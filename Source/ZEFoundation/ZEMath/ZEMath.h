@@ -39,19 +39,19 @@
 
 #include "ZETypes.h"
 
-#define ZE_ZERO_THRESHOLD	0.00000001 
+#define ZE_ZERO_THRESHOLD	 0.00000001 
 #define ZE_INT_MIN			-2147483647
-#define ZE_INT_MAX			2147483647
-#define ZE_UINT_MAX			4294967295
-#define ZE_FLOAT_MAX		3.402823466e+38F 
+#define ZE_INT_MAX			 2147483647
+#define ZE_UINT_MAX			 4294967295
+#define ZE_FLOAT_MAX		 3.402823466e+38F 
 #define ZE_FLOAT_MIN		-3.402823466e+38F
-#define ZE_E				2.71828182845904523536f
-#define ZE_LOG2E			1.44269504088896340736f
-#define ZE_LOG10E			0.434294481903251827651f
-#define ZE_LN2				0.693147180559945309417f
-#define ZE_LN10				2.30258509299404568402f
-#define ZE_SQRT2			1.41421356237309504880f
-#define ZE_SQRT1_2			0.707106781186547524401f
+#define ZE_E				 2.71828182845904523536f
+#define ZE_LOG2E			 1.44269504088896340736f
+#define ZE_LOG10E			 0.434294481903251827651f
+#define ZE_LN2				 0.693147180559945309417f
+#define ZE_LN10				 2.30258509299404568402f
+#define ZE_SQRT2			 1.41421356237309504880f
+#define ZE_SQRT1_2			 0.707106781186547524401f
 
 class ZEMath
 {
@@ -90,7 +90,10 @@ class ZEMath
 		static float		Lerp(float A, float B, float Factor);
 
 		template <typename Type>
-		static Type			Clamp(Type A, Type MinValue, Type MaxValue);
+		static Type			Circular(Type Value, Type MinValue, Type MaxValue);
+
+		template <typename Type>
+		static Type			Clamp(Type Value, Type MinValue, Type MaxValue);
 		
 		template <typename Type>
 		static Type			ClampLower(Type Value, Type MinValue);
@@ -135,7 +138,18 @@ static Type ZEMath::Max(Type A, Type B)
 }
 
 template <typename Type>
-Type ZEMath::Clamp(Type A, Type MinValue, Type MaxValue)
+Type ZEMath::Circular(Type Value, Type MinValue, Type MaxValue)
+{
+	if (Value < MinValue)
+		return MaxValue - (MinValue - Value);
+	else if (Value > MaxValue)
+		return MinValue + (Value - MaxValue);
+	else
+		return Value;
+}
+
+template <typename Type>
+Type ZEMath::Clamp(Type Value, Type MinValue, Type MaxValue)
 {
 	if (Value < MinValue)
 		return MinValue;
@@ -149,7 +163,7 @@ template <typename Type>
 Type ZEMath::ClampLower(Type Value, Type MinValue)
 {
 	if (Value < MinValue)
-		return MaxValue;
+		return MinValue;
 	else
 		return Value;
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureQualityManager.h
+ Zinek Engine - MoonMaterial.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,77 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_TEXTURE_QUALITY_MANAGER_H__
-#define __ZE_TEXTURE_QUALITY_MANAGER_H__
+/************************************************************************/
+/*					        Moon Render Pass		                    */
+/************************************************************************/
 
-class ZEFile;
-class ZETextureData;
-struct ZETextureOptions;
+//------------------------------------------------
+// Samplers
+//------------------------------------------------
+sampler3D 	MoonTexture			: register(s0);
 
-class ZETextureQualityManager
+//------------------------------------------------
+// VS Constants
+//------------------------------------------------
+float4x4	WorldViewProjMat	: register(vs, c0);
+
+//------------------------------------------------
+// PS Constants
+//------------------------------------------------
+float4		MoonParameters		: register(ps, c0);
+
+#define		MoonAmbientColor		MoonParameters.rgb
+#define		MoonLightIntensity		MoonParameters.a
+
+//------------------------------------------------
+// IO Structures
+//------------------------------------------------
+struct VS_INPUT
 {
-	protected:
-						ZETextureQualityManager();
-		virtual			~ZETextureQualityManager();
-
-	public:
-		static bool		Process(ZETextureData* Output, 
-								ZETextureData* TextureData, 
-								ZETextureOptions* FinalOptions );
-		
-		
-		static bool		GetFinalTextureOptions(	ZETextureOptions* FinalOptions, 
-												ZEFile* ResourceFile, 
-												const ZETextureOptions* UserOptions, 
-												const ZEUInt TileCountX = 1, 
-												const ZEUInt TileCountY = 1, 
-												const ZETextureType TextureType = ZE_TT_2D );
-
+	float4 Position			: POSITION0;
+	float3 TextureCoord		: TEXCOORD0;
 };
 
-#endif
+struct VS_OUTPUT
+{
+	float4 Position			: POSITION0;
+	float3 TextureCoord		: TEXCOORD0;
+};
+
+struct PS_INPUT
+{
+	float3 TextureCoord		: TEXCOORD0;
+};
+
+struct PS_OUTPUT
+{
+	float4 PixelColor		: COLOR0;
+};
+
+
+//------------------------------------------------
+// Vertex Shader
+//------------------------------------------------
+VS_OUTPUT vs_main_render_moon(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
+	
+	Output.TextureCoord = Input.TextureCoord;
+
+	Output.Position		= mul(WorldViewProjMat, Input.Position.xyz);
+	Output.Position.z	= Output.Position.w;
+	
+	return Output;
+}
+
+//------------------------------------------------
+// Pixel Shader
+//------------------------------------------------
+PS_OUTPUT ps_main_render_moon(PS_INPUT Input)
+{
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
+
+	Output.PixelColor = MoonLightIntensity * float4(MoonAmbientColor.xyz, 1.0f) * tex3D(MoonTexture, Input.TextureCoord);
+	// Output.PixelColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	return Output;
+}

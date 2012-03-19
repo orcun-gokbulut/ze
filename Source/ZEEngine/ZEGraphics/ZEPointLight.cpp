@@ -99,13 +99,13 @@ void ZEPointLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRende
 	if (FrontShadowMap == NULL)
 	{
 		FrontShadowMap = ZETexture2D::CreateInstance();
-		FrontShadowMap->Create(512, 512, ZE_TPF_F32, true);
+		FrontShadowMap->Create(512, 512, 1, ZE_TPF_F32, true);
 	}
 
 	if (BackShadowMap == NULL)
 	{
 		BackShadowMap = ZETexture2D::CreateInstance();
-		BackShadowMap->Create(512, 512, ZE_TPF_F32, true);
+		BackShadowMap->Create(512, 512, 1, ZE_TPF_F32, true);
 	}
 
 	/*

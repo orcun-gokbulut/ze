@@ -43,7 +43,7 @@
 #include "ZEMath\ZEAABBox.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEMap\ZEPortalMap\ZEPortalMapPortal.h"
-#include <math.h>
+#include "ZETexture2D.h"
 
 
 ZECloudMaterial::ZECloudMaterial()
@@ -67,11 +67,14 @@ ZECloudMaterial::ZECloudMaterial()
 
 	CloudBoundingBox.Max	= ZEVector3::Zero;
 	CloudBoundingBox.Min	= ZEVector3::Zero;
+
+	CloudFormationTexture	= NULL;
 }
 
 ZECloudMaterial::~ZECloudMaterial()
 {
-
+	Camera					= NULL;
+	CloudFormationTexture	= NULL;
 }
 
 void ZECloudMaterial::UpdateParameters(float Time)

@@ -82,13 +82,13 @@ void ZED3D9DOFProcessor::CreateRenderTargets()
 		if (TargetWidth != ColorBufferDS2xBlur->GetWidth() || TargetHeight != ColorBufferDS2xBlur->GetHeight())
 		{
 			ColorBufferDS2xBlur->Release();
-			ColorBufferDS2xBlur->Create(TargetWidth, TargetHeight, ZE_TPF_I8_4, true, 1);
+			ColorBufferDS2xBlur->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
 		}
 	}
 	else // If ColorBufferDS2x not created before
 	{
 		ColorBufferDS2xBlur = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		ColorBufferDS2xBlur->Create(TargetWidth, TargetHeight, ZE_TPF_I8_4, true, 1);
+		ColorBufferDS2xBlur->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
 	}
 
 	// If DepthBufferDS2x created before
@@ -98,13 +98,13 @@ void ZED3D9DOFProcessor::CreateRenderTargets()
 		if (TargetWidth != ColorBufferDS2xTmp->GetWidth() || TargetHeight != ColorBufferDS2xTmp->GetHeight())
 		{
 			ColorBufferDS2xTmp->Release();
-			ColorBufferDS2xTmp->Create(TargetWidth, TargetHeight, ZE_TPF_I8_4, true, 1);
+			ColorBufferDS2xTmp->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
 		}
 	}
 	else // If DepthBufferDS2x not created before
 	{
 		ColorBufferDS2xTmp = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		ColorBufferDS2xTmp->Create(TargetWidth, TargetHeight, ZE_TPF_I8_4, true, 1);
+		ColorBufferDS2xTmp->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
 	}
 }
 

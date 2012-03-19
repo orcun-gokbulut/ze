@@ -56,6 +56,7 @@ class ZETextureCube : public ZETexture
 {
 	protected:
 		ZEUInt						EdgeLength;
+		ZEUInt						LevelCount;
 		ZETexturePixelFormat		PixelFormat;
 		bool						RenderTarget;
 
@@ -64,15 +65,16 @@ class ZETextureCube : public ZETexture
 
 	public:
 		virtual ZETextureType		GetTextureType() const;
+		ZEUInt						GetLevelCount() const;
 		ZEUInt						GetEdgeLenght() const;
 		ZETexturePixelFormat		GetPixelFormat() const;
 		bool						IsRenderTarget() const;
 
 		virtual ZEViewPort*			GetViewPort(ZETextureCubeFace Face) = 0;
 
-		virtual	bool				Create(ZEUInt EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
-		virtual bool				Lock(ZETextureCubeFace Face, void** Buffer, ZESize* Pitch) = 0;
-		virtual void				Unlock(ZETextureCubeFace Face) = 0;
+		virtual	bool				Create(ZEUInt EdgeLength, ZEUInt Levels, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
+		virtual bool				Lock(ZETextureCubeFace Face, ZESize Level, void** Buffer, ZESize* Pitch) = 0;
+		virtual void				Unlock(ZETextureCubeFace Face, ZESize Level) = 0;
 
 		static ZETextureCube*		CreateInstance();
 };

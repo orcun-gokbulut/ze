@@ -68,7 +68,7 @@ bool ZED3D9Texture2D::DeviceRestored()
 {
 	if (RenderTarget)
 	{
-		Create(Width, Height, PixelFormat, true);
+		Create(Width, Height, LevelCount, PixelFormat, true);
 	}
 
 	return true;
@@ -79,16 +79,20 @@ ZEViewPort* ZED3D9Texture2D::GetViewPort()
 	return &ViewPort;
 }
 
-bool ZED3D9Texture2D::Create(ZEUInt Width, ZEUInt Height, ZETexturePixelFormat PixelFormat, bool RenderTarget, ZEUInt MipLevel)
+bool ZED3D9Texture2D::Create(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget)
 {
 	if (Texture != NULL)
-		if (this->Width == Width && this->Height == Height && this->PixelFormat == PixelFormat && this->RenderTarget == RenderTarget)
+	{
+		if (this->Width == Width && this->Height == Height && this->PixelFormat == PixelFormat && this->RenderTarget == RenderTarget && this->LevelCount == LevelCount)
+		{
 			return true;
+		}
 		else
 		{
 			Texture->Release();
 			Texture = NULL;
 		}
+	}
 
 	DWORD Usage;
 	DWORD MipMap;
@@ -96,7 +100,7 @@ bool ZED3D9Texture2D::Create(ZEUInt Width, ZEUInt Height, ZETexturePixelFormat P
 	D3DFORMAT Format;
 
 	Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : 0);
-	MipMap = (RenderTarget ? 1 : MipLevel);
+	MipMap = (RenderTarget ? 1 : LevelCount);
 	Pool = (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
 	Format = ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
 
@@ -108,12 +112,12 @@ bool ZED3D9Texture2D::Create(ZEUInt Width, ZEUInt Height, ZETexturePixelFormat P
 		return false;
 	}
 
-	this->Width = Width;
-	this->Height = Height;
-	this->PixelFormat = PixelFormat;
-	this->RenderTarget = RenderTarget;
-	this->MipLevel = Texture->GetLevelCount();
-
+	this->Width			= Width;
+	this->Height		= Height;
+	this->LevelCount	= LevelCount;
+	this->PixelFormat	= PixelFormat;
+	this->RenderTarget	= RenderTarget;
+	
 	if (RenderTarget)
 	{
 		ZED3D_RELEASE(ViewPort.FrameBuffer);	
@@ -124,17 +128,17 @@ bool ZED3D9Texture2D::Create(ZEUInt Width, ZEUInt Height, ZETexturePixelFormat P
 	return true;
 }
 
-void ZED3D9Texture2D::Lock(void** Buffer, ZESize* Pitch, ZEUInt MipLevel)
+void ZED3D9Texture2D::Lock(void** Buffer, ZESize* Pitch, ZEUInt Level)
 {
 	D3DLOCKED_RECT Rect;
-	Texture->LockRect(MipLevel, &Rect, NULL, NULL);
+	Texture->LockRect(Level, &Rect, NULL, NULL);
 	*Buffer = Rect.pBits;
 	*Pitch = Rect.Pitch;
 }
 
-void ZED3D9Texture2D::Unlock(ZEUInt MipLevel)
+void ZED3D9Texture2D::Unlock(ZEUInt Level)
 {
-	Texture->UnlockRect(MipLevel);
+	Texture->UnlockRect(Level);
 }
 
 void ZED3D9Texture2D::Release()

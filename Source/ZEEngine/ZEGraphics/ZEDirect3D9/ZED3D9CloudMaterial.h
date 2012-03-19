@@ -112,8 +112,7 @@ class ZED3D9CloudMaterial : public ZECloudMaterial, public ZED3D9ComponentBase
 		ZED3D9StaticVertexBuffer*		RenderCloudVertexBuffer;
 		ZED3D9VertexDeclaration*		RenderCloudVertexDeclaration;
 
-		// Textures / Render targets
-		ZED3D9Texture2D*				CloudTexture;
+		// Render targets
 		ZED3D9Texture2D*				CloudShadowBuffer;
 		ZED3D9Texture2D*				CloudDensityBuffer;
 		ZED3D9Texture2D*				CloudDensityBlurBuffer;

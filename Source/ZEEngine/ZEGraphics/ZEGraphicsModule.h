@@ -62,6 +62,7 @@ class ZEPostProcessor;
 class ZEUIMaterial;
 class ZESimpleMaterial;
 class ZESkyBoxMaterial;
+class ZEMoonMaterial;
 class ZESkyDomeMaterial;
 enum ZETextureQuality;
 struct ZETextureOptions;
@@ -153,6 +154,7 @@ class ZEGraphicsModule : public ZEModule
 		virtual ZEUIMaterial*				CreateUIMaterial() = 0;
 		virtual ZECloudMaterial*			CreateCloudMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateFixedMaterial() = 0;
+		virtual ZEMoonMaterial*				CreateMoonMaterial() = 0;
 		virtual ZETerrainMaterial*			CreateTerrainMaterial() = 0;
 		virtual ZESimpleMaterial*			CreateSimpleMaterial() = 0;
 		virtual ZESkyBoxMaterial*			CreateSkyBoxMaterial() = 0;

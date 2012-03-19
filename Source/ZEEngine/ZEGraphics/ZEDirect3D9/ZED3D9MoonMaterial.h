@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureQualityManager.h
+ Zinek Engine - ZED3D9MoonMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,75 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_TEXTURE_QUALITY_MANAGER_H__
-#define __ZE_TEXTURE_QUALITY_MANAGER_H__
+#pragma once
+#ifndef __ZE_D3D9_MOON_MATERIAL_H__
+#define __ZE_D3D9_MOON_MATERIAL_H__
 
-class ZEFile;
-class ZETextureData;
-struct ZETextureOptions;
+#include "ZED3D9ComponentBase.h"
+#include "ZEGraphics/ZEMoonMaterial.h"
+#include "../ZEVertexBuffer.h"
 
-class ZETextureQualityManager
+
+class ZED3D9VertexShader;
+class ZED3D9PixelShader;
+class ZEFrameRenderer;
+class ZERenderCommand;
+class ZED3D9StaticVertexBuffer;
+class ZED3D9VertexDeclaration;
+
+
+struct MoonQuadVertex
 {
-	protected:
-						ZETextureQualityManager();
-		virtual			~ZETextureQualityManager();
-
-	public:
-		static bool		Process(ZETextureData* Output, 
-								ZETextureData* TextureData, 
-								ZETextureOptions* FinalOptions );
-		
-		
-		static bool		GetFinalTextureOptions(	ZETextureOptions* FinalOptions, 
-												ZEFile* ResourceFile, 
-												const ZETextureOptions* UserOptions, 
-												const ZEUInt TileCountX = 1, 
-												const ZEUInt TileCountY = 1, 
-												const ZETextureType TextureType = ZE_TT_2D );
+	float	Position[4];
+	float	TexCoord[3];
 
 };
 
-#endif
+class ZEMoonDynamicVertexBuffer : public ZEDynamicVertexBuffer
+{
+	protected:
+		MoonQuadVertex			Vertices[4];
+
+	private:
+	public:
+								ZEMoonDynamicVertexBuffer();
+		virtual					~ZEMoonDynamicVertexBuffer();
+		
+		virtual ZESize			GetBufferSize();
+		virtual void*			GetVertexBuffer();
+
+};
+
+
+
+class ZED3D9MoonMaterial : public ZEMoonMaterial, public ZED3D9ComponentBase
+{
+	friend class ZED3D9Module;
+
+	private:
+		ZED3D9VertexShader*				MoonVertexShader;
+		ZED3D9PixelShader*				MoonPixelShader;
+		
+		ZEUInt							VertexCount;
+		ZEUInt							PrimitiveCount;
+		ZEMoonDynamicVertexBuffer*		VertexBuffer;
+		ZED3D9VertexDeclaration*		VertexDecleration;
+
+		void							CreateShaders();
+		void							ReleaseShaders();
+
+		void							CreateBuffers();
+		void							ReleaseBuffers();
+
+	protected:
+										ZED3D9MoonMaterial();
+		virtual							~ZED3D9MoonMaterial();
+
+	public:
+		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
+		virtual void					UpdateMaterial();
+		virtual void					Release();
+
+};
+
+#endif	// __ZE_D3D9_MOON_MATERIAL_H__

@@ -449,42 +449,30 @@ void ZED3D9CloudMaterial::CreateRenderTargets()
 	if(CloudShadowBuffer == NULL)
 	{
 		CloudShadowBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Result = CloudShadowBuffer->Create(ZE_CLOUD_SHADOW_BUFFER_WIDTH, ZE_CLOUD_SHADOW_BUFFER_HEIGHT, ZE_TPF_I8_4, true, 1);
+		Result = CloudShadowBuffer->Create(ZE_CLOUD_SHADOW_BUFFER_WIDTH, ZE_CLOUD_SHADOW_BUFFER_HEIGHT, 1, ZE_TPF_I8_4, true);
 		zeAssert(!Result, "Cannot Create ZED3D9Texture2D: \"CloudShadowBuffer at ZED3D9CloudMaterial\".");
 	}
 	
 	if(CloudDensityBuffer == NULL)
 	{
 		CloudDensityBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Result = CloudDensityBuffer->Create(TargetWidth, TargetHeight, ZE_TPF_I8_4, true, 1);
+		Result = CloudDensityBuffer->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
 		zeAssert(!Result, "Cannot Create ZED3D9Texture2D: \"CloudDensityBuffer at ZED3D9CloudMaterial\".");
 	}
 
 	if(CloudDensityBlurBuffer == NULL)
 	{
 		CloudDensityBlurBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Result = CloudDensityBlurBuffer->Create(TargetWidth, TargetHeight, ZE_TPF_I8_4, true, 1);
+		Result = CloudDensityBlurBuffer->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
 		zeAssert(!Result, "Cannot Create ZED3D9Texture2D: \"CloudDensityBlurBuffer at ZED3D9CloudMaterial\".");
-	}
-
-	if(CloudTexture == NULL)
-	{
-		ZETextureOptions TextureOptions = { ZE_TCT_NONE, ZE_TCQ_AUTO, ZE_TDS_NONE,
-											ZE_TFC_ENABLED,	ZE_TMM_DISABLED, 1 };
-		
-		// Load cloud texture
-		ZETexture2DResource* Resource = ZETexture2DResource::LoadSharedResource("Cloud.bmp", &TextureOptions);
-		CloudTexture = (ZED3D9Texture2D*)Resource->GetTexture();
 	}
 }
 
 void ZED3D9CloudMaterial::ReleaseRenderTargets()
 {
-	CloudTexture = NULL;
 	ZED3D_DESTROY(CloudShadowBuffer);
 	ZED3D_DESTROY(CloudDensityBuffer);
 	ZED3D_DESTROY(CloudDensityBlurBuffer);
-
 }
 
 void ZED3D9CloudMaterial::CreateShaders()
@@ -562,7 +550,6 @@ ZED3D9CloudMaterial::ZED3D9CloudMaterial()
 	RenderCloudVertexBuffer			= NULL;
 	RenderCloudVertexDeclaration	= NULL;
 
-	CloudTexture					= NULL;
 	CloudShadowBuffer				= NULL;
 	CloudDensityBuffer				= NULL;
 	CloudDensityBlurBuffer			= NULL;
@@ -662,7 +649,7 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 
 	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)CloudDensityBuffer);
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x0, 1.0f, 0x00);
-	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)CloudTexture, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_WRAP);
+	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)CloudFormationTexture, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_WRAP);
 
 	ZEMatrix4x4	WorldViewProjMatrix;
 	ZEMatrix4x4::Multiply(WorldViewProjMatrix, Renderer->GetCamera()->GetViewProjectionTransform(), RenderCommand->WorldMatrix);

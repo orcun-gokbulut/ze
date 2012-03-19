@@ -51,10 +51,11 @@ struct ZETextureFileHeader
 	ZEUInt32			ChunkId;
 	ZEUInt32			Version;
 
+	ZEUInt32			TextureType;
 	ZEUInt32			PixelFormat;
 
-	ZEUInt32			Depth;
-	ZEUInt32			MipMapCount;
+	ZEUInt32			SurfaceCount;
+	ZEUInt32			LevelCount;
 
 	ZEUInt32			Width;
 	ZEUInt32			Height;	

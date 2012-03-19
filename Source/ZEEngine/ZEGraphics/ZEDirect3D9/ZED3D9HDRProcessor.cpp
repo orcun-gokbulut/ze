@@ -84,74 +84,74 @@ void ZED3D9HDRProcessor::CreateRenderTargets()
 {
 	if (Textures.Luminance5 == NULL)
 		Textures.Luminance5 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	Textures.Luminance5->Create(243, 243, ZE_TPF_F32, true);
+	Textures.Luminance5->Create(243, 243, 1, ZE_TPF_F32, true);
 
 	if (Textures.Luminance4 == NULL)
 		Textures.Luminance4 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	Textures.Luminance4->Create(81, 81, ZE_TPF_F32, true);
+	Textures.Luminance4->Create(81, 81, 1, ZE_TPF_F32, true);
 
 	if (Textures.Luminance3 == NULL)
 		Textures.Luminance3 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	Textures.Luminance3->Create(27, 27, ZE_TPF_F32, true);
+	Textures.Luminance3->Create(27, 27, 1, ZE_TPF_F32, true);
 
 	if (Textures.Luminance2 == NULL)
 		Textures.Luminance2 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	Textures.Luminance2->Create(9, 9, ZE_TPF_F32, true);
+	Textures.Luminance2->Create(9, 9, 1, ZE_TPF_F32, true);
 
 	if (Textures.Luminance1 == NULL)
 		Textures.Luminance1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	Textures.Luminance1->Create(3, 3, ZE_TPF_F32, true);
+	Textures.Luminance1->Create(3, 3, 1, ZE_TPF_F32, true);
 
 	if (Textures.Luminance == NULL)
 		Textures.Luminance = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	Textures.Luminance->Create(1, 1, ZE_TPF_F32, true);
+	Textures.Luminance->Create(1, 1, 1, ZE_TPF_F32, true);
 
 	if (Textures.OldLuminance == NULL)
 		Textures.OldLuminance = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	Textures.OldLuminance->Create(1, 1, ZE_TPF_F32, true);
+	Textures.OldLuminance->Create(1, 1, 1, ZE_TPF_F32, true);
 
 	if (Textures.DownSampled2xA == NULL)
 		Textures.DownSampled2xA = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	Textures.DownSampled2xA->Create(Input->GetWidth() / 2, Input->GetHeight() / 2, ZE_TPF_I8_4, true);
+	Textures.DownSampled2xA->Create(Input->GetWidth() / 2, Input->GetHeight() / 2, 1, ZE_TPF_I8_4, true);
 
 	if (IntParameters.BloomPassCount > 0)
 	{	
 		if (Textures.DownSampled2xB == NULL)
 			Textures.DownSampled2xB = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled2xB->Create(Input->GetWidth() / 2, Input->GetHeight() / 2, ZE_TPF_I8_4, true);
+		Textures.DownSampled2xB->Create(Input->GetWidth() / 2, Input->GetHeight() / 2, 1, ZE_TPF_I8_4, true);
 	}
 
 	if (IntParameters.BloomPassCount > 1)
 	{
 		if (Textures.DownSampled4xA == NULL)
 			Textures.DownSampled4xA = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled4xA->Create(Input->GetWidth() / 4, Input->GetHeight() / 4, ZE_TPF_I8_4, true);
+		Textures.DownSampled4xA->Create(Input->GetWidth() / 4, Input->GetHeight() / 4, 1, ZE_TPF_I8_4, true);
 
 		if (Textures.DownSampled4xB == NULL)
 			Textures.DownSampled4xB = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled4xB->Create(Input->GetWidth() / 4, Input->GetHeight() / 4, ZE_TPF_I8_4, true);
+		Textures.DownSampled4xB->Create(Input->GetWidth() / 4, Input->GetHeight() / 4, 1, ZE_TPF_I8_4, true);
 	}
 
 	if (IntParameters.BloomPassCount > 2)
 	{
 		if (Textures.DownSampled8xA == NULL)
 			Textures.DownSampled8xA = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled8xA->Create(Input->GetWidth() / 8, Input->GetHeight() / 8, ZE_TPF_I8_4, true);
+		Textures.DownSampled8xA->Create(Input->GetWidth() / 8, Input->GetHeight() / 8, 1, ZE_TPF_I8_4, true);
 
 		if (Textures.DownSampled8xB == NULL)
 			Textures.DownSampled8xB = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled8xB->Create(Input->GetWidth() / 8, Input->GetHeight() / 8, ZE_TPF_I8_4, true);
+		Textures.DownSampled8xB->Create(Input->GetWidth() / 8, Input->GetHeight() / 8, 1, ZE_TPF_I8_4, true);
 	}
 
 	if (IntParameters.BloomPassCount > 3)
 	{
 		if (Textures.DownSampled16xA == NULL)
 			Textures.DownSampled16xA = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled16xA->Create(Input->GetWidth() / 16, Input->GetHeight() / 16, ZE_TPF_I8_4, true);
+		Textures.DownSampled16xA->Create(Input->GetWidth() / 16, Input->GetHeight() / 16, 1, ZE_TPF_I8_4, true);
 
 		if (Textures.DownSampled16xB == NULL)
 			Textures.DownSampled16xB = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled16xB->Create(Input->GetWidth() / 16, Input->GetHeight() / 16, ZE_TPF_I8_4, true);
+		Textures.DownSampled16xB->Create(Input->GetWidth() / 16, Input->GetHeight() / 16, 1, ZE_TPF_I8_4, true);
 	}
 }
 

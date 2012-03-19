@@ -46,7 +46,7 @@ ZED3D9Texture3D::ZED3D9Texture3D()
 
 ZED3D9Texture3D::~ZED3D9Texture3D()
 {
-	Release();
+	this->Release();
 }
 
 bool ZED3D9Texture3D::IsEmpty() const
@@ -63,39 +63,49 @@ bool ZED3D9Texture3D::DeviceRestored()
 	return true;
 }
 
-bool ZED3D9Texture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat)
+bool ZED3D9Texture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat)
 {
 	if (VolumeTexture != NULL)
 		VolumeTexture->Release();
 
 	HRESULT Hr;
-	Hr = GetDevice()->CreateVolumeTexture(Width, Height, Depth, 0, D3DUSAGE_AUTOGENMIPMAP, ZED3D9CommonTools::ConvertPixelFormat(PixelFormat), D3DPOOL_MANAGED, &VolumeTexture, NULL);  
+	Hr = GetDevice()->CreateVolumeTexture(Width, Height, Depth, LevelCount, 0, ZED3D9CommonTools::ConvertPixelFormat(PixelFormat), D3DPOOL_MANAGED, &VolumeTexture, NULL);  
 	if (Hr != D3D_OK)
 	{
 		zeError("Can not create volume texture resource.");
 		return false;
 	}
 
-	this->PixelFormat = PixelFormat;
-	this->Width = Width;
-	this->Height = Height;
-	this->Depth = Depth;
-
+	this->PixelFormat	= PixelFormat;
+	this->LevelCount	= LevelCount;
+	this->Depth			= Depth;
+	this->Width			= Width;
+	this->Height		= Height;
+	
 	return true;
 }
 
-void ZED3D9Texture3D::Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch)
+void ZED3D9Texture3D::Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZESize Level)
 {
-	D3DLOCKED_BOX Box;
-	VolumeTexture->LockBox(0, &Box, NULL, D3DLOCK_DISCARD);
+	HRESULT Hr;
+	
+	D3DLOCKED_BOX Box = {0};
+	Hr = VolumeTexture->LockBox(Level, &Box, NULL, 0);
+
+	if (Hr != D3D_OK)
+	{
+		zeError("Can not lock 3D texture.");
+		return;
+	}
+
 	*Buffer = Box.pBits;
 	*RowPitch = Box.RowPitch;
 	*SlicePitch = Box.SlicePitch;
 }
 
-void ZED3D9Texture3D::Unlock()
+void ZED3D9Texture3D::Unlock(ZEUInt Level)
 {
-	VolumeTexture->UnlockBox(0);
+	VolumeTexture->UnlockBox(Level);
 }
 
 void ZED3D9Texture3D::Release()

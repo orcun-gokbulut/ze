@@ -131,15 +131,15 @@ void ZED3D9MLAAProcessor::CreateRenderTargets()
 	this->DestroyRenderTargets();
 	
 	EdgeBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	Result = EdgeBuffer->Create(TargetWidth, TargetHeight, ZE_TPF_I8_4, true, 1);
+	Result = EdgeBuffer->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
 	zeAssert(!Result, "Cannot Create ZED3D9Texture2D: \"EdgeBuffer at ZED3D9MLAAProcessor\".");
 
 	BlendWeightBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	Result = BlendWeightBuffer->Create(TargetWidth, TargetHeight, ZE_TPF_I8_4, true, 1);
+	Result = BlendWeightBuffer->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
 	zeAssert(!Result, "Cannot Create ZED3D9Texture2D: \"BlendWeightBuffer at ZED3D9MLAAProcessor\".");
 	
 	AreaBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	Result = AreaBuffer->Create(ZE_MLAA_AREA_IMAGE_WIDTH, ZE_MLAA_AREA_IMAGE_HEIGHT, ZE_TPF_I8_4, false, 1);
+	Result = AreaBuffer->Create(ZE_MLAA_AREA_IMAGE_WIDTH, ZE_MLAA_AREA_IMAGE_HEIGHT, 1, ZE_TPF_I8_4, false);
 	zeAssert(!Result, "Cannot Create ZED3D9Texture2D: \"AreaBuffer at ZED3D9MLAAProcessor\".");
 
 	unsigned char* AreaImage = GetD3D9LMAAProcessorAreaImage();

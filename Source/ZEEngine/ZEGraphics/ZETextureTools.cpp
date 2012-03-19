@@ -33,11 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <windows.h>
-#include <ATI_Compress.h>
-
-
-
 #include "ZEError.h"
 #include "ZEFile/ZEFile.h"
 #include "ZECore/ZEConsole.h"
@@ -47,35 +42,141 @@
 #include "ZEGraphics/ZETexture2DResource.h"
 #include "zedirect3d9/ZED3D9TextureResizer.h"
 
+#include <windows.h>
+#include <ATI_Compress.h>
+
 
 ZETextureTools::ZETextureTools()
 {
-	/* Empty */
+	
 }
+
 ZETextureTools::~ZETextureTools()
 {
-	/* Empty */
+	
 }
 
-// Is texture resizeable by 2
-bool ZETextureTools::IsResizeable(ZEUInt Width, ZEUInt Height)
+// Is texture compressible by DXTn/BCn
+// Independent of texture type and surface count
+bool ZETextureTools::IsCompressible(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount, const ZEUInt VertTileCount)
 {
-	return (((Width & (Width - 1)) != 0) || ((Height & (Height - 1)) != 0)) ? false : true;
+	ZEUInt TileWidth = Width / HorizTileCount;
+	ZEUInt TileHeight = Height / VertTileCount;
+
+	zeAssert(TileWidth == 0 || TileHeight == 0, "Tile width or tile height is zero.");
+
+	return ((TileWidth % 4 == 0) || (TileHeight % 4 == 0)) ? true : false;
 }
 
-// Is texture compressible by DXT3/BC2
-bool ZETextureTools::IsCompressible(ZEUInt Width, ZEUInt Height)
+// Surface count is used only when texture type is 3D 
+bool ZETextureTools::IsResizeable(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount, const ZEUInt VertTileCount, const ZETextureType TextureType)
 {
-	return ((Width % 4 != 0) || (Height % 4 != 0)) ? false : true;
+	switch (TextureType)
+	{
+		case ZE_TT_2D:
+		{
+			if (Width < 2 || Height < 2)
+			{
+				return false;
+			}
+			else
+			{
+				return ((Width & (Width - 1)) == 0) && ((Height & (Height - 1)) == 0) ? true : false;
+			}
+
+			break;
+		}
+
+		case ZE_TT_CUBE:
+		{
+			ZEUInt TileWidth = Width / HorizTileCount;
+			ZEUInt TileHeight = Height / VertTileCount;
+
+			if (TileWidth < 2 || TileHeight < 2)
+			{
+				return false;
+			}
+			else
+			{
+				return ((TileWidth & (TileWidth - 1)) == 0) && ((TileHeight & (TileHeight - 1)) == 0) ? true : false;
+			}
+			
+			break;
+		}
+			
+		case ZE_TT_3D:
+		{
+			ZEUInt TileWidth = Width / HorizTileCount;
+			ZEUInt TileHeight = Height / VertTileCount;
+			ZEUInt SurfaceCount = HorizTileCount * VertTileCount;
+
+			if (TileWidth < 2 || TileHeight < 2 || SurfaceCount < 2)
+			{
+				return false;
+			}
+			else
+			{
+				return (((TileWidth & (TileWidth - 1)) == 0) && ((TileHeight & (TileHeight - 1)) == 0) && ((SurfaceCount & (SurfaceCount - 1)) == 0)) ? true : false;
+			}
+
+			break;
+		}
+			
+		default:
+		{
+			return false;
+			break;
+		}
+	}
 }
 
-ZEUInt ZETextureTools::GetMaxMipmapCount(ZEUInt Width, ZEUInt Height)
+// Surface count is used only when texture type is 3D 
+ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount, const ZEUInt VertTileCount, const ZETextureType TextureType)
 {
-	ZEUInt WidthCount = (ZEUInt)(ZEMath::Log((float)Width) / ZEMath::Log(2.0f));
-	ZEUInt HeightCount = (ZEUInt)(ZEMath::Log((float)Height) / ZEMath::Log(2.0f));
+	if (!IsResizeable(Width, Height, HorizTileCount, VertTileCount, TextureType))
+	{
+		return 1;
+	}
+	
+	switch (TextureType)
+	{
+		case ZE_TT_2D:
+		{
+			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)Width) / ZEMath::Log(2.0f));
+			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)Height) / ZEMath::Log(2.0f));
+			return ZEMath::Min(MaxMipX, MaxMipY) + 1;
+			break;
+		}
+		case ZE_TT_CUBE:
+		{
+			ZEUInt TileWidth = Width / HorizTileCount;
+			ZEUInt TileHeight = Height / VertTileCount;
+			
+			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)TileWidth) / ZEMath::Log(2.0f));
+			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)TileHeight) / ZEMath::Log(2.0f));
+			return ZEMath::Min(MaxMipX, MaxMipY) + 1;
+			break;
+		}
+			
+		case ZE_TT_3D:
+		{
+			ZEUInt TileWidth = Width / HorizTileCount;
+			ZEUInt TileHeight = Height / VertTileCount;
+			ZEUInt SurfaceCount = HorizTileCount * VertTileCount;
 
-	/* also counts the original (level 0) texture as a mipmap */
-	return WidthCount >= HeightCount ? HeightCount + 1 : WidthCount + 1;
+			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)Width) / ZEMath::Log(2.0f));
+			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)Height) / ZEMath::Log(2.0f));
+			ZEUInt MaxMipZ	= (ZEUInt)(ZEMath::Log((float)SurfaceCount) / ZEMath::Log(2.0f));
+			return ZEMath::Min(ZEMath::Min(MaxMipX, MaxMipY), MaxMipZ) + 1;
+			break;
+		}
+		
+		default:
+		{
+			return 1;
+			break;
+		}
+	}
 }
 
 void ZETextureTools::CompressTexture(void* DestinationData, ZEUInt DestinationPitch, void* SourceData, ZEUInt	SourcePitch, ZEUInt SourceWidth, ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions)
@@ -124,27 +225,28 @@ void ZETextureTools::CompressTexture(void* DestinationData, ZEUInt DestinationPi
 	};
 
 	ATI_TC_Texture srcTexture;
-	srcTexture.dwSize = sizeof(srcTexture);
-	srcTexture.dwWidth = SourceWidth;
-	srcTexture.dwHeight = SourceHeight;
-	srcTexture.dwPitch = SourcePitch;
-	srcTexture.format = ATI_TC_FORMAT_ARGB_8888;
-	srcTexture.pData = (ATI_TC_BYTE*)SourceData;
-	srcTexture.dwDataSize = ATI_TC_CalculateBufferSize(&srcTexture);
+	srcTexture.dwSize		= sizeof(srcTexture);
+	srcTexture.dwWidth		= SourceWidth;
+	srcTexture.dwHeight		= SourceHeight;
+	srcTexture.dwPitch		= SourcePitch;
+	srcTexture.format		= ATI_TC_FORMAT_ARGB_8888;
+	srcTexture.pData		= (ATI_TC_BYTE*)SourceData;
+	srcTexture.dwDataSize	= ATI_TC_CalculateBufferSize(&srcTexture);
 
 	ATI_TC_Texture destTexture;  
-	destTexture.dwSize = sizeof(destTexture);
-	destTexture.dwWidth = SourceWidth;
-	destTexture.dwHeight = SourceHeight;
-	destTexture.dwPitch = DestinationPitch;
-	destTexture.format = Format;
-	destTexture.pData = (ATI_TC_BYTE*)DestinationData;
-	destTexture.dwDataSize = ATI_TC_CalculateBufferSize(&destTexture);
+	destTexture.dwSize		= sizeof(destTexture);
+	destTexture.dwWidth		= SourceWidth;
+	destTexture.dwHeight	= SourceHeight;
+	destTexture.dwPitch		= DestinationPitch;
+	destTexture.format		= Format;
+	destTexture.pData		= (ATI_TC_BYTE*)DestinationData;
+	destTexture.dwDataSize	= ATI_TC_CalculateBufferSize(&destTexture);
 
 	ATI_TC_CompressOptions options;
 	memset(&options, 0, sizeof(options));
-	options.dwSize = sizeof(options);
-	options.nCompressionSpeed = Speed;
+
+	options.dwSize				= sizeof(options);
+	options.nCompressionSpeed	= Speed;
 
 	ATI_TC_ConvertTexture(&srcTexture, &destTexture, &options, NULL, NULL, NULL);
 }
@@ -240,5 +342,38 @@ void ZETextureTools::CopyTexture(void* DestData, ZEUInt DestPitch, void* SourceD
 	for (ZEUInt I = 0; I < RowCount; I++)
 	{
 		memcpy((unsigned char*)DestData + I * DestPitch, (unsigned char*)SourceData + SourcePitch, RowSize);
+	}
+}
+
+// Takes average of two uncompressed image which have same dimensions
+void ZETextureTools::Average(void* DestinationData, const ZEUInt DestinationPitch, const void* SourceData1, const ZEUInt SourcePitch1, const ZEUInt SourceWidth1, const ZEUInt SourceHeight1, const void* SourceData2, const ZEUInt SourcePitch2, const ZEUInt SourceWidth2, const ZEUInt SourceHeight2)
+{
+	if (SourceHeight1 != SourceHeight2 || SourceWidth1 != SourceWidth2)
+	{
+		zeError("Cannot calculate average of two image with different dimensions");
+		return;
+	}
+
+	struct ZEColorARGB
+	{
+		ZEUInt8 Alpha;
+		ZEUInt8 Red;
+		ZEUInt8 Blue;
+		ZEUInt8 Green;
+	};
+
+	for (ZESize y = 0; y < SourceHeight1; y++)
+	{
+		for (ZESize x = 0; x < SourceWidth1; x++)
+		{
+			ZEColorARGB* Source1 = (ZEColorARGB*)((ZEUInt8*)SourceData1 + SourcePitch1 * y + x * 4);
+			ZEColorARGB* Source2 = (ZEColorARGB*)((ZEUInt8*)SourceData2 + SourcePitch2 * y + x * 4);
+			ZEColorARGB* Destination = (ZEColorARGB*)((ZEUInt8*)DestinationData + DestinationPitch * y + x * 4);
+
+			Destination->Alpha	= (Source1->Alpha + Source2->Alpha) / 2;
+			Destination->Green	= (Source1->Green + Source2->Green) / 2;
+			Destination->Blue	= (Source1->Blue + Source2->Blue) / 2;
+			Destination->Red	= (Source1->Red + Source2->Red) / 2;
+		}
 	}
 }

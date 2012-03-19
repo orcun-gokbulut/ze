@@ -47,6 +47,95 @@
 #define ZE_TC_BLOCK_HEIGHT	4 // Pixels
 #define ZE_PIXEL_SIZE		4 // Bytes
 
+static bool IsCompressed(ZETexturePixelFormat PixelFormat)
+{
+	switch (PixelFormat)
+	{
+		case ZE_TPF_DXT1:
+		case ZE_TPF_DXT3:
+		case ZE_TPF_DXT5:
+			return true;
+			break;
+		default:
+			return false;
+			break;
+	}
+
+	return false;
+}
+
+static ZEUInt GetDownSampleCount(ZETextureDownSampling DownSample)
+{
+	switch (DownSample)
+	{
+		case ZE_TDS_NONE:
+			return 0;
+			break;
+		case ZE_TDS_2X:
+			return 1;
+			break;
+		case ZE_TDS_4X:
+			return 2;
+			break;
+		case ZE_TDS_8X:
+			return 3;
+			break;
+		default:
+			zeWarning("Unknown Down Sampling type.");
+			return 0;
+			break;
+	}
+
+	return 0;
+}
+
+static ZETexturePixelFormat GetPixelFormat(ZETextureCompressionType CompressionType)
+{
+	switch (CompressionType)
+	{
+		case ZE_TCT_DXT1:
+			return ZE_TPF_DXT1;
+			break;
+		case ZE_TCT_DXT3:
+			return ZE_TPF_DXT3;
+			break;
+		case ZE_TCT_DXT5:
+			return ZE_TPF_DXT5;
+			break;
+		default:
+			zeWarning("Unknown Compression Type");
+			return ZE_TPF_NOTSET;
+			break;
+	}
+
+	return ZE_TPF_NOTSET;
+}
+
+static ZETextureCompressionType GetCompressionType(ZETexturePixelFormat PixelFormat)
+{
+	switch (PixelFormat)
+	{
+		case ZE_TPF_I8_4:
+			return ZE_TCT_NONE;
+			break;
+		case ZE_TPF_DXT1:
+			return ZE_TCT_DXT1;
+			break;
+		case ZE_TPF_DXT3:
+			return ZE_TCT_DXT3;
+			break;
+		case ZE_TPF_DXT5:
+			return ZE_TCT_DXT5;
+			break;
+		default:
+			zeWarning("Unknown Pixel Format");
+			return ZE_TCT_NONE;
+			break;
+	}
+
+	return ZE_TCT_NONE;
+}
+
 ZETextureQualityManager::ZETextureQualityManager()
 {
 	// Empty
@@ -57,194 +146,558 @@ ZETextureQualityManager::~ZETextureQualityManager()
 	// Empty
 }
 
-bool ZETextureQualityManager::Process(ZETextureData* TextureData, ZETextureOptions* FinalOptions)
+bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* TextureData, ZETextureOptions* FinalOptions)
 {
 	// If texture data is empty
 	if(TextureData->IsEmpty())
 	{
-		zeLog("Texture data is empty.");
+		zeWarning("Cannot process texture data. Texture data is empty.");
 		return false;
 	}
 
-	if (FinalOptions->CompressionType == ZE_TCT_NONE &&
-		FinalOptions->DownSample == ZE_TDS_NONE &&
-		FinalOptions->MipMapping == ZE_TMM_DISABLED)
-		return true;
-
-	ZEUInt OutputBlockSize = 0;
-	ZEUInt InputBlockWidth = 0;
-	ZEUInt InputBlockHeight = 0;
-
-	// Decide pixel format and block properties
-	ZETexturePixelFormat PixelFormat;
-	switch(FinalOptions->CompressionType)
+	// Empty Output
+	if (!Output->IsEmpty())
 	{
-		case ZE_TCT_NONE:
-			PixelFormat			= ZE_TPF_I8_4;
-			InputBlockWidth		= 1; // Pixels
-			InputBlockHeight	= 1; // Pixels
-			OutputBlockSize		= 4; // Bytes
-			break;	
-	
-		case ZE_TCT_DXT1:
-			PixelFormat			= ZE_TPF_DXT1;
-			InputBlockWidth		= ZE_TC_BLOCK_WIDTH;  // Pixels
-			InputBlockHeight	= ZE_TC_BLOCK_HEIGHT; // Pixels
-			OutputBlockSize		= 8; // Bytes
-			break;
-
-		case ZE_TCT_DXT3:
-			PixelFormat			= ZE_TPF_DXT3;
-			InputBlockWidth		= ZE_TC_BLOCK_WIDTH;  // Pixels
-			InputBlockHeight	= ZE_TC_BLOCK_HEIGHT; // Pixels
-			OutputBlockSize		= 16; // Bytes
-			break;
-
-		case ZE_TCT_DXT5:
-			PixelFormat			= ZE_TPF_DXT5;
-			InputBlockWidth		= ZE_TC_BLOCK_WIDTH;  // Pixels
-			InputBlockHeight	= ZE_TC_BLOCK_HEIGHT; // Pixels
-			OutputBlockSize		= 16; // Bytes
-			break;
+		zeWarning("Output Texture data is not empty. Clearing it.");
+		Output->DestroyTexture();
 	}
 
-	ZEUInt MipmapCount	= FinalOptions->MaximumMipmapLevel;
-	ZEUInt SurfaceCount	= TextureData->GetDepth();
-	ZEUInt Width			= TextureData->GetWidth();
-	ZEUInt Height			= TextureData->GetHeight();
-	
-	bool Compress = FinalOptions->CompressionType == ZE_TCT_NONE ? false : true;
-	bool Mipmap = FinalOptions->MipMapping == ZE_TMM_DISABLED ? false : true;
-
-	// Create the temp buffer
-	void* Buffer = (void*)malloc(TextureData->GetMipmapDataSize(0, 0));
-	ZEUInt BufferPitch = TextureData->GetMipmapRowSize(0, 0);
-
-	// Add new mipmaps if it is needed
-	if(Mipmap && FinalOptions->MaximumMipmapLevel > TextureData->GetMipmapCount())
-		TextureData->AddMipmap(FinalOptions->MaximumMipmapLevel - 1);
-	
-	// For every surface
-	for(ZEUInt I = 0; I < SurfaceCount; I++)
+	// If already compressed
+	if (IsCompressed(TextureData->GetPixelFormat()))
 	{
-		// Get mipmap 0 of surface I to buffer
-		TextureData->CopyMipmapDataTo(I, 0, Buffer, BufferPitch);
+		zeWarning("Texture data is already compressed. Texture will not be processed.");
+		return true;
+	}
 
-		// Downsample if it is needed
-		for(ZEUInt K = 0; K < (ZEUInt)FinalOptions->DownSample; K++)
+	// If nothing requested 
+	if (FinalOptions->CompressionType == ZE_TCT_NONE && FinalOptions->DownSample == ZE_TDS_NONE && FinalOptions->MipMapping == ZE_TMM_DISABLED)
+	{
+		// Copy and return 
+		Output->CreateTexture(*TextureData);
+		return true;
+	}
+
+	// If no change is needed
+	if (FinalOptions->MaximumMipmapLevel == TextureData->GetTextureLevelCount() && FinalOptions->CompressionType == GetCompressionType(TextureData->GetPixelFormat()))
+	{
+		// Copy and return 
+		Output->CreateTexture(*TextureData); 
+		return true;
+	}
+
+	// Process flags
+	bool Compress			= (FinalOptions->CompressionType == ZE_TCT_NONE) ? false : true;
+	bool GenerateMipmaps	= (FinalOptions->MipMapping == ZE_TMM_DISABLED) ? false : true;
+
+	
+	// Create output
+	ZESize DestLevelCount					= (ZESize)FinalOptions->MaximumMipmapLevel;
+	ZESize SrcSurfaceCount					= TextureData->GetTextureSurfaceCount();
+	ZETextureType SrcTextureType			= TextureData->GetTextureType();
+	ZETexturePixelFormat DestPixelFormat	= GetPixelFormat(FinalOptions->CompressionType) == ZE_TPF_NOTSET ? TextureData->GetPixelFormat() : GetPixelFormat(FinalOptions->CompressionType);
+
+	ZESize SrcWidth					= TextureData->GetTextureWidth();
+	ZESize SrcHeight				= TextureData->GetTextureHeight();
+	ZESize SrcLevelCount			= TextureData->GetTextureLevelCount();
+
+	// Get down sample count
+	ZEUInt DownSampleCount			= GetDownSampleCount(FinalOptions->DownSample);
+	
+	Output->CreateTexture(SrcTextureType, DestPixelFormat, SrcSurfaceCount, DestLevelCount, SrcWidth >> DownSampleCount, SrcHeight >> DownSampleCount);
+
+	// Compress and generate MipMaps according to texture type
+	switch (SrcTextureType)
+	{
+		// ----------------------------------------------------------------------
+		// Create single buffer and process single surface
+		// ----------------------------------------------------------------------
+		case ZE_TT_2D:
 		{
-			// Down Sample if requested
-			ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, Width, Height);
-			Width /= 2;
-			Height /= 2;
-		}
+			// Create the temp buffer
+			ZESize BufferSize		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetSize();
+			ZESize BufferPitch		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();
+			void* Buffer			= malloc(BufferSize);
 
-		TextureData->SetWidth(Width);
-		TextureData->SetHeight(Height);
-		TextureData->SetPixelFormat(PixelFormat);
-
-		void* DestData			= 0;
-		ZEUInt DestPitch	= 0;
-		ZEUInt RowSize	= 0;
-		ZEUInt RowCount	= 0;		
-
-		if (Compress && Mipmap)
-		{
-			// For every mipmap
-			for(ZEUInt J = 0; J < MipmapCount; J++)
+			// Compress and generate MipMaps
+			if (Compress && GenerateMipmaps)
 			{
-				// Do not change the row size and row count for the last 2 mipmaps
-				// Since they wont be compressible, they will have the same data with compressed 4x4 mipmap 
-				if (Width >= 4 && Height >= 4)
-				{
-					// Allocate for the new Mipmap
-					RowSize = (Width / InputBlockWidth) * OutputBlockSize;
-					RowCount = (Height / InputBlockHeight); 
-				}
-				TextureData->AllocateMipmap(I, J, RowSize, RowCount);
+				// Get level 0 of surface 0 to buffer
+				TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).CopyTo(Buffer, BufferPitch);
 
-				DestData = TextureData->GetMipmapData(I, J);
-				DestPitch = TextureData->GetMipmapRowSize(I, J);
-
-				ZETextureTools::CompressTexture(DestData, DestPitch, Buffer, BufferPitch, Width, Height, FinalOptions);
-				if (Width >= 4 && Height >= 4)
+				// Resize if it is requested
+				for(ZEUInt K = 0; K < DownSampleCount; ++K)
 				{
-					ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, Width, Height, false);
-					Width /= 2;
-					Height /= 2;
+					ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, SrcWidth >> K, SrcHeight >> K);
 				}
+
+				// For every level
+				for(ZESize Level = 0; Level < DestLevelCount; ++Level)
+				{
+					void* DestData		= Output->GetSurfaces().GetItem(0).GetLevels().GetItem(Level).GetData();
+					ZESize DestPitch	= Output->GetSurfaces().GetItem(0).GetLevels().GetItem(Level).GetPitch();
+
+					// Compress
+					ZETextureTools::CompressTexture(DestData, DestPitch, Buffer, BufferPitch, SrcWidth >> (DownSampleCount + Level), SrcHeight >> (DownSampleCount + Level), FinalOptions);
+
+					// Do not resize the last 2 levels since 4x4 block is needed for compression
+					if (SrcWidth > 4 && SrcHeight > 4)
+					{
+						ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, SrcWidth >> (DownSampleCount + Level), SrcHeight >> (DownSampleCount + Level), true);
+					}
+				}
+
 			}
-			
-		}
-		else if (Compress && !Mipmap)
-		{
-			// For every mipmap
-			for(ZEUInt J = 0; J < MipmapCount; J++)
+			// Compress but do not generate MipMaps
+			else if (Compress && !GenerateMipmaps)
 			{
-				// Allocate for the new Mipmap
-				RowSize = (Width / InputBlockWidth) * OutputBlockSize;
-				RowCount = (Height / InputBlockHeight); 
-				TextureData->AllocateMipmap(I, J, RowSize, RowCount);
+				// Get level 0 of surface 0 to buffer
+				TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).CopyTo(Buffer, BufferPitch);
 
-				DestData = TextureData->GetMipmapData(I, J);
-				DestPitch = TextureData->GetMipmapRowSize(I, J);
+				// Resize if it is requested
+				for(ZEUInt K = 0; K < DownSampleCount; ++K)
+				{
+					ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, SrcWidth >> K, SrcHeight >> K);
+				}
+
+				// Compress the only level
+				void* DestData		= Output->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetData();
+				ZESize DestPitch	= Output->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();
 
 				// Compress and send the result to destination
-				ZETextureTools::CompressTexture(DestData, DestPitch, Buffer, BufferPitch, Width, Height, FinalOptions);
+				ZETextureTools::CompressTexture(DestData, DestPitch, Buffer, BufferPitch, SrcWidth >> DownSampleCount, SrcHeight >> DownSampleCount, FinalOptions);
+				
 			}
-		}
-		else if (!Compress && Mipmap)
-		{
-			// For every mipmap
-			for(ZEUInt J = 0; J < MipmapCount; J++)
+			// Do not compress but generate MipMaps
+			else if (!Compress && GenerateMipmaps)
 			{
-				// Allocate for the new Mipmap
-				RowSize = (Width / InputBlockWidth) * OutputBlockSize;
-				RowCount = (Height / InputBlockHeight); 
-				TextureData->AllocateMipmap(I, J, RowSize, RowCount);
-	
-				DestData = TextureData->GetMipmapData(I, J);
-				DestPitch = TextureData->GetMipmapRowSize(I, J);
+				// Get level 0 of surface 0 to buffer
+				TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).CopyTo(Buffer, BufferPitch);
 
-				TextureData->CopyMipmapDataFrom(I, J, Buffer, BufferPitch);
-				ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, Width, Height);
-				Width /= 2;
-				Height /= 2;
+				// Resize if it is requested
+				for(ZEUInt K = 0; K < DownSampleCount; ++K)
+				{
+					ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, SrcWidth >> K, SrcHeight >> K);
+				}
+
+				// For every level
+				for(ZESize Level = 0; Level < DestLevelCount; ++Level)
+				{
+					void* DestData		= Output->GetSurfaces().GetItem(0).GetLevels().GetItem(Level).GetData();
+					ZESize DestPitch	= Output->GetSurfaces().GetItem(0).GetLevels().GetItem(Level).GetPitch();
+
+					// Copy the down sampled level from buffer
+					Output->GetSurfaces().GetItem(0).GetLevels().GetItem(Level).CopyFrom(Buffer, BufferPitch);
+
+					// Down Sample
+					ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, SrcWidth >> (DownSampleCount + Level), SrcHeight >> (DownSampleCount + Level), true);
+				}
+
 			}
-		}
-		else if (!Compress && !Mipmap)
-		{
-			// For every mipmap
-			for(ZEUInt J = 0; J < MipmapCount; J++)
+			// Do not compress and do not generate MipMaps
+			else if (!Compress && !GenerateMipmaps)
 			{
-				// Allocate for the new Mipmap
-				RowSize = (Width / InputBlockWidth) * OutputBlockSize;
-				RowCount = (Height / InputBlockHeight); 
-				TextureData->AllocateMipmap(I, J, RowSize, RowCount);
+				// Get level 0 of surface 0 to buffer
+				TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).CopyTo(Buffer, BufferPitch);
 
-				DestData = TextureData->GetMipmapData(I, J);
-				DestPitch = TextureData->GetMipmapRowSize(I, J);
-
-				TextureData->CopyMipmapDataFrom(I, J, Buffer, BufferPitch);
+				// Initial resize if it is requested
+				for(ZEUInt K = 0; K < DownSampleCount; ++K)
+				{
+					ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, SrcWidth >> K, SrcHeight >> K);
+				}
+				
+				// Copy the only level from buffer
+				Output->GetSurfaces().GetItem(0).GetLevels().GetItem(0).CopyFrom(Buffer, BufferPitch);
 			}
+
+			free(Buffer);
+			return true;
+			break;
 		}
+
+
+		// ----------------------------------------------------------------------
+		// Create single buffer and process 6 surface of cube map
+		// ----------------------------------------------------------------------
+		case ZE_TT_CUBE:
+		{
+			// Create the temp buffer
+			ZESize BufferSize		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetSize();
+			ZESize BufferPitch		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();
+			void* Buffer			= malloc(BufferSize);
+
+			// Compress and generate MipMaps
+			if (Compress && GenerateMipmaps)
+			{
+				// For every surface
+				for(ZESize Surface = 0; Surface < SrcSurfaceCount; ++Surface)
+				{
+					// Get level 0 of surface I into buffer
+					TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).CopyTo(Buffer, BufferPitch);
+
+					// Resize the surface if it is requested
+					for(ZEUInt K = 0; K < DownSampleCount; ++K)
+					{
+						ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, SrcWidth >> K, SrcHeight >> K);
+					}
+
+					// For every level
+					for(ZESize Level = 0; Level < DestLevelCount; ++Level)
+					{
+						void* DestData		= Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetData();
+						ZESize DestPitch	= Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetPitch();
+
+						// Compress
+						ZETextureTools::CompressTexture(DestData, DestPitch, Buffer, BufferPitch, SrcWidth >> (DownSampleCount + Level), SrcHeight >> (DownSampleCount + Level), FinalOptions);
+
+						// Do not resize the last 2 levels since 4x4 block is needed for compression
+						if (SrcWidth > 4 && SrcHeight > 4)
+						{
+							ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, SrcWidth >> (DownSampleCount + Level), SrcHeight >> (DownSampleCount + Level), true);
+						}
+					}
+				}
+			}
+			// Compress but do not generate MipMaps
+			else if (Compress && !GenerateMipmaps)
+			{
+
+				// For every surface
+				for(ZESize Surface = 0; Surface < SrcSurfaceCount; ++Surface)
+				{
+					// Get level 0 of surface I into buffer
+					TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).CopyTo(Buffer, BufferPitch);
+
+					// Resize the surface if it is requested
+					for(ZEUInt K = 0; K < DownSampleCount; ++K)
+					{
+						ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, SrcWidth >> K, SrcHeight >> K);
+					}
+
+					void* DestData		= Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).GetData();
+					ZESize DestPitch	= Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).GetPitch();
+
+					// Compress and send the result to destination
+					ZETextureTools::CompressTexture(DestData, DestPitch, Buffer, BufferPitch, SrcWidth >> DownSampleCount, SrcHeight >> DownSampleCount, FinalOptions);
+
+				}
+			}
+			// Do not compress but generate MipMaps
+			else if (!Compress && GenerateMipmaps)
+			{
+				// For every surface
+				for(ZESize Surface = 0; Surface < SrcSurfaceCount; ++Surface)
+				{
+					// Get level 0 of surface I into buffer
+					TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).CopyTo(Buffer, BufferPitch);
+
+					// Resize the surface if it is requested
+					for(ZEUInt K = 0; K < DownSampleCount; ++K)
+					{
+						ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, SrcWidth >> K, SrcHeight >> K);
+					}
+
+					// For every level
+					for(ZESize Level = 0; Level < DestLevelCount; ++Level)
+					{
+						// Copy the down sampled level from buffer
+						Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyFrom(Buffer, BufferPitch);
+
+						// Down Sample
+						ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, SrcWidth >> (DownSampleCount + Level), SrcHeight >> (DownSampleCount  + Level), true);
+
+					}
+				}
+			}
+			// Do not compress and do not generate MipMaps
+			else if (!Compress && !GenerateMipmaps)
+			{
+		
+				// For every surface
+				for(ZESize Surface = 0; Surface < SrcSurfaceCount; ++Surface)
+				{
+					// Get level 0 of surface I into buffer
+					TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).CopyTo(Buffer, BufferPitch);
+					
+					// Resize the surface if it is requested
+					for(ZEUInt K = 0; K < DownSampleCount; ++K)
+					{
+						ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, SrcWidth >> K, SrcHeight >> K);
+					}
+
+					// Copy the level from buffer to destination level
+					Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).CopyFrom(Buffer, BufferPitch);
+				}
+			}
+
+			free(Buffer);
+			return true;
+			break;
+		}
+
+		// ----------------------------------------------------------------------
+		// Create double buffer & a temp TextureData to process n surface of volume texture
+		// ----------------------------------------------------------------------
+		case ZE_TT_3D:
+		{
+			// Create the temp buffer
+			ZESize BufferSize		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetSize();
+			ZESize BufferPitch		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();
+			void* Buffer1			= malloc(BufferSize);
+			void* Buffer2			= malloc(BufferSize);
+
+			void* TempSurface1		= NULL;	// first slice of 2x2 level
+			void* TempSUrface2		= NULL; // second slice of 2x2 level
+			void* TempSUrface3		= NULL; // 1x1 level
+
+			ZETextureData TempTextureData;
+			TempTextureData.CreateTexture(ZE_TT_3D, TextureData->GetPixelFormat(), SrcSurfaceCount, DestLevelCount, SrcWidth >> DownSampleCount, SrcHeight >> DownSampleCount);
+			
+			// Compress and generate MipMaps
+			if (Compress && GenerateMipmaps)
+			{
+				// First copy all unprocessed level 0 to output as it is
+				for (ZESize Surface = 0; Surface < SrcSurfaceCount; ++Surface)
+				{
+					// Get level 0 of surface I into buffer
+					TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).CopyTo(Buffer1, BufferPitch);
+
+					// Resize the surface if it is requested
+					for(ZEUInt K = 0; K < DownSampleCount; ++K)
+					{
+						ZETextureTools::DownSample2x(Buffer1, BufferPitch, Buffer1, BufferPitch, SrcWidth >> K, SrcHeight >> K);
+					}
+
+					// Write uncompressed data to level 0 
+					TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).CopyFrom(Buffer1, BufferPitch);
+
+					void* DestData		= Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).GetData();
+					ZESize DestPitch	= Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).GetPitch();
+
+					void* SrcData		= TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).GetData();
+					ZESize SrcPitch		= TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).GetPitch();
+					ZESize SrcWidth		= TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).GetWidth();
+					ZESize SrcHeight	= TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).GetHeight();
+
+					// Get data from TempTextureData, Compress and write to Output level 0
+					ZETextureTools::CompressTexture(DestData, DestPitch, SrcData, SrcPitch, SrcWidth, SrcHeight, FinalOptions);
+				}
+
+				// For every valid level starting from 1. (level 0 is already filled)
+				for(ZESize Level = 1,  SurfaceIncrement = 2; Level < DestLevelCount; ++Level, SurfaceIncrement *= 2)
+				{
+					ZESize UpperLevelIncrement = SurfaceIncrement / 2;
+
+					// For every valid surface
+					for(ZESize Surface = 0; Surface < SrcSurfaceCount; Surface += SurfaceIncrement)
+					{
+						// Get 2 upper level data
+						void* SrcData1		= TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level - 1).GetData();
+						ZESize SrcPitch1	= TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level - 1).GetPitch();
+						ZESize SrcWidth1	= TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level - 1).GetWidth();
+						ZESize SrcHeight1	= TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level - 1).GetHeight();
+
+						void* SrcData2		= TempTextureData.GetSurfaces().GetItem(Surface + UpperLevelIncrement).GetLevels().GetItem(Level - 1).GetData();
+						ZESize SrcPitch2	= TempTextureData.GetSurfaces().GetItem(Surface + UpperLevelIncrement).GetLevels().GetItem(Level - 1).GetPitch();
+						ZESize SrcWidth2	= TempTextureData.GetSurfaces().GetItem(Surface + UpperLevelIncrement).GetLevels().GetItem(Level - 1).GetWidth();
+						ZESize SrcHeight2	= TempTextureData.GetSurfaces().GetItem(Surface + UpperLevelIncrement).GetLevels().GetItem(Level - 1).GetHeight();
+
+					//	// Check if it is the level 2x2 and 1x1 levels. if so do not resize since they wont be compressible after the resize
+					//	//if (SrcWidth1 > 4 && SrcHeight1 > 4 && SrcWidth2 > 4 && SrcHeight2 > 4)
+					//	//{
+							// Copy To Buffer
+							TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level - 1).CopyTo(Buffer1, BufferPitch);
+							TempTextureData.GetSurfaces().GetItem(Surface + UpperLevelIncrement).GetLevels().GetItem(Level - 1).CopyTo(Buffer2, BufferPitch);
+
+							// Down Sample each buffer
+							ZETextureTools::DownSample2x(Buffer1, BufferPitch, Buffer1, BufferPitch, SrcWidth1, SrcHeight1, true);
+							ZETextureTools::DownSample2x(Buffer2, BufferPitch, Buffer2, BufferPitch, SrcWidth2, SrcHeight2, true);
+
+							// Average into buffer 1 (for trilinear interpolation)
+							ZETextureTools::Average(Buffer1, BufferPitch, Buffer1, BufferPitch, SrcWidth1, SrcHeight1, Buffer2, BufferPitch, SrcWidth2, SrcHeight2);
+
+							// Copy processed data back to TempTextureData
+							TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyFrom(Buffer1, BufferPitch);
+
+							// Get target info
+							void* DestData		= Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetData();
+							ZESize DestPitch	= Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetPitch();
+
+							// Source info
+							void* SrcData		= TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetData();
+							ZESize SrcPitch		= TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetPitch();
+							ZESize SrcWidth		= TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetWidth();
+							ZESize SrcHeight	= TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetHeight();
+
+							// Compress TempTextureData and write to output
+							ZETextureTools::CompressTexture(DestData, DestPitch, SrcData, SrcPitch, SrcWidth, SrcHeight, FinalOptions);
+					//	}
+					//	else
+					//	{
+					//		// Copy To Buffer
+					//		TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level - 1).CopyTo(Buffer1, BufferPitch);
+					//		TempTextureData.GetSurfaces().GetItem(Surface + UpperLevelIncrement).GetLevels().GetItem(Level - 1).CopyTo(Buffer2, BufferPitch);
+					//
+					//		// Average into buffer 1 (for trilinear interpolation)
+					//		ZETextureTools::Average(Buffer1, BufferPitch, Buffer1, BufferPitch, SrcWidth1, SrcHeight1, Buffer2, BufferPitch, SrcWidth2, SrcHeight2);
+					//	}
+					}
+				}
+				/*
+				// Compress the TempTextureData and write to Output
+				for(ZESize Level = 0,  SurfaceIncrement = 1; Level < DestLevelCount; ++Level, SurfaceIncrement *= 2)
+				{
+					// For every valid surface
+					for(ZESize Surface = 0; Surface < SrcSurfaceCount; Surface += SurfaceIncrement)
+					{
+						void* DestData = Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetData();
+						ZESize DestPitch = Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetPitch();
+						
+						void* SourceData = TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetData();
+						ZESize SourcePitch = TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetPitch();
+						ZESize SourceWidth = TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetWidth();
+						ZESize SourceHeight = TempTextureData.GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetHeight();
+
+						// Compress and send the result to destination
+						ZETextureTools::CompressTexture(DestData, DestPitch, SourceData, SourcePitch, SourceWidth, SourceHeight, FinalOptions);
+					}
+				}
+				*/
+			}
+			// Compress but do not generate MipMaps
+			else if (Compress && !GenerateMipmaps)
+			{
+				// For every surface of source texture
+				for(ZESize Surface = 0; Surface < SrcSurfaceCount; ++Surface)
+				{
+					// Get level 0 of surface I into buffer
+					TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).CopyTo(Buffer1, BufferPitch);
+
+					// Resize the surface if it is requested
+					for(ZEUInt K = 0; K < DownSampleCount; ++K)
+					{
+						ZETextureTools::DownSample2x(Buffer1, BufferPitch, Buffer1, BufferPitch, SrcWidth >> K, SrcHeight >> K);
+					}
+
+					// Get Destination info
+					void* DestData		= Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).GetData();
+					ZESize DestPitch	= Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).GetPitch();
+
+					// Compress and write to destination
+					ZETextureTools::CompressTexture(DestData, DestPitch, Buffer1, BufferPitch, SrcWidth >> DownSampleCount, SrcHeight >> DownSampleCount, FinalOptions);
+
+				}
+			}
+			// Do not compress but generate MipMaps
+			else if (!Compress && GenerateMipmaps)
+			{
+				// First copy all unprocessed level 0 to output as it is
+				for (ZESize Surface = 0; Surface < SrcSurfaceCount; ++Surface)
+				{
+					// Get level 0 of surface I into buffer
+					TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).CopyTo(Buffer1, BufferPitch);
+
+					// Resize the surface if it is requested
+					for(ZEUInt K = 0; K < DownSampleCount; ++K)
+					{
+						ZETextureTools::DownSample2x(Buffer1, BufferPitch, Buffer1, BufferPitch, SrcWidth >> K, SrcHeight >> K);
+					}
+
+					Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).CopyFrom(Buffer1, BufferPitch);
+				}
+
+
+				// For every valid level starting from 1. (level 0 is already filled)
+				for(ZESize Level = 1,  SurfaceIncrement = 2; Level < DestLevelCount; ++Level, SurfaceIncrement *= 2)
+				{
+					ZESize UpperLevelIncrement = SurfaceIncrement / 2;
+
+					// For every valid surface
+					for(ZESize Surface = 0; Surface < SrcSurfaceCount; Surface += SurfaceIncrement)
+					{
+						// Get 2 upper level
+						ZETextureLevel* SourceLevel1 = &Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level - 1);
+						ZETextureLevel* SourceLevel2 = &Output->GetSurfaces().GetItem(Surface + UpperLevelIncrement).GetLevels().GetItem(Level - 1);
+
+						void* SrcData1		= SourceLevel1->GetData();
+						ZESize SrcPitch1	= SourceLevel1->GetPitch();
+						ZESize SrcWidth1	= SourceLevel1->GetWidth();
+						ZESize SrcHeight1	= SourceLevel1->GetHeight();
+
+						void* SrcData2		= SourceLevel2->GetData();
+						ZESize SrcPitch2	= SourceLevel2->GetPitch();
+						ZESize SrcWidth2	= SourceLevel2->GetWidth();
+						ZESize SrcHeight2	= SourceLevel2->GetHeight();
+
+						// Copy To Buffer
+						SourceLevel1->CopyTo(Buffer1, BufferPitch);
+						SourceLevel2->CopyTo(Buffer2, BufferPitch);
+
+						// Down Sample each buffer
+						ZETextureTools::DownSample2x(Buffer1, BufferPitch, Buffer1, BufferPitch, SrcWidth1, SrcHeight1, true);
+						ZETextureTools::DownSample2x(Buffer2, BufferPitch, Buffer2, BufferPitch, SrcWidth2, SrcHeight2, true);
+
+						ZETextureTools::Average(Buffer1, BufferPitch, Buffer1, BufferPitch, SrcWidth1, SrcHeight1, Buffer2, BufferPitch, SrcWidth2, SrcHeight2);
+
+						// Copy processed data back to destination
+						Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyFrom(Buffer1, BufferPitch);
+
+					}
+				}
+			}
+			// Do not compress and do not generate MipMaps
+			else if (!Compress && !GenerateMipmaps)
+			{
+				ZESize SurfaceIncrement = 1;
+
+				// For every level
+				for(ZESize Level = 0; Level < DestLevelCount; ++Level, SurfaceIncrement *= 2)
+				{
+					// For every valid surface
+					for(ZESize Surface = 0; Surface < SrcSurfaceCount; Surface += SurfaceIncrement)
+					{
+						// Get level 0 of surface I into buffer
+						TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(0).CopyTo(Buffer1, BufferPitch);
+
+						// Resize the surface if it is requested
+						for(ZEUInt K = 0; K < DownSampleCount; ++K)
+						{
+							ZETextureTools::DownSample2x(Buffer1, BufferPitch, Buffer1, BufferPitch, SrcWidth >> K, SrcHeight >> K);
+						}
+
+						Output->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyFrom(Buffer1, BufferPitch);
+					}
+				}
+			}
+
+			TempTextureData.DestroyTexture();
+			free(Buffer1);
+			free(Buffer2);
+			return true;
+			break;
+		}
+
+		// Unknown texture type
+		default:
+		{
+			zeError("Unknown texture type. Cannot process texture.");
+			return false;
+			break;
+		}
+
 	}
-	
-	free(Buffer);
-	return true;
+
+	return false;
 }
 
-bool ZETextureQualityManager::GetFinalTextureOptions(ZETextureOptions* FinalOptions, ZEFile* ResourceFile, const ZETextureOptions* UserOptions)
+bool ZETextureQualityManager::GetFinalTextureOptions(ZETextureOptions* FinalOptions, ZEFile* ResourceFile, const ZETextureOptions* UserOptions, const ZEUInt HorizTileCount, const ZEUInt VertTileCount, const ZETextureType TextureType)
 {
 	if(UserOptions == NULL || FinalOptions == NULL)
+	{
+		zeCriticalError("Cannot proceed. UserOptions or FinalOptions is NULL, in function GetFinalTextureOptions()");
 		return false;
+	}
 
-	// Only for test purposes
 	ZETextureOptions *DefaultOptions = zeGraphics->GetTextureOptions();
-	
-	// UNCOMMENT ABOVE LINE AND DELETE BELOW LINE AFTER TEST
-	//static ZETextureOptions Low			= {ZE_TCT_DXT3,	ZE_TCQ_NORMAL,	ZE_TDS_2X,		ZE_TFC_ENABLED,		ZE_TMM_ENABLED, 25};
-	//ZETextureOptions *DefaultOptions = &Low;
 
 	// Eliminate the auto options
 	FinalOptions->CompressionType		= (UserOptions->CompressionType == ZE_TCT_AUTO)		? DefaultOptions->CompressionType		: UserOptions->CompressionType;
@@ -254,47 +707,57 @@ bool ZETextureQualityManager::GetFinalTextureOptions(ZETextureOptions* FinalOpti
 	FinalOptions->FileCaching			= (UserOptions->FileCaching == ZE_TFC_AUTO)			? DefaultOptions->FileCaching			: UserOptions->FileCaching;
 
 	ZETextureInfo TextureInfo = {0};
+	
 	// Tries to get texture info from pack or standalone ZETextureFile
-	// If fails tries to get it from the source image file
 	if(!ZETextureLoader::GetTextureInfo(&TextureInfo, ResourceFile))
 	{
+		// If fails tries to get it from the source image file
 		if(!ZETextureLoader::GetImageInfo(&TextureInfo, ResourceFile))
 		{
 			// There is no more place to look for
-			zeAssert(true, "Cannot get image or texture info. File Path : \"%s\"", ResourceFile->GetFilePath().GetValue());
+			zeCriticalError("Cannot proceed. Resource info is not found in \"%s\".", ResourceFile->GetFilePath().GetValue());
 			return false;
 		}
 	}
 
 	// Creating texture options constrains
-	// Check if it is Resizeable (power of 2)
-	if (!ZETextureTools::IsResizeable(TextureInfo.Width, TextureInfo.Height))
+
+	// Check if it is possible to resize (is it power of 2)
+	if (!ZETextureTools::IsResizeable(TextureInfo.Width, TextureInfo.Height, HorizTileCount, VertTileCount, TextureType))
 	{
+		zeWarning("Texture is not resizeable. Mip Mapping disabled.");
+
 		FinalOptions->DownSample = ZE_TDS_NONE;
 		FinalOptions->MipMapping = ZE_TMM_DISABLED;
 		FinalOptions->MaximumMipmapLevel = 1;
 	}
 
 	// Check if it is Compressible (divisible by 4)
-	if (!ZETextureTools::IsCompressible(TextureInfo.Width, TextureInfo.Height))
+	if (!ZETextureTools::IsCompressible(TextureInfo.Width, TextureInfo.Height, HorizTileCount, VertTileCount))
+	{
+		zeWarning("Texture is not compressible. Compression disabled.");
 		FinalOptions->CompressionType = ZE_TCT_NONE;
+	}
 
 	// If there is MipMapping
 	if (FinalOptions->MipMapping != ZE_TMM_DISABLED)
 	{
 		ZEUInt PossibleMaxMipmapNumber;
-		ZEUInt MipMapCount = ZETextureTools::GetMaxMipmapCount(TextureInfo.Width, TextureInfo.Height);
+		ZEUInt MipMapCount = ZETextureTools::GetMaxMipmapCount(TextureInfo.Width, TextureInfo.Height, HorizTileCount, VertTileCount, TextureType);
 
-		// Subtract the mipmap count if there is a downsample before the process
-		PossibleMaxMipmapNumber = MipMapCount - (ZEUInt)(FinalOptions->DownSample);
-		// Set final mipmap count
-		FinalOptions->MaximumMipmapLevel = (UserOptions->MaximumMipmapLevel > PossibleMaxMipmapNumber) ? PossibleMaxMipmapNumber : UserOptions->MaximumMipmapLevel;
+		// Subtract the level count if there is a down sample before the process
+		ZEInt Test = (ZEInt)MipMapCount - (ZEInt)GetDownSampleCount(FinalOptions->DownSample);
+		// Check if greater than 0
+		PossibleMaxMipmapNumber = Test > 0 ? (ZEUInt)Test : 1;
+		
+		// Set final level count
+		FinalOptions->MaximumMipmapLevel = ZEMath::Min(UserOptions->MaximumMipmapLevel, PossibleMaxMipmapNumber);
 	}
 	else
 	{
 		FinalOptions->MaximumMipmapLevel = 1;
 	}
-		
+	
 
 	return true;
 }

@@ -39,6 +39,7 @@
 #include "ZEDrawParameters.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZEDirect3D9/ZED3D9CloudMaterial.h"
+#include "ZEGraphics/ZETexture2DResource.h"
 
 
 void ZECloud::SetAmbientColor(ZEVector3 Color)
@@ -181,6 +182,32 @@ ZECamera* ZECloud::GetCamera()
 	return Camera;
 }
 
+void ZECloud::SetCloudFormationTexture(const ZEString& FileName)
+{
+	// Load the texture
+	if (CloudFormationTexture != NULL)
+	{
+		CloudFormationTexture->Release();
+		CloudFormationTexture = NULL;
+	}
+
+	ZETextureOptions TextureOption = {
+		ZE_TCT_NONE,
+		ZE_TCQ_LOW,
+		ZE_TDS_NONE,
+		ZE_TFC_DISABLED,
+		ZE_TMM_DISABLED,
+		1
+	};
+
+	CloudFormationTexture = ZETexture2DResource::LoadResource(FileName, &TextureOption);
+}
+
+const ZEString ZECloud::GetCloudFormationTexture() const
+{
+	return (CloudFormationTexture == NULL) ? "" : CloudFormationTexture->GetFileName();
+}
+
 ZEDrawFlags ZECloud::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;
@@ -204,12 +231,14 @@ bool ZECloud::Initialize()
 		CloudMaterial->CloudPlaneHeight			= CloudPlaneHeight;
 		CloudMaterial->SunLightColor			= SunLightColor;
 		CloudMaterial->SunLightDirection		= SunLightDirection;
+
+		if (CloudFormationTexture != NULL)
+			CloudMaterial->CloudFormationTexture = CloudFormationTexture->GetTexture();
 	}
 
 
-
-	CloudRenderCommand.Priority = 4;
-	CloudRenderCommand.Order = 4.0f;
+	CloudRenderCommand.Priority = 1;
+	CloudRenderCommand.Order = 1.3f;
 	CloudRenderCommand.Pipeline = ZE_RORP_3D;
 	CloudRenderCommand.VertexBuffer = (ZEVertexBuffer*)0xfdfdfdfd;
 	CloudRenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
@@ -227,6 +256,12 @@ void ZECloud::Deinitialize()
 	{
 		CloudMaterial->Destroy();
 		CloudMaterial = NULL;
+	}
+
+	if (CloudFormationTexture != NULL)
+	{
+		CloudFormationTexture->Release();
+		CloudFormationTexture = NULL;
 	}
 
 	CloudRenderCommand.SetZero();
@@ -254,8 +289,10 @@ void ZECloud::Draw(ZEDrawParameters* DrawParameters)
 	CloudMaterial->SunLightColor			= SunLightColor;
 	CloudMaterial->SunLightDirection		= SunLightDirection;
 
+	if (CloudFormationTexture != NULL)
+		CloudMaterial->CloudFormationTexture = CloudFormationTexture->GetTexture();
 
-	CloudRenderCommand.Order				= 1.2f;
+	CloudRenderCommand.Order				= 1.3f;
 	CloudRenderCommand.Priority				= 1;
 
 	CloudRenderCommand.VertexBufferOffset	= 0;
@@ -293,6 +330,8 @@ ZECloud::ZECloud()
 	Rayleigh				= ZEVector3(0.3f, 0.45f, 6.5f);
 	Mie						= ZEVector3(0.3f, 0.3f,  0.3f);
 	
+	CloudFormationTexture	= NULL;
+
 }
 
 ZECloud::~ZECloud()

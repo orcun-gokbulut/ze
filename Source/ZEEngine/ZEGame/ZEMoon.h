@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureQualityManager.h
+ Zinek Engine - ZEMoon.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,71 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_TEXTURE_QUALITY_MANAGER_H__
-#define __ZE_TEXTURE_QUALITY_MANAGER_H__
+#pragma once
+#ifndef __ZE_MOON_H__
+#define __ZE_MOON_H__
 
-class ZEFile;
-class ZETextureData;
-struct ZETextureOptions;
 
-class ZETextureQualityManager
+#include "ZETypes.h"
+#include "ZEEntity.h"
+#include "ZEGraphics\ZERenderCommand.h"
+
+
+class ZEMaterial;
+class ZEMoonMaterial;
+class ZETexture3DResource;
+
+
+class ZEMoon : public ZEEntity
 {
 	protected:
-						ZETextureQualityManager();
-		virtual			~ZETextureQualityManager();
+		ZEMoonMaterial*				MoonMaterial;
+		ZETexture3DResource*		MoonTexture;
+		ZERenderCommand				MoonRenderCommand;
+
+		float						MoonPhase;
+		float						MoonScale;
+		float						MoonRotation;
+		float						MoonAmbientFactor;
+		ZEVector3					MoonAmbientColor;
+		ZEVector3					MoonDirection;
+
+									ZEMoon();
+		virtual						~ZEMoon();
+
+	private:
 
 	public:
-		static bool		Process(ZETextureData* Output, 
-								ZETextureData* TextureData, 
-								ZETextureOptions* FinalOptions );
-		
-		
-		static bool		GetFinalTextureOptions(	ZETextureOptions* FinalOptions, 
-												ZEFile* ResourceFile, 
-												const ZETextureOptions* UserOptions, 
-												const ZEUInt TileCountX = 1, 
-												const ZEUInt TileCountY = 1, 
-												const ZETextureType TextureType = ZE_TT_2D );
+		virtual void				SetMoonPhase(float Phase);
+		float						GetMoonPhase() const;
 
+		virtual void				SetMoonScale(float Scale);
+		float						GetMoonScale() const;
+		
+		virtual void				SetMoonRotation(float Rotation);
+		float						GetMoonRotation() const;
+
+		virtual void				SetMoonAmbientFactor(float Value);
+		float						GetMoonAmbientFactor() const;
+		
+		virtual void				SetMoonAmbientColor(ZEVector3& Color);
+		const ZEVector3&			GetMoonAmbientColor() const;
+
+		virtual void				SetMoonDirection(ZEVector3& Direction);
+		const ZEVector3&			GetGetMoonDirection() const;
+
+		virtual void				SetMoonTexture(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
+		const ZEString				GetMoonTexture() const;
+
+		virtual ZEDrawFlags			GetDrawFlags() const;
+
+		virtual bool				Initialize();
+		virtual void				Deinitialize();
+
+		virtual void				Draw(ZEDrawParameters* DrawParameters);
+		virtual void				Tick(float Time);
+
+		static ZEMoon*				CreateInstance();
 };
 
-#endif
+#endif // __ZE_MOON_H__

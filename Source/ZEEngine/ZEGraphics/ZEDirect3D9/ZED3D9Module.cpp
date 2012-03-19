@@ -52,6 +52,7 @@
 #include "ZED3D9UIMaterial.h"
 #include "ZED3D9SimpleMaterial.h"
 #include "ZED3D9SkyBoxMaterial.h"
+#include "ZED3D9MoonMaterial.h"
 #include "ZED3D9ShaderManager.h"
 #include "ZED3D9TerrainMaterial.h"
 #include "ZED3D9CommonTools.h"
@@ -370,14 +371,16 @@ void ZED3D9Module::DeviceRestored()
 	for (ZESize I = 0; I < TextureCubes.GetCount(); I++)
 		TextureCubes[I]->DeviceRestored();
 
-	/*for (ZESize I = 0; I < VertexBuffers.GetCount(); I++)
-		VertexBuffers[I]->DeviceRestored();*/
+	/*
+	for (ZESize I = 0; I < VertexBuffers.GetCount(); I++)
+		VertexBuffers[I]->DeviceRestored();
 
-	/*for (ZESize I = 0; I < Shaders.GetCount(); I++)
+	for (ZESize I = 0; I < Shaders.GetCount(); I++)
 		Shaders[I]->DeviceRestored();
 
 	for (ZESize I = 0; I < PostProcessors.GetCount(); I++)
-		PostProcessors[I]->DeviceRestored();*/
+		PostProcessors[I]->DeviceRestored();
+	*/
 
 	for (ZESize I = 0; I < Renderers.GetCount(); I++)
 		Renderers[I]->DeviceRestored();
@@ -605,6 +608,11 @@ ZETextureCube* ZED3D9Module::CreateTextureCube()
 ZEFixedMaterial* ZED3D9Module::CreateFixedMaterial()
 {
 	return new ZED3D9FixedMaterial();
+}
+
+ZEMoonMaterial* ZED3D9Module::CreateMoonMaterial()
+{
+	return new ZED3D9MoonMaterial();
 }
 
 ZEUIMaterial* ZED3D9Module::CreateUIMaterial()

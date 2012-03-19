@@ -33,90 +33,137 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
 #pragma once
 #ifndef __ZE_TEXTURE_DATA_H__
 #define __ZE_TEXTURE_DATA_H__
 
 #include "ZETypes.h"
 #include "ZETexture.h"
-#include "ZEGraphics/ZETextureOptions.h"
+#include "ZEDS/ZEArray.h"
 
-class ZEFile;
-class ZEPartialFile;
-class ZETextureLoader;
+
+
+// Compressed Dxt1 Block Size
+#define		ZE_DXT_1_COMPRESSION_BLOCK_WIDTH	4	// Pixels
+#define		ZE_DXT_1_COMPRESSION_BLOCK_HEIGHT	4	// Pixels
+#define		ZE_DXT_1_INPUT_BLOCK_SIZE			64	// Bytes
+#define		ZE_DXT_1_OUTPUT_BLOCK_SIZE			8	// Bytes
+
+// Compressed Dxt3 Block Size
+#define		ZE_DXT_3_COMPRESSION_BLOCK_WIDTH	4	// Pixels
+#define		ZE_DXT_3_COMPRESSION_BLOCK_HEIGHT	4	// Pixels
+#define		ZE_DXT_3_INPUT_BLOCK_SIZE			64	// Bytes
+#define		ZE_DXT_3_OUTPUT_BLOCK_SIZE			16	// Bytes
+
+// Compressed Dxt5 Block Size
+#define		ZE_DXT_5_COMPRESSION_BLOCK_WIDTH	4	// Pixels
+#define		ZE_DXT_5_COMPRESSION_BLOCK_HEIGHT	4	// Pixels
+#define		ZE_DXT_5_INPUT_BLOCK_SIZE			64	// Bytes
+#define		ZE_DXT_5_OUTPUT_BLOCK_SIZE			16	// Bytes
+
+// Uncompressed ARGB size
+#define		ZE_I8_4_COMPRESSION_BLOCK_WIDTH		1	// Pixels
+#define		ZE_I8_4_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
+#define		ZE_I8_4_INPUT_BLOCK_SIZE			4	// Bytes
+#define		ZE_I8_4_OUTPUT_BLOCK_SIZE			4	// Bytes
+
+
+class ZETextureData;
+class ZETextureSurface;
+class ZETextureData;
+
+class ZETextureLevel
+{
+	friend class ZETextureSurface;
+	friend class ZETextureData;	
+
+	private:
+		ZETextureSurface*			Owner;
+		ZESize						Level;
+		void*						Data;
+
+	public:
+		ZETextureSurface*			GetOwner();
+
+		ZESize						GetLevel();
+		ZESize						GetWidth();
+		ZESize						GetHeight();
+		ZESize						GetPitch();
+		ZESize						GetRowCount();
+		ZESize						GetSize();
+
+		void*						GetData();
+
+		void						CopyFrom(void* SourceData, ZESize SourcePitch);
+		void						CopyTo(void* Dest, ZESize DestPitch);
+
+									ZETextureLevel();
+		virtual						~ZETextureLevel();
+
+};
+
+
+class ZETextureSurface
+{
+	friend class ZETextureData;
+
+	private:
+		ZESize						Surface;
+		ZETextureData*			Owner;
+		ZEArray<ZETextureLevel>		Levels;
+
+	public:
+		ZESize						GetSurface();
+		ZETextureData*			GetOwner();
+		ZEArray<ZETextureLevel>&	GetLevels();
+
+		ZESize						GetSize();
+
+									ZETextureSurface();
+		virtual						~ZETextureSurface();
+
+};
+
 
 class ZETextureData
 {
-	protected:
-		// Empty
-	
 	private:
-		struct TextureData
-		{
-			ZETexturePixelFormat	PixelFormat;
-			
-			ZEUInt					Width;
-			ZEUInt					Height;
-			ZEUInt 					Depth;
-			ZEUInt 					MipmapCount;
-			
-			struct SurfaceData
-			{
-				struct MipmapData
-				{
-					void*			Data;
-					ZEUInt 			RowCount;
-					ZEUInt			RowSize;
-
-				}* Mipmaps;
-
-			}* Surfaces;
-
-		}Texture;
+		ZESize						Width;
+		ZESize						Height;
+		ZESize						LevelCount;
+		ZESize						SurfaceCount;
 		
-		bool						CheckBoundaries(ZEUInt Depth);
-		bool						CheckBoundaries(ZEUInt Depth, ZEUInt MipLevel);
+		ZETextureType				TextureType;
+		ZETexturePixelFormat		PixelFormat;
+
+		ZEArray<ZETextureSurface>	Surfaces;
 
 	public:
 									ZETextureData();
 		virtual						~ZETextureData();
-		
-		void						CreateTexture(ZETexturePixelFormat PixelFormat, ZEUInt Depth, ZEUInt MipmapCount, ZEUInt Width, ZEUInt Height);
-		void						DestroyTexture();
 
-		void						AddSurface(ZEUInt Count = 1);
-		void						RemoveSurface(ZEUInt Count);
-		void						AddMipmap(ZEUInt Count = 1);
-		void						RemoveMipmap(ZEUInt Count);
-
-		void						AllocateMipmap(ZEUInt Depth, ZEUInt MipLevel, ZEUInt RowSize, ZEUInt RowCount);
-		void						FreeMipmap(ZEUInt Depth, ZEUInt MipLevel);
-			
-		void						CopyMipmapDataFrom(ZEUInt Depth, ZEUInt MipLevel, void* SourceData, ZEUInt SourcePitch);
-		void						CopyMipmapDataTo(ZEUInt Depth, ZEUInt MipLevel, void* Dest, ZEUInt DestPitch);
+		ZEArray<ZETextureSurface>&	GetSurfaces();
 
 		bool						IsEmpty();
 
-		void						SetDepth(ZEUInt Value);
-		ZEUInt						GetDepth();
-		void						SetWidth(ZEUInt Value);
-		ZEUInt						GetWidth();
-		void						SetHeight(ZEUInt Value);
-		ZEUInt						GetHeight();
-		void						SetMipmapCount(ZEUInt Value);
-		ZEUInt						GetMipmapCount();
-		void						SetPixelFormat(ZETexturePixelFormat PixelFormat);
+		ZESize						GetTextureWidth();
+		ZESize						GetTextureHeight();
+		ZESize						GetTextureLevelCount();
+		ZESize						GetTextureSurfaceCount();
+		ZETextureType				GetTextureType();
 		ZETexturePixelFormat		GetPixelFormat();
-		
-		ZEUInt						GetMipmapRowCount(ZEUInt Depth, ZEUInt MipLevel);
-		ZEUInt						GetMipmapRowSize(ZEUInt Depth, ZEUInt MipLevel);
 
-		void*						GetMipmapData(ZEUInt Depth, ZEUInt MipLevel);
-		ZEUInt						GetMipmapDataSize(ZEUInt Depth, ZEUInt MipLevel);
-		ZEUInt						GetSurfaceSize(ZEUInt Depth);
-		ZEUInt						GetTextureSize();
-		ZEUInt						GetSizeOnDisk();
+		ZESize						GetSize();
+		ZESize						GetSizeOnDisk();
+
+		void						CreateTexture(ZETextureType TextureType, ZETexturePixelFormat PixelFormat, ZESize SurfaceCount, ZESize LevelCount, ZESize Width, ZESize Height);
+		void						CreateTexture(ZETextureData& TextureData);
+		void						DestroyTexture();
+
+		static void					ConvertToCubeTextureData(ZETextureData* Output, ZETextureData* TextureData);
+		static void					ConvertToVolumeTextureData(ZETextureData* Output, ZETextureData* TextureData, ZESize TileCountX, ZESize TileCountY);
+		
 };
+
 
 #endif

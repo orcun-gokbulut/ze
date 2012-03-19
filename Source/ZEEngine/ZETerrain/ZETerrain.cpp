@@ -201,7 +201,7 @@ bool ZETerrain::CreateLevels()
 	{
 		ZETerrainLevel* CurrentLevel = &Levels[I];
 		CurrentLevel->ElevationTexture = ZETexture2D::CreateInstance();
-		if (!CurrentLevel->ElevationTexture->Create(ChunkSize * 4 + 8 + 1, ChunkSize * 4 + 8 + 1, ZE_TPF_F32_2, false, 1))
+		if (!CurrentLevel->ElevationTexture->Create(ChunkSize * 4 + 8 + 1, ChunkSize * 4 + 8 + 1, 1, ZE_TPF_F32_2, false))
 			return false;
 
 		CurrentLevel->Material = ZETerrainMaterial::CreateInstance();
@@ -335,7 +335,7 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 		
 		void* Buffer;
 		ZESize Pitch;		
-		CurrLevel->ElevationTexture->Lock(&Buffer, &Pitch);
+		CurrLevel->ElevationTexture->Lock(&Buffer, &Pitch, 0);
 		for (ZESize BufferY = 0; BufferY < TextureSize; BufferY++)
 			for (ZESize BufferX = 0; BufferX < TextureSize; BufferX++)
 			{

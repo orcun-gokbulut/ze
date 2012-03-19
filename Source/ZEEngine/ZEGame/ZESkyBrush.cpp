@@ -80,10 +80,11 @@ void ZESkyBrush::SetSkyTexture(const char* FileName)
 		SkyTexture = NULL;
 	}
 
-	SkyTexture = ZETextureCubeResource::LoadResource(FileName);
+	SkyTexture = ZETextureCubeResource::LoadResource(FileName, NULL);
 	
 	if (SkyMaterial != NULL)
 		SkyMaterial->SetTexture(SkyTexture == NULL ? NULL : SkyTexture->GetTexture());
+
 }
 
 const char* ZESkyBrush::GetSkyTexture() const
@@ -138,6 +139,7 @@ void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)
 
 void ZESkyBrush::Tick(float Time)
 {
+
 }
 
 ZESkyBrush::ZESkyBrush()

@@ -70,6 +70,26 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 	return NewString;
 }
 
+static void CopyToTextureCube(ZETextureCube* Output, ZETextureData* TextureData)
+{
+	ZEUInt LevelCount = TextureData->GetTextureLevelCount();
+	ZEUInt SurfaceCount = TextureData->GetTextureSurfaceCount();
+
+	// Copy texture data into ZETextureCube
+	void* TargetBuffer = NULL;
+	ZESize TargetPitch = 0;
+
+	for(ZESize Surface = 0; Surface < SurfaceCount; ++Surface)
+	{
+		for(ZESize Level = 0; Level < LevelCount; ++Level)
+		{
+			Output->Lock((ZETextureCubeFace)Surface, Level, &TargetBuffer, &TargetPitch);
+			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo(TargetBuffer, TargetPitch);
+			Output->Unlock((ZETextureCubeFace)Surface, Level);
+		}
+	}
+}
+
 static void CopyCubeFaceTo(void* Destination, ZEUInt DestPitch, void* SourceBuffer, ZEUInt SourcePitch, ZEUInt EdgeLenght, ZEUInt OffsetX, ZEUInt OffsetY)
 {
 	for (ZEUInt I = 0; I < EdgeLenght; I++)
@@ -153,122 +173,119 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	if(UserOptions == NULL)
 		UserOptions = zeGraphics->GetTextureOptions();
 
-	ZETextureData		TextureData;
-	ZETextureOptions	FinalOptions;
+
 	ZEFileCache			FileCache;
+	ZETextureOptions	FinalOptions;
+	ZETextureData	TempTextureData;
+	ZETextureData	ProcessedTextureData;
 	ZEString			CachePath = "TextureCache.ZECACHE";
 
-	bool CheckCache		= true;
-	bool CacheIt		= true;
-	bool Process		= true;
+	bool CacheIt			= true;
+	bool Process			= true;
+	bool CheckCache			= true;
+	bool CacheOpen			= false;
+	bool Processed			= false;
+	bool IdentifierExists	= false;
 
 	// Decide final texture options
-	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions);
-
-	if(UserOptions->FileCaching != ZE_TFC_DISABLED && zeGraphics->GetTextureQuality() != ZE_TQ_VERY_HIGH)
-		CheckCache = CacheIt = true;
-	else
-		CheckCache = CacheIt = false;
-
-
-	// Create identifier and check FileCache first
+	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, 3, 2, ZE_TT_CUBE);
+	
+	// Create identifier
 	ZETextureCacheDataIdentifier Identifier(ResourceFile->GetFilePath(), FinalOptions);
-	if(CheckCache && FileCache.Open(CachePath) && FileCache.IdentifierExists(&Identifier))
+
+	if(UserOptions->FileCaching != ZE_TFC_DISABLED)
+	{
+		CacheIt				= true;
+		CheckCache			= true;
+		CacheOpen			= FileCache.Open(CachePath);
+		IdentifierExists	= FileCache.IdentifierExists(&Identifier);
+	}
+	else
+	{
+		CacheIt				= false;
+		CheckCache			= false;
+		CacheOpen			= false;
+		IdentifierExists	= false;
+	}
+
+	if (CheckCache && CacheOpen && IdentifierExists)
 	{
 		// If found in cache load from cache directly
 		zeLog("Loading from file cache: \"%s\".", ResourceFile->GetFilePath().GetValue());
 
 		ZEPartialFile PartialResourceFile;
-		FileCache.OpenData(&PartialResourceFile, &Identifier);
-		ZETextureLoader::Read(&PartialResourceFile, &TextureData);
+		if (!FileCache.OpenData(&PartialResourceFile, &Identifier))
+		{
+			zeAssert(true, "Cannot open partial file on cache for file: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			return NULL;
+		}
+
+		// Load into TextureData
+		if (!ZETextureLoader::Read(&PartialResourceFile, &ProcessedTextureData))
+		{
+			zeAssert(true, "Cannot read texture from cache. File: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			TempTextureData.DestroyTexture();
+			ProcessedTextureData.DestroyTexture();
+			return NULL;
+		}
+
 		PartialResourceFile.Close();
 		FileCache.Close();
 		Process = CacheIt = false;
 
 	}
-	else // if it is not cache try to load from ZEPack / ZETextureFile / Image file
+	else // If cache is not used then try to load from ZEPack / ZETextureFile / Image file
 	{
-		ZETextureLoader::LoadFromFile(ResourceFile, &TextureData);
-	}
-
-	if(TextureData.IsEmpty())
-	{
-		zeError("Cannot load: \"%s\".", ResourceFile->GetFilePath().GetValue());
-		TextureData.DestroyTexture();
-		return NULL;
-	}
-
-	if(TextureData.GetDepth() == 1)
-	{
-		// All the 6 texture data is in one surface
-		// Convert it to 6 surface TextureData
-
-		ZETexturePixelFormat PixelFormat = TextureData.GetPixelFormat();
-		ZEUInt MipmapCount = TextureData.GetMipmapCount();
-		ZEUInt RowSize = TextureData.GetMipmapRowSize(0, 0) / 3;
-		ZEUInt RowCount = TextureData.GetMipmapRowCount(0, 0) / 2;
-		ZEUInt Width = TextureData.GetWidth() / 3;
-		ZEUInt Height = TextureData.GetHeight() / 2;
-		ZEUInt Depth = 6; 
-
-		// Check if texture dimensions are right
-		if (Width != Height)
+		// Load into TextureData
+		if (!ZETextureLoader::LoadFromFile(ResourceFile, &ProcessedTextureData))
 		{
-			zeError("File does not have correct dimensions. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
-			TextureData.DestroyTexture();
+			zeAssert(true, "Cannot load image from file: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			TempTextureData.DestroyTexture();
 			return NULL;
 		}
+	}
 
-		// Copy Texture data
-		void* Buffer = malloc(TextureData.GetMipmapDataSize(0, 0));
-		ZEUInt BufferPitch = TextureData.GetMipmapRowSize(0, 0);
-		TextureData.CopyMipmapDataTo(0, 0, Buffer, BufferPitch);
-
-		TextureData.DestroyTexture();
-		TextureData.CreateTexture(PixelFormat, Depth, MipmapCount, Width, Height);
-
-		ZEUInt Offset = Width;
-
-		// Surf0 Mip0 = +X
-		TextureData.AllocateMipmap(0, 0, RowSize, RowCount);
-		CopyCubeFaceTo(TextureData.GetMipmapData(0, 0), RowSize, Buffer, BufferPitch, Width, 2 * Width, 0);
-
-		// Surf1 Mip0 = -X
-		TextureData.AllocateMipmap(1, 0, RowSize, RowCount);
-		CopyCubeFaceTo(TextureData.GetMipmapData(1, 0), RowSize, Buffer, BufferPitch, Width, 0 * Width, 0);
-
-		// Surf2 Mip0 = +Y
-		TextureData.AllocateMipmap(2, 0, RowSize, RowCount);
-		CopyCubeFaceTo(TextureData.GetMipmapData(2, 0), RowSize, Buffer, BufferPitch, Width, 2 * Width, Width);
-
-		// Surf3 Mip0 = -Y
-		TextureData.AllocateMipmap(3, 0, RowSize, RowCount);
-		CopyCubeFaceTo(TextureData.GetMipmapData(3, 0), RowSize, Buffer, BufferPitch, Width, 1 * Width, Width);
-
-		// Surf4 Mip0 = +Z
-		TextureData.AllocateMipmap(4, 0, RowSize, RowCount);
-		CopyCubeFaceTo(TextureData.GetMipmapData(4, 0), RowSize, Buffer, BufferPitch, Width, 1 * Width, 0);
-
-		// Surf5 Mip0 = -Z
-		TextureData.AllocateMipmap(5, 0, RowSize, RowCount);
-		CopyCubeFaceTo(TextureData.GetMipmapData(5, 0), RowSize, Buffer, BufferPitch, Width, 0 * Width, Width);
-
-		free(Buffer);
+	// If not loaded properly
+	if (ProcessedTextureData.IsEmpty())
+	{
+		zeError("Cannot load: \"%s\".", ResourceFile->GetFilePath().GetValue());
+		TempTextureData.DestroyTexture();
+		return NULL;
 	}
 
 	// Process the data
 	if(Process)
 	{
 		zeLog("Processing texture \"%s\".", ResourceFile->GetFilePath().GetValue());
-		ZETextureQualityManager::Process(&TextureData, &FinalOptions);
+	
+		// Convert to 6 surface texture data and clean ProcessedTextureData
+		ZETextureData::ConvertToCubeTextureData(&TempTextureData, &ProcessedTextureData);
+		ProcessedTextureData.DestroyTexture();
+
+		Processed = ZETextureQualityManager::Process(&ProcessedTextureData, &TempTextureData, &FinalOptions);
+		if (!Processed)
+		{
+			zeCriticalError("Cannot process texture: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			ProcessedTextureData.DestroyTexture();
+			TempTextureData.DestroyTexture();
+			return NULL;
+		}
 	}
 
 	// Save to cache
-	if(CacheIt && !FileCache.IdentifierExists(&Identifier))
+	if(CacheIt && CacheOpen && !IdentifierExists)
 	{
 		ZEPartialFile PartialResourceFile;
-		FileCache.Allocate(&PartialResourceFile, &Identifier, TextureData.GetSizeOnDisk());
-		ZETextureLoader::Write(&PartialResourceFile, &TextureData);
+		if (!FileCache.Allocate(&PartialResourceFile, &Identifier, ProcessedTextureData.GetSizeOnDisk()))
+		{
+			zeAssert(true, "Cache allocation failed for file: \"%s\".", ResourceFile->GetFilePath().GetValue());
+		}
+
+		if (!ZETextureLoader::Write((ZEFile*)&PartialResourceFile, &ProcessedTextureData))
+		{
+			zeAssert(true, "Cannot cache the texture: \"%s\".", ResourceFile->GetFilePath().GetValue());
+		}
+
 		PartialResourceFile.Close();
 		FileCache.Close();
 	}
@@ -279,7 +296,8 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	if (Texture == NULL)
 	{
 		delete TextureResource;
-		TextureData.DestroyTexture();
+		ProcessedTextureData.DestroyTexture();
+		TempTextureData.DestroyTexture();
 		return NULL;
 	}
 
@@ -289,33 +307,20 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	TextureResource->Shared = false;
 
 	// Create the Texture
-	if (!Texture->Create(TextureData.GetWidth(), TextureData.GetPixelFormat(), false))
+	if (!Texture->Create(ProcessedTextureData.GetTextureWidth(), ProcessedTextureData.GetTextureLevelCount(), ProcessedTextureData.GetPixelFormat(), false))
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFilePath().GetValue());
-		TextureData.DestroyTexture();
+		ProcessedTextureData.DestroyTexture();
+		TempTextureData.DestroyTexture();
 		delete TextureResource;
 		return NULL;
 	}
 
-	// Copy Data to texture
-	ZEUInt MipCount = TextureData.GetMipmapCount();
-	ZEUInt SurfaceCount = TextureData.GetDepth();
-
-	// Copy texture data into ZETexture2D
-	void* TargetBuffer = NULL;
-	ZESize TargetPitch = 0;
-
-	for(ZEUInt I = 0; I < SurfaceCount; I++)
-	{
-		for(ZEUInt J = 0; J < MipCount; J++)
-		{
-			Texture->Lock((ZETextureCubeFace)I, &TargetBuffer, &TargetPitch);
-			TextureData.CopyMipmapDataTo(I, J, (unsigned char*)TargetBuffer, TargetPitch);
-			Texture->Unlock((ZETextureCubeFace)I);
-		}
-	}
-
-	TextureData.DestroyTexture();
+	CopyToTextureCube(Texture, &ProcessedTextureData);
+	
+	ProcessedTextureData.DestroyTexture();
+	TempTextureData.DestroyTexture();
+	
 	return TextureResource;
 }
 

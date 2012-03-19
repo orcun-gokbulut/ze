@@ -51,9 +51,9 @@ ZEUInt ZETexture2D::GetHeight() const
 	return Height;
 }
 
-ZEUInt ZETexture2D::GetMipLevel() const
+ZEUInt ZETexture2D::GetLevelCount() const
 {
-	return MipLevel;
+	return LevelCount;
 }
 
 ZETexturePixelFormat ZETexture2D::GetPixelFormat() const
@@ -71,7 +71,7 @@ ZETexture2D::ZETexture2D()
 	Width = Height = 0;
 	PixelFormat = ZE_TPF_NOTSET;
 	RenderTarget = false;
-	MipLevel = 0;
+	LevelCount = 0;
 };
 
 ZETexture2D::~ZETexture2D()

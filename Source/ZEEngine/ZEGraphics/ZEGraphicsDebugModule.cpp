@@ -70,6 +70,7 @@
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEInput/ZEInputModule.h"
 #include "ZECore/ZECore.h"
+#include "ZEGame/ZEMoon.h"
 
 
 #define ACTIONID_INCREASE_DAYTIME		0
@@ -78,20 +79,26 @@
 #define ACTIONID_INCREASE_CLOUDCOVER	2
 #define ACTIONID_DECREASE_CLOUDCOVER	3
 
+#define ACTIONID_INCREASE_MOONPHASE		4
+#define ACTIONID_DECREASE_MOONPHASE		5
+
 
 bool ZEGraphicsDebugModule::Initialize()
 {
-
 	ZEScene* Scene = zeGame->GetScene();
 	
 	PortalMap = ZEPortalMap::CreateInstance();
+	PortalMap->SetName("deneme.ZEMAP");
+	PortalMap->SetEnabled(true);
+	PortalMap->SetVisible(true);
 	PortalMap->SetMapFile("Ground.ZeMap");
 	PortalMap->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	PortalMap->SetName("deneme.ZEMAP");
 	Scene->AddEntity(PortalMap);
 	
 	Player = ZEPlayer::CreateInstance();
 	Player->SetName("TestPlayer1");
+	Player->SetEnabled(true);
+	Player->SetVisible(true);
 	Player->SetPosition(ZEVector3(0.0f, 10.0f, 0.0f));
 	Player->SetRotation(ZEQuaternion::Identity);
 	Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
@@ -192,41 +199,69 @@ bool ZEGraphicsDebugModule::Initialize()
 	//Scene->AddEntity(PointLight5);
 
 	PointLight6 = ZEPointLight::CreateInstance();
+	PointLight6->SetName("TestLight6");
+	PointLight6->SetVisible(true);
+	PointLight6->SetEnabled(true);
 	PointLight6->SetPosition(ZEVector3(-50.0f, 15.0f, -10.0f));
 	PointLight6->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	PointLight6->SetAttenuation(0.01f, 0.0f, 1.0f);
 	PointLight6->SetIntensity(1.0f);
 	PointLight6->SetRange(55.0f);
 	PointLight6->SetCastShadows(false);
-	PointLight6->SetVisible(true);
-	PointLight6->SetEnabled(true);
-	PointLight6->SetName("TestLight6");
 	//Scene->AddEntity(PointLight6);
 
 	// Sun Light
-	DirectionalLight0 = ZEDirectionalLight::CreateInstance();
-	DirectionalLight0->SetEnabled(true);
-	DirectionalLight0->SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3::UnitX));
-	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
-	DirectionalLight0->SetIntensity(1.0f);
-	DirectionalLight0->SetCastsShadow(false);
-	DirectionalLight0->SetVisible(true);
-	DirectionalLight0->SetName("TestDirectionalLight0");
-	Scene->AddEntity(DirectionalLight0);
+	SunLight = ZEDirectionalLight::CreateInstance();
+	SunLight->SetEnabled(true);
+	SunLight->SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3::UnitX));
+	SunLight->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
+	SunLight->SetIntensity(SunLightIntensity);
+	SunLight->SetCastsShadow(false);
+	SunLight->SetVisible(true);
+	SunLight->SetName("TestSunLight");
+	Scene->AddEntity(SunLight);
+	
+	// Moon Light
+	MoonLight = ZEDirectionalLight::CreateInstance();
+	MoonLight->SetName("TestMoonLight");
+	MoonLight->SetEnabled(true);
+	MoonLight->SetVisible(true);
+	MoonLight->SetRotation(ZEQuaternion(ZE_PI_2, -ZEVector3::UnitX));
+	MoonLight->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
+	MoonLight->SetIntensity(MoonLightIntensity);
+	MoonLight->SetCastsShadow(false);
+	Scene->AddEntity(MoonLight);
 
 	// Star Map
 	StarMap = ZESkyBrush::CreateInstance();
+	StarMap->SetName("TestStarMap");
+	StarMap->SetVisible(true);
+	StarMap->SetEnabled(true);
 	StarMap->SetSkyTexture("StarMap.png");
 	StarMap->SetSkyColor(ZEVector3::One);
-	StarMap->SetSkyBrightness(1.0f);
+	StarMap->SetSkyBrightness(0.5f);
 	Scene->AddEntity(StarMap);
+
+	// Moon
+	Moon = ZEMoon::CreateInstance();
+	Moon->SetName("TestMoon");
+	Moon->SetEnabled(true);
+	Moon->SetVisible(true);
+	// Moon->SetMoonTexture("VolumeTextureTest.tga", 4, 4);
+	Moon->SetMoonTexture("MoonFrame.png", 53, 1);
+	Moon->SetMoonAmbientColor(ZEVector3(1.0f, 0.99f, 0.82f));
+	Moon->SetMoonDirection(MoonDirection);
+	Moon->SetMoonPhase(MoonPhase);
+	Moon->SetMoonAmbientFactor(0.7f);
+	Moon->SetMoonScale(0.07f);
+	Scene->AddEntity(Moon);
 
 	// Sky Dome
 	SkyDome = ZESkyDome::CreateInstance();
 	SkyDome->SetName("TestSkyDome");
 	SkyDome->SetEnabled(true);
 	SkyDome->SetVisible(true);
-	SkyDome->SetSunIntensity(10.0f);
+	SkyDome->SetSunIntensity(15.0f);
 	SkyDome->SetOuterRadius(61500.0f);
 	SkyDome->SetInnerRadius(60000.0f);
 	SkyDome->SetCameraPositionOffset(ZEVector3(0.0f, 60000.0f, 0.0f));
@@ -238,15 +273,19 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	// Planar Cloud
 	Cloud = ZECloud::CreateInstance();
-	Cloud->SetCamera(Scene->GetActiveCamera());
+	Cloud->SetName("CloudTest");
 	Cloud->SetEnabled(true);
 	Cloud->SetVisible(true);
+	Cloud->SetCloudFormationTexture("Cloud.bmp");
+	Cloud->SetCamera(Scene->GetActiveCamera());
 	Cloud->SetCloudPlaneHeight(600.0f);
 	Cloud->SetSunLightDirection(SunDirection);
 	Cloud->SetSunLightColor(ZEVector3(0.650f, 0.570f, 0.475f));
 	Cloud->SetCloudCover(CloudCover);
 	Scene->AddEntity(Cloud);
 
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_INCREASE_MOONPHASE,			ZEInputEvent("Keyboard", ZE_IKB_NUMPAD9, ZE_IBS_PRESSING)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_DECREASE_MOONPHASE,			ZEInputEvent("Keyboard", ZE_IKB_NUMPAD6, ZE_IBS_PRESSING)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_INCREASE_DAYTIME,			ZEInputEvent("Keyboard", ZE_IKB_NUMPAD8, ZE_IBS_PRESSING)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_DECREASE_DAYTIME,			ZEInputEvent("Keyboard", ZE_IKB_NUMPAD5, ZE_IBS_PRESSING)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_INCREASE_CLOUDCOVER,			ZEInputEvent("Keyboard", ZE_IKB_NUMPAD7, ZE_IBS_PRESSING)));
@@ -259,6 +298,7 @@ void ZEGraphicsDebugModule::Deinitialize()
 {
 	zeScene->SetActiveCamera(NULL);
 
+	Moon->Destroy();
 	PortalMap->Destroy();
 	Player->Destroy();
 	Cloud->Destroy();
@@ -270,7 +310,7 @@ void ZEGraphicsDebugModule::Deinitialize()
 	PointLight5->Destroy();
 	OmniProjectiveLight0->Destroy();
 	ProjectiveLight0->Destroy();
-	DirectionalLight0->Destroy();
+	SunLight->Destroy();
 
 	delete CoordinatesText;
 	delete SunDirectionText;
@@ -281,7 +321,6 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 {
 	this->ProcessInputs(ElapsedTime);
 	this->DisplayStatus();
-
 }
 
 void ZEGraphicsDebugModule::DisplayStatus()
@@ -334,15 +373,21 @@ void ZEGraphicsDebugModule::ProcessInputs(float ElapsedTime)
 			case ACTIONID_DECREASE_DAYTIME:
 				this->DecreaseDayTime(ElapsedTime);
 				break;
+
+			case ACTIONID_INCREASE_MOONPHASE:
+				this->IncreaseMoonPhase(ElapsedTime);
+				break;
+
+			case ACTIONID_DECREASE_MOONPHASE:
+				this->DecreaseMoonPhase(ElapsedTime);
+				break;
 		}
-
 	}
-
 }
 
 void ZEGraphicsDebugModule::UpdateCloudColor()
 {
- 	float SunDown = 1.0f + SkyDome->GetSunLightDirection().y;
+ 	float SunDown = 1.0f - (-SkyDome->GetSunLightDirection().y);
  	
 	ZEVector3 SunColor(0.650f, 0.570f, 0.475f);
 
@@ -352,57 +397,75 @@ void ZEGraphicsDebugModule::UpdateCloudColor()
 	NewSunColor.z	= -(ZEMath::Power((SunDown / 1.4f), 2.0f)) + SunColor.z;
 
  	Cloud->SetSunLightColor(NewSunColor);
+}
 
+void ZEGraphicsDebugModule::IncreaseMoonPhase(float ElapsedTime)
+{
+	MoonPhase += MoonPhaseChangeMultiplier * ElapsedTime;
+	
+	if (MoonPhase > 1.0f)
+		MoonPhase = 0.0f;
+
+	//MoonPhase = ZEMath::ClampUpper(MoonPhase, 1.0f);
+	Moon->SetMoonPhase(MoonPhase);
+}
+
+void ZEGraphicsDebugModule::DecreaseMoonPhase(float ElapsedTime)
+{
+	MoonPhase -= MoonPhaseChangeMultiplier * ElapsedTime;
+	
+	if (MoonPhase < 0.0f)
+		MoonPhase = 1.0f;
+	
+	//MoonPhase = ZEMath::ClampLower(MoonPhase, 0.0f);
+	Moon->SetMoonPhase(MoonPhase);
 }
 
 void ZEGraphicsDebugModule::IncreaseCloudCover(float ElapsedTime)
 {
-	CloudCover += CloudCoverFactor * ElapsedTime;
-
-	if (CloudCover >= 1.0f)
-		CloudCover = 1.0f;
-	
+	CloudCover += CloudCoverChangeMultiplier * ElapsedTime;
+	CloudCover = ZEMath::ClampUpper(CloudCover, 1.0f);
 	Cloud->SetCloudCover(CloudCover);
 }
 
 void ZEGraphicsDebugModule::DecreaseCloudCover(float ElapsedTime)
 {
-	CloudCover -= CloudCoverFactor * ElapsedTime;
-
-	if (CloudCover <= 0.0f)
-		CloudCover = 0.0f;
-
+	CloudCover -= CloudCoverChangeMultiplier * ElapsedTime;
+	CloudCover = ZEMath::ClampLower(CloudCover, 0.0f);
 	Cloud->SetCloudCover(CloudCover);
 }
 
 void ZEGraphicsDebugModule::IncreaseDayTime(float ElapsedTime)
 {
 	// Update rotation based on speed and elapsed time
-	SunRotation.x += SunRotationSpeed.x * ElapsedTime;
-	SunRotation.y += SunRotationSpeed.y * ElapsedTime;
-	SunRotation.z += SunRotationSpeed.z * ElapsedTime;
+	SunMoonRotation.x += SunMoonRotationMultiplier.x * ElapsedTime;
+	SunMoonRotation.y += SunMoonRotationMultiplier.y * ElapsedTime;
+	SunMoonRotation.z += SunMoonRotationMultiplier.z * ElapsedTime;
 
 	// Limit New Angles
-	if (SunRotation.x >= ZE_PI * 2.0f)
-		SunRotation.x = 0.0f;
-	if (SunRotation.y >= ZE_PI * 2.0f)
-		SunRotation.y = 0.0f;
-	if (SunRotation.z >= ZE_PI * 2.0f)
-		SunRotation.z = 0.0f;
+	if (SunMoonRotation.x >= ZE_PI * 2.0f)
+		SunMoonRotation.x = 0.0f;
+	if (SunMoonRotation.y >= ZE_PI * 2.0f)
+		SunMoonRotation.y = 0.0f;
+	if (SunMoonRotation.z >= ZE_PI * 2.0f)
+		SunMoonRotation.z = 0.0f;
 
 	// Create Rotation
 	ZEVector4 TransformedSunDir;
 	ZEMatrix4x4 SunDirRotationMatrix;
-	ZEMatrix4x4::CreateRotation(SunDirRotationMatrix, SunRotation.x, SunRotation.y, SunRotation.z);
+	ZEMatrix4x4::CreateRotation(SunDirRotationMatrix, SunMoonRotation.x, SunMoonRotation.y, SunMoonRotation.z);
 	ZEMatrix4x4::Transform(TransformedSunDir, SunDirRotationMatrix, ZEVector4(SunDirection, 0.0f));
 
 	SkyDome->SetSunLightDirection(ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
 	Cloud->SetSunLightDirection(ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
-
+	Moon->SetMoonDirection(ZEVector3(-TransformedSunDir.x, -TransformedSunDir.y, -TransformedSunDir.z));
 	
 	ZEQuaternion SunLightRotation;
+	ZEQuaternion MoonLightRotation;
 	ZEQuaternion::CreateFromDirection(SunLightRotation, ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
-	DirectionalLight0->SetRotation(SunLightRotation);
+	ZEQuaternion::CreateFromDirection(MoonLightRotation, ZEVector3(-TransformedSunDir.x, -TransformedSunDir.y, -TransformedSunDir.z));
+	SunLight->SetRotation(SunLightRotation);
+	MoonLight->SetRotation(MoonLightRotation);
 
 	this->UpdateCloudColor();
 }
@@ -410,57 +473,74 @@ void ZEGraphicsDebugModule::IncreaseDayTime(float ElapsedTime)
 void ZEGraphicsDebugModule::DecreaseDayTime(float ElapsedTime)
 {
 	// Update rotation based on speed and elapsed time
-	SunRotation.x -= SunRotationSpeed.x * ElapsedTime;
-	SunRotation.y -= SunRotationSpeed.y * ElapsedTime;
-	SunRotation.z -= SunRotationSpeed.z * ElapsedTime;
+	SunMoonRotation.x -= SunMoonRotationMultiplier.x * ElapsedTime;
+	SunMoonRotation.y -= SunMoonRotationMultiplier.y * ElapsedTime;
+	SunMoonRotation.z -= SunMoonRotationMultiplier.z * ElapsedTime;
 
 	// Limit New Angles
-	if (SunRotation.x <= 0.0f) 
-		SunRotation.x = ZE_PI * 2.0f;
-	if (SunRotation.y <= 0.0f) 
-		SunRotation.y = ZE_PI * 2.0f;
-	if (SunRotation.z <= 0.0f) 
-		SunRotation.z = ZE_PI * 2.0f;
+	if (SunMoonRotation.x <= 0.0f) 
+		SunMoonRotation.x = ZE_PI * 2.0f;
+	if (SunMoonRotation.y <= 0.0f) 
+		SunMoonRotation.y = ZE_PI * 2.0f;
+	if (SunMoonRotation.z <= 0.0f) 
+		SunMoonRotation.z = ZE_PI * 2.0f;
 
 	// Create Rotation
 	ZEVector4 TransformedSunDir;
 	ZEMatrix4x4 SunDirRotationMatrix;
-	ZEMatrix4x4::CreateRotation(SunDirRotationMatrix, SunRotation.x, SunRotation.y, SunRotation.z);
+	ZEMatrix4x4::CreateRotation(SunDirRotationMatrix, SunMoonRotation.x, SunMoonRotation.y, SunMoonRotation.z);
 	ZEMatrix4x4::Transform(TransformedSunDir, SunDirRotationMatrix, ZEVector4(SunDirection, 0.0f));
 
 	SkyDome->SetSunLightDirection(ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
 	Cloud->SetSunLightDirection(ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
+	Moon->SetMoonDirection(ZEVector3(-TransformedSunDir.x, -TransformedSunDir.y, -TransformedSunDir.z));
 
 	ZEQuaternion SunLightRotation;
+	ZEQuaternion MoonLightRotation;
 	ZEQuaternion::CreateFromDirection(SunLightRotation, ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
-	DirectionalLight0->SetRotation(SunLightRotation);
+	ZEQuaternion::CreateFromDirection(MoonLightRotation, ZEVector3(-TransformedSunDir.x, -TransformedSunDir.y, -TransformedSunDir.z));
+	SunLight->SetRotation(SunLightRotation);
+	MoonLight->SetRotation(MoonLightRotation);
 
 	this->UpdateCloudColor();
 }
 
-
 ZEGraphicsDebugModule::ZEGraphicsDebugModule()
 {
-	StarMap					= NULL;
-	PortalMap				= NULL;
-	Model					= NULL;
-	Cloud					= NULL;
-	Player					= NULL;
-	PointLight1				= NULL;
-	PointLight2				= NULL;
-	PointLight3				= NULL;
-	PointLight4				= NULL;
-	PointLight5				= NULL;
-	ProjectiveLight0		= NULL;
-	DirectionalLight0		= NULL;
-	OmniProjectiveLight0	= NULL;
-	
-	CloudCover				= 0.5f;
-	CloudCoverFactor		= 0.2f;
-	SunDirection			= ZEVector3(0.00001f, -1.0f, 0.00001f);
-	SunRotation				= ZEVector3(0.0f, 0.0f, 0.0f);
-	SunRotationSpeed		= ZEVector3(0.7f, 0.01f, 0.01f);
-	
+	CoordinatesText				= NULL;
+	SunDirectionText			= NULL;
+	CloudCoverText				= NULL;
+	WindSpeedText				= NULL;
+
+	PointLight1					= NULL;
+	PointLight2					= NULL;
+	PointLight3					= NULL;
+	PointLight4					= NULL;
+	PointLight5					= NULL;
+	ProjectiveLight0			= NULL;
+
+	Player						= NULL;
+	Moon						= NULL;
+	StarMap						= NULL;
+	PortalMap					= NULL;
+	Model						= NULL;
+	Cloud						= NULL;
+	OmniProjectiveLight0		= NULL;
+	SunLight					= NULL;
+	MoonLight					= NULL;
+	SkyDome						= NULL;
+
+	MoonLightIntensity			= 0.3f;
+	SunLightIntensity			= 1.2f;
+
+	MoonPhase					= 0.3f;
+	CloudCover					= 0.3f;
+	CloudCoverChangeMultiplier	= 0.2f;
+	MoonPhaseChangeMultiplier	= 0.2f;
+	SunDirection				= ZEVector3(0.00001f, -1.0f, 0.00001f);
+	MoonDirection				= -SunDirection;
+	SunMoonRotation				= ZEVector3(0.0f, 0.0f, 0.0f);
+	SunMoonRotationMultiplier	= ZEVector3(0.7f, 0.01f, 0.01f);
 }
 
 ZEGraphicsDebugModule::~ZEGraphicsDebugModule()
