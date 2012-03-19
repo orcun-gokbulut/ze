@@ -39,7 +39,7 @@
 
 #include "ZEDefinitions.h"
 #include "ZETypes.h"
-#include "ZEFile/ZEFileStructure.h"
+#include "ZEPacking.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZERectangle3D.h"
