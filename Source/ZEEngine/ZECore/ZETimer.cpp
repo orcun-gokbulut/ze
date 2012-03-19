@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETransaction.cpp
+ Zinek Engine - ZETimer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,86 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETransaction.h"
-#include "ZEState.h"
+#include "ZETimer.h"
+#include "ZETimerManager.h"
 
-
-ZETransaction::ZETransaction()
+ZETimer::ZETimer()
 {
-	FromState = NULL;
-	ToState = NULL;
-	Priority = -1;
+	Enabled = false;
+	Triggered = false;
+	Repeating = false;
+	Temporary = false;
+
+	SetIntervalTime(0.0f);
 }
 
-ZETransaction::~ZETransaction()
+ZETimer::~ZETimer()
 {
 }
 
-bool ZETransaction::Evaluates()
+void ZETimer::SetRepeating(bool Value)
 {
-	return true;
+	Repeating = Value;
 }
 
-ZEState* ZETransaction::GetFromState()
+bool ZETimer::GetRepeating()
 {
-	return ZETransaction::FromState;
+	return Repeating;
 }
 
-ZEState* ZETransaction::GetToState()
+void ZETimer::SetIntervalTime(float MSecs)
 {
-	return ZETransaction::ToState;
+	IntervalTime = MSecs;
 }
 
-bool ZETransaction::Initialize(ZEState* From, ZEState* To)
+float ZETimer::GetIntervalTime()
 {
-	FromState = From;
-	ToState = To;
-	return true;
+	return IntervalTime;
 }
 
-void ZETransaction::SetPriority(ZEInt Priority)
+void ZETimer::SetTimerEvent(const ZETimerEvent& Event)
 {
-	Priority = Priority;
+	TimerEvent = Event;
 }
 
-ZEInt ZETransaction::GetPriority() const
+const ZETimerEvent& ZETimer::GetTimerEvent()
 {
-	return Priority;
+	return TimerEvent;
+}
+
+void ZETimer::Start()
+{
+	Enabled = true;
+	StartTime = ZETimerManager::GetInstance()->CurrentTime;
+}
+
+void ZETimer::Stop()
+{
+	Enabled = false;
+}
+
+bool ZETimer::GetDone()
+{
+	return Triggered;
+}
+
+ZETimer* ZETimer::CreateInstance()
+{
+	ZETimer* Timer = new ZETimer();
+	ZETimerManager::GetInstance()->RegisterTimer(Timer);
+
+	return Timer;
+}
+
+void ZETimer::CreateAutoTimer(float Interval, const ZETimerEvent& Event)
+{
+	ZETimer* TempTimer = new ZETimer();
+
+	TempTimer->Temporary = true;
+	TempTimer->SetIntervalTime(Interval);
+	TempTimer->SetTimerEvent(Event);
+
+	ZETimerManager::GetInstance()->RegisterTimer(TempTimer);
+	TempTimer->Start();
+
 }

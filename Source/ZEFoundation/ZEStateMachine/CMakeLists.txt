@@ -39,8 +39,6 @@ ze_add_source(ZEState.cpp				Sources)
 ze_add_source(ZEState.h					Sources Headers)
 ze_add_source(ZEStateMachine.cpp		Sources)
 ze_add_source(ZEStateMachine.h			Sources Headers)
-ze_add_source(ZETransaction.cpp			Sources)
-ze_add_source(ZETransaction.h			Sources Headers)
 
 ze_add_library(ZEStateMachine
 	SOURCES ${Sources} 

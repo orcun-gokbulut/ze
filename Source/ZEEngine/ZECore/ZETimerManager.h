@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETransaction.h
+ Zinek Engine - ZETimerManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,33 +34,34 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TRANSACTION_H__
-#define __ZE_TRANSACTION_H__
+#ifndef __ZE_TIMER_MANAGER_H__
+#define __ZE_TIMER_MANAGER_H__
 
-#include <ZETypes.h>
+#include "ZETimer.h"
+#include "ZEDS/ZEArray.h"
+#include "ZERealTimeClock.h"
 
-class ZEState;
-class ZETransaction
+class ZETimerManager
 {
+	friend class ZECore;
+	friend class ZETimer;
+
+	private:
+		ZEArray<ZETimer*>		TimerList;
+		float					CurrentTime;
+
+								ZETimerManager();
+		virtual					~ZETimerManager();
+
 	protected:
-		ZEState*				FromState;
-		ZEState*				ToState;
-
-		ZEInt					Priority;
-
+		void					RegisterTimer(ZETimer* Timer);
+		void					UnregisterTimer(ZETimer* Timer);
 
 	public:
-								ZETransaction(void);
-								~ZETransaction(void);
+		void					Tick(float ElapsedTime);
 
-		bool					Initialize(ZEState* From, ZEState* To);
-		virtual bool			Evaluates();
-
-		ZEState*				GetFromState();
-		ZEState*				GetToState();
-
-		void					SetPriority(ZEInt Priority);
-		ZEInt					GetPriority() const;
+		static ZETimerManager*	GetInstance();
 };
+
 
 #endif

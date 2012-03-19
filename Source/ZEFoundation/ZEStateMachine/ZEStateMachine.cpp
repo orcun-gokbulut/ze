@@ -34,98 +34,108 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEStateMachine.h"
+#include "ZEState.h"
 
-ZEStateMachine::ZEStateMachine(void)
+const ZEArray<ZEState*>& ZEStateMachine::GetStates()
 {
-	CurrentState = NULL;
-}
-
-ZEStateMachine::~ZEStateMachine(void)
-{
+	return States;
 }
 
 bool ZEStateMachine::AddState(ZEState* State)
 {
-	ZEState TemporaryState;
-	memcpy(&TemporaryState, State, sizeof(ZEState));
-	ZEStateMachine::StateArray.Add(TemporaryState);
+	zeAssert(State == NULL, "State cannot be NULL.");
+
+	if (State == NULL)
+		return false;
+
+	if(States.Exists(State))
+		return false;
+
+	if(State->Owner != NULL)
+		return false;
+
+	States.Add(State);
+	State->Owner = this;
+
 	return true;
 }
 
-bool ZEStateMachine::AddTransaction(ZEState* From, ZEState* To, ZEInt Priority)
+bool ZEStateMachine::DeleteState(ZEState* State)
 {
-	ZETransaction TemporaryTransaction;
-	TemporaryTransaction.Initialize(From, To);
-	TemporaryTransaction.SetPriority(Priority);
-	ZEStateMachine::TransactionArray.Add(TemporaryTransaction);
+	zeAssert(State == NULL, "State cannot be NULL.");
+
+	if (State == NULL)
+		return false;
+
+	if (State->Owner != this)
+		return false;
+
+	delete State;
+
 	return true;
 }
 
-bool ZEStateMachine::SetCurrentState(const ZEString& Name)
+bool ZEStateMachine::SetCurrentState(ZEState* TargetState, bool Forced)
 {
-	for(ZESize I = 0; I < StateArray.GetSize(); I++)
-	{
-		if(StateArray.GetItem(I).GetName().Equals(Name))
-		{
-			CurrentState = &StateArray.GetItem(I);
-			return true;
-		}
-	}
-	return false;
-}
+	zeAssert(TargetState == NULL, "TargetState cannot be NULL.");
 
-bool ZEStateMachine::Process()
-{
-	ZEInt TheBiggestPriority = 0;
-	ZEInt TheChosenOne = -1;
+	if (TargetState == NULL)
+		return false;
 
-	//Find transaction with higher priority
-	for(ZESize I = 0; I < TransactionArray.GetSize(); I++)
-	{
-		if(TransactionArray.GetItem(I).GetFromState() == CurrentState)
-		{
-			if(TransactionArray.GetItem(I).Evaluates())
-			{
-				if(TransactionArray.GetItem(I).GetFromState()->OnLeaving(&TransactionArray.GetItem(I)))
-				{
-					if(TransactionArray.GetItem(I).GetToState()->OnEntering(&TransactionArray.GetItem(I)))
-					{
-						if(TransactionArray.GetItem(I).GetPriority() >TheBiggestPriority)
-						{
-							TheBiggestPriority = TransactionArray.GetItem(I).GetPriority();
-							TheChosenOne = I;
-						}
-					}
-				}
-			}
-		}
-	}
+	zeAssert(TargetState->Owner != this, "TargetState is not member of this state machine.");
 
-	if(TheChosenOne != -1)
+	if (Forced)
 	{
-		TransactionArray.GetItem(TheChosenOne).GetFromState()->OnLeave(&TransactionArray.GetItem(TheChosenOne));
-		TransactionArray.GetItem(TheChosenOne).GetToState()->OnEnter(&TransactionArray.GetItem(TheChosenOne));
-		ZEStateMachine::CurrentState = TransactionArray.GetItem(TheChosenOne).GetToState();
+		CurrentState = TargetState;
 		return true;
 	}
-	else
+
+	if (TargetState->Owner != this)
 		return false;
-}
 
-ZEState* ZEStateMachine::GetCurrentState()
-{
-	return ZEStateMachine::CurrentState;
-}
-
-ZEState* ZEStateMachine::GetState(ZEString Name)
-{
-	for(ZESize I = 0; I < StateArray.GetSize(); I++)
+	if(CurrentState != NULL)
 	{
-		if(StateArray.GetItem(I).GetName().Equals(Name))
-		{
-			return &StateArray.GetItem(I);
-		}
+		if(!CurrentState->Transitions.Exists(TargetState))
+			return false;
+
+		bool CancelLeaving;
+		CurrentState->OnLeaving(CurrentState, TargetState, CancelLeaving);
+	
+		if (CancelLeaving)
+			return false;
 	}
 
-	return NULL;
+	bool CancelEntering;
+	TargetState->OnEntering(CurrentState, TargetState, CancelEntering);
+
+	if (CancelEntering)
+		return false;
+
+	ZEState* OldState = CurrentState;
+	CurrentState = TargetState;
+
+	if (OldState != NULL)
+		OldState->OnLeft(OldState, CurrentState);
+
+	CurrentState->OnEntered(OldState, CurrentState);
+
+	return true;
+}
+
+const ZEState& ZEStateMachine::GetCurrentState()
+{
+	return *CurrentState;
+}
+
+ZEStateMachine::ZEStateMachine()
+{
+	CurrentState = NULL;
+}
+
+ZEStateMachine::~ZEStateMachine()
+{
+	for (ZESize I = 0; I < States.GetCount(); I++)
+	{
+		delete States[I];
+	}
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEStateMachine.h
+ Zinek Engine - ZETimerManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,71 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_STATE_MACHINE_H__
-#define	__ZE_STATE_MACHINE_H__
+#include "ZETimerManager.h"
+#include "ZECore.h"
 
-#include "ZEDS\ZEArray.h"
-
-class ZEState;
-
-class ZEStateMachine
+ZETimerManager::ZETimerManager()
 {
-	friend class ZEState;
+	CurrentTime = ZERealTimeClock::GetInstance()->GetCurrentTime();
+}
 
-	private:
-		ZEArray<ZEState*>			States;
-		ZEState*					CurrentState;
+ZETimerManager::~ZETimerManager()
+{
+	for (ZESize I = 0; I < TimerList.GetCount(); I++)
+	{
+		delete TimerList[I];
+	}
+}
 
-	public:
-		const ZEArray<ZEState*>&	GetStates();
+void ZETimerManager::RegisterTimer(ZETimer* Timer)
+{
+	if(TimerList.Exists(Timer))
+		return;
 
-		virtual bool				AddState(ZEState* State);
-		virtual bool				DeleteState(ZEState* State);
+	TimerList.Add(Timer);
+}
 
-		virtual bool				SetCurrentState(ZEState* NextState, bool Forced);
-		virtual const ZEState&		GetCurrentState();
+void ZETimerManager::UnregisterTimer(ZETimer* Timer)
+{
+	if(!TimerList.Exists(Timer))
+		return;
 
+	TimerList.DeleteValue(Timer);
+}
 
+void ZETimerManager::Tick(float ElapsedTime)
+{
+	CurrentTime = (float)ZERealTimeClock::GetInstance()->GetCurrentTime() / 1000000.0f;
 
-									ZEStateMachine();
-		virtual						~ZEStateMachine();
-};
+	for (ZESize I = 0; I < TimerList.GetCount(); I++)
+	{
+		if(!TimerList[I]->Enabled)
+			continue;
 
-#endif
+		if((ElapsedTime >= TimerList[I]->GetIntervalTime()) || (TimerList[I]->StartTime + TimerList[I]->GetIntervalTime() <= CurrentTime))
+		{
+			if(TimerList[I]->TimerEvent != NULL)
+				TimerList[I]->TimerEvent(TimerList[I]->GetIntervalTime());
+
+			TimerList[I]->Triggered = true;
+
+			TimerList[I]->Stop();
+
+			if(TimerList[I]->GetRepeating())
+				TimerList[I]->Start();
+
+			if(TimerList[I]->Temporary)
+			{
+				ZETimer* Temp = TimerList[I];
+				UnregisterTimer(Temp);
+				delete Temp;
+				I--;
+			}
+		}
+	}
+}
+
+ZETimerManager* ZETimerManager::GetInstance()
+{
+	return ZECore::GetInstance()->GetTimerManager();
+}

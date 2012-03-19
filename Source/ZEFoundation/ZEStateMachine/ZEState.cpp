@@ -34,40 +34,160 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEState.h"
-#include "ZETransaction.h"
 
-ZEState::ZEState(void)
+void ZEState::OnEntering(ZEState* From, ZEState* To, bool& Cancel)
+{
+	Cancel = false;
+}
+
+void ZEState::OnEntered(ZEState* From, ZEState* To)
 {
 }
 
-ZEState::~ZEState(void)
+void ZEState::OnLeaving(ZEState* From, ZEState* To, bool& Cancel)
 {
+	Cancel = false;
 }
 
-void ZEState::OnEnter(ZETransaction* Transaction)
+void ZEState::OnLeft(ZEState* From, ZEState* To)
 {
-}
-
-void ZEState::OnLeave(ZETransaction* Transaction)
-{
-}
-
-bool ZEState::OnEntering(ZETransaction* Transaction)
-{
-	return true;
-}
-
-bool ZEState::OnLeaving(ZETransaction* Transaction)
-{
-	return true;
 }
 
 void ZEState::SetName(const ZEString& Name)
 {
-	ZEState::Name.SetValue(Name);
+	this->Name = Name;
 }
 
-ZEString& ZEState::GetName()
+const ZEString& ZEState::GetName()
 {
-	return ZEState::Name;
+	return Name;
+}
+
+const ZEStateMachine& ZEState::GetOwner()
+{
+	return *Owner;
+}
+
+const ZEArray<ZEState*>& ZEState::GetTransitions()
+{
+	return Transitions;
+}
+
+bool ZEState::AddTransition(ZEState* State)
+{
+	zeAssert(State == NULL, "State cannot be NULL.");
+
+	if (State == NULL)
+		return false;
+
+	if (Owner == NULL)
+		return false;
+
+	if (Transitions.Exists(State))
+		return false;
+
+	if (Owner != State->Owner)
+		return false;
+
+	Transitions.Add(State);
+	return true;
+}
+
+bool ZEState::RemoveTransition(ZEState* State)
+{
+	zeAssert(State == NULL, "State cannot be NULL.");
+
+	if (State == NULL)
+		return false;
+
+	if(!Transitions.Exists(State))
+		return false;
+
+	Transitions.DeleteValue(State);
+	return true;
+}
+
+ZEState::ZEState()
+{
+	Name = "";
+	Owner = NULL;
+}
+
+ZEState::~ZEState()
+{
+	if(Owner == NULL)
+		return;
+
+	for (ZESize I = 0; I < Owner->States.GetCount(); I++)
+		Owner->States[I]->RemoveTransition(this);
+
+	Owner->States.DeleteValue(this);
+}
+
+void ZEDelegatedState::OnEntering(ZEState* From, ZEState* To, bool& Cancel)
+{
+	Cancel = false;
+
+	if (EnteringEvent != NULL)
+		EnteringEvent(From, To, Cancel);
+}
+
+void ZEDelegatedState::OnEntered(ZEState* From, ZEState* To)
+{
+	if (EnteredEvent != NULL)
+		EnteredEvent(From, To);
+}
+
+void ZEDelegatedState::OnLeaving(ZEState* From, ZEState* To, bool& Cancel)
+{
+	Cancel = false;
+
+	if (LeavingEvent != NULL)
+		LeavingEvent(From, To, Cancel);
+}
+
+void ZEDelegatedState::OnLeft(ZEState* From, ZEState* To)
+{
+	if (LeftEvent != NULL)
+		LeftEvent(From, To);
+}
+
+void ZEDelegatedState::SetEnteringEvent(const ZEStateEventEntering& Event)
+{
+	EnteringEvent = Event;
+}
+
+const ZEStateEventEntering& ZEDelegatedState::GetEnteringEvent()
+{
+	return EnteringEvent;
+}
+
+void ZEDelegatedState::SetEnteredEvent(const ZEStateEventEntered& Event)
+{
+	EnteredEvent = Event;
+}
+
+const ZEStateEventEntered& ZEDelegatedState::GetEnteredEvent()
+{
+	return EnteredEvent;
+}
+
+void ZEDelegatedState::SetLeavingEvent(const ZEStateEventLeaving& Event)
+{
+	LeavingEvent = Event;
+}
+
+const ZEStateEventLeaving& ZEDelegatedState::GetLeavingEvent()
+{
+	return LeavingEvent;
+}
+
+void ZEDelegatedState::SetLeftEvent(const ZEStateEventLeft& Event)
+{
+	LeftEvent = Event;
+}
+
+const ZEStateEventLeft& ZEDelegatedState::GetLeftEvent()
+{
+	return LeftEvent;
 }

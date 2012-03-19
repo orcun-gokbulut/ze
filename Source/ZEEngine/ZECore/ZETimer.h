@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEStateMachine.h
+ Zinek Engine - ZETimer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,34 +34,55 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_STATE_MACHINE_H__
-#define	__ZE_STATE_MACHINE_H__
+#ifndef __ZE_TIMER_H__
+#define __ZE_TIMER_H__
 
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEDelegate.h"
 
-class ZEState;
+typedef	ZEDelegate<void (float)> ZETimerEvent;
 
-class ZEStateMachine
+class ZETimerManager;
+
+class ZETimer
 {
-	friend class ZEState;
+	friend class ZETimerManager;
 
 	private:
-		ZEArray<ZEState*>			States;
-		ZEState*					CurrentState;
+		bool					Enabled;
+		bool					Repeating;
+		bool					Triggered;
+		bool					Temporary;
+		
+
+		ZETimerEvent			TimerEvent;
+
+		float					IntervalTime;
+		float					StartTime;
+
+	protected:
+								ZETimer();
+		virtual					~ZETimer();
 
 	public:
-		const ZEArray<ZEState*>&	GetStates();
+		void					SetRepeating(bool Value);
+		bool					GetRepeating();
 
-		virtual bool				AddState(ZEState* State);
-		virtual bool				DeleteState(ZEState* State);
+		void					SetIntervalTime(float MSecs);
+		float					GetIntervalTime();
 
-		virtual bool				SetCurrentState(ZEState* NextState, bool Forced);
-		virtual const ZEState&		GetCurrentState();
+		bool					GetDone();
 
+		void					SetTimerEvent(const ZETimerEvent& Event);
+		const ZETimerEvent&		GetTimerEvent();
 
+		void					Start();
+		void					Pause();
+		void					Stop();
+		void					Reset();
 
-									ZEStateMachine();
-		virtual						~ZEStateMachine();
+		static ZETimer*			CreateInstance();
+
+		static void				CreateAutoTimer(float Interval, const ZETimerEvent& Event);
 };
 
 #endif

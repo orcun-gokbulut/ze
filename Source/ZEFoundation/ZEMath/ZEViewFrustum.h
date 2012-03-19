@@ -112,8 +112,8 @@ class ZEViewFrustum : public ZEViewVolume
 		void								SetPosition(ZEVector3 Value);
 
 		const ZEPlane&						GetClippingPlane(ZEViewFrustumPlane Plane) const;
-		const ZELineSegment&				GetEdge(ZEViewFrustumEdge Edge) const;
-		const ZEVector3&					GetVertex(ZEViewFrustumVertex Vertex) const;
+		const ZELineSegment					GetEdge(ZEViewFrustumEdge Edge) const;
+		const ZEVector3						GetVertex(ZEViewFrustumVertex Vertex) const;
 
 		float								GetAspectRatio() const;
 		float								GetFOV() const;
