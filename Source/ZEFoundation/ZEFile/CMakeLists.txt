@@ -50,8 +50,6 @@ ze_add_source(ZEPartialFileTests.cpp	Tests)
 ze_add_source(ZEFileCache.cpp			Sources)
 ze_add_source(ZEFileCache.h				Sources Headers)
 ze_add_source(ZEFileCacheTests.cpp		Tests)
-ze_add_source(ZEFileStructure.h			Sources Headers)
-ze_add_source(ZEFileStructure.cpp		Sources)
 ze_add_source(ZEPack.cpp				Sources)
 ze_add_source(ZEPack.h					Sources Headers)
 

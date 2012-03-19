@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFileStructure.cpp
+ Zinek Engine - ZEPacking.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,65 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEFileStructure.h"
-/*
-ZEUInt16 ZEEndian::ToLittle(ZEUInt16 Value)
-{
-
-}
-
-ZEUInt32 ZEEndian::ToLittle(ZEUInt32 Value)
-{
-
-}
-
-ZEUInt64 ZEEndian::ToLittle(ZEUInt64 Value)
-{
-
-}
-
-ZEInt16 ZEEndian::ToLittle(ZEInt16 Value)
-{
-
-}
-
-ZEInt32 ZEEndian::ToLittle(ZEInt32 Value)
-{
-
-}
-
-ZEInt64 ZEEndian::ToLittle(ZEInt64 Value)
-{
-
-}
-
-ZEUInt16 ZEEndian::ToBig(ZEUInt16 Value)
-{
-
-}
-
-ZEUInt32 ZEEndian::ToBig(ZEUInt32 Value)
-{
-
-}
-
-ZEUInt64 ZEEndian::ToBig(ZEUInt64 Value)
-{
-
-}
-
-ZEInt16 ZEEndian::ToBig(ZEInt16 Value)
-{
-
-}
-
-ZEInt32 ZEEndian::ToBig(ZEInt32 Value)
-{
-
-}
-
-ZEInt64 ZEEndian::ToBig(ZEInt64 Value)
-{
-
-}
-*/
+#include "ZEPacking.h"

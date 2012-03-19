@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFileStructure.h
+ Zinek Engine - ZEPacking.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_FILE_STRUCTURE_H__
-#define __ZE_FILE_STRUCTURE_H__
+#ifndef	__ZE_PACKING_H__
+#define __ZE_PACKING_H__
 
 #include "ZETypes.h"
 #if defined(ZE_PLATFORM_COMPILER_MSVC)
