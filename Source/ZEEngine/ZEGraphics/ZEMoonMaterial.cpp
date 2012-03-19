@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureQualityManager.h
+ Zinek Engine - ZEMoonMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_TEXTURE_QUALITY_MANAGER_H__
-#define __ZE_TEXTURE_QUALITY_MANAGER_H__
+#include "ZETexture3D.h"
+#include "ZEMoonMaterial.h"
+#include "ZEGraphicsModule.h"
 
-class ZEFile;
-class ZETextureData;
-struct ZETextureOptions;
 
-class ZETextureQualityManager
+ZEMoonMaterial::ZEMoonMaterial()
 {
-	protected:
-						ZETextureQualityManager();
-		virtual			~ZETextureQualityManager();
+	MoonTexture			= NULL;
 
-	public:
-		static bool		Process(ZETextureData* Output, 
-								ZETextureData* TextureData, 
-								ZETextureOptions* FinalOptions );
-		
-		
-		static bool		GetFinalTextureOptions(	ZETextureOptions* FinalOptions, 
-												ZEFile* ResourceFile, 
-												const ZETextureOptions* UserOptions, 
-												const ZEUInt TileCountX = 1, 
-												const ZEUInt TileCountY = 1, 
-												const ZETextureType TextureType = ZE_TT_2D );
+	MoonPhase			= 0.0f;
+	MoonScale			= 1.0f;
+	MoonRotation		= 0.0f;
+	MoonAmbientFactor	= 1.0f;
+	MoonAmbientColor	= ZEVector3::One;
+	MoonDirection		= ZEVector3::UnitY;
 
-};
+}
 
-#endif
+ZEMoonMaterial::~ZEMoonMaterial()
+{
+	MoonTexture = NULL;
+}
+
+ZEMaterialFlags ZEMoonMaterial::GetMaterialFlags() const
+{
+	return ZE_MTF_NONE;
+}
+
+ZEMoonMaterial* ZEMoonMaterial::CreateInstance()
+{
+	return zeGraphics->CreateMoonMaterial();
+}

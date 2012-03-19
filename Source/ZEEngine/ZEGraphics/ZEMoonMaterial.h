@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureQualityManager.h
+ Zinek Engine - ZEMoonMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_TEXTURE_QUALITY_MANAGER_H__
-#define __ZE_TEXTURE_QUALITY_MANAGER_H__
+#pragma once
+#ifndef __ZE_MOON_MATERIAL_H__ 
+#define __ZE_MOON_MATERIAL_H__
 
-class ZEFile;
-class ZETextureData;
-struct ZETextureOptions;
+#include "ZEMaterial.h"
+#include "ZEMath\ZEVector.h"
 
-class ZETextureQualityManager
+
+class ZETexture3D;
+
+class ZEMoonMaterial : public ZEMaterial
 {
+	friend class ZED3D9Module;
+	friend class ZEMoon;
+
 	protected:
-						ZETextureQualityManager();
-		virtual			~ZETextureQualityManager();
+		float							MoonPhase;
+		float							MoonScale;
+		float							MoonRotation;
+		float							MoonAmbientFactor;
+		ZEVector3						MoonAmbientColor;
+		ZEVector3						MoonDirection;
+
+		const ZETexture3D*				MoonTexture;
+
+										ZEMoonMaterial();
+		virtual							~ZEMoonMaterial();
 
 	public:
-		static bool		Process(ZETextureData* Output, 
-								ZETextureData* TextureData, 
-								ZETextureOptions* FinalOptions );
-		
-		
-		static bool		GetFinalTextureOptions(	ZETextureOptions* FinalOptions, 
-												ZEFile* ResourceFile, 
-												const ZETextureOptions* UserOptions, 
-												const ZEUInt TileCountX = 1, 
-												const ZEUInt TileCountY = 1, 
-												const ZETextureType TextureType = ZE_TT_2D );
-
+		ZEMaterialFlags					GetMaterialFlags() const;
+		static ZEMoonMaterial*			CreateInstance();
 };
 
-#endif
+#endif // __ZE_MOON_MATERIAL_H__

@@ -62,6 +62,9 @@ extern HINSTANCE ApplicationInstance;
 #include <FreeImage.h>
 
 #include "ZEGraphics/ZEBitmap.h"
+#include "ZEGraphics/ZETextureData.h"
+#include "ZEGraphics/ZETexture.h"
+#include "ZEGraphics/ZETextureTools.h"
 
 ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, ZEInt nCmdShow)
 {
@@ -84,7 +87,6 @@ ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 	ZEUIDebugModule UIDebugModule;
 	//zeCore->SetApplicationModule(&UIDebugModule);
-
 
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();

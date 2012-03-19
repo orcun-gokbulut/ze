@@ -52,24 +52,15 @@ class ZESkyBrush;
 class ZESkyDome;
 class ZEUITextControl;
 class ZECloud;
+class ZEMoon;
 
 class ZEGraphicsDebugModule : public ZEApplicationModule
 {
 	private:
 		ZEInputMap					InputMap;
 
-		ZEVector3					SunDirection;
-		ZEVector3					SunRotation;
-		ZEVector3					SunRotationSpeed;
-
-		ZECloud*					Cloud;
-		float						CloudCover;
-		float						CloudCoverFactor;
-
-		ZEPortalMap*				PortalMap;
 		ZEModel*					Model;
-		ZEPlayer*					Player;
-		ZESkyBrush*					StarMap;
+		ZEPlayer*					Player;		
 		ZEPointLight*				PointLight1;
 		ZEPointLight*				PointLight2;
 		ZEPointLight*				PointLight3;
@@ -77,10 +68,31 @@ class ZEGraphicsDebugModule : public ZEApplicationModule
 		ZEPointLight*				PointLight5;
 		ZEPointLight*				PointLight6;
 		ZEProjectiveLight*			ProjectiveLight0;
-		ZEDirectionalLight*			DirectionalLight0;
 		ZEOmniProjectiveLight*		OmniProjectiveLight0;
-		ZESkyDome*					SkyDome;
 		
+		// Weather system
+		ZEPortalMap*				PortalMap;
+		ZEDirectionalLight*			SunLight;
+		ZEDirectionalLight*			MoonLight;
+		ZESkyBrush*					StarMap;
+		ZESkyDome*					SkyDome;
+		ZECloud*					Cloud;
+		ZEMoon*						Moon;
+
+		float						MoonPhase;
+		float						CloudCover;
+		float						MoonLightIntensity;
+		float						SunLightIntensity;
+
+		ZEVector3					MoonDirection;
+		ZEVector3					SunDirection;
+		ZEVector3					SunMoonRotation;		
+		
+		float						MoonPhaseChangeMultiplier;
+		float						CloudCoverChangeMultiplier;
+		ZEVector3					SunMoonRotationMultiplier;
+
+		// System debug info
 		ZEUITextControl*			CoordinatesText;
 		ZEUITextControl*			SunDirectionText;
 		ZEUITextControl*			CloudCoverText;
@@ -95,6 +107,8 @@ class ZEGraphicsDebugModule : public ZEApplicationModule
 
 		virtual	void				DisplayStatus();
 		virtual void				UpdateCloudColor();
+		virtual void				IncreaseMoonPhase(float ElapsedTime);
+		virtual void				DecreaseMoonPhase(float ElapsedTime);
 		virtual void				IncreaseCloudCover(float ElapsedTime);
 		virtual void				DecreaseCloudCover(float ElapsedTime);
 		virtual void				IncreaseDayTime(float ElapsedTime);

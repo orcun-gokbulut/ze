@@ -33,7 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
 #pragma once
 #ifndef __ZE_TEXTURE_LOADER_H__
 #define __ZE_TEXTURE_LOADER_H__
@@ -41,16 +40,14 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEGraphics/ZETexture.h"
-#include "ZEGraphics/ZETexture2DResource.h"
-#include "ZEGraphics/ZETexture3DResource.h"
-#include "ZEGraphics/ZETextureCubeResource.h"
 
+class ZEFile;
 class ZETextureData;
 
 struct ZETextureInfo
 {
 	ZEUInt					SurfaceCount;
-	ZEUInt					MipmapCount;
+	ZEUInt					LevelCount;
 	ZEUInt					Width;
 	ZEUInt					Height;
 	ZETexturePixelFormat	PixelFormat;
@@ -59,7 +56,6 @@ struct ZETextureInfo
 class ZETextureLoader
 {
 	protected:
-		// Empty
 
 	private:
 							ZETextureLoader();
@@ -70,7 +66,7 @@ class ZETextureLoader
 		static bool			IsZETextureFile(ZEFile* File);
 
 		static bool			LoadFromImageFile(ZEFile* File, ZETextureData* TextureData);
-		static bool			SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, ZEUInt Surface = 0, ZEUInt Mipmap = 0);
+		static bool			SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, ZESize Surface = 0, ZESize Level = 0);
 								
 		static bool			Read(ZEFile* File, ZETextureData* TextureData);
 		static bool			Write(ZEFile* File, ZETextureData* TextureData);

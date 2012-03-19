@@ -42,7 +42,9 @@
 #include "ZEMath\ZEAABBox.h"
 
 
+
 class ZECamera;
+class ZETexture2D;
 
 class ZECloudMaterial : public ZEMaterial
 {
@@ -72,6 +74,8 @@ class ZECloudMaterial : public ZEMaterial
 		float						AmbientScale;
 		float						EarthRadius;
 		float						AtmosphereHeight;
+
+		const ZETexture2D*			CloudFormationTexture;
 
 									ZECloudMaterial();
 		virtual						~ZECloudMaterial();

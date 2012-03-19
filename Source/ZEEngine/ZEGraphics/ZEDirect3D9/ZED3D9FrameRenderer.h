@@ -50,7 +50,6 @@
 #include "ZED3D9ColorTransformProcessor.h"
 #include "ZED3D9MLAAProcessor.h"
 
-
 class ZELight;
 class ZEPointLight;
 class ZED3D9ViewPort;
@@ -61,7 +60,6 @@ class ZEDirectionalLight;
 class ZED3D9VertexShader;
 class ZEOmniProjectiveLight;
 class ZED3D9StaticVertexBuffer;
-
 
 class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 {

@@ -34,22 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
+#include "ZEFile/ZEFile.h"
 #include "ZETextureData.h"
 #include "ZETextureLoader.h"
 #include "ZECore/ZEConsole.h"
 #include "ZETextureFileFormat.h"
+
 
 #define WINDOWS_LEAN_AND_MEAN
 
 //#define FREEIMAGE_LIB
 #include <FreeImage.h>
 
+
 static unsigned DLL_CALLCONV	FreeImageFile_Write_2D(void *buffer, unsigned size, unsigned count, fi_handle handle);
 static unsigned DLL_CALLCONV	FreeImageFile_Read_2D(void *buffer, unsigned size, unsigned count, fi_handle handle);
-static ZEInt		DLL_CALLCONV	FreeImageFile_Seek_2D(fi_handle handle, long offset, ZEInt origin);
+static ZEInt	DLL_CALLCONV	FreeImageFile_Seek_2D(fi_handle handle, long offset, ZEInt origin);
 static long		DLL_CALLCONV	FreeImageFile_Tell_2D(fi_handle handle);
 
-// Checks the file is in ZE texture file format
+
+// Checks if the file is in ZE texture file format or not
 bool ZETextureLoader::IsZETextureFile(const ZEString& FilePath)
 {
 	ZEFile File;
@@ -93,7 +97,7 @@ bool ZETextureLoader::IsZETextureFile(ZEFile* File)
 	return false;
 }
 
-// Loads standard image formats as a surface of ZETexture data
+// Loads a known image format as a surface of ZETexture data
 bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData)
 {
 	FIBITMAP	*Bitmap;
@@ -134,18 +138,18 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 		Bitmap32 = Bitmap;
 	}
 
-	ZEUInt BPP = FreeImage_GetBPP(Bitmap32);
-	ZEUInt Width = FreeImage_GetWidth(Bitmap32);
-	ZEUInt Height = FreeImage_GetHeight(Bitmap32);
-	ZEUInt PixelSize = BPP / 8;
-	ZEUInt RowSize	= Width * PixelSize;
-	ZEUInt RowCount	= Height;
+	ZEUInt BPP			= FreeImage_GetBPP(Bitmap32);
+	ZEUInt Width		= FreeImage_GetWidth(Bitmap32);
+	ZEUInt Height		= FreeImage_GetHeight(Bitmap32);
+	ZEUInt PixelSize	= BPP / 8;
+	ZEUInt RowSize		= Width * PixelSize;
+	ZEUInt RowCount		= Height;
 
-	TextureData->CreateTexture(ZE_TPF_I8_4, 1, 1, Width, Height);
-	TextureData->AllocateMipmap(0, 0, RowSize, RowCount);
-	
-	FreeImage_ConvertToRawBits((BYTE*)TextureData->GetMipmapData(0, 0), Bitmap32, RowSize, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
-	
+	TextureData->CreateTexture(ZE_TT_2D, ZE_TPF_I8_4, 1, 1, Width, Height);
+	BYTE* TargetData = (BYTE*)TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetData();
+
+	FreeImage_ConvertToRawBits(TargetData, Bitmap32, RowSize, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+
 	zeLog("Image file loaded successfully: \"%s\".", File->GetFilePath().GetValue());
 
 	FreeImage_Unload(Bitmap32);
@@ -154,9 +158,8 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 
 }
 
-// Saves a ZETexture data to specified file in ".tga" format
-// Only saves mipmap level 0 of surface 0
-bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, ZEUInt Surface, ZEUInt Mipmap)
+// Saves level 0 of surface 0 to specified file in ".TGA" format
+bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, ZESize Surface, ZESize Level)
 {
 	if(TextureData->GetPixelFormat() != ZE_TPF_I8_4)
 	{
@@ -175,16 +178,14 @@ bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, 
 
 	File->Seek(0, ZE_SF_BEGINING);
 
-	ZEUInt PixelSize	= 4;
-	ZEUInt BPP		= PixelSize * 8;
-	ZEUInt RowSize	= TextureData->GetMipmapRowSize(Surface, Mipmap);
-	ZEUInt RowCount	= TextureData->GetMipmapRowCount(Surface, Mipmap);
-	ZEUInt Width		= RowSize / PixelSize;
-	ZEUInt Height		= RowCount;
-	ZEUInt Pitch		= RowSize;
+	ZEUInt BPP			= 32;
+	BYTE* SourceData	= (BYTE*)TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetData();
+	ZEUInt Pitch		= TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetPitch();
+	ZEUInt Height		= TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetHeight();
+	ZEUInt Width		= TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetWidth();
 
 	FIBITMAP* Bitmap;
-	Bitmap = FreeImage_ConvertFromRawBits((BYTE*)TextureData->GetMipmapData(Surface, Mipmap), Width, Height, Pitch, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+	Bitmap = FreeImage_ConvertFromRawBits(SourceData, Width, Height, Pitch, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
 	if(Bitmap == NULL)
 	{
 		zeError("Error during conversion, cannot save image to \"%s\".", File->GetFilePath().GetValue());
@@ -207,6 +208,7 @@ bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, 
 
 }
 
+// File pointer must be at the beginning of the ZETexture file
 bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 {
 	zeLog("Loading texture from ZETexture file : \"%s\".", File->GetFilePath().GetValue());
@@ -215,7 +217,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 	ZETextureFileHeader	FileHeader;
 	if(File->Read(&FileHeader, sizeof(ZETextureFileHeader), 1) != 1)
 	{
-		zeAssert(true, "Cannot read file header from disk! File name: \"&s\".", File->GetFilePath().GetValue());
+		zeCriticalError("Cannot read file header from disk! File name: \"&s\".", File->GetFilePath().GetValue());
 		TextureData->DestroyTexture();
 		return false;
 	}
@@ -223,23 +225,27 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 	// Check File header is correct
 	if(FileHeader.ChunkId != ZE_TXTF_HEADER)
 	{
-		zeAssert(true, "File header chunk id mismatch. Possible corruption. File name: \"&s\".", File->GetFilePath().GetValue());
+		zeCriticalError("File header chunk id mismatch. Possible corruption. File name: \"&s\".", File->GetFilePath().GetValue());
 		TextureData->DestroyTexture();
 		return false;
 	}
 
 	// Create TextureData
-	TextureData->CreateTexture((ZETexturePixelFormat)FileHeader.PixelFormat, FileHeader.Depth,
-							FileHeader.MipMapCount, FileHeader.Width, FileHeader.Height);
+	TextureData->CreateTexture(	(ZETextureType)FileHeader.TextureType, 
+								(ZETexturePixelFormat)FileHeader.PixelFormat, 
+								(ZESize)FileHeader.SurfaceCount,
+								(ZESize)FileHeader.LevelCount, 
+								(ZESize)FileHeader.Width, 
+								(ZESize)FileHeader.Height );
 
 	// For every surface
-	for(ZESize I = 0; I < FileHeader.Depth; I++)
+	for(ZESize I = 0; I < FileHeader.SurfaceCount; ++I)
 	{
 		// Get surface header
 		ZETextureFileSurfaceChunk	SurfaceChunk;
 		if(File->Read(&SurfaceChunk, sizeof(ZETextureFileSurfaceChunk), 1) != 1)
 		{
-			zeError("Cannot read surface header from disk! File name: \"&s\".", File->GetFilePath().GetValue());
+			zeCriticalError("Cannot read surface header from disk! File name: \"&s\".", File->GetFilePath().GetValue());
 			TextureData->DestroyTexture();
 			return false;
 		}
@@ -247,46 +253,56 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 		// Check surface header is correct
 		if(SurfaceChunk.ChunkId != ZE_TXTF_SURF_CHUNKID)
 		{
-			zeAssert(true, "Surface chunk id mismatch. Possible corruption. File name: \"&s\".", File->GetFilePath().GetValue());
+			zeCriticalError("Surface chunk id mismatch. Possible corruption. File name: \"&s\".", File->GetFilePath().GetValue());
 			TextureData->DestroyTexture();
 			return false;
 		}
 
 		// Get surface data
-		// There is no surface data for v1.0
+		// There is no surface data
 
-		// For every mipmap
-		for(ZESize J = 0; J < FileHeader.MipMapCount; J++)
+		// For every level
+		for(ZESize J = 0; J < FileHeader.LevelCount; ++J)
 		{
 			ZETExtureFileMipmapChunk MipmapChunk;
 			if(File->Read(&MipmapChunk, sizeof(ZETExtureFileMipmapChunk), 1) != 1)
 			{
-				zeAssert(true, "Cannot read mipmap header from disk! File name: \"&s\".", File->GetFilePath().GetValue());
+				zeCriticalError("Cannot read level header from disk! File name: \"&s\".", File->GetFilePath().GetValue());
 				TextureData->DestroyTexture();
 				return false;
 			}
 
-			// Check mipmap header is correct
+			// Check level header is correct
 			if(MipmapChunk.ChunkId != ZE_TXTF_MIP_CHUNKID)
 			{
-				zeAssert(true, "Mipmap chunk id mismatch. Possible corruption. File name: \"&s\".", File->GetFilePath().GetValue());
+				zeCriticalError("Level chunk id mismatch. Possible corruption. File name: \"&s\".", File->GetFilePath().GetValue());
 				TextureData->DestroyTexture();
 				return false;
 			}
 
-			// Read mipmap data
-			ZEUInt MipSize = MipmapChunk.RowCount * MipmapChunk.RowSize;
-			TextureData->AllocateMipmap(I, J, MipmapChunk.RowSize, MipmapChunk.RowCount);
-			if(File->Read(TextureData->GetMipmapData(I, J), MipSize, 1) != 1)
+			ZETextureLevel* CurrentLevel = &TextureData->GetSurfaces().GetItem(I).GetLevels().GetItem(J);
+
+			if (CurrentLevel->GetRowCount() != MipmapChunk.RowCount || CurrentLevel->GetPitch() != MipmapChunk.RowSize )
 			{
-				zeAssert(true, "Cannot read mipmap data from disk! File name: \"&s\".", File->GetFilePath().GetValue());
+				zeCriticalError("Unexpected level data red from file. File name: \"&s\".", File->GetFilePath().GetValue());
 				TextureData->DestroyTexture();
 				return false;
 			}
 
+			// Do not read if level data is empty
+			if (CurrentLevel->GetSize() != 0)
+			{
+				if(File->Read(CurrentLevel->GetData(), CurrentLevel->GetSize(), 1) != 1)
+				{
+					zeCriticalError("Cannot read level data from disk! File name: \"&s\".", File->GetFilePath().GetValue());
+					TextureData->DestroyTexture();
+					return false;
+				}
+			}
+			
 			if (File->Eof())
 			{
-				zeAssert(true, "Eof reached... Possible corruption! File name: \"&s\".", File->GetFilePath().GetValue());
+				zeCriticalError("Eof reached... Possible corruption! File name: \"&s\".", File->GetFilePath().GetValue());
 				TextureData->DestroyTexture();
 				return false;
 			}
@@ -303,21 +319,22 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 	ZETextureFileHeader	FileHeader;
 	FileHeader.ChunkId		= ZE_TXTF_HEADER;
 	FileHeader.Version		= ZE_TXTF_VERSION;
+	FileHeader.TextureType	= TextureData->GetTextureType();
 	FileHeader.PixelFormat	= TextureData->GetPixelFormat();
-	FileHeader.Depth		= TextureData->GetDepth();
-	FileHeader.MipMapCount	= TextureData->GetMipmapCount();
-	FileHeader.Width		= TextureData->GetWidth();
-	FileHeader.Height		= TextureData->GetHeight();
+	FileHeader.SurfaceCount	= TextureData->GetTextureSurfaceCount();
+	FileHeader.LevelCount	= TextureData->GetTextureLevelCount();
+	FileHeader.Width		= TextureData->GetTextureWidth();
+	FileHeader.Height		= TextureData->GetTextureHeight();
 
 	// Write file header
 	if(File->Write(&FileHeader, sizeof(ZETextureFileHeader), 1) != 1)
 	{
-		zeAssert(true, "Cannot write file header to disk!");
+		zeCriticalError("Cannot write file header to disk!");
 		return false;
 	}
 
 	// For every surface
-	for(ZESize I = 0; I < FileHeader.Depth; I++)
+	for(ZESize I = 0; I < FileHeader.SurfaceCount; ++I)
 	{
 		// Create and write surface header
 		ZETextureFileSurfaceChunk	SurfaceChunk;
@@ -325,36 +342,39 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 
 		if(File->Write(&SurfaceChunk, sizeof(ZETextureFileSurfaceChunk), 1) != 1)
 		{
-			zeAssert(true, "Cannot write surface header to disk! File name: \"&s\".", File->GetFilePath().GetValue());
+			zeCriticalError("Cannot write surface header to disk! File name: \"&s\".", File->GetFilePath().GetValue());
 			return false;
 		}
 
-		// For every mipmap
-		for(ZESize J = 0; J < FileHeader.MipMapCount; J++)
+		// For every level
+		for(ZESize J = 0; J < FileHeader.LevelCount; ++J)
 		{
-			// Create and write mipmap header
+			// Create and write level header
 			ZETExtureFileMipmapChunk	MipmapChunk;
 			MipmapChunk.ChunkId		= ZE_TXTF_MIP_CHUNKID;
-			MipmapChunk.RowCount	= TextureData->GetMipmapRowCount(I, J);
-			MipmapChunk.RowSize		= TextureData->GetMipmapRowSize(I, J);
+			MipmapChunk.RowCount	= (ZEUInt32)TextureData->GetSurfaces().GetItem(I).GetLevels().GetItem(J).GetRowCount();
+			MipmapChunk.RowSize		= (ZEUInt32)TextureData->GetSurfaces().GetItem(I).GetLevels().GetItem(J).GetPitch();
 
 			if(File->Write(&MipmapChunk, sizeof(ZETExtureFileMipmapChunk), 1) != 1)
 			{
-				zeAssert(true, "Cannot write mipmap header to disk! File name: \"&s\".", File->GetFilePath().GetValue());
+				zeCriticalError("Cannot write level header to disk! File name: \"&s\".", File->GetFilePath().GetValue());
 				return false;
 			}
 
-			// Write mipmap data
-			ZEUInt MipSize = MipmapChunk.RowCount * MipmapChunk.RowSize;
-			if(File->Write(TextureData->GetMipmapData(I, J), MipSize, 1) != 1)
+			ZETextureLevel* CurrentLevel = &TextureData->GetSurfaces().GetItem(I).GetLevels().GetItem(J);
+			// Do not write if level data is empty
+			if (CurrentLevel->GetSize() != 0)
 			{
-				zeAssert(true, "Cannot write mipmap data! File name: \"&s\".", File->GetFilePath().GetValue());
-				return false;
+				if(File->Write(CurrentLevel->GetData(), CurrentLevel->GetSize(), 1) != 1)
+				{
+					zeCriticalError("Cannot write level data! File name: \"&s\".", File->GetFilePath().GetValue());
+					return false;
+				}
 			}
 
 			if (File->Eof())
 			{
-				zeAssert(true, "Eof reached... Possible corruption! File name: \"&s\".", File->GetFilePath().GetValue());
+				zeCriticalError("Eof reached... Possible corruption! File name: \"&s\".", File->GetFilePath().GetValue());
 				TextureData->DestroyTexture();
 				return false;
 			}
@@ -415,7 +435,7 @@ bool ZETextureLoader::GetImageInfo(ZETextureInfo* TextureInfo, ZEFile* File)
 	}
 
 	// Fill texture info
-	TextureInfo->MipmapCount	= 1;
+	TextureInfo->LevelCount		= 1;
 	TextureInfo->SurfaceCount	= 1;
 	TextureInfo->PixelFormat	= ZE_TPF_I8_4;
 	TextureInfo->Width			= FreeImage_GetWidth(Bitmap);
@@ -448,8 +468,8 @@ bool ZETextureLoader::GetTextureInfo(ZETextureInfo* TextureInfo, ZEFile* File)
 	// Fill texture info
 	TextureInfo->Width			= FileHeader.Width;
 	TextureInfo->Height			= FileHeader.Height;
-	TextureInfo->SurfaceCount	= FileHeader.Depth;
-	TextureInfo->MipmapCount	= FileHeader.MipMapCount;
+	TextureInfo->SurfaceCount	= FileHeader.SurfaceCount;
+	TextureInfo->LevelCount		= FileHeader.LevelCount;
 	TextureInfo->PixelFormat	= (ZETexturePixelFormat)FileHeader.PixelFormat;
 	
 	zeLog("Texture info gathered successfully: \"%s\".", File->GetFilePath().GetValue());

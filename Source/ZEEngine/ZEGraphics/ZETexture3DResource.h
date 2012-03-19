@@ -39,7 +39,11 @@
 
 #include "ZETextureResource.h"
 
+class ZEFile;
 class ZETexture3D;
+
+struct ZETextureOptions;
+
 class ZETexture3DResource : public ZETextureResource
 {
 	private:
@@ -55,9 +59,11 @@ class ZETexture3DResource : public ZETextureResource
 
 		const ZETexture3D*					GetTexture() const;
 
-		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture3DResource*			LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture3DResource*			LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static void							CacheResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);
+		static ZETexture3DResource*			LoadSharedResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);
+		
+		static ZETexture3DResource*			LoadResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);
+		static ZETexture3DResource*			LoadResource(ZEFile* ResourceFile, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);
 };
 
 #endif

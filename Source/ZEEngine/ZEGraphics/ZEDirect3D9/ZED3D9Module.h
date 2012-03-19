@@ -67,7 +67,6 @@ class ZED3D9FixedMaterialShader;
 class ZED3D9ShaderManager;
 class ZED3D9StaticIndexBuffer;
 class ZED3D9DynamicIndexBuffer;
-//class ZED3D9SkyDomeMaterial;
 
 enum ZED3D9PixelShaderVersion
 {
@@ -185,6 +184,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual ZETextureCube*							CreateTextureCube();
 
 		virtual ZEFixedMaterial*						CreateFixedMaterial();
+		virtual ZEMoonMaterial*							CreateMoonMaterial();
 		virtual ZEUIMaterial*							CreateUIMaterial();
 		virtual ZECloudMaterial*						CreateCloudMaterial();
 		virtual ZESimpleMaterial*						CreateSimpleMaterial();

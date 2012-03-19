@@ -53,28 +53,24 @@ class ZETextureTools
 		virtual						~ZETextureTools();
 
 	public:
-		static bool					IsResizeable(ZEUInt Width, ZEUInt Height);
-		static bool					IsCompressible(ZEUInt Width, ZEUInt Height);
-		static ZEUInt				GetMaxMipmapCount(ZEUInt Width, ZEUInt Height);
+		static bool					IsCompressible(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount = 1, const ZEUInt VertTileCount = 1);
+		static bool					IsResizeable(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount = 1, const ZEUInt VertTileCount = 1, const ZETextureType TextureType = ZE_TT_2D);
+		static ZEUInt				GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount = 1, const ZEUInt VertTileCount = 1, const ZETextureType TextureType = ZE_TT_2D);
 
-		static void					CopyTextureRegion(void* DestData, ZEUInt DestPitch,
-													  ZEUInt DestX, ZEUInt DestY,
-													  void* SourceData, ZEUInt SourcePitch, ZEUInt SourceBitsPP,
-													  ZEUInt SourceX, ZEUInt SourceY, 
-													  ZEUInt CopyWidth, ZEUInt CopyHeight);
+		static void					CopyTextureRegion(	void* DestData, ZEUInt DestPitch, ZEUInt DestX, ZEUInt DestY, void* SourceData, ZEUInt SourcePitch, 
+														ZEUInt SourceBitsPP, ZEUInt SourceX, ZEUInt SourceY, ZEUInt CopyWidth, ZEUInt CopyHeight);
 
-		static void					CopyTexture(void* DestData, ZEUInt DestPitch,
-												void* SourceData, ZEUInt SourcePitch,
-												ZEUInt RowSize, ZEUInt RowCount);
+		static void					CopyTexture(void* DestData, ZEUInt DestPitch, void* SourceData, ZEUInt SourcePitch, ZEUInt RowSize, ZEUInt RowCount);
 
-		static void					CompressTexture(void* DestinationData, ZEUInt DestinationPitch, 
-													void* SourceData, ZEUInt SourcePitch, 
-													ZEUInt SourceWidth, ZEUInt SourceHeight, 
-													const ZETextureOptions* CompressionOptions = NULL);
+		static void					CompressTexture(void* DestinationData, ZEUInt DestinationPitch, void* SourceData, ZEUInt SourcePitch, 
+													ZEUInt SourceWidth, ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions = NULL);
 
-		static void					DownSample2x(void* DestinationData, ZEUInt DestinationPitch, 
-												 void* SourceData, ZEUInt SourcePitch,
-												 ZEUInt SourceWidth, ZEUInt SourceHeight, bool UseGpu = true);
+		static void					DownSample2x(	void* DestinationData, ZEUInt DestinationPitch, void* SourceData, ZEUInt SourcePitch,
+													ZEUInt SourceWidth, ZEUInt SourceHeight, bool UseGpu = true);
+
+		static void					Average(void* DestinationData, const ZEUInt DestinationPitch, const void* SourceData1, const ZEUInt SourcePitch1,
+											const ZEUInt SourceWidth1, const ZEUInt SourceHeight1, const void* SourceData2, const ZEUInt SourcePitch2,
+											const ZEUInt SourceWidth2, const ZEUInt SourceHeight2);
 };
 
 #endif

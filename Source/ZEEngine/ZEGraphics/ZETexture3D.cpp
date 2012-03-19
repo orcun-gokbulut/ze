@@ -41,6 +41,11 @@ ZETextureType ZETexture3D::GetTextureType() const
 	return ZE_TT_3D;
 }
 
+ZEUInt ZETexture3D::GetLevelCount() const
+{
+	return LevelCount;
+}
+
 ZEUInt ZETexture3D::GetWidth() const
 {
 	return Width;

@@ -43,6 +43,7 @@
 #include "ZETypes.h"
 #include "ZEMath\ZEAABBox.h"
 
+class ZETexture2DResource;
 class ZECloudMaterial;
 class ZEMaterial;
 class ZEScene;
@@ -68,6 +69,7 @@ class ZECloud : public ZEEntity
 		float					EarthRadius;
 		float					AtmosphereHeight;
 
+		ZETexture2DResource*	CloudFormationTexture;
 
 		ZECloudMaterial*		CloudMaterial;
 		ZERenderCommand			CloudRenderCommand;
@@ -121,6 +123,9 @@ class ZECloud : public ZEEntity
 
 		void					SetCamera(ZECamera* Camera);
 		ZECamera*				GetCamera();
+
+		virtual void			SetCloudFormationTexture(const ZEString& FileName);
+		const ZEString			GetCloudFormationTexture() const;
 
 		virtual ZEDrawFlags		GetDrawFlags() const;
 

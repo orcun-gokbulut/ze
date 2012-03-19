@@ -74,7 +74,7 @@ bool ZED3D9TextureCube::DeviceRestored()
 {
 	if (RenderTarget)
 	{
-		if (!Create(EdgeLength, PixelFormat, true))
+		if (!Create(EdgeLength, LevelCount, PixelFormat, true))
 			return false;
 
 		for (ZESize I = 0; I < 6; I++)
@@ -96,48 +96,55 @@ ZEViewPort* ZED3D9TextureCube::GetViewPort(ZETextureCubeFace Face)
 		return &ViewPorts[Face];
 }
 
-bool ZED3D9TextureCube::Create(ZEUInt EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget)
+bool ZED3D9TextureCube::Create(ZEUInt EdgeLength, ZEUInt Levels, ZETexturePixelFormat PixelFormat, bool RenderTarget)
 {
 	if (CubeTexture != NULL)
+	{
 		if (this->EdgeLength == EdgeLength)
+		{
 			return true;
+		}
 		else
 		{
 			CubeTexture->Release();
 			CubeTexture = NULL;
 		}
+	}
 
-	DWORD Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP);
-	DWORD MipMap = (RenderTarget ? 1 : 0);
-	D3DPOOL Pool = (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
-	D3DFORMAT Format = ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
+	DWORD Usage			= (RenderTarget ? D3DUSAGE_RENDERTARGET : 0);
+	DWORD MipCount		= (RenderTarget ? 1 : Levels);
+	D3DPOOL Pool		= (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
+	D3DFORMAT Format	= ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
 
 	HRESULT Hr;
-	Hr = GetDevice()->CreateCubeTexture(EdgeLength, MipMap, Usage, Format, Pool, &CubeTexture, NULL);  
+	Hr = GetDevice()->CreateCubeTexture(EdgeLength, MipCount, Usage, Format, Pool, &CubeTexture, NULL);  
 	if (Hr != D3D_OK)
 	{
 		zeError("Can not create cube texture.");
 		return false;
 	}
 
-	this->PixelFormat = PixelFormat;
-	this->EdgeLength = EdgeLength;
-	this->RenderTarget = RenderTarget;
+	this->LevelCount	= Levels;
+	this->PixelFormat	= PixelFormat;
+	this->EdgeLength	= EdgeLength;
+	this->RenderTarget	= RenderTarget;
 
 	if (RenderTarget)
+	{
 		for (ZESize I = 0; I < 6; I++)
 		{
 			CubeTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)I, 0, &ViewPorts[I].FrameBuffer);
 			ViewPorts[I].ZBuffer = NULL;
 		}
+	}
 
 	return true;
 }
 
-bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, ZESize* Pitch)
+bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, ZESize Level, void** Buffer, ZESize* Pitch)
 {
 	D3DLOCKED_RECT Rect;
-	HRESULT hr = CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, 0, &Rect, NULL, 0);
+	HRESULT hr = CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, Level, &Rect, NULL, 0);
 	if (hr != D3D_OK)
 		return false;
 	
@@ -147,9 +154,9 @@ bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, ZESize* Pitc
 	return true;
 }
 
-void ZED3D9TextureCube::Unlock(ZETextureCubeFace Face)
+void ZED3D9TextureCube::Unlock(ZETextureCubeFace Face, ZESize Level)
 {
-	CubeTexture->UnlockRect((D3DCUBEMAP_FACES)Face, 0);
+	CubeTexture->UnlockRect((D3DCUBEMAP_FACES)Face, Level);
 }
 
 void ZED3D9TextureCube::Release()
@@ -161,11 +168,18 @@ void ZED3D9TextureCube::Release()
 	}
 
 	if (RenderTarget)
+	{
 		for (ZESize I = 0; I < 6; I++)
 		{
 			ZED3D_RELEASE(ViewPorts[I].FrameBuffer);
 			ViewPorts[I].ZBuffer = NULL;
 		}
+	}
+
+	EdgeLength		= 0;
+	LevelCount		= 0;
+	PixelFormat		= ZE_TPF_NOTSET;
+	RenderTarget	= false; 
 }
 
 
