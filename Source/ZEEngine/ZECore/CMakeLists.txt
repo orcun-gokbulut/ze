@@ -90,6 +90,11 @@ ze_add_source(ZEWindow.h							Sources Headers)
 ze_add_source(ZEWindowResources.h					Sources)
 ze_add_source(ZEVersion.cpp							Sources)
 ze_add_source(ZEVersion.h							Sources Headers)
+ze_add_source(ZETimer.cpp							Sources)
+ze_add_source(ZETimer.h								Sources Headers)
+ze_add_source(ZETimerManager.cpp					Sources)
+ze_add_source(ZETimerManager.h						Sources Headers)
+
 
 
 ze_add_library(ZECore 

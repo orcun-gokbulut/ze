@@ -51,6 +51,7 @@
 #include "ZESystemMessageHandler.h"
 #include "ZERealTimeClock.h"
 #include "ZEProfiler.h"
+#include "ZETimerManager.h"
 
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEInput/ZEInputModule.h"
@@ -135,6 +136,11 @@ ZEPluginManager* ZECore::GetPluginManager()
 ZESystemMessageManager* ZECore::GetSystemMessageManager()
 {
 	return SystemMessageManager;
+}
+
+ZETimerManager* ZECore::GetTimerManager()
+{
+	return TimerManager;
 }
 
 ZERealTimeClock* ZECore::GetRealTimeClock()
@@ -620,6 +626,8 @@ void ZECore::MainLoop()
 
 	float FrameTime = (float)RealTimeClock->GetFrameDeltaTime() / 1000000.0f;
 
+	TimerManager->Tick(FrameTime);
+
 	// Game Logic
 	InputModule->ProcessInputs();
 
@@ -677,6 +685,7 @@ ZECore::ZECore()
 
 	Application	= NULL;
 	RealTimeClock			= new ZERealTimeClock();
+	TimerManager			= new ZETimerManager();
 	Profiler				= new ZEProfiler();
 	SystemMessageManager	= new ZESystemMessageManager();
 	SystemMessageHandler	= new ZECoreSystemMessageHandler();
@@ -716,12 +725,12 @@ ZECore::~ZECore()
 	delete OptionManager;
 	delete CommandManager;
 	delete Console;
+	delete TimerManager;
 	delete RealTimeClock;
 	SystemMessageManager->UnregisterMessageHandler(SystemMessageHandler);
 	delete SystemMessageHandler;
 	delete SystemMessageManager;
 }
-
 
 
 

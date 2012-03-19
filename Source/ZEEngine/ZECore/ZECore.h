@@ -84,6 +84,7 @@ class ZEPluginManager;
 class ZESystemMessageHandler;
 class ZERealTimeClock;
 class ZEProfiler;
+class ZETimerManager;
 
 class ZECore
 {
@@ -107,6 +108,7 @@ class ZECore
 		ZEOptionManager*				OptionManager;
 		ZEResourceManager*				ResourceManager;
 		ZECommandManager*				CommandManager;
+		ZETimerManager*					TimerManager;
 		ZEConsole*						Console;
 		ZEWindow*						Window;
 		
@@ -140,6 +142,7 @@ class ZECore
 		ZEExtensionManager*				GetExtensionManager();
 		ZEPluginManager*				GetPluginManager();
 		ZESystemMessageManager*			GetSystemMessageManager();
+		ZETimerManager*					GetTimerManager();
 		ZERealTimeClock*				GetRealTimeClock();
 		ZEProfiler*						GetProfiler();
 

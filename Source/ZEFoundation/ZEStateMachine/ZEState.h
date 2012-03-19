@@ -37,26 +37,72 @@
 #ifndef __ZE_STATE_H__
 #define	__ZE_STATE_H__
 
+#include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
+#include "ZEDS/ZEDelegate.h"
 
-class ZETransaction;
+#include "ZEStateMachine.h"
+
+typedef ZEDelegate<void (ZEState*, ZEState*, bool&)> ZEStateEventEntering;
+typedef ZEDelegate<void (ZEState*, ZEState*)> ZEStateEventEntered;
+typedef ZEDelegate<void (ZEState*, ZEState*, bool&)> ZEStateEventLeaving;
+typedef ZEDelegate<void (ZEState*, ZEState*)> ZEStateEventLeft;
 
 class ZEState
 {
+	friend class ZEStateMachine;
+
+	private:
+		ZEString					Name;
+		ZEStateMachine*				Owner;
+		ZEArray<ZEState*>			Transitions;
+
 	protected:
-		ZEString							Name;
+									ZEState();
+		virtual						~ZEState();
 
 	public:
-											ZEState(void);
-											~ZEState(void);
+		const ZEStateMachine&		GetOwner();
 
-		virtual void						OnEnter(ZETransaction* Transaction);
-		virtual void						OnLeave(ZETransaction* Transaction);
-		virtual bool						OnLeaving(ZETransaction* Transaction);
-		virtual bool						OnEntering(ZETransaction* Transaction);
+		void						SetName(const ZEString& Name);
+		const ZEString&				GetName();
 
-		ZEString&							GetName();
-		void								SetName(const ZEString& Name);
+		virtual void				OnEntering(ZEState* From, ZEState* To, bool& Cancel);
+		virtual void				OnEntered(ZEState* From, ZEState* To);
+		virtual void				OnLeaving(ZEState* From, ZEState* To, bool& Cancel);
+		virtual void				OnLeft(ZEState* From, ZEState* To);
+
+		const ZEArray<ZEState*>&	GetTransitions();
+		virtual bool				AddTransition(ZEState* State);
+		virtual bool				RemoveTransition(ZEState* State);
+};	
+
+class ZEDelegatedState : public ZEState
+{
+	private:
+		ZEStateEventEntering		EnteringEvent;
+		ZEStateEventEntered			EnteredEvent;
+		ZEStateEventLeaving			LeavingEvent;
+		ZEStateEventLeft			LeftEvent;
+
+	public:
+		virtual void				OnEntering(ZEState* From, ZEState* To, bool& Cancel);
+		virtual void				OnEntered(ZEState* From, ZEState* To);
+		virtual void				OnLeaving(ZEState* From, ZEState* To, bool& Cancel);
+		virtual void				OnLeft(ZEState* From, ZEState* To);
+
+		void						SetEnteringEvent(const ZEStateEventEntering& Event);
+		const ZEStateEventEntering&	GetEnteringEvent();
+
+		void						SetEnteredEvent(const ZEStateEventEntered& Event);
+		const ZEStateEventEntered&	GetEnteredEvent();
+
+		void						SetLeavingEvent(const ZEStateEventLeaving& Event);
+		const ZEStateEventLeaving&	GetLeavingEvent();
+
+		void						SetLeftEvent(const ZEStateEventLeft& Event);
+		const ZEStateEventLeft&		GetLeftEvent();
+
 };
 
 #endif

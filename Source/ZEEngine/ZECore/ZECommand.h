@@ -50,14 +50,14 @@ class ZECommand
 {
 	private:
 		ZEString					Name;
-		ZEInt							AccessLevel;
+		ZEInt						AccessLevel;
 		ZECommandCallback			Callback;
 
 	public:
 		const ZEString&				GetName();
 		void						SetName(const ZEString& Name);
 
-		ZEInt							GetAccessLevel();
+		ZEInt						GetAccessLevel();
 		void						SetAccessLevel(ZEInt AccessLevel);
 		
 		void						SetCallback(ZECommandCallback Callback);

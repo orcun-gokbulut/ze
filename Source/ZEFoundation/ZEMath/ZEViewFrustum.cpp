@@ -138,7 +138,7 @@ const ZEPlane& ZEViewFrustum::GetClippingPlane(ZEViewFrustumPlane Plane) const
 	}
 }
 
-const ZELineSegment& ZEViewFrustum::GetEdge(ZEViewFrustumEdge Edge) const
+const ZELineSegment ZEViewFrustum::GetEdge(ZEViewFrustumEdge Edge) const
 {
 	ZEArray<ZELineSegment> LineSegments;
 	float Fov_2 = FOV / 2;
@@ -211,7 +211,7 @@ const ZELineSegment& ZEViewFrustum::GetEdge(ZEViewFrustumEdge Edge) const
 	}
 }
 
-const ZEVector3& ZEViewFrustum::GetVertex(ZEViewFrustumVertex Vertex) const
+const ZEVector3 ZEViewFrustum::GetVertex(ZEViewFrustumVertex Vertex) const
 {
 	float Fov_2 = FOV / 2;
 
