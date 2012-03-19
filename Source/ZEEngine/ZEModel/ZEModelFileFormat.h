@@ -43,7 +43,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDefinitions.h"
 #include "ZETypes.h"
-#include "ZEFile/ZEFileStructure.h"
+#include "ZEPacking.h"
 
 #define ZE_MDLF_MAX_NAME_SIZE						128
 #define ZE_MDLF_MAX_FILENAME_SIZE					256
