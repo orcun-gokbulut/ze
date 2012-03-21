@@ -86,7 +86,8 @@ bool ZECompressedFile::Eof()
 {
 	if(!File)
 		return false;
-	return (bool)feof((FILE*)File);
+
+	return feof((FILE*)File) == 0;
 }
 
 bool ZECompressedFile::Seek(ZEInt64 Offset, ZESeekFrom Origin)
@@ -396,7 +397,7 @@ ZEUInt64 ZECompressedFile::Read(void* Buffer, ZEUInt64 Size,ZEUInt64 Count)
 	ZEUInt64 DeCompressedDataSize = 0;
 	ZEUInt64 TotalDeCompressedDataSize = 0;
 	ZEUInt64 DataWillBeReadSize = CHUNK_SIZE;
-	ZEUInt64 DataWillBeReadTotalSize;
+//	ZEUInt64 DataWillBeReadTotalSize;
 	ZEUInt64 TotalReadData = 0;
 
 	//Create in and out buffers for inflate function
@@ -462,7 +463,7 @@ ZEUInt64 ZECompressedFile::Read(void* Buffer, ZEUInt64 Size,ZEUInt64 Count)
 
 
 		//Say stream how much data must be decompressed
-		Stream.avail_in = DataWillBeReadSize;
+		Stream.avail_in = (uInt)DataWillBeReadSize;
 
 		//Put data which will be decompressed to in buffer
 		fread(InputBuffer,DataWillBeReadSize,1,(FILE*)File);
@@ -658,7 +659,7 @@ ZEUInt64 ZECompressedFile::Write( const void* Buffer, ZEUInt64 Size, ZEUInt64 Co
 		Buffer = (void*)BufferPointer;
 
 		//Tell stream that how many data will be compressed
-		Stream.avail_in = BufferSizeToCopy;
+		Stream.avail_in = (uInt)BufferSizeToCopy;
 
 		//Put data that will be compressed to stream
 		Stream.next_in = InputBuffer;

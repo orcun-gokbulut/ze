@@ -58,10 +58,11 @@ const ZEVector3& ZERectangle3D::GetPoint(ZEUInt Index) const
 	}
 }
 
-const ZELine& ZERectangle3D::GetBorderLine(ZEUInt Index) const
+ZELine ZERectangle3D::GetBorderLine(ZEUInt Index) const
 {
 	switch(Index)
 	{
+		default:
 		case 0:
 			return ZELine(P1, P2);
 		case 1:
@@ -70,15 +71,15 @@ const ZELine& ZERectangle3D::GetBorderLine(ZEUInt Index) const
 			return ZELine(P3, P4);
 		case 3:
 			return ZELine(P4, P1);
-		default:
-			return ZELine(P1, P2);
+
 	}
 }
 
-const ZELineSegment& ZERectangle3D::GetBorder(ZEUInt Index) const
+ZELineSegment ZERectangle3D::GetBorder(ZEUInt Index) const
 {
 	switch(Index)
 	{
+		default:
 		case 0:
 			return ZELineSegment(P1, P2);
 		case 1:
@@ -87,8 +88,6 @@ const ZELineSegment& ZERectangle3D::GetBorder(ZEUInt Index) const
 			return ZELineSegment(P3, P4);
 		case 3:
 			return ZELineSegment(P4, P1);
-		default:
-			return ZELineSegment(P1, P2);
 	}
 }
 

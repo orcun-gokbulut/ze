@@ -195,7 +195,10 @@ bool ZEFile::Seek(ZEInt64 Offset, ZESeekFrom Origin)
 		return true;
 	}
 	else
+	{
+		FileCursor = _ftelli64((FILE*)File);
 		return false;
+	}
 }
 
 ZEUInt64 ZEFile::Tell()

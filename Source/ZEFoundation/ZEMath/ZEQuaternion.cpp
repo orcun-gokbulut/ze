@@ -132,7 +132,8 @@ void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Di
 	NewRight.z, NewUp.z, NewDirection.z);
 
 	Output.w = ZEMath::Sqrt(1.0f + Basis.M11 + Basis.M22 + Basis.M33) / 2.0f;
-	double Scale = Output.w * 4.0f;
+	
+	float Scale = Output.w * 4.0f;
 	Output.x = (Basis.M32 - Basis.M23) / Scale;
 	Output.y = (Basis.M13 - Basis.M31) / Scale;
 	Output.z = (Basis.M21 - Basis.M12) / Scale;

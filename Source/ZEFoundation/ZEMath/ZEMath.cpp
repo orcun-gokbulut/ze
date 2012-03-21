@@ -122,5 +122,5 @@ float ZEMath::Lerp(float A, float B, float Factor)
 
 float ZEMath::CopySign(float Value, float Sign)
 {
-	return _copysign(Value, Sign);
+	return (float)_copysign(Value, Sign);
 }

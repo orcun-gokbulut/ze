@@ -215,7 +215,7 @@ void ZESerialPort::Clear()
 bool ZESerialPort::Read(void* Data, ZESize DataSize, ZESize &BytesRead)
 {
 	unsigned long Temp;
-	if (!ReadFile(Handle, Data, DataSize, &Temp, NULL))
+	if (!ReadFile(Handle, Data, (DWORD)DataSize, &Temp, NULL))
 		return false;
 
 	BytesRead = Temp;
@@ -226,7 +226,7 @@ bool ZESerialPort::Read(void* Data, ZESize DataSize, ZESize &BytesRead)
 bool ZESerialPort::Write(const void* Data, ZESize DataSize, ZESize &BytesWritten)
 {
 	DWORD Temp;
-	if (!WriteFile(Handle, Data, DataSize, &Temp, NULL))
+	if (!WriteFile(Handle, Data, (DWORD)DataSize, &Temp, NULL))
 		return false;
 
 	BytesWritten = Temp;

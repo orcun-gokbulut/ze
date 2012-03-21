@@ -38,7 +38,7 @@
 
 float ZERandom::GetFloat()
 {
-	return (float)rand() / (float)RAND_MAX - (float)rand() / (float)RAND_MAX;
+	return (float)rand() / (float)RAND_MAX - (float)rand() / (float)RAND_MAX; //-V501
 }
 
 float ZERandom::GetFloatPositive()

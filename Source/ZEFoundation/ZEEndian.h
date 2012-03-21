@@ -33,6 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#ifndef __ZE_ENDIAN_H__
+#define __ZE_ENDIAN_H__
+
 #include "ZETypes.h"
 
 #ifdef ZE_PLATFORM_COMPILER_MSVC
@@ -268,3 +271,5 @@ class ZELittleEndian
 
 		}
 };
+
+#endif

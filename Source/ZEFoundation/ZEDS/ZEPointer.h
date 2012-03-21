@@ -88,6 +88,18 @@ class ZEPointer
 			return Pointer;
 		}
 
+		Type* Transfer()
+		{
+			Type* Temp = Pointer;
+			Pointer = NULL;
+			return Temp;
+		}
+
+		operator Type*()
+		{
+			return Pointer;
+		}
+
 		Type& operator*()
 		{
 			zeAssert(Pointer == NULL, "ZEPointer does not points any data structure.");

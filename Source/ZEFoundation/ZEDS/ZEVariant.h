@@ -79,7 +79,7 @@ class ZEVariant : public ZESerializable
 		union ZEVariantValue
 		{
 			float			Float;
-			ZEInt				Integer;
+			ZEInt			Integer;
 			bool			Boolean;
 			char*			String;
 			ZEObject*		Pointer;
@@ -119,7 +119,7 @@ class ZEVariant : public ZESerializable
 		void				SetVariant(const ZEVariant& NewValue);
 
 		char*				GetString() const;
-		ZEInt					GetInteger() const;
+		ZEInt				GetInteger() const;
 		float				GetFloat() const;
 		bool				GetBoolean() const;
 		ZEVector2&			GetVector2() const;
