@@ -48,9 +48,9 @@ class ZEDelegate;
 #define Arguments
 #include "ZEDelegateImp.h"
 #undef DelegateName
-#undef TemplateArgumentDefinition
+#undef TemplateArgumentDefinitions
 #undef TemplateArguments
-#undef ArgumentDefinition
+#undef ArgumentDefinitions
 #undef Arguments	
 
 #undef ArgumentSeperator

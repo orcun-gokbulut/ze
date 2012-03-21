@@ -34,13 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERectangle.h"
-#include "ZEError.h"
 
 ZEVector2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
 {
 
 	switch(Corner)
 	{
+		default:
 		case ZE_RC_LEFTDOWN:
 			return ZEVector2(LeftUp.x, RightDown.y);
 		case ZE_RC_RIGHTDOWN:
@@ -49,8 +49,6 @@ ZEVector2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
 			return ZEVector2(LeftUp.x, LeftUp.y);
 		case ZE_RC_RIGHTUP:
 			return ZEVector2(RightDown.x, LeftUp.y);
-		default:
-			zeAssert(true, "Wrong ZERectangleCorner enum value.");
 	}
 }
 

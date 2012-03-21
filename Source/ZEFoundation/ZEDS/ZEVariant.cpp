@@ -53,15 +53,23 @@
 
 void ZEVariant::SetType(ZEVariantType NewType)
 {
-	if (Type == ZE_VRT_STRING && Value.String != NULL)
+	if (Value.Pointer != NULL)
 	{
-		delete[] Value.String;
-		Value.String = NULL;
-	}
-	else if ((Type == ZE_VRT_MATRIX3X3 || Type == ZE_VRT_MATRIX4X4) && Value.Pointer != NULL)
-	{
-		delete Value.Pointer;
-		Value.Pointer = NULL;
+		if (Type == ZE_VRT_STRING)
+		{
+			delete[] Value.String;
+			Value.String = NULL;
+		}
+		else if (Type == ZE_VRT_MATRIX3X3)
+		{
+			delete Value.Matrix3x3;
+			Value.Matrix3x3 = NULL;
+		}
+		else if (Type == ZE_VRT_MATRIX4X4)
+		{
+			delete Value.Matrix4x4;
+			Value.Matrix3x3 = NULL;
+		}
 	}
 
 	switch(NewType)
@@ -193,7 +201,7 @@ bool ZEVariant::Serialize(ZESerializer* Serializer)
 		case ZE_VRT_NULL:
 			break;
 		case ZE_VRT_STRING:
-			StringSize = strlen(Value.String) + 1;
+			StringSize = (ZEUInt32)(strlen(Value.String) + 1);
 			Serializer->Write(&StringSize, sizeof(ZEUInt32), 1);
 			Serializer->Write(Value.String, sizeof(char), StringSize);
 			break;
@@ -251,7 +259,7 @@ bool ZEVariant::Unserialize(ZEUnserializer* Unserializer)
 		case ZE_VRT_STRING:
 			SetType(ZE_VRT_STRING);
 			Unserializer->Read(&StringSize, sizeof(ZEUInt32), 1);
-			Value.String = new char[StringSize];
+			Value.String = new char[(ZESize)StringSize];
 			Unserializer->Read(Value.String, sizeof(char), StringSize);
 			break;
 		case ZE_VRT_INTEGER:

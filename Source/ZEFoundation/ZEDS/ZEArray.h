@@ -117,7 +117,7 @@ class ZEArray
 
 		inline void SetItem(ZESize Index, Type Value)
 		{
-			zeAssert(Index < 0 || Index >= Count, "ZEArray::SetItem operaion failed. Index is out of range. (0 <= Index < Count)");
+			zeAssert(Index >= Count, "ZEArray::SetItem operaion failed. Index is out of range. (0 <= Index < Count)");
 			this->Items[Index] = Value;
 		}
 
@@ -269,7 +269,7 @@ class ZEArray
 
 		inline Type* Insert(ZESize Index)
 		{
-			zeAssert(Index < 0 || Index > Count, "ZEArray::Insert operation failed. Index is out of range. (0 <= Index <= Count)");
+			zeAssert(Index > Count, "ZEArray::Insert operation failed. Index is out of range. (0 <= Index <= Count)");
 			ZESize N = 0;
 			Type* TempPointer = this->Items;
 			bool Changed = Allocator.Allocate(&Items, Count + 1);
@@ -304,7 +304,7 @@ class ZEArray
 
 		inline void DeleteAt(ZESize Index)
 		{
-			zeAssert(Index < 0 || Index >= Count, "ZEArray::DeleteAt operation failed. Index is out of range. (0 <= Index < Count)");
+			zeAssert(Index >= Count, "ZEArray::DeleteAt operation failed. Index is out of range. (0 <= Index < Count)");
 			ZESize NewCount = Count, N = 0;
 			Type* TempPointer = this->Items;
 			bool Changed;
@@ -352,8 +352,6 @@ class ZEArray
 		
 		inline void SetCount(ZESize Count)
 		{
-			zeAssert(Count < 0, "ZEArray::SetCount operation failed. Wrong Count value. (Count >= 0)");
-
 			if (Count == this->Count)
 				return;
 
@@ -369,8 +367,6 @@ class ZEArray
 
 		inline void Resize(ZESize Count)
 		{
-			zeAssert(Count < 0, "ZEArray::Resize operation failed. Wrong Count value. (Count >= 0)");
-			
 			if (Count == this->Count)
 				return;
 
@@ -479,13 +475,13 @@ class ZEArray
 
 		inline Type& operator[](ZESize Index)
 		{
-			zeAssert(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
+			zeAssert(Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
 		}
 		
 		inline const Type& operator[](ZESize Index) const
 		{
-			zeAssert(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
+			zeAssert(Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
 		}
 

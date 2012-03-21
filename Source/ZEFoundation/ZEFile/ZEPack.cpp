@@ -450,7 +450,7 @@ bool ZEPack::AddChunk(const char* IdentifierName,unsigned char* Source,ZEUInt64 
 	ZEUInt64 NewRecorsStartPosition = OldRecordsStartPosition + SourceSize;
 
 	//Create buffer for keeping buffers at process
-	unsigned char* bufferForHeaders = new unsigned char[(ZEUInt)OldRecordSize];
+	ZEUInt8* bufferForHeaders = new ZEUInt8[(ZESize)OldRecordSize];
 
 	//Go to chunk headers' start position
 	_fseeki64((FILE*)File->GetFileHandle(),OldRecordsStartPosition,SEEK_SET);
@@ -525,7 +525,7 @@ bool ZEPack::AddChunk(const char* IdentifierName,unsigned char* Source,ZEUInt64 
 		0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
 
 	//Set cursor position to new end of file
-	SetFilePointer(FileHandle,NewEndOfFile,NULL,FILE_BEGIN);
+	SetFilePointer(FileHandle, (LONG)NewEndOfFile, NULL, FILE_BEGIN);
 
 	//Set current position as end of file
 	SetEndOfFile(FileHandle);												
@@ -597,6 +597,8 @@ bool ZEPack::GetChunk(const char *IdentifierName, unsigned char *Data)
 		//Go to next header
 		CurrentHeaderPosition += sizeof(ZEChunkHeader);
 	}
+
+	return false;
 }
 
 
