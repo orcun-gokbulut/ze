@@ -95,17 +95,59 @@ void ZEString::SetValue(const char* String)
 	ZEDebugCheckMemory();
 }
 
-void ZEString::SetValue(ZEInt Value, ZEUInt Base)
+void ZEString::SetValue(ZEInt8 Value, ZEUInt Base)
 {
 	char Buffer[35];
-	ltoa(Value, Buffer, Base);
+	itoa(Value, Buffer, Base);
 	SetValue(Buffer);
 }
 
-void ZEString::SetValue(ZEUInt Value, ZEUInt Base)
+void ZEString::SetValue(ZEInt16 Value, ZEUInt Base)
+{
+	char Buffer[35];
+	itoa(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetValue(ZEInt32 Value, ZEUInt Base)
+{
+	char Buffer[35];
+	itoa(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetValue(ZEInt64 Value, ZEUInt Base)
+{
+	char Buffer[67];
+	_i64toa(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetValue(ZEUInt8 Value, ZEUInt Base)
 {
 	char Buffer[35];
 	ultoa(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetValue(ZEUInt16 Value, ZEUInt Base)
+{
+	char Buffer[35];
+	ultoa(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetValue(ZEUInt32 Value, ZEUInt Base)
+{
+	char Buffer[35];
+	ultoa(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetValue(ZEUInt64 Value, ZEUInt Base)
+{
+	char Buffer[67];
+	_ui64toa(Value, Buffer, Base);
 	SetValue(Buffer);
 }
 
@@ -645,7 +687,7 @@ const char& ZEString::operator[](ZESSize Index) const
 {
 	zeAssert(Buffer == NULL, "Empty string can not be indexed.");
 	zeAssert(Index < 0, "Index parameter is negative.");
-	zeAssert(Index > strlen(Buffer), "Index parameter value exceed length of the string.");
+	zeAssert((ZESize)Index > strlen(Buffer), "Index parameter value exceed length of the string.");
 	return Buffer[Index];
 }
 
@@ -653,7 +695,7 @@ char& ZEString::operator[](ZESSize Index)
 {
 	zeAssert(Buffer == NULL, "Empty string can not be indexed.");
 	zeAssert(Index < 0, "Index parameter is negative.");
-	zeAssert(Index > strlen(Buffer), "Index parameter value exceed length of the string.");
+	zeAssert((ZESize)Index > strlen(Buffer), "Index parameter value exceed length of the string.");
 	return Buffer[Index];
 }
 

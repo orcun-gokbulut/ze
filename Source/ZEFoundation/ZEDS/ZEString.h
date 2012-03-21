@@ -50,8 +50,14 @@ class ZEString
 
 	public:			
 		void						SetValue(const char* String);
-		void						SetValue(ZEInt Value, ZEUInt Base = 10);
-		void						SetValue(ZEUInt Value, ZEUInt Base = 10);
+		void						SetValue(ZEInt8 Value, ZEUInt Base = 10);
+		void						SetValue(ZEInt16 Value, ZEUInt Base = 10);
+		void						SetValue(ZEInt32 Value, ZEUInt Base = 10);
+		void						SetValue(ZEInt64 Value, ZEUInt Base = 10);
+		void						SetValue(ZEUInt8 Value, ZEUInt Base = 10);
+		void						SetValue(ZEUInt16 Value, ZEUInt Base = 10);
+		void						SetValue(ZEUInt32 Value, ZEUInt Base = 10);
+		void						SetValue(ZEUInt64 Value, ZEUInt Base = 10);
 		void						SetValue(float Value, ZEUInt Digits);
 		void						SetValue(bool Value, const char* TrueText = "True", const char* FalseText = "False");
 
