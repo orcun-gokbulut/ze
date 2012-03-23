@@ -104,7 +104,6 @@ bool ZEGraphicsDebugModule::Initialize()
 	Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 	Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
 	Player->GetCamera()->SetFOV(ZE_PI / 3.0f);
-	Player->SetMovementSpeed(100.0f);
 	Scene->SetActiveCamera(Player->GetCamera());
 	Scene->AddEntity(Player);
 
