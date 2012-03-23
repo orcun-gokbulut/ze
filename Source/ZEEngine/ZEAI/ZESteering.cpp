@@ -38,6 +38,8 @@
 
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
+#include "ZEInput/ZEInputDefinitions.h"
+#include "ZEInput/ZEInputModule.h"
 #include "ZERandom.h"
 
 void ZESteeringOutput::SetZero()
@@ -495,4 +497,72 @@ ZESteeringOutput ZECollisionAvoidanceSteering::Process(float ElapsedTime)
 ZECollisionAvoidanceSteering::ZECollisionAvoidanceSteering()
 {
 	SetPriority(1);
+}
+
+#define ACTIONID_FORWARD		0
+#define ACTIONID_BACKWARD		1
+#define ACTIONID_STRAFELEFT		2
+#define ACTIONID_STRAFERIGHT	3
+#define ACTIONID_TURNLEFT		4
+#define ACTIONID_TURNRIGHT		5
+#define ACTIONID_TURNUP			6
+#define ACTIONID_TURNDOWN		7
+
+ZEUserTankControlStreering::ZEUserTankControlStreering()
+{
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,			 ZEInputEvent("Keyboard", ZE_IKB_W, ZE_IBS_PRESSING)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,		 ZEInputEvent("Keyboard", ZE_IKB_S, ZE_IBS_PRESSING)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFERIGHT,		 ZEInputEvent("Keyboard", ZE_IKB_D, ZE_IBS_PRESSING)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFELEFT,		 ZEInputEvent("Keyboard", ZE_IKB_A, ZE_IBS_PRESSING)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNUP,			 ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNDOWN,		 ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNRIGHT,		 ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNLEFT,		 ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE)));
+}
+
+ZESteeringOutput ZEUserTankControlStreering::Process(float ElapsedTime)
+{
+	ZESteeringOutput Output;
+	Output.SetZero();
+
+	ZEInputAction* Current;
+	zeInput->ProcessInputMap(&InputMap);
+
+	float Friction = 1.0f;
+
+	ZEQuaternion OwnerRotation = GetOwner()->GetRotation();
+
+	bool Linear = false;
+	bool Angular = false;
+	for (size_t I = 0; I < InputMap.InputActionCount; I++)
+	{
+		Current = &InputMap.InputActions[I];
+		switch(Current->Id)
+		{
+		case ACTIONID_FORWARD:
+			Output.LinearAcceleration = GetOwner()->GetMaxLinearAcceleration() * GetOwner()->GetDirection();
+			Linear = true;
+			break;
+		case ACTIONID_BACKWARD:
+			Output.LinearAcceleration = -GetOwner()->GetMaxLinearAcceleration() * GetOwner()->GetDirection();
+			Linear = true;
+			break;
+		case ACTIONID_STRAFELEFT:
+			Output.AngularAcceleration = -GetOwner()->GetMaxAngularAcceleration();
+			Angular = true;
+			break;
+		case ACTIONID_STRAFERIGHT:
+			Output.AngularAcceleration = GetOwner()->GetMaxAngularAcceleration();
+			Angular = true;
+			break;
+		}
+	}
+
+	if (!Linear && GetOwner()->GetLinearVelocity().LengthSquare() != 0)
+		Output.LinearAcceleration = -GetOwner()->GetLinearVelocity().Normalize() * Friction * GetOwner()->GetMaxLinearAcceleration();
+
+	if (!Angular)
+		Output.AngularAcceleration = -ZEMath::Sign(GetOwner()->GetAngularVelocity()) * Friction * GetOwner()->GetMaxAngularAcceleration();
+
+	return Output;
 }
