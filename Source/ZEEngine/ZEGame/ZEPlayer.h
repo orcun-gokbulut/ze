@@ -37,9 +37,26 @@
 #ifndef	__ZE_PLAYER_H__
 #define __ZE_PLAYER_H__
  
-#include "ZECompoundEntity.h"
+#include "ZEAI/ZEActor.h"
 #include "ZEInput/ZEInputMap.h"
-#include "ZEUI/ZEUITextControl.h"
+#include "ZEAI/ZESteering.h"
+
+class ZEPlayerFreeSteering : public ZESteering
+{
+	private:
+		
+		ZEInputMap			InputMap;
+		float				Rx, Ry, Rz;
+		float				Friction;
+
+	public:
+
+		virtual ZESteeringOutput	Process(float ElapsedTime);
+
+									~ZEPlayerFreeSteering();
+									ZEPlayerFreeSteering();
+
+};
 
 ZE_META_ENTITY_DESCRIPTION(ZEPlayer);
 
@@ -48,18 +65,18 @@ class ZEProjectiveLight;
 class ZECamera;
 class ZEModelIKChain;
 
-class ZEPlayer : public ZECompoundEntity
+class ZEPlayer : public ZEActor
 {
 	ZE_META_ENTITY(ZEPlayer)
-	
 	private:
 		ZEInputMap				InputMap;
 		ZECamera*				Camera;
 		ZEListener*				Listener;
 		ZEProjectiveLight*		Light;
 
-		float					Ry, Rx, Rz, FOV;
-		float					MovementSpeed;
+		float					FOV;
+
+	protected:
 
 								ZEPlayer();
 		virtual					~ZEPlayer();
@@ -69,9 +86,6 @@ class ZEPlayer : public ZECompoundEntity
 
 		ZECamera*				GetCamera();
 		ZEListener*				GetListener();
-
-		void					SetMovementSpeed(float Meters);
-		float					GetMovementSpeed();
 
 		void					SetFOV(float FOV);
 		float					GetFOV();
