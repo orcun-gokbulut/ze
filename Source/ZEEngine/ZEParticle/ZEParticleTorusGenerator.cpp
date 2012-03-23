@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleEffect.cpp
+ Zinek Engine - ZEParticleTorusGenerator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,80 +33,76 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEParticleTorusGenerator.h"
 #include "ZEParticleEffect.h"
-#include "ZEGame/ZEEntityProvider.h"
+#include "ZEParticleSystem.h"
+#include "ZEMath\ZEAngle.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEParticleEffect);
-		
-ZEDrawFlags ZEParticleEffect::GetDrawFlags() const
+void ZEParticleTorusGenerator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool)
 {
-	return ZE_DF_DRAW | ZE_DF_CULL;
-}
-
-const ZEAABBox& ZEParticleEffect::GetWorldBoundingBox()
-{
-	ZEAABBox Box;
-	Box.Max = ZEVector3::MinValue;
-	Box.Min = ZEVector3::MaxValue;
-
-	for (ZESize I = 0; I < Emitters.GetCount(); I++)
-	{
-		ZEVector3::Min(Box.Min, Box.Min, Emitters[I]->GetBoundingBox().Min);
-		ZEVector3::Max(Box.Max, Box.Max, Emitters[I]->GetBoundingBox().Max);
-	}
-
-	return Box;
-}
-
-bool ZEParticleEffect::Initialize()
-{
-	return true;
-}
-
-void ZEParticleEffect::Deinitialize()
-{
-}
-
-void ZEParticleEffect::Draw(ZEDrawParameters* DrawParameters)
-{
-	if(!GetVisible())
+	if(GetIsSingleBurst() && SingleBurstParticleCounter >= GetSingleBurstMaxParticleCount())
 		return;
 
-	for(ZESize I = 0; I < Emitters.GetCount(); I++)
-		Emitters[I]->Draw(DrawParameters);
+	ParticlesRemaining += GetParticlesPerSecond() * ElapsedTime;
+	int ParticeCountForTimeElapsed = ParticlesRemaining;
+	ParticlesRemaining -= ParticeCountForTimeElapsed;
+
+	ZEUInt ParticlesEmmitedThisFrame = 0;
+
+	if(ParticeCountForTimeElapsed != 0)
+	{
+		for (int I = 0; I < OwnerParticlePool.GetCount(); I++)
+		{
+			if(OwnerParticlePool[I].State == ZE_PAS_DEAD)
+			{
+				ZEVector3 EffectPosition = GetOwner()->GetOwner()->GetWorldPosition();
+
+				float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
+				float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
+				float TubeRadius = RAND_BETWEEN_TWO_FLOAT(0.0f, OuterRadius);
+				OwnerParticlePool[I].Position.x = EffectPosition.x + (InnerRadius + TubeRadius * ZEAngle::Cos(Phi)) * ZEAngle::Cos(Theta);
+				OwnerParticlePool[I].Position.y = EffectPosition.y + (InnerRadius + TubeRadius * ZEAngle::Cos(Phi)) * ZEAngle::Sin(Theta);
+				OwnerParticlePool[I].Position.z = EffectPosition.z + TubeRadius * ZEAngle::Sin(Phi);		
+				OwnerParticlePool[I].State = ZE_PAS_NEW;
+
+				SingleBurstParticleCounter++;
+				ParticlesEmmitedThisFrame++;
+			}
+
+			if(ParticlesEmmitedThisFrame == ParticeCountForTimeElapsed)
+				break;
+		}
+	}
 }
 
-void ZEParticleEffect::Tick(float TimeElapsed)
+void ZEParticleTorusGenerator::SetInnerRadius(float Size)
 {
-	for(ZESize I = 0; I < Emitters.GetCount(); I++)
-		Emitters[I]->Tick(TimeElapsed);
+	InnerRadius = Size;
 }
 
-void ZEParticleEffect::AddEmitter(ZEParticleEmitter* Emitter)
+float ZEParticleTorusGenerator::GetInnerRadius() const
 {
-	Emitter->SetOwner(this);
-	Emitters.Add(Emitter);
+	return InnerRadius;
 }
 
-void ZEParticleEffect::RemoveEmitter(ZEParticleEmitter* Emitter)
+void ZEParticleTorusGenerator::SetOuterRadius(float Size)
 {
-	Emitters.DeleteValue(Emitter);
+	OuterRadius = Size;
 }
 
-const ZEArray<ZEParticleEmitter*>& ZEParticleEffect::GetEmitters()
+float ZEParticleTorusGenerator::GetOuterRadius() const
 {
-	return Emitters;
+	return OuterRadius;
 }
 
-ZEParticleEffect::ZEParticleEffect()
+ZEParticleTorusGenerator::ZEParticleTorusGenerator()
 {
+	InnerRadius = 0.2f;
+	OuterRadius = 0.5f;
+	ParticlesRemaining = 0.0f;
 }
 
-ZEParticleEffect::~ZEParticleEffect()
+ZEParticleTorusGenerator::~ZEParticleTorusGenerator()
 {
-}
 
-ZEParticleEffect* ZEParticleEffect::CreateInstance()
-{
-	return new ZEParticleEffect();
 }

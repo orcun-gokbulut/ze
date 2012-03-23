@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleBoxGenerator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,61 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#include "ZEParticleBoxGenerator.h"
+#include "ZEParticleEffect.h"
+#include "ZEParticleSystem.h"
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
-
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
-
-enum ZEParticleState
+void ZEParticleBoxGenerator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool)
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	if(GetIsSingleBurst() && SingleBurstParticleCounter >= GetSingleBurstMaxParticleCount())
+		return;
 
-class ZEParticle
+	ParticlesRemaining += GetParticlesPerSecond() * ElapsedTime;
+	int ParticeCountForTimeElapsed = ParticlesRemaining;
+	ParticlesRemaining -= ParticeCountForTimeElapsed;
+
+	ZEUInt ParticlesEmmitedThisFrame = 0;
+
+	if(ParticeCountForTimeElapsed != 0)
+	{
+		for (int I = 0; I < OwnerParticlePool.GetCount(); I++)
+		{
+			if(OwnerParticlePool[I].State == ZE_PAS_DEAD)
+			{
+				ZEVector3 EffectPosition = GetOwner()->GetOwner()->GetWorldPosition();
+
+				OwnerParticlePool[I].Position.x = EffectPosition.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2, BoxSize.x / 2);
+				OwnerParticlePool[I].Position.y = EffectPosition.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2, BoxSize.y / 2);
+				OwnerParticlePool[I].Position.z = EffectPosition.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2, BoxSize.z / 2);
+				OwnerParticlePool[I].State = ZE_PAS_NEW;
+
+				SingleBurstParticleCounter++;
+				ParticlesEmmitedThisFrame++;
+			}
+
+			if(ParticlesEmmitedThisFrame == ParticeCountForTimeElapsed)
+				break;
+		}
+	}
+}
+
+void ZEParticleBoxGenerator::SetBoxSize(const ZEVector3& Size)
 {
-	public:
+	BoxSize = Size;
+}
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+const ZEVector3& ZEParticleBoxGenerator::GetBoxSize() const
+{
+	return BoxSize;
+}
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+ZEParticleBoxGenerator::ZEParticleBoxGenerator()
+{
+	BoxSize = ZEVector3::One;
+	ParticlesRemaining = 0.0f;
+}
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
+ZEParticleBoxGenerator::~ZEParticleBoxGenerator()
+{
 
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
-};
-
-#endif
-
-
-
-
+}

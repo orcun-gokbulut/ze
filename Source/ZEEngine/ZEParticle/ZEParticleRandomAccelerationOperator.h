@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleRandomAccelerationOperator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,45 +34,51 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#ifndef __ZE_PARTICLE_RANDOM_ACCELERATION_OPERATOR_H__
+#define __ZE_PARTICLE_RANDOM_ACCELERATION_OPERATOR_H__
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
+#include "ZEParticleOperator.h"
 
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
+ZE_META_OBJECT_DESCRIPTION(ZEParticleRandomAccelerationOperator)
 
-enum ZEParticleState
+class ZEParticleRandomAccelerationOperator : public ZEParticleOperator
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	ZE_META_OBJECT(ZEParticleRandomAccelerationOperator)
 
-class ZEParticle
-{
+	private:
+
+		ZEVector3						MaxStrength;
+		ZEVector3						MinStrength;
+
 	public:
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+		void							SetMaxStrength(ZEVector3 NewStrength = ZEVector3::One);
+		const ZEVector3&				GetMaxStrength() const;
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
+		void							SetMinStrength(ZEVector3 NewStrength = -ZEVector3::One);
+		const ZEVector3&				GetMinStrength() const;
 
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
+		virtual void					Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool);
+		virtual void					ResizeCustomDataPool(ZESize NewPoolSize);
+
+										ZEParticleRandomAccelerationOperator();
+										~ZEParticleRandomAccelerationOperator();
 };
 
 #endif
 
-
-
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEParticleRandomAccelerationOperator" parent="ZEParticleOperator">		
+			<noinstance>true</noinstance>
+			<description>Random Acceleration Modifier.</description>
+			<property name="MinStrength" type="ZEVector3" autogetset="yes" description="Minimum random acceleration that will be aplied in a tick time interval."/>
+			<property name="MaxStrength" type="ZEVector3" autogetset="yes" description="Maximum random acceleration that will be aplied in a tick time interval."/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/

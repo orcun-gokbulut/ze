@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleGenerator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#include "ZEParticleGenerator.h"
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
-
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
-
-enum ZEParticleState
+const ZEParticleSystem* ZEParticleGenerator::GetOwner() const
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	return Owner;
+}
 
-class ZEParticle
+void ZEParticleGenerator::SetParticlesPerSecond(ZEUInt ParticlesPerSecond)
 {
-	public:
+	this->ParticlesPerSecond = ParticlesPerSecond;
+}
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+ZEUInt ZEParticleGenerator::GetParticlesPerSecond() const
+{
+	return ParticlesPerSecond;
+}
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+void ZEParticleGenerator::SetSingleBurstMaxParticleCount(ZEUInt Count)
+{
+	SingleBurstMaxParticleCount = Count;
+}
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
+ZEUInt ZEParticleGenerator::GetSingleBurstMaxParticleCount() const
+{
+	return SingleBurstMaxParticleCount;
+}
 
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
-};
+void ZEParticleGenerator::SetIsSingleBurst(bool IsSingleBurst)
+{
+	this->IsSingleBurst = IsSingleBurst;
+}
 
-#endif
+bool ZEParticleGenerator::GetIsSingleBurst() const
+{
+	return IsSingleBurst;
+}
 
-
-
-
+ZEParticleGenerator::ZEParticleGenerator()
+{
+	Owner = NULL;
+	SingleBurstParticleCounter = 0;
+}

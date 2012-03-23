@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleOperator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#include "ZEParticleOperator.h"
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
-
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
-
-enum ZEParticleState
+const ZEParticleSystem*	ZEParticleOperator::GetOwner() const
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	return Owner;
+}
 
-class ZEParticle
+ZEParticleOperator::ZEParticleOperator()
 {
-	public:
-
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
-
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
-
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
-
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
-};
-
-#endif
-
-
-
-
+	Owner = NULL;
+}
