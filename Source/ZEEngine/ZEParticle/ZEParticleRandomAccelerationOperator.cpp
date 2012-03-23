@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleRandomAccelerationOperator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,69 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#include "ZEParticleRandomAccelerationOperator.h"
+#include "ZEParticleSystem.h"
+#include "ZEParticlePhysicsOperator.h"
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
-
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
-
-enum ZEParticleState
+void ZEParticleRandomAccelerationOperator::SetMaxStrength(ZEVector3 NewStrength)
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	MaxStrength = NewStrength;
+}
 
-class ZEParticle
+const ZEVector3& ZEParticleRandomAccelerationOperator::GetMaxStrength() const
 {
-	public:
+	return MaxStrength;
+}
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+void ZEParticleRandomAccelerationOperator::SetMinStrength(ZEVector3 NewStrength)
+{
+	MinStrength = NewStrength;
+}
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+const ZEVector3& ZEParticleRandomAccelerationOperator::GetMinStrength() const
+{
+	return MinStrength;
+}
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
+void ZEParticleRandomAccelerationOperator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool)
+{
+	ZEParticlePhysicsOperator* PhysicsOperator = NULL;
 
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
-};
+	for(ZESize I = 0; I < GetOwner()->GetOperators().GetCount(); I++)
+	{
+		if(GetOwner()->GetOperators()[I]->GetDescription() == ZEParticlePhysicsOperator::Description())
+			PhysicsOperator = (ZEParticlePhysicsOperator*)GetOwner()->GetOperators()[I];
+	}
 
-#endif
+	if(PhysicsOperator == NULL)
+		return;
 
+	ZEVector3 RandomResult;
 
+	for (ZESize I = 0; I < PhysicsOperator->CustomData.GetCount(); I++)
+	{
+		if(OwnerParticlePool[I].State != ZE_PAS_DEAD)
+		{
+			RandomResult.x = RAND_BETWEEN_TWO_FLOAT(MinStrength.x, MaxStrength.x);
+			RandomResult.y = RAND_BETWEEN_TWO_FLOAT(MinStrength.y, MaxStrength.y);
+			RandomResult.z = RAND_BETWEEN_TWO_FLOAT(MinStrength.z, MaxStrength.z);
+			PhysicsOperator->CustomData[I].Velocity += RandomResult * ElapsedTime; 
+		}
+	}
+}
 
+void ZEParticleRandomAccelerationOperator::ResizeCustomDataPool(ZESize NewPoolSize)
+{
+	//Nothing to do with pool size
+}
 
+ZEParticleRandomAccelerationOperator::ZEParticleRandomAccelerationOperator()
+{
+	MaxStrength = ZEVector3::Zero;
+	MinStrength = ZEVector3::Zero;
+}
+
+ZEParticleRandomAccelerationOperator::~ZEParticleRandomAccelerationOperator()
+{
+
+}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleSphereGenerator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,65 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#include "ZEParticleSphereGenerator.h"
+#include "ZEParticleEffect.h"
+#include "ZEParticleSystem.h"
+#include "ZEMath\ZEAngle.h"
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
-
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
-
-enum ZEParticleState
+void ZEParticleSphereGenerator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool)
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	if(GetIsSingleBurst() && SingleBurstParticleCounter >= GetSingleBurstMaxParticleCount())
+		return;
 
-class ZEParticle
+	ParticlesRemaining += GetParticlesPerSecond() * ElapsedTime;
+	int ParticeCountForTimeElapsed = ParticlesRemaining;
+	ParticlesRemaining -= ParticeCountForTimeElapsed;
+
+	ZEUInt ParticlesEmmitedThisFrame = 0;
+
+	if(ParticeCountForTimeElapsed != 0)
+	{
+		for (int I = 0; I < OwnerParticlePool.GetCount(); I++)
+		{
+			if(OwnerParticlePool[I].State == ZE_PAS_DEAD)
+			{
+				ZEVector3 EffectPosition = GetOwner()->GetOwner()->GetWorldPosition();
+
+				float Radius = RAND_BETWEEN_TWO_FLOAT(0.0f, Radius);
+				float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
+				float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, ZE_PI);
+				OwnerParticlePool[I].Position.x = EffectPosition.x + Radius * ZEAngle::Cos(Theta) * ZEAngle::Sin(Phi);
+				OwnerParticlePool[I].Position.y = EffectPosition.y + Radius * ZEAngle::Sin(Theta) * ZEAngle::Sin(Phi);
+				OwnerParticlePool[I].Position.z = EffectPosition.z + Radius * ZEAngle::Cos(Phi);	
+				OwnerParticlePool[I].State = ZE_PAS_NEW;
+
+				SingleBurstParticleCounter++;
+				ParticlesEmmitedThisFrame++;
+			}
+
+			if(ParticlesEmmitedThisFrame == ParticeCountForTimeElapsed)
+				break;
+		}
+	}
+}
+
+void ZEParticleSphereGenerator::SetRadius(float Size)
 {
-	public:
+	Radius = Size;
+}
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+float ZEParticleSphereGenerator::GetRadius() const
+{
+	return Radius;
+}
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+ZEParticleSphereGenerator::ZEParticleSphereGenerator()
+{
+	Radius = 0.5f;
+	ParticlesRemaining = 0.0f;
+}
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
+ZEParticleSphereGenerator::~ZEParticleSphereGenerator()
+{
 
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
-};
-
-#endif
-
-
-
-
+}

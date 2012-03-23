@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,45 +34,67 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#ifndef __ZE_PARTICLE_GENERETOR_H__
+#define __ZE_PARTICLE_GENERETOR_H__
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
+#include "ZEParticle.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMeta\ZEObject.h"
 
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
+ZE_META_OBJECT_DESCRIPTION(ZEParticleGenerator)
 
-enum ZEParticleState
+class ZEParticleGenerator : public ZEObject
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	ZE_META_OBJECT(ZEParticleGenerator)
 
-class ZEParticle
-{
+	friend class ZEParticleSystem;
+
+	private:
+
+		ZEParticleSystem*		Owner;
+		ZEUInt					ParticlesPerSecond;
+
+		bool					IsSingleBurst;
+		ZEUInt					SingleBurstMaxParticleCount;
+
+	protected:
+
+		ZEUInt					SingleBurstParticleCounter;
+
+		virtual void			Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool) = 0;
+
+								ZEParticleGenerator();
+
 	public:
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+		void					SetParticlesPerSecond(ZEUInt ParticlesPerSecond);
+		ZEUInt					GetParticlesPerSecond() const;
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+		void					SetSingleBurstMaxParticleCount(ZEUInt Count);
+		ZEUInt					GetSingleBurstMaxParticleCount() const;
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
+		void					SetIsSingleBurst(bool IsSingleBurst);
+		bool					GetIsSingleBurst() const;
 
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
+		const ZEParticleSystem*	GetOwner() const;
 };
 
 #endif
 
+// Correct ParticlesPerSecond type in XML !!!
 
-
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEParticleGenerator">		
+			<noinstance>true</noinstance>
+			<description>Base of particle generators.</description>
+			<property name="ParticlesPerSecond" type="integer" autogetset="yes" description="Particle count that will be generated in one second."/>
+			<property name="IsSingleBurst" type="boolean" autogetset="yes" description="Is a single use generator or a permenent generator."/>
+			<property name="SingleBurstMaxParticleCount" type="integer" autogetset="yes" description="If generator is single burst, this number determines how many particles will it generate before stopping generation."/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/

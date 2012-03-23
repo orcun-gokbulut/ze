@@ -39,16 +39,24 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEDS/ZEString.h"
+#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEParticle.h"
 
 class ZEParticleEmitter;
 
 class ZEParticleModifier
 {
 	private:
+
 		ZEString							Name;
 		ZEParticleEmitter*					Owner;
 
+	protected: 
+
+		ZEArray<ZEParticle>&				GetOwnerParticlePool();
+
 	public:
+
 		void								SetName(const ZEString& Name);
 		const ZEString&						GetName();
 
@@ -59,6 +67,161 @@ class ZEParticleModifier
 
 											ZEParticleModifier();
 		virtual								~ZEParticleModifier();
+};
+
+class ZEParticlePhysicsModifier : public ZEParticleModifier
+{
+	private:
+
+		ZEVector3						MinAcceleration;
+		ZEVector3						MaxAcceleration;
+		ZEVector3						MinVelocity;
+		ZEVector3						MaxVelocity;
+
+	public:
+
+		virtual void					Tick(float ElapsedTime);
+
+		void							SetMinAcceleration(const ZEVector3& Acceleration);
+		const ZEVector3&				GetMinAcceleration() const;
+		void							SetMaxAcceleration(const ZEVector3& Acceleration);
+		const ZEVector3&				GetMaxAcceleration() const;
+
+		void							SetMinVelocity(const ZEVector3& Velocity);
+		const ZEVector3&				GetMinVelocity() const;
+		void							SetMaxVelocity(const ZEVector3& Velocity);
+		const ZEVector3&				GetMaxVelocity() const;
+
+										ZEParticlePhysicsModifier();
+										~ZEParticlePhysicsModifier();
+};
+
+class ZEParticleRotationModifier : public ZEParticleModifier
+{
+	private:
+
+		float							MaxRotation;
+		float							MinRotation;
+
+		float							MinAngularAcceleration;
+		float							MaxAngularAcceleration;
+		float							MinAngularVelocity;
+		float							MaxAngularVelocity;
+
+	public:
+
+		void							SetMaxRotation(float MaxRotation);
+		float							GetMaxRotation() const;
+		void							SetMinRotation(float MinRotation);
+		float							GetMinRotation() const;
+
+		void 							SetMinAngularAcceleration(float AngularAcceleration);
+		float			 				GetMinAngularAcceleration() const;
+		void 							SetMaxAngularAcceleration(float AngularAcceleration);
+		float 							GetMaxAngularAcceleration() const;
+
+		void 							SetMinAngularVelocity(float AngularVelocity);
+		float							GetMinAngularVelocity() const;
+		void 							SetMaxAngularVelocity(float AngularVelocity);
+		float							GetMaxAngularVelocity() const;
+
+		virtual	void					Tick(float ElapsedTime);
+
+										ZEParticleRotationModifier();
+										~ZEParticleRotationModifier();
+};
+
+class ZEParticleGrowModifier : public ZEParticleModifier
+{
+	private:
+
+		float	GrowFactor;
+
+	public:
+
+		void			SetGrowFactor(float Factor);
+		float			GetGrowFactor() const;
+
+		virtual	void	Tick(float ElapsedTime);
+
+						ZEParticleGrowModifier();
+						~ZEParticleGrowModifier();
+};
+
+class ZEParticleColorOverLifeModifier : public ZEParticleModifier
+{
+	private:
+
+		ZEVector4			ToColor;
+
+	public:
+
+		void				SetToColor(const ZEVector4& Factor);
+		const ZEVector4&	GetToColor() const;
+
+		virtual	void		Tick(float ElapsedTime);
+
+							ZEParticleColorOverLifeModifier();
+							~ZEParticleColorOverLifeModifier();
+};
+
+class ZEParticleDiffuseMapChangerModifier : public ZEParticleModifier
+{
+	private:
+
+		ZEInt							CurrentTextureIndex;
+		float							TotalTime;
+	
+		ZEArray<ZETexture2DResource*>	Textures;
+		float							Interval;
+
+	public:
+	
+		void							SetInterval(float NewInterval);
+		float							GetInterval();
+
+		void							AddTextureResource(ZETexture2DResource* Resource);
+
+		virtual	void					Tick(float ElapsedTime);
+	
+										ZEParticleDiffuseMapChangerModifier();
+										~ZEParticleDiffuseMapChangerModifier();
+};
+
+class ZEParticleDisplacementModifier : public ZEParticleModifier
+{
+	private:
+	
+		ZEVector3						Displacement;
+	
+	public:
+	
+
+		void							SetDisplacement(ZEVector3 NewDisplacement);
+		ZEVector3						GetDisplacement();
+	
+		virtual	void					Tick(float ElapsedTime);
+	
+										ZEParticleDisplacementModifier();
+										~ZEParticleDisplacementModifier();
+};
+
+class ZEParticleRandomAccelerationModifier : public ZEParticleModifier
+{
+	private:
+	
+		float							MaxStrength;
+	
+	public:
+	
+	
+		void							SetMaxStrength(float NewStrength = 1000.0f);
+		float							GetMaxStrength() const;
+	
+		virtual	void					Tick(float ElapsedTime);
+	
+										ZEParticleRandomAccelerationModifier();
+										~ZEParticleRandomAccelerationModifier();
 };
 
 #endif

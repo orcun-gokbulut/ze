@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleDisplacementOperator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,45 +34,45 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#ifndef __ZE_PARTICLE_DISPLACEMENT_OPERATOR_H__
+#define __ZE_PARTICLE_DISPLACEMENT_OPERATOR_H__
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
+#include "ZEParticleOperator.h"
 
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
+ZE_META_OBJECT_DESCRIPTION(ZEParticleDisplacementOperator)
 
-enum ZEParticleState
+class ZEParticleDisplacementOperator : public ZEParticleOperator
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	ZE_META_OBJECT(ZEParticleDisplacementOperator)
 
-class ZEParticle
-{
+	private: 
+
+		ZEVector3			Displacement;
+
 	public:
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+		virtual void		Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool);
+		virtual void		ResizeCustomDataPool(ZESize NewPoolSize);
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+		void				SetDisplacement(const ZEVector3& Value);
+		const ZEVector3&	GetDisplacement() const;
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
-
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
+							ZEParticleDisplacementOperator();
+							~ZEParticleDisplacementOperator();
 };
 
 #endif
 
-
-
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEParticleDisplacementOperator" parent="ZEParticleOperator">		
+			<noinstance>true</noinstance>
+			<description>Displacement operator.</description>
+			<property name="Displacement" type="ZEVector3" autogetset="yes" description="Displacement in x,y and z related with time."/>	
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleGrow2DOperator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#include "ZEParticleGrow2DOperator.h"
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
-
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
-
-enum ZEParticleState
+void ZEParticleGrow2DOperator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool)
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	for (ZESize I = 0; I < OwnerParticlePool.GetCount(); I++)
+	{
+		if(OwnerParticlePool[I].State != ZE_PAS_DEAD)
+			OwnerParticlePool[I].Size2D += GrowFactor * ElapsedTime; 
+	}
+}
 
-class ZEParticle
+void ZEParticleGrow2DOperator::ResizeCustomDataPool(ZESize NewPoolSize)
 {
-	public:
+	// Nothing to do with pool size
+}
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+void ZEParticleGrow2DOperator::SetGrowFactor(const ZEVector2& Factor)
+{
+	GrowFactor = Factor;
+}
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+const ZEVector2& ZEParticleGrow2DOperator::GetGrowFactor() const
+{
+	return GrowFactor;
+}
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
+ZEParticleGrow2DOperator::ZEParticleGrow2DOperator()
+{
+	GrowFactor = ZEVector2::Zero;
+}
 
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
-};
+ZEParticleGrow2DOperator::~ZEParticleGrow2DOperator()
+{
 
-#endif
-
-
-
-
+}

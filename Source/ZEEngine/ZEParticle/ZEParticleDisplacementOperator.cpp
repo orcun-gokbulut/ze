@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleDisplacementOperator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#include "ZEParticleDisplacementOperator.h"
+#include "ZEParticlePhysicsOperator.h"
+#include "ZEParticleSystem.h"
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
-
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
-
-enum ZEParticleState
+void ZEParticleDisplacementOperator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool)
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	ZEParticlePhysicsOperator* PhysicsOperator = NULL;
 
-class ZEParticle
+	for(ZESize I = 0; I < GetOwner()->GetOperators().GetCount(); I++)
+	{
+		if(GetOwner()->GetOperators()[I]->GetDescription() == ZEParticlePhysicsOperator::Description())
+			PhysicsOperator = (ZEParticlePhysicsOperator*)GetOwner()->GetOperators()[I];
+	}
+
+	if(PhysicsOperator == NULL)
+		return;
+
+	for (ZESize I = 0; I < PhysicsOperator->CustomData.GetCount(); I++)
+	{
+		if(OwnerParticlePool[I].State != ZE_PAS_DEAD)
+		{
+			PhysicsOperator->CustomData[I].Velocity += Displacement * ElapsedTime;
+		}
+	}
+}
+
+void ZEParticleDisplacementOperator::ResizeCustomDataPool(ZESize NewPoolSize)
 {
-	public:
+	//Nothing to do with pool size
+}
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+void ZEParticleDisplacementOperator::SetDisplacement(const ZEVector3& Value)
+{
+	Displacement = Value;
+}
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+const ZEVector3& ZEParticleDisplacementOperator::GetDisplacement() const
+{
+	return Displacement;
+}
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
+ZEParticleDisplacementOperator::ZEParticleDisplacementOperator()
+{
+	Displacement = ZEVector3::Zero;
+}
 
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
-};
+ZEParticleDisplacementOperator::~ZEParticleDisplacementOperator()
+{
 
-#endif
-
-
-
-
+}

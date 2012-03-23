@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleGrow2DOperator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,45 +34,45 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#ifndef __ZE_PARTICLE_GROW_OPERATOR_H__
+#define __ZE_PARTICLE_GROW_OPERATOR_H__
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
+#include "ZEParticleOperator.h"
 
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
+ZE_META_OBJECT_DESCRIPTION(ZEParticleGrow2DOperator)
 
-enum ZEParticleState
+class ZEParticleGrow2DOperator : public ZEParticleOperator
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	ZE_META_OBJECT(ZEParticleGrow2DOperator)
 
-class ZEParticle
-{
+	private: 
+
+		ZEVector2			GrowFactor;
+
 	public:
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+		virtual void		Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool);
+		virtual void		ResizeCustomDataPool(ZESize NewPoolSize);
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+		void				SetGrowFactor(const ZEVector2& Factor);
+		const ZEVector2&	GetGrowFactor() const;
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
-
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
+							ZEParticleGrow2DOperator();
+							~ZEParticleGrow2DOperator();
 };
 
 #endif
 
-
-
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEParticleGrow2DOperator" parent="ZEParticleOperator">		
+			<noinstance>true</noinstance>
+			<description>2D grow and shrink operator.</description>
+			<property name="GrowFactor" type="ZEVector2" autogetset="yes" description="Ammount of grow or shirink in x and y related with time."/>	
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/

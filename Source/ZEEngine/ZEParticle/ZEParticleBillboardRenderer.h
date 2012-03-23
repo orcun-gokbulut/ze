@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleBillboardRenderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,45 +34,43 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#ifndef __ZE_PARTICLE_BILLBOARD_RENDERER_H__
+#define __ZE_PARTICLE_BILLBOARD_RENDERER_H__
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
+#include "ZEParticleEmitter.h"
+#include "ZEParticleRenderer.h"
+#include "ZEGraphics\ZERenderCommand.h"
 
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
+class ZESimpleVertex;
+class ZEDrawParameters;
+class ZEStaticVertexBuffer;
 
-enum ZEParticleState
+class ZEParticleBillboardRenderer : public ZEParticleRenderer
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	private:
 
-class ZEParticle
-{
+		ZEParticleBillboardType				BillboardType;
+
+		ZEStaticVertexBuffer*				VertexBuffer;
+		ZERenderCommand						RenderCommand;
+		ZEVector3							AxisOfOrientation;
+
+		void								UpdateVertexBuffer(ZEDrawParameters* DrawParameters);
+		void								DrawParticle(ZESimpleVertex* Buffer, const ZEParticle* Particle, const ZEVector3& Right, const ZEVector3& Up);
+
+											ZEParticleBillboardRenderer();
+
 	public:
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+		virtual void						Draw(ZEDrawParameters* DrawParameters);
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+		void								SetAxixOfOrientation(const ZEVector3 AxisOfOrientation);
+		ZEVector3							GetAxisOfOrientation() const;
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
+		void								SetBillboardType(ZEParticleBillboardType Type);
+		ZEParticleBillboardType				GetBillboardType() const;
 
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
+		static ZEParticleBillboardRenderer*	CreateInstance();
 };
 
 #endif
-
-
-
-

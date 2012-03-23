@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleBoxGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,45 +34,47 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#ifndef __ZE_PARTICLE_BOX_GENERETOR_H__
+#define __ZE_PARTICLE_BOX_GENERETOR_H__
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
+#include "ZEParticleGenerator.h"
 
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
+ZE_META_OBJECT_DESCRIPTION(ZEParticleBoxGenerator)
 
-enum ZEParticleState
+class ZEParticleBoxGenerator : public ZEParticleGenerator
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	ZE_META_OBJECT(ZEParticleBoxGenerator)
 
-class ZEParticle
-{
+	private:
+
+		ZEVector3			BoxSize;
+		float				ParticlesRemaining;
+
+	protected:
+
+		virtual void		Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool);
+
 	public:
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+		void				SetBoxSize(const ZEVector3& Size);
+		const ZEVector3&	GetBoxSize() const;
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
-
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
-
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
+							ZEParticleBoxGenerator();
+							~ZEParticleBoxGenerator();
 };
 
 #endif
 
-
-
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEParticleBoxGenerator" parent="ZEParticleGenerator">		
+			<noinstance>true</noinstance>
+			<description>Box shaped particle generator.</description>
+			<property name="BoxSize" type="ZEVector3" autogetset="yes" description="Size of the generator box."/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/

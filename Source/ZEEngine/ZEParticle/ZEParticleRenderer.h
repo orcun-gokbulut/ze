@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleRenderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,45 +34,55 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#ifndef __ZE_PARTICLE_RENDERER_H__
+#define __ZE_PARTICLE_RENDERER_H__
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
+#include "ZETypes.h"
+#include "ZEParticle.h"
+#include "ZEDS\ZEArray.h"
 
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
+class ZEDrawParameters;
+class ZEParticleSystem;
+class ZEMaterial;
 
-enum ZEParticleState
+class ZEParticleRenderer
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	friend class ZEParticleSystem;
 
-class ZEParticle
-{
+	private:
+
+		ZEParticleSystem*		Owner;
+		ZEArray<ZEParticle>		SortTempArray;
+
+		bool					IsSortingEnabled;
+		bool					AreParticlesLocal;
+
+		void					SortParticles();
+
+		void					SetParticleCount(ZEUInt Count);
+
+	protected:
+
+		ZEMaterial*				Material;
+		ZEArray<ZEParticle>		Particles;
+
+								ZEParticleRenderer();
+		virtual					~ZEParticleRenderer();
+
 	public:
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+		void					SetParticlesLocal(bool AreParticlesLocal);
+		bool					GetParticlesLocal() const;
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+		void					SetMaterial(ZEMaterial* Material);
+		const ZEMaterial*		GetMaterial() const;
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
+		void					SetSortingEnabled(bool Enabled = true);
+		bool					GetSortingEnabled() const;
 
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
+		const ZEParticleSystem*	GetOwner() const;
+
+		virtual void			Draw(ZEDrawParameters* DrawParameters);
 };
 
 #endif
-
-
-
-

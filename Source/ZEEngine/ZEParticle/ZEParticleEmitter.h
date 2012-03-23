@@ -52,6 +52,7 @@ ZE_META_OBJECT_DESCRIPTION(ZEParticleEmitter);
 enum ZEParticleEmitterType
 {
 	ZE_PET_POINT,
+	ZE_PET_PLANE,
 	ZE_PET_BOX,
 	ZE_PET_TORUS,
 	ZE_PET_SPHERE
@@ -60,10 +61,9 @@ enum ZEParticleEmitterType
 
 enum ZEParticleBillboardType
 {
-	ZE_PBT_NONE					= 0,
+	ZE_PBT_AXIS_ORIENTED		= 0,
 	ZE_PBT_SCREEN_ALIGNED		= 1,
-	ZE_PBT_VIEW_PLANE_ALIGNED	= 2,
-	ZE_PBT_VIEW_POINT_ORIENTED	= 3
+	ZE_PBT_VIEW_POINT_ORIENTED	= 2,
 };
 
 class ZEStaticVertexBuffer;
@@ -74,67 +74,84 @@ class ZEDrawParameters;
 class ZEParticleEmitter : public ZEObject
 {
 	ZE_META_OBJECT(ZEParticleEmitter)
+
+		friend class ZEParticleModifier;
+
 	private:
+
 		ZEString						Name;
 		ZEParticleEffect*				Owner;
 
-		ZEAABBox						BoundingBox;
+		ZEArray<ZEParticle>				ParticlePool;
+		ZEArray<ZEParticle>				SortArray;
+		ZEArray<ZEParticleModifier*>	Modifiers;
 
-		ZEVector3						Acceleration;
+		ZEMaterial*						Material;
+		ZEStaticVertexBuffer*			VertexBuffer;
+		ZERenderCommand					RenderCommand;
+
+		ZEParticleBillboardType			BillboardType;
+
+		ZEVector3						AxisOrientation;
+
+
+		ZEUInt							MaxParticleCount;
 		ZEUInt							ParticlesPerSecond;
+		float							ParticlesRemaining;
+		ZEUInt							EmittedParticleCount;
+		ZEUInt							AliveParticleCount;
+
+		bool							IsEmmiterLocal;
+		bool							IsSortingEnabled;
+		bool							IsParticleFixedAspectRatio;
+
+		ZEAABBox						BoundingBox;		
 		ZEVector3						Position;
 		ZEParticleEmitterType			Type;
-		ZEVector3						UpVector;
-		ZEVector3						Velocity;
 
 		ZEVector3						BoxSize;
 		float							SphereRadius;
 		ZEVector2						TorusSize;
+		ZEVector2						PlaneSize;
 
-		ZEVector3						MinUpVector;	
-		ZEVector3						MaxUpVector;
-		ZEVector3						MinAcceleration;
-		ZEVector3						MaxAcceleration;
-		ZEVector3						MinVelocity;
-		ZEVector3						MaxVelocity;
-		ZEVector3						MinAngularAcceleration;
-		ZEVector3						MaxAngularAcceleration;
-		ZEVector3						MinAngularVelocity;
-		ZEVector3						MaxAngularVelocity;
 		ZEVector4						MinColor;
 		ZEVector4						MaxColor;
-		float							MinSize;
-		float							MaxSize;
+		ZEVector2						MinSize;
+		ZEVector2						MaxSize;
 		float							MinLife;
 		float							MaxLife;
-		float							MinBounceFactor;
-		float							MaxBounceFactor;
-		ZEUInt							MaxParticleCount;
-		bool							IsContinuous;
-		
-		ZEArray<ZEParticle>				ParticlePool;
-		ZEArray<ZEParticleModifier*>	Modifiers;
-		ZEUInt							EmittedParticleCount;
-		float							LastCreation;
 
-		ZEParticleBillboardType			BillboardType;
-		ZEMaterial*						Material;
-		ZEStaticVertexBuffer*			VertexBuffer;
-		ZERenderCommand					RenderCommand;
+		bool							IsContinuous;
 
 		void 							InitializeParticlePool();
 		void							GenerateParticle(ZEParticle &Particle);
 		void							UpdateVertexBuffer(ZEDrawParameters* DrawParameters);
 
+		void							SortParticles();
+
 										ZEParticleEmitter();
 										~ZEParticleEmitter();
 
+	protected:
+
+		ZEArray<ZEParticle>&			GetParticlePool();
+
 	public:
+
 		void							SetName(const ZEString& Name);
 		const ZEString&					GetName() const;	
 
 		void							SetOwner(ZEParticleEffect* Owner);
 		ZEParticleEffect*				GetOwner() const;
+
+		void							SetEmmiterLocal(bool IsLocal);
+		bool							GetIsEmmiterLocal() const;
+
+		void							SetSortingEnabled(bool IsSorted);
+		bool							GetSortingEnabled() const;
+
+		void							SetParticleFixedAspectRatio(bool IsParticleFixedAspectRatio);
+		bool							GetParticleFixedAspectRatio() const;
 
 		void							SetPosition(const ZEVector3& Position);
 		const ZEVector3&				GetPosition() const;
@@ -148,6 +165,11 @@ class ZEParticleEmitter : public ZEObject
 		void							SetParticlesPerSecond(ZEUInt Value);
 		ZEUInt							GetParticlesPerSecond() const;
 
+		ZEUInt							GetAliveParticleCount() const;
+
+		void							SetPlaneSize(const ZEVector2& PlaneSize);
+		const ZEVector2&				GetPlaneSize() const;
+
 		void							SetBoxSize(const ZEVector3& BoxSize);
 		const ZEVector3&				GetBoxSize() const;
 
@@ -160,50 +182,16 @@ class ZEParticleEmitter : public ZEObject
 		void							SetType(ZEParticleEmitterType EmitterType);
 		ZEParticleEmitterType			GetType() const;
 
-		void							SetAcceleration(const ZEVector3& EmitterAcceleration);
-		const ZEVector3&				GetAcceleration() const;
-
-		void							SetUpVector(const ZEVector3& EmitterUpVector);
-		const ZEVector3&				GetUpVector() const;
-
-		void							SetVelocity(const ZEVector3& EmitterVelocity);
-		const ZEVector3&				GetVelocity() const;
-
 		void							SetMaxParticleCount(ZEUInt Value);
 		ZEUInt							GetMaxParticleCount() const;
 
 		void							SetContinuity(bool Value);
 		bool							GetContinuity() const;
 
-		void							SetMinUpVector(const ZEVector3& UpVector);
-		const ZEVector3&				GetMinUpVector() const;
-		void							SetMaxUpVector(const ZEVector3& UpVector);
-		const ZEVector3&				GetMaxUpVector() const;
-
-		void							SetMinAcceleration(const ZEVector3& Acceleration);
-		const ZEVector3&				GetMinAcceleration() const;
-		void							SetMaxAcceleration(const ZEVector3& Acceleration);
-		const ZEVector3&				GetMaxAcceleration() const;
-
-		void							SetMinVelocity(const ZEVector3& Velocity);
-		const ZEVector3&				GetMinVelocity() const;
-		void							SetMaxVelocity(const ZEVector3& Velocity);
-		const ZEVector3&				GetMaxVelocity() const;
-
-		void 							SetMinAngularAcceleration(const ZEVector3& AngularAcceleration);
-		const ZEVector3& 				GetMinAngularAcceleration() const;
-		void 							SetMaxAngularAcceleration(const ZEVector3& AngularAcceleration);
-		const ZEVector3& 				GetMaxAngularAcceleration() const;
-
-		void 							SetMinAngularVelocity(const ZEVector3& AngularVelocity);
-		const ZEVector3&				GetMinAngularVelocity() const;
-		void 							SetMaxAngularVelocity(const ZEVector3& AngularVelocity);
-		const ZEVector3&				GetMaxAngularVelocity() const;
-
-		void							SetMinSize(float Size);
-		float 							GetMinSize() const;
-		void 							SetMaxSize(float Size);
-		float 							GetMaxSize() const;
+		void							SetMinSize(const ZEVector2& Size);
+		const ZEVector2&				GetMinSize() const;
+		void 							SetMaxSize(const ZEVector2& Size);
+		const ZEVector2&				GetMaxSize() const;
 
 		void 							SetMinLife(float Life);
 		float 							GetMinLife() const;
@@ -215,13 +203,11 @@ class ZEParticleEmitter : public ZEObject
 		void 							SetMaxColor(const ZEVector4& Color);
 		const ZEVector4&				GetMaxColor() const;
 
-		void 							SetMinBounceFactor(float BounceFactor);
-		float 							GetMinBounceFactor() const;
-		void 							SetMaxBounceFactor(float BounceFactor);
-		float 							GetMaxBounceFactor() const;
-
 		void							SetBillboardType(ZEParticleBillboardType Type);
 		ZEParticleBillboardType			GetBillboardType() const;
+
+		void							SetAxisOrientation(const ZEVector3& Orientation);
+		const ZEVector3&				GetAxisOrientation() const;
 
 		void							SetMaterial(ZEMaterial *Material);
 		ZEMaterial*						GetMaterial() const;
@@ -230,6 +216,8 @@ class ZEParticleEmitter : public ZEObject
 		void							Draw(ZEDrawParameters* DrawParameters);
 
 		static ZEParticleEmitter*		CreateInstance();
+
+		void							LogSort();
 };
 
 /*
@@ -242,43 +230,30 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="Type" type="integer" autogetset="true" description="Type of the emitter.">
 				<enumurator name="ZEParticleEmitterType">
 					<item name="Point" value="ZE_PET_POINT"/>
+					<item name="Plane" value="ZE_PET_PLANE"/> 
 					<item name="Box" value="ZE_PET_BOX"/> 
 					<item name="Torus" value="ZE_PET_TORUS"/>
 					<item name="Sphere" value="ZE_PET_SPHERE"/>
 				</enumurator>
 			</property>
 			<property name="Position" type="ZEVector3" autogetset="yes" description="Position of the particle emitter."/>
-			<property name="Acceleration" type="ZEVector3" autogetset="true" description="Acceleration of particles emitted from this emitter."/>
-			<property name="Velocity" type="ZEVector3" autogetset="true" description="Velocity of particles emitted from this emitter."/>
-
+			<property name="PlaneSize" groupname="Emitter Sizes" type="ZEVector2" autogetset="true" description="Size of plane emitter."/>
 			<property name="BoxSize" groupname="Emitter Sizes" type="ZEVector3" autogetset="true" description="Size of box emitter."/>
 			<property name="TorusSize" groupname="Emitter Sizes" type="ZEVector2" autogetset="true" description="Size of torus emitter."/>
 			<property name="SphereRadius" groupname="Emitter Sizes" type="float" autogetset="true" description="Size of sphere emitter."/>
-
 			<property name="MaxParticleCount" groupname="Particle Generation" type="integer" autogetset="true" description="Maximum number of particles will be emitted from this emitter."/>
 			<property name="ParticlesPerSecond" groupname="Particle Generation" type="integer" autogetset="true" description="Paritcles per secon emitted from this source."/>
-			<property name="Continuity" groupname="Particle Generation" type="boolean" autogetset="true" description="Continuity of particles emitted from this emitter."/>
-			<property name="MinAcceleration" groupname="Acceleration" type="ZEVector3" autogetset="true" description="Minimum acceleration of particles emitted from this emitter."/>
-			<property name="MaxAcceleration" groupname="Acceleration" type="ZEVector3" autogetset="true" description="Maximum acceleration of particles emitted from this emitter."/>
-			<property name="MaxVelocity" groupname="Velocity" type="ZEVector3" autogetset="true" description="Maximum velocity of particles emitted from this emitter."/>
-			<property name="MinVelocity" groupname="Velocity" type="ZEVector3" autogetset="true" description="Minimum velocity of particles emitted from this emitter."/>	
-			<property name="MinAngularAcceleration" groupname="Acceleration" type="ZEVector3" autogetset="true" description="Minimum angular acceleration of particals."/>
-			<property name="MaxAngularAcceleration" groupname="Acceleration" type="ZEVector3" autogetset="true" description="Maximum angular acceleration of particals."/>
-			<property name="MinAngularVelocity" groupname="Velocity" type="ZEVector3" autogetset="true" description="Minimum angular velocity of particals."/>
-			<property name="MaxAngularVelocity" groupname="Velocity" type="ZEVector3" autogetset="true" description="Maximum angular velocity of particals."/>		
-			<property name="MinSize" groupname="Particle Generation" type="float" autogetset="true" description="Minimum edge lenght of particles."/>
-			<property name="MaxSize" groupname="Particle Generation" type="float" autogetset="true" description="Maximum edge lenght of particles."/>			
+			<property name="Continuity" groupname="Particle Generation" type="boolean" autogetset="true" description="Continuity of particles emitted from this emitter."/>			
+			<property name="MinSize" groupname="Particle Generation" type="ZEVector2" autogetset="true" description="Minimum edge lenght of particles."/>
+			<property name="MaxSize" groupname="Particle Generation" type="ZEVector2" autogetset="true" description="Maximum edge lenght of particles."/>			
 			<property name="MinLife" groupname="Particle Generation" type="float" autogetset="true" description="Minimum life of particles."/>
 			<property name="MaxLife" groupname="Particle Generation" type="float" autogetset="true" description="Maximum life of particles."/>			
 			<property name="MinColor" groupname="Particle Generation" type="ZEVector4" semantic="ZE_PS_COLOR" autogetset="true" description="Minimum color of particles."/>
-			<property name="MaxColor" groupname="Particle Generation" type="ZEVector4" semantic="ZE_PS_COLOR" autogetset="true" description="Maximum color of particles."/>			
-			<property name="MinBounceFactor" groupname="Physics" type="float" autogetset="true" description="Minimum  bounce factor of particles."/>
-			<property name="MaxBounceFactor" groupname="Physics" type="float" autogetset="true" description="Maximum bounce factor of particles."/>
+			<property name="MaxColor" groupname="Particle Generation" type="ZEVector4" semantic="ZE_PS_COLOR" autogetset="true" description="Maximum color of particles."/>				
 			<property name="BillboardType" type="integer" autogetset="true" description="Billboarding type of the particles used in this system.">
 				<enumurator name="ZEParticleBillboardType">
-					<item name="None" value="ZE_PBT_NONE"/>
+					<item name="None" value="ZE_PBT_AXIS_ORIENTED"/>
 					<item name="Screen Aligned" value="ZE_PBT_SCREEN_ALIGNED"/>
-					<item name="ViewPlane Aligned" value="ZE_PBT_VIEW_PLANE_ALIGNED"/>
 					<item name="ViewPoint Oriented" value="ZE_PBT_VIEW_POINT_ORIENTED"/>
 				</enumurator>
 			</property>

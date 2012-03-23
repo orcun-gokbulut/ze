@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticle.h
+ Zinek Engine - ZEParticleSphereGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,45 +34,47 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
+#ifndef __ZE_PARTICLE_SPHERE_GENERETOR_H__
+#define __ZE_PARTICLE_SPHERE_GENERETOR_H__
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
+#include "ZEParticleGenerator.h"
 
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
+ZE_META_OBJECT_DESCRIPTION(ZEParticleSphereGenerator)
 
-enum ZEParticleState
+class ZEParticleSphereGenerator : public ZEParticleGenerator
 {
-	ZE_PAS_NEW,
-	ZE_PAS_ALIVE,
-	ZE_PAS_DEAD
-};
+	ZE_META_OBJECT(ZEParticleSphereGenerator)
 
-class ZEParticle
-{
+	private:
+
+		float				Radius;
+		float				ParticlesRemaining;
+
+	protected:
+
+		virtual void		Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool);
+
 	public:
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		Color;
-		ZEVector3		Position;
+		void				SetRadius(float Size);
+		float				GetRadius() const;
 
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
-
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
-
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
+							ZEParticleSphereGenerator();
+							~ZEParticleSphereGenerator();
 };
 
 #endif
 
-
-
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEParticleSphereGenerator" parent="ZEParticleGenerator">		
+			<noinstance>true</noinstance>
+			<description>Sphere shaped particle generator.</description>
+			<property name="Radius" type="float" autogetset="yes" description="Radius of the generator sphere."/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/
