@@ -217,7 +217,7 @@ void ZEActor::Tick(float ElapsedTime)
 		LinearAcceleration *= GetMaxLinearAcceleration();
 	}
 
-	if (AngularAcceleration > GetMaxAngularAcceleration())
+	if (AngularAcceleration > GetMaxAngularAcceleration() || AngularAcceleration < -GetMaxAngularAcceleration())
 		AngularAcceleration = ZEMath::Sign(AngularAcceleration) * GetMaxAngularAcceleration();
 
 	ZEVector3 LinearVelocity = GetLinearVelocity();

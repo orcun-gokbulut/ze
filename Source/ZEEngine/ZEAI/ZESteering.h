@@ -41,6 +41,7 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEInput/ZEInputMap.h"
 
 
 
@@ -226,6 +227,19 @@ class ZECollisionAvoidanceSteering : public ZESteering
 		virtual ZESteeringOutput	Process(float ElapsedTime);
 
 									ZECollisionAvoidanceSteering();
+};
+
+class ZEUserTankControlStreering : public ZESteering
+{
+	private:
+
+		ZEInputMap	InputMap;
+
+	public:
+
+		virtual ZESteeringOutput	Process(float ElapsedTime);
+
+									ZEUserTankControlStreering();
 };
 
 #endif
