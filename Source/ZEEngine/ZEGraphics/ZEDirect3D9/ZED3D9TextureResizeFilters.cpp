@@ -322,7 +322,7 @@ ZEKernel::ZEKernel(const ZEFilter* Filt, ZEUInt SrcLength, ZEUInt DestLength, ZE
 	}
 
 	KernelWidth = Filt->GetFilterWidth() * InverseScale;
-	KernelWindowSize = (ZEInt)ZEMath::Ceil(KernelWidth * 2);
+	KernelWindowSize = (ZESize)ZEMath::Ceil(KernelWidth * 2);
 	// allocation is fixed since we pass it to graphics device
 	KernelWeights = new ZEVector4[KernelWindowSize];
 	memset(KernelWeights, 0, sizeof(ZEVector4) * KernelWindowSize);
@@ -331,7 +331,7 @@ ZEKernel::ZEKernel(const ZEFilter* Filt, ZEUInt SrcLength, ZEUInt DestLength, ZE
 
 	float PixelCoord = -1.0f * (ZEMath::Floor(Center) - 0.5f);
 	float Total = 0.0f;
-	for(ZEInt I = 0; I < KernelWindowSize; I++)
+	for(ZESize I = 0; I < KernelWindowSize; I++)
 	{
 		const float Sample = Filt->SampleBox(I - Center, Scale, Samples);
 		KernelWeights[I] = ZEVector4(Sample, PixelCoord * PixelSize, 0.0f, 0.0f);
@@ -341,7 +341,7 @@ ZEKernel::ZEKernel(const ZEFilter* Filt, ZEUInt SrcLength, ZEUInt DestLength, ZE
 
 	float InverseTotal = 1.0f / Total;
 	// Normalize the weight of the WindowSize
-	for(ZEInt I = 0; I < KernelWindowSize; I++)
+	for(ZESize I = 0; I < KernelWindowSize; I++)
 	{
 		KernelWeights[I].x *= InverseTotal;
 	}
@@ -362,7 +362,7 @@ ZEVector4* ZEKernel::GetKernel() const
 	return KernelWeights;
 }
 
-ZEInt ZEKernel::GetKernelWindowSize() const
+ZESize ZEKernel::GetKernelWindowSize() const
 {
 	return KernelWindowSize;
 }

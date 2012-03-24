@@ -398,26 +398,31 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 		DeviceState = Device->TestCooperativeLevel();
 
 		if (DeviceState == D3DERR_DRIVERINTERNALERROR)
+		{
 			zeCriticalError("Can not restore Direct3D Device. Internal driver error.");
+		}
 
 		if (DeviceState == D3DERR_DEVICENOTRESET || ForceReset)
 		{
-			HRESULT hr =Device->Reset(&D3DPP);
-			if (hr == D3D_OK)
+			Hr =Device->Reset(&D3DPP);
+			if (Hr == D3D_OK)
 			{
 				zeLog("Direct3D Device Restored.");
 				break;
 			}
-			else if (hr == D3DERR_DEVICELOST)
+			else if (Hr == D3DERR_DEVICELOST)
 			{
 				Sleep(100);
 				continue;
 			}
 			else
+			{
 				zeCriticalError("Can not restore Direct3D Device.");
+			}
 		}
 	}
 	while (DeviceState == D3DERR_DEVICELOST);
+	
 	DeviceRestored();
 }
 
@@ -477,7 +482,7 @@ void ZED3D9Module::SetAntiAliasing(ZEInt Level)
 	}
 }
 
-void ZED3D9Module::SetAnisotropicFilter(ZEInt Level)
+void ZED3D9Module::SetAnisotropicFilter(ZEUInt Level)
 {
 	AnisotropicFilter = Level;
 	for (DWORD I = 0; I < DeviceCaps.MaxSimultaneousTextures; I++)
@@ -486,7 +491,9 @@ void ZED3D9Module::SetAnisotropicFilter(ZEInt Level)
 		Device->SetSamplerState(I, D3DSAMP_MINFILTER, (AnisotropicFilter != 1 ? D3DTEXF_ANISOTROPIC : D3DTEXF_LINEAR));
 		Device->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 		if (AnisotropicFilter != 0)
+		{
 			Device->SetSamplerState(I, D3DSAMP_MAXANISOTROPY, (AnisotropicFilter * 2 > DeviceCaps.MaxAnisotropy ? DeviceCaps.MaxAnisotropy : 2 * AnisotropicFilter));
+		}
 	}
 }
 

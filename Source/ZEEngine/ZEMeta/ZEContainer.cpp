@@ -100,8 +100,12 @@ bool ZEContainer::AddInstance(ZEObject* Instance)
 			return true;
 		}
 		else
+		{
 			return false;
+		}
 	}
+
+	return false;
 }
 
 bool ZEContainer::RemoveInstance(ZEObject* Instance)

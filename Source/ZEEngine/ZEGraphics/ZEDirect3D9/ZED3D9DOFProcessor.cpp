@@ -276,7 +276,7 @@ void ZED3D9DOFProcessor::Process()
 	zeProfilerStart("DOF Pass");
 
 	ZEVector4* KernelData;
-	unsigned int Vector4Count;
+	ZESize Vector4Count;
 
 	static struct Vert  
 	{
@@ -306,8 +306,8 @@ void ZED3D9DOFProcessor::Process()
 	ZED3D9CommonTools::SetRenderTarget(0, ColorBufferDS2xBlur);
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputColorBuffer, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / InputColorBuffer->GetWidth(), 1.0f / InputColorBuffer->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)InputColorBuffer->GetWidth(), 1.0f / (float)InputColorBuffer->GetHeight(), 0.0f, 0.0f), 1);
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
 
 	// Horizontal Blur Pass
 	GetDevice()->SetPixelShader(PixelShaderBlurH->GetPixelShader());
@@ -317,9 +317,9 @@ void ZED3D9DOFProcessor::Process()
 
 	KernelData = HorizontalKernel->GetKernel();
 	Vector4Count = HorizontalKernel->GetKernelWindowSize();
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, Vector4Count);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / ColorBufferDS2xBlur->GetWidth(), 1.0f / ColorBufferDS2xBlur->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, (UINT)Vector4Count);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)ColorBufferDS2xBlur->GetWidth(), 1.0f / (float)ColorBufferDS2xBlur->GetHeight(), 0.0f, 0.0f), 1);
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
 
 	// Vertical Blur Pass
 	GetDevice()->SetPixelShader(PixelShaderBlurV->GetPixelShader());
@@ -329,9 +329,9 @@ void ZED3D9DOFProcessor::Process()
 
 	KernelData = VerticalKernel->GetKernel();
 	Vector4Count = VerticalKernel->GetKernelWindowSize();
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, Vector4Count);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / ColorBufferDS2xTmp->GetWidth(), 1.0f / ColorBufferDS2xTmp->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, (UINT)Vector4Count);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)ColorBufferDS2xTmp->GetWidth(), 1.0f / (float)ColorBufferDS2xTmp->GetHeight(), 0.0f, 0.0f), 1);
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
 
 	// Horizontal Blur Pass
 	GetDevice()->SetPixelShader(PixelShaderBlurH->GetPixelShader());
@@ -341,9 +341,9 @@ void ZED3D9DOFProcessor::Process()
 
 	KernelData = HorizontalKernel->GetKernel();
 	Vector4Count = HorizontalKernel->GetKernelWindowSize();
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, Vector4Count);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / ColorBufferDS2xBlur->GetWidth(), 1.0f / ColorBufferDS2xBlur->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, (UINT)Vector4Count);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)ColorBufferDS2xBlur->GetWidth(), 1.0f / (float)ColorBufferDS2xBlur->GetHeight(), 0.0f, 0.0f), 1);
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
 
 	// Vertical Blur Pass
 	GetDevice()->SetPixelShader(PixelShaderBlurV->GetPixelShader());
@@ -353,9 +353,9 @@ void ZED3D9DOFProcessor::Process()
 
 	KernelData = VerticalKernel->GetKernel();
 	Vector4Count = VerticalKernel->GetKernelWindowSize();
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, Vector4Count);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / ColorBufferDS2xTmp->GetWidth(), 1.0f / ColorBufferDS2xTmp->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, (UINT)Vector4Count);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)ColorBufferDS2xTmp->GetWidth(), 1.0f / (float)ColorBufferDS2xTmp->GetHeight(), 0.0f, 0.0f), 1);
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
 
 
 	// Horizontal Blur Pass
@@ -366,9 +366,9 @@ void ZED3D9DOFProcessor::Process()
 
 	KernelData = HorizontalKernel->GetKernel();
 	Vector4Count = HorizontalKernel->GetKernelWindowSize();
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, Vector4Count);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / ColorBufferDS2xBlur->GetWidth(), 1.0f / ColorBufferDS2xBlur->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, (UINT)Vector4Count);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)ColorBufferDS2xBlur->GetWidth(), 1.0f / (float)ColorBufferDS2xBlur->GetHeight(), 0.0f, 0.0f), 1);
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
 
 	// Vertical Blur Pass
 	GetDevice()->SetPixelShader(PixelShaderBlurV->GetPixelShader());
@@ -378,9 +378,9 @@ void ZED3D9DOFProcessor::Process()
 
 	KernelData = VerticalKernel->GetKernel();
 	Vector4Count = VerticalKernel->GetKernelWindowSize();
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, Vector4Count);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / ColorBufferDS2xTmp->GetWidth(), 1.0f / ColorBufferDS2xTmp->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, (UINT)Vector4Count);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)ColorBufferDS2xTmp->GetWidth(), 1.0f / (float)ColorBufferDS2xTmp->GetHeight(), 0.0f, 0.0f), 1);
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
 
 
 	// Switch to DOF shader
@@ -399,9 +399,9 @@ void ZED3D9DOFProcessor::Process()
 	GetDevice()->SetPixelShaderConstantF(4, (const float*)&ZEVector4(FarClamp, 0, 0.0f, 0.0f), 1);
 
 
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / InputColorBuffer->GetWidth(), 1.0f / InputColorBuffer->GetHeight(), 0.0f, 0.0f), 1);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)InputColorBuffer->GetWidth(), 1.0f / (float)InputColorBuffer->GetHeight(), 0.0f, 0.0f), 1);
 
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
 
 	zeProfilerEnd();
 }

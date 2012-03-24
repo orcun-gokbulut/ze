@@ -88,7 +88,7 @@ ZEPixelColor::ZEPixelColor(unsigned char a, unsigned char r, unsigned char g, un
 	this->b = b;
 }
 
-bool ZEBitmap::Create(ZEUInt Width, ZEUInt Height, ZEUInt PixelSize)
+bool ZEBitmap::Create(ZEUInt Width, ZEUInt Height, ZESize PixelSize)
 {
 	if (Pixels != NULL && this->Width == Width && this->Height == Height && this->PixelSize == PixelSize)
 		return true;
@@ -99,11 +99,11 @@ bool ZEBitmap::Create(ZEUInt Width, ZEUInt Height, ZEUInt PixelSize)
 		return false;
 	}
 	
-	this->Pitch = Width * PixelSize;
-	this->Width = Width;
-	this->Height = Height;
+	this->Pitch		= (ZESize)Width * PixelSize;
+	this->Width		= Width;
+	this->Height		= Height;
 	this->PixelSize = PixelSize;
-	this->Pixels = new ZEUInt8[Width * Height * PixelSize];
+	this->Pixels		= new ZEUInt8[(ZESize)Width * (ZESize)Height * PixelSize];
 
 	return true;
 }
@@ -118,24 +118,24 @@ ZEUInt ZEBitmap::GetHeight()
 	return Height;
 }
 
-ZEUInt ZEBitmap::GetPitch()
+ZESize ZEBitmap::GetPitch()
 {
 	return Pitch;
 }
 
-ZEUInt ZEBitmap::GetPixelSize()
+ZESize ZEBitmap::GetPixelSize()
 {
 	return PixelSize;
 }
 
-ZEUInt ZEBitmap::GetBPP()
+ZESize ZEBitmap::GetBPP()
 {
 	return PixelSize * 8;
 }
 
-ZEUInt ZEBitmap::GetSize()
+ZESize ZEBitmap::GetSize()
 {
-	return Height * Width * PixelSize; 
+	return (ZESize)Height * (ZESize)Width * PixelSize; 
 }
 
 ZEPixelColor* ZEBitmap::GetPixels()
@@ -145,7 +145,7 @@ ZEPixelColor* ZEBitmap::GetPixels()
 
 ZEPixelColor& ZEBitmap::GetPixel(ZEUInt x, ZEUInt y)
 {
-	return *(ZEPixelColor*)((ZEUInt8*)Pixels + y * Pitch + x * 4);
+	return *(ZEPixelColor*)((ZEUInt8*)Pixels + (ZESize)y * Pitch + (ZESize)x * 4);
 }
 
 ZEVector4 ZEBitmap::GetPixelFloat(ZEUInt x, ZEUInt y)
@@ -163,7 +163,7 @@ ZEVector4 ZEBitmap::GetPixelFloat(ZEUInt x, ZEUInt y)
 
 ZEPixelColor* ZEBitmap::GetRow(ZEUInt Index)
 {
-	return (ZEPixelColor*)((ZEUInt8*)Pixels + Index * Pitch);
+	return (ZEPixelColor*)((ZEUInt8*)Pixels + (ZESize)Index * Pitch);
 }
 
 ZEPixelColor& ZEBitmap::SamplePixel(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* UserOptions)
@@ -325,7 +325,7 @@ ZEVector4 ZEBitmap::SamplePixelFloat(const ZEVector2& TextureCoordinate, ZEBitma
 	return ZEVector4::Zero;
 }
 
-void ZEBitmap::CopyFrom(void* SourceBuffer, ZEUInt SourcePitch, 
+void ZEBitmap::CopyFrom(void* SourceBuffer, ZESize SourcePitch, 
 						ZEUInt Width, ZEUInt Height, 
 						ZEUInt SourceOffsetX, ZEUInt SourceOffsetY,
 						ZEUInt DestinationOffsetX, ZEUInt DestinationOffsetY)
@@ -337,13 +337,13 @@ void ZEBitmap::CopyFrom(void* SourceBuffer, ZEUInt SourcePitch,
 	if (Width == 0)
 		Width = this->Width;
 
-	for (ZESize I = 0; I < Height; I++)
-		memcpy((ZEUInt8*)Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
-			(ZEUInt8*)SourceBuffer + (SourceOffsetY + I) * SourcePitch + SourceOffsetX * PixelSize, 
-			Width * PixelSize);
+	for (ZESize I = 0; I < (ZESize)Height; I++)
+		memcpy((ZEUInt8*)Pixels + ((ZESize)SourceOffsetY + I) * Pitch + (ZESize)SourceOffsetX * PixelSize, 
+			(ZEUInt8*)SourceBuffer + ((ZESize)SourceOffsetY + I) * SourcePitch + (ZESize)SourceOffsetX * PixelSize, 
+			(ZESize)Width * PixelSize);
 }
 
-void ZEBitmap::CopyTo(void* DestinationBuffer, ZEUInt DestinationPitch, 
+void ZEBitmap::CopyTo(void* DestinationBuffer, ZESize DestinationPitch, 
 					  ZEUInt Width, ZEUInt Height, 
 					  ZEUInt DestinationOffsetX, ZEUInt DestinationOffsetY,
 					  ZEUInt SourceOffsetX, ZEUInt SourceOffsetY)
@@ -354,15 +354,15 @@ void ZEBitmap::CopyTo(void* DestinationBuffer, ZEUInt DestinationPitch,
 	if (Width == 0)
 		Width = this->Width;
 
-	for (ZESize I = 0; I < Height; I++)
-		memcpy((ZEUInt8*)DestinationBuffer + (DestinationOffsetY + I) * DestinationPitch + DestinationOffsetX * PixelSize, 
-			(ZEUInt8*)Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
-			Width * PixelSize);
+	for (ZESize I = 0; I < (ZESize)Height; I++)
+		memcpy((ZEUInt8*)DestinationBuffer + ((ZESize)DestinationOffsetY + I) * DestinationPitch + (ZESize)DestinationOffsetX * PixelSize, 
+			(ZEUInt8*)Pixels + ((ZESize)SourceOffsetY + I) * Pitch + (ZESize)SourceOffsetX * PixelSize, 
+			(ZESize)Width * PixelSize);
 }
 
 void ZEBitmap::Fill(ZEUInt Color)
 {
-	memset(Pixels, Color, Height * Pitch);
+	memset(Pixels, Color, (ZESize)Height * Pitch);
 }
 
 void ZEBitmap::Clear()
@@ -382,10 +382,10 @@ bool ZEBitmap::Load(const char* FileName)
 		return false;
 	}
 
-	Width = FreeImage_GetWidth(FIBitmap);
-	Height = FreeImage_GetHeight(FIBitmap);
-	Pitch = FreeImage_GetPitch(FIBitmap);
-	PixelSize = FreeImage_GetBPP(FIBitmap) / 8;
+	Width		= FreeImage_GetWidth(FIBitmap);
+	Height		= FreeImage_GetHeight(FIBitmap);
+	Pitch		= (ZESize)FreeImage_GetPitch(FIBitmap);
+	PixelSize	= (ZESize)FreeImage_GetBPP(FIBitmap) / 8;
 	
 	FIBITMAP* FIConvertedBitmap;
 	if (PixelSize != 4)
@@ -394,12 +394,14 @@ bool ZEBitmap::Load(const char* FileName)
 		FreeImage_Unload(FIBitmap);
 	}
 	else
+	{
 		FIConvertedBitmap = FIBitmap;
+	}
 
 	PixelSize = 4;
-	Create(Width, Height, PixelSize);
+	this->Create(Width, Height, PixelSize);
 
-	FreeImage_ConvertToRawBits((BYTE*)Pixels, FIConvertedBitmap, Pitch, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+	FreeImage_ConvertToRawBits((BYTE*)Pixels, FIConvertedBitmap, (int)Pitch, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
 
 	FreeImage_Unload(FIConvertedBitmap);
 
@@ -408,7 +410,7 @@ bool ZEBitmap::Load(const char* FileName)
 
 void ZEBitmap::Save(const char* FileName, ZEBitmapFileFormat Format)
 {
-	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits((BYTE*)Pixels, Width, Height, Pitch, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits((BYTE*)Pixels, (int)Width, (int)Height, (int)Pitch, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
 	FREE_IMAGE_FORMAT FIFormat;
 	switch(Format)
 	{

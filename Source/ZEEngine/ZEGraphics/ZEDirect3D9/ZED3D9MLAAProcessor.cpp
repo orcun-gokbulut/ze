@@ -43,14 +43,10 @@
 #include "ZED3D9MLAAProcessor.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZEGraphics/ZECamera.h"
+#include "ZED3D9MLAAProcessorAreaImage.h"
 #include "ZEGraphics/ZETexture2DResource.h"
-#include "ZED3D9MLAAProcessorAreaImage.cpp"
 
 #include <d3d9.h>
-
-
-#define		ZE_MLAA_AREA_IMAGE_WIDTH		160
-#define		ZE_MLAA_AREA_IMAGE_HEIGHT		160
 
 void ZED3D9MLAAProcessor::SetTreshold(float Value)
 {
@@ -142,7 +138,7 @@ void ZED3D9MLAAProcessor::CreateRenderTargets()
 	Result = AreaBuffer->Create(ZE_MLAA_AREA_IMAGE_WIDTH, ZE_MLAA_AREA_IMAGE_HEIGHT, 1, ZE_TPF_I8_4, false);
 	zeAssert(!Result, "Cannot Create ZED3D9Texture2D: \"AreaBuffer at ZED3D9MLAAProcessor\".");
 
-	unsigned char* AreaImage = GetD3D9LMAAProcessorAreaImage();
+	ZEUInt8* AreaImage = ZED3D9MLAAProcessorAreaImage::GetD3D9LMAAProcessorAreaImage();
 
 	// Copy AreaImage into buffer
 	ZESize Pitch = 0;

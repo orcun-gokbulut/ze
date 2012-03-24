@@ -517,7 +517,7 @@ bool ZEPack::AddChunk(const char* IdentifierName,unsigned char* Source,ZEUInt64 
 	File->Close();
 
 	//Calculate new end of file
-	ZEUInt64 NewEndOfFile = RecordsEndPosition + sizeof(ZEChunkHeader) + (ZEInt64)sizeof(ZEUInt64);
+	ZEUInt64 NewEndOfFile = RecordsEndPosition + sizeof(ZEChunkHeader) + sizeof(ZEUInt64);
 
 	//Create handle
 	HANDLE FileHandle;

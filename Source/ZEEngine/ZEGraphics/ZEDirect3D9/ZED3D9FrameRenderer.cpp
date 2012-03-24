@@ -91,21 +91,21 @@ void ZED3D9FrameRenderer::PumpStreams(ZERenderCommand* RenderCommand)
 	// Check whether render order is indexed or not
 	if (RenderCommand->IndexBuffer != NULL)
 	{
-		ZEUInt VertexCount = ((ZED3D9StaticVertexBuffer*)RenderCommand->VertexBuffer)->GetBufferSize() / ((ZED3D9VertexDeclaration*)RenderCommand->VertexDeclaration)->GetVertexSize();
+		ZESize VertexCount = ((ZED3D9StaticVertexBuffer*)RenderCommand->VertexBuffer)->GetBufferSize() / ((ZED3D9VertexDeclaration*)RenderCommand->VertexDeclaration)->GetVertexSize();
 
 		// Check weather render order has static vertex buffer or not
 		if (VertexBuffer->IsStatic())
 		{
-			GetDevice()->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)RenderCommand->VertexBuffer)->StaticBuffer, 0, RenderCommand->VertexDeclaration->GetVertexSize());
+			GetDevice()->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)RenderCommand->VertexBuffer)->StaticBuffer, 0, (UINT)RenderCommand->VertexDeclaration->GetVertexSize());
 			GetDevice()->SetIndices(((ZED3D9StaticIndexBuffer*)RenderCommand->IndexBuffer)->StaticBuffer);
-			GetDevice()->DrawIndexedPrimitive(PrimitiveType, 0, 0, VertexCount, 0, RenderCommand->PrimitiveCount);
+			GetDevice()->DrawIndexedPrimitive(PrimitiveType, 0, 0, (UINT)VertexCount, 0, (UINT)RenderCommand->PrimitiveCount);
 
 		}
 		else
 		{
-			GetDevice()->DrawIndexedPrimitiveUP(PrimitiveType, 0, VertexCount, RenderCommand->PrimitiveCount, ((ZED3D9StaticIndexBuffer*)RenderCommand->IndexBuffer)->StaticBuffer, D3DFMT_INDEX32, 
+			GetDevice()->DrawIndexedPrimitiveUP(PrimitiveType, 0, (UINT)VertexCount, (UINT)RenderCommand->PrimitiveCount, ((ZED3D9StaticIndexBuffer*)RenderCommand->IndexBuffer)->StaticBuffer, D3DFMT_INDEX32, 
 				(char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderCommand->VertexBufferOffset * RenderCommand->VertexDeclaration->GetVertexSize(),
-				RenderCommand->VertexDeclaration->GetVertexSize());
+				(UINT)RenderCommand->VertexDeclaration->GetVertexSize());
 		}
 	}
 	else
@@ -113,14 +113,14 @@ void ZED3D9FrameRenderer::PumpStreams(ZERenderCommand* RenderCommand)
 		// Check whether render order has static vertex buffer or not
 		if (VertexBuffer->IsStatic())
 		{
-			GetDevice()->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)RenderCommand->VertexBuffer)->StaticBuffer, 0, RenderCommand->VertexDeclaration->GetVertexSize());
-			GetDevice()->DrawPrimitive(PrimitiveType, RenderCommand->VertexBufferOffset, RenderCommand->PrimitiveCount);
+			GetDevice()->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)RenderCommand->VertexBuffer)->StaticBuffer, 0, (UINT)RenderCommand->VertexDeclaration->GetVertexSize());
+			GetDevice()->DrawPrimitive(PrimitiveType, (UINT)RenderCommand->VertexBufferOffset, (UINT)RenderCommand->PrimitiveCount);
 		}
 		else
 		{
-			GetDevice()->DrawPrimitiveUP(PrimitiveType, RenderCommand->PrimitiveCount,
+			GetDevice()->DrawPrimitiveUP(PrimitiveType, (UINT)RenderCommand->PrimitiveCount,
 				(char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderCommand->VertexBufferOffset * RenderCommand->VertexDeclaration->GetVertexSize(),  
-				RenderCommand->VertexDeclaration->GetVertexSize());
+				(UINT)RenderCommand->VertexDeclaration->GetVertexSize());
 		}
 	}
 }
@@ -965,19 +965,25 @@ void ZED3D9FrameRenderer::ClearRenderList()
 
 static ZEInt RenderCommandCompare(const ZERenderCommand* A, const ZERenderCommand* B)
 {
-	if (A->Priority == B->Priority)
+	if (A->Priority > B->Priority)
 	{
-		if (A->Order == B->Order)
-			return 0;
-		else if (A->Order > B->Order)
-			return 1;
-		else
-			return -1;
-	}
-	else if (A->Priority > B->Priority)
 		return 1;
-	else
+	}
+	else if (A->Priority < B->Priority)
+	{
 		return -1;
+	}
+	else
+	{
+		if (A->Order > B->Order)
+			return 1;
+		else if (A->Order < B->Order)
+			return -1;
+		else
+			return 0;
+
+	}
+
 }
 
 void ZED3D9FrameRenderer::Render(float ElaspedTime)

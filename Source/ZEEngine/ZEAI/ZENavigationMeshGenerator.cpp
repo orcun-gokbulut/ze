@@ -141,8 +141,10 @@ bool ZENavigationMeshGenerator::CheckAdjacent(const ZENavigationMeshPolygon& A, 
 	if (ZEVector3::DotProduct(GetNormal(A), GetNormal(B)) < 0.9999)
 		return false;
 
-	for (ZESSize I = 0; I < A.VertexIndices.GetCount(); I++)
-		for (ZESSize N = 0; N < B.VertexIndices.GetCount(); N++)
+	for (ZESSize I = 0; I < (ZESSize)A.VertexIndices.GetCount(); I++)
+	{
+		for (ZESSize N = 0; N < (ZESSize)B.VertexIndices.GetCount(); N++)
+		{
 			if (GetVertexIndex(A, I) == GetVertexIndex(B, N))
 			{
 
@@ -183,6 +185,8 @@ bool ZENavigationMeshGenerator::CheckAdjacent(const ZENavigationMeshPolygon& A, 
 					return true;
 				}
 			}
+		}
+	}
 
 	return false;
 }
@@ -388,9 +392,9 @@ bool ZENavigationMeshGenerator::MergePolygons2to1(ZENavigationMeshPolygon& Outpu
 	if (ZEVector3::DotProduct(Mesh.Normals[A.NormalIndex], Mesh.Normals[B.NormalIndex]) < 0.99f)
 		return false;
 
-	for (ZESSize I = 0; I < A.VertexIndices.GetCount(); I++)
+	for (ZESSize I = 0; I < (ZESSize)A.VertexIndices.GetCount(); I++)
 	{
-		for (ZESSize N = 0; N < B.VertexIndices.GetCount(); N++)
+		for (ZESSize N = 0; N < (ZESSize)B.VertexIndices.GetCount(); N++)
 		{
 			if (GetVertex(A, I) == GetVertex(B, N) && 
 				GetVertex(A, I + 1) == GetVertex(B, N - 1))
@@ -403,24 +407,26 @@ bool ZENavigationMeshGenerator::MergePolygons2to1(ZENavigationMeshPolygon& Outpu
 
 					ZESize Index = 0;
 
-					for (ZESSize K = 0; K < B.VertexIndices.GetCount(); K++)
+					for (ZESSize K = 0; K < (ZESSize)B.VertexIndices.GetCount(); K++)
 					{
 						Output.VertexIndices[Index] = GetVertexIndex(B, N + K);
 						Index++;
 					}
 
-					for (ZESSize K = 0; K < A.VertexIndices.GetCount() - 2; K++)
+					for (ZESSize K = 0; K < (ZESSize)A.VertexIndices.GetCount() - 2; K++)
 					{
 						Output.VertexIndices[Index] = GetVertexIndex(A, I + 2 + K);
 						Index++;
 					}
 
-					for (ZESSize K = 0; K < Output.VertexIndices.GetCount(); K++)
+					for (ZESSize K = 0; K < (ZESSize)Output.VertexIndices.GetCount(); K++)
+					{
 						if (GetVertex(Output, K - 1) == GetVertex(Output, K) || CheckStraight(GetVertex(Output, K - 1), GetVertex(Output, K), GetVertex(Output, K + 1)))
 						{
 							Output.VertexIndices.DeleteAt(K);
 							K--;
 						}
+					}
 
 					return true;
 				}

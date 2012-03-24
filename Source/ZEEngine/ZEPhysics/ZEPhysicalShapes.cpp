@@ -79,11 +79,16 @@ ZEPhysicalMaterial* ZEPhysicalShape::GetMaterial()
 
 ZEPhysicalShape::ZEPhysicalShape()
 {
-	Position = ZEVector3::Zero;
-	Rotation = ZEQuaternion::Identity;
-	Material = NULL;
-	Owner = NULL;
-	Trigger = false;
+	Position	= ZEVector3::Zero;
+	Rotation	= ZEQuaternion::Identity;
+	Material	= NULL;
+	Owner		= NULL;
+	Trigger		= false;
+}
+
+ZEPhysicalShape::~ZEPhysicalShape()
+{
+
 }
 
 // Physical Box Shape

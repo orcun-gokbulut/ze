@@ -55,25 +55,25 @@ static float GausianFunction(float x, float y, float StandartDeviation)
 
 void FillGaussianKernel1D(float* Kernel, ZESize KernelSize, float StandartDeviation)
 {
-	ZEInt HalfKernelSize = (KernelSize - 1) / 2;
-	for (ZEInt x = 0; x < KernelSize; x++)
+	ZESize HalfKernelSize = (KernelSize - 1) / 2;
+	for (ZESize x = 0; x < KernelSize; x++)
 	{
-		Kernel[4 * x] = x - HalfKernelSize;
-		Kernel[4 * x + 1] = GausianFunction(x - HalfKernelSize, StandartDeviation);
+		Kernel[4 * x] = (float)(x - HalfKernelSize);
+		Kernel[4 * x + 1] = GausianFunction((float)(x - HalfKernelSize), StandartDeviation);
 	}
 }
 
 static void FillGaussianKernel2D(float* Kernel, ZESize KernelSize, float StandartDeviation)
 {
-	ZEInt HalfKernelSize = (KernelSize - 1) / 2;
-	for (ZEInt y = 0; y < KernelSize; y++)
+	ZESize HalfKernelSize = (KernelSize - 1) / 2;
+	for (ZESize y = 0; y < KernelSize; y++)
 	{
-		for (ZEInt x = 0; x < KernelSize; x++)
+		for (ZESize x = 0; x < KernelSize; x++)
 		{
 			float* CurrentSample = &Kernel[4 * KernelSize * y + x];
-			CurrentSample[0] = x - HalfKernelSize;
-			CurrentSample[1] = y - HalfKernelSize;
-			CurrentSample[2] = GausianFunction(x - HalfKernelSize, y - HalfKernelSize, StandartDeviation);
+			CurrentSample[0] = (float)(x - HalfKernelSize);
+			CurrentSample[1] = (float)(y - HalfKernelSize);
+			CurrentSample[2] = GausianFunction((float)(x - HalfKernelSize), (float)(y - HalfKernelSize), StandartDeviation);
 			zeOutput("%lf ", CurrentSample[2]);
 		}
 		zeOutput("\r\n");
@@ -345,7 +345,7 @@ void ZED3D9HDRProcessor::BlurPass(ZED3D9Texture2D* Input, ZED3D9Texture2D* Temp,
 	};
 
 	float Kernel[16][4];
-	FillGaussianKernel1D((float*)Kernel, IntParameters.BloomSampleCount, Parameters.BloomStandardDeviation);
+	FillGaussianKernel1D((float*)Kernel, (ZESize)IntParameters.BloomSampleCount, Parameters.BloomStandardDeviation);
 	GetDevice()->SetPixelShaderConstantF(10, (const float*) Kernel, IntParameters.BloomSampleCount);
 
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / Input->GetWidth(), 1.0f / Input->GetHeight(), 0.0f, 0.0f), 1);
@@ -552,7 +552,6 @@ ZED3D9ViewPort* ZED3D9HDRProcessor::GetOutput()
 
 void ZED3D9HDRProcessor::Initialize()
 {
-	ZESize ScreenWidth, ScreenHeight;
 	D3DVERTEXELEMENT9 Declaration[] = 
 	{
 		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},

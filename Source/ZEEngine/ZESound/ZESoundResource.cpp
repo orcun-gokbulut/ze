@@ -44,13 +44,21 @@
 ZESoundFileFormat ZESoundResource::GetFileFormat(const ZEString& FileName)
 {
 	if (FileName.Right(3).Lower() == "mp3")
+	{
 		return ZE_SFF_MP3;
+	}
 	else if(FileName.Right(3).Lower() == "wav")
+	{
 		return  ZE_SFF_WAVE;
+	}
 	else if(FileName.Right(3).Lower() == "ogg")
+	{
 		return  ZE_SFF_OGG;
+	}
 	else
+	{
 		return  ZE_SFF_NONE;
+	}
 }
 
 const char* ZESoundResource::GetResourceType() const
@@ -63,7 +71,7 @@ ZESoundFileFormat ZESoundResource::GetSoundFileFormat() const
 	return FileFormat;
 }
 
-ZEUInt ZESoundResource::GetSamplesPerSecond() const
+ZESize ZESoundResource::GetSamplesPerSecond() const
 {
 	return SamplesPerSecond;
 }

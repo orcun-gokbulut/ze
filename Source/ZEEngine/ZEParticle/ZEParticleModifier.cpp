@@ -336,7 +336,7 @@ void ZEParticleColorOverLifeModifier::Tick(float ElapsedTime)
 	ZESize ParticleCount = GetOwnerParticlePool().GetCount();
 	ZEArray<ZEParticle>& Particles =  GetOwnerParticlePool();
 
-	for (int I = 0; I < ParticleCount; I++)
+	for (ZESize I = 0; I < ParticleCount; I++)
 	{
 		ZEParticle* CurrentParticle = &Particles[I];
 
@@ -384,7 +384,7 @@ void ZEParticleDiffuseMapChangerModifier::AddTextureResource(ZETexture2DResource
 
 void ZEParticleDiffuseMapChangerModifier::Tick(float ElapsedTime)
 {
-	((ZEFixedMaterial*)(GetOwner()->GetMaterial()))->SetBaseMap(Textures[Textures.Circular(CurrentTextureIndex)]->GetTexture());
+	((ZEFixedMaterial*)(GetOwner()->GetMaterial()))->SetBaseMap(Textures[Textures.Circular((ZESize)CurrentTextureIndex)]->GetTexture());
 
 	if(TotalTime >= Interval)
 	{

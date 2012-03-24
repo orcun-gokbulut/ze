@@ -102,7 +102,7 @@ struct ZETextureOptions
 	ZETextureDownSampling			DownSample;
 	ZETextureFileCaching			FileCaching;
 	ZETextureMipMapping				MipMapping;
-	unsigned int					MaximumMipmapLevel;
+	ZEUInt32						MaximumMipmapLevel;
 
 };
 

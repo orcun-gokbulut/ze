@@ -182,14 +182,18 @@ void ZEModel::LoadModelResource()
 	for (ZESize I = 0; I < ModelResource->Bones.GetCount(); I++)
 	{
 		if (ModelResource->Bones[I].ParentBone != -1)
-			Bones[ModelResource->Bones[I].ParentBone].AddChild(&Bones[I]);
+		{
+			Bones[(ZESize)ModelResource->Bones[I].ParentBone].AddChild(&Bones[I]);
+		}
 	}
 
 	for (ZESize I = 0; I < ModelResource->Bones.GetCount(); I++)
 	{
 		Bones[I].Initialize(this, &ModelResource->Bones[I]);
 		if (Bones[I].GetParentBone() == NULL)
+		{
 			Skeleton.Add(&Bones[I]);
+		}
 	}
 
 	if(false/*Skeleton.GetCount() > 1*/)
@@ -283,19 +287,25 @@ const ZEArray<ZEModelMesh>& ZEModel::GetMeshes()
 const ZEArray<ZEModelAnimation>* ZEModel::GetAnimations()
 {
 	if (ModelResource == NULL)
+	{
 		return  NULL;
+	}
 	else 
+	{
 		return &ModelResource->Animations;
+	}
 }
 
 void ZEModel::SetActiveLOD(ZEUInt LOD)
 {
 	ActiveLOD = LOD;
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
+	{
 		Meshes[I].SetActiveLOD(LOD);
+	}
 }
 
-ZEInt ZEModel::GetActiveLOD()
+ZEUInt ZEModel::GetActiveLOD()
 {
 	return ActiveLOD;
 }
@@ -304,9 +314,14 @@ void ZEModel::SetPhysicsEnabled(bool Enabled)
 {
 	PhysicsEnabled = Enabled;
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
+	{
 		Bones[I].SetPhysicsEnabled(Enabled);
+	}
+
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
+	{
 		Meshes[I].SetPhysicsEnabled(Enabled);
+	}
 }
 
 bool ZEModel::GetPhysicsEnabled()

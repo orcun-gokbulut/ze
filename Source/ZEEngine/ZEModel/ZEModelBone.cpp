@@ -503,7 +503,10 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 	}
 
 	for (ZESize I = 0; I < ShapeList.GetCount(); I++)
+	{
 		delete ShapeList[I];
+	}
+
 	ShapeList.Clear();
 }
 

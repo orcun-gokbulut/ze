@@ -69,7 +69,7 @@ enum ZEParticleBillboardType
 class ZEStaticVertexBuffer;
 class ZEParticleEffect;
 class ZEParticleModifier;
-class ZEDrawParameters;
+struct ZEDrawParameters;
 
 class ZEParticleEmitter : public ZEObject
 {
@@ -94,10 +94,9 @@ class ZEParticleEmitter : public ZEObject
 
 		ZEVector3						AxisOrientation;
 
-
+		float							ParticlesRemaining;
 		ZEUInt							MaxParticleCount;
 		ZEUInt							ParticlesPerSecond;
-		float							ParticlesRemaining;
 		ZEUInt							EmittedParticleCount;
 		ZEUInt							AliveParticleCount;
 

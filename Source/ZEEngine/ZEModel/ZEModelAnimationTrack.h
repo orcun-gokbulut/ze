@@ -59,11 +59,11 @@ class ZEModelAnimationTrack
 		ZEModelAnimationBlendMode		BlendMode;
 		float							Speed;
 		float							CurrentFrame;
-		ZEUInt32						StartFrame;
-		ZEUInt32						EndFrame;
+		ZEUInt							StartFrame;
+		ZEUInt							EndFrame;
+		ZEUInt							LOD;
 		bool							Looping;
-		ZEInt							LOD;
-
+		
 		void							UpdateMeshesAndBones();
 
 	public:
@@ -79,8 +79,8 @@ class ZEModelAnimationTrack
 		void							SetState(ZEModelAnimationState State);
 		ZEModelAnimationState			GetState();
 
-		void							SetLOD(ZEInt LOD);
-		ZEInt							GetLOD();
+		void							SetLOD(ZEUInt LOD);
+		ZEUInt							GetLOD();
 
 		void							SetSpeed(float Factor);
 		float							GetSpeed();

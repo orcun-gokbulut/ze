@@ -64,11 +64,11 @@ class ZED3DXInclude : public ID3DXInclude
 			if (File == NULL)
 				return S_FALSE;
 
-			fseek(File, 0, SEEK_END);
-			*pBytes = ftell(File);
-			fseek(File, 0, SEEK_SET);
-			*ppData = (void*)new char[*pBytes];
-			fread((void*)*ppData, 1, *pBytes, File);
+			_fseeki64(File, 0, SEEK_END);
+			*pBytes = (UINT)_ftelli64(File);
+			_fseeki64(File, 0, SEEK_SET);
+			*ppData = (void*)new char[(ZESize)*pBytes];
+			fread((void*)*ppData, 1, (ZESize)*pBytes, File);
 			fclose(File);
 
 			return S_OK;

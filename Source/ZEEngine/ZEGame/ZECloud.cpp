@@ -237,15 +237,15 @@ bool ZECloud::Initialize()
 	}
 
 
-	CloudRenderCommand.Priority = 1;
-	CloudRenderCommand.Order = 1.3f;
-	CloudRenderCommand.Pipeline = ZE_RORP_3D;
-	CloudRenderCommand.VertexBuffer = (ZEVertexBuffer*)0xfdfdfdfd;
-	CloudRenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
-	CloudRenderCommand.Flags = ZE_ROF_NONE;
-	CloudRenderCommand.PrimitiveCount = 0;
-	CloudRenderCommand.VertexDeclaration = (ZEVertexDeclaration*)0xfdfdfdfd;
-	CloudRenderCommand.IndexBuffer = (ZEIndexBuffer*)0xfdfdfdfd;
+	CloudRenderCommand.Priority			= 1;
+	CloudRenderCommand.Order			= 1.3f;
+	CloudRenderCommand.Pipeline			= ZE_RORP_3D;
+	CloudRenderCommand.VertexBuffer		= (ZEVertexBuffer*)NULL;
+	CloudRenderCommand.PrimitiveType	= ZE_ROPT_TRIANGLE;
+	CloudRenderCommand.Flags			= ZE_ROF_NONE;
+	CloudRenderCommand.PrimitiveCount	= 0;
+	CloudRenderCommand.VertexDeclaration = (ZEVertexDeclaration*)NULL;
+	CloudRenderCommand.IndexBuffer		= (ZEIndexBuffer*)NULL;
 
 	return ZEEntity::Initialize();
 }

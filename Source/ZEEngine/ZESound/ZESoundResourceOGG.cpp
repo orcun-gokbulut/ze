@@ -42,7 +42,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -108,7 +108,7 @@ static ZEInt OggMemory_Seek(void *datasource, ogg_int64_t offset, ZEInt whence)
 
 static long OggMemory_Tell(void *datasource)
 {
-	return((ZESoundResourceOGG*)datasource)->MemoryCursor;
+	return (long)((ZESoundResourceOGG*)datasource)->MemoryCursor;
 }
 
 ZESoundResourceOGG::ZESoundResourceOGG()
@@ -136,19 +136,20 @@ void ZESoundResourceOGG::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
 {
 	ov_pcm_seek_lap(&OggFile, SampleIndex);	
 
-	long  BytesRead = 1;
-	ZEInt   Position = 0;		
-	ZEInt	  Section = 0;
+	long BytesRead	= 1;
+	ZEInt Section	= 0;
+	ZESize Position	= 0;		
+	
 
 	while(Position < (Count * BlockAlign))
 	{	
-		BytesRead = ov_read(&OggFile, ((char*)(Buffer)) + Position, (Count * BlockAlign) - Position, 0, 2, 1, &Section);
+		BytesRead = ov_read(&OggFile, ((char*)(Buffer)) + Position, (int)((Count * BlockAlign) - Position), 0, 2, 1, &Section);
 		if(BytesRead < 0)
 		{
 			zeError("Error decoding ogg. (FileName : \"%s\")", GetFileName().ToCString());
 			return;
 		}
-		Position += BytesRead;
+		Position += (ZESize)BytesRead;
 	}
 }
 
@@ -190,12 +191,12 @@ ZESoundResource* ZESoundResourceOGG::LoadResource(const ZEString& FileName)
 		return NULL;
 	}
 
-	vorbis_info* VorbisInfo = ov_info(&NewResource->OggFile, -1);
-	NewResource->ChannelCount = VorbisInfo->channels;
-	NewResource->BitsPerSample = 16;
-	NewResource->SamplesPerSecond = VorbisInfo->rate;
-	NewResource->BlockAlign = 2 * VorbisInfo->channels;
-	NewResource->SampleCount = ov_pcm_total(&NewResource->OggFile, -1);
+	vorbis_info* VorbisInfo			= ov_info(&NewResource->OggFile, -1);
+	NewResource->ChannelCount		= VorbisInfo->channels;
+	NewResource->BitsPerSample		= 16;
+	NewResource->SamplesPerSecond	= (ZESize)VorbisInfo->rate;
+	NewResource->BlockAlign			= 2 * (ZESize)VorbisInfo->channels;
+	NewResource->SampleCount			= (ZESize)ov_pcm_total(&NewResource->OggFile, -1);
 	ov_seekable(&NewResource->OggFile);
 	return NewResource;
 }

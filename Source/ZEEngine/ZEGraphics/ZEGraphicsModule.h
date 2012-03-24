@@ -88,7 +88,7 @@ class ZEGraphicsModule : public ZEModule
 		ZEInt								HDRQuality;
 		ZEInt								AntiAliasing;
 		bool								ToneMappingEnabled;
-		ZEInt								AnisotropicFilter;
+		ZEUInt								AnisotropicFilter;
 
 
 	public:
@@ -123,8 +123,8 @@ class ZEGraphicsModule : public ZEModule
 		ZEInt								GetHDRQuality();
 		virtual void						SetAntiAliasing(ZEInt Level);
 		ZEInt								GetAntiAliasing();
-		virtual void						SetAnisotropicFilter(ZEInt Level);
-		ZEInt								GetAnisotropicFilter();
+		virtual void						SetAnisotropicFilter(ZEUInt Level);
+		ZEUInt								GetAnisotropicFilter();
 
 		virtual ZETextureOptions*			GetTextureOptions();
 

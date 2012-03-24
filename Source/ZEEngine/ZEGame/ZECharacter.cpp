@@ -500,7 +500,9 @@ void ZECharacter::AdvanceRecording(float ElapsedTime)
 	else if (RecordingStatus == ZE_CRS_PLAYING)
 	{
 		if (RecordingFrame >= Records.GetCount())
+		{
 			RecordingStatus = ZE_CRS_STOPPED;
+		}
 
 		for (ZESize I = RecordingFrame; I < Records.GetCount(); I++)
 		{
@@ -641,10 +643,10 @@ void ZECharacter::SaveRecording(const char* FileName)
 {
 	FILE* File = fopen(FileName, "wb");
 
-	ZEUInt32 KeyCount = Records.GetCount();
+	ZEUInt32 KeyCount = (ZEUInt32)Records.GetCount();
 	fwrite(&KeyCount, sizeof(ZEUInt32), 1, File);
 
-	fwrite(Records.GetCArray(), sizeof(ZECharacterRecordingKey), KeyCount, File);
+	fwrite(Records.GetCArray(), sizeof(ZECharacterRecordingKey), (ZESize)KeyCount, File);
 
 	fclose(File);
 }
@@ -656,8 +658,8 @@ void ZECharacter::LoadRecording(const char* FileName)
 	ZEUInt32 KeyCount;
 	fread(&KeyCount, sizeof(ZEUInt32), 1, File);
 
-	Records.SetCount(KeyCount);
-	fread(Records.GetCArray(), sizeof(ZECharacterRecordingKey), KeyCount, File);
+	Records.SetCount((ZESize)KeyCount);
+	fread(Records.GetCArray(), sizeof(ZECharacterRecordingKey), (ZESize)KeyCount, File);
 
 	fclose(File);
 }

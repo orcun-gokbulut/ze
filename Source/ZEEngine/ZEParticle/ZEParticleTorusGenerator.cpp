@@ -44,14 +44,14 @@ void ZEParticleTorusGenerator::Tick(float ElapsedTime, ZEArray<ZEParticle>& Owne
 		return;
 
 	ParticlesRemaining += GetParticlesPerSecond() * ElapsedTime;
-	int ParticeCountForTimeElapsed = ParticlesRemaining;
+	ZEUInt ParticeCountForTimeElapsed = (ZEUInt)ParticlesRemaining;
 	ParticlesRemaining -= ParticeCountForTimeElapsed;
 
 	ZEUInt ParticlesEmmitedThisFrame = 0;
 
 	if(ParticeCountForTimeElapsed != 0)
 	{
-		for (int I = 0; I < OwnerParticlePool.GetCount(); I++)
+		for (ZESize I = 0; I < OwnerParticlePool.GetCount(); I++)
 		{
 			if(OwnerParticlePool[I].State == ZE_PAS_DEAD)
 			{

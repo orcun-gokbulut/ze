@@ -53,11 +53,11 @@ class ZESoundResource : public ZEResource
 	protected:
 		ZESoundFileFormat				FileFormat;
 
-		ZESize							SampleCount;
-		ZEUInt							SamplesPerSecond;
+		ZESize							SamplesPerSecond;
 		ZEUInt							ChannelCount;
 		ZEUInt							BitsPerSample;
 		ZESize							BlockAlign;
+		ZESize							SampleCount;
 		
 		static ZESoundFileFormat		GetFileFormat(const ZEString& FileName);
 
@@ -68,11 +68,11 @@ class ZESoundResource : public ZEResource
 		const char*						GetResourceType() const;
 		ZESoundFileFormat				GetSoundFileFormat() const;
 
-		ZEUInt							GetSamplesPerSecond() const;
+		ZESize							GetSamplesPerSecond() const;
 		ZEUInt							GetChannelCount() const;
 		ZEUInt							GetBitsPerSample() const;
-		ZESize							GetBlockAlign() const;
 		ZESize							GetSampleCount() const;
+		ZESize							GetBlockAlign() const;
 		ZESize							GetUncompressedDataSize() const;
 
 		virtual ZESize					GetDataSize() const = 0;		

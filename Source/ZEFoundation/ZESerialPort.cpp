@@ -218,7 +218,7 @@ bool ZESerialPort::Read(void* Data, ZESize DataSize, ZESize &BytesRead)
 	if (!ReadFile(Handle, Data, (DWORD)DataSize, &Temp, NULL))
 		return false;
 
-	BytesRead = Temp;
+	BytesRead = (ZESize)Temp;
 
 	return true;
 }
@@ -229,7 +229,7 @@ bool ZESerialPort::Write(const void* Data, ZESize DataSize, ZESize &BytesWritten
 	if (!WriteFile(Handle, Data, (DWORD)DataSize, &Temp, NULL))
 		return false;
 
-	BytesWritten = Temp;
+	BytesWritten = (ZESize)Temp;
 
 	return true;
 }

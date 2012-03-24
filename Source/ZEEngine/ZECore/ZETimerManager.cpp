@@ -38,7 +38,7 @@
 
 ZETimerManager::ZETimerManager()
 {
-	CurrentTime = ZERealTimeClock::GetInstance()->GetCurrentTime();
+	CurrentTime = (float)ZERealTimeClock::GetInstance()->GetCurrentTime();
 }
 
 ZETimerManager::~ZETimerManager()

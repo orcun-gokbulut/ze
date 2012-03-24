@@ -89,15 +89,15 @@ bool ZEWindowsInputModule::Initialize()
 		return false;
 	}
 
-	DeviceList.SetCount(NumberOfDevices);
+	DeviceList.SetCount((ZESize)NumberOfDevices);
 	if (GetRawInputDeviceList(DeviceList.GetCArray(), &NumberOfDevices, sizeof(RAWINPUTDEVICELIST)) == (UINT)-1)
 	{
 		zeError("Can not load input device list.");
 		return false;
 	}
 
-	ZEInt MouseIndex = 0;
-	ZEInt KeyboardIndex = 0;
+	ZESize MouseIndex = 0;
+	ZESize KeyboardIndex = 0;
 	for (ZESize I = 0; I < DeviceList.GetCount(); I++)
 	{
 		if (DeviceList[I].dwType == RIM_TYPEMOUSE)
@@ -137,14 +137,18 @@ bool ZEWindowsInputModule::Initialize()
 
 		ZEArray<ZEInputDevice*> ExtensionDevices = Extension->GetDevices();
 		for (ZESize N = 0; N < ExtensionDevices.GetCount(); N++)
+		{
 			Devices.Add(ExtensionDevices[N]);
+		}
 	}
 
 	for (ZESize I = 0; I < Devices.GetCount(); I++)
+	{
 		if (!Devices[I]->Initialize())
 		{
 			zeError("Can not initialize input device. Name : \"\"", Devices[I]->GetDeviceName().ToCString());
 		}
+	}
 
 	return ZEInputModule::Initialize();
 }

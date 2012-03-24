@@ -45,9 +45,9 @@
 
 
 // Returns if a TextureData 3D level of a surface is valid or not
-static bool IsLevelValid(ZESize Surface, ZESize Level)
+static bool IsLevelValid(ZEUInt Surface, ZEUInt Level)
 {
-	return Surface % (ZESize)ZEMath::Power(2.0f, (float)Level) == 0;
+	return Surface % (ZEUInt)ZEMath::Power(2.0f, (float)Level) == 0;
 }
 
 static bool IsCompressed(ZETexturePixelFormat Format)
@@ -62,15 +62,15 @@ ZETextureSurface* ZETextureLevel::GetOwner()
 }
 
 // Returns level index of the level
-ZESize ZETextureLevel::GetLevel()
+ZEUInt ZETextureLevel::GetLevel()
 {
 	return Level;
 }
 
 // Calculates and returns width of requested level
-ZESize ZETextureLevel::GetWidth()
+ZEUInt ZETextureLevel::GetWidth()
 {
-	ZESize OwnerSurface			= Owner->GetSurface();
+	ZEUInt OwnerSurface			= Owner->GetSurface();
 	ZETextureType TextureType	= Owner->GetOwner()->GetTextureType();
 	
 	// If texture is 3D and the level is empty return 0
@@ -79,9 +79,9 @@ ZESize ZETextureLevel::GetWidth()
 		return 0;
 	}
 
-	ZESize TextureWidth			= Owner->GetOwner()->GetTextureWidth();
+	ZEUInt TextureWidth			= Owner->GetOwner()->GetTextureWidth();
 	ZETexturePixelFormat Format = Owner->GetOwner()->GetPixelFormat();
-	ZESize LevelWidth			= TextureWidth >> Level;
+	ZEUInt LevelWidth			= TextureWidth >> Level;
 	
 	// Width of last 2 level of compressed textures (2x2 and 1x1) must be 4x4
 	if (IsCompressed(Format) && LevelWidth < 4)
@@ -96,9 +96,9 @@ ZESize ZETextureLevel::GetWidth()
 }
 
 // Calculates and returns height of requested level
-ZESize ZETextureLevel::GetHeight()
+ZEUInt ZETextureLevel::GetHeight()
 {
-	ZESize OwnerSurface			= Owner->GetSurface();
+	ZEUInt OwnerSurface			= Owner->GetSurface();
 	ZETextureType TextureType	= Owner->GetOwner()->GetTextureType();
 
 	// If texture is 3D and the level is empty return 0
@@ -108,8 +108,8 @@ ZESize ZETextureLevel::GetHeight()
 	}
 
 	ZETexturePixelFormat Format = Owner->GetOwner()->GetPixelFormat();
-	ZESize TextureHeight		= Owner->GetOwner()->GetTextureHeight();
-	ZESize LevelHeight			= TextureHeight >> Level;
+	ZEUInt TextureHeight		= Owner->GetOwner()->GetTextureHeight();
+	ZEUInt LevelHeight			= TextureHeight >> Level;
 	
 	// Height of last 2 level of compressed textures (2x2 and 1x1) must be 4x4
 	if (IsCompressed(Format) && LevelHeight < 4)
@@ -127,22 +127,22 @@ ZESize ZETextureLevel::GetHeight()
 ZESize ZETextureLevel::GetPitch()
 {
 	ZESize Pitch = 0;
-	ZESize LevelWidth = this->GetWidth();
+	ZEUInt LevelWidth = this->GetWidth();
 	ZETexturePixelFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
 	
 	switch (PixelFormat)
 	{
 		case ZE_TPF_I8_4:
-			Pitch = (LevelWidth / ZE_I8_4_COMPRESSION_BLOCK_WIDTH) * ZE_I8_4_OUTPUT_BLOCK_SIZE;
+			Pitch = ((ZESize)LevelWidth / ZE_I8_4_COMPRESSION_BLOCK_WIDTH) * ZE_I8_4_OUTPUT_BLOCK_SIZE;
 			break;
 		case ZE_TPF_DXT1:
-			Pitch = (LevelWidth / ZE_DXT_1_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_1_OUTPUT_BLOCK_SIZE;
+			Pitch = ((ZESize)LevelWidth / ZE_DXT_1_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_1_OUTPUT_BLOCK_SIZE;
 			break;
 		case ZE_TPF_DXT3:
-			Pitch = (LevelWidth / ZE_DXT_3_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_3_OUTPUT_BLOCK_SIZE;
+			Pitch = ((ZESize)LevelWidth / ZE_DXT_3_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_3_OUTPUT_BLOCK_SIZE;
 			break;
 		case ZE_TPF_DXT5:
-			Pitch = (LevelWidth / ZE_DXT_5_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_5_OUTPUT_BLOCK_SIZE;
+			Pitch = ((ZESize)LevelWidth / ZE_DXT_5_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_5_OUTPUT_BLOCK_SIZE;
 			break;
 
 	}
@@ -151,10 +151,10 @@ ZESize ZETextureLevel::GetPitch()
 }
 
 // Calculates and returns RowCount of level
-ZESize ZETextureLevel::GetRowCount()
+ZEUInt ZETextureLevel::GetRowCount()
 {
-	ZESize RowCount = 0;
-	ZESize LevelHeight = this->GetHeight();
+	ZEUInt RowCount = 0;
+	ZEUInt LevelHeight = this->GetHeight();
 	ZETexturePixelFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
 
 	switch (PixelFormat)
@@ -181,7 +181,7 @@ ZESize ZETextureLevel::GetRowCount()
 // Returns size of the level
 ZESize ZETextureLevel::GetSize()
 {
-	return this->GetRowCount() * this->GetPitch();
+	return (ZESize)this->GetRowCount() * this->GetPitch();
 }
 
 void* ZETextureLevel::GetData()
@@ -194,11 +194,11 @@ void ZETextureLevel::CopyFrom(void* SourceData, ZESize SourcePitch)
 	zeAssert(SourceData == NULL || SourcePitch == 0, "Cannot copy from source. Either Source is NULL or pitch is 0.");
 
 	void* Destination		= this->Data;
-	ZEUInt DestinationPitch = this->GetPitch();
-	ZEUInt LevelRowCount	= this->GetRowCount();
+	ZESize DestinationPitch = this->GetPitch();
+	ZESize LevelRowCount	= (ZESize)this->GetRowCount();
 
 	for(ZESize I = 0; I < LevelRowCount; ++I)
-		memcpy((unsigned char*)Destination + I * DestinationPitch, (unsigned char*)SourceData + I * SourcePitch, DestinationPitch);
+		memcpy((ZEUInt8*)Destination + I * DestinationPitch, (ZEUInt8*)SourceData + I * SourcePitch, DestinationPitch);
 }
 
 void ZETextureLevel::CopyTo(void* Dest, ZESize DestPitch)
@@ -207,10 +207,10 @@ void ZETextureLevel::CopyTo(void* Dest, ZESize DestPitch)
 
 	void* SourceData		= this->Data;
 	ZESize SourcePitch		= this->GetPitch();
-	ZESize LevelRowCount	= this->GetRowCount();
+	ZESize LevelRowCount	= (ZESize)this->GetRowCount();
 
 	for(ZESize I = 0; I < LevelRowCount; ++I)
-		memcpy((unsigned char*)Dest + I * DestPitch, (unsigned char*)SourceData + I * SourcePitch, SourcePitch);
+		memcpy((ZEUInt8*)Dest + I * DestPitch, (ZEUInt8*)SourceData + I * SourcePitch, SourcePitch);
 }
 
 // Const
@@ -233,7 +233,7 @@ ZETextureLevel::~ZETextureLevel()
 }
 
 // Returns index of the surface
-ZESize ZETextureSurface::GetSurface()
+ZEUInt ZETextureSurface::GetSurface()
 {
 	return Surface;
 }
@@ -253,7 +253,7 @@ ZEArray<ZETextureLevel>& ZETextureSurface::GetLevels()
 // Calculates and returns the raw data size of surface including all levels
 ZESize ZETextureSurface::GetSize()
 {
-	ZESize LevelCount = Levels.GetCount();
+	ZESize LevelCount = (ZESize)Levels.GetCount();
 	ZESize SurfaceSize = 0;
 
 	for (ZESize I = 0; I < LevelCount; ++I)
@@ -278,7 +278,7 @@ ZETextureSurface::~ZETextureSurface()
 }
 
 // Creates the texture by allocating surface, levels and enough memory based on texture type
-void ZETextureData::CreateTexture(ZETextureType TextureType, ZETexturePixelFormat PixelFormat, ZESize SurfaceCount, ZESize LevelCount, ZESize Width, ZESize Height)
+void ZETextureData::CreateTexture(ZETextureType TextureType, ZETexturePixelFormat PixelFormat, ZEUInt SurfaceCount, ZEUInt LevelCount, ZEUInt Width, ZEUInt Height)
 {
 	if (!this->IsEmpty())
 	{
@@ -288,33 +288,36 @@ void ZETextureData::CreateTexture(ZETextureType TextureType, ZETexturePixelForma
 
 	// Set texture data
 	this->Width			= Width;
-	this->Height		= Height;
-	this->LevelCount	= LevelCount;
+	this->Height			= Height;
+	this->LevelCount		= LevelCount;
 	this->SurfaceCount	= SurfaceCount;
 	this->TextureType	= TextureType;
 	this->PixelFormat	= PixelFormat;
 
+	ZESize TempLevelCount	= (ZESize)LevelCount;
+	ZESize TempSurfaceCount = (ZESize)SurfaceCount;
+
 	// Create surfaces
-	Surfaces.Resize(SurfaceCount);
+	Surfaces.Resize(TempSurfaceCount);
 
 	switch (this->TextureType)
 	{
 		case ZE_TT_3D:
 		{				
 			// Surface 0 level count
-			ZESize InitialLevelCount = LevelCount;
+			ZEUInt InitialLevelCount = LevelCount;
 
 			// Create Levels of each Surface
-			for (ZESize I = 0; I < SurfaceCount; ++I)
+			for (ZESize I = 0; I < TempSurfaceCount; ++I)
 			{
-				Surfaces[I].Surface = I;
+				Surfaces[I].Surface = (ZEUInt)I;
 				Surfaces[I].Owner	= this;
-				Surfaces[I].Levels.Resize(LevelCount);
+				Surfaces[I].Levels.Resize(TempLevelCount);
 
 				// Allocate each MipMap
-				for (ZESize J = 0; J < LevelCount; ++J)
+				for (ZESize J = 0; J < TempLevelCount; ++J)
 				{
-					Surfaces[I].Levels[J].Level = J;
+					Surfaces[I].Levels[J].Level = (ZEUInt)J;
 					Surfaces[I].Levels[J].Owner = &Surfaces[I];
 						
 					// Create level if Surface % (2^Level) == 0
@@ -336,16 +339,16 @@ void ZETextureData::CreateTexture(ZETextureType TextureType, ZETexturePixelForma
 		case ZE_TT_CUBE:
 		{
 			// Create Levels of each Surface
-			for (ZESize I = 0; I < SurfaceCount; ++I)
+			for (ZESize I = 0; I < TempSurfaceCount; ++I)
 			{
-				Surfaces[I].Surface = I;
+				Surfaces[I].Surface = (ZEUInt)I;
 				Surfaces[I].Owner	= this;
-				Surfaces[I].Levels.Resize(LevelCount);
+				Surfaces[I].Levels.Resize(TempLevelCount);
 
 				// Allocate each MipMap
-				for (ZESize J = 0; J < LevelCount; ++J)
+				for (ZESize J = 0; J < TempLevelCount; ++J)
 				{
-					Surfaces[I].Levels[J].Level = J;
+					Surfaces[I].Levels[J].Level = (ZEUInt)J;
 					Surfaces[I].Levels[J].Owner = &Surfaces[I];
 					Surfaces[I].Levels[J].Data	= malloc(Surfaces[I].Levels[J].GetSize());
 				}
@@ -365,47 +368,51 @@ void ZETextureData::CreateTexture(ZETextureType TextureType, ZETexturePixelForma
 void ZETextureData::CreateTexture(ZETextureData& TextureData)
 {
 	if (!this->IsEmpty())
+	{
 		this->DestroyTexture();
+	}
 
 	// Allocate surfaces, levels and level data
 	this->Width			= TextureData.Width;
-	this->Height		= TextureData.Height;
-	this->LevelCount	= TextureData.LevelCount;
+	this->Height			= TextureData.Height;
+	this->LevelCount		= TextureData.LevelCount;
 	this->SurfaceCount	= TextureData.SurfaceCount;
 	this->TextureType	= TextureData.TextureType;
 	this->PixelFormat	= TextureData.PixelFormat;
 
+	ZESize TempLevelCount	= (ZESize)LevelCount;
+	ZESize TempSurfaceCount = (ZESize)SurfaceCount;
+
 	// Create surfaces
-	Surfaces.Resize(SurfaceCount);
+	Surfaces.Resize(TempSurfaceCount);
 
 	// Create Levels of each Surface
-	for (ZESize I = 0; I < SurfaceCount; ++I)
+	for (ZESize I = 0; I < TempSurfaceCount; ++I)
 	{
-		Surfaces[I].Surface = I;
+		Surfaces[I].Surface = (ZEUInt)I;
 		Surfaces[I].Owner	= this;
-		Surfaces[I].Levels.Resize(LevelCount);
+		Surfaces[I].Levels.Resize(TempLevelCount);
 
 		// Allocate each level data
-		for (ZESize J = 0; J < LevelCount; ++J)
+		for (ZESize J = 0; J < TempLevelCount; ++J)
 		{
 			void* Source = TextureData.Surfaces[I].Levels[J].Data;
 
-			// If surface is valid. Some 3D levels may be empty
+			Surfaces[I].Levels[J].Level = (ZEUInt)J;
+			Surfaces[I].Levels[J].Owner = &Surfaces[I];
+
 			if (Source != NULL)
 			{
-				Surfaces[I].Levels[J].Level = J;
-				Surfaces[I].Levels[J].Owner = &Surfaces[I];
+				// If surface is valid. Some 3D levels may be empty
 				Surfaces[I].Levels[J].Data	= malloc(Surfaces[I].Levels[J].GetSize());
 
 				ZESize SourcePitch	= TextureData.Surfaces[I].Levels[J].GetPitch();
 				Surfaces[I].Levels[J].CopyFrom(Source, SourcePitch);
 			
 			}
-			// Set level to empty
 			else
 			{
-				Surfaces[I].Levels[J].Level = J;
-				Surfaces[I].Levels[J].Owner = NULL;
+				// Set level to empty
 				Surfaces[I].Levels[J].Data	= NULL;
 			}
 		}
@@ -415,10 +422,13 @@ void ZETextureData::CreateTexture(ZETextureData& TextureData)
 // Destroys the content
 void ZETextureData::DestroyTexture()
 {
+	ZESize TempLevelCount	= (ZESize)LevelCount;
+	ZESize TempSurfaceCount = (ZESize)SurfaceCount;
+
 	// free Levels of each Surface
-	for (ZESize I = 0; I < SurfaceCount; ++I)
+	for (ZESize I = 0; I < TempSurfaceCount; ++I)
 	{
-		for (ZESize J = 0; J < LevelCount; ++J)
+		for (ZESize J = 0; J < TempLevelCount; ++J)
 		{
 			// Clear level data
 			Surfaces[I].Levels[J].Level = 0;
@@ -444,8 +454,8 @@ void ZETextureData::DestroyTexture()
 
 	// Clear texture data
 	this->Width			= 0;
-	this->Height		= 0;
-	this->LevelCount	= 0;
+	this->Height			= 0;
+	this->LevelCount		= 0;
 	this->SurfaceCount	= 0;
 	this->TextureType	= ZE_TT_2D;
 	this->PixelFormat	= ZE_TPF_NOTSET;
@@ -465,25 +475,25 @@ bool ZETextureData::IsEmpty()
 }
 
 // Returns texture level0 width
-ZESize ZETextureData::GetTextureWidth()
+ZEUInt ZETextureData::GetTextureWidth()
 {
 	return Width;
 }
 
 // Returns texture level0 height
-ZESize ZETextureData::GetTextureHeight()
+ZEUInt ZETextureData::GetTextureHeight()
 {
 	return Height;
 }
 
 // Returns level count of the texture
-ZESize ZETextureData::GetTextureLevelCount()
+ZEUInt ZETextureData::GetTextureLevelCount()
 {
 	return LevelCount;
 }
 
 // Returns Surface count of the texture
-ZESize ZETextureData::GetTextureSurfaceCount()
+ZEUInt ZETextureData::GetTextureSurfaceCount()
 {
 	return SurfaceCount;
 }
@@ -504,10 +514,12 @@ ZETexturePixelFormat ZETextureData::GetPixelFormat()
 ZESize ZETextureData::GetSize()
 {
 	ZESize TextureSize = 0;
+	ZESize TempLevelCount	= (ZESize)LevelCount;
+	ZESize TempSurfaceCount = (ZESize)SurfaceCount;
 
-	for (ZESize I = 0; I < SurfaceCount; I++)
+	for (ZESize I = 0; I < TempSurfaceCount; I++)
 	{
-		for (ZESize J = 0; J < LevelCount; J++)
+		for (ZESize J = 0; J < TempLevelCount; J++)
 		{
 			TextureSize += Surfaces[I].Levels[J].GetSize();
 		}
@@ -520,17 +532,20 @@ ZESize ZETextureData::GetSize()
 ZESize ZETextureData::GetSizeOnDisk()
 {
 	ZESize TextureSize = 0;
-	ZEUInt ZETextureFileHeaderSize = sizeof(ZETextureFileHeader);
-	ZEUInt ZETextureFileSurfaceChunkSize = sizeof(ZETextureFileSurfaceChunk);
-	ZEUInt ZETExtureFileMipmapChunkSize = sizeof(ZETExtureFileMipmapChunk);
+	ZESize TempLevelCount					= (ZESize)LevelCount;
+	ZESize TempSurfaceCount					= (ZESize)SurfaceCount;
+
+	ZESize ZETextureFileHeaderSize			= sizeof(ZETextureFileHeader);
+	ZESize ZETextureFileSurfaceChunkSize	= sizeof(ZETextureFileSurfaceChunk);
+	ZESize ZETExtureFileMipmapChunkSize		= sizeof(ZETExtureFileMipmapChunk);
 
 	TextureSize += ZETextureFileHeaderSize;
 
-	for (ZESize I = 0; I < SurfaceCount; I++)
+	for (ZESize I = 0; I < TempSurfaceCount; I++)
 	{
 		TextureSize += ZETextureFileSurfaceChunkSize;
 
-		for (ZESize J = 0; J < LevelCount; J++)
+		for (ZESize J = 0; J < TempLevelCount; J++)
 		{
 			TextureSize += ZETExtureFileMipmapChunkSize;
 			TextureSize += Surfaces[I].Levels[J].GetSize();
@@ -566,8 +581,8 @@ void ZETextureData::ConvertToCubeTextureData(ZETextureData* Output, ZETextureDat
 	if (TextureData->GetTextureSurfaceCount() != 1)
 		return;
 
-	ZESize TargetWidth	= TextureData->GetTextureWidth() / 3;
-	ZESize TargetHeight = TextureData->GetTextureHeight() / 2;
+	ZEUInt TargetWidth	= TextureData->GetTextureWidth() / 3;
+	ZEUInt TargetHeight = TextureData->GetTextureHeight() / 2;
 
 	zeAssert(TargetWidth != TargetHeight, "Cannot convert texture data. Dimensions do not match..");
 
@@ -586,39 +601,40 @@ void ZETextureData::ConvertToCubeTextureData(ZETextureData* Output, ZETextureDat
 		ZESize OffsetX;
 		ZESize OffsetY;
 
-	} Offsets[6] = {					// Copy Order
+	} Offsets[6] = {									// Copy Order
 
-		{2 * TargetWidth, 0},			// +X Face
-		{0 * TargetWidth, 0},			// -X Face
-		{2 * TargetWidth, TargetWidth},	// +Y Face
-		{1 * TargetWidth, TargetWidth},	// -Y Face
-		{1 * TargetWidth, 0},			// +Z Face
-		{0 * TargetWidth, TargetWidth},	// -Z Face
+		{2 * (ZESize)TargetWidth, 0},					// +X Face
+		{0 * (ZESize)TargetWidth, 0},					// -X Face
+		{2 * (ZESize)TargetWidth, (ZESize)TargetWidth},	// +Y Face
+		{1 * (ZESize)TargetWidth, (ZESize)TargetWidth},	// -Y Face
+		{1 * (ZESize)TargetWidth, 0},					// +Z Face
+		{0 * (ZESize)TargetWidth, (ZESize)TargetWidth},	// -Z Face
 	};
 
 	void* SourceData	= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetData();
 	ZESize SourcePitch	= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();
 	
-	ZESize SurfaceCount = Output->GetTextureSurfaceCount();
+	ZESize TempTargetHeight = (ZESize)TargetHeight;
+	ZESize TempSurfaceCount = (ZESize)Output->GetTextureSurfaceCount();
 
-	for (ZESize I = 0; I < SurfaceCount; ++I)
+
+	for (ZESize I = 0; I < TempSurfaceCount; ++I)
 	{
 		void* TargetData	= Output->GetSurfaces().GetItem(I).GetLevels().GetItem(0).GetData();
 		ZESize TargetPitch	= Output->GetSurfaces().GetItem(I).GetLevels().GetItem(0).GetPitch();
 		
-		for (ZEUInt J = 0; J < TargetHeight; ++J)
+		for (ZESize J = 0; J < TempTargetHeight; ++J)
 		{
-			memcpy((unsigned char*)TargetData + (J * TargetPitch), (unsigned char*)SourceData + SourcePitch * (Offsets[I].OffsetY + J) + Offsets[I].OffsetX * 4, TargetPitch);
+			memcpy((ZEUInt8*)TargetData + (J * TargetPitch), (ZEUInt8*)SourceData + SourcePitch * (Offsets[I].OffsetY + J) + Offsets[I].OffsetX * 4, TargetPitch);
 		}
-
 	}
 }
 
 // Converts a single surface, single level texture data to n surface texture data
-void ZETextureData::ConvertToVolumeTextureData(ZETextureData* Output, ZETextureData* TextureData, ZESize TileCountX, ZESize TileCountY)
+void ZETextureData::ConvertToVolumeTextureData(ZETextureData* Output, ZETextureData* TextureData, ZEUInt HorizTileCount, ZEUInt VertTileCount)
 {
-	ZESize TargetWidth	= TextureData->GetTextureWidth() / TileCountX;
-	ZESize TargetHeight = TextureData->GetTextureHeight() / TileCountY;
+	ZEUInt TargetWidth	= TextureData->GetTextureWidth() / HorizTileCount;
+	ZEUInt TargetHeight = TextureData->GetTextureHeight() / VertTileCount;
 
 	void* SourceData	= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetData();
 	ZESize SourcePitch	= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();
@@ -630,18 +646,23 @@ void ZETextureData::ConvertToVolumeTextureData(ZETextureData* Output, ZETextureD
 		Output->DestroyTexture();
 	}
 
-	Output->CreateTexture(ZE_TT_3D, TextureData->GetPixelFormat(), TileCountX * TileCountY, 1, TargetWidth, TargetHeight);
+	Output->CreateTexture(ZE_TT_3D, TextureData->GetPixelFormat(), HorizTileCount * VertTileCount, 1, TargetWidth, TargetHeight);
 
-	for (ZESize I = 0; I < TileCountY; ++I)
+
+	ZESize TempTargetHeight		= (ZESize)TargetHeight;
+	ZESize TempVertTileCount	= (ZESize)VertTileCount;
+	ZESize TempHorizTileCount	= (ZESize)HorizTileCount;
+
+	for (ZESize I = 0; I < TempVertTileCount; ++I)
 	{
-		for (ZESize J = 0; J < TileCountX; ++J)
+		for (ZESize J = 0; J < TempHorizTileCount; ++J)
 		{
-			void* TargetData	= Output->GetSurfaces().GetItem(TileCountX * I + J).GetLevels().GetItem(0).GetData();
-			ZESize TargetPitch	= Output->GetSurfaces().GetItem(TileCountX * I + J).GetLevels().GetItem(0).GetPitch();
+			void* TargetData	= Output->GetSurfaces().GetItem(TempHorizTileCount * I + J).GetLevels().GetItem(0).GetData();
+			ZESize TargetPitch	= Output->GetSurfaces().GetItem(TempHorizTileCount * I + J).GetLevels().GetItem(0).GetPitch();
 		
-			for (ZESize K = 0; K < TargetHeight; ++K)
+			for (ZESize K = 0; K < (ZESize)TargetHeight; ++K)
 			{
-				memcpy((unsigned char*)TargetData + (K * TargetPitch), (unsigned char*)SourceData + SourcePitch * (TargetHeight * I + K) + TargetPitch * J, TargetPitch);
+				memcpy((ZEUInt8*)TargetData + (K * TargetPitch), (ZEUInt8*)SourceData + SourcePitch * (TempTargetHeight * I + K) + TargetPitch * J, TargetPitch);
 			}
 		}
 	}

@@ -79,17 +79,17 @@ class ZETextureLevel
 
 	private:
 		ZETextureSurface*			Owner;
-		ZESize						Level;
+		ZEUInt						Level;
 		void*						Data;
 
 	public:
 		ZETextureSurface*			GetOwner();
 
-		ZESize						GetLevel();
-		ZESize						GetWidth();
-		ZESize						GetHeight();
+		ZEUInt						GetLevel();
+		ZEUInt						GetWidth();
+		ZEUInt						GetHeight();
 		ZESize						GetPitch();
-		ZESize						GetRowCount();
+		ZEUInt						GetRowCount();
 		ZESize						GetSize();
 
 		void*						GetData();
@@ -108,13 +108,14 @@ class ZETextureSurface
 	friend class ZETextureData;
 
 	private:
-		ZESize						Surface;
-		ZETextureData*			Owner;
+		ZETextureData*				Owner;
+		ZEUInt						Surface;
 		ZEArray<ZETextureLevel>		Levels;
 
 	public:
-		ZESize						GetSurface();
-		ZETextureData*			GetOwner();
+		ZETextureData*				GetOwner();
+
+		ZEUInt						GetSurface();
 		ZEArray<ZETextureLevel>&	GetLevels();
 
 		ZESize						GetSize();
@@ -128,40 +129,40 @@ class ZETextureSurface
 class ZETextureData
 {
 	private:
-		ZESize						Width;
-		ZESize						Height;
-		ZESize						LevelCount;
-		ZESize						SurfaceCount;
+		ZEUInt							Width;
+		ZEUInt							Height;
+		ZEUInt							LevelCount;
+		ZEUInt							SurfaceCount;
 		
-		ZETextureType				TextureType;
-		ZETexturePixelFormat		PixelFormat;
+		ZETextureType					TextureType;
+		ZETexturePixelFormat			PixelFormat;
 
-		ZEArray<ZETextureSurface>	Surfaces;
+		ZEArray<ZETextureSurface>		Surfaces;
 
 	public:
-									ZETextureData();
-		virtual						~ZETextureData();
+										ZETextureData();
+		virtual							~ZETextureData();
 
-		ZEArray<ZETextureSurface>&	GetSurfaces();
+		ZEArray<ZETextureSurface>&		GetSurfaces();
 
-		bool						IsEmpty();
+		bool							IsEmpty();
 
-		ZESize						GetTextureWidth();
-		ZESize						GetTextureHeight();
-		ZESize						GetTextureLevelCount();
-		ZESize						GetTextureSurfaceCount();
-		ZETextureType				GetTextureType();
-		ZETexturePixelFormat		GetPixelFormat();
+		ZEUInt							GetTextureWidth();
+		ZEUInt							GetTextureHeight();
+		ZEUInt							GetTextureLevelCount();
+		ZEUInt							GetTextureSurfaceCount();
+		ZETextureType					GetTextureType();
+		ZETexturePixelFormat			GetPixelFormat();
 
-		ZESize						GetSize();
-		ZESize						GetSizeOnDisk();
+		ZESize							GetSize();
+		ZESize							GetSizeOnDisk();
 
-		void						CreateTexture(ZETextureType TextureType, ZETexturePixelFormat PixelFormat, ZESize SurfaceCount, ZESize LevelCount, ZESize Width, ZESize Height);
-		void						CreateTexture(ZETextureData& TextureData);
-		void						DestroyTexture();
+		void							CreateTexture(ZETextureType TextureType, ZETexturePixelFormat PixelFormat, ZEUInt SurfaceCount, ZEUInt LevelCount, ZEUInt Width, ZEUInt Height);
+		void							CreateTexture(ZETextureData& TextureData);
+		void							DestroyTexture();
 
-		static void					ConvertToCubeTextureData(ZETextureData* Output, ZETextureData* TextureData);
-		static void					ConvertToVolumeTextureData(ZETextureData* Output, ZETextureData* TextureData, ZESize TileCountX, ZESize TileCountY);
+		static void						ConvertToCubeTextureData(ZETextureData* Output, ZETextureData* TextureData);
+		static void						ConvertToVolumeTextureData(ZETextureData* Output, ZETextureData* TextureData, ZEUInt HorizTileCount, ZEUInt VertTileCount);
 		
 };
 

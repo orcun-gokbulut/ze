@@ -54,42 +54,42 @@ struct ZEPortalMapResourceDoor;
 
 struct ZEPortalMapPolygon
 {
-	ZEMapVertex			Vertices[3];
-	ZEMaterial*			Material;
-	ZEUInt				LastIteration;
+	ZEMapVertex				Vertices[3];
+	ZEMaterial*				Material;
+	ZEUInt					LastIteration;
 };
 
 struct ZEPortalMapPhysicalMeshPolygon
 {
-	ZEUInt32			Indices[3];
+	ZEUInt32				Indices[3];
 };
 
 struct ZEPortalMapResourcePhysicalMesh
 {
-	ZEArray<ZEVector3>							Vertices;
-	ZEArray<ZEPortalMapPhysicalMeshPolygon>		Polygons;
+	ZEArray<ZEVector3>								Vertices;
+	ZEArray<ZEPortalMapPhysicalMeshPolygon>			Polygons;
 };
 
 struct ZEPortalMapResourcePortal
 {
-	char										Name[ZE_MAX_NAME_SIZE];
-	ZEAABBox								BoundingBox;
-	ZEArray<ZEPortalMapResourceDoor*>			Doors;
-	ZEArray<ZESize>								DoorIds;
-	ZEArray<ZEPortalMapPolygon>					Polygons;
-	ZEPortalMapResourcePhysicalMesh				PhysicalMesh;
-	bool										HasOctree;
-	//ZEPortalMapOctree							Octree;
-	bool										HasPhysicalMesh;
+	char											Name[ZE_MAX_NAME_SIZE];
+	ZEAABBox										BoundingBox;
+	ZEArray<ZEPortalMapResourceDoor*>				Doors;
+	ZEArray<ZESize>									DoorIds;
+	ZEArray<ZEPortalMapPolygon>						Polygons;
+	ZEPortalMapResourcePhysicalMesh					PhysicalMesh;
+	bool											HasOctree;
+	//ZEPortalMapOctree								Octree;
+	bool											HasPhysicalMesh;
 };
 
 struct ZEPortalMapResourceDoor
 {
-	char										Name[ZE_MAX_NAME_SIZE];
-	ZERectangle3D								Rectangle;
-	ZEPortalMapResourcePortal*					Portals[2];
-	ZESize										PortalIds[2];
-	bool										IsOpen;
+	char											Name[ZE_MAX_NAME_SIZE];
+	ZERectangle3D									Rectangle;
+	ZEPortalMapResourcePortal*						Portals[2];
+	ZEUInt											PortalIds[2];
+	bool											IsOpen;
 };
 
 class ZEFile;

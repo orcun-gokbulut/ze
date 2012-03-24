@@ -41,7 +41,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -73,7 +73,7 @@ static ssize_t Memory_Read(ZEInt fd, void *buffer, ZESize nbyte)
 	memcpy(buffer, Resource->Data + Resource->MemoryCursor, BytesRead);
 	Resource->MemoryCursor += BytesRead;
 
-	return BytesRead;
+	return (ssize_t)BytesRead;
 }
 
 static off_t Memory_Seek(ZEInt fd, off_t offset, ZEInt whence)
@@ -83,19 +83,19 @@ static off_t Memory_Seek(ZEInt fd, off_t offset, ZEInt whence)
 	switch(whence)
 	{
 		case SEEK_SET:
-			Resource->MemoryCursor = offset;
+			Resource->MemoryCursor = (ZESize)offset;
 			break;
 		
 		case SEEK_CUR:
-			Resource->MemoryCursor += offset;
+			Resource->MemoryCursor += (ZESize)offset;
 			break;
 
 		case SEEK_END:
-			Resource->MemoryCursor = Resource->DataSize + offset;
+			Resource->MemoryCursor = Resource->DataSize + (ZESize)offset;
 			break;
 	}
 
-	return Resource->MemoryCursor;
+	return (off_t)Resource->MemoryCursor;
 }
 
 ZESoundResourceMP3::ZESoundResourceMP3()
@@ -125,7 +125,7 @@ const void* ZESoundResourceMP3::GetData() const
 
 void ZESoundResourceMP3::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
 {
-	mpg123_seek(mpg123, SampleIndex, SEEK_SET);
+	mpg123_seek(mpg123, (off_t)SampleIndex, SEEK_SET);
 	
 	ZESize BytesRead = 1;
 	ZESize Position = 0;
@@ -210,13 +210,13 @@ ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
 			return NULL;
 	}*/
 
-	NewResource->FileFormat = ZE_SFF_MP3;
-	NewResource->BitsPerSample = 16;
-	NewResource->ChannelCount = Channels;
-	NewResource->SamplesPerSecond = Rate;
-	NewResource->BlockAlign = NewResource->ChannelCount * (NewResource->BitsPerSample / 8);
+	NewResource->FileFormat			= ZE_SFF_MP3;
+	NewResource->BitsPerSample		= 16;
+	NewResource->ChannelCount		= Channels;
+	NewResource->SamplesPerSecond	= (ZESize)Rate;
+	NewResource->BlockAlign			= (ZESize)NewResource->ChannelCount * ((ZESize)NewResource->BitsPerSample / 8);
 	mpg123_scan(NewResource->mpg123);
-	NewResource->SampleCount = mpg123_length(NewResource->mpg123);
+	NewResource->SampleCount			= (ZESize)mpg123_length(NewResource->mpg123);
 
 	return NewResource;
 }

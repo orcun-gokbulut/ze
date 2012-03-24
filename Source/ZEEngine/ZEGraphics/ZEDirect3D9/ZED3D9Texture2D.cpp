@@ -133,7 +133,7 @@ void ZED3D9Texture2D::Lock(void** Buffer, ZESize* Pitch, ZEUInt Level)
 	D3DLOCKED_RECT Rect;
 	Texture->LockRect(Level, &Rect, NULL, NULL);
 	*Buffer = Rect.pBits;
-	*Pitch = Rect.Pitch;
+	*Pitch = (ZESize)Rect.Pitch;
 }
 
 void ZED3D9Texture2D::Unlock(ZEUInt Level)

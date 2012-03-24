@@ -47,7 +47,7 @@
 class ZEParticleRenderer;
 class ZEParticleOperator;
 class ZEParticleGenerator;
-class ZEDrawParameters;
+struct ZEDrawParameters;
 
 // struct ZENewParticle
 // {
@@ -80,7 +80,7 @@ class ZEParticleSystem : public ZEObject
 		ZEArray<ZEParticleOperator*>			Operators;
 		ZEArray<ZEParticleGenerator*>			Generators;
 
-		ZESize									MaximumParticleCount;
+		ZEUInt									MaximumParticleCount;
 
 	public:
 
@@ -97,8 +97,8 @@ class ZEParticleSystem : public ZEObject
 		bool									AddGenerator(ZEParticleGenerator* NewOperator);
 		bool									RemoveGenerator(ZEParticleGenerator* OperatorToRemove);
 
-		void									SetMaximumParticleCount(ZESize	ParticleCount);
-		ZESize									GetMaximumParticleCount() const;
+		void									SetMaximumParticleCount(ZEUInt	ParticleCount);
+		ZEUInt									GetMaximumParticleCount() const;
 
 		void									SetParticlesPerSecond(ZEUInt ParticlesPerSecond);
 		ZEUInt									GetParticlesPerSecond() const;

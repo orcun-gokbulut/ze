@@ -71,7 +71,7 @@ typedef ZEUInt32 ZEModelFilePhysicalShapeType;
 #define ZE_MFPST_CYLINDER							3
 #define ZE_MFPST_CONVEX								4
 
-ZEPackStruct(
+ZEPackStruct4(
 struct ZEModelFileMaterialChunk
 {
 	ZEUInt32				ChunkId;
@@ -106,7 +106,7 @@ struct ZEModelFileMaterialChunk
 	char					LightMap[ZE_MDLF_MAX_FILENAME_SIZE];
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct ZEModelFileHeaderChunk
 {
 	ZEUInt32				HEADER;
@@ -118,7 +118,7 @@ struct ZEModelFileHeaderChunk
 	ZEUInt32				AnimationCount;
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct ZEModelFileAnimationChunk
 {
 	ZEUInt32				ChunkId;
@@ -126,7 +126,7 @@ struct ZEModelFileAnimationChunk
 	ZEUInt32				FrameCount;
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct ZEModelFileAnimationFrameChunk
 {
 	ZEUInt32				ChunkId;
@@ -134,12 +134,12 @@ struct ZEModelFileAnimationFrameChunk
 	ZEUInt32				MeshKeyCount;
 });
 
-ZEPackStruct(struct  ZEModelFilePhysicalPolygonChunk
+ZEPackStruct4(struct  ZEModelFilePhysicalPolygonChunk
 {	
 	ZEInt					VertexIndexes[3];
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct ZEModelFilePhysicalShapeChunk
 {
 	ZEUInt32				ChunkId;
@@ -183,7 +183,7 @@ struct ZEModelFilePhysicalShapeChunk
 	};
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct ZEModelFilePhysicalBodyChunk
 {
 	ZEUInt32				ChunkId;
@@ -196,7 +196,7 @@ struct ZEModelFilePhysicalBodyChunk
 	ZEUInt32				ShapeCount;
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct ZEModelFilePhysicalJointChunk
 {
 	ZEUInt32				ChunkId;
@@ -292,7 +292,7 @@ struct ZEModelFilePhysicalJointChunk
 	float					AngularSlerpMotorDamper;
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct ZEModelFileMeshLODChunk
 {
 	ZEUInt32				ChunkId;
@@ -302,7 +302,7 @@ struct ZEModelFileMeshLODChunk
 	ZEUInt32				AffectingBoneCount;
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct ZEModelFileMeshChunk
 {
 	ZEUInt32				ChunkId;
@@ -316,7 +316,7 @@ struct ZEModelFileMeshChunk
 	bool					HasPhysicalBody;
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct ZEModelFileBoneChunk
 {
 	ZEUInt32				ChunkId;

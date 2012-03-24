@@ -47,46 +47,11 @@
 #include "ZED3D9Profiler.h"
 #include "ZED3D9Shader.h"
 #include "ZED3D9TextureResizeFilters.h"
+#include "ZECore/ZEConsole.h"
+#include "ZEMath/ZEMath.h"
 
 #include <d3d9.h>
 #include <stdlib.h>
-
-
-#include "ZECore/ZEConsole.h"
-
-
-bool ZED3D9TextureResizer::IsPowerOfTwo(ZEUInt Value)
-{
-	return ((Value & (Value - 1)) != 0)  ? false : true;
-}
-
-ZEUInt ZED3D9TextureResizer::NextPowerOfTwo(ZEUInt Value)
-{
-	if(Value <= 1)
-		return 1;
-
-	Value = (Value >> 1)  | Value;
-	Value = (Value >> 2)  | Value;
-	Value = (Value >> 4)  | Value;
-	Value = (Value >> 8)  | Value;
-	Value = (Value >> 16) | Value;
-
-	return ((Value << 1) + 1) - Value;
-}
-
-ZEUInt ZED3D9TextureResizer::PreviousPowerOfTwo(ZEUInt Value)
-{
-	if(Value <= 1)
-		return 1;
-	
-	Value = (Value >> 1)  | Value;
-	Value = (Value >> 2)  | Value;
-	Value = (Value >> 4)  | Value;
-	Value = (Value >> 8)  | Value;
-	Value = (Value >> 16) | Value;
-
-	return Value - (Value >> 1);
-}
 
 ZEUInt ZED3D9TextureResizer::GetPowerOfTwo(ZEUInt Value)
 {
@@ -98,8 +63,8 @@ ZEUInt ZED3D9TextureResizer::GetPowerOfTwo(ZEUInt Value)
 		default:
 		// Calculate the closest power of two
 		case ZE_D3D9_FPO2_AUTO:
-			Next = NextPowerOfTwo(Value);
-			Previous = PreviousPowerOfTwo(Value);
+			Next = ZEMath::NextPowerOfTwo(Value);
+			Previous = ZEMath::PreviousPowerOfTwo(Value);
 			if(Value > (Next + Previous) / 2)
 				return Next;
 			else
@@ -108,13 +73,13 @@ ZEUInt ZED3D9TextureResizer::GetPowerOfTwo(ZEUInt Value)
 
 		// Calculate next power of two
 		case ZE_D3D9_FPO2_NEXTPO2:
-			Next = NextPowerOfTwo(Value);
+			Next = ZEMath::NextPowerOfTwo(Value);
 			return Next;
 			break;
 
 		// Calculate previous power of two
 		case ZE_D3D9_FPO2_PREVIOUSPO2:
-			Previous = PreviousPowerOfTwo(Value);
+			Previous = ZEMath::PreviousPowerOfTwo(Value);
 			return Previous;
 			break;
 	}
@@ -140,19 +105,18 @@ ZED3D9FittingPowerof2Mode ZED3D9TextureResizer::GetAutoFitMode()
 	return AutoFitMode;
 }
 
-void ZED3D9TextureResizer::Initialize(void* DestData, ZEUInt DestPitch, ZEUInt DestWidth, ZEUInt DestHegiht,
-									  void* SrcData, ZEUInt SrcPitch, ZEUInt SrcWidth, ZEUInt SrcHeight)
+void ZED3D9TextureResizer::Initialize(void* DestData, const ZESize DestPitch, const ZEUInt DestWidth, const ZEUInt DestHegiht, const void* SrcData, const ZESize SrcPitch, const ZEUInt SrcWidth, const ZEUInt SrcHeight)
 {
 	// Set the parameters
-	this->SrcInfo.Buffer = SrcData;
-	this->SrcInfo.Pitch = SrcPitch;
-	this->SrcInfo.Width = SrcWidth;
-	this->SrcInfo.Height = SrcHeight;
+	this->SrcInfo.Buffer		= (void*)SrcData;
+	this->SrcInfo.Pitch		= SrcPitch;
+	this->SrcInfo.Width		= SrcWidth;
+	this->SrcInfo.Height		= SrcHeight;
 
-	this->DestInfo.Buffer = DestData;
-	this->DestInfo.Pitch = DestPitch;
-	this->DestInfo.Width = DestWidth;
-	this->DestInfo.Height = DestHegiht;
+	this->DestInfo.Buffer	= DestData;
+	this->DestInfo.Pitch		= DestPitch;
+	this->DestInfo.Width		= DestWidth;
+	this->DestInfo.Height	= DestHegiht;
 
 	
 }
@@ -270,8 +234,8 @@ bool ZED3D9TextureResizer::Process()
 
 		// Fill the input texture
 		Input->Lock(&Dest, &DestPitch, 0);
-		for(ZESize I = 0; I < SrcInfo.Height; I++)
-			memcpy((unsigned char*)Dest + I * DestPitch, (unsigned char*)SrcInfo.Buffer + I * SrcInfo.Pitch, SrcInfo.Width * Bpp);
+		for(ZESize I = 0; I < (ZESize)SrcInfo.Height; I++)
+			memcpy((unsigned char*)Dest + I * DestPitch, (unsigned char*)SrcInfo.Buffer + I * SrcInfo.Pitch, (ZESize)SrcInfo.Width * (ZESize)Bpp);
 		Input->Unlock(0);
 
 		Dest = NULL;
@@ -302,16 +266,16 @@ bool ZED3D9TextureResizer::Process()
 		GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 		GetDevice()->SetRenderState(D3DRS_CULLMODE,			D3DCULL_NONE);
 
-		const ZEInt WindowSize = HorizontalPassKernel.GetKernelWindowSize();
+		const ZESize WindowSize = HorizontalPassKernel.GetKernelWindowSize();
 		const ZEVector4* Kernel = HorizontalPassKernel.GetKernel();
 
 		// pass the parameters to graphics device
 		GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(DestPixelWidth, DestPixelHeight, 0.0f, 0.0f), 1);
-		GetDevice()->SetPixelShaderConstantF(0, (const float*)Kernel, WindowSize);
+		GetDevice()->SetPixelShaderConstantF(0, (const float*)Kernel, (UINT)WindowSize);
 		
 		// Resize Horizontally
 		GetDevice()->BeginScene();
-		GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+		GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
 		GetDevice()->EndScene();
 		
 		// Clean up the unnecessary textures
@@ -345,8 +309,8 @@ bool ZED3D9TextureResizer::Process()
 
 			// Fill the input texture
 			Input->Lock(&Dest, &DestPitch, 0);
-			for(ZESize I = 0; I < SrcInfo.Height; I++)
-				memcpy((unsigned char*)Dest + I * DestPitch, (unsigned char*)SrcInfo.Buffer + I * SrcInfo.Pitch, SrcInfo.Width * Bpp);
+			for(ZESize I = 0; I < (ZESize)SrcInfo.Height; I++)
+				memcpy((unsigned char*)Dest + I * DestPitch, (unsigned char*)SrcInfo.Buffer + I * SrcInfo.Pitch, (ZESize)SrcInfo.Width * (ZESize)Bpp);
 			Input->Unlock(0);
 			
 			Dest = NULL;
@@ -372,22 +336,22 @@ bool ZED3D9TextureResizer::Process()
 		// Set render states
 		Result = GetDevice()->SetVertexDeclaration(VertexDeclaration);
 		Result = GetDevice()->SetRenderState(D3DRS_ZENABLE,				FALSE);
-		Result = GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE,		FALSE);
+		Result = GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE,			FALSE);
 		Result = GetDevice()->SetRenderState(D3DRS_STENCILENABLE,		FALSE);
 		Result = GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE,		FALSE);
-		Result = GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE,	FALSE);
-		Result = GetDevice()->SetRenderState(D3DRS_CULLMODE,			D3DCULL_NONE);
+		Result = GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE,		FALSE);
+		Result = GetDevice()->SetRenderState(D3DRS_CULLMODE,				D3DCULL_NONE);
 
-		const ZEInt WindowSize = VerticalPassKernel.GetKernelWindowSize();
+		const ZESize WindowSize = VerticalPassKernel.GetKernelWindowSize();
 		const ZEVector4* Kernel = VerticalPassKernel.GetKernel();
 
 		// pass the parameters to graphics device
 		GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(DestPixelWidth, DestPixelHeight, 0.0f, 0.0f), 1);
-		GetDevice()->SetPixelShaderConstantF(0, (const float*)Kernel, WindowSize);
+		GetDevice()->SetPixelShaderConstantF(0, (const float*)Kernel, (UINT)WindowSize);
 		
 		// Resize Vertically
 		Result = GetDevice()->BeginScene();
-		Result = GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+		Result = GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
 		Result = GetDevice()->EndScene();
 
 		// Clean up the unnecessary textures
@@ -407,8 +371,8 @@ bool ZED3D9TextureResizer::Process()
 		D3DLOCKED_RECT Rect;
 		Result = ReadBack->LockRect(&Rect, NULL, NULL);
 
-		for(ZESize I = 0; I < DestInfo.Height; I++)
-			memcpy((unsigned char*)DestInfo.Buffer + I * DestInfo.Pitch, (unsigned char*)Rect.pBits + I * Rect.Pitch, DestInfo.Width * Bpp);
+		for(ZESize I = 0; I < (ZESize)DestInfo.Height; I++)
+			memcpy((unsigned char*)DestInfo.Buffer + I * DestInfo.Pitch, (unsigned char*)Rect.pBits + I * (ZESize)Rect.Pitch, (ZESize)DestInfo.Width * (ZESize)Bpp);
 
 		Result = ReadBack->UnlockRect();
 
@@ -441,7 +405,7 @@ ZED3D9TextureResizer::ZED3D9TextureResizer()
 
 	GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
 
-	// Create and compile shaders
+	// Create and compile shader
 	this->VertexShader = ZED3D9VertexShader::CreateShader("TextureResizeProcessor.hlsl", "vs_main_generic", 0, "vs_3_0");
 	this->PixelShaderHorizontal = ZED3D9PixelShader::CreateShader("TextureResizeProcessor.hlsl", "ps_main_horizontal", 0, "ps_3_0");
 	this->PixelShaderVertical = ZED3D9PixelShader::CreateShader("TextureResizeProcessor.hlsl", "ps_main_vertical", 0, "ps_3_0");

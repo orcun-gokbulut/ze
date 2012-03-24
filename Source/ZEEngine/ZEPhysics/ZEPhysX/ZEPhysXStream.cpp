@@ -101,9 +101,9 @@ double ZEPhysXFileStream::readDouble() const
 	return f;
 }
 
-void ZEPhysXFileStream::readBuffer(void* Buffer, NxU32 Size)	const
+void ZEPhysXFileStream::readBuffer(void* Buffer, NxU32 Size) const
 {
-	ZESize r= fread(Buffer, Size, 1, ((FILE*)File));
+	ZESize r= fread(Buffer, (ZESize)Size, 1, ((FILE*)File));
 	zeAssert(r == 0, "Reading error.");
 }
 
@@ -144,7 +144,7 @@ NxStream& ZEPhysXFileStream::storeDouble(NxF64 f)
 
 NxStream& ZEPhysXFileStream::storeBuffer(const void* Buffer, NxU32 Size)
 {
-	ZESize w = fwrite(Buffer, Size, 1, ((FILE*)File));
+	ZESize w = fwrite(Buffer, (ZESize)Size, 1, ((FILE*)File));
 	zeAssert(w == 0, "Writing error.");
 	return *this;
 }
@@ -172,7 +172,7 @@ const NxU8* ZEPhysXMemoryWriteStream::GetData() const
 
 const ZESize ZEPhysXMemoryWriteStream::GetDataSize() const
 {
-	return CurrentSize;
+	return (ZESize)CurrentSize;
 }
 
 void ZEPhysXMemoryWriteStream::Clear()
@@ -252,18 +252,18 @@ NxStream& ZEPhysXMemoryWriteStream::storeBuffer(const void* Buffer, NxU32 Size)
 	{
 		MaxSize = ExpectedSize + 4096;
 
-		NxU8* NewData = new NxU8[MaxSize];
+		NxU8* NewData = new NxU8[(ZESize)MaxSize];
 		zeAssert(NewData == NULL, "Can not allocate data.");
 
 		if(Data)
 		{
-			memcpy(NewData, Data, CurrentSize);
+			memcpy(NewData, Data, (ZESize)CurrentSize);
 			delete[] Data;
 		}
 		Data = NewData;
 	}
 
-	memcpy(Data + CurrentSize, Buffer, Size);
+	memcpy(Data + (ZESize)CurrentSize, Buffer, (ZESize)Size);
 	CurrentSize += Size;
 	return *this;
 }
@@ -333,8 +333,8 @@ double ZEPhysXMemoryReadStream::readDouble() const
 
 void ZEPhysXMemoryReadStream::readBuffer(void* Destination, NxU32 Size) const
 {
-	memcpy(Destination, Buffer, Size);
-	Buffer += Size;
+	memcpy(Destination, Buffer, (ZESize)Size);
+	Buffer += (ZESize)Size;
 }
 
 NxStream& ZEPhysXMemoryReadStream::storeByte(NxU8 b)

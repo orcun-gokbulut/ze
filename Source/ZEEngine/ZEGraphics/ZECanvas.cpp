@@ -59,7 +59,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -191,22 +191,22 @@ void ZECanvas::ApplyScale(const ZEVector3& Scale)
 
 void ZECanvas::AddWireframePlane(float Width, float Length, ZEUInt VSegment, ZEUInt HSegment)
 {
-	float XPosDiff = Width / (HSegment + 1);
-	float ZPosDiff = Length / (VSegment + 1);
+	float XPosDiff = Width / ((float)HSegment + 1.0f);
+	float ZPosDiff = Length / ((float)VSegment + 1.0f);
 	Length *= 0.5f;
 	Width *= 0.5f;
 	
-	ZECanvasVertex* Verts = Vertices.MassAdd((VSegment + 2) * 2 + (HSegment + 2)* 2);
+	ZECanvasVertex* Verts = Vertices.MassAdd(((ZESize)VSegment + 2) * 2 + ((ZESize)HSegment + 2)* 2);
 
 	ZESize N = 0;
-	for (ZESize I = 0; I <= VSegment + 1; I++)
+	for (ZESize I = 0; I <= (ZESize)VSegment + 1; I++)
 	{
 		ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(I * XPosDiff - Width, 0.0f, Length));
 		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(I * XPosDiff - Width, 0.0f, -Length));
 		N += 2;
 	}
 
-	for (ZESize I = 0; I <= HSegment + 1; I++)
+	for (ZESize I = 0; I <= (ZESize)HSegment + 1; I++)
 	{
 		ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(-Width, 0.0f, I * ZPosDiff - Length));
 		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Width, 0.0f, I * ZPosDiff - Length));
@@ -216,9 +216,9 @@ void ZECanvas::AddWireframePlane(float Width, float Length, ZEUInt VSegment, ZEU
 
 void ZECanvas::AddWireframeBox(float Width, float Height, float Length)
 {
-	Width /= 2;
-	Height /= 2;
-	Length /= 2;
+	Width /= 2.0f;
+	Height /= 2.0f;
+	Length /= 2.0f;
 
 	ZECanvasVertex* Verts = Vertices.MassAdd(24);
 
@@ -264,38 +264,40 @@ void ZECanvas::AddWireframeBox(float Width, float Height, float Length)
 
 void ZECanvas::AddWireframeSphere(float Radius, ZEUInt HSegments, ZEUInt VSegments)
 {
-	float VAngle = ZE_PI / (VSegments + 1);
-	float HAngle = 2.0f * ZE_PI / HSegments;
+	float VAngle = ZE_PI / ((float)VSegments + 1);
+	float HAngle = 2.0f * ZE_PI / (float)HSegments;
 
 	ZESize N = 0;
-	ZECanvasVertex* Verts =  Vertices.MassAdd(VSegments * HSegments * 4 + HSegments * 2);
+	ZECanvasVertex* Verts =  Vertices.MassAdd((ZESize)VSegments * (ZESize)HSegments * 4 + (ZESize)HSegments * 2);
 
 	float YPos = Radius;
 	float PrevRadius = 0.0f;
 	float PrevYPos = YPos;
 
 	float CurrentRadius;
-	for (ZESize Y = 1; Y <= VSegments; Y++)
+	for (ZESize Y = 1; Y <= (ZESize)VSegments; Y++)
 	{
-		YPos = Radius * ZEAngle::Cos(VAngle * Y);
-		CurrentRadius = Radius * ZEAngle::Sin(VAngle * Y);
-		for (ZESize X = 0; X < HSegments; X++)
+		YPos = Radius * ZEAngle::Cos(VAngle * (float)Y);
+		CurrentRadius = Radius * ZEAngle::Sin(VAngle * (float)Y);
+		
+		for (ZESize X = 0; X < (ZESize)HSegments; X++)
 		{
-			ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation,		ZEVector3(CurrentRadius * ZEAngle::Sin(HAngle * X), YPos, CurrentRadius * ZEAngle::Cos(HAngle * X)));
-			ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation,	ZEVector3(CurrentRadius * ZEAngle::Sin(HAngle * (X + 1)), YPos, CurrentRadius * ZEAngle::Cos(HAngle * (X + 1))));
-			ZECANVAS_ADDWIREVERTEX(Verts[N + 2], Transformation,	ZEVector3(PrevRadius * ZEAngle::Sin(HAngle * X), PrevYPos, PrevRadius * ZEAngle::Cos(HAngle * X)));
-			ZECANVAS_ADDWIREVERTEX(Verts[N + 3], Transformation,	ZEVector3(CurrentRadius * ZEAngle::Sin(HAngle * X), YPos, CurrentRadius * ZEAngle::Cos(HAngle * X)));
+			ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation,		ZEVector3(CurrentRadius * ZEAngle::Sin(HAngle * (float)X), YPos, CurrentRadius * ZEAngle::Cos(HAngle * (float)X)));
+			ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation,	ZEVector3(CurrentRadius * ZEAngle::Sin(HAngle * ((float)X + 1.0f)), YPos, CurrentRadius * ZEAngle::Cos(HAngle * ((float)X + 1.0f))));
+			ZECANVAS_ADDWIREVERTEX(Verts[N + 2], Transformation,	ZEVector3(PrevRadius * ZEAngle::Sin(HAngle * (float)X), PrevYPos, PrevRadius * ZEAngle::Cos(HAngle * (float)X)));
+			ZECANVAS_ADDWIREVERTEX(Verts[N + 3], Transformation,	ZEVector3(CurrentRadius * ZEAngle::Sin(HAngle * (float)X), YPos, CurrentRadius * ZEAngle::Cos(HAngle * (float)X)));
 			N += 4;
 		}
+
 		PrevYPos = YPos;
 		PrevRadius = CurrentRadius;
 	}
 	
 	YPos = -Radius;
-	for (ZESize X = 0; X < HSegments; X++)
+	for (ZESize X = 0; X < (ZESize)HSegments; X++)
 	{
 		ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(0, YPos, 0));
-		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(PrevRadius * ZEAngle::Sin(HAngle * X), PrevYPos, PrevRadius * ZEAngle::Cos(HAngle * X)));
+		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(PrevRadius * ZEAngle::Sin(HAngle * (float)X), PrevYPos, PrevRadius * ZEAngle::Cos(HAngle * (float)X)));
 		N += 2;
 	}
 }
@@ -331,38 +333,39 @@ void ZECanvas::AddWireframeQuad(const ZEVector3& P0, const ZEVector3& P1, const 
 
 void ZECanvas::AddWireframeCylinder(float Radius, float Height, ZEUInt HSegments, ZEUInt VSegments, bool Caps)
 {
-	float HAngle = ((2.0f * ZE_PI) / HSegments);
+	float HAngle = ((2.0f * ZE_PI) / (float)HSegments);
 	float YPos;
-	float YPosDiff = (Height / (VSegments + 1));
+	float YPosDiff = ((float)Height / ((float)VSegments + 1.0f));
 
 	ZESize N = 0;
-	ZECanvasVertex* Verts =  Vertices.MassAdd((VSegments + 2) * HSegments * 2 + (VSegments + 1) * HSegments * 2 + (Caps ? 4 * HSegments : 0));
+	ZECanvasVertex* Verts =  Vertices.MassAdd(((ZESize)VSegments + 2) * (ZESize)HSegments * 2 + ((ZESize)VSegments + 1) * (ZESize)HSegments * 2 + (Caps ? 4 * (ZESize)HSegments : 0));
 	
-	for (ZESize Y = 0; Y < VSegments + 2; Y++)
+	for (ZESize Y = 0; Y < (ZESize)VSegments + 2; Y++)
 	{
-		YPos = YPosDiff * Y ;
-		for (ZESize X = 0; X < HSegments; X++)
-		{
-			float sinfHAngle = ZEAngle::Sin(X * HAngle);
-			float cosfHAngle = ZEAngle::Cos(X * HAngle);
+		YPos = YPosDiff * (float)Y ;
 
-			if (Y != VSegments + 1)
+		for (ZESize X = 0; X < (ZESize)HSegments; X++)
+		{
+			float sinfHAngle = ZEAngle::Sin((float)X * HAngle);
+			float cosfHAngle = ZEAngle::Cos((float)X * HAngle);
+
+			if (Y != (ZESize)VSegments + 1)
 			{
 				ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(Radius * sinfHAngle, YPos + YPosDiff, Radius * cosfHAngle));
 				ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * sinfHAngle, YPos, Radius * cosfHAngle));
 				N += 2;
 			}
 			ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(Radius * sinfHAngle, YPos, Radius * cosfHAngle));
-			ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * ZEAngle::Sin((X + 1) * HAngle), YPos, Radius * ZEAngle::Cos((X + 1) * HAngle)));
+			ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * ZEAngle::Sin(((float)X + 1.0f) * HAngle), YPos, Radius * ZEAngle::Cos(((float)X + 1.0f) * HAngle)));
 			N += 2;
 		}
 	}
 
 	if (Caps)
-		for (ZESize X = 0; X < HSegments; X++)
+		for (ZESize X = 0; X < (ZESize)HSegments; X++)
 		{
-			float sinfHAngle = ZEAngle::Sin(X * HAngle);
-			float cosfHAngle = ZEAngle::Cos(X * HAngle);
+			float sinfHAngle = ZEAngle::Sin((float)X * HAngle);
+			float cosfHAngle = ZEAngle::Cos((float)X * HAngle);
 			ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(Radius * sinfHAngle, 0.0f, Radius * cosfHAngle));
 			ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(0.0f, 0.0f, 0.0f));
 			ZECANVAS_ADDWIREVERTEX(Verts[N + 2], Transformation, ZEVector3(Radius * sinfHAngle, Height, Radius * cosfHAngle));
@@ -405,13 +408,13 @@ void ZECanvas::AddWireframePyramid(float Width, float Height, float Length)
 
 void ZECanvas::AddWireframeCone(float Radius, ZEUInt Segments, float Height)
 {
-	ZECanvasVertex* Verts = Vertices.MassAdd(Segments * 4);
+	ZECanvasVertex* Verts = Vertices.MassAdd((ZESize)Segments * 4);
 	float HAngle = ((2.0f * ZE_PI) / Segments);
 	ZESize N = 0;
-	for (ZESize X = 0; X < Segments; X++)
+	for (ZESize X = 0; X < (ZESize)Segments; X++)
 	{
-		ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(Radius * ZEAngle::Sin(X * HAngle), 0.0f, Radius * ZEAngle::Cos(X * HAngle)));
-		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * ZEAngle::Sin((X + 1) * HAngle), 0.0f, Radius * ZEAngle::Cos((X + 1) * HAngle)));
+		ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(Radius * ZEAngle::Sin((float)X * HAngle), 0.0f, Radius * ZEAngle::Cos((float)X * HAngle)));
+		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * ZEAngle::Sin(((float)X + 1.0f) * HAngle), 0.0f, Radius * ZEAngle::Cos(((float)X + 1.0f) * HAngle)));
 		Verts[N + 2] = Verts[N + 1];
 		ZECANVAS_ADDWIREVERTEX(Verts[N + 3], Transformation, ZEVector3(0.0f, Height, 0.0f));
 		N += 4;
@@ -420,9 +423,9 @@ void ZECanvas::AddWireframeCone(float Radius, ZEUInt Segments, float Height)
 
 void ZECanvas::AddWireframeConvexPolygon(const ZEVector3* Vertices, ZESize VertexCount)
 {
-	ZECanvasVertex* Verts = this->Vertices.MassAdd(2 * VertexCount);
+	ZECanvasVertex* Verts = this->Vertices.MassAdd(2 * (ZESize)VertexCount);
 
-	for (ZESize I = 0; I < VertexCount - 1; I++)
+	for (ZESize I = 0; I < (ZESize)VertexCount - 1; I++)
 	{
 		ZECANVAS_ADDWIREVERTEX(Verts[2 * I], Transformation, Vertices[I]);
 		ZECANVAS_ADDWIREVERTEX(Verts[2 * I + 1], Transformation, Vertices[I + 1]);
@@ -448,13 +451,13 @@ void ZECanvas::AddLine(const ZEVector3& Point0, const ZEVector3& Point1)
 
 void ZECanvas::AddCircle(float Radius, ZEUInt Segments)
 {
-	ZECanvasVertex* Verts = Vertices.MassAdd(Segments * 2);
-	float HAngle = ((2.0f * ZE_PI) / Segments);
+	ZECanvasVertex* Verts = Vertices.MassAdd((ZESize)Segments * 2);
+	float HAngle = ((2.0f * ZE_PI) / (float)Segments);
 	ZESize N = 0;
-	for (ZESize X = 0; X < Segments; X++)
+	for (ZESize X = 0; X < (ZESize)Segments; X++)
 	{
-		ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(Radius * ZEAngle::Sin(X * HAngle), 0.0f, Radius * ZEAngle::Cos(X * HAngle)));
-		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * ZEAngle::Sin((X + 1) * HAngle), 0.0f, Radius * ZEAngle::Cos((X + 1) * HAngle)));
+		ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(Radius * ZEAngle::Sin((float)X * HAngle), 0.0f, Radius * ZEAngle::Cos((float)X * HAngle)));
+		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * ZEAngle::Sin(((float)X + 1.0f) * HAngle), 0.0f, Radius * ZEAngle::Cos(((float)X + 1.0f) * HAngle)));
 		N += 2;
 	}
 }
@@ -522,13 +525,13 @@ void ZECanvas::AddBox(float Width, float Height, float Length)
 
 void ZECanvas::AddSphere(float Radius, ZEUInt HSegments, ZEUInt VSegments)
 {
-	float VAngle = ZE_PI / (VSegments + 1);
-	float HAngle = 2.0f * ZE_PI / HSegments;
-	float UDiff = 1.0f / HSegments;
-	float VDiff = 1.0f / VSegments;
+	float VAngle = ZE_PI / ((float)VSegments + 1.0f);
+	float HAngle = 2.0f * ZE_PI / (float)HSegments;
+	float UDiff = 1.0f / (float)HSegments;
+	float VDiff = 1.0f / (float)VSegments;
 
-	ZEInt N = 0;
-	ZECanvasVertex* Verts =  Vertices.MassAdd((VSegments) * HSegments * 6 + HSegments * 6);
+	ZESize N = 0;
+	ZECanvasVertex* Verts =  Vertices.MassAdd(((ZESize)VSegments) * (ZESize)HSegments * 6 + (ZESize)HSegments * 6);
 
 	float YPos;
 	float PrevRadius = Radius * ZEAngle::Sin(VAngle);
@@ -539,36 +542,36 @@ void ZECanvas::AddSphere(float Radius, ZEUInt HSegments, ZEUInt VSegments)
 
 	ZEVector3 Position, Normal;
 	
-	for (ZESize Y = 1; Y <= VSegments; Y++)
+	for (ZESize Y = 1; Y <= (ZESize)VSegments; Y++)
 	{
 		cosfVAngle = ZEAngle::Cos(VAngle * Y);
 		YPos = Radius * cosfVAngle;
 		CurrentRadius = Radius * ZEAngle::Sin(VAngle * Y);
-		for (ZESize X = 0; X < HSegments; X++)
+		for (ZESize X = 0; X < (ZESize)HSegments; X++)
 		{
 			float sinfHAngle;
 		
-			sinfHAngle = ZEAngle::Sin(HAngle * X);
-			cosfHAngle = ZEAngle::Cos(HAngle * X);
+			sinfHAngle = ZEAngle::Sin(HAngle * (float)X);
+			cosfHAngle = ZEAngle::Cos(HAngle * (float)X);
 			Position = ZEVector3(PrevRadius * sinfHAngle , PrevYPos, PrevRadius * cosfHAngle);
 			ZEVector3::Normalize(Normal, Position);
-			ZECANVAS_ADDVERTEX(Verts[N], Transformation, Position, Normal, ZEVector2(X * UDiff, Y * VDiff));
+			ZECANVAS_ADDVERTEX(Verts[N], Transformation, Position, Normal, ZEVector2((float)X * UDiff, (float)Y * VDiff));
 
 			Position = ZEVector3(CurrentRadius * sinfHAngle, YPos, CurrentRadius * cosfHAngle);
 			ZEVector3::Normalize(Normal, Position);
-			ZECANVAS_ADDVERTEX(Verts[N + 1], Transformation, Position, Normal, ZEVector2(X * UDiff, (Y + 1) * VDiff));
+			ZECANVAS_ADDVERTEX(Verts[N + 1], Transformation, Position, Normal, ZEVector2((float)X * UDiff, ((float)Y + 1.0f) * VDiff));
 
-			sinfHAngle = ZEAngle::Sin(HAngle * (X + 1));
-			cosfHAngle = ZEAngle::Cos(HAngle * (X + 1));
+			sinfHAngle = ZEAngle::Sin(HAngle * ((float)X + 1.0f));
+			cosfHAngle = ZEAngle::Cos(HAngle * ((float)X + 1.0f));
 			Position = ZEVector3(CurrentRadius * sinfHAngle, YPos, CurrentRadius * cosfHAngle);
 			ZEVector3::Normalize(Normal, Position);
-			ZECANVAS_ADDVERTEX(Verts[N + 2], Transformation, Position, Normal,	ZEVector2((X + 1) * UDiff, (Y + 1) * VDiff));
+			ZECANVAS_ADDVERTEX(Verts[N + 2], Transformation, Position, Normal,	ZEVector2(((float)X + 1.0f) * UDiff, ((float)Y + 1.0f) * VDiff));
 
 			Verts[N + 3] = Verts[N + 2];
 
 			Position = ZEVector3(PrevRadius * sinfHAngle, PrevYPos, PrevRadius * cosfHAngle);
 			ZEVector3::Normalize(Normal, Position);
-			ZECANVAS_ADDVERTEX(Verts[N + 4], Transformation, Position, Normal, ZEVector2((X + 1) * UDiff, Y * VDiff));
+			ZECANVAS_ADDVERTEX(Verts[N + 4], Transformation, Position, Normal, ZEVector2(((float)X + 1.0f) * UDiff, (float)Y * VDiff));
 
 			Verts[N + 5] = Verts[N];
 
@@ -581,40 +584,40 @@ void ZECanvas::AddSphere(float Radius, ZEUInt HSegments, ZEUInt VSegments)
 	cosfVAngle = ZEAngle::Cos(VAngle);
 	YPos = Radius * cosfVAngle;
 	CurrentRadius = Radius * ZEAngle::Sin(VAngle);
-	for (ZESize X = 0; X < HSegments; X++)
+	for (ZESize X = 0; X < (ZESize)HSegments; X++)
 	{
-		float sinfHAngle = ZEAngle::Sin(HAngle * X);
+		float sinfHAngle = ZEAngle::Sin(HAngle * (float)X);
 		Position = ZEVector3(0.0f, Radius,  0.0f);
 		ZEVector3::Normalize(Normal, Position);
 		ZECANVAS_ADDVERTEX(Verts[N], Transformation, Position, Normal, ZEVector2(0.5f, 1.0f));
 
-		Position = ZEVector3(CurrentRadius * sinfHAngle, YPos, CurrentRadius * ZEAngle::Cos(HAngle * X));
+		Position = ZEVector3(CurrentRadius * sinfHAngle, YPos, CurrentRadius * ZEAngle::Cos(HAngle * (float)X));
 		ZEVector3::Normalize(Normal, Position);
-		ZECANVAS_ADDVERTEX(Verts[N + 1], Transformation, Position, Normal, ZEVector2((X + 1) * UDiff, 1.0f - VDiff));
+		ZECANVAS_ADDVERTEX(Verts[N + 1], Transformation, Position, Normal, ZEVector2(((float)X + 1.0f) * UDiff, 1.0f - VDiff));
 
-		sinfHAngle = ZEAngle::Sin(HAngle * (X + 1));
-		Position = ZEVector3(CurrentRadius * sinfHAngle, YPos, CurrentRadius * ZEAngle::Cos(HAngle * (X + 1)));
+		sinfHAngle = ZEAngle::Sin(HAngle * ((float)X + 1.0f));
+		Position = ZEVector3(CurrentRadius * sinfHAngle, YPos, CurrentRadius * ZEAngle::Cos(HAngle * ((float)X + 1.0f)));
 		ZEVector3::Normalize(Normal, Position);
-		ZECANVAS_ADDVERTEX(Verts[N + 2], Transformation, Position, Normal,	ZEVector2((X) * UDiff, 1.0f - VDiff));
+		ZECANVAS_ADDVERTEX(Verts[N + 2], Transformation, Position, Normal,	ZEVector2((float)X * UDiff, 1.0f - VDiff));
 		N += 3;
 	}
 	cosfVAngle = ZEAngle::Cos(ZE_PI - VAngle);
 	YPos = Radius * cosfVAngle;
-	for (ZESize X = 0; X < HSegments; X++)
+	for (ZESize X = 0; X < (ZESize)HSegments; X++)
 	{
-		float sinfHAngle = ZEAngle::Sin(HAngle * X);
-		Position = ZEVector3(CurrentRadius * sinfHAngle, YPos, CurrentRadius * ZEAngle::Cos(HAngle * X));
+		float sinfHAngle = ZEAngle::Sin(HAngle * (float)X);
+		Position = ZEVector3(CurrentRadius * sinfHAngle, YPos, CurrentRadius * ZEAngle::Cos(HAngle * (float)X));
 		ZEVector3::Normalize(Normal, Position);
 		ZECANVAS_ADDVERTEX(Verts[N], Transformation, Position, Normal, ZEVector2(0.5f, 1.0f));
 
 		Position = ZEVector3(0.0f, -Radius,  0.0f);
 		ZEVector3::Normalize(Normal, Position);
-		ZECANVAS_ADDVERTEX(Verts[N + 1], Transformation, Position, Normal, ZEVector2((X + 1) * UDiff, 1.0f - VDiff));
+		ZECANVAS_ADDVERTEX(Verts[N + 1], Transformation, Position, Normal, ZEVector2(((float)X + 1.0f) * UDiff, 1.0f - VDiff));
 
-		sinfHAngle = ZEAngle::Sin(HAngle * (X + 1));
-		Position = ZEVector3(CurrentRadius * sinfHAngle, YPos, CurrentRadius * ZEAngle::Cos(HAngle * (X + 1)));
+		sinfHAngle = ZEAngle::Sin(HAngle * ((float)X + 1));
+		Position = ZEVector3(CurrentRadius * sinfHAngle, YPos, CurrentRadius * ZEAngle::Cos(HAngle * ((float)X + 1.0f)));
 		ZEVector3::Normalize(Normal, Position);
-		ZECANVAS_ADDVERTEX(Verts[N + 2], Transformation, Position, Normal,	ZEVector2(X * UDiff, 1.0f - VDiff));
+		ZECANVAS_ADDVERTEX(Verts[N + 2], Transformation, Position, Normal,	ZEVector2((float)X * UDiff, 1.0f - VDiff));
 		N += 3;
 	}
 }
@@ -654,19 +657,19 @@ void ZECanvas::AddQuad(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3
 
 void ZECanvas::AddDisc(float Radius, ZEUInt Segments)
 {
-	ZECanvasVertex* Verts = Vertices.MassAdd(Segments * 3);
+	ZECanvasVertex* Verts = Vertices.MassAdd((ZESize)Segments * 3);
 	ZEVector3 Normal(0.0f, 1.0f, 0.0f);
 
-	float HAngle = (2.0f * ZE_PI) / Segments;
-	float UVDif = 1.0f / Segments;
-	ZEInt N = 0;
-	for (ZEUInt X = 0; X < Segments; X++)
+	float HAngle = (2.0f * ZE_PI) / (float)Segments;
+	float UVDif = 1.0f / (float)Segments;
+	ZESize N = 0;
+	for (ZESize X = 0; X < (ZESize)Segments; X++)
 	{
-		float sinfHAngle = ZEAngle::Sin(X * HAngle);
-		float sinfHAnglePP = ZEAngle::Sin((X + 1) * HAngle);
-		ZECANVAS_ADDVERTEX(Verts[N], Transformation, ZEVector3(Radius * sinfHAngle, 0.0f, Radius * ZEAngle::Cos(X * HAngle)), Normal, ZEVector2(X * UVDif, 1.0f));
-		ZECANVAS_ADDVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * sinfHAnglePP , 0.0f, Radius * ZEAngle::Cos((X + 1) * HAngle)), Normal, ZEVector2((X + 1) * UVDif, 1.0f));
-		ZECANVAS_ADDVERTEX(Verts[N + 2], Transformation, ZEVector3(0.0f, 0.0f, 0.0f), Normal, ZEVector2(X * UVDif, 0.0f));
+		float sinfHAngle = ZEAngle::Sin((float)X * HAngle);
+		float sinfHAnglePP = ZEAngle::Sin(((float)X + 1.0f) * HAngle);
+		ZECANVAS_ADDVERTEX(Verts[N], Transformation, ZEVector3(Radius * sinfHAngle, 0.0f, Radius * ZEAngle::Cos((float)X * HAngle)), Normal, ZEVector2((float)X * UVDif, 1.0f));
+		ZECANVAS_ADDVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * sinfHAnglePP , 0.0f, Radius * ZEAngle::Cos(((float)X + 1.0f) * HAngle)), Normal, ZEVector2(((float)X + 1.0f) * UVDif, 1.0f));
+		ZECANVAS_ADDVERTEX(Verts[N + 2], Transformation, ZEVector3(0.0f, 0.0f, 0.0f), Normal, ZEVector2((float)X * UVDif, 0.0f));
 		N += 3;
 	}
 }
@@ -708,25 +711,25 @@ void ZECanvas::AddPyramid(float Width, float Height, float Length)
 
 void ZECanvas::AddCone(float Radius, ZEUInt Segments, float Height)
 {
-	ZECanvasVertex* Verts = Vertices.MassAdd(Segments * 3);
-	float HAngle = ((2.0f * ZE_PI) / Segments);
+	ZECanvasVertex* Verts = Vertices.MassAdd((ZESize)Segments * 3);
+	float HAngle = ((2.0f * ZE_PI) / (float)Segments);
 	ZESize N = 0;
-	for (ZESize X = 0; X < Segments; X++)
+	for (ZESize X = 0; X < (ZESize)Segments; X++)
 	{
-		ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(Radius * ZEAngle::Sin(X * HAngle), 0.0f, Radius * ZEAngle::Cos(X * HAngle)));
-		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * ZEAngle::Sin((X + 1) * HAngle), 0.0f, Radius * ZEAngle::Cos((X + 1) * HAngle)));
+		ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(Radius * ZEAngle::Sin((float)X * HAngle), 0.0f, Radius * ZEAngle::Cos((float)X * HAngle)));
+		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * ZEAngle::Sin(((float)X + 1.0f) * HAngle), 0.0f, Radius * ZEAngle::Cos(((float)X + 1.0f) * HAngle)));
 		ZECANVAS_ADDWIREVERTEX(Verts[N + 2], Transformation, ZEVector3(0.0f, Height, 0.0f));
 		N += 3;
 	}
 }
 void ZECanvas::AddConvexPolygon(const ZEVector3* Vertices, ZESize VertexCount)
 {
-	ZECanvasVertex* Verts = this->Vertices.MassAdd((VertexCount - 2) * 3);
+	ZECanvasVertex* Verts = this->Vertices.MassAdd(((ZESize)VertexCount - 2) * 3);
 	ZEVector3 Normal;
 	ZEVector3::CrossProduct(Normal, Vertices[1] - Vertices[0], Vertices[1] - Vertices[0]);
 	ZEVector3::Normalize(Normal, Normal);
 
-	for (ZESize I = 2; I < VertexCount; I++)
+	for (ZESize I = 2; I < (ZESize)VertexCount; I++)
 	{
 		ZECANVAS_ADDVERTEX(Verts[3 * (I - 2)], Transformation, Vertices[0], Normal, ZEVector2(0.0f ,0.0f));
 		ZECANVAS_ADDVERTEX(Verts[3 * (I - 2) + 1], Transformation, Vertices[I - 1], Normal, ZEVector2(0.0f ,0.0f));
@@ -802,7 +805,7 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 	ZEInt VertexCount;
 	fscanf((FILE*)File->GetFileHandle(), "%d", &VertexCount);
 
-	ZECanvasVertex* Vertices = this->Vertices.MassAdd(VertexCount);
+	ZECanvasVertex* Vertices = this->Vertices.MassAdd((ZESize)VertexCount);
 	ZESize Index = 0;
 	while (!File->Eof())
 	{
@@ -819,7 +822,7 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 		}*/
 	}
 
-	if (Index != VertexCount + 1 )
+	if (Index != (ZESize)VertexCount + 1 )
 		zeWarning("Corrupted canvas file. Vertex count is less than verties in the file. (FileName : \"%s\")", NewPath.ToCString());
 
 	File->Close();

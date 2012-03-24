@@ -149,7 +149,7 @@ bool ZEDSModule::Initialize()
 		return false;
     }
 
-	ZEUInt DeviceId = SoundOptions.GetOption("DeviceId")->GetValue().GetInteger();
+	ZESize DeviceId = (ZESize)SoundOptions.GetOption("DeviceId")->GetValue().GetInteger();
 
 	GUID* DeviceGUID = NULL;
 	if (DeviceId > DeviceList.GetCount())
@@ -188,8 +188,8 @@ bool ZEDSModule::Initialize()
 	
 	DSBUFFERDESC PrimaryBufferDesc;
 	ZeroMemory(&PrimaryBufferDesc, sizeof(DSBUFFERDESC));
-	PrimaryBufferDesc.dwSize = sizeof(DSBUFFERDESC);
-	PrimaryBufferDesc.dwFlags = DSBCAPS_CTRL3D | DSBCAPS_CTRLVOLUME | DSBCAPS_PRIMARYBUFFER;
+	PrimaryBufferDesc.dwSize	= (DWORD)sizeof(DSBUFFERDESC);
+	PrimaryBufferDesc.dwFlags	= DSBCAPS_CTRL3D | DSBCAPS_CTRLVOLUME | DSBCAPS_PRIMARYBUFFER;
 
 	hr = DS->CreateSoundBuffer(&PrimaryBufferDesc, &DSPrimary, NULL);
 	if (FAILED(hr))
@@ -213,7 +213,7 @@ bool ZEDSModule::Initialize()
 		TypeVolumes[I] = 100;
 
 	SetStreamingDisabled(SoundOptions.GetOption("StreamingDisabled")->GetValue().GetBoolean());
-	SetMaxBufferSize(SoundOptions.GetOption("MaxBufferSize")->GetValue().GetInteger());
+	SetMaxBufferSize((ZESize)SoundOptions.GetOption("MaxBufferSize")->GetValue().GetInteger());
 	SetMasterVolume(SoundOptions.GetOption("MasterVolume")->GetValue().GetInteger());
 	SetSpeakerLayout((ZESpeakerLayout)SoundOptions.GetOption("SpeakerLayout")->GetValue().GetInteger());
 	SetTypeVolume(ZE_SST_EFFECT, SoundOptions.GetOption("EffectVolume")->GetValue().GetInteger());

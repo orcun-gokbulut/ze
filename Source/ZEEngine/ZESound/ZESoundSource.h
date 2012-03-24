@@ -80,8 +80,8 @@ class ZESoundSource : public ZEComponent
 {
 	ZE_META_ENTITY(ZESoundSource)
 	private:
-		ZEUInt						StartPosition;
-		ZEUInt						EndPosition;
+		ZESize						StartPosition;
+		ZESize						EndPosition;
 
 	protected:
 		ZESoundResource*			SoundResource;
@@ -94,11 +94,11 @@ class ZESoundSource : public ZEComponent
 		bool						Looping;
 		bool						Streaming;
 
-		ZEUInt						CurrentPosition;
-		ZEUInt						LocalOldPosition;
+		ZESize						CurrentPosition;
+		ZESize						LocalOldPosition;
 
-		ZEUInt						EffectiveStartPosition;
-		ZEUInt						EffectiveEndPosition;
+		ZESize						EffectiveStartPosition;
+		ZESize						EffectiveEndPosition;
 		bool						LimitsEnabled;
 
 		void						ResetParameters();
@@ -115,30 +115,30 @@ class ZESoundSource : public ZEComponent
 		ZESoundSourceType			GetSoundSourceType();
 		void						SetSoundSourceType(ZESoundSourceType Type);
 
-		virtual void				SetCurrentPosition(ZEUInt SampleIndex);
+		virtual void				SetCurrentPosition(ZESize SampleIndex);
 		void						SetCurrentPositionTime(float Seconds);
 		void						SetCurrentPositionPersentage(float Percent);
 
-		ZEUInt						GetCurrentPosition() const;
+		ZESize						GetCurrentPosition() const;
 		ZEUInt						GetCurrentPositionTime() const;
 		float						GetCurrentPositionPersentage() const;
 
 		void						SetLimitsEnabled(bool Enabled);
 		bool						GetLimitsEnabled() const;
 
-		virtual void				SetStartPosition(ZEUInt SampleIndex);
+		virtual void				SetStartPosition(ZESize SampleIndex);
 		void						SetStartPositionTime(float Seconds);
 		void						SetStartPositionPersentage(float Percent);
 
-		ZEUInt						GetStartPosition() const;
+		ZESize						GetStartPosition() const;
 		float						GetStartPositionTime() const;
 		float						GetStartPositionPersentage() const;
 
-		virtual void				SetEndPosition(ZEUInt SampleIndex);
+		virtual void				SetEndPosition(ZESize SampleIndex);
 		void						SetEndPositionTime(float Seconds);
 		void						SetEndPositionPercentage(float Percentage);
 
-		ZEUInt						GetEndPosition() const;
+		ZESize						GetEndPosition() const;
 		float						GetEndPositionTime() const;
 		float						GetEndPositionPersentage() const;
 

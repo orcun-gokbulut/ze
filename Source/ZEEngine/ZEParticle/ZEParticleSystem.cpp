@@ -69,7 +69,7 @@ bool ZEParticleSystem::AddOperator(ZEParticleOperator* NewOperator)
 		return false;
 
 	Operators.Add(NewOperator);
-	NewOperator->ResizeCustomDataPool(MaximumParticleCount);
+	NewOperator->ResizeCustomDataPool((ZESize)MaximumParticleCount);
 	NewOperator->Owner = this;
 
 	return true;
@@ -109,24 +109,26 @@ bool ZEParticleSystem::RemoveGenerator(ZEParticleGenerator* GeneratorToRemove)
 	return true;
 }
 
-void ZEParticleSystem::SetMaximumParticleCount(ZESize ParticleCount)
+void ZEParticleSystem::SetMaximumParticleCount(ZEUInt ParticleCount)
 {
 	if(MaximumParticleCount == ParticleCount)
 		return;
 
 	MaximumParticleCount = ParticleCount;	
-	ParticlePool.Resize(MaximumParticleCount);
+	ParticlePool.Resize((ZESize)MaximumParticleCount);
 
 	for (ZESize I = 0; I < Operators.GetCount(); I++)
 	{
-		Operators[I]->ResizeCustomDataPool(MaximumParticleCount); 
+		Operators[I]->ResizeCustomDataPool((ZESize)MaximumParticleCount); 
 	}
 
 	if(Renderer != NULL)
+	{
 		Renderer->SetParticleCount(MaximumParticleCount);
+	}
 }
 
-ZESize ZEParticleSystem::GetMaximumParticleCount() const
+ZEUInt ZEParticleSystem::GetMaximumParticleCount() const
 {
 	return MaximumParticleCount;
 }
@@ -146,10 +148,12 @@ void ZEParticleSystem::Draw(ZEDrawParameters* DrawParameters)
 
 void ZEParticleSystem::Tick(float ElapsedTime)
 {
-	for (ZESize I = 0; I < MaximumParticleCount; I++)
+	for (ZESize I = 0; I < (ZESize)MaximumParticleCount; I++)
 	{
 		if(ParticlePool[I].State == ZE_PAS_NEW)
+		{
 			ParticlePool[I].State = ZE_PAS_ALIVE;
+		}
 	}
 
 	for (ZESize I = 0; I < Generators.GetCount(); I++)

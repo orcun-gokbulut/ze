@@ -116,7 +116,7 @@ void ZEModelIKChain::Iterate()
 	// Get Direction from bone root to the effector
 	ZEModelBone* Knob = Nodes[Nodes.GetCount() - 1].Bone;
 
-	for (ZEInt I = Nodes.GetCount() - 2; I >= 0 ; I--)
+	for (ZESSize I = Nodes.GetCount() - 2; I >= 0 ; I--)
 	{
 		ZEModelIKChainNode& CurrentNode = Nodes[I];
 

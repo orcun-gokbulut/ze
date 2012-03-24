@@ -44,20 +44,20 @@ void ZEParticleSphereGenerator::Tick(float ElapsedTime, ZEArray<ZEParticle>& Own
 		return;
 
 	ParticlesRemaining += GetParticlesPerSecond() * ElapsedTime;
-	int ParticeCountForTimeElapsed = ParticlesRemaining;
+	ZEUInt ParticeCountForTimeElapsed = (ZEUInt)ParticlesRemaining;
 	ParticlesRemaining -= ParticeCountForTimeElapsed;
 
 	ZEUInt ParticlesEmmitedThisFrame = 0;
 
 	if(ParticeCountForTimeElapsed != 0)
 	{
-		for (int I = 0; I < OwnerParticlePool.GetCount(); I++)
+		for (ZESize I = 0; I < OwnerParticlePool.GetCount(); I++)
 		{
 			if(OwnerParticlePool[I].State == ZE_PAS_DEAD)
 			{
 				ZEVector3 EffectPosition = GetOwner()->GetOwner()->GetWorldPosition();
 
-				float Radius = RAND_BETWEEN_TWO_FLOAT(0.0f, Radius);
+				float Radius = RAND_BETWEEN_TWO_FLOAT(0.0f, this->Radius);
 				float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 				float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, ZE_PI);
 				OwnerParticlePool[I].Position.x = EffectPosition.x + Radius * ZEAngle::Cos(Theta) * ZEAngle::Sin(Phi);

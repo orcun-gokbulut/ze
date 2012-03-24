@@ -63,7 +63,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -321,7 +321,7 @@ bool ZEScene::Save(const ZEString& FileName)
 	ZEFile Serializer;
 	if (Serializer.Open(NewPath, ZE_FM_WRITE_ONLY, true))
 	{
-		ZEUInt32 EntityCount = Entities.GetCount();
+		ZEUInt32 EntityCount = (ZEUInt32)Entities.GetCount();
 		Serializer.Write(&EntityCount, sizeof(ZEUInt32), 1);
 		
 		Serializer.Write(&LastEntityId, sizeof(ZEInt), 1);
@@ -380,7 +380,7 @@ bool ZEScene::Load(const ZEString& FileName)
 
 		ClearEntities();
 
-		for (ZESize I = 0; I < EntityCount; I++)
+		for (ZESize I = 0; I < (ZESize)EntityCount; I++)
 		{
 			ZEEntity* NewEntity;
 			Unserializer.Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);

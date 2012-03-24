@@ -63,12 +63,18 @@ static ZESize CreateQuad(ZETerrainVertex* Vertices, float x, float y)
 static ZESize CreateVerticalBlock(ZETerrainVertex* Vertices, ZEInt Width = -1)
 {
 	if (Width == -1)
+	{
 		Width = EdgeLength;
+	}
 
 	ZESize Index = 0;
-	for (int y = -1; y < EdgeLength + 1; y++)
-		for (int x = 0; x < Width; x++)
-			Index += CreateQuad(Vertices + Index, x, y);
+	for (ZEInt y = -1; y < EdgeLength + 1; y++)
+	{
+		for (ZEInt x = 0; x < Width; x++)
+		{
+			Index += CreateQuad(Vertices + Index, (float)x, (float)y);
+		}
+	}
 	
 	return Index;
 }
@@ -79,9 +85,13 @@ static ZESize CreateHorizontalBlock(ZETerrainVertex* Vertices, ZEInt Height = -1
 		Height = EdgeLength;
 
 	ZESize Index = 0;
-	for (int x = -1; x < EdgeLength + 1; x++)
-		for (int y = 0; y < Height; y++)
-			Index += CreateQuad(Vertices + Index, x, y);
+	for (ZEInt x = -1; x < EdgeLength + 1; x++)
+	{
+		for (ZEInt y = 0; y < Height; y++)
+		{
+			Index += CreateQuad(Vertices + Index, (float)x, (float)y);
+		}
+	}
 
 	return Index;
 }
@@ -91,9 +101,9 @@ bool ZETerrainPrimitivesGenerator::Generate(ZEStaticVertexBuffer** VertexBuffer,
 	::EdgeLength = EdgeLength;
 	
 	ZESize VertexBufferSize = 
-		2 * EdgeLength * (EdgeLength + 2) +
-		1 * (EdgeLength - 1) * (EdgeLength + 2) +
-		3 * (EdgeLength + 2);
+		2 * (ZESize)EdgeLength * ((ZESize)EdgeLength + 2) +
+		1 * ((ZESize)EdgeLength - 1) * ((ZESize)EdgeLength + 2) +
+		3 * ((ZESize)EdgeLength + 2);
 	
 	VertexBufferSize *= 6 * sizeof(ZETerrainVertex);
 
@@ -130,4 +140,6 @@ bool ZETerrainPrimitivesGenerator::Generate(ZEStaticVertexBuffer** VertexBuffer,
 
 	zeAssert(VertexIndex * sizeof(ZETerrainVertex) != VertexBufferSize, "Vertex counts does not match.");
 	(*VertexBuffer)->Unlock();
+
+	return true;
 }

@@ -65,7 +65,7 @@ enum ZEBitmapFilteringMode
 
 struct ZEPixelColor
 {
-	unsigned char				b, g, r, a;
+	ZEUInt8						b, g, r, a;
 
 	static ZEPixelColor			Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T);
 	static ZEVector4			LerpFloat(const ZEPixelColor& A, const ZEPixelColor& B, float T);
@@ -88,19 +88,19 @@ class ZEBitmap
 	private:
 		ZEUInt					Width;
 		ZEUInt					Height;
-		ZEUInt					Pitch;
-		ZEUInt					PixelSize;
+		ZESize					Pitch;
+		ZESize					PixelSize;
 		void*					Pixels;
 
 	public:
-		bool					Create(ZEUInt Width, ZEUInt Height, ZEUInt PixelSize);
+		bool					Create(ZEUInt Width, ZEUInt Height, ZESize PixelSize);
 
 		ZEUInt					GetWidth();
 		ZEUInt					GetHeight();
-		ZEUInt					GetPitch();
-		ZEUInt					GetPixelSize();
-		ZEUInt					GetBPP();
-		ZEUInt					GetSize();
+		ZESize					GetPitch();
+		ZESize					GetPixelSize();
+		ZESize					GetBPP();
+		ZESize					GetSize();
 
 		ZEPixelColor*			GetPixels();
 		ZEPixelColor&			GetPixel(ZEUInt x, ZEUInt y);
@@ -112,12 +112,12 @@ class ZEBitmap
 	
 		ZEPixelColor*			GetRow(ZEUInt Index);
 
-		void					CopyFrom(void* SourceBuffer, ZEUInt SourcePitch, 
+		void					CopyFrom(void* SourceBuffer, ZESize SourcePitch, 
 									ZEUInt Width, ZEUInt Height, 
 									ZEUInt SourceOffsetX = 0, ZEUInt SourceOffsetY = 0,
 									ZEUInt DestinationOffsetX = 0, ZEUInt DestinationOffsetY = 0);
 
-		void					CopyTo(void* DestinationBuffer, ZEUInt DestinationPitch, 
+		void					CopyTo(void* DestinationBuffer, ZESize DestinationPitch, 
 									ZEUInt Width, ZEUInt Height, 
 									ZEUInt DestinationOffsetX = 0, ZEUInt DestinationOffsetY = 0,
 									ZEUInt SourceOffsetX = 0, ZEUInt SourceOffsetY = 0);

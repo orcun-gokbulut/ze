@@ -43,22 +43,22 @@ void ZEParticleBoxGenerator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerP
 		return;
 
 	ParticlesRemaining += GetParticlesPerSecond() * ElapsedTime;
-	int ParticeCountForTimeElapsed = ParticlesRemaining;
+	ZEUInt ParticeCountForTimeElapsed = (ZEUInt)ParticlesRemaining;
 	ParticlesRemaining -= ParticeCountForTimeElapsed;
 
 	ZEUInt ParticlesEmmitedThisFrame = 0;
 
 	if(ParticeCountForTimeElapsed != 0)
 	{
-		for (int I = 0; I < OwnerParticlePool.GetCount(); I++)
+		for (ZESize I = 0; I < OwnerParticlePool.GetCount(); I++)
 		{
 			if(OwnerParticlePool[I].State == ZE_PAS_DEAD)
 			{
 				ZEVector3 EffectPosition = GetOwner()->GetOwner()->GetWorldPosition();
 
-				OwnerParticlePool[I].Position.x = EffectPosition.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2, BoxSize.x / 2);
-				OwnerParticlePool[I].Position.y = EffectPosition.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2, BoxSize.y / 2);
-				OwnerParticlePool[I].Position.z = EffectPosition.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2, BoxSize.z / 2);
+				OwnerParticlePool[I].Position.x = EffectPosition.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2.0f, BoxSize.x / 2.0f);
+				OwnerParticlePool[I].Position.y = EffectPosition.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2.0f, BoxSize.y / 2.0f);
+				OwnerParticlePool[I].Position.z = EffectPosition.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2.0f, BoxSize.z / 2.0f);
 				OwnerParticlePool[I].State = ZE_PAS_NEW;
 
 				SingleBurstParticleCounter++;
@@ -66,7 +66,9 @@ void ZEParticleBoxGenerator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerP
 			}
 
 			if(ParticlesEmmitedThisFrame == ParticeCountForTimeElapsed)
+			{
 				break;
+			}
 		}
 	}
 }

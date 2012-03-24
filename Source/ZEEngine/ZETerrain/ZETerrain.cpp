@@ -196,7 +196,7 @@ bool ZETerrain::CreateLevels()
 {
 	DestroyLevels();
 
-	Levels.SetCount(MaxLevel);
+	Levels.SetCount((ZESize)MaxLevel);
 	for (ZESize I = 0; I < Levels.GetCount(); I++)
 	{
 		ZETerrainLevel* CurrentLevel = &Levels[I];
@@ -211,6 +211,7 @@ bool ZETerrain::CreateLevels()
 		CurrentLevel->Material->SetBlendTreshold(0.75f);
 		CurrentLevel->Material->SetChunkSize(ChunkSize);
 		CurrentLevel->Material->SetColorTexture((ZETexture2D*)ColorTexture);
+		CurrentLevel->Material->SetNormalTexture((ZETexture2D*)DetailNormalTexture);
 	}
 
 	return true;
@@ -288,7 +289,7 @@ float Sample(ZETerrainDataLevel* Data, ZESize x, ZESize y)
 	return Data->ElevationData[y * Data->ElevationWidth + x];
 }
 
-float* Write(void* Buffer, int Pitch, ZESize x, ZESize y)
+float* Write(void* Buffer, ZESize Pitch, ZESize x, ZESize y)
 {
 	return (float*)((ZEUInt8*)Buffer + Pitch * y + x * 2 * sizeof(float));
 }
@@ -306,16 +307,20 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 	OldPositionX = PositionX;
 	OldPositionY = PositionY;
 
-	ZESize TextureSize = (ChunkSize * 4 + 8 + 1);
-	float TexelSize = 1.0f / TextureSize;
+	ZESize TextureSize = ((ZESize)ChunkSize * 4 + 8 + 1);
+	float TexelSize = 1.0f / (float)TextureSize;
 
-	ZEInt LevelCount = Levels.GetCount();
+	ZESize LevelCount = Levels.GetCount();
 	if (DataLevels.GetCount() < LevelCount)
+	{
 		LevelCount = DataLevels.GetCount();
+	}
 	if (MaxLevel < LevelCount)
+	{
 		LevelCount = MaxLevel;
+	}
 
-	for (ZEInt CurrLevelIndex = 0; CurrLevelIndex < LevelCount - 1; CurrLevelIndex++)
+	for (ZESize CurrLevelIndex = 0; CurrLevelIndex < LevelCount - 1; CurrLevelIndex++)
 	{
 		ZETerrainLevel* CurrLevel = &Levels[CurrLevelIndex];
 		CurrLevel->MinHeight = ZE_FLOAT_MAX;
@@ -337,6 +342,7 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 		ZESize Pitch;		
 		CurrLevel->ElevationTexture->Lock(&Buffer, &Pitch, 0);
 		for (ZESize BufferY = 0; BufferY < TextureSize; BufferY++)
+		{
 			for (ZESize BufferX = 0; BufferX < TextureSize; BufferX++)
 			{
 				ZESSize PosX = DataX + BufferX;
@@ -373,10 +379,15 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 				Write(Buffer, Pitch, BufferX, BufferY)[1] = NextLevelHeight;
 
 				if (Height < CurrLevel->MinHeight)
+				{
 					CurrLevel->MinHeight = Height;
+				}
 				else if (Height > CurrLevel->MaxHeight)
+				{
 					CurrLevel->MaxHeight = Height;
+				}
 			}
+		}
 
 		CurrLevel->ElevationTexture->Unlock(0);
 
@@ -401,14 +412,14 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt Po
 {	
 	ZERenderCommand RenderCommand;
 	RenderCommand.SetZero();
-	RenderCommand.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
+	RenderCommand.Flags				= ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
 	RenderCommand.VertexDeclaration = VertexDeclaration;
-	RenderCommand.Material = Levels[Level].Material;
-	RenderCommand.Order = 0;
-	RenderCommand.Pipeline = ZE_RORP_3D;
-	RenderCommand.VertexBuffer = VertexBuffer;
-	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderCommand.Priority = 3;
+	RenderCommand.Material			= Levels[Level].Material;
+	RenderCommand.Order				= 0;
+	RenderCommand.Pipeline			= ZE_RORP_3D;
+	RenderCommand.VertexBuffer		= VertexBuffer;
+	RenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE;
+	RenderCommand.Priority			= 3;
 
 	ZEMatrix4x4 ScaleMatrix;
 	ZEMatrix4x4::CreateOrientation(ScaleMatrix, ZEVector3((float)PositionX, 0.0f, (float)PositionY), ZEQuaternion::Identity, ZEVector3((float)(1 << Level), 1.0f, (float)(1 << Level)));
@@ -417,13 +428,21 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt Po
 
 	ZEInt BarSize;
 	if (PrimitiveType == ZE_TP_CORNER_2)
+	{
 		BarSize = 2;
+	}
 	else if (PrimitiveType == ZE_TP_CORNER_1)
+	{
 		BarSize = 1;
+	}
 	else if (PrimitiveType == ZE_TP_CORNER)
+	{
 		BarSize = ChunkSize - 1;
+	}
 	else
+	{
 		BarSize = ChunkSize;
+	}
 	
 	RenderCommand.VertexBufferOffset = Indices.Index[PrimitiveType] + BarSize * 2 * 3;
 	RenderCommand.PrimitiveCount = ChunkSize * BarSize * 2;
@@ -482,9 +501,13 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	
 	ZESize LevelCount = Levels.GetCount();
 	if (DataLevels.GetCount() < LevelCount)
+	{
 		LevelCount = DataLevels.GetCount();
-	if (MaxLevel < LevelCount)
-		LevelCount = MaxLevel;
+	}
+	if ((ZESize)MaxLevel < LevelCount)
+	{
+		LevelCount = (ZESize)MaxLevel;
+	}
 
 	int ActiveLevel = 0;
 	for (ZESize CurrIndex = 0; CurrIndex < LevelCount; CurrIndex++)

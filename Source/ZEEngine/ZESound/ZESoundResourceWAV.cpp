@@ -40,7 +40,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -140,7 +140,7 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
 	File->Read(&Fmt, sizeof(Fmt), 1);
 	if (Fmt.Header != ' tmf')
 	{
-		zeError("Wrong wave file. (FileName : \"%s\")", NewPath);
+		zeError("Wrong wave file. (FileName : \"%s\")", NewPath.ToCString());
 		return NULL;
 	}
 	
@@ -159,14 +159,14 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
 
 	ZESoundResourceWAV* NewResource = new ZESoundResourceWAV();
 	NewResource->SetFileName(NewPath);
-	NewResource->BitsPerSample = Fmt.BitsPerSample;
-	NewResource->BlockAlign = Fmt.BlockAlign;
-	NewResource->ChannelCount = Fmt.NumChannels;
-	NewResource->SamplesPerSecond = Fmt.SampleRate;
-	NewResource->DataSize = Data.Size;
-	NewResource->SampleCount = NewResource->DataSize / NewResource->BlockAlign;
-	NewResource->Data = new unsigned char[Data.Size];
-	File->Read(NewResource->Data, 1, Data.Size);	
+	NewResource->BitsPerSample		= Fmt.BitsPerSample;
+	NewResource->BlockAlign			= Fmt.BlockAlign;
+	NewResource->ChannelCount		= Fmt.NumChannels;
+	NewResource->SamplesPerSecond	= (ZESize)Fmt.SampleRate;
+	NewResource->DataSize			= (ZESize)Data.Size;
+	NewResource->SampleCount			= NewResource->DataSize / NewResource->BlockAlign;
+	NewResource->Data				= new unsigned char[NewResource->DataSize];
+	File->Read(NewResource->Data, 1, NewResource->DataSize);	
 	File->Close();
 	delete File;
 

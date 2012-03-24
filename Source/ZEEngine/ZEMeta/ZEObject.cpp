@@ -79,8 +79,9 @@ bool ZEObject::SetProperty(const char* PropertyName, const ZEVariant& Value)
 	ZEInt PropertyId = GetPropertyId(PropertyName);
 
     if (PropertyId != -1)
+	{
         return SetProperty(PropertyId, Value);
-
+	}
 	else
 	{
 		ZEUInt Hash = 0;

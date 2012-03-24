@@ -126,12 +126,12 @@ void ZESoundDebugModule::Process(float ElapsedTime)
 	float EndPositionTime				= SoundBrush2D->GetEndPositionTime();
 
 
-	ZEUInt StartPosition = SoundBrush2D->GetStartPosition();
-	ZEUInt EndPosition = SoundBrush2D->GetEndPosition();
-	ZEUInt Volume = SoundBrush2D->GetVolume();
+	ZESize StartPosition		= SoundBrush2D->GetStartPosition();
+	ZESize EndPosition			= SoundBrush2D->GetEndPosition();
+	ZEUInt Volume				= SoundBrush2D->GetVolume();
 	float CurrentPositionPersentage	= SoundBrush2D->GetCurrentPositionPersentage();
-	float CurrentPositionTime = SoundBrush2D->GetCurrentPositionTime();
-	ZEInt BitsPerSample = SoundBrush2D->GetSoundResource()->GetBitsPerSample();
+	ZEUInt CurrentPositionTime	= SoundBrush2D->GetCurrentPositionTime();
+	ZEInt BitsPerSample			= SoundBrush2D->GetSoundResource()->GetBitsPerSample();
 
 	if (EnterFlag == false && (ZEInt)TotalTime == 5)
 	{

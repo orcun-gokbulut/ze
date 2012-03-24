@@ -169,7 +169,7 @@ class ZEParticleDiffuseMapChangerModifier : public ZEParticleModifier
 {
 	private:
 
-		ZEInt							CurrentTextureIndex;
+		ZEUInt							CurrentTextureIndex;
 		float							TotalTime;
 	
 		ZEArray<ZETexture2DResource*>	Textures;

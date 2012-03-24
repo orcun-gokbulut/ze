@@ -84,8 +84,8 @@ class ZETerrain : public ZEEntity
 		const ZETexture2D*						DetailNormalTexture;
 
 		float									UnitLength;
-		ZEInt									ChunkSize;
-		ZEInt									MaxLevel;
+		ZEUInt									ChunkSize;
+		ZEUInt									MaxLevel;
 
 		float									HeightOffset;
 		float									HeightScale;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9VertexBuffer.cpp
+ Zinek Engine - ZED3D9MLAAProcessorAreaImage.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,79 +33,23 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED3D9VertexBuffer.h"
-#include "ZED3D9Module.h"
-#include "ZEError.h"
+#pragma once
+#ifndef __ZE_D3D9_MLAA_PROCESSOR_AREA_IMAGE_H__
+#define __ZE_D3D9_MLAA_PROCESSOR_AREA_IMAGE_H__
 
-ZESize ZED3D9StaticVertexBuffer::GetBufferSize()
+#define		ZE_MLAA_AREA_IMAGE_WIDTH		160
+#define		ZE_MLAA_AREA_IMAGE_HEIGHT		160
+
+#include "ZETypes.h"
+
+class ZED3D9MLAAProcessorAreaImage
 {
-	return BufferSize;
-}
-
-bool ZED3D9StaticVertexBuffer::Create(ZESize BufferSize)
-{
-	Release();
-	this->BufferSize = BufferSize;
-	if (GetDevice()->CreateVertexBuffer((UINT)BufferSize, D3DUSAGE_WRITEONLY, NULL, D3DPOOL_MANAGED, &StaticBuffer, NULL) != D3D_OK)
-	{
-		zeCriticalError("Can not create static vertex buffer.");
-		return false;
-	}
-	return true;
-}
-
-void* ZED3D9StaticVertexBuffer::Lock()
-{
-	if (StaticBuffer != NULL)
-	{
-		char* LockedBuffer;
-		HRESULT Result = StaticBuffer->Lock(0, 0, (void**)&LockedBuffer, 0);
-		if (Result != D3D_OK)
-			zeCriticalError("Can not lock static vertex buffer.");
-		return LockedBuffer;
-	}
-	return NULL;
-}
-
-void ZED3D9StaticVertexBuffer::Unlock()
-{
-	if (StaticBuffer != NULL)
-	{
-		HRESULT Result;
-		Result = StaticBuffer->Unlock();
-		if (Result != D3D_OK)
-			zeError("Can not lock static vertex buffer.");
-	}
-}
-
-void ZED3D9StaticVertexBuffer::Release()
-{
-	if (StaticBuffer != NULL)
-	{
-		StaticBuffer->Release();
-		StaticBuffer = NULL;
-	}
-	BufferSize = 0;
-}
+	private:
+		ZED3D9MLAAProcessorAreaImage();
+		~ZED3D9MLAAProcessorAreaImage();
+	public:
+		static ZEUInt8* GetD3D9LMAAProcessorAreaImage();
+};
 
 
-void ZED3D9StaticVertexBuffer::Destroy()
-{
-	GetModule()->VertexBuffers.DeleteValue((ZED3D9StaticVertexBuffer*)this);
-	delete this;
-}
-
-ZED3D9StaticVertexBuffer::ZED3D9StaticVertexBuffer()
-{
-	BufferSize = 0;
-	StaticBuffer = NULL;
-}
-
-ZED3D9StaticVertexBuffer::~ZED3D9StaticVertexBuffer()
-{
-	this->Release();
-}
-
-
-
-
+#endif //__ZE_D3D9_MLAA_PROCESSOR_AREA_IMAGE_H__

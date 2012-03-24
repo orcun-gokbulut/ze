@@ -203,7 +203,7 @@ ZETextureQuality ZEGraphicsModule::GetTextureQuality()
 
 void ZEGraphicsModule::SetModelQuality(ZEInt Quality)
 {
-	ShaderQuality = Quality;
+	ModelQuality = Quality;
 }
 
 ZEInt ZEGraphicsModule::GetModelQuality()
@@ -251,12 +251,12 @@ ZEInt ZEGraphicsModule::GetAntiAliasing()
 	return AntiAliasing;
 }
 
-void ZEGraphicsModule::SetAnisotropicFilter(ZEInt Level)
+void ZEGraphicsModule::SetAnisotropicFilter(ZEUInt Level)
 {
 	AnisotropicFilter = Level;
 }
 
-ZEInt ZEGraphicsModule::GetAnisotropicFilter()
+ZEUInt ZEGraphicsModule::GetAnisotropicFilter()
 {
 	return AnisotropicFilter;
 }

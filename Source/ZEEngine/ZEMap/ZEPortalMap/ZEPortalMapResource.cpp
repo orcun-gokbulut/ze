@@ -65,7 +65,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -198,7 +198,7 @@ bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEFile* ResourceFile, ZEPorta
 	}
 
 	// Read physical mesh vertices
-	Portal->PhysicalMesh.Vertices.SetCount(FilePhysicalMesh.VertexCount);
+	Portal->PhysicalMesh.Vertices.SetCount((ZESize)FilePhysicalMesh.VertexCount);
 	ResourceFile->Read(Portal->PhysicalMesh.Vertices.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygonChunk), Portal->PhysicalMesh.Vertices.GetCount());
 
 
@@ -211,8 +211,8 @@ bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEFile* ResourceFile, ZEPorta
 	}
 
 	// Read physical mesh polygons
-	Portal->PhysicalMesh.Polygons.SetCount(FilePhysicalMesh.PolygonCount);
-	for (ZESize I = 0; I < FilePhysicalMesh.PolygonCount; I++)
+	Portal->PhysicalMesh.Polygons.SetCount((ZESize)FilePhysicalMesh.PolygonCount);
+	for (ZESize I = 0; I < (ZESize)FilePhysicalMesh.PolygonCount; I++)
 	{
 		ZEMapFilePhysicalMeshPolygonChunk Chunk;
 		ResourceFile->Read(&Chunk, sizeof(ZEMapFilePhysicalMeshPolygonChunk), 1);
@@ -242,7 +242,7 @@ bool ZEPortalMapResource::ReadPortalsFromFile(ZEFile* ResourceFile)
 
 		strncpy(Portal->Name, FilePortal.Name, ZE_MAP_MAX_NAME_SIZE);
 		Portal->BoundingBox = FilePortal.BoundingBox;
-		Portal->Polygons.SetCount(FilePortal.PolygonCount);
+		Portal->Polygons.SetCount((ZESize)FilePortal.PolygonCount);
 		Portal->HasPhysicalMesh = FilePortal.HasPhysicalMesh;
 		Portal->HasOctree = FilePortal.HasOctree;
 //		Portal->Octree = NULL;
@@ -269,15 +269,16 @@ bool ZEPortalMapResource::ReadPortalsFromFile(ZEFile* ResourceFile)
 
 			// Read polygons from file
 			ZEArray<ZEMapFilePolygonChunk> MapPolygons;
-			MapPolygons.SetCount(FilePortal.PolygonCount);
+			MapPolygons.SetCount((ZESize)FilePortal.PolygonCount);
 			ResourceFile->Read(MapPolygons.GetCArray(), sizeof(ZEMapFilePolygonChunk), MapPolygons.GetCount());
 			for (ZESize I = 0; I < Portal->Polygons.GetCount(); I++)
 			{
-				Portal->Polygons[I].Material = Materials[MapPolygons[I].Material];
-				Portal->Polygons[I].LastIteration = 0;
-				Portal->Polygons[I].Vertices[0] = *(ZEMapVertex*)&MapPolygons[I].Vertices[0];
-				Portal->Polygons[I].Vertices[1] = *(ZEMapVertex*)&MapPolygons[I].Vertices[1];
-				Portal->Polygons[I].Vertices[2] = *(ZEMapVertex*)&MapPolygons[I].Vertices[2];
+				Portal->Polygons[I].LastIteration	= 0;
+				Portal->Polygons[I].Material			= Materials[(ZESize)MapPolygons[I].Material];
+				
+				Portal->Polygons[I].Vertices[0]		= *(ZEMapVertex*)&MapPolygons[I].Vertices[0];
+				Portal->Polygons[I].Vertices[1]		= *(ZEMapVertex*)&MapPolygons[I].Vertices[1];
+				Portal->Polygons[I].Vertices[2]		= *(ZEMapVertex*)&MapPolygons[I].Vertices[2];
 			}
 		}
 
@@ -309,12 +310,12 @@ bool ZEPortalMapResource::ReadDoorsFromFile(ZEFile* ResourceFile)
 		Door->IsOpen = FileDoor.IsOpen;
 
 		Door->PortalIds[0] = FileDoor.PortalIds[0];
-		Door->Portals[0] = &Portals[Door->PortalIds[0]];
+		Door->Portals[0] = &Portals[(ZESize)Door->PortalIds[0]];
 		Door->Portals[0]->DoorIds.Add(I);
 		Door->Portals[0]->Doors.Add(Door);
 
 		Door->PortalIds[1] = FileDoor.PortalIds[1];
-		Door->Portals[1] = &Portals[Door->PortalIds[1]];
+		Door->Portals[1] = &Portals[(ZESize)Door->PortalIds[1]];
 		Door->Portals[1]->DoorIds.Add(I);
 		Door->Portals[1]->Doors.Add(Door);
 	}
@@ -341,9 +342,9 @@ bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
 		return false;
 	}
 
-	Portals.SetCount(TempHeader.PortalCount);
-	Doors.SetCount(TempHeader.DoorCount);
-	Materials.SetCount(TempHeader.MaterialCount);
+	Portals.SetCount((ZESize)TempHeader.PortalCount);
+	Doors.SetCount((ZESize)TempHeader.DoorCount);
+	Materials.SetCount((ZESize)TempHeader.MaterialCount);
 
 	if (!ReadMaterialsFromFile(ResourceFile))
 	{
