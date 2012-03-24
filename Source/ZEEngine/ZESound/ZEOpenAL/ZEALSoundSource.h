@@ -73,8 +73,8 @@ class ZEALSoundSource : public ZESoundSource, public ZEALComponentBase
 
 	public:
 		virtual void				SetSoundSourceState(ZESoundSourceState State);
-		virtual void				SetCurrentPosition(ZEUInt SampleIndex);
-		virtual ZEUInt		GetCurrentPosition();
+		virtual void				SetCurrentPosition(ZESize SampleIndex);
+		virtual ZESize				GetCurrentPosition();
 
 		virtual void				SetPan(ZEInt NewPan);
 		virtual void				SetPlaybackSpeed(float Speed);

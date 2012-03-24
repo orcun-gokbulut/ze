@@ -66,7 +66,7 @@ struct ZEVertexDeclarationFileElementChunk
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -140,19 +140,19 @@ ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(ZEFile* ResourceFile)
 	if(HeaderChunk.Version != ZE_VERTEX_DECLARATION_FILE_VERSION)
 	{	
 		zeError("ZEMap file version mismatched. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
-		return false;
+		return NULL;
 	}
 	
 	ZEArray<ZEVertexElement> VertexElements;
-	VertexElements.SetCount(HeaderChunk.VertexElementCount);
+	VertexElements.SetCount((ZESize)HeaderChunk.VertexElementCount);
 	
 	ZEVertexDeclarationFileElementChunk ElementChunk;
-	for (ZESize I = 0; I < HeaderChunk.VertexElementCount; I++)
+	for (ZESize I = 0; I < (ZESize)HeaderChunk.VertexElementCount; I++)
 	{
 		ResourceFile->Read(&ElementChunk, sizeof(ZEVertexDeclarationFileElementChunk), 1);
-		VertexElements[I].Semantic = (ZEVertexElementSemantic)ElementChunk.Semantic;
-		VertexElements[I].Type = (ZEVertexElementType)ElementChunk.Type;
-		VertexElements[I].Index = ElementChunk.Index;
+		VertexElements[I].Semantic	= (ZEVertexElementSemantic)ElementChunk.Semantic;
+		VertexElements[I].Type		= (ZEVertexElementType)ElementChunk.Type;
+		VertexElements[I].Index		= ElementChunk.Index;
 	}
 
 	ZEVertexDeclaration* VertexDeclaration = ZEVertexDeclaration::CreateInstance();

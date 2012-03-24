@@ -67,7 +67,7 @@
 #define ZE_MAP_PHYSICAL_MESH_VERTICES_CHUNK ((ZEUInt32)(ZE_MAP_PHYSICAL_MESH_CHUNK + (ZEUInt32)'VERT'))
 #define ZE_MAP_PHYSICAL_MESH_POLYGONS_CHUNK ((ZEUInt32)(ZE_MAP_PHYSICAL_MESH_CHUNK + (ZEUInt32)'INDX'))
 
-ZEPackStruct(
+ZEPackStruct4(
 struct  ZEMapFileMaterialChunk
 {
 	ZEUInt32				ChunkIdentifier;
@@ -103,7 +103,7 @@ struct  ZEMapFileMaterialChunk
 	char					LightMap[ZE_MAP_MAX_FILENAME_SIZE];
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct ZEMapFileVertexChunk
 {
 	ZEVector3				Position;
@@ -113,20 +113,20 @@ struct ZEMapFileVertexChunk
 	ZEVector2				Texcoord;
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct  ZEMapFilePolygonChunk
 {	
 	ZEUInt32				Material;
 	ZEMapFileVertexChunk	Vertices[3];
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct  ZEMapFilePhysicalMeshPolygonChunk
 {
 	ZEUInt32				Indices[3];
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct  ZEMapFileOctreeChunk
 {
 	ZEUInt32				ChunkIdentifier;
@@ -137,7 +137,7 @@ struct  ZEMapFileOctreeChunk
 	ZEUInt32				PolygonCount;
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct  ZEMapFileDoorChunk
 {
 	ZEUInt32				ChunkIdentifier;
@@ -147,7 +147,7 @@ struct  ZEMapFileDoorChunk
 	bool					IsOpen;
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct  ZEMapFilePortalChunk
 {
 	ZEUInt32				ChunkIdentifier;
@@ -158,7 +158,7 @@ struct  ZEMapFilePortalChunk
 	bool					HasPhysicalMesh;
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct  ZEMapFilePhysicalMeshChunk
 {
 	ZEUInt32				ChunkIdentifier;
@@ -166,7 +166,7 @@ struct  ZEMapFilePhysicalMeshChunk
 	ZEUInt32				PolygonCount;
 });
 
-ZEPackStruct(
+ZEPackStruct4(
 struct  ZEMapFileHeader
 {
 	ZEUInt32				Header;

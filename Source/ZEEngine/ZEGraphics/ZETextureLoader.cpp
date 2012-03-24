@@ -180,12 +180,12 @@ bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, 
 
 	ZEUInt BPP			= 32;
 	BYTE* SourceData	= (BYTE*)TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetData();
-	ZEUInt Pitch		= TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetPitch();
+	ZESize Pitch		= TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetPitch();
 	ZEUInt Height		= TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetHeight();
 	ZEUInt Width		= TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetWidth();
 
 	FIBITMAP* Bitmap;
-	Bitmap = FreeImage_ConvertFromRawBits(SourceData, Width, Height, Pitch, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+	Bitmap = FreeImage_ConvertFromRawBits(SourceData, (ZEInt)Width, (ZEInt)Height, (ZEInt)Pitch, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
 	if(Bitmap == NULL)
 	{
 		zeError("Error during conversion, cannot save image to \"%s\".", File->GetFilePath().GetValue());
@@ -233,13 +233,13 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 	// Create TextureData
 	TextureData->CreateTexture(	(ZETextureType)FileHeader.TextureType, 
 								(ZETexturePixelFormat)FileHeader.PixelFormat, 
-								(ZESize)FileHeader.SurfaceCount,
-								(ZESize)FileHeader.LevelCount, 
-								(ZESize)FileHeader.Width, 
-								(ZESize)FileHeader.Height );
+								FileHeader.SurfaceCount,
+								FileHeader.LevelCount, 
+								FileHeader.Width, 
+								FileHeader.Height );
 
 	// For every surface
-	for(ZESize I = 0; I < FileHeader.SurfaceCount; ++I)
+	for(ZESize I = 0; I < (ZESize)FileHeader.SurfaceCount; ++I)
 	{
 		// Get surface header
 		ZETextureFileSurfaceChunk	SurfaceChunk;
@@ -262,7 +262,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 		// There is no surface data
 
 		// For every level
-		for(ZESize J = 0; J < FileHeader.LevelCount; ++J)
+		for(ZESize J = 0; J < (ZESize)FileHeader.LevelCount; ++J)
 		{
 			ZETExtureFileMipmapChunk MipmapChunk;
 			if(File->Read(&MipmapChunk, sizeof(ZETExtureFileMipmapChunk), 1) != 1)
@@ -282,7 +282,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 
 			ZETextureLevel* CurrentLevel = &TextureData->GetSurfaces().GetItem(I).GetLevels().GetItem(J);
 
-			if (CurrentLevel->GetRowCount() != MipmapChunk.RowCount || CurrentLevel->GetPitch() != MipmapChunk.RowSize )
+			if (CurrentLevel->GetRowCount() != MipmapChunk.RowCount || CurrentLevel->GetPitch() != (ZESize)MipmapChunk.RowSize )
 			{
 				zeCriticalError("Unexpected level data red from file. File name: \"&s\".", File->GetFilePath().GetValue());
 				TextureData->DestroyTexture();
@@ -334,7 +334,7 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 	}
 
 	// For every surface
-	for(ZESize I = 0; I < FileHeader.SurfaceCount; ++I)
+	for(ZESize I = 0; I < (ZESize)FileHeader.SurfaceCount; ++I)
 	{
 		// Create and write surface header
 		ZETextureFileSurfaceChunk	SurfaceChunk;
@@ -347,7 +347,7 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 		}
 
 		// For every level
-		for(ZESize J = 0; J < FileHeader.LevelCount; ++J)
+		for(ZESize J = 0; J < (ZESize)FileHeader.LevelCount; ++J)
 		{
 			// Create and write level header
 			ZETExtureFileMipmapChunk	MipmapChunk;

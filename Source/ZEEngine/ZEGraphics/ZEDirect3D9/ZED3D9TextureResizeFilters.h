@@ -148,7 +148,7 @@ class MitchellFilter : public ZEFilter
 class ZEKernel
 {
 	protected:
-		ZEInt			KernelWindowSize;
+		ZESize			KernelWindowSize;
 		float			KernelWidth;
 		ZEVector4*		KernelWeights;
 		float			Center;
@@ -159,7 +159,7 @@ class ZEKernel
 		virtual			~ZEKernel();
 
 		ZEVector4*		GetKernel() const;
-		ZEInt			GetKernelWindowSize() const;
+		ZESize			GetKernelWindowSize() const;
 		float			GetKernelWidth() const;
 		float			GetKernelCenter() const;
 };

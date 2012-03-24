@@ -57,9 +57,9 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 	};
 
 	ZEParserState ParserState = ZE_PS_DEVICE_IDENTIFIER;
-	ZEInt Len = InputString.GetLength();
-	ZEInt IdentifierStart = 0;
-	for (ZEInt I = 0; I < Len; I++)
+	ZESize Len = InputString.GetLength();
+	ZESize IdentifierStart = 0;
+	for (ZESize I = 0; I < Len; I++)
 	{
 		switch(InputString[I])
 		{

@@ -78,10 +78,10 @@ void ZEPortalMapDoor::Initialize(ZEPortalMap* Owner, const ZEPortalMapResourceDo
 	Rectangle = Resource->Rectangle;
 	Open = Resource->IsOpen;
 	
-	Portals[0] = Owner->Portals[Resource->PortalIds[0]];
+	Portals[0] = Owner->Portals[(ZESize)Resource->PortalIds[0]];
 	Portals[0]->Doors.Add(this);
 
-	Portals[1] = Owner->Portals[Resource->PortalIds[1]];
+	Portals[1] = Owner->Portals[(ZESize)Resource->PortalIds[1]];
 	Portals[1]->Doors.Add(this);
 }
 

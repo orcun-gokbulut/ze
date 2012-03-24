@@ -96,18 +96,18 @@ class ZED3D9CloudMaterial : public ZECloudMaterial, public ZED3D9ComponentBase
 		ZED3D9PixelShader*				PixelShaderDrawCloud;
 
 		// BUffers
-		ZEUInt							CloudShadowVertexCount;
-		ZEUInt							CloudShadowTriangleCount;
+		ZESize							CloudShadowVertexCount;
+		ZESize							CloudShadowTriangleCount;
 		ZED3D9StaticIndexBuffer*		CloudShadowIndexBuffer;
 		ZED3D9StaticVertexBuffer*		CloudShadowVertexBuffer;
 		ZED3D9VertexDeclaration*		CloudShadowVertexDeclaration;
 
-		ZEUInt							DensityBlurTriangleCount;
+		ZESize							DensityBlurTriangleCount;
 		ZED3D9StaticVertexBuffer*		DensityBlurVertexBuffer;
 		ZED3D9VertexDeclaration*		DensityBlurVertexDeclaration;
 
-		ZEUInt							RenderCloudVertexCount;
-		ZEUInt							RenderCloudTriangleCount;
+		ZESize							RenderCloudVertexCount;
+		ZESize							RenderCloudTriangleCount;
 		ZED3D9StaticIndexBuffer*		RenderCloudIndexBuffer;
 		ZED3D9StaticVertexBuffer*		RenderCloudVertexBuffer;
 		ZED3D9VertexDeclaration*		RenderCloudVertexDeclaration;

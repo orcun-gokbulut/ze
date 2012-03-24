@@ -92,7 +92,7 @@ ZESoundSourceType ZESoundSource::GetSoundSourceType()
 	return SoundSourceType;
 }
 
-void ZESoundSource::SetCurrentPosition(ZEUInt SampleIndex)
+void ZESoundSource::SetCurrentPosition(ZESize SampleIndex)
 {
 	StartPosition = SampleIndex;
 }
@@ -101,9 +101,12 @@ void ZESoundSource::SetCurrentPositionTime(float Seconds)
 {
 	if (SoundResource != NULL)
 	{
-		ZEUInt SampleIndex = (float)SoundResource->GetSamplesPerSecond() * Seconds;
+		ZESize SampleIndex = (ZESize)((float)SoundResource->GetSamplesPerSecond() * Seconds);
+		
 		if (SampleIndex < SoundResource->GetSampleCount())
+		{
 			SetCurrentPosition(SampleIndex);
+		}
 	}
 }
 
@@ -112,15 +115,21 @@ void ZESoundSource::SetCurrentPositionPersentage(float Percentage)
 	if (SoundResource != NULL)
 	{
 		if (Percentage < 0.0f)
+		{
 			SetCurrentPosition(0);
+		}
 		else if (Percentage > 100.0f)
+		{
 			SetCurrentPosition(SoundResource->GetSampleCount());
+		}
 		else
-			SetCurrentPosition((SoundResource->GetSampleCount() / 100.0f) * Percentage);
+		{
+			SetCurrentPosition((ZESize)(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage));
+		}
 	}
 }
 
-ZEUInt ZESoundSource::GetCurrentPosition() const
+ZESize ZESoundSource::GetCurrentPosition() const
 {
 	return CurrentPosition;
 }
@@ -128,9 +137,13 @@ ZEUInt ZESoundSource::GetCurrentPosition() const
 ZEUInt ZESoundSource::GetCurrentPositionTime() const
 {
 	if (SoundResource != NULL)
-		return (float)CurrentPosition / (float)SoundResource->GetSamplesPerSecond();
+	{
+		return (ZEUInt)(CurrentPosition / SoundResource->GetSamplesPerSecond());
+	}
 	else
+	{
 		return 0;
+	}
 }
 
 float ZESoundSource::GetCurrentPositionPersentage() const
@@ -164,25 +177,33 @@ bool ZESoundSource::GetLimitsEnabled() const
 	return LimitsEnabled;
 }
 
-void ZESoundSource::SetStartPosition(ZEUInt SampleIndex)
+void ZESoundSource::SetStartPosition(ZESize SampleIndex)
 {
 	StartPosition = SampleIndex;
 
 	if (SoundResource != NULL)
+	{
 		if (LimitsEnabled)
+		{
 			EffectiveStartPosition = StartPosition % SoundResource->GetSampleCount();
+		}
+	}
 }
 
 void ZESoundSource::SetStartPositionTime(float Seconds)
 {
 	if (SoundResource != NULL)
 	{
-		ZEUInt SampleIndex = (float)SoundResource->GetSamplesPerSecond() * Seconds;
+		ZESize SampleIndex = (ZESize)((float)SoundResource->GetSamplesPerSecond() * Seconds);
 
 		if (SampleIndex > SoundResource->GetSampleCount())
+		{
 			SetStartPosition(SoundResource->GetSampleCount());
+		}
 		else
+		{
 			SetStartPosition(SampleIndex);
+		}
 	}
 }
 
@@ -191,13 +212,17 @@ void ZESoundSource::SetStartPositionPersentage(float Percentage)
 	if (SoundResource != NULL)
 	{
 		if (Percentage < 0.0f)
+		{
 			SetStartPosition(0);
+		}
 		else
-			SetStartPosition(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage);
+		{
+			SetStartPosition((ZESize)(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage));
+		}
 	}
 }
 
-ZEUInt ZESoundSource::GetStartPosition() const
+ZESize ZESoundSource::GetStartPosition() const
 {
 	return StartPosition;
 }
@@ -218,25 +243,33 @@ float ZESoundSource::GetStartPositionPersentage() const
 		return 0.0f;
 }
 
-void ZESoundSource::SetEndPosition(ZEUInt SampleIndex)
+void ZESoundSource::SetEndPosition(ZESize SampleIndex)
 {
 	EndPosition = SampleIndex;
 
 	if (SoundResource != NULL)
+	{
 		if (LimitsEnabled)
+		{
 			EffectiveEndPosition = EndPosition % SoundResource->GetSampleCount();
+		}
+	}
 }
 
 void ZESoundSource::SetEndPositionTime(float Seconds)
 {
 	if (SoundResource != NULL)
 	{
-		ZEUInt SampleIndex = (float)SoundResource->GetSamplesPerSecond() * Seconds;
+		ZESize SampleIndex = (ZESize)((float)SoundResource->GetSamplesPerSecond() * Seconds);
 
 		if (SampleIndex > SoundResource->GetSampleCount())
+		{
 			SetEndPosition(SoundResource->GetSampleCount());
+		}
 		else
+		{
 			SetEndPosition(SampleIndex);
+		}
 	}
 }
 
@@ -245,13 +278,17 @@ void ZESoundSource::SetEndPositionPercentage(float Percentage)
 	if (SoundResource != NULL)
 	{
 		if (Percentage < 0.0f)
+		{
 			SetEndPosition(0);
+		}
 		else
-			SetEndPosition(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage);
+		{
+			SetEndPosition((ZESize)(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage));
+		}
 	}
 }
 
-ZEUInt ZESoundSource::GetEndPosition() const
+ZESize ZESoundSource::GetEndPosition() const
 {
 	return EndPosition;
 }
@@ -300,9 +337,11 @@ float ZESoundSource::GetPlaybackSpeed() const
 void ZESoundSource::SetVolume(ZEUInt NewVolume)
 {
 	if (NewVolume > ZE_SS_VOLUME_MAX)
+	{
 		NewVolume = ZE_SS_VOLUME_MAX;
+	}
 
-	Volume = (float)NewVolume * ((float)zeSound->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
+	Volume = (ZEUInt)((float)NewVolume * ((float)zeSound->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX));
 }
 
 ZEUInt ZESoundSource::GetVolume() const
@@ -330,7 +369,7 @@ ZESize ZESoundSource::GetLoopingLength()
 
 float ZESoundSource::GetLoopingLenghtTime()
 {
-	return (float)(GetLoopingLength() / SoundResource->GetSamplesPerSecond());
+	return (float)GetLoopingLength() / (float)SoundResource->GetSamplesPerSecond();
 }
 
 float ZESoundSource::GetLoopingLenghtPercent()

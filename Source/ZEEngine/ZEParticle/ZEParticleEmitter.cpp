@@ -50,18 +50,22 @@ void ZEParticleEmitter::Tick(float TimeElapsed)
 	AliveParticleCount = 0;
 
 	ParticlesRemaining += ParticlesPerSecond * TimeElapsed;
-	int ParticeCountForTimeElapsed = ParticlesRemaining;
+	ZEUInt ParticeCountForTimeElapsed = (ZEUInt)ParticlesRemaining;
 	ParticlesRemaining -= ParticeCountForTimeElapsed;
 
-	int ParticlesEmmitedThisFrame = 0;
+	ZEUInt ParticlesEmmitedThisFrame = 0;
 
-	for (int I = 0; I < ParticlePool.GetCount(); I++)
+	for (ZESize I = 0; I < ParticlePool.GetCount(); I++)
+	{
 		if(ParticlePool[I].State == ZE_PAS_NEW)
+		{
 			ParticlePool[I].State = ZE_PAS_ALIVE;
+		}
+	}
 
 	if(ParticeCountForTimeElapsed != 0)
 	{
-		for (int I = 0; I < ParticlePool.GetCount(); I++)
+		for (ZESize I = 0; I < ParticlePool.GetCount(); I++)
 		{
 			if(ParticlePool[I].State == ZE_PAS_DEAD)
 			{
@@ -83,37 +87,51 @@ void ZEParticleEmitter::Tick(float TimeElapsed)
 			AliveParticleCount++;
 		}
 
-		if(ParticlePool[I].State != ZE_PAS_DEAD  && ParticlePool[I].Life < 0.0f)	
+		if(ParticlePool[I].State != ZE_PAS_DEAD  && ParticlePool[I].Life < 0.0f)
+		{
 			ParticlePool[I].State = ZE_PAS_DEAD;
+		}
 	}
 
 	if(IsContinuous == false)
 	{
 		if(EmittedParticleCount > MaxParticleCount)
+		{
 			for(ZESize I = 0; I < ParticlePool.GetCount(); I++)
 			{
 				if(ParticlePool[I].State != ZE_PAS_DEAD)
+				{
 					return;
+				}
 				else
+				{
 					ParticlesPerSecond = 0;
+				}
 			}
+		}
 	}
 
 	for (ZESize I = 0; I < Modifiers.GetCount(); I++)
+	{
 		Modifiers[I]->Tick(TimeElapsed);
+	}
 
 	if(IsSortingEnabled)
+	{
 		SortParticles();
+	}
 	
 	//zeLog("APC : %u", AliveParticleCount);
 }
 
 void ZEParticleEmitter::InitializeParticlePool()
 {
-	ParticlePool.SetCount(MaxParticleCount);
+	ParticlePool.SetCount((ZESize)MaxParticleCount);
 
-	for(ZESize I = 0; I < MaxParticleCount; I++)
+	for(ZESize I = 0; I < (ZESize)MaxParticleCount; I++)
+	{
 		GenerateParticle(ParticlePool[I]);
+	}
 }
 
 void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
@@ -122,60 +140,71 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 	{
 		switch(Type)
 		{
-		case ZE_PET_POINT:
-			Particle.Position = Position;
-			break;
-		case ZE_PET_PLANE:
-			Particle.Position.x = Position.x + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.x / 2, PlaneSize.x / 2);
-			Particle.Position.y = Position.y;
-			Particle.Position.z = Position.z + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.y / 2, PlaneSize.y / 2);
-			break;
-		case ZE_PET_BOX:
-			Particle.Position.x = Position.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2, BoxSize.x / 2);
-			Particle.Position.y = Position.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2, BoxSize.y / 2);
-			Particle.Position.z = Position.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2, BoxSize.z / 2);
-			break;
-		case ZE_PET_TORUS:
+			case ZE_PET_POINT:
+			{
+				Particle.Position = Position;
+				break;
+			}
+			case ZE_PET_PLANE:
+			{
+				Particle.Position.x = Position.x + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.x / 2.0f, PlaneSize.x / 2.0f);
+				Particle.Position.y = Position.y;
+				Particle.Position.z = Position.z + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.y / 2.0f, PlaneSize.y / 2.0f);
+				break;
+			}
+			case ZE_PET_BOX:
+			{
+				Particle.Position.x = Position.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2.0f, BoxSize.x / 2.0f);
+				Particle.Position.y = Position.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2.0f, BoxSize.y / 2.0f);
+				Particle.Position.z = Position.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2.0f, BoxSize.z / 2.0f);
+				break;
+			}
+			case ZE_PET_TORUS:
 			{
 				float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 				float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 				float TubeRadius = RAND_BETWEEN_TWO_FLOAT(0.0f, TorusSize.y);
 				Particle.Position.x = Position.x + (TorusSize.x + TubeRadius * ZEAngle::Cos(Phi)) * ZEAngle::Cos(Theta);
 				Particle.Position.y = Position.y + (TorusSize.x + TubeRadius * ZEAngle::Cos(Phi)) * ZEAngle::Sin(Theta);
-				Particle.Position.z = Position.z + TubeRadius * ZEAngle::Sin(Phi);		
+				Particle.Position.z = Position.z + TubeRadius * ZEAngle::Sin(Phi);
 				break;
 			}
-		case ZE_PET_SPHERE:
+			case ZE_PET_SPHERE:
 			{
 				float Radius = RAND_BETWEEN_TWO_FLOAT(0.0f, SphereRadius);
 				float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 				float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, ZE_PI);
 				Particle.Position.x = Position.x + Radius * ZEAngle::Cos(Theta) * ZEAngle::Sin(Phi);
 				Particle.Position.y = Position.y + Radius * ZEAngle::Sin(Theta) * ZEAngle::Sin(Phi);
-				Particle.Position.z = Position.z + Radius * ZEAngle::Cos(Phi);		
+				Particle.Position.z = Position.z + Radius * ZEAngle::Cos(Phi);
 				break;
 			}
 		}
 	}
-
 	else
 	{
 		switch(Type)
 		{
-		case ZE_PET_POINT:
-			Particle.Position = GetOwner()->GetWorldPosition() + Position;
-			break;
-		case ZE_PET_PLANE:
-			Particle.Position.x = GetOwner()->GetWorldPosition().x + Position.x + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.x / 2, PlaneSize.x / 2);
-			Particle.Position.y = GetOwner()->GetWorldPosition().y + Position.y;
-			Particle.Position.z = GetOwner()->GetWorldPosition().z + Position.z + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.y / 2, PlaneSize.y / 2);
-			break;
-		case ZE_PET_BOX:
-			Particle.Position.x = GetOwner()->GetWorldPosition().x + Position.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2, BoxSize.x / 2);
-			Particle.Position.y = GetOwner()->GetWorldPosition().y + Position.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2, BoxSize.y / 2);
-			Particle.Position.z = GetOwner()->GetWorldPosition().z + Position.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2, BoxSize.z / 2);
-			break;
-		case ZE_PET_TORUS:
+			case ZE_PET_POINT:
+			{
+				Particle.Position = GetOwner()->GetWorldPosition() + Position;
+				break;
+			}
+			case ZE_PET_PLANE:
+			{
+				Particle.Position.x = GetOwner()->GetWorldPosition().x + Position.x + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.x / 2, PlaneSize.x / 2);
+				Particle.Position.y = GetOwner()->GetWorldPosition().y + Position.y;
+				Particle.Position.z = GetOwner()->GetWorldPosition().z + Position.z + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.y / 2, PlaneSize.y / 2);
+				break;
+			}
+			case ZE_PET_BOX:
+			{
+				Particle.Position.x = GetOwner()->GetWorldPosition().x + Position.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2, BoxSize.x / 2);
+				Particle.Position.y = GetOwner()->GetWorldPosition().y + Position.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2, BoxSize.y / 2);
+				Particle.Position.z = GetOwner()->GetWorldPosition().z + Position.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2, BoxSize.z / 2);
+				break;
+			}
+			case ZE_PET_TORUS:
 			{
 				float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 				float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
@@ -185,7 +214,7 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 				Particle.Position.z = GetOwner()->GetWorldPosition().z + Position.z + TubeRadius * ZEAngle::Sin(Phi);		
 				break;
 			}
-		case ZE_PET_SPHERE:
+			case ZE_PET_SPHERE:
 			{
 				float Radius = RAND_BETWEEN_TWO_FLOAT(0.0f, SphereRadius);
 				float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
@@ -203,14 +232,14 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 
 	if(IsParticleFixedAspectRatio)
 	{
-		float ParticleAspectRatio			= MaxSize.x / MaxSize.y;
-		Particle.Size2D.x						= RAND_BETWEEN_TWO_FLOAT(MinSize.x, MaxSize.x);
-		Particle.Size2D.y						= Particle.Size2D.x  / ParticleAspectRatio;
+		float ParticleAspectRatio		= MaxSize.x / MaxSize.y;
+		Particle.Size2D.x				= RAND_BETWEEN_TWO_FLOAT(MinSize.x, MaxSize.x);
+		Particle.Size2D.y				= Particle.Size2D.x  / ParticleAspectRatio;
 	}				
 	else
 	{
-		Particle.Size2D.x						= RAND_BETWEEN_TWO_FLOAT(MinSize.x, MaxSize.x);
-		Particle.Size2D.y						= RAND_BETWEEN_TWO_FLOAT(MinSize.y, MaxSize.y);
+		Particle.Size2D.x				= RAND_BETWEEN_TWO_FLOAT(MinSize.x, MaxSize.x);
+		Particle.Size2D.y				= RAND_BETWEEN_TWO_FLOAT(MinSize.y, MaxSize.y);
 	}
 
 	Particle.Color.x					= RAND_BETWEEN_TWO_FLOAT(MinColor.x, MaxColor.x);
@@ -432,10 +461,12 @@ void ZEParticleEmitter::SetMaxParticleCount(ZEUInt Value)
 	MaxParticleCount = Value;
 
 	ZESize OldSize = ParticlePool.GetCount();
-	ParticlePool.Resize(Value);
-	SortArray.Resize(Value);
-	for (ZESize I = OldSize; I < MaxParticleCount; I++)
+	ParticlePool.Resize((ZESize)Value);
+	SortArray.Resize((ZESize)Value);
+	for (ZESize I = OldSize; I < (ZESize)MaxParticleCount; I++)
+	{
 		GenerateParticle(ParticlePool[I]);
+	}
 
 }
 
@@ -733,12 +764,12 @@ void ZEParticleEmitter::SortParticles()
 
 	for (ZEInt I = 0; I < 32; I++)
 	{
-		ZEUInt Radix=(1 << I);
+		ZEUInt Radix = (1 << I);
 
 		ZESize ParticleCount = ParticlePool.GetCount();
 
-		int Count0=0;
-		int Count1=0;
+		ZESize Count0 = 0;
+		ZESize Count1 = 0;
 
 		for (ZESize J = 0; J < ParticleCount; J++)
 		{
@@ -746,7 +777,7 @@ void ZEParticleEmitter::SortParticles()
 							(CamPos.y - ParticlePool[J].Position.y) * (CamPos.y - ParticlePool[J].Position.y) +
 							(CamPos.z - ParticlePool[J].Position.z) * (CamPos.z - ParticlePool[J].Position.z);
 
-			if (!((*(ZEUInt*)&(DistanceSqr))&Radix))
+			if (!((*(ZEUInt*)&(DistanceSqr)) & Radix))
 				++Count1;
 		}
 
@@ -756,7 +787,7 @@ void ZEParticleEmitter::SortParticles()
 							(CamPos.y - ParticlePool[J].Position.y) * (CamPos.y - ParticlePool[J].Position.y) +
 							(CamPos.z - ParticlePool[J].Position.z) * (CamPos.z - ParticlePool[J].Position.z);
 
-			if ((*(ZEUInt*)&(DistanceSqr))&Radix)
+			if ((*(ZEUInt*)&(DistanceSqr)) & Radix)
 			{
 				SortArray[Count1]=ParticlePool[J];
 				++Count1;
@@ -769,7 +800,9 @@ void ZEParticleEmitter::SortParticles()
 		}
 
 		for (ZESize J = 0; J < ParticleCount; J++)
+		{
 			ParticlePool[J] = SortArray[J];
+		}
 	}
 }
 

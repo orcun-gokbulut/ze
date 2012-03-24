@@ -41,13 +41,13 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEDrawParameters.h"
 
-void ZEModelMesh::SetActiveLOD(ZESize LOD)
+void ZEModelMesh::SetActiveLOD(ZEUInt LOD)
 {
 	AutoLOD = false;
 	this->ActiveLOD = LOD;
 }
 
-ZESize ZEModelMesh::GetActiveLOD()
+ZEUInt ZEModelMesh::GetActiveLOD()
 {
 	return ActiveLOD;
 }
@@ -309,7 +309,7 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 	if (Lod > LastLod)
 		Lod = LastLod;*/
 
-	LODs[Lod].Draw(DrawParameters, DistanceSquare);
+	LODs[(ZESize)Lod].Draw(DrawParameters, DistanceSquare);
 }
 
 

@@ -97,7 +97,7 @@ class ZECharacter : public ZECompoundEntity
 									Records;
 		ZECharacterRecordingStatus	RecordingStatus;
 		float						RecordingTime;
-		ZEInt							RecordingFrame;
+		ZESize						RecordingFrame;
 
 		ZEModel*					Model;
 		ZEInputMap					InputMap;

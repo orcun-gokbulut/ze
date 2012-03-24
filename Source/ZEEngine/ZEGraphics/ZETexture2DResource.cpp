@@ -54,7 +54,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -85,13 +85,12 @@ static void CopyToTexture2D(ZETexture2D* Output, ZETextureData* TextureData)
 	ZESize TargetPitch = 0;
 
 	// There is one surface (surface 0) and n MipMaps
-	for(ZESize Level = 0; Level < LevelCount; Level++)
+	for(ZESize Level = 0; Level < (ZESize)LevelCount; Level++)
 	{
-		Output->Lock(&TargetBuffer, &TargetPitch, Level);
+		Output->Lock(&TargetBuffer, &TargetPitch, (ZEUInt)Level);
 		TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(Level).CopyTo(TargetBuffer, TargetPitch);
-		Output->Unlock(Level);
+		Output->Unlock((ZEUInt)Level);
 	}
-
 }
 
 const char* ZETexture2DResource::GetResourceType() const

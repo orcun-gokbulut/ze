@@ -278,9 +278,9 @@
 #define ZE_IJB_BUTTON19				0x13
 #define ZE_IJB_BUTTON20				0x14
 
-unsigned char zeGetKeyboardButtonId(char* KeyShortName);
-const char* zeGetKeyboardButtonName(unsigned char Key);
-const char* zeGetKeyboardButtonShortName(unsigned char Key);
+unsigned char	zeGetKeyboardButtonId(char* KeyShortName);
+const char*		zeGetKeyboardButtonName(unsigned char Key);
+const char*		zeGetKeyboardButtonShortName(unsigned char Key);
 
 #endif
 

@@ -147,8 +147,8 @@ void ZED3D9CloudMaterial::CreateBuffers()
 
 	}
 
-	CloudShadowVertexCount = ((ZEUInt)CellCountXZ.x + 1) * ((ZEUInt)CellCountXZ.y + 1);
-	ZEUInt	IndexCount0 = ((ZEUInt)CellCountXZ.x + 2) * 2 * (ZEUInt)CellCountXZ.y - 2;
+	CloudShadowVertexCount = ((ZESize)(CellCountXZ.x + 0.5f) + 1) * ((ZESize)(CellCountXZ.y + 0.5f) + 1);
+	ZESize	IndexCount0 = ((ZESize)(CellCountXZ.x + 0.5f) + 2) * 2 * (ZESize)(CellCountXZ.y + 0.5f) - 2;
 
 	if (CloudShadowVertexBuffer == NULL)
 	{
@@ -288,10 +288,10 @@ void ZED3D9CloudMaterial::CreateBuffers()
 	/*                    Render Cloud Pass Buffers                         */
 	/************************************************************************/
 	
-	ZEUInt DivX = 4;
-	ZEUInt DivY = 4;
+	ZESize DivX = 4;
+	ZESize DivY = 4;
 	RenderCloudVertexCount = (DivX + 1) * (DivY + 1);
-	ZEUInt IndexCount1 = 2 * DivY * (DivX + 1) + (DivY - 1) * 2;
+	ZESize IndexCount1 = 2 * DivY * (DivX + 1) + (DivY - 1) * 2;
 	RenderCloudTriangleCount = IndexCount1 - 2;
 	
 	// Same vertex declaration of Density Blur Pass is used in this pass
@@ -327,9 +327,9 @@ void ZED3D9CloudMaterial::CreateBuffers()
 		Data = (Vertex1*)RenderCloudVertexBuffer->Lock();
 
 		float Depth = 0.999999f;
-		for (ZEUInt I = 0; I <= DivY; ++I)
+		for (ZESize I = 0; I <= DivY; ++I)
 		{
-			for (ZEUInt J = 0; J <= DivX; ++J)
+			for (ZESize J = 0; J <= DivX; ++J)
 			{
 				float X = 1.0f - J / (float)DivX;
 				float Y = I / (float)DivY;
@@ -366,17 +366,17 @@ void ZED3D9CloudMaterial::CreateBuffers()
 		{
 			for (ZEUInt16 J = 0; J <= DivX; ++J)
 			{
-				*Data = I * (DivX + 1) + J;
+				*Data = (ZEUInt16)(I * (DivX + 1) + J);
 				++Data;
-				*Data = (I + 1) * (DivX + 1) + J;
+				*Data = (ZEUInt16)((I + 1) * (DivX + 1) + J);
 				++Data;
 			}
 
 			if (I + 1 < (ZEUInt16)DivY)
 			{
-				*Data = (I + 1) * (DivX + 1) + DivX;
+				*Data = (ZEUInt16)((I + 1) * (DivX + 1) + DivX);
 				++Data;
-				*Data = (I + 1) * (DivX + 1);
+				*Data = (ZEUInt16)((I + 1) * (DivX + 1));
 				++Data;
 			}
 		}
@@ -662,7 +662,7 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	CloudShadowVertexDeclaration->SetupVertexDeclaration();
 	GetDevice()->SetIndices(CloudShadowIndexBuffer->StaticBuffer);
 	GetDevice()->SetStreamSource(0, CloudShadowVertexBuffer->StaticBuffer, 0, sizeof(Vertex0));
-	GetDevice()->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, CloudShadowVertexCount, 0, CloudShadowTriangleCount);
+	GetDevice()->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, (UINT)CloudShadowVertexCount, 0, (UINT)CloudShadowTriangleCount);
 	
 	/************************************************************************/
 	/*                   Pass 3: Blur Cloud Density Texture                 */
@@ -805,7 +805,7 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 
 	DensityBlurVertexDeclaration->SetupVertexDeclaration();
 	GetDevice()->SetStreamSource(0, DensityBlurVertexBuffer->StaticBuffer, 0, sizeof(Vertex1));
-	GetDevice()->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, DensityBlurTriangleCount);
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, (UINT)DensityBlurTriangleCount);
 	
 	/************************************************************************/
 	/*         Pass 4: Setup Forward Pass for Rendering Clouds              */

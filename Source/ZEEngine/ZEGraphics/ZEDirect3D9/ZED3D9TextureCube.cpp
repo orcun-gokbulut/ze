@@ -63,7 +63,7 @@ void ZED3D9TextureCube::DeviceLost()
 {
 	if (RenderTarget)
 	{
-		for (ZESize I = 0; I < 8; I++)
+		for (ZESize I = 0; I < 6; I++)
 			ZED3D_RELEASE(ViewPorts[I].FrameBuffer);
 
 		ZED3D_RELEASE(CubeTexture);
@@ -141,22 +141,22 @@ bool ZED3D9TextureCube::Create(ZEUInt EdgeLength, ZEUInt Levels, ZETexturePixelF
 	return true;
 }
 
-bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, ZESize Level, void** Buffer, ZESize* Pitch)
+bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, ZEUInt Level, void** Buffer, ZESize* Pitch)
 {
 	D3DLOCKED_RECT Rect;
-	HRESULT hr = CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, Level, &Rect, NULL, 0);
+	HRESULT hr = CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, (UINT)Level, &Rect, NULL, 0);
 	if (hr != D3D_OK)
 		return false;
 	
 	*Buffer = Rect.pBits;
-	*Pitch = Rect.Pitch;
+	*Pitch = (ZESize)Rect.Pitch;
 
 	return true;
 }
 
-void ZED3D9TextureCube::Unlock(ZETextureCubeFace Face, ZESize Level)
+void ZED3D9TextureCube::Unlock(ZETextureCubeFace Face, ZEUInt Level)
 {
-	CubeTexture->UnlockRect((D3DCUBEMAP_FACES)Face, Level);
+	CubeTexture->UnlockRect((D3DCUBEMAP_FACES)Face, (UINT)Level);
 }
 
 void ZED3D9TextureCube::Release()

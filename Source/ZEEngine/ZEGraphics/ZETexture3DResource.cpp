@@ -52,7 +52,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -81,20 +81,20 @@ static void CopyToTexture3D(ZETexture3D* Texture, ZETextureData* TextureData)
 	ZESize RowPitch		= 0;
 
 	// Get texture specs
-	ZEUInt SurfaceLevelCount = TextureData->GetTextureLevelCount();
-	ZEUInt TextureSurfaceCount = TextureData->GetTextureSurfaceCount();
+	ZESize SurfaceLevelCount	= (ZESize)TextureData->GetTextureLevelCount();
+	ZESize TextureSurfaceCount	= (ZESize)TextureData->GetTextureSurfaceCount();
 
 
 	for (ZESize Level = 0,  SurfaceIncrement = 1; Level < SurfaceLevelCount; ++Level, SurfaceIncrement *= 2)
 	{
-		Texture->Lock(&TargetBuffer, &RowPitch, &SlicePitch, Level);
+		Texture->Lock(&TargetBuffer, &RowPitch, &SlicePitch, (ZEUInt	)Level);
 
 		for (ZESize Surface = 0, SurfaceCopyCount = 0; Surface < TextureSurfaceCount; Surface += SurfaceIncrement, ++SurfaceCopyCount)
 		{
-			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo((void*)((unsigned char*)TargetBuffer + SlicePitch * SurfaceCopyCount), RowPitch);
+			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo((void*)((ZEUInt8*)TargetBuffer + SlicePitch * SurfaceCopyCount), RowPitch);
 		}
 
-		Texture->Unlock(Level);
+		Texture->Unlock((ZEUInt	)Level);
 	}
 
 }

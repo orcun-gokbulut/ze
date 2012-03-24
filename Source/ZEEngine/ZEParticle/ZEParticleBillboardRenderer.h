@@ -42,7 +42,7 @@
 #include "ZEGraphics\ZERenderCommand.h"
 
 class ZESimpleVertex;
-class ZEDrawParameters;
+struct ZEDrawParameters;
 class ZEStaticVertexBuffer;
 
 class ZEParticleBillboardRenderer : public ZEParticleRenderer
@@ -64,8 +64,8 @@ class ZEParticleBillboardRenderer : public ZEParticleRenderer
 
 		virtual void						Draw(ZEDrawParameters* DrawParameters);
 
-		void								SetAxixOfOrientation(const ZEVector3 AxisOfOrientation);
-		ZEVector3							GetAxisOfOrientation() const;
+		void								SetAxixOfOrientation(const ZEVector3& AxisOfOrientation);
+		const ZEVector3&					GetAxisOfOrientation() const;
 
 		void								SetBillboardType(ZEParticleBillboardType Type);
 		ZEParticleBillboardType				GetBillboardType() const;

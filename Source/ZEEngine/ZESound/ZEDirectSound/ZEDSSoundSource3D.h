@@ -67,10 +67,10 @@ class ZEDSSoundSource3D : public ZESoundSource3D, public ZEDSComponentBase
 
 	public:
 		virtual void				SetSoundSourceState(ZESoundSourceState State);
-		virtual void				SetCurrentPosition(ZEUInt SampleIndex);
-		virtual ZEUInt				GetCurrentPosition();
-		virtual void				SetStartPosition(ZEUInt SampleIndex);
-		virtual void				SetEndPosition(ZEUInt SampleIndex);
+		virtual void				SetCurrentPosition(ZESize SampleIndex);
+		virtual ZESize				GetCurrentPosition();
+		virtual void				SetStartPosition(ZESize SampleIndex);
+		virtual void				SetEndPosition(ZESize SampleIndex);
 
 		virtual void				SetPan(ZEInt NewPan);
 		virtual void				SetPlaybackSpeed(float Speed);

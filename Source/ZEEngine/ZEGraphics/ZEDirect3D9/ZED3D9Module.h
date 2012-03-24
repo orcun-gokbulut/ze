@@ -161,7 +161,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual void									SetPostEffectQuality(ZEInt Quality);
 		virtual void									SetHDRQuality(ZEInt Quality);
 		virtual void									SetAntiAliasing(ZEInt Level);
-		virtual void									SetAnisotropicFilter(ZEInt Level);
+		virtual void									SetAnisotropicFilter(ZEUInt Level);
 
 		virtual void									SetMaterialComponentMask(ZEUInt Mask);
 		virtual ZEUInt									GetMaterialComponentMask();

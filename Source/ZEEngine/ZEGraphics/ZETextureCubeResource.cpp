@@ -49,7 +49,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -79,21 +79,21 @@ static void CopyToTextureCube(ZETextureCube* Output, ZETextureData* TextureData)
 	void* TargetBuffer = NULL;
 	ZESize TargetPitch = 0;
 
-	for(ZESize Surface = 0; Surface < SurfaceCount; ++Surface)
+	for(ZESize Surface = 0; Surface < (ZESize)SurfaceCount; ++Surface)
 	{
-		for(ZESize Level = 0; Level < LevelCount; ++Level)
+		for(ZESize Level = 0; Level < (ZESize)LevelCount; ++Level)
 		{
-			Output->Lock((ZETextureCubeFace)Surface, Level, &TargetBuffer, &TargetPitch);
+			Output->Lock((ZETextureCubeFace)Surface, (ZEUInt)Level, &TargetBuffer, &TargetPitch);
 			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo(TargetBuffer, TargetPitch);
-			Output->Unlock((ZETextureCubeFace)Surface, Level);
+			Output->Unlock((ZETextureCubeFace)Surface, (ZEUInt)Level);
 		}
 	}
 }
 
-static void CopyCubeFaceTo(void* Destination, ZEUInt DestPitch, void* SourceBuffer, ZEUInt SourcePitch, ZEUInt EdgeLenght, ZEUInt OffsetX, ZEUInt OffsetY)
+static void CopyCubeFaceTo(void* Destination, ZESize DestPitch, void* SourceBuffer, ZESize SourcePitch, ZEUInt EdgeLenght, ZEUInt OffsetX, ZEUInt OffsetY)
 {
-	for (ZEUInt I = 0; I < EdgeLenght; I++)
-		memcpy((unsigned char*)Destination + (I * DestPitch), (unsigned char*)SourceBuffer + SourcePitch * (OffsetY + I) + OffsetX * 4, EdgeLenght * 4);
+	for (ZESize I = 0; I < (ZESize)EdgeLenght; I++)
+		memcpy((unsigned char*)Destination + (I * DestPitch), (unsigned char*)SourceBuffer + SourcePitch * ((ZESize)OffsetY + I) + (ZESize)OffsetX * 4, (ZESize)EdgeLenght * 4);
 
 }
 

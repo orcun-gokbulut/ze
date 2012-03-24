@@ -57,8 +57,7 @@ class ZED3D9Shader
 		char							FunctionName[100];
 		ZEUInt32						Components;
 
-		ZEInt							CacheIndex;
-		ZEInt							ReferanceCount;
+		ZESize							ReferanceCount;
 	
 	protected:
 										ZED3D9Shader();

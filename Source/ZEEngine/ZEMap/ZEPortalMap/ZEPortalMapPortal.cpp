@@ -157,18 +157,18 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 	for (ZESize I = 0; I < PhysicalTriangles.GetCount(); I++)
 	{
 		PhysicalTriangles[I].MaterialIndex = 0;
-		PhysicalTriangles[I].Indices[0] =  3 * I;
-		PhysicalTriangles[I].Indices[1] =  3 * I + 1;
-		PhysicalTriangles[I].Indices[2] =  3 * I + 2;
+		PhysicalTriangles[I].Indices[0] =  3 * (ZEUInt)I;
+		PhysicalTriangles[I].Indices[1] =  3 * (ZEUInt)I + 1;
+		PhysicalTriangles[I].Indices[2] =  3 * (ZEUInt)I + 2;
 	}
 
 	if (false)//(PhysicalMesh == NULL && Resource->HasPhysicalMesh)
 	{
 		PhysicalMesh = ZEPhysicalMesh::CreateInstance();
 		PhysicalMesh->SetData(PhysicalVertices.GetConstCArray(), 
-							  PhysicalVertices.GetCount(),
+							  (ZEUInt)PhysicalVertices.GetCount(),
 							  PhysicalTriangles.GetConstCArray(), 
-							  PhysicalTriangles.GetCount(),
+							  (ZEUInt)PhysicalTriangles.GetCount(),
 							  NULL, 0);
 		PhysicalMesh->Initialize();
 		zeScene->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);

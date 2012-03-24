@@ -190,9 +190,9 @@ void ZEMoon::Draw(ZEDrawParameters* DrawParameters)
 	MoonRenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE_STRIPT;
 	MoonRenderCommand.Flags				= ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 	MoonRenderCommand.VertexBufferOffset= 0;
-	MoonRenderCommand.IndexBuffer		= (ZEIndexBuffer*)0xfefefefe;
-	MoonRenderCommand.VertexBuffer		= (ZEVertexBuffer*)0xfefefefe;
-	MoonRenderCommand.VertexDeclaration	= (ZEVertexDeclaration*)0xfefefefe;
+	MoonRenderCommand.IndexBuffer		= (ZEIndexBuffer*)NULL;
+	MoonRenderCommand.VertexBuffer		= (ZEVertexBuffer*)NULL;
+	MoonRenderCommand.VertexDeclaration	= (ZEVertexDeclaration*)NULL;
 	
 	// ---------------------------------------
 

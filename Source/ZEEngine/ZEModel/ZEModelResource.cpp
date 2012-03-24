@@ -49,7 +49,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -253,12 +253,12 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEFile* 
 	Body->Mass				= BodyChunk.Mass;
 
 	//H.C -EDIT- Kinematic Attribute Removed from ModelFileFormat
-	//Body->Kinematic			= BodyChunk.Kinematic;
-	Body->AngularDamping	= BodyChunk.AngularDamping;
+	//Body->Kinematic		= BodyChunk.Kinematic;
+	Body->AngularDamping		= BodyChunk.AngularDamping;
 	Body->LinearDamping		= BodyChunk.LinearDamping;
-	Body->MassCenter		= BodyChunk.MassCenter;
+	Body->MassCenter			= BodyChunk.MassCenter;
 
-	Body->Shapes.SetCount(BodyChunk.ShapeCount);
+	Body->Shapes.SetCount((ZESize)BodyChunk.ShapeCount);
 	for (ZESize I = 0; I < Body->Shapes.GetCount(); I++)
 	{
 		ZEModelResourcePhysicalShape* Shape = &Body->Shapes[I];
@@ -419,7 +419,7 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 		Mesh->PhysicalBody.Position = ZEVector3(0,1,0);
 		Mesh->PhysicalBody.Orientation = ZEQuaternion::Identity;
 
-		Mesh->LODs.SetCount(MeshChunk.LODCount);
+		Mesh->LODs.SetCount((ZESize)MeshChunk.LODCount);
 		for (ZESize I = 0; I < Mesh->LODs.GetCount(); I++)
 		{
 			ZEModelResourceMeshLOD* LOD = &Mesh->LODs[I];
@@ -435,15 +435,15 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 			LOD->LODLevel = MeshLODChunk.LODLevel;
 			if(MeshChunk.IsSkinned)
 			{
-				LOD->AffectingBoneIds.SetCount(MeshLODChunk.AffectingBoneCount);
+				LOD->AffectingBoneIds.SetCount((ZESize)MeshLODChunk.AffectingBoneCount);
 				ResourceFile->Read(LOD->AffectingBoneIds.GetCArray(), sizeof(ZEUInt32), LOD->AffectingBoneIds.GetCount());
 
-				LOD->SkinnedVertices.SetCount(MeshLODChunk.VertexCount);				
+				LOD->SkinnedVertices.SetCount((ZESize)MeshLODChunk.VertexCount);				
 				ResourceFile->Read(LOD->SkinnedVertices.GetCArray(), sizeof(ZESkinnedModelVertex),  LOD->SkinnedVertices.GetCount());
 			}
 			else
 			{
-				LOD->Vertices.SetCount(MeshLODChunk.VertexCount);				
+				LOD->Vertices.SetCount((ZESize)MeshLODChunk.VertexCount);				
 				ResourceFile->Read(LOD->Vertices.GetCArray(), sizeof(ZEModelVertex),  LOD->Vertices.GetCount());
 			}
 		}
@@ -475,14 +475,14 @@ static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEFil
 		return false;
 	}
 
-	Joint->JointType					= (ZEPhysicalJointType)JointChunk.JointType;
+	Joint->JointType						= (ZEPhysicalJointType)JointChunk.JointType;
 	Joint->Enabled						= JointChunk.Enabled;
 	Joint->Body1Id						= JointChunk.Body1Id;
 	Joint->Body2Id						= JointChunk.Body2Id;
-	Joint->Breakable					= JointChunk.Breakable;
+	Joint->Breakable						= JointChunk.Breakable;
 	Joint->BreakForce					= JointChunk.BreakForce;
 	Joint->BreakTorque					= JointChunk.BreakTorque;
-	Joint->CollideBodies				= JointChunk.CollideBodies;
+	Joint->CollideBodies					= JointChunk.CollideBodies;
 	Joint->UseGlobalAnchorAxis			= JointChunk.UseGlobalAnchorAxis;
 	Joint->GlobalAnchor					= JointChunk.GlobalAnchor;
 	Joint->GlobalAxis					= JointChunk.GlobalAxis;
@@ -497,31 +497,29 @@ static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEFil
 
 	Joint->LinearLimitDamping			= JointChunk.LinearLimitDamping;
 	Joint->LinearLimitRestitution		= JointChunk.LinearLimitRestitution;
-	Joint->LinearLimitSpring			= JointChunk.LinearLimitSpring;
+	Joint->LinearLimitSpring				= JointChunk.LinearLimitSpring;
 	Joint->LinearLimitValue				= JointChunk.LinearLimitValue;
 
 	Joint->Swing1Motion					= (ZEPhysicalJointMotion)JointChunk.Swing1Motion;
 	Joint->Swing1LimitDamping			= JointChunk.Swing1LimitDamping;
 	Joint->Swing1LimitRestitution		= JointChunk.Swing1LimitRestitution;
-	Joint->Swing1LimitSpring			= JointChunk.Swing1LimitSpring;
+	Joint->Swing1LimitSpring				= JointChunk.Swing1LimitSpring;
 	Joint->Swing1LimitValue				= JointChunk.Swing1LimitValue;
 
 	Joint->Swing2Motion					= (ZEPhysicalJointMotion)JointChunk.Swing2Motion;
 	Joint->Swing2LimitDamping			= JointChunk.Swing2LimitDamping;
 	Joint->Swing2LimitRestitution		= JointChunk.Swing2LimitRestitution;
-	Joint->Swing2LimitSpring			= JointChunk.Swing2LimitSpring;
+	Joint->Swing2LimitSpring				= JointChunk.Swing2LimitSpring;
 	Joint->Swing2LimitValue				= JointChunk.Swing2LimitValue;
 
 	Joint->TwistMotion					= (ZEPhysicalJointMotion)JointChunk.TwistMotion;
 	Joint->TwistLowLimitDamping			= JointChunk.TwistLowLimitDamping;
 	Joint->TwistLowLimitValue			= JointChunk.TwistLowLimitValue;
-	Joint->TwistLowLimitValue			= JointChunk.TwistLowLimitValue;
 	Joint->TwistLowLimitRestitution		= JointChunk.TwistLowLimitRestitution;
 	Joint->TwistLowLimitSpring			= JointChunk.TwistLowLimitSpring;
-	Joint->TwistHighLimitDamping		= JointChunk.TwistHighLimitDamping;
+	Joint->TwistHighLimitDamping			= JointChunk.TwistHighLimitDamping;
 	Joint->TwistHighLimitValue			= JointChunk.TwistHighLimitValue;
-	Joint->TwistHighLimitValue			= JointChunk.TwistHighLimitValue;
-	Joint->TwistHighLimitRestitution	= JointChunk.TwistHighLimitRestitution;
+	Joint->TwistHighLimitRestitution		= JointChunk.TwistHighLimitRestitution;
 	Joint->TwistHighLimitSpring			= JointChunk.TwistHighLimitSpring;
 
 	Joint->MotorTargetPosition			= JointChunk.MotorTargetPosition;
@@ -531,30 +529,30 @@ static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEFil
 
 	Joint->LinearXMotor					= (ZEPhysicalJointMotorType)JointChunk.LinearXMotor;
 	Joint->LinearXMotorDamper			= JointChunk.LinearXMotorDamper;
-	Joint->LinearXMotorForce			= JointChunk.LinearXMotorForce;
+	Joint->LinearXMotorForce				= JointChunk.LinearXMotorForce;
 	Joint->LinearXMotorSpring			= JointChunk.LinearXMotorSpring;
 
 	Joint->LinearYMotor					= (ZEPhysicalJointMotorType)JointChunk.LinearYMotor;
 	Joint->LinearYMotorDamper			= JointChunk.LinearYMotorDamper;
-	Joint->LinearYMotorForce			= JointChunk.LinearYMotorForce;
+	Joint->LinearYMotorForce				= JointChunk.LinearYMotorForce;
 	Joint->LinearYMotorSpring			= JointChunk.LinearYMotorSpring;
 
 	Joint->LinearZMotor					= (ZEPhysicalJointMotorType)JointChunk.LinearZMotor;
 	Joint->LinearZMotorDamper			= JointChunk.LinearZMotorDamper;
-	Joint->LinearZMotorForce			= JointChunk.LinearZMotorForce;
+	Joint->LinearZMotorForce				= JointChunk.LinearZMotorForce;
 	Joint->LinearZMotorSpring			= JointChunk.LinearZMotorSpring;
 
-	Joint->AngularSwingMotor			= (ZEPhysicalJointMotorType)JointChunk.AngularSwingMotor;
+	Joint->AngularSwingMotor				= (ZEPhysicalJointMotorType)JointChunk.AngularSwingMotor;
 	Joint->AngularSwingMotorDamper		= JointChunk.AngularSwingMotorDamper;
 	Joint->AngularSwingMotorForce		= JointChunk.AngularSwingMotorForce;
 	Joint->AngularSwingMotorSpring		= JointChunk.AngularSwingMotorSpring;
 
-	Joint->AngularTwistMotor			= (ZEPhysicalJointMotorType)JointChunk.AngularTwistMotor;
+	Joint->AngularTwistMotor				= (ZEPhysicalJointMotorType)JointChunk.AngularTwistMotor;
 	Joint->AngularTwistMotorDamper		= JointChunk.AngularTwistMotorDamper;
 	Joint->AngularTwistMotorForce		= JointChunk.AngularTwistMotorForce;
 	Joint->AngularTwistMotorSpring		= JointChunk.AngularTwistMotorSpring;
 
-	Joint->AngularSlerpMotor			= (ZEPhysicalJointMotorType)JointChunk.AngularSlerpMotor;
+	Joint->AngularSlerpMotor				= (ZEPhysicalJointMotorType)JointChunk.AngularSlerpMotor;
 	Joint->AngularSlerpMotorDamper		= JointChunk.AngularSlerpMotorDamper;
 	Joint->AngularSlerpMotorForce		= JointChunk.AngularSlerpMotorForce;
 	Joint->AngularSlerpMotorSpring		= JointChunk.AngularSlerpMotorSpring;
@@ -569,7 +567,7 @@ static void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, ZEIn
 	if (Bone->ParentBone != -1)
 	{
 
-		ZEMatrix4x4::Multiply(Bone->ForwardTransform, Model->Bones[Bone->ParentBone].ForwardTransform, Bone->RelativeTransform);
+		ZEMatrix4x4::Multiply(Bone->ForwardTransform, Model->Bones[(ZESize)Bone->ParentBone].ForwardTransform, Bone->RelativeTransform);
 		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
 	}
 	else
@@ -579,8 +577,12 @@ static void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, ZEIn
 	}
 
 	for (ZESize I = 0; I < Model->Bones.GetCount(); I++)
+	{
 		if (Model->Bones[I].ParentBone == BoneId)
-			ProcessBones(Model, &Model->Bones[I], I);
+		{
+			ProcessBones(Model, &Model->Bones[I], (ZEInt)I);
+		}
+	}
 }
 
 static bool ReadBonesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
@@ -623,8 +625,13 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 	}
 
 	for (ZESize I = 0; I < Model->Bones.GetCount(); I++)
+	{
 		if (Model->Bones[I].ParentBone == -1)
-			ProcessBones(Model, &Model->Bones[I], I);
+		{
+			ProcessBones(Model, &Model->Bones[I], (ZEInt)I);
+		}
+	}
+
 	return true;
 }
 
@@ -643,7 +650,7 @@ static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 			return false;
 		}
 
-		Animation->Frames.SetCount(AnimationChunk.FrameCount);
+		Animation->Frames.SetCount((ZESize)AnimationChunk.FrameCount);
 		strncpy(Animation->Name, AnimationChunk.Name, ZE_MDLF_MAX_NAME_SIZE);
 
 		for (ZESize I = 0; I < Animation->Frames.GetCount(); I++)
@@ -659,10 +666,10 @@ static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 				return false;
 			}
 
-			CurrentAnimationFrame->BoneKeys.SetCount(FileAnimationFrame.BoneKeyCount);
+			CurrentAnimationFrame->BoneKeys.SetCount((ZESize)FileAnimationFrame.BoneKeyCount);
 			ResourceFile->Read(CurrentAnimationFrame->BoneKeys.GetCArray(), sizeof(ZEModelResourceAnimationKey), CurrentAnimationFrame->BoneKeys.GetCount());
 
-			CurrentAnimationFrame->MeshKeys.SetCount(FileAnimationFrame.MeshKeyCount);		
+			CurrentAnimationFrame->MeshKeys.SetCount((ZESize)FileAnimationFrame.MeshKeyCount);		
 			ResourceFile->Read(CurrentAnimationFrame->MeshKeys.GetCArray(), sizeof(ZEModelResourceAnimationKey), CurrentAnimationFrame->MeshKeys.GetCount());
 		}
 	}
@@ -686,28 +693,28 @@ static bool ReadModelFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 		return false;	
 	}
 
-	Model->Materials.SetCount(HeaderChunk.MaterialCount);
+	Model->Materials.SetCount((ZESize)HeaderChunk.MaterialCount);
 	if (!ReadMaterialsFromFile(Model, ResourceFile))
 	{
 		zeError("Corrupted ZEModel file. Can not read model file.");
 		return false;
 	}
 
-	Model->Meshes.SetCount(HeaderChunk.MeshCount);
+	Model->Meshes.SetCount((ZESize)HeaderChunk.MeshCount);
 	if(!ReadMeshesFromFile(Model, ResourceFile))
 	{
 		zeError("Corrupted ZEModel file. Can not read model file.");
 		return false;
 	}
 
-	Model->Bones.SetCount(HeaderChunk.BoneCount);
+	Model->Bones.SetCount((ZESize)HeaderChunk.BoneCount);
 	if(!ReadBonesFromFile(Model, ResourceFile))
 	{
 		zeError("Corrupted ZEModel file. Can not read model file.");
 		return false;
 	}
 
-	Model->Animations.SetCount(HeaderChunk.AnimationCount);
+	Model->Animations.SetCount((ZESize)HeaderChunk.AnimationCount);
 	if(!ReadAnimationsFromFile(Model, ResourceFile))
 	{
 		zeError("Corrupted ZEModel file. Can not read model file.");

@@ -74,7 +74,7 @@ bool ZED3D9PPScreenOutputNode::Initialize()
 
 	if (PixelShader == NULL)
 	{
-		if (GetModule()->GetVertexShaderVersion() < ZE_D3D9_PSV_2_0_0)
+		if (GetModule()->GetPixelShaderVersion() < ZE_D3D9_PSV_2_0_0)
 		{
 			zeError("Pixel shader is not supported.");
 			return false;

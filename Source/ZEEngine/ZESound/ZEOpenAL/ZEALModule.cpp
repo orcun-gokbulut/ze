@@ -116,12 +116,12 @@ bool ZEALModule::Initialize()
 			Device->DriverName[0] = '\0';
 
 			zeLog("Found sound device; "
-				"Index : %d, "
-				"Device Name: \"%s\", "
-				"Device Driver: \"%s\".",
-				Device->DeviceId,
-				Device->DeviceName,
-				Device->DriverName);
+					"Index : %d, "
+					"Device Name: \"%s\", "
+					"Device Driver: \"%s\".",
+					Device->DeviceId,
+					Device->DeviceName,
+					Device->DriverName);
 
 			if (DeviceNames[I] == '\0' && DeviceNames[I + 1] == '\0')
 				break;
@@ -129,7 +129,7 @@ bool ZEALModule::Initialize()
 		I++;
 	}
 
-	ZEUInt DeviceId = SoundOptions.GetOption("DeviceId")->GetValue().GetInteger();
+	ZESize DeviceId = (ZESize)SoundOptions.GetOption("DeviceId")->GetValue().GetInteger();
 
 	ALchar* DeviceName = NULL;
 	if (DeviceId > DeviceList.GetCount())
@@ -137,6 +137,7 @@ bool ZEALModule::Initialize()
 		zeWarning("Wrong device id. Using sound default device.");
 	}
 	else
+	{
 		if (DeviceId == 0)
 		{
 			zeLog("Using default sound device");
@@ -146,6 +147,7 @@ bool ZEALModule::Initialize()
 			DeviceName = (ALchar*)(const char*)DeviceList[DeviceId].DeviceName;
 			zeLog("Using \"%s\" sound device.", DeviceName);
 		}
+	}
 
 	zeLog("Opening device.");
 	Device = alcOpenDevice(NULL); // select the "preferred device"
@@ -161,10 +163,12 @@ bool ZEALModule::Initialize()
 	ZEALComponentBase::BaseInitialize(this);
 
 	for(ZESize I = 0; I < ZE_SS_MAX_TYPE; I++)
+	{
 		TypeVolumes[I] = 100;
+	}
 
 	SetStreamingDisabled(SoundOptions.GetOption("StreamingDisabled")->GetValue().GetBoolean());
-	SetMaxBufferSize(SoundOptions.GetOption("MaxBufferSize")->GetValue().GetInteger());
+	SetMaxBufferSize((ZESize)SoundOptions.GetOption("MaxBufferSize")->GetValue().GetInteger());
 	SetMasterVolume(SoundOptions.GetOption("MasterVolume")->GetValue().GetInteger());
 	SetSpeakerLayout((ZESpeakerLayout)SoundOptions.GetOption("SpeakerLayout")->GetValue().GetInteger());
 	SetTypeVolume(ZE_SST_EFFECT, SoundOptions.GetOption("EffectVolume")->GetValue().GetInteger());

@@ -529,7 +529,7 @@ bool ZECore::StartUp(void* WindowHandle)
 	SetCoreState(ZE_CS_STARTUP);
 	SetUserLevel(ZE_UL_DEVELOPPER);
 
-	zeLog("Zinek Engine V%s.", ZE_VERSION_STRING);
+	zeLog("Zinek Engine %d.%d.%d - Build %d.", ZE_VERSION_MAJOR, ZE_VERSION_MINOR, ZE_VERSION_INTERNAL, ZE_VERSION_BUILD);
 	zeLog("Initializing core...");
 
 	zeLog("Initializing main window...");

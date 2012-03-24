@@ -181,9 +181,7 @@ void ZEPhysXPhysicalMesh::ReCreate()
 	Initialize();
 }
 
-bool ZEPhysXPhysicalMesh::SetData(const ZEVector3* Vertices, ZESize VertexCount, 
-										const ZEPhysicalTriangle* Triangles, ZESize TriangleCount, 
-										const ZEPhysicalMaterial* Materials, ZESize MaterialCount)
+bool ZEPhysXPhysicalMesh::SetData(const ZEVector3* Vertices, ZEUInt VertexCount, const ZEPhysicalTriangle* Triangles, ZEUInt TriangleCount, const ZEPhysicalMaterial* Materials, ZEUInt MaterialCount)
 {
 	if (TriangleMeshShapeDesc.meshData != NULL)
 	{
@@ -192,18 +190,20 @@ bool ZEPhysXPhysicalMesh::SetData(const ZEVector3* Vertices, ZESize VertexCount,
 	}
 
 	ZEArray<ZEVector3> TransformedVertices;
-	TransformedVertices.SetCount(VertexCount);
-	for (ZESize I = 0; I < VertexCount; I++)
+	TransformedVertices.SetCount((ZESize)VertexCount);
+	for (ZESize I = 0; I < (ZESize)VertexCount; I++)
+	{
 		ZEVector3::Multiply(TransformedVertices[I], Vertices[I], Scale);
-
+	}
+	
 	NxTriangleMeshDesc TriangleMeshDesc;
-	TriangleMeshDesc.numVertices = VertexCount;
-	TriangleMeshDesc.pointStrideBytes = sizeof(ZEVector3);
-	TriangleMeshDesc.points = TransformedVertices.GetConstCArray();
-	TriangleMeshDesc.numTriangles = TriangleCount;
-	TriangleMeshDesc.triangles = Triangles->Indices;
+	TriangleMeshDesc.numVertices		= VertexCount;
+	TriangleMeshDesc.pointStrideBytes	= sizeof(ZEVector3);
+	TriangleMeshDesc.points				= TransformedVertices.GetConstCArray();
+	TriangleMeshDesc.numTriangles		= TriangleCount;
+	TriangleMeshDesc.triangles			= Triangles->Indices;
 	TriangleMeshDesc.triangleStrideBytes = sizeof(ZEPhysicalTriangle);
-	TriangleMeshDesc.flags = NULL;
+	TriangleMeshDesc.flags				= NULL;
 
 	ZEPhysXMemoryWriteStream WriteStream;
 	if (!GetCookingInterface()->NxCookTriangleMesh(TriangleMeshDesc, WriteStream))

@@ -67,8 +67,10 @@ void ZEInputModule::Acquire()
 		Acquired = true;
 
 		const ZEArray<ZEInputDevice*>& Devices = GetInputDevices();
-		for (ZEInt I = 0; I < Devices.GetCount(); I++)
+		for (ZESize I = 0; I < Devices.GetCount(); I++)
+		{
 			Devices[I]->Acquire();
+		}
 	}
 }
 
@@ -79,8 +81,10 @@ void ZEInputModule::UnAcquire()
 		Acquired = false;
 
 		const ZEArray<ZEInputDevice*>& Devices = GetInputDevices();
-		for (ZEInt I = 0; I < Devices.GetCount(); I++)
+		for (ZESize I = 0; I < Devices.GetCount(); I++)
+		{
 			Devices[I]->UnAcquire();
+		}
 	}
 }
 

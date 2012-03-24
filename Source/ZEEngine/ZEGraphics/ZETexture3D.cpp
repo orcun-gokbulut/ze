@@ -58,7 +58,7 @@ ZEUInt ZETexture3D::GetHeight() const
 
 ZEUInt ZETexture3D::GetDepth() const
 {
-	return Height;
+	return Depth;
 }
 
 ZETexturePixelFormat ZETexture3D::GetPixelFormat() const

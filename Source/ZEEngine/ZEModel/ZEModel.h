@@ -70,7 +70,7 @@ class ZEModel : public ZEComponent
 	private:
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
-		ZEArray<ZERenderCommand>				LODRenderCommands;
+		ZEArray<ZERenderCommand>			LODRenderCommands;
 		
 		ZEArray<ZEModelMesh>				Meshes;
 		ZEArray<ZEModelBone>				Bones;
@@ -79,9 +79,9 @@ class ZEModel : public ZEComponent
 		ZEPhysicalBoxShape*					ParentlessBoneShape;
 		ZEVector3							ParentlessBoneBodyPosition;
 
+		ZEUInt								ActiveLOD;
 		bool								Visibility;
 		bool								AutoLOD;
-		ZESize								ActiveLOD;
 		bool								PhysicsEnabled;
 
 		ZEModelAnimationType				AnimationType;
@@ -104,6 +104,7 @@ class ZEModel : public ZEComponent
 			ZECanvas						BonePositionsCanvas;
 			ZERenderCommand					BonesRenderCommand;
 			ZERenderCommand					BonePositionsRenderCommand;
+
 		} DebugDrawComponents;
 
 		void								DebugDraw(ZERenderer* Renderer);
@@ -145,7 +146,7 @@ class ZEModel : public ZEComponent
 		bool								GetAutoLOD();
 
 		void								SetActiveLOD(ZEUInt LOD);
-		ZEInt								GetActiveLOD();
+		ZEUInt								GetActiveLOD();
 
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();

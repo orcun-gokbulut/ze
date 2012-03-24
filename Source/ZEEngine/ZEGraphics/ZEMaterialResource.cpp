@@ -47,7 +47,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -220,7 +220,7 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(ZEFile* ResourceFile, const
 	ZEMaterialResource* MaterialResource = new ZEMaterialResource();
 	
 	// Load Textures
-	MaterialResource->TextureResources.SetCount(HeaderChunk.TextureCount);
+	MaterialResource->TextureResources.SetCount((ZESize)HeaderChunk.TextureCount);
 	if (!LoadTextures(MaterialResource, ResourceFile, UserOptions))
 	{
 		zeError("Corrupted material file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
@@ -233,7 +233,7 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(ZEFile* ResourceFile, const
 	MaterialResource->Material->Unserialize(ResourceFile);
 
 	// Load Animations
-	MaterialResource->Animations.SetCount(HeaderChunk.AnimationCount);
+	MaterialResource->Animations.SetCount((ZESize)HeaderChunk.AnimationCount);
 	if (!LoadAnimations(MaterialResource, ResourceFile))
 	{
 		zeError("Corrupted material file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());

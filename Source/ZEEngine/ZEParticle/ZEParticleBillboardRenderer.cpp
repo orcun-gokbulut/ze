@@ -240,12 +240,12 @@ void ZEParticleBillboardRenderer::Draw(ZEDrawParameters* DrawParameters)
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }
 
-void ZEParticleBillboardRenderer::SetAxixOfOrientation(const ZEVector3 AxisOfOrientation)
+void ZEParticleBillboardRenderer::SetAxixOfOrientation(const ZEVector3& AxisOfOrientation)
 {
 	this->AxisOfOrientation = AxisOfOrientation;
 }
 
-ZEVector3 ZEParticleBillboardRenderer::GetAxisOfOrientation() const
+const ZEVector3& ZEParticleBillboardRenderer::GetAxisOfOrientation() const
 {
 	return AxisOfOrientation;
 }

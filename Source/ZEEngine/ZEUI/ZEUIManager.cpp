@@ -132,7 +132,7 @@ void ZEUIManager::SetActiveCursor(ZEUICursorControl* Cursor)
 
 void ZEUIManager::AddControl(ZEUIControl* Control)
 {
-	zeAssert(Controls.FindIndex(Control) != -1, "UI Control already added to ZEUIManager. (Control Name : %s)", Control->GetName());
+	zeAssert(Controls.FindIndex(Control) != -1, "UI Control already added to ZEUIManager. (Control Name : %s)", Control->GetName().GetValue());
 
 	Controls.Add(Control);
 }

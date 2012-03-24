@@ -64,7 +64,7 @@ bool ZED3D9StaticIndexBuffer::Create(ZESize BufferSize, ZEIndexBufferFormat Form
 			break;
 	}
 
-	if (GetDevice()->CreateIndexBuffer(BufferSize, D3DUSAGE_WRITEONLY, D3D9Format, D3DPOOL_MANAGED, &StaticBuffer, NULL) != D3D_OK)
+	if (GetDevice()->CreateIndexBuffer((UINT)BufferSize, D3DUSAGE_WRITEONLY, D3D9Format, D3DPOOL_MANAGED, &StaticBuffer, NULL) != D3D_OK)
 	{
 		zeCriticalError("Can not create static index buffer.");
 		return false;

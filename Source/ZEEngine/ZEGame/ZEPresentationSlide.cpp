@@ -65,10 +65,14 @@ void ZEPresentationSlide::SetPresentationSlide(const char* FileName)
 		}
 
 		if (strlen(PresentationSlide) != 0)
+		{
 			Texture = ZETexture2DResource::LoadSharedResource(PresentationSlide);
+		}
 
 		if (Texture != NULL)
+		{
 			Material->SetBaseMap(Texture->GetTexture());
+		}
 	}
 }
 

@@ -87,7 +87,7 @@ void ZESoundModule::OptionsChanged()
 	Current = SoundOptions.GetOption("MaxBufferSize");
 	if (Current->IsChanged())
 	{
-		SetMaxBufferSize(Current->GetValue().GetInteger());
+		SetMaxBufferSize((ZESize)Current->GetValue().GetInteger());
 		Current->SetValue((ZEInt)GetMaxBufferSize());
 	}
 

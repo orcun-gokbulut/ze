@@ -163,6 +163,9 @@ struct ZETerrainMaterial_GBuffer_VSOutput
 	float2 Texcoord : TEXCOORD2;
 	float3 LocalPosition : TEXCOORD3;
 	float2 CullBlendFactor : TEXCOORD4;
+	float2 GlobalTexcoord : TEXCOORD5;
+	float3 Tangent : TEXCOORD6;
+	float3 Binormal : TEXCOORD7;
 };
 
 ZETerrainMaterial_GBuffer_VSOutput ZETerrainMaterial_GBuffer_VertexShader(ZETerrainMaterial_VSInput Input)
@@ -176,10 +179,21 @@ ZETerrainMaterial_GBuffer_VSOutput ZETerrainMaterial_GBuffer_VertexShader(ZETerr
 	float4 WorldPosition = mul(WorldMatrix, float4(LocalPosition, 1.0f));
 	Output.Position_ = mul(ViewProjMatrix, WorldPosition);
 	Output.Position = mul(ViewMatrix, WorldPosition);
-	Output.Normal = mul((float3x3)ViewMatrix, GetVertexNormal(LocalPosition, GetBlendFactor(LocalPosition)));
+	
+	Output.GlobalTexcoord = GetGlobalTexcoord(WorldPosition);
+
+	float3 Normal = GetVertexNormal(LocalPosition, GetBlendFactor(LocalPosition));
+	float3 Binormal = normalize(cross(float3(1.0f, 0.0f, 0.0f), Normal));
+	float3 Tangent = normalize(cross(Normal, Binormal));
+	
+	Output.Normal = mul((float3x3)ViewMatrix, Normal);
+	Output.Tangent = mul((float3x3)ViewMatrix, Tangent);
+	Output.Binormal = mul((float3x3)ViewMatrix, Binormal);
+	
 	Output.LocalPosition = LocalPosition;
 	Output.CullBlendFactor.x = GetHeight(LocalPosition, GetBlendFactor(LocalPosition));
 	Output.CullBlendFactor.y = GetBlendFactor(LocalPosition);
+	
 	return Output;
 }
 
@@ -191,6 +205,10 @@ struct ZETerrainMaterial_GBuffer_PSInput
 	float2 Texcoord : TEXCOORD2;
 	float3 LocalPosition : TEXCOORD3;
 	float2 CullBlendFactor : TEXCOORD4;
+	float2 GlobalTexcoord : TEXCOORD5;
+	float3 Tangent : TEXCOORD6;
+	float3 Binormal : TEXCOORD7;
+	
 };
 
 ZEGBuffer ZETerrainMaterial_GBuffer_PixelShader(ZETerrainMaterial_GBuffer_PSInput Input)
@@ -204,11 +222,17 @@ ZEGBuffer ZETerrainMaterial_GBuffer_PixelShader(ZETerrainMaterial_GBuffer_PSInpu
 	}
 	
 	float3 PolygonNormal = normalize(cross(ddx(Input.LocalPosition), ddy(Input.LocalPosition)));
-	Input.Normal = GetVertexNormal(Input.LocalPosition, GetBlendFactor(Input.LocalPosition)); //Input.CullBlendFactor.y);
+	//Input.Normal = GetVertexNormal(Input.LocalPosition, GetBlendFactor(Input.LocalPosition)); //Input.CullBlendFactor.y);
 	//Input.Normal = lerp(PolygonNormal, Input.Normal, dot(PolygonNormal, Input.Normal) + 0.5f);
 	
 	ZEGBuffer_SetViewPosition(GBuffer, Input.Position);
-	ZEGBuffer_SetViewNormal(GBuffer, mul(ViewMatrix, Input.Normal));
+	
+	
+	float DetailBlend = saturate(length(Input.Position) * 0.01f);
+	float3 Normal = 2.0f * tex2D(DetailNormalTexture, Input.GlobalTexcoord * 320.0f).xyz - 1.0f;
+	Normal = normalize(Normal.x * normalize(Input.Tangent) + Normal.y * normalize(Input.Binormal) + Normal.z * normalize(Input.Normal));
+	ZEGBuffer_SetViewNormal(GBuffer, normalize(lerp(Normal, Input.Normal, DetailBlend)));
+	
 	ZEGBuffer_SetSpecularGlossiness(GBuffer, 120.0f);	
 	ZEGBuffer_SetSubSurfaceScatteringFactor(GBuffer, 0.0f);
 

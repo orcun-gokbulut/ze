@@ -63,7 +63,7 @@ class ZETexture3D : public ZETexture
 		bool						IsRenderTarget() const;
 
 		virtual bool				Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat) = 0;
-		virtual void				Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZESize Level) = 0;
+		virtual void				Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt Level) = 0;
 		virtual void				Unlock(ZEUInt Level) = 0;
 
 		static ZETexture3D*			CreateInstance();

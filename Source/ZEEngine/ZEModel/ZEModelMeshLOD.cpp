@@ -40,7 +40,7 @@
 
 void ZEModelMeshLOD::ResetMaterial()
 {
-	RenderCommand.Material = Owner->GetModelResource()->Materials[LODResource->MaterialId];
+	RenderCommand.Material = Owner->GetModelResource()->Materials[(ZESize)LODResource->MaterialId];
 }
 
 void ZEModelMeshLOD::SetMaterial(const ZEMaterial* Material)
@@ -67,12 +67,16 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DistanceSquare
 	{
 		RenderCommand.BoneTransforms.SetCount(LODResource->AffectingBoneIds.GetCount());
 		for (ZESize I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
-			ZEMatrix4x4::Multiply(RenderCommand.BoneTransforms[I], Owner->GetBones()[LODResource->AffectingBoneIds[I]].GetVertexTransform(), this->OwnerMesh->GetLocalTransform());
+		{
+			ZEMatrix4x4::Multiply(RenderCommand.BoneTransforms[I], Owner->GetBones()[(ZESize)LODResource->AffectingBoneIds[I]].GetVertexTransform(), this->OwnerMesh->GetLocalTransform());
+		}
 
 		RenderCommand.WorldMatrix = Owner->GetWorldTransform();
 	}
 	else
+	{
 		RenderCommand.WorldMatrix = OwnerMesh->GetWorldTransform();
+	}
 
 	RenderCommand.Order = DistanceSquare;
 
@@ -94,7 +98,7 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	RenderCommand.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();
 	RenderCommand.PrimitiveCount = Skinned ? LODResource->SkinnedVertices.GetCount() / 3: LODResource->Vertices.GetCount() / 3;
 	RenderCommand.VertexDeclaration = Skinned ? ZESkinnedModelVertex::GetVertexDeclaration() : ZEModelVertex::GetVertexDeclaration();
-	RenderCommand.Material = Owner->GetModelResource()->Materials[LODResource->MaterialId];
+	RenderCommand.Material = Owner->GetModelResource()->Materials[(ZESize)LODResource->MaterialId];
 }
 
 void ZEModelMeshLOD::Deinitialize()

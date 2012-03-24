@@ -51,10 +51,11 @@ enum ZEWindowType
 class ZEWindow
 {
 	protected:
+		void*					WindowHandle;
 		ZEInt					WindowPositionLeft, WindowPositionTop;
 		ZEInt					WindowWidth, WindowHeight;
 		ZEWindowType			WindowType;
-		void*					WindowHandle;
+		
 		bool					MouseCursorVisibility;
 		bool					MouseCursorLockEnabled;
 

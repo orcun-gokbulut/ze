@@ -67,7 +67,7 @@ bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Ele
 	for (ZESize I = 0; I < ElementCount; I++)
 	{
 		D3DElements[I].Stream = 0;
-		D3DElements[I].Offset = VertexSize;
+		D3DElements[I].Offset = (WORD)VertexSize;
 		D3DElements[I].UsageIndex = Elements[I].Index;
 		D3DElements[I].Method = D3DDECLMETHOD_DEFAULT;
 		switch (Elements[I].Semantic)

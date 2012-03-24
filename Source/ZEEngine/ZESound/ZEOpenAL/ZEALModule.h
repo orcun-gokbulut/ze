@@ -73,7 +73,7 @@ class ZEALModule : public ZESoundModule
 		ZEUInt									TypeVolumes[ZE_SS_MAX_TYPE];
 
 		bool									StreamingDisabled;
-		ZEUInt									MaxBufferSize;
+		ZESize									MaxBufferSize;
 
 		ZEALListener*							ActiveListener;
 		ZESmartArray<ZEALListener*>				Listeners;

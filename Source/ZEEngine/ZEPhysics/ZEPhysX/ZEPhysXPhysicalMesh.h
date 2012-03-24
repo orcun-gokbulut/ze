@@ -58,7 +58,7 @@ class ZEPhysXPhysicalMesh : public ZEPhysicalMesh, private ZEPhysXComponentBase
 		NxActorDesc							ActorDesc;
 		NxTriangleMeshShapeDesc				TriangleMeshShapeDesc;	
 
-		ZEUInt32								CollisionFlags;
+		ZEUInt32							CollisionFlags;
 		ZEPhysicalCollisionEventArgument	CollisionCallback;
 
 		ZEVector3							Scale;
@@ -90,9 +90,9 @@ class ZEPhysXPhysicalMesh : public ZEPhysicalMesh, private ZEPhysXComponentBase
 		virtual void						SetSkinWidth(float Width);
 		virtual float						GetSkinWidth() const;
 
-		virtual bool						SetData(const ZEVector3* Vertices, ZESize VertexCount, 
-													const ZEPhysicalTriangle* Triangles, ZESize PolygonCount, 
-													const ZEPhysicalMaterial* Materials, ZESize MaterialCount);
+		virtual bool						SetData(const ZEVector3* Vertices, ZEUInt VertexCount, 
+													const ZEPhysicalTriangle* Triangles, ZEUInt PolygonCount, 
+													const ZEPhysicalMaterial* Materials, ZEUInt MaterialCount);
 
 		virtual void						SetCollisionCallbackFlags(ZEUInt32 CollisionCallbackFlags);
 		virtual ZEUInt32						GetCollisionCallbackFlags();

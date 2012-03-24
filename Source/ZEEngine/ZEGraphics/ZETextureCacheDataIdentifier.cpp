@@ -133,9 +133,8 @@ bool ZETextureCacheDataIdentifier::Equal(ZEFile* File) const
 		return false;
 	}
 
-	// Burda sorun olabilir
-	ZEUInt I = 0;
-	ZEUInt StringLenght = strlen(ItemNameBuffer);
+	ZESize I = 0;
+	ZESize StringLenght = strlen(ItemNameBuffer);
 	while (I < StringLenght)
 	{
 		if(ItemNameBuffer[I] != ItemName[I])

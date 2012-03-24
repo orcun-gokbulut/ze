@@ -79,6 +79,7 @@ class ZEPhysicalShape
 		ZEPhysicalMaterial*				GetMaterial();
 
 										ZEPhysicalShape();
+		virtual							~ZEPhysicalShape();
 };
 
 class  ZEPhysicalBoxShape : public  ZEPhysicalShape

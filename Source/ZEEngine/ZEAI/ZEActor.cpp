@@ -190,10 +190,14 @@ void ZEActor::Tick(float ElapsedTime)
 			}
 		}
 		if (LinearAcceleration.LengthSquare() < MinLinearAcceleration * MinLinearAcceleration)
+		{
 			LinearAcceleration = ZEVector3::Zero;
+		}
 
 		if (ZEMath::Abs(AngularAcceleration) < MinAngularAcceleration)
+		{
 			AngularAcceleration = 0.0f;
+		}
 
 		if (!PriorityLinearSteeringDone && PriorityLinearAcceleration.LengthSquare() > GetMaxLinearAcceleration() * GetMaxLinearAcceleration() * 0.1f)
 		{
@@ -218,7 +222,9 @@ void ZEActor::Tick(float ElapsedTime)
 	}
 
 	if (AngularAcceleration > GetMaxAngularAcceleration() || AngularAcceleration < -GetMaxAngularAcceleration())
+	{
 		AngularAcceleration = ZEMath::Sign(AngularAcceleration) * GetMaxAngularAcceleration();
+	}
 
 	ZEVector3 LinearVelocity = GetLinearVelocity();
 	float AngularVelocity = GetAngularVelocity();
@@ -233,9 +239,13 @@ void ZEActor::Tick(float ElapsedTime)
 	}
 	
 	if (AngularVelocity > MaxAngularVelocity)
+	{
 		AngularVelocity = MaxAngularVelocity;
+	}
 	else if (AngularVelocity < -MaxAngularVelocity)
+	{
 		AngularVelocity = -MaxAngularVelocity;
+	}
 
 
 	ZEVector3 Position = GetPosition();
@@ -256,20 +266,20 @@ void ZEActor::Tick(float ElapsedTime)
 
 ZEActor::ZEActor()
 {
-	static ZEInt Index = 0;
-	Rotation2D = 0.0f;
-	MinLinearAcceleration = 0.01;
-	MinAngularAcceleration = 0.01;
-	MaxAngularVelocity = ZE_PI_2;
-	MaxLinearVelocity = 1.0f;
-	LinearVelocity = ZEVector3::Zero;
-	AngularVelocity = 0.0f;
-	LinearAcceleration = ZEVector3::Zero;
-	AngularAcceleration = 0.0f;
+	static ZEInt Index		= 0;
+	Rotation2D				= 0.0f;
+	MinLinearAcceleration	= 0.01f;
+	MinAngularAcceleration	= 0.01f;
+	MaxAngularVelocity		= ZE_PI_2;
+	MaxLinearVelocity		= 1.0f;
+	LinearVelocity			= ZEVector3::Zero;
+	AngularVelocity			= 0.0f;
+	LinearAcceleration		= ZEVector3::Zero;
+	AngularAcceleration		= 0.0f;
 
-	MaxAngularAcceleration = 1.0f;
-	MaxLinearAcceleration = 1.0f;
-	Radius = 1.0f;
+	MaxAngularAcceleration	= 1.0f;
+	MaxLinearAcceleration	= 1.0f;
+	Radius					= 1.0f;
 }
 
 ZEActor::~ZEActor()

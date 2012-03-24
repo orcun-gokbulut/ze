@@ -378,11 +378,13 @@ ZESteeringOutput ZESeperateSteering::Process(float ElapsedTime)
 
 		if (Distance < Treshold + GetOwner()->GetRadius() + GetTarget()->GetRadius())
 		{
-			Direction /= Distance + 0.0001;
+			Direction /= Distance + 0.0001f;
 
 			Distance -= GetOwner()->GetRadius() + GetTarget()->GetRadius();
 			if (Distance < 0.0f)
+			{
 				Distance = 0.0001f;
+			}
 
 			Output.LinearAcceleration = Direction * ZEMath::Min(DecayCoefficient / (Distance * Distance), GetOwner()->GetMaxLinearAcceleration());
 		}
@@ -395,11 +397,13 @@ ZESteeringOutput ZESeperateSteering::Process(float ElapsedTime)
 		
 		if (Distance < Treshold + GetOwner()->GetRadius() + AvoidedActors[I]->GetRadius())
 		{
-			Direction /= Distance + 0.0001;
+			Direction /= Distance + 0.0001f;
 			
 			Distance -= GetOwner()->GetRadius() + AvoidedActors[I]->GetRadius();
 			if (Distance < 0.0f)
+			{
 				Distance = 0.0001f;
+			}
 
 			Output.LinearAcceleration += Direction * ZEMath::Min(DecayCoefficient / (Distance * Distance), GetOwner()->GetMaxLinearAcceleration());
 		}
@@ -427,7 +431,9 @@ ZESteeringOutput ZEFrictionSteering::Process(float ElapsedTime)
 	ZESteeringOutput Output;
 
 	if (GetOwner()->GetLinearVelocity().LengthSquare() != 0)
+	{
 		Output.LinearAcceleration = -GetOwner()->GetLinearVelocity().Normalize() * Friction * GetOwner()->GetMaxLinearAcceleration();
+	}
 
 	Output.AngularAcceleration = ZEMath::Sign(GetOwner()->GetAngularVelocity()) * Friction * GetOwner()->GetMaxAngularAcceleration();
 	

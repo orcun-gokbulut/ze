@@ -362,6 +362,8 @@ bool ZEPortalMap::GenerateViewVolume(ZEViewFrustum& NewViewVolume, const ZEPorta
 
 		return true;
 	}
+
+	return false;
 }
 
 void ZEPortalMap::CullPortal(ZEPortalMapDoor* Door, ZEDrawParameters* DrawParameters, ZEViewVolume* ViewVolume)

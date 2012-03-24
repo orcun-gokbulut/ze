@@ -318,7 +318,7 @@ void ZEPhysXPhysicalWorld::Process(float ElapsedTime)
 
 	Scene->simulate(ElapsedTime);
 
-	for (ZESize I = 0; I < TransformCount; I++)
+	for (ZESize I = 0; I < (ZESize)TransformCount; I++)
 	{
 		if (ActiveTransforms[I].userData != NULL)
 		{

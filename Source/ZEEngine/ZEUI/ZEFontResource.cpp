@@ -47,7 +47,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	ZEUInt ConstLength = strlen("resources\\") - 1;
+	ZESize ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -74,11 +74,15 @@ ZEFontResource::ZEFontResource()
 
 ZEFontResource::~ZEFontResource()
 {
-	for (ZEUInt I = 0; I < Materials.GetCount(); I++)
+	for (ZESize I = 0; I < Materials.GetCount(); I++)
+	{
 		Materials[I]->Destroy();
+	}
 
-	for (ZEUInt I = 0; I < TextureResources.GetCount(); I++)
+	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
+	{
 		TextureResources[I]->Release();
+	}
 }
 
 const char* ZEFontResource::GetResourceType() const
@@ -189,10 +193,10 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 
 	ZEFontResource* NewResource = new ZEFontResource();
 	NewResource->SetFileName(ResourceFile->GetFilePath());
-	NewResource->TextureResources.SetCount(FileHeader.TextureCount);
-	NewResource->Materials.SetCount(FileHeader.TextureCount);
+	NewResource->TextureResources.SetCount((ZESize)FileHeader.TextureCount);
+	NewResource->Materials.SetCount((ZESize)FileHeader.TextureCount);
 
-	for (ZESize I = 0; I < FileHeader.TextureCount; I++)
+	for (ZESize I = 0; I < (ZESize)FileHeader.TextureCount; I++)
 	{
 		ZEUInt32 FileCursor, TextureFileSize;
 		
@@ -224,8 +228,8 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 	for (ZESize I = 0; I < ZE_FONT_FILE_CHARACTER_COUNT; I++)
 	{
 		NewResource->Characters[I].CoordinateRectangle = FileHeader.Characters[I].Coordinates;
-		NewResource->Characters[I].Texture = NewResource->TextureResources[FileHeader.Characters[I].TextureId]->GetTexture();
-		NewResource->Characters[I].Material = NewResource->Materials[FileHeader.Characters[I].TextureId];
+		NewResource->Characters[I].Texture = NewResource->TextureResources[(ZESize)FileHeader.Characters[I].TextureId]->GetTexture();
+		NewResource->Characters[I].Material = NewResource->Materials[(ZESize)FileHeader.Characters[I].TextureId];
 	}
 
 	zeLog("Font file \"%s\" has been loaded.", ResourceFile->GetFilePath().GetValue());

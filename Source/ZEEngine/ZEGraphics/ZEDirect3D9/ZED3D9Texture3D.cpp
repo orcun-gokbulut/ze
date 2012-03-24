@@ -77,15 +77,15 @@ bool ZED3D9Texture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt L
 	}
 
 	this->PixelFormat	= PixelFormat;
-	this->LevelCount	= LevelCount;
+	this->LevelCount		= LevelCount;
 	this->Depth			= Depth;
 	this->Width			= Width;
-	this->Height		= Height;
+	this->Height			= Height;
 	
 	return true;
 }
 
-void ZED3D9Texture3D::Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZESize Level)
+void ZED3D9Texture3D::Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt Level)
 {
 	HRESULT Hr;
 	
@@ -99,8 +99,8 @@ void ZED3D9Texture3D::Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, 
 	}
 
 	*Buffer = Box.pBits;
-	*RowPitch = Box.RowPitch;
-	*SlicePitch = Box.SlicePitch;
+	*RowPitch = (ZESize)Box.RowPitch;
+	*SlicePitch = (ZESize)Box.SlicePitch;
 }
 
 void ZED3D9Texture3D::Unlock(ZEUInt Level)

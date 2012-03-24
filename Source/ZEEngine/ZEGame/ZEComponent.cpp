@@ -95,9 +95,13 @@ const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 			ZEMatrix4x4::Multiply(((ZEComponent*)this)->WorldTransform, Owner->GetWorldTransform(), GetLocalTransform());
 			((ZEComponent*)this)->DirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
 		}
+
+		return WorldTransform;
 	}
 	else
+	{
 		return GetLocalTransform();
+	}
 }
 
 const ZEMatrix4x4& ZEComponent::GetLocalTransform() const 

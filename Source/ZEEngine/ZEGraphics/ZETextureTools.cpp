@@ -179,7 +179,7 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 	}
 }
 
-void ZETextureTools::CompressTexture(void* DestinationData, ZEUInt DestinationPitch, void* SourceData, ZEUInt	SourcePitch, ZEUInt SourceWidth, ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions)
+void ZETextureTools::CompressTexture(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions)
 {
 	ATI_TC_FORMAT	Format;
 	ATI_TC_Speed	Speed;
@@ -228,7 +228,7 @@ void ZETextureTools::CompressTexture(void* DestinationData, ZEUInt DestinationPi
 	srcTexture.dwSize		= sizeof(srcTexture);
 	srcTexture.dwWidth		= SourceWidth;
 	srcTexture.dwHeight		= SourceHeight;
-	srcTexture.dwPitch		= SourcePitch;
+	srcTexture.dwPitch		= (ATI_TC_DWORD)SourcePitch;
 	srcTexture.format		= ATI_TC_FORMAT_ARGB_8888;
 	srcTexture.pData		= (ATI_TC_BYTE*)SourceData;
 	srcTexture.dwDataSize	= ATI_TC_CalculateBufferSize(&srcTexture);
@@ -237,7 +237,7 @@ void ZETextureTools::CompressTexture(void* DestinationData, ZEUInt DestinationPi
 	destTexture.dwSize		= sizeof(destTexture);
 	destTexture.dwWidth		= SourceWidth;
 	destTexture.dwHeight	= SourceHeight;
-	destTexture.dwPitch		= DestinationPitch;
+	destTexture.dwPitch		= (ATI_TC_DWORD)DestinationPitch;
 	destTexture.format		= Format;
 	destTexture.pData		= (ATI_TC_BYTE*)DestinationData;
 	destTexture.dwDataSize	= ATI_TC_CalculateBufferSize(&destTexture);
@@ -251,7 +251,7 @@ void ZETextureTools::CompressTexture(void* DestinationData, ZEUInt DestinationPi
 	ATI_TC_ConvertTexture(&srcTexture, &destTexture, &options, NULL, NULL, NULL);
 }
 
-void ZETextureTools::DownSample2x(void* DestinationData, ZEUInt DestinationPitch, void* SourceData, ZEUInt SourcePitch, ZEUInt SourceWidth, ZEUInt SourceHeight, bool UseGpu)
+void ZETextureTools::DownSample2x(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, bool UseGpu)
 {
 	// Check width height
 	if(SourceWidth <= 1 || SourceHeight <= 1)
@@ -279,9 +279,9 @@ void ZETextureTools::DownSample2x(void* DestinationData, ZEUInt DestinationPitch
 			ZEUInt8 Green;
 		};
 
-		for (ZESize y = 0; y < DestinationHeight; y++)
+		for (ZESize y = 0; y < (ZESize)DestinationHeight; y++)
 		{
-			for (ZESize x = 0; x < DestinationWidth; x++)
+			for (ZESize x = 0; x < (ZESize)DestinationWidth; x++)
 			{
 				ZEColorARGB* Source = (ZEColorARGB*)((ZEUInt8*)SourceData + SourcePitch * y * 2 + x * 8);
 
@@ -319,34 +319,8 @@ void ZETextureTools::DownSample2x(void* DestinationData, ZEUInt DestinationPitch
 	}	
 }
 
-// Can be used to copy a image buffer to another
-// Can be used for getting a portion of a image ex: a face of cube map
-void ZETextureTools::CopyTextureRegion(void* DestData, ZEUInt DestPitch, ZEUInt DestX, ZEUInt DestY, void *SourceData, ZEUInt SourcePitch, ZEUInt SourceBitsPP, ZEUInt SourceX, ZEUInt SourceY, ZEUInt CopyWidth, ZEUInt CopyHeight)
-{
-	ZEUInt SourceBytesPP = SourceBitsPP / 8;
-
-	BYTE* DestRegion	= (BYTE*)DestData + DestPitch * DestY + DestX * SourceBytesPP;
-	BYTE* SourceRegion	= (BYTE*)SourceData + SourcePitch * SourceY + SourceX * SourceBytesPP;
-
-	for(ZEUInt I = 0; I < CopyHeight; I++)
-	{
-		memcpy(DestRegion, SourceRegion, CopyWidth * SourceBytesPP);
-		
-		DestRegion += DestPitch;
-		SourceRegion += SourcePitch;
-	}
-}
-
-void ZETextureTools::CopyTexture(void* DestData, ZEUInt DestPitch, void* SourceData, ZEUInt SourcePitch, ZEUInt RowSize, ZEUInt RowCount)
-{
-	for (ZEUInt I = 0; I < RowCount; I++)
-	{
-		memcpy((unsigned char*)DestData + I * DestPitch, (unsigned char*)SourceData + SourcePitch, RowSize);
-	}
-}
-
 // Takes average of two uncompressed image which have same dimensions
-void ZETextureTools::Average(void* DestinationData, const ZEUInt DestinationPitch, const void* SourceData1, const ZEUInt SourcePitch1, const ZEUInt SourceWidth1, const ZEUInt SourceHeight1, const void* SourceData2, const ZEUInt SourcePitch2, const ZEUInt SourceWidth2, const ZEUInt SourceHeight2)
+void ZETextureTools::Average(void* DestinationData, const ZESize DestinationPitch, const void* SourceData1, const ZESize SourcePitch1, const ZEUInt SourceWidth1, const ZEUInt SourceHeight1, const void* SourceData2, const ZESize SourcePitch2, const ZEUInt SourceWidth2, const ZEUInt SourceHeight2)
 {
 	if (SourceHeight1 != SourceHeight2 || SourceWidth1 != SourceWidth2)
 	{
@@ -362,9 +336,9 @@ void ZETextureTools::Average(void* DestinationData, const ZEUInt DestinationPitc
 		ZEUInt8 Green;
 	};
 
-	for (ZESize y = 0; y < SourceHeight1; y++)
+	for (ZESize y = 0; y < (ZESize)SourceHeight1; y++)
 	{
-		for (ZESize x = 0; x < SourceWidth1; x++)
+		for (ZESize x = 0; x < (ZESize)SourceWidth1; x++)
 		{
 			ZEColorARGB* Source1 = (ZEColorARGB*)((ZEUInt8*)SourceData1 + SourcePitch1 * y + x * 4);
 			ZEColorARGB* Source2 = (ZEColorARGB*)((ZEUInt8*)SourceData2 + SourcePitch2 * y + x * 4);

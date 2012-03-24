@@ -99,8 +99,8 @@ bool ZEParticleRenderer::GetParticlesLocal() const
 
 void ZEParticleRenderer::SetParticleCount(ZEUInt Count)
 {
-	Particles.Resize(Count);
-	SortTempArray.Resize(Count);
+	Particles.Resize((ZESize)Count);
+	SortTempArray.Resize((ZESize)Count);
 }
 
 void ZEParticleRenderer::SetMaterial(ZEMaterial* Material)

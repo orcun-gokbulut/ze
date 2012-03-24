@@ -297,8 +297,12 @@ const char* KeyNames[ZE_MAX_KEYIDNAME][2] =
 unsigned char zeGetKeyboardButtonId(char* KeyShortName)
 {
 	for (ZESize I = 0; I < ZE_MAX_KEYIDNAME; I++)
+	{
 		if (stricmp(KeyNames[I][0], KeyShortName) == 0)
-			return I;
+		{
+			return (ZEUInt8)I;
+		}
+	}
 	return 0;
 }
 

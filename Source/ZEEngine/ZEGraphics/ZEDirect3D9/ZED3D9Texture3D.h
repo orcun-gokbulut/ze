@@ -58,7 +58,7 @@ class ZED3D9Texture3D : public ZETexture3D, public ZED3D9ComponentBase
 		virtual bool					DeviceRestored();
 
 		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt MipLevel, ZETexturePixelFormat PixelFormat);
-		virtual void					Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZESize Level);
+		virtual void					Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt Level);
 		virtual void					Unlock(ZEUInt Level);
 		virtual void					Release();
 
