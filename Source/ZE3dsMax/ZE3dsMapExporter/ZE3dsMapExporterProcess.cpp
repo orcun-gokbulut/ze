@@ -118,7 +118,7 @@ bool GetProperty<bool>(IExportEntity* Object, PropType Type, const char* Propert
 	{
 		if (Prop->GetPropertyValue(Temp))
 		{
-			Value = Temp;
+			Value = Temp == 0;
 			return true;
 		}
 		else
@@ -189,17 +189,17 @@ bool ZE3dsMapExporter::GetRelativePath(const char* RealPath, char* RelativePath)
 
 ZEInt ZE3dsMapExporter::ProcessFaceMaterial(IGameMaterial* Material)
 {
-	for (ZEInt I = 0; I < Materials.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)
 		if (Materials[I] == Material)
-			return I;
+			return (ZEInt)I;
 	Materials.Append(1, &Material);
 	return Materials.Count() - 1;
 }
 
 ZEInt ZE3dsMapExporter::FindPortalIndex(IGameNode* Node)
 {
-	for (ZEInt I = 0; I < Portals.Count(); I++)
-		if (Node == Portals[I]) return I;
+	for (ZESize I = 0; I < (ZESize)Portals.Count(); I++)
+		if (Node == Portals[I]) return (ZEInt)I;
 
 	return -1;
 }
@@ -212,12 +212,12 @@ bool ZE3dsMapExporter::ProcessDoors()
 	INode* PortalBNode;
 	bool IsOpen;
 	float PlaneWidth, PlaneLength;
-	for (ZEInt I = 0; I < Doors.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)Doors.Count(); I++)
 	{
 		IGameNode* CurrentNode = Doors[I];
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 
-		zepdLog("\tProcessing Portal Door \"%s\" (%d/%d)", CurrentNode->GetName(), I + 1, Doors.Count());
+		zepdLog("\tProcessing Portal Door \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Doors.Count());
 
 		GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Width", PlaneWidth);
 		GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Length", PlaneLength);
@@ -257,18 +257,18 @@ void ProcessPhysicalMesh(ZEMapFilePhysicalMesh* PhysicalMesh, IGameObject* Objec
 	IGameMesh* Mesh = (IGameMesh*)Object;
 	Mesh->InitializeData();
 	PhysicalMesh->Polygons.SetCount(Mesh->GetNumberOfFaces());
-	for (ZEInt I = 0; I < Mesh->GetNumberOfFaces(); I++)
+	for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
 	{
-		FaceEx* Face = Mesh->GetFace(I);
+		FaceEx* Face = Mesh->GetFace((ZEInt)I);
 		PhysicalMesh->Polygons[I].Indices[0] = Face->vert[0]; 
 		PhysicalMesh->Polygons[I].Indices[1] = Face->vert[1]; 
 		PhysicalMesh->Polygons[I].Indices[2] = Face->vert[2]; 
 	}
 
 	PhysicalMesh->Vertices.SetCount(Mesh->GetNumberOfVerts());
-	for (ZEInt I = 0; I < Mesh->GetNumberOfVerts(); I++)
+	for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfVerts(); I++)
 	{
-		Point3 Vertex =	Mesh->GetVertex(I, false);
+		Point3 Vertex =	Mesh->GetVertex((ZEInt)I, false);
 		PhysicalMesh->Vertices[I] = MAX_TO_ZE(Vertex);
 	}
 }
@@ -276,11 +276,11 @@ void ProcessPhysicalMesh(ZEMapFilePhysicalMesh* PhysicalMesh, IGameObject* Objec
 bool ZE3dsMapExporter::ProcessPortals()
 {
 	zepdLog("Processing portals...");
-	Map.Portals.SetCount(Portals.Count());
-	for (ZEInt I = 0; I < Portals.Count(); I++)
+	Map.Portals.SetCount((ZESize)Portals.Count());
+	for (ZESize I = 0; I < (ZESize)Portals.Count(); I++)
 	{
 		IGameNode* CurrentNode = Portals[I];
-		zepdOutput("\tProcessing Portal \"%s\" (%d/%d)\r\n", CurrentNode->GetName(), I + 1, Portals.Count());
+		zepdOutput("\tProcessing Portal \"%s\" (%Iu/%d)\r\n", CurrentNode->GetName(), I + 1, Portals.Count());
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		ZEMapFilePortal* CurrentFilePortal = &Map.Portals[I];
 		bool PhysicalMeshEnabled, PhysicalMeshUseSelf;
@@ -334,21 +334,21 @@ bool ZE3dsMapExporter::ProcessPortals()
 
 		ZEMatrix3x3::Transpose(WorldInvTrspsMatrix, Temp3x3);
 
-		for (ZEInt I = 0; I < Mesh->GetNumberOfFaces(); I++)
+		for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
 		{
 			FaceEx* Face;
-			Face = Mesh->GetFace(I);
-			if (Mesh->GetMaterialFromFace(I) == NULL)
+			Face = Mesh->GetFace((ZEInt)I);
+			if (Mesh->GetMaterialFromFace((ZEInt)I) == NULL)
 			{
 				zepdError("Face %d of portal \"%s\" does not have valid material.", I, CurrentNode->GetName());
 				return false;
 			}
 
-			CurrentFilePortal->Polygons[I].Material = ProcessFaceMaterial(Mesh->GetMaterialFromFace(I));
-			for (ZEInt N = 0; N < 3; N++)
-			{	
+			CurrentFilePortal->Polygons[I].Material = ProcessFaceMaterial(Mesh->GetMaterialFromFace((ZEInt)I));
+			for (ZESize N = 0; N < 3; N++)
+			{
 				ZEMapFileVertex* Vertex = &CurrentFilePortal->Polygons[I].Vertices[N];
-				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal(I, N);
+				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt)I, (ZEInt)N);
 
 				Point3 Temp;
 				Mesh->GetVertex(Face->vert[N], Temp, false);
@@ -395,12 +395,12 @@ bool ZE3dsMapExporter::ProcessPortals()
 bool ZE3dsMapExporter::ProcessMaterials()
 {
 	zepdLog("Processing materials...");
-	Map.Materials.SetCount(Materials.Count());
-	for (ZEInt I = 0; I < Materials.Count(); I++)
+	Map.Materials.SetCount((ZESize)Materials.Count());
+	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)
 	{
 		IGameMaterial* NodeMaterial = Materials[I];
 
-		zepdLog("\tProcessing material \"%s\" (%d/%d)", NodeMaterial->GetMaterialName(), I + 1, Materials.Count());
+		zepdLog("\tProcessing material \"%s\" (%Iu/%d)", NodeMaterial->GetMaterialName(), I + 1, Materials.Count());
 		ZEMapFileMaterial* CurrentMaterial = &Map.Materials[I];
 		ZeroMemory(CurrentMaterial, sizeof(ZEMapFileMaterial));
 
@@ -425,7 +425,7 @@ bool ZE3dsMapExporter::ProcessMaterials()
 
 		for (ZEInt N = 0; N < NodeMaterial->GetNumberOfTextureMaps(); N++)
 		{
-			char RelativePath[ZE_MPFL_MAX_FILENAME_SIZE];
+			// char RelativePath[ZE_MPFL_MAX_FILENAME_SIZE];
 
 			IGameTextureMap* CurrentTexture = NodeMaterial->GetIGameTextureMap(N);
 			switch(CurrentTexture->GetStdMapSlot())
@@ -541,7 +541,7 @@ bool ZE3dsMapExporter::ProcessScene()
 	ZESize EntityNodeCount = 0;
 	Tab<IGameNode*> Nodes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
 
-	for (ZEInt I = 0; I < Nodes.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)Nodes.Count(); I++)
 	{
 		IGameNode* CurrentNode = Nodes[I];;
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();

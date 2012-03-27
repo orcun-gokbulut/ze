@@ -512,7 +512,7 @@ bool ZEFileCache::AddData(const ZECacheDataIdentifier* Identifier, const void* D
 	// Write data
 	if (File.Write(Data, Size, 1) != 1)
 	{
-		zeAssert(true, "Can not write. File: \"%s\".", File.GetFilePath().GetValue());
+		zeAssert(true, "Can not write. File: \"%s\".", File.GetFilePath().ToCString());
 		return false;
 	}
 	

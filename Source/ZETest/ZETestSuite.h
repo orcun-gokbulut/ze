@@ -38,6 +38,7 @@
 #define __ZE_TEST_SUITE_H__
 
 #include "ZETypes.h"
+
 class ZETestItem;
 enum ZETestResult;
 
@@ -46,10 +47,10 @@ class ZETestSuiteItem
 	private:
 		char				Name[255];
 		ZETestItem*			Tests[65536];
-		ZESize				TotalTestCount;
+		ZEUInt				TotalTestCount;
 		ZETestResult		Result;
 		float				ElapsedTime;
-		ZEInt					PassedTestCount;
+		ZEUInt				PassedTestCount;
 
 	public:
 		const char*			GetName();
@@ -61,9 +62,9 @@ class ZETestSuiteItem
 		ZETestResult		GetResult();
 		float				GetElapsedTime();
 
-		ZEInt					GetTotalTestCount();
-		ZEInt					GetFailedTestCount();
-		ZEInt					GetPassedTestCount();
+		ZEUInt				GetTotalTestCount();
+		ZEUInt				GetFailedTestCount();
+		ZEUInt				GetPassedTestCount();
 
 							ZETestSuiteItem(const char* SuiteName);
 };

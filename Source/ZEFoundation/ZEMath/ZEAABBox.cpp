@@ -44,6 +44,10 @@
 #include <float.h>
 #include "ZEMath/ZEMath.h"
 
+#define		X_AXIS		(ZEUInt)0x01
+#define		Y_AXIS		(ZEUInt)0x02
+#define		Z_AXIS		(ZEUInt)0x04
+
 ZEVector3 ZEAABBox::GetCenter() const
 {
 	ZEVector3 Center;
@@ -54,7 +58,7 @@ ZEVector3 ZEAABBox::GetCenter() const
 
 ZEVector3 ZEAABBox::GetVertex(ZEUInt Index) const
 {
-	return  ZEVector3(Index & 0x01 ? Max.x : Min.x, Index & 0x02 ? Max.y : Min.y, Index & 0x04 ? Max.z : Min.z);
+	return  ZEVector3(Index & X_AXIS ? Max.x : Min.x, Index & Y_AXIS ? Max.y : Min.y, Index & Z_AXIS ? Max.z : Min.z);
 }
 
 float ZEAABBox::GetLenght() const

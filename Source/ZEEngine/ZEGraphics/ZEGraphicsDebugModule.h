@@ -40,6 +40,7 @@
 #include "ZECore/ZEApplicationModule.h"
 #include "ZEInput/ZEInputMap.h"
 
+
 class ZEPlayer;
 class ZEPointLight;
 class ZEOmniProjectiveLight;
@@ -53,6 +54,7 @@ class ZESkyDome;
 class ZEUITextControl;
 class ZECloud;
 class ZEMoon;
+class ZEPlayerFreeSteering;
 
 class ZEGraphicsDebugModule : public ZEApplicationModule
 {
@@ -60,7 +62,8 @@ class ZEGraphicsDebugModule : public ZEApplicationModule
 		ZEInputMap					InputMap;
 
 		ZEModel*					Model;
-		ZEPlayer*					Player;		
+		ZEPlayer*					Player;
+		ZEPlayerFreeSteering*		Steering;
 		ZEPointLight*				PointLight1;
 		ZEPointLight*				PointLight2;
 		ZEPointLight*				PointLight3;

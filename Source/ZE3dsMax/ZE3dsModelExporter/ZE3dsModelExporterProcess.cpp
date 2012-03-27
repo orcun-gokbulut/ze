@@ -36,9 +36,12 @@
 #include "ZETypes.h"
 #include "ZETOutput.h"
 #include "ZE3dsModelExporter.h"
+#include "ZE3dsProgressDialog/ZE3dsProgressDialog.h"
 
 #include <IGame/IGameFx.h>
 #include <io.h>
+#include "IGame/IGameModifier.h"
+
 
 
 inline ZEVector2 MAX_TO_ZE(const Point2& Point)
@@ -149,7 +152,7 @@ bool GetProperty<bool>(IExportEntity* Object, PropType Type, const char* Propert
 			ZEInt Temp;
 			if (Prop->GetPropertyValue(Temp))
 			{
-				Value = Temp;
+				Value = Temp == 0;
 				return true;
 			}
 			else
@@ -223,17 +226,17 @@ bool ZEModelExporter::GetRelativePath(const char* RealPath, char* RelativePath)
 
 ZEInt ZEModelExporter::GetMeshId(IGameNode* Node)
 {
-	for (ZEInt I = 0; I < ProcessedMasterMeshes.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)ProcessedMasterMeshes.Count(); I++)
 		if (ProcessedMasterMeshes[I]->GetNodeID() == Node->GetNodeID())
-			return I;
+			return (ZEInt)I;
 	return -1;
 }
 
 ZEInt ZEModelExporter::GetBoneId(IGameNode* Node)
 {
-	for (ZEInt I = 0; I < ProcessedBones.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)ProcessedBones.Count(); I++)
 		if (ProcessedBones[I]->GetNodeID() == Node->GetNodeID())
-			return I;
+			return (ZEInt)I;
 
 	return -1;
 }
@@ -272,9 +275,10 @@ ZEInt ZEModelExporter::ProcessMeshMaterial(IGameMaterial* Material)
 	if (Material == NULL)
 		return -1;
 
-	for (ZEInt I = 0; I < Materials.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)
 		if (Materials[I] == Material)
-			return I;
+			return (ZEInt)I;
+	
 	Materials.Append(1, &Material);
 	return Materials.Count() - 1;
 }
@@ -283,8 +287,8 @@ bool ZEModelExporter::ProcessMaterials()
 {
 	zepdLog("Processing materials...");
 
-	ModelFile.Materials.SetCount(Materials.Count());
-	for (ZEInt I = 0; I < Materials.Count(); I++)
+	ModelFile.Materials.SetCount((ZESize)Materials.Count());
+	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)
 	{
 		IGameMaterial* NodeMaterial = Materials[I];
 
@@ -441,9 +445,9 @@ void ZEModelExporter::ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode*
 	Shape->Type = ZE_PBST_CONVEX;
 
 	Shape->Convex.Vertices.SetCount(Mesh->GetNumberOfVerts());
-	for (ZEInt I = 0; I < Mesh->GetNumberOfVerts(); I++)
+	for (ZESize I = 0; I < Mesh->GetNumberOfVerts(); I++)
 	{
-		Point3 Vertex = Mesh->GetVertex(I, false) * WorldTransform;
+		Point3 Vertex = Mesh->GetVertex((ZEInt)I, false) * WorldTransform;
 		Shape->Convex.Vertices[I] = MAX_TO_ZE(Vertex);
 	}
 }
@@ -550,10 +554,10 @@ bool ZEModelExporter::ProcessPhysicalBody(IGameNode* Node, ZEModelFilePhysicalBo
 	IParamBlock2* ParamBlock = ShapesProp->GetMaxParamBlock2();
 	ZEInt ParamId = ParamBlock->IndextoID(ShapesProp->GetParamBlockIndex());
 	PhysicalBody->Shapes.SetCount(ParamBlock->Count(ParamId));
-	for (ZEInt I = 0; I < ParamBlock->Count(ParamId); I++)
+	for (ZESize I = 0; I < (ZESize)ParamBlock->Count(ParamId); I++)
 	{
 		const char* Type;
-		IGameNode* PhysicalShapeNode = Scene->GetIGameNode(ParamBlock->GetINode(ParamId, 0, I));
+		IGameNode* PhysicalShapeNode = Scene->GetIGameNode(ParamBlock->GetINode(ParamId, 0, (ZEInt)I));
 		if (PhysicalShapeNode == NULL || !GetProperty(PhysicalShapeNode->GetIGameObject(), IGAME_STRING_PROP, "ZEType", Type) || strcmp(Type, "PhysicalShape") != 0)
 		{
 			zepdError("Physical body shape is not a valid ZEPhysicalShapeAttribute. Array Index : %d, Shape Name : \"%s\".", I, (PhysicalShapeNode != NULL ? PhysicalShapeNode->GetName() : "NULL"));
@@ -771,7 +775,7 @@ bool ZEModelExporter::ProcessBone(IGameNode* Node)
 
 	if (CurrentBone->ParentBone != -1)
 	{
-		GMatrix Transform = Node->GetWorldTM() * ProcessedBones[CurrentBone->ParentBone]->GetWorldTM().Inverse();
+		GMatrix Transform = Node->GetWorldTM() * ProcessedBones[(ZESize)CurrentBone->ParentBone]->GetWorldTM().Inverse();
 		CurrentBone->RelativePosition = MAX_TO_ZE(Transform.Translation() * Node->GetWorldTM().Scaling());
 		CurrentBone->RelativeRotation = MAX_TO_ZE(Transform.Rotation());
 		CurrentBone->RelativeScale = MAX_TO_ZE(Transform.Scaling());
@@ -795,13 +799,13 @@ bool ZEModelExporter::ProcessBones()
 	zepdLog("Processing bones...");
 	Tab<IGameNode*> Nodes = Scene->GetIGameNodeByType(IGameObject::IGAME_BONE);
 	const char* Type;
-	for (ZEInt I = 0; I < Nodes.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)Nodes.Count(); I++)
 	{
 		Type = NULL;
 		if (GetProperty(Nodes[I]->GetIGameObject(), IGAME_STRING_PROP, "ZEType", Type) && strcmp(Type, "Bone") == 0)
 		{
 			bool Found = false;
-			for (ZEInt N = 0; N < ProcessedBones.Count(); N++)
+			for (ZESize N = 0; N < (ZESize)ProcessedBones.Count(); N++)
 			{
 				if (Nodes[I]->GetNodeID() == ProcessedBones[N]->GetNodeID())
 				{
@@ -814,7 +818,7 @@ bool ZEModelExporter::ProcessBones()
 		}
 	}
 
-	for (ZEInt I = 0; I < ProcessedBones.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)ProcessedBones.Count(); I++)
 		if (!ProcessBone(ProcessedBones[I]))
 			return false;
 
@@ -830,9 +834,9 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 	ZEMeshLod->MaterialId = ProcessMeshMaterial(Node->GetNodeMaterial());
 
 	if (!Mesh->IsObjectSkinned())
-		ZEMeshLod->Vertices.SetCount(Mesh->GetNumberOfFaces() * 3);
+		ZEMeshLod->Vertices.SetCount((ZESize)Mesh->GetNumberOfFaces() * 3);
 	else
-		ZEMeshLod->SkinnedVertices.SetCount(Mesh->GetNumberOfFaces() * 3);
+		ZEMeshLod->SkinnedVertices.SetCount((ZESize)Mesh->GetNumberOfFaces() * 3);
 
 	zepdLog("Processing vertices of mesh \"%s\". Polygon Count : %d, Vertex Count : %d.", Node->GetName(), Mesh->GetNumberOfFaces(), Mesh->GetNumberOfFaces() * 3);
 	Mesh->InitializeBinormalData();
@@ -854,20 +858,20 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 	bool GotError = false;
 	bool BoneCountWarning = false; 
 	ZEMeshLod->AffectingBoneIds.SetCount(0);
-	for (ZEInt I = 0; I < Mesh->GetNumberOfFaces(); I++)
+	for (ZESize I = 0; I < Mesh->GetNumberOfFaces(); I++)
 	{
 		FaceEx* Face;
-		Face = Mesh->GetFace(I);
+		Face = Mesh->GetFace((ZEInt)I);
 		if (!Mesh->IsObjectSkinned())
 		{
-			for (ZEInt N = 0; N < 3; N++)
+			for (ZESize N = 0; N < 3; N++)
 			{	
 				ZEModelFileVertex* Vertex = &ZEMeshLod->Vertices[3*I + N];
 
 				Vertex->Position = WorldTransform * MAX_TO_ZE(Mesh->GetVertex(Face->vert[N], true)); 
 				ZEMatrix4x4::Transform3x3(Vertex->Normal, WorldTransform, MAX_TO_ZE(Mesh->GetNormal(Face->norm[N], true)));
 
-				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal(I, N);
+				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt)I, (ZEInt)N);
 				ZEMatrix4x4::Transform3x3(Vertex->Tangent, WorldTransform, MAX_TO_ZE(Mesh->GetTangent(BinormalTangentIndex).Normalize()));
 				ZEMatrix4x4::Transform3x3(Vertex->Binormal, WorldTransform, MAX_TO_ZE(Mesh->GetBinormal(BinormalTangentIndex)));
 
@@ -877,14 +881,14 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 		}
 		else
 		{
-			for (ZEInt N = 0; N < 3; N++)
+			for (ZESize N = 0; N < 3; N++)
 			{
 				ZEModelFileSkinnedVertex* Vertex = &ZEMeshLod->SkinnedVertices[3*I + N];
 
 				Vertex->Position = WorldTransform * MAX_TO_ZE(Mesh->GetVertex(Face->vert[N], true)); 
 				ZEMatrix4x4::Transform3x3(Vertex->Normal, WorldTransform, MAX_TO_ZE(Mesh->GetNormal(Face->norm[N], true)));
 
-				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal(I, N);
+				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt)I, (ZEInt)N);
 				ZEMatrix4x4::Transform3x3(Vertex->Tangent, WorldTransform, MAX_TO_ZE(Mesh->GetTangent(BinormalTangentIndex).Normalize()));
 				ZEMatrix4x4::Transform3x3(Vertex->Binormal, WorldTransform, MAX_TO_ZE(Mesh->GetBinormal(BinormalTangentIndex)));
 
@@ -900,19 +904,19 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 				ZeroMemory(Vertex->BoneIndices, sizeof(unsigned char) * 4);
 				ZeroMemory(Vertex->BoneWeights, sizeof(float) * 4);
 
-				ZEInt BoneIndex = 0;
-				for (ZEInt M = 0; M < BoneCount; M++)
+				ZESize BoneIndex = 0;
+				for (ZESize M = 0; M < (ZESize)BoneCount; M++)
 				{
-					ZEInt BoneId = GetBoneId(Skin->GetIGameBone(Face->vert[N], M));
+					ZEInt BoneId = GetBoneId(Skin->GetIGameBone((ZEInt)Face->vert[N], (ZEInt)M));
 
 					if (BoneId == -1)
 					{
-						zepdError("Bone that is used for skinning does not have ZEBone attributes. Node Name : \"%s\". 3ds Max Vertex Id : %d. Bone Name : %s.", Node->GetName(), Face->vert[N],  Skin->GetIGameBone(Face->vert[N], M)->GetName());
+						zepdError("Bone that is used for skinning does not have ZEBone attributes. Node Name : \"%s\". 3ds Max Vertex Id : %d. Bone Name : %s.", Node->GetName(), Face->vert[N],  Skin->GetIGameBone((ZEInt)Face->vert[N], (ZEInt)M)->GetName());
 						GotError = true;
 						continue;
 					}
 
-					ZEInt AffectingBoneId = -1;
+					ZESSize AffectingBoneId = -1;
 					for (ZESize J = 0; J < ZEMeshLod->AffectingBoneIds.GetCount(); J++)
 					{
 						if (ZEMeshLod->AffectingBoneIds[J] == BoneId)
@@ -930,8 +934,8 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 							zepdWarning("Affecting bone count exceeds 57. Hardware accelerated skinning may not be posible. Node Name : \"%s\", Bone Count : %d.", Node->GetName(),  ZEMeshLod->AffectingBoneIds.GetCount());
 					}
 
-					float BoneWeight = Skin->GetWeight(Face->vert[N], M);
-					if (BoneWeight > 0.00001)
+					float BoneWeight = Skin->GetWeight(Face->vert[N], (ZEInt)M);
+					if (BoneWeight > 0.00001f)
 					{
 						if (BoneIndex >= 4)
 						{
@@ -1025,7 +1029,7 @@ bool ZEModelExporter::ProcessMeshes()
 	zepdLog("Processing Meshes...");
 	Scene_ = Scene;
 	Tab<IGameNode*> Nodes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
-	for (ZEInt I = 0; I < Nodes.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)Nodes.Count(); I++)
 	{
 		if (GetBoneId(Nodes[I]) == -1)
 			if (!ProcessMesh(Nodes[I]))
@@ -1040,20 +1044,22 @@ bool ZEModelExporter::ProcessAnimation()
 	Tab<IGameNode*> AnimationEnabledBones;
 	Tab<IGameNode*> AnimationEnabledMeshes;
 	GMatrix Matrix;
-	for (ZEInt I = 0; I < ProcessedMasterMeshes.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)ProcessedMasterMeshes.Count(); I++)
 	{
-		Matrix = ProcessedMasterMeshes[I]->GetWorldTM(I * TicksPerFrame);
+		Matrix = ProcessedMasterMeshes[I]->GetWorldTM((ZEInt)I * TicksPerFrame);
 		for (ZEInt N = 0; N < FrameCount; N++)
+		{
 			if (!(ProcessedMeshes[I]->GetWorldTM(N * TicksPerFrame) == Matrix))
 			{
 				AnimationEnabledMeshes.Append(1, &ProcessedMeshes[I]);
 				break;
 			}
+		}
 	}
 
-	for (ZEInt I = 0; I < ProcessedBones.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)ProcessedBones.Count(); I++)
 	{
-		Matrix = ProcessedBones[I]->GetWorldTM(I * TicksPerFrame);
+		Matrix = ProcessedBones[I]->GetWorldTM((ZEInt)I * TicksPerFrame);
 		for (ZEInt N = 0; N < FrameCount; N++)
 			if (!(ProcessedBones[I]->GetWorldTM(N * TicksPerFrame) == Matrix))
 			{
@@ -1065,11 +1071,11 @@ bool ZEModelExporter::ProcessAnimation()
 	ModelFile.Animations.SetCount(1);
 	ZEModelFileAnimation* CurrentAnimation = &ModelFile.Animations[0];
 	strncpy(CurrentAnimation->Name, ExporterOptions.AnimationName, ZE_MDLF_MAX_NAME_SIZE);
-	CurrentAnimation->Frames.SetCount(FrameCount);
+	CurrentAnimation->Frames.SetCount((ZESize)FrameCount);
 
 	zepdLog("Total Frame Count : %d", FrameCount);
 	zepdOutput("Processing Animation Frame: ");
-	for (ZEInt I = 0; I < FrameCount; I++)
+	for (ZESize I = 0; I < (ZESize)FrameCount; I++)
 	{
 		zepdOutput("%d ", I);
 		if (I % 20 == 0)
@@ -1077,22 +1083,22 @@ bool ZEModelExporter::ProcessAnimation()
 
 		ZEModelFileAnimationFrame* CurrentFrame = &CurrentAnimation->Frames[I];
 		ZEModelFileAnimationKey* Key;
-		CurrentFrame->BoneKeys.SetCount(AnimationEnabledBones.Count());
-		for (ZEInt N = 0; N < AnimationEnabledBones.Count(); N++)
+		CurrentFrame->BoneKeys.SetCount((ZESize)AnimationEnabledBones.Count());
+		for (ZESize N = 0; N < (ZESize)AnimationEnabledBones.Count(); N++)
 		{
 			Key = &CurrentFrame->BoneKeys[N];
 			Key->ItemId = GetBoneId(AnimationEnabledBones[N]);
-			if (ModelFile.Bones[Key->ItemId].ParentBone == -1)
+			if (ModelFile.Bones[(ZESize)Key->ItemId].ParentBone == -1)
 			{
-				GMatrix Matrix = AnimationEnabledBones[N]->GetWorldTM(I * TicksPerFrame);
+				GMatrix Matrix = AnimationEnabledBones[N]->GetWorldTM((ZEInt)I * TicksPerFrame);
 				Key->Position = MAX_TO_ZE(Matrix.Translation());
 				Key->Rotation = MAX_TO_ZE(Matrix.Rotation());
 				Key->Scale = MAX_TO_ZE(Matrix.Scaling());
 			}
 			else
 			{
-				GMatrix Matrix = AnimationEnabledBones[N]->GetWorldTM(I * TicksPerFrame) * 
-					ProcessedBones[ModelFile.Bones[Key->ItemId].ParentBone]->GetWorldTM(I * TicksPerFrame).Inverse();
+				GMatrix Matrix = AnimationEnabledBones[N]->GetWorldTM((ZEInt)I * TicksPerFrame) * 
+					ProcessedBones[(ZESize)ModelFile.Bones[(ZESize)Key->ItemId].ParentBone]->GetWorldTM((ZEInt)I * TicksPerFrame).Inverse();
 				//AnimationEnabledBones[N]->GetNodeParent()->GetWorldTM(I * TicksPerFrame).Inverse();
 				Key->Position = MAX_TO_ZE(Matrix.Translation());
 				Key->Rotation = MAX_TO_ZE(Matrix.Rotation());
@@ -1100,12 +1106,12 @@ bool ZEModelExporter::ProcessAnimation()
 			}
 		}
 
-		CurrentFrame->MeshKeys.SetCount(AnimationEnabledMeshes.Count());
-		for (ZEInt N = 0; N < AnimationEnabledMeshes.Count(); N++)
+		CurrentFrame->MeshKeys.SetCount((ZESize)AnimationEnabledMeshes.Count());
+		for (ZESize N = 0; N < (ZESize)AnimationEnabledMeshes.Count(); N++)
 		{
 			Key = &CurrentFrame->MeshKeys[N];
 			Key->ItemId = GetMeshId(AnimationEnabledMeshes[N]);
-			GMatrix Matrix = AnimationEnabledMeshes[N]->GetWorldTM(I * TicksPerFrame);
+			GMatrix Matrix = AnimationEnabledMeshes[N]->GetWorldTM((ZEInt)I * TicksPerFrame);
 			Key->Position = MAX_TO_ZE(Matrix.Translation());
 			Key->Rotation = MAX_TO_ZE(Matrix.Rotation());
 			Key->Scale = MAX_TO_ZE(Matrix.Scaling());

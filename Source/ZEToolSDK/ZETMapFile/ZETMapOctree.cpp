@@ -120,8 +120,8 @@ void GenerateOctreeNode(ZEMapFileOctree* Node, ZEInt MaxDepth, ZEArray<ZEMapFile
 	for (ZESize I = 0; I < Node->PolygonIds.GetCount(); I++)
 	{
 		AtLeft = AtRight = AtDown = AtUp = AtFront = AtBack = false;
-		Polygon = &(*Polygons)[Node->PolygonIds[I]];
-		for (ZEInt N = 0; N < 3; N++)
+		Polygon = &(*Polygons)[(ZESize)Node->PolygonIds[I]];
+		for (ZESize N = 0; N < 3; N++)
 		{
 
 			if (Polygon->Vertices[N].Position.x < PlaneX)
@@ -211,7 +211,7 @@ ZEMapFileOctree* ZEMapFileOctree::GenerateOctree(ZEArray<ZEMapFilePolygon>& Poly
 	Octree->BoundingBox = CalculateBoundingBox(Polygons);
 	Octree->PolygonIds.SetCount(Polygons.GetCount());
 	for(ZESize I = 0; I < Polygons.GetCount(); I++)
-		Octree->PolygonIds[I] = I;
+		Octree->PolygonIds[I] = (ZEUInt32)I;
 	
 	GenerateOctreeNode(Octree, MaxDepth, &Polygons);
 

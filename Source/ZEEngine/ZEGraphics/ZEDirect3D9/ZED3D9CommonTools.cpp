@@ -209,18 +209,20 @@ bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShade
 	D3DXMACRO Macros[33];
 	char ComponentTexts[32][26];
 
-	ZEInt ComponentCount = 0;
-	for (ZEInt I = 0; I < 32; I++)
-		if (Components & (1 << I))
+	ZESize ComponentCount = 0;
+	for (ZEUInt I = 0; I < 32; I++)
+	{
+		if ((ZEUInt)Components & (1 << I))
 		{
 			sprintf(ComponentTexts[ComponentCount], "ZE_SHADER_COMPONENT_%d", I);
 			Macros[ComponentCount].Name = ComponentTexts[ComponentCount];
 			Macros[ComponentCount].Definition = "";
 			ComponentCount++;
 		}
-		Macros[ComponentCount].Name = NULL;
-		Macros[ComponentCount].Definition = NULL;
-
+	}
+	
+	Macros[ComponentCount].Name = NULL;
+	Macros[ComponentCount].Definition = NULL;
 
 	if (D3DXCompileShaderFromFile(FileName, Macros, &D3DIncludeInterface, MainFunction, ShaderProfile, D3DXSHADER_PACKMATRIX_COLUMNMAJOR | ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{

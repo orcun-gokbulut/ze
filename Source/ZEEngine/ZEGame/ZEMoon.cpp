@@ -136,7 +136,7 @@ bool ZEMoon::Initialize()
 
 		MoonMaterial->MoonPhase				= MoonPhase;
 		MoonMaterial->MoonAmbientColor		= MoonAmbientColor;
-		MoonMaterial->MoonAmbientFactor	= MoonAmbientFactor;
+		MoonMaterial->MoonAmbientFactor		= MoonAmbientFactor;
 		MoonMaterial->MoonScale				= MoonScale;
 		MoonMaterial->MoonRotation			= MoonRotation;
 		MoonMaterial->MoonDirection			= MoonDirection;
@@ -190,9 +190,9 @@ void ZEMoon::Draw(ZEDrawParameters* DrawParameters)
 	MoonRenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE_STRIPT;
 	MoonRenderCommand.Flags				= ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 	MoonRenderCommand.VertexBufferOffset= 0;
-	MoonRenderCommand.IndexBuffer		= (ZEIndexBuffer*)NULL;
-	MoonRenderCommand.VertexBuffer		= (ZEVertexBuffer*)NULL;
-	MoonRenderCommand.VertexDeclaration	= (ZEVertexDeclaration*)NULL;
+	MoonRenderCommand.IndexBuffer		= (ZEIndexBuffer*)-1;
+	MoonRenderCommand.VertexBuffer		= (ZEVertexBuffer*)-1;
+	MoonRenderCommand.VertexDeclaration	= (ZEVertexDeclaration*)-1;
 	
 	// ---------------------------------------
 

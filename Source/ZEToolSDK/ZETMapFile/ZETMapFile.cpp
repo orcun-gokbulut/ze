@@ -107,7 +107,7 @@ void WritePolygonsToFile(FILE* File, ZEArray<ZEMapFilePolygon>& Polygons)
 	fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
 
 	// Normalize vertex elements (Normals, Binormals, Tangents)
-	for(ZEInt I = 0; I < Polygons.GetCount(); I++)
+	for(ZESize I = 0; I < Polygons.GetCount(); I++)
 	{
 		ZEMapFileVertex* CurrVertex = &Polygons[I].Vertices[0];
 		ZEVector3::Normalize(CurrVertex->Normal, CurrVertex->Normal);
@@ -148,7 +148,7 @@ void WriteOctreeToFile(FILE* File, ZEMapFileOctree* Octree)
 	else
 	{
 		FileOctree.IsLeaf = true;
-		FileOctree.PolygonCount = Octree->PolygonIds.GetCount();
+		FileOctree.PolygonCount = (ZEUInt32)Octree->PolygonIds.GetCount();
 	}
 
 	fwrite(&FileOctree, sizeof(ZEMapFileOctreeChunk), 1, File);
@@ -169,8 +169,8 @@ void WritePhysicalMeshToFile(FILE* File, ZEMapFilePhysicalMesh& PhysicalMesh)
 	// Write physical mesh header
 	ZEMapFilePhysicalMeshChunk FilePhysicalMesh;
 	FilePhysicalMesh.ChunkIdentifier = ZE_MPFL_PHYSICAL_MESH_CHUNK;
-	FilePhysicalMesh.PolygonCount = PhysicalMesh.Polygons.GetCount();
-	FilePhysicalMesh.VertexCount = PhysicalMesh.Vertices.GetCount();
+	FilePhysicalMesh.PolygonCount = (ZEUInt32)PhysicalMesh.Polygons.GetCount();
+	FilePhysicalMesh.VertexCount = (ZEUInt32)PhysicalMesh.Vertices.GetCount();
 	fwrite(&FilePhysicalMesh, sizeof(ZEMapFilePhysicalMeshChunk), 1, File);
 
 	// Write physical mesh vertices
@@ -197,7 +197,7 @@ void WritePortalsToFile(FILE* File, ZEArray<ZEMapFilePortal>& Portals)
 		strncpy(FilePortal.Name, Portal->Name, ZE_MPFL_MAX_NAME_SIZE);
 		CalculateBoundingBox(Portal->BoundingBox, Portal->Polygons);
 		FilePortal.BoundingBox = Portal->BoundingBox;
-		FilePortal.PolygonCount = Portal->Polygons.GetCount();
+		FilePortal.PolygonCount = (ZEUInt32)Portal->Polygons.GetCount();
 		FilePortal.HasOctree = Portal->GenerateOctree;
 		FilePortal.HasPhysicalMesh = Portal->PhysicalMeshEnabled;
 		fwrite(&FilePortal, sizeof(ZEMapFilePortalChunk), 1, File);
@@ -260,9 +260,9 @@ bool ZEMapFile::WriteToFile(const char* FileName, ZEInt Chunks)
 	ZEMapFileHeader FileHeader;
 	FileHeader.Header = ZE_MPFL_HEADER;
 	FileHeader.Version = ZE_MPFL_VERSION;
-	FileHeader.MaterialCount = Materials.GetCount();
-	FileHeader.DoorCount = Doors.GetCount();
-	FileHeader.PortalCount = Portals.GetCount();
+	FileHeader.MaterialCount = (ZEUInt32)Materials.GetCount();
+	FileHeader.DoorCount = (ZEUInt32)Doors.GetCount();
+	FileHeader.PortalCount = (ZEUInt32)Portals.GetCount();
 	fwrite(&FileHeader, sizeof(ZEMapFileHeader), 1, File);
 
 	// Write file parts to the file
@@ -362,7 +362,7 @@ bool ReadOctreeNodeFromFile(FILE* File, ZEMapFileOctree* Octree)
 		}
 
 		// Read ids of polygons that is included in this octree node
-		Octree->PolygonIds.SetCount(FileOctree.PolygonCount);
+		Octree->PolygonIds.SetCount((ZESize)FileOctree.PolygonCount);
 		fread(Octree->PolygonIds.GetCArray(), sizeof(ZEInt), Octree->PolygonIds.GetCount(), File);
 	}
 
@@ -395,8 +395,8 @@ bool ReadPhysicalMeshFromFile(FILE* File, ZEMapFilePhysicalMesh& PhysicalMesh)
 		return false;
 	}
 
-	PhysicalMesh.Polygons.SetCount(FilePhysicalMesh.PolygonCount);
-	PhysicalMesh.Vertices.SetCount(FilePhysicalMesh.VertexCount);
+	PhysicalMesh.Polygons.SetCount((ZESize)FilePhysicalMesh.PolygonCount);
+	PhysicalMesh.Vertices.SetCount((ZESize)FilePhysicalMesh.VertexCount);
 
 	ZEUInt32 ChunkIdentifier = 0;
 
@@ -443,7 +443,7 @@ bool ReadPortalsFromFile(FILE* File, ZEArray<ZEMapFilePortal>& Portals)
 
 		strncpy(Portal->Name, FilePortal.Name, ZE_MPFL_MAX_NAME_SIZE);
 		Portal->BoundingBox = FilePortal.BoundingBox;
-		Portal->Polygons.SetCount(FilePortal.PolygonCount);
+		Portal->Polygons.SetCount((ZESize)FilePortal.PolygonCount);
 		Portal->PhysicalMeshEnabled = FilePortal.HasPhysicalMesh;
 		Portal->Octree = NULL;
 
@@ -509,9 +509,9 @@ bool ZEMapFile::ReadFromFile(const char* FileName, ZEInt Chunks)
 		return false;
 	}
 
-	Portals.SetCount(TempHeader.PortalCount);
-	Materials.SetCount(TempHeader.MaterialCount);
-	Doors.SetCount(TempHeader.DoorCount);
+	Portals.SetCount((ZESize)TempHeader.PortalCount);
+	Materials.SetCount((ZESize)TempHeader.MaterialCount);
+	Doors.SetCount((ZESize)TempHeader.DoorCount);
 
 	if (!ReadMaterialsFromFile(File, this->Materials))
 	{
@@ -560,23 +560,25 @@ bool ZEMapFile::Validate()
 	{
 		// Check polygon materials
 		for(ZESize N = 0; N < Portals[I].Polygons.GetCount(); N++)
-			if(Portals[I].Polygons[N].Material >= Materials.GetCount())
+		{
+			if(Portals[I].Polygons[N].Material >= (ZEUInt32)Materials.GetCount())
 			{		
 				zesdkWarning("Map File Validation", "Polygon does not have a valid material id. (Portal Index : %d, Polygon Index : %d)", I, N);
 				Validated = false;
 			}
+		}
 	}
 
 	// Check portal door destinations
 	for (ZESize I = 0; I < Doors.GetCount(); I++)
 	{
-		if(Doors[I].PortalIds[0] >= Portals.GetCount())
+		if(Doors[I].PortalIds[0] >= (ZEUInt32)Portals.GetCount())
 		{		
 			zesdkWarning("Map File Validation", "Portal door destination is not valid. (Door Index : %d, Destination Portal)", I, Doors[I].PortalIds[0]);
 			Validated = false;
 		}
 
-		if(Doors[I].PortalIds[1] >= Portals.GetCount())
+		if(Doors[I].PortalIds[1] >= (ZEUInt32)Portals.GetCount())
 		{		
 			zesdkWarning("Map File Validation", "Portal door destination is not valid. (Door Index : %d, Destination Portal)", I, Doors[I].PortalIds[1]);
 			Validated = false;
@@ -584,16 +586,24 @@ bool ZEMapFile::Validate()
 	}
 
 	// Check for unused materials
-	for(ZEInt I = 0; I < Materials.GetCount(); I++)
+	for(ZESize I = 0; I < Materials.GetCount(); I++)
 	{
 		bool Used = false;
 		for (ZESize N = 0; N < Portals.GetCount(); N++)
-			for(ZEInt M = 0; M < Portals[N].Polygons.GetCount(); M++)
-				if(Portals[N].Polygons[M].Material == I)
+		{
+			for(ZESize M = 0; M < Portals[N].Polygons.GetCount(); M++)
+			{
+				if(Portals[N].Polygons[M].Material == (ZEUInt32)I)
+				{
 					Used = true;
+				}
+			}
+		}
 		
 		if(!Used)
+		{
 			zesdkNotice("Map File Validation", "Material %d is not used by any polygons.\n",I);
+		}
 	}
 
 	return Validated;
