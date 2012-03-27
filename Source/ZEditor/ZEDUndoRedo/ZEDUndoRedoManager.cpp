@@ -70,7 +70,7 @@ void ZEDUndoRedoManager::RegisterUndoRedoOperation(ZEDUndoRedoOperation* Operati
 		RedoStack.clear();
 	}
 
-	if (UndoStack.count() > MaximumStackSize)
+	if ((ZEUInt)UndoStack.count() > MaximumStackSize)
 	{
 		UndoStack.first()->Destroy();
 		UndoStack.first() = NULL;
@@ -82,7 +82,7 @@ void ZEDUndoRedoManager::SetMaximumStackSize(ZEUInt Size)
 {
 	if(Size < MaximumStackSize)
 	{
-		for(ZEInt I = 0; I < MaximumStackSize - Size; I++)
+		for(ZEUInt I = 0; I < MaximumStackSize - Size; I++)
 		{
 			if(!UndoStack.isEmpty())
 			{

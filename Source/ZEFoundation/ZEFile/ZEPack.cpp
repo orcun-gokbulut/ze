@@ -456,7 +456,7 @@ bool ZEPack::AddChunk(const char* IdentifierName,unsigned char* Source,ZEUInt64 
 	_fseeki64((FILE*)File->GetFileHandle(),OldRecordsStartPosition,SEEK_SET);
 
 	//Copy chunk headers to buffer
-	fread(bufferForHeaders, (ZEUInt)OldRecordSize, 1, (FILE*)File->GetFileHandle());
+	fread(bufferForHeaders, (ZESize)OldRecordSize, 1, (FILE*)File->GetFileHandle());
 
 	//Set new chunks start position to chunk headers' old start position
 	ZEUInt64 NewChunkPosition = OldRecordsStartPosition;

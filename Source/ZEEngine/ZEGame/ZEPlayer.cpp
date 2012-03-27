@@ -102,7 +102,7 @@ ZESteeringOutput ZEPlayerFreeSteering::Process(float ElapsedTime)
 	ZEInputAction* Current;
 	zeInput->ProcessInputMap(&InputMap);
 
-	for (size_t I = 0; I < InputMap.InputActionCount; I++)
+	for (ZESize I = 0; I < InputMap.InputActionCount; I++)
 	{
 		Current = &InputMap.InputActions[I];
 		switch(Current->Id)
@@ -153,29 +153,45 @@ ZESteeringOutput ZEPlayerFreeSteering::Process(float ElapsedTime)
 	}
 
 	if (Ry < -ZE_PI)
+	{
 		Ry = ZE_PI;
+	}
 	else if (Ry > ZE_PI)
+	{
 		Ry = -ZE_PI;
+	}
 
 	if (Rx < -ZE_PI_2)
+	{
 		Rx = -ZE_PI_2;
+	}
 	else if (Rx > ZE_PI_2)
+	{
 		Rx = ZE_PI_2;
+	}
 
 	if (Rz < -ZE_PI_2)
+	{
 		Rz = -ZE_PI_2;
+	}
 	else if (Rz > ZE_PI_2)
+	{
 		Rz = ZE_PI_2;
+	}
 
 	ZEQuaternion::CreateFromEuler(OwnerCameraRotation, Rx, Ry, Rz);
 	((ZEPlayer*)GetOwner())->GetCamera()->SetLocalRotation(OwnerCameraRotation.Normalize());
 
 	if(Moved)
+	{
 		Output.LinearAcceleration = MovementDirection.Normalize() * GetOwner()->GetMaxLinearAcceleration();
+	}
 	else
 	{
 		if (GetOwner()->GetLinearVelocity().LengthSquare() != 0)
+		{
 			Output.LinearAcceleration = -GetOwner()->GetLinearVelocity().Normalize() * Friction * GetOwner()->GetMaxLinearAcceleration();
+		}
 
 		Output.AngularAcceleration = ZEMath::Sign(GetOwner()->GetAngularVelocity()) * Friction * GetOwner()->GetMaxAngularAcceleration();
 

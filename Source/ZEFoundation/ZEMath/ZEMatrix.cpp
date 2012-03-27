@@ -41,6 +41,9 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZEError.h"
 
+#define ZE_MATRIX4X4_ROW_ELEMENT_COUNT		(ZESize)4
+#define ZE_MATRIX4X4_COL_ELEMENT_COUNT		(ZESize)4
+
 #define SWAP(x, y) temp = (x); (x) = (y); (y) = temp
 
 // ZEMatrix3x3
@@ -1006,14 +1009,17 @@ inline void ZEMatrix4x4::Multiply(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const 
 	zeAssert(&Out == &A, "Parameters Out and A can not be the same variable.");
 	zeAssert(&Out == &B, "Parameters Out and B can not be the same variable.");
 
-	for (ZEInt RowIndex = 0; RowIndex < 4; RowIndex++) // Row
-		for (ZEInt ColumnIndex = 0; ColumnIndex < 4; ColumnIndex++) // Column
+	for (ZESize RowIndex = 0; RowIndex < ZE_MATRIX4X4_ROW_ELEMENT_COUNT; RowIndex++) // Row
+	{
+		for (ZESize ColumnIndex = 0; ColumnIndex < ZE_MATRIX4X4_COL_ELEMENT_COUNT; ColumnIndex++) // Column
+		{
 			Out.M[ColumnIndex][RowIndex] = 
 				A.M[0][RowIndex] * B.M[ColumnIndex][0] + 
 				A.M[1][RowIndex] * B.M[ColumnIndex][1] + 
 				A.M[2][RowIndex] * B.M[ColumnIndex][2] + 
 				A.M[3][RowIndex] * B.M[ColumnIndex][3];
-
+		}
+	}
 }
 
 inline void ZEMatrix4x4::Scale(ZEMatrix4x4 &Out, const ZEMatrix4x4& A, float s)

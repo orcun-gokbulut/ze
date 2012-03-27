@@ -46,12 +46,16 @@
 #include <float.h>
 #include "ZEMath/ZEMath.h"
 
+#define		X_AXIS		(ZEUInt)0x01
+#define		Y_AXIS		(ZEUInt)0x02
+#define		Z_AXIS		(ZEUInt)0x04
+
 ZEVector3 ZEOBBox::GetVertex(ZEUInt Index) const
 {
 	ZEVector3 Max = Center + Up * HalfSize.x + Right * HalfSize.y + Front * HalfSize.z;
 	ZEVector3 Min = Center - Up * HalfSize.x - Right * HalfSize.y - Front * HalfSize.z;
 
-	return  ZEVector3(Index & 0x01 ? Max.x : Min.x, Index & 0x02 ? Max.y : Min.y, Index & 0x04 ? Max.z : Min.z);
+	return  ZEVector3(Index & X_AXIS ? Max.x : Min.x, Index & Y_AXIS ? Max.y : Min.y, Index & Z_AXIS ? Max.z : Min.z);
 }
 
 void ZEOBBox::CreateFromOrientation(ZEOBBox& BoundingBox, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Size)

@@ -102,7 +102,7 @@ static bool WritePhysicalBodyToFile(ZEModelFilePhysicalBody* Body, FILE* File)
 	BodyChunk.AngularDamping	= Body->AngularDamping;
 	BodyChunk.LinearDamping		= Body->LinearDamping;
 	BodyChunk.MassCenter		= Body->MassCenter;
-	BodyChunk.ShapeCount		= Body->Shapes.GetCount();
+	BodyChunk.ShapeCount		= (ZEUInt32)Body->Shapes.GetCount();
 
 	fwrite(&BodyChunk, sizeof(ZEModelFilePhysicalBodyChunk), 1, File);
 
@@ -226,11 +226,9 @@ bool WritePhysicalJointToFile(ZEModelFilePhysicalJoint* Joint, FILE* File)
 	JointChunk.TwistMotion					= Joint->TwistMotion;
 	JointChunk.TwistLowLimitDamping			= Joint->TwistLowLimitDamping;
 	JointChunk.TwistLowLimitValue			= Joint->TwistLowLimitValue;
-	JointChunk.TwistLowLimitValue			= Joint->TwistLowLimitValue;
 	JointChunk.TwistLowLimitRestitution		= Joint->TwistLowLimitRestitution;
 	JointChunk.TwistLowLimitSpring			= Joint->TwistLowLimitSpring;
 	JointChunk.TwistHighLimitDamping		= Joint->TwistHighLimitDamping;
-	JointChunk.TwistHighLimitValue			= Joint->TwistHighLimitValue;
 	JointChunk.TwistHighLimitValue			= Joint->TwistHighLimitValue;
 	JointChunk.TwistHighLimitRestitution	= Joint->TwistHighLimitRestitution;
 	JointChunk.TwistHighLimitSpring			= Joint->TwistHighLimitSpring;
@@ -332,7 +330,7 @@ static void WriteMeshesToFile(FILE *File, ZEModelFile* Model)
 		MeshChunk.Scale							= Mesh->Scale;
 		MeshChunk.IsSkinned						= Mesh->IsSkinned;
 		MeshChunk.BoundingBox					= Mesh->BoundingBox;
-		MeshChunk.LODCount						= Mesh->LODs.GetCount();
+		MeshChunk.LODCount						= (ZEUInt32)Mesh->LODs.GetCount();
 		MeshChunk.HasPhysicalBody				= (Mesh->PhysicalBody.Type != ZE_PBT_NONE);
 		fwrite(&MeshChunk, sizeof(ZEModelFileMeshChunk), 1, File);
 		zesdkDebug("Model File", "Mesh %d is written. Name : %s, Position : <%f, %f, %f>, Rotation : <%f, %f, %f, %f>, Scale : <%f, %f, %f>, BoundingBox : [<%f, %f, %f>, <%f, %f, %f>], LOD count : %d.",
@@ -353,15 +351,15 @@ static void WriteMeshesToFile(FILE *File, ZEModelFile* Model)
 			MeshLODChunk.ChunkId = ZE_MDLF_MESH_LOD_CHUNKID;
 			MeshLODChunk.LODLevel = MeshLOD->LODLevel;
 			MeshLODChunk.MaterialId = MeshLOD->MaterialId;
-			MeshLODChunk.VertexCount = (MeshChunk.IsSkinned ? MeshLOD->SkinnedVertices.GetCount() : MeshLOD->Vertices.GetCount());
-			MeshLODChunk.AffectingBoneCount = MeshLOD->AffectingBoneIds.GetCount();
+			MeshLODChunk.VertexCount = (MeshChunk.IsSkinned ? (ZEUInt32)MeshLOD->SkinnedVertices.GetCount() : (ZEUInt32)MeshLOD->Vertices.GetCount());
+			MeshLODChunk.AffectingBoneCount = (ZEUInt32)MeshLOD->AffectingBoneIds.GetCount();
 			fwrite(&MeshLODChunk, sizeof(ZEModelFileMeshLODChunk), 1, File);
 
 			if(MeshChunk.IsSkinned)
 			{
 				fwrite(MeshLOD->AffectingBoneIds.GetConstCArray(), sizeof(ZEUInt32), MeshLOD->AffectingBoneIds.GetCount(), File);
 
-				for (ZEInt N = 0; N < MeshLODChunk.VertexCount; N++)
+				for (ZESize N = 0; N < (ZESize)MeshLODChunk.VertexCount; N++)
 				{
 					ZEVector3::Normalize(MeshLOD->SkinnedVertices[N].Normal, MeshLOD->SkinnedVertices[N].Normal);
 					ZEVector3::Normalize(MeshLOD->SkinnedVertices[N].Binormal, MeshLOD->SkinnedVertices[N].Binormal);
@@ -371,7 +369,7 @@ static void WriteMeshesToFile(FILE *File, ZEModelFile* Model)
 			}
 			else
 			{
-				for (ZEInt N = 0; N < MeshLODChunk.VertexCount; N++)
+				for (ZESize N = 0; N < (ZESize)MeshLODChunk.VertexCount; N++)
 				{
 					ZEVector3::Normalize(MeshLOD->Vertices[N].Normal, MeshLOD->Vertices[N].Normal);
 					ZEVector3::Normalize(MeshLOD->Vertices[N].Binormal, MeshLOD->Vertices[N].Binormal);
@@ -442,7 +440,7 @@ static void WriteAnimationsToFile(FILE *File, ZEModelFile* Model)
 		ZEModelFileAnimationChunk AnimationChunk;
 		AnimationChunk.ChunkId = ZE_MDLF_ANIMATION_CHUNKID;
 		strncpy(AnimationChunk.Name, Animation->Name, ZE_MDLF_MAX_NAME_SIZE);
-		AnimationChunk.FrameCount = Animation->Frames.GetCount();
+		AnimationChunk.FrameCount = (ZEUInt32)Animation->Frames.GetCount();
 		fwrite(&AnimationChunk, sizeof(ZEModelFileAnimationChunk), 1, File);
 
 		zesdkDebug("Model File", "Animation %d is written. Name : \"%s\", Frame Count : %d. ", I, Animation->Name, Animation->Frames.GetCount());
@@ -454,8 +452,8 @@ static void WriteAnimationsToFile(FILE *File, ZEModelFile* Model)
 
 			ZEModelFileAnimationFrameChunk AnimationFrameChunk;
 			AnimationFrameChunk.ChunkId = ZE_MDLF_ANIMATION_KEYFRAME_CHUNKID;
-			AnimationFrameChunk.BoneKeyCount = AnimationFrame->BoneKeys.GetCount();
-			AnimationFrameChunk.MeshKeyCount = AnimationFrame->MeshKeys.GetCount();
+			AnimationFrameChunk.BoneKeyCount = (ZEUInt32)AnimationFrame->BoneKeys.GetCount();
+			AnimationFrameChunk.MeshKeyCount = (ZEUInt32)AnimationFrame->MeshKeys.GetCount();
 			fwrite(&AnimationFrameChunk, sizeof(ZEModelFileAnimationFrameChunk), 1, File);
 			zesdkDebug("Model File", "Animation frame %d is written. Bone keys count : %d, Mesh key count : %d.", I, AnimationFrameChunk.BoneKeyCount, AnimationFrameChunk.MeshKeyCount);
 
@@ -488,10 +486,10 @@ bool ZEModelFile::WriteToFile(const char* FileName)
 	ZEModelFileHeaderChunk HeaderChunk;
 	HeaderChunk.HEADER = ZE_MDLF_HEADER;
 	HeaderChunk.Version = ZE_MDLF_VERSION;
-	HeaderChunk.MaterialCount = Materials.GetCount();
-	HeaderChunk.MeshCount = Meshes.GetCount();
-	HeaderChunk.BoneCount = Bones.GetCount();
-	HeaderChunk.AnimationCount = Animations.GetCount();
+	HeaderChunk.MaterialCount = (ZEUInt32)Materials.GetCount();
+	HeaderChunk.MeshCount = (ZEUInt32)Meshes.GetCount();
+	HeaderChunk.BoneCount = (ZEUInt32)Bones.GetCount();
+	HeaderChunk.AnimationCount = (ZEUInt32)Animations.GetCount();
 	fwrite(&HeaderChunk, sizeof(ZEModelFileHeaderChunk), 1, File);
 
 	WriteMaterialsToFile(File, this);
@@ -575,7 +573,7 @@ static bool ReadPhysicalBodyFromFile(ZEModelFilePhysicalBody* Body, FILE* File)
 	Body->LinearDamping		= BodyChunk.LinearDamping;
 	Body->MassCenter		= BodyChunk.MassCenter;
 
-	Body->Shapes.SetCount(BodyChunk.ShapeCount);
+	Body->Shapes.SetCount((ZESize)BodyChunk.ShapeCount);
 	for (ZESize I = 0; I < Body->Shapes.GetCount(); I++)
 	{
 		ZEModelFilePhysicalShape* Shape = &Body->Shapes[I];
@@ -709,11 +707,9 @@ bool ReadPhysicalJointFromFile(ZEModelFilePhysicalJoint* Joint, FILE* File)
 	Joint->TwistMotion					= JointChunk.TwistMotion;
 	Joint->TwistLowLimitDamping			= JointChunk.TwistLowLimitDamping;
 	Joint->TwistLowLimitValue			= JointChunk.TwistLowLimitValue;
-	Joint->TwistLowLimitValue			= JointChunk.TwistLowLimitValue;
 	Joint->TwistLowLimitRestitution		= JointChunk.TwistLowLimitRestitution;
 	Joint->TwistLowLimitSpring			= JointChunk.TwistLowLimitSpring;
 	Joint->TwistHighLimitDamping		= JointChunk.TwistHighLimitDamping;
-	Joint->TwistHighLimitValue			= JointChunk.TwistHighLimitValue;
 	Joint->TwistHighLimitValue			= JointChunk.TwistHighLimitValue;
 	Joint->TwistHighLimitRestitution	= JointChunk.TwistHighLimitRestitution;
 	Joint->TwistHighLimitSpring			= JointChunk.TwistHighLimitSpring;
@@ -776,7 +772,7 @@ static bool ReadMeshesFromFile(FILE* File, ZEModelFile* Model)
 		strncpy(Mesh->Name, MeshChunk.Name, ZE_MDLF_MAX_NAME_SIZE);
 		Mesh->IsSkinned						= MeshChunk.IsSkinned;
 		Mesh->BoundingBox					= MeshChunk.BoundingBox;
-		Mesh->LODs.SetCount(MeshChunk.LODCount);
+		Mesh->LODs.SetCount((ZESize)MeshChunk.LODCount);
 		Mesh->Position						= MeshChunk.Position;
 		Mesh->Rotation						= MeshChunk.Rotation;
 		Mesh->Scale							= MeshChunk.Scale;
@@ -796,15 +792,15 @@ static bool ReadMeshesFromFile(FILE* File, ZEModelFile* Model)
 			LOD->LODLevel = MeshLODChunk.LODLevel;
 			if(MeshChunk.IsSkinned)
 			{
-				LOD->AffectingBoneIds.SetCount(MeshLODChunk.AffectingBoneCount);
+				LOD->AffectingBoneIds.SetCount((ZESize)MeshLODChunk.AffectingBoneCount);
 				fread(LOD->AffectingBoneIds.GetCArray(), sizeof(ZEUInt32), LOD->AffectingBoneIds.GetCount(), File);
 
-				LOD->SkinnedVertices.SetCount(MeshLODChunk.VertexCount);				
+				LOD->SkinnedVertices.SetCount((ZESize)MeshLODChunk.VertexCount);				
 				fread(LOD->SkinnedVertices.GetCArray(), sizeof(ZEModelFileSkinnedVertex),  LOD->SkinnedVertices.GetCount(), File);
 			}
 			else
 			{
-				LOD->Vertices.SetCount(MeshLODChunk.VertexCount);				
+				LOD->Vertices.SetCount((ZESize)MeshLODChunk.VertexCount);				
 				fread(LOD->Vertices.GetCArray(), sizeof(ZEModelFileVertex),  LOD->Vertices.GetCount(), File);
 			}
 			zesdkDebug("Model File", "Lod %d is read. LOD Level : %d, Material Id : %d, Vertex Count : %d.", I, LOD->LODLevel, LOD->MaterialId, (Mesh->IsSkinned ? LOD->SkinnedVertices.GetCount() : LOD->Vertices.GetCount()));
@@ -887,7 +883,7 @@ static bool ReadAnimationsFromFile(FILE* File, ZEModelFile* Model)
 		zesdkDebug("Model File", "Animation %d is read. Name : \"%s\", Frames : %d.", Animation->Name, Animation->Frames.GetCount());
 
 		zesdkDebug("Model File", "Reading animation frames.");
-		Animation->Frames.SetCount(AnimationChunk.FrameCount);
+		Animation->Frames.SetCount((ZESize)AnimationChunk.FrameCount);
 		for (ZESize I = 0; I < Animation->Frames.GetCount(); I++)
 		{
 			ZEModelFileAnimationFrame* AnimationFrame = &Animation->Frames[I];
@@ -901,10 +897,10 @@ static bool ReadAnimationsFromFile(FILE* File, ZEModelFile* Model)
 				return false;
 			}
 
-			AnimationFrame->BoneKeys.SetCount(AnimationFrameChunk.BoneKeyCount);
+			AnimationFrame->BoneKeys.SetCount((ZESize)AnimationFrameChunk.BoneKeyCount);
 			fread(AnimationFrame->BoneKeys.GetCArray(), sizeof(ZEModelFileAnimationKey), AnimationFrame->BoneKeys.GetCount(), File);
 
-			AnimationFrame->MeshKeys.SetCount(AnimationFrameChunk.MeshKeyCount);		
+			AnimationFrame->MeshKeys.SetCount((ZESize)AnimationFrameChunk.MeshKeyCount);		
 			fread(AnimationFrame->MeshKeys.GetCArray(), sizeof(ZEModelFileAnimationKey), AnimationFrame->MeshKeys.GetCount(), File);
 		}
 	}
@@ -940,7 +936,7 @@ bool ZEModelFile::ReadFromFile(const char *FileName)
 		return false;	
 	}
 
-	Materials.SetCount(HeaderChunk.MaterialCount);
+	Materials.SetCount((ZESize)HeaderChunk.MaterialCount);
 	if (!ReadMaterialsFromFile(File, this))
 	{
 		zesdkError("Model File", "Can not read model file.");
@@ -948,7 +944,7 @@ bool ZEModelFile::ReadFromFile(const char *FileName)
 		return false;
 	}
 
-	Meshes.SetCount(HeaderChunk.MeshCount);
+	Meshes.SetCount((ZESize)HeaderChunk.MeshCount);
 	if(!ReadMeshesFromFile(File, this))
 	{
 		zesdkError("Model File", "Can not read model file.");
@@ -956,7 +952,7 @@ bool ZEModelFile::ReadFromFile(const char *FileName)
 		return false;
 	}
 
-	Bones.SetCount(HeaderChunk.BoneCount);
+	Bones.SetCount((ZESize)HeaderChunk.BoneCount);
 	if(!ReadBonesFromFile(File, this))
 	{
 		zesdkError("Model File", "Can not read model file.");
@@ -964,7 +960,7 @@ bool ZEModelFile::ReadFromFile(const char *FileName)
 		return false;
 	}
 
-	Animations.SetCount(HeaderChunk.AnimationCount);
+	Animations.SetCount((ZESize)HeaderChunk.AnimationCount);
 	if(!ReadAnimationsFromFile(File, this))
 	{
 		zesdkError("Model File", "Can not read model file.");
@@ -992,7 +988,7 @@ bool ZEModelFile::Validate()
 		for (ZESize N = 0; N < Meshes[I].LODs.GetCount(); N++)
 		{
 			ZEModelFileMeshLOD& MeshLOD = Meshes[I].LODs[N];
-			if (MeshLOD.MaterialId < 0 || MeshLOD.MaterialId >= Materials.GetCount())
+			if (MeshLOD.MaterialId < 0 || (ZESize)MeshLOD.MaterialId >= Materials.GetCount())
 			{
 				zesdkError("Model File Validation", "Mesh %d LOD %d does not have a valid material id.", I, N);
 				Validated = false;
@@ -1007,7 +1003,7 @@ bool ZEModelFile::Validate()
 			
 			for (ZESize M = 0; M < MeshLOD.AffectingBoneIds.GetCount(); M++)
 			{
-				if (MeshLOD.AffectingBoneIds[M] >= Bones.GetCount())
+				if ((ZESize)MeshLOD.AffectingBoneIds[M] >= Bones.GetCount())
 				{
 					zesdkError("Model File Validation", "Mesh %d LOD %d Affecting Bone Index %d has ilvalid value. Value exceeds bone count.", I, N, M);
 					Validated = false;						
@@ -1017,13 +1013,14 @@ bool ZEModelFile::Validate()
 			for (ZESize M = 0; M < MeshLOD.SkinnedVertices.GetCount(); M++)
 			{
 				ZEModelFileSkinnedVertex& Vertex = MeshLOD.SkinnedVertices[M];
-				for (ZEInt P = 0; P < 4; P++)
+				for (ZESize P = 0; P < 4; P++)
+				{
 					if (Vertex.BoneIndices[P] >= MeshLOD.AffectingBoneIds.GetCount())
 					{
-						zesdkError("Model File Validation", "Mesh %d LOD %d Vertex %d Bone Index %d has ilvalid value. Value exceeds affecting bone count.", I, N, M, P);
+						zesdkError("Model File Validation", "Mesh %Iu LOD %Iu Vertex %Iu Bone Index %Iu has ilvalid value. Value exceeds affecting bone count.", I, N, M, P);
 						Validated = false;						
 					}
-
+				}
 					if (ZEMath::Abs(Vertex.BoneWeights[0] + Vertex.BoneWeights[1] + Vertex.BoneWeights[2] + Vertex.BoneWeights[3] - 1.0f ) > 0.001)
 						zesdkWarning("Model File Validation", "Mesh %d LOD %d Vertex %d sum of bone weights is not one.", I, N, M);					
 			}

@@ -58,19 +58,19 @@ bool ZETestSuiteItem::RunTests()
 	printf("Running Test Suite \"%s\".\n", GetName());
 
 	bool CurrentResult = true;
-	for (ZESize I = 0; I < TotalTestCount; I++)
+	for (ZESize I = 0; I < (ZESize)TotalTestCount; I++)
 	{
-		printf("  Test #%d/%d - %s.\n", I + 1, TotalTestCount, Tests[I]->GetName());
+		printf("  Test #%Iu/%u - %s.\n", I + 1, TotalTestCount, Tests[I]->GetName());
 
 		if (!Tests[I]->RunTest())
 		{
-			printf("  Test #%d/%d  - \"%s\"FAILED !!! Elapsed time : %f ms. \n", I + 1, TotalTestCount, Tests[I]->GetName(), Tests[I]->GetEleapsedTime());
+			printf("  Test #%Iu/%u  - \"%s\"FAILED !!! Elapsed time : %f ms. \n", I + 1, TotalTestCount, Tests[I]->GetName(), Tests[I]->GetEleapsedTime());
 			CurrentResult = false;
 		}
 		else
 		{
 			PassedTestCount++;
-			printf("  Test #%d/%d - \"%s\" passed. Elapsed time : %f ms. \n", I + 1, TotalTestCount, Tests[I]->GetName(), Tests[I]->GetEleapsedTime());
+			printf("  Test #%Iu/%u - \"%s\" passed. Elapsed time : %f ms. \n", I + 1, TotalTestCount, Tests[I]->GetName(), Tests[I]->GetEleapsedTime());
 		}
 
 		ElapsedTime += Tests[I]->GetEleapsedTime();
@@ -81,7 +81,7 @@ bool ZETestSuiteItem::RunTests()
 	if (CurrentResult)
 		printf("Test suite \"%s\" has passed. Total Time : %f ms \n", GetName(), ElapsedTime);
 	else
-		printf("Test suite \"%s\" has FAILED !!! Elapsed time : %f, Passed test count : %d, Failed test count : %d.\n", GetName(), ElapsedTime, PassedTestCount, TotalTestCount - PassedTestCount);
+		printf("Test suite \"%s\" has FAILED !!! Elapsed time : %f, Passed test count : %u, Failed test count : %u.\n", GetName(), ElapsedTime, PassedTestCount, TotalTestCount - PassedTestCount);
 
 	return CurrentResult;
 }
@@ -91,7 +91,7 @@ void ZETestSuiteItem::Reset()
 	Result = ZE_TR_NOT_RUN;
 	ElapsedTime = 0;
 	PassedTestCount = 0;
-	for (ZESize I = 0; I < TotalTestCount; I++)
+	for (ZESize I = 0; I < (ZESize)TotalTestCount; I++)
 		Tests[I]->Reset();
 }
 
@@ -105,12 +105,12 @@ float ZETestSuiteItem::GetElapsedTime()
 	return ElapsedTime;
 }
 
-ZEInt ZETestSuiteItem::GetTotalTestCount()
+ZEUInt ZETestSuiteItem::GetTotalTestCount()
 {
 	return TotalTestCount;
 }
 
-ZEInt ZETestSuiteItem::GetFailedTestCount()
+ZEUInt ZETestSuiteItem::GetFailedTestCount()
 {
 	if (Result == ZE_TR_NOT_RUN)
 		return 0;
@@ -118,7 +118,7 @@ ZEInt ZETestSuiteItem::GetFailedTestCount()
 	return TotalTestCount - PassedTestCount;
 }
 
-ZEInt ZETestSuiteItem::GetPassedTestCount()
+ZEUInt ZETestSuiteItem::GetPassedTestCount()
 {
 	return PassedTestCount;
 }

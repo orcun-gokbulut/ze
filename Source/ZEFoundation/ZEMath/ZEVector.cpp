@@ -39,6 +39,8 @@
 #include "ZEMath.h"
 #include "ZEAngle.h"
 
+#define		ZE_VECTOR4_ELEMENT_COUNT	(ZESize)4
+
 // ZEVector2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const ZEVector2 ZEVector2::Zero = ZEVector2(0.0f, 0.0f);
@@ -1344,9 +1346,13 @@ void ZEVector4::SaturateSelf()
 float ZEVector4::Min() const
 {
 	float Min = x;
-	for (ZEInt I = 1; I < 4; I++)
+	for (ZESize I = 1; I < ZE_VECTOR4_ELEMENT_COUNT; I++)
+	{
 		if (M[I] < Min)
+		{
 			Min = M[I];
+		}
+	}
 
 	return Min;
 }
@@ -1354,9 +1360,13 @@ float ZEVector4::Min() const
 float ZEVector4::Max() const
 {
 	float Max = x;
-	for (ZEInt I = 1; I < 4; I++)
+	for (ZESize I = 1; I < ZE_VECTOR4_ELEMENT_COUNT; I++)
+	{
 		if (M[I] > Max)
+		{
 			Max = M[I];
+		}
+	}
 
 	return Max;
 }

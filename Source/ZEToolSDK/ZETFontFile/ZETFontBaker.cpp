@@ -67,7 +67,7 @@ PBITMAPINFO CreateBitmapInfoStruct(HBITMAP hBmp)
      if (cClrBits != 24) 
          pbmi = (PBITMAPINFO) LocalAlloc(LPTR, 
                     sizeof(BITMAPINFOHEADER) + 
-                    sizeof(RGBQUAD) * (1<< cClrBits)); 
+                    sizeof(RGBQUAD) * (ZESize)(1<< cClrBits));
      else 
          pbmi = (PBITMAPINFO) LocalAlloc(LPTR, 
                     sizeof(BITMAPINFOHEADER)); 
@@ -113,7 +113,7 @@ void DumpTexture(ZEResourceInternalFile* TextureFile, HBITMAP Bitmap, HDC DC)
     hdr.bfReserved1 = 0; 
     hdr.bfReserved2 = 0; 
 
-	TextureFile->AllocateBuffer(hdr.bfSize);
+	TextureFile->AllocateBuffer((ZESize)hdr.bfSize);
 
     hdr.bfOffBits = (DWORD) sizeof(BITMAPFILEHEADER) + pbih->biSize + pbih->biClrUsed * sizeof (RGBQUAD); 
 
@@ -136,15 +136,15 @@ void DumpTexture(ZEResourceInternalFile* TextureFile, HBITMAP Bitmap, HDC DC)
 
 	hp = lpBits; 
 	
-	for (ZESize I = 0; I < cb / 4; I++)
+	for (ZESize I = 0; I < (ZESize)cb / 4; I++)
 	{
 		color = ((ARGB*)hp) + I;
 		color->r = color->g = color->b = color->a = (color->r + color->g + color->b) / 3;
 		//(color->r != 0 ? 255 : 0);
 	}
  	
-	memcpy(Data, hp, cb);
-	Data = (ZEUInt8*)Data + cb;
+	memcpy(Data, hp, (ZESize)cb);
+	Data = (ZEUInt8*)Data + (ZESize)cb;
 
     GlobalFree((HGLOBAL)lpBits);
 }
@@ -178,7 +178,7 @@ bool ZEFontBaker:: BakeFont(ZEFont* Output,
 	ZEInt OffsetX = LeftMargin + CharacterSpacingX;
 	ZEInt OffsetY = TopMargin + CharacterSpacingY;
 
-	ZEInt* CharacterWidths = new ZEInt[EndCharacter - StartCharacter];
+	ZEInt* CharacterWidths = new ZEInt[(ZESize)(EndCharacter - StartCharacter)];
 	GetCharWidth(dc, StartCharacter, EndCharacter, CharacterWidths);
 
 	TEXTMETRIC	Metric;

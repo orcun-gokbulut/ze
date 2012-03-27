@@ -95,6 +95,8 @@ bool ZEGraphicsDebugModule::Initialize()
 	PortalMap->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Scene->AddEntity(PortalMap);
 	
+	Steering = new ZEPlayerFreeSteering();
+
 	Player = ZEPlayer::CreateInstance();
 	Player->SetName("TestPlayer1");
 	Player->SetEnabled(true);
@@ -104,6 +106,9 @@ bool ZEGraphicsDebugModule::Initialize()
 	Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 	Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
 	Player->GetCamera()->SetFOV(ZE_PI / 3.0f);
+	Player->AddSteering(Steering);
+	Player->SetMaxLinearVelocity(50.0f);
+	Player->SetMaxLinearAcceleration(50.0f);
 	Scene->SetActiveCamera(Player->GetCamera());
 	Scene->AddEntity(Player);
 
@@ -311,6 +316,7 @@ void ZEGraphicsDebugModule::Deinitialize()
 	ProjectiveLight0->Destroy();
 	SunLight->Destroy();
 
+	delete Steering;
 	delete CoordinatesText;
 	delete SunDirectionText;
 	delete CloudCoverText;
@@ -528,6 +534,7 @@ ZEGraphicsDebugModule::ZEGraphicsDebugModule()
 	SunLight					= NULL;
 	MoonLight					= NULL;
 	SkyDome						= NULL;
+	Steering					= NULL;
 
 	MoonLightIntensity			= 0.3f;
 	SunLightIntensity			= 1.2f;
