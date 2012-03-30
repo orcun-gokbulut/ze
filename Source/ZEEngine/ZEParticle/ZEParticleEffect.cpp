@@ -46,14 +46,17 @@ ZEDrawFlags ZEParticleEffect::GetDrawFlags() const
 const ZEAABBox& ZEParticleEffect::GetWorldBoundingBox()
 {
 	ZEAABBox Box;
-	Box.Max = ZEVector3::MinValue;
-	Box.Min = ZEVector3::MaxValue;
+// 	Box.Max = (ZEVector3::One * 10) + GetPosition();
+// 	Box.Min = (-ZEVector3::One * 10) + GetPosition();
 
-	for (ZESize I = 0; I < Emitters.GetCount(); I++)
-	{
-		ZEVector3::Min(Box.Min, Box.Min, Emitters[I]->GetBoundingBox().Min);
-		ZEVector3::Max(Box.Max, Box.Max, Emitters[I]->GetBoundingBox().Max);
-	}
+	Box.Max = ZEVector3::One;
+	Box.Min = -ZEVector3::One;
+
+// 	for (ZESize I = 0; I < Emitters.GetCount(); I++)
+// 	{
+// 		ZEVector3::Min(Box.Min, Box.Min, Emitters[I]->GetBoundingBox().Min);
+// 		ZEVector3::Max(Box.Max, Box.Max, Emitters[I]->GetBoundingBox().Max);
+// 	}
 
 	return Box;
 }
@@ -74,12 +77,18 @@ void ZEParticleEffect::Draw(ZEDrawParameters* DrawParameters)
 
 	for(ZESize I = 0; I < Emitters.GetCount(); I++)
 		Emitters[I]->Draw(DrawParameters);
+
+	for(ZESize I = 0; I < Systems.GetCount(); I++)
+		Systems[I]->Draw(DrawParameters);
 }
 
 void ZEParticleEffect::Tick(float TimeElapsed)
 {
 	for(ZESize I = 0; I < Emitters.GetCount(); I++)
 		Emitters[I]->Tick(TimeElapsed);
+
+	for(ZESize I = 0; I < Systems.GetCount(); I++)
+		Systems[I]->Tick(TimeElapsed);
 }
 
 void ZEParticleEffect::AddEmitter(ZEParticleEmitter* Emitter)
@@ -96,6 +105,22 @@ void ZEParticleEffect::RemoveEmitter(ZEParticleEmitter* Emitter)
 const ZEArray<ZEParticleEmitter*>& ZEParticleEffect::GetEmitters()
 {
 	return Emitters;
+}
+
+const ZEArray<ZEParticleSystem*>& ZEParticleEffect::GetSystems()
+{
+	return Systems;
+}
+
+void ZEParticleEffect::AddSystem(ZEParticleSystem* System)
+{
+	System->Owner = this;
+	Systems.Add(System);
+}
+
+void ZEParticleEffect::RemoveSystem(ZEParticleSystem* System)
+{
+	Systems.DeleteValue(System);
 }
 
 ZEParticleEffect::ZEParticleEffect()

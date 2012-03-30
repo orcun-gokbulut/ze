@@ -41,6 +41,7 @@
 #include "ZEGame/ZEComponent.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEParticleEmitter.h"
+#include "ZEParticleSystem.h"
 
 struct ZEDrawParameters;
 
@@ -50,7 +51,10 @@ class ZEParticleEffect : public ZEComponent
 {
 	ZE_META_ENTITY(ZEParticleEffect)
 	private:
+
 		ZEArray<ZEParticleEmitter*>			Emitters;
+		
+		ZEArray<ZEParticleSystem*>			Systems;
 
 
 											ZEParticleEffect();
@@ -69,6 +73,10 @@ class ZEParticleEffect : public ZEComponent
 		void								AddEmitter(ZEParticleEmitter* Emitter);
 		void								RemoveEmitter(ZEParticleEmitter* Emitter);
 		
+		const ZEArray<ZEParticleSystem*>&	GetSystems();
+		void								AddSystem(ZEParticleSystem* Emitter);
+		void								RemoveSystem(ZEParticleSystem* Emitter);
+
 		static ZEParticleEffect*			CreateInstance();
 
 };
