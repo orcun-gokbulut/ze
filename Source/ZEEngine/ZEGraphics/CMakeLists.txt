@@ -114,7 +114,10 @@ ze_add_source(ZETextureResource.h 					Sources Headers)
 ze_add_source(ZETextureFile.cpp						Sources)
 ze_add_source(ZETextureFile.h						Sources Headers)
 ze_add_source(ZETextureFileBMP.cpp					Sources)
-ze_add_source(ZETextureFileBMP.h					Sources Headers)
+ze_add_source(ZETextureFileBMP.h					Sources)
+ze_add_source(ZETextureFileBMPTest.cpp				Tests)
+ze_add_source(ZETextureFileTGA.cpp					Sources)
+ze_add_source(ZETextureFileTGA.h					Sources)
 
 ze_add_source(ZEUIMaterial.cpp 						Sources)
 ze_add_source(ZEUIMaterial.h 						Sources Headers)
@@ -139,7 +142,11 @@ ze_add_source(ZETextureQualityManager.h				Sources Headers)
 ze_add_library(ZEGraphics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS libATICompress libfreeimage
+	LIBS ZEDS libATICompress libfreeimage
 	INSTALL
 	INSTALL_DESTINATION "ZEEngineAPI/ZEGraphics"
 	INSTALL_COMPONENT Header)
+
+ze_add_unit_tests(ZEGraphicsTests 
+	SOURCES ${Tests}
+	TEST_TARGET ZEGraphics)

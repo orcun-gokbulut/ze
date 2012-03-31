@@ -77,8 +77,8 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 
 static void CopyToTexture2D(ZETexture2D* Output, ZETextureData* TextureData)
 {
-	ZEUInt LevelCount = TextureData->GetTextureLevelCount();
-	ZEUInt SurfaceCount = TextureData->GetTextureSurfaceCount();
+	ZEUInt LevelCount = TextureData->GetLevelCount();
+	ZEUInt SurfaceCount = TextureData->GetSurfaceCount();
 
 	// Copy texture data into ZETexture2D
 	void* TargetBuffer = NULL;
@@ -251,7 +251,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 		if (!ZETextureLoader::Read(&PartialResourceFile, &TextureData))
 		{
 			zeAssert(true, "Cannot read texture from cache. File: \"%s\".", ResourceFile->GetFilePath().GetValue());
-			TextureData.DestroyTexture();
+			TextureData.Destroy();
 			return NULL;
 		}
 		
@@ -265,7 +265,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 		if (!ZETextureLoader::LoadFromFile(ResourceFile, &TextureData))
 		{
 			zeAssert(true, "Cannot load image from file: \"%s\".", ResourceFile->GetFilePath().GetValue());
-			TextureData.DestroyTexture();
+			TextureData.Destroy();
 			return NULL;
 		}
 		
@@ -274,7 +274,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	if(TextureData.IsEmpty())
 	{
 		zeError("Cannot load: \"%s\".", ResourceFile->GetFilePath().GetValue());
-		TextureData.DestroyTexture();
+		TextureData.Destroy();
 		return NULL;
 	}
 	
@@ -287,8 +287,8 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 		if (!Processed)
 		{
 			zeAssert(true, "Cannot process texture: \"%s\".", ResourceFile->GetFilePath().GetValue());
-			ProcessedTextureData.DestroyTexture();
-			TextureData.DestroyTexture();
+			ProcessedTextureData.Destroy();
+			TextureData.Destroy();
 			return NULL;
 		}
 
@@ -324,10 +324,10 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	TextureResource->Shared = false;
 
 	// Create the Texture
-	if(!Texture->Create(FinalTextureData->GetTextureWidth(), FinalTextureData->GetTextureHeight(), FinalTextureData->GetTextureLevelCount(), FinalTextureData->GetPixelFormat(), false))
+	if(!Texture->Create(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), FinalTextureData->GetLevelCount(), FinalTextureData->GetPixelFormat(), false))
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFilePath().GetValue());
-		TextureData.DestroyTexture();
+		TextureData.Destroy();
 		delete TextureResource;
 		return NULL;
 	}
@@ -335,8 +335,8 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	CopyToTexture2D(Texture, FinalTextureData);
 
 	FinalTextureData = NULL;
-	ProcessedTextureData.DestroyTexture();
-	TextureData.DestroyTexture();
+	ProcessedTextureData.Destroy();
+	TextureData.Destroy();
 
 	return TextureResource;
 }

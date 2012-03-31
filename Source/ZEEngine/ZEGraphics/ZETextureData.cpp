@@ -71,7 +71,7 @@ ZEUInt ZETextureLevel::GetLevel()
 ZEUInt ZETextureLevel::GetWidth()
 {
 	ZEUInt OwnerSurface			= Owner->GetSurface();
-	ZETextureType TextureType	= Owner->GetOwner()->GetTextureType();
+	ZETextureType TextureType	= Owner->GetOwner()->GetType();
 	
 	// If texture is 3D and the level is empty return 0
 	if (TextureType == ZE_TT_3D && !IsLevelValid(OwnerSurface, Level))
@@ -79,7 +79,7 @@ ZEUInt ZETextureLevel::GetWidth()
 		return 0;
 	}
 
-	ZEUInt TextureWidth			= Owner->GetOwner()->GetTextureWidth();
+	ZEUInt TextureWidth			= Owner->GetOwner()->GetWidth();
 	ZETexturePixelFormat Format = Owner->GetOwner()->GetPixelFormat();
 	ZEUInt LevelWidth			= TextureWidth >> Level;
 	
@@ -99,7 +99,7 @@ ZEUInt ZETextureLevel::GetWidth()
 ZEUInt ZETextureLevel::GetHeight()
 {
 	ZEUInt OwnerSurface			= Owner->GetSurface();
-	ZETextureType TextureType	= Owner->GetOwner()->GetTextureType();
+	ZETextureType TextureType	= Owner->GetOwner()->GetType();
 
 	// If texture is 3D and the level is empty return 0
 	if (TextureType == ZE_TT_3D && !IsLevelValid(OwnerSurface, Level))
@@ -108,7 +108,7 @@ ZEUInt ZETextureLevel::GetHeight()
 	}
 
 	ZETexturePixelFormat Format = Owner->GetOwner()->GetPixelFormat();
-	ZEUInt TextureHeight		= Owner->GetOwner()->GetTextureHeight();
+	ZEUInt TextureHeight		= Owner->GetOwner()->GetHeight();
 	ZEUInt LevelHeight			= TextureHeight >> Level;
 	
 	// Height of last 2 level of compressed textures (2x2 and 1x1) must be 4x4
@@ -250,6 +250,16 @@ ZEArray<ZETextureLevel>& ZETextureSurface::GetLevels()
 	return Levels;
 }
 
+ZEUInt ZETextureSurface::GetWidth()
+{
+	return Owner->GetWidth();
+}
+
+ZEUInt ZETextureSurface::GetHeight()
+{
+	return Owner->GetHeight();
+}
+
 // Calculates and returns the raw data size of surface including all levels
 ZESize ZETextureSurface::GetSize()
 {
@@ -278,21 +288,21 @@ ZETextureSurface::~ZETextureSurface()
 }
 
 // Creates the texture by allocating surface, levels and enough memory based on texture type
-void ZETextureData::CreateTexture(ZETextureType TextureType, ZETexturePixelFormat PixelFormat, ZEUInt SurfaceCount, ZEUInt LevelCount, ZEUInt Width, ZEUInt Height)
+void ZETextureData::Create(ZETextureType TextureType, ZETexturePixelFormat PixelFormat, ZEUInt SurfaceCount, ZEUInt LevelCount, ZEUInt Width, ZEUInt Height)
 {
 	if (!this->IsEmpty())
 	{
 		zeWarning("Texture data is not empty. Clearing existing data.");
-		this->DestroyTexture();
+		this->Destroy();
 	}
 
 	// Set texture data
-	this->Width			= Width;
-	this->Height			= Height;
-	this->LevelCount		= LevelCount;
-	this->SurfaceCount	= SurfaceCount;
-	this->TextureType	= TextureType;
-	this->PixelFormat	= PixelFormat;
+	this->Info.Width			= Width;
+	this->Info.Height		= Height;
+	this->Info.LevelCount	= LevelCount;
+	this->Info.SurfaceCount	= SurfaceCount;
+	this->Info.Type			= TextureType;
+	this->Info.PixelFormat	= PixelFormat;
 
 	ZESize TempLevelCount	= (ZESize)LevelCount;
 	ZESize TempSurfaceCount = (ZESize)SurfaceCount;
@@ -300,7 +310,7 @@ void ZETextureData::CreateTexture(ZETextureType TextureType, ZETexturePixelForma
 	// Create surfaces
 	Surfaces.Resize(TempSurfaceCount);
 
-	switch (this->TextureType)
+	switch (this->Info.Type)
 	{
 		case ZE_TT_3D:
 		{				
@@ -365,23 +375,23 @@ void ZETextureData::CreateTexture(ZETextureType TextureType, ZETexturePixelForma
 	}
 }
 
-void ZETextureData::CreateTexture(ZETextureData& TextureData)
+void ZETextureData::Create(ZETextureData& TextureData)
 {
 	if (!this->IsEmpty())
 	{
-		this->DestroyTexture();
+		this->Destroy();
 	}
 
 	// Allocate surfaces, levels and level data
-	this->Width			= TextureData.Width;
-	this->Height			= TextureData.Height;
-	this->LevelCount		= TextureData.LevelCount;
-	this->SurfaceCount	= TextureData.SurfaceCount;
-	this->TextureType	= TextureData.TextureType;
-	this->PixelFormat	= TextureData.PixelFormat;
+	this->Info.Width			= TextureData.Info.Width;
+	this->Info.Height		= TextureData.Info.Height;
+	this->Info.LevelCount	= TextureData.Info.LevelCount;
+	this->Info.SurfaceCount	= TextureData.Info.SurfaceCount;
+	this->Info.Type			= TextureData.Info.Type;
+	this->Info.PixelFormat	= TextureData.Info.PixelFormat;
 
-	ZESize TempLevelCount	= (ZESize)LevelCount;
-	ZESize TempSurfaceCount = (ZESize)SurfaceCount;
+	ZESize TempLevelCount	= (ZESize)Info.LevelCount;
+	ZESize TempSurfaceCount = (ZESize)Info.SurfaceCount;
 
 	// Create surfaces
 	Surfaces.Resize(TempSurfaceCount);
@@ -420,10 +430,10 @@ void ZETextureData::CreateTexture(ZETextureData& TextureData)
 }
 
 // Destroys the content
-void ZETextureData::DestroyTexture()
+void ZETextureData::Destroy()
 {
-	ZESize TempLevelCount	= (ZESize)LevelCount;
-	ZESize TempSurfaceCount = (ZESize)SurfaceCount;
+	ZESize TempLevelCount	= (ZESize)Info.LevelCount;
+	ZESize TempSurfaceCount = (ZESize)Info.SurfaceCount;
 
 	// free Levels of each Surface
 	for (ZESize I = 0; I < TempSurfaceCount; ++I)
@@ -453,12 +463,12 @@ void ZETextureData::DestroyTexture()
 	Surfaces.Clear(false);
 
 	// Clear texture data
-	this->Width			= 0;
-	this->Height			= 0;
-	this->LevelCount		= 0;
-	this->SurfaceCount	= 0;
-	this->TextureType	= ZE_TT_2D;
-	this->PixelFormat	= ZE_TPF_NOTSET;
+	this->Info.Width			= 0;
+	this->Info.Height		= 0;
+	this->Info.LevelCount	= 0;
+	this->Info.SurfaceCount	= 0;
+	this->Info.Type			= ZE_TT_2D;
+	this->Info.PixelFormat	= ZE_TPF_NOTSET;
 
 }
 
@@ -471,51 +481,56 @@ ZEArray<ZETextureSurface>& ZETextureData::GetSurfaces()
 // True if texture is empty
 bool ZETextureData::IsEmpty()
 {
-	return SurfaceCount == 0 ? true : false;
+	return Info.SurfaceCount == 0 ? true : false;
+}
+
+const ZETextureDataInfo& ZETextureData::GetInfo()
+{
+	return Info;
 }
 
 // Returns texture level0 width
-ZEUInt ZETextureData::GetTextureWidth()
+ZEUInt ZETextureData::GetWidth()
 {
-	return Width;
+	return Info.Width;
 }
 
 // Returns texture level0 height
-ZEUInt ZETextureData::GetTextureHeight()
+ZEUInt ZETextureData::GetHeight()
 {
-	return Height;
+	return Info.Height;
 }
 
 // Returns level count of the texture
-ZEUInt ZETextureData::GetTextureLevelCount()
+ZEUInt ZETextureData::GetLevelCount()
 {
-	return LevelCount;
+	return Info.LevelCount;
 }
 
 // Returns Surface count of the texture
-ZEUInt ZETextureData::GetTextureSurfaceCount()
+ZEUInt ZETextureData::GetSurfaceCount()
 {
-	return SurfaceCount;
+	return Info.SurfaceCount;
 }
 
 // Returns texture type
-ZETextureType ZETextureData::GetTextureType()
+ZETextureType ZETextureData::GetType()
 {
-	return TextureType;
+	return Info.Type;
 }
 
 // Returns pixel format
 ZETexturePixelFormat ZETextureData::GetPixelFormat()
 {
-	return PixelFormat;
+	return Info.PixelFormat;
 }
 
 // Returns size of total raw texture data
 ZESize ZETextureData::GetSize()
 {
 	ZESize TextureSize = 0;
-	ZESize TempLevelCount	= (ZESize)LevelCount;
-	ZESize TempSurfaceCount = (ZESize)SurfaceCount;
+	ZESize TempLevelCount	= (ZESize)Info.LevelCount;
+	ZESize TempSurfaceCount = (ZESize)Info.SurfaceCount;
 
 	for (ZESize I = 0; I < TempSurfaceCount; I++)
 	{
@@ -532,8 +547,8 @@ ZESize ZETextureData::GetSize()
 ZESize ZETextureData::GetSizeOnDisk()
 {
 	ZESize TextureSize = 0;
-	ZESize TempLevelCount					= (ZESize)LevelCount;
-	ZESize TempSurfaceCount					= (ZESize)SurfaceCount;
+	ZESize TempLevelCount					= (ZESize)Info.LevelCount;
+	ZESize TempSurfaceCount					= (ZESize)Info.SurfaceCount;
 
 	ZESize ZETextureFileHeaderSize			= sizeof(ZETextureFileHeader);
 	ZESize ZETextureFileSurfaceChunkSize	= sizeof(ZETextureFileSurfaceChunk);
@@ -558,13 +573,12 @@ ZESize ZETextureData::GetSizeOnDisk()
 // Const
 ZETextureData::ZETextureData()
 {
-	Width			= 0;
-	Height			= 0;
-	LevelCount		= 0;
-	SurfaceCount	= 0;
-
-	TextureType		= ZE_TT_2D;
-	PixelFormat		= ZE_TPF_NOTSET;
+	Info.Width			= 0;
+	Info.Height			= 0;
+	Info.LevelCount		= 0;
+	Info.SurfaceCount	= 0;
+	Info.Type			= ZE_TT_2D;
+	Info.PixelFormat	= ZE_TPF_NOTSET;
 
 	Surfaces.Clear(false);
 }
@@ -578,11 +592,11 @@ ZETextureData::~ZETextureData()
 // Converts a single surface, single level texture data to 6 surface texture data
 void ZETextureData::ConvertToCubeTextureData(ZETextureData* Output, ZETextureData* TextureData)
 {
-	if (TextureData->GetTextureSurfaceCount() != 1)
+	if (TextureData->GetSurfaceCount() != 1)
 		return;
 
-	ZEUInt TargetWidth	= TextureData->GetTextureWidth() / 3;
-	ZEUInt TargetHeight = TextureData->GetTextureHeight() / 2;
+	ZEUInt TargetWidth	= TextureData->GetWidth() / 3;
+	ZEUInt TargetHeight = TextureData->GetHeight() / 2;
 
 	zeAssert(TargetWidth != TargetHeight, "Cannot convert texture data. Dimensions do not match..");
 
@@ -590,11 +604,11 @@ void ZETextureData::ConvertToCubeTextureData(ZETextureData* Output, ZETextureDat
 	if (!Output->IsEmpty())
 	{
 		zeWarning("Output Texture data is not empty. Clearing it.");
-		Output->DestroyTexture();
+		Output->Destroy();
 	}
 
 	// Create output
-	Output->CreateTexture(ZE_TT_CUBE, TextureData->GetPixelFormat(), 6, 1, TargetWidth, TargetHeight);
+	Output->Create(ZE_TT_CUBE, TextureData->GetPixelFormat(), 6, 1, TargetWidth, TargetHeight);
 
 	struct
 	{
@@ -615,7 +629,7 @@ void ZETextureData::ConvertToCubeTextureData(ZETextureData* Output, ZETextureDat
 	ZESize SourcePitch	= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();
 	
 	ZESize TempTargetHeight = (ZESize)TargetHeight;
-	ZESize TempSurfaceCount = (ZESize)Output->GetTextureSurfaceCount();
+	ZESize TempSurfaceCount = (ZESize)Output->GetSurfaceCount();
 
 
 	for (ZESize I = 0; I < TempSurfaceCount; ++I)
@@ -633,8 +647,8 @@ void ZETextureData::ConvertToCubeTextureData(ZETextureData* Output, ZETextureDat
 // Converts a single surface, single level texture data to n surface texture data
 void ZETextureData::ConvertToVolumeTextureData(ZETextureData* Output, ZETextureData* TextureData, ZEUInt HorizTileCount, ZEUInt VertTileCount)
 {
-	ZEUInt TargetWidth	= TextureData->GetTextureWidth() / HorizTileCount;
-	ZEUInt TargetHeight = TextureData->GetTextureHeight() / VertTileCount;
+	ZEUInt TargetWidth	= TextureData->GetWidth() / HorizTileCount;
+	ZEUInt TargetHeight = TextureData->GetHeight() / VertTileCount;
 
 	void* SourceData	= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetData();
 	ZESize SourcePitch	= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();
@@ -643,10 +657,10 @@ void ZETextureData::ConvertToVolumeTextureData(ZETextureData* Output, ZETextureD
 	if (!Output->IsEmpty())
 	{
 		zeWarning("Output Texture data is not empty. Clearing it.");
-		Output->DestroyTexture();
+		Output->Destroy();
 	}
 
-	Output->CreateTexture(ZE_TT_3D, TextureData->GetPixelFormat(), HorizTileCount * VertTileCount, 1, TargetWidth, TargetHeight);
+	Output->Create(ZE_TT_3D, TextureData->GetPixelFormat(), HorizTileCount * VertTileCount, 1, TargetWidth, TargetHeight);
 
 
 	ZESize TempTargetHeight		= (ZESize)TargetHeight;
