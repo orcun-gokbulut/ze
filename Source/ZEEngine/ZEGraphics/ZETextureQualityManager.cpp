@@ -159,7 +159,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 	if (!Output->IsEmpty())
 	{
 		zeWarning("Output Texture data is not empty. Clearing it.");
-		Output->DestroyTexture();
+		Output->Destroy();
 	}
 
 	// If already compressed
@@ -173,15 +173,15 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 	if (FinalOptions->CompressionType == ZE_TCT_NONE && FinalOptions->DownSample == ZE_TDS_NONE && FinalOptions->MipMapping == ZE_TMM_DISABLED)
 	{
 		// Copy and return 
-		Output->CreateTexture(*TextureData);
+		Output->Create(*TextureData);
 		return true;
 	}
 
 	// If no change is needed
-	if (FinalOptions->MaximumMipmapLevel == TextureData->GetTextureLevelCount() && FinalOptions->CompressionType == GetCompressionType(TextureData->GetPixelFormat()))
+	if (FinalOptions->MaximumMipmapLevel == TextureData->GetLevelCount() && FinalOptions->CompressionType == GetCompressionType(TextureData->GetPixelFormat()))
 	{
 		// Copy and return 
-		Output->CreateTexture(*TextureData); 
+		Output->Create(*TextureData); 
 		return true;
 	}
 
@@ -192,18 +192,18 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 	
 	// Create output
 	ZEUInt DestLevelCount					= FinalOptions->MaximumMipmapLevel;
-	ZEUInt SrcSurfaceCount					= TextureData->GetTextureSurfaceCount();
-	ZETextureType SrcTextureType			= TextureData->GetTextureType();
+	ZEUInt SrcSurfaceCount					= TextureData->GetSurfaceCount();
+	ZETextureType SrcTextureType			= TextureData->GetType();
 	ZETexturePixelFormat DestPixelFormat	= GetPixelFormat(FinalOptions->CompressionType) == ZE_TPF_NOTSET ? TextureData->GetPixelFormat() : GetPixelFormat(FinalOptions->CompressionType);
 
-	ZEUInt SrcWidth			= TextureData->GetTextureWidth();
-	ZEUInt SrcHeight		= TextureData->GetTextureHeight();
-	ZEUInt SrcLevelCount	= TextureData->GetTextureLevelCount();
+	ZEUInt SrcWidth			= TextureData->GetWidth();
+	ZEUInt SrcHeight		= TextureData->GetHeight();
+	ZEUInt SrcLevelCount	= TextureData->GetLevelCount();
 
 	// Get down sample count
 	ZEUInt DownSampleCount			= GetDownSampleCount(FinalOptions->DownSample);
 	
-	Output->CreateTexture(SrcTextureType, DestPixelFormat, SrcSurfaceCount, DestLevelCount, SrcWidth >> DownSampleCount, SrcHeight >> DownSampleCount);
+	Output->Create(SrcTextureType, DestPixelFormat, SrcSurfaceCount, DestLevelCount, SrcWidth >> DownSampleCount, SrcHeight >> DownSampleCount);
 
 	// Compress and generate MipMaps according to texture type
 	switch (SrcTextureType)
@@ -450,7 +450,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 			void* TempSUrface3		= NULL; // 1x1 level
 
 			ZETextureData TempTextureData;
-			TempTextureData.CreateTexture(ZE_TT_3D, TextureData->GetPixelFormat(), SrcSurfaceCount, DestLevelCount, SrcWidth >> DownSampleCount, SrcHeight >> DownSampleCount);
+			TempTextureData.Create(ZE_TT_3D, TextureData->GetPixelFormat(), SrcSurfaceCount, DestLevelCount, SrcWidth >> DownSampleCount, SrcHeight >> DownSampleCount);
 			
 			// Compress and generate MipMaps
 			if (Compress && GenerateMipmaps)
@@ -669,7 +669,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 				}
 			}
 
-			TempTextureData.DestroyTexture();
+			TempTextureData.Destroy();
 			free(Buffer1);
 			free(Buffer2);
 			return true;
@@ -706,7 +706,7 @@ bool ZETextureQualityManager::GetFinalTextureOptions(ZETextureOptions* FinalOpti
 	FinalOptions->MipMapping			= (UserOptions->MipMapping == ZE_TMM_AUTO)			? DefaultOptions->MipMapping			: UserOptions->MipMapping;
 	FinalOptions->FileCaching			= (UserOptions->FileCaching == ZE_TFC_AUTO)			? DefaultOptions->FileCaching			: UserOptions->FileCaching;
 
-	ZETextureInfo TextureInfo = {0};
+	ZETextureDataInfo TextureInfo = {0};
 	
 	// Tries to get texture info from pack or standalone ZETextureFile
 	if(!ZETextureLoader::GetTextureInfo(&TextureInfo, ResourceFile))

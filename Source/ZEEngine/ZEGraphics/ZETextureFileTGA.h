@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureLoader.h
+ Zinek Engine - ZETextureFileTGA.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,43 +33,18 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
 #pragma once
-#ifndef __ZE_TEXTURE_LOADER_H__
-#define __ZE_TEXTURE_LOADER_H__
+#ifndef __ZE_TEXTURE_FILE_TGA_H__
+#define __ZE_TEXTURE_FILE_TGA_H__
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
-#include "ZEGraphics/ZETexture.h"
+#include "ZETextureFile.h"
 
-class ZEFile;
-class ZETextureData;
-class ZETextureDataInfo;
-
-class ZETextureLoader
+class ZETextureFileTGA : public ZETextureFile
 {
-	protected:
-
-	private:
-							ZETextureLoader();
-		virtual				~ZETextureLoader();
-
 	public:
-		static bool			IsZETextureFile(const ZEString& FilePath);
-		static bool			IsZETextureFile(ZEFile* File);
-
-		static bool			LoadFromImageFile(ZEFile* File, ZETextureData* TextureData);
-		static bool			SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, ZESize Surface = 0, ZESize Level = 0);
-								
-		static bool			Read(ZEFile* File, ZETextureData* TextureData);
-		static bool			Write(ZEFile* File, ZETextureData* TextureData);
-
-		static bool			LoadFromFile(ZEFile* File, ZETextureData* TextureData);
-
-		static bool			GetImageInfo(ZETextureDataInfo* TextureInfo, ZEFile* File);
-		static bool			GetTextureInfo(ZETextureDataInfo* TextureInfo, ZEFile* File);
-
-		
-
+		virtual bool				CanLoad(ZEFile* File);
+		virtual ZETextureData*		Load(ZEFile* File);
 };
 
 #endif

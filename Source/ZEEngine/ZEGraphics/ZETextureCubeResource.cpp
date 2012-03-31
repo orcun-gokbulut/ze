@@ -72,8 +72,8 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 
 static void CopyToTextureCube(ZETextureCube* Output, ZETextureData* TextureData)
 {
-	ZEUInt LevelCount = TextureData->GetTextureLevelCount();
-	ZEUInt SurfaceCount = TextureData->GetTextureSurfaceCount();
+	ZEUInt LevelCount = TextureData->GetLevelCount();
+	ZEUInt SurfaceCount = TextureData->GetSurfaceCount();
 
 	// Copy texture data into ZETextureCube
 	void* TargetBuffer = NULL;
@@ -224,8 +224,8 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		if (!ZETextureLoader::Read(&PartialResourceFile, &ProcessedTextureData))
 		{
 			zeAssert(true, "Cannot read texture from cache. File: \"%s\".", ResourceFile->GetFilePath().GetValue());
-			TempTextureData.DestroyTexture();
-			ProcessedTextureData.DestroyTexture();
+			TempTextureData.Destroy();
+			ProcessedTextureData.Destroy();
 			return NULL;
 		}
 
@@ -240,7 +240,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		if (!ZETextureLoader::LoadFromFile(ResourceFile, &ProcessedTextureData))
 		{
 			zeAssert(true, "Cannot load image from file: \"%s\".", ResourceFile->GetFilePath().GetValue());
-			TempTextureData.DestroyTexture();
+			TempTextureData.Destroy();
 			return NULL;
 		}
 	}
@@ -249,7 +249,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	if (ProcessedTextureData.IsEmpty())
 	{
 		zeError("Cannot load: \"%s\".", ResourceFile->GetFilePath().GetValue());
-		TempTextureData.DestroyTexture();
+		TempTextureData.Destroy();
 		return NULL;
 	}
 
@@ -260,14 +260,14 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	
 		// Convert to 6 surface texture data and clean ProcessedTextureData
 		ZETextureData::ConvertToCubeTextureData(&TempTextureData, &ProcessedTextureData);
-		ProcessedTextureData.DestroyTexture();
+		ProcessedTextureData.Destroy();
 
 		Processed = ZETextureQualityManager::Process(&ProcessedTextureData, &TempTextureData, &FinalOptions);
 		if (!Processed)
 		{
 			zeCriticalError("Cannot process texture: \"%s\".", ResourceFile->GetFilePath().GetValue());
-			ProcessedTextureData.DestroyTexture();
-			TempTextureData.DestroyTexture();
+			ProcessedTextureData.Destroy();
+			TempTextureData.Destroy();
 			return NULL;
 		}
 	}
@@ -296,8 +296,8 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	if (Texture == NULL)
 	{
 		delete TextureResource;
-		ProcessedTextureData.DestroyTexture();
-		TempTextureData.DestroyTexture();
+		ProcessedTextureData.Destroy();
+		TempTextureData.Destroy();
 		return NULL;
 	}
 
@@ -307,19 +307,19 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	TextureResource->Shared = false;
 
 	// Create the Texture
-	if (!Texture->Create(ProcessedTextureData.GetTextureWidth(), ProcessedTextureData.GetTextureLevelCount(), ProcessedTextureData.GetPixelFormat(), false))
+	if (!Texture->Create(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat(), false))
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFilePath().GetValue());
-		ProcessedTextureData.DestroyTexture();
-		TempTextureData.DestroyTexture();
+		ProcessedTextureData.Destroy();
+		TempTextureData.Destroy();
 		delete TextureResource;
 		return NULL;
 	}
 
 	CopyToTextureCube(Texture, &ProcessedTextureData);
 	
-	ProcessedTextureData.DestroyTexture();
-	TempTextureData.DestroyTexture();
+	ProcessedTextureData.Destroy();
+	TempTextureData.Destroy();
 	
 	return TextureResource;
 }

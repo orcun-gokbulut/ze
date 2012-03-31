@@ -81,8 +81,8 @@ static void CopyToTexture3D(ZETexture3D* Texture, ZETextureData* TextureData)
 	ZESize RowPitch		= 0;
 
 	// Get texture specs
-	ZESize SurfaceLevelCount	= (ZESize)TextureData->GetTextureLevelCount();
-	ZESize TextureSurfaceCount	= (ZESize)TextureData->GetTextureSurfaceCount();
+	ZESize SurfaceLevelCount	= (ZESize)TextureData->GetLevelCount();
+	ZESize TextureSurfaceCount	= (ZESize)TextureData->GetSurfaceCount();
 
 
 	for (ZESize Level = 0,  SurfaceIncrement = 1; Level < SurfaceLevelCount; ++Level, SurfaceIncrement *= 2)
@@ -259,7 +259,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 		if (!ZETextureLoader::Read(&PartialResourceFile, &ProcessedTextureData))
 		{
 			zeAssert(true, "Cannot read texture from cache. File: \"%s\".", ResourceFile->GetFilePath().GetValue());
-			ProcessedTextureData.DestroyTexture();
+			ProcessedTextureData.Destroy();
 			return NULL;
 		}
 
@@ -274,7 +274,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 		if (!ZETextureLoader::LoadFromFile(ResourceFile, &ProcessedTextureData))
 		{
 			zeAssert(true, "Cannot load image from file: \"%s\".", ResourceFile->GetFilePath().GetValue());
-			ProcessedTextureData.DestroyTexture();
+			ProcessedTextureData.Destroy();
 			return NULL;
 		}
 	}
@@ -282,7 +282,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	if(ProcessedTextureData.IsEmpty())
 	{
 		zeError("Cannot load: \"%s\".", ResourceFile->GetFilePath().GetValue());
-		ProcessedTextureData.DestroyTexture();
+		ProcessedTextureData.Destroy();
 		return NULL;
 	}
 
@@ -293,15 +293,15 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 
 		// Convert to VertTileCount * HorizTileCount tile count surfaced texture data
 		ZETextureData::ConvertToVolumeTextureData(&TempTextureData, &ProcessedTextureData, HorizTileCount, VertTileCount);
-		ProcessedTextureData.DestroyTexture();
+		ProcessedTextureData.Destroy();
 
 		// Send the unprocessed texture data to process function
 		Processed = ZETextureQualityManager::Process(&ProcessedTextureData, &TempTextureData, &FinalOptions);
 		if (!Processed)
 		{
 			zeCriticalError("Cannot process texture: \"%s\".", ResourceFile->GetFilePath().GetValue());
-			ProcessedTextureData.DestroyTexture();
-			TempTextureData.DestroyTexture();
+			ProcessedTextureData.Destroy();
+			TempTextureData.Destroy();
 			return NULL;
 		}
 		
@@ -331,8 +331,8 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	if (Texture == NULL)
 	{
 		delete TextureResource;
-		ProcessedTextureData.DestroyTexture();
-		TempTextureData.DestroyTexture();
+		ProcessedTextureData.Destroy();
+		TempTextureData.Destroy();
 		return NULL;
 	}
 
@@ -342,19 +342,19 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	TextureResource->Shared = false;
 
 	// Create the Texture
-	if (!Texture->Create(ProcessedTextureData.GetTextureWidth(), ProcessedTextureData.GetTextureHeight(), ProcessedTextureData.GetTextureSurfaceCount(), ProcessedTextureData.GetTextureLevelCount(), ProcessedTextureData.GetPixelFormat()))
+	if (!Texture->Create(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetHeight(), ProcessedTextureData.GetSurfaceCount(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat()))
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFilePath().GetValue());
-		ProcessedTextureData.DestroyTexture();
-		TempTextureData.DestroyTexture();
+		ProcessedTextureData.Destroy();
+		TempTextureData.Destroy();
 		delete TextureResource;
 		return NULL;
 	}
 
 	CopyToTexture3D(Texture, &ProcessedTextureData);
 
-	TempTextureData.DestroyTexture();
-	ProcessedTextureData.DestroyTexture();
+	TempTextureData.Destroy();
+	ProcessedTextureData.Destroy();
 	
 	return TextureResource;
 }
