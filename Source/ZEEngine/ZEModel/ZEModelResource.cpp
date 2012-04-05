@@ -390,14 +390,6 @@ static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 			}
 		}
 	}
-
-	float TempValue = Mesh->BoundingBox.Max.y;
-	Mesh->BoundingBox.Max.y = Mesh->BoundingBox.Max.z;
-	Mesh->BoundingBox.Max.z = TempValue;
-
-	TempValue = Mesh->BoundingBox.Min.y;
-	Mesh->BoundingBox.Min.y = Mesh->BoundingBox.Min.z;
-	Mesh->BoundingBox.Min.z = TempValue;
 }
 
 static bool ReadMeshesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
