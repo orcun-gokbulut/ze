@@ -37,7 +37,7 @@
 #ifndef	__ZE_SOUND_SOURCE_3D_H__
 #define __ZE_SOUND_SOURCE_3D_H__
 
-#include "ZEGame/ZEComponent.h"
+#include "ZEGame/ZEEntity.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZESoundSource.h"
 

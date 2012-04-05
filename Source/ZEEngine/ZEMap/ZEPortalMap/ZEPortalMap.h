@@ -97,7 +97,6 @@ class ZEPortalMap : public ZEEntity
 		const ZEPortalMapCullStatistics&		GetCullStatistics();
 
 		virtual ZEDrawFlags						GetDrawFlags() const;
-		virtual ZERayCastFlags					GetRayCastFlags() const;
 
 		virtual bool							Initialize();
 		virtual void							Deinitialize();
@@ -118,7 +117,7 @@ class ZEPortalMap : public ZEEntity
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-		<class name="ZEPortalMap"	parent="ZEEntity"	description="Portal map">
+		<class name="ZEPortalMap" parent="ZEEntity" description="Portal map">
 			<property name="MapFile"
 				type="string"
 				autogetset="true"

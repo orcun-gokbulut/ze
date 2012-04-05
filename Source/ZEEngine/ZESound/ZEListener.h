@@ -37,11 +37,11 @@
 #ifndef	__ZE_LISTENER_H__
 #define __ZE_LISTENER_H__
 
-#include "ZEGame/ZEComponent.h"
+#include "ZEGame/ZEEntity.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZEListener);
 
-class ZEListener: public ZEComponent
+class ZEListener: public ZEEntity
 {
 	ZE_META_ENTITY(ZEListener)
 	protected:
@@ -74,7 +74,7 @@ class ZEListener: public ZEComponent
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZEListener" parent="ZEComponent">
+		<class name="ZEListener" parent="ZEEntity">
 			<description>Listener</description>
 			<property name="DistanceFactor" type="float" autogetset="yes"/>
 			<property name="DopplerFactor" type="float" autogetset="yes"/>

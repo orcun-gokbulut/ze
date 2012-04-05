@@ -35,8 +35,6 @@
 
 
 #include "ZEMoon.h"
-#include "ZETypes.h"
-#include "ZEEntity.h"
 #include "ZEMath\ZEVector.h"
 #include "ZEDrawParameters.h"
 #include "ZEGraphics\ZERenderer.h"

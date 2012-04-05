@@ -86,7 +86,7 @@ void ZECamera::SetPosition(const ZEVector3& NewPosition)
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;
 	UpdateViewProjectionTransform = true;
-	ZEComponent::SetPosition(NewPosition);
+	ZEEntity::SetPosition(NewPosition);
 }	
 
 void ZECamera::SetLocalRotation(const ZEQuaternion& NewRotation)
@@ -94,7 +94,7 @@ void ZECamera::SetLocalRotation(const ZEQuaternion& NewRotation)
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;
 	UpdateViewProjectionTransform = true;
-	ZEComponent::SetRotation(NewRotation);
+	ZEEntity::SetRotation(NewRotation);
 }
 
 void ZECamera::OnTransformChanged()
@@ -102,7 +102,7 @@ void ZECamera::OnTransformChanged()
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;
 	UpdateViewProjectionTransform = true;
-	ZEComponent::OnTransformChanged();
+	ZEEntity::OnTransformChanged();
 }
 
 void ZECamera::SetNearZ(float NearZ)
@@ -173,7 +173,7 @@ const ZEView& ZECamera::GetView()
 	View.ViewTransform = GetViewTransform();
 	View.ViewProjectionTransform = GetViewProjectionTransform();
 	View.Rotation = GetWorldRotation();
-	View.Direction = GetWorldDirection();
+	View.Direction = GetWorldFront();
 
 	UpdateView = false;
 	return View;

@@ -266,6 +266,7 @@ void ZECloud::Deinitialize()
 
 	CloudRenderCommand.SetZero();
 
+	ZEEntity::Deinitialize();
 }
 
 void ZECloud::Draw(ZEDrawParameters* DrawParameters)

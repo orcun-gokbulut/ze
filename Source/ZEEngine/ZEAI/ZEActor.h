@@ -42,79 +42,79 @@
 #include "ZEDS\ZEFlags.h"
 #include "ZEDS\ZEString.h"
 #include "ZEMath\ZEVector.h"
-#include "ZEGame\ZECompoundEntity.h"
+#include "ZEGame\ZEEntity.h"
 
 class ZESteering;
 
-class ZEActor : public ZECompoundEntity
+class ZEActor : public ZEEntity
 {
 	private:
-		float					Rotation2D;
+		float						Rotation2D;
 
-		ZEVector3				LinearVelocity;
-		float					AngularVelocity;
+		ZEVector3					LinearVelocity;
+		float						AngularVelocity;
 
-		ZEVector3				LinearAcceleration;
-		float					AngularAcceleration;
+		ZEVector3					LinearAcceleration;
+		float						AngularAcceleration;
 
-		float					MinLinearAcceleration;
-		float					MinAngularAcceleration;
+		float						MinLinearAcceleration;
+		float						MinAngularAcceleration;
 
-		float					MaxAngularAcceleration;
-		float					MaxLinearAcceleration;
+		float						MaxAngularAcceleration;
+		float						MaxLinearAcceleration;
 
-		float					MaxLinearVelocity;
-		float					MaxAngularVelocity;
+		float						MaxLinearVelocity;
+		float						MaxAngularVelocity;
 
-		float					Radius;
+		float						Radius;
 
-		ZEArray<ZESteering*>	Steerings;
+		ZEArray<ZESteering*>		Steerings;
 
 	public:
-		void					SetRotation2D(float Rotation);
-		float					GetRotation2D();
+		void						SetRotation2D(float Rotation);
+		float						GetRotation2D();
 
-		void					SetFaceRotation(float Rotation);
-		float					GetFaceRotation();
+		void						SetFaceRotation(float Rotation);
+		float						GetFaceRotation();
 
-		void					SetLinearVelocity(const ZEVector3& Velocity);
-		const ZEVector3&		GetLinearVelocity();
+		void						SetLinearVelocity(const ZEVector3& Velocity);
+		const ZEVector3&			GetLinearVelocity();
 
-		void					SetAngularVelocity(float Velocity);
-		float					GetAngularVelocity();
+		void						SetAngularVelocity(float Velocity);
+		float						GetAngularVelocity();
 
-		const ZEVector3&		GetLinearAcceleration();
-		float					GetAngularAcceleration();
+		const ZEVector3&			GetLinearAcceleration();
+		float						GetAngularAcceleration();
 
-		void					SetMaxAngularVelocity(float Velocity);
-		float					GetMaxAngularVelocity();
+		void						SetMaxAngularVelocity(float Velocity);
+		float						GetMaxAngularVelocity();
 
-		void					SetMaxLinearVelocity(float Velocity);
-		float					GetMaxLinearSpeed();
+		void						SetMaxLinearVelocity(float Velocity);
+		float						GetMaxLinearSpeed();
 
-		void					SetMinLinearAcceleration(float Acceleration);
-		float					GetMinLinearAcceleration();
+		void						SetMinLinearAcceleration(float Acceleration);
+		float						GetMinLinearAcceleration();
 
-		void					SetMaxLinearAcceleration(float Acceleration);
-		float					GetMaxLinearAcceleration();
+		void						SetMaxLinearAcceleration(float Acceleration);
+		float						GetMaxLinearAcceleration();
 
-		void					SetMinAngularAcceleration(float Acceleration);
-		float					GetMinAngularAcceleration();
+		void						SetMinAngularAcceleration(float Acceleration);
+		float						GetMinAngularAcceleration();
 
-		void					SetMaxAngularAcceleration(float Acceleration);
-		float					GetMaxAngularAcceleration();
+		void						SetMaxAngularAcceleration(float Acceleration);
+		float						GetMaxAngularAcceleration();
 	
-		void					SetRadius(float Radius);
-		float					GetRadius();
+		void						SetRadius(float Radius);
+		float						GetRadius();
 
 		const ZEArray<ZESteering*>&	GetSteerings();
-		void					AddSteering(ZESteering* Steering);
-		void					RemoveSteering(ZESteering* Steering);
+		void						AddSteering(ZESteering* Steering);
+		void						RemoveSteering(ZESteering* Steering);
 
-		virtual void			Tick(float ElapsedTime);
+		virtual void				Tick(float ElapsedTime);
 
-								ZEActor();
-								~ZEActor();
+									ZEActor();
+									~ZEActor();
 };
 
 #endif

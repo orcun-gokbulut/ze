@@ -56,7 +56,7 @@ void ZEALListener::ResetParameters()
 		Orientation[5] = Temp.z;
 		alListenerfv(AL_ORIENTATION, Orientation);
 
-		const ZEVector3& WorldVelocity = GetWorldVelocity();
+		const ZEVector3& WorldVelocity = ZEVector3::Zero; /*GetWorldVelocity();*/
 		alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);
 
 		alSpeedOfSound(DistanceFactor * 343.3f);
@@ -88,7 +88,7 @@ bool ZEALListener::IsActiveListener()
 
 void ZEALListener::SetPosition(const ZEVector3& Position)
 {
-	ZEComponent::SetPosition(Position);
+	ZEEntity::SetPosition(Position);
 
 	if (IsActiveListener())
 	{
@@ -99,7 +99,7 @@ void ZEALListener::SetPosition(const ZEVector3& Position)
 
 void ZEALListener::SetRotation(const ZEQuaternion& Rotation)
 {
-	ZEComponent::SetRotation(Rotation);
+	ZEEntity::SetRotation(Rotation);
 
 	if (IsActiveListener())
 	{
@@ -166,16 +166,16 @@ void ZEALListener::OwnerWorldTransformChanged()
 		Orientation[5] = Temp.z;
 		alListenerfv(AL_ORIENTATION, Orientation);
 
-		const ZEVector3& WorldVelocity = GetWorldVelocity();
+		const ZEVector3& WorldVelocity = ZEVector3::Zero; /*GetWorldVelocity();*/
 		alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);
 	}
 }
 
 void ZEALListener::Tick(float ElapsedTime)
 {
-	ZEComponent::Tick(ElapsedTime);
+	ZEEntity::Tick(ElapsedTime);
 
-	const ZEVector3& WorldVelocity = GetWorldVelocity();
+	const ZEVector3& WorldVelocity = ZEVector3::Zero; /*GetWorldVelocity();*/
 	alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);
 }
 

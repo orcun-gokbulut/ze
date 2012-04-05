@@ -114,7 +114,7 @@ const ZEMatrix4x4& ZEModelBone::GetWorldTransform()
 
 const ZEMatrix4x4& ZEModelBone::GetModelTransform()
 {
-	ZEMatrix4x4::Multiply(WorldTransform, Owner->GetLocalTransform(), GetLocalTransform());
+	ZEMatrix4x4::Multiply(WorldTransform, Owner->GetTransform(), GetLocalTransform());
 
 	return WorldTransform;
 }
@@ -325,9 +325,9 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 				case ZE_PST_BOX:
 				{
 					ZEPhysicalBoxShape* BoxShape = new ZEPhysicalBoxShape();
-					BoxShape->SetWidth(Shape->Box.Width);
-					BoxShape->SetHeight(Shape->Box.Height);
-					BoxShape->SetLength(Shape->Box.Length);
+					BoxShape->SetWidth(Shape->Box.Width / 2.0f);
+					BoxShape->SetHeight(Shape->Box.Height / 2.0f);
+					BoxShape->SetLength(Shape->Box.Length / 2.0f);
 					BoxShape->SetPosition(Shape->Position);
 					BoxShape->SetRotation(Shape->Rotation);
 					ShapeList.Add(BoxShape);

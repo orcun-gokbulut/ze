@@ -37,7 +37,7 @@
 #ifndef	__ZE_CAMERA_H__
 #define __ZE_CAMERA_H__
 
-#include "ZEGame/ZEComponent.h"
+#include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZERenderer.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZECanvas.h"
@@ -58,7 +58,7 @@ class ZEViewPort;
 
 ZE_META_OBJECT_DESCRIPTION(ZECamera);
 
-class ZECamera : public ZEComponent
+class ZECamera : public ZEEntity
 {
 	ZE_META_OBJECT(ZECamera)
 	private:
@@ -112,13 +112,11 @@ class ZECamera : public ZEComponent
 		static ZECamera*				CreateInstance();
 };
 
-#endif
-
 /*
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZECamera" parent="ZEComponent" noinstance="false">
+		<class name="ZECamera" parent="ZEEntity" noinstance="false">
 			<description>Camera</description>
 			<property name="NearZ" type="float" autogetset="yes" description="The nearest distance that camera can show"/>
 			<property name="FarZ" type="float" autogetset="yes" description="The farest distance that camera can show"/>
@@ -129,3 +127,6 @@ ZE_POST_PROCESSOR_START(Meta)
 </zinek>
 ZE_POST_PROCESSOR_END()
 */
+
+#endif
+

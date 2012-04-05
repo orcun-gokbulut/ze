@@ -67,7 +67,7 @@ class ZETimer
 		void					SetRepeating(bool Value);
 		bool					GetRepeating();
 
-		void					SetIntervalTime(float MSecs);
+		void					SetIntervalTime(float Secs);
 		float					GetIntervalTime();
 
 		bool					GetDone();

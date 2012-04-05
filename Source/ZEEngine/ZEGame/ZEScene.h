@@ -73,7 +73,7 @@ class ZEScene
 
 		ZESceneCuller							Culler;
 
-		ZESmartArray<ZEEntity*>					Entities;
+		ZESmartArray<ZEEntity*>				Entities;
 
 		ZEPhysicalWorld*						PhysicalWorld;
 

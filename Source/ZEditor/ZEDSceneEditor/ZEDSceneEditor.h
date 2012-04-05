@@ -77,7 +77,7 @@ class MapEditor : public QMainWindow
 		ZEPlayer*					Player;
 		ZEDGizmoMode				GizmoMode;
 		ZEDSceneList*				SceneList;
-		ZEDUndoRedoManagerOld			UndoRedoManager;
+		ZEDUndoRedoManagerOld		UndoRedoManager;
 		ZEDLoadingScreen*			SplashScreen;
 		ZEDGrid*					Grid;
 

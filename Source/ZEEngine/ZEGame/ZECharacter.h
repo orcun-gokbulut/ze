@@ -37,7 +37,7 @@
 #ifndef	__ZE_CHARACTER_H__
 #define __ZE_CHARACTER_H__
  
-#include "ZECompoundEntity.h"
+#include "ZEEntity.h"
 #include "ZEInput/ZEInputMap.h"
 
 #include <stdio.h>
@@ -89,7 +89,7 @@ enum ZECharacterRecordingStatus
 
 class ZEProjectiveLight;
 
-class ZECharacter : public ZECompoundEntity
+class ZECharacter : public ZEEntity
 {
 	ZE_META_ENTITY(ZECharacter)
 	private:
@@ -186,7 +186,7 @@ class ZECharacter : public ZECompoundEntity
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-		<class name="ZECharacter" parent="ZECompoundEntity" description="Player spawn point"/>
+		<class name="ZECharacter" parent="ZEEntity" description="Player spawn point"/>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()

@@ -104,6 +104,16 @@ void ZEGrid::GenerateGrid()
 		MajorGrid.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y), ZEVector3(GridSize.x * 0.5f, 0.0f, Y * MajorGridUnitSize.y));
 }
 
+void ZEGrid::SetAxisColor( const ZEVector3& Color )
+{
+	this->AxisColor = Color;
+}
+
+const ZEVector3& ZEGrid::GetAxisColor()
+{
+	return AxisColor;
+}
+
 void ZEGrid::Draw(ZEDrawParameters* Parameters)
 {
 	ZEVector3 CameraPosition = Parameters->View->Camera->GetWorldPosition();

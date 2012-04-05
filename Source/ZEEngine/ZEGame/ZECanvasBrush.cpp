@@ -70,7 +70,7 @@ void ZECanvasBrush::UpdateCanvas()
 	
 		ZEAABBox BoundingBox;
 		Canvas.CalculateBoundingBox(BoundingBox);
-		SetLocalBoundingBox(BoundingBox);
+		SetBoundingBox(BoundingBox);
 		RenderCommand.VertexBuffer = Canvas.CreateStaticVertexBuffer();
 	}
 }

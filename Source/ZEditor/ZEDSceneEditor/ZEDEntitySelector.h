@@ -98,7 +98,7 @@ class ZEDEntitySelector : public QDialog
 		QLabel*								SearchLabel;
 		QLineEdit*							SearchLineEdit;
 		QComboBox*							FilterComboBox;
-		ZEArray<ZEEntity*>*					SelectedEntities;
+		ZEArray<ZEEntity*>*				SelectedEntities;
 		void								GenerateList();
 
 	

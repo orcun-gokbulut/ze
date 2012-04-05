@@ -294,10 +294,10 @@ ZEPlayer::ZEPlayer()
 	Camera->SetFarZ(zeGraphics->GetFarZ());
 	Camera->SetFOV(FOV);
 	Camera->SetAspectRatio(zeGraphics->GetAspectRatio());
-	RegisterComponent(Camera);
+	AddComponent(Camera);
 
 	Listener = ZEListener::CreateInstance();
-	RegisterComponent(Listener);
+	AddComponent(Listener);
 }
 
 ZEPlayer::~ZEPlayer()

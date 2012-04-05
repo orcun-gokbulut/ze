@@ -51,19 +51,19 @@ class ZEPortal
 {
 	private:
 		ZEMapPortal*					PortalResource;
-		ZESmartArray<ZEEntity*>			Entities;
+		ZESmartArray<ZEEntity*>		Entities;
 	
 	public:
 		void							DetectVisible(ZESmartAllocator<ZECamera*>& ViewFrustumStack,
 														ZESmartAllocator<ZEViewCone*>& ViewConeStack,
-														ZESmartArray<ZEComponent*>& VisibleComponents, 
+														ZESmartArray<ZEEntity*>& VisibleComponents, 
 														ZESmartArray<ZEPortal*>& VisiblePortals,
 														ZESmartArray<ZEInt>& VisibleMapPolygonIds);
 
-		void							DetectEffectiveLights(ZEComponent* Component, ZESmartArray<ZELight*> EffectiveLights);
+		void							DetectEffectiveLights(ZEEntity* Component, ZESmartArray<ZELight*> EffectiveLights);
 
 		void							DetectVisible(ZECamera* ViewFrustum,
-														ZESmartArray<ZEComponent*>& VisibleComponents, 
+														ZESmartArray<ZEEntity*>& VisibleComponents, 
 														ZESmartArray<ZEPortal*>& VisiblePortals,
 														ZESmartArray<ZEInt>& VisibleMapPolygonIds);
 							
