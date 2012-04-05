@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZEModelAnimation.h"
 #include "ZEModelMeshLod.h"
-#include "ZEGame/ZEComponent.h"
+#include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZERenderCommand.h"
 
 class ZEModel;

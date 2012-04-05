@@ -59,11 +59,6 @@ ZEDrawFlags ZETerrain::GetDrawFlags() const
 	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
-ZERayCastFlags ZETerrain::GetRayCastFlags() const
-{
-	return ZE_RCF_INTERNAL;
-}
-
 void ZETerrain::SetChunkSize(ZEUInt Size)
 {
 	ChunkSize = Size;

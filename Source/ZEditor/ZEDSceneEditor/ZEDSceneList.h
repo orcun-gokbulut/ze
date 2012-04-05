@@ -47,7 +47,7 @@ class ZEDSceneListItem : public QTreeWidgetItem
 {
 	public:
 
-		ZEEntity*					Entity;
+		ZEEntity*				Entity;
 
 									ZEDSceneListItem(ZEEntity* Entity);
 };

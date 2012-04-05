@@ -36,7 +36,6 @@
 #include "ZESceneCuller.h"
 #include "ZEScene.h"
 #include "ZEEntity.h"
-#include "ZECompoundEntity.h"
 #include "ZEGraphics/ZELight.h"
 #include "ZEGraphics/ZERenderer.h"
 #include "ZEDrawParameters.h"
@@ -45,7 +44,7 @@
 void ZESceneCuller::DebugDrawEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
 {
 	if (DebugDrawElements & ZE_VDE_ENTITY_LOCAL_BOUNDING_BOX)
-		DebugDraw.DrawOrientedBoundingBox(Entity->GetLocalBoundingBox(), Entity->GetWorldTransform(), DrawParameters->Renderer, ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
+		DebugDraw.DrawOrientedBoundingBox(Entity->GetBoundingBox(), Entity->GetWorldTransform(), DrawParameters->Renderer, ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	if (DebugDrawElements & ZE_VDE_ENTITY_WORLD_BOUNDING_BOX)
 		DebugDraw.DrawAxisAlignedBoundingBox(Entity->GetWorldBoundingBox(), DrawParameters->Renderer, ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));
@@ -94,19 +93,28 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 			}
 		}
 
-		if (Entities[I]->GetEntityType() == ZE_ET_COMPOUND)
-		{
-			const ZEArray<ZEComponent*>& Components = ((ZECompoundEntity*)Entities[I])->GetComponents();
+		const ZEArray<ZEEntity*>& Components = (Entities[I])->GetComponents();
 
-			for (ZESize N = 0; N < Components.GetCount(); N++)
-			{
-				if (ZEObjectDescription::CheckParent(ZELight::Description(), Components[N]->GetDescription()))
-					if (CullLight((ZELight*)Components[N], DrawParameters))
-					{
-						DrawParameters->Renderer->AddToLightList((ZELight*)Components[N]);
-						DebugDrawLight((ZELight*)Components[N], DrawParameters);
-					}
-			}
+		for (ZESize J = 0; J < Components.GetCount(); J++)
+		{
+			if (ZEObjectDescription::CheckParent(ZELight::Description(), Components[J]->GetDescription()))
+				if (CullLight((ZELight*)Components[J], DrawParameters))
+				{
+					DrawParameters->Renderer->AddToLightList((ZELight*)Components[J]);
+					DebugDrawLight((ZELight*)Components[J], DrawParameters);
+				}
+		}
+
+		const ZEArray<ZEEntity*>& ChildEntities = (Entities[I])->GetChildEntities();
+
+		for (ZESize K = 0; K < ChildEntities.GetCount(); K++)
+		{
+			if (ZEObjectDescription::CheckParent(ZELight::Description(), ChildEntities[K]->GetDescription()))
+				if (CullLight((ZELight*)ChildEntities[K], DrawParameters))
+				{
+					DrawParameters->Renderer->AddToLightList((ZELight*)ChildEntities[K]);
+					DebugDrawLight((ZELight*)ChildEntities[K], DrawParameters);
+				}
 		}
 	}
 }
@@ -144,17 +152,23 @@ void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameter
 			DebugDrawEntity(Entities[I], DrawParameters);
 		}
 
-		if (Entities[I]->GetEntityType() == ZE_ET_COMPOUND)
-		{
-			const ZEArray<ZEComponent*>& Components = ((ZECompoundEntity*)Entities[I])->GetComponents();
+		const ZEArray<ZEEntity*>& Components = (Entities[I])->GetComponents();
 
-			for (ZESize N = 0; N < Components.GetCount(); N++)
-				if (!CullEntity(Components[N], DrawParameters))
-				{
-					Components[N]->Draw(DrawParameters);
-					DebugDrawEntity(Components[N], DrawParameters);
-				}
-		}
+		for (ZESize J = 0; J < Components.GetCount(); J++)
+			if (!CullEntity(Components[J], DrawParameters))
+			{
+				Components[J]->Draw(DrawParameters);
+				DebugDrawEntity(Components[J], DrawParameters);
+			}
+
+		const ZEArray<ZEEntity*>& ChildEntities = (Entities[I])->GetChildEntities();
+
+		for (ZESize K = 0; K < ChildEntities.GetCount(); K++)
+			if (!CullEntity(ChildEntities[K], DrawParameters))
+			{
+				ChildEntities[K]->Draw(DrawParameters);
+				DebugDrawEntity(ChildEntities[K], DrawParameters);
+			}
 	}
 }
 
@@ -195,7 +209,7 @@ void ZESceneCuller::CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 ZESceneCuller::ZESceneCuller()
 {
 	memset(&Statistics, 0, sizeof(ZECullStatistics));
-	DebugDrawElements = ZE_VDE_NONE;
+	DebugDrawElements = ZE_VDE_ALL;//ZE_VDE_NONE;
 }
 
 ZESceneCuller::~ZESceneCuller()

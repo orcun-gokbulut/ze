@@ -546,11 +546,11 @@ ZESteeringOutput ZEUserTankControlStreering::Process(float ElapsedTime)
 		switch(Current->Id)
 		{
 		case ACTIONID_FORWARD:
-			Output.LinearAcceleration = GetOwner()->GetMaxLinearAcceleration() * GetOwner()->GetDirection();
+			Output.LinearAcceleration = GetOwner()->GetMaxLinearAcceleration() * GetOwner()->GetFront();
 			Linear = true;
 			break;
 		case ACTIONID_BACKWARD:
-			Output.LinearAcceleration = -GetOwner()->GetMaxLinearAcceleration() * GetOwner()->GetDirection();
+			Output.LinearAcceleration = -GetOwner()->GetMaxLinearAcceleration() * GetOwner()->GetFront();
 			Linear = true;
 			break;
 		case ACTIONID_STRAFELEFT:

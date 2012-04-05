@@ -48,7 +48,7 @@ void ZETrigger::SetScale(const ZEVector3& Scale)
 {
 	// Scale bounding box
 
-	SetLocalBoundingBox(ZEAABBox(ZEVector3(-0.5f * Scale.x, -0.5f * Scale.y, -0.5f * Scale.z), ZEVector3(0.5f * Scale.x, 0.5f * Scale.y, 0.5f * Scale.z)));
+	SetBoundingBox(ZEAABBox(ZEVector3(-0.5f * Scale.x, -0.5f * Scale.y, -0.5f * Scale.z), ZEVector3(0.5f * Scale.x, 0.5f * Scale.y, 0.5f * Scale.z)));
 	ZEEntity::SetScale(Scale);
 }
 

@@ -38,7 +38,7 @@
 #define __ZE_LIGHT_H__
 
 #include "ZETypes.h"
-#include "ZEGame/ZEComponent.h"
+#include "ZEGame/ZEEntity.h"
 #include "ZEMath/ZEViewVolume.h"
 
 enum ZELightType
@@ -54,7 +54,7 @@ ZE_META_OBJECT_DESCRIPTION(ZELight);
 
 class ZEShadowRenderer;
 class ZEScene;
-class ZELight : public ZEComponent
+class ZELight : public ZEEntity
 {
 	ZE_META_ENTITY(ZELight)
 	private:
@@ -105,7 +105,7 @@ class ZELight : public ZEComponent
 ZE_POST_PROCESSOR_START(Meta)
 	<zinek>
 		<meta> 
-			<class name="ZELight" parent="ZEComponent">
+			<class name="ZELight" parent="ZEEntity">
 			<noinstance>true</noinstance>
 			<description>Base Light Type</description>
 				<property name="CastsShadow" type="boolean" autogetset="yes" description="Enables or disables shadow casting for this light."/>

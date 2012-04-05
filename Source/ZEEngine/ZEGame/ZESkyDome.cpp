@@ -257,6 +257,8 @@ void ZESkyDome::Deinitialize()
 		SkyDomeGeometry.Clean();
 
 	SkyDomeRenderCommand.SetZero();	
+
+	ZEEntity::Deinitialize();
 }
 
 void ZESkyDome::Draw(ZEDrawParameters* DrawParameters)

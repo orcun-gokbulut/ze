@@ -115,7 +115,6 @@ class ZETerrain : public ZEEntity
 		bool									Locked;
 		bool									Wireframe;
 		virtual ZEDrawFlags						GetDrawFlags() const;
-		virtual ZERayCastFlags					GetRayCastFlags() const;
 
 		void									SetUnitLength(float Length);
 		float									GetUnitLength();

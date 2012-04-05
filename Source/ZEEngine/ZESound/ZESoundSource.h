@@ -38,7 +38,7 @@
 #define __ZE_SOUND_SOURCE_H__
 
 #include "ZETypes.h"
-#include "ZEGame/ZEComponent.h"
+#include "ZEGame/ZEEntity.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZESoundResource.h"
 
@@ -76,7 +76,7 @@ class ZESoundSourceEffect;
 
 ZE_META_ENTITY_DESCRIPTION(ZESoundSource);
 
-class ZESoundSource : public ZEComponent
+class ZESoundSource : public ZEEntity
 {
 	ZE_META_ENTITY(ZESoundSource)
 	private:
@@ -175,7 +175,7 @@ class ZESoundSource : public ZEComponent
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZESoundSource" noinstance="true" parent="ZEComponent">
+		<class name="ZESoundSource" noinstance="true" parent="ZEEntity">
 			<description>Sound Source</description>
 			<property name="CurrentPosition" type="integer" autogetset="yes">
 				<constraints>

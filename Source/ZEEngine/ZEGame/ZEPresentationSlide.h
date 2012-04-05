@@ -37,7 +37,7 @@
 #ifndef __ZE_PRESENTATION_SLIDE_H_
 #define __ZE_PRESENTATION_SLIDE_H_
 
-#include "ZECompoundEntity.h"
+#include "ZEEntity.h"
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEGraphics/ZERenderCommand.h"
 
@@ -48,7 +48,7 @@ class ZERenderer;
 class ZEFixedMaterial;
 class ZETexture2DResource;
 
-class ZEPresentationSlide : public ZECompoundEntity
+class ZEPresentationSlide : public ZEEntity
 {
 	ZE_META_ENTITY(ZEPresentationSlide)
 
@@ -82,7 +82,7 @@ class ZEPresentationSlide : public ZECompoundEntity
 ZE_POST_PROCESSOR_START(Meta)
 	<zinek>
 		<meta>
-			<class name="ZEPresentationSlide" parent="ZECompoundEntity" icon="" description="">
+			<class name="ZEPresentationSlide" parent="ZEEntity" icon="" description="">
 				<property name="PresentationSlide" type="string" autogetset="true" semantic="ZE_PS_FILENAME" fileextension=""/>
 			</class>
 		</meta>

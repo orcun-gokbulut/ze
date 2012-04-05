@@ -64,16 +64,6 @@ bool ZEObjectDescription::CheckParent(ZEObjectDescription* Parent, ZEObjectDescr
 	return false;
 }
 
-void ZEObject::SetOwner(ZEObject* Class)
-{
-	Owner = Class;
-}
-
-ZEObject* ZEObject::GetOwner()
-{
-	return Owner;
-}
-
 bool ZEObject::SetProperty(const char* PropertyName, const ZEVariant& Value)
 {
 	ZEInt PropertyId = GetPropertyId(PropertyName);
@@ -346,7 +336,6 @@ ZEObject::ZEObject()
 {
 	AnimationController = NULL;
 	CustomProperties.SetCount(0);
-	Owner = NULL;
 }
 
 ZEObject::~ZEObject()

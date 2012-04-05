@@ -855,7 +855,7 @@ ZEDSelectionItem* MapEditor::CreateSelectionItem(ZEEntity* Entity)
 			return SelectionItemPlugIns[I]->CreateSelectionItem(((ZEObject*)(Entity)), GizmoMode, Scene);
 	}
 
-	return SelectionItemPlugIns[3]->CreateSelectionItem(((ZEObject*)Entity), GizmoMode, Scene); //Fix harcoded index
+	return SelectionItemPlugIns[3]->CreateSelectionItem(((ZEObject*)Entity), GizmoMode, Scene); //Fix hard-coded index
 
 	//return NULL;
 }

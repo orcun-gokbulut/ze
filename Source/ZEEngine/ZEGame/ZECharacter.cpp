@@ -560,7 +560,7 @@ void ZECharacter::Tick(float ElapsedTime)
 
 	Model->Tick(ElapsedTime);
 
-	ZECompoundEntity::Tick(ElapsedTime);
+	ZEEntity::Tick(ElapsedTime);
 }
 
 void ZECharacter::WalkForward()
@@ -777,7 +777,7 @@ void ZECharacter::Deinitialize()
 ZECharacter::ZECharacter()
 {
 	Model = ZEModel::CreateInstance();
-	RegisterComponent(Model);
+	AddComponent(Model);
 
 	MovementVelocity = ZEVector3::Zero;
 	MovementRatio = 0.0f;

@@ -158,16 +158,11 @@ class ZEObjectDescription
 class ZEObject
 {
 	private:
-		ZEObject*								Owner;
 		ZEAnimationController*					AnimationController;
 		ZEArray<ZERunTimeProperty>				CustomProperties;
 
 	public:
 		virtual ZEObjectDescription*			GetDescription() const = 0;
-
-		// Owner
-		virtual void							SetOwner(ZEObject* Class);
-		virtual ZEObject*						GetOwner();
 
 		// Property Functions
 		virtual ZESSize							GetPropertyId(const char* PropertyName) const = 0;

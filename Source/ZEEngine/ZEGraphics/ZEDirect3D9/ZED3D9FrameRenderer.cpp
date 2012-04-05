@@ -294,7 +294,7 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 		ZEVector3		Direction;
 		float			Reserverd2;
 	} LightParameters;
-	ZEMatrix4x4::Transform3x3(LightParameters.Direction, Camera->GetViewTransform(), Light->GetWorldDirection());
+	ZEMatrix4x4::Transform3x3(LightParameters.Direction, Camera->GetViewTransform(), Light->GetWorldFront());
 	LightParameters.Direction = -LightParameters.Direction;
 	LightParameters.Color = Light->GetColor();
 	LightParameters.Attenuation = Light->GetAttenuation();
@@ -347,7 +347,7 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	LightParameters.Range = Light->GetRange();
 	LightParameters.Intensity = Light->GetIntensity();
 	LightParameters.FOV = Light->GetFOV();
-	ZEMatrix4x4::Transform3x3(LightParameters.Direction, Camera->GetViewTransform(), Light->GetWorldDirection());
+	ZEMatrix4x4::Transform3x3(LightParameters.Direction, Camera->GetViewTransform(), Light->GetWorldFront());
 
 	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 3);
 
@@ -790,6 +790,7 @@ void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 
 ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 {
+	Camera			= NULL;
 	GBuffer1 		= NULL;
 	GBuffer2 		= NULL;
 	GBuffer3 		= NULL;
@@ -989,6 +990,9 @@ static ZEInt RenderCommandCompare(const ZERenderCommand* A, const ZERenderComman
 void ZED3D9FrameRenderer::Render(float ElaspedTime)
 {
 	if (!GetModule()->GetEnabled() || GetModule()->IsDeviceLost())
+		return;
+
+	if (GetCamera() == NULL)
 		return;
 
 	CommandList.Sort(RenderCommandCompare);

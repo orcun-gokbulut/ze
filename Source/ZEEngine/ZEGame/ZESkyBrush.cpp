@@ -125,6 +125,8 @@ void ZESkyBrush::Deinitialize()
 		SkyTexture->Release();
 		SkyTexture = NULL;
 	}
+
+	ZEEntity::Deinitialize();
 }
 
 void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)

@@ -43,7 +43,7 @@
 #include "ZECore/ZECore.h"
 #include "ZESceneCuller.h"
 #include "ZEDrawParameters.h"
-#include "ZECompoundEntity.h"
+#include "ZEEntity.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEEntityProvider.h"
 #include "ZEGraphics/ZELight.h"
@@ -190,12 +190,37 @@ void ZEScene::AddEntity(ZEEntity* Entity)
 {
 	Entity->SetEntityId(LastEntityId++);
 	Entities.Add(Entity);
+	Entity->SetOwnerScene(this);
+
+	ZEArray<ZEEntity*> Temp = Entity->GetComponents();
+
+	for (ZESize I = 0; I < Temp.GetCount(); I++)
+		Temp[I]->SetOwnerScene(this);
+
+	Temp = Entity->GetChildEntities();
+
+	for (ZESize I = 0; I < Temp.GetCount(); I++)
+		Temp[I]->SetOwnerScene(this);
+
 	Entity->Initialize();
 }
 
 void ZEScene::RemoveEntity(ZEEntity* Entity)
 {
-	Entity->Destroy();
+	/*Entity->Destroy();*/
+
+	Entity->SetOwnerScene(NULL);
+
+	ZEArray<ZEEntity*> Temp = Entity->GetComponents();
+
+	for (ZESize I = 0; I < Temp.GetCount(); I++)
+		Temp[I]->SetOwnerScene(NULL);
+
+	Temp = Entity->GetChildEntities();
+
+	for (ZESize I = 0; I < Temp.GetCount(); I++)
+		Temp[I]->SetOwnerScene(NULL);
+
 	Entities.DeleteValue(Entity);
 }
 

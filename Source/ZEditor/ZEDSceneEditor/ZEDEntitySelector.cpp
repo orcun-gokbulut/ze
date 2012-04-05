@@ -167,8 +167,8 @@ void ZEDEntitySelector::GenerateList()
 	this->FilterComboBox->clear();
 
 	ZEScene*			Scene = zeCore->GetGame()->GetScene();
-	ZEEntity*			CurrentEntity;
-	ZEInt					Id;
+	ZEEntity*		CurrentEntity;
+	ZEInt				Id;
 	const char*			Name;
 	const char*			Type;
 	QTreeWidgetItem*	CurrentItem;

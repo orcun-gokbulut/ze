@@ -35,7 +35,6 @@
 
 #include "ZELight.h"
 #include "ZERenderCommand.h"
-#include "ZEGame/ZEEntity.h"
 
 ZEDrawFlags ZELight::GetDrawFlags() const
 {
@@ -45,20 +44,20 @@ ZEDrawFlags ZELight::GetDrawFlags() const
 void ZELight::SetPosition(const ZEVector3& NewPosition)
 {
 	UpdateViewVolume = true;
-	ZEComponent::SetPosition(NewPosition);
+	ZEEntity::SetPosition(NewPosition);
 }
 
 void ZELight::SetRotation(const ZEQuaternion& NewRotation)
 {
 	UpdateViewVolume = true;
-	ZEComponent::SetRotation(NewRotation);
+	ZEEntity::SetRotation(NewRotation);
 }
 
 
 void ZELight::OnTransformChanged()
 {
 	UpdateViewVolume = true;
-	ZEComponent::OnTransformChanged();
+	ZEEntity::OnTransformChanged();
 }
 
 

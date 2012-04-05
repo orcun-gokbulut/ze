@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEGame/ZEComponent.h"
+#include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEModelResource.h"
@@ -61,7 +61,7 @@ struct ZEDrawParameters;
 
 ZE_META_ENTITY_DESCRIPTION(ZEModel)
 
-class ZEModel : public ZEComponent
+class ZEModel : public ZEEntity
 {	
 	ZE_META_ENTITY(ZEModel)
 
@@ -88,7 +88,7 @@ class ZEModel : public ZEComponent
 
 		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
 
-		ZEAABBox							BoundingBox;
+		/*ZEAABBox							BoundingBox;*/
 
 		void								CalculateBoundingBox();		
 		void								UpdateTransforms();
@@ -100,8 +100,10 @@ class ZEModel : public ZEComponent
 		struct
 		{
 			ZESimpleMaterial*				Material;
+			ZECanvas						BoxCanvas;
 			ZECanvas						BonesCanvas;
 			ZECanvas						BonePositionsCanvas;
+			ZERenderCommand					BoxRenderCommand;
 			ZERenderCommand					BonesRenderCommand;
 			ZERenderCommand					BonePositionsRenderCommand;
 
@@ -119,7 +121,7 @@ class ZEModel : public ZEComponent
 
 		virtual	ZEDrawFlags					GetDrawFlags() const;
 
-		virtual const ZEAABBox&				GetLocalBoundingBox() const;
+		virtual const ZEAABBox&				GetBoundingBox() const;
 
 		void								SetModelFile(const char* ModelFile);
 		const char*							GetModelFile() const;
@@ -184,7 +186,7 @@ class ZEModel : public ZEComponent
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-		<class name="ZEModel" parent="ZEComponent" description="Sky Brush">
+		<class name="ZEModel" parent="ZEEntity" description="Sky Brush">
 			<property name="ModelFile"
 				type="string"
 				autogetset="true"

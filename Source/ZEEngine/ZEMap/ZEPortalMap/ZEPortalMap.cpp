@@ -50,11 +50,6 @@ ZEDrawFlags ZEPortalMap::GetDrawFlags() const
 	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
-ZERayCastFlags ZEPortalMap::GetRayCastFlags() const
-{
-	return ZE_RCF_INTERNAL;
-}
-
 void ZEPortalMap::LoadPortalResource(ZEPortalMapResource* NewResource)
 {
 	if (Resource != NULL)
@@ -145,6 +140,8 @@ void ZEPortalMap::Deinitialize()
 		Resource->Release();
 		Resource = NULL;
 	}
+
+	ZEEntity::Deinitialize();
 }
 
 bool ZEPortalMap::SetMapFile(const ZEString& FileName)

@@ -98,7 +98,7 @@ void ZEParticleBillboardRenderer::UpdateVertexBuffer(ZEDrawParameters* DrawParam
 
 	ZEVector3 CameraRight = DrawParameters->View->Camera->GetWorldRight();
 	ZEVector3 CameraUp = DrawParameters->View->Camera->GetWorldUp();
-	ZEVector3 CameraLook = DrawParameters->View->Camera->GetWorldDirection();
+	ZEVector3 CameraLook = DrawParameters->View->Camera->GetWorldFront();
 
 	if (BillboardType == ZE_PBT_AXIS_ORIENTED)
 	{

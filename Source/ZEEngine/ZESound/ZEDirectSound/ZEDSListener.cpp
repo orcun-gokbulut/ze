@@ -98,7 +98,7 @@ bool ZEDSListener::IsActiveListener()
 
 void ZEDSListener::SetPosition(const ZEVector3& Position)
 {
-	ZEComponent::SetPosition(Position);
+	ZEEntity::SetPosition(Position);
 
 	if (IsActiveListener())
 	{
@@ -109,7 +109,7 @@ void ZEDSListener::SetPosition(const ZEVector3& Position)
 
 void ZEDSListener::SetRotation(const ZEQuaternion& Rotation)
 {
-	ZEComponent::SetRotation(Rotation);
+	ZEEntity::SetRotation(Rotation);
 
 	if (IsActiveListener())
 	{
@@ -157,12 +157,12 @@ void ZEDSListener::OwnerWorldTransformChanged()
 
 void ZEDSListener::Tick(float ElapsedTime)
 {
-	ZEComponent::Tick(ElapsedTime);
-	if (IsActiveListener())
-	{
-		const ZEVector3& WorldVelocity = GetWorldVelocity();
-		GetModule()->GetListener()->SetVelocity(WorldVelocity.x, WorldVelocity.y, WorldVelocity.z, DS3D_DEFERRED);	
-	}
+	ZEEntity::Tick(ElapsedTime);
+// 	if (IsActiveListener())
+// 	{
+// 		const ZEVector3& WorldVelocity = GetWorldVelocity();
+// 		GetModule()->GetListener()->SetVelocity(WorldVelocity.x, WorldVelocity.y, WorldVelocity.z, DS3D_DEFERRED);	
+// 	}
 }
 
 

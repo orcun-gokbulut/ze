@@ -38,7 +38,7 @@
 #define __ZE_PARTICLE_EFFECT_H__
 
 #include "ZETypes.h"
-#include "ZEGame/ZEComponent.h"
+#include "ZEGame/ZEEntity.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEParticleEmitter.h"
 #include "ZEParticleSystem.h"
@@ -47,7 +47,7 @@ struct ZEDrawParameters;
 
 ZE_META_OBJECT_DESCRIPTION(ZEParticleEffect);
 
-class ZEParticleEffect : public ZEComponent
+class ZEParticleEffect : public ZEEntity
 {
 	ZE_META_ENTITY(ZEParticleEffect)
 	private:
@@ -81,17 +81,19 @@ class ZEParticleEffect : public ZEComponent
 
 };
 
-#endif
-
 /*
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZEParticleEffect" parent="ZEComponent">
+		<class name="ZEParticleEffect" parent="ZEEntity">
 			<description>Particle Effect</description>
 		</class>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()
 */
+
+#endif
+
+
 

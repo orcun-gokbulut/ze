@@ -104,7 +104,7 @@ class ZEPlayer : public ZEActor
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-		<class name="ZEPlayer" parent="ZECompoundEntity" description="Player spawn point">
+		<class name="ZEPlayer" parent="ZEActor" description="Player spawn point">
 		</class>
 	</meta>
 </zinek>

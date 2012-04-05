@@ -34,9 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEViewFrustum.h"
-#include "ZEGame/ZEComponent.h"
-#include "ZEError.h"
 #include "ZEGame/ZEEntity.h"
+#include "ZEError.h"
 #include "ZEGraphics/ZELight.h"
 #include "ZEMath.h"
 #include "ZEAngle.h"

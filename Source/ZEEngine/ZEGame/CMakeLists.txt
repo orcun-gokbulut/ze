@@ -41,10 +41,6 @@ ze_add_source(ZECharacter.cpp			Sources)
 ze_add_source(ZECharacter.h				Sources Header ZEPP)
 ze_add_source(ZECloud.cpp				Sources)
 ze_add_source(ZECloud.h					Sources Header)
-ze_add_source(ZEComponent.cpp			Sources)
-ze_add_source(ZEComponent.h				Sources Header ZEPP)
-ze_add_source(ZECompoundEntity.cpp		Sources)
-ze_add_source(ZECompoundEntity.h		Sources Header ZEPP)
 ze_add_source(ZEDrawParameters.cpp		Sources)
 ze_add_source(ZEDrawParameters.h		Sources Headers)
 ze_add_source(ZEEntity.cpp				Sources)
@@ -81,7 +77,6 @@ ze_add_source(ZESkyDome.cpp				Sources)
 ze_add_source(ZESkyDome.h				Sources Header)
 ze_add_source(ZETrigger.cpp				Sources)
 ze_add_source(ZETrigger.h				Sources Header ZEPP)
-
 
 ze_add_library(ZEGame 
 	SOURCES ${Sources}
