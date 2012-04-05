@@ -402,10 +402,10 @@ bool ZEModel::GetAutoLOD()
 	return AutoLOD;
 }
 
-const ZEAABBox& ZEModel::GetBoundingBox() const
+const ZEAABBox& ZEModel::GetWorldBoundingBox()
 {
 	((ZEModel*)this)->CalculateBoundingBox();
-	return ZEEntity::GetBoundingBox();
+	return ZEEntity::GetWorldBoundingBox();
 }
 
 void ZEModel::SetPosition(const ZEVector3& NewPosition)
