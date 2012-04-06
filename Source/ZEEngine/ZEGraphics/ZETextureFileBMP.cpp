@@ -349,7 +349,7 @@ static bool LoadHeaders(ZEFile* File, ZEBitmapHeader* Header, ZEARGB32* Pallete)
 	ZEUInt64 Result;
 
 	File->Seek(0, ZE_SF_BEGINING);
-	Result = File->Read(&Header, 1, sizeof(Header));
+	Result = File->Read(Header, 1, sizeof(ZEBitmapHeader));
 	
 	if (Result < 54)
 	{
@@ -489,7 +489,7 @@ static ZETextureData* Load(ZEFile* File)
 	if (!LoadHeaders(File, &Header, Pallete))
 		return NULL;
 
-	if (Header->CompressionType == 1)
+	if (Header.CompressionType == 1)
 		return LoadCompressedData(File, &Header, Pallete);
 	else
 		return LoadData(File, &Header, Pallete);
