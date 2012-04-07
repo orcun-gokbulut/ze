@@ -96,13 +96,16 @@ else()
 	message(SEND_ERROR "[ZEBuild] Platform is not supported. Operating System : ${CMAKE_SYSTEM_NAME}, Achitecture : ${CMAKE_SYSTEM_PROCESSOR}, Compiler : ${CMAKE_CXX_COMPILER}")
 endif()
 
-if (CMAKE_CXX_COMPILER MATCHES "cl")
-	set(ZEBUILD_PLATFORM_COMPILER "MSVC")
-elseif (CMAKE_CXX_COMPILER MATCHES "gcc")
+if (CMAKE_COMPILER_IS_GNUCC)
 	set(ZEBUILD_PLATFORM_COMPILER "GCC")
 else()
-	set(ZEBUILD_PLATFORM_COMPILER "UNKNOWN")
+	if (CMAKE_CXX_COMPILER MATCHES "cl")
+		set(ZEBUILD_PLATFORM_COMPILER "MSVC")
+	else()
+		set(ZEBUILD_PLATFORM_COMPILER "UNKNOWN")
+	endif()
 endif()
+
 
 set(ZEBUILD_PLATFORM_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
 
@@ -156,11 +159,11 @@ append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS
 ## Static Checking & Testing Options
 #########################################################################################
 set(ZEBUILD_STATIC_CHECKS_ENABLE			FALSE	CACHE BOOL "Enable static checks.")
-set(ZEBUILD_STATIC_CHECKS_ENABLE_CPPCHECK	FALSE	CACHE BOOL "Enable cppcheck static checker.")
-set(ZEBUILD_STATIC_CHECKS_ENABLE_PCLINT		FALSE	CACHE BOOL "Enable pc-lint static checker.")
-set(ZEBUILD_UNIT_TESTS_ENABLE				TRUE	CACHE BOOL "Enable unit tests.")
-set(ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE		TRUE	CACHE BOOL "Enables code coverage instrumentation.")
-set(ZEBUILD_DEBUG_ENABLE					TRUE	CACHE BOOL "Enable debug extensions.")
+set(ZEBUILD_STATIC_CHECKS_ENABLE_CPPCHECK		FALSE	CACHE BOOL "Enable cppcheck static checker.")
+set(ZEBUILD_STATIC_CHECKS_ENABLE_PCLINT			FALSE	CACHE BOOL "Enable pc-lint static checker.")
+set(ZEBUILD_UNIT_TESTS_ENABLE				FALSE	CACHE BOOL "Enable unit tests.")
+set(ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE			FALSE	CACHE BOOL "Enables code coverage instrumentation.")
+set(ZEBUILD_DEBUG_ENABLE				TRUE	CACHE BOOL "Enable debug extensions.")
 set(ZEBUILD_DEBUG_HEAP_CHECK_ENABLE			FALSE	CACHE BOOL "Enable heap checking.")
 set(ZEBUILD_DEBUG_BREAK_ON_ERROR			TRUE	CACHE BOOL "Break if an error occures.")
 set(ZEBUILD_DEBUG_BREAK_ON_WARNING			FALSE	CACHE BOOL "Break if an warning occures.")
@@ -210,16 +213,16 @@ set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll wil
 
 ## Compiler & Linker Options
 #########################################################################################
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
-if (ZEBUILD_PLATFORM STREQUAL "Win32")
+if (ZEBUILD_PLATFORM_COMPILER STREQUAL "MSVC")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")	
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
+
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
+	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /VERBOSE:LIB")
+
+	append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
 endif()
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
-
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /VERBOSE:LIB")
-
-append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
 
 
 ## Directories
