@@ -130,7 +130,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* Event)
 	{	
 		if(Event->buttons() & RightButton && AltPressed)
 		{
-			ZEVector3 CameraDirection = Player->GetDirection();
+			ZEVector3 CameraDirection = Player->GetFront();
 			ZEVector3::Scale(CameraDirection,CameraDirection, 0.1f * (OldMousePositionY - Event->y()));
 			Player->SetPosition(Player->GetPosition() + CameraDirection);
 		}

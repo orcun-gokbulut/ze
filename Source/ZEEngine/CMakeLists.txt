@@ -81,7 +81,6 @@ ze_add_library(ZEEngineAPI
 ze_add_executable(ZE 
 	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
 	LIBS ZEEngineAPI
-	WIN32
 	INSTALL
 	INSTALL_DESTINATION Bin
 	INSTALL_COMPONENT Runtime)

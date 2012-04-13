@@ -53,6 +53,6 @@ ze_add_library(ZEAI
 	SOURCES ${Sources} 
 	LIBS ZEFoundation)
 	
-ze_add_unit_tests(ZEAITests 
+ze_add_test(ZEAITests 
 	SOURCES ${Tests}
 	TEST_TARGET ZEAI)

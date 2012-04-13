@@ -35,7 +35,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-add_custom_target(CMakeScripts
+ze_add_cmake_project(CMakeScripts
 	SOURCES append_property.cmake
 		build_dir_check.cmake
 		CMakeLists.txt

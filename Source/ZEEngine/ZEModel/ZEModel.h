@@ -121,7 +121,7 @@ class ZEModel : public ZEEntity
 
 		virtual	ZEDrawFlags					GetDrawFlags() const;
 
-		virtual const ZEAABBox&				GetWorldBoundingBox() const;
+		virtual const ZEAABBox&				GetWorldBoundingBox();
 
 		void								SetModelFile(const char* ModelFile);
 		const char*							GetModelFile() const;

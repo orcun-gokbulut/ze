@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9SkyDomeMaterial.h
+ Zinek Engine - ZEDSSoundSource3D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,38 +34,69 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_D3D9_SKY_DOME_MATERIAL_H__
-#define __ZE_D3D9_SKY_DOME_MATERIAL_H__
+#ifndef	__ZE_DS_SOUND_SOURCE_3D_H__
+#define __ZE_DS_SOUND_SOURCE_3D_H__
 
-#include "ZED3D9ComponentBase.h"
-#include "..\ZESkyDomeMaterial.h"
+#include "ZETypes.h"
+#include "ZEDSSoundSource.h"
+#include "ZESound/ZESoundSource3D.h"
 
-class ZEFrameRenderer;
-class ZERenderCommand;
-class ZED3D9VertexShader;
-class ZED3D9PixelShader;
+#include <dsound.h>
 
-class ZED3D9SkyDomeMaterial : public ZESkyDomeMaterial, public ZED3D9ComponentBase
+
+class ZEDSSoundSource3D : public ZESoundSource3D, public ZEDSComponentBase
 {
-	friend class	ZED3D9Module;
-
-	protected:
-		ZED3D9VertexShader*			VertexShader;
-		ZED3D9PixelShader*			PixelShader;
-
-		
-		void						CreateShaders();
-		void						ReleaseShaders();
-
+	friend class ZEDSModule;
 	private:
+		LPDIRECTSOUNDBUFFER			DSBuffer;
+		LPDIRECTSOUND3DBUFFER		DS3DBuffer;
+
+		ZESize						BufferSampleCount;
+		ZESize						OldBufferPosition;
+		ZESize						StreamPosition;
+		ZEInt						LastUpdatedBufferChunk;
+
+		bool						CreateBuffer();
+		void						Stream();
+		void						ResetStream();
+		void						ResetParameters();
+		void						StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
+
+									ZEDSSoundSource3D();
+		virtual						~ZEDSSoundSource3D();
+
 	public:
-									ZED3D9SkyDomeMaterial();
-		virtual						~ZED3D9SkyDomeMaterial();
+		virtual void				SetSoundSourceState(ZESoundSourceState State);
+		virtual void				SetCurrentPosition(ZESize SampleIndex);
+		virtual ZESize				GetCurrentPosition();
+		virtual void				SetStartPosition(ZESize SampleIndex);
+		virtual void				SetEndPosition(ZESize SampleIndex);
 
-		virtual bool				SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
-		virtual void				UpdateMaterial();
-		virtual void				Release();
+		virtual void				SetPan(ZEInt NewPan);
+		virtual void				SetPlaybackSpeed(float Speed);
+		virtual void				SetVolume(ZEUInt NewVolume);
+		virtual void				SetLooping(bool Enabled);				
+							
+		virtual void				Play();
+		virtual void				Resume();
+		virtual void				Pause();
+		virtual void				Stop();
 
+		void						Update(float ElapsedTime);
+
+		virtual void				SetSoundResource(ZESoundResource* Resource);
+		virtual void				SetPosition(const ZEVector3& NewPosition);
+		virtual void				SetRotation(const ZEQuaternion& NewRotation);
+
+		virtual void				SetMinDistance(float  NewMinDistance);
+		virtual void				SetMaxDistance(float  NewMaxDistance);
+		virtual void				SetConeInsideAngle(ZEUInt NewInsideAngle);
+		virtual void				SetConeOutsideAngle(ZEUInt NewOutsideAngle);			
+		virtual void				SetConeOutsideVolume(ZEUInt NewOutsideVolume);
 };
 
 #endif
+
+
+
+

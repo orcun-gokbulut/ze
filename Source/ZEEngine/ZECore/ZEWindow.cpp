@@ -170,7 +170,6 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void ShowWindowError()
 {
-    char szBuf[256]; 
     LPVOID lpMsgBuf;
     DWORD dw = GetLastError(); 
 
@@ -183,8 +182,7 @@ void ShowWindowError()
         (LPTSTR) &lpMsgBuf,
         0, NULL );
 
-	sprintf_s(szBuf, 256, "Win32API Error no : %u, Error text : \"%s\"", dw, lpMsgBuf); 
-	zeError("Win32", szBuf); 
+	zeError("Win32API Error no : %u, Error text : \"%s\"", dw, lpMsgBuf); 
     LocalFree(lpMsgBuf);
 }
 

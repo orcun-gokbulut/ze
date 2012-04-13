@@ -43,7 +43,7 @@
 
 class ZEFile;
 class ZETextureData;
-class ZETextureDataInfo;
+struct ZETextureDataInfo;
 
 class ZETextureLoader
 {

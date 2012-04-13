@@ -64,7 +64,6 @@
 
 
 #include <stdlib.h>
-#include <malloc.h>
 #include <stdio.h>
 #include "ZEGame/ZECloud.h"
 #include "ZEInput/ZEInputDefinitions.h"

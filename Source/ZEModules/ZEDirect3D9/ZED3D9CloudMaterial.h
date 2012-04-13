@@ -38,7 +38,7 @@
 #define __ZE_D3D9_CLOUD_MATERIAL_H__
 
 #include "ZED3D9ComponentBase.h"
-#include "..\ZECloudMaterial.h"
+#include "ZEGraphics/ZECloudMaterial.h"
 
 class ZEFrameRenderer;
 class ZERenderCommand;

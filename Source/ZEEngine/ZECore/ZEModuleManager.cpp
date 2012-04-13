@@ -170,14 +170,14 @@ void ZEModuleManager::UnregisterModule(ZEExtensionDescription* ModuleDesc)
 	ModuleList.DeleteValue(ModuleDesc);
 }
 
-#include "ZEGraphics/ZEDirect3D9/ZED3D9Module.h"
-#include "ZESound/ZEDirectSound/ZEDSModule.h"
-#include "ZEInput/ZEDirectInput/ZEDirectInputModule.h"
-#include "ZEInput/ZEDummyInput/ZEDummyInputModule.h"
-#include "ZEInput/ZEWindowsInput/ZEWindowsInputModule.h"
-#include "ZEInput/ZEVirtualInput/ZEVirtualInputModule.h"
-#include "ZESound/ZEOpenAL/ZEALModule.h"
-#include "ZEPhysics/ZEPhysX/ZEPhysXModule.h"
+#include "ZEModules/ZEDirect3D9/ZED3D9Module.h"
+#include "ZEModules/ZEDirectSound/ZEDSModule.h"
+#include "ZEModules/ZEDirectInput/ZEDirectInputModule.h"
+#include "ZEModules/ZEDummyInput/ZEDummyInputModule.h"
+#include "ZEModules/ZEWindowsInput/ZEWindowsInputModule.h"
+#include "ZEModules/ZEVirtualInput/ZEVirtualInputModule.h"
+#include "ZEModules/ZEOpenAL/ZEALModule.h"
+#include "ZEModules/ZEPhysX/ZEPhysXModule.h"
 
 ZEModuleManager::ZEModuleManager()
 {

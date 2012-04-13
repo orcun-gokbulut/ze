@@ -35,13 +35,12 @@
 
 #include "ZED3D9Shader.h"
 #include "ZED3D9SkyDomeMaterial.h"
-#include "..\ZEFrameRenderer.h"
-#include "..\ZERenderCommand.h"
 #include "ZED3D9CommonTools.h"
-#include "ZEMath\ZEMatrix.h"
-#include "..\ZECamera.h"
+#include "ZEGraphics\ZEFrameRenderer.h"
+#include "ZEGraphics\ZERenderCommand.h"
+#include "ZEGraphics\ZECamera.h"
 #include "ZEMath\ZEAngle.h"
-
+#include "ZEMath\ZEMatrix.h"
 
 
 ZED3D9SkyDomeMaterial::ZED3D9SkyDomeMaterial()

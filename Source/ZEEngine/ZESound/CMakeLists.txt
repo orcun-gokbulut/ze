@@ -35,9 +35,6 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_conditional_build(ZESound ZEDirectSound		TRUE TITLE "Build ZEDirectSound Sound Module.")
-ze_add_conditional_build(ZESound ZEOpenAL			TRUE TITLE "Build ZEOpenAL Sound Module.")
-
 ze_add_source(ZEListener.cpp				Sources)
 ze_add_source(ZEListener.h					Sources Headers ZEPP)
 ze_add_source(ZESoundFX.h					Sources Headers)

@@ -227,7 +227,7 @@ ZETextureLevel::~ZETextureLevel()
 {
 	if (Data)	
 	{
-		free(Data);
+		delete[] Data;
 		Data = NULL;
 	}
 }
@@ -333,7 +333,7 @@ void ZETextureData::Create(ZETextureType TextureType, ZETexturePixelFormat Pixel
 					// Create level if Surface % (2^Level) == 0
 					if ((I % (ZESize)ZEMath::Power(2.0f, (float)J)) == 0)
 					{
-						Surfaces[I].Levels[J].Data = malloc(Surfaces[I].Levels[J].GetSize());
+						Surfaces[I].Levels[J].Data = new ZEUInt8[Surfaces[I].Levels[J].GetSize()];
 					}
 					// Create empty level
 					else
@@ -360,7 +360,7 @@ void ZETextureData::Create(ZETextureType TextureType, ZETexturePixelFormat Pixel
 				{
 					Surfaces[I].Levels[J].Level = (ZEUInt)J;
 					Surfaces[I].Levels[J].Owner = &Surfaces[I];
-					Surfaces[I].Levels[J].Data	= malloc(Surfaces[I].Levels[J].GetSize());
+					Surfaces[I].Levels[J].Data	= new ZEUInt8[Surfaces[I].Levels[J].GetSize()];
 				}
 			}
 			break;
@@ -414,7 +414,7 @@ void ZETextureData::Create(ZETextureData& TextureData)
 			if (Source != NULL)
 			{
 				// If surface is valid. Some 3D levels may be empty
-				Surfaces[I].Levels[J].Data	= malloc(Surfaces[I].Levels[J].GetSize());
+				Surfaces[I].Levels[J].Data	= new ZEUInt8[Surfaces[I].Levels[J].GetSize()];
 
 				ZESize SourcePitch	= TextureData.Surfaces[I].Levels[J].GetPitch();
 				Surfaces[I].Levels[J].CopyFrom(Source, SourcePitch);
@@ -447,7 +447,7 @@ void ZETextureData::Destroy()
 			// If there is level image data
 			if (Surfaces[I].Levels[J].Data != NULL)
 			{
-				free(Surfaces[I].Levels[J].Data);
+				delete[] Surfaces[I].Levels[J].Data;
 				Surfaces[I].Levels[J].Data = NULL;
 			}
 		}

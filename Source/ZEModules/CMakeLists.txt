@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZERealTimeTextureCompressor.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,28 +30,22 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
+cmake_minimum_required (VERSION 2.8)
 
-#pragma once
-#ifndef __ZE_REAL_TIME_TEXTURE_COMPRESSOR__
-#define __ZE_REAL_TIME_TEXTURE_COMPRESSOR__
+ze_set_project_folder("ZEModules")
 
-#include "ZEDirect3D9\ZED3D9ComponentBase.h"
+ze_add_module(ZEDirect3D9			PLATFORM Windows)
+ze_add_module(ZEDirectInput			OPTIONAL DEFAULT PLATFORMS Windows )
+ze_add_module(ZEDummyInput			OPTIONAL DEFAULT)
+ze_add_module(ZEVirtualInput		OPTIONAL DEFAULT)
+ze_add_module(ZEWindowsInput		OPTIONAL DEFAULT PLATFORMS Windows)
+ze_add_module(ZEFreespaceInput		OPTIONAL 		 PLATFORMS Windows)
+ze_add_module(ZEVRPNInput			OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
+ze_add_module(ZEDirectSound			OPTIONAL DEFAULT PLATFORMS Windows)
+ze_add_module(ZEOpenAL				OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
+ze_add_module(ZEPhysX				OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
 
-class ZERealTimeTextureCompressor : public ZED3D9ComponentBase
-{
-	private:		
-										ZERealTimeTextureCompressor();
-										~ZERealTimeTextureCompressor();
-
-	public:
-		static bool						Compress(void* DestBuffer, unsigned int DestPitch, D3DFORMAT DestFormat, void* SrcBuffer, unsigned int SrcWidth, unsigned int SrcHeight, unsigned int SrcPitch, unsigned int SrcBitsPP, D3DFORMAT SrcFormat);
-		void							Downsample();
-
-		static bool						Initialize(const char* CompressionShaderPath = NULL, const char* DownSampleShaderPath = NULL);
-		static bool						Deinitialize();
-};
-
-#endif // __ZE_REAL_TIME_TEXTURE_COMPRESSOR__
+ze_add_cmake_project(ZEModules CMakeLists.txt)

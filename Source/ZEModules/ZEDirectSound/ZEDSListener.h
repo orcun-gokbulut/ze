@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEALListener.h
+ Zinek Engine - ZEDSListener.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,23 +34,23 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_AL_LISTENER_H__
-#define __ZE_AL_LISTENER_H__
+#ifndef	__ZE_DS_LISTENER_H__
+#define __ZE_DS_LISTENER_H__
 
-#include "../ZEListener.h"
-#include "ZEALComponentBase.h"
+#include "ZESound/ZEListener.h"
+#include "ZEDSComponentBase.h"
 
-class ZEALListener : public ZEListener, public ZEALComponentBase
+class ZEDSListener : public ZEListener, public ZEDSComponentBase
 {	
-	friend class ZEALModule;
+	friend class ZEDSModule;
 	private:
 		float						UpdateTreshold;
 		bool						ListenerDirtyFlag;
 
 		void						ResetParameters();
 
-									ZEALListener();
-		virtual						~ZEALListener();
+									ZEDSListener();
+		virtual						~ZEDSListener();
 
 	public:
 		bool						IsActiveListener();

@@ -554,7 +554,6 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 			case ZE_PST_CYLINDER:
 			{
 				zeWarningAssert(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Cylinder physical shape does not support scaling. Shape did not scaled.");
-
 				break;
 			}
 
@@ -567,51 +566,39 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 
 	switch (PhysicalBodyType)
 	{
-	case ZE_PBT_DYNAMIC:
+		case ZE_PBT_DYNAMIC:
+			break;
 
-		break;
+		case ZE_PBT_KINEMATIC:
+			if (Enabled)
+			{
+				BodyDesc.flags |= NX_BF_KINEMATIC;
+				if (Actor != NULL)
+					Actor->raiseBodyFlag(NX_BF_KINEMATIC);
+			}
+			else
+			{
+				BodyDesc.flags &= ~NX_BF_KINEMATIC;
+				if (Actor != NULL)
+					Actor->clearBodyFlag(NX_BF_KINEMATIC);
+			}
+			break;
 
-	case ZE_PBT_KINEMATIC:
-		if (Enabled)
-		{
-			BodyDesc.flags |= NX_BF_KINEMATIC;
-			if (Actor != NULL)
-				Actor->raiseBodyFlag(NX_BF_KINEMATIC);
-		}
-		else
-		{
-			BodyDesc.flags &= ~NX_BF_KINEMATIC;
-			if (Actor != NULL)
-				Actor->clearBodyFlag(NX_BF_KINEMATIC);
-		}
-		break;
-
-	case ZE_PBT_STATIC:
-
-		ActorDesc.body = NULL;
-
-		break;
+		case ZE_PBT_STATIC:
+			ActorDesc.body = NULL;
+			break;
 	}
 
 	NxScene* Scene = PhysicalWorld->GetScene();
 	Actor = Scene->createActor(ActorDesc);
 	if (Actor == NULL)
-	{
 		zeError("Can not create actor.");
-
-		for (ZESize I = 0; I < ShapeDescList.GetCount(); I++)
-			delete ShapeDescList[I];
-		ShapeDescList.Clear();
-
-		return false;
-	}
-
 
 	for (ZESize I = 0; I < ShapeDescList.GetCount(); I++)
 		delete ShapeDescList[I];
 	ShapeDescList.Clear();
 
-	return true;
+	return Actor != NULL;
 }
 
 void ZEPhysXPhysicalRigidBody::Deinitialize()

@@ -59,5 +59,4 @@ ze_add_executable(ZEditor
 	LIBS ZEEngineAPI
 		ZEDCommonControls ZEDCommonEntities ZEDCore ZEDImageExtensionsPlugIn ZEDMaterialEditor ZEDPropertyWindowManager
 		ZEDSceneEditor ZEDScriptEditor ZEDSoundExtensionsPlugIn ZEDUndoRedo ZEDBrowser ZEDNodeEditor
-		QtCore4 QtGui4
-	WIN32)
+		QtCore4 QtGui4)

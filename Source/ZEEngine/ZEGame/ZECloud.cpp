@@ -38,7 +38,6 @@
 #include "ZEGraphics/ZECloudMaterial.h"
 #include "ZEDrawParameters.h"
 #include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZEDirect3D9/ZED3D9CloudMaterial.h"
 #include "ZEGraphics/ZETexture2DResource.h"
 
 

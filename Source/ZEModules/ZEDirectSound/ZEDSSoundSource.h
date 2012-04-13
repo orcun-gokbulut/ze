@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9MoonMaterial.h
+ Zinek Engine - ZEDSSoundSource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,74 +34,54 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_D3D9_MOON_MATERIAL_H__
-#define __ZE_D3D9_MOON_MATERIAL_H__
+#ifndef	__ZE_DS_SOUND_SOURCE_H__
+#define __ZE_DS_SOUND_SOURCE_H__
 
-#include "ZED3D9ComponentBase.h"
-#include "ZEGraphics/ZEMoonMaterial.h"
-#include "../ZEVertexBuffer.h"
+#include "ZETypes.h"
+#include "ZEDSComponentBase.h"
+#include "ZESound/ZESoundSource.h"
 
-
-class ZED3D9VertexShader;
-class ZED3D9PixelShader;
-class ZEFrameRenderer;
-class ZERenderCommand;
-class ZED3D9StaticVertexBuffer;
-class ZED3D9VertexDeclaration;
+#include <dsound.h>
 
 
-struct MoonQuadVertex
+class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 {
-	float	Position[4];
-	float	TexCoord[3];
-
-};
-
-class ZEMoonDynamicVertexBuffer : public ZEDynamicVertexBuffer
-{
-	protected:
-		MoonQuadVertex			Vertices[4];
-
+	friend class ZEDSModule;
 	private:
-	public:
-								ZEMoonDynamicVertexBuffer();
-		virtual					~ZEMoonDynamicVertexBuffer();
-		
-		virtual ZESize			GetBufferSize();
-		virtual void*			GetVertexBuffer();
+		LPDIRECTSOUNDBUFFER			DSBuffer;
+		ZESize						BufferSampleCount;
+		ZESize						OldBufferPosition;
+		ZESize						StreamPosition;
+		ZEInt						LastUpdatedBufferChunk;
 
-};
+		bool						CreateBuffer(bool Is3D);
+		void						ResetParameters();
 
+		void						Stream();
+		void						ResetStream();
+		void						StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
 
-
-class ZED3D9MoonMaterial : public ZEMoonMaterial, public ZED3D9ComponentBase
-{
-	friend class ZED3D9Module;
-
-	private:
-		ZED3D9VertexShader*				MoonVertexShader;
-		ZED3D9PixelShader*				MoonPixelShader;
-		
-		ZEUInt							VertexCount;
-		ZEUInt							PrimitiveCount;
-		ZEMoonDynamicVertexBuffer*		VertexBuffer;
-		ZED3D9VertexDeclaration*		VertexDecleration;
-
-		void							CreateShaders();
-		void							ReleaseShaders();
-
-		void							CreateBuffers();
-		void							ReleaseBuffers();
-
-	protected:
-										ZED3D9MoonMaterial();
-		virtual							~ZED3D9MoonMaterial();
+									ZEDSSoundSource();
+		virtual						~ZEDSSoundSource();
 
 	public:
-		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
-		virtual void					UpdateMaterial();
-		virtual void					Release();
+		virtual void				SetSoundSourceState(ZESoundSourceState State);
+		virtual void				SetCurrentPosition(ZESize SampleIndex);
+		virtual ZESize				GetCurrentPosition();
 
+		virtual void				SetPan(ZEInt NewPan);
+		virtual void				SetPlaybackSpeed(float Speed);
+		virtual void				SetVolume(ZEUInt NewVolume);
+		virtual void				SetLooping(bool Enabled);				
+							
+		virtual void				Play();
+		virtual void				Resume();
+		virtual void				Pause();
+		virtual void				Stop();
+
+		void						Update(float ElapsedTime);
+
+		virtual void				SetSoundResource(ZESoundResource* Resource);
 };
 
-#endif	// __ZE_D3D9_MOON_MATERIAL_H__
+#endif

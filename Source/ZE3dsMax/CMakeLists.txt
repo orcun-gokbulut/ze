@@ -39,16 +39,13 @@ project (ZE3dsMax)
 
 ze_set_project_folder("ZE3dsMax")
 
-set(ZEBUILD_3DS_MAX_BINARY_DIRECTORY 		"C:\\Program Files (x86)\\Autodesk\\3ds Max 2010" CACHE STRING "Directory of 3ds max.")
+set(ZEBUILD_3DS_MAX_BINARY_DIRECTORY "C:\\Program Files (x86)\\Autodesk\\3ds Max 2010" CACHE STRING "Directory of 3ds max.")
 
 include_directories(${PROJECT_SOURCE_DIR})
 
-ze_add_conditional_build(ZE3dsMax ZE3dsModelExporter	TRUE TITLE "Build ZE3dsMax Model Exporter.")
-ze_add_conditional_build(ZE3dsMax ZE3dsMapExporter		TRUE TITLE "Build ZE3dsMax Map Exporter.")
-
-if (ZEBUILD_BUILD_ZE3DSMAX_ZE3DSMODELEXPORTER OR ZEBUILD_BUILD_ZE3DSMAX_ZE3DSMAPEXPORTER)
-	add_subdirectory (ZE3dsProgressDialog)
-endif()
+add_subdirectory(ZE3dsProgressDialog)
+add_subdirectory(ZE3dsModelExporter)
+add_subdirectory(ZE3dsMapExporter)
 
 add_custom_target(ZE3dsMax
 	SOURCES CMakeLists.txt)

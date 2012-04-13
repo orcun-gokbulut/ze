@@ -111,7 +111,7 @@ class ZEExtensionManager* ZEExtensionManager::GetInstance()
 	return ZECore::GetInstance()->GetExtensionManager();
 }
 
-#include "ZEInput/ZEVRPNInput/ZEVRPNInputDeviceExtension.h"
+#include "ZEModules/ZEVRPNInput/ZEVRPNInputDeviceExtension.h"
 ZEExtensionManager::ZEExtensionManager()
 {
 	RegisterExtension(ZEVRPNInputDeviceExtension::Description());

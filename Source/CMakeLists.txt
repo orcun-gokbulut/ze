@@ -35,15 +35,11 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-ze_add_conditional_build(ZEEngine			TRUE TITLE "Build ZEEngineAPI.")
-ze_add_conditional_build(ZEditor			TRUE TITLE "Build ZEditor.")
-ze_add_conditional_build(ZE3dsMax			TRUE TITLE "Build ZE3dsMax Exporters.")
-ze_add_conditional_build(ZEFoundation		TRUE TITLE "Build ZEFoundationAPI.")
-ze_add_conditional_build(ZEToolSDK			TRUE TITLE "Build ZEToolAPI.")
-ze_add_conditional_build(ZEApplications		TRUE TITLE "Build Applications.")
-ze_add_conditional_build(Demos				FALSE TITLE "Build Demos.")
-ze_add_conditional_build(Samples			FALSE TITLE "Build Samples.")
+ze_add_module(ZEEngine)
+ze_add_module(ZEModules			OPTIONAL DEFAULT 	PLATFORMS Windows)
+ze_add_module(ZEditor			OPTIONAL DEFAULT)
+#ze_add_module(ZE3dsMax			OPTIONAL DEFAULT 	PLATFORMS Windows)
+ze_add_module(ZEFoundation)
+ze_add_module(ZEToolSDK			OPTIONAL DEFAULT)
 
-if (ZEBUILD_UNIT_TESTS_ENABLE)
-	add_subdirectory (ZETest)
-endif()
+ze_add_cmake_project(ZESource)
