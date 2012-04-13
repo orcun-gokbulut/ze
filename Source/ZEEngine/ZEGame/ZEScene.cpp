@@ -334,7 +334,11 @@ void ZEScene::Render(float ElapsedTime)
 	DrawParameters.View = (ZEView*)&ActiveCamera->GetView();
 	DrawParameters.Lights.Clear();
 
-	Culler.CullScene(this, &DrawParameters);
+	//Culler.CullScene(this, &DrawParameters);
+
+	for (ZEInt I = 0; I < Entities.GetCount(); I++)
+		if(Entities[I]->GetVisible())
+			Entities[I]->Draw(&DrawParameters);
 }
 
 bool ZEScene::Save(const ZEString& FileName)

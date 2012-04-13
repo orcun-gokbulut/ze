@@ -147,6 +147,3 @@ ze_add_library(ZEGraphics
 ze_add_test(ZEGraphicsTests 
 	SOURCES ${Tests}
 	TEST_TARGET ZEGraphics)
-
-add_executable(ZETextureFileTGA ZETextureFileTGA.cpp)
-target_link_libraries(ZETextureFileTGA ZEFoundation ZECore ZEGraphics)
