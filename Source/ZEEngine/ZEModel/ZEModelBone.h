@@ -132,7 +132,6 @@ class ZEModelBone
 		bool								GetPhysicsEnabled();
 
 		void								Initialize(ZEModel* Model, const ZEModelResourceBone* BoneResource);
-
 		void								Deinitialize();
 
 											ZEModelBone();

@@ -40,7 +40,7 @@
 #include "ZEGraphics/ZETextureTools.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEGraphics/ZETexture2DResource.h"
-#include "zedirect3d9/ZED3D9TextureResizer.h"
+#include "ZEModules/ZEDirect3D9/ZED3D9TextureResizer.h"
 
 #include <windows.h>
 #include <ATI_Compress.h>

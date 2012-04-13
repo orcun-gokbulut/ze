@@ -38,13 +38,13 @@
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9VertexBuffer.h"
 #include "ZED3D9VertexDeclaration.h"
-#include "..\ZEFrameRenderer.h"
-#include "..\ZERenderCommand.h"
-#include "..\ZEVertexDeclaration.h"
-#include "..\ZECamera.h"
-#include "..\ZETexture3D.h"
-#include "ZEGame\ZEScene.h"
-#include "ZEMath\ZEAngle.h"
+#include "ZEGraphics/ZEFrameRenderer.h"
+#include "ZEGraphics/ZERenderCommand.h"
+#include "ZEGraphics/ZEVertexDeclaration.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZEGraphics/ZETexture3D.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEMath/ZEAngle.h"
 
 
 ZEMoonDynamicVertexBuffer::ZEMoonDynamicVertexBuffer()

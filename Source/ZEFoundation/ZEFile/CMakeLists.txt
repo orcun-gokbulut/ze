@@ -61,7 +61,7 @@ ze_add_library(ZEFile
 	INSTALL_DESTINATION ZEFoundation/ZEFile
 	INSTALL_COMPONENT ZESDK)
 	
-ze_add_unit_tests(ZEFileTests
+ze_add_test(ZEFileTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES
 	TEST_TARGET ZEFile)

@@ -37,20 +37,35 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Zinek)
 
-SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+## Version
+#########################################################################################
+file(READ "${CMAKE_SOURCE_DIR}/Version.txt" VERSION_STRING)
 
 set(ZEBUILD_VERSION_MAJOR 0)
-set(ZEBUILD_VERSION_MINOR 5)
-set(ZEBUILD_VERSION_INTERNAL 0)
-set(ZEBUILD_VERSION_BUILD 5)
+string(REGEX REPLACE "^[ \\t\\r\\n]*Version[ \\t]*:[ \\t]*([0-9]+).*" "\\1" ZEBUILD_VERSION_MAJOR "${VERSION_STRING}")
 
-message(STATUS "[ZEBuild] Major Version    : " ${ZEBUILD_VERSION_MAJOR})
-message(STATUS "[ZEBuild] Minor Version    : " ${ZEBUILD_VERSION_MINOR})
-message(STATUS "[ZEBuild] Internal Version : " ${ZEBUILD_VERSION_INTERNAL})
-message(STATUS "[ZEBuild] Build            : " ${ZEBUILD_VERSION_BUILD})
+set(ZEBUILD_VERSION_MINOR 0)
+string(REGEX REPLACE "^[ \\t\\r\\n]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*([0-9]+).*" "\\1" ZEBUILD_VERSION_MINOR "${VERSION_STRING}")
+
+set(ZEBUILD_VERSION_INTERNAL 0)
+string(REGEX REPLACE "^[ \\t\\r\\n]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*[0-9]+\\.[ \\t]*([0-9]+).*" "\\1" ZEBUILD_VERSION_INTERNAL "${VERSION_STRING}")
+
+set (ZEBUILD_VERSION_BUILD "0")
+include(FindSubversion)
+Subversion_WC_INFO(${CMAKE_SOURCE_DIR} SVN_INFO)
+set(ZEBUILD_VERSION_BUILD ${SVN_INFO_WC_REVISION})
+
+message(STATUS "[ZEBuild] Version                 : " "v${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}.${ZEBUILD_VERSION_INTERNAL} Build ${ZEBUILD_VERSION_BUILD}")
+message(STATUS "[ZEBuild] Major Version           : " ${ZEBUILD_VERSION_MAJOR})
+message(STATUS "[ZEBuild] Minor Version           : " ${ZEBUILD_VERSION_MINOR})
+message(STATUS "[ZEBuild] Internal Version        : " ${ZEBUILD_VERSION_INTERNAL})
+message(STATUS "[ZEBuild] Build                   : " ${ZEBUILD_VERSION_BUILD})
 message(STATUS "")
-## Configuration
+
+
+## CMake Configuration & Initialization
 #########################################################################################
+SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
 
 include(build_dir_check)
@@ -60,54 +75,59 @@ include(ze_functions)
 
 macro_ensure_out_of_source_build ("${PROJECT_NAME} requires an out of source build.")
 
+
 ## Platform Detection
 #########################################################################################
 message(STATUS "[ZEBuild] Detecting Platform.")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	set(ZEBUILD_PLATFORM_CLASS "Windows")
-	if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-		set(ZEBUILD_PLATFORM "Win32")
-	else()
-		set(ZEBUILD_PLATFORM "Win64")
-	endif()
+	set(ZEBUILD_PLATFORM "Windows")
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	set(ZEBUILD_PLATFORM_CLASS "MacOSX")
-	if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-		set(ZEBUILD_PLATFORM "MacOSX32")
-	else()
-		set(ZEBUILD_PLATFORM "MacOSX64")
-	endif()
+	set(ZEBUILD_PLATFORM "MacOSX")
+	set(ZEBUILD_PLATFORM_UNIX)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	set(ZEBUILD_PLATFORM_CLASS "Linux")
-	if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-		set(ZEBUILD_PLATFORM "Linux32")
-	else()
-		set(ZEBUILD_PLATFORM "Linux64")
-	endif()
-elseif (${CMAKE_SYSTEM_NAME} MATCHES "Unix")
-	set(ZEBUILD_PLATFORM_CLASS "Unix")
-	if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-		set(ZEBUILD_PLATFORM "Unix32")
-	else()
-		set(ZEBUILD_PLATFORM "Unix64")
-	endif()
+	set(ZEBUILD_PLATFORM "Linux")
+	set(ZEBUILD_PLATFORM_UNIX)
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" OR 
+	${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD") 
+	set(ZEBUILD_PLATFORM "BSD")
+	set(ZEBUILD_PLATFORM_UNIX)
 else()
-	message(SEND_ERROR "[ZEBuild] Platform is not supported. Operating System : ${CMAKE_SYSTEM_NAME}, Achitecture : ${CMAKE_SYSTEM_PROCESSOR}, Compiler : ${CMAKE_CXX_COMPILER}")
+	message(SEND_ERROR "[ZEBuild] Error: Platform is not supported. Operating System : ${CMAKE_SYSTEM_NAME}, Achitecture : ${CMAKE_SYSTEM_PROCESSOR}, Compiler : ${CMAKE_CXX_COMPILER}")
 endif()
 
+if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
+	set(ZEBUILD_PLATFORM_WORD_SIZE "32")
+else()
+	set(ZEBUILD_PLATFORM_WORD_SIZE "64")
+endif()
+	
+if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_32" OR
+	${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86" OR
+	${CMAKE_SYSTEM_PROCESSOR} MATCHES "i386" OR
+	${CMAKE_SYSTEM_PROCESSOR} MATCHES "i486" OR
+	${CMAKE_SYSTEM_PROCESSOR} MATCHES "i586" OR
+	${CMAKE_SYSTEM_PROCESSOR} MATCHES "i686")
+	set(ZEBUILD_PLATFORM_ARCHITECTURE "x86")
+elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+	set(ZEBUILD_PLATFORM_ARCHITECTURE "x64")
+else()
+	message(SEND_ERROR "[ZEBuild] Error: Unsupported architecture. Processor Name : ${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+	
 if (CMAKE_COMPILER_IS_GNUCC)
 	set(ZEBUILD_PLATFORM_COMPILER "GCC")
 else()
 	if (CMAKE_CXX_COMPILER MATCHES "cl")
 		set(ZEBUILD_PLATFORM_COMPILER "MSVC")
 	else()
-		set(ZEBUILD_PLATFORM_COMPILER "UNKNOWN")
+		message(SEND_ERROR "[ZEBuild] Error: Compiler is not supported. Compiler Name : ${CMAKE_CXX_COMPILER}")
 	endif()
 endif()
 
-
-set(ZEBUILD_PLATFORM_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
+if (ZEBUILD_PLATFORM EQUAL "Windows" AND NOT ZEBUILD_PLATFORM_COMPILER EQUAL "MSVC")
+	message(SEND_ERROR "[ZEBuild] Error: Only MSVC compiler supported in Windows platform.")
+endif()
 
 include(TestBigEndian)
 TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
@@ -117,57 +137,58 @@ else()
 	set(ZEBUILD_PLATFORM_ENDIANNESS "Little")
 endif()
 
+message(STATUS "[ZEBuild] Platform                : " ${ZEBUILD_PLATFORM})
+message(STATUS "[ZEBuild] Architecture            : " ${ZEBUILD_PLATFORM_ARCHITECTURE})
+message(STATUS "[ZEBuild] Word Size               : " ${ZEBUILD_PLATFORM_WORD_SIZE})
+message(STATUS "[ZEBuild] Endianness              : " ${ZEBUILD_PLATFORM_ENDIANNESS})
+message(STATUS "[ZEBuild] Compiler                : " ${ZEBUILD_PLATFORM_COMPILER})
 message(STATUS "[ZEBuild] Platform detected.")
 message(STATUS "")
 
-message(STATUS "[ZEBuild] Platform Class   : " ${ZEBUILD_PLATFORM_CLASS})
-message(STATUS "[ZEBuild] Platform         : " ${ZEBUILD_PLATFORM})
-message(STATUS "[ZEBuild] Architecture     : " ${ZEBUILD_PLATFORM_ARCHITECTURE})
-message(STATUS "[ZEBuild] C++ Compiler     : " ${ZEBUILD_PLATFORM_COMPILER})
-message(STATUS "[ZEBuild] Endianness       : " ${ZEBUILD_PLATFORM_ENDIANNESS})
-message(STATUS "")
-
-if (ZEBUILD_PLATFORM_COMPILER MATCHES "UNKNOWN")
-message(ERROR "Unknown compiler detected. You can only compile Zinek Engine with Microsoft Visual C++ Compiler, Intel C++ Compiler, GCC and CLANG. Other compiler are not supported.")
-endif()
 
 ## Definitions
 #########################################################################################
 string(TOUPPER ${ZEBUILD_PLATFORM} ZEBUILD_PLATFORM_UPPER_CASE)
-string(TOUPPER ${ZEBUILD_PLATFORM_CLASS} ZEBUILD_PLATFORM_CLASS_UPPER_CASE)
+string(TOUPPER ${ZEBUILD_PLATFORM_ARCHITECTURE} ZEBUILD_PLATFORM_ARCHITECTURE_UPPER_CASE)
 string(TOUPPER ${ZEBUILD_PLATFORM_COMPILER} ZEBUILD_PLATFORM_COMPILER_UPPER_CASE)
 string(TOUPPER ${ZEBUILD_PLATFORM_ENDIANNESS} ZEBUILD_PLATFORM_ENDIANNESS_UPPER_CASE)
 
 append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
 	ZE_ZINEK
+	ZE_VERSION_MAJOR=${ZEBUILD_VERSION_MAJOR}
+	ZE_VERSION_MINOR=${ZEBUILD_VERSION_MINOR}
+	ZE_VERSION_INTERNAL=${ZEBUILD_VERSION_INTERNAL}
+	ZE_VERSION_BUILD=${ZEBUILD_VERSION_BUILD}
+	
 	"ZE_PLATFORM_${ZEBUILD_PLATFORM_UPPER_CASE}"
-	"ZE_PLATFORM_CLASS_${ZEBUILD_PLATFORM_CLASS_UPPER_CASE}"
+	"ZE_PLATFORM_ARCHITECTURE_${ZEBUILD_PLATFORM_ARCHITECTURE_UPPER_CASE}"
 	"ZE_PLATFORM_COMPILER_${ZEBUILD_PLATFORM_COMPILER_UPPER_CASE}"
 	"ZE_PLATFORM_ENDIANNESS_${ZEBUILD_PLATFORM_ENDIANNESS_UPPER_CASE}"
 
 	ZE_PLATFORM="${ZEBUILD_PLATFORM}"
-	ZE_PLATFORM_CLASS="${ZEBUILD_PLATFORM_CLASS}"
+	ZE_PLATFORM_ARCHITECTURE="${ZEBUILD_PLATFORM_ARCHITECTURE}"
 	ZE_PLATFORM_COMPILER="${ZEBUILD_PLATFORM_COMPILER}"
+	ZE_PLATFORM_WORD_SIZE ${ZE_BUILD_PLATFORM_WORD_SIZE})
 
-	ZE_VERSION_MAJOR=${ZEBUILD_VERSION_MAJOR}
-	ZE_VERSION_MINOR=${ZEBUILD_VERSION_MINOR}
-	ZE_VERSION_INTERNAL=${ZEBUILD_VERSION_INTERNAL}
-	ZE_VERSION_BUILD=${ZEBUILD_VERSION_BUILD})
+if (ZEBUILD_PLATFORM_UNIX)
+	append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ZE_PLATFORM_UNIX)
+elseif (ZEBUILD_PLATFORM_WINDOWS)
+	append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ZE_PLATFORM_WINDOWS)
+endif()
 
-	
 
 ## Static Checking & Testing Options
 #########################################################################################
-set(ZEBUILD_STATIC_CHECKS_ENABLE			FALSE	CACHE BOOL "Enable static checks.")
-set(ZEBUILD_STATIC_CHECKS_ENABLE_CPPCHECK		FALSE	CACHE BOOL "Enable cppcheck static checker.")
-set(ZEBUILD_STATIC_CHECKS_ENABLE_PCLINT			FALSE	CACHE BOOL "Enable pc-lint static checker.")
-set(ZEBUILD_UNIT_TESTS_ENABLE				FALSE	CACHE BOOL "Enable unit tests.")
-set(ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE			FALSE	CACHE BOOL "Enables code coverage instrumentation.")
-set(ZEBUILD_DEBUG_ENABLE				TRUE	CACHE BOOL "Enable debug extensions.")
-set(ZEBUILD_DEBUG_HEAP_CHECK_ENABLE			FALSE	CACHE BOOL "Enable heap checking.")
-set(ZEBUILD_DEBUG_BREAK_ON_ERROR			TRUE	CACHE BOOL "Break if an error occures.")
-set(ZEBUILD_DEBUG_BREAK_ON_WARNING			FALSE	CACHE BOOL "Break if an warning occures.")
-set(ZEBUILD_VERBOSE							FALSE	CACHE BOOL "Enable ZEBuild verbose mode.")
+set(ZEBUILD_STATIC_CHECKS_ENABLE          FALSE CACHE BOOL "Enable static checks.")
+set(ZEBUILD_STATIC_CHECKS_ENABLE_CPPCHECK FALSE CACHE BOOL "Enable cppcheck static checker.")
+set(ZEBUILD_STATIC_CHECKS_ENABLE_PCLINT   FALSE CACHE BOOL "Enable pc-lint static checker.")
+set(ZEBUILD_UNIT_TESTS_ENABLE             FALSE CACHE BOOL "Enable unit tests.")
+set(ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE    FALSE CACHE BOOL "Enables code coverage instrumentation.")
+set(ZEBUILD_DEBUG_ENABLE                  TRUE  CACHE BOOL "Enable debug extensions.")
+set(ZEBUILD_DEBUG_HEAP_CHECK_ENABLE       FALSE CACHE BOOL "Enable heap checking.")
+set(ZEBUILD_DEBUG_BREAK_ON_ERROR          TRUE  CACHE BOOL "Break if an error occures.")
+set(ZEBUILD_DEBUG_BREAK_ON_WARNING        FALSE CACHE BOOL "Break if an warning occures.")
+set(ZEBUILD_VERBOSE	                      FALSE CACHE BOOL "Enable ZEBuild verbose mode.")
 
 if (ZEBUILD_DEBUG_ENABLE)
 	append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_ENABLE)
@@ -200,68 +221,70 @@ if (ZEBUILD_STATIC_CHECKS_ENABLE)
 	endif()
 endif()
 
+
 ## Symbol & Source Server Options
 #########################################################################################
-set(ZEBUILD_SYMBOL_SERVER_ENABLE BOOL		FALSE	CACHE BOOL "Upload symbols to symbol server.")
+set(ZEBUILD_SYMBOL_SERVER_ENABLE FALSE CACHE BOOL "Upload symbols to symbol server.")
 set(ZEBUILD_SYMBOL_SERVER_ADDRESS "\\\\Server\\Symbols" CACHE STRING "Symbol server address.")
-set(ZEBUILD_SYMBOL_SERVER_SOURCE_INDEX BOOL	FALSE	CACHE BOOL "Index code in sybols with svn address.")
+set(ZEBUILD_SYMBOL_SERVER_SOURCE_INDEX FALSE CACHE BOOL "Index code in sybols with svn address.")
 
 
 ## DLL Options
 #########################################################################################
 set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll will be generated and external plugins will be disabled.")
 
+
 ## Compiler & Linker Options
 #########################################################################################
-if (ZEBUILD_PLATFORM_COMPILER STREQUAL "MSVC")
+if ("${ZEBUILD_PLATFORM_COMPILER}" EQUAL "MSVC")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")	
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
-
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
 	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /VERBOSE:LIB")
-
 	append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
 endif()
 
 
 ## Directories
 #########################################################################################
+set(ZEBUILD_PLATFORM_PATH ${CMAKE_SOURCE_DIR}/Platform/${ZEBUILD_PLATFORM}/${ZEBUILD_PLATFORM_ARCHITECTURE})
+set(ZEBUILD_INCLUDE_PATH ${ZEBUILD_PLATFORM_PATH}/Include)
+set(ZEBUILD_LIB_PATH ${ZEBUILD_PLATFORM_PATH}/Lib)
+set(ZEBUILD_DLL_PATH ${ZEBUILD_PLATFORM_PATH}/Dll)
+set(ZEBUILD_TOOL_PATH ${ZEBUILD_PLATFORM_PATH}/Tool)
+
 include_directories(
-	${CMAKE_SOURCE_DIR}
+	${CMAKE_SOURCE_DIR}/Source
 	${CMAKE_SOURCE_DIR}/Source/ZEEngine
 	${CMAKE_SOURCE_DIR}/Source/ZEFoundation
 	${CMAKE_SOURCE_DIR}/Source/ZEToolSDK
 	${CMAKE_SOURCE_DIR}/Source/ZETest
-	${CMAKE_SOURCE_DIR}/Include/${ZEBUILD_PLATFORM}
-	${CMAKE_SOURCE_DIR}/Include/${ZEBUILD_PLATFORM}/DirectX
-	${CMAKE_SOURCE_DIR}/Include/${ZEBUILD_PLATFORM}/PhysX2/Cooking 
-	${CMAKE_SOURCE_DIR}/Include/${ZEBUILD_PLATFORM}/PhysX2/Foundation 
-	${CMAKE_SOURCE_DIR}/Include/${ZEBUILD_PLATFORM}/PhysX2/PhysXLoader
-	${CMAKE_SOURCE_DIR}/Include/${ZEBUILD_PLATFORM}/PhysX2/Physics
-	${CMAKE_SOURCE_DIR}/Include/${ZEBUILD_PLATFORM}/3dsMax/2010)
+	${ZEBUILD_INCLUDE_PATH}
+	${ZEBUILD_INCLUDE_PATH}/DirectX
+	${ZEBUILD_INCLUDE_PATH}/PhysX2/Cooking 
+	${ZEBUILD_INCLUDE_PATH}/PhysX2/Foundation 
+	${ZEBUILD_INCLUDE_PATH}/PhysX2/PhysXLoader
+	${ZEBUILD_INCLUDE_PATH}/PhysX2/Physics
+	${ZEBUILD_INCLUDE_PATH}/3dsMax/2010)
 	
 link_directories(
-	${CMAKE_SOURCE_DIR}/Lib/${ZEBUILD_PLATFORM}
-	#${CMAKE_SOURCE_DIR}/Lib/${ZEBUILD_PLATFORM}/Release
-	#${CMAKE_SOURCE_DIR}/Lib/${ZEBUILD_PLATFORM}/Release/vrpn
-
-	${CMAKE_SOURCE_DIR}/Lib/${ZEBUILD_PLATFORM}/$(ConfigurationName)
-	${CMAKE_SOURCE_DIR}/Lib/${ZEBUILD_PLATFORM}/$(ConfigurationName)/vrpn
-	${CMAKE_SOURCE_DIR}/Lib/${ZEBUILD_PLATFORM}/$(ConfigurationName)/Bullet
-	${CMAKE_SOURCE_DIR}/Lib/${ZEBUILD_PLATFORM}/DirectX
-	${CMAKE_SOURCE_DIR}/Lib/${ZEBUILD_PLATFORM}/PhysX2
-	${CMAKE_SOURCE_DIR}/Lib/${ZEBUILD_PLATFORM}/PhysX3
-	${CMAKE_SOURCE_DIR}/Lib/${ZEBUILD_PLATFORM}/3dsMax/2010)
+	${ZEBUILD_LIB_PATH}/$(ConfigurationName)
+	${ZEBUILD_LIB_PATH}/$(ConfigurationName)/vrpn
+	${ZEBUILD_LIB_PATH}/$(ConfigurationName)/Bullet
+	${ZEBUILD_LIB_PATH}/DirectX
+	${ZEBUILD_LIB_PATH}/PhysX2
+	${ZEBUILD_LIB_PATH}/PhysX3
+	${ZEBUILD_LIB_PATH}/3dsMax/2010)
 
 include(ze_qt)
 
-##set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/Rundir)
 
-## Projects
+## Source Files
 #########################################################################################
 add_subdirectory(CMake)
 add_subdirectory(Source)
+
 
 ## Install & Packing
 #########################################################################################

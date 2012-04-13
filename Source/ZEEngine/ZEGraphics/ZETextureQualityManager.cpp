@@ -216,7 +216,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 			// Create the temp buffer
 			ZESize BufferSize		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetSize();
 			ZESize BufferPitch		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();
-			void* Buffer			= malloc(BufferSize);
+			void* Buffer			= new ZEUInt8[BufferSize];
 
 			// Compress and generate MipMaps
 			if (Compress && GenerateMipmaps)
@@ -309,7 +309,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 				Output->GetSurfaces().GetItem(0).GetLevels().GetItem(0).CopyFrom(Buffer, BufferPitch);
 			}
 
-			free(Buffer);
+			delete[] Buffer;
 			return true;
 			break;
 		}
@@ -323,7 +323,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 			// Create the temp buffer
 			ZESize BufferSize		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetSize();
 			ZESize BufferPitch		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();
-			void* Buffer			= malloc(BufferSize);
+			void* Buffer			= new ZEUInt8[BufferSize];
 
 			// Compress and generate MipMaps
 			if (Compress && GenerateMipmaps)
@@ -429,7 +429,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 				}
 			}
 
-			free(Buffer);
+			delete[] Buffer;
 			return true;
 			break;
 		}
@@ -442,8 +442,8 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 			// Create the temp buffer
 			ZESize BufferSize		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetSize();
 			ZESize BufferPitch		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();
-			void* Buffer1			= malloc(BufferSize);
-			void* Buffer2			= malloc(BufferSize);
+			void* Buffer1			= new ZEUInt8[BufferSize];
+			void* Buffer2			= new ZEUInt8[BufferSize];
 
 			void* TempSurface1		= NULL;	// first slice of 2x2 level
 			void* TempSUrface2		= NULL; // second slice of 2x2 level
@@ -670,8 +670,8 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 			}
 
 			TempTextureData.Destroy();
-			free(Buffer1);
-			free(Buffer2);
+			delete[] Buffer1;
+			delete[] Buffer2;
 			return true;
 			break;
 		}

@@ -92,6 +92,6 @@ ze_add_library(ZEDS
 	INSTALL_DESTINATION ZEFoundation/ZEDS
 	INSTALL_COMPONENT ZESDK)
 	
-ze_add_unit_tests(ZEDSTests 
+ze_add_test(ZEDSTests 
 	SOURCES ${Tests}
 	TEST_TARGET ZEDS)

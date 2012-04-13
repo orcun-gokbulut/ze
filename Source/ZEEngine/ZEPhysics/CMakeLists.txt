@@ -35,8 +35,6 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_conditional_build(ZEPhysics ZEPhysX		TRUE TITLE "Build ZEPhysX Physics Module.")
-
 ze_add_source(ZEPhysicalCallbacks.cpp			Sources)
 ze_add_source(ZEPhysicalCallbacks.h				Sources Headers)
 ze_add_source(ZEPhysicalJoint.cpp				Sources)

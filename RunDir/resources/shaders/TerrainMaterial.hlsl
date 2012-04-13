@@ -78,7 +78,7 @@ float2 GetTexcoord(float3 LocalPosition)
 float2 GetGlobalTexcoord(float3 WorldPosition)
 {
 	float2 B = ColorTextureScale * float2(WorldPosition.x, -WorldPosition.z) + ColorTextureOffset;
-	return float2(B.y, 1.0 - B.x);
+	return float2(B.x, 1.0 - B.y);
 }
 
 float GetBlendFactor(float3 LocalPosition)

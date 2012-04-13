@@ -74,49 +74,54 @@ const ZEString& ZEProfilerCounter::GetName()
 void ZEProfilerCounter::Start()
 {
 	CounterActive = true;
-	StartTime = 0;
 	EndTime = 0;
-	StartTime = GetTickCount64();
+
+	LARGE_INTEGER Temp;
+	QueryPerformanceCounter(&Temp);
+
+	StartTime = Temp.QuadPart;
 }
 
 void ZEProfilerCounter::Stop()
 {
-	EndTime = GetTickCount64();
-	if(Owner->GetInstance()->Stack.GetLastItem()->Name == ZEProfilerCounter::Name)
-	{
-		PassedTime = EndTime - StartTime;
+	LARGE_INTEGER Temp;
+	QueryPerformanceCounter(&Temp);
 
-		if(FrameMaximumTime < 0)
-			FrameMaximumTime = PassedTime;
-		else if(PassedTime > FrameMaximumTime)
-			FrameMaximumTime = PassedTime;
+	EndTime = Temp.QuadPart;
 
-		if(FrameMinimumTime < 0)
-			FrameMinimumTime = PassedTime;
-		else if(FrameMinimumTime > PassedTime)
-			FrameMinimumTime = PassedTime;
+	PassedTime = EndTime - StartTime;
 
-		if(TotalMaximumTime < 0)
-			TotalMaximumTime = PassedTime;
-		else if(TotalMaximumTime < PassedTime)
-			TotalMaximumTime = PassedTime;
+	if(FrameMaximumTime < 0)
+		FrameMaximumTime = PassedTime;
+	else if(PassedTime > FrameMaximumTime)
+		FrameMaximumTime = PassedTime;
 
-		if(TotalMinimumTime < 0)
-			TotalMinimumTime = PassedTime;
-		else if(TotalMinimumTime > PassedTime)
-			TotalMinimumTime = PassedTime;
+	if(FrameMinimumTime < 0)
+		FrameMinimumTime = PassedTime;
+	else if(FrameMinimumTime > PassedTime)
+		FrameMinimumTime = PassedTime;
 
-		FrameTotalTime += PassedTime;
-		TotalTime += PassedTime;
-		TotalCount++;
-		FrameCount++;
+	if(TotalMaximumTime < 0)
+		TotalMaximumTime = PassedTime;
+	else if(TotalMaximumTime < PassedTime)
+		TotalMaximumTime = PassedTime;
 
-		CounterActive = false;
-		StartTime = 0;
-		EndTime = 0;
+	if(TotalMinimumTime < 0)
+		TotalMinimumTime = PassedTime;
+	else if(TotalMinimumTime > PassedTime)
+		TotalMinimumTime = PassedTime;
+
+	FrameTotalTime += PassedTime;
+	TotalTime += PassedTime;
+	TotalCount++;
+	FrameCount++;
+
+	CounterActive = false;
+	StartTime = 0;
+	EndTime = 0;
+		
+	if(Owner != NULL && Owner->GetInstance()->Stack.GetLastItem()->Name == ZEProfilerCounter::Name)
 		Owner->GetInstance()->Stack.DeleteAt(Owner->GetInstance()->Stack.GetSize()-1);
-	}
-	
 }
 
 ZEInt64 ZEProfilerCounter::GetFrameCount()

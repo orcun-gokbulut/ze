@@ -485,17 +485,17 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		if(BoneResource->PhysicalJoint.AngularTwistMotor != ZE_PJMT_NONE)
 		{
 		PhysicalJoint->SetAngularTwistMotor(BoneResource->PhysicalJoint.AngularTwistMotor);
-		PhysicalJoint->SetAngularTwistMotorForce(BoneResource->PhysicalJoint.AngularTwistMotorForce);
+			PhysicalJoint->SetAngularTwistMotorForce(BoneResource->PhysicalJoint.AngularTwistMotorForce);
 		PhysicalJoint->SetAngularTwistMotorSpring(BoneResource->PhysicalJoint.AngularTwistMotorSpring);
-		PhysicalJoint->SetAngularTwistMotorDamper(BoneResource->PhysicalJoint.AngularTwistMotorDamper);
+			PhysicalJoint->SetAngularTwistMotorDamper(BoneResource->PhysicalJoint.AngularTwistMotorDamper);
 		}
 
 		if(BoneResource->PhysicalJoint.AngularSlerpMotor != ZE_PJMT_NONE)
 		{
-		PhysicalJoint->SetAngularSlerpMotor(BoneResource->PhysicalJoint.AngularSlerpMotor);
-		PhysicalJoint->SetAngularSlerpMotorForce(BoneResource->PhysicalJoint.AngularSlerpMotorForce);
-		PhysicalJoint->SetAngularSlerpMotorSpring(BoneResource->PhysicalJoint.AngularSlerpMotorSpring);
-		PhysicalJoint->SetAngularSlerpMotorDamper(BoneResource->PhysicalJoint.AngularSlerpMotorDamper);
+			PhysicalJoint->SetAngularSlerpMotor(BoneResource->PhysicalJoint.AngularSlerpMotor);
+			PhysicalJoint->SetAngularSlerpMotorForce(BoneResource->PhysicalJoint.AngularSlerpMotorForce);
+			PhysicalJoint->SetAngularSlerpMotorSpring(BoneResource->PhysicalJoint.AngularSlerpMotorSpring);
+			PhysicalJoint->SetAngularSlerpMotorDamper(BoneResource->PhysicalJoint.AngularSlerpMotorDamper);
 		}
 
 		PhysicalJoint->SetPhysicalWorld(zeScene->GetPhysicalWorld());

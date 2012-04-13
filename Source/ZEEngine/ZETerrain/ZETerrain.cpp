@@ -59,6 +59,7 @@ ZEDrawFlags ZETerrain::GetDrawFlags() const
 	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
+
 void ZETerrain::SetChunkSize(ZEUInt Size)
 {
 	ChunkSize = Size;
@@ -260,7 +261,7 @@ bool ZETerrain::LoadLevelData()
 	File.Close();
 
 	DetailNormalTexture = ZETexture2DResource::LoadResource("normal.jpg")->GetTexture();
-	ColorTexture = ZETexture2DResource::LoadResource("Diffuse3.tif")->GetTexture();
+	ColorTexture = ZETexture2DResource::LoadResource("Diffuse.bmp")->GetTexture();
 	 
 	return true;
 }

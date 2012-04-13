@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSListener.h
+ Zinek Engine - ZED3D9SkyDomeMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DS_LISTENER_H__
-#define __ZE_DS_LISTENER_H__
+#ifndef __ZE_D3D9_SKY_DOME_MATERIAL_H__
+#define __ZE_D3D9_SKY_DOME_MATERIAL_H__
 
-#include "../ZEListener.h"
-#include "ZEDSComponentBase.h"
+#include "ZED3D9ComponentBase.h"
+#include "ZEGraphics\ZESkyDomeMaterial.h"
 
-class ZEDSListener : public ZEListener, public ZEDSComponentBase
-{	
-	friend class ZEDSModule;
+class ZEFrameRenderer;
+class ZERenderCommand;
+class ZED3D9VertexShader;
+class ZED3D9PixelShader;
+
+class ZED3D9SkyDomeMaterial : public ZESkyDomeMaterial, public ZED3D9ComponentBase
+{
+	friend class	ZED3D9Module;
+
+	protected:
+		ZED3D9VertexShader*			VertexShader;
+		ZED3D9PixelShader*			PixelShader;
+
+		
+		void						CreateShaders();
+		void						ReleaseShaders();
+
 	private:
-		float						UpdateTreshold;
-		bool						ListenerDirtyFlag;
-
-		void						ResetParameters();
-
-									ZEDSListener();
-		virtual						~ZEDSListener();
-
 	public:
-		bool						IsActiveListener();
-		void						SetActiveListener();
+									ZED3D9SkyDomeMaterial();
+		virtual						~ZED3D9SkyDomeMaterial();
 
-		virtual void				SetPosition(const ZEVector3& NewPosition);
-		virtual void				SetRotation(const ZEQuaternion& NewRotation);
+		virtual bool				SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
+		virtual void				UpdateMaterial();
+		virtual void				Release();
 
-		virtual void				SetDistanceFactor(float NewDistanceFactor);	
-		virtual void				SetDopplerFactor(float NewDopplerFactor);
-		virtual void				SetRollOffFactor(float NewRollOffFactor);
-
-		virtual void				OwnerWorldTransformChanged();
-
-		virtual void				Tick(float ElapsedTime);
 };
 
 #endif
-
-
-
-

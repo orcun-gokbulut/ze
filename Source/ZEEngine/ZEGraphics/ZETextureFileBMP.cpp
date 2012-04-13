@@ -77,7 +77,7 @@ ZEPackStruct
 	}
 );
 
-static inline ZESize GetPixelSize(ZEUInt8 BPP)
+static inline ZESize GetPixelSize(ZEUInt16 BPP)
 {
 	switch(BPP)
 	{
@@ -101,7 +101,7 @@ static inline ZESize GetPixelSize(ZEUInt8 BPP)
 	}
 }
 
-static inline ZEARGB32 ConvertFrom15(ZEUInt8* Value)
+static __forceinline ZEARGB32 ConvertRow15(ZEUInt8* Value)
 {
 	ZEARGB32 Color;
 	Color.R = (Value[1] << 1) & 0xF8;
@@ -112,7 +112,7 @@ static inline ZEARGB32 ConvertFrom15(ZEUInt8* Value)
 	return Color;
 }
 
-static inline ZEARGB32 ConvertFrom16(ZEUInt8* Value)
+static __forceinline ZEARGB32 ConvertRow16(ZEUInt8* Value)
 {
 	ZEARGB32 Color;
 	Color.R = Value[1] & 0xF8;
@@ -122,8 +122,7 @@ static inline ZEARGB32 ConvertFrom16(ZEUInt8* Value)
 	return Color;
 }
 
-
-static inline ZEARGB32 ConvertFrom24(void* Value)
+static __forceinline ZEARGB32 ConvertRow24(void* Value)
 {
 	ZEARGB32 Color;
 	Color.A = 255;
@@ -133,7 +132,7 @@ static inline ZEARGB32 ConvertFrom24(void* Value)
 	return Color;
 }
 
-static inline ZEARGB32 ConvertFrom32(void* Value)
+static __forceinline ZEARGB32 ConvertRow32(void* Value)
 {
 	ZEARGB32 Color;
 	Color.B = ((ZEUInt8*)Value)[0];
@@ -142,7 +141,8 @@ static inline ZEARGB32 ConvertFrom32(void* Value)
 	Color.A = ((ZEUInt8*)Value)[3];
 	return Color;
 }
-static ZETextureData* LoadCompressedData(ZEFile* File, ZEBitmapHeader* Header, ZEARGB32* Palette)
+
+static ZEUInt8* LoadCompressedData(ZEFile* File, ZEBitmapHeader* Header)
 {
 	ZESize Width = Header->Width;
 	ZESize Height = (Header->Height < 0 ? -Header->Height : Header->Height);
@@ -243,40 +243,25 @@ static ZETextureData* LoadCompressedData(ZEFile* File, ZEBitmapHeader* Header, Z
 		}
 	}
 
-	ZEPointer<ZETextureData> Texture = new ZETextureData();
-	Texture->Create(ZE_TT_2D, ZE_TPF_I8_4, 1, 1, (ZEUInt)Width, (ZEUInt)Height);
-	ZEARGB32* Destination = (ZEARGB32*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
-
-	ZESSize Step = (Height > 0 ? -1 : 1);
-	ZESSize Index = (Height > 0 ? Height - 1 : 0);
-	ZESize Count = (Height > 0 ? Height : -Height);
-
-	for (ZESize I = 0; I < (ZESize)Height; I++)
-	{
-		ZEARGB32* DestinationRow = Destination + Index * (ZESize)Width;
-		for (ZESize N = 0; N < (ZESize)Width; N++)
-		{
-			ZEUInt16 Value = UncompressedData[I * Width + N];
-
-			if (Value & 0xFF00)
-				DestinationRow[N] = Palette[Value & 0x00FF];
-			else
-			{
-				ZEARGB32* DestinationColor =  DestinationRow + N;
-				DestinationColor->R = 0;
-				DestinationColor->G = 0;
-				DestinationColor->B = 0;
-				DestinationColor->A = 0;
-			}
-		}
-
-		Index += Step;
-	}
-
-	return Texture.Transfer();
+	return CompressedData.Transfer();
 }
 
-static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEARGB32* Palette)
+static ZEUInt8* LoadData(ZEFile* File, ZEBitmapHeader* Header)
+{
+	ZESSize Width = Header->Width;
+	ZESSize Height = (Header->Height < 0 ? -Header->Height : Header->Height);
+
+	File->Seek(Header->DataPosition, ZE_SF_BEGINING);
+
+	ZEPointer<ZEUInt8> Buffer = new ZEUInt8[Width * Height * GetPixelSize(Header->BitsPerPixel)];
+	ZEUInt64 Result = File->Read(Buffer, Width * Height * GetPixelSize(Header->BitsPerPixel), 1);
+	if (Result != 1)
+		return NULL;
+
+	return Buffer.Transfer();
+}
+
+static ZETextureData* ConvertData(ZEBitmapHeader* Header, ZEARGB32* Palette, ZEUInt8* Data)
 {
 	ZESSize Width = Header->Width;
 	ZESSize Height = (Header->Height < 0 ? -Header->Height : Header->Height);
@@ -287,70 +272,80 @@ static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEARGB32* P
 
 	ZESize Align = (Header->BitsPerPixel / 8) * Width;
 	Align += (Align % 4) != 0 ? 4 - (Align % 4) : 0;
-	ZEPointer<ZEUInt8> SourceRowData = new ZEUInt8[Align];
-
 	ZESSize Step = (Height > 0 ? -1 : 1);
 	ZESSize Index = (Height > 0 ? Height - 1 : 0);
-	ZESize Count = (Height > 0 ? Height : -Height);
 
-	File->Seek(Header->DataPosition, ZE_SF_BEGINING);
-
-	for (ZESize I = 0; I < (ZESize)Height; I++)
+	ZESize PixelSize = GetPixelSize(Header->BitsPerPixel);
+	switch(Header->BitsPerPixel)
 	{
-		ZEUInt64 Result = File->Read(SourceRowData, Align, 1);
-		if (Result != 1)
-		{
-			zeError("Corrupted bitmap data.");
-			return NULL;
-		}
-		ZESize PixelSize = GetPixelSize(Header->BitsPerPixel);
-
-		ZEARGB32* DestinationRow = Destination + Index * (ZESize)Width;
-		switch(Header->BitsPerPixel)
-		{
-			case 8:
+		case 8:
+			for (ZESize I = 0; I < (ZESize)Height; I++)
+			{
+				ZEUInt8* SourceRow = Data + Index * Width * PixelSize;	
+				ZEARGB32* DestinationRow = Destination + Index * (ZESize)Width;
 				for (ZESize N = 0; N < (ZESize)Width; N++)
-					DestinationRow[N] = Palette[SourceRowData[N]];
+					DestinationRow[N] = Palette[SourceRow[N]];
+				Index += Step;
+			}
+			break;
 
-				break;
-
-			case 16:
-				if (Header->GreenMask == ZEEndian::Big(0x000003E0))
+		case 16:
+			if (Header->GreenMask == ZEEndian::Big(0x000003E0))
+			{
+				for (ZESize I = 0; I < (ZESize)Height; I++)
 				{
+					ZEUInt8* SourceRow = Data + Index * Width * PixelSize;	
+					ZEARGB32* DestinationRow = Destination + Index * (ZESize)Width;
 					for (ZESize N = 0; N < (ZESize)Width; N++)
-						DestinationRow[N] = ConvertFrom15(SourceRowData + N * PixelSize);
+						DestinationRow[N] = ConvertRow15(SourceRow + N * 2);
+					Index += Step;
 				}
-				else
+			}
+			else
+			{
+				for (ZESize I = 0; I < (ZESize)Height; I++)
 				{
+					ZEUInt8* SourceRow = Data + Index * Width * PixelSize;	
+					ZEARGB32* DestinationRow = Destination + Index * (ZESize)Width;
 					for (ZESize N = 0; N < (ZESize)Width; N++)
-						DestinationRow[N] = ConvertFrom16(SourceRowData + N * PixelSize);
+						DestinationRow[N] = ConvertRow16(SourceRow + N * 2);
+					Index += Step;
 				}
-				break;
+			}
+			break;
 
-			case 24:
+		case 24:
+			for (ZESize I = 0; I < (ZESize)Height; I++)
+			{
+				ZEUInt8* SourceRow = Data + Index * Width * PixelSize;	
+				ZEARGB32* DestinationRow = Destination + Index * (ZESize)Width;
 				for (ZESize N = 0; N < (ZESize)Width; N++)
-					DestinationRow[N] = ConvertFrom24(SourceRowData + N * PixelSize);
-				break;
+					DestinationRow[N] = ConvertRow24(SourceRow + N * 3);
+				Index += Step;
+			}
+			break;
 
-			case 32:
+		case 32:
+			for (ZESize I = 0; I < (ZESize)Height; I++)
+			{
+				ZEUInt8* SourceRow = Data + Index * Width * PixelSize;	
+				ZEARGB32* DestinationRow = Destination + Index * (ZESize)Width;
 				for (ZESize N = 0; N < (ZESize)Width; N++)
-					DestinationRow[N] = ConvertFrom32(SourceRowData + N * PixelSize);
-				break;
-		}
-
-		Index += Step;
+					DestinationRow[N] = ConvertRow32(SourceRow + N * 4);
+				Index += Step;
+			}
+			break;
 	}
 
 	return Texture.Transfer();
 }
 
-static bool LoadHeaders(ZEFile* File, ZEBitmapHeader* Header, ZEARGB32* Pallete)
+static bool LoadHeaders(ZEFile* File, ZEBitmapHeader* Header, ZEARGB32* Palette)
 {
 	ZEUInt64 Result;
 
 	File->Seek(0, ZE_SF_BEGINING);
 	Result = File->Read(Header, 1, sizeof(ZEBitmapHeader));
-	
 	if (Result < 54)
 	{
 		zeError("Can not load BMP file header.");
@@ -398,7 +393,6 @@ static bool LoadHeaders(ZEFile* File, ZEBitmapHeader* Header, ZEARGB32* Pallete)
 		zeError("Unsuppored BMP file pixel format. Only 8, 16, 24 and 32 bit pixel formats supported.");
 		return false;
 	}
-
 	
 	switch(Header->CompressionType)
 	{
@@ -441,7 +435,7 @@ static bool LoadHeaders(ZEFile* File, ZEBitmapHeader* Header, ZEARGB32* Pallete)
 			return false;
 	}
 
-	memset(Pallete, 0, 256 * sizeof(ZEARGB32));
+	memset(Palette, 0, 256 * sizeof(ZEARGB32));
 	if (Header->BitsPerPixel == 8)
 	{
 		if (Header->PaletteEntryCount == 0)
@@ -454,14 +448,14 @@ static bool LoadHeaders(ZEFile* File, ZEBitmapHeader* Header, ZEARGB32* Pallete)
 		}
 
 		File->Seek(14 + Header->Size, ZE_SF_BEGINING);
-		if (File->Read(Pallete, sizeof(ZEARGB32), Header->PaletteEntryCount) != Header->PaletteEntryCount)
+		if (File->Read(Palette, sizeof(ZEARGB32), Header->PaletteEntryCount) != Header->PaletteEntryCount)
 		{
 			zeError("Can not load BMP file's palate entries.");
 			return false;
 		}
 
 		for (ZESize I = 0; I < Header->PaletteEntryCount; I++)
-			Pallete[I] = ConvertFrom32(Pallete + I);
+			Palette[I] = ConvertRow32(Palette + I);
 	}
 
 	return true;
@@ -484,19 +478,34 @@ bool ZETextureFileBMP::CanLoad(ZEFile* File)
 static ZETextureData* Load(ZEFile* File)
 {
 	ZEBitmapHeader Header;
-	ZEARGB32 Pallete[256];
+	ZEARGB32 Palette[256];
 
-	if (!LoadHeaders(File, &Header, Pallete))
+	if (!LoadHeaders(File, &Header, Palette))
 		return NULL;
 
+	ZEPointer<ZEUInt8> Data;
 	if (Header.CompressionType == 1)
-		return LoadCompressedData(File, &Header, Pallete);
+		Data = LoadCompressedData(File, &Header);
 	else
-		return LoadData(File, &Header, Pallete);
+		Data = LoadData(File, &Header);
+	
+	if (Data == NULL)
+	{
+		zeError("Can not load pixel data.");
+		return NULL;
+	}
+	
+	return ConvertData(&Header, Palette, Data);
 }
 
 ZETextureData* ZETextureFileBMP::Load(ZEFile* File)
 {
+	if (File == NULL)
+	{
+		zeError("Null file pointer.");
+		return NULL;
+	}
+
 	ZETextureData* Texture = ::Load(File);
 	if (Texture == NULL)
 		zeError("Can not load BMP file.");

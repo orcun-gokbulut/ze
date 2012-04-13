@@ -52,8 +52,6 @@
 #include "ZEMeta/ZEMetaDebugModule.h"
 #include "ZEUI/ZEUIDebugModule.h"
 
-#include "ZEGraphics/ZEDirect3D9/ZED3D9TextureResizer.h"
-
 extern HINSTANCE ApplicationInstance;
 
 #include <stdio.h>

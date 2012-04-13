@@ -103,7 +103,7 @@ ze_add_library(ZEMath
 	INSTALL_DESTINATION ZEFoundation/ZEMath
 	INSTALL_COMPONENT ZESDK)
 	
-ze_add_unit_tests(ZEMathTests
+ze_add_test(ZEMathTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES ZEMathIOStreamMapping.cpp ZEMathIOStreamMapping.h
 	TEST_TARGET ZEMath)

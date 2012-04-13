@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSSoundSource.h
+ Zinek Engine - ZEALListener.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,54 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DS_SOUND_SOURCE_H__
-#define __ZE_DS_SOUND_SOURCE_H__
+#ifndef	__ZE_AL_LISTENER_H__
+#define __ZE_AL_LISTENER_H__
 
-#include "ZETypes.h"
-#include "ZEDSComponentBase.h"
-#include "../ZESoundSource.h"
+#include "ZESound/ZEListener.h"
+#include "ZEALComponentBase.h"
 
-#include <dsound.h>
-
-
-class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
-{
-	friend class ZEDSModule;
+class ZEALListener : public ZEListener, public ZEALComponentBase
+{	
+	friend class ZEALModule;
 	private:
-		LPDIRECTSOUNDBUFFER			DSBuffer;
-		ZESize						BufferSampleCount;
-		ZESize						OldBufferPosition;
-		ZESize						StreamPosition;
-		ZEInt						LastUpdatedBufferChunk;
+		float						UpdateTreshold;
+		bool						ListenerDirtyFlag;
 
-		bool						CreateBuffer(bool Is3D);
 		void						ResetParameters();
 
-		void						Stream();
-		void						ResetStream();
-		void						StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
-
-									ZEDSSoundSource();
-		virtual						~ZEDSSoundSource();
+									ZEALListener();
+		virtual						~ZEALListener();
 
 	public:
-		virtual void				SetSoundSourceState(ZESoundSourceState State);
-		virtual void				SetCurrentPosition(ZESize SampleIndex);
-		virtual ZESize				GetCurrentPosition();
+		bool						IsActiveListener();
+		void						SetActiveListener();
 
-		virtual void				SetPan(ZEInt NewPan);
-		virtual void				SetPlaybackSpeed(float Speed);
-		virtual void				SetVolume(ZEUInt NewVolume);
-		virtual void				SetLooping(bool Enabled);				
-							
-		virtual void				Play();
-		virtual void				Resume();
-		virtual void				Pause();
-		virtual void				Stop();
+		virtual void				SetPosition(const ZEVector3& NewPosition);
+		virtual void				SetRotation(const ZEQuaternion& NewRotation);
 
-		void						Update(float ElapsedTime);
+		virtual void				SetDistanceFactor(float NewDistanceFactor);	
+		virtual void				SetDopplerFactor(float NewDopplerFactor);
+		virtual void				SetRollOffFactor(float NewRollOffFactor);
 
-		virtual void				SetSoundResource(ZESoundResource* Resource);
+		virtual void				OwnerWorldTransformChanged();
+
+		virtual void				Tick(float ElapsedTime);
 };
 
 #endif

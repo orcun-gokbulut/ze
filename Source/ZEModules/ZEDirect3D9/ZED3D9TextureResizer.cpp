@@ -35,8 +35,8 @@
 
 #include "ZED3D9TextureResizer.h"
 
-#include "ZEGraphics/ZEDirect3D9/ZED3D9ComponentBase.h"
-#include "ZEGraphics/ZEDirect3D9/ZED3D9Module.h"
+#include "ZED3D9ComponentBase.h"
+#include "ZED3D9Module.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZED3D9CommonTools.h"
 #include "ZEGraphics/ZETexture2DResource.h"

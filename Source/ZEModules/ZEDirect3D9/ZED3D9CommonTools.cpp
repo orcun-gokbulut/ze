@@ -43,9 +43,8 @@
 
 #include <d3dx9.h>
 #include <stdio.h>
-#include "../ZETexture3DResource.h"
+#include "ZEGraphics/ZETexture3DResource.h"
 #include "ZED3D9Texture3D.h"
-#include "../ZETexture3D.h"
 
 #ifdef ZE_DEBUG_D3D9_DEBUG_SHADERS
 	#define ZE_SHADER_COMPILER_PARAMETERS	(D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION)

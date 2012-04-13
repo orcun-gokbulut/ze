@@ -35,8 +35,6 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-ze_add_conditional_build(ZEGraphics ZEDirect3D9		TRUE TITLE "Build ZEDirect3D9 Graphics Module.")
-
 add_subdirectory(ZEPostProcessor)
 
 ze_add_source(ZEBitmap.cpp							Sources)
@@ -138,7 +136,6 @@ ze_add_source(ZETextureCacheDataIdentifier.h		Sources Headers)
 ze_add_source(ZETextureQualityManager.cpp			Sources)
 ze_add_source(ZETextureQualityManager.h				Sources Headers)
 
-
 ze_add_library(ZEGraphics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
@@ -147,6 +144,9 @@ ze_add_library(ZEGraphics
 	INSTALL_DESTINATION "ZEEngineAPI/ZEGraphics"
 	INSTALL_COMPONENT Header)
 
-ze_add_unit_tests(ZEGraphicsTests 
+ze_add_test(ZEGraphicsTests 
 	SOURCES ${Tests}
 	TEST_TARGET ZEGraphics)
+
+add_executable(ZETextureFileTGA ZETextureFileTGA.cpp)
+target_link_libraries(ZETextureFileTGA ZEFoundation ZECore ZEGraphics)
