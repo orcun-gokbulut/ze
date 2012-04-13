@@ -362,7 +362,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		Output.Color.rgb += DiffuseColor;
 	#endif
 	
-	#ifdef ZE_SHADER_SPECULAR
+	#if defined(ZE_SHADER_SPECULAR)
 		float3 SpecularColor = MaterialSpecularColor;
 		#ifdef ZE_SHADER_SPECULAR_MAP
 			SpecularColor *= tex2D(SpecularMap, Input.Texcoord).rgb;

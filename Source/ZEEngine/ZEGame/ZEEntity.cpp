@@ -460,9 +460,7 @@ void ZEEntity::Destroy()
 
 void ZEEntity::Tick(float Time)
 {
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		if (ChildEntities[I]->GetEnabled())
-			ChildEntities[I]->Tick(Time);
+
 }
 
 void ZEEntity::Draw(ZEDrawParameters* DrawParameters)

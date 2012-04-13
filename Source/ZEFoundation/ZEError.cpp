@@ -39,7 +39,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#if defined(ZE_PLATFORM_CLASS_WINDOWS) && defined(ZE_DEBUG_ENABLE)
+#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
 #define WINDOWS_MEAN_AND_LEAN
 #include <windows.h>
 #endif
@@ -133,7 +133,7 @@ void ZEError::RaiseError(const char* Module, ZEErrorType Type, const char* Error
 		
 		va_end(Args);
 		
-		#if defined(ZE_PLATFORM_CLASS_WINDOWS) && defined(ZE_DEBUG_ENABLE)
+		#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
 			char DebugBuffer[4096];
 			sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZEError::GetErrorTypeString(Type), Buffer);
 			OutputDebugString(DebugBuffer);
@@ -155,7 +155,7 @@ void ZEError::RaiseAssert(ZEAssertType Type, const char* Function, const char* F
 		
 		va_end(Args);
 
-		#if defined(ZE_PLATFORM_CLASS_WINDOWS) && defined(ZE_DEBUG_ENABLE)
+		#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
 			char DebugBuffer[4096];
 			sprintf(DebugBuffer, "[%s] : %s (Function : \"%s\", File : \"%s\", Line : %d)\r\n", ZEError::GetAssertTypeString(Type), Buffer, Function, File, Line);
 			OutputDebugString(DebugBuffer);

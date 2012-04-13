@@ -555,28 +555,28 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 
 		if (CurrIndex == ActiveLevel)
 		{
-			DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, -ChunkSize, -ChunkSize, ZE_TPM_NORMAL, CurrIndex);
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, -(ZEInt)ChunkSize, -(ZEInt)ChunkSize, ZE_TPM_NORMAL, CurrIndex);
 
-			DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, -ChunkSize, 0, ZE_TPM_NORMAL, CurrIndex);
-			DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, 0, -ChunkSize, ZE_TPM_NORMAL, CurrIndex);
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, -(ZEInt)ChunkSize, 0, ZE_TPM_NORMAL, CurrIndex);
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, 0, -(ZEInt)ChunkSize, ZE_TPM_NORMAL, CurrIndex);
 			DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, 0, 0, ZE_TPM_NORMAL, CurrIndex);
 		}
 		
 		// Left			
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL, CurrLevelPositionX, CurrLevelPositionY, -2 * ChunkSize, -ChunkSize, LeftMode, CurrIndex);
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL, CurrLevelPositionX, CurrLevelPositionY, -2 * ChunkSize, 0, LeftMode, CurrIndex);
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL, CurrLevelPositionX, CurrLevelPositionY, -2 * (ZEInt)ChunkSize, -(ZEInt)ChunkSize, LeftMode, CurrIndex);
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL, CurrLevelPositionX, CurrLevelPositionY, -2 * (ZEInt)ChunkSize, 0, LeftMode, CurrIndex);
 
 		// Right
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL, CurrLevelPositionX, CurrLevelPositionY, ChunkSize, -ChunkSize, RightMode, CurrIndex);
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, ChunkSize, 0 * ChunkSize, RightMode, CurrIndex);
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL, CurrLevelPositionX, CurrLevelPositionY, (ZEInt)ChunkSize, -(ZEInt)ChunkSize, RightMode, CurrIndex);
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, (ZEInt)ChunkSize, 0 * (ZEInt)ChunkSize, RightMode, CurrIndex);
 
 		// Top
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_VERTICAL, CurrLevelPositionX, CurrLevelPositionY, -ChunkSize, ChunkSize, TopMode, CurrIndex);
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_VERTICAL, CurrLevelPositionX, CurrLevelPositionY, 0 * ChunkSize, ChunkSize, TopMode, CurrIndex);
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_VERTICAL, CurrLevelPositionX, CurrLevelPositionY, -(ZEInt)ChunkSize, (ZEInt)ChunkSize, TopMode, CurrIndex);
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_VERTICAL, CurrLevelPositionX, CurrLevelPositionY, 0 * (ZEInt)ChunkSize, (ZEInt)ChunkSize, TopMode, CurrIndex);
 
 		// Bottom
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_VERTICAL, CurrLevelPositionX, CurrLevelPositionY, -ChunkSize, -2 * ChunkSize, BottomMode, CurrIndex);
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_VERTICAL, CurrLevelPositionX, CurrLevelPositionY, 0, -2 * ChunkSize, BottomMode, CurrIndex);
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_VERTICAL, CurrLevelPositionX, CurrLevelPositionY, (ZEInt)-ChunkSize, -2 * (ZEInt)ChunkSize, BottomMode, CurrIndex);
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_VERTICAL, CurrLevelPositionX, CurrLevelPositionY, 0, -2 * (ZEInt)ChunkSize, BottomMode, CurrIndex);
 
 		Levels[CurrIndex].Material->SetWireframe(Wireframe);
 

@@ -107,6 +107,7 @@ ZEFixedMaterial::ZEFixedMaterial()
 	SpecularColor = ZEVector3(0.0f, 0.0f, 0.0f);
 	EmmisiveColor = ZEVector3(0.0f, 0.0f, 0.0f);
 	SubSurfaceScatteringFactor = 0.0f;
+	MaterialComponentMask = ~0;
 }
 
 ZEFixedMaterial::~ZEFixedMaterial()
@@ -142,6 +143,10 @@ bool ZEFixedMaterial::GetWireframe() const
 void ZEFixedMaterial::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
 {
 	TransparancyMode = Mode;
+	if (TransparancyMode == ZE_MTM_REGULAR)
+		MaterialComponentMask = ~(ZE_SHADER_DIFFUSE | ZE_SHADER_SPECULAR | ZE_SHADER_DETAIL_NORMAL_MAP);
+	else
+		MaterialComponentMask = ~0;
 }
 
 ZEMaterialTransparancyMode ZEFixedMaterial::GetTransparancyMode() const

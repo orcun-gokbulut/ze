@@ -73,7 +73,7 @@ class ZEScene
 
 		ZESceneCuller							Culler;
 
-		ZESmartArray<ZEEntity*>				Entities;
+		ZESmartArray<ZEEntity*>					Entities;
 
 		ZEPhysicalWorld*						PhysicalWorld;
 
@@ -82,6 +82,8 @@ class ZEScene
 		ZEPostProcessor*						PostProcessor;
 		ZECamera*								ActiveCamera;
 		ZEListener*								ActiveListener;
+
+		void									Tick(ZEEntity* Entity, float ElapsedTime);
 
 	public:
 		void									AddEntity(ZEEntity* Entity);
