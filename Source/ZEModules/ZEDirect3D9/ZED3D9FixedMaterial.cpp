@@ -47,9 +47,17 @@ void ZED3D9FixedMaterial::CreateShaders()
 {
 	ReleaseShaders();
 
-	GBufferPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "ZEFixedMaterial_GBuffer_VertexShader", MaterialComponents, "vs_3_0");
-	GBufferPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "ZEFixedMaterial_GBuffer_PixelShader", MaterialComponents, "ps_3_0");
-
+	if (TransparancyMode == ZE_MTM_NONE)
+	{
+		GBufferPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "ZEFixedMaterial_GBuffer_VertexShader", MaterialComponents, "vs_3_0");
+		GBufferPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "ZEFixedMaterial_GBuffer_PixelShader", MaterialComponents, "ps_3_0");
+	}
+	else
+	{
+		GBufferPassVertexShader = NULL;
+		GBufferPassPixelShader = NULL;
+	}
+	
 	ForwardPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "ZEFixedMaterial_ForwardPass_VertexShader", MaterialComponents, "vs_3_0");
 	ForwardPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "ZEFixedMaterial_ForwardPass_PixelShader", MaterialComponents, "ps_3_0");
 }
@@ -180,6 +188,8 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCo
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9FixedMaterial*)this)->UpdateMaterial();
 
+	ZEUInt32 MaterialComponents = this->MaterialComponents & MaterialComponentMask;
+
 	ZECamera* Camera = Renderer->GetCamera();
 
 	// Setup Transformations
@@ -305,6 +315,8 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9FixedMaterial*)this)->UpdateMaterial();
+
+	ZEUInt32 MaterialComponents = this->MaterialComponents & MaterialComponentMask;
 
 	ZECamera* Camera = Renderer->GetCamera();
 
@@ -500,10 +512,10 @@ bool ZED3D9FixedMaterial::SetupShadowPass() const
 
 void ZED3D9FixedMaterial::UpdateMaterial()
 {
-	if (MaterialComponents != OldMaterialComponents)
+	if ((MaterialComponents & MaterialComponentMask) != OldMaterialComponents)
 	{
 		CreateShaders();
-		OldMaterialComponents = MaterialComponents;
+		OldMaterialComponents = MaterialComponents & MaterialComponentMask;
 	}
 }
 

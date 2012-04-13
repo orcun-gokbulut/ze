@@ -76,6 +76,7 @@ bool ZED3D9SkyBoxMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderC
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9SkyBoxMaterial*)this)->UpdateMaterial();
 
+	GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	ZECamera* Camera = Renderer->GetCamera();
 
 	// Setup Transformations

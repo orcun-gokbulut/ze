@@ -311,11 +311,26 @@ ZEListener* ZEScene::GetActiveListener()
 	return ActiveListener;
 }
 
+void ZEScene::Tick(ZEEntity* Entity, float ElapsedTime)
+{
+	if (!Entity->GetEnabled())
+		return;
+	
+	Entity->Tick(ElapsedTime);
+	
+	const ZEArray<ZEEntity*>& Components = Entity->GetComponents();
+	for (ZESize N = 0; N < Components.GetCount(); N++)
+		Components[N]->Tick(ElapsedTime);
+
+	const ZEArray<ZEEntity*>& SubEntities = Entity->GetChildEntities();
+	for (ZESize N = 0; N < SubEntities.GetCount(); N++)
+		SubEntities[N]->Tick(ElapsedTime);
+}
+
 void ZEScene::Tick(float ElapsedTime)
 {
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		if (Entities[I]->GetEnabled())
-			Entities[I]->Tick(ElapsedTime);
+		Tick(Entities[I], ElapsedTime);
 }
 
 void ZEScene::Render(float ElapsedTime)
@@ -334,11 +349,7 @@ void ZEScene::Render(float ElapsedTime)
 	DrawParameters.View = (ZEView*)&ActiveCamera->GetView();
 	DrawParameters.Lights.Clear();
 
-	//Culler.CullScene(this, &DrawParameters);
-
-	for (ZEInt I = 0; I < Entities.GetCount(); I++)
-		if(Entities[I]->GetVisible())
-			Entities[I]->Draw(&DrawParameters);
+	Culler.CullScene(this, &DrawParameters);
 }
 
 bool ZEScene::Save(const ZEString& FileName)
