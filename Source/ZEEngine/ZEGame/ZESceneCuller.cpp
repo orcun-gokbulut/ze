@@ -124,37 +124,30 @@ bool ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameter
 	Statistics.TotalEntityCount++;
 
 	ZEUInt32 EntityDrawFlags = Entity->GetDrawFlags();
-	if ((EntityDrawFlags & ZE_DF_DRAW) != ZE_DF_DRAW)
-		return false;
-
-	Statistics.DrawableEntityCount++;
-
-	if (EntityDrawFlags & ZE_DF_CULL && DrawParameters->ViewVolume->CullTest(Entity))
+	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)
 	{
-		Statistics.CulledEntityCount++;
-		return true;
+		Statistics.DrawableEntityCount++;
+
+		if (EntityDrawFlags & ZE_DF_CULL && DrawParameters->ViewVolume->CullTest(Entity))
+		{
+			Statistics.CulledEntityCount++;
+			return true;
+		}
+		else
+		{
+			Statistics.DrawedEntityCount++;
+			Entity->Draw(DrawParameters);
+			DebugDrawEntity(Entity, DrawParameters);
+		}
 	}
 
-	Statistics.DrawedEntityCount++;
-
-	Entity->Draw(DrawParameters);
-	DebugDrawEntity(Entity, DrawParameters);
-
 	const ZEArray<ZEEntity*>& Components = Entity->GetComponents();
-	for (ZESize J = 0; J < Components.GetCount(); J++)
-		if (!CullEntity(Components[J], DrawParameters))
-		{
-			Components[J]->Draw(DrawParameters);
-			DebugDrawEntity(Components[J], DrawParameters);
-		}
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+		CullEntity(Components[I], DrawParameters);
 
 	const ZEArray<ZEEntity*>& ChildEntities = Entity->GetChildEntities();
-	for (ZESize K = 0; K < ChildEntities.GetCount(); K++)
-		if (!CullEntity(ChildEntities[K], DrawParameters))
-		{
-			ChildEntities[K]->Draw(DrawParameters);
-			DebugDrawEntity(ChildEntities[K], DrawParameters);
-		}
+	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		CullEntity(ChildEntities[I], DrawParameters);
 
 	return false;
 }
