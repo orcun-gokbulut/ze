@@ -150,6 +150,9 @@
 #define ZE_SHADER_ALPHA_CULL
 #endif
 
+#ifdef ZE_SHADER_COMPONENT_23
+#define ZE_SHADER_VERTEX_COLOR
+#endif
 
 // Derivated Custom Shader Components
 #if defined(ZE_SHADER_NORMAL_MAP) || defined(ZE_SHADER_PARALLAX_MAP) || defined(ZE_SHADER_DETAIL_NORMAL_MAP)

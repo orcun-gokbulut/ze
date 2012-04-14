@@ -147,6 +147,7 @@ float ZETerrain::GetHeight(float X, float Z)
 
 ZETerrain::ZETerrain()
 {
+	Wireframe = false;
 	Locked = false;
 	UnitLength = 1.0f;
 	ChunkSize = 16;

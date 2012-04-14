@@ -117,6 +117,7 @@ struct ZEFixedMaterial_VSInput
 		int4 BoneIndices        : BLENDINDICES0;
 		float4 BoneWeights      : BLENDWEIGHT0;
 	//#endif
+	float4 Color : TEXCOORD1;
 };
 
 #define ZE_SHADER_VERTEX_INPUT_TYPE ZEFixedMaterial_VSInput
@@ -158,6 +159,7 @@ ZEFixedMaterial_GBuffer_VSOutput ZEFixedMaterial_GBuffer_VertexShader(ZEFixedMat
 	#endif
 	
 	Output.Texcoord = Input.Texcoord;
+
 	return Output;
 }
 
@@ -191,7 +193,7 @@ ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput In
 		#else 
 			float Alpha = MaterialOpacity;
 		#endif
-			
+		
 		if (Alpha <= MaterialAlphaCullLimit)
 		{
 			discard;
@@ -247,6 +249,7 @@ struct ZEFixedMaterial_ForwardPass_VSOutput
 	#ifdef ZESHADER_REFRACTION
 		float3 RefractionVector     : TEXCOORD4;
 	#endif	
+	float4 Color : TEXCOORD5;
 };
 
 ZEFixedMaterial_ForwardPass_VSOutput ZEFixedMaterial_ForwardPass_VertexShader(ZEFixedMaterial_VSInput Input)
@@ -272,6 +275,8 @@ ZEFixedMaterial_ForwardPass_VSOutput ZEFixedMaterial_ForwardPass_VertexShader(ZE
 		Output.LightMapTexcoord = Input.LightMapTexcoord;
 	#endif
 	
+	Output.Color = Input.Color;
+		
 	return Output;
 }
 
@@ -300,6 +305,7 @@ struct ZEFixedMaterial_ForwardPass_PSInput
 	#ifdef ZESHADER_REFRACTION
 		float3 RefractionVector     : TEXCOORD4;
 	#endif	
+	float4 Color : TEXCOORD5;
 };
 
 ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEFixedMaterial_ForwardPass_PSInput Input)
@@ -307,13 +313,13 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	ZEFixedMaterial_ForwardPass_PSOutput Output;
 	Output.Color = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	
-	/*#ifdef ZE_SHADER_OPACITY
+	#ifdef ZE_SHADER_OPACITY
 		#ifdef ZE_SHADER_OPACITY_MAP
 				Output.Color.a = MaterialOpacity * tex2D(OpacityMap, Input.Texcoord).r;
 		#elif defined(ZE_SHADER_OPACITY_BASE_ALPHA)
 				Output.Color.a = MaterialOpacity * tex2D(BaseMap, Input.Texcoord).a;
 		#else 
-			Output.Color.a = MaterialOpacity;
+			Ouput.Color.a *= MaterialOpacity;
 		#endif
 	#endif
 	
@@ -323,12 +329,15 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 			discard;
 			return Output;
 		}		
-	#endif*/
+	#endif
 	
 	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
 
 	#ifdef ZE_SHADER_AMBIENT
 		float3 AmbientColor = MaterialAmbientColor;
+		#ifdef ZE_SHADER_VERTEX_COLOR
+			Ouput.Color.rgb *= MaterialOpacity;
+		#endif
 		#ifdef ZE_SHADER_BASE_MAP
 			AmbientColor *= tex2D(BaseMap, Input.Texcoord).rgb;
 		#endif
@@ -382,6 +391,10 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		Output.Color.rgb += EmmisiveColor;
 	#endif
 
+	#ifdef ZE_SHADER_VERTEX_COLOR
+		Output.Color *= Input.Color;
+	#endif
+	
 	#ifdef ZE_SHADER_REFLECTION
 		Output.Color.rgb += MaterialReflectionFactor * texCUBE(EnvironmentMap, normalize(Input.ReflectionVector)).rgb;
 	#endif
@@ -389,6 +402,6 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	#ifdef ZE_SHADER_REFRACTION
 		Output.Color.rgb += MaterialRefractionFactor * texCUBE(EnvironmentMap, normalize(Input.RefractionVector)).rgb;
 	#endif
-		
+	
 	return Output;
 }

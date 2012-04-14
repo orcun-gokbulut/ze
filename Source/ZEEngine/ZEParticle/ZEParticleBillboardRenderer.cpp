@@ -54,21 +54,27 @@ void ZEParticleBillboardRenderer::DrawParticle(ZESimpleVertex* Buffer, const ZEP
 
 	Buffer[0].Position = Particle->Position + NV + PU;
 	Buffer[0].Texcoord = ZEVector2(0.0f, 0.0f);
+	Buffer[0].Color = Particle->Color;
 
 	Buffer[1].Position = Particle->Position + PV + PU;
 	Buffer[1].Texcoord = ZEVector2(1.0f, 0.0f);
+	Buffer[1].Color = Particle->Color;
 
 	Buffer[2].Position = Particle->Position + PV + NU;
 	Buffer[2].Texcoord = ZEVector2(1.0f, 1.0f);
+	Buffer[2].Color = Particle->Color;
 
 	Buffer[3].Position = Buffer[2].Position;
 	Buffer[3].Texcoord = Buffer[2].Texcoord;
+	Buffer[3].Color = Particle->Color;
 
 	Buffer[4].Position = Particle->Position + NV + NU;
 	Buffer[4].Texcoord = ZEVector2(0.0f, 1.0f);
+	Buffer[4].Color = Particle->Color;
 
 	Buffer[5].Position = Buffer[0].Position;
 	Buffer[5].Texcoord = Buffer[0].Texcoord;
+	Buffer[5].Color = Particle->Color;
 }
 
 void ZEParticleBillboardRenderer::UpdateVertexBuffer(ZEDrawParameters* DrawParameters)
