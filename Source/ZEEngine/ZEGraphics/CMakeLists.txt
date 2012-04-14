@@ -117,6 +117,9 @@ ze_add_source(ZETextureFileBMPTest.cpp				Tests)
 ze_add_source(ZETextureFileTGA.cpp					Sources)
 ze_add_source(ZETextureFileTGA.h					Sources)
 
+ze_add_source(ZETextureFileJPEG.cpp					Sources)
+ze_add_source(ZETextureFileJPEG.h					Sources Headers)
+
 ze_add_source(ZEUIMaterial.cpp 						Sources)
 ze_add_source(ZEUIMaterial.h 						Sources Headers)
 ze_add_source(ZEVertexBuffer.cpp 					Sources)

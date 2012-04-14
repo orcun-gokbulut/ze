@@ -107,7 +107,7 @@ class ZESkyDome : public ZEEntity
 		void					SetSunIntensity(float Value);
 		float					GetSunIntensity() const;
 
-		void					SetSunLightDirection(ZEVector3& Value);
+		void					SetSunLightDirection(const ZEVector3& Value);
 		ZEVector3				GetSunLightDirection() const;
 
 		void					SetSunLightWaveLenght(ZEVector3& Value);

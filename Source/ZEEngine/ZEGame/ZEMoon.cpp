@@ -92,7 +92,7 @@ const ZEVector3& ZEMoon::GetMoonAmbientColor() const
 	return MoonAmbientColor;
 }
 
-void ZEMoon::SetMoonDirection(ZEVector3& Direction)
+void ZEMoon::SetMoonDirection(const ZEVector3& Direction)
 {
 	MoonDirection = Direction;
 }
