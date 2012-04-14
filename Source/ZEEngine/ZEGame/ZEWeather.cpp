@@ -269,9 +269,9 @@ ZEWeather::ZEWeather()
 	Cloud				= NULL;
 	Moon				= NULL;
 
-	FogFactor			= 0.0f;
-	MoonPhase			= 0.0f;
-	CloudCover			= 0.0f;
+	FogFactor			= 0.1f;
+	MoonPhase			= 0.3f;
+	CloudCover			= 0.3f;
 	MoonLightIntensity	= 0.3f;
 	SunLightIntensity	= 1.2f;
 
@@ -340,7 +340,7 @@ ZEWeather::ZEWeather()
 	SkyDome->SetCameraPositionOffset(ZEVector3(0.0f, 60000.0f, 0.0f));
 	SkyDome->SetSunLightDirection(SunDirection);
 	SkyDome->SetAmbientFactor(0.5f);
-	SkyDome->SetMiddayAmbientColor(ZEVector3(0.07451f, 0.10197f, 0.12549f));
+	SkyDome->SetMiddayAmbientColor(ZEVector3(0.01851f, 0.12597f, 0.15949f));
 	SkyDome->SetSunsetAmbientColor(ZEVector3(0.89020f, 0.60392f, 0.21177f));
 	this->AddComponent(SkyDome);
 
