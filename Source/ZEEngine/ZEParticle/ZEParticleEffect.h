@@ -61,7 +61,6 @@ class ZEParticleEffect : public ZEEntity
 		virtual								~ZEParticleEffect();
 	public:
 		virtual	ZEDrawFlags					GetDrawFlags() const;
-		virtual const ZEAABBox&				GetWorldBoundingBox();
 
 		bool								Initialize();
 		void								Deinitialize();
