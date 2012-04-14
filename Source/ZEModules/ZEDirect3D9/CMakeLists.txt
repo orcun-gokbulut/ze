@@ -36,8 +36,13 @@
 cmake_minimum_required (VERSION 2.8)
 
 append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG
-	ZE_DEBUG_D3D9_DEBUG_SHADERS
-	ZE_DEBUG_D3D9_ENABLE_PERFHUD)
+	ZE_DEBUG_D3D9_DEBUG_SHADERS	ZE_DEBUG_D3D9_ENABLE_PERFHUD)
+
+set(ZEBUILD_D3D9_ENABLE_PERFHUD	                FALSE CACHE BOOL "Enable PerfHud device in release mode.")
+if(ZEBUILD_D3D9_ENABLE_PERFHUD)
+	append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_RELEASE ZE_DEBUG_D3D9_ENABLE_PERFHUD)
+endif()
+
 
 add_subdirectory (ZED3D9PostProcessor)
 
@@ -111,7 +116,6 @@ ze_add_source(ZED3D9VertexDeclaration.cpp		Sources)
 ze_add_source(ZED3D9VertexDeclaration.h			Sources)
 ze_add_source(ZED3D9ViewPort.cpp				Sources)
 ze_add_source(ZED3D9ViewPort.h					Sources)
-
 
 ze_add_library(ZEDirect3D9 
 	SOURCES ${Sources}

@@ -48,6 +48,7 @@ class ZESimpleVertex
 		ZEVector3						Position;
 		ZEVector3						Normal;
 		ZEVector2						Texcoord;
+		ZEVector4						Color;
 
 		static ZEVertexDeclaration*		GetVertexDeclaration();
 };

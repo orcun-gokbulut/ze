@@ -49,10 +49,11 @@ ZEVertexDeclaration* ZESimpleVertex::GetVertexDeclaration()
 										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
 										{ZE_VES_NORMAL, ZE_VET_FLOAT3, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
+										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT4, 1}
 									};
 
 
-	if (!VertexDeclaration->Create(ElementArray, 3))
+	if (!VertexDeclaration->Create(ElementArray, 4))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
@@ -72,12 +73,12 @@ ZEVertexDeclaration* ZEMapVertex::GetVertexDeclaration()
 	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
 
 	ZEVertexElement ElementArray[] = {
-										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
-										{ZE_VES_NORMAL, ZE_VET_FLOAT3, 0},
-										{ZE_VES_TANGENT, ZE_VET_FLOAT3, 0},
-										{ZE_VES_BINORMAL, ZE_VET_FLOAT3, 0},
-										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
-									};
+		{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
+		{ZE_VES_NORMAL, ZE_VET_FLOAT3, 0},
+		{ZE_VES_TANGENT, ZE_VET_FLOAT3, 0},
+		{ZE_VES_BINORMAL, ZE_VET_FLOAT3, 0},
+		{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
+	};
 	
 	if (!VertexDeclaration->Create(ElementArray, 5))
 	{

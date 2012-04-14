@@ -197,7 +197,7 @@ void ZESceneCuller::CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 ZESceneCuller::ZESceneCuller()
 {
 	memset(&Statistics, 0, sizeof(ZECullStatistics));
-	DebugDrawElements = ZE_VDE_ALL;//ZE_VDE_NONE;
+	DebugDrawElements = ZE_VDE_NONE;
 }
 
 ZESceneCuller::~ZESceneCuller()
