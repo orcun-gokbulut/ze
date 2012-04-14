@@ -449,6 +449,7 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt Po
 	RenderCommand.VertexBuffer		= VertexBuffer;
 	RenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE;
 	RenderCommand.Priority			= 3;
+	RenderCommand.Flags |= 1024;
 
 	ZEMatrix4x4 ScaleMatrix;
 	ZEMatrix4x4::CreateOrientation(ScaleMatrix, ZEVector3((float)PositionX, 0.0f, (float)PositionY), ZEQuaternion::Identity, ZEVector3((float)(1 << Level), 1.0f, (float)(1 << Level)));
