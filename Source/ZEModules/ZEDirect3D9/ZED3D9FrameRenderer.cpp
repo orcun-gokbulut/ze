@@ -1016,9 +1016,15 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		MLAAProcessor.SetInputDepth(GBuffer1);
 		MLAAProcessor.SetInputNormal(GBuffer2);
 		MLAAProcessor.SetInputColor((ZED3D9Texture2D*)ABuffer);
-		MLAAProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
+		MLAAProcessor.SetOutput((ZED3D9ViewPort*)FogInputBuffer->GetViewPort());
 		MLAAProcessor.Process();
 		
+		// Fog Process
+		FogProcessor.SetInputColor(FogInputBuffer);
+		FogProcessor.SetInputDepth(GBuffer1);
+		FogProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
+		FogProcessor.Process();
+
 		// HDR Process
 		HDRProcessor.SetInput(HDRInputBuffer);
 		HDRProcessor.SetOutput(ViewPort); // HDRProcessor.SetOutput((ZED3D9ViewPort*)DOFInputBuffer->GetViewPort());
@@ -1041,13 +1047,6 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		SSAAProcessor.Process();
 		*/
 		
-		/*
-		// Fog Process
-		FogProcessor.SetInputColor(FogInputBuffer);
-		FogProcessor.SetInputDepth(GBuffer1);
-		FogProcessor.SetOutput((ZED3D9ViewPort*)ABuffer->GetViewPort());
-		FogProcessor.Process();
-		*/
 
 		/*
 		// Edge Detection Process
