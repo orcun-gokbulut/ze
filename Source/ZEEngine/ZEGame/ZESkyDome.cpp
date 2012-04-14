@@ -121,7 +121,7 @@ float ZESkyDome::GetSunIntensity() const
 	return SkyDomeMaterial->SunLightIntensity;
 }
 
-void ZESkyDome::SetSunLightDirection(ZEVector3& Value)
+void ZESkyDome::SetSunLightDirection(const ZEVector3& Value)
 {
 	ZEVector3::Normalize(SunLightDirection, Value);
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMoon.h
+ Zinek Engine - ZEWeather.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,60 +34,96 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MOON_H__
-#define __ZE_MOON_H__
+#ifndef __ZE_WEATHER_H__
+#define __ZE_WEATHER_H__
 
-
-#include "ZETypes.h"
 #include "ZEEntity.h"
-#include "ZEGraphics\ZERenderCommand.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEDrawParameters.h"
 
 
-class ZEMaterial;
-class ZEMoonMaterial;
-class ZETexture3DResource;
+class ZEDirectionalLight;
+class ZEDirectionalLight;	
+class ZESkyBrush;	
+class ZESkyDome;			
+class ZECloud;		
+class ZEMoon;				
 
-
-class ZEMoon : public ZEEntity
+class ZEWeather : public ZEEntity
 {
 	protected:
-		ZEMoonMaterial*				MoonMaterial;
-		ZETexture3DResource*		MoonTexture;
-		ZERenderCommand				MoonRenderCommand;
 
+		ZEMoon*						Moon;
+		ZECloud*					Cloud;
+		ZESkyDome*					SkyDome;
+		ZESkyBrush*					StarMap;
+		ZEDirectionalLight*			SunLight;
+		ZEDirectionalLight*			MoonLight;
+
+		float						SunHeight;
+		float						MoonHeight;
+
+		float						FogFactor;
 		float						MoonPhase;
-		float						MoonScale;
-		float						MoonRotation;
-		float						MoonAmbientFactor;
-		ZEVector3					MoonAmbientColor;
-		ZEVector3					MoonDirection;
+		float						CloudCover;
+		float						SunLightIntensity;
+		float						MoonLightIntensity;
 
-									ZEMoon();
-		virtual						~ZEMoon();
+		ZEVector3					SunDirection;
+		ZEVector3					MoonDirection;
+		ZEVector3					SunMoonRotation;
+
+		ZEVector3					SunLightColor;
+		ZEVector3					MoonLightColor;
+
+									ZEWeather();
+		virtual						~ZEWeather();
+
+		virtual void				AdjustHDR(float DayTime);
 
 	private:
 
 	public:
-		virtual void				SetMoonPhase(float Phase);
+		ZEMoon*						GetMoon() const;
+		ZECloud*					GetCloud() const;
+		ZESkyDome*					GetSkyDome() const;
+		ZESkyBrush*					GetStarMap() const;
+		ZEDirectionalLight*			GetSunLight() const;
+		ZEDirectionalLight*			GetMoonLight() const;
+
+		float						GetSunHeight() const;
+		float						GetMoonHeight() const;
+
+		void						SetFogFactor(const float Value);
+		float						GetFogFactor() const;
+
+		void						SetMoonPhase(const float Value);
 		float						GetMoonPhase() const;
 
-		virtual void				SetMoonScale(float Scale);
-		float						GetMoonScale() const;
+		void						SetCloudCover(const float Value);
+		float						GetCloudCover() const;
+
+		void						SetMoonLightIntensity(const float Value);
+		float						GetMoonLightIntensity() const;
+
+		void						SetSunLightIntensity(const float Value);
+		float						GetSunLightIntensity() const;
+
+		void						SetSunDirection(const ZEVector3& Value);
+		const ZEVector3&			GetSunDirection() const;
 		
-		virtual void				SetMoonRotation(float Rotation);
-		float						GetMoonRotation() const;
+		void						SetMoonDirection(const ZEVector3& Value);
+		const ZEVector3&			GetMoonDirection() const;
 
-		virtual void				SetMoonAmbientFactor(float Value);
-		float						GetMoonAmbientFactor() const;
-		
-		virtual void				SetMoonAmbientColor(ZEVector3& Color);
-		const ZEVector3&			GetMoonAmbientColor() const;
+		void						SetSunMoonRotation(const ZEVector3& Value);
+		const ZEVector3&			GetSunMoonRotation() const;
 
-		virtual void				SetMoonDirection(const ZEVector3& Direction);
-		const ZEVector3&			GetGetMoonDirection() const;
+		void						SetSunLightColor(const ZEVector3& Value);
+		const ZEVector3&			GetSunLightColor() const;
 
-		virtual void				SetMoonTexture(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
-		const ZEString				GetMoonTexture() const;
+		void						SetMoonLightColor(const ZEVector3& Value);
+		const ZEVector3&			GetMoonLightColor() const;
+
 
 		virtual ZEDrawFlags			GetDrawFlags() const;
 
@@ -97,7 +133,9 @@ class ZEMoon : public ZEEntity
 		virtual void				Draw(ZEDrawParameters* DrawParameters);
 		virtual void				Tick(float Time);
 
-		static ZEMoon*				CreateInstance();
+		static ZEWeather*			CreateInstance();
 };
 
-#endif // __ZE_MOON_H__
+
+
+#endif // __ZE_WEATHER_H__

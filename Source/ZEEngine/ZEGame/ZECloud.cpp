@@ -223,8 +223,8 @@ bool ZECloud::Initialize()
 	
 		// Send initial Parameters to material
 		CloudMaterial->Camera					= Camera;
-		CloudMaterial->EarthRadius				= EarthRadius;
-		CloudMaterial->AtmosphereHeight			= AtmosphereHeight;
+		//CloudMaterial->EarthRadius			= EarthRadius;
+		//CloudMaterial->AtmosphereHeight		= AtmosphereHeight;
 		CloudMaterial->CloudCover				= CloudCover;
 		CloudMaterial->WindVelocity				= WindVelocity;
 		CloudMaterial->CloudPlaneHeight			= CloudPlaneHeight;
@@ -281,11 +281,11 @@ void ZECloud::Draw(ZEDrawParameters* DrawParameters)
 	
 	// Update materials parameters before drawing
 	CloudMaterial->Camera					= Camera;
-	CloudMaterial->EarthRadius				= EarthRadius;
-	CloudMaterial->AtmosphereHeight			= AtmosphereHeight;
+	//CloudMaterial->EarthRadius			= EarthRadius;
+	//CloudMaterial->AtmosphereHeight		= AtmosphereHeight;
 	CloudMaterial->CloudCover				= CloudCover;
 	CloudMaterial->WindVelocity				= WindVelocity;
-	CloudMaterial->CloudPlaneHeight			= CloudPlaneHeight;
+	//CloudMaterial->CloudPlaneHeight		= CloudPlaneHeight;
 	CloudMaterial->SunLightColor			= SunLightColor;
 	CloudMaterial->SunLightDirection		= SunLightDirection;
 

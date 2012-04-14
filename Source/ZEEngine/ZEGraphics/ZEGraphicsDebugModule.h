@@ -41,6 +41,8 @@
 #include "ZEInput/ZEInputMap.h"
 
 
+
+
 class ZEPlayer;
 class ZEPointLight;
 class ZEOmniProjectiveLight;
@@ -54,7 +56,9 @@ class ZESkyDome;
 class ZEUITextControl;
 class ZECloud;
 class ZEMoon;
+class ZETerrain;
 class ZEPlayerFreeSteering;
+class ZEWeather;
 
 class ZEGraphicsDebugModule : public ZEApplicationModule
 {
@@ -64,24 +68,21 @@ class ZEGraphicsDebugModule : public ZEApplicationModule
 		ZEModel*					Model;
 		ZEPlayer*					Player;
 		ZEPlayerFreeSteering*		Steering;
-		ZEPointLight*				PointLight1;
-		ZEPointLight*				PointLight2;
-		ZEPointLight*				PointLight3;
-		ZEPointLight*				PointLight4;
-		ZEPointLight*				PointLight5;
-		ZEPointLight*				PointLight6;
-		ZEProjectiveLight*			ProjectiveLight0;
-		ZEOmniProjectiveLight*		OmniProjectiveLight0;
-		
-		// Weather system
+	
+		ZEWeather*					Weather;
 		ZEPortalMap*				PortalMap;
+		
+		/*
+		ZETerrain*					Terrain;
 		ZEDirectionalLight*			SunLight;
 		ZEDirectionalLight*			MoonLight;
 		ZESkyBrush*					StarMap;
 		ZESkyDome*					SkyDome;
 		ZECloud*					Cloud;
 		ZEMoon*						Moon;
+		*/
 
+		float						FogFactor;
 		float						MoonPhase;
 		float						CloudCover;
 		float						MoonLightIntensity;
@@ -91,15 +92,10 @@ class ZEGraphicsDebugModule : public ZEApplicationModule
 		ZEVector3					SunDirection;
 		ZEVector3					SunMoonRotation;		
 		
+		float						FogFactorChangeMultiplier;
 		float						MoonPhaseChangeMultiplier;
 		float						CloudCoverChangeMultiplier;
 		ZEVector3					SunMoonRotationMultiplier;
-
-		// System debug info
-		ZEUITextControl*			CoordinatesText;
-		ZEUITextControl*			SunDirectionText;
-		ZEUITextControl*			CloudCoverText;
-		ZEUITextControl*			WindSpeedText;
 
 	public:
 		virtual bool				Initialize();
@@ -108,7 +104,6 @@ class ZEGraphicsDebugModule : public ZEApplicationModule
 
 		virtual void				ProcessInputs(float ElapsedTime);
 
-		virtual	void				DisplayStatus();
 		virtual void				UpdateCloudColor();
 		virtual void				IncreaseMoonPhase(float ElapsedTime);
 		virtual void				DecreaseMoonPhase(float ElapsedTime);
@@ -116,6 +111,8 @@ class ZEGraphicsDebugModule : public ZEApplicationModule
 		virtual void				DecreaseCloudCover(float ElapsedTime);
 		virtual void				IncreaseDayTime(float ElapsedTime);
 		virtual void				DecreaseDayTime(float ElapsedTime);
+		virtual void				IncreaseFogFactor(float ElapsedTime);
+		virtual void				DecreaseFogFactor(float ElapsedTime);
 		
 									ZEGraphicsDebugModule();
 		virtual						~ZEGraphicsDebugModule();

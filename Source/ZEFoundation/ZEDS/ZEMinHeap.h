@@ -56,11 +56,11 @@ class ZEMinHeap : public ZEHeapBase<Type, Allocator_>
 		{
 			ZESize Smallest = Index;
 
-			ZESSize LeftIndex = GetFirstChildIndex(Index);
+			ZESize LeftIndex = GetFirstChildIndex(Index);
 			if (LeftIndex < Heap.GetCount() && Heap[LeftIndex] < Heap[Index])
 				Smallest = LeftIndex;
 
-			ZESSize RightIndex = GetSecondChildIndex(Index);
+			ZESize RightIndex = GetSecondChildIndex(Index);
 			if (RightIndex < Heap.GetCount() && Heap[RightIndex] < Heap[Smallest])
 				Smallest = RightIndex;
 

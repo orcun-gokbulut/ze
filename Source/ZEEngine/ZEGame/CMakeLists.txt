@@ -77,6 +77,8 @@ ze_add_source(ZESkyDome.cpp				Sources)
 ze_add_source(ZESkyDome.h				Sources Header)
 ze_add_source(ZETrigger.cpp				Sources)
 ze_add_source(ZETrigger.h				Sources Header ZEPP)
+ze_add_source(ZEWeather.cpp				Sources)
+ze_add_source(ZEWeather.h				Sources Header)
 
 ze_add_library(ZEGame 
 	SOURCES ${Sources}
