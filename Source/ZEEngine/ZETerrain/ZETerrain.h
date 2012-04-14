@@ -131,6 +131,8 @@ class ZETerrain : public ZEEntity
 		void									SetHeightScale(float Scale);
 		float									GetHeightScale();
 
+		float									GetHeight(float X, float Z);
+
 		virtual bool							Initialize();
 		virtual void							Deinitialize();
 	

@@ -112,6 +112,39 @@ float ZETerrain::GetHeightScale()
 	return HeightScale;
 }
 
+float ZETerrain::GetHeight(float X, float Z)
+{
+	Z = -Z;
+	float Height1, Height2, Height3, Height4;
+	ZESize DataHeight = DataLevels[0].ElevationHeight;
+	ZESize DataWidth = DataLevels[0].ElevationWidth;
+
+	if(X > (ZESize)DataWidth || X < 0.0f)
+		return 0.0f;
+
+	if(Z > (ZESize)DataHeight || Z < 0.0f)
+		return 0.0f;
+
+	float FractX, FractZ;
+
+	FractX = X - (ZESize)X;
+	FractZ = Z - (ZESize)Z;
+
+	Height1 = DataLevels[0].ElevationData[(ZESize)(((ZEInt)Z * DataWidth) + (ZEInt)X)];
+	Height2 = DataLevels[0].ElevationData[(ZESize)(((ZEInt)Z * DataWidth) + (ZEInt)X) + 1];
+
+	Height1 = ZEMath::Lerp(Height1, Height2, FractX);
+
+	Height3 = DataLevels[0].ElevationData[(ZESize)((((ZEInt)Z + 1) * DataWidth) + (ZEInt)X)];
+	Height4 = DataLevels[0].ElevationData[(ZESize)((((ZEInt)Z + 1) * DataWidth) + (ZEInt)X) + 1];
+
+	Height3 = ZEMath::Lerp(Height3, Height4, FractX);
+
+	Height1 = ZEMath::Lerp(Height1, Height3, FractZ);
+
+	return (Height1 * HeightScale) + HeightOffset;
+}
+
 ZETerrain::ZETerrain()
 {
 	Locked = false;
