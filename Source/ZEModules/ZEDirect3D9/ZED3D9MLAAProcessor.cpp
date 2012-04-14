@@ -252,7 +252,6 @@ void ZED3D9MLAAProcessor::Process()
 	ZED3D9CommonTools::SetRenderTarget(1, (ZETexture2D*)BlendWeightBuffer);
 	ZED3D9CommonTools::SetRenderTarget(2, (ZEViewPort*)OutputBuffer);
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x000000FF, 1.0f, 0x00);
-	GetDevice()->SetRenderTarget(0, NULL);
 	GetDevice()->SetRenderTarget(1, NULL);
 	GetDevice()->SetRenderTarget(2, NULL);
 	
