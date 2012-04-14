@@ -320,11 +320,11 @@ ZED3D9FogProcessor::ZED3D9FogProcessor()
 	PixelShaderExpSquareFog	= NULL;
 
 	FogHeight				= 15.0f;
-	FogDistanceFar			= 1000.0f;
-	FogDistanceNear			= 100.0f;
-	FogVisibility			= 0.9f;
+	FogDistanceFar			= 400.0f;
+	FogDistanceNear			= 20.0f;
+	FogVisibility			= 0.0f;
 
-	FogModel				= ZE_D3D9_FM_LINEAR;
+	FogModel				= ZE_D3D9_FM_EXPONENTIAL_SQUARE;
 
 	OutScatterFactor		= ZEVector3(0.003f, 0.003f, 0.003f);
 	InScatterFactor			= ZEVector3(0.003f, 0.003f, 0.003f);
