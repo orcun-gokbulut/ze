@@ -117,7 +117,7 @@ ZEFixedMaterial::~ZEFixedMaterial()
 
 ZEMaterialFlags ZEFixedMaterial::GetMaterialFlags() const
 {
-	return ZE_MTF_G_BUFFER_PASS | ZE_MTF_PRE_Z_PASS | ZE_MTF_SUPPORTS_SKINNING;
+	return (TransparancyMode == ZE_MTM_NONE ? ZE_MTF_G_BUFFER_PASS : 0) | ZE_MTF_PRE_Z_PASS | ZE_MTF_SUPPORTS_SKINNING;
 }
 
 void ZEFixedMaterial::SetTwoSided(bool Enable)
