@@ -35,7 +35,7 @@
 
 #define WINDOWS_LEAN_AND_MEAN
 #include "ui_ZEDSceneEditor.h"
-#include "ZEModule/ZEDirect3D9/ZED3D9FrameRenderer.h"
+#include "ZEModules/ZEDirect3D9/ZED3D9FrameRenderer.h"
 #include <QtGui/QFileDialog.h>
 #include <QtGui/QWidget>
 #include <QtGui/QAction>
