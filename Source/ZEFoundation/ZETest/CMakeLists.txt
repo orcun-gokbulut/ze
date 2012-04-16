@@ -35,8 +35,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-project(Test)
-ze_set_project_folder("ZETest")
+project(ZETest)
 
 ze_add_source(ZETestMain.cpp		Source)
 ze_add_source(ZETest.cpp			Source)

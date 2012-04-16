@@ -148,7 +148,7 @@ void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Di
 
 	ZEQuaternion::Normalize(Output, Output);
 
-	zeAssert(!Output.IsValid(), "Output quaternion is not valid.");
+	//zeAssert(!Output.IsValid(), "Output quaternion is not valid.");
 }
 
 void ZEQuaternion::CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix4x4& Matrix)
@@ -191,8 +191,8 @@ void ZEQuaternion::Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZE
 
 void ZEQuaternion::VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaternion, const ZEVector3& Vector)
 {
-	zeAssert(!Quaternion.IsValid(), "Quaternion is not valid.");
-	zeAssert(!Quaternion.IsNormalized(), "Quaternion is not normalized.");
+	//zeAssert(!Quaternion.IsValid(), "Quaternion is not valid.");
+	//zeAssert(!Quaternion.IsNormalized(), "Quaternion is not normalized.");
 
 	ZEQuaternion Vect(0, Vector.x, Vector.y, Vector.z), Temp, InvQ;
 	
@@ -335,7 +335,7 @@ void ZEQuaternion::Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQu
 
 void ZEQuaternion::Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion)
 {
-	zeAssert(!Quaternion.IsValid(), "Operand quaternion is not valid.");
+//	zeAssert(!Quaternion.IsValid(), "Operand quaternion is not valid.");
 
 	float L = Length(Quaternion);
 	Output.x = Quaternion.x / L;
@@ -343,7 +343,7 @@ void ZEQuaternion::Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternio
 	Output.z = Quaternion.z / L;
 	Output.w = Quaternion.w / L;
 
-	zeAssert(!Output.IsValid(), "Output quaternion is not valid.");
+	//zeAssert(!Output.IsValid(), "Output quaternion is not valid.");
 }
 
 float ZEQuaternion::Length(const ZEQuaternion& Quaternion)

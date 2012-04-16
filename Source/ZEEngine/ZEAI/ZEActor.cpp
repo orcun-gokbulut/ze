@@ -44,20 +44,13 @@
 
 void ZEActor::SetRotation2D(float Rotation)
 {
-	this->Rotation2D = Rotation; //ZEAngle::Range(Rotation);
-	float x, y, z;
-	ZEQuaternion::ConvertToEulerAngles(x, y ,z, GetRotation());
-	ZEQuaternion NewRotation;
-	ZEQuaternion::CreateFromEuler(NewRotation, x, Rotation, z);
-	SetRotation(ZEQuaternion(NewRotation));
+	this->Rotation2D = ZEAngle::Range(Rotation);
+	SetRotation(ZEQuaternion(Rotation2D,ZEVector3::UnitY));
 }
 
 float ZEActor::GetRotation2D()
 {
-	float x, y, z;
-	ZEQuaternion::ConvertToEulerAngles(x, y ,z, GetRotation());
-
-	return y;
+	return Rotation2D;
 }
 
 void ZEActor::SetLinearVelocity(const ZEVector3& Velocity)
@@ -191,25 +184,34 @@ void ZEActor::Tick(float ElapsedTime)
 
 		for (ZESize I = 0; I < Steerings.GetCount(); I++)
 		{
-			if (Steerings[I]->GetEnabled() && Steerings[I]->GetPriority() == Priority && Steerings[I]->GetWeight() != 0.0f)
+			if (Steerings[I]->GetEnabled() && Steerings[I]->GetPriority() == Priority && Steerings[I]->GetEnabled() && Steerings[I]->GetWeight() != 0.0f)
 			{
 				ZESteeringOutput Output = Steerings[I]->Process(ElapsedTime);
 
-				PriorityLinearAcceleration += Steerings[I]->GetWeight() * Output.LinearAcceleration;
-				PriorityAngularAcceleration += Steerings[I]->GetWeight() * Output.AngularAcceleration;
+				LinearAcceleration += Steerings[I]->GetWeight() * Output.LinearAcceleration;
+				AngularAcceleration += Steerings[I]->GetWeight() * Output.AngularAcceleration;
 			}
 		}
-
-		if (!PriorityLinearSteeringDone && PriorityLinearAcceleration.LengthSquare() > MinLinearAcceleration * MinLinearAcceleration)
+		if (LinearAcceleration.LengthSquare() < MinLinearAcceleration * MinLinearAcceleration)
 		{
-			PriorityLinearSteeringDone = true;
-			LinearAcceleration = PriorityLinearAcceleration;
+			LinearAcceleration = ZEVector3::Zero;
 		}
 
-		if (!PriorityAngularSteeringDone && ZEMath::Abs(PriorityAngularAcceleration) > MinAngularAcceleration)
+		if (ZEMath::Abs(AngularAcceleration) < MinAngularAcceleration)
 		{
-			PriorityAngularAcceleration = true;
+			AngularAcceleration = 0.0f;
+		}
+
+		if (!PriorityLinearSteeringDone && PriorityLinearAcceleration.LengthSquare() > GetMaxLinearAcceleration() * GetMaxLinearAcceleration() * 0.1f)
+		{
+			LinearAcceleration = PriorityLinearAcceleration;
+			PriorityLinearSteeringDone = true;
+		}
+
+		if (!PriorityAngularSteeringDone && PriorityAngularAcceleration > GetMaxAngularAcceleration() * 0.1f)
+		{
 			AngularAcceleration = PriorityAngularAcceleration;
+			PriorityAngularSteeringDone = true;
 		}
 
 		if (PriorityLinearSteeringDone && PriorityAngularSteeringDone)
@@ -255,7 +257,7 @@ void ZEActor::Tick(float ElapsedTime)
 	Position += LinearVelocity * ElapsedTime;
 	Rotation += AngularVelocity * ElapsedTime;
 
-	//Rotation = ZEAngle::Range(Rotation);
+	Rotation = ZEAngle::Range(Rotation);
 
 	SetPosition(Position);
 	SetRotation2D(Rotation);

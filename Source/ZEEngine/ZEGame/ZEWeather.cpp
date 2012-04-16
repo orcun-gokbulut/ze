@@ -334,13 +334,15 @@ ZEWeather::ZEWeather()
 	SkyDome->SetName("TestSkyDome");
 	SkyDome->SetEnabled(true);
 	SkyDome->SetVisible(true);
-	SkyDome->SetSunIntensity(10.0f);
+	// SkyDome->SetSunIntensity(10.0f);
+	SkyDome->SetSunIntensity(15.0f);
 	SkyDome->SetOuterRadius(61500.0f);
 	SkyDome->SetInnerRadius(60000.0f);
 	SkyDome->SetCameraPositionOffset(ZEVector3(0.0f, 60000.0f, 0.0f));
 	SkyDome->SetSunLightDirection(SunDirection);
 	SkyDome->SetAmbientFactor(0.5f);
-	SkyDome->SetMiddayAmbientColor(ZEVector3(0.01851f, 0.12597f, 0.15949f));
+	// SkyDome->SetMiddayAmbientColor(ZEVector3(0.01951f, 0.12697f, 0.16049f));
+	SkyDome->SetMiddayAmbientColor(ZEVector3(0.04f, 0.4f, 0.55f));
 	SkyDome->SetSunsetAmbientColor(ZEVector3(0.89020f, 0.60392f, 0.21177f));
 	this->AddComponent(SkyDome);
 
