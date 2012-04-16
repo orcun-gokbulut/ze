@@ -158,6 +158,8 @@ ZETerrain::ZETerrain()
 	HeightOffset = 0.0f;
 	OldPositionX = 2147483647;
 	OldPositionY = 2147483647;
+	ColorTexture = NULL;
+	DetailNormalTexture = NULL;
 }
 
 ZETerrain::~ZETerrain()
