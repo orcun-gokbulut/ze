@@ -67,7 +67,7 @@ class ZESteering
 		ZEActor*					Owner;
 		ZEActor*					Target;
 
-		ZEInt							Priority;
+		ZEInt						Priority;
 		bool						Enabled;
 
 		float						Weight;
@@ -76,7 +76,7 @@ class ZESteering
 		ZEActor*					GetOwner();
 		virtual void				SetOwner(ZEActor*	Owner);
 
-		ZEUInt				GetPriority();
+		ZEUInt						GetPriority();
 		void						SetPriority(ZEUInt Priority);
 
 		float						GetWeight();

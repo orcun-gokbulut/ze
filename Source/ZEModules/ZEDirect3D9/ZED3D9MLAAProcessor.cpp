@@ -243,6 +243,7 @@ void ZED3D9MLAAProcessor::Process()
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
 	float FarZ = ((ZED3D9FrameRenderer*)zeScene->GetRenderer())->GetCamera()->GetFarZ();
 	ZEVector4 PixelSize(1.0f / InputDepthBuffer->GetWidth(), 1.0f / InputDepthBuffer->GetHeight(), 0.0f, 0.0f);
