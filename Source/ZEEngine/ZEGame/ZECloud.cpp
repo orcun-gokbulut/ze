@@ -228,6 +228,7 @@ bool ZECloud::Initialize()
 		CloudMaterial->CloudCover				= CloudCover;
 		CloudMaterial->WindVelocity				= WindVelocity;
 		CloudMaterial->CloudPlaneHeight			= CloudPlaneHeight;
+		CloudMaterial->AmbientColor				= AmbientColor;
 		CloudMaterial->SunLightColor			= SunLightColor;
 		CloudMaterial->SunLightDirection		= SunLightDirection;
 
@@ -278,7 +279,8 @@ void ZECloud::Draw(ZEDrawParameters* DrawParameters)
 	// CloudMaterial->LightScale			= LightScale;
 	// CloudMaterial->AmbientScale			= AmbientScale;
 	// CloudMaterial->AmbientColor			= AmbientColor;
-	
+	CloudMaterial->AmbientColor				= AmbientColor;
+
 	// Update materials parameters before drawing
 	CloudMaterial->Camera					= Camera;
 	//CloudMaterial->EarthRadius			= EarthRadius;
@@ -321,7 +323,7 @@ ZECloud::ZECloud()
 	AmbientScale			= 0.1f;
 	EarthRadius				= 21600000.0f;
 	AtmosphereHeight		= 30000.0f;
-	CloudCover				= 0.5f;
+	CloudCover				= 0.3f;
 	CloudPlaneHeight		= 600.0f;
 	WindVelocity			= ZEVector2(0.005f, 0.005f);
 	SunLightDirection		= ZEVector3(0.0f, -1.0f, 0.0f);
