@@ -82,7 +82,7 @@ ZEDirectionalLight* ZEWeather::GetMoonLight() const
 
 float ZEWeather::GetSunHeight() const
 {
-	return SunHeight;
+	return -SunHeight;
 }
 
 float ZEWeather::GetMoonHeight() const
@@ -192,6 +192,7 @@ void ZEWeather::SetSunLightColor(const ZEVector3& Value)
 {
 	SunLightColor = Value;
 	Cloud->SetSunLightColor(Value);
+	SunLight->SetColor(Value * 2.0f);
 }
 
 const ZEVector3& ZEWeather::GetSunLightColor() const
@@ -202,6 +203,8 @@ const ZEVector3& ZEWeather::GetSunLightColor() const
 void ZEWeather::SetMoonLightColor(const ZEVector3& Value)
 {
 	MoonLightColor = Value;
+	Cloud->SetSunLightColor(Value);
+	//MoonLight->SetColor(Value);
 }
 
 const ZEVector3& ZEWeather::GetMoonLightColor() const
@@ -217,23 +220,11 @@ ZEDrawFlags ZEWeather::GetDrawFlags() const
 void ZEWeather::Deinitialize()
 {
 	MoonLight->Deinitialize();
-	MoonLight = NULL;
-
 	SunLight->Deinitialize();
-	SunLight = NULL;
-
 	StarMap->Deinitialize();
-	StarMap = NULL;
-
 	SkyDome->Deinitialize();
-	SkyDome = NULL;
-
 	Cloud->Deinitialize();
-	Cloud = NULL;
-
 	Moon->Deinitialize();
-	Moon = NULL;
-
 }
 
 void ZEWeather::Draw(ZEDrawParameters* DrawParameters)
@@ -279,14 +270,14 @@ ZEWeather::ZEWeather()
 	SunMoonRotation		= ZEVector3(0.0f, 0.0f, 0.0f);
 	MoonDirection		= -SunDirection;
 
-	SunLightColor		= ZEVector3(0.650f, 0.570f, 0.475f);
+	SunLightColor		= ZEVector3(0.850f, 0.750f, 0.655f);
 	MoonLightColor		= ZEVector3(ZEVector3::One);
 
 	// Sun Light
 	SunLight = ZEDirectionalLight::CreateInstance();
 	SunLight->SetEnabled(true);
 	SunLight->SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3::UnitX));
-	SunLight->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
+	SunLight->SetColor(SunLightColor);
 	SunLight->SetIntensity(SunLightIntensity);
 	SunLight->SetCastsShadow(false);
 	SunLight->SetVisible(true);
@@ -334,15 +325,13 @@ ZEWeather::ZEWeather()
 	SkyDome->SetName("TestSkyDome");
 	SkyDome->SetEnabled(true);
 	SkyDome->SetVisible(true);
-	// SkyDome->SetSunIntensity(10.0f);
 	SkyDome->SetSunIntensity(15.0f);
 	SkyDome->SetOuterRadius(61500.0f);
 	SkyDome->SetInnerRadius(60000.0f);
 	SkyDome->SetCameraPositionOffset(ZEVector3(0.0f, 60000.0f, 0.0f));
 	SkyDome->SetSunLightDirection(SunDirection);
 	SkyDome->SetAmbientFactor(0.5f);
-	// SkyDome->SetMiddayAmbientColor(ZEVector3(0.01951f, 0.12697f, 0.16049f));
-	SkyDome->SetMiddayAmbientColor(ZEVector3(0.04f, 0.4f, 0.55f));
+	SkyDome->SetMiddayAmbientColor(ZEVector3(0.04f, 0.04f, 0.055f));
 	SkyDome->SetSunsetAmbientColor(ZEVector3(0.89020f, 0.60392f, 0.21177f));
 	this->AddComponent(SkyDome);
 

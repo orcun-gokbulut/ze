@@ -215,7 +215,7 @@ ZEMoon::ZEMoon()
 	MoonMaterial			= NULL;
 	MoonTexture				= NULL;
 	
-	MoonPhase				= 0.0f;
+	MoonPhase				= 0.3f;
 	MoonScale				= 1.0f;
 	MoonRotation			= 0.0f;
 	MoonAmbientFactor		= 1.0f;
