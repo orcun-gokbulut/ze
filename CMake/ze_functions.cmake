@@ -195,7 +195,7 @@ function(ze_add_extension)
 endfunction()
 
 function (ze_add_library)
-	parse_arguments(PARAMETER "SOURCES;LIBS;HEADERS;INSTALL_DESTINATION;INSTALL_COMPONENT;PLATFORMS" "INSTALL;SHARED" ${ARGV})
+	parse_arguments(PARAMETER "SOURCES;LIBS;HEADERS;INSTALL_DESTINATION;INSTALL_COMPONENT;PLATFORMS" "INSTALL;DLL" ${ARGV})
 
 	ze_platform_check()
 	if (NOT PLATFORM_FOUND)
@@ -206,7 +206,11 @@ function (ze_add_library)
 	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
 	
 	# Compile
-	add_library(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
+	if (PARAMETER_DLL)
+		add_library(${PARAMETER_TARGET} SHARED ${PARAMETER_SOURCES})
+	else()
+		add_library(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
+	endif()
 
 	target_link_libraries(${PARAMETER_TARGET} ${PARAMETER_LIBS})
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
@@ -345,7 +349,7 @@ function(ze_combine_libraries)
 endfunction()
 
 function(ze_add_cmake_project)
-	parse_arguments(PARAMETER "SOURCESS" "" ${ARGV})
+	parse_arguments(PARAMETER "SOURCES" "" ${ARGV})
 	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_NAME)
 
 	ze_platform_check()
