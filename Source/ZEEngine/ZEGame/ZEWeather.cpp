@@ -192,7 +192,7 @@ void ZEWeather::SetSunLightColor(const ZEVector3& Value)
 {
 	SunLightColor = Value;
 	Cloud->SetSunLightColor(Value);
-	SunLight->SetColor(Value * 2.0f);
+	SunLight->SetColor(Value);
 }
 
 const ZEVector3& ZEWeather::GetSunLightColor() const
@@ -263,7 +263,7 @@ ZEWeather::ZEWeather()
 	FogFactor			= 0.1f;
 	MoonPhase			= 0.3f;
 	CloudCover			= 0.3f;
-	MoonLightIntensity	= 0.3f;
+	MoonLightIntensity	= 0.1f;
 	SunLightIntensity	= 1.2f;
 
 	SunDirection		= ZEVector3(0.00001f, -1.0f, 0.00001f);
@@ -313,10 +313,10 @@ ZEWeather::ZEWeather()
 	Moon->SetEnabled(true);
 	Moon->SetVisible(true);
 	Moon->SetMoonTexture("MoonFrame.png", 53, 1);
-	Moon->SetMoonAmbientColor(ZEVector3(1.0f, 0.99f, 0.82f));
+	Moon->SetMoonAmbientColor(ZEVector3(1.0f, 0.99f, 0.92f));
 	Moon->SetMoonDirection(MoonDirection);
 	Moon->SetMoonPhase(MoonPhase);
-	Moon->SetMoonAmbientFactor(0.7f);
+	Moon->SetMoonAmbientFactor(2.7f);
 	Moon->SetMoonScale(0.07f);
 	this->AddComponent(Moon);
 

@@ -105,6 +105,7 @@ ZESteering::ZESteering()
 
 	Weight = 1.0f;
 	Priority = 3;
+	Enabled = true;
 }
 
 ZESteering::~ZESteering()

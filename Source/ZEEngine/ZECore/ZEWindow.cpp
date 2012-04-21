@@ -152,7 +152,6 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_CLOSE:
 			if (MessageBox(hWnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
 			{
-				exit(0);
 				Window->WindowDestroyed();
 			}
 			break;
@@ -203,8 +202,8 @@ void ZEWindow::WindowLostFocus()
 
 void ZEWindow::WindowDestroyed()
 {
-	if (zeCore->GetCoreState() != ZE_CS_SHUTDOWN && zeCore->GetCoreState() != ZE_CS_CRITICAL_ERROR)
-		zeCore->ShutDown();
+	exit(EXIT_SUCCESS);
+	zeCore->ShutDown();
 }
 
 bool ZEWindow::CreateMainWindow(const char* WindowTitle)

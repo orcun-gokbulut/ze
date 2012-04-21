@@ -49,14 +49,14 @@ ze_add_source(ZE3dsModelExporterResources.h			Sources)
 ze_add_source(ZE3dsModelExporter.def				Sources)
 #ze_add_source(../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc	Sources)
 
-ze_add_executable(ZE3dsModelExporter 
+ze_add_library(ZE3dsModelExporter 
 	SOURCES ${Sources}
 	LIBS ZEFoundation ZEToolAPI ZE3dsProgressDialog
 		core geom gfx mesh maxutil maxscrpt paramblk2 igame
 	INSTALL
 	INSTALL_DESTINATION "Tools/Exporters/ZE3dsMax"
 	INSTALL_COMPONENT Tools
-	PLUGIN)
+	DLL)
 	
 set(LOCAL_WARNING_FLAGS /W3)
 set(LOCAL_RTTI_FLAGS /GR)
