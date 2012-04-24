@@ -295,19 +295,34 @@ void ZEGraphicsDebugModule::ProcessInputs(float ElapsedTime)
 
 void ZEGraphicsDebugModule::UpdateCloudColor()
 {
- 	// float SunDown = 1.0f - (-SkyDome->GetSunLightDirection().y);
- 	float SunDown = 1.0f - (-Weather->GetSunHeight());
+ 
+	ZEVector3 NewSunColor, SunColor;
+	float SunDown = 1 - Weather->GetSunHeight();
 
-	ZEVector3 SunColor(0.650f, 0.570f, 0.475f);
-	// ZEVector3 SunColor(0.8f, 0.7f, 0.5f);
+	ZEVector3 CloudAmbient(0.1f, 0.1f, 0.1f);
 
-	ZEVector3 NewSunColor;
-	NewSunColor.x	= -(ZEMath::Power((SunDown / 2.5f), 2.0f)) + SunColor.x;
-	NewSunColor.y	= -(ZEMath::Power((SunDown / 1.7f), 2.0f)) + SunColor.y;
-	NewSunColor.z	= -(ZEMath::Power((SunDown / 1.4f), 2.0f)) + SunColor.z;
+	// Night Time
+	if (SunDown > 1.0f)
+	{
+		SunDown -= 2.0f;
+		SunColor = ZEVector3(0.650f, 0.570f, 0.475f);
+
+		NewSunColor.x	= -(ZEMath::Power((SunDown / 2.5f), 2.0f)) + SunColor.x;
+		NewSunColor.y	= -(ZEMath::Power((SunDown / 1.7f), 2.0f)) + SunColor.y;
+		NewSunColor.z	= -(ZEMath::Power((SunDown / 1.4f), 2.0f)) + SunColor.z;
+		Weather->SetSunLightColor(NewSunColor);
+	}
+	else	// Daytime
+	{
+		SunColor = ZEVector3(0.850f, 0.750f, 0.655f);
+
+		NewSunColor.x	= -(ZEMath::Power((SunDown / 2.5f), 2.0f)) + SunColor.x;
+		NewSunColor.y	= -(ZEMath::Power((SunDown / 1.7f), 2.0f)) + SunColor.y;
+		NewSunColor.z	= -(ZEMath::Power((SunDown / 1.4f), 2.0f)) + SunColor.z;
+		Weather->SetSunLightColor(NewSunColor);
+	}
 
 	Weather->SetSunLightColor(NewSunColor);
- 	// Cloud->SetSunLightColor(NewSunColor);
 }
 
 void ZEGraphicsDebugModule::IncreaseMoonPhase(float ElapsedTime)
@@ -476,16 +491,16 @@ ZEGraphicsDebugModule::ZEGraphicsDebugModule()
 	MoonLightIntensity			= 0.3f;
 	SunLightIntensity			= 1.2f;
 
-	FogFactor					= 0.0f;
-	MoonPhase					= 0.0f;
-	CloudCover					= 0.0f;
+	FogFactor					= 0.1f;
+	MoonPhase					= 0.3f;
+	CloudCover					= 0.3f;
 	FogFactorChangeMultiplier	= 0.1f;
 	CloudCoverChangeMultiplier	= 0.1f;
 	MoonPhaseChangeMultiplier	= 0.1f;
 	SunDirection				= ZEVector3(0.00001f, -1.0f, 0.00001f);
 	MoonDirection				= -SunDirection;
 	SunMoonRotation				= ZEVector3(0.0f, 0.0f, 0.0f);
-	SunMoonRotationMultiplier	= ZEVector3(0.3f, 0.01f, 0.01f);
+	SunMoonRotationMultiplier	= ZEVector3(0.9f, 0.01f, 0.01f);
 }
 
 ZEGraphicsDebugModule::~ZEGraphicsDebugModule()
