@@ -734,66 +734,82 @@ bool ZEJpegDeCompressionInfo::SetDecompressionParametes()
 		{
 			case 1 * 1 - 1:
 				DctBlockSize = 1;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder8x8;
 				SpectralSelectionEndLimit = SpectralSelectionEnd;
 				break;
 			case 2 * 2 - 1:
 				DctBlockSize = 2;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder2x2;
 				SpectralSelectionEndLimit = SpectralSelectionEnd;
 				break;
 			case 3 * 3 - 1:
 				DctBlockSize = 3;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder3x3;
 				SpectralSelectionEndLimit = SpectralSelectionEnd;
 				break;
 			case 4 * 4 - 1:
 				DctBlockSize = 4;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder4x4;
 				SpectralSelectionEndLimit = SpectralSelectionEnd;
 				break;
 			case 5 * 5 - 1:
 				DctBlockSize = 5;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder5x5;
 				SpectralSelectionEndLimit = SpectralSelectionEnd;
 				break;
 			case 6 * 6 - 1:
 				DctBlockSize = 6;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder6x6;
 				SpectralSelectionEndLimit = SpectralSelectionEnd;
 				break;
 			case 7 * 7 - 1:
 				DctBlockSize = 7;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder7x7;
 				SpectralSelectionEndLimit = SpectralSelectionEnd;
 				break;
 			case 8 * 8 - 1:
 				DctBlockSize = 8;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder8x8;
 				SpectralSelectionEndLimit = SpectralSelectionEnd;
 				break;
 			case 9 * 9 - 1:
 				DctBlockSize = 9;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder8x8;
 				SpectralSelectionEndLimit = ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT - 1;
 				break;
 			case 10 * 10 - 1:
 				DctBlockSize = 10;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder8x8;
 				SpectralSelectionEndLimit = ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT - 1;
 				break;
 			case 11 * 11 - 1:
 				DctBlockSize = 11;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder8x8;
 				SpectralSelectionEndLimit = ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT - 1;
 				break;
 			case 12 * 12 - 1:
 				DctBlockSize = 12;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder8x8;
 				SpectralSelectionEndLimit = ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT - 1;
 				break;
 			case 13 * 13 - 1:
 				DctBlockSize = 13;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder8x8;
 				SpectralSelectionEndLimit = ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT - 1;
 				break;
 			case 14 * 14 - 1:
 				DctBlockSize = 14;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder8x8;
 				SpectralSelectionEndLimit = ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT - 1;
 				break;
 			case 15 * 15 - 1:
 				DctBlockSize = 15;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder8x8;
 				SpectralSelectionEndLimit = ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT - 1;
 				break;
 			case 16 * 16 - 1:
 				DctBlockSize = 16;
+				NaturalOrderPosArray = ZeJpegZigZagToNaturalOrder8x8;
 				SpectralSelectionEndLimit = ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT - 1;
 				break;
 			default:
@@ -818,6 +834,7 @@ bool ZEJpegDeCompressionInfo::SetDecompressionParametes()
 		ComponentInfo[I].DownsampledHeight = ZEMath::Ceil(ImageWidth * ComponentInfo[I].HorizontalFreq / MaxHorzSampleFactor);
 		ComponentInfo[I].DownsampledWidth = ZEMath::Ceil(ImageHeight * ComponentInfo[I].VerticalFreq / MaxVertSampleFactor);
 
+		ComponentInfo[I].ComponentValueNeeded = true;
 	}
 
 	// Compute number of fully interleaved MCU rows.
@@ -2458,8 +2475,11 @@ void ZEJpegDeuantizatizator::Process(ZEJpegDeCompressionInfo* Info)
 
 bool HuffmanDecoderBitBuffer::FillBuffer(bool& EndOfCompression)
 {
-	if (BitsAvailable != 0)
+	if (BitsAvailable >= HUFFMAN_LOOK_AHEAD_BITS)
+	{
+		EndOfCompression = false;
 		return true;
+	}
 
 	ZEUInt TotalReadBytes = 0;
 	ZEUInt UsefulBytes = 0;
@@ -2533,7 +2553,7 @@ ZESize HuffmanDecoderBitBuffer::GetAvailableBitCount() const
 }
 
 // Removes bits from buffer
-bool HuffmanDecoderBitBuffer::GetBits(ZEUInt32& Bits, ZEUInt32 BitCount)
+bool HuffmanDecoderBitBuffer::GetBits(ZEInt32& Bits, ZEUInt32 BitCount)
 {
 	bool EndCompression = false;
 
@@ -2546,7 +2566,7 @@ bool HuffmanDecoderBitBuffer::GetBits(ZEUInt32& Bits, ZEUInt32 BitCount)
 }
 
 // Does not delete the bits
-bool HuffmanDecoderBitBuffer::SeeBits(ZEUInt32& Bits, ZEUInt32 BitCount)
+bool HuffmanDecoderBitBuffer::SeeBits(ZEInt32& Bits, ZEUInt32 BitCount)
 {
 	bool EndCompression = false;
 
@@ -2612,14 +2632,731 @@ HuffmanDecoderBitBuffer::~HuffmanDecoderBitBuffer()
 /*                        ZEJpegHuffmanDecoder							*/
 /************************************************************************/
 
-void ZEJpegHuffmanDecoder::Decode(ZEJpegDeCompressionInfo* Info)
+// Fall back function of HuffmanDecode. Does not use tables, computation is slow
+ZEInt ZEJpegHuffmanDecoder::HuffmanDecodeFallBack(ZEJpegDerivedHuffmanTable* Table, ZEUInt32 NBits)
 {
+	ZESize MinBitCount = NBits; // We know that the bit stream we will read will be at least NB bits long
+	ZEInt32 HuffmanCode = 0;
+	ZEInt32 ReadBit;
 
+
+	if (!BitBuffer->GetBits(HuffmanCode, MinBitCount))
+		return false;
+
+	// Collect the rest of the Huffman code one bit at a time.
+	while (HuffmanCode > Table->MaxCodeLenght[MinBitCount])
+	{
+		HuffmanCode <<= 1;
+		BitBuffer->GetBits(ReadBit, 1);
+		HuffmanCode |= ReadBit;
+		MinBitCount++;
+	}
+
+
+	// Error, huffman codes cannot be longer than 16 bits
+	// Just return 0 and continue decoding
+	if (MinBitCount > 16) 
+	{
+		return 0;
+	}
+
+	return Table->OwnerHuffmanTable->HuffmanValues[ (ZESize)(HuffmanCode + Table->ValueOffsets[ MinBitCount ]) ];
 }
+
+bool ZEJpegHuffmanDecoder::HuffmanDecode(ZEUInt8& Output, ZEJpegDerivedHuffmanTable* Table)
+{
+	ZEInt NBits = 1, CheckBits = 0;
+
+	// Long way of decoding when there are less than 8 bits available in buffer
+	if (BitBuffer->GetAvailableBitCount() < HUFFMAN_LOOK_AHEAD_BITS)
+	{
+		if (Output = HuffmanDecodeFallBack(Table, NBits) < 0)
+			return false;
+	}
+
+	BitBuffer->SeeBits(CheckBits, HUFFMAN_LOOK_AHEAD_BITS);
+
+	// Fast table decoding
+	if (NBits = Table->LookNBits[CheckBits] != 0)
+	{
+		BitBuffer->PassBits(NBits);
+		Output = Table->LookSymbol[CheckBits];
+	}
+	else // Table miss, fall back to slow decoding method
+	{
+		NBits = HUFFMAN_LOOK_AHEAD_BITS + 1;
+		if (Output = HuffmanDecodeFallBack(Table, NBits) < 0)
+			return false;
+	}
+
+	return false;
+}
+
+// Creates the intermediate lookup tables for decompression
+bool ZEJpegHuffmanDecoder::CreateDerivedTable(ZEUInt TableId, ZEJpegDerivedHuffmanTable* DerivedTable, bool IsDc)
+{
+	ZEInt8 HuffmanSize[257];
+	ZEUInt HuffmanCode[257];
+	
+	//	Note that HuffmanSize[] and HuffmanCode[] are filled in code-length order,
+	//	paralleling the order of the symbols themselves in HuffmanTable->HuffmanValues[].
+	
+	if (TableId < 0 || TableId > ZE_JPEG_HUFF_TABLE_COUNT)
+		zeCriticalError("Wrong table id");
+
+	ZEJpegHuffmanTable* SourceTable = (IsDc) ? &Info->DCHuffmanTables[TableId] : &Info->ACHuffmanTables[TableId];
+	DerivedTable->OwnerHuffmanTable = SourceTable;
+
+	ZESize P = 0;
+	ZESize I = 0;
+	ZEInt SymbolCount;
+	for (ZESize L = 0; L <= 16; L++)
+	{
+		I = SourceTable->Bits[L];
+		if (P + I > 256) 
+			zeCriticalError("Table Overrun");
+
+		while (I--)
+			HuffmanSize[P++] = (ZEInt8)L;
+	}
+
+	HuffmanSize[P] = 0;
+	SymbolCount = P;
+
+	// Generate the codes themselves
+	// We also validate that the counts represent a legal Huffman code tree.
+	
+	ZEUInt Code = 0;
+	ZEInt SizeI = (ZEInt)HuffmanSize[0];
+	P = 0;
+	while (HuffmanSize[P])
+	{
+		while ((ZEInt)HuffmanSize[P] == SizeI)
+		{
+			HuffmanCode[P++] = Code;
+			Code++;
+		}
+
+		/*
+			Code is now 1 more than the last code used for codelength si; but
+			it must still fit in si bits, since no code is allowed to be all ones.
+		*/
+
+		Code <<= 1;
+		SizeI++;
+	}
+
+	// Generate decoding tables for bit-sequential decoding
+	P = 0;
+	for (ZESize L = 1; L <= 16; ++L)
+	{
+		if (SourceTable->Bits[L] != 0)
+		{
+			/*
+				ValueOffset[l] = HuffmanValues[] index of 1st symbol of code length l,
+				minus the minimum code of length l
+			*/
+
+			DerivedTable->ValueOffsets[L] = (ZEInt32)P - (ZEInt32)HuffmanCode[P];
+			P += SourceTable->Bits[L];
+			DerivedTable->MaxCodeLenght[L] = HuffmanCode[P - 1];
+		}
+		else
+		{
+			DerivedTable->MaxCodeLenght[L] = -1; // Not used
+		}
+
+		DerivedTable->MaxCodeLenght[17] = 0xFFFFFL;		/* ensures jpeg_huff_decode terminates */
+	}
+
+	/*
+		Compute lookahead tables to speed up decoding.
+		First we set all the table entries to 0, indicating "too long";
+		then we iterate through the Huffman codes that are short enough and
+		fill in all the entries that correspond to bit sequences starting
+		with that code.
+	*/
+
+	memset(DerivedTable->LookNBits, 0, sizeof(ZEInt) * (1 << HUFFMAN_LOOK_AHEAD_BITS));
+
+	P = 0;
+	for (ZESize L = 0; L < HUFFMAN_LOOK_AHEAD_BITS; ++L)
+	{
+		for (ZESize K = 1; K < (ZESize)SourceTable->Bits[L]; ++K, ++P)
+		{
+			// l = current code's length, p = its index in HuffmanCode[] & HuffmanValues[]. 
+			// Generate left-justified code followed by all possible bit sequences.
+			
+			ZEInt LookBits = HuffmanCode[P] << (HUFFMAN_LOOK_AHEAD_BITS - L);
+
+			for (ZEInt Ctr = 1 << (HUFFMAN_LOOK_AHEAD_BITS - L); Ctr > 0; --Ctr)
+			{
+				DerivedTable->LookNBits[LookBits] = L;
+				DerivedTable->LookSymbol[LookBits] = SourceTable->HuffmanValues[P];
+				++LookBits;
+			}
+		}
+	}
+
+
+	// Check table values
+	if (IsDc)
+	{
+		for (ZESize I = 0; I < SymbolCount; ++I)
+		{
+			ZEInt Sym = SourceTable->HuffmanValues[I];
+
+			if (Sym < 0 || Sym > 15)
+				zeCriticalError("Wrong table generation..");
+		}
+	}
+
+	return true;
+}
+
+// MCU DC initial scan. Can be used for both spectral selection and successive approximation modes
+bool ZEJpegHuffmanDecoder::MCUDecodeDcFirstTime(ZEJpegBlock* McuData)
+{
+	ZEInt AL = Info->ApproxBitPosLow;
+
+	// Outer loop handles each block in the MCU
+	for (ZESize BlockN = 0; BlockN < Info->DctBlocksPerMCU; ++BlockN)
+	{
+		ZEJpegBlock* Block = McuData + BlockN;
+		ZESize Member = Info->MCUMembership[BlockN];
+		ZEJpegComponentInfo* Component = Info->CurrentCompInfo[Member];
+		ZEJpegDerivedHuffmanTable* DerivedDecodeTable = DerivedTables[Component->DcTableNo];
+
+		ZEInt32 ReadBits = 0;
+		ZEUInt8 BitCount = 0;
+		ZEUInt8 OutputSymbol = 0;
+
+		bool Result = HuffmanDecode(BitCount, DerivedDecodeTable);
+		STOPPROCESS(Result);
+
+		if (BitCount)
+		{
+			Result = BitBuffer->GetBits(ReadBits, BitCount);
+			STOPPROCESS(Result);
+
+			OutputSymbol = EXTEND(ReadBits, BitCount);
+		}
+
+		OutputSymbol += LastDcValue[Member];
+		LastDcValue[Member] = OutputSymbol;
+
+		Block->BlockData[0] = OutputSymbol << AL;
+	}
+
+	RestartMarkersLeft--;
+
+	return true;
+}
+
+// MCU AC initial scan. Can be used for both spectral selection and successive approximation modes
+bool ZEJpegHuffmanDecoder::MCUDecodeAcFirstTime(ZEJpegBlock* McuData)
+{
+	// NOTE: There is always only one block per MCU
+
+	// ZeJpegZigZagToNaturalOrder8x8[I]
+	ZEInt AL = Info->ApproxBitPosLow;
+	ZEInt SS = Info->SpectralSelectionStart;
+	ZEInt SE = Info->SpectralSelectionEnd;
+	
+	const ZESize* ZZToNTable = Info->NaturalOrderPosArray;
+	// ZEJpegDerivedHuffmanTable* ACTable = this->
+
+	ZEInt32 ReadBits = 0;
+	ZEUInt8 BitCount = 0;
+	ZEUInt8 OutputSymbol = 0;
+
+	if (SeenEobCount > 0 )
+	{
+		--SeenEobCount;
+	}
+	else
+	{
+		ZEJpegBlock* Block = &McuData[0];
+		ZEJpegDerivedHuffmanTable* Table = CurrentAcDerivedTable;
+
+		// Outer loop handles each block in the MCU
+		for (ZESize I = SS; I <= SE; ++I)
+		{
+			bool Result = HuffmanDecode(BitCount, Table);
+			STOPPROCESS(Result);
+
+			ReadBits = BitCount >> 4;
+			BitCount &= 0x0F;
+
+			if (BitCount)
+			{
+				I += ReadBits;
+				Result = BitBuffer->GetBits(ReadBits, BitCount);
+				BitCount = EXTEND(ReadBits, BitCount);
+
+				Block->BlockData[ZZToNTable[I]] = BitCount << AL;
+			}
+			else
+			{
+				if (ReadBits == 15)
+				{
+					I += 15;
+				}
+				else
+				{
+					SeenEobCount = 1 << ReadBits;
+
+					if (ReadBits)
+					{
+						Result = BitBuffer->GetBits(ReadBits, ReadBits);
+						STOPPROCESS(Result);
+						SeenEobCount += ReadBits;
+					}
+
+					--SeenEobCount;
+					break;
+				}
+			}
+		}
+	}
+
+	RestartMarkersLeft--;
+
+	return true;
+}
+
+// MCU DC successive approximation refinement scan decoding
+bool ZEJpegHuffmanDecoder::MCUDecodeDcRefine(ZEJpegBlock* McuData)
+{
+	ZEInt PlusOne = 1 << Info->ApproxBitPosLow;
+	
+	ZEJpegDerivedHuffmanTable* Table = CurrentAcDerivedTable;
+
+	// Outer loop handles each block in the MCU
+	for (ZESize BlockN = 0; BlockN < Info->DctBlocksPerMCU; ++BlockN)
+	{
+		ZEJpegBlock* Block = &McuData[BlockN];
+
+		ZEInt32 ReadBit = 0;
+		// Encoded data is simply the next bit of the two's-complement DC value
+		bool Result = BitBuffer->GetBits(ReadBit, 1);
+		STOPPROCESS(Result);
+
+		if (ReadBit)
+		{
+			Block->BlockData[0] |= PlusOne;
+		}
+	}
+
+	--RestartMarkersLeft;
+
+	return true;
+}
+
+
+// MCU AC successive approximation refinement scan decoding
+bool ZEJpegHuffmanDecoder::MCUDecodeAcRefine(ZEJpegBlock* McuData)
+{
+	// There is always only one block per MCU
+
+	ZEJpegBlock* Block = McuData + 0;
+	ZEInt SE = Info->SpectralSelectionEnd;
+	ZEInt PlusOne = 1 << Info->ApproxBitPosLow;
+	ZEInt MinusOne = (-1) << Info->ApproxBitPosLow;
+	const ZESize* ZZNaturalTable = Info->NaturalOrderPosArray;
+
+	ZESize BitIndex = Info->SpectralSelectionStart;
+	ZEJpegDerivedHuffmanTable* DerivedDecodeTable = CurrentAcDerivedTable;
+
+	bool Result = false;
+	ZEInt32 ReadBits = 0;
+	ZEUInt8 BitCount = 0;
+	ZEUInt8 OutputSymbol = 0;
+	
+	if (SeenEobCount == 0)
+	{
+		for (/* NoInit*/; BitIndex <= SE; ++BitIndex)
+		{
+			Result = HuffmanDecode(BitCount, DerivedDecodeTable);
+			STOPPROCESS(Result);
+
+			ReadBits = BitCount >> 4;
+			BitCount &= 0x0F;
+
+			if (BitCount)
+			{
+				if (BitCount != 1) // Must be one
+				{
+					STOPPROCESS(true);
+				}
+
+				ZEInt32 Dummy = 0;
+				Result = BitBuffer->GetBits(Dummy, 1);
+				STOPPROCESS(Result);
+
+				if (Dummy)
+				{
+					BitCount = PlusOne;
+				}
+				else
+				{
+					BitCount = MinusOne;
+				}
+			}
+			else
+			{
+				if (ReadBits != 15)
+				{
+					SeenEobCount = 1 << ReadBits;
+					if (ReadBits)
+					{
+						Result = BitBuffer->GetBits(ReadBits, ReadBits);
+						STOPPROCESS(Result);
+
+						SeenEobCount += ReadBits;
+					}
+
+					break;
+				}
+			}
+
+			do 
+			{
+				// Make a copy of coefficient
+				ZEUInt8* Coefficient = &Block->BlockData[ZZNaturalTable[BitIndex]];
+
+				if (*Coefficient != 0)
+				{
+					ZEInt32 Dummy;
+					Result = BitBuffer->GetBits(Dummy, 1);
+					STOPPROCESS(Result);
+
+					if (Dummy)
+					{
+						if ((*Coefficient & PlusOne) == 0)
+						{
+							if (*Coefficient >= 0)
+							{
+								*Coefficient += PlusOne;
+							}
+							else
+							{
+								*Coefficient += MinusOne;
+							}
+						}
+					}
+				}
+				else
+				{
+					if (--ReadBits < 0)
+						break;
+				}
+
+				++BitIndex;
+
+			} while (BitIndex <= SE);
+
+
+			if (BitCount)
+			{
+				ZESize Position = ZZNaturalTable[BitIndex];
+
+				Block->BlockData[Position] = BitCount;
+			}
+		}
+	}
+
+	if (SeenEobCount > 0)
+	{
+		for (/*NoInit*/; BitIndex < SE; ++BitIndex)
+		{
+			// Make a copy of coefficient
+			ZEUInt8* Coefficient = &Block->BlockData[ZZNaturalTable[BitIndex]];
+			
+			if (*Coefficient != 0)
+			{
+				ZEInt32 Dummy;
+				Result = BitBuffer->GetBits(Dummy, 1);
+				STOPPROCESS(Result);
+
+				if (Dummy)
+				{
+					if ((*Coefficient & PlusOne) == 0)
+					{
+						if (*Coefficient >= 0)
+						{
+							*Coefficient += PlusOne;
+						}
+						else
+						{
+							*Coefficient += MinusOne;
+						}
+					}
+				}
+			}
+		}
+
+		--SeenEobCount;
+	}
+
+	--RestartMarkersLeft;
+
+	return true;
+}
+
+// Full size MCU block decoding, uses the precalculated tables
+bool ZEJpegHuffmanDecoder::MCUDecodeFullBlock(ZEJpegBlock* McuData)
+{
+	bool EOB = false;
+
+	// Outer loop handles each block in the MCU
+	for (ZESize BlockN = 0; BlockN < Info->DctBlocksPerMCU; ++BlockN)
+	{
+
+		ZEJpegBlock* Block = McuData + BlockN;
+
+		ZEJpegDerivedHuffmanTable* DerivedDecodeTable = CurrentDcTables[BlockN];
+
+		// Decode a single block's worth of coefficients
+
+		// decode the DC coefficient difference
+		ZEInt32 ReadBits = 0;
+		ZEUInt8 BitCount = 0;
+		ZEUInt8 OutputSymbol = 0;
+		
+		bool Result = this->HuffmanDecode(BitCount, DerivedDecodeTable);
+		STOPPROCESS(Result);
+
+		// Decoding block index
+		ZESize I = 1;
+		ZEInt CoefficientLimit = CoefficientLimits[BlockN];
+
+		if (CoefficientLimit)
+		{
+			// Convert DC difference to actual value, update last_dc_val
+			if (BitCount)
+			{
+				Result = BitBuffer->GetBits(ReadBits, BitCount);
+				STOPPROCESS(Result);
+
+				OutputSymbol = EXTEND(ReadBits, BitCount);
+			}
+
+			ZEInt Member = Info->MCUMembership[BlockN];
+			OutputSymbol += LastDcValue[Member];
+			LastDcValue[Member] = OutputSymbol;
+
+			// Output the DC coefficient
+			Block->BlockData[0] = OutputSymbol;
+
+			// Decode AC coefficients
+			// Change table to ac
+			DerivedDecodeTable = CurrentAcTables[BlockN];
+			for (/* No Init */; I < CoefficientLimit; ++I)
+			{
+				Result = HuffmanDecode(BitCount, DerivedDecodeTable);
+				STOPPROCESS(Result);
+
+				ReadBits = BitCount >> 4;
+				BitCount &= 0x0F;
+
+				if (BitCount)
+				{
+					I += ReadBits;
+					Result = BitBuffer->GetBits(ReadBits, BitCount);
+					STOPPROCESS(Result);
+
+					OutputSymbol = EXTEND(ReadBits, BitCount);
+					Block->BlockData[ZeJpegZigZagToNaturalOrder8x8[I]] = OutputSymbol;
+				}
+				else
+				{
+					if (ReadBits != 15) // if 15 zeroes not found block is done
+					{
+						break;
+					}
+					
+					I += 15;
+				}
+			}
+		}
+		else
+		{
+			if (BitCount)
+			{
+				Result = BitBuffer->PassBits(BitCount);
+				STOPPROCESS(Result);
+			}
+		}
+		
+		// Discard the rest of the values
+		for (/* No Init */; I < ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT; ++I)
+		{
+			if (EOB) break; // Do not process if EOB reached
+
+			Result = HuffmanDecode(BitCount, DerivedDecodeTable);
+			STOPPROCESS(Result);
+
+			ReadBits = BitCount >> 4;
+			BitCount &= 0x0F;
+
+			if (BitCount)
+			{
+				I += ReadBits;
+				Result = BitBuffer->PassBits(BitCount);
+				STOPPROCESS(Result);
+			}
+			else
+			{
+				if (ReadBits != 15) // if 15 zeroes not found block is done
+				{
+					break;
+				}
+
+				I += 15;
+			}
+		}
+	}
+
+	RestartMarkersLeft--;
+
+	return true;
+}
+
+// Decodes a partial block
+bool ZEJpegHuffmanDecoder::MCUDecodeSubBlock(ZEJpegBlock* McuData)
+{
+	bool EOB = false;
+	const ZESize* ZZNaturalTable = Info->NaturalOrderPosArray;
+	ZEInt SE = Info->SpectralSelectionEnd;
+
+	// Outer loop handles each block in the MCU
+	for (ZESize BlockN = 0; BlockN < Info->DctBlocksPerMCU; ++BlockN)
+	{
+
+		ZEJpegBlock* Block = McuData + BlockN;
+		ZEJpegDerivedHuffmanTable* DerivedDecodeTable = CurrentDcTables[BlockN];
+
+		// Decode a single block's worth of coefficients
+
+		// decode the DC coefficient difference
+		ZEInt32 ReadBits = 0;
+		ZEUInt8 BitCount = 0;
+		ZEUInt8 OutputSymbol = 0;
+
+		bool Result = this->HuffmanDecode(BitCount, DerivedDecodeTable);
+		STOPPROCESS(Result);
+
+		// Decoding block index
+		ZESize I = 1;
+		ZEInt CoefficientLimit = CoefficientLimits[BlockN];
+
+		if (CoefficientLimit)
+		{
+			// Convert DC difference to actual value, update last_dc_val
+			if (BitCount)
+			{
+				Result = BitBuffer->GetBits(ReadBits, BitCount);
+				STOPPROCESS(Result);
+
+				OutputSymbol = EXTEND(ReadBits, BitCount);
+			}
+
+			ZEInt Member = Info->MCUMembership[BlockN];
+			OutputSymbol += LastDcValue[Member];
+			LastDcValue[Member] = OutputSymbol;
+
+			// Output the DC coefficient
+			Block->BlockData[0] = OutputSymbol;
+
+			// Decode AC coefficients
+			// Change table to ac
+			DerivedDecodeTable = CurrentAcTables[BlockN];
+			for (/* No Init */; I < CoefficientLimit; ++I)
+			{
+				Result = HuffmanDecode(BitCount, DerivedDecodeTable);
+				STOPPROCESS(Result);
+
+				ReadBits = BitCount >> 4;
+				BitCount &= 0x0F;
+
+				if (BitCount)
+				{
+					I += ReadBits;
+					Result = BitBuffer->GetBits(ReadBits, BitCount);
+					STOPPROCESS(Result);
+
+					OutputSymbol = EXTEND(ReadBits, BitCount);
+					Block->BlockData[ZZNaturalTable[I]] = OutputSymbol;
+				}
+				else
+				{
+					if (ReadBits != 15) // if 15 zeroes not found block is done
+					{
+						break;
+					}
+
+					I += 15;
+				}
+			}
+		}
+		else
+		{
+			if (BitCount)
+			{
+				Result = BitBuffer->PassBits(BitCount);
+				STOPPROCESS(Result);
+			}
+		}
+
+		// Discard the rest of the values of the BlockN
+		for (/* No Init */; I < ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT; ++I)
+		{
+			if (EOB) break; // Do not process if EOB reached
+
+			Result = HuffmanDecode(BitCount, DerivedDecodeTable);
+			STOPPROCESS(Result);
+
+			ReadBits = BitCount >> 4;
+			BitCount &= 0x0F;
+
+			if (BitCount)
+			{
+				I += ReadBits;
+				Result = BitBuffer->PassBits(BitCount);
+				STOPPROCESS(Result);
+			}
+			else
+			{
+				if (ReadBits != 15) // if 15 zeroes not found block is done
+				{
+					break;
+				}
+
+				I += 15;
+			}
+		}
+	}
+
+	RestartMarkersLeft--;
+
+	return true;
+}
+
 
 // Creates the intermediate decoding tables which hold the all possible bit strings whose length are given in Huffman tables
 void ZEJpegHuffmanDecoder::Initialize(ZEJpegDeCompressionInfo* Info)
 {
+	this->Info = Info;
+
+	// Allocate tables
+	for (ZESize I = 0; I < ZE_JPEG_HUFF_TABLE_COUNT; ++I)
+	{
+		zeAssert(DerivedTables[I] != NULL, "Tables are already initialized, try Deinitializing first.");
+		DerivedTables[I] = new ZEJpegDerivedHuffmanTable[ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT];
+	}
+	
+
 	// For progressive mode
 	if (Info->IsProgressive)
 	{
@@ -2681,22 +3418,26 @@ void ZEJpegHuffmanDecoder::Initialize(ZEJpegDeCompressionInfo* Info)
 		{
 			if (Info->SpectralSelectionStart == 0)
 			{
-				UseDecodeMcuDcFirstTime = true;
+				DecodeFunction = &ZEJpegHuffmanDecoder::MCUDecodeDcFirstTime;
+				// UseDecodeMcuDcFirstTime = true;
 			}
 			else
 			{
-				UseDecodeMcuAcFirstTime = true;
+				DecodeFunction = &ZEJpegHuffmanDecoder::MCUDecodeAcFirstTime;
+				// UseDecodeMcuAcFirstTime = true;
 			}
 		}
 		else
 		{
 			if (Info->SpectralSelectionStart == 0)
 			{
-				UseDecodeMcuDcRefine = true;
+				this->DecodeFunction = &ZEJpegHuffmanDecoder::MCUDecodeDcRefine;
+				// UseDecodeMcuDcRefine = true;
 			}
 			else
 			{
-				UseDecodeMcuAcRefine = true;
+				this->DecodeFunction = &ZEJpegHuffmanDecoder::MCUDecodeAcRefine;
+				// UseDecodeMcuAcRefine = true;
 			}
 		}
 
@@ -2706,36 +3447,155 @@ void ZEJpegHuffmanDecoder::Initialize(ZEJpegDeCompressionInfo* Info)
 
 			if (Info->SpectralSelectionStart == 0)
 			{
-				if (Info->ApproxBitPosHigh != 0)
+				if (Info->ApproxBitPosHigh == 0)
 				{
-					//this->CreateTable(Info, );
+					// DC refinement needs no table
+					this->CreateDerivedTable(ComponentInfo->DcTableNo, DerivedTables[ComponentInfo->DcTableNo], true);
 				}
 			}
 			else
 			{
-
+				this->CreateDerivedTable(ComponentInfo->AcTableNo, DerivedTables[ComponentInfo->AcTableNo], false);
 			}
 		}
 
+		SeenEobCount = 0;
 	}
 	else
 	{
+		if (Info->SpectralSelectionStart != 0 || Info->ApproxBitPosHigh != 0 || Info->ApproxBitPosLow != 0 ||
+			((Info->IsBaseLine || Info->SpectralSelectionEnd < ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT) && Info->SpectralSelectionEnd != Info->SpectralSelectionEndLimit))
+			zeCriticalError("Wong SOS aprameters for baseline decompression");
 
+		if (Info->SpectralSelectionEnd != ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT)
+		{
+			this->DecodeFunction = &ZEJpegHuffmanDecoder::MCUDecodeSubBlock;
+			// UseDecodeMcuSub = true;
+		}
+		else
+		{
+			this->DecodeFunction = &ZEJpegHuffmanDecoder::MCUDecodeFullBlock;
+			// UseDecodeMcu = true;
+		}
+
+		for (ZESize I = 0; I < Info->ComponentsInScan; ++I)
+		{
+			ZEJpegComponentInfo* ComponentInfo = Info->CurrentCompInfo[I];
+			CreateDerivedTable(ComponentInfo->DcTableNo, DerivedTables[ComponentInfo->DcTableNo], true);
+			if (Info->SpectralSelectionEndLimit != 0)
+			{
+				CreateDerivedTable(ComponentInfo->AcTableNo, DerivedTables[ComponentInfo->AcTableNo], true);
+			}
+		}
+
+		// Precalculate decoding info for each block in an MCU of this scan
+		for (ZESize BlockI = 0; BlockI < Info->DctBlocksPerMCU; ++BlockI)
+		{
+			ZEJpegComponentInfo* ComponentInfo = Info->CurrentCompInfo[Info->MCUMembership[BlockI]];
+			
+			// Precalculate which table to use for each block
+			CurrentDcTables[BlockI] = DerivedDcTables[ComponentInfo->DcTableNo];
+			CurrentAcTables[BlockI] = DerivedAcTables[ComponentInfo->AcTableNo];
+
+			// Decide whether we really care about the coefficient values
+			if (ComponentInfo->ComponentValueNeeded)
+			{
+				ZEInt V = ComponentInfo->DctVertScaledSize;
+				ZEInt H = ComponentInfo->DctHorzScaledSize;
+				
+				switch (Info->SpectralSelectionEndLimit)
+				{
+					case 1 * 1 -1:
+						CoefficientLimits[BlockI] = 1;
+						break;
+					
+					case 2 * 2 -1:
+						if (V <= 0 || V > 2) V = 2;
+						if (H <= 0 || H > 2) H = 2;
+						CoefficientLimits[BlockI] = 1 + ZeJpegNaturalToZigZagOrder2x2[V - 1][H - 1];
+						break;
+					
+					case 3 * 3 -1:
+						if (V <= 0 || V > 3) V = 3;
+						if (H <= 0 || H > 3) H = 3;
+						CoefficientLimits[BlockI] = 1 + ZeJpegNaturalToZigZagOrder3x3[V - 1][H - 1];
+						break;
+					
+					case 4 * 4 -1:
+						if (V <= 0 || V > 4) V = 4;
+						if (H <= 0 || H > 4) H = 4;
+						CoefficientLimits[BlockI] = 1 + ZeJpegNaturalToZigZagOrder4x4[V - 1][H - 1];
+						break;
+					
+					case 5 * 5 -1:
+						if (V <= 0 || V > 5) V = 5;
+						if (H <= 0 || H > 5) H = 5;
+						CoefficientLimits[BlockI] = 1 + ZeJpegNaturalToZigZagOrder5x5[V - 1][H - 1];
+						break;
+					
+					case 6 * 6 -1:
+						if (V <= 0 || V > 6) V = 6;
+						if (H <= 0 || H > 6) H = 6;
+						CoefficientLimits[BlockI] = 1 + ZeJpegNaturalToZigZagOrder6x6[V - 1][H - 1];
+						break;
+					
+					case 7 * 7 -1:
+						if (V <= 0 || V > 7) V = 7;
+						if (H <= 0 || H > 7) H = 7;
+						CoefficientLimits[BlockI] = 1 + ZeJpegNaturalToZigZagOrder7x7[V - 1][H - 1];
+						break;
+					
+					default:
+					case 8 * 8 -1:
+						if (V <= 0 || V > 8) V = 8;
+						if (H <= 0 || H > 8) H = 8;
+						CoefficientLimits[BlockI] = 1 + ZeJpegNaturalToZigZagOrder8x8[V - 1][H - 1];
+						break;
+					
+				}
+			}
+			else
+			{
+				CoefficientLimits[BlockI] = 0;
+			}
+		}
 	}
 }
 
 void ZEJpegHuffmanDecoder::Deinitialize()
 {
+	Info				= NULL;
+	SeenEobCount		= 0;
+	RestartMarkersLeft	= 0;
+
 	if (BitBuffer != NULL)
 	{
 		BitBuffer->Destroy();
 		BitBuffer = NULL;
 	}
 
-	memset(YTableDC, 0, sizeof (ZEInt) * ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT);
-	memset(YTableAC, 0, sizeof (ZEInt) * ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT);
-	memset(CromTableDC, 0, sizeof (ZEInt) * ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT);
-	memset(CromTableAC, 0, sizeof (ZEInt) * ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT);
+	// Delete tables
+	for (ZESize I = 0; I < ZE_JPEG_HUFF_TABLE_COUNT; ++I)
+	{
+		if (DerivedTables[I] != NULL)
+		{
+			delete DerivedTables[I];
+			DerivedTables[I] = NULL;
+		}
+	}
+
+	
+
+	RestartMarkersLeft			= 0;
+
+	// Set pointers to other tables to zero
+	memset(DerivedDcTables, 0, sizeof(ZEInt*) * ZE_JPEG_HUFF_TABLE_COUNT);
+	memset(DerivedAcTables, 0, sizeof(ZEInt*) * ZE_JPEG_HUFF_TABLE_COUNT);
+
+	memset(CurrentDcTables, 0, sizeof(ZEInt*) * ZE_JPEG_MAX_MCU_BLOCKS);
+	memset(CurrentAcTables, 0, sizeof(ZEInt*) * ZE_JPEG_MAX_MCU_BLOCKS);
+
+	memset(LastDcValue, 0, sizeof(ZEInt) * ZE_JPEG_MAX_SCAN_COMPONENTS);
 }
 
 void ZEJpegHuffmanDecoder::Destroy()
@@ -2750,7 +3610,20 @@ ZEJpegHuffmanDecoder* ZEJpegHuffmanDecoder::CreateInstance()
 
 ZEJpegHuffmanDecoder::ZEJpegHuffmanDecoder()
 {
-	BitBuffer = NULL;
+	Info				= NULL;
+	BitBuffer			= NULL;
+	SeenEobCount		= 0;
+	RestartMarkersLeft	= 0;
+	
+	memset(DerivedDcTables, 0, sizeof(ZEInt*) * ZE_JPEG_HUFF_TABLE_COUNT);
+	memset(DerivedAcTables, 0, sizeof(ZEInt*) * ZE_JPEG_HUFF_TABLE_COUNT);
+	
+	memset(CurrentDcTables, 0, sizeof(ZEInt*) * ZE_JPEG_MAX_MCU_BLOCKS);
+	memset(CurrentAcTables, 0, sizeof(ZEInt*) * ZE_JPEG_MAX_MCU_BLOCKS);
+
+	memset(LastDcValue, 0, sizeof(ZEInt) * ZE_JPEG_MAX_SCAN_COMPONENTS);
+	memset(DerivedTables, 0, sizeof(ZEInt*) * ZE_JPEG_MAX_SCAN_COMPONENTS);
+	
 }
 
 ZEJpegHuffmanDecoder::~ZEJpegHuffmanDecoder()
@@ -2835,10 +3708,5 @@ ZETextureData* ZETextureFileJpeg::Load(ZEFile* File)
 				break;
 		}
 	}
-
-
-
-
-
 }
 

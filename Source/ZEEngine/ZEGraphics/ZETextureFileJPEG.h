@@ -109,14 +109,20 @@ ZE_JPG_FM_MB	->	File marker begin byte
 */
 
 
-
-
 #pragma once
 #ifndef __ZE_TEXTURE_FILE_JPEG__
 #define __ZE_TEXTURE_FILE_JPEG__
 
 #include "ZETypes.h"
 #include "ZETextureFile.h"
+#include <intrin.h>
+
+
+#define STOPPROCESS(Result)				\
+{										\
+	if (!(Result))	return false;		\
+}															
+
 
 #define ZE_JPEG_MAX_SAMPLE_FREQUENCY		4
 #define ZE_JPEG_MAX_COMPONENT_COUNT			10
@@ -293,7 +299,7 @@ enum ZEJpegFileMarker
 	ZE_JPEG_FM_MARKER_BEGIN = 0xFF,		
 };
 
-const ZESize ZeJpegZigZagToNaturalOrder8x8[ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT + 16] = 
+const ZESize ZeJpegZigZagToNaturalOrder8x8[8 * 8 + 16] = 
 {
 	 0,  1,  8, 16,  9,  2,  3, 10,
 	17, 24, 32, 25, 18, 11,  4,  5,
@@ -303,65 +309,141 @@ const ZESize ZeJpegZigZagToNaturalOrder8x8[ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT + 16]
 	29, 22, 15, 23, 30, 37, 44, 51,
 	58, 59, 52, 45, 38, 31, 39, 46,
 	53, 60, 61, 54, 47, 55, 62, 63,
+	
 	63, 63, 63, 63, 63, 63, 63, 63, // Extra entries
 	63, 63, 63, 63, 63, 63, 63, 63
 };
 
 const ZESize ZeJpegZigZagToNaturalOrder7x7[7 * 7 + 16] = 
 {
-	 0,  1,  8, 16,  9,  2,  3, 10,
-	17, 24, 32, 25, 18, 11,  4,  5,
-	12, 19, 26, 33, 40, 48, 41, 34,
-	27, 20, 13,  6, 14, 21, 28, 35,
-	42, 49, 50, 43, 36, 29, 22, 30,
-	37, 44, 51, 52, 45, 38, 46, 53,
-	54,
+	 0,  1,  8, 16,  9,  2,  3,
+	 10, 17, 24, 32, 25, 18, 11, 
+	 4,  5,  12, 19, 26, 33, 40, 
+	 48, 41, 34, 27, 20, 13,  6, 
+	 14, 21, 28, 35, 42, 49, 50,
+	 43, 36, 29, 22, 30, 37, 44, 
+	 51, 52, 45, 38, 46, 53, 54,
+
 	63, 63, 63, 63, 63, 63, 63, 63, // Extra entries
 	63, 63, 63, 63, 63, 63, 63, 63
 };
 
 const ZESize ZeJpegZigZagToNaturalOrder6x6[6 * 6 + 16] = 
 {
-	 0,  1,  8, 16,  9,  2,  3, 10,
-	17, 24, 32, 25, 18, 11,  4,  5,
-	12, 19, 26, 33, 40, 41, 34, 27,
-	20, 13, 21, 28, 35, 42, 43, 36,
-	29, 37, 44, 45,
+	 0,  1,   8,  16,  9,  2,  
+	 3,  10,  17, 24,  32, 25,
+	 18, 11,  4,  5,   12, 19,
+	 26, 33, 40, 41,   34, 27, 
+	 20, 13, 21, 28,   35, 42, 
+	 43, 36, 29, 37,   44, 45,
+
 	63, 63, 63, 63, 63, 63, 63, 63, // Extra entries
 	63, 63, 63, 63, 63, 63, 63, 63
 };
 
 const ZESize ZeJpegZigZagToNaturalOrder5x5[5 * 5 + 16] = 
 {
-	 0,  1,  8, 16,  9,  2,  3, 10,
-	17, 24, 32, 25, 18, 11,  4, 12,
-	19, 26, 33, 34, 27, 20, 28, 35,
-	36,
+	 0,  1,  8,  16,  9, 
+	 2,  3,  10, 17,  24, 
+	 32, 25, 18, 11,  4, 
+	 12, 19, 26, 33,  34, 
+	 27, 20, 28, 35,  36,
+
 	63, 63, 63, 63, 63, 63, 63, 63, // Extra entries
 	63, 63, 63, 63, 63, 63, 63, 63
 };
 
 const ZESize ZeJpegZigZagToNaturalOrder4x4[4 * 4 + 16] = 
 {
-	 0,  1,  8, 16,  9,  2,  3, 10,
-	17, 24, 25, 18, 11, 19, 26, 27,
+	 0,  1,  8, 16,  
+	 9,  2,  3, 10,
+	17, 24, 25, 18, 
+	11, 19, 26, 27,
+	
 	63, 63, 63, 63, 63, 63, 63, 63, // Extra entries
 	63, 63, 63, 63, 63, 63, 63, 63
 };
 
 const ZESize ZeJpegZigZagToNaturalOrder3x3[3 * 3 + 16] = 
 {
-	 0,  1,  8, 16,  9,  2, 10, 17,
-	18,
+	 0,  1,  8, 
+	 16, 9,  2, 
+	 10, 17, 18,
+
 	63, 63, 63, 63, 63, 63, 63, 63, // Extra entries
 	63, 63, 63, 63, 63, 63, 63, 63
 };
 
 const ZESize ZeJpegZigZagToNaturalOrder2x2[2 * 2 + 16] = 
 {
-	 0,  1,  8,  9,
+	 0,  1,  
+	 8,  9,
+	
 	63, 63, 63, 63, 63, 63, 63, 63, // Extra entries
 	63, 63, 63, 63, 63, 63, 63, 63
+};
+
+const ZESize ZeJpegNaturalToZigZagOrder8x8[8][8] = 
+{
+	{0,  1,  5,  6,  14, 15, 27, 28},
+	{2,  4,  7,  13, 16, 26, 29, 42},
+	{3,  8,  12, 17, 25, 30, 41, 43},
+	{9,  11, 18, 24, 31, 40, 44, 53},
+	{10, 19, 23, 32, 39, 45, 52, 54},
+	{20, 22, 33, 38, 46, 51, 55, 60},
+	{21, 34, 37, 47, 50, 56, 59, 61},
+	{35, 36, 48, 49, 57, 58, 62, 63}
+};
+
+const ZESize ZeJpegNaturalToZigZagOrder7x7[7][7] = 
+{
+	{0,  1,  5,  6,  14, 15, 27},
+	{2,  4,  7,  13, 16, 26, 28},
+	{3,  8,  12, 17, 25, 29, 38},
+	{9,  11, 18, 24, 30, 37, 39},
+	{10, 19, 23, 31, 36, 40, 45},
+	{20, 22, 32, 35, 41, 44, 46},
+	{21, 33, 34, 42, 43, 47, 48}
+};
+
+const ZESize ZeJpegNaturalToZigZagOrder6x6[6][6] = 
+{
+	{0,  1,  5,  6,  14, 15}, 
+	{2,  4,  7,  13, 16, 25}, 
+	{3,  8,  12, 17, 24, 26}, 
+	{9,  11, 18, 23, 27, 32}, 
+	{10, 19, 22, 28, 31, 33}, 
+	{20, 21, 29, 30, 34, 35}
+};
+
+const ZESize ZeJpegNaturalToZigZagOrder5x5[5][5] = 
+{
+	{0,  1,  5,  6,  14}, 
+	{2,  4,  7,  13, 15}, 
+	{3,  8,  12, 16, 21}, 
+	{9,  11, 17, 20, 22}, 
+	{10, 18, 19, 23, 24}
+};
+
+const ZESize ZeJpegNaturalToZigZagOrder4x4[4][4] = 
+{
+	{0,  1,  5,  6 },  
+	{2,  4,  7,  12}, 
+	{3,  8,  11, 13}, 
+	{9,  10, 14, 15}
+};
+
+const ZESize ZeJpegNaturalToZigZagOrder3x3[3][3] = 
+{
+	{0,  1,  5}, 
+	{2,  4,  6}, 
+	{3,  7,  8}
+};
+
+const ZESize ZeJpegNaturalToZigZagOrder2x2[2][2] = 
+{
+	{0,  1},
+	{2,  3}
 };
 
 
@@ -534,7 +616,7 @@ struct ZEJpegDeCompressionInfo
 	ZEInt						ApproxBitPosLow;		// Al
 
 	ZEInt						DctBlockSize;
-	const ZEUInt16*				NaturalOrderPosArray;
+	const ZESize*				NaturalOrderPosArray;
 	ZEInt						SpectralSelectionEndLimit;
 
 	bool						SetDefaultParametes();
@@ -595,6 +677,18 @@ class ZEJpegDeuantizatizator
 
 };
 
+typedef struct ZEJpegBlock
+{
+	public:
+		 ZEUInt8	BlockData[ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT];
+
+		 void		ZeroBlock()
+		 {
+			 memset(BlockData, 0, sizeof(ZEUInt8) * ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT);
+		 }
+};
+
+
 #define		HUFFMAN_BIT_BUFFER_SIZE			32
 #define		HUFFMAN_BIT_BUFFER_MIN_LOAD		25
 
@@ -616,8 +710,8 @@ class HuffmanDecoderBitBuffer
 	public:
 		ZESize					GetAvailableBitCount() const;
 
-		bool					GetBits(ZEUInt32& Bit, ZEUInt32 BitCount);
-		bool					SeeBits(ZEUInt32& Bit, ZEUInt32 BitCount);
+		bool					GetBits(ZEInt32& Bit, ZEUInt32 BitCount);
+		bool					SeeBits(ZEInt32& Bit, ZEUInt32 BitCount);
 		bool					PassBits(ZEUInt32 BitCount);
 
 		void					Initialize(ZEJpegFileMarkerBuffer* MarkerBuffer);
@@ -653,42 +747,86 @@ const ZEUInt BitMask[16] =
 #define		HUFFMAN_LOOK_AHEAD_BITS		8
 
 // Bit access macro for ZEJpegHuffmanDecoder
-#define		BITMASK(NthBit)		BitMask[NthBit]
+#define		BITMASK(NthBit)					BitMask[NthBit]
+#define		EXTEND(ReadBits, BitCount)		( ( (ReadBits) <= BitMask[(BitCount) - 1] ) ? (ReadBits) - BitMask[(BitCount)] : (ReadBits) )
 
-// Can be used for only one jpeg per initialization
+struct ZEJpegDerivedHuffmanTable
+{
+	ZEJpegHuffmanTable*		OwnerHuffmanTable;
+
+	ZEInt32					MaxCodeLenght[18];	// -1 if not used
+	ZEInt32					ValueOffsets[17];
+
+	ZEInt					LookNBits[1 << HUFFMAN_LOOK_AHEAD_BITS];	/* # bits, or 0 if too long */
+	ZEUInt8					LookSymbol[1 << HUFFMAN_LOOK_AHEAD_BITS];	/* symbol, or unused */
+
+};
+
+// Can be used only for one jpeg per initialization
 class ZEJpegHuffmanDecoder
 {
 	private:
+		ZEJpegDeCompressionInfo*	Info;
 		HuffmanDecoderBitBuffer*	BitBuffer;
+	
+		// Used per scan
+		// --------------
+		ZEUInt						RestartMarkersLeft;
+		ZEJpegDerivedHuffmanTable*	CurrentAcDerivedTable;
+		// --------------
 
-		ZEInt						YTableDC[ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT];
-		ZEInt						YTableAC[ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT];
-		ZEInt						CromTableDC[ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT];
-		ZEInt						CromTableAC[ZE_JPEG_DCT_BLOCK_ELEMENT_COUNT];
+		// Used per image
+		// --------------
+		ZEUInt						SeenEobCount;
+		ZEInt						LastDcValue[ZE_JPEG_MAX_SCAN_COMPONENTS];
+		
+		ZEJpegDerivedHuffmanTable*	DerivedTables[ZE_JPEG_HUFF_TABLE_COUNT];
+		
+		ZEJpegDerivedHuffmanTable*	DerivedDcTables[ZE_JPEG_HUFF_TABLE_COUNT];
+		ZEJpegDerivedHuffmanTable*	DerivedAcTables[ZE_JPEG_HUFF_TABLE_COUNT];
+		// --------------
 
-		bool						UseDecodeMcuDcFirstTime;
-		bool						UseDecodeMcuAcFirstTime;
+		// Used per block
+		// --------------
+		ZEJpegDerivedHuffmanTable*	CurrentDcTables[ZE_JPEG_MAX_MCU_BLOCKS];
+		ZEJpegDerivedHuffmanTable*	CurrentAcTables[ZE_JPEG_MAX_MCU_BLOCKS];
 
-		bool						UseDecodeMcuDcRefine;
-		bool						UseDecodeMcuAcRefine;
+		ZESize						CoefficientLimits[ZE_JPEG_MAX_MCU_BLOCKS];
+		// --------------
 
-		bool						UseDecodeMcu;
-		bool						UseDecodeMcuSub;
+		// Decoding function to use
+		bool						(ZEJpegHuffmanDecoder::*DecodeFunction)(ZEJpegBlock* McuData);
+
+		
 
 									ZEJpegHuffmanDecoder();
 									~ZEJpegHuffmanDecoder();
 
-		bool						CreateTable(ZEJpegDeCompressionInfo* Info, ZEInt* Table, bool IsDc);
+									// Huffman bit decoding functions
+		bool						HuffmanDecode(ZEUInt8& Output, ZEJpegDerivedHuffmanTable* Table);
+		ZEInt						HuffmanDecodeFallBack(ZEJpegDerivedHuffmanTable* Table, ZEUInt32 NBits);
+		
+									// Jpeg MCU decoding functions
+		bool						MCUDecodeDcFirstTime(ZEJpegBlock* McuData);
+		bool						MCUDecodeAcFirstTime(ZEJpegBlock* McuData);
+
+		bool						MCUDecodeDcRefine(ZEJpegBlock* McuData);
+		bool						MCUDecodeAcRefine(ZEJpegBlock* McuData);
+
+		bool						MCUDecodeFullBlock(ZEJpegBlock* McuData);
+		bool						MCUDecodeSubBlock(ZEJpegBlock* McuData);
+
+									// Lookup table creation function
+		bool						CreateDerivedTable(ZEUInt TableId, ZEJpegDerivedHuffmanTable* Table, bool IsDc);
 
 	public:
-		static void					Decode(ZEJpegDeCompressionInfo* Info);
+		
 
 		void						Initialize(ZEJpegDeCompressionInfo* Info);
 		void						Deinitialize();
 
 		void						Destroy();
 		static ZEJpegHuffmanDecoder* CreateInstance();
-
 
 };
 
