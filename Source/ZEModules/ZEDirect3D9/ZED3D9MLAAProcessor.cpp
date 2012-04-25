@@ -44,7 +44,7 @@
 #include "ZED3D9FrameRenderer.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZED3D9MLAAProcessorAreaImage.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 #include <d3d9.h>
 

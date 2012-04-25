@@ -35,7 +35,7 @@
 
 #include "ZED3D9EDProcessor.h"
 #include "ZED3D9CommonTools.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9ViewPort.h"
 #include "ZED3D9Texture2D.h"

@@ -39,8 +39,8 @@
 #include "ZECore/ZEConsole.h"
 #include "ZEFile/ZEPartialFile.h"
 #include "ZEGraphics/ZEUIMaterial.h"
-#include "ZEGraphics/ZETexture2DResource.h"
-#include "ZEGraphics/ZETextureOptions.h"
+#include "ZETexture/ZETexture2DResource.h"
+#include "ZETexture/ZETextureOptions.h"
 #include "ZECore/ZEResourceManager.h"
 
 

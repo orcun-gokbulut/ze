@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIWindowControl.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 void ZEUIWindowTitleBarControl::MouseMoveEvent(const ZEVector2& MoveAmount)
 {

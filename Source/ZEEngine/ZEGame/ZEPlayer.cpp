@@ -279,7 +279,7 @@ void ZEPlayer::Deinitialize()
 	ZEActor::Deinitialize();
 }
 
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 ZEPlayer::ZEPlayer()
 {
 

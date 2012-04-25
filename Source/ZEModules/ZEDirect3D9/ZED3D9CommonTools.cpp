@@ -38,12 +38,12 @@
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9CommonTools.h"
-#include "ZEGraphics/ZETexture2DResource.h"
-#include "ZEGraphics/ZETextureCubeResource.h"
+#include "ZETexture/ZETexture2DResource.h"
+#include "ZETexture/ZETextureCubeResource.h"
 
 #include <d3dx9.h>
 #include <stdio.h>
-#include "ZEGraphics/ZETexture3DResource.h"
+#include "ZETexture/ZETexture3DResource.h"
 #include "ZED3D9Texture3D.h"
 
 #ifdef ZE_DEBUG_D3D9_DEBUG_SHADERS

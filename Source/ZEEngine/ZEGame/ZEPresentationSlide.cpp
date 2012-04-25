@@ -43,7 +43,7 @@
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 
 #include <string.h>

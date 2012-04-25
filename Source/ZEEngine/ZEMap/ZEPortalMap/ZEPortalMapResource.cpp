@@ -41,7 +41,7 @@
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEResource.h"
 #include "ZECore/ZEResourceManager.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
 

@@ -43,7 +43,7 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZED3D9BlurProcessor.h"
 #include "ZED3D9TextureResizeFilters.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 #include <d3d9.h>
 #include <stdlib.h>

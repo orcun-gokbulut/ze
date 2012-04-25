@@ -580,7 +580,7 @@ ZETextureData* ZETextureFileTGA::Load(ZEFile* File)
 
 #include <stdio.h>
 #include "ZECore/ZEProfilerCounter.h"
-#include "ZEGraphics/ZEBitmap.h"
+#include "ZETexture/ZEBitmap.h"
 
 void TestTGA(ZEString FileName)
 {

@@ -59,10 +59,10 @@ extern HINSTANCE ApplicationInstance;
 #include <string.h>
 #include <FreeImage.h>
 
-#include "ZEGraphics/ZEBitmap.h"
-#include "ZEGraphics/ZETextureData.h"
+#include "ZETexture/ZEBitmap.h"
+#include "ZETexture/ZETextureData.h"
 #include "ZEGraphics/ZETexture.h"
-#include "ZEGraphics/ZETextureTools.h"
+#include "ZETexture/ZETextureTools.h"
 
 ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, ZEInt nCmdShow)
 {

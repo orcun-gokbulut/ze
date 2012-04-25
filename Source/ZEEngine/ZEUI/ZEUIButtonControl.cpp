@@ -36,7 +36,7 @@
 #include "ZEUIButtonControl.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEUI/ZEUIRenderer.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
 {

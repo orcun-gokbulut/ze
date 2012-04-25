@@ -40,7 +40,7 @@
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 #include <memory.h>
 #include <string.h>

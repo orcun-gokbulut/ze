@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureResource.h
+ Zinek Engine - ZETexture2DResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,29 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TEXTURE_RESOURCE_H__
-#define __ZE_TEXTURE_RESOURCE_H__
+#ifndef	__ZE_TEXTURE_2D_RESOURCE_H__
+#define __ZE_TEXTURE_2D_RESOURCE_H__
 
-#include "ZECore/ZEResource.h"
-#include "ZEFile/ZEFile.h"
-#include "ZETexture.h"
-#include "ZETextureOptions.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZETextureResource.h"
 
-class ZEFileCacheManager
+class ZETexture2D;
+
+class ZETexture2DResource : public ZETextureResource
 {
-	public:
-		virtual void*						AddToCache();
-		virtual void*						GetFromCache();
-};
+	private:
+		ZETexture2D*						Texture;
 
-class ZETextureResource : public ZEResource
-{
+	protected:
+											ZETexture2DResource();
+		virtual 							~ZETexture2DResource();
+
 	public:
-		virtual ZETextureType				GetTextureType() const = 0;
+		const ZETexture2D*					GetTexture() const;
+		virtual const char*					GetResourceType() const;
+		virtual ZETextureType				GetTextureType() const;
+
+		static ZETexture2DResource*			LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		
+		static ZETexture2DResource*			LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static ZETexture2DResource*			LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
+
 };
 
 #endif
-
-
-
 

@@ -39,7 +39,7 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEDS/ZEString.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 #include "ZEParticle.h"
 
 class ZEParticleEmitter;

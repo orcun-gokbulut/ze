@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureCacheDataIdentifier.h
+ Zinek Engine - ZETextureResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
 #pragma once
-#ifndef __ZE_TEXTURE_CACHE_DATA_IDENTIFIER_H__
-#define __ZE_TEXTURE_CACHE_DATA_IDENTIFIER_H__
+#ifndef	__ZE_TEXTURE_RESOURCE_H__
+#define __ZE_TEXTURE_RESOURCE_H__
 
-#include "ZETypes.h"
+#include "ZECore/ZEResource.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEDefinitions.h"
-#include "ZEFile/ZEFileCache.h"
-#include "ZEGraphics/ZETextureOptions.h"
+#include "ZEGraphics/ZETexture.h"
+#include "ZETextureOptions.h"
 
-#include <stdio.h>
-
-class ZETextureCacheDataIdentifier : public ZECacheDataIdentifier
+class ZEFileCacheManager
 {
 	public:
-		char					ItemName[ZE_MAX_FILE_NAME_SIZE];
-		ZETextureOptions		TextureOptions;
-		ZEUInt64				Offset;
+		virtual void*						AddToCache();
+		virtual void*						GetFromCache();
+};
 
-								ZETextureCacheDataIdentifier();
-								ZETextureCacheDataIdentifier(const char* ItemName, const ZETextureOptions &TextureOptions, ZEUInt64 Offset = 0);
-		virtual					~ZETextureCacheDataIdentifier();
-
-
-		virtual	ZEUInt64		GetDataSize()const;
-		virtual ZEUInt64		GetHash() const;
-		virtual ZEUInt64		Write(ZEFile* File) const;
-		virtual bool			Equal(ZEFile* File) const;
+class ZETextureResource : public ZEResource
+{
+	public:
+		virtual ZETextureType				GetTextureType() const = 0;
 };
 
 #endif
+
+
+
+

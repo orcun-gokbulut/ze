@@ -35,53 +35,49 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-project(ZinekEngine)
+ze_add_source(ZEBitmap.cpp						Sources)
+ze_add_source(ZEBitmap.h						Sources Headers)
+ze_add_source(ZETextureResource.cpp				Sources)
+ze_add_source(ZETextureResource.h				Sources Headers)
+ze_add_source(ZETexture2DResource.cpp			Sources)
+ze_add_source(ZETexture2DResource.h				Sources Headers)
+ze_add_source(ZETexture3DResource.cpp			Sources)
+ze_add_source(ZETexture3DResource.h				Sources Headers)
+ze_add_source(ZETextureCubeResource.cpp			Sources)
+ze_add_source(ZETextureCubeResource.h			Sources Headers)
+ze_add_source(ZETextureCacheDataIdentifier.cpp	Sources)
+ze_add_source(ZETextureCacheDataIdentifier.h	Sources Headers)
+ze_add_source(ZETextureData.cpp					Sources)
+ze_add_source(ZETextureData.h					Sources Headers)
+ze_add_source(ZETextureFile.cpp					Sources)
+ze_add_source(ZETextureFile.h					Sources Headers)
+ze_add_source(ZETextureFileBMP.cpp				Sources)
+ze_add_source(ZETextureFileBMP.h				Sources Headers)
+ze_add_source(ZETextureFileFormat.cpp			Sources)
+ze_add_source(ZETextureFileFormat.h				Sources Headers)
+ze_add_source(ZETextureFileJPEG.cpp				Sources)
+ze_add_source(ZETextureFileJPEG.h				Sources Headers)
+ze_add_source(ZETextureFileTGA.cpp				Sources)
+ze_add_source(ZETextureFileTGA.h				Sources Headers)
+ze_add_source(ZETextureLoader.cpp				Sources)
+ze_add_source(ZETextureLoader.h					Sources Headers)
+ze_add_source(ZETextureOptions.cpp				Sources)
+ze_add_source(ZETextureOptions.h				Sources Headers)
+ze_add_source(ZETextureQualityManager.cpp		Sources)
+ze_add_source(ZETextureQualityManager.h			Sources Headers)
+ze_add_source(ZETextureTools.cpp				Sources)
+ze_add_source(ZETextureTools.h					Sources Headers)
 
-ze_set_project_folder("ZEEngine")
+ze_add_source(ZETextureFileBMPTest.h			Tests)
 
-set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
-
-append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
-	ZE_ZINEK_ENGINE)
-
-add_subdirectory(ZEAI)
-add_subdirectory(ZECore)
-add_subdirectory(ZEDebug)
-add_subdirectory(ZEGame)
-add_subdirectory(ZEGraphics)
-add_subdirectory(ZETexture)
-add_subdirectory(ZEInput)
-add_subdirectory(ZEMap)
-add_subdirectory(ZEMeta)
-add_subdirectory(ZEModel)
-add_subdirectory(ZEParticle)
-add_subdirectory(ZEPhysics)
-add_subdirectory(ZEScript)
-add_subdirectory(ZESound)
-add_subdirectory(ZEUI)
-add_subdirectory(ZETerrain)
-
-ze_add_source(ZEAPI.h 						Sources Headers)
-ze_add_source(ZECompileOptions.h 			Sources Headers)
-ze_add_source(ZEDefinitions.h 				Sources Headers)
-ze_add_source(ZESDK.h 						Sources Headers)
-ze_add_source(ZESDK.cpp 					Sources)
-
-
-ze_add_library(ZEEngineAPI 
+ze_add_library(ZETexture 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-		ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEMap ZEPortalMap ZEModel ZEParticle
-		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEAI ZETerrain ZETexture
+	LIBS ZEDS libATICompress libfreeimage
 	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI"
-	INSTALL_COMPONENT ZESDK)
-	
-ze_add_executable(ZE 
-	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
-	LIBS ZEEngineAPI
-	INSTALL
-	INSTALL_DESTINATION Bin
-	INSTALL_COMPONENT Runtime)
+	INSTALL_DESTINATION "ZEEngineAPI/ZETexture"
+	INSTALL_COMPONENT Header)
 
+ze_add_test(ZETextureTests 
+	SOURCES ${Tests}
+	TEST_TARGET ZETexture)

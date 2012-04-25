@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 
-#include "ZEBitmap.h"
+#include "ZETexture/ZEBitmap.h"
 #include "ZEGame/ZEGrid.h"
 #include "ZEGame/ZEGame.h"
 #include "ZEGame/ZEScene.h"
@@ -58,9 +58,9 @@
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZEGraphics/ZEDirectionalLight.h"
 #include "ZEMap/ZEPortalMap/ZEPortalMap.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 #include "ZEGraphics/ZEOmniProjectiveLight.h"
-#include "ZEGraphics/ZETextureCubeResource.h"
+#include "ZETexture/ZETextureCubeResource.h"
 
 
 #include <stdlib.h>

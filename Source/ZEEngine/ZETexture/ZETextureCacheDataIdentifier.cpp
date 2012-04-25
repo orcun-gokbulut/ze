@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
-#include "ZEGraphics/ZETextureCacheDataIdentifier.h"
+#include "ZETexture/ZETextureCacheDataIdentifier.h"
 
 
 ZETextureCacheDataIdentifier::ZETextureCacheDataIdentifier( )

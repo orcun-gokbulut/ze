@@ -35,7 +35,7 @@
 
 #include "ZEProjectiveLight.h"
 #include "ZETexture2D.h"
-#include "ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 #include "ZETextureCube.h"
 #include "ZEError.h"
 #include "ZEGame/ZEScene.h"
