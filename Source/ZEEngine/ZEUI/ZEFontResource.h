@@ -40,7 +40,7 @@
 #include "ZECore/ZEResource.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZERectangle.h"
-#include "ZEGraphics/ZETextureOptions.h"
+#include "ZETexture/ZETextureOptions.h"
 
 #define ZE_FONT_CHARACTER_COUNT				256
 

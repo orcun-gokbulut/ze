@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEPacking.h"
-#include "ZETexture.h"
+#include "ZEGraphics/ZETexture.h"
 #include "ZEDS/ZEArray.h"
 
 // Compressed Dxt1 Block Size

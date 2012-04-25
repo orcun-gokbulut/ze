@@ -42,8 +42,8 @@
 
 #include "ZEGraphicsModule.h"
 #include "ZEMaterialComponents.h"
-#include "ZETexture2DResource.h"
-#include "ZETextureCubeResource.h"
+#include "ZETexture/ZETexture2DResource.h"
+#include "ZETexture/ZETextureCubeResource.h"
 #include "ZETexture2D.h"
 #include "ZETextureCube.h"
 

@@ -38,7 +38,7 @@
 #include "ZEGraphics/ZECloudMaterial.h"
 #include "ZEDrawParameters.h"
 #include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 
 void ZECloud::SetAmbientColor(ZEVector3 Color)

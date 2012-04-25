@@ -39,7 +39,7 @@
 #include "ZEUI/ZEUIRenderer.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 #define ACTIONID_UP				0
 #define ACTIONID_DOWN			1

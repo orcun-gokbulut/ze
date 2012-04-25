@@ -37,7 +37,7 @@
 #include "ZECore/ZEOptionManager.h"
 #include "ZECore/ZEOption.h"
 #include "ZECore/ZECore.h"
-#include "ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 #include <freeimage.h>
 

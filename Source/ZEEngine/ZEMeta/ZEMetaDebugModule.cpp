@@ -37,7 +37,7 @@
 
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 #include "ZEGame/ZEGame.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGame/ZEPlayer.h"

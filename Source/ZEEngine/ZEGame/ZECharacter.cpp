@@ -42,7 +42,7 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEGraphics/ZEProjectiveLight.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 
 

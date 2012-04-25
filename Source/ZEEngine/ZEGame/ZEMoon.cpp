@@ -39,7 +39,7 @@
 #include "ZEDrawParameters.h"
 #include "ZEGraphics\ZERenderer.h"
 #include "ZEGraphics\ZEMoonMaterial.h"
-#include "ZEGraphics\ZETexture3DResource.h"
+#include "ZETexture\ZETexture3DResource.h"
 
 
 void ZEMoon::SetMoonPhase(float Phase)

@@ -37,9 +37,9 @@
 #include "ZEFile/ZEFile.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEResourceManager.h"
-#include "ZEGraphics/ZETextureTools.h"
+#include "ZETextureTools.h"
 #include "ZEGraphics/ZETexture2D.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture2DResource.h"
 #include "ZEModules/ZEDirect3D9/ZED3D9TextureResizer.h"
 
 #include <windows.h>

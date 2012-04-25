@@ -40,7 +40,7 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZESkyBoxMaterial.h"
 #include "ZEGraphics/ZEDirectionalLight.h"
-#include "ZEGraphics/ZETextureCubeResource.h"
+#include "ZETexture/ZETextureCubeResource.h"
 
 
 #include <string.h>

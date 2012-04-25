@@ -35,11 +35,11 @@
 
 #include "ZEError.h"
 #include "ZEFile/ZEFile.h"
-#include "ZETextureOptions.h"
+#include "ZETexture/ZETextureOptions.h"
 #include "ZEMaterialResource.h"
-#include "ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 #include "ZEMaterialFileFormat.h"
-#include "ZETextureCubeResource.h"
+#include "ZETexture/ZETextureCubeResource.h"
 #include "ZECore/ZEResourceManager.h"
 
 #include <string.h>

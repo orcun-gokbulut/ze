@@ -37,8 +37,7 @@ cmake_minimum_required(VERSION 2.8)
 
 add_subdirectory(ZEPostProcessor)
 
-ze_add_source(ZEBitmap.cpp							Sources)
-ze_add_source(ZEBitmap.h							Sources Headers)
+
 ze_add_source(ZECamera.cpp							Sources)
 ze_add_source(ZECamera.h							Sources Header ZEPP)
 ze_add_source(ZECanvas.cpp							Sources)
@@ -92,34 +91,10 @@ ze_add_source(ZETexture.cpp 						Sources)
 ze_add_source(ZETexture.h 							Sources Headers)
 ze_add_source(ZETexture2D.cpp						Sources)
 ze_add_source(ZETexture2D.h 						Sources Headers)
-ze_add_source(ZETexture2DResource.cpp		 		Sources)
-ze_add_source(ZETexture2DResource.h					Sources Headers)
 ze_add_source(ZETexture3D.cpp 						Sources)
 ze_add_source(ZETexture3D.h 						Sources Headers)
-ze_add_source(ZETexture3DResource.cpp				Sources)
-ze_add_source(ZETexture3DResource.h					Sources Headers)
 ze_add_source(ZETextureCube.cpp 					Sources)
 ze_add_source(ZETextureCube.h 						Sources Headers)
-ze_add_source(ZETextureCubeResource.cpp				Sources)
-ze_add_source(ZETextureCubeResource.h 				Sources Headers)
-ze_add_source(ZETextureData.cpp 					Sources)
-ze_add_source(ZETextureData.h 						Sources Headers)
-ze_add_source(ZETextureFileFormat.cpp 				Sources)
-ze_add_source(ZETextureFileFormat.h 				Sources Headers)
-ze_add_source(ZETextureResource.cpp					Sources)
-ze_add_source(ZETextureResource.h 					Sources Headers)
-
-ze_add_source(ZETextureFile.cpp						Sources)
-ze_add_source(ZETextureFile.h						Sources Headers)
-ze_add_source(ZETextureFileBMP.cpp					Sources)
-ze_add_source(ZETextureFileBMP.h					Sources)
-ze_add_source(ZETextureFileBMPTest.cpp				Tests)
-ze_add_source(ZETextureFileTGA.cpp					Sources)
-ze_add_source(ZETextureFileTGA.h					Sources)
-
-ze_add_source(ZETextureFileJPEG.cpp					Sources)
-ze_add_source(ZETextureFileJPEG.h					Sources Headers)
-
 ze_add_source(ZEUIMaterial.cpp 						Sources)
 ze_add_source(ZEUIMaterial.h 						Sources Headers)
 ze_add_source(ZEVertexBuffer.cpp 					Sources)
@@ -130,19 +105,12 @@ ze_add_source(ZEVertexTypes.cpp 					Sources)
 ze_add_source(ZEVertexTypes.h 						Sources Headers)
 ze_add_source(ZEViewPort.cpp 						Sources)
 ze_add_source(ZEViewPort.h 							Sources Headers)
-ze_add_source(ZETextureLoader.cpp					Sources)
-ze_add_source(ZETextureLoader.h						Sources Headers)
-ze_add_source(ZETextureTools.cpp					Sources)		
-ze_add_source(ZETextureTools.h						Sources Headers)
-ze_add_source(ZETextureCacheDataIdentifier.cpp		Sources)
-ze_add_source(ZETextureCacheDataIdentifier.h		Sources Headers)
-ze_add_source(ZETextureQualityManager.cpp			Sources)
-ze_add_source(ZETextureQualityManager.h				Sources Headers)
+
 
 ze_add_library(ZEGraphics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEDS libATICompress libfreeimage
+	LIBS ZEDS
 	INSTALL
 	INSTALL_DESTINATION "ZEEngineAPI/ZEGraphics"
 	INSTALL_COMPONENT Header)

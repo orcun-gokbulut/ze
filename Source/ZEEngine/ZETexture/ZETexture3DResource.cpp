@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
-#include "ZETexture3D.h"
-#include "ZEGraphicsModule.h"
+#include "ZEGraphics/ZETexture3D.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZETexture3DResource.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZEFile/ZEFile.h"

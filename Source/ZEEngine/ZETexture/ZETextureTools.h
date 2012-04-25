@@ -38,11 +38,11 @@
 #define __ZE_TEXTURE_TOOLS_H__
 
 #include "ZETypes.h"
-#include "ZETextureOptions.h"
-#include "ZEGraphicsModule.h"
-#include "ZETextureResource.h"
-#include "ZEGraphics/ZETexture2DResource.h"
-#include "ZEGraphics/ZETextureLoader.h"
+#include "ZETexture/ZETextureOptions.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZETexture/ZETextureResource.h"
+#include "ZETexture/ZETexture2DResource.h"
+#include "ZETexture/ZETextureLoader.h"
 
 class ZETexture2D;
 

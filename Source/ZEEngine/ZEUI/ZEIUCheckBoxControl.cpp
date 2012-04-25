@@ -36,7 +36,7 @@
 #include "ZEIUCheckBoxControl.h"
 #include "ZEFontResource.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZETexture/ZETexture2DResource.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 
 void ZEUICheckBoxControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
