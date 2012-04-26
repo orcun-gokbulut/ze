@@ -35,7 +35,7 @@
 
 
 #include "ZEDS/ZEFlags.h"
-#include "ZETest.h"
+#include "ZETest/ZETest.h"
 
 ZETestSuite(ZEFlags)
 {

@@ -114,7 +114,3 @@ ze_add_library(ZEGraphics
 	INSTALL
 	INSTALL_DESTINATION "ZEEngineAPI/ZEGraphics"
 	INSTALL_COMPONENT Header)
-
-ze_add_test(ZEGraphicsTests 
-	SOURCES ${Tests}
-	TEST_TARGET ZEGraphics)

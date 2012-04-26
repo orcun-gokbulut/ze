@@ -42,6 +42,12 @@
 #include <stdlib.h>
 #endif
 
+enum ZEEndianType
+{
+	ZE_ET_LITTLE,
+	ZE_ET_BIG
+};
+
 class ZEEndian
 {
 	public:
@@ -223,6 +229,15 @@ class ZEEndian
 			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
 				return Value;
 			#endif
+		}
+
+		template<typename ZEType>
+		static inline ZEType Uni(ZEType Value, ZEEndianType Endianness)
+		{
+			if (Endianness == ZE_ET_BIG)
+				return ZEEndian::Big(Value);
+			else
+				return ZEEndian::Little(Value);
 		}
 };
 

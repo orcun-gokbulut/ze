@@ -41,6 +41,7 @@
 #include "ZETextureData.h"
 #include "ZEDS/ZEPointer.h"
 #include "ZEFile/ZEFile.h"
+#include "ZETexturePixelConverter.h"
 
 #define ZE_TIT_TYPE_MASK				0x03
 #define ZE_TIT_NO_IMAGE					0x00
@@ -111,155 +112,43 @@ static inline ZESize GetPixelSize(ZEUInt8 BPP)
 	}
 }
 
-static __forceinline void ConvertRow15(ZEARGB32* Destination, ZEUInt8* Source, ZESize Width)
-{
-	ZEARGB32* End = Destination + Width;
-	while(Destination < End)
-	{
-		#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
-			Destination->R = *(ZEUInt16*)Source >> 7;
-			Destination->G = *(ZEUInt16*)Source >> 2;
-			Destination->B = *(ZEUInt16*)Source & 0xF8;
-			Destination->A = 255;			
-		#else		
-			Destination->R = (Source[1] << 1) & 0xF8;
-			Destination->G = ((Source[1] << 6) | (Source[0] >> 2)) & 0xF8; 
-			Destination->B = Source[0] << 3;
-			Destination->A = 255;
-		#endif
-		Source += 2;
-		Destination++;
-	}
-}
-
-static void ConvertRow16(ZEARGB32* Destination, ZEUInt8* Source, ZESize Width)
-{
-	ZEARGB32* End = Destination + Width;
-	while(Destination < End)
-	{
-		#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
-			Destination->R = (*(ZEUInt16*)Source >> 7) & 0xF8;
-			Destination->G = (*(ZEUInt16*)Source >> 2) & 0xF8;
-			Destination->B = *(ZEUInt16*)Source & 0xF8;
-			Destination->A = 255;			
-		#else
-			Destination->R = (Source[1] << 1) & 0xF8;
-			Destination->G = ((Source[1] << 6) | (Source[0] >> 2)) & 0xF8; 
-			Destination->B = Source[0] << 3;
-			Destination->A = 255;
-		#endif
-		Destination++;
-		Source += 2;
-	}
-}
-
-static __forceinline void ConvertRow24(ZEARGB32* Destination, ZEUInt8* Source, ZESize Width)
-{
-	ZEARGB32* End = Destination + Width;
-	while(Destination < End)
-	{
-		#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
-			*(ZEUInt32*)Destination  = *(ZEUInt32*)Source;
-			Destination[3].A = 255;
-		#else
-			Destination->B = Source[0];
-			Destination->G = Source[1];
-			Destination->R = Source[2];
-			Destination->A = 255;
-		#endif
-		
-		Destination++;
-		Source += 3;
-	}
-}
-
-static __forceinline void ConvertRow32(ZEARGB32* Destination, ZEUInt8* Source, ZESize Width)
-{
-	ZEARGB32* End = Destination + Width;
-	while(Destination < End)
-	{
-		#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
-			*(ZEUInt32*)Destination  = *(ZEUInt32*)Source;
-		#else
-			Destination->B = Source[0];
-			Destination->G = Source[1];
-			Destination->R = Source[2];
-			Destination->A = 255;
-		#endif
-		Source += 4;
-		Destination++;
-	}
-
-}
-
-static __forceinline void ConvertRowGrayScale8(ZEARGB32* Destination, ZEUInt8* Source, ZESize Width)
-{
-	for (ZESize I = 0; I < Width; I++)
-		((ZEUInt32*)Destination)[I] = (0xFF000000 | (ZEUInt32)Source[I] << 8 | (ZEUInt32)Source[I] << 8 | Source[I]);
-}
-
-static __forceinline void ConvertRowGrayScale16(ZEARGB32* Destination, ZEUInt8* Source, ZESize Width)
-{
-	for (ZESize I = 0; I < Width; I++)
-	{
-		ZEUInt16 Value = *(ZEUInt16*)Source >> 8;
-		((ZEUInt32*)Destination)[I] = (0xFF000000 | (ZEUInt32)Value << 16 | (ZEUInt32)Value << 8 | Value);
-	}
-}
-
-
-static __forceinline void ConvertRowGrayScale32(ZEARGB32* Destination, ZEUInt8* Source, ZESize Width)
-{
-	for (ZESize I = 0; I < Width; I++)
-	{
-		ZEUInt32 Value = *(ZEUInt32*)Source >> 24;
-		((ZEUInt32*)Destination)[I] = (0xFF000000 | Value << 16 | Value << 8 | Value);
-	}
-}
-
-
 static __forceinline void ConvertColorRow(ZEARGB32* Destination, ZEUInt8* Source, ZESize BPP, ZESize Width)
 {
 	switch(BPP)
 	{
 		case 15:
-			ConvertRow15(Destination, Source,  Width);
+			ZETexturePixelConverter::ConvertBGR15(Destination, Source,  Width);
 			break;
 
 		case 16:
-			ConvertRow16(Destination, Source, Width);
+			ZETexturePixelConverter::ConvertBGR16(Destination, Source, Width);
 			break;
 
 		case 24:
-			ConvertRow24(Destination, Source,  Width);
+			ZETexturePixelConverter::ConvertBGR24(Destination, Source,  Width);
 			break;
 
 		case 32:
-			ConvertRow32(Destination, Source, Width);
+			ZETexturePixelConverter::ConvertBGRA32(Destination, Source, Width);
 			break;
 	}
 }
 
-static __forceinline void ConvertIndexedRow(ZEARGB32* Destination, ZEUInt8* Source, ZESize Width, ZEARGB32* Palette)
-{
-	for (ZESize N = 0; N < Width; N++)
-		Destination[N] = Palette[Source[N]];	
-}
 
 static __forceinline void ConvertGrayscaleRow(ZEARGB32* Destination, ZEUInt8* Source, ZESize BPP, ZESize Width)
 {
 	switch(BPP)
 	{
 		case 8:
-			ConvertRowGrayScale8(Destination, Source, Width);
+			ZETexturePixelConverter::ConvertG8(Destination, Source, Width);
 			break;
 
 		case 16:
-			ConvertRowGrayScale16(Destination, Source, Width);
+			ZETexturePixelConverter::ConvertG16(Destination, Source, Width);
 			break;
 
 		case 32:
-			ConvertRowGrayScale32(Destination, Source, Width);
+			ZETexturePixelConverter::ConvertG32(Destination, Source, Width);
 			break;
 	}
 }
@@ -372,7 +261,7 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEARGB32* Pa
 			for (ZESize I = 0; I < Height; I++)
 			{
 				LoadRow(SourceRow, File, Header);
-				ConvertIndexedRow(DestinationRow, SourceRow, Width, Palette);
+				ZETexturePixelConverter::ConvertIndexed(DestinationRow, SourceRow, Width, Palette);
 				DestinationRow += DestinationRowStep;
 			}
 		}
@@ -412,7 +301,7 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEARGB32* Pa
 		{
 			for (ZESize I = 0; I < Height; I++)
 			{
-				ConvertIndexedRow(DestinationRow, SourceRow, Width, Palette);
+				ZETexturePixelConverter::ConvertIndexed(DestinationRow, SourceRow, Width, Palette);
 				DestinationRow += DestinationRowStep;
 				SourceRow += SourceRowStep;
 			}
@@ -617,56 +506,3 @@ void TestTGA(ZEString FileName)
 	Bitmap.CopyFrom(Level->GetData(), Level->GetPitch(), Level->GetWidth(), Level->GetHeight());
 	Bitmap.Save(FileName + ".result.bmp", ZE_BFF_BMP);
 }
-/*
-ZEInt main()
-{
-	/*for(int I = 0; I < 100; I++)
-		TestBMP_("C:\\a.bmp");
-
-	//for (int I = 0; I < 10000; I++)
-	//{
-		TestBMP("C:\\a.bmp");
-		TestBMP("c:\\32bpp-topdown-320x240.bmp");
-		TestBMP("c:\\test16.bmp");
-		TestBMP("c:\\test16bf555.bmp");
-		TestBMP("c:\\test16bf565.bmp");
-		TestBMP("c:\\test24.bmp");
-		TestBMP("c:\\test32.bmp");
-		TestBMP("c:\\test32bf.bmp");
-		//TestBMP("c:\\test32bfv4.bmp");
-		//TestBMP("c:\\test32v5.bmp");
-		TestBMP("c:\\test8.bmp");
-		TestBMP("c:\\testcompress8.bmp")
-		//TestBMP("c:\\trans.bmp");
-	/*}
-
-	TestTGA("c:\\test\\CBW8.TGA");
-	TestTGA("c:\\test\\CCM8.TGA");
-	TestTGA("c:\\test\\CTC16.TGA");
-	TestTGA("c:\\test\\CTC24.TGA");
-	TestTGA("c:\\test\\CTC32.TGA");
-	/*TestTGA("c:\\FLAG_B16.TGA");
-	TestTGA("c:\\FLAG_B24.TGA");
-
-	TestTGA("c:\\FLAG_T16.TGA");
-	TestTGA("c:\\FLAG_T32.TGA");*/
-	/*TestTGA("c:\\MARBLES.TGA");
-	TestTGA("c:\\UBW8.TGA");
-	TestTGA("c:\\UCM8.TGA");
-	TestTGA("c:\\UTC16.TGA");
-	TestTGA("c:\\UTC24.TGA");
-	TestTGA("c:\\UTC32.TGA");
-	TestTGA("c:\\XING_B16.TGA");
-	TestTGA("c:\\XING_B24.TGA");
-	TestTGA("c:\\XING_B32.TGA");
-	TestTGA("c:\\XING_T16.TGA");
-	TestTGA("c:\\XING_T24.TGA");
-	TestTGA("c:\\XING_T32.TGA");
-
-	//TestTGA("c:\\FLAG_B32.TGA");
-
-	//TestTGA("c:\\Big24Color.tga");
-
-
-	exit(0);
-};*/

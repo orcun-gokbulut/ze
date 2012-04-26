@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMath/ZEMath.h"
-#include "ZETest.h"
+#include "ZETest/ZETest.h"
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"

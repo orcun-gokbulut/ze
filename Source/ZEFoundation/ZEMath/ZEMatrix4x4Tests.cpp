@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 
-#include "ZETest.h"
+#include "ZETest/ZETest.h"
 #include <d3dx9.h>
 #include "ZEMath/ZEMath.h"
 #include "ZEMathIOStreamMapping.h"
