@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERectangleTests.cpp
+ Zinek Engine - ZETextureFileTIFF.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,89 +33,18 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-/*#include "ZETest/ZETest.h"
-#include "ZEMathIOStreamMapping.h"
-#include "ZEMath/ZERectangle.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEMath.h"
 
-ZETestSuite(Rectangle)
+#pragma once
+#ifndef __ZE_TEXTURE_FILE_TIFF_H__
+#define __ZE_TEXTURE_FILE_TIFF_H__
+
+#include "ZETextureFile.h"
+
+class ZETextureFileTIFF : public ZETextureFile
 {
+	public:
+		virtual bool				CanLoad(ZEFile* File);
+		virtual ZETextureData*		Load(ZEFile* File);
+};
 
-	ZETest("RECT_Constructor")
-	{
-		ZEVector2 LU(1.0f, 4.0f);
-		ZEVector2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-		ZETestCheckEqual(R.LeftUp, ZEVector2(1.0f, 4.0f));
-		ZETestCheckEqual(R.RightDown, ZEVector2(3.0f, 2.0f));
-
-		ZERectangle R2(LU, 2.0f, 2.0f);
-		ZETestCheckEqual(R2.LeftUp, ZEVector2(1.0f, 4.0f));
-		ZETestCheckEqual(R2.RightDown, ZEVector2(3.0f, 2.0f));
-
-
-
-	}
-
-	ZETest("RECT_BoundingTest")
-	{
-		ZEVector2 LU(1.0f, 4.0f);
-		ZEVector2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-
-		ZEVector2 P(2.0f, 3.0f);
-		bool result = R.BoundingTest(P);
-		CHECK_EQUAL(result, true);
-
-		ZEVector2 P2(0.0f, 0.0f);
-		bool result2 = R.BoundingTest(P2);
-		CHECK_EQUAL(result2, false);
-
-		ZEVector2 P3(2.0f, 2.0f);
-		bool result3 = R.BoundingTest(P3);
-		CHECK_EQUAL(result3, true);
-	}
-
-	ZETest("RECT_GetCorner")
-	{
-		ZEVector2 LU(1.0f, 4.0f);
-		ZEVector2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-
-		ZEVector2 C1 = R.GetCorner(ZE_RC_LEFTDOWN);
-		ZEVector2 C2 = R.GetCorner(ZE_RC_LEFTUP);
-		ZEVector2 C3 = R.GetCorner(ZE_RC_RIGHTDOWN);
-		ZEVector2 C4 = R.GetCorner(ZE_RC_RIGHTUP);
-
-		ZETestCheckEqual(C1, ZEVector2(1.0f, 2.0f));
-		ZETestCheckEqual(C2, ZEVector2(1.0f, 4.0f));
-		ZETestCheckEqual(C3, ZEVector2(3.0f, 2.0f));
-		ZETestCheckEqual(C4, ZEVector2(3.0f, 4.0f));
-
-	}
-
-	ZETest("RECT_GetWidth")
-	{
-		ZEVector2 LU(1.0f, 4.0f);
-		ZEVector2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-
-		float w = R.GetWidth();
-
-		ZETestCheckEqual(w, 2.0f);
-
-	}
-
-	ZETest("RECT_GetHeight")
-	{
-		ZEVector2 LU(1.0f, 4.0f);
-		ZEVector2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-
-		float h = R.GetHeight();
-
-		ZETestCheckEqual(h, 2.0f);
-
-	}
-}*/
+#endif

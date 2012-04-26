@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 
-#include "ZETest.h"
+#include "ZETest/ZETest.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEDS/ZEString.h"
 #include <stdio.h>

@@ -35,7 +35,7 @@
 
 #include "ZEFileCache.h"
 #include "ZEFile.h"
-#include "ZETest.h"
+#include "ZETest/ZETest.h"
 #include "ZETDefinitions.h"
 #include "ZETypes.h"
 #include "ZEError.h"

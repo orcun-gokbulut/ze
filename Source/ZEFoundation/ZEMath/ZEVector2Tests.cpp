@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETest.h"
+#include "ZETest/ZETest.h"
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMath.h"

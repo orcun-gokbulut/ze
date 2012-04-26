@@ -35,7 +35,7 @@
 
 
 #include "ZEVariant.h"
-#include "ZETest.h"
+#include "ZETest/ZETest.h"
 #include "ZEString.h"
 #include "ZETypedVariant.h"
 #include "ZEMath/ZEQuaternion.h"

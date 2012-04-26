@@ -35,7 +35,7 @@
 
 #include "ZEDS/ZEString.h"
 #include <String>
-#include "ZETest.h"
+#include "ZETest/ZETest.h"
 
 ZETestSuite(ZEString)
 {

@@ -35,7 +35,7 @@
 
 
 #include "ZEDS/ZEArray.h"
-#include "ZETest.h"
+#include "ZETest/ZETest.h"
 
 ZEInt Compare(const ZEInt *F, const ZEInt *E)
 {
