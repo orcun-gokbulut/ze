@@ -324,7 +324,7 @@ ZED3D9FogProcessor::ZED3D9FogProcessor()
 	FogDistanceNear			= 20.0f;
 	FogVisibility			= 0.1f;
 
-	FogModel				= ZE_D3D9_FM_EXPONENTIAL_SQUARE;
+	FogModel				= ZE_D3D9_FM_LINEAR;
 
 	OutScatterFactor		= ZEVector3(0.003f, 0.003f, 0.003f);
 	InScatterFactor			= ZEVector3(0.003f, 0.003f, 0.003f);
