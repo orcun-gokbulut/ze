@@ -1231,6 +1231,19 @@ ZETextureAddressMode ZEFixedMaterial::GetDistortionMapAddressModeV() const
 	return DistortionMapAddressModeV; 
 }
 
+void ZEFixedMaterial::SetVertexColorEnabled(bool Enabled)
+{
+	if (Enabled)
+		MaterialComponents |= ZE_SHADER_VERTEX_COLOR;
+	else
+		MaterialComponents &= ~ZE_SHADER_VERTEX_COLOR;
+}
+
+bool ZEFixedMaterial::GetVertexColorEnabled()
+{
+	return (MaterialComponents & ZE_SHADER_VERTEX_COLOR) != 0;
+}
+
 ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
 {
 	return zeGraphics->CreateFixedMaterial();

@@ -345,10 +345,10 @@ void ZEParticleColorOverLifeModifier::Tick(float ElapsedTime)
 			float TotalLife_Life = CurrentParticle->Life / CurrentParticle->TotalLife;
 			float LerpFactor = 1.0f - TotalLife_Life;
 
-			CurrentParticle->Color.x = CurrentParticle->Color.x + (ToColor.x - CurrentParticle->Color.x) * LerpFactor;
-			CurrentParticle->Color.y = CurrentParticle->Color.y + (ToColor.y - CurrentParticle->Color.y) * LerpFactor;
-			CurrentParticle->Color.z = CurrentParticle->Color.z + (ToColor.z - CurrentParticle->Color.z) * LerpFactor;
-			CurrentParticle->Color.w = CurrentParticle->Color.w + (ToColor.w - CurrentParticle->Color.w) * LerpFactor;
+			CurrentParticle->Color.x = CurrentParticle->InitialColor.x + (ToColor.x - CurrentParticle->InitialColor.x) * LerpFactor;
+			CurrentParticle->Color.y = CurrentParticle->InitialColor.y + (ToColor.y - CurrentParticle->InitialColor.y) * LerpFactor;
+			CurrentParticle->Color.z = CurrentParticle->InitialColor.z + (ToColor.z - CurrentParticle->InitialColor.z) * LerpFactor;
+			CurrentParticle->Color.w = CurrentParticle->InitialColor.w + (ToColor.w - CurrentParticle->InitialColor.w) * LerpFactor;
 		}
 	}
 }
@@ -428,7 +428,11 @@ void ZEParticleDisplacementModifier::Tick(float ElapsedTime)
 
 	for (ZESize I = 0; I < ParticleCount; I++)
 	{
-		Particles[I].Position += Displacement * ElapsedTime;
+		ZEVector3 RandomedDisplacement;
+		RandomedDisplacement.x = RAND_BETWEEN_TWO_FLOAT(Displacement.x * 0.9f, Displacement.x * 1.1f);
+		RandomedDisplacement.y = RAND_BETWEEN_TWO_FLOAT(Displacement.y * 0.9f, Displacement.y * 1.1f);
+		RandomedDisplacement.z = RAND_BETWEEN_TWO_FLOAT(Displacement.z * 0.9f, Displacement.z * 1.1f);
+		Particles[I].Position += RandomedDisplacement * ElapsedTime;
 	}
 }
 
