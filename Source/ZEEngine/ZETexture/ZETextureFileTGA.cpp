@@ -148,7 +148,7 @@ static __forceinline void ConvertGrayscaleRow(ZEARGB32* Destination, ZEUInt8* So
 			break;
 
 		case 32:
-			ZETexturePixelConverter::ConvertG32(Destination, Source, Width);
+			ZETexturePixelConverter::ConvertGA32(Destination, Source, Width);
 			break;
 	}
 }
@@ -465,44 +465,4 @@ ZETextureData* ZETextureFileTGA::Load(ZEFile* File)
 		zeError("Can not load TGA file.");
 
 	return Texture;
-}
-
-#include <stdio.h>
-#include "ZECore/ZEProfilerCounter.h"
-#include "ZETexture/ZEBitmap.h"
-
-void TestTGA(ZEString FileName)
-{
-	ZEProfilerCounter A;
-	zeLog("Testing file: %s", FileName.ToCString());
-	ZETextureFileTGA Loader;
-
-	A.Start();
-	ZEPointer<ZEFile> File = ZEFile::Open(FileName);
-	ZETextureData* Data = Loader.Load(File);
-	File->Close();
-	A.Stop();
-	ZEUInt64 TotalTimeA = A.GetFrameTotalTime();
-
-	ZEProfilerCounter B;
-	ZEBitmap Temp;
-
-	B.Start();
-	Temp.Load(FileName);
-	B.Stop();
-
-	ZEUInt64 TotalTimeB = B.GetFrameTotalTime();
-
-
-	zeLog("File : %s, Zinek : %llu, FreeImage : %llu, Ratio : %f", FileName.ToCString(), TotalTimeA, TotalTimeB, (float)TotalTimeA / (float)TotalTimeB);
-
-	if (Data == NULL)
-		zeCriticalError("Failed");
-
-	ZETextureLevel* Level = &Data->GetSurfaces()[0].GetLevels()[0];
-
-	ZEBitmap Bitmap;
-	Bitmap.Create(Level->GetWidth(), Level->GetHeight(), 4);
-	Bitmap.CopyFrom(Level->GetData(), Level->GetPitch(), Level->GetWidth(), Level->GetHeight());
-	Bitmap.Save(FileName + ".result.bmp", ZE_BFF_BMP);
 }

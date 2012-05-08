@@ -39,9 +39,95 @@
 #define __ZE_TEXTURE_FILE_TIFF_H__
 
 #include "ZETextureFile.h"
+#include "ZETextureData.h"
+#include "ZEPacking.h"
+#include "ZETypes.h"
+#include "ZEEndian.h"
+#include "ZEDS/ZEArray.h"
+
+ZEPackStruct
+(
+	struct ZETIFFHeader
+	{
+		ZEUInt16		Endianness;
+		ZEUInt16		Identifier;
+		ZEUInt32		EntryListOffset;
+	};
+);
+
+ZEPackStruct
+(
+	struct ZETIFFEntry
+	{
+		ZEUInt16		Id;
+		ZEUInt16		Type;
+		ZEUInt32		Count;
+		ZEUInt8			Value[8];
+	};
+);
+
+enum ZETIFFChunkType
+{
+	ZE_TIFF_CT_STRIP,
+	ZE_TIFF_CT_TILE
+};
+
+enum ZETIFFCompressionType
+{
+	ZE_TIFF_CT_UNCOMPRESSED = 0,
+	ZE_TIFF_CT_PACKBIT = 32773,
+	ZE_TIFF_CT_LZW = 5
+};
+
+enum ZETIFFPixelFormat
+{
+	ZE_TIFF_PT_NONE,
+	ZE_TIFF_PT_INDEXED,
+	ZE_TIFF_PT_G8,
+	ZE_TIFF_PT_G16, // Will be supported
+	ZE_TIFF_PT_GA16, // Will be supported
+	ZE_TIFF_PT_GA32,
+	ZE_TIFF_PT_RGB24,
+	ZE_TIFF_PT_RGBA32,
+	ZE_TIFF_PT_RGB48, // Will be supported
+	ZE_TIFF_PT_RGB64 // Will be supported
+};
+
+struct ZETIFFInfo
+{
+	ZEEndianness			Endianness;
+	ZESize					Width;
+	ZESize					Height;
+	ZETIFFCompressionType	Compression;
+	ZETIFFPixelFormat		PixelFormat;
+
+	ZETIFFChunkType			ChunkType;
+	ZESize					ChunkWidth;
+	ZESize					ChunkHeight;
+	ZETIFFEntry				ChunkOffsetsEntry;
+	ZETIFFEntry				ChunkSizesEntry;
+	ZEArray<ZEUInt32>		ChunkOffsets;
+	ZEArray<ZEUInt32>		ChunkSizes;
+
+	ZETIFFEntry				PaletteEntry;
+	ZEARGB32				Palette[256];
+};
 
 class ZETextureFileTIFF : public ZETextureFile
 {
+	private:
+		static bool					UncompressPackBit(void* Destination, ZESize DestinationSize, void* Source, ZESize SourceSize);
+		static bool					UncompressLZW(void* Destination, ZESize DestinationSize, void* Source, ZESize SourceCount);
+
+		static bool					LoadEntryArray(ZEArray<ZEUInt32> Output, ZETIFFEntry* Entry, ZEFile* File, ZEEndianness Endianness);
+		static ZESize				LoadEntryArray(ZEUInt32* Output, ZESize OutputSize, ZETIFFEntry* Entry, ZEFile* File, ZEEndianness Endianness);
+		static ZEUInt				LoadEntry(ZETIFFEntry* Entry, ZEEndianness Endian);
+
+		static bool					LoadHeader(ZEFile* File, ZETIFFInfo* Info);
+		static bool					LoadPalette(ZEFile*, ZETIFFInfo* Info);
+		static bool					LoadStripOffsets(ZEFile* File, ZETIFFInfo* Info);
+		static ZETextureData*		LoadData(ZEFile* File, ZETIFFInfo* Info);
+
 	public:
 		virtual bool				CanLoad(ZEFile* File);
 		virtual ZETextureData*		Load(ZEFile* File);

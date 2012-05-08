@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETexturePixelConverter.h
+ Zinek Engine - ZEDecompressorLZW.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,44 +35,82 @@
 
 
 #pragma once
-#ifndef __ZE_TEXTURE_PIXEL_CONVERTER_H__
-#define __ZE_TEXTURE_PIXEL_CONVERTER_H__
+#ifndef __ZE_LZW_DECOMPRESSOR_H__
+#define __ZE_LZW_DECOMPRESSOR_H__
 
 #include "ZETypes.h"
 
-struct ZEARGB32;
-
-class ZETexturePixelConverter
+enum ZEDecompressorState
 {
+	ZE_DS_NONE,
+	ZE_DS_OUTPUT_FULL,
+	ZE_DS_INPUT_PROCESSED,
+	ZE_DS_ERROR,
+	ZE_DS_DONE
+};
+
+struct ZEDictionaryEntryLZW
+{
+	ZESize							Size;
+	void*							Data;
+};
+
+class ZEDecompressorLZW
+{
+	private:
+		// Buffers;
+		void*						Input;
+		ZESize						InputSize;
+		ZESize						InputPosition;
+
+		void*						Output;
+		ZESize						OutputSize;
+		ZESize						OutputPosition;
+
+		// Dictionary
+		static ZEUInt8				DictionaryConstants[256];
+		ZESize						DictionarySize;
+		ZEDictionaryEntryLZW		Dictionary[4096];
+
+		// Input States
+		ZEUInt8						WordSize;
+		ZEUInt8						LastWord;
+		ZEUInt8						LastWordSize;
+
+		// Output
+		ZEDictionaryEntryLZW*		PrevEntry;
+		ZEDictionaryEntryLZW*		OutputEntry;
+		ZESize						OutputEntryByteIndex;
+
+		// Status
+		ZEDecompressorState			State;
+
+		bool						GetNextWord(ZEUInt16& Word);
+		bool						WriteOutput(ZEDictionaryEntryLZW* Entry = NULL);
+
+		void						AddToDictionary(ZEDictionaryEntryLZW* InputB);
+		void						ResetDictionary();
+
 	public:
-		static void ConvertIndexed(ZEARGB32* Destination, void* Source, ZESize Count, ZEARGB32* Palette);
+		void						SetInput(void* Buffer);
+		void*						GetInput();
 
-		static void ConvertG8(ZEARGB32* Destination, void* Source, ZESize Count);
-		static void ConvertG16(ZEARGB32* Destination, void* Source, ZESize Count);
+		void						SetInputSize(ZESize Size);
+		ZESize						GetInputSize();
+
+		void						SetOutput(void* Buffer);
+		void*						GetOutput();
+
+		void						SetOutputSize(ZESize Size);
+		ZESize						GetOutputSize();
+
+		ZEDecompressorState			Decompress();
+
+		void						Reset();
 		
-		static void ConvertGA16(ZEARGB32* Destination, void* Source, ZESize Count);
-		static void ConvertAG16(ZEARGB32* Destination, void* Source, ZESize Count);
-
-		static void ConvertGA32(ZEARGB32* Destination, void* Source, ZESize Count);
-		static void ConvertAG32(ZEARGB32* Destination, void* Source, ZESize Count);
-
-		static void ConvertBGR15(ZEARGB32* Destination, void* Source, ZESize Count);
-		static void ConvertRGB15(ZEARGB32* Destination, void* Source, ZESize Count);
-
-		static void ConvertBGRA16(ZEARGB32* Destination, void* Source, ZESize Count);
-		static void ConvertARGB16(ZEARGB32* Destination, void* Source, ZESize Count);
-
-		static void ConvertBGR16(ZEARGB32* Destination, void* Source, ZESize Count);
-		static void ConvertRGB16(ZEARGB32* Destination, void* Source, ZESize Count);
-
-		static void ConvertBGR24(ZEARGB32* Destination, void* Source, ZESize Count);
-		static void ConvertRGB24(ZEARGB32* Destination, void* Source, ZESize Count);
-		
-		static void ConvertBGRA32(ZEARGB32* Destination, void* Source, ZESize Count);
-		static void ConvertARGB32(ZEARGB32* Destination, void* Source, ZESize Count);
-
-		static void ConvertABGR32(ZEARGB32* Destination, void* Source, ZESize Count);
-		static void ConvertRGBA32(ZEARGB32* Destination, void* Source, ZESize Count);
+									ZEDecompressorLZW();
+									~ZEDecompressorLZW();
+					
 };
 
 #endif
