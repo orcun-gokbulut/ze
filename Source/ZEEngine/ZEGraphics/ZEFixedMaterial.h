@@ -391,6 +391,9 @@ class ZEFixedMaterial : public ZEMaterial
 		void							SetDistortionMapAddressModeV(ZETextureAddressMode Mode);
 		ZETextureAddressMode			GetDistortionMapAddressModeV() const;
 
+		void							SetVertexColorEnabled(bool Enabled);
+		bool							GetVertexColorEnabled();
+
 		void							Tick(float ElapsedTime);
 
 		static ZEFixedMaterial*			CreateInstance();

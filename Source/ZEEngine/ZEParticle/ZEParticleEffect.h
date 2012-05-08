@@ -56,9 +56,12 @@ class ZEParticleEffect : public ZEEntity
 		
 		ZEArray<ZEParticleSystem*>			Systems;
 
+	protected:
 
 											ZEParticleEffect();
 		virtual								~ZEParticleEffect();
+
+
 	public:
 		virtual	ZEDrawFlags					GetDrawFlags() const;
 

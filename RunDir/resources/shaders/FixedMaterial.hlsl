@@ -319,7 +319,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		#elif defined(ZE_SHADER_OPACITY_BASE_ALPHA)
 				Output.Color.a = MaterialOpacity * tex2D(BaseMap, Input.Texcoord).a;
 		#else 
-			Ouput.Color.a *= MaterialOpacity;
+			Ouput.Color.a = MaterialOpacity;
 		#endif
 	#endif
 	
@@ -335,59 +335,39 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 
 	#ifdef ZE_SHADER_AMBIENT
 		float3 AmbientColor = MaterialAmbientColor;
-		#ifdef ZE_SHADER_VERTEX_COLOR
-			Ouput.Color.rgb *= MaterialOpacity;
-		#endif
-		#ifdef ZE_SHADER_BASE_MAP
-			AmbientColor *= tex2D(BaseMap, Input.Texcoord).rgb;
-		#endif
 		//#ifdef ZE_SHADER_SSAO
 			//AmbientColor *= tex2D(SSAOBuffer, ScreenPosition).r;
 		//#endif
-		
-		#ifdef ZE_SHADER_LIGHT_MAP
-			AmbientColor *= tex2D(LightMap, Input.Texcoord).rgb;
-		#endif
 		Output.Color.rgb = AmbientColor;
+		#ifdef ZE_SHADER_LIGHT_MAP
+			Output.Color.rgb *= tex2D(LightMap, Input.Texcoord).rgb;
+		#endif
 	#endif
-	const float3 SkyColor = float3(193.0f, 255.0f, 255.0f) / 255.0f;
-	const float3 GroundColor = float3(222.0f, 226.0f, 164.0f) / 255.0f;
-	
-	//float3 Normal = ZEGBuffer_GetViewNormal(ScreenPosition);
-	//Output.Color.rgb = tex2D(BaseMap, Input.Texcoord).rgb * lerp(GroundColor, SkyColor, 0.5 + 0.5 * dot(CameraUp, Normal));
-	
-	#ifdef ZE_SHADER_BASE_MAP
-		Output.Color.rgb *= tex2D(BaseMap, Input.Texcoord).rgb;
-	#endif
-		
+
 	#ifdef ZE_SHADER_DIFFUSE
 		float3 DiffuseColor = MaterialDiffuseColor;
-		#ifdef ZE_SHADER_BASE_MAP
-			DiffuseColor *= tex2D(BaseMap, Input.Texcoord).rgb;
-		#endif
-	
 		DiffuseColor *= ZELBuffer_GetDiffuse(ScreenPosition);
-		
 		Output.Color.rgb += DiffuseColor;
 	#endif
 	
-	#if defined(ZE_SHADER_SPECULAR)
+	#ifdef ZE_SHADER_SPECULAR
 		float3 SpecularColor = MaterialSpecularColor;
 		#ifdef ZE_SHADER_SPECULAR_MAP
 			SpecularColor *= tex2D(SpecularMap, Input.Texcoord).rgb;
 		#endif
-		
 		SpecularColor *= ZELBuffer_GetSpecular(ScreenPosition);
-		
 		Output.Color.rgb += SpecularColor;
 	#endif
+
+	#ifdef ZE_SHADER_BASE_MAP
+		Output.Color.rgb *= tex2D(BaseMap, Input.Texcoord).rgb;
+	#endif	
 	
 	#ifdef ZESHADER_EMMISIVE
 		float3 EmmisiveColor = MaterialEmmisiveColor;
 		#ifdef ZE_SHADER_EMMISIVE_MAP
 			EmmisiveColor *= MaterialEmmisiveFactor * tex2D(EmmisiveMap, Input.Texcoord);
 		#endif
-
 		Output.Color.rgb += EmmisiveColor;
 	#endif
 

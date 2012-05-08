@@ -56,6 +56,7 @@ class ZEParticle
 		ZEVector2		Size2D;
 		float			TotalLife;
 		float			Life;
+		ZEVector4		InitialColor;
 		ZEVector4		Color;
 		ZEVector3		Position;
 
