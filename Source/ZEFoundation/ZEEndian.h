@@ -42,7 +42,7 @@
 #include <stdlib.h>
 #endif
 
-enum ZEEndianType
+enum ZEEndianness
 {
 	ZE_ET_LITTLE,
 	ZE_ET_BIG
@@ -232,7 +232,7 @@ class ZEEndian
 		}
 
 		template<typename ZEType>
-		static inline ZEType Uni(ZEType Value, ZEEndianType Endianness)
+		static inline ZEType Uni(ZEType Value, ZEEndianness Endianness)
 		{
 			if (Endianness == ZE_ET_BIG)
 				return ZEEndian::Big(Value);
