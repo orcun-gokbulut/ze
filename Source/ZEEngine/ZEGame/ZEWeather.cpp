@@ -50,6 +50,32 @@ void ZEWeather::AdjustHDR(float DayTime)
 
 }
 
+void ZEWeather::UpdateCloudColor()
+{
+	ZEVector3 NewSunColor, SunColor;
+	float SunDown = 1 - SunHeight;
+
+	if (SunDown > 1.0f)	// Night Time
+	{
+		SunDown -= 2.0f;
+		SunColor = ZEVector3(0.650f, 0.570f, 0.475f); // FIX THIS: Hard coded right now
+
+		NewSunColor.x	= -(ZEMath::Power((SunDown / 2.5f), 2.0f)) + SunColor.x;
+		NewSunColor.y	= -(ZEMath::Power((SunDown / 1.7f), 2.0f)) + SunColor.y;
+		NewSunColor.z	= -(ZEMath::Power((SunDown / 1.4f), 2.0f)) + SunColor.z;
+	}
+	else	// Daytime
+	{
+		SunColor = ZEVector3(0.850f, 0.750f, 0.655f); // FIX THIS: Hard coded right now
+
+		NewSunColor.x	= -(ZEMath::Power((SunDown / 2.5f), 2.0f)) + SunColor.x;
+		NewSunColor.y	= -(ZEMath::Power((SunDown / 1.7f), 2.0f)) + SunColor.y;
+		NewSunColor.z	= -(ZEMath::Power((SunDown / 1.4f), 2.0f)) + SunColor.z;
+	}
+
+	SetSunLightColor(NewSunColor);
+}
+
 ZEMoon* ZEWeather::GetMoon() const
 {
 	return Moon;
@@ -156,6 +182,13 @@ void ZEWeather::SetMoonDirection(const ZEVector3& Value)
 	MoonDirection = Value;
 
 	Moon->SetMoonDirection(Value);
+
+	// Set moon directional light
+	ZEQuaternion MoonLightRotation;
+	ZEQuaternion::CreateFromDirection(MoonLightRotation, MoonDirection);
+	MoonLight->SetRotation(MoonLightRotation);
+
+	this->UpdateCloudColor();
 }
 
 const ZEVector3& ZEWeather::GetMoonDirection() const
@@ -170,7 +203,13 @@ void ZEWeather::SetSunDirection(const ZEVector3& Value)
 
 	Cloud->SetSunLightDirection(Value);
 	SkyDome->SetSunLightDirection(Value);
-	
+
+	// Also set the directional sun light
+	ZEQuaternion SunLightRotation;
+	ZEQuaternion::CreateFromDirection(SunLightRotation, SunDirection);
+	SunLight->SetRotation(SunLightRotation);
+
+	this->UpdateCloudColor();
 }
 
 const ZEVector3& ZEWeather::GetSunDirection() const
@@ -188,9 +227,11 @@ const ZEVector3& ZEWeather::GetSunMoonRotation() const
 	return SunMoonRotation;
 }
 
+// OK
 void ZEWeather::SetSunLightColor(const ZEVector3& Value)
 {
 	SunLightColor = Value;
+
 	Cloud->SetSunLightColor(Value);
 	SunLight->SetColor(Value);
 }
@@ -203,8 +244,9 @@ const ZEVector3& ZEWeather::GetSunLightColor() const
 void ZEWeather::SetMoonLightColor(const ZEVector3& Value)
 {
 	MoonLightColor = Value;
+
 	Cloud->SetSunLightColor(Value);
-	//MoonLight->SetColor(Value);
+	
 }
 
 const ZEVector3& ZEWeather::GetMoonLightColor() const

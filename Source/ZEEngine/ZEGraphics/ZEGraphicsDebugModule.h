@@ -104,7 +104,6 @@ class ZEGraphicsDebugModule : public ZEApplicationModule
 
 		virtual void				ProcessInputs(float ElapsedTime);
 
-		virtual void				UpdateCloudColor();
 		virtual void				IncreaseMoonPhase(float ElapsedTime);
 		virtual void				DecreaseMoonPhase(float ElapsedTime);
 		virtual void				IncreaseCloudCover(float ElapsedTime);

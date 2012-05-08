@@ -293,38 +293,6 @@ void ZEGraphicsDebugModule::ProcessInputs(float ElapsedTime)
 	}
 }
 
-void ZEGraphicsDebugModule::UpdateCloudColor()
-{
- 
-	ZEVector3 NewSunColor, SunColor;
-	float SunDown = 1 - Weather->GetSunHeight();
-
-	ZEVector3 CloudAmbient(0.1f, 0.1f, 0.1f);
-
-	// Night Time
-	if (SunDown > 1.0f)
-	{
-		SunDown -= 2.0f;
-		SunColor = ZEVector3(0.650f, 0.570f, 0.475f);
-
-		NewSunColor.x	= -(ZEMath::Power((SunDown / 2.5f), 2.0f)) + SunColor.x;
-		NewSunColor.y	= -(ZEMath::Power((SunDown / 1.7f), 2.0f)) + SunColor.y;
-		NewSunColor.z	= -(ZEMath::Power((SunDown / 1.4f), 2.0f)) + SunColor.z;
-		Weather->SetSunLightColor(NewSunColor);
-	}
-	else	// Daytime
-	{
-		SunColor = ZEVector3(0.850f, 0.750f, 0.655f);
-
-		NewSunColor.x	= -(ZEMath::Power((SunDown / 2.5f), 2.0f)) + SunColor.x;
-		NewSunColor.y	= -(ZEMath::Power((SunDown / 1.7f), 2.0f)) + SunColor.y;
-		NewSunColor.z	= -(ZEMath::Power((SunDown / 1.4f), 2.0f)) + SunColor.z;
-		Weather->SetSunLightColor(NewSunColor);
-	}
-
-	Weather->SetSunLightColor(NewSunColor);
-}
-
 void ZEGraphicsDebugModule::IncreaseMoonPhase(float ElapsedTime)
 {
 	MoonPhase += MoonPhaseChangeMultiplier * ElapsedTime;
@@ -382,28 +350,9 @@ void ZEGraphicsDebugModule::IncreaseDayTime(float ElapsedTime)
 	ZEMatrix4x4::CreateRotation(SunDirRotationMatrix, SunMoonRotation.x, SunMoonRotation.y, SunMoonRotation.z);
 	ZEMatrix4x4::Transform(TransformedSunDir, SunDirRotationMatrix, ZEVector4(SunDirection, 0.0f));
 
-	/*
-	SkyDome->SetSunLightDirection(ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
-	Cloud->SetSunLightDirection(ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
-	Moon->SetMoonDirection(ZEVector3(-TransformedSunDir.x, -TransformedSunDir.y, -TransformedSunDir.z));
-	*/
-
 	Weather->SetSunDirection(ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
 	Weather->SetMoonDirection(ZEVector3(-TransformedSunDir.x, -TransformedSunDir.y, -TransformedSunDir.z));
 
-	ZEQuaternion SunLightRotation;
-	ZEQuaternion MoonLightRotation;
-	ZEQuaternion::CreateFromDirection(SunLightRotation, ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
-	ZEQuaternion::CreateFromDirection(MoonLightRotation, ZEVector3(-TransformedSunDir.x, -TransformedSunDir.y, -TransformedSunDir.z));
-	
-	/*
-	SunLight->SetRotation(SunLightRotation);
-	MoonLight->SetRotation(MoonLightRotation);
-	*/
-	Weather->GetSunLight()->SetRotation(SunLightRotation);
-	Weather->GetMoonLight()->SetRotation(MoonLightRotation);
-
-	this->UpdateCloudColor();
 }
 
 void ZEGraphicsDebugModule::DecreaseDayTime(float ElapsedTime)
@@ -427,29 +376,10 @@ void ZEGraphicsDebugModule::DecreaseDayTime(float ElapsedTime)
 	ZEMatrix4x4::CreateRotation(SunDirRotationMatrix, SunMoonRotation.x, SunMoonRotation.y, SunMoonRotation.z);
 	ZEMatrix4x4::Transform(TransformedSunDir, SunDirRotationMatrix, ZEVector4(SunDirection, 0.0f));
 
-	/*
-	SkyDome->SetSunLightDirection(ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
-	Cloud->SetSunLightDirection(ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
-	Moon->SetMoonDirection(ZEVector3(-TransformedSunDir.x, -TransformedSunDir.y, -TransformedSunDir.z));
-	*/
+	
 	Weather->SetSunDirection(ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
 	Weather->SetMoonDirection(ZEVector3(-TransformedSunDir.x, -TransformedSunDir.y, -TransformedSunDir.z));
 
-
-	ZEQuaternion SunLightRotation;
-	ZEQuaternion MoonLightRotation;
-	ZEQuaternion::CreateFromDirection(SunLightRotation, ZEVector3(TransformedSunDir.x, TransformedSunDir.y, TransformedSunDir.z));
-	ZEQuaternion::CreateFromDirection(MoonLightRotation, ZEVector3(-TransformedSunDir.x, -TransformedSunDir.y, -TransformedSunDir.z));
-	
-	/*
-	SunLight->SetRotation(SunLightRotation);
-	MoonLight->SetRotation(MoonLightRotation);
-	*/
-	Weather->GetSunLight()->SetRotation(SunLightRotation);
-	Weather->GetMoonLight()->SetRotation(MoonLightRotation);
-
-
-	this->UpdateCloudColor();
 }
 
 void ZEGraphicsDebugModule::IncreaseFogFactor(float ElapsedTime)
@@ -472,15 +402,6 @@ void ZEGraphicsDebugModule::DecreaseFogFactor(float ElapsedTime)
 
 ZEGraphicsDebugModule::ZEGraphicsDebugModule()
 {
-	/*
-	Moon						= NULL;
-	StarMap						= NULL;
-	Cloud						= NULL;
-	SunLight					= NULL;
-	MoonLight					= NULL;
-	SkyDome						= NULL;
-	Terrain						= NULL;
-	*/
 
 	Player						= NULL;
 	

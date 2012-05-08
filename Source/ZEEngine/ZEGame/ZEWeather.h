@@ -80,6 +80,7 @@ class ZEWeather : public ZEEntity
 		virtual						~ZEWeather();
 
 		virtual void				AdjustHDR(float DayTime);
+		virtual void				UpdateCloudColor();
 
 	private:
 
