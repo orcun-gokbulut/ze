@@ -68,7 +68,7 @@ ZETerrainMaterial::ZETerrainMaterial()
 	SetDiffuseColor(ZEVector3::One);
 	SetDiffuseFactor(1.0f);
 	SetAmbientColor(ZEVector3::One);
-	SetAmbientFactor(0.0f);
+	SetAmbientFactor(0.1f);
 }
 
 ZETerrainMaterial::~ZETerrainMaterial()
