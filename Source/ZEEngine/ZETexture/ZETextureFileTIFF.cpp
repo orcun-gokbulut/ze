@@ -36,88 +36,135 @@
 #include "ZETextureFileTIFF.h"
 
 #include "ZEError.h"
-#include "ZEPacking.h"
 #include "ZEEndian.h"
 #include "ZETextureData.h"
 #include "ZEDS/ZEPointer.h"
 #include "ZEFile/ZEFile.h"
+#include "ZETexturePixelConverter.h"
 
-#define ZE_TIT_TYPE_MASK				0x03
-#define ZE_TIT_NO_IMAGE					0x00
-#define ZE_TIT_INDEXED					0x01
-#define ZE_TIT_COLOR					0x02
-#define ZE_TIT_GRAYSCALE				0x03
-
-#define ZE_TIT_COMPRESSED				0x08	
-
-#define ZE_TIO_RIGHT_TO_LEFT			0x10
-#define ZE_TIO_TOP_TO_BOTTOM			0x20
-
-ZEPackStruct
-(
-	struct ZETIFFHeader
-	{
-		ZEUInt16		Endianness;
-		ZEUInt16		Identifier;
-		ZEUInt32		EntryListOffset;
-	};
-);
-
-ZEPackStruct
-(
-	struct ZETIFFEntry
-	{
-		ZEUInt16		TagId;
-		ZEUInt16		TagType;
-		ZEUInt32		Count;
-		ZEUInt8			Value[8];
-	};
-);
-
-struct ZETIFFInfo
+ZESize GetPixelSize(ZETIFFPixelFormat Format)
 {
-	ZESize			Width;
-	ZESize			Height;
-	int				PhotometricInterpretation;
-	int				SamplesPerPixel;
-	int				BitsPerSample;
-	int				Compression;
-	ZESize			RowPerStript;
+	switch(Format)
+	{
+		case ZE_TIFF_PT_INDEXED:
+			return 1;
 
-	ZESize			StripOffsetCount;
-	ZESize			StripOffsets;
+		case ZE_TIFF_PT_G8:
+			return 1;
 
-	ZESize			StripSizeCount;
-	ZESize			StripSizes;
+		case ZE_TIFF_PT_G16:
+			return 2;
 
-	ZESize			PaletteOffset;
-};
+		case ZE_TIFF_PT_GA16:
+			return 2;
 
+		case ZE_TIFF_PT_GA32:
+			return 4;
 
-static ZEUInt32* LoadEntryArray(ZEFile* File, ZESize Offset, ZESize Count, ZEEndianType Endianness)
+		case ZE_TIFF_PT_RGB24:
+			return 3;
+
+		case ZE_TIFF_PT_RGBA32:
+			return 4;
+
+		case ZE_TIFF_PT_RGB48:
+			return 6;
+
+		case ZE_TIFF_PT_RGB64:
+			return 8;
+
+		default:
+			return 0;
+	}
+
+}
+
+bool ZETextureFileTIFF::LoadEntryArray(ZEArray<ZEUInt32> Output, ZETIFFEntry* Entry, ZEFile* File, ZEEndianness Endianness)
 {
-	ZEUInt32* Output;
+	ZESize Count = ZEEndian::Uni(Entry->Count, Endianness);
+	ZESize Offset = ZEEndian::Uni(*(ZEUInt32*)Entry->Value, Endianness);
 
-	Output = new ZEUInt32[Count];
+	Output.SetCount(Count);
 	File->Seek(Offset * sizeof(ZEUInt32), ZE_SF_BEGINING);
 		
-	if (File->Read(Output, Count * sizeof(ZEUInt32), 1) != 1)
+	if (Entry->Type == 0)
 	{
-		zeError("Can not read strip offsets.");
-		return NULL;
-	}
+		if (File->Read(Output.GetCArray(), Count * sizeof(ZEUInt32), 1) != 1)
+		{
+			zeError("Can not read strip offsets.");
+			return false;
+		}
 
-	for (ZESize I = 0; I < Count; I++)
-		Output[I] = ZEEndian::Uni(Output[I], Endianness);
-	
-	return Output;
+		for (ZESize I = 0; I < Entry->Count; I++)
+			Output[I] = ZEEndian::Uni(Output[I], Endianness);
+
+	}
+	else
+	{
+		ZESize ReadCount = 0;
+		ZESize TotalReadCount = 0;
+		while(TotalReadCount != Count)
+		{
+			ZEUInt16 Buffer[2048];
+			ZESize ReadCount = TotalReadCount - ReadCount > 2048 ? 2048 : TotalReadCount - ReadCount;
+			
+			ZESize CurrentReadCount = File->Read(Buffer, sizeof(ZEUInt16), ReadCount);
+			if (CurrentReadCount == 0)
+				return false;
+
+			for (ZESize I = 0; I < CurrentReadCount; I++)
+				Output[TotalReadCount + I] = ZEEndian::Uni(Buffer[I], Endianness);
+			
+			TotalReadCount += ReadCount;
+		}
+	}
 }
 
-static ZEUInt LoadEntry(ZETIFFEntry* Entry, ZESize& Count, ZEEndianType Endian)
+ZESize ZETextureFileTIFF::LoadEntryArray(ZEUInt32* Output, ZESize OutputCount, ZETIFFEntry* Entry, ZEFile* File, ZEEndianness Endianness)
 {
-	Count = ZEEndian::Uni(*(ZEUInt32*)Entry->Value, Endian);
+	ZESize Count = OutputCount > ZEEndian::Uni(Entry->Count, Endianness) ? OutputCount : ZEEndian::Uni(Entry->Count, Endianness);
+	ZESize Offset = ZEEndian::Uni(*(ZEUInt32*)Entry->Value, Endianness);
 
-	switch(Entry->TagType)
+	File->Seek(Offset * sizeof(ZEUInt32), ZE_SF_BEGINING);
+
+	if (Entry->Type == 0)
+	{
+		if (File->Read(Output, Count * sizeof(ZEUInt32), 1) != 1)
+		{
+			zeError("Can not read strip offsets.");
+			return 0;
+		}
+
+		for (ZESize I = 0; I < Entry->Count; I++)
+			Output[I] = ZEEndian::Uni(Output[I], Endianness);
+
+	}
+	else
+	{
+		ZESize ReadCount = 0;
+		ZESize TotalReadCount = 0;
+		while(TotalReadCount != Count)
+		{
+			ZEUInt16 Buffer[2048];
+			ZESize ReadCount = TotalReadCount - ReadCount > 2048 ? 2048 : TotalReadCount - ReadCount;
+
+			ZESize CurrentReadCount = File->Read(Buffer, sizeof(ZEUInt16), ReadCount);
+			if (CurrentReadCount == 0)
+				return 0;
+
+			for (ZESize I = 0; I < CurrentReadCount; I++)
+				Output[TotalReadCount + I] = ZEEndian::Uni(Buffer[I], Endianness);
+
+			TotalReadCount += ReadCount;
+		}
+	}
+
+	return Count;
+}
+
+ZEUInt ZETextureFileTIFF::LoadEntry(ZETIFFEntry* Entry, ZEEndianness Endian)
+{
+	switch(Entry->Type)
 	{
 		case 2: // ZEUInt16
 			return ZEEndian::Uni(*(ZEUInt16*)Entry->Value, Endian);
@@ -130,51 +177,56 @@ static ZEUInt LoadEntry(ZETIFFEntry* Entry, ZESize& Count, ZEEndianType Endian)
 	}
 }
 
-static ZEUInt LoadEntry(ZETIFFEntry* Entry, ZEEndianType Endian)
+bool ZETextureFileTIFF::UncompressPackBit(void* Destination, ZESize DestinationSize, void* Source, ZESize SourceSize)
 {
-	switch(Entry->TagType)
+	ZEUInt8* SourceCurrent = (ZEUInt8*)Source;
+	ZEUInt8* SourceEnd = SourceCurrent + SourceSize;
+	ZEUInt8* DestinationCurrent = (ZEUInt8*)Destination;
+	ZEUInt8* DestinationEnd = DestinationCurrent + DestinationSize;
+
+	while(SourceCurrent != SourceEnd)
 	{
-		case 2: // ZEUInt16
-			return ZEEndian::Uni(*(ZEUInt16*)Entry->Value, Endian);
+		ZESize Count = (*DestinationCurrent & 0x7F) + 1;
+		if (*DestinationCurrent & 0x80)
+		{ 
+			if (SourceCurrent + 1 >= SourceEnd)
+				return false;
 
-		case 3: // ZEUInt32
-			return ZEEndian::Uni(*(ZEUInt32*)Entry->Value, Endian);
+			if (DestinationCurrent + Count > DestinationEnd)
+				return false;
 
-		default:
-			return 0;
+			memset(DestinationCurrent, SourceCurrent[1], Count);
+
+			DestinationCurrent += Count;
+			SourceCurrent += 2;
+		}
+		else
+		{
+			if (SourceCurrent + Count + 1 > SourceEnd)
+				return false;
+
+			if (DestinationCurrent + Count > DestinationEnd)
+				return false;
+
+
+			memcpy(DestinationCurrent, SourceCurrent + 1, Count);
+
+			DestinationCurrent += Count;
+			SourceCurrent += Count + 1;
+		}
 	}
+
+	return true;
 }
 
-static ZEARGB32* LoadPallete(ZEFile* File, ZETIFFInfo* Info, ZEEndianType Endianness)
+bool ZETextureFileTIFF::UncompressLZW(void* Destination, ZESize DestinationSize, void* Source, ZESize SourceCount)
 {
-	ZEUInt16 RawPalette[256 * 3];
-	File->Seek(Info->PaletteOffset * sizeof(ZEUInt32), ZE_SF_BEGINING);
 
-	if (File->Read(RawPalette, 3 * 256 * sizeof(ZEUInt16), 1) != 1)
-	{
-		zeError("Can not read strip offsets.");
-		return NULL;
-	}
-
-	ZEARGB32* Palette = new ZEARGB32[256];
-	for (ZESize I = 0; I < 256; I++)
-	{
-		Palette[I].A = 255;
-		Palette[I].R = ZEEndian::Uni(RawPalette[3 * I], Endianness) / 256;
-		Palette[I].G = ZEEndian::Uni(RawPalette[3 * I + 1], Endianness) / 256;
-		Palette[I].B = ZEEndian::Uni(RawPalette[3 * I + 2], Endianness) / 256;
-	}
-	return Palette;
-}
-
-static ZETextureData* LoadData(ZEFile* File, ZETIFFInfo* Info, ZEARGB32* Palette)
-{
-	return NULL;
+	return false;
 }
 
 
-
-static bool LoadHeader(ZEFile* File, ZETIFFInfo* Info, ZEARGB32* Palette)
+bool ZETextureFileTIFF::LoadHeader(ZEFile* File, ZETIFFInfo* Info)
 {
 	// Read Header
 	ZETIFFHeader Header;
@@ -185,25 +237,33 @@ static bool LoadHeader(ZEFile* File, ZETIFFInfo* Info, ZEARGB32* Palette)
 		return false;
 	}
 
-	ZEEndianType Endianness;
 	if (Header.Endianness == 'II')
-		Endianness = ZE_ET_LITTLE;
+		Info->Endianness = ZE_ET_LITTLE;
 	else if (Header.Endianness == 'MM')
-		Endianness = ZE_ET_BIG;
+		Info->Endianness = ZE_ET_BIG;
 	else
 	{
 		zeError("File is not a TIFF file.");
 		return false;
 	}
 
-	if (ZEEndian::Uni(Header.Identifier, Endianness) != 42)
+	if (ZEEndian::Uni(Header.Identifier, Info->Endianness) != 42)
 	{
 		zeError("File is not a TIFF file.");
 		return false;
 	}
 
 	File->Seek(Header.EntryListOffset, ZE_SF_BEGINING);
-		
+	
+	Info->ChunkType = ZE_TIFF_CT_STRIP;
+	Info->Compression = ZE_TIFF_CT_UNCOMPRESSED;
+	int PhotometricInterpretation = -1;
+	ZEUInt32 BitsPerSample[4] = {0, 0, 0, 0};
+	ZEUInt32 SamplesPerPixel = 1;
+	ZEUInt32 ExtraSamples = 0;
+	ZEUInt32 Orientation = 1;
+	ZEUInt32 PlanarConfiguration = 1;
+
 	ZELittleEndian<ZEUInt16> EntryCount;
 	Result = File->Read(&EntryCount, sizeof(ZEUInt16), 1);
 	if (Result != 1)
@@ -211,16 +271,7 @@ static bool LoadHeader(ZEFile* File, ZETIFFInfo* Info, ZEARGB32* Palette)
 		zeError("Can not read TIFF file entry count.");
 		return false;
 	}
-	EntryCount = ZEEndian::Uni(EntryCount, Endianness);
-
-	bool HasWidth = false;
-	bool HasHeight = false;
-	bool HasPhotrometricInterpretation = false;;
-	Info->Compression = 1;
-	Info->BitsPerSample = 1;
-	Info->SamplesPerPixel = 1;
-	Info->StripOffsetCount = 0;
-	Info->StripSizeCount = 0;
+	EntryCount = ZEEndian::Uni(EntryCount, Info->Endianness);
 
 	for (ZESize I = 0; I < EntryCount; I++)
 	{
@@ -232,45 +283,73 @@ static bool LoadHeader(ZEFile* File, ZETIFFInfo* Info, ZEARGB32* Palette)
 			return false;
 		}
 
-		switch(Entry.TagId)
+		switch(Entry.Id)
 		{
 			case 0x0100: // Width
-				HasWidth = true;
-				Info->Height = LoadEntry(&Entry, Endianness);
+				Info->Height = LoadEntry(&Entry, Info->Endianness);
 				break;
 
 			case 0x0101: // Height
-				HasHeight = true;
-				Info->Height = LoadEntry(&Entry, Endianness);
+				Info->Height = LoadEntry(&Entry, Info->Endianness);
 				break;
 
 			case 0x0102: // Bits per Sample
-				Info->BitsPerSample = LoadEntry(&Entry, Endianness);
+				LoadEntryArray(BitsPerSample, 4, &Entry, File, Info->Endianness);
 				break;
 
 			case 0x0103: // Compression
-				Info->Compression = LoadEntry(&Entry, Endianness);
+				Info->Compression = (ZETIFFCompressionType)LoadEntry(&Entry, Info->Endianness);
 				break;
 
 			case 0x0106: // PhotrometricInterpretation
-				HasPhotrometricInterpretation = true;
-				Info->PhotometricInterpretation = LoadEntry(&Entry, Endianness);
+				PhotometricInterpretation = LoadEntry(&Entry, Info->Endianness);
 				break;
 
+			case 0x011C: // Planar Configuration
+				PlanarConfiguration = LoadEntry(&Entry, Info->Endianness);
+				break;
 			case 0x0111: // Strip Offsets
-				Info->StripOffsets = LoadEntry(&Entry, Info->StripOffsetCount, Endianness);
+				Info->ChunkOffsetsEntry = Entry;
+				break;
+
+			case 0x0112: // Orientation
+				Orientation = LoadEntry(&Entry, Info->Endianness);
 				break;
 
 			case 0x0115: // Samples per Pixel
-				Info->SamplesPerPixel = LoadEntry(&Entry, Endianness);
+				SamplesPerPixel = LoadEntry(&Entry, Info->Endianness);
 				break;
 
 			case 0x0116: // Row Per Strip
-				Info->RowPerStript = LoadEntry(&Entry, Endianness);
+				Info->ChunkHeight = LoadEntry(&Entry, Info->Endianness);
 				break;
 
 			case 0x0117: // StriptSizes
-				Info->StripSizes = LoadEntry(&Entry, Info->StripSizeCount, Endianness);
+				Info->ChunkSizesEntry = Entry;
+				break;
+
+			case 0x0152: // ExtraSamples
+				ExtraSamples = LoadEntry(&Entry, Info->Endianness);
+				break;
+
+			case 142: // TileWidth
+				Info->ChunkWidth = LoadEntry(&Entry, Info->Endianness);
+				Info->ChunkType = ZE_TIFF_CT_TILE;
+				break;
+
+			case 143: // TileHeight
+				Info->ChunkHeight = LoadEntry(&Entry, Info->Endianness);
+				Info->ChunkType = ZE_TIFF_CT_TILE;
+				break;
+
+			case 144: // TileOffsets
+				Info->ChunkOffsetsEntry = Entry;
+				Info->ChunkType = ZE_TIFF_CT_TILE;
+				break;
+
+			case 145: // TileSizes
+				Info->ChunkSizesEntry = Entry;
+				Info->ChunkType = ZE_TIFF_CT_TILE;
 				break;
 
 			default:
@@ -278,66 +357,209 @@ static bool LoadHeader(ZEFile* File, ZETIFFInfo* Info, ZEARGB32* Palette)
 		}
 	}
 
-	if (!HasPhotrometricInterpretation)
+	if (PhotometricInterpretation == -1)
 	{
 		zeError("Photrometric Interpretation tag is missing.");
 		return false;
 	}
 
-	if (!HasWidth)
+	if (Info->Width == 0)
 	{
 		zeError("Image Width tag is missing.");
 		return false;
 	}
 
-	if (!HasHeight)
+	if (Info->Height == 0)
 	{
 		zeError("Image Length tag is missing.");
 		return false;
 	}
 
-	// Check Support
-	if (Info->Compression != 0)
+	if (PlanarConfiguration != 1)
 	{
-		zeError("Compressed TIFF files are not supported.");
+		zeError("Unsupported planar configuration. Planar TIFF files are not supported.");
 		return false;
 	}
 
-	// Allowed Types
-	// G8
-	// A8G8
+	if (Orientation != 1)
+	{
+		zeError("Unsupported image orientation.");
+		return false;
+	}
 
-	// G16
-	// A16G16
-	// Indexed
+	if (ExtraSamples == 1)
+	{
+		zeError("Pre-multiplied alpha values are not supported.");
+		return false;
+	}
 
-	// A1R5G5B5
-	// X1R5G5B5
-	// R5G6B5
+	switch(PhotometricInterpretation)
+	{
+		case 1: // Black is Zero
+			if (SamplesPerPixel == 1 && BitsPerSample[0] == 8)
+				Info->PixelFormat = ZE_TIFF_PT_G8;	
+			else if (SamplesPerPixel == 1 && BitsPerSample[0] == 16) 
+				Info->PixelFormat = ZE_TIFF_PT_G16;	
+			else if (SamplesPerPixel == 2 && BitsPerSample[0] == 8 && BitsPerSample[1] == 8)  
+				Info->PixelFormat = ZE_TIFF_PT_GA16;
+			else if (SamplesPerPixel == 2 && ExtraSamples == 2 && BitsPerSample[0] == 16 && BitsPerSample[0] == 16) 
+				Info->PixelFormat = ZE_TIFF_PT_GA32;
+			break;
 
-	// RGB888
-	// ARGB8888
+		case 2: // RGB
+			if (SamplesPerPixel == 2 && ExtraSamples == 2 && BitsPerSample[0] == 8 && BitsPerSample[1] == 8 && BitsPerSample[2] == 8)		
+				Info->PixelFormat = ZE_TIFF_PT_RGB24;
+			else if (SamplesPerPixel == 2 && ExtraSamples == 2 && BitsPerSample[0] == 8 && BitsPerSample[1] == 8 && BitsPerSample[2] == 8 && BitsPerSample[3] == 8)	
+				Info->PixelFormat = ZE_TIFF_PT_RGBA32;
+			break;
+		
+		case 3: // Palette
+			if (BitsPerSample[0] == 8)
+				Info->PixelFormat = ZE_TIFF_PT_INDEXED;
+			break;
+	}
 
-
-	// Check Image Type
-	// Check Bits Per Pixel
-	// Check Compression
-	// Read Palette
+	if (Info->PixelFormat != ZE_TIFF_PT_NONE)
+	{
+		zeError("Unsupported pixel format.");
+		return false;
+	}
 
 	return true;
 }
 
-static ZETextureData* Load(ZEFile* File)
+bool ZETextureFileTIFF::LoadPalette(ZEFile* File, ZETIFFInfo* Info)
 {
-	/*ZETargaHeader Header;
-	ZEARGB32 Palette[256];
+	ZEUInt16 RawPalette[256 * 3];
+	File->Seek(ZEEndian::Uni(*(ZEUInt32*)Info->PaletteEntry.Value, Info->Endianness) * sizeof(ZEUInt32), ZE_SF_BEGINING);
 
-	if (!LoadHeader(File, &Header, Palette))
-		return NULL;
+	if (File->Read(RawPalette, 3 * 256 * sizeof(ZEUInt16), 1) != 1)
+		return false;
+
+	ZEARGB32* Palette = new ZEARGB32[256];
+	for (ZESize I = 0; I < 256; I++)
+	{
+		Palette[I].A = 255;
+		Palette[I].R = ZEEndian::Uni(RawPalette[3 * I], Info->Endianness) / 256;
+		Palette[I].G = ZEEndian::Uni(RawPalette[3 * I + 1], Info->Endianness) / 256;
+		Palette[I].B = ZEEndian::Uni(RawPalette[3 * I + 2], Info->Endianness) / 256;
+	}
+
+	return true;
+}
+
+bool ZETextureFileTIFF::LoadStripOffsets(ZEFile* File, ZETIFFInfo* Info)
+{
+	Info->ChunkOffsets.SetCount(ZEEndian::Uni(*(ZEUInt32*)Info->ChunkOffsetsEntry.Count, Info->Endianness));
+
+	File->Seek(ZEEndian::Uni(*(ZEUInt32*)Info->ChunkOffsetsEntry.Value, Info->Endianness) * sizeof(ZEUInt32), ZE_SF_BEGINING);
+
+	if (File->Read(Info->ChunkOffsets.GetCArray(), Info->ChunkOffsets.GetCount() * sizeof(ZEUInt32), 1) != 1)
+		return false;
+
+	for (ZESize I = 0; I < Info->ChunkOffsets.GetCount(); I++)
+		Info->ChunkOffsets[I] = ZEEndian::Uni(Info->ChunkOffsets[I], Info->Endianness);
+
+
+	if (Info->Compression != ZE_TIFF_CT_UNCOMPRESSED)
+	{
+		Info->ChunkSizes.SetCount(ZEEndian::Uni(*(ZEUInt32*)Info->ChunkSizesEntry.Count, Info->Endianness));
+
+		File->Seek(ZEEndian::Uni(*(ZEUInt32*)Info->ChunkSizesEntry.Value, Info->Endianness) * sizeof(ZEUInt32), ZE_SF_BEGINING);
+
+		if (File->Read(Info->ChunkSizes.GetCArray(), Info->ChunkSizes.GetCount() * sizeof(ZEUInt32), 1) != 1)
+			return false;
+
+		for (ZESize I = 0; I < Info->ChunkSizes.GetCount(); I++)
+			Info->ChunkSizes[I] = ZEEndian::Uni(Info->ChunkSizes[I], Info->Endianness);
+	}
+
+	return true;
+}
+
+void ConvertData(ZEARGB32* Destination, ZESize DestinationPitch, void* Source, ZESize SourcePitch, ZESize RowCount, ZETIFFInfo* Info)
+{
+	ZEUInt8* SourceRow = (ZEUInt8*)Source;
+	ZEUInt8* SourceRowEnd = SourceRow + SourcePitch * RowCount;
 	
-	return LoadData(File, &Header, Palette);*/
+	ZEARGB32* DestinationRow = Destination;
 
-	return NULL;
+	ZESize SourceRowPitch;
+
+	while(SourceRow < SourceRowEnd)
+	{
+		switch(Info->PixelFormat)
+		{
+			case ZE_TIFF_PT_INDEXED:
+				ZETexturePixelConverter::ConvertIndexed(Destination, SourceRow, SourcePitch, Info->Palette);
+				break;
+
+			case ZE_TIFF_PT_G8:
+				ZETexturePixelConverter::ConvertG8(DestinationRow, SourceRow, SourcePitch);
+				break;
+
+			case ZE_TIFF_PT_G16:
+				ZETexturePixelConverter::ConvertG16(DestinationRow, SourceRow, SourcePitch);
+				break;
+
+			case ZE_TIFF_PT_GA16:
+				ZETexturePixelConverter::ConvertGA16(DestinationRow, SourceRow, SourcePitch);
+				break;
+
+			case ZE_TIFF_PT_GA32:
+				ZETexturePixelConverter::ConvertGA32(DestinationRow, SourceRow, SourcePitch);
+				break;
+
+			case ZE_TIFF_PT_RGB24:
+				ZETexturePixelConverter::ConvertRGB24(DestinationRow, SourceRow, SourcePitch);
+				break;
+
+			case ZE_TIFF_PT_RGBA32:
+				ZETexturePixelConverter::ConvertRGBA32(DestinationRow, SourceRow, SourcePitch);
+				break;
+		}
+
+		DestinationRow += DestinationPitch;
+		SourceRow += SourcePitch;
+	}
+
+}
+
+ZETextureData* ZETextureFileTIFF::LoadData(ZEFile* File, ZETIFFInfo* Info)
+{
+	ZEPointer<ZETextureData> Texture = new ZETextureData();
+	Texture->Create(ZE_TT_2D, ZE_TPF_I8_4, 1, 1, Info->Width, Info->Height);
+
+	ZESize PixelSize = GetPixelSize(Info->PixelFormat);
+	ZEARGB32* DestinationData = (ZEARGB32*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
+	ZESize DestinationPitch = Info->Width * PixelSize;
+
+	
+	ZESize PositionX, PositionY;
+
+	if (Info->Compression == ZE_TIFF_CT_UNCOMPRESSED)
+	{
+		if (Info->ChunkType == ZE_TIFF_CT_STRIP)
+		{
+			ZEPointer<ZEUInt8> SourceRowData = new ZEUInt8[PixelSize * Info->Width];
+			ZESize SourceRowPitch = Info->Width * PixelSize;
+
+			for (ZESize I = 0; I < Info->ChunkOffsets.GetCount(); I++) // Row By Row
+			{
+				ZESize ChunkRowCount = Info->Height - I * Info->ChunkHeight >= Info->ChunkHeight ? Info->ChunkHeight : Info->Height % Info->ChunkHeight;
+				File->Seek(Info->ChunkOffsets[I], ZE_SF_BEGINING);
+				for (ZESize N = 0; I < ChunkRowCount; N++)
+				{
+					if (File->Read(SourceRowData, SourceRowPitch, 1) != 1)
+						return NULL;
+					ConvertData(DestinationData, DestinationPitch, SourceRowData, SourceRowPitch, 1, Info);
+					DestinationData += DestinationPitch;
+				}
+			}
+		}
+	}
+
+	return Texture.Transfer();
 }
 
 bool ZETextureFileTIFF::CanLoad(ZEFile* File)
@@ -367,9 +589,36 @@ ZETextureData* ZETextureFileTIFF::Load(ZEFile* File)
 		zeError("Null file pointer.");
 		return NULL;
 	}
-	ZETextureData* Texture = ::Load(File);
+	bool Result;
+
+	ZETIFFInfo Info;
+	Result = LoadHeader(File, &Info);
+	if (!Result)
+	{
+		zeError("Can not load image header.");
+		return false;
+	}
+
+	Result = LoadPalette(File, &Info);
+	if (!Result)
+	{
+		zeError("Can not load palette.");
+		return NULL;
+	}
+
+	Result = LoadStripOffsets(File, &Info);
+	if (!Result)
+	{
+		zeError("Can not load strip offesets.");
+		return NULL;
+	}
+
+	ZETextureData* Texture = LoadData(File, &Info);
 	if (Texture == NULL)
-		zeError("Can not load TGA file.");
+	{
+		zeError("Can not load image data.");
+		return NULL;
+	}
 
 	return Texture;
 }
