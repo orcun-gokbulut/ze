@@ -60,6 +60,7 @@ class ZEParticle
 		ZEVector4		Color;
 		ZEVector3		Position;
 
+		ZEVector3		InitialVelocity;
 		ZEVector3		Velocity;
 		ZEVector3		Acceleration;
 
