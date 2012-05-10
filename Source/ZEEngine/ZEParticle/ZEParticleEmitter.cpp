@@ -49,6 +49,24 @@ void ZEParticleEmitter::Tick(float TimeElapsed)
 {
 	AliveParticleCount = 0;
 
+	if(IsContinuous == false)
+	{
+		if(EmittedParticleCount >= MaxParticleCount)
+		{
+			for(ZESize I = 0; I < ParticlePool.GetCount(); I++)
+			{
+				if(ParticlePool[I].State != ZE_PAS_DEAD)
+				{
+					continue;
+				}
+				else
+				{
+					ParticlesPerSecond = 0;
+				}
+			}
+		}
+	}
+
 	ParticlesRemaining += ParticlesPerSecond * TimeElapsed;
 	ZEUInt ParticeCountForTimeElapsed = (ZEUInt)ParticlesRemaining;
 	ParticlesRemaining -= ParticeCountForTimeElapsed;
@@ -90,24 +108,6 @@ void ZEParticleEmitter::Tick(float TimeElapsed)
 		if(ParticlePool[I].State != ZE_PAS_DEAD  && ParticlePool[I].Life < 0.0f)
 		{
 			ParticlePool[I].State = ZE_PAS_DEAD;
-		}
-	}
-
-	if(IsContinuous == false)
-	{
-		if(EmittedParticleCount > MaxParticleCount)
-		{
-			for(ZESize I = 0; I < ParticlePool.GetCount(); I++)
-			{
-				if(ParticlePool[I].State != ZE_PAS_DEAD)
-				{
-					return;
-				}
-				else
-				{
-					ParticlesPerSecond = 0;
-				}
-			}
 		}
 	}
 

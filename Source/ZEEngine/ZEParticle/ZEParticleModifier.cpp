@@ -149,6 +149,9 @@ void ZEParticlePhysicsModifier::Tick(float ElapsedTime)
 			Particles[I].Velocity.x					= RAND_BETWEEN_TWO_FLOAT(MinVelocity.x, MaxVelocity.x);
 			Particles[I].Velocity.y					= RAND_BETWEEN_TWO_FLOAT(MinVelocity.y, MaxVelocity.y);
 			Particles[I].Velocity.z					= RAND_BETWEEN_TWO_FLOAT(MinVelocity.z, MaxVelocity.z);
+
+			Particles[I].InitialVelocity			= Particles[I].Velocity;
+
 			break;
 
 		case ZE_PAS_ALIVE:
@@ -359,6 +362,51 @@ ZEParticleColorOverLifeModifier::ZEParticleColorOverLifeModifier()
 }
 
 ZEParticleColorOverLifeModifier::~ZEParticleColorOverLifeModifier()
+{
+
+}
+
+/************************************************************************/
+/*                        ZEParticleVelocityLerpModifier				*/
+/************************************************************************/
+
+void ZEParticleVelocityOverLifeModifier::SetToVelocity(const ZEVector3& ToVelocity)
+{
+	this->ToVelocity = ToVelocity;
+}
+
+const ZEVector3& ZEParticleVelocityOverLifeModifier::GetToVelocity() const
+{
+	return ToVelocity;
+}
+
+void ZEParticleVelocityOverLifeModifier::Tick(float ElapsedTime)
+{
+	ZESize ParticleCount = GetOwnerParticlePool().GetCount();
+	ZEArray<ZEParticle>& Particles =  GetOwnerParticlePool();
+
+	for (ZESize I = 0; I < ParticleCount; I++)
+	{
+		ZEParticle* CurrentParticle = &Particles[I];
+
+		if(CurrentParticle->State == ZE_PAS_ALIVE)
+		{
+			float TotalLife_Life = CurrentParticle->Life / CurrentParticle->TotalLife;
+			float LerpFactor = 1.0f - TotalLife_Life;
+
+			CurrentParticle->Velocity.x = CurrentParticle->InitialVelocity.x + (ToVelocity.x - CurrentParticle->InitialVelocity.x) * LerpFactor;
+			CurrentParticle->Velocity.y = CurrentParticle->InitialVelocity.y + (ToVelocity.y - CurrentParticle->InitialVelocity.y) * LerpFactor;
+			CurrentParticle->Velocity.z = CurrentParticle->InitialVelocity.z + (ToVelocity.z - CurrentParticle->InitialVelocity.z) * LerpFactor;
+		}
+	}
+}
+
+ZEParticleVelocityOverLifeModifier::ZEParticleVelocityOverLifeModifier()
+{
+	ToVelocity = ZEVector3::One;
+}
+
+ZEParticleVelocityOverLifeModifier::~ZEParticleVelocityOverLifeModifier()
 {
 
 }

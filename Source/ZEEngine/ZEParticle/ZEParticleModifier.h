@@ -165,6 +165,23 @@ class ZEParticleColorOverLifeModifier : public ZEParticleModifier
 							~ZEParticleColorOverLifeModifier();
 };
 
+class ZEParticleVelocityOverLifeModifier : public ZEParticleModifier
+{
+	private:
+
+		ZEVector3			ToVelocity;
+
+	public:
+
+		void				SetToVelocity(const ZEVector3& Factor);
+		const ZEVector3&	GetToVelocity() const;
+
+		virtual	void		Tick(float ElapsedTime);
+
+							ZEParticleVelocityOverLifeModifier();
+							~ZEParticleVelocityOverLifeModifier();
+};
+
 class ZEParticleDiffuseMapChangerModifier : public ZEParticleModifier
 {
 	private:
