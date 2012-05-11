@@ -241,6 +241,30 @@ class ZEParticleRandomAccelerationModifier : public ZEParticleModifier
 										~ZEParticleRandomAccelerationModifier();
 };
 
+class ZEParticleUVModifier : public ZEParticleModifier
+{
+	private:
+
+		bool							DoOnce;
+		ZEVector2						UVFrameSize;
+		ZEInt							CurrentUVFrame;
+
+		ZEVector2						TextureSize;
+		ZEInt							RowCount;
+		ZEInt							ColumnCount;
+
+	public:
+
+		void							SetTextureSize(ZEVector2 TextureSize);
+		void							SetRowCount(ZEInt RowCount);
+		void							SetColumnCount(ZEInt ColumnCount);
+
+		virtual void					Tick(float ElapsedTime);
+
+										ZEParticleUVModifier();
+										~ZEParticleUVModifier();
+};
+
 #endif
 
 

@@ -249,7 +249,10 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 	Particle.Color						= Particle.InitialColor;
 	Particle.Rotation					= 0.0f;
 	Particle.Cos_NegSin					= ZEVector2::UnitY;
+	Particle.MinTexCoord				= ZEVector2::Zero;
+	Particle.MaxTexCoord				= ZEVector2::One;
 	Particle.State						= ZE_PAS_NEW;
+
 }
 
 void ZEParticleEmitter::SetName(const ZEString& Name)
@@ -587,15 +590,15 @@ static void DrawParticle(ZESimpleVertex* Buffer, const ZEParticle* Particle, con
 
 
 	Buffer[0].Position = Particle->Position + NV + PU;
-	Buffer[0].Texcoord = ZEVector2(0.0f, 0.0f);
+	Buffer[0].Texcoord = ZEVector2(Particle->MinTexCoord.x, Particle->MinTexCoord.y);
 	Buffer[0].Color = Particle->Color;
 
 	Buffer[1].Position = Particle->Position + PV + PU;
-	Buffer[1].Texcoord = ZEVector2(1.0f, 0.0f);
+	Buffer[1].Texcoord = ZEVector2(Particle->MaxTexCoord.x, Particle->MinTexCoord.y);
 	Buffer[1].Color = Particle->Color;
 
 	Buffer[2].Position = Particle->Position + PV + NU;
-	Buffer[2].Texcoord = ZEVector2(1.0f, 1.0f);
+	Buffer[2].Texcoord = ZEVector2(Particle->MaxTexCoord.x, Particle->MaxTexCoord.y);
 	Buffer[2].Color = Particle->Color;
 
 	Buffer[3].Position = Buffer[2].Position;
@@ -603,7 +606,7 @@ static void DrawParticle(ZESimpleVertex* Buffer, const ZEParticle* Particle, con
 	Buffer[3].Color = Particle->Color;
 
 	Buffer[4].Position = Particle->Position + NV + NU;
-	Buffer[4].Texcoord = ZEVector2(0.0f, 1.0f);
+	Buffer[4].Texcoord = ZEVector2(Particle->MinTexCoord.x, Particle->MaxTexCoord.y);
 	Buffer[4].Color = Particle->Color;
 
 	Buffer[5].Position = Buffer[0].Position;
