@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESteering.cpp
+ Zinek Engine - ZESteeringAlign.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,59 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESteering.h"
+#include "ZESteeringAlign.h"
+#include "ZEActor.h"
 
-void ZESteeringOutput::SetZero()
+#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
+
+void ZESteeringAlign::SetSlowRadius(float Radius)
 {
-	LinearAcceleration = ZEVector3::Zero;
-	AngularAcceleration = ZEQuaternion::Identity;
+	SlowRadius = Radius;
 }
 
-ZEActor* ZESteering::GetOwner()
+float ZESteeringAlign::GetSlowRadius()
 {
-	return Owner;
+	return SlowRadius;
 }
 
-void ZESteering::SetOwner(ZEActor*	Owner)
+ZESteeringOutput ZESteeringAlign::Align(const ZEQuaternion& TargetRotation)
 {
-	this->Owner = Owner;
+	ZESteeringOutput Output;
+	Output.SetZero();
+
+	ZEQuaternion Rotation  = TargetRotation * GetOwner()->GetRotation().Conjugate();
+	Rotation.NormalizeSelf();
+
+	float RotationAngle;
+	ZEVector3 RotatationAxis;
+	ZEQuaternion::ConvertToAngleAxis(RotationAngle, RotatationAxis, Rotation);
+ 
+	float RotationSize = ZEMath::Abs(RotationAngle);
+	
+	if (RotationSize == 0)
+		return Output;
+
+	float TargetSpeed;
+	if (RotationSize > SlowRadius)
+		TargetSpeed = GetOwner()->GetMaxAngularAcceleration();
+	else
+		TargetSpeed = GetOwner()->GetMaxAngularAcceleration() * RotationSize / SlowRadius;
+	
+	RotationAngle = (RotationAngle / RotationSize) * TargetSpeed;
+	ZEQuaternion::CreateFromAngleAxis(Output.AngularAcceleration, RotationAngle, RotatationAxis);
+	Output.AngularAcceleration = Output.AngularAcceleration * GetOwner()->GetAngularVelocity().Conjugate();
+	
+	return Output;
 }
 
-ZEUInt ZESteering::GetPriority()
+ZESteeringOutput ZESteeringAlign::Process(float ElapsedTime)
 {
-	return Priority;
+	return Align(GetTarget()->GetRotation());
 }
 
-void ZESteering::SetPriority(ZEUInt Priority)
+ZESteeringAlign::ZESteeringAlign()
 {
-	this->Priority = Priority;
-}
-
-float ZESteering::GetWeight()
-{
-	return Weight;
-}
-
-void ZESteering::SetWeight(float Weight)
-{
-	this->Weight = Weight;
-}
-
-bool ZESteering::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZESteering::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-ZEActor* ZESteering::GetTarget()
-{
-	return Target;
-}
-
-void ZESteering::SetTarget(ZEActor* Target)
-{
-	this->Target = Target;
-}
-
-ZESteering::ZESteering()
-{
-	Target = NULL;
-	Owner = NULL;
-
-	Weight = 1.0f;
-	Priority = 3;
-	Enabled = true;
-}
-
-ZESteering::~ZESteering()
-{
-
+	SlowRadius = ZE_PI_8;
+	SetPriority(3);
 }

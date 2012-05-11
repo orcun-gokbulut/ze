@@ -82,6 +82,11 @@ float ZEMath::Round(float Value)
 	return (float)(int)(Value + 0.5f);
 }
 
+bool ZEMath::IsValid(float Value)
+{
+	return Value == Value;
+}
+
 bool ZEMath::IsPowerOfTwo(ZEUInt Value)
 {
 	return ((Value & (Value - 1)) != 0)  ? false : true;

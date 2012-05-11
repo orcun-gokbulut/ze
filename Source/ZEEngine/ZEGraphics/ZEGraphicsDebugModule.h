@@ -57,7 +57,7 @@ class ZEUITextControl;
 class ZECloud;
 class ZEMoon;
 class ZETerrain;
-class ZEPlayerFreeSteering;
+class ZESteeringPlayerFree;
 class ZEWeather;
 
 class ZEGraphicsDebugModule : public ZEApplicationModule
@@ -67,7 +67,7 @@ class ZEGraphicsDebugModule : public ZEApplicationModule
 
 		ZEModel*					Model;
 		ZEPlayer*					Player;
-		ZEPlayerFreeSteering*		Steering;
+		ZESteeringPlayerFree*		Steering;
 	
 		ZEWeather*					Weather;
 		ZEPortalMap*				PortalMap;

@@ -53,13 +53,12 @@ typedef ZEFlags ZESteeringElements;
 struct ZESteeringOutput
 {
 	ZEVector3						LinearAcceleration;
-	float							AngularAcceleration;
+	ZEQuaternion					AngularAcceleration;
 
 	void							SetZero();
 };
 
 class ZEActor;
-
 class ZESteering
 {
 	friend class ZEActor;
@@ -93,153 +92,6 @@ class ZESteering
 		
 									ZESteering();
 		virtual						~ZESteering();
-};
-
-class ZESeekSteering : public ZESteering
-{	
-	public:
-		ZESteeringOutput			Seek(const ZEVector3& TargetPosition);
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-		ZESeekSteering();
-};
-
-class ZEFleeSteering : public ZESteering
-{	
-	public:
-		ZESteeringOutput			Flee(const ZEVector3& TargetPosition);
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-									ZEFleeSteering();
-};
-
-class ZEArriveSteering : public ZESteering
-{
-	public:
-		float SlowRadius;
-		float TimeToTarget;
-
-		ZESteeringOutput			Arrive(const ZEVector3& TargetPosition);
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-									ZEArriveSteering();
-};
-
-class ZEAlignSteering : public ZESteering
-{
-	public:
-		float TargetRadius;
-		float SlowRadius;
-		float TimeToTarget;
-
-		ZESteeringOutput			Align(float TargetRotation);
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-									ZEAlignSteering();
-};
-
-class ZEVelocityMatchingSteering : public ZESteering
-{
-	public:
-		float TimeToTarget;
-
-		ZESteeringOutput			MatchVelocity(const ZEVector3& TargetVelocity);
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-									ZEVelocityMatchingSteering();
-};
-
-class ZEFaceSteering : public ZEAlignSteering
-{
-	public:
-		ZESteeringOutput			Face(const ZEVector3& TargetDirection);
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-									ZEFaceSteering();
-};
-
-class ZEFaceVelocitySteering : public ZEFaceSteering
-{
-	public:
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-									ZEFaceVelocitySteering();
-};
-
-class ZEWanderSteering : public ZEFaceVelocitySteering
-{
-	public:
-		float WanderRate;	
-		float WanderRotation;
-		float WanderRadius;
-		float WanderOffset;
-
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-									ZEWanderSteering();
-};
-
-class ZEPathFollowingSteering : public ZESteering
-{
-	public:
-		ZESeekSteering				Seek;
-		ZEArriveSteering			Arrive;
-		ZEFaceVelocitySteering		Face;
-
-		ZEArray<ZEVector3>			PathNodes;
-		float						PathNodeRadius;
-		ZESize						CurrentPathNode;
-
-		virtual void				SetOwner(ZEActor*	Owner);
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-									ZEPathFollowingSteering();
-};
-
-
-class ZESeperateSteering : public ZESteering
-{
-	public:
-		ZEArray<ZEActor*>			AvoidedActors;
-		float						Treshold;
-		float						DecayCoefficient;
-
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-									ZESeperateSteering();
-};
-
-class ZEFrictionSteering : public ZESteering
-{
-	public:
-		float						Friction;
-
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-									ZEFrictionSteering();
-};
-
-class ZECollisionAvoidanceSteering : public ZESteering
-{
-	public:
-		ZEArray<ZEActor*>			AvoidedActors;
-
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-									ZECollisionAvoidanceSteering();
-};
-
-class ZEUserTankControlStreering : public ZESteering
-{
-	private:
-
-		ZEInputMap	InputMap;
-
-	public:
-
-		virtual ZESteeringOutput	Process(float ElapsedTime);
-
-									ZEUserTankControlStreering();
 };
 
 #endif

@@ -111,7 +111,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PortalMap->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Scene->AddEntity(PortalMap);
 	
-	Steering = new ZEPlayerFreeSteering();
+	Steering = new ZESteeringPlayerFree();
 
 	Player = ZEPlayer::CreateInstance();
 	Player->SetName("TestPlayer1");

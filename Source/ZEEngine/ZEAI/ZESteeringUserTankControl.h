@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESteering.cpp
+ Zinek Engine - ZESteeringUserTankControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef __ZE_STEERING_USER_TANK_CONTROL_H__
+#define __ZE_STEERING_USER_TANK_CONTROL_H__
+
 #include "ZESteering.h"
 
-void ZESteeringOutput::SetZero()
+class ZEStreeringUserTankControl : public ZESteering
 {
-	LinearAcceleration = ZEVector3::Zero;
-	AngularAcceleration = ZEQuaternion::Identity;
-}
+	private:
+		ZEInputMap	InputMap;
 
-ZEActor* ZESteering::GetOwner()
-{
-	return Owner;
-}
+	public:
+		virtual ZESteeringOutput	Process(float ElapsedTime);
 
-void ZESteering::SetOwner(ZEActor*	Owner)
-{
-	this->Owner = Owner;
-}
+									ZEStreeringUserTankControl();
+};
 
-ZEUInt ZESteering::GetPriority()
-{
-	return Priority;
-}
-
-void ZESteering::SetPriority(ZEUInt Priority)
-{
-	this->Priority = Priority;
-}
-
-float ZESteering::GetWeight()
-{
-	return Weight;
-}
-
-void ZESteering::SetWeight(float Weight)
-{
-	this->Weight = Weight;
-}
-
-bool ZESteering::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZESteering::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-ZEActor* ZESteering::GetTarget()
-{
-	return Target;
-}
-
-void ZESteering::SetTarget(ZEActor* Target)
-{
-	this->Target = Target;
-}
-
-ZESteering::ZESteering()
-{
-	Target = NULL;
-	Owner = NULL;
-
-	Weight = 1.0f;
-	Priority = 3;
-	Enabled = true;
-}
-
-ZESteering::~ZESteering()
-{
-
-}
+#endif

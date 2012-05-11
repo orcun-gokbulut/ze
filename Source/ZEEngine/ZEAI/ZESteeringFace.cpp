@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESteering.cpp
+ Zinek Engine - ZESteeringFace.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESteering.h"
+#include "ZESteeringFace.h"
+#include "ZEActor.h"
+#include "ZEMath/ZEAngle.h"
 
-void ZESteeringOutput::SetZero()
+ZESteeringOutput ZESteeringFace::Face(const ZEVector3& TargetDirection, const ZEVector3& TargetUp)
 {
-	LinearAcceleration = ZEVector3::Zero;
-	AngularAcceleration = ZEQuaternion::Identity;
+	if (TargetDirection.LengthSquare() == 0)
+	{
+		ZESteeringOutput Output;
+		Output.SetZero();
+		return Output;
+	}
+
+	ZEQuaternion Quaternion;
+	ZEQuaternion::CreateFromDirection(Quaternion, TargetDirection, TargetUp);
+	return Align(Quaternion);
 }
 
-ZEActor* ZESteering::GetOwner()
+ZESteeringOutput ZESteeringFace::Process(float ElapsedTime)
 {
-	return Owner;
+	return Face(GetTarget()->GetPosition() - GetOwner()->GetPosition(), GetOwner()->GetUp());
 }
 
-void ZESteering::SetOwner(ZEActor*	Owner)
+ZESteeringFace::ZESteeringFace()
 {
-	this->Owner = Owner;
-}
-
-ZEUInt ZESteering::GetPriority()
-{
-	return Priority;
-}
-
-void ZESteering::SetPriority(ZEUInt Priority)
-{
-	this->Priority = Priority;
-}
-
-float ZESteering::GetWeight()
-{
-	return Weight;
-}
-
-void ZESteering::SetWeight(float Weight)
-{
-	this->Weight = Weight;
-}
-
-bool ZESteering::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZESteering::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-ZEActor* ZESteering::GetTarget()
-{
-	return Target;
-}
-
-void ZESteering::SetTarget(ZEActor* Target)
-{
-	this->Target = Target;
-}
-
-ZESteering::ZESteering()
-{
-	Target = NULL;
-	Owner = NULL;
-
-	Weight = 1.0f;
-	Priority = 3;
-	Enabled = true;
-}
-
-ZESteering::~ZESteering()
-{
-
+	SetPriority(3);
 }

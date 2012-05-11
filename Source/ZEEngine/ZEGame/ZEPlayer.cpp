@@ -65,12 +65,12 @@ ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
 
 
 
-ZEPlayerFreeSteering::~ZEPlayerFreeSteering()
+ZESteeringPlayerFree::~ZESteeringPlayerFree()
 {
 
 }
 
-ZEPlayerFreeSteering::ZEPlayerFreeSteering()
+ZESteeringPlayerFree::ZESteeringPlayerFree()
 {
 	Rx = Ry = Rz = 0.0f;
 
@@ -90,7 +90,7 @@ ZEPlayerFreeSteering::ZEPlayerFreeSteering()
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNLEFT,		 ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE)));
 }
 
-ZESteeringOutput ZEPlayerFreeSteering::Process(float ElapsedTime)
+ZESteeringOutput ZESteeringPlayerFree::Process(float ElapsedTime)
 {
 	ZESteeringOutput Output;
 	Output.SetZero();
