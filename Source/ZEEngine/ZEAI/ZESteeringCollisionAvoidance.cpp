@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESteering.cpp
+ Zinek Engine - ZESteeringCollisionAvoidance.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,64 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESteering.h"
+#include "ZESteeringCollisionAvoidance.h"
+#include "ZEActor.h"
 
-void ZESteeringOutput::SetZero()
+ZESteeringOutput ZESteeringCollisionAvoidance::Process(float ElapsedTime)
 {
-	LinearAcceleration = ZEVector3::Zero;
-	AngularAcceleration = ZEQuaternion::Identity;
+	ZESteeringOutput Output;
+	Output.SetZero();
+
+	float ShortestTime = ZE_FLOAT_MAX;
+	
+	ZEActor* FirstTarget = NULL;
+	float FirstMinSeperation;
+	float FirstDistance;
+	ZEVector3 FirstRelativePosition;
+	ZEVector3 FirstRelativeVelocity;
+
+	for (ZESize I = 0; I < AvoidedActors.GetCount(); I++)
+	{
+		ZEActor* CurrentTarget = AvoidedActors[I];
+
+		ZEVector3 RelativePosition = CurrentTarget->GetPosition() - GetOwner()->GetPosition();
+		ZEVector3 RelativeVelocity = CurrentTarget->GetLinearVelocity() - GetOwner()->GetLinearVelocity();
+		float RelativeSpeed = RelativeVelocity.Length();
+
+		float TimeToCollision = (ZEVector3::DotProduct(RelativePosition, RelativeVelocity) * RelativeSpeed * RelativeSpeed);
+
+		float Distance = RelativePosition.Length();
+		float MinSeparation = Distance - RelativeSpeed * ShortestTime;
+
+		if (MinSeparation > GetOwner()->GetRadius() + CurrentTarget->GetRadius())
+			continue;
+
+		if (TimeToCollision > 0.0f && TimeToCollision < ShortestTime)
+		{
+			ShortestTime = TimeToCollision;
+			FirstTarget = CurrentTarget;
+			FirstMinSeperation = MinSeparation;
+			FirstDistance = Distance;
+			FirstRelativePosition = RelativePosition;
+			FirstRelativeVelocity = RelativeVelocity;
+		}
+	}
+
+	if (FirstTarget == NULL)
+		return Output;
+
+	if (FirstMinSeperation <= 0 || FirstDistance < GetOwner()->GetRadius() + FirstTarget->GetRadius())
+		Output.LinearAcceleration = FirstTarget->GetPosition() - GetOwner()->GetPosition();
+	else
+		Output.LinearAcceleration = FirstRelativePosition + FirstRelativeVelocity * ShortestTime;
+
+	Output.LinearAcceleration.NormalizeSelf();
+	Output.LinearAcceleration = Output.LinearAcceleration * GetOwner()->GetMaxLinearAcceleration();
+
+	return Output;
 }
 
-ZEActor* ZESteering::GetOwner()
+ZESteeringCollisionAvoidance::ZESteeringCollisionAvoidance()
 {
-	return Owner;
-}
-
-void ZESteering::SetOwner(ZEActor*	Owner)
-{
-	this->Owner = Owner;
-}
-
-ZEUInt ZESteering::GetPriority()
-{
-	return Priority;
-}
-
-void ZESteering::SetPriority(ZEUInt Priority)
-{
-	this->Priority = Priority;
-}
-
-float ZESteering::GetWeight()
-{
-	return Weight;
-}
-
-void ZESteering::SetWeight(float Weight)
-{
-	this->Weight = Weight;
-}
-
-bool ZESteering::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZESteering::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-ZEActor* ZESteering::GetTarget()
-{
-	return Target;
-}
-
-void ZESteering::SetTarget(ZEActor* Target)
-{
-	this->Target = Target;
-}
-
-ZESteering::ZESteering()
-{
-	Target = NULL;
-	Owner = NULL;
-
-	Weight = 1.0f;
-	Priority = 3;
-	Enabled = true;
-}
-
-ZESteering::~ZESteering()
-{
-
+	SetPriority(1);
 }

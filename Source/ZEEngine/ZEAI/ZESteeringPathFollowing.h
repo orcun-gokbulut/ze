@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESteering.cpp
+ Zinek Engine - ZESteeringPathFollowing.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef __ZE_STEERING_PATH_FOLLOWING_H__
+#define __ZE_STEERING_PATH_FOLLOWING_H__
+
 #include "ZESteering.h"
+#include "ZESteeringSeek.h"
+#include "ZESteeringArrive.h"
+#include "ZESteeringFaceVelocity.h"
+#include "ZEDS/ZEArray.h"
 
-void ZESteeringOutput::SetZero()
+class ZESteeringPathFollowing : public ZESteering
 {
-	LinearAcceleration = ZEVector3::Zero;
-	AngularAcceleration = ZEQuaternion::Identity;
-}
+	public:
+		ZESteeringSeek				Seek;
+		ZESteeringArrive			Arrive;
+		ZESteeringFaceVelocity		Face;
 
-ZEActor* ZESteering::GetOwner()
-{
-	return Owner;
-}
+		ZEArray<ZEVector3>			PathNodes;
+		float						PathNodeRadius;
+		ZESize						CurrentPathNode;
 
-void ZESteering::SetOwner(ZEActor*	Owner)
-{
-	this->Owner = Owner;
-}
+		virtual void				SetOwner(ZEActor*	Owner);
+		virtual ZESteeringOutput	Process(float ElapsedTime);
 
-ZEUInt ZESteering::GetPriority()
-{
-	return Priority;
-}
+									ZESteeringPathFollowing();
+};
 
-void ZESteering::SetPriority(ZEUInt Priority)
-{
-	this->Priority = Priority;
-}
-
-float ZESteering::GetWeight()
-{
-	return Weight;
-}
-
-void ZESteering::SetWeight(float Weight)
-{
-	this->Weight = Weight;
-}
-
-bool ZESteering::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZESteering::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-ZEActor* ZESteering::GetTarget()
-{
-	return Target;
-}
-
-void ZESteering::SetTarget(ZEActor* Target)
-{
-	this->Target = Target;
-}
-
-ZESteering::ZESteering()
-{
-	Target = NULL;
-	Owner = NULL;
-
-	Weight = 1.0f;
-	Priority = 3;
-	Enabled = true;
-}
-
-ZESteering::~ZESteering()
-{
-
-}
+#endif

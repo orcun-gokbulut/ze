@@ -41,7 +41,7 @@
 #include "ZEInput/ZEInputMap.h"
 #include "ZEAI/ZESteering.h"
 
-class ZEPlayerFreeSteering : public ZESteering
+class ZESteeringPlayerFree : public ZESteering
 {
 	private:
 		
@@ -53,8 +53,8 @@ class ZEPlayerFreeSteering : public ZESteering
 
 		virtual ZESteeringOutput	Process(float ElapsedTime);
 
-									~ZEPlayerFreeSteering();
-									ZEPlayerFreeSteering();
+									~ZESteeringPlayerFree();
+									ZESteeringPlayerFree();
 
 };
 

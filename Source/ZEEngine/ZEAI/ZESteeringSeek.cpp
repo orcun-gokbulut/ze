@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESteering.cpp
+ Zinek Engine - ZESteeringSeek.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESteering.h"
+#include "ZESteeringSeek.h"
+#include "ZEActor.h"
 
-void ZESteeringOutput::SetZero()
+ZESteeringOutput ZESteeringSeek::Seek(const ZEVector3& Target)
 {
-	LinearAcceleration = ZEVector3::Zero;
-	AngularAcceleration = ZEQuaternion::Identity;
+	ZESteeringOutput Output;
+	Output.SetZero();
+
+	Output.LinearAcceleration = Target - GetOwner()->GetPosition();
+	if (Output.LinearAcceleration.LengthSquare() == 0)
+		return Output;
+	Output.LinearAcceleration.NormalizeSelf();
+	Output.LinearAcceleration *= GetOwner()->GetMaxLinearAcceleration();
+
+	return Output;
 }
 
-ZEActor* ZESteering::GetOwner()
+ZESteeringOutput ZESteeringSeek::Process(float ElapsedTime)
 {
-	return Owner;
+	return Seek(GetTarget()->GetPosition());
 }
 
-void ZESteering::SetOwner(ZEActor*	Owner)
+ZESteeringSeek::ZESteeringSeek()
 {
-	this->Owner = Owner;
-}
-
-ZEUInt ZESteering::GetPriority()
-{
-	return Priority;
-}
-
-void ZESteering::SetPriority(ZEUInt Priority)
-{
-	this->Priority = Priority;
-}
-
-float ZESteering::GetWeight()
-{
-	return Weight;
-}
-
-void ZESteering::SetWeight(float Weight)
-{
-	this->Weight = Weight;
-}
-
-bool ZESteering::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZESteering::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-ZEActor* ZESteering::GetTarget()
-{
-	return Target;
-}
-
-void ZESteering::SetTarget(ZEActor* Target)
-{
-	this->Target = Target;
-}
-
-ZESteering::ZESteering()
-{
-	Target = NULL;
-	Owner = NULL;
-
-	Weight = 1.0f;
-	Priority = 3;
-	Enabled = true;
-}
-
-ZESteering::~ZESteering()
-{
-
+	SetPriority(4);
 }

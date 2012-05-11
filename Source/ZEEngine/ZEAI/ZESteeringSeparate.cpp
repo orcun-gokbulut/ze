@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESteering.cpp
+ Zinek Engine - ZESteeringSeparate.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,66 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESteering.h"
+#include "ZESteeringSeparate.h"
+#include "ZEActor.h"
+#include "ZEMath/ZEMath.h"
 
-void ZESteeringOutput::SetZero()
+ZESteeringOutput ZESteeringSeparate::Process(float ElapsedTime)
 {
-	LinearAcceleration = ZEVector3::Zero;
-	AngularAcceleration = ZEQuaternion::Identity;
+	ZESteeringOutput Output;
+	Output.SetZero();
+
+	if (GetTarget() != NULL)
+	{
+		ZEVector3 Direction = GetOwner()->GetPosition() - GetTarget()->GetPosition();
+		float Distance = Direction.Length();
+
+		if (Distance < Treshold + GetOwner()->GetRadius() + GetTarget()->GetRadius())
+		{
+			Direction /= Distance + 0.0001f;
+
+			Distance -= GetOwner()->GetRadius() + GetTarget()->GetRadius();
+			if (Distance < 0.0f)
+			{
+				Distance = 0.0001f;
+			}
+
+			Output.LinearAcceleration = Direction * ZEMath::Min(DecayCoefficient / (Distance * Distance), GetOwner()->GetMaxLinearAcceleration());
+		}
+	}
+
+	for (ZESize I = 0; I < AvoidedActors.GetCount(); I++)
+	{
+		ZEVector3 Direction = GetOwner()->GetPosition() - AvoidedActors[I]->GetPosition();
+		float Distance = Direction.Length();
+		
+		if (Distance < Treshold + GetOwner()->GetRadius() + AvoidedActors[I]->GetRadius())
+		{
+			Direction /= Distance + 0.0001f;
+			
+			Distance -= GetOwner()->GetRadius() + AvoidedActors[I]->GetRadius();
+			if (Distance < 0.0f)
+			{
+				Distance = 0.0001f;
+			}
+
+			Output.LinearAcceleration += Direction * ZEMath::Min(DecayCoefficient / (Distance * Distance), GetOwner()->GetMaxLinearAcceleration());
+		}
+	}
+
+	if (Output.LinearAcceleration.LengthSquare() > GetOwner()->GetMaxLinearAcceleration() * GetOwner()->GetMaxLinearAcceleration())
+	{
+		Output.LinearAcceleration.NormalizeSelf();
+		Output.LinearAcceleration *= GetOwner()->GetMaxLinearAcceleration();
+	}
+
+	return Output;
 }
 
-ZEActor* ZESteering::GetOwner()
+ZESteeringSeparate::ZESteeringSeparate()
 {
-	return Owner;
-}
-
-void ZESteering::SetOwner(ZEActor*	Owner)
-{
-	this->Owner = Owner;
-}
-
-ZEUInt ZESteering::GetPriority()
-{
-	return Priority;
-}
-
-void ZESteering::SetPriority(ZEUInt Priority)
-{
-	this->Priority = Priority;
-}
-
-float ZESteering::GetWeight()
-{
-	return Weight;
-}
-
-void ZESteering::SetWeight(float Weight)
-{
-	this->Weight = Weight;
-}
-
-bool ZESteering::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZESteering::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-ZEActor* ZESteering::GetTarget()
-{
-	return Target;
-}
-
-void ZESteering::SetTarget(ZEActor* Target)
-{
-	this->Target = Target;
-}
-
-ZESteering::ZESteering()
-{
-	Target = NULL;
-	Owner = NULL;
-
-	Weight = 1.0f;
-	Priority = 3;
-	Enabled = true;
-}
-
-ZESteering::~ZESteering()
-{
-
+	SetPriority(1);
+	Treshold = 4.0f;
+	DecayCoefficient = 1.0f;
+	SetPriority(2);
 }

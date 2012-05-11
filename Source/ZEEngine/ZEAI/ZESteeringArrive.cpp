@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESteering.cpp
+ Zinek Engine - ZESteeringArrive.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,48 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESteering.h"
+#include "ZESteeringArrive.h"
+#include "ZEActor.h"
+#include "ZEMath/ZEMath.h"
 
-void ZESteeringOutput::SetZero()
+void ZESteeringArrive::SetSlowRadius(float Radius)
 {
-	LinearAcceleration = ZEVector3::Zero;
-	AngularAcceleration = ZEQuaternion::Identity;
+	SlowRadius = Radius;
 }
 
-ZEActor* ZESteering::GetOwner()
+float ZESteeringArrive::GetSlowRadius()
 {
-	return Owner;
+	return SlowRadius;
 }
 
-void ZESteering::SetOwner(ZEActor*	Owner)
+ZESteeringOutput ZESteeringArrive::Arrive(const ZEVector3& Target)
 {
-	this->Owner = Owner;
+	ZESteeringOutput Output;
+	Output.SetZero();
+
+	ZEVector3 Direction = Target - GetOwner()->GetPosition();
+	float Distance = Direction.Length();
+
+	if (Distance == 0)
+		return Output;
+
+	float TargetSpeed = GetOwner()->GetMaxLinearSpeed() * (Distance / SlowRadius);
+	if (TargetSpeed > GetOwner()->GetMaxLinearSpeed())
+		TargetSpeed = GetOwner()->GetMaxLinearSpeed();
+		
+	ZEVector3 TargetVelocity = (Direction / Distance) * TargetSpeed;
+	Output.LinearAcceleration = TargetVelocity - GetOwner()->GetLinearVelocity();
+
+	return Output;
 }
 
-ZEUInt ZESteering::GetPriority()
+ZESteeringOutput ZESteeringArrive::Process(float ElapsedTime)
 {
-	return Priority;
+	return Arrive(GetTarget()->GetPosition());
 }
 
-void ZESteering::SetPriority(ZEUInt Priority)
+ZESteeringArrive::ZESteeringArrive()
 {
-	this->Priority = Priority;
-}
-
-float ZESteering::GetWeight()
-{
-	return Weight;
-}
-
-void ZESteering::SetWeight(float Weight)
-{
-	this->Weight = Weight;
-}
-
-bool ZESteering::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZESteering::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-ZEActor* ZESteering::GetTarget()
-{
-	return Target;
-}
-
-void ZESteering::SetTarget(ZEActor* Target)
-{
-	this->Target = Target;
-}
-
-ZESteering::ZESteering()
-{
-	Target = NULL;
-	Owner = NULL;
-
-	Weight = 1.0f;
-	Priority = 3;
-	Enabled = true;
-}
-
-ZESteering::~ZESteering()
-{
-
+	SlowRadius = 10.0f;
+	SetPriority(3);
 }

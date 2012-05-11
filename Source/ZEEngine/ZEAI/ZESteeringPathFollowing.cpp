@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESteering.cpp
+ Zinek Engine - ZESteeringPathFollowing.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,42 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESteering.h"
+#include "ZESteeringPathFollowing.h"
+#include "ZEActor.h"
 
-void ZESteeringOutput::SetZero()
+void ZESteeringPathFollowing::SetOwner(ZEActor* Owner)
 {
-	LinearAcceleration = ZEVector3::Zero;
-	AngularAcceleration = ZEQuaternion::Identity;
+	Seek.SetOwner(Owner);
+	Arrive.SetOwner(Owner);
+	Face.SetOwner(Owner);
+
+	ZESteering::SetOwner(Owner);
+}
+ZESteeringOutput ZESteeringPathFollowing::Process(float ElapsedTime)
+{
+	if ((PathNodes[CurrentPathNode] - GetOwner()->GetPosition()).LengthSquare() < PathNodeRadius * PathNodeRadius)
+	{
+		CurrentPathNode++;
+
+		if (PathNodes.GetCount() == CurrentPathNode)
+			CurrentPathNode--;
+	}
+
+	ZESteeringOutput Output;
+	if (CurrentPathNode + 1 == PathNodes.GetCount())
+		Output = Arrive.Arrive(PathNodes[CurrentPathNode]);
+	else
+		Output = Seek.Seek(PathNodes[CurrentPathNode]);
+
+	ZESteeringOutput FaceOutput = Face.Process(ElapsedTime);
+	Output.AngularAcceleration = FaceOutput.AngularAcceleration;
+
+	return Output;
 }
 
-ZEActor* ZESteering::GetOwner()
+ZESteeringPathFollowing::ZESteeringPathFollowing()
 {
-	return Owner;
-}
-
-void ZESteering::SetOwner(ZEActor*	Owner)
-{
-	this->Owner = Owner;
-}
-
-ZEUInt ZESteering::GetPriority()
-{
-	return Priority;
-}
-
-void ZESteering::SetPriority(ZEUInt Priority)
-{
-	this->Priority = Priority;
-}
-
-float ZESteering::GetWeight()
-{
-	return Weight;
-}
-
-void ZESteering::SetWeight(float Weight)
-{
-	this->Weight = Weight;
-}
-
-bool ZESteering::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZESteering::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-ZEActor* ZESteering::GetTarget()
-{
-	return Target;
-}
-
-void ZESteering::SetTarget(ZEActor* Target)
-{
-	this->Target = Target;
-}
-
-ZESteering::ZESteering()
-{
-	Target = NULL;
-	Owner = NULL;
-
-	Weight = 1.0f;
-	Priority = 3;
-	Enabled = true;
-}
-
-ZESteering::~ZESteering()
-{
-
+	CurrentPathNode = 0;
+	PathNodeRadius = 3.0f;
+	SetPriority(3);
 }

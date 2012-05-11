@@ -160,11 +160,11 @@ ZETestSuite(ZEQuaternion)
 		ZETestCheckClose(Up, ZEVector3(0.0f, 0.0f, 1.0f));
 	}
 
-	ZETest("void ZEQuaternion::Create(ZEQuaternion& Output, float Angle, const ZEVector3& Axis)")
+	ZETest("void ZEQuaternion::CreateFromAngleAxis(ZEQuaternion& Output, float Angle, const ZEVector3& Axis)")
 	{
 		ZEQuaternion Quaternion;
 
-		ZEQuaternion::Create(Quaternion, ZE_PI_2, ZEVector3::UnitX);
+		ZEQuaternion::CreateFromAngleAxis(Quaternion, ZE_PI_2, ZEVector3::UnitX);
 		
 		ZETestCheckClose(Quaternion.w, ZE_SQRT1_2);
 		ZETestCheckClose(Quaternion.x, ZE_SQRT1_2);

@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETest.h"
+#include "ZETest/ZETest.h"
 #include "ZEIPAddress.h"
 #include <Winsock2.h>
 #include <Ws2ipdef.h>

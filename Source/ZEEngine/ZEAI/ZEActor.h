@@ -49,13 +49,11 @@ class ZESteering;
 class ZEActor : public ZEEntity
 {
 	private:
-		float						Rotation2D;
-
 		ZEVector3					LinearVelocity;
-		float						AngularVelocity;
+		ZEQuaternion				AngularVelocity;
 
 		ZEVector3					LinearAcceleration;
-		float						AngularAcceleration;
+		ZEQuaternion				AngularAcceleration;
 
 		float						MinLinearAcceleration;
 		float						MinAngularAcceleration;
@@ -71,20 +69,14 @@ class ZEActor : public ZEEntity
 		ZEArray<ZESteering*>		Steerings;
 
 	public:
-		void						SetRotation2D(float Rotation);
-		float						GetRotation2D();
-
-		void						SetFaceRotation(float Rotation);
-		float						GetFaceRotation();
-
 		void						SetLinearVelocity(const ZEVector3& Velocity);
 		const ZEVector3&			GetLinearVelocity();
 
-		void						SetAngularVelocity(float Velocity);
-		float						GetAngularVelocity();
+		void						SetAngularVelocity(const ZEQuaternion& Velocity);
+		const ZEQuaternion&			GetAngularVelocity();
 
 		const ZEVector3&			GetLinearAcceleration();
-		float						GetAngularAcceleration();
+		const ZEQuaternion&			GetAngularAcceleration();
 
 		void						SetMaxAngularVelocity(float Velocity);
 		float						GetMaxAngularVelocity();
