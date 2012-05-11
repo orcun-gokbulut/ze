@@ -533,3 +533,73 @@ ZEParticleRandomAccelerationModifier::~ZEParticleRandomAccelerationModifier()
 {
 
 }
+
+/************************************************************************/
+/*							ZEParticleUVModifier						*/
+/************************************************************************/
+
+
+void ZEParticleUVModifier::SetTextureSize(ZEVector2 TextureSize)
+{
+	this->TextureSize = TextureSize;
+}
+
+void ZEParticleUVModifier::SetRowCount(ZEInt RowCount)
+{
+	this->RowCount = RowCount;
+}
+
+void ZEParticleUVModifier::SetColumnCount(ZEInt ColumnCount)
+{
+	this->ColumnCount = ColumnCount;
+}
+
+void ZEParticleUVModifier::Tick(float ElapsedTime)
+{
+	if(!DoOnce)
+	{
+		UVFrameSize.x = 1.0f / (float)ColumnCount;
+		UVFrameSize.y = 1.0f / (float)RowCount;
+		DoOnce = true;
+	}
+
+	ZEArray<ZEParticle>& Particles = GetOwnerParticlePool();
+	ZESize ParticleCount = Particles.GetCount();
+
+	for (ZESize I = 0; I < ParticleCount; I++)
+	{
+		switch(Particles[I].State)
+		{
+		case ZE_PAS_NEW:
+
+			Particles[I].MinTexCoord = ZEVector2::Zero;
+			Particles[I].MaxTexCoord = UVFrameSize;
+			break;
+
+		case ZE_PAS_ALIVE:
+
+			CurrentUVFrame = (Particles[I].TotalLife - Particles[I].Life) * (((float)RowCount * (float)ColumnCount) / Particles[I].TotalLife);
+
+			Particles[I].MinTexCoord.x = (CurrentUVFrame % ColumnCount) * UVFrameSize.x;
+			Particles[I].MinTexCoord.y = (CurrentUVFrame / ColumnCount) * UVFrameSize.y;
+
+			Particles[I].MaxTexCoord.x = ((CurrentUVFrame % ColumnCount) + 1) * UVFrameSize.x;
+			Particles[I].MaxTexCoord.y = ((CurrentUVFrame / ColumnCount) + 1) * UVFrameSize.y;
+
+			break;
+
+		case ZE_PAS_DEAD:
+			break;
+		}
+	}
+}
+
+ZEParticleUVModifier::ZEParticleUVModifier()
+{
+	DoOnce = false;
+}
+
+ZEParticleUVModifier::~ZEParticleUVModifier()
+{
+
+}
