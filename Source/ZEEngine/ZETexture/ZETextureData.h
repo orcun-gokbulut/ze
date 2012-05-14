@@ -66,14 +66,118 @@
 #define		ZE_I8_4_INPUT_BLOCK_SIZE			4	// Bytes
 #define		ZE_I8_4_OUTPUT_BLOCK_SIZE			4	// Bytes
 
+// Uncompressed ZE_TPF_I8 size
+#define		ZE_I8_COMPRESSION_BLOCK_WIDTH		1	// Pixels
+#define		ZE_I8_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
+#define		ZE_I8_INPUT_BLOCK_SIZE				1	// Bytes
+#define		ZE_I8_OUTPUT_BLOCK_SIZE				1	// Bytes
+
+// Uncompressed ZE_TPF_I16 size
+#define		ZE_I16_COMPRESSION_BLOCK_WIDTH		1	// Pixels
+#define		ZE_I16_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
+#define		ZE_I16_INPUT_BLOCK_SIZE				2	// Bytes
+#define		ZE_I16_OUTPUT_BLOCK_SIZE			2	// Bytes
+
+// Uncompressed ZE_TPF_I16_2 size
+#define		ZE_I16_2_COMPRESSION_BLOCK_WIDTH	1	// Pixels
+#define		ZE_I16_2_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
+#define		ZE_I16_2_INPUT_BLOCK_SIZE			2	// Bytes
+#define		ZE_I16_2_OUTPUT_BLOCK_SIZE			2	// Bytes
+
+// Uncompressed ZE_TPF_I32 size
+#define		ZE_I32_COMPRESSION_BLOCK_WIDTH		1	// Pixels
+#define		ZE_I32_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
+#define		ZE_I32_INPUT_BLOCK_SIZE				2	// Bytes
+#define		ZE_I32_OUTPUT_BLOCK_SIZE			2	// Bytes
+
+// Uncompressed ZE_TPF_F32 size
+#define		ZE_F32_COMPRESSION_BLOCK_WIDTH		1	// Pixels
+#define		ZE_F32_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
+#define		ZE_F32_INPUT_BLOCK_SIZE				4	// Bytes
+#define		ZE_F32_OUTPUT_BLOCK_SIZE			4	// Bytes
+
+// Uncompressed ZE_TPF_F32_2 size
+#define		ZE_F32_2_COMPRESSION_BLOCK_WIDTH	1	// Pixels
+#define		ZE_F32_2_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
+#define		ZE_F32_2_INPUT_BLOCK_SIZE			8	// Bytes
+#define		ZE_F32_2_OUTPUT_BLOCK_SIZE			8	// Bytes
+
+// Uncompressed ZE_TPF_F32_4 size
+#define		ZE_F32_4_COMPRESSION_BLOCK_WIDTH	1	// Pixels
+#define		ZE_F32_4_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
+#define		ZE_F32_4_INPUT_BLOCK_SIZE			16	// Bytes
+#define		ZE_F32_4_OUTPUT_BLOCK_SIZE			16	// Bytes
+
+
 ZEPackStruct
 (
+	struct ZEG8	
+	{
+		ZEUInt8 G;
+	}
+);
+
+ZEPackStruct
+( 
 	struct ZEARGB32
 	{
 		ZEUInt8 B;
 		ZEUInt8 G;
 		ZEUInt8 R;
 		ZEUInt8 A;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEG16
+	{
+		ZEUInt16 G;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEAG32
+	{
+		ZEUInt16 G;
+		ZEUInt16 A;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEG32
+	{
+		ZEUInt32 G;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEG32F
+	{
+		float G;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEAG32F
+	{
+		float G;
+		float A;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEARGB32F
+	{
+		float B;
+		float G;
+		float R;
+		float A;
 	}
 );
 
@@ -86,6 +190,7 @@ ZEPackStruct
 		ZEUInt8 R;
 	}
 );
+
 
 class ZETextureData;
 class ZETextureSurface;

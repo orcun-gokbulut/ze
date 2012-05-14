@@ -34,15 +34,14 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
+#include "ZEMath\ZEMath.h"
 #include "ZETextureData.h"
 #include "ZEFile\ZEFile.h"
+#include "ZEMath\ZEVector.h"
 #include "ZETextureFileFormat.h"
 
 #include <memory.h>
-#include "ZEMath\ZEVector.h"
 #include <intrin.h>
-#include "ZEMath\ZEMath.h"
-
 
 // Returns if a TextureData 3D level of a surface is valid or not
 static bool IsLevelValid(ZEUInt Surface, ZEUInt Level)
@@ -131,7 +130,28 @@ ZESize ZETextureLevel::GetPitch()
 	ZETexturePixelFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
 	
 	switch (PixelFormat)
-	{
+	{		
+		case ZE_TPF_I8:
+			Pitch = ((ZESize)LevelWidth / ZE_I8_COMPRESSION_BLOCK_WIDTH) * ZE_I8_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_I16:
+			Pitch = ((ZESize)LevelWidth / ZE_I16_COMPRESSION_BLOCK_WIDTH) * ZE_I16_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_I16_2:
+			Pitch = ((ZESize)LevelWidth / ZE_I16_2_COMPRESSION_BLOCK_WIDTH) * ZE_I16_2_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_I32:
+			Pitch = ((ZESize)LevelWidth / ZE_I32_COMPRESSION_BLOCK_WIDTH) * ZE_I32_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_F32:
+			Pitch = ((ZESize)LevelWidth / ZE_F32_COMPRESSION_BLOCK_WIDTH) * ZE_F32_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_F32_2:
+			Pitch = ((ZESize)LevelWidth / ZE_F32_2_COMPRESSION_BLOCK_WIDTH) * ZE_F32_2_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_F32_4:
+			Pitch = ((ZESize)LevelWidth / ZE_F32_4_COMPRESSION_BLOCK_WIDTH) * ZE_F32_4_OUTPUT_BLOCK_SIZE;
+			break;
 		case ZE_TPF_I8_4:
 			Pitch = ((ZESize)LevelWidth / ZE_I8_4_COMPRESSION_BLOCK_WIDTH) * ZE_I8_4_OUTPUT_BLOCK_SIZE;
 			break;
@@ -143,6 +163,15 @@ ZESize ZETextureLevel::GetPitch()
 			break;
 		case ZE_TPF_DXT5:
 			Pitch = ((ZESize)LevelWidth / ZE_DXT_5_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_5_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_F16:
+		case ZE_TPF_F16_2:
+		case ZE_TPF_F16_4:
+			zeCriticalError("16 Bit floating point data is not supported.");
+			break;
+		case ZE_TPF_NOTSET:
+		default:
+			zeCriticalError("Unknown Pixel Format");
 			break;
 
 	}
@@ -159,6 +188,27 @@ ZEUInt ZETextureLevel::GetRowCount()
 
 	switch (PixelFormat)
 	{
+		case ZE_TPF_I8:
+			RowCount = LevelHeight / ZE_I8_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_I16:
+			RowCount = LevelHeight / ZE_I16_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_I16_2:
+			RowCount = LevelHeight / ZE_I16_2_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_I32:
+			RowCount = LevelHeight / ZE_I32_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_F32:
+			RowCount = LevelHeight / ZE_F32_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_F32_2:
+			RowCount = LevelHeight / ZE_F32_2_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_F32_4:
+			RowCount = LevelHeight / ZE_F32_4_COMPRESSION_BLOCK_HEIGHT;
+			break;
 		case ZE_TPF_I8_4:
 			RowCount = LevelHeight / ZE_I8_4_COMPRESSION_BLOCK_HEIGHT;
 			break;
@@ -171,7 +221,15 @@ ZEUInt ZETextureLevel::GetRowCount()
 		case ZE_TPF_DXT5:
 			RowCount = LevelHeight / ZE_DXT_5_COMPRESSION_BLOCK_HEIGHT;
 			break;
-
+		case ZE_TPF_F16:
+		case ZE_TPF_F16_2:
+		case ZE_TPF_F16_4:
+			zeCriticalError("16 Bit floating point data is not supported.");
+			break;
+		case ZE_TPF_NOTSET:
+		default:
+			zeCriticalError("Unknown Pixel Format");
+			break;
 	}
 
 	return RowCount;
@@ -201,6 +259,7 @@ void ZETextureLevel::CopyFrom(void* SourceData, ZESize SourcePitch)
 		memcpy((ZEUInt8*)Destination + I * DestinationPitch, (ZEUInt8*)SourceData + I * SourcePitch, DestinationPitch);
 }
 
+
 void ZETextureLevel::CopyTo(void* Dest, ZESize DestPitch)
 {
 	zeAssert(Dest == NULL || DestPitch == 0, "Cannot copy to destination. Either destination is NULL or pitch is 0.");
@@ -227,7 +286,7 @@ ZETextureLevel::~ZETextureLevel()
 {
 	if (Data)	
 	{
-		delete[] Data;
+		delete [] Data;
 		Data = NULL;
 	}
 }
@@ -297,7 +356,7 @@ void ZETextureData::Create(ZETextureType TextureType, ZETexturePixelFormat Pixel
 	}
 
 	// Set texture data
-	this->Info.Width			= Width;
+	this->Info.Width		= Width;
 	this->Info.Height		= Height;
 	this->Info.LevelCount	= LevelCount;
 	this->Info.SurfaceCount	= SurfaceCount;
@@ -383,7 +442,7 @@ void ZETextureData::Create(ZETextureData& TextureData)
 	}
 
 	// Allocate surfaces, levels and level data
-	this->Info.Width			= TextureData.Info.Width;
+	this->Info.Width		= TextureData.Info.Width;
 	this->Info.Height		= TextureData.Info.Height;
 	this->Info.LevelCount	= TextureData.Info.LevelCount;
 	this->Info.SurfaceCount	= TextureData.Info.SurfaceCount;
@@ -463,7 +522,7 @@ void ZETextureData::Destroy()
 	Surfaces.Clear(false);
 
 	// Clear texture data
-	this->Info.Width			= 0;
+	this->Info.Width		= 0;
 	this->Info.Height		= 0;
 	this->Info.LevelCount	= 0;
 	this->Info.SurfaceCount	= 0;
