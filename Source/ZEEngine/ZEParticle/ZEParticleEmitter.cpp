@@ -758,7 +758,7 @@ void ZEParticleEmitter::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	if(IsEmmiterLocal)
-		RenderCommand.WorldMatrix = GetOwner()->GetWorldTransform();
+		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, GetOwner()->GetWorldPosition(), ZEQuaternion::Identity, GetOwner()->GetWorldScale());
 	else
 		RenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
 
