@@ -40,7 +40,6 @@ void ZESteeringPathFollowing::SetOwner(ZEActor* Owner)
 {
 	Seek.SetOwner(Owner);
 	Arrive.SetOwner(Owner);
-	Face.SetOwner(Owner);
 
 	ZESteering::SetOwner(Owner);
 }
@@ -51,7 +50,9 @@ ZESteeringOutput ZESteeringPathFollowing::Process(float ElapsedTime)
 		CurrentPathNode++;
 
 		if (PathNodes.GetCount() == CurrentPathNode)
+		{
 			CurrentPathNode--;
+		}
 	}
 
 	ZESteeringOutput Output;
@@ -59,9 +60,6 @@ ZESteeringOutput ZESteeringPathFollowing::Process(float ElapsedTime)
 		Output = Arrive.Arrive(PathNodes[CurrentPathNode]);
 	else
 		Output = Seek.Seek(PathNodes[CurrentPathNode]);
-
-	ZESteeringOutput FaceOutput = Face.Process(ElapsedTime);
-	Output.AngularAcceleration = FaceOutput.AngularAcceleration;
 
 	return Output;
 }
