@@ -48,7 +48,6 @@ class ZESteeringPathFollowing : public ZESteering
 	public:
 		ZESteeringSeek				Seek;
 		ZESteeringArrive			Arrive;
-		ZESteeringFaceVelocity		Face;
 
 		ZEArray<ZEVector3>			PathNodes;
 		float						PathNodeRadius;
