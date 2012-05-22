@@ -45,13 +45,20 @@ void ZESteeringPathFollowing::SetOwner(ZEActor* Owner)
 }
 ZESteeringOutput ZESteeringPathFollowing::Process(float ElapsedTime)
 {
+	IsReachedLastPoint = false;
+
 	if ((PathNodes[CurrentPathNode] - GetOwner()->GetPosition()).LengthSquare() < PathNodeRadius * PathNodeRadius)
 	{
 		CurrentPathNode++;
 
 		if (PathNodes.GetCount() == CurrentPathNode)
 		{
-			CurrentPathNode--;
+			if(IsLooping)
+				CurrentPathNode = 0;
+			else
+				CurrentPathNode--;
+
+			IsReachedLastPoint = true;
 		}
 	}
 
@@ -69,4 +76,6 @@ ZESteeringPathFollowing::ZESteeringPathFollowing()
 	CurrentPathNode = 0;
 	PathNodeRadius = 3.0f;
 	SetPriority(3);
+	IsReachedLastPoint = false;
+	IsLooping = false;
 }

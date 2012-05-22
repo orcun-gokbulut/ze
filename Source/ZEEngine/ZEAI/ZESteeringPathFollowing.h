@@ -45,9 +45,15 @@
 
 class ZESteeringPathFollowing : public ZESteering
 {
+	private:
+
+	ZESteeringSeek				Seek;
+	ZESteeringArrive			Arrive;
+
 	public:
-		ZESteeringSeek				Seek;
-		ZESteeringArrive			Arrive;
+
+		bool						IsLooping;
+		bool						IsReachedLastPoint;						
 
 		ZEArray<ZEVector3>			PathNodes;
 		float						PathNodeRadius;
