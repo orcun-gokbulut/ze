@@ -98,7 +98,7 @@ void ZED3D9CommonTools::SetRenderTarget(DWORD RenderTarget, ZETexture2D* Texture
 	return;
 }
 
-void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture2D* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
+void ZED3D9CommonTools::SetTexture(DWORD Stage, const ZETexture2D* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
 {
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Addressing);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Addressing);
