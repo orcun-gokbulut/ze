@@ -161,10 +161,10 @@ class ZEVector3
 		static void					Create(ZEVector3& Out, float x, float y, float z);
 		static void					Create(ZEVector3& Out, const ZEVector3 &Start, const ZEVector3 &End);
 		
-		static void					CreateFromSpherical(ZEVector3& Out, float Radius, float Theha, float Rho);
+		static void					CreateFromSpherical(ZEVector3& Out, float Radius, float Theta, float Phi);
 		static void					CreateFromCylindirical(ZEVector3& Out, float Radius, float Theta, float Height);
 
-		static void					ConvertToSpherical(const ZEVector3& In, float& Radius, float& Theta, float& Rho);
+		static void					ConvertToSpherical(const ZEVector3& In, float& Radius, float& Theta, float& Phi);
 		static void					ConvertToCylindirical(const ZEVector3& In, float& Radius, float& Theta, float& Height);
 
 		static void					Add(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B);

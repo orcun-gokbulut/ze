@@ -457,10 +457,15 @@ inline void ZEVector3::Create(ZEVector3& Out, const ZEVector3 &Start, const ZEVe
 
 void ZEVector3::CreateFromSpherical(ZEVector3& Out, float Radius, float Theta, float Phi)
 {
-	float SinTheta = ZEAngle::Sin(Theta);
-	Out.x = Radius * SinTheta * ZEAngle::Cos(Phi);
-	Out.y = Radius * ZEAngle::Cos(Theta);
-	Out.z = Radius * SinTheta * ZEAngle::Sin(Phi);
+// 	float SinTheta = ZEAngle::Sin(Theta);
+// 	Out.x = Radius * SinTheta * ZEAngle::Cos(Phi);
+// 	Out.y = Radius * ZEAngle::Cos(Theta);
+// 	Out.z = Radius * SinTheta * ZEAngle::Sin(Phi);
+
+	float SinPhi = ZEAngle::Sin(-Phi);
+	Out.x = Radius * ZEAngle::Cos(-Theta) * SinPhi;
+	Out.y = Radius * ZEAngle::Cos(-Phi);
+	Out.z = Radius * ZEAngle::Sin(-Theta) * SinPhi;
 }
 
 void ZEVector3::CreateFromCylindirical(ZEVector3& Out, float Radius, float Theta, float Height)
@@ -472,9 +477,19 @@ void ZEVector3::CreateFromCylindirical(ZEVector3& Out, float Radius, float Theta
 
 void ZEVector3::ConvertToSpherical(const ZEVector3& In, float& Radius, float& Theta, float& Phi)
 {
+// 	Radius = ZEMath::Sqrt(In.x * In.x + In.y * In.y + In.z * In.z);
+// 	Theta =  ZEAngle::ArcTan(In.y / ZEMath::Sqrt(In.x * In.x + In.z * In.z));
+// 	Phi = ZEAngle::ArcTan(In.z / In.x);
+
 	Radius = ZEMath::Sqrt(In.x * In.x + In.y * In.y + In.z * In.z);
-	Theta =  ZEAngle::ArcTan(In.y / ZEMath::Sqrt(In.x * In.x + In.z * In.z));
-	Phi = ZEAngle::ArcTan(In.z / In.x);
+	Phi = -ZEAngle::ArcCos(In.y / Radius);
+
+	if (In.x >= 0.0f)
+		Theta = -ZEAngle::ArcSin(In.z / ZEMath::Sqrt(In.x * In.x + In.z * In.z));
+	else
+		Theta = -(ZE_PI - ZEAngle::ArcSin(In.z / ZEMath::Sqrt(In.x * In.x + In.z * In.z)));
+
+	//ZEAngle::ArcTan(In.z / In.x);
 }
 
 void ZEVector3::ConvertToCylindirical(const ZEVector3& In, float& Radius, float& Theta, float& Height)

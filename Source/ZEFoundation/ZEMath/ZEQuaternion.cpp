@@ -114,48 +114,36 @@ void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Di
 	ZEVector3 NewRight, NewUp, NewDirection;
 
 	ZEVector3::Normalize(NewDirection, Direction);
-	//float Dot = ZEVector3::DotProduct(NewDirection, ZEVector3::UnitY);
 
 	ZEVector3::CrossProduct(NewRight, Up, NewDirection);
 	ZEVector3::CrossProduct(NewUp, NewDirection, NewRight);
-
-	/*	if (Dot < 0.99f)
-	{	
-		ZEVector3::CrossProduct(NewRight, Up, NewDirection);
-		ZEVector3::CrossProduct(NewUp, NewDirection, NewRight);
-	}
-	else
-	{
-		ZEVector3::CrossProduct(NewUp, ZEVector3::UnitX, NewDirection);
-		ZEVector3::CrossProduct(NewRight, NewUp, NewDirection);
-	}*/
 
 	ZEVector3::Normalize(NewRight, NewRight);
 	ZEVector3::Normalize(NewUp, NewUp);
 
 	ZEMatrix3x3 Basis(
-	NewRight.x, NewUp.x, NewDirection.x,                                        
-	NewRight.y, NewUp.y, NewDirection.y,                          
+	NewRight.x, NewUp.x, NewDirection.x,                                       
+	NewRight.y, NewUp.y, NewDirection.y,                         
 	NewRight.z, NewUp.z, NewDirection.z);
 
-	Output.w = ZEMath::Sqrt(1.0f + Basis.M11 + Basis.M22 + Basis.M33) / 2.0f;
-	
-	float Scale = Output.w * 4.0f;
-	Output.x = (Basis.M32 - Basis.M23) / Scale;
-	Output.y = (Basis.M13 - Basis.M31) / Scale;
-	Output.z = (Basis.M21 - Basis.M12) / Scale;
-	
-/*
-	ZEQuaternion Quat;
-	Quat.w = ZEMath::Sqrt(1.0f + Right.x + NewUp.y + Direction.z) / 2.0f;
-	float Scale = Quat.w * 4.0f;
-	Quat.x = (Direction.y - NewUp.z) / Scale;
-	Quat.y = (Right.z - Direction.x) / Scale;
-	Quat.z = (NewUp.x - Right.y) / Scale;*/
+	ZEQuaternion::CreateFromMatrix(Output, Basis);
+
+	ZEQuaternion::Normalize(Output, Output);
+}
+
+void ZEQuaternion::CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix3x3& Matrix)
+{
+	Output.w = ZEMath::Sqrt(ZEMath::Max(0.0f, 1.0f + Matrix.M11 + Matrix.M22 + Matrix.M33)) / 2.0f;
+	Output.x = ZEMath::Sqrt(ZEMath::Max(0.0f, 1.0f + Matrix.M11 - Matrix.M22 - Matrix.M33)) / 2.0f;
+	Output.y = ZEMath::Sqrt(ZEMath::Max(0.0f, 1.0f - Matrix.M11 + Matrix.M22 - Matrix.M33)) / 2.0f;
+	Output.z = ZEMath::Sqrt(ZEMath::Max(0.0f, 1.0f - Matrix.M11 - Matrix.M22 + Matrix.M33)) / 2.0f;
+	Output.x = ZEMath::CopySign(Output.x, Matrix.M32 - Matrix.M23);
+	Output.y = ZEMath::CopySign(Output.y, Matrix.M13 - Matrix.M31);
+	Output.z = ZEMath::CopySign(Output.z, Matrix.M21 - Matrix.M12);
 
 	ZEQuaternion::Normalize(Output, Output);
 
-	//zeAssert(!Output.IsValid(), "Output quaternion is not valid.");
+	zeAssert(!Output.IsValid(), "Output quaternion is not valid.");
 }
 
 void ZEQuaternion::CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix4x4& Matrix)
