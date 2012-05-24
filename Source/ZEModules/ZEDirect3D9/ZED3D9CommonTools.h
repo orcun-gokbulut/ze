@@ -60,7 +60,7 @@ class ZED3D9CommonTools : public ZED3D9ComponentBase
 	public:
 		static void				SetRenderTarget(DWORD RenderTarget, ZEViewPort* Texture);
 		static void				SetRenderTarget(DWORD RenderTarget, ZETexture2D* Texture);
-		static void				SetTexture(DWORD Stage, ZETexture2D* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);
+		static void				SetTexture(DWORD Stage, const ZETexture2D* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);
 		static void				SetTexture(DWORD Stage, ZETexture2DResource* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);
 		static void				SetTexture(DWORD Stage, ZETextureCube* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);
 		static void				SetTexture(DWORD Stage, ZETextureCubeResource* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);

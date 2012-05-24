@@ -419,7 +419,7 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
 
-	ZED3D9CommonTools::SetTexture(2, (ZETextureCube*)Light->GetProjectionTexture(), D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetTexture(2, Light->GetProjectionTexture(), D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
 
 	if (Light->GetCastsShadow() && Light->GetShadowMap() != NULL)
 		ZED3D9CommonTools::SetTexture(4, Light->GetShadowMap(), D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);

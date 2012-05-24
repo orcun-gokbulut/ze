@@ -178,10 +178,12 @@ float ZEWeather::GetSunLightIntensity() const
 
 void ZEWeather::SetMoonDirection(const ZEVector3& Value)
 {
-	MoonHeight = Value.y;
-	MoonDirection = Value;
+	ZEVector3 NormalizedValue = Value.Normalize();
 
-	Moon->SetMoonDirection(Value);
+	MoonHeight = NormalizedValue.y;
+	MoonDirection = NormalizedValue;
+
+	Moon->SetMoonDirection(NormalizedValue);
 
 	// Set moon directional light
 	ZEQuaternion MoonLightRotation;
@@ -198,11 +200,13 @@ const ZEVector3& ZEWeather::GetMoonDirection() const
 
 void ZEWeather::SetSunDirection(const ZEVector3& Value)
 {
-	SunHeight = Value.y;
-	SunDirection = Value;
+	ZEVector3 NormalizedValue = Value.Normalize();
 
-	Cloud->SetSunLightDirection(Value);
-	SkyDome->SetSunLightDirection(Value);
+	SunHeight = NormalizedValue.y;
+	SunDirection = NormalizedValue;
+
+	Cloud->SetSunLightDirection(NormalizedValue);
+	SkyDome->SetSunLightDirection(NormalizedValue);
 
 	// Also set the directional sun light
 	ZEQuaternion SunLightRotation;
