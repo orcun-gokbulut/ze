@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileTGA.h
+ Zinek Engine - ZELock.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,18 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
-#pragma once
-#ifndef __ZE_TEXTURE_FILE_TGA_H__
-#define __ZE_TEXTURE_FILE_TGA_H__
-
-#include "ZETextureFile.h"
-
-class ZETextureFileTGA : public ZETextureFile
+class ZELockHandle 
 {
+	friend class ZELock;
+	private:
+		bool				Locked;
+		long				Number;
+
+		ZELockHandle&		operator=(const ZELockHandle& Handle);
+
+							ZELockHandle(const ZELockHandle& Handle);
+
 	public:
-		virtual bool				LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*		Load(ZEFile* File);
+							ZELockHandle();
+							~ZELockHandle();
 };
 
-#endif
+class ZELock
+{
+	private:
+		long				CurrentNumber;
+		volatile long		NextNumber;
+
+	public:
+		bool				Test();
+		bool				Lock(ZELockHandle* Handle);
+		void				Wait();
+		void				WaitAndLock(ZELockHandle* Handle);
+		bool				Unlock(ZELockHandle* Handle);
+
+		ZELock&				operator=(const ZELock& Lock);
+
+							ZELock();
+							ZELock(const ZELock& Lock);
+							~ZELock();
+};

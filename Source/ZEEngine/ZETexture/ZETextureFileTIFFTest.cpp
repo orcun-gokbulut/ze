@@ -59,7 +59,8 @@ static bool TestSuccess(ZEString FileName)
 	ZEPointer<ZEFile> File = ZEFile::Open(FileName);
 
 	ZETextureFileTIFF Loader;
-	if (!Loader.CanLoad(File))
+	ZETextureDataInfo Info;
+	if (!Loader.LoadInfo(&Info, File))
 		return false;
 
 	ZETextureData* Data = Loader.Load(File);
@@ -94,27 +95,6 @@ ZETestSuite(ZETextureFileTIFFTest)
 {
 	ZETest("Valid Samples")
 	{
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/CBW8.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/CCM8.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/CTC16.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/CTC24.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/CTC32.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/FLAG_B16.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/FLAG_B24.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/FLAG_B32.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/FLAG_T16.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/FLAG_T32.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/MARBLES.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/UBW8.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/UCM8.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/UTC16.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/UTC24.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/UTC32.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/XING_B16.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/XING_B24.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/XING_B32.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/XING_T16.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/XING_T24.TGA"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Valid/XING_T32.TGA"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/flower-rgb-planar-08.tif"));
 	}
 }

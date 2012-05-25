@@ -41,6 +41,79 @@
 #include "ZEDS/ZEPointer.h"
 #include "ZEFile/ZEFile.h"
 #include "ZETexturePixelConverter.h"
+#include "ZETextureData.h"
+#include "ZEPacking.h"
+#include "ZETypes.h"
+#include "ZEEndian.h"
+#include "ZEDS/ZEArray.h"
+
+ZEPackStruct
+(
+	struct ZETIFFHeader
+	{
+		ZEUInt16		Endianness;
+		ZEUInt16		Identifier;
+		ZEUInt32		EntryListOffset;
+	};
+);
+
+ZEPackStruct
+(
+	struct ZETIFFEntry
+	{
+		ZEUInt16		Id;
+		ZEUInt16		Type;
+		ZEUInt32		Count;
+		ZEUInt8			Value[8];
+	};
+);
+
+enum ZETIFFChunkType
+{
+	ZE_TIFF_CT_STRIP,
+	ZE_TIFF_CT_TILE
+};
+
+enum ZETIFFCompressionType
+{
+	ZE_TIFF_CT_UNCOMPRESSED = 0,
+	ZE_TIFF_CT_PACKBIT = 32773,
+	ZE_TIFF_CT_LZW = 5
+};
+
+enum ZETIFFPixelFormat
+{
+	ZE_TIFF_PT_NONE,
+	ZE_TIFF_PT_INDEXED,
+	ZE_TIFF_PT_L8,
+	ZE_TIFF_PT_LA8, // Will be supported
+	ZE_TIFF_PT_L16, // Will be supported
+	ZE_TIFF_PT_LA16,
+	ZE_TIFF_PT_RGB8,
+	ZE_TIFF_PT_RGBA8,
+	ZE_TIFF_PT_RGB16, // Will be supported
+	ZE_TIFF_PT_RGBA16 // Will be supported
+};
+
+struct ZETIFFInfo
+{
+	ZEEndianness			Endianness;
+	ZESize					Width;
+	ZESize					Height;
+	ZETIFFCompressionType	Compression;
+	ZETIFFPixelFormat		PixelFormat;
+
+	ZETIFFChunkType			ChunkType;
+	ZESize					ChunkWidth;
+	ZESize					ChunkHeight;
+	ZETIFFEntry				ChunkOffsetsEntry;
+	ZETIFFEntry				ChunkSizesEntry;
+	ZEArray<ZEUInt32>		ChunkOffsets;
+	ZEArray<ZEUInt32>		ChunkSizes;
+
+	ZETIFFEntry				PaletteEntry;
+	ZEBGRA32				Palette[256];
+};
 
 ZESize GetPixelSize(ZETIFFPixelFormat Format)
 {
@@ -49,28 +122,28 @@ ZESize GetPixelSize(ZETIFFPixelFormat Format)
 		case ZE_TIFF_PT_INDEXED:
 			return 1;
 
-		case ZE_TIFF_PT_G8:
+		case ZE_TIFF_PT_L8:
 			return 1;
 
-		case ZE_TIFF_PT_G16:
+		case ZE_TIFF_PT_LA8:
 			return 2;
 
-		case ZE_TIFF_PT_GA16:
+		case ZE_TIFF_PT_L16:
 			return 2;
 
-		case ZE_TIFF_PT_GA32:
+		case ZE_TIFF_PT_LA16:
 			return 4;
 
-		case ZE_TIFF_PT_RGB24:
+		case ZE_TIFF_PT_RGB8:
 			return 3;
 
-		case ZE_TIFF_PT_RGBA32:
+		case ZE_TIFF_PT_RGBA8:
 			return 4;
 
-		case ZE_TIFF_PT_RGB48:
+		case ZE_TIFF_PT_RGB16:
 			return 6;
 
-		case ZE_TIFF_PT_RGB64:
+		case ZE_TIFF_PT_RGBA16:
 			return 8;
 
 		default:
@@ -79,7 +152,36 @@ ZESize GetPixelSize(ZETIFFPixelFormat Format)
 
 }
 
-bool ZETextureFileTIFF::LoadEntryArray(ZEArray<ZEUInt32> Output, ZETIFFEntry* Entry, ZEFile* File, ZEEndianness Endianness)
+static ZETexturePixelFormat GetTextureFormat(ZETIFFPixelFormat PixelFormat)
+{
+	switch(PixelFormat)
+	{
+		case ZE_TIFF_PT_L8:
+			return ZE_TPF_I8;
+
+		case ZE_TIFF_PT_LA8:
+			return ZE_TPF_I8_2;
+
+		case ZE_TIFF_PT_L16:
+			return ZE_TPF_I16;
+
+		case ZE_TIFF_PT_LA16:
+			return ZE_TPF_I16_2;
+
+		case ZE_TIFF_PT_INDEXED:
+		case ZE_TIFF_PT_RGB8:
+		case ZE_TIFF_PT_RGBA8:
+			return ZE_TPF_I8_4;
+
+		case ZE_TIFF_PT_RGB16:
+		case ZE_TIFF_PT_RGBA16:
+			return ZE_TPF_I16_4;
+	}
+
+	return ZE_TPF_NOTSET;
+}
+
+static bool LoadEntryArray(ZEArray<ZEUInt32> Output, ZETIFFEntry* Entry, ZEFile* File, ZEEndianness Endianness)
 {
 	ZESize Count = ZEEndian::Uni(Entry->Count, Endianness);
 	ZESize Offset = ZEEndian::Uni(*(ZEUInt32*)Entry->Value, Endianness);
@@ -120,7 +222,7 @@ bool ZETextureFileTIFF::LoadEntryArray(ZEArray<ZEUInt32> Output, ZETIFFEntry* En
 	}
 }
 
-ZESize ZETextureFileTIFF::LoadEntryArray(ZEUInt32* Output, ZESize OutputCount, ZETIFFEntry* Entry, ZEFile* File, ZEEndianness Endianness)
+static ZESize LoadEntryArray(ZEUInt32* Output, ZESize OutputCount, ZETIFFEntry* Entry, ZEFile* File, ZEEndianness Endianness)
 {
 	ZESize Count = OutputCount > ZEEndian::Uni(Entry->Count, Endianness) ? OutputCount : ZEEndian::Uni(Entry->Count, Endianness);
 	ZESize Offset = ZEEndian::Uni(*(ZEUInt32*)Entry->Value, Endianness);
@@ -162,7 +264,7 @@ ZESize ZETextureFileTIFF::LoadEntryArray(ZEUInt32* Output, ZESize OutputCount, Z
 	return Count;
 }
 
-ZEUInt ZETextureFileTIFF::LoadEntry(ZETIFFEntry* Entry, ZEEndianness Endian)
+static ZEUInt LoadEntry(ZETIFFEntry* Entry, ZEEndianness Endian)
 {
 	switch(Entry->Type)
 	{
@@ -177,7 +279,7 @@ ZEUInt ZETextureFileTIFF::LoadEntry(ZETIFFEntry* Entry, ZEEndianness Endian)
 	}
 }
 
-bool ZETextureFileTIFF::UncompressPackBit(void* Destination, ZESize DestinationSize, void* Source, ZESize SourceSize)
+static bool UncompressPackBit(void* Destination, ZESize DestinationSize, void* Source, ZESize SourceSize)
 {
 	ZEUInt8* SourceCurrent = (ZEUInt8*)Source;
 	ZEUInt8* SourceEnd = SourceCurrent + SourceSize;
@@ -219,14 +321,14 @@ bool ZETextureFileTIFF::UncompressPackBit(void* Destination, ZESize DestinationS
 	return true;
 }
 
-bool ZETextureFileTIFF::UncompressLZW(void* Destination, ZESize DestinationSize, void* Source, ZESize SourceCount)
+static bool UncompressLZW(void* Destination, ZESize DestinationSize, void* Source, ZESize SourceCount)
 {
 
 	return false;
 }
 
 
-bool ZETextureFileTIFF::LoadHeader(ZEFile* File, ZETIFFInfo* Info)
+static bool LoadHeader(ZEFile* File, ZETIFFInfo* Info)
 {
 	// Read Header
 	ZETIFFHeader Header;
@@ -397,20 +499,20 @@ bool ZETextureFileTIFF::LoadHeader(ZEFile* File, ZETIFFInfo* Info)
 	{
 		case 1: // Black is Zero
 			if (SamplesPerPixel == 1 && BitsPerSample[0] == 8)
-				Info->PixelFormat = ZE_TIFF_PT_G8;	
+				Info->PixelFormat = ZE_TIFF_PT_L8;	
 			else if (SamplesPerPixel == 1 && BitsPerSample[0] == 16) 
-				Info->PixelFormat = ZE_TIFF_PT_G16;	
+				Info->PixelFormat = ZE_TIFF_PT_L16;	
 			else if (SamplesPerPixel == 2 && BitsPerSample[0] == 8 && BitsPerSample[1] == 8)  
-				Info->PixelFormat = ZE_TIFF_PT_GA16;
+				Info->PixelFormat = ZE_TIFF_PT_LA8;
 			else if (SamplesPerPixel == 2 && ExtraSamples == 2 && BitsPerSample[0] == 16 && BitsPerSample[0] == 16) 
-				Info->PixelFormat = ZE_TIFF_PT_GA32;
+				Info->PixelFormat = ZE_TIFF_PT_LA16;
 			break;
 
 		case 2: // RGB
 			if (SamplesPerPixel == 2 && ExtraSamples == 2 && BitsPerSample[0] == 8 && BitsPerSample[1] == 8 && BitsPerSample[2] == 8)		
-				Info->PixelFormat = ZE_TIFF_PT_RGB24;
+				Info->PixelFormat = ZE_TIFF_PT_RGB8;
 			else if (SamplesPerPixel == 2 && ExtraSamples == 2 && BitsPerSample[0] == 8 && BitsPerSample[1] == 8 && BitsPerSample[2] == 8 && BitsPerSample[3] == 8)	
-				Info->PixelFormat = ZE_TIFF_PT_RGBA32;
+				Info->PixelFormat = ZE_TIFF_PT_RGBA8;
 			break;
 		
 		case 3: // Palette
@@ -428,7 +530,7 @@ bool ZETextureFileTIFF::LoadHeader(ZEFile* File, ZETIFFInfo* Info)
 	return true;
 }
 
-bool ZETextureFileTIFF::LoadPalette(ZEFile* File, ZETIFFInfo* Info)
+static bool LoadPalette(ZEFile* File, ZETIFFInfo* Info)
 {
 	ZEUInt16 RawPalette[256 * 3];
 	File->Seek(ZEEndian::Uni(*(ZEUInt32*)Info->PaletteEntry.Value, Info->Endianness) * sizeof(ZEUInt32), ZE_SF_BEGINING);
@@ -436,7 +538,7 @@ bool ZETextureFileTIFF::LoadPalette(ZEFile* File, ZETIFFInfo* Info)
 	if (File->Read(RawPalette, 3 * 256 * sizeof(ZEUInt16), 1) != 1)
 		return false;
 
-	ZEARGB32* Palette = new ZEARGB32[256];
+	ZEBGRA32* Palette = new ZEBGRA32[256];
 	for (ZESize I = 0; I < 256; I++)
 	{
 		Palette[I].A = 255;
@@ -448,7 +550,7 @@ bool ZETextureFileTIFF::LoadPalette(ZEFile* File, ZETIFFInfo* Info)
 	return true;
 }
 
-bool ZETextureFileTIFF::LoadStripOffsets(ZEFile* File, ZETIFFInfo* Info)
+static bool LoadStripOffsets(ZEFile* File, ZETIFFInfo* Info)
 {
 	Info->ChunkOffsets.SetCount(ZEEndian::Uni(*(ZEUInt32*)Info->ChunkOffsetsEntry.Count, Info->Endianness));
 
@@ -477,12 +579,12 @@ bool ZETextureFileTIFF::LoadStripOffsets(ZEFile* File, ZETIFFInfo* Info)
 	return true;
 }
 
-void ConvertData(ZEARGB32* Destination, ZESize DestinationPitch, void* Source, ZESize SourcePitch, ZESize RowCount, ZETIFFInfo* Info)
+static void ConvertData(ZEBGRA32* Destination, ZESize DestinationPitch, void* Source, ZESize SourcePitch, ZESize RowCount, ZETIFFInfo* Info)
 {
 	ZEUInt8* SourceRow = (ZEUInt8*)Source;
 	ZEUInt8* SourceRowEnd = SourceRow + SourcePitch * RowCount;
 	
-	ZEARGB32* DestinationRow = Destination;
+	ZEBGRA32* DestinationRow = Destination;
 
 	ZESize SourceRowPitch;
 
@@ -494,28 +596,28 @@ void ConvertData(ZEARGB32* Destination, ZESize DestinationPitch, void* Source, Z
 				ZETexturePixelConverter::ConvertIndexed(Destination, SourceRow, SourcePitch, Info->Palette);
 				break;
 
-			case ZE_TIFF_PT_G8:
-				ZETexturePixelConverter::ConvertG8(DestinationRow, SourceRow, SourcePitch);
+			case ZE_TIFF_PT_L8:
+				ZETexturePixelConverter::ConvertL8(DestinationRow, SourceRow, SourcePitch);
 				break;
 
-			case ZE_TIFF_PT_G16:
-				ZETexturePixelConverter::ConvertG16(DestinationRow, SourceRow, SourcePitch);
+			case ZE_TIFF_PT_L16:
+				ZETexturePixelConverter::ConvertL16(DestinationRow, SourceRow, SourcePitch);
 				break;
 
-			case ZE_TIFF_PT_GA16:
-				ZETexturePixelConverter::ConvertGA16(DestinationRow, SourceRow, SourcePitch);
+			case ZE_TIFF_PT_LA8:
+				ZETexturePixelConverter::ConvertLA8(DestinationRow, SourceRow, SourcePitch);
 				break;
 
-			case ZE_TIFF_PT_GA32:
-				ZETexturePixelConverter::ConvertGA32(DestinationRow, SourceRow, SourcePitch);
+			case ZE_TIFF_PT_LA16:
+				ZETexturePixelConverter::ConvertLA16(DestinationRow, SourceRow, SourcePitch);
 				break;
 
-			case ZE_TIFF_PT_RGB24:
-				ZETexturePixelConverter::ConvertRGB24(DestinationRow, SourceRow, SourcePitch);
+			case ZE_TIFF_PT_RGB8:
+				ZETexturePixelConverter::ConvertRGB8(DestinationRow, SourceRow, SourcePitch);
 				break;
 
-			case ZE_TIFF_PT_RGBA32:
-				ZETexturePixelConverter::ConvertRGBA32(DestinationRow, SourceRow, SourcePitch);
+			case ZE_TIFF_PT_RGBA8:
+				ZETexturePixelConverter::ConvertRGBA8(DestinationRow, SourceRow, SourcePitch);
 				break;
 		}
 
@@ -525,13 +627,13 @@ void ConvertData(ZEARGB32* Destination, ZESize DestinationPitch, void* Source, Z
 
 }
 
-ZETextureData* ZETextureFileTIFF::LoadData(ZEFile* File, ZETIFFInfo* Info)
+static ZETextureData* LoadData(ZEFile* File, ZETIFFInfo* Info)
 {
 	ZEPointer<ZETextureData> Texture = new ZETextureData();
 	Texture->Create(ZE_TT_2D, ZE_TPF_I8_4, 1, 1, Info->Width, Info->Height);
 
 	ZESize PixelSize = GetPixelSize(Info->PixelFormat);
-	ZEARGB32* DestinationData = (ZEARGB32*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
+	ZEBGRA32* DestinationData = (ZEBGRA32*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
 	ZESize DestinationPitch = Info->Width * PixelSize;
 
 	
@@ -562,22 +664,20 @@ ZETextureData* ZETextureFileTIFF::LoadData(ZEFile* File, ZETIFFInfo* Info)
 	return Texture.Transfer();
 }
 
-bool ZETextureFileTIFF::CanLoad(ZEFile* File)
+bool ZETextureFileTIFF::LoadInfo(ZETextureDataInfo* Info, ZEFile* File)
 {
-	/*File->Seek(-(ZESSize)sizeof(ZETargaFooter), ZE_SF_END);
-
-	ZETargaFooter Footer;
-
-	ZEInt64 Result;
-	Result = File->Read(&Footer, sizeof(ZETargaFooter), 1);
-	if (Result != 1)
+	ZETIFFInfo TIFFInfo;
+	if (!LoadInfo(Info, File))
 		return false;
 
-	if (strncmp(Footer.Signature, "TRUEVISION-XFILE.", 17) == 0)
-		return true;
+	Info->Width = TIFFInfo.Width;
+	Info->Height = TIFFInfo.Height;
 
-	if (ZEFile::GetFileExtension(File->GetFilePath()).Lower() != "tga")
-		return false;*/
+
+	Info->PixelFormat = GetTextureFormat(TIFFInfo.PixelFormat);
+	Info->Type = ZE_TT_2D;
+	Info->SurfaceCount = 1;
+	Info->LevelCount = 1;
 
 	return true;
 }

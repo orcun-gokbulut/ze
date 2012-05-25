@@ -43,6 +43,72 @@
 #include <memory.h>
 #include <intrin.h>
 
+// Compressed Dxt1 Block Size
+#define		ZE_DXT_1_COMPRESSION_BLOCK_WIDTH	4	// Pixels
+#define		ZE_DXT_1_COMPRESSION_BLOCK_HEIGHT	4	// Pixels
+#define		ZE_DXT_1_INPUT_BLOCK_SIZE			64	// Bytes
+#define		ZE_DXT_1_OUTPUT_BLOCK_SIZE			8	// Bytes
+
+// Compressed Dxt3 Block Size
+#define		ZE_DXT_3_COMPRESSION_BLOCK_WIDTH	4	// Pixels
+#define		ZE_DXT_3_COMPRESSION_BLOCK_HEIGHT	4	// Pixels
+#define		ZE_DXT_3_INPUT_BLOCK_SIZE			64	// Bytes
+#define		ZE_DXT_3_OUTPUT_BLOCK_SIZE			16	// Bytes
+
+// Compressed Dxt5 Block Size
+#define		ZE_DXT_5_COMPRESSION_BLOCK_WIDTH	4	// Pixels
+#define		ZE_DXT_5_COMPRESSION_BLOCK_HEIGHT	4	// Pixels
+#define		ZE_DXT_5_INPUT_BLOCK_SIZE			64	// Bytes
+#define		ZE_DXT_5_OUTPUT_BLOCK_SIZE			16	// Bytes
+
+// Uncompressed ARGB size
+#define		ZE_I8_4_COMPRESSION_BLOCK_WIDTH		1	// Pixels
+#define		ZE_I8_4_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
+#define		ZE_I8_4_INPUT_BLOCK_SIZE			4	// Bytes
+#define		ZE_I8_4_OUTPUT_BLOCK_SIZE			4	// Bytes
+
+// Uncompressed ZE_TPF_I8 size
+#define		ZE_I8_COMPRESSION_BLOCK_WIDTH		1	// Pixels
+#define		ZE_I8_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
+#define		ZE_I8_INPUT_BLOCK_SIZE				1	// Bytes
+#define		ZE_I8_OUTPUT_BLOCK_SIZE				1	// Bytes
+
+// Uncompressed ZE_TPF_I16 size
+#define		ZE_I16_COMPRESSION_BLOCK_WIDTH		1	// Pixels
+#define		ZE_I16_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
+#define		ZE_I16_INPUT_BLOCK_SIZE				2	// Bytes
+#define		ZE_I16_OUTPUT_BLOCK_SIZE			2	// Bytes
+
+// Uncompressed ZE_TPF_I16_2 size
+#define		ZE_I16_2_COMPRESSION_BLOCK_WIDTH	1	// Pixels
+#define		ZE_I16_2_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
+#define		ZE_I16_2_INPUT_BLOCK_SIZE			2	// Bytes
+#define		ZE_I16_2_OUTPUT_BLOCK_SIZE			2	// Bytes
+
+// Uncompressed ZE_TPF_I32 size
+#define		ZE_I32_COMPRESSION_BLOCK_WIDTH		1	// Pixels
+#define		ZE_I32_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
+#define		ZE_I32_INPUT_BLOCK_SIZE				2	// Bytes
+#define		ZE_I32_OUTPUT_BLOCK_SIZE			2	// Bytes
+
+// Uncompressed ZE_TPF_F32 size
+#define		ZE_F32_COMPRESSION_BLOCK_WIDTH		1	// Pixels
+#define		ZE_F32_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
+#define		ZE_F32_INPUT_BLOCK_SIZE				4	// Bytes
+#define		ZE_F32_OUTPUT_BLOCK_SIZE			4	// Bytes
+
+// Uncompressed ZE_TPF_F32_2 size
+#define		ZE_F32_2_COMPRESSION_BLOCK_WIDTH	1	// Pixels
+#define		ZE_F32_2_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
+#define		ZE_F32_2_INPUT_BLOCK_SIZE			8	// Bytes
+#define		ZE_F32_2_OUTPUT_BLOCK_SIZE			8	// Bytes
+
+// Uncompressed ZE_TPF_F32_4 size
+#define		ZE_F32_4_COMPRESSION_BLOCK_WIDTH	1	// Pixels
+#define		ZE_F32_4_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
+#define		ZE_F32_4_INPUT_BLOCK_SIZE			16	// Bytes
+#define		ZE_F32_4_OUTPUT_BLOCK_SIZE			16	// Bytes
+
 // Returns if a TextureData 3D level of a surface is valid or not
 static bool IsLevelValid(ZEUInt Surface, ZEUInt Level)
 {

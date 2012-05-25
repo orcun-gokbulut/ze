@@ -35,6 +35,31 @@
 #ifndef __ZE_TEXTURE_FILE_FORMAT_H__
 #define __ZE_TEXTURE_FILE_FORMAT_H__
 
+////////////////////////////////////
+/////// ZE Texture File Format /////
+////////////////////////////////////
+//			FileHeader			  //
+//								  //
+//			SurfaceChunk1		  //
+//		Surface1MipmapChunk1	  //
+//		Surface1MipmapData1		  //
+//		Surface1MipmapChunk2	  //
+//		Surface1MipmapData2		  //
+//		Surface1MipmapChunk3	  //
+//		Surface1MipmapData3		  //
+//								  //
+//			SurfaceChunk2		  //
+//		Surface2MipmapChunk1	  //
+//		Surface2MipmapData1		  //
+//		Surface2MipmapChunk2	  //
+//		Surface2MipmapData2		  //
+//		Surface2MipmapChunk3	  //
+//		Surface2MipmapData3		  //
+//				.				  //
+//				.				  //
+//				.				  //
+////////////////////////////////////
+
 #include "ZETypes.h"
 
 #define ZE_FILE_MAKEVERSION(Major, Minor)			((((ZEUInt32)(Major)) << 16) + (ZEUInt32)(Minor))

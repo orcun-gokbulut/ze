@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileTGA.h
+ Zinek Engine - ZEThread.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,18 +33,101 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEThread.h"
 
-#pragma once
-#ifndef __ZE_TEXTURE_FILE_TGA_H__
-#define __ZE_TEXTURE_FILE_TGA_H__
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 
-#include "ZETextureFile.h"
-
-class ZETextureFileTGA : public ZETextureFile
+static DWORD WINAPI RunThread(LPVOID Thread)
 {
-	public:
-		virtual bool				LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*		Load(ZEFile* File);
-};
+	ZEThread* CurrentThread = (ZEThread*)Thread;
 
-#endif
+	CurrentThread->Status = ZE_TS_RUNNING;
+	CurrentThread->Function(CurrentThread->GetParameter());
+	CurrentThread->Status = ZE_TS_DONE;
+
+	return 0;
+}
+
+ZEThreadStatus ZEThread::GetStatus()
+{
+	return Status;
+}
+
+void ZEThread::SetParameter(void* Parameter)
+{
+	this->Parameter = Parameter;
+}
+
+void* ZEThread::GetParameter()
+{
+	return Parameter;
+}
+
+void ZEThread::Run(void* Parameter)
+{
+	if (Handle == NULL)
+	{
+		Handle = CreateThread(NULL, 0,  RunThread, this, CREATE_SUSPENDED, NULL);
+		if (Handle == NULL)
+		{
+			//zeCriticalError("Can not create thread.");
+			return;
+		}
+	}
+
+	if (Status == ZE_TS_RUNNING)
+		return;
+
+	DWORD Result = ResumeThread(Handle);
+	if (Result == -1)
+	{
+		//zeCriticalError("Can not resume thread.");
+		return;
+	}
+}
+
+void ZEThread::Suspend()
+{
+	if (Handle != NULL)
+		return;
+	
+	DWORD Result = SuspendThread(Handle);
+	if (Result == -1)
+	{
+		//zeCriticalError("Can not suspend thread.");
+		return;
+	}
+
+	Status = ZE_TS_SUSPENDED;
+}
+
+void ZEThread::Terminate()
+{
+	if (Handle == NULL)
+		return;
+
+	DWORD Result = TerminateThread(Handle, 0);
+	if (Result == -1)
+	{
+		//zeCriticalError("Can not terminate thread.");
+		return;
+	}
+
+	Status = ZE_TS_TERMINATED;
+}
+
+ZEThread::ZEThread()
+{
+	Handle = NULL;
+	Status = ZE_TS_NONE;
+}
+
+ZEThread::~ZEThread()
+{
+	if (Handle != NULL)
+	{
+		Terminate();
+		CloseHandle(Handle);
+	}
+}

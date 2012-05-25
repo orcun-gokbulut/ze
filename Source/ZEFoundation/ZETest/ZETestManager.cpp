@@ -64,6 +64,10 @@ const char* ZETestManager::GetPackageName()
 
 bool ZETestManager::RunTests()
 {
+	ZEError::SetBreakOnAssertEnabled(false);
+	ZEError::SetBreakOnErrorEnabled(false);
+	ZEError::SetBreakOnWarningEnabled(false);
+
 	bool Result = true;
 	for (ZESize I = 0; I < TestSuiteCount; I++)
 	{
@@ -74,7 +78,7 @@ bool ZETestManager::RunTests()
 		}
 		catch(...)
 		{
-			printf("%s : error T0004: Exception occured. Package Name : \"%s\". \r\n", GetPackageName(), GetPackageName());
+			printf("%s : error T0004: Exception occurred. Package Name : \"%s\". \r\n", GetPackageName(), GetPackageName());
 			Result = false;
 			break;
 		}
@@ -82,6 +86,10 @@ bool ZETestManager::RunTests()
 	
 	if (!Result)
 		printf("%s : error T0003: Test package failed. Package Name : \"%s\". \r\n", GetPackageName(), GetPackageName());
+
+	ZEError::SetBreakOnAssertEnabled(true);
+	ZEError::SetBreakOnErrorEnabled(true);
+	ZEError::SetBreakOnWarningEnabled(true);
 
 	return Result;
 }
