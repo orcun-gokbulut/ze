@@ -50,9 +50,11 @@ enum ZETexturePixelFormat
 
 	// Integer Formats
 	ZE_TPF_I8,
+	ZE_TPF_I8_2,
 	ZE_TPF_I8_4,
 	ZE_TPF_I16,
 	ZE_TPF_I16_2,
+	ZE_TPF_I16_4,
 	ZE_TPF_I32,
 
 	// Floating Point Formats

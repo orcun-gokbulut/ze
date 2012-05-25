@@ -48,12 +48,10 @@
 #define ZE_TIT_INDEXED					0x01
 #define ZE_TIT_COLOR					0x02
 #define ZE_TIT_GRAYSCALE				0x03
-
-#define ZE_TIT_COMPRESSED				0x08	
+#define ZE_TIT_COMPRESSED				0x08
 
 #define ZE_TIO_RIGHT_TO_LEFT			0x10
 #define ZE_TIO_TOP_TO_BOTTOM			0x20
-
 
 ZEPackStruct
 (
@@ -88,153 +86,208 @@ ZEPackStruct
 	}
 );
 
+#define ZE_TGA_DECOMPRESS_BUFFER_SIZE 4096
+
+enum ZETGARLEDecompressorResult
+{
+	ZE_TGA_RLE_OUTPUT_FULL,
+	ZE_TGA_RLE_INPUT_PROCESSED,
+	ZE_TGA_RLE_ERROR
+};
+
+enum ZETGARLDecompressorMode
+{
+	ZE_TGA_RLE_DM_NONE,
+	ZE_TGA_RLE_DM_REPEAT_INIT,
+	ZE_TGA_RLE_DM_REPEAT,
+	ZE_TGA_RLE_DM_ABSOLUTE
+};
+
+struct ZETGARLEDecompressorState
+{
+	// Last State
+	ZEInt Mode;
+	ZESize Count;
+	ZESize Count2;
+	ZEUInt8 Value[4];
+
+	ZESize PixelSize;
+
+	// Ouput
+	void* Output;
+	ZESize OutputCursor;
+	ZESize OutputSize;
+
+	// Input
+	void* Input;
+	ZESize InputCursor;
+	ZESize InputSize;
+
+	ZETGARLEDecompressorState()
+	{
+		Mode = ZE_TGA_RLE_DM_NONE;
+		Count = 0;
+		Count2 = 0;
+		Value[0] = Value[1] = Value[2] = Value[3] = 0;
+
+
+		Output = NULL;
+		OutputCursor = 0;
+		OutputSize = 0;
+
+		Input = NULL;
+		InputCursor = 0;
+		InputSize = 0;
+	}
+};
+
 static inline ZESize GetPixelSize(ZEUInt8 BPP)
 {
 	switch(BPP)
 	{
-		case 8:
-			return 1;
+	case 8:
+		return 1;
 
-		case 15:
-			return 2;
+	case 15:
+		return 2;
 
-		case 16:
-			return 2;
+	case 16:
+		return 2;
 
-		case 24:
-			return 3;
+	case 24:
+		return 3;
 
-		case 32:
-			return 4;
+	case 32:
+		return 4;
 
-		default:
-			return 0;
+	default:
+		return 0;
 	}
 }
 
-static __forceinline void ConvertColorRow(ZEARGB32* Destination, ZEUInt8* Source, ZESize BPP, ZESize Width)
+static __forceinline void ConvertColorRow(ZEBGRA32* Destination, ZEUInt8* Source, ZESize BPP, ZESize Width)
 {
 	switch(BPP)
 	{
-		case 15:
-			ZETexturePixelConverter::ConvertBGR15(Destination, Source,  Width);
+		case 16:
+			ZETexturePixelConverter::ConvertBGR555(Destination, Source,  Width);
 			break;
 
-		case 16:
-			ZETexturePixelConverter::ConvertBGR16(Destination, Source, Width);
+		case 15:
+			ZETexturePixelConverter::ConvertBGR565(Destination, Source, Width);
 			break;
 
 		case 24:
-			ZETexturePixelConverter::ConvertBGR24(Destination, Source,  Width);
+			ZETexturePixelConverter::ConvertBGR8(Destination, Source,  Width);
 			break;
 
 		case 32:
-			ZETexturePixelConverter::ConvertBGRA32(Destination, Source, Width);
+			ZETexturePixelConverter::ConvertBGRA8(Destination, Source, Width);
 			break;
 	}
 }
 
-
-static __forceinline void ConvertGrayscaleRow(ZEARGB32* Destination, ZEUInt8* Source, ZESize BPP, ZESize Width)
+static __forceinline void ConvertGrayscaleRow(ZEBGRA32* Destination, ZEUInt8* Source, ZESize BPP, ZESize Width)
 {
 	switch(BPP)
 	{
 		case 8:
-			ZETexturePixelConverter::ConvertG8(Destination, Source, Width);
+			ZETexturePixelConverter::ConvertL8(Destination, Source, Width);
 			break;
 
 		case 16:
-			ZETexturePixelConverter::ConvertG16(Destination, Source, Width);
-			break;
-
-		case 32:
-			ZETexturePixelConverter::ConvertGA32(Destination, Source, Width);
+			ZETexturePixelConverter::ConvertL16(Destination, Source, Width);
 			break;
 	}
 }
 
-#define ZE_TGA_DECOMPRESS_BUFFER_SIZE 4096
-
-static bool LoadCompressedData(ZEUInt8* Data, ZEFile* File, ZETargaHeader* Header)
+static ZETGARLEDecompressorResult UncomressRLE(ZETGARLEDecompressorState* State)
 {
-	ZESize PixelSize;
-
-	if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_INDEXED)
-		PixelSize = 1;
-	else
-		PixelSize = GetPixelSize(Header->BPP);
-	
-	ZESize TotalPixelCount = 0;
-	ZEUInt8 Buffer[ZE_TGA_DECOMPRESS_BUFFER_SIZE];
-	
-
-	ZEUInt8* SourceEnd = Data + ZE_TGA_DECOMPRESS_BUFFER_SIZE;
-	ZEUInt8* Source = SourceEnd;
-
-	int State = 0;
-	ZESize Count = 0;
-	
-	if (PixelSize == 1)
+	ZESize Remaining = 0;
+	while(true)
 	{
-		ZEUInt8* Destination = Data;
-		ZEUInt8* DestinationEnd = Data + Header->Width * Header->Height;
-		ZEUInt8 RepeatValue;
-		while(true)
+		if (State->InputCursor >= State->InputSize)
 		{
-			if (Destination == DestinationEnd)
+			State->InputCursor = 0;
+			return ZE_TGA_RLE_INPUT_PROCESSED;
+		}
+
+		if (State->OutputCursor >= State->OutputSize)
+		{
+			State->OutputCursor = 0;
+			return ZE_TGA_RLE_OUTPUT_FULL;
+		}
+
+		ZEUInt8* Input = (ZEUInt8*)State->Input + State->InputCursor;
+		ZEUInt8* Output = (ZEUInt8*)State->Output + State->OutputCursor;
+
+		switch(State->Mode)
+		{
+			case ZE_TGA_RLE_DM_NONE: // None
+				if ((*Input & 0x80) == 0x80)
+				{
+					State->Mode = ZE_TGA_RLE_DM_REPEAT_INIT;
+					State->Count = ((*Input & 0x7F) + 1) * State->PixelSize;
+					State->Count2 = State->PixelSize;
+				}
+				else
+				{
+					State->Mode = ZE_TGA_RLE_DM_ABSOLUTE;
+					State->Count = ((*Input & 0x7F) + 1) * State->PixelSize;
+				}
+				State->InputCursor++;
+				break;
+	
+			case ZE_TGA_RLE_DM_REPEAT_INIT:
+				State->Value[State->PixelSize - State->Count2] = *Input;
+				State->Count2--;
+				State->InputCursor++;
+				if (State->Count2 == 0)
+					State->Mode = ZE_TGA_RLE_DM_REPEAT;
 				break;
 
-			if (Source == SourceEnd)
-			{
-				ZEUInt64 BytesRead = File->Read(Buffer, 1, ZE_TGA_DECOMPRESS_BUFFER_SIZE);
-				if (BytesRead == 0)
-					return false;
-				Source = Buffer;
-				SourceEnd = Buffer + BytesRead;
-			}
+			case ZE_TGA_RLE_DM_REPEAT:
+				if (State->OutputCursor + State->Count <= State->OutputSize * State->PixelSize)
+					Remaining = State->Count;
+				else
+					Remaining = State->OutputSize - State->OutputCursor;
 
-			switch(State)
-			{
-				case 0: // Command Mode
-					State = (*Source & 0x80) == 0 ? 1 : 2;
-					Count = *Source & 0x7F;
-					if (Count == 0)
-						return false;
-					Count++;
-					break;
+				for (ZESize I = 0; I < Remaining; I++)
+				{
+					*Output++ = State->Value[State->Count2 % State->PixelSize];
+					State->Count2++;
+				}
 
-				case 1: // Absolute Mode
-					*Destination++ = *Source++;
-					Count--;
-					if (Count == 0)
-						State = 0;
-					break;
+				State->Count -= Remaining;
+				State->OutputCursor += Remaining;
 
-				case 2: // Repeat Mode Initial
-					RepeatValue = *Source++;
-					State = 3;
-					break;
-				
-				case 3: // Repeat Mode				
-					*Destination++ = RepeatValue;
-					Count--;
-					if (Count == 0)
-						State = 0;
-					break;
-			}
+				if (State->Count == 0)
+					State->Mode = ZE_TGA_RLE_DM_NONE;
+				break;
+
+			case ZE_TGA_RLE_DM_ABSOLUTE:
+				if (State->OutputCursor + State->Count <= State->OutputSize)
+					Remaining = State->Count;
+				else
+					Remaining = State->OutputSize - State->OutputCursor;
+
+				if (State->InputCursor + Remaining > State->InputSize)
+					Remaining = State->InputSize - State->InputCursor;
+								
+				memcpy(Output, Input, Remaining);
+
+				State->OutputCursor += Remaining;
+				State->InputCursor += Remaining;
+				State->Count -= Remaining;
+
+				if (State->Count == 0)
+					State->Mode = ZE_TGA_RLE_DM_NONE;
+				break;
 		}
 	}
-
-	return true;
 }
 
-static __forceinline bool LoadRow(ZEUInt8* RowData, ZEFile* File, ZETargaHeader* Header)
-{
-	ZEUInt64 Result = File->Read(RowData, Header->Width * GetPixelSize(Header->BPP), 1);
-	return Result == 1;
-}
-
-static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEARGB32* Palette)
+static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEBGRA32* Palette)
 {
 	ZESize Width = Header->Width;
 	ZESize Height = Header->Height; 
@@ -246,22 +299,27 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEARGB32* Pa
 
 	ZEPointer<ZETextureData> Texture = new ZETextureData();
 	Texture->Create(ZE_TT_2D, ZE_TPF_I8_4, 1, 1, Width, Height);
-	ZEARGB32* Destination = (ZEARGB32*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
+	ZEBGRA32* Destination = (ZEBGRA32*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
+	ZEBGRA32* DestinationEnd = Destination + Height * Width;
 
 	File->Seek(sizeof(ZETargaHeader) + Header->PalleteSize * GetPixelSize(Header->PalleteEntryBPP) + Header->IdSize, ZE_SF_BEGINING);
 
-	ZEARGB32* DestinationRow = Destination + Index * Width;
+	ZEBGRA32* DestinationRow = Destination + Index * Width;
 	ZESSize	DestinationRowStep = Step * Width;
+	
+	ZESize SourceRowSize = Header->Width * PixelSize;
+	ZEPointer<ZEUInt8> SourceRow = new ZEUInt8[SourceRowSize];
 
 	if ((Header->ImageType & ZE_TIT_COMPRESSED) == 0)
 	{
-		ZEPointer<ZEUInt8> SourceRow = new ZEUInt8[PixelSize * Header->Width];
-		if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_INDEXED)
+		if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_COLOR)
 		{
 			for (ZESize I = 0; I < Height; I++)
 			{
-				LoadRow(SourceRow, File, Header);
-				ZETexturePixelConverter::ConvertIndexed(DestinationRow, SourceRow, Width, Palette);
+				if (File->Read(SourceRow, SourceRowSize, 1) != 1)
+					return NULL;
+
+				ConvertColorRow(DestinationRow, SourceRow, BPP, Width);
 				DestinationRow += DestinationRowStep;
 			}
 		}
@@ -269,59 +327,66 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEARGB32* Pa
 		{
 			for (ZESize I = 0; I < Height; I++)
 			{
-				LoadRow(SourceRow, File, Header);
+				if (File->Read(SourceRow, SourceRowSize, 1) != 1)
+					return NULL;
+
 				ConvertGrayscaleRow(DestinationRow, SourceRow, BPP, Width);
 				DestinationRow += DestinationRowStep;
 			}
 		}
-		else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_COLOR)
+		else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_INDEXED)
 		{
 			for (ZESize I = 0; I < Height; I++)
 			{
-				LoadRow(SourceRow, File, Header);
-				ConvertColorRow(DestinationRow, SourceRow, BPP, Width);
+				if (File->Read(SourceRow, SourceRowSize, 1) != 1)
+					return NULL;
+
+				ZETexturePixelConverter::ConvertIndexed(DestinationRow, SourceRow, Width, Palette);
 				DestinationRow += DestinationRowStep;
 			}
 		}
 	}
 	else
 	{
-		ZEPointer<ZEUInt8> UncompressedData = new ZEUInt8[Width * Height * PixelSize];
-		ZEUInt8* SourceRow = UncompressedData;
-		ZESSize SourceRowStep = Step * Width * PixelSize;
+		const ZESize BlockSize = 32 * 1024;
+		ZEUInt8 Block[BlockSize];
 
-		if (!LoadCompressedData(UncompressedData, File, Header))
-		{
-			zeError("Can not uncompress pixel data.");
-			return NULL;
-		}
+		ZETGARLEDecompressorState State;
+		State.PixelSize = PixelSize;
+		State.Input = Block;
+		State.InputSize = BlockSize;
+		State.OutputSize = Width * PixelSize;
+		State.Output = (ZEUInt8*)SourceRow;
 
-		ZESize LastIndex = 0;
-		if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_INDEXED)
+		while (true)
 		{
-			for (ZESize I = 0; I < Height; I++)
+			if (DestinationRow < Destination || DestinationRow >= DestinationEnd)
+				break;
+
+			State.InputSize = File->Read(Block, 1, BlockSize);
+			if (State.InputSize ==  0)
+				return NULL;
+
+			while(true)
 			{
-				ZETexturePixelConverter::ConvertIndexed(DestinationRow, SourceRow, Width, Palette);
-				DestinationRow += DestinationRowStep;
-				SourceRow += SourceRowStep;
-			}
-		}
-		else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_GRAYSCALE)
-		{
-			for (ZESize I = 0; I < Height; I++)
-			{
-				ConvertGrayscaleRow(DestinationRow, SourceRow, BPP, Width);
-				DestinationRow += DestinationRowStep;
-				SourceRow += SourceRowStep;
-			}
-		}
-		else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_COLOR)
-		{
-			for (ZESize I = 0; I < Height; I++)
-			{
-				ConvertColorRow(DestinationRow, SourceRow, BPP, Width);
-				DestinationRow += DestinationRowStep;
-				SourceRow += SourceRowStep;
+				if (DestinationRow < Destination || DestinationRow >= DestinationEnd)
+					break;
+
+				ZETGARLEDecompressorResult Result = UncomressRLE(&State);
+				if (Result == ZE_TGA_RLE_INPUT_PROCESSED)
+					break;
+				else if (Result == ZE_TGA_RLE_OUTPUT_FULL)
+				{
+					if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_COLOR)
+						ConvertColorRow(DestinationRow, SourceRow, BPP, Width);
+					else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_GRAYSCALE)
+						ConvertGrayscaleRow(DestinationRow, SourceRow, BPP, Width);
+					else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_INDEXED)
+						ZETexturePixelConverter::ConvertIndexed(DestinationRow, SourceRow, Width, Palette);
+					DestinationRow = DestinationRow + DestinationRowStep;
+				}
+				else
+					return NULL;
 			}
 		}
 	}
@@ -329,7 +394,7 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEARGB32* Pa
 	return Texture.Transfer();
 }
 
-static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEARGB32* Palette)
+static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEBGRA32* Palette)
 {
 	File->Seek(-(ZESSize)sizeof(ZETargaFooter), ZE_SF_END);
 	
@@ -366,10 +431,35 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEARGB32* Palette)
 		return false;
 	}
 
-	if (Header->Width == 0 || Header->Height == 0)
+	if (Header->Height == 0 || Header->Width == 0)
 	{
-		zeError("Zero sized TGAs are not supported.");
+		zeError("Corrupted or malicious TGA file. Zero width or height.");
 		return false;
+	}
+
+	if (Header->Width * Header->Height * 4 == 0)
+	{
+		zeError("Corrupted or malicious TGA file. 32bit size overflow detected.");
+		return false;
+	}
+
+	if (Header->ImageType & ZE_TIT_COMPRESSED)
+	{
+		ZESize PotentialSize = Header->Width * Header->Height * (Header->BPP / 8) / 128;
+		if (File->GetFileSize() < PotentialSize) 
+		{
+			zeError("Corrupted or malicious TGA file. File size is too small.");
+			return false;
+		}
+	}
+	else
+	{
+		ZESize PotentialSize = Header->Width * Header->Height * (Header->BPP / 8);
+		if (File->GetFileSize() < PotentialSize) 
+		{
+			zeError("Corrupted or malicious TGA file. File size is too small.");
+			return false;
+		}
 	}
 
 	if ((Header->ImageDescriptor & ZE_TIO_RIGHT_TO_LEFT) != 0)
@@ -406,7 +496,7 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEARGB32* Palette)
 		}
 
 		ZESize PalleteSize = (Header->PalleteSize > 256 ? 256 : Header->PalleteSize);
-		memset(Palette, 0, sizeof(ZEARGB32) * 256);
+		memset(Palette, 0, sizeof(ZEBGRA32) * 256);
 
 		ZEUInt32 PalleteTemp[256];
 		Result = File->Read(PalleteTemp, PalletePixelSize, PalleteSize);
@@ -422,10 +512,10 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEARGB32* Palette)
 	return true;
 }
 
-static ZETextureData* Load(ZEFile* File)
+static ZETextureData* LoadImage(ZEFile* File)
 {
 	ZETargaHeader Header;
-	ZEARGB32 Palette[256];
+	ZEBGRA32 Palette[256];
 
 	if (!LoadHeader(File, &Header, Palette))
 		return NULL;
@@ -433,22 +523,22 @@ static ZETextureData* Load(ZEFile* File)
 	return LoadData(File, &Header, Palette);
 }
 
-bool ZETextureFileTGA::CanLoad(ZEFile* File)
+bool ZETextureFileTGA::LoadInfo(ZETextureDataInfo* Info, ZEFile* File)
 {
-	File->Seek(-(ZESSize)sizeof(ZETargaFooter), ZE_SF_END);
-
-	ZETargaFooter Footer;
-
-	ZEInt64 Result;
-	Result = File->Read(&Footer, sizeof(ZETargaFooter), 1);
-	if (Result != 1)
+	if (File == NULL)
 		return false;
 
-	if (strncmp(Footer.Signature, "TRUEVISION-XFILE.", 17) == 0)
-		return true;
-
-	if (ZEFile::GetFileExtension(File->GetFilePath()).Lower() != "tga")
+	ZEBGRA32 Palette[256];
+	ZETargaHeader Header;
+	if (!LoadHeader(File, &Header, Palette))
 		return false;
+
+	Info->Width = Header.Width;
+	Info->Height = Header.Height;
+	Info->PixelFormat = ZE_TPF_I8_4;
+	Info->Type = ZE_TT_2D;
+	Info->SurfaceCount = 1;
+	Info->LevelCount = 1;
 
 	return true;
 }
@@ -460,7 +550,8 @@ ZETextureData* ZETextureFileTGA::Load(ZEFile* File)
 		zeError("Null file pointer.");
 		return NULL;
 	}
-	ZETextureData* Texture = ::Load(File);
+
+	ZETextureData* Texture = LoadImage(File);
 	if (Texture == NULL)
 		zeError("Can not load TGA file.");
 

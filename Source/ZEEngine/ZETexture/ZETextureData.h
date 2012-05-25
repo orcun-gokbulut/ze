@@ -38,134 +38,94 @@
 #define __ZE_TEXTURE_DATA_H__
 
 #include "ZETypes.h"
+#include "ZEEndian.h"
 #include "ZEPacking.h"
 #include "ZEGraphics/ZETexture.h"
 #include "ZEDS/ZEArray.h"
 
-// Compressed Dxt1 Block Size
-#define		ZE_DXT_1_COMPRESSION_BLOCK_WIDTH	4	// Pixels
-#define		ZE_DXT_1_COMPRESSION_BLOCK_HEIGHT	4	// Pixels
-#define		ZE_DXT_1_INPUT_BLOCK_SIZE			64	// Bytes
-#define		ZE_DXT_1_OUTPUT_BLOCK_SIZE			8	// Bytes
-
-// Compressed Dxt3 Block Size
-#define		ZE_DXT_3_COMPRESSION_BLOCK_WIDTH	4	// Pixels
-#define		ZE_DXT_3_COMPRESSION_BLOCK_HEIGHT	4	// Pixels
-#define		ZE_DXT_3_INPUT_BLOCK_SIZE			64	// Bytes
-#define		ZE_DXT_3_OUTPUT_BLOCK_SIZE			16	// Bytes
-
-// Compressed Dxt5 Block Size
-#define		ZE_DXT_5_COMPRESSION_BLOCK_WIDTH	4	// Pixels
-#define		ZE_DXT_5_COMPRESSION_BLOCK_HEIGHT	4	// Pixels
-#define		ZE_DXT_5_INPUT_BLOCK_SIZE			64	// Bytes
-#define		ZE_DXT_5_OUTPUT_BLOCK_SIZE			16	// Bytes
-
-// Uncompressed ARGB size
-#define		ZE_I8_4_COMPRESSION_BLOCK_WIDTH		1	// Pixels
-#define		ZE_I8_4_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
-#define		ZE_I8_4_INPUT_BLOCK_SIZE			4	// Bytes
-#define		ZE_I8_4_OUTPUT_BLOCK_SIZE			4	// Bytes
-
-// Uncompressed ZE_TPF_I8 size
-#define		ZE_I8_COMPRESSION_BLOCK_WIDTH		1	// Pixels
-#define		ZE_I8_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
-#define		ZE_I8_INPUT_BLOCK_SIZE				1	// Bytes
-#define		ZE_I8_OUTPUT_BLOCK_SIZE				1	// Bytes
-
-// Uncompressed ZE_TPF_I16 size
-#define		ZE_I16_COMPRESSION_BLOCK_WIDTH		1	// Pixels
-#define		ZE_I16_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
-#define		ZE_I16_INPUT_BLOCK_SIZE				2	// Bytes
-#define		ZE_I16_OUTPUT_BLOCK_SIZE			2	// Bytes
-
-// Uncompressed ZE_TPF_I16_2 size
-#define		ZE_I16_2_COMPRESSION_BLOCK_WIDTH	1	// Pixels
-#define		ZE_I16_2_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
-#define		ZE_I16_2_INPUT_BLOCK_SIZE			2	// Bytes
-#define		ZE_I16_2_OUTPUT_BLOCK_SIZE			2	// Bytes
-
-// Uncompressed ZE_TPF_I32 size
-#define		ZE_I32_COMPRESSION_BLOCK_WIDTH		1	// Pixels
-#define		ZE_I32_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
-#define		ZE_I32_INPUT_BLOCK_SIZE				2	// Bytes
-#define		ZE_I32_OUTPUT_BLOCK_SIZE			2	// Bytes
-
-// Uncompressed ZE_TPF_F32 size
-#define		ZE_F32_COMPRESSION_BLOCK_WIDTH		1	// Pixels
-#define		ZE_F32_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
-#define		ZE_F32_INPUT_BLOCK_SIZE				4	// Bytes
-#define		ZE_F32_OUTPUT_BLOCK_SIZE			4	// Bytes
-
-// Uncompressed ZE_TPF_F32_2 size
-#define		ZE_F32_2_COMPRESSION_BLOCK_WIDTH	1	// Pixels
-#define		ZE_F32_2_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
-#define		ZE_F32_2_INPUT_BLOCK_SIZE			8	// Bytes
-#define		ZE_F32_2_OUTPUT_BLOCK_SIZE			8	// Bytes
-
-// Uncompressed ZE_TPF_F32_4 size
-#define		ZE_F32_4_COMPRESSION_BLOCK_WIDTH	1	// Pixels
-#define		ZE_F32_4_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
-#define		ZE_F32_4_INPUT_BLOCK_SIZE			16	// Bytes
-#define		ZE_F32_4_OUTPUT_BLOCK_SIZE			16	// Bytes
 
 
 ZEPackStruct
 (
-	struct ZEG8	
+	struct ZEL8	
 	{
-		ZEUInt8 G;
-	}
+		ZEUInt8 L;
+	};
 );
 
 ZEPackStruct
 ( 
-	struct ZEARGB32
+	struct ZELA8
+	{
+		ZEUInt8 L;
+		ZEUInt8 A;
+	};
+);
+
+ZEPackStruct
+( 
+	struct ZERGBA8
+	{
+		ZEUInt8 R;
+		ZEUInt8 G;
+		ZEUInt8 B;
+		ZEUInt8 A;
+	};
+);
+
+
+ZEPackStruct
+( 
+	struct ZEBGRA32
 	{
 		ZEUInt8 B;
 		ZEUInt8 G;
 		ZEUInt8 R;
 		ZEUInt8 A;
-	}
+	};
 );
 
 ZEPackStruct
 (
-	struct ZEG16
+	struct ZEL16
 	{
-		ZEUInt16 G;
-	}
+		ZEBigEndian<ZEUInt16> L;
+	};
 );
 
 ZEPackStruct
 (
-	struct ZEAG32
+	struct ZELA16
 	{
-		ZEUInt16 G;
-		ZEUInt16 A;
-	}
+		ZEBigEndian<ZEUInt16> L;
+		ZEBigEndian<ZEUInt16> A;
+	};
 );
 
 ZEPackStruct
 (
-	struct ZEG32
+	struct ZERGBA16
 	{
-		ZEUInt32 G;
-	}
+		ZEBigEndian<ZEUInt16> R;
+		ZEBigEndian<ZEUInt16> G;
+		ZEBigEndian<ZEUInt16> B;
+		ZEBigEndian<ZEUInt16> A;
+	};
 );
 
 ZEPackStruct
 (
 	struct ZEG32F
 	{
-		float G;
-	}
+		float L;
+	};
 );
 
 ZEPackStruct
 (
 	struct ZEAG32F
 	{
-		float G;
+		float L;
 		float A;
 	}
 );
@@ -174,23 +134,12 @@ ZEPackStruct
 (
 	struct ZEARGB32F
 	{
-		float B;
-		float G;
 		float R;
+		float G;
+		float B;
 		float A;
 	}
 );
-
-ZEPackStruct
-(
-	struct ZERBG24
-	{
-		ZEUInt8 B;
-		ZEUInt8 G;
-		ZEUInt8 R;
-	}
-);
-
 
 class ZETextureData;
 class ZETextureSurface;

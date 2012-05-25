@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZETextureFileTGA.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,21 +30,19 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
+cmake_minimum_required (VERSION 2.8)
 
-#pragma once
-#ifndef __ZE_TEXTURE_FILE_TGA_H__
-#define __ZE_TEXTURE_FILE_TGA_H__
+ze_add_source(ZEThread.cpp				Sources)
+ze_add_source(ZEThread.h					Sources Headers)
+ze_add_source(ZELock.cpp	  	Sources)
+ze_add_source(ZELock.h			  Sources Headers)
 
-#include "ZETextureFile.h"
-
-class ZETextureFileTGA : public ZETextureFile
-{
-	public:
-		virtual bool				LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*		Load(ZEFile* File);
-};
-
-#endif
+ze_add_library(ZEThread
+	SOURCES ${Sources} 
+	HEADERS ${Headers} 
+	INSTALL
+	INSTALL_DESTINATION ZEFoundation/ZEThread
+	INSTALL_COMPONENT ZESDK)

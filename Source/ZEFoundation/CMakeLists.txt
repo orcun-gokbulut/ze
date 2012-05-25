@@ -52,6 +52,7 @@ add_subdirectory(ZEStateMachine)
 add_subdirectory(ZEFile)
 add_subdirectory(ZESpatial)
 add_subdirectory(ZETest)
+add_subdirectory(ZEThread)
 
 ze_add_source(ZETypes.h 			Sources Headers)
 ze_add_source(ZETypes.cpp 			Sources)

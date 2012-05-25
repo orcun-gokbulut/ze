@@ -44,6 +44,12 @@
 #include <windows.h>
 #endif
 
+static ZEErrorType ErrorOutputLevel = ZE_ET_LOG;
+
+static bool BreakOnAssertEnabled = true;
+static bool BreakOnErrorEnabled = true;
+static bool BreakOnWarningEnabled = true;
+
 static void DefaultErrorCallback(const char* Module, ZEErrorType Type, const char* ErrorText)
 {
 	printf("[%s] %s : %s \r\n", Module, ZEError::GetErrorTypeString(Type), ErrorText);
@@ -57,7 +63,50 @@ static void DefaultAssertCallback(ZEAssertType Type, const char* AssertText, con
 static ZEErrorCallback ErrorCallback = &DefaultErrorCallback;
 static ZEAssertCallback AssertCallback = &DefaultAssertCallback;
 
-void ZEError::GetModuleName(const char* Function, char* Output)
+void ZEError::SetErrorOutputLevel(ZEErrorType Type)
+{
+	if (Type > ZE_ET_CRITICAL_ERROR)
+		Type = ZE_ET_CRITICAL_ERROR;
+
+	ErrorOutputLevel = Type;
+}
+
+ZEErrorType ZEError::GetErrorOutputLevel()
+{
+	return ErrorOutputLevel;
+}
+
+void ZEError::SetBreakOnAssertEnabled(bool Enabled)
+{
+	BreakOnAssertEnabled = Enabled;
+}
+
+bool ZEError::GetBreakOnAssertEnabled()
+{
+	return BreakOnAssertEnabled;
+}
+
+void ZEError::SetBreakOnErrorEnabled(bool Enabled)
+{
+	BreakOnErrorEnabled = Enabled;
+}
+
+bool ZEError::GetBreakOnErrorEnabled()
+{
+	return BreakOnErrorEnabled;
+}
+
+void ZEError::SetBreakOnWarningEnabled(bool Enabled)
+{
+	BreakOnWarningEnabled = Enabled;
+}
+
+bool ZEError::GetBreakOnWarningEnabled()
+{
+	return BreakOnWarningEnabled;
+}
+
+void ZEError::GetModuleName(char* Output, const char* Function, const char* FileName)
 {
 	ZESize Len = strlen(Function);
 	for(ZESize I = 0; I <= Len; I++)
@@ -69,7 +118,21 @@ void ZEError::GetModuleName(const char* Function, char* Output)
 		else
 			Output[I] = Function[I];
 
-	Output[Len + 1] = '\0';
+	Len = strlen(FileName);
+	bool Found = false;
+	ZESize N;
+	for(N = Len - 1; N >= 0; N--)
+		if (FileName[N] == '\\' || FileName[N] == '/')
+		{
+			Found = true;
+			N++;
+			break;
+		}
+
+	if (Found)
+		strcpy(Output, FileName + N);
+	else
+		strcpy(Output, FileName);
 }
 
 const char* ZEError::GetErrorTypeString(ZEErrorType Type)
@@ -133,13 +196,16 @@ void ZEError::RaiseError(const char* Module, ZEErrorType Type, const char* Error
 		
 		va_end(Args);
 		
-		#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
-			char DebugBuffer[4096];
-			sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZEError::GetErrorTypeString(Type), Buffer);
-			OutputDebugString(DebugBuffer);
-		#endif
+		if (Type >= ErrorOutputLevel)
+		{
+			#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
+				char DebugBuffer[4096];
+				sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZEError::GetErrorTypeString(Type), Buffer);
+				OutputDebugString(DebugBuffer);
+			#endif
 
-		ErrorCallback(Module, Type, Buffer);
+			ErrorCallback(Module, Type, Buffer);
+		}
 	}
 }
 

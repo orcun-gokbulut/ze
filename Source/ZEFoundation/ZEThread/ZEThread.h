@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileTGA.h
+ Zinek Engine - ZEThread.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,18 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
-#pragma once
-#ifndef __ZE_TEXTURE_FILE_TGA_H__
-#define __ZE_TEXTURE_FILE_TGA_H__
-
-#include "ZETextureFile.h"
-
-class ZETextureFileTGA : public ZETextureFile
+enum ZEThreadStatus
 {
-	public:
-		virtual bool				LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*		Load(ZEFile* File);
+	ZE_TS_NONE,
+	ZE_TS_RUNNING,
+	ZE_TS_SUSPENDED,
+	ZE_TS_TERMINATED,
+	ZE_TS_DONE
 };
 
-#endif
+class ZEThread
+{
+	friend unsigned long __stdcall RunThread(void* Thread);
+	private:
+		void*				Handle;
+		ZEThreadStatus		Status;
+		void*				Parameter;
+
+	protected:
+		virtual void		Function(void* Parameter) = 0;
+
+	public:
+		ZEThreadStatus		GetStatus();
+
+		void				SetParameter(void* Parameter);
+		void*				GetParameter();
+
+		void				Run(void* Parameter);
+		void				Suspend();
+		void				Sleep(unsigned int Milliseconds);
+		void				Terminate();
+
+							ZEThread();
+		virtual 			~ZEThread();
+};

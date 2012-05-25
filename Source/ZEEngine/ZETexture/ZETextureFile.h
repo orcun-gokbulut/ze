@@ -40,12 +40,13 @@
 
 class ZEFile;
 class ZETextureData;
+class ZETextureDataInfo;
 
 class ZETextureFile
 {
 	public:
-		virtual bool			CanLoad(ZEFile* File) = 0;
-		virtual ZETextureData*	Load(ZEFile* File) = 0;
+		virtual bool				LoadInfo(ZETextureDataInfo* Info, ZEFile* File) = 0;
+		virtual ZETextureData*		Load(ZEFile* File) = 0;
 };
 
 #endif

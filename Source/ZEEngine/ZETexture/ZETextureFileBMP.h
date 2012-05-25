@@ -43,7 +43,7 @@
 class ZETextureFileBMP : public ZETextureFile
 {
 	public:
-		virtual bool				CanLoad(ZEFile* File);
+		virtual bool				LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
 		virtual ZETextureData*		Load(ZEFile* File);
 };
 

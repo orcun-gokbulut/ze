@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileTGA.h
+ Zinek Engine - ZELock.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,18 +33,106 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZELock.h"
 
-#pragma once
-#ifndef __ZE_TEXTURE_FILE_TGA_H__
-#define __ZE_TEXTURE_FILE_TGA_H__
+#include <Windows.h>
+#include <intrin.h>
 
-#include "ZETextureFile.h"
+#define ZE_ATOMIC_INCREMENT(Value) _InterlockedIncrement(Value)
 
-class ZETextureFileTGA : public ZETextureFile
+ZELockHandle::ZELockHandle(const ZELockHandle& Handle)
 {
-	public:
-		virtual bool				LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*		Load(ZEFile* File);
-};
+	Locked = false;
+	Number = 0;
+}
 
-#endif
+ZELockHandle& ZELockHandle::operator=(const ZELockHandle& Handle)
+{
+	return ZELockHandle();
+}
+
+ZELockHandle::ZELockHandle()
+{
+	Locked = false;
+	Number = 0;
+}
+
+ZELockHandle::~ZELockHandle()
+{
+	//zeAssert(Locked, "A thread handle is still unlocked !");
+}
+
+bool ZELock::Test()
+{
+	return CurrentNumber < NextNumber;
+}
+
+bool ZELock::Lock(ZELockHandle* Handle)
+{
+	long MyNumber = ZE_ATOMIC_INCREMENT(&NextNumber);
+	if (MyNumber != CurrentNumber)
+	{
+		Handle->Locked = false;
+		Handle->Number = 0;
+		return false;
+	}
+
+	CurrentNumber = MyNumber;
+
+	Handle->Locked = true;
+	Handle->Number = MyNumber;
+
+	return true;
+}
+
+void ZELock::Wait()
+{
+	while(CurrentNumber < NextNumber);
+}
+
+void ZELock::WaitAndLock(ZELockHandle* Handle)
+{
+	unsigned long long MyNumber = ZE_ATOMIC_INCREMENT(&NextNumber);
+
+	while(MyNumber != CurrentNumber);
+
+	CurrentNumber = MyNumber;
+
+	Handle->Locked = true;
+	Handle->Number = MyNumber;
+}
+
+bool ZELock::Unlock(ZELockHandle* Handle)
+{
+	if (!Handle->Locked && Handle->Number != CurrentNumber)
+		return false;
+
+	Handle->Locked = false;
+	Handle->Number = 0;
+
+	CurrentNumber++;
+
+	return true;
+}
+
+ZELock& ZELock::operator=(const ZELock& Lock)
+{
+	return ZELock();
+}
+
+ZELock::ZELock()
+{
+	CurrentNumber = 1;
+	NextNumber = 0;
+}
+
+ZELock::ZELock(const ZELock& Lock)
+{
+	CurrentNumber = 1;
+	NextNumber = 0;
+}
+
+ZELock::~ZELock()
+{
+	//zeError("Destroying lock while it is still locked.");
+}
