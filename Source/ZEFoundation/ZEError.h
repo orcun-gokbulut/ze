@@ -66,7 +66,6 @@ enum ZEAssertType
 #else
 	#define zeBreak(Condition) do {if (Condition) {}} while(false)
 #endif
-#include "ZEAPI.h"
 
 #define ZE_MAX_MODULE_NAME_LENGTH 1024
 

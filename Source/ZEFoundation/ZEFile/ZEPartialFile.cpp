@@ -37,7 +37,6 @@
 
 #include "ZEError.h"
 #include "ZEPartialFile.h"
-#include "ZECore/ZEConsole.h"
 
 #include <Windows.h>
 #include <stdarg.h>

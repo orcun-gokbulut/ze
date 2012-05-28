@@ -33,7 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETDefinitions.h"
 #include "ZECompressedFile.h"
 
 #include <zlib.h>
