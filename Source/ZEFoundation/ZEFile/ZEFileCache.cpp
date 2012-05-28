@@ -35,9 +35,6 @@
 
 #include "ZEError.h"
 #include "ZEFileCache.h"
-#include "ZECore/ZEConsole.h"
-
-
 
 bool ZEFileCache::CheckCompleteness()
 {

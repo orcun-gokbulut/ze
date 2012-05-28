@@ -38,7 +38,6 @@
 #define __ZE_PACK_H__
 
 #include "ZETypes.h"
-#include "ZEDefinitions.h"
 #include "ZEDS/ZEString.h"
 
 #include <stdio.h>

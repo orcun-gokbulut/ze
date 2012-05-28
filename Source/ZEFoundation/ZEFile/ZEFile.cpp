@@ -38,7 +38,6 @@
 #include "ZEError.h"
 #include "ZEFile.h"
 #include "ZEPack.h"
-#include "ZEDefinitions.h"
 #include "ZEPartialFile.h"
 #include "ZECompressedFile.h"
 
@@ -52,7 +51,6 @@
 
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
-
 
 bool ZEFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 {
@@ -341,8 +339,7 @@ ZEUInt64 ZEFile::GetFileSize()
 
 bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZEUInt64 BufferSize)
 {
-	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
-	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", FilePath.GetValue());
+	ZEString RelativeFileName = "resources\\" + FilePath;
 
 	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
@@ -365,9 +362,7 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZEUInt64 BufferSiz
 
 bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEUInt64 BufferSize)
 {
-	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
-
-	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", FilePath.ToCString());
+	ZEString RelativeFileName = "resources\\" + FilePath;
 
 	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
