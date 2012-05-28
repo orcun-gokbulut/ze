@@ -35,6 +35,7 @@
 
 #include "ZEParticleModifier.h"
 #include "ZEParticleEmitter.h"
+#include "ZEParticleEffect.h"
 #include "ZEGraphics\ZEFixedMaterial.h"
 #include "ZERandom.h"
 #include "ZEMath\ZEAngle.h"
@@ -78,6 +79,17 @@ ZEParticleModifier::~ZEParticleModifier()
 /*							ZEParticleBasicBehaviourModifier            */
 /************************************************************************/
 
+void ZEParticlePhysicsModifier::SetRadialMovement(bool Enabled)
+{
+	IsRadialMovement = Enabled;
+}
+
+void ZEParticlePhysicsModifier::SetRadialSpeed(float Max, float Min)
+{
+	MaxRadialSpeed = Max;
+	MinRadialSpeed = Min;
+}
+
 void ZEParticlePhysicsModifier::SetMinAcceleration(const ZEVector3& Acceleration)
 {
 	MinAcceleration = Acceleration;
@@ -120,6 +132,10 @@ const ZEVector3& ZEParticlePhysicsModifier::GetMaxVelocity() const
 
 ZEParticlePhysicsModifier::ZEParticlePhysicsModifier()
 {
+	IsRadialMovement = false;
+	MaxRadialSpeed = 0.0f;
+	MinRadialSpeed = 0.0f;
+
 	MinAcceleration = ZEVector3(0.0f, 0.0f, 0.0f);			
 	MaxAcceleration = ZEVector3(0.0f, 0.0f, 0.0f);			
 	MinVelocity = ZEVector3(0.0f, 0.0f, 0.0f);				
@@ -134,21 +150,38 @@ ZEParticlePhysicsModifier::~ZEParticlePhysicsModifier()
 void ZEParticlePhysicsModifier::Tick(float ElapsedTime)
 {
 	ZEArray<ZEParticle>& Particles = GetOwnerParticlePool();
-	ZESize ParticlCount = Particles.GetCount();
+	ZESize ParticleCount = Particles.GetCount();
+	ZEVector3 EmitterWorldPosition = GetOwner()->GetOwner()->GetWorldPosition() + GetOwner()->GetPosition();
+	ZEVector3 EmitterUp = GetOwner()->GetOwner()->GetWorldRotation() * -ZEVector3::UnitZ;
+	ZEParticleEmitterType EmitterType = GetOwner()->GetType();
 
-	for (ZESize I = 0; I < ParticlCount; I++)
+	for (ZESize I = 0; I < ParticleCount; I++)
 	{
 		switch(Particles[I].State)
 		{
 		case ZE_PAS_NEW:
 
+			if (IsRadialMovement)
+			{
+				Particles[I].Velocity = ((Particles[I].Position - EmitterWorldPosition).Normalize()) * RAND_BETWEEN_TWO_FLOAT(MinRadialSpeed, MaxRadialSpeed);
+				
+				if(EmitterType == ZE_PET_TORUS)
+				{
+					Particles[I].Velocity.x -= ZEMath::Abs(EmitterUp.x) * Particles[I].Velocity.x;
+					Particles[I].Velocity.y -= ZEMath::Abs(EmitterUp.y) * Particles[I].Velocity.y;
+					Particles[I].Velocity.z -= ZEMath::Abs(EmitterUp.z) * Particles[I].Velocity.z;
+				}
+			}
+			else
+			{
+				Particles[I].Velocity.x				= RAND_BETWEEN_TWO_FLOAT(MinVelocity.x, MaxVelocity.x);
+				Particles[I].Velocity.y				= RAND_BETWEEN_TWO_FLOAT(MinVelocity.y, MaxVelocity.y);
+				Particles[I].Velocity.z				= RAND_BETWEEN_TWO_FLOAT(MinVelocity.z, MaxVelocity.z);
+			}
+
 			Particles[I].Acceleration.x				= RAND_BETWEEN_TWO_FLOAT(MinAcceleration.x, MaxAcceleration.x);
 			Particles[I].Acceleration.y				= RAND_BETWEEN_TWO_FLOAT(MinAcceleration.y, MaxAcceleration.y);
 			Particles[I].Acceleration.z				= RAND_BETWEEN_TWO_FLOAT(MinAcceleration.z, MaxAcceleration.z);
-
-			Particles[I].Velocity.x					= RAND_BETWEEN_TWO_FLOAT(MinVelocity.x, MaxVelocity.x);
-			Particles[I].Velocity.y					= RAND_BETWEEN_TWO_FLOAT(MinVelocity.y, MaxVelocity.y);
-			Particles[I].Velocity.z					= RAND_BETWEEN_TWO_FLOAT(MinVelocity.z, MaxVelocity.z);
 
 			Particles[I].InitialVelocity			= Particles[I].Velocity;
 
