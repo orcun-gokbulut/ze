@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEIPAddress.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,48 +30,49 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef	__ZE_IP_ADDRESS_H__
+#define __ZE_IP_ADDRESS_H__
+#include "ZETypes.h"
+#include "ZEDS\ZEString.h"
+#include "ZEDS\ZEArray.h"
 
-project (ZEFoundation)
+enum ZEIPAddressType
+{
+	ZE_IAT_NONE,
+	ZE_IAT_IP_V4,
+	ZE_IAT_IP_V6,
+};
 
-ze_set_project_folder("ZEFoundation")
+class ZEIPAddress
+{
+	public:
 
-include_directories(
-	${PROJECT_SOURCE_DIR} 
-	${PROJECT_SOURCE_DIR}/../Include)
+		static const ZEIPAddress		IPv4Any;
+		static const ZEIPAddress		IPv6Any;
 
-include_directories (${PROJECT_SOURCE_DIR})
+		ZEIPAddressType					Type;
 
-add_subdirectory(ZEDS)
-add_subdirectory(ZEMath)
-add_subdirectory(ZESerialization)
-add_subdirectory(ZEStateMachine)
-add_subdirectory(ZEFile)
-add_subdirectory(ZESpatial)
-add_subdirectory(ZETest)
-add_subdirectory(ZEThread)
-add_subdirectory(ZENetwork)
+		union
+		{
+			ZEUInt8						Address4[4];
+			ZEUInt16					Address6[8];
+		};
 
-ze_add_source(ZETypes.h 			Sources Headers)
-ze_add_source(ZETypes.cpp 			Sources)
-ze_add_source(ZEEndian.h 			Sources Headers)
-ze_add_source(ZEEndian.cpp 			Sources)
-ze_add_source(ZEError.h 			Sources Headers)
-ze_add_source(ZEError.cpp 			Sources)
-ze_add_source(ZEPacking.h 			Sources Headers)
-ze_add_source(ZEPacking.cpp 		Sources)
-ze_add_source(ZESerialPort.h 		Sources Headers)
-ze_add_source(ZESerialPort.cpp 		Sources)
-ze_add_source(ZERandom.h 			Sources Headers)
-ze_add_source(ZERandom.cpp 			Sources)
+		static ZEIPAddress				Parse(ZEString& String);
+		static ZEArray<ZEIPAddress>		Lookup(ZEString& String);
+		static ZEArray<ZEIPAddress>		HostIPs();
 
-ze_add_library(ZEFoundation 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZENetwork
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation
-	INSTALL_COMPONENT ZESDK)
+		bool							operator == (const ZEIPAddress &RightOperand) const;
+		bool							operator != (const ZEIPAddress &RightOperand) const;
+
+										ZEIPAddress();
+										ZEIPAddress(ZEUInt8 Byte0, ZEUInt8 Byte1, ZEUInt8 Byte2, ZEUInt8 Byte3);
+										ZEIPAddress(ZEUInt16 Word0, ZEUInt16 Word1, ZEUInt16 Word2, ZEUInt16 Word3, 
+													ZEUInt16 Word4, ZEUInt16 Word5, ZEUInt16 Word6, ZEUInt16 Word7);
+};
+
+#endif

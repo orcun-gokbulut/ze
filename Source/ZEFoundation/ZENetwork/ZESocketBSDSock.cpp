@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,48 +30,6 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
-
-project (ZEFoundation)
-
-ze_set_project_folder("ZEFoundation")
-
-include_directories(
-	${PROJECT_SOURCE_DIR} 
-	${PROJECT_SOURCE_DIR}/../Include)
-
-include_directories (${PROJECT_SOURCE_DIR})
-
-add_subdirectory(ZEDS)
-add_subdirectory(ZEMath)
-add_subdirectory(ZESerialization)
-add_subdirectory(ZEStateMachine)
-add_subdirectory(ZEFile)
-add_subdirectory(ZESpatial)
-add_subdirectory(ZETest)
-add_subdirectory(ZEThread)
-add_subdirectory(ZENetwork)
-
-ze_add_source(ZETypes.h 			Sources Headers)
-ze_add_source(ZETypes.cpp 			Sources)
-ze_add_source(ZEEndian.h 			Sources Headers)
-ze_add_source(ZEEndian.cpp 			Sources)
-ze_add_source(ZEError.h 			Sources Headers)
-ze_add_source(ZEError.cpp 			Sources)
-ze_add_source(ZEPacking.h 			Sources Headers)
-ze_add_source(ZEPacking.cpp 		Sources)
-ze_add_source(ZESerialPort.h 		Sources Headers)
-ze_add_source(ZESerialPort.cpp 		Sources)
-ze_add_source(ZERandom.h 			Sources Headers)
-ze_add_source(ZERandom.cpp 			Sources)
-
-ze_add_library(ZEFoundation 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZENetwork
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation
-	INSTALL_COMPONENT ZESDK)
