@@ -219,12 +219,11 @@ bool ZEPack::ChunkExists(const char* IdentifierName)
 //Returns hash code
 ZEUInt64 ZEPack::GetHash(const char* Identifier)
 {
-	char ChunkName[256];
-	strncpy(ChunkName,Identifier,256);
+	ZEString ChunkName = Identifier;
 	ZEUInt64 Hash = 0;
 	ZEUInt64 I = 0;	
 	ZEUInt64 Char = 0;
-	while(I < ZE_MAX_FILE_NAME_SIZE)
+	while(I < ChunkName.GetLength())
 	{
 		Char = ChunkName[I];
 		Hash = Char + (Hash << 6) + (Hash << 16) - Hash;

@@ -190,9 +190,9 @@ bool ZECompressedFile::IsOpen()
 	return false;
 }
 
-bool ZECompressedFile::Open(const char* FileName, ZEFileMode Mode, bool Binary)
+bool ZECompressedFile::Open(const ZEString& FileName, ZEFileMode Mode, bool Binary)
 {
-	strncpy(this->FileName, FileName, ZE_MAX_FILE_NAME_SIZE);
+	this->FileName = FileName;
 
 	const char* StrMode = NULL;
 	const char*	AltStrMode = NULL;
@@ -793,7 +793,7 @@ bool ZEPartialCompressedFile::Open(ZECompressedFile* ParentFile, ZEUInt64 Offset
 	this->File		= ParentFile->GetFileHandle();
 	this->BaseFile	= ParentFile;
 
-	strncpy(this->FileName, ParentFile->GetFileName(), ZE_MAX_FILE_NAME_SIZE);
+	FileName = ParentFile->GetFileName();
 
 	return true;
 }
