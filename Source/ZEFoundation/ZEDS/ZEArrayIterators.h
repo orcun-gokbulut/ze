@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEList.cpp
+ Zinek Engine - ZEArrayIterators.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,99 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEList.h"
+#pragma once
+#ifndef	__ZEDS_ARRAY_ITERATORS_H__
+#define __ZEDS_ARRAY_ITERATORS_H__
+
+#include "ZETypes.h"
+
+template<typename ZEType, typename Allocator_>
+class ZEArray;
+
+template<typename ZEType, typename Allocator_>
+class ZEArrayIterator
+{
+	template<typename ZEType, typename Allocator_> class ZEArray;
+	private:
+		ZEArray<ZEType, Allocator_>* Array;
+		ZESize* CurrentIndex;
+
+		ZEArrayIterator(ZEArray<ZEType, Allocator_>* Array)
+		{
+			this->Array = Array;
+		};
+
+	public:
+		inline bool IsEnd() const
+		{
+			return Index < 0 || Index >= Array->GetCount();
+		} 
+
+		inline ZEType* GetCurrentItem()
+		{
+			return &Array->GetItem(Index);
+		}
+
+		inline ZEType* MovePrevious()
+		{
+			if (CurrentIndex + 1 >= Array->GetCount())
+				return NULL;
+
+			CurrentIndex++;
+			return &Array->GetItem(Index);
+		}
+
+		inline ZEType* MoveNext()
+		{
+			if ((ZESSize)CurrentIndex - 1 < (ZESSize)Array->GetSize())
+				return NULL;
+
+			CurrentIndex--;
+			return &Array->GetItem(Index);			
+		}
+};
+
+template<typename ZEType, typename Allocator_>
+class ZEArrayIteratorConst
+{
+	template<typename ZEType, typename Allocator_> class ZEArray;
+	private:
+		const ZEArray<ZEType, Allocator_>* Array;
+		ZESize* CurrentIndex;
+
+		ZEArrayIteratorConst(const ZEArray<ZEType, Allocator_>* Array)
+		{
+			this->Array = Array;
+		};
+
+	public:
+		inline bool IsEnd() const
+		{
+			return Index < 0 || Index >= Array->GetCount();
+		} 
+
+		inline const ZEType* GetCurrentItem() const
+		{
+			return &Array->GetItem(Index);
+		}
+
+		inline const ZEType* MovePrevious() const
+		{
+			if (CurrentIndex + 1 >= Array->GetCount())
+				return NULL;
+
+			CurrentIndex++;
+			return &Array->GetItem(Index);
+		}
+
+		inline const ZEType* MoveNext() const
+		{
+			if ((ZESSize)CurrentIndex - 1 < (ZESSize)Array->GetSize())
+				return NULL;
+
+			CurrentIndex--;
+			return &Array->GetItem(Index);			
+		}
+};
+
+#endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEList.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,268 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#ifndef __ZEDS_LIST_H__
+#define __ZEDS_LIST_H__
+
+#include "ZETypes.h"
+#include "ZEListIterators.h"
+
+template<typename ZEType>
+class ZEListItem
+{
+	template<typename ZEType> friend class ZEList;
+	private:
+		ZEType* NextItem;
+		ZEType* PrevItem;
+
+	protected:
+		ZEListItem()
+		{
+			NextItem = NULL;
+			PrevItem = NULL;
+		}
+};
+
+template<typename ZEType>
+class ZEList
+{
+	private:
+		ZESize Count;
+		ZEType* FirstItem;
+		ZEType* LastItem;
+
+		ZEList(const ZEList& Other)
+		{
+		}
+		
+		void operator=(const ZEList& Other)
+		{
+		}
+
+	public:
+		typedef ZEListIterator<ZEType> Iterator;
+		Iterator GetIterator()
+		{
+			return Iterator(this);
+		}
+
+		typedef ZEListIterator<ZEType> ConstIterator;
+		ConstIterator GetConstIterator() const
+		{
+			return ConstIterator(this);
+		}
+
+		inline ZESize GetCount() const
+		{
+			return Count;
+		}
+
+		inline ZEType* Append(ZEType* Item)
+		{
+			zeAssert(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
+
+			Item->NextItem = NULL;
+			Item->PrevItem = LastItem;
+
+			if (FirstItem == NULL)
+				FirstItem = Item;
+
+			if (LastItem != NULL)
+				LastItem->NextItem = Item;
+
+			LastItem = Item;
+		}
+
+		inline ZEType* Insert(ZEType* Item)
+		{
+			zeAssert(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
+			zeAssert(Exists(Item), "Item is already added to list.");
+
+			Item->NextItem = FirstItem;
+			Item->PrevItem = NULL;
+
+			if (LastItme == NULL)
+				LastItem = Item;
+
+			if (FirstItem != NULL)
+				FirstItem->PrevItem = Item;
+
+			FirstItem = Item;
+
+
+			Count++;
+		}
+
+		inline ZEType* Insert(ZESize Index, ZEType* Item)
+		{
+			zeAssert(Index > Count, "Index out of range.");
+			zeAssert(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
+			zeAssert(Exists(Item), "Item is already added to list.");
+
+			if (Index == 0)
+				Insert(Item);
+			else if (Index == Count)
+				Append(Item);
+			else
+			{
+				ZEType* OldItem = GetItem(Index);
+				Item->PrevItem = OldItem->PrevItem;
+				Item->NextItem = OldItem;
+				OldItem->PrevItem = Item;
+				Count++;
+			}
+		}
+
+		inline void Remove(ZEType* Item)
+		{
+			zeAssert(!Exists(Item), "Item is not in the list.");
+
+			if (Item->PrevItem == NULL)
+				FirstItem = Item->NextItem;
+
+			if (Item->NextItem == NULL)
+				LastItem = Item->PrevItem;
+
+			Item->PrevItem = NULL;
+			Item->NextItem = NULL;
+
+			Count--;
+		}
+
+		inline void RemoveAt(ZESize Index)
+		{
+			ZEType* Item = GetItem(Index);
+			Remove(Item);
+		}
+
+		inline void RemoveAll()
+		{
+			ZEType* Cursor = FirstItem;
+			while(Cursor != NULL)
+			{
+				ZEType* Temp = Item->NextItem;
+				Cursor->PrevItem = NULL;
+				Cursor->NextItem = NULL;
+				Cursor = Temp;
+			}
+		}
+
+		inline const ZEType* GetItem(ZESize Index) const
+		{
+			zeAssert(Index >= Count, "Index is out of range.");
+			
+			const ZEType* Cursor = FirstItem;
+			while(Index-- != 0)
+				Cursor = Cursor->NextItem;
+			
+			return Cursor;
+		}
+
+		inline ZEType* GetItem(ZESize Index)
+		{
+			zeAssert(Index >= Count, "Index is out of range.");
+
+			ZEItem* Cursor = FirstItem;
+			while(Index-- != 0)
+				Cursor = Cursor->NextItem;
+
+			return Cursor;
+		}
+
+		inline const ZEType* GetFirstItem() const
+		{
+			return FirstItem;
+		}
+
+		inline ZEType* GetFirstItem()
+		{
+			return FirstItem;
+		}
+
+		inline ZEType* GetLastItem()
+		{
+			return LastItem;
+		}
+
+		inline const ZEType* GetLastItem() const
+		{
+			return LastItem;
+		}
+
+		inline ZEType* operator[](ZESize Index)
+		{
+			zeAssert(Index >= Count, "Index is out of range.");
+			return GetItem(Index);
+		}
+
+		inline const ZEType* operator[](ZESize Index) const
+		{
+			zeAssert(Index >= Count, "Index is out of range.");
+			return GetItem(Index);
+		}
+
+		inline void Enqueue(ZEType* Value)
+		{
+			Append(Value);
+		}
+
+		inline ZEType* Dequeue()
+		{
+			ZEType* Item = FirstItem;
+			Remove(FirstItem);
+
+			return Item;
+		}
+
+		inline void Push(ZEType* Value)
+		{
+			Insert(Value);
+		}
+
+		inline ZEType Pop()
+		{
+			ZEType* Item = FirstItem;
+			Remove(FirstItem);
+
+			return Item;
+		}
+
+		inline bool Exists(ZEType* Item) const
+		{
+			ZEItem* Cursor = FirstItem;
+			while(Cursor != NULL)
+				if (Cursor == Item)
+					return true;
+
+			return false;
+		}
+
+		inline ZESSize FindIndex(ZEType* Item, ZESize StartIndex = 0) const
+		{
+			ZESize Index = 0;
+			ZEItem* Cursor = FirstItem;
+			while(Cursor != NULL)
+			{
+				if (Cursor == Item)
+					return Index;
+
+				Index++;
+			}
+
+			return -1;
+		}
+
+		ZEList()
+		{
+			First = NULL;
+			Last = NULL;
+			Count = 0;
+		}
+		
+		~ZEList()
+		{
+			RemoveAll();
+		}
+};
+
+#endif

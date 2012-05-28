@@ -48,4 +48,4 @@ ze_add_module(ZEDirectSound			OPTIONAL DEFAULT PLATFORMS Windows)
 ze_add_module(ZEOpenAL				OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
 ze_add_module(ZEPhysX				OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
 
-ze_add_cmake_project(ZEModules CMakeLists.txt)
+ze_add_cmake_project(ZEModules_ SOURCES CMakeLists.txt)
