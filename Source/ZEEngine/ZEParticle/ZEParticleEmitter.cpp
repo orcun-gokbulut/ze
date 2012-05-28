@@ -183,25 +183,27 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 	}
 	else
 	{
+		ZEVector3 TempPosition;
+
 		switch(Type)
 		{
 			case ZE_PET_POINT:
 			{
-				Particle.Position = GetOwner()->GetWorldPosition() + Position;
+				TempPosition = Position;
 				break;
 			}
 			case ZE_PET_PLANE:
-			{
-				Particle.Position.x = GetOwner()->GetWorldPosition().x + Position.x + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.x / 2, PlaneSize.x / 2);
-				Particle.Position.y = GetOwner()->GetWorldPosition().y + Position.y;
-				Particle.Position.z = GetOwner()->GetWorldPosition().z + Position.z + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.y / 2, PlaneSize.y / 2);
+			{		
+				TempPosition.x = Position.x + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.x / 2, PlaneSize.x / 2);
+				TempPosition.y = Position.y;
+				TempPosition.z = Position.z + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.y / 2, PlaneSize.y / 2);
 				break;
 			}
 			case ZE_PET_BOX:
 			{
-				Particle.Position.x = GetOwner()->GetWorldPosition().x + Position.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2, BoxSize.x / 2);
-				Particle.Position.y = GetOwner()->GetWorldPosition().y + Position.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2, BoxSize.y / 2);
-				Particle.Position.z = GetOwner()->GetWorldPosition().z + Position.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2, BoxSize.z / 2);
+				TempPosition.x = Position.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2, BoxSize.x / 2);
+				TempPosition.y = Position.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2, BoxSize.y / 2);
+				TempPosition.z = Position.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2, BoxSize.z / 2);
 				break;
 			}
 			case ZE_PET_TORUS:
@@ -209,9 +211,9 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 				float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 				float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 				float TubeRadius = RAND_BETWEEN_TWO_FLOAT(0.0f, TorusSize.y);
-				Particle.Position.x = GetOwner()->GetWorldPosition().x + Position.x + (TorusSize.x + TubeRadius * ZEAngle::Cos(Phi)) * ZEAngle::Cos(Theta);
-				Particle.Position.y = GetOwner()->GetWorldPosition().y + Position.y + (TorusSize.x + TubeRadius * ZEAngle::Cos(Phi)) * ZEAngle::Sin(Theta);
-				Particle.Position.z = GetOwner()->GetWorldPosition().z + Position.z + TubeRadius * ZEAngle::Sin(Phi);		
+				TempPosition.x = Position.x + (TorusSize.x + TubeRadius * ZEAngle::Cos(Phi)) * ZEAngle::Cos(Theta);
+				TempPosition.y = Position.y + (TorusSize.x + TubeRadius * ZEAngle::Cos(Phi)) * ZEAngle::Sin(Theta);
+				TempPosition.z = Position.z + TubeRadius * ZEAngle::Sin(Phi);		
 				break;
 			}
 			case ZE_PET_SPHERE:
@@ -219,12 +221,14 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 				float Radius = RAND_BETWEEN_TWO_FLOAT(0.0f, SphereRadius);
 				float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 				float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, ZE_PI);
-				Particle.Position.x = GetOwner()->GetWorldPosition().x + Position.x + Radius * ZEAngle::Cos(Theta) * ZEAngle::Sin(Phi);
-				Particle.Position.y = GetOwner()->GetWorldPosition().y + Position.y + Radius * ZEAngle::Sin(Theta) * ZEAngle::Sin(Phi);
-				Particle.Position.z = GetOwner()->GetWorldPosition().z + Position.z + Radius * ZEAngle::Cos(Phi);		
+				TempPosition.x = Position.x + Radius * ZEAngle::Cos(Theta) * ZEAngle::Sin(Phi);
+				TempPosition.y = Position.y + Radius * ZEAngle::Sin(Theta) * ZEAngle::Sin(Phi);
+				TempPosition.z = Position.z + Radius * ZEAngle::Cos(Phi);		
 				break;
 			}
 		}
+
+		Particle.Position = GetOwner()->GetWorldTransform() * TempPosition;
 	}
 
 	Particle.TotalLife					= RAND_BETWEEN_TWO_FLOAT(MinLife, MaxLife);

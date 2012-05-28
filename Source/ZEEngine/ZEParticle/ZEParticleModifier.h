@@ -73,6 +73,10 @@ class ZEParticlePhysicsModifier : public ZEParticleModifier
 {
 	private:
 
+		bool							IsRadialMovement;
+		float							MaxRadialSpeed;
+		float							MinRadialSpeed;
+
 		ZEVector3						MinAcceleration;
 		ZEVector3						MaxAcceleration;
 		ZEVector3						MinVelocity;
@@ -80,7 +84,8 @@ class ZEParticlePhysicsModifier : public ZEParticleModifier
 
 	public:
 
-		virtual void					Tick(float ElapsedTime);
+		void							SetRadialMovement(bool Enabled);
+		void							SetRadialSpeed(float Max, float Min);
 
 		void							SetMinAcceleration(const ZEVector3& Acceleration);
 		const ZEVector3&				GetMinAcceleration() const;
@@ -91,6 +96,8 @@ class ZEParticlePhysicsModifier : public ZEParticleModifier
 		const ZEVector3&				GetMinVelocity() const;
 		void							SetMaxVelocity(const ZEVector3& Velocity);
 		const ZEVector3&				GetMaxVelocity() const;
+
+		virtual void					Tick(float ElapsedTime);
 
 										ZEParticlePhysicsModifier();
 										~ZEParticlePhysicsModifier();
