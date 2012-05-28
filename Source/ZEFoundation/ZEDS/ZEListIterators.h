@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEList.cpp
+ Zinek Engine - ZEListIterators.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,82 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEList.h"
+#ifndef __ZEDS_LIST_ITERATORS_H__
+#define __ZEDS_LIST_ITERATORS_H__
+
+#include "ZETypes.h"
+template<typename ZEType>
+class ZEList;
+
+template<typename ZEType>
+class ZEListIterator
+{
+	template<typename ZEType> class ZEList;
+	private:
+		ZEType* CurrentItem;
+				
+		ZEListIterator(ZEList<ZEType>* List)
+		{
+			CurrentItem = List->FirstItem;
+		}
+
+	public:
+		inline bool IsEnd() const
+		{
+			return CurrentItem == NULL;
+		}
+
+		inline ZEType* GetCurrentItem()
+		{
+			return CurrentItem;
+		}
+		inline ZEType* MovePrevious()
+		{
+			CurrentItem = CurrentItem->PrevItem;
+			return CurrentItem;
+		}
+
+		inline ZEType* MoveNext()
+		{
+			CurrentItem = CurrentItem->NextItem;
+			return CurrentItem;			
+		}
+};
+
+template<typename ZEType>
+class ZEListIteratorConst
+{
+	template<typename ZEType> class ZEList;
+	private:
+		const ZEType* CurrentItem;
+				
+		ZEListIteratorConst(const ZEList<ZEType>* List)
+		{
+			CurrentItem = List->FirstItem;
+		}
+
+	public:
+		inline bool IsEnd() const
+		{
+			return CurrentItem == NULL;
+		}
+
+		inline const ZEType* GetCurrentItem() const
+		{
+			return CurrentItem;
+		}
+
+		inline const ZEType* MovePrevious() const
+		{
+			CurrentItem = CurrentItem->PrevItem;
+			return CurrentItem;
+		}
+
+		inline const ZEType* MoveNext() const
+		{
+			CurrentItem = CurrentItem->NextItem;
+			return CurrentItem;			
+		}
+};
+
+#endif

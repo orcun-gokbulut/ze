@@ -36,7 +36,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 ze_add_module(ZEEngine)
-ze_add_module(ZEModules			OPTIONAL DEFAULT 	PLATFORMS Windows)
+ze_add_module(ZEModules			OPTIONAL DEFAULT)
 ze_add_module(ZEditor			OPTIONAL DEFAULT)
 ze_add_module(ZE3dsMax			OPTIONAL DEFAULT 	PLATFORMS Windows)
 ze_add_module(ZEFoundation)
