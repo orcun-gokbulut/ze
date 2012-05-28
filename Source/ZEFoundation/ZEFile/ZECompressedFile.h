@@ -46,14 +46,14 @@ class ZECompressedFile
 	friend class ZEPartialCompressedFile;
 	protected:
 		void*				File;
-		char				FileName[256];
-		ZEUInt64				FileCursor;
+		ZEString			FileName;
+		ZEUInt64			FileCursor;
 		
 	public:
 		const char*			GetFileName() const;
 		void*				GetFileHandle() const;
 
-		virtual bool		Open(const char* FileName, ZEFileMode Mode = ZE_FM_READ_WRITE, bool Binary = true); 
+		virtual bool		Open(const ZEString& FileName, ZEFileMode Mode = ZE_FM_READ_WRITE, bool Binary = true); 
 
 		virtual bool		Seek(ZEInt64 Offset, ZESeekFrom Origin);		
 
