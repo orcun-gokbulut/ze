@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileJPEG.h
+ Zinek Engine - ZETextureFileJPEGDequantizator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,39 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
 #pragma once
-#ifndef __ZE_TEXTURE_FILE_JPEG__
-#define __ZE_TEXTURE_FILE_JPEG__
+#ifndef __ZE_TEXTURE_FILE_JPEG_DEQUANTIZATOR_H__
+#define __ZE_TEXTURE_FILE_JPEG_DEQUANTIZATOR_H__
 
-#include "ZETypes.h"
-#include "ZETextureFile.h"
+
 #include "ZETextureFileJPEGCommonDefinitions.h"
 
-#include "ZETextureFileJPEGMarkerReader.h"
-#include "ZETextureFileJPEGMainController.h"
 
-class ZETextureData;
+struct ZEJpegDataBlock;
+struct ZEJpegComponentInfo;
+struct ZEJpegDeCompressionInfo;
 
-class ZETextureFileJpeg : public ZETextureFile
+class ZEJpegDequantizator
 {
+
 	private:
-		
-		ZEJpegDeCompressionInfo 		DecompInfo;
-		
-		ZEJpegFileMarkerReader*			MarkerReader;
-		ZEJpegMainController*			MainController;
+		ZEJpegDeCompressionInfo*		Info;
+
+										ZEJpegDequantizator();
+										~ZEJpegDequantizator();
 
 	public:
-										ZETextureFileJpeg();
-		virtual							~ZETextureFileJpeg();
+		void							Dequantize(ZEJpegComponentInfo* ComponentInfo, ZEJpegDataBlock* BlockData);
 
+		void							Initialize(ZEJpegDeCompressionInfo* Info);
+		void							Deinitialize();
 
-
-
-		virtual bool					LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*			Load(ZEFile* File);
+		void							Destroy();
+		static ZEJpegDequantizator*	CreateInstance();
 
 };
 
-#endif
+
+#endif // __ZE_TEXTURE_FILE_JPEG_DEQUANTIZATOR_H__

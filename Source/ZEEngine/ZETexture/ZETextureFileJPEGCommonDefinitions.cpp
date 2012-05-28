@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileJPEG.h
+ Zinek Engine - ZETextureFileJPEGCommonDefinitions.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,38 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 
-#pragma once
-#ifndef __ZE_TEXTURE_FILE_JPEG__
-#define __ZE_TEXTURE_FILE_JPEG__
 
-#include "ZETypes.h"
-#include "ZETextureFile.h"
 #include "ZETextureFileJPEGCommonDefinitions.h"
-
-#include "ZETextureFileJPEGMarkerReader.h"
-#include "ZETextureFileJPEGMainController.h"
-
-class ZETextureData;
-
-class ZETextureFileJpeg : public ZETextureFile
-{
-	private:
-		
-		ZEJpegDeCompressionInfo 		DecompInfo;
-		
-		ZEJpegFileMarkerReader*			MarkerReader;
-		ZEJpegMainController*			MainController;
-
-	public:
-										ZETextureFileJpeg();
-		virtual							~ZETextureFileJpeg();
-
-
-
-
-		virtual bool					LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*			Load(ZEFile* File);
-
-};
-
-#endif
+#include "ZEError.h"
+#include "ZEMath\ZEMath.h"
