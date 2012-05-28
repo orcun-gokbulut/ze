@@ -41,14 +41,6 @@ ze_add_source(ZEUDPClient.cpp						Sources)
 ze_add_source(ZEUDPClient.h							Sources Headers)
 ze_add_source(ZEUDPServer.cpp						Sources)
 ze_add_source(ZEUDPServer.h							Sources Headers)
-ze_add_source(ZESocket.h							Sources Headers)
-ze_add_source(ZESocketWinSock.cpp					Sources)
-ze_add_source(ZESocketWinSockTests.cpp				Tests)
-ze_add_source(ZESocketBSDSock.cpp					Sources)
-ze_add_source(ZEIPAddress.h							Sources Headers)
-ze_add_source(ZEIPAddressWin.cpp					Sources)
-ze_add_source(ZEIPAddressWinTests.cpp				Tests)
-ze_add_source(ZEIPAddressBSD.cpp					Sources)
 
 ze_add_library(ZENetwork 
 	SOURCES ${Sources}

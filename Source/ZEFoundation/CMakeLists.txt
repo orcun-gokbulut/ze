@@ -53,7 +53,7 @@ add_subdirectory(ZEFile)
 add_subdirectory(ZESpatial)
 add_subdirectory(ZETest)
 add_subdirectory(ZEThread)
-add_subdirectory(ZENetwork)
+add_subdirectory(ZESocket)
 
 ze_add_source(ZETypes.h 			Sources Headers)
 ze_add_source(ZETypes.cpp 			Sources)
@@ -71,7 +71,7 @@ ze_add_source(ZERandom.cpp 			Sources)
 ze_add_library(ZEFoundation 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZENetwork
+	LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket
 	INSTALL
 	INSTALL_DESTINATION ZEFoundation
 	INSTALL_COMPONENT ZESDK)

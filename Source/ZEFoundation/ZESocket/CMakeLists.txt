@@ -39,24 +39,24 @@ include_directories(
 	${PROJECT_SOURCE_DIR}
 	${CMAKE_SOURCE_DIR}/Source)
 
-ze_add_source(ZEIPAddressBSD.cpp		Sources)	
-ze_add_source(ZEIPAddressWinTests.cpp	Tests)
-ze_add_source(ZEIPAddressWin.cpp		Sources)
-ze_add_source(ZEIPAddress.h				Sources Headers)
-ze_add_source(ZESocketBSD.cpp			Sources)	
-ze_add_source(ZESocketWinTests.cpp		Tests)
-ze_add_source(ZESocketWin.cpp			Sources)
-ze_add_source(ZESocket.h				Sources Headers)
+ze_add_source(ZEIPAddress_Unix.cpp			Sources PLATFORMS Unix)	
+ze_add_source(ZEIPAddressTests_Windows.cpp	Tests PLATFORMS Windows)
+ze_add_source(ZEIPAddress_Windows.cpp		Sources PLATFORMS Windows)
+ze_add_source(ZEIPAddress.h					Sources Headers)
+ze_add_source(ZESocket_Unix.cpp				Sources PLATFORMS Unix)	
+ze_add_source(ZESocketTests_Windows.cpp		Tests PLATFORMS Windows)
+ze_add_source(ZESocket_Windows.cpp			Sources PLATFORMS Windows)
+ze_add_source(ZESocket.h					Sources Headers)
 
-ze_add_library(ZENetwork 
+ze_add_library(ZESocket 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS libzlib ZEFoundation
 	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZENetwork
+	INSTALL_DESTINATION ZEFoundation/ZESocket
 	INSTALL_COMPONENT ZESDK)
 	
-ze_add_test(ZENetworkTests
+ze_add_test(ZESocketTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES
-	TEST_TARGET ZENetwork)
+	TEST_TARGET ZESocket)

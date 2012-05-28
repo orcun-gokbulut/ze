@@ -207,8 +207,6 @@ void ZEScene::AddEntity(ZEEntity* Entity)
 
 void ZEScene::RemoveEntity(ZEEntity* Entity)
 {
-	/*Entity->Destroy();*/
-
 	Entity->SetOwnerScene(NULL);
 
 	ZEArray<ZEEntity*> Temp = Entity->GetComponents();
