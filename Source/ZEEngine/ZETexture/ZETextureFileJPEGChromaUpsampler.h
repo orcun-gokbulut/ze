@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileJPEG.h
+ Zinek Engine - ZETextureFileJPEGChromaUpsampler.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,37 +35,47 @@
 
 
 #pragma once
-#ifndef __ZE_TEXTURE_FILE_JPEG__
-#define __ZE_TEXTURE_FILE_JPEG__
+#ifndef __ZE_TEXTURE_FILE_JPEG_CHROMA_UPSAMPLER_H__
+#define __ZE_TEXTURE_FILE_JPEG_CHROMA_UPSAMPLER_H__
+
 
 #include "ZETypes.h"
-#include "ZETextureFile.h"
 #include "ZETextureFileJPEGCommonDefinitions.h"
-
-#include "ZETextureFileJPEGMarkerReader.h"
-#include "ZETextureFileJPEGMainController.h"
 
 class ZETextureData;
 
-class ZETextureFileJpeg : public ZETextureFile
+struct ZEJpegDataBlock;
+struct ZEJpegDeCompressionInfo;
+
+// Up Samples the block and writes to destination
+class ZEJpegChromaUpsampler
 {
 	private:
+		ZEJpegDeCompressionInfo*		Info;
 		
-		ZEJpegDeCompressionInfo 		DecompInfo;
+		void							UpSampleWithoutChange(void* Destination, ZEJpegComponentInfo* Component, ZEJpegDataBlock* Source, ZEUInt CopyWidth, ZEUInt CopyHeight, ZEUInt McuCoordX, ZEUInt McuCoordY);
+		void							UpSampleSingleComponent(void* Destination, ZEJpegComponentInfo* Component, ZEJpegDataBlock* Source, ZEUInt CopyWidth, ZEUInt CopyHeight, ZEUInt McuCoordX, ZEUInt McuCoordY);
 		
-		ZEJpegFileMarkerReader*			MarkerReader;
-		ZEJpegMainController*			MainController;
+		void							UpSampleH1V1(void* Destination, ZEJpegComponentInfo* Component, ZEJpegDataBlock* Source, ZEUInt CopyWidth, ZEUInt CopyHeight, ZEUInt McuCoordX, ZEUInt McuCoordY);
+		void							UpSampleH2V1(void* Destination, ZEJpegComponentInfo* Component, ZEJpegDataBlock* Source, ZEUInt CopyWidth, ZEUInt CopyHeight, ZEUInt McuCoordX, ZEUInt McuCoordY);
+		void							UpSampleH1V2(void* Destination, ZEJpegComponentInfo* Component, ZEJpegDataBlock* Source, ZEUInt CopyWidth, ZEUInt CopyHeight, ZEUInt McuCoordX, ZEUInt McuCoordY);
+		void							UpSampleH2V2(void* Destination, ZEJpegComponentInfo* Component, ZEJpegDataBlock* Source, ZEUInt CopyWidth, ZEUInt CopyHeight, ZEUInt McuCoordX, ZEUInt McuCoordY);
+
+
+										ZEJpegChromaUpsampler();
+										~ZEJpegChromaUpsampler();
 
 	public:
-										ZETextureFileJpeg();
-		virtual							~ZETextureFileJpeg();
+		typedef	 void					(ZEJpegChromaUpsampler::*UpSampleFunction)(void* Destination, ZEJpegComponentInfo* Component, ZEJpegDataBlock* Source, ZEUInt CopyWidth, ZEUInt CopyHeight, ZEUInt McuCoordX, ZEUInt McuCoordY);
+		UpSampleFunction				UpSamplePointers[ZE_JPEG_MAX_COMPONENT_COUNT];
 
+		void							Initialize(ZEJpegDeCompressionInfo* Info);
+		void							Deinitialize();
 
-
-
-		virtual bool					LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*			Load(ZEFile* File);
+		void							Destroy();
+		static ZEJpegChromaUpsampler*	CreateInstance();
 
 };
 
-#endif
+
+#endif // __ZE_TEXTURE_FILE_JPEG_CHROMA_UPSAMPLER_H__

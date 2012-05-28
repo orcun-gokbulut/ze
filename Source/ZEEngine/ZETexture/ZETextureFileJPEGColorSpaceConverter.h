@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileJPEG.h
+ Zinek Engine - ZETextureFileJPEGColorSpaceConverter.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,39 +33,47 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
 #pragma once
-#ifndef __ZE_TEXTURE_FILE_JPEG__
-#define __ZE_TEXTURE_FILE_JPEG__
+#ifndef __ZE_TEXTURE_FILE_JPEG_COLOR_SPACE_CONVERTER_H__
+#define __ZE_TEXTURE_FILE_JPEG_COLOR_SPACE_CONVERTER_H__
+
 
 #include "ZETypes.h"
-#include "ZETextureFile.h"
 #include "ZETextureFileJPEGCommonDefinitions.h"
-
-#include "ZETextureFileJPEGMarkerReader.h"
-#include "ZETextureFileJPEGMainController.h"
 
 class ZETextureData;
 
-class ZETextureFileJpeg : public ZETextureFile
+class ZEJpegColorSpaceConverter
 {
 	private:
+		ZEJpegDeCompressionInfo*	Info;
+
+									ZEJpegColorSpaceConverter();
+									~ZEJpegColorSpaceConverter();
+
+		void						NoChange(void* OutputBuffer, void* InputBuffer);
+
+		void						GrayScaleToRgb(void* OutputBuffer, void* InputBuffer);
+		void						GrayScaleToYCbCr(void* OutputBuffer, void* InputBuffer);
 		
-		ZEJpegDeCompressionInfo 		DecompInfo;
-		
-		ZEJpegFileMarkerReader*			MarkerReader;
-		ZEJpegMainController*			MainController;
+		void						RgbToGrayScale(void* OutputBuffer, void* InputBuffer);
+		void						RgbToYCbCr(void* OutputBuffer, void* InputBuffer);
+
+		void						YCbCrToGrayScale(void* OutputBuffer, void* InputBuffer);
+		void						YCbCrToRgb(void* OutputBuffer, void* InputBuffer);
+
+		void						CmykToYcck(void* OutputBuffer, void* InputBuffer);
+		void						YcckToCmyk(void* OutputBuffer, void* InputBuffer);
 
 	public:
-										ZETextureFileJpeg();
-		virtual							~ZETextureFileJpeg();
+		void						(ZEJpegColorSpaceConverter::*Convert)(void* OutputBuffer, void* InputBuffer);
 
+		void						Initialize(ZEJpegDeCompressionInfo* Info);
+		void						Deinitialize();
 
-
-
-		virtual bool					LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*			Load(ZEFile* File);
+		void						Destroy();
+		static ZEJpegColorSpaceConverter*	CreateInstance();
 
 };
 
-#endif
+#endif // __ZE_TEXTURE_FILE_JPEG_COLOR_SPACE_CONVERTER_H__

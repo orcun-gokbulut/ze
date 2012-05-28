@@ -101,9 +101,9 @@ bool ZEBitmap::Create(ZEUInt Width, ZEUInt Height, ZESize PixelSize)
 	
 	this->Pitch		= (ZESize)Width * PixelSize;
 	this->Width		= Width;
-	this->Height		= Height;
+	this->Height	= Height;
 	this->PixelSize = PixelSize;
-	this->Pixels		= new ZEUInt8[(ZESize)Width * (ZESize)Height * PixelSize];
+	this->Pixels	= new ZEUInt8[(ZESize)Width * (ZESize)Height * PixelSize];
 
 	return true;
 }

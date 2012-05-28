@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileJPEG.h
+ Zinek Engine - ZETextureFileJPEGIDCTProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,37 +35,34 @@
 
 
 #pragma once
-#ifndef __ZE_TEXTURE_FILE_JPEG__
-#define __ZE_TEXTURE_FILE_JPEG__
+#ifndef __ZE_TEXTURE_FILE_JPEG_IDCT_PROCESSOR_H__
+#define __ZE_TEXTURE_FILE_JPEG_IDCT_PROCESSOR_H__
+
 
 #include "ZETypes.h"
-#include "ZETextureFile.h"
-#include "ZETextureFileJPEGCommonDefinitions.h"
 
-#include "ZETextureFileJPEGMarkerReader.h"
-#include "ZETextureFileJPEGMainController.h"
+struct ZEJpegDeCompressionInfo;
+struct ZEJpegComponentInfo;
+struct ZEJpegDataBlock;
 
-class ZETextureData;
-
-class ZETextureFileJpeg : public ZETextureFile
+class ZEJpegIDCTProcessor
 {
+
 	private:
-		
-		ZEJpegDeCompressionInfo 		DecompInfo;
-		
-		ZEJpegFileMarkerReader*			MarkerReader;
-		ZEJpegMainController*			MainController;
+		ZEJpegDeCompressionInfo*		Info;
+
+
+										ZEJpegIDCTProcessor();
+										~ZEJpegIDCTProcessor();
 
 	public:
-										ZETextureFileJpeg();
-		virtual							~ZETextureFileJpeg();
+		void							ApplyIdct(ZEJpegComponentInfo* Component,ZEJpegDataBlock* Block);
 
+		void							Initialize(ZEJpegDeCompressionInfo* Info);
+		void							Deinitialize();
 
-
-
-		virtual bool					LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*			Load(ZEFile* File);
-
+		void							Destroy();
+		static ZEJpegIDCTProcessor*		CreateInstance();
 };
 
-#endif
+#endif // __ZE_TEXTURE_FILE_JPEG_IDCT_PROCESSOR_H__

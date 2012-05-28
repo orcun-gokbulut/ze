@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileJPEG.h
+ Zinek Engine - ZETextureFileJPEGMCUController.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,39 +33,55 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
 #pragma once
-#ifndef __ZE_TEXTURE_FILE_JPEG__
-#define __ZE_TEXTURE_FILE_JPEG__
+#ifndef __ZE_TEXTURE_FILE_JPEG_MCU_CONTROLLER_H__
+#define __ZE_TEXTURE_FILE_JPEG_MCU_CONTROLLER_H__
 
-#include "ZETypes.h"
-#include "ZETextureFile.h"
 #include "ZETextureFileJPEGCommonDefinitions.h"
 
-#include "ZETextureFileJPEGMarkerReader.h"
-#include "ZETextureFileJPEGMainController.h"
+
 
 class ZETextureData;
+class ZEJpegChromaUpsampler;
+class ZEJpegIDCTProcessor;
+class ZEJpegDequantizator;
+class ZEJpegHuffmanDecoder;
+class ZEJpegFileMarkerReader;
+class ZEJpegColorSpaceConverter;
+class ZEJpegFileMarkerBuffer;
 
-class ZETextureFileJpeg : public ZETextureFile
+struct ZEJpegDeCompressionInfo;
+
+#define ZE_JPEG_CALL_MEMBER_FUNCTION_BY_POINTER(PtrObject, PtrFunction)		((PtrObject)->(*PtrFunction))
+
+class ZEJpegMCUController
 {
 	private:
-		
-		ZEJpegDeCompressionInfo 		DecompInfo;
-		
-		ZEJpegFileMarkerReader*			MarkerReader;
-		ZEJpegMainController*			MainController;
+		ZEJpegDeCompressionInfo*		Info;
+
+		ZEJpegHuffmanDecoder*			HuffmanDecoder;
+		ZEJpegDequantizator*			Dequantizator;
+		ZEJpegIDCTProcessor*			IDCTProcessor;
+		ZEJpegChromaUpsampler*			ChromaUpsampler;
+
+		ZEUInt							ProcessedMcuCount;
+
+		ZEJpegMcu						McuBuffer;
+
+										ZEJpegMCUController();
+										~ZEJpegMCUController();
 
 	public:
-										ZETextureFileJpeg();
-		virtual							~ZETextureFileJpeg();
+		bool							ProcessMCU(ZEUInt McuWidth, ZEUInt McuHeight, ZEUInt McuCoordX, ZEUInt McuCoordY);
 
+		ZEUInt							GetProcessedMcuCount();
 
+		void							Initialize(ZEJpegDeCompressionInfo* Info, ZEJpegFileMarkerReader* MarkerReader);
+		void							Deinitialize();
 
-
-		virtual bool					LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*			Load(ZEFile* File);
-
+		void							Destroy();
+		static ZEJpegMCUController*		CreateInstance();
 };
 
-#endif
+
+#endif // __ZE_TEXTURE_FILE_JPEG_MCU_CONTROLLER_H__

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileJPEG.h
+ Zinek Engine - ZETextureFileJPEGMainController.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,39 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
 #pragma once
-#ifndef __ZE_TEXTURE_FILE_JPEG__
-#define __ZE_TEXTURE_FILE_JPEG__
+#ifndef __ZE_TEXTURE_FILE_JPEG_MAIN_CONTROLLER_H__
+#define __ZE_TEXTURE_FILE_JPEG_MAIN_CONTROLLER_H__
 
-#include "ZETypes.h"
-#include "ZETextureFile.h"
-#include "ZETextureFileJPEGCommonDefinitions.h"
 
-#include "ZETextureFileJPEGMarkerReader.h"
-#include "ZETextureFileJPEGMainController.h"
 
 class ZETextureData;
+class ZEJpegMCUController;
+class ZEJpegFileMarkerBuffer;
+class ZEJpegColorSpaceConverter;
 
-class ZETextureFileJpeg : public ZETextureFile
+struct ZEJpegDeCompressionInfo;
+
+class ZEJpegMainController
 {
+	friend class ZETextureFileJpeg;
+
 	private:
-		
-		ZEJpegDeCompressionInfo 		DecompInfo;
-		
+
+		ZEJpegDeCompressionInfo			Info;
+
+		ZEJpegMCUController*			McuController;
 		ZEJpegFileMarkerReader*			MarkerReader;
-		ZEJpegMainController*			MainController;
+		ZEJpegColorSpaceConverter*		ColorConverter;
 
+		bool							CreateRangeLimitTable();
+		bool							SetDefaultParameters();
+		bool							SetInitialParameters();
+		bool							SetScanParameters();
+
+		bool							ProcessScan(ZETextureData* TextureData);
+	
 	public:
-										ZETextureFileJpeg();
-		virtual							~ZETextureFileJpeg();
+		bool							LoadHeader(ZETextureDataInfo* TextureDataInfo);
+		ZETextureData*					LoadJpeg();
 
-
-
-
-		virtual bool					LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*			Load(ZEFile* File);
-
+										ZEJpegMainController(ZEFile* ImageFile);
+										~ZEJpegMainController();
 };
+
 
 #endif

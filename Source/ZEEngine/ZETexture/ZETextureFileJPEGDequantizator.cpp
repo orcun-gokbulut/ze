@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileJPEG.h
+ Zinek Engine - ZETextureFileJPEGDequantizator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,38 +34,62 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 
-#pragma once
-#ifndef __ZE_TEXTURE_FILE_JPEG__
-#define __ZE_TEXTURE_FILE_JPEG__
-
-#include "ZETypes.h"
-#include "ZETextureFile.h"
+#include "ZEError.h"
+#include "ZETextureFileJPEGDequantizator.h"
 #include "ZETextureFileJPEGCommonDefinitions.h"
 
-#include "ZETextureFileJPEGMarkerReader.h"
-#include "ZETextureFileJPEGMainController.h"
 
-class ZETextureData;
-
-class ZETextureFileJpeg : public ZETextureFile
+ZEJpegDequantizator::ZEJpegDequantizator()
 {
-	private:
-		
-		ZEJpegDeCompressionInfo 		DecompInfo;
-		
-		ZEJpegFileMarkerReader*			MarkerReader;
-		ZEJpegMainController*			MainController;
+	this->Info = NULL;
+}
 
-	public:
-										ZETextureFileJpeg();
-		virtual							~ZETextureFileJpeg();
+ZEJpegDequantizator::~ZEJpegDequantizator()
+{
+	this->Deinitialize();
+}
+
+void ZEJpegDequantizator::Dequantize(ZEJpegComponentInfo* ComponentInfo, ZEJpegDataBlock* BlockData)
+{
+	// Get component properties
+	ZEJpegQuantizationTable* Table = ComponentInfo->QuantizationTable;
+	ZESize ComponentBlockCount = (ZESize)ComponentInfo->McuBlocks;
+
+	
+	ZEInt* Source = BlockData->BlockData.OneDim;
+
+	// Quantize block elements
+	for (ZESize I = 0; I < ZE_JPEG_DCT_BLOCK_COEFF_COUNT; ++I)
+	{
+		(*Source) *= Table->QuantizationValues[I];
+		Source++;
+	}
+
+}
 
 
+void ZEJpegDequantizator::Initialize(ZEJpegDeCompressionInfo* Info)
+{
+	if (Info == NULL)
+	{
+		zeCriticalError("Null pointer");
+		return;
+	}
+	
+	this->Info = Info;
+}
 
+void ZEJpegDequantizator::Deinitialize()
+{
+	Info = NULL;
+}
 
-		virtual bool					LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
-		virtual ZETextureData*			Load(ZEFile* File);
+void ZEJpegDequantizator::Destroy()
+{
+	delete this;
+}
 
-};
-
-#endif
+ZEJpegDequantizator* ZEJpegDequantizator::CreateInstance()
+{
+	return new ZEJpegDequantizator();
+}
