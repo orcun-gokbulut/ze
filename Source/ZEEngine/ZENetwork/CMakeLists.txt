@@ -49,7 +49,3 @@ ze_add_library(ZENetwork
 	INSTALL
 	INSTALL_DESTINATION "ZEEngineAPI/ZENetwork"
 	INSTALL_COMPONENT Header)
-	
-	ze_add_test(ZENetworkTests
-	SOURCES ${Tests}
-	TEST_TARGET ZENetwork)
