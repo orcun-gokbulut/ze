@@ -38,81 +38,19 @@
 #define __ZE_GRAPHICS_DEBUG_MODULE_H__
 
 #include "ZECore/ZEApplicationModule.h"
-#include "ZEInput/ZEInputMap.h"
 
 
-
-
-class ZEPlayer;
-class ZEPointLight;
-class ZEOmniProjectiveLight;
-class ZEProjectiveLight;
-class ZEDirectionalLight;
-class ZECanvasBrush;
-class ZEModel;
-class ZEPortalMap;
-class ZESkyBrush;
-class ZESkyDome;
-class ZEUITextControl;
-class ZECloud;
-class ZEMoon;
-class ZETerrain;
-class ZESteeringPlayerFree;
-class ZEWeather;
 
 class ZEGraphicsDebugModule : public ZEApplicationModule
 {
 	private:
-		ZEInputMap					InputMap;
-
-		ZEModel*					Model;
-		ZEPlayer*					Player;
-		ZESteeringPlayerFree*		Steering;
-	
-		ZEWeather*					Weather;
-		ZEPortalMap*				PortalMap;
 		
-		/*
-		ZETerrain*					Terrain;
-		ZEDirectionalLight*			SunLight;
-		ZEDirectionalLight*			MoonLight;
-		ZESkyBrush*					StarMap;
-		ZESkyDome*					SkyDome;
-		ZECloud*					Cloud;
-		ZEMoon*						Moon;
-		*/
-
-		float						FogFactor;
-		float						MoonPhase;
-		float						CloudCover;
-		float						MoonLightIntensity;
-		float						SunLightIntensity;
-
-		ZEVector3					MoonDirection;
-		ZEVector3					SunDirection;
-		ZEVector3					SunMoonRotation;		
-		
-		float						FogFactorChangeMultiplier;
-		float						MoonPhaseChangeMultiplier;
-		float						CloudCoverChangeMultiplier;
-		ZEVector3					SunMoonRotationMultiplier;
 
 	public:
 		virtual bool				Initialize();
 		virtual void				Deinitialize();
 		virtual void				Process(float ElapsedTime);
 
-		virtual void				ProcessInputs(float ElapsedTime);
-
-		virtual void				IncreaseMoonPhase(float ElapsedTime);
-		virtual void				DecreaseMoonPhase(float ElapsedTime);
-		virtual void				IncreaseCloudCover(float ElapsedTime);
-		virtual void				DecreaseCloudCover(float ElapsedTime);
-		virtual void				IncreaseDayTime(float ElapsedTime);
-		virtual void				DecreaseDayTime(float ElapsedTime);
-		virtual void				IncreaseFogFactor(float ElapsedTime);
-		virtual void				DecreaseFogFactor(float ElapsedTime);
-		
 									ZEGraphicsDebugModule();
 		virtual						~ZEGraphicsDebugModule();
 };
