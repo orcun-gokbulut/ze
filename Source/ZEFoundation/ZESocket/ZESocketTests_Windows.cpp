@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESocketWinSockTests.cpp
+ Zinek Engine - ZESocketTests_Windows.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,6 +36,7 @@
 #include "ZETest/ZETest.h"
 #include "ZESocket.h"
 #include <concrt.h>
+#include <winsock.h>
 
 #define DefaultPort		27015
 #define DefaultPort2	27016
