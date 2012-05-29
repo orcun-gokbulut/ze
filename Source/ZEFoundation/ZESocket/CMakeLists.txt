@@ -51,7 +51,7 @@ ze_add_source(ZESocket.h					Sources Headers)
 ze_add_library(ZESocket 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS libzlib ZEFoundation
+	LIBS ws2_32 ZEFoundation
 	INSTALL
 	INSTALL_DESTINATION ZEFoundation/ZESocket
 	INSTALL_COMPONENT ZESDK)
