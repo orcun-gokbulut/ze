@@ -40,7 +40,6 @@
 #include "ZETextureFileJPEGCommonDefinitions.h"
 
 
-
 class ZETextureData;
 class ZEJpegChromaUpsampler;
 class ZEJpegIDCTProcessor;
@@ -51,8 +50,6 @@ class ZEJpegColorSpaceConverter;
 class ZEJpegFileMarkerBuffer;
 
 struct ZEJpegDeCompressionInfo;
-
-#define ZE_JPEG_CALL_MEMBER_FUNCTION_BY_POINTER(PtrObject, PtrFunction)		((PtrObject)->(*PtrFunction))
 
 class ZEJpegMCUController
 {
@@ -72,7 +69,7 @@ class ZEJpegMCUController
 										~ZEJpegMCUController();
 
 	public:
-		bool							ProcessMCU(ZEUInt McuWidth, ZEUInt McuHeight, ZEUInt McuCoordX, ZEUInt McuCoordY);
+		bool							ProcessMCU(ZEUInt McuCoordX, ZEUInt McuCoordY);
 
 		ZEUInt							GetProcessedMcuCount();
 

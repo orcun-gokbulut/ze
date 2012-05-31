@@ -179,7 +179,7 @@ void ZEJpegChromaUpsampler::UpSampleH2V2(void* Destination, ZEJpegComponentInfo*
 		{
 			DataX = ColN % 8;
 			SrcBlockX = ColN / ZE_JPEG_DCT_BLOCK_DIMENSION;
-			DestPixel[ComponentIndex] = SourcePtr[SrcBlockY][SrcBlockX]->BlockData.TwoDim[DataY][DataX];
+			DestPixel[ComponentIndex] = (ZEUInt8)SourcePtr[SrcBlockY][SrcBlockX]->BlockData.TwoDim[DataY][DataX];
 			DestPixel += Info->OutputPixelSize;
 		}
 
@@ -215,24 +215,27 @@ void ZEJpegChromaUpsampler::Initialize(ZEJpegDeCompressionInfo* Info)
 	}
 	else
 	{
-		// Create function pointers for each component
-		for (ZESize CompN = 0; CompN < Info->ComponentCount; ++CompN)
-		{
-			ZEJpegComponentInfo* CurComp = Info->CurrentCompInfo[CompN];
+		ZESize CompN;
+		ZEJpegComponentInfo* Component;
 
-			if (CurComp->HorizontalFreq == 1 && CurComp->VerticalFreq == 1)
+		// Create function pointers for each component
+		for (CompN = 0; CompN < Info->ComponentCount; ++CompN)
+		{
+			Component = Info->OrederedCompInfo[CompN];
+
+			if (Component->HorizontalFreq == 1 && Component->VerticalFreq == 1)
 			{
 				UpSamplePointers[CompN] = &ZEJpegChromaUpsampler::UpSampleH1V1;
 			}
-			else if (CurComp->HorizontalFreq == 2 && CurComp->VerticalFreq == 1)
+			else if (Component->HorizontalFreq == 2 && Component->VerticalFreq == 1)
 			{
 				UpSamplePointers[CompN] = &ZEJpegChromaUpsampler::UpSampleH2V1;
 			}
-			else if (CurComp->HorizontalFreq == 1 && CurComp->VerticalFreq == 2)
+			else if (Component->HorizontalFreq == 1 && Component->VerticalFreq == 2)
 			{
 				UpSamplePointers[CompN] = &ZEJpegChromaUpsampler::UpSampleH1V2;
 			}
-			else if (CurComp->HorizontalFreq == 2 && CurComp->VerticalFreq == 2)
+			else if (Component->HorizontalFreq == 2 && Component->VerticalFreq == 2)
 			{
 				UpSamplePointers[CompN] = &ZEJpegChromaUpsampler::UpSampleH2V2;
 			}

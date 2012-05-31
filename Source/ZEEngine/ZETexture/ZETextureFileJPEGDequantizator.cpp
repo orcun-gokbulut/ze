@@ -70,11 +70,7 @@ void ZEJpegDequantizator::Dequantize(ZEJpegComponentInfo* ComponentInfo, ZEJpegD
 
 void ZEJpegDequantizator::Initialize(ZEJpegDeCompressionInfo* Info)
 {
-	if (Info == NULL)
-	{
-		zeCriticalError("Null pointer");
-		return;
-	}
+	zeDebugCheck(Info == NULL, "NUll Pointer..");
 	
 	this->Info = Info;
 }

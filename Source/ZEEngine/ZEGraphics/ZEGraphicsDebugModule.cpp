@@ -35,16 +35,71 @@
 
 
 #include "ZEGraphicsDebugModule.h"
+#include "ZEGame\ZEScene.h"
+#include "ZEGame\ZEGizmo.h"
+#include "ZEGame\ZEGrid.h"
+#include "ZEGame\ZEGame.h"
+#include "ZEGame\ZEPlayer.h"
+#include "ZEGraphics\ZECamera.h"
+#include "ZEMath\ZEAngle.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEMath\ZEVector.h"
 
 
 bool ZEGraphicsDebugModule::Initialize()
 {
+	ZEScene* Scene = zeGame->GetScene();
+
+	Grid = ZEGrid::CreateInstance();
+	Grid->SetPosition(ZEVector3(0.01f, 0.01f, 0.01f));
+	Scene->AddEntity(Grid);
+
+	Gizmo = ZEGizmo::CreateInstance();
+	Gizmo->SetPosition(ZEVector3(-0.01f, -0.01f, -0.01f));
+	Scene->AddEntity(Gizmo);
+
+	PlayerSteering = new ZESteeringPlayerFree();
+
+	Player = ZEPlayer::CreateInstance();
+	Player->SetName("TestPlayer1");
+	Player->SetEnabled(true);
+	Player->SetVisible(true);
+	Player->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	Player->SetRotation(ZEQuaternion::Identity);
+	Player->GetCamera()->SetNearZ(0.01f);
+	Player->GetCamera()->SetFarZ(200.0f);
+	Player->GetCamera()->SetFOV(ZE_PI / 4.0f);
+	Player->AddSteering(PlayerSteering);
+	Player->SetMaxLinearVelocity(20.0f);
+	Player->SetMaxLinearAcceleration(20.0f);
+	Scene->SetActiveCamera(Player->GetCamera());
+	Scene->AddEntity(Player);
+
 	return true;
 }
 
 void ZEGraphicsDebugModule::Deinitialize()
 {
-
+	if (Grid != NULL)
+	{
+		Grid->Destroy();
+		Grid = NULL;
+	}
+	if (Gizmo != NULL)
+	{
+		Gizmo->Destroy();
+		Gizmo = NULL;
+	}
+	if (Player != NULL)
+	{
+		Player->Destroy();
+		Player = NULL;
+	}
+	if (PlayerSteering != NULL)
+	{
+		delete PlayerSteering;
+		PlayerSteering = NULL;
+	}
 }
 
 void ZEGraphicsDebugModule::Process(float ElapsedTime)
@@ -54,7 +109,10 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 
 ZEGraphicsDebugModule::ZEGraphicsDebugModule()
 {
-
+	Grid = NULL;
+	Gizmo = NULL;
+	Player = NULL;
+	PlayerSteering = NULL;
 }
 
 ZEGraphicsDebugModule::~ZEGraphicsDebugModule()

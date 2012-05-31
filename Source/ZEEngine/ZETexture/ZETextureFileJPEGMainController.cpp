@@ -48,33 +48,38 @@ bool ZEJpegMainController::SetInitialParameters()
 	// Check image size
 	if (Info.ImageWidth > ZE_JPEG_MAX_IMAGE_WIDTH || Info.ImageWidth > ZE_JPEG_MAX_IMAGE_HEIGHT)
 	{
-		zeCriticalError("Image is larger than supported width / height");
+		zeError("Image is larger than supported width / height");
 		return false;
 	}
 
 
 	if (Info.ComponentCount > ZE_JPEG_MAX_COMPONENT_COUNT)
 	{
-		zeCriticalError("There are more components than the standard");
+		zeError("There are more components than the standard");
 		return false;
 	}
 
 	// Internal sampling factors, find max h and v sampling factors by checking all components
-	Info.MaxHorzSampleFactor = 1;
-	Info.MaxVertSampleFactor = 1;
+	Info.MaxHorzSampleFactor = ZE_JPEG_MIN_SAMPLING_FACTOR;
+	Info.MaxVertSampleFactor = ZE_JPEG_MIN_SAMPLING_FACTOR;
+	Info.MinHorzSampleFactor = ZE_JPEG_MAX_SAMPLING_FACTOR;
+	Info.MinVertSampleFactor = ZE_JPEG_MAX_SAMPLING_FACTOR;
 
 	for (ZESize I = 0; I < Info.ComponentCount; ++I)
 	{
-		if (Info.ComponentInfo[I].HorizontalFreq > ZE_JPEG_MAX_SAMPLE_FREQUENCY || 
-			Info.ComponentInfo[I].VerticalFreq > ZE_JPEG_MAX_SAMPLE_FREQUENCY)
+		if (Info.ComponentInfo[I].HorizontalFreq > ZE_JPEG_MAX_SAMPLE_FREQUENCY || Info.ComponentInfo[I].VerticalFreq > ZE_JPEG_MAX_SAMPLE_FREQUENCY)
 		{
-			zeCriticalError("Sampling frequency of one of the components exceeds max possible frequency.");
+			zeError("Sampling frequency of one of the components exceeds max possible frequency.");
 			return false;
 		}
 
 		Info.MaxHorzSampleFactor = ZEMath::Max(Info.MaxHorzSampleFactor, Info.ComponentInfo[I].HorizontalFreq);
 		Info.MaxVertSampleFactor = ZEMath::Max(Info.MaxVertSampleFactor, Info.ComponentInfo[I].VerticalFreq);
+
+		Info.MinHorzSampleFactor = ZEMath::Min(Info.MinHorzSampleFactor, Info.ComponentInfo[I].HorizontalFreq);
+		Info.MinVertSampleFactor = ZEMath::Min(Info.MinVertSampleFactor, Info.ComponentInfo[I].VerticalFreq);
 	}
+
 
 	// Decide block size, natural order and Spectral selection end limit
 
@@ -169,32 +174,42 @@ bool ZEJpegMainController::SetInitialParameters()
 				Info.SpectralSelectionEndLimit = ZE_JPEG_DCT_BLOCK_COEFF_COUNT - 1;
 				break;
 			default:
-				zeCriticalError("Cannot decide dct block size");
+				zeError("Cannot decide dct block size");
 				return false;
 				break;
 		}
 	}
 
+	Info.MCUWidthInPixels = Info.MaxHorzSampleFactor / Info.MinHorzSampleFactor * Info.DctBlockSize;
+	Info.MCUHeightInPixels = Info.MaxVertSampleFactor / Info.MinVertSampleFactor * Info.DctBlockSize;
+
 	// Compute component dimensions
 	for (ZESize I = 0; I < Info.ComponentCount; ++I)
 	{
+		Info.ComponentInfo[I].ComponentValueNeeded = true;
+
 		Info.ComponentInfo[I].DctHorzScaledSize = Info.DctBlockSize;
 		Info.ComponentInfo[I].DctVertScaledSize = Info.DctBlockSize;
 
 		Info.ComponentInfo[I].MCUHeightInBlocks = (ZEUInt)ZEMath::Ceil((float)(Info.ImageHeight * Info.ComponentInfo[I].VerticalFreq) / (float)(Info.MaxVertSampleFactor * Info.DctBlockSize));
 		Info.ComponentInfo[I].MCUWidthInBlocks  = (ZEUInt)ZEMath::Ceil((float)(Info.ImageWidth * Info.ComponentInfo[I].HorizontalFreq) / (float)(Info.MaxHorzSampleFactor * Info.DctBlockSize));
 
-		Info.ComponentInfo[I].ComponentValueNeeded = true;
-
 		// Set the quantization table pointer for the component
 		Info.ComponentInfo[I].QuantizationTable = &Info.QuantizationTables[Info.ComponentInfo[I].QuantizationTableNo];
 	}
 
 	/* Decide whether file contains multiple scans */
-	if (Info.ComponentsInScan < Info.ComponentCount || Info.IsProgressive)
+	if ((Info.ComponentsInScan < Info.ComponentCount) || Info.IsProgressive)
 		Info.HasMultipleScan = true;
 	else
 		Info.HasMultipleScan = false;
+
+	// Not Supported yet
+	if (Info.HasMultipleScan)
+	{
+		zeError("Multiple scan jpeg files are not supported.");
+		return false;
+	}
 
 	return true;
 }
@@ -235,7 +250,7 @@ bool ZEJpegMainController::SetDefaultParameters()
 			break;
 
 		case 2:
-			zeCriticalError("Two component color spaces are not supported");
+			zeError("Two component color spaces are not supported");
 			break;
 
 		case 3:
@@ -292,11 +307,11 @@ bool ZEJpegMainController::SetDefaultParameters()
 			break;
 
 		case 4:
-			zeCriticalError("Four component color spaces are not supported");
+			zeError("Four component color spaces are not supported");
 			break;
 
 		default:
-			zeCriticalError("Cannot decide input/output color space");
+			zeError("Cannot decide input/output color space");
 			return false;
 			break;
 	}
@@ -307,23 +322,23 @@ bool ZEJpegMainController::SetDefaultParameters()
 
 bool ZEJpegMainController::SetScanParameters()
 {
+
 	// Noninterleaved (single-component) scan
 	if (Info.ComponentsInScan == 1)
 	{
 		// Only component 0 is used
-		Info.MCUCountPerRow = Info.CurrentCompInfo[0]->MCUWidthInBlocks;
-		Info.MCURowCountInImage = Info.CurrentCompInfo[0]->MCUHeightInBlocks;
+		Info.MCUCountPerRow = Info.OrederedCompInfo[0]->MCUWidthInBlocks;
+		Info.MCURowCountInImage = Info.OrederedCompInfo[0]->MCUHeightInBlocks;
 
 		// For Noninterleaved scan there is always one block per MCU
-		Info.CurrentCompInfo[0]->McuWidth = 1;
-		Info.CurrentCompInfo[0]->McuHeight = 1;
-		Info.CurrentCompInfo[0]->McuBlocks = 1;
-		Info.CurrentCompInfo[0]->McuSampleWidth = Info.CurrentCompInfo[0]->DctHorzScaledSize;
-		Info.CurrentCompInfo[0]->LastColumtWidth = 1;
+		Info.OrederedCompInfo[0]->McuWidth = 1;
+		Info.OrederedCompInfo[0]->McuHeight = 1;
+		Info.OrederedCompInfo[0]->McuBlocks = 1;
+		Info.OrederedCompInfo[0]->McuSampleWidth = Info.OrederedCompInfo[0]->DctHorzScaledSize;
+		Info.OrederedCompInfo[0]->LastColumtWidth = 1;
 
-		ZEUInt Temp = Info.CurrentCompInfo[0]->MCUHeightInBlocks % Info.CurrentCompInfo[0]->VerticalFreq;
-
-		Info.CurrentCompInfo[0]->LastRowHeight = (Temp == 0) ? Info.CurrentCompInfo[0]->VerticalFreq : Temp;
+		ZEUInt Temp = Info.OrederedCompInfo[0]->MCUHeightInBlocks % Info.OrederedCompInfo[0]->VerticalFreq;
+		Info.OrederedCompInfo[0]->LastRowHeight = (Temp == 0) ? Info.OrederedCompInfo[0]->VerticalFreq : Temp;
 
 		// Prepare array describing MCU composition
 		Info.DctBlocksPerMCU = 1;
@@ -336,7 +351,7 @@ bool ZEJpegMainController::SetScanParameters()
 
 		if (Info.ComponentsInScan > ZE_JPEG_MAX_COMPONENTS_IN_SCAN)
 		{
-			zeCriticalError("Component count in current scan exceeds the limits.");
+			zeError("Component count in current scan exceeds the limits.");
 			return false;
 		}
 
@@ -346,7 +361,7 @@ bool ZEJpegMainController::SetScanParameters()
 		Info.DctBlocksPerMCU = 0;
 		for (ZESize I = 0; I < Info.ComponentsInScan; ++I)
 		{
-			ZEJpegComponentInfo* Component = Info.CurrentCompInfo[I];
+			ZEJpegComponentInfo* Component = Info.OrederedCompInfo[I];
 
 			// Sampling factors give # of blocks of component in each MCU
 			Component->McuWidth = Component->HorizontalFreq;
@@ -356,11 +371,9 @@ bool ZEJpegMainController::SetScanParameters()
 
 			// Figure number of non-dummy blocks in last MCU column & row
 			ZEUInt Temp = Component->MCUWidthInBlocks % Component->McuWidth;
-
 			Component->LastColumtWidth = (Temp == 0) ? Component->McuWidth : Temp;
 
 			Temp = Component->MCUHeightInBlocks % Component->McuHeight;
-
 			Component->LastRowHeight = (Temp == 0) ? Component->McuHeight : Temp;
 
 			// Prepare array describing MCU composition
@@ -379,22 +392,20 @@ bool ZEJpegMainController::SetScanParameters()
 bool ZEJpegMainController::ProcessScan(ZETextureData* TextureData)
 {
 	bool Result = false;
+	ZESize I, J;
+	ZEUInt OutputCoordX, OutputCoordY;
 
 	Result = this->SetScanParameters();
 	STOPPROCESS(Result);
-	ZESize I, J;
-	ZEUInt OutputCoordX, OutputCoordY;
-	ZEUInt DefaultMcuWidth = Info.DctBlockSize * Info.MaxHorzSampleFactor;
-	ZEUInt DefaultMcuHeight = Info.DctBlockSize * Info.MaxVertSampleFactor;
-
+	
 	// For each MCU Row
-	for (J = 0, OutputCoordY = 0; J < (ZESize)Info.MCURowCountInImage; ++J, OutputCoordY += DefaultMcuHeight)
+	for (J = 0, OutputCoordY = 0; J < (ZESize)Info.MCURowCountInImage; ++J, OutputCoordY += Info.MCUHeightInPixels)
 	{
 		// For each MCU Column
-		for (I = 0, OutputCoordX = 0; I < (ZESize)Info.MCUCountPerRow; ++I, OutputCoordX += DefaultMcuWidth)
+		for (I = 0, OutputCoordX = 0; I < (ZESize)Info.MCUCountPerRow; ++I, OutputCoordX += Info.MCUWidthInPixels)
 		{
 			// Process MCU and give destination offsets in terms of MCU count
-			Result = McuController->ProcessMCU(DefaultMcuWidth, DefaultMcuHeight, OutputCoordX, OutputCoordY);
+			Result = McuController->ProcessMCU(OutputCoordX, OutputCoordY);
 			STOPPROCESS(Result);
 		}
 	}
@@ -452,14 +463,14 @@ ZETextureData* ZEJpegMainController::LoadJpeg()
 	NoError = MarkerReader->ReadMarkers(StoppedAt);
 	if(!NoError)
 	{
-		zeCriticalError("Cannot read image info.");
+		zeError("Cannot read image info.");
 		return NULL;
 	}
 
-	SetDefaultParameters();
-	SetInitialParameters();
-	SetScanParameters();
-	CreateRangeLimitTable();
+	if (!SetDefaultParameters())	return NULL;
+	if (!SetInitialParameters())	return NULL;
+	if (!SetScanParameters())		return NULL;
+	if (!CreateRangeLimitTable())	return NULL;
 
 	McuController = ZEJpegMCUController::CreateInstance();
 	McuController->Initialize(&Info, MarkerReader);
@@ -483,7 +494,7 @@ ZETextureData* ZEJpegMainController::LoadJpeg()
 				NoError = ProcessScan(TextureData);
 				if (!NoError)
 				{
-					zeCriticalError("Cannot process image data.");
+					zeError("Cannot process image data.");
 					return NULL;
 				}
 				break;
@@ -494,7 +505,7 @@ ZETextureData* ZEJpegMainController::LoadJpeg()
 
 			default:
 			case ZE_JPG_FM_UNKNOWN:	// Unknown marker
-				zeCriticalError("Unknown marker found in image file");
+				zeError("Unknown marker found in image file");
 				break;
 		}
 
@@ -504,7 +515,7 @@ ZETextureData* ZEJpegMainController::LoadJpeg()
 			NoError  = MarkerReader->ReadMarkers(StoppedAt);
 			if (!NoError)
 			{
-				zeCriticalError("Cannot process image data.");
+				zeError("Cannot process image data.");
 				return NULL;
 			}
 		}
@@ -520,6 +531,10 @@ ZETextureData* ZEJpegMainController::LoadJpeg()
 
 ZEJpegMainController::ZEJpegMainController(ZEFile* ImageFile)
 {
+	McuController = NULL;
+	MarkerReader = NULL;
+	ColorConverter = NULL;
+
 	ZEJpegDeCompressionInfo::ZeroData(&Info);
 
 	MarkerReader = ZEJpegFileMarkerReader::CreateInstance();

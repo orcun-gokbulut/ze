@@ -47,19 +47,18 @@
 
 
 
-bool ZEJpegMCUController::ProcessMCU(ZEUInt McuWidth, ZEUInt McuHeight, ZEUInt McuCoordX, ZEUInt McuCoordY)
+bool ZEJpegMCUController::ProcessMCU(ZEUInt McuCoordX, ZEUInt McuCoordY)
 {
 	bool Result = false;
-	
-	ZEUInt CopyWidth = McuWidth; 
-	ZEUInt CopyHeight = McuHeight;
+	ZESize BlockN, ComponentN;
+	ZESize ComponentBlockCount;
+	ZESize ScanComponentCount = (ZESize)Info->ComponentsInScan;
+	ZEJpegComponentInfo* Component;
+	ZEJpegDataBlock* TargetBlock = McuBuffer.McuData;
+	ZEJpegDataBlock* ComponentStart = McuBuffer.McuData;
 
-	if (McuCoordX + McuWidth > Info->ImageWidth)
-		CopyWidth = Info->ImageWidth - McuCoordX;
-
-	if (McuCoordY + McuHeight > Info->ImageHeight)
-		CopyHeight = Info->ImageHeight - McuCoordY;
-
+	ZEUInt CopyWidth = (McuCoordX + Info->MCUWidthInPixels > Info->ImageWidth) ? Info->ImageWidth - McuCoordX : Info->MCUWidthInPixels;
+	ZEUInt CopyHeight = (McuCoordY + Info->MCUHeightInPixels > Info->ImageHeight) ? Info->ImageHeight - McuCoordY : Info->MCUHeightInPixels;
 	void* Destination = (ZEUInt8*)Info->OutputData + (Info->OutputPitch * (ZESize)McuCoordY + (ZESize)McuCoordX * (ZESize)Info->OutputPixelSize);
 
 	// Decode MCU with huffman decoder
@@ -67,26 +66,23 @@ bool ZEJpegMCUController::ProcessMCU(ZEUInt McuWidth, ZEUInt McuHeight, ZEUInt M
 	STOPPROCESS(Result); 
 
 	// For each component
-	ZEJpegDataBlock* TargetBlock = McuBuffer.McuData;
-	ZEJpegDataBlock* ComponentStart = McuBuffer.McuData;	
-	
-	for (ZESize ComponentN = 0; ComponentN < (ZESize)Info->ComponentsInScan; ++ComponentN)
+	for (ComponentN = 0; ComponentN < ScanComponentCount; ++ComponentN)
 	{
 		// Process the decoded MCU block by block
-		ZEJpegComponentInfo* CurComp = Info->CurrentCompInfo[ComponentN];
-		ZESize ComponentBlockCount = (ZESize)CurComp->McuBlocks;
+		Component = Info->OrederedCompInfo[ComponentN];
+		ComponentBlockCount = (ZESize)Component->McuBlocks;
 
 		// For each block that component allocates
-		for (ZESize BlockN = 0; BlockN < ComponentBlockCount; ++BlockN)
+		for (BlockN = 0; BlockN < ComponentBlockCount; ++BlockN)
 		{
-			Dequantizator->Dequantize(CurComp, TargetBlock);
-			IDCTProcessor->ApplyIdct(CurComp, TargetBlock);
+			Dequantizator->Dequantize(Component, TargetBlock);
+			IDCTProcessor->ApplyIdct(Component, TargetBlock);
 			
 			++TargetBlock;
 		}
 
 		// Up Sample the component
-		(ChromaUpsampler->*(ChromaUpsampler->UpSamplePointers[ComponentN]))(Destination, CurComp, ComponentStart, CopyWidth, CopyHeight, McuCoordX, McuCoordY);
+		(ChromaUpsampler->*(ChromaUpsampler->UpSamplePointers[ComponentN]))(Destination, Component, ComponentStart, CopyWidth, CopyHeight, McuCoordX, McuCoordY);
 		ComponentStart += ComponentBlockCount;
 	}
 
