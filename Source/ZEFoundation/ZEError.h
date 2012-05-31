@@ -196,7 +196,7 @@ enum ZEErrorType
 		do\
 		{\
 			zeLog(ZE_LOG_CRITICAL_ERROR, __VA_ARGS__);\
-			ZEError::GetInstance()->RaiseError(__MODULE__, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);\
+			ZEError::GetInstance()->RaiseError(ZE_ET_CRITICAL_ERROR);\
 		}\
 		while(false)
 #endif
