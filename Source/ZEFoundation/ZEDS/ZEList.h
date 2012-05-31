@@ -91,7 +91,7 @@ class ZEList
 
 		inline ZEType* Append(ZEType* Item)
 		{
-			zeAssert(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
+			zeDebugCheck(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
 
 			Item->NextItem = NULL;
 			Item->PrevItem = LastItem;
@@ -107,8 +107,8 @@ class ZEList
 
 		inline ZEType* Insert(ZEType* Item)
 		{
-			zeAssert(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
-			zeAssert(Exists(Item), "Item is already added to list.");
+			zeDebugCheck(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
+			zeDebugCheck(Exists(Item), "Item is already added to list.");
 
 			Item->NextItem = FirstItem;
 			Item->PrevItem = NULL;
@@ -127,9 +127,9 @@ class ZEList
 
 		inline ZEType* Insert(ZESize Index, ZEType* Item)
 		{
-			zeAssert(Index > Count, "Index out of range.");
-			zeAssert(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
-			zeAssert(Exists(Item), "Item is already added to list.");
+			zeDebugCheck(Index > Count, "Index out of range.");
+			zeDebugCheck(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
+			zeDebugCheck(Exists(Item), "Item is already added to list.");
 
 			if (Index == 0)
 				Insert(Item);
@@ -147,7 +147,7 @@ class ZEList
 
 		inline void Remove(ZEType* Item)
 		{
-			zeAssert(!Exists(Item), "Item is not in the list.");
+			zeDebugCheck(!Exists(Item), "Item is not in the list.");
 
 			if (Item->PrevItem == NULL)
 				FirstItem = Item->NextItem;
@@ -181,7 +181,7 @@ class ZEList
 
 		inline const ZEType* GetItem(ZESize Index) const
 		{
-			zeAssert(Index >= Count, "Index is out of range.");
+			zeDebugCheck(Index >= Count, "Index is out of range.");
 			
 			const ZEType* Cursor = FirstItem;
 			while(Index-- != 0)
@@ -192,7 +192,7 @@ class ZEList
 
 		inline ZEType* GetItem(ZESize Index)
 		{
-			zeAssert(Index >= Count, "Index is out of range.");
+			zeDebugCheck(Index >= Count, "Index is out of range.");
 
 			ZEItem* Cursor = FirstItem;
 			while(Index-- != 0)
@@ -223,13 +223,13 @@ class ZEList
 
 		inline ZEType* operator[](ZESize Index)
 		{
-			zeAssert(Index >= Count, "Index is out of range.");
+			zeDebugCheck(Index >= Count, "Index is out of range.");
 			return GetItem(Index);
 		}
 
 		inline const ZEType* operator[](ZESize Index) const
 		{
-			zeAssert(Index >= Count, "Index is out of range.");
+			zeDebugCheck(Index >= Count, "Index is out of range.");
 			return GetItem(Index);
 		}
 

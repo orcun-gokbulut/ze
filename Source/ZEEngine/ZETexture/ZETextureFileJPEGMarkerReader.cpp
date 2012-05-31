@@ -1081,9 +1081,9 @@ ZEJpegFileMarkerBuffer* ZEJpegFileMarkerReader::GetMarkerBuffer() const
 
 void ZEJpegFileMarkerReader::Initialize(ZEFile* ImageFile, ZEJpegDeCompressionInfo* Info)
 {
-	zeAssert(MarkerBuffer != NULL || this->ImageFile != NULL, "MarkerReader is already initialized.");
-	zeAssert(ImageFile == NULL || Info == NULL, "Function call with null pointer");
-	zeAssert(!ImageFile->IsOpen(), "Jpeg file is not open.");
+	zeDebugCheck(MarkerBuffer != NULL || this->ImageFile != NULL, "MarkerReader is already initialized.");
+	zeDebugCheck(ImageFile == NULL || Info == NULL, "Function call with null pointer");
+	zeDebugCheck(!ImageFile->IsOpen(), "Jpeg file is not open.");
 	
 	this->Info = Info;
 	this->ImageFile = ImageFile;

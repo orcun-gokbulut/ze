@@ -102,13 +102,13 @@ class ZEPointer
 
 		Type& operator*()
 		{
-			zeAssert(Pointer == NULL, "ZEPointer does not points any data structure.");
+			zeDebugCheck(Pointer == NULL, "ZEPointer does not points any data structure.");
 			return *Pointer;
 		}
 
 		Type* operator->()
 		{
-			zeAssert(Pointer == NULL, "ZEPointer does not points any data structure.");
+			zeDebugCheck(Pointer == NULL, "ZEPointer does not points any data structure.");
 			return Pointer;
 		}
 

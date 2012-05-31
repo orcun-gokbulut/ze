@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEThread.h"
+#include "ZEError.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -70,10 +71,7 @@ void ZEThread::Run(void* Parameter)
 	{
 		Handle = CreateThread(NULL, 0,  RunThread, this, CREATE_SUSPENDED, NULL);
 		if (Handle == NULL)
-		{
-			//zeCriticalError("Can not create thread.");
-			return;
-		}
+			zeCriticalError("Can not create thread.");
 	}
 
 	if (Status == ZE_TS_RUNNING)
@@ -81,10 +79,7 @@ void ZEThread::Run(void* Parameter)
 
 	DWORD Result = ResumeThread(Handle);
 	if (Result == -1)
-	{
-		//zeCriticalError("Can not resume thread.");
-		return;
-	}
+		zeCriticalError("Can not resume thread.");
 }
 
 void ZEThread::Suspend()
@@ -94,10 +89,7 @@ void ZEThread::Suspend()
 	
 	DWORD Result = SuspendThread(Handle);
 	if (Result == -1)
-	{
-		//zeCriticalError("Can not suspend thread.");
-		return;
-	}
+		zeCriticalError("Can not suspend thread.");
 
 	Status = ZE_TS_SUSPENDED;
 }
@@ -109,10 +101,7 @@ void ZEThread::Terminate()
 
 	DWORD Result = TerminateThread(Handle, 0);
 	if (Result == -1)
-	{
-		//zeCriticalError("Can not terminate thread.");
-		return;
-	}
+		zeCriticalError("Can not terminate thread.");
 
 	Status = ZE_TS_TERMINATED;
 }

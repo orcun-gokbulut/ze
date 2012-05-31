@@ -228,7 +228,7 @@ bool ZESkyDome::Initialize()
 	{
 		if (!SkyDomeGeometry.LoadFromFile(ZE_SKY_DOME_PATH))
 		{
-			zeAssert("Cannot Load Sky Dome Geometry From: \"%s\"", ZE_SKY_DOME_PATH);
+			zeDebugCheck("Cannot Load Sky Dome Geometry From: \"%s\"", ZE_SKY_DOME_PATH);
 			return false;
 		}
 	}

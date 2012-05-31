@@ -129,7 +129,7 @@ bool ZETextureCacheDataIdentifier::Equal(ZEFile* File) const
 	char ItemNameBuffer[ZE_MAX_FILE_NAME_SIZE];
 	if (File->Read(ItemNameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE) != ZE_MAX_FILE_NAME_SIZE)
 	{
-		zeAssert(true, "Cannot read item name from cache: \"%s\".", File->GetFilePath().GetValue());
+		zeDebugCheck(true, "Cannot read item name from cache: \"%s\".", File->GetFilePath().GetValue());
 		return false;
 	}
 
@@ -145,7 +145,7 @@ bool ZETextureCacheDataIdentifier::Equal(ZEFile* File) const
 	ZETextureOptions TextureOptionsRead;
 	if (File->Read(&TextureOptionsRead, ZETexOptSize, 1) != 1)
 	{
-		zeAssert(true, "Cannot read texture options from cache: \"%s\".", File->GetFilePath().GetValue());
+		zeDebugCheck(true, "Cannot read texture options from cache: \"%s\".", File->GetFilePath().GetValue());
 		return false;
 	}
 
@@ -155,7 +155,7 @@ bool ZETextureCacheDataIdentifier::Equal(ZEFile* File) const
 	ZEUInt64 OffsetRead;
 	if (File->Read(&OffsetRead, sizeof(ZEUInt64), 1) != 1)
 	{
-		zeAssert(true, "Cannot read offset from cache: \"%s\".", File->GetFilePath().GetValue());
+		zeDebugCheck(true, "Cannot read offset from cache: \"%s\".", File->GetFilePath().GetValue());
 		return false;
 	}
 

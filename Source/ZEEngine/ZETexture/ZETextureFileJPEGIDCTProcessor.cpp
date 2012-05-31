@@ -201,7 +201,7 @@ void ZEJpegIDCTProcessor::ApplyIdct(ZEJpegComponentInfo* Component, ZEJpegDataBl
 
 void ZEJpegIDCTProcessor::Initialize(ZEJpegDeCompressionInfo* Info)
 {
-	zeAssert(Info == NULL, "NULL Pointer");
+	zeDebugCheck(Info == NULL, "NULL Pointer");
 
 	this->Info = Info;
 

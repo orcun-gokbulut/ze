@@ -33,6 +33,11 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
+macro(ze_append_property SCOPE PROPERTY_IDEN PROPERTY_NAME)
+	get_property(OLD_VALUES ${SCOPE} PROPERTY ${PROPERTY_NAME})
+	set_property(${SCOPE} PROPERTY ${PROPERTY_NAME} ${OLD_VALUES} ${ARGN})
+endmacro()
+
 function(ze_set_project_folder)
 	parse_arguments(PARAMETER "" "" ${ARGV})
 	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_PROJECT_FOLDER)
@@ -360,3 +365,38 @@ function(ze_add_cmake_project)
 	add_custom_target(${PARAMETER_NAME}	SOURCES ${PARAMETER_SOURCES})
 	set_property(TARGET ${PARAMETER_NAME} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
 endfunction()
+
+macro(ze_get_version)
+	file(READ "${ARGV0}/Version.txt" VERSION_STRING)
+	
+	set(VERSION_MAJOR 0)
+	string(REGEX REPLACE "^[ \\t\\r\\n]*Version[ \\t]*:[ \\t]*([0-9]+).*" "\\1" VERSION_MAJOR "${VERSION_STRING}")
+
+	set(VERSION_MINOR 0)
+	string(REGEX REPLACE "^[ \\t\\r\\n]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*([0-9]+).*" "\\1" VERSION_MINOR "${VERSION_STRING}")
+
+	set(VERSION_INTERNAL 0)
+	string(REGEX REPLACE "^[ \\t\\r\\n]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*[0-9]+\\.[ \\t]*([0-9]+).*" "\\1" VERSION_INTERNAL "${VERSION_STRING}")
+endmacro()
+
+macro(ze_get_version_revision_number)
+	set (VERSION_REVISION "0")
+	include(FindSubversion)
+	Subversion_WC_INFO(${ARGV0} SVN_INFO)
+	set(VERSION_REVISION ${SVN_INFO_WC_REVISION})
+endmacro()
+
+macro(ze_check_externals)
+	if (NOT EXISTS "${ARGV0}/Version.txt")
+		set(EXTERNALS_OK -1)
+	else()
+		ze_get_version("${CMAKE_SOURCE_DIR}/Platform")
+		if (NOT ${ARGV1} EQUAL VERSION_MAJOR)
+			set(EXTERNALS_OK -2)
+		elseif (${ARGV2} LESS VERSION_MINOR)
+			set(EXTERNALS_OK -3)
+		else()
+			set(EXTERNALS_OK 0)
+		endif()
+	endif()
+endmacro()

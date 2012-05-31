@@ -49,7 +49,7 @@
 
 void ZETypedVariant::SetString(char *NewValue)
 {
-	zeAssert(Type != ZE_VRT_STRING && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetString operation failed. Types does not match.");
+	zeDebugCheck(Type != ZE_VRT_STRING && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetString operation failed. Types does not match.");
 	if(Type == ZE_VRT_STRING || Type == ZE_VRT_MATRIX3X3 || Type == ZE_VRT_MATRIX4X4)
 	{
 		if (Value.String != NULL || Type == ZE_VRT_UNDEFINED)
@@ -68,7 +68,7 @@ void ZETypedVariant::SetString(char *NewValue)
 
 void ZETypedVariant::SetInteger(ZEInt NewValue)
 {
-	zeAssert(Type != ZE_VRT_INTEGER && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetInteger operation failed. Types does not match.");
+	zeDebugCheck(Type != ZE_VRT_INTEGER && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetInteger operation failed. Types does not match.");
 	if (Type == ZE_VRT_INTEGER)
 	{
 		Value.Integer = NewValue;
@@ -85,7 +85,7 @@ void ZETypedVariant::SetInteger(ZEInt NewValue)
 
 void ZETypedVariant::SetFloat(float NewValue)
 {
-	zeAssert(Type != ZE_VRT_FLOAT && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetFloat operation failed. Types does not match.");
+	zeDebugCheck(Type != ZE_VRT_FLOAT && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetFloat operation failed. Types does not match.");
 	if(Type == ZE_VRT_FLOAT)
 	{
 		Value.Float = NewValue;
@@ -101,7 +101,7 @@ void ZETypedVariant::SetFloat(float NewValue)
 
 void ZETypedVariant::SetBoolean(bool NewValue)
 {
-	zeAssert(Type != ZE_VRT_BOOLEAN && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetBoolean operation failed. Types does not match.");
+	zeDebugCheck(Type != ZE_VRT_BOOLEAN && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetBoolean operation failed. Types does not match.");
 	if(Type == ZE_VRT_BOOLEAN)
 	{
 		Value.Boolean = NewValue;
@@ -118,7 +118,7 @@ void ZETypedVariant::SetBoolean(bool NewValue)
 
 void ZETypedVariant::SetVariant(const ZEVariant &NewValue)
 {
-	zeAssert(Type != NewValue.GetType() && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetVariant operation failed. Types does not match.");
+	zeDebugCheck(Type != NewValue.GetType() && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetVariant operation failed. Types does not match.");
 	if(Type == NewValue.GetType())
 	{
 		if(Type == ZE_VRT_STRING)
@@ -137,7 +137,7 @@ void ZETypedVariant::SetVariant(const ZEVariant &NewValue)
 
 void ZETypedVariant::SetTypedVariant(const ZETypedVariant &NewValue)
 {
-	zeAssert(Type != NewValue.GetType() && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetTypedVariant operation failed. Types does not match.");
+	zeDebugCheck(Type != NewValue.GetType() && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetTypedVariant operation failed. Types does not match.");
 	if(Type == NewValue.GetType())
 	{
 		if(Type == ZE_VRT_STRING)

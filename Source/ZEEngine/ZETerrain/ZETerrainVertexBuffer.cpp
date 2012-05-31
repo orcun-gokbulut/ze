@@ -138,7 +138,7 @@ bool ZETerrainPrimitivesGenerator::Generate(ZEStaticVertexBuffer** VertexBuffer,
 	Indices->Index[ZE_TP_CORNER_2] = VertexIndex;
 	VertexIndex += CreateVerticalBlock(Vertices + VertexIndex, 2);
 
-	zeAssert(VertexIndex * sizeof(ZETerrainVertex) != VertexBufferSize, "Vertex counts does not match.");
+	zeDebugCheck(VertexIndex * sizeof(ZETerrainVertex) != VertexBufferSize, "Vertex counts does not match.");
 	(*VertexBuffer)->Unlock();
 
 	return true;

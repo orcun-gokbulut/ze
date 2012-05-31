@@ -77,7 +77,7 @@ bool ZEViewCuboid::CullTest(ZELight* Light) const
 
 bool ZEViewCuboid::CullTest(const ZERectangle3D& PortalDoor) const
 {
-	zeAssert(true, "Not implemented.");
+	zeDebugCheck(true, "Not implemented.");
 	return false;
 }
 

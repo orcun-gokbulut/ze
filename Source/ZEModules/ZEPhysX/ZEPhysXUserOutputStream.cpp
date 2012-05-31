@@ -60,7 +60,7 @@ void ZEPhysXUserOutputStream::reportError(NxErrorCode Code, const char* Message,
 			break;
 
 		case NXE_DB_INFO:
-			zeNotice("Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
+			zeLog("Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
 			break;
 
 		case NXE_DB_WARNING:

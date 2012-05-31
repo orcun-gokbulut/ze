@@ -44,44 +44,20 @@
 #include <windows.h>
 #endif
 
-static ZEErrorType ErrorOutputLevel = ZE_ET_LOG;
-
-static bool BreakOnAssertEnabled = true;
-static bool BreakOnErrorEnabled = true;
-static bool BreakOnWarningEnabled = true;
-
-static void DefaultErrorCallback(const char* Module, ZEErrorType Type, const char* ErrorText)
+ZEError::ZEError()
 {
-	printf("[%s] %s : %s \r\n", Module, ZEError::GetErrorTypeString(Type), ErrorText);
+	BreakOnAssertEnabled = true;
+	BreakOnErrorEnabled = true;
+	BreakOnWarningEnabled = true;
+	ErrorCallback = NULL;
 }
 
-static void DefaultAssertCallback(ZEAssertType Type, const char* AssertText, const char* Function, const char* File, ZEInt Line)
-{
-	printf("[%s] : %s (Function : \"%s\", File : \"%s\", Line : %d)\r\n", ZEError::GetAssertTypeString(Type), AssertText, Function, File, Line);
-}
-
-static ZEErrorCallback ErrorCallback = &DefaultErrorCallback;
-static ZEAssertCallback AssertCallback = &DefaultAssertCallback;
-
-void ZEError::SetErrorOutputLevel(ZEErrorType Type)
-{
-	if (Type > ZE_ET_CRITICAL_ERROR)
-		Type = ZE_ET_CRITICAL_ERROR;
-
-	ErrorOutputLevel = Type;
-}
-
-ZEErrorType ZEError::GetErrorOutputLevel()
-{
-	return ErrorOutputLevel;
-}
-
-void ZEError::SetBreakOnAssertEnabled(bool Enabled)
+void ZEError::SetBreakOnDebugCheckEnabled(bool Enabled)
 {
 	BreakOnAssertEnabled = Enabled;
 }
 
-bool ZEError::GetBreakOnAssertEnabled()
+bool ZEError::GetBreakOnDebugCheckEnabled()
 {
 	return BreakOnAssertEnabled;
 }
@@ -106,35 +82,6 @@ bool ZEError::GetBreakOnWarningEnabled()
 	return BreakOnWarningEnabled;
 }
 
-void ZEError::GetModuleName(char* Output, const char* Function, const char* FileName)
-{
-	ZESize Len = strlen(Function);
-	for(ZESize I = 0; I <= Len; I++)
-		if (Function[I] == ':' || Function[I] == '<')
-		{
-			Output[I] = '\0';
-			return;
-		}
-		else
-			Output[I] = Function[I];
-
-	Len = strlen(FileName);
-	bool Found = false;
-	ZESize N;
-	for(N = Len - 1; N >= 0; N--)
-		if (FileName[N] == '\\' || FileName[N] == '/')
-		{
-			Found = true;
-			N++;
-			break;
-		}
-
-	if (Found)
-		strcpy(Output, FileName + N);
-	else
-		strcpy(Output, FileName);
-}
-
 const char* ZEError::GetErrorTypeString(ZEErrorType Type)
 {
 	switch(Type)
@@ -148,85 +95,30 @@ const char* ZEError::GetErrorTypeString(ZEErrorType Type)
 		case ZE_ET_WARNING:
 			return "Warning";
 
-		case ZE_ET_NOTICE:
-			return "Notice";
+		case ZE_ET_DEBUG_CHECK_FAILED:
+			return "Debug Check Failed";
 
-		case ZE_ET_LOG:
-			return "Log";
-
-		default:
-			return "Unknown";
-	}
-}
-
-const char* ZEError::GetAssertTypeString(ZEAssertType Type)
-{
-	switch(Type)
-	{
-		case ZE_AT_ASSERT:
-			return "Assert";
-
-		case ZE_AT_WARNING_ASSERT:
-			return "Warning Assert";
+		case ZE_ET_DEBUG_CHECK_WARNING:
+			return "Debug Check Warning";
 
 		default:
 			return "Unknown";
 	}
 }
 
-void ZEError::SetErrorCallback(ZEErrorCallback Callback)
+void ZEError::SetCallback(ZEErrorCallback Callback)
 {
 	ErrorCallback = Callback;
 }
 
-void ZEError::SetAssertCallback(ZEAssertCallback Callback)
-{
-	AssertCallback = Callback;
-}
-
-void ZEError::RaiseError(const char* Module, ZEErrorType Type, const char* ErrorText, ...)
+void ZEError::RaiseError(ZEErrorType Type)
 {
 	if (ErrorCallback != NULL)
-	{
-		va_list Args;
-		va_start(Args, ErrorText);
-
-		char Buffer[4096];
-		vsprintf(Buffer, ErrorText, Args);
-		
-		va_end(Args);
-		
-		if (Type >= ErrorOutputLevel)
-		{
-			#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
-				char DebugBuffer[4096];
-				sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZEError::GetErrorTypeString(Type), Buffer);
-				OutputDebugString(DebugBuffer);
-			#endif
-
-			ErrorCallback(Module, Type, Buffer);
-		}
-	}
+		ErrorCallback(Type);
 }
 
-void ZEError::RaiseAssert(ZEAssertType Type, const char* Function, const char* File, ZEInt Line, const char* AssertText, ...)
+ZEError* ZEError::GetInstance()
 {
-	if (AssertCallback != NULL)
-	{
-		va_list Args;
-		va_start(Args, AssertText);
-		
-		char Buffer[4096];
-		vsprintf(Buffer, AssertText, Args);
-		
-		va_end(Args);
-
-		#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
-			char DebugBuffer[4096];
-			sprintf(DebugBuffer, "[%s] : %s (Function : \"%s\", File : \"%s\", Line : %d)\r\n", ZEError::GetAssertTypeString(Type), Buffer, Function, File, Line);
-			OutputDebugString(DebugBuffer);
-		#endif
-		
-		AssertCallback(Type, Buffer, Function, File, Line);
-	}
+	static ZEError Instance;
+	return &Instance;
 }

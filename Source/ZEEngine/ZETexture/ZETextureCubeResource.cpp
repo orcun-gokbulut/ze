@@ -216,14 +216,14 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		ZEPartialFile PartialResourceFile;
 		if (!FileCache.OpenData(&PartialResourceFile, &Identifier))
 		{
-			zeAssert(true, "Cannot open partial file on cache for file: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			zeDebugCheck(true, "Cannot open partial file on cache for file: \"%s\".", ResourceFile->GetFilePath().GetValue());
 			return NULL;
 		}
 
 		// Load into TextureData
 		if (!ZETextureLoader::Read(&PartialResourceFile, &ProcessedTextureData))
 		{
-			zeAssert(true, "Cannot read texture from cache. File: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			zeDebugCheck(true, "Cannot read texture from cache. File: \"%s\".", ResourceFile->GetFilePath().GetValue());
 			TempTextureData.Destroy();
 			ProcessedTextureData.Destroy();
 			return NULL;
@@ -239,7 +239,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		// Load into TextureData
 		if (!ZETextureLoader::LoadFromFile(ResourceFile, &ProcessedTextureData))
 		{
-			zeAssert(true, "Cannot load image from file: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			zeDebugCheck(true, "Cannot load image from file: \"%s\".", ResourceFile->GetFilePath().GetValue());
 			TempTextureData.Destroy();
 			return NULL;
 		}
@@ -278,12 +278,12 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		ZEPartialFile PartialResourceFile;
 		if (!FileCache.Allocate(&PartialResourceFile, &Identifier, ProcessedTextureData.GetSizeOnDisk()))
 		{
-			zeAssert(true, "Cache allocation failed for file: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			zeDebugCheck(true, "Cache allocation failed for file: \"%s\".", ResourceFile->GetFilePath().GetValue());
 		}
 
 		if (!ZETextureLoader::Write((ZEFile*)&PartialResourceFile, &ProcessedTextureData))
 		{
-			zeAssert(true, "Cannot cache the texture: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			zeDebugCheck(true, "Cannot cache the texture: \"%s\".", ResourceFile->GetFilePath().GetValue());
 		}
 
 		PartialResourceFile.Close();

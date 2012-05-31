@@ -414,6 +414,12 @@ bool ZEConsole::ParseInput(const char* Input)
 	}
 	return false;		
 }
+
+static void LogCallback(const char* Module, ZELogType Type, const char* LogText)
+{
+	zeOutput("[%s] %s: %s\n", Module, ZELog::GetLogTypeString(Type), LogText);
+}
+
 void ZEConsole::SetConsoleInterface(ZEConsoleInterface* Interface)
 {
 	if (ConsoleInterface != NULL)
@@ -532,6 +538,7 @@ ZEConsole::ZEConsole()
 	Visible = false;
 	Instance = this;
 	ConsoleInterface = NULL;
+	ZELog::GetInstance()->SetCallback(LogCallback);
 }
 
 ZEConsole::~ZEConsole()

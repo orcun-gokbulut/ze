@@ -71,7 +71,6 @@ class ZEConsole
 		bool					InputEnabled;
 		bool					Visible;
 
-		
 								ZEConsole();
 								~ZEConsole();
 

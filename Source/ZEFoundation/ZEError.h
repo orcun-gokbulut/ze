@@ -38,6 +38,8 @@
 #define __ZE_ERROR_H__
 
 #include "ZETypes.h"
+#include "ZELog.h"
+#include "ZEDLL.h"
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_PLATFORM_WINDOWS)
 	#include <intrin.h>
@@ -48,116 +50,250 @@
 
 enum ZEErrorType
 {
-	ZE_ET_LOG = 0,
-	ZE_ET_NOTICE = 1,
-	ZE_ET_WARNING = 2,
-	ZE_ET_ERROR = 3,
-	ZE_ET_CRITICAL_ERROR = 4
+	ZE_ET_CRITICAL_ERROR		= 4,
+	ZE_ET_ERROR					= 3,
+	ZE_ET_DEBUG_CHECK_FAILED	= 2,
+	ZE_ET_WARNING				= 1,
+	ZE_ET_DEBUG_CHECK_WARNING	= 0
 };
 
-enum ZEAssertType
-{
-	ZE_AT_ASSERT,
-	ZE_AT_WARNING_ASSERT
-};
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_PLATFORM_WINDOWS)
-	#define zeBreak(Condition) do {if (Condition) {__debugbreak();}} while(false)
+	#define zeBreak(Condition)\
+		do\
+		{\
+			if (Condition)\
+			{\
+				__debugbreak();\
+			}\
+		}\
+		while(false)
 #else
-	#define zeBreak(Condition) do {if (Condition) {}} while(false)
+	#define zeBreak(Condition)\
+		do\
+		{\
+			if (Condition)\
+			{\
+				abort();\
+			}\
+		}\
+		while(false)
 #endif
 
 #define ZE_MAX_MODULE_NAME_LENGTH 1024
 
 #ifdef ZE_DEBUG_MEMORY_CHECKS_ENABLE
-	#include <crtdbg.h>
-#define ZEDebugCheckMemory() do {zeAssert(!_CrtCheckMemory(), "Heap problem");} while(false)
+	#ifdef ZE_PLATFORM_COMPILER_MSVC
+		#include <crtdbg.h>
+		#define ZEDebugCheckMemory()\
+			do\
+			{\
+				zeDebugCheck(!_CrtCheckMemory(), "Heap problem");\
+			}\
+			while(false)
+	#endif
 #else
-	#define ZEDebugCheckMemory() do {} while(false)
+	#define ZEDebugCheckMemory()\
+		do\
+		{\
+		}\
+		while(false)
 #endif
 
 
 #ifdef ZE_DEBUG_ENABLE
-	#ifdef ZE_PLATFORM_WINDOWS
-		#define zeAssert(Condition, ...) do {if (Condition) {ZEError::RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); if (ZEError::GetBreakOnAssertEnabled() && _CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true);}} while(false)
-		#define zeWarningAssert(Condition, ...) do {if (Condition) {ZEError::RaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);}} while(false)
+	#ifdef ZE_PLATFORM_COMPILER_MSVC
+		#define zeDebugCheck(Condition, ...)\
+			do\
+			{\
+				if (Condition)\
+				{\
+					zeError(__VA_ARGS__);\
+					if (ZEError::GetInstance()->GetBreakOnDebugCheckEnabled() && _CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1)\
+						zeBreak(true);\
+				}\
+			}\
+			while(false)
+		#define zeDebugCheckWarning(Condition, ...)\
+			do\
+			{\
+				if (Condition)\
+				{\
+					zeWarning(__VA_ARGS__);\
+				}\
+			}\
+			while(false)
 	#else
-		#define zeAssert(Condition, ...) do {if (Condition){ZEError::RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); if (ZEError::GetBreakOnAssertEnabled()) abort();}} while(false)
-		#define zeWarningAssert(Condition, ...) do {if (Condition) {ZEError::RaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);}} while(false)
+		#define zeDebugCheck(Condition, ...) 
+			do \
+			{\
+				if (Condition)\
+				{\
+					
+					if (ZEError::GetInstance()->GetBreakOnDebugCheckEnabled())\
+						abort();\
+				}\
+			}\
+			while(false)
+		#define zeDebugCheckWarning(Condition, ...) do {if (Condition) {ZEError::GetInstance()->RaiseDebugCheckFail(ZE_DCT_WARNING, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);}} while(false)
 	#endif
 #else
 	#ifdef ZE_DEBUG_FORCE_VERIFY
-		#define zeAssert(Condition, ...) do {if (Condition) {}} while(false)
-		#define zeWarningAssert(Condition, ...) do {if (Condition) {}} while(false)
+		#define zeDebugCheck(Condition, ...)\
+			do\
+			{\
+				if (Condition)\
+				{\
+				}\
+			}\
+			while(false)
+		#define zeDebugCheckWarning(Condition, ...)\
+			do\
+			{\
+				if (Condition)\
+				{\
+				}\
+			}\
+			while(false)
 	#else
-		#define zeAssert(Condition, ...) do {} while(false)
-		#define zeWarningAssert(Condition, ...) do {} while(false)
+		#define zeDebugCheck(Condition, ...)\
+			do\
+			{\
+			}\
+			while(false)
+		#define zeDebugCheckWarning(Condition, ...)\
+			do\
+			{\
+			}\
+			while(false)
 	#endif
 #endif
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_DEBUG_BREAK_ON_ERROR)
-	#ifdef ZE_PLATFORM_WINDOWS
-		#define zeCriticalError(...) do {if (ZEError::GetBreakOnErrorEnabled() && _CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true); char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__MODULE__, __FUNCTION__, __FILE__); ZEError::RaiseError(__MODULE__, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);} while(false)
+	#ifdef ZE_PLATFORM_COMPILER_MSVC
+		#define zeCriticalError(...)\
+		do\
+		{\
+			zeLog(ZE_LOG_CRITICAL_ERROR, __VA_ARGS__);\
+			if (ZEError::GetInstance()->GetBreakOnErrorEnabled() && _CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1)\
+				zeBreak(true);\
+			ZEError::GetInstance()->RaiseError(ZE_ET_CRITICAL_ERROR);\
+		}\
+		while(false)
 	#else
-		#define zeCriticalError(...) do {if (ZEError::GetBreakOnErrorEnabled) abort(); char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__MODULE__, __FUNCTION__, __FILE__); ZEError::RaiseError(__MODULE__, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);} while(false)
+		#define zeCriticalError(...)\
+			do\
+			{\
+				zeLog(ZE_LOG_CRITICAL_ERROR, __VA_ARGS__);\
+				if (ZEError::GetInstance()->GetBreakOnErrorEnabled) \
+					abort();\
+				ZEError::GetInstance()->RaiseError(ZE_ET_CRITICAL_ERROR);\
+			} \
+			while(false)
 	#endif
 #else
-	#define zeCriticalError( ...) {char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__MODULE__, __FUNCTION__, __FILE__); ZEError::RaiseError(__MODULE__, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);} while(false)
+	#define zeCriticalError( ...)\
+		do\
+		{\
+			zeLog(ZE_LOG_CRITICAL_ERROR, __VA_ARGS__);\
+			ZEError::GetInstance()->RaiseError(__MODULE__, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);\
+		}\
+		while(false)
 #endif
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_DEBUG_BREAK_ON_ERROR)
-	#ifdef ZE_PLATFORM_WINDOWS 
-		#define zeError(...) do {if (ZEError::GetBreakOnErrorEnabled() &&_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true); char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__MODULE__, __FUNCTION__, __FILE__); ZEError::RaiseError(__MODULE__, ZE_ET_ERROR, __VA_ARGS__);} while(false)
+	#ifdef ZE_PLATFORM_COMPILER_MSVC
+		#define zeError(...)\
+		do\
+		{\
+			zeLog(ZE_LOG_ERROR, __VA_ARGS__);\
+			if (ZEError::GetInstance()->GetBreakOnErrorEnabled() &&_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1)\
+				zeBreak(true);\
+			ZEError::GetInstance()->RaiseError(ZE_ET_ERROR);\
+		}\
+		while(false)
 	#else
-		#define zeError(...) do {abort(); char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__MODULE__, __FUNCTION__, __FILE__); ZEError::RaiseError(__MODULE__, ZE_ET_ERROR, __VA_ARGS__);} while(false)
+		#define zeError(...)\
+			do\
+			{\
+				zeLog(ZE_LOG_ERROR, __VA_ARGS__);\
+				abort();\
+				ZEError::GetInstance()->RaiseError(ZE_ET_ERROR);\
+			}\
+			while(false)
 	#endif
 #else
-	#define zeError(...) do {char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__MODULE__, __FUNCTION__, __FILE__); ZEError::RaiseError(__MODULE__, ZE_ET_ERROR, __VA_ARGS__);} while(false)
+	#define zeError(...)\
+		do\
+		{\
+			zeLog(ZE_LOG_ERROR, __VA_ARGS__);\
+			ZEError::GetInstance()->RaiseError(ZE_ET_ERROR);\
+		}\
+		while(false)
 #endif
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_DEBUG_BREAK_ON_WARNING)
-	#ifdef ZE_PLATFORM_WINDOWS
-		#define zeWarning(...) do {if(ZEError::GetBreakOnWarningEnabled() && _CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) ==  1) zeBreak(true); char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__MODULE__, __FUNCTION__, __FILE__); ZEError::RaiseError(__MODULE__, ZE_ET_WARNING, __VA_ARGS__);} while(false)
+	#ifdef ZE_PLATFORM_COMPILER_MSVC
+		#define zeWarning(...)\
+			do\
+			{\
+				zeLog(ZE_LOG_WARNING, __VA_ARGS__);\
+				if(ZEError::GetInstance()->GetBreakOnWarningEnabled() && _CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) ==  1)\
+					zeBreak(true);\
+				ZEError::GetInstance()->RaiseError(ZE_ET_WARNING);\
+			}\
+			while(false)
 	#else
-		#define zeWarning(...) do {if(ZEError::GetBreakOnWarningEnabled()) abort(); char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__MODULE__, __FUNCTION__, __FILE__); ZEError::RaiseError(__MODULE__, ZE_ET_WARNING, __VA_ARGS__);} while(false)
+		#define zeWarning(...)\
+			do\
+			{\
+				zeLog(ZE_LOG_WARNING, __VA_ARGS__);\
+				if(ZEError::GetInstance()->GetInstance()->GetBreakOnWarningEnabled())\
+					abort();\
+				ZEError::GetInstance()->RaiseError(ZE_ET_WARNING);\
+			}\
+			while(false)
 	#endif
 #else
-	#define zeWarning(...) do {char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__MODULE__, __FUNCTION__, __FILE__); ZEError::RaiseError(__MODULE__, ZE_ET_WARNING, __VA_ARGS__);} while(false)
+	#define zeWarning(...)\
+		do\
+		{\
+			zeLog(ZE_LOG_WARNING, __VA_ARGS__);\
+			ZEError::GetInstance()->RaiseError(ZE_ET_WARNING);\
+		}\
+		while(false)
 #endif
 
-#define zeNotice(...) do {char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__MODULE__, __FUNCTION__, __FILE__); ZEError::RaiseError(__MODULE__, ZE_ET_NOTICE, __VA_ARGS__);} while(false)
-#define zeLog(...) do {char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__MODULE__, __FUNCTION__, __FILE__); ZEError::RaiseError(__MODULE__, ZE_ET_LOG, __VA_ARGS__);} while(false)
-
-
-typedef void (*ZEErrorCallback)(const char* Module, ZEErrorType Type, const char* ErrorText);
-typedef void (*ZEAssertCallback)(ZEAssertType Type, const char* AssertText, const char* Function, const char* File, ZEInt Line);
+typedef void (*ZEErrorCallback)(ZEErrorType Type);
 
 class ZEError
 {
+	private:
+		bool				BreakOnAssertEnabled;
+		bool				BreakOnErrorEnabled;
+		bool				BreakOnWarningEnabled;
+		ZEErrorCallback		ErrorCallback;
+
+							ZEError();
+
 	public:
-		static void			SetErrorOutputLevel(ZEErrorType Type);
-		static ZEErrorType	GetErrorOutputLevel();
-
-		static void			SetBreakOnAssertEnabled(bool Enabled);
-		static bool			GetBreakOnAssertEnabled();
-
-		static void			SetBreakOnErrorEnabled(bool Enabled);
-		static bool			GetBreakOnErrorEnabled();
-
-		static void			SetBreakOnWarningEnabled(bool Enabled);
-		static bool			GetBreakOnWarningEnabled();
-
-		static void			GetModuleName(char* Output, const char* Function, const char* FileName);
-
 		static const char*	GetErrorTypeString(ZEErrorType Type);
-		static const char*	GetAssertTypeString(ZEAssertType Type);
 
-		static void			SetErrorCallback(ZEErrorCallback Callback);
-		static void			SetAssertCallback(ZEAssertCallback Callback);
+		void				SetBreakOnDebugCheckEnabled(bool Enabled);
+		bool				GetBreakOnDebugCheckEnabled();
 
-		static void			RaiseError(const char* Module, ZEErrorType Type, const char* ErrorText, ...);
-		static void			RaiseAssert(ZEAssertType Type, const char* Function, const char* File, ZEInt Line, const char* AssertText, ...);
+		void				SetBreakOnErrorEnabled(bool Enabled);
+		bool				GetBreakOnErrorEnabled();
+
+		void				SetBreakOnWarningEnabled(bool Enabled);
+		bool				GetBreakOnWarningEnabled();
+
+		void				SetCallback(ZEErrorCallback Callback);
+
+		void				RaiseError(ZEErrorType Type);
+
+		ZE_DLL_METHOD 
+		static ZEError*		GetInstance();
 };
-
 
 #endif

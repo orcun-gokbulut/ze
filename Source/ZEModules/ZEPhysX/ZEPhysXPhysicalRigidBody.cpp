@@ -516,7 +516,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 
 			case ZE_PST_SPHERE:
 			{
-				zeWarningAssert(Scale.x != Scale.y && Scale.y != Scale.z, "Sphere physical shape does not support non uniform scaling. Only scale.x parameter will be used.");
+				zeDebugCheckWarning(Scale.x != Scale.y && Scale.y != Scale.z, "Sphere physical shape does not support non uniform scaling. Only scale.x parameter will be used.");
 
 				NxSphereShapeDesc* SphereShapeDesc = new NxSphereShapeDesc();
 				SphereShapeDesc->setToDefault();
@@ -534,7 +534,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 
 			case ZE_PST_CAPSULE:
 			{
-				zeWarningAssert(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Capsule physical shape does not support scaling. Shape did not scaled.");
+				zeDebugCheckWarning(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Capsule physical shape does not support scaling. Shape did not scaled.");
 				
 				NxCapsuleShapeDesc* CapsuleShapeDesc = new NxCapsuleShapeDesc();
 				CapsuleShapeDesc->setToDefault();
@@ -553,7 +553,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 
 			case ZE_PST_CYLINDER:
 			{
-				zeWarningAssert(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Cylinder physical shape does not support scaling. Shape did not scaled.");
+				zeDebugCheckWarning(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Cylinder physical shape does not support scaling. Shape did not scaled.");
 				break;
 			}
 

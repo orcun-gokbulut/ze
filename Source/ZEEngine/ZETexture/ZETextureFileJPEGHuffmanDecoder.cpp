@@ -1069,8 +1069,8 @@ bool ZEJpegHuffmanDecoder::MCUDecodeSubBlock(ZEJpegMcu* McuData)
 // Creates the intermediate decoding tables which hold the all possible bit strings whose length are given in Huffman tables
 void ZEJpegHuffmanDecoder::Initialize(ZEJpegDeCompressionInfo* Info, ZEJpegFileMarkerReader* MarkerReader)
 {
-	zeAssert(Info == NULL, "NULL Pointer");
-	zeAssert(MarkerReader == NULL, "NULL Pointer");
+	zeDebugCheck(Info == NULL, "NULL Pointer");
+	zeDebugCheck(MarkerReader == NULL, "NULL Pointer");
 
 	this->Info = Info;
 	this->MarkerReeader = MarkerReader;

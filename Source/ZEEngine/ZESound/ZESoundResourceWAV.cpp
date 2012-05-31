@@ -84,7 +84,7 @@ const void* ZESoundResourceWAV::GetData() const
 
 void ZESoundResourceWAV::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
 {
-	zeAssert(SampleIndex + Count > SampleCount, "Sample decoding range (SampleIndex + Count) exceed sample count.");
+	zeDebugCheck(SampleIndex + Count > SampleCount, "Sample decoding range (SampleIndex + Count) exceed sample count.");
 	memcpy(Buffer, (ZEUInt8*)Data + SampleIndex * BlockAlign, Count * BlockAlign);
 }
 

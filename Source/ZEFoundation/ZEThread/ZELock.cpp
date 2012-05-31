@@ -34,53 +34,29 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELock.h"
+#include "ZEError.h"
 
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <intrin.h>
 
-#define ZE_ATOMIC_INCREMENT(Value) _InterlockedIncrement(Value)
-
-ZELockHandle::ZELockHandle(const ZELockHandle& Handle)
-{
-	Locked = false;
-	Number = 0;
-}
-
-ZELockHandle& ZELockHandle::operator=(const ZELockHandle& Handle)
-{
-	return ZELockHandle();
-}
-
-ZELockHandle::ZELockHandle()
-{
-	Locked = false;
-	Number = 0;
-}
-
-ZELockHandle::~ZELockHandle()
-{
-	//zeAssert(Locked, "A thread handle is still unlocked !");
-}
+#ifdef ZE_PLATFORM_COMPILER_MSVC
+	#define ZE_ATOMIC_INCREMENT(Value) _InterlockedIncrement(Value)
+#else
+#endif
 
 bool ZELock::Test()
 {
 	return CurrentNumber < NextNumber;
 }
 
-bool ZELock::Lock(ZELockHandle* Handle)
+bool ZELock::Lock()
 {
 	long MyNumber = ZE_ATOMIC_INCREMENT(&NextNumber);
 	if (MyNumber != CurrentNumber)
-	{
-		Handle->Locked = false;
-		Handle->Number = 0;
 		return false;
-	}
 
 	CurrentNumber = MyNumber;
-
-	Handle->Locked = true;
-	Handle->Number = MyNumber;
 
 	return true;
 }
@@ -90,32 +66,23 @@ void ZELock::Wait()
 	while(CurrentNumber < NextNumber);
 }
 
-void ZELock::WaitAndLock(ZELockHandle* Handle)
+void ZELock::WaitAndLock()
 {
 	unsigned long long MyNumber = ZE_ATOMIC_INCREMENT(&NextNumber);
 
 	while(MyNumber != CurrentNumber);
 
 	CurrentNumber = MyNumber;
-
-	Handle->Locked = true;
-	Handle->Number = MyNumber;
 }
 
-bool ZELock::Unlock(ZELockHandle* Handle)
+bool ZELock::Unlock()
 {
-	if (!Handle->Locked && Handle->Number != CurrentNumber)
-		return false;
-
-	Handle->Locked = false;
-	Handle->Number = 0;
-
 	CurrentNumber++;
 
 	return true;
 }
 
-ZELock& ZELock::operator=(const ZELock& Lock)
+ZELock ZELock::operator=(const ZELock& Lock)
 {
 	return ZELock();
 }
@@ -134,5 +101,5 @@ ZELock::ZELock(const ZELock& Lock)
 
 ZELock::~ZELock()
 {
-	//zeError("Destroying lock while it is still locked.");
+	zeCriticalError("Destroying lock while it is still locked.");
 }

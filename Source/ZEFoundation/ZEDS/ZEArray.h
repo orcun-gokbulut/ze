@@ -109,7 +109,7 @@ class ZEArray
 
 		inline ZEType Dequeue()
 		{
-			zeAssert(Count == 0, "There is no item in the queue.");
+			zeDebugCheck(Count == 0, "There is no item in the queue.");
 			ZEType Temp = Items[0];
 			DeleteAt(0);
 			return Temp;			
@@ -122,7 +122,7 @@ class ZEArray
 
 		inline ZEType Pop()
 		{
-			zeAssert(Count == 0, "There is no item in the stack.");
+			zeDebugCheck(Count == 0, "There is no item in the stack.");
 			ZEType Temp = Items[Count - 1];
 			DeleteAt(Count - 1);
 			return Temp;
@@ -130,7 +130,7 @@ class ZEArray
 
 		inline void SetItem(ZESize Index, ZEType Value)
 		{
-			zeAssert(Index >= Count, "Index is out of range.");
+			zeDebugCheck(Index >= Count, "Index is out of range.");
 			this->Items[Index] = Value;
 		}
 
@@ -282,7 +282,7 @@ class ZEArray
 
 		inline ZEType* Insert(ZESize Index)
 		{
-			zeAssert(Index > Count, "Index is out of range.");
+			zeDebugCheck(Index > Count, "Index is out of range.");
 			ZESize N = 0;
 			ZEType* TempPointer = this->Items;
 			bool Changed = Allocator.Allocate(&Items, Count + 1);
@@ -317,7 +317,7 @@ class ZEArray
 
 		inline void DeleteAt(ZESize Index)
 		{
-			zeAssert(Index >= Count, "Index is out of range.");
+			zeDebugCheck(Index >= Count, "Index is out of range.");
 			ZESize NewCount = Count, N = 0;
 			ZEType* TempPointer = this->Items;
 			bool Changed;
@@ -456,13 +456,13 @@ class ZEArray
 
 		inline const ZEType& GetItem(ZESize Index) const
 		{
-			zeAssert(Index >= Count, "Index is out of range.");
+			zeDebugCheck(Index >= Count, "Index is out of range.");
 			return Items[Index];
 		}
 
 		inline ZEType& GetItem(ZESize Index)
 		{
-			zeAssert(Index >= Count, "Index is out of range.");
+			zeDebugCheck(Index >= Count, "Index is out of range.");
 			return Items[Index];
 		}
 
@@ -488,13 +488,13 @@ class ZEArray
 
 		inline ZEType& operator[](ZESize Index)
 		{
-			zeAssert(Index >= Count, "Index is out of range.");
+			zeDebugCheck(Index >= Count, "Index is out of range.");
 			return Items[Index];
 		}
 		
 		inline const ZEType& operator[](ZESize Index) const
 		{
-			zeAssert(Index >= Count, "Index is out of range.");
+			zeDebugCheck(Index >= Count, "Index is out of range.");
 			return Items[Index];
 		}
 

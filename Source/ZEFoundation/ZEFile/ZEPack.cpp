@@ -97,7 +97,7 @@ ZEPack::~ZEPack()
 // Opens the cache file
 bool ZEPack::Open(const char* PackFileName)
 {
-	//zeAssert(File && File->IsOpen(), "Cache is already open...");
+	//zeDebugCheck(File && File->IsOpen(), "Cache is already open...");
 	
 	File->Open(PackFileName, ZE_FM_READ_WRITE, true);
 
@@ -219,11 +219,12 @@ bool ZEPack::ChunkExists(const char* IdentifierName)
 //Returns hash code
 ZEUInt64 ZEPack::GetHash(const char* Identifier)
 {
-	ZEString ChunkName = Identifier;
+	char ChunkName[256];
+	strncpy(ChunkName,Identifier,256);
 	ZEUInt64 Hash = 0;
 	ZEUInt64 I = 0;	
 	ZEUInt64 Char = 0;
-	while(I < ChunkName.GetLength())
+	while(I < 256)
 	{
 		Char = ChunkName[I];
 		Hash = Char + (Hash << 6) + (Hash << 16) - Hash;
@@ -676,5 +677,5 @@ bool ZEPack::IsPack(ZEString& Path)
 {
 	// NOT IMPLEMENTED !!!!
 	return false;
-	//zeAssert(true, "NOT IMPLEMENTED !!!");
+	//zeDebugCheck(true, "NOT IMPLEMENTED !!!");
 }

@@ -85,7 +85,7 @@ void ZEResourceManager::RemoveResource(ZEResource* Resource)
 
 void ZEResourceManager::ReleaseAllResources()
 {
-	zeWarningAssert(SharedResources.GetCount(), "[Resource Manager] Possible memory leak ! One or more shared resources are not released.");
+	zeDebugCheckWarning(SharedResources.GetCount(), "[Resource Manager] Possible memory leak ! One or more shared resources are not released.");
 
 	for (ZESize I = 0; I < SharedResources.GetCount(); I++)
 		delete SharedResources.GetItem(I);

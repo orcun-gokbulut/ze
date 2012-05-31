@@ -135,16 +135,16 @@ class ZEWeakPointer
 
 		Type& operator*()
 		{
-			zeAssert(Pointer == NULL, "ZEWeakPointer does not points any data structure.");
-			zeAssert(ReferenceCount == 0 || ReferenceCount->Strong == 0, "ZEWeakPointer is ilvalid. Pointer is deleted.");
+			zeDebugCheck(Pointer == NULL, "ZEWeakPointer does not points any data structure.");
+			zeDebugCheck(ReferenceCount == 0 || ReferenceCount->Strong == 0, "ZEWeakPointer is ilvalid. Pointer is deleted.");
 
 			return *Pointer;
 		}
 
 		Type* operator->()
 		{
-			zeAssert(Pointer == NULL, "ZEWeakPointer does not points any data structure.");
-			zeAssert(ReferenceCount == 0 || ReferenceCount->Strong == 0, "ZEWeakPointer is ilvalid. Pointer is deleted.");
+			zeDebugCheck(Pointer == NULL, "ZEWeakPointer does not points any data structure.");
+			zeDebugCheck(ReferenceCount == 0 || ReferenceCount->Strong == 0, "ZEWeakPointer is ilvalid. Pointer is deleted.");
 
 			return Pointer;
 		}

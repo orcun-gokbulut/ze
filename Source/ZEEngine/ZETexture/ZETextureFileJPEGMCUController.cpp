@@ -102,7 +102,7 @@ ZEUInt ZEJpegMCUController::GetProcessedMcuCount()
 
 void ZEJpegMCUController::Initialize(ZEJpegDeCompressionInfo* Info, ZEJpegFileMarkerReader* MarkerReader)
 {
-	zeAssert(Info == NULL, "NULL Pointer");
+	zeDebugCheck(Info == NULL, "NULL Pointer");
 
 	this->Info = Info;
 

@@ -33,6 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#ifndef __ZE_THREAD_H__
+#define __ZE_THREAD_H__
+
 enum ZEThreadStatus
 {
 	ZE_TS_NONE,
@@ -67,3 +70,5 @@ class ZEThread
 							ZEThread();
 		virtual 			~ZEThread();
 };
+
+#endif

@@ -47,15 +47,8 @@ class ZEErrorManager
 {
 	friend class					ZECore;
 	private:
-		bool						LogFileEnabled;
-		ZEString					LogFileName;
 		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
-
-		static char*				ErrorLevelToString(ZEErrorType ErrorLevel);
-		void						LogToFile(const char* Module, ZEErrorType ErrorType, const char* ErrorText);
-
-		static void					ErrorCallback(const char* Module, ZEErrorType ErrorType, const char* ErrorText);
-		static void					AssertCallback(ZEAssertType AssertType, const char* AssertText, const char* Function, const char* File, ZEInt Line);
+		static void					ErrorCallback(ZEErrorType ErrorType);
 
 									ZEErrorManager();
 									~ZEErrorManager();

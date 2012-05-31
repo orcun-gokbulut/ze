@@ -50,7 +50,7 @@
 
 bool ZEPartialFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 {
-	//zeAssert(IsOpen(), "Close the previous file first");
+	//zeDebugCheck(IsOpen(), "Close the previous file first");
 
 	//ZEString String;
 	//ZEString PurePath;
@@ -215,9 +215,9 @@ bool ZEPartialFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 
 bool ZEPartialFile::Open(ZEFile* ParentFile, ZEUInt64 Offset, ZEUInt64 Size)
 {
-	zeAssert(IsOpen(), "File is already open. File Name: \"%s\".", FilePath.GetValue());
-	zeAssert(!ParentFile->IsOpen(), "Parent file is not open. File Name: \"%s\".", FilePath.GetValue());
-	zeAssert(Size == 0, "Cannot open a PartialFile with 0 size. File Name: \"%s\".", ParentFile->GetFilePath().GetValue());
+	zeDebugCheck(IsOpen(), "File is already open. File Name: \"%s\".", FilePath.GetValue());
+	zeDebugCheck(!ParentFile->IsOpen(), "Parent file is not open. File Name: \"%s\".", FilePath.GetValue());
+	zeDebugCheck(Size == 0, "Cannot open a PartialFile with 0 size. File Name: \"%s\".", ParentFile->GetFilePath().GetValue());
 
 	this->StartPosition = ParentFile->GetStartPosition() + Offset;
 	this->EndPosition	= StartPosition + Size;
@@ -291,7 +291,7 @@ ZEUInt64 ZEPartialFile::ReadFormated(const char* Format, ...)
 	if(FileCursor < StartPosition || EndPosition < FileCursor)
 		return 0;
 
-	zeAssert(true, "Not Implemented Yet.");
+	zeDebugCheck(true, "Not Implemented Yet.");
 	// 	va_list ArgList;
 	// 
 	// 	va_start(ArgList, Format);

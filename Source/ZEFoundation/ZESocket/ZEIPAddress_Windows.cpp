@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEIPAddressWin.cpp
+ Zinek Engine - ZEIPAddress_Windows.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -223,8 +223,8 @@ ZEArray<ZEIPAddress> ZEIPAddress::HostIPs()
 
 bool ZEIPAddress::operator == (const ZEIPAddress &RightOperand) const
 {
-	zeAssert(Type != RightOperand.Type, "Ip type mismatch.");
-	zeAssert((Type == ZE_IAT_NONE) || (RightOperand.Type == ZE_IAT_NONE), "Typeless Ip's are not comparable.");
+	zeDebugCheck(Type != RightOperand.Type, "Ip type mismatch.");
+	zeDebugCheck((Type == ZE_IAT_NONE) || (RightOperand.Type == ZE_IAT_NONE), "Typeless Ip's are not comparable.");
 
 	if(Type != RightOperand.Type)
 		return false;
@@ -251,8 +251,8 @@ bool ZEIPAddress::operator == (const ZEIPAddress &RightOperand) const
 
 bool ZEIPAddress::operator != (const ZEIPAddress &RightOperand) const
 {
-	zeAssert(Type != RightOperand.Type, "Ip type mismatch.");
-	zeAssert((Type == ZE_IAT_NONE) || (RightOperand.Type == ZE_IAT_NONE), "Typeless Ip's are not comparable.");
+	zeDebugCheck(Type != RightOperand.Type, "Ip type mismatch.");
+	zeDebugCheck((Type == ZE_IAT_NONE) || (RightOperand.Type == ZE_IAT_NONE), "Typeless Ip's are not comparable.");
 
 	if(Type != RightOperand.Type)
 		return false;

@@ -83,15 +83,15 @@ class ZED3DXInclude : public ID3DXInclude
 
 void ZED3D9CommonTools::SetRenderTarget(DWORD RenderTarget, ZEViewPort* ViewPort)
 {
-	zeAssert(ViewPort == NULL, "ViewPort is null.");
+	zeDebugCheck(ViewPort == NULL, "ViewPort is null.");
 
 	GetDevice()->SetRenderTarget(RenderTarget, ((ZED3D9ViewPort*)ViewPort)->FrameBuffer);
 }
 
 void ZED3D9CommonTools::SetRenderTarget(DWORD RenderTarget, ZETexture2D* Texture)
 {
-	zeAssert(!Texture->IsRenderTarget(), "Texture is not render target.");
-	zeAssert(Texture == NULL, "Texture is null.");
+	zeDebugCheck(!Texture->IsRenderTarget(), "Texture is not render target.");
+	zeDebugCheck(Texture == NULL, "Texture is null.");
 
 	GetDevice()->SetRenderTarget(RenderTarget, ((ZED3D9ViewPort*)Texture->GetViewPort())->FrameBuffer);
 	

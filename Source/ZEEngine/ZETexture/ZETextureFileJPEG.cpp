@@ -58,8 +58,8 @@ ZETextureFileJpeg::~ZETextureFileJpeg()
 
 bool ZETextureFileJpeg::LoadInfo(ZETextureDataInfo* Info, ZEFile* File)
 {
-	zeAssert(File == NULL || Info == NULL, "NULL Pointer");
-	zeAssert(!File->IsOpen(), "File is not open");
+	zeDebugCheck(File == NULL || Info == NULL, "NULL Pointer");
+	zeDebugCheck(!File->IsOpen(), "File is not open");
 
 	ZEJpegMainController MainController(File);
 
@@ -68,8 +68,8 @@ bool ZETextureFileJpeg::LoadInfo(ZETextureDataInfo* Info, ZEFile* File)
 
 ZETextureData* ZETextureFileJpeg::Load(ZEFile* File)
 {
-	zeAssert(File == NULL, "NULL Pointer");
-	zeAssert(!File->IsOpen(), "File is not open");
+	zeDebugCheck(File == NULL, "NULL Pointer");
+	zeDebugCheck(!File->IsOpen(), "File is not open");
 
 	ZEJpegMainController MainController(File);
 	

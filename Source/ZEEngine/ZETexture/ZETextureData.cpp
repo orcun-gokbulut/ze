@@ -315,7 +315,7 @@ void* ZETextureLevel::GetData()
 
 void ZETextureLevel::CopyFrom(void* SourceData, ZESize SourcePitch)
 {
-	zeAssert(SourceData == NULL || SourcePitch == 0, "Cannot copy from source. Either Source is NULL or pitch is 0.");
+	zeDebugCheck(SourceData == NULL || SourcePitch == 0, "Cannot copy from source. Either Source is NULL or pitch is 0.");
 
 	void* Destination		= this->Data;
 	ZESize DestinationPitch = this->GetPitch();
@@ -328,7 +328,7 @@ void ZETextureLevel::CopyFrom(void* SourceData, ZESize SourcePitch)
 
 void ZETextureLevel::CopyTo(void* Dest, ZESize DestPitch)
 {
-	zeAssert(Dest == NULL || DestPitch == 0, "Cannot copy to destination. Either destination is NULL or pitch is 0.");
+	zeDebugCheck(Dest == NULL || DestPitch == 0, "Cannot copy to destination. Either destination is NULL or pitch is 0.");
 
 	void* SourceData		= this->Data;
 	ZESize SourcePitch		= this->GetPitch();
@@ -723,7 +723,7 @@ void ZETextureData::ConvertToCubeTextureData(ZETextureData* Output, ZETextureDat
 	ZEUInt TargetWidth	= TextureData->GetWidth() / 3;
 	ZEUInt TargetHeight = TextureData->GetHeight() / 2;
 
-	zeAssert(TargetWidth != TargetHeight, "Cannot convert texture data. Dimensions do not match..");
+	zeDebugCheck(TargetWidth != TargetHeight, "Cannot convert texture data. Dimensions do not match..");
 
 	// Empty Output
 	if (!Output->IsEmpty())

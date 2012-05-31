@@ -64,9 +64,9 @@ const char* ZETestManager::GetPackageName()
 
 bool ZETestManager::RunTests()
 {
-	ZEError::SetBreakOnAssertEnabled(false);
-	ZEError::SetBreakOnErrorEnabled(false);
-	ZEError::SetBreakOnWarningEnabled(false);
+	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(false);
+	ZEError::GetInstance()->SetBreakOnErrorEnabled(false);
+	ZEError::GetInstance()->SetBreakOnWarningEnabled(false);
 
 	bool Result = true;
 	for (ZESize I = 0; I < TestSuiteCount; I++)
@@ -87,9 +87,9 @@ bool ZETestManager::RunTests()
 	if (!Result)
 		printf("%s : error T0003: Test package failed. Package Name : \"%s\". \r\n", GetPackageName(), GetPackageName());
 
-	ZEError::SetBreakOnAssertEnabled(true);
-	ZEError::SetBreakOnErrorEnabled(true);
-	ZEError::SetBreakOnWarningEnabled(true);
+	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(true);
+	ZEError::GetInstance()->SetBreakOnErrorEnabled(true);
+	ZEError::GetInstance()->SetBreakOnWarningEnabled(true);
 
 	return Result;
 }

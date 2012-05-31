@@ -33,21 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-class ZELockHandle 
-{
-	friend class ZELock;
-	private:
-		bool				Locked;
-		long				Number;
-
-		ZELockHandle&		operator=(const ZELockHandle& Handle);
-
-							ZELockHandle(const ZELockHandle& Handle);
-
-	public:
-							ZELockHandle();
-							~ZELockHandle();
-};
+#ifndef __ZE_LOCK_H__
+#define __ZE_LOCK_H__
 
 class ZELock
 {
@@ -57,14 +44,16 @@ class ZELock
 
 	public:
 		bool				Test();
-		bool				Lock(ZELockHandle* Handle);
+		bool				Lock();
 		void				Wait();
-		void				WaitAndLock(ZELockHandle* Handle);
-		bool				Unlock(ZELockHandle* Handle);
+		void				WaitAndLock();
+		bool				Unlock();
 
-		ZELock&				operator=(const ZELock& Lock);
+		ZELock				operator=(const ZELock& Lock);
 
 							ZELock();
 							ZELock(const ZELock& Lock);
 							~ZELock();
 };
+
+#endif
