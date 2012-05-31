@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_VIEWFRUSTUM_H__
-#define __ZE_VIEWFRUSTUM_H__
+#ifndef __ZE_VIEW_FRUSTUM_H__
+#define __ZE_VIEW_FRUSTUM_H__
 
 #include "ZEViewVolume.h"
 
@@ -107,9 +107,9 @@ class ZEViewFrustum : public ZEViewVolume
 		ZEVector3							Up;
 
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
-		virtual ZEVector3					GetPosition() const;
 
 		void								SetPosition(ZEVector3 Value);
+		virtual ZEVector3					GetPosition() const;
 
 		const ZEPlane&						GetClippingPlane(ZEViewFrustumPlane Plane) const;
 		const ZELineSegment					GetEdge(ZEViewFrustumEdge Edge) const;
@@ -127,13 +127,9 @@ class ZEViewFrustum : public ZEViewVolume
 		virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
 		virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
 		virtual bool						CullTest(const ZEBSphere& BoundingSphere) const;
-
-		virtual bool						CullTest(ZELight* Light) const;
-		virtual bool						CullTest(ZEEntity* Entity) const;
-		virtual bool						CullTest(const ZERectangle3D& PortalDoor) const;
+		virtual bool						CullTest(const ZERectangle3D& Rectangle) const;
 
 		ZEArray<ZELineSegment>				GetFrustumLineSegments();
-
 		ZEArray<ZELineSegment>				GetCustomFrustumLineSegments();
 
 		void								Create(const ZEVector3& Position, const ZEQuaternion& Rotation, 

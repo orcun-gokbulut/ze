@@ -50,10 +50,7 @@ public:
 	virtual bool						CullTest(const ZEBSphere& BoundingSphere) const;
 	virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
 	virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
-
-	virtual bool						CullTest(ZELight* Light) const;
-	virtual bool						CullTest(ZEEntity* Entity) const;
-	virtual bool						CullTest(const ZERectangle3D& PortalDoor) const;
+	virtual bool						CullTest(const ZERectangle3D& Rectangle) const;
 
 	void								Create(const ZEVector3& Position, const ZEQuaternion& Rotation,
 										float Width, float Height, float NearZ, float FarZ);

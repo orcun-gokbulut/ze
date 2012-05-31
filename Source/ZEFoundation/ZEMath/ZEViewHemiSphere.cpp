@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEViewHemiSphere.h"
-#include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZELight.h"
 
 ZEViewVolumeType ZEViewHemiSphere::GetViewVolumeType() const
 {
@@ -66,24 +64,7 @@ bool ZEViewHemiSphere::CullTest(const ZEOBBox& BoundingBox) const
 	return true;
 }
 
-bool ZEViewHemiSphere::CullTest(ZEEntity* Entity) const
-{
-	return CullTest(Entity->GetWorldBoundingBox());
-}
-
-bool ZEViewHemiSphere::CullTest(ZELight* Light) const
-{
-	if (Light->GetLightType() == ZE_LT_DIRECTIONAL)
-		return false;
-
-	ZEBSphere BoundingSphere;
-	BoundingSphere.Position = Light->GetWorldPosition();
-	BoundingSphere.Radius = Light->GetRange();
-
-	return CullTest(BoundingSphere);
-}
-
-bool ZEViewHemiSphere::CullTest(const ZERectangle3D& PortalDoor) const
+bool ZEViewHemiSphere::CullTest(const ZERectangle3D& Rectangle) const
 {
 	zeDebugCheck(true, "NOT IMPLEMENTED");
 	return false;

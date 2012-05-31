@@ -34,30 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_VIEWVIEWSPHERE_H__
-#define __ZE_VIEWVIEWSPHERE_H__
+#ifndef __ZE_VIEW_SPHERE_H__
+#define __ZE_VIEW_SPHERE_H__
 
 #include "ZEViewVolume.h"
 
 class ZEViewSphere : public ZEViewVolume
 {
-private:
-	ZEBSphere							Sphere;
-public: //Change to private
-	float								NearZ;
+	private:
+		ZEBSphere							Sphere;
+		float								NearZ;
 
-public:
-	virtual ZEViewVolumeType			GetViewVolumeType() const;
+	public:
+		virtual ZEViewVolumeType			GetViewVolumeType() const;
 
-	virtual bool						CullTest(const ZEBSphere& BoundingSphere) const;
-	virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
-	virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEBSphere& BoundingSphere) const;
+		virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
+		virtual bool						CullTest(const ZERectangle3D& Rectangle) const;
 
-	virtual bool						CullTest(ZELight* Light) const;
-	virtual bool						CullTest(ZEEntity* Entity) const;
-	virtual bool						CullTest(const ZERectangle3D& PortalDoor) const;
-
-	void								Create(const ZEVector3& Position, float Radius, float NearZ);
+		void								Create(const ZEVector3& Position, float Radius, float NearZ);
 };
 
 #endif

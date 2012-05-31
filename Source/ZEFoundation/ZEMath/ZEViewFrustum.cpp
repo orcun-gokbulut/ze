@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEViewFrustum.h"
-#include "ZEGame/ZEEntity.h"
 #include "ZEError.h"
-#include "ZEGraphics/ZELight.h"
+#include "ZEVector.h"
+#include "ZEQuaternion.h"
 #include "ZEMath.h"
 #include "ZEAngle.h"
 
@@ -281,31 +281,14 @@ const ZEVector3& ZEViewFrustum::GetUp() const
 	return Up;
 }
 
-bool ZEViewFrustum::CullTest(ZELight* Light) const
+bool ZEViewFrustum::CullTest(const ZERectangle3D& Rectangle) const
 {
-	if (Light->GetLightType() == ZE_LT_DIRECTIONAL)
-		return false;
-
-	ZEBSphere BoundingSphere;
-	BoundingSphere.Position = Light->GetWorldPosition();
-	BoundingSphere.Radius = Light->GetRange();
-
-	return CullTest(BoundingSphere);
-}
-
-bool ZEViewFrustum::CullTest(ZEEntity* Entity) const
-{
-	return CullTest(Entity->GetWorldBoundingBox());
-}
-
-bool ZEViewFrustum::CullTest(const ZERectangle3D& PortalDoor) const
-{
-	if ((ZERectangle3D::IntersectionTest(PortalDoor, NearClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZERectangle3D::IntersectionTest(PortalDoor, LeftClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZERectangle3D::IntersectionTest(PortalDoor, RightClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
-		(ZERectangle3D::IntersectionTest(PortalDoor, TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZERectangle3D::IntersectionTest(PortalDoor, FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZERectangle3D::IntersectionTest(PortalDoor, BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))
+	if ((ZERectangle3D::IntersectionTest(Rectangle, NearClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZERectangle3D::IntersectionTest(Rectangle, LeftClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZERectangle3D::IntersectionTest(Rectangle, RightClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZERectangle3D::IntersectionTest(Rectangle, TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZERectangle3D::IntersectionTest(Rectangle, FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZERectangle3D::IntersectionTest(Rectangle, BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))
 		return true;
 
 	return false;
