@@ -361,7 +361,7 @@ bool ZEJpegHuffmanDecoder::CreateDerivedTable(ZEUInt TableId, ZEJpegDerivedHuffm
 	ZEUInt HuffmanCode[257];
 	
 	if (/*TableId < 0 || */ TableId > ZE_JPEG_HUFF_TABLE_COUNT)
-		zeCriticalError("Wrong table id");
+		zeError("Wrong table id");
 
 	ZEJpegHuffmanTable* SourceTable = (IsDc) ? &Info->DCHuffmanTables[TableId] : &Info->ACHuffmanTables[TableId];
 	DerivedTable->OwnerHuffmanTable = SourceTable;
@@ -373,7 +373,7 @@ bool ZEJpegHuffmanDecoder::CreateDerivedTable(ZEUInt TableId, ZEJpegDerivedHuffm
 	{
 		I = SourceTable->Bits[L];
 		if (P + I > 256) 
-			zeCriticalError("Table Overrun");
+			zeError("Table Overrun");
 
 		while (I--)
 			HuffmanSize[P++] = (ZEInt8)L;
@@ -458,7 +458,7 @@ bool ZEJpegHuffmanDecoder::CreateDerivedTable(ZEUInt TableId, ZEJpegDerivedHuffm
 			ZEInt Sym = SourceTable->HuffmanValues[I];
 
 			if (Sym < 0 || Sym > 15)
-				zeCriticalError("Wrong table generation..");
+				zeError("Wrong table generation..");
 		}
 	}
 
@@ -480,7 +480,7 @@ bool ZEJpegHuffmanDecoder::MCUDecodeDcFirstTime(ZEJpegMcu* McuData)
 	{
 		ZEJpegDataBlock* Block = &McuData->McuData[BlockN];
 		ZESize Member = (ZESize)Info->MCUMembership[BlockN];
-		ZEJpegComponentInfo* Component = Info->CurrentCompInfo[Member];
+		ZEJpegComponentInfo* Component = Info->OrederedCompInfo[Member];
 		ZEJpegDerivedHuffmanTable* DerivedDecodeTable = DerivedTables[Component->DcTableNo];
 
 		ZEInt32 ReadBits = 0;
@@ -778,8 +778,6 @@ bool ZEJpegHuffmanDecoder::MCUDecodeAcRefine(ZEJpegMcu* McuData)
 // Full size MCU block decoding, uses the precalculated tables
 bool ZEJpegHuffmanDecoder::MCUDecodeFullBlock(ZEJpegMcu* McuData)
 {
-	// static ZEUInt MCUCount = 1;
-
 	if (Info->RestartInterval != 0)
 		if (McusLeftToRestart == 0)
 			STOPPROCESS(Restart());
@@ -906,36 +904,6 @@ bool ZEJpegHuffmanDecoder::MCUDecodeFullBlock(ZEJpegMcu* McuData)
 	}
 
 	McusLeftToRestart--;
-	
-	/*
-	FILE* File = fopen("ZEMCUDATA.txt", "a");
-
-	fprintf(File, "*********************\n");
-	fprintf(File, "MCU %d - Start\n", MCUCount);
-	fprintf(File, "*********************\n");
-
-	for (ZESize BlockN = 0; BlockN < Info->DctBlocksPerMCU; ++BlockN)
-	{
-	ZEJpegDataBlock* Block = &McuData->McuData[BlockN];
-
-	fprintf(File, "\n");
-	fprintf(File, "---------------------\n");
-	fprintf(File, "Block %d - Start\n", BlockN);
-	fprintf(File, "---------------------\n");
-
-	fprintf(File, "\n");
-	for (ZESize Coef = 0; Coef < 64; ++Coef)
-	{
-	fprintf(File, "%d\n", Block->BlockData[Coef]);
-	}
-	fprintf(File, "\n");
-
-	}
-	fflush(File);
-	fclose(File);
-	
-	MCUCount ++;
-	*/
 	
 	return true;
 }
@@ -1095,7 +1063,7 @@ void ZEJpegHuffmanDecoder::Initialize(ZEJpegDeCompressionInfo* Info, ZEJpegFileM
 			// Spectral selection end cannot be zero
 			if (Info->SpectralSelectionEnd != 0)
 			{
-				zeCriticalError("Wrong Input parameter for decompressor");
+				zeError("Wrong Input parameter for decompressor");
 			}
 		}
 		else
@@ -1104,13 +1072,13 @@ void ZEJpegHuffmanDecoder::Initialize(ZEJpegDeCompressionInfo* Info, ZEJpegFileM
 			if (Info->SpectralSelectionEnd < Info->SpectralSelectionStart ||
 				Info->SpectralSelectionEnd > Info->SpectralSelectionEndLimit)
 			{
-				zeCriticalError("Wrong Input parameter for decompressor");
+				zeError("Wrong Input parameter for decompressor");
 			}
 
 			// There have to be only 1 component per scan
 			if (Info->ComponentsInScan != 1)
 			{
-				zeCriticalError("Wrong Input parameter for decompressor");
+				zeError("Wrong Input parameter for decompressor");
 			}
 		}
 
@@ -1118,18 +1086,18 @@ void ZEJpegHuffmanDecoder::Initialize(ZEJpegDeCompressionInfo* Info, ZEJpegFileM
 		{
 			if (Info->ApproxBitPosLow != Info->ApproxBitPosHigh - 1)
 			{
-				zeCriticalError("Wrong Input parameter for decompressor");
+				zeError("Wrong Input parameter for decompressor");
 			}
 		}
 
 		if (Info->ApproxBitPosLow > 13)
 		{
-			zeCriticalError("Wrong Input parameter for decompressor");
+			zeError("Wrong Input parameter for decompressor");
 		}
 
 		for (ZESize	I = 0; I < Info->ComponentsInScan; I++)
 		{
-			ZEUInt8 CurCompIndex = Info->CurrentCompInfo[I]->ComponentIndex;
+			ZEUInt8 CurCompIndex = Info->OrederedCompInfo[I]->ComponentIndex;
 			ZEInt* CoefBit = &Info->CoefficientBits[CurCompIndex][0];
 
 			for (ZESize Coeff = (ZESize)Info->SpectralSelectionStart; Coeff <= (ZESize)Info->SpectralSelectionEnd; ++Coeff)
@@ -1137,7 +1105,7 @@ void ZEJpegHuffmanDecoder::Initialize(ZEJpegDeCompressionInfo* Info, ZEJpegFileM
 					ZEInt Expected = (CoefBit[Coeff] < 0) ? 0 : CoefBit[Coeff];
 					if (Info->ApproxBitPosHigh != Expected)
 					{
-						zeCriticalError("Wrong Input parameter for decompressor");
+						zeError("Wrong Input parameter for decompressor");
 					}
 					CoefBit[Coeff] = Info->ApproxBitPosLow;
 			}
@@ -1169,7 +1137,7 @@ void ZEJpegHuffmanDecoder::Initialize(ZEJpegDeCompressionInfo* Info, ZEJpegFileM
 
 		for (ZESize I = 0; I < Info->ComponentsInScan; ++I)
 		{
-			ZEJpegComponentInfo* ComponentInfo = Info->CurrentCompInfo[I];
+			ZEJpegComponentInfo* ComponentInfo = Info->OrederedCompInfo[I];
 
 			if (Info->SpectralSelectionStart == 0)
 			{
@@ -1191,7 +1159,7 @@ void ZEJpegHuffmanDecoder::Initialize(ZEJpegDeCompressionInfo* Info, ZEJpegFileM
 	{
 		if (Info->SpectralSelectionStart != 0 || Info->ApproxBitPosHigh != 0 || Info->ApproxBitPosLow != 0 ||
 			((Info->IsBaseLine || Info->SpectralSelectionEnd < ZE_JPEG_DCT_BLOCK_COEFF_COUNT) && Info->SpectralSelectionEnd != Info->SpectralSelectionEndLimit))
-			zeCriticalError("Wong SOS aprameters for baseline decompression");
+			zeError("Wong SOS aprameters for baseline decompression");
 
 		if (Info->SpectralSelectionEnd != ZE_JPEG_DCT_BLOCK_COEFF_COUNT - 1)
 		{
@@ -1204,7 +1172,7 @@ void ZEJpegHuffmanDecoder::Initialize(ZEJpegDeCompressionInfo* Info, ZEJpegFileM
 
 		for (ZESize I = 0; I < Info->ComponentsInScan; ++I)
 		{
-			ZEJpegComponentInfo* ComponentInfo = Info->CurrentCompInfo[I];
+			ZEJpegComponentInfo* ComponentInfo = Info->OrederedCompInfo[I];
 			CreateDerivedTable(ComponentInfo->DcTableNo, &DerivedDcTables[ComponentInfo->DcTableNo], true);
 			
 			if (Info->SpectralSelectionEndLimit != 0)
@@ -1216,7 +1184,7 @@ void ZEJpegHuffmanDecoder::Initialize(ZEJpegDeCompressionInfo* Info, ZEJpegFileM
 		// Precalculate decoding info for each block in an MCU of this scan
 		for (ZESize BlockI = 0; BlockI < (ZESize)Info->DctBlocksPerMCU; ++BlockI)
 		{
-			ZEJpegComponentInfo* ComponentInfo = Info->CurrentCompInfo[Info->MCUMembership[BlockI]];
+			ZEJpegComponentInfo* ComponentInfo = Info->OrederedCompInfo[Info->MCUMembership[BlockI]];
 			
 			// Precalculate which table to use for each block
 			CurrentDcTables[BlockI] = &DerivedDcTables[ComponentInfo->DcTableNo];

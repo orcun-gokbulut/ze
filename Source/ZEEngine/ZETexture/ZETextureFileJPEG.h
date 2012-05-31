@@ -40,28 +40,16 @@
 
 #include "ZETypes.h"
 #include "ZETextureFile.h"
-#include "ZETextureFileJPEGCommonDefinitions.h"
-
-#include "ZETextureFileJPEGMarkerReader.h"
-#include "ZETextureFileJPEGMainController.h"
 
 class ZETextureData;
 
 class ZETextureFileJpeg : public ZETextureFile
 {
 	private:
-		
-		ZEJpegDeCompressionInfo 		DecompInfo;
-		
-		ZEJpegFileMarkerReader*			MarkerReader;
-		ZEJpegMainController*			MainController;
 
 	public:
 										ZETextureFileJpeg();
 		virtual							~ZETextureFileJpeg();
-
-
-
 
 		virtual bool					LoadInfo(ZETextureDataInfo* Info, ZEFile* File);
 		virtual ZETextureData*			Load(ZEFile* File);

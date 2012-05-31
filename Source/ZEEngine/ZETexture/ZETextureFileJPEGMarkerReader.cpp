@@ -68,13 +68,13 @@ _inline bool ZEJpegFileMarkerBuffer::FillBuffer(bool ForceFill)
 		// Confirm that the remaining data is less than ZE_JPEG_INPUT_BUFFER_SIZE
 		if (Size >= ZE_JPEG_INPUT_BUFFER_SIZE)
 		{
-			zeCriticalError("Cannot read the jpeg file...");
+			zeError("Cannot read the jpeg file...");
 			return false;
 		}
 
 		if (ImageFile->Read(Buffer + (ZE_JPEG_INPUT_BUFFER_SIZE - Size), Size, 1) != 1)
 		{
-			zeCriticalError("Cannot read the jpeg file...");
+			zeError("Cannot read the jpeg file...");
 			return false;
 		}
 
@@ -206,7 +206,7 @@ bool ZEJpegFileMarkerBuffer::RewindOneByte()
 		// Go to previous buffer start position
 		if (!ImageFile->Seek(-2 * (ZESSize)BytesRead, ZE_SF_CURRENT))
 		{
-			zeCriticalError("Cannot read jpeg data");
+			zeError("Cannot read jpeg data");
 			return false;
 		}
 		
@@ -311,7 +311,7 @@ void ZEJpegFileMarkerBuffer::Initialize(ZEFile* ImageFile)
 {
 	if (ImageFile != NULL && !ImageFile->IsOpen())
 	{
-		zeCriticalError("Jpeg file is not open");
+		zeError("Jpeg file is not open");
 		return;
 	}
 
@@ -401,11 +401,11 @@ bool ZEJpegFileMarkerReader::ProcessAPP0Marker()
 		}
 
 		Info->JFIFMarkerFound = true;
-// 		Info->JFIFVersionMajor = App0Data[5];
-// 		Info->JFIFVersionMinor = App0Data[6];
-// 		Info->DensityUnit = App0Data[7];
-// 		Info->DensityX = (App0Data[8] << 8) + App0Data[9];
-// 		Info->DensityY = (App0Data[10] << 8) + App0Data[11];
+		// Info->JFIFVersionMajor = App0Data[5];
+		// Info->JFIFVersionMinor = App0Data[6];
+		// Info->DensityUnit = App0Data[7];
+		// Info->DensityX = (App0Data[8] << 8) + App0Data[9];
+		// Info->DensityY = (App0Data[10] << 8) + App0Data[11];
 
 		// Always discard thumbnail data
 	}
@@ -489,7 +489,7 @@ bool ZEJpegFileMarkerReader::ProcessSOFMarker(bool BaseLine, bool Progressive)
 
 	if (SOFFound)
 	{
-		zeCriticalError("Duplicate SOF marker found.");
+		zeError("Duplicate SOF marker found.");
 		return false;
 	}
 
@@ -510,24 +510,24 @@ bool ZEJpegFileMarkerReader::ProcessSOFMarker(bool BaseLine, bool Progressive)
 	MarkerBuffer->GetOneByte(DataPrecision);
 	if (DataPrecision != 8)
 	{
-		zeCriticalError("Only jepg files with 8 bit data precision are supported.");
+		zeError("Only jepg files with 8 bit data precision are supported.");
 		return false;
 	}
 
-	MarkerBuffer->GetTwoByte(Info->ImageHeight);
-	MarkerBuffer->GetTwoByte(Info->ImageWidth);
-	MarkerBuffer->GetOneByte(Info->ComponentCount);
+	MarkerBuffer->GetTwoByte((ZEUInt16&)Info->ImageHeight);
+	MarkerBuffer->GetTwoByte((ZEUInt16&)Info->ImageWidth);
+	MarkerBuffer->GetOneByte((ZEUInt8&)Info->ComponentCount);
 	SOFDataLenght -= 6;
 
 	if (Info->ImageHeight == 0 || Info->ImageWidth == 0 || Info->ComponentCount == 0)
 	{
-		zeCriticalError("Image width, height or component count is invalid.");
+		zeError("Image width, height or component count is invalid.");
 		return false;
 	}
 
 	if (SOFDataLenght != Info->ComponentCount * 3)
 	{
-		zeCriticalError("Wrong data lenght.");
+		zeError("Wrong data lenght.");
 		return false;
 	}
 
@@ -561,7 +561,7 @@ bool ZEJpegFileMarkerReader::ProcessSOSMarker()
 	// Return if SOF not found
 	if (!SOFFound)
 	{
-		zeCriticalError("SOF marker not found");
+		zeError("SOF marker not found");
 		return false;
 	}
 
@@ -571,7 +571,7 @@ bool ZEJpegFileMarkerReader::ProcessSOSMarker()
 	/* pseudo SOS marker only allowed in progressive mode */
 	if (DataLenght != (ScanCompCount * 2 + 6) || ScanCompCount > ZE_JPEG_MAX_COMPONENTS_IN_SCAN || (ScanCompCount == 0 && !Info->IsProgressive))
 	{
-		zeCriticalError("Unexpected data in SOS marker.");
+		zeError("Unexpected data in SOS marker.");
 		return false;
 	}
 
@@ -589,7 +589,7 @@ bool ZEJpegFileMarkerReader::ProcessSOSMarker()
 			if (ComponentSelector == Info->ComponentInfo[J].ComponentId)
 			{
 
-				Info->CurrentCompInfo[I] = &Info->ComponentInfo[J];
+				Info->OrederedCompInfo[I] = &Info->ComponentInfo[J];
 
 				Info->ComponentInfo[J].DcTableNo = (AcDcTableSelector >> 4) & 0x0F; // Get most significant 4 bits
 				Info->ComponentInfo[J].AcTableNo = AcDcTableSelector & 0x0F;		// Get least significant 4 bits
@@ -621,7 +621,7 @@ bool ZEJpegFileMarkerReader::ProcessDHTMarker()
 	ZEUInt16 DataLenght = 0;
 	ZEUInt8 Index = 0;
 	ZESize Count = 0;
-	ZEUInt8 Bits[17] = {0};
+	ZEUInt Bits[17] = {0};
 	ZEUInt8 HuffmanValues[256] = {0};
 	ZEJpegHuffmanTable* TargetTable = NULL;
 
@@ -636,7 +636,7 @@ bool ZEJpegFileMarkerReader::ProcessDHTMarker()
 		Count = 0;
 		for (ZESize I = 1; I <= 16; ++I)
 		{
-			MarkerBuffer->GetOneByte(Bits[I]);
+			MarkerBuffer->GetOneByte((ZEUInt8&)Bits[I]);
 			Count += Bits[I];
 		}
 
@@ -644,7 +644,7 @@ bool ZEJpegFileMarkerReader::ProcessDHTMarker()
 
 		if (Count > 256 || (ZEUInt16)Count > DataLenght)
 		{
-			zeCriticalError("DHT marker data is not correct.");
+			zeError("DHT marker data is not correct.");
 			return false;
 		}
 
@@ -666,20 +666,20 @@ bool ZEJpegFileMarkerReader::ProcessDHTMarker()
 
 		if (Index > ZE_JPEG_HUFF_TABLE_COUNT)
 		{
-			zeCriticalError("There are more huffman tables than four.");
+			zeError("There are more huffman tables than four.");
 			return false;
 		}
 
 		// Copy Huffman table data to destination
-		memcpy(TargetTable->Bits, Bits, 17);
-		memcpy(TargetTable->HuffmanValues, HuffmanValues, Count/*256*/);
+		memcpy(TargetTable->Bits, Bits, 17 * sizeof (ZEUInt));
+		memcpy(TargetTable->HuffmanValues, HuffmanValues, Count * sizeof (ZEUInt8));
 
 	}
 
 	// Data length should be zero
 	if (DataLenght != 0)
 	{
-		zeCriticalError("Extra data found in DHT marker");
+		zeError("Extra data found in DHT marker");
 		return false;
 	}
 
@@ -712,7 +712,7 @@ bool ZEJpegFileMarkerReader::ProcessDQTMarker()
 
 		if (TableIdentifier > ZE_JPEG_QUANT_TABLE_COUNT)
 		{
-			zeCriticalError("More quantization tables than standard amount.");
+			zeError("More quantization tables than standard amount.");
 			return false;
 		}
 
@@ -777,7 +777,7 @@ bool ZEJpegFileMarkerReader::ProcessDQTMarker()
 
 	if (DataLenght != 0)
 	{
-		zeCriticalError("Unexpected data lenght in DQT marker");
+		zeError("Unexpected data lenght in DQT marker");
 		return false;
 	}
 
@@ -794,7 +794,7 @@ bool ZEJpegFileMarkerReader::ProcessDRIMarker()
 
 	if (DataLenght != 4)
 	{
-		zeCriticalError("Wrong DRI Marker data size");
+		zeError("Wrong DRI Marker data size");
 		return false;
 	}
 
@@ -898,7 +898,7 @@ bool ZEJpegFileMarkerReader::ReadMarkers(ZEJpegFileMarker& StoppedAt)
 			case ZE_JPG_FM_SOF14:	// Differential progressive, arithmetic
 			case ZE_JPG_FM_SOF15:	// Differential lossless, arithmetic
 			{
-				zeCriticalError("Arithmetic entropy encoding is not supported");
+				zeError("Arithmetic entropy encoding is not supported");
 
 				// Continue reading markers
 				break;
@@ -911,7 +911,7 @@ bool ZEJpegFileMarkerReader::ReadMarkers(ZEJpegFileMarker& StoppedAt)
 			case ZE_JPG_FM_SOF6:	// Differential lossless, Huffman
 			case ZE_JPG_FM_SOF7:	// Reserved for JPEG extensions
 			{
-				zeCriticalError("Lossless or Differential encoding is not supported");
+				zeError("Lossless or Differential encoding is not supported");
 
 				// Continue reading markers
 				break;
@@ -1043,7 +1043,7 @@ bool ZEJpegFileMarkerReader::ReadMarkers(ZEJpegFileMarker& StoppedAt)
 
 			default:	// Remaining markers are reserved ones: DHP, EXP, JPGn, or RESn. They should not appear in Jpeg file
 			{
-				zeCriticalError("Reserved marker found in jpeg file. Behaviour is not defined.");
+				zeError("Reserved marker found in jpeg file. Behaviour is not defined.");
 				break;
 			}
 
@@ -1081,8 +1081,7 @@ ZEJpegFileMarkerBuffer* ZEJpegFileMarkerReader::GetMarkerBuffer() const
 
 void ZEJpegFileMarkerReader::Initialize(ZEFile* ImageFile, ZEJpegDeCompressionInfo* Info)
 {
-	zeDebugCheck(MarkerBuffer != NULL || this->ImageFile != NULL, "MarkerReader is already initialized.");
-	zeDebugCheck(ImageFile == NULL || Info == NULL, "Function call with null pointer");
+	zeDebugCheck(ImageFile == NULL || Info == NULL, "Null pointer...");
 	zeDebugCheck(!ImageFile->IsOpen(), "Jpeg file is not open.");
 	
 	this->Info = Info;

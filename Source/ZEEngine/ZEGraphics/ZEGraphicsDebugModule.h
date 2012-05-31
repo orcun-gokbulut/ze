@@ -39,12 +39,19 @@
 
 #include "ZECore/ZEApplicationModule.h"
 
-
+class ZEGrid;
+class ZEGizmo;
+class ZEPlayer;
+class ZESteeringPlayerFree;
 
 class ZEGraphicsDebugModule : public ZEApplicationModule
 {
 	private:
-		
+		ZEGrid*						Grid;
+		ZEGizmo*					Gizmo;
+		ZEPlayer*					Player;
+		ZESteeringPlayerFree*		PlayerSteering;
+
 
 	public:
 		virtual bool				Initialize();

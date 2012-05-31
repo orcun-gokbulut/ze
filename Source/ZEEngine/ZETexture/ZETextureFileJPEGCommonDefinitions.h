@@ -97,6 +97,7 @@
 #define ZE_JPEG_QUANT_TABLE_COUNT			4
 #define ZE_JPEG_HUFF_TABLE_COUNT			4
 #define ZE_JPEG_MAX_SAMPLING_FACTOR			4
+#define ZE_JPEG_MIN_SAMPLING_FACTOR			1
 #define ZE_JPEG_MAX_COMPONENTS_IN_SCAN		4
 #define ZE_JPEG_DCT_BLOCK_DIMENSION			(ZESize)8
 #define ZE_JPEG_DCT_BLOCK_COEFF_COUNT		64
@@ -403,7 +404,7 @@ struct ZEJpegHuffmanTable
 {
 	bool				Output;
 
-	ZEUInt8				Bits[17];				// Number of symbols encoded using the indexed bit
+	ZEUInt				Bits[17];				// Number of symbols encoded using the indexed bit
 	ZEUInt8				HuffmanValues[256];		// Symbols in the increasing code length
 
 };
@@ -426,8 +427,8 @@ struct ZEJpegComponentInfo
 	bool						ComponentValueNeeded;	// Will component be used
 	ZEUInt8						ComponentIndex;			// Index of the component
 	ZEUInt8						ComponentId;			// Id of the component, does not have to be arbitrary
-	ZEUInt8						HorizontalFreq;			// Horizontal Sampling Frequency
-	ZEUInt8						VerticalFreq;			// Vertical Sampling Frequency
+	ZEUInt						HorizontalFreq;			// Horizontal Sampling Frequency
+	ZEUInt						VerticalFreq;			// Vertical Sampling Frequency
 	ZEUInt8						QuantizationTableNo;	// Quantization table no to use while decoding
 	ZEUInt						MCUWidthInBlocks;		// Dummy blocks are not counted
 	ZEUInt						MCUHeightInBlocks;		// Dummy blocks are not counted
@@ -451,9 +452,9 @@ struct ZEJpegDeCompressionInfo
 	void*						OutputData;
 	ZESize						OutputPitch;
 	ZESize						OutputPixelSize;
-	ZEUInt16					ImageWidth;										// Image width
-	ZEUInt16					ImageHeight;									// Image height
-	ZEUInt8						ComponentCount;									// Component count of image
+	ZEUInt						ImageWidth;										// Image width
+	ZEUInt						ImageHeight;									// Image height
+	ZEUInt						ComponentCount;									// Component count of image
 	ZEJpegColorSpace			InputColorSpace;								// Input color space
 	ZEJpegColorSpace			OutputColorSpace;								// Output color space
 	ZEUInt						SeenSosCount;									// Sos marker count
@@ -464,25 +465,29 @@ struct ZEJpegDeCompressionInfo
 	ZEUInt						RestartInterval;								// MCU count per restart interval, or 0 for no restart
 	bool						JFIFMarkerFound;
 	bool						AdobeMarkerFound;
-	ZEUInt8						AdobeTransform;									// Color transform code
-	ZEUInt8						MaxHorzSampleFactor;							// Used in upsampler
-	ZEUInt8						MaxVertSampleFactor;							// Used in upsampler
-	ZEUInt8						ComponentsInScan;								// Component Count in scan
+	ZEUInt						AdobeTransform;									// Color transform code
+	ZEUInt						MaxHorzSampleFactor;							// Used in upsampler
+	ZEUInt						MaxVertSampleFactor;							// Used in upsampler
+	ZEUInt						MinHorzSampleFactor;
+	ZEUInt						MinVertSampleFactor;
+	ZEUInt						ComponentsInScan;								// Component Count in scan
 	ZEUInt						MCUCountPerRow;									// MCU count in image width
 	ZEUInt						MCURowCountInImage;								// MCU row count in image
-	ZEInt						DctBlocksPerMCU;								// Block count in an MCU
-	ZEInt						SpectralSelectionStart;							// Ss
-	ZEInt						SpectralSelectionEnd;							// Se
-	ZEInt						ApproxBitPosHigh;								// Ah
-	ZEInt						ApproxBitPosLow;								// Al
-	ZEInt						DctBlockSize;									// 1 to 16 in width and height
+	ZEUInt						MCUWidthInPixels;								// Width of the up sampled MCU in pixels
+	ZEUInt						MCUHeightInPixels;								// Width of the up sampled MCU in pixels
+	ZEUInt						DctBlocksPerMCU;								// Block count in an MCU
+	ZEUInt						SpectralSelectionStart;							// Ss
+	ZEUInt						SpectralSelectionEnd;							// Se
+	ZEUInt						ApproxBitPosHigh;								// Ah
+	ZEUInt						ApproxBitPosLow;								// Al
+	ZEUInt						DctBlockSize;									// 1 to 16 in width and height
 	const ZESize*				NaturalOrderPosArray;							// ZigZag to natural array conversion table
-	ZEInt						SpectralSelectionEndLimit;						// min( SpectralSelectionEnd, ZE_JPEG_DCT_BLOCK_COEFF_COUNT-1 ) for entropy decode
-	ZEInt						MCUMembership[ZE_JPEG_MAX_BLOCKS_IN_MCU];		// Tells which block is owned by which component
+	ZEUInt						SpectralSelectionEndLimit;						// min( SpectralSelectionEnd, ZE_JPEG_DCT_BLOCK_COEFF_COUNT-1 ) for entropy decode
+	ZEUInt						MCUMembership[ZE_JPEG_MAX_BLOCKS_IN_MCU];		// Tells which block is owned by which component
 	ZEJpegHuffmanTable			ACHuffmanTables[ZE_JPEG_HUFF_TABLE_COUNT];		// AC Huffman Tables
 	ZEJpegHuffmanTable			DCHuffmanTables[ZE_JPEG_HUFF_TABLE_COUNT];		// DC Huffman Tables
 	ZEJpegQuantizationTable		QuantizationTables[ZE_JPEG_QUANT_TABLE_COUNT];	// Quantization Tables
-	ZEJpegComponentInfo*		CurrentCompInfo[ZE_JPEG_MAX_COMPONENTS_IN_SCAN];	// Component pointers in an ordered fashion
+	ZEJpegComponentInfo*		OrederedCompInfo[ZE_JPEG_MAX_COMPONENTS_IN_SCAN];	// Component pointers in an ordered fashion
 	ZEInt						CoefficientBits[ZE_JPEG_DCT_BLOCK_DIMENSION][ZE_JPEG_DCT_BLOCK_DIMENSION];	// Current Al value for each coefficient
 	ZEUInt8						SampleRangeLimit[5 * (ZE_JPEG_MAX_SAMPLE_VALUE + 1) + ZE_JPEG_MID_SAMPLE_VALUE]; // Range limiting for color conversion and idct process
 

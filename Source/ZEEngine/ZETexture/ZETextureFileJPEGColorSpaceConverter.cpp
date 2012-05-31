@@ -394,7 +394,7 @@ void ZEJpegColorSpaceConverter::Initialize(ZEJpegDeCompressionInfo* Info)
 
 void ZEJpegColorSpaceConverter::Deinitialize()
 {
-	Convert = NULL;
+	//Convert = NULL;
 	Info = NULL;
 }
 
