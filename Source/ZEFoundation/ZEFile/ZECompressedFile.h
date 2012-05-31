@@ -57,13 +57,13 @@ class ZECompressedFile
 
 		virtual bool		Seek(ZEInt64 Offset, ZESeekFrom Origin);		
 
-		virtual ZEUInt64		Tell();										
+		virtual ZEUInt64	Tell();										
 
-		virtual ZEUInt64		Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);				
-		virtual ZEUInt64		Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count);	
+		virtual ZEUInt64	Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);				
+		virtual ZEUInt64	Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count);	
 		
 		static ZEUInt64		GetFileSize(const char* FileName);
-		virtual ZEUInt64		GetFileSize();
+		virtual ZEUInt64	GetFileSize();
 		
 		virtual void		Close();
 		virtual bool		Eof();
@@ -79,8 +79,8 @@ class ZECompressedFile
 class ZEPartialCompressedFile : public ZECompressedFile
 {
 	protected:
-		ZEUInt64				StartPosition;
-		ZEUInt64				EndPosition;
+		ZEUInt64			StartPosition;
+		ZEUInt64			EndPosition;
 		bool				IsEof;
 		ZECompressedFile*	BaseFile;
 
@@ -89,13 +89,13 @@ class ZEPartialCompressedFile : public ZECompressedFile
 		virtual bool		Open(const char* FileName, ZEFileMode Mode, bool Binary);
 		virtual void		Close();
 
-		virtual ZEUInt64		Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
-		virtual ZEUInt64		Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
+		virtual ZEUInt64	Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
+		virtual ZEUInt64	Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
 
 		virtual bool		Seek(ZEInt64 Offset, ZESeekFrom Origin);
-		virtual ZEUInt64		Tell();
+		virtual ZEUInt64	Tell();
 
-		virtual ZEUInt64		GetFileSize();
+		virtual ZEUInt64	GetFileSize();
 		virtual bool		Eof();				
 
 							ZEPartialCompressedFile();

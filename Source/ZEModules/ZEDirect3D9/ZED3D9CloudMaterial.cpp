@@ -450,21 +450,21 @@ void ZED3D9CloudMaterial::CreateRenderTargets()
 	{
 		CloudShadowBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 		Result = CloudShadowBuffer->Create(ZE_CLOUD_SHADOW_BUFFER_WIDTH, ZE_CLOUD_SHADOW_BUFFER_HEIGHT, 1, ZE_TPF_I8_4, true);
-		zeAssert(!Result, "Cannot Create ZED3D9Texture2D: \"CloudShadowBuffer at ZED3D9CloudMaterial\".");
+		zeDebugCheck(!Result, "Cannot Create ZED3D9Texture2D: \"CloudShadowBuffer at ZED3D9CloudMaterial\".");
 	}
 	
 	if(CloudDensityBuffer == NULL)
 	{
 		CloudDensityBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 		Result = CloudDensityBuffer->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
-		zeAssert(!Result, "Cannot Create ZED3D9Texture2D: \"CloudDensityBuffer at ZED3D9CloudMaterial\".");
+		zeDebugCheck(!Result, "Cannot Create ZED3D9Texture2D: \"CloudDensityBuffer at ZED3D9CloudMaterial\".");
 	}
 
 	if(CloudDensityBlurBuffer == NULL)
 	{
 		CloudDensityBlurBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 		Result = CloudDensityBlurBuffer->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
-		zeAssert(!Result, "Cannot Create ZED3D9Texture2D: \"CloudDensityBlurBuffer at ZED3D9CloudMaterial\".");
+		zeDebugCheck(!Result, "Cannot Create ZED3D9Texture2D: \"CloudDensityBlurBuffer at ZED3D9CloudMaterial\".");
 	}
 }
 

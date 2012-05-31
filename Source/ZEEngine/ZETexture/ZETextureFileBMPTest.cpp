@@ -157,8 +157,8 @@ ZETestSuite(ZETextureFileBMPTest)
 
 	ZETest("Corrupted or Malicius")
 	{
-		ZEErrorType OldErrorLevel = ZEError::GetErrorOutputLevel();
-		ZEError::SetErrorOutputLevel(ZE_ET_CRITICAL_ERROR);
+		ZELogType OldLogType = ZELog::GetInstance()->GetMinimumLogLevel();
+		ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_CRITICAL_ERROR);
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-no-palette.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-pixeldata-cropped.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/24bpp-pixeldata-cropped.bmp"));
@@ -208,13 +208,13 @@ ZETestSuite(ZETextureFileBMPTest)
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/width-negative.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/width-times-height-overflow.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/width-zero.bmp"));
-		ZEError::SetErrorOutputLevel(OldErrorLevel);
+		ZELog::GetInstance()->SetMinimumLogLevel(OldLogType);
 	}
 
 	ZETest("Unsupported Sample Types")
 	{
-		ZEErrorType OldErrorLevel = ZEError::GetErrorOutputLevel();
-		ZEError::SetErrorOutputLevel(ZE_ET_CRITICAL_ERROR);
+		ZELogType OldLogType = ZELog::GetInstance()->GetMinimumLogLevel();
+		ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_CRITICAL_ERROR);
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Valid/Unsupported/filesize-bad.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Valid/Unsupported/filesize-zero.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Valid/Unsupported/pixeldata-toomuch.bmp"));
@@ -258,6 +258,6 @@ ZETestSuite(ZETextureFileBMPTest)
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/rle4-encoded-320x240.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/rle4-height-negative.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/rle4-no-end-of-bitmap-marker.bmp"));
-		ZEError::SetErrorOutputLevel(OldErrorLevel);
+		ZELog::GetInstance()->SetMinimumLogLevel(OldLogType);
 	}
 }

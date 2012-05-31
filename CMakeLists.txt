@@ -37,32 +37,6 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Zinek)
 
-## Version
-#########################################################################################
-file(READ "${CMAKE_SOURCE_DIR}/Version.txt" VERSION_STRING)
-
-set(ZEBUILD_VERSION_MAJOR 0)
-string(REGEX REPLACE "^[ \\t\\r\\n]*Version[ \\t]*:[ \\t]*([0-9]+).*" "\\1" ZEBUILD_VERSION_MAJOR "${VERSION_STRING}")
-
-set(ZEBUILD_VERSION_MINOR 0)
-string(REGEX REPLACE "^[ \\t\\r\\n]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*([0-9]+).*" "\\1" ZEBUILD_VERSION_MINOR "${VERSION_STRING}")
-
-set(ZEBUILD_VERSION_INTERNAL 0)
-string(REGEX REPLACE "^[ \\t\\r\\n]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*[0-9]+\\.[ \\t]*([0-9]+).*" "\\1" ZEBUILD_VERSION_INTERNAL "${VERSION_STRING}")
-
-set (ZEBUILD_VERSION_BUILD "0")
-include(FindSubversion)
-Subversion_WC_INFO(${CMAKE_SOURCE_DIR} SVN_INFO)
-set(ZEBUILD_VERSION_BUILD ${SVN_INFO_WC_REVISION})
-
-message(STATUS "[ZEBuild] Version                 : " "v${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}.${ZEBUILD_VERSION_INTERNAL} Build ${ZEBUILD_VERSION_BUILD}")
-message(STATUS "[ZEBuild] Major Version           : " ${ZEBUILD_VERSION_MAJOR})
-message(STATUS "[ZEBuild] Minor Version           : " ${ZEBUILD_VERSION_MINOR})
-message(STATUS "[ZEBuild] Internal Version        : " ${ZEBUILD_VERSION_INTERNAL})
-message(STATUS "[ZEBuild] Build                   : " ${ZEBUILD_VERSION_BUILD})
-message(STATUS "")
-
-
 ## CMake Configuration & Initialization
 #########################################################################################
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -70,21 +44,40 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
 
 include(build_dir_check)
 include(parse_arguments)
-include(append_property)
 include(ze_functions)
 
-macro_ensure_out_of_source_build ("${PROJECT_NAME} requires an out of source build.")
+macro_ensure_out_of_source_build("[ZEBuild] Error : Project requires an out of source build.")
+
+
+## Version
+#########################################################################################
+message(STATUS "[ZEBuild] Collecting version information...")
+
+ze_get_version(${CMAKE_SOURCE_DIR})
+ze_get_version_revision_number(${CMAKE_SOURCE_DIR})
+
+set(ZEBUILD_VERSION_MAJOR ${VERSION_MAJOR})
+set(ZEBUILD_VERSION_MINOR ${VERSION_MINOR})
+set(ZEBUILD_VERSION_INTERNAL ${VERSION_INTERNAL})
+set(ZEBUILD_VERSION_BUILD ${VERSION_REVISION})
+message(STATUS "[ZEBuild] Version information has been collected.")
+message(STATUS "")
+
+message(STATUS "[ZEBuild] Version           : " "v${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}.${ZEBUILD_VERSION_INTERNAL} Build ${ZEBUILD_VERSION_BUILD}")
+message(STATUS "[ZEBuild] Major Version     : " ${ZEBUILD_VERSION_MAJOR})
+message(STATUS "[ZEBuild] Minor Version     : " ${ZEBUILD_VERSION_MINOR})
+message(STATUS "[ZEBuild] Internal Version  : " ${ZEBUILD_VERSION_INTERNAL})
+message(STATUS "[ZEBuild] Build             : " ${ZEBUILD_VERSION_BUILD})
+message(STATUS "")
+message(STATUS "")
 
 
 ## Platform Detection
 #########################################################################################
-message(STATUS "[ZEBuild] Detecting Platform.")
+message(STATUS "[ZEBuild] Detecting platform...")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(ZEBUILD_PLATFORM "Windows")
-elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	set(ZEBUILD_PLATFORM "MacOSX")
-	set(ZEBUILD_PLATFORM_UNIX)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	set(ZEBUILD_PLATFORM "Linux")
 	set(ZEBUILD_PLATFORM_UNIX)
@@ -140,13 +133,39 @@ if (IS_BIG_ENDIAN)
 else()
 	set(ZEBUILD_PLATFORM_ENDIANNESS "Little")
 endif()
+message(STATUS "[ZEBuild] Platform has been detected.")
+message(STATUS "")
 
-message(STATUS "[ZEBuild] Platform                : " ${ZEBUILD_PLATFORM})
-message(STATUS "[ZEBuild] Architecture            : " ${ZEBUILD_PLATFORM_ARCHITECTURE})
-message(STATUS "[ZEBuild] Word Size               : " ${ZEBUILD_PLATFORM_WORD_SIZE})
-message(STATUS "[ZEBuild] Endianness              : " ${ZEBUILD_PLATFORM_ENDIANNESS})
-message(STATUS "[ZEBuild] Compiler                : " ${ZEBUILD_PLATFORM_COMPILER})
-message(STATUS "[ZEBuild] Platform detected.")
+message(STATUS "[ZEBuild] Platform      : " ${ZEBUILD_PLATFORM})
+message(STATUS "[ZEBuild] Architecture  : " ${ZEBUILD_PLATFORM_ARCHITECTURE})
+message(STATUS "[ZEBuild] Word Size     : " ${ZEBUILD_PLATFORM_WORD_SIZE})
+message(STATUS "[ZEBuild] Endianness    : " ${ZEBUILD_PLATFORM_ENDIANNESS})
+message(STATUS "[ZEBuild] Compiler      : " ${ZEBUILD_PLATFORM_COMPILER})
+message(STATUS "")
+message(STATUS "")
+
+
+## Externals
+#########################################################################################
+message(STATUS "[ZEBUILD] Checking externals...")
+ze_check_externals("${CMAKE_SOURCE_DIR}/Platform" 0 0)
+if (CHECK_EXTERNALS_RESULT EQUAL 1) # Not found
+	message(SEND_ERROR "[ZEBuild] Error: Could not dectect externals. Please check Platforms directory that you have the external.")
+elseif (CHECK_EXTERNALS_RESULT EQUAL 2) # version Mismatch
+	message(SEND_ERROR "[ZEBuild] Error: Externals version is mismatched.")
+endif() 
+message(STATUS "[ZEBuild] Externals has been checked.")
+message(STATUS "")
+
+ze_get_version(${CMAKE_SOURCE_DIR})
+ze_get_version_revision_number(${CMAKE_SOURCE_DIR})
+
+message(STATUS "[ZEBuild] Externals Version             : " "v${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_INTERNAL} Build ${VERSION_BUILD}")
+message(STATUS "[ZEBuild] Externals Major Version       : " ${VERSION_MAJOR})
+message(STATUS "[ZEBuild] Externals Minor Version       : " ${VERSION_MINOR})
+message(STATUS "[ZEBuild] Externals Internal Version    : " ${VERSION_INTERNAL})
+message(STATUS "[ZEBuild] Externals Build               : " ${VERSION_BUILD})
+message(STATUS "")
 message(STATUS "")
 
 
@@ -157,7 +176,7 @@ string(TOUPPER ${ZEBUILD_PLATFORM_ARCHITECTURE} ZEBUILD_PLATFORM_ARCHITECTURE_UP
 string(TOUPPER ${ZEBUILD_PLATFORM_COMPILER} ZEBUILD_PLATFORM_COMPILER_UPPER_CASE)
 string(TOUPPER ${ZEBUILD_PLATFORM_ENDIANNESS} ZEBUILD_PLATFORM_ENDIANNESS_UPPER_CASE)
 
-append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
+ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
 	ZE_ZINEK
 	ZE_VERSION_MAJOR=${ZEBUILD_VERSION_MAJOR}
 	ZE_VERSION_MINOR=${ZEBUILD_VERSION_MINOR}
@@ -175,9 +194,9 @@ append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS
 	ZE_PLATFORM_WORD_SIZE ${ZE_BUILD_PLATFORM_WORD_SIZE})
 
 if (ZEBUILD_PLATFORM_UNIX)
-	append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ZE_PLATFORM_UNIX)
+	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ZE_PLATFORM_UNIX)
 elseif (ZEBUILD_PLATFORM_WINDOWS)
-	append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ZE_PLATFORM_WINDOWS)
+	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ZE_PLATFORM_WINDOWS)
 endif()
 
 
@@ -195,18 +214,18 @@ set(ZEBUILD_DEBUG_BREAK_ON_WARNING        FALSE CACHE BOOL "Break if an warning 
 set(ZEBUILD_VERBOSE	                      FALSE CACHE BOOL "Enable ZEBuild verbose mode.")
 
 if (ZEBUILD_DEBUG_ENABLE)
-	append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_ENABLE)
+	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_ENABLE)
 	
 	if (ZEBUILD_DEBUG_BREAK_ON_ERROR)
-		append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_BREAK_ON_ERROR)
+		ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_BREAK_ON_ERROR)
 	endif()
 
 	if (ZEBUILD_DEBUG_BREAK_ON_WARNING)
-		append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG _ZE_DEBUG_BREAK_ON_WARNING)
+		ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG _ZE_DEBUG_BREAK_ON_WARNING)
 	endif()
 
 	if (ZEBUILD_DEBUG_HEAP_CHECK_ENABLE)
-		append_property(GLOBAL PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_MEMORY_CHECKS_ENABLE)
+		ze_append_property(GLOBAL PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_MEMORY_CHECKS_ENABLE)
 	endif()
 endif()
 
@@ -246,7 +265,7 @@ if ("${ZEBUILD_PLATFORM_COMPILER}" EQUAL "MSVC")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
 	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG")
-	append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
 endif()
 
 

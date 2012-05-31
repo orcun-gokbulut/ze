@@ -61,6 +61,8 @@ ze_add_source(ZEEndian.h 			Sources Headers)
 ze_add_source(ZEEndian.cpp 			Sources)
 ze_add_source(ZEError.h 			Sources Headers)
 ze_add_source(ZEError.cpp 			Sources)
+ze_add_source(ZELog.h				Sources Headers)
+ze_add_source(ZELog.cpp				Sources)
 ze_add_source(ZEPacking.h 			Sources Headers)
 ze_add_source(ZEPacking.cpp 		Sources)
 ze_add_source(ZESerialPort.h 		Sources Headers)
@@ -71,7 +73,7 @@ ze_add_source(ZERandom.cpp 			Sources)
 ze_add_library(ZEFoundation 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket
+	LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket ZEThread
 	INSTALL
 	INSTALL_DESTINATION ZEFoundation
 	INSTALL_COMPONENT ZESDK)

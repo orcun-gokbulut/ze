@@ -75,7 +75,7 @@ const ZEArray<ZEState*>& ZEState::GetTransitions()
 
 bool ZEState::AddTransition(ZEState* State)
 {
-	zeAssert(State == NULL, "State cannot be NULL.");
+	zeDebugCheck(State == NULL, "State cannot be NULL.");
 
 	if (State == NULL)
 		return false;
@@ -95,7 +95,7 @@ bool ZEState::AddTransition(ZEState* State)
 
 bool ZEState::RemoveTransition(ZEState* State)
 {
-	zeAssert(State == NULL, "State cannot be NULL.");
+	zeDebugCheck(State == NULL, "State cannot be NULL.");
 
 	if (State == NULL)
 		return false;

@@ -47,7 +47,7 @@ void ZEJpegColorSpaceConverter::NoChange(void* OutputBuffer, void* InputBuffer)
 // Copies same single channel to the all channels of rgb buffer
 void ZEJpegColorSpaceConverter::GrayScaleToRgb(void* OutputBuffer, void* InputBuffer)
 {
-	zeAssert(OutputBuffer == NULL || InputBuffer == NULL, "Null pointer...");
+	zeDebugCheck(OutputBuffer == NULL || InputBuffer == NULL, "Null pointer...");
 
 	ZESize Width = Info->ImageWidth;
 	ZESize Height = Info->ImageHeight;
@@ -73,7 +73,7 @@ void ZEJpegColorSpaceConverter::GrayScaleToRgb(void* OutputBuffer, void* InputBu
 // Converts gray scale image to YCbCr by only copying Gray value into Y Component of destination
 void ZEJpegColorSpaceConverter::GrayScaleToYCbCr(void* OutputBuffer, void* InputBuffer)
 {
-	zeAssert(OutputBuffer == NULL || InputBuffer == NULL, "Null pointer...");
+	zeDebugCheck(OutputBuffer == NULL || InputBuffer == NULL, "Null pointer...");
 
 	ZESize Width = Info->ImageWidth;
 	ZESize Height = Info->ImageHeight;
@@ -97,7 +97,7 @@ void ZEJpegColorSpaceConverter::GrayScaleToYCbCr(void* OutputBuffer, void* Input
 // Converts rgb source image to Gray Scale image
 void ZEJpegColorSpaceConverter::RgbToGrayScale(void* OutputBuffer, void* InputBuffer)
 {
-	zeAssert(OutputBuffer == NULL || InputBuffer == NULL, "Null pointer...");
+	zeDebugCheck(OutputBuffer == NULL || InputBuffer == NULL, "Null pointer...");
 
 	ZESize Width = Info->ImageWidth;
 	ZESize Height = Info->ImageHeight;
@@ -124,7 +124,7 @@ void ZEJpegColorSpaceConverter::RgbToGrayScale(void* OutputBuffer, void* InputBu
 // Converts rgb to YCbCr
 void ZEJpegColorSpaceConverter::RgbToYCbCr(void* OutputBuffer, void* InputBuffer)
 {
-	zeAssert(OutputBuffer == NULL || InputBuffer == NULL, "Null pointer...");
+	zeDebugCheck(OutputBuffer == NULL || InputBuffer == NULL, "Null pointer...");
 
 
 	//Y	=  0.29900 * R + 0.58700 * G + 0.11400 * B
@@ -161,7 +161,7 @@ void ZEJpegColorSpaceConverter::RgbToYCbCr(void* OutputBuffer, void* InputBuffer
 // Copies to Y channel data to destination gray channel
 void ZEJpegColorSpaceConverter::YCbCrToGrayScale(void* OutputBuffer, void* InputBuffer)
 {
-	zeAssert(OutputBuffer == NULL || InputBuffer == NULL, "Null pointer...");
+	zeDebugCheck(OutputBuffer == NULL || InputBuffer == NULL, "Null pointer...");
 
 	ZESize Width = Info->ImageWidth;
 	ZESize Height = Info->ImageHeight;
@@ -186,7 +186,7 @@ void ZEJpegColorSpaceConverter::YCbCrToGrayScale(void* OutputBuffer, void* Input
 // TESTED OK
 void ZEJpegColorSpaceConverter::YCbCrToRgb(void* OutputBuffer, void* InputBuffer)
 {
-	zeAssert(OutputBuffer == NULL || InputBuffer == NULL, "Null buffer pointer...");
+	zeDebugCheck(OutputBuffer == NULL || InputBuffer == NULL, "Null buffer pointer...");
 
 	float Y, Cb, Cr;
 	
@@ -222,7 +222,7 @@ void ZEJpegColorSpaceConverter::YCbCrToRgb(void* OutputBuffer, void* InputBuffer
 // Converts YCbCr To Ycck by converting to rgb first, then to Ycck, source K channel is copied directly
 void ZEJpegColorSpaceConverter::CmykToYcck(void* OutputBuffer, void* InputBuffer)
 {
-	zeAssert(OutputBuffer == NULL || InputBuffer == NULL, "Null buffer pointer...");
+	zeDebugCheck(OutputBuffer == NULL || InputBuffer == NULL, "Null buffer pointer...");
 
 	ZESize Width = Info->ImageWidth;
 	ZESize Height = Info->ImageHeight;
@@ -256,7 +256,7 @@ void ZEJpegColorSpaceConverter::CmykToYcck(void* OutputBuffer, void* InputBuffer
 // Converts Ycck To Cmyk by converting to rgb first, then to Cmyk
 void ZEJpegColorSpaceConverter::YcckToCmyk(void* OutputBuffer, void* InputBuffer)
 {
-	zeAssert(OutputBuffer == NULL || InputBuffer == NULL, "Null buffer pointer...");
+	zeDebugCheck(OutputBuffer == NULL || InputBuffer == NULL, "Null buffer pointer...");
 
 	
 	ZESize Width = (ZESize)Info->ImageWidth;
@@ -303,9 +303,9 @@ ZEJpegColorSpaceConverter::~ZEJpegColorSpaceConverter()
 
 void ZEJpegColorSpaceConverter::Initialize(ZEJpegDeCompressionInfo* Info)
 {
-	zeAssert(Info == NULL, "Null Pointer...");
-	zeAssert(Info->InputColorSpace == ZE_JPEG_CS_UNKNOWN, "Unknown Color Space");
-	zeAssert(Info->OutputColorSpace == ZE_JPEG_CS_UNKNOWN, "Unknown Color Space");
+	zeDebugCheck(Info == NULL, "Null Pointer...");
+	zeDebugCheck(Info->InputColorSpace == ZE_JPEG_CS_UNKNOWN, "Unknown Color Space");
+	zeDebugCheck(Info->OutputColorSpace == ZE_JPEG_CS_UNKNOWN, "Unknown Color Space");
 
 	this->Info = Info;
 

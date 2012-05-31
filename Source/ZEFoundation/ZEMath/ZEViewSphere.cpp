@@ -76,7 +76,7 @@ bool ZEViewSphere::CullTest(ZELight* Light) const
 
 bool ZEViewSphere::CullTest(const ZERectangle3D& PortalDoor) const
 {
-	zeAssert(true, "NOT IMPLAMENTED");
+	zeDebugCheck(true, "NOT IMPLAMENTED");
 	return false;
 }
 

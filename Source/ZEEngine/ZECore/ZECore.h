@@ -122,7 +122,6 @@ class ZECore
 		ZESystemMessageManager*			SystemMessageManager;
 		ZESystemMessageHandler*			SystemMessageHandler;
 
-
 		bool							InitializeModule(ZEModule* Module);
 		void							DeInitializeModule(ZEModule** Module);
 
@@ -200,8 +199,3 @@ class ZECore
 		ZEAPI static ZECore*			GetInstance();
 };
 #endif
-
-
-
-
-

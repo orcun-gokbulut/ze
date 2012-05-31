@@ -50,7 +50,7 @@ ZEVector3 ZEPolygon::GetCentroid() const
 
 ZEVector3 ZEPolygon::GetNormal() const
 {
-	zeAssert(!IsValid(), "Polygon is not valid.");
+	zeDebugCheck(!IsValid(), "Polygon is not valid.");
 
 	ZEVector3 Normal;
 	ZEVector3::CrossProduct(Normal, Vertices[1] - Vertices[0], Vertices.GetLastItem() - Vertices[0]);
@@ -61,7 +61,7 @@ ZEVector3 ZEPolygon::GetNormal() const
 
 float ZEPolygon::GetArea() const
 {
-	zeAssert(!IsValid(), "Polygon is not valid.");
+	zeDebugCheck(!IsValid(), "Polygon is not valid.");
 
 	ZEVector3 Sum;
 	for(ZESize I = 0; I < Vertices.GetCount() - 1; I++)

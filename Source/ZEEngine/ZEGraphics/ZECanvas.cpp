@@ -102,7 +102,7 @@ ZEVertexDeclaration* ZECanvasVertex::GetVertexDeclaration()
 		VertexDeclaration = NULL;
 	}
 
-	zeAssert(VertexDeclaration->GetVertexSize() != sizeof(ZECanvasVertex), "Vertex decleration size does not matches.");
+	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZECanvasVertex), "Vertex decleration size does not matches.");
 	return VertexDeclaration;
 }
 

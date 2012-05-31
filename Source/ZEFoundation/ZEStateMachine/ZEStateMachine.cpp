@@ -43,7 +43,7 @@ const ZEArray<ZEState*>& ZEStateMachine::GetStates()
 
 bool ZEStateMachine::AddState(ZEState* State)
 {
-	zeAssert(State == NULL, "State cannot be NULL.");
+	zeDebugCheck(State == NULL, "State cannot be NULL.");
 
 	if (State == NULL)
 		return false;
@@ -62,7 +62,7 @@ bool ZEStateMachine::AddState(ZEState* State)
 
 bool ZEStateMachine::DeleteState(ZEState* State)
 {
-	zeAssert(State == NULL, "State cannot be NULL.");
+	zeDebugCheck(State == NULL, "State cannot be NULL.");
 
 	if (State == NULL)
 		return false;
@@ -77,12 +77,12 @@ bool ZEStateMachine::DeleteState(ZEState* State)
 
 bool ZEStateMachine::SetCurrentState(ZEState* TargetState, bool Forced)
 {
-	zeAssert(TargetState == NULL, "TargetState cannot be NULL.");
+	zeDebugCheck(TargetState == NULL, "TargetState cannot be NULL.");
 
 	if (TargetState == NULL)
 		return false;
 
-	zeAssert(TargetState->Owner != this, "TargetState is not member of this state machine.");
+	zeDebugCheck(TargetState->Owner != this, "TargetState is not member of this state machine.");
 
 	if (Forced)
 	{

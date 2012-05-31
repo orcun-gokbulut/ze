@@ -241,7 +241,7 @@ void ZEALModule::SetTypeVolume(ZESoundSourceType Type, ZEUInt Volume)
 
 ZEUInt ZEALModule::GetTypeVolume(ZESoundSourceType Type)
 {
-	zeAssert(Type >= 256, "Sound source types are limited to 256");
+	zeDebugCheck(Type >= 256, "Sound source types are limited to 256");
 	return TypeVolumes[Type];
 }
 

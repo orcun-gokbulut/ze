@@ -65,7 +65,7 @@ NxU8 ZEPhysXFileStream::readByte() const
 {
 	NxU8 b;
 	ZESize r = fread(&b, sizeof(NxU8), 1, ((FILE*)File));
-	zeAssert(r == 0, "Reading error.");
+	zeDebugCheck(r == 0, "Reading error.");
 	return b;
 }
 
@@ -73,7 +73,7 @@ NxU16 ZEPhysXFileStream::readWord() const
 {
 	NxU16 w;
 	ZESize r = fread(&w, sizeof(NxU16), 1, ((FILE*)File));
-	zeAssert(r == 0, "Reading error.");
+	zeDebugCheck(r == 0, "Reading error.");
 	return w;
 }
 
@@ -81,7 +81,7 @@ NxU32 ZEPhysXFileStream::readDword() const
 {
 	NxU32 d;
 	ZESize r = fread(&d, sizeof(NxU32), 1, ((FILE*)File));
-	zeAssert(r == 0, "Reading error.");
+	zeDebugCheck(r == 0, "Reading error.");
 	return d;
 }
 
@@ -89,7 +89,7 @@ float ZEPhysXFileStream::readFloat() const
 {
 	NxReal f;
 	ZESize r = fread(&f, sizeof(NxReal), 1, ((FILE*)File));
-	zeAssert(r == 0, "Reading error.");
+	zeDebugCheck(r == 0, "Reading error.");
 	return f;
 }
 
@@ -97,55 +97,55 @@ double ZEPhysXFileStream::readDouble() const
 {
 	NxF64 f;
 	ZESize r = fread(&f, sizeof(NxF64), 1, ((FILE*)File));
-	zeAssert(r == 0, "Reading error.");
+	zeDebugCheck(r == 0, "Reading error.");
 	return f;
 }
 
 void ZEPhysXFileStream::readBuffer(void* Buffer, NxU32 Size) const
 {
 	ZESize r= fread(Buffer, (ZESize)Size, 1, ((FILE*)File));
-	zeAssert(r == 0, "Reading error.");
+	zeDebugCheck(r == 0, "Reading error.");
 }
 
 NxStream& ZEPhysXFileStream::storeByte(NxU8 b)
 {
 	ZESize w = fwrite(&b, sizeof(NxU8), 1, ((FILE*)File));
-	zeAssert(w == 0, "Writing error.");
+	zeDebugCheck(w == 0, "Writing error.");
 	return *this;
 }
 
 NxStream& ZEPhysXFileStream::storeWord(NxU16 w)
 {
 	ZESize ww = fwrite(&w, sizeof(NxU16), 1, ((FILE*)File));
-	zeAssert(ww == 0, "Writing error.");
+	zeDebugCheck(ww == 0, "Writing error.");
 	return *this;
 }
 
 NxStream& ZEPhysXFileStream::storeDword(NxU32 d)
 {
 	ZESize w = fwrite(&d, sizeof(NxU32), 1, ((FILE*)File));
-	zeAssert(w == 0, "Writing error.");
+	zeDebugCheck(w == 0, "Writing error.");
 	return *this;
 }
 
 NxStream& ZEPhysXFileStream::storeFloat(NxReal f)
 {
 	ZESize w = fwrite(&f, sizeof(NxReal), 1, ((FILE*)File));
-	zeAssert(w == 0, "Writing error.");
+	zeDebugCheck(w == 0, "Writing error.");
 	return *this;
 }
 
 NxStream& ZEPhysXFileStream::storeDouble(NxF64 f)
 {
 	ZESize w = fwrite(&f, sizeof(NxF64), 1, ((FILE*)File));
-	zeAssert(w == 0, "Writing error.");
+	zeDebugCheck(w == 0, "Writing error.");
 	return *this;
 }
 
 NxStream& ZEPhysXFileStream::storeBuffer(const void* Buffer, NxU32 Size)
 {
 	ZESize w = fwrite(Buffer, (ZESize)Size, 1, ((FILE*)File));
-	zeAssert(w == 0, "Writing error.");
+	zeDebugCheck(w == 0, "Writing error.");
 	return *this;
 }
 
@@ -182,37 +182,37 @@ void ZEPhysXMemoryWriteStream::Clear()
 
 NxU8 ZEPhysXMemoryWriteStream::readByte() const 
 {	
-	zeAssert(true, "ZEPhysXMemoryWriteStream can only write to streams."); 
+	zeDebugCheck(true, "ZEPhysXMemoryWriteStream can only write to streams."); 
 	return 0;
 }
 
 NxU16 ZEPhysXMemoryWriteStream::readWord() const
 {	
-	zeAssert(true, "ZEPhysXMemoryWriteStream can only write to streams."); 
+	zeDebugCheck(true, "ZEPhysXMemoryWriteStream can only write to streams."); 
 	return 0;
 }
 
 NxU32 ZEPhysXMemoryWriteStream::readDword() const 
 {
-	zeAssert(true, "ZEPhysXMemoryWriteStream can only write to streams."); 
+	zeDebugCheck(true, "ZEPhysXMemoryWriteStream can only write to streams."); 
 	return 0;
 }
 
 float ZEPhysXMemoryWriteStream::readFloat() const 
 {
-	zeAssert(true, "ZEPhysXMemoryWriteStream can only write to streams."); 
+	zeDebugCheck(true, "ZEPhysXMemoryWriteStream can only write to streams."); 
 	return 0.0f;
 }
 
 double ZEPhysXMemoryWriteStream::readDouble() const
 {
-	zeAssert(true, "ZEPhysXMemoryWriteStream can only write to streams."); 
+	zeDebugCheck(true, "ZEPhysXMemoryWriteStream can only write to streams."); 
 	return 0.0;
 }
 
 void ZEPhysXMemoryWriteStream::readBuffer(void* buffer, NxU32 size) const
 {
-	zeAssert(true, "ZEPhysXMemoryWriteStream can only write to streams.");
+	zeDebugCheck(true, "ZEPhysXMemoryWriteStream can only write to streams.");
 }
 
 NxStream& ZEPhysXMemoryWriteStream::storeByte(NxU8 b)
@@ -253,7 +253,7 @@ NxStream& ZEPhysXMemoryWriteStream::storeBuffer(const void* Buffer, NxU32 Size)
 		MaxSize = ExpectedSize + 4096;
 
 		NxU8* NewData = new NxU8[(ZESize)MaxSize];
-		zeAssert(NewData == NULL, "Can not allocate data.");
+		zeDebugCheck(NewData == NULL, "Can not allocate data.");
 
 		if(Data)
 		{
@@ -339,37 +339,37 @@ void ZEPhysXMemoryReadStream::readBuffer(void* Destination, NxU32 Size) const
 
 NxStream& ZEPhysXMemoryReadStream::storeByte(NxU8 b)
 {
-	zeAssert(true, "ZEPhysXMemoryReadStream can only used for reading.");
+	zeDebugCheck(true, "ZEPhysXMemoryReadStream can only used for reading.");
 	return *this;
 }
 
 NxStream& ZEPhysXMemoryReadStream::storeWord(NxU16 w)
 {
-	zeAssert(true, "ZEPhysXMemoryReadStream can only used for reading.");
+	zeDebugCheck(true, "ZEPhysXMemoryReadStream can only used for reading.");
 	return *this;
 }
 
 NxStream& ZEPhysXMemoryReadStream::storeDword(NxU32 d)
 {
-	zeAssert(true, "ZEPhysXMemoryReadStream can only used for reading.");
+	zeDebugCheck(true, "ZEPhysXMemoryReadStream can only used for reading.");
 	return *this;
 }
 
 NxStream& ZEPhysXMemoryReadStream::storeFloat(NxReal f)
 {
-	zeAssert(true, "ZEPhysXMemoryReadStream can only used for reading.");
+	zeDebugCheck(true, "ZEPhysXMemoryReadStream can only used for reading.");
 	return *this;
 }
 
 NxStream& ZEPhysXMemoryReadStream::storeDouble(NxF64 f)
 {
-	zeAssert(true, "ZEPhysXMemoryReadStream can only used for reading.");
+	zeDebugCheck(true, "ZEPhysXMemoryReadStream can only used for reading.");
 	return *this;
 }
 
 NxStream& ZEPhysXMemoryReadStream::storeBuffer(const void* buffer, NxU32 size)
 {
-	zeAssert(true, "ZEPhysXMemoryReadStream can only used for reading.");
+	zeDebugCheck(true, "ZEPhysXMemoryReadStream can only used for reading.");
 	return *this;
 }
 

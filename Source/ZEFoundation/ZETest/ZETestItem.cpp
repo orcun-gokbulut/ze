@@ -43,7 +43,7 @@
 #include <string.h>
 
 static ZETestItem* CurrentTestItem = NULL;
-static void ZEErrorManagerErrorCallback(const char* Module, ZEErrorType Type, const char* ErrorText)
+static void ZEErrorManagerErrorCallback(ZEErrorType Type)
 {
 	if (CurrentTestItem != NULL)
 	{
@@ -60,37 +60,15 @@ static void ZEErrorManagerErrorCallback(const char* Module, ZEErrorType Type, co
 			case ZE_ET_WARNING:
 				ProblemType = ZE_TPT_WARNING;
 				break;
-
-			case ZE_ET_NOTICE:
-			case ZE_ET_LOG:
-				ProblemType = ZE_TPT_NOTICE;
-				break;
 		}
 
 		char Buffer[4096];
-		sprintf(Buffer, "ZEError::RaiseError redirected. Error type : %s. Error text : \"%s\".", ZEError::GetErrorTypeString(Type), ErrorText);
+		sprintf(Buffer, "ZEError::RaiseError redirected. Error type : %s.", ZEError::GetErrorTypeString(Type));
 
 		CurrentTestItem->ReportProblem(ProblemType, Buffer, CurrentTestItem->GetName(), 1);
 	}
 }
 
-static void ZEErrorManagerAssertCallback(ZEAssertType Type, const char* AssertText, const char* Function, const char* File, ZEInt Line)
-{
-	if (CurrentTestItem != NULL)
-	{
-		ZETestProblemType ProblemType;
-
-		if (Type == ZE_AT_WARNING_ASSERT)
-			ProblemType = ZE_TPT_WARNING;
-		else
-			ProblemType = ZE_TPT_ERROR;
-
-		char Buffer[4096];
-		sprintf(Buffer, "ZEError::RaiseAssert redirected. Assert Type : \"%s\", Assert text : \"%s\"", ZEError::GetAssertTypeString(Type), AssertText);
-
-		CurrentTestItem->ReportProblem(ProblemType, Buffer, File, Line);
-	}
-}
 
 void ZETestItem::ReportProblem(ZETestProblemType Type, const char* Problem, const char* File, ZEInt Line)
 {

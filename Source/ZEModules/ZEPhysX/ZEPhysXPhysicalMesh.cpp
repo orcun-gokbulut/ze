@@ -117,7 +117,7 @@ void ZEPhysXPhysicalMesh::SetPosition(const ZEVector3& NewPosition)
 	ActorDesc.globalPose.t = ZE_TO_NX(NewPosition);
 	if (Actor != NULL)
 	{
-		zeWarningAssert(true, "PhysX Physical Static Mesh", "Moving already initialized static object reduces performance.");
+		zeDebugCheckWarning(true, "PhysX Physical Static Mesh", "Moving already initialized static object reduces performance.");
 		Actor->setGlobalPosition(ActorDesc.globalPose.t);
 	}
 }
@@ -135,7 +135,7 @@ void ZEPhysXPhysicalMesh::SetRotation(const ZEQuaternion& NewRotation)
 	ActorDesc.globalPose.M.fromQuat(ZE_TO_NX(NewRotation));
 	if (Actor != NULL)
 	{
-		zeWarningAssert(true, "PhysX Physical Static Mesh", "Moving already initialized static object reduces performance.");
+		zeDebugCheckWarning(true, "PhysX Physical Static Mesh", "Moving already initialized static object reduces performance.");
 		Actor->setGlobalOrientationQuat(ZE_TO_NX(NewRotation));
 	}
 }

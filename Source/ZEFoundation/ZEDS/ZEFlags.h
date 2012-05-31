@@ -65,7 +65,7 @@ class ZEFlagsBase
 
 		inline bool GetBit(ZESize Index) const
 		{
-			zeAssert(Index > 31, "ZEFlags::GetBit(ZESize Index) index can't be greater than 31.");
+			zeDebugCheck(Index > 31, "ZEFlags::GetBit(ZESize Index) index can't be greater than 31.");
 
 			return (Value & (0x1 << Index)) != 0;
 		}

@@ -63,7 +63,7 @@ bool ZETextureTools::IsCompressible(const ZEUInt Width, const ZEUInt Height, con
 	ZEUInt TileWidth = Width / HorizTileCount;
 	ZEUInt TileHeight = Height / VertTileCount;
 
-	zeAssert(TileWidth == 0 || TileHeight == 0, "Tile width or tile height is zero.");
+	zeDebugCheck(TileWidth == 0 || TileHeight == 0, "Tile width or tile height is zero.");
 
 	return ((TileWidth % 4 == 0) || (TileHeight % 4 == 0)) ? true : false;
 }

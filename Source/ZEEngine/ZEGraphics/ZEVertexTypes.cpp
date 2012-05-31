@@ -59,7 +59,7 @@ ZEVertexDeclaration* ZESimpleVertex::GetVertexDeclaration()
 		VertexDeclaration = NULL;
 	}
 
-	zeAssert(VertexDeclaration->GetVertexSize() != sizeof(ZESimpleVertex), "Vertex decleration size does not matches.");
+	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZESimpleVertex), "Vertex decleration size does not matches.");
 
 	return VertexDeclaration;
 }
@@ -86,7 +86,7 @@ ZEVertexDeclaration* ZEMapVertex::GetVertexDeclaration()
 		VertexDeclaration = NULL;
 	}
 
-	zeAssert(VertexDeclaration->GetVertexSize() != sizeof(ZEMapVertex), "Vertex decleration size does not matches.");
+	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEMapVertex), "Vertex decleration size does not matches.");
 
 	return VertexDeclaration;
 }
@@ -113,7 +113,7 @@ ZEVertexDeclaration* ZEModelVertex::GetVertexDeclaration()
 		VertexDeclaration = NULL;
 	}
 
-	zeAssert(VertexDeclaration->GetVertexSize() != sizeof(ZEModelVertex), "Vertex decleration size does not matches.");
+	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEModelVertex), "Vertex decleration size does not matches.");
 
 	return VertexDeclaration;
 }
@@ -142,7 +142,7 @@ ZEVertexDeclaration* ZESkinnedModelVertex::GetVertexDeclaration()
 		VertexDeclaration = NULL;
 	}
 
-	zeAssert(VertexDeclaration->GetVertexSize() != sizeof(ZESkinnedModelVertex), "Vertex decleration size does not matches.");
+	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZESkinnedModelVertex), "Vertex decleration size does not matches.");
 
 	return VertexDeclaration;
 }
@@ -167,7 +167,7 @@ ZEVertexDeclaration* ZEUIVertex::GetVertexDeclaration()
 		VertexDeclaration = NULL;
 	}
 
-	zeAssert(VertexDeclaration->GetVertexSize() != sizeof(ZEUIVertex), "Vertex decleration size does not matches.");
+	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEUIVertex), "Vertex decleration size does not matches.");
 	return VertexDeclaration;
 }
 
@@ -190,7 +190,7 @@ ZEVertexDeclaration* ZEColoredVertex::GetVertexDeclaration()
 		VertexDeclaration = NULL;
 	}
 
-	zeAssert(VertexDeclaration->GetVertexSize() != sizeof(ZEColoredVertex), "Vertex decleration size does not matches.");
+	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEColoredVertex), "Vertex decleration size does not matches.");
 	return VertexDeclaration;
 }
 

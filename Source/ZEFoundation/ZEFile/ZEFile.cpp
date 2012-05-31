@@ -54,7 +54,7 @@
 
 bool ZEFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 {
-	zeAssert(IsOpen(), "Close the previous file first");
+	zeDebugCheck(IsOpen(), "Close the previous file first");
 
 	const char* StrMode = NULL;
 	const char*	AltStrMode = NULL;
@@ -272,7 +272,7 @@ ZEUInt64 ZEFile::ReadFormated(const char* Format, ...)
 	if(!IsOpen())
 		return 0;
 
-	zeAssert(true, "Not Implemented Yet.");
+	zeDebugCheck(true, "Not Implemented Yet.");
 
 	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
 
@@ -352,7 +352,7 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZEUInt64 BufferSiz
 	ZEUInt64 FileSize = _ftelli64(File);
 	_fseeki64((FILE*)File, 0, SEEK_SET);
 
-	zeAssert(BufferSize < FileSize, "File size exceed buffer size.");
+	zeDebugCheck(BufferSize < FileSize, "File size exceed buffer size.");
 
 	fread(Buffer, sizeof(char), (BufferSize > FileSize ? (ZESize)FileSize : (ZESize)BufferSize), File);
 
@@ -375,7 +375,7 @@ bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEUInt64 Buffe
 	ZEUInt64 FileSize = _ftelli64(File);
 	_fseeki64((FILE*)File, 0, SEEK_SET);
 
-	zeAssert(BufferSize < FileSize + 1, "File size exceed buffer size.");
+	zeDebugCheck(BufferSize < FileSize + 1, "File size exceed buffer size.");
 
 	fread(Buffer, sizeof(char), (ZESize)FileSize, File);
 	Buffer[FileSize] = '\0';

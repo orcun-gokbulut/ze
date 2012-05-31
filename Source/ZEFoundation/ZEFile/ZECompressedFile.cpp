@@ -784,7 +784,7 @@ bool ZEPartialCompressedFile::Open(const char* FileName, ZEFileMode Mode, bool B
 
 bool ZEPartialCompressedFile::Open(ZECompressedFile* ParentFile, ZEUInt64 Offset, ZEUInt64 Size)
 {
-	//zeAssert(Size == 0, "Cannot open a PartialFile with 0 size");
+	//zeDebugCheck(Size == 0, "Cannot open a PartialFile with 0 size");
 
 	IsEof			= false;
 	StartPosition	= Offset;
@@ -793,7 +793,7 @@ bool ZEPartialCompressedFile::Open(ZECompressedFile* ParentFile, ZEUInt64 Offset
 	this->File		= ParentFile->GetFileHandle();
 	this->BaseFile	= ParentFile;
 
-	FileName = ParentFile->GetFileName();
+	this->FileName = ParentFile->GetFileName();
 
 	return true;
 }

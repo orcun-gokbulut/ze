@@ -35,10 +35,18 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEThread.cpp				Sources)
-ze_add_source(ZEThread.h					Sources Headers)
-ze_add_source(ZELock.cpp	  	Sources)
-ze_add_source(ZELock.h			  Sources Headers)
+ze_add_source(ZEJob.cpp          Sources)
+ze_add_source(ZEJob.h            Sources Headers)
+ze_add_source(ZEJobManager.cpp   Sources)
+ze_add_source(ZEJobManager.h     Sources Headers)
+ze_add_source(ZELock.cpp         Sources)
+ze_add_source(ZELock.h           Sources Headers)
+ze_add_source(ZESystemLock.cpp   Sources)
+ze_add_source(ZESystemLock.h     Sources Headers)
+ze_add_source(ZETask.cpp         Sources)
+ze_add_source(ZETask.h           Sources Headers)
+ze_add_source(ZEThread.cpp       Sources)
+ze_add_source(ZEThread.h         Sources Headers)
 
 ze_add_library(ZEThread
 	SOURCES ${Sources} 

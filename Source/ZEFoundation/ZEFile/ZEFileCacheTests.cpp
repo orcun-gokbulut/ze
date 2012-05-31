@@ -100,7 +100,7 @@ class ZECacheTextDataIdentifier : public ZECacheDataIdentifier
 			char ItemNameBuffer[ZE_MAX_FILE_NAME_SIZE];
 			if (File->Read(ItemNameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE) != ZE_MAX_FILE_NAME_SIZE)
 			{
-				zeAssert(true, "Cannot read item name from cache: \"%s\".", File->GetFilePath().GetValue());
+				zeDebugCheck(true, "Cannot read item name from cache: \"%s\".", File->GetFilePath().GetValue());
 				return false;
 			}
 

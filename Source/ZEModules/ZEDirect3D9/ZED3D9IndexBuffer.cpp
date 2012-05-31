@@ -60,7 +60,7 @@ bool ZED3D9StaticIndexBuffer::Create(ZESize BufferSize, ZEIndexBufferFormat Form
 			break;
 		default:
 			D3D9Format = D3DFMT_UNKNOWN;
-			zeAssert(true, "Unknown Index Buffer Format");
+			zeDebugCheck(true, "Unknown Index Buffer Format");
 			break;
 	}
 

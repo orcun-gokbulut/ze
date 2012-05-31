@@ -130,13 +130,13 @@ class ZESharedPointer
 
 		Type& operator*()
 		{
-			zeAssert(Pointer == 0, "ZESharedPointer does not points to any data structure.");
+			zeDebugCheck(Pointer == 0, "ZESharedPointer does not points to any data structure.");
 			return *Pointer;
 		}
 
 		Type* operator->()
 		{
-			zeAssert(Pointer == 0, "ZESharedPointer does not points to any data structure.");
+			zeDebugCheck(Pointer == 0, "ZESharedPointer does not points to any data structure.");
 			return Pointer;
 		}
 

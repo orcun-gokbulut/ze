@@ -50,81 +50,16 @@ static ZEOptionSection ErrorOptions;
 
 bool ZEErrorManager::OptionCallback_General(ZEOption* Option, ZETypedVariant* Value)
 {
-	if (_stricmp(Option->GetName(), "FileLogging") == 0)
-		LogFileEnabled = Option->GetValue().GetBoolean();
-	else if (_stricmp(Option->GetName(), "LogFile") == 0)
-		SetLogFileName(Option->GetValue().GetString());
+	if (Option->GetName() == "FileLogging")
+		ZELog::GetInstance()->SetLogFileEnabled(Option->GetValue().GetBoolean());
+	else if (Option->GetName() == "LogFile")
+		ZELog::GetInstance()->SetLogFileName(Option->GetValue().GetString());
 
 	return true;
 }
 
-void ZEErrorManager::SetLogFileEnabled(bool Enabled)
+void ZEErrorManager::ErrorCallback(ZEErrorType Level)
 {
-	LogFileEnabled = Enabled;
-}
-
-bool ZEErrorManager::GetLogFileEnabled()
-{
-	return LogFileEnabled;
-}
-
-void ZEErrorManager::SetLogFileName(const ZEString& NewLogFile)
-{
-	LogFileName = NewLogFile;
-}
-
-const ZEString& ZEErrorManager::GetLogFileName()
-{
-	return LogFileName;
-}
-
-char* ZEErrorManager::ErrorLevelToString(ZEErrorType ErrorLevel)
-{
-	switch(ErrorLevel)
-	{
-		case ZE_ET_CRITICAL_ERROR:
-			return "Critical Error";
-		case ZE_ET_ERROR:
-			return "Error";
-		case ZE_ET_WARNING:
-			return "Warning";
-		case ZE_ET_NOTICE:
-			return "Notice";
-		case ZE_ET_LOG:
-			return "Log";
-		default:
-			return "Unknown";
-	}
-}
-
-void ZEErrorManager::LogToFile(const char* Module, ZEErrorType ErrorType, const char* Error)
-{
-	if (LogFileEnabled == true)
-	{
-		FILE* LogFile;
-		if (fopen_s(&LogFile, LogFileName, "a") != NULL)
-		{
-			SetLogFileEnabled(false);
-			zeError("Can not open log file. File logging is disabled.", ZE_ET_CRITICAL_ERROR);
-			return;
-		}
-		else
-		{
-			char DateBuf[26], TimeBuf[26];
-			_strdate_s(DateBuf, 26);
-			_strtime_s(TimeBuf, 26);
-			fprintf(LogFile, "(%s - %s) [%s] %s : %s\n", DateBuf, TimeBuf, Module, ErrorLevelToString(ErrorType), Error);
-			fclose(LogFile);
-		}
-	}
-}
-
-void ZEErrorManager::ErrorCallback(const char* From, ZEErrorType Level, const char* ErrorText)
-{
-	ZEErrorManager::GetInstance()->LogToFile(From, Level, ErrorText);
-	if (zeCore->GetConsole() != NULL)
-		zeOutput("[%s] %s : %s\r\n", From, ErrorLevelToString(Level), ErrorText);
-	
 	if (Level == ZE_ET_ERROR)
 		ZEConsole::GetInstance()->ShowConsole();
 
@@ -139,12 +74,6 @@ void ZEErrorManager::ErrorCallback(const char* From, ZEErrorType Level, const ch
 	}
 }
 
-void ZEErrorManager::AssertCallback(ZEAssertType AssertType, const char* AssertText, const char* Function, const char* File, ZEInt Line)
-{
-	if (zeCore->GetConsole() != NULL)
-		zeOutput("%s : %s (Function : %s, File : %s, Line : %d)\r\n", (AssertType == ZE_AT_ASSERT ? "Assert" : "Warning"),  AssertText,  Function, File, Line);
-}
-
 ZEErrorManager* ZEErrorManager::GetInstance()
 {
 	return ZECore::GetInstance()->GetError();
@@ -152,13 +81,12 @@ ZEErrorManager* ZEErrorManager::GetInstance()
 
 ZEErrorManager::ZEErrorManager()
 {
-	LogFileEnabled = false;
+	ZELog::GetInstance()->SetLogFileEnabled(false);
 	ErrorOptions.SetName("Error");
 	ErrorOptions.AddOption(new ZEOption("LogFileEnabled", false, ZE_OA_NORMAL));
 	ErrorOptions.AddOption(new ZEOption("LogFileName", "error.log", ZE_OA_NORMAL));
 	ZEOptionManager::GetInstance()->RegisterSection(&ErrorOptions);
-	ZEError::SetAssertCallback(&ZEErrorManager::AssertCallback);
-	ZEError::SetErrorCallback(&ZEErrorManager::ErrorCallback);
+	ZEError::GetInstance()->SetCallback(&ZEErrorManager::ErrorCallback);
 }
 
 ZEErrorManager::~ZEErrorManager()

@@ -36,8 +36,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 ze_add_cmake_project(CMakeScripts
-	SOURCES append_property.cmake
-		build_dir_check.cmake
+	SOURCES	build_dir_check.cmake
 		CMakeLists.txt
 		cppcheck.cmake
 		parse_arguments.cmake

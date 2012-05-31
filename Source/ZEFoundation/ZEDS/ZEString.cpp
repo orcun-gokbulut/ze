@@ -69,7 +69,7 @@ void ZEString::Clear()
 
 void ZEString::SetValue(const char* String)
 {
-	zeAssert(String == NULL, "Null char array pointer are not valid parameters.");
+	zeDebugCheck(String == NULL, "Null char array pointer are not valid parameters.");
 	
 	if (String == NULL)
 	{
@@ -173,13 +173,13 @@ const char* ZEString::GetValue() const
 
 char ZEString::GetCharacter(ZESize Position) const
 {
-	zeAssert(Position > strlen(Buffer), "Position parameter value exceed length of the string.");
+	zeDebugCheck(Position > strlen(Buffer), "Position parameter value exceed length of the string.");
 	return Buffer[Position];
 }
 
 void ZEString::SetCharacter(ZESize Position, char Value)
 {
-	zeAssert(Position > strlen(Buffer), "Position parameter value exceed length of the string.");
+	zeDebugCheck(Position > strlen(Buffer), "Position parameter value exceed length of the string.");
 	Buffer[Position] = Value;
 }
 
@@ -193,7 +193,7 @@ ZESize ZEString::GetLength() const
 
 void ZEString::Append(const char* String)
 {
-	zeAssert(String == NULL, "String parameter is ilvalid.");
+	zeDebugCheck(String == NULL, "String parameter is ilvalid.");
 	
 	if (Buffer == NULL)
 		SetValue(String);
@@ -215,7 +215,7 @@ void ZEString::Append(const ZEString& String)
 
 void ZEString::Insert(const char* String)
 {
-	zeAssert(String == NULL, "String parameter is ilvalid.");
+	zeDebugCheck(String == NULL, "String parameter is ilvalid.");
 	
 	if (Buffer == NULL)
 		SetValue(String);
@@ -252,8 +252,8 @@ void ZEString::Insert(ZESize Position, const ZEString& String)
 
 void ZEString::Insert(ZESize Position, const char* String)
 {
-	zeAssert(String == NULL, "Inserting string is not valid.");
-	zeAssert(Buffer == NULL && Position != 0, "A string can only be inserted in to empty string at position 0.");
+	zeDebugCheck(String == NULL, "Inserting string is not valid.");
+	zeDebugCheck(Buffer == NULL && Position != 0, "A string can only be inserted in to empty string at position 0.");
 
 	ZESize StringLength = strlen(String);
 	if (StringLength == 0)
@@ -266,7 +266,7 @@ void ZEString::Insert(ZESize Position, const char* String)
 	}
 
 	ZESize Length = strlen(Buffer);
-	zeAssert(Position > Length, "Position parameter is more than string length.");
+	zeDebugCheck(Position > Length, "Position parameter is more than string length.");
 	Length += StringLength;
 
 	char* OldBuffer = Buffer;
@@ -297,8 +297,8 @@ void ZEString::Remove(ZESize Position, ZESize Count)
 		return;
 
 	ZESize Length = strlen(Buffer);
-	zeAssert(Position > Length, "Position parameter is more than string length.");
-	zeAssert(Position + Count > Length, "Remove operation range (Position + Count) exceeds length of the string.");
+	zeDebugCheck(Position > Length, "Position parameter is more than string length.");
+	zeDebugCheck(Position + Count > Length, "Remove operation range (Position + Count) exceeds length of the string.");
 
 	if (Length - Count == 0)
 	{
@@ -349,8 +349,8 @@ ZEString ZEString::Left(ZESize Count) const
 	if (Count == 0)
 		return ZEString();
 
-	zeAssert(Buffer == NULL, "Buffer is empty.");
-	zeAssert(Count >  strlen(Buffer), "Position is bigger than string length.");
+	zeDebugCheck(Buffer == NULL, "Buffer is empty.");
+	zeDebugCheck(Count >  strlen(Buffer), "Position is bigger than string length.");
 
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (Count + 1) * sizeof(char));
@@ -367,10 +367,10 @@ ZEString ZEString::Right(ZESize Count) const
 	if (Count == 0)
 		return ZEString();
 
-	zeAssert(Buffer == NULL, "Buffer is empty.");
+	zeDebugCheck(Buffer == NULL, "Buffer is empty.");
 
 	ZESize Length = strlen(Buffer);
-	zeAssert(Count > strlen(Buffer), "Position is bigger than string length.");
+	zeDebugCheck(Count > strlen(Buffer), "Position is bigger than string length.");
 
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (Count + 1) * sizeof(char));
@@ -386,8 +386,8 @@ ZEString ZEString::Middle(ZESize Position, ZESize Count) const
 	if (Count == 0)
 		return ZEString();
 
-	zeAssert(Buffer == NULL, "Buffer is empty.");
-	zeAssert(Position + Count > strlen(Buffer), "Sub string range (Position and count) is exceed string length.");
+	zeDebugCheck(Buffer == NULL, "Buffer is empty.");
+	zeDebugCheck(Position + Count > strlen(Buffer), "Sub string range (Position and count) is exceed string length.");
 
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (Count + 1) * sizeof(char));
@@ -404,9 +404,9 @@ ZEString ZEString::SubString(ZESize StartPosition, ZESize EndPosition) const
 	if (Buffer == NULL && StartPosition == 0 && EndPosition == 0)
 		return ZEString();
 
-	zeAssert(Buffer == NULL, "Buffer is empty.");
-	zeAssert(StartPosition > strlen(Buffer) || EndPosition > strlen(Buffer), "Sub string range (Position and count) is exceed string length.");
-	zeAssert(EndPosition < StartPosition, "EndPosition parameter can not be smaller than StartPosition parameter.");
+	zeDebugCheck(Buffer == NULL, "Buffer is empty.");
+	zeDebugCheck(StartPosition > strlen(Buffer) || EndPosition > strlen(Buffer), "Sub string range (Position and count) is exceed string length.");
+	zeDebugCheck(EndPosition < StartPosition, "EndPosition parameter can not be smaller than StartPosition parameter.");
 	
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (EndPosition - StartPosition + 2) * sizeof(char));
@@ -685,17 +685,17 @@ ZEString& ZEString::operator+=(const char* String)
 
 const char& ZEString::operator[](ZESSize Index) const
 {
-	zeAssert(Buffer == NULL, "Empty string can not be indexed.");
-	zeAssert(Index < 0, "Index parameter is negative.");
-	zeAssert((ZESize)Index > strlen(Buffer), "Index parameter value exceed length of the string.");
+	zeDebugCheck(Buffer == NULL, "Empty string can not be indexed.");
+	zeDebugCheck(Index < 0, "Index parameter is negative.");
+	zeDebugCheck((ZESize)Index > strlen(Buffer), "Index parameter value exceed length of the string.");
 	return Buffer[Index];
 }
 
 char& ZEString::operator[](ZESSize Index)
 {
-	zeAssert(Buffer == NULL, "Empty string can not be indexed.");
-	zeAssert(Index < 0, "Index parameter is negative.");
-	zeAssert((ZESize)Index > strlen(Buffer), "Index parameter value exceed length of the string.");
+	zeDebugCheck(Buffer == NULL, "Empty string can not be indexed.");
+	zeDebugCheck(Index < 0, "Index parameter is negative.");
+	zeDebugCheck((ZESize)Index > strlen(Buffer), "Index parameter value exceed length of the string.");
 	return Buffer[Index];
 }
 
