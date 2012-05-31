@@ -65,7 +65,11 @@ bool ZESceneCuller::CullLight(ZELight* Light, ZEDrawParameters* DrawParameters)
 
 	Statistics.VisibleLightCount++;
 
-	if (DrawParameters->ViewVolume->CullTest(Light))
+	ZEBSphere LightBoundingSphere;
+	LightBoundingSphere.Position = Light->GetWorldPosition();
+	LightBoundingSphere.Radius = Light->GetRange();
+
+	if (Light->GetLightType() != ZE_LT_DIRECTIONAL && DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
 	{
 		Statistics.CulledLightCount++;
 		return false;
@@ -128,7 +132,7 @@ bool ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameter
 	{
 		Statistics.DrawableEntityCount++;
 
-		if (EntityDrawFlags & ZE_DF_CULL && DrawParameters->ViewVolume->CullTest(Entity))
+		if (EntityDrawFlags & ZE_DF_CULL && DrawParameters->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
 		{
 			Statistics.CulledEntityCount++;
 			return true;

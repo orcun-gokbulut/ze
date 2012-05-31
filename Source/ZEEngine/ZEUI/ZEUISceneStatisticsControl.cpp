@@ -78,10 +78,10 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 
 	FrameCount++;
 	TotalElapsedTime += ElapsedTime;
-	if (TotalElapsedTime > 1.0f)
+	if (TotalElapsedTime > 0.5f)
 	{
 		TotalElapsedTime = 0.0f;
-		AverageFPS = FrameCount;
+		AverageFPS = FrameCount * 2;
 		FrameCount = 0;
 	}
 
@@ -213,7 +213,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	AddChildControl(FPSCount);
 
 	CameraPosition = new ZEUITextControl();
-	CameraPosition->SetWidth(450.0f);
+	CameraPosition->SetWidth(600.0f); //450.0f
 	CameraPosition->SetHeight(25.0f);
 	CameraPosition->SetPosition(ZEVector2(0.0f, 275.0f));
 	CameraPosition->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
@@ -221,7 +221,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	AddChildControl(CameraPosition);
 
 	this->SetHeight(300.0f);
-	this->SetWidth(450.0f);
+	this->SetWidth(600.0f);
 
 // 	int WindowWidth = 0;
 // 	int WindowHeight = 0;
