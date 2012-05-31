@@ -34,17 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_VIEWVOLUME_H__
-#define __ZE_VIEWVOLUME_H__
+#ifndef __ZE_VIEW_VOLUME_H__
+#define __ZE_VIEW_VOLUME_H__
 
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEOBBox.h"
-#include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZERectangle3D.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZELineSegment.h"
 
 enum ZEViewVolumeType
 {
@@ -57,29 +53,16 @@ enum ZEViewVolumeType
 	ZE_VVT_PLANE
 };
 
-enum ZEDoorViewTest
-{
-	ZE_DVT_INSIDE,
-	ZE_DVT_OUTSIDE,
-	ZE_DVT_INTERSECTS,
-	ZE_DVT_DOORCOVERS
-};
 
-class ZEEntity;
-class ZEComponent;
-class ZELight;
 class ZEViewVolume
 {
-public:
-	virtual ZEViewVolumeType			GetViewVolumeType() const = 0;
+	public:
+		virtual ZEViewVolumeType			GetViewVolumeType() const = 0;
 
-	virtual bool						CullTest(const ZEBSphere& BoundingBox) const = 0;
-	virtual bool						CullTest(const ZEAABBox& BoundingBox) const = 0;
-	virtual bool						CullTest(const ZEOBBox& BoundingBox) const = 0;
-
-	virtual bool						CullTest(ZELight* Light) const = 0;
-	virtual bool						CullTest(ZEEntity* Entity) const = 0;
-	virtual bool						CullTest(const ZERectangle3D& PortalDoor) const = 0;
+		virtual bool						CullTest(const ZEBSphere& BoundingBox) const = 0;
+		virtual bool						CullTest(const ZEAABBox& BoundingBox) const = 0;
+		virtual bool						CullTest(const ZEOBBox& BoundingBox) const = 0;
+		virtual bool						CullTest(const ZERectangle3D& PortalDoor) const = 0;
 };
 
 #endif

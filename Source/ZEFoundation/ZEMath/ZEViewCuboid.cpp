@@ -34,8 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEViewCuboid.h"
-#include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZELight.h"
+#include "ZEQuaternion.h"
 
 ZEViewVolumeType ZEViewCuboid::GetViewVolumeType() const
 {
@@ -50,7 +49,6 @@ bool ZEViewCuboid::CullTest(const ZEBSphere& BoundingSphere) const
 bool ZEViewCuboid::CullTest(const ZEAABBox& BoundingBox) const
 {
 	return !ZEOBBox::IntersectionTest(Box, BoundingBox);
-
 }
 
 bool ZEViewCuboid::CullTest(const ZEOBBox& BoundingBox) const
@@ -58,24 +56,7 @@ bool ZEViewCuboid::CullTest(const ZEOBBox& BoundingBox) const
 	return !ZEOBBox::IntersectionTest(Box, BoundingBox);
 }
 
-bool ZEViewCuboid::CullTest(ZEEntity* Entity) const
-{
-	return CullTest(Entity->GetWorldBoundingBox());
-}
-
-bool ZEViewCuboid::CullTest(ZELight* Light) const
-{
-	if (Light->GetLightType() == ZE_LT_DIRECTIONAL)
-		return false;
-
-	ZEBSphere BoundingSphere;
-	BoundingSphere.Position = Light->GetWorldPosition();
-	BoundingSphere.Radius = Light->GetRange();
-
-	return CullTest(BoundingSphere);
-}
-
-bool ZEViewCuboid::CullTest(const ZERectangle3D& PortalDoor) const
+bool ZEViewCuboid::CullTest(const ZERectangle3D& Rectangle) const
 {
 	zeDebugCheck(true, "Not implemented.");
 	return false;
