@@ -40,7 +40,7 @@
 #include <time.h>
 #include <memory.h>
 
-#ifdef PLATFORM_WIN32
+#ifdef ZE_PLATFORM_WINDOWS
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -252,21 +252,27 @@ void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 	vsprintf(Buffer, Format, VList);
 	va_end(VList);
 
-	if (LogCallback != NULL)
-		LogCallback(Module, Type, Buffer);
-
-	time_t Temp = time(NULL);                          
-	tm TimeStamp;
-	memcpy(&TimeStamp, localtime(&Temp), sizeof(tm));
+	#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
+		char DebugBuffer[4096];
+		sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZELog::GetLogTypeString(ZE_LOG_INFO), Buffer);
+		OutputDebugString(DebugBuffer);
+	#endif
 
 	if (LogFile != NULL)
 	{
+		time_t Temp = time(NULL);                          
+		tm TimeStamp;
+		memcpy(&TimeStamp, localtime(&Temp), sizeof(tm));
+
 		fprintf((FILE*)LogFile, "%02d-%02d-%04d %02d:%02d:%02d [%s] %s : %s\n",
 			TimeStamp.tm_mday, TimeStamp.tm_mon + 1, 1900 + TimeStamp.tm_year,
 			TimeStamp.tm_hour, TimeStamp.tm_min, TimeStamp.tm_sec,
 			GetLogTypeString(Type), Module, Buffer);
 		fflush((FILE*)LogFile);
 	}
+
+	if (LogCallback != NULL)
+		LogCallback(Module, Type, Buffer);
 }
 
 void ZELog::Log(const char* Module, const char* Format, ...)
@@ -277,8 +283,11 @@ void ZELog::Log(const char* Module, const char* Format, ...)
 	vsprintf(Buffer, Format, VList);
 	va_end(VList);
 
-	if (LogCallback != NULL)
-		LogCallback(Module, ZE_LOG_INFO, Buffer);
+	#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
+		char DebugBuffer[4096];
+		sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZELog::GetLogTypeString(ZE_LOG_INFO), Buffer);
+		OutputDebugString(DebugBuffer);
+	#endif
 
 	if (LogFile != NULL)
 	{
@@ -292,6 +301,10 @@ void ZELog::Log(const char* Module, const char* Format, ...)
 			GetLogTypeString(ZE_LOG_INFO), Module, Buffer);
 		fflush((FILE*)LogFile);
 	}
+
+	if (LogCallback != NULL)
+		LogCallback(Module, ZE_LOG_INFO, Buffer);
+
 }
 
 ZELog::ZELog()
