@@ -124,7 +124,7 @@ function(ze_add_source)
 endfunction()
 
 function(ze_add_executable)
-	parse_arguments(PARAMETER "SOURCES;LIBS;INSTALL_DESTINATION;INSTALL_COMPONENT;PLATFORMS" "INSTALL;PLUGIN" ${ARGV})
+	parse_arguments(PARAMETER "SOURCES;LIBS;INSTALL_DESTINATION;INSTALL_COMPONENT;PLATFORMS" "INSTALL;PLUGIN;CONSOLE" ${ARGV})
 
 	ze_platform_check()
 	if (NOT PLATFORM_FOUND)
@@ -136,7 +136,11 @@ function(ze_add_executable)
 	
 	# Compile
 	if ("${ZEBUILD_PLATFORM}" MATCHES "Windows")
-		add_executable(${PARAMETER_TARGET} WIN32 ${PARAMETER_SOURCES})
+		if (PARAMETER_CONSOLE)
+			add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
+		else()
+			add_executable(${PARAMETER_TARGET} WIN32 ${PARAMETER_SOURCES})
+		endif()
 	else()
 		add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
 	endif()
