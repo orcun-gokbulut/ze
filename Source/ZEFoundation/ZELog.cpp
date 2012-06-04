@@ -49,31 +49,32 @@ static void DefaultCallback(const char* Module, ZELogType Level, const char* Log
 
 static void SetColor(int Type)
 {
-	#ifdef PLATFORM_WIN32
+	#ifdef ZE_PLATFORM_WINDOWS
 		switch(Type)
 		{
-			case LOG_ERROR:
+			case ZE_LOG_CRITICAL_ERROR:
+			case ZE_LOG_ERROR:
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_INTENSITY);
 
 				break;
 
-			case LOG_WARNING:
+			case ZE_LOG_WARNING:
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 				break;
 
-			case LOG_INFO:
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+			case ZE_LOG_SUCCESS:
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 				break;
 
-			case LOG_SUCCESS:
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+			case -2:
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 				break;
 
 			default:
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 				break;
 		}
-	#else
+	#elif defined(ZE_PLATFORM_UNIX)
 		switch(Type)
 		{
             case ZE_LOG_ERROR:
@@ -95,6 +96,8 @@ static void SetColor(int Type)
 			default:
 				printf("\033[0;37m");
 		}
+	#else
+
 	#endif
 }
 
@@ -105,15 +108,21 @@ static void DefaultCallback(const char* Module, ZELogType Type, const char* LogT
 	memcpy(&TimeStamp, localtime(&Temp), sizeof(tm));
 
 	SetColor(-1);
-	printf("%02d-%02d-%04d %02d:%02d:%02d [",
-		TimeStamp.tm_mday, TimeStamp.tm_mon + 1, 1900 + TimeStamp.tm_year,
+	printf("%04d-%02d-%02d %02d:%02d:%02d [",
+		1900 + TimeStamp.tm_year, TimeStamp.tm_mon + 1,TimeStamp.tm_mday, 
 		TimeStamp.tm_hour, TimeStamp.tm_min, TimeStamp.tm_sec);
+
+	SetColor(-2);
+	printf("%s",  Module);
+	
+	SetColor(-1);
+	printf("] ");
 
 	SetColor(Type);
 	printf("%s", ZELog::GetLogTypeString(Type));
 
 	SetColor(-1);
-	printf("] %s : %s\n", Module, LogText);
+	printf(": %s\n", LogText);
 }
 
 void ZELog::GetModuleName(char* Output, const char* FileName, const char* Function)
@@ -206,8 +215,8 @@ void ZELog::SetLogFileEnabled(bool Enabled)
 	if (LogFile != NULL)
 	{
 		fprintf((FILE*)LogFile, "\n\n##########################################################\n");
-		fprintf((FILE*)LogFile, " Log Session Start Date/Time : %02d-%02d-%04d %2d:%2d:%2d\n", 
-			FileTimeStamp.tm_mday, FileTimeStamp.tm_mon + 1, 1900 + FileTimeStamp.tm_year,
+		fprintf((FILE*)LogFile, " Log Session Start Date/Time : %04d-%02d-%02d %2d:%2d:%2d\n", 
+			1900 + FileTimeStamp.tm_year, FileTimeStamp.tm_mon + 1, FileTimeStamp.tm_mday,
 			FileTimeStamp.tm_hour, FileTimeStamp.tm_min, FileTimeStamp.tm_sec);
 		fprintf((FILE*)LogFile, "##########################################################\n");
 	}
@@ -265,9 +274,9 @@ void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 		memcpy(&TimeStamp, localtime(&Temp), sizeof(tm));
 
 		fprintf((FILE*)LogFile, "%02d-%02d-%04d %02d:%02d:%02d [%s] %s : %s\n",
-			TimeStamp.tm_mday, TimeStamp.tm_mon + 1, 1900 + TimeStamp.tm_year,
+			1900 + TimeStamp.tm_year, TimeStamp.tm_mon + 1, TimeStamp.tm_mday, 
 			TimeStamp.tm_hour, TimeStamp.tm_min, TimeStamp.tm_sec,
-			GetLogTypeString(Type), Module, Buffer);
+			Module, GetLogTypeString(Type), Buffer);
 		fflush((FILE*)LogFile);
 	}
 
@@ -296,9 +305,9 @@ void ZELog::Log(const char* Module, const char* Format, ...)
 		memcpy(&TimeStamp, localtime(&Temp), sizeof(tm));
 
 		fprintf((FILE*)LogFile, "%02d-%02d-%04d %02d:%02d:%02d [%s] %s : %s\n",
-			TimeStamp.tm_mday, TimeStamp.tm_mon + 1, 1900 + TimeStamp.tm_year,
+			1900 + TimeStamp.tm_year, TimeStamp.tm_mon + 1, TimeStamp.tm_mday, 
 			TimeStamp.tm_hour, TimeStamp.tm_min, TimeStamp.tm_sec,
-			GetLogTypeString(ZE_LOG_INFO), Module, Buffer);
+			Module, GetLogTypeString(ZE_LOG_INFO), Buffer);
 		fflush((FILE*)LogFile);
 	}
 
