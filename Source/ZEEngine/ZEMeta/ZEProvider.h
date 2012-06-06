@@ -45,9 +45,9 @@ class ZEObject;
 static class Provider##Class##Registration\
 {\
 	public: \
-	Provider##Class##Registration()\
+		Provider##Class##Registration()\
 		{\
-		Provider::GetInstance()->RegisterClass(Class::Description());\
+			Provider::GetInstance()->RegisterZEClass(Class::Description());\
 		}\
 } Provider##Class##Registration_;
 
@@ -67,8 +67,8 @@ class ZEProvider
 	public:
 		const 
 		ZEArray<ZEObjectDescription*>&	GetClasses();
-		bool							RegisterClass(ZEObjectDescription* Description);
-		void							UnregisterClass(ZEObjectDescription* Description);
+		bool							RegisterZEClass(ZEObjectDescription* Description);
+		void							UnregisterZEClass(ZEObjectDescription* Description);
 
 		ZEObject*						CreateInstance(ZESize Index) const;
 		ZEObject*						CreateInstance(const char* Name) const;

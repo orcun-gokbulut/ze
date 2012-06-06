@@ -48,10 +48,6 @@ void CreateFile(const char* Path)
 		NewFile->Close();
 }
 
-void DeleteFile(const char* Path)
-{
-	zeDebugCheck(remove(Path) != 0, "Cannot Delete File");
-}
 
 ZETestSuite(ZEFile)
 {
