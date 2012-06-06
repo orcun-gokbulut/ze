@@ -52,7 +52,7 @@ const ZEArray<ZEObjectDescription*>& ZEProvider::GetClasses()
 	return Classes;
 }
 
-bool ZEProvider::RegisterClass(ZEObjectDescription* Description)
+bool ZEProvider::RegisterZEClass(ZEObjectDescription* Description)
 {
 	zeDebugCheck(Description == NULL, "Description can not be NULL.");
 
@@ -73,7 +73,7 @@ bool ZEProvider::RegisterClass(ZEObjectDescription* Description)
 	return true;
 }
 
-void ZEProvider::UnregisterClass(ZEObjectDescription* Description)
+void ZEProvider::UnregisterZEClass(ZEObjectDescription* Description)
 {
 	zeDebugCheck(Description == NULL, "Description can not be NULL.");
 	zeDebugCheck(!Classes.Exists(Description), "Can not remove class type from provider. Class type is not exists. "
