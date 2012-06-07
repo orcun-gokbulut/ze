@@ -206,24 +206,24 @@ class ZEList
 			return Cursor;
 		}
 
-		inline const ZEType* GetFirstItem() const
-		{
-			return FirstItem;
-		}
-
 		inline ZEType* GetFirstItem()
 		{
-			return FirstItem;
+			return (ZEType*)FirstItem;
+		}
+
+		inline const ZEType* GetFirstItem() const
+		{
+			return (const ZEType*)FirstItem;
 		}
 
 		inline ZEType* GetLastItem()
 		{
-			return LastItem;
+			return (ZEType*)LastItem;
 		}
 
 		inline const ZEType* GetLastItem() const
 		{
-			return LastItem;
+			return (const ZEType*)LastItem;
 		}
 
 		inline ZEType* operator[](ZESize Index)
@@ -245,7 +245,7 @@ class ZEList
 
 		inline ZEType* Dequeue()
 		{
-			ZEType* Item = FirstItem;
+			ZEType* Item = (ZEType*)FirstItem;
 			Remove(FirstItem);
 
 			return Item;
@@ -258,7 +258,7 @@ class ZEList
 
 		inline ZEType Pop()
 		{
-			ZEType* Item = FirstItem;
+			ZEType* Item = (ZEType*)FirstItem;
 			Remove(FirstItem);
 
 			return Item;
