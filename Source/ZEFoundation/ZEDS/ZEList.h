@@ -37,15 +37,17 @@
 #define __ZEDS_LIST_H__
 
 #include "ZETypes.h"
+#include "ZEError.h"
 #include "ZEListIterators.h"
 
-template<typename ZEType>
 class ZEListItem
 {
-	template<typename ZEType> friend class ZEList;
+	template<typename ZEType> 
+	friend class ZEList;
+
 	private:
-		ZEType* NextItem;
-		ZEType* PrevItem;
+		ZEListItem* NextItem;
+		ZEListItem* PrevItem;
 
 	protected:
 		ZEListItem()
@@ -60,8 +62,8 @@ class ZEList
 {
 	private:
 		ZESize Count;
-		ZEType* FirstItem;
-		ZEType* LastItem;
+		ZEListItem* FirstItem;
+		ZEListItem* LastItem;
 
 		ZEList(const ZEList& Other)
 		{
@@ -103,6 +105,8 @@ class ZEList
 				LastItem->NextItem = Item;
 
 			LastItem = Item;
+
+			return Item;
 		}
 
 		inline ZEType* Insert(ZEType* Item)
@@ -169,14 +173,15 @@ class ZEList
 
 		inline void RemoveAll()
 		{
-			ZEType* Cursor = FirstItem;
+			ZEType* Cursor = (ZEType*)FirstItem;
 			while(Cursor != NULL)
 			{
-				ZEType* Temp = Item->NextItem;
+				ZEType* Temp = (ZEType*)Cursor->NextItem;
 				Cursor->PrevItem = NULL;
 				Cursor->NextItem = NULL;
 				Cursor = Temp;
 			}
+			Count = 0;
 		}
 
 		inline const ZEType* GetItem(ZESize Index) const
@@ -286,8 +291,8 @@ class ZEList
 
 		ZEList()
 		{
-			First = NULL;
-			Last = NULL;
+			FirstItem = NULL;
+			LastItem = NULL;
 			Count = 0;
 		}
 		
