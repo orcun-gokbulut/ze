@@ -81,7 +81,6 @@ static ZEUInt GetDownSampleCount(ZETextureDownSampling DownSample)
 			return 3;
 			break;
 		default:
-			zeWarning("Unknown Down Sampling type.");
 			return 0;
 			break;
 	}
@@ -89,7 +88,7 @@ static ZEUInt GetDownSampleCount(ZETextureDownSampling DownSample)
 	return 0;
 }
 
-static ZETexturePixelFormat GetPixelFormat(ZETextureCompressionType CompressionType)
+static ZETexturePixelFormat GetCompressedPixelFormat(ZETextureCompressionType CompressionType)
 {
 	switch (CompressionType)
 	{
@@ -103,7 +102,6 @@ static ZETexturePixelFormat GetPixelFormat(ZETextureCompressionType CompressionT
 			return ZE_TPF_DXT5;
 			break;
 		default:
-			zeWarning("Unknown Compression Type");
 			return ZE_TPF_NOTSET;
 			break;
 	}
@@ -128,7 +126,6 @@ static ZETextureCompressionType GetCompressionType(ZETexturePixelFormat PixelFor
 			return ZE_TCT_DXT5;
 			break;
 		default:
-			zeWarning("Unknown Pixel Format");
 			return ZE_TCT_NONE;
 			break;
 	}
@@ -194,7 +191,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 	ZEUInt DestLevelCount					= FinalOptions->MaximumMipmapLevel;
 	ZEUInt SrcSurfaceCount					= TextureData->GetSurfaceCount();
 	ZETextureType SrcTextureType			= TextureData->GetType();
-	ZETexturePixelFormat DestPixelFormat	= GetPixelFormat(FinalOptions->CompressionType) == ZE_TPF_NOTSET ? TextureData->GetPixelFormat() : GetPixelFormat(FinalOptions->CompressionType);
+	ZETexturePixelFormat DestPixelFormat	= GetCompressedPixelFormat(FinalOptions->CompressionType) == ZE_TPF_NOTSET ? TextureData->GetPixelFormat() : GetCompressedPixelFormat(FinalOptions->CompressionType);
 
 	ZEUInt SrcWidth			= TextureData->GetWidth();
 	ZEUInt SrcHeight		= TextureData->GetHeight();
