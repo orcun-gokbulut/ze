@@ -48,7 +48,7 @@ class ZEArrayIterator
 	template<typename ZEType, typename Allocator_> class ZEArray;
 	private:
 		ZEArray<ZEType, Allocator_>* Array;
-		ZESize* CurrentIndex;
+		ZESize CurrentIndex;
 
 		ZEArrayIterator(ZEArray<ZEType, Allocator_>* Array)
 		{
@@ -61,7 +61,7 @@ class ZEArrayIterator
 			return Index < 0 || Index >= Array->GetCount();
 		} 
 
-		inline ZEType* GetCurrentItem()
+		inline ZEType* GetItem()
 		{
 			return &Array->GetItem(Index);
 		}
@@ -83,6 +83,12 @@ class ZEArrayIterator
 			CurrentIndex--;
 			return &Array->GetItem(Index);			
 		}
+
+
+		inline ZESize GetIndex()
+		{
+			return CurrentIndex;
+		}
 };
 
 template<typename ZEType, typename Allocator_>
@@ -91,7 +97,7 @@ class ZEArrayIteratorConst
 	template<typename ZEType, typename Allocator_> class ZEArray;
 	private:
 		const ZEArray<ZEType, Allocator_>* Array;
-		ZESize* CurrentIndex;
+		ZESize CurrentIndex;
 
 		ZEArrayIteratorConst(const ZEArray<ZEType, Allocator_>* Array)
 		{
@@ -125,6 +131,11 @@ class ZEArrayIteratorConst
 
 			CurrentIndex--;
 			return &Array->GetItem(Index);			
+		}
+
+		inline ZESize GetIndex()
+		{
+			return CurrentIndex;
 		}
 };
 

@@ -43,35 +43,49 @@ class ZEList;
 template<typename ZEType>
 class ZEListIterator
 {
-	template<typename ZEType> class ZEList;
+	template<typename ZEType> friend class ZEList;
 	private:
-		ZEType* CurrentItem;
-				
+		ZEType* Item;
+
 		ZEListIterator(ZEList<ZEType>* List)
 		{
-			CurrentItem = List->FirstItem;
+			Item = List->GetFirstItem();
 		}
 
 	public:
 		inline bool IsEnd() const
 		{
-			return CurrentItem == NULL;
+			return Item == NULL;
 		}
 
-		inline ZEType* GetCurrentItem()
+		inline ZEType* GetItem()
 		{
-			return CurrentItem;
+			return Item;
 		}
+
 		inline ZEType* MovePrevious()
 		{
-			CurrentItem = CurrentItem->PrevItem;
-			return CurrentItem;
+			Item = Item->PrevItem;
+			return Item;
 		}
 
 		inline ZEType* MoveNext()
 		{
-			CurrentItem = CurrentItem->NextItem;
-			return CurrentItem;			
+			Item = Item->NextItem;
+			return Item;			
+		}
+
+		inline ZESize GetIndex()
+		{
+			ZESize Index = 0;
+			ZEType* Current = Item;
+			while(Current != NULL)
+			{
+				Item = Current->PrevItem;
+				Index++;
+			}
+			
+			return Index;
 		}
 };
 
@@ -80,34 +94,47 @@ class ZEListIteratorConst
 {
 	template<typename ZEType> class ZEList;
 	private:
-		const ZEType* CurrentItem;
+		const ZEType* Item;
 				
 		ZEListIteratorConst(const ZEList<ZEType>* List)
 		{
-			CurrentItem = List->FirstItem;
+			Item = List->GetFirstItem();
 		}
 
 	public:
 		inline bool IsEnd() const
 		{
-			return CurrentItem == NULL;
+			return Item == NULL;
 		}
 
-		inline const ZEType* GetCurrentItem() const
+		inline const ZEType* GetItem() const
 		{
-			return CurrentItem;
+			return Item;
+		}
+
+		inline ZESize GetIndex()
+		{
+			ZESize Index = 0;
+			const ZEType* Current = Item;
+			while(Current != NULL)
+			{
+				Item = Current->PrevItem;
+				Index++;
+			}
+
+			return Index;
 		}
 
 		inline const ZEType* MovePrevious() const
 		{
-			CurrentItem = CurrentItem->PrevItem;
-			return CurrentItem;
+			Item = Item->PrevItem;
+			return Item;
 		}
 
 		inline const ZEType* MoveNext() const
 		{
-			CurrentItem = CurrentItem->NextItem;
-			return CurrentItem;			
+			Item = Item->NextItem;
+			return Item;			
 		}
 };
 
