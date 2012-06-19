@@ -65,7 +65,7 @@ bool ZETextureTools::IsCompressible(const ZEUInt Width, const ZEUInt Height, con
 
 	zeDebugCheck(TileWidth == 0 || TileHeight == 0, "Tile width or tile height is zero.");
 
-	return ((TileWidth % 4 == 0) || (TileHeight % 4 == 0)) ? true : false;
+	return ((TileWidth % 4 == 0) && (TileHeight % 4 == 0)) ? true : false;
 }
 
 // Surface count is used only when texture type is 3D 
