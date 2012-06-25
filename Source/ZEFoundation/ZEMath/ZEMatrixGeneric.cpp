@@ -32,7 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-/*
+
 #include "ZEMatrix.h"
 #include "ZEVector.h"
 #include "ZEError.h"
@@ -516,4 +516,3 @@ void ZEMatrix4x4::Transform(ZEVector4& Out, const ZEMatrix4x4& Matrix, const ZEV
 	Out.z = Matrix.M31 * Vector.x + Matrix.M32 * Vector.y + Matrix.M33 * Vector.z + Matrix.M34 * Vector.w;
 	Out.w = Matrix.M41 * Vector.x + Matrix.M42 * Vector.y + Matrix.M43 * Vector.z + Matrix.M44 * Vector.w;
 }
-*/
