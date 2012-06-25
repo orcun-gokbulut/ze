@@ -56,30 +56,43 @@ class ZEMinHeap : public ZEHeapBase<Type, Allocator_>
 		{
 			ZESize Smallest = Index;
 
-			ZESize LeftIndex = GetFirstChildIndex(Index);
-			if (LeftIndex < Heap.GetCount() && Heap[LeftIndex] < Heap[Index])
+			ZESize LeftIndex = this->GetFirstChildIndex(Index);
+			if (LeftIndex < this->Heap.GetCount() && this->Heap[LeftIndex] < this->Heap[Index])
 				Smallest = LeftIndex;
 
-			ZESize RightIndex = GetSecondChildIndex(Index);
-			if (RightIndex < Heap.GetCount() && Heap[RightIndex] < Heap[Smallest])
+			ZESize RightIndex = this->GetSecondChildIndex(Index);
+			if (RightIndex < this->Heap.GetCount() && this->Heap[RightIndex] < this->Heap[Smallest])
 				Smallest = RightIndex;
 
 			if (Smallest != Index)
 			{
-				Swap(Heap[Index], Heap[Smallest]);
+				Swap(this->Heap[Index], this->Heap[Smallest]);
 				MinHeapify(Smallest);
 			}
 		}
 
 	public:
+		void Create(Type* Array, ZESize Size)
+		{
+			this->Heap.CopyFrom(Array, Size);
+
+			for (ZESize I = this->Heap.GetSize() / 2; I >= 0; I--)
+				this->MinxHeapify(I);
+		}
+
+		void Create(const ZEArray<Type>& Array)
+		{
+			Create(Array.GetCArray(), Array.GetCount());
+		}
+
 		Type& GetMin()
 		{
-			return Heap[0];
+			return this->Heap[0];
 		}
 
 		const Type& GetMin() const
 		{
-			return Heap[0];
+			return this->Heap[0];
 		}
 
 		void InsertValue(Type Value)
@@ -89,25 +102,25 @@ class ZEMinHeap : public ZEHeapBase<Type, Allocator_>
 
 		void Insert(Type& Value)
 		{
-			Heap.Add(Value);
+			this->Heap.Add(Value);
 
-			ZESize Index = Heap.GetCount() - 1;
+			ZESize Index = this->Heap.GetCount() - 1;
 			while(Index != 0)
 			{
-				ZESize ParentIndex = GetParentIndex(Index);
+				ZESize ParentIndex = this->GetParentIndex(Index);
 
-				if (Heap[Index] > Heap[ParentIndex])
+				if (this->Heap[Index] > this->Heap[ParentIndex])
 					break;
 
-				Swap(Heap[Index], Heap[ParentIndex]);
+				Swap(this->Heap[Index], this->Heap[ParentIndex]);
 				Index = ParentIndex;
 			}
 		}
 
 		void Remove(ZESize Index)
 		{
-			Heap[Index] = Heap.GetLastItem();
-			Heap.DeleteAt(Heap.GetCount() - 1);
+			this->Heap[Index] = this->Heap.GetLastItem();
+			this->Heap.DeleteAt(this->Heap.GetCount() - 1);
 
 			MinHeapify(Index);
 		}
@@ -115,6 +128,22 @@ class ZEMinHeap : public ZEHeapBase<Type, Allocator_>
 		void RemoveMin()
 		{
 			Remove(0);
+		}
+
+		ZEMinHeap<Type, Allocator_>& operator=(const ZEMinHeap<Type, Allocator_>& Other)
+		{
+			this->Heap.CopyFrom(Other.Heap);
+			return *this;
+		}
+
+		ZEMinHeap(const ZEMinHeap<Type, Allocator_>& Other)
+		{
+			this->Heap.CopyFrom(Other.Heap);
+		}
+
+		ZEMinHeap()
+		{
+
 		}
 };
 

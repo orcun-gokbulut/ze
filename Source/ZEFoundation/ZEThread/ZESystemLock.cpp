@@ -93,7 +93,9 @@ ZESystemLock::ZESystemLock()
 
 ZESystemLock::ZESystemLock(const ZESystemLock& Lock)
 {
-	ZESystemLock::ZESystemLock();
+	Handle = CreateMutex(NULL, false, NULL);
+	if (Handle == NULL)
+		zeCriticalError("Can not create system lock.");
 }
 
 ZESystemLock::~ZESystemLock()

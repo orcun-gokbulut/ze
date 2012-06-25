@@ -44,7 +44,6 @@ enum ZEIPAddressType
 {
 	ZE_IAT_NONE,
 	ZE_IAT_IP_V4,
-	ZE_IAT_IP_V6,
 };
 
 class ZEIPAddress
@@ -52,18 +51,12 @@ class ZEIPAddress
 	public:
 
 		static const ZEIPAddress		IPv4Any;
-		static const ZEIPAddress		IPv6Any;
-
 		ZEIPAddressType					Type;
+		ZEUInt8							Address4[4];
 
-		union
-		{
-			ZEUInt8						Address4[4];
-			ZEUInt16					Address6[8];
-		};
 
-		static ZEIPAddress				Parse(ZEString& String);
-		static ZEArray<ZEIPAddress>		Lookup(ZEString& String);
+		static ZEIPAddress				Parse(const ZEString& String);
+		static ZEArray<ZEIPAddress>		Lookup(const ZEString& String);
 		static ZEArray<ZEIPAddress>		HostIPs();
 
 		bool							operator == (const ZEIPAddress &RightOperand) const;
@@ -71,8 +64,6 @@ class ZEIPAddress
 
 										ZEIPAddress();
 										ZEIPAddress(ZEUInt8 Byte0, ZEUInt8 Byte1, ZEUInt8 Byte2, ZEUInt8 Byte3);
-										ZEIPAddress(ZEUInt16 Word0, ZEUInt16 Word1, ZEUInt16 Word2, ZEUInt16 Word3, 
-													ZEUInt16 Word4, ZEUInt16 Word5, ZEUInt16 Word6, ZEUInt16 Word7);
 };
 
 #endif

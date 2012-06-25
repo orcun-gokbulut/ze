@@ -35,10 +35,19 @@
 
 #include "ZESocket.h"
 
+#ifdef ZE_PLATFORM_COMPILER_GCC
+#undef _WIN32_WINNT
+#define _WIN32_WINNT 0x501
+#endif
+
 #include <Winsock2.h>
-#include <Ws2ipdef.h>
 #include <Ws2tcpip.h>
+
+#ifdef ZE_PLATFORM_COMPILER_MSVC
 #include <Mstcpip.h>
+#include <Ws2ipdef.h>
+#endif
+
 #include <memory.h>
 
 static sockaddr_in CreateSockAddr4(const ZEIPAddress& IpAddress, ZEUInt16 Port)
@@ -54,7 +63,6 @@ static sockaddr_in CreateSockAddr4(const ZEIPAddress& IpAddress, ZEUInt16 Port)
 		Info.sin_port = htons(Port);
 		Info.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 	}
-	
 	else if(IpAddress.Type == ZE_IAT_IP_V4)
 	{
 		Addr.S_un.S_un_b.s_b1 = IpAddress.Address4[0];
@@ -64,38 +72,6 @@ static sockaddr_in CreateSockAddr4(const ZEIPAddress& IpAddress, ZEUInt16 Port)
 		Info.sin_family = AF_INET;
 		Info.sin_port = htons(Port);
 		Info.sin_addr =  Addr;
-	}
-
-	return Info;
-}
-
-static sockaddr_in6 CreateSockAddr6(const ZEIPAddress& IpAddress, ZEUInt16 Port)
-{
-	sockaddr_in6 Info;
-	memset(&Info, 0, sizeof(Info));
-	in6_addr Addr;
-	memset(&Addr, 0, sizeof(Addr));
-
-	if(IpAddress == ZEIPAddress::IPv6Any)
-	{		
-		Info.sin6_family = AF_INET6;
-		Info.sin6_port = htons(Port);
-		Info.sin6_addr = in6addr_any;
-	}
-
-	else if(IpAddress.Type == ZE_IAT_IP_V6)
-	{
-		Addr.u.Word[0] = IpAddress.Address6[0];
-		Addr.u.Word[1] = IpAddress.Address6[1];
-		Addr.u.Word[2] = IpAddress.Address6[2];
-		Addr.u.Word[3] = IpAddress.Address6[3];
-		Addr.u.Word[4] = IpAddress.Address6[4];
-		Addr.u.Word[5] = IpAddress.Address6[5];
-		Addr.u.Word[6] = IpAddress.Address6[6];
-		Addr.u.Word[7] = IpAddress.Address6[7];
-		Info.sin6_family = AF_INET6;
-		Info.sin6_port = htons(Port);
-		Info.sin6_addr = Addr;
 	}
 
 	return Info;
@@ -111,9 +87,6 @@ bool ZESocketTCP::Create(const ZEIPAddress& Address, ZEUInt16 Port)
 	if(Address.Type == ZE_IAT_IP_V4)
 		Socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	else if(Address.Type == ZE_IAT_IP_V6)
-		Socket = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
-
 	if(Socket == INVALID_SOCKET)
 	{
 		zeError("Can not create TCP Socket, WinSock Error code : %d", WSAGetLastError());
@@ -127,17 +100,6 @@ bool ZESocketTCP::Create(const ZEIPAddress& Address, ZEUInt16 Port)
 		if(bind(Socket, (SOCKADDR*)&LocalInfo, sizeof(LocalInfo)) == SOCKET_ERROR)
 		{
 			zeError("Can not bind IPv4 TCP Socket, WinSock Error code : %d", WSAGetLastError());
-			return false;
-		}
-	}
-
-	else if(Address.Type == ZE_IAT_IP_V6)
-	{
-		sockaddr_in6 LocalInfo = CreateSockAddr6(Address, Port);
-
-		if(bind(Socket, (SOCKADDR*)&LocalInfo, sizeof(LocalInfo)) == SOCKET_ERROR)
-		{
-			zeError("Can not bind IPv6 TCP Socket, WinSock Error code : %d", WSAGetLastError());
 			return false;
 		}
 	}
@@ -192,39 +154,15 @@ ZESSize ZESocketTCP::Connect(const ZEIPAddress& Address, ZEUInt16 Port)
 			else
 			{
 				zeError("Can not connect TCP IPv4 socket to specified address, WinSock Error code : %d", WSAGetLastError());
-				return ZE_SR_NOK;
+				return ZE_SR_ERROR;
 			}
 		}
-	}
-	else if(Address.Type == ZE_IAT_IP_V6)
-	{
-		sockaddr_in6 LocalInfo = CreateSockAddr6(Address, Port);
 
-		if(connect(Socket, (SOCKADDR*)&LocalInfo, sizeof(LocalInfo)) == SOCKET_ERROR)
-		{
-			ZEInt Error = WSAGetLastError();
-
-			if(Error != WSAEWOULDBLOCK && Error != WSAEALREADY)
-			{
-				zeError("Can not connect TCP IPv6 socket to specified address, WinSock Error code : %d", WSAGetLastError());
-				return ZE_SR_NOK;
-			}
-
-			else if(Error == WSAEWOULDBLOCK)
-			{
-				zeLog("WinSock notification code on connect() : %d", Error);
-				return ZE_SR_RETRY;
-			}
-
-			else
-			{
-				zeLog("WinSock notification code on connect() : %d", Error);
-				return ZE_SR_IN_PROGRESS;
-			}
-		}
+		return ZE_SR_OK;
 	}
 
-	return ZE_SR_OK;
+	return ZE_SR_ERROR;
+
 }
 
 ZESSize ZESocketTCP::Send(const void* Buffer, ZESize BufferSize)
@@ -252,7 +190,7 @@ ZESSize ZESocketTCP::Send(const void* Buffer, ZESize BufferSize)
 		else
 		{
 			zeError("Can not send data from TCP Socket, WinSock Error code : %d", WSAGetLastError());
-			return ZE_SR_NOK;
+			return ZE_SR_ERROR;
 		}
 	}
 
@@ -286,7 +224,7 @@ ZESSize ZESocketTCP::Recieve(void* Buffer, ZESize BufferSize)
 		else
 		{
 			//zeError("Can not receive data TCP Socket, WinSock Error code : %d", WSAGetLastError());
-			return ZE_SR_NOK;
+			return ZE_SR_ERROR;
 		}
 	}
 }
@@ -311,9 +249,6 @@ bool ZESocketTCPListener::Create(const ZEIPAddress& Address, ZEUInt16 Port)
 	if(Address.Type == ZE_IAT_IP_V4)
 		Socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	else if(Address.Type == ZE_IAT_IP_V6)
-		Socket = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
-
 	if(Socket == INVALID_SOCKET)
 	{
 		zeError("Can not create TCP Listener Socket, WinSock Error code : %d", WSAGetLastError());
@@ -327,17 +262,6 @@ bool ZESocketTCPListener::Create(const ZEIPAddress& Address, ZEUInt16 Port)
 		if(bind(Socket, (SOCKADDR*)&LocalInfo, sizeof(LocalInfo)) == SOCKET_ERROR)
 		{
 			zeError("Can not bind IPv4 TCP Listener Socket, WinSock Error code : %d", WSAGetLastError());
-			return false;
-		}
-	}
-
-	else if(Address.Type == ZE_IAT_IP_V6)
-	{
-		sockaddr_in6 LocalInfo = CreateSockAddr6(Address, Port);
-
-		if(bind(Socket, (SOCKADDR*)&LocalInfo, sizeof(LocalInfo)) == SOCKET_ERROR)
-		{
-			zeError("Can not bind IPv6 TCP Listener Socket, WinSock Error code : %d", WSAGetLastError());
 			return false;
 		}
 	}
@@ -375,59 +299,44 @@ bool ZESocketTCPListener::Close()
 
 ZESocketTCP* ZESocketTCPListener::Accept()
 {
-	SOCKET Result = accept(Socket, NULL, NULL);
 
-	if(Result == INVALID_SOCKET)
-	{
-		//zeLog("Accepted socket is not valid, WinSock Error code : %d", WSAGetLastError());
-		return NULL;
-	}
-
-	ZESocketTCP* ResultSocket = new ZESocketTCP();
-	ResultSocket->Socket = Result;
 
 	if(IpAddress.Type == ZE_IAT_IP_V4)
 	{
+		SOCKET Result = accept(Socket, NULL, NULL);
+		if(Result == INVALID_SOCKET)
+		{
+			zeError("Accepted socket is not valid. WinSock Error code : %d", WSAGetLastError());
+			return NULL;
+		}
+
 		sockaddr_in Info;
 		memset(&Info, 0, sizeof(Info));
 		int InfoSize = sizeof(Info);
-
 		if(getsockname(Result, (SOCKADDR*)&Info, &InfoSize) == SOCKET_ERROR)
 		{
+			closesocket(Socket);
 			zeError("Can not get TCP v4 socket name, WinSock Error code : %d", WSAGetLastError());
 			return NULL;
 		}
 		
+		ZESocketTCP* ResultSocket = new ZESocketTCP();
+		ResultSocket->Socket = Result;
 		ResultSocket->IpAddress = ZEIPAddress(Info.sin_addr.S_un.S_un_b.s_b1, Info.sin_addr.S_un.S_un_b.s_b2, Info.sin_addr.S_un.S_un_b.s_b3, Info.sin_addr.S_un.S_un_b.s_b4);
 		ResultSocket->Port = ntohs(Info.sin_port);
-	}
-
-	else if(IpAddress.Type == ZE_IAT_IP_V6)
-	{
-		sockaddr_in6 Info;
-		int InfoSize = 0;
-
-		if(getsockname(Result, (SOCKADDR*)&Info, &InfoSize) == SOCKET_ERROR)
+		
+		u_long IMode = 1;
+		if(ioctlsocket(Socket, FIONBIO, &IMode) == SOCKET_ERROR)
 		{
-			zeError("Can not get TCP v6 socket name, WinSock Error code : %d", WSAGetLastError());
+			closesocket(Socket);
+			zeError("Can not set TCP Socket non-blocking mode after accept, WinSock Error code : %d", WSAGetLastError());
 			return NULL;
 		}
 
-		ResultSocket->IpAddress = ZEIPAddress(Info.sin6_addr.u.Word[0], Info.sin6_addr.u.Word[1], Info.sin6_addr.u.Word[2], Info.sin6_addr.u.Word[3], Info.sin6_addr.u.Word[4],
-											  Info.sin6_addr.u.Word[5], Info.sin6_addr.u.Word[6], Info.sin6_addr.u.Word[7]);
-		
-		ResultSocket->Port = ntohs(Info.sin6_port);
+		return ResultSocket;
 	}
 
-	u_long IMode = 1;
-
-	if(ioctlsocket(Socket, FIONBIO, &IMode) == SOCKET_ERROR)
-	{
-		zeError("Can not set TCP Socket non-blocking mode after accept, WinSock Error code : %d", WSAGetLastError());
-		return NULL;
-	}
-
-	return ResultSocket;
+	return NULL;
 }
 
 const ZEIPAddress& ZESocketTCPListener::GetIpAddress() const
@@ -444,52 +353,33 @@ ZEUInt16 ZESocketTCPListener::GetPort() const
 
 bool ZESocketUDP::Create(const ZEIPAddress& Address, ZEUInt16 Port)
 {
-	if(Address.Type == ZE_IAT_NONE)
-		return false;
-
 	if(Address.Type == ZE_IAT_IP_V4)
+	{
 		Socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		if(Socket == INVALID_SOCKET)
+		{
+			zeError("Can not create UDP Socket, WinSock Error code : %d", WSAGetLastError());
+			return false;
+		}
 
-	else if(Address.Type == ZE_IAT_IP_V6)
-		Socket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-
-	if(Socket == INVALID_SOCKET)
-	{
-		zeError("Can not create UDP Socket, WinSock Error code : %d", WSAGetLastError());
-		return false;
-	}
-
-	if(Address.Type == ZE_IAT_IP_V4)
-	{
- 		sockaddr_in LocalInfo = CreateSockAddr4(Address, Port);
-
+		sockaddr_in LocalInfo = CreateSockAddr4(Address, Port);
 		if(bind(Socket, (SOCKADDR*)&LocalInfo, sizeof(LocalInfo)) == SOCKET_ERROR)
 		{
+			closesocket(Socket);
 			zeError("Can not bind IPv4 UDP Socket, WinSock Error code : %d", WSAGetLastError());
 			return false;
 		}
-	}
 
-	else if(Address.Type == ZE_IAT_IP_V6)
-	{
-		sockaddr_in6 LocalInfo = CreateSockAddr6(Address, Port);
+		IpAddress = Address;
+		this->Port = Port;
 
-		if(bind(Socket, (SOCKADDR*)&LocalInfo, sizeof(LocalInfo)) == SOCKET_ERROR)
+		u_long IMode = 1;
+		if(ioctlsocket(Socket, FIONBIO, &IMode) == SOCKET_ERROR)
 		{
-			zeError("Can not bind IPv6 UDP Socket, WinSock Error code : %d", WSAGetLastError());
+			closesocket(Socket);
+			zeError("Can not set UDP Socket non-blocking mode, WinSock Error code : %d", WSAGetLastError());
 			return false;
 		}
-	}
-
-	IpAddress = Address;
-	this->Port = Port;
-
-	u_long IMode = 1;
-
-	if(ioctlsocket(Socket, FIONBIO, &IMode) == SOCKET_ERROR)
-	{
-		zeError("Can not set UDP Socket non-blocking mode, WinSock Error code : %d", WSAGetLastError());
-		return false;
 	}
 
 	return true;
@@ -523,7 +413,7 @@ ZESSize ZESocketUDP::SendTo(const ZEIPAddress* To, ZEUInt16 ToPort, const void* 
 	if(To == NULL)
 	{
 		zeError("To Ip address can not be NULL");
-		return ZE_SR_NOK;
+		return ZE_SR_ERROR;
 	}
 
 	if(To->Type == ZE_IAT_IP_V4)
@@ -550,36 +440,7 @@ ZESSize ZESocketUDP::SendTo(const ZEIPAddress* To, ZEUInt16 ToPort, const void* 
 			else
 			{
 				zeError("Can not send to Ipv4 UDP socket, WinSock Error code : %d", WSAGetLastError());
-				return ZE_SR_NOK;
-			}
-		}
-	}
-
-	else if(To->Type == ZE_IAT_IP_V6)
-	{
-		sockaddr_in6 ToInfo = CreateSockAddr6(*To, ToPort);
-		Result = sendto(Socket, (const char*)Buffer, BufferSize, 0, (SOCKADDR*)&ToInfo, sizeof(ToInfo));
-
-		if(Result == SOCKET_ERROR)
-		{
-			ZEInt Error = WSAGetLastError();
-
-			if(Error == WSAEWOULDBLOCK)
-			{
-				zeLog("WinSock notification code on sendto() : %d", Error);
-				return ZE_SR_RETRY;
-			}
-
-			else if(Error == WSAEALREADY)
-			{
-				zeLog("WinSock notification code on sendto() : %d", Error);
-				return ZE_SR_IN_PROGRESS;
-			}
-
-			else
-			{
-				zeError("Can not send to Ipv6 UDP socket, WinSock Error code : %d", WSAGetLastError());
-				return ZE_SR_NOK;
+				return ZE_SR_ERROR;
 			}
 		}
 	}
@@ -594,9 +455,8 @@ ZESSize ZESocketUDP::RecieveFrom(void* Buffer, ZESize BufferSize, const ZEIPAddr
 	if(From == NULL)
 	{
 		zeError("From Ip address can not be NULL");
-		return ZE_SR_NOK;
+		return ZE_SR_ERROR;
 	}
-
 	else
 	{
 		if(From->Type == ZE_IAT_IP_V4)
@@ -625,38 +485,7 @@ ZESSize ZESocketUDP::RecieveFrom(void* Buffer, ZESize BufferSize, const ZEIPAddr
 				else
 				{
 					zeError("Can not receive from Ipv4 UDP socket, WinSock Error code : %d", WSAGetLastError());
-					return ZE_SR_NOK;
-				}
-			}
-		}
-
-		else if(From->Type == ZE_IAT_IP_V6)
-		{
-			sockaddr_in6 FromInfo = CreateSockAddr6(*From, FromPort);
-			int FromInfoSize = sizeof(FromInfo);
-
-			Result = recvfrom(Socket, (char*)Buffer, BufferSize, 0, (SOCKADDR*)&FromInfo, &FromInfoSize);
-
-			if(Result == SOCKET_ERROR)
-			{
-				ZEInt Error = WSAGetLastError();
-
-				if(Error == WSAEWOULDBLOCK)
-				{
-					zeLog("WinSock notification code on recvfrom() : %d", Error);
-					return ZE_SR_RETRY;
-				}
-
-				else if(Error == WSAEALREADY)
-				{
-					zeLog("WinSock notification code on recvfrom() : %d", Error);
-					return ZE_SR_IN_PROGRESS;
-				}
-
-				else
-				{
-					zeError("Can not receive from Ipv6 UDP socket, WinSock Error code : %d", WSAGetLastError());
-					return ZE_SR_NOK;
+					return ZE_SR_ERROR;
 				}
 			}
 		}

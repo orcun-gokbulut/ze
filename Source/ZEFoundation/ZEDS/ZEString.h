@@ -50,14 +50,16 @@ class ZEString
 
 	public:			
 		void						SetValue(const char* String);
-		void						SetValue(ZEInt8 Value, ZEUInt Base = 10);
-		void						SetValue(ZEInt16 Value, ZEUInt Base = 10);
-		void						SetValue(ZEInt32 Value, ZEUInt Base = 10);
-		void						SetValue(ZEInt64 Value, ZEUInt Base = 10);
-		void						SetValue(ZEUInt8 Value, ZEUInt Base = 10);
-		void						SetValue(ZEUInt16 Value, ZEUInt Base = 10);
-		void						SetValue(ZEUInt32 Value, ZEUInt Base = 10);
-		void						SetValue(ZEUInt64 Value, ZEUInt Base = 10);
+		void						SetValue(const wchar_t* String);
+		void						SetValue(wchar_t Character);
+		void						SetValue(ZEInt8 Value);
+		void						SetValue(ZEInt16 Value);
+		void						SetValue(ZEInt32 Value);
+		void						SetValue(ZEInt64 Value);
+		void						SetValue(ZEUInt8 Value);
+		void						SetValue(ZEUInt16 Value);
+		void						SetValue(ZEUInt32 Value);
+		void						SetValue(ZEUInt64 Value);
 		void						SetValue(float Value, ZEUInt Digits);
 		void						SetValue(bool Value, const char* TrueText = "True", const char* FalseText = "False");
 
@@ -115,8 +117,8 @@ class ZEString
 		
 		static ZEString 			FromChar(char Value);
 		static ZEString				FromWChar(wchar_t Value);
-		static ZEString 			FromInt(ZEInt Value, ZEUInt Base = 10);
-		static ZEString 			FromUInt(ZEUInt Value, ZEUInt Base = 10);
+		static ZEString 			FromInt(ZEInt Value);
+		static ZEString 			FromUInt(ZEUInt Value);
 		static ZEString 			FromFloat(float Value, ZEUInt Digits);
 		static ZEString 			FromBool(bool Value, const char* TrueText = "True", const char* FalseText = "False");
 		static ZEString 			FromCString(const char* Value);

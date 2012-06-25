@@ -36,11 +36,13 @@
 #ifndef __ZE_LOCK_H__
 #define __ZE_LOCK_H__
 
+#include "ZETypes.h"
+
 class ZELock
 {
 	private:
-		long				CurrentNumber;
-		volatile long		NextNumber;
+		ZEInt32				CurrentNumber;
+		volatile ZEInt32	NextNumber;
 
 	public:
 		bool				Test();

@@ -47,6 +47,10 @@
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
 
+#if defined(ZE_PLATFORM_COMPILER_GCC)
+	#define _fseeki64 fseeko64
+	#define _ftelli64 ftello64
+#endif
 
 bool ZEPartialFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 {

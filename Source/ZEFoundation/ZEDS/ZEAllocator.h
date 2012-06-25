@@ -141,15 +141,15 @@ class ZEChunkAllocator : public ZEAllocatorBase<Type>
 			ZESize OldSize;
 			if (NewSize != 0)
 			{
-				if ((Size < NewSize) || (Size - NewSize > ChunkSize))
+				if ((this->Size < NewSize) || (this->Size - NewSize > ChunkSize))
 				{
-					OldSize = Size;
+					OldSize = this->Size;
 					if (NewSize < ChunkSize)
-						Size = ChunkSize;
+						this->Size = ChunkSize;
 					else
-						Size = ((NewSize / ChunkSize) + 1) * ChunkSize;
+						this->Size = ((NewSize / ChunkSize) + 1) * ChunkSize;
 
-					*Pointer = new Type[Size];
+					*Pointer = new Type[this->Size];
 					return true;
 				}
 				else
@@ -157,7 +157,7 @@ class ZEChunkAllocator : public ZEAllocatorBase<Type>
 			}
 			else
 			{
-				Size = 0;
+				this->Size = 0;
 				if (*Pointer != NULL)
 				{
 					delete[] *Pointer;
@@ -170,7 +170,7 @@ class ZEChunkAllocator : public ZEAllocatorBase<Type>
 		inline void Reallocate(Type** Pointer, ZESize NewSize)
 		{
 			Type* OldPointer = *Pointer;
-			ZESize OldSize = Size;
+			ZESize OldSize = this->Size;
 			if (Allocate(Pointer, NewSize))
 			{	
 				if (OldPointer != NULL)		
@@ -195,11 +195,11 @@ class ZESmartAllocator : public ZEAllocatorBase<Type>
 
 			if (NewSize != 0)
 			{
-				if ((NewSize > Size) || (NewSize < LowerLimit))
+				if ((NewSize > this->Size) || (NewSize < LowerLimit))
 				{
-					Size = (ZESize)(ZEMath::Power((float)Exponent, (ZEMath::Log((float)NewSize) / ZEMath::Log((float)Exponent)) + 1.0f) + 0.5f);
-					LowerLimit = Size / Exponent;
-					*Pointer = new Type[Size];
+					this->Size = (ZESize)(ZEMath::Power((float)Exponent, (ZEMath::Log((float)NewSize) / ZEMath::Log((float)Exponent)) + 1.0f) + 0.5f);
+					LowerLimit = this->Size / Exponent;
+					*Pointer = new Type[this->Size];
 					return true;
 				}
 				else
@@ -207,7 +207,7 @@ class ZESmartAllocator : public ZEAllocatorBase<Type>
 			}
 			else
 			{
-				Size = 0;
+				this->Size = 0;
 				if (*Pointer != NULL)
 				{
 					delete[] *Pointer;
@@ -219,7 +219,7 @@ class ZESmartAllocator : public ZEAllocatorBase<Type>
 
 		inline void Reallocate(Type** Pointer, ZESize NewSize)
 		{
-			ZESize OldSize = Size;
+			ZESize OldSize = this->Size;
 			Type* OldPointer = *Pointer;
 			if (Allocate(Pointer, NewSize))
 			{	

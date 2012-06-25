@@ -39,10 +39,14 @@
 #include <memory.h>
 #include <mbstring.h> 
 #include <wchar.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <stdarg.h>
 
+#ifdef ZE_PLATFORM_COMPILER_GCC
+	#define _snprintf snprintf
+#endif
 #include "ZEError.h"
 
 bool ZEString::IsEmpty() const
@@ -95,66 +99,86 @@ void ZEString::SetValue(const char* String)
 	ZEDebugCheckMemory();
 }
 
-void ZEString::SetValue(ZEInt8 Value, ZEUInt Base)
+void ZEString::SetValue(wchar_t Character)
+{
+	char Temp[4];
+	ZESize Size = wctomb(Temp, Character) + 1;
+
+	Allocator.Allocate(&Buffer, Size);
+
+	memcpy(Buffer, Temp, Size - 1);
+	Temp[Size - 1] = '\0';
+}
+
+void ZEString::SetValue(const wchar_t* String)
+{
+	ZESize Size = wcstombs(NULL, String, (size_t)-1);
+	Allocator.Allocate(&Buffer, Size);
+	wcstombs(Buffer, String, (size_t)-1);
+}
+
+void ZEString::SetValue(ZEInt8 Value)
 {
 	char Buffer[35];
-	itoa(Value, Buffer, Base);
+	_snprintf(Buffer, 35, "%d", Value);
 	SetValue(Buffer);
 }
 
-void ZEString::SetValue(ZEInt16 Value, ZEUInt Base)
+void ZEString::SetValue(ZEInt16 Value)
 {
 	char Buffer[35];
-	itoa(Value, Buffer, Base);
+	_snprintf(Buffer, 35, "%d", Value);
 	SetValue(Buffer);
 }
 
-void ZEString::SetValue(ZEInt32 Value, ZEUInt Base)
+void ZEString::SetValue(ZEInt32 Value)
 {
 	char Buffer[35];
-	itoa(Value, Buffer, Base);
+	_snprintf(Buffer, 35, "%d", Value);
 	SetValue(Buffer);
 }
 
-void ZEString::SetValue(ZEInt64 Value, ZEUInt Base)
+void ZEString::SetValue(ZEInt64 Value)
 {
 	char Buffer[67];
-	_i64toa(Value, Buffer, Base);
+	_snprintf(Buffer, 67, "%ll", Value);
 	SetValue(Buffer);
 }
 
-void ZEString::SetValue(ZEUInt8 Value, ZEUInt Base)
+void ZEString::SetValue(ZEUInt8 Value)
 {
 	char Buffer[35];
-	ultoa(Value, Buffer, Base);
+	_snprintf(Buffer, 35, "%u", Value);
 	SetValue(Buffer);
 }
 
-void ZEString::SetValue(ZEUInt16 Value, ZEUInt Base)
+void ZEString::SetValue(ZEUInt16 Value)
 {
 	char Buffer[35];
-	ultoa(Value, Buffer, Base);
+	_snprintf(Buffer, 35, "%u", Value);
 	SetValue(Buffer);
 }
 
-void ZEString::SetValue(ZEUInt32 Value, ZEUInt Base)
+void ZEString::SetValue(ZEUInt32 Value)
 {
 	char Buffer[35];
-	ultoa(Value, Buffer, Base);
+	_snprintf(Buffer, 35, "%u", Value);
 	SetValue(Buffer);
 }
 
-void ZEString::SetValue(ZEUInt64 Value, ZEUInt Base)
+void ZEString::SetValue(ZEUInt64 Value)
 {
 	char Buffer[67];
-	_ui64toa(Value, Buffer, Base);
+	_snprintf(Buffer, 67, "%u", Value);
 	SetValue(Buffer);
 }
 
 void ZEString::SetValue(float Value, ZEUInt Digits)
 {
-	char Buffer[_CVTBUFSIZE];
-	gcvt(Value, Digits, Buffer);
+	char Format[100];
+	_snprintf(Format, 100, "%%.%df", Digits);
+	char Buffer[100];
+	_snprintf(Buffer, 100, Format, Value);
 	SetValue(Buffer);
 }
 
@@ -577,54 +601,31 @@ ZEString ZEString::FromChar(char Value)
 
 ZEString ZEString::FromWChar(wchar_t Value)
 {
-	ZESize Size;
 	ZEString Temp;
-	
-	Size = sizeof(char) + 1;
-	Temp.Allocator.Allocate(&Temp.Buffer, Size);
-	
-	wctomb(Temp.Buffer, Value);
-	
+	Temp.SetValue(Value);
 	return Temp;
 }
 
-ZEString ZEString::FromInt(ZEInt Value, ZEUInt Base)
+ZEString ZEString::FromInt(ZEInt Value)
 {
-	char Buffer[33];
-	ltoa(Value, Buffer, Base);
-	
-	ZESize Size = strlen(Buffer) + 1;
 	ZEString Temp;
-	Temp.Allocator.Allocate(&Temp.Buffer, Size * sizeof(char));
-	memcpy(Temp.Buffer, Buffer, Size);
-
+	Temp.SetValue(Value);
 	return Temp;
 }
 
-ZEString ZEString::FromUInt(ZEUInt Value, ZEUInt Base)
+ZEString ZEString::FromUInt(ZEUInt Value)
 {
-	char Buffer[33];
-	ultoa(Value, Buffer, Base);
-	
-	ZESize Size = strlen(Buffer) + 1;
 	ZEString Temp;
-	Temp.Allocator.Allocate(&Temp.Buffer, Size * sizeof(char));
-	memcpy(Temp.Buffer, Buffer, Size);
-
+	Temp.SetValue(Value);
 	return Temp;
 }
 
-ZEString ZEString::FromFloat(float Value, ZEUInt Digits)
+ZEString ZEString::FromFloat(float Value, ZEUInt Digists)
 {
-	char Buffer[_CVTBUFSIZE];
-	gcvt(Value, Digits, Buffer);
-	
 	ZEString Temp;
-	ZESize Size = (strlen(Buffer) + 1) * sizeof(char);
-	Temp.Allocator.Allocate(&Temp.Buffer, Size);
-	memcpy(Temp.Buffer, Buffer, Size);
-	
+	Temp.SetValue(Value, Digists);
 	return Temp;
+
 }
 
 ZEString ZEString::FromBool(bool Value, const char* TrueText, const char* FalseText)
@@ -634,17 +635,8 @@ ZEString ZEString::FromBool(bool Value, const char* TrueText, const char* FalseT
 
 ZEString ZEString::FromWString(const wchar_t* Value)
 {
-	ZESize Size;
-	ZESize Lenght;
-	ZESize Converted;
 	ZEString Temp;
-
-	Lenght = wcslen(Value);
-	Size = (Lenght + 1) * sizeof (char);
-	Temp.Allocator.Allocate(&Temp.Buffer, Size);
-
-	wcstombs_s(&Converted, Temp.Buffer, Size, Value, _TRUNCATE);
-	
+	Temp.SetValue(Value);
 	return Temp;
 }
 
