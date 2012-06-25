@@ -169,7 +169,7 @@ ZESSize ZESocketTCP::Send(const void* Buffer, ZESize BufferSize)
 {
 	ZESSize Result = 0;
 
-	Result = send(Socket, (const char*)Buffer, BufferSize, 0);
+	Result = send(Socket, (const char*)Buffer, (int)BufferSize, 0);
 
 	if(Result == SOCKET_ERROR)
 	{
@@ -201,7 +201,7 @@ ZESSize ZESocketTCP::Recieve(void* Buffer, ZESize BufferSize)
 {
 	ZESSize Result = 0;
 
-	Result = recv(Socket, (char*)Buffer, BufferSize, 0);
+	Result = recv(Socket, (char*)Buffer, (int)BufferSize, 0);
 
 	if(Result >= 0)
 		return Result;
@@ -419,7 +419,7 @@ ZESSize ZESocketUDP::SendTo(const ZEIPAddress* To, ZEUInt16 ToPort, const void* 
 	if(To->Type == ZE_IAT_IP_V4)
 	{
 		sockaddr_in ToInfo = CreateSockAddr4(*To, ToPort);
-		Result = sendto(Socket, (const char*)Buffer, BufferSize, 0, (SOCKADDR*)&ToInfo, sizeof(ToInfo));
+		Result = sendto(Socket, (const char*)Buffer, (int)BufferSize, 0, (SOCKADDR*)&ToInfo, sizeof(ToInfo));
 
 		if(Result == SOCKET_ERROR)
 		{
@@ -464,7 +464,7 @@ ZESSize ZESocketUDP::RecieveFrom(void* Buffer, ZESize BufferSize, const ZEIPAddr
 			sockaddr_in FromInfo = CreateSockAddr4(*From, FromPort);			
 			int FromInfoSize = sizeof(FromInfo);
 
-			Result = recvfrom(Socket, (char*)Buffer, BufferSize, 0, (SOCKADDR*)&FromInfo, &FromInfoSize);
+			Result = recvfrom(Socket, (char*)Buffer, (int)BufferSize, 0, (SOCKADDR*)&FromInfo, &FromInfoSize);
 
 			if(Result == SOCKET_ERROR)
 			{

@@ -51,7 +51,7 @@ class  ZEMaxHeap : public ZEHeapBase<Type, Allocator_>
 			Two = Temp;
 		}
 
-		void MaxHeapify(ZEInt Index)
+		void MaxHeapify(ZESize Index)
 		{
 			ZESize Largest = Index;
 
@@ -75,7 +75,7 @@ class  ZEMaxHeap : public ZEHeapBase<Type, Allocator_>
 		{
 			this->Heap.CopyFrom(Array, Size);
 
-			for (ZESize I = this->Heap.GetSize() / 2; I >= 0; I--)
+			for (ZESSize I = this->Heap.GetSize() / 2; I >= 0; I--)
 				MaxHeapify(I);
 		}
 
@@ -116,7 +116,7 @@ class  ZEMaxHeap : public ZEHeapBase<Type, Allocator_>
 			}
 		}
 
-		void Remove(ZEInt Index)
+		void Remove(ZESize Index)
 		{
 			this->Heap[Index] = this->Heap.GetLastItem();
 			this->Heap.DeleteAt(this->Heap.GetCount() - 1);

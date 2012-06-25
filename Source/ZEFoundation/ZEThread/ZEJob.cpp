@@ -81,7 +81,7 @@ void ZEJob::RemoveDependentJob(const ZEString& Job)
 
 void ZEJob::Reset()
 {
-	zeDebugCheck(Status != ZE_JS_DONE || Status != ZE_JS_NONE, "Only jobs with status ZE_JS_DONE can be reseted.");
+	zeDebugCheck(Status == ZE_JS_DONE || Status == ZE_JS_NONE, "Only jobs with status ZE_JS_DONE can be reseted.");
 	if (Status == ZE_JS_DONE)
 		Status = ZE_JS_NONE;
 }

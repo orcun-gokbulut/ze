@@ -75,7 +75,7 @@ class ZESwap
 			#elif ZE_PLATFOMR_COMPILER_GCC
 				return __builtin_bswap16(Value) 
 			#else
-				return (Swap((ZEUInt32)(Value & 0xFFFFFFFF)) << 32) | Swap((ZEUInt32)(Value >> 32));
+				return ((ZEUInt64)Swap((ZEUInt32)(Value & 0xFFFFFFFF)) << 32) | Swap((ZEUInt32)(Value >> 32));
 			#endif
 		}
 

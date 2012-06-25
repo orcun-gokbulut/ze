@@ -141,7 +141,7 @@ void ZEString::SetValue(ZEInt32 Value)
 void ZEString::SetValue(ZEInt64 Value)
 {
 	char Buffer[67];
-	_snprintf(Buffer, 67, "%ll", Value);
+	_snprintf(Buffer, 67, "%lld", Value);
 	SetValue(Buffer);
 }
 
@@ -169,7 +169,7 @@ void ZEString::SetValue(ZEUInt32 Value)
 void ZEString::SetValue(ZEUInt64 Value)
 {
 	char Buffer[67];
-	_snprintf(Buffer, 67, "%u", Value);
+	_snprintf(Buffer, 67, "%llu", Value);
 	SetValue(Buffer);
 }
 

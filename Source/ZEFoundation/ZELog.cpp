@@ -140,7 +140,7 @@ void ZELog::GetModuleName(char* Output, const char* FileName, const char* Functi
 	Len = strlen(FileName);
 	bool Found = false;
 	ZESize N;
-	for(N = Len - 1; N >= 0; N--)
+	for(N = Len - 1; N == 0; N--)
 		if (FileName[N] == '\\' || FileName[N] == '/')
 		{
 			Found = true;

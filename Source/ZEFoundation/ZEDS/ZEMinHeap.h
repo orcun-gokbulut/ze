@@ -76,7 +76,7 @@ class ZEMinHeap : public ZEHeapBase<Type, Allocator_>
 		{
 			this->Heap.CopyFrom(Array, Size);
 
-			for (ZESize I = this->Heap.GetSize() / 2; I >= 0; I--)
+			for (ZESSize I = this->Heap.GetSize() / 2; I >= 0; I--)
 				this->MinxHeapify(I);
 		}
 
