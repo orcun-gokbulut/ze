@@ -32,7 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-/*
+
 #include "ZEVector.h"
 
 // ZEVector2
@@ -495,4 +495,3 @@ void ZEVector4::Saturate(ZEVector4& Out, const ZEVector4& Vector)
 	else
 		Out.w = Vector.w;
 }
-*/
