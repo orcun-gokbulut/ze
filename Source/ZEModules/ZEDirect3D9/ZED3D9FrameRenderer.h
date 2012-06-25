@@ -50,6 +50,7 @@
 #include "ZED3D9ColorTransformProcessor.h"
 #include "ZED3D9MLAAProcessor.h"
 #include "ZED3D9GrainProcessor.h"
+#include "ZED3D9ChannelDisorientationProcessor.h"
 
 class ZELight;
 class ZEPointLight;
@@ -88,6 +89,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9Texture2D*					SSAAInputBuffer;
 		ZED3D9Texture2D*					BlurInputBuffer;
 		ZED3D9Texture2D*					GrainInputBuffer;
+		ZED3D9Texture2D*					CDInputBuffer;
 		
 		ZED3D9SSAOProcessor					SSAOProcessor;
 		ZED3D9SSAAProcessor					SSAAProcessor;
@@ -147,6 +149,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9BlurProcessor					BlurProcessor;
 		ZED3D9GrainProcessor				GrainProcessor;
 		ZED3D9ColorTransformProcessor		CTProcessor;
+		ZED3D9ChannelDisorientationProcessor CDProcessor;
 		
 
 		virtual void						SetViewPort(ZEViewPort* ViewPort);

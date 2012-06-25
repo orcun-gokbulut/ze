@@ -766,6 +766,10 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 		HDRInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	HDRInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
 
+	if(CDInputBuffer == NULL)
+		CDInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	CDInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
+
 	if (ABuffer == NULL)
 		ABuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	ABuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_F16_4, true);
@@ -784,6 +788,7 @@ void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 	/*
 	ZED3D_DESTROY(EDInputBuffer);
 	*/
+	ZED3D_DESTROY(CDInputBuffer);
 	ZED3D_DESTROY(GrainInputBuffer);
 	ZED3D_DESTROY(FogInputBuffer);
 	ZED3D_DESTROY(DOFInputBuffer);
@@ -813,6 +818,7 @@ ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 	CTInputBuffer	= NULL;
 	BlurInputBuffer	= NULL;
 	SSAAInputBuffer = NULL;
+	CDInputBuffer = NULL;
 
 	LightningComponents.LightMeshVB				= NULL;
 	LightningComponents.PointLightVS			= NULL;
@@ -868,6 +874,9 @@ bool ZED3D9FrameRenderer::Initialize()
 	EDProcessor.Initialize();
 	*/
 
+	CDProcessor.SetRenderer(this);
+	CDProcessor.Initialize();
+
 	GrainProcessor.SetRenderer(this);
 	GrainProcessor.Initialize();
 
@@ -888,6 +897,7 @@ void ZED3D9FrameRenderer::Deinitialize()
 	SSAOProcessor.Deinitialize();
 	SSAAProcessor.Deinitialize();
 	MLAAProcessor.Deinitialize();
+	CDProcessor.Deinitialize();
 	/*
 	EDProcessor.Deinitialize();
 	*/
@@ -1037,12 +1047,18 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 
 		// HDR Process
 		HDRProcessor.SetInput(HDRInputBuffer);
-		HDRProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
+		HDRProcessor.SetOutput((ZED3D9ViewPort*)CDInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);
 		
+		CDProcessor.SetInput(CDInputBuffer);
+		CDProcessor.SetOutput(ViewPort);
+		CDProcessor.Process();
+
+		/*
 		GrainProcessor.SetInput(GrainInputBuffer);
 		GrainProcessor.SetOutput(ViewPort);
 		GrainProcessor.Process(ElaspedTime);
+		*/
 
 		/*
 		// DOF Process
