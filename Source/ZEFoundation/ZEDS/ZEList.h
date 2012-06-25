@@ -39,6 +39,7 @@
 #include "ZETypes.h"
 #include "ZEError.h"
 #include "ZEListIterators.h"
+#include "ZEError.h"
 
 class ZEListItem
 {
@@ -79,7 +80,7 @@ class ZEList
 			return Iterator(this);
 		}
 
-		typedef ZEListIterator<ZEType> ConstIterator;
+		typedef ZEListIteratorConst<ZEType> ConstIterator;
 		ConstIterator GetConstIterator() const
 		{
 			return ConstIterator(this);
@@ -105,6 +106,8 @@ class ZEList
 
 			LastItem = Item;
 
+			Count++;
+
 			return Item;
 		}
 
@@ -116,7 +119,7 @@ class ZEList
 			Item->NextItem = FirstItem;
 			Item->PrevItem = NULL;
 
-			if (LastItme == NULL)
+			if (LastItem == NULL)
 				LastItem = Item;
 
 			if (FirstItem != NULL)
@@ -126,6 +129,8 @@ class ZEList
 
 
 			Count++;
+
+			return Item;
 		}
 
 		inline ZEType* Insert(ZESize Index, ZEType* Item)
@@ -145,6 +150,7 @@ class ZEList
 				Item->NextItem = OldItem;
 				OldItem->PrevItem = Item;
 				Count++;
+				return OldItem;
 			}
 		}
 
@@ -180,16 +186,16 @@ class ZEList
 				Cursor->NextItem = NULL;
 				Cursor = Temp;
 			}
-			Count = 0;
+  			Count = 0;
 		}
 
 		inline const ZEType* GetItem(ZESize Index) const
 		{
 			zeDebugCheck(Index >= Count, "Index is out of range.");
 			
-			const ZEType* Cursor = FirstItem;
+			const ZEType* Cursor = (ZEType*)FirstItem;
 			while(Index-- != 0)
-				Cursor = Cursor->NextItem;
+				Cursor = (ZEType*)Cursor->NextItem;
 			
 			return Cursor;
 		}
@@ -198,9 +204,9 @@ class ZEList
 		{
 			zeDebugCheck(Index >= Count, "Index is out of range.");
 
-			ZEItem* Cursor = FirstItem;
+			ZEType* Cursor = (ZEType*)FirstItem;
 			while(Index-- != 0)
-				Cursor = Cursor->NextItem;
+				Cursor = (ZEType*)Cursor->NextItem;
 
 			return Cursor;
 		}
@@ -245,7 +251,7 @@ class ZEList
 		inline ZEType* Dequeue()
 		{
 			ZEType* Item = (ZEType*)FirstItem;
-			Remove(FirstItem);
+			Remove((ZEType*)FirstItem);
 
 			return Item;
 		}
@@ -255,34 +261,37 @@ class ZEList
 			Insert(Value);
 		}
 
-		inline ZEType Pop()
+		inline ZEType* Pop()
 		{
 			ZEType* Item = (ZEType*)FirstItem;
-			Remove(FirstItem);
+			Remove((ZEType*)FirstItem);
 
 			return Item;
 		}
 
 		inline bool Exists(ZEType* Item) const
 		{
-			ZEItem* Cursor = FirstItem;
+			ZEType* Cursor = (ZEType*)FirstItem;
 			while(Cursor != NULL)
+			{
 				if (Cursor == Item)
 					return true;
-
+				Cursor = (ZEType*)Cursor->NextItem;
+			}
 			return false;
 		}
 
 		inline ZESSize FindIndex(ZEType* Item, ZESize StartIndex = 0) const
 		{
 			ZESize Index = 0;
-			ZEItem* Cursor = FirstItem;
+			ZEType* Cursor = (ZEType*)FirstItem;
 			while(Cursor != NULL)
 			{
 				if (Cursor == Item)
 					return Index;
 
 				Index++;
+				Cursor = (ZEType*)Cursor->NextItem;
 			}
 
 			return -1;
