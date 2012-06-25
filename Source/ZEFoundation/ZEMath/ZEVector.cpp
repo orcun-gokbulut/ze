@@ -74,16 +74,22 @@ void ZEVector2::ConvertToPolar(float& Radius, float& Theta)
 	Theta = ZEAngle::ArcTan2(y, x);
 }
 
-inline void ZEVector2::Add(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
+void ZEVector2::Add(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
 {
 	Out.x = A.x + B.x;
 	Out.y = A.y + B.y;
 }
 
-inline void ZEVector2::Substution(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
+void ZEVector2::Substution(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
 {
 	Out.x = A.x - B.x;
 	Out.y = A.y - B.y;
+}
+
+void ZEVector2::Scale(ZEVector2 &Out, const ZEVector2 &A, float s)
+{
+	Out.x = A.x * s;
+	Out.y = A.y * s;
 }
 
 void ZEVector2::Multiply(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
@@ -92,27 +98,10 @@ void ZEVector2::Multiply(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
 	Out.y = A.y * B.y;
 }
 
-void ZEVector2::Divide(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
-{
-	Out.x = A.x / B.x;
-	Out.y = A.y / B.y;
-}
-
 void ZEVector2::Divide(ZEVector2 &Out, const ZEVector2 &A, float s)
 {
 	Out.x = A.x / s;
 	Out.y = A.y / s;
-}
-
-float ZEVector2::DotProduct(const ZEVector2 &A, const ZEVector2 &B)
-{
-	return A.x * B.x + A.y * B.y ;
-}
-
-void ZEVector2::Scale(ZEVector2 &Out, const ZEVector2 &A, float s)
-{
-	Out.x = A.x * s;
-	Out.y = A.y * s;
 }
 
 bool ZEVector2::IsValid() const
@@ -130,29 +119,17 @@ bool ZEVector2::IsNormalized() const
 
 float ZEVector2::Length(const ZEVector2 &A)
 {
-	return ZEMath::Sqrt(A.x * A.x + A.y * A.y);
+	return ZEMath::Sqrt(ZEVector2::DotProduct(A, A));
 }
 
 float ZEVector2::LengthSquare(const ZEVector2 &A)
 {
-	return A.x * A.x + A.y * A.y;
+	return ZEVector2::DotProduct(A, A);
 }
 
 float ZEVector2::Distance(const ZEVector2 &A, const ZEVector2 &B)
 {
-	return ZEMath::Sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
-}
-
-float ZEVector2::DistanceSquare(const ZEVector2 &A, const ZEVector2 &B)
-{
-	return (A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y);
-}
-
-void ZEVector2::Normalize(ZEVector2 &Out, const ZEVector2 &A)
-{
-	float L = A.Length();
-	Out.x = A.x / L;
-	Out.y = A.y / L;
+	return ZEMath::Sqrt(ZEVector2::DistanceSquare(A, B));
 }
 
 void ZEVector2::Lerp(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B, float Factor)
@@ -161,95 +138,26 @@ void ZEVector2::Lerp(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B, flo
 	Out.y = A.y + (B.y - A.y) * Factor;
 }
 
-void ZEVector2::Max(ZEVector2& Out, const ZEVector2& A, const ZEVector2& B)
-{
-	Out.x = A.x > B.x ? A.x : B.x;
-	Out.y = A.y > B.y ? A.y : B.y;
-}
-
-void ZEVector2::Min(ZEVector2& Out, const ZEVector2& A, const ZEVector2& B)
-{
-	Out.x = A.x < B.x ? A.x : B.x;
-	Out.y = A.y < B.y ? A.y : B.y;
-}
-
-void ZEVector2::Clamp(ZEVector2& Out, const ZEVector2& Vector, float MinValue, float MaxValue)
-{
-	if (Vector.x > MaxValue)
-		Out.x = MaxValue;
-	else if (Vector.x < MinValue)
-		Out.x = MinValue;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y > MaxValue)
-		Out.y = MaxValue;
-	else if (Vector.y < MinValue)
-		Out.y = MinValue;
-	else
-		Out.y = Vector.y;
-}
-
-void ZEVector2::Clamp(ZEVector2& Out, const ZEVector2& Vector, const ZEVector2& MinValue, const ZEVector2& MaxValue)
-{
-	if (Vector.x > MaxValue.x)
-		Out.x = MaxValue.x;
-	else if (Vector.x < MinValue.x)
-		Out.x = MinValue.x;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y > MaxValue.y)
-		Out.y = MaxValue.y;
-	else if (Vector.y < MinValue.y)
-		Out.y = MinValue.y;
-	else
-		Out.y = Vector.y;
-}
-
-void ZEVector2::Saturate(ZEVector2& Out, const ZEVector2& Vector)
-{
-	if (Vector.x > 1.0f)
-		Out.x = 1.0f;
-	else if (Vector.x < 0.0f)
-		Out.x = 0.0f;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y > 1.0f)
-		Out.y = 1.0f;
-	else if (Vector.y < 0.0f)
-		Out.y = 0.0f;
-	else
-		Out.y = Vector.y;
-}
-
 ZEVector2 ZEVector2::Normalize() const
 {
 	ZEVector2 Temp;
-
-	float L = Length();
-	Temp.x = x / L;
-	Temp.y = y / L;
-
-	return Temp;
+	ZEVector2::Normalize(Temp, *this);
+	return Temp;	
 }
 
 void ZEVector2::NormalizeSelf()
 {
-	float L = Length();
-	x = x / L;
-	y = y / L;
+	ZEVector2::Normalize(*this, *this);
 }
 
 inline float ZEVector2::Length() const
 {
-	return ZEMath::Sqrt(x * x + y * y);
+	return ZEMath::Sqrt(ZEVector2::DotProduct(*this, *this));
 }
 
 float ZEVector2::LengthSquare() const
 {
-	return (x * x + y * y);
+	return (ZEVector2::DotProduct(*this, *this));
 }
 
 ZEVector2 ZEVector2::Clamp(float MinValue, float MaxValue) const
@@ -499,22 +407,21 @@ void ZEVector3::ConvertToCylindirical(const ZEVector3& In, float& Radius, float&
 	Height = In.y;
 }
 
-inline void ZEVector3::Add(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
+void ZEVector3::Add(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
 {
 	Out.x = A.x + B.x;
 	Out.y = A.y + B.y;
 	Out.z = A.z + B.z;
 }
 
-
-inline void ZEVector3::Sub(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
+void ZEVector3::Sub(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
 {
 	Out.x = A.x - B.x;
 	Out.y = A.y - B.y;
 	Out.z = A.z - B.z;
 }
 
-inline void ZEVector3::Scale(ZEVector3& Out, const ZEVector3& A, float s)
+void ZEVector3::Scale(ZEVector3 &Out, const ZEVector3 &A, float s)
 {
 	Out.x = A.x * s;
 	Out.y = A.y * s;
@@ -528,23 +435,11 @@ void ZEVector3::Multiply(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
 	Out.z = A.z * B.z;
 }
 
-void ZEVector3::Divide(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
-{
-	Out.x = A.x / B.x;
-	Out.y = A.y / B.y;
-	Out.z = A.z / B.z;
-}
-
 void ZEVector3::Divide(ZEVector3& Out, const ZEVector3& A, float s)
 {
 	Out.x = A.x / s;
 	Out.y = A.y / s;
 	Out.z = A.z / s;
-}
-
-float ZEVector3::DotProduct(const ZEVector3& A, const ZEVector3& B) 
-{
-	return A.x * B.x + A.y * B.y + A.z * B.z;
 }
 
 void ZEVector3::CrossProduct(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
@@ -569,30 +464,17 @@ bool ZEVector3::IsNormalized() const
 
 float ZEVector3::Length(const ZEVector3& Vector)
 {
-	return ZEMath::Sqrt(Vector.x * Vector.x + Vector.y * Vector.y + Vector.z * Vector.z);
+	return ZEMath::Sqrt(ZEVector3::DotProduct(Vector, Vector));
 }
 
 float ZEVector3::LengthSquare(const ZEVector3& Vector)
 {
-	return Vector.x * Vector.x + Vector.y * Vector.y + Vector.z * Vector.z;
+	return ZEVector3::DotProduct(Vector, Vector);
 }
 
 float ZEVector3::Distance(const ZEVector3& A, const ZEVector3& B)
 {
-	return ZEMath::Sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) + (A.z - B.z) * (A.z - B.z));
-}
-
-float ZEVector3::DistanceSquare(const ZEVector3& A, const ZEVector3& B)
-{
-	return (A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) + (A.z - B.z) * (A.z - B.z);
-}
-
-void ZEVector3::Normalize(ZEVector3& Out, const ZEVector3& Vector)
-{
-	float L = Vector.Length();
-	Out.x = Vector.x / L;
-	Out.y = Vector.y / L;
-	Out.z = Vector.z / L;
+	return ZEMath::Sqrt(ZEVector3::DistanceSquare(A, B));
 }
 
 void ZEVector3::Lerp(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B, float Factor)
@@ -602,196 +484,26 @@ void ZEVector3::Lerp(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B, flo
 	Out.z = A.z + (B.z - A.z) * Factor;
 }
 
-void ZEVector3::Max(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
-{
-	Out.x = A.x > B.x ? A.x : B.x;
-	Out.y = A.y > B.y ? A.y : B.y;
-	Out.z = A.z > B.z ? A.z : B.z;
-}
-
-void ZEVector3::Min(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
-{
-	Out.x = A.x < B.x ? A.x : B.x;
-	Out.y = A.y < B.y ? A.y : B.y;
-	Out.z = A.z < B.z ? A.z : B.z;
-}
-
-void ZEVector3::Clamp(ZEVector3& Out, const ZEVector3& Vector, float MinValue, float MaxValue)
-{
-	if (Vector.x > MaxValue)
-		Out.x = MaxValue;
-	else if (Vector.x < MinValue)
-		Out.x = MinValue;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y > MaxValue)
-		Out.y = MaxValue;
-	else if (Vector.y < MinValue)
-		Out.y = MinValue;
-	else
-		Out.y = Vector.y;
-
-	if (Vector.z > MaxValue)
-		Out.z = MaxValue;
-	else if (Vector.z < MinValue)
-		Out.z = MinValue;
-	else
-		Out.z = Vector.z;
-}
-
-void ZEVector3::Clamp(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MinValue, const ZEVector3& MaxValue)
-{
-	if (Vector.x > MaxValue.x)
-		Out.x = MaxValue.x;
-	else if (Vector.x < MinValue.x)
-		Out.x = MinValue.x;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y > MaxValue.y)
-		Out.y = MaxValue.y;
-	else if (Vector.y < MinValue.y)
-		Out.y = MinValue.y;
-	else
-		Out.y = Vector.y;
-
-	if (Vector.z > MaxValue.z)
-		Out.z = MaxValue.z;
-	else if (Vector.z < MinValue.z)
-		Out.z = MinValue.z;
-	else
-		Out.z = Vector.z;
-}
-
-void ZEVector3::ClampLower(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MinValue)
-{
-	if (Vector.x < MinValue.x)
-		Out.x = MinValue.x;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y < MinValue.y)
-		Out.y = MinValue.y;
-	else
-		Out.y = Vector.y;
-
-
-	if (Vector.z < MinValue.z)
-		Out.z = MinValue.z;
-	else
-		Out.z = Vector.z;
-}
-
-void ZEVector3::ClampLower(ZEVector3& Out, const ZEVector3& Vector, float MinValue)
-{
-	if (Vector.x < MinValue)
-		Out.x = MinValue;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y < MinValue)
-		Out.y = MinValue;
-	else
-		Out.y = Vector.y;
-
-
-	if (Vector.z < MinValue)
-		Out.z = MinValue;
-	else
-		Out.z = Vector.z;
-}
-
-void ZEVector3::ClampUpper(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MaxValue)
-{
-	if (Vector.x > MaxValue.x)
-		Out.x = MaxValue.x;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y > MaxValue.y)
-		Out.y = MaxValue.y;
-	else
-		Out.y = Vector.y;
-
-	if (Vector.z > MaxValue.z)
-		Out.z = MaxValue.z;
-	else
-		Out.z = Vector.z;
-}
-
-void ZEVector3::ClampUpper(ZEVector3& Out, const ZEVector3& Vector, float MaxValue)
-{
-	if (Vector.x > MaxValue)
-		Out.x = MaxValue;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y > MaxValue)
-		Out.y = MaxValue;
-	else
-		Out.y = Vector.y;
-
-	if (Vector.z > MaxValue)
-		Out.z = MaxValue;
-	else
-		Out.z = Vector.z;
-}
-
-void ZEVector3::Saturate(ZEVector3& Out, const ZEVector3& Vector)
-{
-	if (Vector.x > 1.0f)
-		Out.x = 1.0f;
-	else if (Vector.x < 0.0f)
-		Out.x = 0.0f;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y > 1.0f)
-		Out.y = 1.0f;
-	else if (Vector.y < 0.0f)
-		Out.y = 0.0f;
-	else
-		Out.y = Vector.y;
-
-	if (Vector.z > 1.0f)
-		Out.z = 1.0f;
-	else if (Vector.z < 0.0f)
-		Out.z = 0.0f;
-	else
-		Out.z = Vector.z;
-}
-
 inline float ZEVector3::Length() const
 {
-	return ZEMath::Sqrt(x * x + y * y + z * z);
+	return ZEMath::Sqrt(ZEVector3::DotProduct(*this, *this));
 }
 
 float ZEVector3::LengthSquare() const
 {
-	return x * x + y * y + z * z;
+	return ZEVector3::DotProduct(*this, *this);
 }
 
 ZEVector3 ZEVector3::Normalize() const
 {
 	ZEVector3 Temp;
-
-	float L = Length();
-
-	Temp.x = x / L;
-	Temp.y = y / L;
-	Temp.z = z / L;
-	
+	ZEVector3::Normalize(Temp, *this);
 	return Temp;
 }
 
 void ZEVector3::NormalizeSelf()
 {
-	float L = Length();
-
-	x = x / L;
-	y = y / L;
-	z = z / L;
+	ZEVector3::Normalize(*this, *this);
 }
 
 ZEVector3 ZEVector3::Clamp(float MinValue, float MaxValue) const
@@ -1075,78 +787,19 @@ inline void ZEVector4::Create(const ZEVector4 &Start, const ZEVector4 &End)
 	w = End.w - Start.w;
 }
 
-inline void ZEVector4::Add(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
-{
-	Out.x = A.x + B.x;
-	Out.y = A.y + B.y;
-	Out.z = A.z + B.z;
-	Out.w = A.w + B.w;
-}
-
-
-inline void ZEVector4::Sub(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
-{
-	Out.x = A.x - B.x;
-	Out.y = A.y - B.y;
-	Out.z = A.z - B.z;
-	Out.w = A.w - B.w;
-}
-
-inline void ZEVector4::Scale(ZEVector4& Out, const ZEVector4& A, float s)
-{
-	Out.x = A.x * s;
-	Out.y = A.y * s;
-	Out.z = A.z * s;
-	Out.w = A.w * s;
-}
-
-void ZEVector4::Multiply(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
-{
-	Out.x = A.x * B.x;
-	Out.y = A.y * B.y;
-	Out.z = A.z * B.z;
-	Out.w = A.w * B.w;
-}
-
-void ZEVector4::Divide(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
-{
-	Out.x = A.x / B.x;
-	Out.y = A.y / B.y;
-	Out.z = A.z / B.z;
-	Out.w = A.w / B.w;
-}
-
-void ZEVector4::Divide(ZEVector4& Out, const ZEVector4& A, float s)
-{
-	Out.x = A.x / s;
-	Out.y = A.y / s;
-	Out.z = A.z / s;
-	Out.w = A.w / s;
-}
-
-float ZEVector4::DotProduct(const ZEVector4& A, const ZEVector4& B) 
-{
-	return A.x * B.x + A.y * B.y + A.z * B.z + A.w * B.w;
-}
-
 float ZEVector4::Length(const ZEVector4& Vector)
 {
-	return ZEMath::Sqrt(Vector.x * Vector.x + Vector.y * Vector.y + Vector.z * Vector.z + Vector.w * Vector.w);
+	return ZEMath::Sqrt(ZEVector4::DotProduct(Vector, Vector));
 }
 
 float ZEVector4::LengthSquare(const ZEVector4& Vector)
 {
-	return (Vector.x * Vector.x + Vector.y * Vector.y + Vector.z * Vector.z + Vector.w * Vector.w);
+	return ZEVector4::DotProduct(Vector, Vector);
 }
 
 float ZEVector4::Distance(const ZEVector4& A, const ZEVector4& B)
 {
-	return ZEMath::Sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) + (A.z - B.z) * (A.z - B.z) + (A.w - B.w) * (A.w - B.w));
-}
-
-float ZEVector4::DistanceSquare(const ZEVector4& A, const ZEVector4& B)
-{
-	return (A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) + (A.z - B.z) * (A.z - B.z) + (A.w - B.w) * (A.w - B.w);
+	return ZEMath::Sqrt(ZEVector4::DistanceSquare(A, B));
 }
 
 bool ZEVector4::IsValid() const
@@ -1162,164 +815,27 @@ bool ZEVector4::IsNormalized() const
 	return ZEMath::Abs(Length() - 1.0f) < 0.001;
 }
 
-void ZEVector4::Normalize(ZEVector4& Out, const ZEVector4& Vector)
-{
-	float L = Vector.Length();
-	Out.x = Vector.x / L;
-	Out.y = Vector.y / L;
-	Out.z = Vector.z / L;
-	Out.w = Vector.w / L;
-}
-
-void ZEVector4::Lerp(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B, float Factor)
-{
-	Out.x = A.x + (B.x - A.x) * Factor;
-	Out.y = A.y + (B.y - A.y) * Factor;
-	Out.z = A.z + (B.z - A.z) * Factor;
-	Out.w = A.w + (B.w - A.w) * Factor;
-}
-
-void ZEVector4::Max(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
-{
-	Out.x = A.x > B.x ? A.x : B.x;
-	Out.y = A.y > B.y ? A.y : B.y;
-	Out.z = A.z > B.z ? A.z : B.z;
-	Out.w = A.w > B.w ? A.w : B.w;
-}
-
-void ZEVector4::Min(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
-{
-	Out.x = A.x < B.x ? A.x : B.x;
-	Out.y = A.y < B.y ? A.y : B.y;
-	Out.z = A.z < B.z ? A.z : B.z;
-	Out.w = A.w < B.w ? A.w : B.w;
-}
-
-void ZEVector4::Clamp(ZEVector4& Out, const ZEVector4& Vector, float MinValue, float MaxValue)
-{
-	if (Vector.x > MaxValue)
-		Out.x = MaxValue;
-	else if (Vector.x < MinValue)
-		Out.x = MinValue;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y > MaxValue)
-		Out.y = MaxValue;
-	else if (Vector.y < MinValue)
-		Out.y = MinValue;
-	else
-		Out.y = Vector.y;
-
-	if (Vector.z > MaxValue)
-		Out.z = MaxValue;
-	else if (Vector.z < MinValue)
-		Out.z = MinValue;
-	else
-		Out.z = Vector.z;
-
-	if (Vector.w > MaxValue)
-		Out.w = MaxValue;
-	else if (Vector.w < MinValue)
-		Out.w = MinValue;
-	else
-		Out.w = Vector.w;
-}
-
-void ZEVector4::Clamp(ZEVector4& Out, const ZEVector4& Vector, const ZEVector4& MinValue, const ZEVector4& MaxValue)
-{
-	if (Vector.x > MaxValue.x)
-		Out.x = MaxValue.x;
-	else if (Vector.x < MinValue.x)
-		Out.x = MinValue.x;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y > MaxValue.y)
-		Out.y = MaxValue.y;
-	else if (Vector.y < MinValue.y)
-		Out.y = MinValue.y;
-	else
-		Out.y = Vector.y;
-
-	if (Vector.z > MaxValue.z)
-		Out.z = MaxValue.z;
-	else if (Vector.z < MinValue.z)
-		Out.z = MinValue.z;
-	else
-		Out.z = Vector.z;
-
-	if (Vector.w > MaxValue.w)
-		Out.w = MaxValue.w;
-	else if (Vector.w < MinValue.w)
-		Out.w = MinValue.w;
-	else
-		Out.w = Vector.w;
-}
-
-void ZEVector4::Saturate(ZEVector4& Out, const ZEVector4& Vector)
-{
-	if (Vector.x > 1.0f)
-		Out.x = 1.0f;
-	else if (Vector.x < 0.0f)
-		Out.x = 0.0f;
-	else
-		Out.x = Vector.x;
-
-	if (Vector.y > 1.0f)
-		Out.y = 1.0f;
-	else if (Vector.y < 0.0f)
-		Out.y = 0.0f;
-	else
-		Out.y = Vector.y;
-
-	if (Vector.z > 1.0f)
-		Out.z = 1.0f;
-	else if (Vector.z < 0.0f)
-		Out.z = 0.0f;
-	else
-		Out.z = Vector.z;
-
-	if (Vector.w > 1.0f)
-		Out.w = 1.0f;
-	else if (Vector.w < 0.0f)
-		Out.w = 0.0f;
-	else
-		Out.w = Vector.w;
-}
-
 inline float ZEVector4::Length() const
 {
-	return ZEMath::Sqrt(x * x + y * y + z * z + w * w);
+	return ZEMath::Sqrt(ZEVector4::DotProduct(*this, *this));
 }
 
 float ZEVector4::LengthSquare() const
 {
-	return x * x + y * y + z * z + w * w;
+	return ZEVector4::DotProduct(*this, *this);
 }
 
 ZEVector4 ZEVector4::Normalize() const
 {
 	ZEVector4 Temp;
-	
-	float L = Length();
-	
-	Temp.x = x / L;
-	Temp.y = y / L;
-	Temp.z = z / L;
-	Temp.w = w / L;
+	ZEVector4::Normalize(Temp, *this);
 
 	return Temp;
 }
 
 void ZEVector4::NormalizeSelf()
 {
-	float L = Length();
-
-	x = x / L;
-	y = y / L;
-	z = z / L;
-	w = w / L;
+	ZEVector4::Normalize(*this, *this);
 }
 
 ZEVector4 ZEVector4::Clamp(float MinValue, float MaxValue) const
@@ -1413,6 +929,7 @@ ZEVector4 ZEVector4::operator*(float s) const
 	ZEVector4::Scale(Temp, *this, s);
 	return Temp;
 }
+
 ZEVector4 ZEVector4::operator/(const ZEVector4 &RightOperand) const
 {
 	ZEVector4 Temp;
