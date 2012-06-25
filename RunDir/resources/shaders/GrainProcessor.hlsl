@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEApplicationModule.cpp
+ Zinek Engine - GrainProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,95 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEApplicationModule.h"
+sampler2D 	ColorBuffer		: register (s0);
+sampler2D 	GrainBuffer		: register (s1);
 
-ZE_MODULE_DESCRIPTION_ABSTRACT(ZEApplicationModule, ZEModule, NULL)
+float2 		VSParameters	: register(vs, c0);
+
+#define		PixelSize		VSParameters.xy
+
+float4 		PSParameters	: register(ps, c0);
+
+#define		PI				3.1415f
+#define		Time			PSParameters.x
+#define		GrainStrength	PSParameters.y
 
 
-void ZEApplicationModule::SetApplicationName(const ZEString& Name)
+// Vertex Shader
+struct VS_INPUT
 {
-	ApplicationName = Name;
+	float4 Position	: POSITION0;
+	
+};
+
+struct VS_OUTPUT 
+{
+	float4 Position	: POSITION0;
+	float2 TexCoord : TEXCOORD0;
+};
+
+struct PS_INPUT
+{
+	float2 TexCoord : TEXCOORD0;
+};
+
+struct PS_OUTPUT
+{
+	float4 PixelColor : COLOR0;
+};
+
+VS_OUTPUT vs_main_common(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
+   
+	Output.Position	= sign(Input.Position);
+
+	Output.TexCoord.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
+	Output.TexCoord.y = 0.5f * (1.0f - Output.Position.y + PixelSize.y);
+	
+	return Output;
 }
 
-const ZEString& ZEApplicationModule::GetApplicationName() const
+
+float Random(float2 Vector)
 {
-	return ApplicationName;
+	const float4 Temp = float4( 97.409091f, 148.413159f, 56.205410f, 44.687805f );
+	float4 Result = float4(Vector,Vector);
+  
+	for(int i = 0; i < 3; i++)
+	{
+		Result.x = frac( dot(Result, Temp) );
+		Result.y = frac( dot(Result, Temp) );
+		Result.z = frac( dot(Result, Temp) );
+		Result.w = frac( dot(Result, Temp) );
+	}
+  
+	return (float)Result.xy;
 }
 
-void ZEApplicationModule::PreProcess()
+PS_OUTPUT ps_main_grain( PS_INPUT Input )
 {
+	PS_OUTPUT Output = (PS_OUTPUT)1.0f;
+
+	float Rand = Random(Input.TexCoord + Time) * GrainStrength; 
+	float3 Grain = float3(Rand, Rand, Rand);
+
+	Output.PixelColor.rgb *= 1.0f - Grain;
+	Output.PixelColor.rgb *= (1.0f + GrainStrength / 2.0f);
+	
+	return Output;
 }
 
-void ZEApplicationModule::Process(float ElapsedTime)
-{
-}
 
-void ZEApplicationModule::PostProcess()
+PS_OUTPUT ps_main_blend( PS_INPUT Input )
 {
-}
-
-void ZEApplicationModule::StartUp()
-{
-}
-
-void ZEApplicationModule::ShutDown()
-{
-}
-
-void ZEApplicationModule::Start()
-{
-}
-void ZEApplicationModule::Stop()
-{
-}
-void ZEApplicationModule::Tick(float ElapsedTime)
-{
-}
-
-void ZEApplicationModule::Render(float ElapsedTime)
-{
-}
-
-ZEApplicationModule::ZEApplicationModule()
-{
-	ApplicationName = "";
-}
-
-ZEApplicationModule::~ZEApplicationModule()
-{
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
+	
+	float4 Grain = tex2D(GrainBuffer, Input.TexCoord);
+	Output.PixelColor = tex2D(ColorBuffer, Input.TexCoord);
+	
+	if (Grain.x <= 0.999f)
+		Output.PixelColor *= Grain;
+	
+	return Output;
 }

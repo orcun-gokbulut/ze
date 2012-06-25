@@ -38,24 +38,34 @@
 #define __ZE_APPLICATION_MODULE_H__
 
 #include "ZECore/ZEModule.h"
+#include "ZEDS/ZEString.h"
 
 class ZEApplicationModule : public ZEModule
 {
 	ZE_MODULE(ZEApplicationModule)
+	
+	private:
+		ZEString			ApplicationName;
 
-	public:	
-		virtual void					PreProcess();
-		virtual void					Process(float ElapsedTime);
-		virtual void					PostProcess();
+	public:
+		void				SetApplicationName(const ZEString& Name);
+		const ZEString&		GetApplicationName() const;
+
+		virtual void		PreProcess();
+		virtual void		Process(float ElapsedTime);
+		virtual void		PostProcess();
 		
-		virtual void					StartUp();
-		virtual void					ShutDown();
+		virtual void		StartUp();
+		virtual void		ShutDown();
 
-		virtual void					Start();
-		virtual void					Stop();
+		virtual void		Start();
+		virtual void		Stop();
 
-		virtual void					Tick(float ElapsedTime);
-		virtual void					Render(float ElapsedTime);
+		virtual void		Tick(float ElapsedTime);
+		virtual void		Render(float ElapsedTime);
+
+							ZEApplicationModule();
+		virtual				~ZEApplicationModule();
 };
 
 #endif

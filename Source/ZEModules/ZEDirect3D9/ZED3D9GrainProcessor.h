@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEApplicationModule.cpp
+ Zinek Engine - ZED3D9GrainProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,72 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEApplicationModule.h"
+#pragma once
+#ifndef __ZE_D3D9_GRAIN_PROCESSOR_H__
+#define __ZE_D3D9_GRAIN_PROCESSOR_H__
 
-ZE_MODULE_DESCRIPTION_ABSTRACT(ZEApplicationModule, ZEModule, NULL)
+#include "ZED3D9ComponentBase.h"
+#include "..\..\..\Platform\Windows\x64\Include\DirectX\d3d9.h"
 
 
-void ZEApplicationModule::SetApplicationName(const ZEString& Name)
-{
-	ApplicationName = Name;
-}
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
+class ZED3D9Texture2D;
+class ZETexture2D;
+class ZED3D9ViewPort;
+class ZEFrameRenderer;
+class ZED3D9FrameRenderer;
+class ZETexture2DResource;
 
-const ZEString& ZEApplicationModule::GetApplicationName() const
+class ZED3D9GrainProcessor : public ZED3D9ComponentBase
 {
-	return ApplicationName;
-}
+	private:
+		float					Strength;
+		float					Frequency;
+		float					NoiseSize;
 
-void ZEApplicationModule::PreProcess()
-{
-}
+		ZED3D9FrameRenderer*	Renderer;
 
-void ZEApplicationModule::Process(float ElapsedTime)
-{
-}
+		ZED3D9PixelShader*		PixelShaderGrain;
+		ZED3D9PixelShader*		PixelShaderBlend;
+		ZED3D9VertexShader*		VertexShader;
 
-void ZEApplicationModule::PostProcess()
-{
-}
+		ZED3D9Texture2D*		GrainBuffer;
+		ZED3D9ViewPort*			Output;
+		ZED3D9Texture2D*		Input;
+		
+		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 
-void ZEApplicationModule::StartUp()
-{
-}
+		void					CreateRenderTargets();
+		void					DestroyRenderTargets();
 
-void ZEApplicationModule::ShutDown()
-{
-}
+	public:
+								ZED3D9GrainProcessor();
+								~ZED3D9GrainProcessor();
 
-void ZEApplicationModule::Start()
-{
-}
-void ZEApplicationModule::Stop()
-{
-}
-void ZEApplicationModule::Tick(float ElapsedTime)
-{
-}
+		void					Initialize();
+		void					Deinitialize();
 
-void ZEApplicationModule::Render(float ElapsedTime)
-{
-}
+		void					SetRenderer(ZEFrameRenderer* Renderer);
+		ZEFrameRenderer*		GetRenderer();
 
-ZEApplicationModule::ZEApplicationModule()
-{
-	ApplicationName = "";
-}
+		float					GetFrequency() const;
+		void					SetFrequency(float Value);
 
-ZEApplicationModule::~ZEApplicationModule()
-{
-}
+		float					GetStrength() const;
+		void					SetStrength(float Value);
+
+		float					GetNoiseSize() const;
+		void					SetNoiseSize(float Value);
+
+		void					SetInput(ZED3D9Texture2D* Texture);
+		ZED3D9Texture2D*		GetInput();
+
+		void					SetOutput(ZED3D9ViewPort* Texture);
+		ZED3D9ViewPort*			GetOutput();
+
+		void					Process(float ElapsedTime);
+
+};
+
+#endif

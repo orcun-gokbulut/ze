@@ -754,6 +754,10 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 		BlurInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	BlurInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
 
+	if(GrainInputBuffer == NULL)
+		GrainInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	GrainInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
+	
 	if(FogInputBuffer == NULL)
 		FogInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	FogInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
@@ -780,6 +784,7 @@ void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 	/*
 	ZED3D_DESTROY(EDInputBuffer);
 	*/
+	ZED3D_DESTROY(GrainInputBuffer);
 	ZED3D_DESTROY(FogInputBuffer);
 	ZED3D_DESTROY(DOFInputBuffer);
 	ZED3D_DESTROY(SSAAInputBuffer);
@@ -802,6 +807,7 @@ ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 	/*
 	EDInputBuffer	= NULL;
 	*/
+	GrainInputBuffer = NULL;
 	FogInputBuffer	= NULL;
 	DOFInputBuffer	= NULL;
 	CTInputBuffer	= NULL;
@@ -862,6 +868,9 @@ bool ZED3D9FrameRenderer::Initialize()
 	EDProcessor.Initialize();
 	*/
 
+	GrainProcessor.SetRenderer(this);
+	GrainProcessor.Initialize();
+
 	FogProcessor.SetRenderer(this);
 	FogProcessor.Initialize();
 
@@ -882,6 +891,7 @@ void ZED3D9FrameRenderer::Deinitialize()
 	/*
 	EDProcessor.Deinitialize();
 	*/
+	GrainProcessor.Deinitialize();
 	FogProcessor.Deinitialize();
 	DOFProcessor.Deinitialize();
 	CTProcessor.Deinitialize();
@@ -1027,9 +1037,13 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 
 		// HDR Process
 		HDRProcessor.SetInput(HDRInputBuffer);
-		HDRProcessor.SetOutput(ViewPort); // HDRProcessor.SetOutput((ZED3D9ViewPort*)DOFInputBuffer->GetViewPort());
+		HDRProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);
 		
+		GrainProcessor.SetInput(GrainInputBuffer);
+		GrainProcessor.SetOutput(ViewPort);
+		GrainProcessor.Process(ElaspedTime);
+
 		/*
 		// DOF Process
 		DOFProcessor.SetInputColor(DOFInputBuffer);
@@ -1039,7 +1053,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		*/
 
 		/*
-		//Anti Aliasing Process (the old and the ugly one)
+		//Anti Aliasing Process (old bad ugly)
 		SSAAProcessor.SetInputDepth(GBuffer1);
 		SSAAProcessor.SetInputNormal(GBuffer2);
 		SSAAProcessor.SetInputColor(ABuffer);
