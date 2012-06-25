@@ -111,13 +111,16 @@ class ZEString
 		float						ToFloat() const;
 		const char*					ToCString() const;
 		std::string					ToStdString() const;
-
+		
+		
 		static ZEString 			FromChar(char Value);
+		static ZEString				FromWChar(wchar_t Value);
 		static ZEString 			FromInt(ZEInt Value, ZEUInt Base = 10);
 		static ZEString 			FromUInt(ZEUInt Value, ZEUInt Base = 10);
 		static ZEString 			FromFloat(float Value, ZEUInt Digits);
 		static ZEString 			FromBool(bool Value, const char* TrueText = "True", const char* FalseText = "False");
 		static ZEString 			FromCString(const char* Value);
+		static ZEString				FromWString(const wchar_t* Value);
 		static ZEString 			FromStdString(const std::string& Value);
 
 		ZEString&					operator=(const ZEString& String);
