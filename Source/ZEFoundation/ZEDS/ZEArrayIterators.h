@@ -45,14 +45,15 @@ class ZEArray;
 template<typename ZEType, typename Allocator_>
 class ZEArrayIterator
 {
-	template<typename ZEType, typename Allocator_> class ZEArray;
+	template<typename ZEType, typename Allocator_> friend class ZEArray;
 	private:
 		ZEArray<ZEType, Allocator_>* Array;
-		ZESize CurrentIndex;
+		ZESize Index;
 
 		ZEArrayIterator(ZEArray<ZEType, Allocator_>* Array)
 		{
 			this->Array = Array;
+			Index = 0;
 		};
 
 	public:
@@ -68,40 +69,41 @@ class ZEArrayIterator
 
 		inline ZEType* MovePrevious()
 		{
-			if (CurrentIndex + 1 >= Array->GetCount())
+			if ((ZESSize)Index - 1 < (ZESSize)Array->GetSize())
 				return NULL;
 
-			CurrentIndex++;
+			Index--;
 			return &Array->GetItem(Index);
 		}
 
 		inline ZEType* MoveNext()
 		{
-			if ((ZESSize)CurrentIndex - 1 < (ZESSize)Array->GetSize())
+			if (Index + 1 >= Array->GetCount())
 				return NULL;
 
-			CurrentIndex--;
-			return &Array->GetItem(Index);			
+			Index++;
+			return &Array->GetItem(Index);
 		}
 
 
 		inline ZESize GetIndex()
 		{
-			return CurrentIndex;
+			return Index;
 		}
 };
 
 template<typename ZEType, typename Allocator_>
 class ZEArrayIteratorConst
 {
-	template<typename ZEType, typename Allocator_> class ZEArray;
+	template<typename ZEType, typename Allocator_> friend class ZEArray;
 	private:
 		const ZEArray<ZEType, Allocator_>* Array;
-		ZESize CurrentIndex;
+		ZESize Index;
 
 		ZEArrayIteratorConst(const ZEArray<ZEType, Allocator_>* Array)
 		{
 			this->Array = Array;
+			Index = 0;
 		};
 
 	public:
@@ -110,32 +112,32 @@ class ZEArrayIteratorConst
 			return Index < 0 || Index >= Array->GetCount();
 		} 
 
-		inline const ZEType* GetCurrentItem() const
+		inline const ZEType* GetItem() const
 		{
 			return &Array->GetItem(Index);
 		}
 
 		inline const ZEType* MovePrevious() const
 		{
-			if (CurrentIndex + 1 >= Array->GetCount())
+			if ((ZESSize)Index - 1 < (ZESSize)Array->GetSize())
 				return NULL;
 
-			CurrentIndex++;
+			Index--;
 			return &Array->GetItem(Index);
 		}
 
 		inline const ZEType* MoveNext() const
 		{
-			if ((ZESSize)CurrentIndex - 1 < (ZESSize)Array->GetSize())
+			if (Index + 1 >= Array->GetCount())
 				return NULL;
 
-			CurrentIndex--;
-			return &Array->GetItem(Index);			
+			Index++;
+			return &Array->GetItem(Index);
 		}
 
 		inline ZESize GetIndex()
 		{
-			return CurrentIndex;
+			return Index;
 		}
 };
 

@@ -81,7 +81,7 @@ class ZEListIterator
 			ZEType* Current = Item;
 			while(Current != NULL)
 			{
-				Item = Current->PrevItem;
+				Current = Current->PrevItem;
 				Index++;
 			}
 			
@@ -92,7 +92,7 @@ class ZEListIterator
 template<typename ZEType>
 class ZEListIteratorConst
 {
-	template<typename ZEType> class ZEList;
+	template<typename ZEType> friend class ZEList;
 	private:
 		const ZEType* Item;
 				
@@ -118,7 +118,7 @@ class ZEListIteratorConst
 			const ZEType* Current = Item;
 			while(Current != NULL)
 			{
-				Item = Current->PrevItem;
+				Current = Current->PrevItem;
 				Index++;
 			}
 
