@@ -59,7 +59,7 @@ class ZEArrayIterator
 	public:
 		inline bool IsEnd() const
 		{
-			return Index < 0 || Index >= Array->GetCount();
+			return Index >= Array->GetCount();
 		} 
 
 		inline ZEType* GetItem()
@@ -109,7 +109,7 @@ class ZEArrayIteratorConst
 	public:
 		inline bool IsEnd() const
 		{
-			return Index < 0 || Index >= Array->GetCount();
+			return Index >= Array->GetCount();
 		} 
 
 		inline const ZEType* GetItem() const
