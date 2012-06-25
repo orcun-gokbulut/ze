@@ -107,7 +107,7 @@ class ZEMath
 };
 
 template <typename Type>
-static Type ZEMath::Abs(Type Value)
+Type ZEMath::Abs(Type Value)
 {
 	if (Value < (Type)0)
 		return -Value;
@@ -133,7 +133,7 @@ Type ZEMath::Min(Type A, Type B)
 }
 
 template <typename Type>
-static Type ZEMath::Max(Type A, Type B)
+Type ZEMath::Max(Type A, Type B)
 {
 	return (A > B ? A : B);
 }
@@ -190,7 +190,3 @@ Type ZEMath::Saturate(Type Value)
 }
 
 #endif
-
-
-
-

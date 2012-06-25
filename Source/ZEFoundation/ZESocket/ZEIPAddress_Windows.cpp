@@ -35,17 +35,27 @@
 
 #include "ZEIPAddress.h"
 
+#ifdef ZE_PLATFORM_COMPILER_GCC
+#undef _WIN32_WINNT
+#define _WIN32_WINNT 0x501
+#endif
+
 #include <Winsock2.h>
-#include <Ws2ipdef.h>
 #include <Ws2tcpip.h>
+
+#ifdef ZE_PLATFORM_COMPILER_MSVC
 #include <Mstcpip.h>
+#include <Ws2ipdef.h>
+#endif
+
 #include <memory.h>
 
 #include "ZETypes.h"
 #include "ZEError.h"
 
+
+
 const ZEIPAddress ZEIPAddress::IPv4Any = ZEIPAddress(0, 0, 0, 0);
-const ZEIPAddress ZEIPAddress::IPv6Any = ZEIPAddress(0, 0, 0, 0, 0, 0, 0, 0);
 
 ZEIPAddress::ZEIPAddress()
 {
@@ -62,128 +72,35 @@ ZEIPAddress::ZEIPAddress(ZEUInt8 Byte0, ZEUInt8 Byte1, ZEUInt8 Byte2, ZEUInt8 By
 	Address4[3] = Byte3;
 }
 
-ZEIPAddress::ZEIPAddress(ZEUInt16 Word0, ZEUInt16 Word1, ZEUInt16 Word2, ZEUInt16 Word3, ZEUInt16 Word4, ZEUInt16 Word5, ZEUInt16 Word6, ZEUInt16 Word7)
-{
-	Type = ZE_IAT_IP_V6;
-	Address6[0] = Word0;
-	Address6[1] = Word1;
-	Address6[2] = Word2;
-	Address6[3] = Word3;
-	Address6[4] = Word4;
-	Address6[5] = Word5;
-	Address6[6] = Word6;
-	Address6[7] = Word7;
-}
-
-ZEIPAddress ZEIPAddress::Parse(ZEString& String)
+ZEIPAddress ZEIPAddress::Parse(const ZEString& String)
 {
 	ZEIPAddressType Type = ZE_IAT_IP_V4;
 
+	ZEString Part0, Part1, Part2, Part3;
+	ZEUInt PartIndex = 0;
+
 	for (ZESize I = 0; I < String.GetLength(); I++)
 	{
-		if(String[I] == ':')
+		if(String[I] == '.')
 		{
-			Type = ZE_IAT_IP_V6;
-			break;
-		}
-	}
-
-	if(Type == ZE_IAT_IP_V4)
-	{
-		ZEString Part0, Part1, Part2, Part3;
-		ZEUInt PartIndex = 0;
-
-		for (ZESize I = 0; I < String.GetLength(); I++)
-		{
-			if(String[I] == '.')
-			{
-				PartIndex++;
-				continue;
-			}
-
-			if(PartIndex == 0)
-				Part0.Append(ZEString::FromChar(String.GetCharacter(I)));
-			else if(PartIndex == 1)
-				Part1.Append(ZEString::FromChar(String.GetCharacter(I)));
-			else if(PartIndex == 2)
-				Part2.Append(ZEString::FromChar(String.GetCharacter(I)));
-			else if(PartIndex == 3)
-				Part3.Append(ZEString::FromChar(String.GetCharacter(I)));
+			PartIndex++;
+			continue;
 		}
 
-		return ZEIPAddress((ZEUInt8)Part0.ToInt(), (ZEUInt8)Part1.ToInt(), (ZEUInt8)Part2.ToInt(), (ZEUInt8)Part3.ToInt());
+		if(PartIndex == 0)
+			Part0.Append(ZEString::FromChar(String.GetCharacter(I)));
+		else if(PartIndex == 1)
+			Part1.Append(ZEString::FromChar(String.GetCharacter(I)));
+		else if(PartIndex == 2)
+			Part2.Append(ZEString::FromChar(String.GetCharacter(I)));
+		else if(PartIndex == 3)
+			Part3.Append(ZEString::FromChar(String.GetCharacter(I)));
 	}
 
-	else if(Type == ZE_IAT_IP_V6)
-	{
-		ZEString Part0, Part1, Part2, Part3, Part4, Part5, Part6, Part7;
-		ZEUInt PartIndex = 0;
-
-		for (ZESize I = 0; I < String.GetLength(); I++)
-		{
-			if(String[I] == ':')
-			{
-				PartIndex++;
-				continue;
-			}
-
-			if(PartIndex == 0)
-				Part0.Append(ZEString::FromChar(String.GetCharacter(I)));
-			else if(PartIndex == 1)
-				Part1.Append(ZEString::FromChar(String.GetCharacter(I)));
-			else if(PartIndex == 2)
-				Part2.Append(ZEString::FromChar(String.GetCharacter(I)));
-			else if(PartIndex == 3)
-				Part3.Append(ZEString::FromChar(String.GetCharacter(I)));
-			else if(PartIndex == 4)
-				Part4.Append(ZEString::FromChar(String.GetCharacter(I)));
-			else if(PartIndex == 5)
-				Part5.Append(ZEString::FromChar(String.GetCharacter(I)));
-			else if(PartIndex == 6)
-				Part6.Append(ZEString::FromChar(String.GetCharacter(I)));
-			else if(PartIndex == 7)
-				Part7.Append(ZEString::FromChar(String.GetCharacter(I)));
-		}
-
-		char* Error = NULL;
-
-		return ZEIPAddress( (ZEUInt16)strtol(Part0, &Error, 16), (ZEUInt16)strtol(Part1, &Error, 16), (ZEUInt16)strtol(Part2, &Error, 16), (ZEUInt16)strtol(Part3, &Error, 16), 
-							(ZEUInt16)strtol(Part4, &Error, 16), (ZEUInt16)strtol(Part5, &Error, 16), (ZEUInt16)strtol(Part6, &Error, 16), (ZEUInt16)strtol(Part7, &Error, 16));
-	}
-
-
-// 	for (ZESize I = 0; I < String.GetLength(); I++)
-// 	{
-// 		if (String[I] == '.')
-// 		{
-// 			in_addr IP4Adress;
-// 			if (RtlIpv4StringToAddress(String, false, '\0', &IP4Adress) != NO_ERROR)
-// 			{
-// 				return ZEIPAddress(
-// 					IP4Adress.S_un.S_un_b.s_b1, IP4Adress.S_un.S_un_b.s_b1, 
-// 					IP4Adress.S_un.S_un_b.s_b1, IP4Adress.S_un.S_un_b.s_b1);
-// 			}
-// 
-// 			return ZEIPAddress();
-// 		}
-// 		else if (String[I] == ':')
-// 		{
-// 			in6_addr IP6Adress;
-// 			if (RtlIpv6StringToAddress(String, '\0', &IP6Adress) != NO_ERROR)
-// 			{
-// 				return ZEIPAddress(
-// 					IP6Adress.u.Word[0], IP6Adress.u.Word[1], IP6Adress.u.Word[2], IP6Adress.u.Word[3],
-// 					IP6Adress.u.Word[4], IP6Adress.u.Word[5], IP6Adress.u.Word[6], IP6Adress.u.Word[7]);
-// 			}
-// 
-// 			return ZEIPAddress();
-// 		}
-// 	}
-
-	return ZEIPAddress();
+	return ZEIPAddress((ZEUInt8)Part0.ToInt(), (ZEUInt8)Part1.ToInt(), (ZEUInt8)Part2.ToInt(), (ZEUInt8)Part3.ToInt());
 }
 
-ZEArray<ZEIPAddress> ZEIPAddress::Lookup(ZEString& String)
+ZEArray<ZEIPAddress> ZEIPAddress::Lookup(const ZEString& String)
 {
 	ZEArray<ZEIPAddress> Temp;
 
@@ -194,21 +111,10 @@ ZEArray<ZEIPAddress> ZEIPAddress::Lookup(ZEString& String)
 	getaddrinfo(String, NULL, &Hints, &Address);
 	while(Address != NULL)
 	{
-		if (Address->ai_family == AF_INET)
-		{
-			sockaddr_in* IP4Adress = (struct sockaddr_in *)Address->ai_addr;
-			Temp.Add(ZEIPAddress(
-				IP4Adress->sin_addr.S_un.S_un_b.s_b1, IP4Adress->sin_addr.S_un.S_un_b.s_b2, 
-				IP4Adress->sin_addr.S_un.S_un_b.s_b3, IP4Adress->sin_addr.S_un.S_un_b.s_b4));
-		}
-		else if (Address->ai_family == AF_INET6)
-		{
-			sockaddr_in6* IP6Adress = (struct sockaddr_in6 *)Address->ai_addr;
-			Temp.Add(ZEIPAddress(
-				IP6Adress->sin6_addr.u.Word[0], IP6Adress->sin6_addr.u.Word[1], IP6Adress->sin6_addr.u.Word[2], IP6Adress->sin6_addr.u.Word[3],
-				IP6Adress->sin6_addr.u.Word[4], IP6Adress->sin6_addr.u.Word[5], IP6Adress->sin6_addr.u.Word[6], IP6Adress->sin6_addr.u.Word[7]));
-		}
-		Address = Address->ai_next;
+		sockaddr_in* IP4Adress = (struct sockaddr_in *)Address->ai_addr;
+		Temp.Add(ZEIPAddress(
+			IP4Adress->sin_addr.S_un.S_un_b.s_b1, IP4Adress->sin_addr.S_un.S_un_b.s_b2, 
+			IP4Adress->sin_addr.S_un.S_un_b.s_b3, IP4Adress->sin_addr.S_un.S_un_b.s_b4));
 	}
 
 	return Temp;
@@ -232,21 +138,12 @@ bool ZEIPAddress::operator == (const ZEIPAddress &RightOperand) const
 	if(Type == ZE_IAT_NONE || RightOperand.Type == ZE_IAT_NONE)
 		return false;
 
-	if(Type == ZE_IAT_IP_V4)
-		return ((Address4[0] == RightOperand.Address4[0]) &&
-				(Address4[1] == RightOperand.Address4[1]) &&
-				(Address4[2] == RightOperand.Address4[2]) &&
-				(Address4[3] == RightOperand.Address4[3]));
-	
-	else if(Type == ZE_IAT_IP_V6)
-		return ((Address6[0] == RightOperand.Address6[0]) &&
-				(Address6[1] == RightOperand.Address6[1]) &&
-				(Address6[2] == RightOperand.Address6[2]) &&
-				(Address6[3] == RightOperand.Address6[3]) &&
-				(Address6[4] == RightOperand.Address6[4]) &&
-				(Address6[5] == RightOperand.Address6[5]) &&
-				(Address6[6] == RightOperand.Address6[6]) &&
-				(Address6[7] == RightOperand.Address6[7]));
+	return ((Address4[0] == RightOperand.Address4[0]) &&
+			(Address4[1] == RightOperand.Address4[1]) &&
+			(Address4[2] == RightOperand.Address4[2]) &&
+			(Address4[3] == RightOperand.Address4[3]));
+
+	return false;
 }
 
 bool ZEIPAddress::operator != (const ZEIPAddress &RightOperand) const
@@ -266,13 +163,5 @@ bool ZEIPAddress::operator != (const ZEIPAddress &RightOperand) const
 				(Address4[2] != RightOperand.Address4[2]) ||
 				(Address4[3] != RightOperand.Address4[3]));
 
-	else if(Type == ZE_IAT_IP_V6)
-		return ((Address6[0] != RightOperand.Address6[0]) ||
-				(Address6[1] != RightOperand.Address6[1]) ||
-				(Address6[2] != RightOperand.Address6[2]) ||
-				(Address6[3] != RightOperand.Address6[3]) ||
-				(Address6[4] != RightOperand.Address6[4]) ||
-				(Address6[5] != RightOperand.Address6[5]) ||
-				(Address6[6] != RightOperand.Address6[6]) ||
-				(Address6[7] != RightOperand.Address6[7]));
+	return false;
 }

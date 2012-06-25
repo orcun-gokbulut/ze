@@ -37,9 +37,7 @@
 
 #include "ZEError.h"
 #include "ZEFile.h"
-#include "ZEPack.h"
 #include "ZEPartialFile.h"
-#include "ZECompressedFile.h"
 
 #include <Windows.h>
 #include <stdarg.h>
@@ -48,6 +46,11 @@
 #include <fstream>
 
 #include <wchar.h>
+
+#if defined(ZE_PLATFORM_COMPILER_GCC)
+	#define _fseeki64 fseeko64
+	#define _ftelli64 ftello64
+#endif
 
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
@@ -588,7 +591,7 @@ ZEFile* ZEFile::Open(const ZEString& FilePath, bool AutoClose)
 		// If path corresponds to a File
 		if (IsFileExists(Token))
 		{
-			if (ZEPack::IsPack(Token))
+			/*if (ZEPack::IsPack(Token))
 			{
 				ZEPack Pack;
 				if(!Pack.Open(Token))
@@ -607,7 +610,7 @@ ZEFile* ZEFile::Open(const ZEString& FilePath, bool AutoClose)
 				return (ZEFile*)PartialCompressedFile;
 			}
 			else
-			{
+			{*/
 				ZEFile* File = new ZEFile();
 				if (!File->Open(Token, ZE_FM_READ_WRITE, true))
 				{
@@ -617,7 +620,7 @@ ZEFile* ZEFile::Open(const ZEString& FilePath, bool AutoClose)
 
 				File->SetAutoClose(AutoClose);
 				return File;
-			}
+			//}
 		}
 		else
 		{

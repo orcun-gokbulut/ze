@@ -45,7 +45,7 @@ class ZEArray;
 template<typename ZEType, typename Allocator_>
 class ZEArrayIterator
 {
-	template<typename ZEType, typename Allocator_> friend class ZEArray;
+	friend class ZEArray<ZEType, Allocator_>;
 	private:
 		ZEArray<ZEType, Allocator_>* Array;
 		ZESize Index;
@@ -95,7 +95,7 @@ class ZEArrayIterator
 template<typename ZEType, typename Allocator_>
 class ZEArrayIteratorConst
 {
-	template<typename ZEType, typename Allocator_> friend class ZEArray;
+	friend class ZEArray<ZEType, Allocator_>;
 	private:
 		const ZEArray<ZEType, Allocator_>* Array;
 		ZESize Index;
@@ -117,7 +117,7 @@ class ZEArrayIteratorConst
 			return &Array->GetItem(Index);
 		}
 
-		inline const ZEType* MovePrevious() const
+		inline const ZEType* MovePrevious()
 		{
 			if ((ZESSize)Index - 1 < (ZESSize)Array->GetSize())
 				return NULL;
@@ -126,7 +126,7 @@ class ZEArrayIteratorConst
 			return &Array->GetItem(Index);
 		}
 
-		inline const ZEType* MoveNext() const
+		inline const ZEType* MoveNext()
 		{
 			if (Index + 1 >= Array->GetCount())
 				return NULL;

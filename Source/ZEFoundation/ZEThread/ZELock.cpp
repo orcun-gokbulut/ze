@@ -36,14 +36,17 @@
 #include "ZELock.h"
 #include "ZEError.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#include <intrin.h>
-
 #ifdef ZE_PLATFORM_COMPILER_MSVC
-	#define ZE_ATOMIC_INCREMENT(Value) _InterlockedIncrement(Value)
-#else
+	#include <intrin.h>
 #endif
+static inline ZEInt32 AtomicIncrement(volatile ZEInt32* NextNumber)
+{
+	#ifdef ZE_PLATFORM_COMPILER_MSVC
+		return _InterlockedIncrement((long*)NextNumber);
+	#elif defined(ZE_PLATFORM_COMPILER_GCC)
+		return __sync_add_and_fetch(NextNumber, 1);
+	#endif
+}
 
 bool ZELock::Test()
 {
@@ -52,7 +55,8 @@ bool ZELock::Test()
 
 bool ZELock::Lock()
 {
-	long MyNumber = ZE_ATOMIC_INCREMENT(&NextNumber);
+	ZEInt32 MyNumber = AtomicIncrement(&NextNumber);
+
 	if (MyNumber != CurrentNumber)
 		return false;
 
@@ -68,7 +72,7 @@ void ZELock::Wait()
 
 void ZELock::WaitAndLock()
 {
-	unsigned long long MyNumber = ZE_ATOMIC_INCREMENT(&NextNumber);
+	ZEUInt64 MyNumber = AtomicIncrement(&NextNumber);
 
 	while(MyNumber != CurrentNumber);
 

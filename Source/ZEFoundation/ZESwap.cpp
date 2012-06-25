@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPack.h
+ Zinek Engine - ZESwap.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,65 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PACK_H__
-#define __ZE_PACK_H__
-
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
-
-#include <stdio.h>
-
-class ZECompressedFile;
-class ZEPartialCompressedFile;
-
-class ZEPack
-{
-	private:
-
-		ZECompressedFile*				File;
-		char							PackFileName[256];
-
-										// Calculates hash
-		ZEUInt64							GetHash(const char* IdentiifierName);
-
-	public:
-
-										// Constructor
-										ZEPack();
-
-										// Destructor
-										~ZEPack();
-
-										// Opens the pack file
-		bool							Open(const char* PackFileName);
-
-										// Closes the pack file
-		void							ClosePack();
-
-										// Empty the pack file
-		bool							ClearPack();
-
-										// Returns the pack file name
-		const char*						GetPackFileName();
-
-										// Checks if the chunk exists
-		bool							ChunkExists(const char* IdentifierName);
-
-										// Create new chunk from Buffer
-		bool							AddChunk(const char* IdentifierName, unsigned char* source/*SourceBuffer*/, ZEUInt64 Size);		
-
-										// Returns the data in a buffer
-		bool							GetChunk(const char* IdentifierName, unsigned char* data/*DestinationBuffer*/);
-
-										
-		bool							OpenChunk(ZEPartialCompressedFile& PartialFile, const char* IdentifierName);
-
-										// Deletes a chunk completely
-		bool							DeleteChunk(const char* IdentifierName);
-
-		static bool						IsPack(ZEString& Path);
-										
-};
-
-#endif
+#include "ZESwap.h"

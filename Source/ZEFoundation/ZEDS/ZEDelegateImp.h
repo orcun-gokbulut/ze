@@ -40,14 +40,14 @@ class ZEDelegate<TReturn (TemplateArguments)>
 		void* Object;
 		TReturn (*Wrapper)(void* ArgumentSeperator TemplateArguments);
 
-		template<class TClass, typename TReturn(TClass::*TMethod)(TemplateArguments)>
+		template<typename TClass, TReturn(TClass::*TMethod)(TemplateArguments)>
 		static TReturn WrapperImpMember(void* Object ArgumentSeperator ArgumentDefinitions)
 		{
 			TClass* ObjectPointer = static_cast<TClass*>(Object);
 			return (ObjectPointer->*TMethod)(Arguments);
 		}
 
-		template<class TClass, typename TReturn(TClass::*TMethod)(TemplateArguments) const>
+		template<typename TClass, TReturn(TClass::*TMethod)(TemplateArguments) const>
 		static TReturn WrapperImpConst(void* Object ArgumentSeperator ArgumentDefinitions)
 		{
 			const TClass* ObjectPointer = static_cast<const TClass*>(Object);
@@ -61,7 +61,7 @@ class ZEDelegate<TReturn (TemplateArguments)>
 		}
 
 	public:
-		template<class TClass, typename TReturn(TClass::*TMethod)(TemplateArguments)>
+		template<class TClass, TReturn(TClass::*TMethod)(TemplateArguments)>
 		static ZEDelegate Create(TClass* Object)
 		{
 			ZEDelegate Delegate;
@@ -70,7 +70,7 @@ class ZEDelegate<TReturn (TemplateArguments)>
 			return Delegate;
 		}
 
-		template<class TClass, typename TReturn (TClass::*TMethod)(TemplateArguments) const>
+		template<class TClass, TReturn (TClass::*TMethod)(TemplateArguments) const>
 		static ZEDelegate CreateConst(const TClass* Object)
 		{
 			ZEDelegate Delegate;
@@ -79,7 +79,7 @@ class ZEDelegate<TReturn (TemplateArguments)>
 			return Delegate;
 		}
 
-		template<typename TReturn (*TMethod)(TemplateArguments)>
+		template<TReturn (*TMethod)(TemplateArguments)>
 		static ZEDelegate Create()
 		{
 			ZEDelegate Delegate;

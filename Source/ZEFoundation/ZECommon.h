@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECompressedFile.h
+ Zinek Engine - ZECommon.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,72 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_COMPRESSED_FILE_H__
-#define __ZE_COMPRESSED_FILE_H__
+#ifndef __ZE_COMMON_H__
+#define __ZE_COMMON_H__
 
-#include "ZETypes.h"
-#include "ZEFile/ZEFile.h"
-
-
-class ZECompressedFile
-{
-	friend class ZEPartialCompressedFile;
-	protected:
-		void*				File;
-		ZEString			FileName;
-		ZEUInt64			FileCursor;
-		
-	public:
-		const char*			GetFileName() const;
-		void*				GetFileHandle() const;
-
-		virtual bool		Open(const ZEString& FileName, ZEFileMode Mode = ZE_FM_READ_WRITE, bool Binary = true); 
-
-		virtual bool		Seek(ZEInt64 Offset, ZESeekFrom Origin);		
-
-		virtual ZEUInt64	Tell();										
-
-		virtual ZEUInt64	Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);				
-		virtual ZEUInt64	Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count);	
-		
-		static ZEUInt64		GetFileSize(const char* FileName);
-		virtual ZEUInt64	GetFileSize();
-		
-		virtual void		Close();
-		virtual bool		Eof();
-
-		virtual void		Flush();
-		virtual bool		IsOpen();
-
-							ZECompressedFile();
-		virtual				~ZECompressedFile();
-};
-
-
-class ZEPartialCompressedFile : public ZECompressedFile
-{
-	protected:
-		ZEUInt64			StartPosition;
-		ZEUInt64			EndPosition;
-		bool				IsEof;
-		ZECompressedFile*	BaseFile;
-
-	public:
-		virtual bool		Open(ZECompressedFile* ParentFile, ZEUInt64 Offset, ZEUInt64 Size);
-		virtual bool		Open(const char* FileName, ZEFileMode Mode, bool Binary);
-		virtual void		Close();
-
-		virtual ZEUInt64	Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
-		virtual ZEUInt64	Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
-
-		virtual bool		Seek(ZEInt64 Offset, ZESeekFrom Origin);
-		virtual ZEUInt64	Tell();
-
-		virtual ZEUInt64	GetFileSize();
-		virtual bool		Eof();				
-
-							ZEPartialCompressedFile();
-		virtual				~ZEPartialCompressedFile();
-};
+#ifdef ZE_PLATFORM_COMPILER_MSVC
+	#define ZE_FORCE_INLINE __forceinline
+#elif defined(ZE_PLATFORM_COMPILER_GCC)
+	#define ZE_FORCE_INLINE inline
+#else
+	#define ZE_FORCE_INLINE inline
+#endif
 
 #endif

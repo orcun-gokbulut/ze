@@ -42,7 +42,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEArray.h"
 
-template <typename Type, typename Allocator = ZEAllocatorBase<Type>>
+template < typename Type, typename Allocator = ZEAllocatorBase<Type> >
 class ZEQuadTree
 {
 	private:
@@ -82,7 +82,7 @@ class ZEQuadTree
 
 		ZEUInt GetMaxDepth()
 		{
-			return MaxDepth
+			return MaxDepth;
 		}
 
 		const ZEAABBox& GetBoundingBox()

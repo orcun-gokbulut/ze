@@ -314,8 +314,8 @@ bool ZEFileCache::Clear()
 	Close();
 
 	// Remove the file
-	if(remove(FileName.GetValue()) == -1)
-		return false;
+	/*if(remove(FileName.GetValue()) == -1)
+		return false;*/
 
 	// ReOpen the cache	
 	if(Open(FileName))

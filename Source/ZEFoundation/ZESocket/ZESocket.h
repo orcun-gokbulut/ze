@@ -36,29 +36,28 @@
 #pragma once
 #ifndef	__ZE_SOCKET_H__
 #define __ZE_SOCKET_H__
+
 #include "ZETypes.h"
 #include "ZEDS\ZEString.h"
 #include "ZEIPAddress.h"
 
 #include <Winsock2.h>//Must be removed
 
-#define ZE_SR_RETRY			((ZESSize)-999)
-#define ZE_SR_IN_PROGRESS	((ZESSize)-998)
-#define ZE_SR_OK			((ZESSize)-100)
-#define ZE_SR_NOK			((ZESSize)-101)
+#define ZE_SR_OK			((ZESSize)0)
+#define ZE_SR_ERROR			((ZESSize)-1)
+#define ZE_SR_RETRY			((ZESSize)-2)
+#define ZE_SR_IN_PROGRESS	((ZESSize)-3)
 
 class ZESocketTCP
 {
 	friend class ZESocketTCPListener;
 
 	private:
-
 		SOCKET				Socket;
 		ZEIPAddress			IpAddress;
 		ZEUInt16			Port;
 
 	public:
-
 		bool				Create(const ZEIPAddress& Address, ZEUInt16 Port);
 		bool				Close();
 
@@ -73,19 +72,16 @@ class ZESocketTCP
 class ZESocketTCPListener
 {
 	private:
-
 		SOCKET				Socket;
 		ZEIPAddress			IpAddress;
 		ZEUInt16			Port;
 
 	public:
-
-		bool				Create(const ZEIPAddress& Address, ZEUInt16 Port);
-		bool				Close();
-
 		const ZEIPAddress&	GetIpAddress() const;
 		ZEUInt16			GetPort() const;
 
+		bool				Create(const ZEIPAddress& Address, ZEUInt16 Port);
+		bool				Close();
 
 		ZESocketTCP*		Accept();
 };
@@ -93,13 +89,11 @@ class ZESocketTCPListener
 class ZESocketUDP
 {
 	private:
-
 		SOCKET				Socket;
 		ZEIPAddress			IpAddress;
 		ZEUInt16			Port;
 
 	public:
-
 		bool				Create(const ZEIPAddress& Address, ZEUInt16 Port);
 		bool				Close();
 

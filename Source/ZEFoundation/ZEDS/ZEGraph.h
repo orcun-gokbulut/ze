@@ -45,7 +45,7 @@ struct ZEGraphLink
 	ZESize Nodes[2];
 };
 
-template<typename Type, typename NodeAllocator = ZEAllocatorBase<Type>, typename LinkAllocator = ZEAllocatorBase<ZEGraphLink>>
+template< typename Type, typename NodeAllocator = ZEAllocatorBase<Type>, typename LinkAllocator = ZEAllocatorBase<ZEGraphLink> >
 class ZEGraph
 {
 	private:

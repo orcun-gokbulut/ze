@@ -43,7 +43,7 @@ class ZEList;
 template<typename ZEType>
 class ZEListIterator
 {
-	template<typename ZEType> friend class ZEList;
+	friend class ZEList<ZEType>;
 	private:
 		ZEType* Item;
 
@@ -92,7 +92,7 @@ class ZEListIterator
 template<typename ZEType>
 class ZEListIteratorConst
 {
-	template<typename ZEType> friend class ZEList;
+	friend class ZEList<ZEType>;
 	private:
 		const ZEType* Item;
 				

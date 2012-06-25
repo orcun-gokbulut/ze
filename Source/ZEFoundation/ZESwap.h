@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaxHeap.h
+ Zinek Engine - ZESwap.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,116 +33,66 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MAX_HEAP_H__
-#define __ZE_MAX_HEAP_H__
+#ifndef __ZE_SWAP_H__
+#define __ZE_SWAP_H__
 
+#include "ZECommon.h"
 #include "ZETypes.h"
-#include "ZEHeapBase.h"
 
-template< typename Type, typename Allocator_ = ZEChunkAllocator<Type, 100> >
-class  ZEMaxHeap : public ZEHeapBase<Type, Allocator_>
+#ifdef ZE_PLATFORM_COMPILER_MSVC
+#include <intrin.h>
+#endif
+
+class ZESwap
 {
-	private:
-		void Swap(Type& One, Type& Two)
-		{
-			Type Temp = One;
-			One = Two;
-			Two = Temp;
-		}
-
-		void MaxHeapify(ZEInt Index)
-		{
-			ZESize Largest = Index;
-
-			ZESize LeftIndex = this->GetFirstChildIndex(Index);
-			if (LeftIndex < this->Heap.GetCount() && this->Heap[LeftIndex] > this->Heap[Index])
-				Largest = LeftIndex;
-
-			ZESize RightIndex = this->GetSecondChildIndex(Index);
-			if (RightIndex < this->Heap.GetCount() && this->Heap[RightIndex] > this->Heap[Largest])
-				Largest = RightIndex;
-
-			if (Largest != Index)
-			{
-				Swap(this->Heap[Index], this->Heap[Largest]);
-				MaxHeapify(Largest);
-			}
-		}
-
 	public:
-		void Create(Type* Array, ZESize Size)
+		static ZE_FORCE_INLINE ZEUInt16 Swap(ZEUInt16 Value)
 		{
-			this->Heap.CopyFrom(Array, Size);
-
-			for (ZESize I = this->Heap.GetSize() / 2; I >= 0; I--)
-				MaxHeapify(I);
+			#ifdef ZE_PLATFORM_COMPILER_MSVC
+				return _byteswap_ushort(Value);
+			#elif ZE_PLATFOMR_COMPILER_GCC
+				return __builtin_bswap16(Value) 
+			#else
+				return (Value >> 8) | (Value << 8);
+			#endif
 		}
 
-		void Create(const ZEArray<Type>& Array)
+		static ZE_FORCE_INLINE ZEUInt32 Swap(const ZEUInt32 Value)
 		{
-			Create(Array.GetCArray(), Array.GetCount());
+			#ifdef ZE_PLATFORM_COMPILER_MSVC
+				return _byteswap_ulong(Value);
+			#elif ZE_PLATFOMR_COMPILER_GCC
+				return __builtin_bswap16(Value) 
+			#else
+				return (Swap((ZEUInt16)(Value & 0xFFFF)) << 16) | Swap((ZEUInt16)(Value >> 16));
+			#endif
+		}
+	
+		static ZE_FORCE_INLINE ZEUInt64 Swap(ZEUInt64 Value)
+		{
+			#ifdef ZE_PLATFORM_COMPILER_MSVC
+				return _byteswap_uint64(Value);
+			#elif ZE_PLATFOMR_COMPILER_GCC
+				return __builtin_bswap16(Value) 
+			#else
+				return (Swap((ZEUInt32)(Value & 0xFFFFFFFF)) << 32) | Swap((ZEUInt32)(Value >> 32));
+			#endif
 		}
 
-		Type& GetMax()
+		static ZE_FORCE_INLINE ZEUInt16 Swap(ZEInt16 Value)
 		{
-			return this->Heap[0];
+			return Swap((ZEUInt16)Value);
 		}
 
-		const Type& GetMax() const
+		static ZE_FORCE_INLINE ZEUInt32 Swap(const ZEInt32 Value)
 		{
-			return this->Heap[0];
+			return Swap((ZEUInt32)Value);
 		}
-
-		void InsertValue(Type Value)
+	
+		static ZE_FORCE_INLINE ZEUInt64 Swap(ZEInt64 Value)
 		{
-			Insert(Value);
-		}
-
-		void Insert(Type& Value)
-		{
-			this->Heap.Add(Value);
-
-			ZESize Index = this->Heap.GetCount() - 1;
-			while(Index != 0)
-			{
-				ZESize ParentIndex = this->GetParentIndex(Index);
-
-				if (this->Heap[Index] < this->Heap[ParentIndex])
-					break;
-
-				Swap(this->Heap[Index], this->Heap[ParentIndex]);
-				Index = ParentIndex;
-			}
-		}
-
-		void Remove(ZEInt Index)
-		{
-			this->Heap[Index] = this->Heap.GetLastItem();
-			this->Heap.DeleteAt(this->Heap.GetCount() - 1);
-
-			MaxHeapify(Index);
-		}
-
-		void RemoveMax()
-		{
-			Remove(0);
-		}
-
-		ZEMaxHeap<Type, Allocator_>& operator=(const ZEMaxHeap<Type, Allocator_>& Other)
-		{
-			this->Heap.CopyFrom(Other.Heap);
-			return *this;
-		}
-
-		ZEMaxHeap(const ZEMaxHeap<Type, Allocator_>& Other)
-		{
-			this->Heap.CopyFrom(Other.Heap);
-		}
-
-		ZEMaxHeap()
-		{
-
+			return Swap((ZEUInt64)Value);
 		}
 };
+
 #endif

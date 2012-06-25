@@ -39,7 +39,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-static DWORD WINAPI RunThread(LPVOID Thread)
+DWORD WINAPI ThreadFunction(LPVOID Thread)
 {
 	ZEThread* CurrentThread = (ZEThread*)Thread;
 
@@ -69,7 +69,7 @@ void ZEThread::Run(void* Parameter)
 {
 	if (Handle == NULL)
 	{
-		Handle = CreateThread(NULL, 0,  RunThread, this, CREATE_SUSPENDED, NULL);
+		Handle = CreateThread(NULL, 0,  ThreadFunction, this, CREATE_SUSPENDED, NULL);
 		if (Handle == NULL)
 			zeCriticalError("Can not create thread.");
 	}
