@@ -575,6 +575,19 @@ ZEString ZEString::FromChar(char Value)
 	return Temp;
 }
 
+ZEString ZEString::FromWChar(wchar_t Value)
+{
+	ZESize Size;
+	ZEString Temp;
+	
+	Size = sizeof(char) + 1;
+	Temp.Allocator.Allocate(&Temp.Buffer, Size);
+	
+	wctomb(Temp.Buffer, Value);
+	
+	return Temp;
+}
+
 ZEString ZEString::FromInt(ZEInt Value, ZEUInt Base)
 {
 	char Buffer[33];
@@ -617,6 +630,22 @@ ZEString ZEString::FromFloat(float Value, ZEUInt Digits)
 ZEString ZEString::FromBool(bool Value, const char* TrueText, const char* FalseText)
 {
 	return Value ? TrueText : FalseText;
+}
+
+ZEString ZEString::FromWString(const wchar_t* Value)
+{
+	ZESize Size;
+	ZESize Lenght;
+	ZESize Converted;
+	ZEString Temp;
+
+	Lenght = wcslen(Value);
+	Size = (Lenght + 1) * sizeof (char);
+	Temp.Allocator.Allocate(&Temp.Buffer, Size);
+
+	wcstombs_s(&Converted, Temp.Buffer, Size, Value, _TRUNCATE);
+	
+	return Temp;
 }
 
 ZEString ZEString::FromCString(const char* Value)
