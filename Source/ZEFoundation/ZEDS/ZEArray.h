@@ -85,10 +85,10 @@ class ZEArray
 			return Iterator(this);
 		}
 
-		typedef ZEArrayIterator<ZEType, Allocator_> ConstItereator;
-		Iterator GetConstIterator() const
+		typedef ZEArrayIteratorConst<ZEType, Allocator_> ConstIterator;
+		ConstIterator GetConstIterator() const
 		{
-			return ConstItereator(this);
+			return ConstIterator(this);
 		}
 
 		inline ZESize Circular(ZESSize Index) const
