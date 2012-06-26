@@ -149,7 +149,7 @@ bool ZEDSModule::Initialize()
 		return false;
     }
 
-	ZESize DeviceId = (ZESize)SoundOptions.GetOption("DeviceId")->GetValue().GetInteger();
+	ZESize DeviceId = (ZESize)SoundOptions.GetOption("DeviceId")->GetValue().GetInt32();
 
 	GUID* DeviceGUID = NULL;
 	if (DeviceId > DeviceList.GetCount())
@@ -213,14 +213,14 @@ bool ZEDSModule::Initialize()
 		TypeVolumes[I] = 100;
 
 	SetStreamingDisabled(SoundOptions.GetOption("StreamingDisabled")->GetValue().GetBoolean());
-	SetMaxBufferSize((ZESize)SoundOptions.GetOption("MaxBufferSize")->GetValue().GetInteger());
-	SetMasterVolume(SoundOptions.GetOption("MasterVolume")->GetValue().GetInteger());
-	SetSpeakerLayout((ZESpeakerLayout)SoundOptions.GetOption("SpeakerLayout")->GetValue().GetInteger());
-	SetTypeVolume(ZE_SST_EFFECT, SoundOptions.GetOption("EffectVolume")->GetValue().GetInteger());
-	SetTypeVolume(ZE_SST_DIALOG, SoundOptions.GetOption("DialogVolume")->GetValue().GetInteger());
-	SetTypeVolume(ZE_SST_MUSIC, SoundOptions.GetOption("MusicVolume")->GetValue().GetInteger());
-	SetTypeVolume(ZE_SST_VIDEO, SoundOptions.GetOption("VideoVolume")->GetValue().GetInteger());
-	SetTypeVolume(ZE_SST_PLAYER_COMM, SoundOptions.GetOption("PlayerCommVolume")->GetValue().GetInteger());
+	SetMaxBufferSize((ZESize)SoundOptions.GetOption("MaxBufferSize")->GetValue().GetInt32());
+	SetMasterVolume(SoundOptions.GetOption("MasterVolume")->GetValue().GetInt32());
+	SetSpeakerLayout((ZESpeakerLayout)SoundOptions.GetOption("SpeakerLayout")->GetValue().GetInt32());
+	SetTypeVolume(ZE_SST_EFFECT, SoundOptions.GetOption("EffectVolume")->GetValue().GetInt32());
+	SetTypeVolume(ZE_SST_DIALOG, SoundOptions.GetOption("DialogVolume")->GetValue().GetInt32());
+	SetTypeVolume(ZE_SST_MUSIC, SoundOptions.GetOption("MusicVolume")->GetValue().GetInt32());
+	SetTypeVolume(ZE_SST_VIDEO, SoundOptions.GetOption("VideoVolume")->GetValue().GetInt32());
+	SetTypeVolume(ZE_SST_PLAYER_COMM, SoundOptions.GetOption("PlayerCommVolume")->GetValue().GetInt32());
 
 	zeLog("DirectSound Initialized.");
 

@@ -54,6 +54,8 @@ class ZEUIRectangle
 
 		static bool				Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, const ZERectangle& ClipRectangle);
 		void					ConvertToVertices(ZEUIVertex* Buffer) const;
+
+								ZEUIRectangle();
 };
 #endif
 

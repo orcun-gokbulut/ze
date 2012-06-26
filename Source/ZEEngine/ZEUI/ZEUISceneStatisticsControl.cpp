@@ -72,6 +72,9 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 {
 	//FPS Calculation
 
+	for(ZESize I = 0; I < GetChildControls().GetCount(); I++)
+		GetChildControls()[I]->SetZOrder(GetZOrder());
+
 	static float TotalElapsedTime = 0;
 	static unsigned int AverageFPS = 0;
 	static unsigned int FrameCount = 0;

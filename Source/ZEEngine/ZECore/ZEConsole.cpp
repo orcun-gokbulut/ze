@@ -158,7 +158,7 @@ static bool ParseConstant(const char* Input, ZESize &Cursor, ZEVariant *Output)
 				if (IsFloat)
 					Output->SetFloat((float)atof(Temp));
 				else
-					Output->SetInteger(atoi(Temp));
+					Output->SetInt32(atoi(Temp));
 				return true;
 			}
 		}
@@ -376,8 +376,8 @@ bool ZEConsole::ParseInput(const char* Input)
 						case ZE_VRT_UNDEFINED:
 							Output("%s.%s = UNDEFINED (Probably an error)\r\n");
 							break;
-						case ZE_VRT_INTEGER:
-							Output("%s.%s = %d\r\n", Section, Name, Opt->GetValue().GetInteger());
+						case ZE_VRT_INTEGER_32:
+							Output("%s.%s = %d\r\n", Section, Name, Opt->GetValue().GetInt32());
 							break;
 						case ZE_VRT_FLOAT:
 							Output("%s.%s = %lf\r\n", Section, Name, Opt->GetValue().GetFloat());

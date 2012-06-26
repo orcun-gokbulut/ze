@@ -236,7 +236,7 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 	
 	if (!InputIndex.IsEmpty())
 	{
-		Event.Index = InputIndex.ToInt();
+		Event.Index = InputIndex.ToInt32();
 	}
 
 	return false;

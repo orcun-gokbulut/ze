@@ -114,17 +114,44 @@ void ZEVariant::SetVariant(const ZEVariant& NewValue)
 		case ZE_VRT_NULL:
 			SetNull();
 			break;
-		case ZE_VRT_STRING:
-			SetString(NewValue.GetString());
+		case ZE_VRT_FLOAT:
+			SetFloat(NewValue.GetFloat());
 			break;
-		case ZE_VRT_INTEGER:
-			SetInteger(NewValue.GetInteger());
+		case ZE_VRT_DOUBLE:
+			SetDouble(NewValue.GetDouble());
+			break;
+		case ZE_VRT_INTEGER_8:
+			SetInt8(NewValue.GetInt8());
+			break;
+		case ZE_VRT_INTEGER_16:
+			SetInt16(NewValue.GetInt16());
+			break;
+		case ZE_VRT_INTEGER_32:
+			SetInt32(NewValue.GetInt32());
+			break;
+		case ZE_VRT_INTEGER_64:
+			SetInt64(NewValue.GetInt64());
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+			SetUInt8(NewValue.GetUInt8());
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+			SetUInt16(NewValue.GetUInt16());
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			SetUInt32(NewValue.GetUInt32());
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+			SetUInt64(NewValue.GetUInt64());
 			break;
 		case ZE_VRT_BOOLEAN:
 			SetBoolean(NewValue.GetBoolean());
 			break;
-		case ZE_VRT_FLOAT:
-			SetFloat(NewValue.GetFloat());
+		case ZE_VRT_STRING:
+			SetString(NewValue.GetString());
+			break;
+		case ZE_VRT_QUATERNION:
+			SetQuaternion(NewValue.GetQuaternion());
 			break;
 		case ZE_VRT_VECTOR2:
 			SetVector2(NewValue.GetVector2());
@@ -134,9 +161,6 @@ void ZEVariant::SetVariant(const ZEVariant& NewValue)
 			break;
 		case ZE_VRT_VECTOR4:
 			SetVector4(NewValue.GetVector4());
-			break;
-		case ZE_VRT_QUATERNION:
-			SetQuaternion(NewValue.GetQuaternion());
 			break;
 		case ZE_VRT_MATRIX3X3:
 			SetMatrix3x3(NewValue.GetMatrix3x3());
@@ -160,22 +184,38 @@ ZESize ZEVariant::SizeOf() const
 			return 0;
 		case ZE_VRT_NULL:
 			return 0;
-		case ZE_VRT_STRING:
-			return strlen(Value.String) + 1;
-		case ZE_VRT_INTEGER:
-			return sizeof(ZEInt);
-		case ZE_VRT_BOOLEAN:
-			return sizeof(bool);
 		case ZE_VRT_FLOAT:
 			return sizeof(float);
+		case ZE_VRT_DOUBLE:
+			return sizeof(double);
+		case ZE_VRT_INTEGER_8:
+			return sizeof(ZEInt8);
+		case ZE_VRT_INTEGER_16:
+			return sizeof(ZEInt16);
+		case ZE_VRT_INTEGER_32:
+			return sizeof(ZEInt32);
+		case ZE_VRT_INTEGER_64:
+			return sizeof(ZEInt64);
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+			return sizeof(ZEUInt8);
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+			return sizeof(ZEUInt16);
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			return sizeof(ZEUInt32);
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+			return sizeof(ZEUInt64);
+		case ZE_VRT_BOOLEAN:
+			return sizeof(bool);
+		case ZE_VRT_STRING:
+			return strlen(Value.String) + 1;
+		case ZE_VRT_QUATERNION:
+			return sizeof(ZEQuaternion);
 		case ZE_VRT_VECTOR2:
 			return sizeof(ZEVector2);
 		case ZE_VRT_VECTOR3:
 			return sizeof(ZEVector3);
 		case ZE_VRT_VECTOR4:
 			return sizeof(ZEVector4);
-		case ZE_VRT_QUATERNION:
-			return sizeof(ZEQuaternion);
 		case ZE_VRT_MATRIX3X3:
 			return sizeof(ZEMatrix3x3);
 		case ZE_VRT_MATRIX4X4:
@@ -200,19 +240,46 @@ bool ZEVariant::Serialize(ZESerializer* Serializer)
 		case ZE_VRT_UNDEFINED:
 		case ZE_VRT_NULL:
 			break;
+		case ZE_VRT_FLOAT:
+			Serializer->Write(&Value.Float, sizeof(float), 1);
+			break;
+		case ZE_VRT_DOUBLE:
+			Serializer->Write(&Value.Double, sizeof(double), 1);
+			break;
+		case ZE_VRT_INTEGER_8:
+			Serializer->Write(&Value.Int32, sizeof(ZEInt8), 1);
+			break;
+		case ZE_VRT_INTEGER_16:
+			Serializer->Write(&Value.Int32, sizeof(ZEInt16), 1);
+			break;
+		case ZE_VRT_INTEGER_32:
+			Serializer->Write(&Value.Int32, sizeof(ZEInt32), 1);
+			break;
+		case ZE_VRT_INTEGER_64:
+			Serializer->Write(&Value.Int64, sizeof(ZEInt64), 1);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+			Serializer->Write(&Value.Int32, sizeof(ZEUInt8), 1);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+			Serializer->Write(&Value.Int32, sizeof(ZEUInt16), 1);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			Serializer->Write(&Value.Int32, sizeof(ZEUInt32), 1);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+			Serializer->Write(&Value.Int64, sizeof(ZEUInt64), 1);
+			break;
+		case ZE_VRT_BOOLEAN:
+			Serializer->Write(&Value.Boolean, sizeof(bool), 1);
+			break;
 		case ZE_VRT_STRING:
 			StringSize = (ZEUInt32)(strlen(Value.String) + 1);
 			Serializer->Write(&StringSize, sizeof(ZEUInt32), 1);
 			Serializer->Write(Value.String, sizeof(char), StringSize);
 			break;
-		case ZE_VRT_INTEGER:
-			Serializer->Write(&Value.Integer, sizeof(ZEInt), 1);
-			break;
-		case ZE_VRT_BOOLEAN:
-			Serializer->Write(&Value.Boolean, sizeof(bool), 1);
-			break;
-		case ZE_VRT_FLOAT:
-			Serializer->Write(&Value.Float, sizeof(float), 1);
+		case ZE_VRT_QUATERNION:
+			Serializer->Write(&Value.Vectors, sizeof(ZEQuaternion), 1);
 			break;
 		case ZE_VRT_VECTOR2:
 			Serializer->Write(&Value.Vectors, sizeof(ZEVector2), 1);
@@ -222,9 +289,6 @@ bool ZEVariant::Serialize(ZESerializer* Serializer)
 			break;
 		case ZE_VRT_VECTOR4:
 			Serializer->Write(&Value.Vectors, sizeof(ZEVector4), 1);
-			break;
-		case ZE_VRT_QUATERNION:
-			Serializer->Write(&Value.Vectors, sizeof(ZEQuaternion), 1);
 			break;
 		case ZE_VRT_MATRIX3X3:
 			Serializer->Write(Value.Matrix3x3, sizeof(ZEMatrix3x3), 1);
@@ -256,23 +320,59 @@ bool ZEVariant::Unserialize(ZEUnserializer* Unserializer)
 		case ZE_VRT_NULL:
 			SetType(ZE_VRT_NULL);
 			break;
+		case ZE_VRT_FLOAT:
+			SetType(ZE_VRT_FLOAT);
+			Unserializer->Read(&Value.Float, sizeof(float), 1);
+			break;
+		case ZE_VRT_DOUBLE:
+			SetType(ZE_VRT_DOUBLE);
+			Unserializer->Read(&Value.Double, sizeof(double), 1);
+			break;
+		case ZE_VRT_INTEGER_8:
+			SetType(ZE_VRT_INTEGER_8);
+			Unserializer->Read(&Value.Int32, sizeof(ZEInt8), 1);
+			break;
+		case ZE_VRT_INTEGER_16:
+			SetType(ZE_VRT_INTEGER_16);
+			Unserializer->Read(&Value.Int32, sizeof(ZEInt16), 1);
+			break;
+		case ZE_VRT_INTEGER_32:
+			SetType(ZE_VRT_INTEGER_32);
+			Unserializer->Read(&Value.Int32, sizeof(ZEInt32), 1);
+			break;
+		case ZE_VRT_INTEGER_64:
+			SetType(ZE_VRT_INTEGER_64);
+			Unserializer->Read(&Value.Int64, sizeof(ZEInt64), 1);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+			SetType(ZE_VRT_UNSIGNED_INTEGER_8);
+			Unserializer->Read(&Value.Int32, sizeof(ZEUInt8), 1);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+			SetType(ZE_VRT_UNSIGNED_INTEGER_16);
+			Unserializer->Read(&Value.Int32, sizeof(ZEUInt16), 1);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			SetType(ZE_VRT_UNSIGNED_INTEGER_32);
+			Unserializer->Read(&Value.Int32, sizeof(ZEUInt32), 1);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+			SetType(ZE_VRT_UNSIGNED_INTEGER_64);
+			Unserializer->Read(&Value.Int64, sizeof(ZEUInt64), 1);
+			break;
+		case ZE_VRT_BOOLEAN:
+			SetType(ZE_VRT_BOOLEAN);
+			Unserializer->Read(&Value.Boolean, sizeof(bool), 1);
+			break;
 		case ZE_VRT_STRING:
 			SetType(ZE_VRT_STRING);
 			Unserializer->Read(&StringSize, sizeof(ZEUInt32), 1);
 			Value.String = new char[(ZESize)StringSize];
 			Unserializer->Read(Value.String, sizeof(char), StringSize);
 			break;
-		case ZE_VRT_INTEGER:
-			SetType(ZE_VRT_INTEGER);
-			Unserializer->Read(&Value.Integer, sizeof(ZEInt), 1);
-			break;
-		case ZE_VRT_BOOLEAN:
-			SetType(ZE_VRT_BOOLEAN);
-			Unserializer->Read(&Value.Boolean, sizeof(bool), 1);
-			break;
-		case ZE_VRT_FLOAT:
-			SetType(ZE_VRT_FLOAT);
-			Unserializer->Read(&Value.Float, sizeof(float), 1);
+		case ZE_VRT_QUATERNION:
+			SetType(ZE_VRT_QUATERNION);
+			Unserializer->Read(&Value.Vectors, sizeof(ZEQuaternion), 1);
 			break;
 		case ZE_VRT_VECTOR2:
 			SetType(ZE_VRT_VECTOR2);
@@ -285,10 +385,6 @@ bool ZEVariant::Unserialize(ZEUnserializer* Unserializer)
 		case ZE_VRT_VECTOR4:
 			SetType(ZE_VRT_VECTOR4);
 			Unserializer->Read(&Value.Vectors, sizeof(ZEVector4), 1);
-			break;
-		case ZE_VRT_QUATERNION:
-			SetType(ZE_VRT_QUATERNION);
-			Unserializer->Read(&Value.Vectors, sizeof(ZEQuaternion), 1);
 			break;
 		case ZE_VRT_MATRIX3X3:
 			SetType(ZE_VRT_MATRIX3X3);
@@ -318,16 +414,64 @@ void ZEVariant::SetString(const char *NewValue)
 	strcpy(Value.String, NewValue);
 }
 
-void ZEVariant::SetInteger(ZEInt Value)
+void ZEVariant::SetInt8(ZEInt8 Value)
 {
-	Type = ZE_VRT_INTEGER;
-	this->Value.Integer = Value;
+	Type = ZE_VRT_INTEGER_8;
+	this->Value.Int32 = (ZEInt32)Value;
+}
+
+void ZEVariant::SetInt16(ZEInt16 Value)
+{
+	Type = ZE_VRT_INTEGER_16;
+	this->Value.Int32 = (ZEInt32)Value;
+}
+
+void ZEVariant::SetInt32(ZEInt32 Value)
+{
+	Type = ZE_VRT_INTEGER_32;
+	this->Value.Int32 = Value;
+}
+
+void ZEVariant::SetInt64(ZEInt64 Value)
+{
+	Type = ZE_VRT_INTEGER_64;
+	this->Value.Int64 = Value;
+}
+
+void ZEVariant::SetUInt8(ZEUInt8 Value)
+{
+	Type = ZE_VRT_UNSIGNED_INTEGER_8;
+	this->Value.Int32 = Value;
+}
+
+void ZEVariant::SetUInt16(ZEUInt16 Value)
+{
+	Type = ZE_VRT_UNSIGNED_INTEGER_16;
+	this->Value.Int32 = Value;
+}
+
+void ZEVariant::SetUInt32(ZEUInt32 Value)
+{
+	Type = ZE_VRT_UNSIGNED_INTEGER_32;
+	this->Value.Int32 = Value;
+}
+
+void ZEVariant::SetUInt64(ZEUInt64 Value)
+{
+	Type = ZE_VRT_UNSIGNED_INTEGER_64;
+	this->Value.Int64 = Value;
 }
 
 void ZEVariant::SetFloat(float Value)
 {
 	Type = ZE_VRT_FLOAT;
 	this->Value.Float = Value;
+}
+
+void ZEVariant::SetDouble(double Value)
+{
+	Type = ZE_VRT_DOUBLE;
+	this->Value.Double = Value;
 }
 
 void ZEVariant::SetBoolean(bool Value)
@@ -390,16 +534,64 @@ char* ZEVariant::GetString() const
 	return Value.String;
 }
 
-ZEInt ZEVariant::GetInteger() const
+ZEInt8 ZEVariant::GetInt8() const
 {
-	zeDebugCheck(this->Type != ZE_VRT_INTEGER, "ZEVariant::GetInteger operation failed. Variant type mismatched.");
-	return Value.Integer;
+	zeDebugCheck(this->Type != ZE_VRT_INTEGER_8, "ZEVariant::GetInt8 operation failed. Variant type mismatched.");
+	return (ZEInt8)Value.Int32;
+}
+
+ZEInt16 ZEVariant::GetInt16() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_INTEGER_16, "ZEVariant::GetInt16 operation failed. Variant type mismatched.");
+	return (ZEInt16)Value.Int32;
+}
+
+ZEInt32 ZEVariant::GetInt32() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_INTEGER_32, "ZEVariant::GetInt32 operation failed. Variant type mismatched.");
+	return Value.Int32;
+}
+
+ZEInt64 ZEVariant::GetInt64() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_INTEGER_64, "ZEVariant::GetInt64 operation failed. Variant type mismatched.");
+	return Value.Int64;
+}
+
+ZEUInt8 ZEVariant::GetUInt8() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_UNSIGNED_INTEGER_8, "ZEVariant::GetUInt8 operation failed. Variant type mismatched.");
+	return (ZEUInt8)Value.Int32;
+}
+
+ZEUInt16 ZEVariant::GetUInt16() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_UNSIGNED_INTEGER_16, "ZEVariant::GetUInt16 operation failed. Variant type mismatched.");
+	return (ZEUInt16)Value.Int32;
+}
+
+ZEUInt32 ZEVariant::GetUInt32() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_UNSIGNED_INTEGER_32, "ZEVariant::GetUInt32 operation failed. Variant type mismatched.");
+	return Value.Int32;
+}
+
+ZEUInt64 ZEVariant::GetUInt64() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_UNSIGNED_INTEGER_64, "ZEVariant::GetUInt64 operation failed. Variant type mismatched.");
+	return Value.Int64;
 }
 
 float ZEVariant::GetFloat() const
 {
 	zeDebugCheck(this->Type != ZE_VRT_FLOAT, "ZEVariant::GetFloat operation failed. Variant type mismatched.");
 	return Value.Float;
+}
+
+double ZEVariant::GetDouble() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_DOUBLE, "ZEVariant::GetDouble operation failed. Variant type mismatched.");
+	return Value.Double;
 }
 
 bool ZEVariant::GetBoolean() const
@@ -445,7 +637,7 @@ ZEMatrix4x4& ZEVariant::GetMatrix4x4() const
 
 ZEObject* ZEVariant::GetClass() const
 {
-	zeDebugCheck(this->Type != ZE_VRT_CLASS, "ZEVariant::GetPointer operation failed. Variant type mismatched.");
+	zeDebugCheck(this->Type != ZE_VRT_CLASS, "ZEVariant::GetClass operation failed. Variant type mismatched.");
 	return Value.Pointer;
 }
 
@@ -458,14 +650,55 @@ void ZEVariant::operator=(const char* NewValue)
 {
 	SetString(NewValue);
 }
-void ZEVariant::operator=(ZEInt NewValue)
+
+void ZEVariant::operator=(ZEInt8 NewValue)
 {
-	SetInteger(NewValue);
+	SetInt8(NewValue);
+}
+
+void ZEVariant::operator=(ZEInt16 NewValue)
+{
+	SetInt16(NewValue);
+}
+
+void ZEVariant::operator=(ZEInt32 NewValue)
+{
+	SetInt32(NewValue);
+}
+
+void ZEVariant::operator=(ZEInt64 NewValue)
+{
+	SetInt64(NewValue);
+}
+
+void ZEVariant::operator=(ZEUInt8 NewValue)
+{
+	SetUInt8(NewValue);
+}
+
+void ZEVariant::operator=(ZEUInt16 NewValue)
+{
+	SetUInt16(NewValue);
+}
+
+void ZEVariant::operator=(ZEUInt32 NewValue)
+{
+	SetUInt32(NewValue);
+}
+
+void ZEVariant::operator=(ZEUInt64 NewValue)
+{
+	SetUInt64(NewValue);
 }
 
 void ZEVariant::operator=(float NewValue)
 {
 	SetFloat(NewValue);
+}
+
+void ZEVariant::operator=(double NewValue)
+{
+	SetDouble(NewValue);
 }
 
 void ZEVariant::operator=(bool NewValue)
@@ -514,22 +747,346 @@ ZEVariant::operator const char*()
 	return Value.String;
 }
 
-ZEVariant::operator ZEInt()
+ZEVariant::operator ZEInt8()
 {
-	zeDebugCheck(this->Type != ZE_VRT_INTEGER && this->Type != ZE_VRT_FLOAT, "Integer conversion operation failed. Variant type mismatched.");
-	if (this->Type == ZE_VRT_FLOAT)
-		return (ZEInt)Value.Float;
-	else
-		return Value.Integer;
+	zeDebugCheck(this->Type != ZE_VRT_FLOAT && this->Type != ZE_VRT_DOUBLE
+				&& this->Type != ZE_VRT_UNSIGNED_INTEGER_8 && this->Type != ZE_VRT_UNSIGNED_INTEGER_16 
+				&& this->Type != ZE_VRT_UNSIGNED_INTEGER_32 && this->Type != ZE_VRT_UNSIGNED_INTEGER_64
+				&& this->Type != ZE_VRT_INTEGER_8 && this->Type != ZE_VRT_INTEGER_16 
+				&& this->Type != ZE_VRT_INTEGER_32 && this->Type != ZE_VRT_INTEGER_64 
+				, "Integer conversion operation failed. Variant type mismatched.");
+
+	switch(Type)
+	{
+		case ZE_VRT_FLOAT:
+			return (ZEInt8)Value.Float;
+			break;
+		case ZE_VRT_DOUBLE:
+			return (ZEInt8)Value.Double;
+			break;
+		case ZE_VRT_INTEGER_8:
+		case ZE_VRT_INTEGER_16:
+		case ZE_VRT_INTEGER_32:
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			return (ZEInt8)Value.Int32;
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+		case ZE_VRT_INTEGER_64:
+			return (ZEInt8)Value.Int64;
+			break;
+		default:
+			return 0;
+	}
+}
+
+ZEVariant::operator ZEInt16()
+{
+	zeDebugCheck(this->Type != ZE_VRT_FLOAT && this->Type != ZE_VRT_DOUBLE
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_8 && this->Type != ZE_VRT_UNSIGNED_INTEGER_16 
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_32 && this->Type != ZE_VRT_UNSIGNED_INTEGER_64
+		&& this->Type != ZE_VRT_INTEGER_8 && this->Type != ZE_VRT_INTEGER_16 
+		&& this->Type != ZE_VRT_INTEGER_32 && this->Type != ZE_VRT_INTEGER_64 
+		, "Integer conversion operation failed. Variant type mismatched.");
+
+	switch(Type)
+	{
+		case ZE_VRT_FLOAT:
+			return (ZEInt16)Value.Float;
+			break;
+		case ZE_VRT_DOUBLE:
+			return (ZEInt16)Value.Double;
+			break;
+		case ZE_VRT_INTEGER_8:
+		case ZE_VRT_INTEGER_16:
+		case ZE_VRT_INTEGER_32:
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			return (ZEInt16)Value.Int32;
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+		case ZE_VRT_INTEGER_64:
+			return (ZEInt16)Value.Int64;
+			break;
+		default:
+			return 0;
+	}
+}
+
+ZEVariant::operator ZEInt32()
+{
+	zeDebugCheck(this->Type != ZE_VRT_FLOAT && this->Type != ZE_VRT_DOUBLE
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_8 && this->Type != ZE_VRT_UNSIGNED_INTEGER_16 
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_32 && this->Type != ZE_VRT_UNSIGNED_INTEGER_64
+		&& this->Type != ZE_VRT_INTEGER_8 && this->Type != ZE_VRT_INTEGER_16 
+		&& this->Type != ZE_VRT_INTEGER_32 && this->Type != ZE_VRT_INTEGER_64 
+		, "Integer conversion operation failed. Variant type mismatched.");
+
+	switch(Type)
+	{
+		case ZE_VRT_FLOAT:
+			return (ZEInt32)Value.Float;
+			break;
+		case ZE_VRT_DOUBLE:
+			return (ZEInt32)Value.Double;
+			break;
+		case ZE_VRT_INTEGER_8:
+		case ZE_VRT_INTEGER_16:
+		case ZE_VRT_INTEGER_32:
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			return Value.Int32;
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+		case ZE_VRT_INTEGER_64:
+			return (ZEInt32)Value.Int64;
+			break;
+		default:
+			return 0;
+	}
+}
+
+ZEVariant::operator ZEInt64()
+{
+	zeDebugCheck(this->Type != ZE_VRT_FLOAT && this->Type != ZE_VRT_DOUBLE
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_8 && this->Type != ZE_VRT_UNSIGNED_INTEGER_16 
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_32 && this->Type != ZE_VRT_UNSIGNED_INTEGER_64
+		&& this->Type != ZE_VRT_INTEGER_8 && this->Type != ZE_VRT_INTEGER_16 
+		&& this->Type != ZE_VRT_INTEGER_32 && this->Type != ZE_VRT_INTEGER_64 
+		, "Integer conversion operation failed. Variant type mismatched.");
+
+	switch(Type)
+	{
+		case ZE_VRT_FLOAT:
+			return (ZEInt64)Value.Float;
+			break;
+		case ZE_VRT_DOUBLE:
+			return (ZEInt64)Value.Double;
+			break;
+		case ZE_VRT_INTEGER_8:
+		case ZE_VRT_INTEGER_16:
+		case ZE_VRT_INTEGER_32:
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			return (ZEInt64)Value.Int32;
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+		case ZE_VRT_INTEGER_64:
+			return Value.Int64;
+			break;
+		default:
+			return 0;
+	}
+}
+
+ZEVariant::operator ZEUInt8()
+{
+	zeDebugCheck(this->Type != ZE_VRT_FLOAT && this->Type != ZE_VRT_DOUBLE
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_8 && this->Type != ZE_VRT_UNSIGNED_INTEGER_16 
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_32 && this->Type != ZE_VRT_UNSIGNED_INTEGER_64
+		&& this->Type != ZE_VRT_INTEGER_8 && this->Type != ZE_VRT_INTEGER_16 
+		&& this->Type != ZE_VRT_INTEGER_32 && this->Type != ZE_VRT_INTEGER_64 
+		, "Integer conversion operation failed. Variant type mismatched.");
+
+	switch(Type)
+	{
+		case ZE_VRT_FLOAT:
+			return (ZEUInt8)Value.Float;
+			break;
+		case ZE_VRT_DOUBLE:
+			return (ZEUInt8)Value.Double;
+			break;
+		case ZE_VRT_INTEGER_8:
+		case ZE_VRT_INTEGER_16:
+		case ZE_VRT_INTEGER_32:
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			return (ZEUInt8)Value.Int32;
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+		case ZE_VRT_INTEGER_64:
+			return (ZEUInt8)Value.Int64;
+			break;
+		default:
+			return 0;
+	}
+}
+
+ZEVariant::operator ZEUInt16()
+{
+	zeDebugCheck(this->Type != ZE_VRT_FLOAT && this->Type != ZE_VRT_DOUBLE
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_8 && this->Type != ZE_VRT_UNSIGNED_INTEGER_16 
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_32 && this->Type != ZE_VRT_UNSIGNED_INTEGER_64
+		&& this->Type != ZE_VRT_INTEGER_8 && this->Type != ZE_VRT_INTEGER_16 
+		&& this->Type != ZE_VRT_INTEGER_32 && this->Type != ZE_VRT_INTEGER_64 
+		, "Integer conversion operation failed. Variant type mismatched.");
+
+	switch(Type)
+	{
+		case ZE_VRT_FLOAT:
+			return (ZEUInt16)Value.Float;
+			break;
+		case ZE_VRT_DOUBLE:
+			return (ZEUInt16)Value.Double;
+			break;
+		case ZE_VRT_INTEGER_8:
+		case ZE_VRT_INTEGER_16:
+		case ZE_VRT_INTEGER_32:
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			return (ZEUInt16)Value.Int32;
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+		case ZE_VRT_INTEGER_64:
+			return (ZEUInt16)Value.Int64;
+			break;
+		default:
+			return 0;
+	}
+}
+
+ZEVariant::operator ZEUInt32()
+{
+	zeDebugCheck(this->Type != ZE_VRT_FLOAT && this->Type != ZE_VRT_DOUBLE
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_8 && this->Type != ZE_VRT_UNSIGNED_INTEGER_16 
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_32 && this->Type != ZE_VRT_UNSIGNED_INTEGER_64
+		&& this->Type != ZE_VRT_INTEGER_8 && this->Type != ZE_VRT_INTEGER_16 
+		&& this->Type != ZE_VRT_INTEGER_32 && this->Type != ZE_VRT_INTEGER_64 
+		, "Integer conversion operation failed. Variant type mismatched.");
+
+	switch(Type)
+	{
+		case ZE_VRT_FLOAT:
+			return (ZEUInt32)Value.Float;
+			break;
+		case ZE_VRT_DOUBLE:
+			return (ZEUInt32)Value.Double;
+			break;
+		case ZE_VRT_INTEGER_8:
+		case ZE_VRT_INTEGER_16:
+		case ZE_VRT_INTEGER_32:
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			return (ZEUInt32)Value.Int32;
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+		case ZE_VRT_INTEGER_64:
+			return (ZEUInt32)Value.Int64;
+			break;
+		default:
+			return 0;
+	}
+}
+
+ZEVariant::operator ZEUInt64()
+{
+	zeDebugCheck(this->Type != ZE_VRT_FLOAT && this->Type != ZE_VRT_DOUBLE
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_8 && this->Type != ZE_VRT_UNSIGNED_INTEGER_16 
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_32 && this->Type != ZE_VRT_UNSIGNED_INTEGER_64
+		&& this->Type != ZE_VRT_INTEGER_8 && this->Type != ZE_VRT_INTEGER_16 
+		&& this->Type != ZE_VRT_INTEGER_32 && this->Type != ZE_VRT_INTEGER_64 
+		, "Integer conversion operation failed. Variant type mismatched.");
+
+	switch(Type)
+	{
+		case ZE_VRT_FLOAT:
+			return (ZEUInt64)Value.Float;
+			break;
+		case ZE_VRT_DOUBLE:
+			return (ZEUInt64)Value.Double;
+			break;
+		case ZE_VRT_INTEGER_8:
+		case ZE_VRT_INTEGER_16:
+		case ZE_VRT_INTEGER_32:
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			return (ZEUInt64)Value.Int32;
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+		case ZE_VRT_INTEGER_64:
+			return (ZEUInt64)Value.Int64;
+			break;
+		default:
+			return 0;
+	}
 }
 
 ZEVariant::operator float()
 {
-	zeDebugCheck(this->Type != ZE_VRT_INTEGER && this->Type != ZE_VRT_FLOAT, "Float conversion operation failed. Variant type mismatched.");
-	if (this->Type == ZE_VRT_INTEGER)
-		return (float)Value.Integer;
-	else
-		return Value.Float;
+	zeDebugCheck(this->Type != ZE_VRT_FLOAT && this->Type != ZE_VRT_DOUBLE
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_8 && this->Type != ZE_VRT_UNSIGNED_INTEGER_16 
+		&& this->Type != ZE_VRT_UNSIGNED_INTEGER_32 && this->Type != ZE_VRT_UNSIGNED_INTEGER_64
+		&& this->Type != ZE_VRT_INTEGER_8 && this->Type != ZE_VRT_INTEGER_16 
+		&& this->Type != ZE_VRT_INTEGER_32 && this->Type != ZE_VRT_INTEGER_64 
+		, "Integer conversion operation failed. Variant type mismatched.");
+
+	switch(Type)
+	{
+		case ZE_VRT_FLOAT:
+			return Value.Float;
+			break;
+		case ZE_VRT_DOUBLE:
+			return (float)Value.Double;
+			break;
+		case ZE_VRT_INTEGER_8:
+		case ZE_VRT_INTEGER_16:
+		case ZE_VRT_INTEGER_32:
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			return (float)Value.Int32;
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+		case ZE_VRT_INTEGER_64:
+			return (float)Value.Int64;
+			break;
+		default:
+			return 0;
+	}
+}
+
+ZEVariant::operator double()
+{
+	{
+		zeDebugCheck(this->Type != ZE_VRT_FLOAT && this->Type != ZE_VRT_DOUBLE
+			&& this->Type != ZE_VRT_UNSIGNED_INTEGER_8 && this->Type != ZE_VRT_UNSIGNED_INTEGER_16 
+			&& this->Type != ZE_VRT_UNSIGNED_INTEGER_32 && this->Type != ZE_VRT_UNSIGNED_INTEGER_64
+			&& this->Type != ZE_VRT_INTEGER_8 && this->Type != ZE_VRT_INTEGER_16 
+			&& this->Type != ZE_VRT_INTEGER_32 && this->Type != ZE_VRT_INTEGER_64 
+			, "Integer conversion operation failed. Variant type mismatched.");
+
+		switch(Type)
+		{
+			case ZE_VRT_FLOAT:
+				return (double)Value.Float;
+				break;
+			case ZE_VRT_DOUBLE:
+				return Value.Double;
+				break;
+			case ZE_VRT_INTEGER_8:
+			case ZE_VRT_INTEGER_16:
+			case ZE_VRT_INTEGER_32:
+			case ZE_VRT_UNSIGNED_INTEGER_8:
+			case ZE_VRT_UNSIGNED_INTEGER_16:
+			case ZE_VRT_UNSIGNED_INTEGER_32:
+				return (double)Value.Int32;
+				break;
+			case ZE_VRT_UNSIGNED_INTEGER_64:
+			case ZE_VRT_INTEGER_64:
+				return (double)Value.Int64;
+				break;
+			default:
+				return 0;
+		}
+	}
 }
 
 ZEVariant::operator bool()
@@ -597,15 +1154,55 @@ ZEVariant::ZEVariant(const char* InitialValue)
 {
 	SetString(InitialValue);
 }
-	
-ZEVariant::ZEVariant(ZEInt InitialValue)
+
+ZEVariant::ZEVariant(ZEInt8 InitialValue)
 {
-	SetInteger(InitialValue);
+	SetInt8(InitialValue);
+}
+
+ZEVariant::ZEVariant(ZEInt16 InitialValue)
+{
+	SetInt16(InitialValue);
+}
+
+ZEVariant::ZEVariant(ZEInt32 InitialValue)
+{
+	SetInt32(InitialValue);
+}
+
+ZEVariant::ZEVariant(ZEInt64 InitialValue)
+{
+	SetInt64(InitialValue);
+}
+
+ZEVariant::ZEVariant(ZEUInt8 InitialValue)
+{
+	SetUInt8(InitialValue);
+}
+
+ZEVariant::ZEVariant(ZEUInt16 InitialValue)
+{
+	SetUInt16(InitialValue);
+}
+
+ZEVariant::ZEVariant(ZEUInt32 InitialValue)
+{
+	SetUInt32(InitialValue);
+}
+
+ZEVariant::ZEVariant(ZEUInt64 InitialValue)
+{
+	SetUInt64(InitialValue);
 }
 
 ZEVariant::ZEVariant(float InitialValue)
 {
 	SetFloat(InitialValue);
+}
+
+ZEVariant::ZEVariant(double InitialValue)
+{
+	SetDouble(InitialValue);
 }
 
 ZEVariant::ZEVariant(bool InitialValue)

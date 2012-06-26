@@ -87,56 +87,56 @@ void ZESoundModule::OptionsChanged()
 	Current = SoundOptions.GetOption("MaxBufferSize");
 	if (Current->IsChanged())
 	{
-		SetMaxBufferSize((ZESize)Current->GetValue().GetInteger());
+		SetMaxBufferSize((ZESize)Current->GetValue().GetInt32());
 		Current->SetValue((ZEInt)GetMaxBufferSize());
 	}
 
 	Current = SoundOptions.GetOption("MasterVolume");
 	if (Current->IsChanged())
 	{
-		SetMasterVolume(Current->GetValue().GetInteger());
+		SetMasterVolume(Current->GetValue().GetInt32());
 		Current->SetValue((ZEInt)GetMasterVolume());
 	}
 
 	Current = SoundOptions.GetOption("SpeakerLayout");
 	if (Current->IsChanged())
 	{
-		SetSpeakerLayout((ZESpeakerLayout)Current->GetValue().GetInteger());
+		SetSpeakerLayout((ZESpeakerLayout)Current->GetValue().GetInt32());
 		Current->SetValue((ZEInt)GetSpeakerLayout());
 	}
 
 	Current = SoundOptions.GetOption("EffectVolume");
 	if (Current->IsChanged())
 	{
-		SetTypeVolume(ZE_SST_EFFECT, Current->GetValue().GetInteger());
+		SetTypeVolume(ZE_SST_EFFECT, Current->GetValue().GetInt32());
 		Current->SetValue((ZEInt)GetTypeVolume(ZE_SST_EFFECT));
 	}
 
 	Current = SoundOptions.GetOption("DialogVolume");
 	if (Current->IsChanged())
 	{
-		SetTypeVolume(ZE_SST_DIALOG, Current->GetValue().GetInteger());
+		SetTypeVolume(ZE_SST_DIALOG, Current->GetValue().GetInt32());
 		Current->SetValue((ZEInt)GetTypeVolume(ZE_SST_DIALOG));
 	}
 
 	Current = SoundOptions.GetOption("MusicVolume");
 	if (Current->IsChanged())
 	{
-		SetTypeVolume(ZE_SST_MUSIC, Current->GetValue().GetInteger());
+		SetTypeVolume(ZE_SST_MUSIC, Current->GetValue().GetInt32());
 		Current->SetValue((ZEInt)GetTypeVolume(ZE_SST_MUSIC));
 	}
 
 	Current = SoundOptions.GetOption("VideoVolume");
 	if (Current->IsChanged())
 	{
-		SetTypeVolume(ZE_SST_VIDEO, Current->GetValue().GetInteger());
+		SetTypeVolume(ZE_SST_VIDEO, Current->GetValue().GetInt32());
 		Current->SetValue((ZEInt)GetTypeVolume(ZE_SST_VIDEO));
 	}
 
 	Current = SoundOptions.GetOption("PlayerCommVolume");
 	if (Current->IsChanged())
 	{
-		SetTypeVolume(ZE_SST_PLAYER_COMM, Current->GetValue().GetInteger());
+		SetTypeVolume(ZE_SST_PLAYER_COMM, Current->GetValue().GetInt32());
 		Current->SetValue((ZEInt)GetTypeVolume(ZE_SST_PLAYER_COMM));
 	}
 }

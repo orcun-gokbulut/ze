@@ -68,17 +68,17 @@ void ZETypedVariant::SetString(char *NewValue)
 
 void ZETypedVariant::SetInteger(ZEInt NewValue)
 {
-	zeDebugCheck(Type != ZE_VRT_INTEGER && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetInteger operation failed. Types does not match.");
-	if (Type == ZE_VRT_INTEGER)
+	zeDebugCheck(Type != ZE_VRT_INTEGER_32 && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetInteger operation failed. Types does not match.");
+	if (Type == ZE_VRT_INTEGER_32)
 	{
-		Value.Integer = NewValue;
+		Value.Int32 = NewValue;
 		return;
 	}
 
 	if (Type == ZE_VRT_UNDEFINED)
 	{
-		SetType(ZE_VRT_INTEGER);
-		Value.Integer = NewValue;
+		SetType(ZE_VRT_INTEGER_32);
+		Value.Int32 = NewValue;
 	}
 
 }
@@ -131,7 +131,7 @@ void ZETypedVariant::SetVariant(const ZEVariant &NewValue)
 	if (Type == ZE_VRT_UNDEFINED)
 	{
 		SetType(NewValue.GetType());
-		Value.Integer = NewValue.GetValue().Integer;
+		Value.Int32 = NewValue.GetValue().Int32;
 	}
 }
 
@@ -143,14 +143,14 @@ void ZETypedVariant::SetTypedVariant(const ZETypedVariant &NewValue)
 		if(Type == ZE_VRT_STRING)
 			SetString(NewValue.Value.String);
 		else
-			Value.Integer = NewValue.Value.Integer;
+			Value.Int32 = NewValue.Value.Int32;
 		return;
 	}
 
 	if (Type == ZE_VRT_UNDEFINED)
 	{
 		SetType(NewValue.GetType());
-		Value.Integer = NewValue.GetValue().Integer;
+		Value.Int32 = NewValue.GetValue().Int32;
 	}
 }
 
@@ -210,7 +210,7 @@ ZETypedVariant::ZETypedVariant(char* InitialValue)
 	
 ZETypedVariant::ZETypedVariant(ZEInt InitialValue)
 {
-	SetType(ZE_VRT_INTEGER);
+	SetType(ZE_VRT_INTEGER_32);
 	SetInteger(InitialValue);
 }
 

@@ -129,7 +129,7 @@ bool ZEALModule::Initialize()
 		I++;
 	}
 
-	ZESize DeviceId = (ZESize)SoundOptions.GetOption("DeviceId")->GetValue().GetInteger();
+	ZESize DeviceId = (ZESize)SoundOptions.GetOption("DeviceId")->GetValue().GetInt32();
 
 	ALchar* DeviceName = NULL;
 	if (DeviceId > DeviceList.GetCount())
@@ -168,14 +168,14 @@ bool ZEALModule::Initialize()
 	}
 
 	SetStreamingDisabled(SoundOptions.GetOption("StreamingDisabled")->GetValue().GetBoolean());
-	SetMaxBufferSize((ZESize)SoundOptions.GetOption("MaxBufferSize")->GetValue().GetInteger());
-	SetMasterVolume(SoundOptions.GetOption("MasterVolume")->GetValue().GetInteger());
-	SetSpeakerLayout((ZESpeakerLayout)SoundOptions.GetOption("SpeakerLayout")->GetValue().GetInteger());
-	SetTypeVolume(ZE_SST_EFFECT, SoundOptions.GetOption("EffectVolume")->GetValue().GetInteger());
-	SetTypeVolume(ZE_SST_DIALOG, SoundOptions.GetOption("DialogVolume")->GetValue().GetInteger());
-	SetTypeVolume(ZE_SST_MUSIC, SoundOptions.GetOption("MusicVolume")->GetValue().GetInteger());
-	SetTypeVolume(ZE_SST_VIDEO, SoundOptions.GetOption("VideoVolume")->GetValue().GetInteger());
-	SetTypeVolume(ZE_SST_PLAYER_COMM, SoundOptions.GetOption("PlayerCommVolume")->GetValue().GetInteger());
+	SetMaxBufferSize((ZESize)SoundOptions.GetOption("MaxBufferSize")->GetValue().GetInt32());
+	SetMasterVolume(SoundOptions.GetOption("MasterVolume")->GetValue().GetInt32());
+	SetSpeakerLayout((ZESpeakerLayout)SoundOptions.GetOption("SpeakerLayout")->GetValue().GetInt32());
+	SetTypeVolume(ZE_SST_EFFECT, SoundOptions.GetOption("EffectVolume")->GetValue().GetInt32());
+	SetTypeVolume(ZE_SST_DIALOG, SoundOptions.GetOption("DialogVolume")->GetValue().GetInt32());
+	SetTypeVolume(ZE_SST_MUSIC, SoundOptions.GetOption("MusicVolume")->GetValue().GetInt32());
+	SetTypeVolume(ZE_SST_VIDEO, SoundOptions.GetOption("VideoVolume")->GetValue().GetInt32());
+	SetTypeVolume(ZE_SST_PLAYER_COMM, SoundOptions.GetOption("PlayerCommVolume")->GetValue().GetInt32());
 
 	zeLog("OpenAL module initialized.");
 

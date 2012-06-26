@@ -48,7 +48,7 @@ ZEDSpinBox1Integer::ZEDSpinBox1Integer(QTreeWidget* ParentTree, QTreeWidgetItem 
 	setText(0, ClassAttribute.Name);
 	this->setToolTip (0, QString(ClassAttribute.Description));
 
-	if (Value.GetType() != ZE_VRT_INTEGER)
+	if (Value.GetType() != ZE_VRT_INTEGER_32)
 	{
 		setText(1, QString("Error Integer"));
 		return;
@@ -57,7 +57,7 @@ ZEDSpinBox1Integer::ZEDSpinBox1Integer(QTreeWidget* ParentTree, QTreeWidgetItem 
 	this->XValue = new ZEDFloatIntLineEdit(IntegerMode);
 
 	ParentTree->setItemWidget(this, 1, XValue);
-	this->XValue->SetInteger(Value.GetInteger());
+	this->XValue->SetInteger(Value.GetInt32());
 
 	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
 	{
@@ -86,7 +86,7 @@ void ZEDSpinBox1Integer::Changed()
 	Class->GetProperty(ClassAttribute.Name, Value);
 	TempOperation->SetOldValue(Value);
 
-	Value.SetInteger(XValue->GetInteger());
+	Value.SetInt32(XValue->GetInteger());
 	this->Class->SetProperty(ClassAttribute.Name, Value);
 
 	Class->GetProperty(ClassAttribute.Name, Value);

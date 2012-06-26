@@ -296,7 +296,7 @@ void ZEAnimationController::AdvanceAnimation(float TimeElapsed)
 		{
 			ZEPropertyAnimation* PropertyAnimation = &Animation->PropertyAnimations[I];
 
-			if(PropertyAnimation->Interpolate && (PropertyAnimation->ValueType == ZE_VRT_INTEGER || 
+			if(PropertyAnimation->Interpolate && (PropertyAnimation->ValueType == ZE_VRT_INTEGER_32 || 
 												  PropertyAnimation->ValueType == ZE_VRT_FLOAT || 
 												  PropertyAnimation->ValueType == ZE_VRT_QUATERNION || 
 												  PropertyAnimation->ValueType == ZE_VRT_VECTOR2 ||
@@ -381,9 +381,9 @@ void ZEAnimationController::AdvanceAnimation(float TimeElapsed)
 						ZEInt Value = (ZEInt)(V1 + (V2 - V1) * Interpolation);
 						Owner->SetProperty(PropertyAnimation->PropertyId, Value);
 					}
-					else if (PropertyAnimation->ValueType == ZE_VRT_INTEGER)
+					else if (PropertyAnimation->ValueType == ZE_VRT_INTEGER_32)
 					{
-						ZEInt V1 = PrevKeyValue->GetInteger() , V2 = NextKeyValue->GetInteger();
+						ZEInt V1 = PrevKeyValue->GetInt32() , V2 = NextKeyValue->GetInt32();
 						ZEInt Value = (ZEInt)((float)(V1 + (V2 - V1)) * Interpolation);
 						Owner->SetProperty(PropertyAnimation->PropertyId, Value);
 					}

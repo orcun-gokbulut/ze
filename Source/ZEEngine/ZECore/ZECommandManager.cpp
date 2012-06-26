@@ -51,11 +51,11 @@ bool ZECommandManager::Callback_ListSections(ZECommand* Command, const ZECommand
 		Count = Sections.GetCount();
 	}
 	else if (Params->GetCount() == 2 && 
-			 Params->GetItem(0).GetType() == ZE_VRT_INTEGER && 
-			 Params->GetItem(1).GetType() == ZE_VRT_INTEGER)
+			 Params->GetItem(0).GetType() == ZE_VRT_INTEGER_32 && 
+			 Params->GetItem(1).GetType() == ZE_VRT_INTEGER_32)
 	{
-		Index = Params->GetItem(0).GetInteger();
-		Count = Params->GetItem(1).GetInteger();
+		Index = Params->GetItem(0).GetInt32();
+		Count = Params->GetItem(1).GetInt32();
 	}
 	else
 	{
@@ -90,12 +90,12 @@ bool ZECommandManager::Callback_ListCommands(ZECommand* Command, const ZECommand
 	}
 	else if (Params->GetCount() == 1 &&
 			 Params->GetItem(0).GetType() == ZE_VRT_STRING &&
-			 Params->GetItem(1).GetType() == ZE_VRT_INTEGER &&
-			 Params->GetItem(2).GetType() == ZE_VRT_INTEGER)
+			 Params->GetItem(1).GetType() == ZE_VRT_INTEGER_32 &&
+			 Params->GetItem(2).GetType() == ZE_VRT_INTEGER_32)
 	{
 		Sec = GetCommandSection(Params->GetItem(0).GetString());
-		Index = Params->GetItem(1).GetInteger();
-		Count = Params->GetItem(2).GetInteger();
+		Index = Params->GetItem(1).GetInt32();
+		Count = Params->GetItem(2).GetInt32();
 	}
 	else
 	{
