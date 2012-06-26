@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMain.cpp
+ Zinek Engine - ZED3D9TextureMaskProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,56 +33,59 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#define NOMINMAX
-#define WINDOWS_LEAN_AND_MEAN
-#include <windows.h>
+#pragma once
+#ifndef __ZE_D3D9_TEXTURE_MASK_PROCESSOR_H__
+#define __ZE_D3D9_TEXTURE_MASK_PROCESSOR_H__
 
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEWindow.h"
-#include "ZECore/ZEConsoleWindow.h"
-#include "ZECore/ZEModuleManager.h"
-#include "ZECore/ZEOptionManager.h"
-
-#include "ZEUI/ZEUIDebugModule.h"
-#include "ZEMeta/ZEMetaDebugModule.h"
-#include "ZEModel/ZEModelDebugModule.h"
-#include "ZESound/ZESoundDebugModule.h"
-#include "ZEPhysics/ZEPhysicsDebugModule.h"
-#include "ZEGraphics/ZEGraphicsDebugModule.h"
+#include "ZED3D9ComponentBase.h"
 
 
-extern HINSTANCE ApplicationInstance;
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
+class ZED3D9Texture2D;
+class ZETexture2D;
+class ZED3D9ViewPort;
+class ZEFrameRenderer;
+class ZED3D9FrameRenderer;
+class ZETexture2DResource;
 
-ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, ZEInt nCmdShow)
+class ZED3D9TextureMaskProcessor : public ZED3D9ComponentBase
 {
-	ApplicationInstance = hInstance;
-	
-	ZEModelAnimationDebugModule DebugModule;
-	//zeCore->SetDebugComponent(&DebugModule);
+	private:
+		const ZETexture2D*		MaskTexture;
+		ZEUInt					Adressing;
 
-	ZEGraphicsDebugModule GraphicsDebugModule;
-	GraphicsDebugModule.SetApplicationName("Graphics Debug Module");
-	zeCore->SetApplicationModule(&GraphicsDebugModule);
+		ZED3D9FrameRenderer*	Renderer;
 
-	ZEPhysicsDebugModule PhysicsDebugModule;
-	//zeCore->SetDebugComponent(&PhysicsDebugModule);
+		ZED3D9PixelShader*		PixelShader;
+		ZED3D9VertexShader*		VertexShader;
 
-	ZESoundDebugModule SoundDebugComponent;
-	//zeCore->SetDebugComponent(&SoundDebugComponent);
+		ZED3D9ViewPort*			Output;
+		ZED3D9Texture2D*		Input;
+		
+		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 
-	ZEMetaDebugModule MetaDebugComponent;
-	//zeCore->SetDebugComponent(&MetaDebugComponent);
+	public:
+								ZED3D9TextureMaskProcessor();
+								~ZED3D9TextureMaskProcessor();
 
-	ZEUIDebugModule UIDebugModule;
-	//zeCore->SetApplicationModule(&UIDebugModule);
+		void					Initialize();
+		void					Deinitialize();
 
-	zeCore->GetOptions()->Load("options.ini");
-	zeCore->GetOptions()->ResetChanges();
-	ZEConsoleWindow ConsoleWindow;
-	zeCore->GetConsole()->SetConsoleInterface(&ConsoleWindow);
-	zeCore->GetWindow()->SetWindowType(zeCore->GetOptions()->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean() ? ZE_WT_FULLSCREEN : ZE_WT_RESIZABLE);
-	zeCore->GetWindow()->SetWindowSize(zeCore->GetOptions()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInt32(), zeCore->GetOptions()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInt32());
+		void					SetRenderer(ZEFrameRenderer* Renderer);
+		ZEFrameRenderer*		GetRenderer() const;
 
- 	zeCore->StartUp();
-	zeCore->Run();
-}
+		bool					SetMaskTexture(const ZEString& Path);
+		const ZETexture2D*		GetMaskTexture() const;
+
+		void					SetInput(ZED3D9Texture2D* Texture);
+		ZED3D9Texture2D*		GetInput();
+
+		void					SetOutput(ZED3D9ViewPort* Texture);
+		ZED3D9ViewPort*			GetOutput();
+
+		void					Process();
+
+};
+
+#endif // __ZE_D3D9_TEXTURE_MASK_PROCESSOR_H__
