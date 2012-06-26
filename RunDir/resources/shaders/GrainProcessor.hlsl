@@ -120,6 +120,7 @@ PS_OUTPUT ps_main_blend( PS_INPUT Input )
 	float4 Grain = tex2D(GrainBuffer, Input.TexCoord);
 	Output.PixelColor = tex2D(ColorBuffer, Input.TexCoord);
 	
+	[branch]
 	if (Grain.x <= 0.999f)
 		Output.PixelColor *= Grain;
 	

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMain.cpp
+ Zinek Engine - TextureMaskProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,56 +33,62 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#define NOMINMAX
-#define WINDOWS_LEAN_AND_MEAN
-#include <windows.h>
+sampler2D 	ColorBuffer		: register (s0);
+sampler2D 	MaskBuffer		: register (s1);
 
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEWindow.h"
-#include "ZECore/ZEConsoleWindow.h"
-#include "ZECore/ZEModuleManager.h"
-#include "ZECore/ZEOptionManager.h"
+float4 		VSParameters	: register(vs, c0);
 
-#include "ZEUI/ZEUIDebugModule.h"
-#include "ZEMeta/ZEMetaDebugModule.h"
-#include "ZEModel/ZEModelDebugModule.h"
-#include "ZESound/ZESoundDebugModule.h"
-#include "ZEPhysics/ZEPhysicsDebugModule.h"
-#include "ZEGraphics/ZEGraphicsDebugModule.h"
+#define		PixelSizeRT		VSParameters.xy
+#define		PixelSizeMask	VSParameters.zw
 
 
-extern HINSTANCE ApplicationInstance;
-
-ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, ZEInt nCmdShow)
+struct VS_INPUT
 {
-	ApplicationInstance = hInstance;
+	float4 Position	: POSITION0;
+	float2 TexCoord : TEXCOORD0;
 	
-	ZEModelAnimationDebugModule DebugModule;
-	//zeCore->SetDebugComponent(&DebugModule);
+};
 
-	ZEGraphicsDebugModule GraphicsDebugModule;
-	GraphicsDebugModule.SetApplicationName("Graphics Debug Module");
-	zeCore->SetApplicationModule(&GraphicsDebugModule);
+struct VS_OUTPUT 
+{
+	float4 Position : POSITION0;
+	float2 TexCoordColor : TEXCOORD0;
+	float2 TexCoordMask : TEXCOORD1;
+};
 
-	ZEPhysicsDebugModule PhysicsDebugModule;
-	//zeCore->SetDebugComponent(&PhysicsDebugModule);
+struct PS_INPUT
+{
+	float2 TexCoordColor : TEXCOORD0;
+	float2 TexCoordMask : TEXCOORD1;
+};
 
-	ZESoundDebugModule SoundDebugComponent;
-	//zeCore->SetDebugComponent(&SoundDebugComponent);
+struct PS_OUTPUT
+{
+	float4 PixelColor : COLOR0;
+};
 
-	ZEMetaDebugModule MetaDebugComponent;
-	//zeCore->SetDebugComponent(&MetaDebugComponent);
+VS_OUTPUT vs_main(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
+   
+	Output.Position	= sign(Input.Position);
 
-	ZEUIDebugModule UIDebugModule;
-	//zeCore->SetApplicationModule(&UIDebugModule);
+	Output.TexCoordColor.x = 0.5f * (1.0f + Output.Position.x + PixelSizeRT.x);
+	Output.TexCoordColor.y = 0.5f * (1.0f - Output.Position.y + PixelSizeRT.y);
+	
+	Output.TexCoordMask = Input.TexCoord + (PixelSizeMask * 0.5f);
 
-	zeCore->GetOptions()->Load("options.ini");
-	zeCore->GetOptions()->ResetChanges();
-	ZEConsoleWindow ConsoleWindow;
-	zeCore->GetConsole()->SetConsoleInterface(&ConsoleWindow);
-	zeCore->GetWindow()->SetWindowType(zeCore->GetOptions()->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean() ? ZE_WT_FULLSCREEN : ZE_WT_RESIZABLE);
-	zeCore->GetWindow()->SetWindowSize(zeCore->GetOptions()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInt32(), zeCore->GetOptions()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInt32());
+	return Output;
+}
 
- 	zeCore->StartUp();
-	zeCore->Run();
+PS_OUTPUT ps_main( PS_INPUT Input )
+{
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
+
+	Output.PixelColor = tex2D(ColorBuffer, Input.TexCoordColor);
+	float3 Mask = tex2D(MaskBuffer, Input.TexCoordMask).rgb;
+	
+	Output.PixelColor.rgb *= Mask;
+
+	return Output;
 }
