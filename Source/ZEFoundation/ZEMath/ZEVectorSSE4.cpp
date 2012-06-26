@@ -33,8 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <smmintrin.h>
 #include "ZEVector.h"
+
+extern "C"
+{
+#include <xmmintrin.h>
+#include <pmmintrin.h>
+};
+#include <smmintrin.h>
 
 // MMX Register Loads
 inline __m128 LoadVector2(const ZEVector2 &A)
@@ -95,7 +101,9 @@ float ZEVector2::DotProduct(const ZEVector2 &A, const ZEVector2 &B)
 	__m128 mmxB = LoadVector2(B);
 	
 	mmxA = _mm_dp_ps(mmxA, mmxB, 0x31);
-	return mmxA.m128_f32[0];
+	float Temp;
+	_mm_store_ss(&Temp, mmxA);
+	return Temp;
 }
 
 float ZEVector2::DistanceSquare(const ZEVector2 &A, const ZEVector2 &B)
@@ -105,7 +113,10 @@ float ZEVector2::DistanceSquare(const ZEVector2 &A, const ZEVector2 &B)
 	
 	mmxA = _mm_sub_ps(mmxA, mmxB);
 	mmxA = _mm_dp_ps(mmxA, mmxA, 0x31);
-	return mmxA.m128_f32[0];
+
+	float Temp;
+	_mm_store_ss(&Temp, mmxA);
+	return Temp;
 }
 
 void ZEVector2::Normalize(ZEVector2 &Out, const ZEVector2 &A)
@@ -186,7 +197,10 @@ float ZEVector3::DotProduct(const ZEVector3& A, const ZEVector3& B)
 	__m128 mmxB = LoadVector3(B);
 
 	mmxA = _mm_dp_ps(mmxA, mmxB, 0x71);
-	return mmxA.m128_f32[0];
+
+	float Temp;
+	_mm_store_ss(&Temp, mmxA);
+	return Temp;
 }
 
 //void ZEVector3::CrossProduct(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
@@ -211,7 +225,10 @@ float ZEVector3::DistanceSquare(const ZEVector3& A, const ZEVector3& B)
 	
 	mmxA = _mm_sub_ps(mmxA, mmxB);
 	mmxA = _mm_dp_ps(mmxA, mmxA, 0x71);
-	return mmxA.m128_f32[0];
+
+	float Temp;
+	_mm_store_ss(&Temp, mmxA);
+	return Temp;
 }
 
 void ZEVector3::Normalize(ZEVector3& Out, const ZEVector3& Vector)
@@ -366,7 +383,10 @@ float ZEVector4::DotProduct(const ZEVector4& A, const ZEVector4& B)
 	__m128 mmxA = LoadVector4(A);
 	__m128 mmxB = LoadVector4(B);
 	mmxA = _mm_dp_ps(mmxA, mmxB, 0xF1);
-	return mmxA.m128_f32[0];
+	
+	float Temp;
+	_mm_store_ss(&Temp, mmxA);
+	return Temp;
 }
 
 float ZEVector4::DistanceSquare(const ZEVector4& A, const ZEVector4& B)
@@ -375,7 +395,10 @@ float ZEVector4::DistanceSquare(const ZEVector4& A, const ZEVector4& B)
 	__m128 mmxB = LoadVector4(B);
 	mmxA = _mm_sub_ps(mmxA, mmxB);
 	mmxA = _mm_dp_ps(mmxA, mmxA, 0xF1);
-	return mmxA.m128_f32[0];
+	
+	float Temp;
+	_mm_store_ss(&Temp, mmxA);
+	return Temp;
 }
 
 void ZEVector4::Normalize(ZEVector4& Out, const ZEVector4& Vector)

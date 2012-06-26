@@ -725,7 +725,11 @@ ZEUInt32 ZEString::ToUInt32() const
 
 ZEUInt64 ZEString::ToUInt64() const
 {
-	return (ZEUInt64)_strtoui64(Buffer, NULL, 10);
+	#ifdef ZE_PLATFORM_COMPILER_MSVC
+		return (ZEUInt64)_strtoui64(Buffer, NULL, 10);
+	#else
+		return strtoull(Buffer, NULL, 10);
+	#endif
 }
 
 float ZEString::ToFloat() const

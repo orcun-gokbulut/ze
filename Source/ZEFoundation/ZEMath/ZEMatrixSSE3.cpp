@@ -33,11 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <smmintrin.h>
-
 #include "ZEMatrix.h"
 #include "ZEVector.h"
 #include "ZEError.h"
+
+extern "C"
+{
+#include <xmmintrin.h>
+#include <pmmintrin.h>
+};
 
 // MMX Register Loads
 inline __m128 LoadFloat3(const float *F)
@@ -216,7 +220,10 @@ float ZEMatrix3x3::Determinant(const ZEMatrix3x3 &Matrix)
 	mmxABC = _mm_hadd_ps(mmxABC, mmxDEF);
 	mmxABC = _mm_hadd_ps(mmxABC, mmxABC);
 	mmxABC = _mm_hsub_ps(mmxABC, mmxABC);
-	return mmxABC.m128_f32[0];
+
+	float Temp;
+	_mm_store_ss(&Temp, mmxABC);
+	return Temp;
 } 
 
 bool ZEMatrix3x3::Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix)
@@ -251,8 +258,9 @@ bool ZEMatrix3x3::Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix)
 		Matrix.M21, Matrix.M22, 0.0f,
 		Matrix.M31, Matrix.M32, 0.0f);
 
-	mmxDeterminants = _mm_set_ps(0.0f, Z.Determinant(), Y.Determinant(), X.Determinant()); 
-	StoreFloat3(Out.MA, _mm_div_ps(mmxDeterminants, mmxMainDeterminant));
+	mmxDeterminants = _mm_set_ps(0.0f, Z.Determinant(), Y.Determinant(), X.Determinant());
+	__m128 Temp = _mm_div_ps(mmxDeterminants, mmxMainDeterminant);
+	StoreFloat3(Out.MA, Temp);
 
 	// 2nd Column
 	ZEMatrix3x3 K;
@@ -274,7 +282,8 @@ bool ZEMatrix3x3::Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix)
 		Matrix.M31, Matrix.M32, 0.0f);
 
 	mmxDeterminants = _mm_set_ps(0.0f, M.Determinant(), L.Determinant(), K.Determinant()); 
-	StoreFloat3(Out.MA + 3, _mm_div_ps(mmxDeterminants, mmxMainDeterminant));
+	Temp = _mm_div_ps(mmxDeterminants, mmxMainDeterminant);
+	StoreFloat3(Out.MA + 3, Temp);
 
 	// 3rd Column
 	ZEMatrix3x3 O;
@@ -296,7 +305,8 @@ bool ZEMatrix3x3::Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix)
 		Matrix.M31, Matrix.M32, 1.0f);
 	
 	mmxDeterminants = _mm_set_ps(0.0f, Q.Determinant(), P.Determinant(), O.Determinant()); 
-	StoreFloat3(Out.MA + 6, _mm_div_ps(mmxDeterminants, mmxMainDeterminant));
+	Temp = _mm_div_ps(mmxDeterminants, mmxMainDeterminant);
+	StoreFloat3(Out.MA + 6, Temp);
 
 	return true;
 }

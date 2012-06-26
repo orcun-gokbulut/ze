@@ -41,7 +41,7 @@
 #include "ZELog.h"
 #include "ZEDLL.h"
 
-#if defined(ZE_DEBUG_ENABLE) && defined(ZE_PLATFORM_WINDOWS)
+#if defined(ZE_DEBUG_ENABLE) && defined(ZE_PLATFORM_COMPILER_MSVC)
 	#include <intrin.h>
 	#include <crtdbg.h>
 #else
@@ -124,12 +124,11 @@ enum ZEErrorType
 			}\
 			while(false)
 	#else
-		#define zeDebugCheck(Condition, ...) 
+		#define zeDebugCheck(Condition, ...) \
 			do \
 			{\
 				if (Condition)\
 				{\
-					
 					if (ZEError::GetInstance()->GetBreakOnDebugCheckEnabled())\
 						abort();\
 				}\
@@ -185,14 +184,14 @@ enum ZEErrorType
 			do\
 			{\
 				zeLog(ZE_LOG_CRITICAL_ERROR, __VA_ARGS__);\
-				if (ZEError::GetInstance()->GetBreakOnErrorEnabled) \
+				if (ZEError::GetInstance()->GetBreakOnErrorEnabled())\
 					abort();\
 				ZEError::GetInstance()->RaiseError(ZE_ET_CRITICAL_ERROR);\
-			} \
+			}\
 			while(false)
 	#endif
 #else
-	#define zeCriticalError( ...)\
+	#define zeCriticalError(...)\
 		do\
 		{\
 			zeLog(ZE_LOG_CRITICAL_ERROR, __VA_ARGS__);\
