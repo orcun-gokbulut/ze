@@ -225,7 +225,7 @@ ZE_POST_PROCESSOR_START(Meta)
 		<class name="ZEEntity">		
 			<noinstance>true</noinstance>
 			<description>Base Entity Type</description>
-			<property name="EntityId" type="integer" autogetset="yes" description="Unique number that indentifes entity"/>	
+			<property name="EntityId" type="integer32" autogetset="yes" description="Unique number that indentifes entity"/>	
 			<property name="Name" type="string" autogetset="yes" description="Name of the entity"/>
 			<property name="Position" type="ZEVector3" setfunction="SetWorldPosition" getfunction="GetWorldPosition" description="World position of the entity"/>
 			<property name="Rotation" type="ZEQuaternion" setfunction="SetWorldRotation" getfunction="GetWorldRotation" description="World rotation of the entity"/>

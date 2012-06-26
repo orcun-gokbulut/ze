@@ -92,19 +92,19 @@ ZE_POST_PROCESSOR_START(Meta)
 					<minvalue value="0"/>
 				</constraints>
 			</property>
-			<property name="ConeInsideAngle" type="integer" autogetset="yes">
+			<property name="ConeInsideAngle" type="integer32" autogetset="yes">
 				<constraints>
 					<minvalue value="0"/>
 					<maxvalue value="360"/>
 				</constraints>
 			</property>
-			<property name="ConeOutsideAngle" type="integer" autogetset="yes">
+			<property name="ConeOutsideAngle" type="integer32" autogetset="yes">
 				<constraints>
 					<minvalue value="0"/>
 					<maxvalue value="360"/>
 				</constraints>
 			</property>
-			<property name="ConeOutsideVolume" type="integer" autogetset="yes">
+			<property name="ConeOutsideVolume" type="integer32" autogetset="yes">
 				<constraints>
 					<minvalue value="ZE_SS_VOLUME_MIN"/>
 					<maxvalue value="ZE_SS_VOLUME_MAX"/>

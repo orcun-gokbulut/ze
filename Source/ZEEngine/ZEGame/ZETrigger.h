@@ -123,13 +123,13 @@ ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
 		<class name="ZETrigger" parent="ZEEntity" icon="" description="Trigger">
-			<property name="TriggerShape" type="integer" autogetset="true" description="Shape of trigger">
+			<property name="TriggerShape" type="integer32" autogetset="true" description="Shape of trigger">
 				<enumurator name="ZETriggerShape">
 					<item name="Sphere" value="ZE_TS_SPHERE"/>
 					<item name="Box" value="ZE_TS_BOX"/>
 				</enumurator>
 			</property>
-			<property name="ActivateTriggerOn" type="integer" autogetset="true" description="Activation type of trigger">
+			<property name="ActivateTriggerOn" type="integer32" autogetset="true" description="Activation type of trigger">
 				<enumurator name="ZEActivateTriggerOn">
 					<item name="Never Activate" value="ZE_ATO_NONE"/>  
 					<item name="Activate on enter" value="ZE_ATO_ENTER"/>
@@ -137,14 +137,14 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Activate on inside" value="ZE_ATO_INSIDE"/>
 				</enumurator>
 			</property>
-			<property name="FilterObjectsBy" type="integer" autogetset="true" description= "Filter objects for activate">
+			<property name="FilterObjectsBy" type="integer32" autogetset="true" description= "Filter objects for activate">
 				<enumurator name="ZEFilterObjectsBy">
 					<item name="Filter None" value="ZE_FOB_NONE"/>
 					<item name="Filter by entity instance" value="ZE_FOB_ENTITY_INSTANCE"/>
 					<item name="Filter by entity type" value="ZE_FOB_ENTITY_TYPE"/>
 				</enumurator>
 			</property>
-			<property name="ReportBehaviour" type="integer" autogetset="true" description="Report behaviour">
+			<property name="ReportBehaviour" type="integer32" autogetset="true" description="Report behaviour">
 				<enumurator name="ZEReportBehaviour">
 					<item name="Report None" value="ZE_RB_REPORT_NONE"/>
 					<item name="Report Trigger Status" value="ZE_RB_REPORT_TRIGGER_STATUS"/>
