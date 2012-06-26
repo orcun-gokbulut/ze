@@ -90,9 +90,9 @@ ZE_POST_PROCESSOR_START(Meta)
 		<class name="ZEParticleGenerator">		
 			<noinstance>true</noinstance>
 			<description>Base of particle generators.</description>
-			<property name="ParticlesPerSecond" type="integer" autogetset="yes" description="Particle count that will be generated in one second."/>
+			<property name="ParticlesPerSecond" type="integer32" autogetset="yes" description="Particle count that will be generated in one second."/>
 			<property name="IsSingleBurst" type="boolean" autogetset="yes" description="Is a single use generator or a permenent generator."/>
-			<property name="SingleBurstMaxParticleCount" type="integer" autogetset="yes" description="If generator is single burst, this number determines how many particles will it generate before stopping generation."/>
+			<property name="SingleBurstMaxParticleCount" type="integer32" autogetset="yes" description="If generator is single burst, this number determines how many particles will it generate before stopping generation."/>
 		</class>
 	</meta>
 </zinek>

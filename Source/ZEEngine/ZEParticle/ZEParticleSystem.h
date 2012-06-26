@@ -123,7 +123,7 @@ ZE_POST_PROCESSOR_START(Meta)
 		<class name="ZEParticleSystem">		
 			<noinstance>true</noinstance>
 			<description>Particle system.</description>
-			<property name="MaximumParticleCount" type="integer" autogetset="yes" description="Maximum particle pool size of the system."/>	
+			<property name="MaximumParticleCount" type="integer32" autogetset="yes" description="Maximum particle pool size of the system."/>	
 		</class>
 	</meta>
 </zinek>

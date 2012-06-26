@@ -177,18 +177,18 @@ ZE_POST_PROCESSOR_START(Meta)
 	<meta> 
 		<class name="ZESoundSource" noinstance="true" parent="ZEEntity">
 			<description>Sound Source</description>
-			<property name="CurrentPosition" type="integer" autogetset="yes">
+			<property name="CurrentPosition" type="integer32" autogetset="yes">
 				<constraints>
 					<minvalue value="0"/>
 				</constraints>
 			</property>
-			<property name="Volume" type="integer" autogetset="yes">
+			<property name="Volume" type="integer32" autogetset="yes">
 				<constraints>
 					<minvalue value="ZE_SS_VOLUME_MIN"/>
 					<maxvalue value="ZE_SS_VOLUME_MAX"/>
 				</constraints>
 			</property>
-			<property name="Pan" type="integer" autogetset="yes">
+			<property name="Pan" type="integer32" autogetset="yes">
 				<constraints>
 					<minvalue value="-ZE_SS_PAN_LEFT"/>
 					<maxvalue value="ZE_SS_PAN_RIGHT"/>
@@ -202,9 +202,9 @@ ZE_POST_PROCESSOR_START(Meta)
 			</property>
 			<property name="Looping" type="boolean" autogetset="yes"/>
 			<property name="LimitsEnabled" type="boolean" autogetset="yes"/>
-			<property name="StartPosition" type="integer" autogetset="yes"/>
-			<property name="EndPosition" type="integer" autogetset="yes"/>
-			<property name="SoundSourceState" type="integer" autogetset="yes">
+			<property name="StartPosition" type="integer32" autogetset="yes"/>
+			<property name="EndPosition" type="integer32" autogetset="yes"/>
+			<property name="SoundSourceState" type="integer32" autogetset="yes">
 				<enumurator name="ZESoundSourceState">
 					<item name="Playing" value="ZE_SSS_PLAYING"/>
 					<item name="Stopped" value="ZE_SSS_STOPPED"/>

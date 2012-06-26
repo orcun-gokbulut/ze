@@ -172,8 +172,8 @@ ZE_POST_PROCESSOR_START(Meta)
 				<property name="BrightPassTreshold" type="float" autogetset="yes" description="..."/>
 				<property name="BloomFactor" type="float" autogetset="yes" description="..."/>
 				<property name="BloomStandardDeviation" type="float" autogetset="yes" description="..."/>
-				<property name="BloomSampleCount" type="integer" autogetset="yes" description="..."/>
-				<property name="BloomPassCount" type="integer" autogetset="yes" description="..."/>
+				<property name="BloomSampleCount" type="integer32" autogetset="yes" description="..."/>
+				<property name="BloomPassCount" type="integer32" autogetset="yes" description="..."/>
 				<property name="MaxLuminanceChangePerSecond" type="float" autogetset="yes" description="..."/>
 				
 			</class>

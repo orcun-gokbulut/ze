@@ -409,7 +409,7 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="Wireframe" groupname="Shading" type="boolean" autogetset="yes"/>
 			<property name="AlphaCullEnabled" groupname="Transparancy" type="boolean" autogetset="yes"/>
 			<property name="AlphaCullLimit" groupname="Transparancy" type="float" autogetset="yes"/>
-			<property name="TransparancyMode" groupname="Transparancy" type="integer" autogetset="yes">
+			<property name="TransparancyMode" groupname="Transparancy" type="integer32" autogetset="yes">
 				<enumurator name="ZEMaterialTransparancyMode">
 					<item name="No Transparancy" value="ZE_MTM_NONE"/>
 					<item name="Regular" value="ZE_MTM_REGULAR"/>
@@ -427,7 +427,7 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="DiffuseColor" groupname="Diffuse" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
 			<property name="DiffuseFactor" groupname="Diffuse" type="float" autogetset="yes"/>
 			<property name="BaseMap" groupname="Diffuse" type="string" semantic="ZE_PS_FILENAME" setfunction="SetBaseMapFile" getfunction="GetBaseMapFile"/>
-			<property name="BaseMapAddressModeU" groupname="Diffuse" type="integer" autogetset="yes">
+			<property name="BaseMapAddressModeU" groupname="Diffuse" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -435,7 +435,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name="BaseMapAddressModeV" groupname="Diffuse" type="integer" autogetset="yes">
+			<property name="BaseMapAddressModeV" groupname="Diffuse" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -449,7 +449,7 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="SpecularShininess" groupname="Specular" type="float" autogetset="yes"/>
 			<property name="SpecularColor" groupname="Specular" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
 			<property name="SpecularMap" groupname="Specular" type="string" semantic="ZE_PS_FILENAME" setfunction="SetSpecularMapFile" getfunction="GetSpecularMapFile"/>
-			<property name="SpecularMapAddressModeU" groupname="Specular" type="integer" autogetset="yes">
+			<property name="SpecularMapAddressModeU" groupname="Specular" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -457,7 +457,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name="SpecularMapAddressModeV" groupname="Specular" type="integer" autogetset="yes">
+			<property name="SpecularMapAddressModeV" groupname="Specular" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -471,7 +471,7 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="EmmisiveFactor" groupname="Emmisive" type="float" autogetset="yes"/>
 			<property name="EmmisiveColor" groupname="Emmisive" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
 			<property name="EmmisiveMap" groupname="Emmisive" type="string" semantic="ZE_PS_FILENAME" setfunction="SetEmmisiveMapFile" getfunction="GetEmmisiveMapFile"/>
-			<property name="EmmisiveMapAddressModeU" groupname="Emmisive" type="integer" autogetset="yes">
+			<property name="EmmisiveMapAddressModeU" groupname="Emmisive" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -479,7 +479,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name="EmmisiveMapAddressModeV" groupname="Emmisive" type="integer" autogetset="yes">
+			<property name="EmmisiveMapAddressModeV" groupname="Emmisive" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -491,7 +491,7 @@ ZE_POST_PROCESSOR_START(Meta)
 
 			<property name="NormalMapEnabled" groupname="Normal" type="boolean" autogetset="yes"/>
 			<property name="NormalMap" groupname="Normal" type="string" semantic="ZE_PS_FILENAME" setfunction="SetNormalMapFile" getfunction="GetNormalMapFile"/>
-			<property name="NormalMapAddressModeU" groupname="Normal" type="integer" autogetset="yes">
+			<property name="NormalMapAddressModeU" groupname="Normal" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -499,7 +499,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name="NormalMapAddressModeV" groupname="Normal" type="integer" autogetset="yes">
+			<property name="NormalMapAddressModeV" groupname="Normal" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -511,7 +511,7 @@ ZE_POST_PROCESSOR_START(Meta)
 
 			<property name="ParallaxMapEnabled" groupname="Parallax" type="boolean" autogetset="yes"/>
 			<property name="ParallaxMap" groupname="Parallax" type="string" semantic="ZE_PS_FILENAME" setfunction="SetParallaxMapFile" getfunction="GetParallaxMapFile"/>
-			<property name="ParallaxMapAddressModeU" groupname="Parallax" type="integer" autogetset="yes">
+			<property name="ParallaxMapAddressModeU" groupname="Parallax" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -519,7 +519,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property> 
-			<property name="ParallaxMapAddressModeV" groupname="Parallax" type="integer" autogetset="yes">
+			<property name="ParallaxMapAddressModeV" groupname="Parallax" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -531,7 +531,7 @@ ZE_POST_PROCESSOR_START(Meta)
 
 			<property name="OpacityEnabled" groupname="Opacity" type="boolean" autogetset="yes"/>
 			<property name="Opacity" groupname="Opacity" type="float" autogetset="yes"/>
-			<property name="OpacityComponent" groupname="Opacity" type="integer" autogetset="yes">
+			<property name="OpacityComponent" groupname="Opacity" type="integer32" autogetset="yes">
 				<enumurator name = "ZEMaterialOpacityComponent">
 					<item name="Constant" value="ZE_MOC_CONSTANT"/>
 					<item name="Diffuse Map Alpha" value="ZE_MOC_BASE_MAP_ALPHA"/>
@@ -539,7 +539,7 @@ ZE_POST_PROCESSOR_START(Meta)
 				</enumurator>
 			</property>
 			<property name="OpacityMap" groupname="Opacity" type="string" semantic="ZE_PS_FILENAME" setfunction="SetOpacityMapFile" getfunction="GetOpacityMapFile"/>
-			<property name="OpacityMapAddressModeU" groupname="Opacity" type="integer" autogetset="yes">
+			<property name="OpacityMapAddressModeU" groupname="Opacity" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -547,7 +547,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>  
-			<property name="OpacityMapAddressModeV" groupname="Opacity" type="integer" autogetset="yes">
+			<property name="OpacityMapAddressModeV" groupname="Opacity" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -557,7 +557,7 @@ ZE_POST_PROCESSOR_START(Meta)
 			</property>
 
 			<property name="EnvironmentMap" groupname="Environment" type="string" semantic="ZE_PS_FILENAME" getfunction="GetEnvironmentMapFile" setfunction="SetEnvironmentMapFile"/>
-			<property name = "EnvironmentMapAddressModeU" groupname="Environment" type="integer" autogetset="yes">
+			<property name = "EnvironmentMapAddressModeU" groupname="Environment" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -565,7 +565,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name = "EnvironmentMapAddressModeV" groupname="Environment" type="integer" autogetset="yes">
+			<property name = "EnvironmentMapAddressModeV" groupname="Environment" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -573,7 +573,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name = "EnvironmentMapAddressModeW" groupname="Environment" type="integer" autogetset="yes">
+			<property name = "EnvironmentMapAddressModeW" groupname="Environment" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -589,7 +589,7 @@ ZE_POST_PROCESSOR_START(Meta)
 
 			<property name="DetailMapTiling" groupname="Detail" type="ZEVector2" autogetset="yes" />
 			<property name="DetailBaseMap" groupname="Detail" type="string" semantic="ZE_PS_FILENAME" getfunction="GetDetailBaseMapFile" setfunction="SetDetailBaseMapFile" />
-			<property name="DetailBaseMapAddressModeU" groupname="Detail" type="integer" autogetset="yes">
+			<property name="DetailBaseMapAddressModeU" groupname="Detail" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -597,7 +597,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name="DetailBaseMapAddressModeV" groupname="Detail" type="integer" autogetset="yes">
+			<property name="DetailBaseMapAddressModeV" groupname="Detail" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -606,7 +606,7 @@ ZE_POST_PROCESSOR_START(Meta)
 				</enumurator>
 			</property>
 			<property name="DetailNormalMap" groupname="Detail" type="string" semantic="ZE_PS_FILENAME" getfunction="GetDetailNormalMapFile" setfunction="SetDetailNormalMapFile" />
-			<property name="DetailNormalMapAddressModeU" groupname="Detail" type="integer" autogetset="yes">
+			<property name="DetailNormalMapAddressModeU" groupname="Detail" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -614,7 +614,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name="DetailNormalMapAddressModeV" groupname="Detail" type="integer" autogetset="yes">
+			<property name="DetailNormalMapAddressModeV" groupname="Detail" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -627,7 +627,7 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="LightMapEnabled" groupname="Light Map" type="boolean" autogetset="yes" />
 			<property name="LightMapFactor" groupname="Light Map" type="float" autogetset="yes" />
 			<property name="LightMap" groupname="Light Map" type="string" semantic="ZE_PS_FILENAME" getfunction="GetLightMapFile" setfunction="SetLightMapFile" />
-			<property name="LightMapAddressModeU" groupname="Light Map" type="integer" autogetset="yes">
+			<property name="LightMapAddressModeU" groupname="Light Map" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -635,7 +635,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name="LightMapAddressModeU" groupname="Light Map" type="integer" autogetset="yes">
+			<property name="LightMapAddressModeU" groupname="Light Map" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -648,7 +648,7 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="DistortionEnabled" groupname="Distortion" type="boolean" autogetset="yes" />
 			<property name="DistortionFactor" groupname="Distortion" type="float" autogetset="yes" />
 			<property name="DistortionMap" groupname="Distortion" type="string" semantic="ZE_PS_FILENAME" getfunction="GetDistortionMapFile" setfunction="SetDistortionMapFile" />
-			<property name="DistortionMapAddressModeU" groupname="Distortion" type="integer" autogetset="yes">
+			<property name="DistortionMapAddressModeU" groupname="Distortion" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -656,7 +656,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name="DistortionMapAddressModeU" groupname="Distortion" type="integer" autogetset="yes">
+			<property name="DistortionMapAddressModeU" groupname="Distortion" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
