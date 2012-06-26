@@ -54,7 +54,15 @@ enum ZEVariantType
 	ZE_VRT_UNDEFINED = 0,
 	ZE_VRT_NULL,
 	ZE_VRT_FLOAT,
-	ZE_VRT_INTEGER,
+	ZE_VRT_DOUBLE,
+	ZE_VRT_INTEGER_8,
+	ZE_VRT_INTEGER_16,
+	ZE_VRT_INTEGER_32,
+	ZE_VRT_INTEGER_64,
+	ZE_VRT_UNSIGNED_INTEGER_8,
+	ZE_VRT_UNSIGNED_INTEGER_16,
+	ZE_VRT_UNSIGNED_INTEGER_32,
+	ZE_VRT_UNSIGNED_INTEGER_64,
 	ZE_VRT_BOOLEAN,
 	ZE_VRT_STRING,
 	ZE_VRT_QUATERNION,
@@ -79,7 +87,11 @@ class ZEVariant : public ZESerializable
 		union ZEVariantValue
 		{
 			float			Float;
-			ZEInt			Integer;
+			double			Double;
+
+			ZEInt32			Int32;
+			ZEInt64			Int64;
+			
 			bool			Boolean;
 			char*			String;
 			ZEObject*		Pointer;
@@ -105,8 +117,16 @@ class ZEVariant : public ZESerializable
 		ZEVariantValue&		ImplicitAcesss();
 
 		void				SetString(const char *NewValue);
-		void				SetInteger(ZEInt Value);
+		void				SetInt8(ZEInt8 Value);
+		void				SetInt16(ZEInt16 Value);
+		void				SetInt32(ZEInt32 Value);
+		void				SetInt64(ZEInt64 Value);
+		void				SetUInt8(ZEUInt8 Value);
+		void				SetUInt16(ZEUInt16 Value);
+		void				SetUInt32(ZEUInt32 Value);
+		void				SetUInt64(ZEUInt64 Value);
 		void				SetFloat(float Value);
+		void				SetDouble(double Value);
 		void				SetBoolean(bool Value);
 		void				SetVector2(const ZEVector2& Vector);
 		void				SetVector3(const ZEVector3& Vector);
@@ -119,8 +139,16 @@ class ZEVariant : public ZESerializable
 		void				SetVariant(const ZEVariant& NewValue);
 
 		char*				GetString() const;
-		ZEInt				GetInteger() const;
+		ZEInt8				GetInt8() const;
+		ZEInt16				GetInt16() const;
+		ZEInt32				GetInt32() const;
+		ZEInt64				GetInt64() const;
+		ZEUInt8				GetUInt8() const;
+		ZEUInt16			GetUInt16() const;
+		ZEUInt32			GetUInt32() const;
+		ZEUInt64			GetUInt64() const;
 		float				GetFloat() const;
+		double				GetDouble() const;
 		bool				GetBoolean() const;
 		ZEVector2&			GetVector2() const;
 		ZEVector3&			GetVector3() const;
@@ -138,8 +166,16 @@ class ZEVariant : public ZESerializable
 
 		void				operator= (const ZEVariant &NewValue);
 		void				operator= (const char* NewValue);
-		void				operator= (ZEInt NewValue);
+		void				operator= (ZEInt8 NewValue);
+		void				operator= (ZEInt16 NewValue);
+		void				operator= (ZEInt32 NewValue);
+		void				operator= (ZEInt64 NewValue);
+		void				operator= (ZEUInt8 NewValue);
+		void				operator= (ZEUInt16 NewValue);
+		void				operator= (ZEUInt32 NewValue);
+		void				operator= (ZEUInt64 NewValue);
 		void				operator= (float NewValue);
+		void				operator= (double NewValue);
 		void				operator= (bool NewValue);
 		void				operator= (const ZEVector2& Vector);
 		void				operator= (const ZEVector3& Vector);
@@ -150,8 +186,16 @@ class ZEVariant : public ZESerializable
 		void				operator= (ZEObject* Pointer);
 
 							operator const char*();
-							operator ZEInt();
+							operator ZEInt8();
+							operator ZEInt16();
+							operator ZEInt32();
+							operator ZEInt64();
+							operator ZEUInt8();
+							operator ZEUInt16();
+							operator ZEUInt32();
+							operator ZEUInt64();
 							operator float();
+							operator double();
 							operator bool();
 							operator ZEVector2();
 							operator ZEVector3();
@@ -164,8 +208,16 @@ class ZEVariant : public ZESerializable
 							ZEVariant();
 							ZEVariant(const ZEVariant &InitialValue);
 							ZEVariant(const char* InitialValue);	
-							ZEVariant(ZEInt InitialValue);
+							ZEVariant(ZEInt8 InitialValue);
+							ZEVariant(ZEInt16 InitialValue);
+							ZEVariant(ZEInt32 InitialValue);
+							ZEVariant(ZEInt64 InitialValue);
+							ZEVariant(ZEUInt8 InitialValue);
+							ZEVariant(ZEUInt16 InitialValue);
+							ZEVariant(ZEUInt32 InitialValue);
+							ZEVariant(ZEUInt64 InitialValue);
 							ZEVariant(float InitialValue);
+							ZEVariant(double InitialValue);
 							ZEVariant(bool InitialValue);
 							ZEVariant(const ZEVector2& Vector);
 							ZEVariant(const ZEVector3& Vector);
@@ -180,8 +232,3 @@ class ZEVariant : public ZESerializable
 
 #pragma warning(pop)
 #endif
-
-
-
-
-

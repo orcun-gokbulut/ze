@@ -189,7 +189,7 @@ _inline bool ZEJpegFileMarkerBuffer::GetTwoByte(ZEUInt16& TwoByte)
 		// Read two bytes once and convert to little endian
 		ZEUInt16* TwoByteBuffer = (ZEUInt16*)(Buffer + (ZE_JPEG_INPUT_BUFFER_SIZE - BytesAvailable));
 
-		TwoByte = ZEEndian::Swap(TwoByteBuffer[0]);
+		TwoByte = ZESwap::Swap(TwoByteBuffer[0]);
 		BytesAvailable -= 2;
 
 		return true;

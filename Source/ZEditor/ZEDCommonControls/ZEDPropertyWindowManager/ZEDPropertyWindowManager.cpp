@@ -209,7 +209,7 @@ void ZEDPropertyWindowManager::UpdatePropertyWidgets()
 
 					break;
 
-				case ZE_VRT_INTEGER:
+				case ZE_VRT_INTEGER_32:
 
 					if(Property.Enumurators != NULL)
 					{
@@ -486,7 +486,7 @@ void ZEDPropertyWindowManager::UpdateCustomPropertyWidgets()
 				}
 				break;
 
-			case ZE_VRT_INTEGER:
+			case ZE_VRT_INTEGER_32:
 
 				if(Property.Enumurators != NULL)
 				{

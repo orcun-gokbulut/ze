@@ -97,7 +97,7 @@ ZEIPAddress ZEIPAddress::Parse(const ZEString& String)
 			Part3.Append(ZEString::FromChar(String.GetCharacter(I)));
 	}
 
-	return ZEIPAddress((ZEUInt8)Part0.ToInt(), (ZEUInt8)Part1.ToInt(), (ZEUInt8)Part2.ToInt(), (ZEUInt8)Part3.ToInt());
+	return ZEIPAddress((ZEUInt8)Part0.ToInt32(), (ZEUInt8)Part1.ToInt32(), (ZEUInt8)Part2.ToInt32(), (ZEUInt8)Part3.ToInt32());
 }
 
 ZEArray<ZEIPAddress> ZEIPAddress::Lookup(const ZEString& String)

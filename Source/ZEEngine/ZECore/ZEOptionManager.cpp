@@ -109,11 +109,11 @@ bool ZEOptionManager::ListSectionsCommand(ZECommand* Command, const ZECommandPar
 		Count = Sections.GetCount();
 	}
 	else if (Params->GetCount() == 2 && 
-			 Params->GetItem(0).GetType() == ZE_VRT_INTEGER && 
-			 Params->GetItem(1).GetType() == ZE_VRT_INTEGER)
+			 Params->GetItem(0).GetType() == ZE_VRT_INTEGER_32 && 
+			 Params->GetItem(1).GetType() == ZE_VRT_INTEGER_32)
 	{
-		Index = Params->GetItem(0).GetInteger();
-		Count = Params->GetItem(1).GetInteger();
+		Index = Params->GetItem(0).GetInt32();
+		Count = Params->GetItem(1).GetInt32();
 	}
 	else
 	{
@@ -154,12 +154,12 @@ bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandPara
 	}
 	else if (Params->GetCount() == 1 &&
 			 Params->GetItem(0).GetType() == ZE_VRT_STRING &&
-			 Params->GetItem(1).GetType() == ZE_VRT_INTEGER &&
-			 Params->GetItem(2).GetType() == ZE_VRT_INTEGER)
+			 Params->GetItem(1).GetType() == ZE_VRT_INTEGER_32 &&
+			 Params->GetItem(2).GetType() == ZE_VRT_INTEGER_32)
 	{
 		Sec = GetSection(Params->GetItem(0).GetString());
-		Index = Params->GetItem(1).GetInteger();
-		Count = Params->GetItem(2).GetInteger();
+		Index = Params->GetItem(1).GetInt32();
+		Count = Params->GetItem(2).GetInt32();
 	}
 	else
 	{
@@ -187,7 +187,7 @@ bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandPara
 				case ZE_VRT_UNDEFINED:
 					zeOutput(" Undefined  ");
 					break;
-				case ZE_VRT_INTEGER:
+				case ZE_VRT_INTEGER_32:
 					zeOutput(" Integer    ");
 					break;
 				case ZE_VRT_FLOAT:
@@ -212,8 +212,8 @@ bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandPara
 				case ZE_VRT_UNDEFINED:
 					zeOutput("UNDEFINED (Probably Internal Error)\r\n");
 					break;
-				case ZE_VRT_INTEGER:
-					zeOutput("%d\r\n", Opt->GetValue().GetInteger());
+				case ZE_VRT_INTEGER_32:
+					zeOutput("%d\r\n", Opt->GetValue().GetInt32());
 					break;
 				case ZE_VRT_FLOAT:
 					zeOutput("%lf\r\n", Opt->GetValue().GetFloat());
@@ -324,8 +324,8 @@ void ZEOptionManager::Save(const ZEString& FileName)
 						case ZE_VRT_STRING:
 							fprintf(File, "%s = %s\n", Current->GetName().ToCString(), Current->GetValue().GetString());
 							break;
-						case ZE_VRT_INTEGER:
-							fprintf(File, "%s = %d\n", Current->GetName().ToCString(), Current->GetValue().GetInteger());
+						case ZE_VRT_INTEGER_32:
+							fprintf(File, "%s = %d\n", Current->GetName().ToCString(), Current->GetValue().GetInt32());
 							break;			
 						case ZE_VRT_FLOAT:
 							fprintf(File, "%s = %f\n", Current->GetName().ToCString(), Current->GetValue().GetFloat());
@@ -475,7 +475,7 @@ void ZEOptionManager::Load(const ZEString& FileName)
 							case ZE_VRT_STRING:
 								Current->SetValue(ValueBuffer);
 								break;
-							case ZE_VRT_INTEGER:
+							case ZE_VRT_INTEGER_32:
 								Current->SetValue(atoi(ValueBuffer));
 								break;			
 							case ZE_VRT_FLOAT:

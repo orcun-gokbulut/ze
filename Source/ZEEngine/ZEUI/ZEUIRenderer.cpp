@@ -41,6 +41,16 @@
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 
+ZEInt CompareCommandOrder(const ZERenderCommand* Command1, const ZERenderCommand* Command2)
+{
+	if(Command1->Order > Command2->Order)
+		return 1;
+	else if(Command1->Order < Command2->Order)
+		return -1;
+	else
+		return 0;
+}
+
 ZEUIRenderer::ZEUIRenderer()
 {
 	VertexDeclaration = NULL;
@@ -117,12 +127,14 @@ void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 	NewRenderCommand->VertexBufferOffset = 0;
 	NewRenderCommand->IndexBuffer = NULL;
 	NewRenderCommand->PrimitiveCount = 2;
+	NewRenderCommand->Order = (float)Rectangle.ZOrder;
 	ZEUIVertex* Buffer = ((ZEArrayVertexBuffer<ZEUIVertex>*)NewRenderCommand->VertexBuffer)->MassAdd(6);
 	Rectangle.ConvertToVertices(Buffer);
 }
 
 void ZEUIRenderer::Render(ZERenderer* Renderer)
 {
+	RenderCommands.Sort(&CompareCommandOrder);
 	
 	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
 	{

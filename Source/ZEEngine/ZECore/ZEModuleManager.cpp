@@ -68,7 +68,7 @@ ZEExtensionDescription* ZEModuleManager::GetModuleDescription(ZEExtensionDescrip
 	if (BaseModuleDescription->GetParent() != ZEModule::Description())
 		return NULL;
 
-	return GetModuleDescription(ZEString(ModuleManagerOptions.GetOption(BaseModuleDescription->GetName())->GetValue()));
+	return GetModuleDescription(ZEString(ModuleManagerOptions.GetOption(BaseModuleDescription->GetName())->GetValue().GetString()));
 }
 
 ZEModule* ZEModuleManager::CreateModuleInstance(ZESize Index)

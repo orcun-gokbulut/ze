@@ -77,7 +77,7 @@ ZEDEnumComboBox::ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *paren
 	this->setToolTip (0, QString(ClassAttribute.Description));
 	ValueIndexTable.clear();
 
-	if (Value.GetType() != ZE_VRT_INTEGER)
+	if (Value.GetType() != ZE_VRT_INTEGER_32)
 	{
 		setText(1, QString("Error Enumeration"));
 		return;
@@ -109,7 +109,7 @@ ZEDEnumComboBox::ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *paren
 	}
 
 	ParentTree->setItemWidget(this, 1, XValue);	
-	XValue->setCurrentIndex(Value.GetInteger());////////////////////Buggggggggggg
+	XValue->setCurrentIndex(Value.GetInt32());////////////////////Buggggggggggg
 	connect(this->XValue, SIGNAL(currentIndexChanged(ZEInt)), this, SLOT(Changed()));
 }
 
@@ -132,7 +132,7 @@ void ZEDEnumComboBox::Changed()
 	TempOperation->SetOldValue(Value);
 
 	ZEInt Index = XValue->currentIndex();
-	Value.SetInteger(ValueIndexTable[Index]);
+	Value.SetInt32(ValueIndexTable[Index]);
 	this->Class->SetProperty(ClassAttribute.Name, Value);
 
 	Class->GetProperty(ClassAttribute.Name, Value);
