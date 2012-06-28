@@ -447,7 +447,7 @@ class ZEArray
 
 		inline ZESSize BinarySearch(const ZEType& Element, ZEInt (*CompareFunction)(const ZEType*, const ZEType*))
 		{
-			void* Result = bsearch(&Element, &Items, Count, sizeof(ZEType), (ZEArrayFunctionPointerCasterType*)(CompareFunction));
+			void* Result = bsearch(&Element, Items, Count, sizeof(ZEType), (ZEArrayFunctionPointerCasterType*)(CompareFunction));
 			if (Result == NULL)
 				return -1;
 			else
