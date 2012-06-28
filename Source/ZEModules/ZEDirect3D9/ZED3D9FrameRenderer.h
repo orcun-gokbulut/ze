@@ -82,6 +82,8 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9Texture2D*					LBuffer1;
 		ZED3D9Texture2D*					LBuffer2;
 		ZED3D9Texture2D*					SSAOBuffer;
+		ZED3D9Texture2D*					CDInputBuffer;
+		ZED3D9Texture2D*					TMInputBuffer;
 		ZED3D9Texture2D*					CTInputBuffer;
 		//ZED3D9Texture2D*					EDInputBuffer;
 		ZED3D9Texture2D*					HDRInputBuffer;
@@ -90,9 +92,8 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9Texture2D*					SSAAInputBuffer;
 		ZED3D9Texture2D*					BlurInputBuffer;
 		ZED3D9Texture2D*					GrainInputBuffer;
-		ZED3D9Texture2D*					CDInputBuffer;
-		ZED3D9Texture2D*					TMInput;
-
+		ZED3D9Texture2D*					ZoomBlurInputBuffer;
+		
 		ZED3D9SSAOProcessor					SSAOProcessor;
 		ZED3D9SSAAProcessor					SSAAProcessor;
 		ZED3D9MLAAProcessor					MLAAProcessor;

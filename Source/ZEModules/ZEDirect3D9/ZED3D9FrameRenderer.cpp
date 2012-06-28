@@ -758,9 +758,9 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 		GrainInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	GrainInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
 	
-	if(RadialBlurProcessor == NULL)
-		RadialBlurProcessor = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	RadialBlurProcessor->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
+	if(ZoomBlurInputBuffer == NULL)
+		ZoomBlurInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	ZoomBlurInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
 	
 	if(FogInputBuffer == NULL)
 		FogInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
@@ -774,9 +774,9 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 		CDInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	CDInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
 
-	if(TMInput == NULL)
-		TMInput = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	TMInput->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
+	if(TMInputBuffer == NULL)
+		TMInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	TMInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
 
 	if (ABuffer == NULL)
 		ABuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
@@ -792,9 +792,9 @@ void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 	ZED3D_DESTROY(LBuffer1);
 	ZED3D_DESTROY(LBuffer2);
 	ZED3D_DESTROY(SSAOBuffer);
-	ZED3D_DESTROY(TMInput);
+	ZED3D_DESTROY(TMInputBuffer);
 	ZED3D_DESTROY(HDRInputBuffer);
-	ZED3D_DESTROY(RadialBlurProcessor);
+	ZED3D_DESTROY(ZoomBlurInputBuffer);
 	/*
 	ZED3D_DESTROY(EDInputBuffer);
 	*/
@@ -811,7 +811,7 @@ void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 {
 	Camera = NULL;
-	TMInput = NULL;
+	TMInputBuffer = NULL;
 	ABuffer = NULL;
 	GBuffer1 = NULL;
 	GBuffer2 = NULL;
@@ -828,7 +828,7 @@ ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 	SSAAInputBuffer = NULL;
 	// EDInputBuffer = NULL;
 	GrainInputBuffer = NULL;
-	RadialBlurProcessor = NULL;
+	ZoomBlurInputBuffer = NULL;
 	
 	LightningComponents.LightMeshVB = NULL;
 	LightningComponents.PointLightVS = NULL;
@@ -903,7 +903,7 @@ bool ZED3D9FrameRenderer::Initialize()
 	InitializeLightning();
 
 	return true; 
-} 
+}
 
 void ZED3D9FrameRenderer::Deinitialize()
 {
@@ -1072,11 +1072,11 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 
 		// Grain
 		GrainProcessor.SetInput(GrainInputBuffer);
-		GrainProcessor.SetOutput((ZED3D9ViewPort*)TMInput->GetViewPort());
+		GrainProcessor.SetOutput((ZED3D9ViewPort*)TMInputBuffer->GetViewPort());
 		GrainProcessor.Process(ElaspedTime);
 		
 		// Texture mask
-		TMProcessor.SetInput(TMInput);
+		TMProcessor.SetInput(TMInputBuffer);
 		TMProcessor.SetOutput(ViewPort);
 		TMProcessor.Process();
 
