@@ -40,7 +40,6 @@
 
 class ZECamera;
 class ZEViewCone;
-class ZEComponent;
 class ZELight;
 class ZEPortal;
 class ZEMapPortal;
