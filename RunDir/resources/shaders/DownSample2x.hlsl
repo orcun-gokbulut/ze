@@ -66,10 +66,6 @@
 //*                                                                                *//
 //////////////////////////////////////////////////////////////////////////////////////
 
-// Important Note:
-// This shader uses hardware Texture filters for down sampling 2x
-// Choose texture filter method while setting the texture at application side
-// (e.g. choose point for point sampling, choose linear for bilinear sampling)
 
 sampler2D 		TextureInput 	: register(s0);
 const float2	PixelSize		: register(vs, c0);

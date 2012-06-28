@@ -46,6 +46,9 @@ endif()
 
 add_subdirectory (ZED3D9PostProcessor)
 
+
+ze_add_source(ZED3D9BlurMaskProcessor.cpp				Sources)
+ze_add_source(ZED3D9BlurMaskProcessor.h					Sources)
 ze_add_source(ZED3D9BlurProcessor.cpp					Sources)
 ze_add_source(ZED3D9BlurProcessor.h						Sources)
 ze_add_source(ZED3D9ChannelDisorientationProcessor.cpp	Sources)

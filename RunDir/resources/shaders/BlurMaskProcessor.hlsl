@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - TextureMaskProcessor.hlsl
+ Zinek Engine - BlurMaskProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,16 +34,21 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 sampler2D 	ColorBuffer		: register (s0);
-sampler2D 	MaskBuffer		: register (s1);
+sampler2D	BlurBuffer		: register (s2);
+sampler2D 	BlurMaskBuffer	: register (s1);
 
 float4 		VSParameters	: register(vs, c0);
-
-#define		PixelSizeRT		VSParameters.xy
-#define		PixelSizeMask	VSParameters.zw
+// Pass 1-2-3-4
+#define		PixelSize		VSParameters.xy
 
 float4		PSParameters	: register(ps, c0);
 
-#define		MaskFactor		PSParameters.x
+// Pass 4: mask
+#define		BlurFactor		PSParameters.x
+#define		BlurColor		PSParameters.yzw
+
+// Pass 2: Blur
+#define		PixelSizeBlur	PSParameters.xy
 
 
 struct VS_INPUT
@@ -56,14 +61,12 @@ struct VS_INPUT
 struct VS_OUTPUT 
 {
 	float4 Position : POSITION0;
-	float2 TexCoordColor : TEXCOORD0;
-	float2 TexCoordMask : TEXCOORD1;
+	float2 TexCoord : TEXCOORD0;
 };
 
 struct PS_INPUT
 {
-	float2 TexCoordColor : TEXCOORD0;
-	float2 TexCoordMask : TEXCOORD1;
+	float2 TexCoord : TEXCOORD0;
 };
 
 struct PS_OUTPUT
@@ -71,28 +74,74 @@ struct PS_OUTPUT
 	float4 PixelColor : COLOR0;
 };
 
-VS_OUTPUT vs_main(VS_INPUT Input)
+VS_OUTPUT vs_main_common(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
    
 	Output.Position	= sign(Input.Position);
 
-	Output.TexCoordColor.x = 0.5f * (1.0f + Output.Position.x + PixelSizeRT.x);
-	Output.TexCoordColor.y = 0.5f * (1.0f - Output.Position.y + PixelSizeRT.y);
-	
-	Output.TexCoordMask = Input.TexCoord + (PixelSizeMask * 0.5f);
+	Output.TexCoord.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
+	Output.TexCoord.y = 0.5f * (1.0f - Output.Position.y + PixelSize.y);
 
 	return Output;
 }
 
-PS_OUTPUT ps_main( PS_INPUT Input )
+// Used for up / down sampling.
+PS_OUTPUT ps_main_sample( PS_INPUT Input )
 {
 	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
 
-	Output.PixelColor = tex2D(ColorBuffer, Input.TexCoordColor);
-	float3 Masked = tex2D(MaskBuffer, Input.TexCoordMask).rgb * Output.PixelColor.rgb;
-	
-	Output.PixelColor.rgb = lerp(Output.PixelColor.rgb, Masked, MaskFactor);
+	Output.PixelColor = tex2D(ColorBuffer, Input.TexCoord);
+
+	return Output;
+}
+
+static const float4 Weights[9] = 
+{
+	-1.0f, -1.0f, 0.0f, 1.0f / 9.0f,
+	 0.0f, -1.0f, 0.0f, 1.0f / 9.0f,
+	 1.0f, -1.0f, 0.0f, 1.0f / 9.0f,
+
+	-1.0f,  0.0f, 0.0f, 1.0f / 9.0f,
+	 0.0f,  0.0f, 0.0f, 1.0f / 9.0f,
+	 1.0f,  0.0f, 0.0f, 1.0f / 9.0f,
+
+	-1.0f,  1.0f, 0.0f, 1.0f / 9.0f,
+	 0.0f,  1.0f, 0.0f, 1.0f / 9.0f,
+	 1.0f,  1.0f, 0.0f, 1.0f / 9.0f,
+};
+
+// Used for blurring
+PS_OUTPUT ps_main_blur( PS_INPUT Input )
+{
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
+
+	for (int I = 0; I < 9; ++I)
+	{
+		Output.PixelColor += tex2D(ColorBuffer, Input.TexCoord + Weights[I].xy * PixelSizeBlur) * Weights[I].w;
+	}
+
+	return Output;
+}
+
+PS_OUTPUT ps_main_blur_mask( PS_INPUT Input )
+{
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
+
+	float4 ColorSample = tex2D(ColorBuffer, Input.TexCoord);
+	float4 BlurredColor = tex2D(BlurBuffer, Input.TexCoord);
+	float4 WeightSample = tex2D(BlurMaskBuffer, Input.TexCoord);
+	/*
+	[branch]
+	if (WeightSample >= 0.999f)
+	{
+		Output.PixelColor = ColorSample;
+		return Output;
+	}
+	*/
+	BlurredColor.xyz *= BlurColor.xyz;
+	float4 WeightedBlur = lerp(ColorSample, BlurredColor, 1.0f - WeightSample.x);
+	Output.PixelColor = lerp(ColorSample, WeightedBlur, BlurFactor);
 
 	return Output;
 }

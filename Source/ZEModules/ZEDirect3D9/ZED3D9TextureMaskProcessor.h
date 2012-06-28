@@ -52,6 +52,8 @@ class ZETexture2DResource;
 class ZED3D9TextureMaskProcessor : public ZED3D9ComponentBase
 {
 	private:
+		float					MaskFactor;
+
 		const ZETexture2D*		MaskTexture;
 		ZEUInt					Adressing;
 
@@ -74,6 +76,12 @@ class ZED3D9TextureMaskProcessor : public ZED3D9ComponentBase
 
 		void					SetRenderer(ZEFrameRenderer* Renderer);
 		ZEFrameRenderer*		GetRenderer() const;
+
+		void					SetAdressing(ZEUInt Adress);
+		ZEUInt					GetAdressing() const;
+
+		void					SetMaskFactor(float Factor);
+		float					GetMaskFactor() const;
 
 		bool					SetMaskTexture(const ZEString& Path);
 		const ZETexture2D*		GetMaskTexture() const;

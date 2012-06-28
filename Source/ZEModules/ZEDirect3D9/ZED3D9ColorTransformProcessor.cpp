@@ -47,10 +47,11 @@
 #include <d3d9.h>
 #include <stdlib.h>
 
-const ZEMatrix4x4 ZEColorMatrix::Sepia = ZEMatrix4x4(	0.1495f, 0.1495f, 0.1495f, 0.0f,
-														0.2935f, 0.2935f, 0.2935f, 0.0f,
-														0.057f,  0.057f,  0.057f,  0.0f,
-														0.5f,    0.25f,   0.0f,    1.0f );
+
+const ZEMatrix4x4 ZEColorMatrix::Sepia = ZEMatrix4x4(	 0.393f, 0.769f, 0.198f, 0.0f,
+														 0.349f, 0.686f, 0.168f, 0.0f,
+														 0.272f, 0.534f, 0.131f, 0.0f,
+														 0.000f, 0.000f, 0.000f, 1.0f );
 
 const ZEMatrix4x4 ZEColorMatrix::BlackWhite = ZEMatrix4x4(	0.299f, 0.587f, 0.184f, 0.0f,     
 														  	0.299f, 0.587f, 0.184f, 0.0f,
@@ -76,11 +77,6 @@ const ZEMatrix4x4 ZEColorMatrix::Black = ZEMatrix4x4(	0.0f, 0.0f, 0.0f, 0.0f,
 														0.0f, 0.0f, 0.0f, 0.0f,
 														0.0f, 0.0f, 0.0f, 0.0f,
 														0.0f, 0.0f, 0.0f, 1.0f	);
-
-const ZEMatrix4x4 ZEColorMatrix::White = ZEMatrix4x4(	5.0f, 5.0f, 5.0f, 0.0f,
-														5.0f, 5.0f, 5.0f, 0.0f,
-														5.0f, 5.0f, 5.0f, 0.0f,
-														5.0f, 5.0f, 5.0f, 1.0f	);
 
 
 
@@ -114,20 +110,24 @@ ZED3D9ViewPort* ZED3D9ColorTransformProcessor::GetOutput()
 	return OutputBuffer;
 }
 
-void ZED3D9ColorTransformProcessor::SetColorMatrix(const ZEMatrix4x4* Matrix, float BlendFactor)
+void ZED3D9ColorTransformProcessor::SetColorMatrix(const ZEMatrix4x4* Matrix)
 {
-	this->Matrix = (ZEMatrix4x4*)Matrix;
-	this->BlendFactor = BlendFactor;
+	this->ColorMatrix = (ZEMatrix4x4*)Matrix;
 }
 
-float ZED3D9ColorTransformProcessor::GetBlendFactor()
+void ZED3D9ColorTransformProcessor::SetTransformFactor(float Factor)
 {
-	return BlendFactor;
+	TransformFactor = Factor;
+}
+
+float ZED3D9ColorTransformProcessor::GetTransformFactor()
+{
+	return TransformFactor;
 }
 
 ZEMatrix4x4* ZED3D9ColorTransformProcessor::GetColorMatrix()
 {
-	return Matrix;
+	return ColorMatrix;
 }
 
 void ZED3D9ColorTransformProcessor::Initialize()
@@ -144,8 +144,6 @@ void ZED3D9ColorTransformProcessor::Initialize()
 	// Compile Shaders
 	this->VertexShader = ZED3D9VertexShader::CreateShader("ColorTransformProcessor.hlsl", "vs_main", 0, "vs_3_0");
 	this->PixelShader = ZED3D9PixelShader::CreateShader("ColorTransformProcessor.hlsl", "ps_main", 0, "ps_3_0");
-
-	this->SetColorMatrix(&ZEColorMatrix::Identity, 1.0f);
 }
 
 void ZED3D9ColorTransformProcessor::Deinitialize()
@@ -153,9 +151,6 @@ void ZED3D9ColorTransformProcessor::Deinitialize()
 	Renderer		= NULL;
 	InputBuffer		= NULL;
 	OutputBuffer	= NULL;
-
-	BlendFactor		= 0;
-	this->SetColorMatrix(&ZEColorMatrix::Identity, 1.0f);
 
 	ZED3D_RELEASE(PixelShader);
 	ZED3D_RELEASE(VertexShader);
@@ -202,8 +197,8 @@ void ZED3D9ColorTransformProcessor::Process()
 	
 	
 	// Send the color matrix and pixel size
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(BlendFactor, 0.0f, 0.0f, 0.0f), 1);
-	GetDevice()->SetPixelShaderConstantF(1, (const float*)Matrix, 4);
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(TransformFactor, 0.0f, 0.0f, 0.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(1, (const float*)ColorMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / InputBuffer->GetWidth(), 1.0f / InputBuffer->GetHeight(), 0.0f, 0.0f), 1);
 
 	// Set input and output
@@ -226,7 +221,8 @@ ZED3D9ColorTransformProcessor::ZED3D9ColorTransformProcessor()
 	InputBuffer			= NULL;
 	OutputBuffer		= NULL;
 
-	BlendFactor			= 0;
+	TransformFactor		= 1.0f;
+	ColorMatrix			= (ZEMatrix4x4*)&ZEMatrix4x4::Identity;
 	
 }
 
