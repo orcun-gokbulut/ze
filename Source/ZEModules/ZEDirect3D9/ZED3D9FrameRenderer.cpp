@@ -758,9 +758,9 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 		GrainInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	GrainInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
 	
-	if(ZoomBlurInputBuffer == NULL)
-		ZoomBlurInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	ZoomBlurInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
+	if(BlurMaskInputBuffer == NULL)
+		BlurMaskInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	BlurMaskInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
 	
 	if(FogInputBuffer == NULL)
 		FogInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
@@ -794,7 +794,7 @@ void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 	ZED3D_DESTROY(SSAOBuffer);
 	ZED3D_DESTROY(TMInputBuffer);
 	ZED3D_DESTROY(HDRInputBuffer);
-	ZED3D_DESTROY(ZoomBlurInputBuffer);
+	ZED3D_DESTROY(BlurMaskInputBuffer);
 	/*
 	ZED3D_DESTROY(EDInputBuffer);
 	*/
@@ -828,7 +828,7 @@ ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 	SSAAInputBuffer = NULL;
 	// EDInputBuffer = NULL;
 	GrainInputBuffer = NULL;
-	ZoomBlurInputBuffer = NULL;
+	BlurMaskInputBuffer = NULL;
 	
 	LightningComponents.LightMeshVB = NULL;
 	LightningComponents.PointLightVS = NULL;
@@ -884,6 +884,10 @@ bool ZED3D9FrameRenderer::Initialize()
 	EDProcessor.Initialize();
 	*/
 
+	BMProcessor.SetRenderer(this);
+	BMProcessor.Initialize();
+	BMProcessor.SetBlurMaskTexture("resources\\BlurMask.png");
+
 	TMProcessor.SetRenderer(this);
 	TMProcessor.Initialize();
 	TMProcessor.SetMaskTexture("resources\\CrtMask.tga");
@@ -907,6 +911,7 @@ bool ZED3D9FrameRenderer::Initialize()
 
 void ZED3D9FrameRenderer::Deinitialize()
 {
+	BMProcessor.Deinitialize();
 	TMProcessor.Deinitialize();
 	HDRProcessor.Deinitialize();
 	SSAOProcessor.Deinitialize();
@@ -1067,14 +1072,24 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		
 		// Channel Disorientation Processor
 		CDProcessor.SetInput(CDInputBuffer);
-		CDProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
+		CDProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
 		CDProcessor.Process();
+
+		// Color Transform Process
+		CTProcessor.SetInput(CTInputBuffer);
+		CTProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
+		CTProcessor.Process();
 
 		// Grain
 		GrainProcessor.SetInput(GrainInputBuffer);
-		GrainProcessor.SetOutput((ZED3D9ViewPort*)TMInputBuffer->GetViewPort());
+		GrainProcessor.SetOutput((ZED3D9ViewPort*)BlurMaskInputBuffer->GetViewPort());
 		GrainProcessor.Process(ElaspedTime);
 		
+		// Blur Mask
+		BMProcessor.SetInput(BlurMaskInputBuffer);
+		BMProcessor.SetOutput((ZED3D9ViewPort*)TMInputBuffer->GetViewPort());
+		BMProcessor.Process();
+
 		// Texture mask
 		TMProcessor.SetInput(TMInputBuffer);
 		TMProcessor.SetOutput(ViewPort);
@@ -1097,7 +1112,6 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		SSAAProcessor.Process();
 		*/
 		
-
 		/*
 		// Edge Detection Process
 		EDProcessor.SetInputDepth(GBuffer1);
@@ -1105,13 +1119,6 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		EDProcessor.SetInputColor(EDInputBuffer);
 		EDProcessor.SetOutput(ViewPort);
 		EDProcessor.Process();
-		*/
-		
-		/*
-		// Color Transform Process
-		CTProcessor.SetInput(CTInputBuffer);
-		CTProcessor.SetOutput((ZED3D9ViewPort*)BlurInputBuffer->GetViewPort());
-		CTProcessor.Process();
 		*/
 		
 		/*

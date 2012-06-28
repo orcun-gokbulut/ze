@@ -58,14 +58,13 @@ class ZEColorMatrix : public ZEMatrix4x4
 		static const ZEMatrix4x4		Green;
 		static const ZEMatrix4x4		Blue;
 		static const ZEMatrix4x4		Black;
-		static const ZEMatrix4x4		White;
 };
 
 class ZED3D9ColorTransformProcessor : public ZED3D9ComponentBase
 {
 	private:
-		float							BlendFactor;
-		ZEMatrix4x4*					Matrix;
+		float							TransformFactor;
+		ZEMatrix4x4*					ColorMatrix;
 
 		ZED3D9FrameRenderer*			Renderer;
 
@@ -87,9 +86,12 @@ class ZED3D9ColorTransformProcessor : public ZED3D9ComponentBase
 		void							SetOutput(ZED3D9ViewPort* Texture);
 		ZED3D9ViewPort*					GetOutput();
 
-		void							SetColorMatrix(const ZEMatrix4x4* Matrix, float BlendFactor);
-		float							GetBlendFactor();
+		void							SetColorMatrix(const ZEMatrix4x4* Matrix);
 		ZEMatrix4x4*					GetColorMatrix();
+
+		void							SetTransformFactor(float Factor);
+		float							GetTransformFactor();
+		
 		
 		void							Initialize();
 		void							Deinitialize();

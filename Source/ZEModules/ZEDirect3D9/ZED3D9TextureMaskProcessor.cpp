@@ -49,6 +49,7 @@ ZED3D9TextureMaskProcessor::ZED3D9TextureMaskProcessor()
 {
 	Input = NULL;
 	Output = NULL;
+	MaskFactor = 0.8f;
 	MaskTexture = NULL;
 	PixelShader = NULL;
 	VertexShader = NULL;
@@ -95,6 +96,26 @@ void ZED3D9TextureMaskProcessor::SetRenderer(ZEFrameRenderer* Renderer)
 ZEFrameRenderer* ZED3D9TextureMaskProcessor::GetRenderer() const
 {
 	return (ZEFrameRenderer*)Renderer;
+}
+
+void ZED3D9TextureMaskProcessor::SetAdressing(ZEUInt Adress)
+{
+	Adressing = Adress;
+}
+
+ZEUInt ZED3D9TextureMaskProcessor::GetAdressing() const
+{
+	return Adressing;
+}
+
+void ZED3D9TextureMaskProcessor::SetMaskFactor(float Factor)
+{
+	MaskFactor = Factor;
+}
+
+float ZED3D9TextureMaskProcessor::GetMaskFactor() const
+{
+	return MaskFactor;
 }
 
 bool ZED3D9TextureMaskProcessor::SetMaskTexture(const ZEString& Path)
@@ -156,10 +177,10 @@ void ZED3D9TextureMaskProcessor::Process()
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	
-	float OutputWidth = Output->GetWidth();
-	float OutputHeight = Output->GetHeight();
-	float MaskWidth = MaskTexture->GetWidth();
-	float MaskHeight = MaskTexture->GetHeight();
+	float OutputWidth = (float)Output->GetWidth();
+	float OutputHeight = (float)Output->GetHeight();
+	float MaskWidth = (float)MaskTexture->GetWidth();
+	float MaskHeight = (float)MaskTexture->GetHeight();
 	float OutputMaskWidthRatio = OutputWidth / MaskWidth;
 	float OutputMaskHeightRatio = OutputHeight /MaskHeight;
 
@@ -179,14 +200,27 @@ void ZED3D9TextureMaskProcessor::Process()
 	Vertices[3].TexCoord[0] = OutputMaskWidthRatio;
 	Vertices[3].TexCoord[1] = OutputMaskHeightRatio;
 
-	struct 
+	struct VertexShaderParameters
 	{
 		float	PixelSizeInput[2];
 		float	PixelSizeMask[2];
 	
-	} VertexShaderParameters = {
+	} VSParameters = {
 	
 		{1.0f / OutputWidth, 1.0f / OutputHeight}, {1.0f / MaskWidth, 1.0f / MaskHeight}
+	};
+
+
+	struct PixelSahderParameters
+	{
+		float	MaskFactor;
+		float	Reserved0;
+		float	Reserved1;
+		float	Reserved2;
+
+	} PSParameters = {
+
+		MaskFactor, 0.0f, 0.0f, 0.0f
 	};
 
 	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
@@ -196,7 +230,8 @@ void ZED3D9TextureMaskProcessor::Process()
 	ZED3D9CommonTools::SetTexture(0, Input, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, MaskTexture, D3DTEXF_POINT, D3DTEXF_POINT, Adressing);
 
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&VertexShaderParameters, sizeof(VertexShaderParameters) / 16);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&VSParameters, sizeof(VertexShaderParameters) / 16);
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PSParameters, sizeof(PixelSahderParameters) / 16);
 
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 	

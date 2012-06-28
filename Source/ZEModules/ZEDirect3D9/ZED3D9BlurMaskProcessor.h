@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - TextureMaskProcessor.hlsl
+ Zinek Engine - ZED3D9BlurMaskProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,66 +33,77 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sampler2D 	ColorBuffer		: register (s0);
-sampler2D 	MaskBuffer		: register (s1);
+#pragma once
+#ifndef __ZE_D3D9_BLUR_MASK_PROCESSOR_H__
+#define __ZE_D3D9_BLUR_MASK_PROCESSOR_H__
 
-float4 		VSParameters	: register(vs, c0);
+#include "ZED3D9ComponentBase.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEDS\ZEString.h"
 
-#define		PixelSizeRT		VSParameters.xy
-#define		PixelSizeMask	VSParameters.zw
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
+class ZED3D9Texture2D;
+class ZETexture2D;
+class ZED3D9ViewPort;
+class ZEFrameRenderer;
+class ZED3D9FrameRenderer;
+class ZETexture2DResource;
 
-float4		PSParameters	: register(ps, c0);
-
-#define		MaskFactor		PSParameters.x
-
-
-struct VS_INPUT
+class ZED3D9BlurMaskProcessor : public ZED3D9ComponentBase
 {
-	float4 Position	: POSITION0;
-	float2 TexCoord : TEXCOORD0;
-	
+	private:
+		float					BlurFactor;
+		ZEVector3				BlurColor;
+
+		ZETexture2D*			DS2x;				// Downsampled to 1/4 color buffer
+		ZETexture2D*			DS2xBlurred;		// Downsampled to 1/4, blurred color buffer
+		ZETexture2D*			DS2xBlurredUS2x;	// Downsampled to 1/4, blurred, up sampled color buffer
+		const ZETexture2D*		BlurMaskTexture;
+
+		ZED3D9FrameRenderer*	Renderer;
+
+		ZED3D9VertexShader*		VertexShaderCommon;
+		ZED3D9PixelShader*		PixelShaderBlur;
+		ZED3D9PixelShader*		PixelShaderBlurMask;
+		ZED3D9PixelShader*		PixelShaderDownUpSample;
+
+		ZED3D9ViewPort*			Output;
+		ZED3D9Texture2D*		Input;
+		
+		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+
+
+		void					CreateRenderTargets();
+		void					DestroyRenderTargets();
+
+	public:
+								ZED3D9BlurMaskProcessor();
+								~ZED3D9BlurMaskProcessor();
+
+		void					Initialize();
+		void					Deinitialize();
+
+		void					SetRenderer(ZEFrameRenderer* Renderer);
+		ZEFrameRenderer*		GetRenderer() const;
+
+		void					SetBlurFactor(float Factor);
+		float					GetBlurFactor();
+		
+		void					SetBlurColor(const ZEVector3& Color);
+		ZEVector3				GetBlurColor();
+
+		bool					SetBlurMaskTexture(const ZEString& Path);
+		const ZETexture2D*		GetBlurMaskTexture() const;
+
+		void					SetInput(ZED3D9Texture2D* Texture);
+		ZED3D9Texture2D*		GetInput();
+
+		void					SetOutput(ZED3D9ViewPort* Texture);
+		ZED3D9ViewPort*			GetOutput();
+
+		void					Process();
+
 };
 
-struct VS_OUTPUT 
-{
-	float4 Position : POSITION0;
-	float2 TexCoordColor : TEXCOORD0;
-	float2 TexCoordMask : TEXCOORD1;
-};
-
-struct PS_INPUT
-{
-	float2 TexCoordColor : TEXCOORD0;
-	float2 TexCoordMask : TEXCOORD1;
-};
-
-struct PS_OUTPUT
-{
-	float4 PixelColor : COLOR0;
-};
-
-VS_OUTPUT vs_main(VS_INPUT Input)
-{
-	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
-   
-	Output.Position	= sign(Input.Position);
-
-	Output.TexCoordColor.x = 0.5f * (1.0f + Output.Position.x + PixelSizeRT.x);
-	Output.TexCoordColor.y = 0.5f * (1.0f - Output.Position.y + PixelSizeRT.y);
-	
-	Output.TexCoordMask = Input.TexCoord + (PixelSizeMask * 0.5f);
-
-	return Output;
-}
-
-PS_OUTPUT ps_main( PS_INPUT Input )
-{
-	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
-
-	Output.PixelColor = tex2D(ColorBuffer, Input.TexCoordColor);
-	float3 Masked = tex2D(MaskBuffer, Input.TexCoordMask).rgb * Output.PixelColor.rgb;
-	
-	Output.PixelColor.rgb = lerp(Output.PixelColor.rgb, Masked, MaskFactor);
-
-	return Output;
-}
+#endif // __ZE_D3D9_BLUR_MASK_PROCESSOR_H__
