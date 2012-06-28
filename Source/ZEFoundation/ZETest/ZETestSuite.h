@@ -38,6 +38,7 @@
 #define __ZE_TEST_SUITE_H__
 
 #include "ZETypes.h"
+#include "ZETestItem.h"
 
 class ZETestItem;
 enum ZETestResult;

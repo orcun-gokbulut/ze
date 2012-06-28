@@ -127,5 +127,9 @@ float ZEMath::Lerp(float A, float B, float Factor)
 
 float ZEMath::CopySign(float Value, float Sign)
 {
-	return (float)_copysign(Value, Sign);
+    #ifdef ZE_PLATFORM_MSVC
+        return (float)_copysign(Value, Sign);
+    #else
+        return copysignf(Value, Sign);
+    #endif
 }

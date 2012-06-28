@@ -40,8 +40,8 @@
 
 #include "ZEFile.h"
 #include "ZETypes.h"
-#include "ZEDS\ZEString.h"
-#include "zepartialfile.h"
+#include "ZEPartialFile.h"
+#include "ZEDS/ZEString.h"
 
 
 #define ZE_FILE_MAKEVERSION(Major, Minor)			((((ZEUInt32)(Major)) << 16) + (ZEUInt32)(Minor))

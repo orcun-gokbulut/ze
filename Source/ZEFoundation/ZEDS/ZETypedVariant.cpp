@@ -40,10 +40,11 @@
 //  All rights reserved.									 //
 ///////////////////////////////////////////////////////////////
 
-#include "ZEtypedvariant.h"
-#include <string.h>
+#include "ZETypedVariant.h"
 #include "ZEError.h"
+
 #include <string.h>
+
 #pragma warning(push)
 #pragma warning(disable:4482 4996)
 

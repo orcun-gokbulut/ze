@@ -35,10 +35,6 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-include_directories(
-	${PROJECT_SOURCE_DIR}
-	${CMAKE_SOURCE_DIR}/Source)
-
 ze_add_source(ZEIPAddress_Unix.cpp			Sources PLATFORMS Unix)	
 ze_add_source(ZEIPAddressTests_Windows.cpp	Tests PLATFORMS Windows)
 ze_add_source(ZEIPAddress_Windows.cpp		Sources PLATFORMS Windows)

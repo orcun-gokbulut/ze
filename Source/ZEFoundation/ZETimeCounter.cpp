@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETestTimer.h
+ Zinek Engine - ZETimeCounter.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,28 +33,59 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TEST_TIMER_H__
-#define __ZE_TEST_TIMER_H__
+#include "ZETimeCounter.h"
 
-#include "ZETypes.h"
-
-class ZETestTimer
-{
-	private:
-		ZEUInt64		StartTime;
-		ZEUInt64		EndTime;
-		ZEUInt64		Frequency;
-
-	public:
-		float			GetElapsedTime();
-		
-		void			Reset();
-
-		void			Start();
-		void			Stop();
-
-						ZETestTimer();
-};
-
+#ifdef ZE_PLATFORM_WINDOWS
+    #define WINDOWS_MEAN_AND_LEAN
+    #include <windows.h>
+#else
+    #include <time.h>
 #endif
+
+float ZETimeCounter::GetElapsedTime()
+{
+	return (float)((EndTime - StartTime) * 1000) / (float)Frequency;
+}
+
+void ZETimeCounter::Reset()
+{
+	StartTime = 0;
+	EndTime = 0;
+	Frequency = 1;
+}
+
+void ZETimeCounter::Start()
+{
+    #ifdef ZE_PLATFORM_WINDOWS
+        LARGE_INTEGER Temp;
+        QueryPerformanceFrequency(&Temp);
+        Frequency = Temp.QuadPart;
+
+        QueryPerformanceCounter(&Temp);
+        StartTime = Temp.QuadPart;
+    #else
+       timespec Temp;
+       clock_getres(CLOCK_REALTIME, &Temp);
+       Frequency = Temp.tv_nsec;
+       clock_gettime(CLOCK_REALTIME, &Temp);
+       StartTime = Temp.tv_nsec;
+    #endif
+}
+
+void ZETimeCounter::Stop()
+{
+    #ifdef ZE_PLATFORM_WINDOWS
+        LARGE_INTEGER Temp;
+        QueryPerformanceCounter(&Temp);
+        EndTime = Temp.QuadPart;
+    #else
+        timespec Temp;
+        clock_gettime(CLOCK_REALTIME, &Temp);
+        EndTime = Temp.tv_nsec;
+    #endif
+}
+
+ZETimeCounter::ZETimeCounter()
+{
+	Reset();
+}

@@ -37,7 +37,9 @@
 
 #include <string.h>
 #include <memory.h>
-#include <mbstring.h> 
+#ifdef ZE_PLATFORM_WINDOWS
+    #include <mbstring.h>
+#endif
 #include <wchar.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -705,7 +707,11 @@ ZEInt32 ZEString::ToInt32() const
 
 ZEInt64 ZEString::ToInt64() const
 {
-	return (ZEInt64)_atoi64(Buffer);
+    #ifdef ZE_PLATFORM_COMPILER_MSVC
+        return (ZEInt64)_atoi64(Buffer);
+    #else
+        return (ZEInt64)atoll(Buffer);
+    #endif
 }
 
 ZEUInt8 ZEString::ToUInt8() const
@@ -868,7 +874,7 @@ ZEString ZEString::Format(const char* Format, ...)
 	va_list List;
 	va_start(List, Format);
 	
-	ZESize Length = _vscprintf(Format, List);
+    ZESize Length = vsprintf(NULL, Format, List);
 	
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (Length + 1) * sizeof(char));

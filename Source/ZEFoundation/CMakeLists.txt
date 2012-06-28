@@ -39,12 +39,6 @@ project (ZEFoundation)
 
 ze_set_project_folder("ZEFoundation")
 
-include_directories(
-	${PROJECT_SOURCE_DIR} 
-	${PROJECT_SOURCE_DIR}/../Include)
-
-include_directories (${PROJECT_SOURCE_DIR})
-
 add_subdirectory(ZEDS)
 add_subdirectory(ZEMath)
 add_subdirectory(ZESerialization)
@@ -73,11 +67,13 @@ ze_add_source(ZESerialPort.h 		Sources Headers)
 ze_add_source(ZESerialPort.cpp 		Sources)
 ze_add_source(ZERandom.h 			Sources Headers)
 ze_add_source(ZERandom.cpp 			Sources)
+ze_add_source(ZETimeCounter.h		Headers)
+ze_add_source(ZETimeCounter.cpp		Sources)
 
 ze_add_library(ZEFoundation 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket ZEThread
+    LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket ZEThread
 	INSTALL
 	INSTALL_DESTINATION ZEFoundation
 	INSTALL_COMPONENT ZESDK)
