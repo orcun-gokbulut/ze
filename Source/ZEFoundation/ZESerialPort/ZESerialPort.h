@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMath.cpp
+ Zinek Engine - ZESerialPort.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,103 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath.h"
+#pragma once
+#ifndef __ZE_SERIAL_PORT__
+#define __ZE_SERIAL_PORT__
 
-#include <math.h>
+#include "ZETypes.h"
+#include "ZEDS/ZEString.h"
 
-float ZEMath::Sqrt(float Value)
+class ZESerialPort
 {
-	return sqrtf(Value);
-}
+	private:
+		union{
+			void*			Handle;
+			int				Port;
+		};
+		bool				Opened;
+		ZEString			PortName;
+		ZEUInt32			BaudRate;
+		ZEUInt32			TimeOut;
+	
+	public:
+		bool				IsOpen();
+		bool				Open(const ZEString& PortName, ZEUInt32 BaudRate);
+		void				Close();
 
-float ZEMath::Mod(float Value, float Modulus)
-{
-	return fmodf(Value, Modulus);
-}
+		const ZEString&		GetPortName();
+		ZEUInt32			GetBaudRate();
+		
+		void				SetTimeOut(ZEUInt32 Milliseconds);
+		ZEUInt32			GetTimeOut();
 
-float ZEMath::Log(float Value)
-{
-	return logf(Value);
-}
+		bool				Read(void* Buffer, ZESize BufferSize, ZESize &BytesRead);
+		bool				Write(const void* Data, ZESize DataSize, ZESize &BytesWritten);
 
-float ZEMath::Log10(float Value)
-{
-	return log10f(Value);
-}
+		bool				ReadPackage(void* Packet, ZESize PackageSize);
+		bool				WritePackage(const void* Packet, ZESize PackageSize);
 
-float ZEMath::Power(float Base, float Exponent)
-{
-	return powf(Base, Exponent);
-}
+		void				Clear();
 
-float ZEMath::Exp(float Exponent)
-{
-	return expf(Exponent);
-}
+							ZESerialPort();
+							~ZESerialPort();
+};
 
-float ZEMath::Floor(float Value)
-{
-	return floorf(Value);
-}
-
-float ZEMath::Ceil(float Value)
-{
-	return ceilf(Value);
-}
-
-float ZEMath::Round(float Value)
-{
-	return (float)(int)(Value + 0.5f);
-}
-
-bool ZEMath::IsValid(float Value)
-{
-	return Value == Value;
-}
-
-bool ZEMath::IsPowerOfTwo(ZEUInt Value)
-{
-	return ((Value & (Value - 1)) != 0)  ? false : true;
-}
-
-ZEUInt ZEMath::NextPowerOfTwo(ZEUInt Value)
-{
-	if(Value <= 1)
-		return 1;
-
-	Value = (Value >> 1)  | Value;
-	Value = (Value >> 2)  | Value;
-	Value = (Value >> 4)  | Value;
-	Value = (Value >> 8)  | Value;
-	Value = (Value >> 16) | Value;
-
-	return ((Value << 1) + 1) - Value;
-}
-
-ZEUInt ZEMath::PreviousPowerOfTwo(ZEUInt Value)
-{
-	if(Value <= 1)
-		return 1;
-
-	Value = (Value >> 1)  | Value;
-	Value = (Value >> 2)  | Value;
-	Value = (Value >> 4)  | Value;
-	Value = (Value >> 8)  | Value;
-	Value = (Value >> 16) | Value;
-
-	return Value - (Value >> 1);
-}
-
-float ZEMath::Lerp(float A, float B, float Factor)
-{
-	return A + (B - A) * Factor;
-}
-
-float ZEMath::CopySign(float Value, float Sign)
-{
-    #ifdef ZE_PLATFORM_COMPILER_MSVC
-        return (float)_copysign(Value, Sign);
-    #else
-        return copysignf(Value, Sign);
-    #endif
-}
+#endif

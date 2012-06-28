@@ -59,91 +59,6 @@ ZEUInt32 ZESerialPort::GetTimeOut()
 	return TimeOut;
 }
 
-bool ZESerialPort::IsOpen()
-{
-	return Handle != NULL;
-}
-
-bool ZESerialPort::Open(const ZEString& PortName, ZEUInt32 BaudRate)
-{
-	if (Handle != NULL)
-		Close();
-
-	Handle = CreateFile((const char*)PortName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
-	if (Handle == INVALID_HANDLE_VALUE)
-	{
-		//zeError("Can not create serial port.");
-		Close();
-		return false;
-	}
-
-	if(SetupComm(Handle, 1024, 1024) == 0)
-	{
-		//zeError("Can not configure serial port.");
-		Close();
-		return false;
-	}
-
-	DCB dcbConfig;
-	if (GetCommState(Handle, &dcbConfig) == 0)
-	{
-		//zeError("Can not configure serial port.");
-		Close();
-		return false;
-	}
-
-	dcbConfig.BaudRate = BaudRate;
-	dcbConfig.ByteSize = 8;
-	dcbConfig.Parity = NOPARITY;
-	dcbConfig.StopBits = ONESTOPBIT;
-	dcbConfig.fBinary = TRUE;
-	dcbConfig.fParity = TRUE;
-
-	if(!SetCommState(Handle, &dcbConfig))
-	{
-		//zeError("Can not configure serial port.");
-		Close();
-		return false;
-	}
-
-	COMMTIMEOUTS CommTimeout;
-	if (!GetCommTimeouts(Handle, &CommTimeout))
-	{
-		//zeError("Can not configure serial port.");
-		Close();
-		return false;
-	}
-
-	CommTimeout.ReadIntervalTimeout = MAXDWORD;
-	CommTimeout.ReadTotalTimeoutConstant = 0;
-	CommTimeout.ReadTotalTimeoutMultiplier = 0;
-	CommTimeout.WriteTotalTimeoutConstant = 0;
-	CommTimeout.WriteTotalTimeoutMultiplier = 0;
-
-	if (!SetCommTimeouts(Handle, &CommTimeout))
-	{
-		//zeError("Can not configure serial port.");
-		Close();
-		return false;
-	}
-
-	PurgeComm (Handle, PURGE_TXABORT | PURGE_TXCLEAR | PURGE_RXABORT | PURGE_RXCLEAR);
-
-	return true;
-}
-
-void ZESerialPort::Close()
-{
-	if (Handle == NULL)
-		return;
-
-	PurgeComm(Handle, PURGE_TXCLEAR | PURGE_RXCLEAR);
-	CloseHandle(Handle);
-	Handle = NULL;
-	BaudRate = 0;
-	PortName = "";
-}
-
 bool ZESerialPort::ReadPackage(void* Packet, ZESize PackageSize)
 {
 	ZESize TotalBytesRead = 0;
@@ -209,36 +124,6 @@ void ZESerialPort::Clear()
 			break;
 	}
 	while (BytesRead != 0);
-}
-
-
-bool ZESerialPort::Read(void* Data, ZESize DataSize, ZESize &BytesRead)
-{
-	unsigned long Temp;
-	if (!ReadFile(Handle, Data, (DWORD)DataSize, &Temp, NULL))
-		return false;
-
-	BytesRead = (ZESize)Temp;
-
-	return true;
-}
-
-bool ZESerialPort::Write(const void* Data, ZESize DataSize, ZESize &BytesWritten)
-{
-	DWORD Temp;
-	if (!WriteFile(Handle, Data, (DWORD)DataSize, &Temp, NULL))
-		return false;
-
-	BytesWritten = (ZESize)Temp;
-
-	return true;
-}
-
-ZESerialPort::ZESerialPort()
-{
-	Handle = NULL;
-	BaudRate = 0;
-	TimeOut = 1000;
 }
 
 ZESerialPort::~ZESerialPort()

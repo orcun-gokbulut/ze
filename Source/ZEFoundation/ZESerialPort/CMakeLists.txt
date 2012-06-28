@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZESerialPort.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,46 +30,20 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_SERIAL_PORT__
-#define __ZE_SERIAL_PORT__
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
+ze_add_source(ZESerialPort.h				Sources Headers)
+ze_add_source(ZESerialPort.cpp				Sources)
+ze_add_source(ZESerialPort_Windows.cpp		Sources PLATFORMS Windows)
+ze_add_source(ZESerialPort_Unix.cpp			Sources PLATFORMS Unix)
 
-class ZESerialPort
-{
-	private:
-		void*				Handle;
-		bool				Opened;
-		ZEString			PortName;
-		ZEUInt32			BaudRate;
-		ZEUInt32			TimeOut;
-	
-	public:
-		bool				IsOpen();
-		bool				Open(const ZEString& PortName, ZEUInt32 BaudRate);
-		void				Close();
-
-		const ZEString&		GetPortName();
-		ZEUInt32			GetBaudRate();
-		
-		void				SetTimeOut(ZEUInt32 Milliseconds);
-		ZEUInt32			GetTimeOut();
-
-		bool				Read(void* Buffer, ZESize BufferSize, ZESize &BytesRead);
-		bool				Write(const void* Data, ZESize DataSize, ZESize &BytesWritten);
-
-		bool				ReadPackage(void* Packet, ZESize PackageSize);
-		bool				WritePackage(const void* Packet, ZESize PackageSize);
-
-		void				Clear();
-
-							ZESerialPort();
-							~ZESerialPort();
-};
-
-#endif
+ze_add_library(ZESerialPort 
+	SOURCES ${Sources} 
+	HEADERS ${Headers}
+	LIBS ZEFoundation
+	INSTALL
+	INSTALL_DESTINATION ZEFoundation/ZESerialPort
+	INSTALL_COMPONENT ZESDK)
