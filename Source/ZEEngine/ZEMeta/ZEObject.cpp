@@ -224,7 +224,7 @@ bool ZEObject::CallMethod(const char* MethodName, const ZEVariant* Parameters, Z
 	return false;
 }
 
-bool ZEObject::CallMethod(ZEInt MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
+bool ZEObject::CallMethod(ZESSize MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
 {
 	return CallMethod(MethodId, Parameters.GetConstCArray(), Parameters.GetCount(), ReturnValue);
 }
