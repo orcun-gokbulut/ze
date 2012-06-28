@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9TextureMaskProcessor.cpp
+ Zinek Engine - ZED3D9ZoomBlurProcessor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,134 +38,141 @@
 #include "ZED3D9Profiler.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9CommonTools.h"
-#include "ZED3D9TextureMaskProcessor.h"
+#include "ZED3D9ZoomBlurProcessor.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZETexture/ZETexture2DResource.h"
 
 
-ZED3D9TextureMaskProcessor::ZED3D9TextureMaskProcessor()
+ZED3D9ZoomBlurProcessor::ZED3D9ZoomBlurProcessor()
 {
+	Start = 0.3f;		
+	Strength = 0.1f;
+	TransitionOffset = 0.15f;
+	Center = ZEVector2(0.5f, 0.5f);
+
 	Input = NULL;
 	Output = NULL;
 	Renderer = NULL;
-	MaskFactor = 0.8f;
-	MaskTexture = NULL;
 	PixelShader = NULL;
 	VertexShader = NULL;
 	VertexDeclaration = NULL;
-
-	Adressing = D3DTADDRESS_WRAP;
 }
 
-ZED3D9TextureMaskProcessor::~ZED3D9TextureMaskProcessor()
+ZED3D9ZoomBlurProcessor::~ZED3D9ZoomBlurProcessor()
 {
 	this->Deinitialize();
 }
 
-void ZED3D9TextureMaskProcessor::Initialize()
+void ZED3D9ZoomBlurProcessor::Initialize()
 {
 	D3DVERTEXELEMENT9 Declaration[] = 
 	{
 		{0,  0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-		{0,  16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
 		D3DDECL_END()
 	};
 
 	GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
 
-	VertexShader = ZED3D9VertexShader::CreateShader("TextureMaskProcessor.hlsl", "vs_main", 0, "vs_3_0");
-	PixelShader = ZED3D9PixelShader::CreateShader("TextureMaskProcessor.hlsl", "ps_main", 0, "ps_3_0");
+	VertexShader = ZED3D9VertexShader::CreateShader("ZoomBlurProcessor.hlsl", "vs_main", 0, "vs_3_0");
+	PixelShader = ZED3D9PixelShader::CreateShader("ZoomBlurProcessor.hlsl", "ps_main", 0, "ps_3_0");
 }
 
-void ZED3D9TextureMaskProcessor::Deinitialize()
+void ZED3D9ZoomBlurProcessor::Deinitialize()
 {
 	Input = NULL;
 	Output = NULL;
+	Renderer = NULL;
 
 	ZED3D_RELEASE(PixelShader);
 	ZED3D_RELEASE(VertexShader);
 	ZED3D_RELEASE(VertexDeclaration);
 }
 
-void ZED3D9TextureMaskProcessor::SetRenderer(ZEFrameRenderer* Renderer)
+void ZED3D9ZoomBlurProcessor::SetRenderer(ZEFrameRenderer* Renderer)
 {
 	this->Renderer = (ZED3D9FrameRenderer*)Renderer;
 }
 
-ZEFrameRenderer* ZED3D9TextureMaskProcessor::GetRenderer() const
+ZEFrameRenderer* ZED3D9ZoomBlurProcessor::GetRenderer() const
 {
 	return (ZEFrameRenderer*)Renderer;
 }
 
-void ZED3D9TextureMaskProcessor::SetAdressing(ZEUInt Adress)
+void ZED3D9ZoomBlurProcessor::SetStart(float Value)
 {
-	Adressing = Adress;
+	Start = Value;
 }
 
-ZEUInt ZED3D9TextureMaskProcessor::GetAdressing() const
+float ZED3D9ZoomBlurProcessor::GetStart() const
 {
-	return Adressing;
+	return Start;
 }
 
-void ZED3D9TextureMaskProcessor::SetMaskFactor(float Factor)
+void ZED3D9ZoomBlurProcessor::SetStrength(float Value)
 {
-	MaskFactor = Factor;
+	Strength = Value;
 }
 
-float ZED3D9TextureMaskProcessor::GetMaskFactor() const
+float ZED3D9ZoomBlurProcessor::GetStrength() const
 {
-	return MaskFactor;
+	return Strength;
 }
 
-bool ZED3D9TextureMaskProcessor::SetMaskTexture(const ZEString& Path)
+void ZED3D9ZoomBlurProcessor::SetTransitionOffset(float Value)
 {
-	static ZETextureOptions MaskOptions = {ZE_TCT_AUTO, ZE_TCQ_HIGH, ZE_TDS_NONE, ZE_TFC_DISABLED, ZE_TMM_DISABLED, 1};
-	MaskTexture = ZETexture2DResource::LoadResource(Path, &MaskOptions)->GetTexture();
-
-	return MaskTexture != NULL;
+	TransitionOffset = Value;
 }
 
-const ZETexture2D* ZED3D9TextureMaskProcessor::GetMaskTexture() const
+float ZED3D9ZoomBlurProcessor::GetTransitionOffset() const
 {
-	return MaskTexture;
+	return TransitionOffset;
 }
 
-void ZED3D9TextureMaskProcessor::SetInput(ZED3D9Texture2D* Texture)
+void ZED3D9ZoomBlurProcessor::SetCenter(const ZEVector2& Value)
+{
+	Center = Value;
+}
+
+ZEVector2 ZED3D9ZoomBlurProcessor::GetCenter() const
+{
+	return Center;
+}
+
+void ZED3D9ZoomBlurProcessor::SetInput(ZED3D9Texture2D* Texture)
 {
 	Input = Texture;
 }
 
-ZED3D9Texture2D* ZED3D9TextureMaskProcessor::GetInput()
+ZED3D9Texture2D* ZED3D9ZoomBlurProcessor::GetInput()
 {
 	return Input;
 }
 
-void ZED3D9TextureMaskProcessor::SetOutput(ZED3D9ViewPort* Texture)
+void ZED3D9ZoomBlurProcessor::SetOutput(ZED3D9ViewPort* Texture)
 {
 	Output = Texture;
 }
 
-ZED3D9ViewPort* ZED3D9TextureMaskProcessor::GetOutput()
+ZED3D9ViewPort* ZED3D9ZoomBlurProcessor::GetOutput()
 {
 	return Output;
 }
 
-void ZED3D9TextureMaskProcessor::Process()
+void ZED3D9ZoomBlurProcessor::Process()
 {
 	
 	static struct Vert  
 	{
 		float Position[4];
-		float TexCoord[2];
 
 	} Vertices[] = {
 
-		{ {-1.0f,  1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },	// TopLeft
-		{ { 1.0f,  1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },	// TopRight
-		{ {-1.0f, -1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },	// BottomLeft
-		{ { 1.0f, -1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} }	// BottomRight
+		{-1.0f,  1.0f, 1.0f, 1.0f},	// TopLeft
+		{ 1.0f,  1.0f, 1.0f, 1.0f},	// TopRight
+		{-1.0f, -1.0f, 1.0f, 1.0f},	// BottomLeft
+		{ 1.0f, -1.0f, 1.0f, 1.0f}	// BottomRight
 	};
 
 	GetDevice()->SetVertexDeclaration(VertexDeclaration);
@@ -177,51 +184,35 @@ void ZED3D9TextureMaskProcessor::Process()
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	
-	float OutputWidth = (float)Output->GetWidth();
-	float OutputHeight = (float)Output->GetHeight();
-	float MaskWidth = (float)MaskTexture->GetWidth();
-	float MaskHeight = (float)MaskTexture->GetHeight();
-	float OutputMaskWidthRatio = OutputWidth / MaskWidth;
-	float OutputMaskHeightRatio = OutputHeight /MaskHeight;
-
-	// TopLeft
-	Vertices[0].TexCoord[0] = 0.0f;
-	Vertices[0].TexCoord[1] = 0.0f;
-
-	// TopRight
-	Vertices[1].TexCoord[0] = OutputMaskWidthRatio;
-	Vertices[1].TexCoord[1] = 0.0f;
-
-	// BottomLeft
-	Vertices[2].TexCoord[0] = 0.0f;
-	Vertices[2].TexCoord[1] = OutputMaskHeightRatio;
-	
-	// BottomRight
-	Vertices[3].TexCoord[0] = OutputMaskWidthRatio;
-	Vertices[3].TexCoord[1] = OutputMaskHeightRatio;
 
 	struct VertexShaderParameters
 	{
-		float	PixelSizeInput[2];
-		float	PixelSizeMask[2];
-	
+		float	PixelSize[2];
+
+		float	Reserved0;
+		float	Reserved1;
+		
 	} VSParameters = {
 	
-		{1.0f / OutputWidth, 1.0f / OutputHeight}, {1.0f / MaskWidth, 1.0f / MaskHeight}
+		{1.0f / (float)Output->GetWidth(), 1.0f / (float)Output->GetHeight()}, 0.0f, 0.0f
 	};
 
 
 	struct PixelSahderParameters
 	{
-		float	MaskFactor;
+		float	Start;
+		float	Strength;
+		float	TransitionOffset;
 		float	Reserved0;
+
+		float	Center[2];
 		float	Reserved1;
 		float	Reserved2;
 
 	} PSParameters = {
 
-		MaskFactor, 0.0f, 0.0f, 0.0f
+		Start, Strength, TransitionOffset, 0.0f,
+		{Center.x, Center.y}, 0.0f, 0.0f
 	};
 
 	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
@@ -229,11 +220,9 @@ void ZED3D9TextureMaskProcessor::Process()
 
 	ZED3D9CommonTools::SetRenderTarget(0, Output);
 	ZED3D9CommonTools::SetTexture(0, Input, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
-	ZED3D9CommonTools::SetTexture(1, MaskTexture, D3DTEXF_POINT, D3DTEXF_POINT, Adressing);
 
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&VSParameters, sizeof(VertexShaderParameters) / 16);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PSParameters, sizeof(PixelSahderParameters) / 16);
 
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
-	
 }

@@ -125,6 +125,9 @@ ze_add_source(ZED3D9VertexDeclaration.cpp				Sources)
 ze_add_source(ZED3D9VertexDeclaration.h					Sources)
 ze_add_source(ZED3D9ViewPort.cpp						Sources)
 ze_add_source(ZED3D9ViewPort.h							Sources)
+ze_add_source(ZED3D9ZoomBlurProcessor.cpp				Sources)
+ze_add_source(ZED3D9ZoomBlurProcessor.h					Sources)
+
 
 ze_add_library(ZEDirect3D9 
 	SOURCES ${Sources}

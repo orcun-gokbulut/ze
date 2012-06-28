@@ -58,7 +58,7 @@ ZED3D9BlurMaskProcessor::ZED3D9BlurMaskProcessor()
 	VertexShaderCommon = NULL;
 	BlurMaskTexture = NULL;
 	VertexDeclaration = NULL;
-	BlurColor = ZEVector3(0.5f, 0.0f, 0.5f);
+	BlurColor = ZEVector3::One;
 }
 
 ZED3D9BlurMaskProcessor::~ZED3D9BlurMaskProcessor()
