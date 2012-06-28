@@ -222,17 +222,19 @@ function(ze_add_executable)
 	# Copy dependecies
 	if (PARAMETER_PLUGIN)
 	else()
-		FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Platform/${ZEBUILD_PLATFORM}/${ZEBUILD_PLATFORM_ARCHITECTURE}/Dll/*.dll" A)
-		FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Platform/${ZEBUILD_PLATFORM}/${ZEBUILD_PLATFORM_ARCHITECTURE}/Dll/$(ConfigurationName)/*.dll" B)
-		FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/$(ConfigurationName)" C)
-		add_custom_command(
-			TARGET ${PARAMETER_TARGET}
-			COMMAND "copy" 
-			ARGS "${A}" "${C}")
-		add_custom_command(
-			TARGET ${PARAMETER_TARGET}
-			COMMAND "copy" 
-			ARGS "${B}" "${C}")
+        if (ZEBUILD_PLATFORM_WINDOWS)
+            FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Platform/${ZEBUILD_PLATFORM}/${ZEBUILD_PLATFORM_ARCHITECTURE}/Dll/*.dll" A)
+            FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Platform/${ZEBUILD_PLATFORM}/${ZEBUILD_PLATFORM_ARCHITECTURE}/Dll/$(ConfigurationName)/*.dll" B)
+            FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/$(ConfigurationName)" C)
+            add_custom_command(
+                TARGET ${PARAMETER_TARGET}
+                COMMAND "copy"
+                ARGS "${A}" "${C}")
+            add_custom_command(
+                TARGET ${PARAMETER_TARGET}
+                COMMAND "copy"
+                ARGS "${B}" "${C}")
+        endif()
 	endif()
 		
 	# Debug
