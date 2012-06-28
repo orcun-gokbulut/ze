@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETestTimer.cpp
+ Zinek Engine - ZETimeCounter.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETestTimer.h"
+#pragma once
+#ifndef __ZE_TIME_COUNTER_H__
+#define __ZE_TIME_COUNTER_H__
 
-#define WINDOWS_MEAN_AND_LEAN
-#include <windows.h>
+#include "ZETypes.h"
 
-float ZETestTimer::GetElapsedTime()
+class ZETimeCounter
 {
-	return (float)((EndTime - StartTime) * 1000) / (float)Frequency;
-}
+	private:
+		ZEUInt64		StartTime;
+		ZEUInt64		EndTime;
+		ZEUInt64		Frequency;
 
-void ZETestTimer::Reset()
-{
-	StartTime = 0;
-	EndTime = 0;
-	Frequency = 1;
-}
+	public:
+		float			GetElapsedTime();
+		
+		void			Reset();
 
-void ZETestTimer::Start()
-{
-	LARGE_INTEGER Temp;
-	QueryPerformanceFrequency(&Temp);
-	Frequency = Temp.QuadPart;
+		void			Start();
+		void			Stop();
 
-	QueryPerformanceCounter(&Temp);
-	StartTime = Temp.QuadPart;
-}
+                        ZETimeCounter();
+};
 
-void ZETestTimer::Stop()
-{
-	LARGE_INTEGER Temp;
-	QueryPerformanceCounter(&Temp);
-	EndTime = Temp.QuadPart;
-}
-
-ZETestTimer::ZETestTimer()
-{
-	Reset();
-}
+#endif

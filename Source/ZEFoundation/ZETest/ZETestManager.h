@@ -37,11 +37,12 @@
 #ifndef __ZE_TEST_MANAGER_H__
 #define __ZE_TEST_MANAGER_H__
 
+#include "ZETestManager.h"
+#include "ZETestItem.h"
 #include "ZETypes.h"
 
 class ZETestSuiteItem;
 class ZETestItem;
-enum ZETestProblemType;
 
 class ZETestManager
 {

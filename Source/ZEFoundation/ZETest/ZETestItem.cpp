@@ -36,7 +36,7 @@
 #include "ZETestItem.h"
 #include "ZETestSuite.h"
 #include "ZETestManager.h"
-#include "ZETestTimer.h"
+#include "ZETimeCounter.h"
 #include "ZEError.h"
 
 #include <stdio.h>
@@ -122,7 +122,7 @@ bool ZETestItem::RunTest()
 	__coveragescanner_testname(Buffer);
 	#endif
 
-	ZETestTimer Timer;
+    ZETimeCounter Timer;
 	try
 	{
 		Timer.Start();

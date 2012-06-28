@@ -37,8 +37,8 @@
 #ifndef	__ZE_IP_ADDRESS_H__
 #define __ZE_IP_ADDRESS_H__
 #include "ZETypes.h"
-#include "ZEDS\ZEString.h"
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 
 enum ZEIPAddressType
 {
