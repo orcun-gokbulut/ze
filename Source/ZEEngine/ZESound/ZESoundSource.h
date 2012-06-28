@@ -177,12 +177,12 @@ ZE_POST_PROCESSOR_START(Meta)
 	<meta> 
 		<class name="ZESoundSource" noinstance="true" parent="ZEEntity">
 			<description>Sound Source</description>
-			<property name="CurrentPosition" type="integer32" autogetset="yes">
+			<property name="CurrentPosition" type="uinteger32" autogetset="yes">
 				<constraints>
 					<minvalue value="0"/>
 				</constraints>
 			</property>
-			<property name="Volume" type="integer32" autogetset="yes">
+			<property name="Volume" type="uinteger32" autogetset="yes">
 				<constraints>
 					<minvalue value="ZE_SS_VOLUME_MIN"/>
 					<maxvalue value="ZE_SS_VOLUME_MAX"/>
@@ -202,8 +202,8 @@ ZE_POST_PROCESSOR_START(Meta)
 			</property>
 			<property name="Looping" type="boolean" autogetset="yes"/>
 			<property name="LimitsEnabled" type="boolean" autogetset="yes"/>
-			<property name="StartPosition" type="integer32" autogetset="yes"/>
-			<property name="EndPosition" type="integer32" autogetset="yes"/>
+			<property name="StartPosition" type="uinteger32" autogetset="yes"/>
+			<property name="EndPosition" type="uinteger32" autogetset="yes"/>
 			<property name="SoundSourceState" type="integer32" autogetset="yes">
 				<enumurator name="ZESoundSourceState">
 					<item name="Playing" value="ZE_SSS_PLAYING"/>
@@ -211,7 +211,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Paused" value="ZE_SSS_PAUSED"/>
 				</enumurator>
 			</property>
-			<method name="Play" auto="true" description="Starts playing sound sample from the begining."/>
+			<method name="Play" auto="true" description="Starts playing sound sample from the beginning."/>
 			<method name="Resume" auto="true" description="Starts playing sound sample from paused time."/>
 			<method name="Pause" auto="true" description="Pauses sound sample."/>
 			<method name="Stop" auto="true" description="Stops sound sample."/>
