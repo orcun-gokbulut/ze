@@ -45,10 +45,13 @@ add_subdirectory(ZESerialization)
 add_subdirectory(ZEStateMachine)
 add_subdirectory(ZEFile)
 add_subdirectory(ZESpatial)
+add_subdirectory(ZESerialPort)
 add_subdirectory(ZETest)
 add_subdirectory(ZEThread)
 add_subdirectory(ZESocket)
 
+ze_add_source(ZEDLL.h 				Sources Headers)
+ze_add_source(ZEDLL.cpp 			Sources)
 ze_add_source(ZECommon.h 			Sources Headers)
 ze_add_source(ZECommon.cpp 			Sources)
 ze_add_source(ZETypes.h 			Sources Headers)
@@ -63,8 +66,6 @@ ze_add_source(ZELog.h				Sources Headers)
 ze_add_source(ZELog.cpp				Sources)
 ze_add_source(ZEPacking.h 			Sources Headers)
 ze_add_source(ZEPacking.cpp 		Sources)
-ze_add_source(ZESerialPort.h 		Sources Headers)
-ze_add_source(ZESerialPort.cpp 		Sources)
 ze_add_source(ZERandom.h 			Sources Headers)
 ze_add_source(ZERandom.cpp 			Sources)
 ze_add_source(ZETimeCounter.h		Headers)
@@ -73,7 +74,7 @@ ze_add_source(ZETimeCounter.cpp		Sources)
 ze_add_library(ZEFoundation 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-    LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket ZEThread
+    LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket ZEThread ZESerialPort
 	INSTALL
 	INSTALL_DESTINATION ZEFoundation
 	INSTALL_COMPONENT ZESDK)
