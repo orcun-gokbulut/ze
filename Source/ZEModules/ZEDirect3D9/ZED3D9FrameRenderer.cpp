@@ -762,6 +762,10 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 		ZoomBlurInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	ZoomBlurInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
 
+	if(UnsharpenInputBuffer == NULL)
+		UnsharpenInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	UnsharpenInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
+
 	if(BlurMaskInputBuffer == NULL)
 		BlurMaskInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	BlurMaskInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_I8_4, true);
@@ -800,6 +804,7 @@ void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 	ZED3D_DESTROY(HDRInputBuffer);
 	ZED3D_DESTROY(BlurMaskInputBuffer);
 	ZED3D_DESTROY(ZoomBlurInputBuffer);
+	ZED3D_DESTROY(UnsharpenInputBuffer);
 	/*
 	ZED3D_DESTROY(EDInputBuffer);
 	*/
@@ -834,6 +839,7 @@ ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 	SSAAInputBuffer = NULL;
 	// EDInputBuffer = NULL;
 	GrainInputBuffer = NULL;
+	UnsharpenInputBuffer = NULL;
 	BlurMaskInputBuffer = NULL;
 	
 	LightningComponents.LightMeshVB = NULL;
@@ -890,6 +896,9 @@ bool ZED3D9FrameRenderer::Initialize()
 	EDProcessor.Initialize();
 	*/
 
+	UnsharpenProcessor.SetRenderer(this);
+	UnsharpenProcessor.Initialize();
+
 	ZoomBlurProcessor.SetRenderer(this);
 	ZoomBlurProcessor.Initialize();
 
@@ -928,6 +937,7 @@ void ZED3D9FrameRenderer::Deinitialize()
 	MLAAProcessor.Deinitialize();
 	CDProcessor.Deinitialize();
 	ZoomBlurProcessor.Deinitialize();
+	UnsharpenProcessor.Deinitialize();
 	/*
 	EDProcessor.Deinitialize();
 	*/
@@ -1079,13 +1089,18 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 
 		// HDR Process
 		HDRProcessor.SetInput(HDRInputBuffer);
-		HDRProcessor.SetOutput((ZED3D9ViewPort*)ZoomBlurInputBuffer->GetViewPort());
+		HDRProcessor.SetOutput((ZED3D9ViewPort*)UnsharpenInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);
 
+		UnsharpenProcessor.SetInput(UnsharpenInputBuffer);
+		UnsharpenProcessor.SetOutput(ViewPort);
+		UnsharpenProcessor.Process();
+
+		/*
 		ZoomBlurProcessor.SetInput(ZoomBlurInputBuffer);
 		ZoomBlurProcessor.SetOutput(ViewPort);
 		ZoomBlurProcessor.Process();
-
+		*/
 
 		/*
 		// Channel Disorientation Processor
@@ -1095,17 +1110,16 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		*/
 
 		/*
-		// Color Transform Process
-		CTProcessor.SetInput(CTInputBuffer);
-		CTProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
-		CTProcessor.Process();
-		*/
-
-		/*
 		// Grain
 		GrainProcessor.SetInput(GrainInputBuffer);
-		GrainProcessor.SetOutput((ZED3D9ViewPort*)BlurMaskInputBuffer->GetViewPort());
+		GrainProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
 		GrainProcessor.Process(ElaspedTime);
+		*/
+		/*
+		// Color Transform Process
+		CTProcessor.SetInput(CTInputBuffer);
+		CTProcessor.SetOutput(ViewPort);
+		CTProcessor.Process();
 		*/
 
 		/*

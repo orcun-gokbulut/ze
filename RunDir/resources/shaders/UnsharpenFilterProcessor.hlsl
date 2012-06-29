@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ColorTransformProcessor.hlsl
+ Zinek Engine - UnsharpenFilterProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,58 +33,84 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sampler2D 	TextureInput	 		: register(s6);
-float2 		PixelSize				: register(vs, c0);
-float		BlendFactor			 	: register(ps, c0);
-float4x4	ColorTransformMatrix 	: register(ps, c1);
+sampler2D 	ColorBuffer		: register (s0);
 
-// Vertex Shader Input Struct
+float4 		VSParameters	: register(vs, c0);
+
+#define		PixelSize		VSParameters.xy
+
+
 struct VS_INPUT
 {
-	float4 Position  : POSITION0;
-	float2 Texcoord  : TEXCOORD0;
-
+	float4 Position	: POSITION0;
+	
 };
 
-// Vertex Shader Output Struct
 struct VS_OUTPUT 
 {
-	float4 	Position   : POSITION0;
-	float2 	Texcoord   : TEXCOORD0;
+	float4 Position : POSITION0;
+	float2 TexCoord : TEXCOORD0;
 };
 
-// Pixel Shader Input Struct
 struct PS_INPUT
 {
-	float2 	TexCoord  : TEXCOORD0;   
+	float2 TexCoord : TEXCOORD0;
 };
 
-// Pixel Shader Output Struct
 struct PS_OUTPUT
 {
 	float4 PixelColor : COLOR0;
 };
 
-// Vertex Shader Main
-VS_OUTPUT vs_main( VS_INPUT Input )
+VS_OUTPUT vs_main(VS_INPUT Input)
 {
-	VS_OUTPUT Output;
-	
-	Output.Position = float4(sign(Input.Position).xy, 0.0f, 1.0f);
-	Output.Texcoord.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
-	Output.Texcoord.y = 0.5f * (1.0f - Output.Position.y + PixelSize.y);
+	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
+   
+	Output.Position	= sign(Input.Position);
+
+	Output.TexCoord.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
+	Output.TexCoord.y = 0.5f * (1.0f - Output.Position.y + PixelSize.y);
 
 	return Output;
 }
 
+static const float4 OffsetTable[9] = 
+{
+   -1.0f, -1.0f, 0.0f, 1.0f / 9.0f,
+    0.0f, -1.0f, 0.0f, 1.0f / 9.0f,
+    1.0f, -1.0f, 0.0f, 1.0f / 9.0f,
+   
+   -1.0f,  0.0f, 0.0f, 1.0f / 9.0f,
+    0.0f,  0.0f, 0.0f, 1.0f / 9.0f,
+    1.0f,  0.0f, 0.0f, 1.0f / 9.0f,
+   
+   -1.0f,  1.0f, 0.0f, 1.0f / 9.0f,
+    0.0f,  1.0f, 0.0f, 1.0f / 9.0f,
+    1.0f,  1.0f, 0.0f, 1.0f / 9.0f
+};
+
+float4 GetBlurredPixel(float2 Coord)
+{
+	float4 Color = (float4)0.0f;
+
+	for (int I = 0; I < 9; ++I)
+	{
+		Color += tex2D(ColorBuffer, Coord + OffsetTable[I].xy * PixelSize) * OffsetTable[I].w;
+	}
+  
+	return Color;
+}
+
 PS_OUTPUT ps_main( PS_INPUT Input )
 {
-	PS_OUTPUT Output;
-	Output.PixelColor = (float4)0.0f;
-	
-	float4 SampleColor = tex2D(TextureInput, Input.TexCoord);
-	float4 TransformedColor = mul(ColorTransformMatrix, float4(SampleColor.xyz, 1.0f));
-	Output.PixelColor = lerp(SampleColor, TransformedColor, BlendFactor);
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
+   
+	float4 Sample = tex2D(ColorBuffer, Input.TexCoord);
+	float4 Blurred = GetBlurredPixel(Input.TexCoord);
+   
+	float4 Difference = Sample - Blurred;
+  
+	Output.PixelColor = Sample + Difference;
 	
 	return Output;
 }

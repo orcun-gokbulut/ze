@@ -47,15 +47,30 @@
 #include <d3d9.h>
 #include <stdlib.h>
 
+const ZEMatrix4x4 ZEColorMatrix::Normal = ZEMatrix4x4(   1.0f, 0.0f, 0.0f, 0.0f,
+														0.0f, 1.0f, 0.0f, 0.0f,
+														0.0f, 0.0f, 1.0f, 0.0f,
+														0.0f, 0.0f, 0.0f, 1.0f );
+
+
+const ZEMatrix4x4 ZEColorMatrix::Inverse = ZEMatrix4x4(	-1.0f,  0.0f,  0.0f, 1.0f,
+														 0.0f, -1.0f,  0.0f, 1.0f,
+														 0.0f,  0.0f, -1.0f, 1.0f,
+														 0.0f,  0.0f,  0.0f, 1.0f );
+
+const ZEMatrix4x4 ZEColorMatrix::NightVision = ZEMatrix4x4(	0.0f, 0.000f, 0.0f, 0.0f,
+															0.0f, 1.500f, 0.0f, 0.0f,
+															0.0f, 0.000f, 0.0f, 0.0f,
+															0.0f, 0.000f, 0.0f, 1.0f );
 
 const ZEMatrix4x4 ZEColorMatrix::Sepia = ZEMatrix4x4(	 0.393f, 0.769f, 0.198f, 0.0f,
 														 0.349f, 0.686f, 0.168f, 0.0f,
 														 0.272f, 0.534f, 0.131f, 0.0f,
 														 0.000f, 0.000f, 0.000f, 1.0f );
 
-const ZEMatrix4x4 ZEColorMatrix::BlackWhite = ZEMatrix4x4(	0.299f, 0.587f, 0.184f, 0.0f,     
+const ZEMatrix4x4 ZEColorMatrix::BlackWhite = ZEMatrix4x4(	0.299f, 0.587f, 0.184f, 0.0f,
 														  	0.299f, 0.587f, 0.184f, 0.0f,
-														  	0.299f, 0.587f, 0.184f, 0.0f, 
+														  	0.299f, 0.587f, 0.184f, 0.0f,
 														  	0.0f,   0.0f,	0.0f,	0.1f );
 
 const ZEMatrix4x4 ZEColorMatrix::Red = ZEMatrix4x4(	1.0f, 0.0f, 0.0f, 0.0f,
@@ -222,7 +237,7 @@ ZED3D9ColorTransformProcessor::ZED3D9ColorTransformProcessor()
 	OutputBuffer		= NULL;
 
 	TransformFactor		= 1.0f;
-	ColorMatrix			= (ZEMatrix4x4*)&ZEMatrix4x4::Identity;
+	ColorMatrix			= (ZEMatrix4x4*)&ZEColorMatrix::Normal;
 	
 }
 
