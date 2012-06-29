@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ColorTransformProcessor.hlsl
+ Zinek Engine - ZED3D9UnsharpenFilterProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,58 +33,55 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sampler2D 	TextureInput	 		: register(s6);
-float2 		PixelSize				: register(vs, c0);
-float		BlendFactor			 	: register(ps, c0);
-float4x4	ColorTransformMatrix 	: register(ps, c1);
 
-// Vertex Shader Input Struct
-struct VS_INPUT
+#pragma once
+#ifndef __ZE_D3D9_UNSHARPEN_FILTER_PROCESSOR_H__
+#define __ZE_D3D9_UNSHARPEN_FILTER_PROCESSOR_H__
+
+#include "ZED3D9ComponentBase.h"
+
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
+class ZED3D9Texture2D;
+class ZETexture2D;
+class ZED3D9ViewPort;
+class ZEFrameRenderer;
+class ZED3D9FrameRenderer;
+class ZETexture2DResource;
+
+
+class ZED3D9UnsharpenFilterProcessor : public ZED3D9ComponentBase
 {
-	float4 Position  : POSITION0;
-	float2 Texcoord  : TEXCOORD0;
+	private:
+		ZED3D9FrameRenderer*			Renderer;
 
+		ZED3D9Texture2D*				Input;
+		ZED3D9ViewPort*					Output;
+
+		ZED3D9VertexShader*				VertexShader;
+		ZED3D9PixelShader*				PixelShader;
+		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+
+	public:
+		void							SetRenderer(ZEFrameRenderer* Renderer);
+		ZEFrameRenderer*				GetRenderer();
+
+		void							SetInput(ZETexture2D* Texture);
+		ZETexture2D*					GetInput();
+
+		void							SetOutput(ZED3D9ViewPort* Texture);
+		ZED3D9ViewPort*					GetOutput();
+		
+		void							Initialize();
+		void							Deinitialize();
+
+		void							OnDeviceLost();
+		void							OnDeviceRestored();
+
+		void							Process();
+
+										ZED3D9UnsharpenFilterProcessor();
+										~ZED3D9UnsharpenFilterProcessor();
 };
 
-// Vertex Shader Output Struct
-struct VS_OUTPUT 
-{
-	float4 	Position   : POSITION0;
-	float2 	Texcoord   : TEXCOORD0;
-};
-
-// Pixel Shader Input Struct
-struct PS_INPUT
-{
-	float2 	TexCoord  : TEXCOORD0;   
-};
-
-// Pixel Shader Output Struct
-struct PS_OUTPUT
-{
-	float4 PixelColor : COLOR0;
-};
-
-// Vertex Shader Main
-VS_OUTPUT vs_main( VS_INPUT Input )
-{
-	VS_OUTPUT Output;
-	
-	Output.Position = float4(sign(Input.Position).xy, 0.0f, 1.0f);
-	Output.Texcoord.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
-	Output.Texcoord.y = 0.5f * (1.0f - Output.Position.y + PixelSize.y);
-
-	return Output;
-}
-
-PS_OUTPUT ps_main( PS_INPUT Input )
-{
-	PS_OUTPUT Output;
-	Output.PixelColor = (float4)0.0f;
-	
-	float4 SampleColor = tex2D(TextureInput, Input.TexCoord);
-	float4 TransformedColor = mul(ColorTransformMatrix, float4(SampleColor.xyz, 1.0f));
-	Output.PixelColor = lerp(SampleColor, TransformedColor, BlendFactor);
-	
-	return Output;
-}
+#endif	/* __ZE_D3D9_UNSHARPEN_FILTER_PROCESSOR_H__ */

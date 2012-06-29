@@ -52,12 +52,15 @@ class ZETexture2DResource;
 class ZEColorMatrix : public ZEMatrix4x4
 {
 	public:
+		static const ZEMatrix4x4		Normal;
 		static const ZEMatrix4x4		Sepia;
 		static const ZEMatrix4x4		BlackWhite;
 		static const ZEMatrix4x4		Red;
 		static const ZEMatrix4x4		Green;
 		static const ZEMatrix4x4		Blue;
 		static const ZEMatrix4x4		Black;
+		static const ZEMatrix4x4		NightVision;
+		static const ZEMatrix4x4		Inverse;
 };
 
 class ZED3D9ColorTransformProcessor : public ZED3D9ComponentBase
