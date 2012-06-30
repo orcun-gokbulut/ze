@@ -36,9 +36,6 @@
 #include "ZESystemLock.h"
 #include "ZEError.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-
 bool ZESystemLock::Test()
 {
 	return Wait(0);
@@ -57,48 +54,4 @@ bool ZESystemLock::Wait(int Milliseconds = -1)
 	Unlock();
 
 	return true;
-}
-
-bool ZESystemLock::WaitAndLock(int Milliseconds = -1)
-{
-	DWORD MilSec;
-	if (Milliseconds == -1)
-		MilSec = INFINITE;
-	else
-		MilSec = Milliseconds;
-
-	DWORD Result = WaitForSingleObject(Handle, MilSec);
-	if (Result != WAIT_OBJECT_0)
-		return false;
-
-	return true;
-}
-
-bool ZESystemLock::Unlock()
-{
-	return ReleaseMutex(Handle) == TRUE;
-}
-
-ZESystemLock ZESystemLock::operator=(const ZESystemLock& Lock)
-{
-	return ZESystemLock();
-}
-
-ZESystemLock::ZESystemLock()
-{
-	Handle = CreateMutex(NULL, false, NULL);
-	if (Handle == NULL)
-		zeCriticalError("Can not create system lock.");
-}
-
-ZESystemLock::ZESystemLock(const ZESystemLock& Lock)
-{
-	Handle = CreateMutex(NULL, false, NULL);
-	if (Handle == NULL)
-		zeCriticalError("Can not create system lock.");
-}
-
-ZESystemLock::~ZESystemLock()
-{
-	CloseHandle(Handle);
 }

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEThread_Unix.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,29 +30,56 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEThread.h"
+#include "ZEError.h"
 
-ze_add_source(ZEIPAddress_Unix.cpp			Sources PLATFORMS Unix)
-ze_add_source(ZEIPAddress_Windows.cpp		Sources PLATFORMS Windows)
-ze_add_source(ZEIPAddressTests_Windows.cpp	Tests PLATFORMS Windows)
-ze_add_source(ZEIPAddress.h					Sources Headers)
-ze_add_source(ZESocket_Unix.cpp				Sources PLATFORMS Unix)
-ze_add_source(ZESocket_Windows.cpp			Sources PLATFORMS Windows)
-ze_add_source(ZESocketTests_Windows.cpp		Tests PLATFORMS Windows)
-ze_add_source(ZESocket.h					Sources Headers)
+void* ZEThread::ThreadFunction(void* Thread)
+{
+	ZEThread* CurrentThread = (ZEThread*)Thread;
 
-ze_add_library(ZESocket 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ws2_32 ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZESocket
-	INSTALL_COMPONENT ZESDK)
-	
-ze_add_test(ZESocketTests
-	SOURCES ${Tests}
-	EXTRA_SOURCES
-	TEST_TARGET ZESocket)
+	CurrentThread->Status = ZE_TS_RUNNING;
+	CurrentThread->Function(CurrentThread->GetParameter());
+	CurrentThread->Status = ZE_TS_DONE;
+
+	return 0;
+}
+
+void ZEThread::Run(void* Parameter)
+{
+    if (Status == ZE_TS_RUNNING)
+        return;
+
+    if (Status == ZE_TS_NONE || Status == ZE_TS_DONE || Status == ZE_TS_TERMINATED)
+    {
+        int Result = pthread_create(&Thread, NULL, ThreadFunction, Parameter);
+        if (Result != 0)
+            zeCriticalError("Can not create thread.");
+    }
+}
+
+void ZEThread::Suspend()
+{
+
+}
+
+void ZEThread::Terminate()
+{
+    if (Status == ZE_TS_RUNNING || Status == ZE_TS_SUSPENDED)
+    {
+        int Result = pthread_cancel(Thread);
+        if (Result == 0)
+            Status == ZE_TS_TERMINATED;
+    }
+}
+
+ZEThread::ZEThread()
+{
+	Status = ZE_TS_NONE;
+}
+
+ZEThread::~ZEThread()
+{
+}

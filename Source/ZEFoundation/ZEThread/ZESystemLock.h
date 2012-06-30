@@ -36,10 +36,18 @@
 #ifndef __ZE_SYSTEM_LOCK_H__
 #define __ZE_SYSTEM_LOCK_H__
 
+#ifdef ZE_PLATFORM_UNIX
+#include <pthread.h>
+#endif
+
 class ZESystemLock
 {
 	private:
-		void*				Handle;
+        #ifdef ZE_PLATFORM_WINDOWS
+            void*           Handle;
+        #elif defined(ZE_PLATFORM_UNIX)
+            pthread_mutex_t Mutex;
+        #endif
 
 	public:
 		bool				Test();

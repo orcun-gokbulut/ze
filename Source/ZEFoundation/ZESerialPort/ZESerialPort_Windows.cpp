@@ -36,15 +36,15 @@
 #include "ZESerialPort.h"
 #include "ZEError.h"
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <time.h>
 
 bool ZESerialPort::IsOpen()
 {
 	return Handle != NULL;
 }
 
-bool ZESerialPort::Open(const ZEString& PortName, ZEUInt32 BaudRate)
+bool ZESerialPort::Open()
 {
 	if (Handle != NULL)
 		Close();

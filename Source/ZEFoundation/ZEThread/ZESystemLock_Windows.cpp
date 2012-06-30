@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZESystemLock.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,29 +30,75 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZESystemLock.h"
+#include "ZEError.h"
 
-ze_add_source(ZEIPAddress_Unix.cpp			Sources PLATFORMS Unix)
-ze_add_source(ZEIPAddress_Windows.cpp		Sources PLATFORMS Windows)
-ze_add_source(ZEIPAddressTests_Windows.cpp	Tests PLATFORMS Windows)
-ze_add_source(ZEIPAddress.h					Sources Headers)
-ze_add_source(ZESocket_Unix.cpp				Sources PLATFORMS Unix)
-ze_add_source(ZESocket_Windows.cpp			Sources PLATFORMS Windows)
-ze_add_source(ZESocketTests_Windows.cpp		Tests PLATFORMS Windows)
-ze_add_source(ZESocket.h					Sources Headers)
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 
-ze_add_library(ZESocket 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ws2_32 ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZESocket
-	INSTALL_COMPONENT ZESDK)
-	
-ze_add_test(ZESocketTests
-	SOURCES ${Tests}
-	EXTRA_SOURCES
-	TEST_TARGET ZESocket)
+bool ZESystemLock::Test()
+{
+	return Wait(0);
+}
+
+bool ZESystemLock::Lock()
+{
+	return WaitAndLock(0);
+}
+
+bool ZESystemLock::Wait(int Milliseconds = -1)
+{
+	if (!WaitAndLock(Milliseconds))
+		return false;
+
+	Unlock();
+
+	return true;
+}
+
+bool ZESystemLock::WaitAndLock(int Milliseconds = -1)
+{
+	DWORD MilSec;
+	if (Milliseconds == -1)
+		MilSec = INFINITE;
+	else
+		MilSec = Milliseconds;
+
+	DWORD Result = WaitForSingleObject(Handle, MilSec);
+	if (Result != WAIT_OBJECT_0)
+		return false;
+
+	return true;
+}
+
+bool ZESystemLock::Unlock()
+{
+	return ReleaseMutex(Handle) == TRUE;
+}
+
+ZESystemLock ZESystemLock::operator=(const ZESystemLock& Lock)
+{
+	return ZESystemLock();
+}
+
+ZESystemLock::ZESystemLock()
+{
+	Handle = CreateMutex(NULL, false, NULL);
+	if (Handle == NULL)
+		zeCriticalError("Can not create system lock.");
+}
+
+ZESystemLock::ZESystemLock(const ZESystemLock& Lock)
+{
+	Handle = CreateMutex(NULL, false, NULL);
+	if (Handle == NULL)
+		zeCriticalError("Can not create system lock.");
+}
+
+ZESystemLock::~ZESystemLock()
+{
+	CloseHandle(Handle);
+}

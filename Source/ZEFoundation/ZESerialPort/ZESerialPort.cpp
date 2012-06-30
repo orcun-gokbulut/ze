@@ -36,17 +36,47 @@
 #include "ZESerialPort.h"
 #include "ZEError.h"
 
-#include <windows.h>
 #include <time.h>
+
+#ifdef ZE_PLATFORM_UNIX
+#include <sys/times.h>
+#endif
 
 static clock_t ClockMs()
 {
-	return GetTickCount();
+    #ifdef ZE_PLATFORM_WINDOWS
+        return GetClockCount();
+    #elif defined(ZE_PLATFORM_UNIX)
+        static long int TicksPerSec = -1;
+        if (TicksPerSec == -1)
+            TicksPerSec  = sysconf(_SC_CLK_TCK);
+        return (times(NULL) / TicksPerSec) * 1000;
+    #endif
 }
 
 static clock_t GetNextTimeOut(ZEUInt32 TimeOut)
 {
 	return ClockMs() + TimeOut;
+}
+
+void ZESerialPort:: SetPortName(const ZEString& Name)
+{
+    PortName = Name;
+}
+
+const ZEString& ZESerialPort::GetPortName()
+{
+    return PortName;
+}
+
+void ZESerialPort::SetBaudRate(ZEUInt32 Rate)
+{
+    BaudRate = Rate;
+}
+
+ZEUInt32 ZESerialPort::GetBaudRate()
+{
+    return BaudRate;
 }
 
 void ZESerialPort::SetTimeOut(ZEUInt32 Milliseconds)

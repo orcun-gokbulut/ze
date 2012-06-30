@@ -39,11 +39,9 @@
 #include "ZEFile.h"
 #include "ZEPartialFile.h"
 
-#include <Windows.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <sys/stat.h>
-#include <fstream>
 
 #include <wchar.h>
 

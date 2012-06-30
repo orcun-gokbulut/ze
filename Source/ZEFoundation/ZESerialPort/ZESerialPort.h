@@ -53,15 +53,20 @@ class ZESerialPort
 		ZEUInt32			TimeOut;
 	
 	public:
-		bool				IsOpen();
-		bool				Open(const ZEString& PortName, ZEUInt32 BaudRate);
+        void                SetPortName(const ZEString& Name);
+        const ZEString&		GetPortName();
+
+        void                SetBaudRate(ZEUInt32 Rate);
+        ZEUInt32			GetBaudRate();
+
+        void				SetTimeOut(ZEUInt32 Milliseconds);
+        ZEUInt32			GetTimeOut();
+
+        bool				IsOpen();
+        bool				Open();
 		void				Close();
 
-		const ZEString&		GetPortName();
-		ZEUInt32			GetBaudRate();
 		
-		void				SetTimeOut(ZEUInt32 Milliseconds);
-		ZEUInt32			GetTimeOut();
 
 		bool				Read(void* Buffer, ZESize BufferSize, ZESize &BytesRead);
 		bool				Write(const void* Data, ZESize DataSize, ZESize &BytesWritten);

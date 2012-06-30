@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEThread.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,29 +30,93 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEThread.h"
+#include "ZEError.h"
 
-ze_add_source(ZEIPAddress_Unix.cpp			Sources PLATFORMS Unix)
-ze_add_source(ZEIPAddress_Windows.cpp		Sources PLATFORMS Windows)
-ze_add_source(ZEIPAddressTests_Windows.cpp	Tests PLATFORMS Windows)
-ze_add_source(ZEIPAddress.h					Sources Headers)
-ze_add_source(ZESocket_Unix.cpp				Sources PLATFORMS Unix)
-ze_add_source(ZESocket_Windows.cpp			Sources PLATFORMS Windows)
-ze_add_source(ZESocketTests_Windows.cpp		Tests PLATFORMS Windows)
-ze_add_source(ZESocket.h					Sources Headers)
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 
-ze_add_library(ZESocket 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ws2_32 ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZESocket
-	INSTALL_COMPONENT ZESDK)
+DWORD WINAPI ThreadFunction(LPVOID Thread)
+{
+	ZEThread* CurrentThread = (ZEThread*)Thread;
+
+	CurrentThread->Status = ZE_TS_RUNNING;
+	CurrentThread->Function(CurrentThread->GetParameter());
+	CurrentThread->Status = ZE_TS_DONE;
+
+	return 0;
+}
+
+ZEThreadStatus ZEThread::GetStatus()
+{
+	return Status;
+}
+
+void ZEThread::SetParameter(void* Parameter)
+{
+	this->Parameter = Parameter;
+}
+
+void* ZEThread::GetParameter()
+{
+	return Parameter;
+}
+
+void ZEThread::Run(void* Parameter)
+{
+	if (Handle == NULL)
+	{
+		Handle = CreateThread(NULL, 0,  ThreadFunction, this, CREATE_SUSPENDED, NULL);
+		if (Handle == NULL)
+			zeCriticalError("Can not create thread.");
+	}
+
+	if (Status == ZE_TS_RUNNING)
+		return;
+
+	DWORD Result = ResumeThread(Handle);
+	if (Result == -1)
+		zeCriticalError("Can not resume thread.");
+}
+
+void ZEThread::Suspend()
+{
+	if (Handle != NULL)
+		return;
 	
-ze_add_test(ZESocketTests
-	SOURCES ${Tests}
-	EXTRA_SOURCES
-	TEST_TARGET ZESocket)
+	DWORD Result = SuspendThread(Handle);
+	if (Result == -1)
+		zeCriticalError("Can not suspend thread.");
+
+	Status = ZE_TS_SUSPENDED;
+}
+
+void ZEThread::Terminate()
+{
+	if (Handle == NULL)
+		return;
+
+	DWORD Result = TerminateThread(Handle, 0);
+	if (Result == -1)
+		zeCriticalError("Can not terminate thread.");
+
+	Status = ZE_TS_TERMINATED;
+}
+
+ZEThread::ZEThread()
+{
+	Handle = NULL;
+	Status = ZE_TS_NONE;
+}
+
+ZEThread::~ZEThread()
+{
+	if (Handle != NULL)
+	{
+		Terminate();
+		CloseHandle(Handle);
+	}
+}
