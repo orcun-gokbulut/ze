@@ -37,6 +37,7 @@
 #include "ZEFileCommon.h"
 #include "ZECore/ZECore.h"
 #include "ZEDS/ZEString.h"
+#include "ZECore/ZEOptionSection.h"
 #include "ZECore/ZEApplicationModule.h"
 
 #include <winerror.h>
@@ -44,6 +45,259 @@
 #include <shobjidl.h>
 #include <winbase.h>
 
+ZEString ZEFileCommon::AppName = "";
+ZEString ZEFileCommon::UserDataPath = "";
+ZEString ZEFileCommon::ResourcesPath = "";
+ZEString ZEFileCommon::SystemDataPath = "";
+ZEString ZEFileCommon::SavedGamesPath = "";
+ZEString ZEFileCommon::ApplicationResourcesPath;
+
+bool ZEFileCommon::Initialized = false;
+bool ZEFileCommon::EnablePathRestriction = false;
+
+
+// Helper functions to get OS Info
+static bool GetOSVersion(ZEUInt& VerMajor, ZEUInt& VerMinor, ZEUInt& Build)
+{
+	BOOL Result;
+	OSVERSIONINFO OSInfo;
+
+	ZESize StructSize = sizeof(OSVERSIONINFO);
+	memset((void*)&OSInfo, 0, StructSize);
+	OSInfo.dwOSVersionInfoSize = (DWORD)StructSize;
+
+	SetLastError(ERROR_SUCCESS);
+	Result = GetVersionEx(&OSInfo);
+	if ( !Result )
+	{
+		ZEString ErrorString;
+		ZEFileCommon::GetErrorString(ErrorString, GetLastError());
+		zeError("Cannot get OS version.\nError: %s", ErrorString.ToCString());
+		return false;
+	}
+
+	Build = OSInfo.dwBuildNumber;
+	VerMajor = OSInfo.dwMajorVersion;
+	VerMinor = OSInfo.dwMinorVersion;
+
+	return true;
+}
+
+// Helper functions to get ZEFileKnownPaths from string
+static ZEFileKnownPaths GetRootByString(const ZEString& Path)
+{
+	ZEFileKnownPaths RootSymbol;
+
+	switch (Path[0])
+	{
+		case ZE_FILE_PATH_IDENTIFIER_SYMBOL_USER_DATA:
+			RootSymbol = ZE_FKP_USER_DATA;
+			break;
+		case ZE_FILE_PATH_IDENTIFIER_SYMBOL_SYSTEM_DATA:
+			RootSymbol = ZE_FKP_SYSTEM_DATA;
+			break;
+		case ZE_FILE_PATH_IDENTIFIER_SYMBOL_SAVED_GAMES:
+			RootSymbol = ZE_FKP_SAVED_GAMES;
+			break;
+		case ZE_FILE_PATH_IDENTIFIER_SYMBOL_APP_RESOURCES:
+			RootSymbol = ZE_FKP_APP_RESOURCES;
+			break;
+		case ZE_FILE_PATH_IDENTIFIER_SYMBOL_RESOURCES:
+			RootSymbol = ZE_FKP_RESOURCES;
+			break;
+		default:
+			RootSymbol = ZE_FKP_NONE;
+			break;
+	}
+
+	return RootSymbol;
+}
+
+void ZEFileCommon::InitializePaths()
+{
+	if (Initialized)
+		return;
+
+	ZEUInt OSVerMajor, OSVerMinor, OSBuild;
+	GetOSVersion(OSVerMajor, OSVerMinor, OSBuild);
+
+	HRESULT Result;
+	DWORD Lenght;
+	PWSTR Path;
+	TCHAR NPath[MAX_PATH+1];
+
+	Lenght = GetCurrentDirectory(MAX_PATH, NPath);
+	if ( Lenght == 0 )
+	{
+		ZEString ErrorString;
+		GetErrorString(ErrorString, GetLastError());
+		zeError("Cannot get current directory.\nError: %s", ErrorString.ToCString());
+		return;
+	}
+
+	// Get PathToAppResources
+	ApplicationResourcesPath = NPath;				// Add main directory
+	ApplicationResourcesPath += "\\Resources\\";	// Add Resources
+	ApplicationResourcesPath += AppName;			// Add AppName
+
+	// Get PathToResources
+	ResourcesPath = NPath;
+	ResourcesPath += "\\Resources";
+
+	// Server2008/Vista and later
+	if (OSVerMajor >= 6 && OSVerMinor >= 0)
+	{
+		// Get PathToSystemData
+		Result = SHGetKnownFolderPath(FOLDERID_ProgramData, KF_FLAG_CREATE, NULL, &Path);
+		if ( Result != S_OK )
+		{
+			ZEString ErrorString;
+			GetErrorString(ErrorString, GetLastError());
+			zeError("Cannot get common app data directory path.\nError: %s", ErrorString.ToCString());
+			return;
+		}
+
+		SystemDataPath = ZEString::FromWString(Path);
+		SystemDataPath += "\\Zinek\\";
+		SystemDataPath += AppName;
+		CoTaskMemFree((void*)Path);
+
+		// Get PathToUserData
+		Result = SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &Path);
+		if ( Result != S_OK )
+		{
+			ZEString ErrorString;
+			GetErrorString(ErrorString, GetLastError());
+			zeError("Cannot get local app data directory path.\nError: %s", ErrorString.ToCString());
+			return;
+		}
+
+		UserDataPath = ZEString::FromWString(Path);
+		UserDataPath += "\\Zinek\\";
+		UserDataPath += AppName;
+		CoTaskMemFree((void*)Path);
+
+		// Get PathToSavedGames
+		Result = SHGetKnownFolderPath(FOLDERID_SavedGames, KF_FLAG_CREATE, NULL, &Path);
+		if ( Result != S_OK )
+		{
+			ZEString ErrorString;
+			GetErrorString(ErrorString, GetLastError());
+			zeError("Cannot get local app data directory path.\nError: %s", ErrorString.ToCString());
+			return;
+		}
+
+		SavedGamesPath = ZEString::FromWString(Path);
+		SavedGamesPath += "\\Zinek\\";
+		SavedGamesPath += AppName;
+		CoTaskMemFree((void*)Path);
+
+	}
+	// Server2003/XP and previous
+	else if (OSVerMajor <= 5 && OSVerMinor <= 2)
+	{
+		// Get PathToSystemData
+		Result = SHGetFolderPath(NULL, CSIDL_FLAG_CREATE | CSIDL_COMMON_APPDATA, NULL, 0, NPath);
+		if ( Result != S_OK )
+		{
+			ZEString ErrorString;
+			GetErrorString(ErrorString, GetLastError());
+			zeError("Cannot get common app data directory path.\nError: %s", ErrorString.ToCString());
+			return;
+		}
+
+		SystemDataPath = NPath;
+		SystemDataPath += "\\Zinek\\";
+		SystemDataPath += AppName;
+
+		// Get PathToUserData
+		Result = SHGetFolderPath(NULL, CSIDL_FLAG_CREATE | CSIDL_LOCAL_APPDATA, NULL, 0, NPath);
+		if ( Result != S_OK )
+		{
+			ZEString ErrorString;
+			GetErrorString(ErrorString, GetLastError());
+			zeError("Cannot get local app data directory path.\nError: %s", ErrorString.ToCString());
+			return;
+		}
+
+		UserDataPath = NPath;
+		UserDataPath += "\\Zinek\\";
+		UserDataPath += AppName;
+
+		// Get PathToSavedGames
+		Result = SHGetFolderPath(NULL, CSIDL_FLAG_CREATE | CSIDL_MYDOCUMENTS, NULL, 0, NPath);
+		if ( Result != S_OK )
+		{
+			ZEString ErrorString;
+			GetErrorString(ErrorString, GetLastError());
+			zeError("Cannot get local app data directory path.\nError: %s", ErrorString.ToCString());
+			return;
+		}
+
+		SavedGamesPath = NPath;
+		SavedGamesPath += "\\Zinek\\";
+		SavedGamesPath += AppName;
+	}
+
+	Initialized = true;
+}
+
+bool ZEFileCommon::GetInitialized()
+{
+	return Initialized;
+}
+
+void ZEFileCommon::SetEnablePathRestriction(bool Enable)
+{
+	EnablePathRestriction = Enable;
+}
+
+bool ZEFileCommon::SetEnablePathRestriction()
+{
+	return EnablePathRestriction;
+}
+
+void ZEFileCommon::SetApplicationName(ZEString& Name)
+{
+	InitializePaths();
+
+	AppName = Name;
+}
+
+const ZEString&	ZEFileCommon::GetUserDataPath()
+{
+	InitializePaths();
+
+	return UserDataPath;
+}
+
+const ZEString&	ZEFileCommon::GetResourcesPath()
+{
+	InitializePaths();
+
+	return ResourcesPath;
+}
+
+const ZEString&	ZEFileCommon::GetSystemDataPath()
+{
+	InitializePaths();
+
+	return SystemDataPath;
+}
+
+const ZEString&	ZEFileCommon::GetSavedGamesPath()
+{
+	InitializePaths();
+
+	return SavedGamesPath;
+}
+
+const ZEString&	ZEFileCommon::GetApplicationResourcesPath()
+{
+	InitializePaths();
+
+	return ApplicationResourcesPath;
+}
 
 void ZEFileCommon::GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId)
 {
@@ -66,212 +320,51 @@ void ZEFileCommon::GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId)
 	}
 }
 
-bool ZEFileCommon::GetOSVersion(ZEUInt& VerMajor, ZEUInt& VerMinor, ZEUInt& Build)
-{
-	BOOL Result;
-	OSVERSIONINFO OSInfo;
-
-	ZESize StructSize = sizeof(OSVERSIONINFO);
-	memset((void*)&OSInfo, 0, StructSize);
-	OSInfo.dwOSVersionInfoSize = (DWORD)StructSize;
-
-	SetLastError(ERROR_SUCCESS);
-	Result = GetVersionEx(&OSInfo);
-	if ( !Result )
-	{
-		ZEString ErrorString;
-		GetErrorString(ErrorString, GetLastError());
-		zeError("Cannot get OS version.\nError: %s", ErrorString.ToCString());
-		return false;
-	}
-
-	Build = OSInfo.dwBuildNumber;
-	VerMajor = OSInfo.dwMajorVersion;
-	VerMinor = OSInfo.dwMinorVersion;
-
-	return true;
-}
-
 ZEString ZEFileCommon::GetKnownPath(ZEFileKnownPaths KnownPath)
 {
-	static ZEUInt OSBuild ;
-	static ZEUInt OSVerMajor;
-	static ZEUInt OSVerMinor;
-	static bool OSVersionInitialized = false;
-
-	static ZEString	PathToUserData;
-	static ZEString	PathToResources;
-	static ZEString PathToSavedGames;
-	static ZEString	PathToSystemData;
-	static ZEString	PathToAppResources;
-	static bool KnownPathsInitialized = false;
-
-	if ( !OSVersionInitialized )
-	{
-		if ( !GetOSVersion(OSVerMajor, OSVerMinor, OSBuild) )
-			return "";
-		else
-			OSVersionInitialized = true;
-	}
-
-	if ( !KnownPathsInitialized )
-	{
-
-		HRESULT Result;
-		DWORD Lenght;
-		PWSTR Path;
-		TCHAR NPath[MAX_PATH+1];
-		ZEString AppName = zeCore->GetApplicationModule()->GetApplicationName();
-
-		Lenght = GetCurrentDirectory(MAX_PATH, NPath);
-		if ( Lenght == 0 )
-		{
-			ZEString ErrorString;
-			GetErrorString(ErrorString, GetLastError());
-			zeError("Cannot get current directory.\nError: %s", ErrorString.ToCString());
-			return false;
-		}
-
-		// Get PathToAppResources
-		PathToAppResources = NPath;				// Add main directory
-		PathToAppResources += "\\Resources\\";	// Add Resources
-		PathToAppResources += AppName;			// Add AppName
-
-		// Get PathToResources
-		PathToResources = NPath;
-		PathToResources += "\\Resources";
-
-		// Server2008/Vista and later
-		if (OSVerMajor >= 6 && OSVerMinor >= 0)
-		{
-			// Get PathToSystemData
-			Result = SHGetKnownFolderPath(FOLDERID_ProgramData, KF_FLAG_CREATE, NULL, &Path);
-			if ( Result != S_OK )
-			{
-				ZEString ErrorString;
-				GetErrorString(ErrorString, GetLastError());
-				zeError("Cannot get common app data directory path.\nError: %s", ErrorString.ToCString());
-				return false;
-			}
-
-			PathToSystemData = ZEString::FromWString(Path);
-			PathToSystemData += "\\Zinek\\";
-			PathToSystemData += AppName;
-			CoTaskMemFree((void*)Path);
-
-			// Get PathToUserData
-			Result = SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &Path);
-			if ( Result != S_OK )
-			{
-				ZEString ErrorString;
-				GetErrorString(ErrorString, GetLastError());
-				zeError("Cannot get local app data directory path.\nError: %s", ErrorString.ToCString());
-				return false;
-			}
-
-			PathToUserData = ZEString::FromWString(Path);
-			PathToUserData += "\\Zinek\\";
-			PathToUserData += AppName;
-			CoTaskMemFree((void*)Path);
-
-			// Get PathToSavedGames
-			Result = SHGetKnownFolderPath(FOLDERID_SavedGames, KF_FLAG_CREATE, NULL, &Path);
-			if ( Result != S_OK )
-			{
-				ZEString ErrorString;
-				GetErrorString(ErrorString, GetLastError());
-				zeError("Cannot get local app data directory path.\nError: %s", ErrorString.ToCString());
-				return false;
-			}
-
-			PathToSavedGames = ZEString::FromWString(Path);
-			PathToSavedGames += "\\Zinek\\";
-			PathToSavedGames += AppName;
-			CoTaskMemFree((void*)Path);
-
-		}
-		// Server2003/XP and previous
-		else if (OSVerMajor <= 5 && OSVerMinor <= 2)
-		{
-			// Get PathToSystemData
-			Result = SHGetFolderPath(NULL, CSIDL_FLAG_CREATE | CSIDL_COMMON_APPDATA, NULL, 0, NPath);
-			if ( Result != S_OK )
-			{
-				ZEString ErrorString;
-				GetErrorString(ErrorString, GetLastError());
-				zeError("Cannot get common app data directory path.\nError: %s", ErrorString.ToCString());
-				return false;
-			}
-
-			PathToSystemData = NPath;
-			PathToSystemData += "\\Zinek\\";
-			PathToSystemData += AppName;
-
-			// Get PathToUserData
-			Result = SHGetFolderPath(NULL, CSIDL_FLAG_CREATE | CSIDL_LOCAL_APPDATA, NULL, 0, NPath);
-			if ( Result != S_OK )
-			{
-				ZEString ErrorString;
-				GetErrorString(ErrorString, GetLastError());
-				zeError("Cannot get local app data directory path.\nError: %s", ErrorString.ToCString());
-				return false;
-			}
-
-			PathToUserData = NPath;
-			PathToUserData += "\\Zinek\\";
-			PathToUserData += AppName;
-
-			// Get PathToSavedGames
-			Result = SHGetFolderPath(NULL, CSIDL_FLAG_CREATE | CSIDL_MYDOCUMENTS, NULL, 0, NPath);
-			if ( Result != S_OK )
-			{
-				ZEString ErrorString;
-				GetErrorString(ErrorString, GetLastError());
-				zeError("Cannot get local app data directory path.\nError: %s", ErrorString.ToCString());
-				return false;
-			}
-
-			PathToSavedGames = NPath;
-			PathToSavedGames += "\\Zinek\\";
-			PathToSavedGames += AppName;
-		}
-
-		KnownPathsInitialized = true;
-	}
+	InitializePaths();
 
 	switch (KnownPath)
 	{
-	case ZE_FKP_NONE:
-	case ZE_FKP_RESOURCES:
-		return PathToResources;
-		break;
-	case ZE_FKP_APP_RESOURCES:
-		return PathToAppResources;
-		break;
-	case ZE_FKP_USER_DATA:
-		return PathToUserData;
-		break;
-	case ZE_FKP_SYSTEM_DATA:
-		return PathToSystemData;
-		break;
-	case ZE_FKP_SAVED_GAMES:
-		return PathToSavedGames;
-		break;
-	default:
-		return "";
-		break;
+		case ZE_FKP_NONE:
+			if (EnablePathRestriction)
+			{
+				return "";
+			}
+			// Fall through !
+		case ZE_FKP_RESOURCES:
+			return ResourcesPath;
+			break;
+		case ZE_FKP_APP_RESOURCES:
+			return ApplicationResourcesPath;
+			break;
+		case ZE_FKP_USER_DATA:
+			return UserDataPath;
+			break;
+		case ZE_FKP_SYSTEM_DATA:
+			return SystemDataPath;
+			break;
+		case ZE_FKP_SAVED_GAMES:
+			return SavedGamesPath;
+			break;
+		default:
+			return "";
+			break;
 	}
 
 	return "";
 }
 
-bool ZEFileCommon::BoundaryCheck(const ZEString& RootPath, const ZEString& Path)
+bool ZEFileCommon::PathBoundaryCheck(const ZEString& RootPath, const ZEString& Path)
 {
 	char* Token;
 	char* NextToken;
 	ZEInt Depth;
 	ZEString Temp;
 	const char* Search = "\\";
+
+	if (!EnablePathRestriction)
+		return true;
 
 	//Check if path is an extension of root
 	if (strncmp(RootPath.ToCString(), Path.ToCString(), RootPath.GetLength()) != 0)
@@ -282,7 +375,7 @@ bool ZEFileCommon::BoundaryCheck(const ZEString& RootPath, const ZEString& Path)
 	Temp = Path.Right(Path.GetLength() - RootPath.GetLength());
 	if ( !Temp.IsEmpty() )
 	{
-		// Check the depth. Path should no go above the root
+		// Check the depth. Path should not go above the root
 		Token = NULL;
 		NextToken = NULL;
 		Token = strtok_s((char*)Temp.ToCString(), Search, &NextToken);
@@ -330,35 +423,6 @@ ZEString ZEFileCommon::PathFormatCheck(const ZEString& Path)
 	return Temp;
 }
 
-ZEFileKnownPaths ZEFileCommon::GetRootByString(const ZEString& Path)
-{
-	ZEFileKnownPaths RootSymbol;
-
-	switch (Path[0])
-	{
-	case ZE_FILE_PATH_IDENTIFIER_SYMBOL_USER_DATA:
-		RootSymbol = ZE_FKP_USER_DATA;
-		break;
-	case ZE_FILE_PATH_IDENTIFIER_SYMBOL_SYSTEM_DATA:
-		RootSymbol = ZE_FKP_SYSTEM_DATA;
-		break;
-	case ZE_FILE_PATH_IDENTIFIER_SYMBOL_SAVED_GAMES:
-		RootSymbol = ZE_FKP_SAVED_GAMES;
-		break;
-	case ZE_FILE_PATH_IDENTIFIER_SYMBOL_APP_RESOURCES:
-		RootSymbol = ZE_FKP_APP_RESOURCES;
-		break;
-	case ZE_FILE_PATH_IDENTIFIER_SYMBOL_RESOURCES:
-		RootSymbol = ZE_FKP_RESOURCES;
-		break;
-	default:
-		RootSymbol = ZE_FKP_NONE;
-		break;
-	}
-
-	return RootSymbol;
-}
-
 // Checks format, constructs final path and makes a boundary check
 ZEString ZEFileCommon::GetFinalPath(const ZEString& Path, ZEFileKnownPaths& Root)
 {
@@ -373,8 +437,10 @@ ZEString ZEFileCommon::GetFinalPath(const ZEString& Path, ZEFileKnownPaths& Root
 	{
 		// No Symbol found
 		SymbolCount = 0;
+		
 		// Set default path
-		Root = ZE_FKP_RESOURCES;
+		if (EnablePathRestriction)
+			Root = ZE_FKP_RESOURCES;
 	}
 	else
 	{
@@ -386,7 +452,7 @@ ZEString ZEFileCommon::GetFinalPath(const ZEString& Path, ZEFileKnownPaths& Root
 	FinalPath = RootPath + FinalPath.Right(FinalPath.GetLength() - SymbolCount);
 
 	// Check boundary
-	if ( !BoundaryCheck(RootPath, FinalPath) )
+	if ( !PathBoundaryCheck(RootPath, FinalPath) )
 	{
 		zeError("Reaching files above the root is forbidden...");
 		return false;
@@ -430,8 +496,6 @@ bool ZEFileCommon::FILETIMEtoZEFileTime(ZEFileTime& Time, FILETIME& FileTime)
 
 	return true;
 }
-
-
 
 bool ZEFileCommon::CloseSearchHandle(void* SearchHandle)
 {

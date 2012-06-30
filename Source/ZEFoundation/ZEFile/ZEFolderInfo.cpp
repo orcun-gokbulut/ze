@@ -110,7 +110,7 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 	ZEArray<ZEFileInfo*>* FileList;
 
 	// if path is out of boundary
-	if ( !ZEFileCommon::BoundaryCheck(ZEFileCommon::GetKnownPath(Root), Path) )
+	if ( !ZEFileCommon::PathBoundaryCheck(ZEFileCommon::GetKnownPath(Root), Path) )
 	{
 		zeError("Paths above the root are not reachable..");
 		return NULL;
@@ -156,7 +156,7 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 	ZEArray<ZEFolderInfo*>* FolderList;
 
 	// if path is out of boundary
-	if ( !ZEFileCommon::BoundaryCheck(ZEFileCommon::GetKnownPath(Root), Path) )
+	if ( !ZEFileCommon::PathBoundaryCheck(ZEFileCommon::GetKnownPath(Root), Path) )
 	{
 		zeError("Paths above the root are not reachable..");
 		return NULL;
