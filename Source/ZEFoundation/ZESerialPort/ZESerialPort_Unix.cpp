@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "SerialPort.h"
+#include "ZESerialPort.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -42,14 +42,24 @@
 #include <errno.h>
 #include <termios.h>
 
-bool SerialPort::IsOpen()
+bool ZESerialPort::IsOpen()
 {
 	return Port != -1;
 }
 
-bool SerialPort::Open()
+void ZESerialPort::Close()
 {
-	SerialPort::Close();
+    if (!IsOpen())
+        return;
+
+    close(Port);
+    Port = -1;
+}
+
+bool ZESerialPort::Open()
+{
+    if (IsOpen())
+        return false;
 
 	int BaudRateValue;
 	switch(BaudRate)
@@ -157,7 +167,7 @@ bool SerialPort::Open()
 	return true;
 }
 
-bool SerialPort::Read(void* Data, size_t DataSize, size_t &BytesRead)
+bool ZESerialPort::Read(void* Data, size_t DataSize, size_t &BytesRead)
 {
 	ssize_t Result = read(Port, Data, DataSize);
 
@@ -178,7 +188,7 @@ bool SerialPort::Read(void* Data, size_t DataSize, size_t &BytesRead)
 	}
 }
 
-bool SerialPort::Write(const void* Data, size_t DataSize, size_t &BytesWritten)
+bool ZESerialPort::Write(const void* Data, size_t DataSize, size_t &BytesWritten)
 {
 	ssize_t Result = write(Port, Data, DataSize);
 
@@ -197,16 +207,6 @@ bool SerialPort::Write(const void* Data, size_t DataSize, size_t &BytesWritten)
 		BytesWritten = Result;
 		return true;
 	}
-}
-
-void SerialPort::Close()
-{
-	if (SerialPort::IsOpen())
-	{
-		close(Port);
-		Port = -1;
-	}
-
 }
 
 ZESerialPort::ZESerialPort()

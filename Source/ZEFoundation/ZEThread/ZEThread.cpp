@@ -36,20 +36,6 @@
 #include "ZEThread.h"
 #include "ZEError.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-
-DWORD WINAPI ThreadFunction(LPVOID Thread)
-{
-	ZEThread* CurrentThread = (ZEThread*)Thread;
-
-	CurrentThread->Status = ZE_TS_RUNNING;
-	CurrentThread->Function(CurrentThread->GetParameter());
-	CurrentThread->Status = ZE_TS_DONE;
-
-	return 0;
-}
-
 ZEThreadStatus ZEThread::GetStatus()
 {
 	return Status;
@@ -63,60 +49,4 @@ void ZEThread::SetParameter(void* Parameter)
 void* ZEThread::GetParameter()
 {
 	return Parameter;
-}
-
-void ZEThread::Run(void* Parameter)
-{
-	if (Handle == NULL)
-	{
-		Handle = CreateThread(NULL, 0,  ThreadFunction, this, CREATE_SUSPENDED, NULL);
-		if (Handle == NULL)
-			zeCriticalError("Can not create thread.");
-	}
-
-	if (Status == ZE_TS_RUNNING)
-		return;
-
-	DWORD Result = ResumeThread(Handle);
-	if (Result == -1)
-		zeCriticalError("Can not resume thread.");
-}
-
-void ZEThread::Suspend()
-{
-	if (Handle != NULL)
-		return;
-	
-	DWORD Result = SuspendThread(Handle);
-	if (Result == -1)
-		zeCriticalError("Can not suspend thread.");
-
-	Status = ZE_TS_SUSPENDED;
-}
-
-void ZEThread::Terminate()
-{
-	if (Handle == NULL)
-		return;
-
-	DWORD Result = TerminateThread(Handle, 0);
-	if (Result == -1)
-		zeCriticalError("Can not terminate thread.");
-
-	Status = ZE_TS_TERMINATED;
-}
-
-ZEThread::ZEThread()
-{
-	Handle = NULL;
-	Status = ZE_TS_NONE;
-}
-
-ZEThread::~ZEThread()
-{
-	if (Handle != NULL)
-	{
-		Terminate();
-		CloseHandle(Handle);
-	}
 }

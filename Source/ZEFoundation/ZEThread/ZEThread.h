@@ -36,6 +36,10 @@
 #ifndef __ZE_THREAD_H__
 #define __ZE_THREAD_H__
 
+#ifdef ZE_PLATFORM_UNIX
+#include <pthread.h>
+#endif
+
 enum ZEThreadStatus
 {
 	ZE_TS_NONE,
@@ -47,9 +51,17 @@ enum ZEThreadStatus
 
 class ZEThread
 {
-	friend unsigned long __stdcall ThreadFunction(void* Thread);
-	private:
-		void*				Handle;
+    private:
+        #ifdef ZE_PLATFORM_WINDOWS
+            static unsigned long __stdcall
+                            ThreadFunction(void* Thread);
+            void*			Handle;
+        #elif defined(ZE_PLATFORM_UNIX)
+            static void*    ThreadFunction(void* Thread);
+            pthread_t       Thread;
+        #endif
+
+
 		ZEThreadStatus		Status;
 		void*				Parameter;
 

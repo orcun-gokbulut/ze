@@ -38,11 +38,9 @@
 #include "ZEError.h"
 #include "ZEPartialFile.h"
 
-#include <Windows.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <sys/stat.h>
-#include <fstream>
 
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
