@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEFileInfo.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,40 +30,49 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef __ZE_FILE_INFO_H__
+#define __ZE_FILE_INFO_H__
 
-include_directories(
-	${PROJECT_SOURCE_DIR}
-	${CMAKE_SOURCE_DIR}/Source)
-	
-ze_add_source(ZEFile.cpp				Sources)
-ze_add_source(ZEFile.h					Sources Headers)
-ze_add_source(ZEFileCommon.cpp			Sources)
-ze_add_source(ZEFileCommon.h			Sources)
-ze_add_source(ZEFileInfo.cpp			Sources)
-ze_add_source(ZEFileInfo.h				Sources Headers)
-ze_add_source(ZEFolderInfo.cpp			Sources)
-ze_add_source(ZEFolderInfo.h			Sources Headers)
-ze_add_source(ZEFileTests.cpp			Tests)
-ze_add_source(ZEPartialFile.cpp			Sources)
-ze_add_source(ZEPartialFile.h			Sources Headers)
-ze_add_source(ZEPartialFileTests.cpp	Tests)
-ze_add_source(ZEFileCache.cpp			Sources)
-ze_add_source(ZEFileCache.h				Sources Headers)
-ze_add_source(ZEFileCacheTests.cpp		Tests)
+#include "ZETypes.h"
+#include "ZEFileCommon.h"
+#include "ZEDS/ZEString.h"
 
-ze_add_library(ZEFile 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS libzlib ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEFile
-	INSTALL_COMPONENT ZESDK)
-	
-ze_add_test(ZEFileTests
-	SOURCES ${Tests}
-	EXTRA_SOURCES
-	TEST_TARGET ZEFile)
+
+class ZEFileInfo
+{
+	friend class ZEFolderInfo;
+
+	private:
+		ZEFileKnownPaths		Root;
+		ZESize					Size;
+		ZEString				Name;
+		ZEString				Path;
+		ZEString				Extension;
+		ZEFileTime				Creation;
+		ZEFileTime				Modification;
+
+								ZEFileInfo();
+
+	public:
+								ZEFileInfo(const ZEString& FilePath);
+								~ZEFileInfo();
+
+		ZESize					GetSize();
+		const ZEString&			GetPath() const;
+		const ZEString&			GetName() const;
+		const ZEString&			GetExtension() const;
+		bool					GetCreationDate(ZEFileTime& Time);
+		bool					GetModificationDate(ZEFileTime& Time);
+
+		static bool				IsFile(const ZEString& FilePath);
+		static ZEString			GetFileName(const ZEString& FilePath);
+		static ZEString			GetFileExtension(const ZEString& FilePath);
+		static ZEString			GetParentFolder(const ZEString& Path);
+};
+
+
+#endif // __ZE_FILE_INFO_H__

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEFolderInfo.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,40 +30,47 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef __ZE_FOLDER_INFO_H__
+#define __ZE_FOLDER_INFO_H__
 
-include_directories(
-	${PROJECT_SOURCE_DIR}
-	${CMAKE_SOURCE_DIR}/Source)
-	
-ze_add_source(ZEFile.cpp				Sources)
-ze_add_source(ZEFile.h					Sources Headers)
-ze_add_source(ZEFileCommon.cpp			Sources)
-ze_add_source(ZEFileCommon.h			Sources)
-ze_add_source(ZEFileInfo.cpp			Sources)
-ze_add_source(ZEFileInfo.h				Sources Headers)
-ze_add_source(ZEFolderInfo.cpp			Sources)
-ze_add_source(ZEFolderInfo.h			Sources Headers)
-ze_add_source(ZEFileTests.cpp			Tests)
-ze_add_source(ZEPartialFile.cpp			Sources)
-ze_add_source(ZEPartialFile.h			Sources Headers)
-ze_add_source(ZEPartialFileTests.cpp	Tests)
-ze_add_source(ZEFileCache.cpp			Sources)
-ze_add_source(ZEFileCache.h				Sources Headers)
-ze_add_source(ZEFileCacheTests.cpp		Tests)
+#include "ZETypes.h"
+#include "ZEFileCommon.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 
-ze_add_library(ZEFile 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS libzlib ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEFile
-	INSTALL_COMPONENT ZESDK)
-	
-ze_add_test(ZEFileTests
-	SOURCES ${Tests}
-	EXTRA_SOURCES
-	TEST_TARGET ZEFile)
+class ZEFileInfo;
+
+class ZEFolderInfo
+{
+	private:
+		ZEFileKnownPaths		Root;
+		ZEString				Name;
+		ZEString				Path;
+		ZEFileTime				Creation;
+		ZEFileTime				Modification;
+
+								ZEFolderInfo();
+
+	public:
+								ZEFolderInfo(const ZEString& FolderPath);
+								~ZEFolderInfo();
+
+		const ZEString&			GetName() const;
+		const ZEString&			GetPath() const;
+		bool					GetCreationDate(ZEFileTime& Time);
+		bool					GetModificationDate(ZEFileTime& Time);
+
+		ZEArray<ZEFileInfo*>*	GetFileList();
+		ZEArray<ZEFolderInfo*>*	GetFolderList();
+
+		static bool				IsFolder(const ZEString& FolderPath);
+		static ZEString			GetFolderName(const ZEString& FolderPath);
+		static ZEString			GetParentFolder(const ZEString& Path);
+};
+
+
+#endif
