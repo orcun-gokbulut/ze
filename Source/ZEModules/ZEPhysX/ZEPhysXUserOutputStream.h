@@ -37,8 +37,9 @@
 #ifndef __ZE_PHYSX_USER_OUTPUT_STREAM_H__
 #define __ZE_PHYSX_USER_OUTPUT_STREAM_H__
 
-#include <NxUserOutputStream.h>
 #include "ZETypes.h"
+
+#include <NxUserOutputStream.h>
 
 class ZEPhysXUserOutputStream : public NxUserOutputStream
 {

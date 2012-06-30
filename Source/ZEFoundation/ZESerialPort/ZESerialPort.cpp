@@ -40,12 +40,15 @@
 
 #ifdef ZE_PLATFORM_UNIX
 #include <sys/times.h>
+#elif defined(ZE_PLATFORM_WINDOWS)
+	#define WIN32_LEAN_AND_MEAN
+	#include <Windows.h>
 #endif
 
 static clock_t ClockMs()
 {
     #ifdef ZE_PLATFORM_WINDOWS
-        return GetClockCount();
+        return GetTickCount();
     #elif defined(ZE_PLATFORM_UNIX)
         static long int TicksPerSec = -1;
         if (TicksPerSec == -1)

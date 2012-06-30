@@ -242,11 +242,11 @@ struct ZEFixedMaterial_ForwardPass_VSOutput
 		float2 LightMapTexcoord     : TEXCOORD2;
 	#endif
 	
-	#ifdef ZESHADER_REFLECTION
+	#ifdef ZE_SHADER_REFLECTION
 		float3 ReflectionVector     : TEXCOORD3;
 	#endif
 
-	#ifdef ZESHADER_REFRACTION
+	#ifdef ZE_SHADER_REFRACTION
 		float3 RefractionVector     : TEXCOORD4;
 	#endif	
 	float4 Color : TEXCOORD5;
@@ -298,11 +298,11 @@ struct ZEFixedMaterial_ForwardPass_PSInput
 		float2 LightMapTexcoord     : TEXCOORD2;
 	#endif
 	
-	#ifdef ZESHADER_REFLECTION
+	#ifdef ZE_SHADER_REFLECTION
 		float3 ReflectionVector     : TEXCOORD3;
 	#endif
 
-	#ifdef ZESHADER_REFRACTION
+	#ifdef ZE_SHADER_REFRACTION
 		float3 RefractionVector     : TEXCOORD4;
 	#endif	
 	float4 Color : TEXCOORD5;

@@ -40,6 +40,9 @@ ze_add_source(ZEVRPNInputDevice.h							Sources)
 ze_add_source(ZEVRPNInputDeviceExtension.cpp				Sources)
 ze_add_source(ZEVRPNInputDeviceExtension.h					Sources)
 
+link_directories(
+	${ZEBUILD_LIB_PATH}/$(ConfigurationName)/vrpn)
+	
 ze_add_library(ZEVRPNInput 
 	SOURCES ${Sources}
 	LIBS libvrpn)

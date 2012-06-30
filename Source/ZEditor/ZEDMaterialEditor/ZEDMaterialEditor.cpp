@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#define WINDOWS_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
 #include "ui_ZEDMaterialEditor.h"
 #include "ZEDMaterialEditor.h"
 #include <Windows.h>

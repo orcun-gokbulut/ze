@@ -152,8 +152,3 @@ ZESerialPort::ZESerialPort()
 	BaudRate = 0;
 	TimeOut = 1000;
 }
-
-ZESerialPort::~ZESerialPort()
-{
-	Close();
-}

@@ -214,36 +214,6 @@ macro (ze_configure_platform)
 	endif()
 endmacro()
 
-macro (ze_configure_debugging)
-	set(ZEBUILD_UNIT_TESTS_ENABLE             FALSE CACHE BOOL "Enable unit tests.")
-	set(ZEBUILD_DEBUG_ENABLE                  TRUE  CACHE BOOL "Enable debug extensions.")
-	set(ZEBUILD_DEBUG_HEAP_CHECK_ENABLE       FALSE CACHE BOOL "Enable heap checking.")
-	set(ZEBUILD_DEBUG_BREAK_ON_ERROR          TRUE  CACHE BOOL "Break if an error occures.")
-	set(ZEBUILD_DEBUG_BREAK_ON_WARNING        FALSE CACHE BOOL "Break if an warning occures.")
-	set(ZEBUILD_VERBOSE	                      FALSE CACHE BOOL "Enable ZEBuild verbose mode.")
-
-	if (ZEBUILD_DEBUG_ENABLE)
-		ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_ENABLE)
-		
-		if (ZEBUILD_DEBUG_BREAK_ON_ERROR)
-			ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_BREAK_ON_ERROR)
-		endif()
-
-		if (ZEBUILD_DEBUG_BREAK_ON_WARNING)
-			ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG _ZE_DEBUG_BREAK_ON_WARNING)
-		endif()
-
-		if (ZEBUILD_DEBUG_HEAP_CHECK_ENABLE)
-			ze_append_property(GLOBAL PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_MEMORY_CHECKS_ENABLE)
-		endif()
-	endif()
-
-	if (ZEBUILD_UNIT_TESTS_ENABLE)
-		ENABLE_TESTING()
-		include(test_cocoon)
-	endif()
-endmacro()
-
 macro (ze_configure_externals)
 	message(STATUS "[ZEBUILD] Checking externals...")
 	ze_check_externals("${CMAKE_SOURCE_DIR}/Platform" 0 0)
@@ -266,10 +236,73 @@ macro (ze_configure_externals)
 	message(STATUS "")
 	message(STATUS "")
 	
-	set(ZEBUILD_EXTERNAL_PATH ${CMAKE_SOURCE_DIR}/Platform/${ZEBUILD_PLATFORM}/${ZEBUILD_PLATFORM_ARCHITECTURE})
+    set(ZEBUILD_EXTERNAL_PATH ${CMAKE_SOURCE_DIR}/Platform/${ZEBUILD_PLATFORM}/${ZEBUILD_PLATFORM_ARCHITECTURE})
 	set(ZEBUILD_INCLUDE_PATH ${ZEBUILD_EXTERNAL_PATH}/Include)
 	set(ZEBUILD_LIB_PATH ${ZEBUILD_EXTERNAL_PATH}/Lib)
 	set(ZEBUILD_DLL_PATH ${ZEBUILD_EXTERNAL_PATH}/Dll)
 	set(ZEBUILD_TOOL_PATH ${ZEBUILD_EXTERNAL_PATH}/Tool)
+	
+	include_directories(
+		${ZEBUILD_INCLUDE_PATH})
+		
+	link_directories(
+		${ZEBUILD_LIB_PATH}
+		${ZEBUILD_LIB_PATH}/$(ConfigurationName))
+endmacro()
 
+macro (ze_configure_debugging)
+	set(ZEBUILD_DEBUG_ENABLE                  TRUE  CACHE BOOL "Enable debug extensions.")
+	set(ZEBUILD_DEBUG_HEAP_CHECK_ENABLE       FALSE CACHE BOOL "Enable heap checking.")
+	set(ZEBUILD_DEBUG_BREAK_ON_ERROR          TRUE  CACHE BOOL "Break if an error occures.")
+	set(ZEBUILD_DEBUG_BREAK_ON_WARNING        FALSE CACHE BOOL "Break if an warning occures.")
+	set(ZEBUILD_VERBOSE	                      FALSE CACHE BOOL "Enable ZEBuild verbose mode.")
+
+	if (ZEBUILD_DEBUG_ENABLE)
+		ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_ENABLE)
+		
+		if (ZEBUILD_DEBUG_BREAK_ON_ERROR)
+			ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_BREAK_ON_ERROR)
+		endif()
+
+		if (ZEBUILD_DEBUG_BREAK_ON_WARNING)
+			ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG _ZE_DEBUG_BREAK_ON_WARNING)
+		endif()
+
+		if (ZEBUILD_DEBUG_HEAP_CHECK_ENABLE)
+			ze_append_property(GLOBAL PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_MEMORY_CHECKS_ENABLE)
+		endif()
+	endif()
+endmacro()
+
+macro(ze_configure_unit_tests)
+	set(ZEBUILD_UNIT_TESTS_ENABLE             FALSE CACHE BOOL "Enable unit tests.")
+	set(ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE    FALSE CACHE BOOL "Enables code coverage instrumentation.")
+	
+	if (ZEBUILD_UNIT_TESTS_ENABLE)
+		ENABLE_TESTING()
+	endif()
+	
+	if (ZEBUILD_UNIT_TESTS_ENABLE AND ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE)
+		include(test_cocoon)
+	endif()
+endmacro()
+
+macro(ze_configure_static_checks)
+	set(ZEBUILD_STATIC_CHECKS_ENABLE          FALSE CACHE BOOL "Enable static checks.")
+	set(ZEBUILD_STATIC_CHECKS_ENABLE_CPPCHECK FALSE CACHE BOOL "Enable cppcheck static checker.")
+	set(ZEBUILD_STATIC_CHECKS_ENABLE_PCLINT   FALSE CACHE BOOL "Enable pc-lint static checker.")
+	
+	if (ZEBUILD_STATIC_CHECKS_ENABLE AND ZEBUILD_STATIC_CHECKS_ENABLE_CPPCHECK)
+		include(cppcheck.cmake)
+	endif()
+
+	if (ZEBUILD_STATIC_CHECKS_ENABLE AND ZEBUILD_STATIC_CHECKS_ENABLE_PCLINT)
+		include(pc-lint.cmake)
+	endif()
+endmacro()
+
+macro(ze_configure_symbol_server)
+	set(ZEBUILD_SYMBOL_SERVER_ENABLE FALSE CACHE BOOL "Upload symbols to symbol server.")
+	set(ZEBUILD_SYMBOL_SERVER_ADDRESS "\\\\Server\\Symbols" CACHE STRING "Symbol server address.")
+	set(ZEBUILD_SYMBOL_SERVER_SOURCE_INDEX FALSE CACHE BOOL "Index code in sybols with svn address.")
 endmacro()
