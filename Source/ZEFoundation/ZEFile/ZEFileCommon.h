@@ -77,19 +77,47 @@ enum ZEFileKnownPaths
 	ZE_FKP_SAVED_GAMES		= 5,
 };
 
+
 class ZEFileCommon
 {
 	private:
+		static ZEString			AppName;
+		static bool				Initialized;
+		
+		static bool				EnablePathRestriction;
+
+		static ZEString			UserDataPath;
+		static ZEString			ResourcesPath;
+		static ZEString			SystemDataPath;
+		static ZEString			SavedGamesPath;
+		static ZEString			ApplicationResourcesPath;
+
 								ZEFileCommon();
 								~ZEFileCommon();
+
+		static void				InitializePaths();
+
 	public:
-		static void				GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId);
-		static bool				GetOSVersion(ZEUInt& VerMajor, ZEUInt& VerMinor, ZEUInt& Build);
+		static void				SetApplicationName(ZEString& Name);
+
+		static bool				GetInitialized();
+		
+		static void				SetEnablePathRestriction(bool Enable);
+		static bool				SetEnablePathRestriction();
+
+		static const ZEString&	GetUserDataPath();
+		static const ZEString&	GetResourcesPath();
+		static const ZEString&	GetSystemDataPath();
+		static const ZEString&	GetSavedGamesPath();
+		static const ZEString&	GetApplicationResourcesPath();
 		static ZEString			GetKnownPath(ZEFileKnownPaths KnownPath);
-		static bool				BoundaryCheck(const ZEString& RootPath, const ZEString& Path);
-		static ZEString			PathFormatCheck(const ZEString& Path);
-		static ZEFileKnownPaths	GetRootByString(const ZEString& Path);
+		
 		static ZEString			GetFinalPath(const ZEString& Path, ZEFileKnownPaths& Root);
+		static void				GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId);
+		
+		static ZEString			PathFormatCheck(const ZEString& Path);
+		static bool				PathBoundaryCheck(const ZEString& RootPath, const ZEString& Path);
+		
 		static ZESize			FileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow);
 		static bool				FILETIMEtoZEFileTime(ZEFileTime& Time, FILETIME& FileTime);
 
