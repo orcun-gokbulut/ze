@@ -42,5 +42,6 @@ ze_add_cmake_project(CMakeScripts
 		parse_arguments.cmake
 		pclint.cmake
 		test_cocoon.cmake
+		ze.cmake
 		ze_functions.cmake
 		ze_qt.cmake)

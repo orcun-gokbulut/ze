@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#define WINDOWS_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
 #include "ui_ZEDSceneEditor.h"
 #include "ZEModules/ZEDirect3D9/ZED3D9FrameRenderer.h"
 #include <QtGui/QFileDialog.h>

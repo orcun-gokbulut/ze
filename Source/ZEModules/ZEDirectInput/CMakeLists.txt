@@ -38,6 +38,12 @@ cmake_minimum_required (VERSION 2.8)
 ze_add_source(ZEDirectInputModule.cpp				Sources)
 ze_add_source(ZEDirectInputModule.h					Sources)
 
+include_directories(
+	${ZEBUILD_INCLUDE_PATH}/DirectX)
+
+link_directories(
+	${ZEBUILD_LIB_PATH}/DirectX)
+
 ze_add_library(ZEDirectInput 
 	SOURCES ${Sources}
 	LIBS ZEDirectInput dinput8.lib dxguid.lib)

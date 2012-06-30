@@ -95,8 +95,6 @@ ze_add_source(ZETimer.h								Sources Headers)
 ze_add_source(ZETimerManager.cpp					Sources)
 ze_add_source(ZETimerManager.h						Sources Headers)
 
-
-
 ze_add_library(ZECore 
 	SOURCES ${Sources}
 	HEADERS ${Headers}

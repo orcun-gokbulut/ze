@@ -38,14 +38,23 @@ cmake_minimum_required (VERSION 2.8)
 ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG
 	ZE_DEBUG_D3D9_DEBUG_SHADERS	ZE_DEBUG_D3D9_ENABLE_PERFHUD)
 
-set(ZEBUILD_D3D9_ENABLE_PERFHUD	                FALSE CACHE BOOL "Enable PerfHud device in release mode.")
+set(ZEBUILD_D3D9_ENABLE_PERFHUD	                FALSE CACHE BOOL "AT RELEASE CONFIGURATION; Enable PerfHud device in release mode.")
 if(ZEBUILD_D3D9_ENABLE_PERFHUD)
 	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_RELEASE ZE_DEBUG_D3D9_ENABLE_PERFHUD)
 endif()
 
+set(ZEBUILD_D3D9_DEBUG_SHADERS_RELEASE   TRUE CACHE BOOL "AT RELEASE CONFIGURATION; Compile shaders with debug mode.")
+if(ZEBUILD_D3D9_DEBUG_SHADERS_RELEASE)
+	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_RELEASE ZE_DEBUG_D3D9_DEBUG_SHADERS)
+endif()
+
+include_directories(
+	${ZEBUILD_INCLUDE_PATH}/DirectX)
+
+link_directories(
+	${ZEBUILD_LIB_PATH}/DirectX)
 
 add_subdirectory (ZED3D9PostProcessor)
-
 
 ze_add_source(ZED3D9BlurMaskProcessor.cpp				Sources)
 ze_add_source(ZED3D9BlurMaskProcessor.h					Sources)
@@ -129,8 +138,7 @@ ze_add_source(ZED3D9ViewPort.cpp						Sources)
 ze_add_source(ZED3D9ViewPort.h							Sources)
 ze_add_source(ZED3D9ZoomBlurProcessor.cpp				Sources)
 ze_add_source(ZED3D9ZoomBlurProcessor.h					Sources)
-
-
+	
 ze_add_library(ZEDirect3D9 
 	SOURCES ${Sources}
 	LIBS d3d9 d3dx9)

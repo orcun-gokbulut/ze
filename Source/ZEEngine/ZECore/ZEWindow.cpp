@@ -43,7 +43,7 @@
 #include "ZESystemMessageHandler.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 
-#define WINDOWS_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
 #include <stdio.h>

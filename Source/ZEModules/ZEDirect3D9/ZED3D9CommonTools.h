@@ -39,6 +39,7 @@
 
 #include <d3d9.h>
 #include <d3dx9.h>
+
 #include "ZEGraphics/ZETexture.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZETypes.h"

@@ -58,6 +58,15 @@ ze_add_source(ZEPhysXUserOutputStream.h			Sources)
 
 #add_definitions(-DNX_USER_DEBUG_MODE)
 
+include_directories(
+	${ZEBUILD_INCLUDE_PATH}/PhysX2/Cooking 
+	${ZEBUILD_INCLUDE_PATH}/PhysX2/Foundation 
+	${ZEBUILD_INCLUDE_PATH}/PhysX2/PhysXLoader
+	${ZEBUILD_INCLUDE_PATH}/PhysX2/Physics)
+	
+link_directories(
+	${ZEBUILD_LIB_PATH}/PhysX2)
+	
 ze_add_library(ZEPhysX 
 	SOURCES ${Sources}
 	LIBS PhysXLoader PhysXCooking PhysXCore)

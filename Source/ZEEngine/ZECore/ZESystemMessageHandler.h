@@ -37,7 +37,7 @@
 #ifndef __ZE_SYSTEM_MESSAGE_HANDLER__
 #define __ZE_SYSTEM_MESSAGE_HANDLER__
 
-#define WINDOWS_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 class ZESystemMessageHandler
