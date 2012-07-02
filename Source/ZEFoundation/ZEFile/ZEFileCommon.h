@@ -33,21 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+
 #ifndef __ZE_FILE_COMMON_H__
 #define __ZE_FILE_COMMON_H__
 
-
 #include "ZETypes.h"
-#include "ZEDS\ZEString.h"
-
-#include <windows.h>
-
-#define		ZE_FILE_PATH_IDENTIFIER_SYMBOL_RESOURCES		'#'
-#define		ZE_FILE_PATH_IDENTIFIER_SYMBOL_APP_RESOURCES	'~'
-#define		ZE_FILE_PATH_IDENTIFIER_SYMBOL_USER_DATA		'$'
-#define		ZE_FILE_PATH_IDENTIFIER_SYMBOL_SYSTEM_DATA		'&'
-#define		ZE_FILE_PATH_IDENTIFIER_SYMBOL_SAVED_GAMES		'|'
+#include "ZEDS/ZEString.h"
 
 struct ZEFileTime
 {
@@ -62,68 +53,21 @@ struct ZEFileTime
 };
 
 
-// ZE_KFP_RESOURCES: Resources(RunDir\Resources)
-// ZE_KFP_APP_RESOURCES: Application specific resources(RunDir\Resources\AppName)
-// ZE_FKP_USER_DATA: User specific local data
-// ZE_FKP_SYSTEM_DATA: User independent common system data
-// ZE_FKP_SAVED_GAMES: User game saves
-enum ZEFileKnownPaths
-{
-	ZE_FKP_NONE				= 0,
-	ZE_FKP_RESOURCES		= 1,
-	ZE_FKP_APP_RESOURCES	= 2,
-	ZE_FKP_USER_DATA		= 3,
-	ZE_FKP_SYSTEM_DATA		= 4,
-	ZE_FKP_SAVED_GAMES		= 5,
-};
+struct OSFileTime;
+struct ZEFileSearchData;
 
 
 class ZEFileCommon
 {
-	private:
-		static ZEString			AppName;
-		static bool				Initialized;
-		
-		static bool				EnablePathRestriction;
-
-		static ZEString			UserDataPath;
-		static ZEString			ResourcesPath;
-		static ZEString			SystemDataPath;
-		static ZEString			SavedGamesPath;
-		static ZEString			ApplicationResourcesPath;
-
-								ZEFileCommon();
-								~ZEFileCommon();
-
-		static void				InitializePaths();
-
 	public:
-		static void				SetApplicationName(ZEString& Name);
-
-		static bool				GetInitialized();
-		
-		static void				SetEnablePathRestriction(bool Enable);
-		static bool				SetEnablePathRestriction();
-
-		static const ZEString&	GetUserDataPath();
-		static const ZEString&	GetResourcesPath();
-		static const ZEString&	GetSystemDataPath();
-		static const ZEString&	GetSavedGamesPath();
-		static const ZEString&	GetApplicationResourcesPath();
-		static ZEString			GetKnownPath(ZEFileKnownPaths KnownPath);
-		
-		static ZEString			GetFinalPath(const ZEString& Path, ZEFileKnownPaths& Root);
 		static void				GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId);
 		
-		static ZEString			PathFormatCheck(const ZEString& Path);
-		static bool				PathBoundaryCheck(const ZEString& RootPath, const ZEString& Path);
-		
 		static ZESize			FileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow);
-		static bool				FILETIMEtoZEFileTime(ZEFileTime& Time, FILETIME& FileTime);
+        static bool				FILETIMEtoZEFileTime(ZEFileTime* Time, OSFileTime* FileTime);
 
 		static bool				CloseSearchHandle(void* SearchHandle);
-		static bool				GetNextFileFolderInfo(void* OldSearchHandle, WIN32_FIND_DATA* FindData);
-		static bool				GetFileFolderInfo(const ZEString& Path, WIN32_FIND_DATA* FindData, void** SearchHandle);
+        static bool				GetNextFileFolderInfo(void* OldSearchHandle, ZEFileSearchData* FindData);
+        static bool				GetFileFolderInfo(const ZEString& Path, ZEFileSearchData* FindData, void** SearchHandle);
 
 };
 
