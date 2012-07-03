@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFileCommon.cpp
+ Zinek Engine - ZEFileUtils_Unix.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,20 +34,21 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
-#include "ZEFileCommon.h"
+#include "ZEFileUtils.h"
 
 #include <windows.h>
 
-typedef OSFileTime FILETIME ;
-typedef ZEFileSearchData WIN32_FIND_DATA ;
+
+struct OSFileTime : public FILETIME {};
+struct OSFileSearchData : public WIN32_FIND_DATA {};
 
 
-void ZEFileCommon::GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId)
+void ZEFileUtils::GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId)
 {
 	DWORD Return;
 	LPTSTR s;
 
-	Return = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, ErrorId, 0, (LPTSTR)&s, 0, NULL);
+	Return = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)ErrorId, 0, (LPTSTR)&s, 0, NULL);
 	if(Return == 0) // Fail
 	{
 		// Use ErrorId as string
@@ -65,7 +66,7 @@ void ZEFileCommon::GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId)
 
 
 
-ZESize ZEFileCommon::FileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow)
+ZESize ZEFileUtils::FileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow)
 {
 	ULARGE_INTEGER Temp;
 
@@ -75,13 +76,16 @@ ZESize ZEFileCommon::FileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow)
 	return (ZESize)Temp.QuadPart;
 }
 
-bool ZEFileCommon::FILETIMEtoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
+bool ZEFileUtils::FILETIMEtoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
 {
 	BOOL Result;
 	SYSTEMTIME SystemTime;
 	SYSTEMTIME LocalSystemTime;
 
-	Result = FileTimeToSystemTime(&FileTime, &SystemTime);
+	zeDebugCheck(Time == NULL, "NUll pointer");
+	zeDebugCheck(FileTime == NULL, "NUll pointer");
+
+	Result = FileTimeToSystemTime((const FILETIME*)FileTime, &SystemTime);
 	if (!Result)
 		return false;
 
@@ -89,33 +93,41 @@ bool ZEFileCommon::FILETIMEtoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
 	if (!Result)
 		return false;
 
-	Time.Year = LocalSystemTime.wYear;
-	Time.Month = LocalSystemTime.wMonth;
-	Time.DayOfWeek = LocalSystemTime.wDayOfWeek;
-	Time.Day = LocalSystemTime.wDay;
-	Time.Hour = LocalSystemTime.wHour;
-	Time.Minute = LocalSystemTime.wMinute;
-	Time.Second = LocalSystemTime.wSecond;
-	Time.Milliseconds = LocalSystemTime.wMilliseconds;
+	Time->Year = LocalSystemTime.wYear;
+	Time->Month = LocalSystemTime.wMonth;
+	Time->DayOfWeek = LocalSystemTime.wDayOfWeek;
+	Time->Day = LocalSystemTime.wDay;
+	Time->Hour = LocalSystemTime.wHour;
+	Time->Minute = LocalSystemTime.wMinute;
+	Time->Second = LocalSystemTime.wSecond;
+	Time->Milliseconds = LocalSystemTime.wMilliseconds;
 
 	return true;
 }
 
-bool ZEFileCommon::CloseSearchHandle(void* SearchHandle)
+bool ZEFileUtils::CloseSearchHandle(void* SearchHandle)
 {
+	zeDebugCheck(SearchHandle == NULL, "NUll pointer");
+
 	return FindClose((HANDLE)SearchHandle) != 0;
 }
 
-bool ZEFileCommon::GetNextFileFolderInfo(void* OldSearchHandle, ZEFileSearchData* FindData)
+bool ZEFileUtils::GetNextFileFolderInfo(void* OldSearchHandle, OSFileSearchData* FindData)
 {
-	return FindNextFile((HANDLE)OldSearchHandle, FindData) != 0;
+	zeDebugCheck(FindData == NULL, "NUll pointer");
+	zeDebugCheck(OldSearchHandle == NULL, "NUll pointer");
+
+	return FindNextFile((HANDLE)OldSearchHandle, (LPWIN32_FIND_DATA)FindData) != 0;
 }
 
-bool ZEFileCommon::GetFileFolderInfo(const ZEString& Path, ZEFileSearchData* FindData, void** SearchHandle)
+bool ZEFileUtils::GetFileFolderInfo(const ZEString& Path, OSFileSearchData* FindData, void** SearchHandle)
 {
 	HANDLE FirstFileHandle;
 
-	FirstFileHandle = FindFirstFile(Path.ToCString(), FindData);
+	zeDebugCheck(FindData == NULL, "NUll pointer");
+	zeDebugCheck(*SearchHandle == NULL, "NUll pointer");
+
+	FirstFileHandle = FindFirstFile(Path.ToCString(), (LPWIN32_FIND_DATA)FindData);
 	if (FirstFileHandle == INVALID_HANDLE_VALUE) 
 		return false;
 

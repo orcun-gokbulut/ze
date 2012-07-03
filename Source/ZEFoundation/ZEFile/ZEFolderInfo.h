@@ -38,10 +38,13 @@
 #define __ZE_FOLDER_INFO_H__
 
 #include "ZETypes.h"
-#include "ZEFileCommon.h"
+#include "ZEPathManager.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEFileUtils.h"
 
+
+struct ZEFileTime;
 class ZEFileInfo;
 
 class ZEFolderInfo

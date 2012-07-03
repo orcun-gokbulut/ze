@@ -38,8 +38,9 @@
 #define __ZE_FILE_INFO_H__
 
 #include "ZETypes.h"
-#include "ZEFileCommon.h"
 #include "ZEDS/ZEString.h"
+#include "ZEPathManager.h"
+#include "ZEFileUtils.h"
 
 
 class ZEFileInfo
