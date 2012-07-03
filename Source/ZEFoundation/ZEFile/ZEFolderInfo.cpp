@@ -34,14 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEFileInfo.h"
-#include "ZEFileUtils.h"
 #include "ZEFolderInfo.h"
-#include "ZEPathManager.h"
-
-#include "ZEDS/ZEArray.h"
-
-
-#include <windows.h>
 
 
 ZEFolderInfo::ZEFolderInfo()
@@ -76,31 +69,43 @@ const ZEString& ZEFolderInfo::GetPath() const
 
 bool ZEFolderInfo::GetCreationDate(ZEFileTime& Time)
 {
+	bool Result;
 	void* Handle;
-	WIN32_FIND_DATA FindData;
 
 	Handle = NULL;
-	if ( !ZEFileUtils::GetFileFolderInfo(Path, (OSFileSearchData*)&FindData, &Handle) )
+	OSFileSearchData* FindData = ZEFileUtils::CreateOSFileSearchData();
+	Result = ZEFileUtils::GetFileFolderInfo(Path, FindData, &Handle);
+	if (!Result)
+	{
+		ZEFileUtils::DeleteOSFileSearchData(FindData);
 		return false;
+	}
 
-	ZEFileUtils::OSFileTimetoZEFileTime(&Creation, (OSFileTime*)&FindData.ftCreationTime);
+	ZEFileUtils::GetCreationTime(&Creation, FindData);
 	memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
 
+	ZEFileUtils::DeleteOSFileSearchData(FindData);
 	return true;
 }
 
 bool ZEFolderInfo::GetModificationDate(ZEFileTime& Time)
 {
+	bool Result;
 	void* Handle;
-	WIN32_FIND_DATA FindData;
 
 	Handle = NULL;
-	if ( !ZEFileUtils::GetFileFolderInfo(Path, (OSFileSearchData*)&FindData, &Handle) )
+	OSFileSearchData* FindData = ZEFileUtils::CreateOSFileSearchData();
+	Result = ZEFileUtils::GetFileFolderInfo(Path, FindData, &Handle);
+	if (!Result)
+	{
+		ZEFileUtils::DeleteOSFileSearchData(FindData);
 		return false;
+	}
 
-	ZEFileUtils::OSFileTimetoZEFileTime(&Modification, (OSFileTime*)&FindData.ftLastWriteTime);
-	memcpy((void*)&Time, (void*)&Modification, sizeof(ZEFileTime));
+	ZEFileUtils::GetModificationTime(&Creation, FindData);
+	memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
 
+	ZEFileUtils::DeleteOSFileSearchData(FindData);
 	return true;
 }
 
@@ -110,7 +115,6 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 	void* SearchHandle;
 	ZEString FileName;
 	ZEFileInfo*	Temp;
-	WIN32_FIND_DATA FindData;
 	ZEArray<ZEFileInfo*>* FileList;
 
 	// if path is out of boundary
@@ -124,14 +128,15 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 	if ( FileList == NULL )
 		zeCriticalError("Cannot allocate...");
 
-	GetNext = ZEFileUtils::GetFileFolderInfo(Path + "\\*", (OSFileSearchData*)&FindData, &SearchHandle);
+	OSFileSearchData* FindData = ZEFileUtils::CreateOSFileSearchData();
+	GetNext = ZEFileUtils::GetFileFolderInfo(Path + "\\*", FindData, &SearchHandle);
 	while (GetNext)
 	{
 		// If file
-		if ( !(FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
+		if (ZEFileUtils::IsFile(FindData))
 		{
 			FileName = "\\";
-			FileName += FindData.cFileName;
+			FileName += ZEFileUtils::GetFileName(FindData);
 
 			Temp = new ZEFileInfo();
 			if ( Temp == NULL )
@@ -144,9 +149,10 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 			FileList->Add(Temp);
 		}
 
-		GetNext = ZEFileUtils::GetNextFileFolderInfo(SearchHandle, (OSFileSearchData*)&FindData);
+		GetNext = ZEFileUtils::GetNextFileFolderInfo(SearchHandle, FindData);
 	}
 
+	ZEFileUtils::DeleteOSFileSearchData(FindData);
 	return FileList;
 }
 
@@ -156,7 +162,6 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 	void* SearchHandle;
 	ZEString FolderName;
 	ZEFolderInfo* Temp;
-	WIN32_FIND_DATA FindData;
 	ZEArray<ZEFolderInfo*>* FolderList;
 
 	// if path is out of boundary
@@ -170,14 +175,15 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 	if ( FolderList == NULL )
 		zeCriticalError("Cannot allocate...");
 
-	GetNext = ZEFileUtils::GetFileFolderInfo(Path + "\\*", (OSFileSearchData*)&FindData, &SearchHandle);
+	OSFileSearchData* FindData = ZEFileUtils::CreateOSFileSearchData();
+	GetNext = ZEFileUtils::GetFileFolderInfo(Path + "\\*", FindData, &SearchHandle);
 	while (GetNext)
 	{
 		// If Folder
-		if ( FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+		if (ZEFileUtils::IsDirectory(FindData))
 		{
 			FolderName = "\\";
-			FolderName += FindData.cFileName;
+			FolderName += ZEFileUtils::GetFileName(FindData);
 
 			Temp = new ZEFolderInfo();
 			if ( Temp == NULL )
@@ -189,9 +195,10 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 			FolderList->Add(Temp);
 		}
 
-		GetNext = ZEFileUtils::GetNextFileFolderInfo(SearchHandle, (OSFileSearchData*)&FindData);
+		GetNext = ZEFileUtils::GetNextFileFolderInfo(SearchHandle, FindData);
 	}
 
+	ZEFileUtils::DeleteOSFileSearchData(FindData);
 	return FolderList;
 }
 
@@ -200,14 +207,7 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 // STATIC
 bool ZEFolderInfo::IsFolder(const ZEString& FolderPath)
 {
-	WIN32_FIND_DATA FindData;
-	HANDLE FirstFileHandle = INVALID_HANDLE_VALUE;
-
-	FirstFileHandle = FindFirstFile(FolderPath.ToCString(), &FindData);
-	if (FirstFileHandle == INVALID_HANDLE_VALUE)
-		return false;
-
-	return (FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
+	return ZEFileUtils::IsDirectory(FolderPath);
 }
 
 // STATIC

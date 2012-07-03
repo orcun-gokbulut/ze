@@ -35,12 +35,7 @@
 
 #include "ZEError.h"
 #include "ZEFileUtils.h"
-
-#include <windows.h>
-
-
-struct OSFileTime : public FILETIME {};
-struct OSFileSearchData : public WIN32_FIND_DATA {};
+#include "ZEFileTypes_Windows.h"
 
 
 void ZEFileUtils::GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId)
@@ -64,9 +59,8 @@ void ZEFileUtils::GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId)
 	}
 }
 
-
-
-ZESize ZEFileUtils::FileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow)
+// Converts file size of two 32 bits integer into ZESize
+static ZESize OSFileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow)
 {
 	ULARGE_INTEGER Temp;
 
@@ -76,7 +70,7 @@ ZESize ZEFileUtils::FileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow)
 	return (ZESize)Temp.QuadPart;
 }
 
-bool ZEFileUtils::OSFileTimetoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
+static bool OSFileTimetoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
 {
 	BOOL Result;
 	SYSTEMTIME SystemTime;
@@ -103,6 +97,81 @@ bool ZEFileUtils::OSFileTimetoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
 	Time->Milliseconds = LocalSystemTime.wMilliseconds;
 
 	return true;
+}
+
+void ZEFileUtils::DeleteOSFileSearchData(OSFileSearchData* SearchData)
+{
+	delete SearchData;
+	SearchData = NULL;
+}
+
+OSFileSearchData* ZEFileUtils::CreateOSFileSearchData()
+{
+	return new OSFileSearchData;
+}
+
+bool ZEFileUtils::IsFile(const ZEString& Path)
+{
+	bool Result;
+	void* Handle = NULL;
+	OSFileSearchData SearchData;
+
+	Result = ZEFileUtils::GetFileFolderInfo(Path.ToCString(), &SearchData, &Handle);
+	if ( !Result )
+		return false;
+
+	return !((SearchData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
+}
+
+bool ZEFileUtils::IsDirectory(const ZEString& Path)
+{
+	bool Result;
+	void* Handle = NULL;
+	OSFileSearchData SearchData;
+
+	Result = ZEFileUtils::GetFileFolderInfo(Path.ToCString(), &SearchData, &Handle);
+	if ( !Result )
+		return false;
+
+	return ((SearchData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
+}
+
+bool ZEFileUtils::IsFile(OSFileSearchData* FindData)
+{
+	return !((FindData->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
+}
+
+bool ZEFileUtils::IsDirectory(OSFileSearchData* FindData)
+{
+	return ((FindData->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
+}
+
+ZEString ZEFileUtils::GetFileName(OSFileSearchData* FindData)
+{
+	return ZEString(FindData->cFileName);
+}
+
+ZESize ZEFileUtils::GetFileSize(OSFileSearchData* FindData)
+{
+	return OSFileSizetoZESize(FindData->nFileSizeHigh, FindData->nFileSizeLow);
+}
+
+void ZEFileUtils::GetCreationTime(ZEFileTime* Output, OSFileSearchData* FindData)
+{
+	OSFileTime FileTime;
+	FileTime.dwLowDateTime =  FindData->ftCreationTime.dwLowDateTime;
+	FileTime.dwHighDateTime = FindData->ftCreationTime.dwHighDateTime;
+	
+	OSFileTimetoZEFileTime(Output, &FileTime);
+}
+
+void ZEFileUtils::GetModificationTime(ZEFileTime* Output, OSFileSearchData* FindData)
+{
+	OSFileTime FileTime;
+	FileTime.dwLowDateTime =  FindData->ftLastWriteTime.dwLowDateTime;
+	FileTime.dwHighDateTime = FindData->ftLastWriteTime.dwHighDateTime;
+
+	OSFileTimetoZEFileTime(Output, &FileTime);
 }
 
 bool ZEFileUtils::CloseSearchHandle(void* SearchHandle)
