@@ -41,9 +41,14 @@ include_directories(
 	
 ze_add_source(ZEFile.cpp				Sources)
 ze_add_source(ZEFile.h					Sources Headers)
+
+ze_add_source(ZEFileTypes_Unix.h		Sources PLATFORMS Unix)
+ze_add_source(ZEFileTypes_Windows.h		Sources PLATFORMS Windows)
+
 ze_add_source(ZEFileUtils_Unix.cpp		Sources PLATFORMS Unix)
 ze_add_source(ZEFileUtils_Windows.cpp	Sources PLATFORMS Windows)
 ze_add_source(ZEFileUtils.h				Sources)
+
 ze_add_source(ZEFileInfo.cpp			Sources)
 ze_add_source(ZEFileInfo.h				Sources Headers)
 ze_add_source(ZEFolderInfo.cpp			Sources)
@@ -66,7 +71,7 @@ ze_add_library(ZEFile
 	INSTALL
 	INSTALL_DESTINATION ZEFoundation/ZEFile
 	INSTALL_COMPONENT ZESDK)
-	
+
 ze_add_test(ZEFileTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES
