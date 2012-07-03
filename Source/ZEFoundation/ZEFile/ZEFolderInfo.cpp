@@ -83,7 +83,7 @@ bool ZEFolderInfo::GetCreationDate(ZEFileTime& Time)
 	if ( !ZEFileUtils::GetFileFolderInfo(Path, (OSFileSearchData*)&FindData, &Handle) )
 		return false;
 
-	ZEFileUtils::FILETIMEtoZEFileTime(&Creation, (OSFileTime*)&FindData.ftCreationTime);
+	ZEFileUtils::OSFileTimetoZEFileTime(&Creation, (OSFileTime*)&FindData.ftCreationTime);
 	memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
 
 	return true;
@@ -98,7 +98,7 @@ bool ZEFolderInfo::GetModificationDate(ZEFileTime& Time)
 	if ( !ZEFileUtils::GetFileFolderInfo(Path, (OSFileSearchData*)&FindData, &Handle) )
 		return false;
 
-	ZEFileUtils::FILETIMEtoZEFileTime(&Modification, (OSFileTime*)&FindData.ftLastWriteTime);
+	ZEFileUtils::OSFileTimetoZEFileTime(&Modification, (OSFileTime*)&FindData.ftLastWriteTime);
 	memcpy((void*)&Time, (void*)&Modification, sizeof(ZEFileTime));
 
 	return true;

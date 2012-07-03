@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 
-#ifndef __ZE_FILE_COMMON_H__
-#define __ZE_FILE_COMMON_H__
+#ifndef __ZE_FILE_UTILS_H__
+#define __ZE_FILE_UTILS_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
@@ -52,22 +52,21 @@ struct ZEFileTime
 	ZEUInt16	Milliseconds;
 };
 
-
 struct OSFileTime;
 struct OSFileSearchData;
 
 class ZEFileUtils
 {
 	public:
+        static void         GetSize(ZESize* Output, OSFileSearchData* FindData);
+        static void         GetCreationTime(ZEFileTime* Output, OSFileSearchData* FindData);
+        static void         GetModificationTime(ZEFileTime* Output, OSFileSearchData* FindData);
 
-		static bool				CloseSearchHandle(void* SearchHandle);
-        static bool				GetNextFileFolderInfo(void* OldSearchHandle, OSFileSearchData* FindData);
-        static bool				GetFileFolderInfo(const ZEString& Path, OSFileSearchData* FindData, void** SearchHandle);
+        static bool			CloseSearchHandle(void* SearchHandle);
+        static bool			GetNextFileFolderInfo(void* OldSearchHandle, OSFileSearchData* FindData);
+        static bool			GetFileFolderInfo(const ZEString& Path, OSFileSearchData* FindData, void** SearchHandle);
 
-		static ZESize			FileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow);
-		static bool				FILETIMEtoZEFileTime(ZEFileTime* Time, OSFileTime* FileTime);
-
-		static void				GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId);
+        static void			GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId);
 };
 
 
