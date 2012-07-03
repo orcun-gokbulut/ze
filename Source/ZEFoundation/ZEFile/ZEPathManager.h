@@ -66,52 +66,40 @@ enum ZEFileKnownPaths
 class ZEPathManager
 {
     private:
-        static ZEString			AppName;
-        static bool				Initialized;
+        static ZEString				AppName;
+        static bool					Initialized;
 
-        static bool				EnablePathRestriction;
+        static bool					EnablePathRestriction;
 
-        static ZEString			UserDataPath;
-        static ZEString			ResourcesPath;
-        static ZEString			SystemDataPath;
-        static ZEString			SavedGamesPath;
-        static ZEString			ApplicationResourcesPath;
+        static ZEString				UserDataPath;
+        static ZEString				ResourcesPath;
+        static ZEString				SystemDataPath;
+        static ZEString				SavedGamesPath;
+        static ZEString				ApplicationResourcesPath;
 
-                                ZEPathManager();
-                                ~ZEPathManager();
+									ZEPathManager();
+									~ZEPathManager();
 
-        static void				InitializePaths();
+        static void					InitializePaths();
 
     public:
-        static bool				GetInitialized();
-        static void				SetApplicationName(ZEString& Name);
+        static bool					GetInitialized();
+        static void					SetApplicationName(ZEString& Name);
 
-        static void				SetEnablePathRestriction(bool Enable);
-        static bool				GetEnablePathRestriction();
+        static void					SetEnablePathRestriction(bool Enable);
+        static bool					GetEnablePathRestriction();
 
-        static const ZEString&	GetUserDataPath();
-        static const ZEString&	GetResourcesPath();
-        static const ZEString&	GetSystemDataPath();
-        static const ZEString&	GetSavedGamesPath();
-        static const ZEString&	GetApplicationResourcesPath();
-        static ZEString			GetKnownPath(ZEFileKnownPaths KnownPath);
+        static const ZEString&		GetUserDataPath();
+        static const ZEString&		GetResourcesPath();
+        static const ZEString&		GetSystemDataPath();
+        static const ZEString&		GetSavedGamesPath();
+        static const ZEString&		GetApplicationResourcesPath();
+        static ZEString				GetKnownPath(ZEFileKnownPaths KnownPath);
 
-        static ZEString			GetFinalPath(const ZEString& Path, ZEFileKnownPaths& Root);
+        static ZEString				GetFinalPath(const ZEString& Path, ZEFileKnownPaths& Root);
 
-        static ZEString			PathFormatCheck(const ZEString& Path);
-        static bool				PathBoundaryCheck(const ZEString& RootPath, const ZEString& Path);
-
-
-
-
-        static void				GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId);
-
-        static ZESize			FileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow);
-        static bool				FILETIMEtoZEFileTime(ZEFileTime& Time, FILETIME& FileTime);
-
-        static bool				CloseSearchHandle(void* SearchHandle);
-        static bool				GetNextFileFolderInfo(void* OldSearchHandle, WIN32_FIND_DATA* FindData);
-        static bool				GetFileFolderInfo(const ZEString& Path, WIN32_FIND_DATA* FindData, void** SearchHandle);
+        static ZEString				PathFormatCheck(const ZEString& Path);
+        static bool					PathBoundaryCheck(const ZEString& RootPath, const ZEString& Path);
 
 };
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFileCommon.h
+ Zinek Engine - ZEFileUtils.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -54,21 +54,20 @@ struct ZEFileTime
 
 
 struct OSFileTime;
-struct ZEFileSearchData;
+struct OSFileSearchData;
 
-
-class ZEFileCommon
+class ZEFileUtils
 {
 	public:
-		static void				GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId);
-		
-		static ZESize			FileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow);
-        static bool				FILETIMEtoZEFileTime(ZEFileTime* Time, OSFileTime* FileTime);
 
 		static bool				CloseSearchHandle(void* SearchHandle);
-        static bool				GetNextFileFolderInfo(void* OldSearchHandle, ZEFileSearchData* FindData);
-        static bool				GetFileFolderInfo(const ZEString& Path, ZEFileSearchData* FindData, void** SearchHandle);
+        static bool				GetNextFileFolderInfo(void* OldSearchHandle, OSFileSearchData* FindData);
+        static bool				GetFileFolderInfo(const ZEString& Path, OSFileSearchData* FindData, void** SearchHandle);
 
+		static ZESize			FileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow);
+		static bool				FILETIMEtoZEFileTime(ZEFileTime* Time, OSFileTime* FileTime);
+
+		static void				GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId);
 };
 
 

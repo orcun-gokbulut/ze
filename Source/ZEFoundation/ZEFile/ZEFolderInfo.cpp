@@ -34,11 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEFileInfo.h"
+#include "ZEFileUtils.h"
 #include "ZEFolderInfo.h"
+#include "ZEPathManager.h"
+
 #include "ZEDS/ZEArray.h"
 
 
 #include <windows.h>
+
 
 ZEFolderInfo::ZEFolderInfo()
 {
@@ -48,7 +52,7 @@ ZEFolderInfo::ZEFolderInfo()
 
 ZEFolderInfo::ZEFolderInfo(const ZEString& FolderPath)
 {
-	Path = ZEFileCommon::GetFinalPath(FolderPath, Root);
+	Path = ZEPathManager::GetFinalPath(FolderPath, Root);
 	Name = GetFolderName(Path);
 
 	memset((void*)&Creation, 0, sizeof(ZEFileTime));
@@ -76,10 +80,10 @@ bool ZEFolderInfo::GetCreationDate(ZEFileTime& Time)
 	WIN32_FIND_DATA FindData;
 
 	Handle = NULL;
-	if ( !ZEFileCommon::GetFileFolderInfo(Path, &FindData, &Handle) )
+	if ( !ZEFileUtils::GetFileFolderInfo(Path, (OSFileSearchData*)&FindData, &Handle) )
 		return false;
 
-	ZEFileCommon::FILETIMEtoZEFileTime(Creation, FindData.ftCreationTime);
+	ZEFileUtils::FILETIMEtoZEFileTime(&Creation, (OSFileTime*)&FindData.ftCreationTime);
 	memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
 
 	return true;
@@ -91,10 +95,10 @@ bool ZEFolderInfo::GetModificationDate(ZEFileTime& Time)
 	WIN32_FIND_DATA FindData;
 
 	Handle = NULL;
-	if ( !ZEFileCommon::GetFileFolderInfo(Path, &FindData, &Handle) )
+	if ( !ZEFileUtils::GetFileFolderInfo(Path, (OSFileSearchData*)&FindData, &Handle) )
 		return false;
 
-	ZEFileCommon::FILETIMEtoZEFileTime(Modification, FindData.ftLastWriteTime);
+	ZEFileUtils::FILETIMEtoZEFileTime(&Modification, (OSFileTime*)&FindData.ftLastWriteTime);
 	memcpy((void*)&Time, (void*)&Modification, sizeof(ZEFileTime));
 
 	return true;
@@ -110,7 +114,7 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 	ZEArray<ZEFileInfo*>* FileList;
 
 	// if path is out of boundary
-	if ( !ZEFileCommon::PathBoundaryCheck(ZEFileCommon::GetKnownPath(Root), Path) )
+	if ( !ZEPathManager::PathBoundaryCheck(ZEPathManager::GetKnownPath(Root), Path) )
 	{
 		zeError("Paths above the root are not reachable..");
 		return NULL;
@@ -120,7 +124,7 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 	if ( FileList == NULL )
 		zeCriticalError("Cannot allocate...");
 
-	GetNext = ZEFileCommon::GetFileFolderInfo(Path + "\\*", &FindData, &SearchHandle);
+	GetNext = ZEFileUtils::GetFileFolderInfo(Path + "\\*", (OSFileSearchData*)&FindData, &SearchHandle);
 	while (GetNext)
 	{
 		// If file
@@ -140,7 +144,7 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 			FileList->Add(Temp);
 		}
 
-		GetNext = ZEFileCommon::GetNextFileFolderInfo(SearchHandle, &FindData);
+		GetNext = ZEFileUtils::GetNextFileFolderInfo(SearchHandle, (OSFileSearchData*)&FindData);
 	}
 
 	return FileList;
@@ -156,7 +160,7 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 	ZEArray<ZEFolderInfo*>* FolderList;
 
 	// if path is out of boundary
-	if ( !ZEFileCommon::PathBoundaryCheck(ZEFileCommon::GetKnownPath(Root), Path) )
+	if ( !ZEPathManager::PathBoundaryCheck(ZEPathManager::GetKnownPath(Root), Path) )
 	{
 		zeError("Paths above the root are not reachable..");
 		return NULL;
@@ -166,7 +170,7 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 	if ( FolderList == NULL )
 		zeCriticalError("Cannot allocate...");
 
-	GetNext = ZEFileCommon::GetFileFolderInfo(Path + "\\*", &FindData, &SearchHandle);
+	GetNext = ZEFileUtils::GetFileFolderInfo(Path + "\\*", (OSFileSearchData*)&FindData, &SearchHandle);
 	while (GetNext)
 	{
 		// If Folder
@@ -185,7 +189,7 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 			FolderList->Add(Temp);
 		}
 
-		GetNext = ZEFileCommon::GetNextFileFolderInfo(SearchHandle, &FindData);
+		GetNext = ZEFileUtils::GetNextFileFolderInfo(SearchHandle, (OSFileSearchData*)&FindData);
 	}
 
 	return FolderList;

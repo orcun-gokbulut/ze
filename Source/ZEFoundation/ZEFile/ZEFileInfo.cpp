@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEFileCommon.h"
+#include "ZEFileUtils.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEFileInfo.h"
 
@@ -50,7 +50,7 @@ ZEFileInfo::ZEFileInfo()
 ZEFileInfo::ZEFileInfo(const ZEString& FilePath)
 {	
 	Size = 0;
-	Path = ZEFileCommon::GetFinalPath(FilePath, Root);
+	Path = ZEPathManager::GetFinalPath(FilePath, Root);
 	Extension = GetFileExtension(Path);
 	Name = GetFileName(Path);
 
@@ -70,11 +70,11 @@ ZESize ZEFileInfo::GetSize()
 	WIN32_FIND_DATA FindData;
 
 	Handle = NULL;
-	Result = ZEFileCommon::GetFileFolderInfo(Path, &FindData, &Handle);
+	Result = ZEFileUtils::GetFileFolderInfo(Path, (OSFileSearchData*)&FindData, &Handle);
 	if ( !Result )
 		return 0;
 
-	Size = ZEFileCommon::FileSizetoZESize(FindData.nFileSizeHigh, FindData.nFileSizeLow);
+	Size = ZEFileUtils::FileSizetoZESize(FindData.nFileSizeHigh, FindData.nFileSizeLow);
 
 	return Size;
 }
@@ -101,11 +101,11 @@ bool ZEFileInfo::GetCreationDate(ZEFileTime& Time)
 	WIN32_FIND_DATA FindData;
 
 	Handle = NULL;
-	Result = ZEFileCommon::GetFileFolderInfo(Path, &FindData, &Handle);
+	Result = ZEFileUtils::GetFileFolderInfo(Path, (OSFileSearchData*)&FindData, &Handle);
 	if ( !Result )
 		return false;
 
-	ZEFileCommon::FILETIMEtoZEFileTime(Creation, FindData.ftCreationTime);
+	ZEFileUtils::FILETIMEtoZEFileTime(&Creation, (OSFileTime*)&FindData.ftCreationTime);
 	memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
 
 	return true;
@@ -118,11 +118,11 @@ bool ZEFileInfo::GetModificationDate(ZEFileTime& Time)
 	WIN32_FIND_DATA FindData;
 
 	Handle = NULL;
-	Result = ZEFileCommon::GetFileFolderInfo(Path, &FindData, &Handle);
+	Result = ZEFileUtils::GetFileFolderInfo(Path, (OSFileSearchData*)&FindData, &Handle);
 	if ( !Result )
 		return false;
 
-	ZEFileCommon::FILETIMEtoZEFileTime(Modification, FindData.ftLastWriteTime);
+	ZEFileUtils::FILETIMEtoZEFileTime(&Modification, (OSFileTime*)&FindData.ftLastWriteTime);
 	memcpy((void*)&Time, (void*)&Modification, sizeof(ZEFileTime));
 
 	return true;
@@ -137,7 +137,7 @@ bool ZEFileInfo::IsFile(const ZEString& FilePath)
 	WIN32_FIND_DATA FindData;
 
 	Handle = NULL;
-	Result = ZEFileCommon::GetFileFolderInfo(FilePath.ToCString(), &FindData, &Handle);
+	Result = ZEFileUtils::GetFileFolderInfo(FilePath.ToCString(), (OSFileSearchData*)&FindData, &Handle);
 	if ( !Result )
 		return false;
 
