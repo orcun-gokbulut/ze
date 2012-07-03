@@ -36,105 +36,192 @@
 #include "ZEError.h"
 #include "ZEFileUtils.h"
 
-#include <windows.h>
+#include "errno.h"
+#include "fcntl.h"
+#include <string.h>
+#include <dirent.h>
 
+// Platform dependent declerations
+struct OSFileTime
+{
+    time_t      Time;
+};
 
-struct OSFileTime : public FILETIME {};
-struct OSFileSearchData : public WIN32_FIND_DATA {};
+struct OSFileSearchData : public stat
+{
+    ZEString    Name;
+};
 
+static ZEString LastSearchPath = ".";
 
+// Converts operationg system's OSFileTime data into human readable ZEFileTime
+static bool OSFileTimetoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
+{
+    zeDebugCheck(Time == NULL, "NUll pointer");
+    zeDebugCheck(FileTime == NULL, "NUll pointer");
+
+    struct tm* TimeInfo = NULL;
+    TimeInfo = localtime(&FileTime->Time);
+
+    Time->Day = (ZEInt16)TimeInfo->tm_mday;
+    Time->Hour = (ZEInt16)TimeInfo->tm_hour;
+    Time->Year = (ZEInt16)TimeInfo->tm_year;
+    Time->Month = (ZEInt16)TimeInfo->tm_mon;
+    Time->Second = (ZEInt16)TimeInfo->tm_sec;
+    Time->Minute = (ZEInt16)TimeInfo->tm_min;
+    Time->DayOfWeek = (ZEInt16)TimeInfo->tm_wday;
+    Time->Milliseconds = (ZEInt16)0;
+
+    return true;
+}
+
+// Returns the size of a file from OSFileSearchData
+void ZEFileUtils::GetSize(ZESize* Output, OSFileSearchData* FindData)
+{
+    // On unix implementation just return size
+    *Output = (ZESize)FindData->st_size;
+}
+
+// Returns the creation time of a file from OSFileSearchData
+void ZEFileUtils::GetCreationTime(ZEFileTime* Output, OSFileSearchData* FindData)
+{
+    OSFileTime FileTime = {FindData->st_ctim};
+    OSFileTimetoZEFileTime(Output, &FileTime);
+}
+
+// Returns the modification time of a file from OSFileSearchData
+void ZEFileUtils::GetModificationTime(ZEFileTime* Output, OSFileSearchData* FindData)
+{
+    OSFileTime FileTime = {FindData->st_mtim};
+    OSFileTimetoZEFileTime(Output, &FileTime);
+}
+
+// Converts error id to error string
 void ZEFileUtils::GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId)
 {
-	DWORD Return;
-	LPTSTR s;
+    int Return;
+    char CErrorString[256 + 1];
 
-	Return = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)ErrorId, 0, (LPTSTR)&s, 0, NULL);
-	if(Return == 0) // Fail
-	{
-		// Use ErrorId as string
-		ErrorString = "ErrorId: ";
-		ErrorString += ZEString::FromUInt32(ErrorId);
-		ErrorString += ".";
+    Return = sterror_r(ErrorId, CErrorString, 256);
+    if(Return == 0) // Success
+    {
+        // Use returned string to form error message
+        ErrorString = ZEString::FromCString(CErrorString);
+
 	}
-	else // Success
+    else // Fail
 	{
-		// Use returned string to form error message
-		ErrorString = ZEString::FromCString(s);
-		LocalFree(s);
-	}
+        // Use ErrorId as string
+        ErrorString = "ErrorId: ";
+        ErrorString += ZEString::FromUInt32(ErrorId);
+        ErrorString += ".";
+    }
 }
 
-
-
-ZESize ZEFileUtils::FileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow)
-{
-	ULARGE_INTEGER Temp;
-
-	Temp.LowPart = SizeLow;
-	Temp.HighPart = SizeHigh;
-
-	return (ZESize)Temp.QuadPart;
-}
-
-bool ZEFileUtils::FILETIMEtoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
-{
-	BOOL Result;
-	SYSTEMTIME SystemTime;
-	SYSTEMTIME LocalSystemTime;
-
-	zeDebugCheck(Time == NULL, "NUll pointer");
-	zeDebugCheck(FileTime == NULL, "NUll pointer");
-
-	Result = FileTimeToSystemTime((const FILETIME*)FileTime, &SystemTime);
-	if (!Result)
-		return false;
-
-	Result = SystemTimeToTzSpecificLocalTime(NULL, &SystemTime, &LocalSystemTime);
-	if (!Result)
-		return false;
-
-	Time->Year = LocalSystemTime.wYear;
-	Time->Month = LocalSystemTime.wMonth;
-	Time->DayOfWeek = LocalSystemTime.wDayOfWeek;
-	Time->Day = LocalSystemTime.wDay;
-	Time->Hour = LocalSystemTime.wHour;
-	Time->Minute = LocalSystemTime.wMinute;
-	Time->Second = LocalSystemTime.wSecond;
-	Time->Milliseconds = LocalSystemTime.wMilliseconds;
-
-	return true;
-}
-
+// Closes the search stream
 bool ZEFileUtils::CloseSearchHandle(void* SearchHandle)
 {
-	zeDebugCheck(SearchHandle == NULL, "NUll pointer");
+    ZEInt Return;
 
-	return FindClose((HANDLE)SearchHandle) != 0;
+    zeDebugCheck(SearchHandle == NULL, "NUll pointer");
+
+    Return = closedir((DIR*)SearchHandle);
+    if (Return != 0)
+    {
+        ZEString ErrorString;
+        GetErrorString(&ErrorString, errno);
+        zeError("Can not close search handle.\nError: %s", ErrorString.ToCString());
+    }
+
+    LastSearchPath = ".";
+
+    return Return == 0 ? true : false;
 }
 
+// Gets the next file info from search stream
 bool ZEFileUtils::GetNextFileFolderInfo(void* OldSearchHandle, OSFileSearchData* FindData)
 {
-	zeDebugCheck(FindData == NULL, "NUll pointer");
-	zeDebugCheck(OldSearchHandle == NULL, "NUll pointer");
+    ZEInt Result;
+    ZEString ErrorString;
+    dirent* Entry = NULL;
 
-	return FindNextFile((HANDLE)OldSearchHandle, (LPWIN32_FIND_DATA)FindData) != 0;
+    zeDebugCheck(FindData == NULL, "NUll pointer");
+    zeDebugCheck(OldSearchHandle == NULL, "NUll pointer");
+
+    // Get first entry in the folder
+    errno = 0;
+    Entry = readdir (Directory);
+    if (Entry == NULL)
+    {
+        // Nothing found
+        return false;
+    }
+
+    // Get info and return
+    Result = stat(ZEString(LastSearchPath + Entry->d_name).ToCString(), (stat*)FindData);
+    if (Result != 0)
+    {
+        GetErrorString(&ErrorString, errno);
+        zeError("Can not get info.\nError: %s", ErrorString.ToCString());
+        return false;
+    }
+
+    // Set name of search data
+    FindData->Name = Entry->d_name;
+
+    return true;
 }
 
+// Opens a file search stream and returns the first found file info
 bool ZEFileUtils::GetFileFolderInfo(const ZEString& Path, OSFileSearchData* FindData, void** SearchHandle)
 {
-	HANDLE FirstFileHandle;
+    ZEInt Result;
+    ZEString ErrorString;
+    dirent* Entry = NULL;
+    DIR* Directory = NULL;
 
-	zeDebugCheck(FindData == NULL, "NUll pointer");
-	zeDebugCheck(*SearchHandle == NULL, "NUll pointer");
 
-	FirstFileHandle = FindFirstFile(Path.ToCString(), (LPWIN32_FIND_DATA)FindData);
-	if (FirstFileHandle == INVALID_HANDLE_VALUE) 
-		return false;
+    zeDebugCheck(Path.IsEmpty(), "Empty string");
+    zeDebugCheck(FindData == NULL, "NUll pointer");
+    zeDebugCheck(SearchHandle == NULL, "NUll pointer");
 
-	if (*SearchHandle != NULL)
-		*SearchHandle = FirstFileHandle;
-	else
-		FindClose(FirstFileHandle);
+    // Open directory
+    errno = 0;
+    Directory = opendir(Path.ToCString());
+    if (Directory == NULL)
+    {
+        GetErrorString(&ErrorString, errno);
+        zeError("Can not open path.\nError: %s", ErrorString.ToCString());
+        return false;
+    }
 
-	return true;
+    // Save path for future use
+    LastSearchPath = Path;
+
+    // Set the search handle
+    *SearchHandle = (void*)Directory;
+
+    // Get first entry in the folder
+    errno = 0;
+    Entry = readdir (Directory);
+    if (Entry == NULL)
+    {
+        GetErrorString(&ErrorString, errno);
+        zeError("Can not read dir.\nError: %s", ErrorString.ToCString());
+        return false;
+    }
+
+    // Get info and return
+    Result = stat(ZEString(LastSearchPath + Entry->d_name).ToCString(), (stat*)FindData);
+    if (Result != 0)
+    {
+        GetErrorString(&ErrorString, errno);
+        zeError("Can not get info.\nError: %s", ErrorString.ToCString());
+        return false;
+    }
+
+    // Set name of search data
+    FindData->Name = Entry->d_name;
+
+    return true;
 }
