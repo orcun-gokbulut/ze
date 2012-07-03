@@ -115,7 +115,7 @@ void ZEString::SetValue(wchar_t Character)
 void ZEString::SetValue(const wchar_t* String)
 {
 	ZESize Size = wcstombs(NULL, String, (size_t)-1);
-	Allocator.Allocate(&Buffer, Size);
+	Allocator.Allocate(&Buffer, Size + 1);
 	wcstombs(Buffer, String, (size_t)-1);
 }
 
