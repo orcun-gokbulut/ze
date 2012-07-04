@@ -35,7 +35,7 @@
 
 #include "ZEError.h"
 #include "ZEFileUtils.h"
-#include "ZEFileTypes_Windows.h"
+#include "ZEFileDataTypes_Windows.h"
 
 
 void ZEFileUtils::GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId)
