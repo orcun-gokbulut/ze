@@ -265,7 +265,8 @@ void ZED3D9MLAAProcessor::Process()
 
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&PixelSize, 1);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PixelSize, 1);
-	GetDevice()->SetPixelShaderConstantF(1, (const float*)&ZEVector4(Treshold, FarZ, 0.0f, 0.0f), 1);
+	//GetDevice()->SetPixelShaderConstantF(1, (const float*)&ZEVector4(Treshold, FarZ, 0.0f, 0.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(1, (const float*)&ZEVector4(Treshold, 500.0f, 0.0f, 0.0f), 1);
 
 	//ZED3D9CommonTools::SetRenderTarget(0, OutputBuffer);
 	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)EdgeBuffer);
@@ -287,7 +288,7 @@ void ZED3D9MLAAProcessor::Process()
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PixelSize, 1);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&PixelSize, 1);
 
-	ZED3D9CommonTools::SetTexture(4, (ZETexture2D*)EdgeBuffer, D3DTEXF_LINEAR, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetTexture(4, (ZETexture2D*)EdgeBuffer, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(6, (ZETexture2D*)AreaBuffer, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vertex));
@@ -303,7 +304,7 @@ void ZED3D9MLAAProcessor::Process()
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PixelSize, 1);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&PixelSize, 1);
 
-	ZED3D9CommonTools::SetTexture(3, (ZETexture2D*)InputColorBuffer, D3DTEXF_LINEAR, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetTexture(3, (ZETexture2D*)InputColorBuffer, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(5, (ZETexture2D*)BlendWeightBuffer, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 	
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vertex));

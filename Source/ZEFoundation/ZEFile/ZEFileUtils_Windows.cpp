@@ -194,7 +194,7 @@ bool ZEFileUtils::GetFileFolderInfo(const ZEString& Path, OSFileSearchData* Find
 	HANDLE FirstFileHandle;
 
 	zeDebugCheck(FindData == NULL, "NUll pointer");
-	zeDebugCheck(*SearchHandle == NULL, "NUll pointer");
+	//zeDebugCheck(*SearchHandle == NULL, "NUll pointer");
 
 	FirstFileHandle = FindFirstFile(Path.ToCString(), (LPWIN32_FIND_DATA)FindData);
 	if (FirstFileHandle == INVALID_HANDLE_VALUE) 

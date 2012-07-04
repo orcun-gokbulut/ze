@@ -47,7 +47,7 @@
 #include <d3d9.h>
 #include <stdlib.h>
 
-const ZEMatrix4x4 ZEColorMatrix::Normal = ZEMatrix4x4(   1.0f, 0.0f, 0.0f, 0.0f,
+const ZEMatrix4x4 ZEColorMatrix::Normal = ZEMatrix4x4(  1.0f, 0.0f, 0.0f, 0.0f,
 														0.0f, 1.0f, 0.0f, 0.0f,
 														0.0f, 0.0f, 1.0f, 0.0f,
 														0.0f, 0.0f, 0.0f, 1.0f );
@@ -130,6 +130,11 @@ void ZED3D9ColorTransformProcessor::SetColorMatrix(const ZEMatrix4x4* Matrix)
 	this->ColorMatrix = (ZEMatrix4x4*)Matrix;
 }
 
+ZEMatrix4x4* ZED3D9ColorTransformProcessor::GetColorMatrix()
+{
+	return ColorMatrix;
+}
+
 void ZED3D9ColorTransformProcessor::SetTransformFactor(float Factor)
 {
 	TransformFactor = Factor;
@@ -140,9 +145,34 @@ float ZED3D9ColorTransformProcessor::GetTransformFactor()
 	return TransformFactor;
 }
 
-ZEMatrix4x4* ZED3D9ColorTransformProcessor::GetColorMatrix()
+void ZED3D9ColorTransformProcessor::SetHueFactor(float Factor)
 {
-	return ColorMatrix;
+	HueFactor = Factor;
+}
+
+float ZED3D9ColorTransformProcessor::GetHueFactor()
+{
+	return HueFactor;
+}
+
+void ZED3D9ColorTransformProcessor::SetLightnessFactor(float Factor)
+{
+	LightnessFactor = Factor;
+}
+
+float ZED3D9ColorTransformProcessor::GetLightnessFactor()
+{
+	return LightnessFactor;
+}
+
+void ZED3D9ColorTransformProcessor::SetSaturationFactor(float Factor)
+{
+	SaturationFactor = Factor;
+}
+
+float ZED3D9ColorTransformProcessor::GetSaturationFactor()
+{
+	return SaturationFactor;
 }
 
 void ZED3D9ColorTransformProcessor::Initialize()
@@ -210,13 +240,35 @@ void ZED3D9ColorTransformProcessor::Process()
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	
-	
-	// Send the color matrix and pixel size
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(TransformFactor, 0.0f, 0.0f, 0.0f), 1);
-	GetDevice()->SetPixelShaderConstantF(1, (const float*)ColorMatrix, 4);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / InputBuffer->GetWidth(), 1.0f / InputBuffer->GetHeight(), 0.0f, 0.0f), 1);
+	struct VertexShaderParameters
+	{
+		float	PixelSizeInput[2];
 
-	// Set input and output
+		float	Reserved0;
+		float	Reserved1;
+
+	} VSParameters = {
+
+		{1.0f / (float)OutputBuffer->GetWidth(), 1.0f / (float)OutputBuffer->GetHeight()}, 0.0f, 0.0f
+	};
+
+	struct PixelShaderParameters
+	{
+		float	HueFactor;
+		float	LightnessFactor;
+		float	SaturationFactor;
+		float	TransformFactor;
+		
+	} PSParameters = {
+
+		HueFactor, LightnessFactor, SaturationFactor, TransformFactor
+	};
+
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PSParameters, sizeof(PixelShaderParameters) / 16);
+	GetDevice()->SetPixelShaderConstantF(1, (const float*)ColorMatrix, 4);
+	
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&VSParameters, sizeof(VertexShaderParameters) / 16);
+
 	ZED3D9CommonTools::SetRenderTarget(0, OutputBuffer);
 	ZED3D9CommonTools::SetTexture(6, (ZETexture2D*)InputBuffer, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 
@@ -236,6 +288,9 @@ ZED3D9ColorTransformProcessor::ZED3D9ColorTransformProcessor()
 	InputBuffer			= NULL;
 	OutputBuffer		= NULL;
 
+	HueFactor			= 0.0f;
+	LightnessFactor		= 1.1f;
+	SaturationFactor	= 1.2f;
 	TransformFactor		= 1.0f;
 	ColorMatrix			= (ZEMatrix4x4*)&ZEColorMatrix::Normal;
 	
