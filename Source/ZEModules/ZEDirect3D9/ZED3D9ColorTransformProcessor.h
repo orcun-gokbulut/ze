@@ -66,6 +66,10 @@ class ZEColorMatrix : public ZEMatrix4x4
 class ZED3D9ColorTransformProcessor : public ZED3D9ComponentBase
 {
 	private:
+		float							HueFactor;				// Additive
+		float							LightnessFactor;		// Multiplicative
+		float							SaturationFactor;		// Multiplicative
+
 		float							TransformFactor;
 		ZEMatrix4x4*					ColorMatrix;
 
@@ -94,7 +98,15 @@ class ZED3D9ColorTransformProcessor : public ZED3D9ComponentBase
 
 		void							SetTransformFactor(float Factor);
 		float							GetTransformFactor();
-		
+
+		void							SetHueFactor(float Factor);
+		float							GetHueFactor();
+
+		void							SetLightnessFactor(float Factor);
+		float							GetLightnessFactor();
+
+		void							SetSaturationFactor(float Factor);
+		float							GetSaturationFactor();
 		
 		void							Initialize();
 		void							Deinitialize();

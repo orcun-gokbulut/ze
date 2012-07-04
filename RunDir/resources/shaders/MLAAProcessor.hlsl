@@ -53,7 +53,7 @@ float2		MLAAParameters	: register(ps, c1);
 #define		Treshold		MLAAParameters.x
 #define		FarZ			MLAAParameters.y
 
-#define		SEARCH_STEP		4
+#define		SEARCH_STEP		8
 #define		NUM_DISTANCES	32.0f
 #define		AREA_SIZE (NUM_DISTANCES * 5.0f)
 
@@ -305,7 +305,7 @@ PS_OUTPUT ps_main_color_blending(PS_INPUT Input)
 	float4 TexCoord = float4(Input.TextureCoord.x, Input.TextureCoord.y, 0.0f, 0.0f);
 
 	[branch]
-    if (Sum > 0.0f) 
+    if (Sum > 0.001f) 
 	{
         float4 O = A * PixelSize.yyxx;
      

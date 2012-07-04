@@ -97,6 +97,9 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9Texture2D*					BlurMaskInputBuffer;
 		ZED3D9Texture2D*					ZoomBlurInputBuffer;
 		ZED3D9Texture2D*					UnsharpenInputBuffer;
+	
+		ZED3D9Texture2D*					SharpenNormalBuffer;
+		ZED3D9Texture2D*					SharpenDepthBuffer;
 		
 		ZED3D9SSAOProcessor					SSAOProcessor;
 		ZED3D9SSAAProcessor					SSAAProcessor;
