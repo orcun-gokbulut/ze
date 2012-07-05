@@ -58,24 +58,30 @@ struct OSFileSearchData;
 class ZEFileUtils
 {
 	public:
-		static void					DeleteOSFileSearchData(OSFileSearchData* SearchData);
-		static OSFileSearchData*	CreateOSFileSearchData();
 
 		static bool					IsFile(const ZEString& Path);
 		static bool					IsDirectory(const ZEString& Path);
 
-		static bool					IsFile(OSFileSearchData* FindData);
-		static bool					IsDirectory(OSFileSearchData* FindData);
-		static ZEString				GetFileName(OSFileSearchData* FindData);
-		static ZESize				GetFileSize(OSFileSearchData* FindData);
-		static void					GetCreationTime(ZEFileTime* Output, OSFileSearchData* FindData);
-		static void					GetModificationTime(ZEFileTime* Output, OSFileSearchData* FindData);
+        static bool					IsFile(const OSFileSearchData* FindData);
+        static bool					IsDirectory(const OSFileSearchData* FindData);
 
-		static bool					CloseSearchHandle(void* SearchHandle);
-		static bool					GetNextFileFolderInfo(void* OldSearchHandle, OSFileSearchData* FindData);
-		static bool					GetFileFolderInfo(const ZEString& Path, OSFileSearchData* FindData, void** SearchHandle);
+        static ZEString				GetFileName(const OSFileSearchData* FindData);
 
-		static void					GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId);
+        static ZESize               GetFileSize(const ZEString& Path);
+        static ZESize				GetFileSize(const OSFileSearchData* FindData);
+
+        static bool                 GetCreationTime(ZEFileTime* Output, const ZEString& Path);
+        static void					GetCreationTime(ZEFileTime* Output, const OSFileSearchData* FindData);
+
+        static bool                 GetModificationTime(ZEFileTime* Output, const ZEString& Path);
+        static void					GetModificationTime(ZEFileTime* Output, const OSFileSearchData* FindData);
+
+        static void					GetErrorString(ZEString& ErrorString, const ZEInt ErrorId);
+
+        static OSFileSearchData*	OpenSearchStream(const ZEString& Path);
+        static bool					FindNextInStream(OSFileSearchData *FindData);
+        static bool					CloseSearchStream(OSFileSearchData* FindData);
+
 };
 
 #endif

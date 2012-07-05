@@ -36,6 +36,8 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEFileInfo.h"
 
+#include <memory.h>
+
 
 ZEFileInfo::ZEFileInfo()
 {
@@ -45,7 +47,7 @@ ZEFileInfo::ZEFileInfo()
 }
 
 ZEFileInfo::ZEFileInfo(const ZEString& FilePath)
-{	
+{
 	Size = 0;
 	Path = ZEPathManager::GetFinalPath(FilePath, Root);
 	Extension = GetFileExtension(Path);
@@ -57,26 +59,13 @@ ZEFileInfo::ZEFileInfo(const ZEString& FilePath)
 
 ZEFileInfo::~ZEFileInfo()
 {
-	
+
 }
 
 ZESize ZEFileInfo::GetSize()
 {
-	bool Result;
-	void* Handle;
-	Handle = NULL;
+	Size = ZEFileUtils::GetFileSize(Path);
 
-	OSFileSearchData* FindData = ZEFileUtils::CreateOSFileSearchData();
-	Result = ZEFileUtils::GetFileFolderInfo(Path, FindData, &Handle);
-	if (!Result)
-	{
-		ZEFileUtils::DeleteOSFileSearchData(FindData);
-		return false;
-	}
-
-	Size = ZEFileUtils::GetFileSize(FindData);
-
-	ZEFileUtils::DeleteOSFileSearchData(FindData);
 	return Size;
 }
 
@@ -97,54 +86,29 @@ const ZEString&	ZEFileInfo::GetExtension() const
 
 bool ZEFileInfo::GetCreationDate(ZEFileTime& Time)
 {
-	bool Result;
-	void* Handle;
+    bool Result;
 
-	Handle = NULL;
-	OSFileSearchData* FindData = ZEFileUtils::CreateOSFileSearchData();
-	Result = ZEFileUtils::GetFileFolderInfo(Path, FindData, &Handle);
-	if (!Result)
-	{
-		ZEFileUtils::DeleteOSFileSearchData(FindData);
-		return false;
-	}
+	Result = ZEFileUtils::GetCreationTime(&Creation, Path);
+    memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
 
-	ZEFileUtils::GetCreationTime(&Creation, FindData);
-	memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
-
-	ZEFileUtils::DeleteOSFileSearchData(FindData);
-	return true;
+	return Result;
 }
 
 bool ZEFileInfo::GetModificationDate(ZEFileTime& Time)
 {
-	bool Result;
-	void* Handle;
+    bool Result;
 
-	Handle = NULL;
-	OSFileSearchData* FindData = ZEFileUtils::CreateOSFileSearchData();
-	Result = ZEFileUtils::GetFileFolderInfo(Path, FindData, &Handle);
-	if (!Result)
-	{
-		ZEFileUtils::DeleteOSFileSearchData(FindData);
-		return false;
-	}
+    Result = ZEFileUtils::GetModificationTime(&Modification, Path);
+    memcpy((void*)&Time, (void*)&Modification, sizeof(ZEFileTime));
 
-	ZEFileUtils::GetModificationTime(&Creation, FindData);
-	memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
-	
-	ZEFileUtils::DeleteOSFileSearchData(FindData);
-	return true;
+    return Result;
 }
 
-
-// STATIC
 bool ZEFileInfo::IsFile(const ZEString& FilePath)
 {
 	return ZEFileUtils::IsFile(FilePath);
 }
 
-// STATIC
 ZEString ZEFileInfo::GetFileName(const ZEString& FilePath)
 {
 	ZESize Length = FilePath.GetLength();
@@ -161,7 +125,6 @@ ZEString ZEFileInfo::GetFileName(const ZEString& FilePath)
 	return FilePath;
 }
 
-// STATIC
 ZEString ZEFileInfo::GetFileExtension(const ZEString& FilePath)
 {
 	ZESize Length = FilePath.GetLength();
@@ -178,7 +141,6 @@ ZEString ZEFileInfo::GetFileExtension(const ZEString& FilePath)
 	return "";
 }
 
-// STATIC
 ZEString ZEFileInfo::GetParentFolder(const ZEString& Path)
 {
 	ZESize Length = Path.GetLength();

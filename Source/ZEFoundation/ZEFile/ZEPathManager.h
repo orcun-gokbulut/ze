@@ -84,7 +84,7 @@ class ZEPathManager
 
     public:
         static bool					GetInitialized();
-        static void					SetApplicationName(ZEString& Name);
+        static void					SetApplicationName(const ZEString& Name);
 
         static void					SetEnablePathRestriction(bool Enable);
         static bool					GetEnablePathRestriction();

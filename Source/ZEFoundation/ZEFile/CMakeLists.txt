@@ -67,7 +67,7 @@ ze_add_source(ZEFileCacheTests.cpp		Tests)
 ze_add_library(ZEFile 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS libzlib ZEFoundation
+    LIBS ZEFoundation
 	INSTALL
 	INSTALL_DESTINATION ZEFoundation/ZEFile
 	INSTALL_COMPONENT ZESDK)
