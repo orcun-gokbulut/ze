@@ -36,6 +36,7 @@
 #include "ZEFileInfo.h"
 #include "ZEFolderInfo.h"
 
+#include <memory.h>
 
 ZEFolderInfo::ZEFolderInfo()
 {
@@ -69,56 +70,33 @@ const ZEString& ZEFolderInfo::GetPath() const
 
 bool ZEFolderInfo::GetCreationDate(ZEFileTime& Time)
 {
-	bool Result;
-	void* Handle;
+    bool Result;
 
-	Handle = NULL;
-	OSFileSearchData* FindData = ZEFileUtils::CreateOSFileSearchData();
-	Result = ZEFileUtils::GetFileFolderInfo(Path, FindData, &Handle);
-	if (!Result)
-	{
-		ZEFileUtils::DeleteOSFileSearchData(FindData);
-		return false;
-	}
+    Result = ZEFileUtils::GetCreationTime(&Creation, Path);
+    memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
 
-	ZEFileUtils::GetCreationTime(&Creation, FindData);
-	memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
-
-	ZEFileUtils::DeleteOSFileSearchData(FindData);
-	return true;
+    return Result;
 }
 
 bool ZEFolderInfo::GetModificationDate(ZEFileTime& Time)
 {
-	bool Result;
-	void* Handle;
+    bool Result;
 
-	Handle = NULL;
-	OSFileSearchData* FindData = ZEFileUtils::CreateOSFileSearchData();
-	Result = ZEFileUtils::GetFileFolderInfo(Path, FindData, &Handle);
-	if (!Result)
-	{
-		ZEFileUtils::DeleteOSFileSearchData(FindData);
-		return false;
-	}
+    Result = ZEFileUtils::GetModificationTime(&Modification, Path);
+    memcpy((void*)&Time, (void*)&Modification, sizeof(ZEFileTime));
 
-	ZEFileUtils::GetModificationTime(&Creation, FindData);
-	memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
-
-	ZEFileUtils::DeleteOSFileSearchData(FindData);
-	return true;
+    return Result;
 }
 
 ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 {
-	bool GetNext;
-	void* SearchHandle;
-	ZEString FileName;
 	ZEFileInfo*	Temp;
+	bool Continue = true;
 	ZEArray<ZEFileInfo*>* FileList;
+    OSFileSearchData* FindData = NULL;
 
 	// if path is out of boundary
-	if ( !ZEPathManager::PathBoundaryCheck(ZEPathManager::GetKnownPath(Root), Path) )
+    if (!ZEPathManager::PathBoundaryCheck(ZEPathManager::GetKnownPath(Root), Path))
 	{
 		zeError("Paths above the root are not reachable..");
 		return NULL;
@@ -126,43 +104,45 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 
 	FileList = new ZEArray<ZEFileInfo*>;
 	if ( FileList == NULL )
-		zeCriticalError("Cannot allocate...");
+    {
+        zeError("Cannot allocate...");
+        return NULL;
+    }
 
-	OSFileSearchData* FindData = ZEFileUtils::CreateOSFileSearchData();
-	GetNext = ZEFileUtils::GetFileFolderInfo(Path + "\\*", FindData, &SearchHandle);
-	while (GetNext)
+    FindData = ZEFileUtils::OpenSearchStream(Path);
+    while (FindData != NULL && Continue)
 	{
 		// If file
 		if (ZEFileUtils::IsFile(FindData))
 		{
-			FileName = "\\";
-			FileName += ZEFileUtils::GetFileName(FindData);
-
 			Temp = new ZEFileInfo();
-			if ( Temp == NULL )
-				zeCriticalError("Cannot allcoate...");
+            if (Temp == NULL)
+            {
+                zeError("Cannot allcoate...");
+                ZEFileUtils::CloseSearchStream(FindData);
+                return FileList;
+            }
 
 			Temp->Root = Root;
-			Temp->Path = Path + FileName;
-			Temp->Name = ZEFileInfo::GetFileName(Temp->Path);
+			Temp->Name = ZEFileUtils::GetFileName(FindData);
+			Temp->Path = Path + "/" + Temp->Name;
 			Temp->Extension = ZEFileInfo::GetFileExtension(Temp->Path);
 			FileList->Add(Temp);
 		}
 
-		GetNext = ZEFileUtils::GetNextFileFolderInfo(SearchHandle, FindData);
+        Continue = ZEFileUtils::FindNextInStream(FindData);
 	}
 
-	ZEFileUtils::DeleteOSFileSearchData(FindData);
+    ZEFileUtils::CloseSearchStream(FindData);
 	return FileList;
 }
 
 ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 {
-	bool GetNext;
-	void* SearchHandle;
-	ZEString FolderName;
 	ZEFolderInfo* Temp;
+	bool Continue = true;
 	ZEArray<ZEFolderInfo*>* FolderList;
+    OSFileSearchData* FindData = NULL;
 
 	// if path is out of boundary
 	if ( !ZEPathManager::PathBoundaryCheck(ZEPathManager::GetKnownPath(Root), Path) )
@@ -172,45 +152,44 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 	}
 
 	FolderList = new ZEArray<ZEFolderInfo*>;
-	if ( FolderList == NULL )
-		zeCriticalError("Cannot allocate...");
+    if (FolderList == NULL)
+    {
+        zeError("Cannot allocate...");
+        return NULL;
+    }
 
-	OSFileSearchData* FindData = ZEFileUtils::CreateOSFileSearchData();
-	GetNext = ZEFileUtils::GetFileFolderInfo(Path + "\\*", FindData, &SearchHandle);
-	while (GetNext)
-	{
+    FindData = ZEFileUtils::OpenSearchStream(Path);
+    while (FindData != NULL && Continue)
+    {
 		// If Folder
 		if (ZEFileUtils::IsDirectory(FindData))
 		{
-			FolderName = "\\";
-			FolderName += ZEFileUtils::GetFileName(FindData);
-
 			Temp = new ZEFolderInfo();
 			if ( Temp == NULL )
-				zeCriticalError("Cannot allcoate...");
+            {
+                zeError("Cannot allcoate...");
+                ZEFileUtils::CloseSearchStream(FindData);
+                return FolderList;
+            }
 
-			Temp->Root = Root;
-			Temp->Path = Path + FolderName;
-			Temp->Name = ZEFolderInfo::GetFolderName(Temp->Path);
+            Temp->Root = Root;
+            Temp->Name = ZEFileUtils::GetFileName(FindData);
+			Temp->Path = Path + "/" + Temp->Name;
 			FolderList->Add(Temp);
 		}
 
-		GetNext = ZEFileUtils::GetNextFileFolderInfo(SearchHandle, FindData);
+        Continue = ZEFileUtils::FindNextInStream(FindData);
 	}
 
-	ZEFileUtils::DeleteOSFileSearchData(FindData);
-	return FolderList;
+    ZEFileUtils::CloseSearchStream(FindData);
+    return FolderList;
 }
 
-
-
-// STATIC
 bool ZEFolderInfo::IsFolder(const ZEString& FolderPath)
 {
 	return ZEFileUtils::IsDirectory(FolderPath);
 }
 
-// STATIC
 ZEString ZEFolderInfo::GetFolderName(const ZEString& FolderPath)
 {
 	ZESize Length = FolderPath.GetLength();
@@ -227,7 +206,6 @@ ZEString ZEFolderInfo::GetFolderName(const ZEString& FolderPath)
 	return FolderPath;
 }
 
-// STATIC
 ZEString ZEFolderInfo::GetParentFolder(const ZEString& Path)
 {
 	ZESize Length = Path.GetLength();

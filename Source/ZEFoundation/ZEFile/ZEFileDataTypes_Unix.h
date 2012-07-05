@@ -39,14 +39,21 @@
 
 #include "ZEDS/ZEString.h"
 
+#include "fcntl.h"
+#include <time.h>
+#include <dirent.h>
+
+
 // Platform dependent declerations
 struct OSFileTime
 {
     time_t      Time;
 };
 
-struct OSFileSearchData : public stat
+struct OSFileSearchData
 {
+    struct stat Data;
+    DIR*        Directory;
     ZEString    Name;
 };
 

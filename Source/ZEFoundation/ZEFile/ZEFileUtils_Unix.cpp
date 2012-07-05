@@ -35,24 +35,33 @@
 
 #include "ZEError.h"
 #include "ZEFileUtils.h"
+#include "ZEFileDataTypes_Unix.h"
 
 #include "errno.h"
 #include "fcntl.h"
 #include <string.h>
 #include <dirent.h>
 
-// Platform dependent declerations
-struct OSFileTime
-{
-    time_t      Time;
-};
-
-struct OSFileSearchData : public stat
-{
-    ZEString    Name;
-};
 
 static ZEString LastSearchPath = ".";
+
+
+static bool GetStats(const ZEString& Path, struct stat* Stat)
+{
+    int Result;
+
+    errno = 0;
+    Result = stat(Path.ToCString(), Stat);
+    if (Result != 0)
+    {
+        ZEString ErrorString;
+        ZEFileUtils::GetErrorString(ErrorString, errno);
+        zeError("Can not get info.\nError: %s", ErrorString.ToCString());
+        return false;
+    }
+
+    return true;
+}
 
 // Converts operationg system's OSFileTime data into human readable ZEFileTime
 static bool OSFileTimetoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
@@ -65,7 +74,7 @@ static bool OSFileTimetoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
 
     Time->Day = (ZEInt16)TimeInfo->tm_mday;
     Time->Hour = (ZEInt16)TimeInfo->tm_hour;
-    Time->Year = (ZEInt16)TimeInfo->tm_year;
+    Time->Year = (ZEInt16)TimeInfo->tm_year + 1900;
     Time->Month = (ZEInt16)TimeInfo->tm_mon;
     Time->Second = (ZEInt16)TimeInfo->tm_sec;
     Time->Minute = (ZEInt16)TimeInfo->tm_min;
@@ -75,82 +84,174 @@ static bool OSFileTimetoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
     return true;
 }
 
+bool ZEFileUtils::IsFile(const ZEString& Path)
+{
+    bool Result;
+    struct stat Stats;
+
+    Result = GetStats(Path, &Stats);
+    if (Result)
+    {
+        // Found it
+        if(S_ISREG(Stats.st_mode))
+            return true;
+    }
+
+    return false;
+}
+
+bool ZEFileUtils::IsDirectory(const ZEString& Path)
+{
+    bool Result;
+    struct stat Stats;
+
+    Result = GetStats(Path, &Stats);
+    if (Result)
+    {
+        // Found it
+        if(S_ISDIR(Stats.st_mode))
+            return true;
+    }
+
+    return false;
+}
+
+bool ZEFileUtils::IsFile(const OSFileSearchData* FindData)
+{
+    zeDebugCheck(FindData == NULL, "NULL Pointer");
+
+    if(S_ISREG(FindData->Data.st_mode))
+        return true;
+
+    return false;
+}
+
+bool ZEFileUtils::IsDirectory(const OSFileSearchData* FindData)
+{
+    zeDebugCheck(FindData == NULL, "NULL Pointer");
+
+    if(S_ISDIR(FindData->Data.st_mode))
+        return true;
+
+    return false;
+}
+
+ZEString ZEFileUtils::GetFileName(const OSFileSearchData* FindData)
+{
+    zeDebugCheck(FindData == NULL, "NULL Pointer");
+
+    return ZEString(FindData->Name);
+}
+
+ZESize ZEFileUtils::GetFileSize(const ZEString& Path)
+{
+    struct stat Stat;
+
+    return GetStats(Path, &Stat) ? (ZESize)Stat.st_size : 0;
+}
+
 // Returns the size of a file from OSFileSearchData
-void ZEFileUtils::GetSize(ZESize* Output, OSFileSearchData* FindData)
+ZESize ZEFileUtils::GetFileSize(const OSFileSearchData* FindData)
 {
     // On unix implementation just return size
-    *Output = (ZESize)FindData->st_size;
+    return (ZESize)FindData->Data.st_size;
+}
+
+bool ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEString& Path)
+{
+    struct stat Stat;
+
+    if (!GetStats(Path, &Stat))
+        return false;
+
+    OSFileTime FileTime = {Stat.st_ctim.tv_sec};
+    OSFileTimetoZEFileTime(Output, &FileTime);
+
+    return true;
 }
 
 // Returns the creation time of a file from OSFileSearchData
-void ZEFileUtils::GetCreationTime(ZEFileTime* Output, OSFileSearchData* FindData)
+void ZEFileUtils::GetCreationTime(ZEFileTime* Output, const OSFileSearchData* FindData)
 {
-    OSFileTime FileTime = {FindData->st_ctim};
+    OSFileTime FileTime = {FindData->Data.st_ctim.tv_sec};
     OSFileTimetoZEFileTime(Output, &FileTime);
 }
 
-// Returns the modification time of a file from OSFileSearchData
-void ZEFileUtils::GetModificationTime(ZEFileTime* Output, OSFileSearchData* FindData)
+bool ZEFileUtils::GetModificationTime(ZEFileTime* Output, const ZEString& Path)
 {
-    OSFileTime FileTime = {FindData->st_mtim};
+    struct stat Stat;
+
+    if (!GetStats(Path, &Stat))
+        return false;
+
+    OSFileTime FileTime = {Stat.st_mtim.tv_sec};
+    OSFileTimetoZEFileTime(Output, &FileTime);
+
+    return true;
+}
+
+// Returns the modification time of a file from OSFileSearchData
+void ZEFileUtils::GetModificationTime(ZEFileTime* Output, const OSFileSearchData* FindData)
+{
+    OSFileTime FileTime = {FindData->Data.st_mtim.tv_sec};
     OSFileTimetoZEFileTime(Output, &FileTime);
 }
 
 // Converts error id to error string
-void ZEFileUtils::GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId)
+void ZEFileUtils::GetErrorString(ZEString& ErrorString, const ZEInt ErrorId)
 {
-    int Return;
-    char CErrorString[256 + 1];
+    char* ErrorStr;
 
-    Return = sterror_r(ErrorId, CErrorString, 256);
-    if(Return == 0) // Success
+    ErrorStr = strerror((int)ErrorId);
+    if(ErrorStr != NULL) // Success
     {
         // Use returned string to form error message
-        ErrorString = ZEString::FromCString(CErrorString);
+        ErrorString = ZEString::FromCString(ErrorStr);
 
 	}
     else // Fail
 	{
         // Use ErrorId as string
         ErrorString = "ErrorId: ";
-        ErrorString += ZEString::FromUInt32(ErrorId);
+        ErrorString += ZEString::FromInt32(ErrorId);
         ErrorString += ".";
     }
 }
 
 // Closes the search stream
-bool ZEFileUtils::CloseSearchHandle(void* SearchHandle)
+bool ZEFileUtils::CloseSearchStream(OSFileSearchData* FindData)
 {
     ZEInt Return;
 
-    zeDebugCheck(SearchHandle == NULL, "NUll pointer");
+    zeDebugCheck(FindData == NULL, "NUll pointer");
 
-    Return = closedir((DIR*)SearchHandle);
+    Return = closedir(FindData->Directory);
     if (Return != 0)
     {
         ZEString ErrorString;
-        GetErrorString(&ErrorString, errno);
+        GetErrorString(ErrorString, (ZEInt)errno);
         zeError("Can not close search handle.\nError: %s", ErrorString.ToCString());
     }
 
     LastSearchPath = ".";
 
+    delete FindData;
+
     return Return == 0 ? true : false;
 }
 
 // Gets the next file info from search stream
-bool ZEFileUtils::GetNextFileFolderInfo(void* OldSearchHandle, OSFileSearchData* FindData)
+bool ZEFileUtils::FindNextInStream(OSFileSearchData* FindData)
 {
     ZEInt Result;
     ZEString ErrorString;
     dirent* Entry = NULL;
 
     zeDebugCheck(FindData == NULL, "NUll pointer");
-    zeDebugCheck(OldSearchHandle == NULL, "NUll pointer");
 
     // Get first entry in the folder
     errno = 0;
-    Entry = readdir (Directory);
+    Entry = readdir (FindData->Directory);
     if (Entry == NULL)
     {
         // Nothing found
@@ -158,10 +259,11 @@ bool ZEFileUtils::GetNextFileFolderInfo(void* OldSearchHandle, OSFileSearchData*
     }
 
     // Get info and return
-    Result = stat(ZEString(LastSearchPath + Entry->d_name).ToCString(), (stat*)FindData);
+    ZEString StatPath = LastSearchPath + "/" + Entry->d_name;
+    Result = stat(StatPath.ToCString(), &FindData->Data);
     if (Result != 0)
     {
-        GetErrorString(&ErrorString, errno);
+        GetErrorString(ErrorString, errno);
         zeError("Can not get info.\nError: %s", ErrorString.ToCString());
         return false;
     }
@@ -173,55 +275,61 @@ bool ZEFileUtils::GetNextFileFolderInfo(void* OldSearchHandle, OSFileSearchData*
 }
 
 // Opens a file search stream and returns the first found file info
-bool ZEFileUtils::GetFileFolderInfo(const ZEString& Path, OSFileSearchData* FindData, void** SearchHandle)
+OSFileSearchData* ZEFileUtils::OpenSearchStream(const ZEString& Path)
 {
     ZEInt Result;
     ZEString ErrorString;
     dirent* Entry = NULL;
-    DIR* Directory = NULL;
-
+    OSFileSearchData* SearchData = NULL;
 
     zeDebugCheck(Path.IsEmpty(), "Empty string");
-    zeDebugCheck(FindData == NULL, "NUll pointer");
-    zeDebugCheck(SearchHandle == NULL, "NUll pointer");
+
+    SearchData = new OSFileSearchData;
+    if (SearchData == NULL)
+    {
+        zeError("Can not allocate.\nError: %s");
+        return NULL;
+    }
 
     // Open directory
     errno = 0;
-    Directory = opendir(Path.ToCString());
-    if (Directory == NULL)
+    SearchData->Directory = opendir(Path.ToCString());
+    if (SearchData->Directory == NULL)
     {
-        GetErrorString(&ErrorString, errno);
+        GetErrorString(ErrorString, errno);
         zeError("Can not open path.\nError: %s", ErrorString.ToCString());
-        return false;
+        delete SearchData;
+        return NULL;
     }
 
     // Save path for future use
     LastSearchPath = Path;
 
-    // Set the search handle
-    *SearchHandle = (void*)Directory;
 
     // Get first entry in the folder
     errno = 0;
-    Entry = readdir (Directory);
+    Entry = readdir(SearchData->Directory);
     if (Entry == NULL)
     {
-        GetErrorString(&ErrorString, errno);
+        CloseSearchStream(SearchData);
+        GetErrorString(ErrorString, errno);
         zeError("Can not read dir.\nError: %s", ErrorString.ToCString());
-        return false;
+        return NULL;
     }
 
     // Get info and return
-    Result = stat(ZEString(LastSearchPath + Entry->d_name).ToCString(), (stat*)FindData);
+    ZEString StatPath = LastSearchPath + "/" + Entry->d_name;
+    Result = stat(StatPath.ToCString(), &SearchData->Data);
     if (Result != 0)
     {
-        GetErrorString(&ErrorString, errno);
+        CloseSearchStream(SearchData);
+        GetErrorString(ErrorString, errno);
         zeError("Can not get info.\nError: %s", ErrorString.ToCString());
-        return false;
+        return NULL;
     }
 
     // Set name of search data
-    FindData->Name = Entry->d_name;
+    SearchData->Name = Entry->d_name;
 
-    return true;
+    return SearchData;
 }
