@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZETree.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,54 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+class ZETree
+{
+    private:
+        ZETree*                  Parent;
+        ZEArray<ZETree<ZEType>*> SubTrees;
+        ZEType                   Item;
+
+    public:
+        ZETree<ZEType>  GetParent()
+        {
+            return Parent;
+        }
+
+        void AddSubTree(ZETree<ZEType>* SubTree)
+        {
+            if (Parent != NULL)
+                return false;
+
+            SubTrees.Add(SubTree);
+            SubTree->Parent = this;
+
+            return true;
+        }
+
+        void RemoveSubTree(ZETree<ZEType>* SubTree)
+        {
+            ZESSize Index = SubTrees.FindItem(SubTree);
+            if (Index < 0)
+                return false;
+
+            SubTrees[Index].Parent = NULL;
+            SubTrees.DeleteAt(Index);
+
+            return true;
+        }
+
+        ZEType& GetValue()
+        {
+            return Value;
+        }
+
+        void SetValue(ZEType& Value)
+        {
+            this->Value = Value;
+        }
+
+        ZETree()
+        {
+            Parent = NULL;
+        }
+};

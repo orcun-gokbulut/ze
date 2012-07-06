@@ -50,12 +50,20 @@ enum ZELogType
 	ZE_LOG_DEBUG			= 0
 };
 
+#ifdef ZE_PLATFORM_COMPILER_GCC
+#define __ZINEK_FUNCTION__ __PRETTY_FUNCTION__
+#endif
+
+#ifdef ZE_PLATFOMR_COMPILER_MSVC
+#define __ZINEK_FUNCTION__ __FUNCTION__
+#endif
+
 typedef void (*ZELogCallback)(const char* Module, ZELogType Type, const char* LogText);
 #define zeLog(...)\
 	do\
 	{\
 		char __MODULE__[256];\
-		ZELog::GetInstance()->GetModuleName(__MODULE__, __FILE__, __FUNCTION__);\
+        ZELog::GetInstance()->GetModuleName(__MODULE__, __FILE__, __ZINEK_FUNCTION__);\
 		ZELog::GetInstance()->Log(__MODULE__, __VA_ARGS__);\
 	}\
 	while(false)
