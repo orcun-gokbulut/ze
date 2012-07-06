@@ -54,7 +54,7 @@ enum ZELogType
 #define __ZINEK_FUNCTION__ __PRETTY_FUNCTION__
 #endif
 
-#ifdef ZE_PLATFOMR_COMPILER_MSVC
+#ifdef ZE_PLATFORM_COMPILER_MSVC
 #define __ZINEK_FUNCTION__ __FUNCTION__
 #endif
 
