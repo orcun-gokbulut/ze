@@ -128,19 +128,31 @@ static void DefaultCallback(const char* Module, ZELogType Type, const char* LogT
 void ZELog::GetModuleName(char* Output, const char* FileName, const char* Function)
 {
 	ZESize Len = strlen(Function);
+    ZESize Index = 0;
 	for(ZESize I = 0; I <= Len; I++)
+    {
+        if (Function[I] == ' ')
+        {
+            Index = 0;
+            continue;
+        }
+
 		if (Function[I] == ':' || Function[I] == '<')
 		{
-			Output[I] = '\0';
-			return;
+            Output[Index] = '\0';
+            return;
 		}
 		else
-			Output[I] = Function[I];
+        {
+            Output[Index] = Function[I];
+            Index++;
+        }
+    }
 
 	Len = strlen(FileName);
 	bool Found = false;
-	ZESize N;
-	for(N = Len - 1; N == 0; N--)
+    ZESize N = Len - 1;
+    for(; N != 0; N--)
 		if (FileName[N] == '\\' || FileName[N] == '/')
 		{
 			Found = true;
@@ -171,7 +183,7 @@ const char* ZELog::GetLogTypeString(ZELogType Type)
 			break;
 
         case ZE_LOG_INFO:
-			return "Info";
+            return "Info";
 			break;
 		
         case ZE_LOG_SUCCESS:
@@ -198,7 +210,6 @@ void ZELog::SetMinimumLogLevel(ZELogType Level)
 ZELogType ZELog::GetMinimumLogLevel()
 {
 	return MinimumLogLevel;
-
 }
 
 void ZELog::SetLogFileEnabled(bool Enabled)

@@ -38,10 +38,17 @@
 #define __ZE_SOCKET_H__
 
 #include "ZETypes.h"
-#include "ZEDS\ZEString.h"
+#include "ZEDS/ZEString.h"
 #include "ZEIPAddress.h"
 
-#include <Winsock2.h>//Must be removed
+#ifdef ZE_PLATFORM_WINDOWS
+#include <Winsock2.h>
+#endif
+
+#ifdef ZE_PLATFORM_UNIX
+#include <sys/socket.h>
+#define SOCKET int
+#endif
 
 #define ZE_SR_OK			((ZESSize)0)
 #define ZE_SR_ERROR			((ZESSize)-1)
