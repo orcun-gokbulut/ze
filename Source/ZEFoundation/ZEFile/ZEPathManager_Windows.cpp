@@ -552,6 +552,7 @@ ZEString ZEPathManager::GetRelativePath(const ZEString& FullPath)
 ZEString ZEPathManager::GetAbsolutePath(const ZEString& RelativePath)
 {
 	zeCriticalError("Not implemented");
+	return "";
 }
 
 bool ZEPathManager::PathBoundaryCheck(const ZEString& RootPath, const ZEString& Path)
