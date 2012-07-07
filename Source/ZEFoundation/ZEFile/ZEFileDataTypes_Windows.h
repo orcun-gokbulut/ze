@@ -39,14 +39,15 @@
 
 #include <windows.h>
 
-struct OSFileTime : public FILETIME
+struct OSFileTime
 {
-
+	FILETIME	Time;
 };
 
-struct OSFileSearchData : public WIN32_FIND_DATA
+struct OSFileSearchData
 {
-
+	WIN32_FIND_DATA		Data;
+	HANDLE				Handle;
 };
 		
 

@@ -42,8 +42,8 @@
 #include <string.h>
 #include <dirent.h>
 
+static ZEString LastSearchPath = "";
 
-static ZEString LastSearchPath = ".";
 
 
 static bool GetStats(const ZEString& Path, struct stat* Stat)
@@ -63,14 +63,16 @@ static bool GetStats(const ZEString& Path, struct stat* Stat)
     return true;
 }
 
-// Converts operationg system's OSFileTime data into human readable ZEFileTime
+// Converts operating system's OSFileTime data into human readable ZEFileTime
 static bool OSFileTimetoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
 {
     zeDebugCheck(Time == NULL, "NUll pointer");
     zeDebugCheck(FileTime == NULL, "NUll pointer");
 
-    struct tm* TimeInfo = NULL;
-    TimeInfo = localtime(&FileTime->Time);
+	struct tm TimeInfo;
+
+	if (localtime_r(&TimeInfo, &FileTime->Time.st_ctime) != 0)
+		return false;
 
     Time->Day = (ZEInt16)TimeInfo->tm_mday;
     Time->Hour = (ZEInt16)TimeInfo->tm_hour;
@@ -153,7 +155,7 @@ ZESize ZEFileUtils::GetFileSize(const ZEString& Path)
 // Returns the size of a file from OSFileSearchData
 ZESize ZEFileUtils::GetFileSize(const OSFileSearchData* FindData)
 {
-    // On unix implementation just return size
+    // On Unix implementation just return size
     return (ZESize)FindData->Data.st_size;
 }
 
@@ -225,19 +227,21 @@ bool ZEFileUtils::CloseSearchStream(OSFileSearchData* FindData)
 
     zeDebugCheck(FindData == NULL, "NUll pointer");
 
+	errno = 0;
     Return = closedir(FindData->Directory);
     if (Return != 0)
     {
         ZEString ErrorString;
-        GetErrorString(ErrorString, (ZEInt)errno);
+        GetErrorString(ErrorString, errno);
         zeError("Can not close search handle.\nError: %s", ErrorString.ToCString());
+		return false;
     }
 
     LastSearchPath = ".";
 
     delete FindData;
 
-    return Return == 0 ? true : false;
+    return true;
 }
 
 // Gets the next file info from search stream

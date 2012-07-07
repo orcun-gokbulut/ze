@@ -58,11 +58,10 @@ struct OSFileSearchData;
 class ZEFileUtils
 {
 	public:
-
 		static bool					IsFile(const ZEString& Path);
-		static bool					IsDirectory(const ZEString& Path);
+		static bool					IsFile(const OSFileSearchData* FindData);
 
-        static bool					IsFile(const OSFileSearchData* FindData);
+		static bool					IsDirectory(const ZEString& Path);
         static bool					IsDirectory(const OSFileSearchData* FindData);
 
         static ZEString				GetFileName(const OSFileSearchData* FindData);

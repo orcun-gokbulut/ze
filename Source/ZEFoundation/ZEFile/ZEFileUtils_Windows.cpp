@@ -37,8 +37,29 @@
 #include "ZEFileUtils.h"
 #include "ZEFileDataTypes_Windows.h"
 
+#include <sys/stat.h>
+#include <cerrno>
+#include <time.h>
 
-void ZEFileUtils::GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId)
+
+static bool GetStats(const ZEString& Path, struct stat* Stat)
+{
+	int Result;
+
+	SetLastError(ERROR_SUCCESS);
+	Result = stat(Path.ToCString(), Stat);
+	if (Result != 0)
+	{
+		ZEString ErrorString;
+		ZEFileUtils::GetErrorString(ErrorString, GetLastError());
+		zeError("Can not get info.\nError: %s", ErrorString.ToCString());
+		return false;
+	}
+
+	return true;
+}
+
+void ZEFileUtils::GetErrorString(ZEString& ErrorString, const ZEInt ErrorId)
 {
 	DWORD Return;
 	LPTSTR s;
@@ -48,7 +69,7 @@ void ZEFileUtils::GetErrorString(ZEString& ErrorString, ZEUInt32 ErrorId)
 	{
 		// Use ErrorId as string
 		ErrorString = "ErrorId: ";
-		ErrorString += ZEString::FromUInt32(ErrorId);
+		ErrorString += ZEString::FromInt32(ErrorId);
 		ErrorString += ".";
 	}
 	else // Success
@@ -79,7 +100,7 @@ static bool OSFileTimetoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
 	zeDebugCheck(Time == NULL, "NUll pointer");
 	zeDebugCheck(FileTime == NULL, "NUll pointer");
 
-	Result = FileTimeToSystemTime((const FILETIME*)FileTime, &SystemTime);
+	Result = FileTimeToSystemTime(&FileTime->Time, &SystemTime);
 	if (!Result)
 		return false;
 
@@ -99,111 +120,176 @@ static bool OSFileTimetoZEFileTime(ZEFileTime *Time, OSFileTime *FileTime)
 	return true;
 }
 
-void ZEFileUtils::DeleteOSFileSearchData(OSFileSearchData* SearchData)
-{
-	delete SearchData;
-	SearchData = NULL;
-}
-
-OSFileSearchData* ZEFileUtils::CreateOSFileSearchData()
-{
-	return new OSFileSearchData;
-}
-
 bool ZEFileUtils::IsFile(const ZEString& Path)
 {
 	bool Result;
-	void* Handle = NULL;
-	OSFileSearchData SearchData;
+	struct stat Stats;
 
-	Result = ZEFileUtils::GetFileFolderInfo(Path.ToCString(), &SearchData, &Handle);
-	if ( !Result )
-		return false;
+	Result = GetStats(Path, &Stats);
+	if (Result)
+	{
+		// Found it
+		if(Stats.st_mode & S_IFREG)
+			return true;
+	}
 
-	return !((SearchData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
+	return false;
 }
 
 bool ZEFileUtils::IsDirectory(const ZEString& Path)
 {
 	bool Result;
-	void* Handle = NULL;
-	OSFileSearchData SearchData;
+	struct stat Stats;
 
-	Result = ZEFileUtils::GetFileFolderInfo(Path.ToCString(), &SearchData, &Handle);
-	if ( !Result )
+	Result = GetStats(Path, &Stats);
+	if (Result)
+	{
+		// Found it
+		if(Stats.st_mode & S_IFDIR)
+			return true;
+	}
+
+	return false;
+}
+
+bool ZEFileUtils::IsFile(const OSFileSearchData* FindData)
+{
+	return !((FindData->Data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
+}
+
+bool ZEFileUtils::IsDirectory(const OSFileSearchData* FindData)
+{
+	return ((FindData->Data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
+}
+
+ZEString ZEFileUtils::GetFileName(const OSFileSearchData* FindData)
+{
+	return ZEString(FindData->Data.cFileName);
+}
+
+ZESize ZEFileUtils::GetFileSize(const ZEString& Path)
+{
+	struct stat Stat;
+
+	return GetStats(Path, &Stat) ? (ZESize)Stat.st_size : 0;
+}
+
+ZESize ZEFileUtils::GetFileSize(const OSFileSearchData* FindData)
+{
+	return OSFileSizetoZESize(FindData->Data.nFileSizeHigh, FindData->Data.nFileSizeLow);
+}
+
+bool ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEString& Path)
+{
+	struct tm TimeInfo;
+	struct stat Stat;
+
+	if (!GetStats(Path, &Stat))
 		return false;
 
-	return ((SearchData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
+	if (localtime_s(&TimeInfo, &Stat.st_ctime) != 0)
+		return false;
+
+	Output->Day = (ZEInt16)TimeInfo.tm_mday;
+	Output->Hour = (ZEInt16)TimeInfo.tm_hour;
+	Output->Year = (ZEInt16)TimeInfo.tm_year + 1900;
+	Output->Month = (ZEInt16)TimeInfo.tm_mon;
+	Output->Second = (ZEInt16)TimeInfo.tm_sec;
+	Output->Minute = (ZEInt16)TimeInfo.tm_min;
+	Output->DayOfWeek = (ZEInt16)TimeInfo.tm_wday;
+	Output->Milliseconds = (ZEInt16)0;
+
+	return true;
 }
 
-bool ZEFileUtils::IsFile(OSFileSearchData* FindData)
-{
-	return !((FindData->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
-}
-
-bool ZEFileUtils::IsDirectory(OSFileSearchData* FindData)
-{
-	return ((FindData->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
-}
-
-ZEString ZEFileUtils::GetFileName(OSFileSearchData* FindData)
-{
-	return ZEString(FindData->cFileName);
-}
-
-ZESize ZEFileUtils::GetFileSize(OSFileSearchData* FindData)
-{
-	return OSFileSizetoZESize(FindData->nFileSizeHigh, FindData->nFileSizeLow);
-}
-
-void ZEFileUtils::GetCreationTime(ZEFileTime* Output, OSFileSearchData* FindData)
+void ZEFileUtils::GetCreationTime(ZEFileTime* Output, const OSFileSearchData* FindData)
 {
 	OSFileTime FileTime;
-	FileTime.dwLowDateTime =  FindData->ftCreationTime.dwLowDateTime;
-	FileTime.dwHighDateTime = FindData->ftCreationTime.dwHighDateTime;
+	FileTime.Time.dwLowDateTime =  FindData->Data.ftCreationTime.dwLowDateTime;
+	FileTime.Time.dwHighDateTime = FindData->Data.ftCreationTime.dwHighDateTime;
 	
 	OSFileTimetoZEFileTime(Output, &FileTime);
 }
 
-void ZEFileUtils::GetModificationTime(ZEFileTime* Output, OSFileSearchData* FindData)
+bool ZEFileUtils::GetModificationTime(ZEFileTime* Output, const ZEString& Path)
+{
+	struct stat Stat;
+
+	if (!GetStats(Path, &Stat))
+		return false;
+
+	struct tm TimeInfo;
+	if (localtime_s(&TimeInfo, &Stat.st_mtime) != 0)
+		return false;
+
+	Output->Day = (ZEInt16)TimeInfo.tm_mday;
+	Output->Hour = (ZEInt16)TimeInfo.tm_hour;
+	Output->Year = (ZEInt16)TimeInfo.tm_year + 1900;
+	Output->Month = (ZEInt16)TimeInfo.tm_mon;
+	Output->Second = (ZEInt16)TimeInfo.tm_sec;
+	Output->Minute = (ZEInt16)TimeInfo.tm_min;
+	Output->DayOfWeek = (ZEInt16)TimeInfo.tm_wday;
+	Output->Milliseconds = (ZEInt16)0;
+
+	return true;
+}
+
+void ZEFileUtils::GetModificationTime(ZEFileTime* Output, const OSFileSearchData* FindData)
 {
 	OSFileTime FileTime;
-	FileTime.dwLowDateTime =  FindData->ftLastWriteTime.dwLowDateTime;
-	FileTime.dwHighDateTime = FindData->ftLastWriteTime.dwHighDateTime;
+	FileTime.Time.dwLowDateTime =  FindData->Data.ftLastWriteTime.dwLowDateTime;
+	FileTime.Time.dwHighDateTime = FindData->Data.ftLastWriteTime.dwHighDateTime;
 
 	OSFileTimetoZEFileTime(Output, &FileTime);
 }
 
-bool ZEFileUtils::CloseSearchHandle(void* SearchHandle)
+bool ZEFileUtils::CloseSearchStream(OSFileSearchData* FindData)
 {
-	zeDebugCheck(SearchHandle == NULL, "NUll pointer");
-
-	return FindClose((HANDLE)SearchHandle) != 0;
-}
-
-bool ZEFileUtils::GetNextFileFolderInfo(void* OldSearchHandle, OSFileSearchData* FindData)
-{
-	zeDebugCheck(FindData == NULL, "NUll pointer");
-	zeDebugCheck(OldSearchHandle == NULL, "NUll pointer");
-
-	return FindNextFile((HANDLE)OldSearchHandle, (LPWIN32_FIND_DATA)FindData) != 0;
-}
-
-bool ZEFileUtils::GetFileFolderInfo(const ZEString& Path, OSFileSearchData* FindData, void** SearchHandle)
-{
-	HANDLE FirstFileHandle;
+	int Result;
 
 	zeDebugCheck(FindData == NULL, "NUll pointer");
-	//zeDebugCheck(*SearchHandle == NULL, "NUll pointer");
 
-	FirstFileHandle = FindFirstFile(Path.ToCString(), (LPWIN32_FIND_DATA)FindData);
-	if (FirstFileHandle == INVALID_HANDLE_VALUE) 
+	SetLastError(ERROR_SUCCESS);
+	Result = FindClose(FindData->Handle);
+	if (Result == 0)
+	{
+		ZEString ErrorString;
+		GetErrorString(ErrorString, GetLastError());
+		zeError("Can not close search handle.\nError: %s", ErrorString.ToCString());
 		return false;
+	}
 
-	if (*SearchHandle != NULL)
-		*SearchHandle = FirstFileHandle;
-	else
-		FindClose(FirstFileHandle);
-
+	delete FindData;
 	return true;
+}
+
+bool ZEFileUtils::FindNextInStream(OSFileSearchData *FindData)
+{
+	zeDebugCheck(FindData == NULL, "NUll pointer");
+
+	return FindNextFile(FindData->Handle, &FindData->Data) != 0;
+}
+
+OSFileSearchData* ZEFileUtils::OpenSearchStream(const ZEString& Path)
+{
+	OSFileSearchData* FindData;
+
+	zeDebugCheck(Path.IsEmpty(), "Empty string..");
+	
+	FindData = new OSFileSearchData;
+	if (FindData == NULL)
+	{
+		zeError("Cannot allocate");
+		return NULL;
+	}
+	
+	ZEString SearchPath = Path + "\\*";
+	FindData->Handle = FindFirstFile(SearchPath.ToCString(), &FindData->Data);
+	if (FindData->Handle == INVALID_HANDLE_VALUE)
+	{
+		delete FindData;
+		return NULL;
+	}
+
+	return FindData;
 }

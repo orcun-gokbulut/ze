@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPathManager_Unix.cpp
+ Zinek Engine - ZEPathManager_Windows.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -42,6 +42,7 @@
 #include <shlobj.h>
 #include <shobjidl.h>
 #include <winbase.h>
+#include "ZEDS\ZEArray.h"
 
 ZEString ZEPathManager::AppName = "";
 ZEString ZEPathManager::UserDataPath = "";
@@ -53,6 +54,7 @@ ZEString ZEPathManager::ApplicationResourcesPath;
 bool ZEPathManager::Initialized = false;
 bool ZEPathManager::EnablePathRestriction = false;
 
+static const ZEString PathSeperator = "\\";
 
 // Helper functions to get OS Info
 static bool GetOSVersion(ZEUInt& VerMajor, ZEUInt& VerMinor, ZEUInt& Build)
@@ -255,11 +257,16 @@ bool ZEPathManager::GetEnablePathRestriction()
     return EnablePathRestriction;
 }
 
-void ZEPathManager::SetApplicationName(ZEString& Name)
+void ZEPathManager::SetApplicationName(const ZEString& Name)
 {
     InitializePaths();
 
     AppName = Name;
+}
+
+const ZEString& ZEPathManager::GetPathSeperator()
+{
+	return PathSeperator;
 }
 
 const ZEString&	ZEPathManager::GetUserDataPath()
@@ -304,9 +311,9 @@ ZEString ZEPathManager::GetKnownPath(ZEFileKnownPaths KnownPath)
     switch (KnownPath)
     {
         case ZE_FKP_NONE:
-            if (EnablePathRestriction)
+            if (!EnablePathRestriction)
             {
-                return "";
+                return ".";
             }
             // Fall through !
         case ZE_FKP_RESOURCES:
@@ -400,6 +407,94 @@ ZEString ZEPathManager::PathFormatCheck(const ZEString& Path)
     return Temp;
 }
 
+ZEString ZEPathManager::SimplifyPath(const ZEString& Path)
+{
+	ZEInt Depth = 0;
+	ZEString Output;
+	char* Context = NULL;
+	char* NextToken = NULL;
+	char* CurrentToken = NULL;
+	ZEString TempSource = Path;
+	const char* Search = GetPathSeperator();
+	char* Source = (char*)TempSource.ToCString();
+	
+	struct ZEToken
+	{
+		char*	Token;
+		ZESize	Lenth;
+
+		bool IsDot()
+		{
+			return (Lenth == 1) && (strncmp(Token, ".", Lenth) == 0);
+		}
+		bool IsDotDot()
+		{
+			return (Lenth == 2) && (strncmp(Token, "..", Lenth) == 0);
+		}
+	};
+
+	ZESmartArray<ZEToken> Tokens;
+
+
+	// Find all tokens and put them in an array
+	CurrentToken = strtok_s(Source, Search, &Context);
+	while (CurrentToken != NULL)
+	{
+		ZEToken Token = {CurrentToken, strlen(CurrentToken)};
+		Tokens.Add(Token);
+
+		CurrentToken = strtok_s(NULL, Search, &Context);
+	}
+	
+	ZESize Length = Tokens[0].Lenth;
+
+	// Process tokens
+	ZESize Index = 0;
+	ZEUInt UsefulTokens = 0;
+	while ((Index < Tokens.GetCount()) && (Tokens[Index].Token != NULL))
+	{
+		if (Tokens[Index].IsDot())
+		{
+			// Omit "."
+			Tokens.DeleteAt(Index);
+			continue;
+		}
+		else if (Tokens[Index].IsDotDot())
+		{
+			// Omit ".." if there is useful tokens
+			if (UsefulTokens > 0)
+			{
+				// Drop the last useful token
+				Tokens.DeleteAt(--Index);
+				Tokens.DeleteAt(Index);
+				UsefulTokens--;
+			}
+			else
+			{
+				Depth--;
+				Index++;
+				// leave ".."
+			}
+		}
+		else
+		{
+			UsefulTokens++;
+			Depth++;
+			Index++;
+		}
+	}
+
+	Index = 0;
+	while ((Index < Tokens.GetCount()) && (Tokens[Index].Token != NULL))
+	{
+		Output += Tokens[Index].Token;
+		Output += Search;
+		Index++;
+	}
+
+	return Output;
+}
+
 // Checks format, constructs final path and makes a boundary check
 ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEFileKnownPaths& Root)
 {
@@ -426,10 +521,10 @@ ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEFileKnownPaths& Roo
 
     // Do not include symbol
     ZEString RootPath = GetKnownPath(Root);
-    FinalPath = RootPath + FinalPath.Right(FinalPath.GetLength() - SymbolCount);
+    FinalPath = RootPath + "\\" + FinalPath.Right(FinalPath.GetLength() - SymbolCount);
 
     // Check boundary
-    if ( !PathBoundaryCheck(RootPath, FinalPath) )
+    if (!PathBoundaryCheck(RootPath, FinalPath))
     {
         zeError("Reaching files above the root is forbidden...");
         return false;

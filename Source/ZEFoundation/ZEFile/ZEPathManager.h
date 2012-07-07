@@ -89,6 +89,8 @@ class ZEPathManager
         static void					SetEnablePathRestriction(bool Enable);
         static bool					GetEnablePathRestriction();
 
+		static const ZEString&		GetPathSeperator();
+
         static const ZEString&		GetUserDataPath();
         static const ZEString&		GetResourcesPath();
         static const ZEString&		GetSystemDataPath();
@@ -96,6 +98,7 @@ class ZEPathManager
         static const ZEString&		GetApplicationResourcesPath();
         static ZEString				GetKnownPath(ZEFileKnownPaths KnownPath);
 
+		static ZEString				SimplifyPath(const ZEString& Path);
         static ZEString				GetFinalPath(const ZEString& Path, ZEFileKnownPaths& Root);
 
         static ZEString				PathFormatCheck(const ZEString& Path);

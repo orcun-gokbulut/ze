@@ -52,6 +52,7 @@ bool ZEPathManager::Initialized = false;
 bool ZEPathManager::EnablePathRestriction = true;
 
 
+static const ZEString PathSeperator = "/";
 
 // Helper functions to get ZEFileKnownPaths from string
 static ZEFileKnownPaths GetRootByString(const ZEString& Path)
@@ -139,6 +140,11 @@ void ZEPathManager::SetApplicationName(const ZEString &Name)
     AppName = Name;
 }
 
+const ZEString& ZEFileUtils::GetPathSeperator()
+{
+	return PathSeperator;
+}
+
 const ZEString&	ZEPathManager::GetUserDataPath()
 {
     InitializePaths();
@@ -183,7 +189,7 @@ ZEString ZEPathManager::GetKnownPath(ZEFileKnownPaths KnownPath)
         case ZE_FKP_NONE:
             if (!EnablePathRestriction)
             {
-                return "";
+                return ".";
             }
             // Fall through !
         case ZE_FKP_RESOURCES:

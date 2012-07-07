@@ -44,7 +44,7 @@
 #include <dirent.h>
 
 
-// Platform dependent declerations
+// Platform dependent declarations
 struct OSFileTime
 {
     time_t      Time;
