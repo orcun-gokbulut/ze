@@ -125,7 +125,7 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 
 			Temp->Root = Root;
 			Temp->Name = ZEFileUtils::GetFileName(FindData);
-			Temp->Path = Path + "/" + Temp->Name;
+			Temp->Path = Path + ZEPathManager::GetPathSeperator() + Temp->Name;
 			Temp->Extension = ZEFileInfo::GetFileExtension(Temp->Path);
 			FileList->Add(Temp);
 		}
@@ -174,7 +174,7 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 
             Temp->Root = Root;
             Temp->Name = ZEFileUtils::GetFileName(FindData);
-			Temp->Path = Path + "/" + Temp->Name;
+			Temp->Path = Path + ZEPathManager::GetPathSeperator() + Temp->Name;
 			FolderList->Add(Temp);
 		}
 
