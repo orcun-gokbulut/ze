@@ -40,6 +40,31 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 
+#ifdef ZE_PLATFORM_WINDOWS
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+typedef FILETIME ZEOFileTimeOS;
+
+struct ZEFileSearchStream
+{
+	WIN32_FIND_DATA		Data;
+	HANDLE				Handle;
+};
+#endif
+
+#ifdef ZE_PLATFORM_UNIX
+typedef time_t ZEOFileTimeOS;
+
+struct ZEFileSearchStream
+{
+	struct stat Data;
+	DIR*        Directory;
+	ZEString    Name;
+};
+#endif
+
 struct ZEFileTime
 {
 	ZEUInt16	Year;
@@ -52,34 +77,31 @@ struct ZEFileTime
 	ZEUInt16	Milliseconds;
 };
 
-struct OSFileTime;
-struct OSFileSearchData;
-
 class ZEFileUtils
 {
 	public:
 		static bool					IsFile(const ZEString& Path);
-		static bool					IsFile(const OSFileSearchData* FindData);
+		static bool					IsFile(const ZEFileSearchStream* FindData);
 
 		static bool					IsDirectory(const ZEString& Path);
-        static bool					IsDirectory(const OSFileSearchData* FindData);
+        static bool					IsDirectory(const ZEFileSearchStream* FindData);
 
-        static ZEString				GetFileName(const OSFileSearchData* FindData);
+        static ZEString				GetFileName(const ZEFileSearchStream* FindData);
 
         static ZESize               GetFileSize(const ZEString& Path);
-        static ZESize				GetFileSize(const OSFileSearchData* FindData);
+        static ZESize				GetFileSize(const ZEFileSearchStream* FindData);
 
         static bool                 GetCreationTime(ZEFileTime* Output, const ZEString& Path);
-        static void					GetCreationTime(ZEFileTime* Output, const OSFileSearchData* FindData);
+        static void					GetCreationTime(ZEFileTime* Output, const ZEFileSearchStream* FindData);
 
         static bool                 GetModificationTime(ZEFileTime* Output, const ZEString& Path);
-        static void					GetModificationTime(ZEFileTime* Output, const OSFileSearchData* FindData);
+        static void					GetModificationTime(ZEFileTime* Output, const ZEFileSearchStream* FindData);
 
         static void					GetErrorString(ZEString& ErrorString, const ZEInt ErrorId);
 
-        static OSFileSearchData*	OpenSearchStream(const ZEString& Path);
-        static bool					FindNextInStream(OSFileSearchData *FindData);
-        static bool					CloseSearchStream(OSFileSearchData* FindData);
+        static bool					OpenSearchStream(const ZEString& Path, ZEFileSearchStream* Data);
+        static bool					FindNextInStream(ZEFileSearchStream* FindData);
+        static bool					CloseSearchStream(ZEFileSearchStream* FindData);
 
 };
 

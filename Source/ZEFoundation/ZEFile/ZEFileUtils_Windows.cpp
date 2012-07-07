@@ -152,17 +152,17 @@ bool ZEFileUtils::IsDirectory(const ZEString& Path)
 	return false;
 }
 
-bool ZEFileUtils::IsFile(const OSFileSearchData* FindData)
+bool ZEFileUtils::IsFile(const ZEFileSearchStream* FindData)
 {
 	return !((FindData->Data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
 }
 
-bool ZEFileUtils::IsDirectory(const OSFileSearchData* FindData)
+bool ZEFileUtils::IsDirectory(const ZEFileSearchStream* FindData)
 {
 	return ((FindData->Data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
 }
 
-ZEString ZEFileUtils::GetFileName(const OSFileSearchData* FindData)
+ZEString ZEFileUtils::GetFileName(const ZEFileSearchStream* FindData)
 {
 	return ZEString(FindData->Data.cFileName);
 }
@@ -174,7 +174,7 @@ ZESize ZEFileUtils::GetFileSize(const ZEString& Path)
 	return GetStats(Path, &Stat) ? (ZESize)Stat.st_size : 0;
 }
 
-ZESize ZEFileUtils::GetFileSize(const OSFileSearchData* FindData)
+ZESize ZEFileUtils::GetFileSize(const ZEFileSearchStream* FindData)
 {
 	return OSFileSizetoZESize(FindData->Data.nFileSizeHigh, FindData->Data.nFileSizeLow);
 }
@@ -202,7 +202,7 @@ bool ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEString& Path)
 	return true;
 }
 
-void ZEFileUtils::GetCreationTime(ZEFileTime* Output, const OSFileSearchData* FindData)
+void ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEFileSearchStream* FindData)
 {
 	OSFileTime FileTime;
 	FileTime.Time.dwLowDateTime =  FindData->Data.ftCreationTime.dwLowDateTime;
@@ -234,7 +234,7 @@ bool ZEFileUtils::GetModificationTime(ZEFileTime* Output, const ZEString& Path)
 	return true;
 }
 
-void ZEFileUtils::GetModificationTime(ZEFileTime* Output, const OSFileSearchData* FindData)
+void ZEFileUtils::GetModificationTime(ZEFileTime* Output, const ZEFileSearchStream* FindData)
 {
 	OSFileTime FileTime;
 	FileTime.Time.dwLowDateTime =  FindData->Data.ftLastWriteTime.dwLowDateTime;
@@ -243,7 +243,7 @@ void ZEFileUtils::GetModificationTime(ZEFileTime* Output, const OSFileSearchData
 	OSFileTimetoZEFileTime(Output, &FileTime);
 }
 
-bool ZEFileUtils::CloseSearchStream(OSFileSearchData* FindData)
+bool ZEFileUtils::CloseSearchStream(ZEFileSearchStream* FindData)
 {
 	int Result;
 
@@ -263,20 +263,20 @@ bool ZEFileUtils::CloseSearchStream(OSFileSearchData* FindData)
 	return true;
 }
 
-bool ZEFileUtils::FindNextInStream(OSFileSearchData *FindData)
+bool ZEFileUtils::FindNextInStream(ZEFileSearchStream *FindData)
 {
 	zeDebugCheck(FindData == NULL, "NUll pointer");
 
 	return FindNextFile(FindData->Handle, &FindData->Data) != 0;
 }
 
-OSFileSearchData* ZEFileUtils::OpenSearchStream(const ZEString& Path)
+ZEFileSearchStream* ZEFileUtils::OpenSearchStream(const ZEString& Path)
 {
-	OSFileSearchData* FindData;
+	ZEFileSearchStream* FindData;
 
 	zeDebugCheck(Path.IsEmpty(), "Empty string..");
 	
-	FindData = new OSFileSearchData;
+	FindData = new ZEFileSearchStream;
 	if (FindData == NULL)
 	{
 		zeError("Cannot allocate");

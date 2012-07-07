@@ -93,7 +93,7 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 	ZEFileInfo*	Temp;
 	bool Continue = true;
 	ZEArray<ZEFileInfo*>* FileList;
-    OSFileSearchData* FindData = NULL;
+    ZEFileSearchStream* FindData = NULL;
 
 	// if path is out of boundary
     if (!ZEPathManager::PathBoundaryCheck(ZEPathManager::GetKnownPath(Root), Path))
@@ -142,7 +142,7 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 	ZEFolderInfo* Temp;
 	bool Continue = true;
 	ZEArray<ZEFolderInfo*>* FolderList;
-    OSFileSearchData* FindData = NULL;
+    ZEFileSearchStream* FindData = NULL;
 
 	// if path is out of boundary
 	if ( !ZEPathManager::PathBoundaryCheck(ZEPathManager::GetKnownPath(Root), Path) )
