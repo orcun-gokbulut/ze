@@ -39,17 +39,15 @@ include_directories(
 	${PROJECT_SOURCE_DIR}
 	${CMAKE_SOURCE_DIR}/Source)
 	
+ze_add_source(ZEDirectoryInfo.cpp		Sources)
+ze_add_source(ZEDirectoryInfo.h			Sources Headers)
 ze_add_source(ZEFile.cpp				Sources)
 ze_add_source(ZEFile.h					Sources Headers)
-
 ze_add_source(ZEFileUtils_Unix.cpp		Sources PLATFORMS Unix)
 ze_add_source(ZEFileUtils_Windows.cpp	Sources PLATFORMS Windows)
 ze_add_source(ZEFileUtils.h				Sources)
-
 ze_add_source(ZEFileInfo.cpp			Sources)
 ze_add_source(ZEFileInfo.h				Sources Headers)
-ze_add_source(ZEFolderInfo.cpp			Sources)
-ze_add_source(ZEFolderInfo.h			Sources Headers)
 ze_add_source(ZEFileTests.cpp			Tests)
 ze_add_source(ZEPartialFile.cpp			Sources)
 ze_add_source(ZEPartialFile.h			Sources Headers)
