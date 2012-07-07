@@ -42,40 +42,40 @@
 #include "ZEDS/ZEString.h"
 
 
-#define		ZE_FILE_PATH_IDENTIFIER_SYMBOL_RESOURCES		'#'
-#define		ZE_FILE_PATH_IDENTIFIER_SYMBOL_APP_RESOURCES	'~'
-#define		ZE_FILE_PATH_IDENTIFIER_SYMBOL_USER_DATA		'$'
-#define		ZE_FILE_PATH_IDENTIFIER_SYMBOL_SYSTEM_DATA		'&'
-#define		ZE_FILE_PATH_IDENTIFIER_SYMBOL_SAVED_GAMES		'|'
+#define		ZE_PATH_SYMBOL_RESOURCES		'#'
+#define		ZE_PATH_SYMBOL_APP_RESOURCES	'~'
+#define		ZE_PATH_SYMBOL_USER_DATA		'$'
+#define		ZE_PATH_SYMBOL_SYSTEM_DATA		'&'
+#define		ZE_PATH_SYMBOL_SAVED_GAMES		'|'
 
-// ZE_KFP_RESOURCES: Resources(RunDir\Resources)
-// ZE_KFP_APP_RESOURCES: Application specific resources(RunDir\Resources\AppName)
-// ZE_FKP_USER_DATA: User specific local data
-// ZE_FKP_SYSTEM_DATA: User independent common system data
-// ZE_FKP_SAVED_GAMES: User game saves
-enum ZEFileKnownPaths
+
+enum ZEKnownPath
 {
-    ZE_FKP_NONE				= 0,
-    ZE_FKP_RESOURCES		= 1,
-    ZE_FKP_APP_RESOURCES	= 2,
-    ZE_FKP_USER_DATA		= 3,
-    ZE_FKP_SYSTEM_DATA		= 4,
-    ZE_FKP_SAVED_GAMES		= 5
+    ZE_KP_NONE					= 0,
+    ZE_KP_RESOURCES				= 1,
+    ZE_KP_APP_RESOURCES			= 2,
+    ZE_KP_USER_DATA				= 3,
+    ZE_KP_SYSTEM_DATA			= 4,
+    ZE_KP_SAVED_GAMES			= 5,
+	ZE_KP_WORKING_DIRECTORY		= 6
 };
 
 class ZEPathManager
 {
     private:
-        static ZEString				AppName;
-        static bool					Initialized;
+		static bool					Initialized;
+		static bool					EnablePathRestriction;
 
-        static bool					EnablePathRestriction;
+		static ZEString				CompanyName;
+        static ZEString				ApplicationName;
+		static ZEString				ResourceDirName;
 
         static ZEString				UserDataPath;
         static ZEString				ResourcesPath;
         static ZEString				SystemDataPath;
         static ZEString				SavedGamesPath;
-        static ZEString				ApplicationResourcesPath;
+        static ZEString				WorkingDirectory;
+		static ZEString				ApplicationResourcesPath;
 
 									ZEPathManager();
 									~ZEPathManager();
@@ -84,23 +84,41 @@ class ZEPathManager
 
     public:
         static bool					GetInitialized();
+
+		static void					SetCompanyName(const ZEString& Name);
+		static const ZEString&		GetCompanyName();
+
         static void					SetApplicationName(const ZEString& Name);
+		static const ZEString&		GetApplicationName();
+
+		static void					SetResourceDirName(const ZEString& Name);
+		static const ZEString&		GetResourceDirName();
 
         static void					SetEnablePathRestriction(bool Enable);
         static bool					GetEnablePathRestriction();
-
-		static const ZEString&		GetPathSeperator();
 
         static const ZEString&		GetUserDataPath();
         static const ZEString&		GetResourcesPath();
         static const ZEString&		GetSystemDataPath();
         static const ZEString&		GetSavedGamesPath();
-        static const ZEString&		GetApplicationResourcesPath();
-        static ZEString				GetKnownPath(ZEFileKnownPaths KnownPath);
+        static const ZEString&		GetWorkingDirectory();
+		static const ZEString&		GetApplicationResourcesPath();
+        
+		static const ZEString&		GetKnownPath(ZEKnownPath KnownPath);
+		static ZEKnownPath			GetKnownPath(ZEString* RelativePart, const ZEString& SymbolicPath);
+
+		static bool					IsAbsolutePath(const ZEString& Path);
+		static bool					IsRelativePath(const ZEString& Path);
+
+		static ZEString				GetRelativePath(const ZEString& FullPath);
+		static ZEString				GetAbsolutePath(const ZEString& RelativePath);
 
 		static ZEString				SimplifyPath(const ZEString& Path);
-        static ZEString				GetFinalPath(const ZEString& Path, ZEFileKnownPaths& Root);
+		static ZEString				GetFinalPath(const ZEString& Path, ZEKnownPath* Root = NULL);
 
+
+
+		static const ZEString&		GetPathSeperator();
         static ZEString				PathFormatCheck(const ZEString& Path);
         static bool					PathBoundaryCheck(const ZEString& RootPath, const ZEString& Path);
 

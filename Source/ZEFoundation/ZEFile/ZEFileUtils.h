@@ -41,28 +41,27 @@
 #include "ZEDS/ZEString.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+	typedef FILETIME ZEFileTimeOS;
 
-typedef FILETIME ZEOFileTimeOS;
-
-struct ZEFileSearchStream
-{
-	WIN32_FIND_DATA		Data;
-	HANDLE				Handle;
-};
+	struct ZEFileSearchStream
+	{
+		WIN32_FIND_DATA		Data;
+		HANDLE				Handle;
+	};
 #endif
 
 #ifdef ZE_PLATFORM_UNIX
-typedef time_t ZEOFileTimeOS;
+	typedef time_t ZEFileTimeOS;
 
-struct ZEFileSearchStream
-{
-	struct stat Data;
-	DIR*        Directory;
-	ZEString    Name;
-};
+	struct ZEFileSearchStream
+	{
+		struct stat Data;
+		DIR*        Directory;
+		ZEString    Name;
+	};
 #endif
 
 struct ZEFileTime
@@ -99,7 +98,7 @@ class ZEFileUtils
 
         static void					GetErrorString(ZEString& ErrorString, const ZEInt ErrorId);
 
-        static bool					OpenSearchStream(const ZEString& Path, ZEFileSearchStream* Data);
+        static bool					OpenSearchStream(ZEFileSearchStream* FindData, const ZEString& Path);
         static bool					FindNextInStream(ZEFileSearchStream* FindData);
         static bool					CloseSearchStream(ZEFileSearchStream* FindData);
 
