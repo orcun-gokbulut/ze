@@ -50,7 +50,7 @@ class ZEFileInfo;
 class ZEFolderInfo
 {
 	private:
-		ZEFileKnownPaths		Root;
+		ZEKnownPath		Root;
 		ZEString				Name;
 		ZEString				Path;
 		ZEFileTime				Creation;

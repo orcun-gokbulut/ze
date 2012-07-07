@@ -49,7 +49,7 @@ ZEFileInfo::ZEFileInfo()
 ZEFileInfo::ZEFileInfo(const ZEString& FilePath)
 {
 	Size = 0;
-	Path = ZEPathManager::GetFinalPath(FilePath, Root);
+	Path = ZEPathManager::GetFinalPath(FilePath, &Root);
 	Extension = GetFileExtension(Path);
 	Name = GetFileName(Path);
 

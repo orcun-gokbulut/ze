@@ -46,7 +46,7 @@ ZEFolderInfo::ZEFolderInfo()
 
 ZEFolderInfo::ZEFolderInfo(const ZEString& FolderPath)
 {
-	Path = ZEPathManager::GetFinalPath(FolderPath, Root);
+	Path = ZEPathManager::GetFinalPath(FolderPath, &Root);
 	Name = GetFolderName(Path);
 
 	memset((void*)&Creation, 0, sizeof(ZEFileTime));
@@ -93,7 +93,7 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 	ZEFileInfo*	Temp;
 	bool Continue = true;
 	ZEArray<ZEFileInfo*>* FileList;
-    ZEFileSearchStream* FindData = NULL;
+    ZEFileSearchStream FindData;
 
 	// if path is out of boundary
     if (!ZEPathManager::PathBoundaryCheck(ZEPathManager::GetKnownPath(Root), Path))
@@ -109,31 +109,31 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
         return NULL;
     }
 
-    FindData = ZEFileUtils::OpenSearchStream(Path);
-    while (FindData != NULL && Continue)
+    Continue = ZEFileUtils::OpenSearchStream(&FindData, Path);
+    while (Continue)
 	{
 		// If file
-		if (ZEFileUtils::IsFile(FindData))
+		if (ZEFileUtils::IsFile(&FindData))
 		{
 			Temp = new ZEFileInfo();
             if (Temp == NULL)
             {
                 zeError("Cannot allcoate...");
-                ZEFileUtils::CloseSearchStream(FindData);
+                ZEFileUtils::CloseSearchStream(&FindData);
                 return FileList;
             }
 
 			Temp->Root = Root;
-			Temp->Name = ZEFileUtils::GetFileName(FindData);
+			Temp->Name = ZEFileUtils::GetFileName(&FindData);
 			Temp->Path = Path + ZEPathManager::GetPathSeperator() + Temp->Name;
 			Temp->Extension = ZEFileInfo::GetFileExtension(Temp->Path);
 			FileList->Add(Temp);
 		}
 
-        Continue = ZEFileUtils::FindNextInStream(FindData);
+        Continue = ZEFileUtils::FindNextInStream(&FindData);
 	}
 
-    ZEFileUtils::CloseSearchStream(FindData);
+    ZEFileUtils::CloseSearchStream(&FindData);
 	return FileList;
 }
 
@@ -142,7 +142,7 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 	ZEFolderInfo* Temp;
 	bool Continue = true;
 	ZEArray<ZEFolderInfo*>* FolderList;
-    ZEFileSearchStream* FindData = NULL;
+    ZEFileSearchStream FindData;
 
 	// if path is out of boundary
 	if ( !ZEPathManager::PathBoundaryCheck(ZEPathManager::GetKnownPath(Root), Path) )
@@ -158,30 +158,30 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
         return NULL;
     }
 
-    FindData = ZEFileUtils::OpenSearchStream(Path);
-    while (FindData != NULL && Continue)
+    Continue = ZEFileUtils::OpenSearchStream(&FindData, Path);
+    while (Continue)
     {
 		// If Folder
-		if (ZEFileUtils::IsDirectory(FindData))
+		if (ZEFileUtils::IsDirectory(&FindData))
 		{
 			Temp = new ZEFolderInfo();
 			if ( Temp == NULL )
             {
                 zeError("Cannot allcoate...");
-                ZEFileUtils::CloseSearchStream(FindData);
+                ZEFileUtils::CloseSearchStream(&FindData);
                 return FolderList;
             }
 
             Temp->Root = Root;
-            Temp->Name = ZEFileUtils::GetFileName(FindData);
+            Temp->Name = ZEFileUtils::GetFileName(&FindData);
 			Temp->Path = Path + ZEPathManager::GetPathSeperator() + Temp->Name;
 			FolderList->Add(Temp);
 		}
 
-        Continue = ZEFileUtils::FindNextInStream(FindData);
+        Continue = ZEFileUtils::FindNextInStream(&FindData);
 	}
 
-    ZEFileUtils::CloseSearchStream(FindData);
+    ZEFileUtils::CloseSearchStream(&FindData);
     return FolderList;
 }
 
