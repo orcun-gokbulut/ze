@@ -45,10 +45,10 @@
 
 class ZEFileInfo
 {
-	friend class ZEFolderInfo;
+	friend class ZEDirectoryInfo;
 
 	private:
-		ZEKnownPath		Root;
+		ZEKnownPath				Root;
 		ZESize					Size;
 		ZEString				Name;
 		ZEString				Path;
@@ -61,6 +61,8 @@ class ZEFileInfo
 	public:
 								ZEFileInfo(const ZEString& FilePath);
 								~ZEFileInfo();
+
+		void					SetPath(const ZEString& FilePath);
 
 		ZESize					GetSize();
 		const ZEString&			GetPath() const;
@@ -76,4 +78,4 @@ class ZEFileInfo
 };
 
 
-#endif // __ZE_FILE_INFO_H__
+#endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFolderInfo.h
+ Zinek Engine - ZEDirectoryInfo.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_FOLDER_INFO_H__
-#define __ZE_FOLDER_INFO_H__
+#ifndef __ZE_DIRECTORY_INFO_H__
+#define __ZE_DIRECTORY_INFO_H__
 
 #include "ZETypes.h"
 #include "ZEPathManager.h"
@@ -47,7 +47,7 @@
 struct ZEFileTime;
 class ZEFileInfo;
 
-class ZEFolderInfo
+class ZEDirectoryInfo
 {
 	private:
 		ZEKnownPath		Root;
@@ -56,11 +56,13 @@ class ZEFolderInfo
 		ZEFileTime				Creation;
 		ZEFileTime				Modification;
 
-								ZEFolderInfo();
+								ZEDirectoryInfo();
 
 	public:
-								ZEFolderInfo(const ZEString& FolderPath);
-								~ZEFolderInfo();
+								ZEDirectoryInfo(const ZEString& FolderPath);
+								~ZEDirectoryInfo();
+
+		void					SetPath(const ZEString& FilePath);
 
 		const ZEString&			GetName() const;
 		const ZEString&			GetPath() const;
@@ -68,7 +70,7 @@ class ZEFolderInfo
 		bool					GetModificationDate(ZEFileTime& Time);
 
 		ZEArray<ZEFileInfo*>*	GetFileList();
-		ZEArray<ZEFolderInfo*>*	GetFolderList();
+		ZEArray<ZEDirectoryInfo*>*	GetFolderList();
 
 		static bool				IsFolder(const ZEString& FolderPath);
 		static ZEString			GetFolderName(const ZEString& FolderPath);

@@ -48,11 +48,11 @@ ZEFileInfo::ZEFileInfo()
 
 ZEFileInfo::ZEFileInfo(const ZEString& FilePath)
 {
-	Size = 0;
 	Path = ZEPathManager::GetFinalPath(FilePath, &Root);
 	Extension = GetFileExtension(Path);
 	Name = GetFileName(Path);
 
+	Size = 0;
 	memset((void*)&Creation, 0, sizeof(ZEFileTime));
 	memset((void*)&Modification, 0, sizeof(ZEFileTime));
 }
@@ -60,6 +60,17 @@ ZEFileInfo::ZEFileInfo(const ZEString& FilePath)
 ZEFileInfo::~ZEFileInfo()
 {
 
+}
+
+void ZEFileInfo::SetPath(const ZEString& FilePath)
+{
+	Path = ZEPathManager:: GetFinalPath(FilePath, &Root);
+	Extension = GetFileExtension(Path);
+	Name = GetFileName(Path);
+	
+	Size = 0;
+	memset((void*)&Creation, 0, sizeof(ZEFileTime));
+	memset((void*)&Modification, 0, sizeof(ZEFileTime));
 }
 
 ZESize ZEFileInfo::GetSize()

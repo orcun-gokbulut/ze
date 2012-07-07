@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFolderInfo.cpp
+ Zinek Engine - ZEDirectoryInfo.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,17 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEFileInfo.h"
-#include "ZEFolderInfo.h"
+#include "ZEDirectoryInfo.h"
 
 #include <memory.h>
 
-ZEFolderInfo::ZEFolderInfo()
+ZEDirectoryInfo::ZEDirectoryInfo()
 {
 	memset((void*)&Creation, 0, sizeof(ZEFileTime));
 	memset((void*)&Modification, 0, sizeof(ZEFileTime));
 }
 
-ZEFolderInfo::ZEFolderInfo(const ZEString& FolderPath)
+ZEDirectoryInfo::ZEDirectoryInfo(const ZEString& FolderPath)
 {
 	Path = ZEPathManager::GetFinalPath(FolderPath, &Root);
 	Name = GetFolderName(Path);
@@ -53,22 +53,31 @@ ZEFolderInfo::ZEFolderInfo(const ZEString& FolderPath)
 	memset((void*)&Modification, 0, sizeof(ZEFileTime));
 }
 
-ZEFolderInfo::~ZEFolderInfo()
+ZEDirectoryInfo::~ZEDirectoryInfo()
 {
 
 }
 
-const ZEString& ZEFolderInfo::GetName() const
+void ZEFileInfo::SetPath(const ZEString& FoderPath)
+{
+	Path = ZEPathManager:: GetFinalPath(FoderPath, &Root);
+	Name = GetFileName(Path);
+	
+	memset((void*)&Creation, 0, sizeof(ZEFileTime));
+	memset((void*)&Modification, 0, sizeof(ZEFileTime));
+}
+
+const ZEString& ZEDirectoryInfo::GetName() const
 {
 	return Name;
 }
 
-const ZEString& ZEFolderInfo::GetPath() const
+const ZEString& ZEDirectoryInfo::GetPath() const
 {
 	return Path;
 }
 
-bool ZEFolderInfo::GetCreationDate(ZEFileTime& Time)
+bool ZEDirectoryInfo::GetCreationDate(ZEFileTime& Time)
 {
     bool Result;
 
@@ -78,7 +87,7 @@ bool ZEFolderInfo::GetCreationDate(ZEFileTime& Time)
     return Result;
 }
 
-bool ZEFolderInfo::GetModificationDate(ZEFileTime& Time)
+bool ZEDirectoryInfo::GetModificationDate(ZEFileTime& Time)
 {
     bool Result;
 
@@ -88,7 +97,7 @@ bool ZEFolderInfo::GetModificationDate(ZEFileTime& Time)
     return Result;
 }
 
-ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
+ZEArray<ZEFileInfo*>* ZEDirectoryInfo::GetFileList()
 {
 	ZEFileInfo*	Temp;
 	bool Continue = true;
@@ -137,11 +146,11 @@ ZEArray<ZEFileInfo*>* ZEFolderInfo::GetFileList()
 	return FileList;
 }
 
-ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
+ZEArray<ZEDirectoryInfo*>* ZEDirectoryInfo::GetFolderList()
 {
-	ZEFolderInfo* Temp;
+	ZEDirectoryInfo* Temp;
 	bool Continue = true;
-	ZEArray<ZEFolderInfo*>* FolderList;
+	ZEArray<ZEDirectoryInfo*>* FolderList;
     ZEFileSearchStream FindData;
 
 	// if path is out of boundary
@@ -151,7 +160,7 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 		return NULL;
 	}
 
-	FolderList = new ZEArray<ZEFolderInfo*>;
+	FolderList = new ZEArray<ZEDirectoryInfo*>;
     if (FolderList == NULL)
     {
         zeError("Cannot allocate...");
@@ -164,7 +173,7 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
 		// If Folder
 		if (ZEFileUtils::IsDirectory(&FindData))
 		{
-			Temp = new ZEFolderInfo();
+			Temp = new ZEDirectoryInfo();
 			if ( Temp == NULL )
             {
                 zeError("Cannot allcoate...");
@@ -185,12 +194,12 @@ ZEArray<ZEFolderInfo*>* ZEFolderInfo::GetFolderList()
     return FolderList;
 }
 
-bool ZEFolderInfo::IsFolder(const ZEString& FolderPath)
+bool ZEDirectoryInfo::IsFolder(const ZEString& FolderPath)
 {
 	return ZEFileUtils::IsDirectory(FolderPath);
 }
 
-ZEString ZEFolderInfo::GetFolderName(const ZEString& FolderPath)
+ZEString ZEDirectoryInfo::GetFolderName(const ZEString& FolderPath)
 {
 	ZESize Length = FolderPath.GetLength();
 
@@ -206,7 +215,7 @@ ZEString ZEFolderInfo::GetFolderName(const ZEString& FolderPath)
 	return FolderPath;
 }
 
-ZEString ZEFolderInfo::GetParentFolder(const ZEString& Path)
+ZEString ZEDirectoryInfo::GetParentFolder(const ZEString& Path)
 {
 	ZESize Length = Path.GetLength();
 
