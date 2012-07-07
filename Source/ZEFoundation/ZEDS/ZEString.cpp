@@ -75,7 +75,6 @@ void ZEString::Clear()
 
 void ZEString::SetValue(const char* String)
 {
-	zeDebugCheck(String == NULL, "Null char array pointer are not valid parameters.");
 	
 	if (String == NULL)
 	{
