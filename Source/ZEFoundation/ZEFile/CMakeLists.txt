@@ -42,9 +42,6 @@ include_directories(
 ze_add_source(ZEFile.cpp				Sources)
 ze_add_source(ZEFile.h					Sources Headers)
 
-ze_add_source(ZEFileDataTypes_Unix.h	Sources PLATFORMS Unix)
-ze_add_source(ZEFileDataTypes_Windows.h	Sources PLATFORMS Windows)
-
 ze_add_source(ZEFileUtils_Unix.cpp		Sources PLATFORMS Unix)
 ze_add_source(ZEFileUtils_Windows.cpp	Sources PLATFORMS Windows)
 ze_add_source(ZEFileUtils.h				Sources)
