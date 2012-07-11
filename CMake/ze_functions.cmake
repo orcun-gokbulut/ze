@@ -471,3 +471,16 @@ macro(ze_check_externals)
 		endif()
 	endif()
 endmacro()
+
+function(ze_link)
+	parse_arguments(PARAMETER "LIBS;${ze_check_parameters}" "" ${ARGV})
+
+	ze_check()
+	if (NOT CHECK_SUCCEEDED)
+		return()
+	endif()
+
+	# Get Target Name
+	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
+	target_link_libraries(${PARAMETER_TARGET} ${PARAMETER_LIBS})
+endfunction()
