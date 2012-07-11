@@ -50,3 +50,13 @@ void* ZEThread::GetParameter()
 {
 	return Parameter;
 }
+
+void ZEThread::SetFunction(ZEThreadFunction Function)
+{
+    this->Function = Function;
+}
+
+ZEThreadFunction& ZEThread::GetFunction()
+{
+    return Function;
+}

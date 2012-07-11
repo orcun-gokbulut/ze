@@ -36,6 +36,8 @@
 #ifndef __ZE_THREAD_H__
 #define __ZE_THREAD_H__
 
+#include "ZEDS/ZEDelegate.h"
+
 #ifdef ZE_PLATFORM_UNIX
 #include <pthread.h>
 #endif
@@ -48,6 +50,8 @@ enum ZEThreadStatus
 	ZE_TS_TERMINATED,
 	ZE_TS_DONE
 };
+
+typedef ZEDelegate<void (void*)> ZEThreadFunction;
 
 class ZEThread
 {
@@ -63,13 +67,14 @@ class ZEThread
 
 
 		ZEThreadStatus		Status;
-		void*				Parameter;
-
-	protected:
-		virtual void		Function(void* Parameter) = 0;
+        ZEThreadFunction    Function;
+        void*				Parameter;
 
 	public:
 		ZEThreadStatus		GetStatus();
+
+        void                SetFunction(ZEThreadFunction Function);
+        ZEThreadFunction&   GetFunction();
 
 		void				SetParameter(void* Parameter);
 		void*				GetParameter();

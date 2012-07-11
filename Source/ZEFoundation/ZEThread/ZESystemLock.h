@@ -52,8 +52,8 @@ class ZESystemLock
 	public:
 		bool				Test();
 		bool				Lock();
-		bool				Wait(int Milliseconds);
-		bool				WaitAndLock(int Milliseconds);
+        bool				Wait(int Milliseconds = -1);
+        bool				WaitAndLock(int Milliseconds = -1);
 		bool				Unlock();
 
 		ZESystemLock		operator=(const ZESystemLock& Lock);
