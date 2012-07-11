@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESystemLock.cpp
+ Zinek Engine - ZESystemLock_Windows.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -49,7 +49,7 @@ bool ZESystemLock::Lock()
 	return WaitAndLock(0);
 }
 
-bool ZESystemLock::Wait(int Milliseconds = -1)
+bool ZESystemLock::Wait(int Milliseconds)
 {
 	if (!WaitAndLock(Milliseconds))
 		return false;
@@ -59,7 +59,7 @@ bool ZESystemLock::Wait(int Milliseconds = -1)
 	return true;
 }
 
-bool ZESystemLock::WaitAndLock(int Milliseconds = -1)
+bool ZESystemLock::WaitAndLock(int Milliseconds)
 {
 	DWORD MilSec;
 	if (Milliseconds == -1)

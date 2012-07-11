@@ -50,21 +50,6 @@ DWORD WINAPI ZEThread::ThreadFunction(LPVOID Thread)
 	return 0;
 }
 
-ZEThreadStatus ZEThread::GetStatus()
-{
-	return Status;
-}
-
-void ZEThread::SetParameter(void* Parameter)
-{
-	this->Parameter = Parameter;
-}
-
-void* ZEThread::GetParameter()
-{
-	return Parameter;
-}
-
 void ZEThread::Run(void* Parameter)
 {
 	if (Handle == NULL)
