@@ -46,7 +46,7 @@ bool ZESystemLock::Lock()
 	return WaitAndLock(0);
 }
 
-bool ZESystemLock::Wait(int Milliseconds = -1)
+bool ZESystemLock::Wait(int Milliseconds)
 {
 	if (!WaitAndLock(Milliseconds))
 		return false;

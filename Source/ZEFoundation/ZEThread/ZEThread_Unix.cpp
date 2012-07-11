@@ -54,7 +54,7 @@ void ZEThread::Run(void* Parameter)
 
     if (Status == ZE_TS_NONE || Status == ZE_TS_DONE || Status == ZE_TS_TERMINATED)
     {
-        int Result = pthread_create(&Thread, NULL, ThreadFunction, Parameter);
+        int Result = pthread_create(&Thread, NULL, ThreadFunction, this);
         if (Result != 0)
             zeCriticalError("Can not create thread.");
     }

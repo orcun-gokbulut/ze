@@ -36,7 +36,7 @@
 #include "ZESystemLock.h"
 #include "ZEError.h"
 
-bool ZESystemLock::WaitAndLock(int Milliseconds = -1)
+bool ZESystemLock::WaitAndLock(int Milliseconds)
 {
     if (Milliseconds < 0)
         return pthread_mutex_lock(&Mutex) == 0;
