@@ -56,16 +56,15 @@ class ZEFileInfo
 		ZEFileTime				Creation;
 		ZEFileTime				Modification;
 
-								ZEFileInfo();
-
 	public:
+								ZEFileInfo();
 								ZEFileInfo(const ZEString& FilePath);
 								~ZEFileInfo();
 
 		void					SetPath(const ZEString& FilePath);
+		const ZEString&			GetPath() const;
 
 		ZESize					GetSize();
-		const ZEString&			GetPath() const;
 		const ZEString&			GetName() const;
 		const ZEString&			GetExtension() const;
 		bool					GetCreationDate(ZEFileTime& Time);
@@ -74,7 +73,7 @@ class ZEFileInfo
 		static bool				IsFile(const ZEString& FilePath);
 		static ZEString			GetFileName(const ZEString& FilePath);
 		static ZEString			GetFileExtension(const ZEString& FilePath);
-		static ZEString			GetParentFolder(const ZEString& Path);
+		static ZEString			GetParentDirectory(const ZEString& DirectoryPath);
 };
 
 

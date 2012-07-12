@@ -37,6 +37,7 @@
 #include "ZEFileInfo.h"
 
 #include <memory.h>
+#include "ZEPathUtils.h"
 
 
 ZEFileInfo::ZEFileInfo()
@@ -122,14 +123,11 @@ bool ZEFileInfo::IsFile(const ZEString& FilePath)
 
 ZEString ZEFileInfo::GetFileName(const ZEString& FilePath)
 {
-	ZESize Length = FilePath.GetLength();
-
-	if (Length == 0)
-		return "";
+	ZESSize Length = FilePath.GetLength();
 
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
-		if (FilePath[I] == '\\' || FilePath[I] == '/')
+		if (ISSEPERATOR(FilePath[I]))
 			return FilePath.Right(Length - 1 - I);
 	}
 
@@ -138,10 +136,7 @@ ZEString ZEFileInfo::GetFileName(const ZEString& FilePath)
 
 ZEString ZEFileInfo::GetFileExtension(const ZEString& FilePath)
 {
-	ZESize Length = FilePath.GetLength();
-
-	if (Length == 0)
-		return "";
+	ZESSize Length = FilePath.GetLength();
 
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
@@ -152,17 +147,14 @@ ZEString ZEFileInfo::GetFileExtension(const ZEString& FilePath)
 	return "";
 }
 
-ZEString ZEFileInfo::GetParentFolder(const ZEString& Path)
+ZEString ZEFileInfo::GetParentDirectory(const ZEString& DirectoryPath)
 {
-	ZESize Length = Path.GetLength();
-
-	if (Length == 0)
-		return "";
+	ZESSize Length = DirectoryPath.GetLength();
 
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
-		if (Path[I] == '\\' || Path[I] == '/')
-			return Path.Left(I);
+		if (ISSEPERATOR(DirectoryPath[I]))
+			return DirectoryPath.Left(I);
 	}
 
 	return "";

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDirectoryInfo.h
+ Zinek Engine - ZEPathUtils.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,46 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_DIRECTORY_INFO_H__
-#define __ZE_DIRECTORY_INFO_H__
+#ifndef __ZE_PATH_UTILS_H__
+#define __ZE_PATH_UTILS_H__
 
-#include "ZETypes.h"
-#include "ZEPathManager.h"
+
 #include "ZEDS/ZEString.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEFileUtils.h"
+#include "ZEPathManager.h"
 
 
-struct ZEFileTime;
-class ZEFileInfo;
+#define ISSEPERATOR(Char)		(((Char) == '\\') || ((Char) == '/'))
+#define ISDRIVELETTER(Char)		((('a' < (Char)) && ((Char) < 'z')) || (('A' < (Char)) && ((Char) < 'Z')))
 
-class ZEDirectoryInfo
+class ZEPathUtils
 {
 	private:
-		ZEKnownPath					Root;
-		ZEString					Name;
-		ZEString					Path;
-		ZEFileTime					Creation;
-		ZEFileTime					Modification;
+									ZEPathUtils();
+									~ZEPathUtils();
 
 	public:
-									ZEDirectoryInfo();
-									ZEDirectoryInfo(const ZEString& DirectoryPath);
-									~ZEDirectoryInfo();
+		static const ZEString&		GetDot();
+		static const ZEString&		GetDotDot();
+		static const ZEString&		GetSeperator();
+		static const ZEString&		GetEmptyPath();
 
-		void						SetPath(const ZEString& DirectoryPath);
-		const ZEString&				GetPath() const;
+		static ZEString				GetSimplifiedPath(const ZEString& Path);
 
-		const ZEString&				GetName() const;
-		bool						GetCreationDate(ZEFileTime& Time);
-		bool						GetModificationDate(ZEFileTime& Time);
+		static ZEKnownPath			SearchForSymbol(ZEString* RelativePart, const ZEString& SymbolicPath);
 
-		ZEArray<ZEFileInfo*>*		GetFileList();
-		ZEArray<ZEDirectoryInfo*>*	GetDirectoryList();
+		static bool					CheckForRestriction(const ZEString& RootPath, const ZEString& Path);
+		
+		static bool					IsAbsolutePath(const ZEString& Path);
+		static ZEString				GetAbsolutePath(const ZEString& RootPath, const ZEString& RelativePath);
 
-		static bool					IsDirectory(const ZEString& DirectoryPath);
-		static ZEString				GetDirectoryName(const ZEString& DirectoryPath);
-		static ZEString				GetParentDirectory(const ZEString& DirectoryPath);
+		static bool					IsRelativePath(const ZEString& Path);
+		static ZEString				GetRelativePath(const ZEString& RootPath, const ZEString& AbsolutePath);
 };
 
 
