@@ -153,16 +153,22 @@ bool ZEFileUtils::IsDirectory(const ZEString& Path)
 
 bool ZEFileUtils::IsFile(const ZEFileSearchStream* FindData)
 {
+	zeDebugCheck(FindData == NULL, "NUll pointer");
+	
 	return !((FindData->Data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
 }
 
 bool ZEFileUtils::IsDirectory(const ZEFileSearchStream* FindData)
 {
+	zeDebugCheck(FindData == NULL, "NUll pointer");
+
 	return ((FindData->Data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
 }
 
 ZEString ZEFileUtils::GetFileName(const ZEFileSearchStream* FindData)
 {
+	zeDebugCheck(FindData == NULL, "NUll pointer");
+
 	return ZEString(FindData->Data.cFileName);
 }
 
@@ -175,11 +181,15 @@ ZESize ZEFileUtils::GetFileSize(const ZEString& Path)
 
 ZESize ZEFileUtils::GetFileSize(const ZEFileSearchStream* FindData)
 {
+	zeDebugCheck(FindData == NULL, "NUll pointer");
+
 	return OSFileSizetoZESize(FindData->Data.nFileSizeHigh, FindData->Data.nFileSizeLow);
 }
 
 bool ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEString& Path)
 {
+	zeDebugCheck(Output == NULL, "NUll pointer");
+
 	struct tm TimeInfo;
 	struct stat Stat;
 
@@ -203,6 +213,9 @@ bool ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEString& Path)
 
 void ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEFileSearchStream* FindData)
 {
+	zeDebugCheck(Output == NULL, "NUll pointer");
+	zeDebugCheck(FindData == NULL, "NUll pointer");
+	
 	ZEFileTimeOS FileTime;
 	FileTime.dwLowDateTime =  FindData->Data.ftCreationTime.dwLowDateTime;
 	FileTime.dwHighDateTime = FindData->Data.ftCreationTime.dwHighDateTime;
@@ -213,6 +226,8 @@ void ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEFileSearchStream* 
 bool ZEFileUtils::GetModificationTime(ZEFileTime* Output, const ZEString& Path)
 {
 	struct stat Stat;
+
+	zeDebugCheck(Output == NULL, "NUll pointer");
 
 	if (!GetStats(Path, &Stat))
 		return false;
@@ -235,6 +250,9 @@ bool ZEFileUtils::GetModificationTime(ZEFileTime* Output, const ZEString& Path)
 
 void ZEFileUtils::GetModificationTime(ZEFileTime* Output, const ZEFileSearchStream* FindData)
 {
+	zeDebugCheck(Output == NULL, "NUll pointer");
+	zeDebugCheck(FindData == NULL, "NUll pointer");
+
 	ZEFileTimeOS FileTime;
 	FileTime.dwLowDateTime =  FindData->Data.ftLastWriteTime.dwLowDateTime;
 	FileTime.dwHighDateTime = FindData->Data.ftLastWriteTime.dwHighDateTime;
@@ -247,6 +265,9 @@ bool ZEFileUtils::CloseSearchStream(ZEFileSearchStream* FindData)
 	int Result;
 
 	zeDebugCheck(FindData == NULL, "NUll pointer");
+
+	if (FindData->Handle == INVALID_HANDLE_VALUE || FindData->Handle == NULL)
+		return true;
 
 	SetLastError(ERROR_SUCCESS);
 	Result = FindClose(FindData->Handle);
@@ -265,6 +286,9 @@ bool ZEFileUtils::FindNextInStream(ZEFileSearchStream *FindData)
 {
 	zeDebugCheck(FindData == NULL, "NUll pointer");
 
+	if (FindData->Handle == INVALID_HANDLE_VALUE || FindData->Handle == NULL)
+		return false;
+
 	return FindNextFile(FindData->Handle, &FindData->Data) != 0;
 }
 
@@ -272,6 +296,9 @@ bool ZEFileUtils::OpenSearchStream(ZEFileSearchStream* FindData, const ZEString&
 {
 	zeDebugCheck(FindData == NULL, "Null Pointer");
 	zeDebugCheck(Path.IsEmpty(), "Empty string..");
+
+	if (FindData->Handle == INVALID_HANDLE_VALUE || FindData->Handle == NULL)
+		return false;
 	
 	ZEString SearchPath = Path + "\\*";
 	FindData->Handle = FindFirstFile(SearchPath.ToCString(), &FindData->Data);

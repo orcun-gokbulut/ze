@@ -37,6 +37,7 @@
 #include "ZEDirectoryInfo.h"
 
 #include <memory.h>
+#include "ZEPathUtils.h"
 
 ZEDirectoryInfo::ZEDirectoryInfo()
 {
@@ -44,10 +45,10 @@ ZEDirectoryInfo::ZEDirectoryInfo()
 	memset((void*)&Modification, 0, sizeof(ZEFileTime));
 }
 
-ZEDirectoryInfo::ZEDirectoryInfo(const ZEString& FolderPath)
+ZEDirectoryInfo::ZEDirectoryInfo(const ZEString& DirectoryPath)
 {
-	Path = ZEPathManager::GetFinalPath(FolderPath, &Root);
-	Name = GetFolderName(Path);
+	Path = ZEPathManager::GetFinalPath(DirectoryPath, &Root);
+	Name = GetDirectoryName(Path);
 
 	memset((void*)&Creation, 0, sizeof(ZEFileTime));
 	memset((void*)&Modification, 0, sizeof(ZEFileTime));
@@ -58,10 +59,10 @@ ZEDirectoryInfo::~ZEDirectoryInfo()
 
 }
 
-void ZEFileInfo::SetPath(const ZEString& FoderPath)
+void ZEDirectoryInfo::SetPath(const ZEString& DirectoryPath)
 {
-	Path = ZEPathManager:: GetFinalPath(FoderPath, &Root);
-	Name = GetFileName(Path);
+	Path = ZEPathManager:: GetFinalPath(DirectoryPath, &Root);
+	Name = GetDirectoryName(Path);
 	
 	memset((void*)&Creation, 0, sizeof(ZEFileTime));
 	memset((void*)&Modification, 0, sizeof(ZEFileTime));
@@ -103,21 +104,19 @@ ZEArray<ZEFileInfo*>* ZEDirectoryInfo::GetFileList()
 	bool Continue = true;
 	ZEArray<ZEFileInfo*>* FileList;
     ZEFileSearchStream FindData;
+	const ZEString Seperator = ZEPathUtils::GetSeperator();
 
-	// if path is out of boundary
-    if (!ZEPathManager::PathBoundaryCheck(ZEPathManager::GetKnownPath(Root), Path))
-	{
-		zeError("Paths above the root are not reachable..");
-		return NULL;
-	}
+	// Check if path can be opened
+	ZEString NewPath = ZEPathManager::GetFinalPath(Path, NULL);
 
 	FileList = new ZEArray<ZEFileInfo*>;
-	if ( FileList == NULL )
+	if (FileList == NULL)
     {
         zeError("Cannot allocate...");
         return NULL;
     }
 
+	// Open directory
     Continue = ZEFileUtils::OpenSearchStream(&FindData, Path);
     while (Continue)
 	{
@@ -134,11 +133,12 @@ ZEArray<ZEFileInfo*>* ZEDirectoryInfo::GetFileList()
 
 			Temp->Root = Root;
 			Temp->Name = ZEFileUtils::GetFileName(&FindData);
-			Temp->Path = Path + ZEPathManager::GetPathSeperator() + Temp->Name;
-			Temp->Extension = ZEFileInfo::GetFileExtension(Temp->Path);
+			Temp->Path = NewPath + Seperator + Temp->Name;
+			Temp->Extension = ZEFileInfo::GetFileExtension(Temp->Name);
 			FileList->Add(Temp);
 		}
 
+		// Get next
         Continue = ZEFileUtils::FindNextInStream(&FindData);
 	}
 
@@ -146,19 +146,16 @@ ZEArray<ZEFileInfo*>* ZEDirectoryInfo::GetFileList()
 	return FileList;
 }
 
-ZEArray<ZEDirectoryInfo*>* ZEDirectoryInfo::GetFolderList()
+ZEArray<ZEDirectoryInfo*>* ZEDirectoryInfo::GetDirectoryList()
 {
 	ZEDirectoryInfo* Temp;
 	bool Continue = true;
 	ZEArray<ZEDirectoryInfo*>* FolderList;
     ZEFileSearchStream FindData;
+	const ZEString Seperator = ZEPathUtils::GetSeperator();
 
-	// if path is out of boundary
-	if ( !ZEPathManager::PathBoundaryCheck(ZEPathManager::GetKnownPath(Root), Path) )
-	{
-		zeError("Paths above the root are not reachable..");
-		return NULL;
-	}
+	// Check if path can be opened
+	ZEString NewPath = ZEPathManager::GetFinalPath(Path, &Root);
 
 	FolderList = new ZEArray<ZEDirectoryInfo*>;
     if (FolderList == NULL)
@@ -183,7 +180,7 @@ ZEArray<ZEDirectoryInfo*>* ZEDirectoryInfo::GetFolderList()
 
             Temp->Root = Root;
             Temp->Name = ZEFileUtils::GetFileName(&FindData);
-			Temp->Path = Path + ZEPathManager::GetPathSeperator() + Temp->Name;
+			Temp->Path = NewPath + Seperator + Temp->Name;
 			FolderList->Add(Temp);
 		}
 
@@ -194,38 +191,32 @@ ZEArray<ZEDirectoryInfo*>* ZEDirectoryInfo::GetFolderList()
     return FolderList;
 }
 
-bool ZEDirectoryInfo::IsFolder(const ZEString& FolderPath)
+bool ZEDirectoryInfo::IsDirectory(const ZEString& DirectoryPath)
 {
-	return ZEFileUtils::IsDirectory(FolderPath);
+	return ZEFileUtils::IsDirectory(DirectoryPath);
 }
 
-ZEString ZEDirectoryInfo::GetFolderName(const ZEString& FolderPath)
+ZEString ZEDirectoryInfo::GetDirectoryName(const ZEString& DirectoryPath)
 {
-	ZESize Length = FolderPath.GetLength();
-
-	if (Length == 0)
-		return "";
+	ZESSize Length = DirectoryPath.GetLength();
 
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
-		if (FolderPath[I] == '\\' || FolderPath[I] == '/')
-			return FolderPath.Right(Length - 1 - I);
+		if (ISSEPERATOR(DirectoryPath[I]))
+			return DirectoryPath.Right(Length - 1 - I);
 	}
 
-	return FolderPath;
+	return DirectoryPath;
 }
 
-ZEString ZEDirectoryInfo::GetParentFolder(const ZEString& Path)
+ZEString ZEDirectoryInfo::GetParentDirectory(const ZEString& DirectoryPath)
 {
-	ZESize Length = Path.GetLength();
-
-	if (Length == 0)
-		return "";
+	ZESSize Length = DirectoryPath.GetLength();
 
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
-		if (Path[I] == '\\' || Path[I] == '/')
-			return Path.Left(I);
+		if (ISSEPERATOR(DirectoryPath[I]))
+			return DirectoryPath.Left(I);
 	}
 
 	return "";
