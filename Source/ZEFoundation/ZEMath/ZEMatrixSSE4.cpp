@@ -64,9 +64,9 @@ inline void LoadMatrix3x3(__m128 *Reg, const ZEMatrix3x3 &In)
 inline void LoadMatrix3x3Transpose(__m128 *Reg, const ZEMatrix3x3 &In)
 {	
 	// Order is Reversed, Register Holds them in reverse order (z-x)
-	Reg[0] = _mm_set_ps(In.M13 , In.M13 , In.M12 , In.M11 );
-	Reg[1] = _mm_set_ps(In.M23 , In.M23 , In.M22 , In.M21 );
-	Reg[2] = _mm_set_ps(In.M33 , In.M33 , In.M32 , In.M31 );
+	Reg[0] = _mm_set_ps(0.0f , In.M13 , In.M12 , In.M11 );
+	Reg[1] = _mm_set_ps(0.0f , In.M23 , In.M22 , In.M21 );
+	Reg[2] = _mm_set_ps(0.0f , In.M33 , In.M32 , In.M31 );
 }
 
 inline void LoadMatrix4x4(__m128 *Reg, const ZEMatrix4x4 &In)
@@ -193,11 +193,37 @@ void ZEMatrix3x3::Transpose(ZEMatrix3x3& Out, const ZEMatrix3x3& Matrix)
 
 float ZEMatrix3x3::Determinant(const ZEMatrix3x3 &Matrix)
 {
+	// Matrix is
+	// 0, x3, x2, x1
+	// 0, y3, y2, y1
+	// 0, t3, t2, t1
+	// In Registers
+
 	__m128 mmxMatrix[3];
+	__m128 mmxY1Y1Y2, mmxT2T3T3, mmxY2Y3Y3, mmxT1T1T2;
+	LoadMatrix3x3Transpose(mmxMatrix, Matrix);
+
+	// Sub Determinants 2x2 Matrix
+	mmxY1Y1Y2 = _mm_shuffle_ps(mmxMatrix[1], mmxMatrix[1], 0xC1);
+	mmxY2Y3Y3 = _mm_shuffle_ps(mmxMatrix[1], mmxMatrix[1], 0xDA);
+
+	mmxT1T1T2 = _mm_shuffle_ps(mmxMatrix[2], mmxMatrix[2], 0xC1);
+	mmxT2T3T3 = _mm_shuffle_ps(mmxMatrix[2], mmxMatrix[2], 0xDA);
+
+	__m128 mmxTop = _mm_mul_ps(mmxY1Y1Y2, mmxT2T3T3);
+	__m128 mmxBot = _mm_mul_ps(mmxY2Y3Y3, mmxT1T1T2);
+
+	mmxTop = _mm_sub_ps(mmxTop, mmxBot);
+
+	// Now mmxTop Has All the Results of sub determinants (2x2 Matrices)
+	mmxTop = _mm_mul_ps(mmxTop, mmxMatrix[0]);
+
+	mmxTop = _mm_hsub_ps(mmxTop, mmxTop);
+	mmxTop = _mm_hadd_ps(mmxTop, mmxTop);
+
+/*	
 	__m128 mmxRow1Modified, mmxRow2Modified;
 	__m128 mmxABC, mmxDEF;
-	LoadMatrix3x3Transpose(mmxMatrix, Matrix);
-	
 	// Calculating A + B + C
 	mmxRow1Modified = _mm_shuffle_ps(mmxMatrix[1], mmxMatrix[1], 0xC9); //Shift Left
 	mmxRow2Modified = _mm_shuffle_ps(mmxMatrix[2], mmxMatrix[2], 0xD2); //Shift Right
@@ -213,12 +239,12 @@ float ZEMatrix3x3::Determinant(const ZEMatrix3x3 &Matrix)
 	mmxDEF = _mm_mul_ps(mmxRow1Modified, mmxRow2Modified);
 
 	// Adding all together
-	mmxABC = _mm_hadd_ps(mmxABC, mmxDEF);
+	mmxABC = _mm_sub_ps(mmxABC, mmxDEF);
 	mmxABC = _mm_hadd_ps(mmxABC, mmxABC);
-	mmxABC = _mm_hsub_ps(mmxABC, mmxABC);
-
+	mmxABC = _mm_hadd_ps(mmxABC, mmxABC);
+*/	
 	float Temp;
-	_mm_store_ss(&Temp, mmxABC);
+	_mm_store_ss(&Temp, mmxTop);
 	return Temp;
 } 
 
