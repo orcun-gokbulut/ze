@@ -37,6 +37,7 @@
 #include "ZEPathUtils.h"
 #include "ZEDS/ZEArray.h"
 
+#include <string.h>
 
 static const ZEString Dot = ".";
 static const ZEString DotDot = "..";
@@ -56,7 +57,7 @@ class ZEPathToken
 		char*		Token;
 		ZEUInt16	Lenth;
 		bool		Valid;
-		
+
 		bool	IsDot() { return (Lenth == 1) && (strncmp(Token, ".", Lenth) == 0); }
 		bool	IsDotDot() { return (Lenth == 2) && (strncmp(Token, "..", Lenth) == 0); }
 
@@ -116,6 +117,9 @@ ZEString ZEPathUtils::GetRelativePath(const ZEString& RootPath, const ZEString& 
 // Checks if Path is a full path
 bool ZEPathUtils::IsAbsolutePath(const ZEString& Path)
 {
+    if (Path.IsEmpty())
+        return false;
+
 	// If first char is the root character directly accept it
 	if (ISSEPERATOR(Path[0]))
 		return true;
@@ -159,8 +163,11 @@ ZEKnownPath ZEPathUtils::SearchForSymbol(ZEString* RelativePart, const ZEString&
 	bool SymbolFound = false;
 	ZEKnownPath Root = ZE_KP_NONE;
 
+    if (SymbolicPath.IsEmpty())
+        return Root;
+
 	// Search for symbol
-	Token = strtok_s(Source, Search, &Context);
+	Token = strtok_r(Source, Search, &Context);
 	while (Token != NULL && !SymbolFound)
 	{
 		// Check token for known symbols
@@ -191,14 +198,12 @@ ZEKnownPath ZEPathUtils::SearchForSymbol(ZEString* RelativePart, const ZEString&
 			}
 		}
 
-		Token = strtok_s(NULL, Search, &Context);
+		Token = strtok_r(NULL, Search, &Context);
 	}
 
 	// Shortcut
 	if (RelativePart == NULL)
 		return Root;
-	else
-		RelativePart->Clear();
 
 	if (SymbolFound)
 	{
@@ -209,15 +214,15 @@ ZEKnownPath ZEPathUtils::SearchForSymbol(ZEString* RelativePart, const ZEString&
 			*RelativePart += Seperator;
 			*RelativePart += Token;
 
-			Token = strtok_s(NULL, Search, &Context);
+			Token = strtok_r(NULL, Search, &Context);
 		}
 	}
 	else
 	{
 		// Copy all the path to output
-		*RelativePart = Seperator + SymbolicPath;
+		*RelativePart = SymbolicPath;
 	}
-	
+
 	return Root;
 }
 
@@ -225,6 +230,7 @@ ZEKnownPath ZEPathUtils::SearchForSymbol(ZEString* RelativePart, const ZEString&
 // This function does not care about EnablePathRestriction
 ZEString ZEPathUtils::GetSimplifiedPath(const ZEString& AbsolutePath)
 {
+
 	ZEString Output;
 	char* Context = NULL;
 	char* NextToken = NULL;
@@ -233,10 +239,16 @@ ZEString ZEPathUtils::GetSimplifiedPath(const ZEString& AbsolutePath)
 	const char* Search = "\\/";
 	char* Source = (char*)TempSource.ToCString();
 
+    if (AbsolutePath.IsEmpty())
+    {
+        Output = Dot;
+        return Output;
+    }
+
 	ZESmartArray<ZEPathToken> Tokens;
 
 	// Find all tokens and put them in an array
-	CurrentToken = strtok_s(Source, Search, &Context);
+	CurrentToken = strtok_r(Source, Search, &Context);
 	while (CurrentToken != NULL)
 	{
 		ZEPathToken Token;
@@ -244,7 +256,7 @@ ZEString ZEPathUtils::GetSimplifiedPath(const ZEString& AbsolutePath)
 		Token.Lenth = (ZEUInt16)strlen(CurrentToken);
 		Tokens.Add(Token);
 
-		CurrentToken = strtok_s(NULL, Search, &Context);
+		CurrentToken = strtok_r(NULL, Search, &Context);
 	}
 
 	// Process tokens
@@ -255,18 +267,18 @@ ZEString ZEPathUtils::GetSimplifiedPath(const ZEString& AbsolutePath)
 	{
 		if (Tokens[Index].IsDot())
 		{
-			// Omit "."
-			// Tokens.DeleteAt(Index--);
+			// Omit
 			Tokens[Index].Valid = false;
 		}
 		else if (Tokens[Index].IsDotDot())
 		{
+		    // Discard this one
+            Tokens[Index].Valid = false;
+
 			// If there are previous tokens to remove
+			// Do not let ".." stack at the beginning of path
 			if (UsefulTokens > 0)
 			{
-				// Discard this one
-				Tokens[Index].Valid = false;
-
 				// Find previous one
 				ZESSize BackwardIndex = Index - 1;
 				while (BackwardIndex >= 0)
@@ -283,20 +295,19 @@ ZEString ZEPathUtils::GetSimplifiedPath(const ZEString& AbsolutePath)
 
 				--UsefulTokens;
 			}
-			else
-			{
-				// Leave dot dot as a useful token
-				Tokens[Index].Valid = true;
-			}
 		}
-		else	// Let useful token stay
+		else
 		{
+		    // Let useful token stay
 			Tokens[Index].Valid = true;
 			++UsefulTokens;
 		}
 
 		++Index;
 	}
+
+    if (ISSEPERATOR(AbsolutePath[0]))
+        Output = Seperator;
 
 	// Create final path from remaining valid tokens
 	if (UsefulTokens > 0)
@@ -305,9 +316,10 @@ ZEString ZEPathUtils::GetSimplifiedPath(const ZEString& AbsolutePath)
 		ZEUInt AddCount = 0;
 		while (Index < TokenCount)
 		{
+            // If last useful token
 			if (Tokens[Index].Valid)
 			{
-				// If last useful token
+				// If last useful token leave it
 				if (AddCount == (UsefulTokens - 1))
 					break;
 
@@ -320,11 +332,13 @@ ZEString ZEPathUtils::GetSimplifiedPath(const ZEString& AbsolutePath)
 			++Index;
 		}
 
+        // Add last token without seperator
 		Output += Tokens[Index].Token;
 	}
-	
+
+    // If still nothing found, return dot
 	if(Output.IsEmpty())
-		Output += Dot;
+		Output = Dot;
 
 	return Output;
 }
@@ -339,7 +353,7 @@ bool ZEPathUtils::CheckForRestriction(const ZEString& RootPath, const ZEString& 
 	ZEString Temp = AbsolutePath;
 	bool AbsoluteWithSlash = false;
 	bool AbsoluteWithDrive = false;
-		
+
 	ZESize RootLenth = RootPath.GetLength();
 	ZESize PathLength = AbsolutePath.GetLength();
 

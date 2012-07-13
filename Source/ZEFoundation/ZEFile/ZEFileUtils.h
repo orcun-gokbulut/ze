@@ -54,6 +54,10 @@
 #endif
 
 #ifdef ZE_PLATFORM_UNIX
+    #include "fcntl.h"
+    #include <time.h>
+    #include <dirent.h>
+
 	typedef time_t ZEFileTimeOS;
 
 	struct ZEFileSearchStream
