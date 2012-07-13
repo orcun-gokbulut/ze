@@ -36,58 +36,45 @@
 #include "ZEError.h"
 #include "ZEFileUtils.h"
 #include "ZEPathManager.h"
+#include "ZEPathUtils.h"
 
 #include "errno.h"
 #include <string.h>
 #include <memory.h>
 
-ZEString ZEPathManager::AppName = "";
+bool ZEPathManager::Initialized = false;
+bool ZEPathManager::EnablePathRestriction = false;
+
+ZEString ZEPathManager::WorkingDrive = "";
+
 ZEString ZEPathManager::UserDataPath = "";
 ZEString ZEPathManager::ResourcesPath = "";
 ZEString ZEPathManager::SystemDataPath = "";
 ZEString ZEPathManager::SavedGamesPath = "";
-ZEString ZEPathManager::ApplicationResourcesPath;
+ZEString ZEPathManager::WorkingDirectory = "";
+ZEString ZEPathManager::AppResourcesPath = "";
 
-bool ZEPathManager::Initialized = false;
-bool ZEPathManager::EnablePathRestriction = true;
+ZEString ZEPathManager::CompanyName = "Zinek";
+ZEString ZEPathManager::ApplicationName = "Engine";
+ZEString ZEPathManager::ResourceDirName = "Resources";
 
 
-static const ZEString PathSeperator = "/";
-
-// Helper functions to get ZEFileKnownPaths from string
-static ZEFileKnownPaths GetRootByString(const ZEString& Path)
+ZEPathManager::ZEPathManager()
 {
-    ZEFileKnownPaths RootSymbol;
 
-    switch (Path[0])
-    {
-        case ZE_FILE_PATH_IDENTIFIER_SYMBOL_USER_DATA:
-            RootSymbol = ZE_FKP_USER_DATA;
-            break;
-        case ZE_FILE_PATH_IDENTIFIER_SYMBOL_SYSTEM_DATA:
-            RootSymbol = ZE_FKP_SYSTEM_DATA;
-            break;
-        case ZE_FILE_PATH_IDENTIFIER_SYMBOL_SAVED_GAMES:
-            RootSymbol = ZE_FKP_SAVED_GAMES;
-            break;
-        case ZE_FILE_PATH_IDENTIFIER_SYMBOL_APP_RESOURCES:
-            RootSymbol = ZE_FKP_APP_RESOURCES;
-            break;
-        case ZE_FILE_PATH_IDENTIFIER_SYMBOL_RESOURCES:
-            RootSymbol = ZE_FKP_RESOURCES;
-            break;
-        default:
-            RootSymbol = ZE_FKP_NONE;
-            break;
-    }
+}
 
-    return RootSymbol;
+ZEPathManager::~ZEPathManager()
+{
+
 }
 
 void ZEPathManager::InitializePaths()
 {
     if (Initialized)
         return;
+
+    const ZEString PathSeperator = ZEPathUtils::GetSeperator();
 
     errno = 0;
     char* WorkDir = getcwd(NULL, 0);
@@ -99,224 +86,319 @@ void ZEPathManager::InitializePaths()
         return;
     }
 
-    // Paths should be rearranged
-    ResourcesPath = WorkDir;
-    ResourcesPath += "/Resources";
+    WorkingDrive = PathSeperator;
 
-    UserDataPath = WorkDir;
-    UserDataPath += "/UserData";
+    WorkingDirectory = WorkDir;
 
-    SystemDataPath = WorkDir;
-    SystemDataPath += "/SystemData";
+    ResourcesPath = WorkingDirectory;
+	ResourcesPath += PathSeperator;
+	ResourcesPath += ResourceDirName;
 
-    SavedGamesPath = WorkDir;
-    SavedGamesPath += "/SavedGames";
+	AppResourcesPath = ResourcesPath;
+	AppResourcesPath += PathSeperator;
+	AppResourcesPath += ApplicationName;
 
-    ApplicationResourcesPath = WorkDir;
-    ApplicationResourcesPath += "/Resources/" + AppName;
+    SystemDataPath = WorkingDirectory;
+    SystemDataPath += PathSeperator;
+    SystemDataPath += "SystemData";
+    SystemDataPath += PathSeperator;
+    SystemDataPath += ApplicationName;
+
+
+    UserDataPath = WorkingDirectory;
+    UserDataPath += PathSeperator;
+    UserDataPath += "UserData";
+    UserDataPath += PathSeperator;
+    UserDataPath += ApplicationName;
+
+    SavedGamesPath = WorkingDirectory;
+    SavedGamesPath += PathSeperator;
+    SavedGamesPath += "SavedGames";
+    SavedGamesPath += PathSeperator;
+    SavedGamesPath += ApplicationName;
 
     Initialized = true;
 }
 
 bool ZEPathManager::GetInitialized()
 {
-    return Initialized;
+	return Initialized;
+}
+
+void ZEPathManager::SetCompanyName(const ZEString& Name)
+{
+	CompanyName = Name;
+	Initialized = false;
+
+	InitializePaths();
+}
+
+const ZEString& ZEPathManager::GetCompanyName()
+{
+	return CompanyName;
+}
+
+void ZEPathManager::SetApplicationName(const ZEString& Name)
+{
+	ApplicationName = Name;
+	Initialized = false;
+
+	InitializePaths();
+}
+
+const ZEString& ZEPathManager::GetApplicationName()
+{
+	return ApplicationName;
+}
+
+void ZEPathManager::SetResourceDirName(const ZEString& Name)
+{
+	ResourceDirName;
+	Initialized = false;
+
+	InitializePaths();
+}
+
+const ZEString& ZEPathManager::GetResourceDirName()
+{
+	return ResourceDirName;
 }
 
 void ZEPathManager::SetEnablePathRestriction(bool Enable)
 {
-    EnablePathRestriction = Enable;
+	EnablePathRestriction = Enable;
 }
 
 bool ZEPathManager::GetEnablePathRestriction()
 {
-    return EnablePathRestriction;
+	return EnablePathRestriction;
 }
 
-void ZEPathManager::SetApplicationName(const ZEString &Name)
+const ZEString& ZEPathManager::GetWorkingDrive()
 {
-    InitializePaths();
+	InitializePaths();
 
-    AppName = Name;
-}
-
-const ZEString& ZEFileUtils::GetPathSeperator()
-{
-	return PathSeperator;
+	return WorkingDrive;
 }
 
 const ZEString&	ZEPathManager::GetUserDataPath()
 {
-    InitializePaths();
+	InitializePaths();
 
-    return UserDataPath;
+	return UserDataPath;
 }
 
 const ZEString&	ZEPathManager::GetResourcesPath()
 {
-    InitializePaths();
+	InitializePaths();
 
-    return ResourcesPath;
+	return ResourcesPath;
 }
 
 const ZEString&	ZEPathManager::GetSystemDataPath()
 {
-    InitializePaths();
+	InitializePaths();
 
-    return SystemDataPath;
+	return SystemDataPath;
 }
 
 const ZEString&	ZEPathManager::GetSavedGamesPath()
 {
-    InitializePaths();
+	InitializePaths();
 
-    return SavedGamesPath;
+	return SavedGamesPath;
+}
+
+const ZEString& ZEPathManager::GetWorkingDirectory()
+{
+	InitializePaths();
+
+	return WorkingDirectory;
 }
 
 const ZEString&	ZEPathManager::GetApplicationResourcesPath()
 {
-    InitializePaths();
+	InitializePaths();
 
-    return ApplicationResourcesPath;
+	return AppResourcesPath;
 }
 
-ZEString ZEPathManager::GetKnownPath(ZEFileKnownPaths KnownPath)
+ZEKnownPath ZEPathManager::GetKnownPath(const ZEString& AbsolutePath)
 {
-    InitializePaths();
+#define Compare(Str1, Str2, Length)  (strncmp((Str1), (Str2), (Length)) == 0)
 
-    switch (KnownPath)
-    {
-        case ZE_FKP_NONE:
-            if (!EnablePathRestriction)
-            {
-                return ".";
-            }
-            // Fall through !
-        case ZE_FKP_RESOURCES:
-            return ResourcesPath;
-            break;
-        case ZE_FKP_APP_RESOURCES:
-            return ApplicationResourcesPath;
-            break;
-        case ZE_FKP_USER_DATA:
-            return UserDataPath;
-            break;
-        case ZE_FKP_SYSTEM_DATA:
-            return SystemDataPath;
-            break;
-        case ZE_FKP_SAVED_GAMES:
-            return SavedGamesPath;
-            break;
-        default:
-            return "";
-            break;
-    }
+	InitializePaths();
 
-    return "";
+	ZESize Len = 0;
+	ZEKnownPath Root = ZE_KP_NONE;
+	ZESize PathLen = AbsolutePath.GetLength();
+	ZESize ResrcLen = ResourcesPath.GetLength();
+	ZESize AppResLen = AppResourcesPath.GetLength();
+	ZESize WrkDirLen = WorkingDirectory.GetLength();
+	ZESize SysDataLen = SystemDataPath.GetLength();
+	ZESize UsrDataLen = UserDataPath.GetLength();
+	ZESize SvdGameLen = SavedGamesPath.GetLength();
+
+	// Comparison should be done with the order
+	// staring from longest to shortest path
+
+	if (PathLen >= ResrcLen && ResrcLen > Len &&
+		Compare(AbsolutePath, ResourcesPath, ResrcLen))
+	{
+		Len = ResrcLen;
+		Root = ZE_KP_RESOURCES;
+	}
+	if (PathLen >= AppResLen && AppResLen > Len &&
+		Compare(AbsolutePath, AppResourcesPath, AppResLen))
+	{
+		Len = ResrcLen;
+		Root = ZE_KP_APP_RESOURCES;
+	}
+	if (PathLen >= WrkDirLen && WrkDirLen > Len &&
+		Compare(AbsolutePath, WorkingDirectory, WrkDirLen))
+	{
+		Len = WrkDirLen;
+		Root = ZE_KP_WORKING_DIRECTORY;
+	}
+	if (PathLen >= SysDataLen && SysDataLen > Len &&
+		Compare(AbsolutePath, SystemDataPath, SysDataLen))
+	{
+		Len = SysDataLen;
+		Root = ZE_KP_SYSTEM_DATA;
+	}
+	if (PathLen >= UsrDataLen && UsrDataLen > Len &&
+		Compare(AbsolutePath, UserDataPath, UsrDataLen))
+	{
+		Len = UsrDataLen;
+		Root = ZE_KP_USER_DATA;
+	}
+	if (PathLen >= SvdGameLen && SvdGameLen > Len &&
+		Compare(AbsolutePath, SavedGamesPath, SvdGameLen))
+	{
+		Len = SvdGameLen;
+		Root = ZE_KP_SAVED_GAMES;
+	}
+
+	return Root;
 }
 
-bool ZEPathManager::PathBoundaryCheck(const ZEString& RootPath, const ZEString& Path)
+const ZEString& ZEPathManager::GetKnownPath(ZEKnownPath& RedirectedKnownPath, const ZEKnownPath KnownPath)
 {
-    char* Token;
-    char* NextToken;
-    ZEInt Depth;
-    ZEString Temp;
-    const char* Search = "/";
+	InitializePaths();
 
-    if (!EnablePathRestriction)
-        return true;
+	RedirectedKnownPath = KnownPath;
 
-    //Check if path is an extension of root
-    if (strncmp(RootPath.ToCString(), Path.ToCString(), RootPath.GetLength()) != 0)
-        return false;
-
-    Depth = 0;
-    // Exclude root path from Path
-    Temp = Path.Right(Path.GetLength() - RootPath.GetLength());
-    if ( !Temp.IsEmpty() )
-    {
-        // Check the depth. Path should not go above the root
-        Token = NULL;
-        NextToken = NULL;
-        Token = strtok_r((char*)Temp.ToCString(), Search, &NextToken);
-        while (Token != NULL)
-        {
-            if (strncmp(Token, "..", 2) == 0)
-                Depth --;
-            else
-                Depth ++;
-
-            Token = strtok_r(NULL, Search, &NextToken);
-        }
-    }
-
-    if (Depth < 0)
-        return false;
-
-    return true;
-}
-
-ZEString ZEPathManager::PathFormatCheck(const ZEString& Path)
-    // Checks the format of the path for slash correctness
-{
-    ZESize Lenght;
-    ZEString Temp;
-
-    Temp = Path;
-
-    // Remove any (back)slash from beginning of path
-    if (Temp[0] == '\\' || Temp[0] == '/')
-        Temp = Temp.Right(Temp.GetLength()-1);
-
-    Lenght = Temp.GetLength()-1;
-    // Remove any (back)slash from end of path
-    if (Temp[Lenght] == '\\' || Temp[Lenght] == '/')
-        Temp = Temp.Left(Temp.GetLength()-1);
-
-    // Correct (back)slashes
-    Lenght = Temp.GetLength();
-    for (ZESize I = 0; I < Lenght; ++I)
-        if (Temp[I] == '\\')
-            Temp[I] = '/';
-
-
-    return Temp;
+	switch (KnownPath)
+	{
+		case ZE_KP_NONE:
+			if (!EnablePathRestriction)
+				return ZEPathUtils::GetDot();
+			RedirectedKnownPath = ZE_KP_WORKING_DIRECTORY;
+			// Fall Through!!!
+		case ZE_KP_WORKING_DIRECTORY:
+			return WorkingDirectory;
+			break;
+		case ZE_KP_RESOURCES:
+			return ResourcesPath;
+			break;
+		case ZE_KP_APP_RESOURCES:
+			return AppResourcesPath;
+			break;
+		case ZE_KP_USER_DATA:
+			return UserDataPath;
+			break;
+		case ZE_KP_SYSTEM_DATA:
+			return SystemDataPath;
+			break;
+		case ZE_KP_SAVED_GAMES:
+			return SavedGamesPath;
+			break;
+		default:
+			return ZEPathUtils::GetEmptyPath();
+			break;
+	}
 }
 
 // Checks format, constructs final path and makes a boundary check
-ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEFileKnownPaths& Root)
+ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEKnownPath* Root)
 {
-    ZESize SymbolCount;
-    ZEString FinalPath;
+	ZEKnownPath RootSymbol;
+	ZEString FinalPath;
+	ZEString TempPath;
+	ZEString RelativePartOfPath;
+	ZEString RootPath;
 
-    // Check/Correct format of the given string
-    FinalPath = PathFormatCheck(Path);
+	if (ZEPathUtils::IsAbsolutePath(Path))
+	{
+	    if (EnablePathRestriction)
+	    {
+	        FinalPath = ZEPathUtils::GetSimplifiedPath(Path);
+	        RootSymbol = GetKnownPath(FinalPath);
+	        RootPath = GetKnownPath(RootSymbol, RootSymbol);
 
-    Root = GetRootByString(Path);
-    if (Root == ZE_FKP_NONE)
-    {
-        // No Symbol found
-        SymbolCount = 0;
+	        if (!ZEPathUtils::CheckForRestriction(RootPath, FinalPath))
+            {
+                zeError("Final path is restricted!\nPath: \"%s\".\nRoot: \"%s\".", FinalPath, RootPath);
+                return "";
+            }
+	    }
+	    else // No restriction
+	    {
+	        FinalPath = ZEPathUtils::GetSimplifiedPath(Path);
+            RootSymbol = ZE_KP_NONE;
+	    }
+	}
+	else
+	{
+	    if (EnablePathRestriction)
+	    {
+	        // Construct absolute path
+	        RootSymbol = ZEPathUtils::SearchForSymbol(&RelativePartOfPath, Path);
 
-        // Set default path
-        if (EnablePathRestriction)
-            Root = ZE_FKP_RESOURCES;
-    }
-    else
-    {
-        SymbolCount = 1;
-    }
+	        // Get root path
+            RootPath = GetKnownPath(RootSymbol, RootSymbol);
 
-    // Do not include symbol
-    ZEString RootPath = GetKnownPath(Root);
-    FinalPath = RootPath + "/" + FinalPath.Right(FinalPath.GetLength() - SymbolCount);
+            // Construct temp path
+            TempPath = RootPath;
+            TempPath += ZEPathUtils::GetSeperator();
+            TempPath += RelativePartOfPath;
 
-    // Check boundary
-    if ( !PathBoundaryCheck(RootPath, FinalPath) )
-    {
-        zeError("Reaching files above the root is forbidden...");
-        return "";
-    }
+            // Simplify
+            FinalPath = ZEPathUtils::GetSimplifiedPath(TempPath);
 
-    return FinalPath;
+            // Root can change after simplification, check again
+            RootSymbol = GetKnownPath(FinalPath);
+            RootPath = GetKnownPath(RootSymbol, RootSymbol);
+
+            if (!ZEPathUtils::CheckForRestriction(RootPath, FinalPath))
+            {
+                zeError("Final path is restricted!\nPath: \"%s\".\nRoot: \"%s\".", FinalPath, RootPath);
+                return "";
+            }
+	    }
+	    else
+	    {
+            // Try to contruct absolute path
+            RootSymbol = ZEPathUtils::SearchForSymbol(&RelativePartOfPath, Path);
+
+	        // Get root path
+            RootPath = GetKnownPath(RootSymbol, RootSymbol);
+
+            // Construct temp path
+            TempPath = RootPath;
+            TempPath += ZEPathUtils::GetSeperator();
+            TempPath += RelativePartOfPath;
+
+            // Simplify
+            FinalPath = ZEPathUtils::GetSimplifiedPath(TempPath);
+
+            // No restriction so there is no need for root
+            RootSymbol = ZE_KP_NONE;
+	    }
+	}
+
+	if (Root != NULL)
+		*Root = RootSymbol;
+
+	return FinalPath;
 }
