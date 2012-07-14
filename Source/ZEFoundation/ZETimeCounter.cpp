@@ -38,54 +38,76 @@
 #ifdef ZE_PLATFORM_WINDOWS
     #define WINDOWS_MEAN_AND_LEAN
     #include <windows.h>
-#else
+#endif
+
+#ifdef ZE_PLATFORM_UNIX
     #include <time.h>
 #endif
 
-float ZETimeCounter::GetElapsedTime()
+static inline ZEUInt64 GetClock()
 {
-	return (float)((EndTime - StartTime) * 1000) / (float)Frequency;
+    #ifdef ZE_PLATFORM_WINDOWS
+        LARGE_INTEGER Temp;
+        QueryPerformanceCounter(&Temp);
+        return Temp.QuadPart;
+    #endif
+
+    #ifdef ZE_PLATFORM_UNIX
+        timespec Temp;
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &Temp);
+        return Temp.tv_sec * 1000000000 + Temp.tv_nsec;
+    #endif
+}
+
+static inline ZEUInt64 GetFreq()
+{
+    #ifdef ZE_PLATFORM_WINDOWS
+        LARGE_INTEGER Temp;
+        QueryPerformanceFrequency(&Temp);
+        return Temp.QuadPart;
+    #endif
+
+    #ifdef ZE_PLATFORM_UNIX
+        return 1000000000;
+    #endif
+}
+
+ZEUInt64 ZETimeCounter::GetTime()
+{
+    if (Started)
+        EndTime = GetClock();
+
+    return (EndTime - StartTime) / (Frequency / 1000000);
+}
+
+void ZETimeCounter::SetTime(ZEUInt64 Microseconds)
+{
+    StartTime = Microseconds * Frequency / (ZEUInt64)1000000;
 }
 
 void ZETimeCounter::Reset()
 {
 	StartTime = 0;
 	EndTime = 0;
-	Frequency = 1;
+    Frequency = 1000000;
 }
 
 void ZETimeCounter::Start()
 {
-    #ifdef ZE_PLATFORM_WINDOWS
-        LARGE_INTEGER Temp;
-        QueryPerformanceFrequency(&Temp);
-        Frequency = Temp.QuadPart;
-
-        QueryPerformanceCounter(&Temp);
-        StartTime = Temp.QuadPart;
-    #else
-       timespec Temp;
-       clock_getres(CLOCK_REALTIME, &Temp);
-       Frequency = Temp.tv_nsec;
-       clock_gettime(CLOCK_REALTIME, &Temp);
-       StartTime = Temp.tv_nsec;
-    #endif
+    Reset();
+    Frequency = GetFreq();
+    StartTime = GetClock();
+    Started = true;
 }
 
 void ZETimeCounter::Stop()
 {
-    #ifdef ZE_PLATFORM_WINDOWS
-        LARGE_INTEGER Temp;
-        QueryPerformanceCounter(&Temp);
-        EndTime = Temp.QuadPart;
-    #else
-        timespec Temp;
-        clock_gettime(CLOCK_REALTIME, &Temp);
-        EndTime = Temp.tv_nsec;
-    #endif
+    EndTime = GetClock();
+    Started = false;
 }
 
 ZETimeCounter::ZETimeCounter()
 {
+    Started = false;
 	Reset();
 }

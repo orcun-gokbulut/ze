@@ -42,17 +42,18 @@
 class ZETimeCounter
 {
 	private:
+        bool            Started;
 		ZEUInt64		StartTime;
 		ZEUInt64		EndTime;
 		ZEUInt64		Frequency;
 
 	public:
-		float			GetElapsedTime();
-		
-		void			Reset();
+        void            SetTime(ZEUInt64 Microseconds);
+        ZEUInt64		GetTime();
 
 		void			Start();
 		void			Stop();
+        void			Reset();
 
                         ZETimeCounter();
 };

@@ -37,6 +37,7 @@
 #define __ZE_THREAD_H__
 
 #include "ZEDS/ZEDelegate.h"
+#include "ZEDS/ZEString.h"
 
 #ifdef ZE_PLATFORM_UNIX
 #include <pthread.h>
@@ -56,6 +57,7 @@ typedef ZEDelegate<void (void*)> ZEThreadFunction;
 class ZEThread
 {
     private:
+        ZEString            Name;
         #ifdef ZE_PLATFORM_WINDOWS
             static unsigned long __stdcall
                             ThreadFunction(void* Thread);
@@ -71,6 +73,9 @@ class ZEThread
         void*				Parameter;
 
 	public:
+        void                SetName(const ZEString& Name);
+        const ZEString&     GetName();
+
 		ZEThreadStatus		GetStatus();
 
         void                SetFunction(ZEThreadFunction Function);

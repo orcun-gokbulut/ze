@@ -62,7 +62,7 @@ class ZETestItem
 		char					CaseName[256];
 		ZETestSuiteItem*		Owner;
 		ZETestResult			Result;
-		float					ElapsedTime;
+        ZEUInt64				ElapsedTime;
 
 	public:
 		const char*				GetName();

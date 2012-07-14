@@ -65,14 +65,14 @@ class ZEListIterator
 
 		inline ZEType* MovePrevious()
 		{
-			Item = Item->PrevItem;
-			return Item;
+            Item = (ZEType*)Item->PrevItem;
+            return Item;
 		}
 
 		inline ZEType* MoveNext()
 		{
-			Item = Item->NextItem;
-			return Item;			
+            Item = (ZEType*)Item->NextItem;
+            return Item;
 		}
 
 		inline ZESize GetIndex()
