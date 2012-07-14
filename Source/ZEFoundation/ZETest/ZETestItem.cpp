@@ -129,7 +129,7 @@ bool ZETestItem::RunTest()
 		TestImpl();
 		Timer.Stop();
 
-		ElapsedTime = Timer.GetElapsedTime();
+        ElapsedTime = Timer.GetTime();
 
 		if (Result == ZE_TR_NOT_RUN)
 			Result = ZE_TR_PASSED;
@@ -145,7 +145,7 @@ bool ZETestItem::RunTest()
 	catch (...)
 	{
 		Timer.Stop();
-		ElapsedTime = Timer.GetElapsedTime();
+        ElapsedTime = Timer.GetTime();
 
 		Result = ZE_TR_FAILED;
 		return false;

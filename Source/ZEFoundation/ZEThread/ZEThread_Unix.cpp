@@ -35,10 +35,13 @@
 
 #include "ZEThread.h"
 #include "ZEError.h"
+#include <sys/prctl.h>
 
 void* ZEThread::ThreadFunction(void* Thread)
 {
 	ZEThread* CurrentThread = (ZEThread*)Thread;
+
+    prctl(PR_SET_NAME, CurrentThread->GetName().ToCString(), 0, 0, 0);
 
 	CurrentThread->Status = ZE_TS_RUNNING;
 	CurrentThread->Function(CurrentThread->GetParameter());

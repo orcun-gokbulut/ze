@@ -64,13 +64,13 @@ bool ZETestSuiteItem::RunTests()
 
 		if (!Tests[I]->RunTest())
 		{
-			printf("  Test #%Iu/%u  - \"%s\"FAILED !!! Elapsed time : %f ms. \n", I + 1, TotalTestCount, Tests[I]->GetName(), Tests[I]->GetEleapsedTime());
+            printf("  Test #%Iu/%u  - \"%s\"FAILED !!! Elapsed time : %llu microseconds. \n", I + 1, TotalTestCount, Tests[I]->GetName(), Tests[I]->GetEleapsedTime());
 			CurrentResult = false;
 		}
 		else
 		{
 			PassedTestCount++;
-			printf("  Test #%Iu/%u - \"%s\" passed. Elapsed time : %f ms. \n", I + 1, TotalTestCount, Tests[I]->GetName(), Tests[I]->GetEleapsedTime());
+            printf("  Test #%Iu/%u - \"%s\" passed. Elapsed time : %llu microseconds. \n", I + 1, TotalTestCount, Tests[I]->GetName(), Tests[I]->GetEleapsedTime());
 		}
 
 		ElapsedTime += Tests[I]->GetEleapsedTime();

@@ -36,6 +36,16 @@
 #include "ZEThread.h"
 #include "ZEError.h"
 
+void ZEThread::SetName(const ZEString& Name)
+{
+    this->Name = Name;
+}
+
+const ZEString& ZEThread::GetName()
+{
+    return Name;
+}
+
 ZEThreadStatus ZEThread::GetStatus()
 {
 	return Status;

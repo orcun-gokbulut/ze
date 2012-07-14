@@ -78,3 +78,5 @@ ze_add_library(ZEFoundation
 	INSTALL
 	INSTALL_DESTINATION ZEFoundation
 	INSTALL_COMPONENT ZESDK)
+
+ze_link(ZEFoundation LIBS rt PLATFORMS Unix)
