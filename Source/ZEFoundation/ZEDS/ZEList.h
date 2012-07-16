@@ -146,11 +146,13 @@ class ZEList
 			else
 			{
 				ZEType* OldItem = GetItem(Index);
+				ZEType* PreviousItem = (ZEType*)OldItem->PrevItem;
 				Item->PrevItem = OldItem->PrevItem;
 				Item->NextItem = OldItem;
 				OldItem->PrevItem = Item;
+				PreviousItem->NextItem = Item;
 				Count++;
-				return OldItem;
+				return Item;
 			}
 		}
 
@@ -159,11 +161,33 @@ class ZEList
 			zeDebugCheck(!Exists(Item), "Item is not in the list.");
 
 			if (Item->PrevItem == NULL)
+			{
 				FirstItem = Item->NextItem;
 
+				if (FirstItem != NULL)
+					FirstItem->PrevItem = NULL;			
+			}
+
+			else
+			{
+				ZEType* Previous = (ZEType*)Item->PrevItem;
+				Previous->NextItem = Item->NextItem;
+			}
+			
 			if (Item->NextItem == NULL)
+			{
 				LastItem = Item->PrevItem;
 
+				if (LastItem != NULL)
+					LastItem->NextItem = NULL;
+			}
+
+			else
+			{
+				ZEType* Next = (ZEType*)Item->NextItem;
+				Next->PrevItem = Item->PrevItem;
+			}
+				
 			Item->PrevItem = NULL;
 			Item->NextItem = NULL;
 
