@@ -110,7 +110,7 @@ class ZEPathManager
 		static const ZEString&		GetWorkingDirectory();
 		static const ZEString&		GetApplicationResourcesPath();
 
-		static const ZEString&		GetKnownPath(ZEKnownPath& RedirectedKnownPath, const ZEKnownPath KnownPath);
+		static const ZEString&		GetKnownPath(const ZEKnownPath KnownPath);
 		static ZEKnownPath			GetKnownPath(const ZEString& AbsolutePath);
 
 		static ZEString				GetFinalPath(const ZEString& Path, ZEKnownPath* Root = NULL);
