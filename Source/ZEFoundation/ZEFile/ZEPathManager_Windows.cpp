@@ -87,37 +87,6 @@ static bool GetOSVersion(ZEUInt& VerMajor, ZEUInt& VerMinor, ZEUInt& Build)
 	return true;
 }
 
-static ZEString FixAbsolutePath(const ZEString& AbsolutePath)
-{
-	char* Token;
-	char* Context;
-	bool DriveFound = false;
-	ZEString Temp = AbsolutePath;
-	const char* Search = "\\/";
-
-	ZEString WorkDrive = ZEPathManager::GetWorkingDrive();
-	ZESize Len = WorkDrive.GetLength();
-	
-	Token = strtok_s((char*)Temp.ToCString(), Search, &Context);
-	if (Token != NULL)
-	{
-		if (strlen(Token) == Len && strncmp(WorkDrive, Token, Len) == 0)
-			DriveFound = true;
-	}
-
-	if (!DriveFound)
-	{
-		if (AbsolutePath[0] == '\\' || AbsolutePath[0] == '/')
-			return WorkDrive + AbsolutePath;
-		else
-			return ZEPathUtils::GetSeperator() + AbsolutePath;
-	}
-	else
-	{
-		return AbsolutePath;
-	}
-}
-
 ZEPathManager::ZEPathManager()
 {
 
@@ -454,18 +423,15 @@ ZEKnownPath ZEPathManager::GetKnownPath(const ZEString& AbsolutePath)
 	return Root;
 }
 
-const ZEString& ZEPathManager::GetKnownPath(ZEKnownPath& RedirectedKnownPath, const ZEKnownPath KnownPath)
+const ZEString& ZEPathManager::GetKnownPath(const ZEKnownPath KnownPath)
 {
 	InitializePaths();
-
-	RedirectedKnownPath = KnownPath;
 
 	switch (KnownPath)
 	{
 		case ZE_KP_NONE:
 			if (!EnablePathRestriction)
 				return ZEPathUtils::GetEmptyPath();
-			RedirectedKnownPath = ZE_KP_WORKING_DIRECTORY;
 			// Fall Through!!!
 		case ZE_KP_WORKING_DIRECTORY:
 			return WorkingDirectory;
@@ -491,41 +457,154 @@ const ZEString& ZEPathManager::GetKnownPath(ZEKnownPath& RedirectedKnownPath, co
 	}
 }
 
-// Checks format, constructs final path and makes a boundary check
-ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEKnownPath* Root)
+void SeperateDriveAndPath(ZEString& Drive, ZEString& RestOfPath, const ZEString& AbsolutePath)
 {
-	ZEKnownPath Rt;
-	ZEString FinalPath;
-	ZEString AbsolutePath;
-	ZEString RelativePartOfPath;
-	ZEString RootPath;
+	ZESize Offset = 0;
+	bool RootFound = false;
+	bool DriveFound = false;
 
-	if (ZEPathUtils::IsAbsolutePath(Path))
+	if (AbsolutePath.IsEmpty())
 	{
-		AbsolutePath = FixAbsolutePath(Path);
-		Rt = GetKnownPath(AbsolutePath);
-		RootPath = GetKnownPath(Rt);
+		Drive = ZEPathUtils::GetEmptyPath();
+		RestOfPath = ZEPathUtils::GetEmptyPath();
+	}
+
+	if (ISSEPERATOR(AbsolutePath[0]))
+	{
+		Offset += 1;
+		RootFound = true;
+	}
+
+	char* Token;
+	char* Context;
+	ZEString Temp = AbsolutePath;
+	const char* Search = "\\/";
+	char* Source = (char*)Temp.ToCString();
+
+	Token = strtok_s(Source, Search, &Context);
+	if (Token != NULL && strlen(Token) == 2 && ISDRIVELETTER(Token[0]) && Token[1] == ':')
+	{
+		Offset += strlen(Token);
+		DriveFound = true;
+	}
+
+	if (DriveFound)
+	{
+		// If there is a drive letter use it
+		Drive += Token;
+		Drive += ZEPathUtils::GetSeperator();
+		RestOfPath = AbsolutePath.Right(AbsolutePath.GetLength() - Offset);
 	}
 	else
 	{
-		Rt = ZEPathUtils::SearchForSymbol(&RelativePartOfPath, Path);
-		RootPath = GetKnownPath(Rt, Rt);
-		AbsolutePath = RootPath + RelativePartOfPath;
-	}
-	
-	FinalPath = ZEPathUtils::GetSimplifiedPath(AbsolutePath);
-
-	if (EnablePathRestriction)
-	{
-		if (!ZEPathUtils::CheckForRestriction(RootPath, FinalPath))
+		if (RootFound)
 		{
-			zeError("Path is restricted!\nPath: \"%s\".\nRoot: \"%s\".", Path.ToCString(), RootPath.ToCString());
-			return "";
+			// If no drive but root is found
+			Drive += ZEPathManager::GetWorkingDrive();
+			Drive += ZEPathUtils::GetSeperator();
+			RestOfPath = AbsolutePath.Right(AbsolutePath.GetLength() - Offset);
+		}
+		else
+		{
+			// Not an absolute path
+			Drive = ZEPathUtils::GetEmptyPath();
+			RestOfPath = AbsolutePath;
 		}
 	}
-	
+}
+
+// Checks format, constructs final path and makes a boundary check
+ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEKnownPath* Root)
+{
+	ZEString RootPath;
+	ZEString FinalPath;
+	ZEString RelativePartOfPath;
+	ZEKnownPath RootSymbol;
+
+	// Absolute Path
+	if (ZEPathUtils::IsAbsolutePath(Path))
+	{
+		ZEString Drive, RestOfPath;
+		SeperateDriveAndPath(Drive, RestOfPath, Path);
+		// From now on work with RestOfPath
+
+	    if (EnablePathRestriction)
+	    {
+			// We have a drive, do not stack dots while simplification
+	        FinalPath = Drive + ZEPathUtils::GetSimplifiedPath(RestOfPath, false);
+
+			// Try to get root
+	        RootSymbol = GetKnownPath(FinalPath);
+
+			// Get root symbol path
+	        RootPath = GetKnownPath(RootSymbol);
+
+			// Check for restriction
+	        if (!ZEPathUtils::CheckForRestriction(RootPath, FinalPath))
+            {
+                zeError("Final path is restricted!\nPath: \"%s\".\nRoot: \"%s\".", FinalPath, RootPath);
+                return "";
+            }
+	    }
+	    else // No restriction
+	    {
+	       // We have a drive, do not stack dots while simplification
+	       FinalPath = Drive + ZEPathUtils::GetSimplifiedPath(RestOfPath, false);
+
+           RootSymbol = ZE_KP_NONE;
+	    }
+	}
+	// Relative path
+	else	
+	{
+	    if (EnablePathRestriction)
+	    {
+	        RootSymbol = ZEPathUtils::SearchForSymbol(&RelativePartOfPath, Path);
+
+	        // Get root path
+            RootPath = GetKnownPath(RootSymbol);
+
+            // Construct temp path
+            FinalPath = RootPath;
+            FinalPath += ZEPathUtils::GetSeperator();
+            FinalPath += RelativePartOfPath;
+
+            // We have a drive since we have path restriction, do not stack dot dot
+            FinalPath = ZEPathUtils::GetSimplifiedPath(FinalPath, false);
+
+            // Root can change after simplification, check again
+            RootSymbol = GetKnownPath(FinalPath);
+            RootPath = GetKnownPath(RootSymbol);
+
+            if (!ZEPathUtils::CheckForRestriction(RootPath, FinalPath))
+            {
+                zeError("Final path is restricted!\nPath: \"%s\".\nRoot: \"%s\".", FinalPath.ToCString(), RootPath.ToCString());
+                return "";
+            }
+	    }
+	    else
+	    {
+			RootSymbol = ZEPathUtils::SearchForSymbol(&RelativePartOfPath, Path);
+
+			RootPath = GetKnownPath(RootSymbol);
+
+			FinalPath = RootPath;
+			FinalPath += ZEPathUtils::GetSeperator();
+			FinalPath += RelativePartOfPath;
+
+			// No restriction, dot dots can be stacked
+			FinalPath = ZEPathUtils::GetSimplifiedPath(FinalPath, true);
+			
+			if (FinalPath.IsEmpty())
+				FinalPath = ZEPathUtils::GetDot();
+
+			// No restriction so there is no need for root
+			RootSymbol = ZE_KP_NONE;
+	    }
+	}
+
 	if (Root != NULL)
-		*Root = Rt;
+		*Root = RootSymbol;
 
 	return FinalPath;
 }

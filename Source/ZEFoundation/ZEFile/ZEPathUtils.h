@@ -57,7 +57,7 @@ class ZEPathUtils
 		static const ZEString&		GetSeperator();
 		static const ZEString&		GetEmptyPath();
 
-		static ZEString				GetSimplifiedPath(const ZEString& Path);
+		static ZEString				GetSimplifiedPath(const ZEString& Path, bool StackDotDot);
 
 		static ZEKnownPath			SearchForSymbol(ZEString* RelativePart, const ZEString& SymbolicPath);
 
