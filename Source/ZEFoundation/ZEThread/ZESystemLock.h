@@ -36,6 +36,7 @@
 #ifndef __ZE_SYSTEM_LOCK_H__
 #define __ZE_SYSTEM_LOCK_H__
 
+#include "ZEDS/ZEString.h"
 #ifdef ZE_PLATFORM_UNIX
 #include <pthread.h>
 #endif
@@ -43,6 +44,7 @@
 class ZESystemLock
 {
 	private:
+        bool                Locked;
         #ifdef ZE_PLATFORM_WINDOWS
             void*           Handle;
         #elif defined(ZE_PLATFORM_UNIX)
@@ -50,11 +52,16 @@ class ZESystemLock
         #endif
 
 	public:
-		bool				Test();
-		bool				Lock();
-        bool				Wait(int Milliseconds = -1);
-        bool				WaitAndLock(int Milliseconds = -1);
-		bool				Unlock();
+        bool				IsLocked();
+
+        bool				TryToLock();
+        bool                Lock();
+        bool				Lock(ZEUInt Milliseconds);
+
+        void                Wait();
+        bool				Wait(ZEUInt Milliseconds);
+
+        bool				Unlock();
 
 		ZESystemLock		operator=(const ZESystemLock& Lock);
 

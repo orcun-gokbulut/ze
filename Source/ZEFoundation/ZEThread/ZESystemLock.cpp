@@ -36,22 +36,13 @@
 #include "ZESystemLock.h"
 #include "ZEError.h"
 
-bool ZESystemLock::Test()
+bool ZESystemLock::IsLocked()
 {
-	return Wait(0);
+    return Locked;
 }
 
-bool ZESystemLock::Lock()
+ZESystemLock ZESystemLock::operator=(const ZESystemLock& Lock)
 {
-	return WaitAndLock(0);
+    return ZESystemLock();
 }
 
-bool ZESystemLock::Wait(int Milliseconds)
-{
-	if (!WaitAndLock(Milliseconds))
-		return false;
-
-	Unlock();
-
-	return true;
-}
