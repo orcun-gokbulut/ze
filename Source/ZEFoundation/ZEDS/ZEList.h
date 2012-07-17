@@ -45,6 +45,7 @@ class ZEListItem
 {
 	template<typename ZEType> friend class ZEList;
 	template<typename ZEType> friend class ZEListIterator;
+	template<typename ZEType> friend class ZEListIteratorConst;
 	private:
 		ZEListItem* NextItem;
 		ZEListItem* PrevItem;
