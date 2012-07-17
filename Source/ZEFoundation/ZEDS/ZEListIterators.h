@@ -81,7 +81,12 @@ class ZEListIterator
 			ZEType* Current = Item;
 			while(Current != NULL)
 			{
-				Current = Current->PrevItem;
+				Current = (ZEType*)Current->PrevItem;
+				if (Current == NULL)
+				{
+					return Index;
+				}
+
 				Index++;
 			}
 			
@@ -118,23 +123,28 @@ class ZEListIteratorConst
 			const ZEType* Current = Item;
 			while(Current != NULL)
 			{
-				Current = Current->PrevItem;
+				Current = (const ZEType*)Current->PrevItem;
+				if (Current == NULL)
+				{
+					return Index;
+				}
+
 				Index++;
 			}
 
 			return Index;
 		}
 
-		inline const ZEType* MovePrevious() const
+		inline const ZEType* MovePrevious()
 		{
-			Item = Item->PrevItem;
+			Item = (const ZEType*)Item->PrevItem;
 			return Item;
 		}
 
-		inline const ZEType* MoveNext() const
+		inline const ZEType* MoveNext()
 		{
-			Item = Item->NextItem;
-			return Item;			
+			Item = (const ZEType*)Item->NextItem;
+ 			return Item;			
 		}
 };
 
