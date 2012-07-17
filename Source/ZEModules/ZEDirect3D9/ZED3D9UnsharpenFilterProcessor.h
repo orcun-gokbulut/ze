@@ -53,6 +53,8 @@ class ZETexture2DResource;
 class ZED3D9UnsharpenFilterProcessor : public ZED3D9ComponentBase
 {
 	private:
+		float							Amount;
+
 		ZED3D9FrameRenderer*			Renderer;
 
 		ZED3D9Texture2D*				Input;
@@ -63,6 +65,9 @@ class ZED3D9UnsharpenFilterProcessor : public ZED3D9ComponentBase
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 
 	public:
+		void							SetAmount(float Value);
+		float							GetAmount() const;
+
 		void							SetRenderer(ZEFrameRenderer* Renderer);
 		ZEFrameRenderer*				GetRenderer();
 

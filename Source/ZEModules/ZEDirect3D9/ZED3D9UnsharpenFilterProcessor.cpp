@@ -47,6 +47,15 @@
 #include <d3d9.h>
 #include <stdlib.h>
 
+void ZED3D9UnsharpenFilterProcessor::SetAmount(float Value)
+{
+	Amount = Value;
+}
+
+float ZED3D9UnsharpenFilterProcessor::GetAmount() const
+{
+	return Amount;
+}
 
 void ZED3D9UnsharpenFilterProcessor::SetRenderer(ZEFrameRenderer* Renderer)
 {
@@ -83,7 +92,8 @@ void ZED3D9UnsharpenFilterProcessor::Initialize()
 	// Vertex declaration for screen aligned quad
 	D3DVERTEXELEMENT9 Declaration[] = 
 	{
-		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0,  0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0,  16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
 		D3DDECL_END()
 	};
 
@@ -120,12 +130,13 @@ void ZED3D9UnsharpenFilterProcessor::Process()
 	static struct Vert  
 	{
 		float Position[4];
+		float TexCoord[2];
 
 	} Vertices[] = {
-		{-1.0f,  1.0f, 1.0f, 1.0f},
-		{ 1.0f,  1.0f, 1.0f, 1.0f},
-		{-1.0f, -1.0f, 1.0f, 1.0f},
-		{ 1.0f, -1.0f, 1.0f, 1.0f}
+		{ {-1.0f,  1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
+		{ { 1.0f,  1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
+		{ {-1.0f, -1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
+		{ { 1.0f, -1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} }
 	};
 
 	GetDevice()->SetVertexDeclaration(VertexDeclaration);
@@ -138,6 +149,9 @@ void ZED3D9UnsharpenFilterProcessor::Process()
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 
+	float PixelWidth = 1.0f / (float)Output->GetWidth();
+	float PixelHeigth = 1.0f / (float)Output->GetHeight();
+
 	struct VertexShaderParameters
 	{
 		float	PixelSize[2];
@@ -147,7 +161,19 @@ void ZED3D9UnsharpenFilterProcessor::Process()
 
 	} VSParameters = {
 
-		{1.0f / Output->GetWidth(), 1.0f / Output->GetHeight()}, 0.0f, 0.0f
+		{PixelWidth, PixelHeigth}, 0.0f, 0.0f
+	};
+
+	struct PixelShaderParameters
+	{
+		float	PixelSize[2];
+		float	Amount;
+
+		float	Reserved0;
+
+	} PSParameters = {
+
+		{PixelWidth, PixelHeigth}, Amount, 0.0f
 	};
 
 	GetDevice()->SetPixelShader(PixelShader->GetPixelShader());
@@ -157,6 +183,7 @@ void ZED3D9UnsharpenFilterProcessor::Process()
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)Input, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&VSParameters, sizeof(VertexShaderParameters) / 16);
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PSParameters, sizeof(PixelShaderParameters) / 16);
 
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 }
@@ -169,6 +196,7 @@ ZED3D9UnsharpenFilterProcessor::ZED3D9UnsharpenFilterProcessor()
 	PixelShader			= NULL;
 	Input				= NULL;
 	Output				= NULL;
+	Amount				= 0.5f;
 	
 }
 
