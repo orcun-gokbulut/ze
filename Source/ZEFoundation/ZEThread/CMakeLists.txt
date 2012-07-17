@@ -58,3 +58,5 @@ ze_add_library(ZEThread
 	INSTALL
 	INSTALL_DESTINATION ZEFoundation/ZEThread
 	INSTALL_COMPONENT ZESDK)
+
+ze_link(ZEThread PLATFORMS Unix LIBS pthread)

@@ -43,17 +43,20 @@ static inline ZEInt32 AtomicIncrement(volatile ZEInt32* NextNumber)
 {
 	#ifdef ZE_PLATFORM_COMPILER_MSVC
 		return _InterlockedIncrement((long*)NextNumber);
-	#elif defined(ZE_PLATFORM_COMPILER_GCC)
+    #endif
+
+    #ifdef ZE_PLATFORM_COMPILER_GCC
 		return __sync_add_and_fetch(NextNumber, 1);
 	#endif
 }
 
-bool ZELock::Test()
+bool ZELock::IsLocked()
 {
-	return CurrentNumber < NextNumber;
+    //CurrentNumber = NextNumber + NumberOfLocks + 1;
+    return (CurrentNumber == NextNumber + 1);
 }
-
-bool ZELock::Lock()
+/*
+bool ZELock::TryLock()
 {
 	ZEInt32 MyNumber = AtomicIncrement(&NextNumber);
 
@@ -63,20 +66,17 @@ bool ZELock::Lock()
 	CurrentNumber = MyNumber;
 
 	return true;
-}
+}*/
 
 void ZELock::Wait()
 {
-	while(CurrentNumber < NextNumber);
+    while(IsLocked());
 }
 
-void ZELock::WaitAndLock()
+void ZELock::Lock()
 {
-	ZEUInt64 MyNumber = AtomicIncrement(&NextNumber);
-
+    ZEInt32 MyNumber = AtomicIncrement(&NextNumber);
 	while(MyNumber != CurrentNumber);
-
-	CurrentNumber = MyNumber;
 }
 
 bool ZELock::Unlock()
@@ -105,5 +105,5 @@ ZELock::ZELock(const ZELock& Lock)
 
 ZELock::~ZELock()
 {
-	zeCriticalError("Destroying lock while it is still locked.");
+    zeDebugCheck(CurrentNumber != NextNumber + 1, "Destroying lock while it is still locked.");
 }

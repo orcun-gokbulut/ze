@@ -54,8 +54,8 @@ static inline ZEUInt64 GetClock()
 
     #ifdef ZE_PLATFORM_UNIX
         timespec Temp;
-        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &Temp);
-        return Temp.tv_sec * 1000000000 + Temp.tv_nsec;
+        clock_gettime(CLOCK_REALTIME, &Temp);
+        return (ZEUInt64)Temp.tv_sec * (ZEUInt64)1000000000 + (ZEUInt64)Temp.tv_nsec;
     #endif
 }
 
@@ -68,7 +68,9 @@ static inline ZEUInt64 GetFreq()
     #endif
 
     #ifdef ZE_PLATFORM_UNIX
-        return 1000000000;
+        timespec Temp;
+        clock_getres(CLOCK_REALTIME, &Temp);
+        return (ZEUInt64)1000000000 / (ZEUInt64)Temp.tv_nsec;
     #endif
 }
 

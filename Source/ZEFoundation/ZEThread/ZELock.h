@@ -45,10 +45,10 @@ class ZELock
 		volatile ZEInt32	NextNumber;
 
 	public:
-		bool				Test();
-		bool				Lock();
-		void				Wait();
-		void				WaitAndLock();
+        bool				IsLocked();
+        bool				TryToLock();
+        void				Lock();
+        void				Wait();
 		bool				Unlock();
 
 		ZELock				operator=(const ZELock& Lock);

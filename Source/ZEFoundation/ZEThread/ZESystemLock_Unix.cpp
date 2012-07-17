@@ -36,39 +36,83 @@
 #include "ZESystemLock.h"
 #include "ZEError.h"
 
-bool ZESystemLock::WaitAndLock(int Milliseconds)
+bool ZESystemLock::TryToLock()
 {
-    if (Milliseconds < 0)
-        return pthread_mutex_lock(&Mutex) == 0;
-    else if (Milliseconds == 0)
-        return pthread_mutex_trylock(&Mutex) == 0;
+    return Lock(0);
+}
+
+bool ZESystemLock::Lock()
+{
+    if (pthread_mutex_lock(&Mutex) == 0)
+    {
+        Locked = true;
+        return true;
+    }
+    else
+        return false;
+}
+
+bool ZESystemLock::Lock(ZEUInt Milliseconds)
+{
+    if (Milliseconds == 0)
+    {
+        if (pthread_mutex_trylock(&Mutex) == 0)
+        {
+            Locked = true;
+            return true;
+        }
+        else
+            return false;
+    }
     else
     {
         timespec Time;
         Time.tv_sec = Milliseconds / 1000;
         Time.tv_sec = (Milliseconds % 1000) * 1000;
-        return pthread_mutex_timedlock(&Mutex, &Time) == 0;
+
+        if (pthread_mutex_timedlock(&Mutex, &Time) == 0)
+        {
+            Locked = true;
+            return true;
+        }
+        else
+            return false;
     }
 }
 
 bool ZESystemLock::Unlock()
 {
-    return pthread_mutex_unlock(&Mutex) == 0;
+    if (pthread_mutex_unlock(&Mutex) == 0)
+    {
+        Locked = false;
+        return true;
+    }
+    else
+        return false;
 }
 
-ZESystemLock ZESystemLock::operator=(const ZESystemLock& Lock)
+void ZESystemLock::Wait()
 {
-	return ZESystemLock();
+    Lock();
+    Unlock();
+}
+
+bool ZESystemLock::Wait(ZEUInt Milliseconds)
+{
+    if (Lock(Milliseconds))
+        Unlock();
 }
 
 ZESystemLock::ZESystemLock()
 {
-    Mutex = PTHREAD_MUTEX_INITIALIZER;
+    Locked = false;
+    pthread_mutex_init(&Mutex, NULL);
 }
 
 ZESystemLock::ZESystemLock(const ZESystemLock& Lock)
 {
-    Mutex = PTHREAD_MUTEX_INITIALIZER;
+    Locked = false;
+    pthread_mutex_init(&Mutex, NULL);
 }
 
 ZESystemLock::~ZESystemLock()

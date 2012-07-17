@@ -42,11 +42,11 @@ class ZEListTestItem : public ZEListItem
 {
 public:
 
-	ZEListTestItem(ZEListItem* Next, ZEListItem* Prev)
-	{
-		ZEListItem* NextItem = Next;
-		ZEListItem* PrevItem = Prev;
-	}
+    ZEListTestItem(ZEListItem* Next, ZEListItem* Prev)
+    {
+        ZEListItem* NextItem = Next;
+        ZEListItem* PrevItem = Prev;
+    }
 
 	ZEListTestItem()
 	{
@@ -83,7 +83,7 @@ ZETestSuite(ZEList)
 		ZETestCheck(Result == &Item);
 	
 		ZETestCase("for FirstItem != NULL")
-		{
+        {
  			ZEList<ZEListTestItem> List1;
 			ZEListTestItem Item1;
 			Result = List1.Insert(&Item1);
