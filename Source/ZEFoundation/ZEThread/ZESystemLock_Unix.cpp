@@ -41,15 +41,12 @@ bool ZESystemLock::TryToLock()
     return Lock(0);
 }
 
-bool ZESystemLock::Lock()
+void ZESystemLock::Lock()
 {
     if (pthread_mutex_lock(&Mutex) == 0)
-    {
         Locked = true;
-        return true;
-    }
     else
-        return false;
+        zeCriticalError("Can not lock mutex.");
 }
 
 bool ZESystemLock::Lock(ZEUInt Milliseconds)
@@ -80,15 +77,13 @@ bool ZESystemLock::Lock(ZEUInt Milliseconds)
     }
 }
 
-bool ZESystemLock::Unlock()
+void ZESystemLock::Unlock()
 {
     if (pthread_mutex_unlock(&Mutex) == 0)
-    {
         Locked = false;
-        return true;
-    }
     else
-        return false;
+        zeCriticalError("Can not unlock mutex.");
+
 }
 
 void ZESystemLock::Wait()
@@ -101,18 +96,23 @@ bool ZESystemLock::Wait(ZEUInt Milliseconds)
 {
     if (Lock(Milliseconds))
         Unlock();
+    else
+        return false;
 }
 
 ZESystemLock::ZESystemLock()
 {
     Locked = false;
-    pthread_mutex_init(&Mutex, NULL);
+    if (pthread_mutex_init(&Mutex, NULL) != 0)
+        zeCriticalError("Can not create mutex.");
 }
 
 ZESystemLock::ZESystemLock(const ZESystemLock& Lock)
 {
+    zeDebugCheckWarning("Trying to copy mutex.");
     Locked = false;
-    pthread_mutex_init(&Mutex, NULL);
+    if (pthread_mutex_init(&Mutex, NULL) != 0)
+        zeCriticalError("Can not create mutex.");
 }
 
 ZESystemLock::~ZESystemLock()

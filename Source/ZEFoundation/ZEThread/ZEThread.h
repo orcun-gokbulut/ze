@@ -45,14 +45,20 @@
 
 enum ZEThreadStatus
 {
-	ZE_TS_NONE,
-	ZE_TS_RUNNING,
-	ZE_TS_SUSPENDED,
-	ZE_TS_TERMINATED,
-	ZE_TS_DONE
+    ZE_TS_NONE          = 1,
+    ZE_TS_RUNNING       = 2,
+    ZE_TS_WAITING       = 4,
+    ZE_TS_TERMINATED    = 8,
+    ZE_TS_EXITING       = 16,
+    ZE_TS_DONE          = 32
 };
+#define MASK(Value)(Value)
+#define ZE_TS_ALIVE_MASK    MASK(ZE_TS_RUNNING | ZE_TS_WAITING | ZE_TS_EXITING)
+#define ZE_TS_DEAD_MASK     MASK(ZE_TS_NONE | ZE_TS_TERMINATED | ZE_TS_DONE)
 
-typedef ZEDelegate<void (void*)> ZEThreadFunction;
+class ZEThread;
+
+typedef ZEDelegate<void (ZEThread*, void*)> ZEThreadFunction;
 
 class ZEThread
 {
@@ -67,7 +73,6 @@ class ZEThread
             pthread_t       Thread;
         #endif
 
-
 		ZEThreadStatus		Status;
         ZEThreadFunction    Function;
         void*				Parameter;
@@ -77,6 +82,7 @@ class ZEThread
         const ZEString&     GetName();
 
 		ZEThreadStatus		GetStatus();
+        bool                IsAlive();
 
         void                SetFunction(ZEThreadFunction Function);
         ZEThreadFunction&   GetFunction();
@@ -85,12 +91,19 @@ class ZEThread
 		void*				GetParameter();
 
 		void				Run(void* Parameter);
-		void				Suspend();
-		void				Sleep(unsigned int Milliseconds);
 		void				Terminate();
+        void                Exit();
 
-							ZEThread();
+        // Threads Function
+        bool                ControlPoint();
+
+        void                Wait();
+        bool                Wait(unsigned int Milliseconds);
+
+                            ZEThread();
 		virtual 			~ZEThread();
+
+        static ZEThread*    GetCurrentThread();
 };
 
 #endif

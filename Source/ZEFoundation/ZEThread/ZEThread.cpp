@@ -51,6 +51,11 @@ ZEThreadStatus ZEThread::GetStatus()
 	return Status;
 }
 
+ bool ZEThread::IsAlive()
+ {
+     return (Status & ZE_TS_ALIVE_MASK) != 0;
+ }
+
 void ZEThread::SetParameter(void* Parameter)
 {
 	this->Parameter = Parameter;

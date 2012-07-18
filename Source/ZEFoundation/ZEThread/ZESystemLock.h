@@ -55,13 +55,13 @@ class ZESystemLock
         bool				IsLocked();
 
         bool				TryToLock();
-        bool                Lock();
+        void                Lock();
         bool				Lock(ZEUInt Milliseconds);
 
         void                Wait();
         bool				Wait(ZEUInt Milliseconds);
 
-        bool				Unlock();
+        void				Unlock();
 
 		ZESystemLock		operator=(const ZESystemLock& Lock);
 
