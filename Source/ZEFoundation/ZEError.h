@@ -123,7 +123,9 @@ enum ZEErrorType
 				}\
 			}\
 			while(false)
-	#else
+    #endif
+
+    #ifdef ZE_PLATFORM_COMPILER_GCC
 		#define zeDebugCheck(Condition, ...) \
 			do \
 			{\
@@ -134,7 +136,13 @@ enum ZEErrorType
 				}\
 			}\
 			while(false)
-		#define zeDebugCheckWarning(Condition, ...) do {if (Condition) {ZEError::GetInstance()->RaiseDebugCheckFail(ZE_DCT_WARNING, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);}} while(false)
+        #define zeDebugCheckWarning(Condition, ...) \
+            do \
+            {\
+                if (Condition) \
+                {\
+                }\
+            } while(false)
 	#endif
 #else
 	#ifdef ZE_DEBUG_FORCE_VERIFY

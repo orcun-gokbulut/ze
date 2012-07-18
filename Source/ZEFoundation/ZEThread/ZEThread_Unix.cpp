@@ -37,25 +37,30 @@
 #include "ZEError.h"
 #include <sys/prctl.h>
 
+#ifdef ZE_PLATFORM_COMPILER_MSVC
+static __declspec(thread) ZEThread* CurrentThread = NULL;
+#endif
+
+#ifdef ZE_PLATFORM_COMPILER_GCC
+static __thread ZEThread* CurrentThread = NULL;
+#endif
+
 void* ZEThread::ThreadFunction(void* Thread)
 {
-	ZEThread* CurrentThread = (ZEThread*)Thread;
+    CurrentThread = (ZEThread*)Thread;
 
     prctl(PR_SET_NAME, CurrentThread->GetName().ToCString(), 0, 0, 0);
 
 	CurrentThread->Status = ZE_TS_RUNNING;
-	CurrentThread->Function(CurrentThread->GetParameter());
-	CurrentThread->Status = ZE_TS_DONE;
+    CurrentThread->Function(CurrentThread, CurrentThread->GetParameter());
+    CurrentThread->Exit();
 
 	return 0;
 }
 
 void ZEThread::Run(void* Parameter)
 {
-    if (Status == ZE_TS_RUNNING)
-        return;
-
-    if (Status == ZE_TS_NONE || Status == ZE_TS_DONE || Status == ZE_TS_TERMINATED)
+    if (!IsAlive())
     {
         int Result = pthread_create(&Thread, NULL, ThreadFunction, this);
         if (Result != 0)
@@ -63,18 +68,65 @@ void ZEThread::Run(void* Parameter)
     }
 }
 
-void ZEThread::Suspend()
-{
-
-}
-
 void ZEThread::Terminate()
 {
-    if (Status == ZE_TS_RUNNING || Status == ZE_TS_SUSPENDED)
+    if (IsAlive())
     {
         int Result = pthread_cancel(Thread);
         if (Result == 0)
             Status == ZE_TS_TERMINATED;
+    }
+}
+
+void ZEThread::Wait()
+{
+    zeDebugCheck(CurrentThread == this, "You can not wait your own thread.");
+
+    if (IsAlive())
+        pthread_join(Thread, NULL);
+}
+
+bool ZEThread::Wait(ZEUInt Milliseconds)
+{
+    zeDebugCheck(CurrentThread == this, "A thread can not wait its own.");
+
+    if (IsAlive())
+    {
+        if (Milliseconds == 0)
+            return pthread_tryjoin_np(Thread, NULL) == 0;
+        else
+        {
+            timespec Time;
+            Time.tv_sec = Milliseconds / 1000;
+            Time.tv_sec = (Milliseconds % 1000) * 1000;
+
+            return pthread_timedjoin_np(Thread, NULL, &Time) == 0;
+        }
+    }
+
+    return true;
+}
+
+bool ZEThread::ControlPoint()
+{
+    zeDebugCheck(CurrentThread != this, "A thread can only use it's own termination point function.");
+    if (Status == ZE_TS_RUNNING)
+        return true;
+    else if (Status == ZE_TS_EXITING)
+        return false;
+}
+
+void ZEThread::Exit()
+{
+    if (IsAlive())
+    {
+        if (CurrentThread == this)
+        {
+            CurrentThread->Status = ZE_TS_DONE;
+            pthread_exit(NULL);
+        }
+        else
+            Status == ZE_TS_EXITING;
     }
 }
 
@@ -85,4 +137,10 @@ ZEThread::ZEThread()
 
 ZEThread::~ZEThread()
 {
+    Exit();
+}
+
+ZEThread* ZEThread::GetCurrentThread()
+{
+    return CurrentThread;
 }
