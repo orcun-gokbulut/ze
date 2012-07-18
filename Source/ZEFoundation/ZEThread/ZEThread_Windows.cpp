@@ -39,49 +39,31 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+static __declspec(thread) ZEThread* CurrentThread = NULL;
+
 DWORD WINAPI ZEThread::ThreadFunction(LPVOID Thread)
 {
-	ZEThread* CurrentThread = (ZEThread*)Thread;
-
+	CurrentThread = (ZEThread*)Thread;
 	CurrentThread->Status = ZE_TS_RUNNING;
-	CurrentThread->Function(CurrentThread->GetParameter());
-	CurrentThread->Status = ZE_TS_DONE;
+	CurrentThread->Function(CurrentThread, CurrentThread->GetParameter());
+	CurrentThread->Exit();
 
 	return 0;
 }
 
 void ZEThread::Run(void* Parameter)
 {
+    if (IsAlive())
+		return;
+
+	Handle = CreateThread(NULL, 0,  ThreadFunction, this, CREATE_SUSPENDED, NULL);
 	if (Handle == NULL)
-	{
-		Handle = CreateThread(NULL, 0,  ThreadFunction, this, CREATE_SUSPENDED, NULL);
-		if (Handle == NULL)
-			zeCriticalError("Can not create thread.");
-	}
-
-	if (Status == ZE_TS_RUNNING)
-		return;
-
-	DWORD Result = ResumeThread(Handle);
-	if (Result == -1)
-		zeCriticalError("Can not resume thread.");
-}
-
-void ZEThread::Suspend()
-{
-	if (Handle != NULL)
-		return;
-	
-	DWORD Result = SuspendThread(Handle);
-	if (Result == -1)
-		zeCriticalError("Can not suspend thread.");
-
-	Status = ZE_TS_SUSPENDED;
+		zeCriticalError("Can not create thread.");
 }
 
 void ZEThread::Terminate()
 {
-	if (Handle == NULL)
+	 if (!IsAlive())
 		return;
 
 	DWORD Result = TerminateThread(Handle, 0);
@@ -91,6 +73,67 @@ void ZEThread::Terminate()
 	Status = ZE_TS_TERMINATED;
 }
 
+void ZEThread::Sleep(ZEUInt Milliseconds)
+{
+	zeDebugCheck(CurrentThread == this, "A thread can only use it's own sleep function.");
+	::Sleep(Milliseconds);
+}
+
+void ZEThread::Wait()
+{
+	zeDebugCheck(CurrentThread == this, "You can not wait your own thread.");
+
+	if (!IsAlive())
+		return;
+
+	if (Status == ZE_TS_TERMINATED)
+		return;
+
+	DWORD Result = WaitForSingleObject(Handle, INFINITE);
+	if (Result != WAIT_OBJECT_0 || Result != WAIT_ABANDONED_0 )
+		zeCriticalError("Can not wait thread.");
+
+}
+
+bool ZEThread::Wait(ZEUInt Milliseconds)
+{
+	zeDebugCheck(CurrentThread == this, "A thread can not wait its own.");
+
+	if (!IsAlive())
+		return false;
+
+	DWORD Result = WaitForSingleObject(Handle, Milliseconds);
+	if (Result != WAIT_OBJECT_0)
+		return false;
+
+	return true;
+}
+
+bool ZEThread::ControlPoint()
+{
+	zeDebugCheck(CurrentThread != this, "A thread can only use it's own control point function.");
+
+	if (Status == ZE_TS_RUNNING)
+		return true;
+
+	return false;
+}
+
+void ZEThread::Exit()
+{
+	if (!IsAlive())
+		return;
+
+	if (CurrentThread == this)
+	{
+		CurrentThread->Status = ZE_TS_DONE;
+		ExitThread(EXIT_SUCCESS);
+	}
+	else
+		Status == ZE_TS_EXITING;
+}
+
+
 ZEThread::ZEThread()
 {
 	Handle = NULL;
@@ -99,9 +142,8 @@ ZEThread::ZEThread()
 
 ZEThread::~ZEThread()
 {
+	Exit();
+
 	if (Handle != NULL)
-	{
-		Terminate();
 		CloseHandle(Handle);
-	}
 }

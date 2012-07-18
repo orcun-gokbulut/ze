@@ -97,8 +97,9 @@ class ZEThread
         // Threads Function
         bool                ControlPoint();
 
+		void				Sleep(ZEUInt Milliseconds);
         void                Wait();
-        bool                Wait(unsigned int Milliseconds);
+        bool                Wait(ZEUInt Milliseconds);
 
                             ZEThread();
 		virtual 			~ZEThread();
