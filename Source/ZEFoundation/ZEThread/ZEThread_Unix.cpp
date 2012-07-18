@@ -37,13 +37,7 @@
 #include "ZEError.h"
 #include <sys/prctl.h>
 
-#ifdef ZE_PLATFORM_COMPILER_MSVC
-static __declspec(thread) ZEThread* CurrentThread = NULL;
-#endif
-
-#ifdef ZE_PLATFORM_COMPILER_GCC
 static __thread ZEThread* CurrentThread = NULL;
-#endif
 
 void* ZEThread::ThreadFunction(void* Thread)
 {
@@ -60,48 +54,52 @@ void* ZEThread::ThreadFunction(void* Thread)
 
 void ZEThread::Run(void* Parameter)
 {
-    if (!IsAlive())
-    {
-        int Result = pthread_create(&Thread, NULL, ThreadFunction, this);
-        if (Result != 0)
-            zeCriticalError("Can not create thread.");
-    }
+    if (IsAlive())
+		return;
+
+	int Result = pthread_create(&Thread, NULL, ThreadFunction, this);
+    if (Result != 0)
+        zeCriticalError("Can not create thread.");
 }
 
 void ZEThread::Terminate()
 {
-    if (IsAlive())
-    {
-        int Result = pthread_cancel(Thread);
-        if (Result == 0)
-            Status == ZE_TS_TERMINATED;
-    }
+    if (!IsAlive())
+		return;
+
+	int Result = pthread_cancel(Thread);
+    if (Result != 0)
+		zeCriticalError("Can not terminate thread.");
+
+    Status == ZE_TS_TERMINATED;
 }
 
 void ZEThread::Wait()
 {
     zeDebugCheck(CurrentThread == this, "You can not wait your own thread.");
 
-    if (IsAlive())
-        pthread_join(Thread, NULL);
+    if (!IsAlive())
+		return;
+    
+	pthread_join(Thread, NULL);
 }
 
 bool ZEThread::Wait(ZEUInt Milliseconds)
 {
     zeDebugCheck(CurrentThread == this, "A thread can not wait its own.");
 
-    if (IsAlive())
-    {
-        if (Milliseconds == 0)
-            return pthread_tryjoin_np(Thread, NULL) == 0;
-        else
-        {
-            timespec Time;
-            Time.tv_sec = Milliseconds / 1000;
-            Time.tv_sec = (Milliseconds % 1000) * 1000;
+    if (!IsAlive())
+		return false;
 
-            return pthread_timedjoin_np(Thread, NULL, &Time) == 0;
-        }
+    if (Milliseconds == 0)
+        return pthread_tryjoin_np(Thread, NULL) == 0;
+    else
+    {
+        timespec Time;
+        Time.tv_sec = Milliseconds / 1000;
+        Time.tv_sec = (Milliseconds % 1000) * 1000;
+
+        return pthread_timedjoin_np(Thread, NULL, &Time) == 0;
     }
 
     return true;
@@ -110,24 +108,25 @@ bool ZEThread::Wait(ZEUInt Milliseconds)
 bool ZEThread::ControlPoint()
 {
     zeDebugCheck(CurrentThread != this, "A thread can only use it's own termination point function.");
+
     if (Status == ZE_TS_RUNNING)
         return true;
-    else if (Status == ZE_TS_EXITING)
-        return false;
+
+	return false;
 }
 
 void ZEThread::Exit()
 {
-    if (IsAlive())
+    if (!IsAlive())
+		return;
+
+	if (CurrentThread == this)
     {
-        if (CurrentThread == this)
-        {
-            CurrentThread->Status = ZE_TS_DONE;
-            pthread_exit(NULL);
-        }
-        else
-            Status == ZE_TS_EXITING;
+        CurrentThread->Status = ZE_TS_DONE;
+        pthread_exit(NULL);
     }
+    else
+        Status == ZE_TS_EXITING;
 }
 
 ZEThread::ZEThread()

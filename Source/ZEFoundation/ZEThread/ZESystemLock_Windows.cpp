@@ -39,49 +39,47 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-bool ZESystemLock::Test()
+void ZESystemLock::Lock()
 {
-	return Wait(0);
+	DWORD Result = WaitForSingleObject(Handle, INFINITE);
+	if (Result != WAIT_OBJECT_0)
+		zeCriticalError("Can not lock mutex.");
+	Locked = true;
 }
 
-bool ZESystemLock::Lock()
+bool ZESystemLock::Lock(ZEUInt Milliseconds)
 {
-	return WaitAndLock(0);
+	DWORD Result = WaitForSingleObject(Handle, Milliseconds);
+	if (Result != WAIT_OBJECT_0)
+		return false;
+
+	Locked = true;
+
+	return true;
 }
 
-bool ZESystemLock::Wait(int Milliseconds)
+
+void ZESystemLock::Wait()
 {
-	if (!WaitAndLock(Milliseconds))
+	Lock();
+	Unlock();
+}
+
+bool ZESystemLock::Wait(ZEUInt Milliseconds)
+{
+	if (!Lock(Milliseconds))
 		return false;
 
 	Unlock();
 
 	return true;
 }
-
-bool ZESystemLock::WaitAndLock(int Milliseconds)
+void ZESystemLock::Unlock()
 {
-	DWORD MilSec;
-	if (Milliseconds == -1)
-		MilSec = INFINITE;
-	else
-		MilSec = Milliseconds;
+	if (ReleaseMutex(Handle) == FALSE)
+		zeCriticalError("Can not unlock mutex.");
 
-	DWORD Result = WaitForSingleObject(Handle, MilSec);
-	if (Result != WAIT_OBJECT_0)
-		return false;
-
-	return true;
-}
-
-bool ZESystemLock::Unlock()
-{
-	return ReleaseMutex(Handle) == TRUE;
-}
-
-ZESystemLock ZESystemLock::operator=(const ZESystemLock& Lock)
-{
-	return ZESystemLock();
+	Locked = false;
 }
 
 ZESystemLock::ZESystemLock()
@@ -89,13 +87,17 @@ ZESystemLock::ZESystemLock()
 	Handle = CreateMutex(NULL, false, NULL);
 	if (Handle == NULL)
 		zeCriticalError("Can not create system lock.");
+
+	Locked = false;
 }
 
 ZESystemLock::ZESystemLock(const ZESystemLock& Lock)
 {
 	Handle = CreateMutex(NULL, false, NULL);
 	if (Handle == NULL)
-		zeCriticalError("Can not create system lock.");
+		zeCriticalError("Can not create mutex.");
+
+	Locked = false;
 }
 
 ZESystemLock::~ZESystemLock()
