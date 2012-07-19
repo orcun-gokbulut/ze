@@ -41,7 +41,9 @@
 #include "ZETextureData.h"
 #include "ZEDS/ZEPointer.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEFile/ZEFileInfo.h"
 #include "ZETexturePixelConverter.h"
+
 
 #define ZE_TIT_TYPE_MASK				0x03
 #define ZE_TIT_NO_IMAGE					0x00
@@ -410,7 +412,7 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEBGRA32* Palette)
 
 	if (strncmp(Footer.Signature, "TRUEVISION-XFILE.", 17) != 0)
 	{
-		if (ZEFile::GetFileExtension(File->GetFilePath()).Lower() != ".tga")
+		if (ZEFileInfo::GetFileExtension(File->GetPath()).Lower() != ".tga")
 		{
 			zeError("Can not identifty the file. File is not a TGA 2.0 file and it's extension is not .TGA.");
 			return false;
@@ -446,7 +448,7 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEBGRA32* Palette)
 	if (Header->ImageType & ZE_TIT_COMPRESSED)
 	{
 		ZESize PotentialSize = Header->Width * Header->Height * (Header->BPP / 8) / 128;
-		if (File->GetFileSize() < PotentialSize) 
+		if (File->GetSize() < PotentialSize) 
 		{
 			zeError("Corrupted or malicious TGA file. File size is too small.");
 			return false;
@@ -455,7 +457,7 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEBGRA32* Palette)
 	else
 	{
 		ZESize PotentialSize = Header->Width * Header->Height * (Header->BPP / 8);
-		if (File->GetFileSize() < PotentialSize) 
+		if (File->GetSize() < PotentialSize) 
 		{
 			zeError("Corrupted or malicious TGA file. File size is too small.");
 			return false;

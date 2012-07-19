@@ -74,7 +74,7 @@ void ZEFileInfo::SetPath(const ZEString& FilePath)
 	memset((void*)&Modification, 0, sizeof(ZEFileTime));
 }
 
-ZESize ZEFileInfo::GetSize()
+ZEInt64 ZEFileInfo::GetSize()
 {
 	Size = ZEFileUtils::GetFileSize(Path);
 
@@ -114,6 +114,12 @@ bool ZEFileInfo::GetModificationDate(ZEFileTime& Time)
     memcpy((void*)&Time, (void*)&Modification, sizeof(ZEFileTime));
 
     return Result;
+}
+
+
+ZEInt64 ZEFileInfo::GetFileSize(const ZEString& FilePath)
+{
+	return ZEFileUtils::GetFileSize(Path);
 }
 
 bool ZEFileInfo::IsFile(const ZEString& FilePath)

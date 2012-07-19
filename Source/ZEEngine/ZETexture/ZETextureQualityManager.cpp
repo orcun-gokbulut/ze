@@ -712,7 +712,7 @@ bool ZETextureQualityManager::GetFinalTextureOptions(ZETextureOptions* FinalOpti
 		if(!ZETextureLoader::GetImageInfo(&TextureInfo, ResourceFile))
 		{
 			// There is no more place to look for
-			zeCriticalError("Cannot proceed. Resource info is not found in \"%s\".", ResourceFile->GetFilePath().GetValue());
+			zeCriticalError("Cannot proceed. Resource info is not found in \"%s\".", ResourceFile->GetPath().GetValue());
 			return false;
 		}
 	}

@@ -36,9 +36,9 @@
 #include "ZEFileSerializer.h"
 #include <stdio.h>
 
-ZEUInt64 ZEFileSerializer::Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
+ZESize ZEFileSerializer::Write(const void* Buffer, const ZESize Size, const ZESize Count)
 {
-	return fwrite(Buffer, (ZESize)Size, (ZESize)Count, (FILE*)File);
+	return fwrite(Buffer, Size, Count, (FILE*)File);
 }
 
 bool ZEFileSerializer::OpenFile(const char* FileName)

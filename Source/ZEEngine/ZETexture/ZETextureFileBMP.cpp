@@ -457,7 +457,7 @@ static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* P
 
 static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* Palette)
 {
-	ZEUInt64 FileSize = File->GetFileSize();
+	ZEUInt64 FileSize = File->GetSize();
 
 	ZEUInt64 Result;
 	File->Seek(0, ZE_SF_BEGINING);

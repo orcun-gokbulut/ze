@@ -64,7 +64,7 @@ _inline bool ZEJpegFileMarkerBuffer::FillBuffer(bool ForceFill)
 	if (ImageFile->Read((void*)Buffer, ZE_JPEG_INPUT_BUFFER_SIZE, 1) != 1)
 	{
 		// There might be less available data than the ZE_JPEG_INPUT_BUFFER_SIZE
-		ZESize Size = ImageFile->GetFileSize() - ImageFile->Tell();
+		ZESize Size = ImageFile->GetSize() - ImageFile->Tell();
 		// Confirm that the remaining data is less than ZE_JPEG_INPUT_BUFFER_SIZE
 		if (Size >= ZE_JPEG_INPUT_BUFFER_SIZE)
 		{
@@ -204,7 +204,7 @@ bool ZEJpegFileMarkerBuffer::RewindOneByte()
 	if (BytesAvailable == ZE_JPEG_INPUT_BUFFER_SIZE)
 	{
 		// Go to previous buffer start position
-		if (!ImageFile->Seek(-2 * (ZESSize)BytesRead, ZE_SF_CURRENT))
+		if (ImageFile->Seek(-2 * (ZESSize)BytesRead, ZE_SF_CURRENT) != 0)
 		{
 			zeError("Cannot read jpeg data");
 			return false;

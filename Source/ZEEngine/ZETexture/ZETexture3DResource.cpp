@@ -180,18 +180,19 @@ void ZETexture3DResource::CacheResource(const ZEString& FileName, ZEUInt HorizTi
 
 ZETexture3DResource* ZETexture3DResource::LoadResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions)
 {
+	bool Result;
+	ZEFile File;
 	ZETexture3DResource* TextureResource;
 	ZEString NewPath = ConstructResourcePath(FileName);
 
-	ZEFile* File = ZEFile::Open(NewPath, false);
-	if(File != NULL && File->IsOpen())
+	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	if(Result)
 	{
 		if(UserOptions == NULL)
 			UserOptions = zeGraphics->GetTextureOptions();
 
-		TextureResource = LoadResource(File, HorizTileCount, VertTileCount, UserOptions);
-		File->Close();
-		delete File;
+		TextureResource = LoadResource(&File, HorizTileCount, VertTileCount, UserOptions);
+		File.Close();
 
 		return TextureResource;
 	}
@@ -226,7 +227,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, HorizTileCount, VertTileCount, ZE_TT_3D);
 
 	// Create identifier
-	ZETextureCacheDataIdentifier Identifier(ResourceFile->GetFilePath(), FinalOptions);
+	ZETextureCacheDataIdentifier Identifier(ResourceFile->GetPath(), FinalOptions);
 
 	if(UserOptions->FileCaching != ZE_TFC_DISABLED)
 	{
@@ -246,19 +247,19 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	if(CheckCache && CacheOpen && IdentifierExists)
 	{
 		// If found in cache load from cache directly
-		zeLog("Loading from file cache: \"%s\".", ResourceFile->GetFilePath().GetValue());
+		zeLog("Loading from file cache: \"%s\".", ResourceFile->GetPath().GetValue());
 
 		ZEPartialFile PartialResourceFile;
 		if (!FileCache.OpenData(&PartialResourceFile, &Identifier))
 		{
-			zeDebugCheck(true, "Cannot open partial file on cache for file: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			zeDebugCheck(true, "Cannot open partial file on cache for file: \"%s\".", ResourceFile->GetPath().GetValue());
 			return NULL;
 		}
 
 		// Load into TextureData
 		if (!ZETextureLoader::Read(&PartialResourceFile, &ProcessedTextureData))
 		{
-			zeDebugCheck(true, "Cannot read texture from cache. File: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			zeDebugCheck(true, "Cannot read texture from cache. File: \"%s\".", ResourceFile->GetPath().GetValue());
 			ProcessedTextureData.Destroy();
 			return NULL;
 		}
@@ -273,7 +274,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 		// Load into TextureData
 		if (!ZETextureLoader::LoadFromFile(ResourceFile, &ProcessedTextureData))
 		{
-			zeDebugCheck(true, "Cannot load image from file: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			zeDebugCheck(true, "Cannot load image from file: \"%s\".", ResourceFile->GetPath().GetValue());
 			ProcessedTextureData.Destroy();
 			return NULL;
 		}
@@ -281,7 +282,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 
 	if(ProcessedTextureData.IsEmpty())
 	{
-		zeError("Cannot load: \"%s\".", ResourceFile->GetFilePath().GetValue());
+		zeError("Cannot load: \"%s\".", ResourceFile->GetPath().GetValue());
 		ProcessedTextureData.Destroy();
 		return NULL;
 	}
@@ -289,7 +290,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	// Process the data
 	if(Process)
 	{
-		zeLog("Processing texture \"%s\".", ResourceFile->GetFilePath().GetValue());
+		zeLog("Processing texture \"%s\".", ResourceFile->GetPath().GetValue());
 
 		// Convert to VertTileCount * HorizTileCount tile count surfaced texture data
 		ZETextureData::ConvertToVolumeTextureData(&TempTextureData, &ProcessedTextureData, HorizTileCount, VertTileCount);
@@ -299,7 +300,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 		Processed = ZETextureQualityManager::Process(&ProcessedTextureData, &TempTextureData, &FinalOptions);
 		if (!Processed)
 		{
-			zeCriticalError("Cannot process texture: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			zeCriticalError("Cannot process texture: \"%s\".", ResourceFile->GetPath().GetValue());
 			ProcessedTextureData.Destroy();
 			TempTextureData.Destroy();
 			return NULL;
@@ -313,12 +314,12 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 		ZEPartialFile PartialResourceFile;
 		if (!FileCache.Allocate(&PartialResourceFile, &Identifier, ProcessedTextureData.GetSizeOnDisk()))
 		{
-			zeDebugCheck(true, "Cache allocation failed for file: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			zeDebugCheck(true, "Cache allocation failed for file: \"%s\".", ResourceFile->GetPath().GetValue());
 		}
 
 		if (!ZETextureLoader::Write((ZEFile*)&PartialResourceFile, &ProcessedTextureData))
 		{
-			zeDebugCheck(true, "Cannot cache the texture: \"%s\".", ResourceFile->GetFilePath().GetValue());
+			zeDebugCheck(true, "Cannot cache the texture: \"%s\".", ResourceFile->GetPath().GetValue());
 		}
 
 		PartialResourceFile.Close();
@@ -337,14 +338,14 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	}
 
 	// Set Other Variables
-	TextureResource->SetFileName(ResourceFile->GetFilePath().GetValue());
+	TextureResource->SetFileName(ResourceFile->GetPath().GetValue());
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
 
 	// Create the Texture
 	if (!Texture->Create(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetHeight(), ProcessedTextureData.GetSurfaceCount(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat()))
 	{
-		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFilePath().GetValue());
+		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
 		ProcessedTextureData.Destroy();
 		TempTextureData.Destroy();
 		delete TextureResource;

@@ -91,8 +91,8 @@ class ZEFileUtils
 
         static ZEString				GetFileName(const ZEFileSearchStream* FindData);
 
-        static ZESize               GetFileSize(const ZEString& Path);
-        static ZESize				GetFileSize(const ZEFileSearchStream* FindData);
+        static ZEInt64              GetFileSize(const ZEString& Path);
+        static ZEInt64				GetFileSize(const ZEFileSearchStream* FindData);
 
         static bool                 GetCreationTime(ZEFileTime* Output, const ZEString& Path);
         static void					GetCreationTime(ZEFileTime* Output, const ZEFileSearchStream* FindData);

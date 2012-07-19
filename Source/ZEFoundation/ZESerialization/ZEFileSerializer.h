@@ -43,15 +43,15 @@
 class ZEFileSerializer : public ZESerializer
 {
 	private:
-		void*						File;
+		void*				File;
 
 	public:
-		virtual ZEUInt64			Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
-		bool						OpenFile(const char* FileName);
-		void						CloseFile();
+		virtual ZESize		Write(const void* Buffer, const ZESize Size, const ZESize Count);
+		bool				OpenFile(const char* FileName);
+		void				CloseFile();
 									
-									ZEFileSerializer();
-									~ZEFileSerializer();
+							ZEFileSerializer();
+							~ZEFileSerializer();
 };
 
 #endif

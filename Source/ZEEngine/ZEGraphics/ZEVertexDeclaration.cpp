@@ -111,17 +111,19 @@ ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
-	ZEFile* File = ZEFile::Open(NewPath);
-	if (File == NULL || !File->IsOpen())
+	bool Result;
+	ZEFile File;
+
+	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	if (!Result)
 	{
 		zeError("Can not open zeVertexDecl file. (FileName : \"%s\")", NewPath.ToCString());
 		return NULL;
 	}
 	
-	ZEVertexDeclaration* VertexDeclaration = ZEVertexDeclaration::LoadFromFile(File);
+	ZEVertexDeclaration* VertexDeclaration = ZEVertexDeclaration::LoadFromFile(&File);
 	
-	File->Close();
-	delete File;
+	File.Close();
 	
 	return VertexDeclaration;
 }
@@ -133,13 +135,13 @@ ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(ZEFile* ResourceFile)
 	ResourceFile->Read(&HeaderChunk, sizeof(ZEVertexDeclarationFileHeaderChunk), 1);
 	if (HeaderChunk.ChunkIndentifier != ZE_VERTEX_DECLARATION_FILE_HEADER_CHUNK_ID)
 	{
-		zeError("Unknown zeVertex file format. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("Unknown zeVertex file format. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
 		return NULL;
 	}
 
 	if(HeaderChunk.Version != ZE_VERTEX_DECLARATION_FILE_VERSION)
 	{	
-		zeError("ZEMap file version mismatched. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("ZEMap file version mismatched. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
 		return NULL;
 	}
 	

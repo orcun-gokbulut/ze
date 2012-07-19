@@ -35,6 +35,11 @@
 
 #include "ZESerializer.h"
 
+ZESerializer::ZESerializer()
+{
+
+}
+
 ZESerializer::~ZESerializer()
 {
 
