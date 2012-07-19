@@ -56,22 +56,20 @@ enum ZESeekFrom
 // ZE_FOM_READ_WRITE: Both reading and writing
 enum ZEFileOpenMode
 {
-	ZE_FOM_NONE				= 0,
-	ZE_FOM_READ				= 1,
-	ZE_FOM_WRITE			= 2,
-	ZE_FOM_READ_WRITE		= 3,
+	ZE_FOM_READ				= 0,
+	ZE_FOM_WRITE			= 1,
+	ZE_FOM_READ_WRITE		= 2
 };
 
 
 // ZE_FCT_OPEN : Opens an existing file. If there is no file, gives error.						
 // ZE_FCT_OPEN_CREATE : Creates a new file if file does not exists, otherwise opens the existing file.	
 // ZE_FCT_OPEN_CREATE_OVERWRITE : Creates a file, if file exists the file's content is deleted.				
-enum ZEFileCreationType
+enum ZEFileCreationMode
 {
-	ZE_FCT_NONE						= 0,
-	ZE_FCT_OPEN						= 1,	
-	ZE_FCT_OPEN_CREATE				= 2,	
-	ZE_FCT_OPEN_CREATE_OVERWRITE	= 3,
+	ZE_FCM_NONE			= 0,	
+	ZE_FCM_CREATE		= 1,	
+	ZE_FCM_OVERWRITE	= 2
 
 };
 
@@ -81,15 +79,15 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 	protected:
 		void*					File;
 		ZEString				Path;
-		ZEFileOpenMode			Mode;
-		ZEFileCreationType		Creation;
+		ZEFileOpenMode			OpenMode;
+		ZEFileCreationMode		CreationMode;
 
 	public:
 								ZEFile();
 		virtual					~ZEFile();
 
 		virtual ZEInt			Close();
-		virtual bool			Open(const ZEString& FilePath, ZEFileOpenMode OpenMode, ZEFileCreationType CreationType);
+		virtual bool			Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, const ZEFileCreationMode FileCreationMode);
 		
 		virtual ZESize			Read(void* Buffer, const ZESize Size, const ZESize Count);
 		virtual ZESize			Write(const void* Buffer, const ZESize Size, const ZESize Count);
@@ -105,12 +103,12 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 		const ZEString&			GetPath() const;
 		void*					GetHandle() const;
 		ZEFileOpenMode			GetOpenMode() const;
-		ZEFileCreationType		GetCreationType() const;
+		ZEFileCreationMode		GetCreationMode() const;
 
 		ZEFile&					operator = (ZEFile& OtherFile);
 
-		static bool				ReadFile(const ZEString& FilePath, void* Buffer, ZESize BufferSize);
-		static bool				ReadTextFile(const ZEString& FilePath, char* Buffer, ZESize BufferSize);
+		static bool				ReadFile(const ZEString& FilePath, void* Buffer, const ZESize BufferSize);
+		static bool				ReadTextFile(const ZEString& FilePath, char* Buffer, const ZESize BufferSize);
 
 };
 

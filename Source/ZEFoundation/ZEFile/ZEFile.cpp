@@ -43,9 +43,6 @@
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
 
-
-//#include <stdarg.h>
-
 #include "ZEFileInfo.h"
 
 #include <stdio.h>
@@ -122,8 +119,8 @@
 ZEFile::ZEFile()
 {
 	File = NULL;
-	Mode = ZE_FOM_NONE;
-	Creation = ZE_FCT_NONE;
+	OpenMode = ZE_FOM_READ;
+	CreationMode = ZE_FCM_NONE;
 }
 
 ZEFile::~ZEFile()
@@ -149,8 +146,8 @@ ZEInt ZEFile::Close()
 	Path.Clear();
 
 	File = NULL;
-	Mode = ZE_FOM_NONE;
-	Creation = ZE_FCT_NONE;
+	OpenMode = ZE_FOM_READ;
+	CreationMode = ZE_FCM_NONE;
 
 	return Result;
 }
@@ -193,7 +190,7 @@ static bool CreateTheFile(const ZEString& Path, bool DeleteExisting)
 // r+ - open for reading and writing, start at beginning
 // w+ - open for reading and writing (overwrite file)
 // a+ - open for reading and writing (append if file exists)
-bool ZEFile::Open(const ZEString& FilePath, ZEFileOpenMode OpenMode, ZEFileCreationType CreationType)
+bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, const ZEFileCreationMode FileCreationMode)
 {
 	zeDebugCheck(File != NULL, "File is already open...");
 
@@ -203,9 +200,8 @@ bool ZEFile::Open(const ZEString& FilePath, ZEFileOpenMode OpenMode, ZEFileCreat
 	FinalPath = ZEPathManager::GetFinalPath(FilePath);
 
 	// Handle file mode
-	switch (OpenMode)
+	switch (FileOpenMode)
 	{
-		case ZE_FOM_NONE:
 		case ZE_FOM_READ:
 			ModeStr = "rb";
 			break;
@@ -222,16 +218,15 @@ bool ZEFile::Open(const ZEString& FilePath, ZEFileOpenMode OpenMode, ZEFileCreat
 	}
 
 	// Handle file creation
-	switch (CreationType)
+	switch (FileCreationMode)
 	{
-		case ZE_FCT_NONE:
-		case ZE_FCT_OPEN:
+		case ZE_FCM_NONE:
 			break;
-		case ZE_FCT_OPEN_CREATE:
+		case ZE_FCM_CREATE:
 			if (!CreateTheFile(FilePath, false))
 				return false;
 			break;
-		case ZE_FCT_OPEN_CREATE_OVERWRITE:
+		case ZE_FCM_OVERWRITE:
 			if (!CreateTheFile(FilePath, true))
 				return false;
 			break;
@@ -250,9 +245,9 @@ bool ZEFile::Open(const ZEString& FilePath, ZEFileOpenMode OpenMode, ZEFileCreat
 		return false;
 	}
 
-	Mode = OpenMode;
 	Path = FinalPath;
-	Creation = CreationType;
+	OpenMode = FileOpenMode;
+	CreationMode = FileCreationMode;
 
 	return true;
 }
@@ -338,21 +333,21 @@ ZEInt64 ZEFile::GetSize()
 
 ZEFileOpenMode ZEFile::GetOpenMode() const
 {
-	return Mode;
+	return OpenMode;
 }
 
-ZEFileCreationType ZEFile::GetCreationType() const
+ZEFileCreationMode ZEFile::GetCreationMode() const
 {
-	return Creation;
+	return CreationMode;
 }
 
-bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZESize BufferSize)
+bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, const ZESize BufferSize)
 {
 	// NOTE: Relative file name should not be hard coded.
 	ZEString RelativeFileName = "resources\\" + FilePath;
 
 	ZEFile File;
-	if (!File.Open(RelativeFileName, ZE_FOM_READ, ZE_FCT_OPEN))
+	if (!File.Open(RelativeFileName, ZE_FOM_READ, ZE_FCM_NONE))
 		return false;
 
 	ZEInt64 FileSize = File.GetSize();
@@ -370,13 +365,13 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZESize BufferSize)
 	return true;
 }
 
-bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZESize BufferSize)
+bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, const ZESize BufferSize)
 {
 	// NOTE: Relative file name should not be hard coded.
 	ZEString RelativeFileName = "resources\\" + FilePath;
 
 	ZEFile File;
-	if (!File.Open(RelativeFileName, ZE_FOM_READ, ZE_FCT_OPEN))
+	if (!File.Open(RelativeFileName, ZE_FOM_READ, ZE_FCM_NONE))
 		return false;
 
 	ZEInt64 FileSize = File.GetSize();
@@ -409,6 +404,8 @@ ZEFile&	ZEFile::operator = (ZEFile& OtherFile)
 {
 	File = OtherFile.File;
 	Path = OtherFile.Path;
+	CreationMode = OtherFile.CreationMode;
+	OpenMode = OtherFile.OpenMode;
 
 	return *this;
 }

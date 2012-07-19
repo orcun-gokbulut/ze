@@ -72,7 +72,7 @@ bool ZEPartialFile::Open(const ZEFile* ParentFile, const ZEInt64 Offset, const Z
 	zeDebugCheck(Size < 0, "Negative size");
 	zeDebugCheck(Offset < 0, "Negative offset");
 
-	if (!ZEFile::Open(ParentFile->GetPath(), ParentFile->GetOpenMode(),  ParentFile->GetCreationType()))	
+	if (!ZEFile::Open(ParentFile->GetPath(), ParentFile->GetOpenMode(),  ParentFile->GetCreationMode()))	
 		return false;
 
 	if (ZEFile::Seek(Offset, ZE_SF_BEGINING) != 0)
@@ -88,7 +88,7 @@ bool ZEPartialFile::Open(const ZEFile* ParentFile, const ZEInt64 Offset, const Z
 }
 
 
-bool ZEPartialFile::Open(const ZEString& FilePath, ZEFileOpenMode OpenType, ZEFileCreationType CreationType)
+bool ZEPartialFile::Open(const ZEString& FilePath, const ZEFileOpenMode OpenType, const ZEFileCreationMode CreationType)
 {
 	if(!ZEFile::Open(FilePath, OpenType, CreationType))
 		return false;
@@ -181,7 +181,7 @@ ZESize ZEPartialFile::Write(const void* Buffer, const ZESize Size, const ZESize 
 	return ZEFile::Write(Buffer, Size, WriteCount);
 }
 
-void ZEPartialFile::SetEndPosition(ZEInt64 Position)
+void ZEPartialFile::SetEndPosition(const ZEInt64 Position)
 {
 	zeDebugCheck(Position < 0, "Position is negative");
 	zeDebugCheck(Position < StartPosition, "End is lower than start");
@@ -195,7 +195,7 @@ ZEInt64 ZEPartialFile::GetEndPosition() const
 	return EndPosition;
 }
 
-void ZEPartialFile::SetStartPosition(ZEInt64 Position)
+void ZEPartialFile::SetStartPosition(const ZEInt64 Position)
 {
 	zeDebugCheck(Position < 0, "Position is negative");
 	zeDebugCheck(Position > EndPosition, "End is bigger than end");

@@ -275,7 +275,7 @@ bool ZETerrain::LoadLevelData()
 	ZEFile File;
 
 	bool Result;
-	Result = File.Open(TerrainFileName, ZE_FOM_READ, ZE_FCT_OPEN);
+	Result = File.Open(TerrainFileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if (!Result)
 	{
 		zeError("Can not open terrain file.");

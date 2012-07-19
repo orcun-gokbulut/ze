@@ -181,7 +181,7 @@ bool ZEFileCache::IsFileCache(ZEString FileName)
 {
 	ZEFile Check;
 
-	if(!Check.Open(FileName, ZE_FOM_READ_WRITE, ZE_FCT_OPEN_CREATE))
+	if(!Check.Open(FileName, ZE_FOM_READ_WRITE, ZE_FCM_CREATE))
 	{
 		zeError("Cannot open file to check the format");
 		return false;
@@ -237,7 +237,7 @@ bool ZEFileCache::Open(ZEString FileName)
 		return false;
 
 	// Open
-	if (!File.Open(FileName, ZE_FOM_READ_WRITE, ZE_FCT_OPEN_CREATE))
+	if (!File.Open(FileName, ZE_FOM_READ_WRITE, ZE_FCM_CREATE))
 		return false;
 
 	// If it is a new file

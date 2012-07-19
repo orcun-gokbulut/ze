@@ -256,7 +256,7 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(const ZEString& FileName, c
 	bool Result;
 	ZEFile File;
 
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if (Result)
 	{
 		if(UserOptions == NULL)
