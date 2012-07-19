@@ -39,6 +39,7 @@
 #include "ZEFile.h"
 #include "ZEPathManager.h"
 
+
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
 
@@ -48,6 +49,18 @@
 #include "ZEFileInfo.h"
 
 #include <stdio.h>
+
+#ifdef ZE_PLATFORM_WINDOWS
+	#include <cerrno>
+	#define ConvertErrorToString	strerror_s
+#endif
+
+#ifdef ZE_PLATFORM_UNIX
+	#include "errno.h"
+	#include "fcntl.h"
+	#define ConvertErrorToString	strerror_r
+#endif
+
 
 #if defined(ZE_PLATFORM_COMPILER_GCC)
 	#define _fseeki64 fseeko64
@@ -62,7 +75,7 @@ static ZEString GetErrorString(ZEInt32 ErrorId)
 
 	char ErrorString[256];
 
-	Result = strerror_s(ErrorString, 256,(int)ErrorId);
+	Result = ConvertErrorToString(ErrorString, 256,(int)ErrorId);
 	if (Result == 0)
     {
         // Use returned string to form error message
@@ -316,7 +329,7 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZESize BufferSize)
 		return false;
 
 	ZEInt64 FileSize = File.GetSize();
-	zeDebugCheck(BufferSize < FileSize, "File size exceeds buffer size.");
+	zeDebugCheck(BufferSize < (ZESize)FileSize, "File size exceeds buffer size.");
 
 	ZESize ReadSize = BufferSize > (ZESize)FileSize ? (ZESize)FileSize : BufferSize;
 	
@@ -340,7 +353,7 @@ bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZESize BufferS
 		return false;
 
 	ZEInt64 FileSize = File.GetSize();
-	zeDebugCheck(BufferSize < FileSize + 1, "File size exceeds buffer size.");
+	zeDebugCheck(BufferSize < (ZESize)FileSize + 1, "File size exceeds buffer size.");
 
 	ZESize ReadSize = BufferSize > (ZESize)FileSize ? (ZESize)FileSize : BufferSize;
 	
