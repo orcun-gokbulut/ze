@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZESignal_Unix.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,37 +30,66 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZESignal.h"
+#include "ZEError.h"
 
-ze_add_source(ZEJob.cpp          		Sources)
-ze_add_source(ZEJob.h            		Sources Headers)
-ze_add_source(ZEJobManager.cpp   		Sources)
-ze_add_source(ZEJobManager.h     		Sources Headers)
-ze_add_source(ZELock.cpp         		Sources)
-ze_add_source(ZELock.h          	 	Sources Headers)
-ze_add_source(ZEMutex.cpp   			Sources)
-ze_add_source(ZEMutex_Unix.cpp   		Sources PLATFORMS Unix)
-ze_add_source(ZEMutex_Windows.cpp  		Sources PLATFORMS Windows)
-ze_add_source(ZEMutex.h    	 			Sources Headers)
-ze_add_source(ZESignal.cpp   			Sources)
-ze_add_source(ZESignal_Unix.cpp   		Sources PLATFORMS Unix)
-ze_add_source(ZESignal_Windows.cpp  	Sources PLATFORMS Windows)
-ze_add_source(ZESignal.h    	 		Sources Headers)
-ze_add_source(ZETask.cpp         		Sources)
-ze_add_source(ZETask.h           		Sources Headers)
-ze_add_source(ZEThread.cpp       		Sources)
-ze_add_source(ZEThread_Unix.cpp 		Sources PLATFORMS Unix)
-ze_add_source(ZEThread_Windows.cpp		Sources PLATFORMS Windows)
-ze_add_source(ZEThread.h				Sources Headers)
+#include <errno.h>
 
-ze_add_library(ZEThread
-	SOURCES ${Sources} 
-	HEADERS ${Headers} 
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEThread
-	INSTALL_COMPONENT ZESDK)
+void ZESignal::Signal()
+{
+    if (pthread_cond_broadcast(&Cond) != 0)
+        zeCriticalError("Can not signal the signal.");
+}
 
-ze_link(ZEThread PLATFORMS Unix LIBS pthread)
+void ZESignal::Wait()
+{
+    pthread_mutex_t Mutex;
+    pthread_mutex_init(&Mutex, NULL);
+    if (pthread_cond_wait(&Cond, &Mutex) != 0)
+        zeCriticalError("Can not wait signal.");
+    pthread_mutex_destroy(&Mutex);
+}
+
+bool ZESignal::Wait(ZEUInt Milliseconds)
+{
+    timespec Time;
+    Time.tv_sec = Milliseconds / 1000;
+    Time.tv_sec = (Milliseconds % 1000) * 1000;
+
+    pthread_mutex_t Mutex;
+    pthread_mutex_init(&Mutex, NULL);
+
+    int Result = pthread_cond_timedwait(&Cond, &Mutex, &Time);
+    if (Result != 0)
+    {
+        if (Result == ETIMEDOUT)
+            return false;
+        else
+            zeCriticalError("Can not wait signal.");
+    }
+
+    pthread_mutex_destroy(&Mutex);
+
+    return true;
+}
+
+ZESignal::ZESignal()
+{
+    if (pthread_cond_init(&Cond, NULL) != 0)
+        zeCriticalError("Can not create signal.");
+}
+
+ZESignal::ZESignal(const ZESignal& Other)
+{
+    zeDebugCheckWarning(true, "Signal can not be copied. Creating new signal instead.");
+    if (pthread_cond_init(&Cond, NULL) != 0)
+        zeCriticalError("Can not create signal.");
+}
+
+ZESignal::~ZESignal()
+{
+    pthread_cond_destroy(&Cond);
+}
