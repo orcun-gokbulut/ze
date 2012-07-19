@@ -52,13 +52,62 @@
 
 #ifdef ZE_PLATFORM_WINDOWS
 	#include <cerrno>
-	#define ConvertErrorToString	strerror_s
+
+    static ZEString GetErrorString(ZEInt32 ErrorId)
+    {
+        int Result;
+        ZEString Error;
+
+        char ErrorString[256];
+
+        Result = strerror_s(ErrorString, 256,(int)ErrorId);
+        if (Result == 0)
+        {
+            // Use returned string to form error message
+            Error += ErrorString;
+
+        }
+        else // Fail
+        {
+            // Use ErrorId as string
+            Error += "ErrorId: ";
+            Error += ZEString::FromInt32(ErrorId);
+        }
+
+        return Error;
+    }
+
 #endif
 
 #ifdef ZE_PLATFORM_UNIX
-	#include "errno.h"
-	#include "fcntl.h"
-	#define ConvertErrorToString	strerror_r
+	#include <errno.h>
+	#include <fcntl.h>
+	#include <string.h>
+
+    static ZEString GetErrorString(ZEInt32 ErrorId)
+    {
+        char* Result;
+        ZEString Error;
+
+        char ErrorString[256];
+
+        Result = strerror_r((int)ErrorId, ErrorString, 256);
+        if (Result == NULL)
+        {
+            // Use returned string to form error message
+            Error += ErrorString;
+
+        }
+        else // Fail
+        {
+            // Use ErrorId as string
+            Error += "ErrorId: ";
+            Error += ZEString::FromInt32(ErrorId);
+        }
+
+        return Error;
+    }
+
 #endif
 
 
@@ -68,29 +117,7 @@
 #endif
 
 
-static ZEString GetErrorString(ZEInt32 ErrorId)
-{
-	int Result;
-	ZEString Error;
 
-	char ErrorString[256];
-
-	Result = ConvertErrorToString(ErrorString, 256,(int)ErrorId);
-	if (Result == 0)
-    {
-        // Use returned string to form error message
-        Error += ErrorString;
-
-	}
-    else // Fail
-	{
-        // Use ErrorId as string
-        Error += "ErrorId: ";
-        Error += ZEString::FromInt32(ErrorId);
-    }
-
-	return Error;
-}
 
 ZEFile::ZEFile()
 {
@@ -120,11 +147,11 @@ ZEInt ZEFile::Close()
 	}
 
 	Path.Clear();
-	
+
 	File = NULL;
 	Mode = ZE_FOM_NONE;
 	Creation = ZE_FCT_NONE;
-	
+
 	return Result;
 }
 
@@ -226,21 +253,21 @@ bool ZEFile::Open(const ZEString& FilePath, ZEFileOpenMode OpenMode, ZEFileCreat
 	Mode = OpenMode;
 	Path = FinalPath;
 	Creation = CreationType;
-	
+
 	return true;
 }
 
 ZESize ZEFile::Read(void* Buffer, const ZESize Size, const ZESize Count)
 {
 	zeDebugCheck(File == NULL, "File is closed..");
-	
+
 	return fread(Buffer, Size, Count, (FILE*)File);
 }
 
 ZESize ZEFile::Write(const void* Buffer, const ZESize Size, const ZESize Count)
 {
 	zeDebugCheck(File == NULL, "File is closed..");
-	
+
 	return fwrite(Buffer, Size, Count, (FILE*)File);
 }
 
@@ -249,7 +276,7 @@ ZEInt ZEFile::Seek(const ZEInt64 Offset, const ZESeekFrom Origin)
 	zeDebugCheck(File == NULL, "File is closed..");
 
 	int Mode;
-	
+
 	switch (Origin)
 	{
 		case ZE_SF_BEGINING:
@@ -269,19 +296,19 @@ ZEInt ZEFile::Seek(const ZEInt64 Offset, const ZESeekFrom Origin)
 
 	return _fseeki64((FILE*)File, Offset, Mode);
 }
-	
+
 
 ZEInt64 ZEFile::Tell() const
 {
 	zeDebugCheck(File == NULL, "File is closed..");
-	
+
 	return _ftelli64((FILE*)File);
 }
 
 ZEInt ZEFile::Eof() const
 {
 	zeDebugCheck(File == NULL, "File is closed..");
-	
+
 	return feof((FILE*)File) ;
 }
 
@@ -332,7 +359,7 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZESize BufferSize)
 	zeDebugCheck(BufferSize < (ZESize)FileSize, "File size exceeds buffer size.");
 
 	ZESize ReadSize = BufferSize > (ZESize)FileSize ? (ZESize)FileSize : BufferSize;
-	
+
 	if (File.Read(Buffer, sizeof(char), ReadSize) != ReadSize)
 	{
 		File.Close();
@@ -356,7 +383,7 @@ bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZESize BufferS
 	zeDebugCheck(BufferSize < (ZESize)FileSize + 1, "File size exceeds buffer size.");
 
 	ZESize ReadSize = BufferSize > (ZESize)FileSize ? (ZESize)FileSize : BufferSize;
-	
+
 	if (File.Read((void*)Buffer, sizeof(char), ReadSize) != ReadSize)
 	{
 		File.Close();
