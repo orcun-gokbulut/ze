@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZETask.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,29 +30,21 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_TASK_H__
-#define __ZE_TASK_H__
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZELock.h"
-#include "ZETypes.h"
+ze_add_source(ZEJob.cpp          		Sources)
+ze_add_source(ZEJob.h            		Sources Headers)
+ze_add_source(ZEJobManager.cpp   		Sources)
+ze_add_source(ZEJobManager.h     		Sources Headers)
+ze_add_source(ZETask.cpp         		Sources)
+ze_add_source(ZETask.h           		Sources Headers)
 
-enum ZETaskStatus
-{
-	ZE_TS_NONE,
-	ZE_TS_RUNNING,
-	ZE_TS_WAITING,
-	ZE_TS_DONE
-};
-
-class ZETask
-{
-
-	static ZETask* GetCurrentTask(); // Returns Task
-};
-
-// Thread Manager
-
-#endif
+ze_add_library(ZETask
+	SOURCES ${Sources} 
+	HEADERS ${Headers} 
+	INSTALL
+	INSTALL_DESTINATION ZEFoundation/ZETask
+	INSTALL_COMPONENT ZESDK)

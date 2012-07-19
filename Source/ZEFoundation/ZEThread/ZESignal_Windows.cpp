@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESystemLock_Windows.cpp
+ Zinek Engine - ZESignal_Windows.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,74 +33,56 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESystemLock.h"
+#include "ZESignal.h"
 #include "ZEError.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-void ZESystemLock::Lock()
+void ZESignal::Signal()
+{
+	if (!SetEvent(Handle))
+		zeCriticalError("Can not signal a signal.");
+}
+
+void ZESignal::Wait()
 {
 	DWORD Result = WaitForSingleObject(Handle, INFINITE);
 	if (Result != WAIT_OBJECT_0)
-		zeCriticalError("Can not lock mutex.");
-	Locked = true;
+		zeCriticalError("Failed to wait the signal.");
 }
 
-bool ZESystemLock::Lock(ZEUInt Milliseconds)
+bool ZESignal::Wait(ZEUInt Milliseconds)
 {
 	DWORD Result = WaitForSingleObject(Handle, Milliseconds);
 	if (Result != WAIT_OBJECT_0)
-		return false;
-
-	Locked = true;
-
-	return true;
-}
-
-
-void ZESystemLock::Wait()
-{
-	Lock();
-	Unlock();
-}
-
-bool ZESystemLock::Wait(ZEUInt Milliseconds)
-{
-	if (!Lock(Milliseconds))
-		return false;
-
-	Unlock();
+	{
+		if (Result == WAIT_TIMEOUT)
+			return false;
+		else
+			zeCriticalError("Failed to wait the signal.");
+	}
 
 	return true;
 }
-void ZESystemLock::Unlock()
-{
-	if (ReleaseMutex(Handle) == FALSE)
-		zeCriticalError("Can not unlock mutex.");
 
-	Locked = false;
-}
-
-ZESystemLock::ZESystemLock()
+ZESignal::ZESignal()
 {
-	Handle = CreateMutex(NULL, false, NULL);
+	Handle = CreateEvent(NULL, false, false, NULL);
 	if (Handle == NULL)
-		zeCriticalError("Can not create system lock.");
-
-	Locked = false;
+		zeCriticalError("Can not create signal.");
 }
 
-ZESystemLock::ZESystemLock(const ZESystemLock& Lock)
+ZESignal::ZESignal(const ZESignal& Other)
 {
-	Handle = CreateMutex(NULL, false, NULL);
+	zeDebugCheckWarning(true, "Signal can not be copied. Creating new signal instead.");
+	Handle = CreateEvent(NULL, false, false, NULL);
 	if (Handle == NULL)
-		zeCriticalError("Can not create mutex.");
-
-	Locked = false;
+		zeCriticalError("Can not create signal.");
 }
 
-ZESystemLock::~ZESystemLock()
+ZESignal::~ZESignal()
 {
-	CloseHandle(Handle);
+	if (!CloseHandle(Handle))
+		zeCriticalError("Can not destroy signal.");
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMutex_Windows.cpp
+ Zinek Engine - ZETask.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,79 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMutex.h"
-#include "ZEError.h"
+#ifndef __ZE_TASK_H__
+#define __ZE_TASK_H__
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#include "ZETypes.h"
 
-void ZEMutex::Lock()
+enum ZETaskStatus
 {
-	DWORD Result = WaitForSingleObject(Handle, INFINITE);
-	if (Result != WAIT_OBJECT_0)
-		zeCriticalError("Can not lock mutex.");
-	Locked = true;
-}
+	ZE_TS_NONE,
+	ZE_TS_RUNNING,
+	ZE_TS_WAITING,
+	ZE_TS_DONE
+};
 
-bool ZEMutex::Lock(ZEUInt Milliseconds)
+class ZETask
 {
-	DWORD Result = WaitForSingleObject(Handle, Milliseconds);
-	if (Result != WAIT_OBJECT_0)
-	{
-		if (Result == WAIT_TIMEOUT)
-			return false;
-		else
-			zeCriticalError("Failed to wait the signal.");
-	}
 
-	Locked = true;
+	static ZETask* GetCurrentTask(); // Returns Task
+};
 
-	return true;
-}
+// Thread Manager
 
-void ZEMutex::Wait()
-{
-	Lock();
-	Unlock();
-}
-
-bool ZEMutex::Wait(ZEUInt Milliseconds)
-{
-	if (!Lock(Milliseconds))
-		return false;
-
-	Unlock();
-
-	return true;
-}
-void ZEMutex::Unlock()
-{
-	if (ReleaseMutex(Handle) == FALSE)
-		zeCriticalError("Can not unlock mutex.");
-
-	Locked = false;
-}
-
-ZEMutex::ZEMutex()
-{
-	Handle = CreateMutex(NULL, false, NULL);
-	if (Handle == NULL)
-		zeCriticalError("Can not create system lock.");
-
-	Locked = false;
-}
-
-ZEMutex::ZEMutex(const ZEMutex& Lock)
-{
-	Handle = CreateMutex(NULL, false, NULL);
-	if (Handle == NULL)
-		zeCriticalError("Can not create mutex.");
-
-	Locked = false;
-}
-
-ZEMutex::~ZEMutex()
-{
-	if (!CloseHandle(Handle))
-		zeCriticalError("Can not destroy mutex.");
-}
+#endif
