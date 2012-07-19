@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEThread_Unix.cpp
+ Zinek Engine - ZEMutex_Unix.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,120 +33,94 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEThread.h"
+#include "ZEMutex.h"
 #include "ZEError.h"
-#include <sys/prctl.h>
 
-static __thread ZEThread* CurrentThread = NULL;
+#include <errno.h>
 
-void* ZEThread::ThreadFunction(void* Thread)
+bool ZEMutex::TryToLock()
 {
-    CurrentThread = (ZEThread*)Thread;
-
-    prctl(PR_SET_NAME, CurrentThread->GetName().ToCString(), 0, 0, 0);
-
-	CurrentThread->Status = ZE_TS_RUNNING;
-    CurrentThread->Function(CurrentThread, CurrentThread->GetParameter());
-    CurrentThread->Exit();
-
-	return 0;
+    return Lock(0);
 }
 
-void ZEThread::Run(void* Parameter)
+void ZEMutex::Lock()
 {
-    if (IsAlive())
-		return;
-
-	int Result = pthread_create(&Thread, NULL, ThreadFunction, this);
-    if (Result != 0)
-        zeCriticalError("Can not create thread.");
+    if (pthread_mutex_lock(&Mutex) == 0)
+        Locked = true;
+    else
+        zeCriticalError("Can not lock mutex.");
 }
 
-void ZEThread::Terminate()
+bool ZEMutex::Lock(ZEUInt Milliseconds)
 {
-    if (!IsAlive())
-		return;
-
-	int Result = pthread_cancel(Thread);
-    if (Result != 0)
-		zeCriticalError("Can not terminate thread.");
-
-    Status == ZE_TS_TERMINATED;
-}
-
-void ZEThread::Sleep(ZEUInt Milliseconds)
-{
-    zeDebugCheck(CurrentThread != this, "A thread can only use it's own sleep function.");
-    usleep(Milliseconds);
-}
-
-
-void ZEThread::Wait()
-{
-    zeDebugCheck(CurrentThread == this, "You can not wait your own thread.");
-
-    if (!IsAlive())
-		return;
-    
-	pthread_join(Thread, NULL);
-}
-
-bool ZEThread::Wait(ZEUInt Milliseconds)
-{
-    zeDebugCheck(CurrentThread == this, "A thread can not wait its own.");
-
-    if (!IsAlive())
-		return false;
-
     if (Milliseconds == 0)
-        return pthread_tryjoin_np(Thread, NULL) == 0;
+    {
+        if (pthread_mutex_trylock(&Mutex) == 0)
+        {
+            Locked = true;
+            return true;
+        }
+        else
+            return false;
+    }
     else
     {
         timespec Time;
         Time.tv_sec = Milliseconds / 1000;
         Time.tv_sec = (Milliseconds % 1000) * 1000;
 
-        return pthread_timedjoin_np(Thread, NULL, &Time) == 0;
+        int Result = pthread_mutex_timedlock(&Mutex, &Time);
+        if (Result != 0)
+        {
+            if (Result == ETIMEDOUT)
+                return false;
+            else
+                zeCriticalError("Can not wait signal.");
+        }
     }
 
     return true;
 }
 
-bool ZEThread::ControlPoint()
+void ZEMutex::Unlock()
 {
-    zeDebugCheck(CurrentThread != this, "A thread can only use it's own control point function.");
-
-    if (Status == ZE_TS_RUNNING)
-        return true;
-
-	return false;
-}
-
-void ZEThread::Exit()
-{
-    if (!IsAlive())
-		return;
-
-	if (CurrentThread == this)
-    {
-        CurrentThread->Status = ZE_TS_DONE;
-        pthread_exit(NULL);
-    }
+    if (pthread_mutex_unlock(&Mutex) == 0)
+        Locked = false;
     else
-        Status == ZE_TS_EXITING;
+        zeCriticalError("Can not unlock mutex.");
+
 }
 
-ZEThread::ZEThread()
+void ZEMutex::Wait()
 {
-	Status = ZE_TS_NONE;
+    Lock();
+    Unlock();
 }
 
-ZEThread::~ZEThread()
+bool ZEMutex::Wait(ZEUInt Milliseconds)
 {
-    Exit();
+    if (Lock(Milliseconds))
+        Unlock();
+    else
+        return false;
 }
 
-ZEThread* ZEThread::GetCurrentThread()
+ZEMutex::ZEMutex()
 {
-    return CurrentThread;
+    Locked = false;
+    if (pthread_mutex_init(&Mutex, NULL) != 0)
+        zeCriticalError("Can not create mutex.");
+}
+
+ZEMutex::ZEMutex(const ZEMutex& Lock)
+{
+    zeDebugCheckWarning("Trying to copy mutex.");
+    Locked = false;
+    if (pthread_mutex_init(&Mutex, NULL) != 0)
+        zeCriticalError("Can not create mutex.");
+}
+
+ZEMutex::~ZEMutex()
+{
+    pthread_mutex_destroy(&Mutex);
 }

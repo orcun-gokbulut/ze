@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESystemLock.cpp
+ Zinek Engine - ZESignal.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESystemLock.h"
+#include "ZESignal.h"
 #include "ZEError.h"
 
-bool ZESystemLock::IsLocked()
-{
-    return Locked;
-}
 
-ZESystemLock ZESystemLock::operator=(const ZESystemLock& Lock)
+ZESignal ZESignal::operator=(const ZESignal& Other)
 {
-    return ZESystemLock();
+    zeDebugCheckWarning(true, "You can not assign signal instead new empty signal is created.");
+    return ZESignal();
 }
-

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZESystemLock_Windows.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,37 +30,77 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZESystemLock.h"
+#include "ZEError.h"
 
-ze_add_source(ZEJob.cpp          		Sources)
-ze_add_source(ZEJob.h            		Sources Headers)
-ze_add_source(ZEJobManager.cpp   		Sources)
-ze_add_source(ZEJobManager.h     		Sources Headers)
-ze_add_source(ZELock.cpp         		Sources)
-ze_add_source(ZELock.h          	 	Sources Headers)
-ze_add_source(ZEMutex.cpp   			Sources)
-ze_add_source(ZEMutex_Unix.cpp   		Sources PLATFORMS Unix)
-ze_add_source(ZEMutex_Windows.cpp  		Sources PLATFORMS Windows)
-ze_add_source(ZEMutex.h    	 			Sources Headers)
-ze_add_source(ZESignal.cpp   			Sources)
-ze_add_source(ZESignal_Unix.cpp   		Sources PLATFORMS Unix)
-ze_add_source(ZESignal_Windows.cpp  	Sources PLATFORMS Windows)
-ze_add_source(ZESignal.h    	 		Sources Headers)
-ze_add_source(ZETask.cpp         		Sources)
-ze_add_source(ZETask.h           		Sources Headers)
-ze_add_source(ZEThread.cpp       		Sources)
-ze_add_source(ZEThread_Unix.cpp 		Sources PLATFORMS Unix)
-ze_add_source(ZEThread_Windows.cpp		Sources PLATFORMS Windows)
-ze_add_source(ZEThread.h				Sources Headers)
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 
-ze_add_library(ZEThread
-	SOURCES ${Sources} 
-	HEADERS ${Headers} 
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEThread
-	INSTALL_COMPONENT ZESDK)
+void ZESystemLock::Lock()
+{
+	DWORD Result = WaitForSingleObject(Handle, INFINITE);
+	if (Result != WAIT_OBJECT_0)
+		zeCriticalError("Can not lock mutex.");
+	Locked = true;
+}
 
-ze_link(ZEThread PLATFORMS Unix LIBS pthread)
+bool ZESystemLock::Lock(ZEUInt Milliseconds)
+{
+	DWORD Result = WaitForSingleObject(Handle, Milliseconds);
+	if (Result != WAIT_OBJECT_0)
+		return false;
+
+	Locked = true;
+
+	return true;
+}
+
+
+void ZESystemLock::Wait()
+{
+	Lock();
+	Unlock();
+}
+
+bool ZESystemLock::Wait(ZEUInt Milliseconds)
+{
+	if (!Lock(Milliseconds))
+		return false;
+
+	Unlock();
+
+	return true;
+}
+void ZESystemLock::Unlock()
+{
+	if (ReleaseMutex(Handle) == FALSE)
+		zeCriticalError("Can not unlock mutex.");
+
+	Locked = false;
+}
+
+ZESystemLock::ZESystemLock()
+{
+	Handle = CreateMutex(NULL, false, NULL);
+	if (Handle == NULL)
+		zeCriticalError("Can not create system lock.");
+
+	Locked = false;
+}
+
+ZESystemLock::ZESystemLock(const ZESystemLock& Lock)
+{
+	Handle = CreateMutex(NULL, false, NULL);
+	if (Handle == NULL)
+		zeCriticalError("Can not create mutex.");
+
+	Locked = false;
+}
+
+ZESystemLock::~ZESystemLock()
+{
+	CloseHandle(Handle);
+}

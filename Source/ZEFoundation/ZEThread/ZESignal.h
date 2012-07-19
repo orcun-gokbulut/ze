@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESystemLock_Unix.cpp
+ Zinek Engine - ZESignal.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,89 +33,36 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESystemLock.h"
-#include "ZEError.h"
+#ifndef __ZE_SIGNAL_H__
+#define __ZE_SIGNAL_H__
 
-bool ZESystemLock::TryToLock()
+#include "ZEDS/ZEString.h"
+#ifdef ZE_PLATFORM_UNIX
+#include <pthread.h>
+#endif
+
+class ZESignal
 {
-    return Lock(0);
-}
+	private:
+        #ifdef ZE_PLATFORM_WINDOWS
+            void*           Handle;
+        #elif defined(ZE_PLATFORM_UNIX)
+            pthread_cond_t  Cond;
+        #endif
 
-void ZESystemLock::Lock()
-{
-    if (pthread_mutex_lock(&Mutex) == 0)
-        Locked = true;
-    else
-        zeCriticalError("Can not lock mutex.");
-}
+	public:
+        void                Signal();
 
-bool ZESystemLock::Lock(ZEUInt Milliseconds)
-{
-    if (Milliseconds == 0)
-    {
-        if (pthread_mutex_trylock(&Mutex) == 0)
-        {
-            Locked = true;
-            return true;
-        }
-        else
-            return false;
-    }
-    else
-    {
-        timespec Time;
-        Time.tv_sec = Milliseconds / 1000;
-        Time.tv_sec = (Milliseconds % 1000) * 1000;
+        void                Wait();
+        bool				Wait(ZEUInt Milliseconds);
 
-        if (pthread_mutex_timedlock(&Mutex, &Time) == 0)
-        {
-            Locked = true;
-            return true;
-        }
-        else
-            return false;
-    }
-}
+        ZESize              GetWaitCount();
 
-void ZESystemLock::Unlock()
-{
-    if (pthread_mutex_unlock(&Mutex) == 0)
-        Locked = false;
-    else
-        zeCriticalError("Can not unlock mutex.");
+        ZESignal            operator=(const ZESignal& Other);
 
-}
+                            ZESignal();
+                            ZESignal(const ZESignal& Other);
+                            ~ZESignal();
+};
 
-void ZESystemLock::Wait()
-{
-    Lock();
-    Unlock();
-}
-
-bool ZESystemLock::Wait(ZEUInt Milliseconds)
-{
-    if (Lock(Milliseconds))
-        Unlock();
-    else
-        return false;
-}
-
-ZESystemLock::ZESystemLock()
-{
-    Locked = false;
-    if (pthread_mutex_init(&Mutex, NULL) != 0)
-        zeCriticalError("Can not create mutex.");
-}
-
-ZESystemLock::ZESystemLock(const ZESystemLock& Lock)
-{
-    zeDebugCheckWarning("Trying to copy mutex.");
-    Locked = false;
-    if (pthread_mutex_init(&Mutex, NULL) != 0)
-        zeCriticalError("Can not create mutex.");
-}
-
-ZESystemLock::~ZESystemLock()
-{
-    pthread_mutex_destroy(&Mutex);
-}
+#endif

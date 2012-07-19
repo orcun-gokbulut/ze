@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESystemLock.h
+ Zinek Engine - ZEMutex.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_SYSTEM_LOCK_H__
-#define __ZE_SYSTEM_LOCK_H__
+#include "ZEMutex.h"
+#include "ZEError.h"
 
-#include "ZEDS/ZEString.h"
-#ifdef ZE_PLATFORM_UNIX
-#include <pthread.h>
-#endif
-
-class ZESystemLock
+bool ZEMutex::IsLocked()
 {
-	private:
-        bool                Locked;
-        #ifdef ZE_PLATFORM_WINDOWS
-            void*           Handle;
-        #elif defined(ZE_PLATFORM_UNIX)
-            pthread_mutex_t Mutex;
-        #endif
+    return Locked;
+}
 
-	public:
-        bool				IsLocked();
+ZEMutex ZEMutex::operator=(const ZEMutex& Lock)
+{
+    return ZEMutex();
+}
 
-        bool				TryToLock();
-        void                Lock();
-        bool				Lock(ZEUInt Milliseconds);
-
-        void                Wait();
-        bool				Wait(ZEUInt Milliseconds);
-
-        void				Unlock();
-
-		ZESystemLock		operator=(const ZESystemLock& Lock);
-
-							ZESystemLock();
-							ZESystemLock(const ZESystemLock& Lock);
-							~ZESystemLock();
-};
-
-#endif

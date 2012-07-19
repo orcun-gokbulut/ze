@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEMutex.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,37 +30,44 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#ifndef __ZE_MUTEX_H__
+#define __ZE_MUTEX_H__
 
-ze_add_source(ZEJob.cpp          		Sources)
-ze_add_source(ZEJob.h            		Sources Headers)
-ze_add_source(ZEJobManager.cpp   		Sources)
-ze_add_source(ZEJobManager.h     		Sources Headers)
-ze_add_source(ZELock.cpp         		Sources)
-ze_add_source(ZELock.h          	 	Sources Headers)
-ze_add_source(ZEMutex.cpp   			Sources)
-ze_add_source(ZEMutex_Unix.cpp   		Sources PLATFORMS Unix)
-ze_add_source(ZEMutex_Windows.cpp  		Sources PLATFORMS Windows)
-ze_add_source(ZEMutex.h    	 			Sources Headers)
-ze_add_source(ZESignal.cpp   			Sources)
-ze_add_source(ZESignal_Unix.cpp   		Sources PLATFORMS Unix)
-ze_add_source(ZESignal_Windows.cpp  	Sources PLATFORMS Windows)
-ze_add_source(ZESignal.h    	 		Sources Headers)
-ze_add_source(ZETask.cpp         		Sources)
-ze_add_source(ZETask.h           		Sources Headers)
-ze_add_source(ZEThread.cpp       		Sources)
-ze_add_source(ZEThread_Unix.cpp 		Sources PLATFORMS Unix)
-ze_add_source(ZEThread_Windows.cpp		Sources PLATFORMS Windows)
-ze_add_source(ZEThread.h				Sources Headers)
+#include "ZEDS/ZEString.h"
+#ifdef ZE_PLATFORM_UNIX
+#include <pthread.h>
+#endif
 
-ze_add_library(ZEThread
-	SOURCES ${Sources} 
-	HEADERS ${Headers} 
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEThread
-	INSTALL_COMPONENT ZESDK)
+class ZEMutex
+{
+	private:
+        bool                Locked;
+        #ifdef ZE_PLATFORM_WINDOWS
+            void*           Handle;
+        #elif defined(ZE_PLATFORM_UNIX)
+            pthread_mutex_t Mutex;
+        #endif
 
-ze_link(ZEThread PLATFORMS Unix LIBS pthread)
+	public:
+        bool				IsLocked();
+
+        bool				TryToLock();
+        void                Lock();
+        bool				Lock(ZEUInt Milliseconds);
+
+        void                Wait();
+        bool				Wait(ZEUInt Milliseconds);
+
+        void				Unlock();
+
+        ZEMutex         	operator=(const ZEMutex& Lock);
+
+                            ZEMutex();
+                            ZEMutex(const ZEMutex& Lock);
+                            ~ZEMutex();
+};
+
+#endif
