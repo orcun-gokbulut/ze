@@ -774,25 +774,26 @@ ZEModelResource* ZEModelResource::LoadResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
-	ZEFile* ResourceFile = ZEFile::Open(NewPath);
-	if (ResourceFile != NULL && ResourceFile->IsOpen())
+	bool Result;
+	ZEFile ResourceFile;
+
+	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	if (Result)
 	{
 		ZEModelResource* NewResource = new ZEModelResource();
 		NewResource->SetFileName(NewPath);
 		NewResource->Cached = false;
 		NewResource->ReferenceCount = 0;
-		if (!ReadModelFromFile(NewResource, ResourceFile))
+		if (!ReadModelFromFile(NewResource, &ResourceFile))
 		{
 			zeError("Can not load model file. (FileName : \"%s\")", FileName.ToCString());
-			ResourceFile->Close();
-			delete ResourceFile;
+			ResourceFile.Close();
 			delete NewResource;
 			return NULL;
 		}
 		else
 		{
-			ResourceFile->Close();
-			delete ResourceFile;
+			ResourceFile.Close();
 			return NewResource;
 		}
 	}

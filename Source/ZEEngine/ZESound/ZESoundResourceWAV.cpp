@@ -91,9 +91,12 @@ void ZESoundResourceWAV::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
 ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
+	
+	bool Result;
+	ZEFile File;
 
-	ZEFile* File = ZEFile::Open(NewPath);
-	if (File == NULL || !File->IsOpen())
+	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	if (!Result)
 	{
 		zeError("Can not load WAV resource. Can not open file. (Filename : \"%s\")", NewPath.ToCString());
 		return NULL;
@@ -124,7 +127,7 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
 		ZEUInt	Size;     
 	}Data;
 
-	File->Read(&Riff, sizeof(Riff), 1);
+	File.Read(&Riff, sizeof(Riff), 1);
 	if (Riff.Header != 'FFIR')
 	{
 		zeError("Wrong wave file. (FileName : \"%s\")", NewPath.ToCString());
@@ -137,7 +140,7 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
 		return NULL;
 	}
 
-	File->Read(&Fmt, sizeof(Fmt), 1);
+	File.Read(&Fmt, sizeof(Fmt), 1);
 	if (Fmt.Header != ' tmf')
 	{
 		zeError("Wrong wave file. (FileName : \"%s\")", NewPath.ToCString());
@@ -150,7 +153,7 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
 		return NULL;
 	}
 
-	File->Read(&Data, sizeof(Data), 1);
+	File.Read(&Data, sizeof(Data), 1);
 	if (Data.Header != 'atad')
 	{
 		zeError("Wrong wave file. (FileName : \"%s\")", NewPath.ToCString());
@@ -166,9 +169,8 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
 	NewResource->DataSize			= (ZESize)Data.Size;
 	NewResource->SampleCount			= NewResource->DataSize / NewResource->BlockAlign;
 	NewResource->Data				= new unsigned char[NewResource->DataSize];
-	File->Read(NewResource->Data, 1, NewResource->DataSize);	
-	File->Close();
-	delete File;
+	File.Read(NewResource->Data, 1, NewResource->DataSize);	
+	File.Close();
 
 	return NewResource;
 }

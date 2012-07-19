@@ -49,7 +49,7 @@ class ZEFileInfo
 
 	private:
 		ZEKnownPath				Root;
-		ZESize					Size;
+		ZEInt64					Size;
 		ZEString				Name;
 		ZEString				Path;
 		ZEString				Extension;
@@ -64,12 +64,13 @@ class ZEFileInfo
 		void					SetPath(const ZEString& FilePath);
 		const ZEString&			GetPath() const;
 
-		ZESize					GetSize();
+		ZEInt64					GetSize();
 		const ZEString&			GetName() const;
 		const ZEString&			GetExtension() const;
 		bool					GetCreationDate(ZEFileTime& Time);
 		bool					GetModificationDate(ZEFileTime& Time);
 
+		ZEInt64					GetFileSize(const ZEString& FilePath);
 		static bool				IsFile(const ZEString& FilePath);
 		static ZEString			GetFileName(const ZEString& FilePath);
 		static ZEString			GetFileExtension(const ZEString& FilePath);

@@ -794,8 +794,11 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
-	ZEFile* File = ZEFile::Open(NewPath);
-	if (File == NULL || !File->IsOpen())
+	bool Result;
+	ZEFile File;
+
+	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	if (!Result)
 	{
 		zeError("Can not load canvas file. (FileName : \"%s\")", NewPath.ToCString());
 		return false;
@@ -803,13 +806,13 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 	
 	
 	ZEInt VertexCount;
-	fscanf((FILE*)File->GetFileHandle(), "%d", &VertexCount);
+	fscanf((FILE*)File.GetHandle(), "%d", &VertexCount);
 
 	ZECanvasVertex* Vertices = this->Vertices.MassAdd((ZESize)VertexCount);
 	ZESize Index = 0;
-	while (!File->Eof())
+	while (!File.Eof())
 	{
-		fscanf((FILE*)File->GetFileHandle(), "%f %f %f %f %f %f %f %f", 
+		fscanf((FILE*)File.GetHandle(), "%f %f %f %f %f %f %f %f", 
 			 &Vertices[Index].Position.x,  &Vertices[Index].Position.y, &Vertices[Index].Position.z,
 			 &Vertices[Index].Normal.x, &Vertices[Index].Normal.y, &Vertices[Index].Normal.z,
 			 &Vertices[Index].Texcoord.x, &Vertices[Index].Texcoord.y);
@@ -825,8 +828,7 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 	if (Index != (ZESize)VertexCount + 1 )
 		zeWarning("Corrupted canvas file. Vertex count is less than verties in the file. (FileName : \"%s\")", NewPath.ToCString());
 
-	File->Close();
-	delete File;
+	File.Close();
 
 	return true;
 }

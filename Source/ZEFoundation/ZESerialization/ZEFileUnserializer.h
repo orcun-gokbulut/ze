@@ -43,15 +43,15 @@
 class ZEFileUnserializer : public ZEUnserializer
 {
 	private:
-		void*						File;
+		void*					File;
 
 	public:
-		virtual ZEUInt64			Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);	
-		bool						OpenFile(const char* FileName);
-		void						CloseFile();
+		virtual ZESize			Read(void* Buffer, const ZESize Size, const ZESize Count);
+		bool					OpenFile(const char* FileName);
+		void					CloseFile();
 
-									ZEFileUnserializer();
-		virtual						~ZEFileUnserializer();
+								ZEFileUnserializer();
+		virtual					~ZEFileUnserializer();
 };
 
 #endif

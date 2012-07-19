@@ -42,38 +42,32 @@
 class ZEPartialFile : public ZEFile
 {
 	protected:
-		ZEUInt64				StartPosition;
-		ZEUInt64				EndPosition;
-		bool					IsEof;
-
-		ZEFile*					ParentFile;
-
+		bool					EoF;
+		ZEInt64					EndPosition;
+		ZEInt64					StartPosition;
+		
 	public:
-		virtual bool			Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary);
-		virtual bool			Open(ZEFile* ParentFile, ZEUInt64 Offset, ZEUInt64 Size);
-		virtual void			Close();
-
-		virtual ZEUInt64		Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
-		virtual ZEUInt64		ReadFormated(const char* Format, ...);
-
-		virtual ZEUInt64		Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
-		virtual ZEUInt64		WriteFormated(const char* Format, ...);
-
-		virtual bool			Seek(ZEInt64 Offset, ZESeekFrom Origin);
-		virtual ZEUInt64		Tell();
-
-		virtual ZEUInt64		GetStartPosition();
-		virtual ZEUInt64		GetEndPosition();
-
-		virtual ZEUInt64		GetFileSize() const;
-		virtual bool			Eof();
-
-		virtual ZEUInt			IncreaseReferenceCount();
-		virtual ZEUInt			DecreaseReferenceCount();
-
 								ZEPartialFile();
 		virtual					~ZEPartialFile();
-};
 
+		virtual ZEInt			Close();
+		virtual bool			Open(const ZEFile* ParentFile, const ZEInt64 Offset, const ZEInt64 Size);
+		virtual bool			Open(const ZEString& FilePath, ZEFileOpenMode OpenType, ZEFileCreationType CreationType);
+
+		virtual ZESize			Read(void* Buffer, const ZESize Size, const ZESize Count);
+		virtual ZESize			Write(const void* Buffer, const ZESize Size, const ZESize Count);
+
+		virtual ZEInt64			Tell() const;
+		virtual ZEInt			Seek(const ZEInt64 Offset, const ZESeekFrom Origin);
+		
+		virtual ZEInt64			GetSize();
+
+		virtual ZEInt64			GetEndPosition() const;
+		virtual void			SetEndPosition(ZEInt64 Position);
+		
+		virtual ZEInt64			GetStartPosition() const;
+		virtual void			SetStartPosition(ZEInt64 Position);
+
+};
 
 #endif

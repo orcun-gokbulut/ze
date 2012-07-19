@@ -80,14 +80,14 @@ void ZEFileUtils::GetErrorString(ZEString& ErrorString, const ZEInt ErrorId)
 }
 
 // Converts file size of two 32 bits integer into ZESize
-static ZESize OSFileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow)
+static ZEInt64 OSFileSizetoZESize(ZEUInt32 SizeHigh, ZEUInt32 SizeLow)
 {
 	ULARGE_INTEGER Temp;
 
 	Temp.LowPart = SizeLow;
 	Temp.HighPart = SizeHigh;
 
-	return (ZESize)Temp.QuadPart;
+	return (ZEInt64)Temp.QuadPart;
 }
 
 static bool OSFileTimetoZEFileTime(ZEFileTime *Time, ZEFileTimeOS *FileTime)
@@ -172,14 +172,14 @@ ZEString ZEFileUtils::GetFileName(const ZEFileSearchStream* FindData)
 	return ZEString(FindData->Data.cFileName);
 }
 
-ZESize ZEFileUtils::GetFileSize(const ZEString& Path)
+ZEInt64 ZEFileUtils::GetFileSize(const ZEString& Path)
 {
 	struct stat Stat;
 
-	return GetStats(Path, &Stat) ? (ZESize)Stat.st_size : 0;
+	return GetStats(Path, &Stat) ? (ZEInt64)Stat.st_size : (ZEInt64)-1;
 }
 
-ZESize ZEFileUtils::GetFileSize(const ZEFileSearchStream* FindData)
+ZEInt64 ZEFileUtils::GetFileSize(const ZEFileSearchStream* FindData)
 {
 	zeDebugCheck(FindData == NULL, "NUll pointer");
 

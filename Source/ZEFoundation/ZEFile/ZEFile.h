@@ -42,109 +42,75 @@
 #include "ZESerialization/ZESerializer.h"
 #include "ZESerialization/ZEUnserializer.h"
 
-enum ZEFileType
-{
-	ZE_FT_FILE		= 0,
-	ZE_FT_PARTIAL	= 1,
-};
 
 enum ZESeekFrom
 {
 	ZE_SF_BEGINING	= 0,
 	ZE_SF_END		= 1,
-	ZE_SF_CURRENT	= 2,
+	ZE_SF_CURRENT	= 2
 };
 
-enum ZEFileMode
+// ZE_FOM_READ: Read only, can be seekable
+// ZE_FOM_WRITE: Write only, can be seekable
+// ZE_FOM_NOTSET: File is not open
+// ZE_FOM_READ_WRITE: Both reading and writing
+enum ZEFileOpenMode
 {
-	ZE_FM_READ_ONLY			= 0,
-	ZE_FM_WRITE_ONLY		= 1,
-	ZE_FM_APPEND_ONLY		= 2,
-	ZE_FM_READ_WRITE		= 3,
-	ZE_FM_READ_APPEND		= 4,
+	ZE_FOM_NONE				= 0,
+	ZE_FOM_READ				= 1,
+	ZE_FOM_WRITE			= 2,
+	ZE_FOM_READ_WRITE		= 3,
 };
 
 
-////For formatted read however it does not work on CRT DLL
-//#ifdef _DLL
-//#error "In order to compile this code, /MT(d) instead of /MD(d) must be used.
-//#endif
-//
-//#ifdef _UNICODE
-//#define _tinput_l _winput_l
-//#else
-//#define _tinput_l _input_l
-//#endif 
-//
-//extern "C"
-//ZEInt __cdecl _tinput_l(FILE*, const TCHAR*, _locale_t, va_list);
+// ZE_FCT_OPEN : Opens an existing file. If there is no file, gives error.						
+// ZE_FCT_OPEN_CREATE : Creates a new file if file does not exists, otherwise opens the existing file.	
+// ZE_FCT_OPEN_CREATE_OVERWRITE : Creates a file, if file exists the file's content is deleted.				
+enum ZEFileCreationType
+{
+	ZE_FCT_NONE						= 0,
+	ZE_FCT_OPEN						= 1,	
+	ZE_FCT_OPEN_CREATE				= 2,	
+	ZE_FCT_OPEN_CREATE_OVERWRITE	= 3,
 
-class ZEPartialFile;
-class ZECacheDataIdentifier;
+};
+
 
 class ZEFile : public ZESerializer, public ZEUnserializer
 {
-	friend class ZEPartialFile;
-
 	protected:
-		void*					File;				// C file pointer
-		ZEString				FilePath;			
-		ZEUInt64				FileCursor;
-
-		ZEFileType				FileType;
-		bool					AutoClose;			// Closes the file when reference count goes zero
-		ZEUInt					ReferenceCount;		// Count of how many files are open on this file
-
-		virtual ZEUInt			IncreaseReferenceCount();
-		virtual ZEUInt			DecreaseReferenceCount();
+		void*					File;
+		ZEString				Path;
+		ZEFileOpenMode			Mode;
+		ZEFileCreationType		Creation;
 
 	public:
-		virtual bool			Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary);
-		virtual bool			Seek(ZEInt64 Offset, ZESeekFrom Origin);
-		virtual ZEUInt64		Tell();
-		virtual void			Close();
-		virtual bool			Eof();
-		virtual void			Flush();
-		virtual bool			IsOpen();
+								ZEFile();
+		virtual					~ZEFile();
 
-		void					SetAutoClose(bool AutoClose);
-		bool					GetAutoClose();
+		virtual ZEInt			Close();
+		virtual bool			Open(const ZEString& FilePath, ZEFileOpenMode OpenMode, ZEFileCreationType CreationType);
 		
-		virtual ZEUInt64		Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
-		virtual ZEUInt64		ReadFormated(const char* Format, ...);
-
-		virtual ZEUInt64		Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
-		virtual ZEUInt64		WriteFormated(const char* Format, ...);
-
-		static ZEUInt64			GetFileSize(const ZEString& FilePath);
-		virtual ZEUInt64		GetFileSize();
-
-		static bool				ReadFile(const ZEString& FilePath, void* Buffer, ZEUInt64 BufferSize);
-		static bool				ReadTextFile(const ZEString& FilePath, char* Buffer, ZEUInt64 BufferSize);
-
-		ZEFileType				GetFileType() const;
-		void*					GetFileHandle() const;
-		const ZEString			GetFilePath() const;
-
-		virtual ZEUInt64		GetStartPosition();
-		virtual ZEUInt64		GetEndPosition();
-
-		ZEUInt					GetReferenceCount() const;
-
-		static ZEString			GetFileName(const ZEString& FilePath);
-		static ZEString			GetAbsolutePath(const ZEString& FilePath);
-		static ZEString			GetFileExtension(const ZEString& FilePath);
-		static ZEString			GetParentDirectory(const ZEString& FilePath);
+		virtual ZESize			Read(void* Buffer, const ZESize Size, const ZESize Count);
+		virtual ZESize			Write(const void* Buffer, const ZESize Size, const ZESize Count);
 		
-		static bool				IsDirectoryExists(const ZEString& FilePath);
-		static bool				IsFileExists(const ZEString& FilePath);
-
-		static ZEFile*			Open(const ZEString& FilePath, bool AutoClose = true);
+		virtual ZEInt			Seek(const ZEInt64 Offset, const ZESeekFrom Origin);
+		virtual ZEInt64			Tell() const;
+		
+		virtual ZEInt			Eof() const;
+		virtual ZEInt			Flush() const;
+		virtual bool			IsOpen() const;
+		
+		virtual ZEInt64			GetSize();
+		const ZEString&			GetPath() const;
+		void*					GetHandle() const;
+		ZEFileOpenMode			GetOpenMode() const;
+		ZEFileCreationType		GetCreationType() const;
 
 		ZEFile&					operator = (ZEFile& OtherFile);
 
-								ZEFile();
-		virtual					~ZEFile();
+		static bool				ReadFile(const ZEString& FilePath, void* Buffer, ZESize BufferSize);
+		static bool				ReadTextFile(const ZEString& FilePath, char* Buffer, ZESize BufferSize);
 
 };
 

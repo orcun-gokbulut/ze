@@ -147,17 +147,18 @@ ZEFontResource* ZEFontResource::LoadResource(const ZEString& FilePath, const ZET
 {
 	ZEString NewPath = ConstructResourcePath(FilePath);
 
+	bool Result;
+	ZEFile File;
 	ZEFontResource* FontResource;
-	ZEFile* File = ZEFile::Open(NewPath, false);
-
-	if (File != NULL && File->IsOpen())
+	
+	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	if (Result)
 	{
 		if(UserOptions == NULL)
 			UserOptions = zeGraphics->GetTextureOptions();
 
-		FontResource = LoadResource(File, UserOptions);
-		File->Close();
-		delete File;
+		FontResource = LoadResource(&File, UserOptions);
+		File.Close();
 
 		return FontResource;
 	}
@@ -170,7 +171,7 @@ ZEFontResource* ZEFontResource::LoadResource(const ZEString& FilePath, const ZET
 
 ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions)
 {
-	zeLog("Loading font file \"%s\".", ResourceFile->GetFilePath().GetValue());
+	zeLog("Loading font file \"%s\".", ResourceFile->GetPath().GetValue());
 
 	if(UserOptions == NULL)
 		UserOptions = zeGraphics->GetTextureOptions();
@@ -187,12 +188,12 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 	ResourceFile->Read(&FileHeader, sizeof(ZEFontFileHeader), 1);
 	if (FileHeader.Header != ZE_FONT_FILE_HEADER)
 	{
-		zeError("Unknown ZEFont file format. (FilePath : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("Unknown ZEFont file format. (FilePath : \"%s\")", ResourceFile->GetPath().GetValue());
 		return NULL;
 	}
 
 	ZEFontResource* NewResource = new ZEFontResource();
-	NewResource->SetFileName(ResourceFile->GetFilePath());
+	NewResource->SetFileName(ResourceFile->GetPath());
 	NewResource->TextureResources.SetCount((ZESize)FileHeader.TextureCount);
 	NewResource->Materials.SetCount((ZESize)FileHeader.TextureCount);
 
@@ -209,7 +210,7 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 		ZETexture2DResource* CurrentTexture = ZETexture2DResource::LoadResource((ZEFile*)&TextureResourceFile, &ModifiedOptions);
 		if (CurrentTexture == NULL)
 		{
-			zeError("Can not read texture from the file. (FilePath : \"%s\", Texture Index : %d)", ResourceFile->GetFilePath().GetValue(), I);
+			zeError("Can not read texture from the file. (FilePath : \"%s\", Texture Index : %d)", ResourceFile->GetPath().GetValue(), I);
 			TextureResourceFile.Close();
 			delete NewResource;
 			return NULL;
@@ -232,7 +233,7 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 		NewResource->Characters[I].Material = NewResource->Materials[(ZESize)FileHeader.Characters[I].TextureId];
 	}
 
-	zeLog("Font file \"%s\" has been loaded.", ResourceFile->GetFilePath().GetValue());
+	zeLog("Font file \"%s\" has been loaded.", ResourceFile->GetPath().GetValue());
 
 	return NewResource;
 }

@@ -157,22 +157,24 @@ ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
-	ZEFile* File = ZEFile::Open(NewPath);
-	if(File == NULL || !File->IsOpen())
+	bool Result;
+	ZEFile File; 
+	
+	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	if(!Result)
 	{
-		zeError("Can not open ogg file. (FileName : \"%s\")", NewPath.ToCString());
+		zeError("Can not open mp3 file. (FileName : \"%s\")", NewPath.ToCString());
 		return NULL;
 	}
 
 	ZESoundResourceMP3* NewResource = new ZESoundResourceMP3();
 
-	File->Seek(0, ZE_SF_END);
-	NewResource->DataSize = File->Tell();
+	File.Seek(0, ZE_SF_END);
+	NewResource->DataSize = File.Tell();
 	NewResource->Data = new unsigned char[NewResource->DataSize];
-	File->Seek(0, ZE_SF_BEGINING);
-	File->Read(NewResource->Data, 1, NewResource->DataSize);
-	File->Close();
-	delete File;
+	File.Seek(0, ZE_SF_BEGINING);
+	File.Read(NewResource->Data, 1, NewResource->DataSize);
+	File.Close();
 
 	NewResource->SetFileName(NewPath);	
 	NewResource->MemoryCursor = 0;

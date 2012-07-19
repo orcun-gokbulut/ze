@@ -44,7 +44,7 @@ bool ZEFileCache::CheckCompleteness()
 	// Go to end of the file and read cache completeness flag
 	ZEUInt64 Complete = 0;
 
-	if (!File.Seek(-1 * (ZEInt64)ZEQuadWordSize, ZE_SF_END))
+	if (File.Seek(-1 * (ZEInt64)ZEQuadWordSize, ZE_SF_END) != 0)
 	{
 		zeDebugCheck(true, "File Cache", "Cannot seek");
 		return false;
@@ -56,7 +56,7 @@ bool ZEFileCache::CheckCompleteness()
 		return false;
 	}
 	
-	if (!File.Seek(Cursor, ZE_SF_BEGINING))
+	if (File.Seek(Cursor, ZE_SF_BEGINING) != 0)
 	{
 		zeDebugCheck(true, "File Cache", "Cannot seek");
 		return false;
@@ -65,7 +65,7 @@ bool ZEFileCache::CheckCompleteness()
 	if (Complete == ZE_CACHE_COMPLETENESS)
 		return true;
 	
-	zeLog("Cannot verify completeness of cache file: \"%s\".", File.GetFilePath().ToCString());
+	zeLog("Cannot verify completeness of cache file: \"%s\".", File.GetPath().ToCString());
 	return false;
 }
 
@@ -78,7 +78,7 @@ bool ZEFileCache::PrepareCacheForFirstUse()
 
 	if (File.Write(&Header, sizeof(ZECacheFileHeader), 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write file header to file: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write file header to file: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
@@ -88,7 +88,7 @@ bool ZEFileCache::PrepareCacheForFirstUse()
 	ZEUInt64 Cursor = File.Tell();
 	if (File.Write(&Cursor, sizeof(ZEUInt64), 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write records start position to file: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write records start position to file: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
@@ -96,7 +96,7 @@ bool ZEFileCache::PrepareCacheForFirstUse()
 	ZEUInt64 Complete = ZE_CACHE_COMPLETENESS;
 	if (File.Write(&Complete, sizeof(ZEUInt64), 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write completeness flag to file: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write completeness flag to file: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
@@ -118,27 +118,27 @@ bool ZEFileCache::CopyData(ZEFile* File, ZEUInt64 From, ZEUInt64 Size, ZEUInt64 
 	if (LeftOver != 0)
 	{
 		// Go to beginning of leftover
-		if (!File->Seek((ZEInt64)From + (ZEInt64)Size - LeftOver, ZE_SF_BEGINING))
+		if (File->Seek((ZEInt64)From + (ZEInt64)Size - LeftOver, ZE_SF_BEGINING) != 0)
 		{
-			zeDebugCheck(true, "Can not seek. File: \"%s\".", File->GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not seek. File: \"%s\".", File->GetPath().ToCString());
 			return false;
 		}
 
 		if (File->Read(Buffer, LeftOver, 1) != 1)
 		{
-			zeDebugCheck(true, "Can not read. File: \"%s\".", File->GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not read. File: \"%s\".", File->GetPath().ToCString());
 			return false;
 		}
 
-		if (!File->Seek((ZEInt64)To + (ZEInt64)Size - LeftOver, ZE_SF_BEGINING))
+		if (File->Seek((ZEInt64)To + (ZEInt64)Size - LeftOver, ZE_SF_BEGINING) != 0)
 		{
-			zeDebugCheck(true, "Can not seek. File: \"%s\".", File->GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not seek. File: \"%s\".", File->GetPath().ToCString());
 			return false;
 		}
 
 		if (File->Write(Buffer, LeftOver, 1) != 1)
 		{
-			zeDebugCheck(true, "Can not write. File: \"%s\".", File->GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not write. File: \"%s\".", File->GetPath().ToCString());
 			return false;
 		}
 	}
@@ -146,27 +146,27 @@ bool ZEFileCache::CopyData(ZEFile* File, ZEUInt64 From, ZEUInt64 Size, ZEUInt64 
 	// Copy backward to avoid corruption due to overlap
 	for (ZESize I = (ZESize)Count; I > 0; --I)
 	{
-		if (!File->Seek((ZEInt64)From + (I - 1) * (ZEInt64)BufferSize, ZE_SF_BEGINING))
+		if (File->Seek((ZEInt64)From + (I - 1) * (ZEInt64)BufferSize, ZE_SF_BEGINING) != 0)
 		{
-			zeDebugCheck(true, "Can not seek. File: \"%s\".", File->GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not seek. File: \"%s\".", File->GetPath().ToCString());
 			return false;
 		}
 		
 		if (File->Read(Buffer, BufferSize, 1) != 1)
 		{
-			zeDebugCheck(true, "Can not read. File: \"%s\".", File->GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not read. File: \"%s\".", File->GetPath().ToCString());
 			return false;
 		}
 		
-		if (!File->Seek((ZEInt64)To + (I - 1) * (ZEInt64)BufferSize, ZE_SF_BEGINING))
+		if (File->Seek((ZEInt64)To + (I - 1) * (ZEInt64)BufferSize, ZE_SF_BEGINING) != 0)
 		{
-			zeDebugCheck(true, "Can not seek. File: \"%s\".", File->GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not seek. File: \"%s\".", File->GetPath().ToCString());
 			return false;
 		}
 		
 		if (File->Write(Buffer, BufferSize, 1) != 1)
 		{
-			zeDebugCheck(true, "Can not write. File: \"%s\".", File->GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not write. File: \"%s\".", File->GetPath().ToCString());
 			return false;
 		}
 	}
@@ -181,14 +181,13 @@ bool ZEFileCache::IsFileCache(ZEString FileName)
 {
 	ZEFile Check;
 
-	if(!Check.Open(FileName, ZE_FM_READ_WRITE, true))
+	if(!Check.Open(FileName, ZE_FOM_READ_WRITE, ZE_FCT_OPEN_CREATE))
 	{
-		Check.Close();
 		zeError("Cannot open file to check the format");
 		return false;
 	}
 
-	if (Check.GetFileSize() == 0)
+	if (Check.GetSize() == 0)
 	{
 		Check.Close();
 		return true;
@@ -229,7 +228,7 @@ bool ZEFileCache::Open(ZEString FileName)
 	// If file is not open return
 	if(IsOpen())
 	{
-		zeLog("Cache is already open with the file \"%s\".", File.GetFilePath().ToCString());
+		zeLog("Cache is already open with the file \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
@@ -238,11 +237,11 @@ bool ZEFileCache::Open(ZEString FileName)
 		return false;
 
 	// Open
-	if (!File.Open(FileName.GetValue(), ZE_FM_READ_WRITE, true))
+	if (!File.Open(FileName, ZE_FOM_READ_WRITE, ZE_FCT_OPEN_CREATE))
 		return false;
 
 	// If it is a new file
-	if (File.GetFileSize() == 0)
+	if (File.GetSize() == 0)
 	{
 		PrepareCacheForFirstUse();
 		return true;
@@ -269,7 +268,7 @@ bool ZEFileCache::Open(ZEFile* File)
 	this->File = *File;
 
 	// If it is a new file
-	if (this->File.GetFileSize() == 0)
+	if (this->File.GetSize() == 0)
 	{
 		PrepareCacheForFirstUse();
 		return true;
@@ -310,7 +309,7 @@ bool ZEFileCache::Clear()
 
 	ZEString FileName;
 
-	FileName = File.GetFilePath();
+	FileName = File.GetPath();
 	Close();
 
 	// Remove the file
@@ -327,7 +326,7 @@ bool ZEFileCache::Clear()
 // Returns the cache file name
 const ZEString ZEFileCache::GetCacheFilePath()
 {
-	return File.GetFilePath();
+	return File.GetPath();
 }
 
 ZEFile ZEFileCache::GetFile()
@@ -368,18 +367,18 @@ bool ZEFileCache::IdentifierExists(const ZECacheDataIdentifier* Identifier)
 	ZESize ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Get end of file
-	if (!File.Seek((ZEInt64)0, ZE_SF_END))
+	if (File.Seek((ZEInt64)0, ZE_SF_END) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
 	ZEUInt64 EndOfFile = File.Tell();
 
 	// Get records start and end position
-	if (!File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END))
+	if (File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		false;
 	}
 	
@@ -388,7 +387,7 @@ bool ZEFileCache::IdentifierExists(const ZECacheDataIdentifier* Identifier)
 
 	if (File.Read(&RecordsStartPosition, ZEQuadWordSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
@@ -401,9 +400,9 @@ bool ZEFileCache::IdentifierExists(const ZECacheDataIdentifier* Identifier)
 	// Search for the identifier between CurrentPosition && EndOfFile
 	while (NextHeaderPosition < RecordsEndPosition)
 	{
-		if (!File.Seek((ZEInt64)NextHeaderPosition, ZE_SF_BEGINING))
+		if (File.Seek((ZEInt64)NextHeaderPosition, ZE_SF_BEGINING) != 0)
 		{
-			zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 			return false;
 		}
 		
@@ -411,15 +410,14 @@ bool ZEFileCache::IdentifierExists(const ZECacheDataIdentifier* Identifier)
 		ZECacheIdentifierChunk Header = {0};
 		if (File.Read(&Header, ZEIdentifierChunkSize, 1) != 1)
 		{
-			zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetPath().ToCString());
 			return false;
 		}
 		
 		if (Header.ChunkId != ZE_CACHE_IDENT_CHUNKID)
 		{
 			zeLog("Identifier Chunk Id does not match! Possible Corruption");
-			zeLog("Cleaning cache: \"%s\".", File.GetFilePath().ToCString());
-			zeDebugCheck(true, "Identifier Chunk Id does not match! Possible Corruption");
+			zeLog("Cleaning cache: \"%s\".", File.GetPath().ToCString());
 			Clear();
 			return false;
 		}
@@ -462,9 +460,9 @@ bool ZEFileCache::AddData(const ZECacheDataIdentifier* Identifier, const void* D
 	ZESize ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Go to the end of records
-	if (!File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END))
+	if (File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
@@ -475,7 +473,7 @@ bool ZEFileCache::AddData(const ZECacheDataIdentifier* Identifier, const void* D
 	ZEUInt64 OldRecordsStartPosition = 0;
 	if (File.Read(&OldRecordsStartPosition, ZEQuadWordSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
@@ -492,9 +490,9 @@ bool ZEFileCache::AddData(const ZECacheDataIdentifier* Identifier, const void* D
 	ZEUInt64 NewChunkPosition = OldRecordsStartPosition;
 
 	// Goto new chunk position
-	if (!File.Seek((ZEInt64)NewChunkPosition, ZE_SF_BEGINING))
+	if (File.Seek((ZEInt64)NewChunkPosition, ZE_SF_BEGINING) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
@@ -502,21 +500,21 @@ bool ZEFileCache::AddData(const ZECacheDataIdentifier* Identifier, const void* D
 	ZECacheDataChunk DataChunk = {ZE_CACHE_DATA_CHUNKID};
 	if (File.Write(&DataChunk, ZEDataChunkSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
 	// Write data
 	if (File.Write(Data, Size, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetFilePath().ToCString());
+		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
 	// Goto the new records end position
-	if (!File.Seek((ZEInt64)(NewRecordStartPosition + OldRecordsSize), ZE_SF_BEGINING))
+	if (File.Seek((ZEInt64)(NewRecordStartPosition + OldRecordsSize), ZE_SF_BEGINING) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
@@ -524,16 +522,16 @@ bool ZEFileCache::AddData(const ZECacheDataIdentifier* Identifier, const void* D
 	// Write the dummy header and the identifier parameter
 	if (File.Write(&IdentifierChunk, ZEIdentifierChunkSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
 	ZEUInt64 IdentifierSize = Identifier->Write(&File);
 
 	// Goto the header start position
-	if (!File.Seek((ZEInt64)(NewRecordStartPosition + OldRecordsSize), ZE_SF_BEGINING))
+	if (File.Seek((ZEInt64)(NewRecordStartPosition + OldRecordsSize), ZE_SF_BEGINING) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
@@ -546,22 +544,22 @@ bool ZEFileCache::AddData(const ZECacheDataIdentifier* Identifier, const void* D
 	// Write the real header
 	if (File.Write(&IdentifierChunk, ZEIdentifierChunkSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
 
 	// Go to the end of the records
-	if (!File.Seek((ZEInt64)0, ZE_SF_END))
+	if (File.Seek((ZEInt64)0, ZE_SF_END) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
 	// Write the records start position
 	if (File.Write(&NewRecordStartPosition, ZEQuadWordSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
@@ -569,7 +567,7 @@ bool ZEFileCache::AddData(const ZECacheDataIdentifier* Identifier, const void* D
 	ZEUInt64 Complete = ZE_CACHE_COMPLETENESS;
 	if (File.Write(&Complete, ZEQuadWordSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
@@ -603,9 +601,9 @@ bool ZEFileCache::Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 	ZESize ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Go to the end of records
-	if (!File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END))
+	if (File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 		
@@ -616,7 +614,7 @@ bool ZEFileCache::Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 	ZEUInt64 OldRecordsStartPosition = 0;
 	if (File.Read(&OldRecordsStartPosition, ZEQuadWordSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 		
@@ -633,16 +631,16 @@ bool ZEFileCache::Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 	ZEUInt64 NewChunkPosition = OldRecordsStartPosition;
 
 	// Go to chunk start pos and write data header
-	if (!File.Seek((ZEInt64)NewChunkPosition, ZE_SF_BEGINING))
+	if (File.Seek((ZEInt64)NewChunkPosition, ZE_SF_BEGINING) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
 	ZECacheDataChunk DataChunk = {ZE_CACHE_DATA_CHUNKID};
 	if (File.Write(&DataChunk, ZEDataChunkSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
@@ -650,9 +648,9 @@ bool ZEFileCache::Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 	PartialFile->Open(&File, NewChunkPosition + ZEDataChunkSize, ChunkSize);
 
 	// Goto the new records end position
-	if (!File.Seek((ZEInt64)(NewRecordStartPosition + OldRecordsSize), ZE_SF_BEGINING))
+	if (File.Seek((ZEInt64)(NewRecordStartPosition + OldRecordsSize), ZE_SF_BEGINING) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
@@ -660,21 +658,21 @@ bool ZEFileCache::Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 	// Write the dummy header and the identifier parameter
 	if (File.Write(&IdentifierChunk, ZEIdentifierChunkSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
 	ZEUInt64 IdentifierSize = Identifier->Write(&File);
 	if (IdentifierSize == 0)
 	{
-		zeDebugCheck(true, "Can not write identifier. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write identifier. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
 	// Goto the header start position
-	if (!File.Seek((ZEInt64)(NewRecordStartPosition + OldRecordsSize), ZE_SF_BEGINING))
+	if (File.Seek((ZEInt64)(NewRecordStartPosition + OldRecordsSize), ZE_SF_BEGINING) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
@@ -687,21 +685,21 @@ bool ZEFileCache::Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 	// Write the real header
 	if (File.Write(&IdentifierChunk, ZEIdentifierChunkSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
 	// Go to the end of the records
-	if (!File.Seek((ZEInt64)0, ZE_SF_END))
+	if (File.Seek((ZEInt64)0, ZE_SF_END) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
 	// Write the records start position
 	if (File.Write(&NewRecordStartPosition, ZEQuadWordSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 	
@@ -709,7 +707,7 @@ bool ZEFileCache::Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 	ZEUInt64 Complete = ZE_CACHE_COMPLETENESS;
 	if (File.Write(&Complete, ZEQuadWordSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not write. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
@@ -745,9 +743,9 @@ bool ZEFileCache::GetData(const ZECacheDataIdentifier* Identifier, void* Buffer,
 	// Get hash from identifier
 	ZEUInt64 Hash = Identifier->GetHash();
 	// Go to end of records
-	if (!File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END))
+	if (File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
@@ -758,7 +756,7 @@ bool ZEFileCache::GetData(const ZECacheDataIdentifier* Identifier, void* Buffer,
 	ZEUInt64 RecordStartPosition = 0;
 	if (File.Read(&RecordStartPosition, ZEQuadWordSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
@@ -767,9 +765,9 @@ bool ZEFileCache::GetData(const ZECacheDataIdentifier* Identifier, void* Buffer,
 	while (CurrentHeaderPosition < RecordsEndPosition)
 	{
 		// Go to the next header position
-		if (!File.Seek((ZEInt64)CurrentHeaderPosition, ZE_SF_BEGINING))
+		if (File.Seek((ZEInt64)CurrentHeaderPosition, ZE_SF_BEGINING) != 0)
 		{
-			zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 			return false;
 		}
 
@@ -777,14 +775,14 @@ bool ZEFileCache::GetData(const ZECacheDataIdentifier* Identifier, void* Buffer,
 		ZECacheIdentifierChunk IdentifierChunk;
 		if (File.Read(&IdentifierChunk, ZEIdentifierChunkSize, 1) != 1)
 		{
-			zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetPath().ToCString());
 			return false;
 		}
 
 		// Check if the header readable
 		if (IdentifierChunk.ChunkId != ZE_CACHE_IDENT_CHUNKID)
 		{
-			zeLog("Identifier Chunk Id does not match! Possible Corruption. File Name: \"%s\".", (File.GetFilePath()).ToCString());
+			zeLog("Identifier Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetPath().ToCString());
 			return false;
 		}
 
@@ -792,9 +790,9 @@ bool ZEFileCache::GetData(const ZECacheDataIdentifier* Identifier, void* Buffer,
 		if (IdentifierChunk.ChunkHash == Hash && IdentifierChunk.ChunkSize == Size && Identifier->Equal(&File))
 		{
 			// Goto the chunk data position
-			if (!File.Seek((ZEInt64)IdentifierChunk.ChunkPosition, ZE_SF_BEGINING))
+			if (File.Seek((ZEInt64)IdentifierChunk.ChunkPosition, ZE_SF_BEGINING) != 0)
 			{
-				zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+				zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 				return true;
 			}
 
@@ -802,13 +800,13 @@ bool ZEFileCache::GetData(const ZECacheDataIdentifier* Identifier, void* Buffer,
 			ZECacheDataChunk DataChunk;
 			if (File.Read(&DataChunk, ZEDataChunkSize, 1) != 1)
 			{
-				zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetFilePath().GetValue());
+				zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetPath().ToCString());
 				return false;
 			}
 
 			if(DataChunk.ChunkId != ZE_CACHE_DATA_CHUNKID)
 			{
-				zeLog("Data Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetFilePath().ToCString());
+				zeLog("Data Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetPath().ToCString());
 				return false;
 			}
 
@@ -851,9 +849,9 @@ bool ZEFileCache::OpenData(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 	ZESize ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Get records start and end position
-	if (!File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END))
+	if (File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END) != 0)
 	{
-		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 		return true;
 	}
 	ZEUInt64 RecordEndPosition = File.Tell();
@@ -861,7 +859,7 @@ bool ZEFileCache::OpenData(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 	ZEUInt64 RecordsStartPosition = 0;
 	if(File.Read(&RecordsStartPosition, ZEQuadWordSize, 1) != 1)
 	{
-		zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetFilePath().GetValue());
+		zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetPath().ToCString());
 		return false;
 	}
 
@@ -872,9 +870,9 @@ bool ZEFileCache::OpenData(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 	while(NextHeaderPosition < RecordEndPosition)
 	{
 		// Goto next header position
-		if (!File.Seek((ZEInt64)NextHeaderPosition, ZE_SF_BEGINING))
+		if (File.Seek((ZEInt64)NextHeaderPosition, ZE_SF_BEGINING) != 0)
 		{
-			zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 			return false;
 		}
 
@@ -882,14 +880,14 @@ bool ZEFileCache::OpenData(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 		ZECacheIdentifierChunk IdentifierChunk;
 		if (File.Read(&IdentifierChunk, ZEIdentifierChunkSize, 1) != 1)
 		{
-			zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+			zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 			return false;
 		}
 
 		// If header is not corrupted
 		if (IdentifierChunk.ChunkId != ZE_CACHE_IDENT_CHUNKID)
 		{
-			zeLog("Identifier Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetFilePath().ToCString());
+			zeLog("Identifier Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetPath().ToCString());
 			return false;
 		}
 
@@ -897,22 +895,22 @@ bool ZEFileCache::OpenData(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 		if(Identifier->Equal(&File))
 		{
 			// Read data chunk id
-			if (!File.Seek(IdentifierChunk.ChunkPosition, ZE_SF_BEGINING))
+			if (File.Seek(IdentifierChunk.ChunkPosition, ZE_SF_BEGINING) != 0)
 			{
-				zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetFilePath().GetValue());
+				zeDebugCheck(true, "Can not seek. File: \"%s\".", File.GetPath().ToCString());
 				return false;
 			}
 
 			ZECacheDataChunk	DataChunk;
 			if (File.Read(&DataChunk, ZEDataChunkSize, 1) != 1)
 			{
-				zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetFilePath().GetValue());
+				zeDebugCheck(true, "Can not read. File: \"%s\".", File.GetPath().ToCString());
 				return true;
 			}
 
 			if(DataChunk.ChunkId != ZE_CACHE_DATA_CHUNKID)
 			{
-				zeLog("Data Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetFilePath().ToCString());
+				zeLog("Data Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetPath().ToCString());
 				return false;
 			}
 

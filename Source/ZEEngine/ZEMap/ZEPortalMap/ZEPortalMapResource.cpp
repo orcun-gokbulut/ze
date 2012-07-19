@@ -47,6 +47,7 @@
 
 
 #include <string.h>
+#include "ZEFile/ZEFileInfo.h"
 
 // Reading
 #define ZE_SHADER_SKINTRANSFORM				1
@@ -95,7 +96,7 @@ const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(const ZEString
 		if (TextureResources[I]->GetFileName() == FileName)
 			return TextureResources[I]->GetTexture();
 
-	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(ZEFile::GetParentDirectory(this->GetFileName()) + "\\" + FileName);
+	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(ZEFileInfo::GetParentDirectory(this->GetFileName()) + "\\" + FileName);
 	if (NewTextureResource == NULL)
 	{
 		zeError("Can not load texture file. (FileName : \"%s\")", FileName.ToCString());
@@ -325,20 +326,20 @@ bool ZEPortalMapResource::ReadDoorsFromFile(ZEFile* ResourceFile)
 
 bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
 {
-	zeLog("Loading map file \"%s\".", ResourceFile->GetFilePath().GetValue());
+	zeLog("Loading map file \"%s\".", ResourceFile->GetPath().GetValue());
 
 	ZEMapFileHeader TempHeader;
 	ResourceFile->Read(&TempHeader, sizeof(ZEMapFileHeader), 1);
 
 	if(TempHeader.Header!= ZE_MAP_HEADER)
 	{
-		zeError("Unknown ZEMap file format. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("Unknown ZEMap file format. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
 		return false;
 	}
 	
 	if(TempHeader.Version != ZE_MAP_VERSION)
 	{	
-		zeError("ZEMap file version mismatched. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("ZEMap file version mismatched. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
 		return false;
 	}
 
@@ -348,23 +349,23 @@ bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
 
 	if (!ReadMaterialsFromFile(ResourceFile))
 	{
-		zeError("File is corrupted. Can not read materials from file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("File is corrupted. Can not read materials from file. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
 		return false;
 	}
 
 	if (!ReadPortalsFromFile(ResourceFile))
 	{
-		zeError("File is corrupted. Can not read portals from file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("File is corrupted. Can not read portals from file. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
 		return false;
 	}
 
 	if (!ReadDoorsFromFile(ResourceFile))
 	{
-		zeError("File is corrupted. Can not read doors from file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("File is corrupted. Can not read doors from file. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
 		return false;
 	}
 
-	zeLog("Map file \"%s\" has been loaded.", ResourceFile->GetFilePath().GetValue());
+	zeLog("Map file \"%s\" has been loaded.", ResourceFile->GetPath().GetValue());
 
 	return true;
 }
@@ -446,10 +447,13 @@ ZEPortalMapResource* ZEPortalMapResource::LoadResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
+	bool Result;
+	ZEFile ResourceFile;
+
 
 	// Open ZEMap file
-	ZEFile* ResourceFile = ZEFile::Open(NewPath);
-	if (ResourceFile != NULL && ResourceFile->IsOpen())
+	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	if (Result)
 	{
 		// Create ZEMapResource
 		ZEPortalMapResource* MapResource = new ZEPortalMapResource();
@@ -457,17 +461,15 @@ ZEPortalMapResource* ZEPortalMapResource::LoadResource(const ZEString& FileName)
 		MapResource->Cached = false;
 		MapResource->ReferenceCount = 0;
 
-		if (!MapResource->ReadMapFromFile(ResourceFile))
+		if (!MapResource->ReadMapFromFile(&ResourceFile))
 		{
 			zeError("Can not load map resource. (FileName : \"%s\")", NewPath.GetValue());
-			ResourceFile->Close();
-			delete ResourceFile;
+			ResourceFile.Close();
 			delete MapResource;
 			return NULL;
 		}
 		
-		ResourceFile->Close();
-		delete ResourceFile;
+		ResourceFile.Close();
 
 		return MapResource;
 	}

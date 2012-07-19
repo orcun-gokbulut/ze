@@ -168,18 +168,18 @@ ZEString ZEFileUtils::GetFileName(const ZEFileSearchStream* FindData)
     return ZEString(FindData->Name);
 }
 
-ZESize ZEFileUtils::GetFileSize(const ZEString& Path)
+ZEInt64 ZEFileUtils::GetFileSize(const ZEString& Path)
 {
     struct stat Stat;
 
-    return GetStats(Path, &Stat) ? (ZESize)Stat.st_size : 0;
+    return GetStats(Path, &Stat) ? (ZEInt64)Stat.st_size : -1;
 }
 
 // Returns the size of a file from ZEFileSearchStream
-ZESize ZEFileUtils::GetFileSize(const ZEFileSearchStream* FindData)
+ZEInt64 ZEFileUtils::GetFileSize(const ZEFileSearchStream* FindData)
 {
     // On Unix implementation just return size
-    return (ZESize)FindData->Data.st_size;
+    return (ZEInt64)FindData->Data.st_size;
 }
 
 bool ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEString& Path)

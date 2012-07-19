@@ -35,6 +35,11 @@
 
 #include "ZEUnserializer.h"
 
+ZEUnserializer::ZEUnserializer()
+{
+
+}
+
 ZEUnserializer::~ZEUnserializer()
 {
 

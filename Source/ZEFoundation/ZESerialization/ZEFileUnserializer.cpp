@@ -36,9 +36,9 @@
 #include "ZEFileUnserializer.h"
 #include <stdio.h>
 
-ZEUInt64 ZEFileUnserializer::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
+ZESize ZEFileUnserializer::Read(void* Buffer, const ZESize Size, const ZESize Count)
 {
-	return fread(Buffer, (ZESize)Size, (ZESize)Count, (FILE*)File);
+	return fread(Buffer, Size, Count, (FILE*)File);
 }
 
 bool ZEFileUnserializer::OpenFile(const char* FileName)

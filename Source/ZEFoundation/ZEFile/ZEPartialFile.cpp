@@ -37,420 +37,14 @@
 
 #include "ZEError.h"
 #include "ZEPartialFile.h"
+#include "ZEFile.h"
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <sys/stat.h>
-
-#pragma warning(push)
-#pragma warning(disable:4996 4267)
-
-#if defined(ZE_PLATFORM_COMPILER_GCC)
-	#define _fseeki64 fseeko64
-	#define _ftelli64 ftello64
-#endif
-
-bool ZEPartialFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
-{
-	//zeDebugCheck(IsOpen(), "Close the previous file first");
-
-	//ZEString String;
-	//ZEString PurePath;
-
-	//ZEUInt64 EndCursor = 0;
-	//ZEUInt64 StartCursor = 0;
-	//
-	//ZEUInt EndIndex = 0;
-	//ZEUInt StartIndex = 0;
-	//
-	//ZEUInt PathSize = FilePath.GetSize() - 1;
-	//for(ZESize I = 0; I < PathSize; I++)
-	//{
-	//	if(FilePath[I] == ':')
-	//	{
-	//		StartIndex = I + 1;
-	//		for(ZESize J = I; J < PathSize; J++)
-	//		{
-	//			if(FilePath[J] == '-')
-	//			{
-	//				EndIndex = J - 1;
-	//				String = FilePath.SubString(StartIndex, EndIndex);
-	//				StartCursor = _strtoui64(String.GetValue(), NULL, 10);
-
-	//				StartIndex = J + 1;
-	//				for(ZESize K = J; K < PathSize; K++)
-	//				{
-	//					if(FilePath[K] == '\0')
-	//					{
-	//						EndIndex = K - 1;
-	//						String = FilePath.SubString(StartIndex, EndIndex);
-	//						EndCursor = _strtoui64(String.GetValue(), NULL, 10);
-
-	//						PurePath = FilePath.Left(I);
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
-	//if(!EndCursor || !StartCursor || EndCursor == StartCursor)
-	//{
-	//	zeError("Cannot resolve path: \"%s\".", FilePath.GetValue());
-	//	return false;
-	//}
-
-	//const char* StrMode = NULL;
-	//const char*	AltStrMode = NULL;
-
-	//switch(Mode)
-	//{
-	//	case ZE_FM_READ_ONLY:
-	//	{
-	//		if (Binary)		
-	//			StrMode = "rb";
-	//		else
-	//			StrMode = "r";
-	//		break;
-	//	}
-
-	//	case ZE_FM_WRITE_ONLY:
-	//	{
-	//		if (Binary)
-	//		{
-	//			StrMode = "r+b";
-	//			AltStrMode = "w+b";
-	//		}
-	//		else
-	//		{
-	//			StrMode = "r+";
-	//			AltStrMode = "w+";
-	//		}
-	//		break;
-	//	}
-
-	//	case ZE_FM_APPEND_ONLY:
-	//	{
-	//		if (Binary)
-	//			StrMode = "ab";
-	//		else
-	//			StrMode = "a";
-	//		break;
-	//	}
-
-	//	case ZE_FM_READ_APPEND:
-	//	{
-	//		if(Binary)
-	//			StrMode = "a+b";
-	//		else
-	//			StrMode = "a+";
-	//		break;
-	//	}
-
-	//	case ZE_FM_READ_WRITE:
-	//	{
-	//		if(Binary)
-	//		{
-	//			StrMode = "r+b";
-	//			AltStrMode = "w+b";
-	//		}
-	//		else
-	//		{
-	//			StrMode = "r+";
-	//			AltStrMode = "w+";
-	//		}
-	//		break;
-	//	}
-
-	//	default:
-	//	{
-	//		return false;
-	//		break;	
-	//	}
-	//}
-
-	//// Try to open file
-	//File = fopen(PurePath.GetValue(), StrMode);
-
-	//if(File == NULL) // If cant open
-	//{
-	//	if(AltStrMode) // If there is an alternative opening mode
-	//	{
-	//		// Try to open with alternative mode
-	//		File = fopen(PurePath.GetValue(), AltStrMode);
-
-	//		if(File != NULL) // If opened
-	//		{
-	//			this->FilePath		= PurePath;
-	//			this->FileCursor	= StartPosition;
-	//			this->StartPosition = StartCursor;
-	//			this->EndPosition	= EndCursor;
-	//			this->IsEof			= false;
-	//			_fseeki64((FILE*)this->File, StartPosition, SEEK_SET);
-	//			return true;
-	//		}
-	//		else
-	//		{
-	//			zeError("Could not open file \"%s\".", PurePath.GetValue());
-	//			return false;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		zeError("Could not open file \"%s\".", PurePath.GetValue());
-	//		return false;
-	//	}
-	//}
-	//else
-	//{
-	//	this->FilePath		= PurePath;
-	//	this->FileCursor	= StartPosition;
-	//	this->StartPosition = StartCursor;
-	//	this->EndPosition	= EndCursor;
-	//	this->IsEof			= false;
-	//	_fseeki64((FILE*)this->File, StartPosition, SEEK_SET);
-	//	return true;
-	//}
-
-	return false;
-}
-
-bool ZEPartialFile::Open(ZEFile* ParentFile, ZEUInt64 Offset, ZEUInt64 Size)
-{
-	zeDebugCheck(IsOpen(), "File is already open. File Name: \"%s\".", FilePath.GetValue());
-	zeDebugCheck(!ParentFile->IsOpen(), "Parent file is not open. File Name: \"%s\".", FilePath.GetValue());
-	zeDebugCheck(Size == 0, "Cannot open a PartialFile with 0 size. File Name: \"%s\".", ParentFile->GetFilePath().GetValue());
-
-	this->StartPosition = ParentFile->GetStartPosition() + Offset;
-	this->EndPosition	= StartPosition + Size;
-		
-	this->FileType			= ZE_FT_PARTIAL;
-	this->File				= ParentFile->GetFileHandle();
-	this->FilePath			= ParentFile->GetFilePath();
-	this->ParentFile		= ParentFile;
-	this->IsEof				= false;
-	this->FileCursor		= StartPosition;
-	this->ReferenceCount	= 0;
-
-	ParentFile->IncreaseReferenceCount();
-	
-	_fseeki64((FILE*)this->File, StartPosition, SEEK_SET);
-	return true;
-}
-
-void ZEPartialFile::Close()
-{
-	// Parent File will close itself if and only if its reference count is zero
-	if (ParentFile != NULL)
-		ParentFile->DecreaseReferenceCount();
-	
-	// Close the partial file
-	ReferenceCount	= 0;
-	StartPosition	= 0;
-	EndPosition		= 0;
-	ParentFile		= NULL;
-	File			= NULL;
-	IsEof			= false;
-
-	FilePath.Clear();
-}
-
-ZEUInt64 ZEPartialFile::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
-{
-	if(!IsOpen())
-		return 0;
-
-	// Goto this File's cursor position
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-
-	if(FileCursor < StartPosition || EndPosition < FileCursor)
-		return 0;
-
-	// Calculate the maximum possible read count
-	ZEUInt64 ReadEndPos = _ftelli64((FILE*)File) + Size * Count;
-	if (ReadEndPos > EndPosition)
-	{
-		Count -= (ReadEndPos - EndPosition) / Size + (((ReadEndPos - EndPosition) % Size) == 0 ? 0 : 1);
-		IsEof = true;
-	}
-
-	// Read
-	ZEUInt64 ReadCount = fread(Buffer, (ZESize)Size, (ZESize)Count, (FILE*)File);
-	FileCursor += ReadCount * Size;
-
-	return ReadCount;
-}
-
-ZEUInt64 ZEPartialFile::ReadFormated(const char* Format, ...)
-{
-	if(!IsOpen())
-		return 0;
-
-	// Goto this File's cursor position
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-
-	// Check if the cursor is in the file boundary
-	if(FileCursor < StartPosition || EndPosition < FileCursor)
-		return 0;
-
-	zeDebugCheck(true, "Not Implemented Yet.");
-	// 	va_list ArgList;
-	// 
-	// 	va_start(ArgList, Format);
-	// 	ZESize CharCount = _tinput_l(File, Format, 0, ArgList);
-	// 	va_end(ArgList);
-
-	return 0;
-}
-
-ZEUInt64 ZEPartialFile::Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
-{
-	if(!IsOpen())
-		return 0;
-
-	// Goto this File's cursor position
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-
-	// Check if the cursor is in the file boundary
-	if(FileCursor < StartPosition || EndPosition < FileCursor)
-		return 0;
-
-	// Calculate the maximum possible write count
-	ZEUInt64 WriteEndPos = _ftelli64((FILE*)File) + Size * Count;
-	if (WriteEndPos > EndPosition)
-	{
-		Count -= (WriteEndPos - EndPosition) / Size + (((WriteEndPos - EndPosition) % Size) == 0 ? 0 : 1);
-		IsEof = true;
-	}
-
-	ZEUInt64 WriteCount = fwrite(Buffer, (ZESize)Size, (ZESize)Count, (FILE*)File);
-	FileCursor += WriteCount * Size;
-
-	return WriteCount;
-}
-
-ZEUInt64 ZEPartialFile::WriteFormated(const char* Format, ...)
-{
-	if(!IsOpen())
-		return 0;
-
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-	if(FileCursor < StartPosition || EndPosition < FileCursor)
-		return 0;
-
-	va_list ArgList;
-
-	va_start(ArgList, Format);
-	ZEUInt64 WriteSize = vfprintf((FILE*)File, Format, ArgList);
-	FileCursor += WriteSize;
-	va_end(ArgList);
-
-	return WriteSize;
-}
-
-/* If the seek operation tends to go beyond end position or below start position
-the file cursor remains as it is and the return will be false */
-bool ZEPartialFile::Seek(ZEInt64 Offset, ZESeekFrom Origin)
-{
-	if(!IsOpen())
-		return 0;
-
-	switch(Origin)
-	{
-			case ZE_SF_BEGINING:
-			{
-				if(Offset < 0 || EndPosition < StartPosition + Offset)
-					return false;
-
-				if(_fseeki64((FILE*)File, StartPosition + Offset, SEEK_SET) != 0)
-					return false;
-
-				break;
-			}
-
-			case ZE_SF_CURRENT:
-			{
-				_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-
-				ZEUInt64 CurrentPosition = 0;
-				CurrentPosition = _ftelli64((FILE*)File);
-
-				if(CurrentPosition + Offset < StartPosition || EndPosition < CurrentPosition + Offset)
-					return false;
-
-				if(_fseeki64((FILE*)File, Offset, SEEK_CUR) != 0)
-					return false;
-
-				break;
-			}
-
-			case ZE_SF_END:
-			{
-				if(EndPosition + Offset < StartPosition || Offset > 0)
-					return false;
-
-				if(_fseeki64((FILE*)File, EndPosition + Offset, SEEK_SET) != 0)
-					return false;
-
-				break;
-			}
-
-			default:
-				return false;
-				break;
-	}
-
-	FileCursor = _ftelli64((FILE*)File);
-
-	if(IsEof == true && FileCursor >= StartPosition && FileCursor < EndPosition)
-		IsEof = false;
-
-	return true;
-}
-
-ZEUInt64 ZEPartialFile::Tell()
-{
-	return FileCursor - StartPosition;
-}
-
-ZEUInt64 ZEPartialFile::GetStartPosition()
-{
-	return StartPosition;
-}
-
-ZEUInt64 ZEPartialFile::GetEndPosition()
-{
-	return EndPosition;
-}
-
-ZEUInt64 ZEPartialFile::GetFileSize() const
-{
-	return EndPosition - StartPosition;	
-}
-
-bool ZEPartialFile::Eof()
-{
-	return IsEof;
-}
-
-ZEUInt ZEPartialFile::IncreaseReferenceCount()
-{
-	ParentFile->IncreaseReferenceCount();
-	return ++ReferenceCount;
-}
-
-ZEUInt ZEPartialFile::DecreaseReferenceCount()
-{
-	ParentFile->DecreaseReferenceCount();
-	return --ReferenceCount;
-}
 
 ZEPartialFile::ZEPartialFile()
 {
-	StartPosition	= 0;
-	EndPosition		= 0;
-	File			= NULL;
-	IsEof			= false;
+	EoF = false;
+	EndPosition = 0;
+	StartPosition = 0;
 }
 
 ZEPartialFile::~ZEPartialFile()
@@ -458,4 +52,166 @@ ZEPartialFile::~ZEPartialFile()
 	Close();
 }
 
-#pragma warning(pop)
+ZEInt ZEPartialFile::Close()
+{
+	ZEInt Result;
+	
+	Result = ZEFile::Close();
+	if (Result != 0)
+		return Result;
+	
+	EoF = false;
+	EndPosition = 0;
+	StartPosition = 0;
+
+	return Result;
+}
+
+bool ZEPartialFile::Open(const ZEFile* ParentFile, const ZEInt64 Offset, const ZEInt64 Size)
+{
+	zeDebugCheck(Size < 0, "Negative size");
+	zeDebugCheck(Offset < 0, "Negative offset");
+
+	if (!ZEFile::Open(ParentFile->GetPath(), ParentFile->GetOpenMode(),  ParentFile->GetCreationType()))	
+		return false;
+
+	if (ZEFile::Seek(Offset, ZE_SF_BEGINING) != 0)
+	{
+		Close();
+		return false;
+	}
+	
+	StartPosition = Offset;
+	EndPosition = Offset + Size;
+
+	return true;
+}
+
+
+bool ZEPartialFile::Open(const ZEString& FilePath, ZEFileOpenMode OpenType, ZEFileCreationType CreationType)
+{
+	if(!ZEFile::Open(FilePath, OpenType, CreationType))
+		return false;
+
+	EndPosition = 0;
+	StartPosition = 0;
+	
+	return true;
+}
+
+ZEInt64 ZEPartialFile::Tell() const
+{	
+	return ZEFile::Tell() - StartPosition;
+}
+
+ZEInt ZEPartialFile::Seek(const ZEInt64 Offset, const ZESeekFrom Origin)
+{	
+	ZEInt64 SeekOffset = Offset;
+	ZESeekFrom SeekOrigin = Origin;
+
+	if (StartPosition != 0 && EndPosition != 0)
+	{
+		ZEInt64 NewPosition;
+		switch (Origin)
+		{
+			case ZE_SF_BEGINING:
+				NewPosition = StartPosition + Offset;
+				break;
+			case ZE_SF_CURRENT:
+				NewPosition = ZEFile::Tell() + Offset;
+				break;
+			case ZE_SF_END:
+				NewPosition = EndPosition + Offset;	
+				break;
+			default:
+				zeError("Wrong seek origin...");
+				break;
+		}
+
+		if (NewPosition < StartPosition || EndPosition < NewPosition)
+			return -1;
+
+		SeekOrigin = ZE_SF_BEGINING;
+		SeekOffset = NewPosition;
+	}
+
+	EoF = false;
+	return ZEFile::Seek(SeekOffset, SeekOrigin);
+}
+
+ZESize ZEPartialFile::Read(void* Buffer, const ZESize Size, const ZESize Count)
+{
+	ZESize ReadCount = Count;
+
+	// File limits are active
+	if (StartPosition != 0 && EndPosition != 0)
+	{
+		ZEInt64 Current = ZEFile::Tell();
+		ZEInt64 ReadEndPos = Current + Size * Count;
+
+		// Truncate the count so that we will not over read
+		if (ReadEndPos > EndPosition)
+		{
+			ReadCount = (EndPosition - Current) / Size;
+			EoF = true;
+		}
+	}
+
+	return ZEFile::Read(Buffer, Size, ReadCount);
+}
+
+ZESize ZEPartialFile::Write(const void* Buffer, const ZESize Size, const ZESize Count)
+{
+	ZESize WriteCount = Count;
+	
+	// File limits are active
+	if (StartPosition != 0 && EndPosition != 0)
+	{
+		ZEInt64 Current = ZEFile::Tell();
+		ZEInt64 WriteEndPos = Current + Size * Count;
+		
+		// Truncate the count so that we will not over write
+		if (WriteEndPos > EndPosition)
+		{
+			WriteCount = (EndPosition - Current) / Size;
+			EoF = true;
+		}
+	}
+
+	return ZEFile::Write(Buffer, Size, WriteCount);
+}
+
+void ZEPartialFile::SetEndPosition(ZEInt64 Position)
+{
+	zeDebugCheck(Position < 0, "Position is negative");
+	zeDebugCheck(Position < StartPosition, "End is lower than start");
+
+	EoF = false;
+	EndPosition = Position;
+}
+
+ZEInt64 ZEPartialFile::GetEndPosition() const
+{
+	return EndPosition;
+}
+
+void ZEPartialFile::SetStartPosition(ZEInt64 Position)
+{
+	zeDebugCheck(Position < 0, "Position is negative");
+	zeDebugCheck(Position > EndPosition, "End is bigger than end");
+	
+	StartPosition = Position;
+}
+
+ZEInt64 ZEPartialFile::GetStartPosition() const
+{
+	return StartPosition;
+}
+
+ZEInt64 ZEPartialFile::GetSize()
+{
+	if (EndPosition == 0 && StartPosition == 0)
+		return ZEFile::GetSize();
+
+	return EndPosition - StartPosition;
+}

@@ -37,612 +37,340 @@
 
 #include "ZEError.h"
 #include "ZEFile.h"
-#include "ZEPartialFile.h"
+#include "ZEPathManager.h"
 
-#include <stdarg.h>
+#pragma warning(push)
+#pragma warning(disable:4996 4267)
+
+
+//#include <stdarg.h>
+
+#include "ZEFileInfo.h"
+
 #include <stdio.h>
-#include <sys/stat.h>
-
-#include <wchar.h>
 
 #if defined(ZE_PLATFORM_COMPILER_GCC)
 	#define _fseeki64 fseeko64
 	#define _ftelli64 ftello64
 #endif
 
-#pragma warning(push)
-#pragma warning(disable:4996 4267)
 
-bool ZEFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
+static ZEString GetErrorString(ZEInt32 ErrorId)
 {
-	zeDebugCheck(IsOpen(), "Close the previous file first");
+	int Result;
+	ZEString Error;
 
-	const char* StrMode = NULL;
-	const char*	AltStrMode = NULL;
+	char ErrorString[256];
 
-	switch(Mode)
+	Result = strerror_s(ErrorString, 256,(int)ErrorId);
+	if (Result == 0)
+    {
+        // Use returned string to form error message
+        Error += ErrorString;
+
+	}
+    else // Fail
 	{
-		case ZE_FM_READ_ONLY:
-		{
-			if (Binary)		
-				StrMode = "rb";
-			else
-				StrMode = "r";
-			break;
-		}
-
-		case ZE_FM_WRITE_ONLY:
-		{
-			if (Binary)
-			{
-				StrMode = "r+b";
-				AltStrMode = "w+b";
-			}
-			else
-			{
-				StrMode = "r+";
-				AltStrMode = "w+";
-			}
-			break;
-		}
-
-		case ZE_FM_APPEND_ONLY:
-		{
-			if (Binary)
-				StrMode = "ab";
-			else
-				StrMode = "a";
-			break;
-		}
-
-		case ZE_FM_READ_APPEND:
-		{
-			if(Binary)
-				StrMode = "a+b";
-			else
-				StrMode = "a+";
-			break;
-		}
-
-		case ZE_FM_READ_WRITE:
-		{
-			if(Binary)
-			{
-				StrMode = "r+b";
-				AltStrMode = "w+b";
-			}
-			else
-			{
-				StrMode = "r+";
-				AltStrMode = "w+";
-			}
-			break;
-		}
-
-		default:
-		{
-			return false;
-			break;	
-		}
-	}
-
-	// Try to open file
-	File = fopen(FilePath, StrMode);
-
-	if(File == NULL) // If cant open
-	{
-		if(AltStrMode) // If there is an alternative opening mode
-		{
-			// Try to open with alternative mode
-			File = fopen(FilePath, AltStrMode);
-
-			if(File != NULL) // If opened
-			{
-				this->FilePath	= FilePath;
-				FileCursor		= 0;
-				ReferenceCount	= 0;
-				FileType		= ZE_FT_FILE;
-				return true;
-			}
-			else
-			{
-				zeError("Could not open file \"%s\".", FilePath.ToCString());
-				return false;
-			}
-		}
-		else
-		{
-			zeError("Could not open file \"%s\".", FilePath.ToCString());
-			return false;
-		}
-	}
-	else
-	{
-		this->FilePath	= FilePath;
-		FileCursor		= 0;
-		ReferenceCount	= 0;
-		FileType		= ZE_FT_FILE;
-		return true;
-	}
-
-	return false;
-}
-
-bool ZEFile::Seek(ZEInt64 Offset, ZESeekFrom Origin)
-{
-	if (!IsOpen())
-		return false;
-
-	ZEInt OriginNorm;
-	switch(Origin)
-	{
-		case ZE_SF_BEGINING:
-			OriginNorm = SEEK_SET;
-			break;
-		case ZE_SF_CURRENT:
-			_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-			OriginNorm = SEEK_CUR;
-			break;
-		case ZE_SF_END:
-			OriginNorm = SEEK_END;
-			break;
-	}
-
-	if (_fseeki64((FILE*)File, Offset, OriginNorm) == 0)
-	{	
-		FileCursor = _ftelli64((FILE*)File);
-		return true;
-	}
-	else
-	{
-		FileCursor = _ftelli64((FILE*)File);
-		return false;
-	}
-}
-
-ZEUInt64 ZEFile::Tell()
-{
-	if (!IsOpen())
-		return 0;
-
-	return FileCursor;
-}
-
-void ZEFile::Close()
-{
-	if(!IsOpen() || ReferenceCount != 0)
-		return;
-
-	fclose((FILE*)File);
-	FilePath.Clear();
-
-	File			= NULL;
-	AutoClose		= false;
-	FileCursor		= 0;
-	ReferenceCount	= 0;
-}
-
-bool ZEFile::Eof()
-{
-	if (!IsOpen())
-		return false;
-
-	return (feof((FILE*)File) == 0) ? false : true;
-}
-
-void ZEFile::Flush()
-{
-	if(!IsOpen())
-		return;
-
-	fflush((FILE*)File);
-}
-
-bool ZEFile::IsOpen()
-{
-	if(File != NULL && !FilePath.IsEmpty())
-		return true;
-
-	return false;
-}
-
-void ZEFile::SetAutoClose(bool AutoClose)
-{
-	this->AutoClose = AutoClose;
-}
-
-bool ZEFile::GetAutoClose()
-{
-	return AutoClose;
-}
-
-ZEUInt64 ZEFile::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
-{
-	if(!IsOpen())
-		return 0;
-
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-	ZEUInt64 ReadCount = fread(Buffer, (ZESize)Size, (ZESize)Count, (FILE*)File);
-	FileCursor += ReadCount * Size;
-
-	return ReadCount;
-}
-
-ZEUInt64 ZEFile::ReadFormated(const char* Format, ...)
-{
-	if(!IsOpen())
-		return 0;
-
-	zeDebugCheck(true, "Not Implemented Yet.");
-
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-
-	va_list ArgList;
-
-	va_start(ArgList, Format);
-	ZEUInt64 ReadCount = 0;
-	// 	ReadCount = _tinput_l((FILE*)File, Format, 0, ArgList);
-	va_end(ArgList);
-	FileCursor += ReadCount;
-	return ReadCount;
-}
-
-ZEUInt64 ZEFile::Write( const void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
-{
-	if(!IsOpen())
-		return 0;
-
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-	ZEUInt64 WriteCount = fwrite(Buffer, (ZESize)Size, (ZESize)Count, (FILE*)File);
-	FileCursor += WriteCount * Size;
-
-	return WriteCount;
-}
-
-ZEUInt64 ZEFile::WriteFormated(const char* Format, ...)
-{
-	if(!IsOpen())
-		return 0;
-
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-
-	va_list ArgList;
-	va_start(ArgList, Format);
-	ZEUInt64 WriteSize = vfprintf((FILE*)File, Format, ArgList);
-	va_end(ArgList);
-
-	FileCursor += WriteSize;
-
-	return WriteSize;
-}
-
-ZEUInt64 ZEFile::GetFileSize(const ZEString& FilePath)
-{
-	struct stat FileStatus;
-
-	if (stat(FilePath.GetValue(), &FileStatus) != 0)
-		return 0;
-
-	return FileStatus.st_size;
-}
-
-ZEUInt64 ZEFile::GetFileSize()
-{
-	if(!IsOpen())
-		return 0;
-
-	_fseeki64((FILE*)File, 0, SEEK_END);
-	ZEUInt64 EndCursor = _ftelli64((FILE*)File);
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-
-	return EndCursor;
-}
-
-bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZEUInt64 BufferSize)
-{
-	ZEString RelativeFileName = "resources\\" + FilePath;
-
-	FILE* File = fopen(RelativeFileName, "rb");
-	if(File == NULL)
-	{
-		zeError("Could not open file in binary read mode \"%s\".", FilePath.GetValue());
-		return false;
-	}
-
-	_fseeki64((FILE*)File, 0, SEEK_END);
-	ZEUInt64 FileSize = _ftelli64(File);
-	_fseeki64((FILE*)File, 0, SEEK_SET);
-
-	zeDebugCheck(BufferSize < FileSize, "File size exceed buffer size.");
-
-	fread(Buffer, sizeof(char), (BufferSize > FileSize ? (ZESize)FileSize : (ZESize)BufferSize), File);
-
-	fclose(File);
-	return true;
-}
-
-bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEUInt64 BufferSize)
-{
-	ZEString RelativeFileName = "resources\\" + FilePath;
-
-	FILE* File = fopen(RelativeFileName, "rb");
-	if(File == NULL)
-	{
-		zeError("Could not open file in binary read mode \"%s\".", FilePath.ToCString());
-		return false;
-	}
-
-	_fseeki64((FILE*)File, 0, SEEK_END);
-	ZEUInt64 FileSize = _ftelli64(File);
-	_fseeki64((FILE*)File, 0, SEEK_SET);
-
-	zeDebugCheck(BufferSize < FileSize + 1, "File size exceed buffer size.");
-
-	fread(Buffer, sizeof(char), (ZESize)FileSize, File);
-	Buffer[FileSize] = '\0';
-
-	fclose(File);
-	return true;
-}
-
-ZEFileType ZEFile::GetFileType() const
-{
-	return FileType;
-}
-
-void* ZEFile::GetFileHandle() const
-{
-	return File;
-}
-
-ZEUInt64 ZEFile::GetStartPosition()
-{
-	return 0;
-}
-
-ZEUInt64 ZEFile::GetEndPosition()
-{
-	return this->GetFileSize();
-}
-
-const ZEString ZEFile::GetFilePath() const
-{
-	return FilePath;
-}
-
-ZEUInt ZEFile::GetReferenceCount() const
-{
-	return ReferenceCount;
-}
-
-ZEUInt ZEFile::IncreaseReferenceCount()
-{
-	return ++ReferenceCount;
-}
-
-ZEUInt ZEFile::DecreaseReferenceCount()
-{
-	// Prevent ReferenceCount to go to negative values
-	ReferenceCount = (ReferenceCount == 0) ? 0 : --ReferenceCount;
-
-	if (ReferenceCount == 0 && AutoClose)
-		this->Close();
-
-	return ReferenceCount;
-}
-
-ZEString ZEFile::GetFileName(const ZEString& FilePath)
-{
-	ZESize Length = FilePath.GetLength();
-
-	if (Length == 0)
-		return "";
-
-	for (ZESSize I = Length - 1; I >= 0; I--)
-	{
-		if (FilePath[I] == '\\' || FilePath[I] == '/')
-			return FilePath.Right(Length - 1 - I);
-	}
-
-	return FilePath;
-}
-
-ZEString ZEFile::GetAbsolutePath(const ZEString& FilePath)
-{
-	return "";
-}
-
-ZEString ZEFile::GetFileExtension(const ZEString& FilePath)
-{
-	ZESize Length = FilePath.GetLength();
-
-	if (Length == 0)
-		return "";
-
-	for (ZESSize I = Length - 1; I >= 0; I--)
-	{
-		if(FilePath[I] == '.')
-			return FilePath.Right(Length - I);
-	}
-
-	return "";
-}
-
-ZEString ZEFile::GetParentDirectory(const ZEString& FilePath)
-{
-	ZESize Length = FilePath.GetLength();
-
-	if (Length == 0)
-		return "";
-
-	for (ZESSize I = Length - 1; I >= 0; I--)
-	{
-		if (FilePath[I] == '\\' || FilePath[I] == '/')
-			return FilePath.Left(I);
-	}
-
-	return "";
-}
-
-bool ZEFile::IsDirectoryExists(const ZEString& FilePath)
-{
-	struct stat FileStat; 
-	
-	if(stat(FilePath.GetValue(), &FileStat) == 0 ) 
-	{     
-		if(FileStat.st_mode & S_IFDIR)     
-			return true;
-	}
-
-	return false;
-}
-
-bool ZEFile::IsFileExists(const ZEString& FilePath)
-{
-	struct stat FileStat; 
-
-	if(stat(FilePath.GetValue(), &FileStat) == 0 ) 
-	{         
-		if(FileStat.st_mode & S_IFREG)
-			return true;
-	}
-
-	return false;
-}
-
-ZEFile& ZEFile::operator = (ZEFile& OtherFile)
-{	
-	File = OtherFile.File;
-	FilePath = OtherFile.FilePath;
-	FileCursor = OtherFile.FileCursor;
-
-	return *this;
-}
-
-// Opens and returns the first file that is found
-ZEFile* ZEFile::Open(const ZEString& FilePath, bool AutoClose)
-{
-	ZESize		TokenStart = 0;
-	ZESize		TokenEnd = 0;
-	ZESize		Lenght = 0;
-	ZEString	Token;
-	ZEString	NewPath;
-
-	Lenght = FilePath.GetSize() - 1;
-
-	if (Lenght == 0)
-		return NULL;
-	
-	// Clear the '\\' character from beginning and end
-	if ((FilePath[0] == '\\' || FilePath[0] == '/') && (FilePath[Lenght - 1] == '\\' || FilePath[Lenght - 1] == '/'))
-	{
-		if(Lenght - 2 <= 0)
-			return NULL;
-
-		NewPath = FilePath.SubString(1, Lenght - 2);
-		Lenght -= 2;
-		
-	}
-	else if (FilePath[0] == '\\' || FilePath[0] == '/')
-	{
-		if(Lenght - 1 <= 0)
-			return NULL;
-
-		NewPath = FilePath.Right(Lenght - 1);
-		Lenght -= 1;
-	}
-	else if (FilePath[Lenght - 1] == '\\' || FilePath[Lenght - 1] == '/')
-	{
-		if(Lenght - 1 <= 0)
-			return NULL;
-
-		NewPath = FilePath.Left(Lenght - 1);
-		Lenght -= 1;
-	}
-	else
-	{
-		NewPath = FilePath;
-	}
-
-
-	// Until all the string is tokenized/visited
-	while(TokenEnd <= Lenght)
-	{
-		// For the rest of the string starting from token end
-		for(ZESize I = TokenEnd; I < Lenght; I++)
-		{
-			if(NewPath[I] == '\\' || NewPath[I] == '/')
-			{
-				TokenEnd = I;
-				break;
-			}
-		}
-
-		// If no new token is found, between '\\' characters since the last iteration
-		// It means that the last token of the string still remains
-		if(TokenEnd == Token.GetLength())
-			  TokenEnd = Lenght;
-
-		// Add the new found token to the old one and get the new path
-		Token += NewPath.SubString(TokenStart, TokenEnd);
-
-		// If path corresponds to a File
-		if (IsFileExists(Token))
-		{
-			/*if (ZEPack::IsPack(Token))
-			{
-				ZEPack Pack;
-				if(!Pack.Open(Token))
-				{
-					zeError("Cannot resolve the path \"%s\".", FilePath.ToCString());
-					return NULL;
-				}
-
-				ZEPartialCompressedFile* PartialCompressedFile = new ZEPartialCompressedFile();
-				if (!Pack.OpenChunk(*PartialCompressedFile, FilePath.Right(Token.GetLength())))
-				{
-					zeError("Cannot resolve the path \"%s\".", FilePath.ToCString());
-					return NULL;
-				}
-
-				return (ZEFile*)PartialCompressedFile;
-			}
-			else
-			{*/
-				ZEFile* File = new ZEFile();
-				if (!File->Open(Token, ZE_FM_READ_WRITE, true))
-				{
-					zeError("Cannot resolve the path \"%s\".", FilePath.ToCString());
-					return NULL;
-				}
-
-				File->SetAutoClose(AutoClose);
-				return File;
-			//}
-		}
-		else
-		{
-			TokenStart = TokenEnd += 1;
-		}
-	}
-
-	return NULL;
+        // Use ErrorId as string
+        Error += "ErrorId: ";
+        Error += ZEString::FromInt32(ErrorId);
+    }
+
+	return Error;
 }
 
 ZEFile::ZEFile()
 {
-	File			= NULL;
-	FileType		= ZE_FT_FILE;
-	
-	AutoClose		= false;
-	FilePath		= "";
-	FileCursor		= 0;
-	ReferenceCount	= 0;
+	File = NULL;
+	Mode = ZE_FOM_NONE;
+	Creation = ZE_FCT_NONE;
 }
 
 ZEFile::~ZEFile()
 {
 	Close();
+}
+
+ZEInt ZEFile::Close()
+{
+	if (File == NULL)
+		return 0;
+
+	int Result;
+
+	errno = 0;
+	Result = fclose((FILE*)File);
+	if (Result != 0)
+	{
+		zeError("Error: \"%s\" occurred in file: \"%s\".", GetErrorString(errno).ToCString(), Path.ToCString());
+		return Result;
+	}
+
+	Path.Clear();
+	
+	File = NULL;
+	Mode = ZE_FOM_NONE;
+	Creation = ZE_FCT_NONE;
+	
+	return Result;
+}
+
+static bool CreateTheFile(const ZEString& Path, bool DeleteExisting)
+{
+	int Result;
+	FILE* File;
+	const char* Mode = NULL;
+
+	if (DeleteExisting)
+		Mode = "wb+";
+	else
+		Mode = "ab";
+
+	errno = 0;
+	File = fopen(Path.ToCString(), Mode);
+	if (File == NULL)
+	{
+		zeError("Error: \"%s\" occurred in file: \"%s\".", GetErrorString(errno).ToCString(), Path.ToCString());
+		return false;
+	}
+
+	errno = 0;
+	Result = fclose((FILE*)File);
+	if (Result != 0)
+	{
+		zeError("Error: \"%s\" occurred in file: \"%s\".", GetErrorString(errno).ToCString(), Path.ToCString());
+		return false;
+	}
+
+	return true;
+}
+
+// FILE OPEN MODES
+//*********************************************************
+// r  - open for reading
+// w  - open for writing (file need not exist)
+// a  - open for appending (file need not exist)
+// r+ - open for reading and writing, start at beginning
+// w+ - open for reading and writing (overwrite file)
+// a+ - open for reading and writing (append if file exists)
+bool ZEFile::Open(const ZEString& FilePath, ZEFileOpenMode OpenMode, ZEFileCreationType CreationType)
+{
+	zeDebugCheck(File != NULL, "File is already open...");
+
+	ZEString FinalPath;
+	const char* ModeStr = NULL;
+
+	FinalPath = ZEPathManager::GetFinalPath(FilePath);
+
+	// Handle file mode
+	switch (OpenMode)
+	{
+		case ZE_FOM_NONE:
+		case ZE_FOM_READ:
+			ModeStr = "rb";
+			break;
+		case ZE_FOM_WRITE:
+			ModeStr = "wb";
+			break;
+		case ZE_FOM_READ_WRITE:
+			ModeStr = "r+b";
+			break;
+		default:
+			zeError("Unknown open mode");
+			return false;
+			break;
+	}
+
+	// Handle file creation
+	switch (CreationType)
+	{
+		case ZE_FCT_NONE:
+		case ZE_FCT_OPEN:
+			break;
+		case ZE_FCT_OPEN_CREATE:
+			if (!CreateTheFile(FilePath, false))
+				return false;
+			break;
+		case ZE_FCT_OPEN_CREATE_OVERWRITE:
+			if (!CreateTheFile(FilePath, true))
+				return false;
+			break;
+		default:
+			zeError("Unknown creation type");
+			return false;
+			break;
+	}
+
+	// Open file
+	errno = 0;
+	File = (void*)fopen(FinalPath, ModeStr);
+	if (File == NULL)
+	{
+		zeError("Error: \"%s\" occurred in file: \"%s\".", GetErrorString(errno).ToCString(), Path.ToCString());
+		return false;
+	}
+
+	Mode = OpenMode;
+	Path = FinalPath;
+	Creation = CreationType;
+	
+	return true;
+}
+
+ZESize ZEFile::Read(void* Buffer, const ZESize Size, const ZESize Count)
+{
+	zeDebugCheck(File == NULL, "File is closed..");
+	
+	return fread(Buffer, Size, Count, (FILE*)File);
+}
+
+ZESize ZEFile::Write(const void* Buffer, const ZESize Size, const ZESize Count)
+{
+	zeDebugCheck(File == NULL, "File is closed..");
+	
+	return fwrite(Buffer, Size, Count, (FILE*)File);
+}
+
+ZEInt ZEFile::Seek(const ZEInt64 Offset, const ZESeekFrom Origin)
+{
+	zeDebugCheck(File == NULL, "File is closed..");
+
+	int Mode;
+	
+	switch (Origin)
+	{
+		case ZE_SF_BEGINING:
+			Mode = SEEK_SET;
+			break;
+		case ZE_SF_CURRENT:
+			Mode = SEEK_CUR;
+			break;
+		case ZE_SF_END:
+			Mode = SEEK_END;
+			break;
+		default:
+			zeError("Unknown origin type");
+			return -1;
+			break;
+	}
+
+	return _fseeki64((FILE*)File, Offset, Mode);
+}
+	
+
+ZEInt64 ZEFile::Tell() const
+{
+	zeDebugCheck(File == NULL, "File is closed..");
+	
+	return _ftelli64((FILE*)File);
+}
+
+ZEInt ZEFile::Eof() const
+{
+	zeDebugCheck(File == NULL, "File is closed..");
+	
+	return feof((FILE*)File) ;
+}
+
+ZEInt ZEFile::Flush() const
+{
+	zeDebugCheck(File == NULL, "File is closed..");
+
+	return fflush((FILE*)File);
+}
+
+bool ZEFile::IsOpen() const
+{
+	return (File == NULL) ? false : true;
+}
+
+ZEInt64 ZEFile::GetSize()
+{
+	zeDebugCheck(File == NULL, "File is closed..");
+
+	ZEInt64 Cursor = Tell();
+	Seek(0, ZE_SF_END);
+	ZEInt64 Size = Tell();
+	Seek(Cursor, ZE_SF_BEGINING);
+
+	return Size;
+}
+
+ZEFileOpenMode ZEFile::GetOpenMode() const
+{
+	return Mode;
+}
+
+ZEFileCreationType ZEFile::GetCreationType() const
+{
+	return Creation;
+}
+
+bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZESize BufferSize)
+{
+	// NOTE: Relative file name should not be hard coded.
+	ZEString RelativeFileName = "resources\\" + FilePath;
+
+	ZEFile File;
+	if (!File.Open(RelativeFileName, ZE_FOM_READ, ZE_FCT_OPEN))
+		return false;
+
+	ZEInt64 FileSize = File.GetSize();
+	zeDebugCheck(BufferSize < FileSize, "File size exceeds buffer size.");
+
+	ZESize ReadSize = BufferSize > (ZESize)FileSize ? (ZESize)FileSize : BufferSize;
+	
+	if (File.Read(Buffer, sizeof(char), ReadSize) != ReadSize)
+	{
+		File.Close();
+		return false;
+	}
+
+	File.Close();
+	return true;
+}
+
+bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZESize BufferSize)
+{
+	// NOTE: Relative file name should not be hard coded.
+	ZEString RelativeFileName = "resources\\" + FilePath;
+
+	ZEFile File;
+	if (!File.Open(RelativeFileName, ZE_FOM_READ, ZE_FCT_OPEN))
+		return false;
+
+	ZEInt64 FileSize = File.GetSize();
+	zeDebugCheck(BufferSize < FileSize + 1, "File size exceeds buffer size.");
+
+	ZESize ReadSize = BufferSize > (ZESize)FileSize ? (ZESize)FileSize : BufferSize;
+	
+	if (File.Read((void*)Buffer, sizeof(char), ReadSize) != ReadSize)
+	{
+		File.Close();
+		return false;
+	}
+
+	Buffer[ReadSize] = '\0';
+	File.Close();
+	return true;
+}
+
+void* ZEFile::GetHandle() const
+{
+	return File;
+}
+
+const ZEString& ZEFile::GetPath() const
+{
+	return Path;
+}
+
+ZEFile&	ZEFile::operator = (ZEFile& OtherFile)
+{
+	File = OtherFile.File;
+	Path = OtherFile.Path;
+
+	return *this;
 }
 
 #pragma warning(pop)
