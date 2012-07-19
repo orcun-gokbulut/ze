@@ -52,7 +52,7 @@ class ZEPartialFile : public ZEFile
 
 		virtual ZEInt			Close();
 		virtual bool			Open(const ZEFile* ParentFile, const ZEInt64 Offset, const ZEInt64 Size);
-		virtual bool			Open(const ZEString& FilePath, ZEFileOpenMode OpenType, ZEFileCreationType CreationType);
+		virtual bool			Open(const ZEString& FilePath, const ZEFileOpenMode OpenType, const ZEFileCreationMode CreationType);
 
 		virtual ZESize			Read(void* Buffer, const ZESize Size, const ZESize Count);
 		virtual ZESize			Write(const void* Buffer, const ZESize Size, const ZESize Count);
@@ -63,10 +63,10 @@ class ZEPartialFile : public ZEFile
 		virtual ZEInt64			GetSize();
 
 		virtual ZEInt64			GetEndPosition() const;
-		virtual void			SetEndPosition(ZEInt64 Position);
+		virtual void			SetEndPosition(const ZEInt64 Position);
 		
 		virtual ZEInt64			GetStartPosition() const;
-		virtual void			SetStartPosition(ZEInt64 Position);
+		virtual void			SetStartPosition(const ZEInt64 Position);
 
 };
 

@@ -452,7 +452,7 @@ ZEPortalMapResource* ZEPortalMapResource::LoadResource(const ZEString& FileName)
 
 
 	// Open ZEMap file
-	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if (Result)
 	{
 		// Create ZEMapResource

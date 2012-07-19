@@ -357,7 +357,7 @@ bool ZEScene::Save(const ZEString& FileName)
 	ZEString NewPath = ConstructResourcePath(FileName);
 
 	ZEFile Serializer;
-	if (Serializer.Open(NewPath, ZE_FOM_WRITE, ZE_FCT_OPEN_CREATE_OVERWRITE))
+	if (Serializer.Open(NewPath, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
 	{
 		ZEUInt32 EntityCount = (ZEUInt32)Entities.GetCount();
 		Serializer.Write(&EntityCount, sizeof(ZEUInt32), 1);
@@ -407,7 +407,7 @@ bool ZEScene::Load(const ZEString& FileName)
 	ZEFile Unserializer;
 	char EntityTypeName[ZE_MAX_NAME_SIZE];
 
-	if (Unserializer.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN))
+	if (Unserializer.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE))
 	{
 		ZEUInt32 EntityCount;
 		Unserializer.Read(&EntityCount, sizeof(ZEUInt32), 1);

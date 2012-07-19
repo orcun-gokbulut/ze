@@ -185,7 +185,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(const ZEString& FileName,
 	ZETexture3DResource* TextureResource;
 	ZEString NewPath = ConstructResourcePath(FileName);
 
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if(Result)
 	{
 		if(UserOptions == NULL)

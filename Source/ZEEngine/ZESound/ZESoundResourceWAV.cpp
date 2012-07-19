@@ -95,7 +95,7 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
 	bool Result;
 	ZEFile File;
 
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if (!Result)
 	{
 		zeError("Can not load WAV resource. Can not open file. (Filename : \"%s\")", NewPath.ToCString());

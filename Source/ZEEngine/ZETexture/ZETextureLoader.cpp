@@ -59,7 +59,7 @@ static long		DLL_CALLCONV	FreeImageFile_Tell_2D(fi_handle handle);
 bool ZETextureLoader::IsZETextureFile(const ZEString& FilePath)
 {
 	ZEFile File;
-	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCT_OPEN))
+	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
 	{
 		zeError("Cannot open file: \"%s\".", FilePath.GetValue());
 		return false;

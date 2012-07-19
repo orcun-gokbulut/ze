@@ -777,7 +777,7 @@ ZEModelResource* ZEModelResource::LoadResource(const ZEString& FileName)
 	bool Result;
 	ZEFile ResourceFile;
 
-	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCT_OPEN);
+	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if (Result)
 	{
 		ZEModelResource* NewResource = new ZEModelResource();
