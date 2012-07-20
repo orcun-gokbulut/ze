@@ -79,7 +79,7 @@ struct ZEView
 	ZEMatrix4x4				ViewProjectionTransform;
 };
 
-class ZEViewPort;
+class ZERenderTarget;
 
 struct ZEDrawParameters
 {
@@ -90,7 +90,7 @@ struct ZEDrawParameters
 	ZERenderPass			Pass;
 
 	const ZEView*			View;
-	const ZEViewPort*		ViewPort;
+	const ZERenderTarget*	ViewPort;
 	const ZEViewVolume*		ViewVolume;
 
 	ZESmartArray<ZELight*>	Lights;

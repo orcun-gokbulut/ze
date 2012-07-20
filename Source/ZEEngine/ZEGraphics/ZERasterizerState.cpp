@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9GrainProcessor.h
+ Zinek Engine - ZERasterizerState.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,72 +33,69 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_GRAIN_PROCESSOR_H__
-#define __ZE_D3D9_GRAIN_PROCESSOR_H__
+#include "ZERasterizerState.h"
 
-#include "ZED3D9ComponentBase.h"
-#include "..\..\..\Platform\Windows\x64\Include\DirectX\d3d9.h"
-
-
-class ZED3D9PixelShader;
-class ZED3D9VertexShader;
-class ZED3D9Texture2D;
-class ZETexture2D;
-class ZED3D9RenderTarget;
-class ZEFrameRenderer;
-class ZED3D9FrameRenderer;
-class ZETexture2DResource;
-
-class ZED3D9GrainProcessor : public ZED3D9ComponentBase
+void ZERasterizerState::SetCullEnable(bool Enable)
 {
-	private:
-		float					Strength;
-		float					Frequency;
-		float					NoiseSize;
+	CullEnable = Enable;
+	Changed = true;
+}
 
-		ZED3D9FrameRenderer*	Renderer;
+bool ZERasterizerState::GetCullEnable() const
+{
+	return CullEnable;
+}
 
-		ZED3D9PixelShader*		PixelShaderGrain;
-		ZED3D9PixelShader*		PixelShaderBlend;
-		ZED3D9VertexShader*		VertexShader;
+void ZERasterizerState::SetFillMode(ZEFillMode Mode)
+{
+	FillMode = Mode;
+	Changed = true;
+}
 
-		ZED3D9Texture2D*		GrainBuffer;
-		ZED3D9RenderTarget*			Output;
-		ZED3D9Texture2D*		Input;
-		
-		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+ZEFillMode ZERasterizerState::GetFillMode() const
+{
+	return FillMode;
+}
 
-		void					CreateRenderTargets();
-		void					DestroyRenderTargets();
+void ZERasterizerState::SetCullDirection(ZECullDirection Direction)
+{
+	CullDirection = Direction;
+	Changed = true;
+}
 
-	public:
-								ZED3D9GrainProcessor();
-								~ZED3D9GrainProcessor();
+ZECullDirection ZERasterizerState::GetCullDirection() const
+{
+	return CullDirection;
+}
 
-		void					Initialize();
-		void					Deinitialize();
+void ZERasterizerState::SetChanged(bool Change)
+{
+	Changed = Changed;
+}
 
-		void					SetRenderer(ZEFrameRenderer* Renderer);
-		ZEFrameRenderer*		GetRenderer();
+bool ZERasterizerState::GetChanged() const
+{
+	return Changed;
+}
 
-		float					GetFrequency() const;
-		void					SetFrequency(float Value);
+const ZERasterizerState& ZERasterizerState::operator=(const ZERasterizerState& State)
+{
+	CullEnable = State.CullEnable;
+	FillMode = State.FillMode;
+	CullDirection = State.CullDirection;
+	Changed = State.Changed;
+	return *this;
+}
 
-		float					GetStrength() const;
-		void					SetStrength(float Value);
+ZERasterizerState::ZERasterizerState() :	CullEnable(false),
+											FillMode(ZE_FM_CURRENT),
+											CullDirection(ZE_CD_CURRENT),
+											Changed(false)
+{
 
-		float					GetNoiseSize() const;
-		void					SetNoiseSize(float Value);
+}
 
-		void					SetInput(ZED3D9Texture2D* Texture);
-		ZED3D9Texture2D*		GetInput();
+ZERasterizerState::~ZERasterizerState()
+{
 
-		void					SetOutput(ZED3D9RenderTarget* Texture);
-		ZED3D9RenderTarget*			GetOutput();
-
-		void					Process(float ElapsedTime);
-
-};
-
-#endif
+}

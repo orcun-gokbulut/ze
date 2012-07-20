@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZED3D9ViewPort.h"
+#include "ZED3D9RenderTarget.h"
 #include "ZEDS/ZEArray.h"
 
 #ifdef ZE_DEBUG_ENABLE
@@ -110,7 +110,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		LPDIRECT3D9										D3D;
 		LPDIRECT3DDEVICE9								Device;
 
-		ZED3D9ViewPort									FrameBufferViewPort;
+		ZED3D9RenderTarget								FrameBufferViewPort;
 
 		ZED3D9ShaderManager*							ShaderManager;
 
@@ -166,7 +166,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual void									SetMaterialComponentMask(ZEUInt Mask);
 		virtual ZEUInt									GetMaterialComponentMask();
 		
-		virtual ZEViewPort*								GetFrameBufferViewPort();
+		virtual ZERenderTarget*							GetFrameBufferViewPort();
 
 		virtual ZED3D9ShaderManager*					GetShaderManager();
 

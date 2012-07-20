@@ -36,7 +36,7 @@
 
 #include "ZED3D9Shader.h"
 #include "ZEGame/ZEScene.h"
-#include "ZED3D9ViewPort.h"
+#include "ZED3D9Rendertarget.h"
 #include "ZED3D9Profiler.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9CommonTools.h"
@@ -108,12 +108,12 @@ ZETexture2D* ZED3D9MLAAProcessor::GetInputNormal()
 	return (ZETexture2D*)InputNormalBuffer;
 }
 
-void ZED3D9MLAAProcessor::SetOutput(ZED3D9ViewPort* Texture)
+void ZED3D9MLAAProcessor::SetOutput(ZED3D9RenderTarget* Texture)
 {
 	OutputBuffer = Texture;
 }
 
-ZED3D9ViewPort* ZED3D9MLAAProcessor::GetOutput()
+ZED3D9RenderTarget* ZED3D9MLAAProcessor::GetOutput()
 {
 	return OutputBuffer;	
 }
@@ -251,7 +251,7 @@ void ZED3D9MLAAProcessor::Process()
 	// Clear Render Targets
 	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)EdgeBuffer);
 	ZED3D9CommonTools::SetRenderTarget(1, (ZETexture2D*)BlendWeightBuffer);
-	ZED3D9CommonTools::SetRenderTarget(2, (ZEViewPort*)OutputBuffer);
+	ZED3D9CommonTools::SetRenderTarget(2, (ZERenderTarget*)OutputBuffer);
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x000000FF, 1.0f, 0x00);
 	GetDevice()->SetRenderTarget(1, NULL);
 	GetDevice()->SetRenderTarget(2, NULL);
@@ -299,7 +299,7 @@ void ZED3D9MLAAProcessor::Process()
 	GetDevice()->SetVertexShader(VertexShaderCommon->GetVertexShader());
 	GetDevice()->SetPixelShader(PixelShaderColorBlending->GetPixelShader());
 
-	ZED3D9CommonTools::SetRenderTarget(0, (ZEViewPort*)OutputBuffer);
+	ZED3D9CommonTools::SetRenderTarget(0, (ZERenderTarget*)OutputBuffer);
 
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PixelSize, 1);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&PixelSize, 1);

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEViewPort.h
+ Zinek Engine - ZED3D9RenderTarget.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,19 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_VIEW_PORT_H__
-#define __ZE_VIEW_PORT_H__
+#ifndef __ZE_D3D9_RENDER_TARGET_H__
+#define __ZE_D3D9_RENDER_TARGET_H__
 
 #include "ZETypes.h"
+#include "ZEGraphics/ZERenderTarget.h"
 
-class ZEViewPort
+#include <d3d9.h>
+
+class ZED3D9RenderTarget : public ZERenderTarget
 {
 	public:
-		virtual float			GetAspectRatio() = 0;
-		virtual ZEUInt			GetWidth() = 0;
-		virtual ZEUInt			GetHeight() = 0;
+		LPDIRECT3DSURFACE9		FrameBuffer;
+		LPDIRECT3DSURFACE9		ZBuffer;
 
-		virtual					~ZEViewPort();
+		virtual float			GetAspectRatio();
+		virtual ZEUInt			GetWidth();
+		virtual ZEUInt			GetHeight();
+
+								ZED3D9RenderTarget();
+		virtual					~ZED3D9RenderTarget();
 };
 
 #endif

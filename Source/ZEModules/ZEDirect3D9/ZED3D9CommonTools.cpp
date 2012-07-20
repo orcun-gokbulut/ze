@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
-#include "ZED3D9ViewPort.h"
+#include "ZED3D9RenderTarget.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9CommonTools.h"
@@ -54,38 +54,38 @@
 
 class ZED3DXInclude : public ID3DXInclude
 {
-	public:
-		virtual HRESULT __stdcall Open(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID * ppData, UINT * pBytes)
-		{
-			char RelativeFileName[258];
-			sprintf(RelativeFileName, "resources\\shaders\\%s", pFileName);
-			FILE* File = fopen(RelativeFileName, "rb");
-			if (File == NULL)
-				return S_FALSE;
+public:
+	virtual HRESULT __stdcall Open(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID * ppData, UINT * pBytes)
+	{
+		char RelativeFileName[258];
+		sprintf(RelativeFileName, "resources\\shaders\\%s", pFileName);
+		FILE* File = fopen(RelativeFileName, "rb");
+		if (File == NULL)
+			return S_FALSE;
 
-			_fseeki64(File, 0, SEEK_END);
-			*pBytes = (UINT)_ftelli64(File);
-			_fseeki64(File, 0, SEEK_SET);
-			*ppData = (void*)new char[(ZESize)*pBytes];
-			fread((void*)*ppData, 1, (ZESize)*pBytes, File);
-			fclose(File);
+		_fseeki64(File, 0, SEEK_END);
+		*pBytes = (UINT)_ftelli64(File);
+		_fseeki64(File, 0, SEEK_SET);
+		*ppData = (void*)new char[(ZESize)*pBytes];
+		fread((void*)*ppData, 1, (ZESize)*pBytes, File);
+		fclose(File);
 
-			return S_OK;
-		}
+		return S_OK;
+	}
 
-		virtual HRESULT __stdcall Close(LPCVOID pData)
-		{
-			if (pData != NULL)
-				delete[] pData;
-			return S_OK;
-		}
+	virtual HRESULT __stdcall Close(LPCVOID pData)
+	{
+		if (pData != NULL)
+			delete[] pData;
+		return S_OK;
+	}
 } D3DIncludeInterface;
 
-void ZED3D9CommonTools::SetRenderTarget(DWORD RenderTarget, ZEViewPort* ViewPort)
+void ZED3D9CommonTools::SetRenderTarget(DWORD RenderTarget, ZERenderTarget* ViewPort)
 {
 	zeDebugCheck(ViewPort == NULL, "ViewPort is null.");
 
-	GetDevice()->SetRenderTarget(RenderTarget, ((ZED3D9ViewPort*)ViewPort)->FrameBuffer);
+	GetDevice()->SetRenderTarget(RenderTarget, ((ZED3D9RenderTarget*)ViewPort)->FrameBuffer);
 }
 
 void ZED3D9CommonTools::SetRenderTarget(DWORD RenderTarget, ZETexture2D* Texture)
@@ -93,7 +93,7 @@ void ZED3D9CommonTools::SetRenderTarget(DWORD RenderTarget, ZETexture2D* Texture
 	zeDebugCheck(!Texture->IsRenderTarget(), "Texture is not render target.");
 	zeDebugCheck(Texture == NULL, "Texture is null.");
 
-	GetDevice()->SetRenderTarget(RenderTarget, ((ZED3D9ViewPort*)Texture->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(RenderTarget, ((ZED3D9RenderTarget*)Texture->GetViewPort())->FrameBuffer);
 	
 	return;
 }
@@ -157,7 +157,6 @@ void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture3DResource* TextureReso
 
 	ZED3D9CommonTools::SetTexture(Stage, Texture, Filter, MipMappingFilter, Addressing);
 }
-
 
 D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 {

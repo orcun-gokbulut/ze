@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9Shader.h"
-#include "ZED3D9ViewPort.h"
+#include "ZED3D9RenderTarget.h"
 #include "ZED3D9Profiler.h"
 #include "ZED3D9Texture2D.h"
 #include "ZEMath/ZEMatrix.h"
@@ -77,12 +77,12 @@ ZETexture2D* ZED3D9UnsharpenFilterProcessor::GetInput()
 	return Input;
 }
 
-void ZED3D9UnsharpenFilterProcessor::SetOutput(ZED3D9ViewPort* Texture)
+void ZED3D9UnsharpenFilterProcessor::SetOutput(ZED3D9RenderTarget* Texture)
 {
 	this->Output = Texture;
 }
 
-ZED3D9ViewPort* ZED3D9UnsharpenFilterProcessor::GetOutput()
+ZED3D9RenderTarget* ZED3D9UnsharpenFilterProcessor::GetOutput()
 {
 	return Output;
 }

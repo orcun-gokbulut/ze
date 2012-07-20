@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZETexture.h"
 
-class ZEViewPort;
+class ZERenderTarget;
 
 class ZETexture2D : public ZETexture
 {
@@ -67,7 +67,7 @@ class ZETexture2D : public ZETexture
 
 		virtual bool				IsEmpty() const = 0;
 
-		virtual ZEViewPort*			GetViewPort() = 0;
+		virtual ZERenderTarget*		GetViewPort() = 0;
 
 		virtual bool				Create(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
 		virtual void				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
@@ -75,8 +75,6 @@ class ZETexture2D : public ZETexture
 
 		static ZETexture2D*			CreateInstance();
 };
-
-
 #endif
 
 

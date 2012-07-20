@@ -73,5 +73,4 @@ class ZED3D9ComponentBase
 /*		virtual	void					OnDeviceLost();
 		virtual bool					OnDeviceRestored();*/
 };
-
 #endif

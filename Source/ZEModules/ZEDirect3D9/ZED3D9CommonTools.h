@@ -54,12 +54,12 @@ class ZETextureCubeResource;
 class ZETexture3D;
 class ZETexture3DResource;
 
-class ZEViewPort;
+class ZERenderTarget;
 
 class ZED3D9CommonTools : public ZED3D9ComponentBase
 {
 	public:
-		static void				SetRenderTarget(DWORD RenderTarget, ZEViewPort* Texture);
+		static void				SetRenderTarget(DWORD RenderTarget, ZERenderTarget* Texture);
 		static void				SetRenderTarget(DWORD RenderTarget, ZETexture2D* Texture);
 		static void				SetTexture(DWORD Stage, const ZETexture2D* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);
 		static void				SetTexture(DWORD Stage, ZETexture2DResource* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);

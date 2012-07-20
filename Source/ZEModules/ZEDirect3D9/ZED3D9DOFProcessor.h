@@ -45,7 +45,7 @@ class ZED3D9PixelShader;
 class ZED3D9VertexShader;
 class ZED3D9Texture2D;
 class ZETexture2D;
-class ZED3D9ViewPort;
+class ZED3D9RenderTarget;
 class ZEFrameRenderer;
 class ZED3D9FrameRenderer;
 class ZETexture2DResource;
@@ -70,7 +70,7 @@ class ZED3D9DOFProcessor : public ZED3D9ComponentBase
 
 		ZED3D9Texture2D*				InputColorBuffer;	// Input color texture
 		ZED3D9Texture2D*				InputDepthBuffer;	// Input depth texture
-		ZED3D9ViewPort*					OutputBuffer;		// DOF applied output texture
+		ZED3D9RenderTarget*					OutputBuffer;		// DOF applied output texture
 
 		ZED3D9VertexShader*				VertexShaderCommon;	// Common vertex shader for all passes
 
@@ -110,8 +110,8 @@ class ZED3D9DOFProcessor : public ZED3D9ComponentBase
 		void							SetInputColor(ZETexture2D* Texture);
 		ZETexture2D*					GetInputColor();
 
-		void							SetOutput(ZED3D9ViewPort* Texture);
-		ZED3D9ViewPort*					GetOutput();
+		void							SetOutput(ZED3D9RenderTarget* Texture);
+		ZED3D9RenderTarget*					GetOutput();
 
 		void							OnDeviceLost();
 		void							OnDeviceRestored();

@@ -41,7 +41,7 @@
 #include "ZED3D9CommonTools.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZED3D9FrameRenderer.h"
-#include "ZED3D9ViewPort.h"
+#include "ZED3D9RenderTarget.h"
 #include "ZED3D9Texture2D.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZED3D9Profiler.h"
@@ -365,7 +365,7 @@ bool ZED3D9TextureResizer::Process()
 	{
 		// Create a temp texture to read the render target data from graphics device
 		Result = GetDevice()->CreateOffscreenPlainSurface(DestInfo.Width, DestInfo.Height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &ReadBack, NULL);
-		Result = GetDevice()->GetRenderTargetData(((ZED3D9ViewPort*)Output->GetViewPort())->FrameBuffer, ReadBack);
+		Result = GetDevice()->GetRenderTargetData(((ZED3D9RenderTarget*)Output->GetViewPort())->FrameBuffer, ReadBack);
 
 		// Copy resized Texture back to destination buffer
 		D3DLOCKED_RECT Rect;
@@ -381,7 +381,7 @@ bool ZED3D9TextureResizer::Process()
 	}
 
 	// Restore the original depth stencil surface
-	GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)(GetModule()->GetFrameBufferViewPort()))->ZBuffer);
+	GetDevice()->SetDepthStencilSurface(((ZED3D9RenderTarget*)(GetModule()->GetFrameBufferViewPort()))->ZBuffer);
 	return true;
 }
 

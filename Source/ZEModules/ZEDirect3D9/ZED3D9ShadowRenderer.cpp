@@ -105,12 +105,12 @@ void ZED3D9ShadowRenderer::DrawRenderCommand(ZERenderCommand* RenderCommand)
 	//PumpStreams(RenderCommand);
 }
 
-void ZED3D9ShadowRenderer::SetViewPort(ZEViewPort* ViewPort)
+void ZED3D9ShadowRenderer::SetViewPort(ZERenderTarget* ViewPort)
 {
-	this->ViewPort = (ZED3D9ViewPort*)ViewPort;
+	this->ViewPort = (ZED3D9RenderTarget*)ViewPort;
 }
 
-ZEViewPort* ZED3D9ShadowRenderer::GetViewPort()
+ZERenderTarget* ZED3D9ShadowRenderer::GetViewPort()
 {
 	return ViewPort;
 }
@@ -237,7 +237,7 @@ void ZED3D9ShadowRenderer::RenderProjectiveLight()
 {
 	ZEProjectiveLight* Light = (ZEProjectiveLight*)this->Light;
 	GetDevice()->SetRenderTarget(0, ShadowMapFrameBuffer);
-	GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)Light->GetShadowMap()->GetViewPort())->FrameBuffer);
+	GetDevice()->SetDepthStencilSurface(((ZED3D9RenderTarget*)Light->GetShadowMap()->GetViewPort())->FrameBuffer);
 	float MaxFloat = 1.0f;
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, *(ZEInt*)&MaxFloat, 1.0f, 0x00);
 
@@ -319,11 +319,11 @@ void ZED3D9ShadowRenderer::RenderPointLight()
 	GetDevice()->SetDepthStencilSurface(ShadowMapZBuffer);
 	if (Face)
 	{
-		GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)Light->GetFrontShadowMap()->GetViewPort())->FrameBuffer);
+		GetDevice()->SetDepthStencilSurface(((ZED3D9RenderTarget*)Light->GetFrontShadowMap()->GetViewPort())->FrameBuffer);
 	}
 	else
 	{
-		GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)Light->GetBackShadowMap()->GetViewPort())->FrameBuffer);
+		GetDevice()->SetDepthStencilSurface(((ZED3D9RenderTarget*)Light->GetBackShadowMap()->GetViewPort())->FrameBuffer);
 	}
 
 	float MaxFloat = FLT_MAX;

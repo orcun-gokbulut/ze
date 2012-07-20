@@ -520,9 +520,9 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 {
 	zeProfilerStart("GBuffer Pass");
 	
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)GBuffer1->GetViewPort())->FrameBuffer);
-	GetDevice()->SetRenderTarget(1, ((ZED3D9ViewPort*)GBuffer2->GetViewPort())->FrameBuffer);
-	GetDevice()->SetRenderTarget(2, ((ZED3D9ViewPort*)GBuffer3->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9RenderTarget*)GBuffer1->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(1, ((ZED3D9RenderTarget*)GBuffer2->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(2, ((ZED3D9RenderTarget*)GBuffer3->GetViewPort())->FrameBuffer);
 
 	GetDevice()->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x00000000, 1.0f, 0x00);
 
@@ -636,7 +636,7 @@ void ZED3D9FrameRenderer::DoForwardPass()
 
 	// GBuffers
 	// ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
-	ZED3D9CommonTools::SetRenderTarget(0, (ZED3D9ViewPort*)ABuffer->GetViewPort());
+	ZED3D9CommonTools::SetRenderTarget(0, (ZED3D9RenderTarget*)ABuffer->GetViewPort());
 
 	ZED3D9CommonTools::SetTexture(0, GBuffer1, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, GBuffer2, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
@@ -875,12 +875,12 @@ ZED3D9FrameRenderer::~ZED3D9FrameRenderer()
 	Deinitialize();
 }
 
-void ZED3D9FrameRenderer::SetViewPort(ZEViewPort* ViewPort)
+void ZED3D9FrameRenderer::SetViewPort(ZERenderTarget* ViewPort)
 {
-	this->ViewPort = (ZED3D9ViewPort*)ViewPort;
+	this->ViewPort = (ZED3D9RenderTarget*)ViewPort;
 }
 
-ZEViewPort* ZED3D9FrameRenderer::GetViewPort()
+ZERenderTarget* ZED3D9FrameRenderer::GetViewPort()
 {
 	return ViewPort;
 }
@@ -1099,7 +1099,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		*/
 
 		UnsharpenProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
-		UnsharpenProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
+		UnsharpenProcessor.SetOutput((ZED3D9RenderTarget*)HDRInputBuffer->GetViewPort());
 		UnsharpenProcessor.Process();
 
 		/*
@@ -1122,7 +1122,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		
 		// HDR Process
 		HDRProcessor.SetInput(HDRInputBuffer);
-		HDRProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
+		HDRProcessor.SetOutput((ZED3D9RenderTarget*)CTInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);
 
 		

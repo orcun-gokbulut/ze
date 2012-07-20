@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9GrainProcessor.h
+ Zinek Engine - ZED3D9RenderTarget.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,72 +33,51 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_GRAIN_PROCESSOR_H__
-#define __ZE_D3D9_GRAIN_PROCESSOR_H__
+#include "ZED3D9RenderTarget.h"
 
-#include "ZED3D9ComponentBase.h"
-#include "..\..\..\Platform\Windows\x64\Include\DirectX\d3d9.h"
-
-
-class ZED3D9PixelShader;
-class ZED3D9VertexShader;
-class ZED3D9Texture2D;
-class ZETexture2D;
-class ZED3D9RenderTarget;
-class ZEFrameRenderer;
-class ZED3D9FrameRenderer;
-class ZETexture2DResource;
-
-class ZED3D9GrainProcessor : public ZED3D9ComponentBase
+float ZED3D9RenderTarget::GetAspectRatio()
 {
-	private:
-		float					Strength;
-		float					Frequency;
-		float					NoiseSize;
+	if (FrameBuffer != NULL)
+	{
+		D3DSURFACE_DESC Desc;
+		FrameBuffer->GetDesc(&Desc);
+		return (float)Desc.Width / (float)Desc.Height;
+	}
 
-		ZED3D9FrameRenderer*	Renderer;
+	return 0.0f;
+}
 
-		ZED3D9PixelShader*		PixelShaderGrain;
-		ZED3D9PixelShader*		PixelShaderBlend;
-		ZED3D9VertexShader*		VertexShader;
+ZEUInt ZED3D9RenderTarget::GetWidth()
+{
+	if (FrameBuffer != NULL)
+	{
+		D3DSURFACE_DESC Desc;
+		FrameBuffer->GetDesc(&Desc);
+		return Desc.Width;
+	}
 
-		ZED3D9Texture2D*		GrainBuffer;
-		ZED3D9RenderTarget*			Output;
-		ZED3D9Texture2D*		Input;
-		
-		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+	return 0;
+}
 
-		void					CreateRenderTargets();
-		void					DestroyRenderTargets();
+ZEUInt ZED3D9RenderTarget::GetHeight()
+{
+	if (FrameBuffer != NULL)
+	{
+		D3DSURFACE_DESC Desc;
+		FrameBuffer->GetDesc(&Desc);
+		return Desc.Height;
+	}
 
-	public:
-								ZED3D9GrainProcessor();
-								~ZED3D9GrainProcessor();
+	return 0;
+}
 
-		void					Initialize();
-		void					Deinitialize();
+ZED3D9RenderTarget::ZED3D9RenderTarget()
+{
+	FrameBuffer = NULL;
+	ZBuffer = NULL;
+}
 
-		void					SetRenderer(ZEFrameRenderer* Renderer);
-		ZEFrameRenderer*		GetRenderer();
-
-		float					GetFrequency() const;
-		void					SetFrequency(float Value);
-
-		float					GetStrength() const;
-		void					SetStrength(float Value);
-
-		float					GetNoiseSize() const;
-		void					SetNoiseSize(float Value);
-
-		void					SetInput(ZED3D9Texture2D* Texture);
-		ZED3D9Texture2D*		GetInput();
-
-		void					SetOutput(ZED3D9RenderTarget* Texture);
-		ZED3D9RenderTarget*			GetOutput();
-
-		void					Process(float ElapsedTime);
-
-};
-
-#endif
+ZED3D9RenderTarget::~ZED3D9RenderTarget()
+{
+	
+}

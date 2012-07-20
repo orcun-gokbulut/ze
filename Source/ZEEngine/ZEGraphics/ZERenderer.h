@@ -57,7 +57,7 @@ class ZEPostProcessor;
 class ZECamera;
 class ZERenderCommand;
 class ZETexture2D;
-class ZEViewPort;
+class ZERenderTarget;
 class ZELight;
 
 enum ZERendererType
@@ -79,8 +79,8 @@ class ZERenderer
 		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor) = 0;
 		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor) = 0;
 
-		virtual void						SetViewPort(ZEViewPort* ViewPort) = 0;
-		virtual ZEViewPort*					GetViewPort() = 0;
+		virtual void						SetViewPort(ZERenderTarget* ViewPort) = 0;
+		virtual ZERenderTarget*					GetViewPort() = 0;
 
 		virtual bool						Initialize() = 0;
 		virtual void						Deinitialize() = 0;

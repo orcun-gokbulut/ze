@@ -58,7 +58,7 @@
 
 class ZELight;
 class ZEPointLight;
-class ZED3D9ViewPort;
+class ZED3D9RenderTarget;
 class ZED3D9Texture2D;
 class ZED3D9PixelShader;
 class ZEProjectiveLight;
@@ -76,7 +76,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZEUInt32							LightStencilMaskValue;
 
 		ZED3D9Texture2D*					ABuffer;
-		ZED3D9ViewPort*						ViewPort;
+		ZED3D9RenderTarget*					ViewPort;
 		ZED3D9Texture2D* 					GBuffer1;
 		ZED3D9Texture2D*					GBuffer2;
 		ZED3D9Texture2D*					GBuffer3;
@@ -166,8 +166,8 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9UnsharpenFilterProcessor		UnsharpenProcessor;
 		
 
-		virtual void						SetViewPort(ZEViewPort* ViewPort);
-		virtual ZEViewPort*					GetViewPort();
+		virtual void						SetViewPort(ZERenderTarget* ViewPort);
+		virtual ZERenderTarget*				GetViewPort();
 
 		virtual void						SetCamera(ZECamera* Camera);
 		virtual ZECamera*					GetCamera();

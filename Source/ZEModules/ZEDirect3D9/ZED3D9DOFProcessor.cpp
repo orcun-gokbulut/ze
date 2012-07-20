@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9Shader.h"
-#include "ZED3D9ViewPort.h"
+#include "ZED3D9RenderTarget.h"
 #include "ZED3D9Profiler.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9CommonTools.h"
@@ -188,12 +188,12 @@ ZETexture2D* ZED3D9DOFProcessor::GetInputColor()
 	return InputColorBuffer;
 }
 
-void ZED3D9DOFProcessor::SetOutput(ZED3D9ViewPort* Texture)
+void ZED3D9DOFProcessor::SetOutput(ZED3D9RenderTarget* Texture)
 {
 	OutputBuffer = Texture;
 }
 
-ZED3D9ViewPort* ZED3D9DOFProcessor::GetOutput()
+ZED3D9RenderTarget* ZED3D9DOFProcessor::GetOutput()
 {
 	return OutputBuffer;
 }
@@ -386,7 +386,7 @@ void ZED3D9DOFProcessor::Process()
 	// Switch to DOF shader
 	GetDevice()->SetPixelShader(PixelShaderDOF->GetPixelShader());
 
-	ZED3D9CommonTools::SetRenderTarget(0, (ZEViewPort*)OutputBuffer);
+	ZED3D9CommonTools::SetRenderTarget(0, (ZERenderTarget*)OutputBuffer);
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputColorBuffer, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, (ZETexture2D*)InputDepthBuffer, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(2, (ZETexture2D*)ColorBufferDS2xBlur, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);

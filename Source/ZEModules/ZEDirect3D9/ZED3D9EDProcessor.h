@@ -44,7 +44,7 @@ class ZED3D9PixelShader;
 class ZED3D9VertexShader;
 class ZED3D9Texture2D;
 class ZETexture2D;
-class ZED3D9ViewPort;
+class ZED3D9RenderTarget;
 class ZEFrameRenderer;
 class ZED3D9FrameRenderer;
 class ZETexture2DResource;
@@ -61,7 +61,7 @@ class ZED3D9EDProcessor : public ZED3D9ComponentBase
 		ZED3D9Texture2D*				InputColorBuffer;
 		ZED3D9Texture2D*				InputDepthBuffer;
 		ZED3D9Texture2D*				InputNormalBuffer;
-		ZED3D9ViewPort*					Output;
+		ZED3D9RenderTarget*					Output;
 
 
 	public:
@@ -77,8 +77,8 @@ class ZED3D9EDProcessor : public ZED3D9ComponentBase
 		void							SetInputNormal(ZETexture2D* Texture);
 		ZETexture2D*					GetInputNormal();
 
-		void							SetOutput(ZED3D9ViewPort* Texture);
-		ZED3D9ViewPort*					GetOutput();
+		void							SetOutput(ZED3D9RenderTarget* Texture);
+		ZED3D9RenderTarget*					GetOutput();
 
 		void							Initialize();
 		void							Deinitialize();

@@ -43,7 +43,7 @@
 #include "ZEMath\ZEVector.h"
 
 class ZETexture2D;
-class ZED3D9ViewPort;
+class ZED3D9RenderTarget;
 class ZEFrameRenderer;
 class ZED3D9Texture2D;
 class ZED3D9PixelShader;
@@ -77,7 +77,7 @@ class ZED3D9FogProcessor : public ZED3D9ComponentBase
 
 		ZED3D9Texture2D*				InputColorBuffer;
 		ZED3D9Texture2D*				InputDepthBuffer;
-		ZED3D9ViewPort*					OutputBuffer;
+		ZED3D9RenderTarget*					OutputBuffer;
 
 		ZED3D9VertexShader*				VertexShaderFog;
 		ZED3D9PixelShader*				PixelShaderExpFog;
@@ -122,8 +122,8 @@ class ZED3D9FogProcessor : public ZED3D9ComponentBase
 		void							SetInputColor(ZETexture2D* Texture);
 		ZETexture2D*					GetInputColor();
 
-		void							SetOutput(ZED3D9ViewPort* Texture);
-		ZED3D9ViewPort*					GetOutput();
+		void							SetOutput(ZED3D9RenderTarget* Texture);
+		ZED3D9RenderTarget*					GetOutput();
 
 		void							Initialize();
 		void							Deinitialize();

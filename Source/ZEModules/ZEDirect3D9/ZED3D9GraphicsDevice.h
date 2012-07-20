@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9TextureResizer.h
+ Zinek Engine - ZED3D9GraphicsDevice.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,88 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#ifndef __ZE_D3D9_GRAPHICS_DEVICE_H__
+#define __ZE_D3D9_GRAPHICS_DEVICE_H__
 
-#pragma once
-#ifndef __ZE_D3D9_TEXTURE_DOWNSAMPLER_H__
-#define __ZE_D3D9_TEXTURE_DOWNSAMPLER_H__
-
-#include "ZETypes.h"
+#include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZED3D9ComponentBase.h"
 
-class ZED3D9PixelShader;
-class ZED3D9VertexShader;
-class ZED3D9Texture2D;
-class ZETexture2D;
-class ZED3D9RenderTarget;
-class ZEFrameRenderer;
-class ZED3D9FrameRenderer;
-class ZETexture2DResource;
-
-
-enum ZED3D9TextureResizeFilter
+class ZED3D9GraphicsDevice : public ZEGraphicsDevice, private ZED3D9ComponentBase
 {
-	ZE_D3D9_RF_BOX			= 0,
-	ZE_D3D9_RF_TRIANGLE		= 1,
-	ZE_D3D9_RF_CUBIC		= 2,
-	ZE_D3D9_RF_GAUSSIAN		= 3,
-	ZE_D3D9_RF_QUADRATIC	= 4,
-	ZE_D3D9_RF_KAISER		= 5,
-	ZE_D3D9_RF_MITCHELL		= 6,
-};
-
-enum ZED3D9FittingPowerof2Mode
-{
-	ZE_D3D9_FPO2_AUTO			= 0,
-	ZE_D3D9_FPO2_NEXTPO2		= 1,
-	ZE_D3D9_FPO2_PREVIOUSPO2	= 2,
-};
-
-
-class ZED3D9TextureResizer : public ZED3D9ComponentBase
-{
-	struct TextureInfo
-	{
-		void*		Buffer;
-		ZESize		Pitch;
-		ZEUInt		Width;
-		ZEUInt		Height;
-	};
-
 	private:
+		void					InitDefaultState();
+		IDirect3DDevice9*		D3DDevice9;		
 
-		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
-		ZED3D9VertexShader*				VertexShader;
-		ZED3D9PixelShader*				PixelShaderHorizontal;
-		ZED3D9PixelShader*				PixelShaderVertical;
+	protected:
+		virtual void			ApplyRequestedBlendState();
+		virtual void			ApplyRequestedSamplerStates();
+		virtual void			ApplyRequestedShaders();
+		virtual void			ApplyRequestedStencilZState();
+		virtual void			ApplyRequestedRasterizerState();
+		virtual void			ApplyRequestedVertexDeclaration();	
+		virtual void			ApplyRequestedRenderTargets();
 
-		ZED3D9TextureResizeFilter		ResizeFilter;
-		ZED3D9FittingPowerof2Mode		AutoFitMode;
-
-		TextureInfo						DestInfo;
-		TextureInfo						SrcInfo;
-
-		ZEUInt							GetPowerOfTwo(ZEUInt Value);
-		bool							Resize(ZEUInt DestWidth, ZEUInt DestHeight);
+		virtual void			ApplyAllRequestedStates();
 
 	public:
-
-		void							SetResizeFilter(ZED3D9TextureResizeFilter ResizeFilter);
-		ZED3D9TextureResizeFilter		GetResizeFilter();
-
-		void							SetAutoFitMode(ZED3D9FittingPowerof2Mode AutoFitMode);
-		ZED3D9FittingPowerof2Mode		GetAutoFitMode();
-
-		void							OnDeviceLost();
-		void							OnDeviceRestored();
-
-		void							Initialize(void* DestData, const ZESize DestPitch, const ZEUInt DestWidth, const ZEUInt DestHegiht,
-													const void* SrcData, const ZESize SrcPitch, const ZEUInt SrcWidth, const ZEUInt SrcHeight);
-		void							Deinitialize();
-
-		bool							Process();
-
-										ZED3D9TextureResizer();
-										~ZED3D9TextureResizer();
+		virtual void			Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount);
+		virtual void			DrawIndexed(ZEROPrimitiveType PrimitiveType, ZEInt BaseVertexIndex, ZEUInt32 MinIndex, 
+											ZEUInt32 VertexCount, ZEUInt32 StartIndex, ZEUInt32 PrimitiveCount);
+			
+								ZED3D9GraphicsDevice();
+		virtual					~ZED3D9GraphicsDevice();
 };
-
-#endif	/* __ZE_D3D9_TEXTURE_DOWNSAMPLER_H__ */
+#endif

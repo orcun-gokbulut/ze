@@ -152,7 +152,7 @@ bool ZED3D9PPScreenOutputNode::Proces()
 	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)GetModule()->GetFrameBufferViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9RenderTarget*)GetModule()->GetFrameBufferViewPort())->FrameBuffer);
 	GetDevice()->SetPixelShader(PixelShader);
 	GetDevice()->SetVertexShader(VertexShader);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 5 * 4);

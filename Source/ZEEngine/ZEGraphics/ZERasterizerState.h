@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEViewPort.cpp
+ Zinek Engine - ZERasterizerState.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEViewPort.h"
+#ifndef __ZE_RASTERIZER_STATE_H__
+#define __ZE_RASTERIZER_STATE_H__
 
-ZEViewPort::~ZEViewPort()
+enum ZEFillMode
 {
+	ZE_FM_CURRENT		= 0,
+	ZE_FM_WIREFRAME		= 1,
+	ZE_FM_FILL			= 2
+};
 
-}
+enum ZECullDirection
+{
+	ZE_CD_CURRENT			= 0,
+	ZE_CD_CLOCKWISE 		= 1,
+	ZE_CD_COUNTER_CLOCKWISE = 2
+};
+
+class ZERasterizerState
+{
+protected:
+	bool					CullEnable;
+	ZEFillMode				FillMode;
+	ZECullDirection			CullDirection;
+
+	bool					Changed;
+
+public:
+	void						SetCullEnable(bool Enable);
+	bool						GetCullEnable() const;
+	void						SetFillMode(ZEFillMode Mode);
+	ZEFillMode					GetFillMode() const;
+	void						SetCullDirection(ZECullDirection Direction);
+	ZECullDirection				GetCullDirection() const;
+	void						SetChanged(bool Change);
+	bool						GetChanged() const;
+
+	const ZERasterizerState&	operator=(const ZERasterizerState& State);
+
+							ZERasterizerState();
+	virtual					~ZERasterizerState();
+};
+#endif
