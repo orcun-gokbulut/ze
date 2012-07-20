@@ -200,18 +200,6 @@ void ZED3D9Shader::PopulateConstantTable(LPD3DXCONSTANTTABLE Table)
 							SubConstantCPU.RegisterNo = SubConstantDescriptor.RegisterIndex;
 							SubConstantCPU.Semantic = "";		//PLACEHOLDER
 
-							// PRINT
-							printf("PARENT NAME: %s\n", ArrayHandleDescriptor.Name);
-							printf("PARENT REG NO: %d\n", ArrayHandleDescriptor.RegisterIndex);
-							printf("PARENT SIZE: %d\n", ArrayHandleDescriptor.Elements);
-							printf("-\n");
-
-							printf("NAME: %s\n", SubConstantCPU.ConstantName);
-							printf("TYPE: %d\n", SubConstantCPU.Type);
-							printf("SIZE: %d\n", SubConstantCPU.Count);
-							printf("REG NO : %d\n", SubConstantDescriptor.RegisterIndex);
-							printf("----------------------------\n");
-
 							// Add This to Array
 							ShaderConstants.Add(SubConstantCPU);
 
@@ -241,18 +229,6 @@ void ZED3D9Shader::PopulateConstantTable(LPD3DXCONSTANTTABLE Table)
 																				BaseArrayDescriptor.Type);
 									BaseArrayConstantCPU.RegisterNo = BaseArrayDescriptor.RegisterIndex;
 									BaseArrayConstantCPU.Semantic = "";		// PLACEHOLDER
-
-									// PRINT
-									printf("PARENT NAME: %s\n", ArrayHandleDescriptor.Name);
-									printf("PARENT REG NO: %d\n", ArrayHandleDescriptor.RegisterIndex);
-									printf("PARENT SIZE: %d\n", ArrayHandleDescriptor.Elements);
-									printf("-\n");
-
-									printf("NAME: %s\n", BaseArrayConstantCPU.ConstantName);
-									printf("TYPE: %d\n", BaseArrayConstantCPU.Type);
-									printf("SIZE: %d\n", BaseArrayConstantCPU.Count);
-									printf("REG NO : %d\n", BaseArrayConstantCPU.RegisterNo);
-									printf("----------------------------\n");
 
 									// Add This to Array
 									ShaderConstants.Add(BaseArrayConstantCPU);
@@ -285,18 +261,6 @@ void ZED3D9Shader::PopulateConstantTable(LPD3DXCONSTANTTABLE Table)
 						SubConstantCPU.RegisterNo = SubConstantDescriptor.RegisterIndex;
 						SubConstantCPU.Semantic = "";		// PLACEHOLDER
 
-						// PRINT
-						printf("PARENT NAME: %s\n", CurrentConstantDescriptor.Name);
-						printf("PARENT REG NO: %d\n", CurrentConstantDescriptor.RegisterIndex);
-						printf("PARENT SIZE: %d\n", CurrentConstantDescriptor.Elements);
-						printf("-\n");
-
-						printf("NAME: %s\n", SubConstantCPU.ConstantName);
-						printf("TYPE: %d\n", SubConstantCPU.Type);
-						printf("SIZE: %d\n", SubConstantCPU.Count);
-						printf("REG NO : %d\n", SubConstantDescriptor.RegisterIndex);
-						printf("----------------------------\n");
-
 						// Add This to Array
 						ShaderConstants.Add(SubConstantCPU);
 
@@ -327,18 +291,6 @@ void ZED3D9Shader::PopulateConstantTable(LPD3DXCONSTANTTABLE Table)
 								BaseArrayConstantCPU.RegisterNo = BaseArrayDescriptor.RegisterIndex;
 								BaseArrayConstantCPU.Semantic = "";		// PLACEHOLDER
 
-								// PRINT
-								printf("PARENT NAME: %s\n", CurrentConstantDescriptor.Name);
-								printf("PARENT REG NO: %d\n", CurrentConstantDescriptor.RegisterIndex);
-								printf("PARENT SIZE: %d\n", CurrentConstantDescriptor.Elements);
-								printf("-\n");
-
-								printf("NAME: %s\n", BaseArrayConstantCPU.ConstantName);
-								printf("TYPE: %d\n", BaseArrayConstantCPU.Type);
-								printf("SIZE: %d\n", BaseArrayConstantCPU.Count);
-								printf("REG NO : %d\n", BaseArrayConstantCPU.RegisterNo);
-								printf("----------------------------\n");
-
 								// Add This to Array
 								ShaderConstants.Add(BaseArrayConstantCPU);
 							}
@@ -356,14 +308,6 @@ void ZED3D9Shader::PopulateConstantTable(LPD3DXCONSTANTTABLE Table)
 															CurrentConstantDescriptor.Type);
 				CurrentConstantCPU.RegisterNo = CurrentConstantDescriptor.RegisterIndex;
 				CurrentConstantCPU.Semantic = "";			// PLACEHOLDER
-
-
-				// PRINT
-				printf("NAME: %s\n", CurrentConstantCPU.ConstantName);
-				printf("TYPE: %d\n", CurrentConstantCPU.Type);
-				printf("SIZE: %d\n", CurrentConstantCPU.Count);
-				printf("REG NO : %d\n", CurrentConstantDescriptor.RegisterIndex);
-				printf("----------------------------\n");
 
 				// Add This to Array
 				ShaderConstants.Add(CurrentConstantCPU);
@@ -392,12 +336,6 @@ void ZED3D9Shader::PopulateConstantTable(LPD3DXCONSTANTTABLE Table)
 																	BaseArrayDescriptor.Type);
 						BaseArrayConstantCPU.RegisterNo = BaseArrayDescriptor.RegisterIndex;
 						BaseArrayConstantCPU.Semantic = "";		// PLACEHOLDER
-
-						printf("NAME: %s\n", BaseArrayConstantCPU.ConstantName);
-						printf("TYPE: %d\n", BaseArrayConstantCPU.Type);
-						printf("SIZE: %d\n", BaseArrayConstantCPU.Count);
-						printf("REG NO : %d\n", BaseArrayConstantCPU.RegisterNo);
-						printf("----------------------------\n");
 
 						// Add This to Array
 						ShaderConstants.Add(BaseArrayConstantCPU);
