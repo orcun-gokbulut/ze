@@ -38,7 +38,7 @@
 #include "ZED3D9CommonTools.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZED3D9FrameRenderer.h"
-#include "ZED3D9ViewPort.h"
+#include "ZED3D9RenderTarget.h"
 #include "ZED3D9Texture2D.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZED3D9Profiler.h"
@@ -215,7 +215,7 @@ void ZED3D9SSAOProcessor::Process()
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Output->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9RenderTarget*)Output->GetViewPort())->FrameBuffer);
 
 	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
 	GetDevice()->SetPixelShader(PixelShader->GetPixelShader());

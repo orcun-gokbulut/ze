@@ -54,7 +54,7 @@ enum ZECameraProjectionType
 	ZE_CPT_PERSPECTIVE
 };
 
-class ZEViewPort;
+class ZERenderTarget;
 
 ZE_META_OBJECT_DESCRIPTION(ZECamera);
 

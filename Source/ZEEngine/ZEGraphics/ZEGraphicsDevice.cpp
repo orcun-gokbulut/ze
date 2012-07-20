@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9ViewPort.h
+ Zinek Engine - ZEGraphicsDevice.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,100 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_RENDER_VIEW_PORT_H__
-#define __ZE_D3D9_RENDER_VIEW_PORT_H__
+#include "ZEGraphicsDevice.h"
 
-#include "ZETypes.h"
-#include "ZEGraphics/ZEViewPort.h"
 
-#include <d3d9.h>
-
-class ZED3D9ViewPort : public ZEViewPort
+void ZEGraphicsDevice::SetBlendState(const ZEBlendState &NewBlendState)
 {
-	public:
-		LPDIRECT3DSURFACE9		FrameBuffer;
-		LPDIRECT3DSURFACE9		ZBuffer;
+	RequestedBlendState = NewBlendState;
+}
 
-		virtual float			GetAspectRatio();
-		virtual ZEUInt			GetWidth();
-		virtual ZEUInt			GetHeight();
+ZEBlendState& ZEGraphicsDevice::GetBlendStateEdit()
+{
+	return RequestedBlendState;
+}
 
-								ZED3D9ViewPort();
-		virtual					~ZED3D9ViewPort();
-};
+void ZEGraphicsDevice::SetRasterizerState(const ZERasterizerState &NewRasterizerState)
+{
+	RequestedRasterizerState = NewRasterizerState;
+}
 
-#endif
+ZERasterizerState& ZEGraphicsDevice::GetRasterizerStateEdit()
+{
+	return RequestedRasterizerState;
+}
 
+void ZEGraphicsDevice::SetSamplerState(int index, const ZESamplerState &NewSamplerState)
+{
+	RequestedSamplerStates[index] = NewSamplerState;
+}
 
+ZESamplerState& ZEGraphicsDevice::GetSamplerStateEdit(int index)
+{
+	return RequestedSamplerStates[index];
+}
 
+void ZEGraphicsDevice::SetStencilZState(ZEStencilZState NewStencilZState)
+{
+	RequestedStencilZState = NewStencilZState;
+}
 
+ZEStencilZState& ZEGraphicsDevice::GetStencilZStateEdit()
+{
+	return RequestedStencilZState;
+}
+
+void ZEGraphicsDevice::SetVertexDecleration(ZEVertexDeclaration* Declaration)
+{
+	RequestedVertexDeclaration = Declaration;
+}
+
+ZEVertexDeclaration* ZEGraphicsDevice::GetVertexDeclaration()
+{
+	return RequestedVertexDeclaration;
+}
+
+void ZEGraphicsDevice::SetVertexShader(ZEShader* VertexShader)
+{
+	RequestedVertexShader = VertexShader;
+}
+
+ZEShader* ZEGraphicsDevice::GetVertexShader()
+{
+	return RequestedVertexShader;
+}
+
+void ZEGraphicsDevice::SetPixelShader(ZEShader* PixelShader)
+{
+	RequestedVertexShader = PixelShader;
+}
+
+ZEShader* ZEGraphicsDevice::GetPixelShader()
+{
+	return RequestedPixelShader;
+}
+
+void ZEGraphicsDevice::SetRenderTarget(int index, ZERenderTarget* RenderTarget)
+{
+	RequestedRenderTargets[index] = RenderTarget;
+}
+
+ZERenderTarget* ZEGraphicsDevice::GetRenderTarget(int index)
+{
+	return RequestedRenderTargets[index];
+}
+
+void ZEGraphicsDevice::CommitRequestedState()
+{
+	ApplyAllRequestedStates();
+}
+
+ZEGraphicsDevice::ZEGraphicsDevice()
+{
+
+}
+
+ZEGraphicsDevice::~ZEGraphicsDevice()
+{
+
+}

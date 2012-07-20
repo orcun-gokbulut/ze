@@ -45,15 +45,15 @@
 class ZETexture2D;
 class ZETextureCube;
 class ZERenderCommand;
-class ZEViewPort;
-class ZED3D9ViewPort;
+class ZERenderTarget;
+class ZED3D9RenderTarget;
 enum ZETextureCubeFace;
 
 class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 {
 	friend ZED3D9Module;
 	private:
-		ZED3D9ViewPort*							ViewPort;
+		ZED3D9RenderTarget*						ViewPort;
 
 		ZESmartArray<ZERenderCommand>			CommandList;
 
@@ -98,8 +98,8 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		virtual	void							SetFace(bool Front);
 		virtual bool							GetFace();
 
-		virtual void							SetViewPort(ZEViewPort* ViewPort);
-		virtual ZEViewPort*						GetViewPort();
+		virtual void							SetViewPort(ZERenderTarget* ViewPort);
+		virtual ZERenderTarget*					GetViewPort();
 
 		virtual void							AddToRenderList(ZERenderCommand* RenderCommand);
 		virtual void							ClearRenderList();

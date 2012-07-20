@@ -39,8 +39,9 @@
 
 #include "ZETypes.h"
 #include "ZED3D9ComponentBase.h"
-#include "ZEDS/ZEArray.h"
+#include "ZEGraphics/ZEShader.h"
 #include <d3d9.h>
+#include <d3dx9.h>
 
 enum ZED3D9ShaderType
 {
@@ -48,20 +49,17 @@ enum ZED3D9ShaderType
 	ZE_D3D9_ST_PIXEL
 };
 
-class ZED3D9Shader
+class ZED3D9Shader : public ZEShader
 {
 	friend class ZED3D9ShaderManager;
-	private:
-		ZEUInt32						Hash;
-		char							FileName[100];
-		char							FunctionName[100];
-		ZEUInt32						Components;
-
-		ZESize							ReferanceCount;
-	
 	protected:
-										ZED3D9Shader();
-		virtual							~ZED3D9Shader();
+		ZESize							ReferanceCount;
+		ZEUInt32						Hash;
+		ZEUInt32						Components;		//??
+		char							FileName[ZE_MAX_SHADER_NAME_LENGTH];
+		char							FunctionName[ZE_MAX_SHADER_NAME_LENGTH];
+
+		void							PopulateConstantTable(LPD3DXCONSTANTTABLE Table);
 
 	public:
 		virtual ZED3D9ShaderType		GetShaderType() = 0;
@@ -70,45 +68,142 @@ class ZED3D9Shader
 		const char*						GetFunctionName();
 		ZEUInt32						GetComponents();
 
-		void							Release();
-
+		void							Release();	
+		
 		static ZED3D9Shader*			CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile);
+
+										ZED3D9Shader();
+		virtual							~ZED3D9Shader();
 };
 
-
-class ZED3D9PixelShader : public ZED3D9Shader
+class ZED3D9PixelShader : public ZED3D9Shader, private ZED3D9ComponentBase
 {
 	friend class ZED3D9ShaderManager;
 	private:
 		LPDIRECT3DPIXELSHADER9			PixelShader;
-		
-										ZED3D9PixelShader();
-		virtual							~ZED3D9PixelShader();
 
 	public:
 		virtual ZED3D9ShaderType		GetShaderType();
 		LPDIRECT3DPIXELSHADER9			GetPixelShader();
 
+		// Set Constant
+		virtual void					SetConstant(const ZEString& Name, const ZEVector2& Value);
+		virtual void					SetConstant(const ZEString& Name, const ZEVector3& Value);
+		virtual void					SetConstant(const ZEString& Name, const ZEVector4& Value);		
+		virtual void					SetConstant(const ZEString& Name, const ZEMatrix3x3& Value);
+		virtual void					SetConstant(const ZEString& Name, const ZEMatrix4x4& Value);
+		virtual void					SetConstant(const ZEString& Name, bool Value);
+		virtual void					SetConstant(const ZEString& Name, float Value);
+
+		virtual void					SetConstantArray(const ZEString& Name, const ZEVector2* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(const ZEString& Name, const ZEVector3* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(const ZEString& Name, const ZEVector4* ValueArray, ZESize Count);		
+		virtual void					SetConstantArray(const ZEString& Name, const ZEMatrix3x3* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(const ZEString& Name, const ZEMatrix4x4* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(const ZEString& Name, const bool* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(const ZEString& Name, const float* ValueArray, ZESize Count);
+
+		virtual void					SetConstant(int Register, const ZEVector2& Value);
+		virtual void					SetConstant(int Register, const ZEVector3& Value);
+		virtual void					SetConstant(int Register, const ZEVector4& Value);		
+		virtual void					SetConstant(int Register, const ZEMatrix3x3& Value);
+		virtual void					SetConstant(int Register, const ZEMatrix4x4& Value);
+		virtual void					SetConstant(int Register, bool Value);
+		virtual void					SetConstant(int Register, float Value);
+
+		virtual void					SetConstantArray(int Register, const ZEVector2* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(int Register, const ZEVector3* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(int Register, const ZEVector4* ValueArray, ZESize Count);		
+		virtual void					SetConstantArray(int Register, const ZEMatrix3x3* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(int Register, const ZEMatrix4x4* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(int Register, const bool* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(int Register, const float* ValueArray, ZESize Count);
+
+		// Get Constant Value
+		virtual ZEVector2				GetShaderConstantVector2(const char* Name) const;
+		virtual ZEVector3				GetShaderConstantVector3(const char* Name) const;
+		virtual ZEVector4				GetShaderConstantVector4(const char* Name) const;
+		virtual ZEMatrix3x3				GetShaderConstantMatrix3x3(const char* Name) const;
+		virtual ZEMatrix4x4				GetShaderConstantMatrix4x4(const char* Name) const;
+		virtual bool					GetShaderConstantBool(const char* Name) const;
+		virtual float					GetShaderConstantFloat(const char* Name) const;
+
+		virtual	bool					CompileShader(const ZEString CompilerParameters[][2],
+														int MacroSize,
+														ZEString ShaderProfile, 
+														ZEString Source,
+														ZEString MainFunction);
+
 		static ZED3D9PixelShader*		CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
+
+										ZED3D9PixelShader();
+		virtual							~ZED3D9PixelShader();
 };
 
 
-class ZED3D9VertexShader : public ZED3D9Shader
+class ZED3D9VertexShader : public ZED3D9Shader, private ZED3D9ComponentBase
 {
 	friend class ZED3D9ShaderManager;
 	private:
 		LPDIRECT3DVERTEXSHADER9			VertexShader;
 
-										ZED3D9VertexShader();
-										~ZED3D9VertexShader();
-
 	public:
 		virtual ZED3D9ShaderType		GetShaderType();
 		LPDIRECT3DVERTEXSHADER9			GetVertexShader();
+		
+		// Set Constant
+		virtual void					SetConstant(const ZEString& Name, const ZEVector2& Value);
+		virtual void					SetConstant(const ZEString& Name, const ZEVector3& Value);
+		virtual void					SetConstant(const ZEString& Name, const ZEVector4& Value);		
+		virtual void					SetConstant(const ZEString& Name, const ZEMatrix3x3& Value);
+		virtual void					SetConstant(const ZEString& Name, const ZEMatrix4x4& Value);
+		virtual void					SetConstant(const ZEString& Name, bool Value);
+		virtual void					SetConstant(const ZEString& Name, float Value);
+
+		virtual void					SetConstantArray(const ZEString& Name, const ZEVector2* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(const ZEString& Name, const ZEVector3* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(const ZEString& Name, const ZEVector4* ValueArray, ZESize Count);		
+		virtual void					SetConstantArray(const ZEString& Name, const ZEMatrix3x3* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(const ZEString& Name, const ZEMatrix4x4* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(const ZEString& Name, const bool* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(const ZEString& Name, const float* ValueArray, ZESize Count);
+
+		virtual void					SetConstant(int Register, const ZEVector2& Value);
+		virtual void					SetConstant(int Register, const ZEVector3& Value);
+		virtual void					SetConstant(int Register, const ZEVector4& Value);		
+		virtual void					SetConstant(int Register, const ZEMatrix3x3& Value);
+		virtual void					SetConstant(int Register, const ZEMatrix4x4& Value);
+		virtual void					SetConstant(int Register, bool Value);
+		virtual void					SetConstant(int Register, float Value);
+
+		virtual void					SetConstantArray(int Register, const ZEVector2* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(int Register, const ZEVector3* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(int Register, const ZEVector4* ValueArray, ZESize Count);		
+		virtual void					SetConstantArray(int Register, const ZEMatrix3x3* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(int Register, const ZEMatrix4x4* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(int Register, const bool* ValueArray, ZESize Count);
+		virtual void					SetConstantArray(int Register, const float* ValueArray, ZESize Count);
+
+		// Get Constant Value
+		virtual ZEVector2				GetShaderConstantVector2(const char* Name) const;
+		virtual ZEVector3				GetShaderConstantVector3(const char* Name) const;
+		virtual ZEVector4				GetShaderConstantVector4(const char* Name) const;
+		virtual ZEMatrix3x3				GetShaderConstantMatrix3x3(const char* Name) const;
+		virtual ZEMatrix4x4				GetShaderConstantMatrix4x4(const char* Name) const;
+		virtual bool					GetShaderConstantBool(const char* Name) const;
+		virtual float					GetShaderConstantFloat(const char* Name) const;
+
+		virtual	bool					CompileShader(const ZEString CompilerParameters[][2],
+														int MacroSize,
+														ZEString ShaderProfile, 
+														ZEString Source,
+														ZEString MainFunction);
 
 		static ZED3D9VertexShader*		CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
-};
 
+										ZED3D9VertexShader();
+		virtual							~ZED3D9VertexShader();
+};
 #endif
 
 

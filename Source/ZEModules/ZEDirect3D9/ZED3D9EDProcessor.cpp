@@ -37,7 +37,7 @@
 #include "ZED3D9CommonTools.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZED3D9FrameRenderer.h"
-#include "ZED3D9ViewPort.h"
+#include "ZED3D9RenderTarget.h"
 #include "ZED3D9Texture2D.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZED3D9Profiler.h"
@@ -86,12 +86,12 @@ ZETexture2D* ZED3D9EDProcessor::GetInputNormal()
 	return InputNormalBuffer;
 }
 
-void ZED3D9EDProcessor::SetOutput(ZED3D9ViewPort* Texture)
+void ZED3D9EDProcessor::SetOutput(ZED3D9RenderTarget* Texture)
 {
 	this->Output = Texture;
 }
 
-ZED3D9ViewPort* ZED3D9EDProcessor::GetOutput()
+ZED3D9RenderTarget* ZED3D9EDProcessor::GetOutput()
 {
 	return Output;
 }

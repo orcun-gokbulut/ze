@@ -88,7 +88,7 @@ bool ZED3D9TextureCube::DeviceRestored()
 	return true;
 }
 
-ZEViewPort* ZED3D9TextureCube::GetViewPort(ZETextureCubeFace Face)
+ZERenderTarget* ZED3D9TextureCube::GetViewPort(ZETextureCubeFace Face)
 {
 	if (!RenderTarget)
 		return NULL;

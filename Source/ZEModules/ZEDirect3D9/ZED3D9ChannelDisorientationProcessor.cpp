@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9Shader.h"
-#include "ZED3D9ViewPort.h"
+#include "ZED3D9Rendertarget.h"
 #include "ZED3D9Profiler.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9CommonTools.h"
@@ -148,12 +148,12 @@ ZED3D9Texture2D* ZED3D9ChannelDisorientationProcessor::GetInput()
 	return Input;
 }
 
-void ZED3D9ChannelDisorientationProcessor::SetOutput(ZED3D9ViewPort* Texture)
+void ZED3D9ChannelDisorientationProcessor::SetOutput(ZED3D9RenderTarget* Texture)
 {
 	Output = Texture;
 }
 
-ZED3D9ViewPort* ZED3D9ChannelDisorientationProcessor::GetOutput()
+ZED3D9RenderTarget* ZED3D9ChannelDisorientationProcessor::GetOutput()
 {
 	return Output;
 }

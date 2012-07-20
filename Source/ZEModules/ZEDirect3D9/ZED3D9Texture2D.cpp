@@ -74,7 +74,7 @@ bool ZED3D9Texture2D::DeviceRestored()
 	return true;
 }
 
-ZEViewPort* ZED3D9Texture2D::GetViewPort()
+ZERenderTarget* ZED3D9Texture2D::GetViewPort()
 {
 	return &ViewPort;
 }

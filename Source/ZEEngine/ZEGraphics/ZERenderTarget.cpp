@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9GrainProcessor.h
+ Zinek Engine - ZERenderTarget.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,72 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_GRAIN_PROCESSOR_H__
-#define __ZE_D3D9_GRAIN_PROCESSOR_H__
+#include "ZERenderTarget.h"
 
-#include "ZED3D9ComponentBase.h"
-#include "..\..\..\Platform\Windows\x64\Include\DirectX\d3d9.h"
-
-
-class ZED3D9PixelShader;
-class ZED3D9VertexShader;
-class ZED3D9Texture2D;
-class ZETexture2D;
-class ZED3D9RenderTarget;
-class ZEFrameRenderer;
-class ZED3D9FrameRenderer;
-class ZETexture2DResource;
-
-class ZED3D9GrainProcessor : public ZED3D9ComponentBase
+ZERenderTarget::~ZERenderTarget()
 {
-	private:
-		float					Strength;
-		float					Frequency;
-		float					NoiseSize;
 
-		ZED3D9FrameRenderer*	Renderer;
-
-		ZED3D9PixelShader*		PixelShaderGrain;
-		ZED3D9PixelShader*		PixelShaderBlend;
-		ZED3D9VertexShader*		VertexShader;
-
-		ZED3D9Texture2D*		GrainBuffer;
-		ZED3D9RenderTarget*			Output;
-		ZED3D9Texture2D*		Input;
-		
-		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
-
-		void					CreateRenderTargets();
-		void					DestroyRenderTargets();
-
-	public:
-								ZED3D9GrainProcessor();
-								~ZED3D9GrainProcessor();
-
-		void					Initialize();
-		void					Deinitialize();
-
-		void					SetRenderer(ZEFrameRenderer* Renderer);
-		ZEFrameRenderer*		GetRenderer();
-
-		float					GetFrequency() const;
-		void					SetFrequency(float Value);
-
-		float					GetStrength() const;
-		void					SetStrength(float Value);
-
-		float					GetNoiseSize() const;
-		void					SetNoiseSize(float Value);
-
-		void					SetInput(ZED3D9Texture2D* Texture);
-		ZED3D9Texture2D*		GetInput();
-
-		void					SetOutput(ZED3D9RenderTarget* Texture);
-		ZED3D9RenderTarget*			GetOutput();
-
-		void					Process(float ElapsedTime);
-
-};
-
-#endif
+}

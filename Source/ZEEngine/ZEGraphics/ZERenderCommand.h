@@ -65,10 +65,10 @@ typedef ZEUInt32 ZERenderCommandFlags;
 
 enum ZEROPrimitiveType
 {
-	ZE_ROPT_POINT,
-	ZE_ROPT_LINE,
-	ZE_ROPT_TRIANGLE,
-	ZE_ROPT_TRIANGLE_STRIPT
+	ZE_ROPT_POINT			= 0,
+	ZE_ROPT_LINE			= 1,
+	ZE_ROPT_TRIANGLE		= 2,
+	ZE_ROPT_TRIANGLE_STRIPT = 3
 };
 
 class ZELight;

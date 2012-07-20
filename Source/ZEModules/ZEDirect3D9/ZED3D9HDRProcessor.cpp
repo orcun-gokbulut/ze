@@ -176,7 +176,7 @@ void ZED3D9HDRProcessor::ReleaseRenderTargets()
 	ZED3D_DESTROY(Textures.OldLuminance);
 }
 
-void ZED3D9HDRProcessor::MeasureLuminance(ZED3D9Texture2D* Input, ZED3D9Texture2D* OldLimunance, ZED3D9ViewPort* Limunance)
+void ZED3D9HDRProcessor::MeasureLuminance(ZED3D9Texture2D* Input, ZED3D9Texture2D* OldLimunance, ZED3D9RenderTarget* Limunance)
 {
 	static struct Vert  
 	{
@@ -208,7 +208,7 @@ void ZED3D9HDRProcessor::MeasureLuminance(ZED3D9Texture2D* Input, ZED3D9Texture2
 	GetDevice()->SetPixelShaderConstantF(10, (const float*) Kernel, 9);
 
 	// Luminance Measure Start Pass
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.Luminance5->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9RenderTarget*)Textures.Luminance5->GetViewPort())->FrameBuffer);
 	GetDevice()->SetTexture(0, Input->Texture);
 	GetDevice()->SetPixelShader(Shaders.MeasureLuminanceStart->GetPixelShader());
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / 243.0f, 1.0f / 243.0f, 0.0f, 0.0f), 1);
@@ -219,7 +219,7 @@ void ZED3D9HDRProcessor::MeasureLuminance(ZED3D9Texture2D* Input, ZED3D9Texture2
 	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.Luminance4->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9RenderTarget*)Textures.Luminance4->GetViewPort())->FrameBuffer);
 	GetDevice()->SetTexture(0, Textures.Luminance5->Texture);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / 81.0f, 1.0f / 81.0f, 0.0f, 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / 243.0f, 1.0f / 243.0f, 0.0f, 0.0f), 1);
@@ -227,28 +227,28 @@ void ZED3D9HDRProcessor::MeasureLuminance(ZED3D9Texture2D* Input, ZED3D9Texture2
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 	// Luminance Measure Down Sample 3x (From : 81, To: 27)
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.Luminance3->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9RenderTarget*)Textures.Luminance3->GetViewPort())->FrameBuffer);
 	GetDevice()->SetTexture(0, Textures.Luminance4->Texture);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / 27.0f, 1.0f / 27.0f, 0.0f, 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / 81.0f, 1.0f / 81.0f, 0.0f, 0.0f), 1);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 	// Luminance Measure Down Sample 3x (From : 27, To: 9)
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.Luminance2->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9RenderTarget*)Textures.Luminance2->GetViewPort())->FrameBuffer);
 	GetDevice()->SetTexture(0, Textures.Luminance3->Texture);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / 9.0f, 1.0f / 9.0f, 0.0f, 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / 27.0f, 1.0f / 27.0f, 0.0f, 0.0f), 1);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 	// Luminance Measure Down Sample 3x (From : 9, To: 3)
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.Luminance1->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9RenderTarget*)Textures.Luminance1->GetViewPort())->FrameBuffer);
 	GetDevice()->SetTexture(0, Textures.Luminance2->Texture);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / 3.0f, 1.0f / 3.0f, 0.0f, 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / 9.0f, 1.0f / 9.0f, 0.0f, 0.0f), 1);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 	// Luminance Measure End Pass
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.Luminance->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9RenderTarget*)Textures.Luminance->GetViewPort())->FrameBuffer);
 	GetDevice()->SetTexture(1, Textures.Luminance1->Texture);
 	GetDevice()->SetTexture(2, Textures.OldLuminance->Texture);
 	GetDevice()->SetPixelShader(Shaders.MeasureLuminanceEnd->GetPixelShader());
@@ -257,7 +257,7 @@ void ZED3D9HDRProcessor::MeasureLuminance(ZED3D9Texture2D* Input, ZED3D9Texture2
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 }
 
-void ZED3D9HDRProcessor::BrightPass(ZED3D9Texture2D* Input, ZED3D9ViewPort* Output)
+void ZED3D9HDRProcessor::BrightPass(ZED3D9Texture2D* Input, ZED3D9RenderTarget* Output)
 {
 	static struct Vert  
 	{
@@ -294,7 +294,7 @@ void ZED3D9HDRProcessor::BrightPass(ZED3D9Texture2D* Input, ZED3D9ViewPort* Outp
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 }
 
-void ZED3D9HDRProcessor::DownSample2x(ZED3D9Texture2D* Input, ZED3D9ViewPort* Output)
+void ZED3D9HDRProcessor::DownSample2x(ZED3D9Texture2D* Input, ZED3D9RenderTarget* Output)
 {
 	static struct Vert  
 	{
@@ -329,7 +329,7 @@ void ZED3D9HDRProcessor::DownSample2x(ZED3D9Texture2D* Input, ZED3D9ViewPort* Ou
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 }
 
-void ZED3D9HDRProcessor::BlurPass(ZED3D9Texture2D* Input, ZED3D9Texture2D* Temp, ZED3D9ViewPort* Output)
+void ZED3D9HDRProcessor::BlurPass(ZED3D9Texture2D* Input, ZED3D9Texture2D* Temp, ZED3D9RenderTarget* Output)
 {
 	static struct Vert  
 	{
@@ -365,7 +365,7 @@ void ZED3D9HDRProcessor::BlurPass(ZED3D9Texture2D* Input, ZED3D9Texture2D* Temp,
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 }
 
-void ZED3D9HDRProcessor::ToneMap(ZED3D9Texture2D* Input, ZED3D9ViewPort* Output)
+void ZED3D9HDRProcessor::ToneMap(ZED3D9Texture2D* Input, ZED3D9RenderTarget* Output)
 {
 	static struct Vert  
 	{
@@ -427,25 +427,25 @@ void ZED3D9HDRProcessor::Process(float ElapsedTime)
 	GetDevice()->SetPixelShaderConstantB(0, (BOOL*)BloomPasses, 4);
 
 
-	MeasureLuminance(Input, Textures.OldLuminance, (ZED3D9ViewPort*)Textures.Luminance->GetViewPort());
+	MeasureLuminance(Input, Textures.OldLuminance, (ZED3D9RenderTarget*)Textures.Luminance->GetViewPort());
 
-	BrightPass(Input, (ZED3D9ViewPort*)Textures.DownSampled2xA->GetViewPort());
+	BrightPass(Input, (ZED3D9RenderTarget*)Textures.DownSampled2xA->GetViewPort());
 	
 	if (IntParameters.BloomPassCount > 1)
-		DownSample2x(Textures.DownSampled2xA, (ZED3D9ViewPort*)Textures.DownSampled4xA->GetViewPort());
+		DownSample2x(Textures.DownSampled2xA, (ZED3D9RenderTarget*)Textures.DownSampled4xA->GetViewPort());
 	if (IntParameters.BloomPassCount > 2)
-		DownSample2x(Textures.DownSampled4xA, (ZED3D9ViewPort*)Textures.DownSampled8xA->GetViewPort());
+		DownSample2x(Textures.DownSampled4xA, (ZED3D9RenderTarget*)Textures.DownSampled8xA->GetViewPort());
 	if (IntParameters.BloomPassCount > 3)
-		DownSample2x(Textures.DownSampled8xA, (ZED3D9ViewPort*)Textures.DownSampled16xA->GetViewPort());
+		DownSample2x(Textures.DownSampled8xA, (ZED3D9RenderTarget*)Textures.DownSampled16xA->GetViewPort());
 	
 	if (IntParameters.BloomPassCount > 0)
-		BlurPass(Textures.DownSampled2xA, Textures.DownSampled2xB, (ZED3D9ViewPort*)Textures.DownSampled2xA->GetViewPort());
+		BlurPass(Textures.DownSampled2xA, Textures.DownSampled2xB, (ZED3D9RenderTarget*)Textures.DownSampled2xA->GetViewPort());
 	if (IntParameters.BloomPassCount > 1)
-		BlurPass(Textures.DownSampled4xA, Textures.DownSampled4xB, (ZED3D9ViewPort*)Textures.DownSampled4xA->GetViewPort());
+		BlurPass(Textures.DownSampled4xA, Textures.DownSampled4xB, (ZED3D9RenderTarget*)Textures.DownSampled4xA->GetViewPort());
 	if (IntParameters.BloomPassCount > 2)
-		BlurPass(Textures.DownSampled8xA, Textures.DownSampled8xB, (ZED3D9ViewPort*)Textures.DownSampled8xA->GetViewPort());
+		BlurPass(Textures.DownSampled8xA, Textures.DownSampled8xB, (ZED3D9RenderTarget*)Textures.DownSampled8xA->GetViewPort());
 	if (IntParameters.BloomPassCount > 3)
-		BlurPass(Textures.DownSampled16xA, Textures.DownSampled16xB, (ZED3D9ViewPort*)Textures.DownSampled16xA->GetViewPort());
+		BlurPass(Textures.DownSampled16xA, Textures.DownSampled16xB, (ZED3D9RenderTarget*)Textures.DownSampled16xA->GetViewPort());
 
 	ToneMap(Input, Output);
 
@@ -540,12 +540,12 @@ ZED3D9Texture2D* ZED3D9HDRProcessor::GetInput()
 	return Input;
 }
 
-void ZED3D9HDRProcessor::SetOutput(ZED3D9ViewPort* Output)
+void ZED3D9HDRProcessor::SetOutput(ZED3D9RenderTarget* Output)
 {
 	this->Output = Output;
 }
 
-ZED3D9ViewPort* ZED3D9HDRProcessor::GetOutput()
+ZED3D9RenderTarget* ZED3D9HDRProcessor::GetOutput()
 {
 	return Output;
 }

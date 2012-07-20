@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEGraphics/ZETextureCube.h"
-#include "ZED3D9ViewPort.h"
+#include "ZED3D9RenderTarget.h"
 #include "ZED3D9ComponentBase.h"
 #include <d3d9.h>
 
@@ -48,7 +48,7 @@ class ZED3D9TextureCube : public ZETextureCube, public ZED3D9ComponentBase
 	friend class ZED3D9Module;
 
 	protected:
-		ZED3D9ViewPort					ViewPorts[6];
+		ZED3D9RenderTarget				ViewPorts[6];
 										ZED3D9TextureCube();
 		virtual							~ZED3D9TextureCube();
 
@@ -60,7 +60,7 @@ class ZED3D9TextureCube : public ZETextureCube, public ZED3D9ComponentBase
 		virtual void					DeviceLost();
 		virtual bool					DeviceRestored();
 
-		virtual ZEViewPort*				GetViewPort(ZETextureCubeFace Face);
+		virtual ZERenderTarget*			GetViewPort(ZETextureCubeFace Face);
 
 		virtual bool					Create(ZEUInt EdgeLenght, ZEUInt Levels, ZETexturePixelFormat PixelFormat, bool RenderTarget = false);
 		virtual bool					Lock(ZETextureCubeFace Face, ZEUInt Level, void** Buffer, ZESize* Pitch);

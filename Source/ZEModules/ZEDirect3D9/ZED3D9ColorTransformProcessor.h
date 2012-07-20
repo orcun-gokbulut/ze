@@ -44,7 +44,7 @@ class ZED3D9PixelShader;
 class ZED3D9VertexShader;
 class ZED3D9Texture2D;
 class ZETexture2D;
-class ZED3D9ViewPort;
+class ZED3D9RenderTarget;
 class ZEFrameRenderer;
 class ZED3D9FrameRenderer;
 class ZETexture2DResource;
@@ -76,7 +76,7 @@ class ZED3D9ColorTransformProcessor : public ZED3D9ComponentBase
 		ZED3D9FrameRenderer*			Renderer;
 
 		ZED3D9Texture2D*				InputBuffer;
-		ZED3D9ViewPort*					OutputBuffer;
+		ZED3D9RenderTarget*					OutputBuffer;
 
 		ZED3D9VertexShader*				VertexShader;
 		ZED3D9PixelShader*				PixelShader;
@@ -90,8 +90,8 @@ class ZED3D9ColorTransformProcessor : public ZED3D9ComponentBase
 		void							SetInput(ZETexture2D* Texture);
 		ZETexture2D*					GetInput();
 
-		void							SetOutput(ZED3D9ViewPort* Texture);
-		ZED3D9ViewPort*					GetOutput();
+		void							SetOutput(ZED3D9RenderTarget* Texture);
+		ZED3D9RenderTarget*					GetOutput();
 
 		void							SetColorMatrix(const ZEMatrix4x4* Matrix);
 		ZEMatrix4x4*					GetColorMatrix();

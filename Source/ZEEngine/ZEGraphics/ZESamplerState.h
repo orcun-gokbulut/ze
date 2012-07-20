@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureCube.h
+ Zinek Engine - ZESamplerState.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,76 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TEXTURE_CUBE_H__
-#define __ZE_TEXTURE_CUBE_H__
+#ifndef __ZE_SAMPLER_STATE_H__
+#define __ZE_SAMPLER_STATE_H__
 
-#include "ZETypes.h"
+#include "ZEFoundation/ZEMath/ZEVector.h"
 #include "ZETexture.h"
 
-class ZERenderTarget;
-
-enum ZETextureCubeFace
+enum ZETextureAdressMode
 {
-	ZE_CTF_POSITIVEX	= 0,
-	ZE_CTF_NEGATIVEX	= 1,
-	ZE_CTF_POSITIVEY	= 2,
-	ZE_CTF_NEGATIVEY	= 3,
-	ZE_CTF_POSITIVEZ	= 4,
-	ZE_CTF_NEGATIVEZ	= 5
+	ZE_TAM_CURRENT				= 0,	
+	ZE_TAM_WRAP				    = 1,
+	ZE_TAM_MIRROR			    = 2,
+	ZE_TAM_CLAMP			    = 3,
+	ZE_TAM_BORDER				= 4
+
 };
 
-class ZETextureCube : public ZETexture
+enum ZETextureFilterMode
 {
-	protected:
-		ZEUInt						EdgeLength;
-		ZEUInt						LevelCount;
-		ZETexturePixelFormat		PixelFormat;
-		bool						RenderTarget;
+	ZE_TFM_CURRENT				= 0,
+	ZE_TFM_NONE					= 1,
+	ZE_TFM_POINT				= 2,
+	ZE_TFM_LINEAR				= 3,
+	ZE_TFM_ANISOTROPY			= 4
+};
 
-									ZETextureCube();
-		virtual						~ZETextureCube();
+class ZESamplerState
+{
+protected:
+	ZETextureFilterMode				MinFilter;
+	ZETextureFilterMode				MagFilter;
+	ZETextureFilterMode				MipFilter;
+	ZETextureAdressMode				AddressU;
+	ZETextureAdressMode				AddressV;
+	ZETextureAdressMode				AddressW;
+	ZEUInt							MaxAnisotropy;
+	ZEVector4						BorderColor;
+	float							MaxLOD;
 
-	public:
-		virtual ZETextureType		GetTextureType() const;
-		ZEUInt						GetLevelCount() const;
-		ZEUInt						GetEdgeLenght() const;
-		ZETexturePixelFormat		GetPixelFormat() const;
-		bool						IsRenderTarget() const;
+	bool							Changed;
 
-		virtual ZERenderTarget*			GetViewPort(ZETextureCubeFace Face) = 0;
+	// Currently Attached Texture
+	ZETexture*						CurrentTexture;
 
-		virtual	bool				Create(ZEUInt EdgeLength, ZEUInt Levels, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
-		virtual bool				Lock(ZETextureCubeFace Face, ZEUInt Level, void** Buffer, ZESize* Pitch) = 0;
-		virtual void				Unlock(ZETextureCubeFace Face, ZEUInt Level) = 0;
+public:
+	void							SetMinFilter(ZETextureFilterMode FilterMode);
+	ZETextureFilterMode				GetMinFilter() const;
+	void							SetMagFilter(ZETextureFilterMode FilterMode);
+	ZETextureFilterMode				GetMagFilter() const;
+	void							SetMipFilter(ZETextureFilterMode FilterMode);
+	ZETextureFilterMode				GetMipFilter() const;
+	void							SetAddressU(ZETextureAdressMode AdressMode);
+	ZETextureAdressMode				GetAddressU() const;
+	void							SetAddressV(ZETextureAdressMode AdressMode);
+	ZETextureAdressMode				GetAddressV() const;
+	void							SetAddressW(ZETextureAdressMode AdressMode);
+	ZETextureAdressMode				GetAddressW() const;
+	void							SetMaxAnisotrophy(ZEUInt AnisotrophyLevel);
+	ZEUInt							GetMaxAnisotrophy() const;
+	void							SetBorderColor(const ZEVector4& Color);
+	ZEVector4						GetBorderColor() const;
+	void							SetMaxLOD(float LOD);
+	float							GetMaxLOD() const;
+	void							SetChanged(bool Change);
+	bool							GetChanged() const;
+	void							SetCurrentTexture(ZETexture* Texture);
+	ZETexture*						GetTexture() const;
 
-		static ZETextureCube*		CreateInstance();
+	const ZESamplerState&			operator=(const ZESamplerState& State);
+
+									ZESamplerState();
+	virtual							~ZESamplerState();
 };
 #endif
-
-
-
-

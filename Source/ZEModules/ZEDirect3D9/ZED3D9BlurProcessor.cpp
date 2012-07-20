@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9Shader.h"
-#include "ZED3D9ViewPort.h"
+#include "ZED3D9Rendertarget.h"
 #include "ZED3D9Profiler.h"
 #include "ZED3D9Texture2D.h"
 #include "ZEMath/ZEMatrix.h"
@@ -192,12 +192,12 @@ ZETexture2D* ZED3D9BlurProcessor::GetInput()
 	return InputBuffer;
 }
 
-void ZED3D9BlurProcessor::SetOutput(ZED3D9ViewPort* Texture)
+void ZED3D9BlurProcessor::SetOutput(ZED3D9RenderTarget* Texture)
 {
 	this->OutputBuffer = Texture;
 }
 
-ZED3D9ViewPort* ZED3D9BlurProcessor::GetOutput()
+ZED3D9RenderTarget* ZED3D9BlurProcessor::GetOutput()
 {
 	return OutputBuffer;
 }
@@ -419,7 +419,7 @@ void ZED3D9BlurProcessor::Process()
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)OutputBuffer->GetWidth(), 1.0f / (float)OutputBuffer->GetHeight(), 0.0f, 0.0f), 1);
 
 	// Set input and output textures
-	ZED3D9CommonTools::SetRenderTarget(0, (ZEViewPort*)OutputBuffer);
+	ZED3D9CommonTools::SetRenderTarget(0, (ZERenderTarget*)OutputBuffer);
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputBuffer, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, (ZETexture2D*)TempTexture1, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
 

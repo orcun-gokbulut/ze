@@ -404,7 +404,7 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 
 		if (DeviceState == D3DERR_DEVICENOTRESET || ForceReset)
 		{
-			Hr =Device->Reset(&D3DPP);
+			Hr = Device->Reset(&D3DPP);
 			if (Hr == D3D_OK)
 			{
 				zeLog("Direct3D Device Restored.");
@@ -508,7 +508,7 @@ ZEUInt ZED3D9Module::GetMaterialComponentMask()
 	return 0xFFFFFFFF;
 }
 
-ZEViewPort* ZED3D9Module::GetFrameBufferViewPort()
+ZERenderTarget* ZED3D9Module::GetFrameBufferViewPort()
 {
 	return &FrameBufferViewPort;
 }

@@ -47,7 +47,7 @@ class ZETexture2D;
 class ZED3D9Texture2D;
 class ZED3D9PixelShader;
 class ZED3D9VertexShader;
-class ZED3D9ViewPort;
+class ZED3D9RenderTarget;
 
 ZE_META_OBJECT_DESCRIPTION(ZED3D9HDRProcessor);
 
@@ -57,7 +57,7 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 
 	private:
 		ZED3D9Texture2D*				Input;
-		ZED3D9ViewPort*					Output;
+		ZED3D9RenderTarget*					Output;
 		ZESize							ScreenWidth, ScreenHeight;
 
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
@@ -97,11 +97,11 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 		void							CreateRenderTargets();
 		void							ReleaseRenderTargets();
 
-		void							MeasureLuminance(ZED3D9Texture2D* Input, ZED3D9Texture2D* OldLuminance, ZED3D9ViewPort* Output);
-		void							BrightPass(ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
-		void							BlurPass(ZED3D9Texture2D* Input, ZED3D9Texture2D* Temp, ZED3D9ViewPort* Output);
-		void							DownSample2x(ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
-		void							ToneMap(ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
+		void							MeasureLuminance(ZED3D9Texture2D* Input, ZED3D9Texture2D* OldLuminance, ZED3D9RenderTarget* Output);
+		void							BrightPass(ZED3D9Texture2D* Input, ZED3D9RenderTarget* Output);
+		void							BlurPass(ZED3D9Texture2D* Input, ZED3D9Texture2D* Temp, ZED3D9RenderTarget* Output);
+		void							DownSample2x(ZED3D9Texture2D* Input, ZED3D9RenderTarget* Output);
+		void							ToneMap(ZED3D9Texture2D* Input, ZED3D9RenderTarget* Output);
 		
 		struct 
 		{
@@ -152,8 +152,8 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 		void							SetInput(ZED3D9Texture2D* Input);
 		ZED3D9Texture2D*				GetInput();
 
-		void							SetOutput(ZED3D9ViewPort* Output);
-		ZED3D9ViewPort*					GetOutput();
+		void							SetOutput(ZED3D9RenderTarget* Output);
+		ZED3D9RenderTarget*					GetOutput();
 
 		void							Process(float ElapsedTime);
 

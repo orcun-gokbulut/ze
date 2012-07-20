@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9ViewPort.cpp
+ Zinek Engine - ZEShader.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,51 +33,103 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED3D9ViewPort.h"
+#include "ZEShader.h"
 
-float ZED3D9ViewPort::GetAspectRatio()
+ZEShader::~ZEShader()
 {
-	if (FrameBuffer != NULL)
-	{
-		D3DSURFACE_DESC Desc;
-		FrameBuffer->GetDesc(&Desc);
-		return (float)Desc.Width / (float)Desc.Height;
+
+}
+
+bool ZEShader::FindParameterLocation(ZEUInt32& OutLocation, const ZEString Name) const
+{
+	for(ZEUInt32 i = 0; i < ShaderCompilerParameters.GetCount(); i++)
+	{	
+		if(ShaderCompilerParameters[i].Name == Name)
+		{
+			OutLocation = i;
+			return true;
+		}
 	}
-
-	return 0.0f;
+	return false;
 }
 
-ZEUInt ZED3D9ViewPort::GetWidth()
-{
-	if (FrameBuffer != NULL)
-	{
-		D3DSURFACE_DESC Desc;
-		FrameBuffer->GetDesc(&Desc);
-		return Desc.Width;
+bool ZEShader::FindConstantLocation(ZEUInt32& OutLocation, const ZEString Name) const
+{	
+	ZEUInt32 Index = 0;
+	for(ZEUInt32 i = 0; i < ShaderConstants.GetCount(); i++)
+	{	
+		if(ShaderConstants[i].ConstantName == Name)
+		{
+			OutLocation = i;
+			return true;
+		}
 	}
-
-	return 0;
+	return false;
 }
 
-ZEUInt ZED3D9ViewPort::GetHeight()
+bool ZEShader::IsCompiled() const
 {
-	if (FrameBuffer != NULL)
+	return Compiled;
+}
+
+bool ZEShader::IsDefined(const ZEString& ParameterName) const
+{
+	ZEUInt32 Index;
+	if(FindParameterLocation(Index, ParameterName))
+			return true;
+	return false;
+}
+
+bool ZEShader::GetCompilerParameterString(ZEString& Out, const ZEString& ParameterName) const
+{
+	ZEUInt32 Index;
+	if(FindParameterLocation(Index, ParameterName))
 	{
-		D3DSURFACE_DESC Desc;
-		FrameBuffer->GetDesc(&Desc);
-		return Desc.Height;
+		Out = ShaderCompilerParameters[Index].Definition;
+		return true;
 	}
-
-	return 0;
+	return false;
 }
 
-ZED3D9ViewPort::ZED3D9ViewPort()
+bool ZEShader::GetConstantCount(ZEUInt32& Out, const ZEString& Name) const
 {
-	FrameBuffer = NULL;
-	ZBuffer = NULL;
+	ZEUInt32 Index;
+	if(FindConstantLocation(Index, Name))
+	{
+		Out = ShaderConstants[Index].Count;
+		return true;
+	}
+	return false;
 }
 
-ZED3D9ViewPort::~ZED3D9ViewPort()
+bool ZEShader::GetConstantSemantic(ZEString& Out, const ZEString& Name) const
 {
-	
+	return false;
+}
+
+bool ZEShader::GetConstantDataType(ZEShaderConstantDataType& Out, const ZEString& Name) const
+{
+	ZEUInt32 Index;
+	if(FindConstantLocation(Index, Name))
+	{
+		Out = ShaderConstants[Index].Type;
+		return true;
+	}
+	return false;
+}
+
+bool ZEShader::GetShaderConstantRegister(ZEUInt32& Out, const ZEString& Name) const
+{
+	ZEUInt32 Index;
+	if(FindConstantLocation(Index, Name))
+	{
+		Out = ShaderConstants[Index].RegisterNo;
+		return true;
+	}
+	return false;
+}
+
+bool ZEShader::GetSamplerNumber(ZEUInt32& Out, const ZEString& Name) const
+{
+	return GetShaderConstantRegister(Out, Name);
 }
