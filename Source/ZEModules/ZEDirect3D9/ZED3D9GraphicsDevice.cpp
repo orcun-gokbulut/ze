@@ -500,6 +500,7 @@ void ZED3D9GraphicsDevice::ApplyAllRequestedStates()
 	ApplyRequestedStencilZState();
 	ApplyRequestedRasterizerState();
 	ApplyRequestedVertexDeclaration();
+	ApplyRequestedRenderTargets();
 }
 
 void ZED3D9GraphicsDevice::Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount) 
@@ -515,7 +516,7 @@ void ZED3D9GraphicsDevice::DrawIndexed(ZEROPrimitiveType PrimitiveType, ZEInt Ba
 {
 	// Commit State
 	ApplyAllRequestedStates();
-	//Then Draw
+	// Then Draw
 	D3DDevice9->DrawIndexedPrimitive(ZEPrimitiveTypeToDX9(PrimitiveType), BaseVertexIndex, MinIndex,
 										VertexCount, StartIndex, PrimitiveCount);
 }
