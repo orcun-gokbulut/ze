@@ -37,12 +37,17 @@ sampler2D 	ColorBuffer		: register (s0);
 
 float4 		VSParameters	: register(vs, c0);
 
-#define		PixelSize		VSParameters.xy
+#define		PixelSizeVS		VSParameters.xy
 
+float4 		PSParameters	: register(ps, c0);
+
+#define		SharpenAmount	PSParameters.z
+#define		PixelSizePS		PSParameters.xy
 
 struct VS_INPUT
 {
 	float4 Position	: POSITION0;
+	float2 TexCoord	: TEXCOORD0;
 	
 };
 
@@ -67,9 +72,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
    
 	Output.Position	= sign(Input.Position);
-
-	Output.TexCoord.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
-	Output.TexCoord.y = 0.5f * (1.0f - Output.Position.y + PixelSize.y);
+	Output.TexCoord = Input.TexCoord + 0.5f * PixelSizeVS;
 
 	return Output;
 }
@@ -89,13 +92,13 @@ static const float4 OffsetTable[9] =
     1.0f,  1.0f, 0.0f, 1.0f / 9.0f
 };
 
-float4 GetBlurredPixel(float2 Coord)
+float3 GetBlurredPixel(float2 Coord)
 {
-	float4 Color = (float4)0.0f;
+	float3 Color = (float3)0.0f;
 
 	for (int I = 0; I < 9; ++I)
 	{
-		Color += tex2D(ColorBuffer, Coord + OffsetTable[I].xy * PixelSize) * OffsetTable[I].w;
+		Color += tex2D(ColorBuffer, Coord + OffsetTable[I].xy * PixelSizePS).rgb * OffsetTable[I].w;
 	}
   
 	return Color;
@@ -104,13 +107,16 @@ float4 GetBlurredPixel(float2 Coord)
 PS_OUTPUT ps_main( PS_INPUT Input )
 {
 	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
-   
+
 	float4 Sample = tex2D(ColorBuffer, Input.TexCoord);
-	float4 Blurred = GetBlurredPixel(Input.TexCoord);
+	float3 Blurred = GetBlurredPixel(Input.TexCoord);
    
-	float4 Difference = Sample - Blurred;
+	float3 Difference = Sample.rgb - Blurred;
   
-	Output.PixelColor = Sample + Difference;
+	float3 Sharpened = Sample.rgb + Difference;
+	
+	Output.PixelColor.a = Sample.a;
+	Output.PixelColor.rgb = lerp(Sample.rgb, Sharpened, SharpenAmount);
 	
 	return Output;
 }

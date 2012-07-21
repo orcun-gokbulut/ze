@@ -158,10 +158,10 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9DOFProcessor					DOFProcessor;
 		ZED3D9BlurProcessor					BlurProcessor;
 		ZED3D9GrainProcessor				GrainProcessor;
-		ZED3D9ColorTransformProcessor		CTProcessor;
-		ZED3D9ChannelDisorientationProcessor CDProcessor;
-		ZED3D9TextureMaskProcessor			TMProcessor;
-		ZED3D9BlurMaskProcessor				BMProcessor;
+		ZED3D9ColorTransformProcessor		ColorTransformProcessor;
+		ZED3D9ChannelDisorientationProcessor ChannelDisorientProcessor;
+		ZED3D9TextureMaskProcessor			TextureMaskProcessor;
+		ZED3D9BlurMaskProcessor				BlurMaskProcessor;
 		ZED3D9ZoomBlurProcessor				ZoomBlurProcessor;
 		ZED3D9UnsharpenFilterProcessor		UnsharpenProcessor;
 		
