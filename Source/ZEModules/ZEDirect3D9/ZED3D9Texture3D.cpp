@@ -49,11 +49,6 @@ ZED3D9Texture3D::~ZED3D9Texture3D()
 	this->Release();
 }
 
-void* ZED3D9Texture3D::GetTextureHandle() const
-{
-	return (void*)VolumeTexture;
-}
-
 bool ZED3D9Texture3D::IsEmpty() const
 {
 	return VolumeTexture == NULL;

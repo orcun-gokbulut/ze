@@ -34,8 +34,3 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9DepthBuffer.h"
-
-void* ZED3D9DepthBuffer::GetDepthSurface()
-{
-	return (void*) DepthSurface;
-}

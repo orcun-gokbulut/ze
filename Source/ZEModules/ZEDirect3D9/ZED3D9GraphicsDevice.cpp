@@ -37,6 +37,10 @@
 #include "ZED3D9Shader.h"
 #include "ZED3D9VertexDeclaration.h"
 #include "ZED3D9RenderTarget.h"
+#include "ZED3D9DepthBuffer.h"
+#include "ZED3D9Texture2D.h"
+#include "ZED3D9Texture3D.h"
+#include "ZED3D9TextureCube.h"
 
 inline D3DBLEND ZEBlendOptionToDX9(ZEBlendOption BlendOption)
 {
@@ -323,10 +327,20 @@ void ZED3D9GraphicsDevice::ApplyRequestedSamplerStates()
 			{
 				DeviceSamplerStates[i].SetCurrentTexture(RequestedSamplerStates[i].GetTexture());
 
-				// Burada DX9 Modulunde Genel Texture Classi Yok
-				D3DDevice9->SetTexture(i, ((LPDIRECT3DBASETEXTURE9)DeviceSamplerStates[i].GetTexture()->GetTextureHandle()));
-			}
+				ZETextureType TexType = DeviceSamplerStates[i].GetTexture()->GetTextureType();
+				switch (TexType)
+				{
+					case ZE_TT_2D :
+						D3DDevice9->SetTexture(i, (((ZED3D9Texture2D*)DeviceSamplerStates[i].GetTexture())->Texture));
+						break;
+					case ZE_TT_3D :
+						D3DDevice9->SetTexture(i, (((ZED3D9Texture3D*)DeviceSamplerStates[i].GetTexture())->VolumeTexture));
+						break;
+					case ZE_TT_CUBE :
+						D3DDevice9->SetTexture(i, (((ZED3D9TextureCube*)DeviceSamplerStates[i].GetTexture())->CubeTexture));
+				}
 
+			}
 			// Until Next Apply;
 			// If nothing changes on this state block, this should remain false
 			RequestedSamplerStates[i].SetChanged(false);
@@ -512,7 +526,7 @@ void ZED3D9GraphicsDevice::ApplyRequestedRenderTargets()
 	if(RequestedDepthBuffer != NULL && RequestedDepthBuffer != DeviceDepthBuffer)
 	{
 		DeviceDepthBuffer = RequestedDepthBuffer;
-		D3DDevice9->SetDepthStencilSurface((LPDIRECT3DSURFACE9) RequestedDepthBuffer->GetDepthSurface());
+		D3DDevice9->SetDepthStencilSurface(((ZED3D9DepthBuffer*)RequestedDepthBuffer)->DepthSurface);
 	}
 }
 

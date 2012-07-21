@@ -43,7 +43,6 @@ class ZEDepthBuffer
 
 	public:
 		bool					GetHasStencil() const;
-		virtual void*			GetDepthSurface() = 0;
 
 		virtual					~ZEDepthBuffer();
 };
