@@ -44,6 +44,7 @@
 #include "ZEVertexDeclaration.h"
 #include "ZERenderTarget.h"
 #include "ZERenderCommand.h"
+#include "ZEDepthBuffer.h"
 
 #define ZE_MAX_SAMPLER_ATTACHMENT	16	// PLACEHOLDER
 #define ZE_MAX_RENDER_TARGETS		4
@@ -77,9 +78,13 @@ class ZEGraphicsDevice
 		ZEShader*				RequestedPixelShader;
 		ZEShader*				DevicePixelShader;
 
-		// Render Targets
+		// Frame buffer
 		ZERenderTarget*			RequestedRenderTargets[ZE_MAX_RENDER_TARGETS];
 		ZERenderTarget*			DeviceRenderTargets[ZE_MAX_RENDER_TARGETS];
+		ZEDepthBuffer*			RequestedDepthBuffer;
+		ZEDepthBuffer*			DeviceDepthBuffer;
+
+		virtual void			InitDefaultState() = 0;
 
 		virtual void			ApplyRequestedBlendState() = 0;
 		virtual void			ApplyReqestedSamplerStates() = 0;
@@ -114,6 +119,7 @@ class ZEGraphicsDevice
 		virtual void			Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount) = 0;
 		virtual void			DrawIndexed(ZEROPrimitiveType PrimitiveType, int BaseVertexIndex, ZEUInt32 MinIndex, 
 											ZEUInt32 VertexCount, ZEUInt32 StartIndex, ZEUInt32 PrimitiveCount) = 0;
+		
 		// Commit State to GPU without Draw Call
 		void					CommitRequestedState();
 

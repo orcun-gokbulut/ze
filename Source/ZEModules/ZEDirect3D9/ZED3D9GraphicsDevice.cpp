@@ -169,6 +169,14 @@ inline void ZED3D9GraphicsDevice::InitDefaultState()
 	// TODO: 
 	D3DDevice9->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, true);
 
+	// Default Shaders
+	//	.........
+
+	// Default Vertex Declaration
+	// ..........
+
+	// RenderTargets
+	// ..........
 }
 
 void ZED3D9GraphicsDevice::ApplyRequestedBlendState()
@@ -316,7 +324,7 @@ void ZED3D9GraphicsDevice::ApplyRequestedSamplerStates()
 				DeviceSamplerStates[i].SetCurrentTexture(RequestedSamplerStates[i].GetTexture());
 
 				// Burada DX9 Modulunde Genel Texture Classi Yok
-//				D3DDevice9->SetTexture(i, ((ZED3D9Texture*))DeviceSamplerStates[i].GetTexture()));
+				D3DDevice9->SetTexture(i, ((LPDIRECT3DBASETEXTURE9)DeviceSamplerStates[i].GetTexture()->GetTextureHandle()));
 			}
 
 			// Until Next Apply;
@@ -328,16 +336,23 @@ void ZED3D9GraphicsDevice::ApplyRequestedSamplerStates()
 
 void ZED3D9GraphicsDevice::ApplyRequestedShaders()
 {
-	// Check the pointers if same address then consider them as same shader
-	if(RequestedPixelShader != DevicePixelShader)
+	// if RequestedPixelShader is NULL that means use current shader
+	if(RequestedPixelShader != NULL)
 	{
-		DevicePixelShader = RequestedPixelShader;
-		D3DDevice9->SetPixelShader(((ZED3D9PixelShader*)DevicePixelShader)->GetPixelShader());
+		// Check the pointers if same address then consider them as same shader
+		if(RequestedPixelShader != DevicePixelShader)
+		{
+			DevicePixelShader = RequestedPixelShader;
+			D3DDevice9->SetPixelShader(((ZED3D9PixelShader*)DevicePixelShader)->GetPixelShader());
+		}
 	}
-	if(RequestedVertexShader != DeviceVertexShader)
+	if(RequestedVertexShader != NULL)
 	{
-		DeviceVertexShader = RequestedVertexShader;
-		D3DDevice9->SetVertexShader(((ZED3D9VertexShader*)DeviceVertexShader)->GetVertexShader());
+		if(RequestedVertexShader != DeviceVertexShader)
+		{
+			DeviceVertexShader = RequestedVertexShader;
+			D3DDevice9->SetVertexShader(((ZED3D9VertexShader*)DeviceVertexShader)->GetVertexShader());
+		}
 	}
 }
 
@@ -466,11 +481,15 @@ void ZED3D9GraphicsDevice::ApplyRequestedRasterizerState()
 
 void ZED3D9GraphicsDevice::ApplyRequestedVertexDeclaration()
 {
-	// If Pointer Address not same consider it changed
-	if(RequestedVertexDeclaration != DeviceVertexDeclaration)
+	// If Requested Device is NULL it means Use Current
+	if(RequestedVertexDeclaration != NULL)
 	{
-		DeviceVertexDeclaration = RequestedVertexDeclaration;
-		DeviceVertexDeclaration->SetupVertexDeclaration();
+		// If Pointer Address not same consider it changed
+		if(RequestedVertexDeclaration != DeviceVertexDeclaration)
+		{
+			DeviceVertexDeclaration = RequestedVertexDeclaration;
+			DeviceVertexDeclaration->SetupVertexDeclaration();
+		}
 	}
 }
 
@@ -478,17 +497,22 @@ void ZED3D9GraphicsDevice::ApplyRequestedRenderTargets()
 {
 	for(int i = 0; i < ZE_MAX_RENDER_TARGETS; i++)
 	{
-		// If Pointer Address not same consider it changed
-		if(RequestedRenderTargets[i] != DeviceRenderTargets[i])
-		{
-			DeviceRenderTargets[i] = RequestedRenderTargets[i];
-
-			if(DeviceRenderTargets[i] != NULL)
+		// If NULL skip this render target
+		if(RequestedRenderTargets[i] != NULL)
+		{		
+			// If Pointer Address not same consider it changed
+			if(RequestedRenderTargets[i] != DeviceRenderTargets[i])
 			{
+				DeviceRenderTargets[i] = RequestedRenderTargets[i];
 				D3DDevice9->SetRenderTarget(i, ((ZED3D9RenderTarget*)DeviceRenderTargets[i])->FrameBuffer);
-				D3DDevice9->SetDepthStencilSurface(((ZED3D9RenderTarget*)DeviceRenderTargets[i])->ZBuffer);
 			}
 		}
+	}
+
+	if(RequestedDepthBuffer != NULL && RequestedDepthBuffer != DeviceDepthBuffer)
+	{
+		DeviceDepthBuffer = RequestedDepthBuffer;
+		D3DDevice9->SetDepthStencilSurface((LPDIRECT3DSURFACE9) RequestedDepthBuffer->GetDepthSurface());
 	}
 }
 
@@ -499,8 +523,8 @@ void ZED3D9GraphicsDevice::ApplyAllRequestedStates()
 	ApplyRequestedShaders();
 	ApplyRequestedStencilZState();
 	ApplyRequestedRasterizerState();
-	ApplyRequestedVertexDeclaration();
 	ApplyRequestedRenderTargets();
+	ApplyRequestedVertexDeclaration();
 }
 
 void ZED3D9GraphicsDevice::Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount) 

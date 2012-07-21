@@ -121,9 +121,20 @@ void ZEGraphicsDevice::CommitRequestedState()
 	ApplyAllRequestedStates();
 }
 
-ZEGraphicsDevice::ZEGraphicsDevice()
+ZEGraphicsDevice::ZEGraphicsDevice() :	RequestedPixelShader(NULL),
+										DevicePixelShader(NULL),
+										RequestedVertexShader(NULL),
+										DeviceVertexShader(NULL),
+										RequestedVertexDeclaration(NULL),
+										DeviceVertexDeclaration(NULL),
+										RequestedDepthBuffer(NULL),
+										DeviceDepthBuffer(NULL)
 {
-
+	for(int i = 0; i < ZE_MAX_RENDER_TARGETS; i++)
+	{
+		RequestedRenderTargets[i] = NULL;
+		DeviceRenderTargets[i] = NULL;
+	}
 }
 
 ZEGraphicsDevice::~ZEGraphicsDevice()

@@ -50,6 +50,11 @@ ZED3D9Texture2D::~ZED3D9Texture2D()
 	Release();
 }
 
+void* ZED3D9Texture2D::GetTextureHandle() const
+{
+	return (void*)Texture;
+}
+
 bool ZED3D9Texture2D::IsEmpty() const
 {
 	return Texture == NULL;
@@ -70,7 +75,6 @@ bool ZED3D9Texture2D::DeviceRestored()
 	{
 		Create(Width, Height, LevelCount, PixelFormat, true);
 	}
-
 	return true;
 }
 

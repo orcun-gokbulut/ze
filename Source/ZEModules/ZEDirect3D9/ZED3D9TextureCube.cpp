@@ -54,6 +54,11 @@ ZED3D9TextureCube::~ZED3D9TextureCube()
 	Release();
 }
 
+void* ZED3D9TextureCube::GetTextureHandle() const
+{
+	return (void*)CubeTexture;
+}
+
 bool ZED3D9TextureCube::IsEmpty() const
 {
 	return CubeTexture == NULL;
