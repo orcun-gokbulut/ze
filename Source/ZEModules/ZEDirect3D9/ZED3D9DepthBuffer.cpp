@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETexture.h
+ Zinek Engine - ZED3D9DepthBuffer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,62 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TEXTURE_H__
-#define __ZE_TEXTURE_H__
+#include "ZED3D9DepthBuffer.h"
 
-enum ZETextureType
+void* ZED3D9DepthBuffer::GetDepthSurface()
 {
-	ZE_TT_2D,
-	ZE_TT_3D,
-	ZE_TT_CUBE
-};
-
-enum ZETexturePixelFormat
-{
-	ZE_TPF_NOTSET,
-
-	// Integer Formats
-	ZE_TPF_I8,
-	ZE_TPF_I8_2,
-	ZE_TPF_I8_4,
-	ZE_TPF_I16,
-	ZE_TPF_I16_2,
-	ZE_TPF_I16_4,
-	ZE_TPF_I32,
-
-	// Floating Point Formats
-	ZE_TPF_F16,
-	ZE_TPF_F16_2,
-	ZE_TPF_F16_4,
-	ZE_TPF_F32,
-	ZE_TPF_F32_2,
-	ZE_TPF_F32_4,
-
-	// Compressed Formats
-	ZE_TPF_DXT1,
-	ZE_TPF_DXT3,
-	ZE_TPF_DXT5,
-};
-
-class ZETexture
-{
-	protected:
-										ZETexture();
-		virtual							~ZETexture();
-
-	public:
-		virtual void*					GetTextureHandle() const = 0;
-		virtual ZETextureType			GetTextureType() const = 0;
-
-		virtual bool					IsEmpty() const = 0;
-
-		virtual void					Release() = 0;
-		virtual void					Destroy() = 0;
-};
-
-#endif
-
-
-
-
+	return (void*) DepthSurface;
+}

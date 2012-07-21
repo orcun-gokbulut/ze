@@ -746,6 +746,9 @@ bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameter[][2],
 	// Populate Constants Array and Register Array
 	PopulateConstantTable(ConstantTable);
 
+	// Compile Done! Set FunctionName
+//	FunctionName = MainFunction;
+
 	// Create Shader Handle
 	if (GetDevice()->CreatePixelShader((DWORD*)ShaderBuffer->GetBufferPointer(), &PixelShader) != NULL)
 	{
@@ -1144,6 +1147,9 @@ bool ZED3D9VertexShader::CompileShader(const ZEString CompilerParameter[][2],
 
 	// Populate Constants Array and Register Array
 	PopulateConstantTable(ConstantTable);
+
+	// Compile Done! Set FunctionName
+//	FunctionName = MainFunction;
 
 	// Create Shader Handle
 	if (GetDevice()->CreateVertexShader((DWORD*)ShaderBuffer->GetBufferPointer(), &VertexShader) != NULL)

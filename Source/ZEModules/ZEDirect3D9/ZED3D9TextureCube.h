@@ -55,6 +55,7 @@ class ZED3D9TextureCube : public ZETextureCube, public ZED3D9ComponentBase
 	public:
 		LPDIRECT3DCUBETEXTURE9			CubeTexture;
 
+		virtual void*					GetTextureHandle() const;
 		virtual bool					IsEmpty() const;
 
 		virtual void					DeviceLost();

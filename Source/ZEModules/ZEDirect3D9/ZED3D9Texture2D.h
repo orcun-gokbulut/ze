@@ -55,7 +55,7 @@ class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 	public:
 		LPDIRECT3DTEXTURE9				Texture;
 
-
+		virtual void*					GetTextureHandle() const;
 		virtual bool					IsEmpty() const;
 
 		virtual void					DeviceLost();

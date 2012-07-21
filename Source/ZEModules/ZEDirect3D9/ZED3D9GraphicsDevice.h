@@ -42,10 +42,11 @@
 class ZED3D9GraphicsDevice : public ZEGraphicsDevice, private ZED3D9ComponentBase
 {
 	private:
-		void					InitDefaultState();
 		IDirect3DDevice9*		D3DDevice9;		
 
 	protected:
+		virtual void			InitDefaultState();
+
 		virtual void			ApplyRequestedBlendState();
 		virtual void			ApplyRequestedSamplerStates();
 		virtual void			ApplyRequestedShaders();
@@ -59,8 +60,8 @@ class ZED3D9GraphicsDevice : public ZEGraphicsDevice, private ZED3D9ComponentBas
 	public:
 		virtual void			Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount);
 		virtual void			DrawIndexed(ZEROPrimitiveType PrimitiveType, ZEInt BaseVertexIndex, ZEUInt32 MinIndex, 
-											ZEUInt32 VertexCount, ZEUInt32 StartIndex, ZEUInt32 PrimitiveCount);
-			
+											ZEUInt32 VertexCount, ZEUInt32 StartIndex, ZEUInt32 PrimitiveCount);	
+
 								ZED3D9GraphicsDevice();
 		virtual					~ZED3D9GraphicsDevice();
 };
