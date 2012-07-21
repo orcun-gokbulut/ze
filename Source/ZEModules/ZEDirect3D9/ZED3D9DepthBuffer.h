@@ -43,7 +43,5 @@ class ZED3D9DepthBuffer
 {
 	public:
 		LPDIRECT3DSURFACE9 DepthSurface;
-
-		virtual void* GetDepthSurface();
 };
 #endif

@@ -78,7 +78,6 @@ class ZETexture
 		virtual							~ZETexture();
 
 	public:
-		virtual void*					GetTextureHandle() const = 0;
 		virtual ZETextureType			GetTextureType() const = 0;
 
 		virtual bool					IsEmpty() const = 0;

@@ -52,7 +52,6 @@ class ZED3D9Texture3D : public ZETexture3D, public ZED3D9ComponentBase
 	public:
 		LPDIRECT3DVOLUMETEXTURE9		VolumeTexture;
 
-		virtual void*					GetTextureHandle() const;
 		virtual bool					IsEmpty() const;
 
 		virtual void					DeviceLost();
