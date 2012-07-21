@@ -289,8 +289,8 @@ ZED3D9ColorTransformProcessor::ZED3D9ColorTransformProcessor()
 	OutputBuffer		= NULL;
 
 	HueFactor			= 0.0f;
-	LightnessFactor		= 1.1f;
-	SaturationFactor	= 1.2f;
+	SaturationFactor	= 0.0f;
+	LightnessFactor		= 0.0f;
 	TransformFactor		= 1.0f;
 	ColorMatrix			= (ZEMatrix4x4*)&ZEColorMatrix::Normal;
 	

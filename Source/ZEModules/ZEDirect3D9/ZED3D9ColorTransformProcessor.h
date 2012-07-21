@@ -66,9 +66,9 @@ class ZEColorMatrix : public ZEMatrix4x4
 class ZED3D9ColorTransformProcessor : public ZED3D9ComponentBase
 {
 	private:
-		float							HueFactor;				// Additive
-		float							LightnessFactor;		// Multiplicative
-		float							SaturationFactor;		// Multiplicative
+		float							HueFactor;				// Angle 0-360, Additive
+		float							LightnessFactor;		// 0-1, Additive
+		float							SaturationFactor;		// 0-1, Additive
 
 		float							TransformFactor;
 		ZEMatrix4x4*					ColorMatrix;

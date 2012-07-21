@@ -38,23 +38,21 @@ sampler2D 	TextureInput	 		: register(s6);
 
 // Vertex Shader Parameters
 float4 		VSParameters			: register(vs, c0);
+
 #define		PixelSize				VSParameters.xy
 
 // Pixel Shader parameters
 float4		PSParameters			: register(ps, c0);
 float4x4	ColorTransformMatrix 	: register(ps, c1);
-#define		HueFactor				PSParameters.x
-#define		LightnessFactor			PSParameters.y
-#define		SaturationFactor		PSParameters.z
+
+#define		HueBoost				PSParameters.x
+#define		IntensityBoost			PSParameters.y
+#define		SaturationBoost			PSParameters.z
 #define		BlendFactor				PSParameters.w
 
-// Definitions
-#define ZERO_TRESHOLD   0.001f
 
 #define MAX(Vector3)	(max(max( (Vector3.x), (Vector3.y) ), (Vector3.z) ))
 #define MIN(Vector3)	(min(min( (Vector3.x), (Vector3.y) ), (Vector3.z) ))
-
-#define EQUAL(Scalar1, Scalar2)   (abs((Scalar1) - (Scalar2)) < (ZERO_TRESHOLD))
 
 
 // Vertex Shader Input Struct
@@ -97,156 +95,161 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 }
 
 
-float3 RGBtoHSL(float3 RGB)
+float3 RGBtoHSL(float3 RGBColor)
 {
-   float Hue;
-   float Lightness;
-   float Saturation;
+	float Hue = 0.0f;
+	float Saturation = 0.0f;
+	float Lightness = 0.0f;
    
-   float Max = MAX(RGB);
-   float Min = MIN(RGB);
+	float Max = MAX(RGBColor);
+	float Min = MIN(RGBColor);
 
-   // Lightness
-   Lightness = (Max + Min) / 2.0f;
-   
-   // Saturation
-   if (EQUAL(Max, Min))
-   {
-      // Achromatic
-      Hue = 0.0f;
-      Saturation = 0.0f;
+	float MaxMinSum = Max + Min;
+	float MaxMinDiff = Max - Min;
 
-	  // Done
-	  return float3(Hue, Saturation, Lightness);
-   }
-   else
-   {
-      // Chromatic
-      if (Lightness <= 0.5f)
-         Saturation = (Max - Min) / (Max + Min);
-      else
-         Saturation = (Max - Min) / (2.0f - Max - Min);
-   }
+	// Lightness
+	Lightness = (MaxMinSum) / 2.0f;
    
-   // Hue
-   float Cr = (Max - RGB.r) / (Max - Min);	// division can be optimizable
-   float Cg = (Max - RGB.g) / (Max - Min);
-   float Cb = (Max - RGB.b) / (Max - Min);
-   
-   if (EQUAL(RGB.r, Max))
-      Hue = Cb - Cg;
-   if (EQUAL(RGB.g, Max))
-      Hue = 2.0f + Cr - Cb;
-   if (EQUAL(RGB.b, Max))
-      Hue = 4.0f + Cg - Cr;
-   
-   Hue *= 60.0f;
+	// Saturation and Hue
+	[branch]
+	if (Max == Min)
+	{
+		Hue = 0.0f;
+		Saturation = 0.0f;
+	}
+	else // Chromatic
+	{
+		[branch]
+		if (Lightness <= 0.5f)
+			Saturation = (MaxMinDiff) / (MaxMinSum);
+		else
+			Saturation = (MaxMinDiff) / (2.0f - MaxMinDiff);
 
-   if (Hue < 0.0f)
-      Hue += 360;
+		// Hue
+		float3 Chrom; //Chrom = CrCgCb
+		Chrom = (Max - RGBColor) / MaxMinDiff;
    
-   return float3(Hue, Saturation, Lightness);
+		[branch]
+		if (RGBColor.r == Max)
+			Hue = Chrom.b - Chrom.g;
+		else if (RGBColor.g == Max)
+			Hue = 2.0f + Chrom.r - Chrom.b;
+		else //(RGBColor.b == Max)
+			Hue = 4.0f + Chrom.g - Chrom.r;
+   
+		Hue *= 60.0f;
+
+		if (Hue < 0.0f)
+			Hue += 360.0f;
+	}
+
+	return float3(Hue, Saturation, Lightness);
 }
 
-float3 HSLtoRGB(float3 HSL)
+float3 HSLtoRGB(float3 HSLColor)
 {
-   float Hue = HSL.x;
-   float Saturation = HSL.y;
-   float Lightness = HSL.z;
-   
-   float Red, Green, Blue;
+	float Hue = HSLColor.x;
+	float Saturation = HSLColor.y;
+	float Lightness = HSLColor.z;
 
-   float M1, M2;
+	float M1, M2;
+	float3 Color = 0.0f;
+
+	[branch]
+	if (Lightness < 0.5f)
+		M2 = Lightness * (1.0f + Saturation);
+	else
+		M2 = (Lightness + Saturation) - Lightness * Saturation;
+   
+	M1 = 2.0f * Lightness - M2;
+   
+	float M2M1Diff = M2 - M1;
+
+	[branch]
+	if (Saturation == 0.0f)
+	{
+		Color.r = Lightness;
+		Color.g = Lightness;
+		Color.b = Lightness;
+	}
+	else
+	{
+		float h = Hue + 120.0f;
+		if (h > 360.0f)
+			h = h - 360.0f;
+      
+		// Red
+		[branch]
+		if (h  <  60.0f)
+			Color.r = M1 + ( M2M1Diff ) * h / 60.0f;
+		else if (h < 180.0f)
+			Color.r = M2;
+		else if (h < 240.0f)
+			Color.r = M1 + ( M2M1Diff ) * ( 240.0f - h ) / 60.0f;
+		else
+			Color.r = M1;
+         
+		h = Hue;
+         
+		// Green
+		[branch]
+		if (h < 60.0f)
+			Color.g = M1 + ( M2M1Diff ) * h / 60.0f;
+		else if (h < 180.0f)
+			Color.g = M2;
+		else if (h < 240.0f)
+			Color.g = M1 + ( M2M1Diff ) * ( 240.0f - h ) / 60.0f;
+		else
+			Color.g  = M1;
+      
+		h = Hue - 120;
+		if (h < 0.0f)
+			h += 360.0f;
+         
+		// Blue
+		[branch]
+		if (h  <  60.0f)
+			Color.b = M1 + ( M2M1Diff ) * h / 60.0f;
+		else if (h < 180.0f)
+			Color.b = M2;
+		else if (h < 240.0f)
+			Color.b = M1 + ( M2M1Diff ) * ( 240.0f - h ) / 60.0f;
+		else
+			Color.b = M1;
+	}
   
-   if (Lightness < 0.5f)
-      M2 = Lightness * (1.0f + Saturation);
-   else
-      M2 = Lightness + Saturation - Lightness * Saturation;
-   
-   M1 = 2.0f * Lightness - M2;
-   
-   float M2M1Diff = M2 - M1;
-
-   
-   if (EQUAL(Saturation, 0.0f))
-   {
-      Red = Lightness;
-      Green = Lightness;
-      Blue = Lightness;
-
-	  // Done
-	  return float3(Red, Green, Blue); 
-   }
-   else
-   {
-      float h = Hue + 120.0f;
-      if (h > 360.0f)
-         h = h - 360.0f;
-      
-      // Red
-      if (h  <  60.0f)
-         Red = M1 + ( M2M1Diff ) * h / 60.0f;
-      else if (h < 180.0f)
-         Red = M2;
-      else if (h < 240.0f)
-         Red = M1 + ( M2M1Diff ) * ( 240.0f - h ) / 60.0f;
-      else
-         Red = M1;
-         
-      h = Hue;
-         
-      // Green
-      if (h < 60.0f)
-         Green = M1 + ( M2M1Diff ) * h / 60.0f;
-      else if (h < 180.0f)
-         Green = M2;
-      else if (h < 240.0f)
-         Green = M1 + ( M2M1Diff ) * ( 240.0f - h ) / 60.0f;
-      else
-         Green  = M1;
-      
-      h = Hue - 120;
-      if (h < 0.0f)
-         h += 360.0f;
-         
-      // Blue
-      if (h  <  60.0f)
-         Blue = M1 + ( M2M1Diff ) * h / 60.0f;
-      else if (h < 180.0f)
-         Blue = M2;
-      else if (h < 240.0f)
-         Blue = M1 + ( M2M1Diff ) * ( 240.0f - h ) / 60.0f;
-      else
-         Blue = M1;
-   }
-   
-   return float3(Red, Green, Blue); 
+	return Color; 
 }
 
 PS_OUTPUT ps_main( PS_INPUT Input )
 {
-	PS_OUTPUT Output;
-	Output.PixelColor = (float4)0.0f;
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
 	
 	// Transform Color
-	float4 SampleColor = tex2D(TextureInput, Input.TexCoord);
+	float4 SampleColor = saturate(tex2D(TextureInput, Input.TexCoord));
 	float4 TransformedColor = mul(ColorTransformMatrix, float4(SampleColor.xyz, 1.0f));
-	
-	// Adjust H, S, L
+
+	// Convert to HSL
 	float3 HSL = RGBtoHSL(TransformedColor.rgb);
-	
-	// Let hue loop between 0 - 360
-	HSL.x += HueFactor;	
+
+	// Add values
+	// Do not modify lightness at this point
+	// Do not let gray pixels gain saturation as mush as color pixels
+	HSL += float3(HueBoost, HSL.y * SaturationBoost, 0.0f);
+
+	// Limit values
+	float4 ClampedHSL;
 	HSL.x = fmod(HSL.x, 360.0f);
-
-	// Clamp Saturation and lightness 0 - 1 range
-	HSL.yz *= float2(SaturationFactor, LightnessFactor);
-	HSL.yz = saturate(HSL.yz);
-
+	HSL.yz = clamp(HSL.yz, 0.0f, 1.0f);
+	
+	// Convert back to rgb
 	float3 RGB = HSLtoRGB(HSL);
-
+	
+	// Adjust intensity
+	RGB += IntensityBoost;
+	
 	Output.PixelColor.a = SampleColor.a;
 	Output.PixelColor.rgb = lerp(SampleColor.rgb, RGB, BlendFactor);
-	
+
 	return Output;
 }
