@@ -55,6 +55,7 @@
 #include "ZED3D9BlurMaskProcessor.h"
 #include "ZED3D9ZoomBlurProcessor.h"
 #include "ZED3D9UnsharpenFilterProcessor.h"
+#include "ZED3D9CRTScanProcessor.h"
 
 class ZELight;
 class ZEPointLight;
@@ -97,6 +98,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9Texture2D*					BlurMaskInputBuffer;
 		ZED3D9Texture2D*					ZoomBlurInputBuffer;
 		ZED3D9Texture2D*					UnsharpenInputBuffer;
+		ZED3D9Texture2D*					CRTScanInputBuffer;
 	
 		ZED3D9Texture2D*					SharpenNormalBuffer;
 		ZED3D9Texture2D*					SharpenDepthBuffer;
@@ -164,6 +166,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9BlurMaskProcessor				BMProcessor;
 		ZED3D9ZoomBlurProcessor				ZoomBlurProcessor;
 		ZED3D9UnsharpenFilterProcessor		UnsharpenProcessor;
+		ZED3D9CRTScanProcessor				CRTScanProcessor;
 		
 
 		virtual void						SetViewPort(ZERenderTarget* ViewPort);

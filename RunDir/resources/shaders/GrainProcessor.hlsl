@@ -33,24 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sampler2D 	ColorBuffer		: register (s0);
-sampler2D 	GrainBuffer		: register (s1);
+sampler2D 	ColorBuffer : register(s0);
+sampler2D 	GrainBuffer : register(s1);
 
-float2 		VSParameters	: register(vs, c0);
+float		Time;
+float		GrainStrength;
 
-#define		PixelSize		VSParameters.xy
+float2		PixelSize;
 
-float4 		PSParameters	: register(ps, c0);
-
-#define		PI				3.1415f
-#define		Time			PSParameters.x
-#define		GrainStrength	PSParameters.y
-
+#define		PI		3.1415f
 
 // Vertex Shader
 struct VS_INPUT
 {
 	float4 Position	: POSITION0;
+	float2 TexCoord : TEXCOORD0;
 	
 };
 
@@ -58,6 +55,7 @@ struct VS_OUTPUT
 {
 	float4 Position	: POSITION0;
 	float2 TexCoord : TEXCOORD0;
+
 };
 
 struct PS_INPUT
@@ -74,10 +72,9 @@ VS_OUTPUT vs_main_common(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
    
-	Output.Position	= sign(Input.Position);
+	Output.Position	= Input.Position;
 
-	Output.TexCoord.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
-	Output.TexCoord.y = 0.5f * (1.0f - Output.Position.y + PixelSize.y);
+	Output.TexCoord = Input.TexCoord + 0.5f * PixelSize;
 	
 	return Output;
 }
@@ -120,7 +117,6 @@ PS_OUTPUT ps_main_blend( PS_INPUT Input )
 	float4 Grain = tex2D(GrainBuffer, Input.TexCoord);
 	Output.PixelColor = tex2D(ColorBuffer, Input.TexCoord);
 	
-	[branch]
 	if (Grain.x <= 0.999f)
 		Output.PixelColor *= Grain;
 	
