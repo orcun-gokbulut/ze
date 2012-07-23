@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9GrainProcessor.h
+ Zinek Engine - ZED3D9CRTScanProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,14 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
 #pragma once
-#ifndef __ZE_D3D9_GRAIN_PROCESSOR_H__
-#define __ZE_D3D9_GRAIN_PROCESSOR_H__
+#ifndef __ZE_D3D9_CRT_SCAN_PROCESSOR_H__
+#define __ZE_D3D9_CRT_SCAN_PROCESSOR_H__
 
 #include "ZED3D9ComponentBase.h"
-#include "..\..\..\Platform\Windows\x64\Include\DirectX\d3d9.h"
+#include "ZEMath/ZEVector.h"
 #include "ZED3D9Shader.h"
-
 
 class ZED3D9Texture2D;
 class ZETexture2D;
@@ -49,55 +49,66 @@ class ZEFrameRenderer;
 class ZED3D9FrameRenderer;
 class ZETexture2DResource;
 
-class ZED3D9GrainProcessor : public ZED3D9ComponentBase
+
+enum CRTScanDirection
+{
+	SCAN_DIRECTION_UP	= 0,
+	SCAN_DIRECTION_DOWN = 1
+};
+
+class ZED3D9CRTScanProcessor : public ZED3D9ComponentBase
 {
 	private:
-		float					Strength;
-		float					Frequency;
-		float					NoiseSize;
-
-		ZED3D9FrameRenderer*	Renderer;
-
-		ZED3D9PixelShader		PixelShaderGrain;
-		ZED3D9PixelShader		PixelShaderBlend;
-		ZED3D9VertexShader		VertexShader;
-
-		ZED3D9Texture2D*		GrainBuffer;
-		ZED3D9RenderTarget*		Output;
-		ZED3D9Texture2D*		Input;
+		float							ScanThickness;  // In terms of texture coordinates
+		ZEVector3						ScanColor;		
+		float							Speed;			// 0-1
+		float							Sharpness;		// 0-1
+		CRTScanDirection				Direction;
 		
+		ZED3D9FrameRenderer*			Renderer;
+
+		ZED3D9Texture2D*				InputBuffer;
+		ZED3D9RenderTarget*				OutputBuffer;
+
+		ZED3D9VertexShader				VertexShader;
+		ZED3D9PixelShader				PixelShader;
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
-
-		void					CreateRenderTargets();
-		void					DestroyRenderTargets();
-
+		
 	public:
-								ZED3D9GrainProcessor();
-								~ZED3D9GrainProcessor();
+		void							SetRenderer(ZEFrameRenderer* Renderer);
+		ZEFrameRenderer*				GetRenderer();
 
-		void					Initialize();
-		void					Deinitialize();
+		void							SetInput(ZETexture2D* Texture);
+		ZETexture2D*					GetInput();
 
-		void					SetRenderer(ZEFrameRenderer* Renderer);
-		ZEFrameRenderer*		GetRenderer();
+		void							SetOutput(ZED3D9RenderTarget* Texture);
+		ZED3D9RenderTarget*				GetOutput();
 
-		float					GetFrequency() const;
-		void					SetFrequency(float Value);
+		void							SetScanThickness(float Value);
+		float							GetScanThickness();
+		
+		void							SetScanColor(ZEVector3 Color);
+		ZEVector3						GetScanColor();
 
-		float					GetStrength() const;
-		void					SetStrength(float Value);
+		void							SetDirection(CRTScanDirection Value);
+		CRTScanDirection				GetDirection();
 
-		float					GetNoiseSize() const;
-		void					SetNoiseSize(float Value);
+		void							SetSpeed(float Value);
+		float							GetSpeed();
 
-		void					SetInput(ZED3D9Texture2D* Texture);
-		ZED3D9Texture2D*		GetInput();
+		void							SetSharpness(float Value);
+		float							GetSharpness();
+		
+		void							Initialize();
+		void							Deinitialize();
 
-		void					SetOutput(ZED3D9RenderTarget* Texture);
-		ZED3D9RenderTarget*			GetOutput();
+		void							OnDeviceLost();
+		void							OnDeviceRestored();
 
-		void					Process(float ElapsedTime);
+		void							Process(float ElapsedTime);
 
+										ZED3D9CRTScanProcessor();
+										~ZED3D9CRTScanProcessor();
 };
 
 #endif

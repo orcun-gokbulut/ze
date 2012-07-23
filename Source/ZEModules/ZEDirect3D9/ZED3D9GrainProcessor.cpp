@@ -54,9 +54,6 @@ ZED3D9GrainProcessor::ZED3D9GrainProcessor()
 	Input = NULL;
 	Output = NULL;
 	GrainBuffer = NULL;
-	VertexShader = NULL;
-	PixelShaderBlend = NULL;
-	PixelShaderGrain = NULL;
 	VertexDeclaration = NULL;
 }
 
@@ -86,17 +83,47 @@ void ZED3D9GrainProcessor::DestroyRenderTargets()
 
 void ZED3D9GrainProcessor::Initialize()
 {
-	D3DVERTEXELEMENT9 Declaration[] = 
+	bool Result;
+	char Text[5 * 1024];
+	static const ZEString ShaderFilePath = "shaders\\GrainProcessor.hlsl";
+
+	// Vertex declaration for screen aligned quad
+	D3DVERTEXELEMENT9 Declaration[] =
 	{
 		{0,  0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0,  16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
 		D3DDECL_END()
 	};
 
 	GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
+	
+	Result = ZEFile::ReadTextFile(ShaderFilePath, Text, 5*1024);
+	if (!Result)
+	{
+		zeError("Cannot read shader file \"%s\".", ShaderFilePath.ToCString());
+		return;
+	}
+	
+	Result = VertexShader.CompileShader(NULL, 0, "vs_3_0", Text, "vs_main_common");
+	if (!Result)
+	{
+		zeError("Cannot compile shader file \"%s\".", ShaderFilePath.ToCString());
+		return;
+	}
 
-	VertexShader = ZED3D9VertexShader::CreateShader("GrainProcessor.hlsl", "vs_main_common", 0, "vs_3_0");
-	PixelShaderGrain = ZED3D9PixelShader::CreateShader("GrainProcessor.hlsl", "ps_main_grain", 0, "ps_3_0");
-	PixelShaderBlend = ZED3D9PixelShader::CreateShader("GrainProcessor.hlsl", "ps_main_blend", 0, "ps_3_0");
+	Result = PixelShaderGrain.CompileShader(NULL, 0, "ps_3_0", Text, "ps_main_grain");
+	if (!Result)
+	{
+		zeError("Cannot compile shader file \"%s\".", ShaderFilePath.ToCString());
+		return;
+	}
+
+	Result = PixelShaderBlend.CompileShader(NULL, 0, "ps_3_0", Text, "ps_main_blend");
+	if (!Result)
+	{
+		zeError("Cannot compile shader file \"%s\".", ShaderFilePath.ToCString());
+		return;
+	}
 
 	this->CreateRenderTargets();
 }
@@ -105,11 +132,6 @@ void ZED3D9GrainProcessor::Deinitialize()
 {
 	Input = NULL;
 	Output = NULL;
-
-	ZED3D_RELEASE(VertexShader);
-	ZED3D_RELEASE(PixelShaderBlend);
-	ZED3D_RELEASE(PixelShaderGrain);
-	ZED3D_RELEASE(VertexDeclaration);
 
 	this->DestroyRenderTargets();
 }
@@ -180,27 +202,30 @@ void ZED3D9GrainProcessor::Process(float ElapsedTime)
 	float UpdateInterval;
 	static float Time = 0;
 	
-	static struct Vert  
+	static struct ScreenAlignedQuad  
 	{
 		float Position[4];
+		float TexCoord[2];
 
-	} Vertices[] = {
-		{-1.0f,  1.0f, 1.0f, 1.0f},
-		{ 1.0f,  1.0f, 1.0f, 1.0f},
-		{-1.0f, -1.0f, 1.0f, 1.0f},
-		{ 1.0f, -1.0f, 1.0f, 1.0f}
+	} SAQVertices[] = {
+
+		{ {-1.0f,  1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
+		{ { 1.0f,  1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
+		{ {-1.0f, -1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
+		{ { 1.0f, -1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} }
 	};
-
-	GetDevice()->SetVertexDeclaration(VertexDeclaration);
 	
-
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	
+
+	GetDevice()->SetVertexDeclaration(VertexDeclaration);
+
+	ZEVector2 PixelSize(1.0f / Output->GetWidth(), 1.0f / Output->GetHeight());
+
 	UpdateInterval = 1.0f / Frequency;
 	if ( (Time + ElapsedTime) > UpdateInterval )
 	{
@@ -212,55 +237,32 @@ void ZED3D9GrainProcessor::Process(float ElapsedTime)
 		Time += ElapsedTime;
 		Update = false;
 	}
-	
-	struct 
-	{
-		float	PixelSize[2];
-		float	Reserved0;
-		float	Reserved1;
-	
-	} VertexShaderParameters = {
-	
-		{1.0f / Output->GetWidth(), 1.0f / Output->GetHeight()}, 0.0f, 0.0f
-	};
-	
 
 	if (Update)
 	{
-		struct
-		{
-			float	Time;
-			float	Strength;
-			float	Reserved0;
-			float	Reserved1;
+		GetDevice()->SetVertexShader(VertexShader.GetVertexShader());
+		GetDevice()->SetPixelShader(PixelShaderGrain.GetPixelShader());
 
-		} PixelShaderParameters = {
-
-			Time, Strength, 0.0f, 0.0f 
-		};
-
-		GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
-		GetDevice()->SetPixelShader(PixelShaderGrain->GetPixelShader());
+		VertexShader.SetConstant("PixelSize", PixelSize);
+		
+		PixelShaderGrain.SetConstant("Time", Time);
+		PixelShaderGrain.SetConstant("GrainStrength", Strength);
 
 		ZED3D9CommonTools::SetRenderTarget(0, GrainBuffer);
 
-		GetDevice()->SetVertexShaderConstantF(0, (const float*)&VertexShaderParameters, sizeof(VertexShaderParameters) / 16);
-		GetDevice()->SetPixelShaderConstantF(0, (const float*)&PixelShaderParameters, sizeof(PixelShaderParameters) / 16);
-
-		GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+		GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, SAQVertices, sizeof(ScreenAlignedQuad));
 	}
 	
 	// Blend grain buffer
-	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
-	GetDevice()->SetPixelShader(PixelShaderBlend->GetPixelShader());
+	GetDevice()->SetVertexShader(VertexShader.GetVertexShader());
+	GetDevice()->SetPixelShader(PixelShaderBlend.GetPixelShader());
+
+	VertexShader.SetConstant("PixelSize", PixelSize);
 
 	ZED3D9CommonTools::SetRenderTarget(0, Output);
 
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)Input, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, (ZETexture2D*)GrainBuffer, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
 
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&VertexShaderParameters, sizeof(VertexShaderParameters) / 16);
-	
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
-	
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, SAQVertices, sizeof(ScreenAlignedQuad));
 }

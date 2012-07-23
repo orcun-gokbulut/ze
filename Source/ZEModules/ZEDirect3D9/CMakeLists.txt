@@ -64,6 +64,10 @@ ze_add_source(ZED3D9ChannelDisorientationProcessor.cpp	Sources)
 ze_add_source(ZED3D9ChannelDisorientationProcessor.h	Sources)
 ze_add_source(ZED3D9CloudMaterial.cpp					Sources)
 ze_add_source(ZED3D9CloudMaterial.h						Sources)
+
+ze_add_source(ZED3D9CRTScanProcessor.cpp				Sources)
+ze_add_source(ZED3D9CRTScanProcessor.h					Sources)
+
 ze_add_source(ZED3D9ColorTransformProcessor.cpp			Sources)
 ze_add_source(ZED3D9ColorTransformProcessor.h			Sources)
 ze_add_source(ZED3D9CommonTools.cpp						Sources)
