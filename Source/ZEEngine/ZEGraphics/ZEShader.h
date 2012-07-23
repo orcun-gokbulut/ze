@@ -105,8 +105,8 @@ class ZEShader
 		bool									GetShaderConstantRegister(ZEUInt32& Out, const ZEString& Name) const;
 
 		// This directly calls "GetShaderConstantRegister()" but its has a better logical meaning for sampler constants
-		// This function does not check specified "Name" is a sampler or not it directly returns the Sampler No.
-		// It only returns false if "Name" does not match an of the Names stored in the constant table.
+		// This function does not check specified "Name" is a sampler or not it directly returns the Sampler No. / Register No.
+		// It only returns false if "Name" does not match any of the Names stored in the constant table.
 		bool									GetSamplerNumber(ZEUInt32& Out, const ZEString& Name) const;
 
 		// File and Function Name
@@ -148,17 +148,17 @@ class ZEShader
 		virtual void							SetConstantArray(int Register, const float* ValueArray, ZESize Count) = 0;
 
 		// Get Constant Value
-		virtual ZEVector2						GetShaderConstantVector2(const char* Name) const = 0;
-		virtual ZEVector3						GetShaderConstantVector3(const char* Name) const = 0;
-		virtual ZEVector4						GetShaderConstantVector4(const char* Name) const = 0;
-		virtual ZEMatrix3x3						GetShaderConstantMatrix3x3(const char* Name) const = 0;
-		virtual ZEMatrix4x4						GetShaderConstantMatrix4x4(const char* Name) const = 0;
-		virtual bool							GetShaderConstantBool(const char* Name) const = 0;
-		virtual float							GetShaderConstantFloat(const char* Name) const = 0;
+		virtual ZEVector2						GetConstantVector2(const char* Name) const = 0;
+		virtual ZEVector3						GetConstantVector3(const char* Name) const = 0;
+		virtual ZEVector4						GetConstantVector4(const char* Name) const = 0;
+		virtual ZEMatrix3x3						GetConstantMatrix3x3(const char* Name) const = 0;
+		virtual ZEMatrix4x4						GetConstantMatrix4x4(const char* Name) const = 0;
+		virtual bool							GetConstantBool(const char* Name) const = 0;
+		virtual float							GetConstantFloat(const char* Name) const = 0;
 		
 		// Compilation
 		virtual	bool							CompileShader(const ZEString CompilerParameters[][2],
-																int MacroSize,
+																int CompilerParameterCount,
 																ZEString ShaderProfile, 
 																ZEString Source,
 																ZEString MainFunction) = 0;

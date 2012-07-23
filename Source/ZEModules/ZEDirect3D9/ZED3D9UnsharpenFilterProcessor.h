@@ -39,9 +39,8 @@
 #define __ZE_D3D9_UNSHARPEN_FILTER_PROCESSOR_H__
 
 #include "ZED3D9ComponentBase.h"
+#include "ZED3D9Shader.h"
 
-class ZED3D9PixelShader;
-class ZED3D9VertexShader;
 class ZED3D9Texture2D;
 class ZETexture2D;
 class ZED3D9RenderTarget;
@@ -58,10 +57,10 @@ class ZED3D9UnsharpenFilterProcessor : public ZED3D9ComponentBase
 		ZED3D9FrameRenderer*			Renderer;
 
 		ZED3D9Texture2D*				Input;
-		ZED3D9RenderTarget*					Output;
+		ZED3D9RenderTarget*				Output;
 
-		ZED3D9VertexShader*				VertexShader;
-		ZED3D9PixelShader*				PixelShader;
+		ZED3D9VertexShader				VertexShader;
+		ZED3D9PixelShader				PixelShader;
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 
 	public:

@@ -167,7 +167,7 @@ const ZESamplerState& ZESamplerState::operator=(const ZESamplerState& State)
 	MaxLOD = State.MaxLOD;
 	MaxAnisotropy = State.MaxAnisotropy;
 	BorderColor = State.BorderColor;
-	Changed = State.Changed;
+	Changed = true;
 	return *this;
 }
 

@@ -83,7 +83,7 @@ const ZERasterizerState& ZERasterizerState::operator=(const ZERasterizerState& S
 	CullEnable = State.CullEnable;
 	FillMode = State.FillMode;
 	CullDirection = State.CullDirection;
-	Changed = State.Changed;
+	Changed = true;
 	return *this;
 }
 

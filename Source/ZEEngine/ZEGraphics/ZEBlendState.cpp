@@ -131,7 +131,7 @@ const ZEBlendState& ZEBlendState::operator=(const ZEBlendState& State)
 	DestinationAlphaBlendOption = State.DestinationAlphaBlendOption;
 	BlendEquation = State.BlendEquation;
 	ColorChannelMask = State.ColorChannelMask;
-	Changed = State.Changed;
+	Changed = true;
 	return *this;
 }
 
