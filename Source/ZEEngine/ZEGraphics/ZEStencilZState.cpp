@@ -206,7 +206,7 @@ const ZEStencilZState& ZEStencilZState::operator=(const ZEStencilZState& State)
 	BackStencilPassOperation = State.BackStencilPassOperation;
 	BackStencilFunction = State.BackStencilFunction;
 
-	Changed = State.Changed;
+	Changed = true;
 
 	return *this;
 }

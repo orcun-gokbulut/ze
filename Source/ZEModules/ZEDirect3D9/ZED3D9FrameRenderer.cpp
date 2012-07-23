@@ -1148,7 +1148,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		/*
 		// Grain
 		GrainProcessor.SetInput(GrainInputBuffer);
-		GrainProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
+		GrainProcessor.SetOutput((ZED3D9RenderTarget*)CTInputBuffer->GetViewPort());
 		GrainProcessor.Process(ElaspedTime);
 		*/
 		

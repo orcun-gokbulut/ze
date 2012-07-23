@@ -363,7 +363,9 @@ ZEUInt32 ZED3D9Shader::GetComponents()
 
 void ZED3D9Shader::Release()
 {
+	/*
 	ZED3D9ShaderManager::GetInstance()->ReleaseShader(this);
+	*/
 }
 
 ZED3D9Shader* ZED3D9Shader::CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile)
@@ -637,7 +639,7 @@ void ZED3D9PixelShader::SetConstantArray(int Register, const float* ValueArray, 
 		GetDevice()->SetPixelShaderConstantF(Register + i, ZEVector4(ValueArray[i], 0.0f, 0.0f, 0.0f).M, 1);
 }
 
-ZEVector2 ZED3D9PixelShader::GetShaderConstantVector2(const char* Name) const
+ZEVector2 ZED3D9PixelShader::GetConstantVector2(const char* Name) const
 {
 	ZEUInt32 Index;
 	ZEVector4 Vector;
@@ -646,7 +648,7 @@ ZEVector2 ZED3D9PixelShader::GetShaderConstantVector2(const char* Name) const
 	return ZEVector2(Vector.x, Vector.y);
 }
 
-ZEVector3 ZED3D9PixelShader::GetShaderConstantVector3(const char* Name) const
+ZEVector3 ZED3D9PixelShader::GetConstantVector3(const char* Name) const
 {
 	ZEUInt32 Index;
 	ZEVector4 Vector;
@@ -655,7 +657,7 @@ ZEVector3 ZED3D9PixelShader::GetShaderConstantVector3(const char* Name) const
 	return ZEVector3(Vector.x, Vector.y, Vector.z);
 }
 
-ZEVector4 ZED3D9PixelShader::GetShaderConstantVector4(const char* Name) const
+ZEVector4 ZED3D9PixelShader::GetConstantVector4(const char* Name) const
 {
 	ZEUInt32 Index;
 	ZEVector4 Vector;
@@ -664,7 +666,7 @@ ZEVector4 ZED3D9PixelShader::GetShaderConstantVector4(const char* Name) const
 	return Vector;
 }
 
-ZEMatrix3x3 ZED3D9PixelShader::GetShaderConstantMatrix3x3(const char* Name) const
+ZEMatrix3x3 ZED3D9PixelShader::GetConstantMatrix3x3(const char* Name) const
 {
 	ZEUInt32 Index;
 	ZEMatrix4x4 ReturnMatrix;
@@ -675,7 +677,7 @@ ZEMatrix3x3 ZED3D9PixelShader::GetShaderConstantMatrix3x3(const char* Name) cons
 						ReturnMatrix.M31, ReturnMatrix.M32, ReturnMatrix.M33);		
 }
 
-ZEMatrix4x4 ZED3D9PixelShader::GetShaderConstantMatrix4x4(const char* Name) const
+ZEMatrix4x4 ZED3D9PixelShader::GetConstantMatrix4x4(const char* Name) const
 {
 	ZEUInt32 Index;
 	ZEMatrix4x4 ReturnMatrix;
@@ -684,7 +686,7 @@ ZEMatrix4x4 ZED3D9PixelShader::GetShaderConstantMatrix4x4(const char* Name) cons
 	return ReturnMatrix;
 }
 
-bool ZED3D9PixelShader::GetShaderConstantBool(const char* Name) const
+bool ZED3D9PixelShader::GetConstantBool(const char* Name) const
 {
 	ZEUInt32 Index;
 	BOOL ReturnBool[4];
@@ -693,7 +695,7 @@ bool ZED3D9PixelShader::GetShaderConstantBool(const char* Name) const
 	return (bool)ReturnBool[0];
 }
 
-float ZED3D9PixelShader::GetShaderConstantFloat(const char* Name) const
+float ZED3D9PixelShader::GetConstantFloat(const char* Name) const
 {
 	ZEUInt32 Index;
 	ZEVector4 ReturnFloat;
@@ -703,7 +705,7 @@ float ZED3D9PixelShader::GetShaderConstantFloat(const char* Name) const
 }
 
 bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameter[][2],
-										int ParameterSize,
+										int CompilerParameterCount,
 										ZEString ShaderProfile, 
 										ZEString Source,
 										ZEString MainFunction)
@@ -712,11 +714,11 @@ bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameter[][2],
 	LPD3DXBUFFER ShaderBuffer = NULL;
 	LPD3DXBUFFER CompilerOutput = NULL;
 	LPD3DXCONSTANTTABLE ConstantTable = NULL;
-	LPD3DXMACRO MacroDefinitions = new D3DXMACRO[ParameterSize + 1];
+	LPD3DXMACRO MacroDefinitions = new D3DXMACRO[CompilerParameterCount + 1];
 
 	int i;
-	ShaderCompilerParameters.SetCount(ParameterSize);
-	for(i = 0; i < ParameterSize; i++)
+	ShaderCompilerParameters.SetCount(CompilerParameterCount);
+	for(i = 0; i < CompilerParameterCount; i++)
 	{
 		MacroDefinitions[i].Name = CompilerParameter[i][0];
 		MacroDefinitions[i].Definition = CompilerParameter[i][1];
@@ -729,7 +731,7 @@ bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameter[][2],
 	MacroDefinitions[i].Name = NULL;
 	MacroDefinitions[i].Definition = NULL;
 
-	if(D3DXCompileShader(Source.ToCString(), Source.GetLength(), MacroDefinitions, &D3DIncludeInterface2, MainFunction.ToCString(), ShaderProfile, D3DXSHADER_PACKMATRIX_COLUMNMAJOR | ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, &ConstantTable) != D3D_OK)
+	if(D3DXCompileShader(Source.ToCString(), Source.GetSize(), MacroDefinitions, &D3DIncludeInterface2, MainFunction.ToCString(), ShaderProfile, D3DXSHADER_PACKMATRIX_COLUMNMAJOR | ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, &ConstantTable) != D3D_OK)
 	{
 		if (CompilerOutput == NULL)
 			zeError("Can not compile pixel shader. Shader file name : \"%s\"", FileName);
@@ -1040,7 +1042,7 @@ void ZED3D9VertexShader::SetConstantArray(int Register, const float* ValueArray,
 		GetDevice()->SetVertexShaderConstantF(Register + i, ZEVector4(ValueArray[i], 0.0f, 0.0f, 0.0f).M, 1);
 }
 
-ZEVector2 ZED3D9VertexShader::GetShaderConstantVector2(const char* Name) const
+ZEVector2 ZED3D9VertexShader::GetConstantVector2(const char* Name) const
 {
 	ZEUInt32 Index;
 	ZEVector4 Vector;
@@ -1049,7 +1051,7 @@ ZEVector2 ZED3D9VertexShader::GetShaderConstantVector2(const char* Name) const
 	return ZEVector2(Vector.x, Vector.y);
 }
 
-ZEVector3 ZED3D9VertexShader::GetShaderConstantVector3(const char* Name) const
+ZEVector3 ZED3D9VertexShader::GetConstantVector3(const char* Name) const
 {
 	ZEUInt32 Index;
 	ZEVector4 Vector;
@@ -1058,7 +1060,7 @@ ZEVector3 ZED3D9VertexShader::GetShaderConstantVector3(const char* Name) const
 	return ZEVector3(Vector.x, Vector.y, Vector.z);
 }
 
-ZEVector4 ZED3D9VertexShader::GetShaderConstantVector4(const char* Name) const
+ZEVector4 ZED3D9VertexShader::GetConstantVector4(const char* Name) const
 {
 	ZEUInt32 Index;
 	ZEVector4 Vector;
@@ -1067,7 +1069,7 @@ ZEVector4 ZED3D9VertexShader::GetShaderConstantVector4(const char* Name) const
 	return Vector;
 }
 
-ZEMatrix3x3 ZED3D9VertexShader::GetShaderConstantMatrix3x3(const char* Name) const
+ZEMatrix3x3 ZED3D9VertexShader::GetConstantMatrix3x3(const char* Name) const
 {
 	ZEUInt32 Index;
 	ZEMatrix4x4 ReturnMatrix;
@@ -1078,7 +1080,7 @@ ZEMatrix3x3 ZED3D9VertexShader::GetShaderConstantMatrix3x3(const char* Name) con
 		ReturnMatrix.M31, ReturnMatrix.M32, ReturnMatrix.M33);		
 }
 
-ZEMatrix4x4 ZED3D9VertexShader::GetShaderConstantMatrix4x4(const char* Name) const
+ZEMatrix4x4 ZED3D9VertexShader::GetConstantMatrix4x4(const char* Name) const
 {
 	ZEUInt32 Index;
 	ZEMatrix4x4 ReturnMatrix;
@@ -1087,7 +1089,7 @@ ZEMatrix4x4 ZED3D9VertexShader::GetShaderConstantMatrix4x4(const char* Name) con
 	return ReturnMatrix;
 }
 
-bool ZED3D9VertexShader::GetShaderConstantBool(const char* Name) const
+bool ZED3D9VertexShader::GetConstantBool(const char* Name) const
 {
 	ZEUInt32 Index;
 	BOOL ReturnBool[4];
@@ -1096,7 +1098,7 @@ bool ZED3D9VertexShader::GetShaderConstantBool(const char* Name) const
 	return (bool)ReturnBool[0];
 }
 
-float ZED3D9VertexShader::GetShaderConstantFloat(const char* Name) const
+float ZED3D9VertexShader::GetConstantFloat(const char* Name) const
 {
 	ZEUInt32 Index;
 	ZEVector4 ReturnFloat;
@@ -1106,7 +1108,7 @@ float ZED3D9VertexShader::GetShaderConstantFloat(const char* Name) const
 }
 
 bool ZED3D9VertexShader::CompileShader(const ZEString CompilerParameter[][2],
-										int ParameterSize,
+										int CompilerParameterCount,
 										ZEString ShaderProfile, 
 										ZEString Source,
 										ZEString MainFunction)
@@ -1115,10 +1117,10 @@ bool ZED3D9VertexShader::CompileShader(const ZEString CompilerParameter[][2],
 	LPD3DXBUFFER ShaderBuffer = NULL;
 	LPD3DXBUFFER CompilerOutput = NULL;
 	LPD3DXCONSTANTTABLE ConstantTable = NULL;
-	LPD3DXMACRO MacroDefinitions = new D3DXMACRO[ParameterSize + 1];
+	LPD3DXMACRO MacroDefinitions = new D3DXMACRO[CompilerParameterCount + 1];
 
 	int i;
-	for(i = 0; i < ParameterSize; i++)
+	for(i = 0; i < CompilerParameterCount; i++)
 	{
 		MacroDefinitions[i].Name = CompilerParameter[i][0];
 		MacroDefinitions[i].Definition = CompilerParameter[i][1];
@@ -1131,7 +1133,7 @@ bool ZED3D9VertexShader::CompileShader(const ZEString CompilerParameter[][2],
 	MacroDefinitions[i].Name = NULL;
 	MacroDefinitions[i].Definition = NULL;
 
-	if(D3DXCompileShader(Source.ToCString(), Source.GetLength(), MacroDefinitions, &D3DIncludeInterface2, MainFunction.ToCString(), ShaderProfile, D3DXSHADER_PACKMATRIX_COLUMNMAJOR | ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, &ConstantTable) != D3D_OK)
+	if(D3DXCompileShader(Source.ToCString(), Source.GetSize(), MacroDefinitions, &D3DIncludeInterface2, MainFunction.ToCString(), ShaderProfile, D3DXSHADER_PACKMATRIX_COLUMNMAJOR | ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, &ConstantTable) != D3D_OK)
 	{
 		if (CompilerOutput == NULL)
 			zeError("Can not compile vertex shader.\r\n");

@@ -43,6 +43,7 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZED3D9UnsharpenFilterProcessor.h"
 #include "ZETexture/ZETexture2DResource.h"
+#include "ZEFile/ZEFileInfo.h"
 
 #include <d3d9.h>
 #include <stdlib.h>
@@ -99,9 +100,20 @@ void ZED3D9UnsharpenFilterProcessor::Initialize()
 
 	GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
 
+	char *ShaderSource;
+	ZEInt64 SourceSize;
+	ZEFileInfo FInfo("resources\\shaders\\UnsharpenFilterProcessor.hlsl");
+	SourceSize = FInfo.GetFileSize("shaders\\UnsharpenFilterProcessor.hlsl");
+	SourceSize++;
+	ShaderSource = new char[SourceSize];
+
+	ZEFile::ReadTextFile("shaders\\UnsharpenFilterProcessor.hlsl", ShaderSource, SourceSize);
+	
 	// Compile Shaders
-	this->VertexShader = ZED3D9VertexShader::CreateShader("UnsharpenFilterProcessor.hlsl", "vs_main", 0, "vs_3_0");
-	this->PixelShader = ZED3D9PixelShader::CreateShader("UnsharpenFilterProcessor.hlsl", "ps_main", 0, "ps_3_0");
+	VertexShader.CompileShader(NULL, 0, "vs_3_0", ShaderSource, "vs_main");
+	PixelShader.CompileShader(NULL, 0, "ps_3_0", ShaderSource, "ps_main");
+
+	delete [] ShaderSource;
 }
 
 void ZED3D9UnsharpenFilterProcessor::Deinitialize()
@@ -109,10 +121,11 @@ void ZED3D9UnsharpenFilterProcessor::Deinitialize()
 	Renderer	= NULL;
 	Input		= NULL;
 	Output		= NULL;
-
-	ZED3D_RELEASE(PixelShader);
-	ZED3D_RELEASE(VertexShader);
 	ZED3D_RELEASE(VertexDeclaration);
+
+	// Does Not need to Release anymore since it is a data member of this class
+//	ZED3D_RELEASE(PixelShader);
+//	ZED3D_RELEASE(VertexShader);
 }
 
 void ZED3D9UnsharpenFilterProcessor::OnDeviceLost()
@@ -141,7 +154,6 @@ void ZED3D9UnsharpenFilterProcessor::Process()
 
 	GetDevice()->SetVertexDeclaration(VertexDeclaration);
 
-
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
@@ -152,38 +164,17 @@ void ZED3D9UnsharpenFilterProcessor::Process()
 	float PixelWidth = 1.0f / (float)Output->GetWidth();
 	float PixelHeigth = 1.0f / (float)Output->GetHeight();
 
-	struct VertexShaderParameters
-	{
-		float	PixelSize[2];
+	GetDevice()->SetPixelShader(PixelShader.GetPixelShader());
+	GetDevice()->SetVertexShader(VertexShader.GetVertexShader());
 
-		float	Reserved0;
-		float	Reserved1;
-
-	} VSParameters = {
-
-		{PixelWidth, PixelHeigth}, 0.0f, 0.0f
-	};
-
-	struct PixelShaderParameters
-	{
-		float	PixelSize[2];
-		float	Amount;
-
-		float	Reserved0;
-
-	} PSParameters = {
-
-		{PixelWidth, PixelHeigth}, Amount, 0.0f
-	};
-
-	GetDevice()->SetPixelShader(PixelShader->GetPixelShader());
-	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
+	ZEUInt32 ColorBufferSampler;
+	PixelShader.GetSamplerNumber(ColorBufferSampler, "ColorBuffer");
 
 	ZED3D9CommonTools::SetRenderTarget(0, Output);
-	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)Input, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
-
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&VSParameters, sizeof(VertexShaderParameters) / 16);
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PSParameters, sizeof(PixelShaderParameters) / 16);
+	ZED3D9CommonTools::SetTexture(ColorBufferSampler, (ZETexture2D*)Input, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
+	
+	VertexShader.SetConstant("VSParameters", ZEVector4(PixelWidth, PixelHeigth, 0.0f, 0.0));
+	PixelShader.SetConstant("PSParameters", ZEVector4(PixelWidth, PixelHeigth, Amount, 0.0));
 
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 }
@@ -192,12 +183,9 @@ ZED3D9UnsharpenFilterProcessor::ZED3D9UnsharpenFilterProcessor()
 {
 	Renderer			= NULL;
 	VertexDeclaration	= NULL;
-	VertexShader		= NULL;
-	PixelShader			= NULL;
 	Input				= NULL;
 	Output				= NULL;
 	Amount				= 0.5f;
-	
 }
 
 ZED3D9UnsharpenFilterProcessor::~ZED3D9UnsharpenFilterProcessor()
