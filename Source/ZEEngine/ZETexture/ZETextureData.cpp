@@ -493,7 +493,7 @@ void ZETextureData::Create(ZETextureType TextureType, ZETexturePixelFormat Pixel
 
 		default:
 		{
-			zeCriticalError("Unknown Texture Type..");
+			zeError("Unknown Texture Type..");
 			break;
 		}
 			

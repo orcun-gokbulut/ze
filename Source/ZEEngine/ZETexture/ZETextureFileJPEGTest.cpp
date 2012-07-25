@@ -80,13 +80,15 @@ bool JPEGTestSuccess(ZEString& ImageFile, ZEString& ReferanceFile)
 	ZETextureFileJpeg Loader;
 	ZETextureData OriginalData;
 
-	ZEPointer<ZEFile> ImgFile = ZEFile::Open(ImageFile);
-	if (!Loader.LoadInfo(&Info, ImgFile)) return false;
+	ZEFile ImgFile;
+	ImgFile.Open(ImageFile, ZE_FOM_READ, ZE_FCM_NONE);
 
-	ZETextureData* Data = Loader.Load(ImgFile);
+	if (!Loader.LoadInfo(&Info, &ImgFile)) return false;
+
+	ZETextureData* Data = Loader.Load(&ImgFile);
 	if (Data == NULL) return false;
 
-	OrgFile.Open(ReferanceFile, ZE_FM_READ_ONLY, true);
+	OrgFile.Open(ReferanceFile, ZE_FOM_READ, ZE_FCM_NONE);
 	if (!ZETextureLoader::Read(&OrgFile, &OriginalData)) return false;
 	
 	return JPEGCompareImages(Data, &OriginalData);
@@ -94,10 +96,11 @@ bool JPEGTestSuccess(ZEString& ImageFile, ZEString& ReferanceFile)
 
 bool JPEGTestFail(ZEString FileName)
 {
-	ZEPointer<ZEFile> File = ZEFile::Open(FileName);
+	ZEFile File;
+	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 
 	ZETextureFileJpeg Loader;
-	ZETextureData* Data = Loader.Load(File);
+	ZETextureData* Data = Loader.Load(&File);
 
 	return Data == NULL;
 }

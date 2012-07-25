@@ -86,13 +86,13 @@ enum ZETIFFPixelFormat
 	ZE_TIFF_PT_NONE,
 	ZE_TIFF_PT_INDEXED,
 	ZE_TIFF_PT_L8,
-	ZE_TIFF_PT_LA8, // Will be supported
-	ZE_TIFF_PT_L16, // Will be supported
+	ZE_TIFF_PT_LA8,
+	ZE_TIFF_PT_L16,
 	ZE_TIFF_PT_LA16,
 	ZE_TIFF_PT_RGB8,
 	ZE_TIFF_PT_RGBA8,
-	ZE_TIFF_PT_RGB16, // Will be supported
-	ZE_TIFF_PT_RGBA16 // Will be supported
+	ZE_TIFF_PT_RGB16,
+	ZE_TIFF_PT_RGBA16
 };
 
 struct ZETIFFInfo
@@ -112,7 +112,7 @@ struct ZETIFFInfo
 	ZEArray<ZEUInt32>		ChunkSizes;
 
 	ZETIFFEntry				PaletteEntry;
-	ZEBGRA32				Palette[256];
+	ZEPixelRGBA8				Palette[256];
 };
 
 ZESize GetPixelSize(ZETIFFPixelFormat Format)
@@ -157,25 +157,25 @@ static ZETexturePixelFormat GetTextureFormat(ZETIFFPixelFormat PixelFormat)
 	switch(PixelFormat)
 	{
 		case ZE_TIFF_PT_L8:
-			return ZE_TPF_I8;
+			return ZE_TPF_L8;
 
 		case ZE_TIFF_PT_LA8:
-			return ZE_TPF_I8_2;
+			return ZE_TPF_LA8;
 
 		case ZE_TIFF_PT_L16:
-			return ZE_TPF_I16;
+			return ZE_TPF_L16;
 
 		case ZE_TIFF_PT_LA16:
-			return ZE_TPF_I16_2;
+			return ZE_TPF_LA16;
 
 		case ZE_TIFF_PT_INDEXED:
 		case ZE_TIFF_PT_RGB8:
 		case ZE_TIFF_PT_RGBA8:
-			return ZE_TPF_I8_4;
+			return ZE_TPF_RGBA8;
 
 		case ZE_TIFF_PT_RGB16:
 		case ZE_TIFF_PT_RGBA16:
-			return ZE_TPF_I16_4;
+			return ZE_TPF_RGBA16;
 	}
 
 	return ZE_TPF_NOTSET;
@@ -513,6 +513,10 @@ static bool LoadHeader(ZEFile* File, ZETIFFInfo* Info)
 				Info->PixelFormat = ZE_TIFF_PT_RGB8;
 			else if (SamplesPerPixel == 2 && ExtraSamples == 2 && BitsPerSample[0] == 8 && BitsPerSample[1] == 8 && BitsPerSample[2] == 8 && BitsPerSample[3] == 8)	
 				Info->PixelFormat = ZE_TIFF_PT_RGBA8;
+			else if (SamplesPerPixel == 2 && ExtraSamples == 2 && BitsPerSample[0] == 16 && BitsPerSample[1] == 16 && BitsPerSample[2] == 16)		
+				Info->PixelFormat = ZE_TIFF_PT_RGB16;
+			else if (SamplesPerPixel == 2 && ExtraSamples == 2 && BitsPerSample[0] == 16 && BitsPerSample[1] == 16 && BitsPerSample[2] == 16 && BitsPerSample[3] == 16)	
+				Info->PixelFormat = ZE_TIFF_PT_RGBA16;
 			break;
 		
 		case 3: // Palette
@@ -538,7 +542,7 @@ static bool LoadPalette(ZEFile* File, ZETIFFInfo* Info)
 	if (File->Read(RawPalette, 3 * 256 * sizeof(ZEUInt16), 1) != 1)
 		return false;
 
-	ZEBGRA32* Palette = new ZEBGRA32[256];
+	ZEPixelRGBA8* Palette = new ZEPixelRGBA8[256];
 	for (ZESize I = 0; I < 256; I++)
 	{
 		Palette[I].A = 255;
@@ -579,86 +583,141 @@ static bool LoadStripOffsets(ZEFile* File, ZETIFFInfo* Info)
 	return true;
 }
 
-static void ConvertData(ZEBGRA32* Destination, ZESize DestinationPitch, void* Source, ZESize SourcePitch, ZESize RowCount, ZETIFFInfo* Info)
+// Indexed, RGB8, RGB16
+static void ConvertData(void* Destination, void* Source, ZESize Size, ZETIFFInfo* Info)
 {
-	ZEUInt8* SourceRow = (ZEUInt8*)Source;
-	ZEUInt8* SourceRowEnd = SourceRow + SourcePitch * RowCount;
-	
-	ZEBGRA32* DestinationRow = Destination;
-
-	ZESize SourceRowPitch;
-
-	while(SourceRow < SourceRowEnd)
+	switch(Info->PixelFormat)
 	{
-		switch(Info->PixelFormat)
-		{
-			case ZE_TIFF_PT_INDEXED:
-				ZETexturePixelConverter::ConvertIndexed(Destination, SourceRow, SourcePitch, Info->Palette);
-				break;
+		case ZE_TIFF_PT_INDEXED:
+			ZETexturePixelConverter::ConvertIndexed((ZEPixelRGBA8*)Destination, Source, Size, Info->Palette);
+			break;
 
-			case ZE_TIFF_PT_L8:
-				ZETexturePixelConverter::ConvertL8(DestinationRow, SourceRow, SourcePitch);
-				break;
+		case ZE_TIFF_PT_RGB8:
+			ZETexturePixelConverter::ConvertRGB8((ZEPixelRGBA8*)Destination, Source, Size);
+			break;
 
-			case ZE_TIFF_PT_L16:
-				ZETexturePixelConverter::ConvertL16(DestinationRow, SourceRow, SourcePitch);
-				break;
-
-			case ZE_TIFF_PT_LA8:
-				ZETexturePixelConverter::ConvertLA8(DestinationRow, SourceRow, SourcePitch);
-				break;
-
-			case ZE_TIFF_PT_LA16:
-				ZETexturePixelConverter::ConvertLA16(DestinationRow, SourceRow, SourcePitch);
-				break;
-
-			case ZE_TIFF_PT_RGB8:
-				ZETexturePixelConverter::ConvertRGB8(DestinationRow, SourceRow, SourcePitch);
-				break;
-
-			case ZE_TIFF_PT_RGBA8:
-				ZETexturePixelConverter::ConvertRGBA8(DestinationRow, SourceRow, SourcePitch);
-				break;
-		}
-
-		DestinationRow += DestinationPitch;
-		SourceRow += SourcePitch;
+		case ZE_TIFF_PT_RGB16:
+			ZETexturePixelConverter::ConvertRGB16((ZEPixelRGBA16*)Destination, Source, Size);
+			break;
 	}
-
 }
 
 static ZETextureData* LoadData(ZEFile* File, ZETIFFInfo* Info)
 {
 	ZEPointer<ZETextureData> Texture = new ZETextureData();
-	Texture->Create(ZE_TT_2D, ZE_TPF_I8_4, 1, 1, Info->Width, Info->Height);
+
+	Texture->Create(ZE_TT_2D, GetTextureFormat(Info->PixelFormat), 1, 1, Info->Width, Info->Height);
 
 	ZESize PixelSize = GetPixelSize(Info->PixelFormat);
-	ZEBGRA32* DestinationData = (ZEBGRA32*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
-	ZESize DestinationPitch = Info->Width * PixelSize;
-
+	ZEUInt8* DestinationData = (ZEUInt8*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
+	ZEUInt8* DestinationChunk;
+	ZEUInt8* ChunkWidth;
 	
-	ZESize PositionX, PositionY;
+	ZESize DestinationPixelSize = Texture->GetSurfaces()[0].GetLevels()[0].GetPitch() / Texture->GetSurfaces()[0].GetLevels()[0].GetWidth();
+
+	ZESize PositionX = 0;
+	ZESize PositionY = 0;
+
+	ZESize PositionXIncrement;
+	ZESize PositionYIncrement;
+
+	if (Info->ChunkType == ZE_TIFF_CT_TILE)
+	{
+
+	}
+	else
+	{
+
+	}
 
 	if (Info->Compression == ZE_TIFF_CT_UNCOMPRESSED)
 	{
-		if (Info->ChunkType == ZE_TIFF_CT_STRIP)
-		{
-			ZEPointer<ZEUInt8> SourceRowData = new ZEUInt8[PixelSize * Info->Width];
-			ZESize SourceRowPitch = Info->Width * PixelSize;
+		bool InternalFormat = 
+			(Info->PixelFormat == ZE_TIFF_PT_RGBA8 || 
+			(Info->PixelFormat == ZE_TIFF_PT_RGBA16 && Info->Endianness == ZE_ET_LITTLE) || 
+			Info->PixelFormat == ZE_TIFF_PT_L8 ||
+			(Info->PixelFormat == ZE_TIFF_PT_L16 && Info->Endianness == ZE_ET_LITTLE) ||
+			Info->PixelFormat == ZE_TIFF_PT_LA8 || 
+			(Info->PixelFormat == ZE_TIFF_PT_LA16 && Info->Endianness == ZE_ET_LITTLE));
 
-			for (ZESize I = 0; I < Info->ChunkOffsets.GetCount(); I++) // Row By Row
+		ZEPointer<ZEUInt8> SourceRow;
+		if (!InternalFormat)
+			SourceRow = new ZEUInt8[Info->Width * PixelSize];
+
+		ZESize SourceRowPitch = Info->Width * PixelSize;
+		for (ZESize I = 0; I < Info->ChunkOffsets.GetCount(); I++)
+		{
+			DestinationChunk = DestinationData + (Info->Width * PositionY + PositionX) * DestinationPixelSize;
+
+			ZESize ChunkRowCount = Info->Height - I * Info->ChunkHeight >= Info->ChunkHeight ? Info->ChunkHeight : Info->Height % Info->ChunkHeight;
+			File->Seek(Info->ChunkOffsets[I], ZE_SF_BEGINING);
+			for (ZESize N = 0; I < ChunkRowCount; N++)
 			{
-				ZESize ChunkRowCount = Info->Height - I * Info->ChunkHeight >= Info->ChunkHeight ? Info->ChunkHeight : Info->Height % Info->ChunkHeight;
-				File->Seek(Info->ChunkOffsets[I], ZE_SF_BEGINING);
-				for (ZESize N = 0; I < ChunkRowCount; N++)
+				if (InternalFormat)
 				{
-					if (File->Read(SourceRowData, SourceRowPitch, 1) != 1)
-						return NULL;
-					ConvertData(DestinationData, DestinationPitch, SourceRowData, SourceRowPitch, 1, Info);
-					DestinationData += DestinationPitch;
+					if (File->Read(DestinationChunk, SourceRowPitch, 1) != 1)
+						return NULL;	
 				}
+				else
+				{
+					if (File->Read(SourceRow, SourceRowPitch, 1) != 1)
+						return NULL;
+
+					switch(Info->PixelFormat)
+					{
+						case ZE_TIFF_PT_INDEXED:
+							ZETexturePixelConverter::ConvertIndexed((ZEPixelRGBA8*)DestinationChunk, SourceRow, Info->Width, Info->Palette);
+							break;
+
+						case ZE_TIFF_PT_RGB8:
+							ZETexturePixelConverter::ConvertRGB8((ZEPixelRGBA8*)DestinationChunk, SourceRow, Info->Width);
+							break;
+
+						case ZE_TIFF_PT_L16:
+							ZETexturePixelConverter::ConvertL16_BE((ZEPixelL16*)DestinationChunk, SourceRow, Info->Width);
+							break;
+
+						case ZE_TIFF_PT_LA16:
+							ZETexturePixelConverter::ConvertLA16_BE((ZEPixelLA16*)DestinationChunk, SourceRow, Info->Width);
+							break;
+
+						case ZE_TIFF_PT_RGBA16:
+							ZETexturePixelConverter::ConvertRGBA16_BE((ZEPixelRGBA16*)DestinationChunk, SourceRow, Info->Width);
+							break;
+
+						case ZE_TIFF_PT_RGB16:
+							if (Info->Endianness == ZE_ET_BIG)
+								ZETexturePixelConverter::ConvertRGB16_BE((ZEPixelRGBA16*)DestinationChunk, SourceRow, Info->Width);
+							else
+								ZETexturePixelConverter::ConvertRGB16((ZEPixelRGBA16*)DestinationChunk, SourceRow, Info->Width);
+							break;
+					}
+				}
+
+				PositionX += PositionXIncrement;
+				PositionY += PositionYIncrement;
 			}
 		}
+	}
+	else if (Info->Compression == ZE_TIFF_CT_LZW)
+	{
+		ZESize SourceRowPitch = Info->Width * PixelSize;
+		ZEPointer<ZEUInt8> SourceRow = new ZEUInt8[SourceRowPitch];
+		for (ZESize I = 0; I < Info->ChunkOffsets.GetCount(); I++)
+		{
+			ZESize ChunkRowCount = Info->Height - I * Info->ChunkHeight >= Info->ChunkHeight ? Info->ChunkHeight : Info->Height % Info->ChunkHeight;
+			File->Seek(Info->ChunkOffsets[I], ZE_SF_BEGINING);
+			for (ZESize N = 0; I < ChunkRowCount; N++)
+			{
+				// Tiff read directly
+				if (File->Read(SourceRow, SourceRowPitch, 1) != 1)
+					return NULL;
+			}
+		}
+	}
+	else if (Info->Compression == ZE_TIFF_CT_PACKBIT)
+	{
+
 	}
 
 	return Texture.Transfer();
