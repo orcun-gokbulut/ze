@@ -154,6 +154,75 @@ ZED3D9Shader* ZED3D9ShaderManager::GetShader(const char* FileName, const char* F
 	return Shader;
 }
 
+ZED3D9Shader* ZED3D9ShaderManager::GetShaderFromSource(const char* Source, const char* FunctionName, const ZEString CompilerParameters[][2], int CompilerParameterSize, ZED3D9ShaderType Type, const char* Profile)
+{
+	// Check Memory Cache
+	ZEUInt32 Hash = CalculateHash(Source, FunctionName, 0);
+	for (ZESize I = 0; I < Shaders.GetCount(); I++)
+		if (Shaders[I] != NULL)
+			if (Shaders[I]->Hash == Hash)
+				if (Shaders[I]->GetComponents() == 0 &&
+					Shaders[I]->GetShaderType() == Type &&
+					strncmp(Shaders[I]->GetFileName(), Source, ZE_MAX_SHADER_LENGTH) == 0 && 
+					strcmp(Shaders[I]->GetFunctionName(), FunctionName) == 0)
+				{
+					Shaders[I]->ReferanceCount++;
+					return Shaders[I];
+				}
+
+				// Check File Cache
+
+				// Compile
+				ZED3D9Shader* Shader = NULL;
+				if (Type == ZE_D3D9_ST_PIXEL)
+				{
+					Shader = new ZED3D9PixelShader();
+					if (!Shader->CompileShader(CompilerParameters, CompilerParameterSize, Profile, Source, FunctionName))
+					{
+						delete Shader;
+						return NULL;
+					}
+				} 
+				else if (Type == ZE_D3D9_ST_VERTEX)
+				{
+					Shader = new ZED3D9VertexShader();
+					if (!Shader->CompileShader(CompilerParameters, CompilerParameterSize, Profile, Source, FunctionName))
+					{
+						delete Shader;
+						return NULL;
+					}
+				}
+
+				strncpy(Shader->FileName, Source, ZE_MAX_SHADER_LENGTH);
+				strncpy(Shader->FunctionName, FunctionName, ZE_MAX_SHADER_FUNCTION_NAME_LENGTH);
+				Shader->Components = 0;
+				Shader->Hash = CalculateHash(Source, FunctionName, 0);
+
+				// Add to shader list
+				bool Found = false;
+				for (ZESize I = 0; I < Shaders.GetCount(); I++)
+					if (Shaders[I] == NULL)
+					{
+						Found = true;
+						break;
+					}
+
+					if (!Found)
+						Shaders.Add(Shader);
+
+					return Shader;
+}
+
+ZED3D9PixelShader* ZED3D9ShaderManager::GetPixelShaderFromSource(const char* Source, const char* FunctionName, const ZEString CompilerParameters[][2], int CompilerParameterSize, const char* Profile)
+{
+	return (ZED3D9PixelShader*)GetShaderFromSource(Source, FunctionName, CompilerParameters, CompilerParameterSize, ZE_D3D9_ST_PIXEL, Profile);
+}
+
+ZED3D9VertexShader* ZED3D9ShaderManager::GetVertexShaderFromSource(const char* Source, const char* FunctionName, const ZEString CompilerParameters[][2], int CompilerParameterSize, const char* Profile)
+{
+	return (ZED3D9VertexShader*)GetShaderFromSource(Source, FunctionName, CompilerParameters, CompilerParameterSize, ZE_D3D9_ST_VERTEX, Profile);
+}
+
 ZED3D9PixelShader* ZED3D9ShaderManager::GetPixelShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile)
 {
 	return (ZED3D9PixelShader*)GetShader(FileName, FunctionName, Components, ZE_D3D9_ST_PIXEL, Profile);

@@ -128,7 +128,6 @@ ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(const ZEString& FileName)
 	return VertexDeclaration;
 }
 
-
 ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(ZEFile* ResourceFile)
 {
 	ZEVertexDeclarationFileHeaderChunk HeaderChunk;

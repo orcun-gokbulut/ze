@@ -46,6 +46,16 @@ ZEVertexBuffer::~ZEVertexBuffer()
 {
 }
 
+const ZEArray<ZEVertexElement>& ZEVertexBuffer::GetVertexElements()
+{
+	return VertexElements;
+}
+
+void ZEVertexBuffer::AddVertexElements(const ZEVertexElement& NewElement)
+{
+	VertexElements.Add(NewElement);
+}
+
 ZEStaticVertexBuffer::ZEStaticVertexBuffer()
 {
 }
@@ -53,8 +63,6 @@ ZEStaticVertexBuffer::ZEStaticVertexBuffer()
 ZEStaticVertexBuffer::~ZEStaticVertexBuffer()
 {
 }
-
-
 
 bool ZEStaticVertexBuffer::IsStatic()
 {

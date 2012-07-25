@@ -76,14 +76,24 @@ ZEStencilZState& ZEGraphicsDevice::GetStencilZStateEdit()
 	return RequestedStencilZState;
 }
 
-void ZEGraphicsDevice::SetVertexDecleration(ZEVertexDeclaration* Declaration)
+void ZEGraphicsDevice::SetVertexBuffer(ZEVertexBuffer* VertexBuffer)
 {
-	RequestedVertexDeclaration = Declaration;
+	RequestedVertexBuffer = VertexBuffer;
 }
 
-ZEVertexDeclaration* ZEGraphicsDevice::GetVertexDeclaration()
+ZEVertexBuffer* ZEGraphicsDevice::GetVertexBuffer() const
 {
-	return RequestedVertexDeclaration;
+	return RequestedVertexBuffer;
+}
+
+void ZEGraphicsDevice::SetIndexBuffer(ZEIndexBuffer* IndexBuffer)
+{
+	RequestedIndexBuffer = IndexBuffer;
+}
+
+ZEIndexBuffer* ZEGraphicsDevice::GetIndexBuffer() const
+{
+	return RequestedIndexBuffer;
 }
 
 void ZEGraphicsDevice::SetVertexShader(ZEShader* VertexShader)
@@ -91,7 +101,7 @@ void ZEGraphicsDevice::SetVertexShader(ZEShader* VertexShader)
 	RequestedVertexShader = VertexShader;
 }
 
-ZEShader* ZEGraphicsDevice::GetVertexShader()
+ZEShader* ZEGraphicsDevice::GetVertexShader() const
 {
 	return RequestedVertexShader;
 }
@@ -101,7 +111,7 @@ void ZEGraphicsDevice::SetPixelShader(ZEShader* PixelShader)
 	RequestedVertexShader = PixelShader;
 }
 
-ZEShader* ZEGraphicsDevice::GetPixelShader()
+ZEShader* ZEGraphicsDevice::GetPixelShader() const
 {
 	return RequestedPixelShader;
 }
@@ -111,7 +121,7 @@ void ZEGraphicsDevice::SetRenderTarget(int index, ZERenderTarget* RenderTarget)
 	RequestedRenderTargets[index] = RenderTarget;
 }
 
-ZERenderTarget* ZEGraphicsDevice::GetRenderTarget(int index)
+ZERenderTarget* ZEGraphicsDevice::GetRenderTarget(int index) const
 {
 	return RequestedRenderTargets[index];
 }
@@ -125,8 +135,8 @@ ZEGraphicsDevice::ZEGraphicsDevice() :	RequestedPixelShader(NULL),
 										DevicePixelShader(NULL),
 										RequestedVertexShader(NULL),
 										DeviceVertexShader(NULL),
-										RequestedVertexDeclaration(NULL),
-										DeviceVertexDeclaration(NULL),
+										RequestedVertexBuffer(NULL),
+										DeviceVertexBuffer(NULL),
 										RequestedDepthBuffer(NULL),
 										DeviceDepthBuffer(NULL)
 {

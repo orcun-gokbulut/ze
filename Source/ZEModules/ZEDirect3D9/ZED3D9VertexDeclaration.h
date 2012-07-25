@@ -53,10 +53,6 @@ class ZED3D9VertexDeclaration : public ZEVertexDeclaration, private ZED3D9Compon
 		
 		bool								CreateVertexDeclaration(const ZEVertexElement* Elements, ZESize ElementCount);
 
-	protected:
-											ZED3D9VertexDeclaration();
-		virtual								~ZED3D9VertexDeclaration();
-
 	public:
 		const ZEArray<ZEVertexElement>&		GetVertexElements();
 		ZESize								GetVertexSize();
@@ -66,7 +62,8 @@ class ZED3D9VertexDeclaration : public ZEVertexDeclaration, private ZED3D9Compon
 		virtual bool						Create(const ZEVertexElement* VertexElements, ZESize ElementCount);
 		virtual void						Release();
 
-
+											ZED3D9VertexDeclaration();
+		virtual								~ZED3D9VertexDeclaration();
 };
 
 #endif

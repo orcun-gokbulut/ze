@@ -105,13 +105,13 @@ void ZED3D9UnsharpenFilterProcessor::Initialize()
 	ZEFileInfo FInfo("resources\\shaders\\UnsharpenFilterProcessor.hlsl");
 	SourceSize = FInfo.GetFileSize("shaders\\UnsharpenFilterProcessor.hlsl");
 	SourceSize++;
-	ShaderSource = new char[SourceSize];
+	ShaderSource = new char[(int)SourceSize];
 
 	ZEFile::ReadTextFile("shaders\\UnsharpenFilterProcessor.hlsl", ShaderSource, SourceSize);
 	
 	// Compile Shaders
-	VertexShader.CompileShader(NULL, 0, "vs_3_0", ShaderSource, "vs_main");
-	PixelShader.CompileShader(NULL, 0, "ps_3_0", ShaderSource, "ps_main");
+	VertexShader = ZED3D9VertexShader::CreateShaderFromSource(ShaderSource, "vs_main", NULL, 0, "vs_3_0");
+	PixelShader = ZED3D9PixelShader::CreateShaderFromSource(ShaderSource, "ps_main", NULL, 0, "ps_3_0");
 
 	delete [] ShaderSource;
 }
@@ -122,10 +122,8 @@ void ZED3D9UnsharpenFilterProcessor::Deinitialize()
 	Input		= NULL;
 	Output		= NULL;
 	ZED3D_RELEASE(VertexDeclaration);
-
-	// Does Not need to Release anymore since it is a data member of this class
-//	ZED3D_RELEASE(PixelShader);
-//	ZED3D_RELEASE(VertexShader);
+	ZED3D_RELEASE(PixelShader);
+	ZED3D_RELEASE(VertexShader);
 }
 
 void ZED3D9UnsharpenFilterProcessor::OnDeviceLost()
@@ -164,17 +162,17 @@ void ZED3D9UnsharpenFilterProcessor::Process()
 	float PixelWidth = 1.0f / (float)Output->GetWidth();
 	float PixelHeigth = 1.0f / (float)Output->GetHeight();
 
-	GetDevice()->SetPixelShader(PixelShader.GetPixelShader());
-	GetDevice()->SetVertexShader(VertexShader.GetVertexShader());
+	GetDevice()->SetPixelShader(PixelShader->GetPixelShader());
+	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
 
 	ZEUInt32 ColorBufferSampler;
-	PixelShader.GetSamplerNumber(ColorBufferSampler, "ColorBuffer");
+	PixelShader->GetSamplerNumber(ColorBufferSampler, "ColorBuffer");
 
 	ZED3D9CommonTools::SetRenderTarget(0, Output);
 	ZED3D9CommonTools::SetTexture(ColorBufferSampler, (ZETexture2D*)Input, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 	
-	VertexShader.SetConstant("VSParameters", ZEVector4(PixelWidth, PixelHeigth, 0.0f, 0.0));
-	PixelShader.SetConstant("PSParameters", ZEVector4(PixelWidth, PixelHeigth, Amount, 0.0));
+	VertexShader->SetConstant("VSParameters", ZEVector4(PixelWidth, PixelHeigth, 0.0f, 0.0));
+	PixelShader->SetConstant("PSParameters", ZEVector4(PixelWidth, PixelHeigth, Amount, 0.0));
 
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 }

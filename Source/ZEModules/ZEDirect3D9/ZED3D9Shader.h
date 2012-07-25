@@ -56,8 +56,8 @@ class ZED3D9Shader : public ZEShader
 		ZESize							ReferanceCount;
 		ZEUInt32						Hash;
 		ZEUInt32						Components;		//??
-		char							FileName[ZE_MAX_SHADER_NAME_LENGTH];
-		char							FunctionName[ZE_MAX_SHADER_NAME_LENGTH];
+		char							FileName[ZE_MAX_SHADER_LENGTH];
+		char							FunctionName[ZE_MAX_SHADER_LENGTH];
 
 		void							PopulateConstantTable(LPD3DXCONSTANTTABLE Table);
 
@@ -84,7 +84,7 @@ class ZED3D9PixelShader : public ZED3D9Shader, private ZED3D9ComponentBase
 
 	public:
 		virtual ZED3D9ShaderType		GetShaderType();
-		LPDIRECT3DPIXELSHADER9			GetPixelShader();
+		LPDIRECT3DPIXELSHADER9			GetPixelShader() const;
 
 		// Set Constant
 		virtual void					SetConstant(const ZEString& Name, const ZEVector2& Value);
@@ -135,7 +135,8 @@ class ZED3D9PixelShader : public ZED3D9Shader, private ZED3D9ComponentBase
 														ZEString MainFunction);
 
 		static ZED3D9PixelShader*		CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
-
+		static ZED3D9PixelShader*		CreateShaderFromSource(const char* Source, const char* FunctionName, const ZEString CompilerParameters[][2], int CompilerParameterCount, const char* Profile);
+				
 										ZED3D9PixelShader();
 										~ZED3D9PixelShader();
 };
@@ -149,7 +150,7 @@ class ZED3D9VertexShader : public ZED3D9Shader, private ZED3D9ComponentBase
 
 	public:
 		virtual ZED3D9ShaderType		GetShaderType();
-		LPDIRECT3DVERTEXSHADER9			GetVertexShader();
+		LPDIRECT3DVERTEXSHADER9			GetVertexShader() const;
 		
 		// Set Constant
 		virtual void					SetConstant(const ZEString& Name, const ZEVector2& Value);
@@ -200,6 +201,7 @@ class ZED3D9VertexShader : public ZED3D9Shader, private ZED3D9ComponentBase
 														ZEString MainFunction);
 
 		static ZED3D9VertexShader*		CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
+		static ZED3D9VertexShader*		CreateShaderFromSource(const char* Source, const char* FunctionName, const ZEString CompilerParameters[][2], int CompilerParameterCount, const char* Profile);
 
 										ZED3D9VertexShader();
 										~ZED3D9VertexShader();

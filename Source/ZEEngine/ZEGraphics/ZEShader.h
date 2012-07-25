@@ -42,7 +42,7 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEDS/ZEArray.h"
 
-#define ZE_MAX_SHADER_NAME_LENGTH 100
+#define ZE_MAX_SHADER_LENGTH 256		
 #define ZE_MAX_SHADER_FUNCTION_NAME_LENGTH 100
 
 #define ZE_MAX_MACRO_AMOUNT 32
