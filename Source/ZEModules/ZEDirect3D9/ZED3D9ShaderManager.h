@@ -58,6 +58,11 @@ class ZED3D9ShaderManager
 										ZED3D9ShaderManager();
 										~ZED3D9ShaderManager();
 	public:
+
+		ZED3D9Shader*					GetShaderFromSource(const char* Source, const char* FunctionName, const ZEString CompilerParameters[][2], int CompilerParameterSize, ZED3D9ShaderType Type, const char* Profile);
+		ZED3D9PixelShader*				GetPixelShaderFromSource(const char* Source, const char* FunctionName, const ZEString CompilerParameters[][2], int CompilerParameterSize, const char* Profile);
+		ZED3D9VertexShader*				GetVertexShaderFromSource(const char* Source, const char* FunctionName, const ZEString CompilerParameters[][2], int CompilerParameterSize, const char* Profile);
+
 		ZED3D9Shader*					GetShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile);
 		ZED3D9PixelShader*				GetPixelShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);	
 		ZED3D9VertexShader*				GetVertexShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);

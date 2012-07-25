@@ -41,6 +41,8 @@
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9Texture3D.h"
 #include "ZED3D9TextureCube.h"
+#include "ZED3D9VertexBuffer.h"
+#include "ZED3D9IndexBuffer.h"
 
 inline D3DBLEND ZEBlendOptionToDX9(ZEBlendOption BlendOption)
 {
@@ -307,7 +309,7 @@ void ZED3D9GraphicsDevice::ApplyRequestedSamplerStates()
 			}
 			// Rest
 			if(FiltersHaveAnisotrophy &&
-				RequestedSamplerStates[i].GetMaxAnisotrophy() != DeviceSamplerStates[i].GetMaxAnisotrophy() )
+				RequestedSamplerStates[i].GetMaxAnisotrophy() != DeviceSamplerStates[i].GetMaxAnisotrophy())
 			{
 				DeviceSamplerStates[i].SetMaxAnisotrophy(RequestedSamplerStates[i].GetMaxAnisotrophy());
 				D3DDevice9->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, DeviceSamplerStates[i].GetMaxAnisotrophy());
@@ -316,12 +318,21 @@ void ZED3D9GraphicsDevice::ApplyRequestedSamplerStates()
 				RequestedSamplerStates[i].GetBorderColor() != DeviceSamplerStates[i].GetBorderColor())
 			{	
 				DeviceSamplerStates[i].SetBorderColor(RequestedSamplerStates[i].GetBorderColor());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_BORDERCOLOR, *(RequestedSamplerStates[i].GetBorderColor().M));
+
+				// Convert To RGBA
+				int ColorRGBA[4];
+				ZEVector4 Color = RequestedSamplerStates->GetBorderColor().Clamp(0.0f, 1.0f);
+				ColorRGBA[0] = (int)(Color.x * 255);
+				ColorRGBA[1] = (int)(Color.y * 255);
+				ColorRGBA[2] = (int)(Color.z * 255);
+				ColorRGBA[3] = (int)(Color.w * 255);
+
+				D3DDevice9->SetSamplerState(i, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(ColorRGBA[0], ColorRGBA[1], ColorRGBA[2], ColorRGBA[3]));
 			}
 			if(RequestedSamplerStates[i].GetMaxLOD() != RequestedSamplerStates[i].GetMaxLOD())
 			{
 				DeviceSamplerStates[i].SetMaxLOD(RequestedSamplerStates[i].GetMaxLOD());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_MAXMIPLEVEL, DeviceSamplerStates[i].GetMaxLOD());
+				D3DDevice9->SetSamplerState(i, D3DSAMP_MAXMIPLEVEL, (int)DeviceSamplerStates[i].GetMaxLOD());
 			}
 			if(RequestedSamplerStates[i].GetTexture() != DeviceSamplerStates[i].GetTexture())
 			{
@@ -493,17 +504,24 @@ void ZED3D9GraphicsDevice::ApplyRequestedRasterizerState()
 	RequestedRasterizerState.SetChanged(false);
 }
 
-void ZED3D9GraphicsDevice::ApplyRequestedVertexDeclaration()
+void ZED3D9GraphicsDevice::ApplyRequestedVertexBuffer()
 {
-	// If Requested Device is NULL it means Use Current
-	if(RequestedVertexDeclaration != NULL)
+	if (RequestedVertexBuffer != NULL && 
+		RequestedVertexBuffer != DeviceVertexBuffer)
 	{
-		// If Pointer Address not same consider it changed
-		if(RequestedVertexDeclaration != DeviceVertexDeclaration)
-		{
-			DeviceVertexDeclaration = RequestedVertexDeclaration;
-			DeviceVertexDeclaration->SetupVertexDeclaration();
-		}
+		DeviceVertexBuffer = RequestedVertexBuffer;
+		D3DDevice9->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)DeviceVertexBuffer)->StaticBuffer, 0, 0);
+		// Stream ZERO Only for now...
+	}
+}
+
+void ZED3D9GraphicsDevice::ApplyRequestedIndexBuffer()
+{
+	if (RequestedVertexBuffer != NULL && 
+		RequestedVertexBuffer != DeviceVertexBuffer)
+	{
+		DeviceIndexBuffer = RequestedIndexBuffer;
+		D3DDevice9->SetIndices(((ZED3D9StaticIndexBuffer*)DeviceIndexBuffer)->StaticBuffer);
 	}
 }
 
@@ -512,10 +530,10 @@ void ZED3D9GraphicsDevice::ApplyRequestedRenderTargets()
 	for(int i = 0; i < ZE_MAX_RENDER_TARGETS; i++)
 	{
 		// If NULL skip this render target
-		if(RequestedRenderTargets[i] != NULL)
+		if (RequestedRenderTargets[i] != NULL)
 		{		
 			// If Pointer Address not same consider it changed
-			if(RequestedRenderTargets[i] != DeviceRenderTargets[i])
+			if (RequestedRenderTargets[i] != DeviceRenderTargets[i])
 			{
 				DeviceRenderTargets[i] = RequestedRenderTargets[i];
 				D3DDevice9->SetRenderTarget(i, ((ZED3D9RenderTarget*)DeviceRenderTargets[i])->FrameBuffer);
@@ -538,15 +556,29 @@ void ZED3D9GraphicsDevice::ApplyAllRequestedStates()
 	ApplyRequestedStencilZState();
 	ApplyRequestedRasterizerState();
 	ApplyRequestedRenderTargets();
-	ApplyRequestedVertexDeclaration();
+	ApplyRequestedVertexBuffer();
 }
 
 void ZED3D9GraphicsDevice::Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount) 
 {
 	// Commit State
 	ApplyAllRequestedStates();
+
+	// Generate A Vertex Declaration From the Buffer
+	ZED3D9VertexDeclaration VertexDeclaration;
+	if (!VertexDeclaration.Create(DeviceVertexBuffer->GetVertexElements().GetConstCArray(), DeviceVertexBuffer->GetVertexElements().GetSize()))
+	{
+		zeError("Unable To Generate Vertex Declaration!!");
+	}
+
+	// Set Vertex Declaration
+	VertexDeclaration.SetupVertexDeclaration();
+
 	// Then Draw
 	D3DDevice9->DrawPrimitive(ZEPrimitiveTypeToDX9(PrimitiveType), StartVertex, VertexCount);
+
+	// Release This Declaration
+	VertexDeclaration.Release();
 }
 
 void ZED3D9GraphicsDevice::DrawIndexed(ZEROPrimitiveType PrimitiveType, ZEInt BaseVertexIndex, ZEUInt32 MinIndex, 
@@ -554,9 +586,23 @@ void ZED3D9GraphicsDevice::DrawIndexed(ZEROPrimitiveType PrimitiveType, ZEInt Ba
 {
 	// Commit State
 	ApplyAllRequestedStates();
+	ApplyRequestedIndexBuffer();
+
+	// Generate A Vertex Declaration From the Buffer
+	ZED3D9VertexDeclaration VertexDeclaration;
+	if (!VertexDeclaration.Create(DeviceVertexBuffer->GetVertexElements().GetConstCArray(), DeviceVertexBuffer->GetVertexElements().GetSize()))
+	{
+		zeError("Unable To Generate Vertex Declaration!!");
+	}
+
+	// Set Vertex Declaration
+	VertexDeclaration.SetupVertexDeclaration();
+
 	// Then Draw
 	D3DDevice9->DrawIndexedPrimitive(ZEPrimitiveTypeToDX9(PrimitiveType), BaseVertexIndex, MinIndex,
 										VertexCount, StartIndex, PrimitiveCount);
+
+	VertexDeclaration.Release();
 }
 
 ZED3D9GraphicsDevice::ZED3D9GraphicsDevice() : ZEGraphicsDevice()

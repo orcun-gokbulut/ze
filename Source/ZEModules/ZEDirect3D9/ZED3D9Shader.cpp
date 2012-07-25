@@ -391,7 +391,7 @@ ZED3D9ShaderType ZED3D9PixelShader::GetShaderType()
 	return ZE_D3D9_ST_PIXEL;
 }
 
-LPDIRECT3DPIXELSHADER9 ZED3D9PixelShader::GetPixelShader()
+LPDIRECT3DPIXELSHADER9 ZED3D9PixelShader::GetPixelShader() const
 {
 	return PixelShader;
 }
@@ -734,10 +734,10 @@ bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameter[][2],
 	if(D3DXCompileShader(Source.ToCString(), Source.GetSize(), MacroDefinitions, &D3DIncludeInterface2, MainFunction.ToCString(), ShaderProfile, D3DXSHADER_PACKMATRIX_COLUMNMAJOR | ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, &ConstantTable) != D3D_OK)
 	{
 		if (CompilerOutput == NULL)
-			zeError("Can not compile pixel shader. Shader file name : \"%s\"", FileName);
+			zeError("Can not compile vertex shader.\r\n");
 		else
-			zeError("Can not compile pixel shader.\r\nShader file name : \"%s\".\r\nCompile output :\r\n%s\r\n", FileName, CompilerOutput->GetBufferPointer());
-
+			zeError("Can not compile vertex shader.\r\nCompile output :\r\n%s\r\n", CompilerOutput->GetBufferPointer());
+		
 		Compiled = false;
 		return false;
 	}
@@ -777,6 +777,11 @@ ZED3D9PixelShader* ZED3D9PixelShader::CreateShader(const char* FileName, const c
 	return ZED3D9ShaderManager::GetInstance()->GetPixelShader(FileName, FunctionName, Components, Profile);
 }
 
+ZED3D9PixelShader* ZED3D9PixelShader::CreateShaderFromSource(const char* Source, const char* FunctionName, const ZEString CompilerParameters[][2], int CompilerParameterCount, const char* Profile)
+{
+	return ZED3D9ShaderManager::GetInstance()->GetPixelShaderFromSource(Source, FunctionName, CompilerParameters, CompilerParameterCount, Profile);
+}
+
 // ZED3D9VertexShader
 ////////////////////////////////////////////////////////////////////////////////////////
 ZED3D9VertexShader::ZED3D9VertexShader()
@@ -794,7 +799,7 @@ ZED3D9ShaderType ZED3D9VertexShader::GetShaderType()
 	return ZE_D3D9_ST_VERTEX;
 }
 
-LPDIRECT3DVERTEXSHADER9 ZED3D9VertexShader::GetVertexShader()
+LPDIRECT3DVERTEXSHADER9 ZED3D9VertexShader::GetVertexShader() const
 {
 	return VertexShader;
 }
@@ -1177,5 +1182,10 @@ bool ZED3D9VertexShader::CompileShader(const ZEString CompilerParameter[][2],
 ZED3D9VertexShader* ZED3D9VertexShader::CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile)
 {
 	return ZED3D9ShaderManager::GetInstance()->GetVertexShader(FileName, FunctionName, Components, Profile);
+}
+
+ZED3D9VertexShader* ZED3D9VertexShader::CreateShaderFromSource(const char* Source, const char* FunctionName, const ZEString CompilerParameters[][2], int CompilerParameterCount, const char* Profile)
+{
+	return ZED3D9ShaderManager::GetInstance()->GetVertexShaderFromSource(Source, FunctionName, CompilerParameters, CompilerParameterCount, Profile);
 }
 

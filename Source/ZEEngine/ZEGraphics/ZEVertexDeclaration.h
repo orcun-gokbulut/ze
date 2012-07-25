@@ -77,16 +77,13 @@ struct ZEVertexElement
 	ZEVertexElementSemantic				Semantic;
 	ZEVertexElementType					Type;
 	ZEUInt								Index;
+	ZEUInt								Offset;
 };
 
 class ZEFile;
 
 class ZEVertexDeclaration
 {
-	protected:
-													ZEVertexDeclaration();
-		virtual										~ZEVertexDeclaration();
-
 	public:
 		virtual const ZEArray<ZEVertexElement>&		GetVertexElements() = 0;
 		virtual ZESize								GetVertexSize() = 0;
@@ -101,6 +98,9 @@ class ZEVertexDeclaration
 		static ZEVertexDeclaration*					LoadFromFile(const ZEString& FileName);
 		static ZEVertexDeclaration*					LoadFromFile(ZEFile* ResourceFile);
 		static ZEVertexDeclaration*					CreateInstance();
+
+													ZEVertexDeclaration();
+		virtual										~ZEVertexDeclaration();
 };
 
 enum ZEVertexType

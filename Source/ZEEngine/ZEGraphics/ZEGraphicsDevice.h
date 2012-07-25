@@ -67,9 +67,13 @@ class ZEGraphicsDevice
 		ZESamplerState			RequestedSamplerStates[ZE_MAX_SAMPLER_ATTACHMENT];
 		ZESamplerState			DeviceSamplerStates[ZE_MAX_SAMPLER_ATTACHMENT];
 
-		// Vertex Declarations
-		ZEVertexDeclaration*	RequestedVertexDeclaration;
-		ZEVertexDeclaration*	DeviceVertexDeclaration;
+		// Vertex Buffer
+		ZEVertexBuffer*			RequestedVertexBuffer;
+		ZEVertexBuffer*			DeviceVertexBuffer;
+
+		// Index Buffer
+		ZEIndexBuffer*			RequestedIndexBuffer;
+		ZEIndexBuffer*			DeviceIndexBuffer;
 
 		// Shader
 		ZEShader*				RequestedVertexShader;
@@ -91,12 +95,14 @@ class ZEGraphicsDevice
 		virtual void			ApplyRequestedShaders() = 0;
 		virtual void			ApplyRequestedStencilZState() = 0;
 		virtual void			ApplyRequestedRasterizerState() = 0;
-		virtual void			ApplyRequestedVertexDeclaration() = 0;
+		virtual void			ApplyRequestedVertexBuffer() = 0;
+		virtual void			ApplyRequestedIndexBuffer() = 0;
 		virtual void			ApplyRequestedRenderTargets() = 0;
 
 		virtual void			ApplyAllRequestedStates() = 0;
 
 	public:
+		// Render States (Can Arbitrary Change)
 		void					SetBlendState(const ZEBlendState &NewBlendState);
 		ZEBlendState&			GetBlendStateEdit();
 		void					SetRasterizerState(const ZERasterizerState &NewRasterizerState);
@@ -106,14 +112,22 @@ class ZEGraphicsDevice
 		void					SetStencilZState(ZEStencilZState NewStencilZState);
 		ZEStencilZState&		GetStencilZStateEdit();
 		
-		void					SetVertexDecleration(ZEVertexDeclaration* VertexDeclerations);
-		ZEVertexDeclaration*	GetVertexDeclaration();
+		// Per Render Command Changes
+		void					SetVertexBuffer(ZEVertexBuffer* VertexBuffer);
+		ZEVertexBuffer*			GetVertexBuffer() const;
+		void					SetIndexBuffer(ZEIndexBuffer* IndexBuffer);
+		ZEIndexBuffer*			GetIndexBuffer() const;
+
+		// Shader Change
 		void					SetVertexShader(ZEShader* VertexShader);
-		ZEShader*				GetVertexShader();
+		ZEShader*				GetVertexShader() const;
 		void					SetPixelShader(ZEShader* PixelShader);
-		ZEShader*				GetPixelShader();
+		ZEShader*				GetPixelShader() const;
+		
+
+		// Output (Aka. RenderTarget Change)
 		void					SetRenderTarget(int index, ZERenderTarget* RenderTarget);
-		ZERenderTarget*			GetRenderTarget(int index);
+		ZERenderTarget*			GetRenderTarget(int index) const;
 
 		// Commits the Requested State then Draws
 		virtual void			Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount) = 0;

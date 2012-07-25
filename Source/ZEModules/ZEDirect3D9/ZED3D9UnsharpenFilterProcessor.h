@@ -59,8 +59,8 @@ class ZED3D9UnsharpenFilterProcessor : public ZED3D9ComponentBase
 		ZED3D9Texture2D*				Input;
 		ZED3D9RenderTarget*				Output;
 
-		ZED3D9VertexShader				VertexShader;
-		ZED3D9PixelShader				PixelShader;
+		ZED3D9VertexShader*				VertexShader;
+		ZED3D9PixelShader*				PixelShader;
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 
 	public:

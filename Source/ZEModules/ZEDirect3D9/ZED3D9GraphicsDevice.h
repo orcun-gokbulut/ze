@@ -52,7 +52,8 @@ class ZED3D9GraphicsDevice : public ZEGraphicsDevice, private ZED3D9ComponentBas
 		virtual void			ApplyRequestedShaders();
 		virtual void			ApplyRequestedStencilZState();
 		virtual void			ApplyRequestedRasterizerState();
-		virtual void			ApplyRequestedVertexDeclaration();	
+		virtual void			ApplyRequestedVertexBuffer();
+		virtual void			ApplyRequestedIndexBuffer();
 		virtual void			ApplyRequestedRenderTargets();
 
 		virtual void			ApplyAllRequestedStates();
