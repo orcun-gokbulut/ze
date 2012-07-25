@@ -56,14 +56,15 @@ bool CompareImages(ZEBitmap* Original, ZEUInt32* Data, ZESize Width, ZESize Heig
 
 bool TestSuccess(ZEString FileName)
 {
-	ZEPointer<ZEFile> File = ZEFile::Open(FileName);
+	ZEFile File;
+	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 
 	ZETextureFileBMP Loader;
 	ZETextureDataInfo Info;
-	if (!Loader.LoadInfo(&Info, File))
+	if (!Loader.LoadInfo(&Info, &File))
 		return false;
 
-	ZETextureData* Data = Loader.Load(File);
+	ZETextureData* Data = Loader.Load(&File);
 
 	if (Data == NULL)
 		return false;
@@ -85,10 +86,11 @@ bool TestSuccess(ZEString FileName)
 
 bool TestFail(ZEString FileName)
 {
-	ZEPointer<ZEFile> File = ZEFile::Open(FileName);
+	ZEFile File;
+	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 
 	ZETextureFileBMP Loader;
-	ZETextureData* Data = Loader.Load(File);
+	ZETextureData* Data = Loader.Load(&File);
 
 	return Data == NULL;
 }

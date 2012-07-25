@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileTIFFTest.cpp
+ Zinek Engine - ZEPixel.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,114 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETest/ZETest.h"
-#include "ZEDS/ZEPointer.h"
-#include "ZEDS/ZEString.h"
-#include "ZEFile/ZEFile.h"
-#include "ZEBitmap.h"
-#include "ZETextureData.h"
-#include "ZETextureFileTIFF.h"
+#pragma once
+#ifndef __ZE_PIXEL_H__
+#define __ZE_PIXEL_H__
 
-static bool CompareImages(ZEBitmap* Original, ZEUInt32* Data, ZESize Width, ZESize Height)
-{
-	if (Original->GetWidth() != Width || Original->GetHeight() != Height)
-		return false;
+#include "ZETypes.h"
+#include "ZEEndian.h"
+#include "ZEPacking.h"
 
-	for (ZESize y = 0; y < Height; y++)
-		for (ZESize x = 0; x < Width; x++)
-			if (((ZEUInt32*)Original->GetPixels())[y * Width + x] != Data[y * Width + x])
-				return false;
-
-	return true;
-}
-
-static bool TestSuccess(ZEString FileName)
-{
-	ZEFile File;
-	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
-
-	ZETextureFileTIFF Loader;
-	ZETextureDataInfo Info;
-	if (!Loader.LoadInfo(&Info, &File))
-		return false;
-
-	ZETextureData* Data = Loader.Load(&File);
-
-	if (Data == NULL)
-		return false;
-
-	ZEBitmap Original;
-	if (!Original.Load(FileName))
-		return false;
-	ZETextureLevel* Level = &Data->GetSurfaces()[0].GetLevels()[0];
-
-	ZEBitmap Bitmap;
-	Bitmap.Create(Level->GetWidth(), Level->GetHeight(), 4);
-	Bitmap.CopyFrom(Level->GetData(), Level->GetPitch(), Level->GetWidth(), Level->GetHeight());
-	Bitmap.Save(FileName + ".result.bmp", ZE_BFF_BMP);
-
-	return CompareImages(&Original, (ZEUInt32*)Level->GetData(), Data->GetWidth(), Data->GetHeight());
-}
-
-static bool TestFail(ZEString FileName)
-{
-	ZEFile File;
-	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
-
-	ZETextureFileTIFF Loader;
-	ZETextureData* Data = Loader.Load(&File);
-
-	return Data == NULL;
-}
-
-ZETestSuite(ZETextureFileTIFFTest)
-{
-	ZETest("Valid Samples")
+ZEPackStruct
+(
+	struct ZEPixelRGBA8
 	{
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/flower-rgb-planar-08.tif"));
+		ZEUInt8	R;
+		ZEUInt8	G;
+		ZEUInt8	B;
+		ZEUInt8	A;
 	}
-}
+);
+
+ZEPackStruct
+(
+	struct ZEPixelR16
+	{
+		ZEBigEndian<ZEUInt16> R;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEPixelRG16
+	{
+		ZEBigEndian<ZEUInt16> R;
+		ZEBigEndian<ZEUInt16> G;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEPixelRGBA16
+	{
+		ZEBigEndian<ZEUInt16> R;
+		ZEBigEndian<ZEUInt16> G;
+		ZEBigEndian<ZEUInt16> B;
+		ZEBigEndian<ZEUInt16> A;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEPixelL8
+	{
+		ZEUInt8	L;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEPixelLA8
+	{
+		ZEUInt8 L;
+		ZEUInt8 A;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEPixelL16
+	{
+		ZEBigEndian<ZEUInt16> L;
+	}
+);
+
+
+ZEPackStruct
+(
+	struct ZEPixelLA16
+	{
+		ZEBigEndian<ZEUInt16> L;
+		ZEBigEndian<ZEUInt16> A;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEPixelR32F
+	{
+		float R;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEPixelRG32F
+	{
+		float R;
+		float B;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEPixelRGBA32F
+	{
+		float R;
+		float G;
+		float B;
+		float A;
+	}
+);
+
+#endif

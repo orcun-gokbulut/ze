@@ -35,19 +35,10 @@
 
 
 #pragma once
-#ifndef __ZE_LZW_DECOMPRESSOR_H__
-#define __ZE_LZW_DECOMPRESSOR_H__
+#ifndef __ZE_DECOMPRESSOR_LZW_H__
+#define __ZE_DECOMPRESSOR_LZW_H__
 
-#include "ZETypes.h"
-
-enum ZEDecompressorState
-{
-	ZE_DS_NONE,
-	ZE_DS_OUTPUT_FULL,
-	ZE_DS_INPUT_PROCESSED,
-	ZE_DS_ERROR,
-	ZE_DS_DONE
-};
+#include "ZEDecompressor.h"
 
 struct ZEDictionaryEntryLZW
 {
@@ -55,16 +46,10 @@ struct ZEDictionaryEntryLZW
 	void*							Data;
 };
 
-class ZEDecompressorLZW
+class ZEDecompressorLZW : public ZEDecompressor
 {
 	private:
-		// Buffers;
-		void*						Input;
-		ZESize						InputSize;
 		ZESize						InputPosition;
-
-		void*						Output;
-		ZESize						OutputSize;
 		ZESize						OutputPosition;
 
 		// Dictionary
@@ -82,9 +67,6 @@ class ZEDecompressorLZW
 		ZEDictionaryEntryLZW*		OutputEntry;
 		ZESize						OutputEntryByteIndex;
 
-		// Status
-		ZEDecompressorState			State;
-
 		bool						GetNextWord(ZEUInt16& Word);
 		bool						WriteOutput(ZEDictionaryEntryLZW* Entry = NULL);
 
@@ -92,25 +74,11 @@ class ZEDecompressorLZW
 		void						ResetDictionary();
 
 	public:
-		void						SetInput(void* Buffer);
-		void*						GetInput();
+		virtual void				SetOutput(void* Output);
+		virtual void				SetInput(void* Input);
 
-		void						SetInputSize(ZESize Size);
-		ZESize						GetInputSize();
-
-		void						SetOutput(void* Buffer);
-		void*						GetOutput();
-
-		void						SetOutputSize(ZESize Size);
-		ZESize						GetOutputSize();
-
-		ZEDecompressorState			Decompress();
-
-		void						Reset();
-		
-									ZEDecompressorLZW();
-									~ZEDecompressorLZW();
-					
+		virtual void				Decompress();
+		virtual void				Reset();
 };
 
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileTIFFTest.cpp
+ Zinek Engine - ZEDecompressor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,77 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETest/ZETest.h"
-#include "ZEDS/ZEPointer.h"
-#include "ZEDS/ZEString.h"
-#include "ZEFile/ZEFile.h"
-#include "ZEBitmap.h"
-#include "ZETextureData.h"
-#include "ZETextureFileTIFF.h"
+#include "ZEDecompressor.h"
 
-static bool CompareImages(ZEBitmap* Original, ZEUInt32* Data, ZESize Width, ZESize Height)
+#include "ZEError.h"
+#include <memory.h>
+
+ZEDecompressorState ZEDecompressor::GetState()
 {
-	if (Original->GetWidth() != Width || Original->GetHeight() != Height)
-		return false;
-
-	for (ZESize y = 0; y < Height; y++)
-		for (ZESize x = 0; x < Width; x++)
-			if (((ZEUInt32*)Original->GetPixels())[y * Width + x] != Data[y * Width + x])
-				return false;
-
-	return true;
+	return State;
 }
 
-static bool TestSuccess(ZEString FileName)
+void ZEDecompressor::SetInput(void* Buffer)
 {
-	ZEFile File;
-	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
-
-	ZETextureFileTIFF Loader;
-	ZETextureDataInfo Info;
-	if (!Loader.LoadInfo(&Info, &File))
-		return false;
-
-	ZETextureData* Data = Loader.Load(&File);
-
-	if (Data == NULL)
-		return false;
-
-	ZEBitmap Original;
-	if (!Original.Load(FileName))
-		return false;
-	ZETextureLevel* Level = &Data->GetSurfaces()[0].GetLevels()[0];
-
-	ZEBitmap Bitmap;
-	Bitmap.Create(Level->GetWidth(), Level->GetHeight(), 4);
-	Bitmap.CopyFrom(Level->GetData(), Level->GetPitch(), Level->GetWidth(), Level->GetHeight());
-	Bitmap.Save(FileName + ".result.bmp", ZE_BFF_BMP);
-
-	return CompareImages(&Original, (ZEUInt32*)Level->GetData(), Data->GetWidth(), Data->GetHeight());
+	Input = Buffer;
 }
 
-static bool TestFail(ZEString FileName)
+void* ZEDecompressor::GetInput()
 {
-	ZEFile File;
-	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
-
-	ZETextureFileTIFF Loader;
-	ZETextureData* Data = Loader.Load(&File);
-
-	return Data == NULL;
+	return Input;
 }
 
-ZETestSuite(ZETextureFileTIFFTest)
+void ZEDecompressor::SetInputSize(ZESize Size)
 {
-	ZETest("Valid Samples")
-	{
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/flower-rgb-planar-08.tif"));
-	}
+	if (State == ZE_DS_INPUT_PROCESSED)
+		State = ZE_DS_NONE;
+
+	InputSize = Size;
+}
+
+ZESize ZEDecompressor::GetInputSize()
+{
+	return InputSize;
+}
+
+void ZEDecompressor::SetOutput(void* Buffer)
+{
+	if (State == ZE_DS_OUTPUT_FULL)
+		State = ZE_DS_NONE;
+
+	Output = Buffer;
+}
+
+void* ZEDecompressor::GetOutput()
+{
+	return Output;
+}
+
+void ZEDecompressor::SetOutputSize(ZESize Size)
+{
+	OutputSize = Size;
+}
+
+ZESize ZEDecompressor::GetOutputSize()
+{
+	return OutputSize;
+}
+
+void ZEDecompressor::Reset()
+{
+
+}
+
+ZEDecompressor::ZEDecompressor()
+{
+	State = ZE_DS_DONE;
+	Input = NULL;
+	InputSize = 0;
+	Output = NULL;
+	OutputSize = 0;
+}
+
+ZEDecompressor::~ZEDecompressor()
+{
+
 }

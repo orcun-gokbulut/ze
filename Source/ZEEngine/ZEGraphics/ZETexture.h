@@ -43,6 +43,9 @@ enum ZETextureType
 	ZE_TT_3D,
 	ZE_TT_CUBE
 };
+/*
+
+*/
 
 enum ZETexturePixelFormat
 {
@@ -69,6 +72,29 @@ enum ZETexturePixelFormat
 	ZE_TPF_DXT1,
 	ZE_TPF_DXT3,
 	ZE_TPF_DXT5,
+
+
+	// New Formats
+	ZE_TPF_RGBA8	= ZE_TPF_I8_4,
+
+	ZE_TPF_R16		= ZE_TPF_I16,
+	ZE_TPF_RG16		= ZE_TPF_I16_2,
+	ZE_TPF_RGBA16	= ZE_TPF_I16_4,
+
+	ZE_TPF_R16F		= ZE_TPF_F16,
+	ZE_TPF_RG16F	= ZE_TPF_F16_2,
+	ZE_TPF_RGBA16F	= ZE_TPF_F16_4,
+
+	ZE_TPF_R32F		= ZE_TPF_F32,
+	ZE_TPF_RG32F	= ZE_TPF_F32_2,
+	ZE_TPF_RGBA32F	= ZE_TPF_F32_4,
+
+	ZE_TPF_L8		= ZE_TPF_I8,
+	ZE_TPF_LA8		= ZE_TPF_I8_2,
+
+	ZE_TPF_L16		= ZE_TPF_I16,
+	ZE_TPF_LA16		= ZE_TPF_I16_2
+
 };
 
 class ZETexture

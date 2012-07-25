@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureFileTIFFTest.cpp
+ Zinek Engine - ZEDecompressor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,54 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETest/ZETest.h"
-#include "ZEDS/ZEPointer.h"
-#include "ZEDS/ZEString.h"
-#include "ZEFile/ZEFile.h"
-#include "ZEBitmap.h"
-#include "ZETextureData.h"
-#include "ZETextureFileTIFF.h"
 
-static bool CompareImages(ZEBitmap* Original, ZEUInt32* Data, ZESize Width, ZESize Height)
+#pragma once
+#ifndef __ZE_DECOMPRESSOR_H__
+#define __ZE_DECOMPRESSOR_H__
+
+#include "ZETypes.h"
+
+enum ZEDecompressorState
 {
-	if (Original->GetWidth() != Width || Original->GetHeight() != Height)
-		return false;
+	ZE_DS_NONE,
+	ZE_DS_OUTPUT_FULL,
+	ZE_DS_INPUT_PROCESSED,
+	ZE_DS_ERROR,
+	ZE_DS_DONE
+};
 
-	for (ZESize y = 0; y < Height; y++)
-		for (ZESize x = 0; x < Width; x++)
-			if (((ZEUInt32*)Original->GetPixels())[y * Width + x] != Data[y * Width + x])
-				return false;
-
-	return true;
-}
-
-static bool TestSuccess(ZEString FileName)
+class ZEDecompressor
 {
-	ZEFile File;
-	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
+	protected:
+		void*						Input;
+		ZESize						InputSize;
 
-	ZETextureFileTIFF Loader;
-	ZETextureDataInfo Info;
-	if (!Loader.LoadInfo(&Info, &File))
-		return false;
+		void*						Output;
+		ZESize						OutputSize;
 
-	ZETextureData* Data = Loader.Load(&File);
+		ZEDecompressorState			State;
 
-	if (Data == NULL)
-		return false;
+	public:
+		ZEDecompressorState			GetState();
 
-	ZEBitmap Original;
-	if (!Original.Load(FileName))
-		return false;
-	ZETextureLevel* Level = &Data->GetSurfaces()[0].GetLevels()[0];
+		virtual void				SetInput(void* Buffer);
+		void*						GetInput();
 
-	ZEBitmap Bitmap;
-	Bitmap.Create(Level->GetWidth(), Level->GetHeight(), 4);
-	Bitmap.CopyFrom(Level->GetData(), Level->GetPitch(), Level->GetWidth(), Level->GetHeight());
-	Bitmap.Save(FileName + ".result.bmp", ZE_BFF_BMP);
+		void						SetInputSize(ZESize Size);
+		ZESize						GetInputSize();
 
-	return CompareImages(&Original, (ZEUInt32*)Level->GetData(), Data->GetWidth(), Data->GetHeight());
-}
+		virtual void				SetOutput(void* Buffer);
+		void*						GetOutput();
 
-static bool TestFail(ZEString FileName)
-{
-	ZEFile File;
-	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
+		void						SetOutputSize(ZESize Size);
+		ZESize						GetOutputSize();
 
-	ZETextureFileTIFF Loader;
-	ZETextureData* Data = Loader.Load(&File);
+		virtual void				Decompress() = 0;
 
-	return Data == NULL;
-}
+		virtual void				Reset() = 0;
+		
+									ZEDecompressor();
+		virtual						~ZEDecompressor();
+};
 
-ZETestSuite(ZETextureFileTIFFTest)
-{
-	ZETest("Valid Samples")
-	{
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/flower-rgb-planar-08.tif"));
-	}
-}
+#endif
