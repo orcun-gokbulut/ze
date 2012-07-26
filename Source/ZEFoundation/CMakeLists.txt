@@ -50,6 +50,7 @@ add_subdirectory(ZETest)
 add_subdirectory(ZEThread)
 add_subdirectory(ZETask)
 add_subdirectory(ZESocket)
+add_subdirectory(ZEML)
 
 ze_add_source(ZEDLL.h 				Sources Headers)
 ze_add_source(ZEDLL.cpp 			Sources)
