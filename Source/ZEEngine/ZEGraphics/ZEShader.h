@@ -87,8 +87,15 @@ class ZEShader
 		ZEArray<ZEShaderCompilerParameter>		ShaderCompilerParameters;				
 		bool									Compiled;
 
-		bool									FindConstantLocation(ZEUInt32& OutLocation, const ZEString Name) const;
-		bool									FindParameterLocation(ZEUInt32& OutLocation, const ZEString Name) const;
+		bool									FindConstantLocation(ZEUInt32& OutLocation, const ZEString Name) const;		// Search Algorithm for Shader Constants
+		bool									FindParameterLocation(ZEUInt32& OutLocation, const ZEString Name) const;	// Search Algorithm for Macros
+
+		// Compilation
+		virtual	bool							CompileShader(const ZEString CompilerParameters[][2],
+																int CompilerParameterCount,
+																ZEString ShaderProfile, 
+																ZEString Source,
+																ZEString MainFunction) = 0;
 
 	public:
 		// Compilation Query
@@ -155,13 +162,6 @@ class ZEShader
 		virtual ZEMatrix4x4						GetConstantMatrix4x4(const char* Name) const = 0;
 		virtual bool							GetConstantBool(const char* Name) const = 0;
 		virtual float							GetConstantFloat(const char* Name) const = 0;
-		
-		// Compilation
-		virtual	bool							CompileShader(const ZEString CompilerParameters[][2],
-																int CompilerParameterCount,
-																ZEString ShaderProfile, 
-																ZEString Source,
-																ZEString MainFunction) = 0;
 
 		virtual void							Release() = 0;
 

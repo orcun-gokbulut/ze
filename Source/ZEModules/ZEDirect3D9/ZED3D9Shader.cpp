@@ -85,7 +85,7 @@ ZEShaderConstantDataType ConvertD3DXType(int Column, int Row, D3DXPARAMETER_TYPE
 			return ZE_SCDT_FLOAT;
 		else if(Row == 3 && Column == 3)
 			return ZE_SCDT_MATRIX3x3;
-		else if(Row == 4 && Column == 3)
+		else if(Row == 4 && Column == 4)
 			return ZE_SCDT_MATRIX4x4;
 		else if(Row == 1 && Column == 2)
 			return ZE_SCDT_VECTOR2;
@@ -363,9 +363,7 @@ ZEUInt32 ZED3D9Shader::GetComponents()
 
 void ZED3D9Shader::Release()
 {
-	/*
 	ZED3D9ShaderManager::GetInstance()->ReleaseShader(this);
-	*/
 }
 
 ZED3D9Shader* ZED3D9Shader::CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile)
@@ -710,6 +708,9 @@ bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameter[][2],
 										ZEString Source,
 										ZEString MainFunction)
 {
+	if(Compiled)
+		zeWarning("Shader is Already Compiled. You sould not Compile A Shader More Than Once.\r\n");
+
 	// Temp Buffer For Constant Table and Compiler Output
 	LPD3DXBUFFER ShaderBuffer = NULL;
 	LPD3DXBUFFER CompilerOutput = NULL;
@@ -717,6 +718,7 @@ bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameter[][2],
 	LPD3DXMACRO MacroDefinitions = new D3DXMACRO[CompilerParameterCount + 1];
 
 	int i;
+	ShaderCompilerParameters.Clear(true);
 	ShaderCompilerParameters.SetCount(CompilerParameterCount);
 	for(i = 0; i < CompilerParameterCount; i++)
 	{
@@ -746,6 +748,7 @@ bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameter[][2],
 		CompilerOutput->Release();
 
 	// Populate Constants Array and Register Array
+	ShaderConstants.Clear(true);
 	PopulateConstantTable(ConstantTable);
 
 	// Compile Done! Set FunctionName
@@ -1118,6 +1121,9 @@ bool ZED3D9VertexShader::CompileShader(const ZEString CompilerParameter[][2],
 										ZEString Source,
 										ZEString MainFunction)
 {
+	if(Compiled)
+		zeWarning("Shader is Already Compiled. You sould not compile A Shader More Than Once.\r\n");
+
 	// Temp Buffer For Constant Table and Compiler Output
 	LPD3DXBUFFER ShaderBuffer = NULL;
 	LPD3DXBUFFER CompilerOutput = NULL;
