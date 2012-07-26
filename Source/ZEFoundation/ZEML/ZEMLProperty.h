@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETree.h
+ Zinek Engine - ZEMLProperty.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,57 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TREE_H__
-#define __ZE_TREE_H__
+#ifndef	__ZEML_PROPERTY_H__
+#define __ZEML_PROPERTY_H__
 
-#include "ZEList.h"
+#include "ZEMLItem.h"
+#include "ZEDS\ZEString.h"
+#include "ZEDS\ZEVariant.h"
 
-template<typename ZEType>
-class ZETree : public ZEListItem
+class ZEMLProperty : public ZEMLItem
 {
+	friend class ZEMLNode;
+	friend class ZEMLSerialNode;
+	friend class ZEMLSerialRootNode;
+
 	private:
-		ZEType* Parent;
-		ZEType* NextItem;
-		ZEType* PrevItem;
 
-		ZEList<ZEType> SubTrees;
+		ZEVariant			Value;
 
-	public:	
-		ZEType  GetParent()
-		{
-			return Parent;
-		}
+	protected:
 
-		const ZEList<ZEType>& GetSubTrees()
-		{
-			return SubTrees;
-		}
+		virtual void		WriteToFile(ZEFile* File);
+		virtual void		ReadFromFile(ZEFile* File, bool DeferredDataReading);
 
-		bool AddSubTree(ZEType* SubTree)
-		{
-			if (SubTree->Parent != NULL || SubTree->Parent == this)
-				return false;
+	public:
 
-			SubTrees.Add(SubTree);
-			SubTree->Parent = this;
+		virtual ZEUInt64	GetTotalSize();
 
-			return true;
-		}
+		void				SetValue(const ZEVariant& Value);
+		const ZEVariant&	GetValue() const;
 
-		bool RemoveSubTree(ZEType* SubTree)
-		{
-			if (SubTree->Parent != this)
-				return;
-
-			SubTrees[Index].Parent = NULL;
-			SubTrees.Remove(Index);
-
-			return true;
-		}
-
-		ZETree()
-		{
-			Parent = NULL;
-		}
+							ZEMLProperty();
+							ZEMLProperty(const ZEString& Name);
+							ZEMLProperty(const ZEString& Name ,const ZEVariant& Value);
 };
+
 #endif

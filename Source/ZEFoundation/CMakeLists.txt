@@ -75,7 +75,7 @@ ze_add_source(ZETimeCounter.cpp		Sources)
 ze_add_library(ZEFoundation 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-    LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket ZEThread ZESerialPort ZETask
+    LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket ZEThread ZESerialPort ZETask ZEML
 	INSTALL
 	INSTALL_DESTINATION ZEFoundation
 	INSTALL_COMPONENT ZESDK)

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETree.h
+ Zinek Engine - ZEMLDataProperty.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,57 +34,43 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TREE_H__
-#define __ZE_TREE_H__
+#ifndef	__ZEML_DATA_PROPERTY_H__
+#define __ZEML_DATA_PROPERTY_H__
 
-#include "ZEList.h"
+#include "ZEMLItem.h"
+#include "ZEDS\ZEString.h"
+#include "ZEDS\ZEVariant.h"
 
-template<typename ZEType>
-class ZETree : public ZEListItem
+class ZEMLDataProperty : public ZEMLItem
 {
+	friend class ZEMLNode;
+	friend class ZEMLSerialNode;
+	friend class ZEMLSerialRootNode;
+
 	private:
-		ZEType* Parent;
-		ZEType* NextItem;
-		ZEType* PrevItem;
 
-		ZEList<ZEType> SubTrees;
+		void*				Data;
+		bool				IsCached;
+		ZEFile*				File;
+		ZEUInt64			FileDataPosition;
 
-	public:	
-		ZEType  GetParent()
-		{
-			return Parent;
-		}
+	protected:
 
-		const ZEList<ZEType>& GetSubTrees()
-		{
-			return SubTrees;
-		}
+		virtual void		WriteToFile(ZEFile* File);
+		virtual void		ReadFromFile(ZEFile* File, bool DeferredDataReading);
 
-		bool AddSubTree(ZEType* SubTree)
-		{
-			if (SubTree->Parent != NULL || SubTree->Parent == this)
-				return false;
+	public:
 
-			SubTrees.Add(SubTree);
-			SubTree->Parent = this;
+		virtual ZEUInt64	GetTotalSize();
 
-			return true;
-		}
+		void				SetData(void* Data, ZEUInt64 DataSize, bool Cache = true);
+		const void*			GetData();
 
-		bool RemoveSubTree(ZEType* SubTree)
-		{
-			if (SubTree->Parent != this)
-				return;
+							ZEMLDataProperty();
+							ZEMLDataProperty(const ZEString& Name);
+							ZEMLDataProperty(const ZEString& Name ,void* Data, ZEUInt64 DataSize, bool Cache = true);
 
-			SubTrees[Index].Parent = NULL;
-			SubTrees.Remove(Index);
-
-			return true;
-		}
-
-		ZETree()
-		{
-			Parent = NULL;
-		}
+							~ZEMLDataProperty();
 };
+
 #endif

@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZETree.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,61 +30,28 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_TREE_H__
-#define __ZE_TREE_H__
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZEList.h"
+ze_add_source(ZEMLItem.h 			Sources Headers)
+ze_add_source(ZEMLItem.cpp 			Sources)
+ze_add_source(ZEMLNode.h 			Sources Headers)
+ze_add_source(ZEMLNode.cpp 			Sources)
+ze_add_source(ZEMLProperty.h 		Sources Headers)
+ze_add_source(ZEMLProperty.cpp 		Sources)
+ze_add_source(ZEMLDataProperty.h 	Sources Headers)
+ze_add_source(ZEMLDataProperty.cpp 	Sources)
+ze_add_source(ZEMLSerialWriter.h 	Sources Headers)
+ze_add_source(ZEMLSerialWriter.cpp 	Sources)
+ze_add_source(ZEMLSerialReader.h 	Sources Headers)
+ze_add_source(ZEMLSerialReader.cpp 	Sources)
 
-template<typename ZEType>
-class ZETree : public ZEListItem
-{
-	private:
-		ZEType* Parent;
-		ZEType* NextItem;
-		ZEType* PrevItem;
-
-		ZEList<ZEType> SubTrees;
-
-	public:	
-		ZEType  GetParent()
-		{
-			return Parent;
-		}
-
-		const ZEList<ZEType>& GetSubTrees()
-		{
-			return SubTrees;
-		}
-
-		bool AddSubTree(ZEType* SubTree)
-		{
-			if (SubTree->Parent != NULL || SubTree->Parent == this)
-				return false;
-
-			SubTrees.Add(SubTree);
-			SubTree->Parent = this;
-
-			return true;
-		}
-
-		bool RemoveSubTree(ZEType* SubTree)
-		{
-			if (SubTree->Parent != this)
-				return;
-
-			SubTrees[Index].Parent = NULL;
-			SubTrees.Remove(Index);
-
-			return true;
-		}
-
-		ZETree()
-		{
-			Parent = NULL;
-		}
-};
-#endif
+ze_add_library(ZEML 
+	SOURCES ${Sources} 
+	HEADERS ${Headers}
+	LIBS ZEFoundation
+	INSTALL
+	INSTALL_DESTINATION ZEFoundation/ZEML
+	INSTALL_COMPONENT ZESDK)
