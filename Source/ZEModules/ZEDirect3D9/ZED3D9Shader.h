@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZEGraphics/ZEShader.h"
+#include "ZEDS/ZEString.h"
 #include <d3d9.h>
 #include <d3dx9.h>
 
@@ -81,7 +82,12 @@ class ZED3D9PixelShader : public ZED3D9Shader, private ZED3D9ComponentBase
 	friend class ZED3D9ShaderManager;
 	private:
 		LPDIRECT3DPIXELSHADER9			PixelShader;
-
+	protected:
+		virtual	bool					CompileShader(const ZEString CompilerParameters[][2],
+														int CompilerParameterCount,
+														ZEString ShaderProfile, 
+														ZEString Source,
+														ZEString MainFunction);
 	public:
 		virtual ZED3D9ShaderType		GetShaderType();
 		LPDIRECT3DPIXELSHADER9			GetPixelShader() const;
@@ -128,13 +134,7 @@ class ZED3D9PixelShader : public ZED3D9Shader, private ZED3D9ComponentBase
 		virtual bool					GetConstantBool(const char* Name) const;
 		virtual float					GetConstantFloat(const char* Name) const;
 
-		virtual	bool					CompileShader(const ZEString CompilerParameters[][2],
-														int CompilerParameterCount,
-														ZEString ShaderProfile, 
-														ZEString Source,
-														ZEString MainFunction);
-
-		static ZED3D9PixelShader*		CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
+		static ZED3D9PixelShader*		CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile); // Old One Does Not Have Constant Table
 		static ZED3D9PixelShader*		CreateShaderFromSource(const char* Source, const char* FunctionName, const ZEString CompilerParameters[][2], int CompilerParameterCount, const char* Profile);
 				
 										ZED3D9PixelShader();
@@ -147,6 +147,13 @@ class ZED3D9VertexShader : public ZED3D9Shader, private ZED3D9ComponentBase
 	friend class ZED3D9ShaderManager;
 	private:
 		LPDIRECT3DVERTEXSHADER9			VertexShader;
+
+	protected:
+		virtual	bool					CompileShader(const ZEString CompilerParameters[][2],
+														int CompilerParameterCount,
+														ZEString ShaderProfile, 
+														ZEString Source,
+														ZEString MainFunction);
 
 	public:
 		virtual ZED3D9ShaderType		GetShaderType();
@@ -194,13 +201,7 @@ class ZED3D9VertexShader : public ZED3D9Shader, private ZED3D9ComponentBase
 		virtual bool					GetConstantBool(const char* Name) const;
 		virtual float					GetConstantFloat(const char* Name) const;
 
-		virtual	bool					CompileShader(const ZEString CompilerParameters[][2],
-														int CompilerParameterCount,
-														ZEString ShaderProfile, 
-														ZEString Source,
-														ZEString MainFunction);
-
-		static ZED3D9VertexShader*		CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
+		static ZED3D9VertexShader*		CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);	// Old One Does Not Have Constant Table
 		static ZED3D9VertexShader*		CreateShaderFromSource(const char* Source, const char* FunctionName, const ZEString CompilerParameters[][2], int CompilerParameterCount, const char* Profile);
 
 										ZED3D9VertexShader();

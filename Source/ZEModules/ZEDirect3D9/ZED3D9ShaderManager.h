@@ -44,6 +44,8 @@
 
 class ZED3D9ShaderManager
 {
+	friend bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameters[][2], int CompilerParameterCount, ZEString ShaderProfile, ZEString Source, ZEString MainFunction);
+	friend bool ZED3D9VertexShader::CompileShader(const ZEString CompilerParameters[][2], int CompilerParameterCount, ZEString ShaderProfile, ZEString Source, ZEString MainFunction);
 	friend void ZED3D9Shader::Release();
 	friend ZED3D9Module;
 	private:
