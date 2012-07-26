@@ -115,37 +115,37 @@ class ZEShader
 		virtual ZEUInt32						GetComponents() = 0;
 
 		// Set Constant
-		virtual void							SetConstant(const ZEString& Name, const ZEVector2& Value) = 0;
-		virtual void							SetConstant(const ZEString& Name, const ZEVector3& Value) = 0;
-		virtual void							SetConstant(const ZEString& Name, const ZEVector4& Value) = 0;		
-		virtual void							SetConstant(const ZEString& Name, const ZEMatrix3x3& Value) = 0;
-		virtual void							SetConstant(const ZEString& Name, const ZEMatrix4x4& Value) = 0;
-		virtual void							SetConstant(const ZEString& Name, bool Value) = 0;
-		virtual void							SetConstant(const ZEString& Name, float Value) = 0;
+		virtual void							SetConstant(const ZEString& Name, const ZEVector2& Value) const = 0;
+		virtual void							SetConstant(const ZEString& Name, const ZEVector3& Value) const = 0;
+		virtual void							SetConstant(const ZEString& Name, const ZEVector4& Value) const = 0;		
+		virtual void							SetConstant(const ZEString& Name, const ZEMatrix3x3& Value) const = 0;
+		virtual void							SetConstant(const ZEString& Name, const ZEMatrix4x4& Value) const = 0;
+		virtual void							SetConstant(const ZEString& Name, bool Value) const = 0;
+		virtual void							SetConstant(const ZEString& Name, float Value) const = 0;
 
-		virtual void							SetConstantArray(const ZEString& Name, const ZEVector2* ValueArray, ZESize Count) = 0;
-		virtual void							SetConstantArray(const ZEString& Name, const ZEVector3* ValueArray, ZESize Count) = 0;
-		virtual void							SetConstantArray(const ZEString& Name, const ZEVector4* ValueArray, ZESize Count) = 0;		
-		virtual void							SetConstantArray(const ZEString& Name, const ZEMatrix3x3* ValueArray, ZESize Count) = 0;
-		virtual void							SetConstantArray(const ZEString& Name, const ZEMatrix4x4* ValueArray, ZESize Count) = 0;
-		virtual void							SetConstantArray(const ZEString& Name, const bool* ValueArray, ZESize Count) = 0;
-		virtual void							SetConstantArray(const ZEString& Name, const float* ValueArray, ZESize Count) = 0;
+		virtual void							SetConstantArray(const ZEString& Name, const ZEVector2* ValueArray, ZESize Count) const = 0;
+		virtual void							SetConstantArray(const ZEString& Name, const ZEVector3* ValueArray, ZESize Count) const = 0;
+		virtual void							SetConstantArray(const ZEString& Name, const ZEVector4* ValueArray, ZESize Count) const = 0;		
+		virtual void							SetConstantArray(const ZEString& Name, const ZEMatrix3x3* ValueArray, ZESize Count) const = 0;
+		virtual void							SetConstantArray(const ZEString& Name, const ZEMatrix4x4* ValueArray, ZESize Count) const = 0;
+		virtual void							SetConstantArray(const ZEString& Name, const bool* ValueArray, ZESize Count) const = 0;
+		virtual void							SetConstantArray(const ZEString& Name, const float* ValueArray, ZESize Count) const = 0;
 
-		virtual void							SetConstant(int Register, const ZEVector2& Value) = 0;
-		virtual void							SetConstant(int Register, const ZEVector3& Value) = 0;
-		virtual void							SetConstant(int Register, const ZEVector4& Value) = 0;		
-		virtual void							SetConstant(int Register, const ZEMatrix3x3& Value) = 0;
-		virtual void							SetConstant(int Register, const ZEMatrix4x4& Value) = 0;
-		virtual void							SetConstant(int Register, bool Value) = 0;
-		virtual void							SetConstant(int Register, float Value) = 0;
+		virtual void							SetConstant(int Register, const ZEVector2& Value) const = 0;
+		virtual void							SetConstant(int Register, const ZEVector3& Value) const = 0;
+		virtual void							SetConstant(int Register, const ZEVector4& Value) const = 0;		
+		virtual void							SetConstant(int Register, const ZEMatrix3x3& Value) const = 0;
+		virtual void							SetConstant(int Register, const ZEMatrix4x4& Value) const = 0;
+		virtual void							SetConstant(int Register, bool Value) const = 0;
+		virtual void							SetConstant(int Register, float Value) const = 0;
 
-		virtual void							SetConstantArray(int Register, const ZEVector2* ValueArray, ZESize Count) = 0;
-		virtual void							SetConstantArray(int Register, const ZEVector3* ValueArray, ZESize Count) = 0;
-		virtual void							SetConstantArray(int Register, const ZEVector4* ValueArray, ZESize Count) = 0;		
-		virtual void							SetConstantArray(int Register, const ZEMatrix3x3* ValueArray, ZESize Count) = 0;
-		virtual void							SetConstantArray(int Register, const ZEMatrix4x4* ValueArray, ZESize Count) = 0;
-		virtual void							SetConstantArray(int Register, const bool* ValueArray, ZESize Count) = 0;
-		virtual void							SetConstantArray(int Register, const float* ValueArray, ZESize Count) = 0;
+		virtual void							SetConstantArray(int Register, const ZEVector2* ValueArray, ZESize Count) const = 0;
+		virtual void							SetConstantArray(int Register, const ZEVector3* ValueArray, ZESize Count) const = 0;
+		virtual void							SetConstantArray(int Register, const ZEVector4* ValueArray, ZESize Count) const = 0;		
+		virtual void							SetConstantArray(int Register, const ZEMatrix3x3* ValueArray, ZESize Count) const = 0;
+		virtual void							SetConstantArray(int Register, const ZEMatrix4x4* ValueArray, ZESize Count) const = 0;
+		virtual void							SetConstantArray(int Register, const bool* ValueArray, ZESize Count) const = 0;
+		virtual void							SetConstantArray(int Register, const float* ValueArray, ZESize Count) const = 0;
 
 		// Get Constant Value
 		virtual ZEVector2						GetConstantVector2(const char* Name) const = 0;
