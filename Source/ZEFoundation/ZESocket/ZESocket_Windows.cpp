@@ -306,7 +306,7 @@ ZESocketTCP* ZESocketTCPListener::Accept()
 		SOCKET Result = accept(Socket, NULL, NULL);
 		if(Result == INVALID_SOCKET)
 		{
-			zeError("Accepted socket is not valid. WinSock Error code : %d", WSAGetLastError());
+			//zeError("Accepted socket is not valid. WinSock Error code : %d", WSAGetLastError());
 			return NULL;
 		}
 

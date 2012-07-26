@@ -1,0 +1,358 @@
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEMLProperty.cpp
+ ------------------------------------------------------------------------------
+ Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
+
+ This file is part of the Zinek Engine  Software. Zinek Engine Software and the
+ accompanying  materials are  made available  under the  terms of Zinek  Engine
+ Commercial License or the GNU General Public License Version 3.
+
+                      ZINEK ENGINE COMMERCIAL LICENSE
+ Licensees  holding  valid  Zinek Engine Commercial  License(s) may  use  Zinek
+ Engine  Software in  accordance  with   the  commercial  license  agreement(s)
+ (which can only be  issued  by  copyright  owner "Yiğit  Orçun  GÖKBULUT") and
+ provided with the Software  or, alternatively,  in  accordance with the  terms
+ contained  in  a  written  agreement  between  you  and  copyright  owner. For
+ licensing  terms  and conditions  please  contact  with  copyright owner.
+
+                    GNU GENERAL PUBLIC LICENSE VERSION 3
+ This program is free software: you can  redistribute it and/or modify it under
+ the terms of the GNU General Public  License as published by the Free Software
+ Foundation, either  version 3 of  the License, or  (at your option)  any later
+ version. This program is  distributed in the hope that  it will be useful, but
+ WITHOUT ANY WARRANTY; without even the  implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE. See  the GNU General Public License for more
+ details. You  should have received  a copy of the  GNU General  Public License
+ along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+ Copyright Owner Information:
+  Name: Yiğit Orçun GÖKBULUT
+  Contact: orcun.gokbulut@gmail.com
+  Github: https://www.github.com/orcun-gokbulut/ZE
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
+
+#include "ZEMLProperty.h"
+#include "ZEError.h"
+#include "ZEFile\ZEFile.h"
+#include "ZEEndian.h"
+
+ZEMLProperty::ZEMLProperty()
+{
+	SetType(ZEML_IT_UNDEFINED);
+}
+
+ZEMLProperty::ZEMLProperty(const ZEString& Name)
+{
+	SetName(Name);
+}
+
+ZEMLProperty::ZEMLProperty(const ZEString& Name ,const ZEVariant& Value)
+{
+	SetName(Name);
+	SetValue(Value);
+}
+
+ZEUInt64 ZEMLProperty::GetTotalSize()
+{
+	return sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + GetName().GetSize() + sizeof(ZEUInt64) + (ZEUInt64)Value.SizeOf();
+}
+
+void ZEMLProperty::SetValue(const ZEVariant& Value)
+{
+	this->Value = Value;
+	DataSize = Value.SizeOf();
+
+	switch (this->Value.GetType())
+	{
+		case ZE_VRT_FLOAT:
+			SetType(ZEML_IT_FLOAT);
+			break;
+		case ZE_VRT_DOUBLE:
+			SetType(ZEML_IT_DOUBLE);
+			break;
+		case ZE_VRT_INTEGER_8:
+			SetType(ZEML_IT_INT8);
+			break;
+		case ZE_VRT_INTEGER_16:
+			SetType(ZEML_IT_INT16);
+			break;
+		case ZE_VRT_INTEGER_32:
+			SetType(ZEML_IT_INT32);
+			break;
+		case ZE_VRT_INTEGER_64:
+			SetType(ZEML_IT_INT64);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+			SetType(ZEML_IT_UINT8);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+			SetType(ZEML_IT_UINT16);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			SetType(ZEML_IT_UINT32);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+			SetType(ZEML_IT_UINT64);
+			break;
+		case ZE_VRT_BOOLEAN:
+			SetType(ZEML_IT_BOOLEAN);
+			break;
+		case ZE_VRT_STRING:
+			SetType(ZEML_IT_STRING);
+			break;
+		case ZE_VRT_QUATERNION:
+			SetType(ZEML_IT_QUATERNION);
+			break;
+		case ZE_VRT_VECTOR2:
+			SetType(ZEML_IT_VECTOR2);
+			break;
+		case ZE_VRT_VECTOR3:
+			SetType(ZEML_IT_VECTOR3);
+			break;
+		case ZE_VRT_VECTOR4:
+			SetType(ZEML_IT_VECTOR4);
+			break;
+		case ZE_VRT_MATRIX3X3:
+			SetType(ZEML_IT_MATRIX3X3);
+			break;
+		case ZE_VRT_MATRIX4X4:
+			SetType(ZEML_IT_MATRIX4X4);
+			break;
+		default:
+			zeError("Unsupported ZEMLProperty type.");
+			break;
+	}
+}
+
+const ZEVariant& ZEMLProperty::GetValue() const
+{
+	return Value;
+}
+
+void ZEMLProperty::WriteToFile(ZEFile* File)
+{
+	ZEInt64 TempInt64;
+	ZEInt8	TempInt32;
+	ZEInt8	TempInt16;
+	ZEInt8	TempInt8;
+	ZEUInt64 TempUInt64;
+	ZEUInt8 TempUInt32;
+	ZEUInt8 TempUInt16;
+	ZEUInt8 TempUInt8;
+
+	char Identifier = 'Z';
+	if(File->Write(&Identifier, sizeof(char), 1) != 1)
+		zeError("Can not write ZEMLProperty identifier to file.");
+
+	if(File->Write(&Type, sizeof(ZEUInt8), 1) != 1)
+		zeError("Can not write ZEMLProperty type to file.");
+
+	ZEUInt8 NameLength = Name.GetSize();
+	if(File->Write(&NameLength, sizeof(ZEUInt8), 1) != 1)
+		zeError("Can not write ZEMLProperty name lenght to file.");
+
+	if(File->Write(Name.GetValue(), sizeof(char) * NameLength, 1) != 1)
+		zeError("Can not write ZEMLProperty name to file.");
+
+	TempUInt64 = ZEEndian::Big(DataSize);
+	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
+		zeError("Can not write ZEMLProperty data size to file.");
+
+	ZEUInt64 WritenDataSize = 0;
+
+	switch (this->Value.GetType())
+	{
+		case ZE_VRT_FLOAT:
+			WritenDataSize = File->Write(&Value.ImplicitAcesss().Float, Value.SizeOf(), 1);
+			break;
+		case ZE_VRT_DOUBLE:
+			WritenDataSize = File->Write(&Value.ImplicitAcesss().Double, Value.SizeOf(), 1);
+			break;
+		case ZE_VRT_INTEGER_8:
+			TempInt8 = ZEEndian::Big(Value.GetInt8());
+			WritenDataSize = File->Write(&TempInt8, sizeof(ZEInt8), 1);
+			break;
+		case ZE_VRT_INTEGER_16:
+			TempInt16 = ZEEndian::Big(Value.GetInt16());
+			WritenDataSize = File->Write(&TempInt16, sizeof(ZEInt16), 1);
+			break;
+		case ZE_VRT_INTEGER_32:
+			TempInt32 = ZEEndian::Big(Value.GetInt16());
+			WritenDataSize = File->Write(&TempInt32, sizeof(ZEInt16), 1);
+			break;
+		case ZE_VRT_INTEGER_64:
+			TempInt64 = ZEEndian::Big(Value.GetInt64());
+			WritenDataSize = File->Write(&TempInt64, sizeof(ZEInt64), 1);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+			TempUInt8 = ZEEndian::Big(Value.GetUInt8());
+			WritenDataSize = File->Write(&TempUInt8, sizeof(ZEUInt8), 1);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+			TempUInt16 = ZEEndian::Big(Value.GetUInt16());
+			WritenDataSize = File->Write(&TempUInt16, sizeof(ZEUInt16), 1);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			TempUInt32 = ZEEndian::Big(Value.GetUInt32());
+			WritenDataSize = File->Write(&TempUInt32, sizeof(ZEUInt32), 1);
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+			TempUInt64 = ZEEndian::Big(Value.GetUInt64());
+			WritenDataSize = File->Write(&TempUInt64, sizeof(ZEUInt64), 1);
+			break;
+		case ZE_VRT_BOOLEAN:
+			WritenDataSize = File->Write(&Value.ImplicitAcesss().Boolean, Value.SizeOf(), 1);
+			break;
+		case ZE_VRT_STRING:
+			WritenDataSize = File->Write(Value.ImplicitAcesss().String, Value.SizeOf(), 1);
+			break;
+		case ZE_VRT_QUATERNION:
+			WritenDataSize = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEQuaternion), 1);
+			break;
+		case ZE_VRT_VECTOR2:
+			WritenDataSize = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEVector2), 1);
+			break;
+		case ZE_VRT_VECTOR3:
+			WritenDataSize = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEVector3), 1);
+			break;
+		case ZE_VRT_VECTOR4:
+			WritenDataSize = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEVector4), 1);
+			break;
+		case ZE_VRT_MATRIX3X3:
+			WritenDataSize = File->Write(Value.ImplicitAcesss().Matrix3x3, sizeof(ZEMatrix3x3), 1);
+			break;
+		case ZE_VRT_MATRIX4X4:
+			WritenDataSize = File->Write(Value.ImplicitAcesss().Matrix4x4, sizeof(ZEMatrix4x4), 1);
+			break;
+		default:
+			zeError("Unsupported ZEMLProperty type.");
+			break;
+	}
+
+	if(WritenDataSize != 1)
+		zeError("Can not write ZEMLProperty value to file.");
+}
+
+void ZEMLProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
+{
+	char		Identifier;	
+	ZEUInt8		NameSize;
+	char		TempNameBuffer[ZEML_MAX_NAME_SIZE];	
+
+	if(File->Read(&Identifier, sizeof(char), 1) != 1)
+		zeError("Can not read ZEMLProperty identifier from file. Corrupted ZEML file.");
+
+	if(Identifier != ZEML_ITEM_FILE_IDENTIFIER)
+		zeError("ZEMLProperty identifier mismatch. Corrupted ZEML file.");
+
+	if(File->Read(&Type, sizeof(ZEUInt8), 1) != 1)
+		zeError("Can not read ZEMLProperty type from file. Corrupted ZEML file.");
+
+	if(File->Read(&NameSize, sizeof(ZEUInt8), 1) != 1)
+		zeError("Can not read ZEMLProperty name length from file. Corrupted ZEML file.");
+
+	if(File->Read(TempNameBuffer, NameSize, 1) != 1)
+		zeError("Can not read ZEMLProperty name from file. Corrupted ZEML file.");
+
+	if(File->Read(&DataSize, sizeof(ZEUInt64), 1) != 1)
+		zeError("Can not read ZEMLProperty value size from file. Corrupted ZEML file.");
+
+	SetName(TempNameBuffer);
+
+	ZEUInt64 ReadDataSize = 0;
+
+	switch(Type)
+	{
+		case ZEML_IT_FLOAT:
+			Value.SetType(ZE_VRT_FLOAT);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Float, DataSize, 1);
+			break;
+		case ZEML_IT_DOUBLE:
+			Value.SetType(ZE_VRT_DOUBLE);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Double, DataSize, 1);
+			break;
+		case ZEML_IT_INT8:
+			Value.SetType(ZE_VRT_INTEGER_8);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
+			break;
+		case ZEML_IT_INT16:
+			Value.SetType(ZE_VRT_INTEGER_16);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
+			Value.SetInt16(ZEEndian::Big(Value.GetInt16()));
+			break;
+		case ZEML_IT_INT32:
+			Value.SetType(ZE_VRT_INTEGER_32);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
+			Value.SetInt32(ZEEndian::Big(Value.GetInt32()));
+			break;
+		case ZEML_IT_INT64:
+			Value.SetType(ZE_VRT_INTEGER_64);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int64, DataSize, 1);
+			Value.SetInt64(ZEEndian::Big(Value.GetInt64()));
+			break;
+		case ZEML_IT_UINT8:
+			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_8);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
+			break;
+		case ZEML_IT_UINT16:
+			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_16);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
+			Value.SetUInt16(ZEEndian::Big(Value.GetUInt16()));
+			break;
+		case ZEML_IT_UINT32:
+			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_32);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
+			Value.SetUInt32(ZEEndian::Big(Value.GetUInt32()));
+			break;
+		case ZEML_IT_UINT64:
+			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_64);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int64, DataSize, 1);
+			Value.SetUInt64(ZEEndian::Big(Value.GetUInt64()));
+			break;
+		case ZEML_IT_BOOLEAN:
+			Value.SetType(ZE_VRT_BOOLEAN);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Boolean, DataSize, 1);
+			break;
+		case ZEML_IT_STRING:
+			{
+				Value.SetType(ZE_VRT_STRING);
+				char* TempBuffer = new char[DataSize];
+				ReadDataSize = File->Read(TempBuffer, DataSize, 1);
+				Value.SetString(TempBuffer);
+				delete TempBuffer;
+			}
+			break;
+		case ZEML_IT_QUATERNION:
+			Value.SetType(ZE_VRT_QUATERNION);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
+			break;
+		case ZEML_IT_VECTOR2:
+			Value.SetType(ZE_VRT_VECTOR2);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
+			break;
+		case ZEML_IT_VECTOR3:
+			Value.SetType(ZE_VRT_VECTOR3);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
+			break;
+		case ZEML_IT_VECTOR4:
+			Value.SetType(ZE_VRT_VECTOR4);
+			ReadDataSize = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
+			break;
+		case ZEML_IT_MATRIX3X3:
+			Value.SetType(ZE_VRT_MATRIX3X3);
+			ReadDataSize = File->Read(Value.ImplicitAcesss().Matrix3x3, DataSize, 1);
+			break;
+		case ZEML_IT_MATRIX4X4:
+			Value.SetType(ZE_VRT_MATRIX4X4);
+			ReadDataSize = File->Read(Value.ImplicitAcesss().Matrix4x4, DataSize, 1);
+			break;
+		default:
+			zeError("Unsupported ZEMLProperty type.");
+			break;
+	}
+
+	if(ReadDataSize != 1)
+		zeError("Can not read ZEMLProperty value from file. Corrupted ZEML file.");
+}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETree.h
+ Zinek Engine - ZEMLSerialReader.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,57 +34,45 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TREE_H__
-#define __ZE_TREE_H__
+#ifndef	__ZEML_SERIAL_READER_H__
+#define __ZEML_SERIAL_READER_H__
 
-#include "ZEList.h"
+#include "ZETypes.h"
+#include "ZEDS\ZEVariant.h"
+#include "ZEDS\ZEString.h"
+#include "ZEMLItem.h"
 
-template<typename ZEType>
-class ZETree : public ZEListItem
+class ZEFile;
+
+class ZEMLSerialReader
 {
 	private:
-		ZEType* Parent;
-		ZEType* NextItem;
-		ZEType* PrevItem;
 
-		ZEList<ZEType> SubTrees;
+		ZEFile*			File;
 
-	public:	
-		ZEType  GetParent()
-		{
-			return Parent;
-		}
+		ZEMLItemType	CurrentItemType;
+		ZEVariant		CurrentItemValue;
+		ZEString		CurrentItemName;
+		ZEUInt64		CurrentItemDataSize;
+		ZEUInt64		CurrentItemSubItemCount;
 
-		const ZEList<ZEType>& GetSubTrees()
-		{
-			return SubTrees;
-		}
+		ZEUInt64		NextItemPosition;
 
-		bool AddSubTree(ZEType* SubTree)
-		{
-			if (SubTree->Parent != NULL || SubTree->Parent == this)
-				return false;
+	public:
 
-			SubTrees.Add(SubTree);
-			SubTree->Parent = this;
+		bool			ReadNextItem();
+		
+		ZEMLItemType	GetItemType();
+		ZEString		GetItemName();
 
-			return true;
-		}
+		ZEUInt64		GetSubItemCount();
 
-		bool RemoveSubTree(ZEType* SubTree)
-		{
-			if (SubTree->Parent != this)
-				return;
+		ZEVariant		GetItemValue();
+		
+		ZEUInt64		GetDataSize();
+		bool			GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offset = 0);
 
-			SubTrees[Index].Parent = NULL;
-			SubTrees.Remove(Index);
-
-			return true;
-		}
-
-		ZETree()
-		{
-			Parent = NULL;
-		}
+						ZEMLSerialReader(ZEFile* File);
 };
+
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETree.h
+ Zinek Engine - ZEMLItem.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,58 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_TREE_H__
-#define __ZE_TREE_H__
+#include "ZEMLItem.h"
+#include "ZEError.h"
 
-#include "ZEList.h"
-
-template<typename ZEType>
-class ZETree : public ZEListItem
+ZEMLItem::ZEMLItem()
 {
-	private:
-		ZEType* Parent;
-		ZEType* NextItem;
-		ZEType* PrevItem;
+	Type = (ZEUInt8)ZEML_IT_UNDEFINED;
+	DataSize = 0;
+	Parent = NULL;
+}
 
-		ZEList<ZEType> SubTrees;
+ZEMLItem::~ZEMLItem()
+{
 
-	public:	
-		ZEType  GetParent()
-		{
-			return Parent;
-		}
+}
 
-		const ZEList<ZEType>& GetSubTrees()
-		{
-			return SubTrees;
-		}
+void ZEMLItem::SetType(ZEMLItemType Type)
+{
+	this->Type = (ZEUInt8)Type;
+}
 
-		bool AddSubTree(ZEType* SubTree)
-		{
-			if (SubTree->Parent != NULL || SubTree->Parent == this)
-				return false;
+ZEMLItemType ZEMLItem::GetType() const
+{
+	return (ZEMLItemType)Type;
+}
 
-			SubTrees.Add(SubTree);
-			SubTree->Parent = this;
+void ZEMLItem::SetName(const ZEString& Name)
+{
+	if(Name.GetSize() > 255)
+		zeError("ZEMLProperty name too long. Name size must be smaller than 256");
 
-			return true;
-		}
+	this->Name = Name;
+}
 
-		bool RemoveSubTree(ZEType* SubTree)
-		{
-			if (SubTree->Parent != this)
-				return;
+const ZEString& ZEMLItem::GetName() const
+{
+	return Name;
+}
 
-			SubTrees[Index].Parent = NULL;
-			SubTrees.Remove(Index);
-
-			return true;
-		}
-
-		ZETree()
-		{
-			Parent = NULL;
-		}
-};
-#endif
+ZEUInt64 ZEMLItem::GetDataSize()
+{
+	return DataSize;
+}
