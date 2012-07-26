@@ -156,7 +156,7 @@ void ZEMLProperty::WriteToFile(ZEFile* File)
 	if(File->Write(Name.GetValue(), sizeof(char) * NameLength, 1) != 1)
 		zeError("Can not write ZEMLProperty name to file.");
 
-	TempUInt64 = ZEEndian::Big(DataSize);
+	TempUInt64 = ZEEndian::Little(DataSize);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not write ZEMLProperty data size to file.");
 
@@ -171,35 +171,35 @@ void ZEMLProperty::WriteToFile(ZEFile* File)
 			WritenDataSize = File->Write(&Value.ImplicitAcesss().Double, Value.SizeOf(), 1);
 			break;
 		case ZE_VRT_INTEGER_8:
-			TempInt8 = ZEEndian::Big(Value.GetInt8());
+			TempInt8 = ZEEndian::Little(Value.GetInt8());
 			WritenDataSize = File->Write(&TempInt8, sizeof(ZEInt8), 1);
 			break;
 		case ZE_VRT_INTEGER_16:
-			TempInt16 = ZEEndian::Big(Value.GetInt16());
+			TempInt16 = ZEEndian::Little(Value.GetInt16());
 			WritenDataSize = File->Write(&TempInt16, sizeof(ZEInt16), 1);
 			break;
 		case ZE_VRT_INTEGER_32:
-			TempInt32 = ZEEndian::Big(Value.GetInt16());
+			TempInt32 = ZEEndian::Little(Value.GetInt16());
 			WritenDataSize = File->Write(&TempInt32, sizeof(ZEInt16), 1);
 			break;
 		case ZE_VRT_INTEGER_64:
-			TempInt64 = ZEEndian::Big(Value.GetInt64());
+			TempInt64 = ZEEndian::Little(Value.GetInt64());
 			WritenDataSize = File->Write(&TempInt64, sizeof(ZEInt64), 1);
 			break;
 		case ZE_VRT_UNSIGNED_INTEGER_8:
-			TempUInt8 = ZEEndian::Big(Value.GetUInt8());
+			TempUInt8 = ZEEndian::Little(Value.GetUInt8());
 			WritenDataSize = File->Write(&TempUInt8, sizeof(ZEUInt8), 1);
 			break;
 		case ZE_VRT_UNSIGNED_INTEGER_16:
-			TempUInt16 = ZEEndian::Big(Value.GetUInt16());
+			TempUInt16 = ZEEndian::Little(Value.GetUInt16());
 			WritenDataSize = File->Write(&TempUInt16, sizeof(ZEUInt16), 1);
 			break;
 		case ZE_VRT_UNSIGNED_INTEGER_32:
-			TempUInt32 = ZEEndian::Big(Value.GetUInt32());
+			TempUInt32 = ZEEndian::Little(Value.GetUInt32());
 			WritenDataSize = File->Write(&TempUInt32, sizeof(ZEUInt32), 1);
 			break;
 		case ZE_VRT_UNSIGNED_INTEGER_64:
-			TempUInt64 = ZEEndian::Big(Value.GetUInt64());
+			TempUInt64 = ZEEndian::Little(Value.GetUInt64());
 			WritenDataSize = File->Write(&TempUInt64, sizeof(ZEUInt64), 1);
 			break;
 		case ZE_VRT_BOOLEAN:
@@ -280,17 +280,17 @@ void ZEMLProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 		case ZEML_IT_INT16:
 			Value.SetType(ZE_VRT_INTEGER_16);
 			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
-			Value.SetInt16(ZEEndian::Big(Value.GetInt16()));
+			Value.SetInt16(ZEEndian::Little(Value.GetInt16()));
 			break;
 		case ZEML_IT_INT32:
 			Value.SetType(ZE_VRT_INTEGER_32);
 			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
-			Value.SetInt32(ZEEndian::Big(Value.GetInt32()));
+			Value.SetInt32(ZEEndian::Little(Value.GetInt32()));
 			break;
 		case ZEML_IT_INT64:
 			Value.SetType(ZE_VRT_INTEGER_64);
 			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int64, DataSize, 1);
-			Value.SetInt64(ZEEndian::Big(Value.GetInt64()));
+			Value.SetInt64(ZEEndian::Little(Value.GetInt64()));
 			break;
 		case ZEML_IT_UINT8:
 			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_8);
@@ -299,17 +299,17 @@ void ZEMLProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 		case ZEML_IT_UINT16:
 			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_16);
 			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
-			Value.SetUInt16(ZEEndian::Big(Value.GetUInt16()));
+			Value.SetUInt16(ZEEndian::Little(Value.GetUInt16()));
 			break;
 		case ZEML_IT_UINT32:
 			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_32);
 			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
-			Value.SetUInt32(ZEEndian::Big(Value.GetUInt32()));
+			Value.SetUInt32(ZEEndian::Little(Value.GetUInt32()));
 			break;
 		case ZEML_IT_UINT64:
 			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_64);
 			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int64, DataSize, 1);
-			Value.SetUInt64(ZEEndian::Big(Value.GetUInt64()));
+			Value.SetUInt64(ZEEndian::Little(Value.GetUInt64()));
 			break;
 		case ZEML_IT_BOOLEAN:
 			Value.SetType(ZE_VRT_BOOLEAN);

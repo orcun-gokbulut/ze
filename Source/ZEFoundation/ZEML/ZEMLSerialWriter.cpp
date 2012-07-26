@@ -199,11 +199,11 @@ ZEMLSerialNode  ZEMLSerialNode::OpenNode(const ZEString& Name)
 
 	NewNode.FileUpdatePosition = File->Tell();
 
-	TempUInt64 = ZEEndian::Big(NewNode.SubItemCount);
+	TempUInt64 = ZEEndian::Little(NewNode.SubItemCount);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not write ZEMLSerialNode subitem count to file.");
 
-	TempUInt64 = ZEEndian::Big(NewNode.Size);
+	TempUInt64 = ZEEndian::Little(NewNode.Size);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not write ZEMLSerialNode node size to file.");
 
@@ -221,11 +221,11 @@ void  ZEMLSerialNode::CloseNode()
 	if(!File->Seek(FileUpdatePosition, ZE_SF_BEGINING))
 		zeError("Can not seek file.");
 
-	TempUInt64 = ZEEndian::Big(SubItemCount);
+	TempUInt64 = ZEEndian::Little(SubItemCount);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not update ZEMLSerialNode subitem count to file.");
 
-	TempUInt64 = ZEEndian::Big(Size);
+	TempUInt64 = ZEEndian::Little(Size);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not update ZEMLSerialNode node size to file.");
 
@@ -270,11 +270,11 @@ ZEMLSerialNode ZEMLSerialRootNode::OpenNode(const ZEString& Name)
 
 	NewNode.FileUpdatePosition = File->Tell();
 
-	TempUInt64 = ZEEndian::Big(NewNode.SubItemCount);
+	TempUInt64 = ZEEndian::Little(NewNode.SubItemCount);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not write ZEMLSerialNode subitem count to file.");
 
-	TempUInt64 = ZEEndian::Big(NewNode.Size);
+	TempUInt64 = ZEEndian::Little(NewNode.Size);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not write ZEMLSerialNode node size to file.");
 
@@ -289,11 +289,11 @@ void ZEMLSerialRootNode::CloseNode()
 	if(!File->Seek(FileUpdatePosition, ZE_SF_BEGINING))
 		zeError("Can not seek file.");
 
-	TempUInt64 = ZEEndian::Big(SubItemCount);
+	TempUInt64 = ZEEndian::Little(SubItemCount);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not update ZEMLSerialNode subitem count to file.");
 
-	TempUInt64 = ZEEndian::Big(Size);
+	TempUInt64 = ZEEndian::Little(Size);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not update ZEMLSerialNode node size to file.");
 
@@ -328,11 +328,11 @@ ZEMLSerialRootNode::ZEMLSerialRootNode(const ZEString& Name, ZEFile* File)
 
 	FileUpdatePosition = File->Tell();
 
-	TempUInt64 = ZEEndian::Big(SubItemCount);
+	TempUInt64 = ZEEndian::Little(SubItemCount);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not write ZEMLSerialRootNode subitem count to file.");
 	
-	TempUInt64 = ZEEndian::Big(Size);
+	TempUInt64 = ZEEndian::Little(Size);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not write ZEMLSerialRootNode node size to file.");
 }
