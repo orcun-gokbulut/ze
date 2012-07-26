@@ -353,11 +353,11 @@ void ZEMLNode::WriteToFile(ZEFile* File)
 		zeError("Can not write ZEMLNode name to file.");
 
 	ZEUInt64 SubItemCount = (ZEUInt64)Properties.GetCount() + SubNodes.GetCount();
-	TempUInt64 = ZEEndian::Big(SubItemCount);
+	TempUInt64 = ZEEndian::Little(SubItemCount);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not write ZEMLNode subitem count to file.");
 
-	TempUInt64 = ZEEndian::Big(NodeSize);
+	TempUInt64 = ZEEndian::Little(NodeSize);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not write ZEMLNode node size to file.");
 
@@ -407,12 +407,12 @@ void ZEMLNode::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 	if(File->Read(&SubItemCount, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not read ZEMLNode sub item count from file. Corrupted ZEML file.");
 
-	SubItemCount = ZEEndian::Big(SubItemCount);
+	SubItemCount = ZEEndian::Little(SubItemCount);
 
 	if(File->Read(&NodeSize, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not read ZEMLNode node size from file. Corrupted ZEML file.");
 
-	NodeSize = ZEEndian::Big(NodeSize);
+	NodeSize = ZEEndian::Little(NodeSize);
 
 	for(ZESize I = 0; I < SubItemCount; I++)
 	{

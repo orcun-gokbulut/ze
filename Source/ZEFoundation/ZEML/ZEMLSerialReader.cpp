@@ -85,7 +85,7 @@ bool ZEMLSerialReader::ReadNextItem()
 		if(File->Read(&CurrentItemSubItemCount, sizeof(ZEUInt64), 1) != 1)
 			zeError("Can not read ZEMLNode subitem count from file. Corrupted ZEML file.");
 
-		CurrentItemSubItemCount = ZEEndian::Big(CurrentItemSubItemCount);
+		CurrentItemSubItemCount = ZEEndian::Little(CurrentItemSubItemCount);
 
 		NextItemPosition = File->Tell() + sizeof(ZEUInt64);
 	}
@@ -94,7 +94,7 @@ bool ZEMLSerialReader::ReadNextItem()
 		if(File->Read(&CurrentItemDataSize, sizeof(ZEUInt64), 1) != 1)
 			zeError("Can not read ZEMLDataProperty data size from file. Corrupted ZEML file.");
 
-		CurrentItemDataSize = ZEEndian::Big(CurrentItemDataSize);
+		CurrentItemDataSize = ZEEndian::Little(CurrentItemDataSize);
 
 		NextItemPosition = File->Tell() + CurrentItemDataSize;
 	}
@@ -106,7 +106,7 @@ bool ZEMLSerialReader::ReadNextItem()
 		if(File->Read(&ValueSize, sizeof(ZEUInt64), 1) != 1)
 			zeError("Can not read ZEMLProperty value size from file. Corrupted ZEML file.");
 
-		ValueSize = ZEEndian::Big(ValueSize);
+		ValueSize = ZEEndian::Little(ValueSize);
 
 		ZEInt64 TempInt64;
 		ZEInt8	TempInt32;
@@ -134,17 +134,17 @@ bool ZEMLSerialReader::ReadNextItem()
 			case ZEML_IT_INT16:
 				CurrentItemValue.SetType(ZE_VRT_INTEGER_16);
 				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
-				CurrentItemValue.SetInt16(ZEEndian::Big(CurrentItemValue.GetInt16()));
+				CurrentItemValue.SetInt16(ZEEndian::Little(CurrentItemValue.GetInt16()));
 				break;
 			case ZEML_IT_INT32:
 				CurrentItemValue.SetType(ZE_VRT_INTEGER_32);
 				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
-				CurrentItemValue.SetInt32(ZEEndian::Big(CurrentItemValue.GetInt32()));
+				CurrentItemValue.SetInt32(ZEEndian::Little(CurrentItemValue.GetInt32()));
 				break;
 			case ZEML_IT_INT64:
 				CurrentItemValue.SetType(ZE_VRT_INTEGER_64);
 				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int64, ValueSize, 1);
-				CurrentItemValue.SetInt64(ZEEndian::Big(CurrentItemValue.GetInt64()));
+				CurrentItemValue.SetInt64(ZEEndian::Little(CurrentItemValue.GetInt64()));
 				break;
 			case ZEML_IT_UINT8:
 				CurrentItemValue.SetType(ZE_VRT_UNSIGNED_INTEGER_8);
@@ -153,17 +153,17 @@ bool ZEMLSerialReader::ReadNextItem()
 			case ZEML_IT_UINT16:
 				CurrentItemValue.SetType(ZE_VRT_UNSIGNED_INTEGER_16);
 				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
-				CurrentItemValue.SetUInt16(ZEEndian::Big(CurrentItemValue.GetUInt16()));
+				CurrentItemValue.SetUInt16(ZEEndian::Little(CurrentItemValue.GetUInt16()));
 				break;
 			case ZEML_IT_UINT32:
 				CurrentItemValue.SetType(ZE_VRT_UNSIGNED_INTEGER_32);
 				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
-				CurrentItemValue.SetUInt32(ZEEndian::Big(CurrentItemValue.GetUInt32()));
+				CurrentItemValue.SetUInt32(ZEEndian::Little(CurrentItemValue.GetUInt32()));
 				break;
 			case ZEML_IT_UINT64:
 				CurrentItemValue.SetType(ZE_VRT_UNSIGNED_INTEGER_64);
 				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int64, ValueSize, 1);
-				CurrentItemValue.SetUInt64(ZEEndian::Big(CurrentItemValue.GetUInt64()));
+				CurrentItemValue.SetUInt64(ZEEndian::Little(CurrentItemValue.GetUInt64()));
 				break;
 			case ZEML_IT_BOOLEAN:
 				CurrentItemValue.SetType(ZE_VRT_BOOLEAN);
