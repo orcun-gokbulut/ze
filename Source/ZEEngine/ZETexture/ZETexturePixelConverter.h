@@ -55,11 +55,13 @@ class ZETexturePixelConverter
 
 		static void ConvertBGR555(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
 		static void ConvertBGRA1555(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
+		static void ConvertBGRX1555(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
 		static void ConvertBGR565(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
 
 		static void ConvertRGB8(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
 		static void ConvertBGR8(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
 		static void ConvertBGRA8(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
+		static void ConvertBGRX8(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
 
 		static void ConvertRGB16(ZEPixelRGBA16* Destination, void* Source, ZESize Count);
 		static void ConvertRGB16_BE(ZEPixelRGBA16* Destination, void* Source, ZESize Count);
