@@ -33,6 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma  once
+#ifndef __ZE_FORMAT_H__
+#define __ZE_FORMAT_H__
+
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZETypes.h"
@@ -70,7 +74,7 @@ class ZEFormat
 		static ZESSize		Print(char* Buffer, const ZEString& Argument,		const char* ArgumentFormat);
 		static ZESSize		Print(char* Buffer, ZEObject* Argument,				const char* ArgumentFormat);
 
-		static ZEString		Format(const char* Format, const ZEVariant* Arguments, ZESize Count);
+		static ZEString		Format(const char* Format, const ZEVariant** Arguments, ZESize Count);
 
 	public :
 		static ZEString		Format(const char* Format);
@@ -98,3 +102,5 @@ class ZEFormat
 		static ZEString		Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14, const ZEVariant& Arg15, const ZEVariant& Arg16, const ZEVariant& Arg17, const ZEVariant& Arg18, const ZEVariant& Arg19, const ZEVariant& Arg20, const ZEVariant& Arg21);
 		static ZEString		Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14, const ZEVariant& Arg15, const ZEVariant& Arg16, const ZEVariant& Arg17, const ZEVariant& Arg18, const ZEVariant& Arg19, const ZEVariant& Arg20, const ZEVariant& Arg21, const ZEVariant& Arg22);
 };
+
+#endif
