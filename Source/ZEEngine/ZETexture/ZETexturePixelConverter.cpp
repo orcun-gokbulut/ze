@@ -135,6 +135,11 @@ void ZETexturePixelConverter::ConvertBGRA1555(ZEPixelRGBA8* Destination, void* S
 	}
 }
 
+void ZETexturePixelConverter::ConvertBGRX1555(ZEPixelRGBA8* Destination, void* Source, ZESize Count)
+{
+	ZETexturePixelConverter::ConvertBGRA1555(Destination, Source, Count);
+}
+
 void ZETexturePixelConverter::ConvertBGR565(ZEPixelRGBA8* Destination, void* Source, ZESize Count)
 {
 	ZEPixelRGBA8* End = Destination + Count;
@@ -205,6 +210,11 @@ void ZETexturePixelConverter::ConvertBGRA8(ZEPixelRGBA8* Destination, void* Sour
 		Source = (ZEUInt8*)Source + 4;
 		Destination++;
 	}
+}
+
+void ZETexturePixelConverter::ConvertBGRX8(ZEPixelRGBA8* Destination, void* Source, ZESize Count)
+{
+	ConvertBGRA8(Destination, Source, Count);
 }
 
 void ZETexturePixelConverter::ConvertRGB16(ZEPixelRGBA16* Destination, void* Source, ZESize Count)
