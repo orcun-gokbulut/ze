@@ -41,6 +41,7 @@
 #include "ZEDS/ZEVariant.h"
 #include "ZETypes.h"
 
+class ZEStringWriter;
 class ZEVector2;
 class ZEVector3;
 class ZEVector4;
@@ -51,30 +52,8 @@ class ZEObject;
 
 class ZEFormat
 {
-
 	private:
-		static ZESSize		PrintVariant(char* Buffer, const ZEVariant& Argument, const char* ArgumentFormat);
-
-		static ZESSize		Print(char* Buffer, ZEUInt8 Argument,				const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, ZEUInt16 Argument,				const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, ZEUInt32 Argument,				const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, ZEUInt64 Argument,				const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, ZEInt8 Argument,				const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, ZEInt16 Argument,				const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, ZEInt32 Argument,				const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, ZEInt64 Argument,				const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, float Argument,					const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, double Argument,				const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, const ZEVector2& Argument,		const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, const ZEVector3& Argument,		const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, const ZEVector4& Argument,		const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, const ZEQuaternion& Argument,	const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, const ZEMatrix3x3& Argument,	const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, const ZEMatrix4x4& Argument,	const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, const ZEString& Argument,		const char* ArgumentFormat);
-		static ZESSize		Print(char* Buffer, ZEObject* Argument,				const char* ArgumentFormat);
-
-		static ZEString		Format(const char* Format, const ZEVariant** Arguments, ZESize Count);
+		static ZEString		FormatInner(const char* Input, const ZEVariant** Arguments, ZESize Count);
 
 	public :
 		static ZEString		Format(const char* Format);
