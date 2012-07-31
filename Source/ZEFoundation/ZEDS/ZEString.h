@@ -44,6 +44,7 @@
 
 class ZEString
 {
+	friend class ZEStringWriter;
 	private:
 		char*						Buffer;
 		ZEAllocatorBase<char>		Allocator;

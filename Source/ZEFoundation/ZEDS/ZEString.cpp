@@ -375,11 +375,16 @@ void ZEString::Remove(ZESize Position, ZESize Count)
 
 bool ZEString::Equals(const ZEString& String) const
 {
-	return strcmp(String.GetValue(), GetValue()) == 0;
+	return Equals(String.Buffer);
 }
 
 bool ZEString::Equals(const char* String) const
 {
+	if (String == this->Buffer) // NULL Check
+		return true;
+	else if (String == NULL || Buffer == NULL)
+		return false;
+
 	return strcmp(GetValue(), String) == 0;
 }
 

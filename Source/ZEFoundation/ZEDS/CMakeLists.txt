@@ -91,7 +91,8 @@ ze_add_source(ZEPointerTestClass.cpp	Tests)
 ze_add_source(ZEFormat.h				Sources Headers)
 ze_add_source(ZEFormat.cpp				Sources Headers)
 ze_add_source(ZEFormatOverloads.cpp		Sources Headers)
-
+ze_add_source(ZEStringWriter.cpp		Sources)
+ze_add_source(ZEStringWriter.h			Sources Headers)
 ze_add_library(ZEDS 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}

@@ -35,14 +35,476 @@
 
 #include "ZEFormat.h"
 
+#include "ZEStringWriter.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMeta/ZEObject.h"
 
-#include "ZEFormatOverloads.cpp"
-/*
-ZESSize ZEFormat::PrintVariant(char* Buffer, const ZEVariant& Argument, const char* ArgumentFormat)
+#define ZE_FPS_IMMEDIATE					0
+#define ZE_FPS_ARGUMENT_INDEX_START			1
+#define ZE_FPS_ARGUMENT_INDEX				2
+#define ZE_FPS_ARGUMENT_INDEX_END			3
+#define ZE_FPS_ARGUMENT_FORMATTING			4
+#define ZE_FPS_APPLY						5
+
+static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString** Parameters, ZESize Count)
+{
+	ZESize ParameterIndex = 0;
+
+	char ParameterString[255];
+	ZESize ParameterStringIndex = 0;
+
+	const char* Current = ArgumentFormat;
+	while(*Current != '\0')
+	{
+		if (*Current == ':')
+		{
+			if (ParameterIndex >= Count)
+				return false;
+
+			ParameterString[ParameterStringIndex] = '\0';
+			if (ParameterStringIndex != 0)
+				*Parameters[ParameterIndex] = ParameterString;
+			ParameterIndex++;
+			
+			ParameterString[0] = '\0';
+			ParameterStringIndex = 0;
+		}
+		else
+		{
+			ParameterString[ParameterStringIndex] = *Current;
+			ParameterStringIndex++;
+		}
+
+		Current++;
+	}
+
+	if (ParameterStringIndex != 0)
+	{
+		ParameterString[ParameterStringIndex] = '\0';
+		*Parameters[ParameterIndex] = ParameterString;
+	}
+
+	return true;
+}
+
+static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString& Parameter0)
+{
+	ZEString* ArgumentFormatParameters[] = {&Parameter0};
+	return ParseArgumentFormat(ArgumentFormat, ArgumentFormatParameters, 1);
+}
+
+static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString& Parameter0, ZEString& Parameter1)
+{
+	ZEString* ArgumentFormatParameters[] = {&Parameter0, &Parameter1};
+	return ParseArgumentFormat(ArgumentFormat, ArgumentFormatParameters, 2);
+}
+
+static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString& Parameter0, ZEString& Parameter1, ZEString& Parameter2)
+{
+	ZEString* ArgumentFormatParameters[] = {&Parameter0, &Parameter1, &Parameter2};
+	return ParseArgumentFormat(ArgumentFormat, ArgumentFormatParameters, 3);
+}
+
+static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString& Parameter0, ZEString& Parameter1, ZEString& Parameter2, ZEString& Parameter3)
+{
+	ZEString* ArgumentFormatParameters[] = {&Parameter0, &Parameter1, &Parameter2, &Parameter3};
+	return ParseArgumentFormat(ArgumentFormat, ArgumentFormatParameters, 4);
+}
+
+static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString& Parameter0, ZEString& Parameter1, ZEString& Parameter2, ZEString& Parameter3, ZEString& Parameter4)
+{
+	ZEString* ArgumentFormatParameters[] = {&Parameter0, &Parameter1, &Parameter2, &Parameter3, &Parameter4};
+	return ParseArgumentFormat(ArgumentFormat, ArgumentFormatParameters, 4);
+}
+
+static bool CheckArgumentFormat(const char* ArgumentFormat)
+{
+	while(*ArgumentFormat != 0)
+	{
+		if (!isdigit(*ArgumentFormat) && *ArgumentFormat != '.' && *ArgumentFormat != '#' && *ArgumentFormat != '.' && *ArgumentFormat != '-' && *ArgumentFormat != '+')
+			return false;
+		ArgumentFormat++;
+	}
+
+	return true;
+}
+
+static void PrintFloat(ZEStringWriter& Output, float Argument, const char* FormattingOptions)
+{
+	char Temp[256];
+	char Format[256];
+	if (FormattingOptions == NULL)
+		sprintf_s(Format, 256, "%%f");
+	else
+		sprintf_s(Format, 256, "%%%sf", FormattingOptions);
+	sprintf_s(Temp, 256, Format, Argument);
+	Output.Append(Temp);
+}
+
+static bool FormatArgument(ZEStringWriter& Output, ZEInt Argument, const char* ArgumentFormat)
+{
+	ZEString Type = "d";
+	ZEString FormattingOptions;
+
+	if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
+		return false;
+
+	if (Type != "d" && Type != "x" && Type != "X")
+		return false;
+
+	if (!CheckArgumentFormat(FormattingOptions))
+		return false;
+
+	char Temp[256];
+	char Format[256];
+	if (FormattingOptions == NULL)
+		sprintf_s(Format, 256, "%%%s", Type.ToCString());
+	else
+		sprintf_s(Format, 256, "%%%s%s", FormattingOptions.ToCString(), Type.ToCString());
+	sprintf_s(Temp, 256, Format, Argument);
+	Output.Append(Temp);
+
+	return true;
+}
+
+
+static bool FormatArgument(ZEStringWriter& Output, ZEUInt Argument, const char* ArgumentFormat)
+{
+	ZEString Type = "d";
+	ZEString FormattingOptions;
+
+	if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
+		return false;
+
+	if (Type != "d" && Type != "x" && Type != "X")
+		return false;
+
+	if (!CheckArgumentFormat(FormattingOptions))
+		return false;
+
+	if (Type == "d")
+		Type = "u";
+
+	char Temp[256];
+	char Format[256];
+	if (FormattingOptions == NULL)
+		sprintf_s(Format, 256, "%%%s", Type.ToCString());
+	else
+		sprintf_s(Format, 256, "%%%s%s", FormattingOptions.ToCString(), Type.ToCString());
+	sprintf_s(Temp, 256, Format, Argument);
+	Output.Append(Temp);
+
+	return true;
+}
+
+static bool FormatArgument(ZEStringWriter& Output, ZEInt64 Argument,	const char* ArgumentFormat)
+{
+	ZEString Type = "d";
+	ZEString FormattingOptions;
+
+	ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions);
+
+	if (Type != "d" && Type != "x" && Type != "X")
+		return false;
+
+	if (!CheckArgumentFormat(FormattingOptions))
+		return false;
+
+	const char* InnerType;
+	if (Type == "d")
+		InnerType = "lld";
+	else if (Type == "x")
+		InnerType = "llx";
+	else if (Type == "X")
+		InnerType = "llX";
+	
+	char Temp[256];
+	char Format[256];
+	if (FormattingOptions == NULL)
+		sprintf_s(Format, 256, "%%%s", InnerType);
+	else
+		sprintf_s(Format, 256, "%%%s%s", FormattingOptions.ToCString(), Type.ToCString());
+	sprintf_s(Temp, 256, Format, Argument);
+	Output.Append(Temp);
+
+	return true;
+}
+
+static bool FormatArgument(ZEStringWriter& Output, ZEUInt64 Argument, const char* ArgumentFormat)
+{
+	ZEString Type = "d";
+	ZEString FormattingOptions;
+
+	ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions);
+
+	if (Type != "d" && Type != "x" && Type != "X")
+		return false;
+
+	if (!CheckArgumentFormat(FormattingOptions))
+		return false;
+	
+	const char* InnerType;
+	if (Type == "d")
+		InnerType = "llu";
+	else if (Type == "x")
+		InnerType = "llx";
+	else if (Type == "X")
+		InnerType = "llX";
+
+	char Temp[256];
+	char Format[256];
+	if (FormattingOptions == NULL)
+		sprintf_s(Format, 256, "%%%s", InnerType);
+	else
+		sprintf_s(Format, 256, "%%%s%s", FormattingOptions.ToCString(), Type.ToCString());
+	sprintf_s(Temp, 256, Format, Argument);
+	Output.Append(Temp);
+
+	return true;
+}
+
+static bool FormatArgument(ZEStringWriter& Output, float Argument, const char* ArgumentFormat)
+{
+	ZEString FormattingOptions;
+
+	ParseArgumentFormat(ArgumentFormat, FormattingOptions);
+
+	if (!CheckArgumentFormat(FormattingOptions))
+		return false;
+
+	char Temp[256];
+	char Format[256];
+	if (FormattingOptions == NULL)
+		sprintf_s(Format, 256, "%%f");
+	else
+		sprintf_s(Format, 256, "%%%sf", FormattingOptions.ToCString());
+	sprintf_s(Temp, 256, Format, Argument);
+	Output.Append(Temp);
+
+	return true;
+}
+
+static bool FormatArgument(ZEStringWriter& Output, bool Argument, const char* ArgumentFormat)
+{
+	ZEString True = "true";
+	ZEString False = "false";
+	
+	if (!ParseArgumentFormat(ArgumentFormat, True, False))
+		return false;
+
+	Output.Append(Argument ? True : False);
+
+	return true;
+}
+
+static bool FormatArgument(ZEStringWriter& Output, const ZEVector2& Argument, const char* ArgumentFormat)
+{
+	ZEString PreFix = "<";
+	ZEString PostFix = ">";
+	ZEString Comma = ", ";
+	ZEString FormattingOptions = ".03";
+
+	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
+		return false;
+
+	if (!CheckArgumentFormat(FormattingOptions))
+		return false;
+
+	Output.Append(PreFix);
+
+	PrintFloat(Output, Argument.x, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.y, FormattingOptions);
+	
+	Output.Append(PostFix);
+
+	return true;
+}
+
+static bool FormatArgument(ZEStringWriter& Output, const ZEVector3& Argument, const char* ArgumentFormat)
+{
+	ZEString PreFix = "<";
+	ZEString PostFix = ">";
+	ZEString Comma = ", ";
+	ZEString FormattingOptions = ".03";
+
+	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
+		return false;
+
+	if (!CheckArgumentFormat(FormattingOptions))
+		return false;
+
+	Output.Append(PreFix);
+
+	PrintFloat(Output, Argument.x, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.y, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.z, FormattingOptions);
+	
+	Output.Append(PostFix);
+
+	return true;
+}
+
+static bool FormatArgument(ZEStringWriter& Output, const ZEVector4& Argument, const char* ArgumentFormat)
+{
+	ZEString PreFix = "<";
+	ZEString PostFix = ">";
+	ZEString Comma = ", ";
+	ZEString FormattingOptions = ".03";
+
+	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
+		return false;
+
+	if (!CheckArgumentFormat(FormattingOptions))
+		return false;
+
+	Output.Append(PreFix);
+
+	PrintFloat(Output, Argument.x, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.y, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.z, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.w, FormattingOptions);
+	
+	Output.Append(PostFix);
+
+	return true;
+}
+
+static bool FormatArgument(ZEStringWriter& Output, const ZEQuaternion& Argument, const char* ArgumentFormat)
+{
+	ZEString PreFix = "<";
+	ZEString PostFix = ">";
+	ZEString Comma = ", ";
+	ZEString FormattingOptions = ".03";
+
+	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
+		return false;
+
+	if (!CheckArgumentFormat(FormattingOptions))
+		return false;
+
+	Output.Append(PreFix);
+
+	PrintFloat(Output, Argument.x, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.y, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.z, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.w, FormattingOptions);
+	
+	Output.Append(PostFix);
+
+	return true;
+}
+
+static bool FormatArgument(ZEStringWriter& Output, const ZEMatrix3x3& Argument, const char* ArgumentFormat)
+{
+	ZEString FormattingOptions = ".03";
+	ZEString PreFix = "<";
+	ZEString PostFix = ">";
+	ZEString Comma = ", ";
+	ZEString Seperator = ", ";
+
+	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma, Seperator))
+		return false;
+
+	if (!CheckArgumentFormat(FormattingOptions))
+		return false;
+
+	Output.Append(PreFix);
+
+	PrintFloat(Output, Argument.M11, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M12, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M13, FormattingOptions);
+
+	Output.Append(Seperator);
+
+	PrintFloat(Output, Argument.M21, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M22, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M23, FormattingOptions);
+
+	Output.Append(Seperator);
+
+	PrintFloat(Output, Argument.M31, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M32, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M33, FormattingOptions);
+
+	Output.Append(PostFix);
+
+	return true;
+}
+
+static bool FormatArgument(ZEStringWriter& Output, const ZEMatrix4x4& Argument,const char* ArgumentFormat)
+{
+	ZEString FormattingOptions = ".03";
+	ZEString PreFix = "<";
+	ZEString PostFix = ">";
+	ZEString Comma = ", ";
+	ZEString Seperator = ", ";
+
+	ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma, Seperator);
+
+	Output.Append(PreFix);
+	
+	PrintFloat(Output, Argument.M11, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M12, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M13, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M14, FormattingOptions);
+	
+	Output.Append(Seperator);
+	
+	PrintFloat(Output, Argument.M21, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M22, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M23, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M24, FormattingOptions);
+	
+	Output.Append(Seperator);
+	
+	PrintFloat(Output, Argument.M31, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M32, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M33, FormattingOptions);
+	Output.Append(PostFix);
+	PrintFloat(Output, Argument.M34, FormattingOptions);
+	
+	Output.Append(PostFix);
+
+	return true;
+}
+
+static bool FormatArgument(ZEStringWriter& Output, const ZEString& Argument, const char* ArgumentFormat)
+{
+	Output.Append(Argument);
+	return true;
+}
+
+static bool FormatArgument(ZEStringWriter& Output, ZEObject* Argument,	const char* ArgumentFormat)
+{
+	return "";
+}
+
+static bool FormatArgumentVariant(ZEStringWriter& Output, const ZEVariant& Argument, const char* ArgumentFormat)
 {
 	switch(Argument.GetType())
 	{
@@ -50,80 +512,73 @@ ZESSize ZEFormat::PrintVariant(char* Buffer, const ZEVariant& Argument, const ch
 		case ZE_VRT_UNDEFINED:
 		case ZE_VRT_NULL:
 			return -1;
-			
+
 		case ZE_VRT_FLOAT:
-			return Print(Buffer, Argument.GetFloat(), ArgumentFormat);
-			
+			return FormatArgument(Output, Argument.GetFloat(), ArgumentFormat);
+
 		case ZE_VRT_DOUBLE:
-			return Print(Buffer, Argument.GetDouble(), ArgumentFormat);
+			return FormatArgument(Output, (float)Argument.GetDouble(), ArgumentFormat);
 
 		case ZE_VRT_INTEGER_8:
-			return Print(Buffer, Argument.GetInt8(), ArgumentFormat);
+			return FormatArgument(Output, (ZEInt)Argument.GetInt8(), ArgumentFormat);
 
 		case ZE_VRT_INTEGER_16:
-			return Print(Buffer, Argument.GetInt16(), ArgumentFormat);
+			return FormatArgument(Output, (ZEInt)Argument.GetInt16(), ArgumentFormat);
 
 		case ZE_VRT_INTEGER_32:
-			return Print(Buffer, Argument.GetInt32(), ArgumentFormat);
+			return FormatArgument(Output, (ZEInt)Argument.GetInt32(), ArgumentFormat);
 
 		case ZE_VRT_INTEGER_64:
-			return Print(Buffer, Argument.GetInt64(), ArgumentFormat);
+			return FormatArgument(Output, (ZEInt64)Argument.GetInt64(), ArgumentFormat);
 
 		case ZE_VRT_UNSIGNED_INTEGER_8:
-			return Print(Buffer, Argument.GetUInt8(), ArgumentFormat);
+			return FormatArgument(Output, (ZEUInt)Argument.GetUInt8(), ArgumentFormat);
 
 		case ZE_VRT_UNSIGNED_INTEGER_16:
-			return Print(Buffer, Argument.GetUInt16(), ArgumentFormat);
+			return FormatArgument(Output, (ZEUInt)Argument.GetUInt16(), ArgumentFormat);
 
 		case ZE_VRT_UNSIGNED_INTEGER_32:
-			return Print(Buffer, Argument.GetUInt32(), ArgumentFormat);
+			return FormatArgument(Output, (ZEUInt)Argument.GetUInt32(), ArgumentFormat);
 
 		case ZE_VRT_UNSIGNED_INTEGER_64:
-			return Print(Buffer, Argument.GetUInt64(), ArgumentFormat);
+			return FormatArgument(Output, (ZEUInt64)Argument.GetUInt64(), ArgumentFormat);
 
 		case ZE_VRT_BOOLEAN:
-			return Print(Buffer, Argument.GetBoolean(), ArgumentFormat);
+			return FormatArgument(Output, Argument.GetBoolean(), ArgumentFormat);
 
 		case ZE_VRT_STRING:
-			return Print(Buffer, Argument.GetString(), ArgumentFormat);
+			return FormatArgument(Output, Argument.GetString(), ArgumentFormat);
 
 		case ZE_VRT_QUATERNION:
-			return Print(Buffer, Argument.GetQuaternion(), ArgumentFormat);
+			return FormatArgument(Output, Argument.GetQuaternion(), ArgumentFormat);
 
 		case ZE_VRT_VECTOR2:
-			return Print(Buffer, Argument.GetVector2(), ArgumentFormat);
+			return FormatArgument(Output, Argument.GetVector2(), ArgumentFormat);
 
 		case ZE_VRT_VECTOR3:
-			return Print(Buffer, Argument.GetVector3(), ArgumentFormat);
+			return FormatArgument(Output, Argument.GetVector3(), ArgumentFormat);
 
 		case ZE_VRT_VECTOR4:
-			return Print(Buffer, Argument.GetVector4(), ArgumentFormat);
+			return FormatArgument(Output, Argument.GetVector4(), ArgumentFormat);
 
 		case ZE_VRT_MATRIX3X3:
-			return Print(Buffer, Argument.GetMatrix3x3(), ArgumentFormat);
+			return FormatArgument(Output, Argument.GetMatrix3x3(), ArgumentFormat);
 
 		case ZE_VRT_MATRIX4X4:
-			return Print(Buffer, Argument.GetMatrix4x4(), ArgumentFormat);
+			return FormatArgument(Output, Argument.GetMatrix4x4(), ArgumentFormat);
 
 		case ZE_VRT_CLASS:
-			return Print(Buffer, Argument.GetClass(), ArgumentFormat);
+			return FormatArgument(Output, Argument.GetClass(), ArgumentFormat);
 	}
 }
 
-#define ZE_FPS_IMMEDIATE
-#define ZE_FPS_ARGUMENT_INDEX_START
-#define ZE_FPS_ARGUMENT_INDEX
-#define ZE_FPS_ARGUMENT_INDEX_END
-#define ZE_FPS_ARGUMENT_FORMATTING_START
-#define ZE_FPS_ARGUMENT_FORMATTING
-#define ZE_FPS_ARGUMENT_FORMATTING_END
-
-ZEString ZEFormat::Format(const char* Input, const ZEVariant* Arguments, ZESize Count)
+ZEString ZEFormat::FormatInner(const char* Input, const ZEVariant** Arguments, ZESize Count)
 {
-	ZEString
-	char* CurrentOutput;
+	ZEStringWriter Writer;
+
+	int State = ZE_FPS_IMMEDIATE;
+
 	const char* CurrentInput = Input;
-	int State = 0;
 	ZESize ArgumentIndex = -1;
 	
 	char ArgumentIndexString[2];
@@ -136,122 +591,151 @@ ZEString ZEFormat::Format(const char* Input, const ZEVariant* Arguments, ZESize 
 	{
 		switch(State)
 		{
-			case ZE_FPS_IMMEDIATE: // Immediate Mode
+			case ZE_FPS_IMMEDIATE:
 				if (*CurrentInput == '{')
 				{
-					if (*(CurrentInput + 1) != '\0' && *(CurrentInput + 1) != '{')
+					if (*(CurrentInput + 1) != '\0' && *(CurrentInput + 1) == '{')
 					{
-						*CurrentOutput == '{';
-						CurrentOutput++;
+						Writer.Append('{');
 						CurrentInput++;
 					}
-					State = 2;
+					else
+						State = ZE_FPS_ARGUMENT_INDEX_START;
+				}
+				else if (*CurrentInput == '}')
+				{
+					if (*(CurrentInput + 1) != '\0' && *(CurrentInput + 1) == '}')
+					{
+						Writer.Append('}');
+						CurrentInput++;
+					}
+					else
+					{
+						zeError("Formatting error. Mismatch '}' character.");
+						return "";
+					}
 				}
 				else
-					*CurrentOutput = *CurrentInput;
+				{
+					Writer.Append(*CurrentInput);
+				}
 
 				CurrentInput++;
 				break;
 
-			case ZE_FPS_ARGUMENT_INDEX_START: // Argument Index Start
+			case ZE_FPS_ARGUMENT_INDEX_START:
 				if (*CurrentInput == ' ' || *CurrentInput == '\t')
 					CurrentInput++;
 				else if (isdigit(*CurrentInput))
-					State = 2;
+					State = ZE_FPS_ARGUMENT_INDEX;
 				else
+				{
 					zeError("Formatting error. Argument index must be integer.");
+					return "";
+				}
 				break;
 			
-			case ZE_FPS_ARGUMENT_INDEX: // Argument Index
+			case ZE_FPS_ARGUMENT_INDEX:
 				if (*CurrentInput == ' ' || *CurrentInput == '\t' || *CurrentInput == ':' || *CurrentInput == '}')
 				{
-					if (*CurrentInput == '}')
-
 					ArgumentIndexString[ArgumentIndexStringIndex] = '\0';
 					ArgumentIndex = atoi(ArgumentIndexString);
 					ArgumentIndexStringIndex = 0;
 
+					if (ArgumentIndex >= Count)
+					{
+						zeError("Formatting error. Argument index is out of bounds.");
+						return "";
+					}
+
 					if (*CurrentInput == ':')
-						State = 4;
+						State = ZE_FPS_ARGUMENT_FORMATTING;
+					else if (*CurrentInput == '}')
+						State = ZE_FPS_APPLY;
+					else 
+						State = ZE_FPS_ARGUMENT_INDEX_END;
+
 				}
 				else if (isdigit(*CurrentInput))
 				{
-					if (ArgumentIndex >= 3)
+					if (ArgumentIndexStringIndex >= 3)
 					{
 						zeError("Formatting error. Argument index is too big.");
-						return ZEString();
+						return false;
 					}
 
-					ArgumentIndexString[ArgumentIndex] = *CurrentInput;
-					ArgumentIndex++;
-					CurrentInput++;
-
+					ArgumentIndexString[ArgumentIndexStringIndex] = *CurrentInput;
+					ArgumentIndexStringIndex++;
 				}
 				else
 				{
 					zeError("Formatting Error. Argument index must be integer.");
-					return ZEString();
+					return "";
 				}
+				CurrentInput++;
 				break;
 
 			case ZE_FPS_ARGUMENT_INDEX_END: // Argument Index End
 				if (*CurrentInput == ' ' || *CurrentInput == '\t')
-					CurrentInput++;
+				{
+
+				}
+				else if (*CurrentInput == '}')
+				{
+					State = ZE_FPS_APPLY;
+				}
 				else if (*CurrentInput == ':')
 				{
-					State = 4;
+					State = ZE_FPS_ARGUMENT_FORMATTING;
 					CurrentInput++;
 				}
 				else
 				{
-					zeError("Formatting error. Expected ':' after argument index.");
-					return ZEString();
+					zeError("Formatting error. Expected ':' or '}' after argument index.");
+					return "";
 				}
+
+				CurrentInput++;
 				break;
 
-			case ZE_FPS_ARGUMENT_FORMATTING_START: // Formatting String Mode
+			case ZE_FPS_ARGUMENT_FORMATTING:
 				if (*CurrentInput == '}')
 				{
-					if (ArgumentIndex == -1)
-					{
-						zeError("Formatting error. Argument index is missing.");
-						return ZEString();
-					}
-
-					if (ArgumentIndex >= Count)
-					{
-						zeError("Formatting error. Argument index is out of bounds.");
-						return ZEString();
-					}
-					
-					// Do Stuff
-					ArgumentFormat[ArgumentFormatIndex] = '\0';
-					
-					ZESSize BytesWritten = PrintVariant(CurrentOutput, Arguments[ArgumentIndex], ArgumentFormat);
-					if (BytesWritten == -1)
-					{
-						zeError("Formatting error. Argument format is invalid.");
-						return ZEString();
-					}
-
-					ArgumentIndex = -1;
-					ArgumentFormatIndex = 0;
-
-					CurrentOutput += BytesWritten;
+					State = ZE_FPS_APPLY;
 				}
-				break;
-			case ZE_FPS_ARGUMENT_FORMATTING
+				else
+				{
+					ArgumentFormat[ArgumentFormatIndex] = *CurrentInput;
+					ArgumentFormatIndex++;
+				}
+
+				CurrentInput++;
 				break;
 
-			case ZE_FPS_ARGUMENT_FORMATTING_END
+			case ZE_FPS_APPLY:
+				ArgumentFormat[ArgumentFormatIndex] = '\0';
+
+				ZEString PrintOutput;
+				if (!FormatArgumentVariant(Writer, *Arguments[ArgumentIndex], ArgumentFormat))
+					return false;
+				
+				ArgumentIndex = -1;
+				ArgumentFormatIndex = 0;
+
+				State = ZE_FPS_IMMEDIATE;
 				break;
 		}
-
-		if (State != 0)
-		*CurrentOutput = '\0';
-
 	}
 
+	if (State != 0)
+	{
+		zeError("Formatting error. There are non-closed argument available in the format.");
+		return false;
+	}
+
+	ZEString Output;
+	Writer.AppendEnd();
+	Writer.Output(Output);
+
+	return Output;
 }
-// {parameter index : formatting string} {{ }}
-*/
