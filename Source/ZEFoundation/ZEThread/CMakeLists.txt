@@ -37,24 +37,34 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZELock.cpp         		Sources)
 ze_add_source(ZELock.h          	 	Sources Headers)
+ze_add_source(ZELockTests.cpp			Tests)
 ze_add_source(ZEMutex.cpp   			Sources)
 ze_add_source(ZEMutex_Unix.cpp   		Sources PLATFORMS Unix)
 ze_add_source(ZEMutex_Windows.cpp  		Sources PLATFORMS Windows)
-ze_add_source(ZEMutex.h    	 			Sources Headers)
+ze_add_source(ZEMutex.h    	 		Sources Headers)
+ze_add_source(ZEMutexTests.cpp			Tests)
 ze_add_source(ZESignal.cpp   			Sources)
 ze_add_source(ZESignal_Unix.cpp   		Sources PLATFORMS Unix)
-ze_add_source(ZESignal_Windows.cpp  	Sources PLATFORMS Windows)
+ze_add_source(ZESignal_Windows.cpp  		Sources PLATFORMS Windows)
 ze_add_source(ZESignal.h    	 		Sources Headers)
+ze_add_source(ZESignalTests.cpp			Tests)
 ze_add_source(ZEThread.cpp       		Sources)
 ze_add_source(ZEThread_Unix.cpp 		Sources PLATFORMS Unix)
 ze_add_source(ZEThread_Windows.cpp		Sources PLATFORMS Windows)
-ze_add_source(ZEThread.h				Sources Headers)
+ze_add_source(ZEThread.h			Sources Headers)
+ze_add_source(ZEThreadTests.cpp			Tests)
 
 ze_add_library(ZEThread
 	SOURCES ${Sources} 
-	HEADERS ${Headers} 
+	HEADERS ${Headers}
+	LIBS ZEFoundation 
 	INSTALL
 	INSTALL_DESTINATION ZEFoundation/ZEThread
 	INSTALL_COMPONENT ZESDK)
+
+ze_add_test(ZEThreadTests
+	SOURCES ${Tests}
+	EXTRA_SOURCES
+	TEST_TARGET ZEThread)
 
 ze_link(ZEThread PLATFORMS Unix LIBS pthread)
