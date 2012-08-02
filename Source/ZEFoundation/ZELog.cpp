@@ -265,6 +265,9 @@ ZELogCallback ZELog::GetCallback()
 
 void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 {
+	if (Type < GetMinimumLogLevel())
+		return;
+
 	char Buffer[4096];
 
 	va_list VList;
@@ -297,6 +300,9 @@ void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 
 void ZELog::Log(const char* Module, const char* Format, ...)
 {
+	if (ZE_LOG_INFO < GetMinimumLogLevel())
+		return;
+
 	char Buffer[4096];
 	va_list VList;
 	va_start(VList, Format);

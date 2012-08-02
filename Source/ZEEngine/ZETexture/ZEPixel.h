@@ -128,7 +128,7 @@ ZEPackStruct
 	struct ZEPixelRG32F
 	{
 		float R;
-		float B;
+		float G;
 	}
 );
 

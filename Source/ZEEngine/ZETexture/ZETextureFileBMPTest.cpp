@@ -40,19 +40,8 @@
 #include "ZEBitmap.h"
 #include "ZETextureData.h"
 #include "ZETextureFileBMP.h"
-
-bool CompareImages(ZEBitmap* Original, ZEUInt32* Data, ZESize Width, ZESize Height)
-{
-	if (Original->GetWidth() != Width || Original->GetHeight() != Height)
-		return false;
-
-	for (ZESize y = 0; y < Height; y++)
-		for (ZESize x = 0; x < Width; x++)
-			if (((ZEUInt32*)Original->GetPixels())[y * Width + x] != Data[y * Width + x])
-				return false;
-
-	return true;
-}
+#include "ZETextureTestUtils.h"
+#include "ZETextureLoader.h"
 
 bool TestSuccess(ZEString FileName)
 {
@@ -65,32 +54,24 @@ bool TestSuccess(ZEString FileName)
 		return false;
 
 	ZETextureData* Data = Loader.Load(&File);
-
 	if (Data == NULL)
 		return false;
 
-	ZEBitmap Original;
-	if (!Original.Load(FileName))
-	{
-		//return false;
-	}
-	
-	ZETextureLevel* Level = &Data->GetSurfaces()[0].GetLevels()[0];
-	ZEBitmap Bitmap;
-	Bitmap.Create(Level->GetWidth(), Level->GetHeight(), 4);
-	Bitmap.CopyFrom(Level->GetData(), Level->GetPitch(), Level->GetWidth(), Level->GetHeight());
-	Bitmap.Save(FileName + ".result.bmp", ZE_BFF_BMP);
-
-	return true;//CompareImages(&Original, (ZEUInt32*)Level->GetData(), Data->GetWidth(), Data->GetHeight());
+	return ZETextureTestUtils::Compare(Data, FileName + ".zeTexture");
 }
 
 bool TestFail(ZEString FileName)
 {
+	ZELogType OldLogType = ZELog::GetInstance()->GetMinimumLogLevel();
+	ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_CRITICAL_ERROR);
+
 	ZEFile File;
 	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 
 	ZETextureFileBMP Loader;
 	ZETextureData* Data = Loader.Load(&File);
+
+	ZELog::GetInstance()->SetMinimumLogLevel(OldLogType);
 
 	return Data == NULL;
 }
@@ -134,33 +115,22 @@ ZETestSuite(ZETextureFileBMPTest)
 		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/rle8-blank-160x120.bmp"));
 		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/rle8-delta-320x240.bmp"));
 		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/rle8-encoded-320x240.bmp"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/SemiValid/8bpp-pixels-not-in-palette.bmp"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/SemiValid/pels-per-meter-x-large.bmp"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/SemiValid/pels-per-meter-x-negative.bmp"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/SemiValid/pels-per-meter-x-zero.bmp"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/SemiValid/pels-per-meter-y-large.bmp"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/SemiValid/pels-per-meter-y-negative.bmp"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/SemiValid/pels-per-meter-y-zero.bmp"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/SemiValid/pixeldata-rle8-toomuch.bmp"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/SemiValid/rle8-height-negative.bmp"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/SemiValid/rle8-no-end-of-bitmap-marker.bmp"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/SemiValid/8bpp-no-palette.bmp"));
 	}
 
-	ZETest("Semi Valid")
+	ZETest("Unsupported, Corrupted or Malicious")
 	{
-		// Semi Valid
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/8bpp-pixels-not-in-palette.bmp"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/pels-per-meter-x-large.bmp"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/pels-per-meter-x-negative.bmp"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/pels-per-meter-x-zero.bmp"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/pels-per-meter-y-large.bmp"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/pels-per-meter-y-negative.bmp"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/pels-per-meter-y-zero.bmp"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/pixeldata-rle8-toomuch.bmp"));
-		//ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/planes-large.bmp"));
-		//ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/planes-zero.bmp"));
-		//ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/reserved1-bad.bmp"));
-		//ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/reserved2-bad.bmp"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/rle8-height-negative.bmp"));
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/rle8-no-end-of-bitmap-marker.bmp"));
-		//ZETestCheck(TestSuccess("TestResources/ZETextureFileBMP/Valid/Questionable/8bpp-no-palette.bmp"));
-
-	}
-
-	ZETest("Corrupted or Malicius")
-	{
-		ZELogType OldLogType = ZELog::GetInstance()->GetMinimumLogLevel();
-		ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_CRITICAL_ERROR);
+		ZETestCheck(TestFail("Non Existent File"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-no-palette.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-pixeldata-cropped.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/24bpp-pixeldata-cropped.bmp"));
@@ -201,8 +171,8 @@ ZETestSuite(ZETextureFileBMPTest)
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle4-absolute-cropped.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle4-delta-cropped.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle4-no-end-of-line-marker.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle4-runlength-cropped.bmp"));
-		/*ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle8-absolute-cropped.bmp"));
+/*		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle4-runlength-cropped.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle8-absolute-cropped.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle8-delta-cropped.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle8-deltaleavesimage.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle8-no-end-of-line-marker.bmp"));
@@ -210,56 +180,52 @@ ZETestSuite(ZETextureFileBMPTest)
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/width-negative.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/width-times-height-overflow.bmp"));
 		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/width-zero.bmp"));
-		ZELog::GetInstance()->SetMinimumLogLevel(OldLogType);
-	}
-
-	ZETest("Unsupported Sample Types")
-	{
-		ZELogType OldLogType = ZELog::GetInstance()->GetMinimumLogLevel();
-		ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_CRITICAL_ERROR);
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Valid/Unsupported/filesize-bad.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Valid/Unsupported/filesize-zero.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Valid/Unsupported/pixeldata-toomuch.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/32bpp-101110-320x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-1x1.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-320x240-color.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-320x240-overlappingcolor.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-320x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-321x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-322x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-323x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-324x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-325x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-326x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-327x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-328x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-329x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-330x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-331x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-332x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-333x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-334x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-335x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/1bpp-topdown-320x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/32bpp-0x0.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/32bpp-0x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/32bpp-320x0.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/4bpp-1x1.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/4bpp-320x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/4bpp-321x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/4bpp-322x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/4bpp-323x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/4bpp-324x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/4bpp-325x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/4bpp-326x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/4bpp-327x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/4bpp-topdown-320x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/rle4-absolute-320x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/rle4-alternate-320x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/rle4-delta-320x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/rle4-encoded-320x240.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/rle4-height-negative.bmp"));
-		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Unsupported/rle4-no-end-of-bitmap-marker.bmp"));
-		ZELog::GetInstance()->SetMinimumLogLevel(OldLogType);
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/Unsupported/filesize-bad.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/Unsupported/filesize-zero.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/Unsupported/pixeldata-toomuch.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/32bpp-101110-320x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-1x1.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-320x240-color.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-320x240-overlappingcolor.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-320x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-321x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-322x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-323x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-324x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-325x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-326x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-327x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-328x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-329x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-330x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-331x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-332x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-333x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-334x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-335x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/1bpp-topdown-320x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/32bpp-0x0.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/32bpp-0x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/32bpp-320x0.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/4bpp-1x1.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/4bpp-320x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/4bpp-321x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/4bpp-322x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/4bpp-323x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/4bpp-324x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/4bpp-325x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/4bpp-326x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/4bpp-327x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/4bpp-topdown-320x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle4-absolute-320x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle4-alternate-320x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle4-delta-320x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle4-encoded-320x240.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle4-height-negative.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/rle4-no-end-of-bitmap-marker.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/planes-large.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/planes-zero.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/reserved1-bad.bmp"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileBMP/Invalid/reserved2-bad.bmp"));
 	}
 }

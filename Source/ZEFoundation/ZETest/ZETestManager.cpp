@@ -46,6 +46,15 @@
 
 #include <string.h>
 
+void ZETestManager::SetVisualStudioOutput(bool Enabled)
+{
+	VisualStudioOutput = Enabled;
+}
+bool ZETestManager::GetVisualStudioOutput()
+{
+	return VisualStudioOutput;
+}
+
 void ZETestManager::RegisterTestSuite(ZETestSuiteItem* Suite)
 {
 	TestSuites[TestSuiteCount] = Suite;
@@ -67,6 +76,7 @@ bool ZETestManager::RunTests()
 	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(false);
 	ZEError::GetInstance()->SetBreakOnErrorEnabled(false);
 	ZEError::GetInstance()->SetBreakOnWarningEnabled(false);
+	ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_ERROR);
 
 	bool Result = true;
 	for (ZESize I = 0; I < TestSuiteCount; I++)
@@ -79,14 +89,18 @@ bool ZETestManager::RunTests()
 		catch(...)
 		{
 			printf("%s : error T0004: Exception occurred. Package Name : \"%s\". \r\n", GetPackageName(), GetPackageName());
+
 			Result = false;
 			break;
 		}
 	}
 	
 	if (!Result)
+	{
 		printf("%s : error T0003: Test package failed. Package Name : \"%s\". \r\n", GetPackageName(), GetPackageName());
+	}
 
+	ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_INFO);
 	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(true);
 	ZEError::GetInstance()->SetBreakOnErrorEnabled(true);
 	ZEError::GetInstance()->SetBreakOnWarningEnabled(true);
@@ -115,9 +129,17 @@ void ZETestManager::ReportProblem(ZETestSuiteItem* Suite, ZETestItem* Test, ZETe
 	}
 
 	if (Type == ZE_TPT_ERROR)
-		printf("  %s(%d) : warning T0001: Test failed. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", File, Line, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
+	{
+		printf("  Test failed. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
+		if (VisualStudioOutput)
+			printf("  %s(%d) : warning T0001: Test failed. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", File, Line, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
+	}
 	else
-		printf("  %s(%d) : warning T0002: Test gived warning. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", File, Line, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
+	{
+		printf("  Test gave warning. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
+		if (VisualStudioOutput)
+			printf("  %s(%d) : warning T0002: Test gave warning. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", File, Line, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
+	}
 }
 
 ZETestManager* ZETestManager::GetInstance()
@@ -127,4 +149,11 @@ ZETestManager* ZETestManager::GetInstance()
 		Instance = new ZETestManager();
 
 	return Instance;
+}
+
+ZETestManager::ZETestManager()
+{
+	VisualStudioOutput = false;
+	TestSuiteCount = 0;
+	PackageName[0] = '\0';
 }

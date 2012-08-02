@@ -47,14 +47,23 @@ class ZETexturePixelConverter
 		static void ConvertIndexed(ZEPixelRGBA8* Destination, void* Source, ZESize Count, ZEPixelRGBA8* Palette);
 		static void ConvertIndexed16(ZEPixelRGBA8* Destination, void* Source, ZESize Count, ZEPixelRGBA8* Palette);
 
+		static void ConvertL8_INV(ZEPixelL8* Destination, void* Source, ZESize Count);
+		static void ConvertLA8_INV(ZEPixelLA8* Destination, void* Source, ZESize Count);
+
+		static void ConvertL16_INV(ZEPixelL16* Destination, void* Source, ZESize Count);
+		static void ConvertLA16_INV(ZEPixelLA16* Destination, void* Source, ZESize Count);
+
+		static void ConvertL16_INV_BE(ZEPixelL16* Destination, void* Source, ZESize Count);
+		static void ConvertLA16_INV_BE(ZEPixelLA16* Destination, void* Source, ZESize Count);
+
 		static void ConvertL16_BE(ZEPixelL16* Destination, void* Source, ZESize Count);
 		static void ConvertLA16_BE(ZEPixelLA16* Destination, void* Source, ZESize Count);
 
 		static void ConvertAL8(ZEPixelLA8* Destination, void* Source, ZESize Count);
 		static void ConvertAL16(ZEPixelLA16* Destination, void* Source, ZESize Count);
 
-		static void ConvertBGR555(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
-		static void ConvertBGRA1555(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
+		static void ConvertBGRX5551(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
+		static void ConvertBGRA5551(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
 		static void ConvertBGRX1555(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
 		static void ConvertBGR565(ZEPixelRGBA8* Destination, void* Source, ZESize Count);
 

@@ -219,7 +219,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 	ZETextureFileHeader	FileHeader;
 	if(File->Read(&FileHeader, sizeof(ZETextureFileHeader), 1) != 1)
 	{
-		zeCriticalError("Cannot read file header from disk! File name: \"&s\".", File->GetPath().GetValue());
+		zeError("Cannot read file header from disk! File name: \"&s\".", File->GetPath().GetValue());
 		TextureData->Destroy();
 		return false;
 	}
@@ -227,7 +227,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 	// Check File header is correct
 	if(FileHeader.ChunkId != ZE_TXTF_HEADER)
 	{
-		zeCriticalError("File header chunk id mismatch. Possible corruption. File name: \"&s\".", File->GetPath().GetValue());
+		zeError("File header chunk id mismatch. Possible corruption. File name: \"&s\".", File->GetPath().GetValue());
 		TextureData->Destroy();
 		return false;
 	}
@@ -247,7 +247,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 		ZETextureFileSurfaceChunk	SurfaceChunk;
 		if(File->Read(&SurfaceChunk, sizeof(ZETextureFileSurfaceChunk), 1) != 1)
 		{
-			zeCriticalError("Cannot read surface header from disk! File name: \"&s\".", File->GetPath().GetValue());
+			zeError("Cannot read surface header from disk! File name: \"&s\".", File->GetPath().GetValue());
 			TextureData->Destroy();
 			return false;
 		}
@@ -255,7 +255,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 		// Check surface header is correct
 		if(SurfaceChunk.ChunkId != ZE_TXTF_SURF_CHUNKID)
 		{
-			zeCriticalError("Surface chunk id mismatch. Possible corruption. File name: \"&s\".", File->GetPath().GetValue());
+			zeError("Surface chunk id mismatch. Possible corruption. File name: \"&s\".", File->GetPath().GetValue());
 			TextureData->Destroy();
 			return false;
 		}
@@ -269,7 +269,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 			ZETExtureFileMipmapChunk MipmapChunk;
 			if(File->Read(&MipmapChunk, sizeof(ZETExtureFileMipmapChunk), 1) != 1)
 			{
-				zeCriticalError("Cannot read level header from disk! File name: \"&s\".", File->GetPath().GetValue());
+				zeError("Cannot read level header from disk! File name: \"&s\".", File->GetPath().GetValue());
 				TextureData->Destroy();
 				return false;
 			}
@@ -277,7 +277,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 			// Check level header is correct
 			if(MipmapChunk.ChunkId != ZE_TXTF_MIP_CHUNKID)
 			{
-				zeCriticalError("Level chunk id mismatch. Possible corruption. File name: \"&s\".", File->GetPath().GetValue());
+				zeError("Level chunk id mismatch. Possible corruption. File name: \"&s\".", File->GetPath().GetValue());
 				TextureData->Destroy();
 				return false;
 			}
@@ -286,7 +286,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 
 			if (CurrentLevel->GetRowCount() != MipmapChunk.RowCount || CurrentLevel->GetPitch() != (ZESize)MipmapChunk.RowSize )
 			{
-				zeCriticalError("Unexpected level data red from file. File name: \"&s\".", File->GetPath().GetValue());
+				zeError("Unexpected level data red from file. File name: \"&s\".", File->GetPath().GetValue());
 				TextureData->Destroy();
 				return false;
 			}
@@ -296,7 +296,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 			{
 				if(File->Read(CurrentLevel->GetData(), CurrentLevel->GetSize(), 1) != 1)
 				{
-					zeCriticalError("Cannot read level data from disk! File name: \"&s\".", File->GetPath().GetValue());
+					zeError("Cannot read level data from disk. File name: \"&s\".", File->GetPath().GetValue());
 					TextureData->Destroy();
 					return false;
 				}
@@ -304,14 +304,14 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 			
 			if (File->Eof())
 			{
-				zeCriticalError("Eof reached... Possible corruption! File name: \"&s\".", File->GetPath().GetValue());
+				zeError("Eof reached. Possible corruption. File name: \"&s\".", File->GetPath().GetValue());
 				TextureData->Destroy();
 				return false;
 			}
 		}
 	}
 
-	zeLog("Texture loaded successfully: \"%s\".", File->GetPath().GetValue());
+	zeLog("Texture loaded successfully. \"%s\".", File->GetPath().GetValue());
 	return true;
 }
 
@@ -331,7 +331,7 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 	// Write file header
 	if(File->Write(&FileHeader, sizeof(ZETextureFileHeader), 1) != 1)
 	{
-		zeCriticalError("Cannot write file header to disk!");
+		zeError("Cannot write file header to disk.");
 		return false;
 	}
 
@@ -344,7 +344,7 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 
 		if(File->Write(&SurfaceChunk, sizeof(ZETextureFileSurfaceChunk), 1) != 1)
 		{
-			zeCriticalError("Cannot write surface header to disk! File name: \"&s\".", File->GetPath().GetValue());
+			zeError("Cannot write surface header to disk. File name: \"&s\".", File->GetPath().GetValue());
 			return false;
 		}
 
@@ -359,7 +359,7 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 
 			if(File->Write(&MipmapChunk, sizeof(ZETExtureFileMipmapChunk), 1) != 1)
 			{
-				zeCriticalError("Cannot write level header to disk! File name: \"&s\".", File->GetPath().GetValue());
+				zeError("Cannot write level header. File name: \"&s\".", File->GetPath().GetValue());
 				return false;
 			}
 
@@ -369,14 +369,14 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 			{
 				if(File->Write(CurrentLevel->GetData(), CurrentLevel->GetSize(), 1) != 1)
 				{
-					zeCriticalError("Cannot write level data! File name: \"&s\".", File->GetPath().GetValue());
+					zeError("Cannot write level data! File name: \"&s\".", File->GetPath().GetValue());
 					return false;
 				}
 			}
 
 			if (File->Eof())
 			{
-				zeCriticalError("Eof reached... Possible corruption! File name: \"&s\".", File->GetPath().GetValue());
+				zeError("Eof reached. Possible corruption! File name: \"&s\".", File->GetPath().GetValue());
 				TextureData->Destroy();
 				return false;
 			}

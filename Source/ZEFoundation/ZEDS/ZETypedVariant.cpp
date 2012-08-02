@@ -51,35 +51,19 @@
 void ZETypedVariant::SetString(char *NewValue)
 {
 	zeDebugCheck(Type != ZE_VRT_STRING && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetString operation failed. Types does not match.");
-	if(Type == ZE_VRT_STRING || Type == ZE_VRT_MATRIX3X3 || Type == ZE_VRT_MATRIX4X4)
-	{
-		if (Value.String != NULL || Type == ZE_VRT_UNDEFINED)
-			delete[] Value.String;
-		Value.String = new char[strlen(NewValue) + 1];
-		strcpy(Value.String, NewValue);
-		return;
-	}
 
-	if (Type == ZE_VRT_UNDEFINED)
-	{
-		SetType(ZE_VRT_STRING);
-		SetString(NewValue);
+	if (Type == ZE_VRT_STRING ||Type == ZE_VRT_UNDEFINED)
+	{	
+		ZEVariant::SetString(NewValue);
 	}
 }
 
 void ZETypedVariant::SetInteger(ZEInt NewValue)
 {
 	zeDebugCheck(Type != ZE_VRT_INTEGER_32 && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetInteger operation failed. Types does not match.");
-	if (Type == ZE_VRT_INTEGER_32)
+	if (Type == ZE_VRT_INTEGER_32 || Type == ZE_VRT_UNDEFINED)
 	{
-		Value.Int32 = NewValue;
-		return;
-	}
-
-	if (Type == ZE_VRT_UNDEFINED)
-	{
-		SetType(ZE_VRT_INTEGER_32);
-		Value.Int32 = NewValue;
+		ZEVariant::SetInt32(NewValue);
 	}
 
 }
@@ -87,71 +71,36 @@ void ZETypedVariant::SetInteger(ZEInt NewValue)
 void ZETypedVariant::SetFloat(float NewValue)
 {
 	zeDebugCheck(Type != ZE_VRT_FLOAT && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetFloat operation failed. Types does not match.");
-	if(Type == ZE_VRT_FLOAT)
+	if(Type == ZE_VRT_FLOAT || Type == ZE_VRT_UNDEFINED)
 	{
-		Value.Float = NewValue;
-		return;
-	}
-
-	if (Type == ZE_VRT_UNDEFINED)
-	{
-		SetType(ZE_VRT_FLOAT);
-		Value.Float = NewValue;
+		ZEVariant::SetFloat(NewValue);
 	}
 }
 
 void ZETypedVariant::SetBoolean(bool NewValue)
 {
 	zeDebugCheck(Type != ZE_VRT_BOOLEAN && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetBoolean operation failed. Types does not match.");
-	if(Type == ZE_VRT_BOOLEAN)
+	if(Type == ZE_VRT_BOOLEAN || Type == ZE_VRT_UNDEFINED)
 	{
-		Value.Boolean = NewValue;
-		return;
-	}
-
-	if (Type == ZE_VRT_UNDEFINED)
-	{
-		SetType(ZE_VRT_BOOLEAN);
-		Value.Boolean = NewValue;
-
+		ZEVariant::SetBoolean(NewValue);
 	}
 }
 
 void ZETypedVariant::SetVariant(const ZEVariant &NewValue)
 {
 	zeDebugCheck(Type != NewValue.GetType() && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetVariant operation failed. Types does not match.");
-	if(Type == NewValue.GetType())
+	if(Type == NewValue.GetType() || Type == ZE_VRT_UNDEFINED)
 	{
-		if(Type == ZE_VRT_STRING)
-			SetString(NewValue.GetString());
-		else
-			Value = NewValue.GetValue();
-		return;
-	}
-
-	if (Type == ZE_VRT_UNDEFINED)
-	{
-		SetType(NewValue.GetType());
-		Value.Int32 = NewValue.GetValue().Int32;
+		ZEVariant::SetVariant(NewValue);
 	}
 }
 
 void ZETypedVariant::SetTypedVariant(const ZETypedVariant &NewValue)
 {
 	zeDebugCheck(Type != NewValue.GetType() && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetTypedVariant operation failed. Types does not match.");
-	if(Type == NewValue.GetType())
+	if(Type == NewValue.GetType() || Type == ZE_VRT_UNDEFINED)
 	{
-		if(Type == ZE_VRT_STRING)
-			SetString(NewValue.Value.String);
-		else
-			Value.Int32 = NewValue.Value.Int32;
-		return;
-	}
-
-	if (Type == ZE_VRT_UNDEFINED)
-	{
-		SetType(NewValue.GetType());
-		Value.Int32 = NewValue.GetValue().Int32;
+		SetVariant(NewValue);
 	}
 }
 
@@ -188,7 +137,7 @@ void ZETypedVariant::operator=(ZETypedVariant& NewValue)
 ZETypedVariant::ZETypedVariant()
 {
 	Type = ZE_VRT_UNDEFINED;
-	Value.String = NULL;
+	Value.Pointer = NULL;
 }
 
 ZETypedVariant::ZETypedVariant(ZEVariant& InitialValue)

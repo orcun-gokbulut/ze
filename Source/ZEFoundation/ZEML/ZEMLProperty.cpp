@@ -206,7 +206,7 @@ void ZEMLProperty::WriteToFile(ZEFile* File)
 			WritenDataSize = File->Write(&Value.ImplicitAcesss().Boolean, Value.SizeOf(), 1);
 			break;
 		case ZE_VRT_STRING:
-			WritenDataSize = File->Write(Value.ImplicitAcesss().String, Value.SizeOf(), 1);
+			WritenDataSize = File->Write(Value.ImplicitAcesss().String.GetValue(), Value.ImplicitAcesss().String.GetSize(), 1);
 			break;
 		case ZE_VRT_QUATERNION:
 			WritenDataSize = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEQuaternion), 1);
@@ -320,6 +320,7 @@ void ZEMLProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 				Value.SetType(ZE_VRT_STRING);
 				char* TempBuffer = new char[DataSize];
 				ReadDataSize = File->Read(TempBuffer, DataSize, 1);
+				TempBuffer[DataSize - 1] = '\0';
 				Value.SetString(TempBuffer);
 				delete TempBuffer;
 			}

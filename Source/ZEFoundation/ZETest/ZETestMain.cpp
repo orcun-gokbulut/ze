@@ -48,6 +48,10 @@ ZEInt main(ZEInt Argc, char** Argv)
 
 	ZETestManager* Manager = ZETestManager::GetInstance();
 
+	Manager->SetVisualStudioOutput(false);
+	if (Argc == 2)
+		Manager->SetVisualStudioOutput(strcmp(Argv[1], "-vs") == 0);
+
 	Manager->SetPackageName(Argv[0]);
 	Manager->RunTests();
 

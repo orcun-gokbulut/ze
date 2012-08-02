@@ -198,7 +198,7 @@ static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA
 						if (File->Read(SourceRow, Align, 1) != 1)
 							return NULL;
 
-						ZETexturePixelConverter::ConvertBGR555(DestinationRow, SourceRow, Width);
+						ZETexturePixelConverter::ConvertBGRX5551(DestinationRow, SourceRow, Width);
 						DestinationRow += DestinationRowStep;
 					}
 				}
@@ -232,7 +232,7 @@ static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA
 					if (File->Read(SourceRow, Align, 1) != 1)
 						return NULL;
 
-					ZETexturePixelConverter::ConvertBGRA8(DestinationRow, SourceRow, Width);
+					ZETexturePixelConverter::ConvertBGRX8(DestinationRow, SourceRow, Width);
 					DestinationRow += DestinationRowStep;
 				}
 				break;
@@ -242,7 +242,7 @@ static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA
 	return Texture.Transfer();
 }
 
-static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA8* Palette)
+static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA8* Palette, bool EnableErrorOutput)
 {
 	ZEUInt64 FileSize = File->GetSize();
 
@@ -251,13 +251,15 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA8* Palet
 	Result = File->Read(Header, 1, sizeof(ZEBitmapHeader));
 	if (Result < 54)
 	{
-		zeError("Can not load BMP file header.");
+		if (EnableErrorOutput)
+			zeError("Can not load BMP file header.");
 		return false;
 	}
 
 	if (Header->Header != 'MB')
 	{
-		zeError("Unknown BMP file format.");
+		if (EnableErrorOutput)
+			zeError("Unknown BMP file format.");
 		return false;
 	}
 
@@ -266,31 +268,36 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA8* Palet
 
 	if (Header->Height == 0 || Header->Width == 0)
 	{
-		zeError("Corrupted or malicious BMP file. Zero width or height.");
+		if (EnableErrorOutput)
+			zeError("Corrupted or malicious BMP file. Zero width or height.");
 		return false;
 	}
 
 	if (Header->Width < 0)
 	{
-		zeError("Corrupted or malicious BMP file. Negative width.");
+		if (EnableErrorOutput)
+			zeError("Corrupted or malicious BMP file. Negative width.");
 		return false;
 	}
 
 	if (Width > 65536 || Height > 65536)
 	{
-		zeError("Corrupted or malicious BMP file. Width or height of a BMP file can not exceed 65536.");
+		if (EnableErrorOutput)
+			zeError("Corrupted or malicious BMP file. Width or height of a BMP file can not exceed 65536.");
 		return false;
 	}
 
 	if (Width * Height * 4 == 0)
 	{
-		zeError("Corrupted or malicious BMP file. 32bit size overflow detected.");
+		if (EnableErrorOutput)
+			zeError("Corrupted or malicious BMP file. 32bit size overflow detected.");
 		return false;
 	}
 
 	if (Header->DataSize > FileSize) 
 	{
-		zeError("Corrupted or malicious BMP file. File size is too small.");
+		if (EnableErrorOutput)
+			zeError("Corrupted or malicious BMP file. File size is too small.");
 		return false;
 	}
 
@@ -318,7 +325,8 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA8* Palet
 
 	if (Header->BitsPerPixel != 8 && Header->BitsPerPixel != 16 && Header->BitsPerPixel != 24 && Header->BitsPerPixel != 32)
 	{
-		zeError("Unsuppored BMP file pixel format. Only 8, 16, 24 and 32 bit pixel formats supported.");
+		if (EnableErrorOutput)
+			zeError("Unsuppored BMP file pixel format. Only 8, 16, 24 and 32 bit pixel formats supported.");
 		return false;
 	}
 	
@@ -330,7 +338,8 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA8* Palet
 		case 1:
 			if (Header->BitsPerPixel != 8)
 			{
-				zeError("Unsupported compressed format.");
+				if (EnableErrorOutput)
+					zeError("Unsupported compressed format.");
 				return false;
 			}
 			break;
@@ -353,13 +362,15 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA8* Palet
 				Header->GreenMask == ZEEndian::Big(0x0000FF00) && 
 				Header->BlueMask  == ZEEndian::Big(0x000000FF)))
 			{
-				zeError("Unsupported color mask.");
+				if (EnableErrorOutput)
+					zeError("Unsupported color mask.");
 				return false;
 			}
 			break;
 
 		default:
-			zeError("Unsupported encoding method.");
+			if (EnableErrorOutput)
+				zeError("Unsupported encoding method.");
 			return false;
 	}
 
@@ -371,18 +382,21 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA8* Palet
 		
 		if (Header->PaletteEntryCount > 256)
 		{
-			zeError("Only 256 pallette entries supported.");
+			if (EnableErrorOutput)
+				zeError("Only 256 pallette entries supported.");
 			return false;
 		}
 
+		ZEUInt32 PaletteData[256];
 		File->Seek(14 + Header->Size, ZE_SF_BEGINING);
-		if (File->Read(Palette, sizeof(ZEPixelRGBA8), Header->PaletteEntryCount) != Header->PaletteEntryCount)
+		if (File->Read(PaletteData, sizeof(ZEPixelRGBA8), Header->PaletteEntryCount) != Header->PaletteEntryCount)
 		{
-			zeError("Can not load BMP file's palate entries.");
+			if (EnableErrorOutput)
+				zeError("Can not load BMP file's palate entries.");
 			return false;
 		}
 
-		ZETexturePixelConverter::ConvertBGRA8(Palette, Palette, Header->PaletteEntryCount);
+		ZETexturePixelConverter::ConvertBGRX8(Palette, PaletteData, Header->PaletteEntryCount);
 	}
 
 	return true;
@@ -390,14 +404,18 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA8* Palet
 
 static ZETextureData* Load(ZEFile* File)
 {
+	if (File == NULL || !File->IsOpen())
+	{
+		zeError("File is not opened.");
+		return NULL;
+	}
+
 	ZEBitmapHeader Header;
 	ZEPixelRGBA8 Palette[256];
-
-	if (!LoadHeader(File, &Header, Palette))
+	if (!LoadHeader(File, &Header, Palette, true))
 		return NULL;
 
 	ZETextureData* Data = LoadData(File, &Header, Palette);
-
 	if (Data == NULL)
 		zeError("Can not load pixel data.");
 	
@@ -406,12 +424,15 @@ static ZETextureData* Load(ZEFile* File)
 
 bool ZETextureFileBMP::LoadInfo(ZETextureDataInfo* Info, ZEFile* File)
 {
-	if (File == NULL)
-		return false;
+	if (File == NULL || !File->IsOpen())
+	{
+		zeError("File is not opened.");
+		return NULL;
+	}
 
 	ZEPixelRGBA8 Palette[256];
 	ZEBitmapHeader Header;
-	if (!LoadHeader(File, &Header, Palette))
+	if (!LoadHeader(File, &Header, Palette, false))
 		return false;
 
 	Info->Width = ZEMath::Abs((ZEInt16)Header.Width);
