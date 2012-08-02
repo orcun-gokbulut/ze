@@ -64,9 +64,9 @@ ZEPackStruct
 		ZEUInt8						ImageType;
 		
 		// Palette
-		ZELittleEndian<ZEUInt16>	PalleteFirstEntry;
-		ZELittleEndian<ZEUInt16>	PalleteSize;
-		ZEUInt8						PalleteEntryBPP;
+		ZELittleEndian<ZEUInt16>	PaletteFirstEntry;
+		ZELittleEndian<ZEUInt16>	PaletteSize;
+		ZEUInt8						PaletteEntryBPP;
 		
 		// Image
 		ZELittleEndian<ZEUInt16>	XOrgin;
@@ -122,10 +122,6 @@ static __forceinline void ConvertColorRow(ZEPixelRGBA8* Destination, ZEUInt8* So
 			ZETexturePixelConverter::ConvertBGRX5551(Destination, Source,  Width);
 			break;
 
-		case 15:
-			ZETexturePixelConverter::ConvertBGR565(Destination, Source, Width);
-			break;
-
 		case 24:
 			ZETexturePixelConverter::ConvertBGR8(Destination, Source,  Width);
 			break;
@@ -135,6 +131,7 @@ static __forceinline void ConvertColorRow(ZEPixelRGBA8* Destination, ZEUInt8* So
 			break;
 	}
 }
+
 
 static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8* Palette)
 {
@@ -146,28 +143,34 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8
 	ZESSize Step = (Header->ImageDescriptor & ZE_TIO_TOP_TO_BOTTOM ? 1 : -1);
 	ZESize Index = (Header->ImageDescriptor & ZE_TIO_TOP_TO_BOTTOM ? 0 :  Header->Height - 1);
 
+	ZESize DestinationPixelSize = 0;
 	ZEPointer<ZETextureData> Texture = new ZETextureData();
-	if (Header->ImageType == ZE_TIT_COLOR || Header->ImageType == ZE_TIT_INDEXED)
+	if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_COLOR || (Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_INDEXED)
 	{
 		Texture->Create(ZE_TT_2D, ZE_TPF_RGBA8, 1, 1, Width, Height);
+		DestinationPixelSize = 4;
 	}
 	else
 	{
 		if (Header->BPP == 8)
+		{
 			Texture->Create(ZE_TT_2D, ZE_TPF_L8, 1, 1, Width, Height);
+			DestinationPixelSize = 1;
+		}
 		else
-			Texture->Create(ZE_TT_2D, ZE_TPF_L16, 1, 1, Width, Height);
+		{
+			Texture->Create(ZE_TT_2D, ZE_TPF_LA8, 1, 1, Width, Height);
+			DestinationPixelSize = 2;
+		}
 	}
 
-	
-	ZEPixelRGBA8* Destination = (ZEPixelRGBA8*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
-	ZEPixelRGBA8* DestinationEnd = Destination + Height * Width;
+	ZEUInt8* Destination = (ZEUInt8*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
+	ZEUInt8* DestinationEnd = (ZEUInt8*)Destination + Height * Width * DestinationPixelSize;
+	ZEUInt8* DestinationRow = (ZEUInt8*)Destination + Index * Width * DestinationPixelSize;
+	ZESSize	DestinationRowStep = Step * Width * DestinationPixelSize;
 
-	File->Seek(sizeof(ZETargaHeader) + Header->PalleteSize * GetPixelSize(Header->PalleteEntryBPP) + Header->IdSize, ZE_SF_BEGINING);
+	File->Seek(sizeof(ZETargaHeader) + Header->PaletteSize * GetPixelSize(Header->PaletteEntryBPP) + Header->IdSize, ZE_SF_BEGINING);
 
-	ZEPixelRGBA8* DestinationRow = Destination + Index * Width;
-	ZESSize	DestinationRowStep = Step * Width;
-	
 	ZESize SourceRowSize = Header->Width * PixelSize;
 	ZEPointer<ZEUInt8> SourceRow = new ZEUInt8[SourceRowSize];
 
@@ -180,17 +183,27 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8
 				if (File->Read(SourceRow, SourceRowSize, 1) != 1)
 					return NULL;
 
-				ConvertColorRow(DestinationRow, SourceRow, BPP, Width);
+				ConvertColorRow((ZEPixelRGBA8*)DestinationRow, SourceRow, BPP, Width);
 				DestinationRow += DestinationRowStep;
 			}
 		}
-		else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_GRAYSCALE)
+		else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_GRAYSCALE && Header->BPP == 8)
 		{
 			for (ZESize I = 0; I < Height; I++)
 			{
 				if (File->Read(DestinationRow, SourceRowSize, 1) != 1)
 					return NULL;
 
+				DestinationRow += DestinationRowStep;
+			}
+		}
+		else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_GRAYSCALE && Header->BPP == 16)
+		{
+			for (ZESize I = 0; I < Height; I++)
+			{
+				if (File->Read(SourceRow, SourceRowSize, 1) != 1)
+					return NULL;
+				ZETexturePixelConverter::ConvertAL8((ZEPixelLA8*)DestinationRow, SourceRow, Width);
 				DestinationRow += DestinationRowStep;
 			}
 		}
@@ -201,7 +214,7 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8
 				if (File->Read(SourceRow, SourceRowSize, 1) != 1)
 					return NULL;
 
-				ZETexturePixelConverter::ConvertIndexed(DestinationRow, SourceRow, Width, Palette);
+				ZETexturePixelConverter::ConvertIndexed((ZEPixelRGBA8*)DestinationRow, SourceRow, Width, Palette);
 				DestinationRow += DestinationRowStep;
 			}
 		}
@@ -215,8 +228,8 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8
 		Decompressor.SetWordSize(PixelSize);
 		Decompressor.SetInput(Block);
 		Decompressor.SetInputSize(BlockSize);
-		Decompressor.SetOutputSize(Width * PixelSize);
-		Decompressor.SetOutput(DestinationRow);
+		Decompressor.SetOutputSize(SourceRowSize);
+		Decompressor.SetOutput(SourceRow);
 
 		while (true)
 		{
@@ -229,7 +242,7 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8
 
 			while(true)
 			{
-				if (DestinationRow >= DestinationEnd)
+				if (DestinationRow < Destination || DestinationRow >= DestinationEnd)
 					break;
 
 				Decompressor.Decompress();
@@ -238,11 +251,14 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8
 				else if (Decompressor.GetState() == ZE_DS_OUTPUT_FULL)
 				{
 					if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_COLOR)
-						ConvertColorRow(DestinationRow, SourceRow, BPP, Width);
-					else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_GRAYSCALE)
-						memcpy(DestinationRow, SourceRow, Width * PixelSize);
+						ConvertColorRow((ZEPixelRGBA8*)DestinationRow, SourceRow, BPP, Width);
+					else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_GRAYSCALE && Header->BPP == 8)
+						memcpy(DestinationRow, SourceRow, SourceRowSize);
+					else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_GRAYSCALE && Header->BPP == 16)
+						ZETexturePixelConverter::ConvertAL8((ZEPixelLA8*)DestinationRow, SourceRow, Width);
 					else if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_INDEXED)
-						ZETexturePixelConverter::ConvertIndexed(DestinationRow, SourceRow, Width, Palette);
+						ZETexturePixelConverter::ConvertIndexed((ZEPixelRGBA8*)DestinationRow, SourceRow, Width, Palette);
+					
 					DestinationRow = DestinationRow + DestinationRowStep;
 				}
 				else
@@ -254,7 +270,7 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8
 	return Texture.Transfer();
 }
 
-static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8* Palette)
+static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8* Palette, bool OutputError)
 {
 	File->Seek(-(ZESSize)sizeof(ZETargaFooter), ZE_SF_END);
 	
@@ -264,7 +280,8 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8* Palett
 	Result = File->Read(&Footer, sizeof(ZETargaFooter), 1);
 	if (Result != 1)
 	{
-		zeError("Can not load TGA file footer.");
+		if (OutputError)
+			zeError("Can not load TGA file footer.");
 		return false;
 	}
 
@@ -272,7 +289,8 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8* Palett
 	{
 		if (ZEFileInfo::GetFileExtension(File->GetPath()).Lower() != ".tga")
 		{
-			zeError("Can not identifty the file. File is not a TGA 2.0 file and it's extension is not .TGA.");
+			if (OutputError)
+				zeError("Can not identifty the file. File is not a TGA 2.0 file and it's extension is not .TGA.");
 			return false;
 		}
 	}
@@ -281,25 +299,29 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8* Palett
 	Result = File->Read(Header, sizeof(ZETargaHeader), 1);
 	if (Result != 1)
 	{
-		zeError("Can not load TGA file header.");
+		if (OutputError)
+			zeError("Can not load TGA file header.");
 		return false;
 	}
 
 	if (Header->BPP != 8 && Header->BPP != 16 && Header->BPP != 24 && Header->BPP != 32)
 	{
-		zeError("Unsupported pixel size.");
+		if (OutputError)
+			zeError("Unsupported pixel size.");
 		return false;
 	}
 
 	if (Header->Height == 0 || Header->Width == 0)
 	{
-		zeError("Corrupted or malicious TGA file. Zero width or height.");
+		if (OutputError)
+			zeError("Corrupted or malicious TGA file. Zero width or height.");
 		return false;
 	}
 
 	if (Header->Width * Header->Height * 4 == 0)
 	{
-		zeError("Corrupted or malicious TGA file. 32bit size overflow detected.");
+		if (OutputError)
+			zeError("Corrupted or malicious TGA file. 32bit size overflow detected.");
 		return false;
 	}
 
@@ -308,7 +330,8 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8* Palett
 		ZESize PotentialSize = Header->Width * Header->Height * (Header->BPP / 8) / 128;
 		if (File->GetSize() < PotentialSize) 
 		{
-			zeError("Corrupted or malicious TGA file. File size is too small.");
+			if (OutputError)
+				zeError("Corrupted or malicious TGA file. File size is too small.");
 			return false;
 		}
 	}
@@ -317,14 +340,16 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8* Palett
 		ZESize PotentialSize = Header->Width * Header->Height * (Header->BPP / 8);
 		if (File->GetSize() < PotentialSize) 
 		{
-			zeError("Corrupted or malicious TGA file. File size is too small.");
+			if (OutputError)
+				zeError("Corrupted or malicious TGA file. File size is too small.");
 			return false;
 		}
 	}
 
 	if ((Header->ImageDescriptor & ZE_TIO_RIGHT_TO_LEFT) != 0)
 	{
-		zeError("Right to left images are not supported.");
+		if (OutputError)
+			zeError("Right to left images are not supported.");
 		return false;
 	}
 
@@ -335,43 +360,60 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8* Palett
 		Header->ImageType != (ZE_TIT_COMPRESSED | ZE_TIT_GRAYSCALE) && 
 		Header->ImageType != (ZE_TIT_COMPRESSED | ZE_TIT_COLOR))
 	{
-		zeError("Unsupported image type.");
+		if (OutputError)
+			zeError("Unsupported image type.");
 		return false;
 	}
 
 	if ((Header->ImageDescriptor & ZE_TIO_RIGHT_TO_LEFT) != 0)
 	{
-		zeError("Right to left image data is not supported.");
+		if (OutputError)
+			zeError("Right to left image data is not supported.");
 		return false;
 	}
-
-	ZESize PalletePixelSize = GetPixelSize(Header->PalleteEntryBPP);
 
 	if (Header->ColorMapType == 1)
 	{
 		if (Header->BPP != 8)
 		{
-			zeError("Unsupported indexed pixel size.");
+			if (OutputError)
+				zeError("Unsupported indexed pixel size.");
 			return false;
 		}
 
-		ZESize PalleteSize = (Header->PalleteSize > 256 ? 256 : Header->PalleteSize);
-		memset(Palette, 0, sizeof(ZEPixelRGBA8) * 256);
-
-		ZEUInt32 PalleteTemp[256];
-		Result = File->Read(PalleteTemp, PalletePixelSize, PalleteSize);
-		if (Result != PalleteSize)
+		ZESize PalettePixelSize = GetPixelSize(Header->PaletteEntryBPP);
+		if (PalettePixelSize != 2 && PalettePixelSize != 3 && PalettePixelSize != 4)
 		{
-			zeError("Can not load pallete.");
+			if (OutputError)
+				zeError("Unsupported palette entry size. Only 24bit and 32bit palette entries supported.");
 			return false;
 		}
 
-		ConvertColorRow(Palette, (ZEUInt8*)PalleteTemp, Header->PalleteEntryBPP, 256);
+		memset(Palette, 0, PalettePixelSize * 256);
+
+		File->Seek(sizeof(ZETargaHeader) + Header->IdSize, ZE_SF_BEGINING);
+
+		ZESize PaletteSize = (Header->PaletteSize > 256 ? 256 : Header->PaletteSize);
+		ZEUInt32 PaletteTemp[256];
+		Result = File->Read(PaletteTemp, PalettePixelSize, PaletteSize);
+		if (Result != PaletteSize)
+		{
+			zeError("Can not load palette.");
+			return false;
+		}
+
+		if (PalettePixelSize == 4)
+			ZETexturePixelConverter::ConvertBGRA8(Palette, (ZEUInt8*)PaletteTemp, PaletteSize);
+		if (PalettePixelSize == 3)
+			ZETexturePixelConverter::ConvertBGR8(Palette, (ZEUInt8*)PaletteTemp, PaletteSize);
+		else
+			ZETexturePixelConverter::ConvertBGRX5551(Palette, (ZEUInt8*)PaletteTemp, PaletteSize);
 	}
 
-	if (Header->ImageType == ZE_TIT_GRAYSCALE && (Header->BPP != 8 || Header->BPP != 16))
+	if (Header->ImageType == ZE_TIT_GRAYSCALE && (Header->BPP != 8 && Header->BPP != 16))
 	{
-		zeError("Only 8-bit or 16-bit grayscale images are supported.");
+		if (OutputError)
+			zeError("Only 8-bit or 16-bit grayscale images are supported.");
 		return false;
 	}
 
@@ -383,7 +425,7 @@ static ZETextureData* LoadImage(ZEFile* File)
 	ZETargaHeader Header;
 	ZEPixelRGBA8 Palette[256];
 
-	if (!LoadHeader(File, &Header, Palette))
+	if (!LoadHeader(File, &Header, Palette, true))
 		return NULL;
 	
 	return LoadData(File, &Header, Palette);
@@ -391,12 +433,12 @@ static ZETextureData* LoadImage(ZEFile* File)
 
 bool ZETextureFileTGA::LoadInfo(ZETextureDataInfo* Info, ZEFile* File)
 {
-	if (File == NULL)
+	if (File == NULL || !File->IsOpen())
 		return false;
 
 	ZEPixelRGBA8 Palette[256];
 	ZETargaHeader Header;
-	if (!LoadHeader(File, &Header, Palette))
+	if (!LoadHeader(File, &Header, Palette, false))
 		return false;
 
 	Info->Width = Header.Width;
@@ -410,7 +452,7 @@ bool ZETextureFileTGA::LoadInfo(ZETextureDataInfo* Info, ZEFile* File)
 		if (Header.BPP == 8)
 			Info->PixelFormat = ZE_TPF_L8;
 		else
-			Info->PixelFormat = ZE_TPF_L16;
+			Info->PixelFormat = ZE_TPF_LA8;
 	}
 
 	Info->Type = ZE_TT_2D;
@@ -422,7 +464,7 @@ bool ZETextureFileTGA::LoadInfo(ZETextureDataInfo* Info, ZEFile* File)
 
 ZETextureData* ZETextureFileTGA::Load(ZEFile* File)
 {
-	if (File == NULL)
+	if (File == NULL || !File->IsOpen())
 	{
 		zeError("Null file pointer.");
 		return NULL;

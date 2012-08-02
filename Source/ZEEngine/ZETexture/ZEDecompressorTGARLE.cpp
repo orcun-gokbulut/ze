@@ -54,7 +54,7 @@ void ZEDecompressorTGARLE::SetInput(void* Buffer)
 void ZEDecompressorTGARLE::SetOutput(void* Buffer)
 {
 	OutputCursor = 0;
-	ZEDecompressor::SetInput(Buffer);
+	ZEDecompressor::SetOutput(Buffer);
 }
 
 void ZEDecompressorTGARLE::SetWordSize(ZESize Size)
@@ -89,66 +89,66 @@ void ZEDecompressorTGARLE::Decompress()
 
 		switch(this->Mode)
 		{
-		case ZE_TGA_RLE_DM_NONE: // None
-			if ((*Input & 0x80) == 0x80)
-			{
-				this->Mode = ZE_TGA_RLE_DM_REPEAT_INIT;
-				this->Count = ((*Input & 0x7F) + 1) * this->WordSize;
-				this->Count2 = this->WordSize;
-			}
-			else
-			{
-				this->Mode = ZE_TGA_RLE_DM_ABSOLUTE;
-				this->Count = ((*Input & 0x7F) + 1) * this->WordSize;
-			}
-			this->InputCursor++;
-			break;
+			case ZE_TGA_RLE_DM_NONE: // None
+				if ((*Input & 0x80) == 0x80)
+				{
+					this->Mode = ZE_TGA_RLE_DM_REPEAT_INIT;
+					this->Count = ((*Input & 0x7F) + 1) * this->WordSize;
+					this->Count2 = this->WordSize;
+				}
+				else
+				{
+					this->Mode = ZE_TGA_RLE_DM_ABSOLUTE;
+					this->Count = ((*Input & 0x7F) + 1) * this->WordSize;
+				}
+				this->InputCursor++;
+				break;
 
-		case ZE_TGA_RLE_DM_REPEAT_INIT:
-			this->Value[this->WordSize - this->Count2] = *Input;
-			this->Count2--;
-			this->InputCursor++;
-			if (this->Count2 == 0)
-				this->Mode = ZE_TGA_RLE_DM_REPEAT;
-			break;
+			case ZE_TGA_RLE_DM_REPEAT_INIT:
+				this->Value[this->WordSize - this->Count2] = *Input;
+				this->Count2--;
+				this->InputCursor++;
+				if (this->Count2 == 0)
+					this->Mode = ZE_TGA_RLE_DM_REPEAT;
+				break;
 
-		case ZE_TGA_RLE_DM_REPEAT:
-			if (this->OutputCursor + this->Count <= this->OutputSize * this->WordSize)
-				Remaining = this->Count;
-			else
-				Remaining = this->OutputSize - this->OutputCursor;
+			case ZE_TGA_RLE_DM_REPEAT:
+				if (this->OutputCursor + this->Count <= this->OutputSize * this->WordSize)
+					Remaining = this->Count;
+				else
+					Remaining = this->OutputSize - this->OutputCursor;
 
-			for (ZESize I = 0; I < Remaining; I++)
-			{
-				*Output++ = this->Value[this->Count2 % this->WordSize];
-				this->Count2++;
-			}
+				for (ZESize I = 0; I < Remaining; I++)
+				{
+					*Output++ = this->Value[this->Count2 % this->WordSize];
+					this->Count2++;
+				}
 
-			this->Count -= Remaining;
-			this->OutputCursor += Remaining;
+				this->Count -= Remaining;
+				this->OutputCursor += Remaining;
 
-			if (this->Count == 0)
-				this->Mode = ZE_TGA_RLE_DM_NONE;
-			break;
+				if (this->Count == 0)
+					this->Mode = ZE_TGA_RLE_DM_NONE;
+				break;
 
-		case ZE_TGA_RLE_DM_ABSOLUTE:
-			if (this->OutputCursor + this->Count <= this->OutputSize)
-				Remaining = this->Count;
-			else
-				Remaining = this->OutputSize - this->OutputCursor;
+			case ZE_TGA_RLE_DM_ABSOLUTE:
+				if (this->OutputCursor + this->Count <= this->OutputSize)
+					Remaining = this->Count;
+				else
+					Remaining = this->OutputSize - this->OutputCursor;
 
-			if (this->InputCursor + Remaining > this->InputSize)
-				Remaining = this->InputSize - this->InputCursor;
+				if (this->InputCursor + Remaining > this->InputSize)
+					Remaining = this->InputSize - this->InputCursor;
 
-			memcpy(Output, Input, Remaining);
+				memcpy(Output, Input, Remaining);
 
-			this->OutputCursor += Remaining;
-			this->InputCursor += Remaining;
-			this->Count -= Remaining;
+				this->OutputCursor += Remaining;
+				this->InputCursor += Remaining;
+				this->Count -= Remaining;
 
-			if (this->Count == 0)
-				this->Mode = ZE_TGA_RLE_DM_NONE;
-			break;
+				if (this->Count == 0)
+					this->Mode = ZE_TGA_RLE_DM_NONE;
+				break;
 		}
 	}
 }
@@ -167,4 +167,9 @@ void ZEDecompressorTGARLE::Reset()
 	Input = NULL;
 	InputCursor = 0;
 	InputSize = 0;
+}
+
+ZEDecompressorTGARLE::ZEDecompressorTGARLE()
+{
+	Reset();
 }

@@ -37,24 +37,12 @@
 #include "ZEDS/ZEPointer.h"
 #include "ZEDS/ZEString.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEBitmap.h"
 #include "ZETextureData.h"
 #include "ZETextureFileTGA.h"
+#include "ZETextureTestUtils.h"
+#include "ZETextureLoader.h"
 
-static bool CompareImages(ZEBitmap* Original, ZEUInt32* Data, ZESize Width, ZESize Height)
-{
-	if (Original->GetWidth() != Width || Original->GetHeight() != Height)
-		return false;
-
-	for (ZESize y = 0; y < Height; y++)
-		for (ZESize x = 0; x < Width; x++)
-			if (((ZEUInt32*)Original->GetPixels())[y * Width + x] != Data[y * Width + x])
-				return false;
-
-	return true;
-}
-
-static bool TestSuccess(ZEString FileName)
+bool TestSuccess(ZEString FileName)
 {
 	ZEFile File;
 	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
@@ -64,31 +52,25 @@ static bool TestSuccess(ZEString FileName)
 	if (!Loader.LoadInfo(&Info, &File))
 		return false;
 
-	ZETextureData* Data = Loader.Load(&File);
-
+	ZEPointer<ZETextureData> Data = Loader.Load(&File);
 	if (Data == NULL)
 		return false;
 
-	ZEBitmap Original;
-	if (!Original.Load(FileName))
-		return false;
-	ZETextureLevel* Level = &Data->GetSurfaces()[0].GetLevels()[0];
-
-	ZEBitmap Bitmap;
-	Bitmap.Create(Level->GetWidth(), Level->GetHeight(), 4);
-	Bitmap.CopyFrom(Level->GetData(), Level->GetPitch(), Level->GetWidth(), Level->GetHeight());
-	Bitmap.Save(FileName + ".result.bmp", ZE_BFF_BMP);
-
-	return true;// CompareImages(&Original, (ZEUInt32*)Level->GetData(), Data->GetWidth(), Data->GetHeight());
+	return ZETextureTestUtils::Compare(Data, FileName + ".zeTexture");
 }
-
-static bool TestFail(ZEString FileName)
+ 
+bool TestFail(ZEString FileName)
 {
+	ZELogType OldLogType = ZELog::GetInstance()->GetMinimumLogLevel();
+	ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_CRITICAL_ERROR);
+
 	ZEFile File;
 	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 
 	ZETextureFileTGA Loader;
-	ZETextureData* Data = Loader.Load(&File);
+	ZEPointer<ZETextureData> Data = Loader.Load(&File);
+
+	ZELog::GetInstance()->SetMinimumLogLevel(OldLogType);
 
 	return Data == NULL;
 }
@@ -119,5 +101,10 @@ ZETestSuite(ZETextureFileTGATest)
 		ZETestCheck(TestSuccess("TestResources/ZETextureFileTGA/XING_T16.TGA"));
 		ZETestCheck(TestSuccess("TestResources/ZETextureFileTGA/XING_T24.TGA"));
 		ZETestCheck(TestSuccess("TestResources/ZETextureFileTGA/XING_T32.TGA"));
+	}
+
+	ZETest("Ilvalid Samples")
+	{
+		ZETestCheck(TestFail("Non Existent File"));
 	}
 }

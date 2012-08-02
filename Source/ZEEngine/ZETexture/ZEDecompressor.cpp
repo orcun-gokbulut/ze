@@ -89,11 +89,6 @@ ZESize ZEDecompressor::GetOutputSize()
 	return OutputSize;
 }
 
-void ZEDecompressor::Reset()
-{
-
-}
-
 ZEDecompressor::ZEDecompressor()
 {
 	State = ZE_DS_DONE;

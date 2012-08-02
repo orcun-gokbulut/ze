@@ -62,6 +62,8 @@ class ZEDecompressorTGARLE : public ZEDecompressor
 
 		virtual void		Decompress();
 		virtual void		Reset();
+
+							ZEDecompressorTGARLE();
 };
 
 #endif
