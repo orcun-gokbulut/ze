@@ -79,6 +79,8 @@ include_directories(
 
 include_directories(
 	${ZEBUILD_INCLUDE_PATH}/DirectX
+  ${ZEBUILD_INCLUDE_PATH}/GL
+	${ZEBUILD_INCLUDE_PATH}/Cg
 	${ZEBUILD_INCLUDE_PATH}/PhysX2/Cooking 
 	${ZEBUILD_INCLUDE_PATH}/PhysX2/Foundation 
 	${ZEBUILD_INCLUDE_PATH}/PhysX2/PhysXLoader
@@ -90,6 +92,7 @@ link_directories(
 	${ZEBUILD_LIB_PATH}/$(ConfigurationName)/vrpn
 	${ZEBUILD_LIB_PATH}/$(ConfigurationName)/Bullet
 	${ZEBUILD_LIB_PATH}/DirectX
+	${ZEBUILD_LIB_PATH}/GL
 	${ZEBUILD_LIB_PATH}/PhysX2
 	${ZEBUILD_LIB_PATH}/PhysX3
 	${ZEBUILD_LIB_PATH}/3dsMax/2010)

@@ -103,13 +103,13 @@ ZEBlendEquation ZEBlendState::GetBlendEquation() const
 
 void ZEBlendState::SetColorChannelMask(ZEUInt Mask)
 {
-	ColorChannelMask.Value = Mask;
+	ColorChannelMask.RaiseFlags(Mask);
 	Changed = true;
 }
 
-ZEUInt ZEBlendState::GetColorChannelMask() const
+ZEColorChannelMask ZEBlendState::GetColorChannelMask() const
 {
-	return ColorChannelMask.Value;
+	return ColorChannelMask;
 }
 
 void ZEBlendState::SetChanged(bool Change)

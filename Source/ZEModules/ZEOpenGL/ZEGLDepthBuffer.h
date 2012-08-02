@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+ Zinek Engine - ZEGLDepthBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
+#ifndef __ZE_GL_DEPTH_BUFFER_H__ 
+#define __ZE_GL_DEPTH_BUFFER_H__
 
-ZEDepthBuffer::~ZEDepthBuffer()
+#include "ZEGL.h"
+#include "ZEGraphics/ZEDepthBuffer.h"
+
+class ZEGLDepthBuffer : public ZEDepthBuffer
 {
+	private:
+		ZEUInt						Width;
+		ZEUInt						Height;
 
-}
+	protected:
+
+	public:					
+		GLDepthBuffer				DepthBuffer;	// Is Texture
+
+		virtual float				GetAspectRatio();
+		virtual ZEUInt				GetWidth();
+		virtual ZEUInt				GetHeight();
+
+									ZEGLDepthBuffer();
+									ZEGLDepthBuffer(ZEUInt Width, ZEUInt Height);
+									~ZEGLDepthBuffer();
+};
+#endif

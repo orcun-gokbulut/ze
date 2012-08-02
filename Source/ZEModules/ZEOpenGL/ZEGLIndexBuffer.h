@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+ Zinek Engine - ZEGLIndexBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
+#ifndef __ZE_GL_INDEX_BUFFER_H__
+#define __ZE_GL_INDEX_BUFFER_H__
 
-ZEDepthBuffer::~ZEDepthBuffer()
+
+#include "ZETypes.h"
+#include "ZEGraphics/ZEIndexBuffer.h"
+#include "ZEGL.h"
+
+class ZEGLIndexBuffer : public ZEIndexBuffer
 {
+	private:
 
-}
+	protected:
+
+	public:
+		GLIndexBuffer			IndexBuffer;
+};
+#endif

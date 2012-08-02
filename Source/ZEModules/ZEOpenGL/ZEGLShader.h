@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+ Zinek Engine - ZEGLShader.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
+#include "ZEGraphics/ZEShader.h"
+#include <Cg/cg.h>
+#include <CG/cgGL.h>
 
-ZEDepthBuffer::~ZEDepthBuffer()
+class ZEGLShader : public ZEShader
 {
+	private:
 
-}
+	protected:
+		CGprogram				Shader;
+		CGprofile				Profile;
+
+	public:
+		virtual void			BindShader() = 0;		// Using Bind Shader to Minimize cg Runtime usage in different classes
+};
+
+class ZEGLPixelShader : ZEGLShader
+{
+	private:
+
+	protected:
+
+	public:
+		virtual void			BindShader();			// Using Bind Shader to Minimize cg Runtime usage in different classes
+};
+
+class ZEGLVertexShader : ZEGLShader
+{
+	private:
+
+	protected:
+
+	public:
+		virtual void			BindShader();			// Using Bind Shader to Minimize cg Runtime usage in different classes
+};

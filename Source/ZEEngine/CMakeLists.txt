@@ -74,7 +74,7 @@ ze_add_library(ZEEngineAPI
 	HEADERS ${Headers}
 	LIBS ZEFoundation
 		ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEMap ZEPortalMap ZEModel ZEParticle
-		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEAI ZETerrain ZENetwork ZETexture
+		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEAI ZETerrain ZENetwork ZETexture ZEOpenGL
 	INSTALL
 	INSTALL_DESTINATION "ZEEngineAPI"
 	INSTALL_COMPONENT ZESDK)

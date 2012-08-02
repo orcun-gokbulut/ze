@@ -87,6 +87,7 @@ class ZEGraphicsDevice
 		ZERenderTarget*			DeviceRenderTargets[ZE_MAX_RENDER_TARGETS];
 		ZEDepthBuffer*			RequestedDepthBuffer;
 		ZEDepthBuffer*			DeviceDepthBuffer;
+		bool					ScreenWriteEnable;
 
 		virtual void			InitDefaultState() = 0;
 
@@ -124,10 +125,11 @@ class ZEGraphicsDevice
 		void					SetPixelShader(ZEShader* PixelShader);
 		ZEShader*				GetPixelShader() const;
 		
-
 		// Output (Aka. RenderTarget Change)
 		void					SetRenderTarget(int index, ZERenderTarget* RenderTarget);
 		ZERenderTarget*			GetRenderTarget(int index) const;
+		void					SetRenderTargetScreen(ZERenderTarget* RenderTarget);
+		bool					GetScreenWriteEnable() const;
 
 		// Commits the Requested State then Draws
 		virtual void			Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount) = 0;

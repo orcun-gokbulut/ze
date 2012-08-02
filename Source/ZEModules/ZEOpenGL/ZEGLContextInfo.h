@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+ Zinek Engine - ZEGLContextInfo.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
 
-ZEDepthBuffer::~ZEDepthBuffer()
+#include "ZEGL.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEString.h"
+#include "ZEError.h"
+
+#ifndef __ZE_GL_CONTEXTINFO_H__
+#define __ZE_GL_CONTEXTINFO_H__
+
+class ZEGLContextInfo
 {
+	private:
+		ZEString						GLVendor;
+		ZEString						GLVersion;
+		ZEString						GlewVersion;
 
-}
+										// This HAS TO BE CALLED before using any openGL functions(Calls GlewInit)
+		bool							InitializeGLFunctions();
+
+	public:
+		ZEString						GetVendor() const;
+		ZEString						GetGLVersion() const;
+		ZEString						GetGlewVersion() const;
+
+										ZEGLContextInfo();
+										~ZEGLContextInfo();
+};
+
+#endif

@@ -70,8 +70,8 @@ class ZED3D9CRTScanProcessor : public ZED3D9ComponentBase
 		ZED3D9Texture2D*				InputBuffer;
 		ZED3D9RenderTarget*				OutputBuffer;
 
-		ZED3D9VertexShader				VertexShader;
-		ZED3D9PixelShader				PixelShader;
+		ZED3D9VertexShader*				VertexShader;
+		ZED3D9PixelShader*				PixelShader;
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 		
 	public:

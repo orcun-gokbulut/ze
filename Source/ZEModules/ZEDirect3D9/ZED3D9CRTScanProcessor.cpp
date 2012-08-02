@@ -153,19 +153,8 @@ void ZED3D9CRTScanProcessor::Initialize()
 		return;
 	}
 	
-	Result = VertexShader.CompileShader(NULL, 0, "vs_3_0", Text, "vs_main");
-	if (!Result)
-	{
-		zeError("Cannot compile shader file \"%s\".", ShaderFilePath.ToCString());
-		return;
-	}
-
-	Result = PixelShader.CompileShader(NULL, 0, "ps_3_0", Text, "ps_main");
-	if (!Result)
-	{
-		zeError("Cannot compile shader file \"%s\".", ShaderFilePath.ToCString());
-		return;
-	}
+	VertexShader = ZED3D9VertexShader::CreateShaderFromSource(Text, "vs_main", NULL, 0, "vs_3_0");
+	PixelShader = ZED3D9PixelShader::CreateShaderFromSource(Text, "ps_main", NULL, 0, "ps_3_0");
 }
 
 void ZED3D9CRTScanProcessor::Deinitialize()
@@ -173,6 +162,9 @@ void ZED3D9CRTScanProcessor::Deinitialize()
 	Renderer		= NULL;
 	InputBuffer		= NULL;
 	OutputBuffer	= NULL;
+	ZED3D_RELEASE(VertexDeclaration);
+	ZED3D_RELEASE(PixelShader);
+	ZED3D_RELEASE(VertexShader);
 }
 
 void ZED3D9CRTScanProcessor::OnDeviceLost()
@@ -203,8 +195,8 @@ void ZED3D9CRTScanProcessor::Process(float ElapsedTime)
 	};
 	
 	// Set shaders and vertex declaration
-	GetDevice()->SetVertexShader(VertexShader.GetVertexShader());
-	GetDevice()->SetPixelShader(PixelShader.GetPixelShader());
+	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
+	GetDevice()->SetPixelShader(PixelShader->GetPixelShader());
 	GetDevice()->SetVertexDeclaration(VertexDeclaration);
 	
 	// Set render states and output
@@ -225,12 +217,12 @@ void ZED3D9CRTScanProcessor::Process(float ElapsedTime)
 
 	ZEVector2 PixelSize(1.0f / (float)OutputBuffer->GetWidth(), 1.0f / (float)OutputBuffer->GetHeight());
 		
-	VertexShader.SetConstant("PixelSize", PixelSize);
+	VertexShader->SetConstant("PixelSize", PixelSize);
 
-	PixelShader.SetConstant("Color", ScanColor);
-	PixelShader.SetConstant("Thickness", ScanThickness);
-	PixelShader.SetConstant("Sharpness", Sharpness);
-	PixelShader.SetConstant("ScanCoord", DirectedScanCooord);
+	PixelShader->SetConstant("Color", ScanColor);
+	PixelShader->SetConstant("Thickness", ScanThickness);
+	PixelShader->SetConstant("Sharpness", Sharpness);
+	PixelShader->SetConstant("ScanCoord", DirectedScanCooord);
 
 	ZED3D9CommonTools::SetRenderTarget(0, OutputBuffer);
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputBuffer, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);

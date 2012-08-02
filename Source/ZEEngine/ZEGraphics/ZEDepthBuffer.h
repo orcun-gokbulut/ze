@@ -36,13 +36,18 @@
 #ifndef __ZE_DEPTH_BUFFER_H__ 
 #define __ZE_DEPTH_BUFFER_H__
 
+#include "ZETypes.h"
+
 class ZEDepthBuffer
 {
+	private:
+
 	protected:
-		bool					HasStencil;
 
 	public:
-		bool					GetHasStencil() const;
+		virtual float			GetAspectRatio() = 0;
+		virtual ZEUInt			GetWidth() = 0;
+		virtual ZEUInt			GetHeight() = 0;
 
 		virtual					~ZEDepthBuffer();
 };

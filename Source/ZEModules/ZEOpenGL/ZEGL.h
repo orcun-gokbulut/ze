@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+ Zinek Engine - ZEGL.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
+#ifndef GLEW_STATIC
+#define GLEW_STATIC			// Use Static library
+#include <GL/glew.h>
 
-ZEDepthBuffer::~ZEDepthBuffer()
-{
+// Symbolic Typedefs for better understanding
+typedef GLuint	GLTexture;
+typedef GLuint	GLRenderBuffer;
+typedef GLuint	GLFrameBuffer;
+typedef GLuint	GLVertexBuffer;
+typedef GLuint	GLIndexBuffer;
+typedef GLuint	GLDepthBuffer;
 
-}
+#endif

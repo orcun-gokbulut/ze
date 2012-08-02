@@ -104,26 +104,9 @@ void ZED3D9GrainProcessor::Initialize()
 		return;
 	}
 	
-	Result = VertexShader.CompileShader(NULL, 0, "vs_3_0", Text, "vs_main_common");
-	if (!Result)
-	{
-		zeError("Cannot compile shader file \"%s\".", ShaderFilePath.ToCString());
-		return;
-	}
-
-	Result = PixelShaderGrain.CompileShader(NULL, 0, "ps_3_0", Text, "ps_main_grain");
-	if (!Result)
-	{
-		zeError("Cannot compile shader file \"%s\".", ShaderFilePath.ToCString());
-		return;
-	}
-
-	Result = PixelShaderBlend.CompileShader(NULL, 0, "ps_3_0", Text, "ps_main_blend");
-	if (!Result)
-	{
-		zeError("Cannot compile shader file \"%s\".", ShaderFilePath.ToCString());
-		return;
-	}
+	VertexShader = ZED3D9VertexShader::CreateShaderFromSource(Text, "vs_main_common", NULL, 0, "vs_3_0");
+	PixelShaderGrain = ZED3D9PixelShader::CreateShaderFromSource(Text, "ps_main_grain", NULL, 0, "ps_3_0");
+	PixelShaderBlend  = ZED3D9PixelShader::CreateShaderFromSource(Text, "ps_main_blend", NULL, 0, "ps_3_0");
 
 	this->CreateRenderTargets();
 }
@@ -132,7 +115,10 @@ void ZED3D9GrainProcessor::Deinitialize()
 {
 	Input = NULL;
 	Output = NULL;
-
+	ZED3D_RELEASE(VertexDeclaration);
+	ZED3D_RELEASE(VertexShader);
+	ZED3D_RELEASE(PixelShaderGrain);
+	ZED3D_RELEASE(PixelShaderBlend);
 	this->DestroyRenderTargets();
 }
 
@@ -240,13 +226,13 @@ void ZED3D9GrainProcessor::Process(float ElapsedTime)
 
 	if (Update)
 	{
-		GetDevice()->SetVertexShader(VertexShader.GetVertexShader());
-		GetDevice()->SetPixelShader(PixelShaderGrain.GetPixelShader());
+		GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
+		GetDevice()->SetPixelShader(PixelShaderGrain->GetPixelShader());
 
-		VertexShader.SetConstant("PixelSize", PixelSize);
+		VertexShader->SetConstant("PixelSize", PixelSize);
 		
-		PixelShaderGrain.SetConstant("Time", Time);
-		PixelShaderGrain.SetConstant("GrainStrength", Strength);
+		PixelShaderGrain->SetConstant("Time", Time);
+		PixelShaderGrain->SetConstant("GrainStrength", Strength);
 
 		ZED3D9CommonTools::SetRenderTarget(0, GrainBuffer);
 
@@ -254,10 +240,10 @@ void ZED3D9GrainProcessor::Process(float ElapsedTime)
 	}
 	
 	// Blend grain buffer
-	GetDevice()->SetVertexShader(VertexShader.GetVertexShader());
-	GetDevice()->SetPixelShader(PixelShaderBlend.GetPixelShader());
+	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
+	GetDevice()->SetPixelShader(PixelShaderBlend->GetPixelShader());
 
-	VertexShader.SetConstant("PixelSize", PixelSize);
+	VertexShader->SetConstant("PixelSize", PixelSize);
 
 	ZED3D9CommonTools::SetRenderTarget(0, Output);
 

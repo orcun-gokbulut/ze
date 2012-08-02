@@ -46,7 +46,7 @@ ZEVertexBuffer::~ZEVertexBuffer()
 {
 }
 
-const ZEArray<ZEVertexElement>& ZEVertexBuffer::GetVertexElements()
+const ZEArray<ZEVertexElement>& ZEVertexBuffer::GetVertexElements() const
 {
 	return VertexElements;
 }
@@ -54,6 +54,47 @@ const ZEArray<ZEVertexElement>& ZEVertexBuffer::GetVertexElements()
 void ZEVertexBuffer::AddVertexElements(const ZEVertexElement& NewElement)
 {
 	VertexElements.Add(NewElement);
+}
+
+void ZEVertexBuffer::GenerateVertexSize()
+{
+	VertexSize = 0;
+	for(int i = 0; i < VertexElements.GetCount(); i++)
+	{
+		ZEVertexElement E = VertexElements[i];
+		switch(E.Type)
+		{
+			case ZE_VET_FLOAT:
+				VertexSize += sizeof(float);
+				break;
+			case ZE_VET_FLOAT2:
+				VertexSize += sizeof(float) * 2;
+				break;
+			case ZE_VET_FLOAT3:
+				VertexSize += sizeof(float) * 3;
+				break;
+			case ZE_VET_FLOAT4:
+				VertexSize += sizeof(float) * 4;
+				break;
+			case ZE_VET_SHORT2:
+				VertexSize += sizeof(short) * 2;
+				break;
+			case ZE_VET_SHORT4:
+				VertexSize += sizeof(short) * 4;
+				break;
+			case ZE_VET_BYTE4:
+				VertexSize += sizeof(char) * 4;
+				break;
+			case ZE_VET_COLOR:
+				VertexSize += sizeof(char) * 4;
+				break;
+		}
+	}
+}
+
+ZESize ZEVertexBuffer::GetVertexSize() const
+{
+	return VertexSize;
 }
 
 ZEStaticVertexBuffer::ZEStaticVertexBuffer()

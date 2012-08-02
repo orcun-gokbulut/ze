@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+ Zinek Engine - ZEGLContextInfo.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,40 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
+#include "ZEGLContextInfo.h"
 
-ZEDepthBuffer::~ZEDepthBuffer()
+bool ZEGLContextInfo::InitializeGLFunctions()
+{
+	GLenum err = glewInit();
+	if (GLEW_OK != err)
+		zeCriticalError("Unable To Initalize GLEW: %s\n\r", glewGetErrorString(err));
+	
+	GlewVersion = (char*)glewGetString(GLEW_VERSION);
+	GLVersion = (char*)glGetString(GL_VERSION);
+	GLVendor = (char*)glGetString(GL_VENDOR);
+
+	return true;
+}
+
+ZEString ZEGLContextInfo::GetVendor() const
+{
+	return GLVendor;
+}
+ZEString ZEGLContextInfo::GetGLVersion() const
+{
+	return GLVersion;
+}
+ZEString ZEGLContextInfo::GetGlewVersion() const
+{
+	return GlewVersion;
+}
+
+ZEGLContextInfo::ZEGLContextInfo()
+{
+	InitializeGLFunctions();
+}
+
+ZEGLContextInfo::~ZEGLContextInfo()
 {
 
 }

@@ -119,11 +119,23 @@ ZEShader* ZEGraphicsDevice::GetPixelShader() const
 void ZEGraphicsDevice::SetRenderTarget(int index, ZERenderTarget* RenderTarget)
 {
 	RequestedRenderTargets[index] = RenderTarget;
+	ScreenWriteEnable = false;
 }
 
 ZERenderTarget* ZEGraphicsDevice::GetRenderTarget(int index) const
 {
 	return RequestedRenderTargets[index];
+}
+
+void ZEGraphicsDevice::SetRenderTargetScreen(ZERenderTarget* RenderTarget)
+{
+	RequestedRenderTargets[0] = RenderTarget;
+	ScreenWriteEnable = true;
+}
+
+bool ZEGraphicsDevice::GetScreenWriteEnable() const
+{
+	return ScreenWriteEnable;
 }
 
 void ZEGraphicsDevice::CommitRequestedState()
@@ -138,7 +150,8 @@ ZEGraphicsDevice::ZEGraphicsDevice() :	RequestedPixelShader(NULL),
 										RequestedVertexBuffer(NULL),
 										DeviceVertexBuffer(NULL),
 										RequestedDepthBuffer(NULL),
-										DeviceDepthBuffer(NULL)
+										DeviceDepthBuffer(NULL),
+										ScreenWriteEnable(false)
 {
 	for(int i = 0; i < ZE_MAX_RENDER_TARGETS; i++)
 	{
