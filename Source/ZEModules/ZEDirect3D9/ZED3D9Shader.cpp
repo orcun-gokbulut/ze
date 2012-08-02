@@ -432,7 +432,7 @@ void ZED3D9PixelShader::SetConstant(const ZEString& Name, const ZEMatrix4x4& Val
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, Value.MA, 3);
+		GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, Value.MA, 4);
 }
 
 void ZED3D9PixelShader::SetConstant(const ZEString& Name, bool Value) const
@@ -845,7 +845,7 @@ void ZED3D9VertexShader::SetConstant(const ZEString& Name, const ZEMatrix4x4& Va
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, Value.MA, 3);
+		GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, Value.MA, 4);
 }
 
 void ZED3D9VertexShader::SetConstant(const ZEString& Name, bool Value) const

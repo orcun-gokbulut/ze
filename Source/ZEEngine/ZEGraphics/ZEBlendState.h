@@ -102,7 +102,7 @@ public:
 	void						SetBlendEquation(ZEBlendEquation Equation);
 	ZEBlendEquation				GetBlendEquation() const;
 	void						SetColorChannelMask(ZEUInt Mask);
-	ZEUInt						GetColorChannelMask() const;
+	ZEColorChannelMask			GetColorChannelMask() const;
 	void						SetChanged(bool Change);
 	bool						GetChanged() const;
 

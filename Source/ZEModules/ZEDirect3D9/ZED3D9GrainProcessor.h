@@ -58,9 +58,9 @@ class ZED3D9GrainProcessor : public ZED3D9ComponentBase
 
 		ZED3D9FrameRenderer*	Renderer;
 
-		ZED3D9PixelShader		PixelShaderGrain;
-		ZED3D9PixelShader		PixelShaderBlend;
-		ZED3D9VertexShader		VertexShader;
+		ZED3D9PixelShader*		PixelShaderGrain;
+		ZED3D9PixelShader*		PixelShaderBlend;
+		ZED3D9VertexShader*		VertexShader;
 
 		ZED3D9Texture2D*		GrainBuffer;
 		ZED3D9RenderTarget*		Output;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+ Zinek Engine - ZEGLShader.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,24 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
+#include "ZEGLShader.h"
 
-ZEDepthBuffer::~ZEDepthBuffer()
+// ZEGLShader
+////////////////////////////////////////////////////////////////////////////////////////
+
+
+// ZEGLPixelShader
+////////////////////////////////////////////////////////////////////////////////////////
+void ZEGLPixelShader::BindShader()
 {
+	cgGLBindProgram(Shader);
+	cgGLEnableProfile(Profile);
+}
 
+// ZEGLVertexShader
+////////////////////////////////////////////////////////////////////////////////////////
+void ZEGLVertexShader::BindShader()
+{
+	cgGLBindProgram(Shader);
+	cgGLEnableProfile(Profile);
 }

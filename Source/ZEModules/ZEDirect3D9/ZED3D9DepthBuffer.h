@@ -39,7 +39,7 @@
 #include <d3d9.h>
 #include "ZEGraphics/ZEDepthBuffer.h"
 
-class ZED3D9DepthBuffer
+class ZED3D9DepthBuffer : public ZEDepthBuffer
 {
 	public:
 		LPDIRECT3DSURFACE9 DepthSurface;

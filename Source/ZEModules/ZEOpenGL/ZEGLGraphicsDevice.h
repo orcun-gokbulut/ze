@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+ Zinek Engine - ZEGLGraphicsDevice.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,40 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
+#ifndef __ZE_GL_GRAPHICS_DEVICE_H__
+#define __ZE_GL_GRAPHICS_DEVICE_H__
 
-ZEDepthBuffer::~ZEDepthBuffer()
+#include "ZEGL.h"
+#include "ZEGraphics/ZEGraphicsDevice.h"
+
+class ZEGLGraphicsDevice : public ZEGraphicsDevice
 {
+	private:
+		GLuint					GLSamplerStateHandles[ZE_MAX_SAMPLER_ATTACHMENT];
+		GLuint					VertexArrayObject;
+		GLuint					FramebufferObject;
 
-}
+	protected:
+		virtual void			InitDefaultState();
+
+		virtual void			ApplyRequestedBlendState();
+		virtual void			ApplyRequestedSamplerStates();
+		virtual void			ApplyRequestedShaders();
+		virtual void			ApplyRequestedStencilZState();
+		virtual void			ApplyRequestedRasterizerState();
+		virtual void			ApplyRequestedVertexBuffer();
+		virtual void			ApplyRequestedIndexBuffer();
+		virtual void			ApplyRequestedRenderTargets();
+
+		virtual void			ApplyAllRequestedStates();
+
+	public:
+		virtual void			Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount);
+		virtual void			DrawIndexed(ZEROPrimitiveType PrimitiveType, ZEInt BaseVertexIndex, ZEUInt32 MinIndex, 
+											ZEUInt32 VertexCount, ZEUInt32 StartIndex, ZEUInt32 PrimitiveCount);	
+
+								ZEGLGraphicsDevice();
+		virtual					~ZEGLGraphicsDevice();
+
+	};
+#endif

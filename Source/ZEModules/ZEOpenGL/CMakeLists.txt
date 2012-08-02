@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,12 +30,40 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
+cmake_minimum_required (VERSION 2.8)
 
-ZEDepthBuffer::~ZEDepthBuffer()
-{
+include_directories(
+	${ZEBUILD_INCLUDE_PATH}/GL
+	${ZEBUILD_INCLUDE_PATH}/Cg)
 
-}
+link_directories(
+	${ZEBUILD_LIB_PATH}/GL)
+
+ze_add_source(ZEGL.h								Sources)
+ze_add_source(ZEGLContextInfo.cpp					Sources)
+ze_add_source(ZEGLContextInfo.h						Sources)
+ze_add_source(ZEGLDepthBuffer.cpp					Sources)
+ze_add_source(ZEGLDepthBuffer.h						Sources)
+ze_add_source(ZEGLGraphicsDevice.cpp				Sources)
+ze_add_source(ZEGLGraphicsDevice.h					Sources)
+ze_add_source(ZEGLIndexBuffer.cpp					Sources)
+ze_add_source(ZEGLIndexBuffer.h						Sources)
+ze_add_source(ZEGLRenderTarget.cpp					Sources)
+ze_add_source(ZEGLRenderTarget.h					Sources)
+ze_add_source(ZEGLShader.cpp						Sources)
+ze_add_source(ZEGLShader.h							Sources)
+ze_add_source(ZEGLTexture2D.cpp						Sources)
+ze_add_source(ZEGLTexture2D.h						Sources)
+ze_add_source(ZEGLTexture3D.cpp						Sources)
+ze_add_source(ZEGLTexture3D.h						Sources)
+ze_add_source(ZEGLTextureCube.cpp					Sources)
+ze_add_source(ZEGLTextureCube.h						Sources)
+ze_add_source(ZEGLVertexBuffer.cpp					Sources)
+ze_add_source(ZEGLVertexBuffer.h					Sources)
+
+ze_add_library(ZEOpenGL 
+	SOURCES ${Sources}
+	LIBS glew32s OpenGL32 cg cgGL)

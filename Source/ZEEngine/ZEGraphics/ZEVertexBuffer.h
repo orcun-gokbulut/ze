@@ -45,10 +45,15 @@ class ZEVertexBuffer
 {
 	protected:
 		ZEArray<ZEVertexElement>					VertexElements;
+		ZESize										VertexSize;
 
 	public:
-		const ZEArray<ZEVertexElement>&				GetVertexElements();
+		const ZEArray<ZEVertexElement>&				GetVertexElements() const;
 		void										AddVertexElements(const ZEVertexElement& NewElement);
+		
+		void										GenerateVertexSize();
+		ZESize										GetVertexSize() const;
+
 		virtual bool								IsStatic() = 0;
 		virtual ZESize								GetBufferSize() = 0;
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+ Zinek Engine - ZEGLVertexBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,47 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
+#ifndef __ZE_GL_VERTEX_BUFFER_H__
+#define __ZE_GL_VERTEX_BUFFER_H__
 
-ZEDepthBuffer::~ZEDepthBuffer()
+
+#include "ZETypes.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGL.h"
+
+// 1 to 1 CG Order
+enum ZEGLInputSemanticOrder
 {
+	ZE_GISO_POSITION			= 0,
+	ZE_GISO_BLENDWEIGHT		= 1,
+	ZE_GISO_NORMAL			= 2,
+	ZE_GISO_COLOR0			= 3,	ZE_GISO_DIFFUSE		= 3,
+	ZE_GISO_COLOR1			= 4,	ZE_GISO_SPECULAR	= 4,
+	// Not Supported		= 5
+	// Not Supported		= 6
+	ZE_GISO_BLEND_INDICIES	= 7,
+	ZE_GISO_TEXCOORD0		= 8,
+	ZE_GISO_TEXCOORD1		= 9,
+	ZE_GISO_TEXCOORD2		= 10,
+	ZE_GISO_TEXCOORD3		= 11,
+	ZE_GISO_TEXCOORD4		= 12,
+	ZE_GISO_TEXCOORD5		= 13,
+	ZE_GISO_TEXCOORD6		= 14,	ZE_GISO_TANGENT		= 14,
+	ZE_GISO_TEXCOORD7		= 15,	ZE_GISO_BINORMAL	= 15
+};
 
-}
+
+class ZEGLStaticVertexBuffer : public ZEVertexBuffer
+{
+private:
+
+protected:
+
+public:
+	GLVertexBuffer			VertexBuffer;
+
+	void					PrepareForDrawCall();
+	void					RestoreAttribArrays();
+
+};
+#endif

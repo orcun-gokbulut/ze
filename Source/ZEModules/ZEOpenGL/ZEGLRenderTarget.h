@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+ Zinek Engine - ZEGLRenderTarget.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
+#ifndef __ZE_GL_RENDER_TARGET_H__
+#define __ZE_GL_RENDER_TARGET_H__
 
-ZEDepthBuffer::~ZEDepthBuffer()
+#include "ZETypes.h"
+#include "ZEGraphics/ZERenderTarget.h"
+#include "ZEGL.h"
+
+class ZEGLRenderTarget : public ZERenderTarget
 {
+	private:
+		ZEUInt					Width;
+		ZEUInt					Height;
 
-}
+	protected:
+
+
+	public:
+		GLRenderBuffer			RenderTarget;		// Is Texture
+
+		virtual float			GetAspectRatio();
+		virtual ZEUInt			GetWidth();
+		virtual ZEUInt			GetHeight();
+
+								ZEGLRenderTarget();
+								ZEGLRenderTarget(ZEUInt Width, ZEUInt Height);
+								~ZEGLRenderTarget();
+};
+#endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+ Zinek Engine - ZEGLRenderTarget.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,40 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
+#include "ZEGLRenderTarget.h"
 
-ZEDepthBuffer::~ZEDepthBuffer()
+float ZEGLRenderTarget::GetAspectRatio()
 {
+	return ((float)Width)/Height;
+}
 
+ZEUInt ZEGLRenderTarget::GetWidth()
+{
+	return Width;
+}
+
+ZEUInt ZEGLRenderTarget::GetHeight()
+{
+	return Height;
+}
+
+ZEGLRenderTarget::ZEGLRenderTarget()
+{
+	RenderTarget = 0;
+	Width = 0;
+	Height = 0;
+}
+
+ZEGLRenderTarget::ZEGLRenderTarget(ZEUInt Width, ZEUInt Height)
+{
+	glGenTextures(1, &RenderTarget);
+	glBindTexture(GL_TEXTURE_2D, RenderTarget);
+	glTexStorage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Width, Height);		// Allocate Space
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+ZEGLRenderTarget::~ZEGLRenderTarget()
+{
+	if(RenderTarget != 0)
+		glDeleteTextures(1, &RenderTarget);
 }

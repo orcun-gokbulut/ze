@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9GraphicsDevice.cpp
+ Zinek Engine - ZEGLGraphicsDevice.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,159 +33,170 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED3D9GraphicsDevice.h"
-#include "ZED3D9Shader.h"
-#include "ZED3D9VertexDeclaration.h"
-#include "ZED3D9RenderTarget.h"
-#include "ZED3D9DepthBuffer.h"
-#include "ZED3D9Texture2D.h"
-#include "ZED3D9Texture3D.h"
-#include "ZED3D9TextureCube.h"
-#include "ZED3D9VertexBuffer.h"
-#include "ZED3D9IndexBuffer.h"
+#include "ZETypes.h"
+#include "ZEGLGraphicsDevice.h"
+#include "ZEGLShader.h"
+#include "ZEGLRenderTarget.h"
+#include "ZEGLDepthBuffer.h"
+#include "ZEGLTexture2D.h"
+#include "ZEGLTexture3D.h"
+#include "ZEGLTextureCube.h"
+#include "ZEGLVertexBuffer.h"
+#include "ZEGLIndexBuffer.h"
 
-inline D3DBLEND ZEBlendOptionToDX9(ZEBlendOption BlendOption)
+inline GLenum ZEBlendOptionToGL(ZEBlendOption BlendOption)
 {
-	static const D3DBLEND Values[] =
+	static const GLenum Values[] =
 	{
-		(D3DBLEND)0,
-		D3DBLEND_ZERO,
-		D3DBLEND_ONE,
-		D3DBLEND_SRCCOLOR,
-		D3DBLEND_INVSRCCOLOR,
-		D3DBLEND_SRCALPHA,
-		D3DBLEND_INVSRCALPHA,
-		D3DBLEND_DESTALPHA,
-		D3DBLEND_INVDESTALPHA,
-		D3DBLEND_DESTCOLOR,
-		D3DBLEND_INVDESTCOLOR,
-		D3DBLEND_SRCALPHASAT
+		(GLenum)0,
+		GL_ZERO,
+		GL_ONE,
+		GL_SRC_COLOR,
+		GL_ONE_MINUS_SRC_COLOR,
+		GL_SRC_ALPHA,
+		GL_ONE_MINUS_SRC_ALPHA,
+		GL_DST_ALPHA,
+		GL_ONE_MINUS_DST_ALPHA,
+		GL_DST_COLOR,
+		GL_ONE_MINUS_DST_COLOR,
+		GL_SRC_ALPHA_SATURATE
 	};
 	return Values[BlendOption];
 }
 
-inline D3DBLENDOP ZEBlendEquationToDX9(ZEBlendEquation BlendEquation)
+inline GLenum ZEBlendEquationToGL(ZEBlendEquation BlendEquation)
 {
-	static const D3DBLENDOP Values[] =
+	static const GLenum Values[] =
 	{
-		(D3DBLENDOP)0,
-		D3DBLENDOP_ADD,
-		D3DBLENDOP_SUBTRACT,
-		D3DBLENDOP_REVSUBTRACT,
-		D3DBLENDOP_MIN,
-		D3DBLENDOP_MAX
+		(GLenum)0,
+		GL_FUNC_ADD,
+		GL_FUNC_SUBTRACT,
+		GL_FUNC_REVERSE_SUBTRACT,
+		GL_MIN,
+		GL_MAX
 	};
 	return Values[BlendEquation];
 }
 
-inline D3DCMPFUNC ZEComparisionFunctionToDX9(ZEComparisonFunction CompFunc)
+inline GLenum ZEComparisionFunctionToGL(ZEComparisonFunction CompFunc)
 {
-	static const D3DCMPFUNC Values[] =
+	static const GLenum Values[] =
 	{
-		(D3DCMPFUNC)0, 
-		D3DCMP_NEVER, 
-		D3DCMP_LESS, D3DCMP_EQUAL, 
-		D3DCMP_LESSEQUAL, 
-		D3DCMP_GREATER, 
-		D3DCMP_NOTEQUAL, 
-		D3DCMP_GREATEREQUAL, 
-		D3DCMP_ALWAYS
+		(GLenum)0, 
+		GL_NEVER, 
+		GL_LESS, GL_EQUAL, 
+		GL_LEQUAL, 
+		GL_GREATER, 
+		GL_NOTEQUAL, 
+		GL_GEQUAL, 
+		GL_ALWAYS
 	};
 	return Values[CompFunc];
 }
 
-inline D3DSTENCILOP ZEStencilOperationToDX9(ZEStencilOperation StencilOperation)
+inline GLenum ZEStencilOperationToGL(ZEStencilOperation StencilOperation)
 {
-	static const D3DSTENCILOP Values[] = 
+	static const GLenum Values[] = 
 	{ 
-		(D3DSTENCILOP)0, 
-		D3DSTENCILOP_KEEP, 
-		D3DSTENCILOP_ZERO, 
-		D3DSTENCILOP_REPLACE,					
-		D3DSTENCILOP_INCRSAT, 
-		D3DSTENCILOP_DECRSAT, 
-		D3DSTENCILOP_INVERT,
-		D3DSTENCILOP_INCR, 
-		D3DSTENCILOP_DECR
+		(GLenum)0, 
+		GL_KEEP, 
+		GL_ZERO, 
+		GL_REPLACE,					
+		GL_INCR_WRAP, 
+		GL_DECR_WRAP, 
+		GL_INVERT,
+		GL_INCR, 
+		GL_DECR
 	};
 	return Values[StencilOperation];
 }
 
-inline D3DFILLMODE ZEFillModeToDX9(ZEFillMode FillMode)
+inline GLenum ZEFillModeToGL(ZEFillMode FillMode)
 {
-	static const D3DFILLMODE Values[] = 
+	static const GLenum Values[] = 
 	{
-		(D3DFILLMODE)0,
-		D3DFILL_WIREFRAME,
-		D3DFILL_SOLID,
+		(GLenum)0,
+		GL_LINE,
+		GL_FILL,
 	};
 	return Values[FillMode];
 }
 
-inline D3DCULL ZECullDirectionToDX9(ZECullDirection CullDirection)
+inline GLenum ZECullDirectionToGL(ZECullDirection CullDirection)
 {
-	static const D3DCULL Values[] = 
+	static const GLenum Values[] = 
 	{
-		(D3DCULL)0,
-		D3DCULL_CW,
-		D3DCULL_CCW
+		(GLenum)0,
+		GL_CW,
+		GL_CCW
 	};
 	return Values[CullDirection];
 }
 
-inline D3DTEXTUREADDRESS ZETextureAdressModeToDX9(ZETextureAdressMode TextureAddress)
+inline GLenum ZETextureAdressModeToGL(ZETextureAdressMode TextureAddress)
 {
-	static const D3DTEXTUREADDRESS Values[] =
+	static const GLenum Values[] =
 	{
-		(D3DTEXTUREADDRESS)0,
-		D3DTADDRESS_WRAP,
-		D3DTADDRESS_MIRROR,
-		D3DTADDRESS_CLAMP,
-		D3DTADDRESS_BORDER
+		(GLenum)0,
+		GL_REPEAT,
+		GL_MIRRORED_REPEAT,
+		GL_CLAMP_TO_EDGE,
+		GL_CLAMP_TO_BORDER 
 	};
 	return Values[TextureAddress];
 }
 
-inline D3DTEXTUREFILTERTYPE ZETextureFilterModeToDX9(ZETextureFilterMode TextureFilter)
+inline GLenum ZETextureFilterModeToGL(ZETextureFilterMode TextureFilter)
 {
-	static const D3DTEXTUREFILTERTYPE Values[] =
+	static const GLenum Values[] =
 	{
-		D3DTEXF_NONE,
-		D3DTEXF_POINT,
-		D3DTEXF_LINEAR,
-		D3DTEXF_ANISOTROPIC
+		(GLenum)0,
+		GL_NEAREST,
+		GL_LINEAR,
+		GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT,
 	};
 	return Values[TextureFilter];
 }
 
-inline D3DPRIMITIVETYPE ZEPrimitiveTypeToDX9(ZEROPrimitiveType PrimitiveType)
+inline GLenum ZEPrimitiveTypeToGL(ZEROPrimitiveType PrimitiveType)
 {
-	static const D3DPRIMITIVETYPE Values[] = 
+	static const GLenum Values[] = 
 	{
-		D3DPT_POINTLIST,
-		D3DPT_LINELIST,
-		D3DPT_TRIANGLELIST,
-		D3DPT_TRIANGLEFAN
+		GL_POINTS,
+		GL_LINES,
+		GL_TRIANGLES,
+		GL_TRIANGLE_FAN
 	};
 	return Values[PrimitiveType];
 }
 
-inline void ZED3D9GraphicsDevice::InitDefaultState()
+inline void ZEGLGraphicsDevice::InitDefaultState()
 {
-	// TODO: 
-	D3DDevice9->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, true);
+	// ZE standard Front Face is CW
+	glFrontFace(GL_CW);
 
-	// Default Shaders
-	//	.........
+	// Only ZE_MAX_SAMPLER_ATTACHMENT amount, Sampler Object
+	glGenSamplers(ZE_MAX_SAMPLER_ATTACHMENT, GLSamplerStateHandles);
 
-	// Default Vertex Declaration
-	// ..........
+	// Only One VAO, draw calls will be generated on the fly.
+	glGenVertexArrays(1, &VertexArrayObject);
+	glBindVertexArray(VertexArrayObject);
 
-	// RenderTargets
+	// DummyFramebuffer Aside from Main Frame buffer
+	glGenFramebuffers(1, &FramebufferObject);
+
+	// TODO: 						   
+	// Default Shaders				   
+	//	.........					   
+									   
+	// Default Vertex Declaration	   
+	// ..........					   
+									   
+	// RenderTargets				   
 	// ..........
 }
 
-void ZED3D9GraphicsDevice::ApplyRequestedBlendState()
+void ZEGLGraphicsDevice::ApplyRequestedBlendState()
 {
 	// Skip If Requested Blend State didn't changed.
 	if(!RequestedBlendState.GetChanged())
@@ -195,59 +206,74 @@ void ZED3D9GraphicsDevice::ApplyRequestedBlendState()
 	if(RequestedBlendState.GetBlendEnable() != DeviceBlendState.GetBlendEnable())
 	{
 		DeviceBlendState.SetBlendEnable(RequestedBlendState.GetBlendEnable());
-		D3DDevice9->SetRenderState(D3DRS_ALPHABLENDENABLE, DeviceBlendState.GetBlendEnable());
+		if(DeviceBlendState.GetBlendEnable())
+			glEnable(GL_BLEND);
+		else
+			glDisable(GL_BLEND);
 	}
 	// Alpha and Color Blending Options
 	if(DeviceBlendState.GetBlendEnable())
 	{
+		bool ColorBlendOpChanged = false;
 		if(RequestedBlendState.GetSourceColorBlendOption() != ZE_BO_CURRENT && 
 			RequestedBlendState.GetSourceColorBlendOption() != DeviceBlendState.GetSourceColorBlendOption())
 		{
-			DeviceBlendState.SetSourceColorBlendOption(RequestedBlendState.GetSourceColorBlendOption()); 
-			D3DDevice9->SetRenderState(D3DRS_SRCBLEND, ZEBlendOptionToDX9(DeviceBlendState.GetSourceColorBlendOption()));
+			DeviceBlendState.SetSourceColorBlendOption(RequestedBlendState.GetSourceColorBlendOption());
+			ColorBlendOpChanged = true;
 		}
 
 		if(RequestedBlendState.GetDestinationColorBlendOption() != ZE_BO_CURRENT &&
 			RequestedBlendState.GetDestinationColorBlendOption() != DeviceBlendState.GetDestinationColorBlendOption())
 		{
-			DeviceBlendState.SetDestinationColorBlendOption(RequestedBlendState.GetDestinationColorBlendOption()); 
-			D3DDevice9->SetRenderState(D3DRS_DESTBLEND, ZEBlendOptionToDX9(DeviceBlendState.GetDestinationColorBlendOption()));
+			DeviceBlendState.SetDestinationColorBlendOption(RequestedBlendState.GetDestinationColorBlendOption());
+			ColorBlendOpChanged = true;
 		}
-		
+
 		if(RequestedBlendState.GetSourceAlphaBlendOption() != ZE_BO_CURRENT &&
 			RequestedBlendState.GetSourceAlphaBlendOption() != DeviceBlendState.GetSourceAlphaBlendOption())
 		{
 			DeviceBlendState.SetSourceAlphaBlendOption(RequestedBlendState.GetSourceAlphaBlendOption());
-			D3DDevice9->SetRenderState(D3DRS_SRCBLENDALPHA, ZEBlendOptionToDX9(DeviceBlendState.GetSourceAlphaBlendOption()));
+			ColorBlendOpChanged = true;
 		}
 
 		if(RequestedBlendState.GetDestinationAlphaBlendOption() != ZE_BO_CURRENT &&
 			RequestedBlendState.GetDestinationAlphaBlendOption() != DeviceBlendState.GetDestinationAlphaBlendOption())
 		{
 			DeviceBlendState.SetDestinationAlphaBlendOption(RequestedBlendState.GetDestinationAlphaBlendOption());
-			D3DDevice9->SetRenderState(D3DRS_DESTBLENDALPHA, ZEBlendOptionToDX9(DeviceBlendState.GetDestinationAlphaBlendOption()));
+			ColorBlendOpChanged = true;
 		}
-	
+
+		if(ColorBlendOpChanged)
+			glBlendFuncSeparate(ZEBlendOptionToGL(DeviceBlendState.GetSourceColorBlendOption()),
+								ZEBlendOptionToGL(DeviceBlendState.GetDestinationColorBlendOption()),
+								ZEBlendOptionToGL(DeviceBlendState.GetSourceAlphaBlendOption()),
+								ZEBlendOptionToGL(DeviceBlendState.GetDestinationAlphaBlendOption()));
+
+
 		if(RequestedBlendState.GetBlendEquation() != ZE_BE_CURRENT &&
 			RequestedBlendState.GetBlendEquation() != DeviceBlendState.GetBlendEquation())
 		{
 			DeviceBlendState.SetBlendEquation(RequestedBlendState.GetBlendEquation());
-			D3DDevice9->SetRenderState(D3DRS_BLENDOP, ZEBlendEquationToDX9(DeviceBlendState.GetBlendEquation()));
-			D3DDevice9->SetRenderState(D3DRS_BLENDOPALPHA, ZEBlendEquationToDX9(DeviceBlendState.GetBlendEquation()));
+			glBlendEquation(ZEBlendEquationToGL(DeviceBlendState.GetBlendEquation()));
 		}
 	}
 	//ColorMask
 	if(RequestedBlendState.GetColorChannelMask() != DeviceBlendState.GetColorChannelMask())
 	{
 		DeviceBlendState.SetColorChannelMask(RequestedBlendState.GetColorChannelMask());
-		D3DDevice9->SetRenderState(D3DRS_COLORWRITEENABLE, DeviceBlendState.GetColorChannelMask().Value);
+		ZEColorChannelMask ChannelMask = DeviceBlendState.GetColorChannelMask();
+		glColorMask(ChannelMask.GetFlags(ZE_CCM_RED),
+					ChannelMask.GetFlags(ZE_CCM_GREEN),
+					ChannelMask.GetFlags(ZE_CCM_BLUE),
+					ChannelMask.GetFlags(ZE_CCM_ALPHA)
+					);
 	}
 	// Until Next Apply;
 	// If nothing changes on this state block, this should remain false
 	RequestedBlendState.SetChanged(false);
 }
 
-void ZED3D9GraphicsDevice::ApplyRequestedSamplerStates()
+void ZEGLGraphicsDevice::ApplyRequestedSamplerStates()
 {
 	bool AdressesHaveBorderColor = false;
 	bool FiltersHaveAnisotrophy = false;
@@ -262,7 +288,7 @@ void ZED3D9GraphicsDevice::ApplyRequestedSamplerStates()
 				RequestedSamplerStates[i].GetAddressU() != DeviceSamplerStates[i].GetAddressU())
 			{
 				DeviceSamplerStates[i].SetAddressU(RequestedSamplerStates[i].GetAddressU());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_ADDRESSU, ZETextureAdressModeToDX9(DeviceSamplerStates[i].GetAddressU()));
+				glSamplerParameteri(GLSamplerStateHandles[i], GL_TEXTURE_WRAP_S, ZETextureAdressModeToGL(DeviceSamplerStates[i].GetAddressU()));
 				if(DeviceSamplerStates[i].GetAddressU() == ZE_TAM_BORDER)
 					AdressesHaveBorderColor = true;
 			}
@@ -270,7 +296,7 @@ void ZED3D9GraphicsDevice::ApplyRequestedSamplerStates()
 				RequestedSamplerStates[i].GetAddressV() != DeviceSamplerStates[i].GetAddressV())
 			{
 				DeviceSamplerStates[i].SetAddressV(RequestedSamplerStates[i].GetAddressV());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_ADDRESSU, ZETextureAdressModeToDX9(DeviceSamplerStates[i].GetAddressV()));
+				glSamplerParameteri(GLSamplerStateHandles[i], GL_TEXTURE_WRAP_T, ZETextureAdressModeToGL(DeviceSamplerStates[i].GetAddressV()));
 				if(DeviceSamplerStates[i].GetAddressV() == ZE_TAM_BORDER)
 					AdressesHaveBorderColor = true;
 			}
@@ -278,79 +304,99 @@ void ZED3D9GraphicsDevice::ApplyRequestedSamplerStates()
 				RequestedSamplerStates[i].GetAddressW() != DeviceSamplerStates[i].GetAddressW())
 			{
 				DeviceSamplerStates[i].SetAddressW(RequestedSamplerStates[i].GetAddressW());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_ADDRESSU, ZETextureAdressModeToDX9(DeviceSamplerStates[i].GetAddressW()));
+				glSamplerParameteri(GLSamplerStateHandles[i], GL_TEXTURE_WRAP_R, ZETextureAdressModeToGL(DeviceSamplerStates[i].GetAddressW()));
 				if(DeviceSamplerStates[i].GetAddressW() == ZE_TAM_BORDER)
 					AdressesHaveBorderColor = true;
 			}
 			// Filters
-			if(RequestedSamplerStates[i].GetMinFilter() != ZE_TFM_CURRENT &&
-				RequestedSamplerStates[i].GetMinFilter() != DeviceSamplerStates[i].GetMinFilter())
-			{
-				DeviceSamplerStates[i].SetMinFilter(RequestedSamplerStates[i].GetMinFilter());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_MINFILTER, ZETextureFilterModeToDX9(DeviceSamplerStates[i].GetMinFilter()));
-				if(DeviceSamplerStates[i].GetMinFilter() == ZE_TFM_ANISOTROPY)
-					FiltersHaveAnisotrophy = true;
-			}
 			if(RequestedSamplerStates[i].GetMagFilter() != ZE_TFM_CURRENT &&
 				RequestedSamplerStates[i].GetMagFilter() != DeviceSamplerStates[i].GetMagFilter())
 			{
 				DeviceSamplerStates[i].SetMagFilter(RequestedSamplerStates[i].GetMagFilter());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_MINFILTER, ZETextureFilterModeToDX9(DeviceSamplerStates[i].GetMagFilter()));
 				if(DeviceSamplerStates[i].GetMagFilter() == ZE_TFM_ANISOTROPY)
+				{
+					glTexParameteri(GLSamplerStateHandles[i], GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					FiltersHaveAnisotrophy = true;
+				}
+				else
+					glSamplerParameteri(GLSamplerStateHandles[i], GL_TEXTURE_MAG_FILTER, ZETextureFilterModeToGL(DeviceSamplerStates[i].GetMagFilter()));
+			}
+			// Min Mip is set in one go in GL
+			if(RequestedSamplerStates[i].GetMinFilter() != ZE_TFM_CURRENT &&
+				RequestedSamplerStates[i].GetMinFilter() != DeviceSamplerStates[i].GetMinFilter())
+			{
+				DeviceSamplerStates[i].SetMinFilter(RequestedSamplerStates[i].GetMinFilter());
+				if(DeviceSamplerStates[i].GetMinFilter() == ZE_TFM_ANISOTROPY)
 					FiltersHaveAnisotrophy = true;
 			}
 			if(RequestedSamplerStates[i].GetMipFilter() != ZE_TFM_CURRENT &&
 				RequestedSamplerStates[i].GetMipFilter() != DeviceSamplerStates[i].GetMipFilter())
 			{
 				DeviceSamplerStates[i].SetMipFilter(RequestedSamplerStates[i].GetMipFilter());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_MINFILTER, ZETextureFilterModeToDX9(DeviceSamplerStates[i].GetMipFilter()));
 				if(DeviceSamplerStates[i].GetMipFilter() == ZE_TFM_ANISOTROPY)
 					FiltersHaveAnisotrophy = true;
+			}
+			// Assigning Texture Filtering Mode
+			ZETextureFilterMode DeviceMinFilterMode = DeviceSamplerStates[i].GetMinFilter();
+			ZETextureFilterMode DeviceMipFilterMode = DeviceSamplerStates[i].GetMipFilter();
+			if(DeviceMinFilterMode != ZE_TFM_ANISOTROPY)
+			{
+				switch (DeviceMipFilterMode)
+				{
+					case ZE_TFM_NONE :
+						glSamplerParameteri(GLSamplerStateHandles[i], GL_TEXTURE_MIN_FILTER, ZETextureFilterModeToGL(DeviceMinFilterMode));
+						break;
+					case ZE_TFM_LINEAR :
+						if(DeviceMinFilterMode == ZE_TFM_LINEAR)
+							glSamplerParameteri(GLSamplerStateHandles[i], GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+						else if (DeviceMinFilterMode ==  ZE_TFM_POINT)
+							glSamplerParameteri(GLSamplerStateHandles[i], GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+						break;
+					case ZE_TFM_POINT :
+						if(DeviceMinFilterMode == ZE_TFM_LINEAR)
+							glSamplerParameteri(GLSamplerStateHandles[i], GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+						else if (DeviceMinFilterMode ==  ZE_TFM_POINT)
+							glSamplerParameteri(GLSamplerStateHandles[i], GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+						break;
+				}
 			}
 			// Rest
 			if(FiltersHaveAnisotrophy &&
 				RequestedSamplerStates[i].GetMaxAnisotrophy() != DeviceSamplerStates[i].GetMaxAnisotrophy())
 			{
 				DeviceSamplerStates[i].SetMaxAnisotrophy(RequestedSamplerStates[i].GetMaxAnisotrophy());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, DeviceSamplerStates[i].GetMaxAnisotrophy());
+				glSamplerParameterf(GLSamplerStateHandles[i], GL_TEXTURE_MAX_ANISOTROPY_EXT, (int)RequestedSamplerStates[i].GetMaxAnisotrophy());
 			}
 			if(AdressesHaveBorderColor &&
 				RequestedSamplerStates[i].GetBorderColor() != DeviceSamplerStates[i].GetBorderColor())
 			{	
 				DeviceSamplerStates[i].SetBorderColor(RequestedSamplerStates[i].GetBorderColor());
-
-				// Convert To RGBA
-				int ColorRGBA[4];
-				ZEVector4 Color = RequestedSamplerStates->GetBorderColor().Clamp(0.0f, 1.0f);
-				ColorRGBA[0] = (int)(Color.x * 255);
-				ColorRGBA[1] = (int)(Color.y * 255);
-				ColorRGBA[2] = (int)(Color.z * 255);
-				ColorRGBA[3] = (int)(Color.w * 255);
-
-				D3DDevice9->SetSamplerState(i, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(ColorRGBA[0], ColorRGBA[1], ColorRGBA[2], ColorRGBA[3]));
+				glSamplerParameterfv(GLSamplerStateHandles[i], GL_TEXTURE_BORDER_COLOR, DeviceSamplerStates[i].GetBorderColor().M);
 			}
 			if(RequestedSamplerStates[i].GetMaxLOD() != DeviceSamplerStates[i].GetMaxLOD())
 			{
 				DeviceSamplerStates[i].SetMaxLOD(RequestedSamplerStates[i].GetMaxLOD());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_MAXMIPLEVEL, (int)DeviceSamplerStates[i].GetMaxLOD());
+				glSamplerParameterf(GLSamplerStateHandles[i], GL_TEXTURE_MAX_LOD, DeviceSamplerStates[i].GetMaxLOD());
 			}
 			if(RequestedSamplerStates[i].GetTexture() != DeviceSamplerStates[i].GetTexture())
 			{
 				DeviceSamplerStates[i].SetCurrentTexture(RequestedSamplerStates[i].GetTexture());
-
+				glActiveTexture(GL_TEXTURE0 + i);
 				ZETextureType TexType = DeviceSamplerStates[i].GetTexture()->GetTextureType();
 				switch (TexType)
 				{
 					case ZE_TT_2D :
-						D3DDevice9->SetTexture(i, (((ZED3D9Texture2D*)DeviceSamplerStates[i].GetTexture())->Texture));
+						glBindSampler(GLSamplerStateHandles[i], ((ZEGLTexture2D*)DeviceSamplerStates[i].GetTexture())->Texture2D);
+						glBindTexture(GL_TEXTURE_2D, ((ZEGLTexture2D*)DeviceSamplerStates[i].GetTexture())->Texture2D);
 						break;
 					case ZE_TT_3D :
-						D3DDevice9->SetTexture(i, (((ZED3D9Texture3D*)DeviceSamplerStates[i].GetTexture())->VolumeTexture));
+						glBindSampler(GLSamplerStateHandles[i], ((ZEGLTexture3D*)DeviceSamplerStates[i].GetTexture())->Texture3D);
+						glBindTexture(GL_TEXTURE_3D, ((ZEGLTexture3D*)DeviceSamplerStates[i].GetTexture())->Texture3D);
 						break;
 					case ZE_TT_CUBE :
-						D3DDevice9->SetTexture(i, (((ZED3D9TextureCube*)DeviceSamplerStates[i].GetTexture())->CubeTexture));
+						glBindSampler(GLSamplerStateHandles[i], ((ZEGLTextureCube*)DeviceSamplerStates[i].GetTexture())->TextureCube);
+						glBindTexture(GL_TEXTURE_CUBE_MAP, ((ZEGLTextureCube*)DeviceSamplerStates[i].GetTexture())->TextureCube);
 				}
-
 			}
 			// Until Next Apply;
 			// If nothing changes on this state block, this should remain false
@@ -359,7 +405,7 @@ void ZED3D9GraphicsDevice::ApplyRequestedSamplerStates()
 	}
 }
 
-void ZED3D9GraphicsDevice::ApplyRequestedShaders()
+void ZEGLGraphicsDevice::ApplyRequestedShaders()
 {
 	// if RequestedPixelShader is NULL that means use current shader
 	if(RequestedPixelShader != NULL)
@@ -368,7 +414,7 @@ void ZED3D9GraphicsDevice::ApplyRequestedShaders()
 		if(RequestedPixelShader != DevicePixelShader)
 		{
 			DevicePixelShader = RequestedPixelShader;
-			D3DDevice9->SetPixelShader(((ZED3D9PixelShader*)DevicePixelShader)->GetPixelShader());
+			((ZEGLPixelShader*)DevicePixelShader)->BindShader();
 		}
 	}
 	if(RequestedVertexShader != NULL)
@@ -376,12 +422,12 @@ void ZED3D9GraphicsDevice::ApplyRequestedShaders()
 		if(RequestedVertexShader != DeviceVertexShader)
 		{
 			DeviceVertexShader = RequestedVertexShader;
-			D3DDevice9->SetVertexShader(((ZED3D9VertexShader*)DeviceVertexShader)->GetVertexShader());
+			((ZEGLVertexShader*)DeviceVertexShader)->BindShader();
 		}
 	}
 }
 
-void ZED3D9GraphicsDevice::ApplyRequestedStencilZState()
+void ZEGLGraphicsDevice::ApplyRequestedStencilZState()
 {
 	// Skip Entire Function if Requested State is same from before
 	if(!RequestedStencilZState.GetChanged())
@@ -391,90 +437,112 @@ void ZED3D9GraphicsDevice::ApplyRequestedStencilZState()
 	if(RequestedStencilZState.GetZTestEnable() != DeviceStencilZState.GetZTestEnable())
 	{
 		DeviceStencilZState.SetZTestEnable(RequestedStencilZState.GetZTestEnable());
-		D3DDevice9->SetRenderState(D3DRS_ZENABLE, DeviceStencilZState.GetZTestEnable());
+		if(DeviceStencilZState.GetZTestEnable())
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
 	}
 	if(RequestedStencilZState.GetStencilTestEnable() != DeviceStencilZState.GetStencilTestEnable())
 	{	
 		DeviceStencilZState.SetStencilTestEnable(RequestedStencilZState.GetStencilTestEnable());
-		D3DDevice9->SetRenderState(D3DRS_STENCILENABLE, DeviceStencilZState.GetStencilTestEnable());
+		if(DeviceStencilZState.GetStencilTestEnable())
+			glEnable(GL_STENCIL_TEST);
+		else
+			glDisable(GL_STENCIL_TEST);
 	}
 	if(RequestedStencilZState.GetZWriteEnable() != DeviceStencilZState.GetZWriteEnable())
 	{
 		DeviceStencilZState.SetZWriteEnable(RequestedStencilZState.GetZWriteEnable());
-		D3DDevice9->SetRenderState(D3DRS_ZWRITEENABLE, DeviceStencilZState.GetZWriteEnable());
+		glDepthMask(DeviceStencilZState.GetZWriteEnable());
 	}
 	if(RequestedStencilZState.GetStencilWriteMask() != DeviceStencilZState.GetStencilWriteMask())
 	{
 		DeviceStencilZState.SetStencilWriteMask(RequestedStencilZState.GetStencilWriteMask());
-		D3DDevice9->SetRenderState(D3DRS_STENCILWRITEMASK, DeviceStencilZState.GetStencilWriteMask());
+		glStencilMask(DeviceStencilZState.GetStencilWriteMask());
 	}
+
 	// Z Function
 	if(DeviceStencilZState.GetZTestEnable() && RequestedStencilZState.GetZFunction() != ZE_CF_CURRENT &&
 		RequestedStencilZState.GetZFunction() != DeviceStencilZState.GetZFunction())
 	{
 		DeviceStencilZState.SetZFunction(RequestedStencilZState.GetZFunction());
-		D3DDevice9->SetRenderState(D3DRS_ZFUNC, ZEComparisionFunctionToDX9(DeviceStencilZState.GetZFunction()));
+		glDepthFunc(ZEComparisionFunctionToGL(DeviceStencilZState.GetZFunction()));
 	}
 	// Front Stencil Operation
 	if(DeviceStencilZState.GetStencilTestEnable())
 	{
+		bool FrontStencilChanged = false;
+		bool BackStencilChanged = false;
 		// Front Stencil Operation
 		if(RequestedStencilZState.GetFrontStencilFail() != ZE_CF_CURRENT &&
 			RequestedStencilZState.GetFrontStencilFail() != DeviceStencilZState.GetFrontStencilFail())
 		{
 			DeviceStencilZState.SetFrontStencilFail(RequestedStencilZState.GetFrontStencilFail());
-			D3DDevice9->SetRenderState(D3DRS_STENCILFAIL, ZEStencilOperationToDX9(DeviceStencilZState.GetFrontStencilFail()));
+			FrontStencilChanged = true;
 		}
 		if(DeviceStencilZState.GetFrontZFail() != ZE_SO_CURRENT &&
 			RequestedStencilZState.GetFrontZFail() != DeviceStencilZState.GetFrontZFail())
 		{
 			DeviceStencilZState.SetFrontZFail(RequestedStencilZState.GetFrontZFail());
-			D3DDevice9->SetRenderState(D3DRS_STENCILZFAIL, ZEStencilOperationToDX9(DeviceStencilZState.GetFrontZFail()));
+			FrontStencilChanged = true;
 		}
 		if(RequestedStencilZState.GetFrontStencilPass() != ZE_SO_CURRENT &&
 			RequestedStencilZState.GetFrontStencilPass() != DeviceStencilZState.GetFrontStencilPass())
 		{
 			DeviceStencilZState.SetFrontStencilPass(RequestedStencilZState.GetFrontStencilPass());
-			D3DDevice9->SetRenderState(D3DRS_STENCILPASS, ZEStencilOperationToDX9(DeviceStencilZState.GetFrontStencilPass()));
+			FrontStencilChanged = true;
 		}
 		if(RequestedStencilZState.GetFrontStencilFunction() != ZE_SO_CURRENT &&
 			RequestedStencilZState.GetFrontStencilFunction() != DeviceStencilZState.GetFrontStencilFunction())
 		{
 			DeviceStencilZState.SetFrontStencilFunction(RequestedStencilZState.GetFrontStencilFunction());
-			D3DDevice9->SetRenderState(D3DRS_STENCILFUNC, ZEComparisionFunctionToDX9(DeviceStencilZState.GetFrontStencilFunction()));
+			glStencilFuncSeparate(GL_FRONT, ZEComparisionFunctionToGL(DeviceStencilZState.GetFrontStencilFunction()), 0, 0xFFFFFFFF);
 		}
+
+		if(FrontStencilChanged)
+			glStencilOpSeparate(GL_FRONT,
+								DeviceStencilZState.GetFrontStencilFail(),
+								DeviceStencilZState.GetFrontZFail(),
+								DeviceStencilZState.GetFrontStencilPass());
+
 		// Back Stencil Operation
 		if(RequestedStencilZState.GetBackStencilFail() != ZE_CF_CURRENT &&
 			RequestedStencilZState.GetBackStencilFail() != DeviceStencilZState.GetBackStencilFail())
 		{
 			DeviceStencilZState.SetBackStencilFail(RequestedStencilZState.GetBackStencilFail());
-			D3DDevice9->SetRenderState(D3DRS_CCW_STENCILFAIL, ZEStencilOperationToDX9(DeviceStencilZState.GetBackStencilFail()));
+			BackStencilChanged = true;
 		}
 		if(RequestedStencilZState.GetBackZFail() != ZE_SO_CURRENT &&
 			RequestedStencilZState.GetBackZFail() != DeviceStencilZState.GetBackZFail())
 		{
 			DeviceStencilZState.SetBackZFail(RequestedStencilZState.GetBackZFail());
-			D3DDevice9->SetRenderState(D3DRS_CCW_STENCILZFAIL, ZEStencilOperationToDX9(DeviceStencilZState.GetBackZFail()));
+			BackStencilChanged = true;
 		}
 		if(RequestedStencilZState.GetBackStencilPass() != ZE_SO_CURRENT &&
 			RequestedStencilZState.GetBackStencilPass() != DeviceStencilZState.GetBackStencilPass())
 		{
 			DeviceStencilZState.SetBackStencilPass(RequestedStencilZState.GetBackStencilPass());
-			D3DDevice9->SetRenderState(D3DRS_CCW_STENCILPASS, ZEStencilOperationToDX9(DeviceStencilZState.GetBackStencilPass()));
+			BackStencilChanged = true;
 		}
 		if(RequestedStencilZState.GetBackStencilFunction() != ZE_SO_CURRENT &&
 			RequestedStencilZState.GetBackStencilFunction() != DeviceStencilZState.GetBackStencilFunction())
 		{
 			DeviceStencilZState.SetBackStencilFunction(RequestedStencilZState.GetBackStencilFunction());
-			D3DDevice9->SetRenderState(D3DRS_CCW_STENCILFUNC, ZEComparisionFunctionToDX9(DeviceStencilZState.GetBackStencilFunction()));
+			glStencilFuncSeparate(GL_BACK, ZEComparisionFunctionToGL(DeviceStencilZState.GetBackStencilFunction()), 0, 0xFFFFFFFF);
 		}
+
+		if(BackStencilChanged)
+			glStencilOpSeparate(GL_BACK,
+								DeviceStencilZState.GetBackStencilFail(),
+								DeviceStencilZState.GetBackZFail(),
+								DeviceStencilZState.GetBackStencilPass());
 	}
 	// Until Next Apply;
 	// If nothing changes on this state block, this should remain false
 	RequestedStencilZState.SetChanged(false);
 }
 
-void ZED3D9GraphicsDevice::ApplyRequestedRasterizerState()
+void ZEGLGraphicsDevice::ApplyRequestedRasterizerState()
 {
 	// Return if it did not changed
 	if(!RequestedRasterizerState.GetChanged())
@@ -483,87 +551,96 @@ void ZED3D9GraphicsDevice::ApplyRequestedRasterizerState()
 	// Cull Side and Cull Enable
 	if(RequestedRasterizerState.GetCullEnable())
 	{
+		glEnable(GL_CULL_FACE);
 		if(RequestedRasterizerState.GetCullDirection() != ZE_CD_CURRENT &&
 			RequestedRasterizerState.GetCullDirection() != DeviceRasterizerState.GetCullDirection())
 		{
 			DeviceRasterizerState.SetCullDirection(RequestedRasterizerState.GetCullDirection());
-			D3DDevice9->SetRenderState(D3DRS_CULLMODE, ZECullDirectionToDX9(DeviceRasterizerState.GetCullDirection()));
+			if(DeviceRasterizerState.GetCullDirection() == ZE_CD_CLOCKWISE)
+				glCullFace(GL_FRONT);
+			else
+				glCullFace(GL_BACK);
 		}
 	}	
 	else
-		D3DDevice9->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+		glDisable(GL_CULL_FACE);
+
 	// Fill Mode
 	if(RequestedRasterizerState.GetFillMode() !=  ZE_FM_CURRENT &&
 		RequestedRasterizerState.GetFillMode() != DeviceRasterizerState.GetFillMode())
 	{
 		DeviceRasterizerState.SetFillMode(RequestedRasterizerState.GetFillMode());
-		D3DDevice9->SetRenderState(D3DRS_FILLMODE, ZEFillModeToDX9(DeviceRasterizerState.GetFillMode()));
+		glPolygonMode(GL_FRONT_AND_BACK, ZEFillModeToGL(DeviceRasterizerState.GetFillMode()));
 	}
 	// Until Next Apply;
 	// If nothing changes on this state block, this should remain false
 	RequestedRasterizerState.SetChanged(false);
 }
 
-void ZED3D9GraphicsDevice::ApplyRequestedVertexBuffer()
+void ZEGLGraphicsDevice::ApplyRequestedVertexBuffer()
 {
-	if (RequestedVertexBuffer != NULL && 
-		RequestedVertexBuffer != DeviceVertexBuffer)
+	if(RequestedVertexBuffer != NULL && RequestedVertexBuffer == DeviceVertexBuffer)
 	{
 		DeviceVertexBuffer = RequestedVertexBuffer;
-
-		D3DDevice9->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)DeviceVertexBuffer)->StaticBuffer, 0, ((ZED3D9StaticVertexBuffer*)DeviceVertexBuffer)->GetVertexSize());
-		// Stream ZERO Only for now...
+		glBindBuffer(GL_ARRAY_BUFFER, ((ZEGLStaticVertexBuffer*)DeviceVertexBuffer)->VertexBuffer);
 	}
+	// If We Bind Here we can only use one vertex buffer.
 }
 
-void ZED3D9GraphicsDevice::ApplyRequestedIndexBuffer()
+void ZEGLGraphicsDevice::ApplyRequestedIndexBuffer()
 {
-	if (RequestedVertexBuffer != NULL && 
-		RequestedVertexBuffer != DeviceVertexBuffer)
+	if(RequestedIndexBuffer != NULL && RequestedIndexBuffer == DeviceIndexBuffer)
 	{
 		DeviceIndexBuffer = RequestedIndexBuffer;
-		D3DDevice9->SetIndices(((ZED3D9StaticIndexBuffer*)DeviceIndexBuffer)->StaticBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ((ZEGLIndexBuffer*)DeviceIndexBuffer)->IndexBuffer);
 	}
 }
 
-void ZED3D9GraphicsDevice::ApplyRequestedRenderTargets()
+
+void ZEGLGraphicsDevice::ApplyRequestedRenderTargets()
 {
 	if(ScreenWriteEnable)
 	{
-		// Now Only Set RT0 Which Should Have Back buffer
-		D3DDevice9->SetRenderTarget(0, ((ZED3D9RenderTarget*)DeviceRenderTargets[0])->FrameBuffer);
+		// Ignore Any other RenderTarget
+		// Switch to Screen FBO 
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glDrawBuffer(GL_BACK);
+		return;
+	}
+	else
+	{
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FramebufferObject);
+		GLenum DrawBufferEnable[ZE_MAX_RENDER_TARGETS];
+		int EnabledRenderBufferSize = 0;
+		for(int i = 0; i < ZE_MAX_RENDER_TARGETS; i++)
+		{
+			if(RequestedRenderTargets[i] != NULL)
+			{
+				if(RequestedRenderTargets[i] != DeviceRenderTargets[i])
+				{
+					DeviceRenderTargets[i] = RequestedRenderTargets[i];
+					glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, ((ZEGLRenderTarget*)DeviceRenderTargets[i])->RenderTarget, 0);
+				}
+				DrawBufferEnable[EnabledRenderBufferSize] = GL_COLOR_ATTACHMENT0 + i;
+				EnabledRenderBufferSize++;
+			}
+		}
+		// Open Only non-NULL RenderTargets
+		if(EnabledRenderBufferSize != 0)
+			glDrawBuffers(EnabledRenderBufferSize, DrawBufferEnable);
+		else
+			glDrawBuffer(GL_NONE);	// Don't Write on to Anything. This only implies color(Depth/Stencil Buffer Writes Still Apply)
 
-		// Still Try To Set A DepthStencilBuffer
+		// Now Set A DepthStencilBuffer
 		if(RequestedDepthBuffer != NULL && RequestedDepthBuffer != DeviceDepthBuffer)
 		{
 			DeviceDepthBuffer = RequestedDepthBuffer;
-			D3DDevice9->SetDepthStencilSurface(((ZED3D9DepthBuffer*)RequestedDepthBuffer)->DepthSurface);
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, ((ZEGLDepthBuffer*)DeviceDepthBuffer)->DepthBuffer, 0);
 		}
-		return;
-	}
-
-	for(int i = 0; i < ZE_MAX_RENDER_TARGETS; i++)
-	{
-		// If NULL skip this render target
-		if (RequestedRenderTargets[i] != NULL)
-		{		
-			// If Pointer Address not same consider it changed
-			if (RequestedRenderTargets[i] != DeviceRenderTargets[i])
-			{
-				DeviceRenderTargets[i] = RequestedRenderTargets[i];
-				D3DDevice9->SetRenderTarget(i, ((ZED3D9RenderTarget*)DeviceRenderTargets[i])->FrameBuffer);
-			}
-		}
-	}
-
-	if(RequestedDepthBuffer != NULL && RequestedDepthBuffer != DeviceDepthBuffer)
-	{
-		DeviceDepthBuffer = RequestedDepthBuffer;
-		D3DDevice9->SetDepthStencilSurface(((ZED3D9DepthBuffer*)RequestedDepthBuffer)->DepthSurface);
 	}
 }
 
-void ZED3D9GraphicsDevice::ApplyAllRequestedStates()
+void ZEGLGraphicsDevice::ApplyAllRequestedStates()
 {
 	ApplyRequestedBlendState();
 	ApplyRequestedSamplerStates();
@@ -574,59 +651,50 @@ void ZED3D9GraphicsDevice::ApplyAllRequestedStates()
 	ApplyRequestedVertexBuffer();
 }
 
-void ZED3D9GraphicsDevice::Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount) 
+void ZEGLGraphicsDevice::Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount) 
 {
 	// Commit State
 	ApplyAllRequestedStates();
 
-	// Generate A Vertex Declaration From the Buffer
-	ZED3D9VertexDeclaration VertexDeclaration;
-	if (!VertexDeclaration.Create(DeviceVertexBuffer->GetVertexElements().GetConstCArray(), DeviceVertexBuffer->GetVertexElements().GetSize()))
-	{
-		zeError("Unable To Generate Vertex Declaration!!");
-	}
+	// Create Series of GL commands from Vertex Declaration
+	// Assuming Vertex Size is Generated
+	((ZEGLStaticVertexBuffer*)DeviceVertexBuffer)->PrepareForDrawCall();
 
-	// Set Vertex Declaration
-	VertexDeclaration.SetupVertexDeclaration();
+	// DrawCall
+	glDrawArrays(ZEPrimitiveTypeToGL(PrimitiveType), StartVertex, VertexCount);
 
-	// Then Draw
-	D3DDevice9->DrawPrimitive(ZEPrimitiveTypeToDX9(PrimitiveType), StartVertex, VertexCount);
-
-	// Release This Declaration
-	VertexDeclaration.Release();
+	// Disabling VertexAttribArray
+	((ZEGLStaticVertexBuffer*)DeviceVertexBuffer)->RestoreAttribArrays();
 }
 
-void ZED3D9GraphicsDevice::DrawIndexed(ZEROPrimitiveType PrimitiveType, ZEInt BaseVertexIndex, ZEUInt32 MinIndex, 
-										ZEUInt32 VertexCount, ZEUInt32 StartIndex, ZEUInt32 PrimitiveCount)
+void ZEGLGraphicsDevice::DrawIndexed(ZEROPrimitiveType PrimitiveType, ZEInt BaseVertexIndex, ZEUInt32 MinIndex, 
+	ZEUInt32 VertexCount, ZEUInt32 StartIndex, ZEUInt32 PrimitiveCount)
 {
 	// Commit State
 	ApplyAllRequestedStates();
 	ApplyRequestedIndexBuffer();
 
-	// Generate A Vertex Declaration From the Buffer
-	ZED3D9VertexDeclaration VertexDeclaration;
-	if (!VertexDeclaration.Create(DeviceVertexBuffer->GetVertexElements().GetConstCArray(), DeviceVertexBuffer->GetVertexElements().GetSize()))
-	{
-		zeError("Unable To Generate Vertex Declaration!!");
-	}
+	// Create Series of GL commands from Vertex Declaration
+	// Assuming Vertex Size is Generated
+	((ZEGLStaticVertexBuffer*)DeviceVertexBuffer)->PrepareForDrawCall();
 
-	// Set Vertex Declaration
-	VertexDeclaration.SetupVertexDeclaration();
+	// DrawCall
+	glDrawRangeElementsBaseVertex(ZEPrimitiveTypeToGL(PrimitiveType), MinIndex, ZE_UINT_MAX, VertexCount, GL_UNSIGNED_INT, (void*)&StartIndex, BaseVertexIndex);
 
-	// Then Draw
-	D3DDevice9->DrawIndexedPrimitive(ZEPrimitiveTypeToDX9(PrimitiveType), BaseVertexIndex, MinIndex,
-										VertexCount, StartIndex, PrimitiveCount);
-
-	VertexDeclaration.Release();
+	// Disabling VertexAttribArray
+	((ZEGLStaticVertexBuffer*)DeviceVertexBuffer)->RestoreAttribArrays();
 }
 
-ZED3D9GraphicsDevice::ZED3D9GraphicsDevice() : ZEGraphicsDevice()
+ZEGLGraphicsDevice::ZEGLGraphicsDevice() : ZEGraphicsDevice()
 {
-	D3DDevice9 = GetDevice();
 	InitDefaultState();
 }
 
-ZED3D9GraphicsDevice::~ZED3D9GraphicsDevice()
+ZEGLGraphicsDevice::~ZEGLGraphicsDevice()
 {
-
+	glDeleteSamplers(ZE_MAX_SAMPLER_ATTACHMENT, GLSamplerStateHandles);
+	glBindVertexArray(0);
+	glDeleteVertexArrays(1, &VertexArrayObject);
+	glDeleteFramebuffers(1, &FramebufferObject);
 }
+

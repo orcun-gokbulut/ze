@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthBuffer.cpp
+ Zinek Engine - ZEGLTexture2D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDepthBuffer.h"
+#ifndef __ZE_GL_TEXTURE_2D_H__
+#define __ZE_GL_TEXTURE_2D_H__
 
-ZEDepthBuffer::~ZEDepthBuffer()
+
+#include "ZETypes.h"
+#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGL.h"
+
+class ZEGLTexture2D : public ZETexture2D
 {
+	private:
 
-}
+	protected:
+		
+	public:
+		GLTexture				Texture2D;
+};
+#endif
