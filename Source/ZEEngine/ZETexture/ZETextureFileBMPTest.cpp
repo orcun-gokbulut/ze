@@ -37,7 +37,6 @@
 #include "ZEDS/ZEPointer.h"
 #include "ZEDS/ZEString.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEBitmap.h"
 #include "ZETextureData.h"
 #include "ZETextureFileBMP.h"
 #include "ZETextureTestUtils.h"
@@ -53,7 +52,7 @@ bool TestSuccess(ZEString FileName)
 	if (!Loader.LoadInfo(&Info, &File))
 		return false;
 
-	ZETextureData* Data = Loader.Load(&File);
+	ZEPointer<ZETextureData> Data = Loader.Load(&File);
 	if (Data == NULL)
 		return false;
 
@@ -69,7 +68,7 @@ bool TestFail(ZEString FileName)
 	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 
 	ZETextureFileBMP Loader;
-	ZETextureData* Data = Loader.Load(&File);
+	ZEPointer<ZETextureData> Data = Loader.Load(&File);
 
 	ZELog::GetInstance()->SetMinimumLogLevel(OldLogType);
 
