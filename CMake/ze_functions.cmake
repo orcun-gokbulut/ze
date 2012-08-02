@@ -244,12 +244,12 @@ function(ze_add_executable)
             FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/$(ConfigurationName)" C)
             add_custom_command(
                 TARGET ${PARAMETER_TARGET}
-                COMMAND "copy"
-                ARGS "${A}" "${C}")
+                COMMAND "xcopy"
+                ARGS "${A}" "${C}" /D /Y)
             add_custom_command(
                 TARGET ${PARAMETER_TARGET}
-                COMMAND "copy"
-                ARGS "${B}" "${C}")
+                COMMAND "xcopy"
+                ARGS "${B}" "${C}" /D /Y)
         endif()
 	endif()
 		
@@ -367,7 +367,6 @@ function (ze_add_test)
 		message("\tTEST_TARGET_LINKS = ${TEST_TARGET_LINKS}")	
 	endif()
 endfunction()
-
 
 function(ze_add_module)
 	set (PARAMETER_TITLE "")

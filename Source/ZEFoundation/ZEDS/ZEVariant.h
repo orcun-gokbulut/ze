@@ -45,6 +45,7 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZEDS/ZEString.h"
 
 class ZESerializer;
 class ZEUnserializer;
@@ -84,149 +85,156 @@ class ZEObject;
 class ZEVariant : public ZESerializable
 {
 	public:
-		union ZEVariantValue
+		struct ZEVariantValue
 		{
-			float			Float;
-			double			Double;
-
-			ZEInt32			Int32;
-			ZEInt64			Int64;
-			
-			bool			Boolean;
-			char*			String;
-			ZEObject*		Pointer;
-			
-			struct
+			union
 			{
-				float A, B, C, D;
-			} Vectors;
+				float			Float;
+				double			Double;
 
-			ZEMatrix3x3*	Matrix3x3;
-			ZEMatrix4x4*	Matrix4x4;
+				ZEInt32			Int32;
+				ZEInt64			Int64;
+			
+				bool			Boolean;
+				ZEObject*		Pointer;
+			
+				struct
+				{
+					float		A, B, C, D;
+				} Vectors;
+
+				ZEMatrix3x3*	Matrix3x3;
+				ZEMatrix4x4*	Matrix4x4;
+			};
+			ZEString			String;
 		};
 
 	protected:
-		ZEVariantType		Type;
-		ZEVariantValue		Value;
+		ZEVariantType			Type;
+		ZEVariantValue			Value;
 
 	public:
-		void				SetType	(ZEVariantType NewType);
-		ZEVariantType		GetType	() const;
+		void					SetType	(ZEVariantType NewType);
+		ZEVariantType			GetType	() const;
 
-		ZEVariantValue		GetValue() const;
-		ZEVariantValue&		ImplicitAcesss();
+		ZEVariantValue			GetValue() const;
+		ZEVariantValue&			ImplicitAcesss();
 
-		void				SetString(const char *NewValue);
-		void				SetInt8(ZEInt8 Value);
-		void				SetInt16(ZEInt16 Value);
-		void				SetInt32(ZEInt32 Value);
-		void				SetInt64(ZEInt64 Value);
-		void				SetUInt8(ZEUInt8 Value);
-		void				SetUInt16(ZEUInt16 Value);
-		void				SetUInt32(ZEUInt32 Value);
-		void				SetUInt64(ZEUInt64 Value);
-		void				SetFloat(float Value);
-		void				SetDouble(double Value);
-		void				SetBoolean(bool Value);
-		void				SetVector2(const ZEVector2& Vector);
-		void				SetVector3(const ZEVector3& Vector);
-		void				SetVector4(const ZEVector4& Vector);
-		void				SetQuaternion(const ZEQuaternion& Quaternion);
-		void				SetMatrix3x3(const ZEMatrix3x3& Matrix);
-		void				SetMatrix4x4(const ZEMatrix4x4& Matrix);
-		void				SetClass(ZEObject* Pointer);
-		void				SetNull();
-		void				SetVariant(const ZEVariant& NewValue);
+		void					SetString(const char* Value);
+		void					SetString(const ZEString& Value);
+		void					SetInt8(ZEInt8 Value);
+		void					SetInt16(ZEInt16 Value);
+		void					SetInt32(ZEInt32 Value);
+		void					SetInt64(ZEInt64 Value);
+		void					SetUInt8(ZEUInt8 Value);
+		void					SetUInt16(ZEUInt16 Value);
+		void					SetUInt32(ZEUInt32 Value);
+		void					SetUInt64(ZEUInt64 Value);
+		void					SetFloat(float Value);
+		void					SetDouble(double Value);
+		void					SetBoolean(bool Value);
+		void					SetVector2(const ZEVector2& Value);
+		void					SetVector3(const ZEVector3& Value);
+		void					SetVector4(const ZEVector4& Value);
+		void					SetQuaternion(const ZEQuaternion& Value);
+		void					SetMatrix3x3(const ZEMatrix3x3& Value);
+		void					SetMatrix4x4(const ZEMatrix4x4& Value);
+		void					SetClass(ZEObject* Value);
+		void					SetNull();
+		void					SetVariant(const ZEVariant& Value);
 
-		char*				GetString() const;
-		ZEInt8				GetInt8() const;
-		ZEInt16				GetInt16() const;
-		ZEInt32				GetInt32() const;
-		ZEInt64				GetInt64() const;
-		ZEUInt8				GetUInt8() const;
-		ZEUInt16			GetUInt16() const;
-		ZEUInt32			GetUInt32() const;
-		ZEUInt64			GetUInt64() const;
-		float				GetFloat() const;
-		double				GetDouble() const;
-		bool				GetBoolean() const;
-		ZEVector2&			GetVector2() const;
-		ZEVector3&			GetVector3() const;
-		ZEVector4&			GetVector4() const;
-		ZEQuaternion&		GetQuaternion() const;
-		ZEMatrix3x3&		GetMatrix3x3() const;
-		ZEMatrix4x4&		GetMatrix4x4() const;
-		ZEObject*			GetClass() const;
+		const ZEString&			GetString() const;
+		ZEInt8					GetInt8() const;
+		ZEInt16					GetInt16() const;
+		ZEInt32					GetInt32() const;
+		ZEInt64					GetInt64() const;
+		ZEUInt8					GetUInt8() const;
+		ZEUInt16				GetUInt16() const;
+		ZEUInt32				GetUInt32() const;
+		ZEUInt64				GetUInt64() const;
+		float					GetFloat() const;
+		double					GetDouble() const;
+		bool					GetBoolean() const;
+		ZEVector2&				GetVector2() const;
+		ZEVector3&				GetVector3() const;
+		ZEVector4&				GetVector4() const;
+		ZEQuaternion&			GetQuaternion() const;
+		ZEMatrix3x3&			GetMatrix3x3() const;
+		ZEMatrix4x4&			GetMatrix4x4() const;
+		ZEObject*				GetClass() const;
 		
-		bool				IsNull() const;
-		ZESize				SizeOf() const;
+		bool					IsNull() const;
+		ZESize					SizeOf() const;
 
-		bool				Serialize(ZESerializer* Serializer);
-		bool				Unserialize(ZEUnserializer* Unserializer);
+		bool					Serialize(ZESerializer* Serializer);
+		bool					Unserialize(ZEUnserializer* Unserializer);
 
-		void				operator= (const ZEVariant &NewValue);
-		void				operator= (const char* NewValue);
-		void				operator= (ZEInt8 NewValue);
-		void				operator= (ZEInt16 NewValue);
-		void				operator= (ZEInt32 NewValue);
-		void				operator= (ZEInt64 NewValue);
-		void				operator= (ZEUInt8 NewValue);
-		void				operator= (ZEUInt16 NewValue);
-		void				operator= (ZEUInt32 NewValue);
-		void				operator= (ZEUInt64 NewValue);
-		void				operator= (float NewValue);
-		void				operator= (double NewValue);
-		void				operator= (bool NewValue);
-		void				operator= (const ZEVector2& Vector);
-		void				operator= (const ZEVector3& Vector);
-		void				operator= (const ZEVector4& Vector);
-		void				operator= (const ZEQuaternion& Quaternion);
-		void				operator= (const ZEMatrix3x3& Matrix);
-		void				operator= (const ZEMatrix4x4& Matrix);
-		void				operator= (ZEObject* Pointer);
+		void					operator= (const ZEVariant& Value);
+		void					operator= (const char* Value);
+		void					operator= (const ZEString& Value);
+		void					operator= (ZEInt8 Value);
+		void					operator= (ZEInt16 Value);
+		void					operator= (ZEInt32 Value);
+		void					operator= (ZEInt64 Value);
+		void					operator= (ZEUInt8 Value);
+		void					operator= (ZEUInt16 Value);
+		void					operator= (ZEUInt32 Value);
+		void					operator= (ZEUInt64 Value);
+		void					operator= (float Value);
+		void					operator= (double Value);
+		void					operator= (bool Value);
+		void					operator= (const ZEVector2& Value);
+		void					operator= (const ZEVector3& Value);
+		void					operator= (const ZEVector4& Value);
+		void					operator= (const ZEQuaternion& Value);
+		void					operator= (const ZEMatrix3x3& Value);
+		void					operator= (const ZEMatrix4x4& Value);
+		void					operator= (ZEObject* Value);
 
-							operator const char*();
-							operator ZEInt8();
-							operator ZEInt16();
-							operator ZEInt32();
-							operator ZEInt64();
-							operator ZEUInt8();
-							operator ZEUInt16();
-							operator ZEUInt32();
-							operator ZEUInt64();
-							operator float();
-							operator double();
-							operator bool();
-							operator ZEVector2();
-							operator ZEVector3();
-							operator ZEVector4();
-							operator ZEQuaternion();
-							operator ZEMatrix3x3();
-							operator ZEMatrix4x4();
-							operator ZEObject*();
+								operator const char*();
+								
+								operator ZEInt8();
+								operator ZEInt16();
+								operator ZEInt32();
+								operator ZEInt64();
+								operator ZEUInt8();
+								operator ZEUInt16();
+								operator ZEUInt32();
+								operator ZEUInt64();
+								operator float();
+								operator double();
+								operator bool();
+								operator ZEVector2();
+								operator ZEVector3();
+								operator ZEVector4();
+								operator ZEQuaternion();
+								operator ZEMatrix3x3();
+								operator ZEMatrix4x4();
+								operator ZEObject*();
 
-							ZEVariant();
-							ZEVariant(const ZEVariant &InitialValue);
-							ZEVariant(const char* InitialValue);	
-							ZEVariant(ZEInt8 InitialValue);
-							ZEVariant(ZEInt16 InitialValue);
-							ZEVariant(ZEInt32 InitialValue);
-							ZEVariant(ZEInt64 InitialValue);
-							ZEVariant(ZEUInt8 InitialValue);
-							ZEVariant(ZEUInt16 InitialValue);
-							ZEVariant(ZEUInt32 InitialValue);
-							ZEVariant(ZEUInt64 InitialValue);
-							ZEVariant(float InitialValue);
-							ZEVariant(double InitialValue);
-							ZEVariant(bool InitialValue);
-							ZEVariant(const ZEVector2& Vector);
-							ZEVariant(const ZEVector3& Vector);
-							ZEVariant(const ZEVector4& Vector);
-							ZEVariant(const ZEQuaternion& Quaternion);
-							ZEVariant(const ZEMatrix3x3& Matrix);
-							ZEVariant(const ZEMatrix4x4& Matrix);
-							ZEVariant(ZEObject* Pointer);
-							~ZEVariant();
+								ZEVariant();
+								ZEVariant(const ZEVariant& Value);
+								ZEVariant(const char* Value);
+								ZEVariant(const ZEString& Value);
+								ZEVariant(ZEInt8 Value);
+								ZEVariant(ZEInt16 Value);
+								ZEVariant(ZEInt32 Value);
+								ZEVariant(ZEInt64 Value);
+								ZEVariant(ZEUInt8 Value);
+								ZEVariant(ZEUInt16 Value);
+								ZEVariant(ZEUInt32 Value);
+								ZEVariant(ZEUInt64 Value);
+								ZEVariant(float Value);
+								ZEVariant(double Value);
+								ZEVariant(bool Value);
+								ZEVariant(const ZEVector2& Value);
+								ZEVariant(const ZEVector3& Value);
+								ZEVariant(const ZEVector4& Value);
+								ZEVariant(const ZEQuaternion& Quaternion);
+								ZEVariant(const ZEMatrix3x3& Value);
+								ZEVariant(const ZEMatrix4x4& Value);
+								ZEVariant(ZEObject* Value);
+								~ZEVariant();
 };
 
 

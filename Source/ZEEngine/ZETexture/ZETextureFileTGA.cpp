@@ -119,7 +119,7 @@ static __forceinline void ConvertColorRow(ZEPixelRGBA8* Destination, ZEUInt8* So
 	switch(BPP)
 	{
 		case 16:
-			ZETexturePixelConverter::ConvertBGR555(Destination, Source,  Width);
+			ZETexturePixelConverter::ConvertBGRX5551(Destination, Source,  Width);
 			break;
 
 		case 15:

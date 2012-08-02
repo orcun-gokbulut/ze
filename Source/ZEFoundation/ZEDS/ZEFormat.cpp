@@ -121,6 +121,9 @@ static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString& Parameter0
 
 static bool CheckArgumentFormat(const char* ArgumentFormat)
 {
+	if (ArgumentFormat == NULL)
+		return true;
+
 	while(*ArgumentFormat != 0)
 	{
 		if (!isdigit(*ArgumentFormat) && *ArgumentFormat != '.' && *ArgumentFormat != '#' && *ArgumentFormat != '.' && *ArgumentFormat != '-' && *ArgumentFormat != '+')
@@ -711,19 +714,20 @@ ZEString ZEFormat::FormatInner(const char* Input, const ZEVariant** Arguments, Z
 
 				CurrentInput++;
 				break;
+		}
 
-			case ZE_FPS_APPLY:
-				ArgumentFormat[ArgumentFormatIndex] = '\0';
+		if (State == ZE_FPS_APPLY)
+		{
+			ArgumentFormat[ArgumentFormatIndex] = '\0';
 
-				ZEString PrintOutput;
-				if (!FormatArgumentVariant(Writer, *Arguments[ArgumentIndex], ArgumentFormat))
-					return false;
-				
-				ArgumentIndex = -1;
-				ArgumentFormatIndex = 0;
+			ZEString PrintOutput;
+			if (!FormatArgumentVariant(Writer, *Arguments[ArgumentIndex], ArgumentFormat))
+				return false;
 
-				State = ZE_FPS_IMMEDIATE;
-				break;
+			ArgumentIndex = -1;
+			ArgumentFormatIndex = 0;
+
+			State = ZE_FPS_IMMEDIATE;
 		}
 	}
 

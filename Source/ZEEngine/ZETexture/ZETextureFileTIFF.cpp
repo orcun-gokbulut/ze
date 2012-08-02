@@ -46,6 +46,8 @@
 #include "ZETypes.h"
 #include "ZEEndian.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEDecompressorLZW.h"
+//#include "ZEDecompressorPackBit.h"
 
 ZEPackStruct
 (
@@ -459,6 +461,9 @@ static bool LoadHeader(ZEFile* File, ZETIFFInfo* Info)
 		}
 	}
 
+	if (Info->ChunkType == ZE_TIFF_CT_STRIP)
+		Info->ChunkWidth = Info->Width;
+
 	if (PhotometricInterpretation == -1)
 	{
 		zeError("Photrometric Interpretation tag is missing.");
@@ -615,110 +620,134 @@ static ZETextureData* LoadData(ZEFile* File, ZETIFFInfo* Info)
 	
 	ZESize DestinationPixelSize = Texture->GetSurfaces()[0].GetLevels()[0].GetPitch() / Texture->GetSurfaces()[0].GetLevels()[0].GetWidth();
 
+	ZESize ChunkX = 0;
+	ZESize ChunkY;
 	ZESize PositionX = 0;
-	ZESize PositionY = 0;
+	ZESize PositionY;
+	ZESize ChunkRowCount;
+	ZESize ChunkRowWidth = Info->Width;
+	ZESize ChunkRowPitch = ChunkRowWidth * PixelSize;
+	ZESize ChunkRowPadding = 0;
+	
+	ZESize TilesAcross = (Info->Width + Info->ChunkWidth - 1) / Info->ChunkWidth;
 
-	ZESize PositionXIncrement;
-	ZESize PositionYIncrement;
+	bool InternalFormat = 
+		(Info->PixelFormat == ZE_TIFF_PT_RGBA8 || 
+		(Info->PixelFormat == ZE_TIFF_PT_RGBA16 && Info->Endianness == ZE_ET_LITTLE) || 
+		Info->PixelFormat == ZE_TIFF_PT_L8 ||
+		(Info->PixelFormat == ZE_TIFF_PT_L16 && Info->Endianness == ZE_ET_LITTLE) ||
+		Info->PixelFormat == ZE_TIFF_PT_LA8 || 
+		(Info->PixelFormat == ZE_TIFF_PT_LA16 && Info->Endianness == ZE_ET_LITTLE));
 
-	if (Info->ChunkType == ZE_TIFF_CT_TILE)
+	ZEPointer<ZEUInt8> SourceRow;
+	if (!InternalFormat)
+		SourceRow = new ZEUInt8[Info->ChunkWidth * PixelSize];
+
+	ZEPointer<ZEDecompressor> Decompressor;
+	if (Info->Compression == ZE_TIFF_CT_LZW)
+		Decompressor = new ZEDecompressorLZW();
+	else if (Info->Compression == ZE_TIFF_CT_PACKBIT)
+		Decompressor = NULL; //new ZEDecompressorPackBit();
+
+	ZESize SourceRowPitch = Info->Width * PixelSize;
+	for (ZESize I = 0; I < Info->ChunkOffsets.GetCount(); I++)
 	{
+		if (Info->ChunkType == ZE_TIFF_CT_STRIP)
+		{
+			// Other variables has been defaulted above for strip type chunks
+			ChunkY = I;
+			PositionY = I * Info->ChunkHeight;
+			ChunkRowCount = Info->Height - ChunkY * Info->ChunkHeight >= Info->ChunkHeight ? Info->ChunkHeight : Info->Height % Info->ChunkHeight;
+		}
+		else
+		{
+			ChunkX = I % TilesAcross;
+			ChunkY = I / TilesAcross;
+			PositionX = Info->ChunkWidth * ChunkX;
+			PositionY = Info->ChunkHeight * ChunkY;
+			ChunkRowCount = Info->Height - ChunkY * Info->ChunkHeight >= Info->ChunkHeight ? Info->ChunkHeight : Info->Height % Info->ChunkHeight;
+			ChunkRowWidth = (Info->Width - PositionX < Info->ChunkWidth ? Info->Width - PositionX : Info->ChunkWidth);
+			ChunkRowPitch = ChunkRowWidth * PixelSize;
+			ChunkRowPadding = Info->ChunkWidth * PixelSize - ChunkRowPitch;
+		}
 
-	}
-	else
-	{
-
-	}
-
-	if (Info->Compression == ZE_TIFF_CT_UNCOMPRESSED)
-	{
-		bool InternalFormat = 
-			(Info->PixelFormat == ZE_TIFF_PT_RGBA8 || 
-			(Info->PixelFormat == ZE_TIFF_PT_RGBA16 && Info->Endianness == ZE_ET_LITTLE) || 
-			Info->PixelFormat == ZE_TIFF_PT_L8 ||
-			(Info->PixelFormat == ZE_TIFF_PT_L16 && Info->Endianness == ZE_ET_LITTLE) ||
-			Info->PixelFormat == ZE_TIFF_PT_LA8 || 
-			(Info->PixelFormat == ZE_TIFF_PT_LA16 && Info->Endianness == ZE_ET_LITTLE));
-
-		ZEPointer<ZEUInt8> SourceRow;
-		if (!InternalFormat)
-			SourceRow = new ZEUInt8[Info->Width * PixelSize];
-
-		ZESize SourceRowPitch = Info->Width * PixelSize;
-		for (ZESize I = 0; I < Info->ChunkOffsets.GetCount(); I++)
+		if (Decompressor != NULL)
+			Decompressor->Reset();
+		
+		ZEUInt8 CompressedChunk[4096];
+		Decompressor->SetInput(CompressedChunk);
+		File->Seek(Info->ChunkOffsets[I], ZE_SF_BEGINING);
+		for (ZESize N = 0; I < ChunkRowCount; N++)
 		{
 			DestinationChunk = DestinationData + (Info->Width * PositionY + PositionX) * DestinationPixelSize;
+			if (InternalFormat)
+				SourceRow = DestinationChunk;
 
-			ZESize ChunkRowCount = Info->Height - I * Info->ChunkHeight >= Info->ChunkHeight ? Info->ChunkHeight : Info->Height % Info->ChunkHeight;
-			File->Seek(Info->ChunkOffsets[I], ZE_SF_BEGINING);
-			for (ZESize N = 0; I < ChunkRowCount; N++)
+			// Compression
+			if (Info->Compression == ZE_TIFF_CT_UNCOMPRESSED)
 			{
-				if (InternalFormat)
-				{
-					if (File->Read(DestinationChunk, SourceRowPitch, 1) != 1)
-						return NULL;	
-				}
-				else
-				{
-					if (File->Read(SourceRow, SourceRowPitch, 1) != 1)
-						return NULL;
-
-					switch(Info->PixelFormat)
-					{
-						case ZE_TIFF_PT_INDEXED:
-							ZETexturePixelConverter::ConvertIndexed((ZEPixelRGBA8*)DestinationChunk, SourceRow, Info->Width, Info->Palette);
-							break;
-
-						case ZE_TIFF_PT_RGB8:
-							ZETexturePixelConverter::ConvertRGB8((ZEPixelRGBA8*)DestinationChunk, SourceRow, Info->Width);
-							break;
-
-						case ZE_TIFF_PT_L16:
-							ZETexturePixelConverter::ConvertL16_BE((ZEPixelL16*)DestinationChunk, SourceRow, Info->Width);
-							break;
-
-						case ZE_TIFF_PT_LA16:
-							ZETexturePixelConverter::ConvertLA16_BE((ZEPixelLA16*)DestinationChunk, SourceRow, Info->Width);
-							break;
-
-						case ZE_TIFF_PT_RGBA16:
-							ZETexturePixelConverter::ConvertRGBA16_BE((ZEPixelRGBA16*)DestinationChunk, SourceRow, Info->Width);
-							break;
-
-						case ZE_TIFF_PT_RGB16:
-							if (Info->Endianness == ZE_ET_BIG)
-								ZETexturePixelConverter::ConvertRGB16_BE((ZEPixelRGBA16*)DestinationChunk, SourceRow, Info->Width);
-							else
-								ZETexturePixelConverter::ConvertRGB16((ZEPixelRGBA16*)DestinationChunk, SourceRow, Info->Width);
-							break;
-					}
-				}
-
-				PositionX += PositionXIncrement;
-				PositionY += PositionYIncrement;
-			}
-		}
-	}
-	else if (Info->Compression == ZE_TIFF_CT_LZW)
-	{
-		ZESize SourceRowPitch = Info->Width * PixelSize;
-		ZEPointer<ZEUInt8> SourceRow = new ZEUInt8[SourceRowPitch];
-		for (ZESize I = 0; I < Info->ChunkOffsets.GetCount(); I++)
-		{
-			ZESize ChunkRowCount = Info->Height - I * Info->ChunkHeight >= Info->ChunkHeight ? Info->ChunkHeight : Info->Height % Info->ChunkHeight;
-			File->Seek(Info->ChunkOffsets[I], ZE_SF_BEGINING);
-			for (ZESize N = 0; I < ChunkRowCount; N++)
-			{
-				// Tiff read directly
-				if (File->Read(SourceRow, SourceRowPitch, 1) != 1)
+				if (File->Read(SourceRow, ChunkRowPitch, 1) != 1)
 					return NULL;
 			}
+			else
+			{
+				Decompressor->SetOutput(SourceRow);
+				Decompressor->SetOutputSize(ChunkRowPitch);
+				while(true)
+				{
+					Decompressor->Decompress();
+					if (Decompressor->GetState() == ZE_DS_INPUT_PROCESSED)
+					{
+						ZESize BytesRead = File->Read(CompressedChunk, 1, 4096);
+						if (BytesRead == 0)
+							return NULL;
+					}
+					else if (Decompressor->GetState() == ZE_DS_OUTPUT_FULL)
+					{
+						break;
+					}
+				}
+			}
+
+			if (!InternalFormat)
+			{
+				switch(Info->PixelFormat)
+				{
+					case ZE_TIFF_PT_INDEXED:
+						ZETexturePixelConverter::ConvertIndexed((ZEPixelRGBA8*)DestinationChunk, SourceRow, ChunkRowWidth, Info->Palette);
+						break;
+
+					case ZE_TIFF_PT_RGB8:
+						ZETexturePixelConverter::ConvertRGB8((ZEPixelRGBA8*)DestinationChunk, SourceRow, ChunkRowWidth);
+						break;
+
+					case ZE_TIFF_PT_L16:
+						ZETexturePixelConverter::ConvertL16_BE((ZEPixelL16*)DestinationChunk, SourceRow, ChunkRowWidth);
+						break;
+
+					case ZE_TIFF_PT_LA16:
+						ZETexturePixelConverter::ConvertLA16_BE((ZEPixelLA16*)DestinationChunk, SourceRow, ChunkRowWidth);
+						break;
+
+					case ZE_TIFF_PT_RGBA16:
+						ZETexturePixelConverter::ConvertRGBA16_BE((ZEPixelRGBA16*)DestinationChunk, SourceRow, ChunkRowWidth);
+						break;
+
+					case ZE_TIFF_PT_RGB16:
+						if (Info->Endianness == ZE_ET_BIG)
+							ZETexturePixelConverter::ConvertRGB16_BE((ZEPixelRGBA16*)DestinationChunk, SourceRow, ChunkRowWidth);
+						else
+							ZETexturePixelConverter::ConvertRGB16((ZEPixelRGBA16*)DestinationChunk, SourceRow, ChunkRowWidth);
+						break;
+				}
+			}
+
+			PositionY++;
+			if (ChunkRowPadding != 0)
+				File->Seek(ChunkRowPadding, ZE_SF_CURRENT);
 		}
 	}
-	else if (Info->Compression == ZE_TIFF_CT_PACKBIT)
-	{
 
-	}
 
 	return Texture.Transfer();
 }

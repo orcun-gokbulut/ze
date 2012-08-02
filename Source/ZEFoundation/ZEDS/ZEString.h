@@ -49,7 +49,9 @@ class ZEString
 		char*						Buffer;
 		ZEAllocatorBase<char>		Allocator;
 
-	public:			
+	public:
+		void						SetBuffer(void* Buffer, ZESize Size);
+
 		void						SetValue(const char* String);
 		void						SetValue(const wchar_t* String);
 		void						SetValue(wchar_t Character);
@@ -74,6 +76,8 @@ class ZEString
 
 		bool						IsEmpty() const;
 		ZESize						GetLength() const;
+
+		void						SetSize(ZESize Size);
 		ZESize						GetSize() const;
 
 		void						Compact();
@@ -193,8 +197,6 @@ class ZEString
 									operator std::string() const;
 									operator const char*() const;
 
-		static ZEString				Format(const char* Format, ...);
-
 									ZEString();					
 									ZEString(const char* String);
 									ZEString(const ZEString& String);
@@ -212,8 +214,6 @@ class ZEString
 									ZEString(double Value, ZEUInt Digists);
 									ZEString(double Value);
 									~ZEString();
-
-
 };
 
 ZEString operator+(const char* String1, const ZEString& String2);

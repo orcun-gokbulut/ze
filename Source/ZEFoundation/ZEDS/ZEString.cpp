@@ -56,6 +56,11 @@ bool ZEString::IsEmpty() const
 	return (Buffer == NULL || (Buffer[0] == '\0')); 
 }
 
+void ZEString::SetSize(ZESize Size)
+{
+	Allocator.Reallocate(&Buffer, Size);
+}
+
 ZESize ZEString::GetSize() const
 {
 	return Allocator.GetSize();
@@ -72,6 +77,14 @@ void ZEString::Clear()
 	Allocator.Deallocate(&Buffer);
 	Buffer = NULL;
 }
+
+void ZEString::SetBuffer(void* Buffer, ZESize Size)
+{
+	Clear();
+	this->Buffer = (char*)Buffer;
+	this->Allocator.Size = Size;
+}
+
 
 void ZEString::SetValue(const char* String)
 {
@@ -871,22 +884,6 @@ ZEString ZEString::FromCString(const char* Value)
 ZEString ZEString::FromStdString(const std::string& Value)
 {
 	return Value.c_str();
-}
-
-ZEString ZEString::Format(const char* Format, ...)
-{
-	va_list List;
-	va_start(List, Format);
-	
-    ZESize Length = vsprintf(NULL, Format, List);
-	
-	ZEString Temp;
-	Temp.Allocator.Allocate(&Temp.Buffer, (Length + 1) * sizeof(char));
-	vsprintf(Temp.Buffer, Format, List);
-	
-	va_end(List);
-	
-	return Temp;
 }
 
 ZEString& ZEString::operator=(const ZEString& String)
