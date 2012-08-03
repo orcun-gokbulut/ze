@@ -51,6 +51,7 @@ ze_add_source(ZEPortalMapResource.h			Sources Headers)
 ze_add_library(ZEPortalMap 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
+	LIBS ZEFoundation
 	INSTALL
 	INSTALL_DESTINATION "ZEEngineAPI/ZEPortalMap"
 	INSTALL_COMPONENT ZESDK)

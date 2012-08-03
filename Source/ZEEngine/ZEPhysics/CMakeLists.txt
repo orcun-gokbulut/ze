@@ -61,6 +61,7 @@ ze_add_source(ZEPhysicsDebugModule.h	        Sources)
 ze_add_library(ZEPhysics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
+	LIBS ZEFoundation
 	INSTALL
 	INSTALL_DESTINATION "ZEEngineAPI/ZEPhysics"
 	INSTALL_COMPONENT ZESDK)

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,6 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
-
-ze_add_source(ZEListener.cpp				Sources)
-ze_add_source(ZEListener.h					Sources Headers ZEPP)
-ze_add_source(ZESoundFX.h					Sources Headers)
-ze_add_source(ZESoundModule.cpp				Sources)
-ze_add_source(ZESoundModule.h				Sources Headers)
-ze_add_source(ZESoundDebugModule.cpp		Sources)
-ze_add_source(ZESoundDebugModule.h			Sources)
-ze_add_source(ZESoundResource.cpp			Sources)
-ze_add_source(ZESoundResource.h				Sources Headers)
-ze_add_source(ZESoundResourceMP3.cpp		Sources)
-ze_add_source(ZESoundResourceMP3.h			Sources)
-ze_add_source(ZESoundResourceOGG.cpp		Sources)
-ze_add_source(ZESoundResourceOGG.h			Sources)
-ze_add_source(ZESoundResourceWAV.cpp		Sources)
-ze_add_source(ZESoundResourceWAV.h			Sources)
-ze_add_source(ZESoundSource.cpp				Sources)
-ze_add_source(ZESoundSource.h				Sources Headers ZEPP)
-ze_add_source(ZESoundSource3D.cpp			Sources)
-ze_add_source(ZESoundSource3D.h				Sources Headers ZEPP)
-
-ze_add_library(ZESound 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation libmpg123 libogg libvorbis libvorbisfile
-	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZESound"
-	INSTALL_COMPONENT ZESDK)

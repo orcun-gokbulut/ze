@@ -55,6 +55,7 @@ ze_add_source(ZEInputModule.h							Sources Headers)
 ze_add_library(ZEInput 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
+	LIBS ZEFoundation
 	INSTALL
 	INSTALL_DESTINATION "ZEEngineAPI/ZEInput"
 	INSTALL_COMPONENT ZESDK)
