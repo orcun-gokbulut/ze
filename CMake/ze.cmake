@@ -95,7 +95,7 @@ macro (ze_configure_platform)
 		set(ZEBUILD_PLATFORM_BASE "Windows")
 	endif()
 
-	if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
+	if (CMAKE_SIZEOF_VOID_P EQUAL 4)
 		set(ZEBUILD_PLATFORM_WORD_SIZE "32")
 	else()
 		set(ZEBUILD_PLATFORM_WORD_SIZE "64")

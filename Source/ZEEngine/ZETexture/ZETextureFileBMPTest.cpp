@@ -42,7 +42,7 @@
 #include "ZETextureTestUtils.h"
 #include "ZETextureLoader.h"
 
-bool TestSuccess(ZEString FileName)
+static bool TestSuccess(ZEString FileName)
 {
 	ZEFile File;
 	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
@@ -59,7 +59,7 @@ bool TestSuccess(ZEString FileName)
 	return ZETextureTestUtils::Compare(Data, FileName + ".zeTexture");
 }
 
-bool TestFail(ZEString FileName)
+static bool TestFail(ZEString FileName)
 {
 	ZELogType OldLogType = ZELog::GetInstance()->GetMinimumLogLevel();
 	ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_CRITICAL_ERROR);

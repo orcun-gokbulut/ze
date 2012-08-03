@@ -37,15 +37,21 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_set_project_folder("ZEModules")
 
-ze_add_module(ZEDirect3D9			PLATFORM Windows)
-ze_add_module(ZEDirectInput			OPTIONAL PLATFORMS Windows )
-ze_add_module(ZEDummyInput			OPTIONAL)
-ze_add_module(ZEVirtualInput		OPTIONAL)
-ze_add_module(ZEWindowsInput		OPTIONAL DEFAULT PLATFORMS Windows)
-ze_add_module(ZEFreespaceInput		OPTIONAL 		 PLATFORMS Windows)
-ze_add_module(ZEVRPNInput			OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
-ze_add_module(ZEDirectSound			OPTIONAL DEFAULT PLATFORMS Windows)
-ze_add_module(ZEOpenAL				OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
-ze_add_module(ZEPhysX				OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
+ze_add_module(ZEDirect3D9			Modules PLATFORM Windows)
+ze_add_module(ZEDirectInput			Modules OPTIONAL PLATFORMS Windows )
+ze_add_module(ZEDummyInput			Modules OPTIONAL)
+ze_add_module(ZEVirtualInput		Modules OPTIONAL)
+ze_add_module(ZEWindowsInput		Modules OPTIONAL DEFAULT PLATFORMS Windows)
+ze_add_module(ZEFreespaceInput		Modules OPTIONAL 		 PLATFORMS Windows)
+ze_add_module(ZEVRPNInput			Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
+ze_add_module(ZEDirectSound			Modules OPTIONAL DEFAULT PLATFORMS Windows)
+ze_add_module(ZEOpenAL				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
+ze_add_module(ZEPhysX				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
 
-ze_add_cmake_project(ZEModules_ SOURCES CMakeLists.txt)
+ze_add_source(ZEModules.h			Sources Headers)
+ze_add_source(ZEModules.cpp			Sources)
+ze_add_source(CMakeLists.txt		Sources)
+
+ze_add_library(ZEModules 
+	SOURCES ${Sources}
+	LIBS ${Modules})

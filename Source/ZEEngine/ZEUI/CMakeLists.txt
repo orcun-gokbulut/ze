@@ -82,7 +82,8 @@ ze_add_source(ZEUISceneStatisticsControl.h		Sources Headers)
 ze_add_source(ZEUIPortalMapStatisticsControl.cpp	Sources)
 ze_add_source(ZEUIPortalMapStatisticsControl.h		Sources Headers)
 
-ze_add_library(ZEUI 
+ze_add_library(ZEUI
+	LIBS ZEFoundation 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	INSTALL
