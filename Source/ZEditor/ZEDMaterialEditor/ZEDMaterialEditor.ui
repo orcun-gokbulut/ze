@@ -22,13 +22,15 @@
      <x>0</x>
      <y>0</y>
      <width>1161</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSaveAs"/>
     <addaction name="actionClose"/>
    </widget>
    <widget class="QMenu" name="menuPreview">
@@ -83,18 +85,8 @@
      <item>
       <widget class="QTabWidget" name="PropertyTabWidget">
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
-       <widget class="QWidget" name="MaterialTab">
-        <attribute name="title">
-         <string>Material</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="MaterialTabLayout">
-         <property name="margin">
-          <number>0</number>
-         </property>
-        </layout>
-       </widget>
        <widget class="QWidget" name="DirectLight1Tab">
         <attribute name="title">
          <string>DirectLight1</string>
@@ -153,6 +145,16 @@
   <action name="actionCylinder">
    <property name="text">
     <string>Cylinder</string>
+   </property>
+  </action>
+  <action name="actionSaveAs">
+   <property name="text">
+    <string>Save As</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
    </property>
   </action>
  </widget>
