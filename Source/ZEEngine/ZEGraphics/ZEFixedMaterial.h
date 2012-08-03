@@ -43,6 +43,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEML/ZEMLNode.h"
 
 ZE_META_OBJECT_DESCRIPTION(ZEFixedMaterial)
 
@@ -396,6 +397,9 @@ class ZEFixedMaterial : public ZEMaterial
 
 		void							Tick(float ElapsedTime);
 
+		void							WriteToFile(ZEFile* File);
+		void							ReadFromFile(ZEFile* File);
+
 		static ZEFixedMaterial*			CreateInstance();
 };
 
@@ -581,11 +585,11 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name = "ReflectionEnabled" groupname="Environment" type="boolean" autogetset="yes" />
-			<property name = "ReflectionFactor" groupname="Environment" type="float" autogetset="yes" />
-			<property name = "RefractionEnabled" groupname="Environment" type="boolean" autogetset="yes" />
-			<property name = "RefractionFactor" groupname="Environment" type="float" autogetset="yes" />
-			<property name = "RefractionIndex" groupname="Environment" type="float" autogetset="yes" />
+			<property name = "ReflectionEnabled" groupname="Reflection" type="boolean" autogetset="yes" />
+			<property name = "ReflectionFactor" groupname="Reflection" type="float" autogetset="yes" />
+			<property name = "RefractionEnabled" groupname="Refraction" type="boolean" autogetset="yes" />
+			<property name = "RefractionFactor" groupname="Refraction" type="float" autogetset="yes" />
+			<property name = "RefractionIndex" groupname="Refraction" type="float" autogetset="yes" />
 
 			<property name="DetailMapTiling" groupname="Detail" type="ZEVector2" autogetset="yes" />
 			<property name="DetailBaseMap" groupname="Detail" type="string" semantic="ZE_PS_FILENAME" getfunction="GetDetailBaseMapFile" setfunction="SetDetailBaseMapFile" />

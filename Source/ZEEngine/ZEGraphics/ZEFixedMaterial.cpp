@@ -46,6 +46,7 @@
 #include "ZETexture/ZETextureCubeResource.h"
 #include "ZETexture2D.h"
 #include "ZETextureCube.h"
+#include "ZEML/ZEMLProperty.h"
 
 ZEFixedMaterial::ZEFixedMaterial()
 {
@@ -1247,4 +1248,46 @@ bool ZEFixedMaterial::GetVertexColorEnabled()
 ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
 {
 	return zeGraphics->CreateFixedMaterial();
+}
+
+void ZEFixedMaterial::WriteToFile(ZEFile* File)
+{
+	ZEObjectDescription* ClassDescription = GetDescription();
+	ZESSize PropertyCount = ClassDescription->GetPropertyCount();
+	const ZEPropertyDescription* Properties = ClassDescription->GetProperties();
+
+	ZEMLNode* RootNode = new ZEMLNode("Root");
+
+	for(ZESize I = 0; I < PropertyCount; I++)
+	{
+		ZEVariant PropertyValue;
+		GetProperty(Properties[I].Name, PropertyValue);
+		RootNode->AddProperty(Properties[I].Name, PropertyValue);
+	}
+
+	RootNode->Write(File);
+	delete RootNode;
+}
+
+void ZEFixedMaterial::ReadFromFile(ZEFile* File)
+{
+	ZEMLNode* RootNode = new ZEMLNode();
+	RootNode->Read(File);
+
+	ZEArray<ZEMLItem*> Props = RootNode->GetProperties();
+	
+	for (ZESize I = 0; I < Props.GetCount(); I++)
+	{
+		if(Props[I]->GetType() != ZEML_IT_OFFSET_DATA)
+		{
+			ZEMLProperty* CurrentProperty = ((ZEMLProperty*)Props[I]);
+
+			if(CurrentProperty->GetValue().GetType() == ZE_VRT_STRING && ZEString(CurrentProperty->GetValue().GetString()).GetLength() != 0)
+				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
+			else if(CurrentProperty->GetValue().GetType() != ZE_VRT_STRING)
+				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
+		}
+	}
+
+	UpdateMaterial();
 }
