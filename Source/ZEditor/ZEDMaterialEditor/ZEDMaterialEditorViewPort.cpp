@@ -42,6 +42,7 @@
 
 #include "ZEDMaterialEditor.h"
 #include "ZEMath/ZEAngle.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
 
 using namespace Qt;
 
@@ -76,7 +77,7 @@ void ZEDMaterialEditorViewPort::Initialize()
 	zeCore->GetGame()->GetScene()->AddEntity(Grid);
 
 	Model = ZEModel::CreateInstance();
-	Model->SetModelFile("Cube.ZEMODEL");
+	Model->SetModelFile("Box.ZEMODEL");
 	zeCore->GetGame()->GetScene()->AddEntity(Model);
 
 	DirectLight1 = ZEDirectionalLight::CreateInstance();
@@ -151,12 +152,19 @@ void ZEDMaterialEditorViewPort::mousePressEvent(QMouseEvent * Event)
 	OldMousePosition = Event->pos();
 }
 
-ZEFixedMaterial* ZEDMaterialEditorViewPort::GetModelMaterial()
+ZEArray<ZEFixedMaterial*> ZEDMaterialEditorViewPort::GetModelMaterials()
 {
-	if (Model->GetModelResource() == NULL)
-		return NULL;
+	ZEArray<ZEFixedMaterial*> Materials;
 
-	return (ZEFixedMaterial*)(Model->GetModelResource()->Materials[0]);
+	if (Model->GetModelResource() == NULL)
+		return Materials;
+
+	Materials.SetCount(Model->GetModelResource()->Materials.GetCount());
+
+	for(ZESize I = 0; I < Materials.GetCount(); I++)
+		Materials[I] = (ZEFixedMaterial*)Model->GetModelResource()->Materials[I];
+
+	return Materials;
 }
 
 void ZEDMaterialEditorViewPort::SetModelFile(const char* FileName)
