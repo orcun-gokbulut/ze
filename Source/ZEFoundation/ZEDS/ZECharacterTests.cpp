@@ -39,7 +39,6 @@
 #include <mbstring.h>
 #include "ZEFile/ZEFile.h"
 #include "ZEArray.h"
-#include <windows.h>
 
 ZETestSuite(ZECharacter)
 {
@@ -68,8 +67,7 @@ ZETestSuite(ZECharacter)
 	ZETest("void ZECharacter::SetValue(const wchar_t* WideCharacter)")
 	{
 		char MultiByteCharacters[] = "€";
-		wchar_t WideCharacters[2];
-		MultiByteToWideChar(CP_UTF8, 0, MultiByteCharacters, -1, WideCharacters, 2);	
+		wchar_t WideCharacters[2] = {8364, 0};	
 		
 		ZECharacter Character;
 		Character.SetValue(WideCharacters);
@@ -179,8 +177,7 @@ ZETestSuite(ZECharacter)
 		ZECharacter Character;
 		Character.SetValue(MultiByteCharacters);
 
-		wchar_t WideCharacter[2];
-		MultiByteToWideChar(CP_UTF8, 0, MultiByteCharacters, -1, WideCharacter, 2);
+		wchar_t WideCharacter[2] = {8364, 0};
 
 		ZETestCheck(Character.Equals(WideCharacter));
 
@@ -188,8 +185,7 @@ ZETestSuite(ZECharacter)
 		{
 			char AnotherMultiByteCharacter[] = "₭";
 
-			wchar_t AnotherWideCharacter[2];
-			MultiByteToWideChar(CP_UTF8, 0, AnotherMultiByteCharacter, -1, AnotherWideCharacter, 2);
+			wchar_t AnotherWideCharacter[2] = {8365, 0};
 
 			ZETestCheck(!Character.Equals(AnotherWideCharacter));
 		}
@@ -255,8 +251,7 @@ ZETestSuite(ZECharacter)
 	{
 		char MultiByteCharacter[] = "€";
 
-		wchar_t WideCharacter[2];
-		MultiByteToWideChar(CP_UTF8, 0, MultiByteCharacter, -1, WideCharacter, 2);
+		wchar_t WideCharacter[2] = {8364, 0};
 
 		ZECharacter Character = ZECharacter::FromWChar(WideCharacter);
 
@@ -306,10 +301,7 @@ ZETestSuite(ZECharacter)
 
 		ZETestCheck(Character == "€");
 
-		char MultiByteCharacter[] = "₭";
-
-		wchar_t WideCharacter[2];
-		MultiByteToWideChar(CP_UTF8, 0, MultiByteCharacter, -1, WideCharacter, 2);
+		wchar_t WideCharacter[2] = {8365, 0};
 
 		Character = WideCharacter;
 
@@ -362,17 +354,13 @@ ZETestSuite(ZECharacter)
 		char MultiByteCharacter[] = "€";
 		ZECharacter Character(MultiByteCharacter);
 
-		char AnotherMultiByteCharacter[] = "₭";
-
-		wchar_t AnotherWideCharacter[2];
-		MultiByteToWideChar(CP_UTF8, 0, AnotherMultiByteCharacter, -1, AnotherWideCharacter, 2);
+		wchar_t AnotherWideCharacter[2] = {8365, 0};
 
 		ZETestCheck(Character != AnotherWideCharacter);
 
 		ZETestCase("False Condition")
 		{
-			wchar_t WideCharacter[2];
-			MultiByteToWideChar(CP_UTF8, 0, MultiByteCharacter, -1, WideCharacter, 2);
+			wchar_t WideCharacter[2] = {8364, 0};
 
 			ZETestCheck(!(Character != WideCharacter));
 		}
@@ -425,17 +413,13 @@ ZETestSuite(ZECharacter)
 
 		ZECharacter Character(MultiByteCharacter);
 
-		wchar_t WideCharacter[2];
-		MultiByteToWideChar(CP_UTF8, 0, MultiByteCharacter, -1, WideCharacter, 2);
+		wchar_t WideCharacter[2] = {8364, 0};
 
 		ZETestCheck(Character == WideCharacter);
 
 		ZETestCase("False Condition")
 		{
-			char AnotherMultiByteCharacter[] = "₭";
-
-			wchar_t AnotherWideCharacter[2];
-			MultiByteToWideChar(CP_UTF8, 0, AnotherMultiByteCharacter, -1, AnotherWideCharacter, 2);
+			wchar_t AnotherWideCharacter[2] = {8365, 0};
 
 			ZETestCheck(!(Character == AnotherWideCharacter));
 		}
@@ -465,11 +449,8 @@ ZETestSuite(ZECharacter)
 
 		wchar_t Temp = Character;
 
-		char Result[4];
+		ZEString Result(Temp);
 
-		ZESize RequiredSize = WideCharToMultiByte(CP_UTF8, 0, &Temp, 1, 0, 0, 0, 0);
-		WideCharToMultiByte(CP_UTF8, 0, &Temp, 1, Result, RequiredSize, 0, 0);
-
-		ZETestCheck(strncmp(Result, "€", RequiredSize) == 0);
+		ZETestCheck(strcmp(Result, "€") == 0);
 	}
 }
