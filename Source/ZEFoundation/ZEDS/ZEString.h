@@ -37,10 +37,83 @@
 #ifndef __ZE_STRING_H__
 #define __ZE_STRING_H__
 
+#include <string>
 #include "ZETypes.h"
 #include "ZEAllocator.h"
 
-#include <string>
+class ZEString;
+
+class ZECharacter
+{
+	friend class ZEString;
+
+	private:
+		char					Characters[4];
+		ZEUInt					Size;
+
+		mutable ZEString*		Owner;
+		ZESize					Position;
+
+		static ZEUInt			GetByteLength(const char* MultiByteCharacter);
+
+	public:
+		void					SetValue(char Character);
+		void					SetValue(const char* MultiByteCharacter);
+		void					SetValue(const wchar_t* WideCharacter);
+		void					SetValue(ZEInt Character);
+
+		void					SetOwner(ZEString* Owner, ZESize Index);
+		
+		const char*				GetValue() const;
+		ZEUInt					GetSize() const;
+
+		bool					Equals(const ZECharacter& Character) const;
+		bool					Equals(const char& Character) const;
+		bool					Equals(const char* MultiByteCharacter) const;
+		bool					Equals(const wchar_t* WideCharacter) const;
+
+		ZECharacter				Upper() const;
+		void					UpperSelf();
+		ZECharacter				Lower() const;
+		void					LowerSelf();
+
+		static ZECharacter 		FromChar(const char& Value);
+		static ZECharacter		FromMBChar(const char* Value);
+		static ZECharacter		FromWChar(const wchar_t* Value);
+
+		ZECharacter&			operator=(const ZECharacter& Character);
+		ZECharacter&			operator=(const char& Character);
+		ZECharacter&			operator=(const char* MultiByteCharacter);
+		ZECharacter&			operator=(const wchar_t* WideCharacter);
+
+		bool					operator!=(const ZECharacter& Character) const;
+		bool					operator!=(const char& Character) const;
+		bool					operator!=(const char* MultiByteCharacter) const;
+		bool					operator!=(const wchar_t* WideCharacter) const;
+
+		bool					operator==(const ZECharacter& Character) const;
+		bool					operator==(const char& Character) const;
+		bool					operator==(const char* MultiByteCharacter) const;
+		bool					operator==(const wchar_t* WideCharacter) const;
+
+								operator char() const;
+								operator const char*() const;
+								operator wchar_t() const;
+
+								ZECharacter();
+								ZECharacter(const ZECharacter& Character);
+								ZECharacter(char Character);
+								ZECharacter(const char* MultiByteCharacter);
+								ZECharacter(const wchar_t* WideCharacter);
+								~ZECharacter();
+};
+
+bool operator==(const char& Character1, const ZECharacter& Character2);
+bool operator==(const char* MultiByteCharacter, const ZECharacter& Character);
+bool operator==(const wchar_t* WideCharacter, const ZECharacter& Character);
+bool operator!=(const char& Character1, const ZECharacter& Character2);
+bool operator!=(const char* MultiByteCharacter, const ZECharacter& Character);
+bool operator!=(const wchar_t* WideCharacter, const ZECharacter& Character);
 
 class ZEString
 {
@@ -49,12 +122,24 @@ class ZEString
 		char*						Buffer;
 		ZEAllocatorBase<char>		Allocator;
 
-	public:
-		void						SetBuffer(void* Buffer, ZESize Size);
+		bool						BufferChanged;
 
+		wchar_t*					WBuffer;
+		ZEAllocatorBase<wchar_t>	WAllocator;
+
+		static ZESize				GetBytePosition(const char* String, ZESize CharacterPosition);
+		static char*				IncrementByCharacter(const char* Position);
+		static char*				DecrementByCharacter(const char* Start, const char* Position);
+
+	public:			
+		void						SetBuffer(void* Buffer, ZESize Size);
+		void						SetValue(const ZEString& String);
 		void						SetValue(const char* String);
 		void						SetValue(const wchar_t* String);
 		void						SetValue(wchar_t Character);
+		void						SetValue(const std::string& String);
+		void						SetValue(const std::wstring& String);
+		void						SetValue(const ZECharacter& Character);
 		void						SetValue(ZEInt8 Value);
 		void						SetValue(ZEInt16 Value);
 		void						SetValue(ZEInt32 Value);
@@ -71,8 +156,8 @@ class ZEString
 
 		const char*					GetValue() const;
 
-		char						GetCharacter(ZESize Position) const;
-		void						SetCharacter(ZESize Position, char Value);
+		ZECharacter					GetCharacter(ZESize Position) const;
+		void						SetCharacter(ZESize Position, ZECharacter Value);
 
 		bool						IsEmpty() const;
 		ZESize						GetLength() const;
@@ -126,6 +211,9 @@ class ZEString
 		double						ToDouble() const;
 		const char*					ToCString() const;
 		std::string					ToStdString() const;
+
+		const wchar_t*				ToWCString();
+		std::wstring				ToWStdString();
 		
 		static ZEString 			FromChar(char Value);
 		static ZEString				FromWChar(wchar_t Value);		
@@ -143,11 +231,16 @@ class ZEString
 		static ZEString 			FromDouble(double Value);
 		static ZEString 			FromBool(bool Value, const char* TrueText = "True", const char* FalseText = "False");
 		static ZEString 			FromCString(const char* Value);
-		static ZEString				FromWString(const wchar_t* Value);
 		static ZEString 			FromStdString(const std::string& Value);
+
+		static ZEString				FromWCString(const wchar_t* Value);
+		static ZEString				FromWStdString(const std::wstring& Value);
 
 		ZEString&					operator=(const ZEString& String);
 		ZEString&					operator=(const char* String);
+		ZEString&					operator=(const wchar_t* String);
+		ZEString&					operator=(const std::string& String);
+		ZEString&					operator=(const std::wstring& String);
 		ZEString&					operator=(ZEInt8 Value);
 		ZEString&					operator=(ZEInt16 Value);
 		ZEString&					operator=(ZEInt32 Value);
@@ -161,6 +254,9 @@ class ZEString
 
 		ZEString					operator+(const ZEString& String);
 		ZEString					operator+(const char* String);
+		ZEString					operator+(const wchar_t* String);
+		ZEString					operator+(const std::string& String);
+		ZEString					operator+(const std::wstring& String);
 		ZEString					operator+(ZEInt8 Value);
 		ZEString					operator+(ZEInt16 Value);
 		ZEString					operator+(ZEInt32 Value);
@@ -174,6 +270,9 @@ class ZEString
 
 		ZEString&					operator+=(const ZEString& String);
 		ZEString&					operator+=(const char* String);
+		ZEString&					operator+=(const wchar_t* String);
+		ZEString&					operator+=(const std::string& String);
+		ZEString&					operator+=(const std::wstring& String);
 		ZEString&					operator+=(ZEInt8 Value);
 		ZEString&					operator+=(ZEInt16 Value);
 		ZEString&					operator+=(ZEInt32 Value);
@@ -185,22 +284,31 @@ class ZEString
 		ZEString&					operator+=(float Value);
 		ZEString&					operator+=(double Value);
 
-		char&						operator[](ZESSize Index);
-		const char&					operator[](ZESSize Index) const;
+		ZECharacter					operator[](ZESSize Index);
+		const ZECharacter			operator[](ZESSize Index) const;
 
 		bool						operator!=(const ZEString& String) const;
 		bool						operator!=(const char* String) const;
+		bool						operator!=(const wchar_t* String) const;
+		bool						operator!=(const std::string& String) const;
+		bool						operator!=(const std::wstring& String) const;
 
 		bool						operator==(const ZEString& String) const;
 		bool						operator==(const char* String) const;
+		bool						operator==(const wchar_t* String) const;
+		bool						operator==(const std::string& String) const;
+		bool						operator==(const std::wstring& String) const;
 	
 									operator std::string() const;
 									operator const char*() const;
 
 									ZEString();					
 									ZEString(const char* String);
+									ZEString(const wchar_t* String);
 									ZEString(const ZEString& String);
 									ZEString(const std::string& String);
+									ZEString(const std::wstring& String);
+									ZEString(const ZECharacter& Character);
 									ZEString(ZEInt8 Value);
 									ZEString(ZEInt16 Value);
 									ZEString(ZEInt32 Value);
@@ -216,7 +324,9 @@ class ZEString
 									~ZEString();
 };
 
+
 ZEString operator+(const char* String1, const ZEString& String2);
+ZEString operator+(const wchar_t* String1, const ZEString& String2);
 ZEString operator+(ZEInt8 Value, const ZEString& String);
 ZEString operator+(ZEInt16 Value, const ZEString& String);
 ZEString operator+(ZEInt32 Value, const ZEString& String);
@@ -229,6 +339,8 @@ ZEString operator+(float Value, const ZEString& String);
 ZEString operator+(double Value, const ZEString& String);
 
 bool operator==(const char* String1, const ZEString& String2);
+bool operator==(const wchar_t* String1, const ZEString& String2);
 bool operator!=(const char* String1, const ZEString& String2);
+bool operator!=(const wchar_t* String1, const ZEString& String2);
 
 #endif

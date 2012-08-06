@@ -169,27 +169,27 @@ class ZEVariant : public ZESerializable
 		bool					Serialize(ZESerializer* Serializer);
 		bool					Unserialize(ZEUnserializer* Unserializer);
 
-		void					operator= (const ZEVariant& Value);
-		void					operator= (const char* Value);
-		void					operator= (const ZEString& Value);
-		void					operator= (ZEInt8 Value);
-		void					operator= (ZEInt16 Value);
-		void					operator= (ZEInt32 Value);
-		void					operator= (ZEInt64 Value);
-		void					operator= (ZEUInt8 Value);
-		void					operator= (ZEUInt16 Value);
-		void					operator= (ZEUInt32 Value);
-		void					operator= (ZEUInt64 Value);
-		void					operator= (float Value);
-		void					operator= (double Value);
-		void					operator= (bool Value);
-		void					operator= (const ZEVector2& Value);
-		void					operator= (const ZEVector3& Value);
-		void					operator= (const ZEVector4& Value);
-		void					operator= (const ZEQuaternion& Value);
-		void					operator= (const ZEMatrix3x3& Value);
-		void					operator= (const ZEMatrix4x4& Value);
-		void					operator= (ZEObject* Value);
+		ZEVariant&				operator=(const ZEVariant& Value);
+		ZEVariant&				operator=(const char* Value);
+		ZEVariant&				operator=(const ZEString& Value);
+		ZEVariant&				operator=(ZEInt8 Value);
+		ZEVariant&				operator=(ZEInt16 Value);
+		ZEVariant&				operator=(ZEInt32 Value);
+		ZEVariant&				operator=(ZEInt64 Value);
+		ZEVariant&				operator=(ZEUInt8 Value);
+		ZEVariant&				operator=(ZEUInt16 Value);
+		ZEVariant&				operator=(ZEUInt32 Value);
+		ZEVariant&				operator=(ZEUInt64 Value);
+		ZEVariant&				operator=(float Value);
+		ZEVariant&				operator=(double Value);
+		ZEVariant&				operator=(bool Value);
+		ZEVariant&				operator=(const ZEVector2& Value);
+		ZEVariant&				operator=(const ZEVector3& Value);
+		ZEVariant&				operator=(const ZEVector4& Value);
+		ZEVariant&				operator=(const ZEQuaternion& Value);
+		ZEVariant&				operator=(const ZEMatrix3x3& Value);
+		ZEVariant&				operator=(const ZEMatrix4x4& Value);
+		ZEVariant&				operator=(ZEObject* Value);
 
 								operator const char*();
 								

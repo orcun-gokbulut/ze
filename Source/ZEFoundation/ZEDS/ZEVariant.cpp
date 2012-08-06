@@ -652,99 +652,130 @@ bool ZEVariant::IsNull()	const
 	return (Type == ZE_VRT_NULL);
 }
 
-void ZEVariant::operator=(const char* NewValue)
-{
-	SetString(NewValue);
-}
-
-void ZEVariant::operator=(ZEInt8 NewValue)
-{
-	SetInt8(NewValue);
-}
-
-void ZEVariant::operator=(ZEInt16 NewValue)
-{
-	SetInt16(NewValue);
-}
-
-void ZEVariant::operator=(ZEInt32 NewValue)
-{
-	SetInt32(NewValue);
-}
-
-void ZEVariant::operator=(ZEInt64 NewValue)
-{
-	SetInt64(NewValue);
-}
-
-void ZEVariant::operator=(ZEUInt8 NewValue)
-{
-	SetUInt8(NewValue);
-}
-
-void ZEVariant::operator=(ZEUInt16 NewValue)
-{
-	SetUInt16(NewValue);
-}
-
-void ZEVariant::operator=(ZEUInt32 NewValue)
-{
-	SetUInt32(NewValue);
-}
-
-void ZEVariant::operator=(ZEUInt64 NewValue)
-{
-	SetUInt64(NewValue);
-}
-
-void ZEVariant::operator=(float NewValue)
-{
-	SetFloat(NewValue);
-}
-
-void ZEVariant::operator=(double NewValue)
-{
-	SetDouble(NewValue);
-}
-
-void ZEVariant::operator=(bool NewValue)
-{
-	SetBoolean(NewValue);
-}
-
-void ZEVariant::operator=(const ZEVariant& NewValue)
+ZEVariant& ZEVariant::operator=(const ZEVariant& NewValue)
 {
 	SetVariant(NewValue);
+	return *this;
 }
 
-void ZEVariant::operator= (const ZEVector2& Vector)
+ZEVariant& ZEVariant::operator=(const char* NewValue)
+{
+	SetString(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(const ZEString& NewValue)
+{
+	SetString(NewValue.ToCString());
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEInt8 NewValue)
+{
+	SetInt8(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEInt16 NewValue)
+{
+	SetInt16(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEInt32 NewValue)
+{
+	SetInt32(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEInt64 NewValue)
+{
+	SetInt64(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEUInt8 NewValue)
+{
+	SetUInt8(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEUInt16 NewValue)
+{
+	SetUInt16(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEUInt32 NewValue)
+{
+	SetUInt32(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEUInt64 NewValue)
+{
+	SetUInt64(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(float NewValue)
+{
+	SetFloat(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(double NewValue)
+{
+	SetDouble(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(bool NewValue)
+{
+	SetBoolean(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(const ZEVector2& Vector)
 {
 	SetVector2(Vector);
+	return *this;
 }
 
-void ZEVariant::operator= (const ZEVector3& Vector)
+ZEVariant& ZEVariant::operator=(const ZEVector3& Vector)
 {
 	SetVector3(Vector);
+	return *this;
 }
 
-void ZEVariant::operator= (const ZEVector4& Vector)
+ZEVariant& ZEVariant::operator=(const ZEVector4& Vector)
 {
 	SetVector4(Vector);
+	return *this;
 }
 
-void ZEVariant::operator= (const ZEQuaternion& Quaternion)
+ZEVariant& ZEVariant::operator=(const ZEQuaternion& Quaternion)
 {
 	SetQuaternion(Quaternion);
+	return *this;
 }
 
-void ZEVariant::operator= (const ZEMatrix3x3& Matrix)
+ZEVariant& ZEVariant::operator=(const ZEMatrix3x3& Matrix)
 {
 	SetMatrix3x3(Matrix);
+	return *this;
 }
 
-void ZEVariant::operator= (const ZEMatrix4x4& Matrix)
+ZEVariant& ZEVariant::operator=(const ZEMatrix4x4& Matrix)
 {
 	SetMatrix4x4(Matrix);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEObject* NewValue)
+{
+	SetClass(NewValue);
+	return *this;
 }
 
 ZEVariant::operator const char*()
