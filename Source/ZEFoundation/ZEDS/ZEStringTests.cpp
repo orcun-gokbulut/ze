@@ -294,13 +294,13 @@ ZETestSuite(ZEString)
 		ZETestCheck(String == "845756.89");
 	}
 
-	ZETest("ZEString ZEString::FromDouble(double Value)")
+	ZETest("ZEString ZEString::FromDouble(double Value, const char* Format)")
 	{
 		double Value = 845756.88781;
 
 		ZEString String = ZEString::FromDouble(Value);
 
-		ZETestCheck(String == "845756.887810");
+		ZETestCheck(String == "845756.875000");
 	}
 
 	ZETest("ZEString ZEString::FromFloat(float Value, ZEUInt Digits)")
@@ -322,15 +322,41 @@ ZETestSuite(ZEString)
 		ZETestCheck(String == "845756.875000");
 	}
 
-// 	ZETest("ZEString ZEString::FromInt(ZEInt Value, ZEUInt Base)")
-// 	{
-// 		ZEInt Value = 10;
-// 		ZEUInt Base = 5;
-// 
-// 		ZEString String = ZEString::FromInt(Value, Base);
-// 
-// 		ZETestCheckEqual(String, "20");
-// 	}
+	ZETest("ZEString ZEString::FromInt16(ZEInt16 Value, const char* Format)")
+	{
+		ZEInt16 Value = -150;
+
+		ZEString String = ZEString::FromInt16(Value);
+
+		ZETestCheck(String == "-150");
+	}
+
+	ZETest("ZEString ZEString::FromInt32(ZEInt32 Value, const char* Format)")
+	{
+		ZEInt32 Value = 845756;
+
+		ZEString String = ZEString::FromInt32(Value);
+
+		ZETestCheck(String == "845756");
+	}
+
+	ZETest("ZEString ZEString::FromInt64(ZEInt64 Value, const char* Format)")
+	{
+		ZEInt64 Value = -845756;
+
+		ZEString String = ZEString::FromInt64(Value);
+
+		ZETestCheck(String == "-845756");
+	}
+
+	ZETest("ZEString ZEString::FromInt8(ZEInt8 Value, const char* Format)")
+	{
+		ZEInt8 Value = -20;
+
+		ZEString String = ZEString::FromInt8(Value);
+
+		ZETestCheck(String == "-20");
+	}
 
 	ZETest("ZEString ZEString::FromStdString(const std::string& Value)")
 	{
@@ -338,7 +364,7 @@ ZETestSuite(ZEString)
 
 		ZEString StringA = ZEString::FromStdString(Example);
 
-		ZETestCheckEqual(StringA, "Lorem Ipsum");
+		ZETestCheck(StringA == "Lorem Ipsum");
 
 		ZETestCase("UTF-8 encoding compatibility test")
 		{
@@ -350,6 +376,45 @@ ZETestSuite(ZEString)
 		}
 
 	}
+
+	ZETest("ZEString ZEString::FromUInt16(ZEUInt16 Value, const char* Format)")
+	{
+		ZEUInt16 Value = 150;
+
+		ZEString String = ZEString::FromUInt16(Value);
+
+		ZETestCheck(String == "150");
+	}
+
+	ZETest("ZEString ZEString::FromUInt32(ZEUInt32 Value, const char* Format)")
+	{
+		ZEUInt32 Value = 845756;
+
+		ZEString String = ZEString::FromUInt32(Value);
+
+		ZETestCheck(String == "845756");
+	}
+
+
+	ZETest("ZEString ZEString::FromUInt64(ZEUInt64 Value, const char* Format)")
+	{
+		ZEUInt64 Value = 845756.88781;
+
+		ZEString String = ZEString::FromUInt64(Value);
+
+		ZETestCheck(String == "845756");
+	}
+
+
+	ZETest("ZEString ZEString::FromUInt8(ZEUInt8 Value, const char* Format)")
+	{
+		ZEUInt8 Value = 20;
+
+		ZEString String = ZEString::FromUInt8(Value);
+
+		ZETestCheck(String == "20");
+	}
+
 
 	ZETest("ZEString ZEString::FromWChar(wchar_t Value)")
 	{
@@ -377,17 +442,6 @@ ZETestSuite(ZEString)
 
 		ZETestCheck(StringA == "€");
 	}
-
-// 	ZETest("ZEString ZEString::FromUInt(ZEUInt Value, ZEUInt Base)")
-// 	{
-// 		ZEUInt Base = 2;
-// 		ZEUInt Value = 120;
-// 
-// 		ZEString String = ZEString::FromUInt(Value, Base);
-// 
-// 		ZETestCheckEqual(String, "1111000");
-// 
-// 	}
 
 	ZETest("char ZEString::GetCharacter(ZESize Position) const")
 	{
@@ -987,6 +1041,106 @@ ZETestSuite(ZEString)
 		}
 	}
 
+	ZETest("ZEString ZEString::operator+(ZEInt8 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt8 Value = -120;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ -120");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEInt16 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt16 Value = -6320;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ -6320");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEInt32 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt32 Value = -987654;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ -987654");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEInt64 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt64 Value = -987654321;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ -987654321");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEUInt8 Value)")
+	{
+		ZEString String = "€ ";
+		ZEUInt8 Value = 120;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ 120");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEUInt16 Value)")
+	{
+		ZEString String = "€ ";
+		ZEUInt16 Value = 6320;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ 6320");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEUInt32 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt32 Value = 987654;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ 987654");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEUInt64 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt64 Value = -987654321;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ -987654321");
+	}
+
+	ZETest("ZEString ZEString::operator+(float Value)")
+	{
+		ZEString String = "€ ";
+		float Value = 98765.8564f;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ 98765.859375");
+	}
+
+	ZETest("ZEString ZEString::operator+(double Value)")
+	{
+		ZEString String = "€ ";
+		double Value = 98765.8564;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ 98765.859375");
+	}
+
 	ZETest("ZEString & ZEString::operator+=(const ZEString & String)")
 	{
 		ZEString StringA = "Lorem ";
@@ -1083,6 +1237,106 @@ ZETestSuite(ZEString)
 
 			ZETestCheck(StringA == "₭€");
 		}
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEInt8 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt8 Value = -120;
+
+		String += Value;
+
+		ZETestCheck(String == "€ -120");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEInt16 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt16 Value = -6320;
+
+		String += Value;
+
+		ZETestCheck(String == "€ -6320");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEInt32 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt32 Value = -987654;
+
+		String += Value;
+
+		ZETestCheck(String == "€ -987654");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEInt64 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt64 Value = -987654321;
+
+		String += Value;
+
+		ZETestCheck(String == "€ -987654321");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEUInt8 Value)")
+	{
+		ZEString String = "€ ";
+		ZEUInt8 Value = 120;
+
+		String += Value;
+
+		ZETestCheck(String == "€ 120");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEUInt16 Value)")
+	{
+		ZEString String = "€ ";
+		ZEUInt16 Value = 6320;
+
+		String += Value;
+
+		ZETestCheck(String == "€ 6320");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEUInt32 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt32 Value = 987654;
+
+		String += Value;
+
+		ZETestCheck(String == "€ 987654");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEUInt64 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt64 Value = 987654321;
+
+		String += Value;
+
+		ZETestCheck(String == "€ 987654321");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(float Value)")
+	{
+		ZEString String = "€ ";
+		float Value = 98765.8564f;
+
+		String += Value;
+
+		ZETestCheck(String == "€ 98765.859375");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(double Value)")
+	{
+		ZEString String = "€ ";
+		float Value = 98765.8564f;
+
+		String += Value;
+
+		ZETestCheck(String == "€ 98765.859375");
 	}
 
 	ZETest("ZEString & ZEString::operator=(const ZEString & String)")
@@ -1186,6 +1440,96 @@ ZETestSuite(ZEString)
 		}
 	}
 
+	ZETest("ZEString& ZEString::operator=(ZEInt8 Value)")
+	{
+		ZEInt8 Value = -20;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "-20");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEInt16 Value)")
+	{
+		ZEInt32 Value = -8765;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "-8765");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEInt32 Value)")
+	{
+		ZEInt32 Value = -87654321;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "-87654321");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEInt64 Value)")
+	{
+		ZEInt64 Value = -87654321;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "-87654321");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEUInt8 Value)")
+	{
+		ZEUInt8 Value = 20;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "20");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEUInt16 Value)")
+	{
+		ZEUInt16 Value = 8765;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "8765");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEUInt32 Value)")
+	{
+		ZEUInt32 Value = 87654321;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "87654321");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEUInt64 Value)")
+	{
+		ZEUInt64 Value = 87654321;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "87654321");
+	}
+
+	ZETest("ZEString& ZEString::operator=(float Value)")
+	{
+		float Value = 400.5525252f;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "400.552521");
+	}
+
+	ZETest("ZEString& ZEString::operator=(double Value)")
+	{
+		double Value = 400.5525252;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "400.552521");
+	}
+
 	ZETest("bool ZEString::operator==(const ZEString & String) const")
 	{
 		ZETestCase("ZEStrings are not equal")
@@ -1208,6 +1552,60 @@ ZETestSuite(ZEString)
 			ZEString StringE = "Işık Ilık";
 			ZEString StringF = "Süt İç";
 			ZEString StringG = "Işık Ilık";
+
+			ZETestCheck(StringE == StringG);
+			ZETestCheck(!(StringE == StringF));
+		}
+
+		ZETestCase("Strings are not equal (Wide Character)")
+		{
+			ZEString StringA = "Lorem";
+			const wchar_t* StringB = L"Ipsum";
+
+			ZETestCheck(!(StringA == StringB));
+		}
+
+		ZETestCase("Strings are equal (Wide Character)")
+		{
+			ZEString StringA = "Lorem Ipsum";
+			const wchar_t* StringB = L"Lorem Ipsum";
+
+			ZETestCheck(StringA == StringB);
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test (Wide Character)")
+		{
+			ZEString StringE = "€";
+			wchar_t StringF[] = {8365, 0};
+			wchar_t StringG[] = {8364, 0};
+
+			ZETestCheck(StringE == StringG);
+			ZETestCheck(!(StringE == StringF));
+		}
+
+		ZETestCase("Strings are not equal (Wide Standard String)")
+		{
+			ZEString StringA = "Lorem";
+			std::wstring StringB = L"Ipsum";
+
+			ZETestCheck(!(StringA == StringB));
+		}
+
+		ZETestCase("Strings are equal (Wide Standard String)")
+		{
+			ZEString StringA = "Lorem Ipsum";
+			std::wstring StringB = L"Lorem Ipsum";
+
+			ZETestCheck(StringA == StringB);
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test (Wide Standard String)")
+		{
+			ZEString StringE = "€";
+			wchar_t Temp1[] = {8365, 0};
+			std::wstring StringF = std::wstring(Temp1);
+			wchar_t Temp2[] = {8364, 0};
+			std::wstring StringG = std::wstring(Temp2);
 
 			ZETestCheck(StringE == StringG);
 			ZETestCheck(!(StringE == StringF));
@@ -1266,66 +1664,6 @@ ZETestSuite(ZEString)
 			ZEString StringE = "Işık Ilık";
 			std::string StringF = "Süt İç";
 			std::string StringG = "Işık Ilık";
-
-			ZETestCheck(StringE == StringG);
-			ZETestCheck(!(StringE == StringF));
-		}
-	}
-
-	ZETest("bool ZEString::operator==(const wchar_t* String) const")
-	{
-		ZETestCase("Strings are not equal")
-		{
-			ZEString StringA = "Lorem";
-			const wchar_t* StringB = L"Ipsum";
-
-			ZETestCheck(!(StringA == StringB));
-		}
-
-		ZETestCase("Strings are equal")
-		{
-			ZEString StringA = "Lorem Ipsum";
-			const wchar_t* StringB = L"Lorem Ipsum";
-
-			ZETestCheck(StringA == StringB);
-		}
-
-		ZETestCase("UTF-8 encoding compatibility test")
-		{
-			ZEString StringE = "€";
-			wchar_t StringF[] = {8365, 0};
-			wchar_t StringG[] = {8364, 0};
-
-			ZETestCheck(StringE == StringG);
-			ZETestCheck(!(StringE == StringF));
-		}
-	}
-
-	ZETest("bool ZEString::operator==(const std::wstring& String) const")
-	{
-		ZETestCase("Strings are not equal")
-		{
-			ZEString StringA = "Lorem";
-			std::wstring StringB = L"Ipsum";
-
-			ZETestCheck(!(StringA == StringB));
-		}
-
-		ZETestCase("Strings are equal")
-		{
-			ZEString StringA = "Lorem Ipsum";
-			std::wstring StringB = L"Lorem Ipsum";
-
-			ZETestCheck(StringA == StringB);
-		}
-
-		ZETestCase("UTF-8 encoding compatibility test")
-		{
-			ZEString StringE = "€";
-			wchar_t Temp1[] = {8365, 0};
-			std::wstring StringF = std::wstring(Temp1);
-			wchar_t Temp2[] = {8364, 0};
-			std::wstring StringG = std::wstring(Temp2);
 
 			ZETestCheck(StringE == StringG);
 			ZETestCheck(!(StringE == StringF));
@@ -1424,57 +1762,6 @@ ZETestSuite(ZEString)
 		ZETestCheck(StringA == "€");
 	}
 
-// 	ZETest("void ZEString::SetValue(float Value, ZEUInt Digits)")
-// 	{
-// 		float Value = 400.5525252f;
-// 		ZEString String;
-// 		ZEUInt Digits = 6;
-// 		String.SetValue(Value, Digits);
-// 		ZETestCheck(String == "400.553");
-// 	}
-
-// 	ZETest("void ZEString::SetValue(ZEInt Value, ZEUInt Base)")
-// 	{
-// 		ZEString String;
-// 		ZEInt Value = 10;
-// 		ZEUInt Base = 2;
-// 
-// 		String.SetValue(Value, Base);
-// 		ZETestCheckEqual(String, "1010");
-// 	}
-
-// 	ZETest("void ZEString::SetValue(ZEUInt Value, ZEUInt Base)")
-// 	{
-// 		ZEString String;
-// 		ZEUInt Value = 6;
-// 		ZEUInt Base = 2;
-// 
-// 		String.SetValue(Value, Base);
-// 
-// 		ZETestCheckEqual(String, ZEString("110"));
-// 	}
-
-	ZETest("void ZEString::SetValue(bool Value, const char* TrueText, const char* FalseText)")
-	{
-		ZETestCase("ZEString value is set to True")
-		{
-			ZEString StringA;
-
-			StringA.SetValue(1, "True", "False");
-
-			ZETestCheck(StringA == "True");
-		}
-		ZETestCase("ZEString value is set to False")
-		{
-			ZEString StringB;
-
-			StringB.SetValue(0, "True", "False");
-
-			ZETestCheck(StringB == "False");
-		}
-
-	}
-
 	ZETest("void ZEString::SetValue(const ZECharacter& Character)")
 	{
 		ZEString String;
@@ -1515,6 +1802,143 @@ ZETestSuite(ZEString)
 		StringA.SetValue(Character);
 
 		ZETestCheck(StringA == "€");
+	}
+
+	ZETest("void ZEString::SetValue(float Value, const char* Format)")
+	{
+		float Value = 400.5525252f;
+		ZEString String;
+
+		String.SetValue(Value);
+		ZETestCheck(String == "400.552521");
+	}
+
+	ZETest("void ZEString::SetValue(float Value, ZEUInt Digits)")
+	{
+		float Value = 400.5525252f;
+		ZEString String;
+		ZEUInt Digits = 3;
+		String.SetValue(Value, Digits);
+		ZETestCheck(String == "400.553");
+	}
+
+	ZETest("void ZEString::SetValue(double Value, const char* Format)")
+	{
+		double Value = 400.5525252;
+		ZEString String;
+
+		String.SetValue(Value);
+		ZETestCheck(String == "400.552521");
+	}
+
+	ZETest("void ZEString::SetValue(double Value, ZEUInt Base)")
+	{
+		double Value = 400.5525252;
+		ZEString String;
+		ZEUInt Digits = 3;
+		String.SetValue(Value, Digits);
+		ZETestCheck(String == "400.553");
+	}
+
+	ZETest("void ZEString::SetValue(ZEInt8 Value, const char* Format)")
+	{
+		ZEInt8 Value = -20;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "-20");
+	}
+
+	ZETest("void ZEString::SetValue(ZEInt16 Value, const char* Format)")
+	{
+		ZEInt16 Value = -8765;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "-8765");
+	}
+
+	ZETest("void ZEString::SetValue(ZEInt32 Value, const char* Format)")
+	{
+		ZEInt32 Value = -87654321;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "-87654321");
+	}
+
+	ZETest("void ZEString::SetValue(ZEInt64 Value, const char* Format)")
+	{
+		ZEInt64 Value = -87654321;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "-87654321");
+	}
+
+	ZETest("void ZEString::SetValue(ZEUInt8 Value, const char* Format)")
+	{
+		ZEUInt8 Value = 20;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "20");
+	}
+
+	ZETest("void ZEString::SetValue(ZEUInt16 Value, const char* Format)")
+	{
+		ZEUInt16 Value = 8765;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "8765");
+	}
+
+	ZETest("void ZEString::SetValue(ZEUInt32 Value, const char* Format)")
+	{
+		ZEUInt32 Value = 987654;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "987654");
+	}
+
+	ZETest("void ZEString::SetValue(ZEUInt64 Value, const char* Format)")
+	{
+		ZEUInt64 Value = 987654321;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "987654321");
+	}
+
+	ZETest("void ZEString::SetValue(bool Value, const char* TrueText, const char* FalseText)")
+	{
+		ZETestCase("ZEString value is set to True")
+		{
+			ZEString StringA;
+
+			StringA.SetValue(1, "True", "False");
+
+			ZETestCheck(StringA == "True");
+		}
+		ZETestCase("ZEString value is set to False")
+		{
+			ZEString StringB;
+
+			StringB.SetValue(0, "True", "False");
+
+			ZETestCheck(StringB == "False");
+		}
+
 	}
 
 	ZETest("ZEString ZEString::SubString(ZESize StartPosition, ZESize EndPosition) const")
@@ -1632,37 +2056,111 @@ ZETestSuite(ZEString)
 		}
 	}
 
-// 	ZETest("ZEUINT32 ZEString::ToUInt() const")
-// 	{
-// 		ZEString String = "123";
-// 		ZEUInt32 ExpectedValue = 123;
-// 
-// 		ZEUInt32 Value = String.ToUInt32();
-// 
-// 		ZETestCheckEqual(Value, ExpectedValue);
-// 	}
+	ZETest("float ZEString::ToFloat()")
+	{
+		ZEString String = "-255.046";
 
-// 	ZETest("float ZEString::ToFloat()")
-// 	{
-// 		ZEString String = "-255.046";
-// 
-// 		float Value = String.ToFloat();
-// 
-// 		ZETestCheckClose(Value, -255.04601f);
-// 
-// 	}
-// 
-// 	ZETest("ZEInt ZEString::ToInt()")
-// 	{
-// 		ZEString StringA = "255";
-// 		ZEString StringB = "-255.043";
-// 
-// 		ZEInt ValueA = StringA.ToInt32();
-// 		ZEInt ValueB = StringB.ToInt32();
-// 
-// 		ZETestCheckEqual(ValueA, 255);
-// 		ZETestCheckEqual(ValueB, -255);
-// 	}
+		float Value = String.ToFloat();
+
+		ZETestCheckClose(Value, -255.04601f);
+	}
+
+	ZETest("double ZEString::ToDouble() const")
+	{
+		ZEString String = "-255.046";
+
+		double Value = String.ToDouble();
+
+		ZETestCheckClose(Value, -255.04601f);
+	}
+
+	ZETest("ZEInt8 ZEString::ToInt8() const")
+	{
+		ZEString StringA = "120";
+		ZEString StringB = "-120.043";
+
+		ZEInt8 ValueA = StringA.ToInt8();
+		ZEInt8 ValueB = StringB.ToInt8();
+
+		ZETestCheckEqual(ValueA, 120);
+		ZETestCheckEqual(ValueB, -120);
+	}
+
+	ZETest("ZEInt16 ZEString::ToInt16() const")
+	{
+		ZEString StringA = "255";
+		ZEString StringB = "-255.043";
+
+		ZEInt16 ValueA = StringA.ToInt16();
+		ZEInt16 ValueB = StringB.ToInt16();
+
+		ZETestCheckEqual(ValueA, 255);
+		ZETestCheckEqual(ValueB, -255);
+	}
+
+	ZETest("ZEInt32 ZEString::ToInt32() const")
+	{
+		ZEString StringA = "255";
+		ZEString StringB = "-255.043";
+
+		ZEInt32 ValueA = StringA.ToInt32();
+		ZEInt32 ValueB = StringB.ToInt32();
+
+		ZETestCheckEqual(ValueA, 255);
+		ZETestCheckEqual(ValueB, -255);
+	}
+
+	ZETest("ZEInt64 ZEString::ToInt64() const")
+	{
+		ZEString StringA = "255";
+		ZEString StringB = "-255.043";
+
+		ZEInt64 ValueA = StringA.ToInt64();
+		ZEInt64 ValueB = StringB.ToInt64();
+
+		ZETestCheckEqual(ValueA, 255);
+		ZETestCheckEqual(ValueB, -255);
+	}
+
+	ZETest("ZEUInt8 ZEString::ToUInt8() const")
+	{
+		ZEString String = "123";
+		ZEUInt8 ExpectedValue = 123;
+
+		ZEUInt8 Value = String.ToUInt8();
+
+		ZETestCheckEqual(Value, ExpectedValue);
+	}
+
+	ZETest("ZEUInt16 ZEString::ToUInt16() const")
+	{
+		ZEString String = "123";
+		ZEUInt16 ExpectedValue = 123;
+
+		ZEUInt16 Value = String.ToUInt16();
+
+		ZETestCheckEqual(Value, ExpectedValue);
+	}
+
+	ZETest("ZEUInt32 ZEString::ToUInt32() const")
+	{
+		ZEString String = "123456";
+		ZEUInt32 ExpectedValue = 123456;
+
+		ZEUInt32 Value = String.ToUInt32();
+
+		ZETestCheckEqual(Value, ExpectedValue);
+	}
+
+	ZETest("ZEUInt64 ZEString::ToUInt64() const")
+	{
+		ZEString String = "123456";
+		ZEUInt64 ExpectedValue = 123456;
+
+		ZEUInt64 Value = String.ToUInt64();
+
+		ZETestCheckEqual(Value, ExpectedValue);
+	}
 
 	ZETest("ZEString ZEString::Trim() const")
 	{
@@ -2001,7 +2499,96 @@ ZETestSuite(ZEString)
 		ZEString StringB(StringA);
 
 		ZETestCheck(StringB == "Lorem Ipsum");
+	}
 
+	ZETest("ZEString::ZEString(ZEInt8 Value)")
+	{
+		ZEInt8 Value = -20;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "-20");
+	}
+
+	ZETest("ZEString::ZEString(ZEInt16 Value)")
+	{
+		ZEInt16 Value = -8765;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "-8765");
+	}
+
+	ZETest("ZEString::ZEString(ZEInt32 Value)")
+	{
+		ZEInt32 Value = -87654;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "-87654");
+	}
+
+	ZETest("ZEString::ZEString(ZEInt64 Value)")
+	{
+		ZEInt64 Value = -87654321;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "-87654321");
+	}
+
+	ZETest("ZEString::ZEString(ZEUInt8 Value)")
+	{
+		ZEUInt8 Value = 20;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "20");
+	}
+
+	ZETest("ZEString::ZEString(ZEUInt16 Value)")
+	{
+		ZEUInt16 Value = 8765;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "8765");
+	}
+
+	ZETest("ZEString::ZEString(ZEUInt32 Value)")
+	{
+		ZEUInt32 Value = 87654;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "87654");
+	}
+
+	ZETest("ZEString::ZEString(ZEUInt64 Value)")
+	{
+		ZEUInt64 Value = 87654321;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "87654321");
+	}
+
+	ZETest("ZEString::ZEString(float Value)")
+	{
+		float Value = 400.5525252f;
+
+		ZEString String(Value);
+
+		ZETestCheck(String == "400.552521");
+	}
+
+	ZETest("ZEString::ZEString(double Value)")
+	{
+		double Value = 400.5525252;
+
+		ZEString String(Value);
+
+		ZETestCheck(String == "400.552521");
 	}
 
 	ZETest("ZEString operator+(const char* String1, const ZEString& String2)")
@@ -2024,6 +2611,116 @@ ZETestSuite(ZEString)
 		Result = StringB + StringA;
 
 		ZETestCheck(Result == "Lorem Ipsum");
+	}
+
+	ZETest("ZEString operator+(ZEInt8 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEInt8 StringB = -20;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "-20 €");
+	}
+
+	ZETest("ZEString operator+(ZEInt16 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEInt16 StringB = -8765;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "-8765 €");
+	}
+
+	ZETest("ZEString operator+(ZEInt32 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEInt32 StringB = -87654;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "-87654 €");
+	}
+
+	ZETest("ZEString operator+(ZEInt64 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEInt64 StringB = -8765432;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "-8765432 €");
+	}
+
+	ZETest("ZEString operator+(ZEUInt8 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEUInt8 StringB = 20;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "20 €");
+	}
+
+	ZETest("ZEString operator+(ZEUInt16 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEUInt16 StringB = 8765;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "8765 €");
+	}
+
+	ZETest("ZEString operator+(ZEUInt32 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEUInt32 StringB = 87654;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "87654 €");
+	}
+
+	ZETest("ZEString operator+(ZEUInt64 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEUInt64 StringB = 8765432;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "8765432 €");
+	}
+
+	ZETest("ZEString operator+(float Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		float StringB = 400.5525252;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "400.552521 €");
+	}
+
+	ZETest("ZEString operator+(double Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		double StringB = 400.5525252;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "400.552521 €");
 	}
 
 	ZETest("bool operator==(const char* String1, const ZEString& String2)")
@@ -2078,6 +2775,25 @@ ZETestSuite(ZEString)
 		{
 			const ZEString StringC = "Lorem";
 			const char* StringD = "Lorem";
+
+			ZETestCheck(!(StringD != StringC));
+		}
+	}
+
+	ZETest("bool operator!=(const wchar_t* String1, const ZEString& String2)")
+	{
+		ZETestCase("Strings are not equal")
+		{
+			const ZEString StringA = "Lorem";
+			const wchar_t* StringB = L"Ipsum";
+
+			ZETestCheck(StringB != StringA);
+		}
+
+		ZETestCase("Strings are equal")
+		{
+			const ZEString StringC = "Lorem";
+			const wchar_t* StringD = L"Lorem";
 
 			ZETestCheck(!(StringD != StringC));
 		}
