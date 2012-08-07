@@ -164,7 +164,7 @@ void ZEPathManager::InitializePaths()
 			return;
 		}
 
-		SystemDataPath = ZEString::FromWString(Path);
+		SystemDataPath = ZEString::FromWCString(Path);
 		SystemDataPath += PathSeperator;
 		SystemDataPath += CompanyName;
 		SystemDataPath += PathSeperator;
@@ -181,7 +181,7 @@ void ZEPathManager::InitializePaths()
 			return;
 		}
 
-		UserDataPath = ZEString::FromWString(Path);
+		UserDataPath = ZEString::FromWCString(Path);
 		UserDataPath += PathSeperator;
 		UserDataPath += CompanyName;
 		UserDataPath += PathSeperator;
@@ -198,7 +198,7 @@ void ZEPathManager::InitializePaths()
 			return;
 		}
 
-		SavedGamesPath = ZEString::FromWString(Path);
+		SavedGamesPath = ZEString::FromWCString(Path);
 		SavedGamesPath += PathSeperator;
 		SavedGamesPath += CompanyName;
 		SavedGamesPath += PathSeperator;
