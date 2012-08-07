@@ -140,19 +140,21 @@ class ZEString
 		void						SetValue(const std::string& String);
 		void						SetValue(const std::wstring& String);
 		void						SetValue(const ZECharacter& Character);
-		void						SetValue(ZEInt8 Value);
-		void						SetValue(ZEInt16 Value);
-		void						SetValue(ZEInt32 Value);
-		void						SetValue(ZEInt64 Value);
-		void						SetValue(ZEUInt8 Value);
-		void						SetValue(ZEUInt16 Value);
-		void						SetValue(ZEUInt32 Value);
-		void						SetValue(ZEUInt64 Value);
+
+		void						SetValue(ZEInt8 Value, const char* Format = "{0}");
+		void						SetValue(ZEInt16 Value, const char* Format = "{0}");
+		void						SetValue(ZEInt32 Value, const char* Format = "{0}");
+		void						SetValue(ZEInt64 Value, const char* Format = "{0}");
+		void						SetValue(ZEUInt8 Value, const char* Format = "{0}");
+		void						SetValue(ZEUInt16 Value, const char* Format = "{0}");
+		void						SetValue(ZEUInt32 Value, const char* Format = "{0}");
+		void						SetValue(ZEUInt64 Value, const char* Format = "{0}");
 		void						SetValue(float Value, ZEUInt Digits);
-		void						SetValue(float Value);
+		void						SetValue(float Value, const char* Format = "{0}");
 		void						SetValue(double Value, ZEUInt Digits);
-		void						SetValue(double Value);
+		void						SetValue(double Value, const char* Format = "{0}");
 		void						SetValue(bool Value, const char* TrueText = "True", const char* FalseText = "False");
+/*		void						SetValue(bool Value, const char* Format = "");*/
 
 		const char*					GetValue() const;
 
@@ -199,6 +201,10 @@ class ZEString
 		ZEString					Upper() const;
 		void						UpperSelf();
 
+		const char*					ToCString() const;
+		std::string					ToStdString() const;
+		const wchar_t*				ToWCString();
+		std::wstring				ToWStdString();
 		ZEInt8						ToInt8() const;
 		ZEInt16						ToInt16() const;
 		ZEInt32						ToInt32() const;
@@ -209,32 +215,26 @@ class ZEString
 		ZEUInt64					ToUInt64() const;
 		float						ToFloat() const;
 		double						ToDouble() const;
-		const char*					ToCString() const;
-		std::string					ToStdString() const;
-
-		const wchar_t*				ToWCString();
-		std::wstring				ToWStdString();
-		
+	
 		static ZEString 			FromChar(char Value);
-		static ZEString				FromWChar(wchar_t Value);		
-		static ZEString 			FromInt8(ZEInt8 Value);
-		static ZEString 			FromInt16(ZEInt16 Value);
-		static ZEString 			FromInt32(ZEInt32 Value);
-		static ZEString 			FromInt64(ZEInt64 Value);
-		static ZEString 			FromUInt8(ZEUInt8 Value);
-		static ZEString 			FromUInt16(ZEUInt16 Value);
-		static ZEString 			FromUInt32(ZEUInt32 Value);
-		static ZEString 			FromUInt64(ZEUInt64 Value);
-		static ZEString 			FromFloat(float Value, ZEUInt Digits);
-		static ZEString 			FromFloat(float Value);
-		static ZEString 			FromDouble(double Value, ZEUInt Digits);
-		static ZEString 			FromDouble(double Value);
-		static ZEString 			FromBool(bool Value, const char* TrueText = "True", const char* FalseText = "False");
+		static ZEString				FromWChar(wchar_t Value);
 		static ZEString 			FromCString(const char* Value);
 		static ZEString 			FromStdString(const std::string& Value);
-
 		static ZEString				FromWCString(const wchar_t* Value);
 		static ZEString				FromWStdString(const std::wstring& Value);
+		static ZEString 			FromInt8(ZEInt8 Value, const char* Format = "{0}");
+		static ZEString 			FromInt16(ZEInt16 Value, const char* Format = "{0}");
+		static ZEString 			FromInt32(ZEInt32 Value, const char* Format = "{0}");
+		static ZEString 			FromInt64(ZEInt64 Value, const char* Format = "{0}");
+		static ZEString 			FromUInt8(ZEUInt8 Value, const char* Format = "{0}");
+		static ZEString 			FromUInt16(ZEUInt16 Value, const char* Format = "{0}");
+		static ZEString 			FromUInt32(ZEUInt32 Value, const char* Format = "{0}");
+		static ZEString 			FromUInt64(ZEUInt64 Value, const char* Format = "{0}");
+		static ZEString 			FromFloat(float Value, ZEUInt Digits);
+		static ZEString 			FromFloat(float Value, const char* Format = "{0}");
+		static ZEString 			FromDouble(double Value, ZEUInt Digits);
+		static ZEString 			FromDouble(double Value, const char* Format = "{0}");
+		static ZEString 			FromBool(bool Value, const char* TrueText = "True", const char* FalseText = "False");
 
 		ZEString&					operator=(const ZEString& String);
 		ZEString&					operator=(const char* String);
@@ -289,15 +289,11 @@ class ZEString
 
 		bool						operator!=(const ZEString& String) const;
 		bool						operator!=(const char* String) const;
-		bool						operator!=(const wchar_t*& String) const;
 		bool						operator!=(const std::string& String) const;
-		bool						operator!=(const std::wstring& String) const;
 
 		bool						operator==(const ZEString& String) const;
 		bool						operator==(const char* String) const;
-		bool						operator==(const wchar_t*& String) const;
 		bool						operator==(const std::string& String) const;
-		bool						operator==(const std::wstring& String) const;
 	
 									operator std::string() const;
 									operator const char*() const;
