@@ -84,7 +84,7 @@ void ZECharacter::SetValue(const char* MultiByteCharacter)
 {
 	Size = ZECharacter::GetByteLength(MultiByteCharacter);
 
-	for(ZEInt I = 0; I < Size; I++)
+	for(ZEUInt I = 0; I < Size; I++)
 	{
 		Characters[I] = *MultiByteCharacter;
 		MultiByteCharacter++;
@@ -154,7 +154,7 @@ bool ZECharacter::Equals(const ZECharacter& Character) const
 	{
 		bool Result = true;
 
-		for (ZEInt I = 0; I < Size; I++)
+		for (ZEUInt I = 0; I < Size; I++)
 		{
 			if (this->Characters[I] != Character.Characters[I])
 				Result = false;
@@ -184,7 +184,7 @@ bool ZECharacter::Equals(const char* MultiByteCharacter) const
 	if (Size == MultiByteLength)
 	{
 		bool Result = true;
-		for (ZEInt I = 0; I < Size; I++)
+		for (ZEUInt I = 0; I < Size; I++)
 		{
 			if (Characters[I] != *MultiByteCharacter)
 				Result = false;
@@ -994,7 +994,7 @@ ZEString ZEString::Right(ZESize Count) const
 
 	char* CountBuffer = Buffer + ByteLength;
 
-	for (ZEInt I = 0; I < Count; I++)
+	for (ZEUInt I = 0; I < Count; I++)
 		CountBuffer = ZEString::DecrementByCharacter(Buffer, CountBuffer);
 
 	ZESize ByteCount = ZEString::GetBytePosition(CountBuffer, Count);
@@ -1862,7 +1862,7 @@ bool ZEString::operator!=(const char* String) const
 	return !Equals(String);
 }
 
-bool ZEString::operator!=(const wchar_t* String) const
+bool ZEString::operator!=(const wchar_t*& String) const
 {
 	ZEString Temp(String);
 	return !Equals(Temp);
@@ -1889,7 +1889,7 @@ bool ZEString::operator==(const char* String) const
 	return Equals(String);
 }
 
-bool ZEString::operator==(const wchar_t* String) const
+bool ZEString::operator==(const wchar_t*& String) const
 {
 	ZEString Temp(String);
 	return Equals(Temp);

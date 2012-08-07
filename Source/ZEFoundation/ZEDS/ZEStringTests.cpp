@@ -1152,7 +1152,7 @@ ZETestSuite(ZEString)
 
 		StringA = StringB;
 
-		ZETestCheck(StringA = "a");
+		ZETestCheck(StringA == "a");
 
 		ZETestCase("UTF-8 encoding compatibility test")
 		{
@@ -1161,7 +1161,7 @@ ZETestSuite(ZEString)
 
 			StringA = StringC;
 
-			ZETestCheck(StringA = "€");
+			ZETestCheck(StringA == "€");
 		}
 	}
 
@@ -1172,7 +1172,7 @@ ZETestSuite(ZEString)
 
 		StringA = StringB;
 
-		ZETestCheck(StringA = "a");
+		ZETestCheck(StringA == "a");
 
 		ZETestCase("UTF-8 encoding compatibility test")
 		{
@@ -1182,11 +1182,11 @@ ZETestSuite(ZEString)
 
 			StringA = StringC;
 
-			ZETestCheck(StringA = "€");
+			ZETestCheck(StringA == "€");
 		}
 	}
 
-	ZETest(" bool ZEString::operator==(const ZEString & String) const")
+	ZETest("bool ZEString::operator==(const ZEString & String) const")
 	{
 		ZETestCase("ZEStrings are not equal")
 		{

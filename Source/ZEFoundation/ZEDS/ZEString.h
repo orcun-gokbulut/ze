@@ -289,13 +289,13 @@ class ZEString
 
 		bool						operator!=(const ZEString& String) const;
 		bool						operator!=(const char* String) const;
-		bool						operator!=(const wchar_t* String) const;
+		bool						operator!=(const wchar_t*& String) const;
 		bool						operator!=(const std::string& String) const;
 		bool						operator!=(const std::wstring& String) const;
 
 		bool						operator==(const ZEString& String) const;
 		bool						operator==(const char* String) const;
-		bool						operator==(const wchar_t* String) const;
+		bool						operator==(const wchar_t*& String) const;
 		bool						operator==(const std::string& String) const;
 		bool						operator==(const std::wstring& String) const;
 	
