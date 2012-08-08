@@ -61,7 +61,6 @@ ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	//zeCore->SetDebugComponent(&DebugModule);
 
 	ZEGraphicsDebugModule GraphicsDebugModule;
-	GraphicsDebugModule.SetApplicationName("Graphics Debug Module");
 	zeCore->SetApplicationModule(&GraphicsDebugModule);
 
 	ZEPhysicsDebugModule PhysicsDebugModule;
