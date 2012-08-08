@@ -42,21 +42,15 @@
 #include <string.h>
 #include <memory.h>
 
-bool ZEPathManager::Initialized = false;
 bool ZEPathManager::EnablePathRestriction = false;
 
 ZEString ZEPathManager::WorkingDrive = "";
-
 ZEString ZEPathManager::UserDataPath = "";
 ZEString ZEPathManager::ResourcesPath = "";
 ZEString ZEPathManager::SystemDataPath = "";
 ZEString ZEPathManager::SavedGamesPath = "";
 ZEString ZEPathManager::WorkingDirectory = "";
 ZEString ZEPathManager::AppResourcesPath = "";
-
-ZEString ZEPathManager::CompanyName = "Zinek";
-ZEString ZEPathManager::ApplicationName = "Engine";
-ZEString ZEPathManager::ResourceDirName = "Resources";
 
 
 ZEPathManager::ZEPathManager()
@@ -69,13 +63,8 @@ ZEPathManager::~ZEPathManager()
 
 }
 
-void ZEPathManager::InitializePaths()
+void ZEPathManager::CustomizePaths(const ZEString* CompanyName, const ZEString* ApplicationName, const ZEString* ResourceDirectoryName)
 {
-    if (Initialized)
-        return;
-
-    const ZEString PathSeperator = ZEPathUtils::GetSeperator();
-
     errno = 0;
     char* WorkDir = getcwd(NULL, 0);
     if (WorkDir == NULL)
@@ -86,82 +75,52 @@ void ZEPathManager::InitializePaths()
         return;
     }
 
+    const ZEString PathSeperator = ZEPathUtils::GetSeperator();
+
     WorkingDrive = PathSeperator;
 
     WorkingDirectory = WorkDir;
 
     ResourcesPath = WorkingDirectory;
-	ResourcesPath += PathSeperator;
-	ResourcesPath += ResourceDirName;
+    if (ResourceDirectoryName != NULL)
+    {
+        ResourcesPath += PathSeperator;
+        ResourcesPath += ResourceDirectoryName;
+    }
 
 	AppResourcesPath = ResourcesPath;
-	AppResourcesPath += PathSeperator;
-	AppResourcesPath += ApplicationName;
+	if (ApplicationName != NULL)
+    {
+        AppResourcesPath += PathSeperator;
+        AppResourcesPath += ApplicationName;
+    }
 
     SystemDataPath = WorkingDirectory;
     SystemDataPath += PathSeperator;
     SystemDataPath += "SystemData";
-    SystemDataPath += PathSeperator;
-    SystemDataPath += ApplicationName;
-
+    if (ApplicationName != NULL)
+    {
+        SystemDataPath += PathSeperator;
+        SystemDataPath += ApplicationName;
+    }
 
     UserDataPath = WorkingDirectory;
     UserDataPath += PathSeperator;
     UserDataPath += "UserData";
-    UserDataPath += PathSeperator;
-    UserDataPath += ApplicationName;
+    if (ApplicationName != NULL)
+    {
+        UserDataPath += PathSeperator;
+        UserDataPath += ApplicationName;
+    }
 
     SavedGamesPath = WorkingDirectory;
     SavedGamesPath += PathSeperator;
     SavedGamesPath += "SavedGames";
-    SavedGamesPath += PathSeperator;
-    SavedGamesPath += ApplicationName;
-
-    Initialized = true;
-}
-
-bool ZEPathManager::GetInitialized()
-{
-	return Initialized;
-}
-
-void ZEPathManager::SetCompanyName(const ZEString& Name)
-{
-	CompanyName = Name;
-	Initialized = false;
-
-	InitializePaths();
-}
-
-const ZEString& ZEPathManager::GetCompanyName()
-{
-	return CompanyName;
-}
-
-void ZEPathManager::SetApplicationName(const ZEString& Name)
-{
-	ApplicationName = Name;
-	Initialized = false;
-
-	InitializePaths();
-}
-
-const ZEString& ZEPathManager::GetApplicationName()
-{
-	return ApplicationName;
-}
-
-void ZEPathManager::SetResourceDirName(const ZEString& Name)
-{
-	ResourceDirName;
-	Initialized = false;
-
-	InitializePaths();
-}
-
-const ZEString& ZEPathManager::GetResourceDirName()
-{
-	return ResourceDirName;
+    if (ApplicationName != NULL)
+    {
+        SavedGamesPath += PathSeperator;
+        SavedGamesPath += ApplicationName;
+    }
 }
 
 void ZEPathManager::SetEnablePathRestriction(bool Enable)
@@ -176,50 +135,61 @@ bool ZEPathManager::GetEnablePathRestriction()
 
 const ZEString& ZEPathManager::GetWorkingDrive()
 {
-	InitializePaths();
-
-	return WorkingDrive;
-}
-
-const ZEString&	ZEPathManager::GetUserDataPath()
-{
-	InitializePaths();
-
-	return UserDataPath;
-}
-
-const ZEString&	ZEPathManager::GetResourcesPath()
-{
-	InitializePaths();
-
-	return ResourcesPath;
-}
-
-const ZEString&	ZEPathManager::GetSystemDataPath()
-{
-	InitializePaths();
-
-	return SystemDataPath;
-}
-
-const ZEString&	ZEPathManager::GetSavedGamesPath()
-{
-	InitializePaths();
-
-	return SavedGamesPath;
+    return WorkingDrive;
 }
 
 const ZEString& ZEPathManager::GetWorkingDirectory()
 {
-	InitializePaths();
-
 	return WorkingDirectory;
+}
+
+void ZEPathManager::SetUserDataPath(const ZEString& Name)
+{
+    UserDataPath = Name;
+}
+
+const ZEString&	ZEPathManager::GetUserDataPath()
+{
+    return UserDataPath;
+}
+
+void ZEPathManager::SetResourcesPath(const ZEString& Name)
+{
+    ResourcesPath = Name;
+}
+
+const ZEString&	ZEPathManager::GetResourcesPath()
+{
+	return ResourcesPath;
+}
+
+void ZEPathManager::SetSystemDataPath(const ZEString& Name)
+{
+    SystemDataPath = Name;
+}
+
+const ZEString&	ZEPathManager::GetSystemDataPath()
+{
+	return SystemDataPath;
+}
+
+void ZEPathManager::SetSavedGamesPath(const ZEString& Name)
+{
+    SavedGamesPath = Name;
+}
+
+const ZEString&	ZEPathManager::GetSavedGamesPath()
+{
+	return SavedGamesPath;
+}
+
+void ZEPathManager::SetApplicationResourcesPath(const ZEString& Name)
+{
+    AppResourcesPath = Name;
 }
 
 const ZEString&	ZEPathManager::GetApplicationResourcesPath()
 {
-	InitializePaths();
-
 	return AppResourcesPath;
 }
 
@@ -227,9 +197,7 @@ ZEKnownPath ZEPathManager::GetKnownPath(const ZEString& AbsolutePath)
 {
 #define Compare(Str1, Str2, Length)  (strncmp((Str1), (Str2), (Length)) == 0)
 
-	InitializePaths();
-
-	ZESize Len = 0;
+	ZESize Length = 0;
 	ZEKnownPath Root = ZE_KP_NONE;
 	ZESize PathLen = AbsolutePath.GetLength();
 	ZESize ResrcLen = ResourcesPath.GetLength();
@@ -239,43 +207,40 @@ ZEKnownPath ZEPathManager::GetKnownPath(const ZEString& AbsolutePath)
 	ZESize UsrDataLen = UserDataPath.GetLength();
 	ZESize SvdGameLen = SavedGamesPath.GetLength();
 
-	// Comparison should be done with the order
-	// staring from longest to shortest path
-
-	if (PathLen >= ResrcLen && ResrcLen > Len &&
+	if (PathLen >= ResrcLen && ResrcLen > Length &&
 		Compare(AbsolutePath, ResourcesPath, ResrcLen))
 	{
-		Len = ResrcLen;
+		Length = ResrcLen;
 		Root = ZE_KP_RESOURCES;
 	}
-	if (PathLen >= AppResLen && AppResLen > Len &&
+	if (PathLen >= AppResLen && AppResLen > Length &&
 		Compare(AbsolutePath, AppResourcesPath, AppResLen))
 	{
-		Len = ResrcLen;
+		Length = ResrcLen;
 		Root = ZE_KP_APP_RESOURCES;
 	}
-	if (PathLen >= WrkDirLen && WrkDirLen > Len &&
+	if (PathLen >= WrkDirLen && WrkDirLen > Length &&
 		Compare(AbsolutePath, WorkingDirectory, WrkDirLen))
 	{
-		Len = WrkDirLen;
+		Length = WrkDirLen;
 		Root = ZE_KP_WORKING_DIRECTORY;
 	}
-	if (PathLen >= SysDataLen && SysDataLen > Len &&
+	if (PathLen >= SysDataLen && SysDataLen > Length &&
 		Compare(AbsolutePath, SystemDataPath, SysDataLen))
 	{
-		Len = SysDataLen;
+		Length = SysDataLen;
 		Root = ZE_KP_SYSTEM_DATA;
 	}
-	if (PathLen >= UsrDataLen && UsrDataLen > Len &&
+	if (PathLen >= UsrDataLen && UsrDataLen > Length &&
 		Compare(AbsolutePath, UserDataPath, UsrDataLen))
 	{
-		Len = UsrDataLen;
+		Length = UsrDataLen;
 		Root = ZE_KP_USER_DATA;
 	}
-	if (PathLen >= SvdGameLen && SvdGameLen > Len &&
+	if (PathLen >= SvdGameLen && SvdGameLen > Length &&
 		Compare(AbsolutePath, SavedGamesPath, SvdGameLen))
 	{
-		Len = SvdGameLen;
+		Length = SvdGameLen;
 		Root = ZE_KP_SAVED_GAMES;
 	}
 
@@ -284,8 +249,6 @@ ZEKnownPath ZEPathManager::GetKnownPath(const ZEString& AbsolutePath)
 
 const ZEString& ZEPathManager::GetKnownPath(const ZEKnownPath KnownPath)
 {
-	InitializePaths();
-
 	switch (KnownPath)
 	{
 		case ZE_KP_NONE:
