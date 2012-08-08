@@ -145,7 +145,7 @@ const char* ZECharacter::GetValue() const
 	return Characters;
 }
 
-ZESize ZECharacter::GetSize() const
+ZEUInt ZECharacter::GetSize() const
 {
 	return Size;
 }
