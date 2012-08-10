@@ -37,15 +37,23 @@
 
 #include <string.h>
 #include <memory.h>
-#ifdef ZE_PLATFORM_WINDOWS
-    #include <mbstring.h>
-	#include <windows.h>
-#endif
 #include <wchar.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <stdarg.h>
+
+#ifdef ZE_PLATFORM_WINDOWS
+    #include <mbstring.h>
+	#include <windows.h>
+
+#elif defined ZE_PLATFORM_UNIX
+
+#include <iconv.h>
+#include <wctype.h>
+#include <errno.h>
+
+#endif
 
 #ifdef ZE_PLATFORM_COMPILER_GCC
 	#define _snprintf snprintf
@@ -98,6 +106,8 @@ void ZECharacter::SetValue(const char* MultiByteCharacter)
 
 void ZECharacter::SetValue(const wchar_t* WideCharacter)
 {
+	#ifdef ZE_PLATFORM_WINDOWS
+
 	int RequiredSize = WideCharToMultiByte(CP_UTF8, 0, WideCharacter, -1, 0, 0, 0, 0) - 1;
 
 	if(RequiredSize > 0)
@@ -105,6 +115,23 @@ void ZECharacter::SetValue(const wchar_t* WideCharacter)
 		WideCharToMultiByte(CP_UTF8, 0, WideCharacter, -1, &Characters[0], RequiredSize, 0, 0);
 		Size = RequiredSize;
 	}
+
+	#elif defined ZE_PLATFORM_UNIX
+
+	ZESize RequiredSize = wcslen(WideCharacter);
+	char* InputBuffer = (char*)WideCharacter;
+	char* OutputBuffer = &Characters[0];
+
+	if(RequiredSize > 0)
+	{
+		ZESize CharacterSize = 4;
+		iconv_t ConversionDefinition = iconv_open("UTF-8", "WCHAR_T");
+		iconv(ConversionDefinition, &InputBuffer, &RequiredSize, &OutputBuffer, &CharacterSize);
+		iconv_close(ConversionDefinition);
+		Size = CharacterSize;
+	}
+
+	#endif
 
 	if (Owner != NULL)
 		Owner->SetCharacter(Position, this->Characters);
@@ -210,7 +237,24 @@ bool ZECharacter::Equals(const wchar_t* WideCharacter) const
 ZECharacter ZECharacter::Upper() const
 {
 	wchar_t WideBuffer[2] = {0};
+
+	#ifdef ZE_PLATFORM_WINDOWS
+
 	MultiByteToWideChar(CP_UTF8, 0, Characters, Size, WideBuffer, 2);
+
+	#elif defined ZE_PLATFORM_UNIX
+
+	char* OutputBuffer = (char*)WideBuffer;
+	ZESize WideCharacterSize = 4;
+
+	char* InputBuffer = &Characters[0];
+	ZESize CharacterSize = Size;
+
+	iconv_t ConversionDefinition = iconv_open("WCHAR_T", "UTF-8");
+	iconv(ConversionDefinition, &InputBuffer, &CharacterSize, &OutputBuffer, &WideCharacterSize);
+	iconv_close(ConversionDefinition);
+
+	#endif
 
 	if(WideBuffer[1] != NULL)
 		return ZECharacter(this->GetValue());
@@ -224,7 +268,24 @@ ZECharacter ZECharacter::Upper() const
 void ZECharacter::UpperSelf()
 {
 	wchar_t WideBuffer[2] = {0};
+
+	#ifdef ZE_PLATFORM_WINDOWS
+
 	MultiByteToWideChar(CP_UTF8, 0, Characters, Size, WideBuffer, 2);
+
+	#elif defined ZE_PLATFORM_UNIX
+
+	char* OutputBuffer = (char*)WideBuffer;
+	ZESize WideCharacterSize = 4;
+
+	char* InputBuffer = &Characters[0];
+	ZESize CharacterSize = Size;
+
+	iconv_t ConversionDefinition = iconv_open("WCHAR_T", "UTF-8");
+	iconv(ConversionDefinition, &InputBuffer, &CharacterSize, &OutputBuffer, &WideCharacterSize);
+	iconv_close(ConversionDefinition);
+
+	#endif
 
 	if(WideBuffer[1] != NULL)
 		return;
@@ -238,7 +299,24 @@ void ZECharacter::UpperSelf()
 ZECharacter ZECharacter::Lower() const
 {
 	wchar_t WideBuffer[2] = {0};
+
+	#ifdef ZE_PLATFORM_WINDOWS
+
 	MultiByteToWideChar(CP_UTF8, 0, Characters, Size, WideBuffer, 2);
+
+	#elif defined ZE_PLATFORM_UNIX
+
+	char* OutputBuffer = (char*)WideBuffer;
+	ZESize WideCharacterSize = 4;
+
+	char* InputBuffer = &Characters[0];
+	ZESize CharacterSize = Size;
+
+	iconv_t ConversionDefinition = iconv_open("WCHAR_T", "UTF-8");
+	iconv(ConversionDefinition, &InputBuffer, &CharacterSize, &OutputBuffer, &WideCharacterSize);
+	iconv_close(ConversionDefinition);
+
+	#endif
 
 	if(WideBuffer[1] != NULL)
 		return ZECharacter(this->GetValue());
@@ -252,7 +330,24 @@ ZECharacter ZECharacter::Lower() const
 void ZECharacter::LowerSelf()
 {
 	wchar_t WideBuffer[2] = {0};
+
+	#ifdef ZE_PLATFORM_WINDOWS
+
 	MultiByteToWideChar(CP_UTF8, 0, Characters, Size, WideBuffer, 2);
+
+	#elif defined ZE_PLATFORM_UNIX
+
+	char* OutputBuffer = (char*)WideBuffer;
+	ZESize WideCharacterSize = 4;
+
+	char* InputBuffer = &Characters[0];
+	ZESize CharacterSize = Size;
+
+	iconv_t ConversionDefinition = iconv_open("WCHAR_T", "UTF-8");
+	iconv(ConversionDefinition, &InputBuffer, &CharacterSize, &OutputBuffer, &WideCharacterSize);
+	iconv_close(ConversionDefinition);
+
+	#endif
 
 	if(WideBuffer[1] != NULL)
 		return;
@@ -354,8 +449,26 @@ ZECharacter::operator const char*() const
 
 ZECharacter::operator wchar_t() const
 {
-	wchar_t Temp;	
+	wchar_t Temp;
+
+	#ifdef ZE_PLATFORM_WINDOWS
+
 	MultiByteToWideChar(CP_UTF8, 0, Characters, Size, &Temp, 1);
+
+	#elif defined ZE_PLATFORM_UNIX
+
+	char* OutputBuffer = (char*)Temp;
+	ZESize WideCharacterSize = 4;
+
+	char* InputBuffer = &Characters[0];
+	ZESize CharacterSize = Size;
+
+	iconv_t ConversionDefinition = iconv_open("WCHAR_T", "UTF-8");
+	iconv(ConversionDefinition, &InputBuffer, &CharacterSize, &OutputBuffer, &WideCharacterSize);
+	iconv_close(ConversionDefinition);
+
+	#endif
+
 	return Temp;
 }
 
@@ -441,36 +554,80 @@ bool operator!=(const wchar_t* WideCharacter, const ZECharacter& Character)
 
 
 
+#ifdef ZE_PLATFORM_UNIX
 
-// std::string ZEString::ConvertFromUtf16ToUtf8(const std::wstring& WString)
-// {
-// 	std::string ConvertedString;
-// 	int RequiredSize = WideCharToMultiByte(CP_UTF8, 0, WString.c_str(), -1, 0, 0, 0, 0);
-// 
-// 	if(RequiredSize > 0)
-// 	{
-// 		ZEArray<char> Buffer;
-// 		Buffer.SetCount(RequiredSize);
-// 		WideCharToMultiByte(CP_UTF8, 0, WString.c_str(), -1, &Buffer[0], RequiredSize, 0, 0);
-// 		ConvertedString.assign(Buffer.GetCArray(), RequiredSize);
-// 	}
-// 	return ConvertedString;
-// }
-// 
-// std::wstring ZEString::ConvertFromUtf8ToUtf16(const std::string& String)
-// {
-// 	std::wstring ConvertedString;
-// 	int RequiredSize = MultiByteToWideChar(CP_UTF8, 0, String.c_str(), -1, 0, 0);
-// 
-// 	if(RequiredSize > 0)
-// 	{
-// 		ZEArray<wchar_t> Buffer;
-// 		MultiByteToWideChar(CP_UTF8, 0, String.c_str(), -1, &Buffer[0], RequiredSize);
-// 		ConvertedString.assign(Buffer.GetCArray(), RequiredSize);
-// 	}
-// 
-// 	return ConvertedString;
-// }
+ZESize CalculateRequiredSize(const char* String)
+{
+	char TempBuffer[512];
+	char* InputBuffer = (char*)String;
+	ZESize InputSize = strlen(String);
+	char* TempOutput = &TempBuffer[0];
+	ZESize TempSize = 512;
+
+	ZESize ConvertedCharacterCount;
+	ZESize ResultSize = 0;
+
+
+	iconv_t ConversionDescriptor = iconv_open("WCHAR_T", "UTF-8");
+
+	while(InputSize > 0)
+	{
+		ConvertedCharacterCount = iconv(ConversionDescriptor, &InputBuffer, &InputSize, &TempOutput, &TempSize);
+
+		if (ConvertedCharacterCount == (ZESize)-1)
+		{
+			if(errno != E2BIG)
+				break;
+
+			ResultSize += 512 - TempSize;
+			TempOutput = &TempBuffer[0];
+		}
+	}
+
+	iconv_close(ConversionDescriptor);
+
+	ResultSize += 512 - TempSize;
+
+	return ResultSize;
+}
+
+
+ZESize CalculateRequiredSizeW(const wchar_t* WideString)
+{
+	char TempBuffer[512];
+	char* InputString = (char*)WideString;
+	ZESize InputSize = wcslen(WideString);
+	char* TempOutput = &TempBuffer[0];
+	ZESize TempSize = 512;
+
+	ZESize ConvertedCharacterCount;
+	ZESize ResultSize = 0;
+
+
+	iconv_t ConversionDescriptor = iconv_open("UTF-8", "WCHAR_T");
+
+	while (InputSize > 0)
+	{
+		ConvertedCharacterCount = iconv(ConversionDescriptor, &InputString, &InputSize, &TempOutput, &TempSize);
+
+		if (ConvertedCharacterCount == (ZESize)-1)
+		{
+			if (errno != E2BIG)
+				break;
+
+			ResultSize += 512 - TempSize;
+			TempOutput = &TempBuffer[0];
+		}
+	}
+
+	iconv_close(ConversionDescriptor);
+
+	ResultSize += 512 - TempSize;
+
+	return ResultSize;
+}
+
+#endif
 
 
 ZESize ZEString::GetBytePosition(const char* String, ZESize CharacterPosition)
@@ -597,6 +754,8 @@ void ZEString::SetValue(wchar_t Character)
 {
 	BufferChanged = true;
 
+	#ifdef ZE_PLATFORM_WINDOWS
+
 	ZESize Size = WideCharToMultiByte(CP_UTF8, 0, &Character, 1, 0, 0, 0, 0);
 
 	char* OldBuffer = Buffer;
@@ -607,11 +766,33 @@ void ZEString::SetValue(wchar_t Character)
 
 	Buffer[Size] = '\0';
 
+	#elif defined ZE_PLATFORM_UNIX
+
+	wchar_t TempBuffer[2] = {Character, 0};
+	char* InputBuffer = (char*)(&TempBuffer[0]);
+	ZESize WideCharacterSize = 1;
+
+	ZESize RequiredSize = CalculateRequiredSizeW(TempBuffer);
+
+	char* OldBuffer = Buffer;
+	if (Allocator.Allocate(&Buffer, RequiredSize + 1))
+		delete[] OldBuffer;
+
+	ZESize OutputSize = RequiredSize;
+	iconv_t ConversionDefinition = iconv_open("UTF-8", "WCHAR_T");
+	iconv(ConversionDefinition, &InputBuffer, &WideCharacterSize, &Buffer, &OutputSize);
+	iconv_close(ConversionDefinition);
+
+	Buffer[RequiredSize] = '\0';
+
+	#endif
 }
 
 void ZEString::SetValue(const wchar_t* String)
 {
 	BufferChanged = true;
+
+	#ifdef ZE_PLATFORM_WINDOWS
 
 	ZESize Size = WideCharToMultiByte(CP_UTF8, 0, String, -1, 0, 0, 0, 0);
 
@@ -621,6 +802,25 @@ void ZEString::SetValue(const wchar_t* String)
 
 	WideCharToMultiByte(CP_UTF8, 0, String, -1, Buffer, Size, 0, 0);
 
+	#elif defined ZE_PLATFORM_UNIX
+
+	char* InputBuffer = (char*)String;
+	ZESize WideCharacterSize = wcslen(String);
+
+	ZESize RequiredSize = CalculateRequiredSizeW(String);
+
+	char* OldBuffer = Buffer;
+	if (Allocator.Allocate(&Buffer, RequiredSize + 1))
+		delete[] OldBuffer;
+
+	ZESize OutputSize = RequiredSize;
+	iconv_t ConversionDefinition = iconv_open("UTF-8", "WCHAR_T");
+	iconv(ConversionDefinition, &InputBuffer, &WideCharacterSize, &Buffer, &OutputSize);
+	iconv_close(ConversionDefinition);
+
+	Buffer[RequiredSize] = '\0';
+
+	#endif
 }
 
 void ZEString::SetValue(const std::string& String)
@@ -717,9 +917,9 @@ void ZEString::SetValue(double Value, const char* Format)
 	SetValue(ZEFormat::Format(Format, Value));
 }
 
-void ZEString::SetValue(bool Value, const char* TrueText, const char* FalseText)
+void ZEString::SetValue(bool Value, const char* Format)
 {
-	SetValue(Value ? TrueText : FalseText);
+	SetValue(ZEFormat::Format(Format, Value));
 }
 
 const char* ZEString::GetValue() const
@@ -1250,21 +1450,52 @@ ZEString ZEString::Lower() const
 		return ZEString();
 
 	ZESize ByteLength = strlen(Buffer);
-	
+
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (ByteLength + 1) * sizeof(char));
 	Temp = Buffer;
+
+	#ifdef ZE_PLATFORM_WINDOWS
 
 	ZESize RequiredSizeforWide = MultiByteToWideChar(CP_UTF8, 0, Temp, -1, 0, 0);
 	wchar_t* WideTemp = new wchar_t[RequiredSizeforWide];
 	MultiByteToWideChar(CP_UTF8, 0, Temp, -1, WideTemp, RequiredSizeforWide);
 	WideTemp = _wcslwr(WideTemp);
-	
+
 	ZESize RequiredSizeforResult = WideCharToMultiByte(CP_UTF8, 0, WideTemp, -1, 0, 0, 0, 0);
 	Temp.Allocator.Reallocate(&Temp.Buffer, RequiredSizeforResult * sizeof(char));
 	WideCharToMultiByte(CP_UTF8, 0, WideTemp, -1, Temp.Buffer, RequiredSizeforResult, 0, 0);
 	delete[] WideTemp;
-	
+
+	#elif defined ZE_PLATFORM_UNIX
+
+	ZESize RequiredSizeforWide = CalculateRequiredSize(Temp);
+	ZESize RequiredSizeforWideArray = RequiredSizeforWide / sizeof(ZEInt);
+	wchar_t* WideTemp = new wchar_t[RequiredSizeforWideArray];
+	char* OutputBuffer = (char*)WideTemp;
+
+
+	ZESize InputSize = ByteLength;
+	ZESize OutputSize = RequiredSizeforWide;
+	iconv_t ConversionDescriptor = iconv_open("WCHAR_T", "UTF-8");
+	iconv(ConversionDescriptor, &Temp.Buffer, &InputSize, &OutputBuffer, &OutputSize);
+	iconv_close(ConversionDescriptor);
+
+	for (ZEUInt I = 0; I < RequiredSizeforWideArray; I++)
+		WideTemp[I] = towlower(WideTemp[I]);
+
+	ZESize RequiredSizeforResult = CalculateRequiredSizeW(WideTemp);
+	Temp.Allocator.Reallocate(&Temp.Buffer, RequiredSizeforResult * sizeof(char));
+
+	InputSize = RequiredSizeforWide;
+	OutputSize = RequiredSizeforResult;
+	ConversionDescriptor = iconv_open("UTF-8", "WCHAR_T");
+	iconv(ConversionDescriptor, &OutputBuffer, &InputSize, &Temp.Buffer, &OutputSize);
+	iconv_close(ConversionDescriptor);
+	delete[] WideTemp;
+
+	#endif
+
 	return Temp;
 }
 
@@ -1277,15 +1508,47 @@ void ZEString::LowerSelf()
 
 	ZESize ByteLength = strlen(Buffer);
 
+	#ifdef ZE_PLATFORM_WINDOWS
+
 	ZESize RequiredSizeforWide = MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, 0, 0);
 	wchar_t* WideTemp = new wchar_t[RequiredSizeforWide];
 	MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, WideTemp, RequiredSizeforWide);
 	WideTemp = _wcslwr(WideTemp);
-	
+
 	ZESize RequiredSizeforResult = WideCharToMultiByte(CP_UTF8, 0, WideTemp, -1, 0, 0, 0, 0);
 	Allocator.Reallocate(&Buffer, RequiredSizeforResult * sizeof(char));
 	WideCharToMultiByte(CP_UTF8, 0, WideTemp, -1, Buffer, RequiredSizeforResult, 0, 0);
 	delete[] WideTemp;
+
+	#elif defined ZE_PLATFORM_UNIX
+
+	ZESize RequiredSizeforWide = CalculateRequiredSize(Buffer);
+	ZESize RequiredSizeforWideArray = RequiredSizeforWide / sizeof(ZEInt);
+	wchar_t* WideTemp = new wchar_t[RequiredSizeforWideArray];
+	char* OutputBuffer = (char*)WideTemp;
+
+
+	ZESize InputSize = ByteLength;
+	ZESize OutputSize = RequiredSizeforWide;
+	iconv_t ConversionDescriptor = iconv_open("WCHAR_T", "UTF-8");
+	iconv(ConversionDescriptor, &Buffer, &InputSize, &OutputBuffer, &OutputSize);
+	iconv_close(ConversionDescriptor);
+
+	for (ZEUInt I = 0; I < RequiredSizeforWideArray; I++)
+		WideTemp[I] = towlower(WideTemp[I]);
+
+	ZESize RequiredSizeforResult = CalculateRequiredSizeW(WideTemp);
+	Allocator.Reallocate(&Buffer, RequiredSizeforResult * sizeof(char));
+
+	InputSize = RequiredSizeforWide;
+	OutputSize = RequiredSizeforResult;
+	ConversionDescriptor = iconv_open("UTF-8", "WCHAR_T");
+	iconv(ConversionDescriptor, &OutputBuffer, &InputSize, &Buffer, &OutputSize);
+	iconv_close(ConversionDescriptor);
+	delete[] WideTemp;
+
+	#endif
+
 }
 
 ZEString ZEString::Upper() const
@@ -1294,10 +1557,12 @@ ZEString ZEString::Upper() const
 		return ZEString();
 
 	ZESize ByteLength = strlen(Buffer);
-	
+
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (ByteLength + 1) * sizeof(char));
 	Temp = Buffer;
+
+	#ifdef ZE_PLATFORM_WINDOWS
 
 	ZESize RequiredSizeforWide = MultiByteToWideChar(CP_UTF8, 0, Temp, -1, 0, 0);
 	wchar_t* WideTemp = new wchar_t[RequiredSizeforWide];
@@ -1308,6 +1573,35 @@ ZEString ZEString::Upper() const
 	Temp.Allocator.Reallocate(&Temp.Buffer, RequiredSizeforResult * sizeof(char));
 	WideCharToMultiByte(CP_UTF8, 0, WideTemp, -1, Temp.Buffer, RequiredSizeforResult, 0, 0);
 	delete[] WideTemp;
+
+	#elif defined ZE_PLATFORM_UNIX
+
+	ZESize RequiredSizeforWide = CalculateRequiredSize(Temp);
+	ZESize RequiredSizeforWideArray = RequiredSizeforWide / sizeof(ZEInt);
+	wchar_t* WideTemp = new wchar_t[RequiredSizeforWideArray];
+	char* OutputBuffer = (char*)WideTemp;
+
+
+	ZESize InputSize = ByteLength;
+	ZESize OutputSize = RequiredSizeforWide;
+	iconv_t ConversionDescriptor = iconv_open("WCHAR_T", "UTF-8");
+	iconv(ConversionDescriptor, &Temp.Buffer, &InputSize, &OutputBuffer, &OutputSize);
+	iconv_close(ConversionDescriptor);
+
+	for (ZEUInt I = 0; I < RequiredSizeforWideArray; I++)
+		WideTemp[I] = towupper(WideTemp[I]);
+
+	ZESize RequiredSizeforResult = CalculateRequiredSizeW(WideTemp);
+	Temp.Allocator.Reallocate(&Temp.Buffer, RequiredSizeforResult * sizeof(char));
+
+	InputSize = RequiredSizeforWide;
+	OutputSize = RequiredSizeforResult;
+	ConversionDescriptor = iconv_open("UTF-8", "WCHAR_T");
+	iconv(ConversionDescriptor, &OutputBuffer, &InputSize, &Temp.Buffer, &OutputSize);
+	iconv_close(ConversionDescriptor);
+	delete[] WideTemp;
+
+	#endif
 
 	return Temp;
 }
@@ -1321,18 +1615,46 @@ void ZEString::UpperSelf()
 
 	ZESize ByteLength = strlen(Buffer);
 
+	#ifdef ZE_PLATFORM_WINDOWS
+
 	ZESize RequiredSizeforWide = MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, 0, 0);
 	wchar_t* WideTemp = new wchar_t[RequiredSizeforWide];
 	MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, WideTemp, RequiredSizeforWide);
 	WideTemp = _wcsupr(WideTemp);
-	
+
 	ZESize RequiredSizeforResult = WideCharToMultiByte(CP_UTF8, 0, WideTemp, -1, 0, 0, 0, 0);
 	Allocator.Reallocate(&Buffer, RequiredSizeforResult * sizeof(char));
 	WideCharToMultiByte(CP_UTF8, 0, WideTemp, -1, Buffer, RequiredSizeforResult, 0, 0);
 	delete[] WideTemp;
 
-// 	for (ZESize I = 0; I < ByteLength; I++)
-// 		Buffer[I] = (char)_mbctoupper((unsigned int)(Buffer[I]));
+	#elif defined ZE_PLATFORM_UNIX
+
+	ZESize RequiredSizeforWide = CalculateRequiredSize(Buffer);
+	ZESize RequiredSizeforWideArray = RequiredSizeforWide / sizeof(ZEInt);
+	wchar_t* WideTemp = new wchar_t[RequiredSizeforWideArray];
+	char* WideBuffer = (char*)WideTemp;
+
+
+	ZESize InputSize = ByteLength;
+	ZESize OutputSize = RequiredSizeforWide;
+	iconv_t ConversionDescriptor = iconv_open("WCHAR_T", "UTF-8");
+	iconv(ConversionDescriptor, &Buffer, &InputSize, &WideBuffer, &OutputSize);
+	iconv_close(ConversionDescriptor);
+
+	for (ZEUInt I = 0; I < RequiredSizeforWideArray; I++)
+		WideTemp[I] = towupper(WideTemp[I]);
+
+	ZESize RequiredSizeforResult = CalculateRequiredSizeW(WideTemp);
+	Allocator.Reallocate(&Buffer, RequiredSizeforResult * sizeof(char));
+
+	InputSize = RequiredSizeforWide;
+	OutputSize = RequiredSizeforResult;
+	ConversionDescriptor = iconv_open("UTF-8", "WCHAR_T");
+	iconv(ConversionDescriptor, &WideBuffer, &InputSize, &Buffer, &OutputSize);
+	iconv_close(ConversionDescriptor);
+	delete[] WideTemp;
+
+	#endif
 }
 
 const char* ZEString::ToCString() const
@@ -1344,9 +1666,26 @@ const wchar_t* ZEString::ToWCString()
 {
 	if (BufferChanged)
 	{
+		#ifdef ZE_PLATFORM_WINDOWS
+
 		ZESize RequiredSize = MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, 0, 0);
 		WAllocator.Reallocate(&WBuffer, RequiredSize);
 		MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, WBuffer, RequiredSize);
+
+		#elif defined ZE_PLATFORM_UNIX
+
+		ZESize RequiredSize = CalculateRequiredSize(Buffer);
+		WAllocator.Reallocate(&WBuffer, RequiredSize);
+		char* TempWideBuffer = (char*)WBuffer;
+
+		ZESize InputSize = strlen(Buffer);
+		ZESize OutputSize = RequiredSize;
+		iconv_t ConversionDescriptor = iconv_open("UTF-8", "WCHAR_T");
+		iconv(ConversionDescriptor, &Buffer, &InputSize, &TempWideBuffer, &OutputSize);
+		iconv_close(ConversionDescriptor);
+		WBuffer[RequiredSize] = '\0';
+
+		#endif
 
 		BufferChanged = false;
 	}
@@ -1900,6 +2239,13 @@ ZEString::ZEString(const std::wstring& String)
 	Buffer = NULL;
 	WBuffer = NULL;
 	SetValue(String.c_str());
+}
+
+ZEString::ZEString(wchar_t Character)
+{
+	Buffer = NULL;
+	WBuffer = NULL;
+	SetValue(Character);
 }
 
 ZEString::ZEString(const ZECharacter& Character)
