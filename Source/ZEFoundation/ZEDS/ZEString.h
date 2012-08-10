@@ -136,9 +136,9 @@ class ZEString
 		void						SetValue(const ZEString& String);
 		void						SetValue(const char* String);
 		void						SetValue(const wchar_t* String);
-		void						SetValue(wchar_t Character);
 		void						SetValue(const std::string& String);
 		void						SetValue(const std::wstring& String);
+		void						SetValue(wchar_t Character);
 		void						SetValue(const ZECharacter& Character);
 
 		void						SetValue(ZEInt8 Value, const char* Format = "{0}");
@@ -153,8 +153,7 @@ class ZEString
 		void						SetValue(float Value, const char* Format = "{0}");
 		void						SetValue(double Value, ZEUInt Digits);
 		void						SetValue(double Value, const char* Format = "{0}");
-		void						SetValue(bool Value, const char* TrueText = "True", const char* FalseText = "False");
-/*		void						SetValue(bool Value, const char* Format = "");*/
+		void						SetValue(bool Value, const char* Format = "{0}");
 
 		const char*					GetValue() const;
 
@@ -304,6 +303,7 @@ class ZEString
 									ZEString(const ZEString& String);
 									ZEString(const std::string& String);
 									ZEString(const std::wstring& String);
+									ZEString(wchar_t Character);
 									ZEString(const ZECharacter& Character);
 									ZEString(ZEInt8 Value);
 									ZEString(ZEInt16 Value);

@@ -1920,25 +1920,28 @@ ZETestSuite(ZEString)
 		ZETestCheck(String == "987654321");
 	}
 
-	ZETest("void ZEString::SetValue(bool Value, const char* TrueText, const char* FalseText)")
+	ZETest("void ZEString::SetValue(bool Value, const char* Format)")
 	{
 		ZETestCase("ZEString value is set to True")
 		{
 			ZEString StringA;
 
-			StringA.SetValue(1, "True", "False");
+			bool Value = 1;
 
-			ZETestCheck(StringA == "True");
+			StringA.SetValue(Value);
+
+			ZETestCheck(StringA == "true");
 		}
 		ZETestCase("ZEString value is set to False")
 		{
 			ZEString StringB;
 
-			StringB.SetValue(0, "True", "False");
+			bool Value = 0;
 
-			ZETestCheck(StringB == "False");
+			StringB.SetValue(Value);
+
+			ZETestCheck(StringB == "false");
 		}
-
 	}
 
 	ZETest("ZEString ZEString::SubString(ZESize StartPosition, ZESize EndPosition) const")
