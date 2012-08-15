@@ -48,7 +48,7 @@ class ZECharacter
 	friend class ZEString;
 
 	private:
-		char					Characters[4];
+		mutable char			Characters[4];
 		ZEUInt					Size;
 
 		mutable ZEString*		Owner;
@@ -63,7 +63,7 @@ class ZECharacter
 		void					SetValue(ZEInt Character);
 
 		void					SetOwner(ZEString* Owner, ZESize Index);
-		
+
 		const char*				GetValue() const;
 		ZEUInt					GetSize() const;
 
@@ -131,7 +131,7 @@ class ZEString
 		static char*				IncrementByCharacter(const char* Position);
 		static char*				DecrementByCharacter(const char* Start, const char* Position);
 
-	public:			
+	public:
 		void						SetBuffer(void* Buffer, ZESize Size);
 		void						SetValue(const ZEString& String);
 		void						SetValue(const char* String);
@@ -176,7 +176,7 @@ class ZEString
 		void						Insert(ZESize Position, const ZEString& String);
 		void						Insert(ZESize Position, const char* String);
 		void						Remove(ZESize Position, ZESize Count = 1);
-		
+
 		bool						Equals(const ZEString& String) const;
 		bool						Equals(const char* String) const;
 
@@ -214,7 +214,7 @@ class ZEString
 		ZEUInt64					ToUInt64() const;
 		float						ToFloat() const;
 		double						ToDouble() const;
-	
+
 		static ZEString 			FromChar(char Value);
 		static ZEString				FromWChar(wchar_t Value);
 		static ZEString 			FromCString(const char* Value);
@@ -247,9 +247,9 @@ class ZEString
 		ZEString&					operator=(ZEUInt8 Value);
 		ZEString&					operator=(ZEUInt16 Value);
 		ZEString&					operator=(ZEUInt32 Value);
-		ZEString&					operator=(ZEUInt64 Value);	
+		ZEString&					operator=(ZEUInt64 Value);
 		ZEString&					operator=(float Value);
-		ZEString&					operator=(double Value);	
+		ZEString&					operator=(double Value);
 
 		ZEString					operator+(const ZEString& String);
 		ZEString					operator+(const char* String);
@@ -263,9 +263,9 @@ class ZEString
 		ZEString					operator+(ZEUInt8 Value);
 		ZEString					operator+(ZEUInt16 Value);
 		ZEString					operator+(ZEUInt32 Value);
-		ZEString					operator+(ZEUInt64 Value);	
+		ZEString					operator+(ZEUInt64 Value);
 		ZEString					operator+(float Value);
-		ZEString					operator+(double Value);	
+		ZEString					operator+(double Value);
 
 		ZEString&					operator+=(const ZEString& String);
 		ZEString&					operator+=(const char* String);
@@ -279,7 +279,7 @@ class ZEString
 		ZEString&					operator+=(ZEUInt8 Value);
 		ZEString&					operator+=(ZEUInt16 Value);
 		ZEString&					operator+=(ZEUInt32 Value);
-		ZEString&					operator+=(ZEUInt64 Value);	
+		ZEString&					operator+=(ZEUInt64 Value);
 		ZEString&					operator+=(float Value);
 		ZEString&					operator+=(double Value);
 
@@ -293,11 +293,11 @@ class ZEString
 		bool						operator==(const ZEString& String) const;
 		bool						operator==(const char* String) const;
 		bool						operator==(const std::string& String) const;
-	
+
 									operator std::string() const;
 									operator const char*() const;
 
-									ZEString();					
+									ZEString();
 									ZEString(const char* String);
 									ZEString(const wchar_t* String);
 									ZEString(const ZEString& String);

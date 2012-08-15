@@ -37,7 +37,6 @@
 
 #include <string.h>
 #include <memory.h>
-#include <wchar.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -118,17 +117,17 @@ void ZECharacter::SetValue(const wchar_t* WideCharacter)
 
 	#elif defined ZE_PLATFORM_UNIX
 
-	ZESize RequiredSize = wcslen(WideCharacter);
+	ZESize WideCharacterByteCount = wcslen(WideCharacter) * sizeof(wchar_t);
 	char* InputBuffer = (char*)WideCharacter;
 	char* OutputBuffer = &Characters[0];
 
-	if(RequiredSize > 0)
+	if(WideCharacterByteCount > 0)
 	{
-		ZESize CharacterSize = 4;
+		ZESize CharacterByteCount = sizeof(Characters);
 		iconv_t ConversionDefinition = iconv_open("UTF-8", "WCHAR_T");
-		iconv(ConversionDefinition, &InputBuffer, &RequiredSize, &OutputBuffer, &CharacterSize);
+		iconv(ConversionDefinition, &InputBuffer, &WideCharacterByteCount, &OutputBuffer, &CharacterByteCount);
 		iconv_close(ConversionDefinition);
-		Size = CharacterSize;
+		Size = sizeof(Characters) - CharacterByteCount;
 	}
 
 	#endif
@@ -146,14 +145,14 @@ void ZECharacter::SetValue(ZEInt Character)
 	ZEInt I = 0;
 	ZEInt J = 0;
 	Size = 0;
-	
+
 	while(I < sizeof(ZEInt))
 	{
 		if(*Temp != NULL)
 		{
 			this->Characters[J] = *Temp;
 			Size++;
-			J++;	
+			J++;
 		}
 
 		Temp++;
@@ -245,7 +244,7 @@ ZECharacter ZECharacter::Upper() const
 	#elif defined ZE_PLATFORM_UNIX
 
 	char* OutputBuffer = (char*)WideBuffer;
-	ZESize WideCharacterSize = 4;
+	ZESize WideCharacterSize = sizeof(wchar_t);
 
 	char* InputBuffer = &Characters[0];
 	ZESize CharacterSize = Size;
@@ -457,7 +456,7 @@ ZECharacter::operator wchar_t() const
 
 	#elif defined ZE_PLATFORM_UNIX
 
-	char* OutputBuffer = (char*)Temp;
+	char* OutputBuffer = (char*)&Temp;
 	ZESize WideCharacterSize = 4;
 
 	char* InputBuffer = &Characters[0];
@@ -587,6 +586,7 @@ ZESize CalculateRequiredSize(const char* String)
 	iconv_close(ConversionDescriptor);
 
 	ResultSize += 512 - TempSize;
+	ResultSize /= sizeof(wchar_t);
 
 	return ResultSize;
 }
@@ -596,7 +596,7 @@ ZESize CalculateRequiredSizeW(const wchar_t* WideString)
 {
 	char TempBuffer[512];
 	char* InputString = (char*)WideString;
-	ZESize InputSize = wcslen(WideString);
+	ZESize InputSize = wcslen(WideString) * sizeof(wchar_t);
 	char* TempOutput = &TempBuffer[0];
 	ZESize TempSize = 512;
 
@@ -682,7 +682,7 @@ char* ZEString::DecrementByCharacter(const char* Start, const char* Position)
 
 bool ZEString::IsEmpty() const
 {
-	return (Buffer == NULL || (Buffer[0] == '\0')); 
+	return (Buffer == NULL || (Buffer[0] == '\0'));
 }
 
 void ZEString::SetSize(ZESize Size)
@@ -740,7 +740,7 @@ void ZEString::SetValue(const char* String)
 	}
 
 	ZESize Size = ((StringSize) + 1) * sizeof(char);
-	
+
 	char* OldBuffer = Buffer;
 	if (Allocator.Allocate(&Buffer, Size))
 		delete[] OldBuffer;
@@ -770,7 +770,7 @@ void ZEString::SetValue(wchar_t Character)
 
 	wchar_t TempBuffer[2] = {Character, 0};
 	char* InputBuffer = (char*)(&TempBuffer[0]);
-	ZESize WideCharacterSize = 1;
+	ZESize WideCharacterSize = sizeof(wchar_t);
 
 	ZESize RequiredSize = CalculateRequiredSizeW(TempBuffer);
 
@@ -778,9 +778,10 @@ void ZEString::SetValue(wchar_t Character)
 	if (Allocator.Allocate(&Buffer, RequiredSize + 1))
 		delete[] OldBuffer;
 
+    char* OutputBuffer = Buffer;
 	ZESize OutputSize = RequiredSize;
 	iconv_t ConversionDefinition = iconv_open("UTF-8", "WCHAR_T");
-	iconv(ConversionDefinition, &InputBuffer, &WideCharacterSize, &Buffer, &OutputSize);
+	iconv(ConversionDefinition, &InputBuffer, &WideCharacterSize, &OutputBuffer, &OutputSize);
 	iconv_close(ConversionDefinition);
 
 	Buffer[RequiredSize] = '\0';
@@ -805,7 +806,7 @@ void ZEString::SetValue(const wchar_t* String)
 	#elif defined ZE_PLATFORM_UNIX
 
 	char* InputBuffer = (char*)String;
-	ZESize WideCharacterSize = wcslen(String);
+	ZESize WideCharacterSize = wcslen(String) * sizeof(wchar_t);
 
 	ZESize RequiredSize = CalculateRequiredSizeW(String);
 
@@ -813,9 +814,10 @@ void ZEString::SetValue(const wchar_t* String)
 	if (Allocator.Allocate(&Buffer, RequiredSize + 1))
 		delete[] OldBuffer;
 
+    char* OutputBuffer = Buffer;
 	ZESize OutputSize = RequiredSize;
 	iconv_t ConversionDefinition = iconv_open("UTF-8", "WCHAR_T");
-	iconv(ConversionDefinition, &InputBuffer, &WideCharacterSize, &Buffer, &OutputSize);
+	iconv(ConversionDefinition, &InputBuffer, &WideCharacterSize, &OutputBuffer, &OutputSize);
 	iconv_close(ConversionDefinition);
 
 	Buffer[RequiredSize] = '\0';
@@ -837,7 +839,7 @@ void ZEString::SetValue(const ZECharacter& Character)
 {
 	BufferChanged = true;
 	ZESize Size = Character.GetSize() * sizeof(char);
-	
+
 	char* OldBuffer = Buffer;
 	if (Allocator.Allocate(&Buffer, Size + 1))
 		delete[] OldBuffer;
@@ -972,7 +974,7 @@ ZESize ZEString::GetLength() const
 void ZEString::Append(const char* String)
 {
 	zeDebugCheck(String == NULL, "String parameter is invalid.");
-	
+
 	if (Buffer == NULL)
 		SetValue(String);
 	else
@@ -995,7 +997,7 @@ void ZEString::Append(const ZEString& String)
 void ZEString::Insert(const char* String)
 {
 	zeDebugCheck(String == NULL, "String parameter is ilvalid.");
-	
+
 	if (Buffer == NULL)
 		SetValue(String);
 	else
@@ -1085,7 +1087,7 @@ void ZEString::Remove(ZESize Position, ZESize Count)
 	ZESize BytePosition = ZEString::GetBytePosition(Buffer, Position);
 	ZESize ByteCount = ZEString::GetBytePosition(Buffer + BytePosition, Count);
 	/*ZESize ByteCount = _mbsnbcnt((unsigned char*)Buffer, Position + Count) - BytePosition;*/
-	
+
 
 	zeDebugCheck(BytePosition > ByteLength, "Position parameter is more than string length.");
 	zeDebugCheck(BytePosition + ByteCount > ByteLength, "Remove operation range (Position + Count) exceeds length of the string.");
@@ -1107,7 +1109,7 @@ void ZEString::Remove(ZESize Position, ZESize Count)
 	}
 	else
 	{
-		memcpy(Buffer + BytePosition, Buffer + BytePosition + ByteCount, (ByteLength - BytePosition - ByteCount + 1) * sizeof(char));	
+		memcpy(Buffer + BytePosition, Buffer + BytePosition + ByteCount, (ByteLength - BytePosition - ByteCount + 1) * sizeof(char));
 	}
 
 	ZEDebugCheckMemory();
@@ -1154,7 +1156,7 @@ ZEString ZEString::Left(ZESize Count) const
 
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (ByteCount + 1) * sizeof(char));
-	memcpy(Temp.Buffer, Buffer, ByteCount * sizeof(char)); 
+	memcpy(Temp.Buffer, Buffer, ByteCount * sizeof(char));
 	Temp.Buffer[ByteCount] = '\0';
 
 	ZEDebugCheckMemory();
@@ -1182,7 +1184,7 @@ ZEString ZEString::Right(ZESize Count) const
 
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (ByteCount + 1) * sizeof(char));
-	memcpy(Temp.Buffer, Buffer + ByteLength - ByteCount, (ByteCount + 1) * sizeof(char)); 
+	memcpy(Temp.Buffer, Buffer + ByteLength - ByteCount, (ByteCount + 1) * sizeof(char));
 
 	ZEDebugCheckMemory();
 
@@ -1225,7 +1227,7 @@ ZEString ZEString::SubString(ZESize StartPosition, ZESize EndPosition) const
 
 	zeDebugCheck(StartBytePosition > strlen(Buffer) || EndBytePosition > strlen(Buffer), "Sub string range (Position and count) is exceed string length.");
 	zeDebugCheck(EndBytePosition < StartBytePosition, "EndPosition parameter can not be smaller than StartPosition parameter.");
-	
+
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (EndBytePosition - StartBytePosition + 2) * sizeof(char));
 	memcpy(Temp.Buffer, Buffer + StartBytePosition, (EndBytePosition - StartBytePosition + 1) * sizeof(char));
@@ -1250,10 +1252,10 @@ ZEString ZEString::TrimLeft() const
 	ZESize ByteCount = Cursor - Buffer;
 	if (ByteCount == ByteLength)
 		return ZEString();
-	
+
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (ByteLength - ByteCount + 1) * sizeof(char));
-	memcpy(Temp.Buffer, Buffer + ByteCount, (ByteLength - ByteCount + 1) * sizeof(char)); 
+	memcpy(Temp.Buffer, Buffer + ByteCount, (ByteLength - ByteCount + 1) * sizeof(char));
 
 	ZEDebugCheckMemory();
 
@@ -1272,7 +1274,7 @@ void ZEString::TrimLeftSelf()
 	char* Cursor = Buffer;
 	while(*Cursor != '\0' && (*Cursor == ' ' || *Cursor == '\t'))
 		Cursor = ZEString::IncrementByCharacter(Cursor);
-	 
+
 	ZESize ByteCount = Cursor - Buffer;
 
 	if (ByteCount == ByteLength)
@@ -1298,7 +1300,7 @@ ZEString ZEString::TrimRight() const
 
 	while(Cursor != Buffer && (*Cursor == ' ' || *Cursor == '\t'))
 		Cursor = ZEString::DecrementByCharacter(Buffer, Cursor);
-	
+
 	ZESize CursorSize = ZECharacter::GetByteLength(Cursor);
 	Cursor += CursorSize - 1;
 
@@ -1312,7 +1314,7 @@ ZEString ZEString::TrimRight() const
 
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (ByteLength - ByteCount + 1) * sizeof(char));
-	memcpy(Temp.Buffer, Buffer, (ByteLength - ByteCount) * sizeof(char)); 
+	memcpy(Temp.Buffer, Buffer, (ByteLength - ByteCount) * sizeof(char));
 	Temp.Buffer[ByteLength - ByteCount] = '\0';
 
 	ZEDebugCheckMemory();
@@ -1369,14 +1371,14 @@ ZEString ZEString::Trim() const
 		Cursor = ZEString::IncrementByCharacter(Cursor);
 
 	ZESize LeftByteCount = Cursor - Buffer;
-	
+
 	if (LeftByteCount == ByteLength)
 		return ZEString();
 
 	Cursor = Buffer + (ByteLength - 1);
 	while(Cursor != Buffer && (*Cursor == ' ' || *Cursor == '\t'))
 		Cursor = ZEString::DecrementByCharacter(Buffer, Cursor);
-	
+
 	ZESize CursorSize = ZECharacter::GetByteLength(Cursor);
 	Cursor += CursorSize - 1;
 
@@ -1390,7 +1392,7 @@ ZEString ZEString::Trim() const
 
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (ByteLength - LeftByteCount - RightByteCount + 1) * sizeof(char));
-	memcpy(Temp.Buffer, Buffer + LeftByteCount, (ByteLength - LeftByteCount - RightByteCount) * sizeof(char)); 
+	memcpy(Temp.Buffer, Buffer + LeftByteCount, (ByteLength - LeftByteCount - RightByteCount) * sizeof(char));
 	Temp.Buffer[ByteLength - LeftByteCount - RightByteCount] = '\0';
 
 	ZEDebugCheckMemory();
@@ -1421,7 +1423,7 @@ void ZEString::TrimSelf()
 
 	Cursor = Buffer + (ByteLength - 1);
 	while(Cursor != Buffer && (*Cursor == ' ' || *Cursor == '\t'))
-		Cursor = ZEString::DecrementByCharacter(Buffer, Cursor); 
+		Cursor = ZEString::DecrementByCharacter(Buffer, Cursor);
 
 	ZESize CursorSize = ZECharacter::GetByteLength(Cursor);
 	Cursor += CursorSize - 1;
@@ -1469,29 +1471,36 @@ ZEString ZEString::Lower() const
 
 	#elif defined ZE_PLATFORM_UNIX
 
-	ZESize RequiredSizeforWide = CalculateRequiredSize(Temp);
-	ZESize RequiredSizeforWideArray = RequiredSizeforWide / sizeof(ZEInt);
-	wchar_t* WideTemp = new wchar_t[RequiredSizeforWideArray];
-	char* OutputBuffer = (char*)WideTemp;
-
+	ZESize RequiredSizeforWideArray = CalculateRequiredSize(Temp);
+	ZESize RequiredSizeforWide = RequiredSizeforWideArray * sizeof(wchar_t);
+	wchar_t* WideTemp = new wchar_t[RequiredSizeforWideArray + 1];
+	char* WideBuffer = (char*)WideTemp;
+    char* ResultBuffer = Temp.Buffer;
 
 	ZESize InputSize = ByteLength;
 	ZESize OutputSize = RequiredSizeforWide;
 	iconv_t ConversionDescriptor = iconv_open("WCHAR_T", "UTF-8");
-	iconv(ConversionDescriptor, &Temp.Buffer, &InputSize, &OutputBuffer, &OutputSize);
+	iconv(ConversionDescriptor, &ResultBuffer, &InputSize, &WideBuffer, &OutputSize);
 	iconv_close(ConversionDescriptor);
+
+	WideTemp[RequiredSizeforWideArray] = L'\0';
 
 	for (ZEUInt I = 0; I < RequiredSizeforWideArray; I++)
-		WideTemp[I] = towlower(WideTemp[I]);
+        WideTemp[I] = towlower(WideTemp[I]);
 
 	ZESize RequiredSizeforResult = CalculateRequiredSizeW(WideTemp);
-	Temp.Allocator.Reallocate(&Temp.Buffer, RequiredSizeforResult * sizeof(char));
+	Temp.Allocator.Reallocate(&Temp.Buffer, (RequiredSizeforResult + 1) * sizeof(char));
 
 	InputSize = RequiredSizeforWide;
+    WideBuffer = (char*)WideTemp;
 	OutputSize = RequiredSizeforResult;
+	ResultBuffer = Temp.Buffer;
+
 	ConversionDescriptor = iconv_open("UTF-8", "WCHAR_T");
-	iconv(ConversionDescriptor, &OutputBuffer, &InputSize, &Temp.Buffer, &OutputSize);
+	iconv(ConversionDescriptor, &WideBuffer, &InputSize, &ResultBuffer, &OutputSize);
 	iconv_close(ConversionDescriptor);
+
+	Temp.Buffer[RequiredSizeforResult] = '\0';
 	delete[] WideTemp;
 
 	#endif
@@ -1522,29 +1531,35 @@ void ZEString::LowerSelf()
 
 	#elif defined ZE_PLATFORM_UNIX
 
-	ZESize RequiredSizeforWide = CalculateRequiredSize(Buffer);
-	ZESize RequiredSizeforWideArray = RequiredSizeforWide / sizeof(ZEInt);
-	wchar_t* WideTemp = new wchar_t[RequiredSizeforWideArray];
-	char* OutputBuffer = (char*)WideTemp;
+	ZESize RequiredSizeforWideArray = CalculateRequiredSize(Buffer);
+	ZESize RequiredSizeforWide = RequiredSizeforWideArray * sizeof(wchar_t);
+	wchar_t* WideTemp = new wchar_t[RequiredSizeforWideArray + 1];
+	char* WideBuffer = (char*)WideTemp;
+	char* ResultBuffer = Buffer;
 
 
 	ZESize InputSize = ByteLength;
 	ZESize OutputSize = RequiredSizeforWide;
 	iconv_t ConversionDescriptor = iconv_open("WCHAR_T", "UTF-8");
-	iconv(ConversionDescriptor, &Buffer, &InputSize, &OutputBuffer, &OutputSize);
+	iconv(ConversionDescriptor, &ResultBuffer, &InputSize, &WideBuffer, &OutputSize);
 	iconv_close(ConversionDescriptor);
 
 	for (ZEUInt I = 0; I < RequiredSizeforWideArray; I++)
 		WideTemp[I] = towlower(WideTemp[I]);
 
 	ZESize RequiredSizeforResult = CalculateRequiredSizeW(WideTemp);
-	Allocator.Reallocate(&Buffer, RequiredSizeforResult * sizeof(char));
+	Allocator.Reallocate(&Buffer, (RequiredSizeforResult + 1) * sizeof(char));
 
 	InputSize = RequiredSizeforWide;
+	WideBuffer = (char*)WideTemp;
 	OutputSize = RequiredSizeforResult;
+    ResultBuffer = Buffer;
+
 	ConversionDescriptor = iconv_open("UTF-8", "WCHAR_T");
-	iconv(ConversionDescriptor, &OutputBuffer, &InputSize, &Buffer, &OutputSize);
+	iconv(ConversionDescriptor, &WideBuffer, &InputSize, &ResultBuffer, &OutputSize);
 	iconv_close(ConversionDescriptor);
+
+	Buffer[RequiredSizeforResult] = '\0';
 	delete[] WideTemp;
 
 	#endif
@@ -1576,29 +1591,37 @@ ZEString ZEString::Upper() const
 
 	#elif defined ZE_PLATFORM_UNIX
 
-	ZESize RequiredSizeforWide = CalculateRequiredSize(Temp);
-	ZESize RequiredSizeforWideArray = RequiredSizeforWide / sizeof(ZEInt);
-	wchar_t* WideTemp = new wchar_t[RequiredSizeforWideArray];
-	char* OutputBuffer = (char*)WideTemp;
+	ZESize RequiredSizeforWideArray = CalculateRequiredSize(Temp);
+	ZESize RequiredSizeforWide = RequiredSizeforWideArray * sizeof(wchar_t);
+	wchar_t* WideTemp = new wchar_t[RequiredSizeforWideArray + 1];
+	char* WideBuffer = (char*)WideTemp;
+    char* ResultBuffer = Temp.Buffer;
 
 
 	ZESize InputSize = ByteLength;
 	ZESize OutputSize = RequiredSizeforWide;
 	iconv_t ConversionDescriptor = iconv_open("WCHAR_T", "UTF-8");
-	iconv(ConversionDescriptor, &Temp.Buffer, &InputSize, &OutputBuffer, &OutputSize);
+	iconv(ConversionDescriptor, &ResultBuffer, &InputSize, &WideBuffer, &OutputSize);
 	iconv_close(ConversionDescriptor);
+
+	WideTemp[RequiredSizeforWideArray] = L'\0';
 
 	for (ZEUInt I = 0; I < RequiredSizeforWideArray; I++)
-		WideTemp[I] = towupper(WideTemp[I]);
+        WideTemp[I] = towupper(WideTemp[I]);
 
 	ZESize RequiredSizeforResult = CalculateRequiredSizeW(WideTemp);
-	Temp.Allocator.Reallocate(&Temp.Buffer, RequiredSizeforResult * sizeof(char));
+	Temp.Allocator.Reallocate(&Temp.Buffer, (RequiredSizeforResult + 1) * sizeof(char));
 
 	InputSize = RequiredSizeforWide;
+    WideBuffer = (char*)WideTemp;
 	OutputSize = RequiredSizeforResult;
+	ResultBuffer = Temp.Buffer;
+
 	ConversionDescriptor = iconv_open("UTF-8", "WCHAR_T");
-	iconv(ConversionDescriptor, &OutputBuffer, &InputSize, &Temp.Buffer, &OutputSize);
+	iconv(ConversionDescriptor, &WideBuffer, &InputSize, &ResultBuffer, &OutputSize);
 	iconv_close(ConversionDescriptor);
+
+	Temp.Buffer[RequiredSizeforResult] = '\0';
 	delete[] WideTemp;
 
 	#endif
@@ -1629,29 +1652,35 @@ void ZEString::UpperSelf()
 
 	#elif defined ZE_PLATFORM_UNIX
 
-	ZESize RequiredSizeforWide = CalculateRequiredSize(Buffer);
-	ZESize RequiredSizeforWideArray = RequiredSizeforWide / sizeof(ZEInt);
-	wchar_t* WideTemp = new wchar_t[RequiredSizeforWideArray];
+	ZESize RequiredSizeforWideArray = CalculateRequiredSize(Buffer);
+	ZESize RequiredSizeforWide = RequiredSizeforWideArray * sizeof(wchar_t);
+	wchar_t* WideTemp = new wchar_t[RequiredSizeforWideArray + 1];
 	char* WideBuffer = (char*)WideTemp;
+	char* ResultBuffer = Buffer;
 
 
 	ZESize InputSize = ByteLength;
 	ZESize OutputSize = RequiredSizeforWide;
 	iconv_t ConversionDescriptor = iconv_open("WCHAR_T", "UTF-8");
-	iconv(ConversionDescriptor, &Buffer, &InputSize, &WideBuffer, &OutputSize);
+	iconv(ConversionDescriptor, &ResultBuffer, &InputSize, &WideBuffer, &OutputSize);
 	iconv_close(ConversionDescriptor);
 
 	for (ZEUInt I = 0; I < RequiredSizeforWideArray; I++)
 		WideTemp[I] = towupper(WideTemp[I]);
 
 	ZESize RequiredSizeforResult = CalculateRequiredSizeW(WideTemp);
-	Allocator.Reallocate(&Buffer, RequiredSizeforResult * sizeof(char));
+	Allocator.Reallocate(&Buffer, (RequiredSizeforResult + 1) * sizeof(char));
 
 	InputSize = RequiredSizeforWide;
+	WideBuffer = (char*)WideTemp;
 	OutputSize = RequiredSizeforResult;
+    ResultBuffer = Buffer;
+
 	ConversionDescriptor = iconv_open("UTF-8", "WCHAR_T");
-	iconv(ConversionDescriptor, &WideBuffer, &InputSize, &Buffer, &OutputSize);
+	iconv(ConversionDescriptor, &WideBuffer, &InputSize, &ResultBuffer, &OutputSize);
 	iconv_close(ConversionDescriptor);
+
+	Buffer[RequiredSizeforResult] = '\0';
 	delete[] WideTemp;
 
 	#endif
@@ -1675,15 +1704,16 @@ const wchar_t* ZEString::ToWCString()
 		#elif defined ZE_PLATFORM_UNIX
 
 		ZESize RequiredSize = CalculateRequiredSize(Buffer);
-		WAllocator.Reallocate(&WBuffer, RequiredSize);
+		WAllocator.Reallocate(&WBuffer, (RequiredSize + 1) * sizeof(wchar_t));
 		char* TempWideBuffer = (char*)WBuffer;
+        char* CurrentBuffer = (char*)Buffer;
 
 		ZESize InputSize = strlen(Buffer);
-		ZESize OutputSize = RequiredSize;
-		iconv_t ConversionDescriptor = iconv_open("UTF-8", "WCHAR_T");
-		iconv(ConversionDescriptor, &Buffer, &InputSize, &TempWideBuffer, &OutputSize);
+		ZESize OutputSize = RequiredSize * sizeof(wchar_t);
+		iconv_t ConversionDescriptor = iconv_open("WCHAR_T", "UTF-8");
+		iconv(ConversionDescriptor, &CurrentBuffer, &InputSize, &TempWideBuffer, &OutputSize);
 		iconv_close(ConversionDescriptor);
-		WBuffer[RequiredSize] = '\0';
+		WBuffer[RequiredSize] = L'\0';
 
 		#endif
 
