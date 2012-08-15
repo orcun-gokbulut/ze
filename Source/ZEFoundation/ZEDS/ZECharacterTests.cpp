@@ -37,7 +37,6 @@
 #include <String>
 #include "ZETest/ZETest.h"
 #include <mbstring.h>
-#include "ZEFile/ZEFile.h"
 #include "ZEArray.h"
 
 ZETestSuite(ZECharacter)
@@ -88,7 +87,13 @@ ZETestSuite(ZECharacter)
 
 	ZETest("void ZECharacter::SetOwner(ZEString* Owner, ZESize Index)")
 	{
-		//I dont know if this will exist or not.. Decide after string tests.
+		ZECharacter Character('p');
+		ZEString String("Lorem Ipsum");
+
+		Character.SetOwner(&String, 7);
+		Character.SetValue('k');
+
+		ZETestCheck(String == "Lorem Iksum");
 	}
 
 	ZETest("const char* ZECharacter::GetValue() const")
