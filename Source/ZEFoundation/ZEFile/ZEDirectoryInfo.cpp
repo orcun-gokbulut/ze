@@ -171,7 +171,7 @@ ZEArray<ZEDirectoryInfo*>* ZEDirectoryInfo::GetDirectoryList()
 		if (ZEFileUtils::IsDirectory(&FindData))
 		{
 			Temp = new ZEDirectoryInfo();
-			if ( Temp == NULL )
+			if (Temp == NULL)
             {
                 zeError("Cannot allcoate...");
                 ZEFileUtils::CloseSearchStream(&FindData);
@@ -202,7 +202,7 @@ ZEString ZEDirectoryInfo::GetDirectoryName(const ZEString& DirectoryPath)
 
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
-		if (DirectoryPath[0] == '\\' || DirectoryPath[0] == '/')
+		if (DirectoryPath[I] == '\\' || DirectoryPath[I] == '/')
 			return DirectoryPath.Right(Length - 1 - I);
 	}
 
@@ -215,7 +215,7 @@ ZEString ZEDirectoryInfo::GetParentDirectory(const ZEString& DirectoryPath)
 
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
-		if (DirectoryPath[0] == '\\' || DirectoryPath[0] == '/')
+		if (DirectoryPath[I] == '\\' || DirectoryPath[I] == '/')
 			return DirectoryPath.Left(I);
 	}
 
