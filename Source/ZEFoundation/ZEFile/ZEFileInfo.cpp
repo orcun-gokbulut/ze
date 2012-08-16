@@ -133,7 +133,7 @@ ZEString ZEFileInfo::GetFileName(const ZEString& FilePath)
 
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
-		if (FilePath[0] == '\\' || FilePath[0] == '/')
+		if (FilePath[I] == '\\' || FilePath[I] == '/')
 			return FilePath.Right(Length - 1 - I);
 	}
 
@@ -159,7 +159,7 @@ ZEString ZEFileInfo::GetParentDirectory(const ZEString& DirectoryPath)
 
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
-		if (DirectoryPath[0] == '\\' || DirectoryPath[0] == '/')
+		if (DirectoryPath[I] == '\\' || DirectoryPath[I] == '/')
 			return DirectoryPath.Left(I);
 	}
 
