@@ -155,7 +155,7 @@ bool ZED3D9TerrainMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 	GetDevice()->SetVertexShaderConstantF(13, (float*)&ZEVector4(HeightOffset, HeightScale, HeightOffset / (float)(1 << Level), HeightScale / (float)(1 << Level)), 1);
 	GetDevice()->SetVertexShaderConstantF(14, (float*)&ZEVector4(TextureOffset.x, TextureOffset.y, TextureScale.x, TextureScale.y), 1);
 	GetDevice()->SetVertexShaderConstantF(15, (float*)&ZEVector4(BlendTreshold * 2.0f * ChunkSize, ((RenderCommand->Flags & 1024) != 0 ? -1 : 0) + (1.0f - BlendTreshold) * 2.0f * ChunkSize, 0.0f, 0.0f), 1);
-	GetDevice()->SetVertexShaderConstantF(16, (float*)&ZEVector4(0.0f, 0.0f, 1.0 / (float)ColorTexture->GetWidth(), 1.0 / (float)ColorTexture->GetHeight()), 1);
+	GetDevice()->SetVertexShaderConstantF(16, (float*)&ZEVector4(0.0f, 0.0f, 1.0f / (float)ColorTexture->GetWidth(), 1.0f / (float)ColorTexture->GetHeight()), 1);
 	GetDevice()->SetVertexShaderConstantF(20, (float*)&RenderCommand->LocalMatrix, 4);
 	
 	GetDevice()->SetPixelShaderConstantF(13, (float*)&ZEVector4(HeightOffset, HeightScale, HeightOffset / (float)(1 << Level), HeightScale / (float)(1 << Level)), 1);

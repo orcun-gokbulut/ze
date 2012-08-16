@@ -85,14 +85,14 @@ void ZEPathManager::CustomizePaths(const ZEString* CompanyName, const ZEString* 
     if (ResourceDirectoryName != NULL)
     {
         ResourcesPath += PathSeperator;
-        ResourcesPath += ResourceDirectoryName;
+        ResourcesPath += *ResourceDirectoryName;
     }
 
 	AppResourcesPath = ResourcesPath;
 	if (ApplicationName != NULL)
     {
         AppResourcesPath += PathSeperator;
-        AppResourcesPath += ApplicationName;
+        AppResourcesPath += *ApplicationName;
     }
 
     SystemDataPath = WorkingDirectory;
@@ -101,7 +101,7 @@ void ZEPathManager::CustomizePaths(const ZEString* CompanyName, const ZEString* 
     if (ApplicationName != NULL)
     {
         SystemDataPath += PathSeperator;
-        SystemDataPath += ApplicationName;
+        SystemDataPath += *ApplicationName;
     }
 
     UserDataPath = WorkingDirectory;
@@ -110,7 +110,7 @@ void ZEPathManager::CustomizePaths(const ZEString* CompanyName, const ZEString* 
     if (ApplicationName != NULL)
     {
         UserDataPath += PathSeperator;
-        UserDataPath += ApplicationName;
+        UserDataPath += *ApplicationName;
     }
 
     SavedGamesPath = WorkingDirectory;
@@ -119,7 +119,7 @@ void ZEPathManager::CustomizePaths(const ZEString* CompanyName, const ZEString* 
     if (ApplicationName != NULL)
     {
         SavedGamesPath += PathSeperator;
-        SavedGamesPath += ApplicationName;
+        SavedGamesPath += *ApplicationName;
     }
 }
 
@@ -199,46 +199,46 @@ ZEKnownPath ZEPathManager::GetKnownPath(const ZEString& AbsolutePath)
 
 	ZESize Length = 0;
 	ZEKnownPath Root = ZE_KP_NONE;
-	ZESize PathLen = AbsolutePath.GetLength();
-	ZESize ResrcLen = ResourcesPath.GetLength();
-	ZESize AppResLen = AppResourcesPath.GetLength();
-	ZESize WrkDirLen = WorkingDirectory.GetLength();
-	ZESize SysDataLen = SystemDataPath.GetLength();
-	ZESize UsrDataLen = UserDataPath.GetLength();
-	ZESize SvdGameLen = SavedGamesPath.GetLength();
+	ZESize PathLen = strlen(AbsolutePath.ToCString());
+	ZESize ResrcLen = strlen(ResourcesPath.ToCString());
+	ZESize AppResLen = strlen(AppResourcesPath.ToCString());
+	ZESize WrkDirLen = strlen(WorkingDirectory.ToCString());
+	ZESize SysDataLen = strlen(SystemDataPath.ToCString());
+	ZESize UsrDataLen = strlen(UserDataPath.ToCString());
+	ZESize SvdGameLen = strlen(SavedGamesPath.ToCString());
 
 	if (PathLen >= ResrcLen && ResrcLen > Length &&
-		Compare(AbsolutePath, ResourcesPath, ResrcLen))
+		strncmp(AbsolutePath, ResourcesPath, ResrcLen) == 0)
 	{
 		Length = ResrcLen;
 		Root = ZE_KP_RESOURCES;
 	}
 	if (PathLen >= AppResLen && AppResLen > Length &&
-		Compare(AbsolutePath, AppResourcesPath, AppResLen))
+		strncmp(AbsolutePath, AppResourcesPath, AppResLen) == 0)
 	{
 		Length = ResrcLen;
 		Root = ZE_KP_APP_RESOURCES;
 	}
 	if (PathLen >= WrkDirLen && WrkDirLen > Length &&
-		Compare(AbsolutePath, WorkingDirectory, WrkDirLen))
+		strncmp(AbsolutePath, WorkingDirectory, WrkDirLen) == 0)
 	{
 		Length = WrkDirLen;
 		Root = ZE_KP_WORKING_DIRECTORY;
 	}
 	if (PathLen >= SysDataLen && SysDataLen > Length &&
-		Compare(AbsolutePath, SystemDataPath, SysDataLen))
+		strncmp(AbsolutePath, SystemDataPath, SysDataLen) == 0)
 	{
 		Length = SysDataLen;
 		Root = ZE_KP_SYSTEM_DATA;
 	}
 	if (PathLen >= UsrDataLen && UsrDataLen > Length &&
-		Compare(AbsolutePath, UserDataPath, UsrDataLen))
+		strncmp(AbsolutePath, UserDataPath, UsrDataLen) == 0)
 	{
 		Length = UsrDataLen;
 		Root = ZE_KP_USER_DATA;
 	}
 	if (PathLen >= SvdGameLen && SvdGameLen > Length &&
-		Compare(AbsolutePath, SavedGamesPath, SvdGameLen))
+		strncmp(AbsolutePath, SavedGamesPath, SvdGameLen) == 0)
 	{
 		Length = SvdGameLen;
 		Root = ZE_KP_SAVED_GAMES;

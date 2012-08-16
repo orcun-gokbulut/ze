@@ -66,7 +66,7 @@ bool ZEObjectDescription::CheckParent(ZEObjectDescription* Parent, ZEObjectDescr
 
 bool ZEObject::SetProperty(const char* PropertyName, const ZEVariant& Value)
 {
-	ZEInt PropertyId = GetPropertyId(PropertyName);
+	ZESSize PropertyId = GetPropertyId(PropertyName);
 
     if (PropertyId != -1)
 	{
@@ -97,7 +97,7 @@ bool ZEObject::SetProperty(const char* PropertyName, const ZEVariant& Value)
 
 bool ZEObject::GetProperty(const char* PropertyName, ZEVariant& Value) const
 {
-	ZEInt PropertyId = GetPropertyId(PropertyName);
+	ZESSize PropertyId = GetPropertyId(PropertyName);
 
     if (PropertyId != -1)
         return GetProperty(PropertyId, Value);
@@ -176,7 +176,7 @@ const ZEArray<ZERunTimeProperty>* ZEObject::GetCustomProperties() const
 
 bool ZEObject::AddToContainer(const char* ContainerName, ZEObject* Item)
 {
-	ZEInt ContainerId = GetContainerId(ContainerName);
+	ZESSize ContainerId = GetContainerId(ContainerName);
 
 	if (ContainerId != -1)
 		return AddToContainer(ContainerId, Item);
@@ -186,7 +186,7 @@ bool ZEObject::AddToContainer(const char* ContainerName, ZEObject* Item)
 
 bool ZEObject::RemoveFromContainer(const char* ContainerName, ZEObject* Item)
 {
-	ZEInt ContainerId = GetContainerId(ContainerName);
+	ZESSize ContainerId = GetContainerId(ContainerName);
 
 	if (ContainerId != -1)
 		return RemoveFromContainer(ContainerId, Item);
@@ -196,7 +196,7 @@ bool ZEObject::RemoveFromContainer(const char* ContainerName, ZEObject* Item)
 
 const ZEObject** ZEObject::GetContainerItems(const char* ContainerName) const
 {
-	ZEInt ContainerId = GetContainerId(ContainerName);
+	ZESSize ContainerId = GetContainerId(ContainerName);
 
 	if (ContainerId != -1)
 		return GetContainerItems(ContainerId);
@@ -206,7 +206,7 @@ const ZEObject** ZEObject::GetContainerItems(const char* ContainerName) const
 
 ZESize ZEObject::GetContainerItemCount(const char* ContainerName) const 
 {
-	ZEInt ContainerId = GetContainerId(ContainerName);
+	ZESSize ContainerId = GetContainerId(ContainerName);
 
 	if (ContainerId != -1)
 		return GetContainerItemCount(ContainerId);
@@ -216,7 +216,7 @@ ZESize ZEObject::GetContainerItemCount(const char* ContainerName) const
 
 bool ZEObject::CallMethod(const char* MethodName, const ZEVariant* Parameters, ZESize ParameterCount, ZEVariant& ReturnValue)
 {
-	ZEInt MethodId = GetMethodId(MethodName);
+	ZESSize MethodId = GetMethodId(MethodName);
 
 	if (MethodId != -1)
 		return CallMethod(MethodId, Parameters, ParameterCount, ReturnValue);
@@ -231,7 +231,7 @@ bool ZEObject::CallMethod(ZESSize MethodId, const ZEArray<ZEVariant>& Parameters
 
 bool ZEObject::CallMethod(const char* MethodName, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
 {
-	ZEInt MethodId = GetMethodId(MethodName);
+	ZESSize MethodId = GetMethodId(MethodName);
 
 	if (MethodId != -1)
 		return CallMethod(MethodId, Parameters.GetConstCArray(), Parameters.GetCount(), ReturnValue);

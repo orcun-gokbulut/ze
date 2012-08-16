@@ -39,7 +39,7 @@
 class ZEString;
 class ZEFileInfo;
 class ZEDirectoryInfo;
-
+ 
 class ZEFileOperations
 {
 	public:

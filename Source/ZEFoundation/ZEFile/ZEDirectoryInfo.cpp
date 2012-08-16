@@ -202,7 +202,7 @@ ZEString ZEDirectoryInfo::GetDirectoryName(const ZEString& DirectoryPath)
 
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
-		if (ISSEPERATOR(DirectoryPath[I]))
+		if (DirectoryPath[0] == '\\' || DirectoryPath[0] == '/')
 			return DirectoryPath.Right(Length - 1 - I);
 	}
 
@@ -215,7 +215,7 @@ ZEString ZEDirectoryInfo::GetParentDirectory(const ZEString& DirectoryPath)
 
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
-		if (ISSEPERATOR(DirectoryPath[I]))
+		if (DirectoryPath[0] == '\\' || DirectoryPath[0] == '/')
 			return DirectoryPath.Left(I);
 	}
 
