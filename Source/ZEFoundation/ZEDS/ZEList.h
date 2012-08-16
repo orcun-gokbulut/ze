@@ -283,13 +283,13 @@ class ZEList
 
 		inline void Push(ZEType* Value)
 		{
-			Insert(Value);
+			Append(Value);
 		}
 
 		inline ZEType* Pop()
 		{
-			ZEType* Item = (ZEType*)FirstItem;
-			Remove((ZEType*)FirstItem);
+			ZEType* Item = (ZEType*)LastItem;
+			Remove((ZEType*)LastItem);
 
 			return Item;
 		}
