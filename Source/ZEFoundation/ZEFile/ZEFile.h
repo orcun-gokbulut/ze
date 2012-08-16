@@ -45,9 +45,9 @@
 
 enum ZESeekFrom
 {
-	ZE_SF_BEGINING	= 0,
-	ZE_SF_END		= 1,
-	ZE_SF_CURRENT	= 2
+	ZE_SF_BEGINING			= 0,
+	ZE_SF_END				= 1,
+	ZE_SF_CURRENT			= 2
 };
 
 // ZE_FOM_READ: Read only, can be seekable
@@ -67,9 +67,9 @@ enum ZEFileOpenMode
 // ZE_FCT_OPEN_CREATE_OVERWRITE : Creates a file, if file exists the file's content is deleted.				
 enum ZEFileCreationMode
 {
-	ZE_FCM_NONE			= 0,	
-	ZE_FCM_CREATE		= 1,	
-	ZE_FCM_OVERWRITE	= 2
+	ZE_FCM_NONE				= 0,	
+	ZE_FCM_CREATE			= 1,	
+	ZE_FCM_OVERWRITE		= 2
 
 };
 

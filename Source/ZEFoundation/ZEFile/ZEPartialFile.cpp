@@ -109,7 +109,8 @@ ZEInt ZEPartialFile::Seek(const ZEInt64 Offset, const ZESeekFrom Origin)
 	ZEInt64 SeekOffset = Offset;
 	ZESeekFrom SeekOrigin = Origin;
 
-	if (StartPosition != 0 && EndPosition != 0)
+	// If partial file have a limit
+	if (EndPosition != 0)
 	{
 		ZEInt64 NewPosition;
 		switch (Origin)
@@ -143,8 +144,8 @@ ZESize ZEPartialFile::Read(void* Buffer, const ZESize Size, const ZESize Count)
 {
 	ZESize ReadCount = Count;
 
-	// File limits are active
-	if (StartPosition != 0 && EndPosition != 0)
+	// If partial file have a limit
+	if (EndPosition != 0)
 	{
 		ZEInt64 Current = ZEFile::Tell();
 		ZEInt64 ReadEndPos = Current + Size * Count;
@@ -164,8 +165,8 @@ ZESize ZEPartialFile::Write(const void* Buffer, const ZESize Size, const ZESize 
 {
 	ZESize WriteCount = Count;
 	
-	// File limits are active
-	if (StartPosition != 0 && EndPosition != 0)
+	// If partial file have a limit
+	if (EndPosition != 0)
 	{
 		ZEInt64 Current = ZEFile::Tell();
 		ZEInt64 WriteEndPos = Current + Size * Count;
@@ -198,7 +199,7 @@ ZEInt64 ZEPartialFile::GetEndPosition() const
 void ZEPartialFile::SetStartPosition(const ZEInt64 Position)
 {
 	zeDebugCheck(Position < 0, "Position is negative");
-	zeDebugCheck(Position > EndPosition, "End is bigger than end");
+	zeDebugCheck(Position > EndPosition, "Start is bigger than end");
 	
 	StartPosition = Position;
 }
@@ -210,7 +211,7 @@ ZEInt64 ZEPartialFile::GetStartPosition() const
 
 ZEInt64 ZEPartialFile::GetSize()
 {
-	if (EndPosition == 0 && StartPosition == 0)
+	if (EndPosition == 0)
 		return ZEFile::GetSize();
 
 	return EndPosition - StartPosition;

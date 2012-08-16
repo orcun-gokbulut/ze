@@ -778,7 +778,7 @@ ZETestSuite(ZEFile)
 		//ZEFile* FileTest = ZEFile::Open("resources\\ZEFileReadFileTests.txt");
 		
 		bool Res = File.Open("resources\\ZEFileReadFileTests.txt", ZE_FM_READ_WRITE, true);
-		zeDebugCheck(!Res, "Dosyayý acamadým");
+		zeDebugCheck(!Res, "DosyayÄ± acamadÄ±m");
 		ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
 		ZETestCheckEqual(WriteCount, 1024);
 		File.Close();
@@ -813,6 +813,6 @@ ZETestSuite(ZEFile)
 	ZETest("ZEFile* ZEFile::Open(const ZEString& FilePath)")
 	{
 		/*ZEFile* File = ZEFile::Open("resources\\Items0\\FileTest0\\TestTest0\\ZEFileTests0.txt");
-		zeDebugCheck(!File, "Static open calýsmadý");*/
+		zeDebugCheck(!File, "Static open calÄ±smadÄ±");*/
 	}
 }

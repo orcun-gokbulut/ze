@@ -58,11 +58,11 @@ void ZEStringWriter::Append(char Character)
 void ZEStringWriter::AppendUTF8(char* Character)
 {
 	ZESize CharacterSize = 0;
-	if ((Character && 0xF0) == 0xF0)
+	if ((*Character & 0xF0) == 0xF0)
 		CharacterSize = 4;
-	else if ((Character && 0xE0) == 0xE0)
+	else if ((*Character & 0xE0) == 0xE0)
 		CharacterSize = 3;
-	else if ((Character && 0xC0) == 0xC0)
+	else if ((*Character & 0xC0) == 0xC0)
 		CharacterSize = 2;
 	else
 		CharacterSize = 1;

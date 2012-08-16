@@ -37,17 +37,8 @@
 #ifndef __ZE_PATH_MANAGER_H__
 #define __ZE_PATH_MANAGER_H__
 
-
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
-
-
-#define		ZE_PATH_SYMBOL_RESOURCES		'#'
-#define		ZE_PATH_SYMBOL_APP_RESOURCES	'~'
-#define		ZE_PATH_SYMBOL_USER_DATA		'$'
-#define		ZE_PATH_SYMBOL_SYSTEM_DATA		'&'
-#define		ZE_PATH_SYMBOL_SAVED_GAMES		'|'
-
 
 enum ZEKnownPath
 {

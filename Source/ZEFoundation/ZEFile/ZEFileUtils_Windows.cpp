@@ -36,17 +36,18 @@
 #include "ZEError.h"
 #include "ZEFileUtils.h"
 
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <cerrno>
 #include <time.h>
 
 
-static bool GetStats(const ZEString& Path, struct stat* Stat)
+static bool GetStats(ZEString& Path, struct _stati64 *Buffer)
 {
 	int Result;
 
 	SetLastError(ERROR_SUCCESS);
-	Result = stat(Path.ToCString(), Stat);
+	Result = _wstati64(Path.ToWCString(), Buffer);
 	if (Result != 0)
 	{
 		ZEString ErrorString;
@@ -60,22 +61,23 @@ static bool GetStats(const ZEString& Path, struct stat* Stat)
 
 void ZEFileUtils::GetErrorString(ZEString& ErrorString, const ZEInt ErrorId)
 {
-	DWORD Return;
-	LPTSTR s;
+	DWORD Return = 0;
+	LPWSTR Buffer = NULL;
 
-	Return = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)ErrorId, 0, (LPTSTR)&s, 0, NULL);
+	Return = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, (DWORD)ErrorId, 0, Buffer, 0, NULL);
 	if(Return == 0) // Fail
 	{
 		// Use ErrorId as string
-		ErrorString = "ErrorId: ";
+		ErrorString  = "Cannot convert error to string. ";
+		ErrorString += "ErrorId = ";
 		ErrorString += ZEString::FromInt32(ErrorId);
 		ErrorString += ".";
 	}
 	else // Success
 	{
 		// Use returned string to form error message
-		ErrorString = ZEString::FromCString(s);
-		LocalFree(s);
+		ErrorString = Buffer;
+		LocalFree(Buffer);
 	}
 }
 
@@ -122,13 +124,14 @@ static bool OSFileTimetoZEFileTime(ZEFileTime *Time, ZEFileTimeOS *FileTime)
 bool ZEFileUtils::IsFile(const ZEString& Path)
 {
 	bool Result;
-	struct stat Stats;
+	ZEString Temp = Path;
+	struct _stati64 Buffer;
 
-	Result = GetStats(Path, &Stats);
+	Result = GetStats(Temp, &Buffer);
 	if (Result)
 	{
 		// Found it
-		if(Stats.st_mode & S_IFREG)
+		if(Buffer.st_mode & S_IFREG)
 			return true;
 	}
 
@@ -138,13 +141,14 @@ bool ZEFileUtils::IsFile(const ZEString& Path)
 bool ZEFileUtils::IsDirectory(const ZEString& Path)
 {
 	bool Result;
-	struct stat Stats;
+	ZEString Temp = Path;
+	struct _stati64 Buffer;
 
-	Result = GetStats(Path, &Stats);
+	Result = GetStats(Temp, &Buffer);
 	if (Result)
 	{
 		// Found it
-		if(Stats.st_mode & S_IFDIR)
+		if(Buffer.st_mode & S_IFDIR)
 			return true;
 	}
 
@@ -174,9 +178,10 @@ ZEString ZEFileUtils::GetFileName(const ZEFileSearchStream* FindData)
 
 ZEInt64 ZEFileUtils::GetFileSize(const ZEString& Path)
 {
-	struct stat Stat;
+	ZEString Temp = Path;
+	struct _stati64 Buffer;
 
-	return GetStats(Path, &Stat) ? (ZEInt64)Stat.st_size : (ZEInt64)-1;
+	return GetStats(Temp, &Buffer) ? (ZEInt64)Buffer.st_size : (ZEInt64)-1;
 }
 
 ZEInt64 ZEFileUtils::GetFileSize(const ZEFileSearchStream* FindData)
@@ -190,23 +195,24 @@ bool ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEString& Path)
 {
 	zeDebugCheck(Output == NULL, "NUll pointer");
 
+	ZEString Temp = Path;
 	struct tm TimeInfo;
-	struct stat Stat;
+	struct _stati64 Buffer;
 
-	if (!GetStats(Path, &Stat))
+	if (!GetStats(Temp, &Buffer))
 		return false;
 
-	if (localtime_s(&TimeInfo, &Stat.st_ctime) != 0)
+	if (localtime_s(&TimeInfo, &Buffer.st_ctime) != 0)
 		return false;
 
-	Output->Day = (ZEInt16)TimeInfo.tm_mday;
-	Output->Hour = (ZEInt16)TimeInfo.tm_hour;
-	Output->Year = (ZEInt16)TimeInfo.tm_year + 1900;
-	Output->Month = (ZEInt16)TimeInfo.tm_mon;
-	Output->Second = (ZEInt16)TimeInfo.tm_sec;
-	Output->Minute = (ZEInt16)TimeInfo.tm_min;
-	Output->DayOfWeek = (ZEInt16)TimeInfo.tm_wday;
-	Output->Milliseconds = (ZEInt16)0;
+	Output->Day = TimeInfo.tm_mday;
+	Output->Hour = TimeInfo.tm_hour;
+	Output->Year = TimeInfo.tm_year + 1900;
+	Output->Month = TimeInfo.tm_mon + 1;
+	Output->Second = TimeInfo.tm_sec;
+	Output->Minute = TimeInfo.tm_min;
+	Output->DayOfWeek = TimeInfo.tm_wday;
+	Output->Milliseconds = 0;
 
 	return true;
 }
@@ -225,25 +231,26 @@ void ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEFileSearchStream* 
 
 bool ZEFileUtils::GetModificationTime(ZEFileTime* Output, const ZEString& Path)
 {
-	struct stat Stat;
+	ZEString Temp = Path;
+	struct _stati64 Buffer;
 
 	zeDebugCheck(Output == NULL, "NUll pointer");
 
-	if (!GetStats(Path, &Stat))
+	if (!GetStats(Temp, &Buffer))
 		return false;
 
-	struct tm TimeInfo;
-	if (localtime_s(&TimeInfo, &Stat.st_mtime) != 0)
+	struct tm* TimeInfo = _localtime64(&Buffer.st_mtime);
+	if (TimeInfo == NULL)
 		return false;
 
-	Output->Day = (ZEInt16)TimeInfo.tm_mday;
-	Output->Hour = (ZEInt16)TimeInfo.tm_hour;
-	Output->Year = (ZEInt16)TimeInfo.tm_year + 1900;
-	Output->Month = (ZEInt16)TimeInfo.tm_mon;
-	Output->Second = (ZEInt16)TimeInfo.tm_sec;
-	Output->Minute = (ZEInt16)TimeInfo.tm_min;
-	Output->DayOfWeek = (ZEInt16)TimeInfo.tm_wday;
-	Output->Milliseconds = (ZEInt16)0;
+	Output->Day = TimeInfo->tm_mday;
+	Output->Hour = TimeInfo->tm_hour;
+	Output->Year = TimeInfo->tm_year + 1900;
+	Output->Month = TimeInfo->tm_mon + 1;
+	Output->Second = TimeInfo->tm_sec;
+	Output->Minute = TimeInfo->tm_min;
+	Output->DayOfWeek = TimeInfo->tm_wday;
+	Output->Milliseconds = 0;
 
 	return true;
 }
@@ -289,7 +296,7 @@ bool ZEFileUtils::FindNextInStream(ZEFileSearchStream *FindData)
 	if (FindData->Handle == INVALID_HANDLE_VALUE || FindData->Handle == NULL)
 		return false;
 
-	return FindNextFile(FindData->Handle, &FindData->Data) != 0;
+	return FindNextFileW(FindData->Handle, &FindData->Data) != 0;
 }
 
 bool ZEFileUtils::OpenSearchStream(ZEFileSearchStream* FindData, const ZEString& Path)
@@ -301,7 +308,7 @@ bool ZEFileUtils::OpenSearchStream(ZEFileSearchStream* FindData, const ZEString&
 		return false;
 	
 	ZEString SearchPath = Path + "\\*";
-	FindData->Handle = FindFirstFile(SearchPath.ToCString(), &FindData->Data);
+	FindData->Handle = FindFirstFileW(SearchPath.ToWCString(), &FindData->Data);
 	if (FindData->Handle == INVALID_HANDLE_VALUE)
 	{
 		return false;

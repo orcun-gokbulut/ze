@@ -37,13 +37,8 @@
 #ifndef __ZE_PATH_UTILS_H__
 #define __ZE_PATH_UTILS_H__
 
-
 #include "ZEDS/ZEString.h"
 #include "ZEPathManager.h"
-
-
-#define ISSEPERATOR(Char)		(((Char) == '\\') || ((Char) == '/'))
-#define ISDRIVELETTER(Char)		((('a' < (Char)) && ((Char) < 'z')) || (('A' < (Char)) && ((Char) < 'Z')))
 
 class ZEPathUtils
 {
@@ -61,7 +56,7 @@ class ZEPathUtils
 
 		static ZEKnownPath			SearchForSymbol(ZEString* RelativePart, const ZEString& SymbolicPath);
 
-		static bool					CheckForRestriction(const ZEString& RootPath, const ZEString& Path);
+		static bool					CheckPathContainsRoot(const ZEString& RootPath, const ZEString& Path);
 		
 		static bool					IsAbsolutePath(const ZEString& Path);
 		static ZEString				GetAbsolutePath(const ZEString& RootPath, const ZEString& RelativePath);

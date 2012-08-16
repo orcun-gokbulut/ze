@@ -1258,7 +1258,7 @@ void ZEFixedMaterial::WriteToFile(ZEFile* File)
 
 	ZEMLNode* RootNode = new ZEMLNode("Root");
 
-	for(ZESize I = 0; I < PropertyCount; I++)
+	for(ZESSize I = 0; I < PropertyCount; I++)
 	{
 		ZEVariant PropertyValue;
 		GetProperty(Properties[I].Name, PropertyValue);
