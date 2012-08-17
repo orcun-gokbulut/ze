@@ -50,6 +50,7 @@
 #if defined ZE_PLATFORM_WINDOWS
 	
 	#include <cerrno>
+#include "ZEPathUtils.h"
 
     static ZEString GetErrorString(ZEInt ErrorId)
     {
@@ -368,7 +369,7 @@ ZEFileCreationMode ZEFile::GetCreationMode() const
 bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, const ZESize BufferSize)
 {
 	// @TODO: File path should not always include resources path.
-	ZEString AbsolutePath = ZEPathManager::GetResourcesPath() + FilePath;
+	ZEString AbsolutePath = ZEPathManager::GetResourcesPath() + ZEPathUtils::GetSeperator() + FilePath;
 
 	ZEFile File;
 	if (!File.Open(AbsolutePath, ZE_FOM_READ, ZE_FCM_NONE))
@@ -392,7 +393,7 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, const ZESize Buffe
 bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, const ZESize BufferSize)
 {
 	// @TODO: File path should not always include resources path.
-	ZEString AbsolutePath = ZEPathManager::GetResourcesPath() + FilePath;
+	ZEString AbsolutePath = ZEPathManager::GetResourcesPath() + ZEPathUtils::GetSeperator() + FilePath;
 
 	ZEFile File;
 	if (!File.Open(AbsolutePath, ZE_FOM_READ, ZE_FCM_NONE))

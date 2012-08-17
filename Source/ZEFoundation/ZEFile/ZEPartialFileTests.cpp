@@ -41,117 +41,328 @@
 #include <stdio.h>
 #include "ZEError.h"
 
-
-
 ZETestSuite(ZEPartialFile)
 {
-	ZETest("bool ZEPartialFile::Open(ZEFile* ParentFile, ZEUInt64 Offset, ZEUInt64 Size)")
+	ZETest("ZEPartialFile::~ZEPartialFile()")
+	{
+		ZEPartialFile PartialFile;
+		ZEFile File;
+
+		File.Open("Destructor.txt", ZE_FOM_READ, ZE_FCM_CREATE);
+		PartialFile.Open(&File, 20, 50);
+		ZETestCheckEqual(PartialFile.GetStartPosition(), 20);
+		ZETestCheckEqual(PartialFile.GetEndPosition(), 70);
+
+		PartialFile.~ZEPartialFile();
+
+		ZETestCheckEqual(PartialFile.GetStartPosition(), 0);
+		ZETestCheckEqual(PartialFile.GetEndPosition(), 0);
+
+		File.Close();
+		remove("Destructor.txt");
+	}
+
+	ZETest("ZEPartialFile::ZEPartialFile()")
+	{
+		ZEPartialFile PartialFile;
+
+		ZETestCheckEqual(PartialFile.GetStartPosition(), 0);
+		ZETestCheckEqual(PartialFile.GetEndPosition(), 0);
+		//EoF: false
+	}
+
+	ZETest("ZEInt64 ZEPartialFile::GetStartPosition() const")
+	{
+		ZEPartialFile PartialFile;
+
+		ZEInt64 StartPosition = PartialFile.GetStartPosition();
+		ZETestCheckEqual(StartPosition, 0);
+
+		ZEFile File;
+		File.Open("StartPosition.txt", ZE_FOM_READ, ZE_FCM_CREATE);
+		PartialFile.Open(&File, 20, 50);
+
+		StartPosition = PartialFile.GetStartPosition();
+		ZETestCheckEqual(StartPosition, 20);
+
+		PartialFile.Close();
+		File.Close();
+		remove("StartPosition.txt");
+	}
+
+	ZETest("void ZEPartialFile::SetStartPosition(const ZEInt64 Position)")
+	{
+		ZEPartialFile PartialFile;
+		ZETestCheckEqual(PartialFile.GetStartPosition(), 0);
+
+		ZEFile File;
+		File.Open("StartPosition.txt", ZE_FOM_READ, ZE_FCM_CREATE);
+		PartialFile.Open(&File, 20, 50);
+		ZETestCheckEqual(PartialFile.GetStartPosition(), 20);
+
+		PartialFile.SetStartPosition(25);
+		ZETestCheckEqual(PartialFile.GetStartPosition(), 25);
+
+		PartialFile.Close();
+		File.Close();
+		remove("StartPosition.txt");
+	}
+
+	ZETest("ZEInt64 ZEPartialFile::GetEndPosition() const")
+	{
+		ZEPartialFile PartialFile;
+
+		ZEInt64 EndPosition = PartialFile.GetEndPosition();
+		ZETestCheckEqual(EndPosition, 0);
+
+		ZEFile File;
+		File.Open("EndPosition.txt", ZE_FOM_READ, ZE_FCM_CREATE);
+		PartialFile.Open(&File, 20, 50);
+
+		EndPosition = PartialFile.GetEndPosition();
+		ZETestCheckEqual(EndPosition, 70);
+
+		PartialFile.Close();
+		File.Close();
+		remove("EndPosition.txt");
+	}
+
+	ZETest("void ZEPartialFile::SetEndPosition(const ZEInt64 Position)")
+	{
+		ZEPartialFile PartialFile;
+		ZETestCheckEqual(PartialFile.GetEndPosition(), 0);
+
+		ZEFile File;
+		File.Open("EndPosition.txt", ZE_FOM_READ, ZE_FCM_CREATE);
+		PartialFile.Open(&File, 20, 50);
+		ZETestCheckEqual(PartialFile.GetEndPosition(), 70);
+
+		PartialFile.SetEndPosition(30);
+		ZETestCheckEqual(PartialFile.GetEndPosition(), 30);
+
+		PartialFile.Close();
+		File.Close();
+		remove("EndPosition.txt");
+	}
+
+	ZETest("bool ZEPartialFile::Open(const ZEString& FilePath, const ZEFileOpenMode OpenType, const ZEFileCreationMode CreationType)")
 	{
 		ZEFile File;
 		ZEPartialFile PartialFile;
 
-		File.Open("ZEPartialFileOpenTests.txt", ZE_FM_READ_WRITE, true);
+		bool Open = File.Open("OpenTest.txt", ZE_FOM_READ, ZE_FCM_CREATE);
 
-		bool Result = PartialFile.Open(&File, 1025, 100);
-		ZETestCheck(Result == true);
-		
-		ZEUInt64 StartPosition = PartialFile.GetStartPosition();
-		ZETestCheckEqual(StartPosition, 1025);
-		ZEUInt64 EndPosition = PartialFile.GetEndPosition();
-		ZETestCheckEqual(EndPosition, 1125);
-		ZEUInt64 Size = PartialFile.GetFileSize();
-		ZETestCheckEqual(Size, 100);
-		ZEUInt ReferenceCount = File.GetReferenceCount();
-		ZETestCheckEqual(ReferenceCount, 1);
+		bool Opened = PartialFile.Open("OpenTest.txt", ZE_FOM_READ, ZE_FCM_CREATE);
+		ZETestCheck(Opened);
+		ZETestCheckEqual(PartialFile.GetStartPosition(), 0);
+		ZETestCheckEqual(PartialFile.GetEndPosition(), 0);
+
+		ZEInt Closed = PartialFile.Close();
+		ZETestCheckEqual(Closed, 0);
+		Closed = File.Close();
+		ZETestCheckEqual(Closed, 0);
+		remove("OpenTest.txt");
+
+		ZETestCase("open a partial file without a parent file")
+		{
+			Opened = PartialFile.Open("OpenTest.txt", ZE_FOM_READ, ZE_FCM_CREATE);
+			ZETestCheck(Opened);
+
+			PartialFile.Close();
+			remove("OpenTest.txt");
+		}
+	}
+
+	ZETest("bool ZEPartialFile::Open(const ZEFile* ParentFile, const ZEInt64 Offset, const ZEInt64 Size)")
+	{
+		ZEFile File;
+		ZEPartialFile PartialFile;
+
+		bool Open = File.Open("OpenTest.txt", ZE_FOM_READ, ZE_FCM_CREATE);
+
+		bool Opened = PartialFile.Open(&File, 100, 50);
+		ZETestCheck(Opened);
+		ZETestCheckEqual(PartialFile.GetStartPosition(), 100);
+		ZETestCheckEqual(PartialFile.GetEndPosition(), 150);
 
 		PartialFile.Close();
-		ReferenceCount = File.GetReferenceCount();
-		ZETestCheckEqual(ReferenceCount, 0);
-		bool isopen = File.IsOpen();
 		File.Close();
-		remove("ZEPartialFileOpenTests.txt");
-		
-		ZETestCase("open more than 1 partial files")
+		remove("OpenTest.txt");
+
+		ZETestCase("try to open a partial file without a parent file")
+		{
+// 			Opened = PartialFile.Open(&File, 100, 50);
+// 			ZETestCheck(!Opened);
+		}
+
+		ZETestCase("open more than 1 partial file")
 		{
 			ZEPartialFile PartialFile1;
 			ZEPartialFile PartialFile2;
 			ZEPartialFile PartialFile3;
 
-			File.Open("ZEPartialFileOpenTests.txt", ZE_FM_READ_WRITE, true);
+			Open = File.Open("OpenTest.txt", ZE_FOM_READ, ZE_FCM_CREATE);
 
-			bool Result1 = PartialFile1.Open(&File, 100, 100);
-			ZETestCheck(Result1 == true);
-			bool Result2 = PartialFile2.Open(&File, 200, 100);
-			ZETestCheck(Result2 == true);
-			bool Result3 = PartialFile3.Open(&File, 300, 100);
-			ZETestCheck(Result3 == true);
+			Opened = PartialFile1.Open(&File, 10, 50);
+			ZETestCheck(Opened);
+			ZETestCheckEqual(PartialFile1.GetStartPosition(), 10);
+			ZETestCheckEqual(PartialFile1.GetEndPosition(), 60);
 
-			ReferenceCount = File.GetReferenceCount();
-			ZETestCheckEqual(ReferenceCount, 3);
+			Opened = PartialFile2.Open(&File, 60, 30);
+			ZETestCheck(Opened);
+			ZETestCheckEqual(PartialFile2.GetStartPosition(), 60);
+			ZETestCheckEqual(PartialFile2.GetEndPosition(), 90);
 
-			PartialFile1.Close();
-			PartialFile2.Close();
+			Opened = PartialFile3.Open(&File, 90, 10);
+			ZETestCheck(Opened);
+			ZETestCheckEqual(PartialFile3.GetStartPosition(), 90);
+			ZETestCheckEqual(PartialFile3.GetEndPosition(), 100);
+
 			PartialFile3.Close();
-			ReferenceCount = File.GetReferenceCount();
-			ZETestCheckEqual(ReferenceCount, 0);
-			bool isopen = File.IsOpen();
+			PartialFile2.Close();
+			PartialFile1.Close();
 			File.Close();
-			remove("ZEPartialFileOpenTests.txt");	
- 		}
+			remove("OpenTest.txt");
+		}
 
 		ZETestCase("try to intersect the partial files")
 		{
 			ZEPartialFile PartialFile1;
+			ZEPartialFile PartialFile2;
 
-			File.Open("ZEPartialFileOpenTests.txt", ZE_FM_READ_WRITE, true);
+			Open = File.Open("OpenTest.txt", ZE_FOM_READ, ZE_FCM_CREATE);
 
-			Result = PartialFile.Open(&File, 100, 100);
-			ZETestCheck(Result == true);
-			StartPosition = PartialFile.GetStartPosition();
-			ZETestCheckEqual(StartPosition, 100);
-			EndPosition = PartialFile.GetEndPosition();
-			ZETestCheckEqual(EndPosition, 200);
-			Result = PartialFile1.Open(&File, 150, 100);
-			ZETestCheck(Result == true);
-			StartPosition = PartialFile1.GetStartPosition();
-			ZETestCheckEqual(StartPosition, 150);
-			EndPosition = PartialFile1.GetEndPosition();
-			ZETestCheckEqual(EndPosition, 250);
+			Opened = PartialFile1.Open(&File, 100, 100);
+			ZETestCheck(Opened);
+			ZETestCheckEqual(PartialFile1.GetStartPosition(), 100);
+			ZETestCheckEqual(PartialFile1.GetEndPosition(), 200);
 
-			ReferenceCount = File.GetReferenceCount();
-			ZETestCheckEqual(ReferenceCount, 2);
+			Opened = PartialFile2.Open(&File, 150, 100);
+			ZETestCheck(Opened);
+			ZETestCheckEqual(PartialFile2.GetStartPosition(), 150);
+			ZETestCheckEqual(PartialFile2.GetEndPosition(), 250);
 
-			PartialFile.Close();
+			PartialFile2.Close();
 			PartialFile1.Close();
 			File.Close();
-			remove("ZEPartialFileOpenTests.txt");
+			remove("OpenTest.txt");
 		}
 
 		ZETestCase("open partial file on a partial file")
 		{
 			ZEPartialFile PartialFile1;
 			ZEPartialFile PartialFile2;
+			ZEPartialFile PartialFile3;
 
-			File.Open("ZEPartialFileOpenTests.txt", ZE_FM_READ_WRITE, true);
+			Open = File.Open("OpenTest.txt", ZE_FOM_READ, ZE_FCM_CREATE);
 
-			Result = PartialFile.Open(&File, 0, 100);
-			ZETestCheck(Result == true);
+			Opened = PartialFile1.Open(&File, 0, 100);
+			ZETestCheck(Opened);
+			ZETestCheckEqual(PartialFile1.GetStartPosition(), 0);
+			ZETestCheckEqual(PartialFile1.GetEndPosition(), 100);
 
-			bool Result1 = PartialFile1.Open((ZEFile*)&PartialFile, 0, 50);
-			ZETestCheck(Result1 == true);
+			Opened = PartialFile2.Open((ZEFile*)&PartialFile1, 0, 50);
+			ZETestCheck(Opened);
+			ZETestCheckEqual(PartialFile2.GetStartPosition(), 0);
+			ZETestCheckEqual(PartialFile2.GetEndPosition(), 50);
 
-			bool Result2 = PartialFile2.Open((ZEFile*)&PartialFile1, 50, 100);
-			ZETestCheck(Result2 == true);
+			Opened = PartialFile3.Open((ZEFile*)&PartialFile2, 10, 30);
+			ZETestCheck(Opened);
+			ZETestCheckEqual(PartialFile3.GetStartPosition(), 10);
+			ZETestCheckEqual(PartialFile3.GetEndPosition(), 40);
 
-			PartialFile.Close();
-			PartialFile1.Close();
+			PartialFile3.Close();
 			PartialFile2.Close();
+			PartialFile1.Close();
 			File.Close();
-			remove("ZEPartialFileOpenTests.txt");
+			remove("OpenTest.txt");
 		}
 	}
 
-	ZETest("ZEUInt64 ZEPartialFile::Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)")
+	ZETest("ZEInt ZEPartialFile::Close()")
+	{
+		ZEFile File;
+		ZEPartialFile PartialFile;
+
+		File.Open("CloseTest.txt", ZE_FOM_READ, ZE_FCM_CREATE);
+		PartialFile.Open(&File, 10, 30);
+		ZETestCheckEqual(PartialFile.GetStartPosition(), 10);
+		ZETestCheckEqual(PartialFile.GetEndPosition(), 40);
+
+		ZEInt Closed = PartialFile.Close();
+		ZETestCheckEqual(Closed, 0);
+		ZETestCheckEqual(PartialFile.GetStartPosition(), 0);
+		ZETestCheckEqual(PartialFile.GetEndPosition(), 0);
+
+		File.Close();
+		remove("CloseTest.txt");
+
+		ZETestCase("close parent file first")
+		{
+			File.Open("CloseTest.txt", ZE_FOM_READ, ZE_FCM_CREATE);
+			PartialFile.Open(&File, 10, 30);
+			ZETestCheckEqual(PartialFile.GetStartPosition(), 10);
+			ZETestCheckEqual(PartialFile.GetEndPosition(), 40);
+
+			Closed = File.Close();
+			ZETestCheckEqual(Closed, 0);
+
+			Closed = PartialFile.Close();
+			ZETestCheckEqual(Closed, 0);
+			ZETestCheckEqual(PartialFile.GetStartPosition(), 0);
+			ZETestCheckEqual(PartialFile.GetEndPosition(), 0);
+
+			remove("CloseTest.txt");
+		}
+
+		ZETestCase("close partial file on a partial file first")
+		{
+			ZEPartialFile PartialFile1;
+			File.Open("CloseTest.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
+			PartialFile.Open(&File, 0, 100);
+			PartialFile1.Open((ZEFile*)&PartialFile, 30, 50);
+
+			Closed = PartialFile1.Close();
+			ZETestCheckEqual(Closed, 0);
+			ZETestCheckEqual(PartialFile1.GetStartPosition(), 0);
+			ZETestCheckEqual(PartialFile1.GetEndPosition(), 0);
+			ZETestCheckEqual(PartialFile.GetStartPosition(), 0);
+			ZETestCheckEqual(PartialFile.GetEndPosition(), 100);
+
+			Closed = PartialFile.Close();
+			ZETestCheckEqual(Closed, 0);
+			ZETestCheckEqual(PartialFile.GetStartPosition(), 0);
+			ZETestCheckEqual(PartialFile.GetEndPosition(), 0);
+
+			File.Close();
+			remove("CloseTest.txt");
+		}
+
+		ZETestCase("close parent partial file first")
+		{
+			ZEPartialFile PartialFile1;
+			File.Open("CloseTest.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
+			PartialFile.Open(&File, 0, 100);
+			PartialFile1.Open((ZEFile*)&PartialFile, 30, 50);
+
+			Closed = PartialFile.Close();
+			ZETestCheckEqual(Closed, 0);
+			ZETestCheckEqual(PartialFile.GetStartPosition(), 0);
+			ZETestCheckEqual(PartialFile.GetEndPosition(), 0);
+			ZETestCheckEqual(PartialFile1.GetStartPosition(), 30);
+			ZETestCheckEqual(PartialFile1.GetEndPosition(), 80);
+
+			Closed = PartialFile1.Close();
+			ZETestCheckEqual(Closed, 0);
+			ZETestCheckEqual(PartialFile1.GetStartPosition(), 0);
+			ZETestCheckEqual(PartialFile1.GetEndPosition(), 0);
+
+			File.Close();
+			remove("CloseTest.txt");
+		}
+	}
+
+	ZETest("ZESize ZEPartialFile::Write(const void* Buffer, const ZESize Size, const ZESize Count)")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
 		for ( ZEInt I = 0; I < 1024; I++)
@@ -162,240 +373,186 @@ ZETestSuite(ZEPartialFile)
 		ZEFile File;
 		ZEPartialFile PartialFile;
 
-		File.Open("ZEPartialFileWriteTests.txt", ZE_FM_READ_WRITE, true);
+		File.Open("WriteTest.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
+		PartialFile.Open(&File, 100, 100);
+		ZETestCheckEqual(PartialFile.GetStartPosition(), 100);
+		ZETestCheckEqual(PartialFile.GetEndPosition(), 200);
+		ZETestCheckEqual(PartialFile.Tell(), 0);
 
-		bool Result = PartialFile.Open(&File, 100, 100);	
-
-		ZEUInt64 PartialCursor = PartialFile.Tell();
-		ZETestCheckEqual(PartialCursor, 0);
-		ZEUInt64 WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 10);
+		ZESize WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 10);
 		ZETestCheckEqual(WriteCount, 10);
-		PartialCursor = PartialFile.Tell();
-		ZETestCheckEqual(PartialCursor, 10);
-		ZEUInt64 Size = PartialFile.GetFileSize();
-		ZETestCheckEqual(Size, 100);
-		ZEUInt64 FileCursor = File.Tell();
-		ZETestCheckEqual(FileCursor, 0);
-		
+		ZETestCheckEqual(PartialFile.Tell(), 10);
+		ZETestCheckEqual(File.Tell(), 0);
+
 		WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 90);
 		ZETestCheckEqual(WriteCount, 90);
-		PartialCursor = PartialFile.Tell();
-		ZETestCheckEqual(PartialCursor, 100);
-		bool isEof = PartialFile.Eof();
-		ZETestCheck(isEof == false);
-		
+		ZETestCheckEqual(PartialFile.Tell(), 100);
+		//EoF false
+
 		WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 1);
 		ZETestCheckEqual(WriteCount, 0);
-		PartialCursor = PartialFile.Tell();
-		ZETestCheckEqual(PartialCursor, 100);
-		Size = PartialFile.GetFileSize();
-		ZETestCheckEqual(Size, 100);
-		isEof = PartialFile.Eof();
-		ZETestCheck(isEof == true);
-	
+		ZETestCheckEqual(PartialFile.Tell(), 100);
+		//EoF true
+
 		PartialFile.Close();
 		File.Close();
-		remove("ZEPartialFileWriteTests.txt");
-
-		ZETestCase("try to write exceed the partial file size")
-		{
-			ZEPartialFile PartialFile1;
-
-			File.Open("ZEPartialFileWriteTests.txt", ZE_FM_APPEND_ONLY, true);
-
-			Result = PartialFile.Open(&File, 0, 50);
-			ZETestCheck(Result == true);
-			bool Result1 = PartialFile1.Open((ZEFile*)&PartialFile, 10, 30);
-			ZETestCheck(Result1 == true);
-			Size = PartialFile.GetFileSize();
-			ZETestCheckEqual(Size, 50);
-			ZEUInt64 Size1 = PartialFile1.GetFileSize();
-			ZETestCheckEqual(Size1, 30);
-			ZEUInt ReferenceCount = PartialFile.GetReferenceCount();
-			ZETestCheckEqual(ReferenceCount, 1);
-			ReferenceCount = File.GetReferenceCount();
-			ZETestCheckEqual(ReferenceCount, 2);
-
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 0);
-			ZEUInt64 PartialCursor1 = PartialFile1.Tell();
-			ZETestCheckEqual(PartialCursor1, 0);
-
-			WriteCount = PartialFile.Write(Buffer, 4, 9);
-			isEof = PartialFile.Eof();
-			ZETestCheckEqual(WriteCount, 9);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 36);
-			PartialCursor1 = PartialFile1.Tell();
-			ZETestCheckEqual(PartialCursor1, 0);
-			WriteCount = PartialFile.Write(Buffer, 4, 4);
-			isEof = PartialFile.Eof();
-			ZETestCheckEqual(WriteCount, 3);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 48);
-			isEof = PartialFile.Eof();
-			ZETestCheck(isEof == true);
-			WriteCount = PartialFile.Write(Buffer, 4, 1);
-			ZETestCheckEqual(WriteCount, 0);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 48);
-			isEof = PartialFile.Eof();
-			ZETestCheck(isEof == true);
-			WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 3);
-			ZETestCheckEqual(WriteCount, 2);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 50);
-			isEof = PartialFile.Eof();
-			ZETestCheck(isEof == true);
-
-			ZEUInt64 WriteCount1 = PartialFile1.Write(Buffer, 4, 8);
-			ZETestCheckEqual(WriteCount1, 7);
-			PartialCursor1 = PartialFile1.Tell();
-			ZETestCheckEqual(PartialCursor1, 28);
-			bool isEof1 = PartialFile1.Eof();
-			ZETestCheck(isEof1 == true);
-			WriteCount1 = PartialFile1.Write(Buffer, sizeof(unsigned char), 3);
-			ZETestCheckEqual(WriteCount1, 2);
-			PartialCursor1 = PartialFile1.Tell();
-			ZETestCheckEqual(PartialCursor1, 30);
-			isEof1 = PartialFile1.Eof();
-			ZETestCheck(isEof1 == true);
-
-			PartialFile1.Close();
-			PartialFile.Close();
-			File.Close();
-			remove("ZEPartialFileWriteTests.txt");
-		}
+		remove("WriteTest.txt");
 
 		ZETestCase("try to write count > partial file size")
 		{
-			
-			File.Open("ZEPartialFileWriteTests.txt", ZE_FM_READ_WRITE, true);
+			File.Open("WriteTest.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
+			bool a = PartialFile.Open(&File, 0, 100);
 
-			Result = PartialFile.Open(&File, 0, 100);
+			ZETestCheckEqual(PartialFile.Tell(), 0);
 
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 0);
-			WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 101);
+			WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 110);
 			ZETestCheckEqual(WriteCount, 100);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 100);
-			isEof = PartialFile.Eof();
-			ZETestCheck(isEof == true);
+			ZETestCheckEqual(PartialFile.Tell(), 100);
+			//EoF true
 
 			PartialFile.Close();
 			File.Close();
-			remove("ZEPartialFileWriteTests.txt");
-		}
-
-		ZETestCase("open file in ZE_FM_READ_ONLY, and open a partial file then try to write")
-		{
-			File.Open("ZEPartialFileWriteTests.txt", ZE_FM_READ_WRITE, true);
-			File.Close();
-
-			bool Res = File.Open("ZEPartialFileWriteTests.txt", ZE_FM_READ_ONLY, true);
-			ZETestCheck(Res == true);
-
-			Result = PartialFile.Open(&File, 0, 100);
-			ZETestCheck(Result == true);
-
-			WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 50);
-			ZETestCheckEqual(WriteCount, 0);
-
-			PartialFile.Close();
-			File.Close();
-			remove("ZEPartialFileWriteTests.txt");
+			remove("WriteTest.txt");
 		}
 	}
 
-	ZETest("ZEUInt64 ZEPartialFile::GetStartPosition()")
+	ZETest("ZEInt ZEPartialFile::Seek(const ZEInt64 Offset, const ZESeekFrom Origin)")
 	{
-		ZEFile File;
-		ZEPartialFile PartialFile;
+		unsigned char* Buffer = new unsigned char[1024];
+ 		for (ZEInt I = 0; I < 1024; I++)
+ 		{
+			Buffer[I] = I % 256;
+		}
 
-		File.Open("ZEPartialFileStartPositionTests.txt", ZE_FM_READ_WRITE, true);
+ 		ZEFile File;
+ 		ZEPartialFile PartialFile;
+ 
+ 		ZETestCase("for seek form ZE_SF_CURRENT")
+ 		{
+ 			File.Open("SeekTest.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
+			PartialFile.Open(&File, 0, 100);
+ 			ZETestCheckEqual(PartialFile.Tell(), 0);
+ 
+ 			ZESize WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 50);
+ 			ZETestCheckEqual(PartialFile.Tell(), 50);
+ 
+			ZEInt Seek = PartialFile.Seek(-10 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+ 			ZETestCheckEqual(Seek, 0);
+			ZETestCheckEqual(PartialFile.Tell(), 40);
+ 
+ 			Seek = PartialFile.Seek(-40 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+ 			ZETestCheckEqual(Seek, 0);
+			ZETestCheckEqual(PartialFile.Tell(), 0);
+ 
+			Seek = PartialFile.Seek(-5 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+ 			ZETestCheck(Seek != 0);
+ 			ZETestCheckEqual(PartialFile.Tell(), 0);
 
-		bool Result = PartialFile.Open(&File, 10, 1000);
+ 			Seek = PartialFile.Seek(50 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+ 			ZETestCheckEqual(Seek, 0);
+ 			ZETestCheckEqual(PartialFile.Tell(), 50);
+ 
+ 			Seek = PartialFile.Seek(10 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+ 			ZETestCheckEqual(Seek, 0);
+ 			ZETestCheckEqual(PartialFile.Tell(), 60);
 
-		ZEUInt64 StartPosition = PartialFile.GetStartPosition();
-		ZETestCheckEqual(StartPosition, 10);
-
-		PartialFile.Close();
-		File.Close();
-		remove("ZEPartialFileStartPositionTests.txt");
-	}
-
-	ZETest("ZEUInt64 ZEPartialFile::GetEndPosition()")
-	{
-		ZEFile File;
-		ZEPartialFile PartialFile;
-
-		File.Open("ZEPartialFileEndPositionTests.txt", ZE_FM_READ_WRITE, true);
-
-		bool Result = PartialFile.Open(&File, 10, 1000);
-
-		ZEUInt64 EndPosition = PartialFile.GetEndPosition();
-		ZETestCheckEqual(EndPosition, 1010);
-
-		PartialFile.Close();
-		File.Close();
-		remove("ZEPartialFileEndPositionTests.txt");
-	}
-
-	ZETest("ZEUInt64 ZEPartialFile::WriteFormated(const char* Format, ...)")
-	{
-		ZEFile File;
-		ZEPartialFile PartialFile;
-
-		File.Open("ZEPartialFileWriteFormatedTests.txt", ZE_FM_READ_WRITE, true);
-
-		bool Result = PartialFile.Open(&File, 10, 300);
-
-		ZEUInt64 WriteSize = PartialFile.WriteFormated("This line contains Int: %d, Double: %lf, Float: %f, String: %s", 11, 11.11, 11.11f, "eleven");
-		ZETestCheckEqual(WriteSize, 79);
-		
-		ZEUInt64 PartialCursor = PartialFile.Tell();
-		ZETestCheckEqual(PartialCursor, 79);
-
-		PartialFile.Close();
-		File.Close();
-		remove("ZEPartialFileWriteFormatedTests.txt");
-
-		ZETestCase("try to write bigger size of data than partial file size")
-		{
-			File.Open("ZEPartialFileWriteFormatedTests.txt", ZE_FM_READ_WRITE, true);
-
-			bool Result = PartialFile.Open(&File, 0, 50);
-
-			ZEUInt64 WriteSize = PartialFile.WriteFormated("This line contains Int: %d, Double: %lf, Float: %f, String: %s", 11, 11.11, 11.11f, "eleven");
-			ZETestCheckEqual(WriteSize, 79);
+ 			Seek = PartialFile.Seek(50 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+ 			ZETestCheck(Seek != 0);
+ 			ZETestCheckEqual(PartialFile.Tell(), 60);
 			
-			ZEUInt64 PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 79);
+			Seek = PartialFile.Seek(40 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			ZETestCheckEqual(Seek, 0);
+			ZETestCheckEqual(PartialFile.Tell(), 100);
 
-			PartialFile.Close();
-			File.Close();
-			remove("ZEPartialFileWriteFormatedTests.txt");
-		}
+			Seek = PartialFile.Seek(1 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			ZETestCheck(Seek != 0);
+			ZETestCheckEqual(PartialFile.Tell(), 100);
+ 
+ 			PartialFile.Close();
+ 			File.Close();
+ 			remove("SeekTest.txt");
+ 		}
+ 
+ 		ZETestCase("for seek form ZE_SF_BEGINING")
+ 		{
+ 			File.Open("SeekTest.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
+			PartialFile.Open(&File, 0, 100);
+ 			ZETestCheckEqual(PartialFile.Tell(), 0);
+ 
+ 			ZESize WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 50);
+ 			ZETestCheckEqual(PartialFile.Tell(), 50);
+ 
+ 			ZEInt Seek = PartialFile.Seek(10 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
+ 			ZETestCheckEqual(Seek, 0);
+ 			ZETestCheckEqual(PartialFile.Tell(), 10);
+ 
+ 			Seek = PartialFile.Seek(0 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
+ 			ZETestCheckEqual(Seek, 0);
+ 			ZETestCheckEqual(PartialFile.Tell(), 0);
+ 			
+ 			Seek = PartialFile.Seek(110 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
+ 			ZETestCheck(Seek != 0);
+ 			ZETestCheckEqual(PartialFile.Tell(), 0);
+ 
+ 			Seek = PartialFile.Seek(50 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
+ 			ZETestCheckEqual(Seek, 0);
+ 			ZETestCheckEqual(PartialFile.Tell(), 50);
+ 
+ 			Seek = PartialFile.Seek(-10 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
+ 			ZETestCheck(Seek != 0);
+ 			ZETestCheckEqual(PartialFile.Tell(), 50);
 
-		ZETestCase("try to write without openning file")
+			Seek = PartialFile.Seek(100 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
+			ZETestCheckEqual(Seek, 0);
+			ZETestCheckEqual(PartialFile.Tell(), 100);
+ 
+ 			PartialFile.Close();
+ 			File.Close();
+ 			remove("SeekTest.txt");
+ 		}
+ 
+ 		ZETestCase("for seek form ZE_SF_END")
 		{
-			WriteSize = PartialFile.WriteFormated("This line contains Int: %d, Double: %lf, Float: %f, String: %s", 11, 11.11, 11.11f, "eleven");
-			ZETestCheckEqual(WriteSize, 0);
-
-			File.Close();
-			remove("ZEPartialFileWriteFormatedTests.txt");
-		}
+ 			File.Open("SeekTest.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
+			PartialFile.Open(&File, 0, 100);
+ 			ZETestCheckEqual(PartialFile.Tell(), 0);
+ 
+ 			ZESize WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 50);
+ 			ZETestCheckEqual(PartialFile.Tell(), 50);
+ 
+ 			ZEInt Seek = PartialFile.Seek(-10 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
+ 			ZETestCheckEqual(Seek, 0);
+			ZETestCheckEqual(PartialFile.Tell(), 90);
+ 
+ 			Seek = PartialFile.Seek(-50 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
+ 			ZETestCheckEqual(Seek, 0);
+			ZETestCheckEqual(PartialFile.Tell(), 50);
+ 
+ 			Seek = PartialFile.Seek(-100 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
+ 			ZETestCheckEqual(Seek, 0);
+ 			ZETestCheckEqual(PartialFile.Tell(), 0);
+ 
+ 			Seek = PartialFile.Seek(-110 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
+ 			ZETestCheckEqual(Seek, -1);
+ 			ZETestCheckEqual(PartialFile.Tell(), 0);
+ 
+ 			Seek = PartialFile.Seek(60 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
+ 			ZETestCheckEqual(Seek, -1);
+			ZETestCheckEqual(PartialFile.Tell(), 0);
+ 
+ 			PartialFile.Close();
+ 			File.Close();
+ 			remove("SeekTest.txt");	
+ 		}
 	}
 
-	ZETest("ZEUInt64 ZEPartialFile::Tell()")
+	ZETest("ZEInt64 ZEPartialFile::Tell() const")
 	{
 		ZEFile File;
 		ZEPartialFile PartialFile;
 
-		File.Open("ZEPartialFileTellTests.txt", ZE_FM_READ_WRITE, true);
-
-		bool Result = PartialFile.Open(&File, 0, 1024);
+		File.Open("TellTest.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
+		PartialFile.Open(&File, 0, 1024);
 
 		unsigned char* Buffer = new unsigned char[1024];
 		for (ZEInt I = 0; I < 1024; I++)
@@ -403,10 +560,10 @@ ZETestSuite(ZEPartialFile)
 			Buffer[I] = I % 256;
 		}
 
-		ZEUInt64 PartialCursor = PartialFile.Tell();
+		ZEInt64 PartialCursor = PartialFile.Tell();
 		ZETestCheckEqual(PartialCursor, 0);
 
-		ZEUInt64 WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 24);
+		ZESize WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 24);
 		PartialCursor = PartialFile.Tell();
 		ZETestCheckEqual(PartialCursor, 24);
 
@@ -421,236 +578,10 @@ ZETestSuite(ZEPartialFile)
 
 		PartialFile.Close();
 		File.Close();
-		remove("ZEPartialFileTellTests.txt");
+		remove("TellTest.txt");
 	}
 
-	ZETest("bool ZEPartialFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)")
-	{
-		unsigned char* Buffer = new unsigned char[1024];
-		for (ZEInt I = 0; I < 1024; I++)
-		{
-			Buffer[I] = I % 256;
-		}
-
-		ZEFile File;
-		ZEPartialFile PartialFile;
-
-		ZETestCase("for seek form ZE_SF_CURRENT")
-		{
-			File.Open("ZEPartialFileSeekTests.txt", ZE_FM_READ_WRITE, true);
-			bool Partial = PartialFile.Open(&File, 0, 100);
-			ZEUInt64 PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 0);
-
-			ZEUInt64 WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 50);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 50);
-
-			bool Result = PartialFile.Seek(-10 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-			ZETestCheck(Result == true);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 40);
-
-			Result = PartialFile.Seek(-40 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-			ZETestCheck(Result == true);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 0);
-
-			Result = PartialFile.Seek(-5 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-			ZETestCheck(Result == false);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 0);
-
-			Result = PartialFile.Seek(50 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-			ZETestCheck(Result == true);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 50);
-
-			Result = PartialFile.Seek(10 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-			ZETestCheck(Result == true);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 60);
-
-			Result = PartialFile.Seek(50 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-			ZETestCheck(Result == false);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 60);
-
-			PartialFile.Close();
-			File.Close();
-			remove("ZEPartialFileSeekTests.txt");
-		}
-
-		ZETestCase("for seek form ZE_SF_BEGINING")
-		{
-			File.Open("ZEPartialFileSeekTests.txt", ZE_FM_READ_WRITE, true);
-			bool Partial = PartialFile.Open(&File, 0, 100);
-			ZEUInt64 PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 0);
-
-			ZEUInt64 WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 50);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 50);
-
-			bool Result = PartialFile.Seek(10 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
-			ZETestCheck(Result == true);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 10);
-
-			Result = PartialFile.Seek(0 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
-			ZETestCheck(Result == true);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 0);
-			
-			Result = PartialFile.Seek(110 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
-			ZETestCheck(Result == false);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 0);
-
-			Result = PartialFile.Seek(50 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
-			ZETestCheck(Result == true);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 50);
-
-			Result = PartialFile.Seek(-10 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
-			ZETestCheck(Result == false);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 50);
-
-			PartialFile.Close();
-			File.Close();
-			remove("ZEPartialFileSeekTests.txt");
-		}
-
-		ZETestCase("for seek form ZE_SF_END")
-		{
-			File.Open("ZEPartialFileSeekTests.txt", ZE_FM_READ_WRITE, true);
-			bool Partial = PartialFile.Open(&File, 0, 100);
-			ZEUInt64 PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 0);
-
-			ZEUInt64 WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 50);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 50);
-
-			bool Result = PartialFile.Seek(-10 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
-			ZETestCheck(Result == true);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 90);
-
-			Result = PartialFile.Seek(-50 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
-			ZETestCheck(Result == true);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 50);
-
-			Result = PartialFile.Seek(-100 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
-			ZETestCheck(Result == true);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 0);
-
-			Result = PartialFile.Seek(-110 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
-			ZETestCheck(Result == false);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 0);
-
-			Result = PartialFile.Seek(60 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
-			ZETestCheck(Result == false);
-			PartialCursor = PartialFile.Tell();
-			ZETestCheckEqual(PartialCursor, 0);
-
-			PartialFile.Close();
-			File.Close();
-			remove("ZEPartialFileSeekTests.txt");	
-		}
-	}
-
-	ZETest("void ZEPartialFile::Close()")
-	{
-		ZEFile File;
-		ZEPartialFile PartialFile;
-
-		File.Open("ZEPartialFileCloseTests.txt", ZE_FM_READ_WRITE, true);
-		bool Result = PartialFile.Open(&File, 0, 100);
-		ZEUInt ReferenceCount = File.GetReferenceCount();
-		ZETestCheckEqual(ReferenceCount, 1);
-
-		PartialFile.Close();
-		ReferenceCount = File.GetReferenceCount();
-		ZETestCheckEqual(ReferenceCount, 0);
-		ZEUInt64 StartPosition = PartialFile.GetStartPosition();
-		ZETestCheckEqual(StartPosition, 0);
-		ZEUInt64 EndPosition = PartialFile.GetEndPosition();
-		ZETestCheckEqual(EndPosition, 0);
-		bool isEof = PartialFile.Eof();
-		ZETestCheck(isEof == false);
-		
-		File.Close();
-		remove("ZEPartialFileCloseTests.txt");
-
-		ZETestCase("close parent file first")
-		{
-			File.Open("ZEPartialFileCloseTests.txt", ZE_FM_READ_WRITE, true);
-			Result = PartialFile.Open(&File, 0, 100);
-			EndPosition = PartialFile.GetEndPosition();
-			ZETestCheckEqual(EndPosition, 100);
-
-			ReferenceCount = File.GetReferenceCount();
-			ZETestCheckEqual(ReferenceCount, 1);
-
-			File.Close();
-			EndPosition = PartialFile.GetEndPosition();
-			ZETestCheckEqual(EndPosition, 100);
-
-			PartialFile.Close();
-			File.Close();
-			remove("ZEPartialFileCloseTests.txt");
-		}
-
-		ZETestCase("close partial files first")
-		{
-			ZEPartialFile PartialFile1;
-			File.Open("ZEPartialFileCloseTests.txt", ZE_FM_READ_WRITE, true);
-			Result = PartialFile.Open(&File, 0, 50);
-			Result = PartialFile1.Open(&File, 50, 100);
-
-			ReferenceCount = File.GetReferenceCount();
-			ZETestCheckEqual(ReferenceCount, 2);
-
-			PartialFile.Close();
-			PartialFile1.Close();
-
-			bool isOpen = File.IsOpen();
-			ZETestCheck(isOpen == true);
-
-			File.Close();
-			isOpen = File.IsOpen();
-			ZETestCheck(!isOpen);
-			remove("ZEPartialFileCloseTests.txt");
-		}
-
-		ZETestCase("close partial file on a partial file first")
-		{
-			ZEPartialFile PartialFile1;
-			File.Open("ZEPartialFileCloseTests.txt", ZE_FM_READ_WRITE, true);
-			Result = PartialFile.Open(&File, 0, 100);
-			Result = PartialFile1.Open((ZEFile*)&PartialFile, 30, 50);
-
-			ReferenceCount = PartialFile.GetReferenceCount();
-			ZETestCheckEqual(ReferenceCount, 1);
-			ReferenceCount = File.GetReferenceCount();
-			ZETestCheckEqual(ReferenceCount, 2);
-
-			PartialFile1.Close();
-			
-			EndPosition = PartialFile.GetEndPosition();
-			ZETestCheckEqual(EndPosition, 100);
-
-			PartialFile.Close();
-			File.Close();
-			remove("ZEPartialFileCloseTests.txt");
-		}
-	}
-	ZETest("ZEUInt64 ZEPartialFile::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)")
+	ZETest("ZESize ZEPartialFile::Read(void* Buffer, const ZESize Size, const ZESize Count)")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
 		unsigned char* BufferRead = new unsigned char[1024];
@@ -662,13 +593,13 @@ ZETestSuite(ZEPartialFile)
 		ZEFile File;
 		ZEPartialFile PartialFile;
 
-		File.Open("ZEPartialFileReadTests.txt", ZE_FM_READ_WRITE, true);
+		File.Open("ReadTest.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 		PartialFile.Open(&File, 0, 100);
-		ZEUInt64 WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 10);
-		
-		bool Result = PartialFile.Seek(-10 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+		ZESize WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 10);
 
-		ZEUInt64 ReadCount = PartialFile.Read(BufferRead, sizeof(unsigned char), 10);
+		ZEInt Result = PartialFile.Seek(-10 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+
+		ZESize ReadCount = PartialFile.Read(BufferRead, sizeof(unsigned char), 10);
 		ZETestCheckEqual(ReadCount, 10);
 
 		ZEInt Res = memcmp(Buffer, BufferRead, sizeof(unsigned char));
@@ -676,11 +607,11 @@ ZETestSuite(ZEPartialFile)
 
 		PartialFile.Close();
 		File.Close();
-		remove("ZEPartialFileReadTests.txt");
+		remove("ReadTest.txt");
 
 		ZETestCase("try to read whole partial file")
 		{
-			File.Open("ZEPartialFileReadTests.txt", ZE_FM_READ_WRITE, true);
+			File.Open("ReadTest.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 			PartialFile.Open(&File, 0, 1024);
 			WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 1024);
 
@@ -692,17 +623,16 @@ ZETestSuite(ZEPartialFile)
 			Res = memcmp(Buffer, BufferRead, sizeof(unsigned char));
 			ZETestCheckEqual(Res, 0);
 
-			bool isEof = PartialFile.Eof();
-			ZETestCheck(isEof == false);
+			//EoF false
 
 			PartialFile.Close();
 			File.Close();
-			remove("ZEPartialFileReadTests.txt");
+			remove("ReadTest.txt");
 		}
 
 		ZETestCase("try to read bigger than partial file size")
 		{
-			File.Open("ZEPartialFileReadTests.txt", ZE_FM_READ_WRITE, true);
+			File.Open("ReadTest.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 			PartialFile.Open(&File, 0, 1024);
 			WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 1024);
 
@@ -710,31 +640,30 @@ ZETestSuite(ZEPartialFile)
 
 			ReadCount = PartialFile.Read(BufferRead, sizeof(unsigned char), 1100);
 			ZETestCheckEqual(ReadCount, 1024);
+			//EoF true
 
 			Res = memcmp(Buffer, BufferRead, sizeof(unsigned char));
 			ZETestCheckEqual(Res, 0);
 
-			bool isEof = PartialFile.Eof();
-			ZETestCheck(isEof == true);
-
 			PartialFile.Close();
 			File.Close();
-			remove("ZEPartialFileReadTests.txt");
+			remove("ReadTest.txt");
 		}
 
 		ZETestCase("try to write and read bigger than partial file size")
 		{
-			File.Open("ZEPartialFileReadTests.txt", ZE_FM_READ_WRITE, true);
+			File.Open("ReadTest.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 			PartialFile.Open(&File, 0, 100);
 			WriteCount = PartialFile.Write(Buffer, sizeof(ZEUInt), 26);
 			ZETestCheckEqual(WriteCount, 25);
+			//EoF true
 
 			Result = PartialFile.Seek(-30 * (ZEInt64)sizeof(ZEUInt), ZE_SF_CURRENT);
-			ZETestCheck(Result == false);
-			ZEUInt64 PartialCursor = PartialFile.Tell();
+			ZETestCheckEqual(Result, -1);
+			ZEInt64 PartialCursor = PartialFile.Tell();
 			ZETestCheckEqual(PartialCursor, 100);
 			Result = PartialFile.Seek(-25 * (ZEInt64)sizeof(ZEUInt), ZE_SF_CURRENT);
-			ZETestCheck(Result == true);
+			ZETestCheckEqual(Result, 0);
 			PartialCursor = PartialFile.Tell();
 			ZETestCheckEqual(PartialCursor, 0);
 
@@ -746,60 +675,7 @@ ZETestSuite(ZEPartialFile)
 
 			PartialFile.Close();
 			File.Close();
-			remove("ZEPartialFileReadTests.txt");
+			remove("ReadTest.txt");
 		}
-	}
-	ZETest("bool ZEPartialFile::Eof()")
-	{
-		unsigned char* Buffer = new unsigned char[1024];
-		for (ZEInt I = 0; I < 1024; I++)
-		{
-			Buffer[I] = I % 256;
-		}
-
-		ZEFile File;
-		ZEPartialFile PartialFile;
-
-		File.Open("ZEPartialFileEofTests.txt", ZE_FM_READ_WRITE, true);
-		PartialFile.Open(&File, 0, 100);
-
-		bool isEof = PartialFile.Eof();
-		ZETestCheck(isEof == false);
-
-		ZEUInt64 WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 150);
-		ZETestCheckEqual(WriteCount, 100);
-
-		isEof = PartialFile.Eof();
-		ZETestCheck(isEof == true);
-
-		PartialFile.Close();
-		File.Close();
-		remove("ZEPartialFileEofTests.txt");
-	}
-	ZETest("ZEUInt64 ZEPartialFile::GetFileSize() const")
-	{
-		unsigned char* Buffer = new unsigned char[1024];
-		for (ZEInt I = 0; I < 1024; I++)
-		{
-			Buffer[I] = I % 256;
-		}
-
-		ZEFile File;
-		ZEPartialFile PartialFile;
-
-		File.Open("ZEPartialFileSizeTests.txt", ZE_FM_READ_WRITE, true);
-		PartialFile.Open(&File, 0, 100);
-
-		ZEUInt64 Size = PartialFile.GetFileSize();
-		ZETestCheckEqual(Size, 100);
-
-		ZEUInt64 WriteCount = PartialFile.Write(Buffer, sizeof(unsigned char), 150);
-
-		Size = PartialFile.GetFileSize();
-		ZETestCheckEqual(Size, 100);
-
-		PartialFile.Close();
-		File.Close();
-		remove("ZEPartialFileSizeTests.txt");
 	}
 }

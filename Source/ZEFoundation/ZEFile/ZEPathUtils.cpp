@@ -241,7 +241,8 @@ ZEKnownPath ZEPathUtils::SearchForSymbol(ZEString* RelativePart, const ZEString&
 	else // Nothing found
 	{
 		// Copy all the path to output
-		*RelativePart = SymbolicPath;
+		*RelativePart += Seperator;
+		*RelativePart += SymbolicPath;
 	}
 
 	return Root;
