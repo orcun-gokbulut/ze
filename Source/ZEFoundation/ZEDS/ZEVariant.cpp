@@ -69,7 +69,7 @@ void ZEVariant::SetType(ZEVariantType NewType)
 		else if (Type == ZE_VRT_MATRIX4X4)
 		{
 			delete Value.Matrix4x4;
-			Value.Matrix3x3 = NULL;
+			Value.Matrix4x4 = NULL;
 		}
 	}
 
