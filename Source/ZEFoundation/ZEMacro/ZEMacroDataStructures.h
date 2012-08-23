@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDelegate.h
+ Zinek Engine - ZEMacroDataStructures.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,20 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DELEGATE_H__
-#define __ZE_DELEGATE_H__
+#pragma once
+#ifndef __ZE_MACRO_DATA_STRUCTURES_H__
+#define __ZE_MACRO_DATA_STRUCTURES_H__
 
-#define ZEBindFunction(Delegate, Function) do {Delegate.Bind<Function>());} while(false)
-#define ZEBindMethod(Delegate, Class, Function, Object) do {Delegate.Bind<Class, Function>(Object));} while(false)
-#define ZEBindMethodConst(Delegate, class, Function, Object) do {Delegate.BindConst<Class, Function>(Object));} while(false)
+#define ZE_MACRO_TUPLE(Size, Index, Tuple) ZE_MACRO_TUPLE_INTERNAL_##Size##_##Index(Tuple)
 
-template <typename TSignature> 
-class ZEDelegate;
+#define ZE_MACRO_TUPLE_INTERNAL_1_0(E0) E0
 
-#define ZE_MACRO_INCLUDE_FILE_NAME "ZEDS/ZEDelegateImp.h"
-#define ZE_MACRO_INCLUDE_COUNT 30
-#include "ZEMacro/ZEMacroIncludeRepeater.h"
-#undef ZE_MACRO_INCLUDE_FILE_NAME
-#undef ZE_MACRO_INCLUDE_COUNT
+#define ZE_MACRO_TUPLE_INTERNAL_2_0(E0, E1) E0
+#define ZE_MACRO_TUPLE_INTERNAL_2_1(E0, E1) E1
+
+#define ZE_MACRO_TUPLE_INTERNAL_3_0(E0, E1, E2) E0
+#define ZE_MACRO_TUPLE_INTERNAL_3_1(E0, E1, E2) E1
+#define ZE_MACRO_TUPLE_INTERNAL_3_2(E0, E1, E2) E2
+
+#define ZE_MACRO_TUPLE_INTERNAL_4_0(E0, E1, E2, E3) E0
+#define ZE_MACRO_TUPLE_INTERNAL_4_1(E0, E1, E2, E3) E1
+#define ZE_MACRO_TUPLE_INTERNAL_4_2(E0, E1, E2, E3) E2
+#define ZE_MACRO_TUPLE_INTERNAL_4_3(E0, E1, E2, E3) E3
+
+#define ZE_MACRO_TUPLE_INTERNAL_5_0(E0, E1, E2, E3, E4) E0
+#define ZE_MACRO_TUPLE_INTERNAL_5_1(E0, E1, E2, E3, E4) E1
+#define ZE_MACRO_TUPLE_INTERNAL_5_2(E0, E1, E2, E3, E4) E2
+#define ZE_MACRO_TUPLE_INTERNAL_5_3(E0, E1, E2, E3, E4) E3
+#define ZE_MACRO_TUPLE_INTERNAL_5_4(E0, E1, E2, E3, E4) E4
 
 #endif

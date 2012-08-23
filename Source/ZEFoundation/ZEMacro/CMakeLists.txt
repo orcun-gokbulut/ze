@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEDelegate.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,23 +30,32 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DELEGATE_H__
-#define __ZE_DELEGATE_H__
+cmake_minimum_required (VERSION 2.8)
 
-#define ZEBindFunction(Delegate, Function) do {Delegate.Bind<Function>());} while(false)
-#define ZEBindMethod(Delegate, Class, Function, Object) do {Delegate.Bind<Class, Function>(Object));} while(false)
-#define ZEBindMethodConst(Delegate, class, Function, Object) do {Delegate.BindConst<Class, Function>(Object));} while(false)
+ze_add_source(ZEMacro.cpp					Sources)
+ze_add_source(ZEMacro.h						Headers Sources)
+ze_add_source(ZEMacroArithmetic.cpp			Sources)
+ze_add_source(ZEMacroArithmetic.h			Headers Sources)
+ze_add_source(ZEMacroDataStructures.cpp		Sources)
+ze_add_source(ZEMacroDataStructures.h		Headers Sources)
+ze_add_source(ZEMacroFlowControl.cpp		Sources)
+ze_add_source(ZEMacroFlowControl.h			Headers Sources)
+ze_add_source(ZEMacroIncludeRepeater.cpp	Sources)
+ze_add_source(ZEMacroIncludeRepeater.h		Headers Sources)
+ze_add_source(ZEMacroIterator.cpp			Sources)
+ze_add_source(ZEMacroIterator.h				Headers Sources)
+ze_add_source(ZEMacroLogic.cpp				Sources)
+ze_add_source(ZEMacroLogic.h				Headers Sources)
+ze_add_source(ZEMacroRepeater.cpp			Sources)
+ze_add_source(ZEMacroRepeater.h				Headers Sources)
 
-template <typename TSignature> 
-class ZEDelegate;
-
-#define ZE_MACRO_INCLUDE_FILE_NAME "ZEDS/ZEDelegateImp.h"
-#define ZE_MACRO_INCLUDE_COUNT 30
-#include "ZEMacro/ZEMacroIncludeRepeater.h"
-#undef ZE_MACRO_INCLUDE_FILE_NAME
-#undef ZE_MACRO_INCLUDE_COUNT
-
-#endif
+ze_add_library(ZEMacro 
+	SOURCES ${Sources} 
+	HEADERS ${Headers}
+	LIBS ZEFoundation
+	INSTALL
+	INSTALL_DESTINATION ZEFoundation/ZEMacro
+	INSTALL_COMPONENT ZESDK)

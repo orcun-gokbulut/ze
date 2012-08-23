@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDelegate.h
+ Zinek Engine - ZEFormatArgument.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,20 +33,40 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DELEGATE_H__
-#define __ZE_DELEGATE_H__
+#pragma  once
+#ifndef __ZE_FORMAT_ARGUMENT_H__
+#define __ZE_FORMAT_ARGUMENT_H__
 
-#define ZEBindFunction(Delegate, Function) do {Delegate.Bind<Function>());} while(false)
-#define ZEBindMethod(Delegate, Class, Function, Object) do {Delegate.Bind<Class, Function>(Object));} while(false)
-#define ZEBindMethodConst(Delegate, class, Function, Object) do {Delegate.BindConst<Class, Function>(Object));} while(false)
+#include "ZEDS/ZEVariant.h"
+#include "ZETypes.h"
 
-template <typename TSignature> 
-class ZEDelegate;
+class ZEStringWriter;
+class ZEVector2;
+class ZEVector3;
+class ZEVector4;
+class ZEQuaternion;
+class ZEMatrix3x3;
+class ZEMatrix4x4;
+class ZEObject;
 
-#define ZE_MACRO_INCLUDE_FILE_NAME "ZEDS/ZEDelegateImp.h"
-#define ZE_MACRO_INCLUDE_COUNT 30
-#include "ZEMacro/ZEMacroIncludeRepeater.h"
-#undef ZE_MACRO_INCLUDE_FILE_NAME
-#undef ZE_MACRO_INCLUDE_COUNT
+class ZEFormatArgument
+{
+	public :
+		static bool			Format(ZEStringWriter& Output, ZEInt Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, ZEUInt Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, ZEInt64 Argument,	const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, ZEUInt64 Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, float Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, bool Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, const ZEVector2& Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, const ZEVector3& Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, const ZEVector4& Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, const ZEQuaternion& Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, const ZEMatrix3x3& Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, const ZEMatrix4x4& Argument,const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, const ZEString& Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, ZEObject* Argument,	const char* ArgumentFormat);
+		static bool			FormatVariant(ZEStringWriter& Output, const ZEVariant& Argument, const char* ArgumentFormat);
+};
 
 #endif
