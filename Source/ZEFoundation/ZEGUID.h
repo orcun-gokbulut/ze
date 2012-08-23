@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERandom.cpp
+ Zinek Engine - ZEGUID.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERandom.h"
-#include <stdlib.h>
+#pragma once
+#ifndef __ZE_GUID_H__
+#define __ZE_GUID_H__
 
-float ZERandom::GetFloat()
-{
-	return (float)rand() / (float)RAND_MAX - (float)rand() / (float)RAND_MAX; //-V501
-}
+#include "ZEDS/ZEString.h"
+#include "ZETypes.h"
 
-float ZERandom::GetFloatPositive()
+class ZEGUID
 {
-	return (float)rand() / (float)RAND_MAX;
-}
+	public:
+		ZEUInt32			Data1;
+		ZEUInt16			Data2;
+		ZEUInt16			Data3;
+		ZEUInt64			Data4;
 
-ZEInt ZERandom::GetInt()
-{
-	return rand() - rand();
-}
+		ZEInt				Compare(const ZEGUID& Other) const;
+		bool				Equals(const ZEGUID& Other) const;
 
-ZEUInt ZERandom::GetUInt()
-{
-	return rand();
-}
+		bool				operator<(const ZEGUID& Other) const;
+		bool				operator>(const ZEGUID& Other) const;
+		bool				operator<=(const ZEGUID& Other) const;
+		bool				operator>=(const ZEGUID& Other) const;
+		bool				operator==(const ZEGUID& Other) const;
+		bool				operator!=(const ZEGUID& Other) const;
 
-ZEInt8 ZERandom::GetInt8()
-{
-	return rand();
-}
+		ZEString			ToString();
 
-ZEInt16 ZERandom::GetInt16()
-{
-	return rand();
-}
+							ZEGUID();
+							ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4);
+							ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4FirstTwo, ZEUInt64 Data4Remaining);
 
-ZEInt32 ZERandom::GetInt32()
-{
-	return GetUInt32();
-}
+		static ZEGUID		Generate();
+};
 
-ZEInt64 ZERandom::GetInt64()
-{
-	return GetUInt64();
-}
-
-ZEUInt8 ZERandom::GetUInt8()
-{
-	return rand();
-}
-
-ZEUInt16 ZERandom::GetUInt16()
-{
-	return rand();
-}
-
-ZEUInt32 ZERandom::GetUInt32()
-{
-	return (rand() << 16) | rand();
-}
-
-ZEUInt64 ZERandom::GetUInt64()
-{
-	return ((ZEUInt64)GetUInt32() << 32) | (ZEUInt64)GetUInt32();
-}
-
-bool ZERandom::GetBool()
-{
-	return rand() % 2 == 1;
-}
+#endif

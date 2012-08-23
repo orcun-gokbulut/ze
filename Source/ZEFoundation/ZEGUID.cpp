@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERandom.cpp
+ Zinek Engine - ZEGUID.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,104 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEGUID.h"
+#include "ZEDS/ZEFormat.h"
 #include "ZERandom.h"
-#include <stdlib.h>
 
-float ZERandom::GetFloat()
+ZEInt ZEGUID::Compare(const ZEGUID& Other) const
 {
-	return (float)rand() / (float)RAND_MAX - (float)rand() / (float)RAND_MAX; //-V501
+	if (Data1 == Other.Data1)
+	{
+		if (Data2 == Other.Data2)
+		{
+			if (Data3 == Other.Data3)
+			{
+				if (Data4 == Data4)
+					return 0;
+
+				return (Data4 > Other.Data4 ? 1 : -1);
+			}
+
+			return (Data3 > Other.Data3 ? 1 : -1);
+		}
+
+		return (Data2 > Other.Data2 ? 1 : -1);
+	}
+
+	return (Data1 > Other.Data1 ? 1 : -1);
 }
 
-float ZERandom::GetFloatPositive()
+bool ZEGUID::Equals(const ZEGUID& Other) const
 {
-	return (float)rand() / (float)RAND_MAX;
+	return Data1 == Other.Data1 && Data2 == Other.Data2 && Data3 == Other.Data3 && Data4 == Other.Data4;
 }
 
-ZEInt ZERandom::GetInt()
+bool ZEGUID::operator<(const ZEGUID& Other) const
 {
-	return rand() - rand();
+	return Compare(Other) == -1;
 }
 
-ZEUInt ZERandom::GetUInt()
+bool ZEGUID::operator>(const ZEGUID& Other) const
 {
-	return rand();
+	return Compare(Other) == 1;
 }
 
-ZEInt8 ZERandom::GetInt8()
+bool ZEGUID::operator<=(const ZEGUID& Other) const
 {
-	return rand();
+	ZEInt Result = Compare(Other);
+	return Result == -1 || Result == 0;
 }
 
-ZEInt16 ZERandom::GetInt16()
+bool ZEGUID::operator>=(const ZEGUID& Other) const
 {
-	return rand();
+	ZEInt Result = Compare(Other);
+	return Result == 1 || Result == 0;
 }
 
-ZEInt32 ZERandom::GetInt32()
+bool ZEGUID::operator==(const ZEGUID& Other) const
 {
-	return GetUInt32();
+	return Equals(Other);
 }
 
-ZEInt64 ZERandom::GetInt64()
+bool ZEGUID::operator!=(const ZEGUID& Other) const
 {
-	return GetUInt64();
+	return !Equals(Other);
 }
 
-ZEUInt8 ZERandom::GetUInt8()
+ZEString ZEGUID::ToString()
 {
-	return rand();
+	return ZEFormat::Format("{0:X:08}-{1:X:04}-{2:X:04}-{3:X:04}-{4:X:012}", Data1, Data2, Data3, Data4 >> 48, Data4 & (ZEUInt64)0x0000FFFFFFFFFFFF);
 }
 
-ZEUInt16 ZERandom::GetUInt16()
+ZEGUID::ZEGUID()
 {
-	return rand();
+
 }
 
-ZEUInt32 ZERandom::GetUInt32()
+ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4)
 {
-	return (rand() << 16) | rand();
+	this->Data1 = Data1;
+	this->Data2 = Data2;
+	this->Data3 = Data3;
+	this->Data4 = Data4;
 }
 
-ZEUInt64 ZERandom::GetUInt64()
+ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4FirstTwo, ZEUInt64 Data4Remaining)
 {
-	return ((ZEUInt64)GetUInt32() << 32) | (ZEUInt64)GetUInt32();
+	this->Data1 = Data1;
+	this->Data2 = Data2;
+	this->Data3 = Data3;
+	this->Data4 = (Data4FirstTwo << 48) | (Data4 & (ZEUInt64)0x0000FFFFFFFFFFFFFF);
 }
 
-bool ZERandom::GetBool()
+ZEGUID ZEGUID::Generate()
 {
-	return rand() % 2 == 1;
+	ZEGUID GUID;
+
+	GUID.Data1 = ZERandom::GetUInt32();
+	GUID.Data2 = ZERandom::GetUInt16();
+	GUID.Data3 = ZERandom::GetUInt16();
+	GUID.Data4 = ZERandom::GetUInt64();
+
+	return GUID;
 }
