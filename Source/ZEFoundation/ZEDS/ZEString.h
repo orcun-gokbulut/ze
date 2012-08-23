@@ -236,6 +236,7 @@ class ZEString
 		/*REMOVE*/static ZEString 	FromDouble(double Value, ZEUInt Digits);
 		static ZEString 			FromDouble(double Value, const char* Format = NULL);
 		/*REMOVE*/static ZEString 	FromBool(bool Value, const char* TrueText = "True", const char* FalseText = "False");
+		/*REMOVE*/static ZEString 	FromBool(bool Value, const char* Format = NULL);
 
 		ZEString&					operator=(const ZEString& String);
 		ZEString&					operator=(const char* String);

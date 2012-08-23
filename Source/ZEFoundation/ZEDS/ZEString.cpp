@@ -1864,85 +1864,86 @@ ZEString ZEString::FromWStdString(const std::wstring& Value)
 
 ZEString ZEString::FromInt8(ZEInt8 Value, const char* Format)
 {
-	ZEString Value;
-	Value.SetValue(Value, Format);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Format);
+	return Output;
 }
 
 ZEString ZEString::FromInt16(ZEInt16 Value, const char* Format)
 {
-	ZEString Value;
-	Value.SetValue(Value, Format);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Format);
+	return Output;
 }
 
 ZEString ZEString::FromInt32(ZEInt32 Value, const char* Format)
 {
-	ZEString Value;
-	Value.SetValue(Value, Format);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Format);
+	return Output;
 }
 
 ZEString ZEString::FromInt64(ZEInt64 Value, const char* Format)
 {
-	ZEString Value;
-	Value.SetValue(Value, Format);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Format);
+	return Output;
 }
 
 ZEString ZEString::FromUInt8(ZEUInt8 Value, const char* Format)
 {
-	ZEString Value;
-	Value.SetValue(Value, Format);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Format);
+	return Output;
 }
 
 ZEString ZEString::FromUInt16(ZEUInt16 Value, const char* Format)
 {
-	ZEString Value;
-	Value.SetValue(Value, Format);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Format);
+	return Output;
 }
 
 ZEString ZEString::FromUInt32(ZEUInt32 Value, const char* Format)
 {
-	ZEString Value;
-	Value.SetValue(Value, Format);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Format);
+	return Output;
+}
 
 ZEString ZEString::FromUInt64(ZEUInt64 Value, const char* Format)
 {
-	ZEString Value;
-	Value.SetValue(Value, Format);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Format);
+	return Output;
 }
 
 ZEString ZEString::FromFloat(float Value, ZEUInt Digits)
 {
-	ZEString Value;
-	Value.SetValue(Value, Digits);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Digits);
+	return Output;
 }
 
 ZEString ZEString::FromFloat(float Value, const char* Format)
 {
-	ZEString Value;
-	Value.SetValue(Value, Format);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Format);
+	return Output;
 }
 
 ZEString ZEString::FromDouble(double Value, ZEUInt Digits)
 {
-	ZEString Value;
-	Value.SetValue(Value, Format);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Digits);
+	return Output;
 }
 
 ZEString ZEString::FromDouble(double Value, const char* Format)
 {
-	ZEString Value;
-	Value.SetValue(Value, Format);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Format);
+	return Output;
 }
 
 ZEString ZEString::FromBool(bool Value, const char* TrueText, const char* FalseText)
@@ -1952,9 +1953,9 @@ ZEString ZEString::FromBool(bool Value, const char* TrueText, const char* FalseT
 
 ZEString ZEString::FromBool(bool Value, const char* Format)
 {
-	ZEString Value;
-	Value.SetValue(Value, Format);
-	return Value;
+	ZEString Output;
+	Output.SetValue(Value, Format);
+	return Output;
 }
 
 ZEString& ZEString::operator=(const ZEString& String)
