@@ -41,7 +41,7 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEError.h"
 
-static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString** Parameters, ZESize Count)
+static bool ParseArgumentFormat(const char* ArgumentFormat, char** Parameters, ZESize Count)
 {
 	ZESize ParameterIndex = 0;
 
@@ -49,8 +49,12 @@ static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString** Parameter
 	ZESize ParameterStringIndex = 0;
 
 	const char* Current = ArgumentFormat;
+	ZEUInt Index = 0;
 	while(*Current != '\0')
 	{
+		if (Index >= 254)
+			return false;
+
 		if (*Current == ':')
 		{
 			if (ParameterIndex >= Count)
@@ -58,7 +62,7 @@ static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString** Parameter
 
 			ParameterString[ParameterStringIndex] = '\0';
 			if (ParameterStringIndex != 0)
-				*Parameters[ParameterIndex] = ParameterString;
+				strcpy(Parameters[ParameterIndex], ParameterString);
 			ParameterIndex++;
 			
 			ParameterString[0] = '\0';
@@ -71,44 +75,45 @@ static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString** Parameter
 		}
 
 		Current++;
+		Index++;
 	}
 
 	if (ParameterStringIndex != 0)
 	{
 		ParameterString[ParameterStringIndex] = '\0';
-		*Parameters[ParameterIndex] = ParameterString;
+		strcpy(Parameters[ParameterIndex], ParameterString);
 	}
 
 	return true;
 }
 
-static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString& Parameter0)
+static bool ParseArgumentFormat(const char* ArgumentFormat, char* Parameter0)
 {
-	ZEString* ArgumentFormatParameters[] = {&Parameter0};
+	char* ArgumentFormatParameters[] = {Parameter0};
 	return ParseArgumentFormat(ArgumentFormat, ArgumentFormatParameters, 1);
 }
 
-static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString& Parameter0, ZEString& Parameter1)
+static bool ParseArgumentFormat(const char* ArgumentFormat, char* Parameter0, char* Parameter1)
 {
-	ZEString* ArgumentFormatParameters[] = {&Parameter0, &Parameter1};
+	char* ArgumentFormatParameters[] = {Parameter0, Parameter1};
 	return ParseArgumentFormat(ArgumentFormat, ArgumentFormatParameters, 2);
 }
 
-static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString& Parameter0, ZEString& Parameter1, ZEString& Parameter2)
+static bool ParseArgumentFormat(const char* ArgumentFormat, char* Parameter0, char* Parameter1, char* Parameter2)
 {
-	ZEString* ArgumentFormatParameters[] = {&Parameter0, &Parameter1, &Parameter2};
+	char* ArgumentFormatParameters[] = {Parameter0, Parameter1, Parameter2};
 	return ParseArgumentFormat(ArgumentFormat, ArgumentFormatParameters, 3);
 }
 
-static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString& Parameter0, ZEString& Parameter1, ZEString& Parameter2, ZEString& Parameter3)
+static bool ParseArgumentFormat(const char* ArgumentFormat, char* Parameter0, char* Parameter1, char* Parameter2, char* Parameter3)
 {
-	ZEString* ArgumentFormatParameters[] = {&Parameter0, &Parameter1, &Parameter2, &Parameter3};
+	char* ArgumentFormatParameters[] = {Parameter0, Parameter1, Parameter2, Parameter3};
 	return ParseArgumentFormat(ArgumentFormat, ArgumentFormatParameters, 4);
 }
 
-static bool ParseArgumentFormat(const char* ArgumentFormat, ZEString& Parameter0, ZEString& Parameter1, ZEString& Parameter2, ZEString& Parameter3, ZEString& Parameter4)
+static bool ParseArgumentFormat(const char* ArgumentFormat, char* Parameter0, char* Parameter1, char* Parameter2, char* Parameter3, char* Parameter4)
 {
-	ZEString* ArgumentFormatParameters[] = {&Parameter0, &Parameter1, &Parameter2, &Parameter3, &Parameter4};
+	char* ArgumentFormatParameters[] = {Parameter0, Parameter1, Parameter2, Parameter3, Parameter4};
 	return ParseArgumentFormat(ArgumentFormat, ArgumentFormatParameters, 4);
 }
 
@@ -141,13 +146,13 @@ static void PrintFloat(ZEStringWriter& Output, float Argument, const char* Forma
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt Argument, const char* ArgumentFormat)
 {
-	ZEString Type = "d";
-	ZEString FormattingOptions;
+	char Type[256] = "d";
+	char FormattingOptions[256] = "";
 
 	if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
 		return false;
 
-	if (Type != "d" && Type != "x" && Type != "X")
+	if (Type[0] != 'd' && Type[0] != 'x' && Type[0] != 'X' && Type[1] != '\0')
 		return false;
 
 	if (!CheckArgumentFormat(FormattingOptions))
@@ -156,9 +161,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt Argument, const char
 	char Temp[256];
 	char Format[256];
 	if (FormattingOptions == NULL)
-		sprintf_s(Format, 256, "%%%s", Type.ToCString());
+		sprintf_s(Format, 256, "%%%s", Type);
 	else
-		sprintf_s(Format, 256, "%%%s%s", FormattingOptions.ToCString(), Type.ToCString());
+		sprintf_s(Format, 256, "%%%s%s", FormattingOptions, Type);
 	sprintf_s(Temp, 256, Format, Argument);
 	Output.Append(Temp);
 
@@ -168,27 +173,27 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt Argument, const char
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt Argument, const char* ArgumentFormat)
 {
-	ZEString Type = "d";
-	ZEString FormattingOptions;
+	char Type[256] = "d";
+	char FormattingOptions[256] = "";
 
 	if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
 		return false;
 
-	if (Type != "d" && Type != "x" && Type != "X")
+	if (Type[0] != 'd' && Type[0] != 'x' && Type[0] != 'X' && Type[1] != '\0')
 		return false;
 
 	if (!CheckArgumentFormat(FormattingOptions))
 		return false;
 
-	if (Type == "d")
-		Type = "u";
+	if (Type[0] == 'd')
+		Type[0] = 'u';
 
 	char Temp[256];
 	char Format[256];
 	if (FormattingOptions == NULL)
-		sprintf_s(Format, 256, "%%%s", Type.ToCString());
+		sprintf_s(Format, 256, "%%%s", Type);
 	else
-		sprintf_s(Format, 256, "%%%s%s", FormattingOptions.ToCString(), Type.ToCString());
+		sprintf_s(Format, 256, "%%%s%s", FormattingOptions, Type);
 	sprintf_s(Temp, 256, Format, Argument);
 	Output.Append(Temp);
 
@@ -197,23 +202,24 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt Argument, const cha
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt64 Argument,	const char* ArgumentFormat)
 {
-	ZEString Type = "d";
-	ZEString FormattingOptions;
+	char Type[256] = "d";
+	char FormattingOptions[256] = "";
 
-	ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions);
+	if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
+		return false;
 
-	if (Type != "d" && Type != "x" && Type != "X")
+	if (Type[0] != 'd' && Type[0] != 'x' && Type[0] != 'X' && Type[1] != '\0')
 		return false;
 
 	if (!CheckArgumentFormat(FormattingOptions))
 		return false;
 
 	const char* InnerType;
-	if (Type == "d")
+	if (Type[0] == 'd')
 		InnerType = "lld";
-	else if (Type == "x")
+	else if (Type[0] == 'x')
 		InnerType = "llx";
-	else if (Type == "X")
+	else if (Type[0] == 'X')
 		InnerType = "llX";
 	
 	char Temp[256];
@@ -221,7 +227,7 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt64 Argument,	const ch
 	if (FormattingOptions == NULL)
 		sprintf_s(Format, 256, "%%%s", InnerType);
 	else
-		sprintf_s(Format, 256, "%%%s%s", FormattingOptions.ToCString(), Type.ToCString());
+		sprintf_s(Format, 256, "%%%s%s", FormattingOptions, InnerType);
 	sprintf_s(Temp, 256, Format, Argument);
 	Output.Append(Temp);
 
@@ -230,23 +236,24 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt64 Argument,	const ch
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt64 Argument, const char* ArgumentFormat)
 {
-	ZEString Type = "d";
-	ZEString FormattingOptions;
+	char Type[256] = "d";
+	char FormattingOptions[256] = "";
 
-	ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions);
+	if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
+		return false;
 
-	if (Type != "d" && Type != "x" && Type != "X")
+	if (Type[0] != 'd' && Type[0] != 'x' && Type[0] != 'X' && Type[1] != '\0')
 		return false;
 
 	if (!CheckArgumentFormat(FormattingOptions))
 		return false;
 	
 	const char* InnerType;
-	if (Type == "d")
-		InnerType = "llu";
-	else if (Type == "x")
+	if (Type[0] == 'd')
+		InnerType = "lld";
+	else if (Type[0] == 'x')
 		InnerType = "llx";
-	else if (Type == "X")
+	else if (Type[0] == 'X')
 		InnerType = "llX";
 
 	char Temp[256];
@@ -254,7 +261,7 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt64 Argument, const c
 	if (FormattingOptions == NULL)
 		sprintf_s(Format, 256, "%%%s", InnerType);
 	else
-		sprintf_s(Format, 256, "%%%s%s", FormattingOptions.ToCString(), Type.ToCString());
+		sprintf_s(Format, 256, "%%%s%s", FormattingOptions, InnerType);
 	sprintf_s(Temp, 256, Format, Argument);
 	Output.Append(Temp);
 
@@ -263,9 +270,10 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt64 Argument, const c
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, float Argument, const char* ArgumentFormat)
 {
-	ZEString FormattingOptions;
+	char FormattingOptions[256] = "";
 
-	ParseArgumentFormat(ArgumentFormat, FormattingOptions);
+	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions))
+		return false;
 
 	if (!CheckArgumentFormat(FormattingOptions))
 		return false;
@@ -275,7 +283,7 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, float Argument, const char
 	if (FormattingOptions == NULL)
 		sprintf_s(Format, 256, "%%f");
 	else
-		sprintf_s(Format, 256, "%%%sf", FormattingOptions.ToCString());
+		sprintf_s(Format, 256, "%%%sf", FormattingOptions);
 	sprintf_s(Temp, 256, Format, Argument);
 	Output.Append(Temp);
 
@@ -284,8 +292,8 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, float Argument, const char
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, bool Argument, const char* ArgumentFormat)
 {
-	ZEString True = "true";
-	ZEString False = "false";
+	char True[256] = "true";
+	char False[256] = "false";
 	
 	if (!ParseArgumentFormat(ArgumentFormat, True, False))
 		return false;
@@ -297,10 +305,10 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, bool Argument, const char*
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector2& Argument, const char* ArgumentFormat)
 {
-	ZEString PreFix = "<";
-	ZEString PostFix = ">";
-	ZEString Comma = ", ";
-	ZEString FormattingOptions = ".03";
+	char PreFix[256] = "<";
+	char PostFix[256] = ">";
+	char Comma[256] = ", ";
+	char FormattingOptions[256] = ".03";
 
 	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
 		return false;
@@ -321,10 +329,10 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector2& Argument,
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector3& Argument, const char* ArgumentFormat)
 {
-	ZEString PreFix = "<";
-	ZEString PostFix = ">";
-	ZEString Comma = ", ";
-	ZEString FormattingOptions = ".03";
+	char PreFix[256] = "<";
+	char PostFix[256] = ">";
+	char Comma[256] = ", ";
+	char FormattingOptions[256] = ".03";
 
 	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
 		return false;
@@ -347,10 +355,10 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector3& Argument,
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector4& Argument, const char* ArgumentFormat)
 {
-	ZEString PreFix = "<";
-	ZEString PostFix = ">";
-	ZEString Comma = ", ";
-	ZEString FormattingOptions = ".03";
+	char PreFix[256] = "<";
+	char PostFix[256] = ">";
+	char Comma[256] = ", ";
+	char FormattingOptions[256] = ".03";
 
 	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
 		return false;
@@ -375,10 +383,10 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector4& Argument,
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEQuaternion& Argument, const char* ArgumentFormat)
 {
-	ZEString PreFix = "<";
-	ZEString PostFix = ">";
-	ZEString Comma = ", ";
-	ZEString FormattingOptions = ".03";
+	char PreFix[256] = "<";
+	char PostFix[256] = ">";
+	char Comma[256] = ", ";
+	char FormattingOptions[256] = ".03";
 
 	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
 		return false;
@@ -403,11 +411,11 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEQuaternion& Argume
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix3x3& Argument, const char* ArgumentFormat)
 {
-	ZEString FormattingOptions = ".03";
-	ZEString PreFix = "<";
-	ZEString PostFix = ">";
-	ZEString Comma = ", ";
-	ZEString Seperator = ", ";
+	char PreFix[256] = "<";
+	char PostFix[256] = ">";
+	char Comma[256] = ", ";
+	char FormattingOptions[256] = ".03";
+	char Seperator[256] = ", ";
 
 	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma, Seperator))
 		return false;
@@ -446,11 +454,11 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix3x3& Argumen
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix4x4& Argument,const char* ArgumentFormat)
 {
-	ZEString FormattingOptions = ".03";
-	ZEString PreFix = "<";
-	ZEString PostFix = ">";
-	ZEString Comma = ", ";
-	ZEString Seperator = ", ";
+	char PreFix[256] = "<";
+	char PostFix[256] = ">";
+	char Comma[256] = ", ";
+	char FormattingOptions[256] = ".03";
+	char Seperator[256] = ", ";
 
 	ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma, Seperator);
 
