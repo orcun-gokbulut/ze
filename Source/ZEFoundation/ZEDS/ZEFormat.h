@@ -41,15 +41,6 @@
 #include "ZEDS/ZEVariant.h"
 #include "ZETypes.h"
 
-class ZEStringWriter;
-class ZEVector2;
-class ZEVector3;
-class ZEVector4;
-class ZEQuaternion;
-class ZEMatrix3x3;
-class ZEMatrix4x4;
-class ZEObject;
-
 class ZEFormat
 {
 	private:

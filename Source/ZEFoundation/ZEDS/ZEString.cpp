@@ -60,7 +60,8 @@
 
 #include "ZEError.h"
 #include "ZEEndian.h"
-#include "ZEFormat.h"
+#include "ZEFormatArgument.h"
+#include "ZEStringWriter.h"
 
 
 ZEUInt ZECharacter::GetByteLength(const char* MultiByteCharacter)
@@ -713,9 +714,17 @@ void ZEString::SetBuffer(void* Buffer, ZESize Size)
 
 	Clear();
 	this->Buffer = (char*)Buffer;
+	this->Buffer[Size - 1] = '\0';
 	this->Allocator.Size = Size;
 }
 
+void ZEString::SetValue(void* Value, ZESize Size)
+{
+	BufferChanged = true;
+	this->Allocator.Reallocate(&Buffer, Size + 1);
+	memcpy(Buffer, Value, Size);
+	Buffer[Size] = '\0';
+}
 
 void ZEString::SetValue(const ZEString& String)
 {
@@ -853,42 +862,58 @@ void ZEString::SetValue(const ZECharacter& Character)
 
 void ZEString::SetValue(ZEInt8 Value, const char* Format)
 {
-	SetValue(ZEFormat::Format(Format, Value));
+	ZEStringWriter Writer;
+	ZEFormatArgument::Format(Writer, (ZEInt64)Value, Format);
+	Writer.Output(*this);
 }
 
 void ZEString::SetValue(ZEInt16 Value, const char* Format)
 {
-	SetValue(ZEFormat::Format(Format, Value));
+	ZEStringWriter Writer;
+	ZEFormatArgument::Format(Writer, (ZEInt64)Value, Format);
+	Writer.Output(*this);
 }
 
 void ZEString::SetValue(ZEInt32 Value, const char* Format)
 {
-	SetValue(ZEFormat::Format(Format, Value));
+	ZEStringWriter Writer;
+	ZEFormatArgument::Format(Writer, (ZEInt64)Value, Format);
+	Writer.Output(*this);
 }
 
 void ZEString::SetValue(ZEInt64 Value, const char* Format)
 {
-	SetValue(ZEFormat::Format(Format, Value));
+	ZEStringWriter Writer;
+	ZEFormatArgument::Format(Writer, (ZEInt64)Value, Format);
+	Writer.Output(*this);
 }
 
 void ZEString::SetValue(ZEUInt8 Value, const char* Format)
 {
-	SetValue(ZEFormat::Format(Format, Value));
+	ZEStringWriter Writer;
+	ZEFormatArgument::Format(Writer, (ZEUInt64)Value, Format);
+	Writer.Output(*this);
 }
 
 void ZEString::SetValue(ZEUInt16 Value, const char* Format)
 {
-	SetValue(ZEFormat::Format(Format, Value));
+	ZEStringWriter Writer;
+	ZEFormatArgument::Format(Writer, (ZEUInt64)Value, Format);
+	Writer.Output(*this);
 }
 
 void ZEString::SetValue(ZEUInt32 Value, const char* Format)
 {
-	SetValue(ZEFormat::Format(Format, Value));
+	ZEStringWriter Writer;
+	ZEFormatArgument::Format(Writer, (ZEUInt64)Value, Format);
+	Writer.Output(*this);
 }
 
 void ZEString::SetValue(ZEUInt64 Value, const char* Format)
 {
-	SetValue(ZEFormat::Format(Format, Value));
+	ZEStringWriter Writer;
+	ZEFormatArgument::Format(Writer, (ZEUInt64)Value, Format);
+	Writer.Output(*this);
 }
 
 void ZEString::SetValue(float Value, ZEUInt Digits)
@@ -902,7 +927,9 @@ void ZEString::SetValue(float Value, ZEUInt Digits)
 
 void ZEString::SetValue(float Value, const char* Format)
 {
-	SetValue(ZEFormat::Format(Format, Value));
+	ZEStringWriter Writer;
+	ZEFormatArgument::Format(Writer, Value, Format);
+	Writer.Output(*this);
 }
 
 void ZEString::SetValue(double Value, ZEUInt Digits)
@@ -916,12 +943,16 @@ void ZEString::SetValue(double Value, ZEUInt Digits)
 
 void ZEString::SetValue(double Value, const char* Format)
 {
-	SetValue(ZEFormat::Format(Format, Value));
+	ZEStringWriter Writer;
+	ZEFormatArgument::Format(Writer, (ZEUInt64)Value, Format);
+	Writer.Output(*this);
 }
 
 void ZEString::SetValue(bool Value, const char* Format)
 {
-	SetValue(ZEFormat::Format(Format, Value));
+	ZEStringWriter Writer;
+	ZEFormatArgument::Format(Writer, (ZEUInt64)Value, Format);
+	Writer.Output(*this);
 }
 
 const char* ZEString::GetValue() const
@@ -1833,69 +1864,97 @@ ZEString ZEString::FromWStdString(const std::wstring& Value)
 
 ZEString ZEString::FromInt8(ZEInt8 Value, const char* Format)
 {
-	return ZEFormat::Format(Format, Value);
+	ZEString Value;
+	Value.SetValue(Value, Format);
+	return Value;
 }
 
 ZEString ZEString::FromInt16(ZEInt16 Value, const char* Format)
 {
-	return ZEFormat::Format(Format, Value);
+	ZEString Value;
+	Value.SetValue(Value, Format);
+	return Value;
 }
 
 ZEString ZEString::FromInt32(ZEInt32 Value, const char* Format)
 {
-	return ZEFormat::Format(Format, Value);
+	ZEString Value;
+	Value.SetValue(Value, Format);
+	return Value;
 }
 
 ZEString ZEString::FromInt64(ZEInt64 Value, const char* Format)
 {
-	return ZEFormat::Format(Format, Value);
+	ZEString Value;
+	Value.SetValue(Value, Format);
+	return Value;
 }
 
 ZEString ZEString::FromUInt8(ZEUInt8 Value, const char* Format)
 {
-	return ZEFormat::Format(Format, Value);
+	ZEString Value;
+	Value.SetValue(Value, Format);
+	return Value;
 }
 
 ZEString ZEString::FromUInt16(ZEUInt16 Value, const char* Format)
 {
-	return ZEFormat::Format(Format, Value);
+	ZEString Value;
+	Value.SetValue(Value, Format);
+	return Value;
 }
 
 ZEString ZEString::FromUInt32(ZEUInt32 Value, const char* Format)
 {
-	return ZEFormat::Format(Format, Value);
-}
+	ZEString Value;
+	Value.SetValue(Value, Format);
+	return Value;
 
 ZEString ZEString::FromUInt64(ZEUInt64 Value, const char* Format)
 {
-	return ZEFormat::Format(Format, Value);
+	ZEString Value;
+	Value.SetValue(Value, Format);
+	return Value;
 }
 
 ZEString ZEString::FromFloat(float Value, ZEUInt Digits)
 {
-	ZEString Temp(Value, Digits);
-	return Temp;
+	ZEString Value;
+	Value.SetValue(Value, Digits);
+	return Value;
 }
 
 ZEString ZEString::FromFloat(float Value, const char* Format)
 {
-	return ZEFormat::Format(Format, Value);
+	ZEString Value;
+	Value.SetValue(Value, Format);
+	return Value;
 }
 
 ZEString ZEString::FromDouble(double Value, ZEUInt Digits)
 {
-	ZEString Temp(Value, Digits);
-	return Temp;
+	ZEString Value;
+	Value.SetValue(Value, Format);
+	return Value;
 }
 
 ZEString ZEString::FromDouble(double Value, const char* Format)
 {
-	return ZEFormat::Format(Format, Value);
+	ZEString Value;
+	Value.SetValue(Value, Format);
+	return Value;
 }
 
 ZEString ZEString::FromBool(bool Value, const char* TrueText, const char* FalseText)
 {
 	return Value ? TrueText : FalseText;
+}
+
+ZEString ZEString::FromBool(bool Value, const char* Format)
+{
+	ZEString Value;
+	Value.SetValue(Value, Format);
+	return Value;
 }
 
 ZEString& ZEString::operator=(const ZEString& String)
@@ -1988,21 +2047,27 @@ ZEString& ZEString::operator=(double Value)
 	return *this;
 }
 
-ZEString ZEString::operator+(const ZEString& String)
+ZEString& ZEString::operator=(bool Value)
+{
+	SetValue(Value);
+	return *this;
+}
+
+ZEString ZEString::operator+(const ZEString& String) const
 {
 	ZEString Temp(*this);
 	Temp.Append(String);
 	return Temp;
 }
 
-ZEString ZEString::operator+(const char* String)
+ZEString ZEString::operator+(const char* String) const
 {
 	ZEString Temp(*this);
 	Temp.Append(String);
 	return Temp;
 }
 
-ZEString ZEString::operator+(const wchar_t* String)
+ZEString ZEString::operator+(const wchar_t* String) const
 {
 	ZEString Result(*this);
 	ZEString Temp(String);
@@ -2011,14 +2076,14 @@ ZEString ZEString::operator+(const wchar_t* String)
 	return Result;
 }
 
-ZEString ZEString::operator+(const std::string& String)
+ZEString ZEString::operator+(const std::string& String) const
 {
 	ZEString Temp(*this);
 	Temp.Append(String.c_str());
 	return Temp;
 }
 
-ZEString ZEString::operator+(const std::wstring& String)
+ZEString ZEString::operator+(const std::wstring& String) const
 {
 	ZEString Result(*this);
 	ZEString Temp(String);
@@ -2027,52 +2092,57 @@ ZEString ZEString::operator+(const std::wstring& String)
 	return Result;
 }
 
-ZEString ZEString::operator+(ZEInt8 Value)
+ZEString ZEString::operator+(ZEInt8 Value) const
 {
 	return *this + ZEString(Value);
 }
 
-ZEString ZEString::operator+(ZEInt16 Value)
+ZEString ZEString::operator+(ZEInt16 Value) const
 {
 	return *this + ZEString(Value);
 }
 
-ZEString ZEString::operator+(ZEInt32 Value)
+ZEString ZEString::operator+(ZEInt32 Value) const
 {
 	return *this + ZEString(Value);
 }
 
-ZEString ZEString::operator+(ZEInt64 Value)
+ZEString ZEString::operator+(ZEInt64 Value) const
 {
 	return *this + ZEString(Value);
 }
 
-ZEString ZEString::operator+(ZEUInt8 Value)
+ZEString ZEString::operator+(ZEUInt8 Value) const
 {
 	return *this + ZEString(Value);
 }
 
-ZEString ZEString::operator+(ZEUInt16 Value)
+ZEString ZEString::operator+(ZEUInt16 Value) const
 {
 	return *this + ZEString(Value);
 }
 
-ZEString ZEString::operator+(ZEUInt32 Value)
+ZEString ZEString::operator+(ZEUInt32 Value) const
 {
 	return *this + ZEString(Value);
 }
 
-ZEString ZEString::operator+(ZEUInt64 Value)
+ZEString ZEString::operator+(ZEUInt64 Value) const
 {
 	return *this + ZEString(Value);
 }
 
-ZEString ZEString::operator+(float Value)
+ZEString ZEString::operator+(float Value) const
 {
 	return *this + ZEString(Value);
 }
 
-ZEString ZEString::operator+(double Value)
+ZEString ZEString::operator+(double Value) const
+{
+	return *this + ZEString(Value);
+}
+
+ZEString ZEString::operator+(bool Value) const
 {
 	return *this + ZEString(Value);
 }
@@ -2164,6 +2234,12 @@ ZEString& ZEString::operator+=(float Value)
 }
 
 ZEString& ZEString::operator+=(double Value)
+{
+	Append(ZEString(Value));
+	return *this;
+}
+
+ZEString& ZEString::operator+=(bool Value)
 {
 	Append(ZEString(Value));
 	return *this;
@@ -2369,6 +2445,13 @@ ZEString::ZEString(double Value)
 	SetValue(Value);
 }
 
+ZEString::ZEString(bool Value)
+{
+	Buffer = NULL;
+	WBuffer = NULL;
+	SetValue(Value);
+}
+
 ZEString::~ZEString()
 {
 	Clear();
@@ -2454,6 +2537,13 @@ ZEString operator+(float Value, const ZEString& String)
 }
 
 ZEString operator+(double Value, const ZEString& String)
+{
+	ZEString Temp(Value);
+	Temp.Append(String);
+	return Temp;
+}
+
+ZEString operator+(bool Value, const ZEString& String)
 {
 	ZEString Temp(Value);
 	Temp.Append(String);

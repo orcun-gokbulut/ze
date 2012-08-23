@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDelegate.h
+ Zinek Engine - ZEMacro.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,20 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DELEGATE_H__
-#define __ZE_DELEGATE_H__
+#pragma once
+#ifndef __ZE_MACRO_H__
+#define __ZE_MACRO_H__
 
-#define ZEBindFunction(Delegate, Function) do {Delegate.Bind<Function>());} while(false)
-#define ZEBindMethod(Delegate, Class, Function, Object) do {Delegate.Bind<Class, Function>(Object));} while(false)
-#define ZEBindMethodConst(Delegate, class, Function, Object) do {Delegate.BindConst<Class, Function>(Object));} while(false)
+#define ZE_MACRO_COMMA() ,
+#define ZE_MACRO_EMPTY()
 
-template <typename TSignature> 
-class ZEDelegate;
+#define ZE_MACRO_CONCAT(A, B) ZE_MACRO_CONCAT_INTERNAL(A, B)
+#define ZE_MACRO_CONCAT_INERNAL(A, B) A##B
 
-#define ZE_MACRO_INCLUDE_FILE_NAME "ZEDS/ZEDelegateImp.h"
-#define ZE_MACRO_INCLUDE_COUNT 30
-#include "ZEMacro/ZEMacroIncludeRepeater.h"
-#undef ZE_MACRO_INCLUDE_FILE_NAME
-#undef ZE_MACRO_INCLUDE_COUNT
+#define ZE_MACRO_STRING(Value) ZE_MACRO_STRING_INTERNAL(Value)
+#define ZE_MACRO_STRING_INTERNAL(Value) #Value
 
 #endif
