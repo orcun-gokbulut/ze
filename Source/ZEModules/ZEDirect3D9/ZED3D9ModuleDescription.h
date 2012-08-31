@@ -55,7 +55,3 @@ class ZED3D9ModuleDescription : public ZEModuleDescription
 		virtual bool					CheckCompatible();
 };
 #endif
-
-
-
-

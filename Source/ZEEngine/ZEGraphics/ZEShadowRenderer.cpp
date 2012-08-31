@@ -45,7 +45,3 @@ ZEShadowRenderer* ZEShadowRenderer::CreateInstance()
 {
 	return zeGraphics->CreateShadowRenderer();
 }
-
-
-
-

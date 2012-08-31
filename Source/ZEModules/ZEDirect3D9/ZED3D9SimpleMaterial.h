@@ -71,7 +71,3 @@ class ZED3D9SimpleMaterial : public ZESimpleMaterial, public ZED3D9ComponentBase
 };
 
 #endif
-
-
-
-

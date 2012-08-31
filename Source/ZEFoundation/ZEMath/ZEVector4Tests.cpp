@@ -652,4 +652,3 @@ ZETestSuite(ZEVector4)
 		}
 	}
 }
-

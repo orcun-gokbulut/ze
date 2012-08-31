@@ -211,6 +211,3 @@ ZEPhysicalCharacterController* ZEPhysXModule::CreatePhysicalController()
 {
 	return NULL;
 }
-
-
-

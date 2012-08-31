@@ -54,7 +54,3 @@ ZEPostProcessorNode* ZED3D9PostProcessor::CreateNode(ZESize TypeId)
 {
 	return NULL;
 }
-
-
-
-

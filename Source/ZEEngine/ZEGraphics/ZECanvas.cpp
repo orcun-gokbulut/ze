@@ -861,7 +861,3 @@ ZECanvas::ZECanvas()
 	Scale = ZEVector3::One;
 	Color = ZEVector4::One;
 }
-
-
-
-

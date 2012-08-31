@@ -114,7 +114,3 @@ class ZEQuaternion
 
 
 #endif
-
-
-
-

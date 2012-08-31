@@ -81,7 +81,3 @@ class ZEPhysicalWorld
 };
 
 #endif
-
-
-
-

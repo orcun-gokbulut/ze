@@ -73,7 +73,3 @@ class ZETriangle
 };
 
 #endif
-
-
-
-

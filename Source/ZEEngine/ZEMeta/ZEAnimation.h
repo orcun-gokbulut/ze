@@ -124,7 +124,3 @@ class ZEAnimationController
 										~ZEAnimationController();
 };
 #endif
-
-
-
-

@@ -91,8 +91,3 @@ class ZEGame
 		static ZEGame*					GetInstance();
 };
 #endif
-
-
-
-
-

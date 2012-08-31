@@ -122,7 +122,3 @@ class ZEALModule : public ZESoundModule
 		virtual ZEListener*						CreateListener();
 };		
 #endif
-
-
-
-

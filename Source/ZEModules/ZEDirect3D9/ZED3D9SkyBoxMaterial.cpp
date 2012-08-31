@@ -121,7 +121,3 @@ void ZED3D9SkyBoxMaterial::Release()
 {
 	ReleaseShaders();
 }
-
-
-
-

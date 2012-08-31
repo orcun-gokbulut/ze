@@ -81,7 +81,3 @@ class ZEPlane
 };
 
 #endif
-
-
-
-

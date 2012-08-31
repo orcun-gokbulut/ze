@@ -301,7 +301,3 @@ const ZEMaterialResource* ZEMaterialResource::LoadSharedResource(const ZEString&
 	else
 		return NewResource;
 }
-
-
-
-

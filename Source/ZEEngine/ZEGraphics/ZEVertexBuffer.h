@@ -94,7 +94,3 @@ class ZEArrayVertexBuffer : public ZEDynamicVertexBuffer, public ZEArray<_Vertex
 };
 
 #endif
-
-
-
-

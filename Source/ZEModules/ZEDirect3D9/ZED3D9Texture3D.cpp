@@ -119,10 +119,3 @@ void ZED3D9Texture3D::Destroy()
 	GetModule()->Texture3Ds.DeleteValue((ZED3D9Texture3D*)this);
 	delete this;
 }
-
-
-
-
-
-
-

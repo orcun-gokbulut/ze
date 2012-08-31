@@ -164,7 +164,3 @@ void ZEDSListener::Tick(float ElapsedTime)
 // 		GetModule()->GetListener()->SetVelocity(WorldVelocity.x, WorldVelocity.y, WorldVelocity.z, DS3D_DEFERRED);	
 // 	}
 }
-
-
-
-

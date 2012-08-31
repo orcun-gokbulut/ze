@@ -2572,4 +2572,3 @@ bool operator!=(const wchar_t* String1, const ZEString& String2)
 	ZEString Temp(String1);
 	return !String2.Equals(Temp);
 }
-

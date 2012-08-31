@@ -91,7 +91,3 @@ class ZERectangle
 								ZERectangle(const ZEVector2& LeftUp, float Width, float Height);
 };
 #endif
-
-
-
-

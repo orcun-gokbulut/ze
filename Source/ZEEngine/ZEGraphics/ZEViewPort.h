@@ -50,7 +50,3 @@ class ZEViewPort
 };
 
 #endif
-
-
-
-

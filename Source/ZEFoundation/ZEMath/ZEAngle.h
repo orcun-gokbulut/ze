@@ -79,7 +79,3 @@ class ZEAngle
 };
 
 #endif
-
-
-
-

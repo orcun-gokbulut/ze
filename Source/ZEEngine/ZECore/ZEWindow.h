@@ -99,8 +99,3 @@ class ZEWindow
 								~ZEWindow();
 };
 #endif
-
-
-
-
-

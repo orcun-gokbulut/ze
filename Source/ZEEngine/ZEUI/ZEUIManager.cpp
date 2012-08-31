@@ -484,7 +484,3 @@ ZEUIManager* ZEUIManager::CreateInstance()
 {
 	return new ZEUIManager();
 }
-
-
-
-

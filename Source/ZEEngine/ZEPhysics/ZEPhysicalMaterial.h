@@ -68,7 +68,3 @@ class ZEPhysicalMaterial
 };
 
 #endif
-
-
-
-

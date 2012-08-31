@@ -65,7 +65,3 @@
 #define ZE_SHADER_ALPHA_CULL				(1 << 22)
 #define ZE_SHADER_VERTEX_COLOR				(1 << 23)
 #endif
-
-
-
-

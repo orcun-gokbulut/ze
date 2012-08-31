@@ -315,7 +315,3 @@ const char* zeGetKeyboardButtonShortName(unsigned char Key)
 {
 	return KeyNames[Key][0];
 }
-
-
-
-

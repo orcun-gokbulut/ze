@@ -347,7 +347,3 @@ class ZEVector4
 ZEVector4 operator*(float S, const ZEVector4& RightOperand);
 
 #endif
-
-
-
-

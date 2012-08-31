@@ -45,6 +45,3 @@ ZEPhysicalRigidBody* ZEPhysicalRigidBody::CreateInstance()
 {
 	return zePhysics->CreatePhysicalRigidBody();
 }
-
-
-

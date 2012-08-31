@@ -140,7 +140,3 @@ float ZEPPBlurNode::GetStandartDeviation()
 {
 	return StandartDeviation;
 }
-
-
-
-

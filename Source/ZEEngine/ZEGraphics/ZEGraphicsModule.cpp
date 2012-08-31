@@ -266,7 +266,3 @@ ZEGraphicsModule* ZEGraphicsModule::GetInstance()
 {
 	return ZECore::GetInstance()->GetGraphicsModule();
 }
-
-
-
-

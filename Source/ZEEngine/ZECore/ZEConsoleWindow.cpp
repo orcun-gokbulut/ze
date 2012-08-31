@@ -246,8 +246,3 @@ ZEConsoleWindow::~ZEConsoleWindow(void)
 {
 }
 #pragma warning(pop)
-
-
-
-
-

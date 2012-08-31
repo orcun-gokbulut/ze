@@ -273,7 +273,3 @@ class ZEParticleUVModifier : public ZEParticleModifier
 };
 
 #endif
-
-
-
-

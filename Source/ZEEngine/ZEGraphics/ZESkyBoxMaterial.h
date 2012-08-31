@@ -69,7 +69,3 @@ class ZESkyBoxMaterial : public ZEMaterial
 };
 
 #endif
-
-
-
-

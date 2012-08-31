@@ -145,7 +145,3 @@ ZEPostProcessor* ZEPostProcessor::CreateInstance()
 {
 	return zeGraphics->CreatePostProcessor();
 }
-
-
-
-

@@ -88,7 +88,3 @@ ZEUIMaterial* ZEUIMaterial::CreateInstance()
 {
 	return zeGraphics->CreateUIMaterial();
 }
-
-
-
-

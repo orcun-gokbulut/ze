@@ -123,4 +123,3 @@ class ZEModelMesh
 											~ZEModelMesh();
 };
 #endif
-

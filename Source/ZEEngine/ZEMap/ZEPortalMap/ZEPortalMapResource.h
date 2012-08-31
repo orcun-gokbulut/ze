@@ -124,7 +124,3 @@ class ZEPortalMapResource : public ZEMapResource
 		static void									CacheResource(const ZEString& FileName);
 };
 #endif
-
-
-
-

@@ -93,8 +93,3 @@ ZEErrorManager::~ZEErrorManager()
 {
 	ZEOptionManager::GetInstance()->UnregisterSection(&ErrorOptions);
 }
-
-
-
-
-

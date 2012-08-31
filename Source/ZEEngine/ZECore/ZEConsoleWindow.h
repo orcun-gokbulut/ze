@@ -63,8 +63,3 @@ class ZEConsoleWindow : public ZEConsoleInterface
 								~ZEConsoleWindow();
 };
 #endif
-
-
-
-
-

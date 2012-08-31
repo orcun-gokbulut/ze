@@ -292,7 +292,3 @@ ZEBSphere::ZEBSphere(const ZEVector3& Position, float Radius)
 	ZEBSphere::Position = Position;
 	ZEBSphere::Radius = Radius;
 }
-
-
-
-

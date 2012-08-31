@@ -74,7 +74,3 @@ class ZEBSphere
 								ZEBSphere(const ZEVector3& Position, float Radius);
 };
 #endif
-
-
-
-

@@ -731,7 +731,3 @@ ZECore::~ZECore()
 	delete SystemMessageHandler;
 	delete SystemMessageManager;
 }
-
-
-
-

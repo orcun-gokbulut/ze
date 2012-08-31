@@ -126,7 +126,3 @@ struct ZEColoredVertex
 };
 
 #endif
-
-
-
-

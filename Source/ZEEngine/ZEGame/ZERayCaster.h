@@ -57,8 +57,3 @@ class ZERayCaster
 };
 
 #endif
-
-
-
-
-

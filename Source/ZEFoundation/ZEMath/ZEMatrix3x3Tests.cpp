@@ -588,4 +588,3 @@ ZETestSuite(ZEMatrix3x3)
 		ZETestCheckEqual(Matrix, ZEMatrix3x3(1.2f, 3.6f, 15.6f, 1.2f, 6.0f, 25.2f, 2.4f, 9.6f, 40.8f));
 	}
 }
-

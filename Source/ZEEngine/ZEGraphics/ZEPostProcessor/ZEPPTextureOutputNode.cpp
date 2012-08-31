@@ -87,7 +87,3 @@ ZEPPTextureOutputNode* ZEPPTextureOutputNode::CreateInstance()
 {
 	return new ZEPPTextureOutputNode();
 }
-
-
-
-

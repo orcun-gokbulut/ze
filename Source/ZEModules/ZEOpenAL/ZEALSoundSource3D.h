@@ -99,7 +99,3 @@ class ZEALSoundSource3D : public ZESoundSource3D, public ZEALComponentBase
 		virtual void			SetConeOutsideVolume(ZEUInt NewOutsideVolume);
 };
 #endif
-
-
-
-

@@ -48,7 +48,3 @@ void ZEMap::Destroy()
 {
 	delete this;
 }
-
-
-
-

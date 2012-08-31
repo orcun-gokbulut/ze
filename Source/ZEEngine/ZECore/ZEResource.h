@@ -73,8 +73,3 @@ class ZEResource
 		void					Release();
 };
 #endif
-
-
-
-
-

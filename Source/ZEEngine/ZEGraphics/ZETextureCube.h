@@ -79,7 +79,3 @@ class ZETextureCube : public ZETexture
 		static ZETextureCube*		CreateInstance();
 };
 #endif
-
-
-
-
