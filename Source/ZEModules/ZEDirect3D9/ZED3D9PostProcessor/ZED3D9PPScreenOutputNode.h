@@ -60,7 +60,3 @@ class ZED3D9PPScreenOutputNode : public ZEPPScreenOutputNode, public ZED3D9Compo
 };
 
 #endif
-
-
-
-

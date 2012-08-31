@@ -352,7 +352,3 @@ ZETextureCubeResource::~ZETextureCubeResource()
 	if (Texture != NULL)
 		Texture->Destroy();
 };
-
-
-
-

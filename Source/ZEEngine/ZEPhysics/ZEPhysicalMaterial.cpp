@@ -50,4 +50,3 @@ ZEPhysicalMaterial* ZEPhysicalMaterial::CreateInstance()
 {
 	return ZEPhysicsModule::GetInstance()->CreatePhysicalMaterial();
 }
-

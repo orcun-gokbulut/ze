@@ -70,7 +70,3 @@ class ZED3D9TextureCube : public ZETextureCube, public ZED3D9ComponentBase
 		virtual void					Destroy();
 };
 #endif
-
-
-
-

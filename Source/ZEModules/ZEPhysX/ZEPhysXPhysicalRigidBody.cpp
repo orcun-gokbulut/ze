@@ -609,5 +609,3 @@ void ZEPhysXPhysicalRigidBody::Deinitialize()
 		Actor = NULL;
 	}
 }
-
-

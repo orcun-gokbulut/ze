@@ -116,7 +116,3 @@ bool ZEPPFilter1DNode::GetVerticalPass()
 {
 	return VerticalPass;
 }
-
-
-
-

@@ -94,7 +94,3 @@ ZETexture2D* ZEPPFilter2DNode::GetOutput()
 {
 	return Output;
 }
-
-
-
-

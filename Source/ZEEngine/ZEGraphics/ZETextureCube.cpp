@@ -78,7 +78,3 @@ ZETextureCube* ZETextureCube::CreateInstance()
 {
 	return zeGraphics->CreateTextureCube();
 }
-
-
-
-

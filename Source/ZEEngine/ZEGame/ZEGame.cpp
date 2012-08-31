@@ -171,8 +171,3 @@ ZEGame* ZEGame::GetInstance()
 {
 	return zeCore->GetGame();
 }
-
-
-
-
-

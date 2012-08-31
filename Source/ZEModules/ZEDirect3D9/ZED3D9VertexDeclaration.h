@@ -70,7 +70,3 @@ class ZED3D9VertexDeclaration : public ZEVertexDeclaration, private ZED3D9Compon
 };
 
 #endif
-
-
-
-

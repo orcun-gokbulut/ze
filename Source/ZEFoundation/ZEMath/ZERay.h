@@ -66,7 +66,3 @@ class ZERay : public ZELine
 							ZERay();
 };
 #endif
-
-
-
-

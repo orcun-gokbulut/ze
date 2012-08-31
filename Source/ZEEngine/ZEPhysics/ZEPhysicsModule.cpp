@@ -42,7 +42,3 @@ ZEPhysicsModule* ZEPhysicsModule::GetInstance()
 {
 	return ZECore::GetInstance()->GetPhysicsModule();
 }
-
-
-
-

@@ -88,7 +88,3 @@ bool ZED3D9ModuleDescription::CheckCompatible()
 {
 	return true;
 }
-
-
-
-

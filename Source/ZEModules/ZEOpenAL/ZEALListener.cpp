@@ -178,7 +178,3 @@ void ZEALListener::Tick(float ElapsedTime)
 	const ZEVector3& WorldVelocity = ZEVector3::Zero; /*GetWorldVelocity();*/
 	alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);
 }
-
-
-
-

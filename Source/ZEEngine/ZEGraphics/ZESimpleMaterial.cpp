@@ -156,7 +156,3 @@ ZESimpleMaterial* ZESimpleMaterial::CreateInstance()
 {
 	return zeGraphics->CreateSimpleMaterial();
 }
-
-
-
-

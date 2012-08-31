@@ -244,7 +244,3 @@ const ZEArray<ZEVector3>& ZEPhysicalConvexShape::GetConvexVertices()
 {
 	return ConvexVertices;
 }
-
-
-
-

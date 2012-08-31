@@ -67,7 +67,3 @@ class ZETexture3DResource : public ZETextureResource
 };
 
 #endif
-
-
-
-

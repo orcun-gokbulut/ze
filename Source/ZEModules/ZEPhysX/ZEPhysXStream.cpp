@@ -372,7 +372,3 @@ NxStream& ZEPhysXMemoryReadStream::storeBuffer(const void* buffer, NxU32 size)
 	zeDebugCheck(true, "ZEPhysXMemoryReadStream can only used for reading.");
 	return *this;
 }
-
-
-
-

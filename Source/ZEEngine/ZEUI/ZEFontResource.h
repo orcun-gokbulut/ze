@@ -80,7 +80,3 @@ class ZEFontResource : public ZEResource
 
 };
 #endif
-
-
-
-

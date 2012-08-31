@@ -70,7 +70,3 @@ class ZETexture3D : public ZETexture
 };
 
 #endif
-
-
-
-

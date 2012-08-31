@@ -46,7 +46,3 @@ ZEPhysicalWorld* ZEPhysicalWorld::CreateInstance()
 {
 	return zePhysics->CreatePhysicalWorld();
 }
-
-
-
-

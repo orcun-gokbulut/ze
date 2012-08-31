@@ -40,8 +40,3 @@
 // CMake provides !!!
 
 #endif
-
-
-
-
-

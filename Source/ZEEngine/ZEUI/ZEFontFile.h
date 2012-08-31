@@ -52,7 +52,3 @@ struct ZEFontFileHeader
 	ZEUInt32					TextureCount;
 	ZEFontFileCharacter			Characters[ZE_FONT_FILE_CHARACTER_COUNT];
 };
-
-
-
-

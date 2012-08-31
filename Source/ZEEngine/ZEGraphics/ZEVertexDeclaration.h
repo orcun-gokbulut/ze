@@ -113,7 +113,3 @@ enum ZEVertexType
 	ZE_VT_GUIVERTEX				= 5
 };
 #endif
-
-
-
-

@@ -184,8 +184,3 @@ ZEUITextControl::~ZEUITextControl()
 	if (FontResource != NULL)
 		FontResource->Release();
 }
-
-
-
-
-

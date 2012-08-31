@@ -71,7 +71,3 @@ class ZED3D9PPBlurNode : public ZEPPBlurNode, private ZED3D9ComponentBase
 };
 
 #endif
-
-
-
-

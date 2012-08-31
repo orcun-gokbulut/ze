@@ -188,7 +188,3 @@ void ZED3D9TextureCube::Destroy()
 	GetModule()->TextureCubes.DeleteValue((ZED3D9TextureCube*)this);
 	delete this;
 }
-
-
-
-

@@ -113,7 +113,3 @@ class ZETexture
 };
 
 #endif
-
-
-
-

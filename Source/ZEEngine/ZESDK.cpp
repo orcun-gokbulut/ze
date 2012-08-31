@@ -61,8 +61,3 @@ ZECore* zeGetCore()
 {
 	return zeCore;
 }
-
-
-
-
-

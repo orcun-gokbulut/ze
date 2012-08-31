@@ -119,8 +119,3 @@ ZEResourceManager*  ZEResourceManager::GetInstance()
 }
 
 #pragma warning(pop)
-
-
-
-
-

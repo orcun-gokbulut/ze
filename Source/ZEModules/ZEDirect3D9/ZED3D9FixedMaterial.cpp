@@ -523,7 +523,3 @@ void ZED3D9FixedMaterial::Release()
 {
 	ReleaseShaders();
 }
-
-
-
-

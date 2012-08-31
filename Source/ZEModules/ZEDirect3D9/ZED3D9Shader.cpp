@@ -129,4 +129,3 @@ ZED3D9VertexShader* ZED3D9VertexShader::CreateShader(const char* FileName, const
 {
 	return ZED3D9ShaderManager::GetInstance()->GetVertexShader(FileName, FunctionName, Components, Profile);
 }
-

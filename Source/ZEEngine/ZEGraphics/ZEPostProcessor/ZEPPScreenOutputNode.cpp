@@ -65,7 +65,3 @@ ZEPostProcessorNode* ZEPPScreenOutputNode::GetInput()
 {
 	return Input;
 }
-
-
-
-

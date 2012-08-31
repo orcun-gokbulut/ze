@@ -179,7 +179,3 @@ struct ZEMaterialFileFixedMaterialChunk
 };
 
 #endif
-
-
-
-

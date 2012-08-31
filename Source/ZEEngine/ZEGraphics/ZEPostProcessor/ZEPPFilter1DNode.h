@@ -85,7 +85,3 @@ class ZEPPFilter1DNode : public ZEPostProcessorNode
 };
 
 #endif
-
-
-
-

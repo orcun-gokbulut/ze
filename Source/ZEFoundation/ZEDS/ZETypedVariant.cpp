@@ -181,8 +181,3 @@ ZETypedVariant::~ZETypedVariant()
 	SetType(ZE_VRT_UNDEFINED);
 }
 #pragma warning(pop)
-
-
-
-
-

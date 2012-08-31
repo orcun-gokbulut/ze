@@ -114,5 +114,3 @@ ZEPortalMapDoor* ZEPortalMapDoor::CreateInstance()
 {
 	return new ZEPortalMapDoor();
 }
-
-

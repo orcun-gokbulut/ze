@@ -66,7 +66,3 @@ ZEPPTextureInputNode* ZEPPTextureInputNode::CreateInstance()
 {
 	return new ZEPPTextureInputNode();
 }
-
-
-
-

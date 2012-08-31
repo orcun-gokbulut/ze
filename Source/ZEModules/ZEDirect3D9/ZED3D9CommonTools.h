@@ -80,7 +80,3 @@ class ZED3D9CommonTools : public ZED3D9ComponentBase
 		static bool				CreateRenderTarget(LPDIRECT3DSURFACE9* Target, ZEInt Width, ZEInt Height, ZETexturePixelFormat Format);*/
 };
 #endif
-
-
-
-

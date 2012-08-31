@@ -84,7 +84,3 @@ class ZEPortalMapPortal
 };
 
 #endif
-
-
-
-

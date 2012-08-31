@@ -523,7 +523,3 @@ ZEDirectInputModule::~ZEDirectInputModule()
 {
 	Deinitialize();
 }
-
-
-
-

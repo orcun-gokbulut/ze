@@ -58,7 +58,3 @@ class ZEUIRectangle
 								ZEUIRectangle();
 };
 #endif
-
-
-
-

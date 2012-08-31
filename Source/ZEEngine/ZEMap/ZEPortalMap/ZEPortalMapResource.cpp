@@ -486,7 +486,3 @@ ZEPortalMapResource::~ZEPortalMapResource()
 		TextureResources[I]->Release();
 	TextureResources.Clear();
 }
-
-
-
-

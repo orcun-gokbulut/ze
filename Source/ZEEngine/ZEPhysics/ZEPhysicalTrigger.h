@@ -103,7 +103,3 @@ class ZEPhysicalTrigger: public ZEPhysicalObject
 };
 
 #endif
-
-
-
-

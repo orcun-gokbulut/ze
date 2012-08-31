@@ -48,7 +48,3 @@ bool ZEALComponentBase::BaseInitialize(ZEALModule* Mdl)
 
 	return true;
 }
-
-
-
-

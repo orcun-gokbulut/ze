@@ -71,7 +71,3 @@ class ZED3D9SkyBoxMaterial : public ZESkyBoxMaterial, public ZED3D9ComponentBase
 };
 
 #endif
-
-
-
-

@@ -150,7 +150,3 @@ ZERectangle3D::ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEV
 	this->P3 = P3;
 	this->P4 = P4;
 }
-
-
-
-

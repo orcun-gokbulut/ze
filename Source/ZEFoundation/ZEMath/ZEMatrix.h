@@ -232,7 +232,3 @@ class ZEMatrix4x4
 ZEMatrix4x4 operator*(float S, const ZEMatrix4x4& RightOperand);
 
 #endif
-
-
-
-

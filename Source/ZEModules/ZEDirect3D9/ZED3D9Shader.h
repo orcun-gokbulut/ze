@@ -110,7 +110,3 @@ class ZED3D9VertexShader : public ZED3D9Shader
 };
 
 #endif
-
-
-
-

@@ -45,7 +45,3 @@ ZEPhysicalMesh* ZEPhysicalMesh::CreateInstance()
 {
 	return zePhysics->CreatePhysicalStaticMesh();
 }
-
-
-
-

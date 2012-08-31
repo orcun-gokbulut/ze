@@ -70,7 +70,3 @@ class ZELine
 							ZELine();
 };
 #endif
-
-
-
-

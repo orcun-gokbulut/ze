@@ -62,7 +62,3 @@ class ZEPPTextureInputNode : public ZEPostProcessorNode
 };
 
 #endif
-
-
-
-

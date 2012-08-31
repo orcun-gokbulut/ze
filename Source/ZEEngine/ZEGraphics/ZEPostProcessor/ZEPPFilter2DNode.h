@@ -75,7 +75,3 @@ class ZEPPFilter2DNode : public ZEPostProcessorNode
 		virtual ZETexture2D*					GetOutput();
 };
 #endif
-
-
-
-

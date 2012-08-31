@@ -60,8 +60,3 @@ class ZEPluginManager
 		static ZEPluginManager*				GetInstance();
 };
 #endif
-
-
-
-
-

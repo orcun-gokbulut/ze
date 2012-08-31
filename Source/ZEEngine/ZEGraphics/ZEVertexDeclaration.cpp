@@ -171,8 +171,3 @@ ZEVertexDeclaration* ZEVertexDeclaration::CreateInstance()
 {
 	return zeGraphics->CreateVertexDeclaration();
 }
-
-
-
-
-

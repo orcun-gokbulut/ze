@@ -46,7 +46,3 @@ struct ZEIndexedPolygon
 };
 
 #endif
-
-
-
-

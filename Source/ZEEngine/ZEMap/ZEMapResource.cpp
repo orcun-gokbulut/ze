@@ -49,7 +49,3 @@ void ZEMapResource::CacheResource(const ZEString& FileName)
 {
 	ZEPortalMapResource::CacheResource(FileName);
 }
-
-
-
-

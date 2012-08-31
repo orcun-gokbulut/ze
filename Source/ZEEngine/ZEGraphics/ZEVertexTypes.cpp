@@ -193,7 +193,3 @@ ZEVertexDeclaration* ZEColoredVertex::GetVertexDeclaration()
 	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEColoredVertex), "Vertex decleration size does not matches.");
 	return VertexDeclaration;
 }
-
-
-
-

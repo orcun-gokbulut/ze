@@ -142,8 +142,3 @@ ZESceneDebugDraw::~ZESceneDebugDraw()
 {
 	Deinitialize();
 }
-
-
-
-
-

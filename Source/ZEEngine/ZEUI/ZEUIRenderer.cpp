@@ -158,7 +158,3 @@ ZEUIRenderer* ZEUIRenderer::CreateInstance()
 {
 	return new ZEUIRenderer();
 }
-
-
-
-

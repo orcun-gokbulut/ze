@@ -71,7 +71,3 @@ class ZELineSegment : public ZELine
 							ZELineSegment();
 };
 #endif
-
-
-
-

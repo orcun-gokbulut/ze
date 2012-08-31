@@ -108,7 +108,3 @@ class ZERenderCommand
 		void							SetZero();
 };
 #endif
-
-
-
-

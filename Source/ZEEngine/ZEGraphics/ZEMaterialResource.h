@@ -77,7 +77,3 @@ class ZEMaterialResource : public ZEResource
 };
 
 #endif
-
-
-
-

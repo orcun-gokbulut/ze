@@ -49,7 +49,3 @@ bool ZEDSComponentBase::BaseInitialize(ZEDSModule* Mdl)
 	PrimaryBuffer = Mdl->GetPrimaryBuffer();
 	return true;
 }
-
-
-
-

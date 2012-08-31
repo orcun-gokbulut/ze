@@ -588,4 +588,3 @@ ZETestSuite(ZEAABBox)
 		ZETestCheck(ZETestCheckAABBoxRayIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
 	}
 }
-

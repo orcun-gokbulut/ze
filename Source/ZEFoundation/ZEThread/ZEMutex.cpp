@@ -45,4 +45,3 @@ ZEMutex ZEMutex::operator=(const ZEMutex& Lock)
 {
     return ZEMutex();
 }
-
