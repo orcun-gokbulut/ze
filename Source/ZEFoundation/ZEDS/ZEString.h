@@ -48,13 +48,11 @@ class ZECharacter
 	friend class ZEString;
 
 	private:
-		/*FIX*/mutable char			Characters[4];
+		char					Characters[4];
 		ZEUInt					Size;
 
-		/*FIX*/mutable ZEString*		Owner;
+		ZEString*				Owner;
 		ZESize					Position;
-
-		/*FIX*/static ZEUInt	GetByteLength(const char* MultiByteCharacter);
 
 	public:
 		void					SetValue(char Character);
@@ -127,10 +125,6 @@ class ZEString
 		wchar_t*					WBuffer;
 		ZEAllocatorBase<wchar_t>	WAllocator;
 
-		/*FIX*/static ZESize			GetBytePosition(const char* String, ZESize CharacterPosition);
-		/*FIX*/static char*				IncrementByCharacter(const char* Position);
-		/*FIX*/static char*				DecrementByCharacter(const char* Start, const char* Position);
-
 	public:
 		void						SetBuffer(void* Buffer, ZESize Size);
 
@@ -151,9 +145,7 @@ class ZEString
 		void						SetValue(ZEUInt16 Value, const char* Format = NULL);
 		void						SetValue(ZEUInt32 Value, const char* Format = NULL);
 		void						SetValue(ZEUInt64 Value, const char* Format = NULL);
-		/*REMOVE*/void				SetValue(float Value, ZEUInt Digits);
 		void						SetValue(float Value, const char* Format = NULL);
-		/*REMOVE*/void				SetValue(double Value, ZEUInt Digits);
 		void						SetValue(double Value, const char* Format = NULL);
 		void						SetValue(bool Value, const char* Format = NULL);
 
@@ -231,12 +223,9 @@ class ZEString
 		static ZEString 			FromUInt16(ZEUInt16 Value, const char* Format = NULL);
 		static ZEString 			FromUInt32(ZEUInt32 Value, const char* Format = NULL);
 		static ZEString 			FromUInt64(ZEUInt64 Value, const char* Format = NULL);
-		/*REMOVE*/static ZEString 	FromFloat(float Value, ZEUInt Digits);
 		static ZEString 			FromFloat(float Value, const char* Format = NULL);
-		/*REMOVE*/static ZEString 	FromDouble(double Value, ZEUInt Digits);
 		static ZEString 			FromDouble(double Value, const char* Format = NULL);
-		/*REMOVE*/static ZEString 	FromBool(bool Value, const char* TrueText = "True", const char* FalseText = "False");
-		/*REMOVE*/static ZEString 	FromBool(bool Value, const char* Format = NULL);
+		static ZEString 			FromBool(bool Value, const char* Format = NULL);
 
 		ZEString&					operator=(const ZEString& String);
 		ZEString&					operator=(const char* String);
@@ -320,9 +309,7 @@ class ZEString
 									ZEString(ZEUInt16 Value);
 									ZEString(ZEUInt32 Value);
 									ZEString(ZEUInt64 Value);
-						/*REMOVE*/	ZEString(float Value, ZEUInt Digists);
 									ZEString(float Value);
-						/*REMOVE*/	ZEString(double Value, ZEUInt Digists);
 									ZEString(double Value);
 									ZEString(bool Value);
 									~ZEString();

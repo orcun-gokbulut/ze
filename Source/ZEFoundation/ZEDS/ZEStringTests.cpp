@@ -242,21 +242,6 @@ ZETestSuite(ZEString)
 		}
 	}
 
-	ZETest("ZEString ZEString::FromBool(bool Value, const char* TrueText, const char* FalseText)")
-	{
-		ZETestCase("True")
-		{
-			ZEString StringA;
-			ZETestCheck(StringA.FromBool(1,"True","False") == "True");
-		}
-
-		ZETestCase("False")
-		{
-			ZEString StringA;
-			ZETestCheck(StringA.FromBool(0,"True","False") == "False");
-		}
-	}
-
 	ZETest("ZEString ZEString::FromChar(char Value)")
 	{
 		char C = 'a';
@@ -284,16 +269,6 @@ ZETestSuite(ZEString)
 		}
 	}
 
-	ZETest("ZEString ZEString::FromDouble(double Value, ZEUInt Digits)")
-	{
-		double Value = 845756.88781;
-		ZEUInt Digits = 2;
-
-		ZEString String = ZEString::FromDouble(Value, Digits);
-
-		ZETestCheck(String == "845756.89");
-	}
-
 	ZETest("ZEString ZEString::FromDouble(double Value, const char* Format)")
 	{
 		double Value = 845756.88781;
@@ -301,16 +276,6 @@ ZETestSuite(ZEString)
 		ZEString String = ZEString::FromDouble(Value);
 
 		ZETestCheck(String == "845756.875000");
-	}
-
-	ZETest("ZEString ZEString::FromFloat(float Value, ZEUInt Digits)")
-	{
-		float Value = 845756.88781f;
-		ZEUInt Digits = 2;
-
-		ZEString String = ZEString::FromFloat(Value, Digits);
-
-		ZETestCheck(String == "845756.88");
 	}
 
 	ZETest("ZEString ZEString::FromFloat(float Value)")
@@ -1813,15 +1778,6 @@ ZETestSuite(ZEString)
 		ZETestCheck(String == "400.552521");
 	}
 
-	ZETest("void ZEString::SetValue(float Value, ZEUInt Digits)")
-	{
-		float Value = 400.5525252f;
-		ZEString String;
-		ZEUInt Digits = 3;
-		String.SetValue(Value, Digits);
-		ZETestCheck(String == "400.553");
-	}
-
 	ZETest("void ZEString::SetValue(double Value, const char* Format)")
 	{
 		double Value = 400.5525252;
@@ -1829,15 +1785,6 @@ ZETestSuite(ZEString)
 
 		String.SetValue(Value);
 		ZETestCheck(String == "400.552521");
-	}
-
-	ZETest("void ZEString::SetValue(double Value, ZEUInt Base)")
-	{
-		double Value = 400.5525252;
-		ZEString String;
-		ZEUInt Digits = 3;
-		String.SetValue(Value, Digits);
-		ZETestCheck(String == "400.553");
 	}
 
 	ZETest("void ZEString::SetValue(ZEInt8 Value, const char* Format)")
