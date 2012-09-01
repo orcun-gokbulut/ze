@@ -149,8 +149,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt Argument, const char
 	char Type[256] = "d";
 	char FormattingOptions[256] = "";
 
-	if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
-		return false;
+	if(ArgumentFormat != NULL)
+		if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
+			return false;
 
 	if (Type[0] != 'd' && Type[0] != 'x' && Type[0] != 'X' && Type[1] != '\0')
 		return false;
@@ -176,8 +177,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt Argument, const cha
 	char Type[256] = "d";
 	char FormattingOptions[256] = "";
 
-	if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
-		return false;
+	if(ArgumentFormat != NULL)
+		if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
+			return false;
 
 	if (Type[0] != 'd' && Type[0] != 'x' && Type[0] != 'X' && Type[1] != '\0')
 		return false;
@@ -205,8 +207,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt64 Argument,	const ch
 	char Type[256] = "d";
 	char FormattingOptions[256] = "";
 
-	if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
-		return false;
+	if(ArgumentFormat != NULL)
+		if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
+			return false;
 
 	if (Type[0] != 'd' && Type[0] != 'x' && Type[0] != 'X' && Type[1] != '\0')
 		return false;
@@ -239,8 +242,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt64 Argument, const c
 	char Type[256] = "d";
 	char FormattingOptions[256] = "";
 
-	if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
-		return false;
+	if(ArgumentFormat != NULL)
+		if (!ParseArgumentFormat(ArgumentFormat, Type, FormattingOptions))
+			return false;
 
 	if (Type[0] != 'd' && Type[0] != 'x' && Type[0] != 'X' && Type[1] != '\0')
 		return false;
@@ -272,8 +276,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, float Argument, const char
 {
 	char FormattingOptions[256] = "";
 
-	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions))
-		return false;
+	if(ArgumentFormat != NULL)
+		if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions))
+			return false;
 
 	if (!CheckArgumentFormat(FormattingOptions))
 		return false;
@@ -295,8 +300,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, bool Argument, const char*
 	char True[256] = "true";
 	char False[256] = "false";
 	
-	if (!ParseArgumentFormat(ArgumentFormat, True, False))
-		return false;
+	if(ArgumentFormat != NULL)
+		if (!ParseArgumentFormat(ArgumentFormat, True, False))
+			return false;
 
 	Output.Append(Argument ? True : False);
 
@@ -310,8 +316,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector2& Argument,
 	char Comma[256] = ", ";
 	char FormattingOptions[256] = ".03";
 
-	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
-		return false;
+	if(ArgumentFormat != NULL)
+		if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
+			return false;
 
 	if (!CheckArgumentFormat(FormattingOptions))
 		return false;
@@ -334,8 +341,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector3& Argument,
 	char Comma[256] = ", ";
 	char FormattingOptions[256] = ".03";
 
-	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
-		return false;
+	if(ArgumentFormat != NULL)
+		if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
+			return false;
 
 	if (!CheckArgumentFormat(FormattingOptions))
 		return false;
@@ -360,8 +368,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector4& Argument,
 	char Comma[256] = ", ";
 	char FormattingOptions[256] = ".03";
 
-	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
-		return false;
+	if(ArgumentFormat != NULL)
+		if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
+			return false;
 
 	if (!CheckArgumentFormat(FormattingOptions))
 		return false;
@@ -388,8 +397,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEQuaternion& Argume
 	char Comma[256] = ", ";
 	char FormattingOptions[256] = ".03";
 
-	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
-		return false;
+	if(ArgumentFormat != NULL)
+		if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma))
+			return false;
 
 	if (!CheckArgumentFormat(FormattingOptions))
 		return false;
@@ -417,8 +427,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix3x3& Argumen
 	char FormattingOptions[256] = ".03";
 	char Seperator[256] = ", ";
 
-	if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma, Seperator))
-		return false;
+	if(ArgumentFormat != NULL)
+		if (!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma, Seperator))
+			return false;
 
 	if (!CheckArgumentFormat(FormattingOptions))
 		return false;
@@ -460,7 +471,9 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix4x4& Argumen
 	char FormattingOptions[256] = ".03";
 	char Seperator[256] = ", ";
 
-	ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma, Seperator);
+	if(ArgumentFormat != NULL)
+		if(!ParseArgumentFormat(ArgumentFormat, FormattingOptions, PreFix, PostFix, Comma, Seperator))
+			return false;
 
 	Output.Append(PreFix);
 	
@@ -503,7 +516,7 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEString& Argument, 
 	return true;
 }
 
-bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEObject* Argument,	const char* ArgumentFormat)
+bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEObject* Argument, const char* ArgumentFormat)
 {
 	return "";
 }
