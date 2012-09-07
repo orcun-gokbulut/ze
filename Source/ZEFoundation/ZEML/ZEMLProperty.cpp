@@ -134,12 +134,12 @@ const ZEVariant& ZEMLProperty::GetValue() const
 void ZEMLProperty::WriteToFile(ZEFile* File)
 {
 	ZEInt64 TempInt64;
-	ZEInt8	TempInt32;
-	ZEInt8	TempInt16;
+	ZEInt32	TempInt32;
+	ZEInt16	TempInt16;
 	ZEInt8	TempInt8;
 	ZEUInt64 TempUInt64;
-	ZEUInt8 TempUInt32;
-	ZEUInt8 TempUInt16;
+	ZEUInt32 TempUInt32;
+	ZEUInt16 TempUInt16;
 	ZEUInt8 TempUInt8;
 
 	char Identifier = 'Z';
@@ -179,8 +179,8 @@ void ZEMLProperty::WriteToFile(ZEFile* File)
 			WritenDataSize = File->Write(&TempInt16, sizeof(ZEInt16), 1);
 			break;
 		case ZE_VRT_INTEGER_32:
-			TempInt32 = ZEEndian::Little(Value.GetInt16());
-			WritenDataSize = File->Write(&TempInt32, sizeof(ZEInt16), 1);
+			TempInt32 = ZEEndian::Little(Value.GetInt32());
+			WritenDataSize = File->Write(&TempInt32, sizeof(ZEInt32), 1);
 			break;
 		case ZE_VRT_INTEGER_64:
 			TempInt64 = ZEEndian::Little(Value.GetInt64());
