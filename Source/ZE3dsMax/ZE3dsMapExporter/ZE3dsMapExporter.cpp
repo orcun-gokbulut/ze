@@ -38,16 +38,22 @@
 //#include "data_mappings.h"
 
 #include <tchar.h>
-
+#include "QWinWidget/qwinwidget.h"
+#include "QtGui/QApplication"
+#include "ZEMapExporterOptionsDialog.h"
+#include "ZEFile/ZEFileUtils.h"
+#include "ZEFile/ZEFile.h"
+#include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
 
 ZE3dsMapExporter::ZE3dsMapExporter()
 {
 	Scene = NULL;
+	QtApplication = NULL;
 }
 
 ZE3dsMapExporter::~ZE3dsMapExporter() 
 {
-
+	QtApplication->quit();
 }
 
 ZEInt ZE3dsMapExporter::ExtCount()
@@ -123,13 +129,12 @@ ZEInt ZE3dsMapExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode 
 	return i_nodeTab.Count();
 }
 
-ZE3dsProgressDialog* PD;
 void ZEToolSDKOutputCallback(const char* Output)
 {
 	PD->Output((char*)Output);
 }
 
-ZEInt	ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
+ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
 	INodeTab lNodes;
 	GetSceneNodes(lNodes);
@@ -137,78 +142,97 @@ ZEInt	ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	IGameConversionManager * cm = GetConversionManager();
 	cm->SetCoordSystem(IGameConversionManager::IGAME_D3D);
 
-	PD = &ProgDlg;
+	int Argc = 0;
+	ZEMLNode* ExportOptions = new ZEMLNode("Options");
+	ZEString OptionsFilePath((ZEString(i->GetCurFilePath().data())) + ".zecfg");
+	ZEFile* OptionsFile = new ZEFile();
 
+	if(OptionsFile->Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_NONE))
+		ExportOptions->Read(OptionsFile);
+
+	if(OptionsFile->IsOpen())
+		OptionsFile->Close();
+ 
 	ZESDKOutput::SetOutputLevel(ZET_OL_LOG);
 	ZESDKOutput::SetOutputCallback(ZEToolSDKOutputCallback);
 
-	ZEMapExporterOptionsDialog Dialog;
-	char OptFile[MAX_PATH];
-	sprintf(OptFile, "%s\\%s", i->GetDir(APP_PLUGCFG_DIR), "zemap_export_options.cfg");
-	Options.Load(OptFile);
-	if (!Dialog.ShowDialog(hInstance, Options))
+	if(QApplication::instance() == NULL)
+		QtApplication = new QApplication(Argc, NULL);
+
+	QWinWidget* ExporterWindow = new QWinWidget(i->GetMAXHWnd());
+	ZEMapExporterOptionsDialogNew* ExporterDialog = new ZEMapExporterOptionsDialogNew(ExporterWindow, ExportOptions);
+	ExporterWindow->showCentered();
+	ZEInt DialogResult = ExporterDialog->exec();
+
+	if(DialogResult == QDialog::Rejected)
 		return false;
 
-	Options.Save(OptFile);
-
-	if (Options.Logging_OutputToFile == true)
-		ProgDlg.StartFileLogging(Options.Logging_OutputFile);
+	if(strlen(i->GetCurFilePath().data()) != 0)
+	{
+		OptionsFile->Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+		ExporterDialog->GetOptions()->Write(OptionsFile);
+		OptionsFile->Close();
+		delete OptionsFile;
+	}
 
 	ProgDlg.Create(hInstance);
 	ProgDlg.Show();
 	Scene = GetIGameInterface();	
 	Scene->InitialiseIGame(lNodes);
 
+	ZEProgressDialog* ProgressDialog = new ZEProgressDialog();
+	ProgressDialog->Start();
+	ProgressDialog->OpenTask("Map Exporter", true);
+
+	ProgressDialog->OpenTask("Scene Process");
 	zeLog("Processing 3ds Max Scene...\r\n");
 	if (!ProcessScene())
 	{
 		zeError("Can not process scene.");
-		ProgDlg.SetExitMode(true);
-		ProgDlg.StopFileLogging();
 		return false;
 	}
+	ProgressDialog->CloseTask();
 	
+
+	ProgressDialog->OpenTask("Portals", true);
 	if (!ProcessPortals())
 	{
 		zeError("Can not process portals.");
-		ProgDlg.SetExitMode(true);
-		ProgDlg.StopFileLogging();
 		return false;
 	}
+	ProgressDialog->CloseTask();
 
+	ProgressDialog->OpenTask("Doors", true);
 	if (!ProcessDoors())
 	{
 		zeError("Can not process doors.");
-		ProgDlg.SetExitMode(true);
-		ProgDlg.StopFileLogging();
 		return false;
 	}
+	ProgressDialog->CloseTask();
 
+	ProgressDialog->OpenTask("Materials", true);
 	if (!ProcessMaterials())
 	{
 		zeError("Can not process materials.");
-		ProgDlg.SetExitMode(true);
-		ProgDlg.StopFileLogging();
 		return false;
 	}
+	ProgressDialog->CloseTask();
 		
+	ProgressDialog->OpenTask("Writing File");
 	zeLog("Dumping map to file...");
-
 	if (!Map.WriteToFile(name))
 	{
 		zeError("Export failed !");
-		ProgDlg.SetExitMode(true);
-		ProgDlg.StopFileLogging();
 		return true;
 	}
+	ProgressDialog->CloseTask();
 
 	ZEMapFile MapFile2;
-
+	ProgressDialog->OpenTask("Validation");
 	zeLog("Verifying written file...");
 	MapFile2.ReadFromFile(name);
-
+	ProgressDialog->CloseTask();
 	zeLog("Export succeed");
-	ProgDlg.SetExitMode(true);
-	ProgDlg.StopFileLogging();
+
 	return true;
 }

@@ -36,6 +36,7 @@
 
 #include "ZETypes.h"
 #include "ZE3dsMapExporter.h"
+#include "ZEToolComponents\ZEProgressDialog\ZEProgressDialog.h"
 
 
 inline ZEVector2 MAX_TO_ZE(const Point2& Point)
@@ -216,8 +217,8 @@ bool ZE3dsMapExporter::ProcessDoors()
 	{
 		IGameNode* CurrentNode = Doors[I];
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
-
-		zeLog("\tProcessing Portal Door \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Doors.Count());
+		ZEProgressDialog::GetInstance()->OpenTask(CurrentNode->GetName());
+		zeLog("Processing Portal Door \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Doors.Count());
 
 		GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Width", PlaneWidth);
 		GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Length", PlaneLength);
@@ -247,6 +248,7 @@ bool ZE3dsMapExporter::ProcessDoors()
 		ZEMatrix4x4::Transform(Door->Rectangle.P2, WorldMatrix, ZEVector3(PlaneWidth, 0.0f , PlaneLength));
 		ZEMatrix4x4::Transform(Door->Rectangle.P3, WorldMatrix, ZEVector3(PlaneWidth, 0.0f , -PlaneLength));
 		ZEMatrix4x4::Transform(Door->Rectangle.P4, WorldMatrix, ZEVector3(-PlaneWidth, 0.0f , -PlaneLength));
+		ZEProgressDialog::GetInstance()->CloseTask();
 	}
 
 	return true;
@@ -280,7 +282,8 @@ bool ZE3dsMapExporter::ProcessPortals()
 	for (ZESize I = 0; I < (ZESize)Portals.Count(); I++)
 	{
 		IGameNode* CurrentNode = Portals[I];
-		zeOutput("\tProcessing Portal \"%s\" (%Iu/%d)\r\n", CurrentNode->GetName(), I + 1, Portals.Count());
+		ZEProgressDialog::GetInstance()->OpenTask(CurrentNode->GetName());
+		zeLog("Processing Portal \"%s\" (%Iu/%d)\r\n", CurrentNode->GetName(), I + 1, Portals.Count());
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		ZEMapFilePortal* CurrentFilePortal = &Map.Portals[I];
 		bool PhysicalMeshEnabled, PhysicalMeshUseSelf;
@@ -307,7 +310,13 @@ bool ZE3dsMapExporter::ProcessPortals()
 			else
 			{
 				PhysicalMeshNode = Scene->GetIGameNode(PhysicalMeshMaxNode);
-				ProcessPhysicalMesh(&CurrentFilePortal->PhysicalMesh, PhysicalMeshNode->GetIGameObject());
+				if(PhysicalMeshNode == NULL)
+				{
+					zeWarning("Physical Mesh Node NULL.");
+					PhysicalMeshEnabled = false;
+				}
+				else
+					ProcessPhysicalMesh(&CurrentFilePortal->PhysicalMesh, PhysicalMeshNode->GetIGameObject());
 			}
 		else
 		{
@@ -387,6 +396,7 @@ bool ZE3dsMapExporter::ProcessPortals()
 				Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord);
 			}
 		}
+		ZEProgressDialog::GetInstance()->CloseTask();
 	}
 
 	return true;
@@ -399,8 +409,8 @@ bool ZE3dsMapExporter::ProcessMaterials()
 	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)
 	{
 		IGameMaterial* NodeMaterial = Materials[I];
-
-		zeLog("\tProcessing material \"%s\" (%Iu/%d)", NodeMaterial->GetMaterialName(), I + 1, Materials.Count());
+		ZEProgressDialog::GetInstance()->OpenTask(NodeMaterial->GetMaterialName());
+		zeLog("Processing material \"%s\" (%Iu/%d)", NodeMaterial->GetMaterialName(), I + 1, Materials.Count());
 		ZEMapFileMaterial* CurrentMaterial = &Map.Materials[I];
 		ZeroMemory(CurrentMaterial, sizeof(ZEMapFileMaterial));
 
@@ -528,6 +538,7 @@ bool ZE3dsMapExporter::ProcessMaterials()
 			if (CurrentMaterial->Opasity != 1.0f || strncmp(CurrentMaterial->OpasityMap, "", ZE_MPFL_MAX_FILENAME_SIZE) !=0)
 				CurrentMaterial->Transparant = true;
 		}		
+		ZEProgressDialog::GetInstance()->CloseTask();
 	}
 
 	return true;
@@ -570,7 +581,7 @@ bool ZE3dsMapExporter::ProcessScene()
 		else
 			ElectedNodeCount++;
 	}
-	zeLog("\tPortal Count: %d, Portal Doors Count: %d, Entity Count: %d, Elected Node Count: %d", PortalNodeCount, PortalDoorNodeCount, EntityNodeCount, ElectedNodeCount);
+	zeLog("Portal Count: %d, Portal Doors Count: %d, Entity Count: %d, Elected Node Count: %d", PortalNodeCount, PortalDoorNodeCount, EntityNodeCount, ElectedNodeCount);
 
 	return true;
 }

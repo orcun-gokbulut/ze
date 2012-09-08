@@ -52,11 +52,14 @@
 
 
 extern HINSTANCE hInstance;
+class QApplication;
 
 class ZE3dsMapExporter : public SceneExport 
 {
 	private:
-		static HWND					hParams;
+
+		QApplication*				QtApplication;
+
 		ZE3dsMapExporterOptions		Options;
 		ZE3dsProgressDialog			ProgDlg;
 
@@ -69,8 +72,8 @@ class ZE3dsMapExporter : public SceneExport
 		Tab<IGameMaterial*>			Materials;
 
 		bool						GetRelativePath(const char* RealPath, char* RelativePath);
-		ZEInt							FindPortalIndex(IGameNode* Node);
-		ZEInt							ProcessFaceMaterial(IGameMaterial* Material);
+		ZEInt						FindPortalIndex(IGameNode* Node);
+		ZEInt						ProcessFaceMaterial(IGameMaterial* Material);
 
 		bool						ProcessScene();
 		bool						ProcessMaterials();
@@ -78,22 +81,22 @@ class ZE3dsMapExporter : public SceneExport
 		bool						ProcessDoors();
 
 	protected:
-		ZEInt							GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
+		ZEInt						GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
 
 	public:	
-		virtual ZEInt					ExtCount();					// Number of extensions supported
-		virtual const TCHAR *		Ext(ZEInt n);					// Extension #n (i.e. "3DS")
+		virtual ZEInt				ExtCount();					// Number of extensions supported
+		virtual const TCHAR *		Ext(ZEInt n);				// Extension #n (i.e. "3DS")
 		virtual const TCHAR *		LongDesc();					// Long ASCII description (i.e. "Autodesk 3D Studio File")
 		virtual const TCHAR *		ShortDesc();				// Short ASCII description (i.e. "3D Studio")
 		virtual const TCHAR *		AuthorName();				// ASCII Author name
 		virtual const TCHAR *		CopyrightMessage();			// ASCII Copyright message
 		virtual const TCHAR *		OtherMessage1();			// Other message #1
 		virtual const TCHAR *		OtherMessage2();			// Other message #2
-		virtual ZEUInt		Version();					// Version number * 100 (i.e. v3.01 = 301)
+		virtual ZEUInt				Version();					// Version number * 100 (i.e. v3.01 = 301)
 		virtual void				ShowAbout(HWND hWnd);		// Show DLL's "About..." box
 
 		virtual BOOL				SupportsOptions(ZEInt ext, DWORD options);
-		virtual ZEInt					DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
+		virtual ZEInt				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
 
 									ZE3dsMapExporter();
 		virtual						~ZE3dsMapExporter();
