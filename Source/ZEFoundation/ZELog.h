@@ -39,6 +39,7 @@
 
 #include "ZEDS/ZEString.h"
 #include "ZEDLL.h"
+#include "ZEThread/ZELock.h"
 
 enum ZELogType
 {
@@ -76,6 +77,7 @@ class ZELog
 		ZEString			LogFileName;
 		ZELogCallback		LogCallback;
 		ZELogType			MinimumLogLevel;
+		ZELock				Lock;
 
 							ZELog();
 

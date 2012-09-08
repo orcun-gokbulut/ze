@@ -296,6 +296,7 @@ class ZEError
 		bool				GetBreakOnWarningEnabled();
 
 		void				SetCallback(ZEErrorCallback Callback);
+		ZEErrorCallback		GetCallBack();
 
 		void				RaiseError(ZEErrorType Type);
 

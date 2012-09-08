@@ -111,10 +111,20 @@ void ZEError::SetCallback(ZEErrorCallback Callback)
 	ErrorCallback = Callback;
 }
 
+ZEErrorCallback ZEError::GetCallBack()
+{
+	return ErrorCallback;
+}
+
 void ZEError::RaiseError(ZEErrorType Type)
 {
+	static ZELock Lock;
+	Lock.Lock();
+	
 	if (ErrorCallback != NULL)
 		ErrorCallback(Type);
+
+	Lock.Unlock();
 }
 
 ZEError* ZEError::GetInstance()
