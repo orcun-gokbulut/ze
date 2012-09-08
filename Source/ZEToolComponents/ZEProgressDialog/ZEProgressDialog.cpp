@@ -50,18 +50,22 @@ ZEProgressDialog* ZEProgressDialog::Instance = NULL;
 ZEProgressDialog::ZEProgressDialog()
 {
 	Instance = this;
+	QApplicationCreated = false;
 
 	if(QApplication::instance() == NULL)
 	{
 		ZEInt32	Argc = 0;
 		void*	Argv = NULL;
 		Application = new QApplication(Argc, NULL);
+		QApplicationCreated = true;
 	}
 
 	Dialog = new QDialog();
 	Form = new Ui::ZEProgressDialogUI();
 	Form->setupUi(Dialog);
 	
+	Canceled = false;
+	IsWaitForClose = true;
 	TasksTreeWidget = new ZEProgressDialogTreeWidget(Form->tab);
 	Form->tab->layout()->addWidget(TasksTreeWidget);
 
@@ -84,6 +88,12 @@ ZEProgressDialog::~ZEProgressDialog()
 	TasksTreeWidget->hide();
 	delete TasksTreeWidget;
 	TasksTreeWidget = NULL;
+
+	if(QApplicationCreated)
+	{
+		Application->quit();
+		delete Application;
+	}
 }
 
 void ZEProgressDialog::SetTitle(const ZEString& Title)
@@ -136,7 +146,11 @@ void ZEProgressDialog::Start()
 
 void ZEProgressDialog::End()
 {
-	Dialog->close();
+	Form->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
+	Form->lblCurrentTaskName->setText("Finished");
+
+	if(!IsWaitForClose)
+		Dialog->close();
 }
 
 void ZEProgressDialog::TaskSucceded()
@@ -170,4 +184,35 @@ void ZEProgressDialog::Message(ZELogType Type, const char* Text)
 ZEProgressDialog* ZEProgressDialog::GetInstance()
 {
 	return Instance;
+}
+
+void ZEProgressDialog::SetProgressBarVisibility(bool IsVisible)
+{
+	Form->progressBar->setVisible(IsVisible);
+	Form->lblProgress->setVisible(IsVisible);
+}
+
+bool ZEProgressDialog::GetProgressBarVisibility()
+{
+	return Form->progressBar->isVisible();
+}
+
+void ZEProgressDialog::SetHeaderVisibility(bool IsVisible)
+{
+	Form->lblHeader->setVisible(IsVisible);
+}
+
+bool ZEProgressDialog::GetHeaderVisibility()
+{
+	return Form->lblHeader->isVisible();
+}
+
+void ZEProgressDialog::WaitForClose(bool Enable)
+{
+	IsWaitForClose = Enable;
+}
+
+bool ZEProgressDialog::IsCanceled()
+{
+	return Canceled;
 }

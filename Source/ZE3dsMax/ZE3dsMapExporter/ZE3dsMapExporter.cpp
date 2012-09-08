@@ -129,11 +129,6 @@ ZEInt ZE3dsMapExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode 
 	return i_nodeTab.Count();
 }
 
-void ZEToolSDKOutputCallback(const char* Output)
-{
-	PD->Output((char*)Output);
-}
-
 ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
 	INodeTab lNodes;
@@ -152,9 +147,6 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 
 	if(OptionsFile->IsOpen())
 		OptionsFile->Close();
- 
-	ZESDKOutput::SetOutputLevel(ZET_OL_LOG);
-	ZESDKOutput::SetOutputCallback(ZEToolSDKOutputCallback);
 
 	if(QApplication::instance() == NULL)
 		QtApplication = new QApplication(Argc, NULL);
@@ -181,6 +173,8 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	Scene->InitialiseIGame(lNodes);
 
 	ZEProgressDialog* ProgressDialog = new ZEProgressDialog();
+	ProgressDialog->SetTitle("Map Export Progress");
+	ProgressDialog->SetProgressBarVisibility(false);
 	ProgressDialog->Start();
 	ProgressDialog->OpenTask("Map Exporter", true);
 
@@ -233,6 +227,7 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	MapFile2.ReadFromFile(name);
 	ProgressDialog->CloseTask();
 	zeLog("Export succeed");
+	ProgressDialog->End();
 
 	return true;
 }
