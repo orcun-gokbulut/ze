@@ -167,6 +167,8 @@ ZEInt	ZEModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i
 
 	ExporterOptions.Save(OptFile);
 	ProgressDialog.SetOutputLevel((ZE3dsProgressDialogOutputLevel)ExporterOptions.OutputLevel);
+	ProgressDialog.Show();
+
 	ZESDKOutput::SetOutputLevel(ZET_OL_DEBUG);
 	ZESDKOutput::SetOutputCallback(Output);
 

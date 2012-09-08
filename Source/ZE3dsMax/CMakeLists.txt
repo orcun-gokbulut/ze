@@ -51,6 +51,7 @@ link_directories(
 add_subdirectory(ZE3dsProgressDialog)
 add_subdirectory(ZE3dsModelExporter)
 add_subdirectory(ZE3dsMapExporter)
+add_subdirectory(ZE3dsMaxScript)
 
 add_custom_target(ZE3dsMax
 	SOURCES CMakeLists.txt)

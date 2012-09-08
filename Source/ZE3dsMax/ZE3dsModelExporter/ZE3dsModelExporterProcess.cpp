@@ -152,7 +152,7 @@ bool GetProperty<bool>(IExportEntity* Object, PropType Type, const char* Propert
 			ZEInt Temp;
 			if (Prop->GetPropertyValue(Temp))
 			{
-				Value = Temp == 0;
+				Value = (Temp != 0);
 				return true;
 			}
 			else
@@ -898,7 +898,7 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 				if (BoneCount > 4 && !BoneCountWarning)
 				{
 					zepdWarning("Vertex can be affected maximum 4 bones. Exporter is goint to try reducing affecting bones by removing bones with small weights.\r\n"
-						"(Treshold: Weights < 0.00001) Node Name : \"%s\".", Node->GetName()); 
+						"(Treshold: Weights < 0.001) Node Name : \"%s\".", Node->GetName()); 
 					BoneCountWarning = true;
 				}
 				ZeroMemory(Vertex->BoneIndices, sizeof(unsigned char) * 4);
@@ -935,7 +935,7 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 					}
 
 					float BoneWeight = Skin->GetWeight(Face->vert[N], (ZEInt)M);
-					if (BoneWeight > 0.00001f)
+					if (BoneWeight > 0.001f)
 					{
 						if (BoneIndex >= 4)
 						{

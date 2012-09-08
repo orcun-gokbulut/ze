@@ -47,7 +47,7 @@ ze_add_source(ZE3dsModelExporterOptions.cpp			Sources)
 ze_add_source(ZE3dsModelExporterResources.rc		Sources)
 ze_add_source(ZE3dsModelExporterResources.h			Sources)
 ze_add_source(ZE3dsModelExporter.def				Sources)
-#ze_add_source(../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc	Sources)
+ze_add_source(../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc	Sources)
 
 ze_add_library(ZE3dsModelExporter 
 	SOURCES ${Sources}
@@ -67,4 +67,4 @@ set_property(TARGET ZE3dsModelExporter PROPERTY CLEAN_DIRECT_OUTPUT 1)
 
 get_property(TargetPath TARGET ZE3dsModelExporter PROPERTY LOCATION)
 file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)
-add_custom_command(TARGET ZE3dsModelExporter POST_BUILD COMMAND copy "${NativeTargetPath}" "${MAX_BINARY_DIRECTORY}\\plugins")
+add_custom_command(TARGET ZE3dsModelExporter POST_BUILD COMMAND copy "${NativeTargetPath}" "${ZEBUILD_3DS_MAX_BINARY_DIRECTORY}\\plugins")

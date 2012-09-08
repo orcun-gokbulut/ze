@@ -411,7 +411,7 @@ macroScript ZEBoneAttributes_Add
 	(
 		if $ != undefined then
 		(	
-			if (isProperty $ "ZEBoneAttributes" == false and classof Current == BoneGeometry)  then custAttributes.add $ BoneAttributes
+			if (isProperty $ "ZEBoneAttributes" == false and (classof Current == BoneGeometry or classof Current == Biped_Object)  then custAttributes.add $ BoneAttributes
 		)
 	)
 )
