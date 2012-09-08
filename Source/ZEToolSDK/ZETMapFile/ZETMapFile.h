@@ -42,11 +42,11 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERectangle3D.h"
 #include "ZEMath/ZEAABBox.h"
+#include "ZEFile/ZEFile.h"
 #include "ZETypes.h"
-#include "ZETDefinitions.h"
 
-#define ZE_MPFL_MAX_NAME_SIZE				ZE_MAX_NAME_SIZE
-#define ZE_MPFL_MAX_FILENAME_SIZE			ZE_MAX_FILE_NAME_SIZE
+#define ZE_MPFL_MAX_NAME_SIZE				128
+#define ZE_MPFL_MAX_FILENAME_SIZE			256
 
 #define ZEMAP_FILEPART_GEOMETRY				0x01
 #define ZEMAP_FILEPART_ENTITIES				0x02
@@ -69,7 +69,7 @@
 struct ZEMapFileMaterial
 {
 	char									Shader[ZE_MPFL_MAX_FILENAME_SIZE];
-	ZEUInt32									ShaderComponents;
+	ZEUInt32								ShaderComponents;
 
 	bool									TwoSided;
 	bool									LightningEnabled;
@@ -110,13 +110,13 @@ struct ZEMapFileVertex
 
 struct ZEMapFilePolygon
 {	
-	ZEUInt32									Material;
+	ZEUInt32								Material;
 	ZEMapFileVertex							Vertices[3];
 };
 
 struct ZEMapFilePhysicalMeshPolygon
 {
-	ZEUInt32									Indices[3];
+	ZEUInt32								Indices[3];
 };
 
 struct ZEMapFilePhysicalMesh
@@ -129,7 +129,7 @@ struct ZEMapFileDoor
 {
 	char									Name[ZE_MPFL_MAX_NAME_SIZE];
 	ZERectangle3D							Rectangle;
-	ZEUInt32									PortalIds[2];
+	ZEUInt32								PortalIds[2];
 	bool									IsOpen;
 };
 
@@ -138,9 +138,9 @@ class ZEMapFilePortal
 {
 public:
 	char									Name[ZE_MPFL_MAX_NAME_SIZE];
-	ZEAABBox							BoundingBox;
+	ZEAABBox								BoundingBox;
 	bool									GenerateOctree;
-	ZEUInt							MaxOctreeDepth;
+	ZEUInt									MaxOctreeDepth;
 
 	ZEMapFileOctree*						Octree;
 	ZEArray<ZEMapFilePolygon>				Polygons;
@@ -154,7 +154,7 @@ public:
 class ZEMapFile
 {
 	public:
-		ZEAABBox						MapBoundingBox;
+		ZEAABBox							MapBoundingBox;
 
 		ZEArray<ZEMapFileMaterial>			Materials;
 		ZEArray<ZEMapFilePortal>			Portals;

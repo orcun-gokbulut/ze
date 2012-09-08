@@ -37,15 +37,14 @@
 #ifndef __ZET_MAP_FILE_FORMAT_H__
 #define __ZET_MAP_FILE_FORMAT_H__
 
-#include "ZETDefinitions.h"
 #include "ZETypes.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZERectangle3D.h"
 
-#define ZE_MPFL_MAX_NAME_SIZE				ZE_MAX_NAME_SIZE
-#define ZE_MPFL_MAX_FILENAME_SIZE			ZE_MAX_FILE_NAME_SIZE
+#define ZE_MPFL_MAX_NAME_SIZE				128
+#define ZE_MPFL_MAX_FILENAME_SIZE			256
 
 #define ZEFILE_MAKEVERSION(Major, Minor) ((ZEUInt32)((((ZEUInt32)(Major)) << 16) + (ZEUInt32)(Minor)))
 #define ZEFILE_GETMINORVERSION(x) ((ZEUInt32)((x) & 0x0000FFFF))
@@ -78,59 +77,59 @@ struct ZEMapFileVertexChunk
 
 struct ZEMapFilePolygonChunk
 {	
-	ZEUInt32							Material;
+	ZEUInt32						Material;
 	ZEMapFileVertexChunk			Vertices[3];
 };
 
 struct ZEMapFilePhysicalMeshPolygonChunk
 {
-	ZEUInt32							Indices[3];
+	ZEUInt32						Indices[3];
 };
 
 struct ZEMapFilePhysicalMeshChunk
 {
-	ZEUInt32							ChunkIdentifier;
-	ZEUInt32							VertexCount;
-	ZEUInt32							PolygonCount;
+	ZEUInt32						ChunkIdentifier;
+	ZEUInt32						VertexCount;
+	ZEUInt32						PolygonCount;
 };
 
 struct ZEMapFileOctreeChunk
 {
-	ZEUInt32							ChunkIdentifier;
-	ZEAABBox					BoundingBox;
-	ZEUInt32							Depth;
+	ZEUInt32						ChunkIdentifier;
+	ZEAABBox						BoundingBox;
+	ZEUInt32						Depth;
 	bool							SubSpaces[8];
 	bool							IsLeaf;
-	ZEUInt32							PolygonCount;
+	ZEUInt32						PolygonCount;
 };
 
 struct ZEMapFileDoorChunk
 {
-	ZEUInt32							ChunkIdentifier;
+	ZEUInt32						ChunkIdentifier;
 	char							Name[ZE_MPFL_MAX_NAME_SIZE];
 	ZERectangle3D					Rectangle;
-	ZEUInt32							PortalIds[2];
+	ZEUInt32						PortalIds[2];
 	bool							IsOpen;
 };
 
 struct ZEMapFilePortalChunk
 {
-	ZEUInt32							ChunkIdentifier;
+	ZEUInt32						ChunkIdentifier;
 	char							Name[ZE_MPFL_MAX_NAME_SIZE];
-	ZEAABBox					BoundingBox;
-	ZEUInt32							PolygonCount;
+	ZEAABBox						BoundingBox;
+	ZEUInt32						PolygonCount;
 	bool							HasOctree;
 	bool							HasPhysicalMesh;
 };
 
 struct ZEMapFileHeader
 {
-	ZEUInt32							Header;
-	ZEUInt32							Version;
+	ZEUInt32						Header;
+	ZEUInt32						Version;
 
-	ZEUInt32							MaterialCount;
-	ZEUInt32							PortalCount;
-	ZEUInt32							DoorCount;
+	ZEUInt32						MaterialCount;
+	ZEUInt32						PortalCount;
+	ZEUInt32						DoorCount;
 
 };
 
