@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETOutput.h"
+#include "ZEError.h"
 #include "ZETMapFile.h"
 #include "ZETMapOctree.h"
 #include "ZETMapFileFormat.h"
@@ -85,7 +85,7 @@ void CalculateBoundingBox(ZEAABBox& BoundingBox, ZEArray<ZEMapFilePolygon>& Poly
 		}
 }
 
-void WriteMaterialsToFile(FILE* File, ZEArray<ZEMapFileMaterial>& Materials)
+void WriteMaterialsToFile(ZEFile* File, ZEArray<ZEMapFileMaterial>& Materials)
 {
 	ZEUInt32 ChunkIndentifier = ZE_MPFL_MATERIAL_CHUNK;
 	
@@ -93,18 +93,21 @@ void WriteMaterialsToFile(FILE* File, ZEArray<ZEMapFileMaterial>& Materials)
 	for (ZESize I = 0; I < Materials.GetCount(); I++)
 	{
 		// Write Material Chunk Identifier
-		fwrite(&ChunkIndentifier, sizeof(ZEUInt32), 1, File);
+		File->Write(&ChunkIndentifier, sizeof(ZEUInt32), 1);
+		//fwrite(&ChunkIndentifier, sizeof(ZEUInt32), 1, File);
 
 		// Write Material
-		fwrite(&Materials[I], sizeof(ZEMapFileMaterial), 1, File);
+		File->Write(&Materials[I], sizeof(ZEMapFileMaterial), 1);
+		//fwrite(&Materials[I], sizeof(ZEMapFileMaterial), 1, File);
 	}
 }
 
-void WritePolygonsToFile(FILE* File, ZEArray<ZEMapFilePolygon>& Polygons)
+void WritePolygonsToFile(ZEFile* File, ZEArray<ZEMapFilePolygon>& Polygons)
 {
 	// Write chunk identifier
 	ZEUInt32 ChunkIdentifier = ZE_MPFL_POLYGONS_CHUNK;
-	fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
+	File->Write(&ChunkIdentifier, sizeof(ZEUInt32), 1);
+	//fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
 
 	// Normalize vertex elements (Normals, Binormals, Tangents)
 	for(ZESize I = 0; I < Polygons.GetCount(); I++)
@@ -126,10 +129,11 @@ void WritePolygonsToFile(FILE* File, ZEArray<ZEMapFilePolygon>& Polygons)
 	}
 
 	// Write polygons to file
-	fwrite(Polygons.GetCArray(), sizeof(ZEMapFilePolygonChunk), Polygons.GetCount(), File);
+	File->Write(Polygons.GetCArray(), sizeof(ZEMapFilePolygonChunk), Polygons.GetCount());
+	//fwrite(Polygons.GetCArray(), sizeof(ZEMapFilePolygonChunk), Polygons.GetCount(), File);
 }
 
-void WriteOctreeToFile(FILE* File, ZEMapFileOctree* Octree)
+void WriteOctreeToFile(ZEFile* File, ZEMapFileOctree* Octree)
 {
 	ZEMapFileOctreeChunk FileOctree;
 	
@@ -151,12 +155,15 @@ void WriteOctreeToFile(FILE* File, ZEMapFileOctree* Octree)
 		FileOctree.PolygonCount = (ZEUInt32)Octree->PolygonIds.GetCount();
 	}
 
-	fwrite(&FileOctree, sizeof(ZEMapFileOctreeChunk), 1, File);
+	File->Write(&FileOctree, sizeof(ZEMapFileOctreeChunk), 1);
+	//fwrite(&FileOctree, sizeof(ZEMapFileOctreeChunk), 1, File);
 	if (FileOctree.IsLeaf)
 	{
 		ZEUInt32 ChunkIdentifier = ZE_MPFL_OCTREE_POLYGONIDS_CHUNK;
-		fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
-		fwrite(Octree->PolygonIds.GetCArray(), sizeof(ZEUInt32), Octree->PolygonIds.GetCount(), File);
+		File->Write(&ChunkIdentifier, sizeof(ZEUInt32), 1);
+		//fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
+		File->Write(Octree->PolygonIds.GetCArray(), sizeof(ZEUInt32), Octree->PolygonIds.GetCount());
+		//fwrite(Octree->PolygonIds.GetCArray(), sizeof(ZEUInt32), Octree->PolygonIds.GetCount(), File);
 	}
 	else
 		for (ZEInt I = 0; I < 8; I++)
@@ -164,27 +171,32 @@ void WriteOctreeToFile(FILE* File, ZEMapFileOctree* Octree)
 				WriteOctreeToFile(File, Octree->SubTrees[I]);
 }
 
-void WritePhysicalMeshToFile(FILE* File, ZEMapFilePhysicalMesh& PhysicalMesh)
+void WritePhysicalMeshToFile(ZEFile* File, ZEMapFilePhysicalMesh& PhysicalMesh)
 {
 	// Write physical mesh header
 	ZEMapFilePhysicalMeshChunk FilePhysicalMesh;
 	FilePhysicalMesh.ChunkIdentifier = ZE_MPFL_PHYSICAL_MESH_CHUNK;
 	FilePhysicalMesh.PolygonCount = (ZEUInt32)PhysicalMesh.Polygons.GetCount();
 	FilePhysicalMesh.VertexCount = (ZEUInt32)PhysicalMesh.Vertices.GetCount();
-	fwrite(&FilePhysicalMesh, sizeof(ZEMapFilePhysicalMeshChunk), 1, File);
+	File->Write(&FilePhysicalMesh, sizeof(ZEMapFilePhysicalMeshChunk), 1);
+	//fwrite(&FilePhysicalMesh, sizeof(ZEMapFilePhysicalMeshChunk), 1, File);
 
 	// Write physical mesh vertices
 	ZEUInt32 ChunkIdentifier = ZE_MPFL_PHYSICAL_MESH_VERTICES_CHUNK;
-	fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
-	fwrite(PhysicalMesh.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalMesh.Vertices.GetCount(), File);
+	File->Write(&ChunkIdentifier, sizeof(ZEUInt32), 1);
+	//fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
+	File->Write(PhysicalMesh.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalMesh.Vertices.GetCount());
+	//fwrite(PhysicalMesh.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalMesh.Vertices.GetCount(), File);
 
 	// Write physical mesh polygons
 	ChunkIdentifier = ZE_MPFL_PHYSICAL_MESH_POLYGONS_CHUNK;
-	fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
-	fwrite(PhysicalMesh.Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygon), PhysicalMesh.Polygons.GetCount(), File);
+	File->Write(&ChunkIdentifier, sizeof(ZEUInt32), 1);
+	//fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
+	File->Write(PhysicalMesh.Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygon), PhysicalMesh.Polygons.GetCount());
+	//fwrite(PhysicalMesh.Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygon), PhysicalMesh.Polygons.GetCount(), File);
 }
 
-void WritePortalsToFile(FILE* File, ZEArray<ZEMapFilePortal>& Portals)
+void WritePortalsToFile(ZEFile* File, ZEArray<ZEMapFilePortal>& Portals)
 {
 	// Write portal header
 	ZEMapFilePortalChunk FilePortal;
@@ -200,7 +212,8 @@ void WritePortalsToFile(FILE* File, ZEArray<ZEMapFilePortal>& Portals)
 		FilePortal.PolygonCount = (ZEUInt32)Portal->Polygons.GetCount();
 		FilePortal.HasOctree = Portal->GenerateOctree;
 		FilePortal.HasPhysicalMesh = Portal->PhysicalMeshEnabled;
-		fwrite(&FilePortal, sizeof(ZEMapFilePortalChunk), 1, File);
+		File->Write(&FilePortal, sizeof(ZEMapFilePortalChunk), 1);
+		//fwrite(&FilePortal, sizeof(ZEMapFilePortalChunk), 1, File);
 		
 		// Write Polygons
 		WritePolygonsToFile(File, Portal->Polygons);
@@ -220,7 +233,7 @@ void WritePortalsToFile(FILE* File, ZEArray<ZEMapFilePortal>& Portals)
 	}
 }
 
-void WriteDoorsToFile(FILE* File, ZEArray<ZEMapFileDoor>& Doors)
+void WriteDoorsToFile(ZEFile* File, ZEArray<ZEMapFileDoor>& Doors)
 {
 	// Write portal doors
 	for (ZESize I = 0; I < Doors.GetCount(); I++)
@@ -229,31 +242,33 @@ void WriteDoorsToFile(FILE* File, ZEArray<ZEMapFileDoor>& Doors)
 
 		ZEMapFileDoorChunk FileDoor;
 		FileDoor.ChunkIdentifier = ZE_MPFL_PORTAL_DOOR_CHUNK;
-		strncpy(FileDoor.Name, Door->Name, ZE_MAX_NAME_SIZE);
+		strncpy(FileDoor.Name, Door->Name, ZE_MPFL_MAX_NAME_SIZE);
 		FileDoor.Rectangle = Door->Rectangle;
 		FileDoor.PortalIds[0] = Door->PortalIds[0];
 		FileDoor.PortalIds[1] = Door->PortalIds[1];
 		FileDoor.IsOpen = Door->IsOpen;
-		fwrite(&FileDoor, sizeof(ZEMapFileDoorChunk), 1, File);
+		File->Write(&FileDoor, sizeof(ZEMapFileDoorChunk), 1);
+		//fwrite(&FileDoor, sizeof(ZEMapFileDoorChunk), 1, File);
 	}
 }
 
 bool ZEMapFile::WriteToFile(const char* FileName, ZEInt Chunks)
 {
-	zesdkLog("Map File", "Writing ZEMap to file. (Filename : \"%s\")", FileName);
+	zeLog("Writing ZEMap to file. (Filename : \"%s\")", FileName);
 
 	if (!Validate())
 	{
-		zesdkError("Map File", "ZEMapFile could not pass validation cheks.");
+		zeError("ZEMapFile could not pass validation cheks.");
 		return false;
 	}
 
-	FILE* File = fopen(FileName,"wb");
+	ZEFile File;
+	//FILE* File = fopen(FileName,"wb");
 
 	// Check for file is writable
-	if (File == NULL)
+	if (!File.Open(FileName, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
 	{
-		zesdkError("Map File", "Can not open file for writing. (Filename : \"%s\")", FileName);
+		zeError("Can not open file for writing. (Filename : \"%s\")", FileName);
 		return false;
 	}
 
@@ -263,22 +278,24 @@ bool ZEMapFile::WriteToFile(const char* FileName, ZEInt Chunks)
 	FileHeader.MaterialCount = (ZEUInt32)Materials.GetCount();
 	FileHeader.DoorCount = (ZEUInt32)Doors.GetCount();
 	FileHeader.PortalCount = (ZEUInt32)Portals.GetCount();
-	fwrite(&FileHeader, sizeof(ZEMapFileHeader), 1, File);
+	File.Write(&FileHeader, sizeof(ZEMapFileHeader), 1);
+	//fwrite(&FileHeader, sizeof(ZEMapFileHeader), 1, File);
 
 	// Write file parts to the file
-	WriteMaterialsToFile(File, this->Materials);
-	WritePortalsToFile(File, this->Portals);
-	WriteDoorsToFile(File, this->Doors);
+	WriteMaterialsToFile(&File, this->Materials);
+	WritePortalsToFile(&File, this->Portals);
+	WriteDoorsToFile(&File, this->Doors);
 
-	fclose(File);
+	File.Close();
+	//fclose(File);
 
-	zesdkLog("Map File", "ZEMap has written to file.", FileName);
+	zeLog("ZEMap has written to file.", FileName);
 	return true;
 }
 
 // Reading
 
-bool ReadMaterialsFromFile(FILE* File, ZEArray<ZEMapFileMaterial>& Materials)
+bool ReadMaterialsFromFile(ZEFile* File, ZEArray<ZEMapFileMaterial>& Materials)
 {
 	ZEUInt32 ChunkIndentifier = 0;
 	
@@ -286,47 +303,52 @@ bool ReadMaterialsFromFile(FILE* File, ZEArray<ZEMapFileMaterial>& Materials)
 	for (ZESize I = 0; I < Materials.GetCount(); I++)
 	{
 		// Read Material Chunk Identifier and check it
-		fread(&ChunkIndentifier, sizeof(ZEUInt32), 1, File);
+		File->Read(&ChunkIndentifier, sizeof(ZEUInt32), 1);
+		//fread(&ChunkIndentifier, sizeof(ZEUInt32), 1, File);
 		if (ChunkIndentifier != ZE_MPFL_MATERIAL_CHUNK)
 		{
-			zesdkError("Map File", "Material chunk's id does not match.");
+			zeError("Material chunk's id does not match.");
 			return false;
 		}
 
 		// Read Material
-		fread(&Materials[I], sizeof(ZEMapFileMaterial), 1, File);
+		File->Read(&Materials[I], sizeof(ZEMapFileMaterial), 1);
+		//fread(&Materials[I], sizeof(ZEMapFileMaterial), 1, File);
 	}
 	return true;
 }
 
-bool ReadPolygonsFromFile(FILE* File, ZEArray<ZEMapFilePolygon>& Polygons)
+bool ReadPolygonsFromFile(ZEFile* File, ZEArray<ZEMapFilePolygon>& Polygons)
 {
 	// Read chunk identifier and check it
 	ZEUInt32 ChunkIdentifier = 0;
-	fread(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
+	File->Read(&ChunkIdentifier, sizeof(ZEUInt32), 1);
+	//fread(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
 	if (ChunkIdentifier != ZE_MPFL_POLYGONS_CHUNK)
 	{
-		zesdkError("Map File", "Polygons chunk's id does not match.");
+		zeError("Polygons chunk's id does not match.");
 		return false;
 	}
 
 	// Read polygons from file
-	fread(Polygons.GetCArray(), sizeof(ZEMapFilePolygon), Polygons.GetCount(), File);
+	File->Read(Polygons.GetCArray(), sizeof(ZEMapFilePolygon), Polygons.GetCount());
+	//fread(Polygons.GetCArray(), sizeof(ZEMapFilePolygon), Polygons.GetCount(), File);
 
 	return true;
 }
 
-bool ReadOctreeNodeFromFile(FILE* File, ZEMapFileOctree* Octree)
+bool ReadOctreeNodeFromFile(ZEFile* File, ZEMapFileOctree* Octree)
 {
 	ZEMapFileOctreeChunk	FileOctree;
 	
 	// Read octree header
-	fread(&FileOctree, sizeof(ZEMapFileOctreeChunk), 1, File);
+	File->Read(&FileOctree, sizeof(ZEMapFileOctreeChunk), 1);
+	//fread(&FileOctree, sizeof(ZEMapFileOctreeChunk), 1, File);
 
 	// Check chunk id
 	if (FileOctree.ChunkIdentifier != ZE_MPFL_OCTREE_CHUNK)
 	{
-		zesdkError("Map File", "Octree chunk's id does not match.");
+		zeError("Octree chunk's id does not match.");
 		return false;
 	}
 
@@ -352,24 +374,26 @@ bool ReadOctreeNodeFromFile(FILE* File, ZEMapFileOctree* Octree)
 	{
 		// if node is leaf node then read polygon ids.
 		ZEUInt32 ChunkIndentifier;
-		fread(&ChunkIndentifier, sizeof(ZEUInt32), 1, File);
+		File->Read(&ChunkIndentifier, sizeof(ZEUInt32), 1);
+		//fread(&ChunkIndentifier, sizeof(ZEUInt32), 1, File);
 
 		// Check chunk indentifier
 		if (ChunkIndentifier != ZE_MPFL_OCTREE_POLYGONIDS_CHUNK)
 		{
-			zesdkError("Map File", "Octree Polygon Id's chunk id does not match.");
+			zeError("Octree Polygon Id's chunk id does not match.");
 			return false;
 		}
 
 		// Read ids of polygons that is included in this octree node
 		Octree->PolygonIds.SetCount((ZESize)FileOctree.PolygonCount);
-		fread(Octree->PolygonIds.GetCArray(), sizeof(ZEInt), Octree->PolygonIds.GetCount(), File);
+		File->Read(Octree->PolygonIds.GetCArray(), sizeof(ZEInt), Octree->PolygonIds.GetCount());
+		//fread(Octree->PolygonIds.GetCArray(), sizeof(ZEInt), Octree->PolygonIds.GetCount(), File);
 	}
 
 	return true;
 }
 
-bool ReadOctreeFromFile(FILE* File, ZEMapFileOctree* Octree)
+bool ReadOctreeFromFile(ZEFile* File, ZEMapFileOctree* Octree)
 {
 	// Create octree
 	Octree = new ZEMapFileOctree();
@@ -382,16 +406,17 @@ bool ReadOctreeFromFile(FILE* File, ZEMapFileOctree* Octree)
 	return true;
 }
 
-bool ReadPhysicalMeshFromFile(FILE* File, ZEMapFilePhysicalMesh& PhysicalMesh)
+bool ReadPhysicalMeshFromFile(ZEFile* File, ZEMapFilePhysicalMesh& PhysicalMesh)
 {
 	// Read physical mesh header
 	ZEMapFilePhysicalMeshChunk FilePhysicalMesh;
-	fread(&FilePhysicalMesh, sizeof(ZEMapFilePhysicalMeshChunk), 1, File);
+	File->Read(&FilePhysicalMesh, sizeof(ZEMapFilePhysicalMeshChunk), 1);
+	//fread(&FilePhysicalMesh, sizeof(ZEMapFilePhysicalMeshChunk), 1, File);
 
 	// Check physical mesh chunk identifier
 	if (FilePhysicalMesh.ChunkIdentifier != ZE_MPFL_PHYSICAL_MESH_CHUNK)
 	{
-		zesdkError("Map File", "Physical mesh chunk's id does not match.");
+		zeError("Physical mesh chunk's id does not match.");
 		return false;
 	}
 
@@ -401,31 +426,35 @@ bool ReadPhysicalMeshFromFile(FILE* File, ZEMapFilePhysicalMesh& PhysicalMesh)
 	ZEUInt32 ChunkIdentifier = 0;
 
 	// Check physical mesh vertices chunk identifier
-	fread(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
+	File->Read(&ChunkIdentifier, sizeof(ZEUInt32), 1);
+	//fread(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
 	if (ChunkIdentifier != ZE_MPFL_PHYSICAL_MESH_VERTICES_CHUNK)
 	{
-		zesdkError("Map File", "Physical mesh vertices chunk's id does not match.");
+		zeError("Physical mesh vertices chunk's id does not match.");
 		return false;
 	}
 
 	// Read physical mesh vertices
-	fread(PhysicalMesh.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalMesh.Vertices.GetCount(), File);
+	File->Read(PhysicalMesh.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalMesh.Vertices.GetCount());
+	//fread(PhysicalMesh.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalMesh.Vertices.GetCount(), File);
 
 	// Check physical mesh polygons chunk identifier
-	fread(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
+	File->Read(&ChunkIdentifier, sizeof(ZEUInt32), 1);
+	//fread(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
 	if (ChunkIdentifier != ZE_MPFL_PHYSICAL_MESH_POLYGONS_CHUNK)
 	{
-		zesdkError("Map File", "Physical mesh polygons chunk's id does not match.");
+		zeError("Physical mesh polygons chunk's id does not match.");
 		return false;
 	}
 
 	// Read physical mesh polygons
-	fread(PhysicalMesh.Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygon), PhysicalMesh.Polygons.GetCount(), File);
+	File->Read(PhysicalMesh.Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygon), PhysicalMesh.Polygons.GetCount());
+	//fread(PhysicalMesh.Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygon), PhysicalMesh.Polygons.GetCount(), File);
 
 	return true;
 }
 
-bool ReadPortalsFromFile(FILE* File, ZEArray<ZEMapFilePortal>& Portals)
+bool ReadPortalsFromFile(ZEFile* File, ZEArray<ZEMapFilePortal>& Portals)
 {
 	ZEMapFilePortalChunk FilePortal;
 
@@ -433,11 +462,12 @@ bool ReadPortalsFromFile(FILE* File, ZEArray<ZEMapFilePortal>& Portals)
 	{
 		ZEMapFilePortal* Portal = &Portals[I];
 
-		fread(&FilePortal, sizeof(ZEMapFilePortalChunk), 1, File);
+		File->Read(&FilePortal, sizeof(ZEMapFilePortalChunk), 1);
+		//fread(&FilePortal, sizeof(ZEMapFilePortalChunk), 1, File);
 
 		if (FilePortal.ChunkIdentifier != ZE_MPFL_PORTAL_CHUNK)
 		{
-			zesdkError("Map File", "Portal chunk's id does not match.");
+			zeError("Portal chunk's id does not match.");
 			return false;
 		}
 
@@ -463,7 +493,7 @@ bool ReadPortalsFromFile(FILE* File, ZEArray<ZEMapFilePortal>& Portals)
 	return true;
 }
 
-static bool ReadDoorsFromFile(FILE* File, ZEArray<ZEMapFileDoor>& Doors)
+static bool ReadDoorsFromFile(ZEFile* File, ZEArray<ZEMapFileDoor>& Doors)
 {
 	// Read portal doors
 	for (ZESize N = 0; N < Doors.GetCount(); N++)
@@ -471,15 +501,16 @@ static bool ReadDoorsFromFile(FILE* File, ZEArray<ZEMapFileDoor>& Doors)
 		ZEMapFileDoor* Door = &Doors[N];
 		ZEMapFileDoorChunk FileDoor;
 
-		fread(&FileDoor, sizeof(ZEMapFileDoorChunk), 1, File);
+		File->Read(&FileDoor, sizeof(ZEMapFileDoorChunk), 1);
+		//fread(&FileDoor, sizeof(ZEMapFileDoorChunk), 1, File);
 
 		if (FileDoor.ChunkIdentifier != ZE_MPFL_PORTAL_DOOR_CHUNK)
 		{
-			zesdkError("Map File", "Door chunk's id does not match.");
+			zeError("Map File", "Door chunk's id does not match.");
 			return false;
 		}
 
-		strncpy(Door->Name, FileDoor.Name, ZE_MAX_NAME_SIZE);
+		strncpy(Door->Name, FileDoor.Name, ZE_MPFL_MAX_NAME_SIZE);
 		Door->Rectangle = FileDoor.Rectangle;
 		Door->PortalIds[0] = FileDoor.PortalIds[0];
 		Door->PortalIds[1] = FileDoor.PortalIds[1];
@@ -491,54 +522,73 @@ static bool ReadDoorsFromFile(FILE* File, ZEArray<ZEMapFileDoor>& Doors)
 
 bool ZEMapFile::ReadFromFile(const char* FileName, ZEInt Chunks)
 {
+	zeLog("Reading \"%s\" ZEMap file.", FileName);
+
+	ZEFile File;
+	//FILE* File = fopen(FileName, "rb");
+	if (!File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
+	{
+		zeError("Can not open file \"%s\".");
+		return false;
+	}
+
 	Clear();
-	FILE* File = fopen(FileName,"rb");
+
+	zeLog("Reading header.");
+
 	ZEMapFileHeader TempHeader;
-	fread(&TempHeader, sizeof(ZEMapFileHeader), 1, File);
+	File.Read(&TempHeader, sizeof(ZEMapFileHeader), 1);
+	//fread(&TempHeader, sizeof(ZEMapFileHeader), 1, File);
 
 	if(TempHeader.Header!= ZE_MPFL_HEADER)
 	{
-		zesdkError("Map File", "Unknown ZEMap file format.");
+		zeError("Unknown ZEMap file format.");
+		File.Close();
 		return false;
 	}
 	
 	if(TempHeader.Version != ZE_MPFL_VERSION)
 	{	
-		fclose(File);
-		zesdkError("Map File", "ZEMap file version mismatched.");
+		//fclose(File);
+		zeError("ZEMap file version mismatched.");
+		File.Close();
+		return false;
+	}
+
+	Materials.SetCount((ZESize)TempHeader.MaterialCount);
+	if (!ReadMaterialsFromFile(&File, this->Materials))
+	{
+		//fclose(File);
+		zeError("File is corrupted. Can not read materials from file.");
+		File.Close();
 		return false;
 	}
 
 	Portals.SetCount((ZESize)TempHeader.PortalCount);
-	Materials.SetCount((ZESize)TempHeader.MaterialCount);
+	if (!ReadPortalsFromFile(&File, this->Portals))
+	{
+		//fclose(File);
+		zeError("File is corrupted. Can not read portals from file.");
+		File.Close();
+		return false;
+	}
+
 	Doors.SetCount((ZESize)TempHeader.DoorCount);
-
-	if (!ReadMaterialsFromFile(File, this->Materials))
+	if (!ReadDoorsFromFile(&File, this->Doors))
 	{
-		fclose(File);
-		zesdkError("Map File", "File is corrupted. Can not read materials from file.");
+		//fclose(File);
+		zeError("File is corrupted. Can not read doors from file.");
+		File.Close();
 		return false;
 	}
 
-	if (!ReadPortalsFromFile(File, this->Portals))
-	{
-		fclose(File);
-		zesdkError("Map File", "File is corrupted. Can not read portals from file.");
-		return false;
-	}
+	File.Close();
+	//fclose(File);
 
-	if (!ReadDoorsFromFile(File, this->Doors))
-	{
-		fclose(File);
-		zesdkError("Map File", "File is corrupted. Can not read doors from file.");
-		return false;
-	}
-
-	fclose(File);
-
+	zeLog("Validating Map File.");
 	if (!Validate())
 	{
-		zesdkWarning("Map File", "ZEMapFile has been readed but it has failed validation checks.");
+		zeWarning("ZEMapFile has been readed but it has failed validation checks.");
 	}
 
 	return true;
@@ -563,7 +613,7 @@ bool ZEMapFile::Validate()
 		{
 			if(Portals[I].Polygons[N].Material >= (ZEUInt32)Materials.GetCount())
 			{		
-				zesdkWarning("Map File Validation", "Polygon does not have a valid material id. (Portal Index : %d, Polygon Index : %d)", I, N);
+				zeWarning("Polygon does not have a valid material id. (Portal Index : %d, Polygon Index : %d)", I, N);
 				Validated = false;
 			}
 		}
@@ -574,13 +624,13 @@ bool ZEMapFile::Validate()
 	{
 		if(Doors[I].PortalIds[0] >= (ZEUInt32)Portals.GetCount())
 		{		
-			zesdkWarning("Map File Validation", "Portal door destination is not valid. (Door Index : %d, Destination Portal)", I, Doors[I].PortalIds[0]);
+			zeWarning("Portal door destination is not valid. (Door Index : %d, Destination Portal)", I, Doors[I].PortalIds[0]);
 			Validated = false;
 		}
 
 		if(Doors[I].PortalIds[1] >= (ZEUInt32)Portals.GetCount())
 		{		
-			zesdkWarning("Map File Validation", "Portal door destination is not valid. (Door Index : %d, Destination Portal)", I, Doors[I].PortalIds[1]);
+			zeWarning("Portal door destination is not valid. (Door Index : %d, Destination Portal)", I, Doors[I].PortalIds[1]);
 			Validated = false;
 		}
 	}
@@ -602,7 +652,7 @@ bool ZEMapFile::Validate()
 		
 		if(!Used)
 		{
-			zesdkNotice("Map File Validation", "Material %d is not used by any polygons.\n",I);
+			zeLog("Material %d is not used by any polygons.\n",I);
 		}
 	}
 

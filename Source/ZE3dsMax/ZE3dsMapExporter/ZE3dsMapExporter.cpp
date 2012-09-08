@@ -159,10 +159,10 @@ ZEInt	ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	Scene = GetIGameInterface();	
 	Scene->InitialiseIGame(lNodes);
 
-	zepdLog("Processing 3ds Max Scene...\r\n");
+	zeLog("Processing 3ds Max Scene...\r\n");
 	if (!ProcessScene())
 	{
-		zepdError("Can not process scene.");
+		zeError("Can not process scene.");
 		ProgDlg.SetExitMode(true);
 		ProgDlg.StopFileLogging();
 		return false;
@@ -170,7 +170,7 @@ ZEInt	ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	
 	if (!ProcessPortals())
 	{
-		zepdError("Can not process portals.");
+		zeError("Can not process portals.");
 		ProgDlg.SetExitMode(true);
 		ProgDlg.StopFileLogging();
 		return false;
@@ -178,7 +178,7 @@ ZEInt	ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 
 	if (!ProcessDoors())
 	{
-		zepdError("Can not process doors.");
+		zeError("Can not process doors.");
 		ProgDlg.SetExitMode(true);
 		ProgDlg.StopFileLogging();
 		return false;
@@ -186,17 +186,17 @@ ZEInt	ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 
 	if (!ProcessMaterials())
 	{
-		zepdError("Can not process materials.");
+		zeError("Can not process materials.");
 		ProgDlg.SetExitMode(true);
 		ProgDlg.StopFileLogging();
 		return false;
 	}
 		
-	zepdLog("Dumping map to file...");
+	zeLog("Dumping map to file...");
 
 	if (!Map.WriteToFile(name))
 	{
-		zepdError("Export failed !");
+		zeError("Export failed !");
 		ProgDlg.SetExitMode(true);
 		ProgDlg.StopFileLogging();
 		return true;
@@ -204,10 +204,10 @@ ZEInt	ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 
 	ZEMapFile MapFile2;
 
-	zepdLog("Verifying written file...");
+	zeLog("Verifying written file...");
 	MapFile2.ReadFromFile(name);
 
-	zepdLog("Export succeed");
+	zeLog("Export succeed");
 	ProgDlg.SetExitMode(true);
 	ProgDlg.StopFileLogging();
 	return true;

@@ -206,7 +206,7 @@ ZEInt ZE3dsMapExporter::FindPortalIndex(IGameNode* Node)
 
 bool ZE3dsMapExporter::ProcessDoors()
 {
-	zepdLog("Processing Portal Doors...");
+	zeLog("Processing Portal Doors...");
 
 	INode* PortalANode;
 	INode* PortalBNode;
@@ -217,7 +217,7 @@ bool ZE3dsMapExporter::ProcessDoors()
 		IGameNode* CurrentNode = Doors[I];
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 
-		zepdLog("\tProcessing Portal Door \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Doors.Count());
+		zeLog("\tProcessing Portal Door \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Doors.Count());
 
 		GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Width", PlaneWidth);
 		GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Length", PlaneLength);
@@ -226,7 +226,7 @@ bool ZE3dsMapExporter::ProcessDoors()
 		GetProperty(CurrentObject, IGAME_INT_PROP, "IsOpen", IsOpen);
 		if (PortalANode == NULL || PortalBNode == NULL || PortalANode == PortalBNode)
 		{
-			zepdWarning("Portal door \"%s\" has wrong parameters.", CurrentNode->GetName());
+			zeWarning("Portal door \"%s\" has wrong parameters.", CurrentNode->GetName());
 			return false;
 		}
 
@@ -275,12 +275,12 @@ void ProcessPhysicalMesh(ZEMapFilePhysicalMesh* PhysicalMesh, IGameObject* Objec
 
 bool ZE3dsMapExporter::ProcessPortals()
 {
-	zepdLog("Processing portals...");
+	zeLog("Processing portals...");
 	Map.Portals.SetCount((ZESize)Portals.Count());
 	for (ZESize I = 0; I < (ZESize)Portals.Count(); I++)
 	{
 		IGameNode* CurrentNode = Portals[I];
-		zepdOutput("\tProcessing Portal \"%s\" (%Iu/%d)\r\n", CurrentNode->GetName(), I + 1, Portals.Count());
+		zeOutput("\tProcessing Portal \"%s\" (%Iu/%d)\r\n", CurrentNode->GetName(), I + 1, Portals.Count());
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		ZEMapFilePortal* CurrentFilePortal = &Map.Portals[I];
 		bool PhysicalMeshEnabled, PhysicalMeshUseSelf;
@@ -290,7 +290,7 @@ bool ZE3dsMapExporter::ProcessPortals()
 		strncpy(CurrentFilePortal->Name, CurrentNode->GetName(), ZE_MPFL_MAX_NAME_SIZE);
 
 		if (CurrentFilePortal->GenerateOctree)
-			zepdWarning("Octree is not supported. Portal : \"%s\"", CurrentFilePortal->Name);
+			zeWarning("Octree is not supported. Portal : \"%s\"", CurrentFilePortal->Name);
 		//GetProperty(CurrentObject, IGAME_INT_PROP, "GenerateOctree", CurrentFilePortal->GenerateOctree);
 		//GetProperty(CurrentObject, IGAME_INT_PROP, "MaxOctreeDepth", CurrentFilePortal->MaxOctreeDepth);
 		CurrentFilePortal->GenerateOctree = false;
@@ -340,7 +340,7 @@ bool ZE3dsMapExporter::ProcessPortals()
 			Face = Mesh->GetFace((ZEInt)I);
 			if (Mesh->GetMaterialFromFace((ZEInt)I) == NULL)
 			{
-				zepdError("Face %d of portal \"%s\" does not have valid material.", I, CurrentNode->GetName());
+				zeError("Face %d of portal \"%s\" does not have valid material.", I, CurrentNode->GetName());
 				return false;
 			}
 
@@ -394,13 +394,13 @@ bool ZE3dsMapExporter::ProcessPortals()
 
 bool ZE3dsMapExporter::ProcessMaterials()
 {
-	zepdLog("Processing materials...");
+	zeLog("Processing materials...");
 	Map.Materials.SetCount((ZESize)Materials.Count());
 	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)
 	{
 		IGameMaterial* NodeMaterial = Materials[I];
 
-		zepdLog("\tProcessing material \"%s\" (%Iu/%d)", NodeMaterial->GetMaterialName(), I + 1, Materials.Count());
+		zeLog("\tProcessing material \"%s\" (%Iu/%d)", NodeMaterial->GetMaterialName(), I + 1, Materials.Count());
 		ZEMapFileMaterial* CurrentMaterial = &Map.Materials[I];
 		ZeroMemory(CurrentMaterial, sizeof(ZEMapFileMaterial));
 
@@ -435,7 +435,7 @@ bool ZE3dsMapExporter::ProcessMaterials()
 				case ID_DI: // Diffuse
 					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
-						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Diffuse Map.\r\n"
+						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Diffuse Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Diffuse Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
@@ -446,7 +446,7 @@ bool ZE3dsMapExporter::ProcessMaterials()
 				case ID_SP: // Specular
 					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
-						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Specular Map.\r\n"
+						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Specular Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Specular Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
@@ -457,7 +457,7 @@ bool ZE3dsMapExporter::ProcessMaterials()
 				case ID_SI:	// Emmisive
 					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
-						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Emmisive Map.\r\n"
+						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Emmisive Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Self Ilimunation Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
@@ -468,7 +468,7 @@ bool ZE3dsMapExporter::ProcessMaterials()
 				case ID_OP:	// Opacity 
 					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
-						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Opacity Map.\r\n"
+						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Opacity Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Opacity Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
@@ -480,7 +480,7 @@ bool ZE3dsMapExporter::ProcessMaterials()
 					/*
 					if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
-						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Diffuse Map.\r\n"
+						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Diffuse Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Diffuse Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
@@ -493,7 +493,7 @@ bool ZE3dsMapExporter::ProcessMaterials()
 				case ID_BU: // Bump 
 					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
-						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Bump Map.\r\n"
+						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Bump Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Bump Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
@@ -504,7 +504,7 @@ bool ZE3dsMapExporter::ProcessMaterials()
 				case ID_RL: // Reflection 
 					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
-						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Reflection Map.\r\n"
+						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Reflection Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Reflection Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
@@ -515,7 +515,7 @@ bool ZE3dsMapExporter::ProcessMaterials()
 				case ID_RR: // Refraction 
 					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
-						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Refraction Map.\r\n"
+						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Refraction Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Refraction Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
@@ -570,7 +570,7 @@ bool ZE3dsMapExporter::ProcessScene()
 		else
 			ElectedNodeCount++;
 	}
-	zepdLog("\tPortal Count: %d, Portal Doors Count: %d, Entity Count: %d, Elected Node Count: %d", PortalNodeCount, PortalDoorNodeCount, EntityNodeCount, ElectedNodeCount);
+	zeLog("\tPortal Count: %d, Portal Doors Count: %d, Entity Count: %d, Elected Node Count: %d", PortalNodeCount, PortalDoorNodeCount, EntityNodeCount, ElectedNodeCount);
 
 	return true;
 }

@@ -37,7 +37,6 @@
 #ifndef __ZET_MAP_FILE_OCTREE_H__
 #define __ZET_MAP_FILE_OCTREE_H__
 
-#include "ZETDefinitions.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZETMapFile.h"
