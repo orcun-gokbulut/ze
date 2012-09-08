@@ -58,6 +58,9 @@ class ZEProgressDialog
 	private:
 
 		static ZEProgressDialog*		Instance;
+		bool							QApplicationCreated;
+		bool							IsWaitForClose;
+		bool							Canceled;
 
 		QApplication*					Application;
 		ZEProgressDialogSignalHandler*	SignalHandler;
@@ -77,6 +80,12 @@ class ZEProgressDialog
 
 		void							SetTitle(const ZEString& Title);
 
+		void							SetProgressBarVisibility(bool IsVisible);
+		bool							GetProgressBarVisibility();
+
+		void							SetHeaderVisibility(bool IsVisible);
+		bool							GetHeaderVisibility();
+
  		void							Start(); 
 		ZEProgressDialogTask*			OpenTask(const ZEString& Name, bool IsTitle = false);
 		void							CloseTask();
@@ -87,9 +96,11 @@ class ZEProgressDialog
 		void							SetTaskProgress(ZEInt8 Progress);
 
  		void							Message(ZELogType Type, const char* Text);
-// 		void							WaitForClose();
+ 		void							WaitForClose(bool Enable);
 
-		static ZEProgressDialog*		 GetInstance();
+		bool							IsCanceled();
+
+		static ZEProgressDialog*		GetInstance();
 
 										ZEProgressDialog();
 										~ZEProgressDialog();
