@@ -265,6 +265,8 @@ ZELogCallback ZELog::GetCallback()
 
 void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 {
+	Lock.Lock();
+
 	if (Type < GetMinimumLogLevel())
 		return;
 
@@ -296,10 +298,14 @@ void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 
 	if (LogCallback != NULL)
 		LogCallback(Module, Type, Buffer);
+	
+	Lock.Unlock();
 }
 
 void ZELog::Log(const char* Module, const char* Format, ...)
 {
+	Lock.Lock();
+
 	if (ZE_LOG_INFO < GetMinimumLogLevel())
 		return;
 
@@ -330,7 +336,8 @@ void ZELog::Log(const char* Module, const char* Format, ...)
 
 	if (LogCallback != NULL)
 		LogCallback(Module, ZE_LOG_INFO, Buffer);
-
+	
+	Lock.Unlock();
 }
 
 ZELog::ZELog()
