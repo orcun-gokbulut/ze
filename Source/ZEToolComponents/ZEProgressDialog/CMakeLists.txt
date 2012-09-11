@@ -42,6 +42,8 @@ ze_add_source(ZEProgressDialogTask.cpp		Sources)
 ze_add_source(ZEProgressDialog.ui		Sources QtUI)
 ze_add_source(ZEProgresDialogSignalHandler.h		Sources QtMocs)
 ze_add_source(ZEProgresDialogSignalHandler.cpp		Sources)
+ze_add_source(ZEProgressDialogTreeWidget.h			Sources)
+ze_add_source(ZEProgressDialogTreeWidget.cpp		Sources)
 
 qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
