@@ -66,8 +66,8 @@ ZEProgressDialog::ZEProgressDialog()
 	
 	Canceled = false;
 	IsWaitForClose = true;
-	TasksTreeWidget = new ZEProgressDialogTreeWidget(Form->tab);
-	Form->tab->layout()->addWidget(TasksTreeWidget);
+	TasksTreeWidget = new ZEProgressDialogTreeWidget(Form->tabTasks);
+	Form->tabTasks->layout()->addWidget(TasksTreeWidget);
 
 	RootTask = NULL;
 	CurrentTask = NULL;
@@ -178,7 +178,23 @@ void ZEProgressDialog::Message(ZELogType Type, const char* Text)
 		CurrentTask->SetState(ZE_PDTS_ERROR);
 
 	CurrentTask->AppendLog(Text);
-	Form->txtLog->append(Text);
+	QTextCursor TextCursor(Form->txtLog->document());
+	QTextBlockFormat BlockFormat = TextCursor.blockFormat();
+	
+	if(Type == ZE_LOG_WARNING)
+		BlockFormat.setBackground(QBrush(QColor(255, 235, 156)));
+	else if(Type == ZE_LOG_ERROR)
+		BlockFormat.setBackground(QBrush(QColor(255, 199, 206)));
+	else if(Type == ZE_LOG_CRITICAL_ERROR)
+		BlockFormat.setBackground(QBrush(QColor(255, 199, 206)));
+	else
+		BlockFormat.clearBackground();
+
+	TextCursor.setBlockFormat(BlockFormat);
+	TextCursor.movePosition(QTextCursor::End);
+	TextCursor.insertBlock(BlockFormat);
+	QTextCharFormat CharFormat;
+	TextCursor.insertText(Text, CharFormat);
 }
 
 ZEProgressDialog* ZEProgressDialog::GetInstance()
