@@ -44,8 +44,6 @@ void ZEProgressDialogTask::SetUpTreeItem()
 	SetState(ZE_PDTS_PENDING);
 	LogItem->setHidden(true);
 	IsLogVisible = false;
-	//LogItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
-	//TreeItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
 }
 
 ZEProgressDialogTask::ZEProgressDialogTask(QTreeWidget* Parent, const ZEString& Name)
@@ -101,13 +99,13 @@ ZEProgressDialogTask::~ZEProgressDialogTask()
 void  ZEProgressDialogTask::SetState(ZEProgressDialogTaskState State)
 {
 	if(State == ZE_PDTS_PENDING)
-		TreeItem->setBackgroundColor(1, Qt::blue);
+		TreeItem->setBackgroundColor(1, QColor(184, 204, 228));
 	else if(State == ZE_PDTS_WARNING)
-		TreeItem->setBackgroundColor(1, Qt::yellow);
+		TreeItem->setBackgroundColor(1, QColor(255, 235, 156));
 	else if(State == ZE_PDTS_ERROR)
-		TreeItem->setBackgroundColor(1, Qt::red);
+		TreeItem->setBackgroundColor(1, QColor(255, 199, 206));
 	else if(State == ZE_PDTS_OK)
-		TreeItem->setBackgroundColor(1, Qt::green);	
+		TreeItem->setBackgroundColor(1, QColor(198, 239, 206));	
 
 	this->State = State;
 }
@@ -151,7 +149,7 @@ const ZEString&	ZEProgressDialogTask::GetName() const
 
 void ZEProgressDialogTask::AppendLog(const ZEString& Text)
 {
-	TaskLog.Append(Text);
+	TaskLog.Append(Text + "\n");
 	LogItem->setText(0, QString(TaskLog.ToCString()));
 }
 

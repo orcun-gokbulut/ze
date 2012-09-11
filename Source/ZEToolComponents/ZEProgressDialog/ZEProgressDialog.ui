@@ -99,13 +99,13 @@
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="QWidget" name="tab">
+       <widget class="QWidget" name="tabTasks">
         <attribute name="title">
          <string>Tasks</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_4"/>
        </widget>
-       <widget class="QWidget" name="tab_2">
+       <widget class="QWidget" name="tabLog">
         <attribute name="title">
          <string>Log</string>
         </attribute>
