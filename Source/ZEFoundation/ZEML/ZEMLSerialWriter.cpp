@@ -218,7 +218,7 @@ void  ZEMLSerialNode::CloseNode()
 	ParentNode->Size += 	sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + Name.GetSize() + sizeof(ZEUInt64) + sizeof(ZEUInt64);
 	
 	ZEUInt64 CurrentFilePos = File->Tell();
-	if(!File->Seek(FileUpdatePosition, ZE_SF_BEGINING))
+	if(File->Seek(FileUpdatePosition, ZE_SF_BEGINING))
 		zeError("Can not seek file.");
 
 	TempUInt64 = ZEEndian::Little(SubItemCount);
@@ -229,7 +229,7 @@ void  ZEMLSerialNode::CloseNode()
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not update ZEMLSerialNode node size to file.");
 
-	if(!File->Seek(CurrentFilePos, ZE_SF_BEGINING))
+	if(File->Seek(CurrentFilePos, ZE_SF_BEGINING))
 		zeError("Can not seek file.");
 
 }
@@ -286,7 +286,7 @@ void ZEMLSerialRootNode::CloseNode()
 	ZEUInt64 TempUInt64;
 	ZEUInt64 CurrentFilePos = File->Tell();
 
-	if(!File->Seek(FileUpdatePosition, ZE_SF_BEGINING))
+	if(File->Seek(FileUpdatePosition, ZE_SF_BEGINING))
 		zeError("Can not seek file.");
 
 	TempUInt64 = ZEEndian::Little(SubItemCount);
@@ -297,7 +297,7 @@ void ZEMLSerialRootNode::CloseNode()
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not update ZEMLSerialNode node size to file.");
 
-	if(!File->Seek(CurrentFilePos, ZE_SF_BEGINING))
+	if(File->Seek(CurrentFilePos, ZE_SF_BEGINING))
 		zeError("Can not seek file.");
 }
 

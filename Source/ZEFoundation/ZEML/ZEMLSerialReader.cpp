@@ -100,7 +100,7 @@ bool ZEMLSerialReader::ReadNextItem()
 	}
 	else
 	{
-		ZEUInt64 ReadDataSize = 0;
+		ZEUInt64 IsDataRead = 0;
 		ZEUInt64 ValueSize = 0;
 
 		if(File->Read(&ValueSize, sizeof(ZEUInt64), 1) != 1)
@@ -121,93 +121,102 @@ bool ZEMLSerialReader::ReadNextItem()
 		{
 			case ZEML_IT_FLOAT:
 				CurrentItemValue.SetType(ZE_VRT_FLOAT);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Float, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Float, ValueSize, 1);
 				break;
 			case ZEML_IT_DOUBLE:
 				CurrentItemValue.SetType(ZE_VRT_DOUBLE);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Double, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Double, ValueSize, 1);
 				break;
 			case ZEML_IT_INT8:
 				CurrentItemValue.SetType(ZE_VRT_INTEGER_8);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
 				break;
 			case ZEML_IT_INT16:
 				CurrentItemValue.SetType(ZE_VRT_INTEGER_16);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
 				CurrentItemValue.SetInt16(ZEEndian::Little(CurrentItemValue.GetInt16()));
 				break;
 			case ZEML_IT_INT32:
 				CurrentItemValue.SetType(ZE_VRT_INTEGER_32);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
 				CurrentItemValue.SetInt32(ZEEndian::Little(CurrentItemValue.GetInt32()));
 				break;
 			case ZEML_IT_INT64:
 				CurrentItemValue.SetType(ZE_VRT_INTEGER_64);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int64, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int64, ValueSize, 1);
 				CurrentItemValue.SetInt64(ZEEndian::Little(CurrentItemValue.GetInt64()));
 				break;
 			case ZEML_IT_UINT8:
 				CurrentItemValue.SetType(ZE_VRT_UNSIGNED_INTEGER_8);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
 				break;
 			case ZEML_IT_UINT16:
 				CurrentItemValue.SetType(ZE_VRT_UNSIGNED_INTEGER_16);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
 				CurrentItemValue.SetUInt16(ZEEndian::Little(CurrentItemValue.GetUInt16()));
 				break;
 			case ZEML_IT_UINT32:
 				CurrentItemValue.SetType(ZE_VRT_UNSIGNED_INTEGER_32);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
 				CurrentItemValue.SetUInt32(ZEEndian::Little(CurrentItemValue.GetUInt32()));
 				break;
 			case ZEML_IT_UINT64:
 				CurrentItemValue.SetType(ZE_VRT_UNSIGNED_INTEGER_64);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Int64, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int64, ValueSize, 1);
 				CurrentItemValue.SetUInt64(ZEEndian::Little(CurrentItemValue.GetUInt64()));
 				break;
 			case ZEML_IT_BOOLEAN:
 				CurrentItemValue.SetType(ZE_VRT_BOOLEAN);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Boolean, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Boolean, ValueSize, 1);
 				break;
 			case ZEML_IT_STRING:
 				{
 					CurrentItemValue.SetType(ZE_VRT_STRING);
-					char* TempBuffer = new char[ValueSize];
-					ReadDataSize = File->Read(TempBuffer, ValueSize, 1);
-					CurrentItemValue.SetString(TempBuffer);
-					delete TempBuffer;
+
+					if (ValueSize == 0)
+					{
+						IsDataRead = 1;
+						CurrentItemValue.SetString(ZEString());
+					}
+					else
+					{
+						char* TempBuffer = new char[ValueSize];
+						IsDataRead = File->Read(TempBuffer, ValueSize, 1);
+						CurrentItemValue.SetString(TempBuffer);
+						delete TempBuffer;
+					}
 				}
 				break;
 			case ZEML_IT_QUATERNION:
 				CurrentItemValue.SetType(ZE_VRT_QUATERNION);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Vectors, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Vectors, ValueSize, 1);
 				break;
 			case ZEML_IT_VECTOR2:
 				CurrentItemValue.SetType(ZE_VRT_VECTOR2);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Vectors, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Vectors, ValueSize, 1);
 				break;
 			case ZEML_IT_VECTOR3:
 				CurrentItemValue.SetType(ZE_VRT_VECTOR3);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Vectors, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Vectors, ValueSize, 1);
 				break;
 			case ZEML_IT_VECTOR4:
 				CurrentItemValue.SetType(ZE_VRT_VECTOR4);
-				ReadDataSize = File->Read(&CurrentItemValue.ImplicitAcesss().Vectors, ValueSize, 1);
+				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Vectors, ValueSize, 1);
 				break;
 			case ZEML_IT_MATRIX3X3:
 				CurrentItemValue.SetType(ZE_VRT_MATRIX3X3);
-				ReadDataSize = File->Read(CurrentItemValue.ImplicitAcesss().Matrix3x3, ValueSize, 1);
+				IsDataRead = File->Read(CurrentItemValue.ImplicitAcesss().Matrix3x3, ValueSize, 1);
 				break;
 			case ZEML_IT_MATRIX4X4:
 				CurrentItemValue.SetType(ZE_VRT_MATRIX4X4);
-				ReadDataSize = File->Read(CurrentItemValue.ImplicitAcesss().Matrix4x4, ValueSize, 1);
+				IsDataRead = File->Read(CurrentItemValue.ImplicitAcesss().Matrix4x4, ValueSize, 1);
 				break;
 			default:
 				zeError("Unsupported ZEMLProperty type.");
 				break;
 		}
 
-		if(ReadDataSize != 1)
+		if(IsDataRead != 1)
 			zeError("Can not read ZEMLProperty value from file. Corrupted ZEML file.");
 
 		NextItemPosition = File->Tell();
@@ -244,7 +253,7 @@ bool ZEMLSerialReader::GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offse
 	if(CurrentItemType != ZEML_IT_INLINE_DATA)
 		return false;
 
-	if(!File->Seek(Offset, ZE_SF_CURRENT))
+	if(File->Seek(Offset, ZE_SF_CURRENT))
 	{
 		zeError("Can not seek ZEML file.");
 		return false;
