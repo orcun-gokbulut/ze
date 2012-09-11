@@ -160,78 +160,83 @@ void ZEMLProperty::WriteToFile(ZEFile* File)
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
 		zeError("Can not write ZEMLProperty data size to file.");
 
-	ZEUInt64 WritenDataSize = 0;
+	ZEUInt64 IsDataWriten = 0;
 
 	switch (this->Value.GetType())
 	{
 		case ZE_VRT_FLOAT:
-			WritenDataSize = File->Write(&Value.ImplicitAcesss().Float, Value.SizeOf(), 1);
+			IsDataWriten = File->Write(&Value.ImplicitAcesss().Float, Value.SizeOf(), 1);
 			break;
 		case ZE_VRT_DOUBLE:
-			WritenDataSize = File->Write(&Value.ImplicitAcesss().Double, Value.SizeOf(), 1);
+			IsDataWriten = File->Write(&Value.ImplicitAcesss().Double, Value.SizeOf(), 1);
 			break;
 		case ZE_VRT_INTEGER_8:
 			TempInt8 = ZEEndian::Little(Value.GetInt8());
-			WritenDataSize = File->Write(&TempInt8, sizeof(ZEInt8), 1);
+			IsDataWriten = File->Write(&TempInt8, sizeof(ZEInt8), 1);
 			break;
 		case ZE_VRT_INTEGER_16:
 			TempInt16 = ZEEndian::Little(Value.GetInt16());
-			WritenDataSize = File->Write(&TempInt16, sizeof(ZEInt16), 1);
+			IsDataWriten = File->Write(&TempInt16, sizeof(ZEInt16), 1);
 			break;
 		case ZE_VRT_INTEGER_32:
 			TempInt32 = ZEEndian::Little(Value.GetInt32());
-			WritenDataSize = File->Write(&TempInt32, sizeof(ZEInt32), 1);
+			IsDataWriten = File->Write(&TempInt32, sizeof(ZEInt32), 1);
 			break;
 		case ZE_VRT_INTEGER_64:
 			TempInt64 = ZEEndian::Little(Value.GetInt64());
-			WritenDataSize = File->Write(&TempInt64, sizeof(ZEInt64), 1);
+			IsDataWriten = File->Write(&TempInt64, sizeof(ZEInt64), 1);
 			break;
 		case ZE_VRT_UNSIGNED_INTEGER_8:
 			TempUInt8 = ZEEndian::Little(Value.GetUInt8());
-			WritenDataSize = File->Write(&TempUInt8, sizeof(ZEUInt8), 1);
+			IsDataWriten = File->Write(&TempUInt8, sizeof(ZEUInt8), 1);
 			break;
 		case ZE_VRT_UNSIGNED_INTEGER_16:
 			TempUInt16 = ZEEndian::Little(Value.GetUInt16());
-			WritenDataSize = File->Write(&TempUInt16, sizeof(ZEUInt16), 1);
+			IsDataWriten = File->Write(&TempUInt16, sizeof(ZEUInt16), 1);
 			break;
 		case ZE_VRT_UNSIGNED_INTEGER_32:
 			TempUInt32 = ZEEndian::Little(Value.GetUInt32());
-			WritenDataSize = File->Write(&TempUInt32, sizeof(ZEUInt32), 1);
+			IsDataWriten = File->Write(&TempUInt32, sizeof(ZEUInt32), 1);
 			break;
 		case ZE_VRT_UNSIGNED_INTEGER_64:
 			TempUInt64 = ZEEndian::Little(Value.GetUInt64());
-			WritenDataSize = File->Write(&TempUInt64, sizeof(ZEUInt64), 1);
+			IsDataWriten = File->Write(&TempUInt64, sizeof(ZEUInt64), 1);
 			break;
 		case ZE_VRT_BOOLEAN:
-			WritenDataSize = File->Write(&Value.ImplicitAcesss().Boolean, Value.SizeOf(), 1);
+			IsDataWriten = File->Write(&Value.ImplicitAcesss().Boolean, Value.SizeOf(), 1);
 			break;
 		case ZE_VRT_STRING:
-			WritenDataSize = File->Write(Value.ImplicitAcesss().String.GetValue(), Value.ImplicitAcesss().String.GetSize(), 1);
-			break;
+			{
+				if (Value.ImplicitAcesss().String.GetSize() == 0)
+					IsDataWriten = 1;
+				else
+					IsDataWriten = File->Write(Value.ImplicitAcesss().String.GetValue(), Value.ImplicitAcesss().String.GetSize(), 1);
+				break;
+			}
 		case ZE_VRT_QUATERNION:
-			WritenDataSize = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEQuaternion), 1);
+			IsDataWriten = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEQuaternion), 1);
 			break;
 		case ZE_VRT_VECTOR2:
-			WritenDataSize = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEVector2), 1);
+			IsDataWriten = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEVector2), 1);
 			break;
 		case ZE_VRT_VECTOR3:
-			WritenDataSize = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEVector3), 1);
+			IsDataWriten = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEVector3), 1);
 			break;
 		case ZE_VRT_VECTOR4:
-			WritenDataSize = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEVector4), 1);
+			IsDataWriten = File->Write(&Value.ImplicitAcesss().Vectors, sizeof(ZEVector4), 1);
 			break;
 		case ZE_VRT_MATRIX3X3:
-			WritenDataSize = File->Write(Value.ImplicitAcesss().Matrix3x3, sizeof(ZEMatrix3x3), 1);
+			IsDataWriten = File->Write(Value.ImplicitAcesss().Matrix3x3, sizeof(ZEMatrix3x3), 1);
 			break;
 		case ZE_VRT_MATRIX4X4:
-			WritenDataSize = File->Write(Value.ImplicitAcesss().Matrix4x4, sizeof(ZEMatrix4x4), 1);
+			IsDataWriten = File->Write(Value.ImplicitAcesss().Matrix4x4, sizeof(ZEMatrix4x4), 1);
 			break;
 		default:
 			zeError("Unsupported ZEMLProperty type.");
 			break;
 	}
 
-	if(WritenDataSize != 1)
+	if(IsDataWriten != 1)
 		zeError("Can not write ZEMLProperty value to file.");
 }
 
