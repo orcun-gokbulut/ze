@@ -121,7 +121,7 @@ ZEMLProperty* ZEMLNode::AddProperty()
 bool ZEMLNode::RemoveProperty(ZEMLProperty* Property)
 {
 	ZEMLItem* ToRemove = Property;
-	if(Properties.Exists(ToRemove));
+	if(Properties.Exists(ToRemove))
 	{
 		Properties.DeleteValue(ToRemove);
 		return true;
@@ -258,7 +258,7 @@ ZEMLDataProperty* ZEMLNode::AddDataProperty()
 bool ZEMLNode::RemoveDataProperty(ZEMLDataProperty* Property)
 {
 	ZEMLItem* ToRemove = Property;
-	if(Properties.Exists(ToRemove));
+	if(Properties.Exists(ToRemove))
 	{
 		Properties.DeleteValue(ToRemove);
 		return true;
@@ -291,7 +291,7 @@ ZEMLNode* ZEMLNode::AddSubNode()
 
 bool ZEMLNode::RemoveSubNode(ZEMLNode* SubNode)
 {
-	if(SubNodes.Exists(SubNode));
+	if(SubNodes.Exists(SubNode))
 	{
 		SubNodes.Remove(SubNode);
 		return true;

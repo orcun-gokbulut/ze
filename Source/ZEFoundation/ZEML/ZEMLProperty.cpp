@@ -266,99 +266,107 @@ void ZEMLProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 
 	SetName(TempNameBuffer);
 
-	ZEUInt64 ReadDataSize = 0;
+	ZEUInt64 IsDataRead = 0;
 
 	switch(Type)
 	{
 		case ZEML_IT_FLOAT:
 			Value.SetType(ZE_VRT_FLOAT);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Float, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Float, DataSize, 1);
 			break;
 		case ZEML_IT_DOUBLE:
 			Value.SetType(ZE_VRT_DOUBLE);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Double, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Double, DataSize, 1);
 			break;
 		case ZEML_IT_INT8:
 			Value.SetType(ZE_VRT_INTEGER_8);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
 			break;
 		case ZEML_IT_INT16:
 			Value.SetType(ZE_VRT_INTEGER_16);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
 			Value.SetInt16(ZEEndian::Little(Value.GetInt16()));
 			break;
 		case ZEML_IT_INT32:
 			Value.SetType(ZE_VRT_INTEGER_32);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
 			Value.SetInt32(ZEEndian::Little(Value.GetInt32()));
 			break;
 		case ZEML_IT_INT64:
 			Value.SetType(ZE_VRT_INTEGER_64);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int64, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Int64, DataSize, 1);
 			Value.SetInt64(ZEEndian::Little(Value.GetInt64()));
 			break;
 		case ZEML_IT_UINT8:
 			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_8);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
 			break;
 		case ZEML_IT_UINT16:
 			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_16);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
 			Value.SetUInt16(ZEEndian::Little(Value.GetUInt16()));
 			break;
 		case ZEML_IT_UINT32:
 			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_32);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
 			Value.SetUInt32(ZEEndian::Little(Value.GetUInt32()));
 			break;
 		case ZEML_IT_UINT64:
 			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_64);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Int64, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Int64, DataSize, 1);
 			Value.SetUInt64(ZEEndian::Little(Value.GetUInt64()));
 			break;
 		case ZEML_IT_BOOLEAN:
 			Value.SetType(ZE_VRT_BOOLEAN);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Boolean, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Boolean, DataSize, 1);
 			break;
 		case ZEML_IT_STRING:
 			{
 				Value.SetType(ZE_VRT_STRING);
-				char* TempBuffer = new char[DataSize];
-				ReadDataSize = File->Read(TempBuffer, DataSize, 1);
-				TempBuffer[DataSize - 1] = '\0';
-				Value.SetString(TempBuffer);
-				delete TempBuffer;
+
+				if (DataSize == 0)
+				{
+					IsDataRead = 1;
+					Value.SetString(ZEString());
+				}
+				else
+				{
+					char* TempBuffer = new char[DataSize];
+					IsDataRead = File->Read(TempBuffer, DataSize, 1);
+					Value.SetString(TempBuffer);
+					delete TempBuffer;
+				}
 			}
 			break;
 		case ZEML_IT_QUATERNION:
 			Value.SetType(ZE_VRT_QUATERNION);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
 			break;
 		case ZEML_IT_VECTOR2:
 			Value.SetType(ZE_VRT_VECTOR2);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
 			break;
 		case ZEML_IT_VECTOR3:
 			Value.SetType(ZE_VRT_VECTOR3);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
 			break;
 		case ZEML_IT_VECTOR4:
 			Value.SetType(ZE_VRT_VECTOR4);
-			ReadDataSize = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
+			IsDataRead = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
 			break;
 		case ZEML_IT_MATRIX3X3:
 			Value.SetType(ZE_VRT_MATRIX3X3);
-			ReadDataSize = File->Read(Value.ImplicitAcesss().Matrix3x3, DataSize, 1);
+			IsDataRead = File->Read(Value.ImplicitAcesss().Matrix3x3, DataSize, 1);
 			break;
 		case ZEML_IT_MATRIX4X4:
 			Value.SetType(ZE_VRT_MATRIX4X4);
-			ReadDataSize = File->Read(Value.ImplicitAcesss().Matrix4x4, DataSize, 1);
+			IsDataRead = File->Read(Value.ImplicitAcesss().Matrix4x4, DataSize, 1);
 			break;
 		default:
 			zeError("Unsupported ZEMLProperty type.");
 			break;
 	}
 
-	if(ReadDataSize != 1)
+	if(IsDataRead != 1)
 		zeError("Can not read ZEMLProperty value from file. Corrupted ZEML file.");
 }
