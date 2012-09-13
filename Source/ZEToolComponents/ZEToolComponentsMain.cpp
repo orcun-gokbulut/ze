@@ -49,23 +49,23 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 	char** argv = NULL;
 
 	QApplication a(argc, argv);
-	ZEProgressDialog w;
-
-	w.SetTitle("Test Stes");
-	w.Start();
-	w.OpenTask("Main Task", true);
-	w.OpenTask("Task 1");
-	w.TaskFailed();
-	w.OpenTask("Task 1.1");
-	//w.TaskSucceded();
-	w.CloseTask();
-	w.OpenTask("Task 1.2");
-	w.TaskFailed();
-	w.CloseTask();
-	w.CloseTask();
-	w.OpenTask("Task 2");
-	//w.Message(ZE_LOG_WARNING, "Ahanda Uyari !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-	zeWarning("Test Test Test\nTest Test Test");
+// 	ZEProgressDialog* w;
+// 
+// 	w.SetTitle("Test Stes");
+// 	w.Start();
+// 	w.OpenTask("Main Task", true);
+// 	w.OpenTask("Task 1");
+// 	w.TaskFailed();
+// 	w.OpenTask("Task 1.1");
+// 	//w.TaskSucceded();
+// 	w.CloseTask();
+// 	w.OpenTask("Task 1.2");
+// 	w.TaskFailed();
+// 	w.CloseTask();
+// 	w.CloseTask();
+// 	w.OpenTask("Task 2");
+// 	//w.Message(ZE_LOG_WARNING, "Ahanda Uyari !!!!!!!!!!!!!!!!!!!");
+// 	zeWarning("Test Test Test\nTest Test Test");
 	
  	//w.show();
  	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
