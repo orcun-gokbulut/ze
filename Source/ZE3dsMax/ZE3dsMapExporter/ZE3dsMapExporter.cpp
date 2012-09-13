@@ -44,16 +44,52 @@
 #include "ZEFile/ZEFileUtils.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
+#include "ZEFile/ZEFileInfo.h"
 
 ZE3dsMapExporter::ZE3dsMapExporter()
 {
 	Scene = NULL;
 	QtApplication = NULL;
+	ExportOptions = NULL;
+	WinWidget = NULL;
+	OptionsDialog = NULL;
+	ProgressDialog = NULL;
 }
 
 ZE3dsMapExporter::~ZE3dsMapExporter() 
 {
-	QtApplication->quit();
+	if(ExportOptions != NULL)
+	{
+		delete ExportOptions;
+		ExportOptions = NULL;
+	}
+
+	if(ProgressDialog != NULL)
+	{
+		delete ProgressDialog;
+		ProgressDialog = NULL;
+	}
+
+	if(OptionsDialog != NULL)
+	{
+		OptionsDialog->hide();
+		delete OptionsDialog;
+		OptionsDialog = NULL;
+	}
+
+	if(WinWidget != NULL)
+	{
+		WinWidget->hide();
+		delete WinWidget;
+		WinWidget = NULL;
+	}
+
+	if(QtApplication != NULL)
+	{
+		QtApplication->quit();
+		delete QtApplication;
+		QtApplication = NULL;
+	}
 }
 
 ZEInt ZE3dsMapExporter::ExtCount()
@@ -118,7 +154,7 @@ ZEInt ZE3dsMapExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode 
 	{
 		i_currentNode = GetCOREInterface()->GetRootNode();
 	}
-	else // IGame will crash 3ds Max if it is initialised with the root node.
+	else // IGame will crash 3ds Max if it is initialized with the root node.
 	{
 	    i_nodeTab.AppendNode(i_currentNode);
 	}
@@ -131,6 +167,23 @@ ZEInt ZE3dsMapExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode 
 
 ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
+	ExportPath = ZEFileInfo::GetParentDirectory(name);
+	ZEString OptionsFilePath((ZEString(i->GetCurFilePath().data())) + ".zecfg");
+
+	if(strlen(i->GetCurFilePath().data()) != 0)
+	{
+		ZEFile OptionsFile;
+
+		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_NONE))
+		{
+			if(ExportOptions == NULL)
+				ExportOptions = new ZEMLNode("Options");
+
+			ExportOptions->Read(&OptionsFile);
+			OptionsFile.Close();
+		}
+	}
+
 	INodeTab lNodes;
 	GetSceneNodes(lNodes);
 
@@ -138,48 +191,53 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	cm->SetCoordSystem(IGameConversionManager::IGAME_D3D);
 
 	int Argc = 0;
-	ZEMLNode* ExportOptions = new ZEMLNode("Options");
-	ZEString OptionsFilePath((ZEString(i->GetCurFilePath().data())) + ".zecfg");
-	ZEFile* OptionsFile = new ZEFile();
-
-	if(OptionsFile->Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_NONE))
-		ExportOptions->Read(OptionsFile);
-
-	if(OptionsFile->IsOpen())
-		OptionsFile->Close();
-
 	if(QApplication::instance() == NULL)
 		QtApplication = new QApplication(Argc, NULL);
+	else
+		QtApplication = (QApplication*)QApplication::instance();
 
-	QWinWidget* ExporterWindow = new QWinWidget(i->GetMAXHWnd());
-	ZEMapExporterOptionsDialogNew* ExporterDialog = new ZEMapExporterOptionsDialogNew(ExporterWindow, ExportOptions);
-	ExporterWindow->showCentered();
-	ZEInt DialogResult = ExporterDialog->exec();
+	if(WinWidget == NULL)
+		WinWidget = new QWinWidget(i->GetMAXHWnd());
+
+	if(OptionsDialog == NULL)
+		OptionsDialog = new ZEMapExporterOptionsDialogNew(WinWidget, ExportOptions);
+
+	if(ExportOptions != NULL)
+		OptionsDialog->SetOptions(ExportOptions);
+
+	WinWidget->showCentered();
+	ZEInt DialogResult = OptionsDialog->exec();
 
 	if(DialogResult == QDialog::Rejected)
-		return false;
+		return true;
 
-	if(strlen(i->GetCurFilePath().data()) != 0)
+	if(ExportOptions != NULL)
 	{
-		OptionsFile->Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-		ExporterDialog->GetOptions()->Write(OptionsFile);
-		OptionsFile->Close();
-		delete OptionsFile;
+		ZEFile OptionsFile;
+		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
+		{
+			OptionsDialog->GetOptions()->Write(&OptionsFile);
+			OptionsFile.Close();
+		}
+	}
+	else
+	{
+		ExportOptions = OptionsDialog->GetOptions();
 	}
 
-	ProgDlg.Create(hInstance);
-	ProgDlg.Show();
 	Scene = GetIGameInterface();	
 	Scene->InitialiseIGame(lNodes);
 
-	ZEProgressDialog* ProgressDialog = new ZEProgressDialog();
+	if(ProgressDialog == NULL)
+		ProgressDialog = ZEProgressDialog::CreateInstance();
+
 	ProgressDialog->SetTitle("Map Export Progress");
 	ProgressDialog->SetProgressBarVisibility(false);
 	ProgressDialog->Start();
 	ProgressDialog->OpenTask("Map Exporter", true);
 
 	ProgressDialog->OpenTask("Scene Process");
-	zeLog("Processing 3ds Max Scene...\r\n");
+	zeLog("Processing 3ds Max Scene...");
 	if (!ProcessScene())
 	{
 		zeError("Can not process scene.");
@@ -217,7 +275,7 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	if (!Map.WriteToFile(name))
 	{
 		zeError("Export failed !");
-		return true;
+		return false;
 	}
 	ProgressDialog->CloseTask();
 

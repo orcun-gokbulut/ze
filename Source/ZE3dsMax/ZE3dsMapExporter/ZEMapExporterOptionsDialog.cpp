@@ -53,6 +53,12 @@ ZEMapExporterOptionsDialogNew::ZEMapExporterOptionsDialogNew(QWidget* Parent, ZE
 	SetOptions(Options);
 }
 
+ZEMapExporterOptionsDialogNew::~ZEMapExporterOptionsDialogNew()
+{
+	delete Form;
+	Form = NULL;
+}
+
 void ZEMapExporterOptionsDialogNew::SetOptions(ZEMLNode* Options)
 {
 	if(Options == NULL)

@@ -37,6 +37,8 @@
 #include "ZETypes.h"
 #include "ZE3dsMapExporter.h"
 #include "ZEToolComponents\ZEProgressDialog\ZEProgressDialog.h"
+#include "ZEML\ZEMLProperty.h"
+#include "ZEML\ZEMLNode.h"
 
 
 inline ZEVector2 MAX_TO_ZE(const Point2& Point)
@@ -176,9 +178,16 @@ bool GetProperty<INode*>(IExportEntity* Object, PropType Type, const char* Prope
 
 bool ZE3dsMapExporter::GetRelativePath(const char* RealPath, char* RelativePath)
 {
-	if (strnicmp(RealPath, Options.ZinekDir, strlen(Options.ZinekDir)) == 0)
+	ZEString ZinekDir;
+
+	if(ExportOptions != NULL)
+		ZinekDir = ((ZEMLProperty*)(ExportOptions->GetProperties("ZinekEngineWorkingDirectory")[0]))->GetValue().GetString();
+	else
+		zeError("Can not get Zinek Working Directory from options.");
+
+	if (strnicmp(RealPath, ZinekDir.ToCString(), ZinekDir.GetLength()) == 0)
 	{
-		strcpy(RelativePath, RealPath + strlen(Options.ZinekDir) + 1);
+		strcpy(RelativePath, RealPath + ZinekDir.GetLength() + 1);
 		return true;
 	}
 	else
@@ -186,6 +195,8 @@ bool ZE3dsMapExporter::GetRelativePath(const char* RealPath, char* RelativePath)
 		RelativePath[0] = '\0';
 		return false;
 	}
+
+	return false;
 }
 
 ZEInt ZE3dsMapExporter::ProcessFaceMaterial(IGameMaterial* Material)
@@ -283,7 +294,7 @@ bool ZE3dsMapExporter::ProcessPortals()
 	{
 		IGameNode* CurrentNode = Portals[I];
 		ZEProgressDialog::GetInstance()->OpenTask(CurrentNode->GetName());
-		zeLog("Processing Portal \"%s\" (%Iu/%d)\r\n", CurrentNode->GetName(), I + 1, Portals.Count());
+		zeLog("Processing Portal \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Portals.Count());
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		ZEMapFilePortal* CurrentFilePortal = &Map.Portals[I];
 		bool PhysicalMeshEnabled, PhysicalMeshUseSelf;

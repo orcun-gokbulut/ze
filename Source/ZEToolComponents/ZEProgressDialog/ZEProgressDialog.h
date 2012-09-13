@@ -76,6 +76,8 @@ class ZEProgressDialog
 		ZEErrorCallback					OldErrorCallback;
 		ZELogCallback					OldLogCallBack;
 
+										ZEProgressDialog();
+
 	public:
 
 		void							SetTitle(const ZEString& Title);
@@ -101,8 +103,8 @@ class ZEProgressDialog
 		bool							IsCanceled();
 
 		static ZEProgressDialog*		GetInstance();
-
-										ZEProgressDialog();
+		static ZEProgressDialog*		CreateInstance();
+											
 										~ZEProgressDialog();
 };
 
