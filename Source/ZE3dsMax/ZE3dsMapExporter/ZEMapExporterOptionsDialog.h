@@ -67,6 +67,7 @@ class ZEMapExporterOptionsDialogNew : public QDialog
 	public:
 
 								ZEMapExporterOptionsDialogNew(QWidget* Parent, ZEMLNode* Options);
+								~ZEMapExporterOptionsDialogNew();
 
 	void						SetOptions(ZEMLNode* Options);
 	ZEMLNode*					GetOptions();

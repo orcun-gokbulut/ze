@@ -82,17 +82,37 @@ ZEProgressDialog::ZEProgressDialog()
 
 ZEProgressDialog::~ZEProgressDialog()
 {
-	Instance = NULL;
+// 	for (ZESize I = 0; I < Tasks.GetCount(); I++)
+// 	{
+// 		delete Tasks[I];
+// 		Tasks[I] = NULL;
+// 	}
+
+//	Tasks.Clear();
+
 	ZELog::GetInstance()->SetCallback(OldLogCallBack);
 	ZEError::GetInstance()->SetCallback(OldErrorCallback);
+	Instance = NULL;
+
 	TasksTreeWidget->hide();
 	delete TasksTreeWidget;
 	TasksTreeWidget = NULL;
+
+	Dialog->hide();
+	delete Dialog;
+	Dialog = NULL;
+
+	delete SignalHandler;
+	SignalHandler = NULL;
+
+	delete Form;
+	Form = NULL;
 
 	if(QApplicationCreated)
 	{
 		Application->quit();
 		delete Application;
+		Application = NULL;
 	}
 }
 
@@ -151,6 +171,8 @@ void ZEProgressDialog::End()
 
 	if(!IsWaitForClose)
 		Dialog->close();
+	else
+		Dialog->exec();
 }
 
 void ZEProgressDialog::TaskSucceded()
@@ -200,6 +222,14 @@ void ZEProgressDialog::Message(ZELogType Type, const char* Text)
 ZEProgressDialog* ZEProgressDialog::GetInstance()
 {
 	return Instance;
+}
+
+ZEProgressDialog* ZEProgressDialog::CreateInstance()
+{
+	if(Instance != NULL)
+		return Instance;
+
+	return new ZEProgressDialog();
 }
 
 void ZEProgressDialog::SetProgressBarVisibility(bool IsVisible)

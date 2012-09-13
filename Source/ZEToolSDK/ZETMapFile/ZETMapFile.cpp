@@ -652,7 +652,7 @@ bool ZEMapFile::Validate()
 		
 		if(!Used)
 		{
-			zeLog("Material %d is not used by any polygons.\n",I);
+			zeLog("Material %d is not used by any polygons.",I);
 		}
 	}
 

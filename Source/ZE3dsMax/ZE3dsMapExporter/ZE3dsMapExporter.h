@@ -39,9 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZETMapFile/ZETMapFile.h"
-#include "ZE3dsMapExporterOptions.h"
 #include "ZE3dsMapExporterResources.h"
-#include "ZE3dsProgressDialog/ZE3dsProgressDialog.h"
 
 
 #include <Max.h>
@@ -52,16 +50,23 @@
 
 
 extern HINSTANCE hInstance;
+
+class ZEMapExporterOptionsDialogNew;
 class QApplication;
+class QWinWidget;
+class ZEProgressDialog;
+class ZEMLNode;
 
 class ZE3dsMapExporter : public SceneExport 
 {
 	private:
 
-		QApplication*				QtApplication;
-
-		ZE3dsMapExporterOptions		Options;
-		ZE3dsProgressDialog			ProgDlg;
+		QApplication*					QtApplication;
+		ZEMapExporterOptionsDialogNew*	OptionsDialog;
+		ZEMLNode*						ExportOptions;
+		QWinWidget*						WinWidget;
+		ZEProgressDialog*				ProgressDialog;
+		ZEString						ExportPath;
 
 		IGameScene*					Scene;
 		ZEMapFile					Map;
