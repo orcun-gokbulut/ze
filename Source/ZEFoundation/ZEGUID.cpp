@@ -45,7 +45,7 @@ ZEInt ZEGUID::Compare(const ZEGUID& Other) const
 		{
 			if (Data3 == Other.Data3)
 			{
-				if (Data4 == Data4)
+				if (Data4 == Other.Data4)
 					return 0;
 
 				return (Data4 > Other.Data4 ? 1 : -1);
