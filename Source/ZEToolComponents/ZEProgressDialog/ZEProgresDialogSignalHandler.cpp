@@ -41,11 +41,6 @@
 #include "QtGui\QApplication"
 #include "QtGui\QClipboard"
 
-ZEProgressDialogSignalHandler::ZEProgressDialogSignalHandler(QObject* Parent) : QObject(Parent)
-{
-
-}
-
 ZEProgressDialogSignalHandler::ZEProgressDialogSignalHandler(ZEProgressDialog* ProgressDialog, QObject* Parent) : QObject(Parent)
 {
 	this->ProgressDialog = ProgressDialog;
