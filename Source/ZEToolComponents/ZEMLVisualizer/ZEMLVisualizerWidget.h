@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEMLVisualizerWidget.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,24 +30,61 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef	__ZEML_VISUALIZER_WIDGET_H__
+#define __ZEML_VISUALIZER_WIDGET_H__
 
-project (ZEToolComponents)
-ze_set_project_folder("ZEToolComponents")
+#include "QtGui/QWidget"
 
-add_subdirectory(ZEProgressDialog)
-add_subdirectory(ZEResourceConfigurationWidget)
-add_subdirectory(ZEMLVisualizer)
+class ZEMLNode;
+class QApplication;
+class ZEMLItem;
+class QTreeWidgetItem;
+class ZEMLVisualizerTreeWidget;
 
-ze_add_source(ZEToolComponentsMain.cpp		Sources)
+namespace Ui
+{
+	class ZEMLVisualizerWidgetUI;
+}
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+class ZEMLVisualizerQt
+{
+	friend class ZEMLVisualizerWidget;
 
-ze_add_executable(ZEToolComponents 
-	SOURCES ${Sources}
-	LIBS
-		ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget ZEMLVisualizerWidget
-		QtCore4 QtGui4)
+	private:
+
+		bool							QApplicationCreated;
+		Ui::ZEMLVisualizerWidgetUI*		Form;
+		QWidget*						Widget;
+		ZEMLVisualizerTreeWidget*		Tree;
+		QApplication*					Application;
+
+										ZEMLVisualizerQt(QWidget* Parent = NULL);
+										~ZEMLVisualizerQt();
+};
+
+class ZEMLVisualizerWidget
+{
+	private:
+
+		ZEMLVisualizerQt*				QtComponents;
+		ZEMLNode*						Node;
+
+		void							AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem = NULL);
+
+	public:
+
+		void							Show();
+		void							Hide();
+
+		void							SetZEMLNode(ZEMLNode* Node);
+		void							Refresh();
+
+										ZEMLVisualizerWidget(QWidget* Parent = NULL);
+										~ZEMLVisualizerWidget();
+};
+
+#endif

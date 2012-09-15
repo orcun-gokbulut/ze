@@ -35,19 +35,17 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-project (ZEToolComponents)
-ze_set_project_folder("ZEToolComponents")
+ze_add_source(ZEMLVisualizerWidget.h		Sources)
+ze_add_source(ZEMLVisualizerWidget.cpp		Sources)
+ze_add_source(ZEMLVisualizerTreeWidget.h	Sources)
+ze_add_source(ZEMLVisualizerTreeWidget.cpp	Sources)
+ze_add_source(ZEMLVisualizerWidget.ui		Sources QtUI)
 
-add_subdirectory(ZEProgressDialog)
-add_subdirectory(ZEResourceConfigurationWidget)
-add_subdirectory(ZEMLVisualizer)
+qt4_add_resources (QtResourceFiles ${QtResources})
+qt4_wrap_ui (QtUIFiles ${QtUI})
+qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-ze_add_source(ZEToolComponentsMain.cpp		Sources)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-ze_add_executable(ZEToolComponents 
-	SOURCES ${Sources}
-	LIBS
-		ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget ZEMLVisualizerWidget
-		QtCore4 QtGui4)
+ze_add_library(ZEMLVisualizerWidget 
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles})

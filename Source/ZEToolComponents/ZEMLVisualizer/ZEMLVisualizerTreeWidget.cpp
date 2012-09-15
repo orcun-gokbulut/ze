@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEMLVisualizerTreeWidget.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,24 +30,45 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEMLVisualizerTreeWidget.h"
+#include "ZETypes.h"
+#include "QtGui/QHeaderView"
+#include "QtGui/QScrollBar"
 
-project (ZEToolComponents)
-ze_set_project_folder("ZEToolComponents")
+ZEMLVisualizerTreeWidget::ZEMLVisualizerTreeWidget(QWidget* Parent) : QTreeWidget(Parent)
+{
+	QTreeWidgetItem* Header = headerItem();
+	Header->setText(0, "Name");
+	Header->setText(1, "Type");
+	Header->setText(2, "Value");
+}
 
-add_subdirectory(ZEProgressDialog)
-add_subdirectory(ZEResourceConfigurationWidget)
-add_subdirectory(ZEMLVisualizer)
+void ZEMLVisualizerTreeWidget::drawRow(QPainter* Painter, const QStyleOptionViewItem &Option, const QModelIndex &Index) const
+{
+	QTreeWidget::drawRow(Painter, Option, Index);
 
-ze_add_source(ZEToolComponentsMain.cpp		Sources)
+	for(ZEInt I = 0; I < columnCount(); I++)
+	{
+		QModelIndex CurrentIndex = Index.sibling(Index.row(), I);
+		if(CurrentIndex.isValid())
+		{
+			if(I == 0)
+			{
+				QRect GridRect = visualRect(CurrentIndex);
+				GridRect.setTopLeft(QPoint(0, GridRect.topLeft().y()));
+				Painter->setPen(QColor(200,200,200));
+				Painter->drawRect(GridRect);
+			}
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-ze_add_executable(ZEToolComponents 
-	SOURCES ${Sources}
-	LIBS
-		ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget ZEMLVisualizerWidget
-		QtCore4 QtGui4)
+			else
+			{
+				QRect GridRect = visualRect(CurrentIndex);
+				Painter->setPen(QColor(200,200,200));
+				Painter->drawRect(GridRect);
+			}
+		} 
+	}
+}
