@@ -106,6 +106,8 @@ class ZEMLNode : public ZEMLItem
 		const ZEArray<ZEMLItem*>&	GetProperties() const;
 		const ZEArray<ZEMLItem*>	GetProperties(const ZEString& PropertyName);
 
+		const ZEMLNode*				GetParent();
+
 		void						Write(ZEFile* File);
 		void						Read(ZEFile* File, bool DeferredDataReading = false);
 
