@@ -334,6 +334,14 @@ const ZEArray<ZEMLItem*> ZEMLNode::GetProperties(const ZEString& PropertyName)
 	return Result;
 }
 
+const ZEMLNode*	ZEMLNode::GetParent()
+{
+	if(Parent == NULL)
+		return NULL;
+	else
+		return (ZEMLNode*)Parent;
+}
+
 void ZEMLNode::WriteToFile(ZEFile* File)
 {
 	ZEUInt64 TempUInt64;
