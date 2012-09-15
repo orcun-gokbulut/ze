@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEResourceOptionTreeItem.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,23 +30,58 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEResourceOptionTreeItem.h"
+#include "ZEDS\ZEString.h"
+#include "ZEFile\ZEFileInfo.h"
 
-project (ZEToolComponents)
-ze_set_project_folder("ZEToolComponents")
+ZEResourceOptionTreeItem::ZEResourceOptionTreeItem()
+{
+	ResourceOption = NULL;
+	StatusString = "";
+}
 
-add_subdirectory(ZEProgressDialog)
-add_subdirectory(ZEResourceConfigurationWidget)
+void ZEResourceOptionTreeItem::Update()
+{
+	setText(0, ZEString(ResourceOption->Identifier).ToCString());
+	setText(1, ResourceOption->PhysicalPath.ToCString());
+	setText(2, ResourceOption->ExportPath.ToCString());
+	setText(4, ZEString(ResourceOption->Action).ToCString());
 
-ze_add_source(ZEToolComponentsMain.cpp		Sources)
+	StatusString = "";
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+	if(ResourceOption->PhysicalPath.GetLength() != 0)
+	{
+		if(ZEFileInfo::IsFile(ResourceOption->PhysicalPath))
+			StatusString += "(P)OK ";
+		else
+			StatusString += "(P)NOK ";
+	}
+	else
+		StatusString += "(P)NOK ";
 
-ze_add_executable(ZEToolComponents 
-	SOURCES ${Sources}
-	LIBS
-		ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget
-		QtCore4 QtGui4)
+	if(ResourceOption->ExportPath.GetLength() != 0)
+	{
+		if(ZEFileInfo::IsFile(ResourceOption->ExportPath + "\\" + ResourceOption->Identifier))
+			StatusString += "/ (E)OK";
+		else
+			StatusString += "/ (E)NOK";
+	}
+	else
+		StatusString += "/ (E)NOK";
+
+	setText(3, StatusString.ToCString());
+}
+
+void ZEResourceOptionTreeItem::SetResourceOption(ZEResourceOption* Option)
+{
+	this->ResourceOption = Option;
+	Update();
+}
+
+ZEResourceOption* ZEResourceOptionTreeItem::GetResourceOption() const
+{
+	return ResourceOption;
+}
