@@ -174,11 +174,11 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	{
 		ZEFile OptionsFile;
 
+		if(ExportOptions == NULL)
+			ExportOptions = new ZEMLNode("Options");
+
 		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_NONE))
 		{
-			if(ExportOptions == NULL)
-				ExportOptions = new ZEMLNode("Options");
-
 			ExportOptions->Read(&OptionsFile);
 			OptionsFile.Close();
 		}
