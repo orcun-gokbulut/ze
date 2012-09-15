@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEResourceConfigurationWidgetSignalHandler.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,23 +30,38 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef	__ZE_RESOURCE_CONFIGURATION_WIDGET_SIGNAL_HANDLER_H__
+#define __ZE_RESOURCE_CONFIGURATION_WIDGET_SIGNAL_HANDLER_H__
 
-project (ZEToolComponents)
-ze_set_project_folder("ZEToolComponents")
+#include "QtCore\QObject"
 
-add_subdirectory(ZEProgressDialog)
-add_subdirectory(ZEResourceConfigurationWidget)
+class QTreeWidgetItem;
+class ZEResourceConfigurationWidget;
+class ZEResourceOptionWidget;
+class ZEResourceOptionTreeItem;
 
-ze_add_source(ZEToolComponentsMain.cpp		Sources)
+class ZEResourceConfigurationWidgetSignalHandler : public QObject
+{
+	Q_OBJECT
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+	private:
 
-ze_add_executable(ZEToolComponents 
-	SOURCES ${Sources}
-	LIBS
-		ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget
-		QtCore4 QtGui4)
+		ZEResourceConfigurationWidget*	ConfigurationWidget;			
+		ZEResourceOptionTreeItem*		CurrentSelectedResource;
+
+	public:
+
+										ZEResourceConfigurationWidgetSignalHandler(QObject* Parent = NULL);
+										ZEResourceConfigurationWidgetSignalHandler(ZEResourceConfigurationWidget* ConfigurationWidget, QObject* Parent = NULL);
+
+	private slots:
+
+		void							TreeItemClicled(QTreeWidgetItem* Item, int Column);
+		void							OptionChanged(ZEResourceOptionWidget* Widget);
+};
+
+#endif

@@ -42,6 +42,7 @@
 #include "ZETypes.h"
 #include "ZEProgressDialog/ZEProgressDialog.h"
 #include "ZEProgressDialog/ZEProgressDialogTask.h"
+#include "ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
 
 ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {
@@ -49,25 +50,68 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 	char** argv = NULL;
 
 	QApplication a(argc, argv);
-	ZEProgressDialog w;
 
-	w.SetTitle("Test Stes");
-	w.Start();
-	w.OpenTask("Main Task", true);
-	w.OpenTask("Task 1");
-	w.TaskFailed();
-	w.OpenTask("Task 1.1");
-	//w.TaskSucceded();
-	w.CloseTask();
-	w.OpenTask("Task 1.2");
-	w.TaskFailed();
-	w.CloseTask();
-	w.CloseTask();
-	w.OpenTask("Task 2");
-	//w.Message(ZE_LOG_WARNING, "Ahanda Uyari !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-	zeWarning("Test Test Test\nTest Test Test");
+ 	ZEResourceConfigurationWidget w;
+	ZEResourceConfigurationWidget z;
 	
- 	//w.show();
+	w.AddResource("Material-01.zemtl", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Material-02.zemtl","C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Material-03.zemtl","C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("nvidia_ssao.jpg", "C:\\Users\\Can\\Desktop\\Test1.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test2.png", "C:\\Users\\Can\\Desktop\\Test2.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test3.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test4.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test5.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test6.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test7.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test8.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test9.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test10.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test11.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test12.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test13.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test14.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test15.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test16.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test17.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test18.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test19.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test20.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test21.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test22.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.AddResource("Test23.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	w.Show();
+	w.SavePresets("C:\\Users\\Can\\Desktop\\Preset.zeml");
+
+	z.SetPresetFilePath("C:\\Users\\Can\\Desktop\\Preset.zeml");
+	z.AddResource("Material-01.zemtl", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Material-02.zemtl","C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Material-03.zemtl","C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("nvidia_ssao.jpg", "C:\\Users\\Can\\Desktop\\Test1.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test2.png", "C:\\Users\\Can\\Desktop\\Test2.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test3.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test4.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test5.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test6.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test7.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test8.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test9.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test10.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test11.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test12.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test13.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test14.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test15.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test16.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test17.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test18.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test19.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test20.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test21.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test22.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.AddResource("Test23.png", "C:\\Users\\Can\\Desktop\\Test3.png", "C:\\Users\\Can\\Desktop\\ZE\\trunk\\Rundir\\resources", ZE_ROAA_COPY_OVERWRITE);
+	z.Show();
+
  	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
 	return a.exec();
 }
