@@ -417,6 +417,7 @@ void ZEVariant::SetString(const char* Value)
 
 void ZEVariant::SetString(const ZEString& Value)
 {
+	SetType(ZE_VRT_STRING);
 	this->Value.String.SetValue(Value);
 }
 

@@ -289,6 +289,20 @@ ZEMLNode* ZEMLNode::AddSubNode()
 	return Node;
 }
 
+void ZEMLNode::InsertSubNode(ZEMLNode* Node, ZESize Index)
+{
+	Node->Parent = this;
+	SubNodes.Insert(Index, Node);
+}
+
+ZEMLNode* ZEMLNode::InsertSubNode(const ZEString& Name, ZESize Index)
+{
+	ZEMLNode* Node = new ZEMLNode(Name);
+	Node->Parent = this;
+	SubNodes.Insert(Index, Node);
+	return Node;
+}
+
 bool ZEMLNode::RemoveSubNode(ZEMLNode* SubNode)
 {
 	if(SubNodes.Exists(SubNode))
