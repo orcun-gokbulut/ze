@@ -98,6 +98,8 @@ class ZEMLNode : public ZEMLItem
 
 		void				AddSubNode(ZEMLNode* Node);
 		ZEMLNode*			AddSubNode(const ZEString& Name);
+		void				InsertSubNode(ZEMLNode* Node, ZESize Index);
+		ZEMLNode*			InsertSubNode(const ZEString& Name, ZESize Index);
 		ZEMLNode*			AddSubNode();
 		bool				RemoveSubNode(ZEMLNode* SubNode);
 

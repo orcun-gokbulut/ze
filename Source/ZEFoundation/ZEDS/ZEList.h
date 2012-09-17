@@ -141,9 +141,9 @@ class ZEList
 			zeDebugCheck(Exists(Item), "Item is already added to list.");
 
 			if (Index == 0)
-				Insert(Item);
+				return Insert(Item);
 			else if (Index == Count)
-				Append(Item);
+				return Append(Item);
 			else
 			{
 				ZEType* OldItem = GetItem(Index);
