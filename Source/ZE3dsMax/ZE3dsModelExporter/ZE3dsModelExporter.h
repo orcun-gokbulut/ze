@@ -38,10 +38,12 @@
 #define __ZE3DS_MODEL_EXPORTER_H__
 
 #include "ZETypes.h"
-#include "ZETModelFile/ZETModelFile.h"
+#include "ZEML/ZEMLNode.h"
+//#include "ZETModelFile/ZETModelFile.h"
 #include "ZE3dsModelExporterOptions.h"
 #include "ZE3dsModelExporterResources.h"
 #include "ZE3dsProgressDialog/ZE3dsProgressDialog.h"
+
 
 #include <Max.h>
 #include <istdplug.h>
@@ -51,25 +53,21 @@
 #include <IGame/IGameModifier.h> 
 
 extern HINSTANCE hInstance;
+class QApplication;
 
 class ZEModelExporter : public SceneExport 
 {
-	public:
-		
-		virtual ZEInt				ExtCount();
-		virtual const TCHAR*		Ext(ZEInt n);
-		virtual const TCHAR*		LongDesc();
-		virtual const TCHAR*		ShortDesc();
-		virtual const TCHAR*		AuthorName();
-		virtual const TCHAR*		CopyrightMessage();
-		virtual const TCHAR*		OtherMessage1();
-		virtual const TCHAR*		OtherMessage2();
-		virtual ZEUInt				Version();
-		virtual void				ShowAbout(HWND hWnd);
-		virtual	BOOL				SupportsOptions(ZEInt ext, DWORD options);
+	private:
 
-		virtual ZEInt				GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
-		virtual ZEInt				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
+		QApplication*				QtApplication;
+
+		ZEModelExporterOptions		Options;
+		ZE3dsProgressDialog			ProgDlg;
+
+		IGameScene*					Scene;
+		//ZEModelFile					ModelFile;
+		ZEMLNode					ModelNode;
+
 		
 		Tab<IGameNode*>				ProcessedBones;
 		Tab<IGameMaterial*>			ProcessedMaterials;
@@ -80,28 +78,46 @@ class ZEModelExporter : public SceneExport
 		ZEInt						FrameCount;
 		ZEInt						TicksPerFrame;
 
-		ZEModelFile					ModelFile;
-		IGameScene*					Scene;
-		ZE3dsProgressDialog			ProgressDialog;
-		ZEModelExporterOptions		ExporterOptions;
+		bool						ProcessBone(IGameNode* Node, ZEMLNode* BonesNode);
+		bool						ProcessBones(ZEMLNode* BonesNode);
+		ZEInt						ProcessMeshMaterial(IGameMaterial* Material);
+		bool						ProcessMaterials(const char* FileName, ZEMLNode* MaterialsNode);
+		bool						ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* MeshLODNode); //ZEModelFileMeshLOD* ZEMeshLod
+		void						ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* ShapeNode); //ZEModelFilePhysicalShape* Shape
+		bool						ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* PhysicalShapeNode); //ZEModelFilePhysicalShape* PhysicalShape
+		bool						ProcessPhysicalBody(IGameNode* Node, ZEMLNode* PhysicalBodyNode); //ZEModelFilePhysicalBody* Body
+		bool						ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* PhysicalJointNode); //ZEModelFilePhysicalJoint* Joint
+		bool						ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesNode);
+		bool						ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNode);
+		bool						ProcessMeshes(ZEMLNode* MeshesNode);
+		bool						ProcessAnimation(ZEMLNode* AnimationNode);
 
 		bool						DumpPropertyContainer(IExportEntity* Node);
 		bool						GetRelativePath(const char* RealPath, char* RelativePath);
 		ZEInt						GetBoneId(IGameNode* Node);
 		ZEInt						GetMeshId(IGameNode* Node);
 
-		bool						ProcessBone(IGameNode* Node);
-		bool						ProcessBones();
-		ZEInt						ProcessMeshMaterial(IGameMaterial* Material);
-		bool						ProcessMaterials();
-		bool						ProcessMeshLODVertices(IGameNode* Node,  ZEModelFileMeshLOD* ZEMeshLod);
-		void						ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEModelFilePhysicalShape* Shape);
-		bool						ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerNode, ZEModelFilePhysicalShape* PhysicalShape);
-		bool						ProcessPhysicalBody(IGameNode* Node, ZEModelFilePhysicalBody* Body);
-		bool						ProcessPhysicalJoint(IGameNode* Node, ZEModelFilePhysicalJoint* Joint);
-		bool						ProcessMesh(IGameNode* Node);
-		bool						ProcessMeshes();
-		bool						ProcessAnimation();
+	protected:
+		ZEInt						GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
+
+	public:
+		
+		virtual ZEInt				ExtCount();										// Number of extensions supported
+		virtual const TCHAR*		Ext(ZEInt n);									// Extension #n (i.e. "3DS")
+		virtual const TCHAR*		LongDesc();										// Long ASCII description (i.e. "Autodesk 3D Studio File")
+		virtual const TCHAR*		ShortDesc();									// Short ASCII description (i.e. "3D Studio")
+		virtual const TCHAR*		AuthorName();									// ASCII Author name
+		virtual const TCHAR*		CopyrightMessage();								// ASCII Copyright message
+		virtual const TCHAR*		OtherMessage1();								// Other message #1
+		virtual const TCHAR*		OtherMessage2();								// Other message #2
+		virtual ZEUInt				Version();										// Version number * 100 (i.e. v3.01 = 301)
+		virtual void				ShowAbout(HWND hWnd);							// Show DLL's "About..." box
+		
+		virtual	BOOL				SupportsOptions(ZEInt ext, DWORD options);	
+		virtual ZEInt				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
+
+		virtual	bool				WriteToFile(const char* FilePath);
+		
 
 									ZEModelExporter();
 		virtual						~ZEModelExporter();

@@ -74,7 +74,7 @@ void ZEModelExporterOptions::Load(char* Filename)
 bool Canceled;
 void ZEModelExporterOptionsDialog::DialogDataExchange()
 {
-	Options.OutputLevel = ComboBox_GetCurSel(GetDlgItem(hWnd, IDC_LOGLEVEL)) + 1;
+	Options.OutputLevel = ComboBox_GetCurSel(GetDlgItem(hWnd, IDC_LOGLEVEL));
 	Options.LogToFile =	Button_GetCheck(GetDlgItem(hWnd, IDC_OUTPUTTOFILE)) == BST_CHECKED;
 	Options.ExportAnimation = Button_GetCheck(GetDlgItem(hWnd, IDC_EXPORTANIMATION)) == BST_CHECKED;
 	GetWindowText(GetDlgItem(hWnd, IDC_LOGFILE), Options.LogFile, 256);
@@ -112,12 +112,13 @@ INT_PTR CALLBACK OptionsDialogCallback(HWND hWnd,UINT message,WPARAM wParam, LPA
 			Dlg = (ZEModelExporterOptionsDialog*)lParam;
 			Dlg->hWnd = hWnd;
 			
-			ComboBox_AddString(GetDlgItem(hWnd, IDC_LOGLEVEL), "Output Errors only");
-			ComboBox_AddString(GetDlgItem(hWnd, IDC_LOGLEVEL), "Output Errors and Warnings");
-			ComboBox_AddString(GetDlgItem(hWnd, IDC_LOGLEVEL), "Output Debug Logs");
 			ComboBox_AddString(GetDlgItem(hWnd, IDC_LOGLEVEL), "Disable Output");
+			ComboBox_AddString(GetDlgItem(hWnd, IDC_LOGLEVEL), "Output Debug Logs");
+			ComboBox_AddString(GetDlgItem(hWnd, IDC_LOGLEVEL), "Output Errors and Warnings");
+			ComboBox_AddString(GetDlgItem(hWnd, IDC_LOGLEVEL), "Output Errors only");
+						
 			//ComboBox_SetMinVisible(GetDlgItem(hWnd, IDC_LOGLEVEL), 3);
-			ComboBox_SetCurSel(GetDlgItem(hWnd, IDC_LOGLEVEL), Dlg->Options.OutputLevel - 1);
+			ComboBox_SetCurSel(GetDlgItem(hWnd, IDC_LOGLEVEL), Dlg->Options.OutputLevel);
 			
 			Button_SetCheck(GetDlgItem(hWnd, IDC_OUTPUTTOFILE), Dlg->Options.LogToFile);
 			SetWindowText(GetDlgItem(hWnd, IDC_ZINEKDIR), Dlg->Options.ResourceDirectory);

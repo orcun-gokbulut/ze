@@ -34,19 +34,28 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZE3dsModelExporter.h"
-#include "ZETOutput.h"
 
+#include <tchar.h>
+#include "QWinWidget/qwinwidget.h"
+#include "QtGui/QApplication"
+#include "ZE3dsModelExporterOptionsDialog.h"
+#include "ZEFile/ZEFileUtils.h"
+#include "ZEFile/ZEFile.h"
+#include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
 
 ZEModelExporter::ZEModelExporter()
 {
 	Scene = NULL;
+	QtApplication = NULL;
+	ModelNode.SetName("ZEModel");
+
 	FrameCount = 0;
 	TicksPerFrame = 0;
 }
 
 ZEModelExporter::~ZEModelExporter() 
 {
-
+	QtApplication->quit();
 }
 
 ZEInt ZEModelExporter::ExtCount()
@@ -81,7 +90,7 @@ const TCHAR *ZEModelExporter::CopyrightMessage()
 
 const TCHAR *ZEModelExporter::OtherMessage1() 
 {		
-	return _T("Orcun rulz !!!");
+	return _T("");
 }
 
 const TCHAR *ZEModelExporter::OtherMessage2() 
@@ -123,18 +132,10 @@ ZEInt ZEModelExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /
 	return i_nodeTab.Count();
 }
 
-ZE3dsProgressDialog* PD;
-void Output(const char* Output)
+ZEInt ZEModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
-	
-	PD->Output((char*)Output);
-}
-
-ZEInt	ZEModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
-{
-	PD = &ProgressDialog;
-	ProgressDialog.Create(hInstance);
-	ZEModelExporterOptionsDialog OptionsDialog;
+	INodeTab lNodes;
+	GetSceneNodes(lNodes);
 
 	IGameConversionManager * cm = GetConversionManager();
 	cm->SetCoordSystem(IGameConversionManager::IGAME_D3D);
@@ -148,68 +149,116 @@ ZEInt	ZEModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i
 	};*/
 	//cm->SetUserCoordSystem(UserCoord);
 
+	int Argc = 0;
+	ZEMLNode* ExportOptions = new ZEMLNode("Options");
+	ZEString OptionsFilePath((ZEString(i->GetCurFilePath().data())) + ".zecfg");
+	ZEFile* OptionsFile = new ZEFile();
 
-	INodeTab lNodes;
-	GetSceneNodes(lNodes);
+	if(OptionsFile->Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_NONE))
+		ExportOptions->Read(OptionsFile);
 
+	if(OptionsFile->IsOpen())
+		OptionsFile->Close();
+
+	if(QApplication::instance() == NULL)
+		QtApplication = new QApplication(Argc, NULL);
+
+	QWinWidget* ExporterWindow = new QWinWidget(i->GetMAXHWnd());
+	ZE3dsModelExporterOptionsDialogNew* ExporterDialog = new ZE3dsModelExporterOptionsDialogNew(ExporterWindow, ExportOptions);
+	ExporterWindow->showCentered();
+	ZEInt DialogResult = ExporterDialog->exec();
+
+	if(DialogResult == QDialog::Rejected)
+		return false;
+
+	if(strlen(i->GetCurFilePath().data()) != 0)
+	{
+		OptionsFile->Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+		ExporterDialog->GetOptions()->Write(OptionsFile);
+		OptionsFile->Close();
+		delete OptionsFile;
+	}
+
+	ProgDlg.Create(hInstance);
+	//ProgDlg.SetOutputLevel(Options.OutputLevel);
+	ProgDlg.Show();
 	Scene = GetIGameInterface();	
 	Scene->InitialiseIGame(lNodes);
 	Scene->SetStaticFrame(0);
-
 	TicksPerFrame = Scene->GetSceneTicks();
 	FrameCount = Scene->GetSceneEndTime() / TicksPerFrame;
 
-	char OptFile[MAX_PATH];
-	sprintf(OptFile, "%s\\%s", i->GetDir(APP_PLUGCFG_DIR), "zemodel_export.cfg");
-	ExporterOptions.Load(OptFile);
-	if (!OptionsDialog.ShowDialog(hInstance, ExporterOptions))
-		return false;
+	ZEProgressDialog* ProgressDialog = ZEProgressDialog::CreateInstance();
+	ProgressDialog->SetTitle("Model Export Progress");
+	ProgressDialog->SetProgressBarVisibility(false);
+	ProgressDialog->Start();
+	ProgressDialog->OpenTask("Model Exporter", true);
 
-	ExporterOptions.Save(OptFile);
-	ProgressDialog.SetOutputLevel((ZE3dsProgressDialogOutputLevel)ExporterOptions.OutputLevel);
-	ProgressDialog.Show();
+	zeLog("Exporting model to file \"%s\".", name);
 
-	ZESDKOutput::SetOutputLevel(ZET_OL_DEBUG);
-	ZESDKOutput::SetOutputCallback(Output);
-
-	/*TicksPerFrame = Scene->GetSceneTicks();
-	FrameCount = Scene->GetSceneEndTime() / TicksPerFrame;
-	*/
-	zepdLog("Exporting model to file \"%s\".", name);
-
-	if (!ProcessBones())
+	ProgressDialog->OpenTask("Bone Process", true);
+	if (!ProcessBones(ModelNode.AddSubNode("Bones")))
 	{
-		zepdError("Processing bone failed.");
+		zeError("Processing bone failed.");
 		return false;
 	}
+	ProgressDialog->CloseTask();
 
-	if (!ProcessMeshes())
+	ProgressDialog->OpenTask("Mesh Process", true);
+	if (!ProcessMeshes(ModelNode.AddSubNode("Meshes")))
 	{
-		zepdError("Processing mesh failed.");
+		zeError("Processing mesh failed.");
 		return false;
 	}
+	ProgressDialog->CloseTask();
 
-	if (ExporterOptions.ExportAnimation)
-		if(!ProcessAnimation())
+	ProgressDialog->OpenTask("Animation Process", true);
+	if (true/*Options.ExportAnimation*/)
+	{
+		if(!ProcessAnimation(ModelNode.AddSubNode("Animation")))
 		{
-			zepdError("Processing animation failed.");
+			zeError("Processing animation failed.");
 			return false;
 		}
+	}
+	ProgressDialog->CloseTask();
 
-	if (!ProcessMaterials())
+	ProgressDialog->OpenTask("Material Process", true);
+	if (!ProcessMaterials(name, ModelNode.AddSubNode("Materials")))
 	{
-		zepdError("Processing materials failed.");
+		zeError("Processing materials failed.");
 		return false;
 	}
+	ProgressDialog->CloseTask();
 
-	zepdLog("Writing zeModel to file.");
-	if (!ModelFile.WriteToFile(name))
+	ProgressDialog->OpenTask("Writing File");
+	zeLog("Writing zeModel to file.");
+	if (!WriteToFile(name))
 	{
-		zepdError("Writing model to file failed.");
+		zeError("Writing model to file failed.");
 		return false;
 	}
+	ProgressDialog->CloseTask();
 
-	zepdLog("Export process completed succesfully.");
-	ProgressDialog.SetExitMode(true);
+	zeLog("Export process completed succesfully.");
+	ProgressDialog->End();
+
 	return TRUE;
+}
+
+bool ZEModelExporter::WriteToFile(const char* FilePath)
+{
+	ZEFile File;
+
+	if (!File.Open(FilePath, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+	{
+		zeError("Cant open file to write ZEModel file.");
+		return false;
+	}
+	
+	ModelNode.Write(&File);
+
+	File.Close();
+
+	return true;
 }

@@ -44,27 +44,37 @@ ze_add_source(ZE3dsModelExporterDescription.cpp		Sources)
 ze_add_source(ZE3dsModelExporterProcess.cpp			Sources)
 ze_add_source(ZE3dsModelExporterOptions.h			Sources)
 ze_add_source(ZE3dsModelExporterOptions.cpp			Sources)
+ze_add_source(ZE3dsModelExporterOptionsDialog.h		Sources QtMocs)
+ze_add_source(ZE3dsModelExporterOptionsDialog.cpp	Sources)
 ze_add_source(ZE3dsModelExporterResources.rc		Sources)
 ze_add_source(ZE3dsModelExporterResources.h			Sources)
 ze_add_source(ZE3dsModelExporter.def				Sources)
-ze_add_source(../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc	Sources)
+ze_add_source(ZE3dsModelExporterOptionsWidget.ui	Sources QtUI)
+#ze_add_source(../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc	Sources)
+
+qt4_add_resources (QtResourceFiles ${QtResources})
+qt4_wrap_ui (QtUIFiles ${QtUI})
+qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
 ze_add_library(ZE3dsModelExporter 
-	SOURCES ${Sources}
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
 	LIBS ZEFoundation ZEToolAPI ZE3dsProgressDialog
-		core geom gfx mesh maxutil maxscrpt paramblk2 igame
+		core geom gfx mesh maxutil maxscrpt paramblk2 igame QtCore4 QtGui4 QWinWidget ZEProgressDialog
 	INSTALL
 	INSTALL_DESTINATION "Tools/Exporters/ZE3dsMax"
 	INSTALL_COMPONENT Tools
 	DLL)
-	
-set(LOCAL_WARNING_FLAGS /W3)
-set(LOCAL_RTTI_FLAGS /GR)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set_property(TARGET ZE3dsModelExporter PROPERTY FOLDER "ZE3dsMax")
 set_property(TARGET ZE3dsModelExporter PROPERTY SUFFIX ".dle")
 set_property(TARGET ZE3dsModelExporter PROPERTY CLEAN_DIRECT_OUTPUT 1)
 
+set(LOCAL_WARNING_FLAGS /W3)
+set(LOCAL_RTTI_FLAGS /GR)
+
+set(MAX_BINARY_DIRECTORY "C:\\Program Files (x86)\\Autodesk\\3ds Max 2010")
 get_property(TargetPath TARGET ZE3dsModelExporter PROPERTY LOCATION)
 file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)
 add_custom_command(TARGET ZE3dsModelExporter POST_BUILD COMMAND copy "${NativeTargetPath}" "${ZEBUILD_3DS_MAX_BINARY_DIRECTORY}\\plugins")
