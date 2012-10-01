@@ -106,7 +106,7 @@ class ZEMLNode : public ZEMLItem
 		const ZEList<ZEMLNode>&		GetSubNodes() const;
 		const ZEArray<ZEMLNode*>	GetSubNodes(const ZEString& NodeName);
 		const ZEArray<ZEMLItem*>&	GetProperties() const;
-		const ZEArray<ZEMLItem*>	GetProperties(const ZEString& PropertyName);
+		const ZEMLItem*				GetProperty(const ZEString& PropertyName);
 
 		const ZEMLNode*				GetParent();
 
