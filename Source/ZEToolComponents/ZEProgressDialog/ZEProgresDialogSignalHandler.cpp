@@ -49,6 +49,13 @@ ZEProgressDialogSignalHandler::ZEProgressDialogSignalHandler(ZEProgressDialog* P
 	connect(ProgressDialog->Form->btnSave, SIGNAL(clicked(bool)), this, SLOT(SaveLog()));
 }
 
+ZEProgressDialogSignalHandler::~ZEProgressDialogSignalHandler()
+{
+	disconnect((const QObject*)ProgressDialog->TasksTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(TreeItemDoubleClicled(QTreeWidgetItem*, int)));
+	disconnect(ProgressDialog->Form->btnCopyAll, SIGNAL(clicked(bool)), this, SLOT(CopyAllLog()));
+	disconnect(ProgressDialog->Form->btnSave, SIGNAL(clicked(bool)), this, SLOT(SaveLog()));
+}
+
 void ZEProgressDialogSignalHandler::TreeItemDoubleClicled(QTreeWidgetItem* Item, int Column)
 {
 	for (ZESize I = 0; I < ProgressDialog->Tasks.GetCount(); I++)

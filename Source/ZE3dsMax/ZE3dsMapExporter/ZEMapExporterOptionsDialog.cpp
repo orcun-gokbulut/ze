@@ -36,10 +36,11 @@
 #include "ZEMapExporterOptionsDialog.h"
 #include "QtGui\QFileDialog"
 #include "ZEML\ZEMLProperty.h"
+#include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 
 ZEMapExporterOptionsDialogNew::ZEMapExporterOptionsDialogNew(QWidget* Parent, ZEMLNode* Options) : QDialog(Parent)
 {
-	Form = new Ui::Form();
+	Form = new Ui::ZEMapExporterOptionsDialogUI();
 	Form->setupUi(this);
 	Options = Options;
 
@@ -66,30 +67,31 @@ void ZEMapExporterOptionsDialogNew::SetOptions(ZEMLNode* Options)
 
 	this->Options = Options;
 
-	ZEArray<ZEMLItem*> CurrentProperties = Options->GetProperties("ZinekEngineWorkingDirectory");
-	if(CurrentProperties.GetCount() != 0)
-		Form->txtEngineWorkingDirectory->setText(((ZEMLProperty*)CurrentProperties[0])->GetValue().GetString().ToCString());
+	const ZEMLItem* CurrentProperty = NULL;
+	CurrentProperty = Options->GetProperty("ZinekEngineWorkingDirectory");
+	if(CurrentProperty != NULL)
+		Form->txtEngineWorkingDirectory->setText(((ZEMLProperty*)CurrentProperty)->GetValue().GetString().ToCString());
 
-	CurrentProperties = Options->GetProperties("LogFilePath");
-	if(CurrentProperties.GetCount() != 0)
-		Form->txtLogFilePath->setText(((ZEMLProperty*)CurrentProperties[0])->GetValue().GetString().ToCString());
+	CurrentProperty = Options->GetProperty("LogFilePath");
+	if(CurrentProperty != NULL)
+		Form->txtLogFilePath->setText(((ZEMLProperty*)CurrentProperty)->GetValue().GetString().ToCString());
 
-	CurrentProperties = Options->GetProperties("ApplicationPath");
-	if(CurrentProperties.GetCount() != 0)
-		Form->txtApplicationFolder->setText(((ZEMLProperty*)CurrentProperties[0])->GetValue().GetString().ToCString());
+	CurrentProperty = Options->GetProperty("ApplicationPath");
+	if(CurrentProperty != NULL)
+		Form->txtApplicationFolder->setText(((ZEMLProperty*)CurrentProperty)->GetValue().GetString().ToCString());
 
-	CurrentProperties = Options->GetProperties("IsFileLoggingEnabled");
-	if(CurrentProperties.GetCount() != 0)
-		ToggleFileLogging(((ZEMLProperty*)CurrentProperties[0])->GetValue().GetBoolean());
+	CurrentProperty = Options->GetProperty("IsFileLoggingEnabled");
+	if(CurrentProperty != NULL)
+		ToggleFileLogging(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
 
-	CurrentProperties = Options->GetProperties("IsResourceCopyingEnabled");
-	if(CurrentProperties.GetCount() != 0)
-		Form->ckbCopyResources->setChecked(((ZEMLProperty*)CurrentProperties[0])->GetValue().GetBoolean());
+	CurrentProperty = Options->GetProperty("IsResourceCopyingEnabled");
+	if(CurrentProperty != NULL)
+		Form->ckbCopyResources->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
 
-	CurrentProperties = Options->GetProperties("RelativeTo");
-	if(CurrentProperties.GetCount() != 0)
+	CurrentProperty = Options->GetProperty("RelativeTo");
+	if(CurrentProperty != NULL)
 	{
-		ZEInt32 OptionValue = ((ZEMLProperty*)CurrentProperties[0])->GetValue().GetInt32();
+		ZEInt32 OptionValue = ((ZEMLProperty*)CurrentProperty)->GetValue().GetInt32();
 
 		if(OptionValue == 1)
 			ToggleApplicationPathOptions(true);
@@ -185,33 +187,33 @@ void ZEMapExporterOptionsDialogNew::CollectOptionsFromForm()
 	}
 	else
 	{
-		if(Options->GetProperties("ZinekEngineWorkingDirectory").GetCount() != 0)
-			((ZEMLProperty*)(Options->GetProperties("ZinekEngineWorkingDirectory")[0]))->SetValue(ZEVariant(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
+		if(Options->GetProperty("ZinekEngineWorkingDirectory") !=  NULL)
+			((ZEMLProperty*)(Options->GetProperty("ZinekEngineWorkingDirectory")))->SetValue(ZEVariant(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
 		else
 			Options->AddProperty("ZinekEngineWorkingDirectory", ZEVariant(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
 
-		if(Options->GetProperties("IsFileLoggingEnabled").GetCount() != 0)
-			((ZEMLProperty*)(Options->GetProperties("IsFileLoggingEnabled")[0]))->SetValue(ZEVariant(Form->ckbFileLoggingEnabled->isChecked()));
+		if(Options->GetProperty("IsFileLoggingEnabled") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("IsFileLoggingEnabled")))->SetValue(ZEVariant(Form->ckbFileLoggingEnabled->isChecked()));
 		else
 			Options->AddProperty("IsFileLoggingEnabled", ZEVariant(Form->ckbFileLoggingEnabled->isChecked()));
 
-		if(Options->GetProperties("LogFilePath").GetCount() != 0)
-			((ZEMLProperty*)(Options->GetProperties("LogFilePath")[0]))->SetValue(ZEVariant(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
+		if(Options->GetProperty("LogFilePath") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("LogFilePath")))->SetValue(ZEVariant(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
 		else
 			Options->AddProperty("LogFilePath", ZEVariant(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
 
-		if(Options->GetProperties("RelativeTo").GetCount() != 0)
-			((ZEMLProperty*)(Options->GetProperties("RelativeTo")[0]))->SetValue(ZEVariant((ZEInt32)Form->cmbRelativeTo->currentIndex()));
+		if(Options->GetProperty("RelativeTo") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("RelativeTo")))->SetValue(ZEVariant((ZEInt32)Form->cmbRelativeTo->currentIndex()));
 		else
 			Options->AddProperty("RelativeTo", ZEVariant((ZEInt32)Form->cmbRelativeTo->currentIndex()));
 
-		if(Options->GetProperties("ApplicationPath").GetCount() != 0)
-			((ZEMLProperty*)(Options->GetProperties("ApplicationPath")[0]))->SetValue(ZEVariant(ZEString((const char*)Form->txtApplicationFolder->text().toLatin1())));
+		if(Options->GetProperty("ApplicationPath") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("ApplicationPath")))->SetValue(ZEVariant(ZEString((const char*)Form->txtApplicationFolder->text().toLatin1())));
 		else
 			Options->AddProperty("ApplicationPath", ZEVariant(ZEString((const char*)Form->txtApplicationFolder->text().toLatin1())));
 
-		if(Options->GetProperties("IsResourceCopyingEnabled").GetCount() != 0)
-			((ZEMLProperty*)(Options->GetProperties("IsResourceCopyingEnabled")[0]))->SetValue(ZEVariant(Form->ckbCopyResources->isChecked()));
+		if(Options->GetProperty("IsResourceCopyingEnabled") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("IsResourceCopyingEnabled")))->SetValue(ZEVariant(Form->ckbCopyResources->isChecked()));
 		else
 			Options->AddProperty("IsResourceCopyingEnabled", ZEVariant(Form->ckbCopyResources->isChecked()));
 	}

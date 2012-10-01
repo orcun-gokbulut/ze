@@ -38,7 +38,7 @@
 #define __ZE3DS_MAP_EXPORTER_H__
 
 #include "ZETypes.h"
-#include "ZETMapFile/ZETMapFile.h"
+//#include "ZETMapFile/ZETMapFile.h"
 #include "ZE3dsMapExporterResources.h"
 
 
@@ -47,6 +47,10 @@
 #include <iparamb2.h>
 #include <iparamm2.h>
 #include <IGame/IGame.h>
+#include "ZEML/ZEMLNode.h"
+
+#define ZE_MPFL_MAX_NAME_SIZE				128
+#define ZE_MPFL_MAX_FILENAME_SIZE			256
 
 
 extern HINSTANCE hInstance;
@@ -56,32 +60,69 @@ class QApplication;
 class QWinWidget;
 class ZEProgressDialog;
 class ZEMLNode;
+class ZEResourceConfigurationWidget;
+
+struct ZEMapFilePhysicalMeshPolygon
+{
+	ZEUInt32								Indices[3];
+};
+
+struct ZEMapFilePhysicalMesh
+{
+	ZEArray<ZEVector3>						Vertices;
+	ZEArray<ZEMapFilePhysicalMeshPolygon>	Polygons;
+};
+
+struct ZEMapFileVertex
+{
+	ZEVector3								Position;
+	ZEVector3								Normal;
+	ZEVector3								Tangent;
+	ZEVector3								Binormal;
+	ZEVector2								Texcoord;
+};
+
+struct ZEMapFilePolygon
+{	
+	ZEUInt32								Material;
+	ZEMapFileVertex							Vertices[3];
+};
 
 class ZE3dsMapExporter : public SceneExport 
 {
 	private:
 
 		QApplication*					QtApplication;
+
 		ZEMapExporterOptionsDialogNew*	OptionsDialog;
+		ZEResourceConfigurationWidget*	ResourceConfigurationDialog;
+
 		ZEMLNode*						ExportOptions;
 		QWinWidget*						WinWidget;
 		ZEProgressDialog*				ProgressDialog;
 		ZEString						ExportPath;
 
 		IGameScene*					Scene;
-		ZEMapFile					Map;
+		ZEMLNode					MapNode;
 
 		Tab<IGameNode*>				SceneGeometryObjects;
 		Tab<IGameNode*>				Portals;
 		Tab<IGameNode*>				Doors;
 		Tab<IGameMaterial*>			Materials;
 
+		void						CollectResources();
+
+		void						LoadOptions(const char* FilePath);
+		void						SaveOptions(const char* FilePath);
+		bool						ShowOptionsDialog(HWND ParentWindow);
+		bool						ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath);
+
 		bool						GetRelativePath(const char* RealPath, char* RelativePath);
 		ZEInt						FindPortalIndex(IGameNode* Node);
 		ZEInt						ProcessFaceMaterial(IGameMaterial* Material);
 
 		bool						ProcessScene();
-		bool						ProcessMaterials();
+		bool						ProcessMaterials(const char* FileName);
 		bool						ProcessPortals();
 		bool						ProcessDoors();
 

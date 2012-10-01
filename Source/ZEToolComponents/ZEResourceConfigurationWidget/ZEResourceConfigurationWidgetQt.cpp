@@ -71,7 +71,7 @@ ZEResourceConfigurationWidgetQt::ZEResourceConfigurationWidgetQt(ZEResourceConfi
 ZEResourceConfigurationWidgetQt::~ZEResourceConfigurationWidgetQt()
 {
 	Dialog->hide();
-	delete Dialog;
+//	delete Dialog;
 	Dialog = NULL;
 
 	delete Form;

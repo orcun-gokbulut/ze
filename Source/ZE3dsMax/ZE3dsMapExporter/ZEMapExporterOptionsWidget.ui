@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QDialog" name="Form">
+ <class>ZEMapExporterOptionsDialogUI</class>
+ <widget class="QDialog" name="ZEMapExporterOptionsDialogUI">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>360</height>
+    <height>292</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -161,7 +161,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>Form</receiver>
+   <receiver>ZEMapExporterOptionsDialogUI</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -177,7 +177,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>Form</receiver>
+   <receiver>ZEMapExporterOptionsDialogUI</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

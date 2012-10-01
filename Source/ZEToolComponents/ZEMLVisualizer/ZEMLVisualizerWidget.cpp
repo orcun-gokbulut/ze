@@ -132,7 +132,7 @@ void ZEMLVisualizerWidget::AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem)
 
 		ZESize SubNodeCount = CurrentItem->GetSubNodes().GetCount();
 		ZESize PropertyCount = CurrentItem->GetProperties().GetCount();
-		
+
 		for (ZESize I = 0; I < SubNodeCount; I++)
 		{
 			AddItem((ZEMLItem*)CurrentItem->GetSubNodes()[I], NewItem);
@@ -148,7 +148,7 @@ void ZEMLVisualizerWidget::AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem)
 		NewItem->setText(1, "DataProperty");
 		ZEMLDataProperty* CurrentItem = (ZEMLDataProperty*)Item;
 		ZEString DataSize = CurrentItem->GetDataSize();
-		NewItem->setText(2, (DataSize + "Data Size :").ToCString());
+		NewItem->setText(2, ("Data Size : " + DataSize + " byte(s)").ToCString());
 	}
 	else
 	{
@@ -215,24 +215,27 @@ void ZEMLVisualizerWidget::AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem)
 			break;
 		case ZE_VRT_QUATERNION:
 			TempQuat = Value.GetQuaternion();
-			TempString = "X : " + ZEString(TempQuat.x) + " Y : " + ZEString(TempQuat.y) + " Z : " +ZEString(TempQuat.z) + " W : " + ZEString(TempQuat.w);
+			TempString = "x : " + ZEString(TempQuat.x) + " y : " + ZEString(TempQuat.y) + " z : " +ZEString(TempQuat.z) + " w : " + ZEString(TempQuat.w);
 			NewItem->setText(1, "quaternion");
 			NewItem->setText(2, TempString.ToCString());
 			break;
 		case ZE_VRT_VECTOR2:
 			TempVec2 = Value.GetVector2();
-			TempString = "X : " + ZEString(TempVec2.x) + " Y : " + ZEString(TempVec2.y);
+			TempString = "x : " + ZEString(TempVec2.x) + " y : " + ZEString(TempVec2.y);
 			NewItem->setText(1, "vector2");
+			NewItem->setText(2, TempString.ToCString());
 			break;
 		case ZE_VRT_VECTOR3:
 			TempVec3 = Value.GetVector3();
-			TempString = "X : " + ZEString(TempVec3.x) + " Y : " + ZEString(TempVec3.y) + " Z : " +ZEString(TempVec3.z);
+			TempString = "x : " + ZEString(TempVec3.x) + " y : " + ZEString(TempVec3.y) + " z : " +ZEString(TempVec3.z);
 			NewItem->setText(1, "vector3");
+			NewItem->setText(2, TempString.ToCString());
 			break;
 		case ZE_VRT_VECTOR4:
 			TempVec4 = Value.GetVector4();
-			TempString = "X : " + ZEString(TempVec4.x) + " Y : " + ZEString(TempVec4.y) + " Z : " +ZEString(TempVec4.z) + " W : " + ZEString(TempVec4.w);
+			TempString = "x : " + ZEString(TempVec4.x) + " y : " + ZEString(TempVec4.y) + " z : " +ZEString(TempVec4.z) + " w : " + ZEString(TempVec4.w);
 			NewItem->setText(1, "vector4");
+			NewItem->setText(2, TempString.ToCString());
 			break;
 		case ZE_VRT_MATRIX3X3:
 			NewItem->setText(1, "matrix3x3");
@@ -250,4 +253,6 @@ void ZEMLVisualizerWidget::AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem)
 		QtComponents->Tree->addTopLevelItem(NewItem);
 	else
 		ParentItem->addChild(NewItem);
+
+	QtComponents->Tree->expandAll();
 }

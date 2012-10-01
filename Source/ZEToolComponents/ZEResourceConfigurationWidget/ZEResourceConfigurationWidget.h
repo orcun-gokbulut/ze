@@ -57,6 +57,8 @@ class ZEResourceConfigurationWidget
 		ZEArray<ZEResourceOption*>		ResourceOptions;
 		ZEMLNode*						Preset;
 
+		ZEString						ZEDir;
+
 	public:
 
 		void							SetPresetFilePath(const ZEString& Path);
@@ -68,8 +70,12 @@ class ZEResourceConfigurationWidget
 		bool							Show();
 		void							Hide();
 
-		const ZEResourceOption*				GetOption(const ZEString& Identifier);
+		const bool						GetOption(const ZEString& Identifier, ZEResourceOption& Option);
 		const ZEArray<ZEResourceOption*>&	GetOptions();
+
+		void							SetZEWorkingDir(const ZEString& Path);
+		bool							GetCopyState(const ZEString& Identifier);
+		ZEString						GetResourceRelativePath(ZEString& RelativeTo, const ZEString& Identifier);
 
 										ZEResourceConfigurationWidget(QWidget* Parent = NULL);
 										~ZEResourceConfigurationWidget();

@@ -88,13 +88,13 @@ ZEProgressDialogTask::ZEProgressDialogTask(QTreeWidget* Parent)
 
 ZEProgressDialogTask::~ZEProgressDialogTask()
 {
-	TreeItem->setHidden(true);
-	delete TreeItem;
-	TreeItem = NULL;
-
-	LogItem->setHidden(true);
-	delete LogItem;
-	LogItem = NULL;
+// 	TreeItem->setHidden(true);
+// 	delete TreeItem;
+// 	TreeItem = NULL;
+// 
+// 	LogItem->setHidden(true);
+// 	delete LogItem;
+// 	LogItem = NULL;
 
 	ClearLog();
 	Name.Clear();
