@@ -48,8 +48,8 @@ class ZEMapExporterOptionsDialogNew : public QDialog
 
 	private:
 
-		Ui::Form*				Form;
-		ZEMLNode*				Options;
+		Ui::ZEMapExporterOptionsDialogUI*	Form;
+		ZEMLNode*							Options;
 
 		void					ToggleFileLogging(bool IsEnabled);
 		void					ToggleApplicationPathOptions(bool IsEnabled);

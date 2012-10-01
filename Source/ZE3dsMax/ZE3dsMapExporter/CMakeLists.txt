@@ -59,7 +59,7 @@ qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 ze_add_library(ZE3dsMapExporter 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
 	LIBS ZEFoundation ZEToolAPI ZE3dsProgressDialog
-		core geom gfx mesh maxutil maxscrpt paramblk2 igame QtCore4 QtGui4 QWinWidget ZEProgressDialog
+		core geom gfx mesh maxutil maxscrpt paramblk2 igame QtCore4 QtGui4 QWinWidget ZEProgressDialog ZEResourceConfigurationWidget
 	INSTALL
 	INSTALL_DESTINATION "Tools/Exporters/ZE3dsMax"
 	INSTALL_COMPONENT Tools

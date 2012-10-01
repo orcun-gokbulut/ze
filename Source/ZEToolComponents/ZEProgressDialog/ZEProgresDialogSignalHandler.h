@@ -51,6 +51,7 @@ class ZEProgressDialogSignalHandler : public QObject
 	public:
 
 								ZEProgressDialogSignalHandler(ZEProgressDialog* ProgressDialog, QObject* Parent = NULL);
+								~ZEProgressDialogSignalHandler();
 
 	private slots:
 

@@ -37,9 +37,28 @@
 #include "ZETypes.h"
 #include "ZE3dsMapExporter.h"
 #include "ZEToolComponents\ZEProgressDialog\ZEProgressDialog.h"
+#include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 #include "ZEML\ZEMLProperty.h"
 #include "ZEML\ZEMLNode.h"
+#include "ZEFile\ZEFile.h"
+#include "ZEML\ZEMLSerialWriter.h"
+#include "ZEFile\ZEFileInfo.h"
+#include "ZEFile\ZEPathUtils.h"
+#include "zetoolcomponents\zeresourceconfigurationwidget\zeresourceoption.h"
+#include "ZEFile\ZEDirectoryInfo.h"
+#include "ZEFile\ZEFileOperations.h"
 
+#define ZE_MTMP_DIFFUSEMAP						2
+#define ZE_MTMP_NORMALMAP						4
+#define ZE_MTMP_SPECULARMAP						8
+#define ZE_MTMP_EMISSIVEMAP						16
+#define ZE_MTMP_OPACITYMAP						32
+#define ZE_MTMP_DETAILDIFFUSEMAP				64
+#define ZE_MTMP_DETAILNORMALMAP					128
+#define ZE_MTMP_ENVIRONMENTMAP					256
+#define ZE_MTMP_REFRACTION						512
+#define ZE_MTMP_LIGHTMAP						1024
+#define ZE_MTMP_DISTORTIONMAP					2048
 
 inline ZEVector2 MAX_TO_ZE(const Point2& Point)
 {
@@ -181,7 +200,7 @@ bool ZE3dsMapExporter::GetRelativePath(const char* RealPath, char* RelativePath)
 	ZEString ZinekDir;
 
 	if(ExportOptions != NULL)
-		ZinekDir = ((ZEMLProperty*)(ExportOptions->GetProperties("ZinekEngineWorkingDirectory")[0]))->GetValue().GetString();
+		ZinekDir = ((ZEMLProperty*)(ExportOptions->GetProperty("ZinekEngineWorkingDirectory")))->GetValue().GetString();
 	else
 		zeError("Can not get Zinek Working Directory from options.");
 
@@ -219,6 +238,7 @@ ZEInt ZE3dsMapExporter::FindPortalIndex(IGameNode* Node)
 bool ZE3dsMapExporter::ProcessDoors()
 {
 	zeLog("Processing Portal Doors...");
+	ZEMLNode* DoorsNode = MapNode.AddSubNode("Doors");
 
 	INode* PortalANode;
 	INode* PortalBNode;
@@ -226,16 +246,24 @@ bool ZE3dsMapExporter::ProcessDoors()
 	float PlaneWidth, PlaneLength;
 	for (ZESize I = 0; I < (ZESize)Doors.Count(); I++)
 	{
+		ZEMLNode* DoorNode = DoorsNode->AddSubNode("Door");
+
 		IGameNode* CurrentNode = Doors[I];
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		ZEProgressDialog::GetInstance()->OpenTask(CurrentNode->GetName());
 		zeLog("Processing Portal Door \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Doors.Count());
+		
+		DoorNode->AddProperty("Name", CurrentNode->GetName());
 
 		GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Width", PlaneWidth);
 		GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Length", PlaneLength);
+
+		GetProperty(CurrentObject, IGAME_INT_PROP, "IsOpen", IsOpen);
+		DoorNode->AddProperty("IsOpen", IsOpen);
+
 		GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PortalA", PortalANode);
 		GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PortalB", PortalBNode);
-		GetProperty(CurrentObject, IGAME_INT_PROP, "IsOpen", IsOpen);
+
 		if (PortalANode == NULL || PortalBNode == NULL || PortalANode == PortalBNode)
 		{
 			zeWarning("Portal door \"%s\" has wrong parameters.", CurrentNode->GetName());
@@ -243,81 +271,93 @@ bool ZE3dsMapExporter::ProcessDoors()
 		}
 
 		ZEInt PortalAIndex = FindPortalIndex(Scene->GetIGameNode(PortalANode));
-		ZEInt PortalBIndex = FindPortalIndex(Scene->GetIGameNode(PortalBNode));
+		DoorNode->AddProperty("PortalAIndex", PortalAIndex);
 
-		ZEMapFileDoor* Door = Map.Doors.Add();
+		ZEInt PortalBIndex = FindPortalIndex(Scene->GetIGameNode(PortalBNode));
+		DoorNode->AddProperty("PortalBIndex", PortalBIndex);
 	
-		strncpy(Door->Name, CurrentNode->GetName(), ZE_MPFL_MAX_NAME_SIZE);
-		Door->IsOpen = IsOpen;
-		Door->PortalIds[0] = PortalAIndex;
-		Door->PortalIds[1] = PortalBIndex;
-		
+		ZEVector3 Point1, Point2, Point3, Point4;
 		GMatrix Matrix = CurrentNode->GetObjectTM();
 		ZEMatrix4x4 WorldMatrix;
 		ZEMatrix4x4::Transpose(WorldMatrix, *((ZEMatrix4x4*)&Matrix));
-		ZEMatrix4x4::Transform(Door->Rectangle.P1, WorldMatrix, ZEVector3(-PlaneWidth, 0.0f , PlaneLength));
-		ZEMatrix4x4::Transform(Door->Rectangle.P2, WorldMatrix, ZEVector3(PlaneWidth, 0.0f , PlaneLength));
-		ZEMatrix4x4::Transform(Door->Rectangle.P3, WorldMatrix, ZEVector3(PlaneWidth, 0.0f , -PlaneLength));
-		ZEMatrix4x4::Transform(Door->Rectangle.P4, WorldMatrix, ZEVector3(-PlaneWidth, 0.0f , -PlaneLength));
+		ZEMatrix4x4::Transform(Point1, WorldMatrix, ZEVector3(-PlaneWidth, 0.0f , PlaneLength));
+		ZEMatrix4x4::Transform(Point2, WorldMatrix, ZEVector3(PlaneWidth, 0.0f , PlaneLength));
+		ZEMatrix4x4::Transform(Point3, WorldMatrix, ZEVector3(PlaneWidth, 0.0f , -PlaneLength));
+		ZEMatrix4x4::Transform(Point4, WorldMatrix, ZEVector3(-PlaneWidth, 0.0f , -PlaneLength));
+
+		ZEMLNode* RetangleNode = DoorNode->AddSubNode("Rectangle");
+		RetangleNode->AddProperty("Point1", Point1);
+		RetangleNode->AddProperty("Point2", Point2);
+		RetangleNode->AddProperty("Point3", Point3);
+		RetangleNode->AddProperty("Point4", Point4);
+
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
 
 	return true;
 }
 
-void ProcessPhysicalMesh(ZEMapFilePhysicalMesh* PhysicalMesh, IGameObject* Object)
+void ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode)
 {
 	IGameMesh* Mesh = (IGameMesh*)Object;
 	Mesh->InitializeData();
-	PhysicalMesh->Polygons.SetCount(Mesh->GetNumberOfFaces());
+	ZEArray<ZEMapFilePhysicalMeshPolygon> Polygons;
+	Polygons.SetCount(Mesh->GetNumberOfFaces());
+
 	for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
 	{
 		FaceEx* Face = Mesh->GetFace((ZEInt)I);
-		PhysicalMesh->Polygons[I].Indices[0] = Face->vert[0]; 
-		PhysicalMesh->Polygons[I].Indices[1] = Face->vert[1]; 
-		PhysicalMesh->Polygons[I].Indices[2] = Face->vert[2]; 
+		Polygons[I].Indices[0] = Face->vert[0]; 
+		Polygons[I].Indices[1] = Face->vert[1]; 
+		Polygons[I].Indices[2] = Face->vert[2]; 
 	}
 
-	PhysicalMesh->Vertices.SetCount(Mesh->GetNumberOfVerts());
+	PhysicalMeshNode->AddDataProperty("Polygons", Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygon) * Polygons.GetCount(), true);
+
+	ZEArray<ZEVector3> Vertices;
+	Vertices.SetCount(Mesh->GetNumberOfVerts());
+
 	for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfVerts(); I++)
 	{
 		Point3 Vertex =	Mesh->GetVertex((ZEInt)I, false);
-		PhysicalMesh->Vertices[I] = MAX_TO_ZE(Vertex);
+		Vertices[I] = MAX_TO_ZE(Vertex);
 	}
+
+	PhysicalMeshNode->AddDataProperty("Vertices", Vertices.GetCArray(), sizeof(ZEVector3) * Vertices.GetCount(), true);
 }
 
 bool ZE3dsMapExporter::ProcessPortals()
 {
 	zeLog("Processing portals...");
-	Map.Portals.SetCount((ZESize)Portals.Count());
+
+	ZEMLNode* PortalsNode = MapNode.AddSubNode("Portals");
 	for (ZESize I = 0; I < (ZESize)Portals.Count(); I++)
 	{
+		ZEMLNode* PortalNode = PortalsNode->AddSubNode("Portal");
+
 		IGameNode* CurrentNode = Portals[I];
 		ZEProgressDialog::GetInstance()->OpenTask(CurrentNode->GetName());
 		zeLog("Processing Portal \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Portals.Count());
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
-		ZEMapFilePortal* CurrentFilePortal = &Map.Portals[I];
 		bool PhysicalMeshEnabled, PhysicalMeshUseSelf;
 		INode* PhysicalMeshMaxNode;
 		IGameNode* PhysicalMeshNode;
 
-		strncpy(CurrentFilePortal->Name, CurrentNode->GetName(), ZE_MPFL_MAX_NAME_SIZE);
-
-		if (CurrentFilePortal->GenerateOctree)
-			zeWarning("Octree is not supported. Portal : \"%s\"", CurrentFilePortal->Name);
-		//GetProperty(CurrentObject, IGAME_INT_PROP, "GenerateOctree", CurrentFilePortal->GenerateOctree);
-		//GetProperty(CurrentObject, IGAME_INT_PROP, "MaxOctreeDepth", CurrentFilePortal->MaxOctreeDepth);
-		CurrentFilePortal->GenerateOctree = false;
-		CurrentFilePortal->MaxOctreeDepth = 0;
-
+		PortalNode->AddProperty("Name", CurrentNode->GetName());
 		GetProperty(CurrentObject, IGAME_INT_PROP, "PhysicalMeshEnabled", PhysicalMeshEnabled);
 		GetProperty(CurrentObject, IGAME_INT_PROP, "PhysicalMeshUseSelf", PhysicalMeshUseSelf);
+		PortalNode->AddProperty("PhysicalMeshUseSelf", PhysicalMeshUseSelf);
 		GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PhysicalMesh", PhysicalMeshMaxNode);
 		
+		ZEMLNode* PhysicalMeshZEMLNode = PortalNode->AddSubNode("PhysicalMesh");
+
 		// Load physical mesh
 		if (PhysicalMeshEnabled)
+		{
 			if (PhysicalMeshUseSelf)
-				ProcessPhysicalMesh(&CurrentFilePortal->PhysicalMesh, CurrentObject);
+			{
+				ProcessPhysicalMesh(CurrentObject, PhysicalMeshZEMLNode);
+			}
 			else
 			{
 				PhysicalMeshNode = Scene->GetIGameNode(PhysicalMeshMaxNode);
@@ -327,20 +367,20 @@ bool ZE3dsMapExporter::ProcessPortals()
 					PhysicalMeshEnabled = false;
 				}
 				else
-					ProcessPhysicalMesh(&CurrentFilePortal->PhysicalMesh, PhysicalMeshNode->GetIGameObject());
+					ProcessPhysicalMesh(PhysicalMeshNode->GetIGameObject(), PhysicalMeshZEMLNode);
 			}
-		else
-		{
-			CurrentFilePortal->PhysicalMesh.Polygons.SetCount(0);
-			CurrentFilePortal->PhysicalMesh.Vertices.SetCount(0);
 		}
+
+		PortalNode->AddProperty("PhysicalMeshEnabled", PhysicalMeshEnabled);
 
 		// Load geometry
 		IGameMesh* Mesh = (IGameMesh*)CurrentObject;
 		Mesh->InitializeData();
 		Mesh->InitializeBinormalData();
 		Mesh->SetUseWeightedNormals();
-		CurrentFilePortal->Polygons.SetCount(Mesh->GetNumberOfFaces());
+
+		ZEArray<ZEMapFilePolygon> Polygons;
+		Polygons.SetCount(Mesh->GetNumberOfFaces());
 		
 		ZEMatrix4x4 WorldMatrix,  Temp4x4;
 		ZEMatrix3x3 WorldInvTrspsMatrix, Temp3x3;
@@ -364,27 +404,16 @@ bool ZE3dsMapExporter::ProcessPortals()
 				return false;
 			}
 
-			CurrentFilePortal->Polygons[I].Material = ProcessFaceMaterial(Mesh->GetMaterialFromFace((ZEInt)I));
+			Polygons[I].Material = ProcessFaceMaterial(Mesh->GetMaterialFromFace((ZEInt)I));
+
 			for (ZESize N = 0; N < 3; N++)
 			{
-				ZEMapFileVertex* Vertex = &CurrentFilePortal->Polygons[I].Vertices[N];
+				ZEMapFileVertex* Vertex = &Polygons[I].Vertices[N];
 				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt)I, (ZEInt)N);
 
 				Point3 Temp;
 				Mesh->GetVertex(Face->vert[N], Temp, false);
 				Vertex->Position = MAX_TO_ZE(Temp);
-				
-				/*Mesh->GetNormal(I, N, *(Point3*)&Vertex->Normal, false);
-				ZEVector3::Normalize(Vertex->Normal, Vertex->Normal);
-				
-				Mesh->GetTangent(BinormalTangentIndex, *(Point3*)&Vertex->Tangent);
-				ZEVector3::Normalize(Vertex->Tangent, Vertex->Tangent);
-				
-				Mesh->GetBinormal(BinormalTangentIndex, *(Point3*)&Vertex->Binormal);
-				ZEVector3::Normalize(Vertex->Binormal, Vertex->Binormal);
-				
-				Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord);*/
-
 				
 				ZEVector3 Normal;
 				Mesh->GetNormal(Face->norm[N], Temp, true);
@@ -397,158 +426,305 @@ bool ZE3dsMapExporter::ProcessPortals()
 				Mesh->GetBinormal(BinormalTangentIndex, Temp);
 				Vertex->Binormal = MAX_TO_ZE(Temp);
 
-
-				/*
-				ZEMatrix3x3::Transform(Vertex->Tangent, WorldInvTrspsMatrix, *(ZEVector3*)&Mesh->GetTangent(BinormalTangentIndex));
-				ZEVector3::Normalize(Vertex->Tangent, Vertex->Tangent);
-				ZEMatrix3x3::Transform(Vertex->Binormal, WorldInvTrspsMatrix, *(ZEVector3*)&Mesh->GetBinormal(BinormalTangentIndex));
-				ZEVector3::Normalize(Vertex->Binormal, Vertex->Binormal);*/
-
 				Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord);
 			}
 		}
+
+		PortalNode->AddDataProperty("Vertices", Polygons.GetCArray(), sizeof(ZEMapFilePolygon) * Polygons.GetCount(), true);
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
 
 	return true;
 }
 
-bool ZE3dsMapExporter::ProcessMaterials()
+bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 {
 	zeLog("Processing materials...");
-	Map.Materials.SetCount((ZESize)Materials.Count());
-	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)
+	ZEMLNode* MaterialsNode = MapNode.AddSubNode("Materials");
+
+	ZEString FileParentPath = ZEFileInfo::GetParentDirectory(FileName) + ZEPathUtils::GetSeperator();
+
+	char DiffuseMap[ZE_MPFL_MAX_FILENAME_SIZE];
+	char SpecularMap[ZE_MPFL_MAX_FILENAME_SIZE];
+	char EmissiveMap[ZE_MPFL_MAX_FILENAME_SIZE];
+	char OpacityMap[ZE_MPFL_MAX_FILENAME_SIZE];
+	char NormalMap[ZE_MPFL_MAX_FILENAME_SIZE];
+	char EnvironmentMap[ZE_MPFL_MAX_FILENAME_SIZE];
+
+	ZESize MaterialCount = (ZESize)Materials.Count();
+	zeLog("Material count : %d", MaterialCount);
+
+	for (ZESize I = 0; I < MaterialCount; I++)
 	{
 		IGameMaterial* NodeMaterial = Materials[I];
-		ZEProgressDialog::GetInstance()->OpenTask(NodeMaterial->GetMaterialName());
-		zeLog("Processing material \"%s\" (%Iu/%d)", NodeMaterial->GetMaterialName(), I + 1, Materials.Count());
-		ZEMapFileMaterial* CurrentMaterial = &Map.Materials[I];
-		ZeroMemory(CurrentMaterial, sizeof(ZEMapFileMaterial));
+		ZEString MaterialName = NodeMaterial->GetMaterialName();
 
-		CurrentMaterial->LightningEnabled = true;
+		ZEResourceOption MaterialOption;
+		ResourceConfigurationDialog->GetOption(MaterialName + ".ZEMATERIAL", MaterialOption);
+		ZEString MaterialFilePath = MaterialOption.ExportPath + ZEPathUtils::GetSeperator() + MaterialOption.Identifier;
 
-		bool ExportBool = false;
-		GetProperty(NodeMaterial, IGAME_INT_PROP, "wire", ExportBool);
-		CurrentMaterial->Wireframe = ExportBool;
-		ExportBool = false;
-		GetProperty(NodeMaterial, IGAME_INT_PROP, "twoSided", ExportBool);
-		CurrentMaterial->TwoSided = ExportBool;
+		ZEProgressDialog::GetInstance()->OpenTask(MaterialName);
+		zeLog("Processing material \"%s\" (%Iu/%d).", MaterialName.ToCString(), I + 1, Materials.Count());
 
-		NodeMaterial->GetOpacityData()->GetPropertyValue(CurrentMaterial->Opasity);
-		NodeMaterial->GetAmbientData()->GetPropertyValue(*(Point3*)&CurrentMaterial->AmbientColor);
-		NodeMaterial->GetDiffuseData()->GetPropertyValue(*(Point3*)&CurrentMaterial->DiffuseColor);
-		NodeMaterial->GetSpecularData()->GetPropertyValue(*(Point3*)&CurrentMaterial->SpecularColor);
-		NodeMaterial->GetEmissiveData()->GetPropertyValue(*(Point3*)&CurrentMaterial->EmmisiveColor);
-		NodeMaterial->GetSpecularLevelData()->GetPropertyValue(CurrentMaterial->SpecularFactor);
-		NodeMaterial->GetEmissiveAmtData()->GetPropertyValue(CurrentMaterial->EmmisiveFactor);
+		ZeroMemory(DiffuseMap, sizeof(DiffuseMap));
+		ZeroMemory(SpecularMap, sizeof(SpecularMap));
+		ZeroMemory(EmissiveMap, sizeof(EmissiveMap));
+		ZeroMemory(OpacityMap, sizeof(OpacityMap));
+		ZeroMemory(NormalMap, sizeof(NormalMap));
+		ZeroMemory(EnvironmentMap, sizeof(EnvironmentMap));
 
-		CurrentMaterial->ShaderComponents = 0;
+		ZEResourceOption CurrentOption;
+		if(!ResourceConfigurationDialog->GetOption(MaterialName + ".ZEMATERIAL", CurrentOption))
+			zeError("Material export path not found in resource options. Resource identifier : %s");
 
-		for (ZEInt N = 0; N < NodeMaterial->GetNumberOfTextureMaps(); N++)
+		ZEFile MaterialFile;
+		zeLog("Opening material file...");
+		if (!MaterialFile.Open(CurrentOption.ExportPath + "\\" + MaterialName + ".ZEMATERIAL", ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
 		{
-			// char RelativePath[ZE_MPFL_MAX_FILENAME_SIZE];
+			zeError("Material process failed. Unable to open file for material: \"%s\"", MaterialName);
+			return false;
+		}
+		zeLog("Material file succesfuly opened.");
+
+		ZEInt NumberOfMaps = NodeMaterial->GetNumberOfTextureMaps();
+		ZEInt32 MapFlag = 0;
+		ZEString ResourceRelativePath;
+
+		for (ZEInt N = 0; N < NumberOfMaps; N++)
+		{
+			char RelativePath[ZE_MPFL_MAX_FILENAME_SIZE];
 
 			IGameTextureMap* CurrentTexture = NodeMaterial->GetIGameTextureMap(N);
 			switch(CurrentTexture->GetStdMapSlot())
 			{
-				case ID_AM: // Ambient
-					break;
-				case ID_DI: // Diffuse
-					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
-					{
-						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Diffuse Map.\r\n"
-						"\tMaterial Name : \"%s\", Texture Slot : Diffuse Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
-						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
-						continue;
-					}*/
-					CurrentMaterial->ShaderComponents |= ZESHADER_DIFFUSEMAP;
-					strncpy(CurrentMaterial->DiffuseMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
-					break;
-				case ID_SP: // Specular
-					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
-					{
-						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Specular Map.\r\n"
-						"\tMaterial Name : \"%s\", Texture Slot : Specular Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
-						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
-						continue;
-					}*/
-					CurrentMaterial->ShaderComponents |= ZESHADER_SPECULARMAP;
-					strncpy(CurrentMaterial->SpecularMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
-					break;
-				case ID_SI:	// Emmisive
-					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
-					{
-						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Emmisive Map.\r\n"
-						"\tMaterial Name : \"%s\", Texture Slot : Self Ilimunation Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
-						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
-						continue;
-					}*/
-					CurrentMaterial->ShaderComponents |= ZESHADER_EMMISIVEMAP;
-					strncpy(CurrentMaterial->EmmisiveMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
-					break;
-				case ID_OP:	// Opacity 
-					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
-					{
-						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Opacity Map.\r\n"
-						"\tMaterial Name : \"%s\", Texture Slot : Opacity Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
-						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
-						continue;
-					}*/
-					CurrentMaterial->ShaderComponents |= ZESHADER_OCAPASITYMAP;
-					strncpy(CurrentMaterial->OpasityMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
-					break;
-				case ID_FI:	// Filter color 
-					/*
-					if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
-					{
-						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Diffuse Map.\r\n"
-						"\tMaterial Name : \"%s\", Texture Slot : Diffuse Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
-						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
-						continue;
-					}
-					CurrentMaterial->ShaderComponents |= ZESHADER_DIFFUSEMAP;
-					GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath);
-					strncpy(CurrentMaterial->DetailMap, RelativePath, ZE_MPFL_MAX_FILENAME_SIZE);
-					*/
-					break;
-				case ID_BU: // Bump 
-					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
-					{
-						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Bump Map.\r\n"
-						"\tMaterial Name : \"%s\", Texture Slot : Bump Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
-						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
-						continue;
-					}*/
-					CurrentMaterial->ShaderComponents |= ZESHADER_NORMALMAP;
-					strncpy(CurrentMaterial->NormalMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
-					break;
-				case ID_RL: // Reflection 
-					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
-					{
-						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Reflection Map.\r\n"
-						"\tMaterial Name : \"%s\", Texture Slot : Reflection Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
-						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
-						continue;
-					}*/
-					CurrentMaterial->ShaderComponents |= ZESHADER_REFLECTION;
-					strncpy(CurrentMaterial->ReflectionMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
-					break; 
-				case ID_RR: // Refraction 
-					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
-					{
-						zeError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Refraction Map.\r\n"
-						"\tMaterial Name : \"%s\", Texture Slot : Refraction Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
-						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
-						continue;
-					}*/
-					CurrentMaterial->ShaderComponents |= ZESHADER_REFRACTION;
-					strncpy(CurrentMaterial->RefractionMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
-					break;
-			}
+			case ID_AM: // Ambient
+				break;
+			case ID_DI: // Diffuse
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentOption))
+					zeError("Diffuse texture export path not found in resource options. Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
 
-			if (CurrentMaterial->Opasity != 1.0f || strncmp(CurrentMaterial->OpasityMap, "", ZE_MPFL_MAX_FILENAME_SIZE) !=0)
-				CurrentMaterial->Transparant = true;
-		}		
+				if(!ZEDirectoryInfo::IsDirectory(CurrentOption.ExportPath))
+					zeError("Diffuse texture export path not valid . Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				else
+				{
+					MapFlag |= ZE_MTMP_DIFFUSEMAP;
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, CurrentOption.Identifier);
+					strncpy(DiffuseMap, ResourceRelativePath.ToCString() , ZE_MPFL_MAX_FILENAME_SIZE);
+
+					if(ResourceConfigurationDialog->GetCopyState(CurrentOption.Identifier))
+					{
+						ZEFileInfo FileInfo(CurrentOption.PhysicalPath);
+						if(!ZEFileOperations::Copy(CurrentOption.ExportPath, &FileInfo, true))
+							zeError("Can not copy resource, resource identifier : %s", CurrentOption.Identifier.ToCString());
+						else
+							zeLog("Resource copied successfully, resource identifier : %s", CurrentOption.Identifier);
+					}
+				}
+				break;
+			case ID_SP: // Specular
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentOption))
+					zeError("Specular texture export path not found in resource options. Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+
+				if(!ZEDirectoryInfo::IsDirectory(CurrentOption.ExportPath))
+					zeError("Specular texture export path not valid . Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				else
+				{
+					MapFlag |= ZE_MTMP_SPECULARMAP;
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					strncpy(SpecularMap, ResourceRelativePath.ToCString(), ZE_MPFL_MAX_FILENAME_SIZE);
+
+					if(ResourceConfigurationDialog->GetCopyState(CurrentOption.Identifier))
+					{
+						ZEFileInfo FileInfo(CurrentOption.PhysicalPath);
+						if(!ZEFileOperations::Copy(CurrentOption.ExportPath, &FileInfo, true))
+							zeError("Can not copy resource, resource identifier : %s", CurrentOption.Identifier.ToCString());
+						else
+							zeLog("Resource copied successfully, resource identifier : %s", CurrentOption.Identifier);
+					}
+				}
+				break;
+			case ID_SI:	// Emissive
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentOption))
+					zeError("Emissive texture export path not found in resource options. Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+
+				if(!ZEDirectoryInfo::IsDirectory(CurrentOption.ExportPath))
+					zeError("Emissive texture export path not valid . Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				else
+				{
+					MapFlag |= ZE_MTMP_EMISSIVEMAP;
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					strncpy(EmissiveMap, ResourceRelativePath.ToCString(), ZE_MPFL_MAX_FILENAME_SIZE);
+
+					if(ResourceConfigurationDialog->GetCopyState(CurrentOption.Identifier))
+					{
+						ZEFileInfo FileInfo(CurrentOption.PhysicalPath);
+						if(!ZEFileOperations::Copy(CurrentOption.ExportPath, &FileInfo, true))
+							zeError("Can not copy resource, resource identifier : %s", CurrentOption.Identifier.ToCString());
+						else
+							zeLog("Resource copied successfully, resource identifier : %s", CurrentOption.Identifier);
+					}
+				}
+				break;
+			case ID_OP:	// Opacity 
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentOption))
+					zeError("Opacity texture export path not found in resource options. Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+
+				if(!ZEDirectoryInfo::IsDirectory(CurrentOption.ExportPath))
+					zeError("Opacity texture export path not valid . Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				else
+				{
+					MapFlag |= ZE_MTMP_OPACITYMAP;
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					strncpy(OpacityMap, ResourceRelativePath.ToCString(), ZE_MPFL_MAX_FILENAME_SIZE);
+
+					if(ResourceConfigurationDialog->GetCopyState(CurrentOption.Identifier))
+					{
+						ZEFileInfo FileInfo(CurrentOption.PhysicalPath);
+						if(!ZEFileOperations::Copy(CurrentOption.ExportPath, &FileInfo, true))
+							zeError("Can not copy resource, resource identifier : %s", CurrentOption.Identifier.ToCString());
+						else
+							zeLog("Resource copied successfully, resource identifier : %s", CurrentOption.Identifier);
+					}
+				}
+				break;
+			case ID_FI:	// Filter color 
+				break;
+			case ID_BU: // Bump 
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentOption))
+					zeError("Bump texture export path not found in resource options. Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+
+				if(!ZEDirectoryInfo::IsDirectory(CurrentOption.ExportPath))
+					zeError("Bump texture export path not valid . Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				else
+				{
+					MapFlag |= ZE_MTMP_NORMALMAP;
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					strncpy(NormalMap, ResourceRelativePath.ToCString(), ZE_MPFL_MAX_FILENAME_SIZE);
+
+					if(ResourceConfigurationDialog->GetCopyState(CurrentOption.Identifier))
+					{
+						ZEFileInfo FileInfo(CurrentOption.PhysicalPath);
+						if(!ZEFileOperations::Copy(CurrentOption.ExportPath, &FileInfo, true))
+							zeError("Can not copy resource, resource identifier : %s", CurrentOption.Identifier.ToCString());
+						else
+							zeLog("Resource copied successfully, resource identifier : %s", CurrentOption.Identifier);
+					}
+				}
+				break;
+			case ID_RL: // Reflection - Environment
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentOption))
+					zeError("Environment texture export path not found in resource options. Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+
+				if(!ZEDirectoryInfo::IsDirectory(CurrentOption.ExportPath))
+					zeError("Environment texture export path not valid . Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				else
+				{
+					MapFlag |= ZE_MTMP_ENVIRONMENTMAP;
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					strncpy(EnvironmentMap, ResourceRelativePath.ToCString(), ZE_MPFL_MAX_FILENAME_SIZE);
+
+					if(ResourceConfigurationDialog->GetCopyState(CurrentOption.Identifier))
+					{
+						ZEFileInfo FileInfo(CurrentOption.PhysicalPath);
+						if(!ZEFileOperations::Copy(CurrentOption.ExportPath, &FileInfo, true))
+							zeError("Can not copy resource, resource identifier : %s", CurrentOption.Identifier.ToCString());
+						else
+							zeLog("Resource copied successfully, resource identifier : %s", CurrentOption.Identifier);
+					}
+				}
+				break; 
+			case ID_RR: // Refraction 
+				break;
+			}
+			
+		}
+
+		zeLog("Writing material file.");
+		ZEMLSerialRootNode MaterialSerialNode("Material", &MaterialFile);
+		MaterialSerialNode.WriteProperty("Name", MaterialName);
+		ZEMLSerialNode MaterialConfigNode = MaterialSerialNode.OpenNode("Configuration");
+
+		MaterialConfigNode.WriteProperty("Name", "Default");
+		bool TempBooleanValue = false;
+		GetProperty(NodeMaterial, IGAME_INT_PROP, "wire", TempBooleanValue);
+		MaterialConfigNode.WriteProperty("Wireframe", TempBooleanValue);
+
+		TempBooleanValue = false;
+		GetProperty(NodeMaterial, IGAME_INT_PROP, "twoSided", TempBooleanValue);
+		MaterialConfigNode.WriteProperty("TwoSided", TempBooleanValue);
+
+		MaterialConfigNode.WriteProperty("LightningEnabled", true); // Lightning Enabled is forced true;
+
+		float Opacity = 0.0f;
+		NodeMaterial->GetOpacityData()->GetPropertyValue(Opacity);
+
+		if (Opacity != 1.0f || strncmp(OpacityMap, "", ZE_MPFL_MAX_FILENAME_SIZE) !=0)
+			MaterialConfigNode.WriteProperty("Transparant", true);
+		else
+			MaterialConfigNode.WriteProperty("Transparant", false);
+
+		//AMBIENT
+		zeLog("Writing ambient data.");
+		MaterialConfigNode.WriteProperty("AmbientEnabled", false); //Ambient is forced false
+		ZEVector3 TempVector3Value = ZEVector3::Zero;
+		NodeMaterial->GetAmbientData()->GetPropertyValue(*(Point3*)&TempVector3Value);
+		MaterialConfigNode.WriteProperty("AmbientColor", TempVector3Value);
+
+		//DIFFUSE
+		zeLog("Writing diffuse data.");
+		MaterialConfigNode.WriteProperty("DiffuseEnabled", (MapFlag & ZE_MTMP_DIFFUSEMAP) != 0);
+		TempVector3Value = ZEVector3::Zero;
+		NodeMaterial->GetDiffuseData()->GetPropertyValue(*(Point3*)&TempVector3Value);
+		MaterialConfigNode.WriteProperty("DiffuseColor", TempVector3Value);
+		MaterialConfigNode.WriteProperty("BaseMap", DiffuseMap);
+
+		//SPECULAR
+		zeLog("Writing specular data.");
+		MaterialConfigNode.WriteProperty("SpecularEnabled", (MapFlag & ZE_MTMP_SPECULARMAP) != 0);
+		float TempFloatValue = 0.0f;
+		NodeMaterial->GetSpecularLevelData()->GetPropertyValue(TempFloatValue);
+		MaterialConfigNode.WriteProperty("SpecularFactor", TempFloatValue);
+
+		TempVector3Value = ZEVector3::Zero;
+		NodeMaterial->GetSpecularData()->GetPropertyValue(*(Point3*)&TempVector3Value);
+		MaterialConfigNode.WriteProperty("SpecularColor", TempVector3Value);
+		MaterialConfigNode.WriteProperty("SpecularMap", SpecularMap);
+
+		//EMISSIVE
+		zeLog("Writing emissive data.");
+		MaterialConfigNode.WriteProperty("EmmisiveEnabled", (MapFlag & ZE_MTMP_EMISSIVEMAP) != 0);
+		TempFloatValue = 0.0f;
+		NodeMaterial->GetEmissiveAmtData()->GetPropertyValue(TempFloatValue);
+		MaterialConfigNode.WriteProperty("EmmisiveFactor", TempFloatValue);
+
+		TempVector3Value = ZEVector3::Zero;
+		NodeMaterial->GetEmissiveData()->GetPropertyValue(*(Point3*)&TempVector3Value);
+		MaterialConfigNode.WriteProperty("EmmisiveColor", TempVector3Value);
+		MaterialConfigNode.WriteProperty("EmmisiveMap", EmissiveMap);
+
+		//NORMAL
+		zeLog("Writing normals data.");
+		MaterialConfigNode.WriteProperty("NormalMapEnabled", (MapFlag & ZE_MTMP_NORMALMAP) != 0);
+		MaterialConfigNode.WriteProperty("NormalMap", NormalMap);
+
+		//OPACITY
+		MaterialConfigNode.WriteProperty("OpacityEnabled", (MapFlag & ZE_MTMP_OPACITYMAP) != 0);
+		MaterialConfigNode.WriteProperty("Opacity", Opacity);
+		MaterialConfigNode.WriteProperty("OpacityMap", OpacityMap);
+
+		//ENVIRONMENT
+		zeLog("Writing environment data.");
+		MaterialConfigNode.WriteProperty("EnvironmentMap", EnvironmentMap);
+
+		MaterialConfigNode.CloseNode();
+		MaterialSerialNode.CloseNode();
+		zeLog("Closing material file.");
+		MaterialFile.Close();
+
+		ZEMLNode* MaterialDOMNode = MaterialsNode->AddSubNode("Material");
+		MaterialDOMNode->AddProperty("Name", MaterialName);
+		MaterialDOMNode->AddProperty("FilePath", ResourceConfigurationDialog->GetResourceRelativePath(ZEString(FileName) , MaterialName + ".ZEMATERIAL"));
+
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
 
@@ -595,4 +771,104 @@ bool ZE3dsMapExporter::ProcessScene()
 	zeLog("Portal Count: %d, Portal Doors Count: %d, Entity Count: %d, Elected Node Count: %d", PortalNodeCount, PortalDoorNodeCount, EntityNodeCount, ElectedNodeCount);
 
 	return true;
+}
+
+void ZE3dsMapExporter::CollectResources()
+{
+	ZESize PortalNodeCount = 0;
+
+	Tab<IGameNode*>		Nodes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
+	Tab<IGameNode*>		ResourcePortals;
+	Tab<IGameMaterial*>	ResourceMaterials;
+
+	for (ZESize I = 0; I < (ZESize)Nodes.Count(); I++)
+	{
+		IGameNode* CurrentNode = Nodes[I];;
+		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
+		const char* NodeZEType;
+
+		if (!GetProperty(CurrentObject, IGAME_STRING_PROP, "ZEType", NodeZEType))
+			continue;
+
+		if (strcmp(NodeZEType, "Portal") == 0)
+		{
+			PortalNodeCount++;
+			ResourcePortals.Append(1, &CurrentNode);
+		}
+	}
+
+	for (ZESize I = 0; I < (ZESize)ResourcePortals.Count(); I++)
+	{
+		IGameNode* CurrentNode = ResourcePortals[I];
+		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
+
+		IGameMesh* Mesh = (IGameMesh*)CurrentObject;
+		Mesh->InitializeData();
+		Mesh->InitializeBinormalData();
+		Mesh->SetUseWeightedNormals();
+
+		for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
+		{
+			FaceEx* Face;
+			Face = Mesh->GetFace((ZEInt)I);
+			IGameMaterial* CurrentMaterial = Mesh->GetMaterialFromFace((ZEInt)I);
+
+			if (CurrentMaterial == NULL)
+				zeError("Face %d of portal \"%s\" does not have valid material. Can not collect resource.", I, CurrentNode->GetName());
+
+			bool IsFound = false;
+
+			for(ZESize J = 0; J < ResourceMaterials.Count(); J++)
+				if(ResourceMaterials[J] == CurrentMaterial)
+					IsFound = true;
+
+			if(!IsFound)
+				ResourceMaterials.Append(1, &CurrentMaterial);
+		}
+	}
+
+	for (ZESize I = 0; I < ResourceMaterials.Count(); I++)
+	{
+		IGameMaterial* NodeMaterial = ResourceMaterials[I];
+		ZEString MaterialName = NodeMaterial->GetMaterialName();
+
+		ResourceConfigurationDialog->AddResource(MaterialName + ".ZEMATERIAL", ZEString(), ZE_ROAA_COPY_OVERWRITE);
+
+		ZEInt NumberOfMaps = NodeMaterial->GetNumberOfTextureMaps();
+
+		for (ZEInt N = 0; N < NumberOfMaps; N++)
+		{
+			char RelativePath[ZE_MPFL_MAX_FILENAME_SIZE];
+
+			IGameTextureMap* CurrentTexture = NodeMaterial->GetIGameTextureMap(N);
+			switch(CurrentTexture->GetStdMapSlot())
+			{
+			case ID_AM: // Ambient
+				break;
+			case ID_DI: // Diffuse
+				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentTexture->GetBitmapFileName(), ZEString());
+				break;
+			case ID_SP: // Specular
+				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentTexture->GetBitmapFileName(), ZEString());
+				break;
+			case ID_SI:	// Emissive
+				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentTexture->GetBitmapFileName(), ZEString());
+				break;
+			case ID_OP:	// Opacity 
+				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentTexture->GetBitmapFileName(), ZEString());
+				break;
+			case ID_FI:	// Filter color 
+				break;
+			case ID_BU: // Bump 
+				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentTexture->GetBitmapFileName(), ZEString());
+				break;
+			case ID_RL: // Reflection - Environment
+				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentTexture->GetBitmapFileName(), ZEString());
+				break; 
+			case ID_RR: // Refraction 
+				break;
+			}
+			
+		}
+	}
 }

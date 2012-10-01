@@ -43,6 +43,7 @@
 #include "ZEFile/ZEFileUtils.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
+#include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
 #include "ZEFile/ZEFileInfo.h"
 
 ZE3dsMapExporter::ZE3dsMapExporter()
@@ -53,6 +54,7 @@ ZE3dsMapExporter::ZE3dsMapExporter()
 	WinWidget = NULL;
 	OptionsDialog = NULL;
 	ProgressDialog = NULL;
+	ResourceConfigurationDialog = NULL;
 }
 
 ZE3dsMapExporter::~ZE3dsMapExporter() 
@@ -68,12 +70,19 @@ ZE3dsMapExporter::~ZE3dsMapExporter()
 		delete ProgressDialog;
 		ProgressDialog = NULL;
 	}
-
+ 
 	if(OptionsDialog != NULL)
 	{
 		OptionsDialog->hide();
 		delete OptionsDialog;
 		OptionsDialog = NULL;
+	}
+
+	if(ResourceConfigurationDialog != NULL)
+	{
+		ResourceConfigurationDialog->Hide();
+		delete ResourceConfigurationDialog;
+		ResourceConfigurationDialog = NULL;
 	}
 
 	if(WinWidget != NULL)
@@ -82,7 +91,7 @@ ZE3dsMapExporter::~ZE3dsMapExporter()
 		delete WinWidget;
 		WinWidget = NULL;
 	}
-
+ 
 	if(QtApplication != NULL)
 	{
 		QtApplication->quit();
@@ -164,12 +173,11 @@ ZEInt ZE3dsMapExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode 
 	return i_nodeTab.Count();
 }
 
-ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
+void ZE3dsMapExporter::LoadOptions(const char* FilePath)
 {
-	ExportPath = ZEFileInfo::GetParentDirectory(name);
-	ZEString OptionsFilePath((ZEString(i->GetCurFilePath().data())) + ".zecfg");
+	ZEString OptionsFilePath((ZEString(FilePath)) + ".zecfg");
 
-	if(strlen(i->GetCurFilePath().data()) != 0)
+	if(strlen(FilePath) != 0)
 	{
 		ZEFile OptionsFile;
 
@@ -182,33 +190,11 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 			OptionsFile.Close();
 		}
 	}
+}
 
-	INodeTab lNodes;
-	GetSceneNodes(lNodes);
-
-	IGameConversionManager * cm = GetConversionManager();
-	cm->SetCoordSystem(IGameConversionManager::IGAME_D3D);
-
-	int Argc = 0;
-	if(QApplication::instance() == NULL)
-		QtApplication = new QApplication(Argc, NULL);
-	else
-		QtApplication = (QApplication*)QApplication::instance();
-
-	if(WinWidget == NULL)
-		WinWidget = new QWinWidget(i->GetMAXHWnd());
-
-	if(OptionsDialog == NULL)
-		OptionsDialog = new ZEMapExporterOptionsDialogNew(WinWidget, ExportOptions);
-
-	if(ExportOptions != NULL)
-		OptionsDialog->SetOptions(ExportOptions);
-
-	WinWidget->showCentered();
-	ZEInt DialogResult = OptionsDialog->exec();
-
-	if(DialogResult == QDialog::Rejected)
-		return true;
+void ZE3dsMapExporter::SaveOptions(const char* FilePath)
+{
+	ZEString OptionsFilePath((ZEString(FilePath)) + ".zecfg");
 
 	if(ExportOptions != NULL)
 	{
@@ -223,9 +209,82 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	{
 		ExportOptions = OptionsDialog->GetOptions();
 	}
+}
 
+bool ZE3dsMapExporter::ShowOptionsDialog(HWND ParentWindow)
+{
+	int Argc = 0;
+	if(QApplication::instance() == NULL)
+		QtApplication = new QApplication(Argc, NULL);
+	else
+		QtApplication = (QApplication*)QApplication::instance();
+
+	if(WinWidget == NULL)
+		WinWidget = new QWinWidget(ParentWindow);
+
+	if(OptionsDialog == NULL)
+		OptionsDialog = new ZEMapExporterOptionsDialogNew(WinWidget, ExportOptions);
+
+	if(ExportOptions != NULL)
+		OptionsDialog->SetOptions(ExportOptions);
+
+	WinWidget->showCentered();
+	ZEInt DialogResult = OptionsDialog->exec();
+
+	if(DialogResult == QDialog::Rejected)
+		return false;
+
+	return true;
+}
+
+bool ZE3dsMapExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath)
+{
+	int Argc = 0;
+	if(QApplication::instance() == NULL)
+		QtApplication = new QApplication(Argc, NULL);
+	else
+		QtApplication = (QApplication*)QApplication::instance();
+
+	if(WinWidget == NULL)
+		WinWidget = new QWinWidget(ParentWindow);
+
+	if(ResourceConfigurationDialog == NULL)
+		ResourceConfigurationDialog = new ZEResourceConfigurationWidget(WinWidget);
+
+	ResourceConfigurationDialog->SetPresetFilePath(ZEString(MaxFilePath) + ".ZEPRESET");
+	CollectResources();
+
+	WinWidget->showCentered();
+	ZEInt DialogResult = ResourceConfigurationDialog->Show();
+
+	if(DialogResult == QDialog::Rejected)
+		return false;
+
+	ResourceConfigurationDialog->SavePresets(ZEString(MaxFilePath) + ".ZEPRESET");
+	return true;
+}
+
+ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
+{
+	ExportPath = ZEFileInfo::GetParentDirectory(name);
+	LoadOptions(i->GetCurFilePath());
+
+	INodeTab lNodes;
+	GetSceneNodes(lNodes);
+	IGameConversionManager * cm = GetConversionManager();
+	cm->SetCoordSystem(IGameConversionManager::IGAME_D3D);
 	Scene = GetIGameInterface();	
 	Scene->InitialiseIGame(lNodes);
+
+	if(!ShowOptionsDialog(i->GetMAXHWnd()))
+		return true;
+
+	if(!ShowResourceConfigurationDialog(i->GetMAXHWnd(), i->GetCurFilePath()))
+		return true;
+
+	SaveOptions(i->GetCurFilePath());
+
+	MapNode.SetName("ZEMap");
 
 	if(ProgressDialog == NULL)
 		ProgressDialog = ZEProgressDialog::CreateInstance();
@@ -262,7 +321,7 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	ProgressDialog->CloseTask();
 
 	ProgressDialog->OpenTask("Materials", true);
-	if (!ProcessMaterials())
+	if (!ProcessMaterials(name))
 	{
 		zeError("Can not process materials.");
 		return false;
@@ -271,18 +330,14 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 		
 	ProgressDialog->OpenTask("Writing File");
 	zeLog("Dumping map to file...");
-	if (!Map.WriteToFile(name))
+	ZEFile ExportFile;
+	if(ExportFile.Open(name, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
 	{
-		zeError("Export failed !");
-		return false;
+		MapNode.Write(&ExportFile);
+		ExportFile.Close();
 	}
 	ProgressDialog->CloseTask();
 
-	ZEMapFile MapFile2;
-	ProgressDialog->OpenTask("Validation");
-	zeLog("Verifying written file...");
-	MapFile2.ReadFromFile(name);
-	ProgressDialog->CloseTask();
 	zeLog("Export succeed");
 	ProgressDialog->End();
 

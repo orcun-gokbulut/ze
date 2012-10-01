@@ -82,13 +82,13 @@ ZEProgressDialog::ZEProgressDialog()
 
 ZEProgressDialog::~ZEProgressDialog()
 {
-// 	for (ZESize I = 0; I < Tasks.GetCount(); I++)
-// 	{
-// 		delete Tasks[I];
-// 		Tasks[I] = NULL;
-// 	}
+	for (ZESize I = 0; I < Tasks.GetCount(); I++)
+	{
+		delete Tasks[I];
+		Tasks[I] = NULL;
+	}
 
-//	Tasks.Clear();
+	Tasks.Clear();
 
 	ZELog::GetInstance()->SetCallback(OldLogCallBack);
 	ZEError::GetInstance()->SetCallback(OldErrorCallback);
@@ -99,7 +99,7 @@ ZEProgressDialog::~ZEProgressDialog()
 	TasksTreeWidget = NULL;
 
 	Dialog->hide();
-	delete Dialog;
+//	delete Dialog;
 	Dialog = NULL;
 
 	delete SignalHandler;
