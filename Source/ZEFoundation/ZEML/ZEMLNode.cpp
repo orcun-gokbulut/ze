@@ -56,10 +56,13 @@ ZEMLNode::ZEMLNode(const ZEString& Name)
 ZEMLNode::~ZEMLNode()
 {
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
+	{
 		delete Properties[I];
+		Properties[I] = NULL;
+	}
 
-	for (ZESize I = 0; I < SubNodes.GetCount(); I++)
-		delete SubNodes[I];
+// 	for (ZESize I = 0; I < SubNodes.GetCount(); I++)
+// 		delete SubNodes[I];
 
 	Properties.Clear();
 }
@@ -90,12 +93,23 @@ ZEUInt64 ZEMLNode::GetTotalSize()
 
 void ZEMLNode::AddProperty(ZEMLProperty* Property)
 {
+	for (ZESize I = 0; I < Properties.GetCount(); I++)
+		if(Properties[I]->GetName() == Property->GetName())
+			zeError("ZEML node can not contain properties with duplicate name : %s.", Name);
+
 	Property->Parent = this;
 	Properties.Add(Property);
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVariant& Value)
 {
+	for (ZESize I = 0; I < Properties.GetCount(); I++)
+		if(Properties[I]->GetName() == Name)
+		{
+			zeError("ZEML node can not contain properties with duplicate name : %s.", Name);
+			return NULL;
+		}
+
 	ZEMLProperty* Property = new ZEMLProperty(Name, Value);
 	Property->Parent = this;
 	Properties.Add(Property);
@@ -104,6 +118,13 @@ ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVariant& Value
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name)
 {
+	for (ZESize I = 0; I < Properties.GetCount(); I++)
+		if(Properties[I]->GetName() == Name)
+		{
+			zeError("ZEML node can not contain properties with duplicate name : %s.", Name);
+			return NULL;
+		}
+
 	ZEMLProperty* Property = new ZEMLProperty(Name);
 	Property->Parent = this;
 	Properties.Add(Property);
@@ -226,13 +247,24 @@ void ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix4x4& Value)
 }
 
 void ZEMLNode::AddDataProperty(ZEMLDataProperty* Property)
-{
+{	
+	for (ZESize I = 0; I < Properties.GetCount(); I++)
+		if(Properties[I]->GetName() == Property->GetName())
+			zeError("ZEML node can not contain data properties with duplicate name : %s.", Name);
+
 	Property->Parent = this;
 	Properties.Add(Property);
 }
 
 ZEMLDataProperty* ZEMLNode::AddDataProperty(const ZEString& Name ,void* Data, ZEUInt64 DataSize, bool Cache)
 {
+	for (ZESize I = 0; I < Properties.GetCount(); I++)
+		if(Properties[I]->GetName() == Name)
+		{
+			zeError("ZEML node can not contain data properties with duplicate name : %s.", Name);
+			return NULL;
+		}
+
 	ZEMLDataProperty* DataProperty = new ZEMLDataProperty(Name, Data, DataSize, Cache);
 	DataProperty->Parent = this;
 	Properties.Add(DataProperty);
@@ -241,6 +273,13 @@ ZEMLDataProperty* ZEMLNode::AddDataProperty(const ZEString& Name ,void* Data, ZE
 
 ZEMLDataProperty* ZEMLNode::AddDataProperty(const ZEString& Name)
 {
+	for (ZESize I = 0; I < Properties.GetCount(); I++)
+		if(Properties[I]->GetName() == Name)
+		{
+			zeError("ZEML node can not contain data properties with duplicate name : %s.", Name);
+			return NULL;
+		}
+
 	ZEMLDataProperty* DataProperty = new ZEMLDataProperty(Name);
 	DataProperty->Parent = this;
 	Properties.Add(DataProperty);
@@ -336,16 +375,13 @@ const ZEArray<ZEMLItem*>& ZEMLNode::GetProperties() const
 	return Properties;
 }
 
-const ZEArray<ZEMLItem*> ZEMLNode::GetProperties(const ZEString& PropertyName)
+const ZEMLItem*	ZEMLNode::GetProperty(const ZEString& PropertyName)
 {
-	ZEArray<ZEMLItem*> Result;
-	Result.Clear();
-
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 		if(Properties[I]->GetName() == PropertyName)
-			Result.Add(Properties[I]);
+			return Properties[I];
 
-	return Result;
+	return NULL;
 }
 
 const ZEMLNode*	ZEMLNode::GetParent()
