@@ -87,7 +87,10 @@ bool ZEMLSerialReader::ReadNextItem()
 
 		CurrentItemSubItemCount = ZEEndian::Little(CurrentItemSubItemCount);
 
-		NextItemPosition = File->Tell() + sizeof(ZEUInt64);
+		if(File->Read(&CurrentItemDataSize, sizeof(ZEUInt64), 1) != 1)
+			zeError("Can not read ZEMLNode size from file. Corrupted ZEML file.");
+
+		NextItemPosition = File->Tell();
 	}
 	else if(CurrentItemType == ZEML_IT_INLINE_DATA)
 	{
@@ -221,6 +224,14 @@ bool ZEMLSerialReader::ReadNextItem()
 
 		NextItemPosition = File->Tell();
 	}
+}
+
+bool ZEMLSerialReader::ReadSiblingItem()
+{
+	if(CurrentItemType == ZEML_IT_NODE)
+		File->Seek(CurrentItemDataSize, ZE_SF_CURRENT);
+
+	return ReadNextItem();
 }
 
 ZEMLItemType ZEMLSerialReader::GetItemType()

@@ -61,6 +61,7 @@ class ZEMLSerialReader
 	public:
 
 		bool			ReadNextItem();
+		bool			ReadSiblingItem();
 		
 		ZEMLItemType	GetItemType();
 		ZEString		GetItemName();
