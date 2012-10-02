@@ -44,7 +44,7 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEMeta/ZEObject.h"
-#include "ZEModel/ZEModel.h"
+
 
 ZETestSuite(ZEVariant)
 {
@@ -57,7 +57,6 @@ ZETestSuite(ZEVariant)
 
 		Variant.~ZEVariant();
 		ZETestCheckEqual(Variant.GetType(), ZE_VRT_UNDEFINED);
-		ZEString Res = Variant.GetString(); //(Bad Ptr) error Variant type mismatched
 	}
 
 	ZETest("bool ZEVariant::GetBoolean() const")
@@ -512,12 +511,21 @@ ZETestSuite(ZEVariant)
 	ZETest("ZEVariant::ZEVariantValue& ZEVariant::ImplicitAcesss()")
 	{
 		ZEVariant Variant;
-		ZEInt32 i = 6;
-		Variant.SetInt32(i);
+		ZEInt32 Value32 = 0;
+		Variant.SetInt32(Value32);
 		ZETestCheckEqual(Variant.GetType(), ZE_VRT_INTEGER_32);
 
 		ZEVariant::ZEVariantValue Result = Variant.ImplicitAcesss();
-		ZETestCheckEqual(Result.Int32, 6);
+		ZETestCheckEqual(Result.Int32, 0);
+		ZETestCheckEqual(Variant.ImplicitAcesss().Int32, 0);
+
+		ZEInt16 Value16 = 35;
+		Variant.SetInt16(Value16);
+		ZETestCheckEqual(Variant.GetType(), ZE_VRT_INTEGER_16);
+
+		ZEVariant::ZEVariantValue Result1 = Variant.ImplicitAcesss();
+		ZETestCheckEqual(Result1.Int32, 35);
+		ZETestCheckEqual(Variant.ImplicitAcesss().Int32, 35);
 
 		ZETestCase("for ZE_VRT_STRING")
 		{
@@ -547,7 +555,7 @@ ZETestSuite(ZEVariant)
  		}	
 	}
 
-	ZETest("void ZEVariant::operator=(bool NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(bool NewValue)")
 	{
 		ZEVariant Variant;
 		bool NewValue = false;
@@ -557,7 +565,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheck(!Variant.GetBoolean());
 	}
 
-	ZETest("void ZEVariant::operator=(const char* NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(const char* NewValue)")
 	{
 		ZEVariant Variant;
 		const char* NewValue = "String";
@@ -591,7 +599,32 @@ ZETestSuite(ZEVariant)
 		}
 	}
 
-	ZETest("void ZEVariant::operator=(const ZEMatrix3x3& Matrix)")
+	ZETest("ZEVariant& ZEVariant::operator=(const ZEString& NewValue)")
+	{
+		ZEVariant Variant;
+		const ZEString NewValue = "String";
+
+		ZEVariant NewVariant = Variant = NewValue;
+		ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+		ZETestCheckEqual(NewVariant.GetType(), ZE_VRT_STRING);
+		ZETestCheckString(Variant.GetString(), "String");
+		ZETestCheckString(NewVariant.GetString(), "String");
+
+		ZETestCase("for an empty ZEString")
+		{
+			Variant.SetType(ZE_VRT_VECTOR2);
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_VECTOR2);
+			const ZEString Value = "";
+
+			NewVariant = Variant = Value;
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+			ZETestCheckEqual(NewVariant.GetType(), ZE_VRT_STRING);
+			ZETestCheck(Variant.GetString() == "");
+			ZETestCheck(NewVariant.GetString() == "");
+		}
+	}
+
+	ZETest("ZEVariant& ZEVariant::operator=(const ZEMatrix3x3& Matrix)")
 	{
 		ZEVariant Variant;
 		ZEMatrix3x3 Matrix( 1.0f, 1.0f, 2.0f,
@@ -603,7 +636,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetMatrix3x3(), Matrix);
 	}
 
-	ZETest("void ZEVariant::operator=(const ZEMatrix4x4& Matrix)")
+	ZETest("ZEVariant& ZEVariant::operator=(const ZEMatrix4x4& Matrix)")
 	{
 		ZEVariant Variant;
 		ZEMatrix4x4 Matrix(1.0f, 1.0f, 2.0f, 3.0f,
@@ -616,7 +649,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetMatrix4x4(), Matrix);
 	}
 
-	ZETest("void ZEVariant::operator=(const ZEQuaternion& Quaternion)")
+	ZETest("ZEVariant& ZEVariant::operator=(const ZEQuaternion& Quaternion)")
 	{
 		ZEVariant Variant;
 		ZEQuaternion Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
@@ -626,7 +659,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetQuaternion(), Quaternion);
 	}
 
-	ZETest("void ZEVariant::operator=(const ZEVariant& NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(const ZEVariant& NewValue)")
 	{
 		ZEVariant Variant;
 		ZEVariant NewValue;
@@ -635,9 +668,20 @@ ZETestSuite(ZEVariant)
 		Variant = NewValue;
 		ZETestCheckEqual(Variant.GetType(), ZE_VRT_INTEGER_32);
 		ZETestCheckEqual(Variant.GetInt32(), 5);
+
+		ZETestCase("for variant type string")
+		{
+			ZEVariant Variant1;
+			ZEVariant NewValue1;
+			NewValue1.SetString("Test");
+
+			Variant1 = NewValue1;
+			ZETestCheckEqual(Variant1.GetType(), ZE_VRT_STRING);
+			ZETestCheckString(Variant1.GetString(), "Test");
+		}
 	}
 
-	ZETest("void ZEVariant::operator=(const ZEVector2& Vector)")
+	ZETest("ZEVariant& ZEVariant::operator=(const ZEVector2& Vector)")
 	{
 		ZEVariant Variant;
 		ZEVector2 Vector(1.0f, 2.0f);
@@ -647,7 +691,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetVector2(), Vector);
 	}
 
-	ZETest("void ZEVariant::operator=(const ZEVector3& Vector)")
+	ZETest("ZEVariant& ZEVariant::operator=(const ZEVector3& Vector)")
 	{
 		ZEVariant Variant;
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
@@ -657,7 +701,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetVector3(), Vector);
 	}
 
-	ZETest("void ZEVariant::operator=(const ZEVector4& Vector)")
+	ZETest("ZEVariant& ZEVariant::operator=(const ZEVector4& Vector)")
 	{
 		ZEVariant Variant;
 		ZEVector4 Vector(1.0f, 2.0f, 3.0f, 4.0f);
@@ -667,7 +711,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetVector4(), Vector);
 	}
 
-	ZETest("void ZEVariant::operator=(float NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(float NewValue)")
 	{
 		ZEVariant Variant;
 		float NewValue = 3.8f;
@@ -677,7 +721,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetFloat(), NewValue);
 	}
 
-	ZETest("void ZEVariant::operator=(double NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(double NewValue)")
 	{
 		ZEVariant Variant;
 		double NewValue = 3.8;
@@ -687,7 +731,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetDouble(), NewValue);
 	}
 
-	ZETest("void ZEVariant::operator=(ZEInt8 NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(ZEInt8 NewValue)")
 	{
 		ZEVariant Variant;
 		ZEInt8 NewValue = 110;
@@ -697,7 +741,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetInt8(), NewValue);
 	}
 
-	ZETest("void ZEVariant::operator=(ZEInt16 NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(ZEInt16 NewValue)")
 	{
 		ZEVariant Variant;
 		ZEInt16 NewValue = 1000;
@@ -707,7 +751,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetInt16(), NewValue);
 	}
 
-	ZETest("void ZEVariant::operator=(ZEInt32 NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(ZEInt32 NewValue)")
 	{
 		ZEVariant Variant;
 		ZEInt32 NewValue = 1000000000;
@@ -717,7 +761,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetInt32(), NewValue);
 	}
 
-	ZETest("void ZEVariant::operator=(ZEInt64 NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(ZEInt64 NewValue)")
 	{
 		ZEVariant Variant;
 		ZEInt64 NewValue = 700;
@@ -727,7 +771,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetInt64(), NewValue);
 	}
 
-	ZETest("void ZEVariant::operator=(ZEUInt8 NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(ZEUInt8 NewValue)")
 	{
 		ZEVariant Variant;
 		ZEUInt8 NewValue = 210;
@@ -737,7 +781,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetUInt8(), NewValue);
 	}
 
-	ZETest("void ZEVariant::operator=(ZEUInt16 NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(ZEUInt16 NewValue)")
 	{
 		ZEVariant Variant;
 		ZEUInt16 NewValue = 210;
@@ -747,7 +791,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetUInt16(), NewValue);
 	}
 
-	ZETest("void ZEVariant::operator=(ZEUInt32 NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(ZEUInt32 NewValue)")
 	{
 		ZEVariant Variant;
 		ZEUInt32 NewValue = 550;
@@ -757,7 +801,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetUInt32(), NewValue);
 	}
 
-	ZETest("void ZEVariant::operator=(ZEUInt64 NewValue)")
+	ZETest("ZEVariant& ZEVariant::operator=(ZEUInt64 NewValue)")
 	{
 		ZEVariant Variant;
 		ZEUInt64 NewValue = 1550;
@@ -765,6 +809,11 @@ ZETestSuite(ZEVariant)
 		Variant = NewValue;
 		ZETestCheckEqual(Variant.GetType(), ZE_VRT_UNSIGNED_INTEGER_64);
 		ZETestCheckEqual(Variant.GetUInt64(), NewValue);
+	}
+
+	ZETest("ZEVariant& ZEVariant::operator=(ZEObject* NewValue)")
+	{
+
 	}
 
 	ZETest("ZEVariant::operator bool()")
@@ -882,6 +931,16 @@ ZETestSuite(ZEVariant)
 			Result = (ZEInt16)Variant;
 			ZETestCheckEqual(Result, 120);
 			ZETestCheckClose(Variant.GetDouble(), 120.2);
+		}
+
+		ZETestCase("for ZEVector2")
+		{
+			Variant.SetVector2(ZEVector2::One);
+
+			Result = (ZEInt16)Variant;
+			//error Integer conversion operation failed. Variant type mismatched.
+			ZETestCheckEqual(Result, 0);
+			ZETestCheckEqual(Variant.GetVector2(), ZEVector2::One);
 		}
 	}
 
@@ -1450,7 +1509,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetUInt64(), Value);
 	}
 
-	ZETest("void ZEVariant::SetMatrix3x3(const ZEMatrix3x3& Matrix)")
+	ZETest("void ZEVariant::SetMatrix3x3(const ZEMatrix3x3& Value)")
 	{
 		ZEVariant Variant;
 		ZEMatrix3x3 Matrix(1.0f, 1.0f, 2.0f,
@@ -1462,7 +1521,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetMatrix3x3(), Matrix);
 	}
 
-	ZETest("void ZEVariant::SetMatrix4x4(const ZEMatrix4x4& Matrix)")
+	ZETest("void ZEVariant::SetMatrix4x4(const ZEMatrix4x4& Value)")
 	{
 		ZEVariant Variant;
 		ZEMatrix4x4 Matrix(1.0f, 1.0f, 2.0f, 3.0f,   
@@ -1483,18 +1542,16 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetType(), ZE_VRT_NULL);
 	}
 
-	ZETest("void ZEVariant::SetClass(ZEObject* Class)")
+	ZETest("void ZEVariant::SetClass(ZEObject* Value)")
 	{
-// 		ZEVariant Variant;
-// 		ZEObjectDescription* Desc;
-// 		ZEObject* Class = Desc->CreateInstance();
+//		ZEVariant Variant;
 
-// 
-// 		Variant.SetClass(Class);
-// 		ZETestCheckEqual(Variant.GetType(), ZE_VRT_CLASS);
+//		ZEObject* Class;
+//		Variant.SetClass(Class);
+//  	ZETestCheckEqual(Variant.GetType(), ZE_VRT_CLASS);
 	}
 
-	ZETest("void ZEVariant::SetQuaternion(const ZEQuaternion& Quaternion)")
+	ZETest("void ZEVariant::SetQuaternion(const ZEQuaternion& Value)")
 	{
 		ZEVariant Variant;
 		ZEQuaternion Quaternion(ZE_PI_2, ZEVector3::UnitZ);
@@ -1504,7 +1561,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetQuaternion(), Quaternion);
 	}
 
-	ZETest("void ZEVariant::SetString(const char *NewValue)")
+	ZETest("void ZEVariant::SetString(const char *Value)")
 	{
 		ZEVariant Variant;
 		const char* NewValue = "String";
@@ -1519,7 +1576,7 @@ ZETestSuite(ZEVariant)
 
 			Variant.SetString(NewValue);
 			ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
-			ZETestCheckString(Variant.GetString(), "");
+			ZETestCheck(Variant.GetString() == "");
 		}
 
 		ZETestCase("call SetString with different parameters respectively")
@@ -1600,7 +1657,7 @@ ZETestSuite(ZEVariant)
 			ZEString String = Variant.GetString(); //(Bad Ptr) error Variant type mismatched
 			Result = Variant.GetValue();
 			ZETestCheckClose(Result.Double, 1.20);
-			String = Result.String; //(Bad Ptr)
+			ZETestCheckString(Result.String, "TestValue");
 
 			NewVariant.SetType(ZE_VRT_STRING);
 			NewVariant = "Test";
@@ -1661,10 +1718,181 @@ ZETestSuite(ZEVariant)
 
 		ZETestCase("set string to NULL")
 		{
-// 			NewValue = NULL;
-// 
-// 			Variant.SetString(NewValue);
-// 			char* Result = Variant.GetString();
+ 			NewValue = NULL;
+ 
+ 			Variant.SetString(NewValue);
+ 			const char* Result = Variant.GetString();
+			ZETestCheck(Result == NULL);
+		}
+	}
+
+	ZETest("void ZEVariant::SetString(const ZEString& Value)")
+	{
+		ZEVariant Variant;
+		ZEString NewValue = "String";
+
+		Variant.SetString(NewValue);
+		ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+		ZETestCheckString(Variant.GetString(), "String");
+
+		ZETestCase("for an empty string")
+		{
+			const ZEString String;
+
+			Variant.SetString(String);
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+			ZETestCheck(Variant.GetString() == "");
+		}
+
+		ZETestCase("set string to "" ")
+		{
+			const ZEString NewValue1 = "";
+
+			Variant.SetString(NewValue1);
+ 			ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+			ZETestCheck(Variant.GetString() == "");
+		}
+
+		ZETestCase("call SetString with different parameters respectively")
+		{
+			ZEString String = "String";
+			ZEString Test = "Test";
+
+			Variant.SetString(String);
+			Variant.SetString(Test);
+
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+			ZETestCheckString(Variant.GetString(), "Test");
+		}
+
+		ZETestCase("first set variant to boolean then set same variant to string")
+		{
+			ZEVariant TestVariant(false);
+			ZETestCheckEqual(TestVariant.GetType(), ZE_VRT_BOOLEAN);
+			ZETestCheck(!TestVariant.GetBoolean());
+			ZEVariant::ZEVariantValue Result = TestVariant.GetValue();
+			ZETestCheck(!Result.Boolean);
+
+			ZEString Test = "Test";
+			TestVariant = Test;
+			ZETestCheckEqual(TestVariant.GetType(),ZE_VRT_STRING);
+			ZETestCheckString(TestVariant.GetString(), "Test");
+			Result = TestVariant.GetValue();
+			ZETestCheckString(Result.String, "Test");
+		}
+
+		ZETestCase("first create a variant as undefined then set string to same variant")
+		{
+			ZEVariant TestVariant;
+			ZETestCheckEqual(TestVariant.GetType(), ZE_VRT_UNDEFINED);
+			ZETestCheck(TestVariant.GetString() == ""); //error Variant type mismatched
+
+			ZEString Value = "TestString";
+			TestVariant.SetString(Value);
+
+			ZETestCheckEqual(TestVariant.GetType(), ZE_VRT_STRING);
+			ZETestCheckString(TestVariant.GetString(), Value);
+			ZETestCheckString(TestVariant.GetString(), "TestString");
+			ZEVariant::ZEVariantValue Result = TestVariant.GetValue();
+			ZETestCheckString(Result.String, Value);
+			ZETestCheckString(Result.String, "TestString");
+		}
+
+		ZETestCase("first create a variant as undefined then set ZEString to same variant")
+		{
+			ZEVariant TestVariant;
+			ZETestCheckEqual(TestVariant.GetType(), ZE_VRT_UNDEFINED);
+
+			ZEString Value = "Test";
+			TestVariant.SetString(Value);
+
+			ZETestCheckEqual(TestVariant.GetType(), ZE_VRT_STRING);
+			ZETestCheckString(TestVariant.GetString(), Value);
+			ZETestCheckString(TestVariant.GetString(), "Test");
+			ZEVariant::ZEVariantValue Result = TestVariant.GetValue();
+			ZETestCheckString(Result.String, Value);
+			ZETestCheckString(Result.String, "Test");
+		}
+
+		ZETestCase("set variant to different variant types respectively")
+		{
+			ZEVariant NewVariant;
+			NewVariant.SetType(ZE_VRT_NULL);
+
+			Variant.SetVariant(NewVariant);
+			ZETestCheckEqual(Variant.GetType(), NewVariant.GetType());
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_NULL);
+
+			ZEString TestValue = "TestValue";
+			Variant = TestValue;
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+			ZETestCheckString(Variant.GetString(), "TestValue");
+			ZEVariant::ZEVariantValue Result = Variant.GetValue();
+			ZETestCheckString(Result.String, "TestValue");
+
+			Variant.SetDouble(1.20);
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_DOUBLE);
+			ZETestCheckClose(Variant.GetDouble(), 1.20);
+			ZEString String = Variant.GetString(); //(Bad Ptr) error Variant type mismatched
+			Result = Variant.GetValue();
+			ZETestCheckClose(Result.Double, 1.20);
+			String = Result.String;
+			ZETestCheckString(String, "TestValue");
+
+			NewVariant.SetType(ZE_VRT_STRING);
+			ZEString Test = "Test";
+			NewVariant = Test;
+			Variant.SetVariant(NewVariant);
+			ZETestCheckEqual(Variant.GetType(), NewVariant.GetType());
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+			ZETestCheckString(Variant.GetString(), NewVariant.GetString());
+			ZETestCheckString(Variant.GetString(), "Test");
+			ZETestCheckString(NewVariant.GetString(), "Test");
+
+			Variant = "String";	
+			ZETestCheckString(Variant.GetString(), "String");
+			ZETestCheckString(NewVariant.GetString(), "Test");
+
+			Variant.SetType(ZE_VRT_UNSIGNED_INTEGER_32);
+			ZETestCheckEqual(Variant.GetUInt32(), 0);
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_UNSIGNED_INTEGER_32);
+			ZEString NewString = "NewTestString";
+			Variant = NewString;
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+			ZETestCheckString(Variant.GetString(), NewString);
+			ZETestCheckString(Variant.GetString(), "NewTestString");
+
+			NewVariant.SetType(ZE_VRT_INTEGER_8);
+			ZETestCheckEqual(NewVariant.GetType(), ZE_VRT_INTEGER_8);
+			ZETestCheckEqual(NewVariant.GetInt8(), 0);
+			Variant.SetVariant(NewVariant);
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_INTEGER_8);
+			ZETestCheckEqual(Variant.GetInt8(), 0);
+			Result = Variant.GetValue();
+			ZETestCheckEqual(Result.Int32, 0);
+		}
+
+		ZETestCase("assign const char* to ZEString ")
+		{
+			const char* String = "New";
+			NewValue = String;
+
+			Variant.SetType(ZE_VRT_NULL);
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_NULL);
+
+			Variant.SetString(NewValue);
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+			ZETestCheckString(Variant.GetString(), NewValue);
+			ZETestCheckString(Variant.GetString(), "New");
+		}
+
+		ZETestCase("for dynamicly created ZEString")
+		{
+			ZEString String = new char;
+
+			Variant.SetString(String);
+			ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+			ZETestCheckString(Variant.GetString(), String);
 		}
 	}
 
@@ -1677,6 +1905,19 @@ ZETestSuite(ZEVariant)
 
 		Variant.SetType(ZE_VRT_MATRIX4X4);
 		ZETestCheckEqual(Variant.GetType(), ZE_VRT_MATRIX4X4);
+
+		Variant.SetString("String");
+		ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+		ZETestCheckString(Variant.GetString(), "String");
+
+		Variant.SetType(ZE_VRT_STRING);
+		ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+		ZETestCheckString(Variant.GetString(), "String");
+		
+		Variant.SetType(ZE_VRT_MATRIX3X3);
+		ZETestCheckEqual(Variant.GetType(), ZE_VRT_MATRIX3X3);
+		ZETestCheckString(Variant.GetString(), "String");
+		//error ZEVariant::GetString operation failed. Variant type mismatched. 
 	}
 
 	ZETest("void ZEVariant::SetVariant(const ZEVariant& NewValue)")
@@ -1953,11 +2194,11 @@ ZETestSuite(ZEVariant)
 			ZETestCheckEqual(Variant1.GetType(), NewValue1.GetType());
 			ZETestCheckEqual(Variant1.GetType(), ZE_VRT_MATRIX4X4);
 
-// 			NewValue1.SetType(ZE_VRT_STRING);
-// 			Variant1.SetVariant(NewValue1); //access violation reading location 0x00000000
-// 			ZEString String = Variant1.GetString();
-// 			ZETestCheckEqual(Variant1.GetType(), NewValue1.GetType());
-// 			ZETestCheckEqual(Variant1.GetType(), ZE_VRT_STRING);
+ 			NewValue1.SetType(ZE_VRT_STRING);
+ 			Variant1.SetVariant(NewValue1);
+ 			ZEString String = Variant1.GetString();
+ 			ZETestCheckEqual(Variant1.GetType(), NewValue1.GetType());
+ 			ZETestCheckEqual(Variant1.GetType(), ZE_VRT_STRING);
 
 			NewValue1.SetType(ZE_VRT_UNSIGNED_INTEGER_16);
 			Variant1.SetVariant(NewValue1);
@@ -2003,7 +2244,7 @@ ZETestSuite(ZEVariant)
 		}
 	}
 
-	ZETest("void ZEVariant::SetVector2(const ZEVector2& Vector)")
+	ZETest("void ZEVariant::SetVector2(const ZEVector2& Value)")
 	{
 		ZEVariant Variant;
 		ZEVector2 Vector(1.0f, 2.0f);
@@ -2013,7 +2254,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetVector2(), Vector);
 	}
 
-	ZETest("void ZEVariant::SetVector3(const ZEVector3& Vector)")
+	ZETest("void ZEVariant::SetVector3(const ZEVector3& Value)")
 	{
 		ZEVariant Variant;
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
@@ -2023,7 +2264,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetVector3(), Vector);
 	}
 
-	ZETest("void ZEVariant::SetVector4(const ZEVector4& Vector)")
+	ZETest("void ZEVariant::SetVector4(const ZEVector4& Value)")
 	{
 		ZEVariant Variant;
 		ZEVector4 Vector(1.0f, 2.0f, 3.0f, 4.0f);
@@ -2599,7 +2840,24 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetType(), ZE_VRT_UNDEFINED);
 	}
 
-	ZETest("ZEVariant::ZEVariant(bool InitialValue)")
+	ZETest("ZEVariant::ZEVariant(const ZEVariant& Value)")
+	{
+		ZEVariant Value;
+		Value.SetBoolean(true);
+
+		ZEVariant Variant(Value);
+		ZETestCheckEqual(Variant.GetType(), Value.GetType());
+		ZETestCheckEqual(Variant.GetType(), ZE_VRT_BOOLEAN);
+		ZETestCheck(Variant.GetBoolean(), Value.GetBoolean());
+		ZETestCheck(Variant.GetBoolean());
+
+		Value.SetString("TestString");
+		ZEVariant Variant1(Value);
+		ZETestCheckEqual(Variant1.GetType(), ZE_VRT_STRING);
+		ZETestCheckString(Variant1.GetString(), "TestString");
+	}
+
+	ZETest("ZEVariant::ZEVariant(bool Value)")
 	{
 		bool InitialValue = true;
 
@@ -2608,7 +2866,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheck(Variant.GetBoolean());
 	}
 
-	ZETest("ZEVariant::ZEVariant(const char* InitialValue)")
+	ZETest("ZEVariant::ZEVariant(const char* Value)")
 	{
 		const char* InitialValue = "String";
 
@@ -2617,7 +2875,16 @@ ZETestSuite(ZEVariant)
 		ZETestCheckString(Variant.GetString(), InitialValue);
 	}
 
-	ZETest("ZEVariant::ZEVariant(const ZEMatrix3x3& Matrix)")
+	ZETest("ZEVariant(const ZEString& Value)")
+	{
+		const ZEString Value = "";
+
+		ZEVariant Variant(Value);
+		ZETestCheckEqual(Variant.GetType(), ZE_VRT_STRING);
+		ZETestCheck(Variant.GetString() == "");
+	}
+
+	ZETest("ZEVariant::ZEVariant(const ZEMatrix3x3& Value)")
 	{
 		ZEMatrix3x3 Matrix(1.0f, 1.0f, 2.0f,
 			3.0f, 5.0f, 8.0f,
@@ -2628,7 +2895,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetMatrix3x3(), Matrix);
 	}
 
-	ZETest("ZEVariant::ZEVariant(const ZEMatrix4x4& Matrix)")
+	ZETest("ZEVariant::ZEVariant(const ZEMatrix4x4& Value)")
 	{
 		ZEMatrix4x4 Matrix(1.0f, 1.0f, 2.0f, 3.0f,
 			5.0f, 8.0f, 6.0f, 9.0f,
@@ -2649,7 +2916,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetQuaternion(), Quaternion);
 	}
 
-	ZETest("ZEVariant::ZEVariant(const ZEVariant& InitialValue)")
+	ZETest("ZEVariant::ZEVariant(const ZEVariant& Value)")
 	{
 		ZEVariant InitialValue;
 		InitialValue.SetInt16(255);
@@ -2659,7 +2926,7 @@ ZETestSuite(ZEVariant)
  		ZETestCheckEqual(Variant.GetInt16(), InitialValue.GetInt16());
 	}
 
-	ZETest("ZEVariant::ZEVariant(const ZEVector2& Vector)")
+	ZETest("ZEVariant::ZEVariant(const ZEVector2& Value)")
 	{
 		ZEVector2 Vector(1.0f, 2.0f);
 
@@ -2668,7 +2935,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetVector2(), Vector);
 	}
 
-	ZETest("ZEVariant::ZEVariant(const ZEVector3& Vector)")
+	ZETest("ZEVariant::ZEVariant(const ZEVector3& Value)")
 	{
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 
@@ -2677,7 +2944,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetVector3(), Vector);
 	}
 
-	ZETest("ZEVariant::ZEVariant(const ZEVector4& Vector)")
+	ZETest("ZEVariant::ZEVariant(const ZEVector4& Value)")
 	{
 		ZEVector4 Vector(1.0f, 2.0f, 3.0f, 4.0f);
 
@@ -2686,7 +2953,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetVector4(), Vector);
 	}
 
-	ZETest("ZEVariant::ZEVariant(float InitialValue)")
+	ZETest("ZEVariant::ZEVariant(float Value)")
 	{
 		float InitialValue = 255.349f;
 
@@ -2695,7 +2962,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetFloat(), InitialValue);
 	}
 
-	ZETest("ZEVariant::ZEVariant(double InitialValue)")
+	ZETest("ZEVariant::ZEVariant(double Value)")
 	{
 		double InitialValue = 12.56;
 
@@ -2704,7 +2971,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckClose(Variant.GetDouble(), InitialValue);
 	}
 
-	ZETest("ZEVariant::ZEVariant(ZEInt8 InitialValue)")
+	ZETest("ZEVariant::ZEVariant(ZEInt8 Value)")
 	{
 		ZEInt8 InitialValue = 16;
 
@@ -2713,7 +2980,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetInt8(), InitialValue);
 	}
 
-	ZETest("ZEVariant::ZEVariant(ZEInt16 InitialValue)")
+	ZETest("ZEVariant::ZEVariant(ZEInt16 Value)")
 	{
 		ZEInt16 InitialValue = 30;
 
@@ -2722,7 +2989,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetInt16(), InitialValue);
 	}
 
-	ZETest("ZEVariant::ZEVariant(ZEInt32 InitialValue)")
+	ZETest("ZEVariant::ZEVariant(ZEInt32 Value)")
 	{
 		ZEInt32 InitialValue = 0;
 
@@ -2731,7 +2998,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetInt32(), InitialValue);
 	}
 
-	ZETest("ZEVariant::ZEVariant(ZEInt64 InitialValue)")
+	ZETest("ZEVariant::ZEVariant(ZEInt64 Value)")
 	{
 		ZEInt64 InitialValue = 40;
 
@@ -2740,7 +3007,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetInt64(), InitialValue);
 	}
 
-	ZETest("ZEVariant::ZEVariant(ZEUInt8 InitialValue)")
+	ZETest("ZEVariant::ZEVariant(ZEUInt8 Value)")
 	{
 		ZEUInt8 InitialValue = 200;
 
@@ -2749,7 +3016,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetUInt8(), InitialValue);
 	}
 
-	ZETest("ZEVariant::ZEVariant(ZEUInt16 InitialValue)")
+	ZETest("ZEVariant::ZEVariant(ZEUInt16 Value)")
 	{
 		ZEUInt16 InitialValue = 640;
 
@@ -2758,7 +3025,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetUInt16(), InitialValue);
 	}
 
-	ZETest("ZEVariant::ZEVariant(ZEUInt32 InitialValue)")
+	ZETest("ZEVariant::ZEVariant(ZEUInt32 Value)")
 	{
 		ZEUInt32 InitialValue = 43000;
 
@@ -2767,7 +3034,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetUInt32(), InitialValue);
 	}
 
-	ZETest("ZEVariant::ZEVariant(ZEUInt64 InitialValue)")
+	ZETest("ZEVariant::ZEVariant(ZEUInt64 Value)")
 	{
 		ZEUInt64 InitialValue = 2000000000;
 
@@ -2776,7 +3043,7 @@ ZETestSuite(ZEVariant)
 		ZETestCheckEqual(Variant.GetUInt64(), InitialValue);
 	}
 
-	ZETest("ZEVariant::ZEVariant(ZEObject* Class)")
+	ZETest("ZEVariant::ZEVariant(ZEObject* Value)")
 	{
 		ZEObject* Class;
 

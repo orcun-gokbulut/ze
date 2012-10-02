@@ -189,6 +189,8 @@ class ZEString
 		ZEString					Trim() const;
 		void						TrimSelf();
 
+		ZESize						Hash();
+
 		ZEString					Lower() const;
 		void						LowerSelf();
 		ZEString					Upper() const;

@@ -38,6 +38,7 @@
 #include "ZEDS/ZEArray.h"
 
 #include <string.h>
+#include "ZEFileUtils.h"
 
 static const ZEString Dot = ".";
 static const ZEString DotDot = "..";
@@ -113,17 +114,93 @@ bool ZEPathUtils::IsRelativePath(const ZEString& Path)
 }
 
 // Extracts root from absolute path and returns the relative path.
-ZEString ZEPathUtils::GetRelativePath(const ZEString& RootPath, const ZEString& AbsolutePath)
-{
-	ZESize RootLength = strlen(RootPath.ToCString());
-	ZESize PathLength = strlen(AbsolutePath.ToCString());
+ZEString ZEPathUtils::GetRelativePath(ZEString& RelativeTo, ZEString& Path)
+{	
+	wchar_t* Token0 = NULL;
+	wchar_t* Context0 = NULL;
+	wchar_t* Source0 = (wchar_t*)RelativeTo.ToWCString();
 
-	// Compare
-	if (PathLength >= RootLength)
-		if (strncmp(RootPath.ToCString(), AbsolutePath.ToCString(), RootLength) == 0)
-			return AbsolutePath.Right(AbsolutePath.GetLength() - RootPath.GetLength());
+	wchar_t* Token1 = NULL;
+	wchar_t* PrevToken1 = NULL;
+	wchar_t* Context1 = NULL;
+	wchar_t* Source1 = (wchar_t*)Path.ToWCString();
+	
+	if (Source0 == NULL)
+		return Path;
+	if (Source1 == NULL)
+		return "";
 
-	return EmptyPath;
+	const wchar_t* Search = L"\\/";
+	
+	ZEPathToken TempToken;
+	ZESize CommonTokenCount = 0;
+	ZEArray<ZEPathToken> Tokens0;
+	ZEArray<ZEPathToken> Tokens1;
+
+	Token0 = Tokenize(Source0, Search, &Context0);
+	Token1 = Tokenize(Source1, Search, &Context1);
+	while (Token0 != NULL && Token1 != NULL)
+	{
+		// If token is different
+		if (wcscmp(Token0, Token1) != 0)
+			break;
+
+		TempToken.Token = Token0;
+		Tokens0.Add(TempToken);
+
+		TempToken.Token = Token1;
+		Tokens1.Add(TempToken);
+
+		Token0 = Tokenize(NULL, Search, &Context0);
+		Token1 = Tokenize(NULL, Search, &Context1);
+
+		CommonTokenCount++;
+	}
+
+	if (CommonTokenCount == 0)
+		return Path;
+
+	ZESize Token0Components = 0;
+	while (Token0 != NULL)
+	{
+		TempToken.Token = Token0;
+		Tokens0.Add(TempToken);
+
+		Token0Components++;
+
+		// check next token
+		Token0 = Tokenize(NULL, Search, &Context0);
+	}
+
+	ZESize Token1Components = 0;
+	while(Token1 != NULL)
+	{
+		TempToken.Token = Token1;
+		Tokens1.Add(TempToken);
+
+		Token1Components++;
+
+		// check next token
+		Token1 = Tokenize(NULL, Search, &Context1);
+	}
+
+	//Start creating relative path
+	ZEString RelativePath = "";
+
+	ZESize Token0Count = Tokens0.GetCount();
+	for (ZESize I = Token0Count-1; I > CommonTokenCount; --I)
+	{
+		RelativePath += GetDotDot();
+		RelativePath += GetSeperator();
+	}
+	
+	for (ZESize I = CommonTokenCount; I < Tokens1.GetCount(); ++I)
+	{
+		RelativePath += ZEString::FromWCString(Tokens1[I].Token);
+		RelativePath += GetSeperator();
+	}
+	
+	return RelativePath.Left(RelativePath.GetLength() - 1);
 }
 
 // Checks if Path is a full path

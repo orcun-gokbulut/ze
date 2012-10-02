@@ -42,6 +42,48 @@
 #include "ZEDS\ZEString.h"
 #include "ZEMLItem.h"
 
+struct ZEMLSerialPointer 
+{
+	ZEUInt64 FilePosition;
+};
+
+struct ZEMLSerialListItem
+{
+	private:
+
+		bool					IsFound;
+
+	public:
+
+		ZEString				Name;
+		ZEUInt64				Hash;
+		ZEVariant*				Value;
+		ZEMLSerialPointer		Pointer;
+};
+
+#define ZEML_LIST_PROPERTY(Name, Value) {false, Name, ZEHash::Hash(Name), &Value}
+#define ZEML_LIST_NODE(Name)			{false, Name, ZEHash::Hash(Name), NULL}
+#define ZEML_LIST_DATA ZEML_LIST_NODE
+
+// int blah()
+// {
+// 	ZEMLSerialReader A;
+// 
+// 	ZEVariant Enabled;
+// 	ZEVariant Scale;
+// 	ZEMLSerialListItem List[] =
+// 	{
+// 		ZEML_LIST_PROPERTY("Enabled", Enabled),
+// 		ZEML_LIST_PROPERTY("Scale", Scale),
+// 		ZEML_LIST_NODE("Rectangle")
+// 	};
+// 
+// 	A.ReadPropertyList(List);
+// 
+// 	A.SeekPointer(List[2].Pointer);
+// 	A.Read();
+// }
+
 class ZEFile;
 
 class ZEMLSerialReader
@@ -60,8 +102,9 @@ class ZEMLSerialReader
 
 	public:
 
-		bool			ReadNextItem();
-		bool			ReadSiblingItem();
+		bool			Read();
+		bool			SkipNodeAndRead();
+		void			SeekPointer(ZEMLSerialPointer Pointer);
 		
 		ZEMLItemType	GetItemType();
 		ZEString		GetItemName();
@@ -72,6 +115,8 @@ class ZEMLSerialReader
 		
 		ZEUInt64		GetDataSize();
 		bool			GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offset = 0);
+
+		bool			ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCount);
 
 						ZEMLSerialReader(ZEFile* File);
 };

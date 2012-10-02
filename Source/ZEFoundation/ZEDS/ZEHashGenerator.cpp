@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPathUtils.h
+ Zinek Engine - ZEHashGenerator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PATH_UTILS_H__
-#define __ZE_PATH_UTILS_H__
+#include "ZEHashGenerator.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEPathManager.h"
-
-class ZEPathUtils
+ZESize ZEHashGenerator::Hash(void* Value, ZESize Size)
 {
-	private:
-									ZEPathUtils();
-									~ZEPathUtils();
+	ZEUInt Hash = 0;
+	for (ZESize I = 0; I < Size; I++)
+		Hash = (ZEUInt)((ZEUInt8*)Value)[I] + (Hash << 6) + (Hash << 16) - Hash;
 
-	public:
-		static const ZEString&		GetDot();
-		static const ZEString&		GetDotDot();
-		static const ZEString&		GetSeperator();
-		static const ZEString&		GetEmptyPath();
+	return Hash;
+}
 
-		static ZEString				GetSimplifiedPath(const ZEString& Path, bool StackDotDot);
+ZESize ZEHashGenerator::Hash(const char* String)
+{
+	ZEUInt Hash = 0;
+	while(*String != '\0')
+	{
+		Hash = (ZEUInt)*String + (Hash << 6) + (Hash << 16) - Hash;
+		String++;
+	}
 
-		static ZEKnownPath			SearchForSymbol(ZEString* RelativePart, const ZEString& SymbolicPath);
+	return Hash;
+}
 
-		static bool					CheckPathContainsRoot(const ZEString& RootPath, const ZEString& Path);
-		
-		static bool					IsAbsolutePath(const ZEString& Path);
-		static ZEString				GetAbsolutePath(const ZEString& RootPath, const ZEString& RelativePath);
-
-		static bool					IsRelativePath(const ZEString& Path);
-		static ZEString				GetRelativePath(ZEString& RootPath, ZEString& AbsolutePath);
-};
-
-
-#endif
+ZESize ZEHashGenerator::Hash(const ZEString& String)
+{
+	return Hash(String.ToCString());
+}

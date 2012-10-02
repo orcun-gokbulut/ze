@@ -50,9 +50,9 @@ static bool GetStats(ZEString& Path, struct _stati64 *Buffer)
 	Result = _wstati64(Path.ToWCString(), Buffer);
 	if (Result != 0)
 	{
-		ZEString ErrorString;
-		ZEFileUtils::GetErrorString(ErrorString, GetLastError());
-		zeError("Can not get info.\nError: %s", ErrorString.ToCString());
+// 		ZEString ErrorString;
+// 		ZEFileUtils::GetErrorString(ErrorString, GetLastError());
+// 		zeError("Can not get info.\nError: %s", ErrorString.ToCString());
 		return false;
 	}
 
