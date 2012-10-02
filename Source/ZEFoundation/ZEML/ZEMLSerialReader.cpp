@@ -43,7 +43,7 @@ ZEMLSerialReader::ZEMLSerialReader(ZEFile* File)
 	NextItemPosition = 0;
 }
 
-bool ZEMLSerialReader::ReadNextItem()
+bool ZEMLSerialReader::Read()
 {
 	ZEUInt64 TempUInt64;
 
@@ -226,12 +226,12 @@ bool ZEMLSerialReader::ReadNextItem()
 	}
 }
 
-bool ZEMLSerialReader::ReadSiblingItem()
+bool ZEMLSerialReader::SkipNodeAndRead()
 {
 	if(CurrentItemType == ZEML_IT_NODE)
 		File->Seek(CurrentItemDataSize, ZE_SF_CURRENT);
 
-	return ReadNextItem();
+	return Read();
 }
 
 ZEMLItemType ZEMLSerialReader::GetItemType()
@@ -277,4 +277,65 @@ bool ZEMLSerialReader::GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offse
 	}
 
 	return true;
+}
+
+void ZEMLSerialReader::SeekPointer(ZEMLSerialPointer Pointer)
+{
+	NextItemPosition = Pointer.FilePosition;
+}
+
+bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCount)
+{
+	if(GetItemType() != ZEML_IT_NODE)
+	{
+		zeError("Current item type is not a ZEMLNode");
+		return false;
+	}
+
+	ZEUInt64 CurrentSubItemCount = CurrentItemSubItemCount;
+	ZEString CurrentName = CurrentItemName;
+
+	for (ZESize I = 0; I < ItemCount; I++)
+	{
+		if(List[I].Name.GetLength() == 0)
+		{
+			zeError("ZEMLPropertyListItem name can not be empty.");
+			return false;
+		}
+
+		List[I].Hash = List[I].Name.Hash();
+	}
+
+	for (ZESize I = 0; I < CurrentSubItemCount; I++)
+	{
+		ZEUInt64 ItemFilePosition = File->Tell();
+
+		if(!Read())
+			return false;
+
+		ZEUInt64 CurrentItemHash = CurrentName.Hash();
+		ZESSize CurrentItemIndex = -1;
+
+		for(ZESize J = 0; J < ItemCount; J++)
+		{
+			if(CurrentItemHash == List[J].Hash)
+				CurrentItemIndex = J;
+		}
+
+		if(CurrentItemIndex != -1)
+		{
+			if(CurrentItemType == ZEML_IT_NODE)
+			{
+				List[CurrentItemIndex].Pointer.FilePosition = ItemFilePosition;
+			}
+			else if(CurrentItemType == ZEML_IT_INLINE_DATA)
+			{
+				List[CurrentItemIndex].Pointer.FilePosition = ItemFilePosition;
+			}
+			else
+			{
+				List[CurrentItemIndex].Value->SetVariant(CurrentItemValue);
+			}
+		}
+	}
 }
