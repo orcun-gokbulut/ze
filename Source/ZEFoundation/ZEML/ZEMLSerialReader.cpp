@@ -319,7 +319,10 @@ bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCou
 		for(ZESize J = 0; J < ItemCount; J++)
 		{
 			if(CurrentItemHash == List[J].Hash)
+			{
 				CurrentItemIndex = J;
+				List[J].IsFound = true;
+			}
 		}
 
 		if(CurrentItemIndex != -1)
@@ -338,4 +341,8 @@ bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCou
 			}
 		}
 	}
+
+	for(ZESize I = 0; I < ItemCount; I++)
+		if(!List[I].IsFound)
+			zeError("List item not found in current ZEML depth. Item name : %s", List[I].Name.ToCString());
 }
