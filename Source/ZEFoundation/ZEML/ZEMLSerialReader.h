@@ -49,6 +49,8 @@ struct ZEMLSerialPointer
 
 struct ZEMLSerialListItem
 {
+	friend class ZEMLSerialReader;
+
 	private:
 
 		bool					IsFound;
