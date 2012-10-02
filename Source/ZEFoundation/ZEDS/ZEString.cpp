@@ -62,6 +62,7 @@
 #include "ZEEndian.h"
 #include "ZEFormatArgument.h"
 #include "ZEStringWriter.h"
+#include "ZEHashGenerator.h"
 
 
 static ZEUInt GetByteLength(const char* MultiByteCharacter)
@@ -1468,6 +1469,11 @@ void ZEString::TrimSelf()
 	Buffer[ByteLength - LeftByteCount - RightByteCount] = '\0';
 
 	ZEDebugCheckMemory();
+}
+
+ZESize ZEString::Hash()
+{
+	return ZEHashGenerator::Hash(Buffer);
 }
 
 ZEString ZEString::Lower() const
