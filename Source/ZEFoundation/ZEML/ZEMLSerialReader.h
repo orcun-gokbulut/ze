@@ -41,50 +41,31 @@
 #include "ZEDS\ZEVariant.h"
 #include "ZEDS\ZEString.h"
 #include "ZEMLItem.h"
+#include "ZEDS\ZEHashGenerator.h"
 
 struct ZEMLSerialPointer 
-{
-	ZEUInt64 FilePosition;
-};
-
-struct ZEMLSerialListItem
 {
 	friend class ZEMLSerialReader;
 
 	private:
-
-		bool					IsFound;
-
-	public:
-
-		ZEString				Name;
-		ZEUInt64				Hash;
-		ZEVariant*				Value;
-		ZEMLSerialPointer		Pointer;
+	
+		ZEUInt64 FilePosition;
 };
 
-#define ZEML_LIST_PROPERTY(Name, Value) {false, Name, ZEHash::Hash(Name), &Value}
-#define ZEML_LIST_NODE(Name)			{false, Name, ZEHash::Hash(Name), NULL}
-#define ZEML_LIST_DATA ZEML_LIST_NODE
+struct ZEMLSerialListItem
+{
+	bool					IsFound;
+	const char*				Name;
+	ZEUInt64				Hash;
+	ZEVariant*				Value;
+	bool					Mandatory;
 
-// int blah()
-// {
-// 	ZEMLSerialReader A;
-// 
-// 	ZEVariant Enabled;
-// 	ZEVariant Scale;
-// 	ZEMLSerialListItem List[] =
-// 	{
-// 		ZEML_LIST_PROPERTY("Enabled", Enabled),
-// 		ZEML_LIST_PROPERTY("Scale", Scale),
-// 		ZEML_LIST_NODE("Rectangle")
-// 	};
-// 
-// 	A.ReadPropertyList(List);
-// 
-// 	A.SeekPointer(List[2].Pointer);
-// 	A.Read();
-// }
+	ZEMLSerialPointer		Pointer;
+};
+
+#define ZEML_LIST_PROPERTY(Name, Value, Mandatory)	{false, Name, ZEHashGenerator::Hash(Name), &Value, Mandatory}
+#define ZEML_LIST_NODE(Name, Mandatory)				{false, Name, ZEHashGenerator::Hash(Name), NULL, Mandatory}
+#define ZEML_LIST_DATA ZEML_LIST_NODE
 
 class ZEFile;
 
@@ -92,7 +73,8 @@ class ZEMLSerialReader
 {
 	private:
 
-		ZEFile*			File;
+		ZEFile*				File;
+		ZEMLSerialPointer	CurrentPointer;
 
 		ZEMLItemType	CurrentItemType;
 		ZEVariant		CurrentItemValue;
@@ -106,7 +88,10 @@ class ZEMLSerialReader
 
 		bool			Read();
 		bool			SkipNodeAndRead();
-		void			SeekPointer(ZEMLSerialPointer Pointer);
+
+		void				SeekPointer(ZEMLSerialPointer Pointer);
+		ZEMLSerialPointer	GetCurrentPointer();
+		void				GoToCurrentPointer();
 		
 		ZEMLItemType	GetItemType();
 		ZEString		GetItemName();
