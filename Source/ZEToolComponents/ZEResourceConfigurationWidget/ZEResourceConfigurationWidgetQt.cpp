@@ -64,7 +64,7 @@ ZEResourceConfigurationWidgetQt::ZEResourceConfigurationWidgetQt(ZEResourceConfi
 	OptionWidget->setVisible(false);
 
 	this->ConfigurationWidget = ConfigurationWidget;
-	connect(Form->ResourcesTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(TreeItemClicled(QTreeWidgetItem*, int)));
+	connect(Form->ResourcesTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(TreeItemClicked(QTreeWidgetItem*, int)));
 	connect(OptionWidget, SIGNAL(OptionChanged(ZEResourceOptionWidget*)), this, SLOT(OptionChanged(ZEResourceOptionWidget*)));
 }
 
@@ -85,7 +85,7 @@ ZEResourceConfigurationWidgetQt::~ZEResourceConfigurationWidgetQt()
 	}
 }
 
-void ZEResourceConfigurationWidgetQt::TreeItemClicled(QTreeWidgetItem* Item, int Column)
+void ZEResourceConfigurationWidgetQt::TreeItemClicked(QTreeWidgetItem* Item, int Column)
 {
 	ZEResourceOptionTreeItem* ZEItem = (ZEResourceOptionTreeItem*)Item;
 	OptionWidget->setVisible(true);

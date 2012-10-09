@@ -469,7 +469,7 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 		ZEString MaterialFilePath = MaterialOption.ExportPath + ZEPathUtils::GetSeperator() + MaterialOption.Identifier;
 
 		ZEProgressDialog::GetInstance()->OpenTask(MaterialName);
-		zeLog("Processing material \"%s\" (%Iu/%d).", MaterialName.ToCString(), I + 1, Materials.Count());
+		zeLog("Processing material \"%s\" (%u/%d).", MaterialName.ToCString(), I + 1, Materials.Count());
 
 		ZeroMemory(DiffuseMap, sizeof(DiffuseMap));
 		ZeroMemory(SpecularMap, sizeof(SpecularMap));

@@ -41,80 +41,125 @@
 #include "ZE3dsModelExporterOptionsDialog.h"
 #include "ZEFile/ZEFileUtils.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEFile/ZEFileInfo.h"
 #include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
+#include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
+#include "ZEML/ZEMLProperty.h"
 
-ZEModelExporter::ZEModelExporter()
+ZE3dsModelExporter::ZE3dsModelExporter()
 {
 	Scene = NULL;
 	QtApplication = NULL;
-	ModelNode.SetName("ZEModel");
+	ExportOptions = NULL;
+	WinWidget = NULL;
+	OptionsDialog = NULL;
+	ProgressDialog = NULL;
+	ResourceConfigurationDialog = NULL;
 
-	FrameCount = 0;
+	TotalFrameCount = 0;
 	TicksPerFrame = 0;
 }
 
-ZEModelExporter::~ZEModelExporter() 
+ZE3dsModelExporter::~ZE3dsModelExporter() 
 {
-	QtApplication->quit();
+	if(ExportOptions != NULL)
+	{
+		delete ExportOptions;
+		ExportOptions = NULL;
+	}
+
+	if(ProgressDialog != NULL)
+	{
+		delete ProgressDialog;
+		ProgressDialog = NULL;
+	}
+
+	if(OptionsDialog != NULL)
+	{
+		OptionsDialog->hide();
+		delete OptionsDialog;
+		OptionsDialog = NULL;
+	}
+
+	if(ResourceConfigurationDialog != NULL)
+	{
+		ResourceConfigurationDialog->Hide();
+		delete ResourceConfigurationDialog;
+		ResourceConfigurationDialog = NULL;
+	}
+
+	if(WinWidget != NULL)
+	{
+		WinWidget->hide();
+		delete WinWidget;
+		WinWidget = NULL;
+	}
+
+	if(QtApplication != NULL)
+	{
+		QtApplication->quit();
+		delete QtApplication;
+		QtApplication = NULL;
+	}
 }
 
-ZEInt ZEModelExporter::ExtCount()
+ZEInt ZE3dsModelExporter::ExtCount()
 {
 	return 1;
 }
 
-const TCHAR *ZEModelExporter::Ext(ZEInt n)
+const TCHAR *ZE3dsModelExporter::Ext(ZEInt n)
 {		
-	return _T("zeModel");
+	return "zeModel";
 }
 
-const TCHAR *ZEModelExporter::LongDesc()
+const TCHAR *ZE3dsModelExporter::LongDesc()
 {
-	return _T("Zinek Engine Model File");
+	return "Zinek Engine Model File";
 }
 	
-const TCHAR *ZEModelExporter::ShortDesc() 
+const TCHAR *ZE3dsModelExporter::ShortDesc() 
 {			
-	return _T("Zinek Engine Model");
+	return "Zinek Engine Model";
 }
 
-const TCHAR *ZEModelExporter::AuthorName()
+const TCHAR *ZE3dsModelExporter::AuthorName()
 {			
-	return _T("Zinek Engine Staff");
+	return "Zinek Engine Staff";
 }
 
-const TCHAR *ZEModelExporter::CopyrightMessage() 
+const TCHAR *ZE3dsModelExporter::CopyrightMessage() 
 {	
-	return _T("Copyright (c) 2008, Zinek Engine Staff");
+	return "Copyright (c) 2008, Zinek Engine Staff";
 }
 
-const TCHAR *ZEModelExporter::OtherMessage1() 
+const TCHAR *ZE3dsModelExporter::OtherMessage1() 
 {		
-	return _T("");
+	return "";
 }
 
-const TCHAR *ZEModelExporter::OtherMessage2() 
+const TCHAR *ZE3dsModelExporter::OtherMessage2() 
 {		
-	return _T("");
+	return "";
 }
 
-ZEUInt ZEModelExporter::Version()
+ZEUInt ZE3dsModelExporter::Version()
 {				
 	return 300;
 }
 
-void ZEModelExporter::ShowAbout(HWND hWnd)
+void ZE3dsModelExporter::ShowAbout(HWND hWnd)
 {			
 
 }
 
-BOOL ZEModelExporter::SupportsOptions(ZEInt ext, DWORD options)
+BOOL ZE3dsModelExporter::SupportsOptions(ZEInt ext, DWORD options)
 {
 	return TRUE;
 }
 
 
-ZEInt ZEModelExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
+ZEInt ZE3dsModelExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
 {
 	ZEInt i;
 	if (i_currentNode == NULL)
@@ -132,63 +177,127 @@ ZEInt ZEModelExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /
 	return i_nodeTab.Count();
 }
 
-ZEInt ZEModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
+void ZE3dsModelExporter::LoadOptions(const char* FilePath)
 {
-	INodeTab lNodes;
-	GetSceneNodes(lNodes);
+	if(strlen(FilePath) != 0)
+	{
+		ZEString OptionsFilePath(FilePath);
+		OptionsFilePath += ".zecfg";
 
-	IGameConversionManager * cm = GetConversionManager();
-	cm->SetCoordSystem(IGameConversionManager::IGAME_D3D);
-	/*UserCoord UserCoord = {
-		0,	//Left Handed
-		1,	//X axis goes right
-		2,	//Y Axis goes up
-		5,	//Z Axis goes out.
-		1,	//U Tex axis is right
-		1,  //V Tex axis is down
-	};*/
-	//cm->SetUserCoordSystem(UserCoord);
+		ZEFile OptionsFile;
 
+		if(ExportOptions == NULL)
+			ExportOptions = new ZEMLNode("Options");
+
+		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_NONE))
+		{
+			ExportOptions->Read(&OptionsFile);
+			OptionsFile.Close();
+		}
+	}
+}
+
+void ZE3dsModelExporter::SaveOptions(const char* FilePath)
+{
+	ZEString OptionsFilePath(FilePath);
+	OptionsFilePath += ".zecfg";
+
+	if(ExportOptions != NULL)
+	{
+		ZEFile OptionsFile;
+		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
+		{
+			OptionsDialog->GetOptions()->Write(&OptionsFile);
+			OptionsFile.Close();
+		}
+	}
+	else
+	{
+		ExportOptions = OptionsDialog->GetOptions();
+	}
+}
+
+bool ZE3dsModelExporter::ShowOptionsDialog(HWND ParentWindow)
+{
 	int Argc = 0;
-	ZEMLNode* ExportOptions = new ZEMLNode("Options");
-	ZEString OptionsFilePath((ZEString(i->GetCurFilePath().data())) + ".zecfg");
-	ZEFile* OptionsFile = new ZEFile();
-
-	if(OptionsFile->Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_NONE))
-		ExportOptions->Read(OptionsFile);
-
-	if(OptionsFile->IsOpen())
-		OptionsFile->Close();
-
 	if(QApplication::instance() == NULL)
 		QtApplication = new QApplication(Argc, NULL);
+	else
+		QtApplication = (QApplication*)QApplication::instance();
 
-	QWinWidget* ExporterWindow = new QWinWidget(i->GetMAXHWnd());
-	ZE3dsModelExporterOptionsDialogNew* ExporterDialog = new ZE3dsModelExporterOptionsDialogNew(ExporterWindow, ExportOptions);
-	ExporterWindow->showCentered();
-	ZEInt DialogResult = ExporterDialog->exec();
+	if(WinWidget == NULL)
+		WinWidget = new QWinWidget(ParentWindow);
+
+	if(OptionsDialog == NULL)
+		OptionsDialog = new ZE3dsModelExporterOptionsDialogNew(WinWidget);
+
+	if(ExportOptions != NULL)
+		OptionsDialog->SetOptions(ExportOptions);
+
+	WinWidget->showCentered();
+	ZEInt DialogResult = OptionsDialog->exec();
 
 	if(DialogResult == QDialog::Rejected)
 		return false;
 
-	if(strlen(i->GetCurFilePath().data()) != 0)
-	{
-		OptionsFile->Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-		ExporterDialog->GetOptions()->Write(OptionsFile);
-		OptionsFile->Close();
-		delete OptionsFile;
-	}
+	return true;
+}
 
-	ProgDlg.Create(hInstance);
-	//ProgDlg.SetOutputLevel(Options.OutputLevel);
-	ProgDlg.Show();
+bool ZE3dsModelExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath)
+{
+	int Argc = 0;
+	if(QApplication::instance() == NULL)
+		QtApplication = new QApplication(Argc, NULL);
+	else
+		QtApplication = (QApplication*)QApplication::instance();
+
+	if(WinWidget == NULL)
+		WinWidget = new QWinWidget(ParentWindow);
+
+	if(ResourceConfigurationDialog == NULL)
+		ResourceConfigurationDialog = new ZEResourceConfigurationWidget(WinWidget);
+
+	ResourceConfigurationDialog->SetPresetFilePath(ZEString(MaxFilePath) + ".ZEPRESET");
+	CollectResources();
+
+	WinWidget->showCentered();
+	ZEInt DialogResult = ResourceConfigurationDialog->Show();
+
+	if(DialogResult == QDialog::Rejected)
+		return false;
+
+	ResourceConfigurationDialog->SavePresets(ZEString(MaxFilePath) + ".ZEPRESET");
+	return true;
+}
+
+ZEInt ZE3dsModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
+{
+	ExportPath = ZEFileInfo::GetParentDirectory(name);
+	LoadOptions(i->GetCurFilePath());
+
+	INodeTab lNodes;
+	GetSceneNodes(lNodes);
+	IGameConversionManager * cm = GetConversionManager();
+	cm->SetCoordSystem(IGameConversionManager::IGAME_D3D);
 	Scene = GetIGameInterface();	
 	Scene->InitialiseIGame(lNodes);
 	Scene->SetStaticFrame(0);
 	TicksPerFrame = Scene->GetSceneTicks();
-	FrameCount = Scene->GetSceneEndTime() / TicksPerFrame;
+	TotalFrameCount = Scene->GetSceneEndTime() / TicksPerFrame;
 
-	ZEProgressDialog* ProgressDialog = ZEProgressDialog::CreateInstance();
+	if(!ShowOptionsDialog(i->GetMAXHWnd()))
+		return true;
+
+	if(!ShowResourceConfigurationDialog(i->GetMAXHWnd(), i->GetCurFilePath()))
+		return true;
+
+	SaveOptions(i->GetCurFilePath());
+
+	ModelNode.SetName("ZEModel");
+
+	if(ProgressDialog == NULL)
+		ProgressDialog = ZEProgressDialog::CreateInstance();
+
 	ProgressDialog->SetTitle("Model Export Progress");
 	ProgressDialog->SetProgressBarVisibility(false);
 	ProgressDialog->Start();
@@ -213,9 +322,12 @@ ZEInt ZEModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i
 	ProgressDialog->CloseTask();
 
 	ProgressDialog->OpenTask("Animation Process", true);
-	if (true/*Options.ExportAnimation*/)
+
+	bool IsAnimationExportEnabled = ((ZEMLProperty*)(ExportOptions->GetProperty("IsAnimationExportEnabled")))->GetValue().GetBoolean();
+
+	if (IsAnimationExportEnabled)
 	{
-		if(!ProcessAnimation(ModelNode.AddSubNode("Animation")))
+		if(!ProcessAnimations(ModelNode.AddSubNode("Animations")))
 		{
 			zeError("Processing animation failed.");
 			return false;
@@ -246,7 +358,7 @@ ZEInt ZEModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i
 	return TRUE;
 }
 
-bool ZEModelExporter::WriteToFile(const char* FilePath)
+bool ZE3dsModelExporter::WriteToFile(const char* FilePath)
 {
 	ZEFile File;
 
@@ -256,6 +368,30 @@ bool ZEModelExporter::WriteToFile(const char* FilePath)
 		return false;
 	}
 	
+	bool CurrentOption = false;
+
+	CurrentOption = ((ZEMLProperty*)(ExportOptions->GetProperty("IsBoneExportEnabled")))->GetValue().GetBoolean();
+
+	if (!CurrentOption)
+	{
+		if (ModelNode.GetSubNodes("Bones").GetCount() > 0)
+		{
+			ZEMLNode* BonesNode = ModelNode.GetSubNodes("Bones").GetFirstItem();
+			ModelNode.RemoveSubNode(BonesNode);
+		}
+	}
+
+	CurrentOption = ((ZEMLProperty*)(ExportOptions->GetProperty("IsMeshExportEnabled")))->GetValue().GetBoolean();
+
+	if (!CurrentOption)
+	{
+		if (ModelNode.GetSubNodes("Meshes").GetCount() > 0)
+		{
+			ZEMLNode* MeshesNode = ModelNode.GetSubNodes("Meshes").GetFirstItem();
+			ModelNode.RemoveSubNode(MeshesNode);
+		}
+	}
+
 	ModelNode.Write(&File);
 
 	File.Close();

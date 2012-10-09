@@ -38,34 +38,41 @@
 #define __ZE3DS_MODEL_EXPORTER_H__
 
 #include "ZETypes.h"
-#include "ZEML/ZEMLNode.h"
-//#include "ZETModelFile/ZETModelFile.h"
-#include "ZE3dsModelExporterOptions.h"
 #include "ZE3dsModelExporterResources.h"
-#include "ZE3dsProgressDialog/ZE3dsProgressDialog.h"
-
+#include "ZEML/ZEMLNode.h"
 
 #include <Max.h>
 #include <istdplug.h>
 #include <iparamb2.h>
 #include <iparamm2.h>
 #include <IGame/IGame.h>
-#include <IGame/IGameModifier.h> 
+#include <IGame/IGameModifier.h>
+
+#define ZE_MDLF_MAX_NAME_SIZE					128
+#define ZE_MDLF_MAX_FILENAME_SIZE				256
 
 extern HINSTANCE hInstance;
 class QApplication;
+class QWinWidget;
+class ZEProgressDialog;
+class ZE3dsModelExporterOptionsDialogNew;
+class ZEResourceConfigurationWidget;
 
-class ZEModelExporter : public SceneExport 
+class ZE3dsModelExporter : public SceneExport 
 {
 	private:
 
-		QApplication*				QtApplication;
+		QApplication*						QtApplication;
 
-		ZEModelExporterOptions		Options;
-		ZE3dsProgressDialog			ProgDlg;
+		ZE3dsModelExporterOptionsDialogNew*	OptionsDialog;
+		ZEResourceConfigurationWidget*		ResourceConfigurationDialog;
+
+		ZEMLNode*							ExportOptions;
+		QWinWidget*							WinWidget;
+		ZEProgressDialog*					ProgressDialog;
+		ZEString							ExportPath;
 
 		IGameScene*					Scene;
-		//ZEModelFile					ModelFile;
 		ZEMLNode					ModelNode;
 
 		
@@ -74,23 +81,32 @@ class ZEModelExporter : public SceneExport
 		Tab<IGameNode*>				ProcessedMeshes;
 		Tab<IGameNode*>				ProcessedMasterMeshes;
 		Tab<IGameMaterial*>			Materials;
+		Tab<IGameNode*>				AnimationEnabledBones;
+		Tab<IGameNode*>				AnimationEnabledMeshes;
 
-		ZEInt						FrameCount;
+		ZEInt						TotalFrameCount;
 		ZEInt						TicksPerFrame;
+
+		void						CollectResources();
+		void						LoadOptions(const char* FilePath);
+		void						SaveOptions(const char* FilePath);
+		bool						ShowOptionsDialog(HWND ParentWindow);
+		bool						ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath);
 
 		bool						ProcessBone(IGameNode* Node, ZEMLNode* BonesNode);
 		bool						ProcessBones(ZEMLNode* BonesNode);
 		ZEInt						ProcessMeshMaterial(IGameMaterial* Material);
 		bool						ProcessMaterials(const char* FileName, ZEMLNode* MaterialsNode);
-		bool						ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* MeshLODNode); //ZEModelFileMeshLOD* ZEMeshLod
-		void						ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* ShapeNode); //ZEModelFilePhysicalShape* Shape
-		bool						ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* PhysicalShapeNode); //ZEModelFilePhysicalShape* PhysicalShape
-		bool						ProcessPhysicalBody(IGameNode* Node, ZEMLNode* PhysicalBodyNode); //ZEModelFilePhysicalBody* Body
-		bool						ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* PhysicalJointNode); //ZEModelFilePhysicalJoint* Joint
+		bool						ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* MeshLODNode);
+		void						ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* ShapeNode);
+		bool						ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* PhysicalShapeNode);
+		bool						ProcessPhysicalBody(IGameNode* Node, ZEMLNode* PhysicalBodyNode);
+		bool						ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* PhysicalJointNode);
 		bool						ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesNode);
 		bool						ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNode);
 		bool						ProcessMeshes(ZEMLNode* MeshesNode);
-		bool						ProcessAnimation(ZEMLNode* AnimationNode);
+		void						ProcessAnimationFrames(ZESize AnimationStartFrame, ZESize AnimationFrameCount, ZEMLNode* AnimationNode);
+		bool						ProcessAnimations(ZEMLNode* AnimationsNode);
 
 		bool						DumpPropertyContainer(IExportEntity* Node);
 		bool						GetRelativePath(const char* RealPath, char* RelativePath);
@@ -119,8 +135,8 @@ class ZEModelExporter : public SceneExport
 		virtual	bool				WriteToFile(const char* FilePath);
 		
 
-									ZEModelExporter();
-		virtual						~ZEModelExporter();
+									ZE3dsModelExporter();
+		virtual						~ZE3dsModelExporter();
 };
 
 #endif

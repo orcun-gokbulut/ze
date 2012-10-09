@@ -75,7 +75,7 @@ class ZEResourceConfigurationWidgetQt : public QObject
 
 	private slots:
 
-		void							TreeItemClicled(QTreeWidgetItem* Item, int Column);
+		void							TreeItemClicked(QTreeWidgetItem* Item, int Column);
 		void							OptionChanged(ZEResourceOptionWidget* Widget);
 };
 
