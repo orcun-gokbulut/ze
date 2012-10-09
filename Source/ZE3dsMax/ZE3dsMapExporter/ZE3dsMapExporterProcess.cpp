@@ -270,10 +270,10 @@ bool ZE3dsMapExporter::ProcessDoors()
 			return false;
 		}
 
-		ZEInt PortalAIndex = FindPortalIndex(Scene->GetIGameNode(PortalANode));
+		ZEUInt32 PortalAIndex = FindPortalIndex(Scene->GetIGameNode(PortalANode));
 		DoorNode->AddProperty("PortalAIndex", PortalAIndex);
 
-		ZEInt PortalBIndex = FindPortalIndex(Scene->GetIGameNode(PortalBNode));
+		ZEUInt32 PortalBIndex = FindPortalIndex(Scene->GetIGameNode(PortalBNode));
 		DoorNode->AddProperty("PortalBIndex", PortalBIndex);
 	
 		ZEVector3 Point1, Point2, Point3, Point4;
@@ -430,7 +430,7 @@ bool ZE3dsMapExporter::ProcessPortals()
 			}
 		}
 
-		PortalNode->AddDataProperty("Vertices", Polygons.GetCArray(), sizeof(ZEMapFilePolygon) * Polygons.GetCount(), true);
+		PortalNode->AddDataProperty("Polygons", Polygons.GetCArray(), sizeof(ZEMapFilePolygon) * Polygons.GetCount(), true);
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
 
@@ -461,6 +461,10 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 
 		ZEResourceOption MaterialOption;
 		ResourceConfigurationDialog->GetOption(MaterialName + ".ZEMATERIAL", MaterialOption);
+
+		if(!ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
+			continue;
+
 		ZEString MaterialFilePath = MaterialOption.ExportPath + ZEPathUtils::GetSeperator() + MaterialOption.Identifier;
 
 		ZEProgressDialog::GetInstance()->OpenTask(MaterialName);

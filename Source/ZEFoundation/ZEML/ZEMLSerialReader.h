@@ -43,14 +43,7 @@
 #include "ZEMLItem.h"
 #include "ZEDS\ZEHashGenerator.h"
 
-struct ZEMLSerialPointer 
-{
-	friend class ZEMLSerialReader;
-
-	private:
-	
-		ZEUInt64 FilePosition;
-};
+typedef ZEInt64 ZEMLSerialPointer;
 
 struct ZEMLSerialListItem
 {
@@ -60,11 +53,11 @@ struct ZEMLSerialListItem
 	ZEVariant*				Value;
 	bool					Mandatory;
 
-	ZEMLSerialPointer		Pointer;
+	ZEMLSerialPointer*		Pointer;
 };
 
-#define ZEML_LIST_PROPERTY(Name, Value, Mandatory)	{false, Name, ZEHashGenerator::Hash(Name), &Value, Mandatory}
-#define ZEML_LIST_NODE(Name, Mandatory)				{false, Name, ZEHashGenerator::Hash(Name), NULL, Mandatory}
+#define ZEML_LIST_PROPERTY(Name, Value, Mandatory)	{false, Name, ZEHashGenerator::Hash(Name), &Value, Mandatory, NULL}
+#define ZEML_LIST_NODE(Name, Pointer, Mandatory)	{false, Name, ZEHashGenerator::Hash(Name), NULL, Mandatory, &Pointer}
 #define ZEML_LIST_DATA ZEML_LIST_NODE
 
 class ZEFile;
@@ -75,37 +68,33 @@ class ZEMLSerialReader
 
 		ZEFile*				File;
 		ZEMLSerialPointer	CurrentPointer;
+		ZEUInt64			NextItemPosition;
 
-		ZEMLItemType	CurrentItemType;
-		ZEVariant		CurrentItemValue;
-		ZEString		CurrentItemName;
-		ZEUInt64		CurrentItemDataSize;
-		ZEUInt64		CurrentItemSubItemCount;
-
-		ZEUInt64		NextItemPosition;
+		ZEMLItemType		CurrentItemType;
+		ZEVariant			CurrentItemValue;
+		ZEString			CurrentItemName;
+		ZEUInt64			CurrentItemDataSize;
+		ZEUInt64			CurrentItemSubItemCount;
 
 	public:
 
-		bool			Read();
-		bool			SkipNodeAndRead();
+		bool				Read();
+		bool				SkipNodeAndRead();
 
 		void				SeekPointer(ZEMLSerialPointer Pointer);
 		ZEMLSerialPointer	GetCurrentPointer();
 		void				GoToCurrentPointer();
 		
-		ZEMLItemType	GetItemType();
-		ZEString		GetItemName();
+		ZEMLItemType		GetItemType();
+		ZEString			GetItemName();
+		ZEUInt64			GetSubItemCount();
+		ZEVariant			GetItemValue();
+		ZEUInt64			GetDataSize();
+		bool				GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offset = 0);
 
-		ZEUInt64		GetSubItemCount();
+		bool				ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCount);
 
-		ZEVariant		GetItemValue();
-		
-		ZEUInt64		GetDataSize();
-		bool			GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offset = 0);
-
-		bool			ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCount);
-
-						ZEMLSerialReader(ZEFile* File);
+							ZEMLSerialReader(ZEFile* File);
 };
 
 #endif

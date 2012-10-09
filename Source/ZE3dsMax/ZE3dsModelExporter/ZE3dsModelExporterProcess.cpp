@@ -1321,7 +1321,7 @@ bool ZEModelExporter::ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNode)
 
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 	{
-		if (((ZEMLProperty*)Meshes[I]->GetProperties("Name").GetFirstItem())->GetValue().GetString() == LODName);
+		if (((ZEMLProperty*)Meshes[I]->GetProperty("Name"))->GetValue().GetString() == LODName);
 			MasterMesh = Meshes[I];
 	}
 
@@ -1492,12 +1492,10 @@ bool ZEModelExporter::ProcessAnimation(ZEMLNode* AnimationNode)
 	Frames.SetCount((ZESize)FrameCount);
 
 	zeLog("Total Frame Count : %d", FrameCount);
-	zeOutput("Processing Animation Frame: ");
+	zeLog("Processing Animation Frame: ");
 	for (ZESize I = 0; I < (ZESize)FrameCount; I++)
 	{
-		zeOutput("%d ", I);
-		if (I % 20 == 0)
-			zeOutput("\r\n");
+		zeLog("%d ", I);
 
 		ZEModelFileAnimationFrame* CurrentFrame = &(Frames[I]);
 		ZEModelFileAnimationKey* Key;
@@ -1510,7 +1508,7 @@ bool ZEModelExporter::ProcessAnimation(ZEMLNode* AnimationNode)
 
 			ZEMLNode* MainBonesNode = ModelNode.GetSubNodes("Bones").GetFirstItem();
 			ZEArray<ZEMLNode*> BoneNodes = MainBonesNode->GetSubNodes("Bone");
-			ZEInt32 ParentBoneId = ((ZEMLProperty*)BoneNodes[(ZESize)Key->ItemId]->GetProperties("ParentId").GetFirstItem())->GetValue().GetInt32();
+			ZEInt32 ParentBoneId = ((ZEMLProperty*)BoneNodes[(ZESize)Key->ItemId]->GetProperty("ParentId"))->GetValue().GetInt32();
 			
 			if (ParentBoneId == -1)
 			{
@@ -1541,7 +1539,6 @@ bool ZEModelExporter::ProcessAnimation(ZEMLNode* AnimationNode)
 			Key->Scale = MAX_TO_ZE(Matrix.Scaling());
 		}
 	}
-	zeOutput("\r\n");
 
 	AnimationNode->AddDataProperty("Frames", Frames.GetCArray(), Frames.GetCount() * sizeof(ZEModelFileAnimationFrame), true);
 
@@ -1561,11 +1558,11 @@ bool ZEModelExporter::DumpPropertyContainer(IExportEntity* Node)
 		zeError("There is no property container. Class Name : \"%s\".", Node->GetClassName());
 		return false;
 	}
-	zeOutput("Dumping properties of entity. Class Name : \"%s\".\r\n", Node->GetClassName());
+	zeLog("Dumping properties of entity. Class Name : \"%s\".", Node->GetClassName());
 	for (ZEInt I = 0; I < Properties->GetNumberOfProperties(); I++)
 	{
 		IGameProperty* Property = Properties->GetProperty(I);
-		zeOutput("Property %d. Name : \"%s\", Index : %d, Animated : %s, ", I, Property->GetName(), Property->GetParamBlockIndex(), (Property->IsPropAnimated() ? "Yes" : "No"));
+		zeLog("Property %d. Name : \"%s\", Index : %d, Animated : %s, ", I, Property->GetName(), Property->GetParamBlockIndex(), (Property->IsPropAnimated() ? "Yes" : "No"));
 
 		float FloatValue;
 		ZEInt IntValue;
@@ -1584,38 +1581,38 @@ bool ZEModelExporter::DumpPropertyContainer(IExportEntity* Node)
 			switch(ParamBlock->GetParameterType(ParamId))
 			{
 			case TYPE_INODE:
-				zeOutput("Type : INode, Value : \"%s\".", (ParamBlock->GetINode(ParamId, 0, 0)->GetName() != NULL ? ParamBlock->GetINode(ParamId, 0, 0)->GetName() : "NULL"));
+				zeLog("Type : INode, Value : \"%s\".", (ParamBlock->GetINode(ParamId, 0, 0)->GetName() != NULL ? ParamBlock->GetINode(ParamId, 0, 0)->GetName() : "NULL"));
 				break;
 			case TYPE_INODE_TAB:
-				zeOutput("Type : INodeTab, Values : [");
+				zeLog("Type : INodeTab, Values : [");
 				for (ZEInt N = 0 ; N < ParamBlock->Count(ParamId); N++)
-					zeOutput("\"%s\", ", ParamBlock->GetINode(ParamId, 0, N)->GetName());
-				zeOutput("].\r\n");
+					zeLog("\"%s\", ", ParamBlock->GetINode(ParamId, 0, N)->GetName());
+				zeLog("].");
 				break;
 			};
 			break;
 		case ZE_FLOAT_PROP:
 			Property->GetPropertyValue(FloatValue);
-			zeOutput("Type : FLOAT, Value : %f.\r\n", FloatValue);
+			zeLog("Type : FLOAT, Value : %f.", FloatValue);
 			break;
 		case ZE_VECTOR3_PROP:
 			Property->GetPropertyValue(Point3Value);
-			zeOutput("Type : POINT3, Value : <%f, %f, %f>\r\n", Point3Value.x, Point3Value.y, Point3Value.z);
+			zeLog("Type : POINT3, Value : <%f, %f, %f>.", Point3Value.x, Point3Value.y, Point3Value.z);
 			break;
 		case ZE_INT_PROP:
 			Property->GetPropertyValue(IntValue);
-			zeOutput("Type : INT, Value : %d.\r\n", IntValue);
+			zeLog("Type : INT, Value : %d.", IntValue);
 			break;
 		case ZE_STRING_PROP:
 			Property->GetPropertyValue(StringValue);
-			zeOutput("Type : STRING, Value : \"%s\".\r\n",StringValue);
+			zeLog("Type : STRING, Value : \"%s\".",StringValue);
 			break;
 		case ZE_VECTOR4_PROP:
 			Property->GetPropertyValue(Point4Value);
-			zeOutput("Type : POINT4, Value : <%f, %f, %f, %f>.\r\n", Point4Value.x, Point4Value.y, Point4Value.z, Point4Value.w);
+			zeLog("Type : POINT4, Value : <%f, %f, %f, %f>.", Point4Value.x, Point4Value.y, Point4Value.z, Point4Value.w);
 			break;
 		default:
-			zeOutput("Property Type : ERROR. \r\n.");
+			zeLog("Property Type : ERROR..");
 		}
 	}
 	return true;

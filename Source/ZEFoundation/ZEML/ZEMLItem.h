@@ -83,6 +83,7 @@ class ZEMLItem : public ZEListItem
 		ZEUInt8				Type;
 		ZEMLItem*			Parent;
 		ZEUInt64			DataSize;
+		ZEUInt64			FilePosition;
 
 		virtual void		ReadFromFile(ZEFile* File, bool DeferredDataReading) = 0;
 		virtual void		WriteToFile(ZEFile* File) = 0;
@@ -96,6 +97,8 @@ class ZEMLItem : public ZEListItem
 	public:
 
 		ZEMLItemType		GetType() const;
+
+		ZEUInt64			GetFilePosition();
 
 		virtual ZEUInt64	GetTotalSize() = 0;
 		ZEUInt64			GetDataSize();
