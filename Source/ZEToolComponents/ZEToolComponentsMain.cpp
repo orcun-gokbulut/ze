@@ -58,7 +58,7 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
  	ZEMLVisualizerWidget w;
 	ZEFile File;
 	
-	File.Open("C:\\Users\\Can\\Desktop\\ZEMapTest\\Test.zemap", ZE_FOM_READ, ZE_FCM_NONE);
+	File.Open("C:\\Users\\Egemen.Barutcu\\Documents\\3dsMax\\export\\asd.ZEMODEL", ZE_FOM_READ, ZE_FCM_NONE);
 	//File.Open("C:\\Users\\Can\\Desktop\\asd.ZEMODEL", ZE_FOM_READ, ZE_FCM_NONE);
 	//File.Open("C:\\Users\\Can\\Desktop\\Material #48.ZEMaterial", ZE_FOM_READ, ZE_FCM_NONE);
 	//File.Open("C:\\Users\\Can\\Desktop\\Preset.zeml", ZE_FOM_READ, ZE_FCM_NONE);

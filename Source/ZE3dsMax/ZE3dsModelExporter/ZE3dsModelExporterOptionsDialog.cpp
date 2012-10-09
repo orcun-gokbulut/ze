@@ -36,12 +36,12 @@
 #include "ZE3dsModelExporterOptionsDialog.h"
 #include "QtGui\QFileDialog"
 #include "ZEML\ZEMLProperty.h"
+#include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 
-ZE3dsModelExporterOptionsDialogNew::ZE3dsModelExporterOptionsDialogNew(QWidget* Parent, ZEMLNode* Options) : QDialog(Parent)
+ZE3dsModelExporterOptionsDialogNew::ZE3dsModelExporterOptionsDialogNew(QWidget* Parent) : QDialog(Parent)
 {
-	Form = new Ui::Form();
+	Form = new Ui::ZEModelExporterOptionsDialogUI();
 	Form->setupUi(this);
-	Options = Options;
 
 	connect(Form->btnBrowseEngineDir, SIGNAL(clicked()), this, SLOT(ShowEngineDirectoryDialog()));
 	connect(Form->btnBrowseLogPath, SIGNAL(clicked()), this, SLOT(ShowLoggingFilePathDialog()));
@@ -49,8 +49,13 @@ ZE3dsModelExporterOptionsDialogNew::ZE3dsModelExporterOptionsDialogNew(QWidget* 
 	connect(Form->ckbFileLoggingEnabled, SIGNAL(stateChanged(int)), this, SLOT(SetFileLoggingEnabled(int)));
 	connect(Form->cmbRelativeTo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetApplicationPathOptionsVisibility(int)));
 	connect(Form->ckbCopyResources, SIGNAL(stateChanged(int)), this, SLOT(SetResourceCopyEnabled(int)));
+	connect(Form->btnNewAnimation, SIGNAL(clicked()), this, SLOT(AddAnimation()));
+	connect(Form->btnDeleteAnimation, SIGNAL(clicked()), this, SLOT(RemoveAnimation()));
+	connect(Form->grpExportBones, SIGNAL(toggled(bool)), this, SLOT(SetExportBonesEnabled(bool)));
+	connect(Form->grpExportMeshes, SIGNAL(toggled(bool)), this, SLOT(SetExportMeshesEnabled(bool)));
+	Form->AnimationTreeWidget->setSortingEnabled(false);
 
-	SetOptions(Options);
+	SetApplicationPathOptionsVisibility(Form->cmbRelativeTo->currentIndex());
 }
 
 void ZE3dsModelExporterOptionsDialogNew::SetOptions(ZEMLNode* Options)
@@ -93,6 +98,49 @@ void ZE3dsModelExporterOptionsDialogNew::SetOptions(ZEMLNode* Options)
 
 		Form->cmbRelativeTo->setCurrentIndex(OptionValue);
 	}
+
+	CurrentProperty = Options->GetProperty("IsBoneExportEnabled");
+	if(CurrentProperty != NULL)
+		Form->grpExportBones->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
+
+	CurrentProperty = Options->GetProperty("IsBonePhysicalBodyExportEnabled");
+	if(CurrentProperty != NULL)
+		Form->ckbExportBonePhysicalBodies->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
+
+	CurrentProperty = Options->GetProperty("IsMeshExportEnabled");
+	if(CurrentProperty != NULL)
+		Form->grpExportMeshes->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
+
+	CurrentProperty = Options->GetProperty("IsMeshPhysicalBodyExportEnabled");
+	if(CurrentProperty != NULL)
+		Form->ckbExportMeshPhysicalBodies->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
+
+	CurrentProperty = Options->GetProperty("IsAnimationExportEnabled");
+	if (CurrentProperty != NULL)
+		Form->grpExportAnimations->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
+
+
+	if (Options->GetSubNodes("Animations").GetCount() > 0)
+	{
+		CurrentProperty = Options->GetSubNodes("Animations").GetFirstItem();
+
+		ZEArray<ZEMLNode*> Animations = ((ZEMLNode*)CurrentProperty)->GetSubNodes("Animation");
+
+		for (ZESize I = 0; I < Animations.GetCount(); I++)
+		{
+			ZEInt ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
+
+			QStringList List;
+			List << ((ZEMLProperty*)Animations[I]->GetProperty("Name"))->GetValue().GetString().ToCString() 
+				 << ((ZEMLProperty*)Animations[I]->GetProperty("StartFrame"))->GetValue().GetString().ToCString() 
+				 << ((ZEMLProperty*)Animations[I]->GetProperty("EndFrame"))->GetValue().GetString().ToCString();
+
+			QTreeWidgetItem* Item = new QTreeWidgetItem(List);
+			Item->setFlags(Item->flags() | Qt::ItemFlag::ItemIsEditable);
+			Form->AnimationTreeWidget->insertTopLevelItem(ItemCount, Item);
+		}
+	}
+
 }
 
 ZEMLNode* ZE3dsModelExporterOptionsDialogNew::GetOptions()
@@ -166,48 +214,149 @@ void ZE3dsModelExporterOptionsDialogNew::SetApplicationPathOptionsVisibility(int
 		ToggleApplicationPathOptions(false);
 }
 
+void ZE3dsModelExporterOptionsDialogNew::SetExportBonesEnabled(bool IsChecked)
+{
+	if(!IsChecked)
+		Form->ckbExportBonePhysicalBodies->setChecked(false);
+}
+
+void ZE3dsModelExporterOptionsDialogNew::SetExportMeshesEnabled(bool IsChecked)
+{
+	if(!IsChecked)
+		Form->ckbExportMeshPhysicalBodies->setChecked(false);
+}
+
+void ZE3dsModelExporterOptionsDialogNew::AddAnimation()
+{
+
+	ZEInt ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
+
+	for (ZEInt I = 0; I < ItemCount; I++)
+		if (Form->AnimationTreeWidget->topLevelItem(I)->text(0) == "Default")
+			return;
+
+	QStringList List;
+	List << "Default" << "0" << "0";
+	QTreeWidgetItem* Item = new QTreeWidgetItem(List);
+	Item->setFlags(Item->flags() | Qt::ItemFlag::ItemIsEditable);
+	Form->AnimationTreeWidget->insertTopLevelItem(ItemCount, Item);
+	Form->AnimationTreeWidget->editItem(Item, 0);
+}
+
+void ZE3dsModelExporterOptionsDialogNew::RemoveAnimation()
+{
+	if(Form->AnimationTreeWidget->currentItem() == NULL)
+		return;
+
+	ZEInt IndexOfItem = Form->AnimationTreeWidget->indexOfTopLevelItem(Form->AnimationTreeWidget->currentItem());
+	Form->AnimationTreeWidget->takeTopLevelItem(IndexOfItem);
+}
+
 void ZE3dsModelExporterOptionsDialogNew::CollectOptionsFromForm()
 {
 	if(Options == NULL)
 	{
 		Options = new ZEMLNode("Options");
-		Options->AddProperty("ZinekEngineWorkingDirectory", ZEVariant(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
-		Options->AddProperty("IsFileLoggingEnabled", ZEVariant(Form->ckbFileLoggingEnabled->isChecked()));
-		Options->AddProperty("LogFilePath", ZEVariant(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
-		Options->AddProperty("RelativeTo", ZEVariant((ZEInt32)Form->cmbRelativeTo->currentIndex()));
-		Options->AddProperty("ApplicationPath", ZEVariant(ZEString((const char*)Form->txtApplicationFolder->text().toLatin1())));
-		Options->AddProperty("IsResourceCopyingEnabled", ZEVariant(Form->ckbCopyResources->isChecked()));
+		Options->AddProperty("ZinekEngineWorkingDirectory", (const char*)Form->txtEngineWorkingDirectory->text().toUtf8());
+		Options->AddProperty("IsFileLoggingEnabled", Form->ckbFileLoggingEnabled->isChecked());
+		Options->AddProperty("LogFilePath", (const char*)Form->txtLogFilePath->text().toUtf8());
+		Options->AddProperty("RelativeTo", (ZEInt32)Form->cmbRelativeTo->currentIndex());
+		Options->AddProperty("ApplicationPath", (const char*)Form->txtApplicationFolder->text().toUtf8());
+		Options->AddProperty("IsResourceCopyingEnabled", Form->ckbCopyResources->isChecked());
+		Options->AddProperty("IsBoneExportEnabled", Form->grpExportBones->isChecked());
+		Options->AddProperty("IsBonePhysicalBodyExportEnabled", Form->ckbExportBonePhysicalBodies->isChecked());
+		Options->AddProperty("IsMeshExportEnabled", Form->grpExportMeshes->isChecked());
+		Options->AddProperty("IsMeshPhysicalBodyExportEnabled", Form->ckbExportMeshPhysicalBodies->isChecked());
+		Options->AddProperty("IsAnimationExportEnabled", Form->grpExportAnimations->isChecked());
+		
+		ZEInt ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
+
+		if (ItemCount > 0)
+		{
+			ZEMLNode* AnimationsNode = Options->AddSubNode("Animations");
+
+			for (ZEInt I = 0; I < ItemCount; I++)
+			{
+				ZEMLNode* Animation = AnimationsNode->AddSubNode("Animation");
+				Animation->AddProperty("Name", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(0).toUtf8());
+				Animation->AddProperty("StartFrame", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(1).toUtf8());
+				Animation->AddProperty("EndFrame", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(2).toUtf8());
+			}
+		}
 	}
 	else
 	{
-		if(Options->GetProperty("ZinekEngineWorkingDirectory") !=  NULL)
-			((ZEMLProperty*)(Options->GetProperty("ZinekEngineWorkingDirectory")))->SetValue(ZEVariant(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
+		if (Options->GetProperty("ZinekEngineWorkingDirectory") !=  NULL)
+			((ZEMLProperty*)(Options->GetProperty("ZinekEngineWorkingDirectory")))->SetValue((const char*)Form->txtEngineWorkingDirectory->text().toUtf8());
 		else
-			Options->AddProperty("ZinekEngineWorkingDirectory", ZEVariant(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
+			Options->AddProperty("ZinekEngineWorkingDirectory", (const char*)Form->txtEngineWorkingDirectory->text().toUtf8());
 
-		if(Options->GetProperty("IsFileLoggingEnabled") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("IsFileLoggingEnabled")))->SetValue(ZEVariant(Form->ckbFileLoggingEnabled->isChecked()));
+		if (Options->GetProperty("IsFileLoggingEnabled") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("IsFileLoggingEnabled")))->SetValue(Form->ckbFileLoggingEnabled->isChecked());
 		else
-			Options->AddProperty("IsFileLoggingEnabled", ZEVariant(Form->ckbFileLoggingEnabled->isChecked()));
+			Options->AddProperty("IsFileLoggingEnabled", Form->ckbFileLoggingEnabled->isChecked());
 
-		if(Options->GetProperty("LogFilePath") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("LogFilePath")))->SetValue(ZEVariant(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
+		if (Options->GetProperty("LogFilePath") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("LogFilePath")))->SetValue((const char*)Form->txtLogFilePath->text().toUtf8());
 		else
-			Options->AddProperty("LogFilePath", ZEVariant(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
+			Options->AddProperty("LogFilePath", (const char*)Form->txtLogFilePath->text().toUtf8());
 
-		if(Options->GetProperty("RelativeTo") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("RelativeTo")))->SetValue(ZEVariant((ZEInt32)Form->cmbRelativeTo->currentIndex()));
+		if (Options->GetProperty("RelativeTo") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("RelativeTo")))->SetValue((ZEInt32)Form->cmbRelativeTo->currentIndex());
 		else
-			Options->AddProperty("RelativeTo", ZEVariant((ZEInt32)Form->cmbRelativeTo->currentIndex()));
+			Options->AddProperty("RelativeTo", (ZEInt32)Form->cmbRelativeTo->currentIndex());
 
-		if(Options->GetProperty("ApplicationPath") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("ApplicationPath")))->SetValue(ZEVariant(ZEString((const char*)Form->txtApplicationFolder->text().toLatin1())));
+		if (Options->GetProperty("ApplicationPath") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("ApplicationPath")))->SetValue((const char*)Form->txtApplicationFolder->text().toUtf8());
 		else
-			Options->AddProperty("ApplicationPath", ZEVariant(ZEString((const char*)Form->txtApplicationFolder->text().toLatin1())));
+			Options->AddProperty("ApplicationPath", (const char*)Form->txtApplicationFolder->text().toUtf8());
 
-		if(Options->GetProperty("IsResourceCopyingEnabled") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("IsResourceCopyingEnabled")))->SetValue(ZEVariant(Form->ckbCopyResources->isChecked()));
+		if (Options->GetProperty("IsResourceCopyingEnabled") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("IsResourceCopyingEnabled")))->SetValue(Form->ckbCopyResources->isChecked());
 		else
-			Options->AddProperty("IsResourceCopyingEnabled", ZEVariant(Form->ckbCopyResources->isChecked()));
+			Options->AddProperty("IsResourceCopyingEnabled", Form->ckbCopyResources->isChecked());
+
+		if (Options->GetProperty("IsBoneExportEnabled") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("IsBoneExportEnabled")))->SetValue(Form->grpExportBones->isChecked());
+		else
+			Options->AddProperty("IsBoneExportEnabled", Form->grpExportBones->isChecked());
+
+		if (Options->GetProperty("IsBonePhysicalBodyExportEnabled") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("IsBonePhysicalBodyExportEnabled")))->SetValue(Form->ckbExportBonePhysicalBodies->isChecked());
+		else
+			Options->AddProperty("IsBonePhysicalBodyExportEnabled", Form->ckbExportBonePhysicalBodies->isChecked());
+
+		if (Options->GetProperty("IsMeshExportEnabled") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("IsMeshExportEnabled")))->SetValue(Form->grpExportMeshes->isChecked());
+		else
+			Options->AddProperty("IsMeshExportEnabled", Form->grpExportMeshes->isChecked());
+
+		if (Options->GetProperty("IsMeshPhysicalBodyExportEnabled") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("IsMeshPhysicalBodyExportEnabled")))->SetValue(Form->ckbExportMeshPhysicalBodies->isChecked());
+		else
+			Options->AddProperty("IsMeshPhysicalBodyExportEnabled", Form->ckbExportMeshPhysicalBodies->isChecked());
+
+		if (Options->GetProperty("IsAnimationExportEnabled") != NULL)
+			((ZEMLProperty*)(Options->GetProperty("IsAnimationExportEnabled")))->SetValue(Form->grpExportAnimations->isChecked());
+		else
+			Options->AddProperty("IsAnimationExportEnabled", Form->grpExportAnimations->isChecked());
+
+		if (Options->GetSubNodes("Animations").GetCount() != 0)
+			Options->RemoveSubNode(Options->GetSubNodes("Animations").GetFirstItem());
+
+		ZEInt ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
+
+		if (ItemCount > 0)
+		{
+			ZEMLNode* AnimationsNode = Options->AddSubNode("Animations");
+
+			for (ZEInt I = 0; I < ItemCount; I++)
+			{
+				ZEMLNode* Animation = AnimationsNode->AddSubNode("Animation");
+				Animation->AddProperty("Name", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(0).toUtf8());
+				Animation->AddProperty("StartFrame", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(1).toUtf8());
+				Animation->AddProperty("EndFrame", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(2).toUtf8());
+			}
+		}
 	}
 }

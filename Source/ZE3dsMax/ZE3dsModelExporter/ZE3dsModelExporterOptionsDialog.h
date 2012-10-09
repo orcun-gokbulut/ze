@@ -48,8 +48,8 @@ class ZE3dsModelExporterOptionsDialogNew : public QDialog
 
 	private:
 
-		Ui::Form*		Form;
-		ZEMLNode*		Options;
+		Ui::ZEModelExporterOptionsDialogUI*		Form;
+		ZEMLNode*								Options;
 	
 		void			ToggleFileLogging(bool IsEnabled);
 		void			ToggleApplicationPathOptions(bool IsEnabled);
@@ -63,13 +63,18 @@ class ZE3dsModelExporterOptionsDialogNew : public QDialog
 		void			SetFileLoggingEnabled(int CheckBoxState);
 		void			SetResourceCopyEnabled(int CheckBoxState);
 		void			SetApplicationPathOptionsVisibility(int Index);
+		void			SetExportBonesEnabled(bool IsChecked);
+		void			SetExportMeshesEnabled(bool IsChecked);
 
-public:
+		void			AddAnimation();
+		void			RemoveAnimation();
 
-						ZE3dsModelExporterOptionsDialogNew(QWidget* Parent, ZEMLNode* Options);
+	public:
 
-	void				SetOptions(ZEMLNode* Options);
-	ZEMLNode*			GetOptions();
+						ZE3dsModelExporterOptionsDialogNew(QWidget* Parent);
+
+		void			SetOptions(ZEMLNode* Options);
+		ZEMLNode*		GetOptions();
 };
 
 #endif

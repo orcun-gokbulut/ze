@@ -45,7 +45,7 @@ ZEInt ZE3dsModelExporterDescription::IsPublic()
 
 void* ZE3dsModelExporterDescription::Create(BOOL Loading) 
 { 
-	return new ZEModelExporter(); 
+	return new ZE3dsModelExporter(); 
 }
 
 const TCHAR* ZE3dsModelExporterDescription::ClassName()
