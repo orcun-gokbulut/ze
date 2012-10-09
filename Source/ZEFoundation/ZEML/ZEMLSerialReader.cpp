@@ -41,7 +41,7 @@ ZEMLSerialReader::ZEMLSerialReader(ZEFile* File)
 {
 	this->File = File;
 	NextItemPosition = 0;
-	CurrentPointer.FilePosition = 0;
+	CurrentPointer = 0;
 }
 
 bool ZEMLSerialReader::Read()
@@ -55,7 +55,7 @@ bool ZEMLSerialReader::Read()
 	CurrentItemSubItemCount = 0;
 
 	if(NextItemPosition >= File->Tell())
-		CurrentPointer.FilePosition = NextItemPosition;
+		CurrentPointer = NextItemPosition;
 
 	File->Seek(NextItemPosition, ZE_SF_BEGINING);
 
@@ -69,7 +69,7 @@ bool ZEMLSerialReader::Read()
 	}
 
 	if(Identifier != ZEML_ITEM_FILE_IDENTIFIER)
-		zeError("Corrupted ZEML file. Corrupted ZEML file.");
+		zeError("Identifier missmatch. Corrupted ZEML file.");
 
 	if(File->Read(&CurrentItemType, sizeof(ZEUInt8), 1) != 1)
 		zeError("Can not read ZEMLItem type from file. Corrupted ZEML file.");
@@ -285,7 +285,8 @@ bool ZEMLSerialReader::GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offse
 
 void ZEMLSerialReader::SeekPointer(ZEMLSerialPointer Pointer)
 {
-	NextItemPosition = Pointer.FilePosition;
+	NextItemPosition = Pointer;
+	Read();
 }
 
 ZEMLSerialPointer ZEMLSerialReader::GetCurrentPointer()
@@ -307,7 +308,6 @@ bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCou
 	}
 
 	ZEUInt64 CurrentSubItemCount = CurrentItemSubItemCount;
-	ZEString CurrentName = CurrentItemName;
 
 	for (ZESize I = 0; I < ItemCount; I++)
 	{
@@ -316,16 +316,27 @@ bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCou
 			zeError("ZEMLPropertyListItem name can not be empty.");
 			return false;
 		}
+
+		if(List[I].Pointer != NULL)
+			*(List[I].Pointer) = -1;
 	}
 
 	for (ZESize I = 0; I < CurrentSubItemCount; I++)
 	{
+		if(I == 0)
+		{
+			if(!Read())
+				return false;
+		}
+		else
+		{
+			if(!SkipNodeAndRead())
+				return false;
+		}
+
 		ZEUInt64 ItemFilePosition = File->Tell();
 
-		if(!Read())
-			return false;
-
-		ZEUInt64 CurrentItemHash = CurrentName.Hash();
+		ZEUInt64 CurrentItemHash = CurrentItemName.Hash();
 		ZESSize CurrentItemIndex = -1;
 
 		for(ZESize J = 0; J < ItemCount; J++)
@@ -334,6 +345,7 @@ bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCou
 			{
 				CurrentItemIndex = J;
 				List[J].IsFound = true;
+				break;
 			}
 		}
 
@@ -341,11 +353,11 @@ bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCou
 		{
 			if(CurrentItemType == ZEML_IT_NODE)
 			{
-				List[CurrentItemIndex].Pointer.FilePosition = ItemFilePosition;
+				*(List[CurrentItemIndex].Pointer) = ItemFilePosition - (sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + CurrentItemName.GetSize() + sizeof(ZEUInt64) + sizeof(ZEUInt64));
 			}
 			else if(CurrentItemType == ZEML_IT_INLINE_DATA)
 			{
-				List[CurrentItemIndex].Pointer.FilePosition = ItemFilePosition;
+				*(List[CurrentItemIndex].Pointer) = ItemFilePosition - (sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + CurrentItemName.GetSize() + sizeof(ZEUInt64));
 			}
 			else
 			{

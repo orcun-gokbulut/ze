@@ -446,6 +446,7 @@ void ZEMLNode::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 	ZEUInt8		NameSize;
 	char		TempNameBuffer[ZEML_MAX_NAME_SIZE];	
 	ZEUInt64	SubItemCount;
+	FilePosition = File->Tell();
 
 	if(File->Read(&Identifier, sizeof(char), 1) != 1)
 		zeError("Can not read ZEMLNode identifier from file. Corrupted ZEML file.");

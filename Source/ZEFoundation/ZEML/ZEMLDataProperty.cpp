@@ -141,6 +141,7 @@ void ZEMLDataProperty::WriteToFile(ZEFile* File)
 
 void ZEMLDataProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 {
+	FilePosition = File->Tell();
 	IsCached = !DeferredDataReading;
 
 	char		Identifier;	

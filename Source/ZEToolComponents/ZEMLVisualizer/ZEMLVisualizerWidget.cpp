@@ -123,7 +123,7 @@ void ZEMLVisualizerWidget::AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem)
 
 	if(Item->GetType() == ZEML_IT_NODE)
 	{
-		NewItem->setText(0, Item->GetName().ToCString());
+		NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
 		NewItem->setText(1, "node");
 		NewItem->setBackgroundColor(0,QColor(230,230,230));
 		NewItem->setBackgroundColor(1,QColor(230,230,230));
@@ -144,7 +144,7 @@ void ZEMLVisualizerWidget::AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem)
 	}
 	else if(Item->GetType() == ZEML_IT_INLINE_DATA)
 	{
-		NewItem->setText(0, Item->GetName().ToCString());
+		NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
 		NewItem->setText(1, "DataProperty");
 		ZEMLDataProperty* CurrentItem = (ZEMLDataProperty*)Item;
 		ZEString DataSize = CurrentItem->GetDataSize();
@@ -160,7 +160,7 @@ void ZEMLVisualizerWidget::AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem)
 		ZEMatrix4x4		TempM4;
 		ZEString		TempString = "";
 
-		NewItem->setText(0, Item->GetName().ToCString());
+		NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
 		ZEMLProperty* CurrentItem = (ZEMLProperty*)Item;
 		ZEVariant Value = CurrentItem->GetValue();
 		switch (Value.GetType())
@@ -254,5 +254,5 @@ void ZEMLVisualizerWidget::AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem)
 	else
 		ParentItem->addChild(NewItem);
 
-	QtComponents->Tree->expandAll();
+	//QtComponents->Tree->expandAll();
 }

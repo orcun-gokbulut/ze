@@ -41,6 +41,7 @@ ZEMLItem::ZEMLItem()
 	Type = (ZEUInt8)ZEML_IT_UNDEFINED;
 	DataSize = 0;
 	Parent = NULL;
+	FilePosition = 0;
 }
 
 ZEMLItem::~ZEMLItem()
@@ -56,6 +57,11 @@ void ZEMLItem::SetType(ZEMLItemType Type)
 ZEMLItemType ZEMLItem::GetType() const
 {
 	return (ZEMLItemType)Type;
+}
+
+ZEUInt64 ZEMLItem::GetFilePosition()
+{
+	return FilePosition;
 }
 
 void ZEMLItem::SetName(const ZEString& Name)

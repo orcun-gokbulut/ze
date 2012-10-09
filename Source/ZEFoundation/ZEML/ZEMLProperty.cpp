@@ -242,6 +242,8 @@ void ZEMLProperty::WriteToFile(ZEFile* File)
 
 void ZEMLProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 {
+	FilePosition = File->Tell();
+
 	char		Identifier;	
 	ZEUInt8		NameSize;
 	char		TempNameBuffer[ZEML_MAX_NAME_SIZE];	
