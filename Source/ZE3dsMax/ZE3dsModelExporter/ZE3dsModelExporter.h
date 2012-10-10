@@ -100,7 +100,7 @@ class ZE3dsModelExporter : public SceneExport
 		bool						ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* MeshLODNode);
 		void						ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* ShapeNode);
 		bool						ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* PhysicalShapeNode);
-		bool						ProcessPhysicalBody(IGameNode* Node, ZEMLNode* PhysicalBodyNode);
+		void						ProcessPhysicalBody(IGameNode* Node, ZEMLNode* ParentNode);
 		bool						ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* PhysicalJointNode);
 		bool						ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesNode);
 		bool						ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNode);

@@ -75,6 +75,14 @@ enum ZEPropType //Do not change order
 	ZE_BOOL_PROP			= 6
 };
 
+enum ZEPhysicalBodyType
+{
+	ZE_PBT_NONE				= 0,
+	ZE_PBT_RIGID			= 1,
+	ZE_PBT_DEFORMABLE		= 2,
+	ZE_PBT_CLOTH			= 3
+};
+
 enum ZEPhysicalShapeType
 {
 	ZE_PBST_BOX				= 0,
@@ -866,62 +874,83 @@ bool ZE3dsModelExporter::ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerN
 	return true;
 }
 
-bool ZE3dsModelExporter::ProcessPhysicalBody(IGameNode* Node, ZEMLNode* PhysicalBodyNode)
+void ZE3dsModelExporter::ProcessPhysicalBody(IGameNode* Node, ZEMLNode* ParentNode)
 {
 	IGameObject* Object = Node->GetIGameObject();
 
 	if (Object == NULL)
-		return false;
-
-	zeLog("Processing physical body of \"%s\"", Node->GetName());
-
-	GetProperty(Object, ZE_BOOL_PROP, "PhysicalBody_Enabled", *PhysicalBodyNode->AddProperty("Enabled"));
+		return;
 
 	ZEInt PhysicalBodyTypeValue;
 	GetProperty(Object, ZE_INT_PROP, "PhysicalBody_Type", PhysicalBodyTypeValue);
 	PhysicalBodyTypeValue--; // Array index start problem with Max Script and C++)
-	PhysicalBodyNode->AddProperty("Type", PhysicalBodyTypeValue);
 
-	GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_Mass", *PhysicalBodyNode->AddProperty("Mass"));
+	ZEPhysicalBodyType PhysicalBodyType = (ZEPhysicalBodyType)PhysicalBodyTypeValue;
 
-	IGameNode* MassCenter = NULL;
-	GetProperty(Object, "PhysicalBody_CenterOfMass", MassCenter);
-
-	if (MassCenter == NULL)
-		PhysicalBodyNode->AddProperty("MassCenter", ZEVector3::Zero);
-	else
-		PhysicalBodyNode->AddProperty("MassCenter", MAX_TO_ZE(MassCenter->GetObjectTM().Translation() - Node->GetObjectTM().Translation()));
-
-	GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_LinearDamping", *PhysicalBodyNode->AddProperty("LinearDamping"));
-	GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_AngularDamping", *PhysicalBodyNode->AddProperty("AngularDamping"));
-
-	IGameProperty* ShapesProp = Object->GetIPropertyContainer()->QueryProperty("PhysicalBody_Shapes");
-	if (ShapesProp == NULL)
+	if (PhysicalBodyType == ZE_PBT_NONE)
 	{
-		zeError("Missing property \"PhysicalShapes\" in ZEBoneAttribute. Node Name : \"%s\"", Node->GetName());
-		return false;
+		zeWarning("No physical body found to export. Node Name : \"%s\"", Node->GetName());
+		return;
 	}
-
-	ZEMLNode* PhysicalShapesNode = PhysicalBodyNode->AddSubNode("PhysicalShapes");
-	IParamBlock2* ParamBlock = ShapesProp->GetMaxParamBlock2();
-	ZEInt ParamId = ParamBlock->IndextoID(ShapesProp->GetParamBlockIndex());
-
-	for (ZESize I = 0; I < (ZESize)ParamBlock->Count(ParamId); I++)
+	else if (PhysicalBodyType == ZE_PBT_RIGID)
 	{
-		const char* Type;
-		IGameNode* PhysicalShapeNode = Scene->GetIGameNode(ParamBlock->GetINode(ParamId, 0, (ZEInt)I));
-		if (PhysicalShapeNode == NULL || !GetProperty(PhysicalShapeNode->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type) || strcmp(Type, "PhysicalShape") != 0)
+		zeLog("Processing physical body of \"%s\"", Node->GetName());
+
+		ZEMLNode* PhysicalBodyNode = ParentNode->AddSubNode("PhysicalBody");
+
+		GetProperty(Object, ZE_BOOL_PROP, "PhysicalBody_Enabled", *PhysicalBodyNode->AddProperty("Enabled"));
+
+		ZEInt PhysicalBodyTypeValue;
+		GetProperty(Object, ZE_INT_PROP, "PhysicalBody_Type", PhysicalBodyTypeValue);
+		PhysicalBodyTypeValue--; // Array index start problem with Max Script and C++)
+		PhysicalBodyNode->AddProperty("Type", PhysicalBodyTypeValue);
+
+		GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_Mass", *PhysicalBodyNode->AddProperty("Mass"));
+
+		IGameNode* MassCenter = NULL;
+		GetProperty(Object, "PhysicalBody_CenterOfMass", MassCenter);
+
+		if (MassCenter == NULL)
+			PhysicalBodyNode->AddProperty("MassCenter", ZEVector3::Zero);
+		else
+			PhysicalBodyNode->AddProperty("MassCenter", MAX_TO_ZE(MassCenter->GetObjectTM().Translation() - Node->GetObjectTM().Translation()));
+
+		GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_LinearDamping", *PhysicalBodyNode->AddProperty("LinearDamping"));
+		GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_AngularDamping", *PhysicalBodyNode->AddProperty("AngularDamping"));
+
+		IGameProperty* ShapesProp = Object->GetIPropertyContainer()->QueryProperty("PhysicalBody_Shapes");
+		if (ShapesProp == NULL)
 		{
-			zeError("Physical body shape is not a valid ZEPhysicalShapeAttribute. Array Index : %d, Shape Name : \"%s\".", I, (PhysicalShapeNode != NULL ? PhysicalShapeNode->GetName() : "NULL"));
-			return false;
+			zeError("Missing property \"PhysicalShapes\" in ZEAttribute. Node Name : \"%s\"", Node->GetName());
+			return;
 		}
 
-		ProcessPhysicalShape(PhysicalShapeNode, Node, PhysicalShapesNode->AddSubNode("PhysicalShape"));
+		ZEMLNode* PhysicalShapesNode = PhysicalBodyNode->AddSubNode("PhysicalShapes");
+		IParamBlock2* ParamBlock = ShapesProp->GetMaxParamBlock2();
+		ZEInt ParamId = ParamBlock->IndextoID(ShapesProp->GetParamBlockIndex());
+
+		for (ZESize I = 0; I < (ZESize)ParamBlock->Count(ParamId); I++)
+		{
+			const char* Type;
+			IGameNode* PhysicalShapeNode = Scene->GetIGameNode(ParamBlock->GetINode(ParamId, 0, (ZEInt)I));
+			if (PhysicalShapeNode == NULL || !GetProperty(PhysicalShapeNode->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type) || strcmp(Type, "PhysicalShape") != 0)
+			{
+				zeError("Physical body shape is not a valid ZEPhysicalShapeAttribute. Array Index : %d, Shape Name : \"%s\".", I, (PhysicalShapeNode != NULL ? PhysicalShapeNode->GetName() : "NULL"));
+				return;
+			}
+
+			ProcessPhysicalShape(PhysicalShapeNode, Node, PhysicalShapesNode->AddSubNode("PhysicalShape"));
+		}
+
+		zeLog("Physical body is processed successfully.");
+
+		return;
 	}
-
-	zeLog("Physical body is processed successfully.");
-
-	return true;
+	else
+	{
+		zeWarning("Physical body type not supported. Node Name \"%s\"", ParentNode->GetName());
+		return;
+	}
 }
 
 bool ZE3dsModelExporter::ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* PhysicalJointNode)
@@ -1149,7 +1178,7 @@ bool ZE3dsModelExporter::ProcessBone(IGameNode* Node, ZEMLNode* BonesNode)
 	bool IsBonePhysicalBodyExportEnabled = ((ZEMLProperty*)(ExportOptions->GetProperty("IsBonePhysicalBodyExportEnabled")))->GetValue().GetBoolean();
 
 	if (IsBonePhysicalBodyExportEnabled)
-		ProcessPhysicalBody(Node, BoneNode->AddSubNode("PhysicalBody"));
+		ProcessPhysicalBody(Node, BoneNode);
 
 	zeLog("Bone \"%s\" is processed.", Node->GetName());
 	ZEProgressDialog::GetInstance()->CloseTask();
@@ -1383,7 +1412,7 @@ bool ZE3dsModelExporter::ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesNode
 	bool IsMeshPhysicalBodyExportEnabled = ((ZEMLProperty*)(ExportOptions->GetProperty("IsMeshPhysicalBodyExportEnabled")))->GetValue().GetBoolean();
 
 	if (IsMeshPhysicalBodyExportEnabled)
-		ProcessPhysicalBody(Node, CurrentMeshNode->AddSubNode("PhysicalBody"));
+		ProcessPhysicalBody(Node, CurrentMeshNode);
 
 	ProcessedMeshes.Append(1, &Node);
 
