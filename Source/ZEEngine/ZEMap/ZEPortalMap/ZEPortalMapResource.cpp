@@ -48,6 +48,8 @@
 
 #include <string.h>
 #include "ZEFile/ZEFileInfo.h"
+#include "ZEML/ZEMLSerialReader.h"
+#include "ZEFile/ZEPathUtils.h"
 
 // Reading
 #define ZE_SHADER_SKINTRANSFORM				1
@@ -175,197 +177,251 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEFile* ResourceFile)
 	return true;
 }
 
-bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEFile* ResourceFile, ZEPortalMapResourcePortal* Portal)
-{
-	// Read physical mesh header
-	ZEMapFilePhysicalMeshChunk FilePhysicalMesh;
-	ResourceFile->Read(&FilePhysicalMesh, sizeof(ZEMapFilePhysicalMeshChunk), 1);
-
-	// Check physical mesh chunk identifier
-	if (FilePhysicalMesh.ChunkIdentifier != ZE_MAP_PHYSICAL_MESH_CHUNK)
-	{
-		zeError("Physical mesh chunk's id does not match.");
-		return false;
-	}
-
-	ZEUInt32 ChunkIdentifier = 0;
-
-	// Check physical mesh vertices chunk identifier
-	ResourceFile->Read(&ChunkIdentifier, sizeof(ZEUInt32), 1);
-	if (ChunkIdentifier != ZE_MAP_PHYSICAL_MESH_VERTICES_CHUNK)
-	{
-		zeError("Physical mesh vertices chunk's id does not match.");
-		return false;
-	}
-
-	// Read physical mesh vertices
-	Portal->PhysicalMesh.Vertices.SetCount((ZESize)FilePhysicalMesh.VertexCount);
-	ResourceFile->Read(Portal->PhysicalMesh.Vertices.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygonChunk), Portal->PhysicalMesh.Vertices.GetCount());
-
-
-	// Check physical mesh polygons chunk identifier
-	ResourceFile->Read(&ChunkIdentifier, sizeof(ZEUInt32), 1);
-	if (ChunkIdentifier != ZE_MAP_PHYSICAL_MESH_POLYGONS_CHUNK)
-	{
-		zeError("Physical mesh polygons chunk's id does not match.");
-		return false;
-	}
-
-	// Read physical mesh polygons
-	Portal->PhysicalMesh.Polygons.SetCount((ZESize)FilePhysicalMesh.PolygonCount);
-	for (ZESize I = 0; I < (ZESize)FilePhysicalMesh.PolygonCount; I++)
-	{
-		ZEMapFilePhysicalMeshPolygonChunk Chunk;
-		ResourceFile->Read(&Chunk, sizeof(ZEMapFilePhysicalMeshPolygonChunk), 1);
-		Portal->PhysicalMesh.Polygons[I].Indices[0] = Chunk.Indices[0];
-		Portal->PhysicalMesh.Polygons[I].Indices[1] = Chunk.Indices[1];
-		Portal->PhysicalMesh.Polygons[I].Indices[2] = Chunk.Indices[2];
-	}
-
-	return true;
-}
-
-bool ZEPortalMapResource::ReadPortalsFromFile(ZEFile* ResourceFile)
-{
-	ZEMapFilePortalChunk FilePortal;
-
-	for (ZESize I = 0; I < Portals.GetCount(); I++)
-	{
-		ZEPortalMapResourcePortal* Portal = &Portals[I];
-
-		ResourceFile->Read(&FilePortal, sizeof(ZEMapFilePortalChunk), 1);
-
-		if (FilePortal.ChunkIdentifier != ZE_MAP_PORTAL_CHUNK)
-		{
-			zeError("Portal chunk's id does not match.");
-			return false;
-		}
-
-		strncpy(Portal->Name, FilePortal.Name, ZE_MAP_MAX_NAME_SIZE);
-		Portal->BoundingBox = FilePortal.BoundingBox;
-		Portal->Polygons.SetCount((ZESize)FilePortal.PolygonCount);
-		Portal->HasPhysicalMesh = FilePortal.HasPhysicalMesh;
-		Portal->HasOctree = FilePortal.HasOctree;
-//		Portal->Octree = NULL;
-
-
-		// Read Octree
-		if (FilePortal.HasOctree)
-		{
-			zeError("Octree is not supported.");
-			return false;
-			/*if (!ReadOctreeFromFile(ResourceFile, &Portal->Octree, Materials))
-				return false;*/
-		}
-		else
-		{
-			// Read chunk identifier and check it
-			ZEUInt32 ChunkIdentifier = 0;
-			ResourceFile->Read(&ChunkIdentifier, sizeof(ZEUInt32), 1);
-			if (ChunkIdentifier != ZE_MAP_POLYGONS_CHUNK)
-			{
-				zeError("Polygons chunk's id does not match.");
-				return false;
-			}
-
-			// Read polygons from file
-			ZEArray<ZEMapFilePolygonChunk> MapPolygons;
-			MapPolygons.SetCount((ZESize)FilePortal.PolygonCount);
-			ResourceFile->Read(MapPolygons.GetCArray(), sizeof(ZEMapFilePolygonChunk), MapPolygons.GetCount());
-			for (ZESize I = 0; I < Portal->Polygons.GetCount(); I++)
-			{
-				Portal->Polygons[I].LastIteration	= 0;
-				Portal->Polygons[I].Material			= Materials[(ZESize)MapPolygons[I].Material];
-				
-				Portal->Polygons[I].Vertices[0]		= *(ZEMapVertex*)&MapPolygons[I].Vertices[0];
-				Portal->Polygons[I].Vertices[1]		= *(ZEMapVertex*)&MapPolygons[I].Vertices[1];
-				Portal->Polygons[I].Vertices[2]		= *(ZEMapVertex*)&MapPolygons[I].Vertices[2];
-			}
-		}
-
-		// Read Physical Mesh
-		if (FilePortal.HasPhysicalMesh)
-			if (!ReadPhysicalMeshFromFile(ResourceFile, Portal))
-				return false;
-	}
-	return true;
-}
-
-bool ZEPortalMapResource::ReadDoorsFromFile(ZEFile* ResourceFile)
+bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
 { 
-	for (ZESize I = 0; I < Doors.GetCount(); I++)
+	ZEMLSerialReader Reader(ResourceFile);
+
+	if(!Reader.Read())
 	{
-		ZEPortalMapResourceDoor* Door = &Doors[I];
-		
-		ZEMapFileDoorChunk FileDoor;
-		ResourceFile->Read(&FileDoor, sizeof(ZEMapFileDoorChunk), 1);
+		zeError("Can not read map file.");
+		return false;
+	}
 
-		if (FileDoor.ChunkIdentifier != ZE_MAP_PORTAL_DOOR_CHUNK)
-		{
-			zeError("Portal chunk's id does not match.");
-			return false;
-		}
+	if(Reader.GetItemName() != ZEString("ZEMap"))
+	{
+		zeError("Resource file is not a map file, file name : %s", ResourceFile->GetPath());
+		return false;
+	}
 
-		strncpy(Door->Name, FileDoor.Name, ZE_MAX_NAME_SIZE);
-		Door->Rectangle = FileDoor.Rectangle;
-		Door->IsOpen = FileDoor.IsOpen;
+	ZEMLSerialPointer PortalsPointer, DoorsPointer, MaterialsPointer;
+	ZEVariant DoorCount, PortalCount, MaterialCount;
 
-		Door->PortalIds[0] = FileDoor.PortalIds[0];
+	ZEMLSerialListItem MapList[] = {
+		ZEML_LIST_NODE("Portals",			PortalsPointer,		true),
+		ZEML_LIST_NODE("Doors",				DoorsPointer,		true),
+		ZEML_LIST_NODE("Materials",			MaterialsPointer,	true),
+		ZEML_LIST_PROPERTY("DoorCount",		DoorCount,			true),
+		ZEML_LIST_PROPERTY("PortalCount",	PortalCount,		true),
+		ZEML_LIST_PROPERTY("MaterialCount", MaterialCount,		true)
+	};
+
+	if(!Reader.ReadPropertyList(MapList, 6))
+	{
+		zeError("Can not read map from file.");
+		return false;
+	}
+
+	Doors.SetCount(DoorCount.GetUInt32());
+	Portals.SetCount(PortalCount.GetUInt32());
+	Materials.SetCount(MaterialCount.GetUInt32());
+
+	Reader.SeekPointer(MaterialsPointer);
+	if(!ReadMaterials(&Reader))
+	{
+		zeError("Can not read materials from file.");
+		return false;
+	}
+
+	Reader.SeekPointer(PortalsPointer);
+	if(!ReadPortals(&Reader))
+	{
+		zeError("Can not read portals from file.");
+		return false;
+	}
+
+	Reader.SeekPointer(DoorsPointer);
+	if(!ReadPortalDoors(&Reader))
+	{
+		zeError("Can not read portal doors from file.");
+		return false;
+	}
+
+	Reader.GoToCurrentPointer();
+
+	return true;
+}
+
+bool ZEPortalMapResource::ReadPortalDoors(ZEMLSerialReader* Reader)
+{
+	ZEUInt32 DoorCounter = 0;
+
+	while(Reader->Read())
+	{
+		if(Reader->GetItemName() != "Door")
+			break;
+
+		ZEVariant DoorName, IsOpen, PortalAIndex, PortalBIndex, Point1, Point2, Point3, Point4;
+		ZEMLSerialPointer RectanglePointer;
+
+		ZEMLSerialListItem DoorPropertiesList[] = { 
+			ZEML_LIST_PROPERTY("Name",			DoorName,			true),  
+			ZEML_LIST_PROPERTY("IsOpen",		IsOpen,				true),
+			ZEML_LIST_PROPERTY("PortalAIndex",	PortalAIndex,		true),  
+			ZEML_LIST_PROPERTY("PortalBIndex",	PortalBIndex,		true),
+			ZEML_LIST_NODE("Rectangle",			RectanglePointer,	true)
+		};
+
+		Reader->ReadPropertyList(DoorPropertiesList, 5);
+
+		ZEMLSerialListItem RectangleList[] = { 
+			ZEML_LIST_PROPERTY("Point1", Point1, true),  
+			ZEML_LIST_PROPERTY("Point2", Point2, true),
+			ZEML_LIST_PROPERTY("Point3", Point3, true),  
+			ZEML_LIST_PROPERTY("Point4", Point4, true),
+		};
+
+		Reader->SeekPointer(RectanglePointer);
+		Reader->ReadPropertyList(RectangleList, 4);
+
+		ZEPortalMapResourceDoor* Door = &Doors[DoorCounter];
+
+		strncpy(Door->Name, DoorName.GetString().ToCString(), ZE_MAX_NAME_SIZE);
+		Door->IsOpen = IsOpen.GetBoolean();
+
+		Door->Rectangle.P1 = Point1.GetVector3();
+		Door->Rectangle.P2 = Point2.GetVector3();
+		Door->Rectangle.P3 = Point3.GetVector3();
+		Door->Rectangle.P4 = Point4.GetVector3();
+
+		Door->PortalIds[0] = PortalAIndex.GetUInt32();
 		Door->Portals[0] = &Portals[(ZESize)Door->PortalIds[0]];
-		Door->Portals[0]->DoorIds.Add(I);
+		Door->Portals[0]->DoorIds.Add(DoorCounter);
 		Door->Portals[0]->Doors.Add(Door);
 
-		Door->PortalIds[1] = FileDoor.PortalIds[1];
+		Door->PortalIds[1] = PortalBIndex.GetUInt32();
 		Door->Portals[1] = &Portals[(ZESize)Door->PortalIds[1]];
-		Door->Portals[1]->DoorIds.Add(I);
+		Door->Portals[1]->DoorIds.Add(DoorCounter);
 		Door->Portals[1]->Doors.Add(Door);
+
+		DoorCounter++;
 	}
+
+	Reader->GoToCurrentPointer();
 
 	return true;
 }
 
-bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
+bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
 {
-	zeLog("Loading map file \"%s\".", ResourceFile->GetPath().GetValue());
+	ZEUInt32 PortalCounter = 0;
 
-	ZEMapFileHeader TempHeader;
-	ResourceFile->Read(&TempHeader, sizeof(ZEMapFileHeader), 1);
-
-	if(TempHeader.Header!= ZE_MAP_HEADER)
+	while(Reader->Read())
 	{
-		zeError("Unknown ZEMap file format. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
-		return false;
-	}
-	
-	if(TempHeader.Version != ZE_MAP_VERSION)
-	{	
-		zeError("ZEMap file version mismatched. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
-		return false;
+		if(Reader->GetItemName() != "Portal")
+			break;
+
+		ZEVariant PortalName, PhysicalMeshEnabled;
+		ZEMLSerialPointer PolygonsPointer, PhysicalMeshPointer;
+
+		ZEMLSerialListItem PortalPropertiesList[] = {
+			ZEML_LIST_PROPERTY("Name",					PortalName,				true),
+			ZEML_LIST_DATA("Polygons",					PolygonsPointer,		true),
+			ZEML_LIST_NODE("PhysicalMesh",				PhysicalMeshPointer,	false)
+		};
+
+		Reader->ReadPropertyList(PortalPropertiesList, 3);
+		Reader->SeekPointer(PolygonsPointer);
+
+		ZEPortalMapResourcePortal* Portal = &Portals[PortalCounter];
+		strncpy(Portal->Name, PortalName.GetString().ToCString(), ZE_MAX_NAME_SIZE);
+
+		ZEArray<ZEMapFilePolygonChunk> MapPolygons;
+		MapPolygons.SetCount(Reader->GetDataSize() / sizeof(ZEMapFilePolygonChunk));
+		Reader->GetData(MapPolygons.GetCArray(), Reader->GetDataSize());
+		Portal->Polygons.SetCount(MapPolygons.GetCount());
+
+		for (ZESize I = 0; I < Portal->Polygons.GetCount(); I++)
+		{
+			Portal->Polygons[I].LastIteration	= 0;
+			Portal->Polygons[I].Material			= Materials[(ZESize)MapPolygons[I].Material];
+			Portal->Polygons[I].Vertices[0]		= *(ZEMapVertex*)&MapPolygons[I].Vertices[0];
+			Portal->Polygons[I].Vertices[1]		= *(ZEMapVertex*)&MapPolygons[I].Vertices[1];
+			Portal->Polygons[I].Vertices[2]		= *(ZEMapVertex*)&MapPolygons[I].Vertices[2];
+		}
+
+		ZEAABBox BoundingBox(ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX), ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
+
+		for (ZESize I = 0; I < Portal->Polygons.GetCount(); I++)
+		{
+			for (ZESize J = 0; J < 3; J++)
+			{
+				ZEVector3 Vertex = Portal->Polygons[I].Vertices[J].Position;
+
+				if (Vertex.x < BoundingBox.Min.x) BoundingBox.Min.x = Vertex.x;
+				if (Vertex.y < BoundingBox.Min.y) BoundingBox.Min.y = Vertex.y;
+				if (Vertex.z < BoundingBox.Min.z) BoundingBox.Min.z = Vertex.z;
+
+				if (Vertex.x > BoundingBox.Max.x) BoundingBox.Max.x = Vertex.x;
+				if (Vertex.y > BoundingBox.Max.y) BoundingBox.Max.y = Vertex.y;
+				if (Vertex.z > BoundingBox.Max.z) BoundingBox.Max.z = Vertex.z;
+			}
+		}
+
+		Portal->BoundingBox = BoundingBox;
+
+		if(PhysicalMeshPointer != -1)
+		{
+			ZEMLSerialPointer PhysicalVerticesPointer, PhysicalPolygonsPointer;
+
+			Reader->SeekPointer(PhysicalMeshPointer);
+
+			ZEMLSerialListItem PhysicalMeshList[] = {
+				ZEML_LIST_DATA("Polygons", PhysicalPolygonsPointer, true),
+				ZEML_LIST_DATA("Vertices", PhysicalVerticesPointer, true)
+			};
+
+			Reader->ReadPropertyList(PhysicalMeshList, 2);
+			Reader->SeekPointer(PhysicalVerticesPointer);
+			Reader->Read();
+			Portal->PhysicalMesh.Vertices.SetCount(Reader->GetDataSize() / sizeof(ZEVector3));
+			Reader->GetData(Portal->PhysicalMesh.Vertices.GetCArray(), Reader->GetDataSize());
+
+			Reader->SeekPointer(PhysicalPolygonsPointer);
+			Reader->Read();
+			Portal->PhysicalMesh.Polygons.SetCount(Reader->GetDataSize() / sizeof(ZEPortalMapPhysicalMeshPolygon));
+			Reader->GetData(Portal->PhysicalMesh.Polygons.GetCArray(), Reader->GetDataSize());
+		}
+		else
+			zeWarning("Portal %s does not have physical mesh.", PortalName.GetString().ToCString());
+
+		PortalCounter++;
 	}
 
-	Portals.SetCount((ZESize)TempHeader.PortalCount);
-	Doors.SetCount((ZESize)TempHeader.DoorCount);
-	Materials.SetCount((ZESize)TempHeader.MaterialCount);
+	Reader->GoToCurrentPointer();
 
-	if (!ReadMaterialsFromFile(ResourceFile))
+	return true;
+}
+
+bool ZEPortalMapResource::ReadMaterials(ZEMLSerialReader* Reader)
+{
+	for(ZESize I = 0; I < Materials.GetCount(); I++)
+		Materials[I] = ZEFixedMaterial::CreateInstance();
+
+	ZEUInt32 MaterialCounter = 0;
+
+	while(Reader->Read())
 	{
-		zeError("File is corrupted. Can not read materials from file. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
-		return false;
+		if(Reader->GetItemName() != "Material")
+			break;
+
+		ZEVariant MaterialName, MaterialRelativePath;
+
+		ZEMLSerialListItem MaterialList[] = {
+			ZEML_LIST_PROPERTY("Name", MaterialName, true),
+			ZEML_LIST_PROPERTY("FilePath", MaterialRelativePath, true)
+		};
+
+		Reader->ReadPropertyList(MaterialList, 2);
+		
+		ZEString MaterialPath = ZEFileInfo::GetParentDirectory(GetFileName()) + ZEPathUtils::GetSeperator() + MaterialRelativePath.GetString();
+
+		ZEFixedMaterial* CurrentMaterial = (ZEFixedMaterial*)Materials[MaterialCounter];
+		CurrentMaterial->ReadFromFile(MaterialPath);
+
+		MaterialCounter++;
 	}
 
-	if (!ReadPortalsFromFile(ResourceFile))
-	{
-		zeError("File is corrupted. Can not read portals from file. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
-		return false;
-	}
-
-	if (!ReadDoorsFromFile(ResourceFile))
-	{
-		zeError("File is corrupted. Can not read doors from file. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
-		return false;
-	}
-
-	zeLog("Map file \"%s\" has been loaded.", ResourceFile->GetPath().GetValue());
+	Reader->GoToCurrentPointer();
 
 	return true;
 }
@@ -441,6 +497,8 @@ void ZEPortalMapResource::CacheResource(const ZEString& FileName)
 			zeResources->AddResource(Resource);
 		}
 	}
+
+	Resource->SetFileName(FileName);
 }
 
 ZEPortalMapResource* ZEPortalMapResource::LoadResource(const ZEString& FileName)

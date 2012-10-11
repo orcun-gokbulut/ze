@@ -40,8 +40,8 @@
 ZEMLSerialReader::ZEMLSerialReader(ZEFile* File)
 {
 	this->File = File;
-	NextItemPosition = 0;
-	CurrentPointer = 0;
+	MaxPointer = 0;
+	DataItemDataPointer = 0;
 }
 
 bool ZEMLSerialReader::Read()
@@ -54,10 +54,8 @@ bool ZEMLSerialReader::Read()
 	CurrentItemDataSize		= 0;
 	CurrentItemSubItemCount = 0;
 
-	if(NextItemPosition >= File->Tell())
-		CurrentPointer = NextItemPosition;
-
-	File->Seek(NextItemPosition, ZE_SF_BEGINING);
+	if(MaxPointer < File->Tell())
+		MaxPointer = File->Tell();
 
 	char Identifier;	
 	if(File->Read(&Identifier, sizeof(char), 1) != 1)
@@ -69,41 +67,63 @@ bool ZEMLSerialReader::Read()
 	}
 
 	if(Identifier != ZEML_ITEM_FILE_IDENTIFIER)
-		zeError("Identifier missmatch. Corrupted ZEML file.");
+	{
+		zeError("Identifier mismatch. Corrupted ZEML file.");
+		return false;
+	}
 
 	if(File->Read(&CurrentItemType, sizeof(ZEUInt8), 1) != 1)
+	{
 		zeError("Can not read ZEMLItem type from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	ZEUInt8 NameSize = 0;
 	if(File->Read(&NameSize, sizeof(ZEUInt8), 1) != 1)
+	{
 		zeError("Can not read ZEMLItem name size from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	char TempNameBuffer[ZEML_MAX_NAME_SIZE];
 	if(File->Read(TempNameBuffer, NameSize, 1) != 1)
+	{
 		zeError("Can not read ZEMLItem name from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	CurrentItemName = TempNameBuffer;
 
 	if(CurrentItemType == ZEML_IT_NODE)
 	{
 		if(File->Read(&CurrentItemSubItemCount, sizeof(ZEUInt64), 1) != 1)
+		{
 			zeError("Can not read ZEMLNode subitem count from file. Corrupted ZEML file.");
+			return false;
+		}
 
 		CurrentItemSubItemCount = ZEEndian::Little(CurrentItemSubItemCount);
 
 		if(File->Read(&CurrentItemDataSize, sizeof(ZEUInt64), 1) != 1)
+		{
 			zeError("Can not read ZEMLNode size from file. Corrupted ZEML file.");
+			return false;
+		}
 
-		NextItemPosition = File->Tell();
+		return true;
 	}
 	else if(CurrentItemType == ZEML_IT_INLINE_DATA)
 	{
 		if(File->Read(&CurrentItemDataSize, sizeof(ZEUInt64), 1) != 1)
+		{
 			zeError("Can not read ZEMLDataProperty data size from file. Corrupted ZEML file.");
+			return false;
+		}
 
 		CurrentItemDataSize = ZEEndian::Little(CurrentItemDataSize);
+		DataItemDataPointer = File->Tell();
 
-		NextItemPosition = File->Tell() + CurrentItemDataSize;
+		return true;
 	}
 	else
 	{
@@ -111,7 +131,10 @@ bool ZEMLSerialReader::Read()
 		ZEUInt64 ValueSize = 0;
 
 		if(File->Read(&ValueSize, sizeof(ZEUInt64), 1) != 1)
+		{
 			zeError("Can not read ZEMLProperty value size from file. Corrupted ZEML file.");
+			return false;
+		}
 
 		ValueSize = ZEEndian::Little(ValueSize);
 
@@ -220,20 +243,21 @@ bool ZEMLSerialReader::Read()
 				break;
 			default:
 				zeError("Unsupported ZEMLProperty type.");
+				return false;
 				break;
 		}
 
 		if(IsDataRead != 1)
 			zeError("Can not read ZEMLProperty value from file. Corrupted ZEML file.");
 
-		NextItemPosition = File->Tell();
+		return true;
 	}
 }
 
 bool ZEMLSerialReader::SkipNodeAndRead()
 {
 	if(CurrentItemType == ZEML_IT_NODE)
-		NextItemPosition = File->Tell() +  CurrentItemDataSize;
+		File->Seek(CurrentItemDataSize, ZE_SF_CURRENT);
 
 	return Read();
 }
@@ -268,6 +292,8 @@ bool ZEMLSerialReader::GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offse
 	if(CurrentItemType != ZEML_IT_INLINE_DATA)
 		return false;
 
+	File->Seek(DataItemDataPointer, ZE_SF_BEGINING);
+
 	if(File->Seek(Offset, ZE_SF_CURRENT))
 	{
 		zeError("Can not seek ZEML file.");
@@ -285,18 +311,18 @@ bool ZEMLSerialReader::GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offse
 
 void ZEMLSerialReader::SeekPointer(ZEMLSerialPointer Pointer)
 {
-	NextItemPosition = Pointer;
+	File->Seek(Pointer, ZE_SF_BEGINING);
 	Read();
 }
 
 ZEMLSerialPointer ZEMLSerialReader::GetCurrentPointer()
 {
-	return CurrentPointer;
+	return MaxPointer;
 }
 
 void ZEMLSerialReader::GoToCurrentPointer()
 {
-	SeekPointer(CurrentPointer);
+	SeekPointer(MaxPointer);
 }
 
 bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCount)

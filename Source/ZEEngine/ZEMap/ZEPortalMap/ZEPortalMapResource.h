@@ -51,12 +51,13 @@ class ZEMaterial;
 class ZETexture2D;
 class ZETexture2DResource;
 struct ZEPortalMapResourceDoor;
+class ZEMLSerialReader;
 
 struct ZEPortalMapPolygon
 {
 	ZEMapVertex				Vertices[3];
 	ZEMaterial*				Material;
-	ZEUInt					LastIteration;
+	ZEUInt32				LastIteration;
 };
 
 struct ZEPortalMapPhysicalMeshPolygon
@@ -102,11 +103,12 @@ class ZEPortalMapResource : public ZEMapResource
 		ZEArray<ZEPortalMapResourceDoor>			Doors;
 		ZEArray<ZEPortalMapResourcePortal>			Portals;
 
+		bool										ReadPortalDoors(ZEMLSerialReader* Reader);
+		bool										ReadPortals(ZEMLSerialReader* Reader);
+		bool										ReadMaterials(ZEMLSerialReader* Reader);
+
 		const ZETexture2D*							ManageMapMaterialTextures(const ZEString& FileName);
 		bool  										ReadMaterialsFromFile(ZEFile* ResourceFile);
-		bool  										ReadPhysicalMeshFromFile(ZEFile* ResourceFile, ZEPortalMapResourcePortal* Portal);
-		bool  										ReadPortalsFromFile(ZEFile* ResourceFile);
-		bool  										ReadDoorsFromFile(ZEFile* ResourceFile);
 		bool  										ReadMapFromFile(ZEFile* ResourceFile);
 
 		virtual										~ZEPortalMapResource();

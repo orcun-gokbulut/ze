@@ -140,7 +140,11 @@ bool GetProperty<bool>(IExportEntity* Object, PropType Type, const char* Propert
 	{
 		if (Prop->GetPropertyValue(Temp))
 		{
-			Value = Temp == 0;
+			if(Temp == 0)
+				Value = false;
+			else
+				Value = true;
+
 			return true;
 		}
 		else
@@ -244,6 +248,7 @@ bool ZE3dsMapExporter::ProcessDoors()
 	INode* PortalBNode;
 	bool IsOpen;
 	float PlaneWidth, PlaneLength;
+
 	for (ZESize I = 0; I < (ZESize)Doors.Count(); I++)
 	{
 		ZEMLNode* DoorNode = DoorsNode->AddSubNode("Door");
@@ -277,6 +282,7 @@ bool ZE3dsMapExporter::ProcessDoors()
 		DoorNode->AddProperty("PortalBIndex", PortalBIndex);
 	
 		ZEVector3 Point1, Point2, Point3, Point4;
+
 		GMatrix Matrix = CurrentNode->GetObjectTM();
 		ZEMatrix4x4 WorldMatrix;
 		ZEMatrix4x4::Transpose(WorldMatrix, *((ZEMatrix4x4*)&Matrix));
@@ -331,6 +337,7 @@ bool ZE3dsMapExporter::ProcessPortals()
 	zeLog("Processing portals...");
 
 	ZEMLNode* PortalsNode = MapNode.AddSubNode("Portals");
+
 	for (ZESize I = 0; I < (ZESize)Portals.Count(); I++)
 	{
 		ZEMLNode* PortalNode = PortalsNode->AddSubNode("Portal");
@@ -346,16 +353,15 @@ bool ZE3dsMapExporter::ProcessPortals()
 		PortalNode->AddProperty("Name", CurrentNode->GetName());
 		GetProperty(CurrentObject, IGAME_INT_PROP, "PhysicalMeshEnabled", PhysicalMeshEnabled);
 		GetProperty(CurrentObject, IGAME_INT_PROP, "PhysicalMeshUseSelf", PhysicalMeshUseSelf);
-		PortalNode->AddProperty("PhysicalMeshUseSelf", PhysicalMeshUseSelf);
 		GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PhysicalMesh", PhysicalMeshMaxNode);
-		
-		ZEMLNode* PhysicalMeshZEMLNode = PortalNode->AddSubNode("PhysicalMesh");
 
 		// Load physical mesh
-		if (PhysicalMeshEnabled)
+		if(PhysicalMeshEnabled)
 		{
 			if (PhysicalMeshUseSelf)
 			{
+				ZEMLNode* PhysicalMeshZEMLNode = PortalNode->AddSubNode("PhysicalMesh");
+				PhysicalMeshZEMLNode->AddProperty("PhysicalMeshEnabled", PhysicalMeshEnabled);
 				ProcessPhysicalMesh(CurrentObject, PhysicalMeshZEMLNode);
 			}
 			else
@@ -367,11 +373,13 @@ bool ZE3dsMapExporter::ProcessPortals()
 					PhysicalMeshEnabled = false;
 				}
 				else
+				{
+					ZEMLNode* PhysicalMeshZEMLNode = PortalNode->AddSubNode("PhysicalMesh");
+					PhysicalMeshZEMLNode->AddProperty("PhysicalMeshEnabled", PhysicalMeshEnabled);
 					ProcessPhysicalMesh(PhysicalMeshNode->GetIGameObject(), PhysicalMeshZEMLNode);
+				}
 			}
 		}
-
-		PortalNode->AddProperty("PhysicalMeshEnabled", PhysicalMeshEnabled);
 
 		// Load geometry
 		IGameMesh* Mesh = (IGameMesh*)CurrentObject;

@@ -179,6 +179,7 @@ void ZEPortalMap::Draw(ZEDrawParameters* DrawParameters)
 	if (!GetVisible())
 		return;
 
+
 	memset(&Statistics, 0, sizeof(ZEPortalMapCullStatistics));
 
 	for (size_t I = 0; I < Portals.GetCount(); I++)

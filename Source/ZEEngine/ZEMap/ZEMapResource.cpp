@@ -38,11 +38,15 @@
 
 ZEMapResource* ZEMapResource::LoadResource(const ZEString& FileName)
 {
-	return ZEPortalMapResource::LoadResource(FileName);
+	ZEPortalMapResource* Resource = ZEPortalMapResource::LoadResource(FileName);
+	Resource->SetFileName(FileName);
+	return Resource;
 }
 const ZEMapResource* ZEMapResource::LoadSharedResource(const ZEString& FileName)
 {
-	return ZEPortalMapResource::LoadSharedResource(FileName);
+	ZEPortalMapResource* Resource = ZEPortalMapResource::LoadSharedResource(FileName);
+	Resource->SetFileName(FileName);
+	return Resource;
 }
 
 void ZEMapResource::CacheResource(const ZEString& FileName)
