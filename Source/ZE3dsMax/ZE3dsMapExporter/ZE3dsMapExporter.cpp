@@ -328,6 +328,10 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	}
 	ProgressDialog->CloseTask();
 		
+	MapNode.AddProperty("DoorCount", (ZEUInt32)Doors.Count());
+	MapNode.AddProperty("PortalCount", (ZEUInt32)Portals.Count());
+	MapNode.AddProperty("MaterialCount", (ZEUInt32)Materials.Count());
+
 	ProgressDialog->OpenTask("Writing File");
 	zeLog("Dumping map to file...");
 	ZEFile ExportFile;

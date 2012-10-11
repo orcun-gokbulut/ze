@@ -67,8 +67,8 @@ class ZEMLSerialReader
 	private:
 
 		ZEFile*				File;
-		ZEMLSerialPointer	CurrentPointer;
-		ZEUInt64			NextItemPosition;
+		ZEMLSerialPointer	DataItemDataPointer;
+		ZEMLSerialPointer	MaxPointer;
 
 		ZEMLItemType		CurrentItemType;
 		ZEVariant			CurrentItemValue;
