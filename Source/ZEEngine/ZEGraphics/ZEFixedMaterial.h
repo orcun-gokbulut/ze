@@ -397,8 +397,8 @@ class ZEFixedMaterial : public ZEMaterial
 
 		void							Tick(float ElapsedTime);
 
-		void							WriteToFile(ZEFile* File);
-		void							ReadFromFile(ZEFile* File);
+		void							WriteToFile(const ZEString& FilePath);
+		void							ReadFromFile(const ZEString& FilePath);
 
 		static ZEFixedMaterial*			CreateInstance();
 };
