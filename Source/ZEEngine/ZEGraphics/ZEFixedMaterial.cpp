@@ -47,6 +47,8 @@
 #include "ZETexture2D.h"
 #include "ZETextureCube.h"
 #include "ZEML/ZEMLProperty.h"
+#include "ZEFile/ZEPathUtils.h"
+#include "ZEFile/ZEFileInfo.h"
 
 ZEFixedMaterial::ZEFixedMaterial()
 {
@@ -1250,8 +1252,12 @@ ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
 	return zeGraphics->CreateFixedMaterial();
 }
 
-void ZEFixedMaterial::WriteToFile(ZEFile* File)
+void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 {
+	ZEFile File;
+	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
+		zeError("Can not open given file. File : %s", FilePath.ToCString());
+
 	ZEObjectDescription* ClassDescription = GetDescription();
 	ZESSize PropertyCount = ClassDescription->GetPropertyCount();
 	const ZEPropertyDescription* Properties = ClassDescription->GetProperties();
@@ -1265,16 +1271,28 @@ void ZEFixedMaterial::WriteToFile(ZEFile* File)
 		RootNode->AddProperty(Properties[I].Name, PropertyValue);
 	}
 
-	RootNode->Write(File);
+	RootNode->Write(&File);
+
+	if(File.IsOpen())
+		File.Close();
+
 	delete RootNode;
 }
 
-void ZEFixedMaterial::ReadFromFile(ZEFile* File)
+void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 {
-	ZEMLNode* RootNode = new ZEMLNode();
-	RootNode->Read(File);
+	ZEFile File;
+	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
+		zeError("Can not open given file. File : %s", FilePath.ToCString());
 
-	ZEArray<ZEMLItem*> Props = RootNode->GetProperties();
+	ZEMLNode* RootNode = new ZEMLNode();
+	RootNode->Read(&File);
+
+	if(File.IsOpen())
+		File.Close();
+
+	ZEArray<ZEMLNode*> ConfigurationsNodes = RootNode->GetSubNodes("Configuration");
+	ZEArray<ZEMLItem*> Props = ConfigurationsNodes[0]->GetProperties();
 	
 	for (ZESize I = 0; I < Props.GetCount(); I++)
 	{
@@ -1283,7 +1301,14 @@ void ZEFixedMaterial::ReadFromFile(ZEFile* File)
 			ZEMLProperty* CurrentProperty = ((ZEMLProperty*)Props[I]);
 
 			if(CurrentProperty->GetValue().GetType() == ZE_VRT_STRING && ZEString(CurrentProperty->GetValue().GetString()).GetLength() != 0)
-				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
+			{
+				if(CurrentProperty->GetName() == "Name")
+					continue;
+
+				ZEString Path = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + CurrentProperty->GetValue().GetString();
+				ZEVariant TempVar(Path);
+				SetProperty(Props[I]->GetName(), TempVar);
+			}
 			else if(CurrentProperty->GetValue().GetType() != ZE_VRT_STRING)
 				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
 		}
