@@ -39,6 +39,7 @@
 #include "ZEProgressDialogTask.h"
 #include "ZEProgresDialogSignalHandler.h"
 #include "ZEProgressDialogTreeWidget.h"
+#include "ZEFile\ZEFile.h"
 
 void LogCallback(const char* Module, ZELogType Type, const char* LogText)
 {
@@ -51,6 +52,7 @@ ZEProgressDialog::ZEProgressDialog()
 {
 	Instance = this;
 	QApplicationCreated = false;
+	LogFile = NULL;
 
 	if(QApplication::instance() == NULL)
 	{
@@ -90,6 +92,16 @@ ZEProgressDialog::~ZEProgressDialog()
 
 	Tasks.Clear();
 
+	if(LogFile != NULL)
+	{
+		if(LogFile->IsOpen())
+		{
+			LogFile->Close();
+			delete LogFile;
+			LogFile = NULL;
+		}
+	}
+
 	ZELog::GetInstance()->SetCallback(OldLogCallBack);
 	ZEError::GetInstance()->SetCallback(OldErrorCallback);
 	Instance = NULL;
@@ -99,7 +111,6 @@ ZEProgressDialog::~ZEProgressDialog()
 	TasksTreeWidget = NULL;
 
 	Dialog->hide();
-//	delete Dialog;
 	Dialog = NULL;
 
 	delete SignalHandler;
@@ -217,6 +228,23 @@ void ZEProgressDialog::Message(ZELogType Type, const char* Text)
 	TextCursor.insertBlock(BlockFormat);
 	QTextCharFormat CharFormat;
 	TextCursor.insertText(Text, CharFormat);
+
+	if(LogFile == NULL && IsFileLoggingEnabled == true)
+		LogFile = new ZEFile();
+
+	if(LogFile != NULL)
+	{
+		if(LogFile->IsOpen() == false)
+			LogFile->Open(LogFilePath, ZE_FOM_WRITE, ZE_FCM_OVERWRITE);
+
+		if(LogFile->IsOpen())
+		{
+			ZEString LogMessage;
+			LogMessage = Text;
+			LogMessage = "\n" + LogMessage;
+			LogFile->Write(LogMessage.ToCString(), LogMessage.GetLength(), 1);
+		}
+	}
 }
 
 ZEProgressDialog* ZEProgressDialog::GetInstance()
@@ -261,4 +289,24 @@ void ZEProgressDialog::WaitForClose(bool Enable)
 bool ZEProgressDialog::IsCanceled()
 {
 	return Canceled;
+}
+
+void ZEProgressDialog::SetLogFilePath(const ZEString& FilePath)
+{
+	LogFilePath = FilePath;
+}
+
+const ZEString& ZEProgressDialog::GetLogFilePath()
+{
+	return LogFilePath;
+}
+
+void ZEProgressDialog::SetFileLoggingEnabled(bool Enabled)
+{
+	IsFileLoggingEnabled = Enabled;
+}
+
+bool ZEProgressDialog::GetFileLoggingEnabled() const
+{
+	return IsFileLoggingEnabled;
 }

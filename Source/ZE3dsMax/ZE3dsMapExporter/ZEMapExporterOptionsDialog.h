@@ -42,7 +42,7 @@
 #include "ZEDS\ZEString.h"
 #include "ZEML\ZEMLNode.h"
 
-class ZEMapExporterOptionsDialogNew : public QDialog
+class ZEMapExporterOptionsDialog : public QDialog
 {
 	Q_OBJECT
 
@@ -59,15 +59,15 @@ class ZEMapExporterOptionsDialogNew : public QDialog
 
 		void					ShowEngineDirectoryDialog();
 		void					ShowLoggingFilePathDialog();
-		void					ShowApplicationPathDialog();
 		void					SetFileLoggingEnabled(int CheckBoxState);
-		void					SetResourceCopyEnabled(int CheckBoxState);
-		void					SetApplicationPathOptionsVisibility(int Index);
 
 	public:
 
-								ZEMapExporterOptionsDialogNew(QWidget* Parent, ZEMLNode* Options);
-								~ZEMapExporterOptionsDialogNew();
+								ZEMapExporterOptionsDialog(QWidget* Parent, ZEMLNode* Options);
+								~ZEMapExporterOptionsDialog();
+
+	bool						GetFileLoggingEnabled();
+	ZEString					GetLogFilePath();
 
 	void						SetOptions(ZEMLNode* Options);
 	ZEMLNode*					GetOptions();

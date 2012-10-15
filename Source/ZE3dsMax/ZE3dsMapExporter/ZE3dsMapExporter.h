@@ -38,9 +38,6 @@
 #define __ZE3DS_MAP_EXPORTER_H__
 
 #include "ZETypes.h"
-//#include "ZETMapFile/ZETMapFile.h"
-#include "ZE3dsMapExporterResources.h"
-
 
 #include <Max.h>
 #include <istdplug.h>
@@ -55,7 +52,7 @@
 
 extern HINSTANCE hInstance;
 
-class ZEMapExporterOptionsDialogNew;
+class ZEMapExporterOptionsDialog;
 class QApplication;
 class QWinWidget;
 class ZEProgressDialog;
@@ -94,21 +91,21 @@ class ZE3dsMapExporter : public SceneExport
 
 		QApplication*					QtApplication;
 
-		ZEMapExporterOptionsDialogNew*	OptionsDialog;
+		ZEMapExporterOptionsDialog*		OptionsDialog;
 		ZEResourceConfigurationWidget*	ResourceConfigurationDialog;
 
+		ZEMLNode						MapNode;
 		ZEMLNode*						ExportOptions;
 		QWinWidget*						WinWidget;
 		ZEProgressDialog*				ProgressDialog;
 		ZEString						ExportPath;
 
-		IGameScene*					Scene;
-		ZEMLNode					MapNode;
+		IGameScene*						Scene;
 
-		Tab<IGameNode*>				SceneGeometryObjects;
-		Tab<IGameNode*>				Portals;
-		Tab<IGameNode*>				Doors;
-		Tab<IGameMaterial*>			Materials;
+		Tab<IGameNode*>					SceneGeometryObjects;
+		Tab<IGameNode*>					Portals;
+		Tab<IGameNode*>					Doors;
+		Tab<IGameMaterial*>				Materials;
 
 		void						CollectResources();
 
@@ -117,7 +114,6 @@ class ZE3dsMapExporter : public SceneExport
 		bool						ShowOptionsDialog(HWND ParentWindow);
 		bool						ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath);
 
-		bool						GetRelativePath(const char* RealPath, char* RelativePath);
 		ZEInt						FindPortalIndex(IGameNode* Node);
 		ZEInt						ProcessFaceMaterial(IGameMaterial* Material);
 
@@ -127,7 +123,7 @@ class ZE3dsMapExporter : public SceneExport
 		bool						ProcessDoors();
 
 	protected:
-		ZEInt						GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
+		ZEInt						GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode = NULL);
 
 	public:	
 		virtual ZEInt				ExtCount();					// Number of extensions supported
@@ -142,7 +138,7 @@ class ZE3dsMapExporter : public SceneExport
 		virtual void				ShowAbout(HWND hWnd);		// Show DLL's "About..." box
 
 		virtual BOOL				SupportsOptions(ZEInt ext, DWORD options);
-		virtual ZEInt				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
+		virtual ZEInt				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts = FALSE, DWORD options = 0);
 
 									ZE3dsMapExporter();
 		virtual						~ZE3dsMapExporter();
