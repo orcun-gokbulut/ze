@@ -308,6 +308,9 @@ void ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode)
 	ZEArray<ZEMapFilePhysicalMeshPolygon> Polygons;
 	Polygons.SetCount(Mesh->GetNumberOfFaces());
 
+	if(Mesh->GetNumberOfFaces() == 0)
+		zeError("Physical mesh face count is : 0.");
+
 	for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
 	{
 		FaceEx* Face = Mesh->GetFace((ZEInt)I);
@@ -409,6 +412,9 @@ bool ZE3dsMapExporter::ProcessPortals()
 			WorldMatrix.M31, WorldMatrix.M32, WorldMatrix.M33);
 
 		ZEMatrix3x3::Transpose(WorldInvTrspsMatrix, Temp3x3);
+
+		if(Mesh->GetNumberOfFaces() == 0)
+			zeError("Face count is : 0.");
 
 		for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
 		{
