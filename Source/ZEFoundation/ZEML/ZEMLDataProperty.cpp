@@ -136,7 +136,12 @@ void ZEMLDataProperty::WriteToFile(ZEFile* File)
 		zeError("Can not write ZEMLDataProperty data size to file.");
 
 	if(File->Write(GetData(), sizeof(char) * DataSize, 1) != 1)
-		zeError("Can not write ZEMLDataProperty data to file.");
+	{
+		if(DataSize != 0)
+			zeError("Can not write ZEMLDataProperty data to file. Property name : %s", GetName().ToCString());
+		if(DataSize == 0)
+			zeWarning("ZEMLDataProperty \"%s\" data size is : 0", GetName().ToCString());
+	}
 }
 
 void ZEMLDataProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
@@ -170,10 +175,13 @@ void ZEMLDataProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 
 	if(IsCached)
 	{
-		Data = new char[DataSize];
+		if(DataSize != 0)
+		{
+			Data = new char[DataSize];
 
-		if(File->Read(Data, DataSize, 1) != 1)
-			zeError("Can not read ZEMLDataProperty data from file. Corrupted ZEML file.");
+			if(File->Read(Data, DataSize, 1) != 1)
+				zeError("Can not read ZEMLDataProperty data from file. Corrupted ZEML file.");
+		}
 	}
 	else
 	{

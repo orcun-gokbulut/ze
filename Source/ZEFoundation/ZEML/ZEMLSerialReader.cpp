@@ -256,7 +256,7 @@ bool ZEMLSerialReader::Read()
 
 bool ZEMLSerialReader::SkipNodeAndRead()
 {
-	if(CurrentItemType == ZEML_IT_NODE)
+	if(CurrentItemType == ZEML_IT_NODE || CurrentItemType == ZEML_IT_INLINE_DATA)
 		File->Seek(CurrentItemDataSize, ZE_SF_CURRENT);
 
 	return Read();
@@ -302,8 +302,13 @@ bool ZEMLSerialReader::GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offse
 	
 	if(File->Read(Buffer, BufferSize, 1) != 1)
 	{
-		zeError("Can not read ZEMLDataProperty data with offset : %d", Offset);
-		return false;
+		if(BufferSize != 0)
+		{
+			zeError("Can not read ZEMLDataProperty data with offset : %d", Offset);
+			return false;
+		}
+		else
+			zeWarning("ZEMLDataProperty data buffer size : 0.");
 	}
 
 	return true;

@@ -257,6 +257,10 @@ bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
 		ZEArray<ZEMapFilePolygonChunk> MapPolygons;
 		MapPolygons.SetCount(Reader->GetDataSize() / sizeof(ZEMapFilePolygonChunk));
 		Reader->GetData(MapPolygons.GetCArray(), Reader->GetDataSize());
+
+		if(MapPolygons.GetCount() == 0)
+			zeError("Polygon count is : 0. Portal name : %s", Portal->Name);
+
 		Portal->Polygons.SetCount(MapPolygons.GetCount());
 
 		for (ZESize I = 0; I < Portal->Polygons.GetCount(); I++)
