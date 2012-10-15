@@ -189,6 +189,8 @@ void ZE3dsMapExporter::LoadOptions(const char* FilePath)
 			ExportOptions->Read(&OptionsFile);
 			OptionsFile.Close();
 		}
+		else
+			zeWarning("Can not open options file.");
 	}
 }
 
@@ -204,6 +206,8 @@ void ZE3dsMapExporter::SaveOptions(const char* FilePath)
 			OptionsDialog->GetOptions()->Write(&OptionsFile);
 			OptionsFile.Close();
 		}
+		else
+			zeWarning("Can not save options file.");
 	}
 	else
 	{
@@ -223,7 +227,7 @@ bool ZE3dsMapExporter::ShowOptionsDialog(HWND ParentWindow)
 		WinWidget = new QWinWidget(ParentWindow);
 
 	if(OptionsDialog == NULL)
-		OptionsDialog = new ZEMapExporterOptionsDialogNew(WinWidget, ExportOptions);
+		OptionsDialog = new ZEMapExporterOptionsDialog(WinWidget, ExportOptions);
 
 	if(ExportOptions != NULL)
 		OptionsDialog->SetOptions(ExportOptions);
@@ -291,6 +295,8 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 
 	ProgressDialog->SetTitle("Map Export Progress");
 	ProgressDialog->SetProgressBarVisibility(false);
+	ProgressDialog->SetFileLoggingEnabled(OptionsDialog->GetFileLoggingEnabled());
+	ProgressDialog->SetLogFilePath(OptionsDialog->GetLogFilePath());
 	ProgressDialog->Start();
 	ProgressDialog->OpenTask("Map Exporter", true);
 

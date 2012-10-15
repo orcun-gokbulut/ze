@@ -38,7 +38,7 @@
 #include "ZEML\ZEMLProperty.h"
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 
-ZEMapExporterOptionsDialogNew::ZEMapExporterOptionsDialogNew(QWidget* Parent, ZEMLNode* Options) : QDialog(Parent)
+ZEMapExporterOptionsDialog::ZEMapExporterOptionsDialog(QWidget* Parent, ZEMLNode* Options) : QDialog(Parent)
 {
 	Form = new Ui::ZEMapExporterOptionsDialogUI();
 	Form->setupUi(this);
@@ -46,21 +46,18 @@ ZEMapExporterOptionsDialogNew::ZEMapExporterOptionsDialogNew(QWidget* Parent, ZE
 
 	connect(Form->btnBrowseEngineDir, SIGNAL(clicked()), this, SLOT(ShowEngineDirectoryDialog()));
 	connect(Form->btnBrowseLogPath, SIGNAL(clicked()), this, SLOT(ShowLoggingFilePathDialog()));
-	connect(Form->btnBrowseApplicationFolder, SIGNAL(clicked()), this, SLOT(ShowApplicationPathDialog()));
 	connect(Form->ckbFileLoggingEnabled, SIGNAL(stateChanged(int)), this, SLOT(SetFileLoggingEnabled(int)));
-	connect(Form->cmbRelativeTo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetApplicationPathOptionsVisibility(int)));
-	connect(Form->ckbCopyResources, SIGNAL(stateChanged(int)), this, SLOT(SetResourceCopyEnabled(int)));
 
 	SetOptions(Options);
 }
 
-ZEMapExporterOptionsDialogNew::~ZEMapExporterOptionsDialogNew()
+ZEMapExporterOptionsDialog::~ZEMapExporterOptionsDialog()
 {
 	delete Form;
 	Form = NULL;
 }
 
-void ZEMapExporterOptionsDialogNew::SetOptions(ZEMLNode* Options)
+void ZEMapExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 {
 	if(Options == NULL)
 		return;
@@ -76,53 +73,25 @@ void ZEMapExporterOptionsDialogNew::SetOptions(ZEMLNode* Options)
 	if(CurrentProperty != NULL)
 		Form->txtLogFilePath->setText(((ZEMLProperty*)CurrentProperty)->GetValue().GetString().ToCString());
 
-	CurrentProperty = Options->GetProperty("ApplicationPath");
-	if(CurrentProperty != NULL)
-		Form->txtApplicationFolder->setText(((ZEMLProperty*)CurrentProperty)->GetValue().GetString().ToCString());
-
 	CurrentProperty = Options->GetProperty("IsFileLoggingEnabled");
 	if(CurrentProperty != NULL)
 		ToggleFileLogging(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
-
-	CurrentProperty = Options->GetProperty("IsResourceCopyingEnabled");
-	if(CurrentProperty != NULL)
-		Form->ckbCopyResources->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
-
-	CurrentProperty = Options->GetProperty("RelativeTo");
-	if(CurrentProperty != NULL)
-	{
-		ZEInt32 OptionValue = ((ZEMLProperty*)CurrentProperty)->GetValue().GetInt32();
-
-		if(OptionValue == 1)
-			ToggleApplicationPathOptions(true);
-		else
-			ToggleApplicationPathOptions(false);
-
-		Form->cmbRelativeTo->setCurrentIndex(OptionValue);
-	}
 }
 
-ZEMLNode*	ZEMapExporterOptionsDialogNew::GetOptions()
+ZEMLNode*	ZEMapExporterOptionsDialog::GetOptions()
 {
 	CollectOptionsFromForm();
 	return Options;
 }
 
-void ZEMapExporterOptionsDialogNew::ToggleFileLogging(bool IsEnabled)
+void ZEMapExporterOptionsDialog::ToggleFileLogging(bool IsEnabled)
 {
 	Form->btnBrowseLogPath->setEnabled(IsEnabled);
 	Form->txtLogFilePath->setEnabled(IsEnabled);
 	Form->ckbFileLoggingEnabled->setChecked(IsEnabled);
 }
 
-void ZEMapExporterOptionsDialogNew::ToggleApplicationPathOptions(bool IsEnabled)
-{
-	Form->lblApplicationPath->setVisible(IsEnabled);
-	Form->txtApplicationFolder->setVisible(IsEnabled);
-	Form->btnBrowseApplicationFolder->setVisible(IsEnabled);
-}
-
-void ZEMapExporterOptionsDialogNew::ShowEngineDirectoryDialog()
+void ZEMapExporterOptionsDialog::ShowEngineDirectoryDialog()
 {
 	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text());
 
@@ -132,27 +101,17 @@ void ZEMapExporterOptionsDialogNew::ShowEngineDirectoryDialog()
 	Form->txtEngineWorkingDirectory->setText(SelectedDirectory);
 }
 
-void ZEMapExporterOptionsDialogNew::ShowLoggingFilePathDialog()
+void ZEMapExporterOptionsDialog::ShowLoggingFilePathDialog()
 {
-	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text());
+	QString SaveFilePath = QFileDialog::getSaveFileName(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text(), QString("*.txt"));
 
-	if(SelectedDirectory.length() == 0)
+	if(SaveFilePath.length() == 0)
 		return;
 
-	Form->txtLogFilePath->setText(SelectedDirectory);
+	Form->txtLogFilePath->setText(SaveFilePath);
 }
 
-void ZEMapExporterOptionsDialogNew::ShowApplicationPathDialog()
-{
-	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtApplicationFolder->text());
-
-	if(SelectedDirectory.length() == 0)
-		return;
-
-	Form->txtApplicationFolder->setText(SelectedDirectory);
-}
-
-void ZEMapExporterOptionsDialogNew::SetFileLoggingEnabled(int CheckBoxState)
+void ZEMapExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
 {
 	if(CheckBoxState == Qt::CheckState::Checked)
 		ToggleFileLogging(true);
@@ -160,20 +119,7 @@ void ZEMapExporterOptionsDialogNew::SetFileLoggingEnabled(int CheckBoxState)
 		ToggleFileLogging(false);
 }
 
-void ZEMapExporterOptionsDialogNew::SetResourceCopyEnabled(int CheckBoxState)
-{
-
-}
-
-void ZEMapExporterOptionsDialogNew::SetApplicationPathOptionsVisibility(int Index)
-{
-	if(Index == 1)
-		ToggleApplicationPathOptions(true);
-	else
-		ToggleApplicationPathOptions(false);
-}
-
-void ZEMapExporterOptionsDialogNew::CollectOptionsFromForm()
+void ZEMapExporterOptionsDialog::CollectOptionsFromForm()
 {
 	if(Options == NULL)
 	{
@@ -181,9 +127,6 @@ void ZEMapExporterOptionsDialogNew::CollectOptionsFromForm()
 		Options->AddProperty("ZinekEngineWorkingDirectory", ZEVariant(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
 		Options->AddProperty("IsFileLoggingEnabled", ZEVariant(Form->ckbFileLoggingEnabled->isChecked()));
 		Options->AddProperty("LogFilePath", ZEVariant(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
-		Options->AddProperty("RelativeTo", ZEVariant((ZEInt32)Form->cmbRelativeTo->currentIndex()));
-		Options->AddProperty("ApplicationPath", ZEVariant(ZEString((const char*)Form->txtApplicationFolder->text().toLatin1())));
-		Options->AddProperty("IsResourceCopyingEnabled", ZEVariant(Form->ckbCopyResources->isChecked()));
 	}
 	else
 	{
@@ -201,20 +144,15 @@ void ZEMapExporterOptionsDialogNew::CollectOptionsFromForm()
 			((ZEMLProperty*)(Options->GetProperty("LogFilePath")))->SetValue(ZEVariant(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
 		else
 			Options->AddProperty("LogFilePath", ZEVariant(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
-
-		if(Options->GetProperty("RelativeTo") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("RelativeTo")))->SetValue(ZEVariant((ZEInt32)Form->cmbRelativeTo->currentIndex()));
-		else
-			Options->AddProperty("RelativeTo", ZEVariant((ZEInt32)Form->cmbRelativeTo->currentIndex()));
-
-		if(Options->GetProperty("ApplicationPath") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("ApplicationPath")))->SetValue(ZEVariant(ZEString((const char*)Form->txtApplicationFolder->text().toLatin1())));
-		else
-			Options->AddProperty("ApplicationPath", ZEVariant(ZEString((const char*)Form->txtApplicationFolder->text().toLatin1())));
-
-		if(Options->GetProperty("IsResourceCopyingEnabled") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("IsResourceCopyingEnabled")))->SetValue(ZEVariant(Form->ckbCopyResources->isChecked()));
-		else
-			Options->AddProperty("IsResourceCopyingEnabled", ZEVariant(Form->ckbCopyResources->isChecked()));
 	}
+}
+
+bool ZEMapExporterOptionsDialog::GetFileLoggingEnabled()
+{
+	return ((ZEMLProperty*)Options->GetProperty("IsFileLoggingEnabled"))->GetValue().GetBoolean();
+}
+
+ZEString ZEMapExporterOptionsDialog::GetLogFilePath()
+{
+	return ((ZEMLProperty*)Options->GetProperty("LogFilePath"))->GetValue().GetString();
 }

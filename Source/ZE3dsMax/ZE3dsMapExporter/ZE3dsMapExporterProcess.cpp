@@ -199,35 +199,14 @@ bool GetProperty<INode*>(IExportEntity* Object, PropType Type, const char* Prope
 	}
 }
 
-bool ZE3dsMapExporter::GetRelativePath(const char* RealPath, char* RelativePath)
-{
-	ZEString ZinekDir;
-
-	if(ExportOptions != NULL)
-		ZinekDir = ((ZEMLProperty*)(ExportOptions->GetProperty("ZinekEngineWorkingDirectory")))->GetValue().GetString();
-	else
-		zeError("Can not get Zinek Working Directory from options.");
-
-	if (strnicmp(RealPath, ZinekDir.ToCString(), ZinekDir.GetLength()) == 0)
-	{
-		strcpy(RelativePath, RealPath + ZinekDir.GetLength() + 1);
-		return true;
-	}
-	else
-	{
-		RelativePath[0] = '\0';
-		return false;
-	}
-
-	return false;
-}
-
 ZEInt ZE3dsMapExporter::ProcessFaceMaterial(IGameMaterial* Material)
 {
 	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)
 		if (Materials[I] == Material)
 			return (ZEInt)I;
+
 	Materials.Append(1, &Material);
+
 	return Materials.Count() - 1;
 }
 
@@ -260,14 +239,22 @@ bool ZE3dsMapExporter::ProcessDoors()
 		
 		DoorNode->AddProperty("Name", CurrentNode->GetName());
 
-		GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Width", PlaneWidth);
-		GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Length", PlaneLength);
+		if(!GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Width", PlaneWidth))
+			zeError("Can not find door property With");
 
-		GetProperty(CurrentObject, IGAME_INT_PROP, "IsOpen", IsOpen);
+		if(!GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Length", PlaneLength))
+			zeError("Can not find door property Height");
+
+		if(!GetProperty(CurrentObject, IGAME_INT_PROP, "IsOpen", IsOpen))
+			zeError("Can not find door property IsOpen");
+
 		DoorNode->AddProperty("IsOpen", IsOpen);
 
-		GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PortalA", PortalANode);
-		GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PortalB", PortalBNode);
+		if(!GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PortalA", PortalANode))
+			zeError("Can not find door property PortalA");
+
+		if(!GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PortalB", PortalBNode))
+			zeError("Can not find door property PortalB");
 
 		if (PortalANode == NULL || PortalBNode == NULL || PortalANode == PortalBNode)
 		{
@@ -276,9 +263,17 @@ bool ZE3dsMapExporter::ProcessDoors()
 		}
 
 		ZEUInt32 PortalAIndex = FindPortalIndex(Scene->GetIGameNode(PortalANode));
+		
+		if(PortalAIndex < 0)
+			zeError("Can nor find PortalAIndex.");
+		
 		DoorNode->AddProperty("PortalAIndex", PortalAIndex);
 
 		ZEUInt32 PortalBIndex = FindPortalIndex(Scene->GetIGameNode(PortalBNode));
+
+		if(PortalBIndex < 0)
+			zeError("Can nor find PortalBIndex.");
+
 		DoorNode->AddProperty("PortalBIndex", PortalBIndex);
 	
 		ZEVector3 Point1, Point2, Point3, Point4;
@@ -306,7 +301,10 @@ bool ZE3dsMapExporter::ProcessDoors()
 void ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode)
 {
 	IGameMesh* Mesh = (IGameMesh*)Object;
-	Mesh->InitializeData();
+
+	if(!Mesh->InitializeData())
+		zeError("Can not initialize mesh data for phsical mesh.");
+
 	ZEArray<ZEMapFilePhysicalMeshPolygon> Polygons;
 	Polygons.SetCount(Mesh->GetNumberOfFaces());
 
@@ -351,11 +349,16 @@ bool ZE3dsMapExporter::ProcessPortals()
 		IGameNode* PhysicalMeshNode;
 
 		PortalNode->AddProperty("Name", CurrentNode->GetName());
-		GetProperty(CurrentObject, IGAME_INT_PROP, "PhysicalMeshEnabled", PhysicalMeshEnabled);
-		GetProperty(CurrentObject, IGAME_INT_PROP, "PhysicalMeshUseSelf", PhysicalMeshUseSelf);
-		GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PhysicalMesh", PhysicalMeshMaxNode);
+		if(!GetProperty(CurrentObject, IGAME_INT_PROP, "PhysicalMeshEnabled", PhysicalMeshEnabled))
+			zeError("Can not find portal property \"PhysicalMeshEnabled\".");
 
-		// Load physical mesh
+		if(!GetProperty(CurrentObject, IGAME_INT_PROP, "PhysicalMeshUseSelf", PhysicalMeshUseSelf))
+			zeError("Can not find portal property \"PhysicalMeshUseSelf\".");
+
+		if(PhysicalMeshEnabled && !PhysicalMeshUseSelf)
+			if(GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PhysicalMesh", PhysicalMeshMaxNode))
+				zeError("Can not find portal property \"PhysicalMesh\".");
+
 		if(PhysicalMeshEnabled)
 		{
 			if (PhysicalMeshUseSelf)
@@ -370,6 +373,7 @@ bool ZE3dsMapExporter::ProcessPortals()
 				if(PhysicalMeshNode == NULL)
 				{
 					zeWarning("Physical Mesh Node NULL.");
+					zeWarning("Physical mesh disabled.");
 					PhysicalMeshEnabled = false;
 				}
 				else
@@ -381,10 +385,14 @@ bool ZE3dsMapExporter::ProcessPortals()
 			}
 		}
 
-		// Load geometry
 		IGameMesh* Mesh = (IGameMesh*)CurrentObject;
-		Mesh->InitializeData();
-		Mesh->InitializeBinormalData();
+		
+		if(!Mesh->InitializeData())
+			zeError("Can not initialize mesh data.");
+
+		if(!Mesh->InitializeBinormalData())
+			zeError("Can not initialize mesh binormal data.");
+
 		Mesh->SetUseWeightedNormals();
 
 		ZEArray<ZEMapFilePolygon> Polygons;
@@ -420,21 +428,32 @@ bool ZE3dsMapExporter::ProcessPortals()
 				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt)I, (ZEInt)N);
 
 				Point3 Temp;
-				Mesh->GetVertex(Face->vert[N], Temp, false);
+				if(!Mesh->GetVertex(Face->vert[N], Temp, false))
+					zeError("Can not get vertex of face %d, vertex index : %d.", I, N);
+
 				Vertex->Position = MAX_TO_ZE(Temp);
 				
 				ZEVector3 Normal;
-				Mesh->GetNormal(Face->norm[N], Temp, true);
+				
+				if(!Mesh->GetNormal(Face->norm[N], Temp, true))
+					zeError("Can not get normal of face %d, normal index : %d.", I, N);
+
 				Normal = MAX_TO_ZE(Temp);
 				ZEMatrix3x3::Transform(Vertex->Normal, WorldInvTrspsMatrix, Normal);
 				ZEVector3::Normalize(Vertex->Normal, Vertex->Normal);
 
-				Mesh->GetTangent(BinormalTangentIndex, Temp);
+				if(!Mesh->GetTangent(BinormalTangentIndex, Temp))
+					zeError("Can not get tangent of face %d, tangent index : %d.", I, BinormalTangentIndex);
+
 				Vertex->Tangent = MAX_TO_ZE(Temp);
-				Mesh->GetBinormal(BinormalTangentIndex, Temp);
+
+				if(!Mesh->GetBinormal(BinormalTangentIndex, Temp))
+					zeError("Can not get binormal of face %d, binormal index : %d.", I, BinormalTangentIndex);
+
 				Vertex->Binormal = MAX_TO_ZE(Temp);
 
-				Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord);
+				if(!Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord))
+					zeError("Can not get texture coordinate of face %d vertex %d.", I, N, BinormalTangentIndex);
 			}
 		}
 

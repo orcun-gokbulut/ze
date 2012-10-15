@@ -50,6 +50,7 @@ namespace Ui
 class ZEProgressDialogTask;
 class QTreeWidgetItem;
 class ZEProgressDialogTreeWidget;
+class ZEFile;
 
 class ZEProgressDialog
 {
@@ -76,6 +77,10 @@ class ZEProgressDialog
 		ZEErrorCallback					OldErrorCallback;
 		ZELogCallback					OldLogCallBack;
 
+		bool							IsFileLoggingEnabled;
+		ZEFile*							LogFile;
+		ZEString						LogFilePath;
+
 										ZEProgressDialog();
 
 	public:
@@ -87,6 +92,12 @@ class ZEProgressDialog
 
 		void							SetHeaderVisibility(bool IsVisible);
 		bool							GetHeaderVisibility();
+
+		void							SetLogFilePath(const ZEString& FilePath);
+		const ZEString&					GetLogFilePath();
+
+		void							SetFileLoggingEnabled(bool Enabled);
+		bool							GetFileLoggingEnabled() const;
 
  		void							Start(); 
 		ZEProgressDialogTask*			OpenTask(const ZEString& Name, bool IsTitle = false);
