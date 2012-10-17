@@ -33,66 +33,9 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 
-project (ZEFoundation)
+ze_set_project_folder("ZECodeUtilities")
 
-ze_set_project_folder("ZEFoundation")
-
-add_subdirectory(ZEDS)
-add_subdirectory(ZEMath)
-add_subdirectory(ZESerialization)
-add_subdirectory(ZEStateMachine)
-add_subdirectory(ZEFile)
-add_subdirectory(ZEMacro)
-add_subdirectory(ZESpatial)
-add_subdirectory(ZESerialPort)
-add_subdirectory(ZETest)
-add_subdirectory(ZEThread)
-add_subdirectory(ZETask)
-add_subdirectory(ZESocket)
-add_subdirectory(ZEML)
-
-ze_add_source(ZEData.h 				Sources Headers)
-ze_add_source(ZEData.cpp 			Sources)
-ze_add_source(ZEDLL.h 				Sources Headers)
-ze_add_source(ZEDLL.cpp 			Sources)
-ze_add_source(ZECommon.h 			Sources Headers)
-ze_add_source(ZECommon.cpp 			Sources)
-ze_add_source(ZEGUID.h 				Sources Headers)
-ze_add_source(ZEGUID.cpp 			Sources)
-ze_add_source(ZEGUIDTests.cpp			Tests)
-ze_add_source(ZETypes.h 			Sources Headers)
-ze_add_source(ZETypes.cpp 			Sources)
-ze_add_source(ZEEndian.h 			Sources Headers)
-ze_add_source(ZEEndian.cpp 			Sources)
-ze_add_source(ZEEndianTests.cpp			Tests)
-ze_add_source(ZESwap.h 				Sources Headers)
-ze_add_source(ZESwap.cpp 			Sources)
-ze_add_source(ZEError.h 			Sources Headers)
-ze_add_source(ZEError.cpp 			Sources)
-ze_add_source(ZELog.h				Sources Headers)
-ze_add_source(ZELog.cpp				Sources)
-ze_add_source(ZEPacking.h 			Sources Headers)
-ze_add_source(ZEPacking.cpp 			Sources)
-ze_add_source(ZERandom.h 			Sources Headers)
-ze_add_source(ZERandom.cpp 			Sources)
-ze_add_source(ZERandomTests.cpp			Tests)
-ze_add_source(ZETimeCounter.h			Headers)
-ze_add_source(ZETimeCounter.cpp			Sources)
-ze_add_source(ZETimeCounterTests.cpp		Tests)
-
-ze_add_library(ZEFoundation 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-    LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket ZEThread ZESerialPort ZETask ZEML
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation
-	INSTALL_COMPONENT ZESDK)
-
-ze_add_test(ZEFoundationTests
-	SOURCES ${Tests}
-	EXTRA_SOURCES
-	TEST_TARGET ZEFoundation)
-
-ze_link(ZEFoundation LIBS rt PLATFORMS Unix)
+ze_add_module(ZEFileCompiler)
+#ze_add_module(ZEMetaCompiler)

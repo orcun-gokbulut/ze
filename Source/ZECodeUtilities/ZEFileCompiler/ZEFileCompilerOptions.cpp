@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEFileCompilerOptions.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,20 +30,7 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
-
-ze_add_module(ZECodeUtilities)
-ze_add_module(ZEEngine)
-ze_add_module(ZEModules			OPTIONAL DEFAULT)
-ze_add_module(ZEditor			OPTIONAL DEFAULT)
-ze_add_module(ZE3dsMax			OPTIONAL DEFAULT 	PLATFORMS Windows)
-ze_add_module(ZEFoundation)
-ze_add_module(ZEToolComponents)
-ze_add_module(ZEToolSDK			OPTIONAL DEFAULT)
-
-add_subdirectory(QWinWidget)
-
-ze_add_cmake_project(ZESource)
+#include "ZEFileCompilerOptions.h"
