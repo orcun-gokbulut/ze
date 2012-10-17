@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZE3dsMaxUI - Copy.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 YiÄŸit OrÃ§un GÃ–KBULUT. All rights reserved.
 
@@ -30,29 +30,55 @@
   Name: YiÄŸit OrÃ§un GÃ–KBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZE3dsMaxUI.h"
+#include "imenus.h"
+#include "imenuman.h"
 
-ze_add_source(ZE3dsModelExporter.h					Sources)
-ze_add_source(ZE3dsModelExporter.cpp				Sources)
-ze_add_source(ZE3dsModelExporterDescription.h		Sources)
-ze_add_source(ZE3dsModelExporterDescription.cpp		Sources)
-ze_add_source(ZE3dsModelExporterProcess.cpp			Sources)
-ze_add_source(ZE3dsModelExporterOptions.h			Sources)
-ze_add_source(ZE3dsModelExporterOptions.cpp			Sources)
-ze_add_source(ZE3dsModelExporterOptionsDialog.h		Sources QtMocs)
-ze_add_source(ZE3dsModelExporterOptionsDialog.cpp	Sources)
-ze_add_source(ZE3dsModelExporterOptionsWidget.ui	Sources QtUI)
+class ZEMakeZEMeshAction : public ActionItem
+{
+	public:
+		virtual BOOL			ExecuteAction();
+		CoreExport BOOL			Execute();
+		virtual void			GetButtonText(MSTR &buttonText);
+		virtual void			GetMenuText(MSTR &menuText);
+		virtual void			GetDescriptionText(MSTR &descText);
+		virtual void			GetCategoryText(MSTR &catText);
+		virtual BOOL			IsChecked();
+		virtual BOOL			IsItemVisible();
+		virtual BOOL			IsEnabled();
+		virtual MaxIcon*		GetIcon();
+		virtual void			DeleteThis();
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+};
+DWORD ZE3dsMaxUI::Start()
+{
+	// Define Actions
+	// Menus
 
-ze_add_library(ZE3dsModelExporter 
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget
-		core geom gfx mesh maxutil maxscrpt paramblk2 igame QtCore4 QtGui4 QWinWidget)
+	MessageBox(NULL, "Start", "Büllü", MB_OK);
+	return GUPRESULT_KEEP;
+}
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+class ZEMenuItem : public IMenuItem
+{
+	public:
+
+};
+
+void ZE3dsMaxUI::Stop()
+{
+	MessageBox(NULL, "Büllük", "Stop", MB_OK);
+}
+
+ZE3dsMaxUI::ZE3dsMaxUI()
+{
+
+}
+
+ZE3dsMaxUI::~ZE3dsMaxUI()
+{
+
+}

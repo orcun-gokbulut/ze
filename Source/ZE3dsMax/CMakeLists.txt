@@ -48,10 +48,10 @@ include_directories(
 link_directories(
 	${ZEBUILD_LIB_PATH}/3dsMax/2010)
 	
-add_subdirectory(ZE3dsProgressDialog)
 add_subdirectory(ZE3dsModelExporter)
 add_subdirectory(ZE3dsMapExporter)
-add_subdirectory(ZE3dsMaxScript)
+add_subdirectory(ZE3dsMaxUI)
+add_subdirectory(ZE3dsMaxPlugin)
 
 add_custom_target(ZE3dsMax
 	SOURCES CMakeLists.txt)

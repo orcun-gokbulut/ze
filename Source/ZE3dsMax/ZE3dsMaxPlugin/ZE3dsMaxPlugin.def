@@ -1,4 +1,4 @@
-LIBRARY ZE3dsMapExporter.dle
+LIBRARY StaticModelExporter.dle
 EXPORTS
    LibDescription       @1       PRIVATE
    LibNumberClasses     @2       PRIVATE

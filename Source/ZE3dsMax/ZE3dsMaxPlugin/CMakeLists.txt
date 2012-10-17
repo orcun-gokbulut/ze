@@ -35,9 +35,25 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZE3dsProgressDialog.cpp				Sources)
-ze_add_source(ZE3dsProgressDialog.h					Sources)
-ze_add_source(ZE3dsProgressDialogResources.h		Sources)
+ze_add_source(ZE3dsMaxPlugin.h				Sources)
+ze_add_source(ZE3dsMaxPlugin.cpp			Sources)
+ze_add_source(ZE3dsMaxPlugin.def			Sources)
 
-ze_add_library(ZE3dsProgressDialog 
-	SOURCES ${Sources})
+ze_add_library(ZE3dsMaxPlugin 
+	SOURCES ${Sources}
+	LIBS ZE3dsModelExporter ZE3dsMapExporter ZE3dsMaxUI
+	INSTALL
+	INSTALL_DESTINATION "Tools/Exporters/ZE3dsMax"
+	INSTALL_COMPONENT Tools
+	DLL)
+	
+set(LOCAL_WARNING_FLAGS /W3)
+set(LOCAL_RTTI_FLAGS /GR)
+
+set_property(TARGET ZE3dsMaxPlugin PROPERTY FOLDER "ZE3dsMax")
+set_property(TARGET ZE3dsMaxPlugin PROPERTY SUFFIX ".gup")
+set_property(TARGET ZE3dsMaxPlugin PROPERTY CLEAN_DIRECT_OUTPUT 1)
+
+get_property(TargetPath TARGET ZE3dsMaxPlugin PROPERTY LOCATION)
+file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)
+add_custom_command(TARGET ZE3dsMaxPlugin POST_BUILD COMMAND copy "${NativeTargetPath}" "${ZEBUILD_3DS_MAX_BINARY_DIRECTORY}\\plugins")

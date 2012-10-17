@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMapExporterDLLEntry.cpp
+ Zinek Engine - ZE3dsMaxUIDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,57 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETypes.h"
-#include "ZE3dsMapExporterDLLEntry.h"
-#include "ZE3dsMapExporterDescription.h"
+#include "ZE3dsMaxUIDescription.h"
+#include "ZE3dsMaxUI.h"
 
+#define ZE_3DS_MAX_UI_CLASS_ID Class_ID(0x9b240b2, 0x2c757d96)
 
-HINSTANCE hInstance;
-ZEInt controlsInit = FALSE;
-
-BOOL WINAPI DllMain(HINSTANCE hinstDLL,ULONG fdwReason, LPVOID /*lpvReserved*/)
-{
-	if( fdwReason == DLL_PROCESS_ATTACH )
-	{
-		hInstance = hinstDLL;
-		DisableThreadLibraryCalls(hInstance);
-	}
-
-	return TRUE;
+INT ZE3dsMaxUIDescription::IsPublic()
+{ 
+	return TRUE; 
 }
 
-__declspec( dllexport ) const TCHAR* LibDescription()
-{
-	return "ZEMap Exporter";
+void* ZE3dsMaxUIDescription::Create(BOOL Loading) 
+{ 
+	return new ZE3dsMaxUI(); 
 }
 
-__declspec( dllexport ) ZEInt LibNumberClasses()
-{
-	return 1;
+const TCHAR* ZE3dsMaxUIDescription::ClassName()
+{ 
+	return "ZE3dsMaxUI"; 
 }
 
-__declspec( dllexport ) ClassDesc* LibClassDesc(ZEInt i)
-{
-	switch(i) 
-	{
-		case 0: 
-			return ZE3dsMapExporterDescription::GetInstance();
-		default: 
-			return 0;
-	}
+SClass_ID ZE3dsMaxUIDescription::SuperClassID()
+{ 
+	return GUP_CLASS_ID; 
 }
 
-__declspec( dllexport ) ULONG LibVersion()
-{
-	return VERSION_3DSMAX;
+Class_ID ZE3dsMaxUIDescription::ClassID()
+{ 
+	return ZE_3DS_MAX_UI_CLASS_ID; 
 }
 
-__declspec( dllexport ) ZEInt LibInitialize(void)
+const TCHAR* ZE3dsMaxUIDescription::Category()
 {
-	return TRUE;
+	return "Zinek"; 
 }
 
-__declspec( dllexport ) ZEInt LibShutdown(void)
+const TCHAR* ZE3dsMaxUIDescription::InternalName()
+{ 
+	return "Zinek Engine UI"; 
+}
+
+HINSTANCE ZE3dsMaxUIDescription::HInstance()
+{ 
+	return hInstance; 
+}
+
+ClassDesc2* ZE3dsMaxUIDescription::GetInstance()
 {
-	return TRUE;	
+	static ZE3dsMaxUIDescription Desc;
+	return &Desc;
 }

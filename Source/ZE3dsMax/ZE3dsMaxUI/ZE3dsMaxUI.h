@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsProgressDialogResources.h
+ Zinek Engine - ZE3dsMaxUI.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,24 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by ProgressDialogResources.rc
-//
-#define IDD_PANEL                       101
-#define IDD_PROGRESS                    101
-#define IDB_BITMAP1                     102
-#define IDB_LOGO                        102
-#define IDI_ICON1                       105
-#define IDI_ZINEKENGINE                 105
-#define IDC_CLOSEBUTTON                 1000
-#define IDC_DOSTUFF                     1000
-#define IDC_PROGRESS                    1001
-#define IDC_TOTALPROGRESS               1001
-#define IDC_VOLUME                      1001
-#define IDC_LOG                         1002
-#define IDC_ACTION                      1003
-#define IDC_PARTIALPROGRESS             1004
-#define IDC_HEURISTIC                   1004
-#define IDC_COMMAND1                    1005
-#define IDC_DEEP                        1009
-#define IDC_MESHES                      1012
-#define IDC_EXPORTMESHES                1012
-#define IDC_EXPORTMATERIALS             1016
-#define IDC_EXPORTBONES                 1018
-#define IDC_COLOR                       1456
-#define IDC_EDIT                        1490
-#define IDC_SPIN                        1496
+#pragma once
+#ifndef __ZE_3DS_MAX_UI_H__
+#define __ZE_3DS_MAX_UI_H__
 
-// Next default values for new objects
-// 
-#ifdef APSTUDIO_INVOKED
-#ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        106
-#define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1020
-#define _APS_NEXT_SYMED_VALUE           101
-#endif
+#include <max.h>
+#include <bmmlib.h>
+#include <guplib.h>
+
+extern HINSTANCE hInstance;
+
+class ZE3dsMaxUI : public GUP 
+{
+	public:
+		virtual DWORD		Start(); 
+		virtual void		Stop();
+
+							ZE3dsMaxUI();
+		virtual				~ZE3dsMaxUI();
+};
+
 #endif
