@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsProgressDialog.h
+ Zinek Engine - ZE3dsMaxMakeZEMeshAction.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,55 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __PROGRESS_DIALOG_H__
-#define __PROGRESS_DIALOG_H__
+#include "ZE3dsMaxMakeZEMeshAction.h"
 
-#include "ZETypes.h"
-
-#include <tchar.h>
-#include <stdio.h>
-
-
-#define zepdOutput(...) ZE3dsProgressDialog::GetInstance()->Output(__VA_ARGS__)
-#define zepdLog(...) ZE3dsProgressDialog::GetInstance()->Output(ZE3DS_PDOL_LOG, __VA_ARGS__)
-#define zepdWarning(...) ZE3dsProgressDialog::GetInstance()->Output(ZE3DS_PDOL_WARNINGS, __VA_ARGS__)
-#define zepdError(...) ZE3dsProgressDialog::GetInstance()->Output(ZE3DS_PDOL_ERRORS, __VA_ARGS__)
-
-enum ZE3dsProgressDialogOutputLevel
+BOOL ZEMakeZEMeshAction::ExecuteAction()
 {
-	ZE3DS_PDOL_ERRORS = 0,
-	ZE3DS_PDOL_WARNINGS = 1,
-	ZE3DS_PDOL_NOTICE = 2,
-	ZE3DS_PDOL_LOG = 3
+	return TRUE;
+}
 
-};
-
-class ZE3dsProgressDialog
+void ZEMakeZEMeshAction::GetButtonText(MSTR& ButtonText)
 {
-	private:
-		void*						handle;
-		ZEInt							UpdateTreshold;
-		ZEInt							OutputLevel;
-		FILE*						LogFile;
-		static	ZE3dsProgressDialog*	Instance;
 
-	public:
-		void						Create(void* Instance);
+}
 
-		void						Show();
-		void						Hide();
+void ZEMakeZEMeshAction::GetMenuText(MSTR& MenuText)
+{
 
-		void						Update();
-		void						ProcessMessages();
+}
 
-		void						SetOutputLevel(ZE3dsProgressDialogOutputLevel OutputLevel);
+void ZEMakeZEMeshAction::GetDescriptionText(MSTR& DescText)
+{
 
-		void						StartFileLogging(TCHAR* Filename);
-		void						StopFileLogging();
-		
-		bool						IsCanceled();
-		void						SetExitMode(bool Exit);
+}
 
-		void						Output(TCHAR* Format, ...);
-		void						Output(ZE3dsProgressDialogOutputLevel OutputLevel, TCHAR* Format, ...);
+void ZEMakeZEMeshAction::GetCategoryText(MSTR& CatText)
+{
 
-		void						SetProgress(ZEInt Value);
-		void						SetProgressRange(ZEInt Min, ZEInt Max);
+}
 
-		void						SetPartialProgress(ZEInt Value);
-		void						SetPartialProgressRange(ZEInt Min, ZEInt Max);
+BOOL ZEMakeZEMeshAction::IsChecked()
+{
 
-									ZE3dsProgressDialog();
-									~ZE3dsProgressDialog();
+}
 
-		static ZE3dsProgressDialog*	GetInstance();
-};
-#endif
+BOOL ZEMakeZEMeshAction::IsItemVisible()
+{
+	return TRUE;
+}
+
+BOOL ZEMakeZEMeshAction::IsEnabled()
+{
+	return TRUE;	
+}
+
+
+MaxIcon* ZEMakeZEMeshAction::GetIcon()
+{
+
+}
+
+void ZEMakeZEMeshAction::DeleteThis()
+{
+	delete this;
+}

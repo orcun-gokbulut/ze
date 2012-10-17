@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMapExporterDLLEntry.h
+ Zinek Engine - ZE3dsMaxMakeZEMeshAction.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,7 +34,25 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE3DS_MAP_EXPORTER_DLL_ENTRY_H__
-#define __ZE3DS_MAP_EXPORTER_DLL_ENTRY_H__
+#ifndef __ZE_MAKE_ZE_MESH_ACTION_H__
+#define __ZE_MAKE_ZE_MESH_ACTION_H__
+
+#include <max.h>
+#include <actiontable.h>
+
+class ZEMakeZEMeshAction : public ActionItem
+{
+	public:
+		virtual BOOL			ExecuteAction();
+		virtual void			GetButtonText(MSTR& ButtonText);
+		virtual void			GetMenuText(MSTR& MenuText);
+		virtual void			GetDescriptionText(MSTR& DescText);
+		virtual void			GetCategoryText(MSTR& CatText);
+		virtual BOOL			IsChecked();
+		virtual BOOL			IsItemVisible();
+		virtual BOOL			IsEnabled();
+		virtual MaxIcon*		GetIcon();
+		virtual void			DeleteThis();
+};
 
 #endif

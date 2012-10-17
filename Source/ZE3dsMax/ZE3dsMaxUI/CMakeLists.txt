@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZE3dsModelExporterDLLEntry.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,65 +30,20 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include "ZE3dsModelExporterDLLEntry.h"
-#include "ZE3dsModelExporterDescription.h"
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZETypes.h"
+ze_add_source(ZE3dsMaxUI.h					Sources)
+ze_add_source(ZE3dsMaxUI.cpp				Sources)
+ze_add_source(ZE3dsMaxUIDescription.h		Sources)
+ze_add_source(ZE3dsMaxUIDescription.cpp		Sources)
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-
-HINSTANCE hInstance;
-ZEInt controlsInit = FALSE;
-
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
-{
-	if( fdwReason == DLL_PROCESS_ATTACH )
-	{
-		hInstance = hinstDLL;
-		DisableThreadLibraryCalls(hInstance);
-	}
-
-	return TRUE;
-}
-
-__declspec( dllexport ) const TCHAR* LibDescription()
-{
-	return "ZEModel Exporter";
-}
-
-__declspec( dllexport ) ZEInt LibNumberClasses()
-{
-	return 1;
-}
-
-__declspec( dllexport ) ClassDesc* LibClassDesc(ZEInt i)
-{
-	switch(i) 
-	{
-		case 0: 
-			return ZE3dsModelExporterDescription::GetInstance();
-		
-		default: 
-			return 0;
-	}
-}
-
-__declspec( dllexport ) ULONG LibVersion()
-{
-	return VERSION_3DSMAX;
-}
-
-__declspec( dllexport ) ZEInt LibInitialize(void)
-{
-	return TRUE;
-}
-
-__declspec( dllexport ) ZEInt LibShutdown(void)
-{
-	return TRUE;
-}
+ze_add_library(ZE3dsMaxUI 
+	SOURCES ${Sources}
+	LIBS ZEFoundation
+		core gup menuman)
+	
+set(LOCAL_WARNING_FLAGS /W3)
+set(LOCAL_RTTI_FLAGS /GR)

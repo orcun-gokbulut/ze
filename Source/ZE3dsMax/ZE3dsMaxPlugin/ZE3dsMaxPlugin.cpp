@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsModelExporterDLLEntry.h
+ Zinek Engine - ZE3dsMaxPlugin.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,65 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE3DS_MODEL_EXPORTER_DLL_ENTRY_H__
-#define __ZE3DS_MODEL_EXPORTER_DLL_ENTRY_H__
+#include "ZE3dsMaxPlugin.h"
+#include "ZE3dsModelExporter/ZE3dsModelExporterDescription.h"
+#include "ZE3dsMapExporter/ZE3dsMapExporterDescription.h"
+#include "ZE3dsMaxUI/ZE3dsMaxUIDescription.h"
+#include "ZETypes.h"
 
-#endif
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+HINSTANCE hInstance;
+ZEInt controlsInit = FALSE;
+
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
+{
+	if( fdwReason == DLL_PROCESS_ATTACH )
+	{
+		hInstance = hinstDLL;
+		DisableThreadLibraryCalls(hInstance);
+	}
+
+	return TRUE;
+}
+
+__declspec( dllexport ) const TCHAR* LibDescription()
+{
+	return "Zinek Engine 3ds Max Plugin";
+}
+
+__declspec( dllexport ) ZEInt LibNumberClasses()
+{
+	return 3;
+}
+
+__declspec( dllexport ) ClassDesc* LibClassDesc(ZEInt i)
+{
+	switch(i) 
+	{
+		case 0: 
+			return ZE3dsModelExporterDescription::GetInstance();
+		case 1:
+			return ZE3dsMapExporterDescription::GetInstance();
+		case 2:
+			return ZE3dsMaxUIDescription::GetInstance();
+		default: 
+			return 0;
+	}
+}
+
+__declspec( dllexport ) ULONG LibVersion()
+{
+	return VERSION_3DSMAX;
+}
+
+__declspec( dllexport ) ZEInt LibInitialize(void)
+{
+	return TRUE;
+}
+
+__declspec( dllexport ) ZEInt LibShutdown(void)
+{
+	return TRUE;
+}
