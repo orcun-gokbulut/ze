@@ -44,4 +44,5 @@ ze_add_cmake_project(CMakeScripts
 		test_cocoon.cmake
 		ze.cmake
 		ze_functions.cmake
-		ze_qt.cmake)
+		ze_qt.cmake
+		ZEFindSubversion.cmake)

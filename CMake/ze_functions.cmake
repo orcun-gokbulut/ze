@@ -133,7 +133,7 @@ macro(ze_check)
 endmacro()
 
 function(ze_add_source)
-	parse_arguments(PARAMETER "${ze_check_parameters}" "ZEPP;ZEDOC" ${ARGV})
+	parse_arguments(PARAMETER "${ze_check_parameters};ZEFC" "ZEPP;ZEDOC" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
@@ -153,15 +153,43 @@ function(ze_add_source)
 	if (PARAMETER_ZEPP)
 		add_custom_command(
 			COMMAND "${ZEBUILD_TOOL_PATH}/zepp.exe" 
-			ARGS ${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE}
+			ARGS "${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE}"
 			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE}
 			OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE}.ZEMeta.cpp)
-		list(APPEND ${PARAMETER_FILE_LIST} ${PARAMETER_FILE}.ZEMeta.cpp)
+		list(APPEND ${PARAMETsER_FILE_LIST} ${PARAMETER_FILE}.ZEMeta.cpp)
 		
-		source_group("Meta" FILES ${PARAMETER_FILE}.ZEMeta.cpp)
+		source_group("Generated" FILES ${PARAMETER_FILE}.ZEMeta.cpp)
 		set_property(SOURCE ${PARAMETER_FILE}.ZEMeta.cpp PROPERTY LANGUAGE CXX)
 		
 		list(APPEND ${PARAMETER_SOURCE_LIST} ${PARAMETER_FILE}.ZEMeta.cpp)
+	endif()
+	
+	if (PARAMETER_ZEFC)
+		message("${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE} -C ${PARAMETER_ZEFC} -S ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.cpp -H ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h")
+		get_property(ZEFC_BINARY_PATH TARGET ZEFC PROPERTY LOCATION)
+		add_custom_command(
+			COMMAND "${ZEFC_BINARY_PATH}" 
+			ARGS "${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE}" -C ${PARAMETER_ZEFC} -S "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.cpp" -H "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h"
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE} ZEFC
+			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.cpp ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h)
+		if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h)
+			 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h 
+			 	"#pragma once\n\n"
+				"#include \"ZEData.h\"\n"
+				"#include \"ZETypes.h\"\n"
+				"\n"
+				"class ${PARAMETER_ZEFC} : public ZEData\n"
+				"{\n"
+				"\tpublic:\n"
+					"\t\tvoid*\t\tGetData();\n"
+					"\t\tZESize\t\tGetSize();\n"
+				"};\n")			
+			 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.cpp "//Will be generated.")
+		endif()
+		list(APPEND ${PARAMETER_SOURCE_LIST} ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h)
+		list(APPEND ${PARAMETER_SOURCE_LIST} ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.cpp)
+	
+		source_group("Generated" FILES ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.cpp ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h)
 	endif()
 	
 	# Process File With ZEDOC
@@ -473,15 +501,31 @@ endfunction()
 
 macro(ze_get_version)
 	file(READ "${ARGV0}/Version.txt" VERSION_STRING)
-	
+
 	set(VERSION_MAJOR 0)
-	string(REGEX REPLACE "^[ \\t\\r\\n]*Version[ \\t]*:[ \\t]*([0-9]+).*" "\\1" VERSION_MAJOR "${VERSION_STRING}")
+	if ("${VERSION_STRING}" MATCHES "[ \\t]*Version[ \\t]*:[ \\t]*([0-9]+).*")
+		set(VERSION_MAJOR ${CMAKE_MATCH_1})
+	endif()
 
 	set(VERSION_MINOR 0)
-	string(REGEX REPLACE "^[ \\t\\r\\n]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*([0-9]+).*" "\\1" VERSION_MINOR "${VERSION_STRING}")
+	if ("${VERSION_STRING}" MATCHES "[ \\t]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*([0-9]+).*")
+		set(VERSION_MINOR ${CMAKE_MATCH_1})
+	endif()
 
 	set(VERSION_INTERNAL 0)
-	string(REGEX REPLACE "^[ \\t\\r\\n]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*[0-9]+\\.[ \\t]*([0-9]+).*" "\\1" VERSION_INTERNAL "${VERSION_STRING}")
+	if ("${VERSION_STRING}" MATCHES "[ \\t]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*[0-9]+\\.[ \\t]*([0-9]+).*")
+		set(VERSION_INTERNAL ${CMAKE_MATCH_1})
+	endif()
+
+endmacro()
+
+macro(ze_get_version_branch_name)
+	file(READ "${ARGV0}/Version.txt" VERSION_STRING)
+
+	set (VERSION_BRANCH_NAME "")
+	if ("${VERSION_STRING}" MATCHES "[ \\t]*Branch[ \\t]*:[ \\t]*(.*)[ \\t]*")
+		set(VERSION_BRANCH_NAME ${CMAKE_MATCH_1})
+	endif()
 endmacro()
 
 macro(ze_get_version_revision_number)
