@@ -42,6 +42,7 @@
 #include "ZEDS\ZEString.h"
 #include "ZEMLItem.h"
 #include "ZEDS\ZEHashGenerator.h"
+#include "ZEFile\ZEPartialFile.h"
 
 typedef ZEInt64 ZEMLSerialPointer;
 
@@ -92,6 +93,7 @@ class ZEMLSerialReader
 		ZEVariant			GetItemValue();
 		ZEUInt64			GetDataSize();
 		bool				GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offset = 0);
+		bool				GetData(ZEPartialFile& File);
 
 		bool				ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCount);
 
