@@ -1036,6 +1036,7 @@ void ZEGizmo::Draw(ZEDrawParameters* DrawParameters)
 {
 	UpdateGizmo();
 
+	RenderCommand.Priority = 4;
 	RenderCommand.WorldMatrix = GetWorldTransform();
 	RenderCommand.Flags = (Mode == ZE_GM_ROTATE ? ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM : ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM);
 	RenderCommand.PrimitiveType = ZE_ROPT_LINE;

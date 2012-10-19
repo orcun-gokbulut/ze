@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsModelExporterOptions.h
+ Zinek Engine - ZEModelExporterOptionsDialog.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,47 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE3DS_MODEL_EXPORTER_OPTIONS_H__
-#define __ZE3DS_MODEL_EXPORTER_OPTIONS_H__
+#ifndef __ZE_3DS_MODEL_EXPORTER_OPTIONS_DIALOG_H__
+#define __ZE_3DS_MODEL_EXPORTER_OPTIONS_DIALOG_H__
 
-#include "ZETypes.h"
+#include "ui_ZEModelExporterOptionsWidget.h"
+#include "QtGui\QDialog"
+#include "ZEDS\ZEString.h"
+#include "ZEML\ZEMLNode.h"
 
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-
-class ZEModelExporterOptions
+class ZE3dsModelExporterOptionsDialog : public QDialog
 {
-	public:
-		char					ResourceDirectory[MAX_PATH];
-		
-		bool					LogToFile;
-		TCHAR					LogFile[MAX_PATH];
-		ZEInt						OutputLevel;
-		bool					ExportAnimation;
-		TCHAR					AnimationName[MAX_PATH];
-
-		void					Save(char* Filename);
-		void					Load(char* Filename);
-};
-
-class ZEModelExporterOptionsDialog
-{
-	friend INT_PTR CALLBACK		OptionsDialogCallback(HWND hWnd,UINT message,WPARAM wParam, LPARAM lParam);
+	Q_OBJECT
 
 	private:
-		HWND					hWnd;
-		ZEModelExporterOptions	Options;
-		void					DialogDataExchange();
-		void					ManageDialog();
+
+		Ui::ZEModelExporterOptionsDialogUI*		Form;
+		ZEMLNode*								Options;
+	
+		void			ToggleFileLogging(bool IsEnabled);
+		void			ToggleApplicationPathOptions(bool IsEnabled);
+		void			CollectOptionsFromForm();
+
+	private slots:
+
+		void			ShowEngineDirectoryDialog();
+		void			ShowLoggingFilePathDialog();
+		void			SetFileLoggingEnabled(int CheckBoxState);
+		void			SetExportBonesEnabled(bool IsChecked);
+		void			SetExportMeshesEnabled(bool IsChecked);
+
+		void			AddAnimation();
+		void			RemoveAnimation();
+
 	public:
-		bool					ShowDialog(HINSTANCE Instance, ZEModelExporterOptions& Options);
+
+						ZE3dsModelExporterOptionsDialog(QWidget* Parent);
+
+		bool			GetFileLoggingEnabled();
+		ZEString		GetLogFilePath();
+
+		void			SetOptions(ZEMLNode* Options);
+		ZEMLNode*		GetOptions();
 };
 
 #endif

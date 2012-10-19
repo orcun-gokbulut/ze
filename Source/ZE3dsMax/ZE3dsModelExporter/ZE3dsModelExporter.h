@@ -37,25 +37,13 @@
 #ifndef __ZE3DS_MODEL_EXPORTER_H__
 #define __ZE3DS_MODEL_EXPORTER_H__
 
-#include "ZETypes.h"
-#include "ZE3dsModelExporterResources.h"
-#include "ZEML/ZEMLNode.h"
-
-#include <Max.h>
-#include <istdplug.h>
-#include <iparamb2.h>
-#include <iparamm2.h>
-#include <IGame/IGame.h>
-#include <IGame/IGameModifier.h>
-
-#define ZE_MDLF_MAX_NAME_SIZE					128
-#define ZE_MDLF_MAX_FILENAME_SIZE				256
+#include "ZE3dsMaxUtils/ZE3dsMaxUtils.h"
 
 extern HINSTANCE hInstance;
 class QApplication;
 class QWinWidget;
 class ZEProgressDialog;
-class ZE3dsModelExporterOptionsDialogNew;
+class ZE3dsModelExporterOptionsDialog;
 class ZEResourceConfigurationWidget;
 
 class ZE3dsModelExporter : public SceneExport 
@@ -64,7 +52,7 @@ class ZE3dsModelExporter : public SceneExport
 
 		QApplication*						QtApplication;
 
-		ZE3dsModelExporterOptionsDialogNew*	OptionsDialog;
+		ZE3dsModelExporterOptionsDialog*	OptionsDialog;
 		ZEResourceConfigurationWidget*		ResourceConfigurationDialog;
 
 		ZEMLNode*							ExportOptions;
@@ -77,12 +65,9 @@ class ZE3dsModelExporter : public SceneExport
 
 		
 		Tab<IGameNode*>				ProcessedBones;
-		Tab<IGameMaterial*>			ProcessedMaterials;
 		Tab<IGameNode*>				ProcessedMeshes;
 		Tab<IGameNode*>				ProcessedMasterMeshes;
-		Tab<IGameMaterial*>			Materials;
-		Tab<IGameNode*>				AnimationEnabledBones;
-		Tab<IGameNode*>				AnimationEnabledMeshes;
+		Tab<IGameMaterial*>			ProcessedMaterials;
 
 		ZEInt						TotalFrameCount;
 		ZEInt						TicksPerFrame;
@@ -94,9 +79,9 @@ class ZE3dsModelExporter : public SceneExport
 		bool						ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath);
 
 		bool						ProcessBone(IGameNode* Node, ZEMLNode* BonesNode);
-		bool						ProcessBones(ZEMLNode* BonesNode);
+		bool						ProcessBones();
 		ZEInt						ProcessMeshMaterial(IGameMaterial* Material);
-		bool						ProcessMaterials(const char* FileName, ZEMLNode* MaterialsNode);
+		bool						ProcessMaterials(const char* FileName);
 		bool						ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* MeshLODNode);
 		void						ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* ShapeNode);
 		bool						ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* PhysicalShapeNode);
@@ -104,7 +89,7 @@ class ZE3dsModelExporter : public SceneExport
 		bool						ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* PhysicalJointNode);
 		bool						ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesNode);
 		bool						ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNode);
-		bool						ProcessMeshes(ZEMLNode* MeshesNode);
+		bool						ProcessMeshes();
 		void						ProcessAnimationFrames(ZESize AnimationStartFrame, ZESize AnimationFrameCount, ZEMLNode* AnimationNode);
 		bool						ProcessAnimations(ZEMLNode* AnimationsNode);
 

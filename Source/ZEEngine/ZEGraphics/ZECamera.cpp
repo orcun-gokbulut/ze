@@ -89,7 +89,7 @@ void ZECamera::SetPosition(const ZEVector3& NewPosition)
 	ZEEntity::SetPosition(NewPosition);
 }	
 
-void ZECamera::SetLocalRotation(const ZEQuaternion& NewRotation)
+void ZECamera::SetRotation(const ZEQuaternion& NewRotation)
 {
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;
@@ -202,9 +202,9 @@ void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
 
 	ZEMatrix4x4::Transform3x3(Ray.v, InvViewMatrix, V);
 
-	Ray.p.x = InvViewMatrix.M41;
-	Ray.p.y = InvViewMatrix.M42;
-	Ray.p.z = InvViewMatrix.M43; 
+	Ray.p.x = InvViewMatrix.M14;
+	Ray.p.y = InvViewMatrix.M24;
+	Ray.p.z = InvViewMatrix.M34; 
 	ZEVector3::Normalize(Ray.v, Ray.v);
 }
 

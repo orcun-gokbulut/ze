@@ -37,18 +37,7 @@
 #ifndef __ZE3DS_MAP_EXPORTER_H__
 #define __ZE3DS_MAP_EXPORTER_H__
 
-#include "ZETypes.h"
-
-#include <Max.h>
-#include <istdplug.h>
-#include <iparamb2.h>
-#include <iparamm2.h>
-#include <IGame/IGame.h>
-#include "ZEML/ZEMLNode.h"
-
-#define ZE_MPFL_MAX_NAME_SIZE				128
-#define ZE_MPFL_MAX_FILENAME_SIZE			256
-
+#include "ZE3dsMaxUtils/ZE3dsMaxUtils.h"
 
 extern HINSTANCE hInstance;
 
@@ -59,31 +48,6 @@ class ZEProgressDialog;
 class ZEMLNode;
 class ZEResourceConfigurationWidget;
 
-struct ZEMapFilePhysicalMeshPolygon
-{
-	ZEUInt32								Indices[3];
-};
-
-struct ZEMapFilePhysicalMesh
-{
-	ZEArray<ZEVector3>						Vertices;
-	ZEArray<ZEMapFilePhysicalMeshPolygon>	Polygons;
-};
-
-struct ZEMapFileVertex
-{
-	ZEVector3								Position;
-	ZEVector3								Normal;
-	ZEVector3								Tangent;
-	ZEVector3								Binormal;
-	ZEVector2								Texcoord;
-};
-
-struct ZEMapFilePolygon
-{	
-	ZEUInt32								Material;
-	ZEMapFileVertex							Vertices[3];
-};
 
 class ZE3dsMapExporter : public SceneExport 
 {
@@ -120,6 +84,7 @@ class ZE3dsMapExporter : public SceneExport
 		bool						ProcessScene();
 		bool						ProcessMaterials(const char* FileName);
 		bool						ProcessPortals();
+		void						ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode);
 		bool						ProcessDoors();
 
 	protected:

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsModelExporterOptionsDialog.cpp
+ Zinek Engine - ZEModelExporterOptionsDialog.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZE3dsModelExporterOptionsDialog.h"
+#include "ZEModelExporterOptionsDialog.h"
 #include "QtGui\QFileDialog"
 #include "ZEML\ZEMLProperty.h"
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 
-ZE3dsModelExporterOptionsDialogNew::ZE3dsModelExporterOptionsDialogNew(QWidget* Parent) : QDialog(Parent)
+ZE3dsModelExporterOptionsDialog::ZE3dsModelExporterOptionsDialog(QWidget* Parent) : QDialog(Parent)
 {
 	Form = new Ui::ZEModelExporterOptionsDialogUI();
 	Form->setupUi(this);
 
+	Options = NULL;
+
 	connect(Form->btnBrowseEngineDir, SIGNAL(clicked()), this, SLOT(ShowEngineDirectoryDialog()));
 	connect(Form->btnBrowseLogPath, SIGNAL(clicked()), this, SLOT(ShowLoggingFilePathDialog()));
-	connect(Form->btnBrowseApplicationFolder, SIGNAL(clicked()), this, SLOT(ShowApplicationPathDialog()));
 	connect(Form->ckbFileLoggingEnabled, SIGNAL(stateChanged(int)), this, SLOT(SetFileLoggingEnabled(int)));
-	connect(Form->cmbRelativeTo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetApplicationPathOptionsVisibility(int)));
-	connect(Form->ckbCopyResources, SIGNAL(stateChanged(int)), this, SLOT(SetResourceCopyEnabled(int)));
-	connect(Form->btnNewAnimation, SIGNAL(clicked()), this, SLOT(AddAnimation()));
-	connect(Form->btnDeleteAnimation, SIGNAL(clicked()), this, SLOT(RemoveAnimation()));
 	connect(Form->grpExportBones, SIGNAL(toggled(bool)), this, SLOT(SetExportBonesEnabled(bool)));
 	connect(Form->grpExportMeshes, SIGNAL(toggled(bool)), this, SLOT(SetExportMeshesEnabled(bool)));
+	connect(Form->btnNewAnimation, SIGNAL(clicked()), this, SLOT(AddAnimation()));
+	connect(Form->btnDeleteAnimation, SIGNAL(clicked()), this, SLOT(RemoveAnimation()));
 	Form->AnimationTreeWidget->setSortingEnabled(false);
-
-	SetApplicationPathOptionsVisibility(Form->cmbRelativeTo->currentIndex());
 }
 
-void ZE3dsModelExporterOptionsDialogNew::SetOptions(ZEMLNode* Options)
+void ZE3dsModelExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 {
 	if(Options == NULL)
 		return;
@@ -74,30 +71,9 @@ void ZE3dsModelExporterOptionsDialogNew::SetOptions(ZEMLNode* Options)
 	if(CurrentProperty != NULL)
 		Form->txtLogFilePath->setText(((ZEMLProperty*)CurrentProperty)->GetValue().GetString().ToCString());
 
-	CurrentProperty = Options->GetProperty("ApplicationPath");
-	if(CurrentProperty != NULL)
-		Form->txtApplicationFolder->setText(((ZEMLProperty*)CurrentProperty)->GetValue().GetString().ToCString());
-
 	CurrentProperty = Options->GetProperty("IsFileLoggingEnabled");
 	if(CurrentProperty != NULL)
 		ToggleFileLogging(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
-
-	CurrentProperty = Options->GetProperty("IsResourceCopyingEnabled");
-	if(CurrentProperty != NULL)
-		Form->ckbCopyResources->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
-
-	CurrentProperty = Options->GetProperty("RelativeTo");
-	if(CurrentProperty != NULL)
-	{
-		ZEInt32 OptionValue = ((ZEMLProperty*)CurrentProperty)->GetValue().GetInt32();
-
-		if(OptionValue == 1)
-			ToggleApplicationPathOptions(true);
-		else
-			ToggleApplicationPathOptions(false);
-
-		Form->cmbRelativeTo->setCurrentIndex(OptionValue);
-	}
 
 	CurrentProperty = Options->GetProperty("IsBoneExportEnabled");
 	if(CurrentProperty != NULL)
@@ -143,27 +119,20 @@ void ZE3dsModelExporterOptionsDialogNew::SetOptions(ZEMLNode* Options)
 
 }
 
-ZEMLNode* ZE3dsModelExporterOptionsDialogNew::GetOptions()
+ZEMLNode* ZE3dsModelExporterOptionsDialog::GetOptions()
 {
 	CollectOptionsFromForm();
 	return Options;
 }
 
-void ZE3dsModelExporterOptionsDialogNew::ToggleFileLogging(bool IsEnabled)
+void ZE3dsModelExporterOptionsDialog::ToggleFileLogging(bool IsEnabled)
 {
 	Form->btnBrowseLogPath->setEnabled(IsEnabled);
 	Form->txtLogFilePath->setEnabled(IsEnabled);
 	Form->ckbFileLoggingEnabled->setChecked(IsEnabled);
 }
 
-void ZE3dsModelExporterOptionsDialogNew::ToggleApplicationPathOptions(bool IsEnabled)
-{
-	Form->lblApplicationPath->setVisible(IsEnabled);
-	Form->txtApplicationFolder->setVisible(IsEnabled);
-	Form->btnBrowseApplicationFolder->setVisible(IsEnabled);
-}
-
-void ZE3dsModelExporterOptionsDialogNew::ShowEngineDirectoryDialog()
+void ZE3dsModelExporterOptionsDialog::ShowEngineDirectoryDialog()
 {
 	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text());
 
@@ -173,7 +142,7 @@ void ZE3dsModelExporterOptionsDialogNew::ShowEngineDirectoryDialog()
 	Form->txtEngineWorkingDirectory->setText(SelectedDirectory);
 }
 
-void ZE3dsModelExporterOptionsDialogNew::ShowLoggingFilePathDialog()
+void ZE3dsModelExporterOptionsDialog::ShowLoggingFilePathDialog()
 {
 	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text());
 
@@ -183,17 +152,7 @@ void ZE3dsModelExporterOptionsDialogNew::ShowLoggingFilePathDialog()
 	Form->txtLogFilePath->setText(SelectedDirectory);
 }
 
-void ZE3dsModelExporterOptionsDialogNew::ShowApplicationPathDialog()
-{
-	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtApplicationFolder->text());
-
-	if(SelectedDirectory.length() == 0)
-		return;
-
-	Form->txtApplicationFolder->setText(SelectedDirectory);
-}
-
-void ZE3dsModelExporterOptionsDialogNew::SetFileLoggingEnabled(int CheckBoxState)
+void ZE3dsModelExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
 {
 	if(CheckBoxState == Qt::CheckState::Checked)
 		ToggleFileLogging(true);
@@ -201,32 +160,19 @@ void ZE3dsModelExporterOptionsDialogNew::SetFileLoggingEnabled(int CheckBoxState
 		ToggleFileLogging(false);
 }
 
-void ZE3dsModelExporterOptionsDialogNew::SetResourceCopyEnabled(int CheckBoxState)
-{
-
-}
-
-void ZE3dsModelExporterOptionsDialogNew::SetApplicationPathOptionsVisibility(int Index)
-{
-	if(Index == 1)
-		ToggleApplicationPathOptions(true);
-	else
-		ToggleApplicationPathOptions(false);
-}
-
-void ZE3dsModelExporterOptionsDialogNew::SetExportBonesEnabled(bool IsChecked)
+void ZE3dsModelExporterOptionsDialog::SetExportBonesEnabled(bool IsChecked)
 {
 	if(!IsChecked)
 		Form->ckbExportBonePhysicalBodies->setChecked(false);
 }
 
-void ZE3dsModelExporterOptionsDialogNew::SetExportMeshesEnabled(bool IsChecked)
+void ZE3dsModelExporterOptionsDialog::SetExportMeshesEnabled(bool IsChecked)
 {
 	if(!IsChecked)
 		Form->ckbExportMeshPhysicalBodies->setChecked(false);
 }
 
-void ZE3dsModelExporterOptionsDialogNew::AddAnimation()
+void ZE3dsModelExporterOptionsDialog::AddAnimation()
 {
 
 	ZEInt ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
@@ -243,7 +189,7 @@ void ZE3dsModelExporterOptionsDialogNew::AddAnimation()
 	Form->AnimationTreeWidget->editItem(Item, 0);
 }
 
-void ZE3dsModelExporterOptionsDialogNew::RemoveAnimation()
+void ZE3dsModelExporterOptionsDialog::RemoveAnimation()
 {
 	if(Form->AnimationTreeWidget->currentItem() == NULL)
 		return;
@@ -252,7 +198,7 @@ void ZE3dsModelExporterOptionsDialogNew::RemoveAnimation()
 	Form->AnimationTreeWidget->takeTopLevelItem(IndexOfItem);
 }
 
-void ZE3dsModelExporterOptionsDialogNew::CollectOptionsFromForm()
+void ZE3dsModelExporterOptionsDialog::CollectOptionsFromForm()
 {
 	if(Options == NULL)
 	{
@@ -260,9 +206,6 @@ void ZE3dsModelExporterOptionsDialogNew::CollectOptionsFromForm()
 		Options->AddProperty("ZinekEngineWorkingDirectory", (const char*)Form->txtEngineWorkingDirectory->text().toUtf8());
 		Options->AddProperty("IsFileLoggingEnabled", Form->ckbFileLoggingEnabled->isChecked());
 		Options->AddProperty("LogFilePath", (const char*)Form->txtLogFilePath->text().toUtf8());
-		Options->AddProperty("RelativeTo", (ZEInt32)Form->cmbRelativeTo->currentIndex());
-		Options->AddProperty("ApplicationPath", (const char*)Form->txtApplicationFolder->text().toUtf8());
-		Options->AddProperty("IsResourceCopyingEnabled", Form->ckbCopyResources->isChecked());
 		Options->AddProperty("IsBoneExportEnabled", Form->grpExportBones->isChecked());
 		Options->AddProperty("IsBonePhysicalBodyExportEnabled", Form->ckbExportBonePhysicalBodies->isChecked());
 		Options->AddProperty("IsMeshExportEnabled", Form->grpExportMeshes->isChecked());
@@ -300,21 +243,6 @@ void ZE3dsModelExporterOptionsDialogNew::CollectOptionsFromForm()
 			((ZEMLProperty*)(Options->GetProperty("LogFilePath")))->SetValue((const char*)Form->txtLogFilePath->text().toUtf8());
 		else
 			Options->AddProperty("LogFilePath", (const char*)Form->txtLogFilePath->text().toUtf8());
-
-		if (Options->GetProperty("RelativeTo") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("RelativeTo")))->SetValue((ZEInt32)Form->cmbRelativeTo->currentIndex());
-		else
-			Options->AddProperty("RelativeTo", (ZEInt32)Form->cmbRelativeTo->currentIndex());
-
-		if (Options->GetProperty("ApplicationPath") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("ApplicationPath")))->SetValue((const char*)Form->txtApplicationFolder->text().toUtf8());
-		else
-			Options->AddProperty("ApplicationPath", (const char*)Form->txtApplicationFolder->text().toUtf8());
-
-		if (Options->GetProperty("IsResourceCopyingEnabled") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("IsResourceCopyingEnabled")))->SetValue(Form->ckbCopyResources->isChecked());
-		else
-			Options->AddProperty("IsResourceCopyingEnabled", Form->ckbCopyResources->isChecked());
 
 		if (Options->GetProperty("IsBoneExportEnabled") != NULL)
 			((ZEMLProperty*)(Options->GetProperty("IsBoneExportEnabled")))->SetValue(Form->grpExportBones->isChecked());

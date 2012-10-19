@@ -63,7 +63,7 @@ class ZEMapExporterOptionsDialog : public QDialog
 
 	public:
 
-								ZEMapExporterOptionsDialog(QWidget* Parent, ZEMLNode* Options);
+								ZEMapExporterOptionsDialog(QWidget* Parent);
 								~ZEMapExporterOptionsDialog();
 
 	bool						GetFileLoggingEnabled();

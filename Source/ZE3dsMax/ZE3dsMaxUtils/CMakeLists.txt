@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZE3dsModelExporterOptionsDialog.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,51 +30,17 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_3DS_MODEL_EXPORTER_OPTIONS_DIALOG_H__
-#define __ZE_3DS_MODEL_EXPORTER_OPTIONS_DIALOG_H__
+cmake_minimum_required (VERSION 2.8)
 
-#include "ui_ZE3dsModelExporterOptionsWidget.h"
-#include "QtGui\QDialog"
-#include "ZEDS\ZEString.h"
-#include "ZEML\ZEMLNode.h"
+ze_add_source(ZE3dsMaxUtils.h				Sources)
+ze_add_source(ZE3dsMaxUtils.cpp				Sources)
 
-class ZE3dsModelExporterOptionsDialogNew : public QDialog
-{
-	Q_OBJECT
-
-	private:
-
-		Ui::ZEModelExporterOptionsDialogUI*		Form;
-		ZEMLNode*								Options;
-	
-		void			ToggleFileLogging(bool IsEnabled);
-		void			ToggleApplicationPathOptions(bool IsEnabled);
-		void			CollectOptionsFromForm();
-
-	private slots:
-
-		void			ShowEngineDirectoryDialog();
-		void			ShowLoggingFilePathDialog();
-		void			ShowApplicationPathDialog();
-		void			SetFileLoggingEnabled(int CheckBoxState);
-		void			SetResourceCopyEnabled(int CheckBoxState);
-		void			SetApplicationPathOptionsVisibility(int Index);
-		void			SetExportBonesEnabled(bool IsChecked);
-		void			SetExportMeshesEnabled(bool IsChecked);
-
-		void			AddAnimation();
-		void			RemoveAnimation();
-
-	public:
-
-						ZE3dsModelExporterOptionsDialogNew(QWidget* Parent);
-
-		void			SetOptions(ZEMLNode* Options);
-		ZEMLNode*		GetOptions();
-};
-
-#endif
+ze_add_library(ZE3dsMaxUtils
+	SOURCES ${Sources}
+	LIBS ZEFoundation core geom gfx mesh maxutil maxscrpt paramblk2 igame
+	INSTALL
+	INSTALL_DESTINATION "Tools/Exporters/ZE3dsMax"
+	INSTALL_COMPONENT Tool)

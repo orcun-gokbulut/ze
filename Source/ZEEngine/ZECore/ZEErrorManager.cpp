@@ -68,7 +68,7 @@ void ZEErrorManager::ErrorCallback(ZEErrorType Level)
 		zeCore->SetCoreState(ZE_CS_CRITICAL_ERROR);
 		ZEConsoleWindow ConsoleWindow;
 		ZECore::GetInstance()->GetConsole()->SetConsoleInterface(&ConsoleWindow);
-		ConsoleWindow.TermiantionState();
+		ConsoleWindow.TerminationState();
 		ZECore::GetInstance()->GetConsole()->SetConsoleInterface(NULL);
 		exit(0);
 	}
