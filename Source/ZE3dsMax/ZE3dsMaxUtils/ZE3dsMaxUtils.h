@@ -41,6 +41,7 @@
 #include "ZEMath/ZEAABBox.h"
 #include "ZEML/ZEMLNode.h"
 #include "ZEML/ZEMLProperty.h"
+#include "ZEPacking.h"
 
 #include <Max.h>
 #include <istdplug.h>
@@ -76,46 +77,8 @@ enum ZEPropType //Do not change order
 	ZE_BOOL_PROP			= 6
 };
 
-// template <typename T>
-// bool GetProperty(IExportEntity * Object, ZEPropType Type, const char* Property, T& Value)
-// { 
-// 	if (Object == NULL)
-// 		return false;
-// 
-// 	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
-// 	if (Prop != NULL)
-// 	{
-// 		if(Type == ZE_BOOL_PROP)
-// 			Type = ZE_INT_PROP;
-// 
-// 		if (Prop->GetType() == Type)
-// 		{
-// 			if (Prop->GetPropertyValue(Value))
-// 				return true;
-// 			else
-// 			{
-// 				zeWarning("Can not read property value. (Property Name : \"%s\")", Property);
-// 				return false;
-// 			}
-// 		}
-// 		else
-// 		{
-// 			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property, Prop->GetType(), Type);
-// 			return false;
-// 		}
-// 	}
-// 	else
-// 	{
-// 		zeWarning("Can not find property. (Property Name : \"%s\")", Property);
-// 		return false;
-// 	}
-// }
-
 class ZE3dsMaxUtils
 {
-	private:
-						ZE3dsMaxUtils();
-						~ZE3dsMaxUtils();
 
 	public:
 		static ZEVector2		MaxtoZE(const Point2& Point);

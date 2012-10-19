@@ -64,6 +64,7 @@ enum ZEPhysicalShapeType
 	ZE_PBST_CONVEX			= 4
 };
 
+ZEPackStruct(
 struct ZEModelFileSkinnedVertex
 {
 	ZEVector3									Position;
@@ -73,8 +74,9 @@ struct ZEModelFileSkinnedVertex
 	ZEVector2									Texcoord;
 	ZEUInt8										BoneIndices[4];
 	float										BoneWeights[4];
-};
+});
 
+ZEPackStruct(
 struct ZEModelFileVertex
 {
 	ZEVector3									Position;
@@ -82,44 +84,16 @@ struct ZEModelFileVertex
 	ZEVector3									Tangent;
 	ZEVector3									Binormal;
 	ZEVector2									Texcoord;
-};
+});
 
+ZEPackStruct(
 struct ZEModelFileAnimationKey
 {
 	ZEUInt32									ItemId;
 	ZEVector3									Position;
 	ZEQuaternion								Rotation;
 	ZEVector3									Scale;
-};
-
-struct ZEModelFileAnimationFrame
-{
-	ZEArray<ZEModelFileAnimationKey>			BoneKeys;
-	ZEArray<ZEModelFileAnimationKey>			MeshKeys;
-};
-
-bool ZE3dsModelExporter::GetRelativePath(const char* RealPath, char* RelativePath)
-{
-	ZEString ZinekDir;
-
-	if(ExportOptions != NULL)
-		ZinekDir = ((ZEMLProperty*)(ExportOptions->GetProperty("ZinekEngineWorkingDirectory")))->GetValue().GetString();
-	else
-		zeError("Can not get Zinek Working Directory from options.");
-
-	if (strnicmp(RealPath, ZinekDir.ToCString(), ZinekDir.GetLength()) == 0)
-	{
-		strcpy(RelativePath, RealPath + ZinekDir.GetLength() + 1);
-		return true;
-	}
-	else
-	{
-		RelativePath[0] = '\0';
-		return false;
-	}
-
-	return false;
-}
+});
 
 ZEInt ZE3dsModelExporter::GetMeshId(IGameNode* Node)
 {
@@ -518,7 +492,7 @@ bool ZE3dsModelExporter::ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerN
 		char* ObjectClassName = Object->GetClassName();
 		if (strcmp(ObjectClassName, "Box") == 0)
 		{
-			PhysicalShapeNode->AddProperty("Type", ZE_PBST_BOX);
+			PhysicalShapeNode->AddProperty("Type", (ZEInt)ZE_PBST_BOX);
 			ZEMLNode* ShapeNode = PhysicalShapeNode->AddSubNode("Shape");
 			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "width",  *ShapeNode->AddProperty("Width"));
 			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "height", *ShapeNode->AddProperty("Height"));
@@ -526,27 +500,27 @@ bool ZE3dsModelExporter::ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerN
 		}
 		else if (strcmp(ObjectClassName, "Sphere") == 0)
 		{
-			PhysicalShapeNode->AddProperty("Type", ZE_PBST_SPHERE);
+			PhysicalShapeNode->AddProperty("Type", (ZEInt)ZE_PBST_SPHERE);
 			ZEMLNode* ShapeNode = PhysicalShapeNode->AddSubNode("Shape");
 			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "radius", *ShapeNode->AddProperty("Radius"));
 		}
 		else if (strcmp(ObjectClassName, "Capsule") == 0)
 		{
-			PhysicalShapeNode->AddProperty("Type", ZE_PBST_CAPSULE);
+			PhysicalShapeNode->AddProperty("Type", (ZEInt)ZE_PBST_CAPSULE);
 			ZEMLNode* ShapeNode = PhysicalShapeNode->AddSubNode("Shape");
 			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "radius", *ShapeNode->AddProperty("Radius"));
 			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "height", *ShapeNode->AddProperty("Height"));
 		}
 		else if (strcmp(ObjectClassName, "Cylinder") == 0)
 		{
-			PhysicalShapeNode->AddProperty("Type", ZE_PBST_CYLINDER);
+			PhysicalShapeNode->AddProperty("Type", (ZEInt)ZE_PBST_CYLINDER);
 			ZEMLNode* ShapeNode = PhysicalShapeNode->AddSubNode("Shape");
 			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "radius", *ShapeNode->AddProperty("Radius"));
 			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "height", *ShapeNode->AddProperty("Height"));
 		}
 		else if (strcmp(ObjectClassName, "Editable Poly") == 0 || strcmp(ObjectClassName, "Editable Mesh") == 0 || strcmp(ObjectClassName, "Editable Patch") == 0)
 		{
-			PhysicalShapeNode->AddProperty("Type", ZE_PBST_CONVEX);
+			PhysicalShapeNode->AddProperty("Type", (ZEInt)ZE_PBST_CONVEX);
 			ProcessPhysicalBodyConvexShape(Node, OwnerNode, PhysicalShapeNode->AddSubNode("Shape"));
 		}
 		else
@@ -557,7 +531,7 @@ bool ZE3dsModelExporter::ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerN
 	}
 	else if (GeometryType == 2) // Convex
 	{
-		PhysicalShapeNode->AddProperty("Type", ZE_PBST_CONVEX);
+		PhysicalShapeNode->AddProperty("Type", (ZEInt)ZE_PBST_CONVEX);
 		ProcessPhysicalBodyConvexShape(Node, OwnerNode, PhysicalShapeNode->AddSubNode("Shape"));
 	}
 
@@ -697,7 +671,7 @@ bool ZE3dsModelExporter::ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* Physica
 	}
 
 	ZEInt JointTypeValue = 0;
-	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_Type",						JointTypeValue);
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,	"Joint_Type", JointTypeValue);
 	JointTypeValue--;
 	PhysicalJointNode->AddProperty("JointType", JointTypeValue);
 
@@ -1474,79 +1448,6 @@ bool ZE3dsModelExporter::ProcessAnimations(ZEMLNode* AnimationsNode)
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
 
-	return true;
-}
-
-bool ZE3dsModelExporter::DumpPropertyContainer(IExportEntity* Node)
-{
-	if (Node == NULL)
-	{
-		return false;
-	}
-
-	IPropertyContainer* Properties = Node->GetIPropertyContainer();
-	if (Properties == NULL)
-	{
-		zeError("There is no property container. Class Name : \"%s\".", Node->GetClassName());
-		return false;
-	}
-	zeLog("Dumping properties of entity. Class Name : \"%s\".", Node->GetClassName());
-	for (ZEInt I = 0; I < Properties->GetNumberOfProperties(); I++)
-	{
-		IGameProperty* Property = Properties->GetProperty(I);
-		zeLog("Property %d. Name : \"%s\", Index : %d, Animated : %s, ", I, Property->GetName(), Property->GetParamBlockIndex(), (Property->IsPropAnimated() ? "Yes" : "No"));
-
-		float FloatValue;
-		ZEInt IntValue;
-		Point3 Point3Value;
-		Point4 Point4Value;
-		const char* StringValue;
-		IParamBlock2* ParamBlock;
-		ZEInt ParamId;
-		ParamType2 ParamType;
-		switch(Property->GetType())
-		{
-		case ZE_UNKNOWN_PROP:
-			ParamBlock =  Property->GetMaxParamBlock2();
-			ParamId = ParamBlock->IndextoID(Property->GetParamBlockIndex());
-			ParamType = ParamBlock->GetParameterType(ParamId);
-			switch(ParamBlock->GetParameterType(ParamId))
-			{
-			case TYPE_INODE:
-				zeLog("Type : INode, Value : \"%s\".", (ParamBlock->GetINode(ParamId, 0, 0)->GetName() != NULL ? ParamBlock->GetINode(ParamId, 0, 0)->GetName() : "NULL"));
-				break;
-			case TYPE_INODE_TAB:
-				zeLog("Type : INodeTab, Values : [");
-				for (ZEInt N = 0 ; N < ParamBlock->Count(ParamId); N++)
-					zeLog("\"%s\", ", ParamBlock->GetINode(ParamId, 0, N)->GetName());
-				zeLog("].");
-				break;
-			};
-			break;
-		case ZE_FLOAT_PROP:
-			Property->GetPropertyValue(FloatValue);
-			zeLog("Type : FLOAT, Value : %f.", FloatValue);
-			break;
-		case ZE_VECTOR3_PROP:
-			Property->GetPropertyValue(Point3Value);
-			zeLog("Type : POINT3, Value : <%f, %f, %f>", Point3Value.x, Point3Value.y, Point3Value.z);
-			break;
-		case ZE_INT_PROP:
-			Property->GetPropertyValue(IntValue);
-			zeLog("Type : INT, Value : %d.", IntValue);
-			break;
-		case ZE_STRING_PROP:
-			Property->GetPropertyValue(StringValue);
-			zeLog("Type : STRING, Value : \"%s\".",StringValue);
-			break;
-		case ZE_VECTOR4_PROP:
-			Property->GetPropertyValue(Point4Value);
-			zeLog("Type : POINT4, Value : <%f, %f, %f, %f>.", Point4Value.x, Point4Value.y, Point4Value.z, Point4Value.w);
-			break;
-		default:
-			zeLog("Property Type : ERROR.");
-		}
-	}
 	return true;
 }
 

@@ -36,7 +36,6 @@
 #include "ZEError.h"
 #include "ZEModelResource.h"
 #include "ZEModelFileFormat.h"
-//#include "ZECore/ZEResource.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
@@ -191,8 +190,8 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEMLSerialReader* Node
 
 		ZEMLSerialListItem MaterialList[] = 
 		{
-			ZEML_LIST_PROPERTY("Name", NameValue, true),
-			ZEML_LIST_PROPERTY("FilePath", FilePathValue, true)
+			ZEML_LIST_PROPERTY("Name",		NameValue,		ZE_VRT_STRING,	true),
+			ZEML_LIST_PROPERTY("FilePath",	FilePathValue,	ZE_VRT_STRING,	true)
 		};
 
 		if (!NodeReader->ReadPropertyList(MaterialList, 2))
@@ -224,13 +223,13 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEMLSeri
 
 	ZEMLSerialListItem PhysicalBodyList[] = 
 	{
-		ZEML_LIST_PROPERTY("Enabled", Enabled, true),
-		ZEML_LIST_PROPERTY("Type", Type, true),
-		ZEML_LIST_PROPERTY("Mass", Mass, true),
-		ZEML_LIST_PROPERTY("MassCenter", MassCenter, true),
-		ZEML_LIST_PROPERTY("LinearDamping", LinearDamping, true),
-		ZEML_LIST_PROPERTY("AngularDamping", AngularDamping, true),
-		ZEML_LIST_NODE("PhysicalShapes", PhysicalShapesNodePointer, true)
+		ZEML_LIST_PROPERTY("Enabled",			Enabled,		ZE_VRT_BOOLEAN,		true),
+		ZEML_LIST_PROPERTY("Type",				Type,			ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("Mass",				Mass,			ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("MassCenter",		MassCenter,		ZE_VRT_VECTOR3,		true),
+		ZEML_LIST_PROPERTY("LinearDamping",		LinearDamping,	ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("AngularDamping",	AngularDamping, ZE_VRT_FLOAT,		true),
+		ZEML_LIST_NODE("PhysicalShapes",		PhysicalShapesNodePointer,			true)
 	};
 
 	if (!NodeReader->ReadPropertyList(PhysicalBodyList, 7))
@@ -255,13 +254,13 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEMLSeri
 
 		ZEMLSerialListItem PhysicalShapeList [] = 
 		{
-			ZEML_LIST_PROPERTY("Position", ShapePosition, true),
-			ZEML_LIST_PROPERTY("Rotation", ShapeRotation, true),
-			ZEML_LIST_PROPERTY("Restitution", ShapeRestitution, true),
-			ZEML_LIST_PROPERTY("DynamicFriction", ShapeDynamicFriction, true),
-			ZEML_LIST_PROPERTY("StaticFriction", ShapeStaticFriction, true),
-			ZEML_LIST_PROPERTY("Type", ShapeType, true),
-			ZEML_LIST_NODE("Shape", ShapeNodePointer, true)
+			ZEML_LIST_PROPERTY("Position",			ShapePosition,			ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("Rotation",			ShapeRotation,			ZE_VRT_QUATERNION,	true),
+			ZEML_LIST_PROPERTY("Restitution",		ShapeRestitution,		ZE_VRT_FLOAT,		true),
+			ZEML_LIST_PROPERTY("DynamicFriction",	ShapeDynamicFriction,	ZE_VRT_FLOAT,		true),
+			ZEML_LIST_PROPERTY("StaticFriction",	ShapeStaticFriction,	ZE_VRT_FLOAT,		true),
+			ZEML_LIST_PROPERTY("Type",				ShapeType,				ZE_VRT_INTEGER_32,	true),
+			ZEML_LIST_NODE("Shape",					ShapeNodePointer,							true)
 		};
 
 		if (!NodeReader->ReadPropertyList(PhysicalShapeList, 7))
@@ -283,11 +282,11 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEMLSeri
 
 		ZEMLSerialListItem ActualShapeList [] = 
 		{
-			ZEML_LIST_PROPERTY("Height", ShapeHeight, false),
-			ZEML_LIST_PROPERTY("Width", ShapeWidth, false),
-			ZEML_LIST_PROPERTY("Length", ShapeLength, false),
-			ZEML_LIST_PROPERTY("Radius", ShapeRadius, false),
-			ZEML_LIST_DATA("Vertices", VerticesDataPointer, false)
+			ZEML_LIST_PROPERTY("Height", ShapeHeight,			ZE_VRT_FLOAT,	false),
+			ZEML_LIST_PROPERTY("Width", ShapeWidth,				ZE_VRT_FLOAT,	false),
+			ZEML_LIST_PROPERTY("Length", ShapeLength,			ZE_VRT_FLOAT,	false),
+			ZEML_LIST_PROPERTY("Radius", ShapeRadius,			ZE_VRT_FLOAT,	false),
+			ZEML_LIST_DATA("Vertices", VerticesDataPointer,		ZE_VRT_FLOAT,	false)
 		};
 
 		NodeReader->ReadPropertyList(ActualShapeList, 5);
@@ -390,14 +389,14 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRea
 
 		ZEMLSerialListItem MeshList[] = 
 		{
-			ZEML_LIST_PROPERTY("Name", NameValue, true),
-			ZEML_LIST_NODE("BoundingBox", BoundingBoxNodePointer, true),
-			ZEML_LIST_PROPERTY("Position", PositionValue, true),
-			ZEML_LIST_PROPERTY("Rotation", RotationValue, true),
-			ZEML_LIST_PROPERTY("Scale", ScaleValue, true),
-			ZEML_LIST_PROPERTY("IsSkinned", IsSkinnedValue, true),
-			ZEML_LIST_NODE("PhysicalBody", PhysicalBodyNodePointer, false),
-			ZEML_LIST_NODE("LODs", LODsNodePointer, true)
+			ZEML_LIST_PROPERTY("Name",			NameValue,				ZE_VRT_STRING,		true),
+			ZEML_LIST_NODE("BoundingBox",		BoundingBoxNodePointer,						true),
+			ZEML_LIST_PROPERTY("Position",		PositionValue,			ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("Rotation",		RotationValue,			ZE_VRT_QUATERNION,	true),
+			ZEML_LIST_PROPERTY("Scale",			ScaleValue,				ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("IsSkinned",		IsSkinnedValue,			ZE_VRT_BOOLEAN,		true),
+			ZEML_LIST_NODE("PhysicalBody",		PhysicalBodyNodePointer,					false),
+			ZEML_LIST_NODE("LODs",				LODsNodePointer,							true)
 		};
 
 		if (!NodeReader->ReadPropertyList(MeshList, 8))
@@ -417,8 +416,8 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRea
 
 		ZEMLSerialListItem BoundingBoxList[] = 
 		{
-			ZEML_LIST_PROPERTY("Min", BBoxMinValue, true),
-			ZEML_LIST_PROPERTY("Max", BBoxMaxValue, true)
+			ZEML_LIST_PROPERTY("Min", BBoxMinValue,	ZE_VRT_VECTOR3,	true),
+			ZEML_LIST_PROPERTY("Max", BBoxMaxValue,	ZE_VRT_VECTOR3,	true)
 		};
 
 		if(!NodeReader->ReadPropertyList(BoundingBoxList, 2))
@@ -439,10 +438,10 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRea
 
 			ZEMLSerialListItem LODList[] = 
 			{
-				ZEML_LIST_PROPERTY("LODLevel", LODLevelValue, true),
-				ZEML_LIST_PROPERTY("MaterialId", MaterialIdValue, true),
-				ZEML_LIST_DATA("Vertices", VerticesDataPointer, false),
-				ZEML_LIST_DATA("AffectingBoneIds", AffectingBoneIdsDataPointer, false)
+				ZEML_LIST_PROPERTY("LODLevel",		LODLevelValue,		ZE_VRT_INTEGER_32,	true),
+				ZEML_LIST_PROPERTY("MaterialId",	MaterialIdValue,	ZE_VRT_INTEGER_32,	true),
+				ZEML_LIST_DATA("Vertices",			VerticesDataPointer,					false),
+				ZEML_LIST_DATA("AffectingBoneIds",	AffectingBoneIdsDataPointer,			false)
 			};
 
 			if (!NodeReader->ReadPropertyList(LODList, 4))
@@ -523,88 +522,88 @@ static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEMLS
 
 	ZEMLSerialListItem JointList[] = 
 	{
-		ZEML_LIST_PROPERTY("Enabled", Enabled, true),
-		ZEML_LIST_PROPERTY("Body1Id", Body1Id, true),
-		ZEML_LIST_PROPERTY("Body2Id", Body2Id, true),
+		ZEML_LIST_PROPERTY("Enabled",						Enabled,						ZE_VRT_BOOLEAN,		true),
+		ZEML_LIST_PROPERTY("Body1Id",						Body1Id,						ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("Body2Id",						Body2Id,						ZE_VRT_INTEGER_32,	true),
 
-		ZEML_LIST_PROPERTY("UseGlobalAnchorAxis", UseGlobalAnchorAxis, true),
-		ZEML_LIST_PROPERTY("LocalAnchor1", LocalAnchor1, false),
-		ZEML_LIST_PROPERTY("LocalAxis1", LocalAxis1, false),
-		ZEML_LIST_PROPERTY("LocalAnchor2", LocalAnchor2, false),
-		ZEML_LIST_PROPERTY("LocalAxis2", LocalAxis2, false),
-		ZEML_LIST_PROPERTY("GlobalAnchor", GlobalAnchor, false),
-		ZEML_LIST_PROPERTY("GlobalAxis", GlobalAxis, false),
+		ZEML_LIST_PROPERTY("UseGlobalAnchorAxis",			UseGlobalAnchorAxis,			ZE_VRT_BOOLEAN,		true),
+		ZEML_LIST_PROPERTY("LocalAnchor1",					LocalAnchor1,					ZE_VRT_VECTOR3,		false),
+		ZEML_LIST_PROPERTY("LocalAxis1",					LocalAxis1,						ZE_VRT_QUATERNION,	false),
+		ZEML_LIST_PROPERTY("LocalAnchor2",					LocalAnchor2,					ZE_VRT_VECTOR3,		false),
+		ZEML_LIST_PROPERTY("LocalAxis2",					LocalAxis2,						ZE_VRT_QUATERNION,	false),
+		ZEML_LIST_PROPERTY("GlobalAnchor",					GlobalAnchor,					ZE_VRT_VECTOR3,		false),
+		ZEML_LIST_PROPERTY("GlobalAxis",					GlobalAxis,						ZE_VRT_QUATERNION,	false),
 
-		ZEML_LIST_PROPERTY("JointType", JointType, true),
-		ZEML_LIST_PROPERTY("CollideBodies", CollideBodies, true),
-		ZEML_LIST_PROPERTY("Breakable", Breakable, true),
-		ZEML_LIST_PROPERTY("BreakForce", BreakForce, true),
-		ZEML_LIST_PROPERTY("BreakTorque", BreakTorque, true),
+		ZEML_LIST_PROPERTY("JointType",						JointType,						ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("CollideBodies",					CollideBodies,					ZE_VRT_BOOLEAN,		true),
+		ZEML_LIST_PROPERTY("Breakable",						Breakable,						ZE_VRT_BOOLEAN,		true),
+		ZEML_LIST_PROPERTY("BreakForce",					BreakForce,						ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("BreakTorque",					BreakTorque,					ZE_VRT_FLOAT,		true),
 
-		ZEML_LIST_PROPERTY("XMotion", XMotion, true),
-		ZEML_LIST_PROPERTY("YMotion", YMotion, true),
-		ZEML_LIST_PROPERTY("ZMotion", ZMotion, true),
-		ZEML_LIST_PROPERTY("LinearLimitValue", LinearLimitValue, true),
-		ZEML_LIST_PROPERTY("LinearLimitRestitution", LinearLimitRestitution, true),
-		ZEML_LIST_PROPERTY("LinearLimitSpring", LinearLimitSpring, true),
-		ZEML_LIST_PROPERTY("LinearLimitDamping", LinearLimitDamping, true),
+		ZEML_LIST_PROPERTY("XMotion",						XMotion,						ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("YMotion",						YMotion,						ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("ZMotion",						ZMotion,						ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("LinearLimitValue",				LinearLimitValue,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("LinearLimitRestitution",		LinearLimitRestitution,			ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("LinearLimitSpring",				LinearLimitSpring,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("LinearLimitDamping",			LinearLimitDamping,				ZE_VRT_FLOAT,		true),
 
-		ZEML_LIST_PROPERTY("TwistMotion", TwistMotion, true),
-		ZEML_LIST_PROPERTY("TwistLowLimitValue", TwistLowLimitValue, true),
-		ZEML_LIST_PROPERTY("TwistLowLimitRestitution", TwistLowLimitRestitution, true),
-		ZEML_LIST_PROPERTY("TwistLowLimitSpring", TwistLowLimitSpring, true),
-		ZEML_LIST_PROPERTY("TwistLowLimitDamping", TwistLowLimitDamping, true),
-		ZEML_LIST_PROPERTY("TwistHighLimitValue", TwistHighLimitValue, true),
-		ZEML_LIST_PROPERTY("TwistHighLimitRestitution", TwistHighLimitRestitution, true),
-		ZEML_LIST_PROPERTY("TwistHighLimitSpring", TwistHighLimitSpring, true),
-		ZEML_LIST_PROPERTY("TwistHighLimitDamping", TwistHighLimitDamping, true),
+		ZEML_LIST_PROPERTY("TwistMotion",					TwistMotion,					ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("TwistLowLimitValue",			TwistLowLimitValue,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("TwistLowLimitRestitution",		TwistLowLimitRestitution,		ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("TwistLowLimitSpring",			TwistLowLimitSpring,			ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("TwistLowLimitDamping",			TwistLowLimitDamping,			ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("TwistHighLimitValue",			TwistHighLimitValue,			ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("TwistHighLimitRestitution",		TwistHighLimitRestitution,		ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("TwistHighLimitSpring",			TwistHighLimitSpring,			ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("TwistHighLimitDamping",			TwistHighLimitDamping,			ZE_VRT_FLOAT,		true),
 
-		ZEML_LIST_PROPERTY("Swing1Motion", Swing1Motion, true),
-		ZEML_LIST_PROPERTY("Swing1LimitValue", Swing1LimitValue, true),
-		ZEML_LIST_PROPERTY("Swing1LimitRestitution", Swing1LimitRestitution, true),
-		ZEML_LIST_PROPERTY("Swing1LimitSpring", Swing1LimitSpring, true),
-		ZEML_LIST_PROPERTY("Swing1LimitDamping", Swing1LimitDamping, true),
+		ZEML_LIST_PROPERTY("Swing1Motion",					Swing1Motion,					ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("Swing1LimitValue",				Swing1LimitValue,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("Swing1LimitRestitution",		Swing1LimitRestitution,			ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("Swing1LimitSpring",				Swing1LimitSpring,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("Swing1LimitDamping",			Swing1LimitDamping,				ZE_VRT_FLOAT,		true),
 
-		ZEML_LIST_PROPERTY("Swing2Motion", Swing2Motion, true),
-		ZEML_LIST_PROPERTY("Swing2LimitValue", Swing2LimitValue, true),
-		ZEML_LIST_PROPERTY("Swing2LimitRestitution", Swing2LimitRestitution, true),
-		ZEML_LIST_PROPERTY("Swing2LimitSpring", Swing2LimitSpring, true),
-		ZEML_LIST_PROPERTY("Swing2LimitDamping", Swing2LimitDamping, true),
+		ZEML_LIST_PROPERTY("Swing2Motion",					Swing2Motion,					ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("Swing2LimitValue",				Swing2LimitValue,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("Swing2LimitRestitution",		Swing2LimitRestitution,			ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("Swing2LimitSpring",				Swing2LimitSpring,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("Swing2LimitDamping",			Swing2LimitDamping,				ZE_VRT_FLOAT,		true),
 
-		ZEML_LIST_PROPERTY("LinearXMotor", LinearXMotor, true),
-		ZEML_LIST_PROPERTY("LinearXMotorForce", LinearXMotorForce, true),
-		ZEML_LIST_PROPERTY("LinearXMotorSpring", LinearXMotorSpring, true),
-		ZEML_LIST_PROPERTY("LinearXMotorDamper", LinearXMotorDamper, true),
+		ZEML_LIST_PROPERTY("LinearXMotor",					LinearXMotor,					ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("LinearXMotorForce",				LinearXMotorForce,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("LinearXMotorSpring",			LinearXMotorSpring,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("LinearXMotorDamper",			LinearXMotorDamper,				ZE_VRT_FLOAT,		true),
 
-		ZEML_LIST_PROPERTY("LinearYMotor", LinearYMotor, true),
-		ZEML_LIST_PROPERTY("LinearYMotorForce", LinearYMotorForce, true),
-		ZEML_LIST_PROPERTY("LinearYMotorSpring", LinearYMotorSpring, true),
-		ZEML_LIST_PROPERTY("LinearYMotorDamper", LinearYMotorDamper, true),
+		ZEML_LIST_PROPERTY("LinearYMotor",					LinearYMotor,					ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("LinearYMotorForce",				LinearYMotorForce,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("LinearYMotorSpring",			LinearYMotorSpring,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("LinearYMotorDamper",			LinearYMotorDamper,				ZE_VRT_FLOAT,		true),
 
-		ZEML_LIST_PROPERTY("LinearZMotor", LinearZMotor, true),
-		ZEML_LIST_PROPERTY("LinearZMotorForce", LinearZMotorForce, true),
-		ZEML_LIST_PROPERTY("LinearZMotorSpring", LinearZMotorSpring, true),
-		ZEML_LIST_PROPERTY("LinearZMotorDamper", LinearZMotorDamper, true),
+		ZEML_LIST_PROPERTY("LinearZMotor",					LinearZMotor,					ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("LinearZMotorForce",				LinearZMotorForce,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("LinearZMotorSpring",			LinearZMotorSpring,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("LinearZMotorDamper",			LinearZMotorDamper,				ZE_VRT_FLOAT,		true),
 
-		ZEML_LIST_PROPERTY("AngularSwingMotor", AngularSwingMotor, true),
-		ZEML_LIST_PROPERTY("AngularSwingMotorForce", AngularSwingMotorForce, true),
-		ZEML_LIST_PROPERTY("AngularSwingMotorSpring", AngularSwingMotorSpring, true),
-		ZEML_LIST_PROPERTY("AngularSwingMotorDamper", AngularSwingMotorDamper, true),
+		ZEML_LIST_PROPERTY("AngularSwingMotor",				AngularSwingMotor,				ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("AngularSwingMotorForce",		AngularSwingMotorForce,			ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("AngularSwingMotorSpring",		AngularSwingMotorSpring,		ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("AngularSwingMotorDamper",		AngularSwingMotorDamper,		ZE_VRT_FLOAT,		true),
 
-		ZEML_LIST_PROPERTY("AngularTwistMotor", AngularTwistMotor, true),
-		ZEML_LIST_PROPERTY("AngularTwistMotorForce", AngularTwistMotorForce, true),
-		ZEML_LIST_PROPERTY("AngularTwistMotorSpring", AngularTwistMotorSpring, true),
-		ZEML_LIST_PROPERTY("AngularTwistMotorDamper", AngularTwistMotorDamper, true),
+		ZEML_LIST_PROPERTY("AngularTwistMotor",				AngularTwistMotor,				ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("AngularTwistMotorForce",		AngularTwistMotorForce,			ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("AngularTwistMotorSpring",		AngularTwistMotorSpring,		ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("AngularTwistMotorDamper",		AngularTwistMotorDamper,		ZE_VRT_FLOAT,		true),
 
-		ZEML_LIST_PROPERTY("AngularSlerpMotor", AngularSlerpMotor, true),
-		ZEML_LIST_PROPERTY("AngularSlerpMotorForce", AngularSlerpMotorForce, true),
-		ZEML_LIST_PROPERTY("AngularSlerpMotorSpring", AngularSlerpMotorSpring, true),
-		ZEML_LIST_PROPERTY("AngularSlerpMotorDamper", AngularSlerpMotorDamper, true),
+		ZEML_LIST_PROPERTY("AngularSlerpMotor",				AngularSlerpMotor,				ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("AngularSlerpMotorForce",		AngularSlerpMotorForce,			ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("AngularSlerpMotorSpring",		AngularSlerpMotorSpring,		ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("AngularSlerpMotorDamper",		AngularSlerpMotorDamper,		ZE_VRT_FLOAT,		true),
 
-		ZEML_LIST_PROPERTY("MotorTargetPosition", MotorTargetPosition, true),
-		ZEML_LIST_PROPERTY("MotorTargetVelocity", MotorTargetVelocity, true),
-		ZEML_LIST_PROPERTY("MotorTargetOrientation", MotorTargetOrientation, true),
-		ZEML_LIST_PROPERTY("MotorTargetAngularVelocity", MotorTargetAngularVelocity, true),
+		ZEML_LIST_PROPERTY("MotorTargetPosition",			MotorTargetPosition,			ZE_VRT_VECTOR3,		true),
+		ZEML_LIST_PROPERTY("MotorTargetVelocity",			MotorTargetVelocity,			ZE_VRT_VECTOR3,		true),
+		ZEML_LIST_PROPERTY("MotorTargetOrientation",		MotorTargetOrientation,			ZE_VRT_VECTOR3,		true),
+		ZEML_LIST_PROPERTY("MotorTargetAngularVelocity",	MotorTargetAngularVelocity,		ZE_VRT_VECTOR3,		true),
 	};
 
 	if (!NodeReader->ReadPropertyList(JointList, 69))
@@ -741,14 +740,14 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRead
 
 		ZEMLSerialListItem BoneList[] = 
 		{
-			ZEML_LIST_PROPERTY("Name",				NameValue,					true),
-			ZEML_LIST_PROPERTY("ParentBone",		ParentBoneValue,			true),
-			ZEML_LIST_NODE("BoundingBox",			BoundingBoxNodePointer,		true),
-			ZEML_LIST_PROPERTY("RelativePosition",	RelativePositionValue,		true),
-			ZEML_LIST_PROPERTY("RelativeRotation",	RelativeRotationValue,		true),
-			ZEML_LIST_PROPERTY("RelativeScale",		RelativeScaleValue,			true),
-			ZEML_LIST_NODE("PhysicalJoint",			PhysicalJointNodePointer,	true),
-			ZEML_LIST_NODE("PhysicalBody",			PhysicalBodyNodePointer,	false)
+			ZEML_LIST_PROPERTY("Name",				NameValue,					ZE_VRT_STRING,		true),
+			ZEML_LIST_PROPERTY("ParentBone",		ParentBoneValue,			ZE_VRT_INTEGER_32,	true),
+			ZEML_LIST_NODE("BoundingBox",			BoundingBoxNodePointer,							true),
+			ZEML_LIST_PROPERTY("RelativePosition",	RelativePositionValue,		ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("RelativeRotation",	RelativeRotationValue,		ZE_VRT_QUATERNION,	true),
+			ZEML_LIST_PROPERTY("RelativeScale",		RelativeScaleValue,			ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_NODE("PhysicalJoint",			PhysicalJointNodePointer,						true),
+			ZEML_LIST_NODE("PhysicalBody",			PhysicalBodyNodePointer,						false)
 		};
 
 		if (!NodeReader->ReadPropertyList(BoneList, 8))
@@ -768,8 +767,8 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRead
 
 		ZEMLSerialListItem BoundingBoxList[] = 
 		{
-			ZEML_LIST_PROPERTY("Min", BBoxMinValue, true),
-			ZEML_LIST_PROPERTY("Max", BBoxMaxValue, true)
+			ZEML_LIST_PROPERTY("Min", BBoxMinValue, ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("Max", BBoxMaxValue, ZE_VRT_VECTOR3,		true)
 		};
 
 		if(!NodeReader->ReadPropertyList(BoundingBoxList, 2))
@@ -821,10 +820,10 @@ static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEMLSerialReader* Nod
 
 		ZEMLSerialListItem AnimationList[] = 
 		{
-			ZEML_LIST_PROPERTY("Name", NameValue, true),
-			ZEML_LIST_PROPERTY("BoneKeyCount", BoneKeyCountValue, true),
-			ZEML_LIST_PROPERTY("MeshKeyCount", MeshKeyCountValue, true),
-			ZEML_LIST_DATA("Frames", FramesDataPointer, true)
+			ZEML_LIST_PROPERTY("Name",			NameValue,			ZE_VRT_STRING,		true),
+			ZEML_LIST_PROPERTY("BoneKeyCount",	BoneKeyCountValue,	ZE_VRT_INTEGER_32,	true),
+			ZEML_LIST_PROPERTY("MeshKeyCount",	MeshKeyCountValue,	ZE_VRT_INTEGER_32,	true),
+			ZEML_LIST_DATA("Frames",			FramesDataPointer,						true)
 		};
 
 		if (!NodeReader->ReadPropertyList(AnimationList, 4))
@@ -880,10 +879,10 @@ static bool ReadModelFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 
 	ZEMLSerialListItem ModelList[] = 
 	{
-		ZEML_LIST_NODE("Bones", BonesNodePointer, false),
-		ZEML_LIST_NODE("Meshes", MeshesNodePointer, false),
-		ZEML_LIST_NODE("Animations", AnimationsNodePointer, false),
-		ZEML_LIST_NODE("Materials", MaterialsNodePointer, true)
+		ZEML_LIST_NODE("Bones",			BonesNodePointer,		false),
+		ZEML_LIST_NODE("Meshes",		MeshesNodePointer,		false),
+		ZEML_LIST_NODE("Animations",	AnimationsNodePointer,	false),
+		ZEML_LIST_NODE("Materials",		MaterialsNodePointer,	true)
 	};
 
 	if (!NodeReader.ReadPropertyList(ModelList, 4))

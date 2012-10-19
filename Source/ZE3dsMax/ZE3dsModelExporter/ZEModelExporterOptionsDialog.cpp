@@ -270,7 +270,7 @@ void ZE3dsModelExporterOptionsDialog::CollectOptionsFromForm()
 			Options->AddProperty("IsAnimationExportEnabled", Form->grpExportAnimations->isChecked());
 
 		if (Options->GetSubNodes("Animations").GetCount() != 0)
-			Options->RemoveSubNode(Options->GetSubNodes("Animations").GetFirstItem());
+			Options->RemoveItem(Options->GetSubNodes("Animations").GetFirstItem());
 
 		ZEInt ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
 
