@@ -376,7 +376,7 @@ bool ZE3dsModelExporter::WriteToFile(const char* FilePath)
 		if (ModelNode.GetSubNodes("Bones").GetCount() > 0)
 		{
 			ZEMLNode* BonesNode = ModelNode.GetSubNodes("Bones").GetFirstItem();
-			ModelNode.RemoveSubNode(BonesNode);
+			ModelNode.RemoveItem(BonesNode);
 		}
 	}
 
@@ -387,7 +387,7 @@ bool ZE3dsModelExporter::WriteToFile(const char* FilePath)
 		if (ModelNode.GetSubNodes("Meshes").GetCount() > 0)
 		{
 			ZEMLNode* MeshesNode = ModelNode.GetSubNodes("Meshes").GetFirstItem();
-			ModelNode.RemoveSubNode(MeshesNode);
+			ModelNode.RemoveItem(MeshesNode);
 		}
 	}
 

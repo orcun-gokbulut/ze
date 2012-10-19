@@ -93,8 +93,6 @@ class ZE3dsModelExporter : public SceneExport
 		void						ProcessAnimationFrames(ZESize AnimationStartFrame, ZESize AnimationFrameCount, ZEMLNode* AnimationNode);
 		bool						ProcessAnimations(ZEMLNode* AnimationsNode);
 
-		bool						DumpPropertyContainer(IExportEntity* Node);
-		bool						GetRelativePath(const char* RealPath, char* RelativePath);
 		ZEInt						GetBoneId(IGameNode* Node);
 		ZEInt						GetMeshId(IGameNode* Node);
 
@@ -103,16 +101,16 @@ class ZE3dsModelExporter : public SceneExport
 
 	public:
 		
-		virtual ZEInt				ExtCount();										// Number of extensions supported
-		virtual const TCHAR*		Ext(ZEInt n);									// Extension #n (i.e. "3DS")
-		virtual const TCHAR*		LongDesc();										// Long ASCII description (i.e. "Autodesk 3D Studio File")
-		virtual const TCHAR*		ShortDesc();									// Short ASCII description (i.e. "3D Studio")
-		virtual const TCHAR*		AuthorName();									// ASCII Author name
-		virtual const TCHAR*		CopyrightMessage();								// ASCII Copyright message
-		virtual const TCHAR*		OtherMessage1();								// Other message #1
-		virtual const TCHAR*		OtherMessage2();								// Other message #2
-		virtual ZEUInt				Version();										// Version number * 100 (i.e. v3.01 = 301)
-		virtual void				ShowAbout(HWND hWnd);							// Show DLL's "About..." box
+		virtual ZEInt				ExtCount();
+		virtual const TCHAR*		Ext(ZEInt n);
+		virtual const TCHAR*		LongDesc();
+		virtual const TCHAR*		ShortDesc();
+		virtual const TCHAR*		AuthorName();
+		virtual const TCHAR*		CopyrightMessage();
+		virtual const TCHAR*		OtherMessage1();
+		virtual const TCHAR*		OtherMessage2();
+		virtual ZEUInt				Version();
+		virtual void				ShowAbout(HWND hWnd);
 		
 		virtual	BOOL				SupportsOptions(ZEInt ext, DWORD options);	
 		virtual ZEInt				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);

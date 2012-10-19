@@ -405,13 +405,3 @@ void ZE3dsMaxUtils::CalculateLocalBoundingBox(ZEAABBox& BoundingBox, IGameMesh* 
 		}
 	}
 }
-
-ZE3dsMaxUtils::ZE3dsMaxUtils()
-{
-
-}
-
-ZE3dsMaxUtils::~ZE3dsMaxUtils()
-{
-
-}

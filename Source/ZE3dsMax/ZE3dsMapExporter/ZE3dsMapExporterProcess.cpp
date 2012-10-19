@@ -44,17 +44,20 @@
 #include "ZEFile\ZEFileOperations.h"
 #include "ZEML\ZEMLSerialWriter.h"
 
+ZEPackStruct(
 struct ZEMapFilePhysicalMeshPolygon
 {
 	ZEUInt32								Indices[3];
-};
+});
 
+ZEPackStruct(
 struct ZEMapFilePhysicalMesh
 {
 	ZEArray<ZEVector3>						Vertices;
 	ZEArray<ZEMapFilePhysicalMeshPolygon>	Polygons;
-};
+});
 
+ZEPackStruct(
 struct ZEMapFileVertex
 {
 	ZEVector3								Position;
@@ -62,13 +65,14 @@ struct ZEMapFileVertex
 	ZEVector3								Tangent;
 	ZEVector3								Binormal;
 	ZEVector2								Texcoord;
-};
+});
 
+ZEPackStruct(
 struct ZEMapFilePolygon
 {	
 	ZEUInt32								Material;
 	ZEMapFileVertex							Vertices[3];
-};
+});
 
 ZEInt ZE3dsMapExporter::ProcessFaceMaterial(IGameMaterial* Material)
 {
