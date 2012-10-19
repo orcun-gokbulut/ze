@@ -37,7 +37,6 @@
 #include "ZE3dsModelExporter.h"
 #include "ZEToolComponents\ZEProgressDialog\ZEProgressDialog.h"
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
-#include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceOption.h"
 #include "ZEMath\ZEAABBox.h"
 #include "ZEML/ZEMLProperty.h"
 #include "ZEFile/ZEFileInfo.h"

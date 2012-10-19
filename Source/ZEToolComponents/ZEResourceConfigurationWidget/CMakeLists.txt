@@ -35,6 +35,7 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ze_add_source(ZEResourceOptionWidget.ui			Sources QtUI)
 ze_add_source(ZEResourceConfigurationWidget.ui	Sources QtUI)
@@ -42,18 +43,15 @@ ze_add_source(ZEResourceConfigurationWidget.h	Sources)
 ze_add_source(ZEResourceConfigurationWidget.cpp	Sources)
 ze_add_source(ZEResourceOptionWidget.h			Sources QtMocs)
 ze_add_source(ZEResourceOptionWidget.cpp		Sources)
-ze_add_source(ZEResourceOption.h				Sources)
 ze_add_source(ZEResourceOptionTreeItem.cpp		Sources)
 ze_add_source(ZEResourceOptionTreeItem.h		Sources)
 ze_add_source(ZEResourceConfigurationWidgetQt.cpp	Sources)
 ze_add_source(ZEResourceConfigurationWidgetQt.h		Sources QtMocs)
-ze_add_source(ZEResourceOption.h		Sources)
 
 qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 ze_add_library(ZEResourceConfigurationWidget 
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles})
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
+	LIBS ZEResourceConfigurator)

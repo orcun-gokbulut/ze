@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEResourceOptionTreeItem.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,30 +30,17 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_RESOURCE_OPTION_TREE_ITEM_H__
-#define __ZE_RESOURCE_OPTION_TREE_ITEM_H__
+cmake_minimum_required (VERSION 2.8)
 
-#include "QtGui\QTreeWidgetItem"
-#include "ZEResourceConfigurator\ZEResourceOption.h"
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-class ZEResourceOptionTreeItem : public QTreeWidgetItem
-{
-	private:
+ze_add_source(ZEResourceOption.h			    Sources)
+ze_add_source(ZEResourceOption.cpp			    Sources)
+ze_add_source(ZEResourceConfigurator.h			Sources)
+ze_add_source(ZEResourceConfigurator.cpp		Sources)
 
-		ZEResourceOption*	ResourceOption;
-		ZEString			StatusString;
-
-	public:
-
-		void				Update();
-		void				SetResourceOption(ZEResourceOption* Option);
-		ZEResourceOption*	GetResourceOption() const;
-
-							ZEResourceOptionTreeItem();
-};
-
-#endif
+ze_add_library(ZEResourceConfigurator 
+	SOURCES ${Sources})

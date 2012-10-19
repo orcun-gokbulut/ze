@@ -75,7 +75,8 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/Source/ZEEngine
 	${CMAKE_SOURCE_DIR}/Source/ZEFoundation
 	${CMAKE_SOURCE_DIR}/Source/ZEToolSDK
-	${CMAKE_SOURCE_DIR}/Source/ZETest)
+	${CMAKE_SOURCE_DIR}/Source/ZETest
+	${CMAKE_SOURCE_DIR}/Source/ZEToolComponents)
 
 include_directories(
 	${ZEBUILD_INCLUDE_PATH}/DirectX

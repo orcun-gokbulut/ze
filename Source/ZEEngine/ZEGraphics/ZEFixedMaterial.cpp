@@ -1309,6 +1309,7 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 				ZEVariant TempVar(Path);
 				SetProperty(Props[I]->GetName(), TempVar);
 			}
+
 			else if(CurrentProperty->GetValue().GetType() != ZE_VRT_STRING)
 				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
 		}
