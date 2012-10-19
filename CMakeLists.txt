@@ -40,6 +40,7 @@ project(Zinek)
 ## Build system initalization
 #########################################################################################
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
+
 include(ze)
 ze_configure_init()
 ze_configure_version()
@@ -102,6 +103,8 @@ include(ze_qt)
 add_subdirectory(CMake)
 add_subdirectory(Source)
 
+get_property(fancy_lib_location TARGET ZEFC PROPERTY LOCATION)
+message (STATUS "fancy_lib_location == ${fancy_lib_location}")
 
 ## Install & Packing
 #########################################################################################
