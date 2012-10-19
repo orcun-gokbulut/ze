@@ -53,6 +53,8 @@ void ZEResourceOptionTreeItem::Update()
 		setText(4, "Do Nothing");
 	else if(ResourceOption->Action == ZE_ROAA_COPY_OVERWRITE)
 		setText(4, "Overwrite");
+	else if(ResourceOption->Action == ZE_ROAA_COPY_IF_MISSING)
+		setText(4, "Copy If Missing");
 	else
 		setText(4, "Copy If Newer");
 

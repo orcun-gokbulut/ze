@@ -39,20 +39,14 @@
 
 #include "ZEDS\ZEString.h"
 #include "QtGui\QWidget"
+#include "ZEResourceConfigurator\ZEResourceOption.h"
 
 namespace Ui
 {
 	class ZEResourceOptionUI;
 }
 
-enum ZEResourceOptionAvailableAction
-{
-	ZE_ROAA_DO_NOTHING,
-	ZE_ROAA_COPY_OVERWRITE,
-	ZE_ROAA_COPY_IF_NEWER
-};
-
-struct ZEResourceOption;
+class ZEResourceOption;
 
 class ZEResourceOptionWidget : public QWidget
 {

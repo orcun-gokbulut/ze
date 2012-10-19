@@ -257,7 +257,7 @@ bool ZE3dsModelExporter::ShowResourceConfigurationDialog(HWND ParentWindow, cons
 	if(ResourceConfigurationDialog == NULL)
 		ResourceConfigurationDialog = new ZEResourceConfigurationWidget(WinWidget);
 
-	ResourceConfigurationDialog->SetPresetFilePath(ZEString(MaxFilePath) + ".ZEPRESET");
+	ResourceConfigurationDialog->LoadPreset(ZEString(MaxFilePath) + ".ZEPRESET");
 	CollectResources();
 
 	WinWidget->showCentered();
@@ -266,7 +266,7 @@ bool ZE3dsModelExporter::ShowResourceConfigurationDialog(HWND ParentWindow, cons
 	if(DialogResult == QDialog::Rejected)
 		return false;
 
-	ResourceConfigurationDialog->SavePresets(ZEString(MaxFilePath) + ".ZEPRESET");
+	ResourceConfigurationDialog->SavePreset(ZEString(MaxFilePath) + ".ZEPRESET");
 	return true;
 }
 

@@ -44,7 +44,6 @@
 #include "ZEML\ZEMLSerialWriter.h"
 #include "ZEFile\ZEFileInfo.h"
 #include "ZEFile\ZEPathUtils.h"
-#include "zetoolcomponents\zeresourceconfigurationwidget\zeresourceoption.h"
 #include "ZEFile\ZEDirectoryInfo.h"
 #include "ZEFile\ZEFileOperations.h"
 
