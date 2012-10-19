@@ -51,13 +51,14 @@ struct ZEMLSerialListItem
 	const char*				Name;
 	ZEUInt64				Hash;
 	ZEVariant*				Value;
+	ZEVariantType			VariantType;
 	bool					Mandatory;
 
 	ZEMLSerialPointer*		Pointer;
 };
 
-#define ZEML_LIST_PROPERTY(Name, Value, Mandatory)	{false, Name, ZEHashGenerator::Hash(Name), &Value, Mandatory, NULL}
-#define ZEML_LIST_NODE(Name, Pointer, Mandatory)	{false, Name, ZEHashGenerator::Hash(Name), NULL, Mandatory, &Pointer}
+#define ZEML_LIST_PROPERTY(Name, Value, ValueType, Mandatory)	{false, Name, ZEHashGenerator::Hash(Name), &Value, ValueType, Mandatory, NULL}
+#define ZEML_LIST_NODE(Name, Pointer, Mandatory)	{false, Name, ZEHashGenerator::Hash(Name), NULL, ZE_VRT_NULL, Mandatory, &Pointer}
 #define ZEML_LIST_DATA ZEML_LIST_NODE
 
 class ZEFile;
