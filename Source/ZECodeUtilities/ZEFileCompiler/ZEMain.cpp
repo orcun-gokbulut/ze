@@ -79,9 +79,10 @@ static void ShowHelp()
 		"\n");
 }
 
-
+#include <windows.h>
 static void ParseParameters(int Argc, const char** Argv, ZEFileCompilerOptions& Options)
 {
+	MessageBox(NULL, "Attach", "ZEFC", MB_OK);
 	Options.Verbose = false;
 	for (int I = 1; I < Argc; I++)
 	{
@@ -148,9 +149,14 @@ static void ParseParameters(int Argc, const char** Argv, ZEFileCompilerOptions& 
 		ShowHelp();
 	}
 
-	if (Options.SourceFileName.IsEmpty())
+	if (Options.SourceFileName.IsEmpty() && Options.HeaderFileName.IsEmpty())
 	{
-		Error("Missing source file name (-S) parameter.");
+		Error("Missing source file name (-S) and header file name (-H) parameters. You should give at last one of the parameters.");
+		ShowHelp();
+	}
+	else if (Options.SourceFileName.IsEmpty() && Options.HeaderFileName.IsEmpty())
+	{
+		Error("Missing header file name (-H) parameter.");
 		ShowHelp();
 	}
 }
