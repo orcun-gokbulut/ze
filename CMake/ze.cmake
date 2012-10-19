@@ -48,11 +48,13 @@ macro (ze_configure_version)
 
 	ze_get_version(${CMAKE_SOURCE_DIR})
 	ze_get_version_revision_number(${CMAKE_SOURCE_DIR})
+	ze_get_version_branch_name(${CMAKE_SOURCE_DIR})
 
 	set(ZEBUILD_VERSION_MAJOR ${VERSION_MAJOR})
 	set(ZEBUILD_VERSION_MINOR ${VERSION_MINOR})
 	set(ZEBUILD_VERSION_INTERNAL ${VERSION_INTERNAL})
 	set(ZEBUILD_VERSION_BUILD ${VERSION_REVISION})
+	set(ZEBUILD_VERSION_BRANCH_NAME ${VERSION_BRANCH_NAME})
 	message(STATUS "[ZEBuild] Version information has been collected.")
 	message(STATUS "")
 
@@ -61,6 +63,7 @@ macro (ze_configure_version)
 	message(STATUS "[ZEBuild] Minor Version     : " ${ZEBUILD_VERSION_MINOR})
 	message(STATUS "[ZEBuild] Internal Version  : " ${ZEBUILD_VERSION_INTERNAL})
 	message(STATUS "[ZEBuild] Build             : " ${ZEBUILD_VERSION_BUILD})
+	message(STATUS "[ZEBuild] Branch Name       : " ${ZEBUILD_VERSION_BRANCH_NAME})
 	message(STATUS "")
 	message(STATUS "")
 	
@@ -69,7 +72,8 @@ macro (ze_configure_version)
 		ZE_VERSION_MAJOR=${ZEBUILD_VERSION_MAJOR}
 		ZE_VERSION_MINOR=${ZEBUILD_VERSION_MINOR}
 		ZE_VERSION_INTERNAL=${ZEBUILD_VERSION_INTERNAL}
-		ZE_VERSION_BUILD=${ZEBUILD_VERSION_BUILD})
+		ZE_VERSION_BUILD=${ZEBUILD_VERSION_BUILD}
+		ZE_VERSION_BRANCH_NAME=${ZEBUILD_VERSION_BRANCH_NAME})
 endmacro()
 
 macro (ze_configure_platform)

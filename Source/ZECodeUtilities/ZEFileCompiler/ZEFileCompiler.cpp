@@ -33,6 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDS/ZEArray.h"
 #include "ZEFileCompiler.h"
 #include "ZEError.h"
 
@@ -92,83 +93,68 @@ bool ZEFileCompiler::Compile(const ZEFileCompilerOptions& Options)
 			Options.ClassName.ToCString());
 		fclose(HeaderFile);
 
-		fprintf(SourceFile,	"#include \"%s\"\n", Options.HeaderFileName.ToCString());
 	}
-	else
+	if (SourceFile != NULL)
 	{
-		fprintf(SourceFile, 
-			"#include \"ZEData.h\"\n"
-			"#include \"ZETypes.h\"\n"
+		fprintf(SourceFile,	"#include \"%s\"\n"
 			"\n"
-			"class %s : public ZEData\n"
+			"void* %s::GetData()\n"
 			"{\n"
-				"\tpublic:\n"
-					"\t\tvoid*\t\tGetData();\n"
-					"\t\tZESize\t\tGetSize();\n"
-			"};\n", 
-			Options.ClassName.ToCString());
-	}
+				"\tstatic ZEUInt8 Data[] =\n"
+				"\t{\n", 
+			Options.HeaderFileName.ToCString(), Options.ClassName.ToCString());
 
-	fprintf(SourceFile, 
-		"\n"
-		"void* %s::GetData()\n"
-		"{\n"
-			"\tstatic ZEUInt8 Data[] =\n"
-			"\t{\n", 
-		Options.ClassName.ToCString());
-
-	ZEUInt8* Buffer = new ZEUInt8[FileSize];
-	ZESize BytesRead = fread(Buffer, 1, FileSize, InputFile);
-	if (BytesRead != FileSize)
-	{
-		zeError("Error occured while reading content of input file.");
-		return false;
-	}
-	fclose(InputFile);
-
-	ZEUInt8* Current = Buffer;
-	BytesRead = 0;
-	while(true)
-	{
-		if (FileSize > BytesRead + 16)
+		ZEArray<ZEUInt8> Buffer;
+		Buffer.SetCount(FileSize);
+		ZESize BytesRead = fread(Buffer.GetCArray(), 1, FileSize, InputFile);
+		if (BytesRead != FileSize)
 		{
-			fprintf(SourceFile, "\t\t0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X,\n",
-				Current[0], Current[1], Current[2], Current[3], Current[4], Current[5], Current[6], Current[7],
-				Current[8], Current[9], Current[1], Current[11], Current[12], Current[13], Current[14], Current[15]);
-
-			BytesRead += 16;
-			Current += 16;
+			zeError("Error occured while reading content of input file.");
+			return false;
 		}
-		else
+		fclose(InputFile);
+
+		ZEUInt8* Current = Buffer.GetCArray();
+		BytesRead = 0;
+		while(true)
 		{
-			fprintf(SourceFile, "\t\t");
-			for (int I = 0; I < FileSize - BytesRead; I++)
+			if (FileSize > BytesRead + 16)
 			{
-				fprintf(SourceFile,"0x%02X, ", *Current);
-				Current++;
+				fprintf(SourceFile, "\t\t0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X,\n",
+					Current[0], Current[1], Current[2], Current[3], Current[4], Current[5], Current[6], Current[7],
+					Current[8], Current[9], Current[1], Current[11], Current[12], Current[13], Current[14], Current[15]);
+
+				BytesRead += 16;
+				Current += 16;
 			}
-			fprintf(SourceFile, "\n");
-			break;
+			else
+			{
+				fprintf(SourceFile, "\t\t");
+				for (int I = 0; I < FileSize - BytesRead; I++)
+				{
+					fprintf(SourceFile,"0x%02X, ", *Current);
+					Current++;
+				}
+				fprintf(SourceFile, "\n");
+				break;
+			}
 		}
-	}
 
-	delete[] Buffer;
-
-	fprintf(SourceFile,	
-				"\t\t0x00, 0x00, 0x00, 0x00\n"
-			"\t};\n"
+		fprintf(SourceFile,	
+					"\t\t0x00, 0x00, 0x00, 0x00\n"
+				"\t};\n"
+				"\n"
+				"\treturn Data;\n"
+			"}\n"
 			"\n"
-			"\treturn Data;\n"
-		"}\n"
-		"\n"
-		"ZESize %s::GetDataSize()\n"
-		"{\n"
-			"\treturn %u;\n"
-		"}", 
-		Options.ClassName.ToCString(), FileSize);
+			"ZESize %s::GetSize()\n"
+			"{\n"
+				"\treturn %u;\n"
+			"}", 
+			Options.ClassName.ToCString(), FileSize);
 
-	fclose(SourceFile);
-
+		fclose(SourceFile);
+	}
 	return true;
 };
 
