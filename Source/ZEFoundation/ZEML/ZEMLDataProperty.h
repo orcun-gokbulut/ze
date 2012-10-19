@@ -65,6 +65,7 @@ class ZEMLDataProperty : public ZEMLItem
 
 		void				SetData(void* Data, ZEUInt64 DataSize, bool Cache = true);
 		const void*			GetData();
+		//bool				GetData(ZEMemoryFile& File);
 
 							ZEMLDataProperty();
 							ZEMLDataProperty(const ZEString& Name);

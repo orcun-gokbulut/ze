@@ -314,6 +314,18 @@ bool ZEMLSerialReader::GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offse
 	return true;
 }
 
+bool ZEMLSerialReader::GetData(ZEPartialFile& File)
+{
+	if(!File.Open(this->File, DataItemDataPointer, CurrentItemDataSize))
+	{
+		zeError("Can not open partial file.");
+		return false;
+	}
+
+	this->File->Seek(DataItemDataPointer + CurrentItemDataSize, ZE_SF_BEGINING);
+	return true;
+}
+
 void ZEMLSerialReader::SeekPointer(ZEMLSerialPointer Pointer)
 {
 	File->Seek(Pointer, ZE_SF_BEGINING);
