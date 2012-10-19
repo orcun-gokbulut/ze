@@ -91,14 +91,18 @@ ZEUInt64 ZEMLNode::GetTotalSize()
 	return TotalSize;
 }
 
-void ZEMLNode::AddProperty(ZEMLProperty* Property)
+bool ZEMLNode::AddProperty(ZEMLProperty* Property)
 {
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 		if(Properties[I]->GetName() == Property->GetName())
+		{
 			zeError("ZEML node can not contain properties with duplicate name : %s.", Name);
+			return false;
+		}
 
 	Property->Parent = this;
 	Properties.Add(Property);
+	return true;
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVariant& Value)
@@ -151,109 +155,113 @@ bool ZEMLNode::RemoveProperty(ZEMLProperty* Property)
 	return false;
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, float Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, float Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, double Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, double Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, ZEInt8 Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt8 Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, ZEInt16 Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt16 Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, ZEInt32 Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt32 Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, ZEInt64 Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt64 Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, ZEUInt8 Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt8 Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, ZEUInt16 Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt16 Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, ZEUInt32 Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt32 Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, ZEUInt64 Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt64 Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, bool Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, bool Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, const ZEString& Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEString& Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, const char* Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const char* Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, const ZEQuaternion& Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEQuaternion& Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, const ZEVector2& Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVector2& Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, const ZEVector3& Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVector3& Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, const ZEVector4& Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVector4& Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix3x3& Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix3x3& Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix4x4& Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix4x4& Value)
 {
-	AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEVariant(Value));
 }
 
-void ZEMLNode::AddDataProperty(ZEMLDataProperty* Property)
+bool ZEMLNode::AddDataProperty(ZEMLDataProperty* Property)
 {	
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 		if(Properties[I]->GetName() == Property->GetName())
+		{
 			zeError("ZEML node can not contain data properties with duplicate name : %s.", Name);
+			return false;
+		}
 
 	Property->Parent = this;
 	Properties.Add(Property);
+	return true;
 }
 
 ZEMLDataProperty* ZEMLNode::AddDataProperty(const ZEString& Name ,void* Data, ZEUInt64 DataSize, bool Cache)
@@ -328,10 +336,23 @@ ZEMLNode* ZEMLNode::AddSubNode()
 	return Node;
 }
 
-void ZEMLNode::InsertSubNode(ZEMLNode* Node, ZESize Index)
+bool ZEMLNode::InsertSubNode(ZEMLNode* Node, ZESize Index)
 {
+	if(Node == NULL)
+	{
+		zeError("Node can not be NULL.");
+		return false;
+	}
+
+	if(Index > SubNodes.GetCount())
+	{
+		zeError("Can not insert sub node index is out of range. Node name : %s, index : %d", Node->GetName().ToCString(), Index);
+		return false;
+	}
+
 	Node->Parent = this;
 	SubNodes.Insert(Index, Node);
+	return true;
 }
 
 ZEMLNode* ZEMLNode::InsertSubNode(const ZEString& Name, ZESize Index)
@@ -392,55 +413,93 @@ const ZEMLNode*	ZEMLNode::GetParent()
 		return (ZEMLNode*)Parent;
 }
 
-void ZEMLNode::WriteToFile(ZEFile* File)
+bool ZEMLNode::WriteSelf(ZEFile* File)
 {
 	ZEUInt64 TempUInt64;
 
 	char Identifier = 'Z';
 	if(File->Write(&Identifier, sizeof(char), 1) != 1)
+	{
 		zeError("Can not write ZEMLNode identifier to file.");
+		return false;
+	}
 
 	if(File->Write(&Type, sizeof(ZEUInt8), 1) != 1)
+	{
 		zeError("Can not write ZEMLNode type to file.");
+		return false;
+	}
 
 	ZEUInt8 NameLength = Name.GetSize();
 	if(File->Write(&NameLength, sizeof(ZEUInt8), 1) != 1)
+	{
 		zeError("Can not write ZEMLNode name lenght to file.");
+		return false;
+	}
 
 	if(File->Write(Name.GetValue(), sizeof(char) * NameLength, 1) != 1)
+	{
 		zeError("Can not write ZEMLNode name to file.");
+		return false;
+	}
 
 	ZEUInt64 SubItemCount = (ZEUInt64)Properties.GetCount() + SubNodes.GetCount();
 	TempUInt64 = ZEEndian::Little(SubItemCount);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
+	{
 		zeError("Can not write ZEMLNode subitem count to file.");
+		return false;
+	}
 
 	TempUInt64 = ZEEndian::Little(NodeSize);
 	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
+	{
 		zeError("Can not write ZEMLNode node size to file.");
+		return false;
+	}
 
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 	{
 		ZEMLItemType CurrentItemType = Properties[I]->GetType();
 
 		if(CurrentItemType == ZEML_IT_OFFSET_DATA)
-			((ZEMLDataProperty*)Properties[I])->WriteToFile(File);
+		{
+			if(!((ZEMLDataProperty*)Properties[I])->WriteSelf(File))
+			{
+				zeError("Can not write data property, name : %s", Properties[I]->GetName());
+				return false;
+			}
+		}
 
 		else
-			((ZEMLProperty*)Properties[I])->WriteToFile(File);
+		{
+			if(!((ZEMLProperty*)Properties[I])->WriteSelf(File))
+			{
+				zeError("Can not write property, name : %s", Properties[I]->GetName());
+				return false;
+			}
+		}
 	}
 
 	for (ZESize I = 0; I < SubNodes.GetCount(); I++)
-		SubNodes[I]->WriteToFile(File);
+	{
+		if(!SubNodes[I]->WriteSelf(File))
+		{
+			zeError("Can not write sub node, sub node name : %s", SubNodes[I]->GetName().ToCString());
+			return false;
+		}
+	}
+
+	return true;
 }
 
-void ZEMLNode::Write(ZEFile* File)
+bool ZEMLNode::Write(ZEFile* File)
 {
 	GetTotalSize();
-	WriteToFile(File);
+	return WriteSelf(File);
 }
 
-void ZEMLNode::ReadFromFile(ZEFile* File, bool DeferredDataReading)
+bool ZEMLNode::ReadSelf(ZEFile* File, bool DeferredDataReading)
 {
 	char		Identifier;	
 	ZEUInt8		NameSize;
@@ -449,27 +508,48 @@ void ZEMLNode::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 	FilePosition = File->Tell();
 
 	if(File->Read(&Identifier, sizeof(char), 1) != 1)
+	{
 		zeError("Can not read ZEMLNode identifier from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	if(Identifier != ZEML_ITEM_FILE_IDENTIFIER)
+	{
 		zeError("ZEMLNode identifier mismatch. Corrupted ZEML file.");
+		return false;
+	}
 
 	if(File->Read(&Type, sizeof(ZEUInt8), 1) != 1)
+	{
 		zeError("Can not read ZEMLNode type from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	if(File->Read(&NameSize, sizeof(ZEUInt8), 1) != 1)
+	{
 		zeError("Can not read ZEMLNode name length from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	if(File->Read(TempNameBuffer, NameSize, 1) != 1)
+	{
 		zeError("Can not read ZEMLDataProperty name from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	if(File->Read(&SubItemCount, sizeof(ZEUInt64), 1) != 1)
+	{
 		zeError("Can not read ZEMLNode sub item count from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	SubItemCount = ZEEndian::Little(SubItemCount);
 
 	if(File->Read(&NodeSize, sizeof(ZEUInt64), 1) != 1)
+	{
 		zeError("Can not read ZEMLNode node size from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	NodeSize = ZEEndian::Little(NodeSize);
 
@@ -483,30 +563,88 @@ void ZEMLNode::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 		if((ZEMLItemType)SubItemType == ZEML_IT_NODE)
 		{
 			ZEMLNode* NewNode = new ZEMLNode();
-			NewNode->ReadFromFile(File, DeferredDataReading);
+			if(!NewNode->ReadSelf(File, DeferredDataReading))
+			{
+				zeError("Can not read sub node.");
+				return false;
+			}
 			NewNode->Parent = this;
 			SubNodes.Append(NewNode);
 		}
 		else if((ZEMLItemType)SubItemType == ZEML_IT_INLINE_DATA)
 		{
 			ZEMLDataProperty* NewDataProperty = new ZEMLDataProperty();
-			NewDataProperty->ReadFromFile(File, DeferredDataReading);
+			if(!NewDataProperty->ReadSelf(File, DeferredDataReading))
+			{
+				zeError("Can not read data property.");
+				return false;
+			}
 			NewDataProperty->Parent = this;
 			Properties.Add(NewDataProperty);
 		}
 		else
 		{
 			ZEMLProperty* NewProperty = new ZEMLProperty();
-			NewProperty->ReadFromFile(File, DeferredDataReading);
+			if(!NewProperty->ReadSelf(File, DeferredDataReading))
+			{
+				zeError("Can not read property.");
+				return false;
+			}
 			NewProperty->Parent = this;
 			Properties.Add(NewProperty);
 		}
 	}
 
 	SetName(TempNameBuffer);
+	return true;
 }
 
-void ZEMLNode::Read(ZEFile* File, bool DeferredDataReading)
+bool ZEMLNode::Read(ZEFile* File, bool DeferredDataReading)
 {
-	ReadFromFile(File, DeferredDataReading);
+	return ReadSelf(File, DeferredDataReading);
+}
+
+bool ZEMLNode::AddItem(ZEMLItem* Item)
+{
+	if(Item == NULL)
+	{
+		zeError("Given item for addition is NULL.");
+		return false;
+	}
+
+	if(Item->GetType() == ZEML_IT_NODE)
+	{
+		AddSubNode((ZEMLNode*)Item);
+		return true;
+	}
+	else if (Item->GetType() == ZEML_IT_INLINE_DATA)
+	{
+		return AddDataProperty((ZEMLDataProperty*)Item);
+	}	
+	else
+	{
+		return AddProperty((ZEMLProperty*)Item);
+	}
+
+	zeError("Can not add item, type is not supported.");
+	return false;
+}
+
+bool ZEMLNode::RemoveItem(ZEMLItem* Item)
+{
+	if(Item == NULL)
+	{
+		zeError("Given item for removal is NULL.");
+		return false;
+	}
+
+	if(Item->GetType() == ZEML_IT_NODE)
+		return RemoveSubNode((ZEMLNode*)Item);
+	else if (Item->GetType() == ZEML_IT_INLINE_DATA)
+		return RemoveDataProperty((ZEMLDataProperty*)Item);
+	else
+		return RemoveProperty((ZEMLProperty*)Item);
+
+	zeError("Can not remove item, type is not supported.");
+	return false;
 }
