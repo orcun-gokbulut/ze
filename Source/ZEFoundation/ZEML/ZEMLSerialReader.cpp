@@ -392,6 +392,12 @@ bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCou
 			}
 			else
 			{
+				if(CurrentItemValue.GetType() != List[CurrentItemIndex].VariantType)
+				{
+					zeError("Property found but property type mismatched. Property name : %s", CurrentItemName.ToCString());
+					return false;
+				}
+
 				List[CurrentItemIndex].Value->SetVariant(CurrentItemValue);
 			}
 		}

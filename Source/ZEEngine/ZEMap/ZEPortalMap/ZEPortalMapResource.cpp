@@ -129,9 +129,9 @@ bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
 		ZEML_LIST_NODE("Portals",			PortalsPointer,		true),
 		ZEML_LIST_NODE("Doors",				DoorsPointer,		true),
 		ZEML_LIST_NODE("Materials",			MaterialsPointer,	true),
-		ZEML_LIST_PROPERTY("DoorCount",		DoorCount,			true),
-		ZEML_LIST_PROPERTY("PortalCount",	PortalCount,		true),
-		ZEML_LIST_PROPERTY("MaterialCount", MaterialCount,		true)
+		ZEML_LIST_PROPERTY("DoorCount",		DoorCount,			ZE_VRT_UNSIGNED_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("PortalCount",	PortalCount,		ZE_VRT_UNSIGNED_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("MaterialCount", MaterialCount,		ZE_VRT_UNSIGNED_INTEGER_32,	true)
 	};
 
 	if(!Reader.ReadPropertyList(MapList, 6))
@@ -183,20 +183,20 @@ bool ZEPortalMapResource::ReadPortalDoors(ZEMLSerialReader* Reader)
 		ZEMLSerialPointer RectanglePointer;
 
 		ZEMLSerialListItem DoorPropertiesList[] = { 
-			ZEML_LIST_PROPERTY("Name",			DoorName,			true),  
-			ZEML_LIST_PROPERTY("IsOpen",		IsOpen,				true),
-			ZEML_LIST_PROPERTY("PortalAIndex",	PortalAIndex,		true),  
-			ZEML_LIST_PROPERTY("PortalBIndex",	PortalBIndex,		true),
+			ZEML_LIST_PROPERTY("Name",			DoorName,		ZE_VRT_STRING,	true),  
+			ZEML_LIST_PROPERTY("IsOpen",		IsOpen,			ZE_VRT_BOOLEAN, 	true),
+			ZEML_LIST_PROPERTY("PortalAIndex",	PortalAIndex,	ZE_VRT_UNSIGNED_INTEGER_32,	true),  
+			ZEML_LIST_PROPERTY("PortalBIndex",	PortalBIndex,	ZE_VRT_UNSIGNED_INTEGER_32,	true),
 			ZEML_LIST_NODE("Rectangle",			RectanglePointer,	true)
 		};
 
 		Reader->ReadPropertyList(DoorPropertiesList, 5);
 
 		ZEMLSerialListItem RectangleList[] = { 
-			ZEML_LIST_PROPERTY("Point1", Point1, true),  
-			ZEML_LIST_PROPERTY("Point2", Point2, true),
-			ZEML_LIST_PROPERTY("Point3", Point3, true),  
-			ZEML_LIST_PROPERTY("Point4", Point4, true),
+			ZEML_LIST_PROPERTY("Point1", Point1, ZE_VRT_VECTOR3, true),  
+			ZEML_LIST_PROPERTY("Point2", Point2, ZE_VRT_VECTOR3, true),
+			ZEML_LIST_PROPERTY("Point3", Point3, ZE_VRT_VECTOR3, true),  
+			ZEML_LIST_PROPERTY("Point4", Point4, ZE_VRT_VECTOR3, true),
 		};
 
 		Reader->SeekPointer(RectanglePointer);
@@ -243,7 +243,7 @@ bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
 		ZEMLSerialPointer PolygonsPointer, PhysicalMeshPointer;
 
 		ZEMLSerialListItem PortalPropertiesList[] = {
-			ZEML_LIST_PROPERTY("Name",					PortalName,				true),
+			ZEML_LIST_PROPERTY("Name",					PortalName, ZE_VRT_STRING,	true),
 			ZEML_LIST_DATA("Polygons",					PolygonsPointer,		true),
 			ZEML_LIST_NODE("PhysicalMesh",				PhysicalMeshPointer,	false)
 		};
@@ -340,8 +340,8 @@ bool ZEPortalMapResource::ReadMaterials(ZEMLSerialReader* Reader)
 		ZEVariant MaterialName, MaterialRelativePath;
 
 		ZEMLSerialListItem MaterialList[] = {
-			ZEML_LIST_PROPERTY("Name", MaterialName, true),
-			ZEML_LIST_PROPERTY("FilePath", MaterialRelativePath, true)
+			ZEML_LIST_PROPERTY("Name", MaterialName, ZE_VRT_STRING, true),
+			ZEML_LIST_PROPERTY("FilePath", MaterialRelativePath, ZE_VRT_STRING, true)
 		};
 
 		Reader->ReadPropertyList(MaterialList, 2);
