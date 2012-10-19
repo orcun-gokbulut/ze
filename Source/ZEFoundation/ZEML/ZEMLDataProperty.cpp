@@ -116,35 +116,55 @@ const void* ZEMLDataProperty::GetData()
 	return Data;
 }
 
-void ZEMLDataProperty::WriteToFile(ZEFile* File)
+bool ZEMLDataProperty::WriteSelf(ZEFile* File)
 {
 	char Identifier = 'Z';
 	if(File->Write(&Identifier, sizeof(char), 1) != 1)
+	{
 		zeError("Can not write ZEMLDataProperty identifier to file.");
+		return false;
+	}
 
 	if(File->Write(&Type, sizeof(ZEUInt8), 1) != 1)
+	{
 		zeError("Can not write ZEMLDataProperty type to file.");
+		return false;
+	}
 
 	ZEUInt8 NameLength = Name.GetSize();
 	if(File->Write(&NameLength, sizeof(ZEUInt8), 1) != 1)
+	{
 		zeError("Can not write ZEMLDataProperty name lenght to file.");
+		return false;
+	}
 
 	if(File->Write(Name.GetValue(), sizeof(char) * NameLength, 1) != 1)
+	{
 		zeError("Can not write ZEMLDataProperty name to file.");
+		return false;
+	}
 
 	if(File->Write(&DataSize, sizeof(ZEUInt64), 1) != 1)
+	{
 		zeError("Can not write ZEMLDataProperty data size to file.");
+		return false;
+	}
 
 	if(File->Write(GetData(), sizeof(char) * DataSize, 1) != 1)
 	{
 		if(DataSize != 0)
+		{
 			zeError("Can not write ZEMLDataProperty data to file. Property name : %s", GetName().ToCString());
+			return false;
+		}
 		if(DataSize == 0)
 			zeWarning("ZEMLDataProperty \"%s\" data size is : 0", GetName().ToCString());
 	}
+
+	return true;
 }
 
-void ZEMLDataProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
+bool ZEMLDataProperty::ReadSelf(ZEFile* File, bool DeferredDataReading)
 {
 	FilePosition = File->Tell();
 	IsCached = !DeferredDataReading;
@@ -154,22 +174,40 @@ void ZEMLDataProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 	char		TempNameBuffer[ZEML_MAX_NAME_SIZE];	
 
 	if(File->Read(&Identifier, sizeof(char), 1) != 1)
+	{
 		zeError("Can not read ZEMLDataProperty identifier from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	if(Identifier != ZEML_ITEM_FILE_IDENTIFIER)
+	{
 		zeError("ZEMLProperty identifier mismatch. Corrupted ZEML file.");
+		return false;
+	}
 
 	if(File->Read(&Type, sizeof(ZEUInt8), 1) != 1)
+	{
 		zeError("Can not read ZEMLDataProperty type from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	if(File->Read(&NameSize, sizeof(ZEUInt8), 1) != 1)
+	{
 		zeError("Can not read ZEMLDataProperty name length from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	if(File->Read(TempNameBuffer, NameSize, 1) != 1)
+	{
 		zeError("Can not read ZEMLDataProperty name from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	if(File->Read(&DataSize, sizeof(ZEUInt64), 1) != 1)
+	{
 		zeError("Can not read ZEMLDataProperty data size from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	SetName(TempNameBuffer);
 
@@ -180,7 +218,10 @@ void ZEMLDataProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 			Data = new char[DataSize];
 
 			if(File->Read(Data, DataSize, 1) != 1)
+			{
 				zeError("Can not read ZEMLDataProperty data from file. Corrupted ZEML file.");
+				return false;
+			}
 		}
 	}
 	else
@@ -189,4 +230,5 @@ void ZEMLDataProperty::ReadFromFile(ZEFile* File, bool DeferredDataReading)
 		File->Seek(DataSize, ZE_SF_CURRENT);
 	}
 
+	return true;
 }

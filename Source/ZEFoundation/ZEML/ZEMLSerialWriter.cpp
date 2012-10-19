@@ -62,7 +62,7 @@ void ZEMLSerialNode::WriteProperty(const ZEString& Name, const ZEVariant& Value)
 	ZEMLProperty Property;
 	Property.SetName(Name);
 	Property.SetValue(Value);
-	Property.WriteToFile(File);
+	Property.WriteSelf(File);
 	Size += Property.GetTotalSize();
 	SubItemCount++;
 }
@@ -167,7 +167,7 @@ void ZEMLSerialNode::WriteDataProperty(const ZEString& Name, void* Data, ZEUInt6
 	ZEMLDataProperty DataProperty;
 	DataProperty.SetName(Name);
 	DataProperty.SetData(Data, DataSize, false);
-	DataProperty.WriteToFile(File);
+	DataProperty.WriteSelf(File);
 	ParentNode->Size += DataProperty.GetTotalSize();
 	ParentNode->SubItemCount++;
 }
