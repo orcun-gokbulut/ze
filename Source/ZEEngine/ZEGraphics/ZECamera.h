@@ -102,7 +102,7 @@ class ZECamera : public ZEEntity
 		const ZEMatrix4x4&				GetViewProjectionTransform();
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);	
-		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);
+		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 
 		const ZEView&					GetView();
 		const ZEViewVolume&				GetViewVolume();

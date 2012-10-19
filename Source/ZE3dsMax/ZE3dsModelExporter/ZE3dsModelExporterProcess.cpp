@@ -33,46 +33,19 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETypes.h"
 #include "ZE3dsModelExporter.h"
 #include "ZEToolComponents\ZEProgressDialog\ZEProgressDialog.h"
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
-#include "ZEMath\ZEAABBox.h"
-#include "ZEML/ZEMLProperty.h"
+#include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEFile/ZEPathUtils.h"
-#include "ZEFile/ZEFile.h"
-#include "ZEML/ZEMLSerialWriter.h"
 #include "ZEFile\ZEDirectoryInfo.h"
 #include "ZEFile\ZEFileOperations.h"
+#include "ZEML/ZEMLSerialWriter.h"
 
 // #include <IGame/IGameFx.h>
 // #include <io.h>
 // #include "IGame/IGameModifier.h"
-
-#define ZE_MTMP_SKINTRANSFORM					1
-#define ZE_MTMP_DIFFUSEMAP						2
-#define ZE_MTMP_NORMALMAP						4
-#define ZE_MTMP_SPECULARMAP						8
-#define ZE_MTMP_EMISSIVEMAP						16
-#define ZE_MTMP_OPACITYMAP						32
-#define ZE_MTMP_DETAILDIFFUSEMAP				64
-#define ZE_MTMP_DETAILNORMALMAP					128
-#define ZE_MTMP_ENVIRONMENTMAP					256
-#define ZE_MTMP_REFRACTION						512
-#define ZE_MTMP_LIGHTMAP						1024
-#define ZE_MTMP_DISTORTIONMAP					2048
-
-enum ZEPropType //Do not change order
-{
-	ZE_UNKNOWN_PROP			= 0,
-	ZE_FLOAT_PROP			= 1,
-	ZE_VECTOR3_PROP			= 2,
-	ZE_INT_PROP				= 3,
-	ZE_STRING_PROP			= 4,
-	ZE_VECTOR4_PROP			= 5,
-	ZE_BOOL_PROP			= 6
-};
 
 enum ZEPhysicalBodyType
 {
@@ -125,265 +98,6 @@ struct ZEModelFileAnimationFrame
 	ZEArray<ZEModelFileAnimationKey>			MeshKeys;
 };
 
-inline ZEVector2 MAX_TO_ZE(const Point2& Point)
-{
-	return ZEVector2(Point.x, Point.y);
-}
-
-inline ZEVector3 MAX_TO_ZE(const Point3& Point)
-{
-	return ZEVector3(Point.x, Point.y, Point.z);
-}
-
-inline ZEQuaternion MAX_TO_ZE(const Quat& Quaternion)
-{
-	Quat Temp = Quaternion.Inverse();
-	return ZEQuaternion(Temp.w, Temp.x, Temp.y, Temp.z);
-}
-
-inline Point2 ZE_TO_MAX(const ZEVector2& Vector)
-{
-	return Point2(Vector.x, Vector.y);
-}
-
-inline Point3 ZE_TO_MAX(const ZEVector3& Vector)
-{
-	return Point3(Vector.x, Vector.y, Vector.z);
-}
-
-inline Quat ZE_TO_MAX(const ZEQuaternion& Quaternion)
-{
-	return Quat(Quaternion.x, Quaternion.y, Quaternion.z, Quaternion.w);
-}
-
-IGameScene* Scene_;
-
-template <typename T>
-bool GetProperty(IExportEntity * Object, ZEPropType Type, const char* Property, T& Value)
-{ 
-	if (Object == NULL)
-		return false;
-
-	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
-	if (Prop != NULL)
-	{
-		if(Type == ZE_BOOL_PROP)
-			Type = ZE_INT_PROP;
-
-		if (Prop->GetType() == Type)
-		{
-			if (Prop->GetPropertyValue(Value))
-				return true;
-			else
-			{
-				zeWarning("Can not read property value. (Property Name : \"%s\")", Property);
-				return false;
-			}
-		}
-		else
-		{
-			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property, Prop->GetType(), Type);
-			return false;
-		}
-	}
-	else
-	{
-		zeWarning("Can not find property. (Property Name : \"%s\")", Property);
-		return false;
-	}
-}
-
-bool GetProperty(IExportEntity* Object, const char* Property, IGameNode*& Value)
-{ 
-	if (Object == NULL)
-		return false;
-
-	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
-
-	if (Prop != NULL)
-	{	
-		IParamBlock2* ParamBlock = Prop->GetMaxParamBlock2();
-		ZEInt ParamId = ParamBlock->IndextoID(Prop->GetParamBlockIndex());
-
-		INode* Node =  ParamBlock->GetINode(ParamId);
-		if (Node == NULL)
-		{
-			Value = NULL;
-			return true;
-		}
-
-		Value = Scene_->GetIGameNode(Node);
-		return true;
-	}
-	else
-	{
-		zeWarning("Can not find property. (Property Name : \"%s\")", Property);
-		return false;
-	}
-}
-
-template <>
-bool GetProperty<bool>(IExportEntity* Object, ZEPropType Type, const char* Property, bool& Value)
-{ 
-	if (Object == NULL)
-		return false;
-
-	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
-	if (Prop != NULL)
-	{
-		if(Type == ZE_BOOL_PROP)
-			Type = ZE_INT_PROP;
-
-		if (Prop->GetType() == Type)
-		{
-			ZEInt Temp;
-			if (Prop->GetPropertyValue(Temp))
-			{
-				Value = (Temp != 0);
-				return true;
-			}
-			else
-			{
-				zeWarning("Can not read property value. (Property Name : \"%s\")", Property);
-				return false;
-			}
-		}
-		else
-		{
-			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property, Prop->GetType(), Type);
-			return false;
-		}
-	}
-	else
-	{
-		zeWarning("Can not find property. (Property Name : \"%s\")", Property);
-		return false;
-	}
-}
-
-template <>
-bool GetProperty<const char*>(IExportEntity * Object, ZEPropType Type, const char* Property, const char*& Value)
-{ 
-	if (Object == NULL)
-		return false;
-
-	if(Type == ZE_BOOL_PROP)
-		Type = ZE_INT_PROP;
-
-	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
-	if (Prop != NULL && Prop->GetType() == Type)
-		return Prop->GetPropertyValue(Value);
-	else
-		return false;
-}
-
-template <>
-bool GetProperty<ZEUInt>(IExportEntity* Object, ZEPropType Type, const char* Property, ZEUInt& Value)
-{ 
-	ZEInt Temp;
-	if (Object == NULL)
-		return false;
-
-	if(Type == ZE_BOOL_PROP)
-		Type = ZE_INT_PROP;
-
-	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
-	if (Prop != NULL && Prop->GetType() == Type)
-	{
-		if (Prop->GetPropertyValue(Temp))
-		{
-			Value = Temp;
-			return true;
-		}
-		else
-			return false;
-	}
-	else
-		return false;
-}
-
-template <>
-bool GetProperty<ZEMLProperty>(IExportEntity* Object, ZEPropType Type, const char* Property, ZEMLProperty& Value)
-{
-	if (Object == NULL)
-		return false;
-
-	bool IsPropertyBoolean = false;
-
-	if(Type == ZE_BOOL_PROP)
-	{
-		Type = ZE_INT_PROP;
-		IsPropertyBoolean = true;
-	};
-
-	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
-	if (Prop != NULL && Prop->GetType() == Type)
-	{
-		bool Result;
-		ZEVariant TempValue;
-
-		switch (Type)
-		{
-			case ZE_FLOAT_PROP:
-			{
-				float FloatValue;
-				Result = Prop->GetPropertyValue(FloatValue);
-				TempValue.SetFloat(FloatValue);
-				break;
-			}
-			case ZE_INT_PROP:
-			{
-				ZEInt IntegerValue;
-				Result = Prop->GetPropertyValue(IntegerValue);
-
-				if (IsPropertyBoolean)
-				{
-					bool BooleanValue = (IntegerValue != 0);
-					TempValue.SetBoolean(BooleanValue);
-				}
-				else
-				{
-					TempValue.SetInt32(IntegerValue);
-				}
-				
-				break;
-			}
-			case ZE_VECTOR3_PROP:
-			{
-				ZEVector3 Vector3Value;
-				Result = Prop->GetPropertyValue((Point3&)Vector3Value);
-				TempValue.SetVector3(Vector3Value);
-				break;
-			}
-			case ZE_VECTOR4_PROP:
-			{
-				ZEVector4 Vector4Value;
-				Result = Prop->GetPropertyValue((Point4&)Vector4Value);
-				TempValue.SetVector4(Vector4Value);
-				break;
-			}
-			case ZE_STRING_PROP:
-			{
-				const char* StringValue;
-				Result = Prop->GetPropertyValue(StringValue);
-				TempValue.SetString(StringValue);
-				break;
-			}
-		}
-
-		if(Result)
-		{
-			Value.SetValue(TempValue);
-			return true;
-		}
-		else
-			return false;
-	}
-	else
-		return false;
-}
-
-
 bool ZE3dsModelExporter::GetRelativePath(const char* RealPath, char* RelativePath)
 {
 	ZEString ZinekDir;
@@ -424,66 +138,45 @@ ZEInt ZE3dsModelExporter::GetBoneId(IGameNode* Node)
 	return -1;
 }
 
-void CalculateLocalBoundingBox(ZEAABBox& BoundingBox, IGameMesh* Mesh)
-{
-	if (Mesh->GetNumberOfFaces() == 0)
-	{
-		BoundingBox.Min = BoundingBox.Max = ZEVector3(0.0f, 0.0f, 0.0f);
-		return;
-	}
-	else
-		BoundingBox.Min = BoundingBox.Max = *(ZEVector3*)&Mesh->GetVertex(Mesh->GetFace(0)->vert[0], true);
-
-	for (ZEInt I = 0; I < Mesh->GetNumberOfFaces(); I++)
-	{
-		FaceEx* Face = Mesh->GetFace(I);
-		for (ZESize N = 0; N < 3; N++)
-		{
-			Point3 Point;
-			Mesh->GetVertex(Face->vert[N], Point, true);
-			if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
-			if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
-			if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
-			if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
-			if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
-			if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
-		}
-	}
-
-}
-
 ZEInt ZE3dsModelExporter::ProcessMeshMaterial(IGameMaterial* Material)
 {
 	if (Material == NULL)
 		return -1;
 
-	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)
-		if (Materials[I] == Material)
+	for (ZESize I = 0; I < (ZESize)ProcessedMaterials.Count(); I++)
+		if (ProcessedMaterials[I] == Material)
 			return (ZEInt)I;
 	
-	Materials.Append(1, &Material);
-	return Materials.Count() - 1;
+	ProcessedMaterials.Append(1, &Material);
+	return ProcessedMaterials.Count() - 1;
 }
 
-bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* MaterialsNode)
+bool ZE3dsModelExporter::ProcessMaterials(const char* FileName)
 {
 	zeLog("Processing materials...");
 
-	ZEString FileParentPath = ZEFileInfo::GetParentDirectory(FileName) + ZEPathUtils::GetSeperator();
+	char DiffuseMap[ZE_EXFL_MAX_FILENAME_SIZE];
+	char SpecularMap[ZE_EXFL_MAX_FILENAME_SIZE];
+	char EmissiveMap[ZE_EXFL_MAX_FILENAME_SIZE];
+	char OpacityMap[ZE_EXFL_MAX_FILENAME_SIZE];
+	char NormalMap[ZE_EXFL_MAX_FILENAME_SIZE];
+	char EnvironmentMap[ZE_EXFL_MAX_FILENAME_SIZE];
 
-	char DiffuseMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char SpecularMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char EmissiveMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char OpacityMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char NormalMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char EnvironmentMap[ZE_MDLF_MAX_FILENAME_SIZE];
+	ZESize MaterialCount = (ZESize)ProcessedMaterials.Count();
 
-	ZESize MaterialCount = (ZESize)Materials.Count();
+	if (MaterialCount == 0)
+	{
+		zeWarning("No materials found. Material processing aborted.");
+		return true;
+	}
+
+	ZEMLNode* MaterialsNode = ModelNode.AddSubNode("Materials");
+
 	zeLog("Material count : %d", MaterialCount);
 
 	for (ZESize I = 0; I < MaterialCount; I++)
 	{
-		IGameMaterial* NodeMaterial = Materials[I];
+		IGameMaterial* NodeMaterial = ProcessedMaterials[I];
 		ZEString MaterialName = NodeMaterial->GetMaterialName();
 
 		ZEResourceOption MaterialOption;
@@ -496,7 +189,7 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* Materi
 		ZEString MaterialFilePath = MaterialOption.ExportPath + ZEPathUtils::GetSeperator() + MaterialOption.Identifier;
 
 		ZEProgressDialog::GetInstance()->OpenTask(MaterialName);
-		zeLog("Processing material \"%s\" (%u/%d).", MaterialName.ToCString(), I + 1, Materials.Count());
+		zeLog("Processing material \"%s\" (%u/%d).", MaterialName.ToCString(), I + 1, ProcessedMaterials.Count());
 
 		ZeroMemory(DiffuseMap, sizeof(DiffuseMap));
 		ZeroMemory(SpecularMap, sizeof(SpecularMap));
@@ -519,8 +212,6 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* Materi
 
 		for (ZEInt N = 0; N < NumberOfMaps; N++)
 		{
-			char RelativePath[ZE_MDLF_MAX_FILENAME_SIZE];
-
 			IGameTextureMap* CurrentTexture = NodeMaterial->GetIGameTextureMap(N);
 			switch(CurrentTexture->GetStdMapSlot())
 			{
@@ -536,7 +227,7 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* Materi
 				{
 					MapFlag |= ZE_MTMP_DIFFUSEMAP;
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
-					strncpy(DiffuseMap, ResourceRelativePath.ToCString() , ZE_MDLF_MAX_FILENAME_SIZE);
+					strncpy(DiffuseMap, ResourceRelativePath.ToCString() , ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
@@ -558,7 +249,7 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* Materi
 				{
 					MapFlag |= ZE_MTMP_SPECULARMAP;
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
-					strncpy(SpecularMap, ResourceRelativePath.ToCString(), ZE_MDLF_MAX_FILENAME_SIZE);
+					strncpy(SpecularMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
@@ -580,7 +271,7 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* Materi
 				{
 					MapFlag |= ZE_MTMP_EMISSIVEMAP;
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
-					strncpy(EmissiveMap, ResourceRelativePath.ToCString(), ZE_MDLF_MAX_FILENAME_SIZE);
+					strncpy(EmissiveMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
@@ -602,7 +293,7 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* Materi
 				{
 					MapFlag |= ZE_MTMP_OPACITYMAP;
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
-					strncpy(OpacityMap, ResourceRelativePath.ToCString(), ZE_MDLF_MAX_FILENAME_SIZE);
+					strncpy(OpacityMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
@@ -624,7 +315,7 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* Materi
 				continue;
 				}
 				CurrentMaterial->ShaderComponents |= ZESHADER_DIFFUSEMAP;
-				strncpy(CurrentMaterial->DetailMap, RelativePath, ZE_MDLF_MAX_FILENAME_SIZE);
+				strncpy(CurrentMaterial->DetailMap, RelativePath, ZE_EXFL_MAX_FILENAME_SIZE);
 				*/
 				break;
 			case ID_BU: // Bump 
@@ -637,7 +328,7 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* Materi
 				{
 					MapFlag |= ZE_MTMP_NORMALMAP;
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
-					strncpy(NormalMap, ResourceRelativePath.ToCString(), ZE_MDLF_MAX_FILENAME_SIZE);
+					strncpy(NormalMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
@@ -659,7 +350,7 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* Materi
 				{
 					MapFlag |= ZE_MTMP_ENVIRONMENTMAP;
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
-					strncpy(EnvironmentMap, ResourceRelativePath.ToCString(), ZE_MDLF_MAX_FILENAME_SIZE);
+					strncpy(EnvironmentMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
@@ -680,7 +371,7 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* Materi
 					continue;
 				}
 				MapFlag |= ZE_MTMP_REFRACTION;
-				strncpy(CurrentMaterial->RefractionMap, RelativePath, ZE_MDLF_MAX_FILENAME_SIZE);*/
+				strncpy(CurrentMaterial->RefractionMap, RelativePath, ZE_EXFL_MAX_FILENAME_SIZE);*/
 				break;
 			}
 			
@@ -692,11 +383,11 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* Materi
 
 		MaterialConfigNode.WriteProperty("Name", "Default");
 		bool TempBooleanValue = false;
-		GetProperty(NodeMaterial, ZE_INT_PROP, "wire", TempBooleanValue);
+		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, "wire", TempBooleanValue);
 		MaterialConfigNode.WriteProperty("Wireframe", TempBooleanValue);
 
 		TempBooleanValue = false;
-		GetProperty(NodeMaterial, ZE_INT_PROP, "twoSided", TempBooleanValue);
+		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, "twoSided", TempBooleanValue);
 		MaterialConfigNode.WriteProperty("TwoSided", TempBooleanValue);
 
 		MaterialConfigNode.WriteProperty("LightningEnabled", true); // Lightning Enabled is forced true;
@@ -704,7 +395,7 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName, ZEMLNode* Materi
 		float Opacity = 0.0f;
 		NodeMaterial->GetOpacityData()->GetPropertyValue(Opacity);
 
-		if (Opacity != 1.0f || strncmp(OpacityMap, "", ZE_MDLF_MAX_FILENAME_SIZE) !=0)
+		if (Opacity != 1.0f || strncmp(OpacityMap, "", ZE_EXFL_MAX_FILENAME_SIZE) !=0)
 			MaterialConfigNode.WriteProperty("Transparant", true);
 		else
 			MaterialConfigNode.WriteProperty("Transparant", false);
@@ -792,7 +483,7 @@ void ZE3dsModelExporter::ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNo
 	for (ZESize I = 0; I < NumberofVertices; I++)
 	{
 		Point3 Vertex = Mesh->GetVertex((ZEInt)I, false) * WorldTransform;
-		Vertices[I] = MAX_TO_ZE(Vertex);
+		Vertices[I] = ZE3dsMaxUtils::MaxtoZE(Vertex);
 	}
 
 	ShapeNode->AddDataProperty("Vertices", Vertices.GetCArray(), sizeof(ZEVector3) * NumberofVertices, true);
@@ -806,21 +497,21 @@ bool ZE3dsModelExporter::ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerN
 		return false;
 
 	const char* ZEType;
-	if (!GetProperty(Object, ZE_STRING_PROP, "ZEType", ZEType) || (strcmp(ZEType, "PhysicalShape") != 0))
+	if (!ZE3dsMaxUtils::GetProperty(Object, ZE_STRING_PROP, "ZEType", ZEType) || (strcmp(ZEType, "PhysicalShape") != 0))
 	{
 		zeError("Mesh is rejected because it does not contain ZEPhysicalShape. Node Name: \"%s\".", Node->GetName());
 		return false;
 	}
 
 	GMatrix Transform = Node->GetWorldTM() * OwnerNode->GetWorldTM().Inverse();
-	PhysicalShapeNode->AddProperty("Position", MAX_TO_ZE(Transform.Translation()));
-	PhysicalShapeNode->AddProperty("Rotation", MAX_TO_ZE(Transform.Rotation()));
+	PhysicalShapeNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(Transform.Translation()));
+	PhysicalShapeNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(Transform.Rotation()));
 
 	ZEInt GeometryType;
-	GetProperty(Object, ZE_FLOAT_PROP,	"PhysicalShape_MaterialRestitution",		*PhysicalShapeNode->AddProperty("Restitution"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"PhysicalShape_MaterialDynamicFriction",	*PhysicalShapeNode->AddProperty("DynamicFriction"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"PhysicalShape_MaterialStaticFriction",		*PhysicalShapeNode->AddProperty("StaticFriction"));
-	GetProperty(Object, ZE_INT_PROP,		"PhysicalShape_GeometryType",				 GeometryType);
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"PhysicalShape_MaterialRestitution",		*PhysicalShapeNode->AddProperty("Restitution"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"PhysicalShape_MaterialDynamicFriction",	*PhysicalShapeNode->AddProperty("DynamicFriction"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"PhysicalShape_MaterialStaticFriction",		*PhysicalShapeNode->AddProperty("StaticFriction"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"PhysicalShape_GeometryType",				 GeometryType);
 
 	if (GeometryType == 1)
 	{
@@ -829,29 +520,29 @@ bool ZE3dsModelExporter::ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerN
 		{
 			PhysicalShapeNode->AddProperty("Type", ZE_PBST_BOX);
 			ZEMLNode* ShapeNode = PhysicalShapeNode->AddSubNode("Shape");
-			GetProperty(Object, ZE_FLOAT_PROP, "width",  *ShapeNode->AddProperty("Width"));
-			GetProperty(Object, ZE_FLOAT_PROP, "height", *ShapeNode->AddProperty("Height"));
-			GetProperty(Object, ZE_FLOAT_PROP, "length", *ShapeNode->AddProperty("Length"));
+			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "width",  *ShapeNode->AddProperty("Width"));
+			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "height", *ShapeNode->AddProperty("Height"));
+			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "length", *ShapeNode->AddProperty("Length"));
 		}
 		else if (strcmp(ObjectClassName, "Sphere") == 0)
 		{
 			PhysicalShapeNode->AddProperty("Type", ZE_PBST_SPHERE);
 			ZEMLNode* ShapeNode = PhysicalShapeNode->AddSubNode("Shape");
-			GetProperty(Object, ZE_FLOAT_PROP, "radius", *ShapeNode->AddProperty("Radius"));
+			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "radius", *ShapeNode->AddProperty("Radius"));
 		}
 		else if (strcmp(ObjectClassName, "Capsule") == 0)
 		{
 			PhysicalShapeNode->AddProperty("Type", ZE_PBST_CAPSULE);
 			ZEMLNode* ShapeNode = PhysicalShapeNode->AddSubNode("Shape");
-			GetProperty(Object, ZE_FLOAT_PROP, "radius", *ShapeNode->AddProperty("Radius"));
-			GetProperty(Object, ZE_FLOAT_PROP, "height", *ShapeNode->AddProperty("Height"));
+			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "radius", *ShapeNode->AddProperty("Radius"));
+			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "height", *ShapeNode->AddProperty("Height"));
 		}
 		else if (strcmp(ObjectClassName, "Cylinder") == 0)
 		{
 			PhysicalShapeNode->AddProperty("Type", ZE_PBST_CYLINDER);
 			ZEMLNode* ShapeNode = PhysicalShapeNode->AddSubNode("Shape");
-			GetProperty(Object, ZE_FLOAT_PROP, "radius", *ShapeNode->AddProperty("Radius"));
-			GetProperty(Object, ZE_FLOAT_PROP, "height", *ShapeNode->AddProperty("Height"));
+			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "radius", *ShapeNode->AddProperty("Radius"));
+			ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "height", *ShapeNode->AddProperty("Height"));
 		}
 		else if (strcmp(ObjectClassName, "Editable Poly") == 0 || strcmp(ObjectClassName, "Editable Mesh") == 0 || strcmp(ObjectClassName, "Editable Patch") == 0)
 		{
@@ -881,14 +572,14 @@ void ZE3dsModelExporter::ProcessPhysicalBody(IGameNode* Node, ZEMLNode* ParentNo
 		return;
 
 	ZEInt PhysicalBodyTypeValue;
-	GetProperty(Object, ZE_INT_PROP, "PhysicalBody_Type", PhysicalBodyTypeValue);
-	PhysicalBodyTypeValue--; // Array index start problem with Max Script and C++)
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP, "PhysicalBody_Type", PhysicalBodyTypeValue);
+	PhysicalBodyTypeValue--; //This action is made because Max Script Array index starts from 1 instead of 0
 
 	ZEPhysicalBodyType PhysicalBodyType = (ZEPhysicalBodyType)PhysicalBodyTypeValue;
 
 	if (PhysicalBodyType == ZE_PBT_NONE)
 	{
-		zeWarning("No physical body found to export. Node Name : \"%s\"", Node->GetName());
+		zeWarning("No physical body found. Processing physical body aborted. Node Name : \"%s\"", Node->GetName());
 		return;
 	}
 	else if (PhysicalBodyType == ZE_PBT_RIGID)
@@ -897,25 +588,25 @@ void ZE3dsModelExporter::ProcessPhysicalBody(IGameNode* Node, ZEMLNode* ParentNo
 
 		ZEMLNode* PhysicalBodyNode = ParentNode->AddSubNode("PhysicalBody");
 
-		GetProperty(Object, ZE_BOOL_PROP, "PhysicalBody_Enabled", *PhysicalBodyNode->AddProperty("Enabled"));
+		ZE3dsMaxUtils::GetProperty(Object, ZE_BOOL_PROP, "PhysicalBody_Enabled", *PhysicalBodyNode->AddProperty("Enabled"));
 
 		ZEInt PhysicalBodyTypeValue;
-		GetProperty(Object, ZE_INT_PROP, "PhysicalBody_Type", PhysicalBodyTypeValue);
+		ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP, "PhysicalBody_Type", PhysicalBodyTypeValue);
 		PhysicalBodyTypeValue--; // Array index start problem with Max Script and C++)
 		PhysicalBodyNode->AddProperty("Type", PhysicalBodyTypeValue);
 
-		GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_Mass", *PhysicalBodyNode->AddProperty("Mass"));
+		ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_Mass", *PhysicalBodyNode->AddProperty("Mass"));
 
 		IGameNode* MassCenter = NULL;
-		GetProperty(Object, "PhysicalBody_CenterOfMass", MassCenter);
+		ZE3dsMaxUtils::GetProperty(Object, "PhysicalBody_CenterOfMass", Scene, MassCenter);
 
 		if (MassCenter == NULL)
 			PhysicalBodyNode->AddProperty("MassCenter", ZEVector3::Zero);
 		else
-			PhysicalBodyNode->AddProperty("MassCenter", MAX_TO_ZE(MassCenter->GetObjectTM().Translation() - Node->GetObjectTM().Translation()));
+			PhysicalBodyNode->AddProperty("MassCenter", ZE3dsMaxUtils::MaxtoZE(MassCenter->GetObjectTM().Translation() - Node->GetObjectTM().Translation()));
 
-		GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_LinearDamping", *PhysicalBodyNode->AddProperty("LinearDamping"));
-		GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_AngularDamping", *PhysicalBodyNode->AddProperty("AngularDamping"));
+		ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_LinearDamping", *PhysicalBodyNode->AddProperty("LinearDamping"));
+		ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_AngularDamping", *PhysicalBodyNode->AddProperty("AngularDamping"));
 
 		IGameProperty* ShapesProp = Object->GetIPropertyContainer()->QueryProperty("PhysicalBody_Shapes");
 		if (ShapesProp == NULL)
@@ -932,7 +623,7 @@ void ZE3dsModelExporter::ProcessPhysicalBody(IGameNode* Node, ZEMLNode* ParentNo
 		{
 			const char* Type;
 			IGameNode* PhysicalShapeNode = Scene->GetIGameNode(ParamBlock->GetINode(ParamId, 0, (ZEInt)I));
-			if (PhysicalShapeNode == NULL || !GetProperty(PhysicalShapeNode->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type) || strcmp(Type, "PhysicalShape") != 0)
+			if (PhysicalShapeNode == NULL || !ZE3dsMaxUtils::GetProperty(PhysicalShapeNode->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type) || strcmp(Type, "PhysicalShape") != 0)
 			{
 				zeError("Physical body shape is not a valid ZEPhysicalShapeAttribute. Array Index : %d, Shape Name : \"%s\".", I, (PhysicalShapeNode != NULL ? PhysicalShapeNode->GetName() : "NULL"));
 				return;
@@ -961,149 +652,149 @@ bool ZE3dsModelExporter::ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* Physica
 
 	zeLog("Processing physical joint of \"%s\"", Node->GetName());
 
-	GetProperty(Object, ZE_INT_PROP, "Joint_Enabled", *PhysicalJointNode->AddProperty("Enabled"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_BOOL_PROP, "Joint_Enabled", *PhysicalJointNode->AddProperty("Enabled"));
 
 	IGameNode* Body1 = NULL;
-	GetProperty(Object, "Joint_Body1", Body1); 								
+	ZE3dsMaxUtils::GetProperty(Object, "Joint_Body1", Scene, Body1); 								
 	if (Body1 != NULL)
 		PhysicalJointNode->AddProperty("Body1Id", GetMeshId(Body1));
 	else
 		PhysicalJointNode->AddProperty("Body1Id", -1);
 
 	IGameNode* Body2 = NULL;
-	GetProperty(Object, "Joint_Body2", Body2);
+	ZE3dsMaxUtils::GetProperty(Object, "Joint_Body2", Scene, Body2);
 	if (Body2 != NULL)
 		PhysicalJointNode->AddProperty("Body2Id", GetMeshId(Body2));
 	else
 		PhysicalJointNode->AddProperty("Body2Id", -1);
 
 	ZEMLProperty* GlobalAnchorAxisProperty = PhysicalJointNode->AddProperty("UseGlobalAnchorAxis");
-	GetProperty(Object, ZE_BOOL_PROP, "Joint_UseGlobalAnchorAxis", *GlobalAnchorAxisProperty);
+	ZE3dsMaxUtils::GetProperty(Object, ZE_BOOL_PROP, "Joint_UseGlobalAnchorAxis", *GlobalAnchorAxisProperty);
 	if (!GlobalAnchorAxisProperty->GetValue().GetBoolean())
 	{
 		IGameNode* BodyAnchor1 = NULL;
-		GetProperty(Object, "Joint_Body1_Anchor", BodyAnchor1);
+		ZE3dsMaxUtils::GetProperty(Object, "Joint_Body1_Anchor", Scene, BodyAnchor1);
 		if (BodyAnchor1 != NULL)
 		{
 			GMatrix LocalTransform =  BodyAnchor1->GetObjectTM() * Node->GetObjectTM().Inverse();
-			PhysicalJointNode->AddProperty("LocalAnchor1", MAX_TO_ZE(LocalTransform.Translation()));
-			PhysicalJointNode->AddProperty("LocalAxis1", MAX_TO_ZE(LocalTransform.Rotation()));
+			PhysicalJointNode->AddProperty("LocalAnchor1", ZE3dsMaxUtils::MaxtoZE(LocalTransform.Translation()));
+			PhysicalJointNode->AddProperty("LocalAxis1", ZE3dsMaxUtils::MaxtoZE(LocalTransform.Rotation()));
 		}
 
 		IGameNode* BodyAnchor2 = NULL;
-		GetProperty(Object, "Joint_Body2_Anchor", BodyAnchor2);
+		ZE3dsMaxUtils::GetProperty(Object, "Joint_Body2_Anchor", Scene, BodyAnchor2);
 		if (BodyAnchor2 != NULL)
 		{
 			GMatrix LocalTransform = BodyAnchor2->GetObjectTM() * Node->GetObjectTM().Inverse();
-			PhysicalJointNode->AddProperty("LocalAnchor2", MAX_TO_ZE(LocalTransform.Translation()));
-			PhysicalJointNode->AddProperty("LocalAxis2", MAX_TO_ZE(LocalTransform.Rotation()));
+			PhysicalJointNode->AddProperty("LocalAnchor2", ZE3dsMaxUtils::MaxtoZE(LocalTransform.Translation()));
+			PhysicalJointNode->AddProperty("LocalAxis2", ZE3dsMaxUtils::MaxtoZE(LocalTransform.Rotation()));
 		}
 	}
 	else
 	{
-		PhysicalJointNode->AddProperty("GlobalAnchor", MAX_TO_ZE(Node->GetObjectTM().Translation()));
-		PhysicalJointNode->AddProperty("GlobalAxis", MAX_TO_ZE(Node->GetObjectTM().Rotation()));
+		PhysicalJointNode->AddProperty("GlobalAnchor", ZE3dsMaxUtils::MaxtoZE(Node->GetObjectTM().Translation()));
+		PhysicalJointNode->AddProperty("GlobalAxis", ZE3dsMaxUtils::MaxtoZE(Node->GetObjectTM().Rotation()));
 	}
 
 	ZEInt JointTypeValue = 0;
-	GetProperty(Object, ZE_INT_PROP,		"Joint_Type",						JointTypeValue);
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_Type",						JointTypeValue);
 	JointTypeValue--;
 	PhysicalJointNode->AddProperty("JointType", JointTypeValue);
 
-	GetProperty(Object, ZE_BOOL_PROP,		"Joint_CollideBodies",				*PhysicalJointNode->AddProperty("CollideBodies"));
-	GetProperty(Object, ZE_BOOL_PROP,		"Joint_Breakable",					*PhysicalJointNode->AddProperty("Breakable"));	
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Break_Force",				*PhysicalJointNode->AddProperty("BreakForce"));					
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Break_Torque",				*PhysicalJointNode->AddProperty("BreakTorque"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_BOOL_PROP,		"Joint_CollideBodies",				*PhysicalJointNode->AddProperty("CollideBodies"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_BOOL_PROP,		"Joint_Breakable",					*PhysicalJointNode->AddProperty("Breakable"));	
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Break_Force",				*PhysicalJointNode->AddProperty("BreakForce"));					
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Break_Torque",				*PhysicalJointNode->AddProperty("BreakTorque"));
 
 	//Added : Free Joint Properties:
 
-	GetProperty(Object, ZE_INT_PROP,		"Joint_XMotion", 					*PhysicalJointNode->AddProperty("XMotion"));
-	GetProperty(Object, ZE_INT_PROP,		"Joint_YMotion", 					*PhysicalJointNode->AddProperty("YMotion"));
-	GetProperty(Object, ZE_INT_PROP,		"Joint_ZMotion", 					*PhysicalJointNode->AddProperty("ZMotion"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_LinearLimitValue", 			*PhysicalJointNode->AddProperty("LinearLimitValue"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_LinearLimitRestitution", 	*PhysicalJointNode->AddProperty("LinearLimitRestitution"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_LinearLimitSpring", 			*PhysicalJointNode->AddProperty("LinearLimitSpring"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_LinearLimitDamping", 		*PhysicalJointNode->AddProperty("LinearLimitDamping"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_XMotion", 					*PhysicalJointNode->AddProperty("XMotion"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_YMotion", 					*PhysicalJointNode->AddProperty("YMotion"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_ZMotion", 					*PhysicalJointNode->AddProperty("ZMotion"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_LinearLimitValue", 			*PhysicalJointNode->AddProperty("LinearLimitValue"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_LinearLimitRestitution", 	*PhysicalJointNode->AddProperty("LinearLimitRestitution"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_LinearLimitSpring", 			*PhysicalJointNode->AddProperty("LinearLimitSpring"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_LinearLimitDamping", 		*PhysicalJointNode->AddProperty("LinearLimitDamping"));
 
-	GetProperty(Object, ZE_INT_PROP,		"Joint_TwistMotion", 				*PhysicalJointNode->AddProperty("TwistMotion"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistLowLimitValue", 		*PhysicalJointNode->AddProperty("TwistLowLimitValue"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistLowLimitRestitution", 	*PhysicalJointNode->AddProperty("TwistLowLimitRestitution"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistLowLimitSpring", 		*PhysicalJointNode->AddProperty("TwistLowLimitSpring"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistLowLimitDamping", 		*PhysicalJointNode->AddProperty("TwistLowLimitDamping"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistHighLimitValue", 		*PhysicalJointNode->AddProperty("TwistHighLimitValue"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistHighLimitRestitution",	*PhysicalJointNode->AddProperty("TwistHighLimitRestitution"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistHighLimitSpring", 		*PhysicalJointNode->AddProperty("TwistHighLimitSpring"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistHighLimitDamping", 		*PhysicalJointNode->AddProperty("TwistHighLimitDamping"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_TwistMotion", 				*PhysicalJointNode->AddProperty("TwistMotion"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistLowLimitValue", 		*PhysicalJointNode->AddProperty("TwistLowLimitValue"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistLowLimitRestitution", 	*PhysicalJointNode->AddProperty("TwistLowLimitRestitution"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistLowLimitSpring", 		*PhysicalJointNode->AddProperty("TwistLowLimitSpring"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistLowLimitDamping", 		*PhysicalJointNode->AddProperty("TwistLowLimitDamping"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistHighLimitValue", 		*PhysicalJointNode->AddProperty("TwistHighLimitValue"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistHighLimitRestitution",	*PhysicalJointNode->AddProperty("TwistHighLimitRestitution"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistHighLimitSpring", 		*PhysicalJointNode->AddProperty("TwistHighLimitSpring"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_TwistHighLimitDamping", 		*PhysicalJointNode->AddProperty("TwistHighLimitDamping"));
 
-	GetProperty(Object, ZE_INT_PROP,		"Joint_Swing1Motion", 				*PhysicalJointNode->AddProperty("Swing1Motion"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing1LimitValue", 			*PhysicalJointNode->AddProperty("Swing1LimitValue"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing1LimitRestitution", 	*PhysicalJointNode->AddProperty("Swing1LimitRestitution"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing1LimitSpring", 			*PhysicalJointNode->AddProperty("Swing1LimitSpring"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing1LimitDamping", 		*PhysicalJointNode->AddProperty("Swing1LimitDamping"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_Swing1Motion", 				*PhysicalJointNode->AddProperty("Swing1Motion"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing1LimitValue", 			*PhysicalJointNode->AddProperty("Swing1LimitValue"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing1LimitRestitution", 	*PhysicalJointNode->AddProperty("Swing1LimitRestitution"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing1LimitSpring", 			*PhysicalJointNode->AddProperty("Swing1LimitSpring"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing1LimitDamping", 		*PhysicalJointNode->AddProperty("Swing1LimitDamping"));
 
-	GetProperty(Object, ZE_INT_PROP,		"Joint_Swing2Motion", 				*PhysicalJointNode->AddProperty("Swing2Motion"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing2LimitValue", 			*PhysicalJointNode->AddProperty("Swing2LimitValue"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing2LimitRestitution", 	*PhysicalJointNode->AddProperty("Swing2LimitRestitution"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing2LimitSpring", 			*PhysicalJointNode->AddProperty("Swing2LimitSpring"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing2LimitDamping", 		*PhysicalJointNode->AddProperty("Swing2LimitDamping"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_Swing2Motion", 				*PhysicalJointNode->AddProperty("Swing2Motion"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing2LimitValue", 			*PhysicalJointNode->AddProperty("Swing2LimitValue"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing2LimitRestitution", 	*PhysicalJointNode->AddProperty("Swing2LimitRestitution"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing2LimitSpring", 			*PhysicalJointNode->AddProperty("Swing2LimitSpring"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_Swing2LimitDamping", 		*PhysicalJointNode->AddProperty("Swing2LimitDamping"));
 
-	GetProperty(Object, ZE_INT_PROP,		"Joint_XLinearMotor", 				*PhysicalJointNode->AddProperty("LinearXMotor"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_XLinearMotorForce", 			*PhysicalJointNode->AddProperty("LinearXMotorForce"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_XLinearMotorSpring", 		*PhysicalJointNode->AddProperty("LinearXMotorSpring"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_XLinearMotorDamper", 		*PhysicalJointNode->AddProperty("LinearXMotorDamper"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_XLinearMotor", 				*PhysicalJointNode->AddProperty("LinearXMotor"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_XLinearMotorForce", 			*PhysicalJointNode->AddProperty("LinearXMotorForce"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_XLinearMotorSpring", 		*PhysicalJointNode->AddProperty("LinearXMotorSpring"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_XLinearMotorDamper", 		*PhysicalJointNode->AddProperty("LinearXMotorDamper"));
 
-	GetProperty(Object, ZE_INT_PROP,		"Joint_YLinearMotor", 				*PhysicalJointNode->AddProperty("LinearYMotor"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_YLinearMotorForce", 			*PhysicalJointNode->AddProperty("LinearYMotorForce"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_YLinearMotorSpring", 		*PhysicalJointNode->AddProperty("LinearYMotorSpring"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_YLinearMotorDamper", 		*PhysicalJointNode->AddProperty("LinearYMotorDamper"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_YLinearMotor", 				*PhysicalJointNode->AddProperty("LinearYMotor"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_YLinearMotorForce", 			*PhysicalJointNode->AddProperty("LinearYMotorForce"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_YLinearMotorSpring", 		*PhysicalJointNode->AddProperty("LinearYMotorSpring"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_YLinearMotorDamper", 		*PhysicalJointNode->AddProperty("LinearYMotorDamper"));
 
-	GetProperty(Object, ZE_INT_PROP,		"Joint_ZLinearMotor", 				*PhysicalJointNode->AddProperty("LinearZMotor"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_ZLinearMotorForce", 			*PhysicalJointNode->AddProperty("LinearZMotorForce"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_ZLinearMotorSpring", 		*PhysicalJointNode->AddProperty("LinearZMotorSpring"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_ZLinearMotorDamper", 		*PhysicalJointNode->AddProperty("LinearZMotorDamper"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_ZLinearMotor", 				*PhysicalJointNode->AddProperty("LinearZMotor"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_ZLinearMotorForce", 			*PhysicalJointNode->AddProperty("LinearZMotorForce"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_ZLinearMotorSpring", 		*PhysicalJointNode->AddProperty("LinearZMotorSpring"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_ZLinearMotorDamper", 		*PhysicalJointNode->AddProperty("LinearZMotorDamper"));
 
-	GetProperty(Object, ZE_INT_PROP,		"Joint_AngularSwingMotor", 			*PhysicalJointNode->AddProperty("AngularSwingMotor"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularSwingMotorForce", 	*PhysicalJointNode->AddProperty("AngularSwingMotorForce"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularSwingMotorSpring", 	*PhysicalJointNode->AddProperty("AngularSwingMotorSpring"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularSwingMotorDamper", 	*PhysicalJointNode->AddProperty("AngularSwingMotorDamper"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_AngularSwingMotor", 			*PhysicalJointNode->AddProperty("AngularSwingMotor"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularSwingMotorForce", 	*PhysicalJointNode->AddProperty("AngularSwingMotorForce"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularSwingMotorSpring", 	*PhysicalJointNode->AddProperty("AngularSwingMotorSpring"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularSwingMotorDamper", 	*PhysicalJointNode->AddProperty("AngularSwingMotorDamper"));
 
-	GetProperty(Object, ZE_INT_PROP,		"Joint_AngularTwistMotor", 			*PhysicalJointNode->AddProperty("AngularTwistMotor"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularTwistMotorForce", 	*PhysicalJointNode->AddProperty("AngularTwistMotorForce"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularTwistMotorSpring",	*PhysicalJointNode->AddProperty("AngularTwistMotorSpring"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularTwistMotorDamper",	*PhysicalJointNode->AddProperty("AngularTwistMotorDamper"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_AngularTwistMotor", 			*PhysicalJointNode->AddProperty("AngularTwistMotor"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularTwistMotorForce", 	*PhysicalJointNode->AddProperty("AngularTwistMotorForce"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularTwistMotorSpring",	*PhysicalJointNode->AddProperty("AngularTwistMotorSpring"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularTwistMotorDamper",	*PhysicalJointNode->AddProperty("AngularTwistMotorDamper"));
 
-	GetProperty(Object, ZE_INT_PROP,		"Joint_AngularSlerpMotor", 			*PhysicalJointNode->AddProperty("AngularSlerpMotor"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularSlerpMotorForce", 	*PhysicalJointNode->AddProperty("AngularSlerpMotorForce"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularSlerpMotorSpring", 	*PhysicalJointNode->AddProperty("AngularSlerpMotorSpring"));
-	GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularSlerpMotorDamper", 	*PhysicalJointNode->AddProperty("AngularSlerpMotorDamper"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_INT_PROP,		"Joint_AngularSlerpMotor", 			*PhysicalJointNode->AddProperty("AngularSlerpMotor"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularSlerpMotorForce", 	*PhysicalJointNode->AddProperty("AngularSlerpMotorForce"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularSlerpMotorSpring", 	*PhysicalJointNode->AddProperty("AngularSlerpMotorSpring"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP,	"Joint_AngularSlerpMotorDamper", 	*PhysicalJointNode->AddProperty("AngularSlerpMotorDamper"));
 
 	Quat Quaternion;
 	Point3 Point;
 
 	IGameNode* MotorTargetPosition = NULL;
-	GetProperty(Object, "Joint_MotorTargetPosition", MotorTargetPosition);
+	ZE3dsMaxUtils::GetProperty(Object, "Joint_MotorTargetPosition", Scene, MotorTargetPosition);
 	if (MotorTargetPosition != NULL)
 	{
-		PhysicalJointNode->AddProperty("MotorTargetPosition", MAX_TO_ZE(MotorTargetPosition->GetObjectTM().Translation() - Node->GetObjectTM().Translation()));
+		PhysicalJointNode->AddProperty("MotorTargetPosition", ZE3dsMaxUtils::MaxtoZE(MotorTargetPosition->GetObjectTM().Translation() - Node->GetObjectTM().Translation()));
 	}
 	else
 		PhysicalJointNode->AddProperty("MotorTargetPosition", ZEVector3::Zero);
 
-	GetProperty(Object, ZE_VECTOR3_PROP, "Joint_MotorTargetVelocity", *PhysicalJointNode->AddProperty("MotorTargetVelocity"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_VECTOR3_PROP, "Joint_MotorTargetVelocity", *PhysicalJointNode->AddProperty("MotorTargetVelocity"));
 
 	IGameNode* MotorTargetOrientation = NULL;
-	GetProperty(Object, "Joint_MotorTargetOrientation", MotorTargetOrientation);
+	ZE3dsMaxUtils::GetProperty(Object, "Joint_MotorTargetOrientation", Scene, MotorTargetOrientation);
 	if (MotorTargetOrientation != NULL)
 	{
 		GMatrix Orientation = MotorTargetPosition->GetObjectTM() * Node->GetObjectTM().Inverse();
-		PhysicalJointNode->AddProperty("MotorTargetOrientation", MAX_TO_ZE(Orientation.Rotation())); //Investigate why there's error
+		PhysicalJointNode->AddProperty("MotorTargetOrientation", ZE3dsMaxUtils::MaxtoZE(Orientation.Rotation())); //Investigate why there's error
 		// ERROR ERROR
-		//Joint->Joint.LinearMotorPosition = MAX_TO_ZE(Orientation.Rotation());
+		//Joint->Joint.LinearMotorPosition = ZE3dsMaxUtils::MaxtoZE(Orientation.Rotation());
 	}
 	else
 		PhysicalJointNode->AddProperty("MotorTargetOrientation", ZEQuaternion::Identity);
 
-	GetProperty(Object, ZE_VECTOR3_PROP, "Joint_MotorTargetAngularVelocity", *PhysicalJointNode->AddProperty("MotorTargetAngularVelocity"));
+	ZE3dsMaxUtils::GetProperty(Object, ZE_VECTOR3_PROP, "Joint_MotorTargetAngularVelocity", *PhysicalJointNode->AddProperty("MotorTargetAngularVelocity"));
 
 	zeLog("Physical joint is processed successfully.");
 
@@ -1153,22 +844,22 @@ bool ZE3dsModelExporter::ProcessBone(IGameNode* Node, ZEMLNode* BonesNode)
 	Box3 BB;
 	Bone->GetBoundingBox(BB);
 	ZEMLNode* BoundingBoxNode = BoneNode->AddSubNode("BoundingBox");
-	BoundingBoxNode->AddProperty("Min", MAX_TO_ZE(BB.Min()));
-	BoundingBoxNode->AddProperty("Max", MAX_TO_ZE(BB.Max()));
+	BoundingBoxNode->AddProperty("Min", ZE3dsMaxUtils::MaxtoZE(BB.Min()));
+	BoundingBoxNode->AddProperty("Max", ZE3dsMaxUtils::MaxtoZE(BB.Max()));
 
 	if (ParentBoneId != -1)
 	{
 		GMatrix Transform = Node->GetWorldTM() * ProcessedBones[(ZESize)ParentBoneId]->GetWorldTM().Inverse();
-		BoneNode->AddProperty("RelativePosition", MAX_TO_ZE(Transform.Translation() * Node->GetWorldTM().Scaling()));
-		BoneNode->AddProperty("RelativeRotation", MAX_TO_ZE(Transform.Rotation()));
-		BoneNode->AddProperty("RelativeScale", MAX_TO_ZE(Transform.Scaling()));
+		BoneNode->AddProperty("RelativePosition", ZE3dsMaxUtils::MaxtoZE(Transform.Translation() * Node->GetWorldTM().Scaling()));
+		BoneNode->AddProperty("RelativeRotation", ZE3dsMaxUtils::MaxtoZE(Transform.Rotation()));
+		BoneNode->AddProperty("RelativeScale", ZE3dsMaxUtils::MaxtoZE(Transform.Scaling()));
 	}
 	else
 	{ 
 		zeLog("\"%s\" is the Root Bone", Node->GetName());
-		BoneNode->AddProperty("RelativePosition", MAX_TO_ZE(Node->GetWorldTM().Translation() * Node->GetWorldTM().Scaling()));
-		BoneNode->AddProperty("RelativeRotation", MAX_TO_ZE(Node->GetWorldTM().Rotation()));
-		BoneNode->AddProperty("RelativeScale", MAX_TO_ZE(Node->GetWorldTM().Scaling()));
+		BoneNode->AddProperty("RelativePosition", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Translation() * Node->GetWorldTM().Scaling()));
+		BoneNode->AddProperty("RelativeRotation", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Rotation()));
+		BoneNode->AddProperty("RelativeScale", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Scaling()));
 	}
 
 	// Process Physical Properties
@@ -1185,7 +876,7 @@ bool ZE3dsModelExporter::ProcessBone(IGameNode* Node, ZEMLNode* BonesNode)
 	return true;
 }
 
-bool ZE3dsModelExporter::ProcessBones(ZEMLNode* BonesNode)
+bool ZE3dsModelExporter::ProcessBones()
 {
 	zeLog("Processing bones...");
 
@@ -1195,7 +886,7 @@ bool ZE3dsModelExporter::ProcessBones(ZEMLNode* BonesNode)
 	for (ZESize I = 0; I < (ZESize)Nodes.Count(); I++)
 	{
 		Type = NULL;
-		if (GetProperty(Nodes[I]->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type) && strcmp(Type, "Bone") == 0)
+		if (ZE3dsMaxUtils::GetProperty(Nodes[I]->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type) && strcmp(Type, "Bone") == 0)
 		{
 			bool Found = false;
 			for (ZESize N = 0; N < (ZESize)ProcessedBones.Count(); N++)
@@ -1211,6 +902,14 @@ bool ZE3dsModelExporter::ProcessBones(ZEMLNode* BonesNode)
 		}
 	}
 
+	if (ProcessedBones.Count() == 0)
+	{
+		zeWarning("No bones with ZEBoneAttribute found. Bone processing aborted.");
+		return true;
+	}
+
+	ZEMLNode* BonesNode = ModelNode.AddSubNode("Bones");
+
 	for (ZESize I = 0; I < (ZESize)ProcessedBones.Count(); I++)
 		if (!ProcessBone(ProcessedBones[I], BonesNode))
 			return false;
@@ -1221,7 +920,10 @@ bool ZE3dsModelExporter::ProcessBones(ZEMLNode* BonesNode)
 bool ZE3dsModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LODNode)
 {
 	IGameMesh* Mesh = (IGameMesh*)Node->GetIGameObject();
-	Mesh->InitializeData();
+
+	if(!Mesh->InitializeData())
+		zeError("Can not initialize mesh data for mesh.");
+
 	IGameSkin* Skin = Mesh->GetIGameSkin();
 
 	ZEArray<ZEModelFileVertex> Vertices;
@@ -1230,32 +932,37 @@ bool ZE3dsModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LODNo
 
 	LODNode->AddProperty("MaterialId", ProcessMeshMaterial(Node->GetNodeMaterial()));
 
+	if(Mesh->GetNumberOfFaces() == 0)
+		zeError("Mesh face count is : 0.");
+
 	if (!Mesh->IsObjectSkinned())
 		Vertices.SetCount((ZESize)Mesh->GetNumberOfFaces() * 3);
 	else
 		SkinnedVertices.SetCount((ZESize)Mesh->GetNumberOfFaces() * 3);
 
 	zeLog("Processing vertices of mesh \"%s\". Polygon Count : %d, Vertex Count : %d.", Node->GetName(), Mesh->GetNumberOfFaces(), Mesh->GetNumberOfFaces() * 3);
-	Mesh->InitializeBinormalData();
+
+	if (!Mesh->InitializeBinormalData())
+		zeError("Can not initialize mesh binormal data.");
 
 	ZEMatrix4x4 ObjectTM;
 	ZEMatrix4x4::CreateOrientation(ObjectTM, 
-		MAX_TO_ZE(Node->GetObjectTM().Translation()), 
-		MAX_TO_ZE(Node->GetObjectTM().Rotation()), 
-		MAX_TO_ZE(Node->GetObjectTM().Scaling()));
+		ZE3dsMaxUtils::MaxtoZE(Node->GetObjectTM().Translation()), 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetObjectTM().Rotation()), 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetObjectTM().Scaling()));
 
 	ZEMatrix4x4 WorldTM;
 	ZEMatrix4x4::CreateOrientation(WorldTM, 
-		MAX_TO_ZE(Node->GetWorldTM().Translation()), 
-		MAX_TO_ZE(Node->GetWorldTM().Rotation()), 
-		MAX_TO_ZE(Node->GetWorldTM().Scaling()));
+		ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Translation()), 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Rotation()), 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Scaling()));
 
 	ZEMatrix4x4 WorldTransform = WorldTM.Inverse() * ObjectTM;
 
 	bool GotError = false;
 	bool BoneCountWarning = false; 
 	AffectingBoneIds.SetCount(0);
-	for (ZESize I = 0; I < Mesh->GetNumberOfFaces(); I++)
+	for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
 	{
 		FaceEx* Face;
 		Face = Mesh->GetFace((ZEInt)I);
@@ -1265,14 +972,33 @@ bool ZE3dsModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LODNo
 			{	
 				ZEModelFileVertex* Vertex = &(Vertices[3*I + N]);
 
-				Vertex->Position = WorldTransform * MAX_TO_ZE(Mesh->GetVertex(Face->vert[N], true)); 
-				ZEMatrix4x4::Transform3x3(Vertex->Normal, WorldTransform, MAX_TO_ZE(Mesh->GetNormal(Face->norm[N], true)));
+				Point3 Temp;
+
+				if (!Mesh->GetVertex(Face->vert[N], Temp, true))
+					zeError("Can not get vertex of face %d, vertex index : %d.", I, N);
+
+				Vertex->Position = WorldTransform * ZE3dsMaxUtils::MaxtoZE(Temp);
+
+				if (!Mesh->GetNormal(Face->norm[N], Temp, true))
+					zeError("Can not get normal of face %d, normal index : %d.", I, N);
+				
+				ZEMatrix4x4::Transform3x3(Vertex->Normal, WorldTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
 
 				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt)I, (ZEInt)N);
-				ZEMatrix4x4::Transform3x3(Vertex->Tangent, WorldTransform, MAX_TO_ZE(Mesh->GetTangent(BinormalTangentIndex).Normalize()));
-				ZEMatrix4x4::Transform3x3(Vertex->Binormal, WorldTransform, MAX_TO_ZE(Mesh->GetBinormal(BinormalTangentIndex)));
 
-				Vertex->Texcoord = MAX_TO_ZE(Mesh->GetTexVertex(Face->texCoord[N]));
+				if (!Mesh->GetTangent(BinormalTangentIndex, Temp))
+					zeError("Can not get tangent of face %d, tangent index : %d.", I, BinormalTangentIndex);
+
+				ZEMatrix4x4::Transform3x3(Vertex->Tangent, WorldTransform, ZE3dsMaxUtils::MaxtoZE(Temp.Normalize()));
+
+				if (!Mesh->GetBinormal(BinormalTangentIndex, Temp))
+					zeError("Can not get binormal of face %d, binormal index : %d.", I, BinormalTangentIndex);
+
+				ZEMatrix4x4::Transform3x3(Vertex->Binormal, WorldTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
+
+				if (!Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord))
+					zeError("Can not get texture coordinate of face %d vertex %d.", I, N, BinormalTangentIndex);
+
 				Vertex++;
 			}
 		}
@@ -1282,14 +1008,33 @@ bool ZE3dsModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LODNo
 			{
 				ZEModelFileSkinnedVertex* Vertex = &(SkinnedVertices[3*I + N]);
 
-				Vertex->Position = WorldTransform * MAX_TO_ZE(Mesh->GetVertex(Face->vert[N], true)); 
-				ZEMatrix4x4::Transform3x3(Vertex->Normal, WorldTransform, MAX_TO_ZE(Mesh->GetNormal(Face->norm[N], true)));
+				Point3 Temp;
+
+				if (!Mesh->GetVertex(Face->vert[N], Temp, true))
+					zeError("Can not get vertex of face %d, vertex index : %d.", I, N);
+
+				Vertex->Position = WorldTransform * ZE3dsMaxUtils::MaxtoZE(Temp);
+
+				if (!Mesh->GetNormal(Face->norm[N], Temp, true))
+					zeError("Can not get normal of face %d, normal index : %d.", I, N);
+
+				ZEMatrix4x4::Transform3x3(Vertex->Normal, WorldTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
 
 				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt)I, (ZEInt)N);
-				ZEMatrix4x4::Transform3x3(Vertex->Tangent, WorldTransform, MAX_TO_ZE(Mesh->GetTangent(BinormalTangentIndex).Normalize()));
-				ZEMatrix4x4::Transform3x3(Vertex->Binormal, WorldTransform, MAX_TO_ZE(Mesh->GetBinormal(BinormalTangentIndex)));
 
-				Vertex->Texcoord = MAX_TO_ZE(Mesh->GetTexVertex(Face->texCoord[N]));
+				if (!Mesh->GetTangent(BinormalTangentIndex, Temp))
+					zeError("Can not get tangent of face %d, tangent index : %d.", I, BinormalTangentIndex);
+
+				ZEMatrix4x4::Transform3x3(Vertex->Tangent, WorldTransform, ZE3dsMaxUtils::MaxtoZE(Temp.Normalize()));
+
+				if (!Mesh->GetBinormal(BinormalTangentIndex, Temp))
+					zeError("Can not get texture coordinate of face %d vertex %d.", I, N, BinormalTangentIndex);
+
+				ZEMatrix4x4::Transform3x3(Vertex->Binormal, WorldTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
+
+				if (!Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord))
+					zeError("Can not get texture coordinate of face %d vertex %d.", I, N, BinormalTangentIndex);
+
 
 				ZEInt BoneCount = Skin->GetNumberOfBones(Face->vert[N]);
 				if (BoneCount > 4 && !BoneCountWarning)
@@ -1371,7 +1116,7 @@ bool ZE3dsModelExporter::ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesNode
 	const char* ZEType;
 
 
-	if (!GetProperty(Mesh, ZE_STRING_PROP, "ZEType", ZEType) || strcmp(ZEType, "Mesh") != 0)
+	if (!ZE3dsMaxUtils::GetProperty(Mesh, ZE_STRING_PROP, "ZEType", ZEType) || strcmp(ZEType, "Mesh") != 0)
 	{
 		zeError("Mesh is rejected because it does not contain ZEMeshAttributes. Node Name : \"%s\"", Node->GetName());
 		return false;
@@ -1383,25 +1128,27 @@ bool ZE3dsModelExporter::ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesNode
 
 	zeLog("Mesh is a master LOD. Setting mesh properties by using this mesh.");
 	ProcessedMasterMeshes.Append(1, &Node);
-	Mesh->InitializeData();
+	
+	if (!Mesh->InitializeData())
+		zeError("Can not initialize mesh data.");
 
 
 	ZEAABBox BoundingBox;
-	CalculateLocalBoundingBox(BoundingBox, Mesh);
+	ZE3dsMaxUtils::CalculateLocalBoundingBox(BoundingBox, Mesh);
 	ZEMLNode* BBoxNode = CurrentMeshNode->AddSubNode("BoundingBox");
 	BBoxNode->AddProperty("Min", BoundingBox.Min);
 	BBoxNode->AddProperty("Max", BoundingBox.Max);
 
 	CurrentMeshNode->AddProperty("IsSkinned", Mesh->IsObjectSkinned());
-	CurrentMeshNode->AddProperty("Position", MAX_TO_ZE(Node->GetWorldTM().Translation()));
-	CurrentMeshNode->AddProperty("Rotation", MAX_TO_ZE(Node->GetWorldTM().Rotation()));
-	CurrentMeshNode->AddProperty("Scale", MAX_TO_ZE(Node->GetWorldTM().Scaling()));
+	CurrentMeshNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Translation()));
+	CurrentMeshNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Rotation()));
+	CurrentMeshNode->AddProperty("Scale", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Scaling()));
 
 	ZEMLNode* MainLODsNode = CurrentMeshNode->AddSubNode("LODs");
 	ZEMLNode* LODNode = MainLODsNode->AddSubNode("LOD");
 
 	ZEInt MeshLOD;
-	GetProperty(Mesh, ZE_INT_PROP, "Mesh_LOD", MeshLOD);
+	ZE3dsMaxUtils::GetProperty(Mesh, ZE_INT_PROP, "Mesh_LOD", MeshLOD);
 
 	LODNode->AddProperty("LODLevel", MeshLOD);
 
@@ -1426,21 +1173,21 @@ bool ZE3dsModelExporter::ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNode)
 
 	const char* ZEType;
 
-	if (!GetProperty(Mesh, ZE_STRING_PROP, "ZEType", ZEType) || strcmp(ZEType, "Mesh") != 0)
+	if (!ZE3dsMaxUtils::GetProperty(Mesh, ZE_STRING_PROP, "ZEType", ZEType) || strcmp(ZEType, "Mesh") != 0)
 	{
 		zeError("Mesh is rejected because it does not contain ZEMeshAttributes. Node Name : \"%s\"", Node->GetName());
 		return false;
 	}
 	
 	ZEInt CurrentMeshLODLevel;
-	GetProperty(Mesh, ZE_INT_PROP, "Mesh_LOD", CurrentMeshLODLevel);
+	ZE3dsMaxUtils::GetProperty(Mesh, ZE_INT_PROP, "Mesh_LOD", CurrentMeshLODLevel);
 
 	ZEArray<ZEMLNode*> Meshes = MeshesNode->GetSubNodes("Mesh");
 	ZEMLNode* MasterMesh = NULL;
 
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 	{
-		if (((ZEMLProperty*)Meshes[I]->GetProperty("Name"))->GetValue().GetString() == LODName);
+		if (((ZEMLProperty*)Meshes[I]->GetProperty("Name"))->GetValue().GetString() == LODName)
 			MasterMesh = Meshes[I];
 	}
 
@@ -1492,14 +1239,13 @@ bool ZE3dsModelExporter::ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNode)
 	return true;
 }
 
-bool ZE3dsModelExporter::ProcessMeshes(ZEMLNode* MeshesNode)
+bool ZE3dsModelExporter::ProcessMeshes()
 {
 	zeLog("Processing Meshes...");
 
 	ZEArray<IGameNode*> MasterMeshes;
 	ZEArray<IGameNode*>	MeshLODs;
 	bool MeshExists = false;
-	Scene_ = Scene;
 	Tab<IGameNode*> Nodes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
 
 	for (ZESize I = 0; I < (ZESize)Nodes.Count(); I++)
@@ -1511,23 +1257,22 @@ bool ZE3dsModelExporter::ProcessMeshes(ZEMLNode* MeshesNode)
 			const char* ZEType;
 
 			IGameMesh* Mesh = (IGameMesh*)Nodes[I]->GetIGameObject();
-			if (GetProperty(Mesh, ZE_STRING_PROP, "ZEType", ZEType) == true)	
-				if (strcmp(ZEType, "PhysicalShape") == 0) 
-					continue;
+			if (!ZE3dsMaxUtils::GetProperty(Mesh, ZE_STRING_PROP, "ZEType", ZEType) || strcmp(ZEType, "Mesh") != 0)	
+				continue;
 
 			for (ZESize J = 0; J < MasterMeshes.GetCount(); J++)
 			{
-				if (strncmp(MasterMeshes[J]->GetName(), Nodes[I]->GetName(), ZE_MDLF_MAX_NAME_SIZE) == 0)
+				if (strncmp(MasterMeshes[J]->GetName(), Nodes[I]->GetName(), ZE_EXFL_MAX_NAME_SIZE) == 0)
 				{
 					MeshExists = true;
 					ZEInt MasterMeshLOD;
 					ZEInt CurrentMeshLOD;
 
 					IGameMesh* MasterMesh = (IGameMesh*)MasterMeshes[J]->GetIGameObject();
-					GetProperty(MasterMesh, ZE_INT_PROP, "Mesh_LOD", MasterMeshLOD);
+					ZE3dsMaxUtils::GetProperty(MasterMesh, ZE_INT_PROP, "Mesh_LOD", MasterMeshLOD);
 
 					IGameMesh* CurrentMesh = (IGameMesh*)Nodes[I]->GetIGameObject();
-					GetProperty(CurrentMesh, ZE_INT_PROP, "Mesh_LOD", CurrentMeshLOD);
+					ZE3dsMaxUtils::GetProperty(CurrentMesh, ZE_INT_PROP, "Mesh_LOD", CurrentMeshLOD);
 
 
 					if (MasterMeshLOD == CurrentMeshLOD)
@@ -1550,6 +1295,14 @@ bool ZE3dsModelExporter::ProcessMeshes(ZEMLNode* MeshesNode)
 			}
 		}
 	}
+
+	if (MasterMeshes.GetCount() == 0)
+	{
+		zeWarning("No meshes with ZEMeshAttribute found. Mesh processing aborted.");
+		return true;
+	}
+
+	ZEMLNode* MeshesNode = ModelNode.AddSubNode("Meshes");
 
 	for (ZESize I = 0; I < MasterMeshes.GetCount(); I++)
 	{
@@ -1575,26 +1328,72 @@ bool ZE3dsModelExporter::ProcessMeshes(ZEMLNode* MeshesNode)
 
 void ZE3dsModelExporter::ProcessAnimationFrames(ZESize AnimationStartFrame, ZESize AnimationFrameCount, ZEMLNode* AnimationNode)
 {
-	if (AnimationStartFrame + AnimationFrameCount - 1 > TotalFrameCount)
+	if (AnimationStartFrame + AnimationFrameCount - 1 > (ZESize)TotalFrameCount)
 		zeError("Specified animation frame range is exceeds 3ds Max Scene frame count.");
 
-	ZEArray<ZEModelFileAnimationFrame> Frames;
-	Frames.SetCount(AnimationFrameCount);
+	Tab<IGameNode*>	CurrentAnimationAffectedBones;
+	Tab<IGameNode*>	CurrentAnimationAffectedMeshes;
 	ZEInt ActualAnimationFrame = (ZEInt)AnimationStartFrame;
+
+	GMatrix Matrix;
+	for (ZESize I = 0; I < (ZESize)ProcessedMasterMeshes.Count(); I++)
+	{
+		//Matrix = ProcessedMasterMeshes[I]->GetWorldTM(); //Karsılaştır.
+		Matrix = ProcessedMasterMeshes[I]->GetWorldTM((ZEInt)AnimationStartFrame * TicksPerFrame);
+
+		ActualAnimationFrame = (ZEInt)AnimationStartFrame;
+		for (ZESize N = 0; N < AnimationFrameCount; N++)
+		{
+			if (!(ProcessedMeshes[I]->GetWorldTM(ActualAnimationFrame * TicksPerFrame) == Matrix))
+			{
+				CurrentAnimationAffectedMeshes.Append(1, &ProcessedMeshes[I]);
+				break;
+			}
+
+			ActualAnimationFrame++;
+		}
+	}
+
+	for (ZESize I = 0; I < (ZESize)ProcessedBones.Count(); I++)
+	{
+		//Matrix = ProcessedBones[I]->GetWorldTM();
+		Matrix = ProcessedBones[I]->GetWorldTM((ZEInt)AnimationStartFrame * TicksPerFrame);
+
+		ActualAnimationFrame = (ZEInt)AnimationStartFrame;
+		for (ZESize N = 0; N < AnimationFrameCount; N++)
+		{
+			if (!(ProcessedBones[I]->GetWorldTM(ActualAnimationFrame * TicksPerFrame) == Matrix))
+			{
+				CurrentAnimationAffectedBones.Append(1, &ProcessedBones[I]);
+				break;
+			}
+
+			ActualAnimationFrame++;
+		}
+	}
+
+	ZESize MeshKeyCount = (ZESize)CurrentAnimationAffectedMeshes.Count();
+	ZESize BoneKeyCount = (ZESize)CurrentAnimationAffectedBones.Count();
+	ZESize FrameKeyCount = MeshKeyCount + BoneKeyCount;
+
+	AnimationNode->AddProperty("BoneKeyCount", BoneKeyCount);
+	AnimationNode->AddProperty("MeshKeyCount", MeshKeyCount);
+
+	ZEArray<ZEModelFileAnimationKey> Frames;
+	Frames.SetCount((MeshKeyCount + BoneKeyCount) * AnimationFrameCount);
+	ActualAnimationFrame = (ZEInt)AnimationStartFrame;
 
 	zeLog("Frame Count : %d", AnimationFrameCount);
 	zeLog("Processing Animation Frames: %d - %d", AnimationStartFrame, AnimationStartFrame + AnimationFrameCount - 1);
 
 	for (ZESize I = 0; I < AnimationFrameCount; I++)
 	{
-		ZEModelFileAnimationFrame* CurrentFrame = &(Frames[I]);
 		ZEModelFileAnimationKey* Key;
 
-		CurrentFrame->BoneKeys.SetCount((ZESize)AnimationEnabledBones.Count());
-		for (ZESize N = 0; N < (ZESize)AnimationEnabledBones.Count(); N++)
+		for (ZESize N = 0; N < (ZESize)CurrentAnimationAffectedBones.Count(); N++)
 		{
-			Key = &CurrentFrame->BoneKeys[N];
-			Key->ItemId = GetBoneId(AnimationEnabledBones[N]);
+			Key = &Frames[(I * FrameKeyCount) + N];
+			Key->ItemId = GetBoneId(CurrentAnimationAffectedBones[N]);
 
 			ZEMLNode* MainBonesNode = ModelNode.GetSubNodes("Bones").GetFirstItem();
 			ZEArray<ZEMLNode*> BoneNodes = MainBonesNode->GetSubNodes("Bone");
@@ -1602,68 +1401,42 @@ void ZE3dsModelExporter::ProcessAnimationFrames(ZESize AnimationStartFrame, ZESi
 
 			if (ParentBoneId == -1)
 			{
-				GMatrix Matrix = AnimationEnabledBones[N]->GetWorldTM(ActualAnimationFrame * TicksPerFrame);
-				Key->Position = MAX_TO_ZE(Matrix.Translation());
-				Key->Rotation = MAX_TO_ZE(Matrix.Rotation());
-				Key->Scale = MAX_TO_ZE(Matrix.Scaling());
+				GMatrix Matrix = CurrentAnimationAffectedBones[N]->GetWorldTM(ActualAnimationFrame * TicksPerFrame);
+				Key->Position = ZE3dsMaxUtils::MaxtoZE(Matrix.Translation());
+				Key->Rotation = ZE3dsMaxUtils::MaxtoZE(Matrix.Rotation());
+				Key->Scale = ZE3dsMaxUtils::MaxtoZE(Matrix.Scaling());
 			}
 			else
 			{
-				GMatrix Matrix = AnimationEnabledBones[N]->GetWorldTM(ActualAnimationFrame * TicksPerFrame) * 
+				GMatrix Matrix = CurrentAnimationAffectedBones[N]->GetWorldTM(ActualAnimationFrame * TicksPerFrame) * 
 					ProcessedBones[(ZESize)ParentBoneId]->GetWorldTM(ActualAnimationFrame * TicksPerFrame).Inverse();
 				//AnimationEnabledBones[N]->GetNodeParent()->GetWorldTM(I * TicksPerFrame).Inverse();
-				Key->Position = MAX_TO_ZE(Matrix.Translation());
-				Key->Rotation = MAX_TO_ZE(Matrix.Rotation());
-				Key->Scale = MAX_TO_ZE(Matrix.Scaling());
+				Key->Position = ZE3dsMaxUtils::MaxtoZE(Matrix.Translation());
+				Key->Rotation = ZE3dsMaxUtils::MaxtoZE(Matrix.Rotation());
+				Key->Scale = ZE3dsMaxUtils::MaxtoZE(Matrix.Scaling());
 			}
 		}
 
-		CurrentFrame->MeshKeys.SetCount((ZESize)AnimationEnabledMeshes.Count());
-		for (ZESize N = 0; N < (ZESize)AnimationEnabledMeshes.Count(); N++)
+		for (ZESize N = 0; N < (ZESize)CurrentAnimationAffectedMeshes.Count(); N++)
 		{
-			Key = &CurrentFrame->MeshKeys[N];
-			Key->ItemId = GetMeshId(AnimationEnabledMeshes[N]);
-			GMatrix Matrix = AnimationEnabledMeshes[N]->GetWorldTM(ActualAnimationFrame * TicksPerFrame);
-			Key->Position = MAX_TO_ZE(Matrix.Translation());
-			Key->Rotation = MAX_TO_ZE(Matrix.Rotation());
-			Key->Scale = MAX_TO_ZE(Matrix.Scaling());
+			Key = &Frames[(I * FrameKeyCount) + BoneKeyCount + N];
+			Key->ItemId = GetMeshId(CurrentAnimationAffectedMeshes[N]);
+			GMatrix Matrix = CurrentAnimationAffectedMeshes[N]->GetWorldTM(ActualAnimationFrame * TicksPerFrame);
+			Key->Position = ZE3dsMaxUtils::MaxtoZE(Matrix.Translation());
+			Key->Rotation = ZE3dsMaxUtils::MaxtoZE(Matrix.Rotation());
+			Key->Scale = ZE3dsMaxUtils::MaxtoZE(Matrix.Scaling());
 		}
 
 		ActualAnimationFrame++;
 	}
 
-	AnimationNode->AddDataProperty("Frames", Frames.GetCArray(), Frames.GetCount() * sizeof(ZEModelFileAnimationFrame), true);
+	AnimationNode->AddDataProperty("Frames", Frames.GetCArray(), Frames.GetCount() * sizeof(ZEModelFileAnimationKey), true);
 
 }
 
 bool ZE3dsModelExporter::ProcessAnimations(ZEMLNode* AnimationsNode)
 {
 	zeLog("Processing Animations...");
-
-	GMatrix Matrix;
-	for (ZESize I = 0; I < (ZESize)ProcessedMasterMeshes.Count(); I++)
-	{
-		Matrix = ProcessedMasterMeshes[I]->GetWorldTM((ZEInt)I * TicksPerFrame);
-		for (ZEInt N = 0; N < TotalFrameCount; N++)
-		{
-			if (!(ProcessedMeshes[I]->GetWorldTM(N * TicksPerFrame) == Matrix))
-			{
-				AnimationEnabledMeshes.Append(1, &ProcessedMeshes[I]);
-				break;
-			}
-		}
-	}
-
-	for (ZESize I = 0; I < (ZESize)ProcessedBones.Count(); I++)
-	{
-		Matrix = ProcessedBones[I]->GetWorldTM((ZEInt)I * TicksPerFrame);
-		for (ZEInt N = 0; N < TotalFrameCount; N++)
-			if (!(ProcessedBones[I]->GetWorldTM(N * TicksPerFrame) == Matrix))
-			{
-				AnimationEnabledBones.Append(1, &ProcessedBones[I]);
-				break;
-			}
-	}
 
 	if (ExportOptions->GetSubNodes("Animations").GetCount() > 0)
 	{
@@ -1791,7 +1564,7 @@ void ZE3dsModelExporter::CollectResources()
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		const char* NodeZEType;
 
-		if (!GetProperty(CurrentObject, ZE_STRING_PROP, "ZEType", NodeZEType))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, "ZEType", NodeZEType))
 			continue;
 
 		if (strcmp(NodeZEType, "Mesh") == 0)
@@ -1811,7 +1584,7 @@ void ZE3dsModelExporter::CollectResources()
 
 		bool IsFound = false;
 
-		for(ZESize J = 0; J < ResourceMaterials.Count(); J++)
+		for(ZESize J = 0; J < (ZESize)ResourceMaterials.Count(); J++)
 			if(ResourceMaterials[J] == CurrentMaterial)
 				IsFound = true;
 
@@ -1819,7 +1592,7 @@ void ZE3dsModelExporter::CollectResources()
 			ResourceMaterials.Append(1, &CurrentMaterial);
 	}
 
-	for (ZESize I = 0; I < ResourceMaterials.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)ResourceMaterials.Count(); I++)
 	{
 		IGameMaterial* NodeMaterial = ResourceMaterials[I];
 		ZEString MaterialName = NodeMaterial->GetMaterialName();
@@ -1830,8 +1603,6 @@ void ZE3dsModelExporter::CollectResources()
 
 		for (ZEInt N = 0; N < NumberOfMaps; N++)
 		{
-			char RelativePath[ZE_MDLF_MAX_FILENAME_SIZE];
-
 			IGameTextureMap* CurrentTexture = NodeMaterial->GetIGameTextureMap(N);
 			switch(CurrentTexture->GetStdMapSlot())
 			{

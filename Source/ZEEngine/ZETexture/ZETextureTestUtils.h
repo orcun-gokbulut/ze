@@ -33,6 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#ifndef __ZE_TEXTURE_TEST_UTILS_H__
+#define __ZE_TEXTURE_TEST_UTILS_H__
+
 #include "ZEDS/ZEString.h"
 #include "ZETextureData.h"
 
@@ -51,3 +54,5 @@ class ZETextureTestUtils
 		static bool			Compare(ZETextureData* Data, const ZEString& FileName);
 		static bool			Compare(ZETextureData* DataA, ZETextureData* DataB);
 };
+
+#endif

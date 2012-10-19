@@ -50,6 +50,6 @@ qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
 ze_add_library(ZE3dsMapExporter 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS ZEFoundation core geom gfx mesh maxutil maxscrpt paramblk2 igame QtCore4 QtGui4 QWinWidget ZEProgressDialog ZEResourceConfigurationWidget)
+	LIBS ZEFoundation ZE3dsMaxUtils QtCore4 QtGui4 QWinWidget ZEProgressDialog ZEResourceConfigurationWidget)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

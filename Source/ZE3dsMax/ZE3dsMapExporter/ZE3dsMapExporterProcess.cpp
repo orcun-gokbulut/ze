@@ -34,169 +34,41 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 
-#include "ZETypes.h"
 #include "ZE3dsMapExporter.h"
 #include "ZEToolComponents\ZEProgressDialog\ZEProgressDialog.h"
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
-#include "ZEML\ZEMLProperty.h"
-#include "ZEML\ZEMLNode.h"
 #include "ZEFile\ZEFile.h"
-#include "ZEML\ZEMLSerialWriter.h"
 #include "ZEFile\ZEFileInfo.h"
 #include "ZEFile\ZEPathUtils.h"
 #include "ZEFile\ZEDirectoryInfo.h"
 #include "ZEFile\ZEFileOperations.h"
+#include "ZEML\ZEMLSerialWriter.h"
 
-#define ZE_MTMP_DIFFUSEMAP						2
-#define ZE_MTMP_NORMALMAP						4
-#define ZE_MTMP_SPECULARMAP						8
-#define ZE_MTMP_EMISSIVEMAP						16
-#define ZE_MTMP_OPACITYMAP						32
-#define ZE_MTMP_DETAILDIFFUSEMAP				64
-#define ZE_MTMP_DETAILNORMALMAP					128
-#define ZE_MTMP_ENVIRONMENTMAP					256
-#define ZE_MTMP_REFRACTION						512
-#define ZE_MTMP_LIGHTMAP						1024
-#define ZE_MTMP_DISTORTIONMAP					2048
-
-inline ZEVector2 MAX_TO_ZE(const Point2& Point)
+struct ZEMapFilePhysicalMeshPolygon
 {
-	return ZEVector2(Point.x, Point.y);
-}
+	ZEUInt32								Indices[3];
+};
 
-inline ZEVector3 MAX_TO_ZE(const Point3& Point)
+struct ZEMapFilePhysicalMesh
 {
-	return ZEVector3(Point.x, Point.y, Point.z);
-}
+	ZEArray<ZEVector3>						Vertices;
+	ZEArray<ZEMapFilePhysicalMeshPolygon>	Polygons;
+};
 
-inline ZEQuaternion MAX_TO_ZE(const Quat& Quaternion)
+struct ZEMapFileVertex
 {
-	return ZEQuaternion(Quaternion.w, Quaternion.x, Quaternion.y, Quaternion.z);
-}
+	ZEVector3								Position;
+	ZEVector3								Normal;
+	ZEVector3								Tangent;
+	ZEVector3								Binormal;
+	ZEVector2								Texcoord;
+};
 
-inline Point2 ZE_TO_MAX(const ZEVector2& Vector)
-{
-	return Point2(Vector.x, Vector.y);
-}
-
-inline Point3 ZE_TO_MAX(const ZEVector3& Vector)
-{
-	return Point3(Vector.x, Vector.y, Vector.z);
-}
-
-inline Quat ZE_TO_MAX(const ZEQuaternion& Quaternion)
-{
-	return Quat(Quaternion.x, Quaternion.y, Quaternion.z, Quaternion.w);
-}
-
-template <typename T>
-bool GetProperty(IExportEntity * Object, PropType Type, const char* Property, T& Value)
-{ 
-	if (Object == NULL)
-		return false;
-
-	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
-	if (Prop != NULL && Prop->GetType() == Type)
-	{
-		if (Prop->GetPropertyValue(Value))
-			return true;
-		else
-			return false;
-	}
-	else
-		return false;
-}
-
-template <>
-bool GetProperty<const char*>(IExportEntity * Object, PropType Type, const char* Property, const char*& Value)
-{ 
-	if (Object == NULL)
-		return false;
-
-	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
-	if (Prop != NULL && Prop->GetType() == Type)
-	{
-		if (Prop->GetPropertyValue(Value))
-		{
-			return true;
-		}
-		else
-			return false;
-	}
-	else
-		return false;
-}
-
-template <>
-bool GetProperty<bool>(IExportEntity* Object, PropType Type, const char* Property, bool& Value)
-{ 
-	ZEInt Temp;
-	if (Object == NULL)
-		return false;
-
-	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
-	if (Prop != NULL && Prop->GetType() == Type)
-	{
-		if (Prop->GetPropertyValue(Temp))
-		{
-			if(Temp == 0)
-				Value = false;
-			else
-				Value = true;
-
-			return true;
-		}
-		else
-			return false;
-	}
-	else
-		return false;
-}
-
-template <>
-bool GetProperty<ZEUInt>(IExportEntity* Object, PropType Type, const char* Property, ZEUInt& Value)
-{ 
-	ZEInt Temp;
-	if (Object == NULL)
-		return false;
-
-	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
-	if (Prop != NULL && Prop->GetType() == Type)
-	{
-		if (Prop->GetPropertyValue(Temp))
-		{
-			Value = Temp;
-			return true;
-		}
-		else
-			return false;
-	}
-	else
-		return false;
-}
-
-template<>
-bool GetProperty<INode*>(IExportEntity* Object, PropType Type, const char* Property, INode*& Value)
-{
-	if (Object == NULL)
-		return false;
-	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
-	if (Prop != NULL)
-	{
-		IParamBlock2* ParamBlock =  Prop->GetMaxParamBlock2();
-		ZEInt ParamId = ParamBlock->IndextoID(Prop->GetParamBlockIndex());
-		if (ParamBlock->GetParameterType(ParamId) != TYPE_INODE)
-			return false;
-
-		Value = ParamBlock->GetINode(ParamId);
-		return true;
-	}
-	else
-	{
-		Value = NULL;
-		return false;
-	}
-}
+struct ZEMapFilePolygon
+{	
+	ZEUInt32								Material;
+	ZEMapFileVertex							Vertices[3];
+};
 
 ZEInt ZE3dsMapExporter::ProcessFaceMaterial(IGameMaterial* Material)
 {
@@ -220,6 +92,13 @@ ZEInt ZE3dsMapExporter::FindPortalIndex(IGameNode* Node)
 bool ZE3dsMapExporter::ProcessDoors()
 {
 	zeLog("Processing Portal Doors...");
+
+	if (Doors.Count() == 0)
+	{
+		zeWarning("No portal doors found. Portal door processing aborted.");
+		return true;
+	}
+
 	ZEMLNode* DoorsNode = MapNode.AddSubNode("Doors");
 
 	INode* PortalANode;
@@ -238,21 +117,21 @@ bool ZE3dsMapExporter::ProcessDoors()
 		
 		DoorNode->AddProperty("Name", CurrentNode->GetName());
 
-		if(!GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Width", PlaneWidth))
-			zeError("Can not find door property With");
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, "Width", PlaneWidth))
+			zeError("Can not find door property Width");
 
-		if(!GetProperty(CurrentObject, IGAME_FLOAT_PROP, "Length", PlaneLength))
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, "Length", PlaneLength))
 			zeError("Can not find door property Height");
 
-		if(!GetProperty(CurrentObject, IGAME_INT_PROP, "IsOpen", IsOpen))
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "IsOpen", IsOpen))
 			zeError("Can not find door property IsOpen");
 
 		DoorNode->AddProperty("IsOpen", IsOpen);
 
-		if(!GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PortalA", PortalANode))
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, "PortalA", PortalANode))
 			zeError("Can not find door property PortalA");
 
-		if(!GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PortalB", PortalBNode))
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, "PortalB", PortalBNode))
 			zeError("Can not find door property PortalB");
 
 		if (PortalANode == NULL || PortalBNode == NULL || PortalANode == PortalBNode)
@@ -297,7 +176,7 @@ bool ZE3dsMapExporter::ProcessDoors()
 	return true;
 }
 
-void ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode)
+void ZE3dsMapExporter::ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode)
 {
 	IGameMesh* Mesh = (IGameMesh*)Object;
 
@@ -326,7 +205,7 @@ void ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode)
 	for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfVerts(); I++)
 	{
 		Point3 Vertex =	Mesh->GetVertex((ZEInt)I, false);
-		Vertices[I] = MAX_TO_ZE(Vertex);
+		Vertices[I] = ZE3dsMaxUtils::MaxtoZE(Vertex);
 	}
 
 	PhysicalMeshNode->AddDataProperty("Vertices", Vertices.GetCArray(), sizeof(ZEVector3) * Vertices.GetCount(), true);
@@ -335,6 +214,12 @@ void ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode)
 bool ZE3dsMapExporter::ProcessPortals()
 {
 	zeLog("Processing portals...");
+
+	if (Portals.Count() == 0)
+	{
+		zeWarning("No portals found. Portal processing aborted.");
+		return true;
+	}
 
 	ZEMLNode* PortalsNode = MapNode.AddSubNode("Portals");
 
@@ -351,14 +236,14 @@ bool ZE3dsMapExporter::ProcessPortals()
 		IGameNode* PhysicalMeshNode;
 
 		PortalNode->AddProperty("Name", CurrentNode->GetName());
-		if(!GetProperty(CurrentObject, IGAME_INT_PROP, "PhysicalMeshEnabled", PhysicalMeshEnabled))
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "PhysicalMeshEnabled", PhysicalMeshEnabled))
 			zeError("Can not find portal property \"PhysicalMeshEnabled\".");
 
-		if(!GetProperty(CurrentObject, IGAME_INT_PROP, "PhysicalMeshUseSelf", PhysicalMeshUseSelf))
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "PhysicalMeshUseSelf", PhysicalMeshUseSelf))
 			zeError("Can not find portal property \"PhysicalMeshUseSelf\".");
 
 		if(PhysicalMeshEnabled && !PhysicalMeshUseSelf)
-			if(GetProperty(CurrentObject, IGAME_UNKNOWN_PROP, "PhysicalMesh", PhysicalMeshMaxNode))
+			if(ZE3dsMaxUtils::GetProperty(CurrentObject, "PhysicalMesh", PhysicalMeshMaxNode))
 				zeError("Can not find portal property \"PhysicalMesh\".");
 
 		if(PhysicalMeshEnabled)
@@ -397,6 +282,9 @@ bool ZE3dsMapExporter::ProcessPortals()
 
 		Mesh->SetUseWeightedNormals();
 
+		if(Mesh->GetNumberOfFaces() == 0)
+			zeError("Face count is : 0.");
+
 		ZEArray<ZEMapFilePolygon> Polygons;
 		Polygons.SetCount(Mesh->GetNumberOfFaces());
 		
@@ -411,9 +299,6 @@ bool ZE3dsMapExporter::ProcessPortals()
 			WorldMatrix.M31, WorldMatrix.M32, WorldMatrix.M33);
 
 		ZEMatrix3x3::Transpose(WorldInvTrspsMatrix, Temp3x3);
-
-		if(Mesh->GetNumberOfFaces() == 0)
-			zeError("Face count is : 0.");
 
 		for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
 		{
@@ -436,26 +321,26 @@ bool ZE3dsMapExporter::ProcessPortals()
 				if(!Mesh->GetVertex(Face->vert[N], Temp, false))
 					zeError("Can not get vertex of face %d, vertex index : %d.", I, N);
 
-				Vertex->Position = MAX_TO_ZE(Temp);
+				Vertex->Position = ZE3dsMaxUtils::MaxtoZE(Temp);
 				
 				ZEVector3 Normal;
 				
 				if(!Mesh->GetNormal(Face->norm[N], Temp, true))
 					zeError("Can not get normal of face %d, normal index : %d.", I, N);
 
-				Normal = MAX_TO_ZE(Temp);
+				Normal = ZE3dsMaxUtils::MaxtoZE(Temp);
 				ZEMatrix3x3::Transform(Vertex->Normal, WorldInvTrspsMatrix, Normal);
 				ZEVector3::Normalize(Vertex->Normal, Vertex->Normal);
 
 				if(!Mesh->GetTangent(BinormalTangentIndex, Temp))
 					zeError("Can not get tangent of face %d, tangent index : %d.", I, BinormalTangentIndex);
 
-				Vertex->Tangent = MAX_TO_ZE(Temp);
+				Vertex->Tangent = ZE3dsMaxUtils::MaxtoZE(Temp);
 
 				if(!Mesh->GetBinormal(BinormalTangentIndex, Temp))
 					zeError("Can not get binormal of face %d, binormal index : %d.", I, BinormalTangentIndex);
 
-				Vertex->Binormal = MAX_TO_ZE(Temp);
+				Vertex->Binormal = ZE3dsMaxUtils::MaxtoZE(Temp);
 
 				if(!Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord))
 					zeError("Can not get texture coordinate of face %d vertex %d.", I, N, BinormalTangentIndex);
@@ -472,18 +357,24 @@ bool ZE3dsMapExporter::ProcessPortals()
 bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 {
 	zeLog("Processing materials...");
-	ZEMLNode* MaterialsNode = MapNode.AddSubNode("Materials");
-
-	ZEString FileParentPath = ZEFileInfo::GetParentDirectory(FileName) + ZEPathUtils::GetSeperator();
-
-	char DiffuseMap[ZE_MPFL_MAX_FILENAME_SIZE];
-	char SpecularMap[ZE_MPFL_MAX_FILENAME_SIZE];
-	char EmissiveMap[ZE_MPFL_MAX_FILENAME_SIZE];
-	char OpacityMap[ZE_MPFL_MAX_FILENAME_SIZE];
-	char NormalMap[ZE_MPFL_MAX_FILENAME_SIZE];
-	char EnvironmentMap[ZE_MPFL_MAX_FILENAME_SIZE];
+	
+	char DiffuseMap[ZE_EXFL_MAX_FILENAME_SIZE];
+	char SpecularMap[ZE_EXFL_MAX_FILENAME_SIZE];
+	char EmissiveMap[ZE_EXFL_MAX_FILENAME_SIZE];
+	char OpacityMap[ZE_EXFL_MAX_FILENAME_SIZE];
+	char NormalMap[ZE_EXFL_MAX_FILENAME_SIZE];
+	char EnvironmentMap[ZE_EXFL_MAX_FILENAME_SIZE];
 
 	ZESize MaterialCount = (ZESize)Materials.Count();
+
+	if (MaterialCount == 0)
+	{
+		zeWarning("No materials found. Material processing aborted.");
+		return true;
+	}
+
+	ZEMLNode* MaterialsNode = MapNode.AddSubNode("Materials");
+
 	zeLog("Material count : %d", MaterialCount);
 
 	for (ZESize I = 0; I < MaterialCount; I++)
@@ -517,7 +408,7 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 			zeError("Material process failed. Unable to open file for material: \"%s\"", MaterialName);
 			return false;
 		}
-		zeLog("Material file succesfuly opened.");
+		zeLog("Material file successfully opened.");
 
 		ZEInt NumberOfMaps = NodeMaterial->GetNumberOfTextureMaps();
 		ZEInt32 MapFlag = 0;
@@ -525,8 +416,6 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 
 		for (ZEInt N = 0; N < NumberOfMaps; N++)
 		{
-			char RelativePath[ZE_MPFL_MAX_FILENAME_SIZE];
-
 			IGameTextureMap* CurrentTexture = NodeMaterial->GetIGameTextureMap(N);
 			switch(CurrentTexture->GetStdMapSlot())
 			{
@@ -542,7 +431,7 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 				{
 					MapFlag |= ZE_MTMP_DIFFUSEMAP;
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
-					strncpy(DiffuseMap, ResourceRelativePath.ToCString() , ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(DiffuseMap, ResourceRelativePath.ToCString() , ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
@@ -564,7 +453,7 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 				{
 					MapFlag |= ZE_MTMP_SPECULARMAP;
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
-					strncpy(SpecularMap, ResourceRelativePath.ToCString(), ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(SpecularMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
@@ -586,7 +475,7 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 				{
 					MapFlag |= ZE_MTMP_EMISSIVEMAP;
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
-					strncpy(EmissiveMap, ResourceRelativePath.ToCString(), ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(EmissiveMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
@@ -608,7 +497,7 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 				{
 					MapFlag |= ZE_MTMP_OPACITYMAP;
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
-					strncpy(OpacityMap, ResourceRelativePath.ToCString(), ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(OpacityMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
@@ -632,7 +521,7 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 				{
 					MapFlag |= ZE_MTMP_NORMALMAP;
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
-					strncpy(NormalMap, ResourceRelativePath.ToCString(), ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(NormalMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
@@ -654,7 +543,7 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 				{
 					MapFlag |= ZE_MTMP_ENVIRONMENTMAP;
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
-					strncpy(EnvironmentMap, ResourceRelativePath.ToCString(), ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(EnvironmentMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
@@ -679,11 +568,11 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 
 		MaterialConfigNode.WriteProperty("Name", "Default");
 		bool TempBooleanValue = false;
-		GetProperty(NodeMaterial, IGAME_INT_PROP, "wire", TempBooleanValue);
+		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, "wire", TempBooleanValue);
 		MaterialConfigNode.WriteProperty("Wireframe", TempBooleanValue);
 
 		TempBooleanValue = false;
-		GetProperty(NodeMaterial, IGAME_INT_PROP, "twoSided", TempBooleanValue);
+		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, "twoSided", TempBooleanValue);
 		MaterialConfigNode.WriteProperty("TwoSided", TempBooleanValue);
 
 		MaterialConfigNode.WriteProperty("LightningEnabled", true); // Lightning Enabled is forced true;
@@ -691,7 +580,7 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 		float Opacity = 0.0f;
 		NodeMaterial->GetOpacityData()->GetPropertyValue(Opacity);
 
-		if (Opacity != 1.0f || strncmp(OpacityMap, "", ZE_MPFL_MAX_FILENAME_SIZE) !=0)
+		if (Opacity != 1.0f || strncmp(OpacityMap, "", ZE_EXFL_MAX_FILENAME_SIZE) !=0)
 			MaterialConfigNode.WriteProperty("Transparant", true);
 		else
 			MaterialConfigNode.WriteProperty("Transparant", false);
@@ -778,7 +667,7 @@ bool ZE3dsMapExporter::ProcessScene()
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		const char* NodeZEType;
 
-		if (!GetProperty(CurrentObject, IGAME_STRING_PROP, "ZEType", NodeZEType))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, "ZEType", NodeZEType))
 			continue;
 
 		if (strcmp(NodeZEType, "Portal") == 0)
@@ -797,6 +686,7 @@ bool ZE3dsMapExporter::ProcessScene()
 		}
 		else if (strcmp(NodeZEType, "ZEMapFileEntity") == 0)
 		{
+			//Why is is empty...
 		}
 		else
 			ElectedNodeCount++;
@@ -820,7 +710,7 @@ void ZE3dsMapExporter::CollectResources()
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		const char* NodeZEType;
 
-		if (!GetProperty(CurrentObject, IGAME_STRING_PROP, "ZEType", NodeZEType))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, "ZEType", NodeZEType))
 			continue;
 
 		if (strcmp(NodeZEType, "Portal") == 0)
@@ -851,7 +741,7 @@ void ZE3dsMapExporter::CollectResources()
 
 			bool IsFound = false;
 
-			for(ZESize J = 0; J < ResourceMaterials.Count(); J++)
+			for(ZESize J = 0; J < (ZESize)ResourceMaterials.Count(); J++)
 				if(ResourceMaterials[J] == CurrentMaterial)
 					IsFound = true;
 
@@ -860,7 +750,7 @@ void ZE3dsMapExporter::CollectResources()
 		}
 	}
 
-	for (ZESize I = 0; I < ResourceMaterials.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)ResourceMaterials.Count(); I++)
 	{
 		IGameMaterial* NodeMaterial = ResourceMaterials[I];
 		ZEString MaterialName = NodeMaterial->GetMaterialName();
@@ -871,8 +761,6 @@ void ZE3dsMapExporter::CollectResources()
 
 		for (ZEInt N = 0; N < NumberOfMaps; N++)
 		{
-			char RelativePath[ZE_MPFL_MAX_FILENAME_SIZE];
-
 			IGameTextureMap* CurrentTexture = NodeMaterial->GetIGameTextureMap(N);
 			switch(CurrentTexture->GetStdMapSlot())
 			{

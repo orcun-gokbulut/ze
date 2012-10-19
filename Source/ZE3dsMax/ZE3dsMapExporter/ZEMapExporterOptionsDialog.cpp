@@ -38,17 +38,16 @@
 #include "ZEML\ZEMLProperty.h"
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 
-ZEMapExporterOptionsDialog::ZEMapExporterOptionsDialog(QWidget* Parent, ZEMLNode* Options) : QDialog(Parent)
+ZEMapExporterOptionsDialog::ZEMapExporterOptionsDialog(QWidget* Parent) : QDialog(Parent)
 {
 	Form = new Ui::ZEMapExporterOptionsDialogUI();
 	Form->setupUi(this);
-	Options = Options;
+
+	Options = NULL;
 
 	connect(Form->btnBrowseEngineDir, SIGNAL(clicked()), this, SLOT(ShowEngineDirectoryDialog()));
 	connect(Form->btnBrowseLogPath, SIGNAL(clicked()), this, SLOT(ShowLoggingFilePathDialog()));
 	connect(Form->ckbFileLoggingEnabled, SIGNAL(stateChanged(int)), this, SLOT(SetFileLoggingEnabled(int)));
-
-	SetOptions(Options);
 }
 
 ZEMapExporterOptionsDialog::~ZEMapExporterOptionsDialog()
@@ -113,7 +112,7 @@ void ZEMapExporterOptionsDialog::ShowLoggingFilePathDialog()
 
 void ZEMapExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
 {
-	if(CheckBoxState == Qt::CheckState::Checked)
+	if(CheckBoxState == Qt::Checked)
 		ToggleFileLogging(true);
 	else
 		ToggleFileLogging(false);

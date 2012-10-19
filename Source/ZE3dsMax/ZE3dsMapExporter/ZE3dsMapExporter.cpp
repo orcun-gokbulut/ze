@@ -40,10 +40,10 @@
 #include "QWinWidget/qwinwidget.h"
 #include "QtGui/QApplication"
 #include "ZEMapExporterOptionsDialog.h"
-#include "ZEFile/ZEFileUtils.h"
-#include "ZEFile/ZEFile.h"
 #include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
 #include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
+#include "ZEFile/ZEFile.h"
+#include "ZEFile/ZEFileUtils.h"
 #include "ZEFile/ZEFileInfo.h"
 
 ZE3dsMapExporter::ZE3dsMapExporter()
@@ -227,7 +227,7 @@ bool ZE3dsMapExporter::ShowOptionsDialog(HWND ParentWindow)
 		WinWidget = new QWinWidget(ParentWindow);
 
 	if(OptionsDialog == NULL)
-		OptionsDialog = new ZEMapExporterOptionsDialog(WinWidget, ExportOptions);
+		OptionsDialog = new ZEMapExporterOptionsDialog(WinWidget);
 
 	if(ExportOptions != NULL)
 		OptionsDialog->SetOptions(ExportOptions);
@@ -339,7 +339,7 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	MapNode.AddProperty("MaterialCount", (ZEUInt32)Materials.Count());
 
 	ProgressDialog->OpenTask("Writing File");
-	zeLog("Dumping map to file...");
+	zeLog("Writing ZEMap to file...");
 	ZEFile ExportFile;
 	if(ExportFile.Open(name, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
 	{
@@ -348,7 +348,7 @@ ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* 
 	}
 	ProgressDialog->CloseTask();
 
-	zeLog("Export succeed");
+	zeLog("Export process completed succesfully.");
 	ProgressDialog->End();
 
 	return true;

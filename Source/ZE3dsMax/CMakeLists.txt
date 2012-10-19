@@ -52,6 +52,7 @@ add_subdirectory(ZE3dsModelExporter)
 add_subdirectory(ZE3dsMapExporter)
 add_subdirectory(ZE3dsMaxUI)
 add_subdirectory(ZE3dsMaxPlugin)
+add_subdirectory(ZE3dsMaxUtils)
 
 add_custom_target(ZE3dsMax
 	SOURCES CMakeLists.txt)

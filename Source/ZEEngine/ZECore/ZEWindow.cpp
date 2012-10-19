@@ -384,6 +384,27 @@ void* ZEWindow::GetHandle()
 	return WindowHandle;
 }
 
+ZEVector2 ZEWindow::GetAbsoluteCursorPosition()
+{
+	POINT CursorPosition;
+	GetCursorPos(&CursorPosition);
+
+	return ZEVector2((float)CursorPosition.x, (float)CursorPosition.y);
+}
+
+ZEVector2 ZEWindow::GetRelativeCursorPosition()
+{
+	POINT CursorPosition;
+	GetCursorPos(&CursorPosition);
+
+	ZEInt LeftPosition;
+	ZEInt TopPosition;
+
+	GetWindowPosition(LeftPosition, TopPosition);
+
+	return ZEVector2(((float)CursorPosition.x) - LeftPosition, ((float)CursorPosition.y) - TopPosition);
+}
+
 void ZEWindow::SetMouseCursorVisibility(bool Visibility)
 {
 	MouseCursorVisibility = Visibility;

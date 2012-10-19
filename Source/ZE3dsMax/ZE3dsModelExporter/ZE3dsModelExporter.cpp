@@ -38,13 +38,12 @@
 #include <tchar.h>
 #include "QWinWidget/qwinwidget.h"
 #include "QtGui/QApplication"
-#include "ZE3dsModelExporterOptionsDialog.h"
+#include "ZEModelExporterOptionsDialog.h"
+#include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
+#include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
 #include "ZEFile/ZEFileUtils.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileInfo.h"
-#include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
-#include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
-#include "ZEML/ZEMLProperty.h"
 
 ZE3dsModelExporter::ZE3dsModelExporter()
 {
@@ -229,7 +228,7 @@ bool ZE3dsModelExporter::ShowOptionsDialog(HWND ParentWindow)
 		WinWidget = new QWinWidget(ParentWindow);
 
 	if(OptionsDialog == NULL)
-		OptionsDialog = new ZE3dsModelExporterOptionsDialogNew(WinWidget);
+		OptionsDialog = new ZE3dsModelExporterOptionsDialog(WinWidget);
 
 	if(ExportOptions != NULL)
 		OptionsDialog->SetOptions(ExportOptions);
@@ -306,17 +305,17 @@ ZEInt ZE3dsModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface
 	zeLog("Exporting model to file \"%s\".", name);
 
 	ProgressDialog->OpenTask("Bone Process", true);
-	if (!ProcessBones(ModelNode.AddSubNode("Bones")))
+	if (!ProcessBones())
 	{
-		zeError("Processing bone failed.");
+		zeError("Processing bones failed.");
 		return false;
 	}
 	ProgressDialog->CloseTask();
 
 	ProgressDialog->OpenTask("Mesh Process", true);
-	if (!ProcessMeshes(ModelNode.AddSubNode("Meshes")))
+	if (!ProcessMeshes())
 	{
-		zeError("Processing mesh failed.");
+		zeError("Processing meshes failed.");
 		return false;
 	}
 	ProgressDialog->CloseTask();
@@ -329,14 +328,14 @@ ZEInt ZE3dsModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface
 	{
 		if(!ProcessAnimations(ModelNode.AddSubNode("Animations")))
 		{
-			zeError("Processing animation failed.");
+			zeError("Processing animations failed.");
 			return false;
 		}
 	}
 	ProgressDialog->CloseTask();
 
 	ProgressDialog->OpenTask("Material Process", true);
-	if (!ProcessMaterials(name, ModelNode.AddSubNode("Materials")))
+	if (!ProcessMaterials(name))
 	{
 		zeError("Processing materials failed.");
 		return false;
@@ -344,7 +343,7 @@ ZEInt ZE3dsModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface
 	ProgressDialog->CloseTask();
 
 	ProgressDialog->OpenTask("Writing File");
-	zeLog("Writing zeModel to file.");
+	zeLog("Writing ZEModel to file...");
 	if (!WriteToFile(name))
 	{
 		zeError("Writing model to file failed.");

@@ -180,7 +180,7 @@ ZESteeringOutput ZESteeringPlayerFree::Process(float ElapsedTime)
 	}
 
 	ZEQuaternion::CreateFromEuler(OwnerCameraRotation, Rx, Ry, Rz);
-	((ZEPlayer*)GetOwner())->GetCamera()->SetLocalRotation(OwnerCameraRotation.Normalize());
+	((ZEPlayer*)GetOwner())->GetCamera()->SetRotation(OwnerCameraRotation.Normalize());
 
 	if(Moved)
 	{
@@ -289,7 +289,7 @@ ZEPlayer::ZEPlayer()
 
 	Camera = ZECamera::CreateInstance();
 	Camera->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	Camera->SetLocalRotation(ZEQuaternion::Identity);
+	Camera->SetRotation(ZEQuaternion::Identity);
 	Camera->SetNearZ(zeGraphics->GetNearZ());
 	Camera->SetFarZ(zeGraphics->GetFarZ());
 	Camera->SetFOV(FOV);

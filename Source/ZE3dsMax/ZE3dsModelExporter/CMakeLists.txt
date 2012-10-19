@@ -40,11 +40,9 @@ ze_add_source(ZE3dsModelExporter.cpp				Sources)
 ze_add_source(ZE3dsModelExporterDescription.h		Sources)
 ze_add_source(ZE3dsModelExporterDescription.cpp		Sources)
 ze_add_source(ZE3dsModelExporterProcess.cpp			Sources)
-ze_add_source(ZE3dsModelExporterOptions.h			Sources)
-ze_add_source(ZE3dsModelExporterOptions.cpp			Sources)
-ze_add_source(ZE3dsModelExporterOptionsDialog.h		Sources QtMocs)
-ze_add_source(ZE3dsModelExporterOptionsDialog.cpp	Sources)
-ze_add_source(ZE3dsModelExporterOptionsWidget.ui	Sources QtUI)
+ze_add_source(ZEModelExporterOptionsDialog.h		Sources QtMocs)
+ze_add_source(ZEModelExporterOptionsDialog.cpp		Sources)
+ze_add_source(ZEModelExporterOptionsWidget.ui		Sources QtUI)
 
 qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
@@ -52,7 +50,6 @@ qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
 ze_add_library(ZE3dsModelExporter 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget
-		core geom gfx mesh maxutil maxscrpt paramblk2 igame QtCore4 QtGui4 QWinWidget)
+	LIBS ZEFoundation ZE3dsMaxUtils ZEProgressDialog ZEResourceConfigurationWidget QtCore4 QtGui4 QWinWidget)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
