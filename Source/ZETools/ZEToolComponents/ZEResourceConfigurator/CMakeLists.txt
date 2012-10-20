@@ -35,20 +35,10 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-project (ZEToolComponents)
-ze_set_project_folder("ZEToolComponents")
+ze_add_source(ZEResourceOption.h			    Sources)
+ze_add_source(ZEResourceOption.cpp			    Sources)
+ze_add_source(ZEResourceConfigurator.h			Sources)
+ze_add_source(ZEResourceConfigurator.cpp		Sources)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-add_subdirectory(ZEProgressDialog)
-add_subdirectory(ZEResourceConfigurationWidget)
-add_subdirectory(ZEResourceConfigurator)
-add_subdirectory(ZEMLVisualizer)
-
-ze_add_source(ZEToolComponentsMain.cpp		Sources)
-
-ze_add_executable(ZEToolComponents 
-	SOURCES ${Sources}
-	LIBS
-		ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget ZEMLVisualizerWidget ZEResourceConfigurator
-		QtCore4 QtGui4)
+ze_add_library(ZEResourceConfigurator 
+	SOURCES ${Sources})

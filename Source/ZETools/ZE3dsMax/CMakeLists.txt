@@ -33,13 +33,31 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-ze_add_module(ZECodeTools)
-ze_add_module(ZEFoundation)
-ze_add_module(ZEEngine)
-ze_add_module(ZEModules			OPTIONAL DEFAULT)
-ze_add_module(ZEditor			OPTIONAL DEFAULT)
-ze_add_module(ZETools			OPTIONAL DEFAULT)
+ze_set_project_folder("ZETools/ZE3dsMax")
 
-ze_add_cmake_project(ZESource)
+set(ZEBUILD_3DS_MAX_BINARY_DIRECTORY "C:\\Program Files (x86)\\Autodesk\\3ds Max 2010" CACHE STRING "Directory of 3ds max.")
+
+include_directories(
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${ZEBUILD_INCLUDE_PATH}/3dsMax/2010)
+	
+link_directories(
+	${ZEBUILD_LIB_PATH}/3dsMax/2010)
+
+add_subdirectory(ZE3dsMaxUI)	
+add_subdirectory(ZE3dsModelExporter)
+add_subdirectory(ZE3dsMapExporter)
+add_subdirectory(ZE3dsMaxPlugin)
+add_subdirectory(ZE3dsMaxUtils)
+
+add_custom_target(ZE3dsMax
+	SOURCES CMakeLists.txt)
+
+install(DIRECTORY ZE3dsMaxScript 
+	CONFIGURATIONS Release 
+	DESTINATION "Tools/Exporters/ZE3dsMax/MaxScript" 
+	COMPONENT Tools 
+	PATTERN .svn EXCLUDE)
+set_property(TARGET ZE3dsMax PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})

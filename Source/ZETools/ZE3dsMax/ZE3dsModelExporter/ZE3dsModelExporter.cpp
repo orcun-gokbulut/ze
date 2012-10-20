@@ -36,7 +36,7 @@
 #include "ZE3dsModelExporter.h"
 
 #include <tchar.h>
-#include "QWinWidget/qwinwidget.h"
+#include "ZEToolComponents/QWinWidget/qwinwidget.h"
 #include "QtGui/QApplication"
 #include "ZEModelExporterOptionsDialog.h"
 #include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"

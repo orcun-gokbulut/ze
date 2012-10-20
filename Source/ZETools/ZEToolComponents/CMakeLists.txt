@@ -35,31 +35,20 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-project (ZE3dsMax)
+ze_set_project_folder("ZETools/ZEToolComponents")
 
-ze_set_project_folder("ZE3dsMax")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-set(ZEBUILD_3DS_MAX_BINARY_DIRECTORY "C:\\Program Files (x86)\\Autodesk\\3ds Max 2010" CACHE STRING "Directory of 3ds max.")
+add_subdirectory(ZEProgressDialog)
+add_subdirectory(ZEResourceConfigurationWidget)
+add_subdirectory(ZEResourceConfigurator)
+add_subdirectory(ZEMLVisualizer)
+add_subdirectory(QWinWidget)
 
-include_directories(
-	${PROJECT_SOURCE_DIR}
-	${ZEBUILD_INCLUDE_PATH}/3dsMax/2010)
-	
-link_directories(
-	${ZEBUILD_LIB_PATH}/3dsMax/2010)
-	
-add_subdirectory(ZE3dsModelExporter)
-add_subdirectory(ZE3dsMapExporter)
-add_subdirectory(ZE3dsMaxUI)
-add_subdirectory(ZE3dsMaxPlugin)
-add_subdirectory(ZE3dsMaxUtils)
+ze_add_source(ZEToolComponentsMain.cpp		Sources)
 
-add_custom_target(ZE3dsMax
-	SOURCES CMakeLists.txt)
-
-install(DIRECTORY ZE3dsMaxScript 
-	CONFIGURATIONS Release 
-	DESTINATION "Tools/Exporters/ZE3dsMax/MaxScript" 
-	COMPONENT Tools 
-	PATTERN .svn EXCLUDE)
-set_property(TARGET ZE3dsMax PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
+ze_add_executable(ZEToolComponents 
+	SOURCES ${Sources}
+	LIBS
+		ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget ZEMLVisualizerWidget ZEResourceConfigurator
+		QtCore4 QtGui4)

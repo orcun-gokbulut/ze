@@ -33,9 +33,17 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-ze_set_project_folder("ZECodeUtilities")
+qt4_wrap_cpp (QtMocFiles qwinwidget.h qwinhost.h)
 
-ze_add_module(ZEFileCompiler)
-#ze_add_module(ZEMetaCompiler)
+add_library(QWinWidget SHARED
+	qwinwidget.h
+	qwinwidget.cpp
+	qwinhost.h
+	qwinhost.cpp
+	qmfcapp.h
+	qmfcapp.cpp
+	${QtMocFiles})
+
+target_link_libraries(QWinWidget QtCore4.lib QtGui4.lib)
