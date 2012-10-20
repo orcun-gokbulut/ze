@@ -35,7 +35,6 @@
 
 #include "ZEError.h"
 #include "ZEModelResource.h"
-#include "ZEModelFileFormat.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
@@ -299,31 +298,31 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEMLSeri
 
 		switch (Shape->Type)
 		{
-			case ZE_MFPST_BOX:
+			case ZE_MRPST_BOX:
 			{
 				Shape->Box.Width = ShapeWidth;
 				Shape->Box.Height = ShapeHeight;
 				Shape->Box.Length = ShapeLength;
 				break;
 			}
-			case ZE_MFPST_SPHERE:
+			case ZE_MRPST_SPHERE:
 			{
 				Shape->Sphere.Radius = ShapeRadius;
 				break;
 			}
-			case ZE_MFPST_CAPSULE:
+			case ZE_MRPST_CAPSULE:
 			{
 				Shape->Capsule.Radius = ShapeRadius;
 				Shape->Capsule.Height = ShapeHeight;
 				break;
 			}
-			case ZE_MFPST_CYLINDER:
+			case ZE_MRPST_CYLINDER:
 			{
 				Shape->Cylinder.Radius = ShapeRadius;
 				Shape->Cylinder.Height = ShapeHeight;
 				break;
 			}
-			case ZE_MFPST_CONVEX:
+			case ZE_MRPST_CONVEX:
 			{
 				NodeReader->SeekPointer(VerticesDataPointer);
 				Shape->Convex.Vertices.SetCount((ZESize)NodeReader->GetDataSize() / sizeof(ZEVector3));

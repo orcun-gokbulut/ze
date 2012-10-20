@@ -59,17 +59,15 @@ class ZEPhysicalJoint;
 #include "ZEPhysics/ZEPhysicalJoint.h"
 #include "ZEPhysics/ZEPhysicalShapes.h"
 
-/*
-enum ZEPhysicalShapeType
+
+enum ZEModelResourcePhysicalShapeType
 {
-	ZE_PST_PLANE            = 0,
-	ZE_PST_BOX				= 1,
-	ZE_PST_SPHERE			= 2,
-	ZE_PST_CYLINDER			= 3,
-	ZE_PST_CAPSULE			= 4,
-	ZE_PST_CONVEX			= 5,
-	ZE_PST_TRIMESH          = 6
-};*/
+	ZE_MRPST_BOX			= 0,
+	ZE_MRPST_SPHERE			= 1,
+	ZE_MRPST_CYLINDER		= 2,
+	ZE_MRPST_CAPSULE		= 3,
+	ZE_MRPST_CONVEX			= 4,
+};
 
 enum ZEModelResourcePhysicalBodyType
 {
