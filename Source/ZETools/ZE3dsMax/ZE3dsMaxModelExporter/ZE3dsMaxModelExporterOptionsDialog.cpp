@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelExporterOptionsDialog.cpp
+ Zinek Engine - ZE3dsMaxModelExporterOptionsDialog.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,14 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModelExporterOptionsDialog.h"
+#include "ZE3dsMaxModelExporterOptionsDialog.h"
 #include "QtGui\QFileDialog"
 #include "ZEML\ZEMLProperty.h"
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 
-ZE3dsModelExporterOptionsDialog::ZE3dsModelExporterOptionsDialog(QWidget* Parent) : QDialog(Parent)
+ZE3dsMaxModelExporterOptionsDialog::ZE3dsMaxModelExporterOptionsDialog(QWidget* Parent) : QDialog(Parent)
 {
-	Form = new Ui::ZEModelExporterOptionsDialogUI();
+	Form = new Ui::ZE3dsMaxModelExporterOptionsDialogUI();
 	Form->setupUi(this);
 
 	Options = NULL;
@@ -55,7 +55,7 @@ ZE3dsModelExporterOptionsDialog::ZE3dsModelExporterOptionsDialog(QWidget* Parent
 	Form->AnimationTreeWidget->setSortingEnabled(false);
 }
 
-void ZE3dsModelExporterOptionsDialog::SetOptions(ZEMLNode* Options)
+void ZE3dsMaxModelExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 {
 	if(Options == NULL)
 		return;
@@ -119,20 +119,20 @@ void ZE3dsModelExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 
 }
 
-ZEMLNode* ZE3dsModelExporterOptionsDialog::GetOptions()
+ZEMLNode* ZE3dsMaxModelExporterOptionsDialog::GetOptions()
 {
 	CollectOptionsFromForm();
 	return Options;
 }
 
-void ZE3dsModelExporterOptionsDialog::ToggleFileLogging(bool IsEnabled)
+void ZE3dsMaxModelExporterOptionsDialog::ToggleFileLogging(bool IsEnabled)
 {
 	Form->btnBrowseLogPath->setEnabled(IsEnabled);
 	Form->txtLogFilePath->setEnabled(IsEnabled);
 	Form->ckbFileLoggingEnabled->setChecked(IsEnabled);
 }
 
-void ZE3dsModelExporterOptionsDialog::ShowEngineDirectoryDialog()
+void ZE3dsMaxModelExporterOptionsDialog::ShowEngineDirectoryDialog()
 {
 	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text());
 
@@ -142,7 +142,7 @@ void ZE3dsModelExporterOptionsDialog::ShowEngineDirectoryDialog()
 	Form->txtEngineWorkingDirectory->setText(SelectedDirectory);
 }
 
-void ZE3dsModelExporterOptionsDialog::ShowLoggingFilePathDialog()
+void ZE3dsMaxModelExporterOptionsDialog::ShowLoggingFilePathDialog()
 {
 	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text());
 
@@ -152,7 +152,7 @@ void ZE3dsModelExporterOptionsDialog::ShowLoggingFilePathDialog()
 	Form->txtLogFilePath->setText(SelectedDirectory);
 }
 
-void ZE3dsModelExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
+void ZE3dsMaxModelExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
 {
 	if(CheckBoxState == Qt::CheckState::Checked)
 		ToggleFileLogging(true);
@@ -160,19 +160,19 @@ void ZE3dsModelExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
 		ToggleFileLogging(false);
 }
 
-void ZE3dsModelExporterOptionsDialog::SetExportBonesEnabled(bool IsChecked)
+void ZE3dsMaxModelExporterOptionsDialog::SetExportBonesEnabled(bool IsChecked)
 {
 	if(!IsChecked)
 		Form->ckbExportBonePhysicalBodies->setChecked(false);
 }
 
-void ZE3dsModelExporterOptionsDialog::SetExportMeshesEnabled(bool IsChecked)
+void ZE3dsMaxModelExporterOptionsDialog::SetExportMeshesEnabled(bool IsChecked)
 {
 	if(!IsChecked)
 		Form->ckbExportMeshPhysicalBodies->setChecked(false);
 }
 
-void ZE3dsModelExporterOptionsDialog::AddAnimation()
+void ZE3dsMaxModelExporterOptionsDialog::AddAnimation()
 {
 
 	ZEInt ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
@@ -189,7 +189,7 @@ void ZE3dsModelExporterOptionsDialog::AddAnimation()
 	Form->AnimationTreeWidget->editItem(Item, 0);
 }
 
-void ZE3dsModelExporterOptionsDialog::RemoveAnimation()
+void ZE3dsMaxModelExporterOptionsDialog::RemoveAnimation()
 {
 	if(Form->AnimationTreeWidget->currentItem() == NULL)
 		return;
@@ -198,7 +198,7 @@ void ZE3dsModelExporterOptionsDialog::RemoveAnimation()
 	Form->AnimationTreeWidget->takeTopLevelItem(IndexOfItem);
 }
 
-void ZE3dsModelExporterOptionsDialog::CollectOptionsFromForm()
+void ZE3dsMaxModelExporterOptionsDialog::CollectOptionsFromForm()
 {
 	if(Options == NULL)
 	{

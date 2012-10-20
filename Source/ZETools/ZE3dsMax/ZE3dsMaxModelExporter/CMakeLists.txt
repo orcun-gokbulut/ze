@@ -35,20 +35,20 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZE3dsModelExporter.h					Sources)
-ze_add_source(ZE3dsModelExporter.cpp				Sources)
-ze_add_source(ZE3dsModelExporterDescription.h		Sources)
-ze_add_source(ZE3dsModelExporterDescription.cpp		Sources)
-ze_add_source(ZE3dsModelExporterProcess.cpp			Sources)
-ze_add_source(ZEModelExporterOptionsDialog.h		Sources QtMocs)
-ze_add_source(ZEModelExporterOptionsDialog.cpp		Sources)
-ze_add_source(ZEModelExporterOptionsWidget.ui		Sources QtUI)
+ze_add_source(ZE3dsMaxModelExporter.h					Sources)
+ze_add_source(ZE3dsMaxModelExporter.cpp					Sources)
+ze_add_source(ZE3dsMaxModelExporterDescription.h		Sources)
+ze_add_source(ZE3dsMaxModelExporterDescription.cpp		Sources)
+ze_add_source(ZE3dsMaxModelExporterProcess.cpp			Sources)
+ze_add_source(ZE3dsMaxModelExporterOptionsDialog.h		Sources QtMocs)
+ze_add_source(ZE3dsMaxModelExporterOptionsDialog.cpp	Sources)
+ze_add_source(ZE3dsMaxModelExporterOptionsWidget.ui		Sources QtUI)
 
 qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-ze_add_library(ZE3dsModelExporter 
+ze_add_library(ZE3dsMaxModelExporter 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
 	LIBS ZEFoundation ZE3dsMaxUtils ZEProgressDialog ZEResourceConfigurationWidget QtCore4 QtGui4 QWinWidget)
 

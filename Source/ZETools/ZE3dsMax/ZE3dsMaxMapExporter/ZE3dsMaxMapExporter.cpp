@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMapExporter.cpp
+ Zinek Engine - ZE3dsMaxMapExporter.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,20 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZE3dsMapExporter.h"
+#include "ZE3dsMaxMapExporter.h"
 //#include "data_mappings.h"
 
 #include <tchar.h>
 #include "QWinWidget/qwinwidget.h"
 #include "QtGui/QApplication"
-#include "ZEMapExporterOptionsDialog.h"
+#include "ZE3dsMaxMapExporterOptionsDialog.h"
 #include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
 #include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileUtils.h"
 #include "ZEFile/ZEFileInfo.h"
 
-ZE3dsMapExporter::ZE3dsMapExporter()
+ZE3dsMaxMapExporter::ZE3dsMaxMapExporter()
 {
 	Scene = NULL;
 	QtApplication = NULL;
@@ -57,7 +57,7 @@ ZE3dsMapExporter::ZE3dsMapExporter()
 	ResourceConfigurationDialog = NULL;
 }
 
-ZE3dsMapExporter::~ZE3dsMapExporter() 
+ZE3dsMaxMapExporter::~ZE3dsMaxMapExporter() 
 {
 	if(ExportOptions != NULL)
 	{
@@ -100,62 +100,62 @@ ZE3dsMapExporter::~ZE3dsMapExporter()
 	}
 }
 
-ZEInt ZE3dsMapExporter::ExtCount()
+ZEInt ZE3dsMaxMapExporter::ExtCount()
 {
 	return 1;
 }
 
-const TCHAR *ZE3dsMapExporter::Ext(ZEInt n)
+const TCHAR *ZE3dsMaxMapExporter::Ext(ZEInt n)
 {		
 	return "zeMap";
 }
 
-const TCHAR *ZE3dsMapExporter::LongDesc()
+const TCHAR *ZE3dsMaxMapExporter::LongDesc()
 {
 	return "Zinek Engine Map File";
 }
 	
-const TCHAR *ZE3dsMapExporter::ShortDesc() 
+const TCHAR *ZE3dsMaxMapExporter::ShortDesc() 
 {			
 	return "Zinek Engine Map";
 }
 
-const TCHAR *ZE3dsMapExporter::AuthorName()
+const TCHAR *ZE3dsMaxMapExporter::AuthorName()
 {			
 	return "Zinek Code House and Game Studio";
 }
 
-const TCHAR *ZE3dsMapExporter::CopyrightMessage() 
+const TCHAR *ZE3dsMaxMapExporter::CopyrightMessage() 
 {	
 	return "Copyright (c) 2008-2011, Zinek Code House and Game Studio";
 }
 
-const TCHAR *ZE3dsMapExporter::OtherMessage1() 
+const TCHAR *ZE3dsMaxMapExporter::OtherMessage1() 
 {		
 	return "";
 }
 
-const TCHAR *ZE3dsMapExporter::OtherMessage2() 
+const TCHAR *ZE3dsMaxMapExporter::OtherMessage2() 
 {		
 	return "";
 }
 
-ZEUInt ZE3dsMapExporter::Version()
+ZEUInt ZE3dsMaxMapExporter::Version()
 {				
 	return 100;
 }
 
-void ZE3dsMapExporter::ShowAbout(HWND hWnd)
+void ZE3dsMaxMapExporter::ShowAbout(HWND hWnd)
 {			
 
 }
 
-BOOL ZE3dsMapExporter::SupportsOptions(ZEInt ext, DWORD options)
+BOOL ZE3dsMaxMapExporter::SupportsOptions(ZEInt ext, DWORD options)
 {
 	return TRUE;
 }
 
-ZEInt ZE3dsMapExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
+ZEInt ZE3dsMaxMapExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
 {
 	ZEInt i;
 	if (i_currentNode == NULL)
@@ -173,7 +173,7 @@ ZEInt ZE3dsMapExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode 
 	return i_nodeTab.Count();
 }
 
-void ZE3dsMapExporter::LoadOptions(const char* FilePath)
+void ZE3dsMaxMapExporter::LoadOptions(const char* FilePath)
 {
 	ZEString OptionsFilePath((ZEString(FilePath)) + ".zecfg");
 
@@ -194,7 +194,7 @@ void ZE3dsMapExporter::LoadOptions(const char* FilePath)
 	}
 }
 
-void ZE3dsMapExporter::SaveOptions(const char* FilePath)
+void ZE3dsMaxMapExporter::SaveOptions(const char* FilePath)
 {
 	ZEString OptionsFilePath((ZEString(FilePath)) + ".zecfg");
 
@@ -215,7 +215,7 @@ void ZE3dsMapExporter::SaveOptions(const char* FilePath)
 	}
 }
 
-bool ZE3dsMapExporter::ShowOptionsDialog(HWND ParentWindow)
+bool ZE3dsMaxMapExporter::ShowOptionsDialog(HWND ParentWindow)
 {
 	int Argc = 0;
 	if(QApplication::instance() == NULL)
@@ -227,7 +227,7 @@ bool ZE3dsMapExporter::ShowOptionsDialog(HWND ParentWindow)
 		WinWidget = new QWinWidget(ParentWindow);
 
 	if(OptionsDialog == NULL)
-		OptionsDialog = new ZEMapExporterOptionsDialog(WinWidget);
+		OptionsDialog = new ZE3dsMaxMapExporterOptionsDialog(WinWidget);
 
 	if(ExportOptions != NULL)
 		OptionsDialog->SetOptions(ExportOptions);
@@ -241,7 +241,7 @@ bool ZE3dsMapExporter::ShowOptionsDialog(HWND ParentWindow)
 	return true;
 }
 
-bool ZE3dsMapExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath)
+bool ZE3dsMaxMapExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath)
 {
 	int Argc = 0;
 	if(QApplication::instance() == NULL)
@@ -268,7 +268,7 @@ bool ZE3dsMapExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const 
 	return true;
 }
 
-ZEInt ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
+ZEInt ZE3dsMaxMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
 	ExportPath = ZEFileInfo::GetParentDirectory(name);
 	LoadOptions(i->GetCurFilePath());

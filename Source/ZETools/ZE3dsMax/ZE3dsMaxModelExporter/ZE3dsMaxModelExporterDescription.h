@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZE3dsMaxModelExporterDescription.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,26 +30,32 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef __ZE3DS_MODEL_EXPORTER_DESCRIPTION_H__
+#define __ZE3DS_MODEL_EXPORTER_DESCRIPTION_H__
 
-ze_add_source(ZE3dsMapExporter.h				Sources)
-ze_add_source(ZE3dsMapExporter.cpp				Sources)
-ze_add_source(ZE3dsMapExporterDescription.h		Sources)
-ze_add_source(ZE3dsMapExporterDescription.cpp	Sources)
-ze_add_source(ZE3dsMapExporterProcess.cpp		Sources)
-ze_add_source(ZEMapExporterOptionsDialog.h		Sources QtMocs)
-ze_add_source(ZEMapExporterOptionsDialog.cpp	Sources)
-ze_add_source(ZEMapExporterOptionsWidget.ui		Sources QtUI)
+#include "ZETypes.h"
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+#include <Max.h>
+#include <iparamb2.h>
 
-ze_add_library(ZE3dsMapExporter 
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS ZEFoundation ZE3dsMaxUtils QtCore4 QtGui4 QWinWidget ZEProgressDialog ZEResourceConfigurationWidget)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+class ZE3dsMaxModelExporterDescription : public ClassDesc2 
+{
+	public:
+		virtual ZEInt				IsPublic();
+		virtual void*				Create(BOOL Loading = FALSE);
+		virtual const TCHAR*		ClassName();
+		virtual SClass_ID			SuperClassID();
+		virtual Class_ID			ClassID();
+		virtual const TCHAR*		Category();
+		virtual const TCHAR*		InternalName();
+		virtual HINSTANCE			HInstance();
+
+		static ClassDesc2*			GetInstance();
+};
+
+#endif

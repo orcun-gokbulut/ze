@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMapExporterOptionsDialog.cpp
+ Zinek Engine - ZE3dsMaxMapExporterOptionsDialog.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,14 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMapExporterOptionsDialog.h"
+#include "ZE3dsMaxMapExporterOptionsDialog.h"
 #include "QtGui\QFileDialog"
 #include "ZEML\ZEMLProperty.h"
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 
-ZEMapExporterOptionsDialog::ZEMapExporterOptionsDialog(QWidget* Parent) : QDialog(Parent)
+ZE3dsMaxMapExporterOptionsDialog::ZE3dsMaxMapExporterOptionsDialog(QWidget* Parent) : QDialog(Parent)
 {
-	Form = new Ui::ZEMapExporterOptionsDialogUI();
+	Form = new Ui::ZE3dsMaxMapExporterOptionsDialogUI();
 	Form->setupUi(this);
 
 	Options = NULL;
@@ -50,13 +50,13 @@ ZEMapExporterOptionsDialog::ZEMapExporterOptionsDialog(QWidget* Parent) : QDialo
 	connect(Form->ckbFileLoggingEnabled, SIGNAL(stateChanged(int)), this, SLOT(SetFileLoggingEnabled(int)));
 }
 
-ZEMapExporterOptionsDialog::~ZEMapExporterOptionsDialog()
+ZE3dsMaxMapExporterOptionsDialog::~ZE3dsMaxMapExporterOptionsDialog()
 {
 	delete Form;
 	Form = NULL;
 }
 
-void ZEMapExporterOptionsDialog::SetOptions(ZEMLNode* Options)
+void ZE3dsMaxMapExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 {
 	if(Options == NULL)
 		return;
@@ -77,20 +77,20 @@ void ZEMapExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 		ToggleFileLogging(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
 }
 
-ZEMLNode*	ZEMapExporterOptionsDialog::GetOptions()
+ZEMLNode*	ZE3dsMaxMapExporterOptionsDialog::GetOptions()
 {
 	CollectOptionsFromForm();
 	return Options;
 }
 
-void ZEMapExporterOptionsDialog::ToggleFileLogging(bool IsEnabled)
+void ZE3dsMaxMapExporterOptionsDialog::ToggleFileLogging(bool IsEnabled)
 {
 	Form->btnBrowseLogPath->setEnabled(IsEnabled);
 	Form->txtLogFilePath->setEnabled(IsEnabled);
 	Form->ckbFileLoggingEnabled->setChecked(IsEnabled);
 }
 
-void ZEMapExporterOptionsDialog::ShowEngineDirectoryDialog()
+void ZE3dsMaxMapExporterOptionsDialog::ShowEngineDirectoryDialog()
 {
 	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text());
 
@@ -100,7 +100,7 @@ void ZEMapExporterOptionsDialog::ShowEngineDirectoryDialog()
 	Form->txtEngineWorkingDirectory->setText(SelectedDirectory);
 }
 
-void ZEMapExporterOptionsDialog::ShowLoggingFilePathDialog()
+void ZE3dsMaxMapExporterOptionsDialog::ShowLoggingFilePathDialog()
 {
 	QString SaveFilePath = QFileDialog::getSaveFileName(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text(), QString("*.txt"));
 
@@ -110,7 +110,7 @@ void ZEMapExporterOptionsDialog::ShowLoggingFilePathDialog()
 	Form->txtLogFilePath->setText(SaveFilePath);
 }
 
-void ZEMapExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
+void ZE3dsMaxMapExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
 {
 	if(CheckBoxState == Qt::Checked)
 		ToggleFileLogging(true);
@@ -118,7 +118,7 @@ void ZEMapExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
 		ToggleFileLogging(false);
 }
 
-void ZEMapExporterOptionsDialog::CollectOptionsFromForm()
+void ZE3dsMaxMapExporterOptionsDialog::CollectOptionsFromForm()
 {
 	if(Options == NULL)
 	{
@@ -146,12 +146,12 @@ void ZEMapExporterOptionsDialog::CollectOptionsFromForm()
 	}
 }
 
-bool ZEMapExporterOptionsDialog::GetFileLoggingEnabled()
+bool ZE3dsMaxMapExporterOptionsDialog::GetFileLoggingEnabled()
 {
 	return ((ZEMLProperty*)Options->GetProperty("IsFileLoggingEnabled"))->GetValue().GetBoolean();
 }
 
-ZEString ZEMapExporterOptionsDialog::GetLogFilePath()
+ZEString ZE3dsMaxMapExporterOptionsDialog::GetLogFilePath()
 {
 	return ((ZEMLProperty*)Options->GetProperty("LogFilePath"))->GetValue().GetString();
 }

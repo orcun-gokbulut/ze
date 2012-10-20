@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ZEModelExporterOptionsDialogUI</class>
- <widget class="QDialog" name="ZEModelExporterOptionsDialogUI">
+ <class>ZE3dsMaxModelExporterOptionsDialogUI</class>
+ <widget class="QDialog" name="ZE3dsMaxModelExporterOptionsDialogUI">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -318,7 +318,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>ZEModelExporterOptionsDialogUI</receiver>
+   <receiver>ZE3dsMaxModelExporterOptionsDialogUI</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -334,7 +334,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>ZEModelExporterOptionsDialogUI</receiver>
+   <receiver>ZE3dsMaxModelExporterOptionsDialogUI</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

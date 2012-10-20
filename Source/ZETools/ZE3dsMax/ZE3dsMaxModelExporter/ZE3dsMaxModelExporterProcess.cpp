@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsModelExporterProcess.cpp
+ Zinek Engine - ZE3dsMaxModelExporterProcess.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZE3dsModelExporter.h"
+#include "ZE3dsMaxModelExporter.h"
 #include "ZEToolComponents\ZEProgressDialog\ZEProgressDialog.h"
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 #include "ZEFile/ZEFile.h"
@@ -95,7 +95,7 @@ struct ZEModelFileAnimationKey
 	ZEVector3									Scale;
 });
 
-ZEInt ZE3dsModelExporter::GetMeshId(IGameNode* Node)
+ZEInt ZE3dsMaxModelExporter::GetMeshId(IGameNode* Node)
 {
 	for (ZESize I = 0; I < (ZESize)ProcessedMasterMeshes.Count(); I++)
 		if (ProcessedMasterMeshes[I]->GetNodeID() == Node->GetNodeID())
@@ -103,7 +103,7 @@ ZEInt ZE3dsModelExporter::GetMeshId(IGameNode* Node)
 	return -1;
 }
 
-ZEInt ZE3dsModelExporter::GetBoneId(IGameNode* Node)
+ZEInt ZE3dsMaxModelExporter::GetBoneId(IGameNode* Node)
 {
 	for (ZESize I = 0; I < (ZESize)ProcessedBones.Count(); I++)
 		if (ProcessedBones[I]->GetNodeID() == Node->GetNodeID())
@@ -112,7 +112,7 @@ ZEInt ZE3dsModelExporter::GetBoneId(IGameNode* Node)
 	return -1;
 }
 
-ZEInt ZE3dsModelExporter::ProcessMeshMaterial(IGameMaterial* Material)
+ZEInt ZE3dsMaxModelExporter::ProcessMeshMaterial(IGameMaterial* Material)
 {
 	if (Material == NULL)
 		return -1;
@@ -125,7 +125,7 @@ ZEInt ZE3dsModelExporter::ProcessMeshMaterial(IGameMaterial* Material)
 	return ProcessedMaterials.Count() - 1;
 }
 
-bool ZE3dsModelExporter::ProcessMaterials(const char* FileName)
+bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 {
 	zeLog("Processing materials...");
 
@@ -435,7 +435,7 @@ bool ZE3dsModelExporter::ProcessMaterials(const char* FileName)
 	return true;
 }
 
-void ZE3dsModelExporter::ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* ShapeNode)
+void ZE3dsMaxModelExporter::ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* ShapeNode)
 {
 	IGameMesh* Mesh = (IGameMesh*)Node->GetIGameObject();
 	Mesh->InitializeData();
@@ -463,7 +463,7 @@ void ZE3dsModelExporter::ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNo
 	ShapeNode->AddDataProperty("Vertices", Vertices.GetCArray(), sizeof(ZEVector3) * NumberofVertices, true);
 }
 
-bool ZE3dsModelExporter::ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* PhysicalShapeNode)
+bool ZE3dsMaxModelExporter::ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* PhysicalShapeNode)
 {
 	IGameObject* Object = Node->GetIGameObject();
 
@@ -538,7 +538,7 @@ bool ZE3dsModelExporter::ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerN
 	return true;
 }
 
-void ZE3dsModelExporter::ProcessPhysicalBody(IGameNode* Node, ZEMLNode* ParentNode)
+void ZE3dsMaxModelExporter::ProcessPhysicalBody(IGameNode* Node, ZEMLNode* ParentNode)
 {
 	IGameObject* Object = Node->GetIGameObject();
 
@@ -617,7 +617,7 @@ void ZE3dsModelExporter::ProcessPhysicalBody(IGameNode* Node, ZEMLNode* ParentNo
 	}
 }
 
-bool ZE3dsModelExporter::ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* PhysicalJointNode)
+bool ZE3dsMaxModelExporter::ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* PhysicalJointNode)
 {
 	IGameObject* Object = Node->GetIGameObject();
 
@@ -775,7 +775,7 @@ bool ZE3dsModelExporter::ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* Physica
 	return true;
 }
 
-bool ZE3dsModelExporter::ProcessBone(IGameNode* Node, ZEMLNode* BonesNode)
+bool ZE3dsMaxModelExporter::ProcessBone(IGameNode* Node, ZEMLNode* BonesNode)
 {
 	ZEProgressDialog::GetInstance()->OpenTask(Node->GetName());
 	zeLog("Processing bone \"%s\".", Node->GetName());
@@ -850,7 +850,7 @@ bool ZE3dsModelExporter::ProcessBone(IGameNode* Node, ZEMLNode* BonesNode)
 	return true;
 }
 
-bool ZE3dsModelExporter::ProcessBones()
+bool ZE3dsMaxModelExporter::ProcessBones()
 {
 	zeLog("Processing bones...");
 
@@ -891,7 +891,7 @@ bool ZE3dsModelExporter::ProcessBones()
 	return true;
 }
 
-bool ZE3dsModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LODNode)
+bool ZE3dsMaxModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LODNode)
 {
 	IGameMesh* Mesh = (IGameMesh*)Node->GetIGameObject();
 
@@ -1081,7 +1081,7 @@ bool ZE3dsModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LODNo
 	return !GotError;
 }
 
-bool ZE3dsModelExporter::ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesNode)
+bool ZE3dsMaxModelExporter::ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesNode)
 {
 	zeLog("Processing mesh \"%s\".", Node->GetName());
 	IGameMesh* Mesh = (IGameMesh*)Node->GetIGameObject();
@@ -1140,7 +1140,7 @@ bool ZE3dsModelExporter::ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesNode
 	return true;
 }
 
-bool ZE3dsModelExporter::ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNode)
+bool ZE3dsMaxModelExporter::ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNode)
 {
 	IGameMesh* Mesh = (IGameMesh*)Node->GetIGameObject();
 	const char* LODName = Node->GetName();
@@ -1213,7 +1213,7 @@ bool ZE3dsModelExporter::ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNode)
 	return true;
 }
 
-bool ZE3dsModelExporter::ProcessMeshes()
+bool ZE3dsMaxModelExporter::ProcessMeshes()
 {
 	zeLog("Processing Meshes...");
 
@@ -1300,7 +1300,7 @@ bool ZE3dsModelExporter::ProcessMeshes()
 	return true;
 }
 
-void ZE3dsModelExporter::ProcessAnimationFrames(ZESize AnimationStartFrame, ZESize AnimationFrameCount, ZEMLNode* AnimationNode)
+void ZE3dsMaxModelExporter::ProcessAnimationFrames(ZESize AnimationStartFrame, ZESize AnimationFrameCount, ZEMLNode* AnimationNode)
 {
 	if (AnimationStartFrame + AnimationFrameCount - 1 > (ZESize)TotalFrameCount)
 		zeError("Specified animation frame range is exceeds 3ds Max Scene frame count.");
@@ -1408,7 +1408,7 @@ void ZE3dsModelExporter::ProcessAnimationFrames(ZESize AnimationStartFrame, ZESi
 
 }
 
-bool ZE3dsModelExporter::ProcessAnimations(ZEMLNode* AnimationsNode)
+bool ZE3dsMaxModelExporter::ProcessAnimations(ZEMLNode* AnimationsNode)
 {
 	zeLog("Processing Animations...");
 
@@ -1451,7 +1451,7 @@ bool ZE3dsModelExporter::ProcessAnimations(ZEMLNode* AnimationsNode)
 	return true;
 }
 
-void ZE3dsModelExporter::CollectResources()
+void ZE3dsMaxModelExporter::CollectResources()
 {
 	ZESize MeshNodeCount = 0;
 

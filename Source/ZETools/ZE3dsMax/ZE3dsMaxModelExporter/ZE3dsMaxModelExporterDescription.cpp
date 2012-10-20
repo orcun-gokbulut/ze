@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMapExporterOptionsDialog.h
+ Zinek Engine - ZE3dsMaxModelExporterDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,44 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MAP_EXPORTER_OPTIONS_DIALOG_H__
-#define __ZE_MAP_EXPORTER_OPTIONS_DIALOG_H__
+#include "ZE3dsMaxModelExporterDescription.h"
+#include "ZE3dsMaxModelExporter.h"
 
-#include "ui_ZEMapExporterOptionsWidget.h"
-#include "QtGui\QDialog"
-#include "ZEDS\ZEString.h"
-#include "ZEML\ZEMLNode.h"
+#define ZE3dsModelExporter_CLASS_ID	Class_ID(0x9129e3a6, 0xa6fe6398)
 
-class ZEMapExporterOptionsDialog : public QDialog
+ZEInt ZE3dsMaxModelExporterDescription::IsPublic()
+{ 
+	return TRUE; 
+}
+
+void* ZE3dsMaxModelExporterDescription::Create(BOOL Loading) 
+{ 
+	return new ZE3dsMaxModelExporter(); 
+}
+
+const TCHAR* ZE3dsMaxModelExporterDescription::ClassName()
+{ 
+	return "ZEMapExporter"; 
+}
+
+SClass_ID ZE3dsMaxModelExporterDescription::SuperClassID()
+{ 
+	return SCENE_EXPORT_CLASS_ID; 
+}
+
+Class_ID ZE3dsMaxModelExporterDescription::ClassID()
+{ 
+	return ZE3dsModelExporter_CLASS_ID; 
+}
+
+const TCHAR* ZE3dsMaxModelExporterDescription::Category()
 {
-	Q_OBJECT
+	return "Exporter"; 
+}
 
-	private:
+const TCHAR* ZE3dsMaxModelExporterDescription::InternalName()
+{ 
+	return "ZEMap Exporter"; 
+}
 
-		Ui::ZEMapExporterOptionsDialogUI*	Form;
-		ZEMLNode*							Options;
+HINSTANCE ZE3dsMaxModelExporterDescription::HInstance()
+{ 
+	return hInstance; 
+}
 
-		void					ToggleFileLogging(bool IsEnabled);
-		void					ToggleApplicationPathOptions(bool IsEnabled);
-		void					CollectOptionsFromForm();
-
-	private slots:
-
-		void					ShowEngineDirectoryDialog();
-		void					ShowLoggingFilePathDialog();
-		void					SetFileLoggingEnabled(int CheckBoxState);
-
-	public:
-
-								ZEMapExporterOptionsDialog(QWidget* Parent);
-								~ZEMapExporterOptionsDialog();
-
-	bool						GetFileLoggingEnabled();
-	ZEString					GetLogFilePath();
-
-	void						SetOptions(ZEMLNode* Options);
-	ZEMLNode*					GetOptions();
-};
-
-#endif
+ClassDesc2* ZE3dsMaxModelExporterDescription::GetInstance()
+{
+	static ZE3dsMaxModelExporterDescription Desc;
+	return &Desc;
+}

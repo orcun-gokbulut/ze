@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsModelExporterDescription.cpp
+ Zinek Engine - ZE3dsMaxMapExporterDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZE3dsModelExporterDescription.h"
-#include "ZE3dsModelExporter.h"
+#include "ZE3dsMaxMapExporterDescription.h"
+#include "ZE3dsMaxMapExporter.h"
 
-#define ZE3dsModelExporter_CLASS_ID	Class_ID(0x9129e3a6, 0xa6fe6398)
+#define ZE3dsMapExporter_CLASS_ID	Class_ID(0x3a8ad1e4, 0x973e26ff)
 
-ZEInt ZE3dsModelExporterDescription::IsPublic()
+ZEInt ZE3dsMaxMapExporterDescription::IsPublic()
 { 
 	return TRUE; 
 }
 
-void* ZE3dsModelExporterDescription::Create(BOOL Loading) 
+void* ZE3dsMaxMapExporterDescription::Create(BOOL Loading) 
 { 
-	return new ZE3dsModelExporter(); 
+	return new ZE3dsMaxMapExporter(); 
 }
 
-const TCHAR* ZE3dsModelExporterDescription::ClassName()
+const TCHAR* ZE3dsMaxMapExporterDescription::ClassName()
 { 
 	return "ZEMapExporter"; 
 }
 
-SClass_ID ZE3dsModelExporterDescription::SuperClassID()
+SClass_ID ZE3dsMaxMapExporterDescription::SuperClassID()
 { 
 	return SCENE_EXPORT_CLASS_ID; 
 }
 
-Class_ID ZE3dsModelExporterDescription::ClassID()
+Class_ID ZE3dsMaxMapExporterDescription::ClassID()
 { 
-	return ZE3dsModelExporter_CLASS_ID; 
+	return ZE3dsMapExporter_CLASS_ID; 
 }
 
-const TCHAR* ZE3dsModelExporterDescription::Category()
+const TCHAR* ZE3dsMaxMapExporterDescription::Category()
 {
 	return "Exporter"; 
 }
 
-const TCHAR* ZE3dsModelExporterDescription::InternalName()
+const TCHAR* ZE3dsMaxMapExporterDescription::InternalName()
 { 
 	return "ZEMap Exporter"; 
 }
 
-HINSTANCE ZE3dsModelExporterDescription::HInstance()
+HINSTANCE ZE3dsMaxMapExporterDescription::HInstance()
 { 
 	return hInstance; 
 }
 
-ClassDesc2* ZE3dsModelExporterDescription::GetInstance()
+ClassDesc2* ZE3dsMaxMapExporterDescription::GetInstance()
 {
-	static ZE3dsModelExporterDescription Desc;
+	static ZE3dsMaxMapExporterDescription Desc;
 	return &Desc;
 }
