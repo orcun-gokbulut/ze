@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMapExporterProcess.cpp
+ Zinek Engine - ZE3dsMaxMapExporterProcess.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 
-#include "ZE3dsMapExporter.h"
+#include "ZE3dsMaxMapExporter.h"
 #include "ZEToolComponents\ZEProgressDialog\ZEProgressDialog.h"
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 #include "ZEFile\ZEFile.h"
@@ -74,7 +74,7 @@ struct ZEMapFilePolygon
 	ZEMapFileVertex							Vertices[3];
 });
 
-ZEInt ZE3dsMapExporter::ProcessFaceMaterial(IGameMaterial* Material)
+ZEInt ZE3dsMaxMapExporter::ProcessFaceMaterial(IGameMaterial* Material)
 {
 	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)
 		if (Materials[I] == Material)
@@ -85,7 +85,7 @@ ZEInt ZE3dsMapExporter::ProcessFaceMaterial(IGameMaterial* Material)
 	return Materials.Count() - 1;
 }
 
-ZEInt ZE3dsMapExporter::FindPortalIndex(IGameNode* Node)
+ZEInt ZE3dsMaxMapExporter::FindPortalIndex(IGameNode* Node)
 {
 	for (ZESize I = 0; I < (ZESize)Portals.Count(); I++)
 		if (Node == Portals[I]) return (ZEInt)I;
@@ -93,7 +93,7 @@ ZEInt ZE3dsMapExporter::FindPortalIndex(IGameNode* Node)
 	return -1;
 }
 
-bool ZE3dsMapExporter::ProcessDoors()
+bool ZE3dsMaxMapExporter::ProcessDoors()
 {
 	zeLog("Processing Portal Doors...");
 
@@ -180,7 +180,7 @@ bool ZE3dsMapExporter::ProcessDoors()
 	return true;
 }
 
-void ZE3dsMapExporter::ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode)
+void ZE3dsMaxMapExporter::ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode)
 {
 	IGameMesh* Mesh = (IGameMesh*)Object;
 
@@ -215,7 +215,7 @@ void ZE3dsMapExporter::ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* Physic
 	PhysicalMeshNode->AddDataProperty("Vertices", Vertices.GetCArray(), sizeof(ZEVector3) * Vertices.GetCount(), true);
 }
 
-bool ZE3dsMapExporter::ProcessPortals()
+bool ZE3dsMaxMapExporter::ProcessPortals()
 {
 	zeLog("Processing portals...");
 
@@ -358,7 +358,7 @@ bool ZE3dsMapExporter::ProcessPortals()
 	return true;
 }
 
-bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
+bool ZE3dsMaxMapExporter::ProcessMaterials(const char* FileName)
 {
 	zeLog("Processing materials...");
 	
@@ -657,7 +657,7 @@ bool ZE3dsMapExporter::ProcessMaterials(const char* FileName)
 	return true;
 }
 
-bool ZE3dsMapExporter::ProcessScene()
+bool ZE3dsMaxMapExporter::ProcessScene()
 {
 	ZESize ElectedNodeCount = 0;
 	ZESize PortalNodeCount = 0;
@@ -700,7 +700,7 @@ bool ZE3dsMapExporter::ProcessScene()
 	return true;
 }
 
-void ZE3dsMapExporter::CollectResources()
+void ZE3dsMaxMapExporter::CollectResources()
 {
 	ZESize PortalNodeCount = 0;
 

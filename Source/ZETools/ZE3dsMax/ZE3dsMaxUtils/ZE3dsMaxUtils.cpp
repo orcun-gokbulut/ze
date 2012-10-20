@@ -185,6 +185,11 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ch
 			return false;
 		}
 	}
+	else
+	{
+		zeWarning("Can not find property. (Property Name : \"%s\")", Property);
+		return false;
+	}
 
 }
 

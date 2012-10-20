@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZE3dsMapExporterDescription.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,33 +30,26 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE3DS_MAP_EXPORTER_DESCRIPTION_H__
-#define __ZE3DS_MAP_EXPORTER_DESCRIPTION_H__
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZETypes.h"
+ze_add_source(ZE3dsMaxMapExporter.h						Sources)
+ze_add_source(ZE3dsMaxMapExporter.cpp					Sources)
+ze_add_source(ZE3dsMaxMapExporterDescription.h			Sources)
+ze_add_source(ZE3dsMaxMapExporterDescription.cpp		Sources)
+ze_add_source(ZE3dsMaxMapExporterProcess.cpp			Sources)
+ze_add_source(ZE3dsMaxMapExporterOptionsDialog.h		Sources QtMocs)
+ze_add_source(ZE3dsMaxMapExporterOptionsDialog.cpp		Sources)
+ze_add_source(ZE3dsMaxMapExporterOptionsWidget.ui		Sources QtUI)
 
+qt4_add_resources (QtResourceFiles ${QtResources})
+qt4_wrap_ui (QtUIFiles ${QtUI})
+qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-#include <Max.h>
-#include <iparamb2.h>
+ze_add_library(ZE3dsMaxMapExporter 
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
+	LIBS ZEFoundation ZE3dsMaxUtils QtCore4 QtGui4 QWinWidget ZEProgressDialog ZEResourceConfigurationWidget)
 
-
-class ZE3dsMapExporterDescription : public ClassDesc2 
-{
-	public:
-		virtual ZEInt				IsPublic();
-		virtual void*				Create(BOOL Loading = FALSE);
-		virtual const TCHAR*		ClassName();
-		virtual SClass_ID			SuperClassID();
-		virtual Class_ID			ClassID();
-		virtual const TCHAR*		Category();
-		virtual const TCHAR*		InternalName();
-		virtual HINSTANCE			HInstance();
-
-		static ClassDesc2*			GetInstance();
-};
-
-#endif
+include_directories(${CMAKE_CURRENT_BINARY_DIR})

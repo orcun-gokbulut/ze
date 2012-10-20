@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsModelExporter.cpp
+ Zinek Engine - ZE3dsMaxModelExporter.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,19 +33,19 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZE3dsModelExporter.h"
+#include "ZE3dsMaxModelExporter.h"
 
 #include <tchar.h>
 #include "ZEToolComponents/QWinWidget/qwinwidget.h"
 #include "QtGui/QApplication"
-#include "ZEModelExporterOptionsDialog.h"
+#include "ZE3dsMaxModelExporterOptionsDialog.h"
 #include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
 #include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
 #include "ZEFile/ZEFileUtils.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileInfo.h"
 
-ZE3dsModelExporter::ZE3dsModelExporter()
+ZE3dsMaxModelExporter::ZE3dsMaxModelExporter()
 {
 	Scene = NULL;
 	QtApplication = NULL;
@@ -59,7 +59,7 @@ ZE3dsModelExporter::ZE3dsModelExporter()
 	TicksPerFrame = 0;
 }
 
-ZE3dsModelExporter::~ZE3dsModelExporter() 
+ZE3dsMaxModelExporter::~ZE3dsMaxModelExporter() 
 {
 	if(ExportOptions != NULL)
 	{
@@ -102,63 +102,63 @@ ZE3dsModelExporter::~ZE3dsModelExporter()
 	}
 }
 
-ZEInt ZE3dsModelExporter::ExtCount()
+ZEInt ZE3dsMaxModelExporter::ExtCount()
 {
 	return 1;
 }
 
-const TCHAR *ZE3dsModelExporter::Ext(ZEInt n)
+const TCHAR *ZE3dsMaxModelExporter::Ext(ZEInt n)
 {		
 	return "zeModel";
 }
 
-const TCHAR *ZE3dsModelExporter::LongDesc()
+const TCHAR *ZE3dsMaxModelExporter::LongDesc()
 {
 	return "Zinek Engine Model File";
 }
 	
-const TCHAR *ZE3dsModelExporter::ShortDesc() 
+const TCHAR *ZE3dsMaxModelExporter::ShortDesc() 
 {			
 	return "Zinek Engine Model";
 }
 
-const TCHAR *ZE3dsModelExporter::AuthorName()
+const TCHAR *ZE3dsMaxModelExporter::AuthorName()
 {			
 	return "Zinek Engine Staff";
 }
 
-const TCHAR *ZE3dsModelExporter::CopyrightMessage() 
+const TCHAR *ZE3dsMaxModelExporter::CopyrightMessage() 
 {	
 	return "Copyright (c) 2008, Zinek Engine Staff";
 }
 
-const TCHAR *ZE3dsModelExporter::OtherMessage1() 
+const TCHAR *ZE3dsMaxModelExporter::OtherMessage1() 
 {		
 	return "";
 }
 
-const TCHAR *ZE3dsModelExporter::OtherMessage2() 
+const TCHAR *ZE3dsMaxModelExporter::OtherMessage2() 
 {		
 	return "";
 }
 
-ZEUInt ZE3dsModelExporter::Version()
+ZEUInt ZE3dsMaxModelExporter::Version()
 {				
 	return 300;
 }
 
-void ZE3dsModelExporter::ShowAbout(HWND hWnd)
+void ZE3dsMaxModelExporter::ShowAbout(HWND hWnd)
 {			
 
 }
 
-BOOL ZE3dsModelExporter::SupportsOptions(ZEInt ext, DWORD options)
+BOOL ZE3dsMaxModelExporter::SupportsOptions(ZEInt ext, DWORD options)
 {
 	return TRUE;
 }
 
 
-ZEInt ZE3dsModelExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
+ZEInt ZE3dsMaxModelExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
 {
 	ZEInt i;
 	if (i_currentNode == NULL)
@@ -176,7 +176,7 @@ ZEInt ZE3dsModelExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNod
 	return i_nodeTab.Count();
 }
 
-void ZE3dsModelExporter::LoadOptions(const char* FilePath)
+void ZE3dsMaxModelExporter::LoadOptions(const char* FilePath)
 {
 	if(strlen(FilePath) != 0)
 	{
@@ -196,7 +196,7 @@ void ZE3dsModelExporter::LoadOptions(const char* FilePath)
 	}
 }
 
-void ZE3dsModelExporter::SaveOptions(const char* FilePath)
+void ZE3dsMaxModelExporter::SaveOptions(const char* FilePath)
 {
 	ZEString OptionsFilePath(FilePath);
 	OptionsFilePath += ".zecfg";
@@ -216,7 +216,7 @@ void ZE3dsModelExporter::SaveOptions(const char* FilePath)
 	}
 }
 
-bool ZE3dsModelExporter::ShowOptionsDialog(HWND ParentWindow)
+bool ZE3dsMaxModelExporter::ShowOptionsDialog(HWND ParentWindow)
 {
 	int Argc = 0;
 	if(QApplication::instance() == NULL)
@@ -228,7 +228,7 @@ bool ZE3dsModelExporter::ShowOptionsDialog(HWND ParentWindow)
 		WinWidget = new QWinWidget(ParentWindow);
 
 	if(OptionsDialog == NULL)
-		OptionsDialog = new ZE3dsModelExporterOptionsDialog(WinWidget);
+		OptionsDialog = new ZE3dsMaxModelExporterOptionsDialog(WinWidget);
 
 	if(ExportOptions != NULL)
 		OptionsDialog->SetOptions(ExportOptions);
@@ -242,7 +242,7 @@ bool ZE3dsModelExporter::ShowOptionsDialog(HWND ParentWindow)
 	return true;
 }
 
-bool ZE3dsModelExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath)
+bool ZE3dsMaxModelExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath)
 {
 	int Argc = 0;
 	if(QApplication::instance() == NULL)
@@ -269,7 +269,7 @@ bool ZE3dsModelExporter::ShowResourceConfigurationDialog(HWND ParentWindow, cons
 	return true;
 }
 
-ZEInt ZE3dsModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
+ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
 	ExportPath = ZEFileInfo::GetParentDirectory(name);
 	LoadOptions(i->GetCurFilePath());
@@ -357,7 +357,7 @@ ZEInt ZE3dsModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface
 	return TRUE;
 }
 
-bool ZE3dsModelExporter::WriteToFile(const char* FilePath)
+bool ZE3dsMaxModelExporter::WriteToFile(const char* FilePath)
 {
 	ZEFile File;
 

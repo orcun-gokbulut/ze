@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZE3dsMaxPlugin.h"
-#include "ZE3dsModelExporter/ZE3dsModelExporterDescription.h"
-#include "ZE3dsMapExporter/ZE3dsMapExporterDescription.h"
+#include "ZE3dsMaxModelExporter/ZE3dsMaxModelExporterDescription.h"
+#include "ZE3dsMaxMapExporter/ZE3dsMaxMapExporterDescription.h"
 #include "ZE3dsMaxUI/ZE3dsMaxUIDescription.h"
 #include "ZETypes.h"
 
@@ -71,9 +71,9 @@ __declspec( dllexport ) ClassDesc* LibClassDesc(ZEInt i)
 	switch(i) 
 	{
 		case 0: 
-			return ZE3dsModelExporterDescription::GetInstance();
+			return ZE3dsMaxModelExporterDescription::GetInstance();
 		case 1:
-			return ZE3dsMapExporterDescription::GetInstance();
+			return ZE3dsMaxMapExporterDescription::GetInstance();
 		case 2:
 			return ZE3dsMaxUIDescription::GetInstance();
 		default: 

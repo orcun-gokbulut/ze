@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsModelExporterDescription.h
+ Zinek Engine - ZE3dsMaxModelExporterOptionsDialog.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,28 +34,44 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE3DS_MODEL_EXPORTER_DESCRIPTION_H__
-#define __ZE3DS_MODEL_EXPORTER_DESCRIPTION_H__
+#ifndef __ZE_3DS_MODEL_EXPORTER_OPTIONS_DIALOG_H__
+#define __ZE_3DS_MODEL_EXPORTER_OPTIONS_DIALOG_H__
 
-#include "ZETypes.h"
+#include "ui_ZE3dsMaxModelExporterOptionsWidget.h"
+#include "QtGui\QDialog"
+#include "ZEDS\ZEString.h"
+#include "ZEML\ZEMLNode.h"
 
-#include <Max.h>
-#include <iparamb2.h>
-
-
-class ZE3dsModelExporterDescription : public ClassDesc2 
+class ZE3dsMaxModelExporterOptionsDialog : public QDialog
 {
-	public:
-		virtual ZEInt				IsPublic();
-		virtual void*				Create(BOOL Loading = FALSE);
-		virtual const TCHAR*		ClassName();
-		virtual SClass_ID			SuperClassID();
-		virtual Class_ID			ClassID();
-		virtual const TCHAR*		Category();
-		virtual const TCHAR*		InternalName();
-		virtual HINSTANCE			HInstance();
+	Q_OBJECT
 
-		static ClassDesc2*			GetInstance();
+	private:
+		Ui::ZE3dsMaxModelExporterOptionsDialogUI*		Form;
+		ZEMLNode*										Options;
+	
+		void			ToggleFileLogging(bool IsEnabled);
+		void			ToggleApplicationPathOptions(bool IsEnabled);
+		void			CollectOptionsFromForm();
+
+	private slots:
+		void			ShowEngineDirectoryDialog();
+		void			ShowLoggingFilePathDialog();
+		void			SetFileLoggingEnabled(int CheckBoxState);
+		void			SetExportBonesEnabled(bool IsChecked);
+		void			SetExportMeshesEnabled(bool IsChecked);
+
+		void			AddAnimation();
+		void			RemoveAnimation();
+
+	public:
+						ZE3dsMaxModelExporterOptionsDialog(QWidget* Parent);
+
+		bool			GetFileLoggingEnabled();
+		ZEString		GetLogFilePath();
+
+		void			SetOptions(ZEMLNode* Options);
+		ZEMLNode*		GetOptions();
 };
 
 #endif

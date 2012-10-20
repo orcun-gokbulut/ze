@@ -47,8 +47,8 @@ link_directories(
 	${ZEBUILD_LIB_PATH}/3dsMax/2010)
 
 add_subdirectory(ZE3dsMaxUI)	
-add_subdirectory(ZE3dsModelExporter)
-add_subdirectory(ZE3dsMapExporter)
+add_subdirectory(ZE3dsMaxModelExporter)
+add_subdirectory(ZE3dsMaxMapExporter)
 add_subdirectory(ZE3dsMaxPlugin)
 add_subdirectory(ZE3dsMaxUtils)
 

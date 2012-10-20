@@ -176,15 +176,17 @@ static const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArr
 
 static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeReader)
 {
-// 	while (NodeReader->Read())
-// 	{	
-// 		if (NodeReader->GetItemName() != "Material")
-// 			break;
-
-	while (NodeReader->GetItemName() == "Materials" || NodeReader->GetItemName() == "Material")
+	ZESize SubItemCount = NodeReader->GetSubItemCount();
+	for (ZESize I = 0; I < SubItemCount; I++)
 	{
-		if (NodeReader->GetItemName() == "Materials")
-			NodeReader->Read();
+		if (!NodeReader->Read())
+		{
+			zeError("Can not read ZEML node.");
+			return false;
+		}
+
+		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Material")
+			continue;
 
 		ZEVariant NameValue, FilePathValue;
 
@@ -205,9 +207,6 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEMLSerialReader* Node
 		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();
 		CurrentMaterial->ReadFromFile(MaterialPath);
 		Model->Materials.Add(CurrentMaterial);
-
-		if (NodeReader->GetItemName() != "Material")
-			NodeReader->Read();
 	}
 
 	NodeReader->GoToCurrentPointer();
@@ -244,10 +243,17 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEMLSeri
 
 	NodeReader->SeekPointer(PhysicalShapesNodePointer);
 
-	while (NodeReader->GetItemName() == "PhysicalShapes" || NodeReader->GetItemName() == "PhysicalShape")
+	ZESize SubItemCount = NodeReader->GetSubItemCount();
+	for (ZESize I = 0; I < SubItemCount; I++)
 	{
-		if(NodeReader->GetItemName() == "PhysicalShapes")
-			NodeReader->Read();
+		if (!NodeReader->Read())
+		{
+			zeError("Can not read ZEML node.");
+			return false;
+		}
+
+		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "PhysicalShape")
+			continue;
 
 		ZEVariant ShapePosition, ShapeRotation, ShapeRestitution, ShapeDynamicFriction, ShapeStaticFriction, ShapeType;
 		ZEMLSerialPointer ShapeNodePointer;
@@ -282,11 +288,11 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEMLSeri
 
 		ZEMLSerialListItem ActualShapeList [] = 
 		{
-			ZEML_LIST_PROPERTY("Height", ShapeHeight,			ZE_VRT_FLOAT,	false),
-			ZEML_LIST_PROPERTY("Width", ShapeWidth,				ZE_VRT_FLOAT,	false),
-			ZEML_LIST_PROPERTY("Length", ShapeLength,			ZE_VRT_FLOAT,	false),
-			ZEML_LIST_PROPERTY("Radius", ShapeRadius,			ZE_VRT_FLOAT,	false),
-			ZEML_LIST_DATA("Vertices", VerticesDataPointer,		ZE_VRT_FLOAT,	false)
+			ZEML_LIST_PROPERTY("Height",	ShapeHeight,			ZE_VRT_FLOAT,	false),
+			ZEML_LIST_PROPERTY("Width",		ShapeWidth,				ZE_VRT_FLOAT,	false),
+			ZEML_LIST_PROPERTY("Length",	ShapeLength,			ZE_VRT_FLOAT,	false),
+			ZEML_LIST_PROPERTY("Radius",	ShapeRadius,			ZE_VRT_FLOAT,	false),
+			ZEML_LIST_DATA("Vertices",		VerticesDataPointer,					false)
 		};
 
 		NodeReader->ReadPropertyList(ActualShapeList, 5);
@@ -330,8 +336,6 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEMLSeri
 				return false;
 			}
 		}
-
-		NodeReader->Read();
 	}
 
 	return true;
@@ -379,10 +383,17 @@ static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 static bool ReadMeshesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeReader)
 {
 
-	while (NodeReader->GetItemName() == "Meshes" || NodeReader->GetItemName() == "Mesh")
+	ZESize SubItemCount = NodeReader->GetSubItemCount();
+	for (ZESize I = 0; I < SubItemCount; I++)
 	{
-		if(NodeReader->GetItemName() == "Meshes")
-			NodeReader->Read();
+		if (!NodeReader->Read())
+		{
+			zeError("Can not read ZEML node.");
+			return false;
+		}
+
+		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Mesh")
+			continue;
 
 		ZEVariant NameValue, PositionValue, RotationValue, ScaleValue, IsSkinnedValue;
 		ZEMLSerialPointer BoundingBoxNodePointer, PhysicalBodyNodePointer, LODsNodePointer;
@@ -428,10 +439,17 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRea
 
 		NodeReader->SeekPointer(LODsNodePointer);
 
-		while (NodeReader->GetItemName() == "LODs" || NodeReader->GetItemName() == "LOD")
+		ZESize SubItemCount = NodeReader->GetSubItemCount();
+		for (ZESize J = 0; J < SubItemCount; J++)
 		{
-			if (NodeReader->GetItemName() == "LODs")
-				NodeReader->Read();
+			if (!NodeReader->Read())
+			{
+				zeError("Can not read ZEML node.");
+				return false;
+			}
+
+			if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "LOD")
+				continue;
 
 			ZEVariant LODLevelValue, MaterialIdValue;
 			ZEMLSerialPointer VerticesDataPointer, AffectingBoneIdsDataPointer;
@@ -476,7 +494,6 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRea
 				NodeReader->GetData(LOD->Vertices.GetCArray(), (ZESize)NodeReader->GetDataSize());
 			}
 
-			NodeReader->Read();
 		}
 
 		CalculateBoundingBox(Mesh);
@@ -491,9 +508,6 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRea
 			Mesh->PhysicalBody.Shapes.Clear();
 			memset(&Mesh->PhysicalBody, 0, sizeof(ZEModelResourcePhysicalBody));
 		}
-
-		if (NodeReader->GetItemName() != "Mesh")
-			NodeReader->Read();
 
 	}
 
@@ -602,7 +616,7 @@ static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEMLS
 
 		ZEML_LIST_PROPERTY("MotorTargetPosition",			MotorTargetPosition,			ZE_VRT_VECTOR3,		true),
 		ZEML_LIST_PROPERTY("MotorTargetVelocity",			MotorTargetVelocity,			ZE_VRT_VECTOR3,		true),
-		ZEML_LIST_PROPERTY("MotorTargetOrientation",		MotorTargetOrientation,			ZE_VRT_VECTOR3,		true),
+		ZEML_LIST_PROPERTY("MotorTargetOrientation",		MotorTargetOrientation,			ZE_VRT_QUATERNION,	true),
 		ZEML_LIST_PROPERTY("MotorTargetAngularVelocity",	MotorTargetAngularVelocity,		ZE_VRT_VECTOR3,		true),
 	};
 
@@ -730,10 +744,17 @@ static void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, ZEIn
 static bool ReadBonesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeReader)
 {
 
-	while (NodeReader->GetItemName() == "Bones" || NodeReader->GetItemName() == "Bone")
+	ZESize SubItemCount = NodeReader->GetSubItemCount();
+	for (ZESize I = 0; I < SubItemCount; I++)
 	{
-		if(NodeReader->GetItemName() == "Bones")
-			NodeReader->Read();
+		if (!NodeReader->Read())
+		{
+			zeError("Can not read ZEML node.");
+			return false;
+		}
+
+		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Bone")
+			continue;
 
 		ZEVariant NameValue, ParentBoneValue, RelativePositionValue, RelativeRotationValue, RelativeScaleValue;
 		ZEMLSerialPointer BoundingBoxNodePointer, PhysicalJointNodePointer, PhysicalBodyNodePointer;
@@ -789,9 +810,6 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRead
 			NodeReader->SeekPointer(PhysicalBodyNodePointer);
 			ReadPhysicalBodyFromFile(&Bone->PhysicalBody, NodeReader);
 		}
-
-		if (NodeReader->GetItemName() != "Bone")
-			NodeReader->Read();
 	}
 
 	for (ZESize I = 0; I < Model->Bones.GetCount(); I++)
@@ -810,20 +828,27 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRead
 static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeReader)
 {
 
-	while (NodeReader->GetItemName() == "Animations" || NodeReader->GetItemName() == "Animation")
+	ZESize SubItemCount = NodeReader->GetSubItemCount();
+	for (ZESize I = 0; I < SubItemCount; I++)
 	{
-		if(NodeReader->GetItemName() == "Animations")
-			NodeReader->Read();
+		if (!NodeReader->Read())
+		{
+			zeError("Can not read ZEML node.");
+			return false;
+		}
+
+		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Animation")
+			continue;
 
 		ZEVariant NameValue, BoneKeyCountValue, MeshKeyCountValue;
 		ZEMLSerialPointer FramesDataPointer;
 
 		ZEMLSerialListItem AnimationList[] = 
 		{
-			ZEML_LIST_PROPERTY("Name",			NameValue,			ZE_VRT_STRING,		true),
-			ZEML_LIST_PROPERTY("BoneKeyCount",	BoneKeyCountValue,	ZE_VRT_INTEGER_32,	true),
-			ZEML_LIST_PROPERTY("MeshKeyCount",	MeshKeyCountValue,	ZE_VRT_INTEGER_32,	true),
-			ZEML_LIST_DATA("Frames",			FramesDataPointer,						true)
+			ZEML_LIST_PROPERTY("Name",			NameValue,			ZE_VRT_STRING,					true),
+			ZEML_LIST_PROPERTY("BoneKeyCount",	BoneKeyCountValue,	ZE_VRT_UNSIGNED_INTEGER_32,		true),
+			ZEML_LIST_PROPERTY("MeshKeyCount",	MeshKeyCountValue,	ZE_VRT_UNSIGNED_INTEGER_32,		true),
+			ZEML_LIST_DATA("Frames",			FramesDataPointer,									true)
 		};
 
 		if (!NodeReader->ReadPropertyList(AnimationList, 4))
@@ -833,9 +858,9 @@ static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEMLSerialReader* Nod
 
 		strncpy(Animation->Name, NameValue.GetString(), ZE_MDLF_MAX_NAME_SIZE);
 		
-		ZEInt BoneKeyCount = BoneKeyCountValue;
-		ZEInt MeshKeyCount = MeshKeyCountValue;
-		ZEInt FrameKeyCount = BoneKeyCount + MeshKeyCount;
+		ZEUInt BoneKeyCount = BoneKeyCountValue;
+		ZEUInt MeshKeyCount = MeshKeyCountValue;
+		ZEUInt FrameKeyCount = BoneKeyCount + MeshKeyCount;
 
 		NodeReader->SeekPointer(FramesDataPointer);
 		Animation->Frames.SetCount(((ZESize)NodeReader->GetDataSize() / sizeof(ZEModelResourceAnimationKey)) / (ZESize)FrameKeyCount);
@@ -855,8 +880,6 @@ static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEMLSerialReader* Nod
 				NodeReader->GetData(CurrentAnimationFrame->MeshKeys.GetCArray(), MeshKeyCount * sizeof(ZEModelResourceAnimationKey), (I * (FrameKeyCount + BoneKeyCount)) * sizeof(ZEModelResourceAnimationKey));
 		}
 
-		if (NodeReader->GetItemName() != "Animation")
-			NodeReader->Read();
 	}
 
 	NodeReader->GoToCurrentPointer();
