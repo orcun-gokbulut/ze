@@ -35,12 +35,21 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+ze_add_source(ZEProgressDialog.h					Sources)
+ze_add_source(ZEProgressDialog.cpp					Sources)
+ze_add_source(ZEProgressDialogTask.h				Sources)
+ze_add_source(ZEProgressDialogTask.cpp				Sources)
+ze_add_source(ZEProgressDialog.ui					Sources QtUI)
+ze_add_source(ZEProgresDialogSignalHandler.h		Sources QtMocs)
+ze_add_source(ZEProgresDialogSignalHandler.cpp		Sources)
+ze_add_source(ZEProgressDialogTreeWidget.h			Sources)
+ze_add_source(ZEProgressDialogTreeWidget.cpp		Sources)
+
+qt4_add_resources (QtResourceFiles ${QtResources})
+qt4_wrap_ui (QtUIFiles ${QtUI})
+qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-ze_add_source(ZEResourceOption.h			    Sources)
-ze_add_source(ZEResourceOption.cpp			    Sources)
-ze_add_source(ZEResourceConfigurator.h			Sources)
-ze_add_source(ZEResourceConfigurator.cpp		Sources)
-
-ze_add_library(ZEResourceConfigurator 
-	SOURCES ${Sources})
+ze_add_library(ZEProgressDialog 
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles})
