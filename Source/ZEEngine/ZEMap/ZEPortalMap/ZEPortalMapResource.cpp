@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPortalMapResource.h"
-#include "ZEPortalMapFileFormat.h"
 
 #include "ZEError.h"
 #include "ZEFile/ZEFile.h"
@@ -48,6 +47,7 @@
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEML/ZEMLSerialReader.h"
 #include "ZEFile/ZEPathUtils.h"
+#include "ZEFoundation/ZEPacking.h"
 
 // Reading
 #define ZE_SHADER_SKINTRANSFORM				1
@@ -232,6 +232,23 @@ bool ZEPortalMapResource::ReadPortalDoors(ZEMLSerialReader* Reader)
 
 bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
 {
+	ZEPackStruct(
+	struct ZEMapFileVertexChunk
+	{
+		ZEVector3				Position;
+		ZEVector3				Normal;
+		ZEVector3				Tangent;
+		ZEVector3				Binormal;
+		ZEVector2				Texcoord;
+	});
+
+	ZEPackStruct(
+	struct ZEMapFilePolygonChunk
+	{	
+		ZEUInt32				Material;
+		ZEMapFileVertexChunk	Vertices[3];
+	});
+
 	ZEUInt32 PortalCounter = 0;
 
 	while(Reader->Read())
@@ -265,11 +282,25 @@ bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
 
 		for (ZESize I = 0; I < Portal->Polygons.GetCount(); I++)
 		{
-			Portal->Polygons[I].LastIteration	= 0;
-			Portal->Polygons[I].Material			= Materials[(ZESize)MapPolygons[I].Material];
-			Portal->Polygons[I].Vertices[0]		= *(ZEMapVertex*)&MapPolygons[I].Vertices[0];
-			Portal->Polygons[I].Vertices[1]		= *(ZEMapVertex*)&MapPolygons[I].Vertices[1];
-			Portal->Polygons[I].Vertices[2]		= *(ZEMapVertex*)&MapPolygons[I].Vertices[2];
+			Portal->Polygons[I].LastIteration			= 0;
+			Portal->Polygons[I].Material				= Materials[(ZESize)MapPolygons[I].Material];
+			Portal->Polygons[I].Vertices[0].Position	= MapPolygons[I].Vertices[0].Position;
+			Portal->Polygons[I].Vertices[0].Normal		= MapPolygons[I].Vertices[0].Normal;
+			Portal->Polygons[I].Vertices[0].Tangent		= MapPolygons[I].Vertices[0].Tangent;
+			Portal->Polygons[I].Vertices[0].Binormal	= MapPolygons[I].Vertices[0].Binormal;
+			Portal->Polygons[I].Vertices[0].Texcoord	= MapPolygons[I].Vertices[0].Texcoord;
+
+			Portal->Polygons[I].Vertices[1].Position	= MapPolygons[I].Vertices[1].Position;
+			Portal->Polygons[I].Vertices[1].Normal		= MapPolygons[I].Vertices[1].Normal;
+			Portal->Polygons[I].Vertices[1].Tangent		= MapPolygons[I].Vertices[1].Tangent;
+			Portal->Polygons[I].Vertices[1].Binormal	= MapPolygons[I].Vertices[1].Binormal;
+			Portal->Polygons[I].Vertices[1].Texcoord	= MapPolygons[I].Vertices[1].Texcoord;
+
+			Portal->Polygons[I].Vertices[2].Position	= MapPolygons[I].Vertices[2].Position;
+			Portal->Polygons[I].Vertices[2].Normal		= MapPolygons[I].Vertices[2].Normal;
+			Portal->Polygons[I].Vertices[2].Tangent		= MapPolygons[I].Vertices[2].Tangent;
+			Portal->Polygons[I].Vertices[2].Binormal	= MapPolygons[I].Vertices[2].Binormal;
+			Portal->Polygons[I].Vertices[2].Texcoord	= MapPolygons[I].Vertices[2].Texcoord;
 		}
 
 		ZEAABBox BoundingBox(ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX), ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
