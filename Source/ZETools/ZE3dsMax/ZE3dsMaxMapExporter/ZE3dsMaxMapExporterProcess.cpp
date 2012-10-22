@@ -591,7 +591,7 @@ bool ZE3dsMaxMapExporter::ProcessMaterials(const char* FileName)
 
 		//AMBIENT
 		zeLog("Writing ambient data.");
-		MaterialConfigNode.WriteProperty("AmbientEnabled", true); //Ambient is forced true
+		MaterialConfigNode.WriteProperty("AmbientEnabled", false); //Ambient is forced false
 		ZEVector3 TempVector3Value = ZEVector3::Zero;
 		NodeMaterial->GetAmbientData()->GetPropertyValue(*(Point3*)&TempVector3Value);
 		MaterialConfigNode.WriteProperty("AmbientColor", TempVector3Value);
@@ -618,7 +618,7 @@ bool ZE3dsMaxMapExporter::ProcessMaterials(const char* FileName)
 
 		//EMISSIVE
 		zeLog("Writing emissive data.");
-		MaterialConfigNode.WriteProperty("EmmisiveEnabled", true /*(MapFlag & ZE_MTMP_EMISSIVEMAP) != 0*/); //Emissive is forced true
+		MaterialConfigNode.WriteProperty("EmmisiveEnabled", (MapFlag & ZE_MTMP_EMISSIVEMAP) != 0);
 		TempFloatValue = 0.0f;
 		NodeMaterial->GetEmissiveAmtData()->GetPropertyValue(TempFloatValue);
 		MaterialConfigNode.WriteProperty("EmmisiveFactor", TempFloatValue);
