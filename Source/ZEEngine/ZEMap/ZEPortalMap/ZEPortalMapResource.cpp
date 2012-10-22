@@ -126,12 +126,12 @@ bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
 	ZEVariant DoorCount, PortalCount, MaterialCount;
 
 	ZEMLSerialListItem MapList[] = {
-		ZEML_LIST_NODE("Portals",			PortalsPointer,		true),
-		ZEML_LIST_NODE("Doors",				DoorsPointer,		true),
-		ZEML_LIST_NODE("Materials",			MaterialsPointer,	true),
-		ZEML_LIST_PROPERTY("DoorCount",		DoorCount,			ZE_VRT_UNSIGNED_INTEGER_32,	true),
-		ZEML_LIST_PROPERTY("PortalCount",	PortalCount,		ZE_VRT_UNSIGNED_INTEGER_32,	true),
-		ZEML_LIST_PROPERTY("MaterialCount", MaterialCount,		ZE_VRT_UNSIGNED_INTEGER_32,	true)
+		ZEML_LIST_NODE("Portals",				PortalsPointer,										true),
+		ZEML_LIST_NODE("Doors",					DoorsPointer,										true),
+		ZEML_LIST_NODE("Materials",				MaterialsPointer,									true),
+		ZEML_LIST_PROPERTY("DoorCount",			DoorCount,			ZE_VRT_UNSIGNED_INTEGER_32,		true),
+		ZEML_LIST_PROPERTY("PortalCount",		PortalCount,		ZE_VRT_UNSIGNED_INTEGER_32,		true),
+		ZEML_LIST_PROPERTY("MaterialCount",		MaterialCount,		ZE_VRT_UNSIGNED_INTEGER_32,		true)
 	};
 
 	if(!Reader.ReadPropertyList(MapList, 6))
@@ -172,37 +172,42 @@ bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
 
 bool ZEPortalMapResource::ReadPortalDoors(ZEMLSerialReader* Reader)
 {
-	ZEUInt32 DoorCounter = 0;
-
-	while(Reader->Read())
+	ZESize SubItemCount = Reader->GetSubItemCount();
+	for (ZESize I = 0; I < SubItemCount; I++)
 	{
-		if(Reader->GetItemName() != "Door")
-			break;
+		if (!Reader->Read())
+		{
+			zeError("Can not read ZEML node.");
+			return false;
+		}
+
+		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Door")
+			continue;
 
 		ZEVariant DoorName, IsOpen, PortalAIndex, PortalBIndex, Point1, Point2, Point3, Point4;
 		ZEMLSerialPointer RectanglePointer;
 
 		ZEMLSerialListItem DoorPropertiesList[] = { 
-			ZEML_LIST_PROPERTY("Name",			DoorName,		ZE_VRT_STRING,	true),  
-			ZEML_LIST_PROPERTY("IsOpen",		IsOpen,			ZE_VRT_BOOLEAN, 	true),
-			ZEML_LIST_PROPERTY("PortalAIndex",	PortalAIndex,	ZE_VRT_UNSIGNED_INTEGER_32,	true),  
-			ZEML_LIST_PROPERTY("PortalBIndex",	PortalBIndex,	ZE_VRT_UNSIGNED_INTEGER_32,	true),
-			ZEML_LIST_NODE("Rectangle",			RectanglePointer,	true)
+			ZEML_LIST_PROPERTY("Name",				DoorName,			ZE_VRT_STRING,					true),  
+			ZEML_LIST_PROPERTY("IsOpen",			IsOpen,				ZE_VRT_BOOLEAN, 				true),
+			ZEML_LIST_PROPERTY("PortalAIndex",		PortalAIndex,		ZE_VRT_UNSIGNED_INTEGER_32,		true),  
+			ZEML_LIST_PROPERTY("PortalBIndex",		PortalBIndex,		ZE_VRT_UNSIGNED_INTEGER_32,		true),
+			ZEML_LIST_NODE("Rectangle",				RectanglePointer,									true)
 		};
 
 		Reader->ReadPropertyList(DoorPropertiesList, 5);
 
 		ZEMLSerialListItem RectangleList[] = { 
-			ZEML_LIST_PROPERTY("Point1", Point1, ZE_VRT_VECTOR3, true),  
-			ZEML_LIST_PROPERTY("Point2", Point2, ZE_VRT_VECTOR3, true),
-			ZEML_LIST_PROPERTY("Point3", Point3, ZE_VRT_VECTOR3, true),  
-			ZEML_LIST_PROPERTY("Point4", Point4, ZE_VRT_VECTOR3, true),
+			ZEML_LIST_PROPERTY("Point1",	Point1,		ZE_VRT_VECTOR3,		true),  
+			ZEML_LIST_PROPERTY("Point2",	Point2,		ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("Point3",	Point3,		ZE_VRT_VECTOR3,		true),  
+			ZEML_LIST_PROPERTY("Point4",	Point4,		ZE_VRT_VECTOR3,		true)
 		};
 
 		Reader->SeekPointer(RectanglePointer);
 		Reader->ReadPropertyList(RectangleList, 4);
 
-		ZEPortalMapResourceDoor* Door = &Doors[DoorCounter];
+		ZEPortalMapResourceDoor* Door = &Doors[I];
 
 		strncpy(Door->Name, DoorName.GetString().ToCString(), ZE_MAX_NAME_SIZE);
 		Door->IsOpen = IsOpen.GetBoolean();
@@ -214,15 +219,14 @@ bool ZEPortalMapResource::ReadPortalDoors(ZEMLSerialReader* Reader)
 
 		Door->PortalIds[0] = PortalAIndex.GetUInt32();
 		Door->Portals[0] = &Portals[(ZESize)Door->PortalIds[0]];
-		Door->Portals[0]->DoorIds.Add(DoorCounter);
+		Door->Portals[0]->DoorIds.Add(I);
 		Door->Portals[0]->Doors.Add(Door);
 
 		Door->PortalIds[1] = PortalBIndex.GetUInt32();
 		Door->Portals[1] = &Portals[(ZESize)Door->PortalIds[1]];
-		Door->Portals[1]->DoorIds.Add(DoorCounter);
+		Door->Portals[1]->DoorIds.Add(I);
 		Door->Portals[1]->Doors.Add(Door);
 
-		DoorCounter++;
 	}
 
 	Reader->GoToCurrentPointer();
@@ -249,26 +253,31 @@ bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
 		ZEMapFileVertexChunk	Vertices[3];
 	});
 
-	ZEUInt32 PortalCounter = 0;
-
-	while(Reader->Read())
+	ZESize SubItemCount = Reader->GetSubItemCount();
+	for (ZESize I = 0; I < SubItemCount; I++)
 	{
-		if(Reader->GetItemName() != "Portal")
-			break;
+		if (!Reader->Read())
+		{
+			zeError("Can not read ZEML node.");
+			return false;
+		}
+
+		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Portal")
+			continue;
 
 		ZEVariant PortalName, PhysicalMeshEnabled;
 		ZEMLSerialPointer PolygonsPointer, PhysicalMeshPointer;
 
 		ZEMLSerialListItem PortalPropertiesList[] = {
-			ZEML_LIST_PROPERTY("Name",					PortalName, ZE_VRT_STRING,	true),
-			ZEML_LIST_DATA("Polygons",					PolygonsPointer,		true),
-			ZEML_LIST_NODE("PhysicalMesh",				PhysicalMeshPointer,	false)
+			ZEML_LIST_PROPERTY("Name",			PortalName,		ZE_VRT_STRING,	true),
+			ZEML_LIST_DATA("Polygons",			PolygonsPointer,				true),
+			ZEML_LIST_NODE("PhysicalMesh",		PhysicalMeshPointer,			false)
 		};
 
 		Reader->ReadPropertyList(PortalPropertiesList, 3);
 		Reader->SeekPointer(PolygonsPointer);
 
-		ZEPortalMapResourcePortal* Portal = &Portals[PortalCounter];
+		ZEPortalMapResourcePortal* Portal = &Portals[I];
 		strncpy(Portal->Name, PortalName.GetString().ToCString(), ZE_MAX_NAME_SIZE);
 
 		ZEArray<ZEMapFilePolygonChunk> MapPolygons;
@@ -330,8 +339,8 @@ bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
 			Reader->SeekPointer(PhysicalMeshPointer);
 
 			ZEMLSerialListItem PhysicalMeshList[] = {
-				ZEML_LIST_DATA("Polygons", PhysicalPolygonsPointer, true),
-				ZEML_LIST_DATA("Vertices", PhysicalVerticesPointer, true)
+				ZEML_LIST_DATA("Polygons",		PhysicalPolygonsPointer,	true),
+				ZEML_LIST_DATA("Vertices",		PhysicalVerticesPointer,	true)
 			};
 
 			Reader->ReadPropertyList(PhysicalMeshList, 2);
@@ -348,7 +357,6 @@ bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
 		else
 			zeWarning("Portal %s does not have physical mesh.", PortalName.GetString().ToCString());
 
-		PortalCounter++;
 	}
 
 	Reader->GoToCurrentPointer();
@@ -361,28 +369,32 @@ bool ZEPortalMapResource::ReadMaterials(ZEMLSerialReader* Reader)
 	for(ZESize I = 0; I < Materials.GetCount(); I++)
 		Materials[I] = ZEFixedMaterial::CreateInstance();
 
-	ZEUInt32 MaterialCounter = 0;
-
-	while(Reader->Read())
+	ZESize SubItemCount = Reader->GetSubItemCount();
+	for (ZESize I = 0; I < SubItemCount; I++)
 	{
-		if(Reader->GetItemName() != "Material")
-			break;
+		if (!Reader->Read())
+		{
+			zeError("Can not read ZEML node.");
+			return false;
+		}
+
+		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Material")
+			continue;
 
 		ZEVariant MaterialName, MaterialRelativePath;
 
 		ZEMLSerialListItem MaterialList[] = {
-			ZEML_LIST_PROPERTY("Name", MaterialName, ZE_VRT_STRING, true),
-			ZEML_LIST_PROPERTY("FilePath", MaterialRelativePath, ZE_VRT_STRING, true)
+			ZEML_LIST_PROPERTY("Name",		MaterialName,			ZE_VRT_STRING,	true),
+			ZEML_LIST_PROPERTY("FilePath",	MaterialRelativePath,	ZE_VRT_STRING,	true)
 		};
 
 		Reader->ReadPropertyList(MaterialList, 2);
 		
 		ZEString MaterialPath = ZEFileInfo::GetParentDirectory(GetFileName()) + ZEPathUtils::GetSeperator() + MaterialRelativePath.GetString();
 
-		ZEFixedMaterial* CurrentMaterial = (ZEFixedMaterial*)Materials[MaterialCounter];
+		ZEFixedMaterial* CurrentMaterial = (ZEFixedMaterial*)Materials[I];
 		CurrentMaterial->ReadFromFile(MaterialPath);
 
-		MaterialCounter++;
 	}
 
 	Reader->GoToCurrentPointer();
