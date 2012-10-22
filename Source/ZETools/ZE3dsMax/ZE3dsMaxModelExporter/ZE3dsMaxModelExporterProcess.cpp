@@ -375,7 +375,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 			MaterialConfigNode.WriteProperty("Transparant", false);
 
 		//AMBIENT
-		MaterialConfigNode.WriteProperty("AmbientEnabled", true); //Ambient is forced true
+		MaterialConfigNode.WriteProperty("AmbientEnabled", false); //Ambient is forced false
 		ZEVector3 TempVector3Value = ZEVector3::Zero;
 		NodeMaterial->GetAmbientData()->GetPropertyValue(*(Point3*)&TempVector3Value);
 		MaterialConfigNode.WriteProperty("AmbientColor", TempVector3Value);
@@ -399,7 +399,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 		MaterialConfigNode.WriteProperty("SpecularMap", SpecularMap);
 
 		//EMISSIVE
-		MaterialConfigNode.WriteProperty("EmmisiveEnabled", true /*(MapFlag & ZE_MTMP_EMISSIVEMAP) != 0*/); //Emissive is forced true
+		MaterialConfigNode.WriteProperty("EmmisiveEnabled", (MapFlag & ZE_MTMP_EMISSIVEMAP) != 0);
 		TempFloatValue = 0.0f;
 		NodeMaterial->GetEmissiveAmtData()->GetPropertyValue(TempFloatValue);
 		MaterialConfigNode.WriteProperty("EmmisiveFactor", TempFloatValue);
