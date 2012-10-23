@@ -42,18 +42,24 @@
 #include "ZEMath/ZERectangle.h"
 #include "ZETexture/ZETextureOptions.h"
 
-#define ZE_FONT_CHARACTER_COUNT				256
-
 class ZETexture2D;
 class ZETexture2DResource;
 class ZEUIMaterial;
 class ZEMaterial;
 
-struct ZEFontCharacter
+struct ZEFontResourceCharacter
 {
 	const ZEMaterial*		Material;
 	const ZETexture2D*		Texture;
 	ZERectangle				CoordinateRectangle;
+	ZEUInt32				Value;
+};
+
+struct ZEFontFileCharacter
+{
+	ZEUInt32					TextureId;
+	ZERectangle					Coordinates;
+	ZEUInt32					Value;
 };
 
 class ZEFontResource : public ZEResource
@@ -61,7 +67,8 @@ class ZEFontResource : public ZEResource
 	private:
 		ZEArray<ZETexture2DResource*>		TextureResources;
 		ZEArray<ZEUIMaterial*>				Materials;
-		ZEFontCharacter						Characters[ZE_FONT_CHARACTER_COUNT];
+		ZEArray<ZEFontResourceCharacter>	Characters;
+		//ZEFontCharacter						Characters[ZE_FONT_CHARACTER_COUNT];
 
 	protected:
 											ZEFontResource();
@@ -69,7 +76,7 @@ class ZEFontResource : public ZEResource
 
 	public:
 		virtual const char*					GetResourceType() const;
-		const ZEFontCharacter&				GetCharacter(char Character);
+		const ZEFontResourceCharacter&		GetCharacter(char Character);
 
 		static ZEFontResource*				LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);

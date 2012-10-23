@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
-#include "ZEFontFile.h"
 #include "ZEFontResource.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEFile/ZEPartialFile.h"
@@ -42,6 +41,8 @@
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZETexture/ZETextureOptions.h"
 #include "ZECore/ZEResourceManager.h"
+#include "ZEML/ZEMLSerialReader.h"
+#include "ZEFile/ZEDirectoryInfo.h"
 
 
 static ZEString ConstructResourcePath(const ZEString& Path)
@@ -90,9 +91,10 @@ const char* ZEFontResource::GetResourceType() const
 	return "Font Resource";
 }
 
-const ZEFontCharacter& ZEFontResource::GetCharacter(char Character)
+const ZEFontResourceCharacter& ZEFontResource::GetCharacter(char Character)
 {
-	return Characters[Character];
+	ZESize Index = Character - Characters[0].Value;
+	return Characters[Index];
 }
 
 ZEFontResource* ZEFontResource::LoadSharedResource(const ZEString& FilePath, const ZETextureOptions* UserOptions)
@@ -173,6 +175,20 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 {
 	zeLog("Loading font file \"%s\".", ResourceFile->GetPath().GetValue());
 
+	ZEMLSerialReader Reader(ResourceFile);
+
+	if(!Reader.Read())
+	{
+		zeError("Can not read fot file. File path : %s", ResourceFile->GetPath());
+		return NULL;
+	}
+
+	if(Reader.GetItemName() != "ZEFont")
+	{
+		zeError("Given file is not a font file. File path : %s", ResourceFile->GetPath());
+		return NULL;
+	}
+
 	if(UserOptions == NULL)
 		UserOptions = zeGraphics->GetTextureOptions();
 
@@ -184,53 +200,89 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 										ZE_TMM_DISABLED, 
 										UserOptions->MaximumMipmapLevel};
 
-	ZEFontFileHeader FileHeader;
-	ResourceFile->Read(&FileHeader, sizeof(ZEFontFileHeader), 1);
-	if (FileHeader.Header != ZE_FONT_FILE_HEADER)
-	{
-		zeError("Unknown ZEFont file format. (FilePath : \"%s\")", ResourceFile->GetPath().GetValue());
-		return NULL;
-	}
-
 	ZEFontResource* NewResource = new ZEFontResource();
 	NewResource->SetFileName(ResourceFile->GetPath());
-	NewResource->TextureResources.SetCount((ZESize)FileHeader.TextureCount);
-	NewResource->Materials.SetCount((ZESize)FileHeader.TextureCount);
 
-	for (ZESize I = 0; I < (ZESize)FileHeader.TextureCount; I++)
+	ZEVariant TextureCount;
+	ZEMLSerialPointer CharactersPointer, TexturesPointer;
+
+	ZEMLSerialListItem List[] = {
+		ZEML_LIST_DATA("Characters",		CharactersPointer,	true),
+		ZEML_LIST_NODE("Textures",			TexturesPointer,	false),
+		ZEML_LIST_PROPERTY("TextureCount",	TextureCount, ZE_VRT_UNSIGNED_INTEGER_32, true)
+	};
+
+	Reader.ReadPropertyList(List, 3);
+
+	if(TexturesPointer != -1)
 	{
-		ZEUInt32 FileCursor, TextureFileSize;
-		
-		ResourceFile->Read(&TextureFileSize, sizeof(ZEUInt32), 1);
-		FileCursor = (ZEUInt32)ResourceFile->Tell();
+		NewResource->TextureResources.SetCount(TextureCount.GetUInt32());
+		NewResource->Materials.SetCount(TextureCount.GetUInt32());
+		Reader.SeekPointer(TexturesPointer);
 
-		ZEPartialFile TextureResourceFile;
-		TextureResourceFile.Open(ResourceFile, FileCursor, TextureFileSize);
-
-		ZETexture2DResource* CurrentTexture = ZETexture2DResource::LoadResource((ZEFile*)&TextureResourceFile, &ModifiedOptions);
-		if (CurrentTexture == NULL)
+		for (ZESize I = 0; I < (ZESize)TextureCount.GetUInt32(); I++)
 		{
-			zeError("Can not read texture from the file. (FilePath : \"%s\", Texture Index : %d)", ResourceFile->GetPath().GetValue(), I);
-			TextureResourceFile.Close();
-			delete NewResource;
-			return NULL;
+			if(!Reader.Read())
+			{
+				zeError("Can not read texture file.");
+				delete NewResource;
+				return NULL;
+			}
+
+			if(Reader.GetItemName() != "Texture")
+			{
+				zeError("Can not read texture file.");
+				delete NewResource;
+				return NULL;
+			}
+
+			if(!Reader.Read())
+			{
+				zeError("Can not read texture file name.");
+				delete NewResource;
+				return NULL;
+			}
+
+			if(Reader.GetItemName() != "FileName")
+			{
+				zeError("Can not read texture file name.");
+				delete NewResource;
+				return NULL;
+			}
+
+			ZEString TextureFilePath = ZEDirectoryInfo::GetParentDirectory(ResourceFile->GetPath()) + "\\" + Reader.GetItemValue().GetString();
+
+			ZETexture2DResource* CurrentTexture = ZETexture2DResource::LoadResource(TextureFilePath, &ModifiedOptions);
+			if (CurrentTexture == NULL)
+			{
+				zeError("Can not read texture from the file. (FilePath : \"%s\", Texture Index : %d)", TextureFilePath.ToCString(), I);
+				delete NewResource;
+				return NULL;
+			}
+
+			NewResource->TextureResources[I] = CurrentTexture;
+
+			NewResource->Materials[I] = ZEUIMaterial::CreateInstance();
+			NewResource->Materials[I]->SetWireFrame(false);
+			NewResource->Materials[I]->SetTexture(NewResource->TextureResources[I]->GetTexture());
+			NewResource->Materials[I]->UpdateMaterial();
 		}
-		TextureResourceFile.Close();
-
-		NewResource->TextureResources[I] = CurrentTexture;
-
-		NewResource->Materials[I] = ZEUIMaterial::CreateInstance();
-		NewResource->Materials[I]->SetWireFrame(false);
-		NewResource->Materials[I]->SetTexture(NewResource->TextureResources[I]->GetTexture());
-		NewResource->Materials[I]->UpdateMaterial();
-		ResourceFile->Seek(FileCursor + TextureFileSize, ZE_SF_BEGINING);
 	}
+	else
+		zeWarning("Font file does not contain any textures.");
 
-	for (ZESize I = 0; I < ZE_FONT_FILE_CHARACTER_COUNT; I++)
+	Reader.SeekPointer(CharactersPointer);
+	ZEArray<ZEFontFileCharacter> FileCharacters;
+	FileCharacters.SetCount(Reader.GetDataSize() / sizeof(ZEFontFileCharacter));
+	Reader.GetData(FileCharacters.GetCArray(), Reader.GetDataSize());
+	NewResource->Characters.SetCount(FileCharacters.GetCount());
+
+	for (ZESize I = 0; I < NewResource->Characters.GetCount(); I++)
 	{
-		NewResource->Characters[I].CoordinateRectangle = FileHeader.Characters[I].Coordinates;
-		NewResource->Characters[I].Texture = NewResource->TextureResources[(ZESize)FileHeader.Characters[I].TextureId]->GetTexture();
-		NewResource->Characters[I].Material = NewResource->Materials[(ZESize)FileHeader.Characters[I].TextureId];
+		NewResource->Characters[I].CoordinateRectangle = FileCharacters[I].Coordinates;
+		NewResource->Characters[I].Texture = NewResource->TextureResources[FileCharacters[I].TextureId]->GetTexture();
+		NewResource->Characters[I].Material = NewResource->Materials[FileCharacters[I].TextureId];
+		NewResource->Characters[I].Value = FileCharacters[I].Value;
 	}
 
 	zeLog("Font file \"%s\" has been loaded.", ResourceFile->GetPath().GetValue());

@@ -38,6 +38,7 @@
 #define __ZEML_VISUALIZER_WIDGET_H__
 
 #include "QtGui/QWidget"
+#include "ZEDS/ZEString.h"
 
 class ZEMLNode;
 class QApplication;
@@ -80,6 +81,7 @@ class ZEMLVisualizerWidget
 		void							Show();
 		void							Hide();
 
+		void							SetZEMLFile(const ZEString& FileNamme);
 		void							SetZEMLNode(ZEMLNode* Node);
 		void							Refresh();
 

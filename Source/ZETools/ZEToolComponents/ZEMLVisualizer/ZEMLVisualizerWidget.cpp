@@ -43,6 +43,7 @@
 #include "ZEML/ZEMLDataProperty.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMLVisualizerTreeWidget.h"
+#include "ZEFile/ZEFile.h"
 
 ZEMLVisualizerQt::ZEMLVisualizerQt(QWidget* Parent)
 {
@@ -106,8 +107,28 @@ void ZEMLVisualizerWidget::Hide()
 
 void ZEMLVisualizerWidget::SetZEMLNode(ZEMLNode* Node)
 {
+	if(this->Node != NULL)
+	{
+		delete this->Node;
+		this->Node = NULL;
+	}
+
 	this->Node = Node;
 	Refresh();
+}
+
+void ZEMLVisualizerWidget::SetZEMLFile(const ZEString& FileName)
+{
+	ZEFile File;
+
+	if(!File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
+		zeError("Can not open given file. File name : %s", FileName.ToCString());
+
+	Node = new ZEMLNode("Root");
+	Node->Read(&File);
+	File.Close();
+
+	SetZEMLNode(Node);
 }
 
 void ZEMLVisualizerWidget::Refresh()

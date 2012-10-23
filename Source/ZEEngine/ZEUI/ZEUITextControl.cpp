@@ -116,7 +116,7 @@ void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 	Output.ZOrder = ZOrder;
 	for (ZESize I = 0; I < Size; I++)
 	{
-		const ZEFontCharacter& CurrCharacter = FontResource->GetCharacter(Narrow[I]);
+		const ZEFontResourceCharacter& CurrCharacter = FontResource->GetCharacter(Narrow[I]);
 
 		ZEVector2::Substution(CharacterSize, CurrCharacter.CoordinateRectangle.RightDown, CurrCharacter.CoordinateRectangle.LeftUp);
 		ZEVector2::Multiply(CharacterSize, CharacterSize, FontSize);
