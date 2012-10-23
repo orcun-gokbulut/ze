@@ -196,8 +196,8 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 	ZETextureOptions ModifiedOptions = {UserOptions->CompressionType, 
 										UserOptions->CompressionQuality,
 										ZE_TDS_NONE, 
-										UserOptions->FileCaching,
-										ZE_TMM_DISABLED, 
+										ZE_TFC_DISABLED,
+										ZE_TMM_DISABLED,
 										UserOptions->MaximumMipmapLevel};
 
 	ZEFontResource* NewResource = new ZEFontResource();
