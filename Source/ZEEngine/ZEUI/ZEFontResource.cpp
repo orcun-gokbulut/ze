@@ -281,7 +281,12 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 	{
 		NewResource->Characters[I].CoordinateRectangle = FileCharacters[I].Coordinates;
 		NewResource->Characters[I].Texture = NewResource->TextureResources[FileCharacters[I].TextureId]->GetTexture();
-		NewResource->Characters[I].Material = NewResource->Materials[FileCharacters[I].TextureId];
+		
+		if(TexturesPointer != -1)
+			NewResource->Characters[I].Material = NewResource->Materials[FileCharacters[I].TextureId];
+		else
+			NewResource->Characters[I].Material = NULL;
+		
 		NewResource->Characters[I].Value = FileCharacters[I].Value;
 	}
 
