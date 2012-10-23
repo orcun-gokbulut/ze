@@ -37,6 +37,12 @@
 #include "ZETypes.h"
 #include "QtGui/QHeaderView"
 #include "QtGui/QScrollBar"
+#include "QtCore/qmimedata.h"
+#include "ZEMLVisualizerWidget.h"
+#include "ZEFile/ZEFileUtils.h"
+#include "QtGui/Qevent.h"
+#include "QtCore/QUrl"
+#include "QtCore/QString"
 
 ZEMLVisualizerTreeWidget::ZEMLVisualizerTreeWidget(QWidget* Parent) : QTreeWidget(Parent)
 {
@@ -44,6 +50,9 @@ ZEMLVisualizerTreeWidget::ZEMLVisualizerTreeWidget(QWidget* Parent) : QTreeWidge
 	Header->setText(0, "Name");
 	Header->setText(1, "Type");
 	Header->setText(2, "Value");
+	ParentWidget = Parent;
+	setAcceptDrops(true);
+	setDragDropMode(DragDrop);
 }
 
 void ZEMLVisualizerTreeWidget::drawRow(QPainter* Painter, const QStyleOptionViewItem &Option, const QModelIndex &Index) const
@@ -71,4 +80,23 @@ void ZEMLVisualizerTreeWidget::drawRow(QPainter* Painter, const QStyleOptionView
 			}
 		} 
 	}
+}
+
+void ZEMLVisualizerTreeWidget::dragEnterEvent(QDragEnterEvent* Event)
+{
+	if(Event->mimeData()->hasUrls())
+		Event->acceptProposedAction();
+}
+
+void ZEMLVisualizerTreeWidget::dropEvent(QDropEvent* Event)
+{
+	if(!ZEFileUtils::IsFile((const char*)Event->mimeData()->urls()[0].path().toLatin1()))
+		return;
+
+	((ZEMLVisualizerWidget*)ParentWidget)->SetZEMLFile((const char*)Event->mimeData()->urls()[0].path().toLatin1());
+}
+
+bool ZEMLVisualizerTreeWidget::dropMimeData(QTreeWidgetItem* Parent, int Index, const QMimeData* Data, Qt::DropAction Action)
+{
+	return true;
 }

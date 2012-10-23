@@ -35,8 +35,6 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEFontFile.cpp					Sources)
-ze_add_source(ZEFontFile.h						Sources Headers)
 ze_add_source(ZEFontResource.cpp				Sources)
 ze_add_source(ZEFontResource.h					Sources Headers)
 ze_add_source(ZEIUCheckBoxControl.cpp			Sources)
