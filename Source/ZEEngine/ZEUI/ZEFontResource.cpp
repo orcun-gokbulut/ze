@@ -94,6 +94,10 @@ const char* ZEFontResource::GetResourceType() const
 const ZEFontResourceCharacter& ZEFontResource::GetCharacter(char Character)
 {
 	ZESize Index = Character - Characters[0].Value;
+
+	if(Index >= Characters.GetCount())
+		zeError("Character %c does not exist in font resource : %s.", Character, GetFileName().ToCString());
+
 	return Characters[Index];
 }
 

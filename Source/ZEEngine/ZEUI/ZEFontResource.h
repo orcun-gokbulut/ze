@@ -68,7 +68,6 @@ class ZEFontResource : public ZEResource
 		ZEArray<ZETexture2DResource*>		TextureResources;
 		ZEArray<ZEUIMaterial*>				Materials;
 		ZEArray<ZEFontResourceCharacter>	Characters;
-		//ZEFontCharacter						Characters[ZE_FONT_CHARACTER_COUNT];
 
 	protected:
 											ZEFontResource();
