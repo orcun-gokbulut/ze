@@ -85,8 +85,15 @@ class ZEMatrix3x3
 		static void						CreateRotationY(ZEMatrix3x3& Matrix, float Yawn);
 		static void						CreateRotationZ(ZEMatrix3x3& Matrix, float Roll);
 		static void						CreateScale(ZEMatrix3x3& Matrix, float x, float y, float z);
+		static void						CreateScale(ZEMatrix3x3& Matrix, const ZEVector3& Scale);
 		static void						CreateIdentity(ZEMatrix3x3& Matrix);
 		static void						CreateZero(ZEMatrix3x3& Matrix);
+
+		static void						CreateTranslation2D(ZEMatrix3x3& Matrix, float x, float y);
+		static void						CreateTranslation2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation);
+		static void						CreateRotation2D(ZEMatrix3x3& Matrix, float Angle);
+		static void						CreateScale2D(ZEMatrix3x3& Matrix, float x, float y);
+		static void						CreateScale2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation);
 
 		static void						Add(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
 		static void						Sub(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
