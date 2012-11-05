@@ -216,6 +216,60 @@ void ZEMatrix3x3::CreateScale(ZEMatrix3x3& Matrix, float x, float y, float z)
 			0.0f, 0.0f, z);
 }
 
+void ZEMatrix3x3::CreateScale(ZEMatrix3x3& Matrix, const ZEVector3& Scale)
+{
+	Create(Matrix,
+		Scale.x, 0.0f, 0.0f,
+		0.0f, Scale.y, 0.0f,
+		0.0f, 0.0f, Scale.z);
+}
+
+
+void ZEMatrix3x3::CreateTranslation2D(ZEMatrix3x3& Matrix, float x, float y)
+{
+	Create(Matrix,
+		1.0f, 0.0f, x,
+		0.0f, 1.0f, y,
+		0.0f, 0.0f, 1.0f);
+
+}
+
+void ZEMatrix3x3::CreateTranslation2D(ZEMatrix3x3& Matrix, const ZEVector2& Position)
+{
+	Create(Matrix,
+		1.0f, 0.0f, Position.x,
+		0.0f, 1.0f, Position.y,
+		0.0f, 0.0f, 1.0f);
+
+}
+
+void ZEMatrix3x3::CreateRotation2D(ZEMatrix3x3& Matrix, float Angle)
+{
+	float SinAngle = ZEAngle::Sin(Angle);
+	float CosAngle = ZEAngle::Cos(Angle);
+
+	Create(Matrix,
+		CosAngle, SinAngle, 0.0f,
+		-SinAngle, CosAngle, 0.0f,
+		0.0f, 0.0f, 1.0f);
+}
+
+void ZEMatrix3x3::CreateScale2D(ZEMatrix3x3& Matrix, float x, float y)
+{
+	Create(Matrix,
+		x, 0.0f, 0.0f,
+		0.0f, y, 0.0f,
+		0.0f, 0.0f, 1.0f);
+}
+
+void ZEMatrix3x3::CreateScale2D(ZEMatrix3x3& Matrix, const ZEVector2& Scale)
+{
+	Create(Matrix,
+		Scale.x, 0.0f, 0.0f,
+		0.0f, Scale.y, 0.0f,
+		0.0f, 0.0f, 1.0f);
+}
+
 float ZEMatrix3x3::Determinant() const
 {
 	return ZEMatrix3x3::Determinant(*this);
