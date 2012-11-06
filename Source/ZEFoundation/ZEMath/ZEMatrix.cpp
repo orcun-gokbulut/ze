@@ -245,13 +245,20 @@ void ZEMatrix3x3::CreateTranslation2D(ZEMatrix3x3& Matrix, const ZEVector2& Posi
 
 void ZEMatrix3x3::CreateRotation2D(ZEMatrix3x3& Matrix, float Angle)
 {
-	float SinAngle = ZEAngle::Sin(Angle);
 	float CosAngle = ZEAngle::Cos(Angle);
+	float SinAngle = ZEAngle::Sin(Angle);
 
-	Create(Matrix,
-		CosAngle, SinAngle, 0.0f,
-		-SinAngle, CosAngle, 0.0f,
-		0.0f, 0.0f, 1.0f);
+	Matrix.M11 = CosAngle;
+	Matrix.M12 = SinAngle;
+	Matrix.M13 = 0.0f;
+
+	Matrix.M21 = -SinAngle;
+	Matrix.M22 = CosAngle;
+	Matrix.M23 = 0.0f;
+
+	Matrix.M31 = 0.0f;
+	Matrix.M32 = 0.0f;
+	Matrix.M33 = 1.0f;
 }
 
 void ZEMatrix3x3::CreateScale2D(ZEMatrix3x3& Matrix, float x, float y)
@@ -268,6 +275,24 @@ void ZEMatrix3x3::CreateScale2D(ZEMatrix3x3& Matrix, const ZEVector2& Scale)
 		Scale.x, 0.0f, 0.0f,
 		0.0f, Scale.y, 0.0f,
 		0.0f, 0.0f, 1.0f);
+}
+
+void ZEMatrix3x3::CreateOrientation2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation, float Angle, const ZEVector2& Scale)
+{
+	float Cos = ZEAngle::Cos(Angle);
+	float Sin = ZEAngle::Sin(Angle);
+
+	Matrix.M11 = Cos * Scale.x;
+	Matrix.M12 = Sin * Scale.y;
+	Matrix.M13 = Translation.x;
+
+	Matrix.M21 = -Sin * Scale.x;
+	Matrix.M22 = Cos * Scale.y;
+	Matrix.M23 = Translation.y;
+
+	Matrix.M31 = 0.0f;
+	Matrix.M32 = 0.0f;
+	Matrix.M33 = 1.0f;
 }
 
 float ZEMatrix3x3::Determinant() const
@@ -301,6 +326,79 @@ void ZEMatrix3x3::TransposeSelf()
 	ZEMatrix3x3 Temp;
 	ZEMatrix3x3::Transpose(Temp, *this);
 	*this = Temp;
+}
+
+ZEQuaternion ZEMatrix3x3::GetRotation()
+{
+	ZEVector3 TempScale;
+	TempScale.x = ZEVector3(M11, M21, M31).Length();
+	TempScale.y = ZEVector3(M12, M22, M32).Length();
+	TempScale.z = ZEVector3(M13, M23, M33).Length();
+
+	ZEMatrix3x3 ScaleMatrix;
+	ZEMatrix3x3::CreateScale(ScaleMatrix, TempScale.x, TempScale.y, TempScale.z);
+
+	ZEMatrix3x3 RotationMatrix = (*this) * ScaleMatrix.Inverse();
+
+	ZEQuaternion Rotation;
+	ZEQuaternion::CreateFromMatrix(Rotation, RotationMatrix);
+	return Rotation;
+}
+
+ZEVector3 ZEMatrix3x3::GetScale()
+{
+	ZEVector3 Scale;
+
+	Scale.x = ZEVector3(M11, M21, M31).Length();
+	Scale.y = ZEVector3(M12, M22, M32).Length();
+	Scale.z = ZEVector3(M13, M23, M33).Length();
+
+	return Scale;
+}
+
+void ZEMatrix3x3::GetDecomposition(ZEQuaternion& Rotation, ZEVector3& Scale, const ZEMatrix3x3& Matrix)
+{
+	Scale.x = ZEVector3(Matrix.M11, Matrix.M21, Matrix.M31).Length();
+	Scale.y = ZEVector3(Matrix.M12, Matrix.M22, Matrix.M32).Length();
+	Scale.z = ZEVector3(Matrix.M13, Matrix.M23, Matrix.M33).Length();
+
+	ZEMatrix3x3 ScaleMatrix;
+	ZEMatrix3x3::CreateScale(ScaleMatrix, Scale.x, Scale.y, Scale.z);
+
+	ZEMatrix3x3 RotationMatrix = Matrix * ScaleMatrix.Inverse();
+
+	ZEQuaternion::CreateFromMatrix(Rotation, RotationMatrix);
+}
+
+ZEVector2 ZEMatrix3x3::Get2DTranslation()
+{
+	return ZEVector2(M13, M23);
+}
+
+float ZEMatrix3x3::Get2DRotation()
+{
+	return ZEAngle::ArcTan2(M12, M22);
+}
+
+ZEVector2 ZEMatrix3x3::Get2DScale()
+{
+	ZEVector2 Scale;
+
+	Scale.x = ZEVector2(M11, M21).Length();
+	Scale.y = ZEVector2(M12, M22).Length();
+
+	return Scale;
+}
+
+void ZEMatrix3x3::Get2DDecomposition(ZEVector2& Translation, float& Rotation, ZEVector2& Scale, const ZEMatrix3x3& Matrix)
+{
+	Translation.x = Matrix.M13;
+	Translation.y = Matrix.M23;
+
+	Scale.x = ZEVector2(Matrix.M11, Matrix.M21).Length();
+	Scale.y = ZEVector2(Matrix.M12, Matrix.M22).Length();
+
+	Rotation = ZEAngle::ArcTan2(Matrix.M12, Matrix.M22);
 }
 
 ZEMatrix3x3 ZEMatrix3x3::operator+(const ZEMatrix3x3 &RightOperand) const 
@@ -875,6 +973,57 @@ void ZEMatrix4x4::TransposeSelf()
 	ZEMatrix4x4 Temp;
 	ZEMatrix4x4::Transpose(Temp, *this);
 	*this = Temp;
+}
+
+ZEVector3 ZEMatrix4x4::GetTranslation()
+{
+	return ZEVector3(M14, M24, M34);
+}
+
+ZEQuaternion ZEMatrix4x4::GetRotation()
+{
+	ZEVector3 TempScale;
+	TempScale.x = ZEVector3(M11, M21, M31).Length();
+	TempScale.y = ZEVector3(M12, M22, M32).Length();
+	TempScale.z = ZEVector3(M13, M23, M33).Length();
+
+	ZEMatrix4x4 ScaleMatrix;
+	ZEMatrix4x4::CreateScale(ScaleMatrix, TempScale);
+
+	ZEMatrix4x4 RotationMatrix = (*this) * ScaleMatrix.Inverse();
+
+	ZEQuaternion Rotation;
+	ZEQuaternion::CreateFromMatrix(Rotation, RotationMatrix);
+	return Rotation;
+}
+
+ZEVector3 ZEMatrix4x4::GetScale()
+{
+	ZEVector3 Scale;
+
+	Scale.x = ZEVector3(M11, M21, M31).Length();
+	Scale.y = ZEVector3(M12, M22, M32).Length();
+	Scale.z = ZEVector3(M13, M23, M33).Length();
+
+	return Scale;
+}
+
+void ZEMatrix4x4::GetDecomposition(ZEVector3& Translation, ZEQuaternion& Rotation, ZEVector3& Scale, const ZEMatrix4x4& Matrix)
+{
+	Translation.x = Matrix.M14;
+	Translation.y = Matrix.M24;
+	Translation.z = Matrix.M34;
+
+	Scale.x = ZEVector3(Matrix.M11, Matrix.M21, Matrix.M31).Length();
+	Scale.y = ZEVector3(Matrix.M12, Matrix.M22, Matrix.M32).Length();
+	Scale.z = ZEVector3(Matrix.M13, Matrix.M23, Matrix.M33).Length();
+
+	ZEMatrix4x4 TempScaleMatrix;
+	ZEMatrix4x4::CreateScale(TempScaleMatrix, Scale);
+
+	ZEMatrix4x4 RotationMatrix = Matrix * TempScaleMatrix.Inverse();
+
+	ZEQuaternion::CreateFromMatrix(Rotation, RotationMatrix);
 }
 
 ZEMatrix4x4 ZEMatrix4x4::operator+(const ZEMatrix4x4 &RightOperand) const 
