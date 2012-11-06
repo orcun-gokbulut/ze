@@ -93,7 +93,8 @@ class ZEMatrix3x3
 		static void						CreateTranslation2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation);
 		static void						CreateRotation2D(ZEMatrix3x3& Matrix, float Angle);
 		static void						CreateScale2D(ZEMatrix3x3& Matrix, float x, float y);
-		static void						CreateScale2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation);
+		static void						CreateScale2D(ZEMatrix3x3& Matrix, const ZEVector2& Scale);
+		static void						CreateOrientation2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation, float Angle, const ZEVector2& Scale);
 
 		static void						Add(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
 		static void						Sub(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
@@ -114,6 +115,15 @@ class ZEMatrix3x3
 
 		void							InverseSelf();
 		void							TransposeSelf();
+
+		ZEQuaternion					GetRotation();
+		ZEVector3						GetScale();
+		static void						GetDecomposition(ZEQuaternion& Rotation, ZEVector3& Scale, const ZEMatrix3x3& Matrix);
+
+		ZEVector2						Get2DTranslation();
+		float							Get2DRotation();
+		ZEVector2						Get2DScale();
+		static void						Get2DDecomposition(ZEVector2& Translation, float& Rotation, ZEVector2& Scale, const ZEMatrix3x3& Matrix);
 
 		ZEMatrix3x3						operator+(const ZEMatrix3x3 &RightOperand) const;
 		ZEMatrix3x3						operator-(const ZEMatrix3x3 &RightOperand) const;
@@ -209,6 +219,11 @@ class ZEMatrix4x4
 		
 		void							InverseSelf();
 		void							TransposeSelf();
+
+		ZEVector3						GetTranslation();
+		ZEQuaternion					GetRotation();
+		ZEVector3						GetScale();
+		static void						GetDecomposition(ZEVector3& Translation, ZEQuaternion& Rotation, ZEVector3& Scale, const ZEMatrix4x4& Matrix);
 
 		ZEMatrix4x4						operator+(const ZEMatrix4x4& RightOperand) const;
 		ZEMatrix4x4						operator-(const ZEMatrix4x4& RightOperand) const;
