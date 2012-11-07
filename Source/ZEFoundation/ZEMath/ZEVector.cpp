@@ -160,6 +160,13 @@ float ZEVector2::LengthSquare() const
 	return (ZEVector2::DotProduct(*this, *this));
 }
 
+
+float ZEVector2::SignedAngle(const ZEVector2& A, const ZEVector2& B)
+{
+	float PerpDot = A.x * B.y - A.y * B.x;
+	return (float)ZEAngle::ArcTan2(PerpDot, ZEVector2::DotProduct(A, B));
+}
+
 ZEVector2 ZEVector2::Clamp(float MinValue, float MaxValue) const
 {
 	ZEVector2 Temp;

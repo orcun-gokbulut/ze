@@ -81,6 +81,7 @@ class ZEVector2
 		static float				LengthSquare(const ZEVector2 &A);
 		static float				Distance(const ZEVector2 &A, const ZEVector2 &B);
 		static float				DistanceSquare(const ZEVector2 &A, const ZEVector2 &B);
+		static float				SignedAngle(const ZEVector2& A, const ZEVector2& B);
 		static void					Normalize(ZEVector2 &Out, const ZEVector2 &A);
 		static void					Lerp(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B, float Factor);	
 		static void					Max(ZEVector2& Out, const ZEVector2& A, const ZEVector2& B);
