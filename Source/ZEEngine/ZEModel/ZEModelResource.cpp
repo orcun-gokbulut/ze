@@ -138,7 +138,7 @@ ZEModelResourceMeshLOD::~ZEModelResourceMeshLOD()
 
 //////////////////////////////////////////////////////////////// READ ////////////////////////////////////////////////////////////////
 
-static const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArray<ZETexture2DResource*>& TextureResources)
+const ZETexture2D* ZEModelResource::ManageModelMaterialTextures(const ZEString& FileName)
 {
 	if (strncmp(FileName, "", ZE_MDLF_MAX_FILENAME_SIZE) == 0)
 		return NULL;
@@ -146,14 +146,14 @@ static const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArr
 	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
 	{
 		//if (strnicmp(TextureResources[I]->GetFileName(), FileName, ZE_MDLF_MAX_FILENAME_SIZE) == 0)
-		if (TextureResources[I]->GetFileName() == ZEString(FileName))
+		if (TextureResources[I]->GetFileName() == FileName)
 			return TextureResources[I]->GetTexture();
 	}
 
 	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(FileName);
 	if (NewTextureResource == NULL)
 	{
-		zeError("Can not load texture file. (FileName : \"%s\")", FileName);
+		zeError("Can not load texture file. (FileName : \"%s\")", FileName.GetValue());
 		return NULL;
 	}
 	TextureResources.Add(NewTextureResource);
@@ -173,9 +173,9 @@ static const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArr
 #define ZE_MFSC_LIGHTMAP					1024
 #define ZE_MFSC_DISTORTIONMAP				2048
 
-static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeReader)
+bool ZEModelResource::ReadMaterials(ZEMLSerialReader* NodeReader)
 {
-	ZESize SubItemCount = NodeReader->GetSubItemCount();
+	ZESize SubItemCount = (ZESize)NodeReader->GetSubItemCount();
 	for (ZESize I = 0; I < SubItemCount; I++)
 	{
 		if (!NodeReader->Read())
@@ -198,14 +198,14 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEMLSerialReader* Node
 		if (!NodeReader->ReadPropertyList(MaterialList, 2))
 			return false;
 
-		ZEString MaterialPath = ZEFileInfo::GetParentDirectory(Model->GetFileName()) + ZEPathUtils::GetSeperator() + FilePathValue.GetString();
+		ZEString MaterialPath = ZEFileInfo::GetParentDirectory(this->GetFileName()) + ZEPathUtils::GetSeperator() + FilePathValue.GetString();
 
 		if (!ZEFileInfo::IsFile(MaterialPath))
 			return false;
 
 		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();
 		CurrentMaterial->ReadFromFile(MaterialPath);
-		Model->Materials.Add(CurrentMaterial);
+		Materials.Add(CurrentMaterial);
 	}
 
 	NodeReader->GoToCurrentPointer();
@@ -213,7 +213,7 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEMLSerialReader* Node
 	return true;
 }
 
-static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEMLSerialReader* NodeReader)
+bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSerialReader* NodeReader)
 {
 
 	ZEVariant Enabled, Type, Mass, MassCenter, LinearDamping, AngularDamping;
@@ -242,7 +242,7 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEMLSeri
 
 	NodeReader->SeekPointer(PhysicalShapesNodePointer);
 
-	ZESize SubItemCount = NodeReader->GetSubItemCount();
+	ZESize SubItemCount = (ZESize)NodeReader->GetSubItemCount();
 	for (ZESize I = 0; I < SubItemCount; I++)
 	{
 		if (!NodeReader->Read())
@@ -278,7 +278,7 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEMLSeri
 		Shape->Restitution = ShapeRestitution;
 		Shape->DynamicFriction = ShapeDynamicFriction;
 		Shape->StaticFriction = ShapeStaticFriction;
-		Shape->Type = (ZEPhysicalShapeType)ShapeType.GetInt32();
+		Shape->Type = (ZEModelResourcePhysicalShapeType)ShapeType.GetInt32();
 
 		NodeReader->SeekPointer(ShapeNodePointer);
 
@@ -379,10 +379,10 @@ static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 	}
 }
 
-static bool ReadMeshesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeReader)
+bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 {
 
-	ZESize SubItemCount = NodeReader->GetSubItemCount();
+	ZESize SubItemCount = (ZESize)NodeReader->GetSubItemCount();
 	for (ZESize I = 0; I < SubItemCount; I++)
 	{
 		if (!NodeReader->Read())
@@ -412,7 +412,7 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRea
 		if (!NodeReader->ReadPropertyList(MeshList, 8))
 			return false;
 
-		ZEModelResourceMesh* Mesh = Model->Meshes.Add();
+		ZEModelResourceMesh* Mesh = Meshes.Add();
 
 		strncpy(Mesh->Name, NameValue.GetString(), ZE_MDLF_MAX_NAME_SIZE);
 		Mesh->Position = PositionValue;
@@ -438,7 +438,7 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRea
 
 		NodeReader->SeekPointer(LODsNodePointer);
 
-		ZESize SubItemCount = NodeReader->GetSubItemCount();
+		ZESize SubItemCount = (ZESize)NodeReader->GetSubItemCount();
 		for (ZESize J = 0; J < SubItemCount; J++)
 		{
 			if (!NodeReader->Read())
@@ -500,7 +500,7 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRea
 		if (PhysicalBodyNodePointer != -1)
 		{
 			NodeReader->SeekPointer(PhysicalBodyNodePointer);
-			ReadPhysicalBodyFromFile(&Mesh->PhysicalBody, NodeReader);
+			ReadPhysicalBody(&Mesh->PhysicalBody, NodeReader);
 		}
 		else
 		{
@@ -515,7 +515,7 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRea
 	return true;
 }
 
-static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEMLSerialReader* NodeReader)
+bool ZEModelResource::ReadPhysicalJoint(ZEModelResourcePhysicalJoint* Joint, ZEMLSerialReader* NodeReader)
 {
 
 	ZEVariant Enabled, Body1Id, Body2Id;
@@ -715,14 +715,14 @@ static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEMLS
 	return true;
 }
 
-static void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, ZEInt BoneId)
+void ZEModelResource::ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId)
 {
 	ZEMatrix4x4::CreateOrientation(Bone->RelativeTransform, Bone->RelativePosition, Bone->RelativeRotation, Bone->RelativeScale);
 
 	if (Bone->ParentBone != -1)
 	{
 
-		ZEMatrix4x4::Multiply(Bone->ForwardTransform, Model->Bones[(ZESize)Bone->ParentBone].ForwardTransform, Bone->RelativeTransform);
+		ZEMatrix4x4::Multiply(Bone->ForwardTransform, Bones[(ZESize)Bone->ParentBone].ForwardTransform, Bone->RelativeTransform);
 		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
 	}
 	else
@@ -731,19 +731,19 @@ static void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, ZEIn
 		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
 	}
 
-	for (ZESize I = 0; I < Model->Bones.GetCount(); I++)
+	for (ZESize I = 0; I < Bones.GetCount(); I++)
 	{
-		if (Model->Bones[I].ParentBone == BoneId)
+		if (Bones[I].ParentBone == BoneId)
 		{
-			ProcessBones(Model, &Model->Bones[I], (ZEInt)I);
+			ProcessBones(&Bones[I], (ZEInt)I);
 		}
 	}
 }
 
-static bool ReadBonesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeReader)
+bool ZEModelResource::ReadBones(ZEMLSerialReader* NodeReader)
 {
 
-	ZESize SubItemCount = NodeReader->GetSubItemCount();
+	ZESize SubItemCount = (ZESize)NodeReader->GetSubItemCount();
 	for (ZESize I = 0; I < SubItemCount; I++)
 	{
 		if (!NodeReader->Read())
@@ -773,7 +773,7 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRead
 		if (!NodeReader->ReadPropertyList(BoneList, 8))
 			return false;
 
-		ZEModelResourceBone* Bone = Model->Bones.Add();
+		ZEModelResourceBone* Bone = Bones.Add();
 
 		strncpy(Bone->Name, NameValue.GetString(), ZE_MDLF_MAX_NAME_SIZE);
 		Bone->ParentBone = ParentBoneValue;
@@ -800,22 +800,22 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRead
 		memset(&Bone->PhysicalJoint, 0, sizeof(ZEModelResourcePhysicalJoint));
 
 		NodeReader->SeekPointer(PhysicalJointNodePointer);
-		ReadPhysicalJointFromFile(&Bone->PhysicalJoint, NodeReader);
+		ReadPhysicalJoint(&Bone->PhysicalJoint, NodeReader);
 
 		memset(&Bone->PhysicalBody, 0, sizeof(ZEModelResourcePhysicalBody));
 
 		if (PhysicalBodyNodePointer != -1)
 		{
 			NodeReader->SeekPointer(PhysicalBodyNodePointer);
-			ReadPhysicalBodyFromFile(&Bone->PhysicalBody, NodeReader);
+			ReadPhysicalBody(&Bone->PhysicalBody, NodeReader);
 		}
 	}
 
-	for (ZESize I = 0; I < Model->Bones.GetCount(); I++)
+	for (ZESize I = 0; I < Bones.GetCount(); I++)
 	{
-		if (Model->Bones[I].ParentBone == -1)
+		if (Bones[I].ParentBone == -1)
 		{
-			ProcessBones(Model, &Model->Bones[I], (ZEInt)I);
+			ProcessBones(&Bones[I], (ZEInt)I);
 		}
 	}
 
@@ -824,10 +824,10 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeRead
 	return true;
 }
 
-static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEMLSerialReader* NodeReader)
+bool ZEModelResource::ReadAnimations(ZEMLSerialReader* NodeReader)
 {
 
-	ZESize SubItemCount = NodeReader->GetSubItemCount();
+	ZESize SubItemCount = (ZESize)NodeReader->GetSubItemCount();
 	for (ZESize I = 0; I < SubItemCount; I++)
 	{
 		if (!NodeReader->Read())
@@ -853,7 +853,7 @@ static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEMLSerialReader* Nod
 		if (!NodeReader->ReadPropertyList(AnimationList, 4))
 			return false;
 
-		ZEModelResourceAnimation* Animation = Model->Animations.Add();
+		ZEModelResourceAnimation* Animation = Animations.Add();
 
 		strncpy(Animation->Name, NameValue.GetString(), ZE_MDLF_MAX_NAME_SIZE);
 		
@@ -886,7 +886,7 @@ static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEMLSerialReader* Nod
 	return true;
 }
 
-static bool ReadModelFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
+bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
 {
 
 	ZEMLSerialReader NodeReader(ResourceFile);
@@ -914,7 +914,7 @@ static bool ReadModelFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 	{
 		NodeReader.SeekPointer(BonesNodePointer);
 
-		if (!ReadBonesFromFile(Model, &NodeReader))
+		if (!ReadBones(&NodeReader))
 			return false;
 	}
 
@@ -922,7 +922,7 @@ static bool ReadModelFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 	{
 		NodeReader.SeekPointer(MeshesNodePointer);
 
-		if (!ReadMeshesFromFile(Model, &NodeReader))
+		if (!ReadMeshes(&NodeReader))
 			return false;
 	}
 
@@ -930,13 +930,13 @@ static bool ReadModelFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 	{
 		NodeReader.SeekPointer(AnimationsNodePointer);
 
-		if (!ReadAnimationsFromFile(Model, &NodeReader))
+		if (!ReadAnimations(&NodeReader))
 			return false;
 	}
 
 	NodeReader.SeekPointer(MaterialsNodePointer);
 
-	if (!ReadMaterialsFromFile(Model, &NodeReader))
+	if (!ReadMaterials(&NodeReader))
 		return false;
 	
 	return true;
@@ -947,6 +947,30 @@ const char* ZEModelResource::GetResourceType() const
 	return "Model";
 }
 
+const ZESmartArray<ZETexture2DResource*>& ZEModelResource::GetTextures() const
+{
+	return TextureResources;
+}
+
+const ZEArray<ZEMaterial*>& ZEModelResource::GetMaterials() const
+{
+	return Materials;
+}
+
+const ZEArray<ZEModelResourceBone>& ZEModelResource::GetBones() const
+{
+	return Bones;
+}
+
+const ZEArray<ZEModelResourceMesh>& ZEModelResource::GetMeshes() const
+{
+	return Meshes;
+}
+
+const ZEArray<ZEModelResourceAnimation> ZEModelResource::GetAnimations() const
+{
+	return Animations;
+}
 
 ZEModelResource* ZEModelResource::LoadSharedResource(const ZEString& FileName)
 {
@@ -1002,7 +1026,7 @@ ZEModelResource* ZEModelResource::LoadResource(const ZEString& FileName)
 		NewResource->SetFileName(NewPath);
 		NewResource->Cached = false;
 		NewResource->ReferenceCount = 0;
-		if (!ReadModelFromFile(NewResource, &ResourceFile))
+		if (!NewResource->ReadModelFromFile(&ResourceFile))
 		{
 			zeError("Can not load model file. (FileName : \"%s\")", FileName.ToCString());
 			ResourceFile.Close();

@@ -48,7 +48,7 @@ ZEVector3 ZE3dsMaxUtils::MaxtoZE(const Point3& Point)
 
 ZEQuaternion ZE3dsMaxUtils::MaxtoZE(const Quat& Quaternion)
 {
-	Quat Temp = Quaternion.Inverse(); // MAP EXPORTTA DAHIL EDILMIYO
+	Quat Temp = Quaternion.Inverse();
 	return ZEQuaternion(Temp.w, Temp.x, Temp.y, Temp.z);
 }
 

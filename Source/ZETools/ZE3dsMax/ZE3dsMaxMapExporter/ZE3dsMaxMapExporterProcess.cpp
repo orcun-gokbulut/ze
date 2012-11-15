@@ -43,6 +43,7 @@
 #include "ZEFile\ZEDirectoryInfo.h"
 #include "ZEFile\ZEFileOperations.h"
 #include "ZEML\ZEMLSerialWriter.h"
+#include "ZEMath\ZEAngle.h"
 
 ZEPackStruct(
 struct ZEMapFilePhysicalMeshPolygon
@@ -107,8 +108,6 @@ bool ZE3dsMaxMapExporter::ProcessDoors()
 
 	INode* PortalANode;
 	INode* PortalBNode;
-	bool IsOpen;
-	float PlaneWidth, PlaneLength;
 
 	for (ZESize I = 0; I < (ZESize)Doors.Count(); I++)
 	{
@@ -121,16 +120,35 @@ bool ZE3dsMaxMapExporter::ProcessDoors()
 		
 		DoorNode->AddProperty("Name", CurrentNode->GetName());
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, "Width", PlaneWidth))
-			zeError("Can not find door property Width");
-
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, "Length", PlaneLength))
-			zeError("Can not find door property Height");
-
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "IsOpen", IsOpen))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_BOOL_PROP, "IsOpen", *DoorNode->AddProperty("IsOpen")))
 			zeError("Can not find door property IsOpen");
 
-		DoorNode->AddProperty("IsOpen", IsOpen);
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, "Width", *DoorNode->AddProperty("Width")))
+			zeError("Can not find door property Width");
+
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, "Length", *DoorNode->AddProperty("Length")))
+			zeError("Can not find door property Length");
+
+		ZEMatrix4x4 ObjectTM;
+		ZEMatrix4x4::CreateOrientation(ObjectTM, 
+			ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Translation()), 
+			ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Rotation()), 
+			ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Scaling()));
+
+		ZEMatrix4x4 WorldTM;
+		ZEMatrix4x4::CreateOrientation(WorldTM, 
+			ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Translation()), 
+			ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Rotation()), 
+			ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Scaling()));
+
+		ZEMatrix4x4 OffsetTransform = WorldTM.Inverse() * ObjectTM;
+
+		if (OffsetTransform != ZEMatrix4x4::Identity)
+			zeWarning("Pivot transformations are omitted for ZEPortalDoors. The pivot for ZEPortalDoor: %s is returned to it's Identity state.", CurrentNode->GetName());
+
+		DoorNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Translation()));
+		DoorNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Rotation()));
+		DoorNode->AddProperty("Scale", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Scaling()));
 
 		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, "PortalA", PortalANode))
 			zeError("Can not find door property PortalA");
@@ -158,22 +176,6 @@ bool ZE3dsMaxMapExporter::ProcessDoors()
 
 		DoorNode->AddProperty("PortalBIndex", PortalBIndex);
 	
-		ZEVector3 Point1, Point2, Point3, Point4;
-
-		GMatrix Matrix = CurrentNode->GetObjectTM();
-		ZEMatrix4x4 WorldMatrix;
-		ZEMatrix4x4::Transpose(WorldMatrix, *((ZEMatrix4x4*)&Matrix));
-		ZEMatrix4x4::Transform(Point1, WorldMatrix, ZEVector3(-PlaneWidth, 0.0f , PlaneLength));
-		ZEMatrix4x4::Transform(Point2, WorldMatrix, ZEVector3(PlaneWidth, 0.0f , PlaneLength));
-		ZEMatrix4x4::Transform(Point3, WorldMatrix, ZEVector3(PlaneWidth, 0.0f , -PlaneLength));
-		ZEMatrix4x4::Transform(Point4, WorldMatrix, ZEVector3(-PlaneWidth, 0.0f , -PlaneLength));
-
-		ZEMLNode* RetangleNode = DoorNode->AddSubNode("Rectangle");
-		RetangleNode->AddProperty("Point1", Point1);
-		RetangleNode->AddProperty("Point2", Point2);
-		RetangleNode->AddProperty("Point3", Point3);
-		RetangleNode->AddProperty("Point4", Point4);
-
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
 
@@ -240,6 +242,11 @@ bool ZE3dsMaxMapExporter::ProcessPortals()
 		IGameNode* PhysicalMeshNode;
 
 		PortalNode->AddProperty("Name", CurrentNode->GetName());
+
+		PortalNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Translation()));
+		PortalNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Rotation()));
+		PortalNode->AddProperty("Scale", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Scaling()));
+
 		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "PhysicalMeshEnabled", PhysicalMeshEnabled))
 			zeError("Can not find portal property \"PhysicalMeshEnabled\".");
 
@@ -292,17 +299,19 @@ bool ZE3dsMaxMapExporter::ProcessPortals()
 		ZEArray<ZEMapFilePolygon> Polygons;
 		Polygons.SetCount(Mesh->GetNumberOfFaces());
 		
-		ZEMatrix4x4 WorldMatrix,  Temp4x4;
-		ZEMatrix3x3 WorldInvTrspsMatrix, Temp3x3;
+		ZEMatrix4x4 ObjectTM;
+		ZEMatrix4x4::CreateOrientation(ObjectTM, 
+			ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Translation()), 
+			ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Rotation()), 
+			ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Scaling()));
 
-		memcpy(&Temp4x4, &CurrentNode->GetObjectTM().Inverse(), sizeof(ZEMatrix4x4));
-		ZEMatrix4x4::Transpose(WorldMatrix, Temp4x4);
-		ZEMatrix3x3::Create(Temp3x3, 
-			WorldMatrix.M11, WorldMatrix.M12, WorldMatrix.M13, 
-			WorldMatrix.M21, WorldMatrix.M22, WorldMatrix.M23, 
-			WorldMatrix.M31, WorldMatrix.M32, WorldMatrix.M33);
+		ZEMatrix4x4 WorldTM;
+		ZEMatrix4x4::CreateOrientation(WorldTM, 
+			ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Translation()), 
+			ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Rotation()), 
+			ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Scaling()));
 
-		ZEMatrix3x3::Transpose(WorldInvTrspsMatrix, Temp3x3);
+		ZEMatrix4x4 OffsetTransform = WorldTM.Inverse() * ObjectTM;
 
 		for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
 		{
@@ -322,29 +331,25 @@ bool ZE3dsMaxMapExporter::ProcessPortals()
 				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt)I, (ZEInt)N);
 
 				Point3 Temp;
-				if(!Mesh->GetVertex(Face->vert[N], Temp, false))
+				if(!Mesh->GetVertex(Face->vert[N], Temp, true))
 					zeError("Can not get vertex of face %d, vertex index : %d.", I, N);
 
-				Vertex->Position = ZE3dsMaxUtils::MaxtoZE(Temp);
-				
-				ZEVector3 Normal;
+				ZEMatrix4x4::Transform(Vertex->Position, OffsetTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
 				
 				if(!Mesh->GetNormal(Face->norm[N], Temp, true))
 					zeError("Can not get normal of face %d, normal index : %d.", I, N);
 
-				Normal = ZE3dsMaxUtils::MaxtoZE(Temp);
-				ZEMatrix3x3::Transform(Vertex->Normal, WorldInvTrspsMatrix, Normal);
-				ZEVector3::Normalize(Vertex->Normal, Vertex->Normal);
+				ZEMatrix4x4::Transform3x3(Vertex->Normal, OffsetTransform, ZE3dsMaxUtils::MaxtoZE(Temp.Normalize()));
 
 				if(!Mesh->GetTangent(BinormalTangentIndex, Temp))
 					zeError("Can not get tangent of face %d, tangent index : %d.", I, BinormalTangentIndex);
 
-				Vertex->Tangent = ZE3dsMaxUtils::MaxtoZE(Temp);
+				ZEMatrix4x4::Transform3x3(Vertex->Tangent, OffsetTransform, ZE3dsMaxUtils::MaxtoZE(Temp.Normalize()));
 
 				if(!Mesh->GetBinormal(BinormalTangentIndex, Temp))
 					zeError("Can not get binormal of face %d, binormal index : %d.", I, BinormalTangentIndex);
 
-				Vertex->Binormal = ZE3dsMaxUtils::MaxtoZE(Temp);
+				ZEMatrix4x4::Transform3x3(Vertex->Binormal, OffsetTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
 
 				if(!Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord))
 					zeError("Can not get texture coordinate of face %d vertex %d.", I, N, BinormalTangentIndex);
@@ -391,7 +396,12 @@ bool ZE3dsMaxMapExporter::ProcessMaterials(const char* FileName)
 			zeError("Can not find resource option. Resource identifier : %s", (MaterialName + ".ZEMATERIAL").ToCString());
 
 		if(!ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
+		{
+			ZEMLNode* MaterialNode = MaterialsNode->AddSubNode("Material");
+			MaterialNode->AddProperty("Name", MaterialName);
+			MaterialNode->AddProperty("FilePath", ResourceConfigurationDialog->GetResourceRelativePath(ZEString(FileName) , MaterialName + ".ZEMATERIAL"));
 			continue;
+		}
 
 		ZEString MaterialFilePath = MaterialOption.ExportPath + ZEPathUtils::GetSeperator() + MaterialOption.Identifier;
 

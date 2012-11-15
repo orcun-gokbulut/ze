@@ -48,9 +48,11 @@
 
 
 class ZEStaticVertexBuffer;
+class ZETexture2D;
 class ZETexture2DResource;
 class ZEMaterial;
 class ZEPhysicalJoint;
+class ZEMLSerialReader;
 
 #define ZE_MDLF_MAX_NAME_SIZE					128
 #define ZE_MDLF_MAX_FILENAME_SIZE				256
@@ -64,8 +66,8 @@ enum ZEModelResourcePhysicalShapeType
 {
 	ZE_MRPST_BOX			= 0,
 	ZE_MRPST_SPHERE			= 1,
-	ZE_MRPST_CYLINDER		= 2,
-	ZE_MRPST_CAPSULE		= 3,
+	ZE_MRPST_CAPSULE		= 2,
+	ZE_MRPST_CYLINDER		= 3,
 	ZE_MRPST_CONVEX			= 4,
 };
 
@@ -87,7 +89,7 @@ struct ZEModelResourcePhysicalPolygon
 struct ZEModelResourcePhysicalShape
 {
 
-	ZEPhysicalShapeType							Type;
+	ZEModelResourcePhysicalShapeType			Type;
 	ZEVector3									Position;
 	ZEQuaternion								Rotation;
 	float										Restitution;
@@ -302,21 +304,38 @@ struct ZEModelResourceBone
 
 class ZEModelResource : public ZEResource
 {
-	protected:
-		virtual									~ZEModelResource();
+	private:
+		ZEArray<ZEModelResourceMesh>				Meshes;
+		ZEArray<ZEModelResourceBone>				Bones;
+		ZEArray<ZEModelResourceAnimation>			Animations;
+		ZESmartArray<ZETexture2DResource*>			TextureResources;
+		ZEArray<ZEMaterial*>						Materials;
+
+		bool										ReadBones(ZEMLSerialReader* NodeReader);
+		void										ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId);
+		bool										ReadMeshes(ZEMLSerialReader* NodeReader);
+		bool										ReadAnimations(ZEMLSerialReader* NodeReader);
+		bool										ReadMaterials(ZEMLSerialReader* NodeReader);
+		bool										ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSerialReader* NodeReader);
+		bool										ReadPhysicalJoint(ZEModelResourcePhysicalJoint* Joint, ZEMLSerialReader* NodeReader);
+
+		const ZETexture2D*							ManageModelMaterialTextures(const ZEString& FileName);
+		bool  										ReadModelFromFile(ZEFile* ResourceFile);
+
+		virtual										~ZEModelResource();
 
 	public:
-		ZEArray<ZEModelResourceMesh>			Meshes;
-		ZEArray<ZEModelResourceBone>			Bones;
-		ZEArray<ZEModelResourceAnimation>		Animations;
-		ZESmartArray<ZETexture2DResource*>		TextureResources;
-		ZEArray<ZEMaterial*>					Materials;
-
-		const char*								GetResourceType() const;
+		const char*									GetResourceType() const;
 		
-		static ZEModelResource*					LoadResource(const ZEString& FileName);
-		static ZEModelResource*					LoadSharedResource(const ZEString& FileName);
-		static void								CacheResource(const ZEString& FileName);
+		const ZESmartArray<ZETexture2DResource*>&	GetTextures() const;
+		const ZEArray<ZEMaterial*>&					GetMaterials() const;
+		const ZEArray<ZEModelResourceBone>&			GetBones() const;
+		const ZEArray<ZEModelResourceMesh>&			GetMeshes() const;
+		const ZEArray<ZEModelResourceAnimation>		GetAnimations() const;
+
+		static ZEModelResource*						LoadResource(const ZEString& FileName);
+		static ZEModelResource*						LoadSharedResource(const ZEString& FileName);
+		static void									CacheResource(const ZEString& FileName);
 };
 
 #endif

@@ -41,7 +41,6 @@ ze_add_source(ZEPortalMapDoor.cpp			Sources)
 ze_add_source(ZEPortalMapDoor.h				Sources Headers)
 ze_add_source(ZEPortalMapPortal.cpp			Sources)
 ze_add_source(ZEPortalMapPortal.h			Sources Headers)
-ze_add_source(ZEPortalMapPortalDoor.h		Sources Headers)
 ze_add_source(ZEPortalMapResource.cpp		Sources)
 ze_add_source(ZEPortalMapResource.h			Sources Headers)
 

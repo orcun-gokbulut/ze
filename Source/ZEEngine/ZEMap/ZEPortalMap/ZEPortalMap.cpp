@@ -43,7 +43,8 @@
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEViewFrustum.h"
-#include <string.h>
+#include "ZEMath/ZEAngle.h"
+#include "ZEPhysics/ZEPhysicalMesh.h"
 
 ZEDrawFlags ZEPortalMap::GetDrawFlags() const
 {
@@ -91,6 +92,7 @@ void ZEPortalMap::LoadPortalResource(ZEPortalMapResource* NewResource)
 ZEPortalMap::ZEPortalMap()
 {
 	Resource = NULL;
+	CullMode = ZE_MCM_FULL;
 }
 
 ZEPortalMap::~ZEPortalMap()
@@ -179,16 +181,15 @@ void ZEPortalMap::Draw(ZEDrawParameters* DrawParameters)
 	if (!GetVisible())
 		return;
 
-
 	memset(&Statistics, 0, sizeof(ZEPortalMapCullStatistics));
 
 	for (size_t I = 0; I < Portals.GetCount(); I++)
 	{
 		Portals[I]->CullPass = false;
+		Portals[I]->IsDrawn = false;
 	}
 
 	CullPortals(DrawParameters);
-
 }
 
 bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT)
@@ -274,7 +275,7 @@ static void IntersectionTest(ZEVector3* IntersectedPoints, ZESize& IntersectedPo
 		CurrentResult = NextResult;
 	}
 }
-bool ZEPortalMap::GenerateViewVolume(ZEViewFrustum& NewViewVolume, const ZEPortalMapDoor* Door, const ZEViewVolume* OldViewVolume)
+bool ZEPortalMap::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEPortalMapDoor* Door, const ZEViewVolume* OldViewVolume)
 {
 	ZERectangle3D DoorRectangle = Door->GetRectangle();
 
@@ -297,60 +298,60 @@ bool ZEPortalMap::GenerateViewVolume(ZEViewFrustum& NewViewVolume, const ZEPorta
 		if (PointsCount == 0)
 			return false;
 
-		ZEVector3 FrustumRight = Frustum->GetRight();
-		ZEVector3 FrustumUp = Frustum->GetUp();
-		ZEVector3 FrustumFront = Frustum->GetDirection();
+		float TempDotProduct = 0.0f;
+		ZEPlane VerticalPlane, HorizontalPlane;
 
-		ZEMatrix3x3 UVNMatrix(FrustumRight.x, FrustumRight.y, FrustumRight.z,
-			FrustumUp.x, FrustumUp.y, FrustumUp.z,
-			FrustumFront.x, FrustumFront.y, FrustumFront.z);
+ 		float LeftDotProduct = -1.0f; float RightDotProduct = -1.0f;
+ 		float TopDotProduct = -1.0f; float BottomDotProduct = -1.0f;
+		//ZEVector3 LeftPoint, RightPoint, TopPoint, BottomPoint;
+		ZEPlane LeftPlane, RightPlane, TopPlane, BottomPlane;
 
-		//UVNMatrix.TransposeSelf();
-
-		for (size_t I = 0; I < PointsCount; I++)
+		for (ZESize I = 0; I < PointsCount; I++)
 		{
-			ZEVector3 TempPoint;
-			ZEMatrix3x3::Transform(TempPoint, UVNMatrix, Points[I] - Frustum->GetPosition());
-			Points[I] = TempPoint;
+			ZEPlane::Create(VerticalPlane, Frustum->GetPosition(), Points[I], Points[I] - Frustum->GetUp());
+
+			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_VFP_LEFT).n, VerticalPlane.n);
+
+			if (TempDotProduct > LeftDotProduct)
+			{
+				LeftDotProduct = TempDotProduct;
+				LeftPlane.n = VerticalPlane.n;
+				LeftPlane.p = Frustum->GetPosition();
+				//LeftPoint = Points[I];
+			}
+
+			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_VFP_RIGHT).n, -VerticalPlane.n);
+
+			if (TempDotProduct > RightDotProduct)
+			{
+				RightDotProduct = TempDotProduct;
+				RightPlane.n = -VerticalPlane.n;
+				RightPlane.p = Frustum->GetPosition();
+				//RightPoint = Points[I];
+			}
+
+			ZEPlane::Create(HorizontalPlane, Frustum->GetPosition(), Points[I], Points[I] - Frustum->GetRight());
+
+			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_VFP_TOP).n, HorizontalPlane.n);
+
+			if (TempDotProduct > TopDotProduct)
+			{
+				TopDotProduct = TempDotProduct;
+				TopPlane.n = HorizontalPlane.n;
+				TopPlane.p = Frustum->GetPosition();
+				//TopPoint = Points[I];
+			}
+
+			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_VFP_BOTTOM).n, -HorizontalPlane.n);
+
+			if (TempDotProduct > BottomDotProduct)
+			{
+				BottomDotProduct = TempDotProduct;
+				BottomPlane.n = -HorizontalPlane.n;
+				BottomPlane.p = Frustum->GetPosition();
+				//BottomPoint = Points[I];
+			}
 		}
-
-		ZEVector3 LeftPoint, RightPoint, TopPoint, BottomPoint;
-		LeftPoint = RightPoint = TopPoint = BottomPoint = Points[0];
-		for (size_t I = 1; I < PointsCount; I++)
-		{
-			if (Points[I].x < LeftPoint.x)
-				LeftPoint = Points[I];
-			if (Points[I].x > RightPoint.x)
-				RightPoint = Points[I];
-
-			if (Points[I].y < BottomPoint.y)
-				BottomPoint = Points[I];
-			if (Points[I].y > TopPoint.y)
-				TopPoint = Points[I];
-		}
-
-		UVNMatrix.TransposeSelf();
-
-		ZEVector3 TempNormal;
-		ZEPlane LeftPlane;
-		ZEPlane::Create(LeftPlane, ZEVector3::Zero, LeftPoint, LeftPoint - ZEVector3::UnitY); //(LeftPoint.x < 0.0f ? -1.0f : 1.0f) * ZEVector3::UnitY
-		LeftPlane.n = UVNMatrix * LeftPlane.n;
-		LeftPlane.p = Frustum->GetPosition();
-		
-		ZEPlane RightPlane;
-		ZEPlane::Create(RightPlane,	ZEVector3::Zero, RightPoint, RightPoint + ZEVector3::UnitY); //(RightPoint.x >= 0.0f ? 1.0f : -1.0f) * ZEVector3::UnitY)
-		RightPlane.n = UVNMatrix * RightPlane.n;
-		RightPlane.p = Frustum->GetPosition();
-
-		ZEPlane BottomPlane;
-		ZEPlane::Create(BottomPlane, ZEVector3::Zero, BottomPoint, BottomPoint + ZEVector3::UnitX); //(BottomPoint.y < 0.0f ? 1.0f : -1.0f) * ZEVector3::UnitX)
-		BottomPlane.n = UVNMatrix * BottomPlane.n;
-		BottomPlane.p = Frustum->GetPosition();
-
-		ZEPlane TopPlane;
-		ZEPlane::Create(TopPlane, ZEVector3::Zero, TopPoint, TopPoint - ZEVector3::UnitX); //(TopPoint.y >= 0.0f ? -1.0f : 1.0f) * ZEVector3::UnitX)
-		TopPlane.n = UVNMatrix * TopPlane.n;
-		TopPlane.p = Frustum->GetPosition();
 
 		NewViewVolume.Create(RightPlane, BottomPlane, LeftPlane, TopPlane, Frustum->GetClippingPlane(ZE_VFP_FAR), Frustum->GetClippingPlane(ZE_VFP_NEAR));
 		NewViewVolume.SetPosition(Frustum->GetPosition());
@@ -401,59 +402,105 @@ void ZEPortalMap::CullPortal(ZEPortalMapDoor* Door, ZEDrawParameters* DrawParame
 
 void ZEPortalMap::CullPortals(ZEDrawParameters* DrawParameters)
 {
-	bool NoClip = true;
-
-	if (DrawParameters->ViewVolume->GetViewVolumeType() == ZE_VVT_FRUSTUM)
+	if (CullMode == ZE_MCM_NONE)
 	{
-		ZEViewFrustum* Frustum = (ZEViewFrustum*)DrawParameters->ViewVolume;
-		ZEVector3 FrustumPosition = Frustum->GetPosition();
-
-		for (size_t I = 0; I < Portals.GetCount(); I++)
+		for (ZESize I = 0; I < Portals.GetCount(); I++)
 		{
+			Portals[I]->Draw(DrawParameters);
+
 			Statistics.TotalPortalCount++;
+			Statistics.DrawedPortalCount++;
 			Statistics.TotalMapPolygonCount += Portals[I]->GetPolygonCount();
+			Statistics.DrawedMapPolygonCount += Portals[I]->GetPolygonCount();
+		}
+	}
+	else
+	{
+		bool NoClip = true;
 
-			if (ZEAABBox::IntersectionTest(Portals[I]->GetBoundingBox(), FrustumPosition))
+		if (DrawParameters->ViewVolume->GetViewVolumeType() == ZE_VVT_FRUSTUM)
+		{
+			ZEViewFrustum* Frustum = (ZEViewFrustum*)DrawParameters->ViewVolume;
+			ZEVector3 FrustumPosition = Frustum->GetPosition();
+
+			for (size_t I = 0; I < Portals.GetCount(); I++)
 			{
-				NoClip = false;
-				Portals[I]->CullPass = true;
-				Portals[I]->Draw(DrawParameters);
+				Statistics.TotalPortalCount++;
+				Statistics.TotalMapPolygonCount += Portals[I]->GetPolygonCount();
 
-				Statistics.DrawedPortalCount++;
-				Statistics.DrawedMapPolygonCount += Portals[I]->GetPolygonCount();
+				if (CullMode == ZE_MCM_VIEW)
+					continue;
 
-				const ZEArray<ZEPortalMapDoor*>& Doors = Portals[I]->GetDoors();
-				for(size_t J = 0; J < Doors.GetCount(); J++)
+				if (ZEAABBox::IntersectionTest(Portals[I]->GetWorldBoundingBox(), FrustumPosition))
 				{
-					CullPortal(Doors[J], DrawParameters, Frustum);
+					NoClip = false;
+					Portals[I]->CullPass = true;
+					Portals[I]->Draw(DrawParameters);
+
+					Statistics.DrawedPortalCount++;
+					Statistics.DrawedMapPolygonCount += Portals[I]->GetPolygonCount();
+
+					const ZEArray<ZEPortalMapDoor*>& Doors = Portals[I]->GetDoors();
+					for(size_t J = 0; J < Doors.GetCount(); J++)
+					{
+						CullPortal(Doors[J], DrawParameters, Frustum);
+					}
 				}
 			}
 		}
 
-		Statistics.CulledPortalCount = Statistics.TotalPortalCount - Statistics.DrawedPortalCount;
-		Statistics.CulledMapPolygonCount = Statistics.TotalMapPolygonCount - Statistics.DrawedMapPolygonCount;
-	}
-
-	if (NoClip)
-	{
-		for (size_t I = 0; I < Portals.GetCount(); I++)
+		if (NoClip)
 		{
-			if (!DrawParameters->ViewVolume->CullTest(Portals[I]->GetBoundingBox()))
+			for (ZESize I = 0; I < Portals.GetCount(); I++)
 			{
-				Portals[I]->Draw(DrawParameters);
+				if (!DrawParameters->ViewVolume->CullTest(Portals[I]->GetWorldBoundingBox()))
+				{
+					Portals[I]->Draw(DrawParameters);
 
-				Statistics.DrawedPortalCount++;
-				Statistics.DrawedMapPolygonCount += Portals[I]->GetPolygonCount();
-			}
-			else
-			{
-				Statistics.CulledPortalCount++;
-				Statistics.CulledMapPolygonCount += Portals[I]->GetPolygonCount();
+					Statistics.DrawedPortalCount++;
+					Statistics.DrawedMapPolygonCount += Portals[I]->GetPolygonCount();
+				}
 			}
 		}
 
+		for (ZESize I = 0; I < Portals.GetCount(); I++)
+		{
+			if (Portals[I]->IsPersistentDraw)
+			{
+				if (!Portals[I]->IsDrawn)
+				{
+					Portals[I]->Draw(DrawParameters);
 
+					Statistics.DrawedPortalCount++;
+					Statistics.DrawedMapPolygonCount += Portals[I]->GetPolygonCount();
+				}
+			}
+		}
 	}
+
+	Statistics.CulledPortalCount = Statistics.TotalPortalCount - Statistics.DrawedPortalCount;
+	Statistics.CulledMapPolygonCount = Statistics.TotalMapPolygonCount - Statistics.DrawedMapPolygonCount;
+}
+
+void ZEPortalMap::OnTransformChanged()
+{
+	for (ZESize I = 0; I < Portals.GetCount(); I++)
+	{
+		Portals[I]->TransformChanged = true;
+		Portals[I]->PhysicalMesh->SetPosition(GetWorldPosition() + Portals[I]->Position);
+		Portals[I]->PhysicalMesh->SetRotation(GetWorldRotation() * Portals[I]->Rotation);
+		Portals[I]->PhysicalMesh->SetScale(GetWorldScale() * Portals[I]->Scale);
+	}
+
+	for (ZESize I = 0; I < Doors.GetCount(); I++)
+		Doors[I]->TransformChanged = true;
+
+	ZEEntity::OnTransformChanged();
+}
+
+void ZEPortalMap::SetCullMode(ZEMapCullMode Value)
+{
+	CullMode = Value;
 }
 
 ZEEntityRunAt ZEPortalMapDescription::GetRunAt() const

@@ -41,6 +41,7 @@
 #include "../ZEMapResource.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZERectangle3D.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEDefinitions.h"
@@ -75,6 +76,9 @@ struct ZEPortalMapResourcePortal
 {
 	char											Name[ZE_MAX_NAME_SIZE];
 	ZEAABBox										BoundingBox;
+	ZEVector3										Position;
+	ZEQuaternion									Rotation;
+	ZEVector3										Scale;
 	ZEArray<ZEPortalMapResourceDoor*>				Doors;
 	ZEArray<ZESize>									DoorIds;
 	ZEArray<ZEPortalMapPolygon>						Polygons;
@@ -87,10 +91,15 @@ struct ZEPortalMapResourcePortal
 struct ZEPortalMapResourceDoor
 {
 	char											Name[ZE_MAX_NAME_SIZE];
-	ZERectangle3D									Rectangle;
+	bool											IsOpen;
+	float											Width;
+	float											Length;
+	ZEVector3										Position;
+	ZEQuaternion									Rotation;
+	ZEVector3										Scale;
 	ZEPortalMapResourcePortal*						Portals[2];
 	ZEUInt											PortalIds[2];
-	bool											IsOpen;
+	
 };
 
 class ZEFile;
@@ -108,7 +117,6 @@ class ZEPortalMapResource : public ZEMapResource
 		bool										ReadMaterials(ZEMLSerialReader* Reader);
 
 		const ZETexture2D*							ManageMapMaterialTextures(const ZEString& FileName);
-		bool  										ReadMaterialsFromFile(ZEFile* ResourceFile);
 		bool  										ReadMapFromFile(ZEFile* ResourceFile);
 
 		virtual										~ZEPortalMapResource();

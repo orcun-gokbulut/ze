@@ -51,6 +51,15 @@ class ZEPhysicalMesh : public ZEPhysicalObject
 	public:
 		virtual ZEPhysicalObjectType	GetPhysicalObjectType();
 
+		virtual void					SetPosition(const ZEVector3& NewPosition) = 0;
+		virtual ZEVector3				GetPosition() = 0;
+
+		virtual void					SetRotation(const ZEQuaternion& NewRotation) = 0;
+		virtual ZEQuaternion			GetRotation() = 0;
+
+		virtual void					SetScale(const ZEVector3& NewScale) = 0;
+		virtual ZEVector3				GetScale() = 0;
+
 		virtual bool					SetData(const ZEVector3* Vertices, ZEUInt VertexCount, 
 												const ZEPhysicalTriangle* Triangles, ZEUInt PolygonCount, 
 												const ZEPhysicalMaterial* Materials, ZEUInt MaterialCount) = 0;

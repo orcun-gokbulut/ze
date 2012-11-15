@@ -158,7 +158,12 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 			zeError("Material export path not found in resource options. Resource identifier : %s");
 
 		if(!ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
+		{
+			ZEMLNode* MaterialNode = MaterialsNode->AddSubNode("Material");
+			MaterialNode->AddProperty("Name", MaterialName);
+			MaterialNode->AddProperty("FilePath", ResourceConfigurationDialog->GetResourceRelativePath(ZEString(FileName) , MaterialName + ".ZEMATERIAL"));
 			continue;
+		}
 
 		ZEString MaterialFilePath = MaterialOption.ExportPath + ZEPathUtils::GetSeperator() + MaterialOption.Identifier;
 

@@ -91,10 +91,10 @@ void ZEModelAnimationTrack::SetAnimationByName(const char* AnimationName)
 	if (Owner->ModelResource == NULL)
 		return;
 
-	for (ZESize I = 0; I < Owner->ModelResource->Animations.GetCount(); I++)
-		if (strnicmp(AnimationName, Owner->ModelResource->Animations[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
+	for (ZESize I = 0; I < Owner->ModelResource->GetAnimations().GetCount(); I++)
+		if (strnicmp(AnimationName, Owner->ModelResource->GetAnimations()[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
 		{
-			Animation = &Owner->ModelResource->Animations[I];
+			Animation = &Owner->ModelResource->GetAnimations()[I];
 
 			// Recalculate Start and End Frame
 			return;
@@ -319,8 +319,8 @@ void ZEModelAnimationTrack::UpdateMeshesAndBones()
 					ZEQuaternion::Slerp(RotationBlend, Owner->Bones[ItemId].GetRelativeRotation(), Rotation, BlendFactor);
 					break;
 				case ZE_MABM_ADDAPTIVE:		
-					PositionBlend = Owner->Bones[ItemId].GetRelativePosition() + (Position - Owner->ModelResource->Bones[ItemId].RelativePosition) * BlendFactor;
-					RotationBlend = Owner->Bones[ItemId].GetRelativeRotation() * (Owner->ModelResource->Bones[ItemId].RelativeRotation.Conjugate() * Rotation);
+					PositionBlend = Owner->Bones[ItemId].GetRelativePosition() + (Position - Owner->ModelResource->GetBones()[ItemId].RelativePosition) * BlendFactor;
+					RotationBlend = Owner->Bones[ItemId].GetRelativeRotation() * (Owner->ModelResource->GetBones()[ItemId].RelativeRotation.Conjugate() * Rotation);
 					break;
 			}
 

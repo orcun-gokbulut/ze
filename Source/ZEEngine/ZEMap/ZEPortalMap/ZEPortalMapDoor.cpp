@@ -37,6 +37,54 @@
 #include "ZEPortalMapResource.h"
 #include "ZEPortalMap.h"
 #include "ZEPortalMapPortal.h"
+#include "ZEGraphics\ZESimpleMaterial.h"
+#include "ZEGraphics\ZERenderer.h"
+
+void ZEPortalMapDoor::DebugDraw(ZERenderer* Renderer)
+{
+	if (DebugDrawComponents.Material == NULL)
+	{
+		DebugDrawComponents.Material = ZESimpleMaterial::CreateInstance();
+
+		DebugDrawComponents.BoxRenderCommand.SetZero();
+		DebugDrawComponents.BoxRenderCommand.Material = DebugDrawComponents.Material;
+		DebugDrawComponents.BoxRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_NO_Z_WRITE;
+		DebugDrawComponents.BoxRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+		DebugDrawComponents.BoxRenderCommand.VertexBuffer = &DebugDrawComponents.BoxCanvas;
+		DebugDrawComponents.BoxRenderCommand.PrimitiveType = ZE_ROPT_LINE;
+	}
+
+	DebugDrawComponents.BoxCanvas.Clean();
+	DebugDrawComponents.BoxCanvas.SetColor(ZEVector4(0.254902f, 0.411765f, 0.882353f, 1.0f));
+
+	ZERectangle3D Rectangle = GetRectangle();
+	DebugDrawComponents.BoxCanvas.SetRotation(ZEQuaternion::Identity);
+	DebugDrawComponents.BoxCanvas.SetTranslation(ZEVector3::Zero);
+	DebugDrawComponents.BoxCanvas.AddWireframeQuad(Rectangle.P1, Rectangle.P2, Rectangle.P3, Rectangle.P4);
+	ZEMatrix4x4 LocalMatrix;
+	ZEMatrix4x4::CreateOrientation(LocalMatrix, Position, Rotation);
+	DebugDrawComponents.BoxRenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
+	DebugDrawComponents.BoxRenderCommand.PrimitiveCount = DebugDrawComponents.BoxCanvas.Vertices.GetCount() / 2;
+	DebugDrawComponents.BoxRenderCommand.Priority = 4;
+	Renderer->AddToRenderList(&DebugDrawComponents.BoxRenderCommand);
+}
+
+void ZEPortalMapDoor::CalculateRectangle()
+{
+	float HalfWidth = (Width * Scale.x) / 2.0f;
+	float HalfLength = (Length * Scale.z) / 2.0f;
+
+	ZEMatrix4x4 Transform;
+	ZEMatrix4x4::CreateOrientation(Transform, Position, Rotation);
+
+	ZEMatrix4x4 WorldTransform;
+	ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), Transform);
+
+	ZEMatrix4x4::Transform(Rectangle.P1, WorldTransform, ZEVector3(-HalfWidth, 0.0f , HalfLength));
+	ZEMatrix4x4::Transform(Rectangle.P2, WorldTransform, ZEVector3(HalfWidth, 0.0f , HalfLength));
+	ZEMatrix4x4::Transform(Rectangle.P3, WorldTransform, ZEVector3(HalfWidth, 0.0f , -HalfLength));
+	ZEMatrix4x4::Transform(Rectangle.P4, WorldTransform, ZEVector3(-HalfWidth, 0.0f , -HalfLength));
+}
 
 ZEPortalMap* ZEPortalMapDoor::GetOwner()
 {
@@ -56,9 +104,48 @@ ZEPortalMapPortal** ZEPortalMapDoor::GetPortals()
 	return Portals;
 }
 
-const ZERectangle3D& ZEPortalMapDoor::GetRectangle() const
+const ZERectangle3D& ZEPortalMapDoor::GetRectangle()
 {
+	if (TransformChanged)
+	{
+		CalculateRectangle();
+		TransformChanged = false;
+	}
+
 	return Rectangle;
+}
+
+void ZEPortalMapDoor::SetPosition(const ZEVector3& NewPosition)
+{
+	Position = NewPosition;
+	TransformChanged = true;
+}
+
+const ZEVector3& ZEPortalMapDoor::GetPosition() const
+{
+	return Position;
+}
+
+void ZEPortalMapDoor::SetRotation(const ZEQuaternion& NewRotation)
+{
+	Rotation = NewRotation;
+	TransformChanged = true;
+}
+
+const ZEQuaternion& ZEPortalMapDoor::GetRotation() const
+{
+	return Rotation;
+}
+
+void ZEPortalMapDoor::SetScale(const ZEVector3& NewScale)
+{
+	Scale = NewScale;
+	TransformChanged = true;
+}
+
+const ZEVector3& ZEPortalMapDoor::GetScale() const
+{
+	return Scale;
 }
 
 void ZEPortalMapDoor::SetSeenThrough(bool Value)
@@ -75,8 +162,15 @@ void ZEPortalMapDoor::Initialize(ZEPortalMap* Owner, const ZEPortalMapResourceDo
 {
 	this->Owner = Owner;
 	this->Resource = Resource;
-	Rectangle = Resource->Rectangle;
-	Open = Resource->IsOpen;
+	this->Open = Resource->IsOpen;
+	this->Width = Resource->Width;
+	this->Length = Resource->Length;
+
+	this->Position = Resource->Position;
+	this->Rotation = Resource->Rotation;
+	this->Scale = Resource->Scale;
+	
+	CalculateRectangle();
 	
 	Portals[0] = Owner->Portals[(ZESize)Resource->PortalIds[0]];
 	Portals[0]->Doors.Add(this);
@@ -105,9 +199,14 @@ ZEPortalMapDoor::ZEPortalMapDoor()
 {
 	Owner = NULL;
 	Resource = NULL;
+	DebugDrawComponents.Material = NULL;
 	Portals[0] = NULL;
 	Portals[1] = NULL;
 	Open = true;
+	TransformChanged = false;
+	Position = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Scale = ZEVector3::One;
 }
 
 ZEPortalMapDoor* ZEPortalMapDoor::CreateInstance()
