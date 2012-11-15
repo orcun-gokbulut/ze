@@ -38,20 +38,49 @@
 #define __ZE_PORTAL_MAP_DOOR_H__
 
 #include "ZEMath/ZERectangle3D.h"
+#include "ZEGraphics/ZERenderCommand.h"
+#include "ZEGraphics/ZECanvas.h"
 
 class ZEPortalMap;
 class ZEPortalMapPortal;
 struct ZEPortalMapResourceDoor;
+class ZESimpleMaterial;
+class ZECanvas;
+class ZERenderer;
+class ZERenderCommand;
 
 class ZEPortalMapDoor
 {
+	friend class ZEPortalMap;
+
 	private:
 		ZEPortalMap*					Owner;
 		const ZEPortalMapResourceDoor*	Resource;
+
 		ZERectangle3D					Rectangle;
+		float							Width;
+		float							Length;
+
+		mutable bool					TransformChanged;
+		ZEVector3						Position;
+		ZEQuaternion					Rotation;
+		ZEVector3						Scale;
+
 		ZEPortalMapPortal*				Portals[2];
 		bool							Open;
 		bool							SeenThrough;
+
+		struct
+		{
+			ZESimpleMaterial*				Material;
+			ZECanvas						BoxCanvas;
+			ZERenderCommand					BoxRenderCommand;
+
+		} DebugDrawComponents;
+
+
+		void							DebugDraw(ZERenderer* Renderer);
+		void							CalculateRectangle();
 
 										ZEPortalMapDoor();
 
@@ -61,7 +90,16 @@ class ZEPortalMapDoor
 		const char*						GetName();
 
 		ZEPortalMapPortal**				GetPortals();
-		const ZERectangle3D&			GetRectangle() const;
+		const ZERectangle3D&			GetRectangle();
+
+		void							SetPosition(const ZEVector3& NewPosition);
+		const ZEVector3&				GetPosition() const;
+
+		void							SetRotation(const ZEQuaternion& NewRotation);
+		const ZEQuaternion&				GetRotation() const;
+
+		void							SetScale(const ZEVector3& NewScale);
+		const ZEVector3&				GetScale() const;
 
 		void							SetSeenThrough(bool Value);
 		bool							GetSeenThrough();

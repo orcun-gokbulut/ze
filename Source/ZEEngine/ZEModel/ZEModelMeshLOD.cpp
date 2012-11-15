@@ -40,7 +40,7 @@
 
 void ZEModelMeshLOD::ResetMaterial()
 {
-	RenderCommand.Material = Owner->GetModelResource()->Materials[(ZESize)LODResource->MaterialId];
+	RenderCommand.Material = Owner->GetModelResource()->GetMaterials()[(ZESize)LODResource->MaterialId];
 }
 
 void ZEModelMeshLOD::SetMaterial(const ZEMaterial* Material)
@@ -98,7 +98,7 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	RenderCommand.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();
 	RenderCommand.PrimitiveCount = Skinned ? LODResource->SkinnedVertices.GetCount() / 3: LODResource->Vertices.GetCount() / 3;
 	RenderCommand.VertexDeclaration = Skinned ? ZESkinnedModelVertex::GetVertexDeclaration() : ZEModelVertex::GetVertexDeclaration();
-	RenderCommand.Material = Owner->GetModelResource()->Materials[(ZESize)LODResource->MaterialId];
+	RenderCommand.Material = Owner->GetModelResource()->GetMaterials()[(ZESize)LODResource->MaterialId];
 }
 
 void ZEModelMeshLOD::Deinitialize()

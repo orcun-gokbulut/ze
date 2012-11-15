@@ -199,25 +199,25 @@ void ZEModel::LoadModelResource()
 	if (ModelResource == NULL)
 		return;
 
-	Meshes.SetCount(ModelResource->Meshes.GetCount());
-	for (ZESize I = 0; I < ModelResource->Meshes.GetCount(); I++)
+	Meshes.SetCount(ModelResource->GetMeshes().GetCount());
+	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
 	{
-		Meshes[I].Initialize(this, &ModelResource->Meshes[I]);
+		Meshes[I].Initialize(this, &ModelResource->GetMeshes()[I]);
 	}
 
-	Bones.SetCount(ModelResource->Bones.GetCount());
+	Bones.SetCount(ModelResource->GetBones().GetCount());
 
-	for (ZESize I = 0; I < ModelResource->Bones.GetCount(); I++)
+	for (ZESize I = 0; I < ModelResource->GetBones().GetCount(); I++)
 	{
-		if (ModelResource->Bones[I].ParentBone != -1)
+		if (ModelResource->GetBones()[I].ParentBone != -1)
 		{
-			Bones[(ZESize)ModelResource->Bones[I].ParentBone].AddChild(&Bones[I]);
+			Bones[(ZESize)ModelResource->GetBones()[I].ParentBone].AddChild(&Bones[I]);
 		}
 	}
 
-	for (ZESize I = 0; I < ModelResource->Bones.GetCount(); I++)
+	for (ZESize I = 0; I < ModelResource->GetBones().GetCount(); I++)
 	{
-		Bones[I].Initialize(this, &ModelResource->Bones[I]);
+		Bones[I].Initialize(this, &ModelResource->GetBones()[I]);
 		if (Bones[I].GetParentBone() == NULL)
 		{
 			Skeleton.Add(&Bones[I]);
@@ -320,7 +320,7 @@ const ZEArray<ZEModelAnimation>* ZEModel::GetAnimations()
 	}
 	else 
 	{
-		return &ModelResource->Animations;
+		return &ModelResource->GetAnimations();
 	}
 }
 

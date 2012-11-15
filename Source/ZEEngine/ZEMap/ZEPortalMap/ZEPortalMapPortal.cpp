@@ -45,6 +45,36 @@
 #include "ZEPhysics/ZEPhysicalWorld.h"
 #include "ZEMap/ZEPortalMap/ZEPortalMap.h"
 #include "ZEMath/ZEViewVolume.h"
+#include "ZEGraphics/ZESimpleMaterial.h"
+
+void ZEPortalMapPortal::DebugDraw(ZERenderer* Renderer)
+{
+	if (DebugDrawComponents.Material == NULL)
+	{
+		DebugDrawComponents.Material = ZESimpleMaterial::CreateInstance();
+
+		DebugDrawComponents.BoxRenderCommand.SetZero();
+		DebugDrawComponents.BoxRenderCommand.Material = DebugDrawComponents.Material;
+		DebugDrawComponents.BoxRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_NO_Z_WRITE;
+		DebugDrawComponents.BoxRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+		DebugDrawComponents.BoxRenderCommand.VertexBuffer = &DebugDrawComponents.BoxCanvas;
+		DebugDrawComponents.BoxRenderCommand.PrimitiveType = ZE_ROPT_LINE;
+	}
+
+	DebugDrawComponents.BoxCanvas.Clean();
+	DebugDrawComponents.BoxCanvas.SetColor(ZEVector4(0.7f, 0.5f, 0.0f, 1.0f));
+
+	ZEAABBox BoundingBox = GetBoundingBox();
+	DebugDrawComponents.BoxCanvas.SetRotation(ZEQuaternion::Identity);
+	DebugDrawComponents.BoxCanvas.SetTranslation(ZEVector3::Zero);
+	DebugDrawComponents.BoxCanvas.AddWireframeBox((BoundingBox.Max.x - BoundingBox.Min.x), (BoundingBox.Max.y - BoundingBox.Min.y), (BoundingBox.Max.z - BoundingBox.Min.z));
+	ZEMatrix4x4 LocalMatrix;
+	ZEMatrix4x4::CreateOrientation(LocalMatrix, Position, Rotation, Scale);
+	DebugDrawComponents.BoxRenderCommand.WorldMatrix = Owner->GetWorldTransform() * LocalMatrix;
+	DebugDrawComponents.BoxRenderCommand.PrimitiveCount = DebugDrawComponents.BoxCanvas.Vertices.GetCount() / 2;
+	DebugDrawComponents.BoxRenderCommand.Priority = 4;
+	Renderer->AddToRenderList(&DebugDrawComponents.BoxRenderCommand);
+}
 
 ZEPortalMap* ZEPortalMapPortal::GetOwner()
 {
@@ -66,7 +96,61 @@ const ZEArray<ZEPortalMapDoor*>& ZEPortalMapPortal::GetDoors()
 
 const ZEAABBox& ZEPortalMapPortal::GetBoundingBox()
 {
-	return Resource->BoundingBox;
+	return BoundingBox;
+}
+
+const ZEAABBox& ZEPortalMapPortal::GetWorldBoundingBox()
+{
+	if (TransformChanged)
+	{
+		ZEMatrix4x4 Transform;
+		ZEMatrix4x4::CreateOrientation(Transform, Position, Rotation, Scale);
+
+		ZEMatrix4x4 WorldTransform;
+		ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), Transform);
+
+		ZEAABBox::Transform(WorldBoundingBox, BoundingBox, WorldTransform);
+		TransformChanged = false;
+	}
+
+	return WorldBoundingBox;
+	
+}
+
+void ZEPortalMapPortal::SetPosition(const ZEVector3& NewPosition)
+{
+	Position = NewPosition;
+	TransformChanged = true;
+	PhysicalMesh->SetPosition(Owner->GetWorldPosition() + Position);
+}
+
+const ZEVector3& ZEPortalMapPortal::GetPosition() const
+{
+	return Position;
+}
+
+void ZEPortalMapPortal::SetRotation(const ZEQuaternion& NewRotation)
+{
+	Rotation = NewRotation;
+	TransformChanged = true;
+	PhysicalMesh->SetRotation(Owner->GetWorldRotation() * Rotation);
+}
+
+const ZEQuaternion& ZEPortalMapPortal::GetRotation() const
+{
+	return Rotation;
+}
+
+void ZEPortalMapPortal::SetScale(const ZEVector3& NewScale)
+{
+	Scale = NewScale;
+	TransformChanged = true;
+	PhysicalMesh->SetScale(Owner->GetWorldScale() * Scale);
+}
+
+const ZEVector3& ZEPortalMapPortal::GetScale() const
+{
+	return Scale;
 }
 
 ZEPhysicalMesh* ZEPortalMapPortal::GetPhysicalMesh()
@@ -79,11 +163,20 @@ size_t ZEPortalMapPortal::GetPolygonCount()
 	return Resource->Polygons.GetCount();
 }
 
+void ZEPortalMapPortal::SetPersistentDraw(bool Enabled)
+{
+	IsPersistentDraw = Enabled;
+}
+
 void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
 {
+	IsDrawn = true;
+
 	for(ZESize I = 0; I < RenderCommands.GetCount(); I++)
 	{
-		RenderCommands[I].WorldMatrix = Owner->GetWorldTransform();
+		ZEMatrix4x4 LocalTransform;
+		ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
+		RenderCommands[I].WorldMatrix = Owner->GetWorldTransform() * LocalTransform;
 		RenderCommands[I].Lights.Clear();
 		RenderCommands[I].Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
 
@@ -93,6 +186,20 @@ void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
 
 bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource)
 {	
+
+	this->Owner = Owner;
+	this->Resource = Resource;
+	this->BoundingBox = Resource->BoundingBox;
+	this->TransformChanged = true;
+	this->Position = Resource->Position;
+	this->Rotation = Resource->Rotation;
+	this->Scale = Resource->Scale;
+
+	ZEMatrix4x4 LocalTransform;
+	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
+	ZEMatrix4x4 WorldTransform = Owner->GetWorldTransform() * LocalTransform;
+	
+
 	// Initialize Render Components
 	if (VertexBuffer == NULL)
 	{
@@ -123,7 +230,7 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 				RenderCommand->VertexBufferOffset = VertexIndex;
 				RenderCommand->VertexBuffer = VertexBuffer;
 				RenderCommand->VertexDeclaration = ZEMapVertex::GetVertexDeclaration();
-				ZEMatrix4x4::CreateIdentity(RenderCommand->WorldMatrix);
+				RenderCommand->WorldMatrix = WorldTransform;
 
 				RenderCommand->PrimitiveCount = 0;
 				for (ZESize I = N; I < Resource->Polygons.GetCount(); I++)
@@ -170,13 +277,13 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 							  PhysicalTriangles.GetConstCArray(), 
 							  (ZEUInt)PhysicalTriangles.GetCount(),
 							  NULL, 0);
+
+		PhysicalMesh->SetPosition(Owner->GetWorldPosition() + Position);
+		PhysicalMesh->SetRotation(Owner->GetWorldRotation() * Rotation);
+		PhysicalMesh->SetScale(Owner->GetWorldScale() * Scale);
 		PhysicalMesh->Initialize();
 		zeScene->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);
 	}
-
-	this->Resource = Resource;
-
-	this->Owner = Owner;
 
 	return true;
 }
@@ -197,6 +304,12 @@ void ZEPortalMapPortal::Deinitialize()
 		PhysicalMesh->Destroy();
 		PhysicalMesh = NULL;
 	}
+
+	if (DebugDrawComponents.Material != NULL)
+	{
+		DebugDrawComponents.Material->Release();
+		DebugDrawComponents.Material = NULL;
+	}
 }
 
 ZEPortalMapPortal::ZEPortalMapPortal()
@@ -205,6 +318,16 @@ ZEPortalMapPortal::ZEPortalMapPortal()
 	Resource = NULL;
 	PhysicalMesh = NULL;
 	VertexBuffer = NULL;
+	DebugDrawComponents.Material = NULL;
+
+	CullPass = false;
+	IsDrawn = false;
+	IsPersistentDraw = false;
+
+	TransformChanged = false;
+	Position = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Scale = ZEVector3::One;
 }
 
 ZEPortalMapPortal::~ZEPortalMapPortal()

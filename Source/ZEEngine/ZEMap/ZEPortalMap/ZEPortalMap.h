@@ -41,6 +41,16 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 
+
+#include "ZEML/ZEMLNode.h"
+
+enum ZEMapCullMode
+{
+	ZE_MCM_NONE,
+	ZE_MCM_VIEW,
+	ZE_MCM_FULL
+};
+
 struct ZEPortalMapCullStatistics
 {
 	size_t	TotalPortalCount;
@@ -78,14 +88,16 @@ class ZEPortalMap : public ZEEntity
 		ZEPortalMapResource*					Resource;
 		ZEArray<ZEPortalMapPortal*>				Portals;
 		ZEArray<ZEPortalMapDoor*>				Doors; 
+		ZEMapCullMode							CullMode;
 		ZEPortalMapCullStatistics				Statistics;
 
 		void									LoadPortalResource(ZEPortalMapResource* Resource);
 
-		static bool								GenerateViewVolume(ZEViewFrustum& NewViewVolume, const ZEPortalMapDoor* Door, const ZEViewVolume* OldViewVolume);
+		static bool								GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEPortalMapDoor* Door, const ZEViewVolume* OldViewVolume);
 		void									CullPortal(ZEPortalMapDoor* Door, ZEDrawParameters* DrawParameters, ZEViewVolume* ViewVolume);
 		void									CullPortals(ZEDrawParameters* DrawParameters);
 
+		virtual	void							OnTransformChanged();
 
 												ZEPortalMap();
 												~ZEPortalMap();
@@ -108,6 +120,8 @@ class ZEPortalMap : public ZEEntity
 
 		virtual bool							SetMapFile(const ZEString& FileName);
 		virtual const ZEString&					GetMapFile() const;
+
+		void									SetCullMode(ZEMapCullMode Value);
 
 		static ZEPortalMap*						CreateInstance();
 

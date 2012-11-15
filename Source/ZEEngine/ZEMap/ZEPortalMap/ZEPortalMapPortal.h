@@ -39,14 +39,17 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEGraphics/ZERenderCommand.h"
+#include "ZEGraphics/ZECanvas.h"
 
 class ZEPortalMap;
 class ZEPortalMapDoor;
 struct ZEPortalMapResourcePortal;
 class ZEStaticVertexBuffer;
 class ZEPhysicalMesh;
+class ZERenderer;
 struct ZEDrawParameters;
 class ZEViewVolume;
+class ZESimpleMaterial;
 
 class ZEPortalMapPortal
 {
@@ -62,6 +65,26 @@ class ZEPortalMapPortal
 		ZEPhysicalMesh*						PhysicalMesh;
 
 		bool								CullPass;
+		bool								IsDrawn;
+		bool								IsPersistentDraw;
+
+		bool								TransformChanged;
+		ZEAABBox							BoundingBox;
+		ZEAABBox							WorldBoundingBox;
+
+		ZEVector3							Position;
+		ZEQuaternion						Rotation;
+		ZEVector3							Scale;
+
+		struct
+		{
+			ZESimpleMaterial*				Material;
+			ZECanvas						BoxCanvas;
+			ZERenderCommand					BoxRenderCommand;
+
+		} DebugDrawComponents;
+
+		void								DebugDraw(ZERenderer* Renderer);
 
 											ZEPortalMapPortal();
 											~ZEPortalMapPortal();
@@ -71,13 +94,25 @@ class ZEPortalMapPortal
 		const char*							GetName();
 
 		const ZEArray<ZEPortalMapDoor*>&	GetDoors();
-		const ZEAABBox&						GetBoundingBox();
 		ZEPhysicalMesh*						GetPhysicalMesh();
-		size_t								GetPolygonCount();
+		ZESize								GetPolygonCount();
+
+		const ZEAABBox&						GetBoundingBox();
+		const ZEAABBox&						GetWorldBoundingBox();
+
+		void								SetPosition(const ZEVector3& NewPosition);
+		const ZEVector3&					GetPosition() const;
+
+		void								SetRotation(const ZEQuaternion& NewRotation);
+		const ZEQuaternion&					GetRotation() const;
+
+		void								SetScale(const ZEVector3& NewScale);
+		const ZEVector3&					GetScale() const;
 
 		bool								Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource);
 		void								Deinitialize();
 
+		void								SetPersistentDraw(bool Enabled);
 		void								Draw(ZEDrawParameters* DrawParameters);
 
 		static ZEPortalMapPortal*			CreateInstance();
