@@ -285,7 +285,7 @@ bool ZEViewFrustum::CullTest(const ZERectangle3D& Rectangle) const
 {
 	if ((ZERectangle3D::IntersectionTest(Rectangle, NearClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
 		(ZERectangle3D::IntersectionTest(Rectangle, LeftClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZERectangle3D::IntersectionTest(Rectangle, RightClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZERectangle3D::IntersectionTest(Rectangle, RightClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
 		(ZERectangle3D::IntersectionTest(Rectangle, TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
 		(ZERectangle3D::IntersectionTest(Rectangle, FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
 		(ZERectangle3D::IntersectionTest(Rectangle, BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))

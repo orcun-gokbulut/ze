@@ -102,6 +102,18 @@ ZETestSuite(ZEMatrix3x3)
 		ZEMatrix3x3::CreateIdentity(Matrix);
 		ZETestCheckEqual(Matrix, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f));
 	}
+	ZETest("void ZEMatrix3x3::CreateOrientation2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation, float Angle, const ZEVector2& Scale)")
+	{
+		ZEMatrix3x3 TransformationMatrix;
+		ZEMatrix3x3::CreateOrientation2D(TransformationMatrix, ZEVector2(5.0f, 5.0f), ZE_PI_2, ZEVector2(2.0f, 2.0f));
+
+		ZEVector2 SampleVector(5.0f, 0.0f);
+
+		ZEVector2 ResultingVector = TransformationMatrix * SampleVector;
+
+		ZETestCheckClose(ResultingVector.x, 5.0f);
+		ZETestCheckClose(ResultingVector.y, -5.0f);
+	}
 	ZETest("void ZEMatrix3x3::CreateRotation(ZEMatrix3x3& Matrix, const ZEQuaternion& Rotation)")
 	{
 		ZEQuaternion Rotation(ZE_PI_4, ZEVector3::UnitY);
@@ -109,6 +121,18 @@ ZETestSuite(ZEMatrix3x3)
 
 		ZEMatrix3x3::CreateRotation(Matrix, Rotation);
 		ZETestCheckClose(Matrix, ZEMatrix3x3(0.70710673f, 0.0f, 0.70710680f, 0.0f, 1.0f, 0.0f, -0.70710680f, 0.0f, 0.70710673f));
+	}
+	ZETest("static void ZEMatrix3x3::CreateRotation2D(ZEMatrix3x3& Matrix, float Angle)")
+	{
+		ZEMatrix3x3 RotationMatrix;
+		ZEMatrix3x3::CreateRotation2D(RotationMatrix, ZE_PI_2);
+
+		ZEVector2 SampleVector(5.0f, 0.0f);
+
+		ZEVector2 ResultingVector = RotationMatrix * SampleVector;
+
+		ZETestCheckClose(ResultingVector.x, 0.0f);
+		ZETestCheckClose(ResultingVector.y, -5.0f);
 	}
 	ZETest("void ZEMatrix3x3::CreateRotationX(ZEMatrix3x3& Matrix, float Pitch)")
 	{
@@ -191,6 +215,50 @@ ZETestSuite(ZEMatrix3x3)
 		ZEMatrix3x3::CreateScale(Matrix, 1.0f, 2.0f, 3.0f);
 		ZETestCheckEqual(Matrix, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 3.0f));
 	}
+	ZETest("static void ZEMatrix3x3::CreateScale2D(ZEMatrix3x3& Matrix, float x, float y)")
+	{
+		ZEMatrix3x3 ScaleMatrix;
+		ZEMatrix3x3::CreateScale2D(ScaleMatrix, 2.0f, 2.0f);
+
+		ZEVector2 SampleVector(5.0f, 5.0f);
+		ZEVector2 ResultVector = ScaleMatrix * SampleVector;
+
+		ZETestCheckClose(ResultVector.x, 10.0f);
+		ZETestCheckClose(ResultVector.y, 10.0f);
+	}
+	ZETest("static void ZEMatrix3x3::CreateScale2D(ZEMatrix3x3& Matrix, const ZEVector2& Scale)")
+	{
+		ZEMatrix3x3 ScaleMatrix;
+		ZEMatrix3x3::CreateScale2D(ScaleMatrix, ZEVector2(2.0f, 2.0f));
+
+		ZEVector2 SampleVector(5.0f, 5.0f);
+		ZEVector2 ResultVector = ScaleMatrix * SampleVector;
+
+		ZETestCheckClose(ResultVector.x, 10.0f);
+		ZETestCheckClose(ResultVector.y, 10.0f);
+	}
+	ZETest("static void ZEMatrix3x3::CreateTranslation2D(ZEMatrix3x3& Matrix, float x, float y)")
+	{
+		ZEMatrix3x3 TranslationMatrix;
+		ZEMatrix3x3::CreateTranslation2D(TranslationMatrix, 5.0f, 5.0f);
+
+		ZEVector2 SampleVector(3.0f, 3.0f);
+		ZEVector2 ResultVector = TranslationMatrix * SampleVector;
+
+		ZETestCheckClose(ResultVector.x, 8.0f);
+		ZETestCheckClose(ResultVector.y, 8.0f);
+	}
+	ZETest("static void ZEMatrix3x3::CreateTranslation2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation)")
+	{
+		ZEMatrix3x3 TranslationMatrix;
+		ZEMatrix3x3::CreateTranslation2D(TranslationMatrix, ZEVector2(5.0f, 5.0f));
+
+		ZEVector2 SampleVector(3.0f, 3.0f);
+		ZEVector2 ResultVector = TranslationMatrix * SampleVector;
+
+		ZETestCheckClose(ResultVector.x, 8.0f);
+		ZETestCheckClose(ResultVector.y, 8.0f);
+	}
 	ZETest("void ZEMatrix3x3::CreateZero(ZEMatrix3x3& Matrix)")
 	{
 		ZEMatrix3x3 Matrix;
@@ -213,6 +281,110 @@ ZETestSuite(ZEMatrix3x3)
 
 		float Determinant = Matrix.Determinant();
 		ZETestCheckClose(Determinant, -60.0f);
+	}
+	ZETest("static void ZEMatrix3x3::Get2DDecomposition(ZEVector2& Translation, float& Rotation, ZEVector2& Scale, const ZEMatrix3x3& Matrix)")
+	{
+		ZEMatrix3x3 TransformationMatrix;
+		ZEMatrix3x3::CreateOrientation2D(TransformationMatrix, ZEVector2(3.0f, 5.0f), ZE_PI_2, ZEVector2(2.0f, 4.0f));
+
+		ZEVector2 ResultPosition;
+		float ResultRotation;
+		ZEVector2 ResultScale;
+
+		ZEMatrix3x3::Get2DDecomposition(ResultPosition, ResultRotation, ResultScale, TransformationMatrix);
+
+		ZETestCheckClose(ResultPosition.x, 3.0f);
+		ZETestCheckClose(ResultPosition.y, 5.0f);
+		ZETestCheckClose(ResultRotation, ZE_PI_2);
+		ZETestCheckClose(ResultScale.x, 2.0f);
+		ZETestCheckClose(ResultScale.y, 4.0f);
+	}
+	ZETest("float ZEMatrix3x3::Get2DRotation()")
+	{
+		ZEMatrix3x3 TransformationMatrix;
+		ZEMatrix3x3::CreateOrientation2D(TransformationMatrix, ZEVector2(3.0f, 5.0f), ZE_PI_2, ZEVector2(2.0f, 4.0f));
+
+		float ResultRotation = TransformationMatrix.Get2DRotation();
+
+		ZETestCheckClose(ResultRotation, ZE_PI_2);
+	}
+	ZETest("ZEVector2 ZEMatrix3x3::Get2DScale()")
+	{
+		ZEMatrix3x3 TransformationMatrix;
+		ZEMatrix3x3::CreateOrientation2D(TransformationMatrix, ZEVector2(3.0f, 5.0f), ZE_PI_2, ZEVector2(2.0f, 4.0f));
+
+		ZEVector2 ResultScale = TransformationMatrix.Get2DScale();
+
+		ZETestCheckClose(ResultScale.x, 2.0f);
+		ZETestCheckClose(ResultScale.y, 4.0f);
+	}
+	ZETest("ZEVector2 ZEMatrix3x3::Get2DTranslation()")
+	{
+		ZEMatrix3x3 TransformationMatrix;
+		ZEMatrix3x3::CreateOrientation2D(TransformationMatrix, ZEVector2(3.0f, 5.0f), ZE_PI_2, ZEVector2(2.0f, 4.0f));
+
+		ZEVector2 ResultPosition = TransformationMatrix.Get2DTranslation();
+
+		ZETestCheckClose(ResultPosition.x, 3.0f);
+		ZETestCheckClose(ResultPosition.y, 5.0f);
+	}
+	ZETest("static void ZEMatrix3x3::GetDecomposition(ZEQuaternion& Rotation, ZEVector3& Scale, const ZEMatrix3x3& Matrix)")
+	{
+		ZEMatrix3x3 RotationMatrix;
+		ZEMatrix3x3::CreateRotation(RotationMatrix, ZEQuaternion(ZE_PI_2, ZEVector3::UnitY));
+
+		ZEMatrix3x3 ScaleMatrix;
+		ZEMatrix3x3::CreateScale(ScaleMatrix, 2.0f, 3.0f, 4.0f);
+
+		ZEMatrix3x3 TransformationMatrix = RotationMatrix * ScaleMatrix;
+
+		ZEQuaternion ResultRotation;
+		ZEVector3 ResultScale;
+
+		ZEMatrix3x3::GetDecomposition(ResultRotation, ResultScale, TransformationMatrix);
+
+		ZETestCheckClose(ResultRotation.w, 0.70710677f);
+		ZETestCheckClose(ResultRotation.x, 0.0f);
+		ZETestCheckClose(ResultRotation.y, 0.70710677f);
+		ZETestCheckClose(ResultRotation.z, 0.0f);
+
+		ZETestCheckClose(ResultScale.x, 2.0f);
+		ZETestCheckClose(ResultScale.y, 3.0f);
+		ZETestCheckClose(ResultScale.z, 4.0f);
+
+	}
+	ZETest("ZEQuaternion ZEMatrix3x3::GetRotation()")
+	{
+		ZEMatrix3x3 RotationMatrix;
+		ZEMatrix3x3::CreateRotation(RotationMatrix, ZEQuaternion(ZE_PI_2, ZEVector3::UnitY));
+
+		ZEMatrix3x3 ScaleMatrix;
+		ZEMatrix3x3::CreateScale(ScaleMatrix, 2.0f, 3.0f, 4.0f);
+
+		ZEMatrix3x3 TransformationMatrix = RotationMatrix * ScaleMatrix;
+
+		ZEQuaternion ResultRotation = TransformationMatrix.GetRotation();
+
+		ZETestCheckClose(ResultRotation.w, 0.70710677f);
+		ZETestCheckClose(ResultRotation.x, 0.0f);
+		ZETestCheckClose(ResultRotation.y, 0.70710677f);
+		ZETestCheckClose(ResultRotation.z, 0.0f);
+	}
+	ZETest("ZEVector3 ZEMatrix3x3::GetScale()")
+	{
+		ZEMatrix3x3 RotationMatrix;
+		ZEMatrix3x3::CreateRotation(RotationMatrix, ZEQuaternion(ZE_PI_2, ZEVector3::UnitY));
+
+		ZEMatrix3x3 ScaleMatrix;
+		ZEMatrix3x3::CreateScale(ScaleMatrix, 2.0f, 3.0f, 4.0f);
+
+		ZEMatrix3x3 TransformationMatrix = RotationMatrix * ScaleMatrix;
+
+		ZEVector3 ResultScale = TransformationMatrix.GetScale();
+
+		ZETestCheckClose(ResultScale.x, 2.0f);
+		ZETestCheckClose(ResultScale.y, 3.0f);
+		ZETestCheckClose(ResultScale.z, 4.0f);
 	}
 	ZETest("bool ZEMatrix3x3::Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix)")
 	{
