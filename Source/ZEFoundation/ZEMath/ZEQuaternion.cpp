@@ -448,6 +448,22 @@ ZEVector3 ZEQuaternion::RotationAxis() const
 	return Axis;
 }
 
+bool ZEQuaternion::Equals(const ZEQuaternion& Quaternion) const
+{
+	return ((ZEMath::Abs(this->x - Quaternion.x) < ZE_ZERO_THRESHOLD) && 
+		(ZEMath::Abs(this->y - Quaternion.y) < ZE_ZERO_THRESHOLD) &&
+		(ZEMath::Abs(this->z - Quaternion.z) < ZE_ZERO_THRESHOLD) &&
+		(ZEMath::Abs(this->w - Quaternion.w) < ZE_ZERO_THRESHOLD));
+}
+
+bool ZEQuaternion::Equals(const ZEQuaternion& Quaternion, float Threshold) const
+{
+	return ((ZEMath::Abs(this->x - Quaternion.x) < Threshold) && 
+		(ZEMath::Abs(this->y - Quaternion.y) < Threshold) &&
+		(ZEMath::Abs(this->z - Quaternion.z) < Threshold) &&
+		(ZEMath::Abs(this->w - Quaternion.w) < Threshold));
+}
+
 ZEQuaternion ZEQuaternion::operator*(const ZEQuaternion& Other) const
 {
 	ZEQuaternion Temp;
@@ -472,18 +488,12 @@ ZEVector3 ZEQuaternion::operator*(const ZEVector3& Vector) const
 
 bool ZEQuaternion::operator==(const ZEQuaternion& RightOperand) const
 {
-	return ((ZEMath::Abs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
-		(ZEMath::Abs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD) &&
-		(ZEMath::Abs(this->z - RightOperand.z) < ZE_ZERO_THRESHOLD) &&
-		(ZEMath::Abs(this->w - RightOperand.w) < ZE_ZERO_THRESHOLD));
+	return Equals(RightOperand);
 }
 
 bool ZEQuaternion::operator!=(const ZEQuaternion& RightOperand) const
 {
-	return ((ZEMath::Abs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
-			(ZEMath::Abs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD) ||
-			(ZEMath::Abs(this->z - RightOperand.z) > ZE_ZERO_THRESHOLD) ||
-			(ZEMath::Abs(this->w - RightOperand.w) > ZE_ZERO_THRESHOLD));
+	return !Equals(RightOperand);
 }
 
 float ZEQuaternion::operator[](ZESize Index) const

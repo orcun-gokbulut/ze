@@ -106,6 +106,9 @@ class ZEVector2
 		float						Min() const;
 		float						Max() const;
 
+		bool						Equals(const ZEVector2& Vector) const;
+		bool						Equals(const ZEVector2& Vector, float Threshold) const;
+
 		ZEVector2					operator +(const ZEVector2 &RightOperand) const;
 		ZEVector2					operator -(const ZEVector2 &RightOperand) const;
 		ZEVector2					operator *(const ZEVector2 &RightOperand) const;
@@ -221,6 +224,8 @@ class ZEVector3
 		float						Min() const;
 		float						Max() const;
 
+		bool						Equals(const ZEVector3& Vector) const;
+		bool						Equals(const ZEVector3& Vector, float Threshold) const;
 
 		ZEVector3					operator+(const ZEVector3& RightOperand) const;
 		ZEVector3					operator-(const ZEVector3& RightOperand) const;
@@ -316,6 +321,9 @@ class ZEVector4
 		void						SaturateSelf();
 		float						Min() const;
 		float						Max() const;
+
+		bool						Equals(const ZEVector4& Vector) const;
+		bool						Equals(const ZEVector4& Vector, float Threshold) const;
 
 		ZEVector4					operator+(const ZEVector4 &RightOperand) const;
 		ZEVector4					operator-(const ZEVector4 &RightOperand) const;
