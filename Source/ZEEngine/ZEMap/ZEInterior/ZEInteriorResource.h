@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPortalMapResource.h
+ Zinek Engine - ZEInteriorResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PORTAL_MAP_RESOURCE_H__
-#define __ZE_PORTAL_MAP_RESOURCE_H__
+#ifndef __ZE_INTERIOR_RESOURCE_H__
+#define __ZE_INTERIOR_RESOURCE_H__
 
 #include "ZETypes.h"
 #include "../ZEMapResource.h"
@@ -51,44 +51,43 @@
 class ZEMaterial;
 class ZETexture2D;
 class ZETexture2DResource;
-struct ZEPortalMapResourceDoor;
+struct ZEInteriorDoorResource;
 class ZEMLSerialReader;
 
-struct ZEPortalMapPolygon
+struct ZEInteriorPolygon
 {
 	ZEMapVertex				Vertices[3];
 	ZEMaterial*				Material;
 	ZEUInt32				LastIteration;
 };
 
-struct ZEPortalMapPhysicalMeshPolygon
+struct ZEInteriorPhysicalMeshPolygon
 {
 	ZEUInt32				Indices[3];
 };
 
-struct ZEPortalMapResourcePhysicalMesh
+struct ZEInteriorPhysicalMeshResource
 {
+	bool											PhysicalMeshEnabled;
 	ZEArray<ZEVector3>								Vertices;
-	ZEArray<ZEPortalMapPhysicalMeshPolygon>			Polygons;
+	ZEArray<ZEInteriorPhysicalMeshPolygon>			Polygons;
 };
 
-struct ZEPortalMapResourcePortal
+struct ZEInteriorRoomResource
 {
 	char											Name[ZE_MAX_NAME_SIZE];
 	ZEAABBox										BoundingBox;
 	ZEVector3										Position;
 	ZEQuaternion									Rotation;
 	ZEVector3										Scale;
-	ZEArray<ZEPortalMapResourceDoor*>				Doors;
+	ZEArray<ZEInteriorDoorResource*>				Doors;
 	ZEArray<ZESize>									DoorIds;
-	ZEArray<ZEPortalMapPolygon>						Polygons;
-	ZEPortalMapResourcePhysicalMesh					PhysicalMesh;
-	bool											HasOctree;
-	//ZEPortalMapOctree								Octree;
+	ZEArray<ZEInteriorPolygon>						Polygons;
+	ZEInteriorPhysicalMeshResource					PhysicalMesh;
 	bool											HasPhysicalMesh;
 };
 
-struct ZEPortalMapResourceDoor
+struct ZEInteriorDoorResource
 {
 	char											Name[ZE_MAX_NAME_SIZE];
 	bool											IsOpen;
@@ -97,40 +96,40 @@ struct ZEPortalMapResourceDoor
 	ZEVector3										Position;
 	ZEQuaternion									Rotation;
 	ZEVector3										Scale;
-	ZEPortalMapResourcePortal*						Portals[2];
-	ZEUInt											PortalIds[2];
+	ZEInteriorRoomResource*							Rooms[2];
+	ZEUInt											RoomIds[2];
 	
 };
 
 class ZEFile;
 
-class ZEPortalMapResource : public ZEMapResource
+class ZEInteriorResource : public ZEMapResource
 {
 	private:
 		ZEArray<ZETexture2DResource*>				TextureResources;
 		ZEArray<ZEMaterial*>						Materials;
-		ZEArray<ZEPortalMapResourceDoor>			Doors;
-		ZEArray<ZEPortalMapResourcePortal>			Portals;
+		ZEArray<ZEInteriorDoorResource>				Doors;
+		ZEArray<ZEInteriorRoomResource>				Rooms;
 
-		bool										ReadPortalDoors(ZEMLSerialReader* Reader);
-		bool										ReadPortals(ZEMLSerialReader* Reader);
+		bool										ReadDoors(ZEMLSerialReader* Reader);
+		bool										ReadRooms(ZEMLSerialReader* Reader);
 		bool										ReadMaterials(ZEMLSerialReader* Reader);
 
-		const ZETexture2D*							ManageMapMaterialTextures(const ZEString& FileName);
-		bool  										ReadMapFromFile(ZEFile* ResourceFile);
+		const ZETexture2D*							ManageInteriorMaterialTextures(const ZEString& FileName);
+		bool  										ReadInteriorFromFile(ZEFile* ResourceFile);
 
-		virtual										~ZEPortalMapResource();
+		virtual										~ZEInteriorResource();
 
 	public:
 		const char*									GetResourceType() const;
 
 		const ZEArray<ZETexture2DResource*>&		GetTextures();
 		const ZEArray<ZEMaterial*>&					GetMaterials();
-		const ZEArray<ZEPortalMapResourcePortal>&	GetPortals();
-		const ZEArray<ZEPortalMapResourceDoor>&		GetDoors();
+		const ZEArray<ZEInteriorRoomResource>&		GetRooms();
+		const ZEArray<ZEInteriorDoorResource>&		GetDoors();
 
-		static ZEPortalMapResource*					LoadResource(const ZEString& FileName);
-		static ZEPortalMapResource*					LoadSharedResource(const ZEString& FileName);
+		static ZEInteriorResource*					LoadResource(const ZEString& FileName);
+		static ZEInteriorResource*					LoadSharedResource(const ZEString& FileName);
 		static void									CacheResource(const ZEString& FileName);
 };
 #endif

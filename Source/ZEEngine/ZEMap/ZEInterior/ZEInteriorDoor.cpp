@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPortalMapDoor.cpp
+ Zinek Engine - ZEInteriorDoor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,14 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPortalMapDoor.h"
-#include "ZEPortalMapResource.h"
-#include "ZEPortalMap.h"
-#include "ZEPortalMapPortal.h"
+#include "ZEInteriorDoor.h"
+#include "ZEInteriorResource.h"
+#include "ZEInterior.h"
+#include "ZEInteriorRoom.h"
 #include "ZEGraphics\ZESimpleMaterial.h"
 #include "ZEGraphics\ZERenderer.h"
 
-void ZEPortalMapDoor::DebugDraw(ZERenderer* Renderer)
+void ZEInteriorDoor::DebugDraw(ZERenderer* Renderer)
 {
 	if (DebugDrawComponents.Material == NULL)
 	{
@@ -69,7 +69,7 @@ void ZEPortalMapDoor::DebugDraw(ZERenderer* Renderer)
 	Renderer->AddToRenderList(&DebugDrawComponents.BoxRenderCommand);
 }
 
-void ZEPortalMapDoor::CalculateRectangle()
+void ZEInteriorDoor::CalculateRectangle()
 {
 	float HalfWidth = (Width * Scale.x) / 2.0f;
 	float HalfLength = (Length * Scale.z) / 2.0f;
@@ -86,12 +86,12 @@ void ZEPortalMapDoor::CalculateRectangle()
 	ZEMatrix4x4::Transform(Rectangle.P4, WorldTransform, ZEVector3(-HalfWidth, 0.0f , -HalfLength));
 }
 
-ZEPortalMap* ZEPortalMapDoor::GetOwner()
+ZEInterior* ZEInteriorDoor::GetOwner()
 {
 	return Owner;
 }
 
-const char* ZEPortalMapDoor::GetName()
+const char* ZEInteriorDoor::GetName()
 {
 	if (Resource != NULL)
 		return Resource->Name;
@@ -99,12 +99,12 @@ const char* ZEPortalMapDoor::GetName()
 		return "";
 }
 
-ZEPortalMapPortal** ZEPortalMapDoor::GetPortals()
+ZEInteriorRoom** ZEInteriorDoor::GetRooms()
 {
-	return Portals;
+	return Rooms;
 }
 
-const ZERectangle3D& ZEPortalMapDoor::GetRectangle()
+const ZERectangle3D& ZEInteriorDoor::GetRectangle()
 {
 	if (TransformChanged)
 	{
@@ -115,50 +115,50 @@ const ZERectangle3D& ZEPortalMapDoor::GetRectangle()
 	return Rectangle;
 }
 
-void ZEPortalMapDoor::SetPosition(const ZEVector3& NewPosition)
+void ZEInteriorDoor::SetPosition(const ZEVector3& NewPosition)
 {
 	Position = NewPosition;
 	TransformChanged = true;
 }
 
-const ZEVector3& ZEPortalMapDoor::GetPosition() const
+const ZEVector3& ZEInteriorDoor::GetPosition() const
 {
 	return Position;
 }
 
-void ZEPortalMapDoor::SetRotation(const ZEQuaternion& NewRotation)
+void ZEInteriorDoor::SetRotation(const ZEQuaternion& NewRotation)
 {
 	Rotation = NewRotation;
 	TransformChanged = true;
 }
 
-const ZEQuaternion& ZEPortalMapDoor::GetRotation() const
+const ZEQuaternion& ZEInteriorDoor::GetRotation() const
 {
 	return Rotation;
 }
 
-void ZEPortalMapDoor::SetScale(const ZEVector3& NewScale)
+void ZEInteriorDoor::SetScale(const ZEVector3& NewScale)
 {
 	Scale = NewScale;
 	TransformChanged = true;
 }
 
-const ZEVector3& ZEPortalMapDoor::GetScale() const
+const ZEVector3& ZEInteriorDoor::GetScale() const
 {
 	return Scale;
 }
 
-void ZEPortalMapDoor::SetSeenThrough(bool Value)
+void ZEInteriorDoor::SetSeenThrough(bool Value)
 {
 	SeenThrough = Value;
 }
 
-bool ZEPortalMapDoor::GetSeenThrough()
+bool ZEInteriorDoor::GetSeenThrough()
 {
 	return SeenThrough;
 }
 
-void ZEPortalMapDoor::Initialize(ZEPortalMap* Owner, const ZEPortalMapResourceDoor* Resource)
+void ZEInteriorDoor::Initialize(ZEInterior* Owner, const ZEInteriorDoorResource* Resource)
 {
 	this->Owner = Owner;
 	this->Resource = Resource;
@@ -172,36 +172,36 @@ void ZEPortalMapDoor::Initialize(ZEPortalMap* Owner, const ZEPortalMapResourceDo
 	
 	CalculateRectangle();
 	
-	Portals[0] = Owner->Portals[(ZESize)Resource->PortalIds[0]];
-	Portals[0]->Doors.Add(this);
+	Rooms[0] = Owner->Rooms[(ZESize)Resource->RoomIds[0]];
+	Rooms[0]->Doors.Add(this);
 
-	Portals[1] = Owner->Portals[(ZESize)Resource->PortalIds[1]];
-	Portals[1]->Doors.Add(this);
+	Rooms[1] = Owner->Rooms[(ZESize)Resource->RoomIds[1]];
+	Rooms[1]->Doors.Add(this);
 }
 
-void ZEPortalMapDoor::Deinitialize()
+void ZEInteriorDoor::Deinitialize()
 {
 	Owner = NULL;
 	Resource = NULL;
 }
 
-void ZEPortalMapDoor::SetOpen(bool Open)
+void ZEInteriorDoor::SetOpen(bool Open)
 {
 	this->Open = Open;
 }
 
-bool ZEPortalMapDoor::GetOpen()
+bool ZEInteriorDoor::GetOpen()
 {
 	return Open;
 }
 
-ZEPortalMapDoor::ZEPortalMapDoor()
+ZEInteriorDoor::ZEInteriorDoor()
 {
 	Owner = NULL;
 	Resource = NULL;
 	DebugDrawComponents.Material = NULL;
-	Portals[0] = NULL;
-	Portals[1] = NULL;
+	Rooms[0] = NULL;
+	Rooms[1] = NULL;
 	Open = true;
 	TransformChanged = false;
 	Position = ZEVector3::Zero;
@@ -209,7 +209,7 @@ ZEPortalMapDoor::ZEPortalMapDoor()
 	Scale = ZEVector3::One;
 }
 
-ZEPortalMapDoor* ZEPortalMapDoor::CreateInstance()
+ZEInteriorDoor* ZEInteriorDoor::CreateInstance()
 {
-	return new ZEPortalMapDoor();
+	return new ZEInteriorDoor();
 }

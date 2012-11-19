@@ -37,12 +37,10 @@
 #include "ZEGraphicsModule.h"
 #include "ZECamera.h"
 #include "ZEGame\ZEScene.h"
-#include "ZEMap\ZEPortalMap\ZEPortalMap.h"
 #include "ZEDS\ZEArray.h"
 #include "ZETypes.h"
 #include "ZEMath\ZEAABBox.h"
 #include "ZEGame\ZEEntity.h"
-#include "ZEMap\ZEPortalMap\ZEPortalMapPortal.h"
 #include "ZETexture2D.h"
 
 

@@ -328,6 +328,24 @@ void ZEMatrix3x3::TransposeSelf()
 	*this = Temp;
 }
 
+bool ZEMatrix3x3::Equals(const ZEMatrix3x3& Matrix) const
+{
+	for (ZESize I = 0; I < 9; I++)
+		if (ZEMath::Abs(MA[I] - Matrix.MA[I]) > ZE_ZERO_THRESHOLD)
+			return false;
+
+	return true;
+}
+
+bool ZEMatrix3x3::Equals(const ZEMatrix3x3& Matrix, float Threshold)
+{
+	for (ZESize I = 0; I < 9; I++)
+		if (ZEMath::Abs(MA[I] - Matrix.MA[I]) > Threshold)
+			return false;
+
+	return true;
+}
+
 ZEQuaternion ZEMatrix3x3::GetRotation()
 {
 	ZEVector3 TempScale;
@@ -477,20 +495,12 @@ ZEMatrix3x3& ZEMatrix3x3::operator *= (float S)
 
 bool ZEMatrix3x3::operator == (const ZEMatrix3x3 &M) const 
 {
-	for (ZESize I = 0; I < 9; I++)
-		if (ZEMath::Abs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
-			return false;
-
-	return true;
+	return Equals(M);
 }
 
 bool ZEMatrix3x3::operator != (const ZEMatrix3x3 &M) const 
 {
-	for (ZESize I = 0; I < 9; I++)
-		if (ZEMath::Abs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
-			return true;
-
-	return false;
+	return !Equals(M);
 }
 
 float ZEMatrix3x3::operator[](ZESize Index) const
@@ -975,6 +985,24 @@ void ZEMatrix4x4::TransposeSelf()
 	*this = Temp;
 }
 
+bool ZEMatrix4x4::Equals(const ZEMatrix4x4& Matrix) const
+{
+	for (ZESize I = 0; I < 16; I++)
+		if (ZEMath::Abs(MA[I] - Matrix.MA[I]) > ZE_ZERO_THRESHOLD)
+			return false;
+
+	return true;
+}
+
+bool ZEMatrix4x4::Equals(const ZEMatrix4x4& Matrix, float Threshold) const
+{
+	for (ZESize I = 0; I < 16; I++)
+		if (ZEMath::Abs(MA[I] - Matrix.MA[I]) > Threshold)
+			return false;
+
+	return true;
+}
+
 ZEVector3 ZEMatrix4x4::GetTranslation()
 {
 	return ZEVector3(M14, M24, M34);
@@ -1097,20 +1125,12 @@ ZEMatrix4x4& ZEMatrix4x4::operator *= (float S)
 
 bool ZEMatrix4x4::operator == (const ZEMatrix4x4 &M) const 
 {
-	for (ZESize I = 0; I < 16; I++)
-		if (ZEMath::Abs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
-			return false;
-
-	return true;
+	return Equals(M);
 }
 
 bool ZEMatrix4x4::operator != (const ZEMatrix4x4 &M) const 
 {
-	for (ZESize I = 0; I < 16; I++)
-		if (ZEMath::Abs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
-			return true;
-
-	return false;
+	return !Equals(M);
 }
 
 float ZEMatrix4x4::operator[](ZESize Index) const

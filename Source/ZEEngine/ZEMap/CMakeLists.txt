@@ -35,7 +35,7 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_subdirectory (ZEPortalMap)
+add_subdirectory (ZEInterior)
 
 ze_add_source(ZEMap.cpp				Sources)
 ze_add_source(ZEMap.h				Sources Headers)

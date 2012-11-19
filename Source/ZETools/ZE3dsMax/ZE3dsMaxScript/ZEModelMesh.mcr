@@ -21,7 +21,7 @@ macroScript ZEMeshAttributes_Add
 		
 		Result.PositionValue.x = if abs(obj.position.x) < Threshold then 0.0 else obj.position.x
 		Result.PositionValue.y = if abs(obj.position.z) < Threshold then 0.0 else obj.position.z
-		Result.PositionValue.z = -(if abs(obj.position.y) < Threshold then 0.0 else obj.position.y)
+		Result.PositionValue.z = if abs(obj.position.y) < Threshold then 0.0 else obj.position.y
 
 		TempValues = (obj.rotation) as eulerAngles
 		

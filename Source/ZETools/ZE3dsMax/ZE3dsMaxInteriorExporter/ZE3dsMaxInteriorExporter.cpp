@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMaxMapExporter.cpp
+ Zinek Engine - ZE3dsMaxInteriorExporter.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,20 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZE3dsMaxMapExporter.h"
+#include "ZE3dsMaxInteriorExporter.h"
 //#include "data_mappings.h"
 
 #include <tchar.h>
 #include "QWinWidget/qwinwidget.h"
 #include "QtGui/QApplication"
-#include "ZE3dsMaxMapExporterOptionsDialog.h"
+#include "ZE3dsMaxInteriorExporterOptionsDialog.h"
 #include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
 #include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileUtils.h"
 #include "ZEFile/ZEFileInfo.h"
 
-ZE3dsMaxMapExporter::ZE3dsMaxMapExporter()
+ZE3dsMaxInteriorExporter::ZE3dsMaxInteriorExporter()
 {
 	Scene = NULL;
 	QtApplication = NULL;
@@ -57,7 +57,7 @@ ZE3dsMaxMapExporter::ZE3dsMaxMapExporter()
 	ResourceConfigurationDialog = NULL;
 }
 
-ZE3dsMaxMapExporter::~ZE3dsMaxMapExporter() 
+ZE3dsMaxInteriorExporter::~ZE3dsMaxInteriorExporter() 
 {
 	if(ExportOptions != NULL)
 	{
@@ -100,62 +100,62 @@ ZE3dsMaxMapExporter::~ZE3dsMaxMapExporter()
 	}
 }
 
-ZEInt ZE3dsMaxMapExporter::ExtCount()
+ZEInt ZE3dsMaxInteriorExporter::ExtCount()
 {
 	return 1;
 }
 
-const TCHAR *ZE3dsMaxMapExporter::Ext(ZEInt n)
+const TCHAR *ZE3dsMaxInteriorExporter::Ext(ZEInt n)
 {		
-	return "zeMap";
+	return "zeInterior";
 }
 
-const TCHAR *ZE3dsMaxMapExporter::LongDesc()
+const TCHAR *ZE3dsMaxInteriorExporter::LongDesc()
 {
-	return "Zinek Engine Map File";
+	return "Zinek Engine Interior File";
 }
 	
-const TCHAR *ZE3dsMaxMapExporter::ShortDesc() 
+const TCHAR *ZE3dsMaxInteriorExporter::ShortDesc() 
 {			
-	return "Zinek Engine Map";
+	return "Zinek Engine Interior";
 }
 
-const TCHAR *ZE3dsMaxMapExporter::AuthorName()
+const TCHAR *ZE3dsMaxInteriorExporter::AuthorName()
 {			
 	return "Zinek Code House and Game Studio";
 }
 
-const TCHAR *ZE3dsMaxMapExporter::CopyrightMessage() 
+const TCHAR *ZE3dsMaxInteriorExporter::CopyrightMessage() 
 {	
 	return "Copyright (c) 2008-2011, Zinek Code House and Game Studio";
 }
 
-const TCHAR *ZE3dsMaxMapExporter::OtherMessage1() 
+const TCHAR *ZE3dsMaxInteriorExporter::OtherMessage1() 
 {		
 	return "";
 }
 
-const TCHAR *ZE3dsMaxMapExporter::OtherMessage2() 
+const TCHAR *ZE3dsMaxInteriorExporter::OtherMessage2() 
 {		
 	return "";
 }
 
-ZEUInt ZE3dsMaxMapExporter::Version()
+ZEUInt ZE3dsMaxInteriorExporter::Version()
 {				
 	return 100;
 }
 
-void ZE3dsMaxMapExporter::ShowAbout(HWND hWnd)
+void ZE3dsMaxInteriorExporter::ShowAbout(HWND hWnd)
 {			
 
 }
 
-BOOL ZE3dsMaxMapExporter::SupportsOptions(ZEInt ext, DWORD options)
+BOOL ZE3dsMaxInteriorExporter::SupportsOptions(ZEInt ext, DWORD options)
 {
 	return TRUE;
 }
 
-ZEInt ZE3dsMaxMapExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
+ZEInt ZE3dsMaxInteriorExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
 {
 	ZEInt i;
 	if (i_currentNode == NULL)
@@ -173,7 +173,7 @@ ZEInt ZE3dsMaxMapExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNo
 	return i_nodeTab.Count();
 }
 
-void ZE3dsMaxMapExporter::LoadOptions(const char* FilePath)
+void ZE3dsMaxInteriorExporter::LoadOptions(const char* FilePath)
 {
 	ZEString OptionsFilePath((ZEString(FilePath)) + ".zecfg");
 
@@ -184,7 +184,7 @@ void ZE3dsMaxMapExporter::LoadOptions(const char* FilePath)
 		if(ExportOptions == NULL)
 			ExportOptions = new ZEMLNode("Options");
 
-		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_NONE))
+		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ, ZE_FCM_NONE))
 		{
 			ExportOptions->Read(&OptionsFile);
 			OptionsFile.Close();
@@ -194,14 +194,14 @@ void ZE3dsMaxMapExporter::LoadOptions(const char* FilePath)
 	}
 }
 
-void ZE3dsMaxMapExporter::SaveOptions(const char* FilePath)
+void ZE3dsMaxInteriorExporter::SaveOptions(const char* FilePath)
 {
 	ZEString OptionsFilePath((ZEString(FilePath)) + ".zecfg");
 
 	if(ExportOptions != NULL)
 	{
 		ZEFile OptionsFile;
-		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
+		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
 		{
 			OptionsDialog->GetOptions()->Write(&OptionsFile);
 			OptionsFile.Close();
@@ -215,7 +215,7 @@ void ZE3dsMaxMapExporter::SaveOptions(const char* FilePath)
 	}
 }
 
-bool ZE3dsMaxMapExporter::ShowOptionsDialog(HWND ParentWindow)
+bool ZE3dsMaxInteriorExporter::ShowOptionsDialog(HWND ParentWindow)
 {
 	int Argc = 0;
 	if(QApplication::instance() == NULL)
@@ -227,7 +227,7 @@ bool ZE3dsMaxMapExporter::ShowOptionsDialog(HWND ParentWindow)
 		WinWidget = new QWinWidget(ParentWindow);
 
 	if(OptionsDialog == NULL)
-		OptionsDialog = new ZE3dsMaxMapExporterOptionsDialog(WinWidget);
+		OptionsDialog = new ZE3dsMaxInteriorExporterOptionsDialog(WinWidget);
 
 	if(ExportOptions != NULL)
 		OptionsDialog->SetOptions(ExportOptions);
@@ -241,7 +241,7 @@ bool ZE3dsMaxMapExporter::ShowOptionsDialog(HWND ParentWindow)
 	return true;
 }
 
-bool ZE3dsMaxMapExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath)
+bool ZE3dsMaxInteriorExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath)
 {
 	int Argc = 0;
 	if(QApplication::instance() == NULL)
@@ -268,7 +268,7 @@ bool ZE3dsMaxMapExporter::ShowResourceConfigurationDialog(HWND ParentWindow, con
 	return true;
 }
 
-ZEInt ZE3dsMaxMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
+ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
 	ExportPath = ZEFileInfo::GetParentDirectory(name);
 	LoadOptions(i->GetCurFilePath());
@@ -288,17 +288,17 @@ ZEInt ZE3dsMaxMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interfac
 
 	SaveOptions(i->GetCurFilePath());
 
-	MapNode.SetName("ZEMap");
+	InteriorNode.SetName("ZEInterior");
 
 	if(ProgressDialog == NULL)
 		ProgressDialog = ZEProgressDialog::CreateInstance();
 
-	ProgressDialog->SetTitle("Map Export Progress");
+	ProgressDialog->SetTitle("Interior Export Progress");
 	ProgressDialog->SetProgressBarVisibility(false);
 	ProgressDialog->SetFileLoggingEnabled(OptionsDialog->GetFileLoggingEnabled());
 	ProgressDialog->SetLogFilePath(OptionsDialog->GetLogFilePath());
 	ProgressDialog->Start();
-	ProgressDialog->OpenTask("Map Exporter", true);
+	ProgressDialog->OpenTask("Interior Exporter", true);
 
 	ProgressDialog->OpenTask("Scene Process");
 	zeLog("Processing 3ds Max Scene...");
@@ -310,10 +310,10 @@ ZEInt ZE3dsMaxMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interfac
 	ProgressDialog->CloseTask();
 	
 
-	ProgressDialog->OpenTask("Portals", true);
-	if (!ProcessPortals())
+	ProgressDialog->OpenTask("Rooms", true);
+	if (!ProcessRooms())
 	{
-		zeError("Can not process portals.");
+		zeError("Can not process rooms.");
 		return false;
 	}
 	ProgressDialog->CloseTask();
@@ -334,16 +334,16 @@ ZEInt ZE3dsMaxMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interfac
 	}
 	ProgressDialog->CloseTask();
 		
-	MapNode.AddProperty("DoorCount", (ZEUInt32)Doors.Count());
-	MapNode.AddProperty("PortalCount", (ZEUInt32)Portals.Count());
-	MapNode.AddProperty("MaterialCount", (ZEUInt32)Materials.Count());
+	InteriorNode.AddProperty("DoorCount", (ZEUInt32)Doors.Count());
+	InteriorNode.AddProperty("RoomCount", (ZEUInt32)Rooms.Count());
+	InteriorNode.AddProperty("MaterialCount", (ZEUInt32)Materials.Count());
 
 	ProgressDialog->OpenTask("Writing File");
-	zeLog("Writing ZEMap to file...");
+	zeLog("Writing ZEInterior to file...");
 	ZEFile ExportFile;
 	if(ExportFile.Open(name, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
 	{
-		MapNode.Write(&ExportFile);
+		InteriorNode.Write(&ExportFile);
 		ExportFile.Close();
 	}
 	ProgressDialog->CloseTask();

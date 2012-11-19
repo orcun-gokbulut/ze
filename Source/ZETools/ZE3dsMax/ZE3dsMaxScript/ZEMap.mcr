@@ -1,82 +1,70 @@
 /*ZEHEADER_START*/
-//////////////////////////////////////////////////////////////////////////////////////
-//                                                                                  //
-//  ZEMap.ms - Zinek Engine 3ds Max zeMap Exporter GUI Frontend v0.03 Source Code   //                              
-// -------------------------------------------------------------------------------- //
-//  Copyright (c) 2007-2008 Zinek Engine group.                                     //
-//  All rights reserved.                                                            //
-//                                                                                  //
-//                 READ TERMS BELLOW BEFORE TAKING ANY ACTION !                     //
-//                                                                                  //
-//  These coded instructions, statements, and computer programs contain             //
-//  unpublished proprietary information written by Zinek Engine group and they are  //
-//  protected by international copyright laws. This file is intellectual property   //
-//  of the Zinek Engine group and author(s). Storing this file, using this file,    //
-//  compiling this file, publishing this file to anykind media or network, editing  //
-//  this file, selling this file, reading this file is probited without notice and  //
-//  written permision of Y. Orcun Gokbulut. These terms at above can only be        //
-//  changed by Y. Orcun GOKBULUT.                                                   //
-//  author(s).                                                                      //
-//*                                                                                *//
-//  DESCRIPTION         :                                                           //
-//  AUTHOR(S)           : Y. Orcun GOKBULUT                                         //
-//*                                                                                *//
-//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//																								//
+//	ZEInterior.ms - Zinek Engine 3ds Max ZEInterior Exporter GUI Frontend v0.03 Source Code		//                              
+//		-------------------------------------------------------------------------------			//
+//		Copyright (c) 2007-2008 Zinek Engine group.												//
+//		All rights reserved.																	//
+//																								//
+//		               READ TERMS BELLOW BEFORE TAKING ANY ACTION !								//
+//																								//
+//		These coded instructions, statements, and computer programs contain						//
+//		unpublished proprietary information written by Zinek Engine group and they are			//
+//		protected by international copyright laws. This file is intellectual property			//
+//		of the Zinek Engine group and author(s). Storing this file, using this file,			//
+//		compiling this file, publishing this file to anykind media or network, editing			//
+//		this file, selling this file, reading this file is probited without notice and			//
+//		written permision of Y. Orcun Gokbulut. These terms at above can only be				//
+//		changed by Y. Orcun GOKBULUT.															//
+//		author(s).																				//
+//*																							   *//
+//		DESCRIPTION         :																	//
+//		AUTHOR(S)           : Y. Orcun GOKBULUT													//
+//*																							   *//
+//////////////////////////////////////////////////////////////////////////////////////////////////
 /*ZEHEADER_END*/
 
-macroScript AddZEMapPortalParameters
-	category:"ZEMap"
-	toolTip:"Add ZEMapPortal parameters"
+macroScript AddZEInteriorRoomParameters
+	category:"ZEInterior"
+	toolTip:"Add ZEInteriorRoom Parameters"
 	icon:#("ZEToolbarIcons", 7)
 (
-	PortalParameters = attributes ZEMapPortalParameters
+	RoomAttributes = attributes ZEInteriorRoomAttributes
 	(
-		parameters ZEMapPortal rollout:ZEMapPortalRollout
+		parameters ZEInteriorRoom rollout:ZEInteriorRoomRollout
 		(
-			ZEType type:#string default:"Portal" animatable:false
-			PhysicalMeshEnabled type:#boolean ui:uiPhysicalMeshEnabled default:false animatable:false
-			PhysicalMeshUseSelf type:#boolean ui:uiPhysicalMeshUseSelf default:true animation:false
-			PhysicalMesh type:#node animatable:false
-			GenerateOctree type:#boolean ui:uiGenerateOctree default:true animatable:false
-			MaxOctreeDepth type:#integer ui:uiMaxOctreeDepth default:3 animatable:false
-			--Doors type:#nodeTab tabSizeVariable:true animatable:false
+			ZEType 					type:#string 		default:"Room" 										animatable:false
+			PhysicalMeshExists 		type:#boolean 		default:false		ui:uiPhysicalMeshExists  		animatable:false
+			PhysicalMeshEnabled		type:#boolean		default:true		ui:uiPhysicalMeshEnabled		animatable:false
+			PhysicalMeshUseSelf 	type:#boolean  		default:true 		ui:uiPhysicalMeshUseSelf		animatable:false
+			PhysicalMesh 			type:#node 																animatable:false
 		)
 		
-		rollout ZEMapPortalRollout "ZEMapPortal Parameters" rolledUp:false
+		rollout ZEInteriorRoomRollout "ZEInteriorRoom Parameters" rolledUp:false
 		(
-			--fn DoorFilter obj =  isProperty obj "ZEMapPortalDoor" == true and $ != obj
-			fn PhysicalMeshFilter obj = (classof obj == Editable_mesh or classof obj == Editable_Poly) 
+			/* PICK FILTERS */
+			fn PhysicalMeshFilter obj = (classof obj == Editable_mesh or classof obj == Editable_Poly) and obj != $
 
-			checkbox uiPhysicalMeshEnabled "Enable Physical Mesh" 
+			/* LAYOUT DEFINITION */
+			bitmap		uiLogo					fileName:"zineklogo.bmp"
+			checkbox 	uiPhysicalMeshExists 	"Export Physical Mesh" 
 			
 			group "Physical Mesh"
 			(
-				checkbox uiPhysicalMeshUseSelf "Use self geometry" enabled:PhysicalMeshEnabled
-				edittext uiPhysicalMesh "Physical Mesh" readOnly:true text:(if (PhysicalMesh != undefined) then PhysicalMesh.name else "") enabled:PhysicalMeshEnabled
-				pickbutton uiPhysicalMeshSelect "Pick" filter:PhysicalMeshFilter enabled:(PhysicalMeshEnabled and not PhysicalMeshUseSelf) across:2
-				button uiPhysicalMeshClean "Clean" enabled:(PhysicalMeshEnabled and not PhysicalMeshUseSelf)
+				checkbox	uiPhysicalMeshEnabled	"Physical Mesh Enabled"																										enabled:PhysicalMeshExists
+				checkbox 	uiPhysicalMeshUseSelf 	"Use self geometry" 																										enabled:PhysicalMeshExists
+				edittext 	uiPhysicalMesh 			"Physical Mesh" 		readOnly:true 				text:(if (PhysicalMesh != undefined) then PhysicalMesh.name else "") 	enabled:PhysicalMeshExists
+				pickbutton 	uiPhysicalMeshSelect 	"Pick" 					filter:PhysicalMeshFilter 	across:2																enabled:(PhysicalMeshExists and not PhysicalMeshUseSelf) 
+				button 		uiPhysicalMeshClean 	"Clean" 																													enabled:(PhysicalMeshExists and not PhysicalMeshUseSelf)
 			)
-			
-			group "Octree"
-			(
-				checkbox uiGenerateOctree "Generate Octree" 
-				spinner uiMaxOctreeDepth "Max Depth" enabled:GenerateOctree
-			)	
-			
-			/*group "Doors"
-			(
-				listbox uiPortalDoors "Portal Doors"
-				pickbutton uiAddPortalDoor "Add" type:#node filter:DoorFilter across:2
-				pickbutton uiRemovePortalDoor "Remove"
-			)*/
 			
 			function ManageRollout =
 			(
-				uiPhysicalMeshUseSelf.enabled = PhysicalMeshEnabled
-				uiPhysicalMesh.enabled = (PhysicalMeshEnabled and not PhysicalMeshUseSelf)
-				uiPhysicalMeshSelect.enabled = (PhysicalMeshEnabled and not PhysicalMeshUseSelf)
-				uiPhysicalMeshClean.enabled = (PhysicalMeshEnabled and not PhysicalMeshUseSelf)
-				uiMaxOctreeDepth.enabled = GenerateOctree
+				uiPhysicalMeshEnabled.enabled 	= PhysicalMeshExists
+				uiPhysicalMeshUseSelf.enabled 	= PhysicalMeshExists
+				uiPhysicalMesh.enabled 			= (PhysicalMeshExists and not PhysicalMeshUseSelf)
+				uiPhysicalMeshSelect.enabled 	= (PhysicalMeshExists and not PhysicalMeshUseSelf)
+				uiPhysicalMeshClean.enabled 	= (PhysicalMeshExists and not PhysicalMeshUseSelf)
 			)
 			
 			on uiPhysicalMeshSelect picked obj do
@@ -94,141 +82,179 @@ macroScript AddZEMapPortalParameters
 				PhysicalMesh = undefined
 			)
 			
+			on uiPhysicalMeshExists changed arg do ManageRollout()
+			
 			on uiPhysicalMeshEnabled changed arg do ManageRollout()
-			
-			on uiGenerateOctree changed Enabled do ManageRollout()
-			
+					
 			on uiPhysicalMeshUseSelf changed Enabled do 
 			(
 				uiPhysicalMesh.text = ""
 				PhysicalMesh = undefined
 				ManageRollout()			
 			)
-			/*
-			on uiAddPortalDoor picked obj do
-			( 
-				fn AllreadyAdded NewObject =
-				(
-					for o in Doors do
-						if  o == NewObject then return true
-					return false
-				)
-				
-				if obj != undefined do
-					if not AllreadyAdded obj then
-					(
-						append  Doors obj 
-						uiPortalDoors.items = (for o in Doors collect o.name)
-					)
-			)	
-			
-			on uiRemovePortalDoor pressed do
-			(
-				if uiPortalDoors.selection != 0 then
-				(
-					deleteitem Doors uiPortalDoors.selection
-					uiPortalDoors.items = (for o in Doors collect o.name)
-				)
-			)*/
 		)
 	)
-
+	
+	/* ADDING ATTRIBUTES */
 	for obj in selection do
-		if isProperty obj "PortalAttributes" == false and superclassof obj  == GeometryClass then 
-			custAttributes.add obj PortalParameters
+	(
+		if obj != undefined then
+		(
+			if (isProperty obj "ZEInteriorRoomAttributes" == false and superclassof obj == GeometryClass) do
+			(
+				custAttributes.add obj RoomAttributes
+			)
+		)
+
+	)
 )
 
-macroScript RemoveZEMapPortalParameters
-	category:"ZEMap"
-	toolTip:"Remove ZEMapPortal parameters"
+macroScript RemoveZEInteriorRoomParameters
+	category:"ZEInterior"
+	toolTip:"Remove ZEInteriorRoom Parameters"
 	icon:#("ZEToolbarIcons", 9)
 (
 	for obj in selection do
+	(
 		if obj != undefined then
-			if isProperty obj "ZEMapPortalParameters" == true then
+		(
+			if isProperty obj "ZEInteriorRoomAttributes" == true then
+			(
 				for i = 1 to custAttributes.count obj  do
-					if (custAttributes.getdef obj i).name == #ZEMapPortalParameters then custAttributes.delete obj i
+				(
+					if (custAttributes.getdef obj i).name == #ZEInteriorRoomAttributes then custAttributes.delete obj i
+				)
+			)
+		)
+	)
 )
 
-macroScript AddZEMapPortalDoorParameters
-	category:"ZEMap"
-	toolTip:"Add ZEMapPortalDoor parameters"
+macroScript AddZEInteriorDoorParameters
+	category:"ZEInterior"
+	toolTip:"Add ZEInteriorDoor Parameters"
 	icon:#("ZEToolbarIcons", 8)
 (
-	PortalDoorParameters = attributes ZEMapPortalDoorParameters
+	DoorAttributes = attributes ZEInteriorDoorAttributes
 	(
-		parameters ZEMapPortalDoor rollout:ZEMapPortalDoorRollout
+		parameters ZEInteriorDoor rollout:ZEInteriorDoorRollout
 		(
-			ZEType type:#string default:"PortalDoor" animatable:false
-			PortalA type:#node animatable:false
-			PortalB type:#node animatable:false
-			IsOpen ui:uiIsOpen type:#boolean default:true animatable:false
+			ZEType 	type:#string 	default:"Door" 					animatable:false
+			RoomA 	type:#node 										animatable:false
+			RoomB 	type:#node 										animatable:false
+			IsOpen 	type:#boolean 	default:true 	ui:uiIsOpen  	animatable:false
 		)
 		
-		rollout ZEMapPortalDoorRollout "ZEMapPortalDoor Parameters" rolledUp:false
+		rollout ZEInteriorDoorRollout "ZEInteriorDoor Parameters" rolledUp:false
 		(
-			fn PortalFilter obj =  isProperty obj "ZEMapPortalParameters" == true and $ != obj
+			/* PICK FILTERS */
+			fn RoomFilter obj =  isProperty obj "ZEInteriorRoomAttributes" == true and $ != obj
 
-			checkbox uiIsOpen "Portal door is open"
-			group "Portal A"
+			/* LAYOUT DEFINITION */
+			bitmap		uiLogo		fileName:"zineklogo.bmp"
+			checkbox 	uiIsOpen 	"Is Open"	toolTip:"Indicates whether the door is open or not."
+			
+			group "Room A"
 			(
-				edittext uiPortalA "Portal A" readOnly:true text:(if (PortalA != undefined) then PortalA.name else "") 
-				pickbutton uiPortalASelect "Pick" filter:PortalFilter across:2
-				button uiPortalAClean "Clean"
+				edittext 		uiRoomA 		"Room :" 	readOnly:true text:(if (RoomA != undefined) then RoomA.name else "") 
+				pickbutton 		uiRoomASelect 	"Pick" 		filter:RoomFilter across:2
+				button 			uiRoomAClean 	"Clean"
 			)
 
-			group "Portal B"
+			group "Room B"
 			(
-				edittext uiPortalB "Portal B" readOnly:true text:(if (PortalB != undefined) then PortalB.name else "") 
-				pickbutton uiPortalBSelect "Pick" filter:PortalFilter across:2
-				button uiPortalBClean "Clean"
+				edittext 		uiRoomB 		"Room :" 	readOnly:true text:(if (RoomB != undefined) then RoomB.name else "") 
+				pickbutton 		uiRoomBSelect 	"Pick" 		filter:RoomFilter across:2
+				button 			uiRoomBClean 	"Clean"
 			)
 			
-			on uiPortalASelect picked obj do
+			on uiRoomASelect picked obj do
 			(
 				if obj != undefined do
 				(
-					uiPortalA.text = obj.name
-					PortalA = obj
+					uiRoomA.text = obj.name
+					RoomA = obj
 				)
 			)
 			
-			on uiPortalAClean pressed do
+			on uiRoomAClean pressed do
 			(
-				uiPortalA.text = ""
-				PortalA = undefined
+				uiRoomA.text = ""
+				RoomA = undefined
 			)
 			
-			on uiPortalBSelect picked obj do
+			on uiRoomBSelect picked obj do
 			(
 				if obj != undefined do
 				(
-					uiPortalB.text = obj.name
-					PortalB = obj
+					uiRoomB.text = obj.name
+					RoomB = obj
 				)
 			)
 			
-			on uiPortalBClean pressed do
+			on uiRoomBClean pressed do
 			(
-				uiPortalB.text = ""
-				PortalB = undefined
+				uiRoomB.text = ""
+				RoomB = undefined
 			)		
 		)
 	)
-
+	
+	/* ADDING ATTRIBUTES */
 	for obj in selection do
-		if isProperty obj "PortalDoorParamters" == false and classof obj  == plane then 
-			custAttributes.add obj PortalDoorParameters
+	(
+		if obj != undefined then
+		(
+			if isProperty obj "ZEInteriorDoorAttributes" == false and classof obj == plane do
+			(
+				custAttributes.add obj DoorAttributes	
+			)
+		)
+	)
 )
 
-macroScript RemoveZEMapPortalDoorParameters
-	category:"ZEMap"
-	toolTip:"Remove ZEMapPortalDoor paramters"
+macroScript RemoveZEInteriorDoorParameters
+	category:"ZEInterior"
+	toolTip:"Remove ZEInteriorDoor Parameters"
 	icon:#("ZEToolbarIcons", 10)
 (
 	for obj in selection do
+	(
 		if obj != undefined then
-			if isProperty obj "ZEMapPortalDoorParameters" == true then
+		(
+			if isProperty obj "ZEInteriorDoorAttributes" == true then
+			(
 				for i = 1 to custAttributes.count obj  do
-					if (custAttributes.getdef obj i).name == #ZEMapPortalDoorParameters then custAttributes.delete obj i
+				(
+					if (custAttributes.getdef obj i).name == #ZEInteriorDoorAttributes then custAttributes.delete obj i
+				)
+			)
+		)
+	)
 )
+
+macroScript RemoveZEPortalMapParameters
+	category:"ZEInterior"
+	toolTip:"Remove All Old ZEPortalMap Parameters"
+(
+	for obj in selection do
+	(
+		if obj != undefined then
+		(
+			if isProperty obj "ZEMapPortalParameters" == true then
+			(
+				for i = 1 to custAttributes.count obj  do
+				(
+					if (custAttributes.getdef obj i).name == #ZEMapPortalParameters then custAttributes.delete obj i
+				)
+			)
+			if isProperty obj "ZEMapPortalDoorParameters" == true then
+			(
+				for i = 1 to custAttributes.count obj  do
+				(
+					if (custAttributes.getdef obj i).name == #ZEMapPortalDoorParameters then custAttributes.delete obj i
+				)
+			)
+		)
+	)
+)
+

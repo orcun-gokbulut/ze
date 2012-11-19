@@ -54,12 +54,12 @@
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZEPointLight.h"
-#include "ZEMap/ZEPortalMap/ZEPortalMap.h"
+#include "ZEMap/ZEInterior/ZEInterior.h"
 #include "ZEMap/ZEMapResource.h"
-#include "ZEMap/ZEPortalMap/ZEPortalMapPortal.h"
+#include "ZEMap/ZEInterior/ZEInteriorRoom.h"
 #include "ZEMath/ZEAngle.h"
 
-#include "ZEMap/ZEPortalMap/ZEPortalMapResource.h"
+#include "ZEMap/ZEInterior/ZEInteriorResource.h"
 
 #include "../ZEGraphics/ZEDirectionalLight.h"
 

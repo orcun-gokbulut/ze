@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPortalMapPortal.h
+ Zinek Engine - ZEInteriorRoom.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,16 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PORTAL_MAP_PORTAL_H__
-#define __ZE_PORTAL_MAP_PORTAL_H__
+#ifndef __ZE_INTERIOR_ROOM_H__
+#define __ZE_INTERIOR_ROOM_H__
 
 #include "ZEDS/ZEArray.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZECanvas.h"
 
-class ZEPortalMap;
-class ZEPortalMapDoor;
-struct ZEPortalMapResourcePortal;
+class ZEInterior;
+class ZEInteriorDoor;
+struct ZEInteriorRoomResource;
 class ZEStaticVertexBuffer;
 class ZEPhysicalMesh;
 class ZERenderer;
@@ -51,17 +51,17 @@ struct ZEDrawParameters;
 class ZEViewVolume;
 class ZESimpleMaterial;
 
-class ZEPortalMapPortal
+class ZEInteriorRoom
 {
-	friend class ZEPortalMapDoor;
-	friend class ZEPortalMap;
+	friend class ZEInteriorDoor;
+	friend class ZEInterior;
 
 	private:
-		ZEPortalMap*						Owner;
-		const ZEPortalMapResourcePortal*	Resource;
+		ZEInterior*						Owner;
+		const ZEInteriorRoomResource*	Resource;
 		ZEStaticVertexBuffer*				VertexBuffer;
 		ZEArray<ZERenderCommand>			RenderCommands;
-		ZEArray<ZEPortalMapDoor*>			Doors;
+		ZEArray<ZEInteriorDoor*>			Doors;
 		ZEPhysicalMesh*						PhysicalMesh;
 
 		bool								CullPass;
@@ -86,14 +86,14 @@ class ZEPortalMapPortal
 
 		void								DebugDraw(ZERenderer* Renderer);
 
-											ZEPortalMapPortal();
-											~ZEPortalMapPortal();
+											ZEInteriorRoom();
+											~ZEInteriorRoom();
 
 	public:
-		ZEPortalMap*						GetOwner();
+		ZEInterior*						GetOwner();
 		const char*							GetName();
 
-		const ZEArray<ZEPortalMapDoor*>&	GetDoors();
+		const ZEArray<ZEInteriorDoor*>&		GetDoors();
 		ZEPhysicalMesh*						GetPhysicalMesh();
 		ZESize								GetPolygonCount();
 
@@ -109,13 +109,13 @@ class ZEPortalMapPortal
 		void								SetScale(const ZEVector3& NewScale);
 		const ZEVector3&					GetScale() const;
 
-		bool								Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource);
+		bool								Initialize(ZEInterior* Owner, ZEInteriorRoomResource* Resource);
 		void								Deinitialize();
 
 		void								SetPersistentDraw(bool Enabled);
 		void								Draw(ZEDrawParameters* DrawParameters);
 
-		static ZEPortalMapPortal*			CreateInstance();
+		static ZEInteriorRoom*				CreateInstance();
 };
 
 #endif

@@ -41,7 +41,7 @@ ze_add_source(ZE3dsMaxPlugin.def			Sources)
 
 ze_add_library(ZE3dsMaxPlugin 
 	SOURCES ${Sources}
-	LIBS ZE3dsMaxModelExporter ZE3dsMaxMapExporter ZE3dsMaxUI
+	LIBS ZE3dsMaxModelExporter ZE3dsMaxInteriorExporter ZE3dsMaxUI
 	INSTALL
 	INSTALL_DESTINATION "Tools/Exporters/ZE3dsMax"
 	INSTALL_COMPONENT Tools

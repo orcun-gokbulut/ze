@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMaxMapExporter.h
+ Zinek Engine - ZE3dsMaxInteriorExporter.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,14 +34,14 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE3DS_MAP_EXPORTER_H__
-#define __ZE3DS_MAP_EXPORTER_H__
+#ifndef __ZE3DS_INTERIOR_EXPORTER_H__
+#define __ZE3DS_INTERIOR_EXPORTER_H__
 
 #include "ZE3dsMaxUtils/ZE3dsMaxUtils.h"
 
 extern HINSTANCE hInstance;
 
-class ZE3dsMaxMapExporterOptionsDialog;
+class ZE3dsMaxInteriorExporterOptionsDialog;
 class QApplication;
 class QWinWidget;
 class ZEProgressDialog;
@@ -49,27 +49,27 @@ class ZEMLNode;
 class ZEResourceConfigurationWidget;
 
 
-class ZE3dsMaxMapExporter : public SceneExport 
+class ZE3dsMaxInteriorExporter : public SceneExport 
 {
 	private:
 
-		QApplication*					QtApplication;
+		QApplication*								QtApplication;
 
-		ZE3dsMaxMapExporterOptionsDialog*		OptionsDialog;
-		ZEResourceConfigurationWidget*	ResourceConfigurationDialog;
+		ZE3dsMaxInteriorExporterOptionsDialog*		OptionsDialog;
+		ZEResourceConfigurationWidget*				ResourceConfigurationDialog;
 
-		ZEMLNode						MapNode;
-		ZEMLNode*						ExportOptions;
-		QWinWidget*						WinWidget;
-		ZEProgressDialog*				ProgressDialog;
-		ZEString						ExportPath;
+		ZEMLNode									InteriorNode;
+		ZEMLNode*									ExportOptions;
+		QWinWidget*									WinWidget;
+		ZEProgressDialog*							ProgressDialog;
+		ZEString									ExportPath;
 
-		IGameScene*						Scene;
+		IGameScene*									Scene;
 
-		Tab<IGameNode*>					SceneGeometryObjects;
-		Tab<IGameNode*>					Portals;
-		Tab<IGameNode*>					Doors;
-		Tab<IGameMaterial*>				Materials;
+		Tab<IGameNode*>								SceneGeometryObjects;
+		Tab<IGameNode*>								Rooms;
+		Tab<IGameNode*>								Doors;
+		Tab<IGameMaterial*>							Materials;
 
 		void						CollectResources();
 
@@ -78,12 +78,12 @@ class ZE3dsMaxMapExporter : public SceneExport
 		bool						ShowOptionsDialog(HWND ParentWindow);
 		bool						ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath);
 
-		ZEInt						FindPortalIndex(IGameNode* Node);
+		ZEInt						FindRoomIndex(IGameNode* Node);
 		ZEInt						ProcessFaceMaterial(IGameMaterial* Material);
 
 		bool						ProcessScene();
 		bool						ProcessMaterials(const char* FileName);
-		bool						ProcessPortals();
+		bool						ProcessRooms();
 		void						ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode);
 		bool						ProcessDoors();
 
@@ -105,8 +105,8 @@ class ZE3dsMaxMapExporter : public SceneExport
 		virtual BOOL				SupportsOptions(ZEInt ext, DWORD options);
 		virtual ZEInt				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts = FALSE, DWORD options = 0);
 
-									ZE3dsMaxMapExporter();
-		virtual						~ZE3dsMaxMapExporter();
+									ZE3dsMaxInteriorExporter();
+		virtual						~ZE3dsMaxInteriorExporter();
 
 
 };

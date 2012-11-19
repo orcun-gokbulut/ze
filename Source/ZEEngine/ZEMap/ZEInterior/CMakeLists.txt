@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZE3dsMaxMapExporterDescription.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,56 +30,24 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include "ZE3dsMaxMapExporterDescription.h"
-#include "ZE3dsMaxMapExporter.h"
+cmake_minimum_required (VERSION 2.8)
 
-#define ZE3dsMapExporter_CLASS_ID	Class_ID(0x3a8ad1e4, 0x973e26ff)
+ze_add_source(ZEInterior.cpp				Sources)
+ze_add_source(ZEInterior.h					Sources Headers ZEPP)
+ze_add_source(ZEInteriorDoor.cpp			Sources)
+ze_add_source(ZEInteriorDoor.h				Sources Headers)
+ze_add_source(ZEInteriorRoom.cpp			Sources)
+ze_add_source(ZEInteriorRoom.h				Sources Headers)
+ze_add_source(ZEInteriorResource.cpp		Sources)
+ze_add_source(ZEInteriorResource.h			Sources Headers)
 
-ZEInt ZE3dsMaxMapExporterDescription::IsPublic()
-{ 
-	return TRUE; 
-}
-
-void* ZE3dsMaxMapExporterDescription::Create(BOOL Loading) 
-{ 
-	return new ZE3dsMaxMapExporter(); 
-}
-
-const TCHAR* ZE3dsMaxMapExporterDescription::ClassName()
-{ 
-	return "ZEMapExporter"; 
-}
-
-SClass_ID ZE3dsMaxMapExporterDescription::SuperClassID()
-{ 
-	return SCENE_EXPORT_CLASS_ID; 
-}
-
-Class_ID ZE3dsMaxMapExporterDescription::ClassID()
-{ 
-	return ZE3dsMapExporter_CLASS_ID; 
-}
-
-const TCHAR* ZE3dsMaxMapExporterDescription::Category()
-{
-	return "Exporter"; 
-}
-
-const TCHAR* ZE3dsMaxMapExporterDescription::InternalName()
-{ 
-	return "ZEMap Exporter"; 
-}
-
-HINSTANCE ZE3dsMaxMapExporterDescription::HInstance()
-{ 
-	return hInstance; 
-}
-
-ClassDesc2* ZE3dsMaxMapExporterDescription::GetInstance()
-{
-	static ZE3dsMaxMapExporterDescription Desc;
-	return &Desc;
-}
+ze_add_library(ZEInterior 
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	LIBS ZEFoundation
+	INSTALL
+	INSTALL_DESTINATION "ZEEngineAPI/ZEInterior"
+	INSTALL_COMPONENT ZESDK)

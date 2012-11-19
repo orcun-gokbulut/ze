@@ -48,7 +48,7 @@ link_directories(
 
 add_subdirectory(ZE3dsMaxUI)	
 add_subdirectory(ZE3dsMaxModelExporter)
-add_subdirectory(ZE3dsMaxMapExporter)
+add_subdirectory(ZE3dsMaxInteriorExporter)
 add_subdirectory(ZE3dsMaxPlugin)
 add_subdirectory(ZE3dsMaxUtils)
 

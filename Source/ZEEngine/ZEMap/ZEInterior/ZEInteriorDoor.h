@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMaxMapExporterOptionsDialog.h
+ Zinek Engine - ZEInteriorDoor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,43 +34,83 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MAP_EXPORTER_OPTIONS_DIALOG_H__
-#define __ZE_MAP_EXPORTER_OPTIONS_DIALOG_H__
+#ifndef __ZE_INTERIOR_DOOR_H__
+#define __ZE_INTERIOR_DOOR_H__
 
-#include "ui_ZE3dsMaxMapExporterOptionsWidget.h"
-#include "QtGui\QDialog"
-#include "ZEDS\ZEString.h"
-#include "ZEML\ZEMLNode.h"
+#include "ZEMath/ZERectangle3D.h"
+#include "ZEGraphics/ZERenderCommand.h"
+#include "ZEGraphics/ZECanvas.h"
 
-class ZE3dsMaxMapExporterOptionsDialog : public QDialog
+class ZEInterior;
+class ZEInteriorRoom;
+struct ZEInteriorDoorResource;
+class ZESimpleMaterial;
+class ZECanvas;
+class ZERenderer;
+class ZERenderCommand;
+
+class ZEInteriorDoor
 {
-	Q_OBJECT
+	friend class ZEInterior;
 
 	private:
+		ZEInterior*					Owner;
+		const ZEInteriorDoorResource*	Resource;
 
-		Ui::ZE3dsMaxMapExporterOptionsDialogUI*	Form;
-		ZEMLNode*							Options;
+		ZERectangle3D					Rectangle;
+		float							Width;
+		float							Length;
 
-		void					ToggleFileLogging(bool IsEnabled);
-		void					ToggleApplicationPathOptions(bool IsEnabled);
-		void					CollectOptionsFromForm();
+		mutable bool					TransformChanged;
+		ZEVector3						Position;
+		ZEQuaternion					Rotation;
+		ZEVector3						Scale;
 
-	private slots:
+		ZEInteriorRoom*					Rooms[2];
+		bool							Open;
+		bool							SeenThrough;
 
-		void					ShowEngineDirectoryDialog();
-		void					ShowLoggingFilePathDialog();
-		void					SetFileLoggingEnabled(int CheckBoxState);
+		struct
+		{
+			ZESimpleMaterial*				Material;
+			ZECanvas						BoxCanvas;
+			ZERenderCommand					BoxRenderCommand;
+
+		} DebugDrawComponents;
+
+
+		void							DebugDraw(ZERenderer* Renderer);
+		void							CalculateRectangle();
+
+										ZEInteriorDoor();
 
 	public:
+		ZEInterior*					GetOwner();
 
-								ZE3dsMaxMapExporterOptionsDialog(QWidget* Parent);
-								~ZE3dsMaxMapExporterOptionsDialog();
+		const char*						GetName();
 
-	bool						GetFileLoggingEnabled();
-	ZEString					GetLogFilePath();
+		ZEInteriorRoom**				GetRooms();
+		const ZERectangle3D&			GetRectangle();
 
-	void						SetOptions(ZEMLNode* Options);
-	ZEMLNode*					GetOptions();
+		void							SetPosition(const ZEVector3& NewPosition);
+		const ZEVector3&				GetPosition() const;
+
+		void							SetRotation(const ZEQuaternion& NewRotation);
+		const ZEQuaternion&				GetRotation() const;
+
+		void							SetScale(const ZEVector3& NewScale);
+		const ZEVector3&				GetScale() const;
+
+		void							SetSeenThrough(bool Value);
+		bool							GetSeenThrough();
+
+		void							Initialize(ZEInterior* Owner, const ZEInteriorDoorResource* Resource);
+		void							Deinitialize();
+
+		void							SetOpen(bool Open);
+		bool							GetOpen();
+
+		static ZEInteriorDoor*			CreateInstance();
 };
 
 #endif

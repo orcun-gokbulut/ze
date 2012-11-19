@@ -77,8 +77,8 @@ ze_add_source(ZEUTextEditControl.cpp			Sources)
 ze_add_source(ZEUTextEditControl.h				Sources Headers)
 ze_add_source(ZEUISceneStatisticsControl.cpp	Sources)
 ze_add_source(ZEUISceneStatisticsControl.h		Sources Headers)
-ze_add_source(ZEUIPortalMapStatisticsControl.cpp	Sources)
-ze_add_source(ZEUIPortalMapStatisticsControl.h		Sources Headers)
+ze_add_source(ZEUIInteriorStatisticsControl.cpp	Sources)
+ze_add_source(ZEUIInteriorStatisticsControl.h	Sources Headers)
 
 ze_add_library(ZEUI
 	LIBS ZEFoundation 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIPortalMapStatisticsControl.h
+ Zinek Engine - ZE3dsMaxInteriorExporterDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_UI_PORTAL_MAP_STATISTICS_CONTROL_H__
-#define __ZE_UI_PORTAL_MAP_STATISTICS_CONTROL_H__
+#include "ZE3dsMaxInteriorExporterDescription.h"
+#include "ZE3dsMaxInteriorExporter.h"
 
-#include "ZEUI/ZEUIControl.h"
-#include "ZEUI/ZEUITextControl.h"
+#define ZE3dsMaxInteriorExporter_CLASS_ID	Class_ID(0x3a8ad1e4, 0x973e26ff)
 
+ZEInt ZE3dsMaxInteriorExporterDescription::IsPublic()
+{ 
+	return TRUE; 
+}
 
-class ZEUIPortalMapStatisticsControl : public ZEUIControl
+void* ZE3dsMaxInteriorExporterDescription::Create(BOOL Loading) 
+{ 
+	return new ZE3dsMaxInteriorExporter(); 
+}
+
+const TCHAR* ZE3dsMaxInteriorExporterDescription::ClassName()
+{ 
+	return "ZE3dsMaxInteriorExporter"; 
+}
+
+SClass_ID ZE3dsMaxInteriorExporterDescription::SuperClassID()
+{ 
+	return SCENE_EXPORT_CLASS_ID; 
+}
+
+Class_ID ZE3dsMaxInteriorExporterDescription::ClassID()
+{ 
+	return ZE3dsMaxInteriorExporter_CLASS_ID; 
+}
+
+const TCHAR* ZE3dsMaxInteriorExporterDescription::Category()
 {
-private:
+	return "Exporter"; 
+}
 
-	ZEUITextControl* TotalPortalCount;
-	ZEUITextControl* CulledPortalCount;
-	ZEUITextControl* DrawedPortalCount;
+const TCHAR* ZE3dsMaxInteriorExporterDescription::InternalName()
+{ 
+	return "ZEInterior Exporter"; 
+}
 
-	ZEUITextControl* TotalPolygonCount;
-	ZEUITextControl* CulledPolygonCount;
-	ZEUITextControl* DrawedPolygonCount;
+HINSTANCE ZE3dsMaxInteriorExporterDescription::HInstance()
+{ 
+	return hInstance; 
+}
 
-public:
-
-	void					SetMaterial(ZEMaterial* Material);
-	ZEMaterial*				GetMaterial() const;
-
-	void					Draw(ZEUIRenderer* Renderer);
-	void					Tick(float ElapsedTime);
-
-							ZEUIPortalMapStatisticsControl();
-
-
-};
-
-#endif
+ClassDesc2* ZE3dsMaxInteriorExporterDescription::GetInstance()
+{
+	static ZE3dsMaxInteriorExporterDescription Desc;
+	return &Desc;
+}

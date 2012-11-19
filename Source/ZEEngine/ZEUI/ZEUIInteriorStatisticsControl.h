@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPortalMapDoor.h
+ Zinek Engine - ZEUIInteriorStatisticsControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,83 +34,36 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PORTAL_MAP_DOOR_H__
-#define __ZE_PORTAL_MAP_DOOR_H__
+#ifndef __ZE_UI_INTERIOR_STATISTICS_CONTROL_H__
+#define __ZE_UI_INTERIOR_STATISTICS_CONTROL_H__
 
-#include "ZEMath/ZERectangle3D.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECanvas.h"
+#include "ZEUI/ZEUIControl.h"
+#include "ZEUI/ZEUITextControl.h"
 
-class ZEPortalMap;
-class ZEPortalMapPortal;
-struct ZEPortalMapResourceDoor;
-class ZESimpleMaterial;
-class ZECanvas;
-class ZERenderer;
-class ZERenderCommand;
 
-class ZEPortalMapDoor
+class ZEUIInteriorStatisticsControl : public ZEUIControl
 {
-	friend class ZEPortalMap;
+private:
 
-	private:
-		ZEPortalMap*					Owner;
-		const ZEPortalMapResourceDoor*	Resource;
+	ZEUITextControl* TotalRoomCount;
+	ZEUITextControl* CulledRoomCount;
+	ZEUITextControl* DrawedRoomCount;
 
-		ZERectangle3D					Rectangle;
-		float							Width;
-		float							Length;
+	ZEUITextControl* TotalPolygonCount;
+	ZEUITextControl* CulledPolygonCount;
+	ZEUITextControl* DrawedPolygonCount;
 
-		mutable bool					TransformChanged;
-		ZEVector3						Position;
-		ZEQuaternion					Rotation;
-		ZEVector3						Scale;
+public:
 
-		ZEPortalMapPortal*				Portals[2];
-		bool							Open;
-		bool							SeenThrough;
+	void					SetMaterial(ZEMaterial* Material);
+	ZEMaterial*				GetMaterial() const;
 
-		struct
-		{
-			ZESimpleMaterial*				Material;
-			ZECanvas						BoxCanvas;
-			ZERenderCommand					BoxRenderCommand;
+	void					Draw(ZEUIRenderer* Renderer);
+	void					Tick(float ElapsedTime);
 
-		} DebugDrawComponents;
+							ZEUIInteriorStatisticsControl();
 
 
-		void							DebugDraw(ZERenderer* Renderer);
-		void							CalculateRectangle();
-
-										ZEPortalMapDoor();
-
-	public:
-		ZEPortalMap*					GetOwner();
-
-		const char*						GetName();
-
-		ZEPortalMapPortal**				GetPortals();
-		const ZERectangle3D&			GetRectangle();
-
-		void							SetPosition(const ZEVector3& NewPosition);
-		const ZEVector3&				GetPosition() const;
-
-		void							SetRotation(const ZEQuaternion& NewRotation);
-		const ZEQuaternion&				GetRotation() const;
-
-		void							SetScale(const ZEVector3& NewScale);
-		const ZEVector3&				GetScale() const;
-
-		void							SetSeenThrough(bool Value);
-		bool							GetSeenThrough();
-
-		void							Initialize(ZEPortalMap* Owner, const ZEPortalMapResourceDoor* Resource);
-		void							Deinitialize();
-
-		void							SetOpen(bool Open);
-		bool							GetOpen();
-
-		static ZEPortalMapDoor*			CreateInstance();
 };
 
 #endif

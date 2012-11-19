@@ -159,10 +159,10 @@ ZEArray<ZEFixedMaterial*> ZEDMaterialEditorViewPort::GetModelMaterials()
 	if (Model->GetModelResource() == NULL)
 		return Materials;
 
-	Materials.SetCount(Model->GetModelResource()->Materials.GetCount());
+	Materials.SetCount(Model->GetModelResource()->GetMaterials().GetCount());
 
 	for(ZESize I = 0; I < Materials.GetCount(); I++)
-		Materials[I] = (ZEFixedMaterial*)Model->GetModelResource()->Materials[I];
+		Materials[I] = (ZEFixedMaterial*)Model->GetModelResource()->GetMaterials()[I];
 
 	return Materials;
 }
@@ -171,15 +171,15 @@ void ZEDMaterialEditorViewPort::SetModelFile(const char* FileName)
 {
 	ZEModelResource* TempResource = ZEModelResource::LoadSharedResource(FileName);
 
-	for (ZESize I = 0; I < Model->GetModelResource()->Materials[0]->GetDescription()->GetPropertyCount(); I++)
+	for (ZESize I = 0; I < Model->GetModelResource()->GetMaterials()[0]->GetDescription()->GetPropertyCount(); I++)
 	{
 		ZEVariant TempVariant;
-		Model->GetModelResource()->Materials[0]->GetProperty(I, TempVariant);
+		Model->GetModelResource()->GetMaterials()[0]->GetProperty(I, TempVariant);
 
 		if (TempVariant.GetType() == ZE_VRT_STRING && strcmp(TempVariant.GetString(), "") == 0)
 			continue;
 
-		TempResource->Materials[0]->SetProperty(I, TempVariant);
+		TempResource->GetMaterials()[0]->SetProperty(I, TempVariant);
 	}
 
 	Model->SetModelResource(TempResource);

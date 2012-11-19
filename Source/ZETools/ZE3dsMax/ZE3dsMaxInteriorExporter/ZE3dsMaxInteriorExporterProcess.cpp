@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMaxMapExporterProcess.cpp
+ Zinek Engine - ZE3dsMaxInteriorExporterProcess.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 
-#include "ZE3dsMaxMapExporter.h"
+#include "ZE3dsMaxInteriorExporter.h"
 #include "ZEToolComponents\ZEProgressDialog\ZEProgressDialog.h"
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 #include "ZEFile\ZEFile.h"
@@ -46,20 +46,20 @@
 #include "ZEMath\ZEAngle.h"
 
 ZEPackStruct(
-struct ZEMapFilePhysicalMeshPolygon
+struct ZEInteriorFilePhysicalMeshPolygon
 {
 	ZEUInt32								Indices[3];
 });
 
 ZEPackStruct(
-struct ZEMapFilePhysicalMesh
+struct ZEInteriorFilePhysicalMesh
 {
 	ZEArray<ZEVector3>						Vertices;
-	ZEArray<ZEMapFilePhysicalMeshPolygon>	Polygons;
+	ZEArray<ZEInteriorFilePhysicalMeshPolygon>	Polygons;
 });
 
 ZEPackStruct(
-struct ZEMapFileVertex
+struct ZEInteriorFileVertex
 {
 	ZEVector3								Position;
 	ZEVector3								Normal;
@@ -69,13 +69,13 @@ struct ZEMapFileVertex
 });
 
 ZEPackStruct(
-struct ZEMapFilePolygon
+struct ZEInteriorFilePolygon
 {	
 	ZEUInt32								Material;
-	ZEMapFileVertex							Vertices[3];
+	ZEInteriorFileVertex					Vertices[3];
 });
 
-ZEInt ZE3dsMaxMapExporter::ProcessFaceMaterial(IGameMaterial* Material)
+ZEInt ZE3dsMaxInteriorExporter::ProcessFaceMaterial(IGameMaterial* Material)
 {
 	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)
 		if (Materials[I] == Material)
@@ -86,28 +86,28 @@ ZEInt ZE3dsMaxMapExporter::ProcessFaceMaterial(IGameMaterial* Material)
 	return Materials.Count() - 1;
 }
 
-ZEInt ZE3dsMaxMapExporter::FindPortalIndex(IGameNode* Node)
+ZEInt ZE3dsMaxInteriorExporter::FindRoomIndex(IGameNode* Node)
 {
-	for (ZESize I = 0; I < (ZESize)Portals.Count(); I++)
-		if (Node == Portals[I]) return (ZEInt)I;
+	for (ZESize I = 0; I < (ZESize)Rooms.Count(); I++)
+		if (Node == Rooms[I]) return (ZEInt)I;
 
 	return -1;
 }
 
-bool ZE3dsMaxMapExporter::ProcessDoors()
+bool ZE3dsMaxInteriorExporter::ProcessDoors()
 {
-	zeLog("Processing Portal Doors...");
+	zeLog("Processing Interior Doors...");
 
 	if (Doors.Count() == 0)
 	{
-		zeWarning("No portal doors found. Portal door processing aborted.");
+		zeWarning("No interior doors found. Interior door processing aborted.");
 		return true;
 	}
 
-	ZEMLNode* DoorsNode = MapNode.AddSubNode("Doors");
+	ZEMLNode* DoorsNode = InteriorNode.AddSubNode("Doors");
 
-	INode* PortalANode;
-	INode* PortalBNode;
+	INode* RoomANode;
+	INode* RoomBNode;
 
 	for (ZESize I = 0; I < (ZESize)Doors.Count(); I++)
 	{
@@ -116,18 +116,18 @@ bool ZE3dsMaxMapExporter::ProcessDoors()
 		IGameNode* CurrentNode = Doors[I];
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		ZEProgressDialog::GetInstance()->OpenTask(CurrentNode->GetName());
-		zeLog("Processing Portal Door \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Doors.Count());
+		zeLog("Processing Door \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Doors.Count());
 		
 		DoorNode->AddProperty("Name", CurrentNode->GetName());
 
 		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_BOOL_PROP, "IsOpen", *DoorNode->AddProperty("IsOpen")))
-			zeError("Can not find door property IsOpen");
+			zeError("Can not find door property : \"IsOpen\".");
 
 		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, "Width", *DoorNode->AddProperty("Width")))
-			zeError("Can not find door property Width");
+			zeError("Can not find door property : \"Width\".");
 
 		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, "Length", *DoorNode->AddProperty("Length")))
-			zeError("Can not find door property Length");
+			zeError("Can not find door property : \"Length\".");
 
 		ZEMatrix4x4 ObjectTM;
 		ZEMatrix4x4::CreateOrientation(ObjectTM, 
@@ -143,38 +143,38 @@ bool ZE3dsMaxMapExporter::ProcessDoors()
 
 		ZEMatrix4x4 OffsetTransform = WorldTM.Inverse() * ObjectTM;
 
-		if (OffsetTransform != ZEMatrix4x4::Identity)
-			zeWarning("Pivot transformations are omitted for ZEPortalDoors. The pivot for ZEPortalDoor: %s is returned to it's Identity state.", CurrentNode->GetName());
+		if (!OffsetTransform.Equals(ZEMatrix4x4::Identity, 0.0000001f))
+			zeWarning("Pivot transformations are omitted for ZEInteriorDoor. The pivot for ZEInteriorDoor: %s is returned to it's Identity state.", CurrentNode->GetName());
 
 		DoorNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Translation()));
 		DoorNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Rotation()));
 		DoorNode->AddProperty("Scale", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Scaling()));
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, "PortalA", PortalANode))
-			zeError("Can not find door property PortalA");
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, "RoomA", RoomANode))
+			zeError("Can not find door property: RoomA");
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, "PortalB", PortalBNode))
-			zeError("Can not find door property PortalB");
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, "RoomB", RoomBNode))
+			zeError("Can not find door property: RoomB");
 
-		if (PortalANode == NULL || PortalBNode == NULL || PortalANode == PortalBNode)
+		if (RoomANode == NULL || RoomBNode == NULL || RoomANode == RoomBNode)
 		{
-			zeWarning("Portal door \"%s\" has wrong parameters.", CurrentNode->GetName());
+			zeWarning("Interior door \"%s\" has wrong parameters.", CurrentNode->GetName());
 			return false;
 		}
 
-		ZEUInt32 PortalAIndex = FindPortalIndex(Scene->GetIGameNode(PortalANode));
+		ZEUInt32 RoomAIndex = FindRoomIndex(Scene->GetIGameNode(RoomANode));
 		
-		if(PortalAIndex < 0)
-			zeError("Can nor find PortalAIndex.");
+		if(RoomAIndex < 0)
+			zeError("Can nor find RoomAIndex.");
 		
-		DoorNode->AddProperty("PortalAIndex", PortalAIndex);
+		DoorNode->AddProperty("RoomAIndex", RoomAIndex);
 
-		ZEUInt32 PortalBIndex = FindPortalIndex(Scene->GetIGameNode(PortalBNode));
+		ZEUInt32 RoomBIndex = FindRoomIndex(Scene->GetIGameNode(RoomBNode));
 
-		if(PortalBIndex < 0)
-			zeError("Can nor find PortalBIndex.");
+		if(RoomBIndex < 0)
+			zeError("Can nor find RoomBIndex.");
 
-		DoorNode->AddProperty("PortalBIndex", PortalBIndex);
+		DoorNode->AddProperty("RoomBIndex", RoomBIndex);
 	
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
@@ -182,14 +182,14 @@ bool ZE3dsMaxMapExporter::ProcessDoors()
 	return true;
 }
 
-void ZE3dsMaxMapExporter::ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode)
+void ZE3dsMaxInteriorExporter::ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode)
 {
 	IGameMesh* Mesh = (IGameMesh*)Object;
 
 	if(!Mesh->InitializeData())
 		zeError("Can not initialize mesh data for phsical mesh.");
 
-	ZEArray<ZEMapFilePhysicalMeshPolygon> Polygons;
+	ZEArray<ZEInteriorFilePhysicalMeshPolygon> Polygons;
 	Polygons.SetCount(Mesh->GetNumberOfFaces());
 
 	if(Mesh->GetNumberOfFaces() == 0)
@@ -203,7 +203,7 @@ void ZE3dsMaxMapExporter::ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* Phy
 		Polygons[I].Indices[2] = Face->vert[2]; 
 	}
 
-	PhysicalMeshNode->AddDataProperty("Polygons", Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygon) * Polygons.GetCount(), true);
+	PhysicalMeshNode->AddDataProperty("Polygons", Polygons.GetCArray(), sizeof(ZEInteriorFilePhysicalMeshPolygon) * Polygons.GetCount(), true);
 
 	ZEArray<ZEVector3> Vertices;
 	Vertices.SetCount(Mesh->GetNumberOfVerts());
@@ -217,51 +217,54 @@ void ZE3dsMaxMapExporter::ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* Phy
 	PhysicalMeshNode->AddDataProperty("Vertices", Vertices.GetCArray(), sizeof(ZEVector3) * Vertices.GetCount(), true);
 }
 
-bool ZE3dsMaxMapExporter::ProcessPortals()
+bool ZE3dsMaxInteriorExporter::ProcessRooms()
 {
-	zeLog("Processing portals...");
+	zeLog("Processing rooms...");
 
-	if (Portals.Count() == 0)
+	if (Rooms.Count() == 0)
 	{
-		zeWarning("No portals found. Portal processing aborted.");
+		zeWarning("No rooms found. Room processing aborted.");
 		return true;
 	}
 
-	ZEMLNode* PortalsNode = MapNode.AddSubNode("Portals");
+	ZEMLNode* RoomsNode = InteriorNode.AddSubNode("Rooms");
 
-	for (ZESize I = 0; I < (ZESize)Portals.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)Rooms.Count(); I++)
 	{
-		ZEMLNode* PortalNode = PortalsNode->AddSubNode("Portal");
+		ZEMLNode* RoomNode = RoomsNode->AddSubNode("Room");
 
-		IGameNode* CurrentNode = Portals[I];
+		IGameNode* CurrentNode = Rooms[I];
 		ZEProgressDialog::GetInstance()->OpenTask(CurrentNode->GetName());
-		zeLog("Processing Portal \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Portals.Count());
+		zeLog("Processing Room \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Rooms.Count());
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
-		bool PhysicalMeshEnabled, PhysicalMeshUseSelf;
+		bool PhysicalMeshExists, PhysicalMeshEnabled, PhysicalMeshUseSelf;
 		INode* PhysicalMeshMaxNode;
 		IGameNode* PhysicalMeshNode;
 
-		PortalNode->AddProperty("Name", CurrentNode->GetName());
+		RoomNode->AddProperty("Name", CurrentNode->GetName());
 
-		PortalNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Translation()));
-		PortalNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Rotation()));
-		PortalNode->AddProperty("Scale", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Scaling()));
+		RoomNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Translation()));
+		RoomNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Rotation()));
+		RoomNode->AddProperty("Scale", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Scaling()));
+
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "PhysicalMeshExists", PhysicalMeshExists))
+			zeError("Can not find room property : \"PhysicalMeshExists\".");
 
 		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "PhysicalMeshEnabled", PhysicalMeshEnabled))
-			zeError("Can not find portal property \"PhysicalMeshEnabled\".");
+			zeError("Can not find room property : \"PhysicalMeshEnabled\".");
 
 		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "PhysicalMeshUseSelf", PhysicalMeshUseSelf))
-			zeError("Can not find portal property \"PhysicalMeshUseSelf\".");
+			zeError("Can not find room property : \"PhysicalMeshUseSelf\".");
 
 		if(PhysicalMeshEnabled && !PhysicalMeshUseSelf)
 			if(ZE3dsMaxUtils::GetProperty(CurrentObject, "PhysicalMesh", PhysicalMeshMaxNode))
-				zeError("Can not find portal property \"PhysicalMesh\".");
+				zeError("Can not find room property : \"PhysicalMesh\".");
 
-		if(PhysicalMeshEnabled)
+		if(PhysicalMeshExists)
 		{
 			if (PhysicalMeshUseSelf)
 			{
-				ZEMLNode* PhysicalMeshZEMLNode = PortalNode->AddSubNode("PhysicalMesh");
+				ZEMLNode* PhysicalMeshZEMLNode = RoomNode->AddSubNode("PhysicalMesh");
 				PhysicalMeshZEMLNode->AddProperty("PhysicalMeshEnabled", PhysicalMeshEnabled);
 				ProcessPhysicalMesh(CurrentObject, PhysicalMeshZEMLNode);
 			}
@@ -270,13 +273,12 @@ bool ZE3dsMaxMapExporter::ProcessPortals()
 				PhysicalMeshNode = Scene->GetIGameNode(PhysicalMeshMaxNode);
 				if(PhysicalMeshNode == NULL)
 				{
-					zeWarning("Physical Mesh Node NULL.");
-					zeWarning("Physical mesh disabled.");
+					zeWarning("No physical mesh found. Physical Mesh processing aborted.");
 					PhysicalMeshEnabled = false;
 				}
 				else
 				{
-					ZEMLNode* PhysicalMeshZEMLNode = PortalNode->AddSubNode("PhysicalMesh");
+					ZEMLNode* PhysicalMeshZEMLNode = RoomNode->AddSubNode("PhysicalMesh");
 					PhysicalMeshZEMLNode->AddProperty("PhysicalMeshEnabled", PhysicalMeshEnabled);
 					ProcessPhysicalMesh(PhysicalMeshNode->GetIGameObject(), PhysicalMeshZEMLNode);
 				}
@@ -296,7 +298,7 @@ bool ZE3dsMaxMapExporter::ProcessPortals()
 		if(Mesh->GetNumberOfFaces() == 0)
 			zeError("Face count is : 0.");
 
-		ZEArray<ZEMapFilePolygon> Polygons;
+		ZEArray<ZEInteriorFilePolygon> Polygons;
 		Polygons.SetCount(Mesh->GetNumberOfFaces());
 		
 		ZEMatrix4x4 ObjectTM;
@@ -319,7 +321,7 @@ bool ZE3dsMaxMapExporter::ProcessPortals()
 			Face = Mesh->GetFace((ZEInt)I);
 			if (Mesh->GetMaterialFromFace((ZEInt)I) == NULL)
 			{
-				zeError("Face %d of portal \"%s\" does not have valid material.", I, CurrentNode->GetName());
+				zeError("Face %d of room \"%s\" does not have valid material.", I, CurrentNode->GetName());
 				return false;
 			}
 
@@ -327,7 +329,7 @@ bool ZE3dsMaxMapExporter::ProcessPortals()
 
 			for (ZESize N = 0; N < 3; N++)
 			{
-				ZEMapFileVertex* Vertex = &Polygons[I].Vertices[N];
+				ZEInteriorFileVertex* Vertex = &Polygons[I].Vertices[N];
 				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt)I, (ZEInt)N);
 
 				Point3 Temp;
@@ -356,14 +358,14 @@ bool ZE3dsMaxMapExporter::ProcessPortals()
 			}
 		}
 
-		PortalNode->AddDataProperty("Polygons", Polygons.GetCArray(), sizeof(ZEMapFilePolygon) * Polygons.GetCount(), true);
+		RoomNode->AddDataProperty("Polygons", Polygons.GetCArray(), sizeof(ZEInteriorFilePolygon) * Polygons.GetCount(), true);
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
 
 	return true;
 }
 
-bool ZE3dsMaxMapExporter::ProcessMaterials(const char* FileName)
+bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 {
 	zeLog("Processing materials...");
 	
@@ -382,7 +384,7 @@ bool ZE3dsMaxMapExporter::ProcessMaterials(const char* FileName)
 		return true;
 	}
 
-	ZEMLNode* MaterialsNode = MapNode.AddSubNode("Materials");
+	ZEMLNode* MaterialsNode = InteriorNode.AddSubNode("Materials");
 
 	zeLog("Material count : %d", MaterialCount);
 
@@ -667,11 +669,11 @@ bool ZE3dsMaxMapExporter::ProcessMaterials(const char* FileName)
 	return true;
 }
 
-bool ZE3dsMaxMapExporter::ProcessScene()
+bool ZE3dsMaxInteriorExporter::ProcessScene()
 {
 	ZESize ElectedNodeCount = 0;
-	ZESize PortalNodeCount = 0;
-	ZESize PortalDoorNodeCount = 0;
+	ZESize RoomNodeCount = 0;
+	ZESize DoorNodeCount = 0;
 	ZESize EntityNodeCount = 0;
 	Tab<IGameNode*> Nodes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
 
@@ -684,38 +686,38 @@ bool ZE3dsMaxMapExporter::ProcessScene()
 		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, "ZEType", NodeZEType))
 			continue;
 
-		if (strcmp(NodeZEType, "Portal") == 0)
+		if (strcmp(NodeZEType, "Room") == 0)
 		{
-			PortalNodeCount++;
-			Portals.Append(1, &CurrentNode);
+			RoomNodeCount++;
+			Rooms.Append(1, &CurrentNode);
 		}
-		else if (strcmp(NodeZEType, "PortalDoor") == 0)
+		else if (strcmp(NodeZEType, "Door") == 0)
 		{
-			PortalDoorNodeCount++;
+			DoorNodeCount++;
 			Doors.Append(1, &CurrentNode);
 		}
-		else if (strcmp(NodeZEType, "ZEMapFileBrush") == 0)
+		else if (strcmp(NodeZEType, "ZEInteriorFileBrush") == 0)
 		{
 			EntityNodeCount++;
 		}
-		else if (strcmp(NodeZEType, "ZEMapFileEntity") == 0)
+		else if (strcmp(NodeZEType, "ZEInteriorFileEntity") == 0)
 		{
 			//Why is is empty...
 		}
 		else
 			ElectedNodeCount++;
 	}
-	zeLog("Portal Count: %d, Portal Doors Count: %d, Entity Count: %d, Elected Node Count: %d", PortalNodeCount, PortalDoorNodeCount, EntityNodeCount, ElectedNodeCount);
+	zeLog("Room Count: %d, Door Count: %d, Entity Count: %d, Elected Node Count: %d", RoomNodeCount, DoorNodeCount, EntityNodeCount, ElectedNodeCount);
 
 	return true;
 }
 
-void ZE3dsMaxMapExporter::CollectResources()
+void ZE3dsMaxInteriorExporter::CollectResources()
 {
-	ZESize PortalNodeCount = 0;
+	ZESize RoomNodeCount = 0;
 
 	Tab<IGameNode*>		Nodes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
-	Tab<IGameNode*>		ResourcePortals;
+	Tab<IGameNode*>		ResourceRooms;
 	Tab<IGameMaterial*>	ResourceMaterials;
 
 	for (ZESize I = 0; I < (ZESize)Nodes.Count(); I++)
@@ -727,16 +729,16 @@ void ZE3dsMaxMapExporter::CollectResources()
 		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, "ZEType", NodeZEType))
 			continue;
 
-		if (strcmp(NodeZEType, "Portal") == 0)
+		if (strcmp(NodeZEType, "Room") == 0)
 		{
-			PortalNodeCount++;
-			ResourcePortals.Append(1, &CurrentNode);
+			RoomNodeCount++;
+			ResourceRooms.Append(1, &CurrentNode);
 		}
 	}
 
-	for (ZESize I = 0; I < (ZESize)ResourcePortals.Count(); I++)
+	for (ZESize I = 0; I < (ZESize)ResourceRooms.Count(); I++)
 	{
-		IGameNode* CurrentNode = ResourcePortals[I];
+		IGameNode* CurrentNode = ResourceRooms[I];
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 
 		IGameMesh* Mesh = (IGameMesh*)CurrentObject;
@@ -751,7 +753,7 @@ void ZE3dsMaxMapExporter::CollectResources()
 			IGameMaterial* CurrentMaterial = Mesh->GetMaterialFromFace((ZEInt)I);
 
 			if (CurrentMaterial == NULL)
-				zeError("Face %d of portal \"%s\" does not have valid material. Can not collect resource.", I, CurrentNode->GetName());
+				zeError("Face %d of room \"%s\" does not have valid material. Can not collect resource.", I, CurrentNode->GetName());
 
 			bool IsFound = false;
 

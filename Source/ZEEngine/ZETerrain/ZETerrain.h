@@ -71,7 +71,7 @@ ZE_META_ENTITY_DESCRIPTION(ZETerrain)
 class ZETerrain : public ZEEntity
 {
 	ZE_META_ENTITY(ZETerrain)
-	friend class ZEPortalMapDoor;
+	friend class ZEInteriorDoor;
 	private:
 		ZEStaticVertexBuffer*					VertexBuffer;
 		ZEVertexDeclaration*					VertexDeclaration;

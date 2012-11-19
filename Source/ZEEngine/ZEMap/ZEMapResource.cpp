@@ -34,22 +34,22 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMapResource.h"
-#include "ZEPortalMap/ZEPortalMapResource.h"
+#include "ZEInterior/ZEInteriorResource.h"
 
 ZEMapResource* ZEMapResource::LoadResource(const ZEString& FileName)
 {
-	ZEPortalMapResource* Resource = ZEPortalMapResource::LoadResource(FileName);
+	ZEInteriorResource* Resource = ZEInteriorResource::LoadResource(FileName);
 	Resource->SetFileName(FileName);
 	return Resource;
 }
 const ZEMapResource* ZEMapResource::LoadSharedResource(const ZEString& FileName)
 {
-	ZEPortalMapResource* Resource = ZEPortalMapResource::LoadSharedResource(FileName);
+	ZEInteriorResource* Resource = ZEInteriorResource::LoadSharedResource(FileName);
 	Resource->SetFileName(FileName);
 	return Resource;
 }
 
 void ZEMapResource::CacheResource(const ZEString& FileName)
 {
-	ZEPortalMapResource::CacheResource(FileName);
+	ZEInteriorResource::CacheResource(FileName);
 }

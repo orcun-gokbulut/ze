@@ -104,6 +104,9 @@ class ZEMatrix3x3
 		static float					Determinant(const ZEMatrix3x3 &Matrix);
 		static bool						Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix);
 
+		bool							Equals(const ZEMatrix3x3& Matrix) const;
+		bool							Equals(const ZEMatrix3x3& Matrix, float Threshold);
+
 		static void						Transform(ZEVector2& Out, const ZEMatrix3x3 &Matrix, const ZEVector2& Vector);
 		static void						Transform(ZEVector3& Out, const ZEMatrix3x3 &Matrix, const ZEVector3& Vector);
 		static void						Transform(ZEVector4& Out, const ZEMatrix3x3 &Matrix, const ZEVector4& Vector);
@@ -207,6 +210,9 @@ class ZEMatrix4x4
 		static void						Transpose(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix);
 		static bool						Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix);
 		static float					Determinant(const ZEMatrix4x4 &Matrix);
+
+		bool							Equals(const ZEMatrix4x4& Matrix) const;
+		bool							Equals(const ZEMatrix4x4& Matrix, float Threshold) const;
 
 		static void						Transform(ZEVector3 &Out, const ZEMatrix4x4 &Matrix, const ZEVector3& Vector);
 		static void						Transform3x3(ZEVector3 &Out, const ZEMatrix4x4 &Matrix, const ZEVector3& Vector);
