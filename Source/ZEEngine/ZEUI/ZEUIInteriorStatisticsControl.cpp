@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIPortalMapStatisticsControl.cpp
+ Zinek Engine - ZEUIInteriorStatisticsControl.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,95 +33,95 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUIPortalMapStatisticsControl.h"
+#include "ZEUIInteriorStatisticsControl.h"
 #include "ZEDS/ZEString.h"
 #include "ZEUI/ZEFontResource.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
-#include "ZEMap/ZEPortalMap/ZEPortalMap.h"
+#include "ZEMap/ZEInterior/ZEInterior.h"
 
-#define TotalPortalText     ZEString("Total Portal Count    : ")
-#define CulledPortalText	ZEString("Culled Portal Count   : ")
-#define DrawedPortalText    ZEString("Drawn Portal Count    : ")
+#define TotalRoomText		ZEString("Total Room Count		: ")
+#define CulledRoomText		ZEString("Culled Room Count		: ")
+#define DrawedRoomText		ZEString("Drawn Room Count		: ")
 #define TotalPolygonText    ZEString("Total Polygon Count   : ")
 #define CulledPolygonText	ZEString("Culled Polygon Count  : ")
 #define DrawedPolygonText   ZEString("Drawn Polygon Count   : ")
 #define FPSText				ZEString("Frame Per Second      : ")
 #define CamPosText			ZEString("Camera Position       : ")
 
-void ZEUIPortalMapStatisticsControl::SetMaterial( ZEMaterial* Material )
+void ZEUIInteriorStatisticsControl::SetMaterial( ZEMaterial* Material )
 {
 
 }
 
-ZEMaterial* ZEUIPortalMapStatisticsControl::GetMaterial() const
+ZEMaterial* ZEUIInteriorStatisticsControl::GetMaterial() const
 {
 	return NULL;
 }
 
-void ZEUIPortalMapStatisticsControl::Draw( ZEUIRenderer* Renderer )
+void ZEUIInteriorStatisticsControl::Draw( ZEUIRenderer* Renderer )
 {
 	ZEUIControl::Draw(Renderer);
 }
 
-void ZEUIPortalMapStatisticsControl::Tick( float ElapsedTime )
+void ZEUIInteriorStatisticsControl::Tick( float ElapsedTime )
 {
 	//Portal Culling Calculation
 
 	ZEScene* TempScene = zeScene;
-	ZEPortalMap* TempMap = (ZEPortalMap*)TempScene->GetEntities(ZEPortalMap::Description()).GetFirstItem();
+	ZEInterior* TempMap = (ZEInterior*)TempScene->GetEntities(ZEInterior::Description()).GetFirstItem();
 	ZEVector3 CamPos = TempScene->GetActiveCamera()->GetWorldPosition();
-	ZEPortalMapCullStatistics Stats = TempMap->GetCullStatistics();
+	ZEInteriorCullStatistics Stats = TempMap->GetCullStatistics();
 	ZEString Value;
 
-	Value.SetValue(Stats.TotalPortalCount);
-	TotalPortalCount->SetText(TotalPortalText + Value);
+	Value.SetValue(Stats.TotalRoomCount);
+	TotalRoomCount->SetText(TotalRoomText + Value);
 
-	Value.SetValue(Stats.CulledPortalCount);
-	CulledPortalCount->SetText(CulledPortalText + Value);
+	Value.SetValue(Stats.CulledRoomCount);
+	CulledRoomCount->SetText(CulledRoomText + Value);
 
-	Value.SetValue(Stats.DrawedPortalCount);
-	DrawedPortalCount->SetText(DrawedPortalText + Value);
+	Value.SetValue(Stats.DrawedRoomCount);
+	DrawedRoomCount->SetText(DrawedRoomText + Value);
 
-	Value.SetValue(Stats.TotalMapPolygonCount);
+	Value.SetValue(Stats.TotalInteriorPolygonCount);
 	TotalPolygonCount->SetText(TotalPolygonText + Value);
 
-	Value.SetValue(Stats.CulledMapPolygonCount);
+	Value.SetValue(Stats.CulledInteriorPolygonCount);
 	CulledPolygonCount->SetText(CulledPolygonText + Value);
 
-	Value.SetValue(Stats.DrawedMapPolygonCount);
+	Value.SetValue(Stats.DrawedInteriorPolygonCount);
 	DrawedPolygonCount->SetText(DrawedPolygonText + Value);
 
 	ZEUIControl::Tick(ElapsedTime);
 }
 
-ZEUIPortalMapStatisticsControl::ZEUIPortalMapStatisticsControl()
+ZEUIInteriorStatisticsControl::ZEUIInteriorStatisticsControl()
 {
-	TotalPortalCount = new ZEUITextControl();
-	TotalPortalCount->SetWidth(250.0f);
-	TotalPortalCount->SetHeight(25.0f);
-	TotalPortalCount->SetPosition(ZEVector2(0.0f, 0.0f));
-	TotalPortalCount->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
-	TotalPortalCount->SetTextColor(ZEVector4::HomogenousUnitY);
-	AddChildControl(TotalPortalCount);
+	TotalRoomCount = new ZEUITextControl();
+	TotalRoomCount->SetWidth(250.0f);
+	TotalRoomCount->SetHeight(25.0f);
+	TotalRoomCount->SetPosition(ZEVector2(0.0f, 0.0f));
+	TotalRoomCount->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
+	TotalRoomCount->SetTextColor(ZEVector4::HomogenousUnitY);
+	AddChildControl(TotalRoomCount);
 
-	CulledPortalCount = new ZEUITextControl();
-	CulledPortalCount->SetWidth(250.0f);
-	CulledPortalCount->SetHeight(25.0f);
-	CulledPortalCount->SetPosition(ZEVector2(0.0f, 25.0f));
-	CulledPortalCount->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
-	CulledPortalCount->SetTextColor(ZEVector4::HomogenousUnitY);
-	AddChildControl(CulledPortalCount);
+	CulledRoomCount = new ZEUITextControl();
+	CulledRoomCount->SetWidth(250.0f);
+	CulledRoomCount->SetHeight(25.0f);
+	CulledRoomCount->SetPosition(ZEVector2(0.0f, 25.0f));
+	CulledRoomCount->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
+	CulledRoomCount->SetTextColor(ZEVector4::HomogenousUnitY);
+	AddChildControl(CulledRoomCount);
 
-	DrawedPortalCount = new ZEUITextControl();
-	DrawedPortalCount->SetWidth(250.0f);
-	DrawedPortalCount->SetHeight(25.0f);
-	DrawedPortalCount->SetPosition(ZEVector2(0.0f, 50.0f));
-	DrawedPortalCount->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
-	DrawedPortalCount->SetTextColor(ZEVector4::HomogenousUnitY);
-	AddChildControl(DrawedPortalCount);
+	DrawedRoomCount = new ZEUITextControl();
+	DrawedRoomCount->SetWidth(250.0f);
+	DrawedRoomCount->SetHeight(25.0f);
+	DrawedRoomCount->SetPosition(ZEVector2(0.0f, 50.0f));
+	DrawedRoomCount->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
+	DrawedRoomCount->SetTextColor(ZEVector4::HomogenousUnitY);
+	AddChildControl(DrawedRoomCount);
 
 	TotalPolygonCount = new ZEUITextControl();
 	TotalPolygonCount->SetWidth(250.0f);

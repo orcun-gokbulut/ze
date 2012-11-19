@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPortalMapResource.cpp
+ Zinek Engine - ZEInteriorResource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPortalMapResource.h"
+#include "ZEInteriorResource.h"
 
 #include "ZEError.h"
 #include "ZEFile/ZEFile.h"
@@ -87,7 +87,7 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 	return NewString;
 }
 
-const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(const ZEString& FileName)
+const ZETexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZEString& FileName)
 {
 	if (FileName == "")
 		return NULL;
@@ -106,7 +106,7 @@ const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(const ZEString
 	return NewTextureResource->GetTexture();
 }
 
-bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
+bool ZEInteriorResource::ReadInteriorFromFile(ZEFile* ResourceFile)
 { 
 	ZEMLSerialReader Reader(ResourceFile);
 
@@ -116,32 +116,32 @@ bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
 		return false;
 	}
 
-	if(Reader.GetItemName() != ZEString("ZEMap"))
+	if(Reader.GetItemName() != ZEString("ZEInterior"))
 	{
-		zeError("Resource file is not a map file, file name : %s", ResourceFile->GetPath());
+		zeError("Resource file is not an interior file, file name : %s", ResourceFile->GetPath());
 		return false;
 	}
 
-	ZEMLSerialPointer PortalsPointer, DoorsPointer, MaterialsPointer;
-	ZEVariant DoorCount, PortalCount, MaterialCount;
+	ZEMLSerialPointer RoomsPointer, DoorsPointer, MaterialsPointer;
+	ZEVariant DoorCount, RoomCount, MaterialCount;
 
-	ZEMLSerialListItem MapList[] = {
-		ZEML_LIST_NODE("Portals",				PortalsPointer,										true),
+	ZEMLSerialListItem InteriorList[] = {
+		ZEML_LIST_NODE("Rooms",					RoomsPointer,										true),
 		ZEML_LIST_NODE("Doors",					DoorsPointer,										true),
 		ZEML_LIST_NODE("Materials",				MaterialsPointer,									true),
 		ZEML_LIST_PROPERTY("DoorCount",			DoorCount,			ZE_VRT_UNSIGNED_INTEGER_32,		true),
-		ZEML_LIST_PROPERTY("PortalCount",		PortalCount,		ZE_VRT_UNSIGNED_INTEGER_32,		true),
+		ZEML_LIST_PROPERTY("RoomCount",			RoomCount,			ZE_VRT_UNSIGNED_INTEGER_32,		true),
 		ZEML_LIST_PROPERTY("MaterialCount",		MaterialCount,		ZE_VRT_UNSIGNED_INTEGER_32,		true)
 	};
 
-	if(!Reader.ReadPropertyList(MapList, 6))
+	if(!Reader.ReadPropertyList(InteriorList, 6))
 	{
 		zeError("Can not read map from file.");
 		return false;
 	}
 
 	Doors.SetCount(DoorCount.GetUInt32());
-	Portals.SetCount(PortalCount.GetUInt32());
+	Rooms.SetCount(RoomCount.GetUInt32());
 	Materials.SetCount(MaterialCount.GetUInt32());
 
 	Reader.SeekPointer(MaterialsPointer);
@@ -151,17 +151,17 @@ bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
 		return false;
 	}
 
-	Reader.SeekPointer(PortalsPointer);
-	if(!ReadPortals(&Reader))
+	Reader.SeekPointer(RoomsPointer);
+	if(!ReadRooms(&Reader))
 	{
-		zeError("Can not read portals from file.");
+		zeError("Can not read rooms from file.");
 		return false;
 	}
 
 	Reader.SeekPointer(DoorsPointer);
-	if(!ReadPortalDoors(&Reader))
+	if(!ReadDoors(&Reader))
 	{
-		zeError("Can not read portal doors from file.");
+		zeError("Can not read doors from file.");
 		return false;
 	}
 
@@ -170,7 +170,7 @@ bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
 	return true;
 }
 
-bool ZEPortalMapResource::ReadPortalDoors(ZEMLSerialReader* Reader)
+bool ZEInteriorResource::ReadDoors(ZEMLSerialReader* Reader)
 {
 	ZESize SubItemCount = Reader->GetSubItemCount();
 	for (ZESize I = 0; I < SubItemCount; I++)
@@ -184,7 +184,7 @@ bool ZEPortalMapResource::ReadPortalDoors(ZEMLSerialReader* Reader)
 		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Door")
 			continue;
 
-		ZEVariant DoorName, IsOpen, Width, Length, Position, Rotation, Scale, PortalAIndex, PortalBIndex;
+		ZEVariant DoorName, IsOpen, Width, Length, Position, Rotation, Scale, RoomAIndex, RoomBIndex;
 		ZEMLSerialPointer RectanglePointer;
 
 		ZEMLSerialListItem DoorPropertiesList[] = { 
@@ -195,13 +195,13 @@ bool ZEPortalMapResource::ReadPortalDoors(ZEMLSerialReader* Reader)
 			ZEML_LIST_PROPERTY("Position",			Position,			ZE_VRT_VECTOR3,					true),
 			ZEML_LIST_PROPERTY("Rotation",			Rotation,			ZE_VRT_QUATERNION,				true),
 			ZEML_LIST_PROPERTY("Scale",				Scale,				ZE_VRT_VECTOR3,					true),
-			ZEML_LIST_PROPERTY("PortalAIndex",		PortalAIndex,		ZE_VRT_UNSIGNED_INTEGER_32,		true),  
-			ZEML_LIST_PROPERTY("PortalBIndex",		PortalBIndex,		ZE_VRT_UNSIGNED_INTEGER_32,		true)
+			ZEML_LIST_PROPERTY("RoomAIndex",		RoomAIndex,			ZE_VRT_UNSIGNED_INTEGER_32,		true),  
+			ZEML_LIST_PROPERTY("RoomBIndex",		RoomBIndex,			ZE_VRT_UNSIGNED_INTEGER_32,		true)
 		};
 
 		Reader->ReadPropertyList(DoorPropertiesList, 9);
 
-		ZEPortalMapResourceDoor* Door = &Doors[I];
+		ZEInteriorDoorResource* Door = &Doors[I];
 
 		strncpy(Door->Name, DoorName.GetString().ToCString(), ZE_MAX_NAME_SIZE);
 		Door->IsOpen = IsOpen.GetBoolean();
@@ -212,15 +212,15 @@ bool ZEPortalMapResource::ReadPortalDoors(ZEMLSerialReader* Reader)
 		Door->Rotation = Rotation.GetQuaternion();
 		Door->Scale = Scale.GetVector3();
 
-		Door->PortalIds[0] = PortalAIndex.GetUInt32();
-		Door->Portals[0] = &Portals[(ZESize)Door->PortalIds[0]];
-		Door->Portals[0]->DoorIds.Add(I);
-		Door->Portals[0]->Doors.Add(Door);
+		Door->RoomIds[0] = RoomAIndex.GetUInt32();
+		Door->Rooms[0] = &Rooms[(ZESize)Door->RoomIds[0]];
+		Door->Rooms[0]->DoorIds.Add(I);
+		Door->Rooms[0]->Doors.Add(Door);
 
-		Door->PortalIds[1] = PortalBIndex.GetUInt32();
-		Door->Portals[1] = &Portals[(ZESize)Door->PortalIds[1]];
-		Door->Portals[1]->DoorIds.Add(I);
-		Door->Portals[1]->Doors.Add(Door);
+		Door->RoomIds[1] = RoomBIndex.GetUInt32();
+		Door->Rooms[1] = &Rooms[(ZESize)Door->RoomIds[1]];
+		Door->Rooms[1]->DoorIds.Add(I);
+		Door->Rooms[1]->Doors.Add(Door);
 
 	}
 
@@ -229,7 +229,7 @@ bool ZEPortalMapResource::ReadPortalDoors(ZEMLSerialReader* Reader)
 	return true;
 }
 
-bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
+bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 {
 	ZEPackStruct(
 	struct ZEMapFileVertexChunk
@@ -257,14 +257,14 @@ bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
 			return false;
 		}
 
-		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Portal")
+		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Room")
 			continue;
 
-		ZEVariant PortalName, Position, Rotation, Scale, PhysicalMeshEnabled;
+		ZEVariant RoomName, Position, Rotation, Scale, PhysicalMeshEnabled;
 		ZEMLSerialPointer PolygonsPointer, PhysicalMeshPointer;
 
-		ZEMLSerialListItem PortalPropertiesList[] = {
-			ZEML_LIST_PROPERTY("Name",			PortalName,		ZE_VRT_STRING,		true),
+		ZEMLSerialListItem RoomPropertiesList[] = {
+			ZEML_LIST_PROPERTY("Name",			RoomName,		ZE_VRT_STRING,		true),
 			ZEML_LIST_PROPERTY("Position",		Position,		ZE_VRT_VECTOR3,		true),
 			ZEML_LIST_PROPERTY("Rotation",		Rotation,		ZE_VRT_QUATERNION,	true),
 			ZEML_LIST_PROPERTY("Scale",			Scale,			ZE_VRT_VECTOR3,		true),
@@ -272,55 +272,55 @@ bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
 			ZEML_LIST_NODE("PhysicalMesh",		PhysicalMeshPointer,				false)
 		};
 
-		Reader->ReadPropertyList(PortalPropertiesList, 6);
+		Reader->ReadPropertyList(RoomPropertiesList, 6);
 		Reader->SeekPointer(PolygonsPointer);
 
-		ZEPortalMapResourcePortal* Portal = &Portals[I];
-		strncpy(Portal->Name, PortalName.GetString().ToCString(), ZE_MAX_NAME_SIZE);
+		ZEInteriorRoomResource* Room = &Rooms[I];
+		strncpy(Room->Name, RoomName.GetString().ToCString(), ZE_MAX_NAME_SIZE);
 
-		Portal->Position = Position.GetVector3();
-		Portal->Rotation = Rotation.GetQuaternion();
-		Portal->Scale = Scale.GetVector3();
+		Room->Position = Position.GetVector3();
+		Room->Rotation = Rotation.GetQuaternion();
+		Room->Scale = Scale.GetVector3();
 
 		ZEArray<ZEMapFilePolygonChunk> MapPolygons;
 		MapPolygons.SetCount(Reader->GetDataSize() / sizeof(ZEMapFilePolygonChunk));
 		Reader->GetData(MapPolygons.GetCArray(), Reader->GetDataSize());
 
 		if(MapPolygons.GetCount() == 0)
-			zeError("Polygon count is : 0. Portal name : %s", Portal->Name);
+			zeError("Polygon count is : 0. Room name : %s", Room->Name);
 
-		Portal->Polygons.SetCount(MapPolygons.GetCount());
+		Room->Polygons.SetCount(MapPolygons.GetCount());
 
-		for (ZESize I = 0; I < Portal->Polygons.GetCount(); I++)
+		for (ZESize I = 0; I < Room->Polygons.GetCount(); I++)
 		{
-			Portal->Polygons[I].LastIteration			= 0;
-			Portal->Polygons[I].Material				= Materials[(ZESize)MapPolygons[I].Material];
-			Portal->Polygons[I].Vertices[0].Position	= MapPolygons[I].Vertices[0].Position;
-			Portal->Polygons[I].Vertices[0].Normal		= MapPolygons[I].Vertices[0].Normal;
-			Portal->Polygons[I].Vertices[0].Tangent		= MapPolygons[I].Vertices[0].Tangent;
-			Portal->Polygons[I].Vertices[0].Binormal	= MapPolygons[I].Vertices[0].Binormal;
-			Portal->Polygons[I].Vertices[0].Texcoord	= MapPolygons[I].Vertices[0].Texcoord;
+			Room->Polygons[I].LastIteration			= 0;
+			Room->Polygons[I].Material				= Materials[(ZESize)MapPolygons[I].Material];
+			Room->Polygons[I].Vertices[0].Position	= MapPolygons[I].Vertices[0].Position;
+			Room->Polygons[I].Vertices[0].Normal		= MapPolygons[I].Vertices[0].Normal;
+			Room->Polygons[I].Vertices[0].Tangent		= MapPolygons[I].Vertices[0].Tangent;
+			Room->Polygons[I].Vertices[0].Binormal	= MapPolygons[I].Vertices[0].Binormal;
+			Room->Polygons[I].Vertices[0].Texcoord	= MapPolygons[I].Vertices[0].Texcoord;
 
-			Portal->Polygons[I].Vertices[1].Position	= MapPolygons[I].Vertices[1].Position;
-			Portal->Polygons[I].Vertices[1].Normal		= MapPolygons[I].Vertices[1].Normal;
-			Portal->Polygons[I].Vertices[1].Tangent		= MapPolygons[I].Vertices[1].Tangent;
-			Portal->Polygons[I].Vertices[1].Binormal	= MapPolygons[I].Vertices[1].Binormal;
-			Portal->Polygons[I].Vertices[1].Texcoord	= MapPolygons[I].Vertices[1].Texcoord;
+			Room->Polygons[I].Vertices[1].Position	= MapPolygons[I].Vertices[1].Position;
+			Room->Polygons[I].Vertices[1].Normal		= MapPolygons[I].Vertices[1].Normal;
+			Room->Polygons[I].Vertices[1].Tangent		= MapPolygons[I].Vertices[1].Tangent;
+			Room->Polygons[I].Vertices[1].Binormal	= MapPolygons[I].Vertices[1].Binormal;
+			Room->Polygons[I].Vertices[1].Texcoord	= MapPolygons[I].Vertices[1].Texcoord;
 
-			Portal->Polygons[I].Vertices[2].Position	= MapPolygons[I].Vertices[2].Position;
-			Portal->Polygons[I].Vertices[2].Normal		= MapPolygons[I].Vertices[2].Normal;
-			Portal->Polygons[I].Vertices[2].Tangent		= MapPolygons[I].Vertices[2].Tangent;
-			Portal->Polygons[I].Vertices[2].Binormal	= MapPolygons[I].Vertices[2].Binormal;
-			Portal->Polygons[I].Vertices[2].Texcoord	= MapPolygons[I].Vertices[2].Texcoord;
+			Room->Polygons[I].Vertices[2].Position	= MapPolygons[I].Vertices[2].Position;
+			Room->Polygons[I].Vertices[2].Normal		= MapPolygons[I].Vertices[2].Normal;
+			Room->Polygons[I].Vertices[2].Tangent		= MapPolygons[I].Vertices[2].Tangent;
+			Room->Polygons[I].Vertices[2].Binormal	= MapPolygons[I].Vertices[2].Binormal;
+			Room->Polygons[I].Vertices[2].Texcoord	= MapPolygons[I].Vertices[2].Texcoord;
 		}
 
 		ZEAABBox BoundingBox(ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX), ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
 
-		for (ZESize I = 0; I < Portal->Polygons.GetCount(); I++)
+		for (ZESize I = 0; I < Room->Polygons.GetCount(); I++)
 		{
 			for (ZESize J = 0; J < 3; J++)
 			{
-				ZEVector3 Vertex = Portal->Polygons[I].Vertices[J].Position;
+				ZEVector3 Vertex = Room->Polygons[I].Vertices[J].Position;
 
 				if (Vertex.x < BoundingBox.Min.x) BoundingBox.Min.x = Vertex.x;
 				if (Vertex.y < BoundingBox.Min.y) BoundingBox.Min.y = Vertex.y;
@@ -332,35 +332,38 @@ bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
 			}
 		}
 
-		Portal->BoundingBox = BoundingBox;
+		Room->BoundingBox = BoundingBox;
 
 		if(PhysicalMeshPointer != -1)
 		{
+			ZEVariant PhysicalMeshEnabledValue;
 			ZEMLSerialPointer PhysicalVerticesPointer, PhysicalPolygonsPointer;
 
 			Reader->SeekPointer(PhysicalMeshPointer);
 
 			ZEMLSerialListItem PhysicalMeshList[] = {
-				ZEML_LIST_DATA("Polygons",		PhysicalPolygonsPointer,	true),
-				ZEML_LIST_DATA("Vertices",		PhysicalVerticesPointer,	true)
+				ZEML_LIST_PROPERTY("PhysicalMeshEnabled",	PhysicalMeshEnabledValue,	ZE_VRT_BOOLEAN,	true),
+				ZEML_LIST_DATA("Polygons",					PhysicalPolygonsPointer,					true),
+				ZEML_LIST_DATA("Vertices",					PhysicalVerticesPointer,					true)
 			};
 
-			Reader->ReadPropertyList(PhysicalMeshList, 2);
+			Reader->ReadPropertyList(PhysicalMeshList, 3);
 
+			Room->PhysicalMesh.PhysicalMeshEnabled = PhysicalMeshEnabledValue;
 			Reader->SeekPointer(PhysicalPolygonsPointer);
-			Portal->PhysicalMesh.Polygons.SetCount(Reader->GetDataSize() / sizeof(ZEPortalMapPhysicalMeshPolygon));
-			Reader->GetData(Portal->PhysicalMesh.Polygons.GetCArray(), Reader->GetDataSize());
+			Room->PhysicalMesh.Polygons.SetCount(Reader->GetDataSize() / sizeof(ZEInteriorPhysicalMeshPolygon));
+			Reader->GetData(Room->PhysicalMesh.Polygons.GetCArray(), Reader->GetDataSize());
 
 			Reader->SeekPointer(PhysicalVerticesPointer);
-			Portal->PhysicalMesh.Vertices.SetCount(Reader->GetDataSize() / sizeof(ZEVector3));
-			Reader->GetData(Portal->PhysicalMesh.Vertices.GetCArray(), Reader->GetDataSize());
+			Room->PhysicalMesh.Vertices.SetCount(Reader->GetDataSize() / sizeof(ZEVector3));
+			Reader->GetData(Room->PhysicalMesh.Vertices.GetCArray(), Reader->GetDataSize());
 
-			Portal->HasPhysicalMesh = true;
+			Room->HasPhysicalMesh = true;
 		}
 		else
 		{
-			Portal->HasPhysicalMesh = false;
-			zeWarning("Portal %s does not have physical mesh.", PortalName.GetString().ToCString());
+			Room->HasPhysicalMesh = false;
+			zeWarning("Room %s does not have physical mesh.", RoomName.GetString().ToCString());
 		}
 
 	}
@@ -370,7 +373,7 @@ bool ZEPortalMapResource::ReadPortals(ZEMLSerialReader* Reader)
 	return true;
 }
 
-bool ZEPortalMapResource::ReadMaterials(ZEMLSerialReader* Reader)
+bool ZEInteriorResource::ReadMaterials(ZEMLSerialReader* Reader)
 {
 	for(ZESize I = 0; I < Materials.GetCount(); I++)
 		Materials[I] = ZEFixedMaterial::CreateInstance();
@@ -408,37 +411,37 @@ bool ZEPortalMapResource::ReadMaterials(ZEMLSerialReader* Reader)
 	return true;
 }
 
-const char* ZEPortalMapResource::GetResourceType() const
+const char* ZEInteriorResource::GetResourceType() const
 {
-	return "Portal Map Resource";
+	return "Interior Resource";
 }
 
-const ZEArray<ZETexture2DResource*>& ZEPortalMapResource::GetTextures()
+const ZEArray<ZETexture2DResource*>& ZEInteriorResource::GetTextures()
 {
 	return TextureResources;
 }
 
-const ZEArray<ZEMaterial*>& ZEPortalMapResource::GetMaterials()
+const ZEArray<ZEMaterial*>& ZEInteriorResource::GetMaterials()
 {
 	return Materials;
 }
 
-const ZEArray<ZEPortalMapResourcePortal>& ZEPortalMapResource::GetPortals()
+const ZEArray<ZEInteriorRoomResource>& ZEInteriorResource::GetRooms()
 {
-	return Portals;
+	return Rooms;
 }
 
-const ZEArray<ZEPortalMapResourceDoor>& ZEPortalMapResource::GetDoors()
+const ZEArray<ZEInteriorDoorResource>& ZEInteriorResource::GetDoors()
 {
 	return Doors;
 }
 
-ZEPortalMapResource* ZEPortalMapResource::LoadSharedResource(const ZEString& FileName)
+ZEInteriorResource* ZEInteriorResource::LoadSharedResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
 	// Try to get instance of shared ZEMap file from resource manager
-	ZEPortalMapResource* Resource = (ZEPortalMapResource*)zeResources->GetResource(NewPath);
+	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(NewPath);
 	
 	if (Resource != NULL)
 		return Resource;
@@ -459,12 +462,12 @@ ZEPortalMapResource* ZEPortalMapResource::LoadSharedResource(const ZEString& Fil
 	}
 }
 
-void ZEPortalMapResource::CacheResource(const ZEString& FileName)
+void ZEInteriorResource::CacheResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
 	// Try to get instance of shared ZEMap file from resource manager
-	ZEPortalMapResource* Resource = (ZEPortalMapResource*)zeResources->GetResource(NewPath);
+	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(NewPath);
 	if (Resource != NULL)
 		Resource->Cached = true;
 	else
@@ -483,7 +486,7 @@ void ZEPortalMapResource::CacheResource(const ZEString& FileName)
 	Resource->SetFileName(FileName);
 }
 
-ZEPortalMapResource* ZEPortalMapResource::LoadResource(const ZEString& FileName)
+ZEInteriorResource* ZEInteriorResource::LoadResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
@@ -496,14 +499,14 @@ ZEPortalMapResource* ZEPortalMapResource::LoadResource(const ZEString& FileName)
 	if (Result)
 	{
 		// Create ZEMapResource
-		ZEPortalMapResource* MapResource = new ZEPortalMapResource();
+		ZEInteriorResource* MapResource = new ZEInteriorResource();
 		MapResource->SetFileName(NewPath);
 		MapResource->Cached = false;
 		MapResource->ReferenceCount = 0;
 
-		if (!MapResource->ReadMapFromFile(&ResourceFile))
+		if (!MapResource->ReadInteriorFromFile(&ResourceFile))
 		{
-			zeError("Can not load map resource. (FileName : \"%s\")", NewPath.GetValue());
+			zeError("Can not load interior resource. (FileName : \"%s\")", NewPath.GetValue());
 			ResourceFile.Close();
 			delete MapResource;
 			return NULL;
@@ -515,12 +518,12 @@ ZEPortalMapResource* ZEPortalMapResource::LoadResource(const ZEString& FileName)
 	}
 	else
 	{
-		zeError("Map file does not exists. FileName : \"%s\"", NewPath.GetValue());
+		zeError("Interior file does not exists. FileName : \"%s\"", NewPath.GetValue());
 		return NULL;
 	}
 }
 
-ZEPortalMapResource::~ZEPortalMapResource()
+ZEInteriorResource::~ZEInteriorResource()
 {
 	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
 		TextureResources[I]->Release();

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMaxMapExporterDescription.h
+ Zinek Engine - ZE3dsMaxInteriorExporterDescription.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE3DS_MAP_EXPORTER_DESCRIPTION_H__
-#define __ZE3DS_MAP_EXPORTER_DESCRIPTION_H__
+#ifndef __ZE3DS_INTERIOR_EXPORTER_DESCRIPTION_H__
+#define __ZE3DS_INTERIOR_EXPORTER_DESCRIPTION_H__
 
 #include "ZETypes.h"
 
@@ -44,7 +44,7 @@
 #include <iparamb2.h>
 
 
-class ZE3dsMaxMapExporterDescription : public ClassDesc2 
+class ZE3dsMaxInteriorExporterDescription : public ClassDesc2 
 {
 	public:
 		virtual ZEInt				IsPublic();

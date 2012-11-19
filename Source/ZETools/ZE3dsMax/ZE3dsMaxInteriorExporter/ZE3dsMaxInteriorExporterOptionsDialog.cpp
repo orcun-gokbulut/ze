@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMaxMapExporterOptionsDialog.cpp
+ Zinek Engine - ZE3dsMaxInteriorExporterOptionsDialog.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,14 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZE3dsMaxMapExporterOptionsDialog.h"
+#include "ZE3dsMaxInteriorExporterOptionsDialog.h"
 #include "QtGui\QFileDialog"
 #include "ZEML\ZEMLProperty.h"
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 
-ZE3dsMaxMapExporterOptionsDialog::ZE3dsMaxMapExporterOptionsDialog(QWidget* Parent) : QDialog(Parent)
+ZE3dsMaxInteriorExporterOptionsDialog::ZE3dsMaxInteriorExporterOptionsDialog(QWidget* Parent) : QDialog(Parent)
 {
-	Form = new Ui::ZE3dsMaxMapExporterOptionsDialogUI();
+	Form = new Ui::ZE3dsMaxInteriorExporterOptionsDialogUI();
 	Form->setupUi(this);
 
 	Options = NULL;
@@ -50,13 +50,13 @@ ZE3dsMaxMapExporterOptionsDialog::ZE3dsMaxMapExporterOptionsDialog(QWidget* Pare
 	connect(Form->ckbFileLoggingEnabled, SIGNAL(stateChanged(int)), this, SLOT(SetFileLoggingEnabled(int)));
 }
 
-ZE3dsMaxMapExporterOptionsDialog::~ZE3dsMaxMapExporterOptionsDialog()
+ZE3dsMaxInteriorExporterOptionsDialog::~ZE3dsMaxInteriorExporterOptionsDialog()
 {
 	delete Form;
 	Form = NULL;
 }
 
-void ZE3dsMaxMapExporterOptionsDialog::SetOptions(ZEMLNode* Options)
+void ZE3dsMaxInteriorExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 {
 	if(Options == NULL)
 		return;
@@ -77,20 +77,20 @@ void ZE3dsMaxMapExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 		ToggleFileLogging(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
 }
 
-ZEMLNode*	ZE3dsMaxMapExporterOptionsDialog::GetOptions()
+ZEMLNode*	ZE3dsMaxInteriorExporterOptionsDialog::GetOptions()
 {
 	CollectOptionsFromForm();
 	return Options;
 }
 
-void ZE3dsMaxMapExporterOptionsDialog::ToggleFileLogging(bool IsEnabled)
+void ZE3dsMaxInteriorExporterOptionsDialog::ToggleFileLogging(bool IsEnabled)
 {
 	Form->btnBrowseLogPath->setEnabled(IsEnabled);
 	Form->txtLogFilePath->setEnabled(IsEnabled);
 	Form->ckbFileLoggingEnabled->setChecked(IsEnabled);
 }
 
-void ZE3dsMaxMapExporterOptionsDialog::ShowEngineDirectoryDialog()
+void ZE3dsMaxInteriorExporterOptionsDialog::ShowEngineDirectoryDialog()
 {
 	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text());
 
@@ -100,7 +100,7 @@ void ZE3dsMaxMapExporterOptionsDialog::ShowEngineDirectoryDialog()
 	Form->txtEngineWorkingDirectory->setText(SelectedDirectory);
 }
 
-void ZE3dsMaxMapExporterOptionsDialog::ShowLoggingFilePathDialog()
+void ZE3dsMaxInteriorExporterOptionsDialog::ShowLoggingFilePathDialog()
 {
 	QString SaveFilePath = QFileDialog::getSaveFileName(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text(), QString("*.txt"));
 
@@ -110,7 +110,7 @@ void ZE3dsMaxMapExporterOptionsDialog::ShowLoggingFilePathDialog()
 	Form->txtLogFilePath->setText(SaveFilePath);
 }
 
-void ZE3dsMaxMapExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
+void ZE3dsMaxInteriorExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
 {
 	if(CheckBoxState == Qt::Checked)
 		ToggleFileLogging(true);
@@ -118,7 +118,7 @@ void ZE3dsMaxMapExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
 		ToggleFileLogging(false);
 }
 
-void ZE3dsMaxMapExporterOptionsDialog::CollectOptionsFromForm()
+void ZE3dsMaxInteriorExporterOptionsDialog::CollectOptionsFromForm()
 {
 	if(Options == NULL)
 	{
@@ -146,12 +146,12 @@ void ZE3dsMaxMapExporterOptionsDialog::CollectOptionsFromForm()
 	}
 }
 
-bool ZE3dsMaxMapExporterOptionsDialog::GetFileLoggingEnabled()
+bool ZE3dsMaxInteriorExporterOptionsDialog::GetFileLoggingEnabled()
 {
 	return ((ZEMLProperty*)Options->GetProperty("IsFileLoggingEnabled"))->GetValue().GetBoolean();
 }
 
-ZEString ZE3dsMaxMapExporterOptionsDialog::GetLogFilePath()
+ZEString ZE3dsMaxInteriorExporterOptionsDialog::GetLogFilePath()
 {
 	return ((ZEMLProperty*)Options->GetProperty("LogFilePath"))->GetValue().GetString();
 }

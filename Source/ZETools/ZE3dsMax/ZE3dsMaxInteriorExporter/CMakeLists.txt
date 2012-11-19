@@ -35,19 +35,21 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEPortalMap.cpp				Sources)
-ze_add_source(ZEPortalMap.h					Sources Headers ZEPP)
-ze_add_source(ZEPortalMapDoor.cpp			Sources)
-ze_add_source(ZEPortalMapDoor.h				Sources Headers)
-ze_add_source(ZEPortalMapPortal.cpp			Sources)
-ze_add_source(ZEPortalMapPortal.h			Sources Headers)
-ze_add_source(ZEPortalMapResource.cpp		Sources)
-ze_add_source(ZEPortalMapResource.h			Sources Headers)
+ze_add_source(ZE3dsMaxInteriorExporter.h					Sources)
+ze_add_source(ZE3dsMaxInteriorExporter.cpp					Sources)
+ze_add_source(ZE3dsMaxInteriorExporterDescription.h			Sources)
+ze_add_source(ZE3dsMaxInteriorExporterDescription.cpp		Sources)
+ze_add_source(ZE3dsMaxInteriorExporterProcess.cpp			Sources)
+ze_add_source(ZE3dsMaxInteriorExporterOptionsDialog.h		Sources QtMocs)
+ze_add_source(ZE3dsMaxInteriorExporterOptionsDialog.cpp		Sources)
+ze_add_source(ZE3dsMaxInteriorExporterOptionsWidget.ui		Sources QtUI)
 
-ze_add_library(ZEPortalMap 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZEPortalMap"
-	INSTALL_COMPONENT ZESDK)
+qt4_add_resources (QtResourceFiles ${QtResources})
+qt4_wrap_ui (QtUIFiles ${QtUI})
+qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+
+ze_add_library(ZE3dsMaxInteriorExporter 
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
+	LIBS ZEFoundation ZE3dsMaxUtils QtCore4 QtGui4 QWinWidget ZEProgressDialog ZEResourceConfigurationWidget)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR})

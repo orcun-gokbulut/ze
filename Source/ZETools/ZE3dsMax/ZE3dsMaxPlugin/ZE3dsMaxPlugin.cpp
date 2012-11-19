@@ -35,7 +35,7 @@
 
 #include "ZE3dsMaxPlugin.h"
 #include "ZE3dsMaxModelExporter/ZE3dsMaxModelExporterDescription.h"
-#include "ZE3dsMaxMapExporter/ZE3dsMaxMapExporterDescription.h"
+#include "ZE3dsMaxInteriorExporter/ZE3dsMaxInteriorExporterDescription.h"
 #include "ZE3dsMaxUI/ZE3dsMaxUIDescription.h"
 #include "ZETypes.h"
 
@@ -73,7 +73,7 @@ __declspec( dllexport ) ClassDesc* LibClassDesc(ZEInt i)
 		case 0: 
 			return ZE3dsMaxModelExporterDescription::GetInstance();
 		case 1:
-			return ZE3dsMaxMapExporterDescription::GetInstance();
+			return ZE3dsMaxInteriorExporterDescription::GetInstance();
 		case 2:
 			return ZE3dsMaxUIDescription::GetInstance();
 		default: 

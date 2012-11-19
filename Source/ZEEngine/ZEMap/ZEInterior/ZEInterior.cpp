@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPortalMap.cpp
+ Zinek Engine - ZEInterior.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPortalMap.h"
-#include "ZEPortalMapResource.h"
-#include "ZEPortalMapPortal.h"
-#include "ZEPortalMapDoor.h"
+#include "ZEInterior.h"
+#include "ZEInteriorResource.h"
+#include "ZEInteriorRoom.h"
+#include "ZEInteriorDoor.h"
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEGame/ZEDrawParameters.h"
@@ -46,12 +46,12 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
 
-ZEDrawFlags ZEPortalMap::GetDrawFlags() const
+ZEDrawFlags ZEInterior::GetDrawFlags() const
 {
 	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
-void ZEPortalMap::LoadPortalResource(ZEPortalMapResource* NewResource)
+void ZEInterior::LoadInteriorResource(ZEInteriorResource* NewResource)
 {
 	if (Resource != NULL)
 	{
@@ -61,10 +61,10 @@ void ZEPortalMap::LoadPortalResource(ZEPortalMapResource* NewResource)
 
 	if (NewResource == NULL)
 	{
-		for (ZESize I = 0; I < Portals.GetCount(); I++)
-			Portals[I]->Deinitialize();
+		for (ZESize I = 0; I < Rooms.GetCount(); I++)
+			Rooms[I]->Deinitialize();
 
-		Portals.SetCount(0);
+		Rooms.SetCount(0);
 
 		for (ZESize I = 0; I < Doors.GetCount(); I++)
 			Doors[I]->Deinitialize();
@@ -74,60 +74,60 @@ void ZEPortalMap::LoadPortalResource(ZEPortalMapResource* NewResource)
 
 	this->Resource = NewResource;
 
-	Portals.SetCount(Resource->GetPortals().GetCount());
-	for (ZESize I = 0; I < Portals.GetCount(); I++)
+	Rooms.SetCount(Resource->GetRooms().GetCount());
+	for (ZESize I = 0; I < Rooms.GetCount(); I++)
 	{
-		Portals[I] = ZEPortalMapPortal::CreateInstance();
-		Portals[I]->Initialize(this, (ZEPortalMapResourcePortal*)&Resource->GetPortals()[I]);
+		Rooms[I] = ZEInteriorRoom::CreateInstance();
+		Rooms[I]->Initialize(this, (ZEInteriorRoomResource*)&Resource->GetRooms()[I]);
 	}
 
 	Doors.SetCount(Resource->GetDoors().GetCount());
 	for (ZESize I = 0; I < Doors.GetCount(); I++)
 	{
-		Doors[I] = ZEPortalMapDoor::CreateInstance();
+		Doors[I] = ZEInteriorDoor::CreateInstance();
 		Doors[I]->Initialize(this, &Resource->GetDoors()[I]);
 	}
 }
 
-ZEPortalMap::ZEPortalMap()
+ZEInterior::ZEInterior()
 {
 	Resource = NULL;
-	CullMode = ZE_MCM_FULL;
+	CullMode = ZE_ICM_FULL;
 }
 
-ZEPortalMap::~ZEPortalMap()
+ZEInterior::~ZEInterior()
 {
 	Deinitialize();
 }
 
-const ZEArray<ZEPortalMapPortal*>& ZEPortalMap::GetPortals()
+const ZEArray<ZEInteriorRoom*>& ZEInterior::GetRooms()
 {
-	return Portals;
+	return Rooms;
 }
 
-const ZEArray<ZEPortalMapDoor*>& ZEPortalMap::GetDoors()
+const ZEArray<ZEInteriorDoor*>& ZEInterior::GetDoors()
 {
 	return Doors;
 }
 
-const ZEPortalMapCullStatistics& ZEPortalMap::GetCullStatistics()
+const ZEInteriorCullStatistics& ZEInterior::GetCullStatistics()
 {
 	return Statistics;
 }
 
-bool ZEPortalMap::Initialize()
+bool ZEInterior::Initialize()
 {
 	if (GetInitialized())
 		return false;
 
-	if (PortalMapFile != "")
+	if (InteriorFile != "")
 	{
-		ZEPortalMapResource* NewResource = ZEPortalMapResource::LoadSharedResource(ZEString("Resources\\") + PortalMapFile);
+		ZEInteriorResource* NewResource = ZEInteriorResource::LoadSharedResource(ZEString("Resources\\") + InteriorFile);
 		if (NewResource != NULL)
-			LoadPortalResource(NewResource);
+			LoadInteriorResource(NewResource);
 		else
 		{
-			zeError("Can not load ZEPortalMap file.");
+			zeError("Can not load ZEInterior file.");
 			return false;
 		}
 	}
@@ -135,7 +135,7 @@ bool ZEPortalMap::Initialize()
 	return ZEEntity::Initialize();
 }
 
-void ZEPortalMap::Deinitialize()
+void ZEInterior::Deinitialize()
 {
 	if (Resource != NULL)
 	{
@@ -146,66 +146,66 @@ void ZEPortalMap::Deinitialize()
 	ZEEntity::Deinitialize();
 }
 
-bool ZEPortalMap::SetMapFile(const ZEString& FileName)
+bool ZEInterior::SetInteriorFile(const ZEString& FileName)
 {
-	PortalMapFile = FileName;
+	InteriorFile = FileName;
 
 	if (!GetInitialized())
 	{
-		PortalMapFile = FileName;
+		InteriorFile = FileName;
 		return true;
 	}
 
-	const ZEPortalMapResource* NewResource = ZEPortalMapResource::LoadSharedResource(PortalMapFile);
+	const ZEInteriorResource* NewResource = ZEInteriorResource::LoadSharedResource(InteriorFile);
 	if (NewResource != NULL)
 	{
-		PortalMapFile = FileName;
-		LoadPortalResource(Resource);
+		InteriorFile = FileName;
+		LoadInteriorResource(Resource);
 	}
 	else
 	{
-		zeError("Can not load ZEPortalMap file.");
+		zeError("Can not load ZEInterior file.");
 		return false;
 	}
 
 	return false;
 }
 
-const ZEString& ZEPortalMap::GetMapFile() const
+const ZEString& ZEInterior::GetInteriorFile() const
 {
-	return PortalMapFile;
+	return InteriorFile;
 }
 
-void ZEPortalMap::Draw(ZEDrawParameters* DrawParameters)
+void ZEInterior::Draw(ZEDrawParameters* DrawParameters)
 {
 	if (!GetVisible())
 		return;
 
-	memset(&Statistics, 0, sizeof(ZEPortalMapCullStatistics));
+	memset(&Statistics, 0, sizeof(ZEInteriorCullStatistics));
 
-	for (size_t I = 0; I < Portals.GetCount(); I++)
+	for (size_t I = 0; I < Rooms.GetCount(); I++)
 	{
-		Portals[I]->CullPass = false;
-		Portals[I]->IsDrawn = false;
+		Rooms[I]->CullPass = false;
+		Rooms[I]->IsDrawn = false;
 	}
 
-	CullPortals(DrawParameters);
+	CullRooms(DrawParameters);
 }
 
-bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT)
+bool ZEInterior::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT)
 {
 	if (Resource == NULL)
 		return false;
 
 	float T;
 	bool Found = false;
-	for (ZESize I = 0; I < Resource->GetPortals().GetCount(); I++)
+	for (ZESize I = 0; I < Resource->GetRooms().GetCount(); I++)
 	{
-		const ZEPortalMapResourcePortal* CurrentPortal = &Resource->GetPortals()[I];
+		const ZEInteriorRoomResource* CurrentRoom = &Resource->GetRooms()[I];
 		//if (ZEAABBox::IntersectionTest(CurrentPortal->BoundingBox,Ray))
-		for (ZESize N = 0; N < CurrentPortal->Polygons.GetCount(); N++)
+		for (ZESize N = 0; N < CurrentRoom->Polygons.GetCount(); N++)
 		{
-			const ZEPortalMapPolygon& MapPolygon = CurrentPortal->Polygons[N];
+			const ZEInteriorPolygon& MapPolygon = CurrentRoom->Polygons[N];
 			ZETriangle Triangle(MapPolygon.Vertices[0].Position, MapPolygon.Vertices[1].Position, MapPolygon.Vertices[2].Position);
 			if (ZETriangle::IntersectionTest(Triangle, Ray, T) && (!Found || MinT > T))
 			{
@@ -220,14 +220,14 @@ bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Norm
 	return Found;
 }
 
-ZEPortalMapResource* ZEPortalMap::GetResource() const
+ZEInteriorResource* ZEInterior::GetResource() const
 {
 	return Resource;
 }
 
-ZEPortalMap* ZEPortalMap::CreateInstance()
+ZEInterior* ZEInterior::CreateInstance()
 {
-	return new ZEPortalMap();
+	return new ZEInterior();
 }
 
 static inline ZESize Circular(ZESSize Index, ZESize Count) 
@@ -275,7 +275,7 @@ static void IntersectionTest(ZEVector3* IntersectedPoints, ZESize& IntersectedPo
 		CurrentResult = NextResult;
 	}
 }
-bool ZEPortalMap::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEPortalMapDoor* Door, const ZEViewVolume* OldViewVolume)
+bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor* Door, const ZEViewVolume* OldViewVolume)
 {
 	ZERectangle3D DoorRectangle = Door->GetRectangle();
 
@@ -365,7 +365,7 @@ bool ZEPortalMap::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEPortalMapDo
 	return false;
 }
 
-void ZEPortalMap::CullPortal(ZEPortalMapDoor* Door, ZEDrawParameters* DrawParameters, ZEViewVolume* ViewVolume)
+void ZEInterior::CullRoom(ZEInteriorDoor* Door, ZEDrawParameters* DrawParameters, ZEViewVolume* ViewVolume)
 {
 	if(!Door->GetOpen())
 		return;
@@ -373,45 +373,45 @@ void ZEPortalMap::CullPortal(ZEPortalMapDoor* Door, ZEDrawParameters* DrawParame
 	if (ViewVolume->CullTest(Door->GetRectangle()))
 		return;
 
-	ZEPortalMapPortal** DoorPortals = Door->GetPortals();
+	ZEInteriorRoom** DoorRooms = Door->GetRooms();
 	for (ZEInt I = 0; I < 2; I++)
 	{
-		if(DoorPortals[I]->CullPass == true)
+		if(DoorRooms[I]->CullPass == true)
 			continue;
 
 		ZEViewFrustum NewViewVolume;
 		GenerateViewVolume(NewViewVolume, Door, ViewVolume);
 
-		DoorPortals[I]->CullPass = true;
-		DoorPortals[I]->Draw(DrawParameters);
+		DoorRooms[I]->CullPass = true;
+		DoorRooms[I]->Draw(DrawParameters);
 
-		Statistics.DrawedPortalCount++;
-		Statistics.DrawedMapPolygonCount += DoorPortals[I]->GetPolygonCount();
+		Statistics.DrawedRoomCount++;
+		Statistics.DrawedInteriorPolygonCount += DoorRooms[I]->GetPolygonCount();
 
-		const ZEArray<ZEPortalMapDoor*>& NextDoors = DoorPortals[I]->GetDoors();
+		const ZEArray<ZEInteriorDoor*>& NextDoors = DoorRooms[I]->GetDoors();
 
 		for (size_t J = 0; J < NextDoors.GetCount(); J++)
 		{
 			if(NextDoors[J] == Door)
 				continue;
 
-			CullPortal(NextDoors[J], DrawParameters, (ZEViewVolume*)&NewViewVolume);
+			CullRoom(NextDoors[J], DrawParameters, (ZEViewVolume*)&NewViewVolume);
 		}
 	}
 }
 
-void ZEPortalMap::CullPortals(ZEDrawParameters* DrawParameters)
+void ZEInterior::CullRooms(ZEDrawParameters* DrawParameters)
 {
-	if (CullMode == ZE_MCM_NONE)
+	if (CullMode == ZE_ICM_NONE)
 	{
-		for (ZESize I = 0; I < Portals.GetCount(); I++)
+		for (ZESize I = 0; I < Rooms.GetCount(); I++)
 		{
-			Portals[I]->Draw(DrawParameters);
+			Rooms[I]->Draw(DrawParameters);
 
-			Statistics.TotalPortalCount++;
-			Statistics.DrawedPortalCount++;
-			Statistics.TotalMapPolygonCount += Portals[I]->GetPolygonCount();
-			Statistics.DrawedMapPolygonCount += Portals[I]->GetPolygonCount();
+			Statistics.TotalRoomCount++;
+			Statistics.DrawedRoomCount++;
+			Statistics.TotalInteriorPolygonCount += Rooms[I]->GetPolygonCount();
+			Statistics.DrawedInteriorPolygonCount += Rooms[I]->GetPolygonCount();
 		}
 	}
 	else
@@ -423,27 +423,27 @@ void ZEPortalMap::CullPortals(ZEDrawParameters* DrawParameters)
 			ZEViewFrustum* Frustum = (ZEViewFrustum*)DrawParameters->ViewVolume;
 			ZEVector3 FrustumPosition = Frustum->GetPosition();
 
-			for (size_t I = 0; I < Portals.GetCount(); I++)
+			for (size_t I = 0; I < Rooms.GetCount(); I++)
 			{
-				Statistics.TotalPortalCount++;
-				Statistics.TotalMapPolygonCount += Portals[I]->GetPolygonCount();
+				Statistics.TotalRoomCount++;
+				Statistics.TotalInteriorPolygonCount += Rooms[I]->GetPolygonCount();
 
-				if (CullMode == ZE_MCM_VIEW)
+				if (CullMode == ZE_ICM_VIEW)
 					continue;
 
-				if (ZEAABBox::IntersectionTest(Portals[I]->GetWorldBoundingBox(), FrustumPosition))
+				if (ZEAABBox::IntersectionTest(Rooms[I]->GetWorldBoundingBox(), FrustumPosition))
 				{
 					NoClip = false;
-					Portals[I]->CullPass = true;
-					Portals[I]->Draw(DrawParameters);
+					Rooms[I]->CullPass = true;
+					Rooms[I]->Draw(DrawParameters);
 
-					Statistics.DrawedPortalCount++;
-					Statistics.DrawedMapPolygonCount += Portals[I]->GetPolygonCount();
+					Statistics.DrawedRoomCount++;
+					Statistics.DrawedInteriorPolygonCount += Rooms[I]->GetPolygonCount();
 
-					const ZEArray<ZEPortalMapDoor*>& Doors = Portals[I]->GetDoors();
+					const ZEArray<ZEInteriorDoor*>& Doors = Rooms[I]->GetDoors();
 					for(size_t J = 0; J < Doors.GetCount(); J++)
 					{
-						CullPortal(Doors[J], DrawParameters, Frustum);
+						CullRoom(Doors[J], DrawParameters, Frustum);
 					}
 				}
 			}
@@ -451,45 +451,45 @@ void ZEPortalMap::CullPortals(ZEDrawParameters* DrawParameters)
 
 		if (NoClip)
 		{
-			for (ZESize I = 0; I < Portals.GetCount(); I++)
+			for (ZESize I = 0; I < Rooms.GetCount(); I++)
 			{
-				if (!DrawParameters->ViewVolume->CullTest(Portals[I]->GetWorldBoundingBox()))
+				if (!DrawParameters->ViewVolume->CullTest(Rooms[I]->GetWorldBoundingBox()))
 				{
-					Portals[I]->Draw(DrawParameters);
+					Rooms[I]->Draw(DrawParameters);
 
-					Statistics.DrawedPortalCount++;
-					Statistics.DrawedMapPolygonCount += Portals[I]->GetPolygonCount();
+					Statistics.DrawedRoomCount++;
+					Statistics.DrawedInteriorPolygonCount += Rooms[I]->GetPolygonCount();
 				}
 			}
 		}
 
-		for (ZESize I = 0; I < Portals.GetCount(); I++)
+		for (ZESize I = 0; I < Rooms.GetCount(); I++)
 		{
-			if (Portals[I]->IsPersistentDraw)
+			if (Rooms[I]->IsPersistentDraw)
 			{
-				if (!Portals[I]->IsDrawn)
+				if (!Rooms[I]->IsDrawn)
 				{
-					Portals[I]->Draw(DrawParameters);
+					Rooms[I]->Draw(DrawParameters);
 
-					Statistics.DrawedPortalCount++;
-					Statistics.DrawedMapPolygonCount += Portals[I]->GetPolygonCount();
+					Statistics.DrawedRoomCount++;
+					Statistics.DrawedInteriorPolygonCount += Rooms[I]->GetPolygonCount();
 				}
 			}
 		}
 	}
 
-	Statistics.CulledPortalCount = Statistics.TotalPortalCount - Statistics.DrawedPortalCount;
-	Statistics.CulledMapPolygonCount = Statistics.TotalMapPolygonCount - Statistics.DrawedMapPolygonCount;
+	Statistics.CulledRoomCount = Statistics.TotalRoomCount - Statistics.DrawedRoomCount;
+	Statistics.CulledInteriorPolygonCount = Statistics.TotalInteriorPolygonCount - Statistics.DrawedInteriorPolygonCount;
 }
 
-void ZEPortalMap::OnTransformChanged()
+void ZEInterior::OnTransformChanged()
 {
-	for (ZESize I = 0; I < Portals.GetCount(); I++)
+	for (ZESize I = 0; I < Rooms.GetCount(); I++)
 	{
-		Portals[I]->TransformChanged = true;
-		Portals[I]->PhysicalMesh->SetPosition(GetWorldPosition() + Portals[I]->Position);
-		Portals[I]->PhysicalMesh->SetRotation(GetWorldRotation() * Portals[I]->Rotation);
-		Portals[I]->PhysicalMesh->SetScale(GetWorldScale() * Portals[I]->Scale);
+		Rooms[I]->TransformChanged = true;
+		Rooms[I]->PhysicalMesh->SetPosition(GetWorldPosition() + Rooms[I]->Position);
+		Rooms[I]->PhysicalMesh->SetRotation(GetWorldRotation() * Rooms[I]->Rotation);
+		Rooms[I]->PhysicalMesh->SetScale(GetWorldScale() * Rooms[I]->Scale);
 	}
 
 	for (ZESize I = 0; I < Doors.GetCount(); I++)
@@ -498,12 +498,12 @@ void ZEPortalMap::OnTransformChanged()
 	ZEEntity::OnTransformChanged();
 }
 
-void ZEPortalMap::SetCullMode(ZEMapCullMode Value)
+void ZEInterior::SetCullMode(ZEInteriorCullMode Value)
 {
 	CullMode = Value;
 }
 
-ZEEntityRunAt ZEPortalMapDescription::GetRunAt() const
+ZEEntityRunAt ZEInteriorDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }

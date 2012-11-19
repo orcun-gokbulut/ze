@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPortalMapPortal.cpp
+ Zinek Engine - ZEInteriorRoom.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECore/ZECore.h"
-#include "ZEPortalMapPortal.h"
-#include "ZEPortalMapResource.h"
+#include "ZEInteriorRoom.h"
+#include "ZEInteriorResource.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
 #include "ZEGraphics/ZELight.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
@@ -43,11 +43,11 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEMap/ZEPortalMap/ZEPortalMap.h"
+#include "ZEMap/ZEInterior/ZEInterior.h"
 #include "ZEMath/ZEViewVolume.h"
 #include "ZEGraphics/ZESimpleMaterial.h"
 
-void ZEPortalMapPortal::DebugDraw(ZERenderer* Renderer)
+void ZEInteriorRoom::DebugDraw(ZERenderer* Renderer)
 {
 	if (DebugDrawComponents.Material == NULL)
 	{
@@ -76,12 +76,12 @@ void ZEPortalMapPortal::DebugDraw(ZERenderer* Renderer)
 	Renderer->AddToRenderList(&DebugDrawComponents.BoxRenderCommand);
 }
 
-ZEPortalMap* ZEPortalMapPortal::GetOwner()
+ZEInterior* ZEInteriorRoom::GetOwner()
 {
 	return Owner;
 }
 
-const char* ZEPortalMapPortal::GetName()
+const char* ZEInteriorRoom::GetName()
 {
 	if (Resource != NULL)
 		return Resource->Name;
@@ -89,17 +89,17 @@ const char* ZEPortalMapPortal::GetName()
 		return "";
 }
 
-const ZEArray<ZEPortalMapDoor*>& ZEPortalMapPortal::GetDoors()
+const ZEArray<ZEInteriorDoor*>& ZEInteriorRoom::GetDoors()
 {
 	return Doors;
 }
 
-const ZEAABBox& ZEPortalMapPortal::GetBoundingBox()
+const ZEAABBox& ZEInteriorRoom::GetBoundingBox()
 {
 	return BoundingBox;
 }
 
-const ZEAABBox& ZEPortalMapPortal::GetWorldBoundingBox()
+const ZEAABBox& ZEInteriorRoom::GetWorldBoundingBox()
 {
 	if (TransformChanged)
 	{
@@ -117,58 +117,58 @@ const ZEAABBox& ZEPortalMapPortal::GetWorldBoundingBox()
 	
 }
 
-void ZEPortalMapPortal::SetPosition(const ZEVector3& NewPosition)
+void ZEInteriorRoom::SetPosition(const ZEVector3& NewPosition)
 {
 	Position = NewPosition;
 	TransformChanged = true;
 	PhysicalMesh->SetPosition(Owner->GetWorldPosition() + Position);
 }
 
-const ZEVector3& ZEPortalMapPortal::GetPosition() const
+const ZEVector3& ZEInteriorRoom::GetPosition() const
 {
 	return Position;
 }
 
-void ZEPortalMapPortal::SetRotation(const ZEQuaternion& NewRotation)
+void ZEInteriorRoom::SetRotation(const ZEQuaternion& NewRotation)
 {
 	Rotation = NewRotation;
 	TransformChanged = true;
 	PhysicalMesh->SetRotation(Owner->GetWorldRotation() * Rotation);
 }
 
-const ZEQuaternion& ZEPortalMapPortal::GetRotation() const
+const ZEQuaternion& ZEInteriorRoom::GetRotation() const
 {
 	return Rotation;
 }
 
-void ZEPortalMapPortal::SetScale(const ZEVector3& NewScale)
+void ZEInteriorRoom::SetScale(const ZEVector3& NewScale)
 {
 	Scale = NewScale;
 	TransformChanged = true;
 	PhysicalMesh->SetScale(Owner->GetWorldScale() * Scale);
 }
 
-const ZEVector3& ZEPortalMapPortal::GetScale() const
+const ZEVector3& ZEInteriorRoom::GetScale() const
 {
 	return Scale;
 }
 
-ZEPhysicalMesh* ZEPortalMapPortal::GetPhysicalMesh()
+ZEPhysicalMesh* ZEInteriorRoom::GetPhysicalMesh()
 {
 	return PhysicalMesh;
 }
 
-size_t ZEPortalMapPortal::GetPolygonCount()
+size_t ZEInteriorRoom::GetPolygonCount()
 {
 	return Resource->Polygons.GetCount();
 }
 
-void ZEPortalMapPortal::SetPersistentDraw(bool Enabled)
+void ZEInteriorRoom::SetPersistentDraw(bool Enabled)
 {
 	IsPersistentDraw = Enabled;
 }
 
-void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
+void ZEInteriorRoom::Draw(ZEDrawParameters* DrawParameters)
 {
 	IsDrawn = true;
 
@@ -184,7 +184,7 @@ void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
 	}
 }
 
-bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource)
+bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorRoomResource* Resource)
 {	
 
 	this->Owner = Owner;
@@ -281,6 +281,7 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 		PhysicalMesh->SetPosition(Owner->GetWorldPosition() + Position);
 		PhysicalMesh->SetRotation(Owner->GetWorldRotation() * Rotation);
 		PhysicalMesh->SetScale(Owner->GetWorldScale() * Scale);
+		PhysicalMesh->SetEnabled(Resource->PhysicalMesh.PhysicalMeshEnabled);
 		PhysicalMesh->Initialize();
 		zeScene->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);
 	}
@@ -288,7 +289,7 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 	return true;
 }
 
-void ZEPortalMapPortal::Deinitialize()
+void ZEInteriorRoom::Deinitialize()
 {
 	Owner = NULL;
 	Resource = NULL;
@@ -312,7 +313,7 @@ void ZEPortalMapPortal::Deinitialize()
 	}
 }
 
-ZEPortalMapPortal::ZEPortalMapPortal()
+ZEInteriorRoom::ZEInteriorRoom()
 {
 	Owner = NULL;
 	Resource = NULL;
@@ -330,12 +331,12 @@ ZEPortalMapPortal::ZEPortalMapPortal()
 	Scale = ZEVector3::One;
 }
 
-ZEPortalMapPortal::~ZEPortalMapPortal()
+ZEInteriorRoom::~ZEInteriorRoom()
 {
 	Deinitialize();
 }
 
-ZEPortalMapPortal* ZEPortalMapPortal::CreateInstance()
+ZEInteriorRoom* ZEInteriorRoom::CreateInstance()
 {
-	return new ZEPortalMapPortal();
+	return new ZEInteriorRoom();
 }

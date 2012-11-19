@@ -20,7 +20,7 @@ macroScript ZEBoneAttributes_Add
 		
 		Result.PositionValue.x = if abs(obj.position.x) < Threshold then 0.0 else obj.position.x
 		Result.PositionValue.y = if abs(obj.position.z) < Threshold then 0.0 else obj.position.z
-		Result.PositionValue.z = -(if abs(obj.position.y) < Threshold then 0.0 else obj.position.y)
+		Result.PositionValue.z = if abs(obj.position.y) < Threshold then 0.0 else obj.position.y
 
 		TempValues = (obj.rotation) as eulerAngles
 		
@@ -251,7 +251,6 @@ macroScript ZEBoneAttributes_Add
 		
 			
 			/* LAYOUT DEFINITION */
-			bitmap					uiLogo																		fileName:"zineklogo.bmp"
 			dropdownlist			uiJoint_Type								"Joint Type:"					items:#("None", "D6")
 			checkbox				uiJoint_Enabled								"Enabled"																						enabled:(Joint_Type != 1)
 			checkbox 				uiJoint_CollideBodies						"Bodies Collide"																				enabled:(Joint_Type != 1)

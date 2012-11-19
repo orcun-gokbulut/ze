@@ -52,8 +52,8 @@ class ZEPostProcessor;
 class ZEFixedMaterial;
 class ZEEntity;
 class ZEPhysicalWorld;
-class ZEPortalMap;
-class ZEPortalMapResource;
+class ZEInterior;
+class ZEInteriorResource;
 class ZEObjectDescription;
 
 #define ZE_RCF_ENTITY							1

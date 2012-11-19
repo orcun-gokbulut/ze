@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZE3dsMaxInteriorExporterOptionsDialog.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,26 +30,47 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef __ZE_INTERIOR_EXPORTER_OPTIONS_DIALOG_H__
+#define __ZE_INTERIOR_EXPORTER_OPTIONS_DIALOG_H__
 
-ze_add_source(ZE3dsMaxMapExporter.h						Sources)
-ze_add_source(ZE3dsMaxMapExporter.cpp					Sources)
-ze_add_source(ZE3dsMaxMapExporterDescription.h			Sources)
-ze_add_source(ZE3dsMaxMapExporterDescription.cpp		Sources)
-ze_add_source(ZE3dsMaxMapExporterProcess.cpp			Sources)
-ze_add_source(ZE3dsMaxMapExporterOptionsDialog.h		Sources QtMocs)
-ze_add_source(ZE3dsMaxMapExporterOptionsDialog.cpp		Sources)
-ze_add_source(ZE3dsMaxMapExporterOptionsWidget.ui		Sources QtUI)
+#include "ui_ZE3dsMaxInteriorExporterOptionsWidget.h"
+#include "QtGui\QDialog"
+#include "ZEDS\ZEString.h"
+#include "ZEML\ZEMLNode.h"
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+class ZE3dsMaxInteriorExporterOptionsDialog : public QDialog
+{
+	Q_OBJECT
 
-ze_add_library(ZE3dsMaxMapExporter 
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS ZEFoundation ZE3dsMaxUtils QtCore4 QtGui4 QWinWidget ZEProgressDialog ZEResourceConfigurationWidget)
+	private:
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+		Ui::ZE3dsMaxInteriorExporterOptionsDialogUI*	Form;
+		ZEMLNode*										Options;
+
+		void					ToggleFileLogging(bool IsEnabled);
+		void					ToggleApplicationPathOptions(bool IsEnabled);
+		void					CollectOptionsFromForm();
+
+	private slots:
+
+		void					ShowEngineDirectoryDialog();
+		void					ShowLoggingFilePathDialog();
+		void					SetFileLoggingEnabled(int CheckBoxState);
+
+	public:
+
+								ZE3dsMaxInteriorExporterOptionsDialog(QWidget* Parent);
+								~ZE3dsMaxInteriorExporterOptionsDialog();
+
+	bool						GetFileLoggingEnabled();
+	ZEString					GetLogFilePath();
+
+	void						SetOptions(ZEMLNode* Options);
+	ZEMLNode*					GetOptions();
+};
+
+#endif

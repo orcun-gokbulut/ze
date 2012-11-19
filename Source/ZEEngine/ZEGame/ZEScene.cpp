@@ -52,10 +52,10 @@
 #include "ZEPhysics/ZEPhysicalWorld.h"
 #include "ZEGraphics/ZEFrameRenderer.h"
 #include "ZEGraphics/ZEShadowRenderer.h"
-#include "ZEMap/ZEPortalMap/ZEPortalMap.h"
+#include "ZEMap/ZEInterior/ZEInterior.h"
 #include "ZESerialization/ZEFileSerializer.h"
 #include "ZESerialization/ZEFileUnserializer.h"
-#include "ZEMap/ZEPortalMap/ZEPortalMapResource.h"
+#include "ZEMap/ZEInterior/ZEInteriorResource.h"
 
 #include <memory.h>
 

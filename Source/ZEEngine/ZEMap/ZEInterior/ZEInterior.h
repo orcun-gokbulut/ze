@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPortalMap.h
+ Zinek Engine - ZEInterior.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PORTAL_MAP_H__
-#define __ZE_PORTAL_MAP_H__
+#ifndef __ZE_INTERIOR_H__
+#define __ZE_INTERIOR_H__
 
 #include "ZEGame/ZEEntity.h"
 #include "ZEDS/ZEArray.h"
@@ -44,86 +44,86 @@
 
 #include "ZEML/ZEMLNode.h"
 
-enum ZEMapCullMode
+enum ZEInteriorCullMode
 {
-	ZE_MCM_NONE,
-	ZE_MCM_VIEW,
-	ZE_MCM_FULL
+	ZE_ICM_NONE,
+	ZE_ICM_VIEW,
+	ZE_ICM_FULL
 };
 
-struct ZEPortalMapCullStatistics
+struct ZEInteriorCullStatistics
 {
-	size_t	TotalPortalCount;
-	size_t	CulledPortalCount;
-	size_t	DrawedPortalCount;
+	size_t	TotalRoomCount;
+	size_t	CulledRoomCount;
+	size_t	DrawedRoomCount;
 
-	size_t	TotalMapPolygonCount;
-	size_t	CulledMapPolygonCount;
-	size_t	DrawedMapPolygonCount;
+	size_t	TotalInteriorPolygonCount;
+	size_t	CulledInteriorPolygonCount;
+	size_t	DrawedInteriorPolygonCount;
 
-	size_t	TotalMapMaterialCount;
-	size_t	CulledMapMaterialCount;
-	size_t	DrawedMapMaterialCount;
+	size_t	TotalInteriorMaterialCount;
+	size_t	CulledInteriorMaterialCount;
+	size_t	DrawedInteriorMaterialCount;
 
 };
 
-ZE_META_ENTITY_DESCRIPTION(ZEPortalMap)
+ZE_META_ENTITY_DESCRIPTION(ZEInterior)
 
-class ZEPortalMapResource;
-class ZEPortalMapPortal;
-class ZEPortalMapDoor;
+class ZEInteriorResource;
+class ZEInteriorRoom;
+class ZEInteriorDoor;
 struct ZEDrawParameters;
-struct ZEPortalMapCullStatistics;
+struct ZEInteriorCullStatistics;
 class ZERay;
 class ZEVector3;
 class ZEViewVolume;
 class ZEViewFrustum;
 
-class ZEPortalMap : public ZEEntity
+class ZEInterior : public ZEEntity
 {
-	ZE_META_ENTITY(ZEPortalMap)
-	friend class ZEPortalMapDoor;
+	ZE_META_ENTITY(ZEInterior)
+	friend class ZEInteriorDoor;
 	private:
-		ZEString								PortalMapFile;
-		ZEPortalMapResource*					Resource;
-		ZEArray<ZEPortalMapPortal*>				Portals;
-		ZEArray<ZEPortalMapDoor*>				Doors; 
-		ZEMapCullMode							CullMode;
-		ZEPortalMapCullStatistics				Statistics;
+		ZEString								InteriorFile;
+		ZEInteriorResource*						Resource;
+		ZEArray<ZEInteriorRoom*>				Rooms;
+		ZEArray<ZEInteriorDoor*>				Doors; 
+		ZEInteriorCullMode						CullMode;
+		ZEInteriorCullStatistics				Statistics;
 
-		void									LoadPortalResource(ZEPortalMapResource* Resource);
+		void									LoadInteriorResource(ZEInteriorResource* Resource);
 
-		static bool								GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEPortalMapDoor* Door, const ZEViewVolume* OldViewVolume);
-		void									CullPortal(ZEPortalMapDoor* Door, ZEDrawParameters* DrawParameters, ZEViewVolume* ViewVolume);
-		void									CullPortals(ZEDrawParameters* DrawParameters);
+		static bool								GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor* Door, const ZEViewVolume* OldViewVolume);
+		void									CullRoom(ZEInteriorDoor* Door, ZEDrawParameters* DrawParameters, ZEViewVolume* ViewVolume);
+		void									CullRooms(ZEDrawParameters* DrawParameters);
 
 		virtual	void							OnTransformChanged();
 
-												ZEPortalMap();
-												~ZEPortalMap();
+												ZEInterior();
+												~ZEInterior();
 
 	public:	
-		const ZEArray<ZEPortalMapPortal*>&		GetPortals();
-		const ZEArray<ZEPortalMapDoor*>&		GetDoors();
+		const ZEArray<ZEInteriorRoom*>&			GetRooms();
+		const ZEArray<ZEInteriorDoor*>&			GetDoors();
 
-		const ZEPortalMapCullStatistics&		GetCullStatistics();
+		const ZEInteriorCullStatistics&			GetCullStatistics();
 
 		virtual ZEDrawFlags						GetDrawFlags() const;
 
 		virtual bool							Initialize();
 		virtual void							Deinitialize();
 
-		ZEPortalMapResource*					GetResource() const;
+		ZEInteriorResource*						GetResource() const;
 
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
 		virtual bool							CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT);
 
-		virtual bool							SetMapFile(const ZEString& FileName);
-		virtual const ZEString&					GetMapFile() const;
+		virtual bool							SetInteriorFile(const ZEString& FileName);
+		virtual const ZEString&					GetInteriorFile() const;
 
-		void									SetCullMode(ZEMapCullMode Value);
+		void									SetCullMode(ZEInteriorCullMode Value);
 
-		static ZEPortalMap*						CreateInstance();
+		static ZEInterior*						CreateInstance();
 
 };
 
@@ -131,14 +131,14 @@ class ZEPortalMap : public ZEEntity
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-		<class name="ZEPortalMap" parent="ZEEntity" description="Portal map">
-			<property name="MapFile"
+		<class name="ZEInterior" parent="ZEEntity" description="Interior Map">
+			<property name="InteriorFile"
 				type="string"
 				autogetset="true"
 				default=""
-				description="Map file"
+				description="Interior file"
 				semantic="ZE_PS_FILENAME"
-				fileextension="*.zeMap"/>
+				fileextension="*.zeInterior"/>
 		</class>
 	</meta>
 </zinek>
