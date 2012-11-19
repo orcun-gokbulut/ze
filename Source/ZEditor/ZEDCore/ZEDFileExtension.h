@@ -45,11 +45,11 @@
 #include <ZEGame/ZEEntity.h>
 
 /*
-#define ZEMAP	"ZEMAP"
-#define ZEMODEL "ZEMODEL"
-#define ZESCENE "ZESCENE"
-#define	ZEFONT	"ZEFONT"
-#define ZEMTL	"ZEMTL"
+#define ZEINTERIOR	"ZEINTERIOR"
+#define ZEMODEL		"ZEMODEL"
+#define ZESCENE		"ZESCENE"
+#define	ZEFONT		"ZEFONT"
+#define ZEMTL		"ZEMTL"
 
 #define DDS		"DDS"
 #define PNG		"PNG"

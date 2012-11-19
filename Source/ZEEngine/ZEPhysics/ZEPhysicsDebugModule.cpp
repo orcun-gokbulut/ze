@@ -54,14 +54,11 @@
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZEPointLight.h"
-#include "ZEMap/ZEInterior/ZEInterior.h"
-#include "ZEMap/ZEMapResource.h"
-#include "ZEMap/ZEInterior/ZEInteriorRoom.h"
+#include "ZEInterior/ZEInterior.h"
+#include "ZEInterior/ZEInteriorRoom.h"
+#include "ZEInterior/ZEInteriorResource.h"
 #include "ZEMath/ZEAngle.h"
-
-#include "ZEMap/ZEInterior/ZEInteriorResource.h"
-
-#include "../ZEGraphics/ZEDirectionalLight.h"
+#include "ZEGraphics/ZEDirectionalLight.h"
 
 void ZEPhysicsDebugModule::TransformChanged(const ZEPhysicalTransformChangeEventArgument& TransformChange)
 {

@@ -53,7 +53,7 @@ class ZESimpleVertex
 		static ZEVertexDeclaration*		GetVertexDeclaration();
 };
 
-struct ZEMapVertex
+struct ZEInteriorVertex
 {
 	private:
 		static ZEVertexDeclaration*		VertexDeclaration;

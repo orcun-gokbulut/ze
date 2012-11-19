@@ -44,7 +44,6 @@
 #include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZERectangle.h"
-#include "ZEGame/ZEPortal.h"
 #include "ZEGame/ZEDrawParameters.h"
 
 enum ZECameraProjectionType

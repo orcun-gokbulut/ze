@@ -52,7 +52,7 @@
 #include "ZETexture/ZETextureOptions.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEMap/ZEInterior/ZEInterior.h"
+#include "ZEInterior/ZEInterior.h"
 #include "ZEGraphics/ZEVertexDeclaration.h"
 #include "ZED3D9VertexDeclaration.h"
 #include "ZEGraphics/ZEVertexBuffer.h"

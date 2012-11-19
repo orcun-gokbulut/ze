@@ -40,7 +40,7 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
-#include "ZEMap/ZEInterior/ZEInterior.h"
+#include "ZEInterior/ZEInterior.h"
 
 #define TotalRoomText		ZEString("Total Room Count		: ")
 #define CulledRoomText		ZEString("Culled Room Count		: ")

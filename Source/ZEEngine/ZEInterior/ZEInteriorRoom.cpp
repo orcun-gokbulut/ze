@@ -43,7 +43,7 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEMap/ZEInterior/ZEInterior.h"
+#include "ZEInterior/ZEInterior.h"
 #include "ZEMath/ZEViewVolume.h"
 #include "ZEGraphics/ZESimpleMaterial.h"
 
@@ -205,7 +205,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorRoomResource* Resou
 	{
 		RenderCommands.Clear();
 		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
-		if (!VertexBuffer->Create(Resource->Polygons.GetCount() * 3 * sizeof(ZEMapVertex)))
+		if (!VertexBuffer->Create(Resource->Polygons.GetCount() * 3 * sizeof(ZEInteriorVertex)))
 			return false;
 
 		ZEArray<bool> Processed;
@@ -213,7 +213,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorRoomResource* Resou
 		Processed.Fill(false);
 
 		ZESize VertexIndex = 0;
-		ZEMapVertex* Buffer = (ZEMapVertex*)VertexBuffer->Lock();	
+		ZEInteriorVertex* Buffer = (ZEInteriorVertex*)VertexBuffer->Lock();	
 		for (ZESize N = 0; N < Resource->Polygons.GetCount(); N++)
 		{
 			if (!Processed[N])
@@ -229,7 +229,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorRoomResource* Resou
 				RenderCommand->PrimitiveType = ZE_ROPT_TRIANGLE;
 				RenderCommand->VertexBufferOffset = VertexIndex;
 				RenderCommand->VertexBuffer = VertexBuffer;
-				RenderCommand->VertexDeclaration = ZEMapVertex::GetVertexDeclaration();
+				RenderCommand->VertexDeclaration = ZEInteriorVertex::GetVertexDeclaration();
 				RenderCommand->WorldMatrix = WorldTransform;
 
 				RenderCommand->PrimitiveCount = 0;
@@ -238,7 +238,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorRoomResource* Resou
 					if (Resource->Polygons[I].Material != Material)
 						continue;
 
-					memcpy(Buffer + VertexIndex, Resource->Polygons[I].Vertices, sizeof(ZEMapVertex) * 3);
+					memcpy(Buffer + VertexIndex, Resource->Polygons[I].Vertices, sizeof(ZEInteriorVertex) * 3);
 					VertexIndex += 3;
 					RenderCommand->PrimitiveCount++;
 					Processed[I] = true;
