@@ -141,7 +141,7 @@ ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(ZEFile* ResourceFile)
 
 	if(HeaderChunk.Version != ZE_VERTEX_DECLARATION_FILE_VERSION)
 	{	
-		zeError("ZEMap file version mismatched. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
+		zeError("ZEInterior file version mismatched. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
 		return NULL;
 	}
 	

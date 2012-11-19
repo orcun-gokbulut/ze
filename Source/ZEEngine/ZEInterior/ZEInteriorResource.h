@@ -38,7 +38,6 @@
 #define __ZE_INTERIOR_RESOURCE_H__
 
 #include "ZETypes.h"
-#include "../ZEMapResource.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
@@ -56,7 +55,7 @@ class ZEMLSerialReader;
 
 struct ZEInteriorPolygon
 {
-	ZEMapVertex				Vertices[3];
+	ZEInteriorVertex				Vertices[3];
 	ZEMaterial*				Material;
 	ZEUInt32				LastIteration;
 };
@@ -103,7 +102,7 @@ struct ZEInteriorDoorResource
 
 class ZEFile;
 
-class ZEInteriorResource : public ZEMapResource
+class ZEInteriorResource : public ZEResource
 {
 	private:
 		ZEArray<ZETexture2DResource*>				TextureResources;

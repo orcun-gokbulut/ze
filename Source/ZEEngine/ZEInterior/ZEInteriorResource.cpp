@@ -232,7 +232,7 @@ bool ZEInteriorResource::ReadDoors(ZEMLSerialReader* Reader)
 bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 {
 	ZEPackStruct(
-	struct ZEMapFileVertexChunk
+	struct ZEInteriorFileVertexChunk
 	{
 		ZEVector3				Position;
 		ZEVector3				Normal;
@@ -242,10 +242,10 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 	});
 
 	ZEPackStruct(
-	struct ZEMapFilePolygonChunk
+	struct ZEInteriorFilePolygonChunk
 	{	
-		ZEUInt32				Material;
-		ZEMapFileVertexChunk	Vertices[3];
+		ZEUInt32					Material;
+		ZEInteriorFileVertexChunk	Vertices[3];
 	});
 
 	ZESize SubItemCount = Reader->GetSubItemCount();
@@ -282,8 +282,8 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 		Room->Rotation = Rotation.GetQuaternion();
 		Room->Scale = Scale.GetVector3();
 
-		ZEArray<ZEMapFilePolygonChunk> MapPolygons;
-		MapPolygons.SetCount(Reader->GetDataSize() / sizeof(ZEMapFilePolygonChunk));
+		ZEArray<ZEInteriorFilePolygonChunk> MapPolygons;
+		MapPolygons.SetCount(Reader->GetDataSize() / sizeof(ZEInteriorFilePolygonChunk));
 		Reader->GetData(MapPolygons.GetCArray(), Reader->GetDataSize());
 
 		if(MapPolygons.GetCount() == 0)
@@ -440,14 +440,14 @@ ZEInteriorResource* ZEInteriorResource::LoadSharedResource(const ZEString& FileN
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
-	// Try to get instance of shared ZEMap file from resource manager
+	// Try to get instance of shared ZEInterior file from resource manager
 	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(NewPath);
 	
 	if (Resource != NULL)
 		return Resource;
 	else
 	{
-		// If there is no shared instance of ZEMap file create and load new instance
+		// If there is no shared instance of ZEInterior file create and load new instance
 		Resource = LoadResource(NewPath);
 		if (Resource != NULL)
 		{
@@ -466,13 +466,13 @@ void ZEInteriorResource::CacheResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
-	// Try to get instance of shared ZEMap file from resource manager
+	// Try to get instance of shared ZEInterior file from resource manager
 	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(NewPath);
 	if (Resource != NULL)
 		Resource->Cached = true;
 	else
 	{
-		// If there is no shared instance of ZEMap file create and load new instance
+		// If there is no shared instance of ZEInterior file create and load new instance
 		Resource = LoadResource(NewPath);
 		if (Resource != NULL)
 		{
@@ -494,11 +494,11 @@ ZEInteriorResource* ZEInteriorResource::LoadResource(const ZEString& FileName)
 	ZEFile ResourceFile;
 
 
-	// Open ZEMap file
+	// Open ZEInterior file
 	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if (Result)
 	{
-		// Create ZEMapResource
+		// Create ZEInteriorResource
 		ZEInteriorResource* MapResource = new ZEInteriorResource();
 		MapResource->SetFileName(NewPath);
 		MapResource->Cached = false;

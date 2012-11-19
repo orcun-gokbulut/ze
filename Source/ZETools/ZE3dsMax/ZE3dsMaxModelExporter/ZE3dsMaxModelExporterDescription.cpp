@@ -50,7 +50,7 @@ void* ZE3dsMaxModelExporterDescription::Create(BOOL Loading)
 
 const TCHAR* ZE3dsMaxModelExporterDescription::ClassName()
 { 
-	return "ZEMapExporter"; 
+	return "ZE3dsMaxModelExporter"; 
 }
 
 SClass_ID ZE3dsMaxModelExporterDescription::SuperClassID()
@@ -70,7 +70,7 @@ const TCHAR* ZE3dsMaxModelExporterDescription::Category()
 
 const TCHAR* ZE3dsMaxModelExporterDescription::InternalName()
 { 
-	return "ZEMap Exporter"; 
+	return "ZEModel Exporter"; 
 }
 
 HINSTANCE ZE3dsMaxModelExporterDescription::HInstance()
