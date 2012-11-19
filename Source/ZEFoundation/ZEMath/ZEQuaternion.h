@@ -96,6 +96,8 @@ class ZEQuaternion
 		void							ConjugateSelf();
 		void							NormalizeSelf();
 
+		bool							Equals(const ZEQuaternion& Quaternion) const;
+		bool							Equals(const ZEQuaternion& Quaternion, float Threshold) const;
 
 		ZEVector3						operator*(const ZEVector3& Vector) const;
 		ZEQuaternion					operator*(const ZEQuaternion& Other) const;
