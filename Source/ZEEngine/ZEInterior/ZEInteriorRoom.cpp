@@ -121,7 +121,9 @@ void ZEInteriorRoom::SetPosition(const ZEVector3& NewPosition)
 {
 	Position = NewPosition;
 	TransformChanged = true;
-	PhysicalMesh->SetPosition(Owner->GetWorldPosition() + Position);
+
+	if (PhysicalMesh != NULL)
+		PhysicalMesh->SetPosition(Owner->GetWorldPosition() + Position);
 }
 
 const ZEVector3& ZEInteriorRoom::GetPosition() const
@@ -133,7 +135,9 @@ void ZEInteriorRoom::SetRotation(const ZEQuaternion& NewRotation)
 {
 	Rotation = NewRotation;
 	TransformChanged = true;
-	PhysicalMesh->SetRotation(Owner->GetWorldRotation() * Rotation);
+
+	if (PhysicalMesh != NULL)
+		PhysicalMesh->SetRotation(Owner->GetWorldRotation() * Rotation);
 }
 
 const ZEQuaternion& ZEInteriorRoom::GetRotation() const
@@ -145,7 +149,9 @@ void ZEInteriorRoom::SetScale(const ZEVector3& NewScale)
 {
 	Scale = NewScale;
 	TransformChanged = true;
-	PhysicalMesh->SetScale(Owner->GetWorldScale() * Scale);
+
+	if (PhysicalMesh != NULL)
+		PhysicalMesh->SetScale(Owner->GetWorldScale() * Scale);
 }
 
 const ZEVector3& ZEInteriorRoom::GetScale() const
@@ -249,41 +255,35 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorRoomResource* Resou
 		VertexBuffer->Unlock();
 	}
 
-	ZEArray<ZEVector3> PhysicalVertices;
-	ZEArray<ZEPhysicalTriangle> PhysicalTriangles;
-
-	PhysicalVertices.SetCount(Resource->Polygons.GetCount() * 3);
-	PhysicalTriangles.SetCount(Resource->Polygons.GetCount());
-
-	for (ZESize I = 0; I < PhysicalTriangles.GetCount(); I++)
+	if (Resource->HasPhysicalMesh)
 	{
-		PhysicalVertices[3 * I] = Resource->Polygons[I].Vertices[0].Position;
-		PhysicalVertices[3 * I + 1] = Resource->Polygons[I].Vertices[1].Position;
-		PhysicalVertices[3 * I + 2] = Resource->Polygons[I].Vertices[2].Position;
-	}
-	for (ZESize I = 0; I < PhysicalTriangles.GetCount(); I++)
-	{
-		PhysicalTriangles[I].MaterialIndex = 0;
-		PhysicalTriangles[I].Indices[0] =  3 * (ZEUInt)I;
-		PhysicalTriangles[I].Indices[1] =  3 * (ZEUInt)I + 1;
-		PhysicalTriangles[I].Indices[2] =  3 * (ZEUInt)I + 2;
-	}
+		ZEArray<ZEPhysicalTriangle> PhysicalTriangles;
+		PhysicalTriangles.SetCount(Resource->PhysicalMesh.Polygons.GetCount());
 
-	if (PhysicalMesh == NULL && Resource->HasPhysicalMesh)
-	{
-		PhysicalMesh = ZEPhysicalMesh::CreateInstance();
-		PhysicalMesh->SetData(PhysicalVertices.GetConstCArray(), 
-							  (ZEUInt)PhysicalVertices.GetCount(),
-							  PhysicalTriangles.GetConstCArray(), 
-							  (ZEUInt)PhysicalTriangles.GetCount(),
-							  NULL, 0);
+		for (ZESize I = 0; I < PhysicalTriangles.GetCount(); I++)
+		{
+			PhysicalTriangles[I].MaterialIndex = 0;
+			PhysicalTriangles[I].Indices[0] =  Resource->PhysicalMesh.Polygons[I].Indices[0];
+			PhysicalTriangles[I].Indices[1] =  Resource->PhysicalMesh.Polygons[I].Indices[1];
+			PhysicalTriangles[I].Indices[2] =  Resource->PhysicalMesh.Polygons[I].Indices[2];
+		}
 
-		PhysicalMesh->SetPosition(Owner->GetWorldPosition() + Position);
-		PhysicalMesh->SetRotation(Owner->GetWorldRotation() * Rotation);
-		PhysicalMesh->SetScale(Owner->GetWorldScale() * Scale);
-		PhysicalMesh->SetEnabled(Resource->PhysicalMesh.PhysicalMeshEnabled);
-		PhysicalMesh->Initialize();
-		zeScene->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);
+		if (PhysicalMesh == NULL)
+		{
+			PhysicalMesh = ZEPhysicalMesh::CreateInstance();
+			PhysicalMesh->SetData(Resource->PhysicalMesh.Vertices.GetConstCArray(), 
+				(ZEUInt)Resource->PhysicalMesh.Vertices.GetCount(),
+				PhysicalTriangles.GetConstCArray(), 
+				(ZEUInt)PhysicalTriangles.GetCount(),
+				NULL, 0);
+
+			PhysicalMesh->SetPosition(Owner->GetWorldPosition() + Position);
+			PhysicalMesh->SetRotation(Owner->GetWorldRotation() * Rotation);
+			PhysicalMesh->SetScale(Owner->GetWorldScale() * Scale);
+			PhysicalMesh->SetEnabled(Resource->PhysicalMesh.PhysicalMeshEnabled);
+			PhysicalMesh->Initialize();
+			zeScene->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);
+		}
 	}
 
 	return true;

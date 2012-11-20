@@ -84,7 +84,7 @@ class ZE3dsMaxInteriorExporter : public SceneExport
 		bool						ProcessScene();
 		bool						ProcessMaterials(const char* FileName);
 		bool						ProcessRooms();
-		void						ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode);
+		void						ProcessPhysicalMesh(IGameNode* ParentNode, IGameNode* Node, ZEMLNode* PhysicalMeshNode);
 		bool						ProcessDoors();
 
 	protected:
