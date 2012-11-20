@@ -182,9 +182,9 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 	return true;
 }
 
-void ZE3dsMaxInteriorExporter::ProcessPhysicalMesh(IGameObject* Object, ZEMLNode* PhysicalMeshNode)
+void ZE3dsMaxInteriorExporter::ProcessPhysicalMesh(IGameNode* ParentNode, IGameNode* Node, ZEMLNode* PhysicalMeshNode)
 {
-	IGameMesh* Mesh = (IGameMesh*)Object;
+	IGameMesh* Mesh = (IGameMesh*)Node->GetIGameObject();
 
 	if(!Mesh->InitializeData())
 		zeError("Can not initialize mesh data for phsical mesh.");
@@ -208,10 +208,32 @@ void ZE3dsMaxInteriorExporter::ProcessPhysicalMesh(IGameObject* Object, ZEMLNode
 	ZEArray<ZEVector3> Vertices;
 	Vertices.SetCount(Mesh->GetNumberOfVerts());
 
+	ZEMatrix4x4 ObjectTM;
+	ZEMatrix4x4::CreateOrientation(ObjectTM, 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetObjectTM().Translation()), 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetObjectTM().Rotation()), 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetObjectTM().Scaling()));
+
+	ZEMatrix4x4 WorldTM;
+	ZEMatrix4x4::CreateOrientation(WorldTM, 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Translation()), 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Rotation()), 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Scaling()));
+
+	ZEMatrix4x4 ParentWorldTM;
+	ZEMatrix4x4::CreateOrientation(ParentWorldTM,
+		ZE3dsMaxUtils::MaxtoZE(ParentNode->GetWorldTM().Translation()), 
+		ZE3dsMaxUtils::MaxtoZE(ParentNode->GetWorldTM().Rotation()), 
+		ZE3dsMaxUtils::MaxtoZE(ParentNode->GetWorldTM().Scaling()));
+
+	ZEMatrix4x4 TotalTransform = (ParentWorldTM.Inverse() * WorldTM) * (WorldTM.Inverse() * ObjectTM); //Contains Room-PhysicalMesh relativity transformation and Offset transformation.
+
+	Point3		TempObjectVertex;
+
 	for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfVerts(); I++)
 	{
-		Point3 Vertex =	Mesh->GetVertex((ZEInt)I, false);
-		Vertices[I] = ZE3dsMaxUtils::MaxtoZE(Vertex);
+		TempObjectVertex = Mesh->GetVertex((ZEInt)I, true);
+		ZEMatrix4x4::Transform(Vertices[I], TotalTransform, ZE3dsMaxUtils::MaxtoZE(TempObjectVertex));
 	}
 
 	PhysicalMeshNode->AddDataProperty("Vertices", Vertices.GetCArray(), sizeof(ZEVector3) * Vertices.GetCount(), true);
@@ -257,7 +279,7 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 			zeError("Can not find room property : \"PhysicalMeshUseSelf\".");
 
 		if(PhysicalMeshEnabled && !PhysicalMeshUseSelf)
-			if(ZE3dsMaxUtils::GetProperty(CurrentObject, "PhysicalMesh", PhysicalMeshMaxNode))
+			if(!ZE3dsMaxUtils::GetProperty(CurrentObject, "PhysicalMesh", PhysicalMeshMaxNode))
 				zeError("Can not find room property : \"PhysicalMesh\".");
 
 		if(PhysicalMeshExists)
@@ -266,7 +288,7 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 			{
 				ZEMLNode* PhysicalMeshZEMLNode = RoomNode->AddSubNode("PhysicalMesh");
 				PhysicalMeshZEMLNode->AddProperty("PhysicalMeshEnabled", PhysicalMeshEnabled);
-				ProcessPhysicalMesh(CurrentObject, PhysicalMeshZEMLNode);
+				ProcessPhysicalMesh(CurrentNode, CurrentNode, PhysicalMeshZEMLNode);
 			}
 			else
 			{
@@ -280,7 +302,7 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 				{
 					ZEMLNode* PhysicalMeshZEMLNode = RoomNode->AddSubNode("PhysicalMesh");
 					PhysicalMeshZEMLNode->AddProperty("PhysicalMeshEnabled", PhysicalMeshEnabled);
-					ProcessPhysicalMesh(PhysicalMeshNode->GetIGameObject(), PhysicalMeshZEMLNode);
+					ProcessPhysicalMesh(CurrentNode, PhysicalMeshNode, PhysicalMeshZEMLNode);
 				}
 			}
 		}

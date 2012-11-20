@@ -487,9 +487,13 @@ void ZEInterior::OnTransformChanged()
 	for (ZESize I = 0; I < Rooms.GetCount(); I++)
 	{
 		Rooms[I]->TransformChanged = true;
-		Rooms[I]->PhysicalMesh->SetPosition(GetWorldPosition() + Rooms[I]->Position);
-		Rooms[I]->PhysicalMesh->SetRotation(GetWorldRotation() * Rooms[I]->Rotation);
-		Rooms[I]->PhysicalMesh->SetScale(GetWorldScale() * Rooms[I]->Scale);
+
+		if (Rooms[I]->PhysicalMesh != NULL)
+		{
+			Rooms[I]->PhysicalMesh->SetPosition(GetWorldPosition() + Rooms[I]->Position);
+			Rooms[I]->PhysicalMesh->SetRotation(GetWorldRotation() * Rooms[I]->Rotation);
+			Rooms[I]->PhysicalMesh->SetScale(GetWorldScale() * Rooms[I]->Scale);
+		}
 	}
 
 	for (ZESize I = 0; I < Doors.GetCount(); I++)
