@@ -75,5 +75,5 @@ ze_add_library(ZEParticle
 	HEADERS ${Headers}
 	LIBS ZEFoundation
 	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZEParticle"
+	INSTALL_DESTINATION "ZEEngine/ZEParticle"
 	INSTALL_COMPONENT ZESDK)

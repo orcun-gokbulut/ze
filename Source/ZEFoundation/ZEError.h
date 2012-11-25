@@ -300,7 +300,7 @@ class ZEError
 
 		void				RaiseError(ZEErrorType Type);
 
-		ZE_DLL_METHOD 
+		ZE_ENGINE_EXPORT 
 		static ZEError*		GetInstance();
 };
 

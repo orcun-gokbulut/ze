@@ -60,5 +60,5 @@ ze_add_library(ZESound
 	HEADERS ${Headers}
 	LIBS ZEFoundation libmpg123 libogg libvorbis libvorbisfile
 	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZESound"
+	INSTALL_DESTINATION "ZEEngine/ZESound"
 	INSTALL_COMPONENT ZESDK)

@@ -47,5 +47,5 @@ ze_add_library(ZETerrain
 	HEADERS ${Headers}
 	LIBS ZEFoundation
 	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZETerrain"
+	INSTALL_DESTINATION "ZEEngine/ZETerrain"
 	INSTALL_COMPONENT ZESDK)

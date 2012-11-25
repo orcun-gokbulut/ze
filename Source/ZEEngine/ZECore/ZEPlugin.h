@@ -41,20 +41,23 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEVersion.h"
 
-class ZEExtensionDescription;
-class ZEModuleDescription;
-
+class ZEClass;
 class ZEPlugin
 {
+	friend class ZEPluginManager;
 	public:
 		virtual ZEString					GetName() = 0;
-		virtual ZEString					GetCopyright() = 0;
+		virtual ZEString					GetCopyright()= 0;
 
-		virtual	ZEVersion					GetVersion() = 0;
-		virtual ZEVersion					GetRequiredZinekVersion() = 0;
+		virtual	ZEVersion					GetVersion();
+		virtual ZEVersion					GetRequiredZinekVersion();
 
-		virtual const 
-		ZEArray<ZEExtensionDescription*>&	GetExtensionDescriptions() = 0;
+		virtual ZEClass*					GetClasses();
+
+		virtual bool						Initialize();
+		virtual void						Deinitialize();
+
+		void								Destroy();
 };
 
 #endif

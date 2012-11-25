@@ -157,7 +157,7 @@ ze_add_library(ZETexture
 	HEADERS ${Headers}
 	LIBS ZEFoundation libfreeimage libATICompress ZEDirect3D9
 	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZETexture"
+	INSTALL_DESTINATION "ZEEngine/ZETexture"
 	INSTALL_COMPONENT Header)
 
 ze_add_test(ZETextureTests 

@@ -56,7 +56,7 @@ ze_add_source(ZEDMain.cpp		Sources)
 
 ze_add_executable(ZEditor 
 	SOURCES ${Sources}
-	LIBS ZEEngineAPI
+	LIBS ZEEngine
 		ZEDCommonControls ZEDCommonEntities ZEDCore ZEDImageExtensionsPlugIn ZEDMaterialEditor ZEDPropertyWindowManager
 		ZEDSceneEditor ZEDScriptEditor ZEDSoundExtensionsPlugIn ZEDUndoRedo ZEDBrowser ZEDNodeEditor
 		QtCore4 QtGui4)

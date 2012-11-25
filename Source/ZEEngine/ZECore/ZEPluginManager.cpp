@@ -42,8 +42,13 @@
 #include "ZEPluginManager.h"
 #include "ZEExtensionManager.h"
 
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEFormat.h"
+
 #include <string.h>
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
 ZEPlugin* ZEPluginManager::GetPlugin(const ZEString& Name)
 {
@@ -74,7 +79,7 @@ bool ZEPluginManager::RegisterPlugin(ZEPlugin* Plugin)
 		return false;
 	}
 
-	const ZEArray<ZEExtensionDescription*>& Extensions = Plugin->GetExtensionDescriptions();
+	/*const ZEArray<ZEExtensionDescription*>& Extensions = Plugin->GetExtensionDescriptions();
 
 	zeLog("Registering plugin's extensions. Plugin Name : \"%s\", Total Extensions : %Iu.", 
 		Plugin->GetName().ToCString(), Extensions.GetCount());
@@ -82,7 +87,7 @@ bool ZEPluginManager::RegisterPlugin(ZEPlugin* Plugin)
 	for (ZESize I = 0; I < Extensions.GetCount(); I++ )
 		ZEExtensionManager::GetInstance()->RegisterExtension(Extensions[I]);
 
-	zeLog("Plugin registered. Plugin Name : \"%s\".", (const char*)Plugin->GetName());
+	zeLog("Plugin registered. Plugin Name : \"%s\".", (const char*)Plugin->GetName());*/
 
 	return true;
 }
@@ -90,9 +95,57 @@ bool ZEPluginManager::RegisterPlugin(ZEPlugin* Plugin)
 void ZEPluginManager::UnregisterPlugin(ZEPlugin* Plugin)
 {
 	Plugins.DeleteValue(Plugin);
-	const ZEArray<ZEExtensionDescription*>& Extensions = Plugin->GetExtensionDescriptions();
+	/*const ZEArray<ZEExtensionDescription*>& Extensions = Plugin->GetExtensionDescriptions();
 	for (ZESize I = 0; I < Extensions.GetCount(); I++ )
 		ZEExtensionManager::GetInstance()->UnregisterExtension(Extensions[I]);
+	*/
+}
+
+typedef ZEPlugin* (*ZEGetPlugingFunction)();
+
+static void LoadExternalPlugin_Load(const ZEString& Path)
+{
+	HMODULE Module = LoadLibraryW(Path.ToWCString());
+	if (Module == NULL)
+		return;
+	
+	ZEGetPlugingFunction Function = (ZEGetPlugingFunction)GetProcAddress(Module, "GetPlugin");
+	ZEPlugin* Plugin = Function();
+	if (Plugin == NULL)
+	{
+		FreeLibrary(Module);
+		return;
+	}
+}
+
+void ZEPluginManager::LoadExternalPlugins(ZEString& Path, bool Recursive)
+{
+	WIN32_FIND_DATAW FindData;
+
+	HANDLE Handle = FindFirstFileW(ZEFormat::Format("{0}\\*.zePlugin", Path).ToWCString(), &FindData);
+
+	if ((FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+		LoadExternalPlugin_Load(ZEFormat::Format("{0}\\{1}", Path, ZEString(FindData.cFileName)));
+
+	while(FindNextFileW(Handle, &FindData))
+	{
+		if ((FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+			LoadExternalPlugin_Load(ZEFormat::Format("{0}\\{1}", Path, ZEString(FindData.cFileName)));
+	}
+
+	if (!Recursive)
+		return;
+
+	Handle = FindFirstFileW(ZEFormat::Format("{0}\\*", Path).ToWCString(), &FindData);
+
+	if ((FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+		LoadExternalPlugins(ZEFormat::Format("{0}\\{1}", Path, ZEString(FindData.cFileName)));
+
+	while(FindNextFileW(Handle, &FindData))
+	{
+		if ((FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+			LoadExternalPlugins(ZEFormat::Format("{0}\\{1}", Path, ZEString(FindData.cFileName)));
+	}
 }
 
 ZEPluginManager::ZEPluginManager()
