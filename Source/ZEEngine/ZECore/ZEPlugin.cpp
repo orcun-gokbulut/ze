@@ -34,3 +34,33 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPlugin.h"
+
+
+ZEVersion ZEPlugin::GetVersion()
+{
+	return ZEVersion::GetZinekVersion();
+}
+
+ZEVersion ZEPlugin::GetRequiredZinekVersion()
+{
+	return ZEVersion::GetZinekVersion();
+}
+
+ZEClass* ZEPlugin::GetClasses()
+{
+	return NULL;
+}
+
+bool ZEPlugin::Initialize()
+{
+	return true;
+}
+void ZEPlugin::Deinitialize()
+{
+
+}
+
+void ZEPlugin::Destroy()
+{
+	delete this;
+}

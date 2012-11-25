@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,38 +30,6 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
-
-ze_add_source(ZEModel.cpp					Sources)
-ze_add_source(ZEModel.h						Sources Headers ZEPP)
-ze_add_source(ZEModelAnimation.cpp			Sources)
-ze_add_source(ZEModelAnimation.h			Sources Headers)
-ze_add_source(ZEModelAnimationTrack.cpp		Sources)
-ze_add_source(ZEModelAnimationTrack.h		Sources Headers)
-ze_add_source(ZEModelBone.cpp				Sources)
-ze_add_source(ZEModelBone.h					Sources Headers)
-ze_add_source(ZEModelDebugModule.cpp		Sources)
-ze_add_source(ZEModelDebugModule.h			Sources)
-ze_add_source(ZEModelFileFormat.cpp			Sources)
-ze_add_source(ZEModelFileFormat.h			Sources)
-ze_add_source(ZEModelIKChain.cpp			Sources)
-ze_add_source(ZEModelIKChain.h				Sources Headers)
-ze_add_source(ZEModelIKChainNode.cpp		Sources)
-ze_add_source(ZEModelIKChainNode.h			Sources Headers)
-ze_add_source(ZEModelMesh.cpp				Sources)
-ze_add_source(ZEModelMesh.h					Sources Headers)
-ze_add_source(ZEModelMeshLOD.cpp			Sources)
-ze_add_source(ZEModelMeshLOD.h				Sources Headers)
-ze_add_source(ZEModelResource.cpp			Sources)
-ze_add_source(ZEModelResource.h				Sources Headers)
-
-ze_add_library(ZEModel 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION "ZEEngine/ZEModel"
-	INSTALL_COMPONENT ZESDK)

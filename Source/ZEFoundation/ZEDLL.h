@@ -37,13 +37,16 @@
 #define __ZE_DLL_H__
 
 #ifdef ZE_PLATFORM_COMPILER_MSVC
-	#ifdef ZE_DLL
-		#define ZE_DLL_METHOD __declspec(dllimport)
+	#ifdef ZE_PLUGIN
+		#define ZE_ENGINE_EXPORT __declspec(dllimport)
+		#define ZE_PLUGIN_EXPORT __declspec(dllexport)
 	#else
-		#define ZE_DLL_METHOD __declspec(dllexport)
+		#define ZE_ENGINE_EXPORT __declspec(dllexport)
+		#define ZE_PLUGIN_EXPORT __declspec(dllimport)
 	#endif
 #else
-	#define ZE_DLL_METHOD
+	#define ZE_ENGINE_EXPORT
+	#define ZE_PLUGIN_EXPORT
 #endif
 
 #endif

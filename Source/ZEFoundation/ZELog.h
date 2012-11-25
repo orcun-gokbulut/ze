@@ -100,7 +100,7 @@ class ZELog
 		void				Log(const char* Module, ZELogType Type, const char* Format, ...);
         void				Log(const char* Module, const char* Format, ...);
 
-		ZE_DLL_METHOD 
+		ZE_ENGINE_EXPORT 
 		static ZELog*		GetInstance();
 };
 

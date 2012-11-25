@@ -47,5 +47,5 @@ ze_add_library(ZENetwork
 	HEADERS ${Headers}
 	LIBS ZEFoundation ws2_32
 	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZENetwork"
+	INSTALL_DESTINATION "ZEEngine/ZENetwork"
 	INSTALL_COMPONENT Header)

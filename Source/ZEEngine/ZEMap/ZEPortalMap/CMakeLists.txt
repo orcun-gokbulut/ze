@@ -53,5 +53,5 @@ ze_add_library(ZEPortalMap
 	HEADERS ${Headers}
 	LIBS ZEFoundation
 	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZEPortalMap"
+	INSTALL_DESTINATION "ZEEngine/ZEPortalMap"
 	INSTALL_COMPONENT ZESDK)
