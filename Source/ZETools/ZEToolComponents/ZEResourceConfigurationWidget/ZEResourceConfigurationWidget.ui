@@ -46,6 +46,11 @@
           </column>
           <column>
            <property name="text">
+            <string>Type</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
             <string>Phsyical Path</string>
            </property>
           </column>

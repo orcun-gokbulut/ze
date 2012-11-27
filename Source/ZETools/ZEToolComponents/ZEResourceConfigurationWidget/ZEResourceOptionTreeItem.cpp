@@ -46,17 +46,18 @@ ZEResourceOptionTreeItem::ZEResourceOptionTreeItem()
 void ZEResourceOptionTreeItem::Update()
 {
 	setText(0, ZEString(ResourceOption->Identifier).ToCString());
-	setText(1, ResourceOption->PhysicalPath.ToCString());
-	setText(2, ResourceOption->ExportPath.ToCString());
+	setText(1, ZEString(ResourceOption->Type).ToCString());
+	setText(2, ResourceOption->PhysicalPath.ToCString());
+	setText(3, ResourceOption->ExportPath.ToCString());
 
 	if(ResourceOption->Action == ZE_ROAA_DO_NOTHING)
-		setText(4, "Do Nothing");
+		setText(5, "Do Nothing");
 	else if(ResourceOption->Action == ZE_ROAA_COPY_OVERWRITE)
-		setText(4, "Overwrite");
+		setText(5, "Overwrite");
 	else if(ResourceOption->Action == ZE_ROAA_COPY_IF_MISSING)
-		setText(4, "Copy If Missing");
+		setText(5, "Copy If Missing");
 	else
-		setText(4, "Copy If Newer");
+		setText(5, "Copy If Newer");
 
 	StatusString = "";
 
@@ -80,7 +81,7 @@ void ZEResourceOptionTreeItem::Update()
 	else
 		StatusString += "/ (E)NOK";
 
-	setText(3, StatusString.ToCString());
+	setText(4, StatusString.ToCString());
 }
 
 void ZEResourceOptionTreeItem::SetResourceOption(ZEResourceOption* Option)

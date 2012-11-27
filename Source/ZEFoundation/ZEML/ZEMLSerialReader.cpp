@@ -54,6 +54,8 @@ bool ZEMLSerialReader::Read()
 	CurrentItemDataSize		= 0;
 	CurrentItemSubItemCount = 0;
 
+	ZEUInt64 Fiepos = File->Tell();
+
 	if(MaxPointer < File->Tell())
 		MaxPointer = File->Tell();
 
@@ -122,7 +124,7 @@ bool ZEMLSerialReader::Read()
 
 		CurrentItemDataSize = ZEEndian::Little(CurrentItemDataSize);
 		DataItemDataPointer = File->Tell();
-
+		File->Seek(CurrentItemDataSize, ZE_SF_CURRENT);
 		return true;
 	}
 	else
