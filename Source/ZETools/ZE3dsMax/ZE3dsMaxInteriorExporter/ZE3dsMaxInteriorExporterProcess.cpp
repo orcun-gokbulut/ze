@@ -793,7 +793,7 @@ void ZE3dsMaxInteriorExporter::CollectResources()
 		IGameMaterial* NodeMaterial = ResourceMaterials[I];
 		ZEString MaterialName = NodeMaterial->GetMaterialName();
 
-		ResourceConfigurationDialog->AddResource(MaterialName + ".ZEMATERIAL", ZEString(), ZE_ROAA_COPY_OVERWRITE);
+		ResourceConfigurationDialog->AddResource(MaterialName + ".ZEMATERIAL", "Material", ZEString(), ZE_ROAA_COPY_OVERWRITE);
 
 		ZEInt NumberOfMaps = NodeMaterial->GetNumberOfTextureMaps();
 
@@ -805,24 +805,24 @@ void ZE3dsMaxInteriorExporter::CollectResources()
 			case ID_AM: // Ambient
 				break;
 			case ID_DI: // Diffuse
-				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentTexture->GetBitmapFileName(), ZEString());
+				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 				break;
 			case ID_SP: // Specular
-				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentTexture->GetBitmapFileName(), ZEString());
+				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 				break;
 			case ID_SI:	// Emissive
-				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentTexture->GetBitmapFileName(), ZEString());
+				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 				break;
 			case ID_OP:	// Opacity 
-				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentTexture->GetBitmapFileName(), ZEString());
+				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 				break;
 			case ID_FI:	// Filter color 
 				break;
 			case ID_BU: // Bump 
-				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentTexture->GetBitmapFileName(), ZEString());
+				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 				break;
 			case ID_RL: // Reflection - Environment
-				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), CurrentTexture->GetBitmapFileName(), ZEString());
+				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 				break; 
 			case ID_RR: // Refraction 
 				break;
