@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMaxUI - Copy.cpp
+ Zinek Engine - ZE3dsMaxUI.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 YiÄŸit OrÃ§un GÃ–KBULUT. All rights reserved.
 
@@ -57,8 +57,6 @@ DWORD ZE3dsMaxUI::Start()
 {
 	// Define Actions
 	// Menus
-
-	MessageBox(NULL, "Start", "Büllü", MB_OK);
 	return GUPRESULT_KEEP;
 }
 
@@ -70,7 +68,7 @@ class ZEMenuItem : public IMenuItem
 
 void ZE3dsMaxUI::Stop()
 {
-	MessageBox(NULL, "Büllük", "Stop", MB_OK);
+	
 }
 
 ZE3dsMaxUI::ZE3dsMaxUI()
