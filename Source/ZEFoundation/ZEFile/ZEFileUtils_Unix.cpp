@@ -182,6 +182,7 @@ ZEInt64 ZEFileUtils::GetFileSize(const ZEFileSearchStream* FindData)
     return (ZEInt64)FindData->Data.st_size;
 }
 
+/*
 bool ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEString& Path)
 {
     struct stat Stat;
@@ -222,6 +223,7 @@ void ZEFileUtils::GetModificationTime(ZEFileTime* Output, const ZEFileSearchStre
     OSFileTimetoZEFileTime(Output, &FileTime);
 }
 
+*/
 
 // Closes the search stream
 bool ZEFileUtils::CloseSearchStream(ZEFileSearchStream* FindData)

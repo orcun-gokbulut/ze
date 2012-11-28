@@ -38,6 +38,32 @@
 
 #include <errno.h>
 
+#if defined(ZE_PLATFORM_IOS) || defined(ZE_PLATFORM_ANDROID)
+#include <sys/time.h>
+int pthread_mutex_timedlock (pthread_mutex_t *mutex, struct timespec *timeout)
+{
+    struct timeval timenow;
+    struct timespec sleepytime;
+    int retcode;
+    
+    sleepytime.tv_sec = 0;
+    sleepytime.tv_nsec = 10000000;
+    
+    while ((retcode = pthread_mutex_trylock (mutex)) == EBUSY)
+    {
+        gettimeofday (&timenow, NULL);
+        if (timenow.tv_sec >= timeout->tv_sec && (timenow.tv_usec * 1000) >= timeout->tv_nsec)
+        {
+            return ETIMEDOUT;
+        }
+        
+        nanosleep (&sleepytime, NULL);
+    }
+    
+    return retcode;
+}
+#endif
+
 bool ZEMutex::TryToLock()
 {
     return Lock(0);
@@ -50,6 +76,41 @@ void ZEMutex::Lock()
     else
         zeCriticalError("Can not lock mutex.");
 }
+
+#ifdef ZE_PLATFORM_MACOSX
+int pthread_mutex_timedlock(pthread_mutex_t* Mutex, const struct timespec* TimeOut)
+{
+    int Result;
+    timespec Remaining;
+    timespec Elapsed;
+    timespec Timestamp;
+
+    Remaining = *TimeOut;
+    while ((Result = pthread_mutex_trylock(Mutex)) == EBUSY)
+    {
+        Timestamp.tv_sec = 0;
+        Timestamp.tv_nsec = (Remaining.tv_sec > 0 ? 10000000 : (Remaining.tv_nsec < 10000000 ? Remaining.tv_nsec : 10000000));
+        nanosleep(&Timestamp, &Elapsed);
+        Timestamp.tv_nsec -= Elapsed.tv_nsec;
+        if (Timestamp.tv_nsec <= Remaining.tv_nsec)
+        {
+            Remaining.tv_nsec -= Timestamp.tv_nsec;
+        }
+        else
+        {
+            Remaining.tv_sec--;
+            Remaining.tv_nsec = (1000000 - (Timestamp.tv_nsec - Remaining.tv_nsec));
+        }
+        
+        if (Remaining.tv_sec < 0 || (!Remaining.tv_sec && Remaining.tv_nsec <= 0))
+        {
+            return ETIMEDOUT;
+        }
+    }
+    
+    return Result;
+}
+#endif
 
 bool ZEMutex::Lock(ZEUInt Milliseconds)
 {

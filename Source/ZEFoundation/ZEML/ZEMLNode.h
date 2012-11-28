@@ -38,10 +38,10 @@
 #define __ZEML_NODE_H__
 
 #include "ZEMLItem.h"
-#include "ZEDS\ZEList.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZEString.h"
-#include "ZEDS\ZEVariant.h"
+#include "ZEDS/ZEList.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEVariant.h"
 #include "ZEEndian.h"
 
 class ZEFile;

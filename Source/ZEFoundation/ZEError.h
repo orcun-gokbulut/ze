@@ -123,9 +123,7 @@ enum ZEErrorType
 				}\
 			}\
 			while(false)
-    #endif
-
-    #ifdef ZE_PLATFORM_COMPILER_GCC
+    #else
 		#define zeDebugCheck(Condition, ...) \
 			do \
 			{\

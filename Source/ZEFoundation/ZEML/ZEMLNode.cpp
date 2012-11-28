@@ -36,7 +36,7 @@
 #include "ZEMLNode.h"
 #include "ZEMLProperty.h"
 #include "ZEMLDataProperty.h"
-#include "ZEFile\ZEFile.h"
+#include "ZEFile/ZEFile.h"
 
 ZEMLNode::ZEMLNode()
 {

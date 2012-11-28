@@ -35,7 +35,7 @@
 
 #include "ZEMLProperty.h"
 #include "ZEError.h"
-#include "ZEFile\ZEFile.h"
+#include "ZEFile/ZEFile.h"
 #include "ZEEndian.h"
 
 ZEMLProperty::ZEMLProperty()

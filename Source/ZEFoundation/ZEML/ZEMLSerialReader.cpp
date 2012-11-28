@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMLSerialReader.h"
-#include "ZEFile\ZEFile.h"
+#include "ZEFile/ZEFile.h"
 #include "ZEEndian.h"
 
 ZEMLSerialReader::ZEMLSerialReader(ZEFile* File)

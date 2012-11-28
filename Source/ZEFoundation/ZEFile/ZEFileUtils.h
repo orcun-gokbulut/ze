@@ -58,6 +58,7 @@
     #include "fcntl.h"
     #include <time.h>
     #include <dirent.h>
+    #include <sys/stat.h>
 
 	typedef time_t ZEFileTimeOS;
 

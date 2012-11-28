@@ -38,8 +38,8 @@
 #define __ZEML_TYPE_H__
 
 #include "ZETypes.h"
-#include "ZEDS\ZEList.h"
-#include "ZEDS\ZEString.h"
+#include "ZEDS/ZEList.h"
+#include "ZEDS/ZEString.h"
 
 #define ZEML_ITEM_FILE_IDENTIFIER	'Z'
 #define ZEML_MAX_NAME_SIZE			256
