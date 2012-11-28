@@ -41,6 +41,11 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEError.h"
 
+#ifdef ZE_PLATFORM_UNIX
+    #define sprintf_s snprintf
+#endif
+
+
 static bool ParseArgumentFormat(const char* ArgumentFormat, char** Parameters, ZESize Count)
 {
 	ZESize ParameterIndex = 0;

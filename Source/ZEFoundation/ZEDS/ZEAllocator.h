@@ -191,8 +191,6 @@ class ZESmartAllocator : public ZEAllocatorBase<Type>
 	public:
 		inline bool Allocate(Type** Pointer, ZESize NewSize)
 		{
-			ZEInt A = Exponent;
-
 			if (NewSize != 0)
 			{
 				if ((NewSize > this->Size) || (NewSize < LowerLimit))
@@ -225,7 +223,7 @@ class ZESmartAllocator : public ZEAllocatorBase<Type>
 			{	
 				if (OldPointer != NULL)		
 				{
-					ObjectCopy(*Pointer, OldPointer, (OldSize > NewSize ? NewSize : OldSize));
+                    ZEAllocatorBase<Type>::ObjectCopy(*Pointer, OldPointer, (OldSize > NewSize ? NewSize : OldSize));
 					delete[] OldPointer;
 				}
 			}

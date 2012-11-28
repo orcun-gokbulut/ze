@@ -38,8 +38,8 @@
 #define __ZEML_SERIAL_READER_H__
 
 #include "ZETypes.h"
-#include "ZEDS\ZEVariant.h"
-#include "ZEDS\ZEString.h"
+#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEString.h"
 #include "ZEMLItem.h"
 
 class ZEFile;

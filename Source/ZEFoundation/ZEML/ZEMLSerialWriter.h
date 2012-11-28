@@ -38,8 +38,8 @@
 #define __ZEML_SERIAL_WRITER_H__
 
 #include "ZETypes.h"
-#include "ZEDS\ZEString.h"
-#include "ZEDS\ZEVariant.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEVariant.h"
 
 class ZEFile;
 

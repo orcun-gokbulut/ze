@@ -248,7 +248,7 @@ ZECharacter ZECharacter::Upper() const
 	char* OutputBuffer = (char*)WideBuffer;
 	ZESize WideCharacterSize = sizeof(wchar_t);
 
-	char* InputBuffer = &Characters[0];
+	char* InputBuffer = (char*)&Characters[0];
 	ZESize CharacterSize = Size;
 
 	iconv_t ConversionDefinition = iconv_open("WCHAR_T", "UTF-8");
@@ -310,7 +310,7 @@ ZECharacter ZECharacter::Lower() const
 	char* OutputBuffer = (char*)WideBuffer;
 	ZESize WideCharacterSize = 4;
 
-	char* InputBuffer = &Characters[0];
+	char* InputBuffer = (char*)&Characters[0];
 	ZESize CharacterSize = Size;
 
 	iconv_t ConversionDefinition = iconv_open("WCHAR_T", "UTF-8");
@@ -461,7 +461,7 @@ ZECharacter::operator wchar_t() const
 	char* OutputBuffer = (char*)&Temp;
 	ZESize WideCharacterSize = 4;
 
-	char* InputBuffer = &Characters[0];
+	char* InputBuffer = (char*)&Characters[0];
 	ZESize CharacterSize = Size;
 
 	iconv_t ConversionDefinition = iconv_open("WCHAR_T", "UTF-8");
