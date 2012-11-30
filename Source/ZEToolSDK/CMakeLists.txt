@@ -59,6 +59,4 @@ ze_add_library(ZEToolAPI
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZETFontFile ZETMapFile ZETModelFile ZETMaterialFile ZETCommon
-	INSTALL
-	INSTALL_DESTINATION "ZEToolAPI"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

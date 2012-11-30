@@ -41,6 +41,4 @@ ze_add_source(ZETResourceFilePart.h		Sources Headers)
 ze_add_library(ZETCommon 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	INSTALL
-	INSTALL_DESTINATION "ZEToolAPI/ZETCommon"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

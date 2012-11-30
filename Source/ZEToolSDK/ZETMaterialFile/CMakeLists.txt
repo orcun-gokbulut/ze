@@ -43,6 +43,4 @@ ze_add_source(ZETMaterialFileFormat.cpp		Sources)
 ze_add_library(ZETMaterialFile 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	INSTALL
-	INSTALL_DESTINATION "ZEToolAPI/ZETMaterialFile"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

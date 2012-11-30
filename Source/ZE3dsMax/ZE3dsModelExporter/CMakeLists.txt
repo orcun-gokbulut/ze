@@ -54,8 +54,6 @@ ze_add_library(ZE3dsModelExporter
 	LIBS ZEFoundation ZEToolAPI ZE3dsProgressDialog
 		core geom gfx mesh maxutil maxscrpt paramblk2 igame
 	INSTALL
-	INSTALL_DESTINATION "Tools/Exporters/ZE3dsMax"
-	INSTALL_COMPONENT Tools
 	DLL)
 	
 set(LOCAL_WARNING_FLAGS /W3)

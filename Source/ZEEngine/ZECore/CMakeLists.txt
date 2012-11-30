@@ -99,6 +99,4 @@ ze_add_library(ZECore
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION "ZEEngine/ZECore"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

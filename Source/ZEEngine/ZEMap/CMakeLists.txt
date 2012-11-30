@@ -46,6 +46,4 @@ ze_add_library(ZEMap
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION "ZEEngine/ZEMap"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

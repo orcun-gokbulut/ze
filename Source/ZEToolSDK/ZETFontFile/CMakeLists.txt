@@ -43,6 +43,4 @@ ze_add_source(ZETFontFile.h			Sources Headers)
 ze_add_library(ZETFontFile 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	INSTALL
-	INSTALL_DESTINATION "ZEToolAPI/ZETFontFile"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

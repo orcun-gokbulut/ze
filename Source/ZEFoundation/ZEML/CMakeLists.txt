@@ -58,9 +58,7 @@ ze_add_library(ZEML
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEML
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)
 
 ze_add_test(ZEMLTests
 	SOURCES ${Tests}

@@ -35,16 +35,16 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-ze_add_cmake_project(ZE3dsMaxScripts
-	SOURCES	CMakeLists.txt
-		ToolbarIcons.pdn
-		zeCanvasExport.ms
-		ZEMap.mcr
-		ZEModelBone.mcr
-		ZEModelMesh.mcr
-		ZEModelPhysicalShape.mcr
-		ZEToolbarIcons_16a.bmp
-		ZEToolbarIcons_16i.bmp
-		ZEToolbarIcons_24a.bmp
-		ZEToolbarIcons_24i.bmp
-		zineklogo.bmp)
+ze_add_source(ToolbarIcons.pdn				Sources ZEFC)
+ze_add_source(zeCanvasExport.ms				Sources ZEFC)
+ze_add_source(ZEMap.mcr						Sources ZEFC)
+ze_add_source(ZEModelBone.mcr				Sources ZEFC)
+ze_add_source(ZEModelMesh.mcr				Sources ZEFC)
+ze_add_source(ZEModelPhysicalShape.mcr		Sources ZEFC)
+ze_add_source(ZEToolbarIcons_16a.bmp		Sources ZEFC)
+ze_add_source(ZEToolbarIcons_16i.bmp		Sources ZEFC)
+ze_add_source(ZEToolbarIcons_24a.bmp		Sources ZEFC)
+ze_add_source(ZEToolbarIcons_24i.bmp		Sources ZEFC)
+ze_add_source(zineklogo.bmp					Sources ZEFC)
+  
+ze_add_cmake_project(ZE3dsMaxScripts SOURCES ${Sources})

@@ -116,9 +116,7 @@ ze_add_library(ZEMath
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEMath
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)
 	
 ze_add_test(ZEMathTests
 	SOURCES ${Tests}

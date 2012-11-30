@@ -44,6 +44,4 @@ ze_add_library(ZESpatial
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation ZEDS ZEMath
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZESpatial
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

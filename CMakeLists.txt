@@ -104,8 +104,6 @@ include(ze_qt)
 add_subdirectory(CMake)
 add_subdirectory(Source)
 
-get_property(fancy_lib_location TARGET ZEFC PROPERTY LOCATION)
-message (STATUS "fancy_lib_location == ${fancy_lib_location}")
 
 ## Install & Packing
 #########################################################################################
