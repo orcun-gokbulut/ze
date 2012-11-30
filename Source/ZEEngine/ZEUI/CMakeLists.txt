@@ -86,6 +86,4 @@ ze_add_library(ZEUI
 	LIBS ZEFoundation 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	INSTALL
-	INSTALL_DESTINATION "ZEEngine/ZEUI"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

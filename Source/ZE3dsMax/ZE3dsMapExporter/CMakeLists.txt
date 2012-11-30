@@ -39,13 +39,13 @@ ze_add_source(ZE3dsMapExporterDLLEntry.cpp		Sources)
 ze_add_source(ZE3dsMapExporterDLLEntry.h		Sources)
 ze_add_source(ZE3dsMapExporter.h				Sources)
 ze_add_source(ZE3dsMapExporter.cpp				Sources)
-ze_add_source(ZE3dsMapExporterDescription.h		Sources)
+ze_add_source(ZE3dsMapExporterDescription.h		Sources ZEFC)
 ze_add_source(ZE3dsMapExporterDescription.cpp	Sources)
 ze_add_source(ZE3dsMapExporterProcess.cpp		Sources)
 ze_add_source(ZE3dsMapExporterOptions.h			Sources)
 ze_add_source(ZE3dsMapExporterOptions.cpp		Sources)
-ze_add_source(ZEMapExporterOptionsDialog.h			Sources QtMocs)
-ze_add_source(ZEMapExporterOptionsDialog.cpp			Sources)
+ze_add_source(ZEMapExporterOptionsDialog.h		Sources QtMocs)
+ze_add_source(ZEMapExporterOptionsDialog.cpp	Sources)
 ze_add_source(ZE3dsMapExporterResources.rc		Sources)
 ze_add_source(ZE3dsMapExporterResources.h		Sources)
 ze_add_source(ZE3dsMapExporter.def				Sources)
@@ -61,8 +61,6 @@ ze_add_library(ZE3dsMapExporter
 	LIBS ZEFoundation ZEToolAPI ZE3dsProgressDialog
 		core geom gfx mesh maxutil maxscrpt paramblk2 igame QtCore4 QtGui4 QWinWidget ZEProgressDialog
 	INSTALL
-	INSTALL_DESTINATION "Tools/Exporters/ZE3dsMax"
-	INSTALL_COMPONENT Tools
 	DLL)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

@@ -44,6 +44,4 @@ ze_add_library(ZERegEx
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation TRE
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZERegEx
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

@@ -62,6 +62,4 @@ ze_add_library(ZEPhysics
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION "ZEEngine/ZEPhysics"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

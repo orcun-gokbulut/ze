@@ -45,6 +45,4 @@ ze_add_source(ZETMapOctree.h				Sources)
 ze_add_library(ZETMapFile 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	INSTALL
-	INSTALL_DESTINATION "ZEToolAPI/ZETMapFile"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

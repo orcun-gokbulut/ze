@@ -74,9 +74,7 @@ ze_add_library(ZEFile
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
     LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEFile
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)
 
 ze_add_test(ZEFileTests
 	SOURCES ${Tests}

@@ -62,6 +62,4 @@ ze_add_library(ZEModel
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION "ZEEngine/ZEModel"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

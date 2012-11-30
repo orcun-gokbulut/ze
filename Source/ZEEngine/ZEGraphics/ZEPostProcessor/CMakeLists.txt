@@ -61,6 +61,4 @@ ze_add_source(ZEPPVelocityInputNode.h		Sources Headers)
 ze_add_library(ZEPostProcessor 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	INSTALL
-	INSTALL_DESTINATION "ZEEngine/ZEGraphics/ZEPostProcessor"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)
