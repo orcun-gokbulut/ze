@@ -83,13 +83,12 @@ ze_add_source(ZETimeCounter.h			Headers)
 ze_add_source(ZETimeCounter.cpp			Sources)
 ze_add_source(ZETimeCounterTests.cpp	Tests)
 
-ze_add_library(ZEFoundation 
+ze_add_library(ZEFoundation
+	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket ZEML ZERegEx
 	SOURCES ${Sources} 
-	HEADERS ${Headers}
-    LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket ZEThread ZESerialPort ZETask ZEML
-	INSTALL)
+	HEADERS ${Headers})
 
-ze_combine_libraries(ZEFoundationStatic ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket ZEThread ZESerialPort ZETask ZEML)
+ze_combine_libraries(ZEFoundation LIBS ZEFoundation ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket ZEML ZERegEx)
 
 ze_add_test(ZEFoundationTests
 	SOURCES ${Tests}

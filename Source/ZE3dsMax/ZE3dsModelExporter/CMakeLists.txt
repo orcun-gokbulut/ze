@@ -53,7 +53,6 @@ ze_add_library(ZE3dsModelExporter
 	SOURCES ${Sources}
 	LIBS ZEFoundation ZEToolAPI ZE3dsProgressDialog
 		core geom gfx mesh maxutil maxscrpt paramblk2 igame
-	INSTALL
 	DLL)
 	
 set(LOCAL_WARNING_FLAGS /W3)

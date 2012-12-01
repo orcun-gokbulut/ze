@@ -45,5 +45,4 @@ ze_add_source(ZETerrainVertexBuffer.h		Sources)
 ze_add_library(ZETerrain 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL)
+	LIBS ZEFoundation)

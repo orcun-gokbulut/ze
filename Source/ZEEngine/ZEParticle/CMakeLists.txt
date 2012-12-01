@@ -73,5 +73,4 @@ ze_add_source(ZEParticleRandomAccelerationOperator.h	Sources Headers ZEPP)
 ze_add_library(ZEParticle 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL)
+	LIBS ZEFoundation)

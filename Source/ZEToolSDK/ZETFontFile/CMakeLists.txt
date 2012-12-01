@@ -42,5 +42,4 @@ ze_add_source(ZETFontFile.h			Sources Headers)
 
 ze_add_library(ZETFontFile 
 	SOURCES ${Sources}
-	HEADERS ${Headers}
-	INSTALL)
+	HEADERS ${Headers})

@@ -42,5 +42,4 @@ ze_add_source(ZETMaterialFileFormat.cpp		Sources)
 
 ze_add_library(ZETMaterialFile 
 	SOURCES ${Sources}
-	HEADERS ${Headers}
-	INSTALL)
+	HEADERS ${Headers})

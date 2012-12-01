@@ -101,8 +101,7 @@ ze_add_source(ZEStringWriter.h			Sources Headers)
 ze_add_library(ZEDS 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL)
+	LIBS ZEFoundation)
 	
 ze_add_test(ZEDSTests 
 	SOURCES ${Tests}
