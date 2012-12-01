@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIRadioButtonControl.h"
-#include "ZEFontResource.h"
+#include "ZEFontResourceBitmap.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGraphics/ZEUIMaterial.h"
@@ -104,7 +104,7 @@ void ZEUIRadioButtonControl::SetMaterial(ZEMaterial* Material)
 ZEUIRadioButtonControl::ZEUIRadioButtonControl()
 {
 	State = ZE_UI_RBS_UNCHECKED;
-	Label.SetFont(ZEFontResource::LoadResource("OldEnglish.zefont"));
+	Label.SetFontResource(ZEFontResourceBitmap::LoadResource("OldEnglish.zefont"));
 	Label.SetText(ZEString("Test"));
 
 	Box.SetWidth(24);

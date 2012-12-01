@@ -35,7 +35,7 @@
 
 #include "ZEUIPortalMapStatisticsControl.h"
 #include "ZEDS/ZEString.h"
-#include "ZEUI/ZEFontResource.h"
+#include "ZEUI/ZEFontResourceBitmap.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZECore/ZECore.h"
@@ -103,7 +103,7 @@ ZEUIPortalMapStatisticsControl::ZEUIPortalMapStatisticsControl()
 	TotalPortalCount->SetWidth(250.0f);
 	TotalPortalCount->SetHeight(25.0f);
 	TotalPortalCount->SetPosition(ZEVector2(0.0f, 0.0f));
-	TotalPortalCount->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
+	TotalPortalCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	TotalPortalCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(TotalPortalCount);
 
@@ -111,7 +111,7 @@ ZEUIPortalMapStatisticsControl::ZEUIPortalMapStatisticsControl()
 	CulledPortalCount->SetWidth(250.0f);
 	CulledPortalCount->SetHeight(25.0f);
 	CulledPortalCount->SetPosition(ZEVector2(0.0f, 25.0f));
-	CulledPortalCount->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
+	CulledPortalCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	CulledPortalCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(CulledPortalCount);
 
@@ -119,7 +119,7 @@ ZEUIPortalMapStatisticsControl::ZEUIPortalMapStatisticsControl()
 	DrawedPortalCount->SetWidth(250.0f);
 	DrawedPortalCount->SetHeight(25.0f);
 	DrawedPortalCount->SetPosition(ZEVector2(0.0f, 50.0f));
-	DrawedPortalCount->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
+	DrawedPortalCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	DrawedPortalCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(DrawedPortalCount);
 
@@ -127,7 +127,7 @@ ZEUIPortalMapStatisticsControl::ZEUIPortalMapStatisticsControl()
 	TotalPolygonCount->SetWidth(250.0f);
 	TotalPolygonCount->SetHeight(25.0f);
 	TotalPolygonCount->SetPosition(ZEVector2(0.0f, 100.0f));
-	TotalPolygonCount->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
+	TotalPolygonCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	TotalPolygonCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(TotalPolygonCount);
 
@@ -135,7 +135,7 @@ ZEUIPortalMapStatisticsControl::ZEUIPortalMapStatisticsControl()
 	CulledPolygonCount->SetWidth(250.0f);
 	CulledPolygonCount->SetHeight(25.0f);
 	CulledPolygonCount->SetPosition(ZEVector2(0.0f, 125.0f));
-	CulledPolygonCount->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
+	CulledPolygonCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	CulledPolygonCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(CulledPolygonCount);
 
@@ -143,7 +143,7 @@ ZEUIPortalMapStatisticsControl::ZEUIPortalMapStatisticsControl()
 	DrawedPolygonCount->SetWidth(250.0f);
 	DrawedPolygonCount->SetHeight(25.0f);
 	DrawedPolygonCount->SetPosition(ZEVector2(0.0f, 150.0f));
-	DrawedPolygonCount->SetFont(ZEFontResource::LoadResource("Courier New.zeFont"));
+	DrawedPolygonCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	DrawedPolygonCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(DrawedPolygonCount);
 

@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUTextEditControl.h"
-#include "ZEFontResource.h"
+#include "ZEFontResourceBitmap.h"
 #include "ZEUIRenderer.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 
@@ -116,7 +116,7 @@ ZEUITextEditControl::ZEUITextEditControl()
 	TextDisplayer.SetText("Single Line Text Edit");
 	TextDisplayer.SetTextWrap(false);
 	TextDisplayer.SetFontSize(ZEVector2::One);
-	TextDisplayer.SetFont(ZEFontResource::LoadResource("OldEnglish.zeFont"));
+	TextDisplayer.SetFontResource(ZEFontResourceBitmap::LoadResource("OldEnglish.zeFont"));
 
 	SetWidth(400);
 	SetHeight(24);
