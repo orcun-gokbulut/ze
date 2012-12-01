@@ -110,5 +110,4 @@ ze_add_source(ZEViewPort.h 							Sources Headers)
 ze_add_library(ZEGraphics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation libfreeimage
-	INSTALL)
+	LIBS ZEFoundation libfreeimage)

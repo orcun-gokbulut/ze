@@ -82,5 +82,4 @@ ze_add_source(ZEWeather.h				Sources Header)
 
 ze_add_library(ZEGame 
 	SOURCES ${Sources}
-	HEADERS ${Headers}
-	INSTALL)
+	HEADERS ${Headers})

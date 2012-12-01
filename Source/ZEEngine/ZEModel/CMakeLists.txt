@@ -61,5 +61,4 @@ ze_add_source(ZEModelResource.h				Sources Headers)
 ze_add_library(ZEModel 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL)
+	LIBS ZEFoundation)

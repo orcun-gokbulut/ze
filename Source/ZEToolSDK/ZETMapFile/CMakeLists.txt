@@ -44,5 +44,4 @@ ze_add_source(ZETMapOctree.h				Sources)
 
 ze_add_library(ZETMapFile 
 	SOURCES ${Sources}
-	HEADERS ${Headers}
-	INSTALL)
+	HEADERS ${Headers})

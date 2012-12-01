@@ -60,7 +60,6 @@ ze_add_library(ZE3dsMapExporter
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
 	LIBS ZEFoundation ZEToolAPI ZE3dsProgressDialog
 		core geom gfx mesh maxutil maxscrpt paramblk2 igame QtCore4 QtGui4 QWinWidget ZEProgressDialog
-	INSTALL
 	DLL)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

@@ -45,5 +45,4 @@ ze_add_source(ZEMapResource.h		Sources Headers)
 ze_add_library(ZEMap 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL)
+	LIBS ZEFoundation)

@@ -155,8 +155,7 @@ ze_add_source(ZEDecompressorBMPRLE.h					Sources)
 ze_add_library(ZETexture 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation libfreeimage libATICompress ZEDirect3D9
-	INSTALL)
+	LIBS ZEFoundation libfreeimage libATICompress ZEDirect3D9)
 
 ze_add_test(ZETextureTests 
 	SOURCES ${Tests}

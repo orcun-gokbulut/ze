@@ -115,8 +115,7 @@ endif()
 ze_add_library(ZEMath 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL)
+	LIBS ZEFoundation)
 	
 ze_add_test(ZEMathTests
 	SOURCES ${Tests}

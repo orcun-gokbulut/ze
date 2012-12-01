@@ -45,5 +45,4 @@ ze_add_source(ZEUDPServer.h							Sources Headers)
 ze_add_library(ZENetwork 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation ws2_32
-	INSTALL)
+	LIBS ZEFoundation ws2_32)

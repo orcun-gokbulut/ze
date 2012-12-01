@@ -58,5 +58,7 @@ ze_add_source(ZETOutput.cpp			Sources)
 ze_add_library(ZEToolAPI 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZETFontFile ZETMapFile ZETModelFile ZETMaterialFile ZETCommon
-	INSTALL)
+	LIBS ZETFontFile ZETMapFile ZETModelFile ZETMaterialFile ZETCommon)
+
+ze_combine_libraries(ZEToolAPI
+	LIBS ZEToolAPI ZETFontFile ZETMapFile ZETModelFile ZETMaterialFile ZETCommon)
