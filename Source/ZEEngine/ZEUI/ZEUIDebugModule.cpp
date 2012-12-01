@@ -53,8 +53,10 @@
 #include "ZEUI/ZEUIMultiLineTextEdit.h"
 #include "ZEUI/ZEUIRadioButtonControl.h"
 #include "ZEUI/ZEUIBorderedFrameControl.h"
+#include "ZEFontResourceBitmap.h"
 
 #include <Windows.h>
+
 
 bool ZEUIDebugModule::Initialize()
 {
@@ -75,7 +77,7 @@ bool ZEUIDebugModule::Initialize()
 		Grid = ZEGrid::CreateInstance();
 
 	ZEUITextControl* Control  = new ZEUITextControl();
-	Control->SetFont(ZEFontResource::LoadResource("OldEnglish.ZEFONT"));
+	Control->SetFontResource(ZEFontResourceBitmap::LoadResource("OldEnglish.ZEFONT"));
 	Control->SetText("Gokay Test");
 	zeGame->UIManager->AddControl(Control);
 	Control->SetPosition(ZEVector2::Zero);

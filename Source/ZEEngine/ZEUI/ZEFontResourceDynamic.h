@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETFontFile.cpp
+ Zinek Engine - ZEFontResourceDynamic.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,73 +33,67 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETFontFile.h"
-#include <stdio.h>
-#include <memory.h>
+#pragma once
+#ifndef	__ZE_FONT_RESOURCE_DYNAMIC_H__
+#define __ZE_FONT_RESOURCE_DYNAMIC_H__
 
-#define ZEFONTFILE_HEADER									((ZEUInt32)((ZEUInt32)'ZEFF' + (ZEUInt32)'FONT'))
+#include "ft2build.h"
+#include "freetype\freetype.h"
+#include "freetype\ftglyph.h"
 
-struct ZEFontFileHeader
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEVector.h"
+
+#include "ZEGraphics\ZETexture2D.h"
+#include "ZEGraphics\ZEUIMaterial.h"
+#include "ZEUI\ZEFontResource.h"
+#include "ZEUI\ZEUIRectangle.h"
+
+class ZEFontResourceDynamic : public ZEFontResource
 {
-	ZEUInt32				Header;
-	ZEUInt32				TextureCount;
-	ZEFontChar		Characters[256];
+	private:
+		FT_Library							Library;
+		FT_Face								Face;
+
+		ZEUInt32							HorizontalOutputDPI;
+		ZEUInt32							VerticalOutputDPI;
+		ZEInt32								PointFactor;
+
+		ZEString							FontFile;
+		ZEUInt32							FontSize;
+		bool								FontSupportsKerning;
+
+		ZEArray<ZEFontCharacter>			FontCharacters;
+		ZEVector2							LastCharacterPosition;
+
+		ZEUInt32							LastTextureId;
+		ZEUInt32							LastTextureLine;
+
+		ZEArray<ZETexture2D*>				Textures;
+
+		void								SetFontFile(ZEString FontFilePath);
+		void								SetFontSize(ZEUInt32 FontSize);
+		void								CreateNewTexture(ZEUInt32 Width, ZEUInt32 Height);
+
+											ZEFontResourceDynamic();
+											~ZEFontResourceDynamic();
+
+	public:
+		virtual const char*					GetResourceType() const;
+		virtual ZEFontResourceType			GetFontResourceType() const;
+
+		ZEUInt32							GetFontSize() const;
+
+		virtual const ZEFontCharacter&		GetCharacter(char Character);
+		virtual const ZEFontCharacter&		GetCharacter(char CurrentChar, char NextChar, ZEInt64& KerningDistance);
+
+		ZETexture2D*						GetTexture(ZEUInt32 TextureId);
+
+		static ZEFontResourceDynamic*		LoadSharedResource(const ZEString& FileName, ZEUInt32 FontSize);
+		static void							CacheResource(const ZEString& FileName, ZEUInt32 FontSize);
+
+		static ZEFontResourceDynamic*		LoadResource(const ZEString& FileName, ZEUInt32 FontSize);
+		static ZEFontResourceDynamic*		LoadResource(ZEFile* ResourceFile, ZEUInt32 FontSize);
+
 };
-
-bool ZEFont::ReadFromFile(const char* Filename)
-{
-	ZEFontFileHeader	FileHeader;
-	FILE* File = fopen(Filename, "rb");
-	if (File == NULL)
-	{
-		// Error Error
-		return false;
-	}
-
-	fread(&FileHeader, sizeof(ZEFontFileHeader), 1, File);
-	if (FileHeader.Header != ZEFONTFILE_HEADER)
-	{
-		// Error Error
-		fclose(File);	
-		return false;
-	}
-
-	memcpy(Characters, FileHeader.Characters, sizeof(ZEFontChar) * ZEFONTFILE_CHARACTERCOUNT);
-
-	Textures.SetCount((ZESize)FileHeader.TextureCount);
-	for (ZESize I = 0; I < (ZESize)FileHeader.TextureCount; I++)
-	{
-		Textures[I].ReadFromResourceFile(File);
-	}
-
-	return true;
-}
-
-bool ZEFont::WriteToFile(const char* Filename)
-{
-	ZEFontFileHeader	FileHeader;
-	
-	FILE* File = fopen(Filename, "wb");
-	if (File == NULL)
-	{
-		// Error Error
-		return false;
-	}
-
-	FileHeader.Header = ZEFONTFILE_HEADER;
-	FileHeader.TextureCount = (ZEUInt32)Textures.GetCount();
-	memcpy(FileHeader.Characters, Characters, sizeof(ZEFontChar) * ZEFONTFILE_CHARACTERCOUNT);
-
-	fwrite(&FileHeader, sizeof(ZEFontFileHeader), 1, File);
-
-
-	for (ZESize I = 0; I < (ZESize)FileHeader.TextureCount; I++)
-		Textures[I].WriteToResourceFile(File);
-
-	return true;
-}
-
-ZEFont::~ZEFont()
-{
-
-}
+#endif

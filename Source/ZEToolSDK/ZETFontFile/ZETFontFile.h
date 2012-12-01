@@ -44,7 +44,7 @@
 
 #define ZEFONTFILE_CHARACTERCOUNT 256
 
-class ZEFontCharacter
+class ZEFontChar
 {
 	public:
 		ZEUInt32						TextureId;
@@ -55,7 +55,7 @@ class ZEFont
 {
 	public:
 		ZEArray<ZEResourceInternalFile>		Textures;
-		ZEFontCharacter						Characters[ZEFONTFILE_CHARACTERCOUNT];
+		ZEFontChar							Characters[ZEFONTFILE_CHARACTERCOUNT];
 
 		bool								ReadFromFile(const char* Filename);
 		bool								WriteToFile(const char* Filename);

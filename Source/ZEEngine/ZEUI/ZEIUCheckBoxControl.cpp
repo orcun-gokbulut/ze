@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEIUCheckBoxControl.h"
-#include "ZEFontResource.h"
+#include "ZEFontResourceBitmap.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGraphics/ZEUIMaterial.h"
@@ -116,7 +116,7 @@ void ZEUICheckBoxControl::SetMaterial(ZEMaterial* Material)
 ZEUICheckBoxControl::ZEUICheckBoxControl()
 {
 	State = ZE_UI_CBS_UNCHECKED;
-	Label.SetFont(ZEFontResource::LoadResource("OldEnglish.zefont"));
+	Label.SetFontResource(ZEFontResourceBitmap::LoadResource("OldEnglish.zefont"));
 	Label.SetText(ZEString("Test"));
 
 	IsTriState = false;

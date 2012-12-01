@@ -38,11 +38,13 @@
 #define __ZE_UI_TEXT_CONTROL__
 
 #include "ZEUIControl.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMath/ZEVector.h"
+#include "ZEDS\ZEString.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEFontResource.h"
+#include "ZEGraphics\ZEUIMaterial.h"
 
 class ZEUIRenderer;
-class ZEFontResource;
+
 class ZEUITextControl : public ZEUIControl
 {
 	private:
@@ -51,9 +53,9 @@ class ZEUITextControl : public ZEUIControl
 		bool							TextWrap;
 		ZEFontResource*					FontResource;
 		ZEVector2						FontSize;
+		ZEMaterial*						Material;
 
 	public:
-
 		ZEUIRectangle					Output;
 
 		void							SetText(const ZEString& Value);
@@ -65,8 +67,8 @@ class ZEUITextControl : public ZEUIControl
 		void							SetTextWrap(bool Wrap);
 		bool							GetTextWrap();
 
-		void							SetFont(ZEFontResource* FontResource);
-		ZEFontResource*					GetFont();
+		void							SetFontResource(ZEFontResource* FontResource);
+		ZEFontResource*					GetFontResource();
 
 		void							SetFontSize(const ZEVector2& FontSize);
 		const ZEVector2&				GetFontSize();

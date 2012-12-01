@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIMultiLineTextEdit.h"
-#include "ZEFontResource.h"
+#include "ZEFontResourceBitmap.h"
 #include "ZEUIRenderer.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 
@@ -118,7 +118,7 @@ ZEUIMultiLineTextEdit::ZEUIMultiLineTextEdit()
 	TextDisplayer.SetText("Multi Line Text Edit");
 	TextDisplayer.SetTextWrap(true);
 	TextDisplayer.SetFontSize(ZEVector2::One);
-	TextDisplayer.SetFont(ZEFontResource::LoadResource("OldEnglish.zeFont"));
+	TextDisplayer.SetFontResource(ZEFontResourceBitmap::LoadResource("OldEnglish.zeFont"));
 
 	SetPosition(ZEVector2::Zero);
 	TextDisplayer.SetPosition(ZEVector2(1,1));

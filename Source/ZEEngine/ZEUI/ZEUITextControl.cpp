@@ -35,7 +35,6 @@
 
 #include "ZEUITextControl.h"
 #include "ZEUIRenderer.h"
-#include "ZEFontResource.h"
 #include "ZEGraphics/ZETexture2D.h"
 
 void ZEUITextControl::SetText(const ZEString& Value)
@@ -48,7 +47,7 @@ const ZEString& ZEUITextControl::GetText()
 	return Text;
 }
 
-void ZEUITextControl::SetFont(ZEFontResource* FontResource)
+void ZEUITextControl::SetFontResource(ZEFontResource* FontResource)
 {
 	if (this->FontResource != NULL)
 		this->FontResource->Release();
@@ -59,7 +58,7 @@ void ZEUITextControl::SetFont(ZEFontResource* FontResource)
 		FontResource->AddReferance();
 }
 
-ZEFontResource* ZEUITextControl::GetFont()
+ZEFontResource* ZEUITextControl::GetFontResource()
 {
 	return FontResource;
 }
@@ -112,12 +111,18 @@ void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 	ZEVector2 CharacterSize;
 
 	Temporary.Positions.LeftUp = ControlRectangle.LeftUp;
-
+	
 	Output.ZOrder = ZOrder;
 	for (ZESize I = 0; I < Size; I++)
 	{
-		const ZEFontCharacter& CurrCharacter = FontResource->GetCharacter(Narrow[I]);
+		ZEInt64 KerningDistance = 0;
+		const ZEFontCharacter CurrCharacter = (I < Size - 1) ? FontResource->GetCharacter(Narrow[I], Narrow[I + 1], KerningDistance) : FontResource->GetCharacter(Narrow[I]);
+		const ZEFontCharacter NextChar = (I < Size - 1) ? FontResource->GetCharacter(Narrow[I + 1]) : FontResource->GetCharacter(Narrow[I]);
 
+		float HorizontalBearingY = 0;
+
+		if(FontResource->GetFontResourceType() == ZE_FRT_BITMAP)
+		{
 		ZEVector2::Substution(CharacterSize, CurrCharacter.CoordinateRectangle.RightDown, CurrCharacter.CoordinateRectangle.LeftUp);
 		ZEVector2::Multiply(CharacterSize, CharacterSize, FontSize);
 		ZEVector2::Multiply(CharacterSize, CharacterSize, ZEVector2((float)CurrCharacter.Texture->GetWidth(), (float)CurrCharacter.Texture->GetHeight()));
@@ -139,13 +144,44 @@ void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 
 		ZEVector2::Add(Temporary.Positions.RightDown, Temporary.Positions.LeftUp, CharacterSize);
 		Temporary.Texcoords = CurrCharacter.CoordinateRectangle;
+		}
+		else
+		{
+			ZEVector2::Substution(CharacterSize, CurrCharacter.CoordinateRectangle.RightDown, CurrCharacter.CoordinateRectangle.LeftUp);
+			ZEVector2::Multiply(CharacterSize, CharacterSize, ZEVector2((float)CurrCharacter.Texture->GetWidth(), (float)CurrCharacter.Texture->GetHeight()));
 
+			if (TextWrap)
+			{
+				if (Temporary.Positions.LeftUp.x + CharacterSize.x > ControlRectangle.RightDown.x)
+				{
+					Temporary.Positions.LeftUp.y += CurrCharacter.CharacterMetric.FontSize;
+					if (Temporary.Positions.LeftUp.y > ControlRectangle.RightDown.y)
+						return;
+
+					Temporary.Positions.LeftUp.x = ControlRectangle.LeftUp.x;
+				}
+			}
+			else
+				if (Temporary.Positions.LeftUp.x > ControlRectangle.RightDown.x)
+					return;
+
+			ZEVector2::Add(Temporary.Positions.RightDown, Temporary.Positions.LeftUp, CharacterSize);
+
+			HorizontalBearingY = CurrCharacter.CharacterMetric.FontSize - CurrCharacter.CharacterMetric.HorizontalBearingY - (CurrCharacter.CharacterMetric.FontSize - CurrCharacter.CharacterMetric.MaximumHeight);
+
+			Temporary.Positions.LeftUp.y += HorizontalBearingY;
+			Temporary.Positions.RightDown.y += HorizontalBearingY;
+
+			Temporary.Texcoords = CurrCharacter.CoordinateRectangle;
+		}
 
 	/*	if (Temporary.Positions.RightDown.y > ControlRectangle.RightDown.y)
 		{*/
 			if (!ZEUIRectangle::Clip(Output, Temporary, ControlRectangle)) // Muhtemel bug
 			{
-				Output.Material = CurrCharacter.Material;
+				((ZEUIMaterial*)Material)->SetTexture(CurrCharacter.Texture);
+				Material->UpdateMaterial();
+				Output.Material = Material;
 				Output.ZOrder = ZOrder;
 				Renderer->AddRectangle(Output);
 			}
@@ -157,18 +193,25 @@ void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 			Renderer->AddRectangle(Temporary);
 		}*/
 
+		if(FontResource->GetFontResourceType() == ZE_FRT_DYNAMIC)
+		{
+			Temporary.Positions.LeftUp.y -= HorizontalBearingY;
+			Temporary.Positions.RightDown.y -= HorizontalBearingY;
+			Temporary.Positions.RightDown.x += KerningDistance - CurrCharacter.CharacterMetric.HorizontalBearingX + NextChar.CharacterMetric.HorizontalBearingX;
+		}
+
 		Temporary.Positions.LeftUp.x = Temporary.Positions.RightDown.x;
 	}
 }
 
 void ZEUITextControl::SetMaterial(ZEMaterial* Material)
 {
-	
+	this->Material = Material;
 }
 
 ZEMaterial* ZEUITextControl::GetMaterial() const
 {
-	return NULL;
+	return Material;
 }
 
 ZEUITextControl::ZEUITextControl()

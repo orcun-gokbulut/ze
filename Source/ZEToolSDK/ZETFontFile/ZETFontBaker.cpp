@@ -191,7 +191,7 @@ bool ZEFontBaker:: BakeFont(ZEFont* Output,
 	for (ZEInt I = 0; I <= 255; I++)
 	{
 		if (I < StartCharacter || I > EndCharacter)
-			ZeroMemory(&Output->Characters[I], sizeof(ZEFontCharacter));
+			ZeroMemory(&Output->Characters[I], sizeof(ZEFontChar));
 	}
 
 	for (ZEInt I = StartCharacter; I <= EndCharacter; I++)

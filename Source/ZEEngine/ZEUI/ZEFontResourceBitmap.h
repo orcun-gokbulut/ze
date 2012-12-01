@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETFontFile.cpp
+ Zinek Engine - ZEFontResourceBitmap.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,73 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETFontFile.h"
-#include <stdio.h>
-#include <memory.h>
+#pragma once
+#ifndef	__ZE_FONT_RESOURCE_BITMAP_H__
+#define __ZE_FONT_RESOURCE_BITMAP_H__
 
-#define ZEFONTFILE_HEADER									((ZEUInt32)((ZEUInt32)'ZEFF' + (ZEUInt32)'FONT'))
+#include "ZEFontResource.h"
 
-struct ZEFontFileHeader
+class ZEFontResourceBitmap : public ZEFontResource
 {
-	ZEUInt32				Header;
-	ZEUInt32				TextureCount;
-	ZEFontChar		Characters[256];
+	private:
+		ZEArray<ZETexture2DResource*>		TextureResources;
+		ZEArray<ZETexture2D*>				Textures;
+		ZEArray<ZEFontCharacter>			Characters;
+
+											ZEFontResourceBitmap();
+											~ZEFontResourceBitmap();
+
+	public:
+		virtual const char*					GetResourceType() const;
+		virtual ZEFontResourceType			GetFontResourceType() const;
+
+		virtual const ZEFontCharacter&		GetCharacter(char Character);
+		virtual const ZEFontCharacter&		GetCharacter(char CurrentChar, char NextChar, ZEInt64& KerningDistance);
+
+		static ZEFontResourceBitmap*		LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+
+		static ZEFontResourceBitmap*		LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static ZEFontResourceBitmap*		LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
 };
 
-bool ZEFont::ReadFromFile(const char* Filename)
-{
-	ZEFontFileHeader	FileHeader;
-	FILE* File = fopen(Filename, "rb");
-	if (File == NULL)
-	{
-		// Error Error
-		return false;
-	}
-
-	fread(&FileHeader, sizeof(ZEFontFileHeader), 1, File);
-	if (FileHeader.Header != ZEFONTFILE_HEADER)
-	{
-		// Error Error
-		fclose(File);	
-		return false;
-	}
-
-	memcpy(Characters, FileHeader.Characters, sizeof(ZEFontChar) * ZEFONTFILE_CHARACTERCOUNT);
-
-	Textures.SetCount((ZESize)FileHeader.TextureCount);
-	for (ZESize I = 0; I < (ZESize)FileHeader.TextureCount; I++)
-	{
-		Textures[I].ReadFromResourceFile(File);
-	}
-
-	return true;
-}
-
-bool ZEFont::WriteToFile(const char* Filename)
-{
-	ZEFontFileHeader	FileHeader;
-	
-	FILE* File = fopen(Filename, "wb");
-	if (File == NULL)
-	{
-		// Error Error
-		return false;
-	}
-
-	FileHeader.Header = ZEFONTFILE_HEADER;
-	FileHeader.TextureCount = (ZEUInt32)Textures.GetCount();
-	memcpy(FileHeader.Characters, Characters, sizeof(ZEFontChar) * ZEFONTFILE_CHARACTERCOUNT);
-
-	fwrite(&FileHeader, sizeof(ZEFontFileHeader), 1, File);
-
-
-	for (ZESize I = 0; I < (ZESize)FileHeader.TextureCount; I++)
-		Textures[I].WriteToResourceFile(File);
-
-	return true;
-}
-
-ZEFont::~ZEFont()
-{
-
-}
+#endif
