@@ -79,7 +79,7 @@ void ZEPhysXPhysicalCloth::SetEnabled(bool IsEnabled /*= true*/)
 
 bool ZEPhysXPhysicalCloth::GetEnabled() const
 {
-	return ClothDesc.flags & ZE_CBF_STATIC == ZE_CBF_STATIC;
+	return (ClothDesc.flags & ZE_CBF_STATIC) == ZE_CBF_STATIC;
 }
 
 void ZEPhysXPhysicalCloth::SetPhysicalWorld(ZEPhysicalWorld* World)
@@ -127,7 +127,7 @@ void ZEPhysXPhysicalCloth::SetBendingMode(bool IsEnabled)
 
 bool ZEPhysXPhysicalCloth::GetBendingMode() const
 {
-	return ClothDesc.flags & ZE_CBF_BENDING == ZE_CBF_BENDING;
+	return (ClothDesc.flags & ZE_CBF_BENDING) == ZE_CBF_BENDING;
 }
 
 void ZEPhysXPhysicalCloth::SetBendingStiffness(float BendingStiffness)
@@ -161,7 +161,7 @@ void ZEPhysXPhysicalCloth::SetDampingMode(bool IsEnabled)
 
 bool ZEPhysXPhysicalCloth::GetDampingMode() const
 {
-	return ClothDesc.flags & ZE_CBF_DAMPING == ZE_CBF_DAMPING;
+	return (ClothDesc.flags & ZE_CBF_DAMPING) == ZE_CBF_DAMPING;
 }
 
 void ZEPhysXPhysicalCloth::SetDampingCoefficient(float DampingCoefficient)
@@ -195,7 +195,7 @@ void ZEPhysXPhysicalCloth::SetPressureMode(bool IsEnabled)
 
 bool ZEPhysXPhysicalCloth::GetPressureMode() const
 {
-	return ClothDesc.flags & ZE_CBF_PRESSURE == ZE_CBF_PRESSURE;
+	return (ClothDesc.flags & ZE_CBF_PRESSURE) == ZE_CBF_PRESSURE;
 }
 
 void ZEPhysXPhysicalCloth::SetPressure(float Pressure)
