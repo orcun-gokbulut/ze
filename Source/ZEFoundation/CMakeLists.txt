@@ -87,9 +87,9 @@ ze_add_library(ZEFoundation
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
     LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket ZEThread ZESerialPort ZETask ZEML
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)
+
+ze_combine_libraries(ZEFoundationStatic ZEDS ZEMath ZEFile ZESerialization ZEStateMachine ZESpatial ZESocket ZEThread ZESerialPort ZETask ZEML)
 
 ze_add_test(ZEFoundationTests
 	SOURCES ${Tests}

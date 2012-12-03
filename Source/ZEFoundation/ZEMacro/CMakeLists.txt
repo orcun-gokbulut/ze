@@ -56,6 +56,4 @@ ze_add_library(ZEMacro
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEMacro
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

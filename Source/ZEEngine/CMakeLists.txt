@@ -69,18 +69,20 @@ ze_add_source(ZESDK.h 						Sources Headers)
 ze_add_source(ZESDK.cpp 					Sources)
 
 
-ze_add_library(ZEEngineAPI 
+ze_add_library(ZEEngine 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEInterior ZEInterior ZEModel ZEParticle ZEAI ZETerrain ZENetwork ZETexture ZEModules
-	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI"
-	INSTALL_COMPONENT ZESDK)
-	
+	LIBS ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEMap ZEPortalMap ZEModel ZEParticle ZEAI ZETerrain ZENetwork ZETexture ZEModules
+	INSTALL)
+
+ze_add_library(ZEEnginePlugin 
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	LIBS ZEFoundation ZECore ZEMeta
+	INSTALL)
+		
 ze_add_executable(ZE 
 	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
-	LIBS ZEEngineAPI
-	INSTALL
-	INSTALL_DESTINATION Bin
-	INSTALL_COMPONENT Runtime)
+	LIBS ZEEngine
+	INSTALL)
 

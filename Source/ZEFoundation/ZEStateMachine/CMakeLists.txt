@@ -43,6 +43,4 @@ ze_add_source(ZEStateMachine.h			Sources Headers)
 ze_add_library(ZEStateMachine
 	SOURCES ${Sources} 
 	HEADERS ${Headers} 
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEStateMachine
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

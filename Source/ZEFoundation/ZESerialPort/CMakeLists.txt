@@ -44,6 +44,4 @@ ze_add_library(ZESerialPort
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZESerialPort
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

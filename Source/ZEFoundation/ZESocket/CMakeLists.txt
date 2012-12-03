@@ -48,9 +48,7 @@ ze_add_library(ZESocket
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
     LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZESocket
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)
 	
 #ze_add_test(ZESocketTests
 #	SOURCES ${Tests}

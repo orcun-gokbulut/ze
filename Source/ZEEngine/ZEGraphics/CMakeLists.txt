@@ -111,6 +111,4 @@ ze_add_library(ZEGraphics
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation libfreeimage
-	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZEGraphics"
-	INSTALL_COMPONENT Header)
+	INSTALL)

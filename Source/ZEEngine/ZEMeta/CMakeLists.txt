@@ -58,6 +58,4 @@ ze_add_library(ZEMeta
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZEMeta"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)
