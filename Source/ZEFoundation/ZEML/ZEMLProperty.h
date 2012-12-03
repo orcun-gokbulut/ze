@@ -38,8 +38,8 @@
 #define __ZEML_PROPERTY_H__
 
 #include "ZEMLItem.h"
-#include "ZEDS\ZEString.h"
-#include "ZEDS\ZEVariant.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEVariant.h"
 
 class ZEMLProperty : public ZEMLItem
 {

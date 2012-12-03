@@ -120,10 +120,10 @@ class ZEString
 		char*						Buffer;
 		ZEAllocatorBase<char>		Allocator;
 
-		bool						BufferChanged;
+		mutable bool						BufferChanged;
 
-		wchar_t*					WBuffer;
-		ZEAllocatorBase<wchar_t>	WAllocator;
+		mutable wchar_t*					WBuffer;
+		mutable ZEAllocatorBase<wchar_t>	WAllocator;
 
 	public:
 		void						SetBuffer(void* Buffer, ZESize Size);
@@ -198,8 +198,8 @@ class ZEString
 
 		const char*					ToCString() const;
 		std::string					ToStdString() const;
-		const wchar_t*				ToWCString();
-		std::wstring				ToWStdString();
+		const wchar_t*				ToWCString() const;
+		std::wstring				ToWStdString() const;
 		ZEInt8						ToInt8() const;
 		ZEInt16						ToInt16() const;
 		ZEInt32						ToInt32() const;

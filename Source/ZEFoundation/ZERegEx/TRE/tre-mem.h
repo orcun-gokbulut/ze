@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLItem.h
+ Zinek Engine - tre-mem.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,76 +33,69 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZEML_TYPE_H__
-#define __ZEML_TYPE_H__
+/*
+  tre-mem.h - TRE memory allocator interface
 
-#include "ZETypes.h"
-#include "ZEDS/ZEList.h"
-#include "ZEDS/ZEString.h"
+  This software is released under a BSD-style license.
+  See the file LICENSE for details and copyright.
 
-#define ZEML_ITEM_FILE_IDENTIFIER	'Z'
-#define ZEML_MAX_NAME_SIZE			256
+*/
 
-enum ZEMLItemType
-{
-	ZEML_IT_UNDEFINED,
-	ZEML_IT_FLOAT,
-	ZEML_IT_DOUBLE,
-	ZEML_IT_INT8,
-	ZEML_IT_INT16,
-	ZEML_IT_INT32,
-	ZEML_IT_INT64,
-	ZEML_IT_UINT8,
-	ZEML_IT_UINT16,
-	ZEML_IT_UINT32,
-	ZEML_IT_UINT64,
-	ZEML_IT_BOOLEAN,
-	ZEML_IT_STRING,
-	ZEML_IT_QUATERNION,
-	ZEML_IT_VECTOR2,
-	ZEML_IT_VECTOR3,
-	ZEML_IT_VECTOR4,
-	ZEML_IT_MATRIX3X3,
-	ZEML_IT_MATRIX4X4,
-	ZEML_IT_INLINE_DATA,
-	ZEML_IT_OFFSET_DATA,
-	ZEML_IT_NODE
-};
+#ifndef TRE_MEM_H
+#define TRE_MEM_H 1
 
-class ZEMLNode;
-class ZEFile;
+#include <stdlib.h>
 
-class ZEMLItem : public ZEListItem
-{
-	friend class ZEMLNode;
+#define TRE_MEM_BLOCK_SIZE 1024
 
-	protected:
-		ZEString			Name;
-		ZEUInt8				Type;
-		ZEMLItem*			Parent;
-		ZEUInt64			DataSize;
-		ZEUInt64			FilePosition;
+typedef struct tre_list {
+  void *data;
+  struct tre_list *next;
+} tre_list_t;
 
-		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading) = 0;
-		virtual bool		WriteSelf(ZEFile* File) = 0;
+typedef struct tre_mem_struct {
+  tre_list_t *blocks;
+  tre_list_t *current;
+  char *ptr;
+  size_t n;
+  int failed;
+  void **provided;
+} *tre_mem_t;
 
 
-		void				SetType(ZEMLItemType Type);
+tre_mem_t tre_mem_new_impl(int provided, void *provided_block);
+void *tre_mem_alloc_impl(tre_mem_t mem, int provided, void *provided_block,
+			 int zero, size_t size);
 
-							ZEMLItem();
-							~ZEMLItem();
+/* Returns a new memory allocator or NULL if out of memory. */
+#define tre_mem_new()  tre_mem_new_impl(0, NULL)
 
-	public:
-		ZEMLItemType		GetType() const;
+/* Allocates a block of `size' bytes from `mem'.  Returns a pointer to the
+   allocated block or NULL if an underlying malloc() failed. */
+#define tre_mem_alloc(mem, size) tre_mem_alloc_impl(mem, 0, NULL, 0, size)
 
-		ZEUInt64			GetFilePosition();
+/* Allocates a block of `size' bytes from `mem'.  Returns a pointer to the
+   allocated block or NULL if an underlying malloc() failed.  The memory
+   is set to zero. */
+#define tre_mem_calloc(mem, size) tre_mem_alloc_impl(mem, 0, NULL, 1, size)
 
-		virtual ZEUInt64	GetTotalSize() = 0;
-		ZEUInt64			GetDataSize();
+#ifdef TRE_USE_ALLOCA
+/* alloca() versions.  Like above, but memory is allocated with alloca()
+   instead of malloc(). */
 
-		void				SetName(const ZEString& Name);
-		const ZEString&		GetName() const;				
-};
+#define tre_mem_newa() \
+  tre_mem_new_impl(1, alloca(sizeof(struct tre_mem_struct)))
 
-#endif
+#define tre_mem_alloca(mem, size)					      \
+  ((mem)->n >= (size)							      \
+   ? tre_mem_alloc_impl((mem), 1, NULL, 0, (size))			      \
+   : tre_mem_alloc_impl((mem), 1, alloca(TRE_MEM_BLOCK_SIZE), 0, (size)))
+#endif /* TRE_USE_ALLOCA */
+
+
+/* Frees the memory allocator and all memory allocated with it. */
+void tre_mem_destroy(tre_mem_t mem);
+
+#endif /* TRE_MEM_H */
+
+/* EOF */

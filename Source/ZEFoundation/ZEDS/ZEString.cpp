@@ -248,7 +248,7 @@ ZECharacter ZECharacter::Upper() const
 	char* OutputBuffer = (char*)WideBuffer;
 	ZESize WideCharacterSize = sizeof(wchar_t);
 
-	char* InputBuffer = &Characters[0];
+	char* InputBuffer = (char*)&Characters[0];
 	ZESize CharacterSize = Size;
 
 	iconv_t ConversionDefinition = iconv_open("WCHAR_T", "UTF-8");
@@ -310,7 +310,7 @@ ZECharacter ZECharacter::Lower() const
 	char* OutputBuffer = (char*)WideBuffer;
 	ZESize WideCharacterSize = 4;
 
-	char* InputBuffer = &Characters[0];
+	char* InputBuffer = (char*)&Characters[0];
 	ZESize CharacterSize = Size;
 
 	iconv_t ConversionDefinition = iconv_open("WCHAR_T", "UTF-8");
@@ -461,7 +461,7 @@ ZECharacter::operator wchar_t() const
 	char* OutputBuffer = (char*)&Temp;
 	ZESize WideCharacterSize = 4;
 
-	char* InputBuffer = &Characters[0];
+	char* InputBuffer = (char*)&Characters[0];
 	ZESize CharacterSize = Size;
 
 	iconv_t ConversionDefinition = iconv_open("WCHAR_T", "UTF-8");
@@ -1721,30 +1721,26 @@ const char* ZEString::ToCString() const
 	return Buffer;
 }
 
-const wchar_t* ZEString::ToWCString()
+const wchar_t* ZEString::ToWCString() const
 {
 	if (BufferChanged)
 	{
 		#ifdef ZE_PLATFORM_WINDOWS
-
-		ZESize RequiredSize = MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, 0, 0);
-		WAllocator.Reallocate(&WBuffer, RequiredSize);
-		MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, WBuffer, RequiredSize);
-
+			ZESize RequiredSize = MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, 0, 0);
+			WAllocator.Reallocate(&WBuffer, RequiredSize);
+			MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, WBuffer, RequiredSize);
 		#elif defined ZE_PLATFORM_UNIX
+			ZESize RequiredSize = CalculateRequiredSize(Buffer);
+			WAllocator.Reallocate(&WBuffer, (RequiredSize + 1) * sizeof(wchar_t));
+			char* TempWideBuffer = (char*)WBuffer;
+			char* CurrentBuffer = (char*)Buffer;
 
-		ZESize RequiredSize = CalculateRequiredSize(Buffer);
-		WAllocator.Reallocate(&WBuffer, (RequiredSize + 1) * sizeof(wchar_t));
-		char* TempWideBuffer = (char*)WBuffer;
-        char* CurrentBuffer = (char*)Buffer;
-
-		ZESize InputSize = strlen(Buffer);
-		ZESize OutputSize = RequiredSize * sizeof(wchar_t);
-		iconv_t ConversionDescriptor = iconv_open("WCHAR_T", "UTF-8");
-		iconv(ConversionDescriptor, &CurrentBuffer, &InputSize, &TempWideBuffer, &OutputSize);
-		iconv_close(ConversionDescriptor);
-		WBuffer[RequiredSize] = L'\0';
-
+			ZESize InputSize = strlen(Buffer);
+			ZESize OutputSize = RequiredSize * sizeof(wchar_t);
+			iconv_t ConversionDescriptor = iconv_open("WCHAR_T", "UTF-8");
+			iconv(ConversionDescriptor, &CurrentBuffer, &InputSize, &TempWideBuffer, &OutputSize);
+			iconv_close(ConversionDescriptor);
+			WBuffer[RequiredSize] = L'\0';
 		#endif
 
 		BufferChanged = false;
@@ -1754,7 +1750,7 @@ const wchar_t* ZEString::ToWCString()
 
 }
 
-std::wstring ZEString::ToWStdString()
+std::wstring ZEString::ToWStdString() const
 {
 	return std::wstring(this->ToWCString());
 }
