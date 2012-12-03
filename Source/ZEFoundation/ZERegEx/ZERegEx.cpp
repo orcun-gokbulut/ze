@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLItem.h
+ Zinek Engine - ZERegEx.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,76 +33,98 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZEML_TYPE_H__
-#define __ZEML_TYPE_H__
-
-#include "ZETypes.h"
-#include "ZEDS/ZEList.h"
+#include "ZERegEx.h"
 #include "ZEDS/ZEString.h"
 
-#define ZEML_ITEM_FILE_IDENTIFIER	'Z'
-#define ZEML_MAX_NAME_SIZE			256
+#include "ZERegEx.h"
+#include "TRE/regex.h"
 
-enum ZEMLItemType
+bool ZERegEx::Compile(const ZEString& RegEx, ZERegExFlags Flags)
 {
-	ZEML_IT_UNDEFINED,
-	ZEML_IT_FLOAT,
-	ZEML_IT_DOUBLE,
-	ZEML_IT_INT8,
-	ZEML_IT_INT16,
-	ZEML_IT_INT32,
-	ZEML_IT_INT64,
-	ZEML_IT_UINT8,
-	ZEML_IT_UINT16,
-	ZEML_IT_UINT32,
-	ZEML_IT_UINT64,
-	ZEML_IT_BOOLEAN,
-	ZEML_IT_STRING,
-	ZEML_IT_QUATERNION,
-	ZEML_IT_VECTOR2,
-	ZEML_IT_VECTOR3,
-	ZEML_IT_VECTOR4,
-	ZEML_IT_MATRIX3X3,
-	ZEML_IT_MATRIX4X4,
-	ZEML_IT_INLINE_DATA,
-	ZEML_IT_OFFSET_DATA,
-	ZEML_IT_NODE
-};
+	if (Code == NULL)
+		Code = new regex_t;
 
-class ZEMLNode;
-class ZEFile;
+	if (regcomp((regex_t*)Code, RegEx, 0) != 0)
+	{
+		delete Code;
+		return false;
+	}
 
-class ZEMLItem : public ZEListItem
+	return true;
+}
+
+bool ZERegEx::Match(const ZEString& String)
 {
-	friend class ZEMLNode;
+	if (Code == NULL)
+		return false;
 
-	protected:
-		ZEString			Name;
-		ZEUInt8				Type;
-		ZEMLItem*			Parent;
-		ZEUInt64			DataSize;
-		ZEUInt64			FilePosition;
+	return regexec((regex_t*)Code, String.ToCString(), 0, NULL, NULL) == 0;
+}
 
-		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading) = 0;
-		virtual bool		WriteSelf(ZEFile* File) = 0;
+bool ZERegEx::Match(const ZEString& String, ZEArray<ZERegExMatch>& Matches)
+{
+	if (Code == NULL)
+		return false;
 
+	Matches.SetCount(((regex_t*)Code)->re_nsub);
+	regmatch_t Temp[64];
 
-		void				SetType(ZEMLItemType Type);
+	if (regexec((regex_t*)Code, String.ToCString(), ((regex_t*)Code)->re_nsub, Temp, NULL) != 0)
+		return false;
 
-							ZEMLItem();
-							~ZEMLItem();
+	for (int I = 0; I < ((regex_t*)Code)->re_nsub; I++)
+	{
+		Matches[I].Offset = Temp[I].rm_so;
+		Matches[I].Size = Temp[I].rm_eo - Temp[I].rm_so;
+	}
 
-	public:
-		ZEMLItemType		GetType() const;
+	return true;
+}
 
-		ZEUInt64			GetFilePosition();
+bool ZERegEx::Match(const ZEString& RegEx, const ZEString& String, ZERegExFlags Flags)
+{
+	regex_t Code;
 
-		virtual ZEUInt64	GetTotalSize() = 0;
-		ZEUInt64			GetDataSize();
+	if (regcomp(&Code, RegEx, 0) != 0)
+		return false;
 
-		void				SetName(const ZEString& Name);
-		const ZEString&		GetName() const;				
-};
+	return regexec(&Code, String.ToCString(), 0, NULL, NULL) == 0;
+}
 
-#endif
+bool ZERegEx::Match(const ZEString& RegEx, const ZEString& String, ZEArray<ZERegExMatch>& Matches, ZERegExFlags Flags)
+{
+	regex_t Code;
+
+	if (regcomp(&Code, RegEx, 0) != 0)
+		return false;
+
+	Matches.SetCount(Code.re_nsub);
+	regmatch_t Temp[64];
+
+	if (regexec(&Code, String.ToCString(), Code.re_nsub, Temp, NULL) != 0)
+		return false;
+
+	for (int I = 0; I < Code.re_nsub; I++)
+	{
+		Matches[I].Offset = Temp[I].rm_so;
+		Matches[I].Size = Temp[I].rm_eo - Temp[I].rm_so;
+	}
+
+	return true;
+}
+
+ZERegEx::ZERegEx()
+{
+	Code = NULL;
+}
+
+ZERegEx::ZERegEx(const ZEString& RegEx, ZERegExFlags Flags)
+{
+	Compile(RegEx, Flags);
+}
+
+ZERegEx::~ZERegEx()
+{
+	if (Code != NULL)
+		delete Code;
+}

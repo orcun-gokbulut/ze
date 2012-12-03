@@ -38,6 +38,7 @@
 #include "ZEError.h"
 #include "ZEFile.h"
 #include "ZEPathManager.h"
+#include "ZEPathUtils.h"
 
 
 #pragma warning(push)
@@ -48,10 +49,8 @@
 #include <stdio.h>
 
 #if defined ZE_PLATFORM_WINDOWS
-	
 	#include <cerrno>
-#include "ZEPathUtils.h"
-
+    #include "ZEPathUtils.h"
     static ZEString GetErrorString(ZEInt ErrorId)
     {
         int Result;
@@ -76,25 +75,23 @@
         return Error;
     }
 
-	static FILE* FileOpen(ZEString Path, ZEString Mode)
+	static FILE* FileOpen(const ZEString& Path, const ZEString& Mode)
 	{
 		return _wfopen(Path.ToWCString(), Mode.ToWCString());
 	}
 
 #elif defined ZE_PLATFORM_UNIX
-
 	#include <errno.h>
 	#include <fcntl.h>
 	#include <string.h>
 
 	static ZEString GetErrorString(ZEInt32 ErrorId)
 	{
-		char* Result;
 		ZEString Error;
 
-		char ErrorString[256];
+		char ErrorString[256] = "UNKNOWN";
 
-		Result = strerror_r((int)ErrorId, ErrorString, 256);
+        void* Result = (void*)strerror_r((int)ErrorId, ErrorString, 256);
 		if (Result == NULL)
 		{
 			// Use returned string to form error message
@@ -111,17 +108,19 @@
 		return Error;
 	}
 
-	static FILE* FileOpen(ZEString Path, ZEString Mode)
+	static FILE* FileOpen(const ZEString& Path, const ZEString& Mode)
 	{
 		return fopen(Path.ToCString(), Mode.ToCString());
 	}
-
 #endif
 
 
-#if defined(ZE_PLATFORM_COMPILER_GCC)
-	#define _fseeki64 fseeko64
-	#define _ftelli64 ftello64
+#if defined(ZE_PLATFORM_LINUX)
+    #define _fseeki64 fseeko64
+    #define _ftelli64 ftello64
+#elif defined(ZE_PLATFORM_MACOSX)
+	#define _fseeki64 fseeko
+	#define _ftelli64 ftello
 #endif
 
 

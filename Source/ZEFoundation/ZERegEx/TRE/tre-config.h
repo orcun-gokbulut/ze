@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLItem.h
+ Zinek Engine - tre-config.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,76 +33,55 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZEML_TYPE_H__
-#define __ZEML_TYPE_H__
+/* tre-config.h.  This file defines all compile time definitions
+   that are needed in `regex.h' for Win32. */
 
-#include "ZETypes.h"
-#include "ZEDS/ZEList.h"
-#include "ZEDS/ZEString.h"
+/* Define to 1 if you have `alloca', as a function or macro. */
+#define HAVE_ALLOCA 1
 
-#define ZEML_ITEM_FILE_IDENTIFIER	'Z'
-#define ZEML_MAX_NAME_SIZE			256
+/* Define to 1 if you have <alloca.h> and it should be used (not on Ultrix).
+ */
+#define HAVE_ALLOCA_H 1
 
-enum ZEMLItemType
-{
-	ZEML_IT_UNDEFINED,
-	ZEML_IT_FLOAT,
-	ZEML_IT_DOUBLE,
-	ZEML_IT_INT8,
-	ZEML_IT_INT16,
-	ZEML_IT_INT32,
-	ZEML_IT_INT64,
-	ZEML_IT_UINT8,
-	ZEML_IT_UINT16,
-	ZEML_IT_UINT32,
-	ZEML_IT_UINT64,
-	ZEML_IT_BOOLEAN,
-	ZEML_IT_STRING,
-	ZEML_IT_QUATERNION,
-	ZEML_IT_VECTOR2,
-	ZEML_IT_VECTOR3,
-	ZEML_IT_VECTOR4,
-	ZEML_IT_MATRIX3X3,
-	ZEML_IT_MATRIX4X4,
-	ZEML_IT_INLINE_DATA,
-	ZEML_IT_OFFSET_DATA,
-	ZEML_IT_NODE
-};
+/* Define to 1 if you have the <libutf8.h> header file. */
+/* #undef HAVE_LIBUTF8_H */
 
-class ZEMLNode;
-class ZEFile;
+/* Define to 1 if the system has the type `reg_errcode_t'. */
+/* #undef HAVE_REG_ERRCODE_T */
 
-class ZEMLItem : public ZEListItem
-{
-	friend class ZEMLNode;
+/* Define to 1 if you have the <sys/types.h> header file. */
+#define HAVE_SYS_TYPES_H 1
 
-	protected:
-		ZEString			Name;
-		ZEUInt8				Type;
-		ZEMLItem*			Parent;
-		ZEUInt64			DataSize;
-		ZEUInt64			FilePosition;
+/* Define to 1 if you have the <wchar.h> header file. */
+#define HAVE_WCHAR_H 1
 
-		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading) = 0;
-		virtual bool		WriteSelf(ZEFile* File) = 0;
+/* Define if you want to enable approximate matching functionality. */
+#define TRE_APPROX 1
 
+/* Define to enable multibyte character set support. */
+#define TRE_MULTIBYTE 1
 
-		void				SetType(ZEMLItemType Type);
+/* Define to the absolute path to the system regex.h */
+/* #undef TRE_SYSTEM_REGEX_H_PATH */
 
-							ZEMLItem();
-							~ZEMLItem();
+/* Define if you want TRE to use alloca() instead of malloc() when allocating
+   memory needed for regexec operations. */
+#define TRE_USE_ALLOCA 1
 
-	public:
-		ZEMLItemType		GetType() const;
+/* Define to include the system regex.h from TRE regex.h */
+/* #undef TRE_USE_SYSTEM_REGEX_H */
 
-		ZEUInt64			GetFilePosition();
+/* Define to enable wide character (wchar_t) support. */
+#define TRE_WCHAR 1
 
-		virtual ZEUInt64	GetTotalSize() = 0;
-		ZEUInt64			GetDataSize();
+/* TRE version string. */
+#define TRE_VERSION "0.8.0"
 
-		void				SetName(const ZEString& Name);
-		const ZEString&		GetName() const;				
-};
+/* TRE version level 1. */
+#define TRE_VERSION_1 0
 
-#endif
+/* TRE version level 2. */
+#define TRE_VERSION_2 8
+
+/* TRE version level 3. */
+#define TRE_VERSION_3 0

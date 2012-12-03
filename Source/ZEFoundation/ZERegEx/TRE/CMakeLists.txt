@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEMLItem.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,79 +30,36 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZEML_TYPE_H__
-#define __ZEML_TYPE_H__
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZETypes.h"
-#include "ZEDS/ZEList.h"
-#include "ZEDS/ZEString.h"
+ze_add_source(regcomp.c 				Sources)
+ze_add_source(regerror.c 				Sources)
+ze_add_source(regex.h 					Sources)
+ze_add_source(regexec.c 				Sources)
+ze_add_source(tre-ast.c 				Sources)
+ze_add_source(tre-ast.h 				Sources)
+ze_add_source(tre-compile.c 			Sources)
+ze_add_source(tre-compile.h 			Sources)
+ze_add_source(tre-config.h.in 			Sources)
+ze_add_source(tre-internal.h 			Sources)
+ze_add_source(tre-match-approx.c 		Sources)
+ze_add_source(tre-match-backtrack.c 	Sources)
+ze_add_source(tre-match-parallel.c 		Sources)
+ze_add_source(tre-match-utils.h 		Sources)
+ze_add_source(tre-mem.c 				Sources)
+ze_add_source(tre-mem.h 				Sources)
+ze_add_source(tre-parse.c 				Sources)
+ze_add_source(tre-parse.h 				Sources)
+ze_add_source(tre-stack.c 				Sources)
+ze_add_source(tre-stack.h 				Sources)
+ze_add_source(tre.h 					Sources)
+ze_add_source(xmalloc.c 				Sources)
+ze_add_source(xmalloc.h 				Sources)
 
-#define ZEML_ITEM_FILE_IDENTIFIER	'Z'
-#define ZEML_MAX_NAME_SIZE			256
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS HAVE_CONFIG_H)
 
-enum ZEMLItemType
-{
-	ZEML_IT_UNDEFINED,
-	ZEML_IT_FLOAT,
-	ZEML_IT_DOUBLE,
-	ZEML_IT_INT8,
-	ZEML_IT_INT16,
-	ZEML_IT_INT32,
-	ZEML_IT_INT64,
-	ZEML_IT_UINT8,
-	ZEML_IT_UINT16,
-	ZEML_IT_UINT32,
-	ZEML_IT_UINT64,
-	ZEML_IT_BOOLEAN,
-	ZEML_IT_STRING,
-	ZEML_IT_QUATERNION,
-	ZEML_IT_VECTOR2,
-	ZEML_IT_VECTOR3,
-	ZEML_IT_VECTOR4,
-	ZEML_IT_MATRIX3X3,
-	ZEML_IT_MATRIX4X4,
-	ZEML_IT_INLINE_DATA,
-	ZEML_IT_OFFSET_DATA,
-	ZEML_IT_NODE
-};
-
-class ZEMLNode;
-class ZEFile;
-
-class ZEMLItem : public ZEListItem
-{
-	friend class ZEMLNode;
-
-	protected:
-		ZEString			Name;
-		ZEUInt8				Type;
-		ZEMLItem*			Parent;
-		ZEUInt64			DataSize;
-		ZEUInt64			FilePosition;
-
-		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading) = 0;
-		virtual bool		WriteSelf(ZEFile* File) = 0;
-
-
-		void				SetType(ZEMLItemType Type);
-
-							ZEMLItem();
-							~ZEMLItem();
-
-	public:
-		ZEMLItemType		GetType() const;
-
-		ZEUInt64			GetFilePosition();
-
-		virtual ZEUInt64	GetTotalSize() = 0;
-		ZEUInt64			GetDataSize();
-
-		void				SetName(const ZEString& Name);
-		const ZEString&		GetName() const;				
-};
-
-#endif
+ze_add_library(TRE SOURCES ${Sources})

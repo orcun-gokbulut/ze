@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLItem.h
+ Zinek Engine - regex.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,76 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZEML_TYPE_H__
-#define __ZEML_TYPE_H__
+/*
+  regex.h - TRE legacy API
 
-#include "ZETypes.h"
-#include "ZEDS/ZEList.h"
-#include "ZEDS/ZEString.h"
+  This software is released under a BSD-style license.
+  See the file LICENSE for details and copyright.
 
-#define ZEML_ITEM_FILE_IDENTIFIER	'Z'
-#define ZEML_MAX_NAME_SIZE			256
+  This header is for source level compatibility with old code using
+  the <tre/regex.h> header which defined the TRE API functions without
+  a prefix.  New code should include <tre/tre.h> instead.
 
-enum ZEMLItemType
-{
-	ZEML_IT_UNDEFINED,
-	ZEML_IT_FLOAT,
-	ZEML_IT_DOUBLE,
-	ZEML_IT_INT8,
-	ZEML_IT_INT16,
-	ZEML_IT_INT32,
-	ZEML_IT_INT64,
-	ZEML_IT_UINT8,
-	ZEML_IT_UINT16,
-	ZEML_IT_UINT32,
-	ZEML_IT_UINT64,
-	ZEML_IT_BOOLEAN,
-	ZEML_IT_STRING,
-	ZEML_IT_QUATERNION,
-	ZEML_IT_VECTOR2,
-	ZEML_IT_VECTOR3,
-	ZEML_IT_VECTOR4,
-	ZEML_IT_MATRIX3X3,
-	ZEML_IT_MATRIX4X4,
-	ZEML_IT_INLINE_DATA,
-	ZEML_IT_OFFSET_DATA,
-	ZEML_IT_NODE
-};
+*/
 
-class ZEMLNode;
-class ZEFile;
+#ifndef TRE_REXEX_H
+#define TRE_REGEX_H 1
 
-class ZEMLItem : public ZEListItem
-{
-	friend class ZEMLNode;
+#include "tre.h"
 
-	protected:
-		ZEString			Name;
-		ZEUInt8				Type;
-		ZEMLItem*			Parent;
-		ZEUInt64			DataSize;
-		ZEUInt64			FilePosition;
+#ifndef TRE_USE_SYSTEM_REGEX_H
+#define regcomp	   tre_regcomp
+#define regerror   tre_regerror
+#define regexec	   tre_regexec
+#define regfree	   tre_regfree
+#endif /* TRE_USE_SYSTEM_REGEX_H */
 
-		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading) = 0;
-		virtual bool		WriteSelf(ZEFile* File) = 0;
+#define regacomp   tre_regacomp
+#define regaexec   tre_regaexec
+#define regancomp  tre_regancomp
+#define reganexec  tre_reganexec
+#define regawncomp tre_regawncomp
+#define regawnexec tre_regawnexec
+#define regncomp   tre_regncomp
+#define regnexec   tre_regnexec
+#define regwcomp   tre_regwcomp
+#define regwexec   tre_regwexec
+#define regwncomp  tre_regwncomp
+#define regwnexec  tre_regwnexec
 
-
-		void				SetType(ZEMLItemType Type);
-
-							ZEMLItem();
-							~ZEMLItem();
-
-	public:
-		ZEMLItemType		GetType() const;
-
-		ZEUInt64			GetFilePosition();
-
-		virtual ZEUInt64	GetTotalSize() = 0;
-		ZEUInt64			GetDataSize();
-
-		void				SetName(const ZEString& Name);
-		const ZEString&		GetName() const;				
-};
-
-#endif
+#endif /* TRE_REGEX_H */

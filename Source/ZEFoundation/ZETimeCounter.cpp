@@ -38,11 +38,15 @@
 #ifdef ZE_PLATFORM_WINDOWS
     #define WINDOWS_MEAN_AND_LEAN
     #include <windows.h>
-#endif
-
-#ifdef ZE_PLATFORM_UNIX
+#elif defined(ZE_PLATFORM_DARWIN)
+    #include <mach/clock.h>
+    #include <mach/mach.h>
+    #include <mach/mach_time.h>
+#elif defined(ZE_PLATFORM_UNIX)
     #include <time.h>
 #endif
+
+#include <time.h>
 
 static inline ZEUInt64 GetClock()
 {
@@ -50,9 +54,14 @@ static inline ZEUInt64 GetClock()
         LARGE_INTEGER Temp;
         QueryPerformanceCounter(&Temp);
         return Temp.QuadPart;
-    #endif
-
-    #ifdef ZE_PLATFORM_UNIX
+    #elif defined(ZE_PLATFORM_DARWIN)
+        clock_serv_t Clock;
+        mach_timespec_t TimeSpec;
+        host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &Clock);
+        clock_get_time(Clock, &TimeSpec);
+        mach_port_deallocate(mach_task_self(), Clock);
+        return (ZEUInt64)TimeSpec.tv_sec * (ZEUInt64)1000000000 + (ZEUInt64)TimeSpec.tv_nsec;
+    #elif ZE_PLATFORM_UNIX
         timespec Temp;
         clock_gettime(CLOCK_REALTIME, &Temp);
         return (ZEUInt64)Temp.tv_sec * (ZEUInt64)1000000000 + (ZEUInt64)Temp.tv_nsec;
@@ -65,9 +74,11 @@ static inline ZEUInt64 GetFreq()
         LARGE_INTEGER Temp;
         QueryPerformanceFrequency(&Temp);
         return Temp.QuadPart;
-    #endif
-
-    #ifdef ZE_PLATFORM_UNIX
+    #elif defined(ZE_PLATFORM_DARWIN)
+        mach_timebase_info_data_t Info;
+        mach_timebase_info(&Info);
+        return (ZEUInt64)((double) Info.numer / (double) Info.denom);
+    #elif ZE_PLATFORM_UNIX
         timespec Temp;
         clock_getres(CLOCK_REALTIME, &Temp);
         return (ZEUInt64)1000000000 / (ZEUInt64)Temp.tv_nsec;

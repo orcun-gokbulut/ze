@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLItem.h
+ Zinek Engine - tre-parse.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,76 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZEML_TYPE_H__
-#define __ZEML_TYPE_H__
+/*
+  tre-parse.c - Regexp parser definitions
 
-#include "ZETypes.h"
-#include "ZEDS/ZEList.h"
-#include "ZEDS/ZEString.h"
+  This software is released under a BSD-style license.
+  See the file LICENSE for details and copyright.
 
-#define ZEML_ITEM_FILE_IDENTIFIER	'Z'
-#define ZEML_MAX_NAME_SIZE			256
+*/
 
-enum ZEMLItemType
-{
-	ZEML_IT_UNDEFINED,
-	ZEML_IT_FLOAT,
-	ZEML_IT_DOUBLE,
-	ZEML_IT_INT8,
-	ZEML_IT_INT16,
-	ZEML_IT_INT32,
-	ZEML_IT_INT64,
-	ZEML_IT_UINT8,
-	ZEML_IT_UINT16,
-	ZEML_IT_UINT32,
-	ZEML_IT_UINT64,
-	ZEML_IT_BOOLEAN,
-	ZEML_IT_STRING,
-	ZEML_IT_QUATERNION,
-	ZEML_IT_VECTOR2,
-	ZEML_IT_VECTOR3,
-	ZEML_IT_VECTOR4,
-	ZEML_IT_MATRIX3X3,
-	ZEML_IT_MATRIX4X4,
-	ZEML_IT_INLINE_DATA,
-	ZEML_IT_OFFSET_DATA,
-	ZEML_IT_NODE
-};
+#ifndef TRE_PARSE_H
+#define TRE_PARSE_H 1
 
-class ZEMLNode;
-class ZEFile;
+/* Parse context. */
+typedef struct {
+  /* Memory allocator.	The AST is allocated using this. */
+  tre_mem_t mem;
+  /* Stack used for keeping track of regexp syntax. */
+  tre_stack_t *stack;
+  /* The parse result. */
+  tre_ast_node_t *result;
+  /* The regexp to parse and its length. */
+  const tre_char_t *re;
+  /* The first character of the entire regexp. */
+  const tre_char_t *re_start;
+  /* The first character after the end of the regexp. */
+  const tre_char_t *re_end;
+  int len;
+  /* Current submatch ID. */
+  int submatch_id;
+  /* Current position (number of literal). */
+  int position;
+  /* The highest back reference or -1 if none seen so far. */
+  int max_backref;
+  /* This flag is set if the regexp uses approximate matching. */
+  int have_approx;
+  /* Compilation flags. */
+  int cflags;
+  /* If this flag is set the top-level submatch is not captured. */
+  int nofirstsub;
+  /* The currently set approximate matching parameters. */
+  int params[TRE_PARAM_LAST];
+} tre_parse_ctx_t;
 
-class ZEMLItem : public ZEListItem
-{
-	friend class ZEMLNode;
+/* Parses a wide character regexp pattern into a syntax tree.  This parser
+   handles both syntaxes (BRE and ERE), including the TRE extensions. */
+reg_errcode_t
+tre_parse(tre_parse_ctx_t *ctx);
 
-	protected:
-		ZEString			Name;
-		ZEUInt8				Type;
-		ZEMLItem*			Parent;
-		ZEUInt64			DataSize;
-		ZEUInt64			FilePosition;
+#endif /* TRE_PARSE_H */
 
-		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading) = 0;
-		virtual bool		WriteSelf(ZEFile* File) = 0;
-
-
-		void				SetType(ZEMLItemType Type);
-
-							ZEMLItem();
-							~ZEMLItem();
-
-	public:
-		ZEMLItemType		GetType() const;
-
-		ZEUInt64			GetFilePosition();
-
-		virtual ZEUInt64	GetTotalSize() = 0;
-		ZEUInt64			GetDataSize();
-
-		void				SetName(const ZEString& Name);
-		const ZEString&		GetName() const;				
-};
-
-#endif
+/* EOF */
