@@ -53,12 +53,12 @@ endfunction()
 
 set(ze_check_parameters "PLATFORMS;COMPILERS;ARCHS")
 macro(ze_check)
+	set(CHECK_SUCCEEDED FALSE)
 	if (PARAMETER_PLATFORMS)
-		string(TOUPPER ${ZEBUILD_PLATFORM} PLATFORM_UPPER)
 		set(CHECK_SUCCEEDED FALSE)
 		foreach(ARG ${PARAMETER_PLATFORMS})
-			string(TOUPPER ${ARG} ARG_UPPER)
-			if (${ARG_UPPER} MATCHES ${PLATFORM_UPPER})
+			string(TOUPPER ${ARG} TEMP_UPPER)
+			if (ZEBUILD_PLATFORM_${TEMP_UPPER})
 				set(CHECK_SUCCEEDED TRUE)
 				break()
 			endif()
@@ -67,29 +67,13 @@ macro(ze_check)
 		set(CHECK_SUCCEEDED TRUE)
 	endif()
 
-    if (NOT CHECK_SUCCEEDED)
-        if (PARAMETER_PLATFORMS)
-            string(TOUPPER ${ZEBUILD_PLATFORM_BASE} PLATFORM_UPPER)
-            set(CHECK_SUCCEEDED FALSE)
-            foreach(ARG ${PARAMETER_PLATFORMS})
-                string(TOUPPER ${ARG} ARG_UPPER)
-                if ("${ARG_UPPER}" EQUAL "${PLATFORM_UPPER}")
-                    set(CHECK_SUCCEEDED TRUE)
-                    break()
-                endif()
-            endforeach()
-        else()
-            set(CHECK_SUCCEEDED TRUE)
-        endif()
-    endif()
-
 	if (CHECK_SUCCEEDED)
 		if (PARAMETER_ARCHS)
-			string(TOUPPER ${ZEBUILD_PLATFORM_ARCHITECTURE} PLATFORM_UPPER)
+			string(TOUPPER ${ZEBUILD_PLATFORM_ARCHITECTURE} TEMP_UPPER)
 			set(CHECK_SUCCEEDED FALSE)
 			foreach(ARG ${PARAMETER_ARCHS})
 				string(TOUPPER ${ARG} ARG_UPPER)
-				if (${ARG_UPPER} MATCHES ${PLATFORM_UPPER})
+				if (${ARG_UPPER} MATCHES ${TEMP_UPPER})
 					set(CHECK_SUCCEEDED TRUE)
 					break()
 				endif()
@@ -101,11 +85,11 @@ macro(ze_check)
 
 	if (CHECK_SUCCEEDED)
 		if (PARAMETER_COMPILERS)
-			string(TOUPPER ${ZEBUILD_PLATFORM_COMPILERS} PLATFORM_UPPER)
+			string(TOUPPER ${ZEBUILD_PLATFORM_COMPILERS} TEMP_UPPER)
 			set(CHECK_SUCCEEDED FALSE)
 			foreach(ARG ${PARAMETER_COMPILERS})
 				string(TOUPPER ${ARG} ARG_UPPER)
-				if (${ARG_UPPER} MATCHES ${PLATFORM_UPPER})
+				if (${ARG_UPPER} MATCHES ${TEMP_UPPER})
 					set(CHECK_SUCCEEDED TRUE)
 					break()
 				endif()
@@ -117,11 +101,11 @@ macro(ze_check)
 
 	if (CHECK_SUCCEEDED)
 		if (PLATFORM_FLAGS)
-			string(TOUPPER ${ZEBUILD_PLATFORM_ARCHITECTURE} PLATFORM_UPPER)
+			string(TOUPPER ${ZEBUILD_PLATFORM_ARCHITECTURE} TEMP_UPPER)
 			set(CHECK_SUCCEEDED FALSE)
 			foreach(ARG ${PARAMETER_ARCHS})
 				string(TOUPPER ${ARG} ARG_UPPER)
-				if (${ARG_UPPER} MATCHES ${PLATFORM_UPPER})
+				if (${ARG_UPPER} MATCHES ${TEMP_UPPER})
 					set(CHECK_SUCCEEDED TRUE)
 					break()
 				endif()
@@ -132,8 +116,60 @@ macro(ze_check)
 	endif()
 endmacro()
 
+function(ze_file_compiler)
+	parse_arguments(PARAMETER "CLASS;OUTPUT" "" ${ARGV})
+	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_INPUT)
+
+	get_property(ZEFC_BINARY_PATH TARGET ZEFC PROPERTY RUNTIME_OUTPUT_DIRECTORY)
+	add_custom_command(
+		COMMAND $<TARGET_FILE:ZEFC>
+		ARGS "\"${PARAMETER_INPUT}\" -C \"${PARAMETER_CLASS}\" -S \"${PARAMETER_OUTPUT}.cpp\" -H \"${PARAMETER_OUTPUT}.h\""
+		DEPENDS ${PARAMETER_INPUT} ZEFC
+		OUTPUT "${PARAMETER_OUTPUT}.cpp" "${PARAMETER_OUTPUT}.h")
+		
+	if (NOT EXISTS "${PARAMETER_OUTPUT}.h")
+		 file(WRITE "${PARAMETER_OUTPUT}.h"
+			"#pragma once\n\n"
+			"#include \"ZEData.h\"\n"
+			"#include \"ZETypes.h\"\n"
+			"\n"
+			"class ${PARAMETER_CLASS} : public ZEData\n"
+			"{\n"
+			"\tpublic:\n"
+				"\t\tvoid*\t\tGetData();\n"
+				"\t\tZESize\t\tGetSize();\n"
+			"};\n")			
+	endif()
+endfunction()
+
+function(ze_meta_compiler)
+	parse_arguments(PARAMETER "OUTPUT" "" ${ARGV})
+	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_INPUT)
+
+	add_custom_command(
+		COMMAND ${ZEBUILD_TOOL_PATH}\\zepp.exe
+		ARGS "\"${PARAMETER_INPUT}\" \"${PARAMETER_OUTPUT}\""
+		DEPENDS "${PARAMETER_INPUT}"
+		OUTPUT ${PARAMETER_OUTPUT})
+endfunction()
+
+function (ze_copy_files)
+	parse_arguments(PARAMETER "TARGET;BASE;DESTINATION" " " ${ARGV})
+
+	foreach(PARAMETER_FILE ${PARAMETER_DEFAULT_ARGS})
+		string(REPLACE ${PARAMETER_BASE} "\0" MODIFIED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE})
+		add_custom_command(
+			OUTPUT "${PARAMETER_DESTINATION}${MODIFIED_PATH}"
+			COMMAND ${CMAKE_COMMAND} 
+			ARGS "-E copy \"${PARAMETER_FILE}\" \"${PARAMETER_DESTINATION}${MODIFIED_PATH}\""
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			MAIN_DEPENDENCY ${PARAMETER_TARGET}
+			DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE})
+	endforeach()
+endfunction()
+
 function(ze_add_source)
-	parse_arguments(PARAMETER "${ze_check_parameters};ZEFC" "ZEPP;ZEDOC" ${ARGV})
+	parse_arguments(PARAMETER "${ze_check_parameters}" "ZEFC;ZEPP;ZEDOC" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
@@ -151,45 +187,24 @@ function(ze_add_source)
 
 	# Process File with ZEPP
 	if (PARAMETER_ZEPP)
-		add_custom_command(
-			COMMAND "${ZEBUILD_TOOL_PATH}/zepp.exe" 
-			ARGS "${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE}"
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE}
-			OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE}.ZEMeta.cpp)
-		list(APPEND ${PARAMETsER_FILE_LIST} ${PARAMETER_FILE}.ZEMeta.cpp)
-		
-		source_group("Generated" FILES ${PARAMETER_FILE}.ZEMeta.cpp)
-		set_property(SOURCE ${PARAMETER_FILE}.ZEMeta.cpp PROPERTY LANGUAGE CXX)
-		
+		ze_meta_compiler("${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE}"
+			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_FILE}.ZEMeta.cpp)
+			
+		source_group("Generated" FILES ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_FILE}.ZEMeta.cpp)
+		set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_FILE}.ZEMeta.cpp PROPERTY LANGUAGE CXX)
 		list(APPEND ${PARAMETER_SOURCE_LIST} ${PARAMETER_FILE}.ZEMeta.cpp)
 	endif()
 	
+	# Process File With ZEFC
 	if (PARAMETER_ZEFC)
-		message("${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE} -C ${PARAMETER_ZEFC} -S ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.cpp -H ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h")
-		get_property(ZEFC_BINARY_PATH TARGET ZEFC PROPERTY LOCATION)
-		add_custom_command(
-			COMMAND "${ZEFC_BINARY_PATH}" 
-			ARGS "${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE}" -C ${PARAMETER_ZEFC} -S "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.cpp" -H "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h"
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE} ZEFC
-			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.cpp ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h)
-		if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h)
-			 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h 
-			 	"#pragma once\n\n"
-				"#include \"ZEData.h\"\n"
-				"#include \"ZETypes.h\"\n"
-				"\n"
-				"class ${PARAMETER_ZEFC} : public ZEData\n"
-				"{\n"
-				"\tpublic:\n"
-					"\t\tvoid*\t\tGetData();\n"
-					"\t\tZESize\t\tGetSize();\n"
-				"};\n")			
-			 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.cpp "//Will be generated.")
-		endif()
-		list(APPEND ${PARAMETER_SOURCE_LIST} ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h)
-		list(APPEND ${PARAMETER_SOURCE_LIST} ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.cpp)
+		string(REPLACE  "." "_" PARAMETER_CLASS ${PARAMETER_FILE} )
+		ze_file_compiler(${CMAKE_CURRENT_SOURCE_DIR}/${PARAMETER_FILE} 
+			CLASS ${PARAMETER_CLASS} 
+			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_CLASS})
 	
-		source_group("Generated" FILES ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.cpp ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_ZEFC}.h)
+		list(APPEND ${PARAMETER_SOURCE_LIST} ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_CLASS}.h)
+		list(APPEND ${PARAMETER_SOURCE_LIST} ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_CLASS}.cpp)
+		source_group("Generated" FILES ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_CLASS}.cpp ${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_CLASS}.h)
 	endif()
 	
 	# Process File With ZEDOC
@@ -203,21 +218,10 @@ function(ze_add_source)
 	endforeach()
 	
 	set(${PARAMETER_SOURCE_LIST} ${${PARAMETER_SOURCE_LIST}} PARENT_SCOPE)
-	
-	# Debugging
-	if (ZEBUILD_VERBOSE)
-		message("ze_add_source") 
-		message("\t${PARAMETER_SOURCE_LIST} = ${${PARAMETER_SOURCE_LIST}}")
-		message("\tPARAMETER_ZEPP = ${PARAMETER_ZEPP}")
-		message("\tPARAMETER_ZEDOC= ${tPARAMETER_ZEDOC}")
-		foreach (SOURCE_LIST ${PARAMETER_SOURCE_LISTS})
-			message ("\t${SOURCE_LIST} = ${${SOURCE_LIST}}")
-		endforeach()
-	endif()
 endfunction()
 
 function(ze_add_executable)
-	parse_arguments(PARAMETER "SOURCES;LIBS;INSTALL_DESTINATION;INSTALL_COMPONENT;${ze_check_parameters}" "INSTALL;PLUGIN;CONSOLE" ${ARGV})
+	parse_arguments(PARAMETER "SOURCES;LIBS;DESTINATION;${ze_check_parameters}" "INSTALL;PLUGIN;CONSOLE" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
@@ -227,12 +231,20 @@ function(ze_add_executable)
 	# Get Target Name
 	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
 	
+	include_directories(
+		${CMAKE_CURRENT_BINARY_DIR}
+		${CMAKE_CURRENT_SOURCE_DIR})
+
 	# Compile
-	if ("${ZEBUILD_PLATFORM}" MATCHES "Windows")
-		if (PARAMETER_CONSOLE)
-			add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
-		else()
+	if (PARAMETER_CONSOLE)
+		add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
+	else()
+		if (ZEBUILD_PLATFORM_WINDOWS)
 			add_executable(${PARAMETER_TARGET} WIN32 ${PARAMETER_SOURCES})
+		elseif (ZEBUILD_PLATFORM_MACOSX OR ZEBUILD_PLATFORM_IOS)
+			add_executable(${PARAMETER_TARGET} MACOSX_BUNDLE ${PARAMETER_SOURCES})
+		else()
+			add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
 		endif()
 	else()
 		add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
@@ -242,6 +254,76 @@ function(ze_add_executable)
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_LIBS ${PARAMETER_LIBS})
 
+	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ZE_ENGINE)
+
+	# Static Analysis
+	if (ZEBUILD_STATIC_CHECKS_ENABLE)
+		if (ZEBUILD_ENABLE_STATIC_CHECKS)
+			if (ZEBUILD_STATIC_CHECKS_ENABLE_CPPCHECK)
+				add_cppcheck(${PARAMETER_TARGET})
+			endif()
+			
+			if (ZEBUILD_STATIC_CHECKS_ENABLE_PCLINT)
+				add_pc_lint(${PARAMETER_TARGET})
+			endif()
+		endif()
+	endif()
+	
+	# Copy dependecies
+	if (NOT PARAMETER_PLUGIN)
+        if (ZEBUILD_PLATFORM_WINDOWS)
+            FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Platform/${ZEBUILD_PLATFORM}/${ZEBUILD_PLATFORM_ARCHITECTURE}/Dll/*.dll" A)
+            FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Platform/${ZEBUILD_PLATFORM}/${ZEBUILD_PLATFORM_ARCHITECTURE}/Dll/$(ConfigurationName)/*.dll" B)
+            FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/$(ConfigurationName)" C)
+            add_custom_command(
+                TARGET ${PARAMETER_TARGET}
+                COMMAND "xcopy"
+                ARGS "${A}" "${C}" /D /Y)
+            add_custom_command(
+                TARGET ${PARAMETER_TARGET}
+                COMMAND "xcopy"
+                ARGS "${B}" "${C}" /D /Y)
+        endif()
+	endif()
+	
+	if (PARAMETER_INSTALL)
+		if (PARAMETER_DESTINATION)
+			set(PARAMETER_DESTINATION "Engine")
+		endif()
+		
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/${PARAMETER_DESTINATION})
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/Output/${PARAMETER_DESTINATION})
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/Output/${PARAMETER_DESTINATION})
+	endif()
+endfunction()
+
+function(ze_add_plugin)
+	parse_arguments(PARAMETER "SOURCES;LIBS;${ze_check_parameters}" "INSTALL;DLL" ${ARGV})
+
+	ze_check()
+	if (NOT CHECK_SUCCEEDED)
+		return()
+	endif()
+
+	# Get Target Name
+	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
+	
+	include_directories(
+		${CMAKE_CURRENT_BINARY_DIR}
+		${CMAKE_CURRENT_SOURCE_DIR})
+	
+	# Compile
+	add_library(${PARAMETER_TARGET} SHARED ${PARAMETER_SOURCES})
+  
+	set_property(TARGET ${PARAMETER_TARGET} PROPERTY SUFFIX ".zePlugin")
+	set_property(TARGET ${PARAMETER_TARGET} PROPERTY CLEAN_DIRECT_OUTPUT 1)
+
+	target_link_libraries(${PARAMETER_TARGET} ${PARAMETER_LIBS})
+	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
+	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_LIBS ${PARAMETER_LIBS})
+	
+	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ZE_PLUGIN)
+	
 	# Static Analysis
 	if (ZEBUILD_STATIC_CHECKS_ENABLE)
 		if (ZEBUILD_ENABLE_STATIC_CHECKS)
@@ -257,49 +339,14 @@ function(ze_add_executable)
 		
 	# Install
 	if (PARAMETER_INSTALL)
-		install(TARGETS ${PARAMERTER_TARGET} 
-			DESTINATION ${PARAMETER_INSTALL_DESTINATION} 
-			COMPONENT ${PARAMETER_INSTALL_COMPONENT} 
-			CONFIGURATIONS Release)
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/${PARAMETER_DESTINATION})
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/Output/${PARAMETER_DESTINATION})
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/Output/${PARAMETER_DESTINATION})
 	endif()
-
-	# Copy dependecies
-	if (PARAMETER_PLUGIN)
-	else()
-        if (ZEBUILD_PLATFORM_WINDOWS)
-            FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Platform/${ZEBUILD_PLATFORM}/${ZEBUILD_PLATFORM_ARCHITECTURE}/Dll/*.dll" A)
-            FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Platform/${ZEBUILD_PLATFORM}/${ZEBUILD_PLATFORM_ARCHITECTURE}/Dll/$(ConfigurationName)/*.dll" B)
-            FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/$(ConfigurationName)" C)
-            add_custom_command(
-                TARGET ${PARAMETER_TARGET}
-                COMMAND "xcopy"
-                ARGS "${A}" "${C}" /D /Y)
-            add_custom_command(
-                TARGET ${PARAMETER_TARGET}
-                COMMAND "xcopy"
-                ARGS "${B}" "${C}" /D /Y)
-        endif()
-	endif()
-		
-	# Debug
-	if (ZEBUILD_VERBOSE)
-		message("ze_add_executable") 
-		message("\tPARAMETER_TARGET = ${PARAMETER_TARGET}")	
-		message("\tPARAMETER_SOURCES = ${PARAMETER_SOURCES}")	
-		message("\tPARAMETER_LIBS = ${PARAMETER_LIBS}")	
-		message("\tPARAMETER_INSTALL = ${PARAMETER_INSTALL}")	
-		message("\tPARAMETER_INSTALL_DESTINATION = ${PARAMETER_INSTALL_DESTINATION}")	
-		message("\tPARAMETER_INSTALL_COMPONENT = ${PARAMETER_INSTALL_COMPONENT}")	
-		message("\tZEBUILD_PROJECT_FOLDER = ${ZEBUILD_PROJECT_FOLDER}")	
-	endif()
-endfunction()
-
-function(ze_add_extension)
-
 endfunction()
 
 function (ze_add_library)
-	parse_arguments(PARAMETER "SOURCES;LIBS;HEADERS;INSTALL_DESTINATION;INSTALL_COMPONENT;${ze_check_parameters}" "INSTALL;DLL" ${ARGV})
+	parse_arguments(PARAMETER "SOURCES;LIBS;HEADERS;${ze_check_parameters}" "INSTALL;DLL" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
@@ -309,6 +356,10 @@ function (ze_add_library)
 	# Get Target Name
 	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
 	
+	include_directories(
+		${CMAKE_CURRENT_BINARY_DIR}
+		${CMAKE_CURRENT_SOURCE_DIR})
+		
 	# Compile
 	if (PARAMETER_DLL)
 		add_library(${PARAMETER_TARGET} SHARED ${PARAMETER_SOURCES})
@@ -332,30 +383,17 @@ function (ze_add_library)
 			endif()
 		endif()
 	endif()
-	
-	# Install
+
 	if (PARAMETER_INSTALL)
-		install(TARGETS ${PARAMETER_TARGET} 
-			DESTINATION "Lib" 
-			COMPONENT ${PARAMETER_INSTALL_COMPONENT} 
-			CONFIGURATIONS Release)
-		install(FILES ${PARAMETER_HEADERS} 
-			DESTINATION Include/${PARAMETER_INSTALL_DESTINATION}
-			COMPONENT ${PARAMETER_INSTALL_COMPONENT}
-			CONFIGURATIONS Release)
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/${PARAMETER_DESTINATION})
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/Output/${PARAMETER_DESTINATION})
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/Output/${PARAMETER_DESTINATION})
+	
+		if (PARAMETER_HEADERS)
+			ze_copy_files(${PARAMETER_HEADERS} TARGET ${PARAMETER_TARGET} DESTINATION ${CMAKE_SOURCE_DIR}/Output/Include BASE ${CMAKE_SOURCE_DIR}/Source)
+		endif()
 	endif()
 		
-	# Debug
-	if (ZEBUILD_VERBOSE)
-		message("ze_add_library") 
-		message("\tPARAMETER_TARGET = ${PARAMETER_TARGET}")	
-		message("\tPARAMETER_SOURCES = ${PARAMETER_SOURCES}")	
-		message("\tPARAMETER_LIBS = ${PARAMETER_LIBS}")	
-		message("\tPARAMETER_INSTALL = ${PARAMETER_INSTALL}")	
-		message("\tPARAMETER_INSTALL_DESTINATION = ${PARAMETER_INSTALL_DESTINATION}")	
-		message("\tPARAMETER_INSTALL_COMPONENT = ${PARAMETER_INSTALL_COMPONENT}")
-		message("\tZEBUILD_PROJECT_FOLDER = ${ZEBUILD_PROJECT_FOLDER}")	
-	endif()
 endfunction()
 
 function (ze_add_test)
@@ -388,8 +426,10 @@ function (ze_add_test)
 
 	endif()
 
+	get_property(OLD_VALUES TARGET ${PARAMETER_TARGET} PROPERTY INCLUDE_DIRECTORIES)
+	set_property(TARGET ${PARAMETER_TARGET} PROPERTY INCLUDE_DIRECTORIES ${OLD_VALUES} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+
 	target_link_libraries(${PARAMETER_TARGET} ZETest)
-	
 
 	# Copy dependent DLLs
     if (ZEBUILD_PLATFORM_WINDOWS)
@@ -408,15 +448,6 @@ function (ze_add_test)
 
 	source_group("" FILES ${PARAMETER_SOURCES})		
 	add_test(${PARAMETER_TARGET}Test ${PARAMETER_TARGET})
-			
-	if (ZEBUILD_VERBOSE)
-		message("ze_add_test") 
-		message("\tPARAMETER_TARGET = ${PARAMETER_TARGET}")	
-		message("\tPARAMETER_SOURCES = ${PARAMETER_SOURCES}")	
-		message("\tPARAMETER_TEST_TARGET = ${PARAMETER_TEST_TARGET}")	
-		message("\tPARAMETER_LIBS = ${PARAMETER_LIBS}")	
-		message("\tTEST_TARGET_LINKS = ${TEST_TARGET_LINKS}")	
-	endif()
 endfunction()
 
 function(ze_add_module)
@@ -466,23 +497,29 @@ function(ze_add_module)
 			set(${PARAMETER_SET} ${${PARAMETER_SET}} PARENT_SCOPE)
 		endif()
 	endif()
-	
-	# Debug	
-	if (ZEBUILD_VERBOSE)	
-		message("ze_add_module") 
-		message("\tPARAMETER_TITLE = ${PARAMETER_TITLE}")
-		message("\tPARAMETER_PLATFORMS = ${tPARAMETER_PLATFORMS}")
-		message("\tPARAMETER_DEFAULT = ${PARAMETER_DEFAULT}")
-		message("\tPARAMETER_OPTIONAL = ${PARAMETER_OPTIONAL}")
-		message("\tPARAMETER_NAME = ${PARAMETER_NAME}")
-		message("\tPARAMETER_DIRECTORTY = ${PARAMETER_DIRECTORTY}")
-	endif()
 endfunction()
 
 function(ze_combine_libraries)
-	parse_arguments(PARAMETER "TARGETS;INSTALL_DESTINATION;INSTALL_COMPONENT" "INSTALL" ${ARGV})
+	parse_arguments(PARAMETER "LIBS;${ze_check_parameters}" "" ${ARGV})
+	
+	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
+	
+	ze_check()
+	if (NOT CHECK_SUCCEEDED)
+		return()
+	endif()
+	
 	if (ZEBUILD_PLATFORM_WINDOWS)
-	elseif (ZEBUILF_PLATFORM_LINUX OR ZEBUILD_PLATFORM_UNIX)
+		foreach (TEMP ${PARAMETER_LIBS})
+			get_property(TARGET_LOCATION TARGET ${TEMP} PROPERTY LOCATION)
+			get_property(TARGET_OUTPUT_NAME TARGET ${TEMP} PROPERTY OUTPUT_NAME)
+			set (LIBRARY_PATHS ${LIBRARY_PATHS} "${TARGET_LOCATION}\\${TARGET_OUTPUT_NAME}")	
+		endforeach()
+		add_custom_target(${PARAMETER_TARGET}
+			COMMAND "lib.exe " ${LIBRARY_PATHS} " /out:${CMAKE_SOURCE_DIR}\\Output\\Lib\\$(ConfigurationName)\\${PARAMETER_TARGET}.lib"
+			DEPENDS ${PARAMETER_LIBS})
+	elseif (ZEBUILD_PLATFORM_DARWIN)
+	elseif (ZEBUILD_PLATFORM_UNIX)
 	endif()
 endfunction()
 

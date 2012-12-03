@@ -83,7 +83,7 @@ ze_add_source(ZEWeakPointerTests.cpp	Tests)
 ze_add_source(ZEString.cpp				Sources)
 ze_add_source(ZEString.h				Sources Headers)
 ze_add_source(ZEStringTests.cpp			Tests)
-ze_add_source(ZECharacterTests.cpp			Tests)
+ze_add_source(ZECharacterTests.cpp		Tests)
 ze_add_source(ZETypedVariant.cpp		Sources)
 ze_add_source(ZETypedVariant.h			Sources Headers)
 ze_add_source(ZEVariant.cpp				Sources)
@@ -92,19 +92,17 @@ ze_add_source(ZEVariantTests.cpp		Tests)
 ze_add_source(ZEPointerTestClass.h		Tests)
 ze_add_source(ZEPointerTestClass.cpp	Tests)
 ze_add_source(ZEFormat.h				Sources Headers)
-ze_add_source(ZEFormat.cpp				Sources Headers)
+ze_add_source(ZEFormat.cpp				Sources)
 ze_add_source(ZEFormatArgument.h		Sources)
 ze_add_source(ZEFormatArgument.cpp		Sources)
-ze_add_source(ZEFormatOverloads.cpp		Sources Headers)
+ze_add_source(ZEFormatOverloads.cpp		Sources)
 ze_add_source(ZEStringWriter.cpp		Sources)
 ze_add_source(ZEStringWriter.h			Sources Headers)
 ze_add_library(ZEDS 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEDS
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)
 	
 ze_add_test(ZEDSTests 
 	SOURCES ${Tests}

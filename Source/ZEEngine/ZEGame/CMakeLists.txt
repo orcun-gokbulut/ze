@@ -81,6 +81,4 @@ ze_add_source(ZEWeather.h				Sources Header)
 ze_add_library(ZEGame 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZEGame"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)
