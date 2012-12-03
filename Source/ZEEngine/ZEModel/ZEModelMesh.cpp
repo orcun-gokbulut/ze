@@ -41,6 +41,9 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEDrawParameters.h"
 
+#include "ZEPhysics/ZEPhysicalCloth.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
+
 void ZEModelMesh::SetActiveLOD(ZEUInt LOD)
 {
 	AutoLOD = false;
@@ -252,10 +255,35 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 					}
 				}
 
-				PhysicalBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
-				PhysicalBody->Initialize();
-			}
+			PhysicalBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+			PhysicalBody->Initialize();
 		}
+		else if(MeshResource->PhysicalBody.Type == ZE_MRPBT_CLOTH)
+		{
+			PhysicalCloth = ZEPhysicalCloth::CreateInstance();
+
+			ZESize VertexCount = MeshResource->LODs[0].Vertices.GetCount();
+			ZEArray<ZEVector3>& ClothVertices = PhysicalCloth->GetVertices();
+			ClothVertices.SetCount(VertexCount);
+
+			for(ZESize I = 0; I < VertexCount; I++)
+				ClothVertices[I] = MeshResource->LODs[0].Vertices[I].Position;
+
+			PhysicalCloth->SetPosition(Owner->GetWorldTransform() * Position);
+			ZEQuaternion TempRotation;
+			ZEQuaternion::CreateFromMatrix(TempRotation, Owner->GetWorldTransform() * GetLocalTransform());
+			PhysicalCloth->SetRotation(TempRotation);
+
+			PhysicalCloth->SetThickness(0.5f);
+			PhysicalCloth->SetBendingMode(true);
+			PhysicalCloth->SetBendingStiffness(1.0f);
+			PhysicalCloth->SetStretchingStiffness(1.0f);
+			PhysicalCloth->SetTearableMode(true);
+			PhysicalCloth->SetTearFactor(1.5f);
+			PhysicalCloth->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+			PhysicalCloth->Initialize();
+	}
+	}
 
 	LODs.SetCount(MeshResource->LODs.GetCount());
 	for (ZESize I = 0; I < MeshResource->LODs.GetCount(); I++)
@@ -264,8 +292,6 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	for (ZESize I = 0; I < ShapeList.GetCount(); I++)
 		delete ShapeList[I];
 	ShapeList.Clear();
-
-
 }
 
 void ZEModelMesh::Deinitialize()
@@ -319,6 +345,7 @@ ZEModelMesh::ZEModelMesh()
 	Owner = NULL;
 	MeshResource = NULL;
 	PhysicalBody = NULL;
+	PhysicalCloth = NULL;
 	Visible = true;
 	PhysicsEnabled = false;
 	AutoLOD = false;

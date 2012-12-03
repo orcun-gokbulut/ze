@@ -352,5 +352,4 @@ void ZEPhysXPhysicalWorld::Destroy()
 void ZEPhysXPhysicalWorld::Update()
 {
 	Scene->fetchResults(NX_ALL_FINISHED, true);
-
 }
