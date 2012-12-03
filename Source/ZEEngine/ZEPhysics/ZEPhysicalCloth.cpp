@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEPhysicalCloth.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,45 +30,28 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEPhysicalCloth.h"
 
-ze_add_source(ZEPhysXCollisionManager.cpp		Sources)
-ze_add_source(ZEPhysXCollisionManager.h			Sources)
-ze_add_source(ZEPhysXComponentBase.cpp			Sources)
-ze_add_source(ZEPhysXComponentBase.h			Sources)
-ze_add_source(ZEPhysXConversion.cpp				Sources)
-ze_add_source(ZEPhysXConversion.h				Sources)
-ze_add_source(ZEPhysXModule.cpp					Sources)
-ze_add_source(ZEPhysXModule.h					Sources)
-ze_add_source(ZEPhysXPhysicalCloth.cpp			Sources)
-ze_add_source(ZEPhysXPhysicalCloth.h			Sources)
-ze_add_source(ZEPhysXPhysicalJoint.cpp			Sources)
-ze_add_source(ZEPhysXPhysicalJoint.h			Sources)
-ze_add_source(ZEPhysXPhysicalMesh.cpp			Sources)
-ze_add_source(ZEPhysXPhysicalMesh.h				Sources)
-ze_add_source(ZEPhysXPhysicalRigidBody.cpp		Sources)
-ze_add_source(ZEPhysXPhysicalRigidBody.h		Sources)
-ze_add_source(ZEPhysXPhysicalWorld.cpp			Sources)
-ze_add_source(ZEPhysXPhysicalWorld.h			Sources)
-ze_add_source(ZEPhysXStream.cpp					Sources)
-ze_add_source(ZEPhysXStream.h					Sources)
-ze_add_source(ZEPhysXUserOutputStream.cpp		Sources)
-ze_add_source(ZEPhysXUserOutputStream.h			Sources)
+ZEPhysicalCloth::ZEPhysicalCloth()
+{
 
-#add_definitions(-DNX_USER_DEBUG_MODE)
+}
 
-include_directories(
-	${ZEBUILD_INCLUDE_PATH}/PhysX2/Cooking 
-	${ZEBUILD_INCLUDE_PATH}/PhysX2/Foundation 
-	${ZEBUILD_INCLUDE_PATH}/PhysX2/PhysXLoader
-	${ZEBUILD_INCLUDE_PATH}/PhysX2/Physics)
-	
-link_directories(
-	${ZEBUILD_LIB_PATH}/PhysX2)
-	
-ze_add_library(ZEPhysX 
-	SOURCES ${Sources}
-	LIBS PhysXLoader PhysXCooking PhysXCore)
+ZEPhysicalCloth::~ZEPhysicalCloth()
+{
+
+}
+
+ZEPhysicalCloth* ZEPhysicalCloth::CreateInstance()
+{
+	return zePhysics->CreatePhysicalCloth();
+}
+
+void ZEPhysicalCloth::Destroy()
+{
+	Deinitialize();
+	delete this;
+}
