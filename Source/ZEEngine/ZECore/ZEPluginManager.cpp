@@ -105,6 +105,8 @@ typedef ZEPlugin* (*ZEGetPlugingFunction)();
 
 static void LoadExternalPlugin_Load(const ZEString& Path)
 {
+	SetDllDirectoryW(Path.ToWCString());
+
 	HMODULE Module = LoadLibraryW(Path.ToWCString());
 	if (Module == NULL)
 		return;
@@ -114,8 +116,11 @@ static void LoadExternalPlugin_Load(const ZEString& Path)
 	if (Plugin == NULL)
 	{
 		FreeLibrary(Module);
+		SetDllDirectoryW(NULL);
 		return;
 	}
+
+	SetDllDirectoryW(NULL);
 }
 
 void ZEPluginManager::LoadExternalPlugins(ZEString& Path, bool Recursive)

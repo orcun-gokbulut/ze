@@ -37,7 +37,7 @@
 #ifndef	__ZE_PHYSICAL_CLOTH_H__
 #define __ZE_PHYSICAL_CLOTH_H__
 
-#include "ZEFoundation/ZETypes.h"
+#include "ZETypes.h"
 
 #include "ZEPhysics/ZEPhysicsModule.h"
 #include "ZEPhysics/ZEPhysicalShapes.h"
