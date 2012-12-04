@@ -39,7 +39,7 @@ ze_add_source(ZE3dsMapExporterDLLEntry.cpp		Sources)
 ze_add_source(ZE3dsMapExporterDLLEntry.h		Sources)
 ze_add_source(ZE3dsMapExporter.h				Sources)
 ze_add_source(ZE3dsMapExporter.cpp				Sources)
-ze_add_source(ZE3dsMapExporterDescription.h		Sources ZEFC)
+ze_add_source(ZE3dsMapExporterDescription.h		Sources)
 ze_add_source(ZE3dsMapExporterDescription.cpp	Sources)
 ze_add_source(ZE3dsMapExporterProcess.cpp		Sources)
 ze_add_source(ZE3dsMapExporterOptions.h			Sources)
@@ -56,11 +56,10 @@ qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-ze_add_library(ZE3dsMapExporter 
+ze_add_executable(ZE3dsMapExporter DLL
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
 	LIBS ZEFoundation ZEToolAPI ZE3dsProgressDialog
-		core geom gfx mesh maxutil maxscrpt paramblk2 igame QtCore4 QtGui4 QWinWidget ZEProgressDialog
-	DLL)
+		core geom gfx mesh maxutil maxscrpt paramblk2 igame QtCore4 QtGui4 QWinWidget ZEProgressDialog)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 	
