@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEClient.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,29 +30,69 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZEClient.h"
+#include "ZEConnectionTCP.h"
+#include "ZESocket/ZESocket.h"
 
-ze_add_source(ZENetworkModule.cpp					Sources)
-ze_add_source(ZENetworkModule.h						Sources Headers)
-ze_add_source(ZEPacketHandler.cpp					Sources)
-ze_add_source(ZEPacketHandler.h						Sources Headers)
-ze_add_source(ZEPacketManagerServer.cpp					Sources)
-ze_add_source(ZEPacketManagerServer.h						Sources Headers)
-ze_add_source(ZEConnection.cpp						Sources)
-ze_add_source(ZEConnection.h						Sources Headers)
-ze_add_source(ZEConnectionTCP.cpp					Sources)
-ze_add_source(ZEConnectionTCP.h						Sources Headers)
-ze_add_source(ZEPacketManagerBuffer.cpp				Sources)
-ze_add_source(ZEPacketManagerBuffer.h				Sources Headers)
-ze_add_source(ZEServer.cpp							Sources)
-ze_add_source(ZEServer.h							Sources Headers)
-ze_add_source(ZEClient.cpp							Sources)
-ze_add_source(ZEClient.h							Sources Headers)
+#define TCP_CLIENT_PORT_NO	27200
 
-ze_add_library(ZENetwork 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation ws2_32.lib)
+ZEClient::ZEClient()
+{
+	Socket = NULL;
+	Connection = NULL;
+}
+
+ZEClient::~ZEClient()
+{
+	if(Socket != NULL)
+	{
+		Socket->Close();
+		delete Socket;
+		delete Connection;
+		Socket = NULL;
+		Connection = NULL;
+	}
+}
+
+bool ZEClient::Connect(const ZEIPAddress& Address, ZEUInt16 Port)
+{
+	if(Socket != NULL)
+	{
+		PacketManager.RemoveConnection(Connection);
+		Socket->Close();
+		delete Socket;
+		delete Connection;
+		Socket = NULL;
+		Connection = NULL;
+	}
+
+	Socket = new ZESocketTCP();
+	Socket->Create(ZEIPAddress::IPv4Any, TCP_CLIENT_PORT_NO);
+	ZESize Result = Socket->Connect(Address, Port);
+
+	if(Result != ZE_SR_OK)
+		return false;
+
+	Connection = new ZEConnectionTCP(Socket);
+	PacketManager.AddConnection(Connection);
+
+	return true;
+}
+
+void ZEClient::Process(float ElapsedTime)
+{
+	PacketManager.Process(ElapsedTime);
+}
+
+const ZEPacketManagerServer* ZEClient::GetPacketManager()
+{
+	return &PacketManager;
+}
+
+bool ZEClient::Send(void* Data, ZESize DataSize)
+{
+	return Connection->SendData(Data, DataSize);
+}

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEServer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,29 +30,35 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
+#ifndef	__ZE_SERVER_H__
+#define __ZE_SERVER_H__
 
-ze_add_source(ZENetworkModule.cpp					Sources)
-ze_add_source(ZENetworkModule.h						Sources Headers)
-ze_add_source(ZEPacketHandler.cpp					Sources)
-ze_add_source(ZEPacketHandler.h						Sources Headers)
-ze_add_source(ZEPacketManagerServer.cpp					Sources)
-ze_add_source(ZEPacketManagerServer.h						Sources Headers)
-ze_add_source(ZEConnection.cpp						Sources)
-ze_add_source(ZEConnection.h						Sources Headers)
-ze_add_source(ZEConnectionTCP.cpp					Sources)
-ze_add_source(ZEConnectionTCP.h						Sources Headers)
-ze_add_source(ZEPacketManagerBuffer.cpp				Sources)
-ze_add_source(ZEPacketManagerBuffer.h				Sources Headers)
-ze_add_source(ZEServer.cpp							Sources)
-ze_add_source(ZEServer.h							Sources Headers)
-ze_add_source(ZEClient.cpp							Sources)
-ze_add_source(ZEClient.h							Sources Headers)
+#include "ZEPacketManagerServer.h"
 
-ze_add_library(ZENetwork 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation ws2_32.lib)
+class ZEServer
+{
+	private:
+
+		ZESocketTCPListener*	Listener;
+		ZEPacketManagerServer	PacketManager;
+
+		void					AcceptConnections();
+
+	public:
+
+		const ZEPacketManagerServer*	GetPacketManager();
+
+		void							Process(float ElapsedTime);
+
+		bool							SendData(void* Data, ZESize DataSize, ZEConnection* Connection);
+		void							BroadCast(void* Data, ZESize DataSize);
+
+										ZEServer();
+										~ZEServer();
+};
+
+#endif

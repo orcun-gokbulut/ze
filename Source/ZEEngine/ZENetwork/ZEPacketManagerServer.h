@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEPacketManagerServer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,29 +30,54 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
+#ifndef	__ZE_PACKET_MANAGER_H__
+#define __ZE_PACKET_MANAGER_H__
 
-ze_add_source(ZENetworkModule.cpp					Sources)
-ze_add_source(ZENetworkModule.h						Sources Headers)
-ze_add_source(ZEPacketHandler.cpp					Sources)
-ze_add_source(ZEPacketHandler.h						Sources Headers)
-ze_add_source(ZEPacketManagerServer.cpp					Sources)
-ze_add_source(ZEPacketManagerServer.h						Sources Headers)
-ze_add_source(ZEConnection.cpp						Sources)
-ze_add_source(ZEConnection.h						Sources Headers)
-ze_add_source(ZEConnectionTCP.cpp					Sources)
-ze_add_source(ZEConnectionTCP.h						Sources Headers)
-ze_add_source(ZEPacketManagerBuffer.cpp				Sources)
-ze_add_source(ZEPacketManagerBuffer.h				Sources Headers)
-ze_add_source(ZEServer.cpp							Sources)
-ze_add_source(ZEServer.h							Sources Headers)
-ze_add_source(ZEClient.cpp							Sources)
-ze_add_source(ZEClient.h							Sources Headers)
+#include "ZETypes.h"
+#include "ZEPacketHandler.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEConnection.h"
+#include "ZEDS/ZEDelegate.h"
 
-ze_add_library(ZENetwork 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation ws2_32.lib)
+#define ZE_MAX_PACKET_SIZE 0xFFFF
+#define ZE_COMMAND_PACKET_HEADER_IDENTIFIER "ZE_C_P_H_I"
+
+class ZESocketTCP;
+class ZESerialPort;
+class ZESocketTCPListener;
+
+struct ZEPacketHeader
+{
+	char	 Identifier[10];
+	ZEInt16	 CommandId;
+	ZEUInt16 DataSize;
+};
+
+class ZEPacketManagerServer
+{
+	private:
+
+		ZEArray<ZEConnection*>		Connections;
+		ZEArray<ZEPacketHandler*>	Handlers;
+
+	public:
+
+		void						Process(float ElapsedTime);
+
+		bool						RegisterHander(ZEPacketHandler* Handler);
+		bool						UnRegisterHandler(ZEPacketHandler* Handler);
+
+		bool						AddConnection(ZEConnection* Connection);
+		bool						RemoveConnection(ZEConnection* Connection);
+
+		const ZEArray<ZEConnection*>* GetConnections();
+
+									ZEPacketManagerServer();
+									~ZEPacketManagerServer();
+};
+
+#endif
