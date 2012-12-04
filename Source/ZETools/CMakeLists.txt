@@ -41,6 +41,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
 
 ze_add_module(ZE3dsMax)
+ze_add_module(ZEFontBaker)
 ze_add_module(ZEToolComponents)
 
 ze_add_cmake_project(ZETools)

@@ -56,6 +56,7 @@ ze_configure_symbol_server()
 set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll will be generated and external plugins will be disabled.")
 
 
+
 ## Compiler & Linker Options
 #########################################################################################
 if ("${ZEBUILD_PLATFORM_COMPILER}" EQUAL "MSVC")
