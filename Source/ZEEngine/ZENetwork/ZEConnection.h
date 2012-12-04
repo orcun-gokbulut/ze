@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUDPClient.cpp
+ Zinek Engine - ZEConnection.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,22 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUDPClient.h"
+#pragma once
+#ifndef	__ZE_CONNECTION_H__
+#define __ZE_CONNECTION_H__
+
+#include "ZETypes.h"
+
+class ZEConnection
+{
+	public:
+
+		virtual bool				SendData(const void* Data, ZESize Size) = 0;
+		virtual void*				GetBuffer(ZESize& UsedSize) = 0;
+
+		virtual void				CleanBuffer() = 0;
+
+		virtual void				Process(float ElapsedTime) = 0;
+};
+
+#endif

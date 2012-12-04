@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUDPClient.h
+ Zinek Engine - ZEClient.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-// #pragma once
-// #ifndef	__ZE_UDP_CLIENT_H__
-// #define __ZE_UDP_CLIENT_H__
-// 
-// class ZESocketUDP;
-// 
-// class ZEUDPClient
-// {
-// 	private:
-// 
-// 		ZESocketUDP*	Socket;
-// 
-// 	public:
-// 
-// 		bool			Connect(const ZEIPAddress& ServerIP);
-// 		ZESSize			SendData(const void* Data, ZESize DataSize);
-// 		ZESSize			ReceiveData(void* Buffer, ZESize BufferSize);
-// };
-// 
-// #endif
+#pragma once
+#ifndef	__ZE_CLIENT_H__
+#define __ZE_CLIENT_H__
+
+#include "ZEPacketManagerServer.h"
+#include "ZESocket/ZEIPAddress.h"
+
+class ZESocketTCP;
+class ZEConnectionTCP;
+
+class ZEClient
+{
+	private:
+
+		ZESocketTCP*					Socket;
+		ZEConnectionTCP*				Connection;
+		ZEPacketManagerServer			PacketManager;
+
+	public:
+
+		void							Process(float ElapsedTime);
+		const ZEPacketManagerServer*	GetPacketManager();
+
+		bool							Connect(const ZEIPAddress& Address, ZEUInt16 Port);
+
+		bool							Send(void* Data, ZESize DataSize);
+
+										ZEClient();
+										~ZEClient();
+};
+
+#endif

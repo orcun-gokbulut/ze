@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUDPServer.cpp
+ Zinek Engine - ZEConnectionTCP.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,87 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUDPServer.h"
+#include "ZEConnectionTCP.h"
+#include "ZEFoundation/ZESocket/ZESocket.h"
+
+#include <memory.h>
+
+ZEConnectionTCP::ZEConnectionTCP()
+{
+
+}
+
+bool ZEConnectionTCP::SendData(const void* Data, ZESize Size)
+{
+	if(Size + FilledSendBufferSize >= SendBufferSize)
+		return false;
+
+	memcpy(SendBuffer + FilledSendBufferSize, Data, Size);
+	FilledSendBufferSize += Size;
+	return true;
+}
+
+void* ZEConnectionTCP::GetBuffer(ZESize& UsedSize)
+{
+	UsedSize = FilledReadBufferSize;
+	return ReadBuffer;
+}
+
+void ZEConnectionTCP::CleanBuffer()
+{
+	memset(ReadBuffer, 0, ReadBufferSize);
+	FilledReadBufferSize = 0;
+}
+
+void ZEConnectionTCP::Process(float ElapsedTime)
+{
+	if(Socket == NULL)
+		return;
+
+	if(FilledReadBufferSize > 0)
+	{
+		ZESSize SentDataSize = Socket->Send(SendBuffer, FilledSendBufferSize);
+
+		if(SentDataSize > 0)
+		{
+			memmove(SendBuffer, SendBuffer + SentDataSize, SendBufferSize - SentDataSize);
+			FilledSendBufferSize -= SentDataSize;
+		}
+	}
+
+	ZESSize ReadDataSize = Socket->Recieve(TempBuffer, TempBufferSize);
+
+	if(ReadDataSize > 0)
+	{
+		memcpy(ReadBuffer + FilledReadBufferSize, TempBuffer, ReadDataSize);
+		FilledReadBufferSize += ReadDataSize;
+	}
+}
+
+ZEConnectionTCP::ZEConnectionTCP(ZESocketTCP* Socket, ZEUInt16 MaxPacketSize)
+{
+	this->Socket = Socket;
+	ReadBufferSize = MaxPacketSize;
+	SendBufferSize = MaxPacketSize;
+	TempBufferSize = MaxPacketSize;
+
+	ReadBuffer = new char[ReadBufferSize];
+	memset(ReadBuffer, 0, ReadBufferSize);
+	SendBuffer = new char[SendBufferSize];
+	memset(SendBuffer, 0, SendBufferSize);
+	TempBuffer = new char[TempBufferSize];
+	memset(TempBuffer, 0, TempBufferSize);
+
+	FilledReadBufferSize = 0;
+	FilledSendBufferSize = 0;
+}
+
+ZEConnectionTCP::~ZEConnectionTCP()
+{
+	delete ReadBuffer;
+	ReadBuffer = NULL;
+	delete SendBuffer;
+	SendBuffer = NULL;
+	delete TempBuffer;
+	TempBuffer = NULL;
+}

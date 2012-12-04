@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEServer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,29 +30,44 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZEServer.h"
+#include "ZESocket/ZESocket.h"
+#include "ZEConnectionTCP.h"
 
-ze_add_source(ZENetworkModule.cpp					Sources)
-ze_add_source(ZENetworkModule.h						Sources Headers)
-ze_add_source(ZEPacketHandler.cpp					Sources)
-ze_add_source(ZEPacketHandler.h						Sources Headers)
-ze_add_source(ZEPacketManagerServer.cpp					Sources)
-ze_add_source(ZEPacketManagerServer.h						Sources Headers)
-ze_add_source(ZEConnection.cpp						Sources)
-ze_add_source(ZEConnection.h						Sources Headers)
-ze_add_source(ZEConnectionTCP.cpp					Sources)
-ze_add_source(ZEConnectionTCP.h						Sources Headers)
-ze_add_source(ZEPacketManagerBuffer.cpp				Sources)
-ze_add_source(ZEPacketManagerBuffer.h				Sources Headers)
-ze_add_source(ZEServer.cpp							Sources)
-ze_add_source(ZEServer.h							Sources Headers)
-ze_add_source(ZEClient.cpp							Sources)
-ze_add_source(ZEClient.h							Sources Headers)
+#define TCP_PORT_NO	27100
 
-ze_add_library(ZENetwork 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation ws2_32.lib)
+void ZEServer::AcceptConnections()
+{
+	ZESocketTCP* NewTCP = NULL;
+	NewTCP = Listener->Accept();
+
+	Listener->Create(ZEIPAddress::IPv4Any, TCP_PORT_NO);
+
+	if(NewTCP != NULL)
+		PacketManager.AddConnection(new ZEConnectionTCP(NewTCP));
+}
+
+void ZEServer::Process(float ElapsedTime)
+{
+	AcceptConnections();
+	PacketManager.Process(ElapsedTime);
+}
+
+const ZEPacketManagerServer* ZEServer::GetPacketManager()
+{
+	return &PacketManager;
+}
+
+bool ZEServer::SendData(void* Data, ZESize DataSize, ZEConnection* Connection)
+{
+	return Connection->SendData(Data, DataSize);
+}
+
+void ZEServer::BroadCast(void* Data, ZESize DataSize)
+{
+	for (ZESize I = 0; I < PacketManager.GetConnections()->GetCount(); I++)
+		PacketManager.GetConnections()->GetItem(I)->SendData(Data, DataSize);
+}

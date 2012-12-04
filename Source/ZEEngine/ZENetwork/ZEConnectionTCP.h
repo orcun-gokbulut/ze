@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUDPServer.h
+ Zinek Engine - ZEConnectionTCP.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,44 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-// #pragma once
-// #ifndef	__ZE_UDP_SERVER_H__
-// #define __ZE_UDP_SERVER_H__
-// 
-// class ZESocketUDP;
-// 
-// struct ZEUDPConnection
-// {
-// 	ZEUInt		Id;
-// 	float		TimeOut;
-// 	ZEIPAddress	IPAddress;
-// 	ZEUInt16	Port;
-// };
-// 
-// class ZEUDPServer
-// {
-// 	private:
-// 
-// 		ZESocketUDP*					Socket;
-// 
-// 		ZEArray<ZEUDPConnection>	Connections;
-// 
-// 		void	Broadcast(const void* Data, ZESize DataSize);
-// 		void	SendDataToClient(ZEUInt ConnectionId, const void* Data, ZESize DataSize);
-// 
-// 	public:
-// };
-// 
-// #endif
+#pragma once
+#ifndef	__ZE_CONNECTION_TCP_H__
+#define __ZE_CONNECTION_TCP_H__
+
+#include "ZEConnection.h"
+
+class ZESocketTCP;
+
+class ZEConnectionTCP : public ZEConnection
+{
+	private:
+
+		ZESocketTCP*	Socket;
+
+		char*			TempBuffer;
+		char*			ReadBuffer;
+		char*			SendBuffer;
+
+		ZESize			ReadBufferSize;
+		ZESize			TempBufferSize;
+		ZESize			SendBufferSize;
+
+		ZESize			FilledReadBufferSize;
+		ZESize			FilledSendBufferSize;
+
+						ZEConnectionTCP();
+
+	public:
+
+		virtual bool	SendData(const void* Data, ZESize Size);
+		virtual void*	GetBuffer(ZESize& UsedSize);
+
+		virtual void	CleanBuffer();
+
+		virtual void	Process(float ElapsedTime);
+
+						ZEConnectionTCP(ZESocketTCP* Socket, ZEUInt16 MaxPacketSize = 0xFFFF);
+						~ZEConnectionTCP();
+};
+
+#endif
