@@ -48,6 +48,4 @@ ze_add_library(ZEInterior
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZEInterior"
-	INSTALL_COMPONENT ZESDK)
+	INSTALL)

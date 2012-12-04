@@ -246,8 +246,6 @@ function(ze_add_executable)
 		else()
 			add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
 		endif()
-	else()
-		add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
 	endif()
 	
 	target_link_libraries(${PARAMETER_TARGET} ${PARAMETER_LIBS})
