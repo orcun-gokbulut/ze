@@ -139,7 +139,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	TotalEntityCount->SetWidth(250.0f);
 	TotalEntityCount->SetHeight(25.0f);
 	TotalEntityCount->SetPosition(ZEVector2(0.0f, 0.0f));
-	TotalEntityCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+	TotalEntityCount->SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	TotalEntityCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(TotalEntityCount);
 
@@ -147,7 +147,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	DrawableEntityCount->SetWidth(250.0f);
 	DrawableEntityCount->SetHeight(25.0f);
 	DrawableEntityCount->SetPosition(ZEVector2(0.0f, 25.0f));
-	DrawableEntityCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+	DrawableEntityCount->SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	DrawableEntityCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(DrawableEntityCount);
 
@@ -155,7 +155,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	VisibleEntityCount->SetWidth(250.0f);
 	VisibleEntityCount->SetHeight(25.0f);
 	VisibleEntityCount->SetPosition(ZEVector2(0.0f, 50.0f));
-	VisibleEntityCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+	VisibleEntityCount->SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	VisibleEntityCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(VisibleEntityCount);
 
@@ -163,7 +163,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	CulledEntityCount->SetWidth(250.0f);
 	CulledEntityCount->SetHeight(25.0f);
 	CulledEntityCount->SetPosition(ZEVector2(0.0f, 75.0f));
-	CulledEntityCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+	CulledEntityCount->SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	CulledEntityCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(CulledEntityCount);
 
@@ -171,7 +171,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	DrawedEntityCount->SetWidth(250.0f);
 	DrawedEntityCount->SetHeight(25.0f);
 	DrawedEntityCount->SetPosition(ZEVector2(0.0f, 100.0f));
-	DrawedEntityCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+	DrawedEntityCount->SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	DrawedEntityCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(DrawedEntityCount);
 
@@ -179,7 +179,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	TotalLightCount->SetWidth(250.0f);
 	TotalLightCount->SetHeight(25.0f);
 	TotalLightCount->SetPosition(ZEVector2(0.0f, 150.0f));
-	TotalLightCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+	TotalLightCount->SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	TotalLightCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(TotalLightCount);
 
@@ -187,7 +187,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	VisibleLightCount->SetWidth(250.0f);
 	VisibleLightCount->SetHeight(25.0f);
 	VisibleLightCount->SetPosition(ZEVector2(0.0f, 175.0f));
-	VisibleLightCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+	VisibleLightCount->SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	VisibleLightCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(VisibleLightCount);
 
@@ -195,7 +195,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	CulledLightCount->SetWidth(250.0f);
 	CulledLightCount->SetHeight(25.0f);
 	CulledLightCount->SetPosition(ZEVector2(0.0f, 200.0f));
-	CulledLightCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+	CulledLightCount->SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	CulledLightCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(CulledLightCount);
 	
@@ -203,7 +203,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	DrawedLightCount->SetWidth(250.0f);
 	DrawedLightCount->SetHeight(25.0f);
 	DrawedLightCount->SetPosition(ZEVector2(0.0f, 225.0f));
-	DrawedLightCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+	DrawedLightCount->SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	DrawedLightCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(DrawedLightCount);
 
@@ -211,7 +211,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	FPSCount->SetWidth(250.0f);
 	FPSCount->SetHeight(25.0f);
 	FPSCount->SetPosition(ZEVector2(0.0f, 250.0f));
-	FPSCount->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+	FPSCount->SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	FPSCount->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(FPSCount);
 
@@ -219,7 +219,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	CameraPosition->SetWidth(600.0f); //450.0f
 	CameraPosition->SetHeight(25.0f);
 	CameraPosition->SetPosition(ZEVector2(0.0f, 275.0f));
-	CameraPosition->SetFontResource(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+	CameraPosition->SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
 	CameraPosition->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(CameraPosition);
 

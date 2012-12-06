@@ -37,8 +37,8 @@
 #ifndef __ZE_UI_CURSOR_CONTROL__
 #define __ZE_UI_CURSOR_CONTROL__
 
-#include "ZEUI/ZEUIControl.h"
-#include "ZEUI/ZEUIRectangle.h"
+#include "zeui/ZEUIControl.h"
+#include "zeui/ZEUIRectangle.h"
 #include "ZEInput/ZEInputMap.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 

@@ -35,20 +35,24 @@
 
 #include "ZETypes.h"
 
-#define ZE_FONT_FILE_HEADER						((ZEUInt32)((ZEUInt32)'ZEFF' + (ZEUInt32)'FONT'))
+#define ZE_FONT_FILE_HEADER						((ZEUInt)((ZEUInt)'ZEFF' + (ZEUInt)'FONT'))
 #define ZE_FONT_FILE_CHARACTER_COUNT			256
 
 #include "ZEMath/ZERectangle.h"
 
 struct ZEFontFileCharacter
 {
-	ZEUInt32					TextureId;
+	ZEUInt						TextureId;
 	ZERectangle					Coordinates;
 };
 
 struct ZEFontFileHeader
 {
-	ZEUInt32					Header;
-	ZEUInt32					TextureCount;
+	ZEUInt						Header;
+	ZEUInt						TextureCount;
 	ZEFontFileCharacter			Characters[ZE_FONT_FILE_CHARACTER_COUNT];
 };
+
+
+
+

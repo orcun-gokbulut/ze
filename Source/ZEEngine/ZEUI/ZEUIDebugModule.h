@@ -50,6 +50,16 @@ class ZEUIDebugModule : public ZEApplicationModule
 		ZEGrid*					Grid;
 		ZEScene*				Scene;
 
+		void					AddFrameInFrameControl();
+		void					AddButtonControl();
+		void					AddCheckboxControlInFrame();
+		void					AddCheckboxControl();
+		void					AddFrameInBorderedFrameControl();
+		void					AddConsole();
+		void					AddFrameInScrollArea();
+		
+		void					AddCursor();
+
 	public:
 
 		virtual bool			Initialize();

@@ -87,8 +87,8 @@ ZEUISliderControl::ZEUISliderControl()
 	SliderLineMaterial = ZEFixedMaterial::CreateInstance();
 	SliderLine.Material = SliderLineMaterial;
 
-	SetMoveable(false);
-	SliderButton.SetMoveable(true);
+// 	SetMoveable(false);
+// 	SliderButton.SetMoveable(true);
 
 	StepSize = 10;
 }

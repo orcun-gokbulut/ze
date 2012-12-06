@@ -38,24 +38,12 @@
 #include "ZEIUCheckBoxControl.h"
 #include "ZEUIHorizontalSliderControl.h"
 
-void ZEUIFrameControl::MouseMoveEvent(const ZEVector2& MoveAmount)
-{
-	ZEUIControl::MouseMoveEvent(MoveAmount);
-
-	if (!GetMoveable())
-		return;
-
-	else
-		SetPosition(GetPosition() + MoveAmount);
-}
-
 void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
 {
 	if (GetVisiblity() == false)
 		return;
 
 	ZEUIRectangle Output;
-	Output.ZOrder = GetZOrder();
 
 	if(!ZEUIRectangle::Clip(Output, Frame, GetVisibleRectangle()))
 		Renderer->AddRectangle(Output);
@@ -63,25 +51,36 @@ void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
 	ZEUIControl::Draw(Renderer);
 }
 
+void ZEUIFrameControl::SetSize(const ZEVector2& Size)
+{
+	SetWidth(Size.x);
+	SetHeight(Size.y);
+}
+
 void ZEUIFrameControl::SetWidth(float Width)
 {
 	ZEUIControl::SetWidth(Width);
-	Frame.Positions.LeftUp = GetRectangle().LeftUp;
-	Frame.Positions.RightDown = GetRectangle().RightDown;
+ 	Frame.Positions.LeftUp = GetScreenRectangle().LeftUp;
+ 	Frame.Positions.RightDown = GetScreenRectangle().RightDown;
 }
 
 void ZEUIFrameControl::SetHeight(float Height)
 {
 	ZEUIControl::SetHeight(Height);
-	Frame.Positions.LeftUp = GetRectangle().LeftUp;
-	Frame.Positions.RightDown = GetRectangle().RightDown;
+ 	Frame.Positions.LeftUp = GetScreenRectangle().LeftUp;
+ 	Frame.Positions.RightDown = GetScreenRectangle().RightDown;
+}
+
+void ZEUIFrameControl::SetPosition(float X, float Y)
+{
+	SetPosition(ZEVector2(X, Y));
 }
 
 void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
 {
 	ZEUIControl::SetPosition(Position);
-	Frame.Positions.LeftUp = GetRectangle().LeftUp;
-	Frame.Positions.RightDown = GetRectangle().RightDown;
+	Frame.Positions.LeftUp = GetScreenRectangle().LeftUp;
+	Frame.Positions.RightDown = GetScreenRectangle().RightDown;
 }
 
 ZEMaterial* ZEUIFrameControl::GetMaterial() const
@@ -103,8 +102,7 @@ ZEUIFrameControl::ZEUIFrameControl()
 	Frame.Texcoords.LeftUp = ZEVector2::Zero;
 	Frame.Texcoords.RightDown = ZEVector2::One;
 
+	SetPosition(ZEVector2::Zero);
 	SetWidth(200);
 	SetHeight(200);
-
-	SetMoveable(true);
 }

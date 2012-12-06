@@ -35,7 +35,7 @@
 
 #include "ZEUIButtonControl.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
-#include "ZEUI/ZEUIRenderer.h"
+#include "zeui/ZEUIRenderer.h"
 #include "ZETexture/ZETexture2DResource.h"
 
 void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
@@ -54,30 +54,34 @@ void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
 void ZEUIButtonControl::SetWidth(float Width)
 {
 	ZEUIControl::SetWidth(Width);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
+	Button.Positions.LeftUp = GetScreenRectangle().LeftUp;
+	Button.Positions.RightDown = GetScreenRectangle().RightDown;
 }
 
 void ZEUIButtonControl::SetHeight(float Height)
 {
 	ZEUIControl::SetHeight(Height);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
+	Button.Positions.LeftUp = GetScreenRectangle().LeftUp;
+	Button.Positions.RightDown = GetScreenRectangle().RightDown;
 }
 
 void ZEUIButtonControl::SetSize(const ZEVector2& Size)
 {
 	ZEUIControl::SetSize(Size);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
+	Button.Positions.LeftUp = GetScreenRectangle().LeftUp;
+	Button.Positions.RightDown = GetScreenRectangle().RightDown;
+}
+
+void ZEUIButtonControl::SetPosition(float X, float Y)
+{
+	SetPosition(ZEVector2(X, Y));
 }
 
 void ZEUIButtonControl::SetPosition(const ZEVector2& Position)
 {
 	ZEUIControl::SetPosition(Position);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
-
+	Button.Positions.LeftUp = GetScreenRectangle().LeftUp;
+	Button.Positions.RightDown = GetScreenRectangle().RightDown;
 }
 
 ZEMaterial* ZEUIButtonControl::GetMaterial() const
@@ -101,8 +105,8 @@ ZEUIButtonControl::ZEUIButtonControl()
 
 	SetHeight(25);
 	SetWidth(80);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
+	Button.Positions.LeftUp = GetScreenRectangle().LeftUp;
+	Button.Positions.RightDown = GetScreenRectangle().RightDown;
 	Button.Texcoords.LeftUp = ZEVector2::Zero;
 	Button.Texcoords.RightDown = ZEVector2::One;
 }

@@ -39,7 +39,9 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEFastDelegate.h"
+#include "ZEUI/ZEUIManager.h"
 
+enum ZEUIInputKey;
 enum ZEUIMouseKey
 {
 	ZE_UI_MOUSE_BUTTON_NONE		= 0,
@@ -56,11 +58,11 @@ typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEv
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseHovered;
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseEntered;
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseLeft;
-typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseMoved;
+typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseMoved;
 
 // Keyboard Events
-typedef fastdelegate::FastDelegate1<unsigned char, void>					ZEUIEventKeyPressed;
-typedef fastdelegate::FastDelegate1<unsigned char, void>					ZEUIEventKeyReleased;
+typedef fastdelegate::FastDelegate1<ZEUIInputKey, void>						ZEUIEventKeyPressed;
+typedef fastdelegate::FastDelegate1<ZEUIInputKey, void>						ZEUIEventKeyReleased;
 
 // Component Event
 typedef fastdelegate::FastDelegate0<void>									ZEUIEventDestroyed;
@@ -75,3 +77,7 @@ typedef fastdelegate::FastDelegate1<bool, void>								ZEUIEventWindowClosed;
 typedef fastdelegate::FastDelegate0<void>									ZEUIEventWindowMinimized;
 
 #endif
+
+
+
+

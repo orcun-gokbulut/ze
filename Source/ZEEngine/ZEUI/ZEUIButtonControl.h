@@ -37,8 +37,8 @@
 #ifndef __ZE_UI_BUTTON_CONTROL__
 #define __ZE_UI_BUTTON_CONTROL__
 
-#include "ZEUI/ZEUIControl.h"
-#include "ZEUI/ZEUIRectangle.h"
+#include "zeui/ZEUIControl.h"
+#include "zeui/ZEUIRectangle.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 
 class ZEUIButtonControl : public ZEUIControl
@@ -48,24 +48,25 @@ class ZEUIButtonControl : public ZEUIControl
 
 	protected:
 
-		ZEUIRectangle			Button;
-		ZEUIMaterial*			ButtonMaterial;
+		ZEUIRectangle		Button;
+		ZEUIMaterial*		ButtonMaterial;
 
 	public:
 
-		virtual void			Draw(ZEUIRenderer* Renderer);
+		virtual void		Draw(ZEUIRenderer* Renderer);
 
-		virtual void			SetWidth(float Width);
-		virtual void			SetHeight(float Height);
-		virtual void			SetSize(const ZEVector2& Size);
+		virtual void		SetWidth(float Width);
+		virtual void		SetHeight(float Height);
+		virtual void		SetSize(const ZEVector2& Size);
 
-		virtual void			SetPosition(const ZEVector2& Position);
+		virtual void		SetPosition(float X, float Y);
+		virtual void		SetPosition(const ZEVector2& Position);
 
-		virtual ZEMaterial*		GetMaterial() const;
-		virtual void			SetMaterial(ZEMaterial* Material);
+		virtual ZEMaterial*	GetMaterial() const;
+		virtual void		SetMaterial(ZEMaterial* Material);
 
-								ZEUIButtonControl();
-								~ZEUIButtonControl();
+							ZEUIButtonControl();
+							~ZEUIButtonControl();
 
 };
 

@@ -36,7 +36,7 @@
 #include "ZEUIVerticalSliderControl.h"
 #include "ZEUIRenderer.h"
 
-void ZEUIVerticalSliderControl::SetSliderValueByButton(const ZEVector2& MoveAmount)
+void ZEUIVerticalSliderControl::SetSliderValueByButton(ZEUIMouseKey Button, const ZEVector2& MoveAmount)
 {
 	float SliderLineHeight = SliderLine.Positions.RightDown.y - SliderLine.Positions.LeftUp.y - SliderButton.GetHeight();
 	float Range = MaximumValue - MinimumValue;
@@ -112,6 +112,11 @@ void ZEUIVerticalSliderControl::Draw(ZEUIRenderer* Renderer)
 		Renderer->AddRectangle(Output);
 
 	ZEUIControl::Draw(Renderer);
+}
+
+void ZEUIVerticalSliderControl::SetPosition(float X, float Y)
+{
+	SetPosition(ZEVector2(X, Y));
 }
 
 void ZEUIVerticalSliderControl::SetPosition(const ZEVector2& Position)

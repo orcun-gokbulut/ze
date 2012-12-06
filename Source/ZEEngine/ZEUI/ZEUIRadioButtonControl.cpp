@@ -36,7 +36,7 @@
 #include "ZEUIRadioButtonControl.h"
 #include "ZEFontResourceBitmap.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
-#include "ZETexture/ZETexture2DResource.h"
+#include "ZETexture//ZETexture2DResource.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 
 void ZEUIRadioButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
@@ -50,7 +50,7 @@ void ZEUIRadioButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVec
 	{
 		SetState(ZE_UI_RBS_CHECKED);
 
-		for (ZESize I = 0; I < InteractingRadioButtons.GetCount(); I++)
+		for (size_t I = 0; I < InteractingRadioButtons.GetCount(); I++)
 			InteractingRadioButtons[I]->SetState(ZE_UI_RBS_UNCHECKED);
 	}
 }
@@ -104,24 +104,24 @@ void ZEUIRadioButtonControl::SetMaterial(ZEMaterial* Material)
 ZEUIRadioButtonControl::ZEUIRadioButtonControl()
 {
 	State = ZE_UI_RBS_UNCHECKED;
-	Label.SetFontResource(ZEFontResourceBitmap::LoadResource("OldEnglish.zefont"));
+	Label.SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+	Label.SetFontSize(ZEVector2::One);
 	Label.SetText(ZEString("Test"));
 
 	Box.SetWidth(24);
 	Box.SetHeight(24);
 	Label.SetWidth(120);
-	Label.SetHeight(25);
+	Label.SetHeight(Label.GetTextControlCharacters()[0].RenderableCharacter.Positions.GetHeight());
 
 	AddChildControl(&Box);
 	AddChildControl(&Label);
 	Box.SetPosition(ZEVector2::Zero);
-	Label.SetPosition(ZEVector2(Box.GetPosition().x + Box.GetWidth(), Box.GetPosition().y));
+	Label.SetPosition(ZEVector2(Box.GetPosition().x + Box.GetWidth() + 1, Box.GetPosition().y + (Box.GetHeight() - Label.GetHeight()) / 2));
 
 	SetHeight(Box.GetHeight());
 	SetWidth(Box.GetWidth() + Label.GetWidth());
 
 	Box.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUIRadioButtonControl::MouseButtonPressed));
-	Label.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUIRadioButtonControl::MouseButtonPressed));
 
 	((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("UnChecked.png")->GetTexture());
 }

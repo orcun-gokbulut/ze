@@ -116,7 +116,7 @@ void ZEUICheckBoxControl::SetMaterial(ZEMaterial* Material)
 ZEUICheckBoxControl::ZEUICheckBoxControl()
 {
 	State = ZE_UI_CBS_UNCHECKED;
-	Label.SetFontResource(ZEFontResourceBitmap::LoadResource("OldEnglish.zefont"));
+	Label.SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zefont"));
 	Label.SetText(ZEString("Test"));
 
 	IsTriState = false;
