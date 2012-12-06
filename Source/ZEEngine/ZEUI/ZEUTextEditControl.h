@@ -37,10 +37,12 @@
 #ifndef __ZE_UI_TEXT_EDIT_CONTROL__
 #define __ZE_UI_TEXT_EDIT_CONTROL__
 
-#include "ZEUI/ZEUIFrameControl.h"
+#include "zeui/ZEUIFrameControl.h"
 #include "ZEUITextControl.h"
 
 class ZEMaterial;
+class ZEFontResource;
+class ZEUIRectangle;
 
 class ZEUITextEditControl : public ZEUIFrameControl
 {
@@ -50,18 +52,60 @@ class ZEUITextEditControl : public ZEUIFrameControl
 
 		float					CursorBlinkTime;
 		float					TotalTime;
+
 		ZEUIRectangle			Cursor;
+
+		ZEVector2				InitialMousePosition;
+		ZEVector2				LastMousePosition;
+
+		ZEArray<ZEUIRectangle>	SelectedTextItemsRectangles;
+		ZEArray<size_t>			SelectedTextItemsPositions;
+
+		size_t					CursorTextPosition;
+		ZEVector2				CharacterScenePosition;
+
+		const ZEMaterial*		HightlightMaterial;
+
 		bool					CursorVisible;
+		bool					IsAnyCharacterClicked;
+		bool					ReadOnly;
+
+		void					SelectCursorPosition(ZEVector2 MousePosition);
+		void					MultiCharacterSelection(ZEVector2 MoveAmount);
+		void					DeleteCharacter(int Position);
+		void					BackspaceKeyPressed();
+		void					AddCharacter(char Key);
+		void					CharacterKeyPressed(char Key);	
 
 	protected:
 
-		virtual void			KeyPressed(unsigned char Key);
+		virtual void			MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+		virtual void			MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmount);
+		virtual void			KeyPressed(ZEUIInputKey Key);
 
 	public:
 
-		virtual void			SetMaterial(ZEMaterial* Material);
-		virtual ZEMaterial*		GetMaterial() const;
+		void					AppendText(const ZEString& Value);
 
+		void					SetText(const ZEString& Value);
+		const ZEString&			GetText();
+
+		void					SetTextColor(const ZEVector4& Color);
+		const ZEVector4&		GetTextColor();
+
+		void					SetFont(ZEFontResource* FontResource);
+		ZEFontResource*			GetFont();
+
+		void					SetFontSize(const ZEVector2& FontSize);
+		const ZEVector2&		GetFontSize();
+
+		void					SetReadOnly(bool ReadOnly);
+		bool					GetReadOnly();
+
+		virtual void			SetMaterial(ZEMaterial* Material);
+		virtual ZEMaterial* 	GetMaterial() const;
+
+		virtual void			SetSize(const ZEVector2& Size);
 		virtual void			SetWidth(float Width);
 		virtual void			SetHeight(float Height);
 

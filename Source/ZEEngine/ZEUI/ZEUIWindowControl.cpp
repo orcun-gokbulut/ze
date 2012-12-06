@@ -36,20 +36,20 @@
 #include "ZEUIWindowControl.h"
 #include "ZETexture/ZETexture2DResource.h"
 
-void ZEUIWindowTitleBarControl::MouseMoveEvent(const ZEVector2& MoveAmount)
+void ZEUIWindowTitleBarControl::MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmount)
 {
-	if (!GetMoveable())
+	if (!IsMoveable)
 		return;
 
 	if (GetParentControl() != NULL)
-		GetParentControl()->SetPosition(GetParentControl()->GetPosition() + MoveAmount);
+		GetParentControl()->SetPosition(GetParentControl()->GetScreenPosition() + MoveAmount);
 }
 
 void ZEUIWindowTitleBarControl::SetWidth(float Width)
 {
 	ZEUIFrameControl::SetWidth(Width);
-	CloseButton.SetPosition(ZEVector2(GetRectangle().RightDown.x - CloseButton.GetWidth() - 2, GetPosition().y + 2));
-	MinimizeButton.SetPosition(ZEVector2(CloseButton.GetPosition().x - 2 - MinimizeButton.GetWidth(), CloseButton.GetPosition().y));
+	CloseButton.SetPosition(ZEVector2(GetScreenRectangle().RightDown.x - CloseButton.GetWidth() - 2, GetScreenPosition().y + 2));
+	MinimizeButton.SetPosition(ZEVector2(CloseButton.GetScreenPosition().x - 2 - MinimizeButton.GetWidth(), CloseButton.GetScreenPosition().y));
 }
 
 void ZEUIWindowTitleBarControl::SetTitleText(const char* TitleText)
@@ -79,21 +79,29 @@ ZEUIWindowTitleBarControl::ZEUIWindowTitleBarControl()
 	SetWidth(200);
 	SetHeight(25);
 
-	Title.SetPosition(GetPosition());
+	Title.SetPosition(GetScreenPosition());
 
 	AddChildControl(&Title);
 	AddChildControl(&MinimizeButton);
-	AddChildControl(&CloseButton);	
-	SetMoveable(true);
+	AddChildControl(&CloseButton);
 }
 
-void ZEUIWindowControl::ResizeWindow(const ZEVector2& ResizeAmount)
+void ZEUIWindowControl::ResizeWindow(ZEUIMouseKey Button, const ZEVector2& ResizeAmount)
 {
 	if(GetFixedSized())
 		return;
 
-	SetWidth(GetWidth() + ResizeAmount.x);
-	SetHeight(GetHeight() + ResizeAmount.y);
+	if (GetWidth() + ResizeAmount.x >  GetScreenRectangle().RightDown.x - TitleBar.CloseButton.GetScreenRectangle().RightDown.x + GetScreenRectangle().RightDown.x - TitleBar.MinimizeButton.GetScreenPosition().x)
+	{
+		SetWidth(GetWidth() + ResizeAmount.x);
+	}
+
+	if (ContentArea.GetHeight() + ResizeAmount.y > ResizeButton.GetHeight())
+	{
+		SetHeight(GetHeight() + ResizeAmount.y);
+	}
+
+	ResizeButton.SetPosition(ZEVector2(GetScreenRectangle().RightDown.x - ResizeButton.GetWidth(), GetScreenRectangle().RightDown.y - ResizeButton.GetHeight()));
 }
 
 void ZEUIWindowControl::CloseWindow(ZEUIMouseKey Button, const ZEVector2& MousePosition)
@@ -118,19 +126,24 @@ void ZEUIWindowControl::HideContentArea(ZEUIMouseKey Button, const ZEVector2& Mo
 	}
 }
 
+// void ZEUIWindowControl::SetPosition(const ZEVector2& Position)
+// {
+// 	ZEUIControl::SetPosition(Position);
+// }
+
 void ZEUIWindowControl::SetWidth(float Width)
 {
 	ZEUIControl::SetWidth(Width);
 	TitleBar.SetWidth(GetWidth());
 	ContentArea.SetWidth(GetWidth());
-	ResizeButton.SetPosition(ZEVector2(GetRectangle().RightDown.x - ResizeButton.GetWidth(), GetRectangle().RightDown.y - ResizeButton.GetHeight()));
+	ResizeButton.SetPosition(ZEVector2(GetScreenRectangle().RightDown.x - ResizeButton.GetWidth(), GetScreenRectangle().RightDown.y - ResizeButton.GetHeight()));
 }
 
 void ZEUIWindowControl::SetHeight(float Height)
 {
 	ZEUIControl::SetHeight(Height);
 	ContentArea.SetHeight(GetHeight() - TitleBar.GetHeight());
-	ResizeButton.SetPosition(ZEVector2(GetRectangle().RightDown.x - ResizeButton.GetWidth(), GetRectangle().RightDown.y - ResizeButton.GetHeight()));
+	ResizeButton.SetPosition(ZEVector2(GetScreenRectangle().RightDown.x - ResizeButton.GetWidth(), GetScreenRectangle().RightDown.y - ResizeButton.GetHeight()));
 }
 
 void ZEUIWindowControl::AddChildControl(ZEUIControl* Control)
@@ -138,10 +151,14 @@ void ZEUIWindowControl::AddChildControl(ZEUIControl* Control)
 	ContentArea.AddChildControl(Control);
 }
 
+bool ZEUIWindowControl::GetMoveable()
+{
+	return TitleBar.IsMoveable;
+}
+
 void ZEUIWindowControl::SetMoveable(bool Moveable)
 {
-	TitleBar.SetMoveable(Moveable);
-	ZEUIControl::SetMoveable(Moveable);
+	TitleBar.IsMoveable = Moveable;
 }
 
 void ZEUIWindowControl::SetMaterial(ZEMaterial* Material)
@@ -158,7 +175,9 @@ ZEUIWindowControl::ZEUIWindowControl()
 {
 	SetPosition(ZEVector2::Zero);
 	TitleBar.SetPosition(ZEVector2::Zero);
-	ContentArea.SetPosition(ZEVector2(0.0f, TitleBar.GetHeight()));
+	ContentArea.SetPosition(ZEVector2(0.0f, TitleBar.GetScreenRectangle().RightDown.y));
+
+	float x = TitleBar.GetHeight();
 
 	ZEUIControl::AddChildControl(&TitleBar);
 	ZEUIControl::AddChildControl(&ContentArea);
@@ -169,9 +188,7 @@ ZEUIWindowControl::ZEUIWindowControl()
 	ResizeButton.SetWidth(10);
 	ResizeButton.SetHeight(10);
 
-	SetMoveable(true);
-	ContentArea.SetMoveable(false);
-	ResizeButton.SetMoveable(true);
+ 	SetMoveable(true);
 	SetFixedSized(false);
 
 	SetWidth(200);
@@ -180,9 +197,4 @@ ZEUIWindowControl::ZEUIWindowControl()
 	ResizeButton.SetMouseMovedEvent(BindDelegate(this, &ZEUIWindowControl::ResizeWindow));
 	TitleBar.CloseButton.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUIWindowControl::CloseWindow));
 	TitleBar.MinimizeButton.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUIWindowControl::HideContentArea));
-
-	ZEUIButtonControl* TestB = new ZEUIButtonControl();
-	TestB->SetPosition(ZEVector2(5,30));
-	AddChildControl(TestB);
-	SetMinimumSize(ZEVector2(50,50));
 }

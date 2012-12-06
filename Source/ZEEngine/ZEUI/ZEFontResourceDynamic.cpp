@@ -181,7 +181,7 @@ const ZEFontCharacter& ZEFontResourceDynamic::GetCharacter(char CurrentChar, cha
 	FT_Bitmap FTBitmap = ((FT_BitmapGlyph)Glyph)->bitmap;
 
 	FT_Load_Glyph(Face, FT_Get_Char_Index(Face, 'O'), FT_LOAD_DEFAULT);
-	FontCharacters[LastItem].CharacterMetric.MaximumHeight = Face->glyph->metrics.height / PointFactor;
+	FontCharacters[LastItem].CharacterMetric.MaximumHeight = 18;//Face->glyph->metrics.height / PointFactor;
 
 	if(isspace(NextChar))
 		NextGlyphIndex = FT_Get_Char_Index(Face, UTF8SpaceChar);

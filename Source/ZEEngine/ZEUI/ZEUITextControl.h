@@ -38,48 +38,89 @@
 #define __ZE_UI_TEXT_CONTROL__
 
 #include "ZEUIControl.h"
-#include "ZEDS\ZEString.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEVector.h"
 #include "ZEFontResource.h"
-#include "ZEGraphics\ZEUIMaterial.h"
 
+struct ZEUITextControlCharacter
+{
+	char				CChar;
+	ZEFontCharacter		FontCharacter;
+	ZEUIRectangle		RenderableCharacter;
+	int					Line;
+	bool				IsSelected;
+};
+
+class ZEMaterial;
 class ZEUIRenderer;
-
+class ZEFontResource;
 class ZEUITextControl : public ZEUIControl
 {
+	friend class ZEUIMultiLineTextEdit;
+	friend class ZEUITextEditControl;
+
 	private:
-		ZEString						Text;
-		ZEVector4						TextColor;
-		bool							TextWrap;
-		ZEFontResource*					FontResource;
-		ZEVector2						FontSize;
-		ZEMaterial*						Material;
+		ZEString									Text;
+		ZEArray<ZEUITextControlCharacter>			DisplayTextCharacters;
+
+		ZEArray<ZECharacter>						SpecialCharacters;
+
+		ZEVector4									TextColor;
+
+		ZEFontResource*								FontResource;
+		ZEVector2									FontSize;
+
+		bool										TextWrap;
+
+		const ZEMaterial*							HightlightMaterial;
+		ZEUIMaterial*								Material;
+
+		void										SetDisplayTextCharacters();
+
+		ZEVector2									SpecialCharacter(char Character, size_t Position, ZEUIRectangle Rectangle);
+		void										RearrangeDimensions();
 
 	public:
-		ZEUIRectangle					Output;
 
-		void							SetText(const ZEString& Value);
-		const ZEString&					GetText();
+		ZEUIRectangle								Output;
 
-		void							SetTextColor(const ZEVector4& Color);
-		const ZEVector4&				GetTextColor();
+		const ZEArray<ZEUITextControlCharacter>&	GetTextControlCharacters();
 
-		void							SetTextWrap(bool Wrap);
-		bool							GetTextWrap();
+		void										AddText(size_t Position, const ZEString& Value);
+		void										AddCharacter(size_t Position, char Character);
 
-		void							SetFontResource(ZEFontResource* FontResource);
-		ZEFontResource*					GetFontResource();
+		void										DeleteCharacters(ZEArray<size_t> Positions);
+		void										DeleteCharacter(size_t Position);
 
-		void							SetFontSize(const ZEVector2& FontSize);
-		const ZEVector2&				GetFontSize();
+		void										SetText(const ZEString& Value);
+		const ZEString&								GetText();
 
-		virtual	void					SetMaterial(ZEMaterial* Material);
-		virtual ZEMaterial*				GetMaterial() const;
+		virtual void								SetPosition(float X, float Y);
+		virtual void								SetPosition(const ZEVector2& Position);
 
-		virtual void					Draw(ZEUIRenderer* Renderer);
+		void										SetTextColor(const ZEVector4& Color);
+		const ZEVector4&							GetTextColor();
 
-										ZEUITextControl();
-										~ZEUITextControl();
+		void										SetTextWrap(bool Wrap);
+		bool										GetTextWrap();
+
+		void										SetFont(ZEFontResource* FontResource);
+		ZEFontResource*								GetFont();
+
+		void										SetFontSize(const ZEVector2& FontSize);
+		const ZEVector2&							GetFontSize();
+
+		virtual	void								SetMaterial(ZEMaterial* Material);
+		virtual ZEMaterial*							GetMaterial() const;
+
+		virtual void								Draw(ZEUIRenderer* Renderer);
+
+													ZEUITextControl();
+													~ZEUITextControl();
 };
 
 #endif
+
+
+
+

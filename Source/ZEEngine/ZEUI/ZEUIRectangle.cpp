@@ -36,11 +36,6 @@
 #include "ZEUIRectangle.h"
 #include "ZEGraphics/ZEVertexTypes.h"
 
-ZEUIRectangle::ZEUIRectangle()
-{
-	ZOrder = 0;
-}
-
 void ZEUIRectangle::ConvertToVertices(ZEUIVertex* Buffer) const
 {
 	Buffer[0].Position = Positions.LeftUp;

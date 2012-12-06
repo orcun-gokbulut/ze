@@ -43,7 +43,7 @@ class ZEUIVerticalSliderControl : public ZEUISliderControl
 {
 	protected:
 
-		virtual void	SetSliderValueByButton(const ZEVector2& MoveAmount);
+		virtual void	SetSliderValueByButton(ZEUIMouseKey Button, const ZEVector2& MoveAmount);
 		virtual void	MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 
 	public:
@@ -52,6 +52,7 @@ class ZEUIVerticalSliderControl : public ZEUISliderControl
 
 		virtual void	SetCurretnValue(float NewValue);
 
+		virtual void	SetPosition(float X, float Y);
 		virtual	void	SetPosition(const ZEVector2& Position);
 		virtual void	SetHeight(float Height);
 

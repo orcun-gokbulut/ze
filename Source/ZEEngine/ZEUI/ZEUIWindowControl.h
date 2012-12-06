@@ -37,8 +37,8 @@
 #ifndef __ZE_UI_WINDOW_CONTROL__
 #define __ZE_UI_WINDOW_CONTROL__
 
-#include "ZEUI/ZEUIControl.h"
-#include "ZEUI/ZEUIRectangle.h"
+#include "zeui/ZEUIControl.h"
+#include "zeui/ZEUIRectangle.h"
 #include "ZEUIFrameControl.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEUITextControl.h"
@@ -54,7 +54,9 @@ class ZEUIWindowTitleBarControl : public ZEUIFrameControl
 		ZEUIButtonControl			CloseButton;
 		ZEUIButtonControl			MinimizeButton;
 
-		virtual void				MouseMoveEvent(const ZEVector2& MoveAmount);
+		bool						IsMoveable;
+
+		virtual void				MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmount);
 
 	public:
 
@@ -70,19 +72,25 @@ class ZEUIWindowControl : public ZEUIControl
 {
 	friend class ZEUIWindowTitleBarControl;
 
+	friend class ZEUIDebugModule;
+
 	private:
 
 		ZEUIWindowTitleBarControl	TitleBar;
 		ZEUIButtonControl			ResizeButton;
 		ZEUIFrameControl			ContentArea;
 
-		virtual void				ResizeWindow(const ZEVector2& ResizeAmount);
+		virtual void				ResizeWindow(ZEUIMouseKey Button, const ZEVector2& ResizeAmount);
 		virtual void				HideContentArea(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 		virtual void				CloseWindow(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 
 	public:
 
-		virtual void				SetMoveable(bool Moveable);
+		void						SetMoveable(bool Moveable);
+		bool						GetMoveable();
+
+//		virtual void				SetPosition(const ZEVector2& Position);
+
 		virtual void				SetWidth(float Width);
 		virtual void				SetHeight(float Height);
 		virtual void				AddChildControl(ZEUIControl* Control);
