@@ -153,6 +153,8 @@ void ZEUILoadingBar::Draw(ZEUIRenderer* Renderer)
 	ZEUIControl::Draw(Renderer);
 
 	ZEUIRectangle Output;
+	Output.ZOrder = GetZOrder();
+
 	if (GetParentControl() != NULL)
 	{
 		if (!ZEUIRectangle::Clip(Output, Frame, GetVisibleRectangle()))

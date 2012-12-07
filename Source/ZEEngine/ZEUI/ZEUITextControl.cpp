@@ -338,12 +338,13 @@ void ZEUITextControl::AddCharacter(size_t Position, char Character)
 		Line = DisplayTextCharacters[DisplayTextCharacters.GetCount() - 1].Line;
 	}
 
-	Text.Insert(Position, &Character);
-	const char* Narrow = (const char*)Text;
+	Text.Insert(Position, ZEString(ZECharacter(Character)));
+	const char* Narrow = Text.ToCString();
 
 	if (SpecialCharacters.Exists(Text[Position]))
+	{
 		Temporary.Positions.LeftUp = SpecialCharacter(Text[Position], Position, Temporary);
-
+	}
 	else
 	{
 		const ZEFontCharacter& CurrCharacter = FontResource->GetCharacter(Narrow[Position]);

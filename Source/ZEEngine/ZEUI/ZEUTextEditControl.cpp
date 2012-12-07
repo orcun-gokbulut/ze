@@ -837,6 +837,7 @@ void ZEUITextEditControl::Draw(ZEUIRenderer* Renderer)
 	ZEUIFrameControl::Draw(Renderer);
 
 	ZEUIRectangle Output;
+	Output.ZOrder = GetZOrder() + 1;
 
 	if (CursorVisible && TextDisplayer.GetFocused())
 		if (!ZEUIRectangle::Clip(Output, Cursor, TextDisplayer.GetVisibleRectangle()))
@@ -846,7 +847,10 @@ void ZEUITextEditControl::Draw(ZEUIRenderer* Renderer)
 	if (SelectedTextItemsRectangles.GetSize() != 0)
 		for (size_t I = 0; I < SelectedTextItemsRectangles.GetSize(); I++)
 			if (!ZEUIRectangle::Clip(Output, SelectedTextItemsRectangles[I], TextDisplayer.GetVisibleRectangle()))
-				Renderer->AddRectangle(Output);
+				{
+					Output.ZOrder = GetZOrder() + 2;
+					Renderer->AddRectangle(Output);
+				}
 }
 
 void ZEUITextEditControl::AppendText(const ZEString& Value)

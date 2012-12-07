@@ -108,6 +108,8 @@ void ZEUIVerticalSliderControl::Draw(ZEUIRenderer* Renderer)
 		return;	
 
 	ZEUIRectangle Output;
+	Output.ZOrder = GetZOrder();
+
 	if(!ZEUIRectangle::Clip(Output, SliderLine, GetVisibleRectangle()))
 		Renderer->AddRectangle(Output);
 
