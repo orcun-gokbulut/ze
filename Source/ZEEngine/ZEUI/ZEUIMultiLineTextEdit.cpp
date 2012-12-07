@@ -294,8 +294,8 @@ void ZEUIMultiLineTextEdit::DeleteCharacter(int Position)
 	}
 
 	ZEString Manipulator = TextDisplayer.GetText();
-	ZERectangle CharacterRectangle = ZERectangle(TextDisplayer.GetTextControlCharacters()[Position].RenderableCharacter.Positions.LeftUp, TextDisplayer.GetTextControlCharacters()[Position].RenderableCharacter.Positions.RightDown);
-
+	ZERectangle CharacterRectangle = ZERectangle(TextDisplayer.GetTextControlCharacters()[Position-1].RenderableCharacter.Positions.LeftUp, TextDisplayer.GetTextControlCharacters()[Position-1].RenderableCharacter.Positions.RightDown);
+	
 	if (Position == 0)
 	{
 		Cursor.Positions.LeftUp.x = CharacterRectangle.LeftUp.x;
@@ -567,7 +567,7 @@ void ZEUIMultiLineTextEdit::AddCharacter(char Key)
 			}
 		}
 		// IF ENTER KEY PRESSED THAN MOVE TEXTDISPLAYER TO START POSITION (TYPEWRITER BEHAVIOUR)
-		if (TextDisplayer.GetTextControlCharacters()[CursorTextPosition - 1].RenderableCharacter.Positions.RightDown.y < TextDisplayer.GetTextControlCharacters()[CursorTextPosition].RenderableCharacter.Positions.RightDown.y)
+		if (TextDisplayer.GetTextControlCharacters()[CursorTextPosition /*- 1*/].RenderableCharacter.Positions.RightDown.y < TextDisplayer.GetTextControlCharacters()[CursorTextPosition].RenderableCharacter.Positions.RightDown.y)
 		{
 			TextDisplayer.SetPosition(ZEVector2(0.0f, TextDisplayer.GetPosition().y));
 		}
@@ -1072,6 +1072,7 @@ void ZEUIMultiLineTextEdit::Draw(ZEUIRenderer* Renderer)
 	ZEUIScrollArea::Draw(Renderer);
 
 	ZEUIRectangle Output;
+	Output.ZOrder = GetZOrder() + 1;
 
 	if (CursorVisible && TextDisplayer.GetFocused())
 		if (!ZEUIRectangle::Clip(Output, Cursor, GetVisibleContentArea()->GetRectangle()))

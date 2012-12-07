@@ -45,6 +45,8 @@ void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
 
 	ZEUIControl::Draw(Renderer);
 	ZEUIRectangle Output;
+
+	Output.ZOrder = GetZOrder();
 		
 	if(!ZEUIRectangle::Clip(Output, Button, GetVisibleRectangle()))
 		Renderer->AddRectangle(Output);

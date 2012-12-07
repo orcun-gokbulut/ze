@@ -44,6 +44,7 @@ void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
 		return;
 
 	ZEUIRectangle Output;
+	Output.ZOrder = GetZOrder();
 
 	if(!ZEUIRectangle::Clip(Output, Frame, GetVisibleRectangle()))
 		Renderer->AddRectangle(Output);

@@ -61,6 +61,7 @@ void ZEUICursorControl::Draw(ZEUIRenderer* Renderer)
 		return;
 
 	ZEUIControl::Draw(Renderer);
+	Cursor.ZOrder = GetZOrder();
 	Renderer->AddRectangle(Cursor);
 }
 
