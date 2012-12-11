@@ -1,6 +1,6 @@
 #ZE_SOURCE_PROCESSOR_START(License, 1.0)
 #[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+ Zinek Engine - ze_dependency.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,17 +33,35 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+function (ze_add_dependency)
+	parse_arguments(PARAMETER "TARGET;DEPENDENCIES" "" ${ARGV})
+	set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY ZEBUILD_DEPENDENCIES ${PARAMETER_DEPENDENCIES})
+endfunction()
 
-ze_add_cmake_project(CMakeScripts
-	SOURCES	
-		ze.cmake
-		ze_check.cmake
-		ze_common.cmake
-		ze_dependency.cmake
-		ze_functions.cmake
-		ze_platform.cmake
-		ze_qt.cmake
-		ze_target.cmake
-		ze_utility.cmake
-		ze_version.cmake)
+function (ze_get_dependency_list)
+	parse_arguments(PARAMETER "TARGET;RETURN;LIST" "" ${ARGV})
+	
+	if (PARAMETER_LIST)
+		set(RETURN_TEMP ${PARAMETER_LIST} ${PARAMETER_TARGET})
+	else()
+		set(RETURN_TEMP ${PARAMETER_TARGET})
+	endif()
+	
+	if (TARGET ${PARAMETER_TARGET})
+		get_property(TARGET_DEPENDENCIES TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_DEPENDENCIES)
+		foreach(CURRENT_DEPENDENCY ${TARGET_DEPENDENCIES})
+			list(FIND RETURN_TEMP ${CURRENT_DEPENDENCY} RESULT)
+			if (RESULT EQUAL -1)
+				ze_get_dependency_list(TARGET ${CURRENT_DEPENDENCY} LIST ${RETURN_TEMP} RETURN RETURNED_VALUES)
+				foreach(CURRENT_RETURN ${RETURNED_VALUES})
+					list(FIND RETURN_TEMP ${CURRENT_RETURN} RESULT)
+					if (RESULT EQUAL -1)
+						list(APPEND RETURN_TEMP ${CURRENT_RETURN})
+					endif()
+				endforeach()
+			endif()
+		endforeach()
+	endif()
+	
+	set(${PARAMETER_RETURN} ${RETURN_TEMP} PARENT_SCOPE)
+endfunction()

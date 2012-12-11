@@ -1,6 +1,6 @@
 #ZE_SOURCE_PROCESSOR_START(License, 1.0)
 #[[*****************************************************************************
- Zinek Engine - append_property.cmake
+ Zinek Engine - ze_platform.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,25 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-macro(append_property SCOPE PROPERTY_IDEN PROPERTY_NAME)
-	get_property(OLD_VALUES ${SCOPE} PROPERTY ${PROPERTY_NAME})
-	set_property(${SCOPE} PROPERTY ${PROPERTY_NAME} ${OLD_VALUES} ${ARGN})
-endmacro(append_property)
+function (ze_register_platform_library)
+	parse_arguments(PARAMETER "TARGET;SYSTEM_LIBS;${ze_check_parameters}" "COMBINABLE" ${ARGV})
+	
+	ze_check()
+	if (NOT CHECK_SUCCEEDED)
+		return()
+	endif()
+	
+	ze_add_custom_target(TARGET ${PARAMETER_TARGET})
+	
+	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_TYPE "PLATFORMLIB")
+	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_PATH "${CURRENT_SOURCE_DIR}")
+	if (PARAMETER_COMBINABLE)
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_COMBINABLE TRUE)
+	else()
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_COMBINABLE FALSE)
+	endif()
+
+	if (PARAMETER_EXTRA_LIBS)
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_SYSTEM_LIBS ${PARAMETER_EXTRA_LIBS})
+	endif()
+endfunction()
