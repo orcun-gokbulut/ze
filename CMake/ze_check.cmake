@@ -1,6 +1,6 @@
 #ZE_SOURCE_PROCESSOR_START(License, 1.0)
 #[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+ Zinek Engine - ze_check.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,17 +33,67 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+set(ze_check_parameters "PLATFORMS;COMPILERS;ARCHS")
+macro(ze_check)
+	set(CHECK_SUCCEEDED FALSE)
+	if (PARAMETER_PLATFORMS)
+		set(CHECK_SUCCEEDED FALSE)
+		foreach(ARG ${PARAMETER_PLATFORMS})
+			string(TOUPPER ${ARG} TEMP_UPPER)
+			if (ZEBUILD_PLATFORM_${TEMP_UPPER})
+				set(CHECK_SUCCEEDED TRUE)
+				break()
+			endif()
+		endforeach()
+	else()
+		set(CHECK_SUCCEEDED TRUE)
+	endif()
 
-ze_add_cmake_project(CMakeScripts
-	SOURCES	
-		ze.cmake
-		ze_check.cmake
-		ze_common.cmake
-		ze_dependency.cmake
-		ze_functions.cmake
-		ze_platform.cmake
-		ze_qt.cmake
-		ze_target.cmake
-		ze_utility.cmake
-		ze_version.cmake)
+	if (CHECK_SUCCEEDED)
+		if (PARAMETER_ARCHS)
+			string(TOUPPER ${ZEBUILD_PLATFORM_ARCHITECTURE} TEMP_UPPER)
+			set(CHECK_SUCCEEDED FALSE)
+			foreach(ARG ${PARAMETER_ARCHS})
+				string(TOUPPER ${ARG} ARG_UPPER)
+				if (${ARG_UPPER} MATCHES ${TEMP_UPPER})
+					set(CHECK_SUCCEEDED TRUE)
+					break()
+				endif()
+			endforeach()
+		else()
+			set(CHECK_SUCCEEDED TRUE)
+		endif()
+	endif()
+
+	if (CHECK_SUCCEEDED)
+		if (PARAMETER_COMPILERS)
+			string(TOUPPER ${ZEBUILD_PLATFORM_COMPILERS} TEMP_UPPER)
+			set(CHECK_SUCCEEDED FALSE)
+			foreach(ARG ${PARAMETER_COMPILERS})
+				string(TOUPPER ${ARG} ARG_UPPER)
+				if (${ARG_UPPER} MATCHES ${TEMP_UPPER})
+					set(CHECK_SUCCEEDED TRUE)
+					break()
+				endif()
+			endforeach()
+		else()
+			set(CHECK_SUCCEEDED TRUE)
+		endif()
+	endif()
+
+	if (CHECK_SUCCEEDED)
+		if (PLATFORM_FLAGS)
+			string(TOUPPER ${ZEBUILD_PLATFORM_ARCHITECTURE} TEMP_UPPER)
+			set(CHECK_SUCCEEDED FALSE)
+			foreach(ARG ${PARAMETER_ARCHS})
+				string(TOUPPER ${ARG} ARG_UPPER)
+				if (${ARG_UPPER} MATCHES ${TEMP_UPPER})
+					set(CHECK_SUCCEEDED TRUE)
+					break()
+				endif()
+			endforeach()
+		else()
+			set(CHECK_SUCCEEDED TRUE)
+		endif()
+	endif()
+endmacro()

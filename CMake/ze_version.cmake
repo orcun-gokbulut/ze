@@ -1,6 +1,6 @@
 #ZE_SOURCE_PROCESSOR_START(License, 1.0)
 #[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+ Zinek Engine - ze_version.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,17 +33,57 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+macro(ze_get_version)
+	file(READ "${ARGV0}/Version.txt" VERSION_STRING)
 
-ze_add_cmake_project(CMakeScripts
-	SOURCES	
-		ze.cmake
-		ze_check.cmake
-		ze_common.cmake
-		ze_dependency.cmake
-		ze_functions.cmake
-		ze_platform.cmake
-		ze_qt.cmake
-		ze_target.cmake
-		ze_utility.cmake
-		ze_version.cmake)
+	set(VERSION_MAJOR 0)
+	if ("${VERSION_STRING}" MATCHES "[ \\t]*Version[ \\t]*:[ \\t]*([0-9]+).*")
+		set(VERSION_MAJOR ${CMAKE_MATCH_1})
+	endif()
+
+	set(VERSION_MINOR 0)
+	if ("${VERSION_STRING}" MATCHES "[ \\t]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*([0-9]+).*")
+		set(VERSION_MINOR ${CMAKE_MATCH_1})
+	endif()
+
+	set(VERSION_INTERNAL 0)
+	if ("${VERSION_STRING}" MATCHES "[ \\t]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*[0-9]+\\.[ \\t]*([0-9]+).*")
+		set(VERSION_INTERNAL ${CMAKE_MATCH_1})
+	endif()
+
+endmacro()
+
+macro(ze_get_version_branch_name)
+	file(READ "${ARGV0}/Version.txt" VERSION_STRING)
+
+	set (VERSION_BRANCH_NAME "")
+	if ("${VERSION_STRING}" MATCHES "[ \\t]*Branch[ \\t]*:[ \\t]*(.*)[ \\t]*")
+		set(VERSION_BRANCH_NAME ${CMAKE_MATCH_1})
+	endif()
+endmacro()
+
+macro(ze_get_version_revision_number)
+	set (VERSION_REVISION "0")
+	include(External/FindSubversion)
+	Subversion_WC_INFO(${ARGV0} SVN_INFO)
+	if (Subversion_WC_RESULT)
+		set(VERSION_REVISION ${SVN_INFO_WC_REVISION})
+	else()
+		set(VERSION_REVISION "0")
+	endif()
+endmacro()
+
+macro(ze_check_externals)
+	if (NOT EXISTS "${ARGV0}/Version.txt")
+		set(EXTERNALS_OK -1)
+	else()
+		ze_get_version("${CMAKE_SOURCE_DIR}/Platform")
+		if (NOT ${ARGV1} EQUAL VERSION_MAJOR)
+			set(EXTERNALS_OK -2)
+		elseif (${ARGV2} LESS VERSION_MINOR)
+			set(EXTERNALS_OK -3)
+		else()
+			set(EXTERNALS_OK 0)
+		endif()
+	endif()
+endmacro()

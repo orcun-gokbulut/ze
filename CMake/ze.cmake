@@ -36,9 +36,15 @@
 macro (ze_configure_init)
 	SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
-	include(build_dir_check)
-	include(parse_arguments)
-	include(ze_functions)
+	include(External/build_dir_check)
+	include(External/parse_arguments)
+	include(ze_check)
+	include(ze_common)
+	include(ze_dependency)
+	include(ze_utility)
+	include(ze_target)
+	include(ze_platform)
+	include(ze_version)
 
 	macro_ensure_out_of_source_build("[ZEBuild] Error : Project requires an out of source build.")
 endmacro()
@@ -352,7 +358,7 @@ macro(ze_configure_unit_tests)
 	endif()
 	
 	if (ZEBUILD_UNIT_TESTS_ENABLE AND ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE)
-		include(test_cocoon)
+		include(External/test_cocoon)
 	endif()
 endmacro()
 
@@ -362,11 +368,11 @@ macro(ze_configure_static_checks)
 	set(ZEBUILD_STATIC_CHECKS_ENABLE_PCLINT   FALSE CACHE BOOL "Enable pc-lint static checker.")
 	
 	if (ZEBUILD_STATIC_CHECKS_ENABLE AND ZEBUILD_STATIC_CHECKS_ENABLE_CPPCHECK)
-		include(cppcheck.cmake)
+		include(External/cppcheck.cmake)
 	endif()
 
 	if (ZEBUILD_STATIC_CHECKS_ENABLE AND ZEBUILD_STATIC_CHECKS_ENABLE_PCLINT)
-		include(pc-lint.cmake)
+		include(External/pc-lint.cmake)
 	endif()
 endmacro()
 

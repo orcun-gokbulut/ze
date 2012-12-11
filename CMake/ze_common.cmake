@@ -1,6 +1,6 @@
 #ZE_SOURCE_PROCESSOR_START(License, 1.0)
 #[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+ Zinek Engine - ze_common.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,17 +33,23 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+macro(ze_append_property SCOPE PROPERTY_IDEN PROPERTY_NAME)
+	get_property(OLD_VALUES ${SCOPE} PROPERTY ${PROPERTY_NAME})
+	set_property(${SCOPE} PROPERTY ${PROPERTY_NAME} ${OLD_VALUES} ${ARGN})
+endmacro()
 
-ze_add_cmake_project(CMakeScripts
-	SOURCES	
-		ze.cmake
-		ze_check.cmake
-		ze_common.cmake
-		ze_dependency.cmake
-		ze_functions.cmake
-		ze_platform.cmake
-		ze_qt.cmake
-		ze_target.cmake
-		ze_utility.cmake
-		ze_version.cmake)
+function (ze_set_property_all_config)
+	parse_arguments(PARAMETER "TARGET;PROPERTY" "" ${ARGV})
+
+	list(GET PARAMETER_PROPERTY 0 PARAMETER_PROPERTY_NAME)
+	list(REMOVE_AT PARAMETER_PROPERTY 0)
+	
+	if (CMAKE_CONFIGURATION_TYPES)
+		foreach(CONFIGURATION ${CMAKE_CONFIGURATION_TYPES})
+			string(TOUPPER ${CONFIGURATION} CONFIGURATION_UPPER) 
+			set_property(TARGET ${PARAMETER_TARGET} PROPERTY ${PARAMETER_PROPERTY_NAME}_${CONFIGURATION_UPPER} ${PARAMETER_PROPERTY})
+		endforeach()
+	else()
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ${PARAMETER_PROPERTY_NAME} ${PARAMETER_PROPERTY})
+	endif()
+endfunction()
