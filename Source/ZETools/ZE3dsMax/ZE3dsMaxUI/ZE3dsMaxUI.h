@@ -37,11 +37,40 @@
 #ifndef __ZE_3DS_MAX_UI_H__
 #define __ZE_3DS_MAX_UI_H__
 
-#include <max.h>
+#include <Max.h>
+#include <MaxIcon.h>
 #include <bmmlib.h>
 #include <guplib.h>
 
+#define ZECommonUtilsRemoveAttributes_Action_ID 980
+
 extern HINSTANCE hInstance;
+
+class ZE3dsMaxCommonUtilsRemoveAttributes : public ActionItem
+{
+private:
+
+	MaxBmpFileIcon*		RemoveActionIcon;
+
+public:
+	int					GetId();
+	BOOL				ExecuteAction();
+
+	void				GetButtonText(MSTR& buttonText);
+	void				GetMenuText(MSTR& menuText);
+	void				GetDescriptionText(MSTR& descText);
+	void				GetCategoryText(MSTR& catText);
+
+	BOOL				IsChecked();
+	BOOL				IsItemVisible();
+	BOOL				IsEnabled();
+
+	MaxIcon*			GetIcon();
+
+	void				DeleteThis();
+
+						ZE3dsMaxCommonUtilsRemoveAttributes();
+};
 
 class ZE3dsMaxUI : public GUP 
 {

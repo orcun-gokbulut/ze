@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZE3dsMaxInteriorActions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,21 +30,71 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
+#ifndef __ZE_3DS_MAX_INTERIOR_ACTIONS_H__
+#define __ZE_3DS_MAX_INTERIOR_ACTIONS_H__
 
-ze_add_cmake_project(ZE3dsMaxScripts
-	SOURCES	CMakeLists.txt
-		ToolbarIcons.pdn
-		zeCanvasExport.ms
-		ZEMap.mcr
-		ZEModelBone.mcr
-		ZEModelMesh.mcr
-		ZEModelPhysicalShape.mcr
-		ZEToolbarIcons_16a.bmp
-		ZEToolbarIcons_16i.bmp
-		ZEToolbarIcons_24a.bmp
-		ZEToolbarIcons_24i.bmp
-		zineklogo.bmp)
+#define ZEInteriorRoomAttributesAdd_Action_ID 950
+#define ZEInteriorDoorAttributesAdd_Action_ID 960
+
+#include <Max.h>
+#include <ActionTable.h>
+#include <MaxIcon.h>
+
+class ZE3dsMaxInteriorActionAddRoomAttributes : public ActionItem
+{
+	private:
+
+		MaxBmpFileIcon*		RoomActionIcon;
+
+	public:
+		int					GetId();
+		BOOL				ExecuteAction();
+
+		void				GetButtonText(MSTR& buttonText);
+		void				GetMenuText(MSTR& menuText);
+		void				GetDescriptionText(MSTR& descText);
+		void				GetCategoryText(MSTR& catText);
+
+		BOOL				IsChecked();
+		BOOL				IsItemVisible();
+		BOOL				IsEnabled();
+
+		MaxIcon*			GetIcon();
+
+		void				DeleteThis();
+
+							ZE3dsMaxInteriorActionAddRoomAttributes();
+};
+
+class ZE3dsMaxInteriorActionAddDoorAttributes : public ActionItem
+{
+	private:
+
+		MaxBmpFileIcon*		DoorActionIcon;
+
+	public:
+		int					GetId();
+		BOOL				ExecuteAction();
+
+		void				GetButtonText(MSTR& buttonText);
+		void				GetMenuText(MSTR& menuText);
+		void				GetDescriptionText(MSTR& descText);
+		void				GetCategoryText(MSTR& catText);
+
+		BOOL				IsChecked();
+		BOOL				IsItemVisible();
+		BOOL				IsEnabled();
+
+		MaxIcon*			GetIcon();
+
+		void				DeleteThis();
+
+							ZE3dsMaxInteriorActionAddDoorAttributes();
+};
+
+
+#endif

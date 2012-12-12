@@ -35,6 +35,7 @@
 
 #include "ZE3dsMaxInteriorExporterDescription.h"
 #include "ZE3dsMaxInteriorExporter.h"
+#include "ZE3dsMaxInteriorActions.h"
 
 #define ZE3dsMaxInteriorExporter_CLASS_ID	Class_ID(0x3a8ad1e4, 0x973e26ff)
 
@@ -76,6 +77,24 @@ const TCHAR* ZE3dsMaxInteriorExporterDescription::InternalName()
 HINSTANCE ZE3dsMaxInteriorExporterDescription::HInstance()
 { 
 	return hInstance; 
+}
+
+int ZE3dsMaxInteriorExporterDescription::NumActionTables()
+{
+	return 1;
+}
+
+ActionTable* ZE3dsMaxInteriorExporterDescription::GetActionTable(int i)
+{
+	ActionTable* MainActionTable = GetCOREInterface()->GetActionManager()->FindTable(kActionMainUI);
+
+	ZE3dsMaxInteriorActionAddRoomAttributes* AddZEInteriorRoomAttributesAction = new ZE3dsMaxInteriorActionAddRoomAttributes();
+	MainActionTable->AppendOperation(AddZEInteriorRoomAttributesAction);
+
+	ZE3dsMaxInteriorActionAddDoorAttributes* AddZEInteriorDoorAttributesAction = new ZE3dsMaxInteriorActionAddDoorAttributes();
+	MainActionTable->AppendOperation(AddZEInteriorDoorAttributesAction);
+
+	return MainActionTable;
 }
 
 ClassDesc2* ZE3dsMaxInteriorExporterDescription::GetInstance()

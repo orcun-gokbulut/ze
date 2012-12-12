@@ -38,14 +38,17 @@ cmake_minimum_required (VERSION 2.8)
 ze_add_source(ZE3dsMaxPlugin.h				Sources)
 ze_add_source(ZE3dsMaxPlugin.cpp			Sources)
 ze_add_source(ZE3dsMaxPlugin.def			Sources)
+ze_add_source(ZEToolbarIcons_16a.bmp		Sources ZEFC)
+ze_add_source(ZEToolbarIcons_16i.bmp		Sources ZEFC)
+ze_add_source(ZEToolbarIcons_24a.bmp		Sources ZEFC)
+ze_add_source(ZEToolbarIcons_24i.bmp		Sources ZEFC)
+ze_add_source(zineklogo.bmp					Sources ZEFC)
 
 ze_add_library(ZE3dsMaxPlugin 
 	SOURCES ${Sources}
-	LIBS ZE3dsMaxModelExporter ZE3dsMaxInteriorExporter ZE3dsMaxUI
-	INSTALL
-	INSTALL_DESTINATION "Tools/Exporters/ZE3dsMax"
-	INSTALL_COMPONENT Tools
-	DLL)
+	LIBS ZEFoundation ZEFile ZE3dsMaxModelExporter ZE3dsMaxInteriorExporter ZE3dsMaxUI Comctl32
+	DLL
+	INSTALL)
 	
 set(LOCAL_WARNING_FLAGS /W3)
 set(LOCAL_RTTI_FLAGS /GR)
