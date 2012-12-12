@@ -122,7 +122,7 @@ bool ZEFileCompiler::Compile(const ZEFileCompilerOptions& Options)
 			{
 				fprintf(SourceFile, "\t\t0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X,\n",
 					Current[0], Current[1], Current[2], Current[3], Current[4], Current[5], Current[6], Current[7],
-					Current[8], Current[9], Current[1], Current[11], Current[12], Current[13], Current[14], Current[15]);
+					Current[8], Current[9], Current[10], Current[11], Current[12], Current[13], Current[14], Current[15]);
 
 				BytesRead += 16;
 				Current += 16;

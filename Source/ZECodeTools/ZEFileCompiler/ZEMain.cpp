@@ -79,10 +79,8 @@ static void ShowHelp()
 		"\n");
 }
 
-#include <windows.h>
 static void ParseParameters(int Argc, const char** Argv, ZEFileCompilerOptions& Options)
 {
-	MessageBox(NULL, "Attach", "ZEFC", MB_OK);
 	Options.Verbose = false;
 	for (int I = 1; I < Argc; I++)
 	{
