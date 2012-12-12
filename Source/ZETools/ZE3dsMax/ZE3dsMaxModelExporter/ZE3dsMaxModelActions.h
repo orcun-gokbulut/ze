@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMaxUI - Copy.cpp
+ Zinek Engine - ZE3dsMaxModelActions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 YiÄŸit OrÃ§un GÃ–KBULUT. All rights reserved.
 
@@ -33,52 +33,95 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZE3dsMaxUI.h"
-#include "imenus.h"
-#include "imenuman.h"
+#pragma once
+#ifndef __ZE_3DS_MAX_MODEL_ACTIONS_H__
+#define __ZE_3DS_MAX_MODEL_ACTIONS_H__
 
-class ZEMakeZEMeshAction : public ActionItem
+#define ZEModelMeshAttributesAdd_Action_ID 900
+#define ZEModelBoneAttributesAdd_Action_ID 910
+#define ZEModelPhysicalBodyAttributesAdd_Action_ID 920
+
+
+#include <Max.h>
+#include <ActionTable.h>
+#include <MaxIcon.h>
+
+class ZE3dsMaxModelActionAddMeshAttributes : public ActionItem
 {
+	private:
+
+		MaxBmpFileIcon*		MeshActionIcon;
+
 	public:
-		virtual BOOL			ExecuteAction();
-		CoreExport BOOL			Execute();
-		virtual void			GetButtonText(MSTR &buttonText);
-		virtual void			GetMenuText(MSTR &menuText);
-		virtual void			GetDescriptionText(MSTR &descText);
-		virtual void			GetCategoryText(MSTR &catText);
-		virtual BOOL			IsChecked();
-		virtual BOOL			IsItemVisible();
-		virtual BOOL			IsEnabled();
-		virtual MaxIcon*		GetIcon();
-		virtual void			DeleteThis();
+		int					GetId();
+		BOOL				ExecuteAction();
 
+		void				GetButtonText(MSTR& buttonText);
+		void				GetMenuText(MSTR& menuText);
+		void				GetDescriptionText(MSTR& descText);
+		void				GetCategoryText(MSTR& catText);
+
+		BOOL				IsChecked();
+		BOOL				IsItemVisible();
+		BOOL				IsEnabled();
+
+		MaxIcon*			GetIcon();
+
+		void				DeleteThis();
+
+							ZE3dsMaxModelActionAddMeshAttributes();
 };
-DWORD ZE3dsMaxUI::Start()
-{
-	// Define Actions
-	// Menus
 
-	MessageBox(NULL, "Start", "Büllü", MB_OK);
-	return GUPRESULT_KEEP;
-}
-
-class ZEMenuItem : public IMenuItem
+class ZE3dsMaxModelActionAddBoneAttributes : public ActionItem
 {
+	private:
+
+		MaxBmpFileIcon*		BoneActionIcon;
+
 	public:
+		int					GetId();
+		BOOL				ExecuteAction();
 
+		void				GetButtonText(MSTR& buttonText);
+		void				GetMenuText(MSTR& menuText);
+		void				GetDescriptionText(MSTR& descText);
+		void				GetCategoryText(MSTR& catText);
+
+		BOOL				IsChecked();
+		BOOL				IsItemVisible();
+		BOOL				IsEnabled();
+
+		MaxIcon*			GetIcon();
+
+		void				DeleteThis();
+
+							ZE3dsMaxModelActionAddBoneAttributes();
 };
 
-void ZE3dsMaxUI::Stop()
+class ZE3dsMaxModelActionAddPhysicalBodyAttributes : public ActionItem
 {
-	MessageBox(NULL, "Büllük", "Stop", MB_OK);
-}
+	private:
 
-ZE3dsMaxUI::ZE3dsMaxUI()
-{
+		MaxBmpFileIcon*		PhysicalBodyActionIcon;
 
-}
+	public:
+		int					GetId();
+		BOOL				ExecuteAction();
 
-ZE3dsMaxUI::~ZE3dsMaxUI()
-{
+		void				GetButtonText(MSTR& buttonText);
+		void				GetMenuText(MSTR& menuText);
+		void				GetDescriptionText(MSTR& descText);
+		void				GetCategoryText(MSTR& catText);
 
-}
+		BOOL				IsChecked();
+		BOOL				IsItemVisible();
+		BOOL				IsEnabled();
+
+		MaxIcon*			GetIcon();
+
+		void				DeleteThis();
+
+							ZE3dsMaxModelActionAddPhysicalBodyAttributes();
+};
+
+#endif

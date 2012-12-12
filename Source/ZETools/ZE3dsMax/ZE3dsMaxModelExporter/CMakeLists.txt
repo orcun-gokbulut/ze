@@ -43,6 +43,12 @@ ze_add_source(ZE3dsMaxModelExporterProcess.cpp			Sources)
 ze_add_source(ZE3dsMaxModelExporterOptionsDialog.h		Sources QtMocs)
 ze_add_source(ZE3dsMaxModelExporterOptionsDialog.cpp	Sources)
 ze_add_source(ZE3dsMaxModelExporterOptionsWidget.ui		Sources QtUI)
+ze_add_source(ZE3dsMaxModelActions.h					Sources)
+ze_add_source(ZE3dsMaxModelActions.cpp					Sources)
+ze_add_source(ZE3dsMaxModelScriptMesh.ms				Sources ZEFC)
+ze_add_source(ZE3dsMaxModelScriptBone.ms				Sources ZEFC)
+ze_add_source(ZE3dsMaxModelScriptPhysicalBody.ms		Sources ZEFC)
+
 
 qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})

@@ -55,9 +55,4 @@ add_subdirectory(ZE3dsMaxUtils)
 add_custom_target(ZE3dsMax
 	SOURCES CMakeLists.txt)
 
-install(DIRECTORY ZE3dsMaxScript 
-	CONFIGURATIONS Release 
-	DESTINATION "Tools/Exporters/ZE3dsMax/MaxScript" 
-	COMPONENT Tools 
-	PATTERN .svn EXCLUDE)
 set_property(TARGET ZE3dsMax PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})

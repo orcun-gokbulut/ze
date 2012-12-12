@@ -34,37 +34,22 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZE3dsMaxUI.h"
-#include "imenus.h"
-#include "imenuman.h"
+#include "ZE3dsMaxScriptCommonUtilities_ms.h"
+#include "ZE3dsMaxScriptRemove_ms.h"
+#include <imenus.h>
+#include <imenuman.h>
+#include <maxscrpt/maxscrpt.h>
 
-class ZEMakeZEMeshAction : public ActionItem
-{
-	public:
-		virtual BOOL			ExecuteAction();
-		CoreExport BOOL			Execute();
-		virtual void			GetButtonText(MSTR &buttonText);
-		virtual void			GetMenuText(MSTR &menuText);
-		virtual void			GetDescriptionText(MSTR &descText);
-		virtual void			GetCategoryText(MSTR &catText);
-		virtual BOOL			IsChecked();
-		virtual BOOL			IsItemVisible();
-		virtual BOOL			IsEnabled();
-		virtual MaxIcon*		GetIcon();
-		virtual void			DeleteThis();
-
-};
 DWORD ZE3dsMaxUI::Start()
 {
 	// Define Actions
 	// Menus
+
+	ZE3dsMaxScriptCommonUtilities_ms CommonUtilitiesScript;
+	ExecuteMAXScriptScript((char*)CommonUtilitiesScript.GetData());
+
 	return GUPRESULT_KEEP;
 }
-
-class ZEMenuItem : public IMenuItem
-{
-	public:
-
-};
 
 void ZE3dsMaxUI::Stop()
 {
@@ -79,4 +64,68 @@ ZE3dsMaxUI::ZE3dsMaxUI()
 ZE3dsMaxUI::~ZE3dsMaxUI()
 {
 
+}
+
+int ZE3dsMaxCommonUtilsRemoveAttributes::GetId()
+{
+	return ZECommonUtilsRemoveAttributes_Action_ID;
+}
+
+BOOL ZE3dsMaxCommonUtilsRemoveAttributes::ExecuteAction()
+{
+	ZE3dsMaxScriptRemove_ms RemoveScript;
+	return ExecuteMAXScriptScript((char*)RemoveScript.GetData());
+}
+
+void ZE3dsMaxCommonUtilsRemoveAttributes::GetButtonText(MSTR& buttonText)
+{
+	buttonText = "Remove Zinek Engine Attributes";
+}
+
+void ZE3dsMaxCommonUtilsRemoveAttributes::GetMenuText(MSTR& menuText)
+{
+	menuText = "Remove Zinek Engine Attributes";
+}
+
+void ZE3dsMaxCommonUtilsRemoveAttributes::GetDescriptionText(MSTR& descText)
+{
+	descText = "Remove Zinek Engine Attributes";
+}
+
+void ZE3dsMaxCommonUtilsRemoveAttributes::GetCategoryText(MSTR& catText)
+{
+	catText = "Zinek Engine";
+}
+
+BOOL ZE3dsMaxCommonUtilsRemoveAttributes::IsChecked()
+{
+	return FALSE;
+}
+
+BOOL ZE3dsMaxCommonUtilsRemoveAttributes::IsItemVisible()
+{
+	return TRUE;
+}
+
+BOOL ZE3dsMaxCommonUtilsRemoveAttributes::IsEnabled()
+{
+	return TRUE;
+}
+
+MaxIcon* ZE3dsMaxCommonUtilsRemoveAttributes::GetIcon()
+{
+	if (RemoveActionIcon == NULL)
+		RemoveActionIcon = new MaxBmpFileIcon("ZEToolbarIcons", 6);
+
+	return RemoveActionIcon;
+}
+
+void ZE3dsMaxCommonUtilsRemoveAttributes::DeleteThis()
+{
+	delete RemoveActionIcon;
+}
+
+ZE3dsMaxCommonUtilsRemoveAttributes::ZE3dsMaxCommonUtilsRemoveAttributes()
+{
+	RemoveActionIcon = NULL;
 }

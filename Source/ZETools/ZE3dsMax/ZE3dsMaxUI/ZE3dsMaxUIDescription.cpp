@@ -78,6 +78,21 @@ HINSTANCE ZE3dsMaxUIDescription::HInstance()
 	return hInstance; 
 }
 
+int ZE3dsMaxUIDescription::NumActionTables()
+{
+	return 1;
+}
+
+ActionTable* ZE3dsMaxUIDescription::GetActionTable(int i)
+{
+	ActionTable* MainActionTable = GetCOREInterface()->GetActionManager()->FindTable(kActionMainUI);
+
+	ZE3dsMaxCommonUtilsRemoveAttributes* RemoveZEAttributesAction = new ZE3dsMaxCommonUtilsRemoveAttributes();
+	MainActionTable->AppendOperation(RemoveZEAttributesAction);
+
+	return MainActionTable;
+}
+
 ClassDesc2* ZE3dsMaxUIDescription::GetInstance()
 {
 	static ZE3dsMaxUIDescription Desc;

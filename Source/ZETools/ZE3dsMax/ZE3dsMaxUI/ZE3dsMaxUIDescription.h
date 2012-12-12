@@ -51,6 +51,8 @@ class ZE3dsMaxUIDescription : public ClassDesc2
 		virtual const TCHAR*		Category();
 		virtual const TCHAR*		InternalName();
 		virtual HINSTANCE			HInstance();
+		virtual int					NumActionTables();
+		virtual ActionTable*		GetActionTable(int i);
 
 		static ClassDesc2*			GetInstance();
 };

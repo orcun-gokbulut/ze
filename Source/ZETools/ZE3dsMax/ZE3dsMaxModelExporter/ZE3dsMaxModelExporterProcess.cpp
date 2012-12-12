@@ -574,6 +574,8 @@ void ZE3dsMaxModelExporter::ProcessPhysicalBody(IGameNode* Node, ZEMLNode* Paren
 		PhysicalBodyTypeValue--; // Array index start problem with Max Script and C++)
 		PhysicalBodyNode->AddProperty("Type", PhysicalBodyTypeValue);
 
+		ZE3dsMaxUtils::GetProperty(Object, ZE_BOOL_PROP, "PhysicalBody_IsKinematic", *PhysicalBodyNode->AddProperty("IsKinematic"));
+
 		ZE3dsMaxUtils::GetProperty(Object, ZE_FLOAT_PROP, "PhysicalBody_Mass", *PhysicalBodyNode->AddProperty("Mass"));
 
 		IGameNode* MassCenter = NULL;

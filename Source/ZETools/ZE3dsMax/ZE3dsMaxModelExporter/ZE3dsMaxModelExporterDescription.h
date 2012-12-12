@@ -42,20 +42,21 @@
 #include <Max.h>
 #include <iparamb2.h>
 
-
 class ZE3dsMaxModelExporterDescription : public ClassDesc2 
 {
 	public:
-		virtual ZEInt				IsPublic();
-		virtual void*				Create(BOOL Loading = FALSE);
-		virtual const TCHAR*		ClassName();
-		virtual SClass_ID			SuperClassID();
-		virtual Class_ID			ClassID();
-		virtual const TCHAR*		Category();
-		virtual const TCHAR*		InternalName();
-		virtual HINSTANCE			HInstance();
+		virtual ZEInt					IsPublic();
+		virtual void*					Create(BOOL Loading = FALSE);
+		virtual const TCHAR*			ClassName();
+		virtual SClass_ID				SuperClassID();
+		virtual Class_ID				ClassID();
+		virtual const TCHAR*			Category();
+		virtual const TCHAR*			InternalName();
+		virtual HINSTANCE				HInstance();
+		virtual int						NumActionTables();
+		virtual ActionTable*			GetActionTable(int i);
 
-		static ClassDesc2*			GetInstance();
+		static ClassDesc2*				GetInstance();
 };
 
 #endif
