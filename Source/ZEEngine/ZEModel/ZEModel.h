@@ -88,8 +88,6 @@ class ZEModel : public ZEEntity
 
 		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
 
-		/*ZEAABBox							BoundingBox;*/
-
 		void								CalculateBoundingBox();		
 		void								UpdateTransforms();
 
@@ -163,7 +161,7 @@ class ZEModel : public ZEEntity
 
 		void								Tick(float ElapsedTime);
 		void								Draw(ZEDrawParameters* DrawParameters);
-		void								TransformChangeEvent(const ZEPhysicalTransformChangeEventArgument& TransformChange);
+		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);
 
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
 

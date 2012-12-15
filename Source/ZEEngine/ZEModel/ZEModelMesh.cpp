@@ -83,15 +83,14 @@ const ZEAABBox& ZEModelMesh::GetLocalBoundingBox()
 
 const ZEAABBox& ZEModelMesh::GetModelBoundingBox()
 {
-	ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
+	ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetLocalTransform());
 
 	return ModelBoundingBox;
 }
 
 const ZEAABBox& ZEModelMesh::GetWorldBoundingBox()
 {
-
-	ZEAABBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+	ZEAABBox::Transform(WorldBoundingBox, LocalBoundingBox, GetWorldTransform());
 
 	return WorldBoundingBox;
 }
@@ -101,13 +100,6 @@ const ZEMatrix4x4& ZEModelMesh::GetLocalTransform()
 	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
 
 	return LocalTransform;
-}
-
-const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
-{
-	ZEMatrix4x4::Multiply(ModelTransform, Owner->GetTransform(), GetLocalTransform());
-
-	return ModelTransform;	
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
@@ -196,7 +188,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			PhysicalBody->SetPosition(Owner->GetWorldPosition());
 			PhysicalBody->SetRotation(Owner->GetWorldRotation());
 			PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenter);
-			PhysicalBody->SetTransformChangeEvent(ZEPhysicalTransformChangeEvent(this->Owner, &ZEModel::TransformChangeEvent));
+			PhysicalBody->SetTransformChangeEvent(ZEDelegate<void (ZEPhysicalObject*, ZEVector3, ZEQuaternion)>::Create<ZEModel, &ZEModel::TransformChangeEvent>(this->Owner));
 
 			for (ZESize I = 0; I < MeshResource->PhysicalBody.Shapes.GetCount(); I++)
 			{

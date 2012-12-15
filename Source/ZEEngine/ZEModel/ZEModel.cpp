@@ -64,8 +64,8 @@ void ZEModel::CalculateBoundingBox()
 	{
 		if (!Meshes[I].MeshResource->IsSkinned)
 		{
-			ZEAABBox CurrentBoundingBox;
-			ZEAABBox::Transform(CurrentBoundingBox, Meshes[I].GetLocalBoundingBox(), Meshes[I].GetLocalTransform());
+			ZEAABBox CurrentBoundingBox = Meshes[I].GetModelBoundingBox();
+			//ZEAABBox::Transform(CurrentBoundingBox, Meshes[I].GetLocalBoundingBox(), Meshes[I].GetLocalTransform());
 
 			for (ZEInt N = 0; N < 8; N++)
 			{
@@ -83,7 +83,7 @@ void ZEModel::CalculateBoundingBox()
 
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
 	{
-		ZEVector3 BonePosition = Bones[I].GetModelPosition();
+		ZEVector3 BonePosition = Bones[I].GetLocalPosition();
 
 		if (BonePosition.x < BoundingBox.Min.x) BoundingBox.Min.x = BonePosition.x;
 		if (BonePosition.y < BoundingBox.Min.y) BoundingBox.Min.y = BonePosition.y;
@@ -224,7 +224,7 @@ void ZEModel::LoadModelResource()
 		}
 	}
 
-	if(false/*Skeleton.GetCount() > 1*/)
+	if(Skeleton.GetCount() > 1)
 	{
 		ZEVector3 AveragePosition = ZEVector3::Zero;
 
@@ -467,7 +467,7 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].Draw(DrawParameters);
 	
-	DebugDraw(DrawParameters->Renderer);
+	//DebugDraw(DrawParameters->Renderer);
 }
 
 void ZEModel::Tick(float ElapsedTime)
@@ -480,7 +480,7 @@ void ZEModel::Tick(float ElapsedTime)
 	
 }
 
-void ZEModel::TransformChangeEvent(const ZEPhysicalTransformChangeEventArgument& TransformChange)
+void ZEModel::TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation)
 {
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
 	{

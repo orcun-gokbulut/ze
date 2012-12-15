@@ -80,6 +80,7 @@ class ZEModelBone
 		ZEModelBone*						GetParentBone();
 		const ZEArray<ZEModelBone*>			GetChildBones();
 		const char*							GetName();
+		ZEPhysicalRigidBody*				GetPhysicalBody();
 
 		bool								IsRootBone();
 

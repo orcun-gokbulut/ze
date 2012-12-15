@@ -133,6 +133,7 @@ struct ZEModelResourcePhysicalBody
 {
 	ZEModelResourcePhysicalBodyType				Type;
 	bool										Enabled;
+	bool										IsKinematic;
 	float										Mass;
 	float										LinearDamping;
 	float										AngularDamping;

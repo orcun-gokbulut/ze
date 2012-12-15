@@ -62,7 +62,7 @@ class ZEModelMesh
 		ZEQuaternion						Rotation;
 
 		ZEMatrix4x4							LocalTransform;
-		ZEMatrix4x4							ModelTransform;
+/*		ZEMatrix4x4							ModelTransform;*/
 		ZEMatrix4x4							WorldTransform;
 
 		bool								PhysicsEnabled;
@@ -87,7 +87,7 @@ class ZEModelMesh
 		const ZEAABBox&						GetWorldBoundingBox();
 
 		const ZEMatrix4x4&					GetLocalTransform();
-		const ZEMatrix4x4&					GetModelTransform();
+/*		const ZEMatrix4x4&					GetModelTransform();*/
 		const ZEMatrix4x4&					GetWorldTransform();
 				
 		void								SetLocalPosition(const ZEVector3& LocalPosition);

@@ -59,11 +59,13 @@
 #include "ZEInterior/ZEInteriorResource.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEGraphics/ZEDirectionalLight.h"
+#include "NxPhysicsSDK.h"
+#include "PhysXLoader.h"
 
-void ZEPhysicsDebugModule::TransformChanged(const ZEPhysicalTransformChangeEventArgument& TransformChange)
+void ZEPhysicsDebugModule::TransformChanged(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation)
 {
 	float Pitch, Yaw, Roll;
-	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, TransformChange.NewRotation);
+	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, NewRotation);
 
 	/*zeLog("Transform Changed. Object: %x, New Position: [%f, %f, %f], New Orientation: [%f, %f, %f]", 
 	TransformChange.PhysicalObject,
@@ -71,9 +73,9 @@ void ZEPhysicsDebugModule::TransformChanged(const ZEPhysicalTransformChangeEvent
 	Pitch, Yaw, Roll);*/
 }
 
-void ZEPhysicsDebugModule::ColisionDetected(const ZEPhysicalCollisionEventArgument& Collision)
+void ZEPhysicsDebugModule::ColisionDetected(ZEPhysicalObject* Collider1, ZEPhysicalObject* Collider2)
 {
-	zeLog("Collision Occured: Object1 : %x, Object2 : %x", Collision.Collider1, Collision.Collider2);
+	zeLog("Collision Occured: Object1 : %x, Object2 : %x", Collider1, Collider2);
 }
 
 
@@ -89,6 +91,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
+		Player->AddSteering(new ZESteeringPlayerFree());
 		Scene->SetActiveCamera(Player->GetCamera());
 		Scene->AddEntity(Player);
 	}
@@ -152,6 +155,7 @@ void ZEPhysicsDebugModule::Deinitialize()
 {
 	if (Player != NULL)
 	{
+		delete (Player->GetSteerings())[0];
 		Player->Destroy();
 		Player = NULL;
 	}
@@ -203,6 +207,11 @@ void ZEPhysicsDebugModule::Process(float ElapsedTime)
 	}
 }
 
+void ZEPhysicsDebugModule::ConnectToVisualDebugger(const char* Adress, ZEInt Port)
+{
+	NxPhysicsSDK* gPhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION);
+	gPhysicsSDK->getFoundationSDK().getRemoteDebugger()->connect(Adress, Port);
+}
 
 ZEPhysicsDebugModule::ZEPhysicsDebugModule()
 {

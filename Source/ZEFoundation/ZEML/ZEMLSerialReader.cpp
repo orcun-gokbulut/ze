@@ -258,7 +258,7 @@ bool ZEMLSerialReader::Read()
 
 bool ZEMLSerialReader::SkipNodeAndRead()
 {
-	if(CurrentItemType == ZEML_IT_NODE || CurrentItemType == ZEML_IT_INLINE_DATA)
+	if(CurrentItemType == ZEML_IT_NODE)
 		File->Seek(CurrentItemDataSize, ZE_SF_CURRENT);
 
 	return Read();
@@ -402,7 +402,7 @@ bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCou
 			}
 			else if(CurrentItemType == ZEML_IT_INLINE_DATA)
 			{
-				*(List[CurrentItemIndex].Pointer) = ItemFilePosition - (sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + CurrentItemName.GetSize() + sizeof(ZEUInt64));
+				*(List[CurrentItemIndex].Pointer) = ItemFilePosition - (sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + CurrentItemName.GetSize() + sizeof(ZEUInt64) +  CurrentItemDataSize);
 			}
 			else
 			{

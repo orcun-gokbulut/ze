@@ -80,6 +80,11 @@ fn CheckZEAttributes CurrentSelection AttributeFilterValue =
 			if AttributeFilterValue != 5 do
 				return true
 		)
+		else if isProperty CurrentObject "ZEHelperAttributes" == true then
+		(
+			if AttributeFilterValue != 6 do
+				return true
+		)
 	)
 	
 	return false
