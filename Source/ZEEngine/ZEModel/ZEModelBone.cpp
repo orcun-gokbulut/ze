@@ -62,6 +62,11 @@ const ZEArray<ZEModelBone*> ZEModelBone::GetChildBones()
 	return ChildBones;
 }
 
+ZEPhysicalRigidBody* ZEModelBone::GetPhysicalBody()
+{
+	return PhysicalBody;
+}
+
 bool ZEModelBone::IsRootBone()
 {
 	return ParentBone == NULL;
@@ -309,13 +314,14 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
 
 		PhysicalBody->SetEnabled(BoneResource->PhysicalBody.Enabled);
+		PhysicalBody->SetPhysicalBodyType(BoneResource->PhysicalBody.IsKinematic ? ZE_PBT_KINEMATIC : ZE_PBT_DYNAMIC);
 		PhysicalBody->SetMass(BoneResource->PhysicalBody.Mass);
 		PhysicalBody->SetLinearDamping(BoneResource->PhysicalBody.LinearDamping);
 		PhysicalBody->SetAngularDamping(BoneResource->PhysicalBody.AngularDamping);
 		PhysicalBody->SetPosition(this->GetWorldPosition());
 		PhysicalBody->SetRotation(this->GetWorldRotation());
 		PhysicalBody->SetMassCenterPosition(BoneResource->PhysicalBody.MassCenter);
-		PhysicalBody->SetTransformChangeEvent(ZEPhysicalTransformChangeEvent(this->Owner, &ZEModel::TransformChangeEvent));
+		PhysicalBody->SetTransformChangeEvent(ZEDelegate<void (ZEPhysicalObject*, ZEVector3, ZEQuaternion)>::Create<ZEModel, &ZEModel::TransformChangeEvent>(this->Owner));
 
 		for (ZESize I = 0; I < BoneResource->PhysicalBody.Shapes.GetCount(); I++)
 		{
@@ -373,7 +379,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 
 	}
 
-	if (false) //BoneResource->PhysicalJoint.JointType != ZE_PJT_NONE && BoneResource->ParentBone != -1)
+	if (BoneResource->PhysicalJoint.JointType != ZE_PJT_NONE && BoneResource->ParentBone != -1)
 	{
 		if (PhysicalJoint == NULL)
 			PhysicalJoint = ZEPhysicalJoint::CreateInstance();
@@ -502,12 +508,12 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->Initialize();
 	}
 
-	for (ZESize I = 0; I < ShapeList.GetCount(); I++)
-	{
-		delete ShapeList[I];
-	}
-
-	ShapeList.Clear();
+// 	for (ZESize I = 0; I < ShapeList.GetCount(); I++)
+// 	{
+// 		delete ShapeList[I];
+// 	}
+// 
+// 	ShapeList.Clear();
 }
 
 void ZEModelBone::Deinitialize()

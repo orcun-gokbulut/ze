@@ -216,13 +216,14 @@ bool ZEModelResource::ReadMaterials(ZEMLSerialReader* NodeReader)
 bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSerialReader* NodeReader)
 {
 
-	ZEVariant Enabled, Type, Mass, MassCenter, LinearDamping, AngularDamping;
+	ZEVariant Enabled, Type, IsKinematic, Mass, MassCenter, LinearDamping, AngularDamping;
 	ZEMLSerialPointer PhysicalShapesNodePointer;
 
 	ZEMLSerialListItem PhysicalBodyList[] = 
 	{
 		ZEML_LIST_PROPERTY("Enabled",			Enabled,		ZE_VRT_BOOLEAN,		true),
 		ZEML_LIST_PROPERTY("Type",				Type,			ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("IsKinematic",		IsKinematic,	ZE_VRT_BOOLEAN,		true),
 		ZEML_LIST_PROPERTY("Mass",				Mass,			ZE_VRT_FLOAT,		true),
 		ZEML_LIST_PROPERTY("MassCenter",		MassCenter,		ZE_VRT_VECTOR3,		true),
 		ZEML_LIST_PROPERTY("LinearDamping",		LinearDamping,	ZE_VRT_FLOAT,		true),
@@ -230,11 +231,12 @@ bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSe
 		ZEML_LIST_NODE("PhysicalShapes",		PhysicalShapesNodePointer,			true)
 	};
 
-	if (!NodeReader->ReadPropertyList(PhysicalBodyList, 7))
+	if (!NodeReader->ReadPropertyList(PhysicalBodyList, 8))
 		return false;
 
 	Body->Enabled = Enabled;
 	Body->Type = (ZEModelResourcePhysicalBodyType)Type.GetInt32();
+	Body->IsKinematic = IsKinematic;
 	Body->Mass = Mass;
 	Body->MassCenter = MassCenter;
 	Body->LinearDamping = LinearDamping;
