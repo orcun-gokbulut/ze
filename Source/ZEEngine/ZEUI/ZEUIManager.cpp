@@ -338,6 +338,15 @@ void ZEUIManager::ProcessEvents()
 				LastPressedControl->MouseMoveEvent(Cursor->GetCurrentButton(), CursorPosition - OldMousePosition);
 		}
 
+		if(LastHoveredControl == NULL && LastFocusedControl != NULL && 
+			(Cursor->GetCurrentButton() == ZE_UI_MOUSE_BUTTON_LEFT || 
+			Cursor->GetCurrentButton() == ZE_UI_MOUSE_BUTTON_RIGHT || 
+			Cursor->GetCurrentButton() == ZE_UI_MOUSE_BUTTON_MIDDLE))
+		{
+			LastFocusedControl->FocusLost();
+			LastFocusedControl = NULL;
+		}
+
 		/************************************************************************/
 		/*        MOUSE PRESS, RELEASE EVENT AND FOCUSGAIN, FOCUSLOST           */
 		/************************************************************************/

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.h
+ Zinek Engine - ZEUITextCursor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,36 +34,42 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_BUTTON_CONTROL__
-#define __ZE_UI_BUTTON_CONTROL__
+#ifndef __ZE_UI_TEXT_CURSOR__
+#define __ZE_UI_TEXT_CURSOR__
 
-#include "ZEUIFrameControl.h"
+#include "ZEUIRectangle.h"
+#include "ZECore/ZETimer.h"
 
-class ZEUILabel;
-
-class ZEUIButtonControl : public ZEUIFrameControl
+class ZEUITextCursor : public ZEUIRectangle
 {
-	friend class ZEUIManager;
-	friend class ZEUICheckBoxControl;
-
 	private:
+		ZETimer*			Timer;
+		float				BlinkTime;
+		bool				IsVisible;
 
-		ZEUILabel*			TextLabel;
+		ZEInt32				Width;
+		ZEInt32				Height;
+
+		void				Blink(float Time);
+		void				Update();
 
 	public:
+		void				SetBlinkTime(float Time);
+		float				GetBlinkTime();
 
-		virtual void		Draw(ZEUIRenderer* Renderer);
+		bool				GetVisible() const;
 
-		void				SetText(const ZEString& Text);
-		const ZEString&		GetText() const;
+		void				SetHeight(ZEInt32 Height);
+		void				SetWidth(ZEInt32 Width);
+		void				SetSize(const ZEVector2& Size);
 
-		virtual void		SetWidth(float Width);
-		virtual void		SetHeight(float Height);
-		virtual void		SetSize(const ZEVector2& Size);
+		void				SetPostion(const ZEVector2& Position);
+		const ZEVector2&	GetPosition() const;
 
-							ZEUIButtonControl();
-							~ZEUIButtonControl();
+		const ZEMaterial*	GetMaterial() const;
 
+							ZEUITextCursor();
+							~ZEUITextCursor();
 };
 
 #endif

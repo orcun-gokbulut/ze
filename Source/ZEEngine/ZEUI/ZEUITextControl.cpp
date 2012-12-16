@@ -89,7 +89,7 @@ void ZEUITextControl::SetDisplayTextCharacters()
 				ZEVector2::Add(Temporary.Positions.RightDown, Temporary.Positions.LeftUp, CharacterSize);
 				Temporary.Texcoords = CurrCharacter.CoordinateRectangle;
 
-				ZEUITextControlCharacter TextControlCharacter;
+				ZEUITextCharacter TextControlCharacter;
 				TextControlCharacter.CChar = Text[I];
 				TextControlCharacter.RenderableCharacter = Temporary;
 				TextControlCharacter.FontCharacter = CurrCharacter;
@@ -128,7 +128,7 @@ void ZEUITextControl::SetDisplayTextCharacters()
 
 			Temporary.Texcoords = CurrCharacter.CoordinateRectangle;
 
-			ZEUITextControlCharacter TextControlCharacter;
+			ZEUITextCharacter TextControlCharacter;
 			TextControlCharacter.CChar = Text[I];
 			TextControlCharacter.RenderableCharacter = Temporary;
 			TextControlCharacter.FontCharacter = CurrCharacter;
@@ -146,7 +146,7 @@ void ZEUITextControl::SetDisplayTextCharacters()
 	RearrangeDimensions();
 }
 
-const ZEArray<ZEUITextControlCharacter>& ZEUITextControl::GetTextControlCharacters()
+const ZEArray<ZEUITextCharacter>& ZEUITextControl::GetTextControlCharacters()
 {
 	return DisplayTextCharacters;
 }
@@ -170,7 +170,7 @@ ZEVector2 ZEUITextControl::SpecialCharacter(char Character, size_t Position, ZEU
 
 	Temporary.Texcoords = CurrCharacter.CoordinateRectangle;
 
-	ZEUITextControlCharacter TextControlCharacter;
+	ZEUITextCharacter TextControlCharacter;
 	TextControlCharacter.CChar = Text[Position];
 	TextControlCharacter.RenderableCharacter = Temporary;
 	TextControlCharacter.FontCharacter = CurrCharacter;
@@ -272,7 +272,7 @@ void ZEUITextControl::AddText(size_t Position, const ZEString& Value)
 				ZEVector2::Add(Temporary.Positions.RightDown, Temporary.Positions.LeftUp, CharacterSize);
 				Temporary.Texcoords = CurrCharacter.CoordinateRectangle;
 
-				ZEUITextControlCharacter TextControlCharacter;
+				ZEUITextCharacter TextControlCharacter;
 				TextControlCharacter.CChar = Text[I];
 				TextControlCharacter.RenderableCharacter = Temporary;
 				TextControlCharacter.FontCharacter = CurrCharacter;
@@ -366,7 +366,7 @@ void ZEUITextControl::AddCharacter(size_t Position, char Character)
 		ZEVector2::Add(Temporary.Positions.RightDown, Temporary.Positions.LeftUp, CharacterSize);
 		Temporary.Texcoords = CurrCharacter.CoordinateRectangle;
 
-		ZEUITextControlCharacter TextControlCharacter;
+		ZEUITextCharacter TextControlCharacter;
 		TextControlCharacter.CChar = Text[Position];
 		TextControlCharacter.RenderableCharacter = Temporary;
 		TextControlCharacter.FontCharacter = CurrCharacter;

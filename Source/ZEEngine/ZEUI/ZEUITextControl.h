@@ -41,15 +41,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEFontResource.h"
-
-struct ZEUITextControlCharacter
-{
-	char				CChar;
-	ZEFontCharacter		FontCharacter;
-	ZEUIRectangle		RenderableCharacter;
-	int					Line;
-	bool				IsSelected;
-};
+#include "ZEUILabel.h"
 
 class ZEMaterial;
 class ZEUIRenderer;
@@ -61,7 +53,7 @@ class ZEUITextControl : public ZEUIControl
 
 	private:
 		ZEString									Text;
-		ZEArray<ZEUITextControlCharacter>			DisplayTextCharacters;
+		ZEArray<ZEUITextCharacter>			DisplayTextCharacters;
 
 		ZEArray<ZECharacter>						SpecialCharacters;
 
@@ -84,7 +76,7 @@ class ZEUITextControl : public ZEUIControl
 
 		ZEUIRectangle								Output;
 
-		const ZEArray<ZEUITextControlCharacter>&	GetTextControlCharacters();
+		const ZEArray<ZEUITextCharacter>&	GetTextControlCharacters();
 
 		void										AddText(size_t Position, const ZEString& Value);
 		void										AddCharacter(size_t Position, char Character);

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.h
+ Zinek Engine - ZEUILabel.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,36 +34,81 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_BUTTON_CONTROL__
-#define __ZE_UI_BUTTON_CONTROL__
+#ifndef __ZE_UI_LABEL__
+#define __ZE_UI_LABEL__
 
 #include "ZEUIFrameControl.h"
+#include "ZEFontResource.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 
-class ZEUILabel;
-
-class ZEUIButtonControl : public ZEUIFrameControl
+enum ZEUITextAlignment
 {
-	friend class ZEUIManager;
-	friend class ZEUICheckBoxControl;
+	ZE_UI_TA_LEFT,
+	ZE_UI_TA_RIGHT,
+	ZE_UI_TA_CENTER
+};
 
-	private:
+struct ZEUITextCharacter
+{
+	char				CChar;
+	ZEFontCharacter		FontCharacter;
+	ZEUIRectangle		RenderableCharacter;
+	int					Line;
+	bool				IsSelected;
+};
 
-		ZEUILabel*			TextLabel;
+class ZEUILabel : public ZEUIFrameControl
+{
+	protected:
+		ZEString							Text;
+		ZEArray<ZEUITextCharacter>			Characters;
+
+		ZEFontResource*						FontResource;
+		ZEMaterial*							FontMaterial;
+		ZEVector4							FontColor;
+
+		ZESize								TextWidth;
+		ZERectangle							TextRenderingArea;
+		ZEVector2							TextStartPosition;
+
+		ZEUITextAlignment					TextAlignment;
+		ZEVector2							TextMargin;
+		bool								IsWordWrapping;
+
+		ZEUInt32							CurrentLine;
+		ZEUInt32							CurrentLineWidth;
+
+		void								UpdateCharacters();
+		ZEVector2							CalculateTextStartPoint();
 
 	public:
+		virtual void						Draw(ZEUIRenderer* Renderer);
 
-		virtual void		Draw(ZEUIRenderer* Renderer);
+		void								SetFontResource(ZEFontResource* Resource);
 
-		void				SetText(const ZEString& Text);
-		const ZEString&		GetText() const;
+		void								SetFontColor(const ZEVector4& Color);
+		const ZEVector4&					GetFontColor() const;
 
-		virtual void		SetWidth(float Width);
-		virtual void		SetHeight(float Height);
-		virtual void		SetSize(const ZEVector2& Size);
+		void								SetText(ZEString Text);
+		const ZEString&						GetText();
 
-							ZEUIButtonControl();
-							~ZEUIButtonControl();
+		void								SetTextAlignment(ZEUITextAlignment Alignment);
+		ZEUITextAlignment					GetTextAlignment() const;
 
+		void								SetTextMargin(const ZEVector2& Margin);
+		const ZEVector2&					GetTextMargin() const;
+
+		void								SetWordWrapping(bool Enabled);
+		bool								GetWordWrapping() const;
+
+		virtual void						SetPosition(const ZEVector2& Position);
+		virtual void						SetSize(const ZEVector2& Size);
+		virtual void						SetWidth(float Width);
+		virtual void						SetHeight(float Height);
+
+											ZEUILabel();
+											~ZEUILabel();
 };
 
 #endif

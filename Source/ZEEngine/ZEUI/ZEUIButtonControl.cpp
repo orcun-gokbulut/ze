@@ -36,81 +36,62 @@
 #include "ZEUIButtonControl.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "zeui/ZEUIRenderer.h"
-#include "ZETexture/ZETexture2DResource.h"
+#include "ZEUILabel.h"
+#include "ZEFontResourceDynamic.h"
 
 void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
 {
-	if (!GetVisiblity())
-		return;
-
-	ZEUIControl::Draw(Renderer);
-	ZEUIRectangle Output;
-
-	Output.ZOrder = GetZOrder();
-		
-	if(!ZEUIRectangle::Clip(Output, Button, GetVisibleRectangle()))
-		Renderer->AddRectangle(Output);
-
+	TextLabel->SetZOrder(GetZOrder() + 3);
+	ZEUIFrameControl::Draw(Renderer);
 }
 
 void ZEUIButtonControl::SetWidth(float Width)
 {
-	ZEUIControl::SetWidth(Width);
-	Button.Positions.LeftUp = GetScreenRectangle().LeftUp;
-	Button.Positions.RightDown = GetScreenRectangle().RightDown;
+	ZEUIFrameControl::SetWidth(Width);
+	TextLabel->SetWidth(GetWidth());
 }
 
 void ZEUIButtonControl::SetHeight(float Height)
 {
-	ZEUIControl::SetHeight(Height);
-	Button.Positions.LeftUp = GetScreenRectangle().LeftUp;
-	Button.Positions.RightDown = GetScreenRectangle().RightDown;
+	ZEUIFrameControl::SetHeight(Height);
+	ZEVector2 TextLocalPosition = TextLabel->GetPosition() - GetPosition();
+	ZEInt32 LocalY = (GetHeight() - TextLabel->GetHeight()) / 2;
+	TextLocalPosition.y = LocalY;
+	TextLabel->SetPosition(TextLocalPosition + GetPosition());
 }
 
 void ZEUIButtonControl::SetSize(const ZEVector2& Size)
 {
-	ZEUIControl::SetSize(Size);
-	Button.Positions.LeftUp = GetScreenRectangle().LeftUp;
-	Button.Positions.RightDown = GetScreenRectangle().RightDown;
+	ZEUIFrameControl::SetSize(Size);
+	SetWidth(Size.x);
+	SetHeight(Size.y);
 }
 
-void ZEUIButtonControl::SetPosition(float X, float Y)
+void ZEUIButtonControl::SetText(const ZEString& Text)
 {
-	SetPosition(ZEVector2(X, Y));
+	TextLabel->SetText(Text);
 }
 
-void ZEUIButtonControl::SetPosition(const ZEVector2& Position)
+const ZEString& ZEUIButtonControl::GetText() const
 {
-	ZEUIControl::SetPosition(Position);
-	Button.Positions.LeftUp = GetScreenRectangle().LeftUp;
-	Button.Positions.RightDown = GetScreenRectangle().RightDown;
-}
-
-ZEMaterial* ZEUIButtonControl::GetMaterial() const
-{
-	return ButtonMaterial;
-}
-
-void ZEUIButtonControl::SetMaterial(ZEMaterial* Material)
-{
-	ButtonMaterial = (ZEUIMaterial*)Material;
+	return TextLabel->GetText();
 }
 
 ZEUIButtonControl::ZEUIButtonControl()
 {
-	Button.Texcoords = ZERectangle(ZEVector2::Zero, ZEVector2(50,50));
-	ButtonMaterial = ZEUIMaterial::CreateInstance();
-	ButtonMaterial->SetTexture(ZETexture2DResource::LoadResource("Button.jpg")->GetTexture());
-	Button.Color = ZEVector4::One;
-
-	Button.Material = ButtonMaterial;
-
+	TextLabel = new ZEUILabel();
+	TextLabel->SetWordWrapping(false);
+	TextLabel->SetFontResource(ZEFontResourceDynamic::LoadSharedResource("Arial.ttf", 18));
+	TextLabel->SetFontColor(ZEVector4::UnitW);
+	TextLabel->SetBackgroundColor(ZEVector4::Zero);
+	TextLabel->SetHeight(22);
+	TextLabel->SetTextAlignment(ZE_UI_TA_CENTER);
+	///TextLabel->SetText("Button");
+	TextLabel->SetMoveable(false);
+	SetMoveable(true);
+	AddChildControl(TextLabel);
 	SetHeight(25);
 	SetWidth(80);
-	Button.Positions.LeftUp = GetScreenRectangle().LeftUp;
-	Button.Positions.RightDown = GetScreenRectangle().RightDown;
-	Button.Texcoords.LeftUp = ZEVector2::Zero;
-	Button.Texcoords.RightDown = ZEVector2::One;
 }
 
 ZEUIButtonControl::~ZEUIButtonControl()
