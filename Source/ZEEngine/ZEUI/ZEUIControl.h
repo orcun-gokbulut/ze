@@ -220,8 +220,8 @@ class ZEUIControl
 		virtual void					Draw(ZEUIRenderer* Renderer);
 		virtual void					Tick(float ElapsedTime);
 
-		virtual ZEMaterial*				GetMaterial() const = 0;
-		virtual void					SetMaterial(ZEMaterial* Material) = 0;
+// 		virtual ZEMaterial*				GetMaterial() const = 0;
+// 		virtual void					SetMaterial(ZEMaterial* Material) = 0;
 
 										ZEUIControl();
 										~ZEUIControl();

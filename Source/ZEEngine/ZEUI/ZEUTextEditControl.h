@@ -37,82 +37,36 @@
 #ifndef __ZE_UI_TEXT_EDIT_CONTROL__
 #define __ZE_UI_TEXT_EDIT_CONTROL__
 
-#include "zeui/ZEUIFrameControl.h"
-#include "ZEUITextControl.h"
+#include "ZEUILabel.h"
+#include "ZEUITextCursor.h"
 
 class ZEMaterial;
-class ZEFontResource;
 class ZEUIRectangle;
 
-class ZEUITextEditControl : public ZEUIFrameControl
+class ZEUITextEditControl : public ZEUILabel
 {
 	private:
+		ZEUITextCursor						Cursor;
+		bool								IsTextDirty;
 
-		ZEUITextControl			TextDisplayer;
-
-		float					CursorBlinkTime;
-		float					TotalTime;
-
-		ZEUIRectangle			Cursor;
-
-		ZEVector2				InitialMousePosition;
-		ZEVector2				LastMousePosition;
-
-		ZEArray<ZEUIRectangle>	SelectedTextItemsRectangles;
-		ZEArray<size_t>			SelectedTextItemsPositions;
-
-		size_t					CursorTextPosition;
-		ZEVector2				CharacterScenePosition;
-
-		const ZEMaterial*		HightlightMaterial;
-
-		bool					CursorVisible;
-		bool					IsAnyCharacterClicked;
-		bool					ReadOnly;
-
-		void					SelectCursorPosition(ZEVector2 MousePosition);
-		void					MultiCharacterSelection(ZEVector2 MoveAmount);
-		void					DeleteCharacter(int Position);
-		void					BackspaceKeyPressed();
-		void					AddCharacter(char Key);
-		void					CharacterKeyPressed(char Key);	
+		ZEUITextAlignment					TextAlignment;
+		bool								IsReadOnly;
+		ZEVector2							TextMargin;
 
 	protected:
-
-		virtual void			MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
-		virtual void			MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmount);
-		virtual void			KeyPressed(ZEUIInputKey Key);
+		virtual void						KeyPressed(ZEUIInputKey Key);
 
 	public:
+		virtual void						Tick(float ElapsedTime);
 
-		void					AppendText(const ZEString& Value);
+		const ZEMaterial*					GetCursorMaterial() const;
+		void								SetCursorColor(const ZEVector4& Color);
+		const ZEVector4&					GetCursorColor() const;
 
-		void					SetText(const ZEString& Value);
-		const ZEString&			GetText();
+		void								SetReadOnly(bool ReadOnly);
+		bool								GetReadOnly();
 
-		void					SetTextColor(const ZEVector4& Color);
-		const ZEVector4&		GetTextColor();
-
-		void					SetFont(ZEFontResource* FontResource);
-		ZEFontResource*			GetFont();
-
-		void					SetFontSize(const ZEVector2& FontSize);
-		const ZEVector2&		GetFontSize();
-
-		void					SetReadOnly(bool ReadOnly);
-		bool					GetReadOnly();
-
-		virtual void			SetMaterial(ZEMaterial* Material);
-		virtual ZEMaterial* 	GetMaterial() const;
-
-		virtual void			SetSize(const ZEVector2& Size);
-		virtual void			SetWidth(float Width);
-		virtual void			SetHeight(float Height);
-
-		virtual void			Tick(float ElapsedTime);
-		virtual void			Draw(ZEUIRenderer* Renderer);
-
-								ZEUITextEditControl();
+											ZEUITextEditControl();
 };
 
 #endif

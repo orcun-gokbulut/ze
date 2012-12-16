@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.h
+ Zinek Engine - ZEUITextCursor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,97 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_UI_BUTTON_CONTROL__
-#define __ZE_UI_BUTTON_CONTROL__
+#include "ZEUITextCursor.h"
+#include "ZEGraphics/ZEUIMaterial.h"
 
-#include "ZEUIFrameControl.h"
-
-class ZEUILabel;
-
-class ZEUIButtonControl : public ZEUIFrameControl
+ZEUITextCursor::ZEUITextCursor()
 {
-	friend class ZEUIManager;
-	friend class ZEUICheckBoxControl;
+	IsVisible = false;
+	BlinkTime = 0.5f;
+	Width = 2;
+	Height = 20;
+	Positions.LeftUp = ZEVector2::Zero;
 
-	private:
+	Timer = ZETimer::CreateInstance();
+	SetBlinkTime(BlinkTime);
+	Timer->SetRepeating(true);
+	Timer->SetTimerEvent(ZEDelegate<void (float)>::Create<ZEUITextCursor, &ZEUITextCursor::Blink>(this));
+	Timer->Start();
 
-		ZEUILabel*			TextLabel;
+	SetWidth(Width);
+	SetHeight(Height);
 
-	public:
+	Material = ZEUIMaterial::CreateInstance();
+	Color = ZEVector4::UnitW;
+}
 
-		virtual void		Draw(ZEUIRenderer* Renderer);
+ZEUITextCursor::~ZEUITextCursor()
+{
+	Timer->Stop();
+	Timer->Destroy();
+	Timer = NULL;
+	((ZEUIMaterial*)Material)->Destroy();
+}
 
-		void				SetText(const ZEString& Text);
-		const ZEString&		GetText() const;
+void ZEUITextCursor::Blink(float Time)
+{
+	if(IsVisible)
+		IsVisible = false;
+	else
+		IsVisible = true;
+}
 
-		virtual void		SetWidth(float Width);
-		virtual void		SetHeight(float Height);
-		virtual void		SetSize(const ZEVector2& Size);
+void ZEUITextCursor::SetBlinkTime(float Time)
+{
+	BlinkTime = Time;
+	Timer->SetIntervalTime(Time);
+}
 
-							ZEUIButtonControl();
-							~ZEUIButtonControl();
+float ZEUITextCursor::GetBlinkTime()
+{
+	return BlinkTime;
+}
 
-};
+bool ZEUITextCursor::GetVisible() const
+{
+	return IsVisible;
+}
 
-#endif
+void ZEUITextCursor::Update()
+{
+	Positions.RightDown = Positions.LeftUp + ZEVector2(Width, Height);
+}
+
+void ZEUITextCursor::SetHeight(ZEInt32 Height)
+{
+	Positions.RightDown.y += Height;
+	Update();
+}
+
+void ZEUITextCursor::SetWidth(ZEInt32 Width)
+{
+	Positions.RightDown.x += Width;
+	Update();
+}
+
+void ZEUITextCursor::SetSize(const ZEVector2& Size)
+{
+	SetWidth(Size.x);
+	SetHeight(Size.y);
+}
+
+void ZEUITextCursor::SetPostion(const ZEVector2& Position)
+{
+	Positions.LeftUp = Position;
+	Update();
+}
+
+const ZEVector2& ZEUITextCursor::GetPosition() const
+{
+	return Positions.LeftUp;
+}
+
+const ZEMaterial* ZEUITextCursor::GetMaterial() const
+{
+	return Material;
+}

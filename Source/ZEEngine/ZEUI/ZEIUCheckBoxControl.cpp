@@ -110,7 +110,7 @@ ZEMaterial*	ZEUICheckBoxControl::GetMaterial() const
 
 void ZEUICheckBoxControl::SetMaterial(ZEMaterial* Material)
 {
-	Box.Button.Material = Material;
+	//Box.Button.Material = Material;
 }
 
 ZEUICheckBoxControl::ZEUICheckBoxControl()

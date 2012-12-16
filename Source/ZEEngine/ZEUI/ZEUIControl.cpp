@@ -477,9 +477,9 @@ void ZEUIControl::MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmoun
 {
 	if (MouseMovedEvent != NULL)
 		MouseMovedEvent(Button, MoveAmount);
- 
-//  	if (ParentControl != NULL)
-//  		ParentControl->MouseMoveEvent(Button, MoveAmount);
+	
+	if(GetMoveable())
+		SetPosition(GetPosition() + MoveAmount);
 }
 
 void ZEUIControl::FocusLost()

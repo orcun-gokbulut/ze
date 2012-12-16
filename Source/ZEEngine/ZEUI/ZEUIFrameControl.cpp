@@ -45,6 +45,7 @@ void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
 
 	ZEUIRectangle Output;
 	Output.ZOrder = GetZOrder();
+	Frame.Color = GetBackgroundColor();
 
 	if(!ZEUIRectangle::Clip(Output, Frame, GetVisibleRectangle()))
 		Renderer->AddRectangle(Output);
