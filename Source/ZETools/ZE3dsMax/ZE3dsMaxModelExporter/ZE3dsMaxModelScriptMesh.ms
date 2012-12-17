@@ -23,9 +23,9 @@ MeshAttributes = attributes ZEMeshAttributes
 	rollout ZEMeshRollout "ZE Mesh Parameters" rolledUp:false
 	(
 		/* LAYOUT DEFINITION */
-		bitmap					uiLogo														fileName:"zineklogo.bmp"
-		spinner 				uiMesh_LOD			"Mesh's Lod:" 					type:#integer
-		checkbox 				uiMesh_Visibility 		"Is Visible"						toolTip:"Indicates whether the mesh is visible or not."
+		bitmap					uiLogo													fileName:"zineklogo.bmp"
+		spinner 				uiMesh_LOD			"Mesh's Lod:" 						type:#integer
+		checkbox 				uiMesh_Visibility 	"Is Visible"						toolTip:"Indicates whether the mesh is visible or not."
 	)
 	
 	rollout ZEPhysicalBodyRollout "ZE Physical Body Parameters" rolledUp:true

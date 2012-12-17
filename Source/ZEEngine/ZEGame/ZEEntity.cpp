@@ -307,7 +307,6 @@ const ZEVector3 ZEEntity::GetWorldPosition() const
 	{
 		ZEVector3 Temp;
 		ZEMatrix4x4::Transform(Temp, Owner->GetWorldTransform(), GetPosition());
-		//ZEVector3::Add(Temp, Owner->GetPosition(), GetPosition());
 		return Temp;
 	}
 

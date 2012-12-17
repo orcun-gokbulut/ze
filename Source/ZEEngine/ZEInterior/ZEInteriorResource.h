@@ -55,7 +55,7 @@ class ZEMLSerialReader;
 
 struct ZEInteriorPolygon
 {
-	ZEInteriorVertex				Vertices[3];
+	ZEInteriorVertex		Vertices[3];
 	ZEMaterial*				Material;
 	ZEUInt32				LastIteration;
 };
@@ -96,7 +96,7 @@ struct ZEInteriorDoorResource
 	ZEQuaternion									Rotation;
 	ZEVector3										Scale;
 	ZEInteriorRoomResource*							Rooms[2];
-	ZEUInt											RoomIds[2];
+	ZEInt											RoomIds[2];
 	
 };
 

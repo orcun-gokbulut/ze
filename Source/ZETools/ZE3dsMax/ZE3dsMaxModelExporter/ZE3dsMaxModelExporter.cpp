@@ -320,6 +320,14 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 	}
 	ProgressDialog->CloseTask();
 
+	ProgressDialog->OpenTask("Helper Process", true);
+	if(!ProcessHelpers())
+	{
+		zeError("Processing helpers failed.");
+		return false;
+	}
+	ProgressDialog->CloseTask();
+
 	ProgressDialog->OpenTask("Animation Process", true);
 
 	bool IsAnimationExportEnabled = ((ZEMLProperty*)(ExportOptions->GetProperty("IsAnimationExportEnabled")))->GetValue().GetBoolean();

@@ -196,6 +196,10 @@ void ZEModel::LoadModelResource()
 
 	Skeleton.SetCount(0);
 
+	for (ZESize I = 0; I < Helpers.GetCount(); I++)
+		Helpers[I].Deinitialize();
+	Helpers.SetCount(0);
+
 	if (ModelResource == NULL)
 		return;
 
@@ -255,6 +259,12 @@ void ZEModel::LoadModelResource()
 			LinkParentlessBones(Skeleton[I]);
 		}
 	}
+
+	Helpers.SetCount(ModelResource->GetHelpers().GetCount());
+	for (ZESize I = 0; I < ModelResource->GetHelpers().GetCount(); I++)
+	{
+		Helpers[I].Initialize(this, &ModelResource->GetHelpers()[I]);
+	}
 }
 
 void ZEModel::SetModelFile(const char* ModelFile)
@@ -310,6 +320,11 @@ ZEArray<ZEModelBone>& ZEModel::GetBones()
 const ZEArray<ZEModelMesh>& ZEModel::GetMeshes()
 {
 	return Meshes;
+}
+
+const ZEArray<ZEModelHelper>& ZEModel::GetHelpers()
+{
+	return Helpers;
 }
 
 const ZEArray<ZEModelAnimation>* ZEModel::GetAnimations()
@@ -371,6 +386,15 @@ ZEModelMesh* ZEModel::GetMesh(const char* Name)
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		if (strcmp(Meshes[I].GetName(), Name) == 0)
 			return &Meshes[I];
+
+	return NULL;
+}
+
+ZEModelHelper* ZEModel::GetHelper(const char* Name)
+{
+	for (ZESize I = 0; I < Helpers.GetCount(); I++)
+		if (strcmp(Helpers[I].GetName(), Name) == 0)
+			return &Helpers[I];
 
 	return NULL;
 }
@@ -467,7 +491,7 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].Draw(DrawParameters);
 	
-	//DebugDraw(DrawParameters->Renderer);
+	DebugDraw(DrawParameters->Renderer);
 }
 
 void ZEModel::Tick(float ElapsedTime)

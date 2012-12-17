@@ -162,14 +162,14 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 			return false;
 		}
 
-		ZEUInt32 RoomAIndex = FindRoomIndex(Scene->GetIGameNode(RoomANode));
+		ZEInt RoomAIndex = FindRoomIndex(Scene->GetIGameNode(RoomANode));
 		
 		if(RoomAIndex < 0)
 			zeError("Can nor find RoomAIndex.");
 		
 		DoorNode->AddProperty("RoomAIndex", RoomAIndex);
 
-		ZEUInt32 RoomBIndex = FindRoomIndex(Scene->GetIGameNode(RoomBNode));
+		ZEInt RoomBIndex = FindRoomIndex(Scene->GetIGameNode(RoomBNode));
 
 		if(RoomBIndex < 0)
 			zeError("Can nor find RoomBIndex.");

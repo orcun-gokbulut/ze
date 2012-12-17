@@ -67,6 +67,7 @@ class ZE3dsMaxModelExporter : public SceneExport
 		Tab<IGameNode*>				ProcessedBones;
 		Tab<IGameNode*>				ProcessedMeshes;
 		Tab<IGameNode*>				ProcessedMasterMeshes;
+		Tab<IGameNode*>				ProcessedHelpers;
 		Tab<IGameMaterial*>			ProcessedMaterials;
 
 		ZEInt						TotalFrameCount;
@@ -92,6 +93,8 @@ class ZE3dsMaxModelExporter : public SceneExport
 		bool						ProcessMeshes();
 		void						ProcessAnimationFrames(ZESize AnimationStartFrame, ZESize AnimationFrameCount, ZEMLNode* AnimationNode);
 		bool						ProcessAnimations(ZEMLNode* AnimationsNode);
+		bool						ProcessHelpers();
+		bool						ProcessHelper(IGameNode* Node, ZEMLNode* HelpersNode);
 
 		ZEInt						GetBoneId(IGameNode* Node);
 		ZEInt						GetMeshId(IGameNode* Node);

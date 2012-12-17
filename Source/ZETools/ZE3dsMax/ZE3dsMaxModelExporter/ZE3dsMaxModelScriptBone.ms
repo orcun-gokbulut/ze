@@ -9,7 +9,7 @@ BoneAttributes = attributes ZEBoneAttributes
 	rollout ZEBoneRollout "ZE Bone Parameters" rolledUp:false
 	(
 		/* LAYOUT DEFINITION */
-		bitmap						uiLogo																				fileName:"zineklogo.bmp"
+		bitmap						uiLogo										fileName:"zineklogo.bmp"
 		label						uiNoParams		"No Parameters"				enabled:false
 	)
 	

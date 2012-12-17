@@ -195,8 +195,8 @@ bool ZEInteriorResource::ReadDoors(ZEMLSerialReader* Reader)
 			ZEML_LIST_PROPERTY("Position",			Position,			ZE_VRT_VECTOR3,					true),
 			ZEML_LIST_PROPERTY("Rotation",			Rotation,			ZE_VRT_QUATERNION,				true),
 			ZEML_LIST_PROPERTY("Scale",				Scale,				ZE_VRT_VECTOR3,					true),
-			ZEML_LIST_PROPERTY("RoomAIndex",		RoomAIndex,			ZE_VRT_UNSIGNED_INTEGER_32,		true),  
-			ZEML_LIST_PROPERTY("RoomBIndex",		RoomBIndex,			ZE_VRT_UNSIGNED_INTEGER_32,		true)
+			ZEML_LIST_PROPERTY("RoomAIndex",		RoomAIndex,			ZE_VRT_INTEGER_32,				true),  
+			ZEML_LIST_PROPERTY("RoomBIndex",		RoomBIndex,			ZE_VRT_INTEGER_32,				true)
 		};
 
 		Reader->ReadPropertyList(DoorPropertiesList, 9);

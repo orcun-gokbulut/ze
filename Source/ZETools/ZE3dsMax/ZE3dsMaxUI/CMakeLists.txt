@@ -40,6 +40,7 @@ ze_add_source(ZE3dsMaxUI.cpp					Sources)
 ze_add_source(ZE3dsMaxUIDescription.h			Sources)
 ze_add_source(ZE3dsMaxUIDescription.cpp			Sources)
 ze_add_source(ZE3dsMaxScriptCommonUtilities.ms 	Sources ZEFC)
+ze_add_source(ZE3dsMaxScriptHelper.ms			Sources ZEFC)
 ze_add_source(ZE3dsMaxScriptRemove.ms 			Sources ZEFC)
 
 ze_add_library(ZE3dsMaxUI 

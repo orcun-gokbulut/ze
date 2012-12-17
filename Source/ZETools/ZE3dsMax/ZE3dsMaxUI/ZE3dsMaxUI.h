@@ -42,9 +42,36 @@
 #include <bmmlib.h>
 #include <guplib.h>
 
-#define ZECommonUtilsRemoveAttributes_Action_ID 980
+#define ZECommonUtilsHelperAttributesAdd_Action_ID 980
+#define ZECommonUtilsRemoveAttributes_Action_ID 990
 
 extern HINSTANCE hInstance;
+
+class ZE3dsMaxCommonUtilsActionAddHelperAttributes : public ActionItem
+{
+private:
+
+	MaxBmpFileIcon*		HelperActionIcon;
+
+public:
+	int					GetId();
+	BOOL				ExecuteAction();
+
+	void				GetButtonText(MSTR& buttonText);
+	void				GetMenuText(MSTR& menuText);
+	void				GetDescriptionText(MSTR& descText);
+	void				GetCategoryText(MSTR& catText);
+
+	BOOL				IsChecked();
+	BOOL				IsItemVisible();
+	BOOL				IsEnabled();
+
+	MaxIcon*			GetIcon();
+
+	void				DeleteThis();
+
+	ZE3dsMaxCommonUtilsActionAddHelperAttributes();
+};
 
 class ZE3dsMaxCommonUtilsRemoveAttributes : public ActionItem
 {
