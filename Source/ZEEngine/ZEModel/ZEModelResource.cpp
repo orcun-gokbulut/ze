@@ -396,7 +396,7 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Mesh")
 			continue;
 
-		ZEVariant NameValue, PositionValue, RotationValue, ScaleValue, IsSkinnedValue;
+		ZEVariant NameValue, PositionValue, RotationValue, ScaleValue, IsVisibleValue, IsSkinnedValue;
 		ZEMLSerialPointer BoundingBoxNodePointer, PhysicalBodyNodePointer, LODsNodePointer;
 
 		ZEMLSerialListItem MeshList[] = 
@@ -406,12 +406,13 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 			ZEML_LIST_PROPERTY("Position",		PositionValue,			ZE_VRT_VECTOR3,		true),
 			ZEML_LIST_PROPERTY("Rotation",		RotationValue,			ZE_VRT_QUATERNION,	true),
 			ZEML_LIST_PROPERTY("Scale",			ScaleValue,				ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("IsVisible",		IsVisibleValue,			ZE_VRT_BOOLEAN,		true),
 			ZEML_LIST_PROPERTY("IsSkinned",		IsSkinnedValue,			ZE_VRT_BOOLEAN,		true),
 			ZEML_LIST_NODE("PhysicalBody",		PhysicalBodyNodePointer,					false),
 			ZEML_LIST_NODE("LODs",				LODsNodePointer,							true)
 		};
 
-		if (!NodeReader->ReadPropertyList(MeshList, 8))
+		if (!NodeReader->ReadPropertyList(MeshList, 9))
 			return false;
 
 		ZEModelResourceMesh* Mesh = Meshes.Add();
@@ -420,6 +421,7 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 		Mesh->Position = PositionValue;
 		Mesh->Rotation = RotationValue;
 		Mesh->Scale = ScaleValue;
+		Mesh->IsVisible = IsVisibleValue;
 		Mesh->IsSkinned = IsSkinnedValue;
 
 		NodeReader->SeekPointer(BoundingBoxNodePointer);
@@ -826,6 +828,69 @@ bool ZEModelResource::ReadBones(ZEMLSerialReader* NodeReader)
 	return true;
 }
 
+bool ZEModelResource::ReadHelpers(ZEMLSerialReader* NodeReader)
+{
+	ZESize SubItemCount = (ZESize)NodeReader->GetSubItemCount();
+	for (ZESize I = 0; I < SubItemCount; I++)
+	{
+		if (!NodeReader->Read())
+		{
+			zeError("Can not read ZEML node.");
+			return false;
+		}
+
+		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Helper")
+			continue;
+
+		ZEVariant NameValue, OwnerTypeValue, OwnerIdValue, PositionValue, RotationValue, ScaleValue;
+
+		ZEMLSerialListItem HelperList[] = 
+		{
+			ZEML_LIST_PROPERTY("Name",			NameValue,				ZE_VRT_STRING,		true),
+			ZEML_LIST_PROPERTY("OwnerType",		OwnerTypeValue,			ZE_VRT_INTEGER_32,	true),
+			ZEML_LIST_PROPERTY("OwnerId",		OwnerIdValue,			ZE_VRT_INTEGER_32,	true),
+			ZEML_LIST_PROPERTY("Position",		PositionValue,			ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("Rotation",		RotationValue,			ZE_VRT_QUATERNION,	true),
+			ZEML_LIST_PROPERTY("Scale",			ScaleValue,				ZE_VRT_VECTOR3,		true)
+		};
+
+		if (!NodeReader->ReadPropertyList(HelperList, 6))
+			return false;
+
+		ZEModelResourceHelper* Helper = Helpers.Add();
+
+		memset(Helper, 0, sizeof(ZEModelResourceHelper));
+
+		strncpy(Helper->Name, NameValue.GetString(), ZE_MDLF_MAX_NAME_SIZE);
+		Helper->Position = PositionValue;
+		Helper->Rotation = RotationValue;
+		Helper->Scale = ScaleValue;
+
+		Helper->OwnerType = (ZEModelResourceHelperOwnerType)OwnerTypeValue.GetInt32();
+		Helper->OwnerId = OwnerIdValue;
+
+		switch (Helper->OwnerType)
+		{
+			case ZE_MRHOT_MESH:
+				{
+					Helper->OwnerMesh = &Meshes[Helper->OwnerId];
+					break;
+				}
+			case ZE_MRHOT_BONE:
+				{
+					Helper->OwnerBone = &Bones[Helper->OwnerId];
+					break;
+				}
+			default:
+				break;
+		}
+	}
+
+	NodeReader->GoToCurrentPointer();
+
+	return true;
+}
+
 bool ZEModelResource::ReadAnimations(ZEMLSerialReader* NodeReader)
 {
 
@@ -899,17 +964,18 @@ bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
 	if (NodeReader.GetItemName() != "ZEModel")
 		return false;
 
-	ZEMLSerialPointer BonesNodePointer, MeshesNodePointer, MaterialsNodePointer, AnimationsNodePointer;
+	ZEMLSerialPointer BonesNodePointer, MeshesNodePointer, HelpersNodePointer, MaterialsNodePointer, AnimationsNodePointer;
 
 	ZEMLSerialListItem ModelList[] = 
 	{
 		ZEML_LIST_NODE("Bones",			BonesNodePointer,		false),
 		ZEML_LIST_NODE("Meshes",		MeshesNodePointer,		false),
+		ZEML_LIST_NODE("Helpers",		HelpersNodePointer,		false),
 		ZEML_LIST_NODE("Animations",	AnimationsNodePointer,	false),
 		ZEML_LIST_NODE("Materials",		MaterialsNodePointer,	true)
 	};
 
-	if (!NodeReader.ReadPropertyList(ModelList, 4))
+	if (!NodeReader.ReadPropertyList(ModelList, 5))
 		return false;
 
 	if (BonesNodePointer != -1)
@@ -925,6 +991,14 @@ bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
 		NodeReader.SeekPointer(MeshesNodePointer);
 
 		if (!ReadMeshes(&NodeReader))
+			return false;
+	}
+
+	if (HelpersNodePointer != -1)
+	{
+		NodeReader.SeekPointer(HelpersNodePointer);
+
+		if (!ReadHelpers(&NodeReader))
 			return false;
 	}
 
@@ -967,6 +1041,11 @@ const ZEArray<ZEModelResourceBone>& ZEModelResource::GetBones() const
 const ZEArray<ZEModelResourceMesh>& ZEModelResource::GetMeshes() const
 {
 	return Meshes;
+}
+
+const ZEArray<ZEModelResourceHelper>& ZEModelResource::GetHelpers() const
+{
+	return Helpers;
 }
 
 const ZEArray<ZEModelResourceAnimation> ZEModelResource::GetAnimations() const

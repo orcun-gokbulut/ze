@@ -170,6 +170,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	Position = MeshResource->Position;
 	Rotation = MeshResource->Rotation;
 	Scale = MeshResource->Scale;
+	Visible = MeshResource->IsVisible;
 	LocalBoundingBox = MeshResource->BoundingBox;
 	PhysicsEnabled = false;
 

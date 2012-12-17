@@ -64,6 +64,13 @@ enum ZEPhysicalShapeType
 	ZE_PBST_CONVEX			= 4
 };
 
+enum ZEModelHelperOwnerType
+{
+	ZE_MHOT_MODEL			= 0,
+	ZE_MHOT_MESH			= 1,
+	ZE_MHOT_BONE			= 2
+};
+
 ZEPackStruct(
 struct ZEModelFileSkinnedVertex
 {
@@ -1120,6 +1127,8 @@ bool ZE3dsMaxModelExporter::ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesN
 	BBoxNode->AddProperty("Min", BoundingBox.Min);
 	BBoxNode->AddProperty("Max", BoundingBox.Max);
 
+	ZE3dsMaxUtils::GetProperty(Mesh,  ZE_BOOL_PROP, "Mesh_Visibility", *CurrentMeshNode->AddProperty("IsVisible"));
+
 	CurrentMeshNode->AddProperty("IsSkinned", Mesh->IsObjectSkinned());
 	CurrentMeshNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Translation()));
 	CurrentMeshNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Rotation()));
@@ -1458,6 +1467,159 @@ bool ZE3dsMaxModelExporter::ProcessAnimations(ZEMLNode* AnimationsNode)
 	return true;
 }
 
+bool ZE3dsMaxModelExporter::ProcessHelper(IGameNode* Node, ZEMLNode* HelpersNode)
+{
+	ZEProgressDialog::GetInstance()->OpenTask(Node->GetName());
+	zeLog("Processing helper \"%s\".", Node->GetName());
+	ZEMLNode* HelperNode = HelpersNode->AddSubNode("Helper");
+
+	IGameObject* Helper = Node->GetIGameObject();
+	HelperNode->AddProperty("Name", Node->GetName());
+
+	INode* OwnerNode = NULL;
+
+	if(!ZE3dsMaxUtils::GetProperty(Helper, "Owner", OwnerNode))
+		zeError("Can not find helper property: Owner");
+
+	if (OwnerNode == NULL)
+	{
+		zeWarning("Helper \"%s\" has wrong parameters.", Node->GetName());
+		return false;
+	}
+
+	const char* Type;
+	bool CurrentExportOption;
+	ZEInt OwnerId;
+	ZEModelHelperOwnerType OwnerType;
+	IGameNode* OwnerGameNode = Scene->GetIGameNode(OwnerNode);
+
+	ZE3dsMaxUtils::GetProperty(OwnerGameNode->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type);
+
+	if (strcmp(Type, "Mesh") == 0)
+	{
+		CurrentExportOption = ((ZEMLProperty*)(ExportOptions->GetProperty("IsMeshExportEnabled")))->GetValue().GetBoolean();
+
+		if (CurrentExportOption)
+		{
+			OwnerId = ZE3dsMaxModelExporter::GetMeshId(OwnerGameNode);
+			OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MESH;
+		}
+		else
+		{
+			OwnerId = -1;
+			OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MODEL;
+
+			zeWarning("Since mesh export option is disabled, Helper \"%s\" will be exported without an owner.", Node->GetName());
+		}
+	}
+	else if (strcmp(Type, "Bone") == 0)
+	{
+		CurrentExportOption = ((ZEMLProperty*)(ExportOptions->GetProperty("IsBoneExportEnabled")))->GetValue().GetBoolean();
+
+		if (CurrentExportOption)
+		{
+			OwnerId = ZE3dsMaxModelExporter::GetBoneId(OwnerGameNode);
+			OwnerType = ZEModelHelperOwnerType::ZE_MHOT_BONE;	
+		}
+		else
+		{
+			OwnerId = -1;
+			OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MODEL;
+			
+			zeWarning("Since bone export option is disabled, Helper \"%s\" will be exported without an owner.", Node->GetName());
+		}
+
+	}
+	else
+	{
+		zeError("Helper \"%s\" has invalid owner parameter.", Node->GetName());
+		return false;
+	}
+
+	if (OwnerId < 0 && OwnerType != ZE_MHOT_MODEL)
+	{
+		zeError("Helper \"%s\" has invalid owner parameter.", Node->GetName());
+		return false;
+	}
+
+	HelperNode->AddProperty("OwnerType", OwnerType);
+	HelperNode->AddProperty("OwnerId", OwnerId);
+
+	ZEMatrix4x4 FinalTransform;
+
+	ZEMatrix4x4 WorldTM;
+	ZEMatrix4x4::CreateOrientation(WorldTM, 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Translation()), 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Rotation()), 
+		ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Scaling()));
+
+	if (OwnerId != -1)
+	{
+		ZEMatrix4x4 OwnerWorldTM;
+		ZEMatrix4x4::CreateOrientation(OwnerWorldTM,
+			ZE3dsMaxUtils::MaxtoZE(OwnerGameNode->GetWorldTM().Translation()), 
+			ZE3dsMaxUtils::MaxtoZE(OwnerGameNode->GetWorldTM().Rotation()), 
+			ZE3dsMaxUtils::MaxtoZE(OwnerGameNode->GetWorldTM().Scaling()));
+
+		FinalTransform = OwnerWorldTM.Inverse() * WorldTM;
+	}
+	else
+	{
+		FinalTransform = WorldTM;
+	}
+
+	HelperNode->AddProperty("Position", FinalTransform.GetTranslation());
+	HelperNode->AddProperty("Rotation", FinalTransform.GetRotation());
+	HelperNode->AddProperty("Scale", FinalTransform.GetScale());
+
+
+	zeLog("Helper \"%s\" is processed.", Node->GetName());
+	ZEProgressDialog::GetInstance()->CloseTask();
+
+	return true;
+}
+
+bool ZE3dsMaxModelExporter::ProcessHelpers()
+{
+	zeLog("Processing helpers...");
+
+	Tab<IGameNode*> Nodes = Scene->GetIGameNodeByType(IGameObject::IGAME_HELPER);
+	const char* Type;
+
+	for (ZESize I = 0; I < (ZESize)Nodes.Count(); I++)
+	{
+		Type = NULL;
+		if (ZE3dsMaxUtils::GetProperty(Nodes[I]->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type) && strcmp(Type, "Helper") == 0)
+		{
+			bool Found = false;
+			for (ZESize N = 0; N < (ZESize)ProcessedHelpers.Count(); N++)
+			{
+				if (Nodes[I]->GetNodeID() == ProcessedHelpers[N]->GetNodeID())
+				{
+					Found = true;
+					break;
+				}			
+			}
+			if (Found == false)
+				ProcessedHelpers.Append(1, &Nodes[I]);
+		}
+	}
+
+	if (ProcessedHelpers.Count() == 0)
+	{
+		zeLog("No helpers with ZEHelperAttribute found. Helper processing skipped.");
+		return true;
+	}
+
+	ZEMLNode* HelpersNode = ModelNode.AddSubNode("Helpers");
+
+	for (ZESize I = 0; I < (ZESize)ProcessedHelpers.Count(); I++)
+		if (!ProcessHelper(ProcessedHelpers[I], HelpersNode))
+			return false;
+
+	return true;
+}
+
 void ZE3dsMaxModelExporter::CollectResources()
 {
 	ZESize MeshNodeCount = 0;
@@ -1488,7 +1650,7 @@ void ZE3dsMaxModelExporter::CollectResources()
 		IGameMaterial* CurrentMaterial = CurrentNode->GetNodeMaterial();
 
 		if (CurrentMaterial == NULL)
-			zeError("Mesh \"%s\" does not have valid material. Can not collect resource.", I, CurrentNode->GetName());
+			zeError("Mesh \"%s\" does not have valid material. Can not collect resource.", CurrentNode->GetName());
 
 		bool IsFound = false;
 

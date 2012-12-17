@@ -45,6 +45,7 @@
 #include "ZEModelResource.h"
 #include "ZEModelBone.h"
 #include "ZEModelMesh.h"
+#include "ZEModelHelper.h"
 #include "ZEModelAnimation.h"
 #include "ZEModelAnimationTrack.h"
 #include "ZEModelIKChain.h"
@@ -67,6 +68,7 @@ class ZEModel : public ZEEntity
 
 	friend class ZEPhysicalEnvironment;
 	friend class ZEModelAnimationTrack;
+	friend class ZEModelHelper;
 	private:
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
@@ -74,6 +76,7 @@ class ZEModel : public ZEEntity
 		
 		ZEArray<ZEModelMesh>				Meshes;
 		ZEArray<ZEModelBone>				Bones;
+		ZEArray<ZEModelHelper>				Helpers;
 
 		ZEPhysicalRigidBody*				ParentlessBoneBody;
 		ZEPhysicalBoxShape*					ParentlessBoneShape;
@@ -132,10 +135,12 @@ class ZEModel : public ZEEntity
 		ZEArray<ZEModelBone>&				GetBones();
 		const ZEArray<ZEMatrix4x4>&			GetBoneTransforms();
 		const ZEArray<ZEModelMesh>&			GetMeshes();
+		const ZEArray<ZEModelHelper>&		GetHelpers();
 		const ZEArray<ZEModelAnimation>*	GetAnimations();
 
 		ZEModelBone*						GetBone(const char* Name);
 		ZEModelMesh*						GetMesh(const char* Name);
+		ZEModelHelper*						GetHelper(const char* Name);
 
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();

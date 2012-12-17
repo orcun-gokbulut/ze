@@ -35,6 +35,7 @@
 
 #include "ZE3dsMaxUI.h"
 #include "ZE3dsMaxScriptCommonUtilities_ms.h"
+#include "ZE3dsMaxScriptHelper_ms.h"
 #include "ZE3dsMaxScriptRemove_ms.h"
 #include <imenus.h>
 #include <imenuman.h>
@@ -64,6 +65,70 @@ ZE3dsMaxUI::ZE3dsMaxUI()
 ZE3dsMaxUI::~ZE3dsMaxUI()
 {
 
+}
+
+int ZE3dsMaxCommonUtilsActionAddHelperAttributes::GetId()
+{
+	return ZECommonUtilsHelperAttributesAdd_Action_ID;
+}
+
+BOOL ZE3dsMaxCommonUtilsActionAddHelperAttributes::ExecuteAction()
+{
+ 	ZE3dsMaxScriptHelper_ms HelperScript;
+ 	return ExecuteMAXScriptScript((char*)HelperScript.GetData());
+}
+
+void ZE3dsMaxCommonUtilsActionAddHelperAttributes::GetButtonText(MSTR& buttonText)
+{
+	buttonText = "Add ZEHelper Attributes";
+}
+
+void ZE3dsMaxCommonUtilsActionAddHelperAttributes::GetMenuText(MSTR& menuText)
+{
+	menuText = "Add ZEHelper Attributes";
+}
+
+void ZE3dsMaxCommonUtilsActionAddHelperAttributes::GetDescriptionText(MSTR& descText)
+{
+	descText = "Add ZEHelper Attributes";
+}
+
+void ZE3dsMaxCommonUtilsActionAddHelperAttributes::GetCategoryText(MSTR& catText)
+{
+	catText = "Zinek Engine";
+}
+
+BOOL ZE3dsMaxCommonUtilsActionAddHelperAttributes::IsChecked()
+{
+	return FALSE;
+}
+
+BOOL ZE3dsMaxCommonUtilsActionAddHelperAttributes::IsItemVisible()
+{
+	return TRUE;
+}
+
+BOOL ZE3dsMaxCommonUtilsActionAddHelperAttributes::IsEnabled()
+{
+	return TRUE;
+}
+
+MaxIcon* ZE3dsMaxCommonUtilsActionAddHelperAttributes::GetIcon()
+{
+	if (HelperActionIcon == NULL)
+		HelperActionIcon = new MaxBmpFileIcon("ZEToolbarIcons", 7);
+
+	return HelperActionIcon;
+}
+
+void ZE3dsMaxCommonUtilsActionAddHelperAttributes::DeleteThis()
+{
+	delete HelperActionIcon;
+}
+
+ZE3dsMaxCommonUtilsActionAddHelperAttributes::ZE3dsMaxCommonUtilsActionAddHelperAttributes()
+{
+	HelperActionIcon = NULL;
 }
 
 int ZE3dsMaxCommonUtilsRemoveAttributes::GetId()

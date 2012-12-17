@@ -79,6 +79,12 @@ enum ZEModelResourcePhysicalBodyType
 	ZE_MRPBT_CLOTH			= 3
 };
 
+enum ZEModelResourceHelperOwnerType
+{
+	ZE_MRHOT_MODEL			= 0,
+	ZE_MRHOT_MESH			= 1,
+	ZE_MRHOT_BONE			= 2
+};
 
 
 struct ZEModelResourcePhysicalPolygon
@@ -283,6 +289,7 @@ struct ZEModelResourceMesh
 	ZEVector3									Position;
 	ZEQuaternion								Rotation;
 	ZEVector3									Scale;
+	bool										IsVisible;
 	bool										IsSkinned;
 	ZEArray<ZEModelResourceMeshLOD>				LODs;
 	ZEModelResourcePhysicalBody					PhysicalBody;
@@ -303,11 +310,25 @@ struct ZEModelResourceBone
 	ZEModelResourcePhysicalJoint				PhysicalJoint;
 };
 
+struct ZEModelResourceHelper
+{
+	char										Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEModelResourceHelperOwnerType				OwnerType;
+	ZEInt										OwnerId;
+	ZEModelResourceMesh*						OwnerMesh;
+	ZEModelResourceBone*						OwnerBone;
+	ZEVector3									Position;
+	ZEQuaternion								Rotation;
+	ZEVector3									Scale;
+};
+
+
 class ZEModelResource : public ZEResource
 {
 	private:
 		ZEArray<ZEModelResourceMesh>				Meshes;
 		ZEArray<ZEModelResourceBone>				Bones;
+		ZEArray<ZEModelResourceHelper>				Helpers;
 		ZEArray<ZEModelResourceAnimation>			Animations;
 		ZESmartArray<ZETexture2DResource*>			TextureResources;
 		ZEArray<ZEMaterial*>						Materials;
@@ -315,6 +336,7 @@ class ZEModelResource : public ZEResource
 		bool										ReadBones(ZEMLSerialReader* NodeReader);
 		void										ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId);
 		bool										ReadMeshes(ZEMLSerialReader* NodeReader);
+		bool										ReadHelpers(ZEMLSerialReader* NodeReader);
 		bool										ReadAnimations(ZEMLSerialReader* NodeReader);
 		bool										ReadMaterials(ZEMLSerialReader* NodeReader);
 		bool										ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSerialReader* NodeReader);
@@ -332,6 +354,7 @@ class ZEModelResource : public ZEResource
 		const ZEArray<ZEMaterial*>&					GetMaterials() const;
 		const ZEArray<ZEModelResourceBone>&			GetBones() const;
 		const ZEArray<ZEModelResourceMesh>&			GetMeshes() const;
+		const ZEArray<ZEModelResourceHelper>&		GetHelpers() const;
 		const ZEArray<ZEModelResourceAnimation>		GetAnimations() const;
 
 		static ZEModelResource*						LoadResource(const ZEString& FileName);

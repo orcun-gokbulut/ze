@@ -87,6 +87,9 @@ ActionTable* ZE3dsMaxUIDescription::GetActionTable(int i)
 {
 	ActionTable* MainActionTable = GetCOREInterface()->GetActionManager()->FindTable(kActionMainUI);
 
+	ZE3dsMaxCommonUtilsActionAddHelperAttributes* AddZEHelperAttributesAction = new ZE3dsMaxCommonUtilsActionAddHelperAttributes();
+	MainActionTable->AppendOperation(AddZEHelperAttributesAction);
+
 	ZE3dsMaxCommonUtilsRemoveAttributes* RemoveZEAttributesAction = new ZE3dsMaxCommonUtilsRemoveAttributes();
 	MainActionTable->AppendOperation(RemoveZEAttributesAction);
 
