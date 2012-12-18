@@ -94,7 +94,7 @@ ZEUIButtonControl::ZEUIButtonControl()
 {
 	Button.Texcoords = ZERectangle(ZEVector2::Zero, ZEVector2(50,50));
 	ButtonMaterial = ZEUIMaterial::CreateInstance();
-	ButtonMaterial->SetTexture(ZETexture2DResource::LoadResource("Button.jpg")->GetTexture());
+	ButtonMaterial->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/Button.jpg")->GetTexture());
 	Button.Color = ZEVector4::One;
 
 	Button.Material = ButtonMaterial;

@@ -348,7 +348,7 @@ ZEWeather::ZEWeather()
 	StarMap->SetName("TestStarMap");
 	StarMap->SetVisible(true);
 	StarMap->SetEnabled(true);
-	StarMap->SetSkyTexture("StarMap.png");
+	StarMap->SetSkyTexture("ZEEngine/ZEAtmosphere/Textures/StarMap.png");
 	StarMap->SetSkyColor(ZEVector3::One);
 	StarMap->SetSkyBrightness(0.5f);
 	this->AddComponent(StarMap);
@@ -358,7 +358,7 @@ ZEWeather::ZEWeather()
 	Moon->SetName("TestMoon");
 	Moon->SetEnabled(true);
 	Moon->SetVisible(true);
-	Moon->SetMoonTexture("MoonFrame.png", 53, 1);
+	Moon->SetMoonTexture("ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
 	Moon->SetMoonAmbientColor(ZEVector3(1.0f, 0.99f, 0.92f));
 	Moon->SetMoonDirection(MoonDirection);
 	Moon->SetMoonPhase(MoonPhase);
@@ -386,7 +386,7 @@ ZEWeather::ZEWeather()
 	Cloud->SetName("CloudTest");
 	Cloud->SetEnabled(true);
 	Cloud->SetVisible(true);
-	Cloud->SetCloudFormationTexture("Cloud.bmp");
+	Cloud->SetCloudFormationTexture("ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
 	Cloud->SetCamera(zeScene->GetActiveCamera());
 	Cloud->SetCloudPlaneHeight(600.0f);
 	Cloud->SetSunLightDirection(SunDirection);

@@ -48,25 +48,25 @@ void ZEUICheckBoxControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector
 			if (IsTriState)
 			{
 				State = ZE_UI_CBS_SEMICHECKED;
-				((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("SemiChecked.png")->GetTexture());
+				((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/SemiChecked.png")->GetTexture());
 			}
 			else
 			{
 				State = ZE_UI_CBS_CHECKED;
-				((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("Checked.png")->GetTexture());
+				((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/Checked.png")->GetTexture());
 			}
 		}
 		
 		else if (State == ZE_UI_CBS_SEMICHECKED)
 		{	
 			State = ZE_UI_CBS_CHECKED;
-			((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("Checked.png")->GetTexture());
+			((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/Checked.png")->GetTexture());
 		}
 		
 		else if (State == ZE_UI_CBS_CHECKED)
 		{	
 			State = ZE_UI_CBS_UNCHECKED;
-			((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("UnChecked.png")->GetTexture());
+			((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/UnChecked.png")->GetTexture());
 		}
 	}
 
@@ -137,7 +137,7 @@ ZEUICheckBoxControl::ZEUICheckBoxControl()
 	Box.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUICheckBoxControl::MouseButtonPressed));
 	Label.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUICheckBoxControl::MouseButtonPressed));
 
-	((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("UnChecked.png")->GetTexture());
+	((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/UnChecked.png")->GetTexture());
 }
 
 ZEUICheckBoxControl::~ZEUICheckBoxControl()

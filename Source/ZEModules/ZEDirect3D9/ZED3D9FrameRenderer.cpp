@@ -919,11 +919,11 @@ bool ZED3D9FrameRenderer::Initialize()
 
 	BlurMaskProcessor.SetRenderer(this);
 	BlurMaskProcessor.Initialize();
-	BlurMaskProcessor.SetBlurMaskTexture("resources\\BlurMask.png");
+	BlurMaskProcessor.SetBlurMaskTexture("ZEEngine/ZEPostEffects/Textures/BlurMask.png");
 
 	TextureMaskProcessor.SetRenderer(this);
 	TextureMaskProcessor.Initialize();
-	TextureMaskProcessor.SetMaskTexture("resources\\CrtMask.tga");
+	TextureMaskProcessor.SetMaskTexture("ZEEngine/ZEPostEffects/Textures/CrtMask.tga");
 
 	ChannelDisorientProcessor.SetRenderer(this);
 	ChannelDisorientProcessor.Initialize();

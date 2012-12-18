@@ -70,9 +70,9 @@ ZEUIWindowTitleBarControl::ZEUIWindowTitleBarControl()
 	MinimizeButton.SetWidth(20);
 	MinimizeButton.SetHeight(20);
 
-	((ZEUIMaterial*)(MinimizeButton.GetMaterial()))->SetTexture(ZETexture2DResource::LoadResource("Minimize.png")->GetTexture());
-	((ZEUIMaterial*)(CloseButton.GetMaterial()))->SetTexture(ZETexture2DResource::LoadResource("Close.png")->GetTexture());
-	((ZEUIMaterial*)(GetMaterial()))->SetTexture(ZETexture2DResource::LoadResource("Frame.png")->GetTexture());
+	((ZEUIMaterial*)(MinimizeButton.GetMaterial()))->SetTexture(ZETexture2DResource::LoadSharedResource("ZEEngine/ZEGUI/Textures/Minimize.png")->GetTexture());
+	((ZEUIMaterial*)(CloseButton.GetMaterial()))->SetTexture(ZETexture2DResource::LoadSharedResource("ZEEngine/ZEGUI/Textures/Close.png")->GetTexture());
+	((ZEUIMaterial*)(GetMaterial()))->SetTexture(ZETexture2DResource::LoadSharedResource("ZEEngine/ZEGUI/Textures/Frame.png")->GetTexture());
 
 	Frame.Color = ZEVector4(0.8f, 0.8f, 0.8f, 1.0f);
 
@@ -107,14 +107,14 @@ void ZEUIWindowControl::HideContentArea(ZEUIMouseKey Button, const ZEVector2& Mo
 	{
 		ZEUIControl::SetHeight(TitleBar.GetHeight());
 		ContentArea.SetVisiblity(false);
-		((ZEUIMaterial*)(TitleBar.MinimizeButton.GetMaterial()))->SetTexture(ZETexture2DResource::LoadResource("Maximize.png")->GetTexture());
+		((ZEUIMaterial*)(TitleBar.MinimizeButton.GetMaterial()))->SetTexture(ZETexture2DResource::LoadSharedResource("ZEEngine/ZEGUI/Textures/Maximize.png")->GetTexture());
 	}
 
 	else
 	{
 		SetHeight(TitleBar.GetHeight() + ContentArea.GetHeight());
 		ContentArea.SetVisiblity(true);
-		((ZEUIMaterial*)(TitleBar.MinimizeButton.GetMaterial()))->SetTexture(ZETexture2DResource::LoadResource("Minimize.png")->GetTexture());
+		((ZEUIMaterial*)(TitleBar.MinimizeButton.GetMaterial()))->SetTexture(ZETexture2DResource::LoadSharedResource("ZEEngine/ZEGUI/Textures/Minimize.png")->GetTexture());
 	}
 }
 
@@ -163,8 +163,8 @@ ZEUIWindowControl::ZEUIWindowControl()
 	ZEUIControl::AddChildControl(&TitleBar);
 	ZEUIControl::AddChildControl(&ContentArea);
 	ContentArea.AddChildControl(&ResizeButton);
-	((ZEUIMaterial*)(ContentArea.GetMaterial()))->SetTexture(ZETexture2DResource::LoadResource("Frame.png")->GetTexture());
-	((ZEUIMaterial*)(ResizeButton.GetMaterial()))->SetTexture(ZETexture2DResource::LoadResource("Resize.png")->GetTexture());
+	((ZEUIMaterial*)(ContentArea.GetMaterial()))->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/Frame.png")->GetTexture());
+	((ZEUIMaterial*)(ResizeButton.GetMaterial()))->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/Resize.png")->GetTexture());
 
 	ResizeButton.SetWidth(10);
 	ResizeButton.SetHeight(10);

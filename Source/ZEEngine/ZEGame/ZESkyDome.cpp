@@ -38,9 +38,6 @@
 #include "ZEGraphics/ZESkyDomeMaterial.h"
 #include "ZEDrawParameters.h"
 
-#define		ZE_SKY_DOME_PATH		"resources\\ClippedUnitDome.zeCanvas"
-
-
 void ZESkyDome::SetAmbientFactor(float Value)
 {
 	AmbientFactor = Value;
@@ -226,9 +223,9 @@ bool ZESkyDome::Initialize()
 	// Load sky dome
 	if (SkyDomeGeometry.IsEmpty())
 	{
-		if (!SkyDomeGeometry.LoadFromFile(ZE_SKY_DOME_PATH))
+		if (!SkyDomeGeometry.LoadFromFile("ZEEngine/ZEAtmosphere/Meshes/SkyDome.zeCanvas"))
 		{
-			zeDebugCheck("Cannot Load Sky Dome Geometry From: \"%s\"", ZE_SKY_DOME_PATH);
+			zeError("Cannot load sky dome geometry.");
 			return false;
 		}
 	}
