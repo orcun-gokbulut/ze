@@ -1048,7 +1048,7 @@ const ZEArray<ZEModelResourceHelper>& ZEModelResource::GetHelpers() const
 	return Helpers;
 }
 
-const ZEArray<ZEModelResourceAnimation> ZEModelResource::GetAnimations() const
+const ZEArray<ZEModelResourceAnimation>& ZEModelResource::GetAnimations() const
 {
 	return Animations;
 }
