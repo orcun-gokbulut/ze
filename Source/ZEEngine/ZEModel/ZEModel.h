@@ -114,6 +114,7 @@ class ZEModel : public ZEEntity
 		
 		void								LoadModelResource();
 
+	protected:
 											ZEModel();
 		virtual								~ZEModel();
 
