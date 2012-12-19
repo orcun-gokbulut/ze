@@ -69,7 +69,7 @@ const ZEVector3& ZEModelHelper::GetPosition()
 	return Position;
 }
 
-const ZEVector3& ZEModelHelper::GetWorldPosition()
+const ZEVector3 ZEModelHelper::GetWorldPosition()
 {
 	ZEVector3 Temp;
 
@@ -93,7 +93,7 @@ const ZEQuaternion& ZEModelHelper::GetRotation()
 	return Rotation;
 }
 
-const ZEQuaternion& ZEModelHelper::GetWorldRotation()
+const ZEQuaternion ZEModelHelper::GetWorldRotation()
 {
 	ZEQuaternion Temp;
 
@@ -126,7 +126,7 @@ const ZEVector3& ZEModelHelper::GetScale()
 	return Scale;
 }
 
-const ZEVector3& ZEModelHelper::GetWorldScale()
+const ZEVector3 ZEModelHelper::GetWorldScale()
 {
 	ZEVector3 Temp;
 
