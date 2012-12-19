@@ -139,7 +139,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	TotalEntityCount->SetWidth(250.0f);
 	TotalEntityCount->SetHeight(25.0f);
 	TotalEntityCount->SetPosition(ZEVector2(0.0f, 0.0f));
-	TotalEntityCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	TotalEntityCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	TotalEntityCount->SetTextColor(ZEVector4::One);
 	AddChildControl(TotalEntityCount);
 
@@ -147,7 +147,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	DrawableEntityCount->SetWidth(250.0f);
 	DrawableEntityCount->SetHeight(25.0f);
 	DrawableEntityCount->SetPosition(ZEVector2(0.0f, 25.0f));
-	DrawableEntityCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	DrawableEntityCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	DrawableEntityCount->SetTextColor(ZEVector4::One);
 	AddChildControl(DrawableEntityCount);
 
@@ -155,7 +155,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	VisibleEntityCount->SetWidth(250.0f);
 	VisibleEntityCount->SetHeight(25.0f);
 	VisibleEntityCount->SetPosition(ZEVector2(0.0f, 50.0f));
-	VisibleEntityCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	VisibleEntityCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	VisibleEntityCount->SetTextColor(ZEVector4::One);
 	AddChildControl(VisibleEntityCount);
 
@@ -163,7 +163,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	CulledEntityCount->SetWidth(250.0f);
 	CulledEntityCount->SetHeight(25.0f);
 	CulledEntityCount->SetPosition(ZEVector2(0.0f, 75.0f));
-	CulledEntityCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	CulledEntityCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	CulledEntityCount->SetTextColor(ZEVector4::One);
 	AddChildControl(CulledEntityCount);
 
@@ -171,7 +171,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	DrawedEntityCount->SetWidth(250.0f);
 	DrawedEntityCount->SetHeight(25.0f);
 	DrawedEntityCount->SetPosition(ZEVector2(0.0f, 100.0f));
-	DrawedEntityCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	DrawedEntityCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	DrawedEntityCount->SetTextColor(ZEVector4::One);
 	AddChildControl(DrawedEntityCount);
 
@@ -179,7 +179,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	TotalLightCount->SetWidth(250.0f);
 	TotalLightCount->SetHeight(25.0f);
 	TotalLightCount->SetPosition(ZEVector2(0.0f, 150.0f));
-	TotalLightCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	TotalLightCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	TotalLightCount->SetTextColor(ZEVector4::One);
 	AddChildControl(TotalLightCount);
 
@@ -187,7 +187,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	VisibleLightCount->SetWidth(250.0f);
 	VisibleLightCount->SetHeight(25.0f);
 	VisibleLightCount->SetPosition(ZEVector2(0.0f, 175.0f));
-	VisibleLightCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	VisibleLightCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	VisibleLightCount->SetTextColor(ZEVector4::One);
 	AddChildControl(VisibleLightCount);
 
@@ -195,7 +195,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	CulledLightCount->SetWidth(250.0f);
 	CulledLightCount->SetHeight(25.0f);
 	CulledLightCount->SetPosition(ZEVector2(0.0f, 200.0f));
-	CulledLightCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	CulledLightCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	CulledLightCount->SetTextColor(ZEVector4::One);
 	AddChildControl(CulledLightCount);
 	
@@ -203,7 +203,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	DrawedLightCount->SetWidth(250.0f);
 	DrawedLightCount->SetHeight(25.0f);
 	DrawedLightCount->SetPosition(ZEVector2(0.0f, 225.0f));
-	DrawedLightCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	DrawedLightCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	DrawedLightCount->SetTextColor(ZEVector4::One);
 	AddChildControl(DrawedLightCount);
 
@@ -211,7 +211,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	FPSCount->SetWidth(250.0f);
 	FPSCount->SetHeight(25.0f);
 	FPSCount->SetPosition(ZEVector2(0.0f, 250.0f));
-	FPSCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	FPSCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	FPSCount->SetTextColor(ZEVector4::One);
 	AddChildControl(FPSCount);
 
@@ -219,7 +219,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	CameraPosition->SetWidth(600.0f); //450.0f
 	CameraPosition->SetHeight(25.0f);
 	CameraPosition->SetPosition(ZEVector2(0.0f, 275.0f));
-	CameraPosition->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	CameraPosition->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	CameraPosition->SetTextColor(ZEVector4::One);
 	AddChildControl(CameraPosition);
 
