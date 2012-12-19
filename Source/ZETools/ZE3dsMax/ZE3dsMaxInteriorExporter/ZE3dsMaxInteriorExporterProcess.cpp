@@ -490,7 +490,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				else
 				{
 					MapFlag |= ZE_MTMP_SPECULARMAP;
-					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(SpecularMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
@@ -512,7 +512,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				else
 				{
 					MapFlag |= ZE_MTMP_EMISSIVEMAP;
-					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(EmissiveMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
@@ -534,7 +534,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				else
 				{
 					MapFlag |= ZE_MTMP_OPACITYMAP;
-					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(OpacityMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
@@ -558,7 +558,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				else
 				{
 					MapFlag |= ZE_MTMP_NORMALMAP;
-					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(NormalMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
@@ -580,7 +580,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				else
 				{
 					MapFlag |= ZE_MTMP_ENVIRONMENTMAP;
-					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(EnvironmentMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
