@@ -80,14 +80,17 @@ class ZEModelHelper
 
 		void								SetPosition(const ZEVector3& LocalPosition);
 		const ZEVector3&					GetPosition();
+		const ZEVector3						GetModelPosition();
 		const ZEVector3						GetWorldPosition();
 
 		void								SetRotation(const ZEQuaternion& LocalRotation);
 		const ZEQuaternion&					GetRotation();
+		const ZEQuaternion					GetModelRotation();
 		const ZEQuaternion					GetWorldRotation();
 
 		void								SetScale(const ZEVector3& LocalScale);
 		const ZEVector3&					GetScale();
+		const ZEVector3						GetModelScale();
 		const ZEVector3						GetWorldScale();
 
 		void								Initialize(ZEModel* Model, const ZEModelResourceHelper* HelperResource);
