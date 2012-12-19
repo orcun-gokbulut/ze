@@ -381,6 +381,11 @@ ZEModelBone* ZEModel::GetBone(const char* Name)
 	return NULL;
 }
 
+ZEModelMesh* ZEModel::GetMesh(ZESize Index)
+{
+	return &Meshes[Index];
+}
+
 ZEModelMesh* ZEModel::GetMesh(const char* Name)
 {
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
@@ -491,7 +496,7 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].Draw(DrawParameters);
 	
-	DebugDraw(DrawParameters->Renderer);
+	//DebugDraw(DrawParameters->Renderer);
 }
 
 void ZEModel::Tick(float ElapsedTime)

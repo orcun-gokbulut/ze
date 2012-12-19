@@ -140,6 +140,7 @@ class ZEModel : public ZEEntity
 		const ZEArray<ZEModelAnimation>*	GetAnimations();
 
 		ZEModelBone*						GetBone(const char* Name);
+		ZEModelMesh*						GetMesh(ZESize Index);
 		ZEModelMesh*						GetMesh(const char* Name);
 		ZEModelHelper*						GetHelper(const char* Name);
 
