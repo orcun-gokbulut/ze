@@ -234,7 +234,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 				else
 				{
 					MapFlag |= ZE_MTMP_SPECULARMAP;
-					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(SpecularMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
@@ -256,7 +256,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 				else
 				{
 					MapFlag |= ZE_MTMP_EMISSIVEMAP;
-					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(EmissiveMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
@@ -278,7 +278,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 				else
 				{
 					MapFlag |= ZE_MTMP_OPACITYMAP;
-					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(OpacityMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
@@ -313,7 +313,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 				else
 				{
 					MapFlag |= ZE_MTMP_NORMALMAP;
-					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(NormalMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
@@ -335,7 +335,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 				else
 				{
 					MapFlag |= ZE_MTMP_ENVIRONMENTMAP;
-					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()));
+					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(EnvironmentMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
@@ -1477,63 +1477,68 @@ bool ZE3dsMaxModelExporter::ProcessHelper(IGameNode* Node, ZEMLNode* HelpersNode
 	HelperNode->AddProperty("Name", Node->GetName());
 
 	INode* OwnerNode = NULL;
-
+	ZEInt OwnerId;
+	ZEModelHelperOwnerType OwnerType;
+	
 	if(!ZE3dsMaxUtils::GetProperty(Helper, "Owner", OwnerNode))
 		zeError("Can not find helper property: Owner");
 
-	if (OwnerNode == NULL)
-	{
-		zeWarning("Helper \"%s\" has wrong parameters.", Node->GetName());
-		return false;
-	}
-
-	const char* Type;
-	bool CurrentExportOption;
-	ZEInt OwnerId;
-	ZEModelHelperOwnerType OwnerType;
 	IGameNode* OwnerGameNode = Scene->GetIGameNode(OwnerNode);
 
-	ZE3dsMaxUtils::GetProperty(OwnerGameNode->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type);
-
-	if (strcmp(Type, "Mesh") == 0)
+	if (OwnerNode == NULL)
 	{
-		CurrentExportOption = ((ZEMLProperty*)(ExportOptions->GetProperty("IsMeshExportEnabled")))->GetValue().GetBoolean();
+		zeWarning("Helper \"%s\" has no immediate owner parameter. Model will be set as owner.", Node->GetName());
 
-		if (CurrentExportOption)
-		{
-			OwnerId = ZE3dsMaxModelExporter::GetMeshId(OwnerGameNode);
-			OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MESH;
-		}
-		else
-		{
-			OwnerId = -1;
-			OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MODEL;
-
-			zeWarning("Since mesh export option is disabled, Helper \"%s\" will be exported without an owner.", Node->GetName());
-		}
-	}
-	else if (strcmp(Type, "Bone") == 0)
-	{
-		CurrentExportOption = ((ZEMLProperty*)(ExportOptions->GetProperty("IsBoneExportEnabled")))->GetValue().GetBoolean();
-
-		if (CurrentExportOption)
-		{
-			OwnerId = ZE3dsMaxModelExporter::GetBoneId(OwnerGameNode);
-			OwnerType = ZEModelHelperOwnerType::ZE_MHOT_BONE;	
-		}
-		else
-		{
-			OwnerId = -1;
-			OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MODEL;
-			
-			zeWarning("Since bone export option is disabled, Helper \"%s\" will be exported without an owner.", Node->GetName());
-		}
-
+		OwnerId = -1;
+		OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MODEL;
 	}
 	else
 	{
-		zeError("Helper \"%s\" has invalid owner parameter.", Node->GetName());
-		return false;
+		const char* Type;
+		bool CurrentExportOption;
+
+		ZE3dsMaxUtils::GetProperty(OwnerGameNode->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type);
+
+		if (strcmp(Type, "Mesh") == 0)
+		{
+			CurrentExportOption = ((ZEMLProperty*)(ExportOptions->GetProperty("IsMeshExportEnabled")))->GetValue().GetBoolean();
+
+			if (CurrentExportOption)
+			{
+				OwnerId = ZE3dsMaxModelExporter::GetMeshId(OwnerGameNode);
+				OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MESH;
+			}
+			else
+			{
+				OwnerId = -1;
+				OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MODEL;
+
+				zeWarning("Since mesh export option is disabled, Helper \"%s\" will be exported without an owner.", Node->GetName());
+			}
+		}
+		else if (strcmp(Type, "Bone") == 0)
+		{
+			CurrentExportOption = ((ZEMLProperty*)(ExportOptions->GetProperty("IsBoneExportEnabled")))->GetValue().GetBoolean();
+
+			if (CurrentExportOption)
+			{
+				OwnerId = ZE3dsMaxModelExporter::GetBoneId(OwnerGameNode);
+				OwnerType = ZEModelHelperOwnerType::ZE_MHOT_BONE;	
+			}
+			else
+			{
+				OwnerId = -1;
+				OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MODEL;
+
+				zeWarning("Since bone export option is disabled, Helper \"%s\" will be exported without an owner.", Node->GetName());
+			}
+
+		}
+		else
+		{
+			zeError("Helper \"%s\" has invalid owner parameter.", Node->GetName());
+			return false;
+		}
 	}
 
 	if (OwnerId < 0 && OwnerType != ZE_MHOT_MODEL)
