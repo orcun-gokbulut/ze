@@ -355,7 +355,7 @@ class ZEModelResource : public ZEResource
 		const ZEArray<ZEModelResourceBone>&			GetBones() const;
 		const ZEArray<ZEModelResourceMesh>&			GetMeshes() const;
 		const ZEArray<ZEModelResourceHelper>&		GetHelpers() const;
-		const ZEArray<ZEModelResourceAnimation>		GetAnimations() const;
+		const ZEArray<ZEModelResourceAnimation>&	GetAnimations() const;
 
 		static ZEModelResource*						LoadResource(const ZEString& FileName);
 		static ZEModelResource*						LoadSharedResource(const ZEString& FileName);
