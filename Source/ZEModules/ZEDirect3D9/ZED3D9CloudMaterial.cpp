@@ -590,7 +590,8 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00FFFFFF, 1.0f, 0x00);
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)CloudTexture, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_WRAP);
 	*/
-	ZEVector3 CameraPosition = Camera->GetWorldPosition();
+
+	ZEVector3 CameraPosition = zeScene->GetActiveCamera()->GetWorldPosition();
 
 	struct
 	{
@@ -753,7 +754,7 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	LocalESun.z = LightScale * SunLightColor.z / LocalMieRayleighSum.z;
 	LocalESun.w = EarthRadius;
 
-	ZEVector4::Scale(LocalMieRayleighSum, LocalMieRayleighSum, 1.0f / Camera->GetFarZ());
+	ZEVector4::Scale(LocalMieRayleighSum, LocalMieRayleighSum, 1.0f / zeScene->GetActiveCamera()->GetFarZ());
 	LocalMieRayleighSum.w = AtmosphereHeight * (2.0f * EarthRadius + AtmosphereHeight);
 
 	ZEVector4 LocalAmbient;
