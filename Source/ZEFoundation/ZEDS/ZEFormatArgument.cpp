@@ -507,9 +507,18 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix4x4& Argumen
 	PrintFloat(Output, Argument.M32, FormattingOptions);
 	Output.Append(Comma);
 	PrintFloat(Output, Argument.M33, FormattingOptions);
-	Output.Append(PostFix);
+	Output.Append(Comma);
 	PrintFloat(Output, Argument.M34, FormattingOptions);
-	
+
+	Output.Append(Seperator);
+
+	PrintFloat(Output, Argument.M41, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M42, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M43, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M44, FormattingOptions);	
 	Output.Append(PostFix);
 
 	return true;
