@@ -54,6 +54,7 @@ add_subdirectory(ZESocket)
 add_subdirectory(ZEML)
 add_subdirectory(ZERegEx)
 
+ze_add_source(ZEAutoExpt.txt			Sources Headers)
 ze_add_source(ZEData.h 					Sources Headers)
 ze_add_source(ZEData.cpp 				Sources)
 ze_add_source(ZEDLL.h 					Sources Headers)
