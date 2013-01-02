@@ -40,6 +40,7 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEError.h"
+#include "ZERegEx/TRE/config.h"
 
 #ifdef ZE_PLATFORM_UNIX
     #define sprintf_s snprintf
@@ -129,7 +130,7 @@ static bool CheckArgumentFormat(const char* ArgumentFormat)
 
 	while(*ArgumentFormat != 0)
 	{
-		if (!isdigit(*ArgumentFormat) && *ArgumentFormat != '.' && *ArgumentFormat != '#' && *ArgumentFormat != '.' && *ArgumentFormat != '-' && *ArgumentFormat != '+')
+		if (!isdigit(*ArgumentFormat) && *ArgumentFormat != ' ' && *ArgumentFormat != '#' && *ArgumentFormat != '.' && *ArgumentFormat != '-' && *ArgumentFormat != '+')
 			return false;
 		ArgumentFormat++;
 	}

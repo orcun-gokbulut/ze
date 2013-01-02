@@ -102,7 +102,16 @@ ZETestSuite(ZEString)
 
 	ZETest("void ZEString::Compact()")
 	{
-		ZETestCheck(false);
+		ZEString String("ZE");
+		ZETestCheck(String.GetSize() == 3);
+
+		String.SetSize(7);
+		ZETestCheck(String == "ZE");
+		ZETestCheck(String.GetSize() == 7);
+
+		String.Compact();
+		ZETestCheck(String == "ZE");
+		ZETestCheck(String.GetSize() == 3);
 	}
 
 	ZETest("void ZEString::CopyFrom(const ZEString & String)")
@@ -276,15 +285,27 @@ ZETestSuite(ZEString)
 		ZEString String = ZEString::FromDouble(Value);
 
 		ZETestCheck(String == "845756.875000");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromDouble(Value, ".");
+			ZETestCheck(String == "845757");
+		}
 	}
 
-	ZETest("ZEString ZEString::FromFloat(float Value)")
+	ZETest("ZEString ZEString::FromFloat(float Value, const char* Format)")
 	{
 		float Value = 845756.88781f;
 
 		ZEString String = ZEString::FromFloat(Value);
 
 		ZETestCheck(String == "845756.875000");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromFloat(Value, "12.1");
+			ZETestCheck(String == "    845756.9");
+		}
 	}
 
 	ZETest("ZEString ZEString::FromInt16(ZEInt16 Value, const char* Format)")
@@ -294,6 +315,12 @@ ZETestSuite(ZEString)
 		ZEString String = ZEString::FromInt16(Value);
 
 		ZETestCheck(String == "-150");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromInt16(Value, "d:.6");
+			ZETestCheck(String == "-000150");
+		}
 	}
 
 	ZETest("ZEString ZEString::FromInt32(ZEInt32 Value, const char* Format)")
@@ -303,6 +330,12 @@ ZETestSuite(ZEString)
 		ZEString String = ZEString::FromInt32(Value);
 
 		ZETestCheck(String == "845756");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromInt32(Value, "x:08");
+			ZETestCheck(String == "000ce7bc");
+		}
 	}
 
 	ZETest("ZEString ZEString::FromInt64(ZEInt64 Value, const char* Format)")
@@ -312,6 +345,12 @@ ZETestSuite(ZEString)
 		ZEString String = ZEString::FromInt64(Value);
 
 		ZETestCheck(String == "-845756");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromInt64(Value, "d:-11.8");
+			ZETestCheck(String == "-00845756  ");
+		}
 	}
 
 	ZETest("ZEString ZEString::FromInt8(ZEInt8 Value, const char* Format)")
@@ -321,6 +360,12 @@ ZETestSuite(ZEString)
 		ZEString String = ZEString::FromInt8(Value);
 
 		ZETestCheck(String == "-20");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromInt8(Value, "d:6.3");
+			ZETestCheck(String == "  -020");
+		}
 	}
 
 	ZETest("ZEString ZEString::FromStdString(const std::string& Value)")
@@ -339,7 +384,6 @@ ZETestSuite(ZEString)
 
 			ZETestCheck(StringB == "Işık Ilık Süt İç");
 		}
-
 	}
 
 	ZETest("ZEString ZEString::FromUInt16(ZEUInt16 Value, const char* Format)")
@@ -349,6 +393,12 @@ ZETestSuite(ZEString)
 		ZEString String = ZEString::FromUInt16(Value);
 
 		ZETestCheck(String == "150");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromUInt16(Value, "x:04");
+			ZETestCheck(String == "0096");
+		}
 	}
 
 	ZETest("ZEString ZEString::FromUInt32(ZEUInt32 Value, const char* Format)")
@@ -358,8 +408,13 @@ ZETestSuite(ZEString)
 		ZEString String = ZEString::FromUInt32(Value);
 
 		ZETestCheck(String == "845756");
-	}
 
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromUInt32(Value, "X:-10.8");
+			ZETestCheck(String = "000CE7BC  ");
+		}
+	}
 
 	ZETest("ZEString ZEString::FromUInt64(ZEUInt64 Value, const char* Format)")
 	{
@@ -368,18 +423,28 @@ ZETestSuite(ZEString)
 		ZEString String = ZEString::FromUInt64(Value);
 
 		ZETestCheck(String == "845756");
-	}
 
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromUInt64(Value, "d:8.7");
+			ZETestCheck(String == " 0845756");
+		}
+	}
 
 	ZETest("ZEString ZEString::FromUInt8(ZEUInt8 Value, const char* Format)")
 	{
-		ZEUInt8 Value = 20;
+		ZEUInt8 Value = 122;
 
 		ZEString String = ZEString::FromUInt8(Value);
 
-		ZETestCheck(String == "20");
-	}
+		ZETestCheck(String == "122");
 
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromUInt8(Value, "c:-4");
+			ZETestCheck(String == "z   ");
+		}
+	}
 
 	ZETest("ZEString ZEString::FromWChar(wchar_t Value)")
 	{
@@ -491,7 +556,6 @@ ZETestSuite(ZEString)
 
 			ZETestCheck(StringC == "Işık Ilık Süt İç");
 		}
-
 	}
 
 	ZETest("void ZEString::Insert(const char * String);")
@@ -893,7 +957,6 @@ ZETestSuite(ZEString)
 			ZETestCheck(StringA[1] == "€");
 		}
 	}
-
 
 	ZETest("const char & ZEString::operator[](ZEInt Index) const")
 	{
@@ -1687,6 +1750,18 @@ ZETestSuite(ZEString)
 		}
 	}
 
+	ZETest("void ZEString::SetBuffer(void* Buffer, ZESize Size)")
+	{
+		void* Buffer = new unsigned char[1];
+
+		ZEString String("String");
+		ZETestCheck(String.GetSize() == 7);
+
+		String.SetBuffer(Buffer, 1);
+		ZETestCheck(String == "");
+		ZETestCheck(String.GetSize() == 1);
+	}
+
 	ZETest("void ZEString::SetCharacter(ZESize Position, char Value)")
 	{
 		ZEString String = "0123456789";
@@ -1725,6 +1800,18 @@ ZETestSuite(ZEString)
 		StringA.SetValue(StringB);
 
 		ZETestCheck(StringA == "€");
+	}
+
+	ZETest("void ZEString::SetValue(const ZEString& String)")
+	{
+		ZEString StringA("Test");
+		ZETestCheck(StringA.GetSize() == 5);
+		ZEString StringB("String");
+		ZETestCheck(StringB.GetSize() == 7);
+
+		StringA.SetValue(StringB);
+		ZETestCheck(StringA == "String");
+		ZETestCheck(StringA.GetSize() == 7);
 	}
 
 	ZETest("void ZEString::SetValue(const ZECharacter& Character)")
@@ -1776,6 +1863,12 @@ ZETestSuite(ZEString)
 
 		String.SetValue(Value);
 		ZETestCheck(String == "400.552521");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "-8.1");
+			ZETestCheck(String == "400.6   ");
+		}
 	}
 
 	ZETest("void ZEString::SetValue(double Value, const char* Format)")
@@ -1785,6 +1878,12 @@ ZETestSuite(ZEString)
 
 		String.SetValue(Value);
 		ZETestCheck(String == "400.552521");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "10.3");
+			ZETestCheck(String == "   400.553");
+		}
 	}
 
 	ZETest("void ZEString::SetValue(ZEInt8 Value, const char* Format)")
@@ -1795,6 +1894,12 @@ ZETestSuite(ZEString)
 		String.SetValue(Value);
 
 		ZETestCheck(String == "-20");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "x");
+			ZETestCheck(String == "ffffffec");
+		}
 	}
 
 	ZETest("void ZEString::SetValue(ZEInt16 Value, const char* Format)")
@@ -1805,6 +1910,12 @@ ZETestSuite(ZEString)
 		String.SetValue(Value);
 
 		ZETestCheck(String == "-8765");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "d:8");
+			ZETestCheck(String == "   -8765");
+		}
 	}
 
 	ZETest("void ZEString::SetValue(ZEInt32 Value, const char* Format)")
@@ -1815,6 +1926,12 @@ ZETestSuite(ZEString)
 		String.SetValue(Value);
 
 		ZETestCheck(String == "-87654321");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, ":");
+			ZETestCheck(String == "-87654321");
+		}
 	}
 
 	ZETest("void ZEString::SetValue(ZEInt64 Value, const char* Format)")
@@ -1825,16 +1942,28 @@ ZETestSuite(ZEString)
 		String.SetValue(Value);
 
 		ZETestCheck(String == "-87654321");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "d:.12");
+			ZETestCheck(String == "-000087654321");
+		}
 	}
 
 	ZETest("void ZEString::SetValue(ZEUInt8 Value, const char* Format)")
 	{
-		ZEUInt8 Value = 20;
+		ZEUInt8 Value = 90;
 
 		ZEString String;
 		String.SetValue(Value);
 
-		ZETestCheck(String == "20");
+		ZETestCheck(String == "90");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "c:4");
+			ZETestCheck(String == "   Z");
+		}
 	}
 
 	ZETest("void ZEString::SetValue(ZEUInt16 Value, const char* Format)")
@@ -1845,6 +1974,12 @@ ZETestSuite(ZEString)
 		String.SetValue(Value);
 
 		ZETestCheck(String == "8765");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "X:-6");
+			ZETestCheck(String == "223D  ");
+		}
 	}
 
 	ZETest("void ZEString::SetValue(ZEUInt32 Value, const char* Format)")
@@ -1855,6 +1990,12 @@ ZETestSuite(ZEString)
 		String.SetValue(Value);
 
 		ZETestCheck(String == "987654");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "d:.8");
+			ZETestCheck(String == "00987654");
+		}
 	}
 
 	ZETest("void ZEString::SetValue(ZEUInt64 Value, const char* Format)")
@@ -1865,6 +2006,12 @@ ZETestSuite(ZEString)
 		String.SetValue(Value);
 
 		ZETestCheck(String == "987654321");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "X:-10");
+			ZETestCheck(String == "3ADE68B1  ");
+		}
 	}
 
 	ZETest("void ZEString::SetValue(bool Value, const char* Format)")
@@ -1889,6 +2036,35 @@ ZETestSuite(ZEString)
 
 			ZETestCheck(StringB == "false");
 		}
+
+		ZETestCase("for Format != NULL")
+		{
+			ZEString StringC;
+
+			bool Value = 1;
+
+			StringC.SetValue(Value, "false");
+			ZETestCheck(StringC == "false");
+		}
+	}
+
+	ZETest("void ZEString::SetValue(void* Value, ZESize Size)")
+	{
+		void* Value = "Value";
+		ZEString String("String");
+		ZETestCheck(String.GetSize() == 7);
+
+		String.SetValue(Value, 0);
+		ZETestCheck(String == "");
+		ZETestCheck(String.GetSize() == 1);
+
+		String.SetValue(Value, 1);
+		ZETestCheck(String == "V");
+		ZETestCheck(String.GetSize() == 2);
+
+		String.SetValue(Value, 5);
+		ZETestCheck(String == "Value");
+		ZETestCheck(String.GetSize() == 6);
 	}
 
 	ZETest("ZEString ZEString::SubString(ZESize StartPosition, ZESize EndPosition) const")
@@ -2654,7 +2830,7 @@ ZETestSuite(ZEString)
 	ZETest("ZEString operator+(float Value, const ZEString& String);")
 	{
 		ZEString StringA = " €";
-		float StringB = 400.5525252;
+		float StringB = 400.5525252f;
 		ZEString Result;
 
 		Result = StringB + StringA;

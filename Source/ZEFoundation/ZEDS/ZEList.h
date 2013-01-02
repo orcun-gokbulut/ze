@@ -95,6 +95,7 @@ class ZEList
 		inline ZEType* Append(ZEType* Item)
 		{
 			zeDebugCheck(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
+			zeDebugCheck(Exists(Item), "Item is already added to list.");
 
 			Item->NextItem = NULL;
 			Item->PrevItem = LastItem;
@@ -308,8 +309,8 @@ class ZEList
 
 		inline ZESSize FindIndex(ZEType* Item, ZESize StartIndex = 0) const
 		{
-			ZESize Index = 0;
-			ZEType* Cursor = (ZEType*)FirstItem;
+			ZESize Index = StartIndex;
+			ZEType* Cursor = (ZEType*)GetItem(Index);
 			while(Cursor != NULL)
 			{
 				if (Cursor == Item)
