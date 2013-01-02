@@ -79,6 +79,9 @@ void ZECloudMaterial::UpdateParameters(float Time)
 {
 	Camera = zeScene->GetActiveCamera();
 
+	if (Camera == NULL)
+		return;
+
 	// Update texture UVOffset
 	ZEVector2 Vector;
 	ZEVector2::Scale(Vector, WindVelocity, Time);

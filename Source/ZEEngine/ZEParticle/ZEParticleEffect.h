@@ -72,8 +72,10 @@ class ZEParticleEffect : public ZEEntity
 		void								Tick(float TimeElapsed);
 
 		const ZEArray<ZEParticleEmitter*>&	GetEmitters();
+		void								ResetEmitters();
 		void								AddEmitter(ZEParticleEmitter* Emitter);
 		void								RemoveEmitter(ZEParticleEmitter* Emitter);
+
 		
 		const ZEArray<ZEParticleSystem*>&	GetSystems();
 		void								AddSystem(ZEParticleSystem* Emitter);

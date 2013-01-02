@@ -93,6 +93,18 @@ class ZEModelHelper
 		const ZEVector3						GetModelScale();
 		const ZEVector3						GetWorldScale();
 
+		ZEVector3							GetFront();
+		ZEVector3							GetRight();
+		ZEVector3							GetUp();
+
+		ZEVector3							GetModelFront();
+		ZEVector3							GetModelRight();
+		ZEVector3							GetModelUp();
+
+		ZEVector3							GetWorldFront();
+		ZEVector3							GetWorldRight();
+		ZEVector3							GetWorldUp();
+
 		void								Initialize(ZEModel* Model, const ZEModelResourceHelper* HelperResource);
 		void								Deinitialize();
 
