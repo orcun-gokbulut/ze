@@ -76,7 +76,7 @@ ZESteeringPlayerFree::ZESteeringPlayerFree()
 {
 	Rx = Ry = Rz = 0.0f;
 
-	Friction = 1.0f;
+	Friction = 100.0f;
 
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,			ZEInputEvent("Keyboard", ZE_IKB_W, ZE_IBS_PRESSING)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,		ZEInputEvent("Keyboard", ZE_IKB_S, ZE_IBS_PRESSING)));
@@ -198,9 +198,9 @@ ZESteeringOutput ZESteeringPlayerFree::Process(float ElapsedTime)
 	}
 	else
 	{
-		if (GetOwner()->GetLinearVelocity().LengthSquare() != 0)
+		if (fabs(Output.LinearAcceleration.LengthSquare()) < 0.1f)
 		{
-			Output.LinearAcceleration = -GetOwner()->GetLinearVelocity().Normalize() * Friction * GetOwner()->GetMaxLinearAcceleration();
+			Output.LinearAcceleration = -GetOwner()->GetLinearVelocity() * Friction;
 		}
 
 		//Output.AngularAcceleration = ZEMath::Sign(GetOwner()->GetAngularVelocity()) * Friction * GetOwner()->GetMaxAngularAcceleration();
