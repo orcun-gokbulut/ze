@@ -76,6 +76,12 @@ ZETestSuite(ZEListIterator)
 
 			End = Iterator.IsEnd();
 			ZETestCheck(!End);
+
+			ZEListItem* Next = Iterator.MoveNext();
+			ZETestCheckEqual(Next, NULL);
+
+			End = Iterator.IsEnd();
+			ZETestCheck(End);
 		}
 	}
 
