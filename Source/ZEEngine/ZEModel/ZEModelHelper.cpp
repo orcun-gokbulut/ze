@@ -185,6 +185,51 @@ const ZEVector3 ZEModelHelper::GetWorldScale()
 	return Temp;
 }
 
+ZEVector3 ZEModelHelper::GetFront()
+{
+	return Rotation * ZEVector3::UnitZ;
+}
+
+ZEVector3 ZEModelHelper::GetRight()
+{
+	return Rotation * ZEVector3::UnitX;
+}
+
+ZEVector3 ZEModelHelper::GetUp()
+{
+	return Rotation * ZEVector3::UnitY;
+}
+
+ZEVector3 ZEModelHelper::GetModelFront()
+{
+	return GetModelRotation() * ZEVector3::UnitZ;
+}
+
+ZEVector3 ZEModelHelper::GetModelRight()
+{
+	return GetModelRotation() * ZEVector3::UnitX;
+}
+
+ZEVector3 ZEModelHelper::GetModelUp()
+{
+	return GetModelRotation() * ZEVector3::UnitY;
+}
+
+ZEVector3 ZEModelHelper::GetWorldFront()
+{
+	return GetWorldRotation() * ZEVector3::UnitZ;
+}
+
+ZEVector3 ZEModelHelper::GetWorldRight()
+{
+	return GetWorldRotation() * ZEVector3::UnitX;
+}
+
+ZEVector3 ZEModelHelper::GetWorldUp()
+{
+	return GetWorldRotation() * ZEVector3::UnitY;
+}
+
 void ZEModelHelper::Initialize(ZEModel* Model, const ZEModelResourceHelper* HelperResource)
 {
 	OwnerModel = Model;

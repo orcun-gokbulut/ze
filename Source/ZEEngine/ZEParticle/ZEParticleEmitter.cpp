@@ -434,6 +434,12 @@ const ZEVector4& ZEParticleEmitter::GetMaxColor() const
 	return MaxColor;
 }
 
+void ZEParticleEmitter::Reset()
+{
+	if (IsContinuous == false)
+		EmittedParticleCount = 0;
+}
+
 void ZEParticleEmitter::SetContinuity(bool Value)
 {
 	IsContinuous = Value;

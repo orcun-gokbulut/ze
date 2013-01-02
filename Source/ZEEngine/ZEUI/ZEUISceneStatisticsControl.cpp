@@ -90,45 +90,49 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 
 	ZEScene* TempScene = zeScene;
 	ZECullStatistics Stats = TempScene->GetCullerStatistics();
-	ZEVector3 CamPos = TempScene->GetActiveCamera()->GetWorldPosition();
-	ZEString Value;
-	
-	Value.SetValue(Stats.TotalEntityCount);
-	TotalEntityCount->SetText(TotalEntityText + Value);
 
-	Value.SetValue(Stats.DrawableEntityCount);
-	DrawableEntityCount->SetText(DrawableEntityText + Value);
+	if (TempScene->GetActiveCamera() != NULL)
+	{
+		ZEVector3 CamPos = TempScene->GetActiveCamera()->GetWorldPosition();
+		ZEString Value;
 
-	Value.SetValue(Stats.VisibleEntityCount);
-	VisibleEntityCount->SetText(VisibleEntityText + Value);
+		Value.SetValue(Stats.TotalEntityCount);
+		TotalEntityCount->SetText(TotalEntityText + Value);
 
-	Value.SetValue(Stats.CulledEntityCount);
-	CulledEntityCount->SetText(CulledEntityText + Value);
+		Value.SetValue(Stats.DrawableEntityCount);
+		DrawableEntityCount->SetText(DrawableEntityText + Value);
 
-	Value.SetValue(Stats.DrawedEntityCount);
-	DrawedEntityCount->SetText(DrawedEntityText + Value);
+		Value.SetValue(Stats.VisibleEntityCount);
+		VisibleEntityCount->SetText(VisibleEntityText + Value);
 
-	Value.SetValue(Stats.TotalLightCount);
-	TotalLightCount->SetText(TotalLightText + Value);
+		Value.SetValue(Stats.CulledEntityCount);
+		CulledEntityCount->SetText(CulledEntityText + Value);
 
-	Value.SetValue(Stats.VisibleLightCount);
-	VisibleLightCount->SetText(VisibleLightText + Value);
+		Value.SetValue(Stats.DrawedEntityCount);
+		DrawedEntityCount->SetText(DrawedEntityText + Value);
 
-	Value.SetValue(Stats.CulledLightCount);
-	CulledLightCount->SetText(CulledLightText + Value);
+		Value.SetValue(Stats.TotalLightCount);
+		TotalLightCount->SetText(TotalLightText + Value);
 
-	Value.SetValue(Stats.DrawedLightCount);
-	DrawedLightCount->SetText(DrawedLightText + Value);
+		Value.SetValue(Stats.VisibleLightCount);
+		VisibleLightCount->SetText(VisibleLightText + Value);
 
-	Value.SetValue(AverageFPS);
-	FPSCount->SetText(FPSText + Value);
+		Value.SetValue(Stats.CulledLightCount);
+		CulledLightCount->SetText(CulledLightText + Value);
 
-	static char FormatString[100];
+		Value.SetValue(Stats.DrawedLightCount);
+		DrawedLightCount->SetText(DrawedLightText + Value);
 
-	sprintf(FormatString, "X: %.3lf, Y: %.3lf, Z: %.3lf", CamPos.x, CamPos.y, CamPos.z);
+		Value.SetValue(AverageFPS);
+		FPSCount->SetText(FPSText + Value);
 
-	Value.SetValue(FormatString);
-	CameraPosition->SetText(CamPosText + Value);
+		static char FormatString[100];
+
+		sprintf(FormatString, "X: %.3lf, Y: %.3lf, Z: %.3lf", CamPos.x, CamPos.y, CamPos.z);
+
+		Value.SetValue(FormatString);
+		CameraPosition->SetText(CamPosText + Value);
+	}
 
 	ZEUIControl::Tick(ElapsedTime);
 }

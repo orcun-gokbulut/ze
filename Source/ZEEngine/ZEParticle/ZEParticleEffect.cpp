@@ -89,6 +89,12 @@ const ZEArray<ZEParticleEmitter*>& ZEParticleEffect::GetEmitters()
 	return Emitters;
 }
 
+void ZEParticleEffect::ResetEmitters()
+{
+	for (ZESize I = 0; I < Emitters.GetCount(); I++)
+		Emitters[I]->Reset();
+}
+
 const ZEArray<ZEParticleSystem*>& ZEParticleEffect::GetSystems()
 {
 	return Systems;
