@@ -111,6 +111,7 @@ ZEFixedMaterial::ZEFixedMaterial()
 	EmmisiveColor = ZEVector3(0.0f, 0.0f, 0.0f);
 	SubSurfaceScatteringFactor = 0.0f;
 	MaterialComponentMask = ~0;
+	GlobalAmbientEnabled = true;
 }
 
 ZEFixedMaterial::~ZEFixedMaterial()
@@ -214,6 +215,16 @@ void ZEFixedMaterial::SetAmbientFactor(float Factor)
 float ZEFixedMaterial::GetAmbientFactor() const
 {
 	return AmbientFactor;
+}
+
+void ZEFixedMaterial::SetGlobalAmbientEnabled(bool Enabled)
+{
+	GlobalAmbientEnabled = Enabled;
+}
+
+bool ZEFixedMaterial::GetGlobalAmbientEnabled()
+{
+	return GlobalAmbientEnabled;
 }
 
 void ZEFixedMaterial::SetDiffuseEnabled(bool Enabled)
@@ -1245,6 +1256,11 @@ void ZEFixedMaterial::SetVertexColorEnabled(bool Enabled)
 bool ZEFixedMaterial::GetVertexColorEnabled()
 {
 	return (MaterialComponents & ZE_SHADER_VERTEX_COLOR) != 0;
+}
+
+void ZEFixedMaterial::Tick(float ElapsedTime)
+{
+
 }
 
 ZEFixedMaterial* ZEFixedMaterial::CreateInstance()

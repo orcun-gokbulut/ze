@@ -1085,9 +1085,9 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		DoLightningPass();
 		DoForwardPass();
 		
-		UnsharpenProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
-		UnsharpenProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
-		UnsharpenProcessor.Process();
+// 		UnsharpenProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
+// 		UnsharpenProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
+// 		UnsharpenProcessor.Process();
 		
 		/*
 		//Anti Aliasing Process
@@ -1107,7 +1107,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		*/
 		
 		// HDR Process
-		HDRProcessor.SetInput(HDRInputBuffer);
+		HDRProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
 		HDRProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);
 		

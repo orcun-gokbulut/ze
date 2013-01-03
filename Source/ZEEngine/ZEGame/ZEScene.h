@@ -83,6 +83,9 @@ class ZEScene
 		ZECamera*								ActiveCamera;
 		ZEListener*								ActiveListener;
 
+		float									AmbientFactor;
+		ZEVector3								AmbientColor;
+
 		void									Tick(ZEEntity* Entity, float ElapsedTime);
 
 	public:
@@ -115,6 +118,12 @@ class ZEScene
 
 		void									Tick(float ElapsedTime);
 		void									Render(float ElapsedTime);
+
+		void									SetAmbientFactor(float Factor);
+		float									GetAmbientFactor() const;
+
+		void									SetAmbientColor(ZEVector3 Color);
+		const ZEVector3&						GetAmbientColor() const;
 
 												ZEScene();
 		virtual									~ZEScene();

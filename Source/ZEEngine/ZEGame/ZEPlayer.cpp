@@ -293,7 +293,7 @@ void ZEPlayer::Deinitialize()
 ZEPlayer::ZEPlayer()
 {
 
-	FOV = ZE_PI / 3.0f;
+	FOV = ZEAngle::ToRadian(50);
 
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_CONSOLE,			 ZEInputEvent("Keyboard", ZE_IKB_GRAVE, ZE_IBS_PRESSED)));
 

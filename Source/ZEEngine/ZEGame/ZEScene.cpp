@@ -452,6 +452,26 @@ bool ZEScene::Load(const ZEString& FileName)
 	}
 }
 
+void ZEScene::SetAmbientFactor(float Factor)
+{
+	AmbientFactor = Factor;
+}
+
+float ZEScene::GetAmbientFactor() const
+{
+	return AmbientFactor;
+}
+
+void ZEScene::SetAmbientColor(ZEVector3 Color)
+{
+	AmbientColor = Color;
+}
+
+const ZEVector3& ZEScene::GetAmbientColor() const
+{
+	return AmbientColor;
+}
+
 ZEScene::ZEScene()
 {
 	Initialized = false;
@@ -462,6 +482,8 @@ ZEScene::ZEScene()
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
 	PhysicalWorld = NULL;
+	AmbientColor = ZEVector3::One;
+	AmbientFactor = 1.0f;
 }
 
 ZEScene::~ZEScene()
