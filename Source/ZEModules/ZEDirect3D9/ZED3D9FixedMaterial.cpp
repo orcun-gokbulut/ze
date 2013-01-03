@@ -42,6 +42,7 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEMaterialComponents.h"
+#include "ZEGame/ZEScene.h"
 
 void ZED3D9FixedMaterial::CreateShaders()
 {
@@ -512,6 +513,13 @@ bool ZED3D9FixedMaterial::SetupShadowPass() const
 
 void ZED3D9FixedMaterial::UpdateMaterial()
 {
+	if(GetGlobalAmbientEnabled())
+	{
+		SetAmbientEnabled(true);
+		SetAmbientFactor(zeScene->GetAmbientFactor());
+		SetAmbientColor(zeScene->GetAmbientColor());
+	}
+
 	if ((MaterialComponents & MaterialComponentMask) != OldMaterialComponents)
 	{
 		CreateShaders();

@@ -67,14 +67,14 @@ void ZEUIRenderer::Initialize()
 	if (VertexDeclaration == NULL)
 		VertexDeclaration = ZEUIVertex::GetVertexDeclaration();
 
-	if (DefaultMaterial == NULL)
-	{
-		DefaultMaterial = ZEFixedMaterial::CreateInstance();
-		((ZEFixedMaterial*)DefaultMaterial)->SetLightningEnabled(false);
-		((ZEFixedMaterial*)DefaultMaterial)->SetAmbientEnabled(true);
-		((ZEFixedMaterial*)DefaultMaterial)->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));
-		((ZEFixedMaterial*)DefaultMaterial)->UpdateMaterial();
-	}
+// 	if (DefaultMaterial == NULL)
+// 	{
+// 		DefaultMaterial = ZEFixedMaterial::CreateInstance();
+// 		((ZEFixedMaterial*)DefaultMaterial)->SetLightningEnabled(false);
+// 		((ZEFixedMaterial*)DefaultMaterial)->SetAmbientEnabled(true);
+// 		((ZEFixedMaterial*)DefaultMaterial)->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));
+// 		((ZEFixedMaterial*)DefaultMaterial)->UpdateMaterial();
+// 	}
 
 	ZEMatrix4x4::CreateViewPortTransform(ScreenTransform, 0.0f, (float)zeGraphics->GetScreenWidth(), 0.0f, (float)zeGraphics->GetScreenHeight(), 0.0f, 1.0f);
 	
