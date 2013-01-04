@@ -53,6 +53,8 @@ class ZEOmniProjectiveLight : public ZELight
 		ZEViewSphere					ViewVolume;
 		ZETexture2D*					FrontShadowMap;
 		ZETexture2D*					BackShadowMap;
+		ZEMatrix4x4						ViewProjectionMatrix;
+
 
 										ZEOmniProjectiveLight();
 		virtual							~ZEOmniProjectiveLight();
@@ -70,6 +72,7 @@ class ZEOmniProjectiveLight : public ZELight
 		virtual void					Deinitialize();
 
 		virtual const ZEViewVolume&		GetViewVolume();
+		virtual const ZEMatrix4x4&		GetLightTransformation(ZESize CascadeIndex = 0);
 
 		ZETexture2D*					GetFrontShadowMap();
 		ZETexture2D*					GetBackShadowMap();

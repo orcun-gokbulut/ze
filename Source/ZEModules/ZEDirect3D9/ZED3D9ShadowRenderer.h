@@ -51,36 +51,34 @@ enum ZETextureCubeFace;
 
 class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 {
-	friend ZED3D9Module;
+	friend class ZED3D9Module;
 	private:
+		
+		ZELight*								Light;
 		ZED3D9ViewPort*							ViewPort;
-
+		ZEUInt									ShadowResolution;
 		ZESmartArray<ZERenderCommand>			CommandList;
+		LPDIRECT3DSURFACE9						ShadowMapZBuffer;
 
 		ZEArray<ZEPostProcessor*>				PostProcessors;
-
-		ZELight*								Light;
-		
 		bool									Face;
 
 		bool									InitializeShaders();
 		void									DeinitializeShaders();
 
-		void									RenderProjectiveLight();
 		void									RenderPointLight();
-		void									RenderOmniProjectiveLight();
+		void									RenderProjectiveLight();
 		void									RenderDirectionalLight();
-
-		LPDIRECT3DSURFACE9						ShadowMapFrameBuffer;
-		LPDIRECT3DSURFACE9						ShadowMapZBuffer;
-
+		void									RenderOmniProjectiveLight();
+		
 	protected:
 												ZED3D9ShadowRenderer();
 		virtual									~ZED3D9ShadowRenderer();
 
-		void									DrawRenderCommand(ZERenderCommand* RenderCommand);
-
-	public:	
+	public:
+		void									SetShadowResolution(ZEUInt Resolution);
+		ZEUInt									GetShadowResolution() const;
+		
 		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors();
 		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor);
 		virtual void							RemovePostProcessor(ZEPostProcessor* PostProcessor);

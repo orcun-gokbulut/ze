@@ -106,7 +106,7 @@ bool ZEScene::Initialize()
 	if (ShadowRenderer == NULL)
 		ShadowRenderer = ZEShadowRenderer::CreateInstance();
 
-	if (Renderer == NULL)
+	if (ShadowRenderer == NULL)
 	{
 		zeCriticalError("Can not create shadow renderer.");
 		return false;
@@ -278,6 +278,11 @@ ZERenderer* ZEScene::GetRenderer()
 	return Renderer;
 }
 
+ZERenderer*	ZEScene::GetShadowRenderer()
+{
+	return ShadowRenderer;
+}
+
 ZEPhysicalWorld* ZEScene::GetPhysicalWorld()
 {
 	return PhysicalWorld;
@@ -336,18 +341,55 @@ void ZEScene::Render(float ElapsedTime)
 	if (ActiveCamera == NULL)
 		return;
 
+	// Frame render setup
+	// ------------------------------------------------------
 	Renderer->SetCamera(ActiveCamera);
 	
-	ZEDrawParameters DrawParameters;
-	DrawParameters.ElapsedTime = ElapsedTime;
-	DrawParameters.FrameId = zeCore->GetFrameId();
-	DrawParameters.Pass = ZE_RP_COLOR;
-	DrawParameters.Renderer = Renderer;
-	DrawParameters.ViewVolume = (ZEViewVolume*)&ActiveCamera->GetViewVolume();
-	DrawParameters.View = (ZEView*)&ActiveCamera->GetView();
-	DrawParameters.Lights.Clear();
+	ZEDrawParameters FrameDrawParameters;
+	FrameDrawParameters.ElapsedTime = ElapsedTime;
+	FrameDrawParameters.FrameId = zeCore->GetFrameId();
+	FrameDrawParameters.Pass = ZE_RP_COLOR;
+	FrameDrawParameters.Renderer = Renderer;
+	FrameDrawParameters.ViewVolume = (ZEViewVolume*)&ActiveCamera->GetViewVolume();
+	FrameDrawParameters.View = (ZEView*)&ActiveCamera->GetView();
+	FrameDrawParameters.Lights.Clear();
 
-	Culler.CullScene(this, &DrawParameters);
+	Culler.CullScene(this, &FrameDrawParameters);
+
+	// Shadow render setup
+	// ------------------------------------------------------
+	ZEDrawParameters ShadowDrawParameters;
+	ShadowDrawParameters.ElapsedTime = ElapsedTime;
+	ShadowDrawParameters.FrameId = zeCore->GetFrameId();
+	ShadowDrawParameters.Pass = ZE_RP_SHADOW_MAP;
+	ShadowDrawParameters.Renderer = ShadowRenderer;
+	ShadowDrawParameters.ViewVolume = (ZEViewVolume*)&ActiveCamera->GetViewVolume();
+	ShadowDrawParameters.View = (ZEView*)&ActiveCamera->GetView();
+
+	ShadowRenderer->ClearLists();
+
+	for (ZESize I = 0; I < Entities.GetCount(); ++I)
+	{
+		if (!ZEObjectDescription::CheckParent(ZELight::Description(), Entities[I]->GetDescription()))
+		{
+			Entities[I]->Draw(&ShadowDrawParameters);
+
+			const ZEArray<ZEEntity*>& Components = Entities[I]->GetComponents();
+			for (ZESize I = 0; I < Components.GetCount(); I++)
+				Components[I]->Draw(&ShadowDrawParameters);
+
+			const ZEArray<ZEEntity*>& ChildEntities = Entities[I]->GetChildEntities();
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+				ChildEntities[I]->Draw(&ShadowDrawParameters);
+		}
+	}
+
+	const ZESmartArray<ZELight*>& LightList = Renderer->GetLightList();
+	for (ZESize I = 0; I < LightList.GetCount(); ++I)
+	{
+		if (LightList[I]->GetCastsShadow() && LightList[I]->GetLightType() == ZE_LT_DIRECTIONAL)
+			LightList[I]->RenderShadowMap(this, ShadowRenderer);
+	}
 }
 
 bool ZEScene::Save(const ZEString& FileName)

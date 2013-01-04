@@ -136,10 +136,23 @@ const ZEViewVolume& ZEPointLight::GetViewVolume()
 	return ViewVolume;
 }
 
+const ZEMatrix4x4& ZEPointLight::GetLightTransformation(ZESize CascadeIndex)
+{
+	if (UpdateShadowTransform)
+	{
+		// Update
+
+		UpdateShadowTransform = false;
+	}
+	
+	return ViewProjectionMatrix;
+}
+
 ZEPointLight::ZEPointLight()
 {
 	FrontShadowMap = NULL;
 	BackShadowMap = NULL;
+	ViewProjectionMatrix = ZEMatrix4x4::Identity;
 }
 
 ZEPointLight::~ZEPointLight()

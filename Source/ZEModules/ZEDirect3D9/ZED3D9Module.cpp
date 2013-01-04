@@ -136,7 +136,8 @@ bool ZED3D9Module::Initialize()
 	D3DPP.MultiSampleType = D3DMULTISAMPLE_NONE;
 	D3DPP.MultiSampleQuality = 0;
 
-	D3DPP.EnableAutoDepthStencil = true;
+	// D3DPP.EnableAutoDepthStencil = true;
+	D3DPP.EnableAutoDepthStencil = false;
 	D3DPP.AutoDepthStencilFormat = D3DFMT_D24S8;
 
 	D3DPP.Windowed = !Fullscreen;
@@ -277,7 +278,7 @@ bool ZED3D9Module::Initialize()
 	}
 
 	// Get screen's z buffer
-	Result = Device->GetDepthStencilSurface(&FrameBufferViewPort.ZBuffer);
+	Result = Device->CreateDepthStencilSurface(ScreenWidth, ScreenHeight, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, &FrameBufferViewPort.ZBuffer, NULL);
 	if(FAILED(Result))
 	{
 		zeCriticalError("Can not create Direct3D Backbuffer.");
@@ -520,28 +521,12 @@ ZED3D9ShaderManager* ZED3D9Module::GetShaderManager()
 
 ZEFrameRenderer* ZED3D9Module::CreateFrameRenderer()
 {
-	ZED3D9FrameRenderer* Renderer = new ZED3D9FrameRenderer();
-	if (!Renderer->Initialize())
-	{
-		Renderer->Destroy();
-		return NULL;
-	}
-
-	Renderers.Add(Renderer);
-	return Renderer;
+	return new ZED3D9FrameRenderer();
 }
 
 ZEShadowRenderer* ZED3D9Module::CreateShadowRenderer()
 {
-	ZED3D9ShadowRenderer* Renderer = new ZED3D9ShadowRenderer();
-	if (!Renderer->Initialize())
-	{
-		Renderer->Destroy();
-		return NULL;
-	}
-
-	ShadowRenderers.Add(Renderer);
-	return  Renderer;
+	return new ZED3D9ShadowRenderer(); 
 }
 
 ZEPostProcessor* ZED3D9Module::CreatePostProcessor()
@@ -568,13 +553,16 @@ void ZED3D9Module::UpdateScreen()
  
 void ZED3D9Module::ClearFrameBuffer()
 {
-	if (IsDeviceLost())
-		return;
-
-	if (Device->TestCooperativeLevel() != D3D_OK)
-		RestoreDevice();
-
-	Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00555555, 1, 0);
+// 	if (IsDeviceLost())
+// 		return;
+// 
+// 	if (Device->TestCooperativeLevel() != D3D_OK)
+// 		RestoreDevice();
+// 
+// 	if (FAILED(Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00555555, 1, 0)))
+// 	{
+// 		zeCriticalError("Clear failed");
+// 	}
 }
 
 ZEStaticIndexBuffer* ZED3D9Module::CreateStaticIndexBuffer()

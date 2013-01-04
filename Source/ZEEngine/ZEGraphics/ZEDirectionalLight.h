@@ -39,28 +39,59 @@
 
 #include "ZELight.h"
 #include "ZEMath/ZEViewCuboid.h"
+#include "ZEMath/ZEViewFrustum.h"
 
-class ZETexture2D; 
+class ZETexture2D;
 
 ZE_META_OBJECT_DESCRIPTION(ZEDirectionalLight);
+
+#define MAX_CASCADE_COUNT			4
 
 class ZEDirectionalLight : public ZELight
 {
 	ZE_META_ENTITY(ZEDirectionalLight)
 	private:
-		ZETexture2D*					ShadowMap;
+		ZESize						CascadeCount;
+		ZEViewFrustum				Cascades[MAX_CASCADE_COUNT];				// View volume for each division, Not functional right now
 
-										ZEDirectionalLight();
+		bool						SplitsInitialized;
+		float						SplitBias;									// For shifting split distances
+		float						SplitDistances[MAX_CASCADE_COUNT + 1];		// Near and far z is same as camera
+
+		ZETexture2D*				ShadowMaps[MAX_CASCADE_COUNT];				// Shadow map for each view
+		ZEMatrix4x4					LightTransformations[MAX_CASCADE_COUNT];	// crop * proj * view
+
+		void						CreateRenderTargets();
+		void						DestroyRenderTargets();
+
+									ZEDirectionalLight();
+									~ZEDirectionalLight();
 
 	public:
-		ZELightType						GetLightType();
+		ZELightType					GetLightType();
+		
+		void						SetSplitBias(float Bias);
+		float						GetSplitBias() const;
 
-		const ZETexture2D*				GetShadowMap();
+		void						SetCascadeCount(ZESize Count);
+		ZESize						GetCascadeCount() const;
 
-		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
-		virtual const ZEViewVolume&		GetViewVolume();
+		float						GetSplitDistance(ZESize Index);
 
-		static ZEDirectionalLight*		CreateInstance();
+		ZETexture2D*				GetShadowMap(ZESize Index = 0);
+		
+		const ZEViewVolume&			GetViewVolume();							// Not functional right now
+		const ZEAABBox&				GetCascadeVolume(ZESize Index = 0);
+		
+		const ZEMatrix4x4&			GetLightTransformation(ZESize CascadeIndex = 0);
+
+		bool						Initialize();
+		void						Deinitialize();
+
+		void						RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
+
+		static ZEDirectionalLight*	CreateInstance();
+
 };
 
 #endif
