@@ -418,6 +418,13 @@ bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCou
 	}
 
 	for(ZESize I = 0; I < ItemCount; I++)
+	{
 		if(List[I].Mandatory && !List[I].IsFound)
+		{
 			zeError("List item not found. Item name : %s", List[I].Name);
+			return false;
+		}
+	}
+
+	return true;
 }
