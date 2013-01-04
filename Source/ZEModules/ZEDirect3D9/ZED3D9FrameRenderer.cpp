@@ -1113,33 +1113,33 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		
 		// Color Transform Process
 		ColorTransformProcessor.SetInput(CTInputBuffer);
-		ColorTransformProcessor.SetOutput(ViewPort);
+		ColorTransformProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
 		ColorTransformProcessor.Process();
-		/*
+		
 		// Grain
 		GrainProcessor.SetInput(GrainInputBuffer);
-		GrainProcessor.SetOutput((ZED3D9ViewPort*)BlurMaskInputBuffer->GetViewPort());
+		GrainProcessor.SetOutput((ZED3D9ViewPort*)ZoomBlurInputBuffer->GetViewPort());
 		GrainProcessor.Process(ElaspedTime);
-		*/
+		
 		/*
 		// Blur Mask
 		BlurMaskProcessor.SetInput(BlurMaskInputBuffer);
 		BlurMaskProcessor.SetOutput(ViewPort);
 		BlurMaskProcessor.Process();
 		*/
-		/*
+		
 		// Zoom blur
 		ZoomBlurProcessor.SetInput(ZoomBlurInputBuffer);
-		ZoomBlurProcessor.SetOutput(ViewPort);
+		ZoomBlurProcessor.SetOutput((ZED3D9ViewPort*)CDInputBuffer->GetViewPort());
 		ZoomBlurProcessor.Process();
-		*/
+		
 
-		/*
+		
 		// Channel Disorientation Processor
-		CDProcessor.SetInput(CDInputBuffer);
-		CDProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
-		CDProcessor.Process();
-		*/
+		ChannelDisorientProcessor.SetInput(CDInputBuffer);
+		ChannelDisorientProcessor.SetOutput((ZED3D9ViewPort*)BlurInputBuffer->GetViewPort());
+		ChannelDisorientProcessor.Process();
+		
 
 		/*
 		// Texture mask
@@ -1174,12 +1174,12 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		EDProcessor.Process();
 		*/
 		
-		/*
+		
 		// Blur Process
 		BlurProcessor.SetInput(BlurInputBuffer);
-		BlurProcessor.SetOutput((ZED3D9ViewPort*)DOFInputBuffer->GetViewPort());
+		BlurProcessor.SetOutput(ViewPort);
 		BlurProcessor.Process();
-		*/
+		
 
 		Do2DPass();
 
