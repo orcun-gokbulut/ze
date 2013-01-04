@@ -36,39 +36,21 @@
 #include "ZELight.h"
 #include "ZERenderCommand.h"
 
-ZEDrawFlags ZELight::GetDrawFlags() const
-{
-	return ZE_DF_LIGHT_SOURCE;
-}
-
-void ZELight::SetPosition(const ZEVector3& NewPosition)
-{
-	UpdateViewVolume = true;
-	ZEEntity::SetPosition(NewPosition);
-}
-
-void ZELight::SetRotation(const ZEQuaternion& NewRotation)
-{
-	UpdateViewVolume = true;
-	ZEEntity::SetRotation(NewRotation);
-}
-
-
 void ZELight::OnTransformChanged()
 {
 	UpdateViewVolume = true;
+	UpdateShadowTransform = true;
 	ZEEntity::OnTransformChanged();
 }
 
-
-void ZELight::SetColor(const ZEVector3& NewColor)
+void ZELight::SetRange(float NewValue)
 {
-	Color = NewColor;
+	Range = NewValue;
 }
 
-const ZEVector3& ZELight::GetColor() const
+float ZELight::GetRange() const
 {
-	return Color;
+	return Range;
 }
 
 void ZELight::SetIntensity(float NewValue)
@@ -81,14 +63,14 @@ float ZELight::GetIntensity() const
 	return Intensity;
 }
 
-void ZELight::SetRange(float NewValue)
+void ZELight::SetColor(const ZEVector3& NewColor)
 {
-	Range = NewValue;
+	Color = NewColor;
 }
 
-float ZELight::GetRange() const
+const ZEVector3& ZELight::GetColor() const
 {
-	return Range;
+	return Color;
 }
 
 void ZELight::SetAttenuation(const ZEVector3& Attenuation)
@@ -108,6 +90,11 @@ const ZEVector3& ZELight::GetAttenuation() const
 	return Attenuation;
 }
 
+ZEDrawFlags ZELight::GetDrawFlags() const
+{
+	return ZE_DF_LIGHT_SOURCE;
+}
+
 void ZELight::SetCastsShadow(bool NewValue)
 {
 	CastsShadows = NewValue;
@@ -118,12 +105,39 @@ bool ZELight::GetCastsShadow() const
 	return CastsShadows;
 }
 
+void ZELight::SetPosition(const ZEVector3& NewPosition)
+{
+	if (GetPosition() != NewPosition)
+	{
+		UpdateViewVolume = true;
+		UpdateShadowTransform = true;
+		ZEEntity::SetPosition(NewPosition);
+	}
+}
+
+void ZELight::SetRotation(const ZEQuaternion& NewRotation)
+{
+	if (GetRotation() != NewRotation)
+	{
+		UpdateViewVolume = true;
+		UpdateShadowTransform = true;
+		ZEEntity::SetRotation(NewRotation);
+	}
+}
+
 ZELight::ZELight()
 {
-	Color = ZEVector3(1.0f, 1.0f, 1.0f);
-	Intensity = 1.0f;
-	Range = 100.0f;
-	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
-	CastsShadows = false;
 	Enabled = true;
+	CastsShadows = false;
+	UpdateViewVolume = true;
+	UpdateShadowTransform = true;
+	Range = 100.0f;
+	Intensity = 1.0f;
+	Color = ZEVector3(1.0f, 1.0f, 1.0f);
+	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
+}
+
+ZELight::~ZELight()
+{
+	
 }

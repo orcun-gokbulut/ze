@@ -108,11 +108,6 @@ const char* ZEProjectiveLight::GetProjectionTextureFile() const
 		return ProjectionTextureFile;
 }
 
-const ZEMatrix4x4& ZEProjectiveLight::GetProjectionMatrix()
-{
-	return ZEMatrix4x4::Identity;
-}
-
 ZETexture2D* ZEProjectiveLight::GetShadowMap()
 {
 	return ShadowMap;
@@ -120,7 +115,8 @@ ZETexture2D* ZEProjectiveLight::GetShadowMap()
 
 void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
 {
-/*	if (!GetCastsShadow())
+	/*
+	if (!GetCastsShadow())
 		return;
 
 	if (ShadowMap == NULL)
@@ -135,7 +131,8 @@ void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* Shadow
 	ShadowRenderer->ClearList();
 
 	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
-	ShadowRenderer->Render();*/
+	ShadowRenderer->Render();
+	*/
 }
 
 const ZEViewVolume& ZEProjectiveLight::GetViewVolume()
@@ -147,6 +144,18 @@ const ZEViewVolume& ZEProjectiveLight::GetViewVolume()
 	}
 
 	return ViewVolume;
+}
+
+const ZEMatrix4x4& ZEProjectiveLight::GetLightTransformation(ZESize CascadeIndex)
+{
+	if (UpdateShadowTransform)
+	{
+		// Update
+
+		UpdateShadowTransform = false;
+	}
+	
+	return ViewProjectionMatrix;
 }
 
 void ZEProjectiveLight::SetCastsShadow(bool NewValue)
@@ -208,6 +217,7 @@ ZEProjectiveLight::ZEProjectiveLight()
 	ShadowMap = NULL;
 	ProjectionTexture = NULL;
 	ProjectionTextureResource = NULL;
+	ViewProjectionMatrix = ZEMatrix4x4::Identity;
 	memset(ProjectionTextureFile, 0, ZE_MAX_FILE_NAME_SIZE);
 }
 

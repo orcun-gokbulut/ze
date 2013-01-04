@@ -186,6 +186,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		virtual void						SetLights(ZESmartArray<ZELight*>& Lights);
 
 		virtual void						AddToLightList(ZELight* Light);
+		virtual const ZESmartArray<ZELight*>&	GetLightList() const;
 		virtual void						ClearLightList();
 
 		virtual void						AddToRenderList(ZERenderCommand* RenderCommand);

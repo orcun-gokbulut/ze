@@ -42,12 +42,14 @@
 class ZEFrameRenderer : public ZERenderer
 {
 	public:
-		virtual ZERendererType				GetRendererType();
+		virtual ZERendererType					GetRendererType();
 
-		virtual void						SetCamera(ZECamera* Camera) = 0;
-		virtual ZECamera*					GetCamera() = 0;
+		virtual void							SetCamera(ZECamera* Camera) = 0;
+		virtual ZECamera*						GetCamera() = 0;
 
-		static ZEFrameRenderer*				CreateInstance();
+		virtual const ZESmartArray<ZELight*>&	GetLightList() const = 0;
+
+		static ZEFrameRenderer*					CreateInstance();
 };
 
 #endif

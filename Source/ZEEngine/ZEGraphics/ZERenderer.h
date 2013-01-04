@@ -69,33 +69,33 @@ enum ZERendererType
 class ZERenderer
 {
 	protected:
-											ZERenderer();
-		virtual								~ZERenderer();
+												ZERenderer();
+		virtual									~ZERenderer();
 
 	public:
-		virtual ZERendererType				GetRendererType() = 0;
+		virtual ZERendererType					GetRendererType() = 0;
 
-		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors() = 0;
-		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor) = 0;
-		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor) = 0;
+		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors() = 0;
+		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor) = 0;
+		virtual void							RemovePostProcessor(ZEPostProcessor* PostProcessor) = 0;
 
-		virtual void						SetViewPort(ZEViewPort* ViewPort) = 0;
-		virtual ZEViewPort*					GetViewPort() = 0;
+		virtual void							SetViewPort(ZEViewPort* ViewPort) = 0;
+		virtual ZEViewPort*						GetViewPort() = 0;
 
-		virtual bool						Initialize() = 0;
-		virtual void						Deinitialize() = 0;
+		virtual bool							Initialize() = 0;
+		virtual void							Deinitialize() = 0;
 
-		virtual void						Destroy();
+		virtual void							Destroy();
 
-		virtual void						AddToLightList(ZELight* Light);
-		virtual void						ClearLightList();
+		virtual void							AddToLightList(ZELight* Light);
+		virtual void							ClearLightList();
 
-		virtual void						AddToRenderList(ZERenderCommand* RenderCommand) = 0;
-		virtual void						ClearRenderList() = 0;
+		virtual void							AddToRenderList(ZERenderCommand* RenderCommand) = 0;
+		virtual void							ClearRenderList() = 0;
 
-		void								ClearLists();
+		void									ClearLists();
 		
-		virtual void						Render(float ElaspedTime = 0) = 0;
+		virtual void							Render(float ElaspedTime = 0) = 0;
 };
 
 #endif

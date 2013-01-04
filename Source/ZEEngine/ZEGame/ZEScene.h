@@ -99,6 +99,7 @@ class ZEScene
 		void									ClearEntities();
 
 		ZERenderer*								GetRenderer();
+		ZERenderer*								GetShadowRenderer();
 		ZEPhysicalWorld*						GetPhysicalWorld();
 
 		void									SetActiveCamera(ZECamera* Camera);

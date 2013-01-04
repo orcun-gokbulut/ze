@@ -59,12 +59,19 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZED3D9IndexBuffer.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGraphics/ZEShadowRenderer.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
 #pragma warning(disable:4267)
 
 void ZED3D9FrameRenderer::PumpStreams(ZERenderCommand* RenderCommand)
 {
 	ZEVertexBuffer* VertexBuffer = RenderCommand->VertexBuffer;
+
+	// NOTE:Hack to workaround a ZEWeather problem. Should be removed 
+	if ((ZEUInt64)RenderCommand->VertexDeclaration == 0xFFFFFFFFFFFFFFFF)
+		return;
 
 	((ZED3D9VertexDeclaration*)RenderCommand->VertexDeclaration)->SetupVertexDeclaration();
 
@@ -247,7 +254,9 @@ void ZED3D9FrameRenderer::DrawPointLight(ZEPointLight* Light)
 		float			Intensity;
 		ZEVector3		Attenuation;
 		float			Reserved1;
+	
 	} LightParameters;
+
 	ZEMatrix4x4::Transform(LightParameters.Position, Camera->GetViewTransform(), Light->GetWorldPosition());
 	LightParameters.Color = Light->GetColor();
 	LightParameters.Attenuation = Light->GetAttenuation();
@@ -260,8 +269,7 @@ void ZED3D9FrameRenderer::DrawPointLight(ZEPointLight* Light)
 	ZEMatrix4x4 WorldTransform;
 	ZEMatrix4x4 WorldViewTransform;
 	ZEMatrix4x4 WorldViewProjTransform;
-	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), 
-		ZEQuaternion::Identity, 
+	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), ZEQuaternion::Identity, 
 		ZEVector3(LightParameters.Range, LightParameters.Range, LightParameters.Range));
 	ZEMatrix4x4::Multiply(WorldViewTransform, Camera->GetViewTransform(), WorldTransform);
 	ZEMatrix4x4::Multiply(WorldViewProjTransform, Camera->GetViewProjectionTransform(), WorldTransform);
@@ -280,7 +288,17 @@ void ZED3D9FrameRenderer::DrawPointLight(ZEPointLight* Light)
 
 void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 {
+	D3DPERF_BeginEvent(0, L"Directional Light Pass");
 	zeProfilerStart("Directional Light Pass");
+
+	GetDevice()->SetVertexShader(LightningComponents.DirectionalLightVS->GetVertexShader());
+	GetDevice()->SetPixelShader(LightningComponents.DirectionalLightPS->GetPixelShader());
+
+	// Matrix to transform clip space positions(of screen aligned quad) to view space
+	ZEMatrix4x4 CameraInvProj;
+	ZEMatrix4x4::Inverse(CameraInvProj, Camera->GetProjectionTransform());
+
+	GetDevice()->SetVertexShaderConstantF(0, (float*)&CameraInvProj, 4);
 
 	// Light Parameters
 	struct
@@ -293,37 +311,72 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 		float			Reserved1;
 		ZEVector3		Direction;
 		float			Reserverd2;
+
 	} LightParameters;
-	ZEMatrix4x4::Transform3x3(LightParameters.Direction, Camera->GetViewTransform(), Light->GetWorldFront());
-	LightParameters.Direction = -LightParameters.Direction;
+
+	ZEVector3 Direction;
+	ZEMatrix4x4::Transform3x3(Direction, Camera->GetViewTransform(), Light->GetWorldFront());
+
+	LightParameters.Direction = -Direction;
 	LightParameters.Color = Light->GetColor();
 	LightParameters.Attenuation = Light->GetAttenuation();
 	LightParameters.Range = Light->GetRange();
 	LightParameters.Intensity = Light->GetIntensity();
 	
 	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 4);
-	
-	// Transformation
-	/*ZEMatrix4x4 WorldTransform;
-	ZEMatrix4x4 WorldViewProjTransform;
-	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), 
-		ZEQuaternion::Identity, 
-		ZEVector3(LightParameters.Range, LightParameters.Range, LightParameters.Range));
-	ZEMatrix4x4::Multiply(WorldViewProjTransform, Camera->GetViewProjectionTransform(), WorldTransform);
-	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);*/
-	
-	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
 
-	GetDevice()->SetVertexShader(LightningComponents.DirectionalLightVS->GetVertexShader());
-	GetDevice()->SetPixelShader(LightningComponents.DirectionalLightPS->GetPixelShader());
+
+
+	// Transformation matrix for camera view space position to world space position
+	ZEMatrix4x4 CameraInverseView;
+	ZEMatrix4x4::Inverse(CameraInverseView, Camera->GetViewTransform());
+	
+	float ShadowMapDimension = (float)((ZEShadowRenderer*)zeScene->GetShadowRenderer())->GetShadowResolution();
+	float TexOffsX = 0.5f + (0.5f / ShadowMapDimension);
+	float TexOffsY = 0.5f + (0.5f / ShadowMapDimension);
+
+	ZEMatrix4x4 LightTexture(	0.5f,  0.0f, 0.0f, TexOffsX,
+								0.0f, -0.5f, 0.0f, TexOffsY,
+								0.0f,  0.0f, 1.0f, 0.0f,
+								0.0f,  0.0f, 0.0f, 1.0f		);
+
+
+	// Transformation matrix from world space to light texture space
+	ZEMatrix4x4 LightMatrices[4];
+	LightMatrices[0] =  LightTexture * Light->GetLightTransformation(0) * CameraInverseView;
+	LightMatrices[1] =  LightTexture * Light->GetLightTransformation(1) * CameraInverseView;
+	LightMatrices[2] =  LightTexture * Light->GetLightTransformation(2) * CameraInverseView;
+	LightMatrices[3] =  LightTexture * Light->GetLightTransformation(3) * CameraInverseView;
+	
+	GetDevice()->SetPixelShaderConstantF(90, (float*)&LightMatrices[0], 4 * 4);
+
+	// Set shadow maps
+	GetDevice()->SetSamplerState(6, D3DSAMP_BORDERCOLOR, 0xFFFFFFFF);
+	ZED3D9CommonTools::SetTexture(6, Light->GetShadowMap(0), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
+	GetDevice()->SetSamplerState(7, D3DSAMP_BORDERCOLOR, 0xFFFFFFFF);
+	ZED3D9CommonTools::SetTexture(7, Light->GetShadowMap(1), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
+	GetDevice()->SetSamplerState(8, D3DSAMP_BORDERCOLOR, 0xFFFFFFFF);
+	ZED3D9CommonTools::SetTexture(8, Light->GetShadowMap(2), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
+	GetDevice()->SetSamplerState(9, D3DSAMP_BORDERCOLOR, 0xFFFFFFFF);
+	ZED3D9CommonTools::SetTexture(9, Light->GetShadowMap(3), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
+
+	ZEVector4 SplitDistances[4];
+	for (ZESize I = 0; I < 4; ++I)
+		SplitDistances[I].x = Light->GetSplitDistance(I+1);
+
+	GetDevice()->SetPixelShaderConstantF(106, (float*)&SplitDistances[0], 4);
 	
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 2); // Quad
 
 	zeProfilerEnd();
+
+	D3DPERF_EndEvent();
 }
 
 void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 {
+	D3DPERF_BeginEvent(0, L"Projective Light Pass");
+
 	if (Light->GetProjectionTexture() == NULL)
 		return;
 
@@ -428,10 +481,14 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 	zeProfilerEnd();
+
+	D3DPERF_EndEvent();
 }
 
 void ZED3D9FrameRenderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 {
+	D3DPERF_BeginEvent(0, L"Omni Projective Light Pass");
+
 	if (Light->GetProjectionTexture() == NULL)
 		return;
 
@@ -486,12 +543,14 @@ void ZED3D9FrameRenderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 6, 312); // Sphere 1
 
 	zeProfilerEnd();
+
+	D3DPERF_EndEvent();
 }
 
 void ZED3D9FrameRenderer::DoPreZPass()
 {
 	zeProfilerStart("PreZ Pass");
-
+	
 	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
 
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
@@ -519,23 +578,29 @@ void ZED3D9FrameRenderer::DoPreZPass()
 void ZED3D9FrameRenderer::DoGBufferPass()
 {
 	zeProfilerStart("GBuffer Pass");
-	
+	D3DPERF_BeginEvent(0, L"GBuffer Pass");
+
+	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
 	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)GBuffer1->GetViewPort())->FrameBuffer);
 	GetDevice()->SetRenderTarget(1, ((ZED3D9ViewPort*)GBuffer2->GetViewPort())->FrameBuffer);
 	GetDevice()->SetRenderTarget(2, ((ZED3D9ViewPort*)GBuffer3->GetViewPort())->FrameBuffer);
+	
+	if (FAILED(GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x00000000, 1.0f, 0x00)))
+	{
+		zeCriticalError("Clear failed");
+	}
 
-	GetDevice()->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x00000000, 1.0f, 0x00);
 
-	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
+	
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	
 
 	for (ZESize I = 0; I < CommandList.GetCount(); I++)
 	{
@@ -558,15 +623,24 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 	
 	GetDevice()->SetRenderTarget(1, NULL);
 	GetDevice()->SetRenderTarget(2, NULL);
+	GetDevice()->SetRenderTarget(3, NULL);
 	zeProfilerEnd();
+
+	D3DPERF_EndEvent();
 }
 
 void ZED3D9FrameRenderer::DoLightningPass()
 {
 	zeProfilerStart("Lightning Pass");
 
+	D3DPERF_BeginEvent(0, L"LBuffer Pass");
+
 	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00, 0.0f, 0);
+	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
+	if (FAILED(GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00, 0.0f, 0)))
+	{
+		zeCriticalError("Clear failed");
+	}
 	
 	if (Lights.GetCount() == 0)
 		return;
@@ -628,14 +702,19 @@ void ZED3D9FrameRenderer::DoLightningPass()
 		}
 
 	zeProfilerEnd();
+
+	D3DPERF_EndEvent();
 }
 
 void ZED3D9FrameRenderer::DoForwardPass()
 {
 	zeProfilerStart("Forward Pass");
 
+	D3DPERF_BeginEvent(0, L"ABuffer Pass");
+
 	// GBuffers
-	// ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
+	//ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
+	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
 	ZED3D9CommonTools::SetRenderTarget(0, (ZED3D9ViewPort*)ABuffer->GetViewPort());
 
 	ZED3D9CommonTools::SetTexture(0, GBuffer1, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
@@ -644,7 +723,11 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	ZED3D9CommonTools::SetTexture(3, LBuffer1, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(4, SSAOBuffer, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x333333, 1.0f, 0x00);
+	if (FAILED(GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x333333, 1.0f, 0x00)))
+	{
+		zeCriticalError("Clear failed");
+	}
+
 
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
@@ -673,6 +756,8 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetTexture(4, NULL);
 
 	zeProfilerEnd();
+	
+	D3DPERF_EndEvent();
 }
 
 
@@ -1018,6 +1103,11 @@ void ZED3D9FrameRenderer::AddToLightList(ZELight* Light)
 	Lights.Add(Light);
 }
 
+const ZESmartArray<ZELight*>& ZED3D9FrameRenderer::GetLightList() const
+{
+	return Lights;
+}
+
 void ZED3D9FrameRenderer::ClearLightList()
 {
 	Lights.Clear();
@@ -1062,6 +1152,8 @@ static ZEInt RenderCommandCompare(const ZERenderCommand* A, const ZERenderComman
 
 void ZED3D9FrameRenderer::Render(float ElaspedTime)
 {
+	D3DPERF_BeginEvent(0, L"Frame Render");
+
 	if (!GetModule()->GetEnabled() || GetModule()->IsDeviceLost())
 		return;
 
@@ -1080,92 +1172,79 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 
 	GetDevice()->BeginScene();
 
-		//DoPreZPass();
 		DoGBufferPass();
 		DoLightningPass();
 		DoForwardPass();
 		
-// 		UnsharpenProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
-// 		UnsharpenProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
-// 		UnsharpenProcessor.Process();
-		
 		/*
+		
+		UnsharpenProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
+		UnsharpenProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
+		UnsharpenProcessor.Process();
+
 		//Anti Aliasing Process
 		MLAAProcessor.SetInputDepth(GBuffer1);
 		MLAAProcessor.SetInputNormal(GBuffer2);
 		MLAAProcessor.SetInputColor(SSAAInputBuffer);
 		MLAAProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
 		MLAAProcessor.Process();
-		*/
-		
-		/*
+
 		// Fog Process
 		FogProcessor.SetInputColor(FogInputBuffer);
 		FogProcessor.SetInputDepth(GBuffer1);
 		FogProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
 		FogProcessor.Process();
 		*/
-		
+
 		// HDR Process
 		HDRProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
 		HDRProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);
 		
+		
 		// Color Transform Process
 		ColorTransformProcessor.SetInput(CTInputBuffer);
 		ColorTransformProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
 		ColorTransformProcessor.Process();
-		
+
 		// Grain
 		GrainProcessor.SetInput(GrainInputBuffer);
 		GrainProcessor.SetOutput((ZED3D9ViewPort*)ZoomBlurInputBuffer->GetViewPort());
 		GrainProcessor.Process(ElaspedTime);
-		
-		/*
+/*
 		// Blur Mask
 		BlurMaskProcessor.SetInput(BlurMaskInputBuffer);
 		BlurMaskProcessor.SetOutput(ViewPort);
 		BlurMaskProcessor.Process();
 		*/
-		
 		// Zoom blur
 		ZoomBlurProcessor.SetInput(ZoomBlurInputBuffer);
 		ZoomBlurProcessor.SetOutput((ZED3D9ViewPort*)CDInputBuffer->GetViewPort());
 		ZoomBlurProcessor.Process();
-		
 
-		
 		// Channel Disorientation Processor
 		ChannelDisorientProcessor.SetInput(CDInputBuffer);
 		ChannelDisorientProcessor.SetOutput((ZED3D9ViewPort*)BlurInputBuffer->GetViewPort());
 		ChannelDisorientProcessor.Process();
-		
-
 		/*
 		// Texture mask
 		TMProcessor.SetInput(TMInputBuffer);
 		TMProcessor.SetOutput(ViewPort);
 		TMProcessor.Process();
-		*/
 
-		/*
 		// DOF Process
 		DOFProcessor.SetInputColor(DOFInputBuffer);
 		DOFProcessor.SetInputDepth(GBuffer1);
 		DOFProcessor.SetOutput(ViewPort);
 		DOFProcessor.Process();
-		*/
 
-		/*
 		//Anti Aliasing Process (old bad ugly)
 		SSAAProcessor.SetInputDepth(GBuffer1);
 		SSAAProcessor.SetInputNormal(GBuffer2);
 		SSAAProcessor.SetInputColor(ABuffer);
 		SSAAProcessor.SetOutput(ViewPort);
 		SSAAProcessor.Process();
-		*/
-		
-		/*
+
 		// Edge Detection Process
 		EDProcessor.SetInputDepth(GBuffer1);
 		EDProcessor.SetInputNormal(GBuffer2);
@@ -1173,17 +1252,18 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		EDProcessor.SetOutput(ViewPort);
 		EDProcessor.Process();
 		*/
-		
-		
 		// Blur Process
 		BlurProcessor.SetInput(BlurInputBuffer);
 		BlurProcessor.SetOutput(ViewPort);
 		BlurProcessor.Process();
 		
+	
 
 		Do2DPass();
 
 	GetDevice()->EndScene();
 	
 	zeProfilerEnd();
+
+	D3DPERF_EndEvent();
 }

@@ -54,6 +54,7 @@ class ZEProjectiveLight : public ZELight
 		ZEViewFrustum					ViewVolume;
 		const ZETexture2D*				ProjectionTexture;
 		ZETexture2D*					ShadowMap;
+		ZEMatrix4x4						ViewProjectionMatrix;
 		
 		ZETexture2DResource*			ProjectionTextureResource;
 		char							ProjectionTextureFile[ZE_MAX_FILE_NAME_SIZE];
@@ -76,9 +77,8 @@ class ZEProjectiveLight : public ZELight
 		void							SetProjectionTexture(const ZETexture2D* Texture);
 		const ZETexture2D*				GetProjectionTexture() const;
 
-		const ZEMatrix4x4&				GetProjectionMatrix();
-
 		virtual const ZEViewVolume&		GetViewVolume();
+		virtual const ZEMatrix4x4&		GetLightTransformation(ZESize CascadeIndex = 0);
 
 		virtual void					SetCastsShadow(bool NewValue);
 

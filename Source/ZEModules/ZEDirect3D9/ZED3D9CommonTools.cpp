@@ -105,7 +105,7 @@ void ZED3D9CommonTools::SetTexture(DWORD Stage, const ZETexture2D* Texture, DWOR
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
-	GetDevice()->SetTexture(Stage, ((ZED3D9Texture2D*)Texture)->Texture);
+	GetDevice()->SetTexture(Stage, Texture == NULL ? NULL : ((ZED3D9Texture2D*)Texture)->Texture);
 }
 
 void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture2DResource* TextureResource, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
@@ -125,7 +125,7 @@ void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETextureCube* Texture, DWORD Fi
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
-	GetDevice()->SetTexture(Stage, ((ZED3D9TextureCube*)Texture)->CubeTexture);
+	GetDevice()->SetTexture(Stage, Texture == NULL ? NULL : ((ZED3D9TextureCube*)Texture)->CubeTexture);
 }
 
 void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETextureCubeResource* TextureResource, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
@@ -146,7 +146,7 @@ void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture3D* Texture, DWORD Filt
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
-	GetDevice()->SetTexture(Stage, ((ZED3D9Texture3D*)Texture)->VolumeTexture);
+	GetDevice()->SetTexture(Stage, Texture == NULL ? NULL : ((ZED3D9Texture3D*)Texture)->VolumeTexture);
 }
 
 void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture3DResource* TextureResource, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)

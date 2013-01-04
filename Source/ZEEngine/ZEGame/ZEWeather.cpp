@@ -43,6 +43,7 @@
 #include "ZESkyDome.h"
 #include "ZECloud.h"
 #include "ZEModules\ZEDirect3D9\ZED3D9FrameRenderer.h"
+#include "ZEGraphics\ZECamera.h"
 
 
 void ZEWeather::AdjustHDR(float DayTime)
@@ -280,7 +281,7 @@ void ZEWeather::Draw(ZEDrawParameters* DrawParameters)
 
 void ZEWeather::Tick(float Time)
 {
-
+	//SunLight->SetWorldPosition(zeScene->GetActiveCamera()->GetWorldPosition());
 }
 
 ZEWeather* ZEWeather::CreateInstance()
@@ -325,11 +326,10 @@ ZEWeather::ZEWeather()
 	SunLight->SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3::UnitX));
 	SunLight->SetColor(SunLightColor);
 	SunLight->SetIntensity(SunLightIntensity);
-	SunLight->SetCastsShadow(false);
+	SunLight->SetCastsShadow(true);
 	SunLight->SetVisible(true);
 	SunLight->SetName("TestSunLight");
 	this->AddComponent(SunLight);
-
 
 	// Moon Light
 	MoonLight = ZEDirectionalLight::CreateInstance();
@@ -341,7 +341,6 @@ ZEWeather::ZEWeather()
 	MoonLight->SetIntensity(MoonLightIntensity);
 	MoonLight->SetCastsShadow(false);
 	this->AddComponent(MoonLight);
-
 
 	// Star Map
 	StarMap = ZESkyBrush::CreateInstance();
@@ -358,13 +357,13 @@ ZEWeather::ZEWeather()
 	Moon->SetName("TestMoon");
 	Moon->SetEnabled(true);
 	Moon->SetVisible(true);
-	Moon->SetMoonTexture("ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
+	//Moon->SetMoonTexture("ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
 	Moon->SetMoonAmbientColor(ZEVector3(1.0f, 0.99f, 0.92f));
 	Moon->SetMoonDirection(MoonDirection);
 	Moon->SetMoonPhase(MoonPhase);
 	Moon->SetMoonAmbientFactor(2.7f);
 	Moon->SetMoonScale(0.07f);
-	this->AddComponent(Moon);
+	//this->AddComponent(Moon);
 
 	// Sky Dome
 	SkyDome = ZESkyDome::CreateInstance();
