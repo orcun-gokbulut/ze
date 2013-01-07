@@ -97,8 +97,10 @@ class ZELight : public ZEEntity
 		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer) = 0;
 
 		virtual ZELightType				GetLightType() = 0;
-		virtual const ZEViewVolume&		GetViewVolume() = 0;
-		virtual const ZEMatrix4x4&		GetLightTransformation(ZESize CascadeIndex = 0) = 0;
+		virtual ZESize					GetViewCount() = 0;
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) = 0;
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize CascadeIndex = 0) = 0;
+
 										ZELight();
 		virtual							~ZELight();
 };

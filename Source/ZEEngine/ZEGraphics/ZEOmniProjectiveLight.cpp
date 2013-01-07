@@ -117,7 +117,12 @@ void ZEOmniProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* Sh
 	}
 }
 
-const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume()
+ZESize ZEOmniProjectiveLight::GetViewCount()
+{
+	return 1;
+}
+
+const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume(ZESize Index)
 {
 	if (UpdateViewVolume)
 	{
@@ -128,7 +133,7 @@ const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume()
 	return ViewVolume;
 }
 
-const ZEMatrix4x4& ZEOmniProjectiveLight::GetLightTransformation(ZESize CascadeIndex)
+const ZEMatrix4x4& ZEOmniProjectiveLight::GetViewTransform(ZESize Index)
 {
 	if (UpdateShadowTransform)
 	{

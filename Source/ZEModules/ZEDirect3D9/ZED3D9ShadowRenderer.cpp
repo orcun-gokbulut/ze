@@ -190,6 +190,11 @@ void ZED3D9ShadowRenderer::ClearRenderList()
 	CommandList.Clear(true);
 }
 
+const ZESmartArray<ZERenderCommand>& ZED3D9ShadowRenderer::GetRenderList() const
+{
+	return CommandList;
+}
+
 void ZED3D9ShadowRenderer::AddToRenderList(ZERenderCommand* RenderCommand)
 {
 	#ifdef ZE_DEBUG_ENABLE
@@ -333,7 +338,7 @@ void ZED3D9ShadowRenderer::RenderDirectionalLight()
 
 			GetDevice()->SetVertexShaderConstantB(0, &SkinEnabled, 1);
 			
-			ZEMatrix4x4 LightMatrix = DirLight->GetLightTransformation(CascadeN) * RenderCommand->WorldMatrix;
+			ZEMatrix4x4 LightMatrix = DirLight->GetViewTransform(CascadeN) * RenderCommand->WorldMatrix;
 
 			GetDevice()->SetVertexShaderConstantF(0, (float*)&LightMatrix, 4);
 

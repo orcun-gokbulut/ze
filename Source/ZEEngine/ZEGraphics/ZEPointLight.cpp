@@ -125,7 +125,12 @@ void ZEPointLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRende
 	*/
 }
 
-const ZEViewVolume& ZEPointLight::GetViewVolume()
+ZESize ZEPointLight::GetViewCount()
+{
+	return 1;
+}
+
+const ZEViewVolume& ZEPointLight::GetViewVolume(ZESize Index)
 {
 	if (UpdateViewVolume)
 	{
@@ -136,7 +141,7 @@ const ZEViewVolume& ZEPointLight::GetViewVolume()
 	return ViewVolume;
 }
 
-const ZEMatrix4x4& ZEPointLight::GetLightTransformation(ZESize CascadeIndex)
+const ZEMatrix4x4& ZEPointLight::GetViewTransform(ZESize Index)
 {
 	if (UpdateShadowTransform)
 	{
