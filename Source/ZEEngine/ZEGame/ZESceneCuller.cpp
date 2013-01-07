@@ -44,7 +44,7 @@
 void ZESceneCuller::DebugDrawEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
 {
 	if (DebugDrawElements & ZE_VDE_ENTITY_LOCAL_BOUNDING_BOX)
-		DebugDraw.DrawOrientedBoundingBox(Entity->GetBoundingBox(), Entity->GetWorldTransform(), DrawParameters->Renderer, ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
+		DebugDraw.DrawOrientedBoundingBox(Entity->GetBoundingBox(), Entity->GetWorldTransform(), DrawParameters->Renderer, ZEVector4(0.25f, 1.0f, 0.25f, 1.0f));
 
 	if (DebugDrawElements & ZE_VDE_ENTITY_WORLD_BOUNDING_BOX)
 		DebugDraw.DrawAxisAlignedBoundingBox(Entity->GetWorldBoundingBox(), DrawParameters->Renderer, ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));
@@ -91,7 +91,7 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 		{
 			if (CullLight((ZELight*)Entities[I], DrawParameters))
 			{
-				DrawParameters->Renderer->AddToLightList((ZELight*)Entities[I]);	
+				Entities[I]->Draw(DrawParameters);
 				DebugDrawLight((ZELight*)Entities[I], DrawParameters);
 			}
 		}
@@ -103,7 +103,7 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 			if (ZEObjectDescription::CheckParent(ZELight::Description(), Components[J]->GetDescription()))
 				if (CullLight((ZELight*)Components[J], DrawParameters))
 				{
-					DrawParameters->Renderer->AddToLightList((ZELight*)Components[J]);
+					Components[J]->Draw(DrawParameters);
 					DebugDrawLight((ZELight*)Components[J], DrawParameters);
 				}
 		}
@@ -115,7 +115,7 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 			if (ZEObjectDescription::CheckParent(ZELight::Description(), ChildEntities[K]->GetDescription()))
 				if (CullLight((ZELight*)ChildEntities[K], DrawParameters))
 				{
-					DrawParameters->Renderer->AddToLightList((ZELight*)ChildEntities[K]);
+					ChildEntities[K]->Draw(DrawParameters);
 					DebugDrawLight((ZELight*)ChildEntities[K], DrawParameters);
 				}
 		}
@@ -125,6 +125,24 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 bool ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
 {
 	Statistics.TotalEntityCount++;
+
+// 	ZEUInt32 EntityDrawFlags = Entity->GetDrawFlags();
+// 	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)
+// 	{
+// 		Statistics.DrawableEntityCount++;
+// 
+// 		if (EntityDrawFlags & ZE_DF_CULL && DrawParameters->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
+// 		{
+// 			Statistics.CulledEntityCount++;
+// 			return true;
+// 		}
+// 		else
+// 		{
+// 			Statistics.DrawedEntityCount++;
+// 			Entity->Draw(DrawParameters);
+// 			DebugDrawEntity(Entity, DrawParameters);
+// 		}
+// 	}
 
 	ZEUInt32 EntityDrawFlags = Entity->GetDrawFlags();
 	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)

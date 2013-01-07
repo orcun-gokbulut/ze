@@ -101,6 +101,8 @@ class ZELight : public ZEEntity
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) = 0;
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize CascadeIndex = 0) = 0;
 
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
+
 										ZELight();
 		virtual							~ZELight();
 };
