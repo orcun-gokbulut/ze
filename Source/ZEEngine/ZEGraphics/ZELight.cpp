@@ -35,6 +35,8 @@
 
 #include "ZELight.h"
 #include "ZERenderCommand.h"
+#include "ZEGame\ZEDrawParameters.h"
+#include "ZERenderer.h"
 
 void ZELight::OnTransformChanged()
 {
@@ -123,6 +125,11 @@ void ZELight::SetRotation(const ZEQuaternion& NewRotation)
 		UpdateShadowTransform = true;
 		ZEEntity::SetRotation(NewRotation);
 	}
+}
+
+void ZELight::Draw(ZEDrawParameters* DrawParameters)
+{
+	DrawParameters->Renderer->AddToLightList(this);
 }
 
 ZELight::ZELight()

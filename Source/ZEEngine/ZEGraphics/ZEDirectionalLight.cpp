@@ -251,9 +251,6 @@ ZEDirectionalLight* ZEDirectionalLight::CreateInstance()
 
 void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 {
-	if (!CastsShadows)
-		return;
-
 	// Update cascade transformations
 	ZECamera* Camera = zeScene->GetActiveCamera();
 
@@ -390,4 +387,6 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 		ZEOBBox OBBox(Center, Right, Up, Front, Half);
 		ViewVolumes[CascadeN].Create(OBBox);
 	}
+
+	ZELight::Draw(DrawParameters);
 }
