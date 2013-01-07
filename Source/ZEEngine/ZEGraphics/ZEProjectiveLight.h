@@ -77,8 +77,9 @@ class ZEProjectiveLight : public ZELight
 		void							SetProjectionTexture(const ZETexture2D* Texture);
 		const ZETexture2D*				GetProjectionTexture() const;
 
-		virtual const ZEViewVolume&		GetViewVolume();
-		virtual const ZEMatrix4x4&		GetLightTransformation(ZESize CascadeIndex = 0);
+		virtual ZESize					GetViewCount();
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
 
 		virtual void					SetCastsShadow(bool NewValue);
 

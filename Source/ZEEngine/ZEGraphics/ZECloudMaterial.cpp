@@ -89,7 +89,8 @@ void ZECloudMaterial::UpdateParameters(float Time)
 
 	// Adjust the height so that clouds are always above.
 	// cloud height = m_fDefaultHeight + m_fFallOffHeight * squaredistance_in_horizontal
-	float Range = 0.5f * Camera->GetFarZ();
+
+	float Range = 0.5f * 20000.0f; //Camera->GetFarZ();
 	float Height = Range * 0.12f;
 	CloudPlaneHeight = Height + Camera->GetWorldPosition().y;
 	CloudPlaneHeightFallOff  = -(0.1f / Range) * (Camera->GetWorldPosition().y / Height + 1.0f);

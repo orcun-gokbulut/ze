@@ -358,37 +358,29 @@ void ZEScene::Render(float ElapsedTime)
 
 	// Shadow render setup
 	// ------------------------------------------------------
-	ZEDrawParameters ShadowDrawParameters;
-	ShadowDrawParameters.ElapsedTime = ElapsedTime;
-	ShadowDrawParameters.FrameId = zeCore->GetFrameId();
-	ShadowDrawParameters.Pass = ZE_RP_SHADOW_MAP;
-	ShadowDrawParameters.Renderer = ShadowRenderer;
-	ShadowDrawParameters.ViewVolume = (ZEViewVolume*)&ActiveCamera->GetViewVolume();
-	ShadowDrawParameters.View = (ZEView*)&ActiveCamera->GetView();
-
-	ShadowRenderer->ClearLists();
-
-	for (ZESize I = 0; I < Entities.GetCount(); ++I)
-	{
-		if (!ZEObjectDescription::CheckParent(ZELight::Description(), Entities[I]->GetDescription()))
-		{
-			Entities[I]->Draw(&ShadowDrawParameters);
-
-			const ZEArray<ZEEntity*>& Components = Entities[I]->GetComponents();
-			for (ZESize I = 0; I < Components.GetCount(); I++)
-				Components[I]->Draw(&ShadowDrawParameters);
-
-			const ZEArray<ZEEntity*>& ChildEntities = Entities[I]->GetChildEntities();
-			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-				ChildEntities[I]->Draw(&ShadowDrawParameters);
-		}
-	}
-
 	const ZESmartArray<ZELight*>& LightList = Renderer->GetLightList();
-	for (ZESize I = 0; I < LightList.GetCount(); ++I)
+	for (ZESize LightN = 0; LightN < LightList.GetCount(); ++LightN)
 	{
-		if (LightList[I]->GetCastsShadow() && LightList[I]->GetLightType() == ZE_LT_DIRECTIONAL)
-			LightList[I]->RenderShadowMap(this, ShadowRenderer);
+		// NOTE: Only works for ZE_LT_DIRECTIONAL for now
+		if (LightList[LightN]->GetCastsShadow() && LightList[LightN]->GetLightType() == ZE_LT_DIRECTIONAL)
+		{
+			for (ZESize ViewN = 0; ViewN < LightList[LightN]->GetViewCount(); ++ViewN)
+			{
+				ShadowRenderer->ClearLists();
+
+				ZEDrawParameters ShadowDrawParameters;
+				ShadowDrawParameters.ElapsedTime = ElapsedTime;
+				ShadowDrawParameters.FrameId = zeCore->GetFrameId();
+				ShadowDrawParameters.Pass = ZE_RP_SHADOW_MAP;
+				ShadowDrawParameters.Renderer = ShadowRenderer;
+				ShadowDrawParameters.ViewVolume = (ZEViewVolume*)&LightList[LightN]->GetViewVolume(ViewN);
+				ShadowDrawParameters.View = (ZEView*)&ActiveCamera->GetView();
+
+				Culler.CullScene(this, &ShadowDrawParameters);
+
+				LightList[LightN]->RenderShadowMap(this, ShadowRenderer);
+			}
+		}	
 	}
 }
 

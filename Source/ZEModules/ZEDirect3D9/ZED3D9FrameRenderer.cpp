@@ -343,10 +343,10 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 
 	// Transformation matrix from world space to light texture space
 	ZEMatrix4x4 LightMatrices[4];
-	LightMatrices[0] =  LightTexture * Light->GetLightTransformation(0) * CameraInverseView;
-	LightMatrices[1] =  LightTexture * Light->GetLightTransformation(1) * CameraInverseView;
-	LightMatrices[2] =  LightTexture * Light->GetLightTransformation(2) * CameraInverseView;
-	LightMatrices[3] =  LightTexture * Light->GetLightTransformation(3) * CameraInverseView;
+	LightMatrices[0] =  LightTexture * Light->GetViewTransform(0) * CameraInverseView;
+	LightMatrices[1] =  LightTexture * Light->GetViewTransform(1) * CameraInverseView;
+	LightMatrices[2] =  LightTexture * Light->GetViewTransform(2) * CameraInverseView;
+	LightMatrices[3] =  LightTexture * Light->GetViewTransform(3) * CameraInverseView;
 	
 	GetDevice()->SetPixelShaderConstantF(90, (float*)&LightMatrices[0], 4 * 4);
 
@@ -1111,6 +1111,11 @@ const ZESmartArray<ZELight*>& ZED3D9FrameRenderer::GetLightList() const
 void ZED3D9FrameRenderer::ClearLightList()
 {
 	Lights.Clear();
+}
+
+const ZESmartArray<ZERenderCommand>& ZED3D9FrameRenderer::GetRenderList() const
+{
+	return CommandList;
 }
 
 void ZED3D9FrameRenderer::AddToRenderList(ZERenderCommand* RenderCommand)

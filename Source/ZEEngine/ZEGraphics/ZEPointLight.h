@@ -67,9 +67,11 @@ class ZEPointLight  : public ZELight
 
 		virtual void					Deinitialize();
 
+		virtual ZESize					GetViewCount();
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
+
 		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
-		virtual const ZEViewVolume&		GetViewVolume();
-		virtual const ZEMatrix4x4&		GetLightTransformation(ZESize CascadeIndex = 0);
 
 		static ZEPointLight*			CreateInstance();
 };

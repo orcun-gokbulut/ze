@@ -90,6 +90,7 @@ class ZERenderer
 		virtual void							AddToLightList(ZELight* Light);
 		virtual void							ClearLightList();
 
+		virtual const ZESmartArray<ZERenderCommand>& GetRenderList() const = 0;
 		virtual void							AddToRenderList(ZERenderCommand* RenderCommand) = 0;
 		virtual void							ClearRenderList() = 0;
 
