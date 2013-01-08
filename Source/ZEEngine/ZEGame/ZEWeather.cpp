@@ -357,13 +357,13 @@ ZEWeather::ZEWeather()
 	Moon->SetName("TestMoon");
 	Moon->SetEnabled(true);
 	Moon->SetVisible(true);
-	//Moon->SetMoonTexture("ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
+	Moon->SetMoonTexture("ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
 	Moon->SetMoonAmbientColor(ZEVector3(1.0f, 0.99f, 0.92f));
 	Moon->SetMoonDirection(MoonDirection);
 	Moon->SetMoonPhase(MoonPhase);
 	Moon->SetMoonAmbientFactor(2.7f);
 	Moon->SetMoonScale(0.07f);
-	//this->AddComponent(Moon);
+	this->AddComponent(Moon);
 
 	// Sky Dome
 	SkyDome = ZESkyDome::CreateInstance();
