@@ -58,12 +58,14 @@ void ZESceneCuller::DebugDrawLight(ZELight* Light, ZEDrawParameters* DrawParamet
 
 bool ZESceneCuller::CullLight(ZELight* Light, ZEDrawParameters* DrawParameters)
 {
-	Statistics.TotalLightCount++;
+	if (FrameStatisticsEnabled)
+		Statistics.TotalLightCount++;
 
 	if (!Light->GetVisible())
 		return false;
 
-	Statistics.VisibleLightCount++;
+	if (FrameStatisticsEnabled)
+		Statistics.VisibleLightCount++;
 
 	ZEBSphere LightBoundingSphere;
 	LightBoundingSphere.Position = Light->GetWorldPosition();
@@ -71,11 +73,14 @@ bool ZESceneCuller::CullLight(ZELight* Light, ZEDrawParameters* DrawParameters)
 
 	if (Light->GetLightType() != ZE_LT_DIRECTIONAL && DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
 	{
-		Statistics.CulledLightCount++;
+		if (FrameStatisticsEnabled)
+			Statistics.CulledLightCount++;
+
 		return false;
 	}
 
-	Statistics.DrawedLightCount++;	
+	if (FrameStatisticsEnabled)
+		Statistics.DrawedLightCount++;	
 	
 	return true;
 }
@@ -124,7 +129,8 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 
 bool ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
 {
-	Statistics.TotalEntityCount++;
+	if (FrameStatisticsEnabled)
+		Statistics.TotalEntityCount++;
 
 // 	ZEUInt32 EntityDrawFlags = Entity->GetDrawFlags();
 // 	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)
@@ -147,25 +153,32 @@ bool ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameter
 	ZEUInt32 EntityDrawFlags = Entity->GetDrawFlags();
 	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)
 	{
-		Statistics.DrawableEntityCount++;
+		if (FrameStatisticsEnabled)
+			Statistics.DrawableEntityCount++;
 
 		if (EntityDrawFlags & ZE_DF_CULL)
 		{
 			if (DrawParameters->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
 			{
-				Statistics.CulledEntityCount++;
+				if (FrameStatisticsEnabled)
+					Statistics.CulledEntityCount++;
+
 				return true;
 			}
 			else
 			{
-				Statistics.DrawedEntityCount++;
+				if (FrameStatisticsEnabled)
+					Statistics.DrawedEntityCount++;
+
 				Entity->Draw(DrawParameters);
 				DebugDrawEntity(Entity, DrawParameters);
 			}
 		}
 		else
 		{
-			Statistics.DrawedEntityCount++;
+			if (FrameStatisticsEnabled)
+				Statistics.DrawedEntityCount++;
+
 			Entity->Draw(DrawParameters);
 			DebugDrawEntity(Entity, DrawParameters);
 		}
@@ -212,7 +225,8 @@ void ZESceneCuller::CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 	else
 		DebugDraw.Initialize();
 
-	memset(&Statistics, 0, sizeof(ZECullStatistics));
+	if (FrameStatisticsEnabled)
+		memset(&Statistics, 0, sizeof(ZECullStatistics));
 
 	DebugDraw.Clean();
 
@@ -228,6 +242,7 @@ ZESceneCuller::ZESceneCuller()
 {
 	memset(&Statistics, 0, sizeof(ZECullStatistics));
 	DebugDrawElements = ZE_VDE_NONE;
+	FrameStatisticsEnabled = true;
 }
 
 ZESceneCuller::~ZESceneCuller()

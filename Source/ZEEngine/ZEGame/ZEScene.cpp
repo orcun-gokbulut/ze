@@ -354,11 +354,14 @@ void ZEScene::Render(float ElapsedTime)
 	FrameDrawParameters.View = (ZEView*)&ActiveCamera->GetView();
 	FrameDrawParameters.Lights.Clear();
 
+	Culler.FrameStatisticsEnabled = true;
 	Culler.CullScene(this, &FrameDrawParameters);
 
 	// Shadow render setup
 	// ------------------------------------------------------
 	const ZESmartArray<ZELight*>& LightList = Renderer->GetLightList();
+	Culler.FrameStatisticsEnabled = false;
+
 	for (ZESize LightN = 0; LightN < LightList.GetCount(); ++LightN)
 	{
 		// NOTE: Only works for ZE_LT_DIRECTIONAL for now

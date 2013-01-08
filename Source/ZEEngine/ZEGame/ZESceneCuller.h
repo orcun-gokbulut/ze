@@ -69,8 +69,11 @@ struct ZECullStatistics
 
 class ZESceneCuller
 {
+	friend class ZEScene;
+
 	private:
 		ZECullStatistics				Statistics;
+		bool							FrameStatisticsEnabled;
 
 		ZESceneDebugDraw				DebugDraw;
 		ZEUInt32						DebugDrawElements;
