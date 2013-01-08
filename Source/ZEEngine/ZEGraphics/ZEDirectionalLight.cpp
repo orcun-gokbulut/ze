@@ -156,42 +156,12 @@ ZESize ZEDirectionalLight::GetViewCount()
 const ZEViewVolume& ZEDirectionalLight::GetViewVolume(ZESize Index)
 {
 	zeDebugCheck(Index >= MAX_CASCADE_COUNT, "Index out of range");
-	
 	return ViewVolumes[Index];
-
-// 	//For every cascade level
-// 	ZEVector3 FrustumCorners[8];
-// 	ZEVector4 TransformedFrustumCorners[8];
-// 	
-// 	// Calculate near and far plane corners of frustum
-// 	float NearPlaneHalfHeight = ZEAngle::Tan(FOV * 0.5f) * SplitDistances[Index];
-// 	float FarPlaneHalfHeight = ZEAngle::Tan(FOV * 0.5f) * SplitDistances[Index + 1];
-// 	
-// 	float FarPlaneHalfWidth = FarPlaneHalfHeight * AspectRatio;
-// 	float NearPlaneHalfWidth = NearPlaneHalfHeight * AspectRatio;
-// 	
-// 	ZEVector3 NearPlaneCenter = Position + Front * SplitDistances[Index];
-// 	ZEVector3 FarPlaneCenter = Position + Front * SplitDistances[Index + 1];
-// 	
-// 	ZEVector3 FarHalfUpVector = Up * FarPlaneHalfHeight;
-// 	ZEVector3 NearHalfUpVector = Up * NearPlaneHalfHeight;
-// 	ZEVector3 FarHalfRightVector = Right * FarPlaneHalfWidth;
-// 	ZEVector3 NearHalfRightVector = Right * NearPlaneHalfWidth;
-// 	
-// 	// Create world space view volume
-// 	zeCriticalError("This part is missing. Create final view volume here.");
-// 	
-// 	ZEVector3 FrustumCenter = (NearPlaneCenter + FarPlaneCenter) * 0.5f;
-// 	float HalfDepth = ZEVector3::Length(NearPlaneCenter - FrustumCenter);
-// 	float MaxDimension = ZEMath::Max(FarPlaneHalfWidth, ZEMath::Max(FarPlaneHalfHeight, HalfDepth));
-// 	
-// 	ZEOBBox OBBox(FrustumCenter, Right, Up, Front, MaxDimension);
 }
 
 const ZEMatrix4x4& ZEDirectionalLight::GetViewTransform(ZESize Index)
 {
 	zeDebugCheck(Index >= MAX_CASCADE_COUNT, "Index out of range");
-
 	return LightTransformations[Index];
 }
 
@@ -277,9 +247,9 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 	ZEVector3 Position = Camera->GetWorldPosition();
 	ZEQuaternion Rotation = Camera->GetWorldRotation();
 		
-	ZEVector3 Up = Camera->GetWorldUp();
-	ZEVector3 Right = Camera->GetWorldRight();
-	ZEVector3 Front = Camera->GetWorldFront();
+	ZEVector3 CameraUp = Camera->GetWorldUp();
+	ZEVector3 CameraRight = Camera->GetWorldRight();
+	ZEVector3 CameraFront = Camera->GetWorldFront();
 
 	// For every cascade level
 	ZEVector4 FrustumCorners[8];
@@ -288,8 +258,8 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 	// Calculate near and far plane corners of frustum
 	for (ZESize CascadeN = 0; CascadeN < CascadeCount; ++CascadeN)
 	{
-		ZEVector3 NearPlaneCenter = Position + Front * SplitDistances[CascadeN];
-		ZEVector3 FarPlaneCenter = Position + Front * SplitDistances[CascadeN + 1];
+		ZEVector3 NearPlaneCenter = Position + CameraFront * SplitDistances[CascadeN];
+		ZEVector3 FarPlaneCenter = Position + CameraFront * SplitDistances[CascadeN + 1];
 
 		float NearPlaneHalfHeight = ZEAngle::Tan(FOV * 0.5f) * SplitDistances[CascadeN];
 		float NearPlaneHalfWidth = NearPlaneHalfHeight * AspectRatio;
@@ -297,10 +267,10 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 		float FarPlaneHalfHeight = ZEAngle::Tan(FOV * 0.5f) * SplitDistances[CascadeN + 1];
 		float FarPlaneHalfWidth = FarPlaneHalfHeight * AspectRatio;
 
-		ZEVector3 FarHalfUpVector = Up * FarPlaneHalfHeight;
-		ZEVector3 NearHalfUpVector = Up * NearPlaneHalfHeight;
-		ZEVector3 FarHalfRightVector = Right * FarPlaneHalfWidth;
-		ZEVector3 NearHalfRightVector = Right * NearPlaneHalfWidth;
+		ZEVector3 FarHalfUpVector = CameraUp * FarPlaneHalfHeight;
+		ZEVector3 NearHalfUpVector = CameraUp * NearPlaneHalfHeight;
+		ZEVector3 FarHalfRightVector = CameraRight * FarPlaneHalfWidth;
+		ZEVector3 NearHalfRightVector = CameraRight * NearPlaneHalfWidth;
 
 		FrustumCorners[0] = ZEVector4(NearPlaneCenter - NearHalfRightVector - NearHalfUpVector, 1.0f);	// Near Left Down
 		FrustumCorners[1] = ZEVector4(NearPlaneCenter - NearHalfRightVector + NearHalfUpVector, 1.0f);	// Near Left Up
@@ -308,9 +278,9 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 		FrustumCorners[3] = ZEVector4(NearPlaneCenter + NearHalfRightVector - NearHalfUpVector, 1.0f);	// Near Right Down
 
 		FrustumCorners[4] = ZEVector4(FarPlaneCenter - FarHalfRightVector - FarHalfUpVector, 1.0f);		// Far  Left Down
-		FrustumCorners[5] = ZEVector4(FarPlaneCenter - FarHalfRightVector + FarHalfUpVector, 1.0f);		// Far  Left Up
-		FrustumCorners[6] = ZEVector4(FarPlaneCenter + FarHalfRightVector + FarHalfUpVector, 1.0f);		// Far  Right Up
-		FrustumCorners[7] = ZEVector4(FarPlaneCenter + FarHalfRightVector - FarHalfUpVector, 1.0f);		// Far  Right Down
+		FrustumCorners[5] = ZEVector4(FarPlaneCenter - FarHalfRightVector + FarHalfUpVector, 1.0f);		// Far  Left CameraUp
+		FrustumCorners[6] = ZEVector4(FarPlaneCenter + FarHalfRightVector + FarHalfUpVector, 1.0f);		// Far Right CameraUp
+		FrustumCorners[7] = ZEVector4(FarPlaneCenter + FarHalfRightVector - FarHalfUpVector, 1.0f);		// Far  CameraRight Down
 
 		// Calculate light view proj transform
 		ZEMatrix4x4 LightViewMatrix;
@@ -359,32 +329,40 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 		// Final transformation matrix which is crop * proj * view
 		LightTransformations[CascadeN] = CropMatrix * LightViewProjMatrix;
 
-		// Create final clip space corners
+		// Clip Space Corners
+		static ZEVector4 ClipCorners[8] = {
+			ClipCorners[0] = ZEVector4(-1.0f, -1.0f, 0.0f, 1.0f),	// Near Left Down
+			ClipCorners[1] = ZEVector4(-1.0f, +1.0f, 0.0f, 1.0f),	// Near Left Up
+			ClipCorners[2] = ZEVector4(+1.0f, +1.0f, 0.0f, 1.0f),	// Near Right Up
+			ClipCorners[3] = ZEVector4(+1.0f, -1.0f, 0.0f, 1.0f),	// Near Right Down
+			ClipCorners[4] = ZEVector4(-1.0f, -1.0f, 1.0f, 1.0f),	// Far  Left Down
+			ClipCorners[5] = ZEVector4(-1.0f, +1.0f, 1.0f, 1.0f),	// Far  Left Up
+			ClipCorners[6] = ZEVector4(+1.0f, +1.0f, 1.0f, 1.0f),	// Far  Right Up
+			ClipCorners[7] = ZEVector4(+1.0f, -1.0f, 1.0f, 1.0f)	// Far  Right Down
+		};
+		
+		ZEMatrix4x4 LightInvViewProjCrop;
+		ZEMatrix4x4::Inverse(LightInvViewProjCrop, LightTransformations[CascadeN]);
+
+		// World Space Corners
+		ZEVector4 WorldCorners[8];
 		for (ZESize I = 0; I < 8; ++I)
 		{
-			ZEMatrix4x4::Transform(TransformedFrustumCorners[I], LightTransformations[CascadeN], FrustumCorners[I]);
-			TransformedFrustumCorners[I] /= TransformedFrustumCorners[I].w;
+			ZEMatrix4x4::Transform(WorldCorners[I], LightInvViewProjCrop, ClipCorners[I]);
+			WorldCorners[I] /= WorldCorners[I].w;
 		}
 
-		// Create world space View Volumes
+		ZEVector3 ViewUp		= ((WorldCorners[1] - WorldCorners[0]).ToVector3()).Normalize();
+		ZEVector3 ViewFront		= ((WorldCorners[4] - WorldCorners[0]).ToVector3()).Normalize();
+		ZEVector3 ViewRight		= ((WorldCorners[3] - WorldCorners[0]).ToVector3()).Normalize();
+		ZEVector3 ViewCenter	= (WorldCorners[6] + WorldCorners[0]).ToVector3() * 0.5f;
 
-		// Do not include Crop matrix
-		ZEMatrix4x4 LightInvViewProjMatrix;
-		ZEMatrix4x4::Inverse(LightInvViewProjMatrix, LightViewProjMatrix);
+		float ViewHalfDepth		= ((WorldCorners[4] - WorldCorners[0]) * 0.5f).ToVector3().Length();
+		float ViewHalfWidth		= ((WorldCorners[3] - WorldCorners[0]) * 0.5f).ToVector3().Length();
+		float ViewHalfHeight	= ((WorldCorners[1] - WorldCorners[0]) * 0.5f).ToVector3().Length();
+		ZEVector3 ViewHalfSize	= ZEVector3(ViewHalfWidth, ViewHalfHeight, ViewHalfDepth);
 
-		// Create world space corners
-		for (ZESize I = 0; I < 8; ++I)
-		{
-			ZEMatrix4x4::Transform(FrustumCorners[I], LightInvViewProjMatrix, TransformedFrustumCorners[I]);
-			FrustumCorners[I] /= FrustumCorners[I].w;
-		}
-
-		ZEVector4 Temp0 = (FrustumCorners[0] + FrustumCorners[6]) * 0.5f;	// (near-left-bottom + far-right-top) / 2 = Diagonal / 2
-		ZEVector3 Center = ZEVector3(Temp0.x, Temp0.y, Temp0.z);
-		ZEVector4 Temp1 = (FrustumCorners[0] - FrustumCorners[3]) * 0.5f;	// (near-left-bottom - near-right-bottom) / 2 = width / 2
-		ZEVector3 Half = ZEVector3(Temp1.x, Temp1.y, Temp1.z);
-
-		ZEOBBox OBBox(Center, Right, Up, Front, Half);
+		ZEOBBox OBBox(ViewCenter, ViewRight, ViewUp, ViewFront, ViewHalfSize);
 		ViewVolumes[CascadeN].Create(OBBox);
 	}
 
