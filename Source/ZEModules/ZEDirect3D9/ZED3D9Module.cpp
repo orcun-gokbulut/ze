@@ -397,15 +397,18 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 	do
 	{
 		DeviceState = Device->TestCooperativeLevel();
-
 		if (DeviceState == D3DERR_DRIVERINTERNALERROR)
 		{
 			zeCriticalError("Can not restore Direct3D Device. Internal driver error.");
 		}
+		else if (DeviceState == D3DERR_OUTOFVIDEOMEMORY)
+		{
+			zeCriticalError("Can not restore Direct3D Device. Out of video memory");
+		}
 
 		if (DeviceState == D3DERR_DEVICENOTRESET || ForceReset)
 		{
-			Hr =Device->Reset(&D3DPP);
+			Hr = Device->Reset(&D3DPP);
 			if (Hr == D3D_OK)
 			{
 				zeLog("Direct3D Device Restored.");
@@ -418,7 +421,7 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 			}
 			else
 			{
-				zeCriticalError("Can not restore Direct3D Device.");
+				zeLog("Bla");
 			}
 		}
 	}
