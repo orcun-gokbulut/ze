@@ -44,10 +44,10 @@
 void ZESceneCuller::DebugDrawEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
 {
 	if (DebugDrawElements & ZE_VDE_ENTITY_LOCAL_BOUNDING_BOX)
-		DebugDraw.DrawOrientedBoundingBox(Entity->GetBoundingBox(), Entity->GetWorldTransform(), DrawParameters->Renderer, ZEVector4(0.25f, 1.0f, 0.25f, 1.0f));
+		DebugDraw.DrawOrientedBoundingBox(Entity->GetBoundingBox(), Entity->GetWorldTransform(), DrawParameters->Renderer, ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	if (DebugDrawElements & ZE_VDE_ENTITY_WORLD_BOUNDING_BOX)
-		DebugDraw.DrawAxisAlignedBoundingBox(Entity->GetWorldBoundingBox(), DrawParameters->Renderer, ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));
+		DebugDraw.DrawAxisAlignedBoundingBox(Entity->GetWorldBoundingBox(), DrawParameters->Renderer, ZEVector4(0.75f, 0.75f, 1.0f, 1.0f));
 }
 
 void ZESceneCuller::DebugDrawLight(ZELight* Light, ZEDrawParameters* DrawParameters)
@@ -161,7 +161,8 @@ void ZESceneCuller::CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 	if (FrameStatisticsEnabled)
 		memset(&Statistics, 0, sizeof(ZECullStatistics));
 
-	DebugDraw.Clean();
+	if (CurrentRendererType == ZE_RT_FRAME)
+		DebugDraw.Clean();
 
 	CullEntities(Scene, DrawParameters);
 	
