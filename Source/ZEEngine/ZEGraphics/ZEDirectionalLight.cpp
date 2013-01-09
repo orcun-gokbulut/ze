@@ -221,6 +221,7 @@ ZEDirectionalLight* ZEDirectionalLight::CreateInstance()
 
 void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 {
+
 	// Update cascade transformations
 	ZECamera* Camera = zeScene->GetActiveCamera();
 
@@ -246,7 +247,7 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 	float AspectRatio = Camera->GetAspectRatio();
 	ZEVector3 Position = Camera->GetWorldPosition();
 	ZEQuaternion Rotation = Camera->GetWorldRotation();
-		
+
 	ZEVector3 CameraUp = Camera->GetWorldUp();
 	ZEVector3 CameraRight = Camera->GetWorldRight();
 	ZEVector3 CameraFront = Camera->GetWorldFront();
@@ -285,14 +286,14 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 		// Calculate light view proj transform
 		ZEMatrix4x4 LightViewMatrix;
 		ZEMatrix4x4::CreateLookAtTransform(LightViewMatrix, -GetWorldFront(), ZEVector3::Zero, GetWorldUp());
-	
+
 		// No need to use accurate near and far z values since we will use a crop matrix
 		ZEMatrix4x4 LightProjMatrix;
 		float FarPlaneHeight = 2.0f * ZEAngle::Tan(FOV * 0.5f) * MaxShadowDepth;
 		ZEMatrix4x4::CreateOrthographicProjection(LightProjMatrix, FarPlaneHeight * AspectRatio, FarPlaneHeight, 0.01f, 50.0f);
 
 		ZEMatrix4x4 LightViewProjMatrix = LightProjMatrix * LightViewMatrix;
-	
+
 		// Transform world positions to light clip space
 		for (ZESize I = 0; I < 8; ++I)
 		{
@@ -340,7 +341,7 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 			ClipCorners[6] = ZEVector4(+1.0f, +1.0f, 1.0f, 1.0f),	// Far  Right Up
 			ClipCorners[7] = ZEVector4(+1.0f, -1.0f, 1.0f, 1.0f)	// Far  Right Down
 		};
-		
+
 		ZEMatrix4x4 LightInvViewProjCrop;
 		ZEMatrix4x4::Inverse(LightInvViewProjCrop, LightTransformations[CascadeN]);
 

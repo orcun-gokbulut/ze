@@ -46,13 +46,8 @@ class ZEUISceneStatisticsControl : public ZEUIControl
 
 		ZEUITextControl*		TotalEntityCount;
 		ZEUITextControl*		DrawableEntityCount;
-		ZEUITextControl*		VisibleEntityCount;
 		ZEUITextControl*		CulledEntityCount;
 		ZEUITextControl*		DrawedEntityCount;
-		ZEUITextControl*		TotalLightCount;
-		ZEUITextControl*		VisibleLightCount;
-		ZEUITextControl*		CulledLightCount;
-		ZEUITextControl*		DrawedLightCount;
 
 		ZEUITextControl*		FPSCount;
 		ZEUITextControl*		CameraPosition;
