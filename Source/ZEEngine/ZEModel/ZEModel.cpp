@@ -47,6 +47,7 @@
 #include <float.h>
 
 #include "ZEGame/ZEEntityProvider.h"
+#include "ZEMath/ZEViewVolume.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEModel);
 
@@ -112,7 +113,6 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 	{
 		DebugDrawComponents.Material = ZESimpleMaterial::CreateInstance();
 
-
 		DebugDrawComponents.BonePositionsRenderCommand.SetZero();
 		DebugDrawComponents.BonePositionsRenderCommand.Material = DebugDrawComponents.Material;
 		DebugDrawComponents.BonePositionsRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM;
@@ -120,7 +120,6 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 		DebugDrawComponents.BonePositionsRenderCommand.VertexBuffer = &DebugDrawComponents.BonePositionsCanvas;
 		DebugDrawComponents.BonePositionsRenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
 		DebugDrawComponents.BonePositionsRenderCommand.Priority = 4;
-
 
 		DebugDrawComponents.BonesRenderCommand.SetZero();
 		DebugDrawComponents.BonesRenderCommand.Material = DebugDrawComponents.Material;
@@ -132,7 +131,7 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 
 		DebugDrawComponents.BoxRenderCommand.SetZero();
 		DebugDrawComponents.BoxRenderCommand.Material = DebugDrawComponents.Material;
-		DebugDrawComponents.BoxRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_NO_Z_WRITE;
+		DebugDrawComponents.BoxRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM;
 		DebugDrawComponents.BoxRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 		DebugDrawComponents.BoxRenderCommand.VertexBuffer = &DebugDrawComponents.BoxCanvas;
 		DebugDrawComponents.BoxRenderCommand.PrimitiveType = ZE_ROPT_LINE;
@@ -143,7 +142,7 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 	DebugDrawComponents.BoxCanvas.Clean();
 	DebugDrawComponents.BonePositionsCanvas.SetColor(ZEVector4(1.0f, 0.0f, 0.0f, 0.0f));
 	DebugDrawComponents.BonesCanvas.SetColor(ZEVector4(0.0f, 1.0f, 1.0f, 0.0f));
-	DebugDrawComponents.BoxCanvas.SetColor(ZEVector4(1.0f, 1.0f, 1.0f, 0.0f));
+	DebugDrawComponents.BoxCanvas.SetColor(ZEVector4(0.25f, 1.0f, 0.25f, 1.0f));
 
 	if (DrawSkeleton)
 	{
@@ -172,6 +171,15 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 	DebugDrawComponents.BoxCanvas.SetRotation(ZEQuaternion::Identity);
 	DebugDrawComponents.BoxCanvas.SetTranslation(BoundingBox.GetCenter());
 	DebugDrawComponents.BoxCanvas.AddWireframeBox((BoundingBox.Max.x - BoundingBox.Min.x), (BoundingBox.Max.y - BoundingBox.Min.y), (BoundingBox.Max.z - BoundingBox.Min.z));
+
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
+	{
+		BoundingBox = Meshes[I].GetWorldBoundingBox();
+		DebugDrawComponents.BoxCanvas.SetRotation(ZEQuaternion::Identity);
+		DebugDrawComponents.BoxCanvas.SetTranslation(BoundingBox.GetCenter());
+		DebugDrawComponents.BoxCanvas.AddWireframeBox((BoundingBox.Max.x - BoundingBox.Min.x), (BoundingBox.Max.y - BoundingBox.Min.y), (BoundingBox.Max.z - BoundingBox.Min.z));
+	}
+
 	DebugDrawComponents.BoxRenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
 	DebugDrawComponents.BoxRenderCommand.PrimitiveCount = DebugDrawComponents.BoxCanvas.Vertices.GetCount() / 2;
 	DebugDrawComponents.BoxRenderCommand.Priority = 4;
@@ -493,10 +501,28 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 	if(!GetVisible())
 		return;
 
-	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-		Meshes[I].Draw(DrawParameters);
+	ZEUInt32 EntityDrawFlags = GetDrawFlags();
+
+		for (ZESize I = 0; I < Meshes.GetCount(); I++)
+		{
+			if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL)
+			{
+				if (DrawParameters->ViewVolume->CullTest(Meshes[I].GetWorldBoundingBox()))
+					continue;
+				else
+					Meshes[I].Draw(DrawParameters);
+			}
+			else
+			{
+				Meshes[I].Draw(DrawParameters);
+			}
+		}
+
+// 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
+// 		Meshes[I].Draw(DrawParameters);
 	
-	//DebugDraw(DrawParameters->Renderer);
+// 	if (DrawParameters->Renderer->GetRendererType() == ZE_RT_FRAME)
+// 		DebugDraw(DrawParameters->Renderer);
 }
 
 void ZEModel::Tick(float ElapsedTime)
