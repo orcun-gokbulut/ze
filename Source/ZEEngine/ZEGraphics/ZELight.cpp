@@ -129,7 +129,20 @@ void ZELight::SetRotation(const ZEQuaternion& NewRotation)
 
 void ZELight::Draw(ZEDrawParameters* DrawParameters)
 {
-	DrawParameters->Renderer->AddToLightList(this);
+	if (DrawParameters->Renderer->GetRendererType() == ZE_RT_FRAME)
+	{
+		if (GetLightType() != ZE_LT_DIRECTIONAL)
+			{
+				ZEBSphere LightBoundingSphere;
+				LightBoundingSphere.Position = GetWorldPosition();
+				LightBoundingSphere.Radius = GetRange();
+
+				if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
+					DrawParameters->Renderer->AddToLightList(this);
+			}	
+		else
+			DrawParameters->Renderer->AddToLightList(this);
+	}
 }
 
 ZELight::ZELight()

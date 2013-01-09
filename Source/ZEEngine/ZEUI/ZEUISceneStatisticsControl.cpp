@@ -43,13 +43,8 @@
 
 #define TotalEntityText	   ZEString("Total Entity Count    : ")
 #define DrawableEntityText ZEString("Drawable Entity Count : ")
-#define VisibleEntityText  ZEString("Visible Entity Count  : ")
 #define CulledEntityText   ZEString("Culled Entity Count   : ")
 #define DrawedEntityText   ZEString("Drawn Entity Count    : ")
-#define TotalLightText     ZEString("Total Light Count     : ")
-#define VisibleLightText   ZEString("Visible Light Count   : ")
-#define CulledLightText	   ZEString("Culled Light Count    : ")
-#define DrawedLightText    ZEString("Drawn Light Count     : ")
 #define FPSText				ZEString("Frame Per Second      : ")
 #define CamPosText			ZEString("Camera Position       : ")
 
@@ -102,26 +97,11 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 		Value.SetValue(Stats.DrawableEntityCount);
 		DrawableEntityCount->SetText(DrawableEntityText + Value);
 
-		Value.SetValue(Stats.VisibleEntityCount);
-		VisibleEntityCount->SetText(VisibleEntityText + Value);
-
 		Value.SetValue(Stats.CulledEntityCount);
 		CulledEntityCount->SetText(CulledEntityText + Value);
 
 		Value.SetValue(Stats.DrawedEntityCount);
 		DrawedEntityCount->SetText(DrawedEntityText + Value);
-
-		Value.SetValue(Stats.TotalLightCount);
-		TotalLightCount->SetText(TotalLightText + Value);
-
-		Value.SetValue(Stats.VisibleLightCount);
-		VisibleLightCount->SetText(VisibleLightText + Value);
-
-		Value.SetValue(Stats.CulledLightCount);
-		CulledLightCount->SetText(CulledLightText + Value);
-
-		Value.SetValue(Stats.DrawedLightCount);
-		DrawedLightCount->SetText(DrawedLightText + Value);
 
 		Value.SetValue(AverageFPS);
 		FPSCount->SetText(FPSText + Value);
@@ -155,14 +135,6 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	DrawableEntityCount->SetTextColor(ZEVector4::One);
 	AddChildControl(DrawableEntityCount);
 
-	VisibleEntityCount= new ZEUITextControl();
-	VisibleEntityCount->SetWidth(250.0f);
-	VisibleEntityCount->SetHeight(25.0f);
-	VisibleEntityCount->SetPosition(ZEVector2(0.0f, 50.0f));
-	VisibleEntityCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
-	VisibleEntityCount->SetTextColor(ZEVector4::One);
-	AddChildControl(VisibleEntityCount);
-
 	CulledEntityCount = new ZEUITextControl();
 	CulledEntityCount->SetWidth(250.0f);
 	CulledEntityCount->SetHeight(25.0f);
@@ -179,42 +151,10 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	DrawedEntityCount->SetTextColor(ZEVector4::One);
 	AddChildControl(DrawedEntityCount);
 
-	TotalLightCount = new ZEUITextControl();
-	TotalLightCount->SetWidth(250.0f);
-	TotalLightCount->SetHeight(25.0f);
-	TotalLightCount->SetPosition(ZEVector2(0.0f, 150.0f));
-	TotalLightCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
-	TotalLightCount->SetTextColor(ZEVector4::One);
-	AddChildControl(TotalLightCount);
-
-	VisibleLightCount = new ZEUITextControl();
-	VisibleLightCount->SetWidth(250.0f);
-	VisibleLightCount->SetHeight(25.0f);
-	VisibleLightCount->SetPosition(ZEVector2(0.0f, 175.0f));
-	VisibleLightCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
-	VisibleLightCount->SetTextColor(ZEVector4::One);
-	AddChildControl(VisibleLightCount);
-
-	CulledLightCount = new ZEUITextControl();
-	CulledLightCount->SetWidth(250.0f);
-	CulledLightCount->SetHeight(25.0f);
-	CulledLightCount->SetPosition(ZEVector2(0.0f, 200.0f));
-	CulledLightCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
-	CulledLightCount->SetTextColor(ZEVector4::One);
-	AddChildControl(CulledLightCount);
-	
-	DrawedLightCount = new ZEUITextControl();
-	DrawedLightCount->SetWidth(250.0f);
-	DrawedLightCount->SetHeight(25.0f);
-	DrawedLightCount->SetPosition(ZEVector2(0.0f, 225.0f));
-	DrawedLightCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
-	DrawedLightCount->SetTextColor(ZEVector4::One);
-	AddChildControl(DrawedLightCount);
-
 	FPSCount = new ZEUITextControl();
 	FPSCount->SetWidth(250.0f);
 	FPSCount->SetHeight(25.0f);
-	FPSCount->SetPosition(ZEVector2(0.0f, 250.0f));
+	FPSCount->SetPosition(ZEVector2(0.0f, 150.0f));
 	FPSCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	FPSCount->SetTextColor(ZEVector4::One);
 	AddChildControl(FPSCount);
@@ -222,7 +162,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	CameraPosition = new ZEUITextControl();
 	CameraPosition->SetWidth(600.0f); //450.0f
 	CameraPosition->SetHeight(25.0f);
-	CameraPosition->SetPosition(ZEVector2(0.0f, 275.0f));
+	CameraPosition->SetPosition(ZEVector2(0.0f, 175.0f));
 	CameraPosition->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	CameraPosition->SetTextColor(ZEVector4::One);
 	AddChildControl(CameraPosition);

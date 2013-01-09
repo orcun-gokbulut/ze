@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZESceneDebugDraw.h"
+#include "ZEGraphics/ZERenderer.h"
 
 
 class ZEScene;
@@ -51,14 +52,14 @@ struct ZECullStatistics
 {
 	ZESize			TotalEntityCount;
 	ZESize			DrawableEntityCount;
-	ZESize			VisibleEntityCount;
+/*	ZESize			VisibleEntityCount;*/
 	ZESize			CulledEntityCount;
 	ZESize			DrawedEntityCount;
 
-	ZESize			TotalLightCount;
-	ZESize			VisibleLightCount;
-	ZESize			CulledLightCount;
-	ZESize			DrawedLightCount;
+// 	ZESize			TotalLightCount;
+// 	ZESize			VisibleLightCount;
+// 	ZESize			CulledLightCount;
+// 	ZESize			DrawedLightCount;
 };
 
 #define ZE_VDE_NONE									0
@@ -69,11 +70,11 @@ struct ZECullStatistics
 
 class ZESceneCuller
 {
-	friend class ZEScene;
-
 	private:
 		ZECullStatistics				Statistics;
 		bool							FrameStatisticsEnabled;
+
+		ZERendererType					CurrentRendererType;
 
 		ZESceneDebugDraw				DebugDraw;
 		ZEUInt32						DebugDrawElements;
@@ -81,10 +82,7 @@ class ZESceneCuller
 		void							DebugDrawEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters);
 		void							DebugDrawLight(ZELight* Light, ZEDrawParameters* DrawParameters);
 
-		bool							CullLight(ZELight* Light, ZEDrawParameters* DrawParameters);
-		void							CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters);
-
-		bool							CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters);
+		void							CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters);
 		void							CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameters);
 
 	public:
