@@ -127,7 +127,7 @@ bool ZEInteriorResource::ReadInteriorFromFile(ZEFile* ResourceFile)
 
 	ZEMLSerialListItem InteriorList[] = {
 		ZEML_LIST_NODE("Rooms",					RoomsPointer,										true),
-		ZEML_LIST_NODE("Doors",					DoorsPointer,										true),
+		ZEML_LIST_NODE("Doors",					DoorsPointer,										false),
 		ZEML_LIST_NODE("Materials",				MaterialsPointer,									true),
 		ZEML_LIST_PROPERTY("DoorCount",			DoorCount,			ZE_VRT_UNSIGNED_INTEGER_32,		true),
 		ZEML_LIST_PROPERTY("RoomCount",			RoomCount,			ZE_VRT_UNSIGNED_INTEGER_32,		true),
