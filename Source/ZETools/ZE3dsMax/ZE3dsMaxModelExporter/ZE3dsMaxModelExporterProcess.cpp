@@ -892,7 +892,13 @@ bool ZE3dsMaxModelExporter::ProcessBones()
 
 	if (ProcessedBones.Count() == 0)
 	{
-		zeWarning("No bones with ZEBoneAttribute found. Bone processing aborted.");
+		bool IsBoneExportEnabled = ((ZEMLProperty*)(ExportOptions->GetProperty("IsBoneExportEnabled")))->GetValue().GetBoolean();
+
+		if (IsBoneExportEnabled)
+			zeWarning("No bones with ZEBoneAttribute found. Bone processing aborted.");
+		else
+			zeLog("Since bone export is not enabled. Bone export process is skipped.");
+
 		return true;
 	}
 
@@ -1288,7 +1294,13 @@ bool ZE3dsMaxModelExporter::ProcessMeshes()
 
 	if (MasterMeshes.GetCount() == 0)
 	{
-		zeWarning("No meshes with ZEMeshAttribute found. Mesh processing aborted.");
+		bool IsMeshExportEnabled = ((ZEMLProperty*)(ExportOptions->GetProperty("IsMeshExportEnabled")))->GetValue().GetBoolean();
+
+		if (IsMeshExportEnabled)
+			zeWarning("No meshes with ZEMeshAttribute found. Mesh processing aborted.");
+		else
+			zeLog("Since mesh export is not enabled. Mesh export process is skipped.");
+
 		return true;
 	}
 
