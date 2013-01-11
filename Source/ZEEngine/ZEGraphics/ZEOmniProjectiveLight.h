@@ -77,7 +77,7 @@ class ZEOmniProjectiveLight : public ZELight
 		ZETexture2D*					GetFrontShadowMap();
 		ZETexture2D*					GetBackShadowMap();
 
-		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
 
 		static ZEOmniProjectiveLight*	CreateInstance();
 };

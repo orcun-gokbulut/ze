@@ -45,7 +45,7 @@ class ZETexture2D;
 
 ZE_META_OBJECT_DESCRIPTION(ZEDirectionalLight);
 
-#define MAX_CASCADE_COUNT			4
+#define MAX_CASCADE_COUNT			7
 
 class ZEDirectionalLight : public ZELight
 {
@@ -53,12 +53,10 @@ class ZEDirectionalLight : public ZELight
 	private:
 		float						SplitBias;
 		ZESize						CascadeCount;
-		float						MaxShadowDepth;
-
-		ZETexture2D*				ShadowMaps[MAX_CASCADE_COUNT];
 		ZEViewCuboid				ViewVolumes[MAX_CASCADE_COUNT];
+		ZETexture2D*				ShadowMaps[MAX_CASCADE_COUNT];
+		ZEMatrix4x4					ShadowTransforms[MAX_CASCADE_COUNT];
 		float						SplitDistances[MAX_CASCADE_COUNT + 1];
-		ZEMatrix4x4					LightTransformations[MAX_CASCADE_COUNT];
 
 		void						CreateRenderTargets();
 		void						DestroyRenderTargets();
@@ -68,9 +66,6 @@ class ZEDirectionalLight : public ZELight
 
 	public:
 		ZELightType					GetLightType();
-		
-		void						SetMaxShadowDepth(float Value);
-		float						GetMaxShadowDepth() const;
 
 		void						SetSplitBias(float Bias);
 		float						GetSplitBias() const;
@@ -88,8 +83,6 @@ class ZEDirectionalLight : public ZELight
 		
 		bool						Initialize();
 		void						Deinitialize();
-
-		void						RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
 
 		void						Draw(ZEDrawParameters* DrawParameters);
 		static ZEDirectionalLight*	CreateInstance();

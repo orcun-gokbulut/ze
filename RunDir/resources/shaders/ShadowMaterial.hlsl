@@ -133,9 +133,9 @@ PixelShaderOutput OmniProjectiveLightShadowPS(PixelShaderInput Input)
 VertexShaderOutput DirectionalLightShadowVS(VertexShaderInput Input)
 {
 	VertexShaderOutput Output;
-	
+
 	if (EnableSkin)
-  		ShadowSkinTransform(Input);
+			ShadowSkinTransform(Input);
 	
 	Output.Position = mul(LightWorldViewProj, Input.Position);
 	
@@ -144,8 +144,8 @@ VertexShaderOutput DirectionalLightShadowVS(VertexShaderInput Input)
 	return Output;
 }
 
-static const float DepthBias = 0.002f;
-static const float SlopeScaledDepthBias = 0.2f;
+static const float DepthBias = 0.001f;
+static const float SlopeScaledDepthBias = 0.5f;
 
 PixelShaderOutput DirectionalLightShadowPS(PixelShaderInput Input)
 {
@@ -156,7 +156,7 @@ PixelShaderOutput DirectionalLightShadowPS(PixelShaderInput Input)
 	float SlopeFactor = max(DDX, DDY);
 	
 	float FinalBias = SlopeFactor * SlopeScaledDepthBias + DepthBias;
-	Output.Depth = (Input.Depth.z + FinalBias).xxxx;
+	Output.Depth = (Input.Depth.z /*+ FinalBias*/).xxxx;
 	
 	return Output;
 }

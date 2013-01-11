@@ -87,7 +87,8 @@ class ZEProjectiveLight : public ZELight
 		virtual void					Deinitialize();
 
 		ZETexture2D*					GetShadowMap();
-		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
+
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
 
 		static ZEProjectiveLight*		CreateInstance();
 };

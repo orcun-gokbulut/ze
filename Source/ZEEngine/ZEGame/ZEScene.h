@@ -77,6 +77,8 @@ class ZEScene
 
 		ZEPhysicalWorld*						PhysicalWorld;
 
+		ZEDrawParameters						FrameDrawParameters;
+
 		ZEFrameRenderer*						Renderer;
 		ZEShadowRenderer*						ShadowRenderer;
 		ZEPostProcessor*						PostProcessor;
@@ -108,7 +110,7 @@ class ZEScene
 		void									SetActiveListener(ZEListener* Listener);
 		ZEListener*								GetActiveListener();
 
-		const ZECullStatistics&					GetCullerStatistics();
+		ZESceneCuller&							GetSceneCuller();
 
 		bool									Save(const ZEString& FileName);
 		bool									Load(const ZEString& FileName);

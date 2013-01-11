@@ -325,46 +325,34 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 	
 	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 4);
 
-
-
-	// Transformation matrix for camera view space position to world space position
+	// Matrix to transform camera view space to world space.
 	ZEMatrix4x4 CameraInverseView;
 	ZEMatrix4x4::Inverse(CameraInverseView, Camera->GetViewTransform());
 	
 	float ShadowMapDimension = (float)((ZEShadowRenderer*)zeScene->GetShadowRenderer())->GetShadowResolution();
-	float TexOffsX = 0.5f + (0.5f / ShadowMapDimension);
-	float TexOffsY = 0.5f + (0.5f / ShadowMapDimension);
+	float TexOffset = 0.5f + (0.5f / ShadowMapDimension);
 
-	ZEMatrix4x4 LightTexture(	0.5f,  0.0f, 0.0f, TexOffsX,
-								0.0f, -0.5f, 0.0f, TexOffsY,
+	ZEMatrix4x4 LightTexture(	0.5f,  0.0f, 0.0f, TexOffset,
+								0.0f, -0.5f, 0.0f, TexOffset,
 								0.0f,  0.0f, 1.0f, 0.0f,
 								0.0f,  0.0f, 0.0f, 1.0f		);
 
-
-	// Transformation matrix from world space to light texture space
-	ZEMatrix4x4 LightMatrices[4];
-	LightMatrices[0] =  LightTexture * Light->GetViewTransform(0) * CameraInverseView;
-	LightMatrices[1] =  LightTexture * Light->GetViewTransform(1) * CameraInverseView;
-	LightMatrices[2] =  LightTexture * Light->GetViewTransform(2) * CameraInverseView;
-	LightMatrices[3] =  LightTexture * Light->GetViewTransform(3) * CameraInverseView;
 	
-	GetDevice()->SetPixelShaderConstantF(90, (float*)&LightMatrices[0], 4 * 4);
-
-	// Set shadow maps
-	GetDevice()->SetSamplerState(6, D3DSAMP_BORDERCOLOR, 0xFFFFFFFF);
-	ZED3D9CommonTools::SetTexture(6, Light->GetShadowMap(0), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
-	GetDevice()->SetSamplerState(7, D3DSAMP_BORDERCOLOR, 0xFFFFFFFF);
-	ZED3D9CommonTools::SetTexture(7, Light->GetShadowMap(1), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
-	GetDevice()->SetSamplerState(8, D3DSAMP_BORDERCOLOR, 0xFFFFFFFF);
-	ZED3D9CommonTools::SetTexture(8, Light->GetShadowMap(2), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
-	GetDevice()->SetSamplerState(9, D3DSAMP_BORDERCOLOR, 0xFFFFFFFF);
-	ZED3D9CommonTools::SetTexture(9, Light->GetShadowMap(3), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
-
-	ZEVector4 SplitDistances[4];
-	for (ZESize I = 0; I < 4; ++I)
+	ZEVector4 SplitDistances[MAX_CASCADE_COUNT];
+	ZEMatrix4x4 LightMatrices[MAX_CASCADE_COUNT];
+	for (ZESize I = 0; I < Light->GetCascadeCount(); ++I)
+	{
+		// Transformations and split distances
 		SplitDistances[I].x = Light->GetSplitDistance(I+1);
+		LightMatrices[I] = LightTexture * Light->GetViewTransform(I) * CameraInverseView;
+		
+		// Set shadow maps
+		GetDevice()->SetSamplerState(6 + I, D3DSAMP_BORDERCOLOR, 0xFFFFFFFF);
+		ZED3D9CommonTools::SetTexture(6 + I, Light->GetShadowMap(I), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
+	}
 
-	GetDevice()->SetPixelShaderConstantF(106, (float*)&SplitDistances[0], 4);
+	GetDevice()->SetPixelShaderConstantF(90, (float*)LightMatrices, MAX_CASCADE_COUNT * 4);
+	GetDevice()->SetPixelShaderConstantF(118, (float*)SplitDistances, MAX_CASCADE_COUNT * 1);
 	
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 2); // Quad
 
@@ -641,8 +629,8 @@ void ZED3D9FrameRenderer::DoLightningPass()
 	{
 		zeCriticalError("Clear failed");
 	}
-	
-	if (Lights.GetCount() == 0)
+
+	if (DrawParameters->Lights.GetCount() == 0)
 		return;
 
 	// Z-Buffer
@@ -684,20 +672,20 @@ void ZED3D9FrameRenderer::DoLightningPass()
 	ZECanvasVertex::GetVertexDeclaration()->SetupVertexDeclaration();
 
 	// Draw lights
-	for (ZESize I = 0; I < Lights.GetCount(); I++)
-		switch(Lights[I]->GetLightType())
+	for (ZESize I = 0; I < DrawParameters->Lights.GetCount(); I++)
+		switch(DrawParameters->Lights[I]->GetLightType())
 		{
 			case ZE_LT_POINT:
-				DrawPointLight((ZEPointLight*)Lights[I]);
+				DrawPointLight((ZEPointLight*)DrawParameters->Lights[I]);
 				break;
 			case ZE_LT_DIRECTIONAL:
-				DrawDirectionalLight((ZEDirectionalLight*)Lights[I]);
+				DrawDirectionalLight((ZEDirectionalLight*)DrawParameters->Lights[I]);
 				break;
 			case ZE_LT_PROJECTIVE:
-				DrawProjectiveLight((ZEProjectiveLight*)Lights[I]);
+				DrawProjectiveLight((ZEProjectiveLight*)DrawParameters->Lights[I]);
 				break;
 			case ZE_LT_OMNIPROJECTIVE:
-				DrawOmniProjectiveLight((ZEOmniProjectiveLight*)Lights[I]);
+				DrawOmniProjectiveLight((ZEOmniProjectiveLight*)DrawParameters->Lights[I]);
 				break;
 		}
 
@@ -709,10 +697,9 @@ void ZED3D9FrameRenderer::DoLightningPass()
 void ZED3D9FrameRenderer::DoForwardPass()
 {
 	zeProfilerStart("Forward Pass");
-
+	 
 	D3DPERF_BeginEvent(0, L"ABuffer Pass");
 
-	// GBuffers
 	//ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
 	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
 	ZED3D9CommonTools::SetRenderTarget(0, (ZED3D9ViewPort*)ABuffer->GetViewPort());
@@ -728,10 +715,9 @@ void ZED3D9FrameRenderer::DoForwardPass()
 		zeCriticalError("Clear failed");
 	}
 
-
-	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	
 	for (ZESize I = 0; I < CommandList.GetCount(); I++)
@@ -919,6 +905,7 @@ ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 {
 	Camera = NULL;
 	TMInputBuffer = NULL;
+	DrawParameters = NULL;
 	ABuffer = NULL;
 	GBuffer1 = NULL;
 	GBuffer2 = NULL;
@@ -958,6 +945,16 @@ ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 ZED3D9FrameRenderer::~ZED3D9FrameRenderer()
 {
 	Deinitialize();
+}
+
+void ZED3D9FrameRenderer::SetDrawParameters(ZEDrawParameters* DrawParameters)
+{
+	this->DrawParameters = DrawParameters;
+}
+
+ZEDrawParameters* ZED3D9FrameRenderer::GetDrawParameters()
+{
+	return DrawParameters;
 }
 
 void ZED3D9FrameRenderer::SetViewPort(ZEViewPort* ViewPort)
@@ -1103,11 +1100,6 @@ void ZED3D9FrameRenderer::AddToLightList(ZELight* Light)
 	Lights.Add(Light);
 }
 
-const ZESmartArray<ZELight*>& ZED3D9FrameRenderer::GetLightList() const
-{
-	return Lights;
-}
-
 void ZED3D9FrameRenderer::ClearLightList()
 {
 	Lights.Clear();
@@ -1163,6 +1155,9 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		return;
 
 	if (GetCamera() == NULL)
+		return;
+
+	if (DrawParameters == NULL)
 		return;
 
 	CommandList.Sort(RenderCommandCompare);

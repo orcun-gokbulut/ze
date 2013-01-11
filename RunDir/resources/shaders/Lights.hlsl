@@ -68,10 +68,12 @@ samplerCUBE OmniProjectionShadowMap : register(ps, s5);
 
 // Directional Light parameters
 // ------------------------------------------------------
-float4x4 LightMatrices[4]			: register(ps, c90);
-float	 SplitDistances[4]			: register(ps, c106);
+#define ZE_MAX_CASCADE_COUNT		7
 
-sampler2D DirectionalShadowMap[4]	: register(ps, s6);
+float4x4 LightMatrices[ZE_MAX_CASCADE_COUNT]			: register(ps, c90);
+float	 SplitDistances[ZE_MAX_CASCADE_COUNT]			: register(ps, c118);
+
+sampler2D DirectionalShadowMap[ZE_MAX_CASCADE_COUNT]	: register(ps, s6);
 // ------------------------------------------------------
 
 
@@ -176,8 +178,15 @@ struct ZEDirectionalLight_PSInput
 	float4 ScreenPosition 	: VPOS;
 };
 
-float Sample9TapPCF(float2 ShadowSampleCoord, float PixelDepth, int CascadeN)
+float Sample9TapPCF(float4 TextureSpacePosition, int CascadeN)
 {
+	TextureSpacePosition /= TextureSpacePosition.w;
+	
+	float PixelDepth = TextureSpacePosition.z;
+	float SampleDepth = tex2D(DirectionalShadowMap[CascadeN], TextureSpacePosition.xy).x;
+	
+	return PixelDepth > SampleDepth ? 0.0f : 1.0f;
+	/*
 	float SomeAverage = 0.0f;
 	for (float y = -1.0f; y <= 1.0f; y += 1.0f)
 	{
@@ -189,6 +198,7 @@ float Sample9TapPCF(float2 ShadowSampleCoord, float PixelDepth, int CascadeN)
 		}
 	}
 	return SomeAverage / 9.0f;
+	*/
 }
 
 ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input) : COLOR0
@@ -200,21 +210,19 @@ ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input) : COL
 	float3 Normal = ZEGBuffer_GetViewNormal(ScreenPosition);
 	float3 SpecularPower = ZEGBuffer_GetSpecularPower(ScreenPosition);
 	
-	float ShadowFactor = 1.0f;
-	[unroll]
-	for (int i = 0; i < 4; i++)
+	float ShadowFactor = 1.0f;	
+	for (int I = 0; I < ZE_MAX_CASCADE_COUNT; I++)
 	{
-		float Dist = SplitDistances[i];
-		if (Position.z < Dist)
+		if (Position.z < SplitDistances[I])
 		{
-			float4 ShadowSampleCoord = mul(LightMatrices[i], float4(Position, 1.0f));
-			ShadowSampleCoord /= ShadowSampleCoord.w;
- 			float PixelDepth = ShadowSampleCoord.z;
-
-			ShadowFactor = Sample9TapPCF(ShadowSampleCoord.xy, PixelDepth, i);			
+			float4 TexSpacePos = mul(LightMatrices[I], float4(Position, 1.0f));
+			ShadowFactor = Sample9TapPCF(TexSpacePos, I);
 			break;
 		}
 	}
+	
+	if (ShadowFactor < 0.001f)
+		discard;
 	
 	// Light Derived Parameters
 	float4 Output = (float4)0.0f;

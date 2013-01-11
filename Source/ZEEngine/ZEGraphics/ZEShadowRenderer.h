@@ -42,11 +42,13 @@
 
 class ZETexture2D;
 class ZETextureCube;
+struct ZEDrawParameters;
 enum ZETextureCubeFace;
 
 class ZEShadowRenderer : public ZERenderer
 {
 	public:
+
 		virtual void				SetShadowResolution(ZEUInt Resolution) = 0;
 		virtual ZEUInt				GetShadowResolution() const = 0;
 
@@ -59,6 +61,9 @@ class ZEShadowRenderer : public ZERenderer
 		virtual bool				GetFace() = 0;
 
 		static ZEShadowRenderer*	CreateInstance();
+
+									ZEShadowRenderer();
+		virtual						~ZEShadowRenderer();
 };
 
 #endif

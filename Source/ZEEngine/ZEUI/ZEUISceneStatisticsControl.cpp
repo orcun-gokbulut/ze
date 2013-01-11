@@ -84,8 +84,8 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 	}
 
 	ZEScene* TempScene = zeScene;
-	ZECullStatistics Stats = TempScene->GetCullerStatistics();
-
+	ZESceneStatistics Stats = TempScene->GetRenderer()->GetDrawParameters()->Statistics;
+	
 	if (TempScene->GetActiveCamera() != NULL)
 	{
 		ZEVector3 CamPos = TempScene->GetActiveCamera()->GetWorldPosition();

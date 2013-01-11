@@ -113,28 +113,6 @@ ZETexture2D* ZEProjectiveLight::GetShadowMap()
 	return ShadowMap;
 }
 
-void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
-{
-	/*
-	if (!GetCastsShadow())
-		return;
-
-	if (ShadowMap == NULL)
-	{
-		ShadowMap = ZETexture2D::CreateInstance();
-		ShadowMap->Create(512, 512, ZE_TPF_SHADOW_MAP, true);
-	}
-
-	ShadowRenderer->SetLight(this);
-	ShadowRenderer->SetViewPort(ShadowMap->GetViewPort());
-
-	ShadowRenderer->ClearList();
-
-	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
-	ShadowRenderer->Render();
-	*/
-}
-
 ZESize ZEProjectiveLight::GetViewCount()
 {
 	return 1;
@@ -213,6 +191,19 @@ void ZEProjectiveLight::Deinitialize()
 		ShadowMap->Destroy();
 		ShadowMap = NULL;
 	}
+}
+
+void ZEProjectiveLight::Draw(ZEDrawParameters* DrawParameters)
+{
+	if (DrawParameters->Pass != ZE_RP_COLOR)
+		return;
+
+	ZEBSphere LightBoundingSphere;
+	LightBoundingSphere.Position = GetWorldPosition();
+	LightBoundingSphere.Radius = GetRange();
+
+	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
+		ZELight::Draw(DrawParameters);
 }
 
 ZEProjectiveLight::ZEProjectiveLight()

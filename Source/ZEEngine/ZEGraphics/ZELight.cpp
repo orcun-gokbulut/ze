@@ -94,7 +94,7 @@ const ZEVector3& ZELight::GetAttenuation() const
 
 ZEDrawFlags ZELight::GetDrawFlags() const
 {
-	return ZE_DF_LIGHT_SOURCE;
+	return ZE_DF_DRAW | ZE_DF_LIGHT_SOURCE;
 }
 
 void ZELight::SetCastsShadow(bool NewValue)
@@ -129,20 +129,8 @@ void ZELight::SetRotation(const ZEQuaternion& NewRotation)
 
 void ZELight::Draw(ZEDrawParameters* DrawParameters)
 {
-	if (DrawParameters->Renderer->GetRendererType() == ZE_RT_FRAME)
-	{
-		if (GetLightType() != ZE_LT_DIRECTIONAL)
-			{
-				ZEBSphere LightBoundingSphere;
-				LightBoundingSphere.Position = GetWorldPosition();
-				LightBoundingSphere.Radius = GetRange();
-
-				if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
-					DrawParameters->Renderer->AddToLightList(this);
-			}	
-		else
-			DrawParameters->Renderer->AddToLightList(this);
-	}
+	DrawParameters->Lights.Add(this);
+	DrawParameters->Statistics.DrawedLightCount++;
 }
 
 ZELight::ZELight()

@@ -56,6 +56,7 @@ struct ZEViewPoint
 class ZEPostProcessor;
 class ZECamera;
 class ZERenderCommand;
+struct ZEDrawParameters;
 class ZETexture2D;
 class ZEViewPort;
 class ZELight;
@@ -73,6 +74,10 @@ class ZERenderer
 		virtual									~ZERenderer();
 
 	public:
+
+		virtual void							SetDrawParameters(ZEDrawParameters* DrawParameters) = 0;
+		virtual ZEDrawParameters*				GetDrawParameters() = 0;
+
 		virtual ZERendererType					GetRendererType() = 0;
 
 		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors() = 0;
