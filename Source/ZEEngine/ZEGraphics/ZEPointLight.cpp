@@ -91,40 +91,6 @@ void ZEPointLight::Deinitialize()
 	}
 }
 
-void ZEPointLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
-{
-	if (!CastsShadows)
-		return;
-
-	if (FrontShadowMap == NULL)
-	{
-		FrontShadowMap = ZETexture2D::CreateInstance();
-		FrontShadowMap->Create(512, 512, 1, ZE_TPF_F32, true);
-	}
-
-	if (BackShadowMap == NULL)
-	{
-		BackShadowMap = ZETexture2D::CreateInstance();
-		BackShadowMap->Create(512, 512, 1, ZE_TPF_F32, true);
-	}
-
-	/*
-	ShadowRenderer->SetLight(this);
-
-	ShadowRenderer->SetFace(true);
-	ShadowRenderer->SetViewPort(FrontShadowMap->GetViewPort());
-	ShadowRenderer->ClearList();
-	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
-	ShadowRenderer->Render();
-
-	ShadowRenderer->SetFace(false);
-	ShadowRenderer->SetViewPort(BackShadowMap->GetViewPort());
-	ShadowRenderer->ClearLists();
-	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
-	ShadowRenderer->Render();
-	*/
-}
-
 ZESize ZEPointLight::GetViewCount()
 {
 	return 1;
@@ -151,6 +117,20 @@ const ZEMatrix4x4& ZEPointLight::GetViewTransform(ZESize Index)
 	}
 	
 	return ViewProjectionMatrix;
+}
+
+void ZEPointLight::Draw(ZEDrawParameters* DrawParameters)
+{
+	if (DrawParameters->Pass != ZE_RP_COLOR)
+		return;
+
+	ZEBSphere LightBoundingSphere;
+	LightBoundingSphere.Position = GetWorldPosition();
+	LightBoundingSphere.Radius = GetRange();
+
+	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
+		ZELight::Draw(DrawParameters);
+
 }
 
 ZEPointLight::ZEPointLight()

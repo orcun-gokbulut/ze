@@ -79,6 +79,19 @@ struct ZEView
 	ZEMatrix4x4				ViewProjectionTransform;
 };
 
+struct ZESceneStatistics
+{
+	ZEUInt16			TotalEntityCount;
+	ZEUInt16			DrawableEntityCount;
+	ZEUInt16			CulledEntityCount;
+	ZEUInt16			DrawedEntityCount;
+
+	ZEUInt16			TotalLightCount;
+	ZEUInt16			VisibleLightCount;
+	ZEUInt16			CulledLightCount;
+	ZEUInt16			DrawedLightCount;
+};
+
 class ZEViewPort;
 
 struct ZEDrawParameters
@@ -88,12 +101,14 @@ struct ZEDrawParameters
 	float					Time;
 	ZERenderer*				Renderer;
 	ZERenderPass			Pass;
+	ZESceneStatistics		Statistics;
 
 	const ZEView*			View;
 	const ZEViewPort*		ViewPort;
 	const ZEViewVolume*		ViewVolume;
 
 	ZESmartArray<ZELight*>	Lights;
+	void*					CustomData;
 };
 
 #endif

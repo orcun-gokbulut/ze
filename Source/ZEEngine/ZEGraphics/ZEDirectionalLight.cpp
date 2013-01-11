@@ -103,16 +103,6 @@ ZELightType ZEDirectionalLight::GetLightType()
 	return ZE_LT_DIRECTIONAL;
 }
 
-void ZEDirectionalLight::SetMaxShadowDepth(float Value)
-{
-	MaxShadowDepth = Value;
-}
-
-float ZEDirectionalLight::GetMaxShadowDepth() const
-{
-	return MaxShadowDepth;
-}
-
 void ZEDirectionalLight::SetSplitBias(float Bias)
 {
 	zeDebugCheck(Bias > 1.0f || Bias < 0.0f, "Bias out of 0 - 1 range.");
@@ -152,17 +142,18 @@ ZESize ZEDirectionalLight::GetViewCount()
 	return CascadeCount;
 }
 
-// Creates a world space view volume that represents a single cascade of camera frustum
+// Returns world space view volume(for culling purposes) of directional light which contains the cascade represented by Index
 const ZEViewVolume& ZEDirectionalLight::GetViewVolume(ZESize Index)
 {
 	zeDebugCheck(Index >= MAX_CASCADE_COUNT, "Index out of range");
 	return ViewVolumes[Index];
 }
 
+// Returns the transformation matrix(crop * proj * view) of light's cascade represented by Index
 const ZEMatrix4x4& ZEDirectionalLight::GetViewTransform(ZESize Index)
 {
 	zeDebugCheck(Index >= MAX_CASCADE_COUNT, "Index out of range");
-	return LightTransformations[Index];
+	return ShadowTransforms[Index];
 }
 
 bool ZEDirectionalLight::Initialize()
@@ -183,28 +174,10 @@ void ZEDirectionalLight::Deinitialize()
 	DestroyRenderTargets();
 }
 
-void ZEDirectionalLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
-{
-	if (!GetCastsShadow())
-	{
-		DestroyRenderTargets();
-		return;
-	}
-
-	CreateRenderTargets();
-	
-	ShadowRenderer->SetFace(true);
-	ShadowRenderer->SetLight(this);
-	ShadowRenderer->SetViewPort(NULL); // Not used, shadow maps are queried by shadow renderer automatically
-
-	ShadowRenderer->Render();
-}
-
 ZEDirectionalLight::ZEDirectionalLight()
 {
-	SplitBias = 0.7f;
+	SplitBias = 0.95f;
 	CascadeCount = 4;
-	MaxShadowDepth = 400.0f;
 
 	memset(ShadowMaps, NULL, sizeof(ZETexture2D*) * MAX_CASCADE_COUNT);
 }
@@ -221,14 +194,23 @@ ZEDirectionalLight* ZEDirectionalLight::CreateInstance()
 
 void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 {
+	if (DrawParameters->Pass != ZE_RP_COLOR)
+		return;
+
+	ZELight::Draw(DrawParameters);
+
+	if (!CastsShadows)
+		return;
+
+	CreateRenderTargets();
 
 	// Update cascade transformations
-	ZECamera* Camera = zeScene->GetActiveCamera();
+	ZECamera* Camera = DrawParameters->View->Camera;
 
 	// Fetch constants
-	float FarZ = MaxShadowDepth;
 	float NearZ = Camera->GetNearZ();
-
+	float FarZ = Camera->GetShadowDistance();
+	
 	// Calculate split distances
 	for (ZESize SplitN = 0; SplitN <= CascadeCount; ++SplitN)
 	{
@@ -241,6 +223,8 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 		// Keep distances
 		SplitDistances[SplitN] = SplitDistance;
 	}
+	SplitDistances[0] = NearZ;
+	SplitDistances[CascadeCount] = FarZ;
 
 	// Fetch constants
 	float FOV = Camera->GetFOV();
@@ -284,13 +268,14 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 		FrustumCorners[7] = ZEVector4(FarPlaneCenter + FarHalfRightVector - FarHalfUpVector, 1.0f);		// Far  CameraRight Down
 
 		// Calculate light view proj transform
+		// Look at transform should contain light's frustum depth info
 		ZEMatrix4x4 LightViewMatrix;
-		ZEMatrix4x4::CreateLookAtTransform(LightViewMatrix, -GetWorldFront(), ZEVector3::Zero, GetWorldUp());
+		ZEMatrix4x4::CreateLookAtTransform(LightViewMatrix, -GetWorldFront() * Range, ZEVector3::Zero, GetWorldUp());
 
-		// No need to use accurate near and far z values since we will use a crop matrix
+		// No need to use accurate near and far z values, crop matrix will make those values meaningless
 		ZEMatrix4x4 LightProjMatrix;
-		float FarPlaneHeight = 2.0f * ZEAngle::Tan(FOV * 0.5f) * MaxShadowDepth;
-		ZEMatrix4x4::CreateOrthographicProjection(LightProjMatrix, FarPlaneHeight * AspectRatio, FarPlaneHeight, 0.01f, 50.0f);
+		float FarPlaneHeight = 2.0f * ZEAngle::Tan(FOV * 0.5f) * FarZ;
+		ZEMatrix4x4::CreateOrthographicProjection(LightProjMatrix, FarPlaneHeight * AspectRatio, FarPlaneHeight, 1.0f, 10.0f);
 
 		ZEMatrix4x4 LightViewProjMatrix = LightProjMatrix * LightViewMatrix;
 
@@ -309,10 +294,14 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 			if (TransformedFrustumCorners[I].x < Min.x)	Min.x = TransformedFrustumCorners[I].x;
 			if (TransformedFrustumCorners[I].y < Min.y) Min.y = TransformedFrustumCorners[I].y;
 			if (TransformedFrustumCorners[I].z < Min.z) Min.z = TransformedFrustumCorners[I].z;
+			
 			if (TransformedFrustumCorners[I].x > Max.x) Max.x = TransformedFrustumCorners[I].x;
 			if (TransformedFrustumCorners[I].y > Max.y) Max.y = TransformedFrustumCorners[I].y;
 			if (TransformedFrustumCorners[I].z > Max.z) Max.z = TransformedFrustumCorners[I].z;
 		}
+
+		// Pull z back, to avoid casters between light and light's near z
+		Min.z = 0.0f;
 
 		// Create crop matrix
 		float ScaleX = 2.0f / (Max.x - Min.x);
@@ -320,7 +309,7 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 		float ScaleZ = 1.0f / (Max.z - Min.z);
 		float OffsetX = -0.5f * (Max.x + Min.x) * ScaleX;
 		float OffsetY = -0.5f * (Max.y + Min.y) * ScaleY;
-		float OffsetZ = -1.0f * Min.z * ScaleZ;
+		float OffsetZ = -Min.z * ScaleZ;
 
 		ZEMatrix4x4 CropMatrix(	ScaleX, 0.0f,	0.0f,	OffsetX,
 								0.0f,	ScaleY,	0.0f,	OffsetY,
@@ -328,22 +317,22 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 								0.0f,	0.0f,	0.0f,	1.0f);
 
 		// Final transformation matrix which is crop * proj * view
-		LightTransformations[CascadeN] = CropMatrix * LightViewProjMatrix;
+		ShadowTransforms[CascadeN] = CropMatrix * LightViewProjMatrix;
 
 		// Clip Space Corners
-		static ZEVector4 ClipCorners[8] = {
-			ClipCorners[0] = ZEVector4(-1.0f, -1.0f, 0.0f, 1.0f),	// Near Left Down
-			ClipCorners[1] = ZEVector4(-1.0f, +1.0f, 0.0f, 1.0f),	// Near Left Up
-			ClipCorners[2] = ZEVector4(+1.0f, +1.0f, 0.0f, 1.0f),	// Near Right Up
-			ClipCorners[3] = ZEVector4(+1.0f, -1.0f, 0.0f, 1.0f),	// Near Right Down
-			ClipCorners[4] = ZEVector4(-1.0f, -1.0f, 1.0f, 1.0f),	// Far  Left Down
-			ClipCorners[5] = ZEVector4(-1.0f, +1.0f, 1.0f, 1.0f),	// Far  Left Up
-			ClipCorners[6] = ZEVector4(+1.0f, +1.0f, 1.0f, 1.0f),	// Far  Right Up
-			ClipCorners[7] = ZEVector4(+1.0f, -1.0f, 1.0f, 1.0f)	// Far  Right Down
+		static const ZEVector4 ClipCorners[8] = {
+			ZEVector4(-1.0f, -1.0f, 0.0f, 1.0f),	// Near Left Down
+			ZEVector4(-1.0f, +1.0f, 0.0f, 1.0f),	// Near Left Up
+			ZEVector4(+1.0f, +1.0f, 0.0f, 1.0f),	// Near Right Up
+			ZEVector4(+1.0f, -1.0f, 0.0f, 1.0f),	// Near Right Down
+			ZEVector4(-1.0f, -1.0f, 1.0f, 1.0f),	// Far  Left Down
+			ZEVector4(-1.0f, +1.0f, 1.0f, 1.0f),	// Far  Left Up
+			ZEVector4(+1.0f, +1.0f, 1.0f, 1.0f),	// Far  Right Up
+			ZEVector4(+1.0f, -1.0f, 1.0f, 1.0f)		// Far  Right Down
 		};
 
 		ZEMatrix4x4 LightInvViewProjCrop;
-		ZEMatrix4x4::Inverse(LightInvViewProjCrop, LightTransformations[CascadeN]);
+		ZEMatrix4x4::Inverse(LightInvViewProjCrop, ShadowTransforms[CascadeN]);
 
 		// World Space Corners
 		ZEVector4 WorldCorners[8];
@@ -367,5 +356,28 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 		ViewVolumes[CascadeN].Create(OBBox);
 	}
 
-	ZELight::Draw(DrawParameters);
+	ZEShadowRenderer* ShadowRenderer = (ZEShadowRenderer*)zeScene->GetShadowRenderer();
+
+	for (ZESize CascadeN = 0; CascadeN < CascadeCount; ++CascadeN)
+	{
+		ShadowRenderer->ClearLists();
+	
+		ZEDrawParameters ShadowDrawParameters;
+		ShadowDrawParameters.ElapsedTime = DrawParameters->ElapsedTime;
+		ShadowDrawParameters.FrameId = DrawParameters->FrameId;
+		ShadowDrawParameters.Pass = ZE_RP_SHADOW_MAP;
+		ShadowDrawParameters.Renderer = ShadowRenderer;
+		ShadowDrawParameters.ViewVolume = &ViewVolumes[CascadeN];
+		ShadowDrawParameters.View = DrawParameters->View;
+		ShadowDrawParameters.CustomData = &ShadowTransforms[CascadeN];
+		ShadowDrawParameters.ViewPort = ShadowMaps[CascadeN]->GetViewPort();
+
+		zeScene->GetSceneCuller().CullScene(zeScene, &ShadowDrawParameters);
+
+		
+		ShadowRenderer->SetLight(this);
+		ShadowRenderer->SetDrawParameters(&ShadowDrawParameters);
+
+		ShadowRenderer->Render();
+	}
 }

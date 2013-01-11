@@ -161,6 +161,16 @@ float ZECamera::GetAspectRatio() const
 	return AspectRatio;
 }
 
+void ZECamera::SetShadowDistance(float Value)
+{
+	ShadowDistance = Value;
+}
+
+float ZECamera::GetShadowDistance() const
+{
+	return ShadowDistance;
+}
+
 const ZEView& ZECamera::GetView()
 {
 	/*if (!UpdateView)
@@ -214,6 +224,7 @@ ZECamera::ZECamera()
 	AspectRatio = zeGraphics->GetAspectRatio();
 	NearZ = zeGraphics->GetNearZ();
 	FarZ = zeGraphics->GetFarZ();
+	ShadowDistance = 500.0f;
 	UpdateView = true;
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;

@@ -94,8 +94,6 @@ class ZELight : public ZEEntity
 		virtual	void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 
-		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer) = 0;
-
 		virtual ZELightType				GetLightType() = 0;
 		virtual ZESize					GetViewCount() = 0;
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) = 0;

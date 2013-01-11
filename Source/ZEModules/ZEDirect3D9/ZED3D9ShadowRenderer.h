@@ -42,18 +42,22 @@
 
 #include <d3d9.h>
 
+
 class ZETexture2D;
 class ZETextureCube;
 class ZERenderCommand;
 class ZEViewPort;
 class ZED3D9ViewPort;
+struct ZEDrawParameters;
 enum ZETextureCubeFace;
 
 class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	private:
-		
+		ZEDrawParameters*						DrawParameters;
+
+
 		ZELight*								Light;
 		ZED3D9ViewPort*							ViewPort;
 		ZEUInt									ShadowResolution;
@@ -76,6 +80,9 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		virtual									~ZED3D9ShadowRenderer();
 
 	public:
+		void									SetDrawParameters(ZEDrawParameters* Parameters);
+		ZEDrawParameters*						GetDrawParameters();
+
 		void									SetShadowResolution(ZEUInt Resolution);
 		ZEUInt									GetShadowResolution() const;
 		

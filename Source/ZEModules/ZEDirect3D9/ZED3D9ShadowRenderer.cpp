@@ -44,6 +44,7 @@
 #include "ZED3D9TextureCube.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZED3D9FrameRenderer.h"
+#include "ZEGame/ZEDrawParameters.h"
 #include "ZED3D9ShadowRenderer.h"
 #include "ZEGraphics/ZEMaterial.h"
 #include "ZEGraphics/ZEPointLight.h"
@@ -87,6 +88,16 @@ void ZED3D9ShadowRenderer::SetLight(ZELight* Light)
 ZELight* ZED3D9ShadowRenderer::GetLight()
 {
 	return Light;
+}
+
+void ZED3D9ShadowRenderer::SetDrawParameters(ZEDrawParameters* Parameters)
+{
+	DrawParameters = Parameters;
+}
+
+ZEDrawParameters* ZED3D9ShadowRenderer::GetDrawParameters()
+{
+	return DrawParameters;
 }
 
 void ZED3D9ShadowRenderer::SetShadowResolution(ZEUInt Resolution)
@@ -297,56 +308,46 @@ void ZED3D9ShadowRenderer::RenderDirectionalLight()
 
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED);
 
 	GetDevice()->BeginScene();
 
-	// Render each cascade
-	for (ZESize CascadeN = 0; CascadeN < DirLight->GetCascadeCount(); ++CascadeN)
-	{
-		D3DPERF_BeginEvent(0, L"Cascade Pass");
+	D3DPERF_BeginEvent(0, L"Cascade Pass");
 
-		GetDevice()->SetRenderTarget(3, NULL);
-		GetDevice()->SetRenderTarget(2, NULL);
-		GetDevice()->SetRenderTarget(1, NULL);
-		GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)DirLight->GetShadowMap(CascadeN)->GetViewPort())->FrameBuffer);
-		GetDevice()->SetDepthStencilSurface(ShadowMapZBuffer);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)DrawParameters->ViewPort)->FrameBuffer);
+	GetDevice()->SetDepthStencilSurface(ShadowMapZBuffer);
 		
-		if (FAILED(GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0x00)))
-		{
-			zeCriticalError("Clear failed");
-		}
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0x00);
 
-		for (ZESize CommandN = 0; CommandN < CommandList.GetCount(); CommandN++)
-		{
-			ZERenderCommand* RenderCommand = &CommandList[CommandN];
+	for (ZESize CommandN = 0; CommandN < CommandList.GetCount(); CommandN++)
+	{
+		ZERenderCommand* RenderCommand = &CommandList[CommandN];
 
- 			if (!RenderCommand->Material->GetShadowCaster())
- 				continue;
+ 		if (!RenderCommand->Material->GetShadowCaster())
+ 			continue;
 
-			BOOL SkinEnabled = false;
- 			if (RenderCommand->Flags & ZE_ROF_SKINNED && RenderCommand->BoneTransforms.GetCount() < 58)
- 			{
- 				SkinEnabled = true;
- 				UINT MatrixCount = (UINT)RenderCommand->BoneTransforms.GetCount();
- 				const float* BoneMatrices = (const float*)RenderCommand->BoneTransforms.GetConstCArray();
+		BOOL SkinEnabled = false;
+ 		if (RenderCommand->Flags & ZE_ROF_SKINNED && RenderCommand->BoneTransforms.GetCount() < 58)
+ 		{
+ 			SkinEnabled = true;
+ 			UINT MatrixCount = (UINT)RenderCommand->BoneTransforms.GetCount();
+ 			const float* BoneMatrices = (const float*)RenderCommand->BoneTransforms.GetConstCArray();
 
- 				GetDevice()->SetVertexShaderConstantF(32, BoneMatrices, MatrixCount * 4);
- 			}
+ 			GetDevice()->SetVertexShaderConstantF(32, BoneMatrices, MatrixCount * 4);
+ 		}
 
-			GetDevice()->SetVertexShaderConstantB(0, &SkinEnabled, 1);
-			
-			ZEMatrix4x4 LightMatrix = DirLight->GetViewTransform(CascadeN) * RenderCommand->WorldMatrix;
+		GetDevice()->SetVertexShaderConstantB(0, &SkinEnabled, 1);
+		
+		ZEMatrix4x4 LightMatrix = *(ZEMatrix4x4*)DrawParameters->CustomData * RenderCommand->WorldMatrix;
 
-			GetDevice()->SetVertexShaderConstantF(0, (float*)&LightMatrix, 4);
+		GetDevice()->SetVertexShaderConstantF(0, (float*)&LightMatrix, 4);
 
-			ZED3D9FrameRenderer::PumpStreams(RenderCommand);
-		}
-
-		D3DPERF_EndEvent();
+		ZED3D9FrameRenderer::PumpStreams(RenderCommand);
 	}
+
+	D3DPERF_EndEvent();
 
 	GetDevice()->EndScene();
 
@@ -471,13 +472,16 @@ void ZED3D9ShadowRenderer::Render(float ElaspedTime)
 	}
 
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFF);
+
+	DrawParameters = NULL;
 }
 
 ZED3D9ShadowRenderer::ZED3D9ShadowRenderer()
 {
 	ShadowMapZBuffer = NULL;
 
-	ShadowResolution = 2048;
+	ShadowResolution = 1024;
+	DrawParameters = NULL;
 }
 
 ZED3D9ShadowRenderer::~ZED3D9ShadowRenderer()

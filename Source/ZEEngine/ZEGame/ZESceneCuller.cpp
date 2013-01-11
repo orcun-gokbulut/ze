@@ -41,25 +41,10 @@
 #include "ZEDrawParameters.h"
 #include "ZEMath/ZEViewVolume.h"
 
-void ZESceneCuller::DebugDrawEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
-{
-	if (DebugDrawElements & ZE_VDE_ENTITY_LOCAL_BOUNDING_BOX)
-		DebugDraw.DrawOrientedBoundingBox(Entity->GetBoundingBox(), Entity->GetWorldTransform(), DrawParameters->Renderer, ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
-
-	if (DebugDrawElements & ZE_VDE_ENTITY_WORLD_BOUNDING_BOX)
-		DebugDraw.DrawAxisAlignedBoundingBox(Entity->GetWorldBoundingBox(), DrawParameters->Renderer, ZEVector4(0.75f, 0.75f, 1.0f, 1.0f));
-}
-
-void ZESceneCuller::DebugDrawLight(ZELight* Light, ZEDrawParameters* DrawParameters)
-{
-	if (DebugDrawElements & ZE_VDE_LIGHT_RANGE)
-		DebugDraw.DrawBoundingSphere(ZEBSphere(Light->GetWorldPosition(), Light->GetRange()), DrawParameters->Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));
-}
-
 void ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
 {
-	if (FrameStatisticsEnabled)
-		Statistics.TotalEntityCount++;
+	if (CurrentPass == ZE_RP_COLOR)
+		DrawParameters->Statistics.TotalEntityCount++;
 
 	if (!Entity->GetVisible())
 		return;
@@ -68,45 +53,30 @@ void ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameter
 
 	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)
 	{
-		if (FrameStatisticsEnabled)
-			Statistics.DrawableEntityCount++;
+		if (CurrentPass == ZE_RP_COLOR)
+			DrawParameters->Statistics.DrawableEntityCount++;
 
 		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL)
 		{
 			if (DrawParameters->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
 			{
-				if (FrameStatisticsEnabled)
-					Statistics.CulledEntityCount++;
+				if (CurrentPass == ZE_RP_COLOR)
+					DrawParameters->Statistics.CulledEntityCount++;
 			}
 			else
 			{
-				if (FrameStatisticsEnabled)
-					Statistics.DrawedEntityCount++;
+				if (CurrentPass == ZE_RP_COLOR)
+					DrawParameters->Statistics.DrawedEntityCount++;
 
 				Entity->Draw(DrawParameters);
-
-				if (CurrentRendererType == ZE_RT_FRAME)
-					DebugDrawEntity(Entity, DrawParameters);
 			}
 		}
 		else
 		{
-			if (FrameStatisticsEnabled)
-				Statistics.DrawedEntityCount++;
+			if (CurrentPass == ZE_RP_COLOR)
+				DrawParameters->Statistics.DrawedEntityCount++;
 
 			Entity->Draw(DrawParameters);
-
-			if (CurrentRendererType == ZE_RT_FRAME)
-				DebugDrawEntity(Entity, DrawParameters);
-		}
-	}
-
-	if ((EntityDrawFlags & ZE_DF_LIGHT_SOURCE) == ZE_DF_LIGHT_SOURCE)
-	{
-		if (CurrentRendererType == ZE_RT_FRAME)
-		{
-			Entity->Draw(DrawParameters);
-			DebugDrawLight((ZELight*)Entity, DrawParameters);
 		}
 	}
 
@@ -129,55 +99,19 @@ void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameter
 		CullEntity(Entities[I], DrawParameters);
 }
 
-const ZECullStatistics& ZESceneCuller::GetStatistics()
-{
-	return Statistics;
-}
-
-void ZESceneCuller::SetDebugDrawElements(ZEUInt32 Elements)
-{
-	this->DebugDrawElements = Elements;
-}
-
-ZEUInt32 ZESceneCuller::SetDebugDrawElements()
-{
-	return this->DebugDrawElements;
-}
-
 void ZESceneCuller::CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 {
-	if (DebugDrawElements == ZE_VDE_NONE)
-		DebugDraw.Deinitialize();
-	else
-		DebugDraw.Initialize();
-
-	CurrentRendererType = DrawParameters->Renderer->GetRendererType();
-
-	if (CurrentRendererType == ZE_RT_FRAME)
-		FrameStatisticsEnabled = true;
-	else
-		FrameStatisticsEnabled = false;
-
-	if (FrameStatisticsEnabled)
-		memset(&Statistics, 0, sizeof(ZECullStatistics));
-
-	if (CurrentRendererType == ZE_RT_FRAME)
-		DebugDraw.Clean();
+	CurrentPass = DrawParameters->Pass;
 
 	CullEntities(Scene, DrawParameters);
-	
-	DebugDraw.Draw(DrawParameters->Renderer);
 }
 
 ZESceneCuller::ZESceneCuller()
 {
-	memset(&Statistics, 0, sizeof(ZECullStatistics));
-	DebugDrawElements = ZE_VDE_NONE;
-	FrameStatisticsEnabled = true;
-	CurrentRendererType = ZE_RT_FRAME;
+	CurrentPass = ZE_RP_COLOR;
 }
 
 ZESceneCuller::~ZESceneCuller()
 {
-	DebugDraw.Deinitialize();
+	
 }

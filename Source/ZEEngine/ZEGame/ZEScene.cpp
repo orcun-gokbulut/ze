@@ -304,9 +304,9 @@ void ZEScene::SetActiveListener(ZEListener* Listener)
 	zeSound->SetActiveListener(Listener);
 }
 
-const ZECullStatistics& ZEScene::GetCullerStatistics()
+ZESceneCuller& ZEScene::GetSceneCuller()
 {
-	return Culler.GetStatistics();
+	return Culler;
 }
 
 ZEListener* ZEScene::GetActiveListener()
@@ -341,11 +341,8 @@ void ZEScene::Render(float ElapsedTime)
 	if (ActiveCamera == NULL)
 		return;
 
-	// Frame render setup
-	// ------------------------------------------------------
 	Renderer->SetCamera(ActiveCamera);
 	
-	ZEDrawParameters FrameDrawParameters;
 	FrameDrawParameters.ElapsedTime = ElapsedTime;
 	FrameDrawParameters.FrameId = zeCore->GetFrameId();
 	FrameDrawParameters.Pass = ZE_RP_COLOR;
@@ -354,34 +351,11 @@ void ZEScene::Render(float ElapsedTime)
 	FrameDrawParameters.View = (ZEView*)&ActiveCamera->GetView();
 	FrameDrawParameters.Lights.Clear();
 
+	memset(&FrameDrawParameters.Statistics, 0, sizeof(ZESceneStatistics));
+
 	Culler.CullScene(this, &FrameDrawParameters);
 
-	// Shadow render setup
-	// ------------------------------------------------------
-	const ZESmartArray<ZELight*>& LightList = Renderer->GetLightList();
-	for (ZESize LightN = 0; LightN < LightList.GetCount(); ++LightN)
-	{
-		// NOTE: Only works for ZE_LT_DIRECTIONAL for now
-		if (LightList[LightN]->GetCastsShadow() && LightList[LightN]->GetLightType() == ZE_LT_DIRECTIONAL)
-		{
-			for (ZESize ViewN = 0; ViewN < LightList[LightN]->GetViewCount(); ++ViewN)
-			{
-				ShadowRenderer->ClearLists();
-
-				ZEDrawParameters ShadowDrawParameters;
-				ShadowDrawParameters.ElapsedTime = ElapsedTime;
-				ShadowDrawParameters.FrameId = zeCore->GetFrameId();
-				ShadowDrawParameters.Pass = ZE_RP_SHADOW_MAP;
-				ShadowDrawParameters.Renderer = ShadowRenderer;
-				ShadowDrawParameters.ViewVolume = (ZEViewVolume*)&LightList[LightN]->GetViewVolume(ViewN);
-				ShadowDrawParameters.View = (ZEView*)&ActiveCamera->GetView();
-
-				Culler.CullScene(this, &ShadowDrawParameters);
-
-				LightList[LightN]->RenderShadowMap(this, ShadowRenderer);
-			}
-		}	
-	}
+	FrameDrawParameters.Renderer->SetDrawParameters(&FrameDrawParameters);
 }
 
 bool ZEScene::Save(const ZEString& FileName)
@@ -517,7 +491,7 @@ ZEScene::ZEScene()
 	ActiveListener = NULL;
 	PhysicalWorld = NULL;
 	AmbientColor = ZEVector3::One;
-	AmbientFactor = 1.0f;
+	AmbientFactor = 0.0f;
 }
 
 ZEScene::~ZEScene()
