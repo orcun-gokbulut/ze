@@ -176,9 +176,9 @@ void ZEDirectionalLight::Deinitialize()
 
 ZEDirectionalLight::ZEDirectionalLight()
 {
-	SplitBias = 0.95f;
 	CascadeCount = 4;
-
+	SplitBias = 0.85f;
+	
 	memset(ShadowMaps, NULL, sizeof(ZETexture2D*) * MAX_CASCADE_COUNT);
 }
 
@@ -208,9 +208,20 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 	ZECamera* Camera = DrawParameters->View->Camera;
 
 	// Fetch constants
+	float FOV = Camera->GetFOV();
 	float NearZ = Camera->GetNearZ();
 	float FarZ = Camera->GetShadowDistance();
-	
+	float AspectRatio = Camera->GetAspectRatio();
+	ZEVector3 CameraUp = Camera->GetWorldUp();
+	ZEVector3 CameraRight = Camera->GetWorldRight();
+	ZEVector3 CameraFront = Camera->GetWorldFront();
+	ZEVector3 Position = Camera->GetWorldPosition();
+	ZEQuaternion Rotation = Camera->GetWorldRotation();
+
+	// For every cascade level
+	ZEVector4 FrustumCorners[8];
+	ZEVector4 TransformedFrustumCorners[8];
+
 	// Calculate split distances
 	for (ZESize SplitN = 0; SplitN <= CascadeCount; ++SplitN)
 	{
@@ -226,19 +237,6 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 	SplitDistances[0] = NearZ;
 	SplitDistances[CascadeCount] = FarZ;
 
-	// Fetch constants
-	float FOV = Camera->GetFOV();
-	float AspectRatio = Camera->GetAspectRatio();
-	ZEVector3 Position = Camera->GetWorldPosition();
-	ZEQuaternion Rotation = Camera->GetWorldRotation();
-
-	ZEVector3 CameraUp = Camera->GetWorldUp();
-	ZEVector3 CameraRight = Camera->GetWorldRight();
-	ZEVector3 CameraFront = Camera->GetWorldFront();
-
-	// For every cascade level
-	ZEVector4 FrustumCorners[8];
-	ZEVector4 TransformedFrustumCorners[8];
 
 	// Calculate near and far plane corners of frustum
 	for (ZESize CascadeN = 0; CascadeN < CascadeCount; ++CascadeN)
@@ -360,8 +358,15 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 
 	for (ZESize CascadeN = 0; CascadeN < CascadeCount; ++CascadeN)
 	{
-		ShadowRenderer->ClearLists();
-	
+		struct ZEDirectionalLightShadowData
+		{
+			ZESize				CascadeIndex;
+			ZEMatrix4x4*		ShadowTransform;
+		} CustomData;
+
+		CustomData.CascadeIndex = CascadeN;
+		CustomData.ShadowTransform = &ShadowTransforms[CascadeN];
+		
 		ZEDrawParameters ShadowDrawParameters;
 		ShadowDrawParameters.ElapsedTime = DrawParameters->ElapsedTime;
 		ShadowDrawParameters.FrameId = DrawParameters->FrameId;
@@ -369,12 +374,12 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 		ShadowDrawParameters.Renderer = ShadowRenderer;
 		ShadowDrawParameters.ViewVolume = &ViewVolumes[CascadeN];
 		ShadowDrawParameters.View = DrawParameters->View;
-		ShadowDrawParameters.CustomData = &ShadowTransforms[CascadeN];
 		ShadowDrawParameters.ViewPort = ShadowMaps[CascadeN]->GetViewPort();
-
+		ShadowDrawParameters.CustomData = &CustomData;
+		
+		ShadowRenderer->ClearLists();	
 		zeScene->GetSceneCuller().CullScene(zeScene, &ShadowDrawParameters);
 
-		
 		ShadowRenderer->SetLight(this);
 		ShadowRenderer->SetDrawParameters(&ShadowDrawParameters);
 
