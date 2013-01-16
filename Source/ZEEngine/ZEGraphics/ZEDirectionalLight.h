@@ -51,18 +51,20 @@ class ZEDirectionalLight : public ZELight
 {
 	ZE_META_ENTITY(ZEDirectionalLight)
 	private:
-		float						SplitBias;
 		ZESize						CascadeCount;
-		ZEViewCuboid				ViewVolumes[MAX_CASCADE_COUNT];
 		ZETexture2D*				ShadowMaps[MAX_CASCADE_COUNT];
+
+		ZEViewCuboid				ViewVolumes[MAX_CASCADE_COUNT];
 		ZEMatrix4x4					ShadowTransforms[MAX_CASCADE_COUNT];
+		
+		float						SplitBias;
 		float						SplitDistances[MAX_CASCADE_COUNT + 1];
 
 		void						CreateRenderTargets();
 		void						DestroyRenderTargets();
 
 									ZEDirectionalLight();
-									~ZEDirectionalLight();
+		virtual						~ZEDirectionalLight();
 
 	public:
 		ZELightType					GetLightType();

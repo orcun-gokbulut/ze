@@ -42,7 +42,7 @@ float4x4 BoneMatrices[58] 	: register(vs, c32);
 struct VertexShaderInput
 {
 	float4 Position 			: POSITION0;
-
+	
 	//#if defined(ZE_SHADER_SKIN_TRANSFORM)
  		int4 BoneIndices        : BLENDINDICES0;
 		float4 BoneWeights      : BLENDWEIGHT0;
@@ -51,18 +51,18 @@ struct VertexShaderInput
 
 struct VertexShaderOutput
 {
-	float4 Position 	: POSITION0;
-	float4 Depth 		: TEXCOORD0;
+	float4 Position 		: POSITION0;
+	float4 Depth 			: TEXCOORD0;
 };
 
 struct PixelShaderInput
 {
-	float4 Depth 		: TEXCOORD0;
+	float4 Depth 			: TEXCOORD0;
 };
 
 struct PixelShaderOutput
 {
-	float4 Depth		: COLOR0;
+	float4 Depth			: COLOR0;
 };
 
 // Skinning for shadow map generation
@@ -86,7 +86,6 @@ VertexShaderOutput ProjectiveLightShadowVS(VertexShaderInput Input)
 	Output.Position = mul(LightWorldViewProj, Input.Position);
 	Output.Position.z *= Output.Position.z;
 	Output.Depth = Output.Position.z;
-	
 	return Output;
 }
 
@@ -129,34 +128,23 @@ PixelShaderOutput OmniProjectiveLightShadowPS(PixelShaderInput Input)
 
 // Directional Light Shadow Map Generation
 // ----------------------------------------------------------------------
-
 VertexShaderOutput DirectionalLightShadowVS(VertexShaderInput Input)
 {
 	VertexShaderOutput Output;
 
 	if (EnableSkin)
-			ShadowSkinTransform(Input);
+		ShadowSkinTransform(Input);
 	
-	Output.Position = mul(LightWorldViewProj, Input.Position);
-	
+	Output.Position =  mul(LightWorldViewProj, Input.Position);
 	Output.Depth = Output.Position / Output.Position.w;
 
 	return Output;
 }
 
-static const float DepthBias = 0.001f;
-static const float SlopeScaledDepthBias = 0.5f;
-
 PixelShaderOutput DirectionalLightShadowPS(PixelShaderInput Input)
 {
 	PixelShaderOutput Output;
-
-	float DDX = clamp(ddx(Input.Depth), 0.0f, 0.01f);
-	float DDY = clamp(ddy(Input.Depth), 0.0f, 0.01f);
-	float SlopeFactor = max(DDX, DDY);
 	
-	float FinalBias = SlopeFactor * SlopeScaledDepthBias + DepthBias;
-	Output.Depth = (Input.Depth.z /*+ FinalBias*/).xxxx;
-	
+	Output.Depth =  Input.Depth.z;
 	return Output;
 }

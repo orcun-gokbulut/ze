@@ -53,9 +53,10 @@
 float4 ShadowKernel2x2[2];
 float4 ShadowKernel4x4[2];
 
+
 float SampleShadowMap1x1(sampler2D ShadowMap, float4 Texcoord)
 {
-	#if ShadowHardwareFiltering == ZE_SHF_NVIDIA
+	#if (ShadowHardwareFiltering == ZE_SHF_NVIDIA)
 		return tex2Dproj(ShadowMap, Texcoord).x; // nVidia - Hardware PCF
 	#else //ShadowHardwareFiltering == ZE_SHF_NONE
 		return tex2Dproj(ShadowMap, Texcoord).x > (Texcoord.z / Texcoord.w); // Standard
@@ -64,9 +65,9 @@ float SampleShadowMap1x1(sampler2D ShadowMap, float4 Texcoord)
 
 float SampleShadowMap2x2(sampler2D ShadowMap, float4 Texcoord)
 {
-	#if ShadowHardwareFiltering == ZE_SHF_NVIDIA
+	#if (ShadowHardwareFiltering == ZE_SHF_NVIDIA)
 		return tex2Dproj(ShadowMap, Texcoord).x;
-	#elif ShadowHardwareFiltering == ZE_SHF_ATI
+	#elif (ShadowHardwareFiltering == ZE_SHF_ATI)
 		float4 Comparasion = tex2Dproj(ShadowMap, Texcoord).rgba > (Texcoord.z / Texcoord.w).xxxx ? 1.0f : 0.0f;
 		return dot(Comparasion, float4(0.25f, 0.25f, 0.25f, 0.25f));
 	#else //ShadowHardwareFiltering == ZE_SHF_NONE
@@ -82,19 +83,19 @@ float SampleShadowMap2x2(sampler2D ShadowMap, float4 Texcoord)
 
 float SampleShadowMap(sampler2D ShadowMap, float4 Texcoord)
 {
-	#if ShadowMapping == ZE_SM_ENABLED
-		#if ShadowFiltering == ZE_SF_PCF_2X2
+	#if (ShadowMapping == ZE_SM_ENABLED)
+		#if (ShadowFiltering == ZE_SF_PCF_2X2)
 			return SampleShadowMap2x2(ShadowMap, Texcoord);
-		#elif ShadowFiltering == ZE_SF_PCF_4X4
+		#elif (ShadowFiltering == ZE_SF_PCF_4X4)
 			float4 Values = float4(
 				SampleShadowMap2x2(ShadowMap, float4(Texcoord.xy + ShadowKernel4x4[0].xy, Texcoord.zw)),
 				SampleShadowMap2x2(ShadowMap, float4(Texcoord.xy + ShadowKernel4x4[0].zw, Texcoord.zw)),
 				SampleShadowMap2x2(ShadowMap, float4(Texcoord.xy + ShadowKernel4x4[1].xy, Texcoord.zw)),
 				SampleShadowMap2x2(ShadowMap, float4(Texcoord.xy + ShadowKernel4x4[1].zw, Texcoord.zw)));
 			return dot(Values, float4(0.25, 0.25, 0.25, 0.25));
-		#elif ShadowFiltering == ZE_SF_POISSION_PCF
+		#elif (ShadowFiltering == ZE_SF_POISSION_PCF)
 			// Shadow Quality 4: 12 tap Possion Filtering	
-		#elif ShadowFiltering == ZE_SF_RR_POISSION_PCF
+		#elif (ShadowFiltering == ZE_SF_RR_POISSION_PCF)
 			// Shadow Quality 5: 12 tap Randomly Rotated Possion Filtering
 		#else //ShadowFiltering == ZE_SF_NONE
 			return SampleShadowMap1x1(ShadowMap, Texcoord);

@@ -299,8 +299,6 @@ void ZED3D9ShadowRenderer::RenderOmniProjectiveLight()
 
 void ZED3D9ShadowRenderer::RenderDirectionalLight()
 {
-	D3DPERF_BeginEvent(0, L"Shadow Pass");
-
 	ZEDirectionalLight* DirLight = (ZEDirectionalLight*)Light;
 
 	GetDevice()->SetVertexShader(DirectionalLightVS->GetVertexShader());
@@ -316,10 +314,17 @@ void ZED3D9ShadowRenderer::RenderDirectionalLight()
 
 	D3DPERF_BeginEvent(0, L"Cascade Pass");
 
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)DrawParameters->ViewPort)->FrameBuffer);
 	GetDevice()->SetDepthStencilSurface(ShadowMapZBuffer);
-		
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)DrawParameters->ViewPort)->FrameBuffer);
+	
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0x00);
+
+	struct ZEDirectionalLightShadowData
+	{
+		ZESize			CascadeIndex;
+		ZEMatrix4x4*	ShadowTransform;
+		
+	} *CustomData = (ZEDirectionalLightShadowData*)DrawParameters->CustomData;
 
 	for (ZESize CommandN = 0; CommandN < CommandList.GetCount(); CommandN++)
 	{
@@ -328,26 +333,23 @@ void ZED3D9ShadowRenderer::RenderDirectionalLight()
  		if (!RenderCommand->Material->GetShadowCaster())
  			continue;
 
-		BOOL SkinEnabled = false;
- 		if (RenderCommand->Flags & ZE_ROF_SKINNED && RenderCommand->BoneTransforms.GetCount() < 58)
- 		{
- 			SkinEnabled = true;
- 			UINT MatrixCount = (UINT)RenderCommand->BoneTransforms.GetCount();
- 			const float* BoneMatrices = (const float*)RenderCommand->BoneTransforms.GetConstCArray();
+		BOOL SkinEnabled = FALSE;
+  		if (RenderCommand->Flags & ZE_ROF_SKINNED && RenderCommand->BoneTransforms.GetCount() < 58)
+  		{
+  			SkinEnabled = TRUE;
+  			UINT MatrixCount = (UINT)RenderCommand->BoneTransforms.GetCount();
+  			const float* BoneMatrices = (const float*)RenderCommand->BoneTransforms.GetConstCArray();
+ 
+  			GetDevice()->SetVertexShaderConstantF(32, BoneMatrices, MatrixCount * 4);
+  		}
 
- 			GetDevice()->SetVertexShaderConstantF(32, BoneMatrices, MatrixCount * 4);
- 		}
-
-		GetDevice()->SetVertexShaderConstantB(0, &SkinEnabled, 1);
+		ZEMatrix4x4 LightMatrix = (*CustomData->ShadowTransform) * RenderCommand->WorldMatrix;
 		
-		ZEMatrix4x4 LightMatrix = *(ZEMatrix4x4*)DrawParameters->CustomData * RenderCommand->WorldMatrix;
-
-		GetDevice()->SetVertexShaderConstantF(0, (float*)&LightMatrix, 4);
+		GetDevice()->SetVertexShaderConstantB(0, &SkinEnabled, 1);
+		GetDevice()->SetVertexShaderConstantF(0, LightMatrix.MA, 4);
 
 		ZED3D9FrameRenderer::PumpStreams(RenderCommand);
 	}
-
-	D3DPERF_EndEvent();
 
 	GetDevice()->EndScene();
 
@@ -480,7 +482,7 @@ ZED3D9ShadowRenderer::ZED3D9ShadowRenderer()
 {
 	ShadowMapZBuffer = NULL;
 
-	ShadowResolution = 1024;
+	ShadowResolution = 2048;
 	DrawParameters = NULL;
 }
 

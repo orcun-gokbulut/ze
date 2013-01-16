@@ -57,7 +57,6 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 	private:
 		ZEDrawParameters*						DrawParameters;
 
-
 		ZELight*								Light;
 		ZED3D9ViewPort*							ViewPort;
 		ZEUInt									ShadowResolution;
