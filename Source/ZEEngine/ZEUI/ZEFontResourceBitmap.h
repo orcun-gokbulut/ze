@@ -43,7 +43,7 @@ class ZEFontResourceBitmap : public ZEFontResource
 {
 	private:
 		ZEArray<ZETexture2DResource*>		TextureResources;
-		ZEArray<ZETexture2D*>				Textures;
+		ZEArray<const ZETexture2D*>			Textures;
 		ZEArray<ZEFontCharacter>			Characters;
 
 											ZEFontResourceBitmap();

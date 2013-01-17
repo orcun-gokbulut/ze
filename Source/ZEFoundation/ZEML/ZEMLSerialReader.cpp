@@ -59,31 +59,49 @@ bool ZEMLSerialReader::ReadNextItem()
 	if(File->Read(&Identifier, sizeof(char), 1) != 1)
 	{
 		if(!File->Eof())
+		{
 			zeError("Can not read ZEML file. Corrupted ZEML file.");
+			return false;
+		}
 		else
 			return false;
 	}
 
 	if(Identifier != ZEML_ITEM_FILE_IDENTIFIER)
+	{
 		zeError("Corrupted ZEML file. Corrupted ZEML file.");
+		return false;
+	}
 
 	if(File->Read(&CurrentItemType, sizeof(ZEUInt8), 1) != 1)
+	{
 		zeError("Can not read ZEMLItem type from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	ZEUInt8 NameSize = 0;
 	if(File->Read(&NameSize, sizeof(ZEUInt8), 1) != 1)
+	{
 		zeError("Can not read ZEMLItem name size from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	char TempNameBuffer[ZEML_MAX_NAME_SIZE];
 	if(File->Read(TempNameBuffer, NameSize, 1) != 1)
+	{
 		zeError("Can not read ZEMLItem name from file. Corrupted ZEML file.");
+		return false;
+	}
 
 	CurrentItemName = TempNameBuffer;
 
 	if(CurrentItemType == ZEML_IT_NODE)
 	{
 		if(File->Read(&CurrentItemSubItemCount, sizeof(ZEUInt64), 1) != 1)
+		{
 			zeError("Can not read ZEMLNode subitem count from file. Corrupted ZEML file.");
+			return false;
+		}
 
 		CurrentItemSubItemCount = ZEEndian::Little(CurrentItemSubItemCount);
 
@@ -92,7 +110,10 @@ bool ZEMLSerialReader::ReadNextItem()
 	else if(CurrentItemType == ZEML_IT_INLINE_DATA)
 	{
 		if(File->Read(&CurrentItemDataSize, sizeof(ZEUInt64), 1) != 1)
+		{
 			zeError("Can not read ZEMLDataProperty data size from file. Corrupted ZEML file.");
+			return false;
+		}
 
 		CurrentItemDataSize = ZEEndian::Little(CurrentItemDataSize);
 
@@ -104,7 +125,10 @@ bool ZEMLSerialReader::ReadNextItem()
 		ZEUInt64 ValueSize = 0;
 
 		if(File->Read(&ValueSize, sizeof(ZEUInt64), 1) != 1)
+		{
 			zeError("Can not read ZEMLProperty value size from file. Corrupted ZEML file.");
+			return false;
+		}
 
 		ValueSize = ZEEndian::Little(ValueSize);
 
@@ -213,14 +237,19 @@ bool ZEMLSerialReader::ReadNextItem()
 				break;
 			default:
 				zeError("Unsupported ZEMLProperty type.");
-				break;
+				return false;
 		}
 
 		if(IsDataRead != 1)
+		{
 			zeError("Can not read ZEMLProperty value from file. Corrupted ZEML file.");
+			return false;
+		}
 
 		NextItemPosition = File->Tell();
 	}
+
+	return true;
 }
 
 ZEMLItemType ZEMLSerialReader::GetItemType()

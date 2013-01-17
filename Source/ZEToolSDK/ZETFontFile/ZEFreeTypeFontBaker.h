@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEFreeTypeFontBaker.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,18 +30,36 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef __ZET_FREETYPE_FONT_BAKER_H__
+#define __ZET_FREETYPE_FONT_BAKER_H__
 
-ze_add_source(ZETFontBaker.cpp			Sources)
-ze_add_source(ZETFontBaker.h			Sources Headers)
-ze_add_source(ZETFontFile.cpp			Sources)
-ze_add_source(ZETFontFile.h				Sources Headers)
-ze_add_source(ZEFreeTypeFontBaker.cpp	Sources)
-ze_add_source(ZEFreeTypeFontBaker.h		Sources Headers)
+#include "ZETexture/ZEBitmap.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
+#include "ZETypes.h"
 
-ze_add_library(ZETFontFile 
-	SOURCES ${Sources}
-	HEADERS ${Headers})
+struct ZEFTFontCharMetrics;
+
+class ZEFreeTypeFontBaker
+{
+	public:
+		static bool	BakeFont(ZEString CharacterSequence, ZEString FontFilePath, ZEString OutputFilePath, ZEString OutputFileName, ZEUInt32 FontSize, 
+							ZEUInt32 HorizontalOutputDPI = 72, ZEUInt32 VerticalOutputDPI = 72, ZEUInt32 PointFactor = 64,
+							ZEUInt32 TextureWidth = 512, ZEUInt32 TextureHeight = 512,
+							ZEUInt32 MarginTop = 8, ZEUInt32 MarginBottom = 8, ZEUInt32 MarginLeft = 8, ZEUInt32 MarginRight = 8,
+							ZEUInt32 HorizontalPadding = 8, ZEUInt32 VerticalPadding = 8);
+
+		static bool	BakeFont(const char StartCharacter, const char EndCharacter,
+							ZEString FontFilePath, ZEString OutputFilePath, ZEString OutputFileName, ZEUInt32 FontSize, 
+							ZEUInt32 HorizontalOutputDPI = 72, ZEUInt32 VerticalOutputDPI = 72, ZEUInt32 PointFactor = 64,
+							ZEUInt32 TextureWidth = 512, ZEUInt32 TextureHeight = 512,
+							ZEUInt32 MarginTop = 8, ZEUInt32 MarginBottom = 8, ZEUInt32 MarginLeft = 8, ZEUInt32 MarginRight = 8,
+							ZEUInt32 HorizontalPadding = 8, ZEUInt32 VerticalPadding = 8);
+};
+
+#endif
