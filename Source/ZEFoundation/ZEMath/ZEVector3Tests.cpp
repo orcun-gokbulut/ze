@@ -653,6 +653,33 @@ ZETestSuite(ZEVector3)
 		ZETestCheckEqual(A, ZEVector3(1.0f, 0.4f, 0.0f));
 	}
 
+	ZETest("bool ZEVector3::Equals(const ZEVector3& Vector) const")
+	{
+		ZEVector3 VectorA(1.0f, 2.0f, 3.0f);
+		ZEVector3 VectorB(0.0f, 2.0f, 3.0f);
+		ZEVector3 VectorC(1.00000001f, 2.0f, 3.0f);
+
+		bool Equal = VectorA.Equals(VectorB);
+		ZETestCheck(!Equal);
+
+		Equal = VectorA.Equals(VectorC);
+		ZETestCheck(Equal);
+	}
+
+	ZETest("bool ZEVector3::Equals(const ZEVector3& Vector, float Threshold) const")
+	{
+		float Threshold = 0.1f;
+		ZEVector3 VectorA(1.11f, 2.11f, 3.11f);
+		ZEVector3 VectorB(1.1f, 2.11f, 3.11f);
+		ZEVector3 VectorC(1.0f, 2.11f, 3.11f);
+
+		bool Equal = VectorA.Equals(VectorB, Threshold);
+		ZETestCheck(Equal);
+
+		Equal = VectorA.Equals(VectorC, Threshold);
+		ZETestCheck(!Equal);
+	}
+
 	ZETest("ZEVector3 ZEVector3::operator-() const")
 	{
 		ZEVector3 A(10.0f, 1.0f, 4.0f);

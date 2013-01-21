@@ -96,7 +96,7 @@ ZETestSuite(ZEGUID)
 		ZETestCheckEqual(Data3, 8976);
 		ZETestCheckEqual(Data4FirstTwo, 291);
 		ZETestCheckEqual(Data4Remaining, 81985529216486895);
-		ZETestCheckEqual(TestItem1.Data4, 57646075249413324);
+		ZETestCheckEqual(TestItem1.Data4, 9927935178558959);
 
 		Data1 = 0x604857D3;
 		Data2 = 0x01D3;
@@ -113,7 +113,7 @@ ZETestSuite(ZEGUID)
 		ZETestCheckEqual(Data3, 930);
 		ZETestCheckEqual(Data4FirstTwo, 1110);
 		ZETestCheckEqual(Data4Remaining, 17279655951921914625);
-		ZETestCheckEqual(TestItem2.Data4, 57646075231521996);
+		ZETestCheckEqual(TestItem2.Data4, 57890976858317569);
 	}
 
 	ZETest("ZEGUID ZEGUID::Generate()")
@@ -407,7 +407,7 @@ ZETestSuite(ZEGUID)
 		ZETestCheckEqual(Item.Data4, 14757395258967641292);
 
 		ZEString ItemString = Item.ToString();
-		//ZETestCheckString(ItemmString, "CCCCCCCC-CCCC-CCCC-CCCCCCCCCCCC");
+		//ZETestCheckString(ItemString, "CCCCCCCC-CCCC-CCCC-CCCCCCCCCCCC");
 
 		ZETestCase("values in decimal form")
 		{

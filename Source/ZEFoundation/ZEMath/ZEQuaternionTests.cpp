@@ -91,6 +91,20 @@ ZETestSuite(ZEQuaternion)
 		ZETestCheckClose(Result.z, -(Quaternion.z));
 	}
 
+	ZETest("void ZEQuaternion::ConvertToAngleAxis(float& Angle, ZEVector3& Axis, const ZEQuaternion& Quaternion)")
+	{
+		ZEQuaternion Quaternion(0.70710683f, 0.70710683f, 0.00000000f, 0.00000000f);
+
+		float Angle;
+		ZEVector3 Axis;
+
+		ZEQuaternion::ConvertToAngleAxis(Angle, Axis, Quaternion);
+		ZETestCheckClose(Angle, 1.57079632f);
+		ZETestCheckClose(Axis.x, 1.0f);
+		ZETestCheckClose(Axis.y, 0.0f);
+		ZETestCheckClose(Axis.z, 0.0f);
+	}
+
 	ZETest("void ZEQuaternion::ConvertToEulerAngles(float &x, float &y, float &z, const ZEQuaternion& Quaternion)")
 	{
 		ZEQuaternion Quaternion(ZE_PI_2, ZEVector3::UnitX);
@@ -238,6 +252,33 @@ ZETestSuite(ZEQuaternion)
 		ZEQuaternion::CreateIdentity(IdentityQuaternion);
 
 		ZETestCheckClose(IdentityQuaternion, ZEQuaternion::Identity);
+	}
+
+	ZETest("bool ZEQuaternion::Equals(const ZEQuaternion& Quaternion) const")
+	{
+		ZEQuaternion QuaternionA(ZE_PI_2, ZEVector3::UnitX);
+		ZEQuaternion QuaternionB(0.70710683f, 0.70710683f, 0.00000000f, 0.00000000f);
+		ZEQuaternion QuaternionC(ZE_PI_2, ZEVector3::UnitY);
+
+		bool Equal = QuaternionA.Equals(QuaternionB);
+		ZETestCheck(Equal);
+
+		Equal = QuaternionA.Equals(QuaternionC);
+		ZETestCheck(!Equal);
+	}
+
+	ZETest("bool ZEQuaternion::Equals(const ZEQuaternion& Quaternion, float Threshold) const")
+	{
+		float Threshold = 0.0001f;
+		ZEQuaternion QuaternionA(ZE_PI_2, ZEVector3::UnitX);
+		ZEQuaternion QuaternionB(0.70710690f, 0.70710683f, 0.00000000f, 0.00000000f);
+		ZEQuaternion QuaternionC(0.70610683f, 0.70710683f, 0.00000000f, 0.00000000f);
+
+		bool Equal = QuaternionA.Equals(QuaternionB, Threshold);
+		ZETestCheck(Equal);
+			
+		Equal = QuaternionA.Equals(QuaternionC, Threshold);
+		ZETestCheck(!Equal);
 	}
 
 	ZETest("bool ZEQuaternion::IsNormalized() const")
@@ -480,6 +521,37 @@ ZETestSuite(ZEQuaternion)
 		ZETestCheckClose(Result.x, 0.49999997f);
 		ZETestCheckClose(Result.y, 0.49999997f);
 		ZETestCheckClose(Result.z, 0.49999997f);
+	}
+
+	ZETest("float ZEQuaternion::RotationAngle() const")
+	{
+		ZEQuaternion Quaternion(ZE_PI_2, ZEVector3::UnitX);
+
+		float Angle = Quaternion.RotationAngle();
+		ZETestCheckClose(Angle, 1.57079632f);
+	}
+
+	ZETest("ZEVector3 ZEQuaternion::RotationAxis() const")
+	{
+		ZEQuaternion Quaternion(ZE_PI_2, ZEVector3::UnitX);
+
+		ZEVector3 Axis = Quaternion.RotationAxis();
+		ZETestCheckClose(Axis.x, 1.0000000f);
+		ZETestCheckClose(Axis.y, 0.0000000f);
+		ZETestCheckClose(Axis.z, 0.0000000f);
+	}
+
+	ZETest("void ZEQuaternion::ScaleRotation(ZEQuaternion& Output, const ZEQuaternion& Input, float Scale)")
+	{
+		ZEQuaternion Input(0.5f, 0.5f, 0.5f, 0.5f);
+		float Scale = 2.0f;
+		ZEQuaternion Output;
+
+		ZEQuaternion::ScaleRotation(Output, Input, Scale);
+		ZETestCheckClose(Output.w, -0.50000006f);
+		ZETestCheckClose(Output.x, 0.49999997f);
+		ZETestCheckClose(Output.y, 0.49999997f);
+		ZETestCheckClose(Output.z, 0.49999997f);
 	}
 
 	ZETest("void ZEQuaternion::Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor)")
