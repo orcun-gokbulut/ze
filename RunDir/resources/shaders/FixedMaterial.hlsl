@@ -356,10 +356,10 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		Output.Color.rgb *= tex2D(BaseMap, Input.Texcoord).rgb;
 	#endif	
 	
-	#ifdef ZESHADER_EMMISIVE
+	#ifdef ZE_SHADER_EMMISIVE
 		float3 EmmisiveColor = MaterialEmmisiveColor;
 		#ifdef ZE_SHADER_EMMISIVE_MAP
-			EmmisiveColor *= MaterialEmmisiveFactor * tex2D(EmmisiveMap, Input.Texcoord);
+			EmmisiveColor *= tex2D(EmmisiveMap, Input.Texcoord);
 		#endif
 		Output.Color.rgb += EmmisiveColor;
 	#endif
