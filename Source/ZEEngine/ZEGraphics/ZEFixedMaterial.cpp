@@ -100,15 +100,15 @@ ZEFixedMaterial::ZEFixedMaterial()
 	DistortionMapAddressModeU = ZE_TAM_WRAP;
 	DistortionMapAddressModeV = ZE_TAM_WRAP;
 
-	AmbientFactor = 1.0f;
+	AmbientFactor = 0.0f;
 	DiffuseFactor = 1.0f;
-	SpecularFactor = 1.0f;
-	EmmisiveFactor = 1.0f;
+	SpecularFactor = 0.0f;
+	EmmisiveFactor = 0.0f;
 	DistortionFactor = 1.0f;
-	AmbientColor = ZEVector3(0.0f, 0.0f, 0.0f);
-	DiffuseColor = ZEVector3(1.0f, 1.0f, 1.0f);
-	SpecularColor = ZEVector3(0.0f, 0.0f, 0.0f);
-	EmmisiveColor = ZEVector3(0.0f, 0.0f, 0.0f);
+	AmbientColor = ZEVector3::One;
+	DiffuseColor = ZEVector3::One;
+	SpecularColor = ZEVector3::One;
+	EmmisiveColor = ZEVector3::One;
 	SubSurfaceScatteringFactor = 0.0f;
 	MaterialComponentMask = ~0;
 	GlobalAmbientEnabled = true;
@@ -454,8 +454,6 @@ void ZEFixedMaterial::SetEmmisiveEnabled(bool Enabled)
 		MaterialComponents |= ZE_SHADER_EMMISIVE;
 	else
 		MaterialComponents &= ~ZE_SHADER_EMMISIVE;
-
-
 }
 
 bool ZEFixedMaterial::GetEmmisiveEnabled() const
@@ -492,8 +490,13 @@ void ZEFixedMaterial::SetEmmisiveMap(const ZETexture2D* Texture)
 		EmmisiveMapResource->Release();
 		EmmisiveMapResource = NULL;
 	}
+	else
+	{
+		MaterialComponents &= ~ZE_SHADER_EMMISIVE_MAP;
+	}
 
 	EmmisiveMap = Texture;
+	MaterialComponents |= ZE_SHADER_EMMISIVE_MAP;
 }
 
 const ZETexture2D* ZEFixedMaterial::GetEmmisiveMap() const
@@ -512,9 +515,15 @@ void ZEFixedMaterial::SetEmmisiveMapFile(const char* Filename)
 	EmmisiveMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
 	if (EmmisiveMapResource != NULL)
+	{
 		EmmisiveMap = EmmisiveMapResource->GetTexture();
+		MaterialComponents |= ZE_SHADER_EMMISIVE_MAP;
+	}
 	else
+	{
 		EmmisiveMap = NULL;
+		MaterialComponents &= ~ZE_SHADER_EMMISIVE_MAP;
+	}
 }
 
 const char* ZEFixedMaterial::GetEmmisiveMapFile() const
