@@ -42,62 +42,63 @@
 #include "ZECore/ZEWindow.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEInput/ZEInputModule.h"
+#include "ZEDS/ZEFormat.h"
 
 #define ACTIONID_VISIBILITY 1
 
-#define FPSText								ZEString("Frame Per Second : ")
-#define CamPosText							ZEString("Camera Position : ")
+#define FPSText								"Frame Per Second : {0:d}"
+#define CamPosText							"Camera Position : X: {0:.5}, Y: {1:.5}, Z: {2:.5}"
 
-#define SceneTotalEntityText				ZEString("Total Entity Count : ")
-#define SceneDrawableEntityText				ZEString("Drawable Entity Count : ")
-#define SceneCulledEntityText				ZEString("Culled Entity Count : ")
-#define SceneDrawedEntityText				ZEString("Drawn Entity Count : ")
-#define SceneTotalLightText					ZEString("Total Light Count : ")
-#define SceneCulledLightText				ZEString("Culled Light Count : ")
-#define SceneDrawedLightText				ZEString("Drawn Light Count : ")
+#define SceneTotalEntityText				"Total Entity Count : {0:d}"
+#define SceneDrawableEntityText				"Drawable Entity Count : {0:d}"
+#define SceneCulledEntityText				"Culled Entity Count : {0:d}"
+#define SceneDrawedEntityText				"Drawn Entity Count : {0:d}"
+#define SceneTotalLightText					"Total Light Count : {0:d}"
+#define SceneCulledLightText				"Culled Light Count : {0:d}"
+#define SceneDrawedLightText				"Drawn Light Count : {0:d}"
 
-#define RendererMeshText					ZEString("Mesh Count : ")
-#define RendererInstancedMeshText			ZEString("Instanced Mesh Count : ")
-#define RendererStageText					ZEString("Stage Count : ")
-#define RendererPostProcessorText			ZEString("Post Processor Count : ")	    
-#define RendererPrimitiveText				ZEString("Primitive Count : ")
-#define RendererMinBatchText				ZEString("Min Batch Count : ")
-#define RendererMaxBatchText				ZEString("Max Batch Count : ")
-#define RendererAvgBatchText				ZEString("Avg Batch Count : ")
-#define RendererVertexText					ZEString("Vertex Count : ")
-#define RendererDrawCallText				ZEString("Draw Call Count : ")
-#define RendererDrawPrimitiveText			ZEString("Draw Primitive Count : ")
+#define RendererMeshText					"Mesh Count : {0:d}"
+#define RendererInstancedMeshText			"Instanced Mesh Count : {0:d}"
+#define RendererStageText					"Stage Count : {0:d}"
+#define RendererPostProcessorText			"Post Processor Count : {0:d}" 
+#define RendererPrimitiveText				"Primitive Count : {0:d}"
+#define RendererMinBatchText				"Min Batch Count : {0:d}"
+#define RendererMaxBatchText				"Max Batch Count : {0:d}"
+#define RendererAvgBatchText				"Avg Batch Count : {0:d}"
+#define RendererVertexText					"Vertex Count : {0:d}"
+#define RendererDrawCallText				"Draw Call Count : {0:d}"
+#define RendererDrawPrimitiveText			"Draw Primitive Count : {0:d}"
 
-#define	GraphicsVertexBufferText			ZEString("Vertex Buffer Count : ")
-#define	GraphicsVertexDeclarationText		ZEString("Vertex Declaration Count : ")
-#define	GraphicsTotalVertexBufferSizeText	ZEString("Total Vertex Buffer Size : ")
-#define	GraphicsShaderText					ZEString("Shader Count : ")	    
-#define	GraphicsTextureText					ZEString("Texture Count : ")
-#define	GraphicsTexture2DText				ZEString("Texture2D Count : ")
-#define	GraphicsTexture3DText				ZEString("Texture3D Count : ")
-#define	GraphicsTextureCubeText				ZEString("TextureCube Count : ")
-#define	GraphicsTotalTextureSizeText		ZEString("Total Texture Size : ")
-#define	GraphicsRenderTargetText			ZEString("Render Target Count : ")
-#define	GraphicsTotalRenderTargetSizeText	ZEString("Total Render Target Size : ")
-#define	GraphicsDepthBufferText				ZEString("Depth Buffer Count : ")
-#define	GraphicsTotalDepthBufferSizeText	ZEString("Total Depth Buffer Size : ")
+#define	GraphicsVertexBufferText			"Vertex Buffer Count : {0:d}"
+#define	GraphicsVertexDeclarationText		"Vertex Declaration Count : {0:d}"
+#define	GraphicsTotalVertexBufferSizeText	"Total Vertex Buffer Size : {0:d}"
+#define	GraphicsShaderText					"Shader Count : {0:d}"
+#define	GraphicsTextureText					"Texture Count : {0:d}"
+#define	GraphicsTexture2DText				"Texture2D Count : {0:d}"
+#define	GraphicsTexture3DText				"Texture3D Count : {0:d}"
+#define	GraphicsTextureCubeText				"TextureCube Count : {0:d}"
+#define	GraphicsTotalTextureSizeText		"Total Texture Size : {0:d}"
+#define	GraphicsRenderTargetText			"Render Target Count : {0:d}"
+#define	GraphicsTotalRenderTargetSizeText	"Total Render Target Size : {0:d}"
+#define	GraphicsDepthBufferText				"Depth Buffer Count : {0:d}"
+#define	GraphicsTotalDepthBufferSizeText	"Total Depth Buffer Size : {0:d}"
 
-#define	ModelTotalMeshText					ZEString("Total Mesh Count : ")
-#define	ModelCulledMeshText					ZEString("Culled Mesh Count : ")
-#define	ModelDrawnMeshText					ZEString("Drawn Mesh Count : ")
+#define	ModelTotalMeshText					"Total Mesh Count : {0:d}"
+#define	ModelCulledMeshText					"Culled Mesh Count : {0:d}"
+#define	ModelDrawnMeshText					"Drawn Mesh Count : {0:d}"
 
-#define InteriorTotalRoomText				ZEString("Total Room Count : ")
-#define InteriorCulledRoomText				ZEString("Culled Room Count : ")
-#define InteriorDrawedRoomText				ZEString("Drawn Room Count : ")
-#define InteriorTotalDoorText				ZEString("Total Door Count : ")
-#define InteriorSeenDoorText				ZEString("Viewed Door Count : ")
-#define InteriorTotalPolygonText			ZEString("Total Interior Polygon Count : ")
-#define InteriorCulledPolygonText			ZEString("Culled Interior Polygon Count : ")
-#define InteriorDrawedPolygonText			ZEString("Drawn  Interior Polygon Count : ")
+#define InteriorTotalRoomText				"Total Room Count : {0:d}"
+#define InteriorCulledRoomText				"Culled Room Count : {0:d}"
+#define InteriorDrawedRoomText				"Drawn Room Count : {0:d}"
+#define InteriorTotalDoorText				"Total Door Count : {0:d}"
+#define InteriorSeenDoorText				"Viewed Door Count : {0:d}"
+#define InteriorTotalPolygonText			"Total Interior Polygon Count : {0:d}"
+#define InteriorCulledPolygonText			"Culled Interior Polygon Count : {0:d}"
+#define InteriorDrawedPolygonText			"Drawn  Interior Polygon Count : {0:d}"
 
-#define	ParticleEmitterText					ZEString("Emitter Count : ")
-#define	ParticleTotalParticleText			ZEString("Total Particle Count : ")
-#define	ParticleDrawedParticleText			ZEString("Drawn Particle Count : ")
+#define	ParticleEmitterText					"Emitter Count : {0:d}"
+#define	ParticleTotalParticleText			"Total Particle Count : {0:d}"
+#define	ParticleDrawedParticleText			"Drawn Particle Count : {0:d}"
 
 #define GreenTextColor						ZEVector4(0.0f, 0.7f, 0.0f, 1.0f)
 #define RedTextColor						ZEVector4(7.0f, 0.0f, 0.0f, 1.0f)
@@ -115,154 +116,154 @@ ZEMaterial* ZEUISceneStatisticsControl::GetMaterial() const
 void ZEUISceneStatisticsControl::Draw(ZEUIRenderer* Renderer)
 {
 	ZEDrawStatistics Stats = zeScene->GetRenderer()->GetDrawParameters()->Statistics;
-	ZEString Value;
+	ZEVariant Value;
 
 	//Scene Statistics
 
-	Value.SetValue(Stats.SceneStatistics.TotalEntityCount);
-	SceneTotalEntityCount->SetText(SceneTotalEntityText + Value);
+	Value.SetUInt32(Stats.SceneStatistics.TotalEntityCount);
+	SceneTotalEntityCount->SetText(ZEFormat::Format(SceneTotalEntityText, Value));
 
-	Value.SetValue(Stats.SceneStatistics.DrawableEntityCount);
-	SceneDrawableEntityCount->SetText(SceneDrawableEntityText + Value);
+	Value.SetUInt32(Stats.SceneStatistics.DrawableEntityCount);
+	SceneDrawableEntityCount->SetText(ZEFormat::Format(SceneDrawableEntityText, Value));
 
-	Value.SetValue(Stats.SceneStatistics.CulledEntityCount);
-	SceneCulledEntityCount->SetText(SceneCulledEntityText + Value);
+	Value.SetUInt32(Stats.SceneStatistics.CulledEntityCount);
+	SceneCulledEntityCount->SetText(ZEFormat::Format(SceneCulledEntityText, Value));
 
-	Value.SetValue(Stats.SceneStatistics.DrawedEntityCount);
-	SceneDrawedEntityCount->SetText(SceneDrawedEntityText + Value);
+	Value.SetUInt32(Stats.SceneStatistics.DrawedEntityCount);
+	SceneDrawedEntityCount->SetText(ZEFormat::Format(SceneDrawedEntityText, Value));
 
-	Value.SetValue(Stats.SceneStatistics.TotalLightCount);
-	SceneTotalLightCount->SetText(SceneTotalLightText + Value);
+	Value.SetUInt32(Stats.SceneStatistics.TotalLightCount);
+	SceneTotalLightCount->SetText(ZEFormat::Format(SceneTotalLightText, Value));
 
-	Value.SetValue(Stats.SceneStatistics.CulledLightCount);
-	SceneCulledLightCount->SetText(SceneCulledLightText + Value);
+	Value.SetUInt32(Stats.SceneStatistics.CulledLightCount);
+	SceneCulledLightCount->SetText(ZEFormat::Format(SceneCulledLightText, Value));
 
-	Value.SetValue(Stats.SceneStatistics.DrawedLightCount);
-	SceneDrawedLightCount->SetText(SceneDrawedLightText + Value);
+	Value.SetUInt32(Stats.SceneStatistics.DrawedLightCount);
+	SceneDrawedLightCount->SetText(ZEFormat::Format(SceneDrawedLightText, Value));
 
 	//Renderer Statistics
 
-	Value.SetValue(Stats.RendererStatistics.MeshCount);
-	RendererMeshCount->SetText(RendererMeshText + Value);
+	Value.SetUInt32(Stats.RendererStatistics.MeshCount);
+	RendererMeshCount->SetText(ZEFormat::Format(RendererMeshText, Value));
 
-	Value.SetValue(Stats.RendererStatistics.InstancedMeshCount);
-	RendererInstancedMeshCount->SetText(RendererInstancedMeshText + Value);
+	Value.SetUInt32(Stats.RendererStatistics.InstancedMeshCount);
+	RendererInstancedMeshCount->SetText(ZEFormat::Format(RendererInstancedMeshText, Value));
 
-	Value.SetValue(Stats.RendererStatistics.StageCount);
-	RendererStageCount->SetText(RendererStageText + Value);
+	Value.SetUInt32(Stats.RendererStatistics.StageCount);
+	RendererStageCount->SetText(ZEFormat::Format(RendererStageText, Value));
 
-	Value.SetValue(Stats.RendererStatistics.PostProcessorCount);
-	RendererPostProcessorCount->SetText(RendererPostProcessorText + Value);
+	Value.SetUInt32(Stats.RendererStatistics.PostProcessorCount);
+	RendererPostProcessorCount->SetText(ZEFormat::Format(RendererPostProcessorText, Value));
 
-	Value.SetValue(Stats.RendererStatistics.PrimitiveCount);
-	RendererPrimitiveCount->SetText(RendererPrimitiveText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.RendererStatistics.PrimitiveCount);
+	RendererPrimitiveCount->SetText(ZEFormat::Format(RendererDrawPrimitiveText, Value));
 
-	Value.SetValue(Stats.RendererStatistics.MinBatchCount);
-	RendererMinBatchCount->SetText(RendererMinBatchText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.RendererStatistics.MinBatchCount);
+	RendererMinBatchCount->SetText(ZEFormat::Format(RendererMinBatchText, Value));
 
-	Value.SetValue(Stats.RendererStatistics.MaxBatchCount);
-	RendererMaxBatchCount->SetText(RendererMaxBatchText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.RendererStatistics.MaxBatchCount);
+	RendererMaxBatchCount->SetText(ZEFormat::Format(RendererMaxBatchText, Value));
 
-	Value.SetValue(Stats.RendererStatistics.AvgBatchCount);
-	RendererAvgBatchCount->SetText(RendererAvgBatchText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.RendererStatistics.AvgBatchCount);
+	RendererAvgBatchCount->SetText(ZEFormat::Format(RendererAvgBatchText, Value));
 
-	Value.SetValue(Stats.RendererStatistics.VertexCount);
-	RendererVertexCount->SetText(RendererVertexText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.RendererStatistics.VertexCount);
+	RendererVertexCount->SetText(ZEFormat::Format(RendererVertexText, Value));
 
-	Value.SetValue(Stats.RendererStatistics.DrawCallCount);
-	RendererDrawCallCount->SetText(RendererDrawCallText + Value);
+	Value.SetUInt32(Stats.RendererStatistics.DrawCallCount);
+	RendererDrawCallCount->SetText(ZEFormat::Format(RendererDrawCallText, Value));
 
-	Value.SetValue(Stats.RendererStatistics.DrawPrimitiveCount);
-	RendererDrawPrimitiveCount->SetText(RendererDrawPrimitiveText + Value);
+	Value.SetUInt32(Stats.RendererStatistics.DrawPrimitiveCount);
+	RendererDrawPrimitiveCount->SetText(ZEFormat::Format(RendererDrawPrimitiveText, Value));
 
 	//Graphics Statistics
 
-	Value.SetValue(Stats.GraphicsStatistics.VertexBufferCount);
-	GraphicsVertexBufferCount->SetText(GraphicsVertexBufferText + Value);
+	Value.SetUInt32(Stats.GraphicsStatistics.VertexBufferCount);
+	GraphicsVertexBufferCount->SetText(ZEFormat::Format(GraphicsVertexBufferText, Value));
 
-	Value.SetValue(Stats.GraphicsStatistics.VertexDeclarationCount);
-	GraphicsVertexDeclarationCount->SetText(GraphicsVertexDeclarationText + Value);
+	Value.SetUInt32(Stats.GraphicsStatistics.VertexDeclarationCount);
+	GraphicsVertexDeclarationCount->SetText(ZEFormat::Format(GraphicsVertexDeclarationText, Value));
 
-	Value.SetValue(Stats.GraphicsStatistics.TotalVertexBufferSize);
-	GraphicsTotalVertexBufferSize->SetText(GraphicsTotalVertexBufferSizeText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.GraphicsStatistics.TotalVertexBufferSize);
+	GraphicsTotalVertexBufferSize->SetText(ZEFormat::Format(GraphicsTotalVertexBufferSizeText, Value));
 
-	Value.SetValue(Stats.GraphicsStatistics.ShaderCount);
-	GraphicsShaderCount->SetText(GraphicsShaderText + Value);
+	Value.SetUInt32(Stats.GraphicsStatistics.ShaderCount);
+	GraphicsShaderCount->SetText(ZEFormat::Format(GraphicsShaderText, Value));
 
-	Value.SetValue(Stats.GraphicsStatistics.TextureCount);
-	GraphicsTextureCount->SetText(GraphicsTextureText + Value);
+	Value.SetUInt32(Stats.GraphicsStatistics.TextureCount);
+	GraphicsTextureCount->SetText(ZEFormat::Format(GraphicsTextureText, Value));
 
-	Value.SetValue(Stats.GraphicsStatistics.Texture2DCount);
-	GraphicsTexture2DCount->SetText(GraphicsTexture2DText + Value);
+	Value.SetUInt32(Stats.GraphicsStatistics.Texture2DCount);
+	GraphicsTexture2DCount->SetText(ZEFormat::Format(GraphicsTexture2DText, Value));
 
-	Value.SetValue(Stats.GraphicsStatistics.Texture3DCount);
-	GraphicsTexture3DCount->SetText(GraphicsTexture3DText + Value);
+	Value.SetUInt32(Stats.GraphicsStatistics.Texture3DCount);
+	GraphicsTexture3DCount->SetText(ZEFormat::Format(GraphicsTexture3DText, Value));
 
-	Value.SetValue(Stats.GraphicsStatistics.TextureCubeCount);
-	GraphicsTextureCubeCount->SetText(GraphicsTextureCubeText + Value);
+	Value.SetUInt32(Stats.GraphicsStatistics.TextureCubeCount);
+	GraphicsTextureCubeCount->SetText(ZEFormat::Format(GraphicsTextureCubeText, Value));
 
-	Value.SetValue(Stats.GraphicsStatistics.TotalTextureSize);
-	GraphicsTotalTextureSize->SetText(GraphicsTotalTextureSizeText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.GraphicsStatistics.TotalTextureSize);
+	GraphicsTotalTextureSize->SetText(ZEFormat::Format(GraphicsTotalTextureSizeText, Value));
 
-	Value.SetValue(Stats.GraphicsStatistics.RenderTargetCount);
-	GraphicsRenderTargetCount->SetText(GraphicsRenderTargetText + Value);
+	Value.SetUInt32(Stats.GraphicsStatistics.RenderTargetCount);
+	GraphicsRenderTargetCount->SetText(ZEFormat::Format(GraphicsRenderTargetText, Value));
 
-	Value.SetValue(Stats.GraphicsStatistics.TotalRenderTargetSize);
-	GraphicsTotalRenderTargetSize->SetText(GraphicsTotalRenderTargetSizeText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.GraphicsStatistics.TotalRenderTargetSize);
+	GraphicsTotalRenderTargetSize->SetText(ZEFormat::Format(GraphicsTotalRenderTargetSizeText, Value));
 
-	Value.SetValue(Stats.GraphicsStatistics.DepthBufferCount);
-	GraphicsDepthBufferCount->SetText(GraphicsDepthBufferText + Value);
+	Value.SetUInt32(Stats.GraphicsStatistics.DepthBufferCount);
+	GraphicsDepthBufferCount->SetText(ZEFormat::Format(GraphicsDepthBufferText, Value));
 
-	Value.SetValue(Stats.GraphicsStatistics.TotalDepthBufferSize);
-	GraphicsTotalDepthBufferSize->SetText(GraphicsTotalDepthBufferSizeText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.GraphicsStatistics.TotalDepthBufferSize);
+	GraphicsTotalDepthBufferSize->SetText(ZEFormat::Format(GraphicsTotalDepthBufferSizeText, Value));
 
 	//Model Statistics
 
-	Value.SetValue(Stats.ModelStatistics.TotalMeshCount);
-	ModelTotalMeshCount->SetText(ModelTotalMeshText + Value);
+	Value.SetUInt32(Stats.ModelStatistics.TotalMeshCount);
+	ModelTotalMeshCount->SetText(ZEFormat::Format(ModelTotalMeshText, Value));
 
-	Value.SetValue(Stats.ModelStatistics.CulledMeshCount);
-	ModelCulledMeshCount->SetText(ModelCulledMeshText + Value);
+	Value.SetUInt32(Stats.ModelStatistics.CulledMeshCount);
+	ModelCulledMeshCount->SetText(ZEFormat::Format(ModelCulledMeshText, Value));
 
-	Value.SetValue(Stats.ModelStatistics.DrawnMeshCount);
-	ModelDrawnMeshCount->SetText(ModelDrawnMeshText + Value);
+	Value.SetUInt32(Stats.ModelStatistics.DrawnMeshCount);
+	ModelDrawnMeshCount->SetText(ZEFormat::Format(ModelDrawnMeshText, Value));
 
 	//Interior Statistics
 
-	Value.SetValue(Stats.InteriorStatistics.TotalRoomCount);
-	InteriorTotalRoomCount->SetText(InteriorTotalRoomText + Value);
+	Value.SetUInt32(Stats.InteriorStatistics.TotalRoomCount);
+	InteriorTotalRoomCount->SetText(ZEFormat::Format(InteriorTotalRoomText, Value));
 
-	Value.SetValue(Stats.InteriorStatistics.CulledRoomCount);
-	InteriorCulledRoomCount->SetText(InteriorCulledRoomText + Value);
+	Value.SetUInt32(Stats.InteriorStatistics.CulledRoomCount);
+	InteriorCulledRoomCount->SetText(ZEFormat::Format(InteriorCulledRoomText, Value));
 
-	Value.SetValue(Stats.InteriorStatistics.DrawedRoomCount);
-	InteriorDrawedRoomCount->SetText(InteriorDrawedRoomText + Value);
+	Value.SetUInt32(Stats.InteriorStatistics.DrawedRoomCount);
+	InteriorDrawedRoomCount->SetText(ZEFormat::Format(InteriorDrawedRoomText, Value));
 
-	Value.SetValue(Stats.InteriorStatistics.TotalDoorCount);
-	InteriorTotalDoorCount->SetText(InteriorTotalDoorText + Value);
+	Value.SetUInt32(Stats.InteriorStatistics.TotalDoorCount);
+	InteriorTotalDoorCount->SetText(ZEFormat::Format(InteriorTotalDoorText, Value));
 
-	Value.SetValue(Stats.InteriorStatistics.SeenDoorCount);
-	InteriorSeenDoorCount->SetText(InteriorSeenDoorText + Value);
+	Value.SetUInt32(Stats.InteriorStatistics.SeenDoorCount);
+	InteriorSeenDoorCount->SetText(ZEFormat::Format(InteriorSeenDoorText, Value));
 
-	Value.SetValue(Stats.InteriorStatistics.TotalInteriorPolygonCount);
-	InteriorTotalPolygonCount->SetText(InteriorTotalPolygonText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.InteriorStatistics.TotalInteriorPolygonCount);
+	InteriorTotalPolygonCount->SetText(ZEFormat::Format(InteriorTotalPolygonText, Value));
 
-	Value.SetValue(Stats.InteriorStatistics.CulledInteriorPolygonCount);
-	InteriorCulledPolygonCount->SetText(InteriorCulledPolygonText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.InteriorStatistics.CulledInteriorPolygonCount);
+	InteriorCulledPolygonCount->SetText(ZEFormat::Format(InteriorCulledPolygonText, Value));
 
-	Value.SetValue(Stats.InteriorStatistics.DrawedInteriorPolygonCount);
-	InteriorDrawedPolygonCount->SetText(InteriorDrawedPolygonText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.InteriorStatistics.DrawedInteriorPolygonCount);
+	InteriorDrawedPolygonCount->SetText(ZEFormat::Format(InteriorDrawedPolygonText, Value));
 
 	// Particle Statistics
 
-	Value.SetValue(Stats.ParticleStatistics.EmitterCount);
-	ParticleEmitterCount->SetText(ParticleEmitterText + Value);
+	Value.SetUInt32(Stats.ParticleStatistics.EmitterCount);
+	ParticleEmitterCount->SetText(ZEFormat::Format(ParticleEmitterText, Value));
 
-	Value.SetValue(Stats.ParticleStatistics.TotalParticleCount);
-	ParticleTotalParticleCount->SetText(ParticleTotalParticleText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.ParticleStatistics.TotalParticleCount);
+	ParticleTotalParticleCount->SetText(ZEFormat::Format(ParticleTotalParticleText, Value));
 
-	Value.SetValue(Stats.ParticleStatistics.DrawedParticleCount);
-	ParticleDrawedParticleCount->SetText(ParticleDrawedParticleText + Value);
+	Value.SetUInt32((ZEUInt32)Stats.ParticleStatistics.DrawedParticleCount);
+	ParticleDrawedParticleCount->SetText(ZEFormat::Format(ParticleDrawedParticleText, Value));
 
 
 	ZEUIControl::Draw(Renderer);
@@ -276,8 +277,8 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 		GetChildControls()[I]->SetZOrder(GetZOrder());
 
 	static float TotalElapsedTime = 0;
-	static unsigned int AverageFPS = 0;
-	static unsigned int FrameCount = 0;
+	static ZEUInt32 AverageFPS = 0;
+	static ZEUInt32 FrameCount = 0;
 
 	FrameCount++;
 	TotalElapsedTime += ElapsedTime;
@@ -293,17 +294,16 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 	if (TempScene->GetActiveCamera() != NULL)
 	{
 		ZEVector3 CamPos = TempScene->GetActiveCamera()->GetWorldPosition();
-		ZEString Value;
+		//ZEVariant Value;
 
-		Value.SetValue(AverageFPS);
-		FPSCount->SetText(FPSText + Value);
+		//Value.SetUInt32(AverageFPS);
+		FPSCount->SetText(ZEFormat::Format(FPSText, AverageFPS));
 
-		static char FormatString[100];
+		//static char FormatString[100];
 
-		sprintf(FormatString, "X: %.3lf, Y: %.3lf, Z: %.3lf", CamPos.x, CamPos.y, CamPos.z);
+		//sprintf(FormatString, "X: %.3lf, Y: %.3lf, Z: %.3lf", CamPos.x, CamPos.y, CamPos.z);
 
-		Value.SetValue(FormatString);
-		CameraPosition->SetText(CamPosText + Value);
+		CameraPosition->SetText(ZEFormat::Format(CamPosText, CamPos.x, CamPos.y, CamPos.z));
 	}
 
 	zeInput->ProcessInputMap(&InputMap);
