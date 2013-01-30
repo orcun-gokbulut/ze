@@ -35,6 +35,7 @@
 
 #include "ZEParticleEffect.h"
 #include "ZEGame/ZEEntityProvider.h"
+#include "ZEGame/ZEDrawParameters.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEParticleEffect);
 		
@@ -57,11 +58,25 @@ void ZEParticleEffect::Draw(ZEDrawParameters* DrawParameters)
 	if(!GetVisible())
 		return;
 
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+	{
+		memset(&Statistics, 0, sizeof(ZEParticleStatistics));
+
+		Statistics.EmitterCount = Emitters.GetCount();
+	}
+
 	for(ZESize I = 0; I < Emitters.GetCount(); I++)
 		Emitters[I]->Draw(DrawParameters);
 
 	for(ZESize I = 0; I < Systems.GetCount(); I++)
 		Systems[I]->Draw(DrawParameters);
+
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+	{
+		DrawParameters->Statistics.ParticleStatistics.EmitterCount += Statistics.EmitterCount;
+		DrawParameters->Statistics.ParticleStatistics.TotalParticleCount += Statistics.TotalParticleCount;
+		DrawParameters->Statistics.ParticleStatistics.DrawedParticleCount += Statistics.DrawedParticleCount;
+	}
 }
 
 void ZEParticleEffect::Tick(float TimeElapsed)
@@ -111,9 +126,16 @@ void ZEParticleEffect::RemoveSystem(ZEParticleSystem* System)
 	Systems.DeleteValue(System);
 }
 
+const ZEParticleStatistics& ZEParticleEffect::GetStatistics()
+{
+	return Statistics;
+}
+
 ZEParticleEffect::ZEParticleEffect()
 {
 	SetBoundingBox(ZEAABBox(-ZEVector3::One * 10, ZEVector3::One * 10));
+
+	memset(&Statistics, 0, sizeof(ZEParticleStatistics));
 }
 
 ZEParticleEffect::~ZEParticleEffect()

@@ -43,7 +43,7 @@
 
 class ZEInterior;
 class ZEInteriorDoor;
-struct ZEInteriorRoomResource;
+struct ZEInteriorResourceRoom;
 class ZEStaticVertexBuffer;
 class ZEPhysicalMesh;
 class ZERenderer;
@@ -57,8 +57,8 @@ class ZEInteriorRoom
 	friend class ZEInterior;
 
 	private:
-		ZEInterior*						Owner;
-		const ZEInteriorRoomResource*	Resource;
+		ZEInterior*							Owner;
+		const ZEInteriorResourceRoom*		Resource;
 		ZEStaticVertexBuffer*				VertexBuffer;
 		ZEArray<ZERenderCommand>			RenderCommands;
 		ZEArray<ZEInteriorDoor*>			Doors;
@@ -90,7 +90,7 @@ class ZEInteriorRoom
 											~ZEInteriorRoom();
 
 	public:
-		ZEInterior*						GetOwner();
+		ZEInterior*							GetOwner();
 		const char*							GetName();
 
 		const ZEArray<ZEInteriorDoor*>&		GetDoors();
@@ -109,7 +109,7 @@ class ZEInteriorRoom
 		void								SetScale(const ZEVector3& NewScale);
 		const ZEVector3&					GetScale() const;
 
-		bool								Initialize(ZEInterior* Owner, ZEInteriorRoomResource* Resource);
+		bool								Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resource);
 		void								Deinitialize();
 
 		void								SetPersistentDraw(bool Enabled);

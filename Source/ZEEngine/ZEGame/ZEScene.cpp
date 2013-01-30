@@ -309,6 +309,11 @@ ZESceneCuller& ZEScene::GetSceneCuller()
 	return Culler;
 }
 
+const ZESceneStatistics& ZEScene::GetStatistics() const
+{
+	return Culler.GetStatistics();
+}
+
 ZEListener* ZEScene::GetActiveListener()
 {
 	return ActiveListener;
@@ -351,11 +356,13 @@ void ZEScene::Render(float ElapsedTime)
 	FrameDrawParameters.View = (ZEView*)&ActiveCamera->GetView();
 	FrameDrawParameters.Lights.Clear();
 
-	memset(&FrameDrawParameters.Statistics, 0, sizeof(ZESceneStatistics));
+	memset(&FrameDrawParameters.Statistics, 0, sizeof(ZEDrawStatistics));
+
+	FrameDrawParameters.Renderer->SetDrawParameters(&FrameDrawParameters);
 
 	Culler.CullScene(this, &FrameDrawParameters);
 
-	FrameDrawParameters.Renderer->SetDrawParameters(&FrameDrawParameters);
+	//Fill Draw Parameters Statistics ZESceneStats section
 }
 
 bool ZEScene::Save(const ZEString& FileName)

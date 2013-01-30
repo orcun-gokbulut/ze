@@ -41,6 +41,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZEGame/ZEDrawStatistics.h"
 
 struct ZEViewPoint
 {
@@ -70,6 +71,9 @@ enum ZERendererType
 class ZERenderer
 {
 	protected:
+
+		ZERendererStatistics					Statistics;
+
 												ZERenderer();
 		virtual									~ZERenderer();
 
@@ -79,6 +83,7 @@ class ZERenderer
 		virtual ZEDrawParameters*				GetDrawParameters() = 0;
 
 		virtual ZERendererType					GetRendererType() = 0;
+		virtual	const ZERendererStatistics&		GetStatistics() const;
 
 		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors() = 0;
 		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor) = 0;

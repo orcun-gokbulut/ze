@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDrawParameters.h
+ Zinek Engine - ZEUISequencePlayer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,69 +34,51 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_DRAW_PARAMETERS_H__
-#define __ZE_DRAW_PARAMETERS_H__
-
-#include "ZETypes.h"
+#ifndef	__ZE_UI_SEQUANCE_PLAYER__
+#define __ZE_UI_SEQUANCE_PLAYER__
+#include "ZEUI/ZEUIFrameControl.h"
+#include "ZEGraphics/ZETexture2D.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEDrawStatistics.h"
+#include "ZESound/ZESoundSource.h"
 
-class ZELight;
-class ZECamera;
-class ZERenderer;
-class ZEViewVolume;
-
-enum ZERenderPass
+enum ZEUISequencePlayerState
 {
-	ZE_RP_COLOR,
-	ZE_RP_DEPTH,
-	ZE_RP_SHADOW_MAP,
-	ZE_RP_OCCLUSION_MAP
+	ZEUI_SPS_STOPPED,
+	ZEUI_SPS_PLAYING,
+	ZEUI_SPS_PAUSED
 };
 
-enum ZEViewType
+class ZEUISequencePlayer : public ZEUIFrameControl
 {
-	ZE_VPT_CAMERA,
-	ZE_VPT_LIGHT
-};
+	private:
 
-struct ZEView
-{
-	ZEViewType				Type;
-	ZELight*				Light;
-	ZECamera*				Camera;
+		ZEArray<const ZETexture2D*>	Frames;
+		ZESoundSource*				SoundPlayer;
 
-	ZEVector3				Position;
-	ZEQuaternion			Rotation;
-	ZEVector3				Direction;
+		float						TimeRemainder;
+		float						Time;
 
-	float					FOV;
+		float						FramesPerSecond;
+		ZEUInt32					FrameCounter;
 
-	ZEMatrix4x4				ViewTransform;
-	ZEMatrix4x4				ProjectionTransform;
-	ZEMatrix4x4				ViewProjectionTransform;
-};
+		ZEUISequencePlayerState		State;
 
-class ZEViewPort;
+	public:
 
-struct ZEDrawParameters
-{
-	ZESize					FrameId;
-	float					ElapsedTime;
-	float					Time;
-	ZERenderer*				Renderer;
-	ZERenderPass			Pass;
-	ZEDrawStatistics		Statistics;
+		virtual  void				Tick(float ElapsedTime);
+		
+		void						SetFramesPerSecond(float FPS);
+		float						GetFramesPerSecond() const;
 
-	const ZEView*			View;
-	const ZEViewPort*		ViewPort;
-	const ZEViewVolume*		ViewVolume;
+		void						SetFramesSequence(const ZEString& FolderPath, ZEUInt FrameCount);
+		void						SetAudioFile(const ZEString& FileName);
 
-	ZESmartArray<ZELight*>	Lights;
-	void*					CustomData;
+		void						Play();
+		void						Stop();
+		void						SetVolume(ZEUInt Volume);
+
+									ZEUISequencePlayer();
+									~ZEUISequencePlayer();
 };
 
 #endif

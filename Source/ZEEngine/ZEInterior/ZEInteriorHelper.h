@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDrawParameters.h
+ Zinek Engine - ZEInteriorHelper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,69 +34,84 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_DRAW_PARAMETERS_H__
-#define __ZE_DRAW_PARAMETERS_H__
+#ifndef	__ZE_INTERIOR_HELPER_H__
+#define __ZE_INTERIOR_HELPER_H__
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEDrawStatistics.h"
 
-class ZELight;
-class ZECamera;
-class ZERenderer;
-class ZEViewVolume;
-
-enum ZERenderPass
+enum ZEInteriorHelperOwnerType
 {
-	ZE_RP_COLOR,
-	ZE_RP_DEPTH,
-	ZE_RP_SHADOW_MAP,
-	ZE_RP_OCCLUSION_MAP
+	ZE_IHOT_INTERIOR		= 0,
+	ZE_IHOT_ROOM			= 1
 };
 
-enum ZEViewType
+class ZEInterior;
+struct ZEInteriorResourceHelper;
+class ZEInteriorRoom;
+
+class ZEInteriorHelper
 {
-	ZE_VPT_CAMERA,
-	ZE_VPT_LIGHT
+private:
+
+	ZEInterior*							OwnerInterior;
+
+	ZEInteriorHelperOwnerType			OwnerType;
+
+	ZEInteriorRoom*						OwnerRoom;
+
+	const ZEInteriorResourceHelper*		HelperResource;
+
+	ZEVector3							Position;
+	ZEVector3							Scale;
+	ZEQuaternion						Rotation;
+
+										ZEInteriorHelper();
+
+public:
+
+	const char*							GetName();
+
+	ZEInteriorHelperOwnerType			GetOwnerType();
+
+	ZEInteriorRoom*						GetRoomOwner();
+
+	void								SetPosition(const ZEVector3& LocalPosition);
+	const ZEVector3&					GetPosition();
+	const ZEVector3						GetInteriorPosition();
+	const ZEVector3						GetWorldPosition();
+
+	void								SetRotation(const ZEQuaternion& LocalRotation);
+	const ZEQuaternion&					GetRotation();
+	const ZEQuaternion					GetInteriorRotation();
+	const ZEQuaternion					GetWorldRotation();
+
+	void								SetScale(const ZEVector3& LocalScale);
+	const ZEVector3&					GetScale();
+	const ZEVector3						GetInteriorScale();
+	const ZEVector3						GetWorldScale();
+
+	ZEVector3							GetFront();
+	ZEVector3							GetRight();
+	ZEVector3							GetUp();
+
+	ZEVector3							GetInteriorFront();
+	ZEVector3							GetInteriorRight();
+	ZEVector3							GetInteriorUp();
+
+	ZEVector3							GetWorldFront();
+	ZEVector3							GetWorldRight();
+	ZEVector3							GetWorldUp();
+
+	void								Initialize(ZEInterior* Interior, const ZEInteriorResourceHelper* HelperResource);
+	void								Deinitialize();
+
+	static ZEInteriorHelper*			CreateInstance();
+
+										
+
 };
 
-struct ZEView
-{
-	ZEViewType				Type;
-	ZELight*				Light;
-	ZECamera*				Camera;
 
-	ZEVector3				Position;
-	ZEQuaternion			Rotation;
-	ZEVector3				Direction;
-
-	float					FOV;
-
-	ZEMatrix4x4				ViewTransform;
-	ZEMatrix4x4				ProjectionTransform;
-	ZEMatrix4x4				ViewProjectionTransform;
-};
-
-class ZEViewPort;
-
-struct ZEDrawParameters
-{
-	ZESize					FrameId;
-	float					ElapsedTime;
-	float					Time;
-	ZERenderer*				Renderer;
-	ZERenderPass			Pass;
-	ZEDrawStatistics		Statistics;
-
-	const ZEView*			View;
-	const ZEViewPort*		ViewPort;
-	const ZEViewVolume*		ViewVolume;
-
-	ZESmartArray<ZELight*>	Lights;
-	void*					CustomData;
-};
 
 #endif

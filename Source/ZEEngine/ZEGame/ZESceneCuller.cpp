@@ -41,40 +41,46 @@
 #include "ZEDrawParameters.h"
 #include "ZEMath/ZEViewVolume.h"
 
+
 void ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
 {
-	if (CurrentPass == ZE_RP_COLOR)
-		DrawParameters->Statistics.TotalEntityCount++;
+	ZEUInt32 EntityDrawFlags = Entity->GetDrawFlags();
+
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+	{
+		Statistics.TotalEntityCount++;
+
+		if ((EntityDrawFlags & ZE_DF_LIGHT_SOURCE) == ZE_DF_LIGHT_SOURCE)
+			Statistics.TotalLightCount++;
+	}
 
 	if (!Entity->GetVisible())
 		return;
 
-	ZEUInt32 EntityDrawFlags = Entity->GetDrawFlags();
-
 	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)
 	{
-		if (CurrentPass == ZE_RP_COLOR)
-			DrawParameters->Statistics.DrawableEntityCount++;
+		if (DrawParameters->Pass == ZE_RP_COLOR)
+			Statistics.DrawableEntityCount++;
 
 		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL)
 		{
 			if (DrawParameters->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
 			{
-				if (CurrentPass == ZE_RP_COLOR)
-					DrawParameters->Statistics.CulledEntityCount++;
+				if (DrawParameters->Pass == ZE_RP_COLOR)
+					Statistics.CulledEntityCount++;
 			}
 			else
 			{
-				if (CurrentPass == ZE_RP_COLOR)
-					DrawParameters->Statistics.DrawedEntityCount++;
+				if (DrawParameters->Pass == ZE_RP_COLOR)
+					Statistics.DrawedEntityCount++;
 
 				Entity->Draw(DrawParameters);
 			}
 		}
 		else
 		{
-			if (CurrentPass == ZE_RP_COLOR)
-				DrawParameters->Statistics.DrawedEntityCount++;
+			if (DrawParameters->Pass == ZE_RP_COLOR)
+				Statistics.DrawedEntityCount++;
 
 			Entity->Draw(DrawParameters);
 		}
@@ -97,18 +103,34 @@ void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameter
 
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		CullEntity(Entities[I], DrawParameters);
+
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+	{
+		Statistics.DrawedLightCount = DrawParameters->Lights.GetCount();
+		Statistics.CulledLightCount = Statistics.TotalLightCount - Statistics.DrawedLightCount;
+	}
+
 }
 
 void ZESceneCuller::CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 {
-	CurrentPass = DrawParameters->Pass;
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+		memset(&Statistics, 0, sizeof(ZESceneStatistics));
 
 	CullEntities(Scene, DrawParameters);
+
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+		DrawParameters->Statistics.SceneStatistics = Statistics;
+}
+
+const ZESceneStatistics& ZESceneCuller::GetStatistics() const
+{
+	return Statistics;
 }
 
 ZESceneCuller::ZESceneCuller()
 {
-	CurrentPass = ZE_RP_COLOR;
+	memset(&Statistics, 0, sizeof(ZESceneStatistics));
 }
 
 ZESceneCuller::~ZESceneCuller()

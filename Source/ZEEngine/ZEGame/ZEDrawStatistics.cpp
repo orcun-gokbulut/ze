@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDrawParameters.h
+ Zinek Engine - ZEDrawStatistics.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_DRAW_PARAMETERS_H__
-#define __ZE_DRAW_PARAMETERS_H__
-
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
 #include "ZEDrawStatistics.h"
-
-class ZELight;
-class ZECamera;
-class ZERenderer;
-class ZEViewVolume;
-
-enum ZERenderPass
-{
-	ZE_RP_COLOR,
-	ZE_RP_DEPTH,
-	ZE_RP_SHADOW_MAP,
-	ZE_RP_OCCLUSION_MAP
-};
-
-enum ZEViewType
-{
-	ZE_VPT_CAMERA,
-	ZE_VPT_LIGHT
-};
-
-struct ZEView
-{
-	ZEViewType				Type;
-	ZELight*				Light;
-	ZECamera*				Camera;
-
-	ZEVector3				Position;
-	ZEQuaternion			Rotation;
-	ZEVector3				Direction;
-
-	float					FOV;
-
-	ZEMatrix4x4				ViewTransform;
-	ZEMatrix4x4				ProjectionTransform;
-	ZEMatrix4x4				ViewProjectionTransform;
-};
-
-class ZEViewPort;
-
-struct ZEDrawParameters
-{
-	ZESize					FrameId;
-	float					ElapsedTime;
-	float					Time;
-	ZERenderer*				Renderer;
-	ZERenderPass			Pass;
-	ZEDrawStatistics		Statistics;
-
-	const ZEView*			View;
-	const ZEViewPort*		ViewPort;
-	const ZEViewVolume*		ViewVolume;
-
-	ZESmartArray<ZELight*>	Lights;
-	void*					CustomData;
-};
-
-#endif

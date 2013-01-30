@@ -45,6 +45,12 @@
 #include "ZEML\ZEMLSerialWriter.h"
 #include "ZEMath\ZEAngle.h"
 
+enum ZEInteriorHelperOwnerType
+{
+	ZE_IHOT_INTERIOR		= 0,
+	ZE_IHOT_ROOM			= 1
+};
+
 ZEPackStruct(
 struct ZEInteriorFilePhysicalMeshPolygon
 {
@@ -75,21 +81,21 @@ struct ZEInteriorFilePolygon
 	ZEInteriorFileVertex					Vertices[3];
 });
 
-ZEInt ZE3dsMaxInteriorExporter::ProcessFaceMaterial(IGameMaterial* Material)
+ZEInt32 ZE3dsMaxInteriorExporter::ProcessFaceMaterial(IGameMaterial* Material)
 {
 	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)
 		if (Materials[I] == Material)
-			return (ZEInt)I;
+			return (ZEInt32)I;
 
 	Materials.Append(1, &Material);
 
 	return Materials.Count() - 1;
 }
 
-ZEInt ZE3dsMaxInteriorExporter::FindRoomIndex(IGameNode* Node)
+ZEInt32 ZE3dsMaxInteriorExporter::FindRoomIndex(IGameNode* Node)
 {
 	for (ZESize I = 0; I < (ZESize)Rooms.Count(); I++)
-		if (Node == Rooms[I]) return (ZEInt)I;
+		if (Node == Rooms[I]) return (ZEInt32)I;
 
 	return -1;
 }
@@ -100,7 +106,7 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 
 	if (Doors.Count() == 0)
 	{
-		zeWarning("No interior doors found. Interior door processing aborted.");
+		zeLog("No doors with ZEInteriorDoorAttribute found. Interior door processing skipped.");
 		return true;
 	}
 
@@ -162,19 +168,25 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 			return false;
 		}
 
-		ZEInt RoomAIndex = FindRoomIndex(Scene->GetIGameNode(RoomANode));
+		ZEInt32 RoomAIndex = FindRoomIndex(Scene->GetIGameNode(RoomANode));
 		
 		if(RoomAIndex < 0)
 			zeError("Can nor find RoomAIndex.");
 		
 		DoorNode->AddProperty("RoomAIndex", RoomAIndex);
 
-		ZEInt RoomBIndex = FindRoomIndex(Scene->GetIGameNode(RoomBNode));
+		ZEInt32 RoomBIndex = FindRoomIndex(Scene->GetIGameNode(RoomBNode));
 
 		if(RoomBIndex < 0)
 			zeError("Can nor find RoomBIndex.");
 
 		DoorNode->AddProperty("RoomBIndex", RoomBIndex);
+
+		MSTR UserDefinedPropertiesBuffer;
+		CurrentNode->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
+
+		if (!UserDefinedPropertiesBuffer.isNull())
+			DoorNode->AddProperty("UserDefinedProperties", ZEString(UserDefinedPropertiesBuffer.data()));
 	
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
@@ -190,14 +202,14 @@ void ZE3dsMaxInteriorExporter::ProcessPhysicalMesh(IGameNode* ParentNode, IGameN
 		zeError("Can not initialize mesh data for phsical mesh.");
 
 	ZEArray<ZEInteriorFilePhysicalMeshPolygon> Polygons;
-	Polygons.SetCount(Mesh->GetNumberOfFaces());
+	Polygons.SetCount((ZESize)Mesh->GetNumberOfFaces());
 
 	if(Mesh->GetNumberOfFaces() == 0)
 		zeError("Physical mesh face count is : 0.");
 
 	for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
 	{
-		FaceEx* Face = Mesh->GetFace((ZEInt)I);
+		FaceEx* Face = Mesh->GetFace((ZEInt32)I);
 		Polygons[I].Indices[0] = Face->vert[0]; 
 		Polygons[I].Indices[1] = Face->vert[1]; 
 		Polygons[I].Indices[2] = Face->vert[2]; 
@@ -206,7 +218,7 @@ void ZE3dsMaxInteriorExporter::ProcessPhysicalMesh(IGameNode* ParentNode, IGameN
 	PhysicalMeshNode->AddDataProperty("Polygons", Polygons.GetCArray(), sizeof(ZEInteriorFilePhysicalMeshPolygon) * Polygons.GetCount(), true);
 
 	ZEArray<ZEVector3> Vertices;
-	Vertices.SetCount(Mesh->GetNumberOfVerts());
+	Vertices.SetCount((ZESize)Mesh->GetNumberOfVerts());
 
 	ZEMatrix4x4 ObjectTM;
 	ZEMatrix4x4::CreateOrientation(ObjectTM, 
@@ -232,7 +244,7 @@ void ZE3dsMaxInteriorExporter::ProcessPhysicalMesh(IGameNode* ParentNode, IGameN
 
 	for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfVerts(); I++)
 	{
-		TempObjectVertex = Mesh->GetVertex((ZEInt)I, true);
+		TempObjectVertex = Mesh->GetVertex((ZEInt32)I, true);
 		ZEMatrix4x4::Transform(Vertices[I], TotalTransform, ZE3dsMaxUtils::MaxtoZE(TempObjectVertex));
 	}
 
@@ -245,8 +257,8 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 
 	if (Rooms.Count() == 0)
 	{
-		zeWarning("No rooms found. Room processing aborted.");
-		return true;
+		zeError("No rooms with ZEInteriorRoomAttribute found. Room processing aborted. Interiors must contain at least single Room object.");
+		return false;
 	}
 
 	ZEMLNode* RoomsNode = InteriorNode.AddSubNode("Rooms");
@@ -269,6 +281,12 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 		RoomNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Rotation()));
 		RoomNode->AddProperty("Scale", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Scaling()));
 
+		MSTR UserDefinedPropertiesBuffer;
+		CurrentNode->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
+
+		if (!UserDefinedPropertiesBuffer.isNull())
+			RoomNode->AddProperty("UserDefinedProperties", ZEString(UserDefinedPropertiesBuffer.data()));
+
 		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "PhysicalMeshExists", PhysicalMeshExists))
 			zeError("Can not find room property : \"PhysicalMeshExists\".");
 
@@ -288,6 +306,13 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 			{
 				ZEMLNode* PhysicalMeshZEMLNode = RoomNode->AddSubNode("PhysicalMesh");
 				PhysicalMeshZEMLNode->AddProperty("PhysicalMeshEnabled", PhysicalMeshEnabled);
+
+				MSTR UserDefinedPropertiesBuffer;
+				CurrentNode->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
+
+				if (!UserDefinedPropertiesBuffer.isNull())
+					PhysicalMeshZEMLNode->AddProperty("UserDefinedProperties", ZEString(UserDefinedPropertiesBuffer.data()));
+
 				ProcessPhysicalMesh(CurrentNode, CurrentNode, PhysicalMeshZEMLNode);
 			}
 			else
@@ -302,6 +327,13 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 				{
 					ZEMLNode* PhysicalMeshZEMLNode = RoomNode->AddSubNode("PhysicalMesh");
 					PhysicalMeshZEMLNode->AddProperty("PhysicalMeshEnabled", PhysicalMeshEnabled);
+
+					MSTR UserDefinedPropertiesBuffer;
+					PhysicalMeshNode->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
+
+					if (!UserDefinedPropertiesBuffer.isNull())
+						PhysicalMeshZEMLNode->AddProperty("UserDefinedProperties", ZEString(UserDefinedPropertiesBuffer.data()));
+
 					ProcessPhysicalMesh(CurrentNode, PhysicalMeshNode, PhysicalMeshZEMLNode);
 				}
 			}
@@ -321,7 +353,7 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 			zeError("Face count is : 0.");
 
 		ZEArray<ZEInteriorFilePolygon> Polygons;
-		Polygons.SetCount(Mesh->GetNumberOfFaces());
+		Polygons.SetCount((ZESize)Mesh->GetNumberOfFaces());
 		
 		ZEMatrix4x4 ObjectTM;
 		ZEMatrix4x4::CreateOrientation(ObjectTM, 
@@ -340,19 +372,19 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 		for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
 		{
 			FaceEx* Face;
-			Face = Mesh->GetFace((ZEInt)I);
-			if (Mesh->GetMaterialFromFace((ZEInt)I) == NULL)
+			Face = Mesh->GetFace((ZEInt32)I);
+			if (Mesh->GetMaterialFromFace((ZEInt32)I) == NULL)
 			{
 				zeError("Face %d of room \"%s\" does not have valid material.", I, CurrentNode->GetName());
 				return false;
 			}
 
-			Polygons[I].Material = ProcessFaceMaterial(Mesh->GetMaterialFromFace((ZEInt)I));
+			Polygons[I].Material = ProcessFaceMaterial(Mesh->GetMaterialFromFace((ZEInt32)I));
 
 			for (ZESize N = 0; N < 3; N++)
 			{
 				ZEInteriorFileVertex* Vertex = &Polygons[I].Vertices[N];
-				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt)I, (ZEInt)N);
+				ZEInt32 BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt32)I, (ZEInt32)N);
 
 				Point3 Temp;
 				if(!Mesh->GetVertex(Face->vert[N], Temp, true))
@@ -381,6 +413,115 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 		}
 
 		RoomNode->AddDataProperty("Polygons", Polygons.GetCArray(), sizeof(ZEInteriorFilePolygon) * Polygons.GetCount(), true);
+
+		ZEProgressDialog::GetInstance()->CloseTask();
+	}
+
+	return true;
+}
+
+bool ZE3dsMaxInteriorExporter::ProcessHelpers()
+{
+	zeLog("Processing Interior Helpers...");
+
+	if (Helpers.Count() == 0)
+	{
+		zeWarning("No helpers with ZEHelperAttribute found. Interior helper processing aborted.");
+		return true;
+	}
+
+	ZEMLNode* HelpersNode = InteriorNode.AddSubNode("Helpers");
+
+	for (ZESize I = 0; I < (ZESize)Helpers.Count(); I++)
+	{
+		ZEMLNode* HelperNode = HelpersNode->AddSubNode("Helper");
+
+		IGameNode* Node = Helpers[I];
+		IGameObject* Helper = Node->GetIGameObject();
+
+		ZEProgressDialog::GetInstance()->OpenTask(Node->GetName());
+		zeLog("Processing helper \"%s\".", Node->GetName());
+
+		HelperNode->AddProperty("Name", Node->GetName());
+
+		INode* OwnerNode = NULL;
+		ZEInt32 OwnerIndex;
+		ZEInteriorHelperOwnerType OwnerType;
+
+		if(!ZE3dsMaxUtils::GetProperty(Helper, "Owner", OwnerNode))
+			zeError("Can not find helper property: Owner");
+
+		IGameNode* OwnerGameNode = Scene->GetIGameNode(OwnerNode);
+
+		if (OwnerNode == NULL)
+		{
+			zeWarning("Helper \"%s\" has no immediate owner parameter. Interior will be set as owner.", Node->GetName());
+
+			OwnerIndex = -1;
+			OwnerType = ZEInteriorHelperOwnerType::ZE_IHOT_INTERIOR;
+		}
+		else
+		{
+			const char* Type;
+			bool CurrentExportOption;
+
+			ZE3dsMaxUtils::GetProperty(OwnerGameNode->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type);
+
+			if (strcmp(Type, "Room") == 0)
+			{
+				OwnerIndex = ZE3dsMaxInteriorExporter::FindRoomIndex(OwnerGameNode);
+				OwnerType = ZEInteriorHelperOwnerType::ZE_IHOT_ROOM;
+			}
+			else
+			{
+				zeError("Helper \"%s\" has invalid owner parameter.", Node->GetName());
+				return false;
+			}
+		}
+
+		if (OwnerIndex < 0 && OwnerType != ZE_IHOT_INTERIOR)
+		{
+			zeError("Helper \"%s\" has invalid owner parameter.", Node->GetName());
+			return false;
+		}
+
+		HelperNode->AddProperty("OwnerType", (ZEInt32)OwnerType);
+		HelperNode->AddProperty("OwnerIndex", OwnerIndex);
+
+		ZEMatrix4x4 FinalTransform;
+
+		ZEMatrix4x4 WorldTM;
+		ZEMatrix4x4::CreateOrientation(WorldTM, 
+			ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Translation()), 
+			ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Rotation()), 
+			ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Scaling()));
+
+		if (OwnerIndex != -1)
+		{
+			ZEMatrix4x4 OwnerWorldTM;
+			ZEMatrix4x4::CreateOrientation(OwnerWorldTM,
+				ZE3dsMaxUtils::MaxtoZE(OwnerGameNode->GetWorldTM().Translation()), 
+				ZE3dsMaxUtils::MaxtoZE(OwnerGameNode->GetWorldTM().Rotation()), 
+				ZE3dsMaxUtils::MaxtoZE(OwnerGameNode->GetWorldTM().Scaling()));
+
+			FinalTransform = OwnerWorldTM.Inverse() * WorldTM;
+		}
+		else
+		{
+			FinalTransform = WorldTM;
+		}
+
+		HelperNode->AddProperty("Position", FinalTransform.GetTranslation());
+		HelperNode->AddProperty("Rotation", FinalTransform.GetRotation());
+		HelperNode->AddProperty("Scale", FinalTransform.GetScale());
+
+		MSTR UserDefinedPropertiesBuffer;
+		Node->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
+
+		if (!UserDefinedPropertiesBuffer.isNull())
+			HelperNode->AddProperty("UserDefinedProperties", ZEString(UserDefinedPropertiesBuffer.data()));
+
+		zeLog("Helper \"%s\" is processed.", Node->GetName());
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
 
@@ -448,11 +589,11 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 		}
 		zeLog("Material file successfully opened.");
 
-		ZEInt NumberOfMaps = NodeMaterial->GetNumberOfTextureMaps();
+		ZEInt32 NumberOfMaps = NodeMaterial->GetNumberOfTextureMaps();
 		ZEInt32 MapFlag = 0;
 		ZEString ResourceRelativePath;
 
-		for (ZEInt N = 0; N < NumberOfMaps; N++)
+		for (ZEInt32 N = 0; N < NumberOfMaps; N++)
 		{
 			IGameTextureMap* CurrentTexture = NodeMaterial->GetIGameTextureMap(N);
 			switch(CurrentTexture->GetStdMapSlot())
@@ -696,14 +837,18 @@ bool ZE3dsMaxInteriorExporter::ProcessScene()
 	ZESize ElectedNodeCount = 0;
 	ZESize RoomNodeCount = 0;
 	ZESize DoorNodeCount = 0;
+	ZESize HelperNodeCount = 0;
 	ZESize EntityNodeCount = 0;
-	Tab<IGameNode*> Nodes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
+	Tab<IGameNode*> MeshNodes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
 
-	for (ZESize I = 0; I < (ZESize)Nodes.Count(); I++)
+	IGameNode* CurrentNode = NULL;
+	IGameObject* CurrentObject = NULL;
+	const char* NodeZEType = NULL;
+
+	for (ZESize I = 0; I < (ZESize)MeshNodes.Count(); I++)
 	{
-		IGameNode* CurrentNode = Nodes[I];;
-		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
-		const char* NodeZEType;
+		CurrentNode = MeshNodes[I];
+		CurrentObject = CurrentNode->GetIGameObject();
 
 		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, "ZEType", NodeZEType))
 			continue;
@@ -729,7 +874,27 @@ bool ZE3dsMaxInteriorExporter::ProcessScene()
 		else
 			ElectedNodeCount++;
 	}
-	zeLog("Room Count: %d, Door Count: %d, Entity Count: %d, Elected Node Count: %d", RoomNodeCount, DoorNodeCount, EntityNodeCount, ElectedNodeCount);
+
+	Tab<IGameNode*> HelperNodes = Scene->GetIGameNodeByType(IGameObject::IGAME_HELPER);
+
+	for (ZESize I = 0; I < (ZESize)HelperNodes.Count(); I++)
+	{
+		CurrentNode = HelperNodes[I];
+		CurrentObject = CurrentNode->GetIGameObject();
+
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, "ZEType", NodeZEType))
+			continue;
+
+		if (strcmp(NodeZEType, "Helper") == 0)
+		{
+			HelperNodeCount++;
+			Helpers.Append(1, &CurrentNode);
+		}
+		else
+			ElectedNodeCount++;
+	}
+
+	zeLog("Room Count: %d, Door Count: %d, Helper Count: %d, Entity Count: %d, Elected Node Count: %d", RoomNodeCount, DoorNodeCount, HelperNodeCount, EntityNodeCount, ElectedNodeCount);
 
 	return true;
 }
@@ -771,8 +936,8 @@ void ZE3dsMaxInteriorExporter::CollectResources()
 		for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
 		{
 			FaceEx* Face;
-			Face = Mesh->GetFace((ZEInt)I);
-			IGameMaterial* CurrentMaterial = Mesh->GetMaterialFromFace((ZEInt)I);
+			Face = Mesh->GetFace((ZEInt32)I);
+			IGameMaterial* CurrentMaterial = Mesh->GetMaterialFromFace((ZEInt32)I);
 
 			if (CurrentMaterial == NULL)
 				zeError("Face %d of room \"%s\" does not have valid material. Can not collect resource.", I, CurrentNode->GetName());
@@ -795,11 +960,11 @@ void ZE3dsMaxInteriorExporter::CollectResources()
 
 		ResourceConfigurationDialog->AddResource(MaterialName + ".ZEMATERIAL", "Material", ZEString(), ZE_ROAA_COPY_OVERWRITE);
 
-		ZEInt NumberOfMaps = NodeMaterial->GetNumberOfTextureMaps();
+		ZESize NumberOfMaps = (ZESize)NodeMaterial->GetNumberOfTextureMaps();
 
-		for (ZEInt N = 0; N < NumberOfMaps; N++)
+		for (ZESize N = 0; N < NumberOfMaps; N++)
 		{
-			IGameTextureMap* CurrentTexture = NodeMaterial->GetIGameTextureMap(N);
+			IGameTextureMap* CurrentTexture = NodeMaterial->GetIGameTextureMap((ZEInt32)N);
 			switch(CurrentTexture->GetStdMapSlot())
 			{
 			case ID_AM: // Ambient

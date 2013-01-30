@@ -65,6 +65,8 @@ class ZEUIFrameControl : public ZEUIControl
 
 		virtual void			SetPosition(const ZEVector2& Position);
 
+		virtual void			SetZOrder(ZEInt Z);
+
 								ZEUIFrameControl();
 };
 

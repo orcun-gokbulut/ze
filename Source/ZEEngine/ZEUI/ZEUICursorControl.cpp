@@ -157,6 +157,12 @@ ZEUIMouseKey ZEUICursorControl::GetCurrentButton()
 	return CurentButton;
 }
 
+void ZEUICursorControl::SetZOrder(ZEInt Z)
+{
+	ZEUIControl::SetZOrder(Z);
+	Cursor.ZOrder = Z;
+}
+
 ZEMaterial* ZEUICursorControl::GetMaterial() const
 {
 	return CursorMaterial;
