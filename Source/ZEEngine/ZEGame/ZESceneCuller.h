@@ -39,29 +39,28 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEDrawParameters.h"
+#include "ZEDrawStatistics.h"
 
 class ZEScene;
 class ZEEntity;
 class ZELight;
-
-
-
+struct ZEDrawParameters;
 
 class ZESceneCuller
 {
 	private:
-		ZERenderPass					CurrentPass;
+		ZESceneStatistics					Statistics;
 
-		void							CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters);
-		void							CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameters);
+		void								CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters);
+		void								CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameters);
 
 	public:
+		virtual const ZESceneStatistics&	GetStatistics() const;
 
-		virtual void					CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters);
+		virtual void						CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters);
 
-										ZESceneCuller();
-		virtual							~ZESceneCuller();
+											ZESceneCuller();
+		virtual								~ZESceneCuller();
 };
 
 #endif

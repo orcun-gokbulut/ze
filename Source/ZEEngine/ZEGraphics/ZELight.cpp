@@ -130,7 +130,6 @@ void ZELight::SetRotation(const ZEQuaternion& NewRotation)
 void ZELight::Draw(ZEDrawParameters* DrawParameters)
 {
 	DrawParameters->Lights.Add(this);
-	DrawParameters->Statistics.DrawedLightCount++;
 }
 
 ZELight::ZELight()

@@ -158,7 +158,7 @@ bool ZEInteriorDoor::GetSeenThrough()
 	return SeenThrough;
 }
 
-void ZEInteriorDoor::Initialize(ZEInterior* Owner, const ZEInteriorDoorResource* Resource)
+void ZEInteriorDoor::Initialize(ZEInterior* Owner, const ZEInteriorResourceDoor* Resource)
 {
 	this->Owner = Owner;
 	this->Resource = Resource;

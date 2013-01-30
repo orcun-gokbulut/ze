@@ -41,6 +41,7 @@
 #include "ZESceneDebugDraw.h"
 #include "ZESceneCuller.h"
 #include "ZETypes.h"
+#include "ZEDrawParameters.h"
 
 class ZEViewVolume;
 class ZEBoundingBox;
@@ -111,6 +112,7 @@ class ZEScene
 		ZEListener*								GetActiveListener();
 
 		ZESceneCuller&							GetSceneCuller();
+		const ZESceneStatistics&				GetStatistics() const;
 
 		bool									Save(const ZEString& FileName);
 		bool									Load(const ZEString& FileName);

@@ -190,7 +190,7 @@ void ZEInteriorRoom::Draw(ZEDrawParameters* DrawParameters)
 	}
 }
 
-bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorRoomResource* Resource)
+bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resource)
 {	
 
 	this->Owner = Owner;

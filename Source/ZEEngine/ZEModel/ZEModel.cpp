@@ -192,6 +192,11 @@ ZEDrawFlags ZEModel::GetDrawFlags() const
 	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
+const ZEModelStatistics& ZEModel::GetStatistics() const
+{
+	return Statistics;
+}
+
 void ZEModel::LoadModelResource()
 {
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
@@ -313,7 +318,6 @@ const ZEModelResource* ZEModel::GetModelResource()
 {
 	return ModelResource;
 }
-
 
 const ZEArray<ZEModelBone*>& ZEModel::GetSkeleton()
 {
@@ -501,22 +505,49 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 	if(!GetVisible())
 		return;
 
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+	{
+		memset(&Statistics, 0, sizeof(ZEModelStatistics));
+
+		Statistics.TotalMeshCount = Meshes.GetCount();
+	}
+
 	ZEUInt32 EntityDrawFlags = GetDrawFlags();
 
-		for (ZESize I = 0; I < Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
+	{
+		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL)
 		{
-			if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL)
+			if (DrawParameters->ViewVolume->CullTest(Meshes[I].GetWorldBoundingBox()))
 			{
-				if (DrawParameters->ViewVolume->CullTest(Meshes[I].GetWorldBoundingBox()))
-					continue;
-				else
-					Meshes[I].Draw(DrawParameters);
+				if (DrawParameters->Pass == ZE_RP_COLOR)
+					Statistics.CulledMeshCount++;
+
+				continue;
 			}
 			else
 			{
+				if (DrawParameters->Pass == ZE_RP_COLOR)
+					Statistics.DrawnMeshCount++;
+
 				Meshes[I].Draw(DrawParameters);
 			}
 		}
+		else
+		{
+			if (DrawParameters->Pass == ZE_RP_COLOR)
+				Statistics.DrawnMeshCount++;
+
+			Meshes[I].Draw(DrawParameters);
+		}
+	}
+
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+	{
+		DrawParameters->Statistics.ModelStatistics.TotalMeshCount += Statistics.TotalMeshCount;
+		DrawParameters->Statistics.ModelStatistics.CulledMeshCount += Statistics.CulledMeshCount;
+		DrawParameters->Statistics.ModelStatistics.DrawnMeshCount += Statistics.DrawnMeshCount;
+	}
 
 // 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 // 		Meshes[I].Draw(DrawParameters);
@@ -585,6 +616,8 @@ ZEModel::ZEModel()
 	DebugDrawComponents.Material = NULL;
 	DrawSkeleton = true;
 	ParentlessBoneBody = NULL;
+
+	memset(&Statistics, 0, sizeof(ZEModelStatistics));
 }
 
 ZEModel::~ZEModel()

@@ -61,6 +61,8 @@ void ZEUIRectangle::ConvertToVertices(ZEUIVertex* Buffer) const
 
 bool ZEUIRectangle::Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, const ZERectangle& ClipRectangle)
 {
+	Output.ZOrder = Rectangle.ZOrder;
+
 	if ((Rectangle.Positions.RightDown.x < ClipRectangle.LeftUp.x) ||
 		(Rectangle.Positions.LeftUp.x > ClipRectangle.RightDown.x) ||
 		(Rectangle.Positions.RightDown.y < ClipRectangle.LeftUp.y) ||

@@ -172,7 +172,7 @@ class ZEUIControl
 		bool							GetFocused() const;
 		bool							GetPressed() const;
 
-		void							SetZOrder(ZEInt Z);
+		virtual void					SetZOrder(ZEInt Z);
 		ZEInt							GetZOrder() const;
 
 		void							SetMinimumSize(ZEVector2 MinimumSize);

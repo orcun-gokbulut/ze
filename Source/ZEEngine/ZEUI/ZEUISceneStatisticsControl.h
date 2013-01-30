@@ -39,18 +39,78 @@
 
 #include "ZEUI/ZEUIControl.h"
 #include "ZEUI/ZEUITextControl.h"
+#include "ZEInput/ZEInputMap.h"
 
 class ZEUISceneStatisticsControl : public ZEUIControl
 {
 	private:
 
-		ZEUITextControl*		TotalEntityCount;
-		ZEUITextControl*		DrawableEntityCount;
-		ZEUITextControl*		CulledEntityCount;
-		ZEUITextControl*		DrawedEntityCount;
+		ZEInputMap				InputMap;
 
 		ZEUITextControl*		FPSCount;
 		ZEUITextControl*		CameraPosition;
+
+		ZEUITextControl*		SceneStatisticsDescription;
+		ZEUITextControl*		SceneTotalEntityCount;
+		ZEUITextControl*		SceneDrawableEntityCount;
+		ZEUITextControl*		SceneCulledEntityCount;
+		ZEUITextControl*		SceneDrawedEntityCount;
+
+		ZEUITextControl*		SceneTotalLightCount;
+		ZEUITextControl*		SceneCulledLightCount;
+		ZEUITextControl*		SceneDrawedLightCount;
+
+		ZEUITextControl*		RendererStatisticsDescription;
+		ZEUITextControl*		RendererMeshCount;
+		ZEUITextControl*		RendererInstancedMeshCount;
+
+		ZEUITextControl*		RendererStageCount;
+		ZEUITextControl*		RendererPostProcessorCount;
+
+		ZEUITextControl*		RendererPrimitiveCount;
+		ZEUITextControl*		RendererMinBatchCount;
+		ZEUITextControl*		RendererMaxBatchCount;
+		ZEUITextControl*		RendererAvgBatchCount;
+		ZEUITextControl*		RendererVertexCount;
+		ZEUITextControl*		RendererDrawCallCount;
+		ZEUITextControl*		RendererDrawPrimitiveCount;
+
+		ZEUITextControl*		GraphicsStatisticsDescription;
+		ZEUITextControl*		GraphicsVertexBufferCount;
+		ZEUITextControl*		GraphicsVertexDeclarationCount;
+		ZEUITextControl*		GraphicsTotalVertexBufferSize;
+		ZEUITextControl*		GraphicsShaderCount;
+		ZEUITextControl*		GraphicsTextureCount;
+		ZEUITextControl*		GraphicsTexture2DCount;
+		ZEUITextControl*		GraphicsTexture3DCount;
+		ZEUITextControl*		GraphicsTextureCubeCount;
+		ZEUITextControl*		GraphicsTotalTextureSize;
+		ZEUITextControl*		GraphicsRenderTargetCount;
+		ZEUITextControl*		GraphicsTotalRenderTargetSize;
+		ZEUITextControl*		GraphicsDepthBufferCount;
+		ZEUITextControl*		GraphicsTotalDepthBufferSize;
+
+		ZEUITextControl*		ModelStatisticsDescription;
+		ZEUITextControl*		ModelTotalMeshCount;
+		ZEUITextControl*		ModelCulledMeshCount;
+		ZEUITextControl*		ModelDrawnMeshCount;
+
+		ZEUITextControl*		InteriorStatisticsDescription;
+		ZEUITextControl*		InteriorTotalRoomCount;
+		ZEUITextControl*		InteriorCulledRoomCount;
+		ZEUITextControl*		InteriorDrawedRoomCount;
+
+		ZEUITextControl*		InteriorTotalDoorCount;
+		ZEUITextControl*		InteriorSeenDoorCount;
+
+		ZEUITextControl*		InteriorTotalPolygonCount;
+		ZEUITextControl*		InteriorCulledPolygonCount;
+		ZEUITextControl*		InteriorDrawedPolygonCount;
+
+		ZEUITextControl*		ParticleStatisticsDescription;
+		ZEUITextControl*		ParticleTotalParticleCount;
+		ZEUITextControl*		ParticleDrawedParticleCount;
+		ZEUITextControl*		ParticleEmitterCount;
 
 	public:
 

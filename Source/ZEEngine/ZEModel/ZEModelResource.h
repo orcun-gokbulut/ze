@@ -101,7 +101,8 @@ struct ZEModelResourcePhysicalShape
 	float										Restitution;
 	float										StaticFriction;
 	float										DynamicFriction;
-	
+	ZEString									UserDefinedProperties;
+
 	union
 	{
 		struct
@@ -293,6 +294,7 @@ struct ZEModelResourceMesh
 	bool										IsSkinned;
 	ZEArray<ZEModelResourceMeshLOD>				LODs;
 	ZEModelResourcePhysicalBody					PhysicalBody;
+	ZEString									UserDefinedProperties;
 };
 
 struct ZEModelResourceBone
@@ -308,18 +310,20 @@ struct ZEModelResourceBone
 	ZEMatrix4x4									InverseTransform;
 	ZEModelResourcePhysicalBody					PhysicalBody;
 	ZEModelResourcePhysicalJoint				PhysicalJoint;
+	ZEString									UserDefinedProperties;
 };
 
 struct ZEModelResourceHelper
 {
 	char										Name[ZE_MDLF_MAX_NAME_SIZE];
 	ZEModelResourceHelperOwnerType				OwnerType;
-	ZEInt										OwnerId;
+	ZEInt32										OwnerId;
 	ZEModelResourceMesh*						OwnerMesh;
 	ZEModelResourceBone*						OwnerBone;
 	ZEVector3									Position;
 	ZEQuaternion								Rotation;
 	ZEVector3									Scale;
+	ZEString									UserDefinedProperties;
 };
 
 

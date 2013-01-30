@@ -95,6 +95,12 @@ void ZEUIFrameControl::SetMaterial(ZEMaterial* Material)
 	Frame.Material = FrameMaterial;
 }
 
+void ZEUIFrameControl::SetZOrder(ZEInt Z)
+{
+	ZEUIControl::SetZOrder(Z);
+	Frame.ZOrder = Z;
+}
+
 ZEUIFrameControl::ZEUIFrameControl()
 {
 	FrameMaterial = ZEUIMaterial::CreateInstance();

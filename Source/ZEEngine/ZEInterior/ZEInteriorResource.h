@@ -50,8 +50,14 @@
 class ZEMaterial;
 class ZETexture2D;
 class ZETexture2DResource;
-struct ZEInteriorDoorResource;
+struct ZEInteriorResourceDoor;
 class ZEMLSerialReader;
+
+enum ZEInteriorResourceHelperOwnerType
+{
+	ZE_IRHOT_INTERIOR		= 0,
+	ZE_IRHOT_ROOM			= 1
+};
 
 struct ZEInteriorPolygon
 {
@@ -65,28 +71,30 @@ struct ZEInteriorPhysicalMeshPolygon
 	ZEUInt32				Indices[3];
 };
 
-struct ZEInteriorPhysicalMeshResource
+struct ZEInteriorResourcePhysicalMesh
 {
 	bool											PhysicalMeshEnabled;
 	ZEArray<ZEVector3>								Vertices;
 	ZEArray<ZEInteriorPhysicalMeshPolygon>			Polygons;
+	ZEString										UserDefinedProperties;
 };
 
-struct ZEInteriorRoomResource
+struct ZEInteriorResourceRoom
 {
 	char											Name[ZE_MAX_NAME_SIZE];
 	ZEAABBox										BoundingBox;
 	ZEVector3										Position;
 	ZEQuaternion									Rotation;
 	ZEVector3										Scale;
-	ZEArray<ZEInteriorDoorResource*>				Doors;
+	ZEArray<ZEInteriorResourceDoor*>				Doors;
 	ZEArray<ZESize>									DoorIds;
 	ZEArray<ZEInteriorPolygon>						Polygons;
-	ZEInteriorPhysicalMeshResource					PhysicalMesh;
+	ZEInteriorResourcePhysicalMesh					PhysicalMesh;
 	bool											HasPhysicalMesh;
+	ZEString										UserDefinedProperties;
 };
 
-struct ZEInteriorDoorResource
+struct ZEInteriorResourceDoor
 {
 	char											Name[ZE_MAX_NAME_SIZE];
 	bool											IsOpen;
@@ -95,9 +103,22 @@ struct ZEInteriorDoorResource
 	ZEVector3										Position;
 	ZEQuaternion									Rotation;
 	ZEVector3										Scale;
-	ZEInteriorRoomResource*							Rooms[2];
-	ZEInt											RoomIds[2];
+	ZEInteriorResourceRoom*							Rooms[2];
+	ZEInt32											RoomIds[2];
+	ZEString										UserDefinedProperties;
 	
+};
+
+struct ZEInteriorResourceHelper
+{
+	char										Name[ZE_MAX_NAME_SIZE];
+	ZEInteriorResourceHelperOwnerType			OwnerType;
+	ZEInt32										OwnerIndex;
+	ZEInteriorResourceRoom*						OwnerRoom;
+	ZEVector3									Position;
+	ZEQuaternion								Rotation;
+	ZEVector3									Scale;
+	ZEString									UserDefinedProperties;
 };
 
 class ZEFile;
@@ -107,11 +128,13 @@ class ZEInteriorResource : public ZEResource
 	private:
 		ZEArray<ZETexture2DResource*>				TextureResources;
 		ZEArray<ZEMaterial*>						Materials;
-		ZEArray<ZEInteriorDoorResource>				Doors;
-		ZEArray<ZEInteriorRoomResource>				Rooms;
+		ZEArray<ZEInteriorResourceDoor>				Doors;
+		ZEArray<ZEInteriorResourceRoom>				Rooms;
+		ZEArray<ZEInteriorResourceHelper>			Helpers;
 
 		bool										ReadDoors(ZEMLSerialReader* Reader);
 		bool										ReadRooms(ZEMLSerialReader* Reader);
+		bool										ReadHelpers(ZEMLSerialReader* Reader);
 		bool										ReadMaterials(ZEMLSerialReader* Reader);
 
 		const ZETexture2D*							ManageInteriorMaterialTextures(const ZEString& FileName);
@@ -124,8 +147,9 @@ class ZEInteriorResource : public ZEResource
 
 		const ZEArray<ZETexture2DResource*>&		GetTextures();
 		const ZEArray<ZEMaterial*>&					GetMaterials();
-		const ZEArray<ZEInteriorRoomResource>&		GetRooms();
-		const ZEArray<ZEInteriorDoorResource>&		GetDoors();
+		const ZEArray<ZEInteriorResourceRoom>&		GetRooms();
+		const ZEArray<ZEInteriorResourceDoor>&		GetDoors();
+		const ZEArray<ZEInteriorResourceHelper>&	GetHelpers();
 
 		static ZEInteriorResource*					LoadResource(const ZEString& FileName);
 		static ZEInteriorResource*					LoadSharedResource(const ZEString& FileName);

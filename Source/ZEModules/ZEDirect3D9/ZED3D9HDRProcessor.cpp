@@ -592,7 +592,8 @@ ZED3D9HDRProcessor::ZED3D9HDRProcessor()
 	memset(&Textures, 0, sizeof(Textures));
 	memset(&Shaders, 0, sizeof(Shaders));
 
-	Parameters.Key = 0.7f;
+	//Parameters.Key = 0.7f;
+	Parameters.Key = 0.9f;
 	Parameters.BrightPassTreshold = 0.01f;
 	Parameters.BloomFactor = 0.9f;
 	Parameters.BloomStandardDeviation = 2.0f;

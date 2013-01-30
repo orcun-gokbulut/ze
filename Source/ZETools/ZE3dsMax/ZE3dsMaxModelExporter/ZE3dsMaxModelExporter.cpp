@@ -158,7 +158,7 @@ BOOL ZE3dsMaxModelExporter::SupportsOptions(ZEInt ext, DWORD options)
 }
 
 
-ZEInt ZE3dsMaxModelExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
+ZEInt32 ZE3dsMaxModelExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
 {
 	ZEInt i;
 	if (i_currentNode == NULL)
@@ -234,7 +234,7 @@ bool ZE3dsMaxModelExporter::ShowOptionsDialog(HWND ParentWindow)
 		OptionsDialog->SetOptions(ExportOptions);
 
 	WinWidget->showCentered();
-	ZEInt DialogResult = OptionsDialog->exec();
+	ZEInt32 DialogResult = OptionsDialog->exec();
 
 	if(DialogResult == QDialog::Rejected)
 		return false;
@@ -260,7 +260,7 @@ bool ZE3dsMaxModelExporter::ShowResourceConfigurationDialog(HWND ParentWindow, c
 	CollectResources();
 
 	WinWidget->showCentered();
-	ZEInt DialogResult = ResourceConfigurationDialog->Show();
+	ZEInt32 DialogResult = ResourceConfigurationDialog->Show();
 
 	if(DialogResult == QDialog::Rejected)
 		return false;

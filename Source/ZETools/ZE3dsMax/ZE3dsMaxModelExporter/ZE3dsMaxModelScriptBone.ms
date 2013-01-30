@@ -462,7 +462,7 @@ if selection.count > 0 then
 		(
 			if Current != undefined then
 			(	
-				if isProperty Current "ZEBoneAttributes" == false and classof Current == BoneGeometry do 
+				if isProperty Current "ZEBoneAttributes" == false and (classof Current == BoneGeometry or classof Current == Biped_Object) do 
 				(
 					custAttributes.add Current BoneAttributes
 					UpdateZECoordinates Current

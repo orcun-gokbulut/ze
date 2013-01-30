@@ -13,19 +13,19 @@ fn MAX_TO_ZE obj  =
 	
 	Threshold = 0.0001
 	
-	Result.PositionValue.x = if abs(obj.position.x) < Threshold then 0.0 else obj.position.x
-	Result.PositionValue.y = if abs(obj.position.z) < Threshold then 0.0 else obj.position.z
-	Result.PositionValue.z = if abs(obj.position.y) < Threshold then 0.0 else obj.position.y
+	Result.PositionValue.x = if abs(obj.transform.position.x) < Threshold then 0.0 else obj.transform.position.x
+	Result.PositionValue.y = if abs(obj.transform.position.z) < Threshold then 0.0 else obj.transform.position.z
+	Result.PositionValue.z = if abs(obj.transform.position.y) < Threshold then 0.0 else obj.transform.position.y
 
-	TempValues = (obj.rotation) as eulerAngles
+	TempValues = (obj.transform.rotation) as eulerAngles
 	
 	Result.RotationValue.x = if abs(TempValues.x) < Threshold then 0.0 else TempValues.x
 	Result.RotationValue.y = if abs(TempValues.z) < Threshold then 0.0 else TempValues.z
 	Result.RotationValue.z = if abs(TempValues.y) < Threshold then 0.0 else TempValues.y
 	
-	Result.ScaleValue.x = if abs(obj.scale.x) < Threshold then 0.0 else obj.scale.x
-	Result.ScaleValue.y = if abs(obj.scale.z) < Threshold then 0.0 else obj.scale.z
-	Result.ScaleValue.z = if abs(obj.scale.y) < Threshold then 0.0 else obj.scale.y
+	Result.ScaleValue.x = if abs(obj.transform.scale.x) < Threshold then 0.0 else obj.transform.scale.x
+	Result.ScaleValue.y = if abs(obj.transform.scale.z) < Threshold then 0.0 else obj.transform.scale.z
+	Result.ScaleValue.z = if abs(obj.transform.scale.y) < Threshold then 0.0 else obj.transform.scale.y
 	
 	return Result		
 )

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDrawParameters.h
+ Zinek Engine - ZEDrawStatistics.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,69 +34,104 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_DRAW_PARAMETERS_H__
-#define __ZE_DRAW_PARAMETERS_H__
+#ifndef __ZE_DRAW_STATISTICS_H__
+#define __ZE_DRAW_STATISTICS_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEDrawStatistics.h"
 
-class ZELight;
-class ZECamera;
-class ZERenderer;
-class ZEViewVolume;
-
-enum ZERenderPass
+struct ZESceneStatistics
 {
-	ZE_RP_COLOR,
-	ZE_RP_DEPTH,
-	ZE_RP_SHADOW_MAP,
-	ZE_RP_OCCLUSION_MAP
+	ZEUInt32	TotalEntityCount;
+	ZEUInt32	DrawableEntityCount;
+
+	ZEUInt32	CulledEntityCount;
+	ZEUInt32	DrawedEntityCount;
+
+	ZEUInt32	TotalLightCount;
+	ZEUInt32	CulledLightCount;
+	ZEUInt32	DrawedLightCount;
 };
 
-enum ZEViewType
+struct ZERendererStatistics
 {
-	ZE_VPT_CAMERA,
-	ZE_VPT_LIGHT
+	ZEUInt32	MeshCount;
+	ZEUInt32	InstancedMeshCount;
+	ZEUInt32	StageCount;
+	ZEUInt32	PostProcessorCount;
+
+	ZESize		PrimitiveCount;
+	ZESize		MinBatchCount;
+	ZESize		MaxBatchCount;
+	ZESize		AvgBatchCount;
+	ZESize		VertexCount;
+
+	ZEUInt32	DrawCallCount;
+	ZEUInt32	DrawPrimitiveCount;
 };
 
-struct ZEView
+struct ZEGraphicsStatistics
 {
-	ZEViewType				Type;
-	ZELight*				Light;
-	ZECamera*				Camera;
+	ZEUInt32	VertexBufferCount;
+	ZEUInt32	VertexDeclarationCount;
+	ZESize		TotalVertexBufferSize;
 
-	ZEVector3				Position;
-	ZEQuaternion			Rotation;
-	ZEVector3				Direction;
+	ZEUInt32	ShaderCount;
 
-	float					FOV;
+	ZEUInt32	TextureCount;
+	ZEUInt32	Texture2DCount;
+	ZEUInt32	Texture3DCount;
+	ZEUInt32	TextureCubeCount;
+	ZESize		TotalTextureSize;
 
-	ZEMatrix4x4				ViewTransform;
-	ZEMatrix4x4				ProjectionTransform;
-	ZEMatrix4x4				ViewProjectionTransform;
+	ZEUInt32	RenderTargetCount;
+	ZESize		TotalRenderTargetSize;
+
+	ZEUInt32	DepthBufferCount;
+	ZESize		TotalDepthBufferSize;
 };
 
-class ZEViewPort;
-
-struct ZEDrawParameters
+struct ZEModelStatistics
 {
-	ZESize					FrameId;
-	float					ElapsedTime;
-	float					Time;
-	ZERenderer*				Renderer;
-	ZERenderPass			Pass;
-	ZEDrawStatistics		Statistics;
+	ZEUInt32	TotalMeshCount;
+	ZEUInt32	CulledMeshCount;
+	ZEUInt32	DrawnMeshCount;
+};
 
-	const ZEView*			View;
-	const ZEViewPort*		ViewPort;
-	const ZEViewVolume*		ViewVolume;
+struct ZEInteriorStatistics
+{
+	ZEUInt32	TotalRoomCount;
+	ZEUInt32	CulledRoomCount;
+	ZEUInt32	DrawedRoomCount;
 
-	ZESmartArray<ZELight*>	Lights;
-	void*					CustomData;
+	ZEUInt32	TotalDoorCount;
+	ZEUInt32	SeenDoorCount;
+
+	ZESize		TotalInteriorPolygonCount;
+	ZESize		CulledInteriorPolygonCount;
+	ZESize		DrawedInteriorPolygonCount;
+
+	ZEUInt32	TotalInteriorMaterialCount;
+	ZEUInt32	CulledInteriorMaterialCount;
+	ZEUInt32	DrawedInteriorMaterialCount;
+
+};
+
+struct ZEParticleStatistics
+{
+	ZESize		TotalParticleCount;
+	ZESize		DrawedParticleCount;
+	
+	ZEInt32		EmitterCount;
+};
+
+struct ZEDrawStatistics
+{
+	ZESceneStatistics		SceneStatistics;
+	ZERendererStatistics	RendererStatistics;
+	ZEGraphicsStatistics	GraphicsStatistics;
+	ZEModelStatistics		ModelStatistics;
+	ZEInteriorStatistics	InteriorStatistics;
+	ZEParticleStatistics	ParticleStatistics;
 };
 
 #endif
