@@ -235,7 +235,7 @@ ZEGBuffer ZETerrainMaterial_GBuffer_PixelShader(ZETerrainMaterial_GBuffer_PSInpu
 
 	//ZEGBuffer_SetViewNormal(GBuffer, Input.Normal);
 	
-	ZEGBuffer_SetSpecularGlossiness(GBuffer, 120.0f);	
+	ZEGBuffer_SetSpecularGlossiness(GBuffer, 0.1f);	
 	ZEGBuffer_SetSubSurfaceScatteringFactor(GBuffer, 0.0f);
 
 	return GBuffer;

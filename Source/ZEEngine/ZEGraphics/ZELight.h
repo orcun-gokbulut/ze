@@ -44,11 +44,11 @@
 
 enum ZELightType
 {
-	ZE_LT_NONE = 0,
-	ZE_LT_POINT = 1,
-	ZE_LT_DIRECTIONAL = 2,
-	ZE_LT_PROJECTIVE = 3,
-	ZE_LT_OMNIPROJECTIVE = 4
+	ZE_LT_NONE				= 0,
+	ZE_LT_POINT				= 1,
+	ZE_LT_DIRECTIONAL		= 2,
+	ZE_LT_PROJECTIVE		= 3,
+	ZE_LT_OMNIPROJECTIVE	= 4
 };
 
 ZE_META_OBJECT_DESCRIPTION(ZELight);
@@ -64,9 +64,14 @@ class ZELight : public ZEEntity
 	protected:
 		bool							CastsShadows;
 		bool							UpdateViewVolume;
-		bool							UpdateShadowTransform;
+		
+		float							PenumbraScale;
+		float							DepthScaledBias;
+		float							SlopeScaledBias;
+		
 		float							Range;
 		float							Intensity;
+
 		ZEVector3						Color;
 		ZEVector3						Attenuation;
 
@@ -78,6 +83,15 @@ class ZELight : public ZEEntity
 
 		void							SetIntensity(float NewValue);
 		float							GetIntensity() const;
+
+		void							SetPenumbraScale(float NewValue);
+		float							GetPenumbraScale() const;
+
+		void							SetDepthScaledBias(float NewValue);
+		float							GetDepthScaledBias() const;
+
+		void							SetSlopeScaledBias(float NewValue);
+		float							GetSlopeScaledBias() const;
 
 		void							SetColor(const ZEVector3& NewColor);
 		const ZEVector3&				GetColor() const;

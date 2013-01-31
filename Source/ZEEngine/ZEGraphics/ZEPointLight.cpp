@@ -109,13 +109,6 @@ const ZEViewVolume& ZEPointLight::GetViewVolume(ZESize Index)
 
 const ZEMatrix4x4& ZEPointLight::GetViewTransform(ZESize Index)
 {
-	if (UpdateShadowTransform)
-	{
-		// Update
-
-		UpdateShadowTransform = false;
-	}
-	
 	return ViewProjectionMatrix;
 }
 

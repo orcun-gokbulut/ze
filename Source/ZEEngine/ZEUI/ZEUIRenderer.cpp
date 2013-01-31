@@ -138,7 +138,7 @@ void ZEUIRenderer::Render(ZERenderer* Renderer)
 	
 	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
 	{
-		RenderCommands[I].Priority = RenderCommands[I].Order;
+		RenderCommands[I].Priority = (ZEInt)RenderCommands[I].Order;
 
 		if (RenderCommands[I].Material == NULL)
 			RenderCommands[I].Material = DefaultMaterial;

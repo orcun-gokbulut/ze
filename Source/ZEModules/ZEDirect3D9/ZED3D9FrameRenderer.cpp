@@ -62,6 +62,7 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEShadowRenderer.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZED3D9ShadowRenderer.h"
 
 #pragma warning(disable:4267)
 
@@ -334,8 +335,10 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 		// Matrix to transform camera view space to world space.
 		ZEMatrix4x4 CameraInverseView;
 		ZEMatrix4x4::Inverse(CameraInverseView, Camera->GetViewTransform());
-	
-		float ShadowMapDimension = (float)((ZEShadowRenderer*)zeScene->GetShadowRenderer())->GetShadowResolution();
+
+		ZED3D9ShadowRenderer* ShadowRenderer = (ZED3D9ShadowRenderer*)zeScene->GetShadowRenderer();
+		float ShadowMapDimension = (float)ShadowRenderer->GetShadowResolution();
+		float RotationmapDimension = (float)ShadowRenderer->GetRandomRotationMap()->GetWidth();
 		float TexOffset = 0.5f + (0.5f / ShadowMapDimension);
 
 		ZEMatrix4x4 LightTexture(	0.5f,  0.0f, 0.0f, TexOffset,
@@ -343,21 +346,39 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 									0.0f,  0.0f, 1.0f, 0.0f,
 									0.0f,  0.0f, 0.0f, 1.0f		);
 
-		ZEVector4 SplitDistances[MAX_CASCADE_COUNT];
-		ZEMatrix4x4 LightMatrices[MAX_CASCADE_COUNT];
+		ZEVector4 ShadowParameters0;
+		ZEVector4 ShadowParameters1;
+		ShadowParameters0.x = Light->GetDepthScaledBias();
+		ShadowParameters0.y = Light->GetSlopeScaledBias();
+		ShadowParameters0.z = Camera->GetShadowDistance();
+		ShadowParameters0.w = Camera->GetShadowFadeDistance();
+		ShadowParameters1.x = Light->GetPenumbraScale();
+		ShadowParameters1.y = 1.0f / ShadowMapDimension;
+		ShadowParameters1.z = 1.0f / RotationmapDimension;
+		
+		ZEVector4 CascadeData[MAX_CASCADE_COUNT];
+		ZEMatrix4x4 LightTransforms[MAX_CASCADE_COUNT];
 		for (ZESize I = 0; I < Light->GetCascadeCount(); ++I)
 		{
-			// Transformations and split distances
-			SplitDistances[I].x = Light->GetSplitDistance(I+1);
-			LightMatrices[I] = LightTexture * Light->GetViewTransform(I) * CameraInverseView;
+			const ZEDirectionalLightCascade* Cascade = &Light->GetCascadeData(I);
+		
+			CascadeData[I].x = Cascade->FarZ;
+			CascadeData[I].y = Cascade->NearZ;
+			CascadeData[I].z = Cascade->Depth;
+	
+			LightTransforms[I] = LightTexture * Cascade->ShadowTransform * CameraInverseView;
 		
 			// Set shadow maps
 			GetDevice()->SetSamplerState(6 + I, D3DSAMP_BORDERCOLOR, 0xFFFFFFFF);
-			ZED3D9CommonTools::SetTexture(6 + I, Light->GetShadowMap(I), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
+			ZED3D9CommonTools::SetTexture(6 + I, Cascade->ShadowMap, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
 		}
 
-		GetDevice()->SetPixelShaderConstantF(90, LightMatrices->MA, MAX_CASCADE_COUNT * 4);
-		GetDevice()->SetPixelShaderConstantF(118, SplitDistances->M, MAX_CASCADE_COUNT * 1);
+		ZED3D9CommonTools::SetTexture(15, ShadowRenderer->GetRandomRotationMap(), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_WRAP);
+
+		GetDevice()->SetPixelShaderConstantF(90, LightTransforms->MA, MAX_CASCADE_COUNT * 4);
+		GetDevice()->SetPixelShaderConstantF(118, CascadeData->M, MAX_CASCADE_COUNT);
+		GetDevice()->SetPixelShaderConstantF(124, ShadowParameters0.M, 1);
+		GetDevice()->SetPixelShaderConstantF(125, ShadowParameters1.M, 1);
 	}
 
 	GetDevice()->SetPixelShaderConstantB(0, &CastShadow, 1);
@@ -423,11 +444,11 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	ZEMatrix4x4::Multiply(LightViewProjectionMatrix, LightProjectionMatrix, LightViewMatrix);
 
 	ZEMatrix4x4 TextureMatrix;
-	ZEMatrix4x4::Create(TextureMatrix, 
-		0.5f, 0.0f, 0.0f, 0.5f,
-		0.0f, -0.5f, 0.0f, 0.5f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f);
+	ZEMatrix4x4::Create(TextureMatrix,
+						0.5f, 0.0f, 0.0f, 0.5f,
+						0.0f, -0.5f, 0.0f, 0.5f,
+						0.0f, 0.0f, 1.0f, 0.0f,
+						0.0f, 0.0f, 0.0f, 1.0f);
 
 	ZEMatrix4x4 InvCameraViewMatrix;
 	ZEMatrix4x4::Inverse(InvCameraViewMatrix, Camera->GetViewTransform());
@@ -651,6 +672,7 @@ void ZED3D9FrameRenderer::DoLightningPass()
 	GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 	GetDevice()->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ONE);
 	GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
 
 	// Stencil Buffer
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
@@ -703,10 +725,9 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	 
 	D3DPERF_BeginEvent(0, L"ABuffer Pass");
 
-	
 	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
-	//ZED3D9CommonTools::SetRenderTarget(0, (ZED3D9ViewPort*)ABuffer->GetViewPort());
 	ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
+	//ZED3D9CommonTools::SetRenderTarget(0, (ZED3D9ViewPort*)ABuffer->GetViewPort());
 
 	ZED3D9CommonTools::SetTexture(0, GBuffer1, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, GBuffer2, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
@@ -720,7 +741,9 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
 	
+
 	for (ZESize I = 0; I < CommandList.GetCount(); I++)
 	{		
 		ZERenderCommand* RenderCommand = &CommandList[I];
@@ -1177,86 +1200,89 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		DoLightningPass();
 		DoForwardPass();
 		
-		
-// 		UnsharpenProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
-// 		UnsharpenProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
-// 		UnsharpenProcessor.Process();
+		/*
+		UnsharpenProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
+		UnsharpenProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
+		UnsharpenProcessor.Process();
 
 		//Anti Aliasing Process
-// 		MLAAProcessor.SetInputDepth(GBuffer1);
-// 		MLAAProcessor.SetInputNormal(GBuffer2);
-// 		MLAAProcessor.SetInputColor(SSAAInputBuffer);
-// 		MLAAProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
-// 		MLAAProcessor.Process();
+		MLAAProcessor.SetInputDepth(GBuffer1);
+		MLAAProcessor.SetInputNormal(GBuffer2);
+		MLAAProcessor.SetInputColor(SSAAInputBuffer);
+		MLAAProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
+		MLAAProcessor.Process();
 
 		// Fog Process
-// 		FogProcessor.SetInputColor(FogInputBuffer);
-// 		FogProcessor.SetInputDepth(GBuffer1);
-// 		FogProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
-// 		FogProcessor.Process();
+		FogProcessor.SetInputColor(FogInputBuffer);
+		FogProcessor.SetInputDepth(GBuffer1);
+		FogProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
+		FogProcessor.Process();
 		
-
+		*/
+		/*
 		// HDR Process
-// 		HDRProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
-// 		HDRProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
-// 		HDRProcessor.Process(ElaspedTime);
-		
-		
+		HDRProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
+		HDRProcessor.SetOutput(ViewPort);
+		HDRProcessor.Process(ElaspedTime);
+		*/
+		/*
 		// Color Transform Process
-// 		ColorTransformProcessor.SetInput(CTInputBuffer);
-// 		ColorTransformProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
-// 		ColorTransformProcessor.Process();
-
+		ColorTransformProcessor.SetInput(CTInputBuffer);
+		//ColorTransformProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
+		ColorTransformProcessor.SetOutput(ViewPort);
+		ColorTransformProcessor.Process();
+		*/
+		/*
 		// Grain
-// 		GrainProcessor.SetInput(GrainInputBuffer);
-// 		GrainProcessor.SetOutput((ZED3D9ViewPort*)ZoomBlurInputBuffer->GetViewPort());
-// 		GrainProcessor.Process(ElaspedTime);
+		GrainProcessor.SetInput(GrainInputBuffer);
+		GrainProcessor.SetOutput((ZED3D9ViewPort*)ZoomBlurInputBuffer->GetViewPort());
+		GrainProcessor.Process(ElaspedTime);
 
 		// Blur Mask
-// 		BlurMaskProcessor.SetInput(BlurMaskInputBuffer);
-// 		BlurMaskProcessor.SetOutput(ViewPort);
-// 		BlurMaskProcessor.Process();
+		BlurMaskProcessor.SetInput(BlurMaskInputBuffer);
+		BlurMaskProcessor.SetOutput(ViewPort);
+		BlurMaskProcessor.Process();
 
 		// Zoom blur
-// 		ZoomBlurProcessor.SetInput(ZoomBlurInputBuffer);
-// 		ZoomBlurProcessor.SetOutput((ZED3D9ViewPort*)CDInputBuffer->GetViewPort());
-// 		ZoomBlurProcessor.Process();
+		ZoomBlurProcessor.SetInput(ZoomBlurInputBuffer);
+		ZoomBlurProcessor.SetOutput((ZED3D9ViewPort*)CDInputBuffer->GetViewPort());
+		ZoomBlurProcessor.Process();
 
 		// Channel Disorientation Processor
-// 		ChannelDisorientProcessor.SetInput(CDInputBuffer);
-// 		ChannelDisorientProcessor.SetOutput((ZED3D9ViewPort*)BlurInputBuffer->GetViewPort());
-// 		ChannelDisorientProcessor.Process();
+		ChannelDisorientProcessor.SetInput(CDInputBuffer);
+		ChannelDisorientProcessor.SetOutput((ZED3D9ViewPort*)BlurInputBuffer->GetViewPort());
+		ChannelDisorientProcessor.Process();
 
 		// Texture mask
-// 		TMProcessor.SetInput(TMInputBuffer);
-// 		TMProcessor.SetOutput(ViewPort);
-// 		TMProcessor.Process();
+		TMProcessor.SetInput(TMInputBuffer);
+		TMProcessor.SetOutput(ViewPort);
+		TMProcessor.Process();
 
 		// DOF Process
-// 		DOFProcessor.SetInputColor(DOFInputBuffer);
-// 		DOFProcessor.SetInputDepth(GBuffer1);
-// 		DOFProcessor.SetOutput(ViewPort);
-// 		DOFProcessor.Process();
+		DOFProcessor.SetInputColor(DOFInputBuffer);
+		DOFProcessor.SetInputDepth(GBuffer1);
+		DOFProcessor.SetOutput(ViewPort);
+		DOFProcessor.Process();
 
 		//Anti Aliasing Process (old bad ugly)
-// 		SSAAProcessor.SetInputDepth(GBuffer1);
-// 		SSAAProcessor.SetInputNormal(GBuffer2);
-// 		SSAAProcessor.SetInputColor(ABuffer);
-// 		SSAAProcessor.SetOutput(ViewPort);
-// 		SSAAProcessor.Process();
+		SSAAProcessor.SetInputDepth(GBuffer1);
+		SSAAProcessor.SetInputNormal(GBuffer2);
+		SSAAProcessor.SetInputColor(ABuffer);
+		SSAAProcessor.SetOutput(ViewPort);
+		SSAAProcessor.Process();
 
 		// Edge Detection Process
-// 		EDProcessor.SetInputDepth(GBuffer1);
-// 		EDProcessor.SetInputNormal(GBuffer2);
-// 		EDProcessor.SetInputColor(EDInputBuffer);
-// 		EDProcessor.SetOutput(ViewPort);
-// 		EDProcessor.Process();
+		EDProcessor.SetInputDepth(GBuffer1);
+		EDProcessor.SetInputNormal(GBuffer2);
+		EDProcessor.SetInputColor(EDInputBuffer);
+		EDProcessor.SetOutput(ViewPort);
+		EDProcessor.Process();
 		
 		// Blur Process
-// 		BlurProcessor.SetInput(BlurInputBuffer);
-// 		BlurProcessor.SetOutput(ViewPort);
-// 		BlurProcessor.Process();
-		
+		BlurProcessor.SetInput(BlurInputBuffer);
+		BlurProcessor.SetOutput(ViewPort);
+		BlurProcessor.Process();
+		*/
 	
 
 		Do2DPass();

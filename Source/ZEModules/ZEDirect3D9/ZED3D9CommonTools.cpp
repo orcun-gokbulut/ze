@@ -193,6 +193,11 @@ D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 		case ZE_TPF_DXT5:
 			return D3DFMT_DXT5;
 
+		case ZE_TPF_NULL:
+			return ((D3DFORMAT)(MAKEFOURCC('N', 'U', 'L', 'L')));
+		case ZE_TPF_INTZ:
+			return ((D3DFORMAT)(MAKEFOURCC('I', 'N', 'T', 'Z')));
+
 		default:
 			return (D3DFORMAT)0;
 	}

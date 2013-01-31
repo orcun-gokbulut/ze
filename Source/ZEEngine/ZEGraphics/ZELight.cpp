@@ -41,7 +41,6 @@
 void ZELight::OnTransformChanged()
 {
 	UpdateViewVolume = true;
-	UpdateShadowTransform = true;
 	ZEEntity::OnTransformChanged();
 }
 
@@ -63,6 +62,36 @@ void ZELight::SetIntensity(float NewValue)
 float ZELight::GetIntensity() const
 {
 	return Intensity;
+}
+
+void ZELight::SetPenumbraScale(float NewValue)
+{
+	PenumbraScale = NewValue;
+}
+
+float ZELight::GetPenumbraScale() const
+{
+	return PenumbraScale;
+}
+
+void ZELight::SetDepthScaledBias(float NewValue)
+{
+	DepthScaledBias = NewValue;
+}
+
+float ZELight::GetDepthScaledBias() const
+{
+	return DepthScaledBias;
+}
+
+void ZELight::SetSlopeScaledBias(float NewValue)
+{
+	SlopeScaledBias = NewValue;
+}
+
+float ZELight::GetSlopeScaledBias() const
+{
+	return SlopeScaledBias;
 }
 
 void ZELight::SetColor(const ZEVector3& NewColor)
@@ -112,7 +141,6 @@ void ZELight::SetPosition(const ZEVector3& NewPosition)
 	if (GetPosition() != NewPosition)
 	{
 		UpdateViewVolume = true;
-		UpdateShadowTransform = true;
 		ZEEntity::SetPosition(NewPosition);
 	}
 }
@@ -122,7 +150,6 @@ void ZELight::SetRotation(const ZEQuaternion& NewRotation)
 	if (GetRotation() != NewRotation)
 	{
 		UpdateViewVolume = true;
-		UpdateShadowTransform = true;
 		ZEEntity::SetRotation(NewRotation);
 	}
 }
@@ -137,7 +164,12 @@ ZELight::ZELight()
 	Enabled = true;
 	CastsShadows = false;
 	UpdateViewVolume = true;
-	UpdateShadowTransform = true;
+
+	PenumbraScale = 1.0f;
+
+	DepthScaledBias = 0.0f;
+	SlopeScaledBias = 0.0f;
+
 	Range = 100.0f;
 	Intensity = 1.0f;
 	Color = ZEVector3(1.0f, 1.0f, 1.0f);

@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 // Vertex Transformation
-float4x4 LightWorldViewProj : register(vs, c0);
+float4x4 LightWorldViewProjCrop : register(vs, c0);
 
 bool EnableSkin 			: register(vs, b0);
 float4x4 BoneMatrices[58] 	: register(vs, c32);
@@ -52,12 +52,12 @@ struct VertexShaderInput
 struct VertexShaderOutput
 {
 	float4 Position 		: POSITION0;
-	float4 Depth 			: TEXCOORD0;
+	float Depth 			: TEXCOORD0;
 };
 
 struct PixelShaderInput
 {
-	float4 Depth 			: TEXCOORD0;
+	float Depth 			: TEXCOORD0;
 };
 
 struct PixelShaderOutput
@@ -83,7 +83,7 @@ VertexShaderOutput ProjectiveLightShadowVS(VertexShaderInput Input)
 {
 	VertexShaderOutput Output;
 	
-	Output.Position = mul(LightWorldViewProj, Input.Position);
+	Output.Position = mul(LightWorldViewProjCrop, Input.Position);
 	Output.Position.z *= Output.Position.z;
 	Output.Depth = Output.Position.z;
 	return Output;
@@ -103,7 +103,7 @@ VertexShaderOutput OmniProjectiveLightShadowVS(VertexShaderInput Input)
 {
 	VertexShaderOutput Output;
 	
-	Output.Position = mul(LightWorldViewProj, Input.Position);
+	Output.Position = mul(LightWorldViewProjCrop, Input.Position);
 	Output.Position = Output.Position / Output.Position.w;
 	
 	float Distance = length(Output.Position);
@@ -131,13 +131,16 @@ PixelShaderOutput OmniProjectiveLightShadowPS(PixelShaderInput Input)
 VertexShaderOutput DirectionalLightShadowVS(VertexShaderInput Input)
 {
 	VertexShaderOutput Output;
-
+	
 	if (EnableSkin)
 		ShadowSkinTransform(Input);
 	
-	Output.Position =  mul(LightWorldViewProj, Input.Position);
-	Output.Depth = Output.Position / Output.Position.w;
-
+	// Pipeline output position
+	Output.Position =  mul(LightWorldViewProjCrop, Input.Position);
+	
+	// Save screen space depth
+	Output.Depth = Output.Position.z / Output.Position.w;
+	
 	return Output;
 }
 
@@ -145,6 +148,6 @@ PixelShaderOutput DirectionalLightShadowPS(PixelShaderInput Input)
 {
 	PixelShaderOutput Output;
 	
-	Output.Depth =  Input.Depth.z;
+	Output.Depth =  Input.Depth.xxxx;
 	return Output;
 }

@@ -129,7 +129,6 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 			ZED3D9PixelShader*				OmniProjectiveLightPS;
 		} LightningComponents;
 
-
 		static bool							CheckRenderCommand(ZERenderCommand* RenderCommand);
 		static void							PumpStreams(ZERenderCommand* RenderCommand);
 

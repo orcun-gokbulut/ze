@@ -114,7 +114,7 @@ float ZEWeather::GetSunHeight() const
 
 float ZEWeather::GetMoonHeight() const
 {
-	return MoonHeight;
+	return -MoonHeight;
 }
 
 void ZEWeather::SetFogFactor(float Value)
@@ -133,7 +133,7 @@ void ZEWeather::SetMoonPhase(float Value)
 {
 	MoonPhase = Value;
 
-	Moon->SetMoonPhase(Value);
+	Moon->SetPhase(Value);
 }
 
 float ZEWeather::GetMoonPhase() const
@@ -179,12 +179,10 @@ float ZEWeather::GetSunLightIntensity() const
 
 void ZEWeather::SetMoonDirection(const ZEVector3& Value)
 {
-	ZEVector3 NormalizedValue = Value.Normalize();
+	MoonDirection = Value.Normalize();
+	MoonHeight = MoonDirection.y;
 
-	MoonHeight = NormalizedValue.y;
-	MoonDirection = NormalizedValue;
-
-	Moon->SetMoonDirection(NormalizedValue);
+	Moon->SetDirection(MoonDirection);
 
 	// Set moon directional light
 	ZEQuaternion MoonLightRotation;
@@ -201,13 +199,11 @@ const ZEVector3& ZEWeather::GetMoonDirection() const
 
 void ZEWeather::SetSunDirection(const ZEVector3& Value)
 {
-	ZEVector3 NormalizedValue = Value.Normalize();
-
-	SunHeight = NormalizedValue.y;
-	SunDirection = NormalizedValue;
-
-	Cloud->SetSunLightDirection(NormalizedValue);
-	SkyDome->SetSunLightDirection(NormalizedValue);
+	SunDirection = Value.Normalize();
+	SunHeight = SunDirection.y;
+	
+	Cloud->SetSunLightDirection(SunDirection);
+	SkyDome->SetSunLightDirection(SunDirection);
 
 	// Also set the directional sun light
 	ZEQuaternion SunLightRotation;
@@ -222,17 +218,6 @@ const ZEVector3& ZEWeather::GetSunDirection() const
 	return SunDirection;
 }
 
-void ZEWeather::SetSunMoonRotation(const ZEVector3& Value)
-{
-	SunMoonRotation = Value;
-}
-
-const ZEVector3& ZEWeather::GetSunMoonRotation() const
-{
-	return SunMoonRotation;
-}
-
-// OK
 void ZEWeather::SetSunLightColor(const ZEVector3& Value)
 {
 	SunLightColor = Value;
@@ -281,7 +266,7 @@ void ZEWeather::Draw(ZEDrawParameters* DrawParameters)
 
 void ZEWeather::Tick(float Time)
 {
-	//SunLight->SetWorldPosition(zeScene->GetActiveCamera()->GetWorldPosition());
+
 }
 
 ZEWeather* ZEWeather::CreateInstance()
@@ -292,8 +277,6 @@ ZEWeather* ZEWeather::CreateInstance()
 bool ZEWeather::Initialize()
 {
 	ZEEntity::Initialize();
-
-
 
 	return true;
 }
@@ -313,61 +296,72 @@ ZEWeather::ZEWeather()
 	MoonLightIntensity	= 0.1f;
 	SunLightIntensity	= 1.2f;
 
-	SunDirection		= ZEVector3(0.00001f, -1.0f, 0.00001f);
-	SunMoonRotation		= ZEVector3(0.0f, 0.0f, 0.0f);
+	SunDirection		= ZEVector3(0.0001f, -1.0f, 0.0001f);
+	SunMoonRotation		= ZEVector3(ZE_PI_2, 0.0f, 0.0f);
 	MoonDirection		= -SunDirection;
+
+	SunHeight			= SunDirection.y;
+	MoonHeight			= MoonDirection.y;
 
 	SunLightColor		= ZEVector3(0.850f, 0.750f, 0.655f);
 	MoonLightColor		= ZEVector3(ZEVector3::One);
 
+	ZEQuaternion SunRotation;
+	ZEQuaternion::CreateFromDirection(SunRotation, SunDirection);
+
 	// Sun Light
 	SunLight = ZEDirectionalLight::CreateInstance();
+	SunLight->SetName("SunLight");
+	SunLight->SetVisible(true);
 	SunLight->SetEnabled(true);
-	SunLight->SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3::UnitX));
+	SunLight->SetRotation(SunRotation);
 	SunLight->SetColor(SunLightColor);
 	SunLight->SetIntensity(SunLightIntensity);
-	SunLight->SetCastsShadow(true);
-	SunLight->SetVisible(true);
-	SunLight->SetName("TestSunLight");
+	SunLight->SetCastsShadow(false);
+	SunLight->SetRange(600.0f);
 	this->AddComponent(SunLight);
+
+	ZEQuaternion MoonRotation;
+	ZEQuaternion::CreateFromDirection(MoonRotation, -SunDirection);
 
 	// Moon Light
 	MoonLight = ZEDirectionalLight::CreateInstance();
-	MoonLight->SetName("TestMoonLight");
+	MoonLight->SetName("MoonLight");
 	MoonLight->SetEnabled(true);
 	MoonLight->SetVisible(true);
-	MoonLight->SetRotation(ZEQuaternion(ZE_PI_2, -ZEVector3::UnitX));
+	MoonLight->SetRotation(MoonRotation);
 	MoonLight->SetColor(MoonLightColor);
-	MoonLight->SetIntensity(MoonLightIntensity);
 	MoonLight->SetCastsShadow(false);
+	MoonLight->SetIntensity(MoonLightIntensity);
+	MoonLight->SetRange(600.0f);
 	this->AddComponent(MoonLight);
 
 	// Star Map
 	StarMap = ZESkyBrush::CreateInstance();
-	StarMap->SetName("TestStarMap");
+	StarMap->SetName("StarMap");
 	StarMap->SetVisible(true);
 	StarMap->SetEnabled(true);
 	StarMap->SetSkyTexture("ZEEngine/ZEAtmosphere/Textures/StarMap.png");
 	StarMap->SetSkyColor(ZEVector3::One);
-	StarMap->SetSkyBrightness(0.5f);
+	StarMap->SetSkyBrightness(1.0f);
 	this->AddComponent(StarMap);
 
 	// Moon
 	Moon = ZEMoon::CreateInstance();
-	Moon->SetName("TestMoon");
+	Moon->SetName("Moon");
 	Moon->SetEnabled(true);
 	Moon->SetVisible(true);
-	Moon->SetMoonTexture("ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
-	Moon->SetMoonAmbientColor(ZEVector3(1.0f, 0.99f, 0.92f));
-	Moon->SetMoonDirection(MoonDirection);
-	Moon->SetMoonPhase(MoonPhase);
-	Moon->SetMoonAmbientFactor(2.7f);
-	Moon->SetMoonScale(0.07f);
+	Moon->SetTexture("ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
+	Moon->SetAmbientColor(ZEVector3(1.0f, 0.99f, 0.92f));
+	Moon->SetDirection(MoonDirection);
+	Moon->SetPhase(MoonPhase);
+	Moon->SetAmbientFactor(2.7f);
+	Moon->SetScale(0.07f);
 	this->AddComponent(Moon);
 
 	// Sky Dome
 	SkyDome = ZESkyDome::CreateInstance();
-	SkyDome->SetName("TestSkyDome");
+	SkyDome->SetName("SkyDome");
 	SkyDome->SetEnabled(true);
 	SkyDome->SetVisible(true);
 	SkyDome->SetSunIntensity(15.0f);
@@ -382,7 +376,7 @@ ZEWeather::ZEWeather()
 
 	// Planar Cloud
 	Cloud = ZECloud::CreateInstance();
-	Cloud->SetName("CloudTest");
+	Cloud->SetName("PlanarCloud");
 	Cloud->SetEnabled(true);
 	Cloud->SetVisible(true);
 	Cloud->SetCloudFormationTexture("ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
