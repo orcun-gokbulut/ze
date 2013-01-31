@@ -72,6 +72,7 @@ class ZECamera : public ZEEntity
 		float							FOV, AspectRatio;
 		float							Width, Height;
 		float							ShadowDistance;
+		float							ShadowFadeDistance;
 
 		ZEMatrix4x4						ViewTransform;
 		ZEMatrix4x4						ProjectionTransform;
@@ -99,6 +100,9 @@ class ZECamera : public ZEEntity
 
 		void							SetShadowDistance(float Value);
 		float							GetShadowDistance() const;
+
+		void							SetShadowFadeDistance(float Value);
+		float							GetShadowFadeDistance() const;
 
 		const ZEMatrix4x4&				GetViewTransform();
 		const ZEMatrix4x4&				GetProjectionTransform();

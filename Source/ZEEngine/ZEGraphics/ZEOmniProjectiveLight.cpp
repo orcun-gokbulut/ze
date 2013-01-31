@@ -119,14 +119,7 @@ const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume(ZESize Index)
 }
 
 const ZEMatrix4x4& ZEOmniProjectiveLight::GetViewTransform(ZESize Index)
-{
-	if (UpdateShadowTransform)
-	{
-		// Update
-
-		UpdateShadowTransform = false;
-	}
-	
+{	
 	return ViewProjectionMatrix;
 }
 

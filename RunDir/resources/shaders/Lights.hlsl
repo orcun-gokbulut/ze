@@ -33,8 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <Shadow.hlsl>
-
 //* Vertex Shader Constants
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -62,24 +60,36 @@ float4 ScreenToTextureParams	: register(ps, c5);
 float3x3 LightRotationParam			: register(ps, c12);
 float4x4 LightProjectionMatrixParam : register(ps, c16);
 
-sampler2D ProjectionMap				: register(ps, s2);
-samplerCUBE OmniProjectionMap		: register(ps, s3);
-sampler2D ProjectionShadowMap		: register(ps, s4);
-samplerCUBE OmniProjectionShadowMap : register(ps, s5);
+sampler2D ProjectionMap				: register(ps, s4);
+samplerCUBE OmniProjectionMap		: register(ps, s5);
 
 // Directional Light parameters
 // ------------------------------------------------------
-#define ZE_MAX_CASCADE_COUNT		5
+#define ZE_MAX_CASCADE_COUNT	4
 
-bool CastShadow											: register(ps, b0);
+bool CastShadow									: register(ps, b0);
+float4x4 LightTransforms[ZE_MAX_CASCADE_COUNT]	: register(ps, c90);
 
-float4x4 LightMatrices[ZE_MAX_CASCADE_COUNT]			: register(ps, c90);
-float	 SplitDistances[ZE_MAX_CASCADE_COUNT]			: register(ps, c118);
+float3 CascadeData[ZE_MAX_CASCADE_COUNT]		: register(ps, c118);
+#define	CASCADE_FAR_Z(Index)					CascadeData[Index].x
+#define	CASCADE_NEAR_Z(Index)					CascadeData[Index].y
+#define	CASCADE_DEPTH(Index)					CascadeData[Index].z
 
-sampler2D DirectionalShadowMap[ZE_MAX_CASCADE_COUNT]	: register(ps, s6);
+float4 ShadowParameters0						: register(ps, c124);
+float4 ShadowParameters1						: register(ps, c125);
+#define DepthScaledBias							ShadowParameters0.x
+#define SlopeScaledBias							ShadowParameters0.y
+#define ShadowDistance							ShadowParameters0.z
+#define ShadowFadeDistance						ShadowParameters0.w
+#define PenumbraScale							ShadowParameters1.x
+#define ShadowMapTexelSize						ShadowParameters1.y
+#define RotationMapTexelSize					ShadowParameters1.z
+
+sampler2D ShadowMaps[ZE_MAX_CASCADE_COUNT]		: register(ps, s6);
+sampler2D RandomRotationMap						: register(ps, s15);
 // ------------------------------------------------------
 
-
+#include "Shadow.hlsl"
 #include "GBuffer.hlsl"
 #include "LBuffer.hlsl"
 
@@ -96,7 +106,6 @@ ZEPointLight_VSOutput ZEPointLight_VertexShader(in float4 Position : POSITION0)
 	ZEPointLight_VSOutput Output;
 	
 	Output.Position = mul(WorldViewProjMatrix, Position);
-	
 	Output.ViewVector = ZEGBuffer_GetViewVector(mul(WorldViewMatrix, Position));
 	
 	return Output;
@@ -181,47 +190,43 @@ struct ZEDirectionalLight_PSInput
 	float4 ScreenPosition 	: VPOS;
 };
 
-static const float ShadowFadeDistance = 50.0f;
-
-// Return = 0.0f means no shadow
-// Return = 1.0f means full shadow
-float SampleShadow(float4 TextureSpacePosition, int CascadeN)
+float ZEDirectionalLight_CalculateFilterScale(float ViewDepth, int CascadeIndex)
 {
-	TextureSpacePosition /= TextureSpacePosition.w;
-	float TextureSpaceDepth = TextureSpacePosition.z;
-	float DepthSample = tex2D(DirectionalShadowMap[CascadeN], TextureSpacePosition.xy).x;
-	
-	return TextureSpaceDepth > DepthSample ? 1.0f : 0.0f;
+	float FilterScale = (PenumbraScale / pow(2.0f, (float)CascadeIndex)) * (1.0f - (CascadeIndex / ZE_MAX_CASCADE_COUNT));
+	return clamp(FilterScale, 0.4f, PenumbraScale);
 }
 
-#define POISSON_KERNEL_TAPS 6
-static const float2 PoissonKernel[POISSON_KERNEL_TAPS] = {
-	{-.326,-.406},
-	//{-.840,-.074},
-	{-.696, .457},
-	//{-.203, .621},
-	{ .962,-.195},
-	//{ .473,-.480},
-	{ .519, .767},
-	//{ .185,-.893},
-	{ .507, .064},
-	//{ .896, .412},
-	{-.322,-.933},
-	//{-.792,-.598}
-};
-static const float Scale = 1.5;
-float SampleShadowPoisson(float4 TextureSpacePosition, int CascadeN)
+float ZEDirectionalLight_GetShadowFactor(float3 PixelViewPos, float3 PixelViewNormal, float2 ScreenPos, float AngularAttenuation)
 {
-	TextureSpacePosition /= TextureSpacePosition.w;
-	float TextureSpaceDepth = TextureSpacePosition.z;
-	
-	float Average = 0.0f;
-	for (int I = 0; I < POISSON_KERNEL_TAPS; ++I)
+	float ShadowFactor = 0.0f;
+	if (CastShadow)
 	{
-		float DepthSample = tex2D(DirectionalShadowMap[CascadeN], TextureSpacePosition.xy + PoissonKernel[I] * Scale * ScreenToTextureParams.xy).r;
-		Average += TextureSpaceDepth > DepthSample ? 1.0f : 0.0f;
+		float DepthFactor = PixelViewPos.z / ShadowDistance;
+		float SlopeFactor = 1.0f - saturate(AngularAttenuation);
+		float NormalOffset = SlopeFactor *  SlopeScaledBias + DepthFactor * DepthScaledBias;
+		float3 PixelBiasedPos = PixelViewPos + PixelViewNormal * NormalOffset;
+		
+		[unroll]
+		for (int CascadeN = 0; CascadeN < ZE_MAX_CASCADE_COUNT; CascadeN++)
+		{
+			if (PixelViewPos.z <= CASCADE_FAR_Z(CascadeN))
+			{
+				float FilterScale = ZEDirectionalLight_CalculateFilterScale(PixelViewPos.z, CascadeN);
+				float2 RotationMapCoord = RotationMapTexelSize * ScreenPos;
+				float4 TexSpacePos = mul(LightTransforms[CascadeN], float4(PixelBiasedPos, 1.0f));
+				ShadowFactor = SampleShadowMap(ShadowMaps[CascadeN], TexSpacePos.xy, ShadowMapTexelSize, TexSpacePos.z, RandomRotationMap, RotationMapCoord, FilterScale);
+				break;
+			}
+		}
+		
+		// Calculate fade out factor
+		float FadeFactor = (ShadowDistance - PixelViewPos.z) / ShadowFadeDistance;
+		ShadowFactor *= saturate(FadeFactor);
+		
+		if (ShadowFactor >= 0.995f)
+			discard;
 	}
-	return Average / POISSON_KERNEL_TAPS;
+	return ShadowFactor;
 }
 
 ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input) : COLOR0
@@ -231,43 +236,13 @@ ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input) : COL
 	float2 ScreenPosition = Input.ScreenPosition.xy * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
 	float3 Position = ZEGBuffer_GetViewPosition(ScreenPosition, Input.ViewVector);
 	float3 Normal = ZEGBuffer_GetViewNormal(ScreenPosition);
+	float3 SpecularPower = ZEGBuffer_GetSpecularPower(ScreenPosition);
 	float AngularAttenuation = dot(LightDirectionParam, Normal);
 	
-	float ShadowFactor = 0.0f;
-	float PixelDepth = Position.z;
-	if (CastShadow)
-	{
-		// For each cascade
-		for (int I = 0; I < ZE_MAX_CASCADE_COUNT; I++)
-		{
-			// Choose cascade
-			if (PixelDepth < SplitDistances[I])
-			{
-				// Calculate bias for pixel
-				float3 NormalOffset = (PixelDepth + 1.0f) / 50.0f;
-				float3 NewPos = Position + Normal * NormalOffset;
-			
-				// Calculate position and sample
-				float4 TextureSpacePos = mul(LightMatrices[I], float4(NewPos, 1.0f));
-				ShadowFactor = SampleShadowPoisson(TextureSpacePos, I);
-				break;
-			}
-		}
-		
-		// Calculate fade out factor
-		float FadeFactor = (ShadowVisibleDistance - PixelDepth) / ShadowFadeDistance;
-		ShadowFactor *= saturate(FadeFactor);
-		
-		if (ShadowFactor > 0.995f)
-			discard;
-	}
-
-	
-	float3 SpecularPower = ZEGBuffer_GetSpecularPower(ScreenPosition);
+	float ShadowFactor = ZEDirectionalLight_GetShadowFactor(Position, Normal, Input.ScreenPosition.xy, AngularAttenuation);
 	
 	// Light Derived Parameters
 	float4 Output = (float4)0.0f;
-	
 	if (AngularAttenuation > 0.0f)
 	{
 		float3 ViewDirection = normalize(-Position);
@@ -283,7 +258,7 @@ ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input) : COL
 		float SubSurfaceScatteringFactor = ZEGBuffer_GetSubSurfaceScatteringFactor(ScreenPosition);
 		if (SubSurfaceScatteringFactor > 0.0f)
 		{
-			Output.rgb = SubSurfaceScatteringFactor * -AngularAttenuation * LightIntensityParam * LightColorParam;
+			Output.rgb = SubSurfaceScatteringFactor * -AngularAttenuation * LightIntensityParam * LightColorParam * (1.0f - ShadowFactor);
 			Output.a = 0.0f;
 		}
 	}

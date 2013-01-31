@@ -45,49 +45,59 @@ class ZETexture2D;
 
 ZE_META_OBJECT_DESCRIPTION(ZEDirectionalLight);
 
-#define MAX_CASCADE_COUNT			7
+#define MAX_CASCADE_COUNT			4
+
+struct ZEDirectionalLightCascade
+{
+	ZEUInt			Index;
+	float			FarZ;
+	float			NearZ;
+	float			Depth;
+	float			FilterScale;
+	ZEUInt			UpdateInterval;
+
+	ZETexture2D*	ShadowMap;
+	ZEViewCuboid	ViewVolume;
+	ZEMatrix4x4		ShadowTransform;
+};
 
 class ZEDirectionalLight : public ZELight
 {
 	ZE_META_ENTITY(ZEDirectionalLight)
 	private:
-		ZESize						CascadeCount;
-		ZETexture2D*				ShadowMaps[MAX_CASCADE_COUNT];
-
-		ZEViewCuboid				ViewVolumes[MAX_CASCADE_COUNT];
-		ZEMatrix4x4					ShadowTransforms[MAX_CASCADE_COUNT];
 		
-		float						SplitBias;
-		float						SplitDistances[MAX_CASCADE_COUNT + 1];
+		float								SplitBias;
+		ZESize								CascadeCount;
+		ZEDirectionalLightCascade			Cascades[MAX_CASCADE_COUNT];
 
-		void						CreateRenderTargets();
-		void						DestroyRenderTargets();
+		void								CreateRenderTargets();
+		void								DestroyRenderTargets();
 
-									ZEDirectionalLight();
-		virtual						~ZEDirectionalLight();
+											ZEDirectionalLight();
+		virtual								~ZEDirectionalLight();
 
 	public:
-		ZELightType					GetLightType();
+		ZELightType							GetLightType();
 
-		void						SetSplitBias(float Bias);
-		float						GetSplitBias() const;
+		void								SetSplitBias(float Bias);
+		float								GetSplitBias() const;
 
-		void						SetCascadeCount(ZESize Count);
-		ZESize						GetCascadeCount() const;
+		void								SetCascadeCount(ZESize Count);
+		ZESize								GetCascadeCount() const;
 
-		float						GetSplitDistance(ZESize Index);
+		const ZEDirectionalLightCascade&	GetCascadeData(ZESize Index) const;
 
-		ZETexture2D*				GetShadowMap(ZESize Index = 0);
+		ZETexture2D*						GetShadowMap(ZESize Index = 0);
 		
-		ZESize						GetViewCount();
-		const ZEViewVolume&			GetViewVolume(ZESize Index = 0);
-		const ZEMatrix4x4&			GetViewTransform(ZESize CascadeIndex = 0);
+		ZESize								GetViewCount();
+		const ZEViewVolume&					GetViewVolume(ZESize Index = 0);
+		const ZEMatrix4x4&					GetViewTransform(ZESize CascadeIndex = 0);
 		
-		bool						Initialize();
-		void						Deinitialize();
+		bool								Initialize();
+		void								Deinitialize();
 
-		void						Draw(ZEDrawParameters* DrawParameters);
-		static ZEDirectionalLight*	CreateInstance();
+		void								Draw(ZEDrawParameters* DrawParameters);
+		static ZEDirectionalLight*			CreateInstance();
 };
 
 #endif

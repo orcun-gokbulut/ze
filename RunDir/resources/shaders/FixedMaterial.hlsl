@@ -248,7 +248,8 @@ struct ZEFixedMaterial_ForwardPass_VSOutput
 ZEFixedMaterial_ForwardPass_VSOutput ZEFixedMaterial_ForwardPass_VertexShader(ZEFixedMaterial_VSInput Input)
 {
 	ZEFixedMaterial_ForwardPass_VSOutput Output;
-	
+
+
 	if (EnableSkin)
 		SkinTransform(Input);
 
@@ -318,10 +319,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	
 	#ifdef ZE_SHADER_ALPHA_CULL
 		if (Output.Color.a <= MaterialAlphaCullLimit)
-		{
 			discard;
-			return Output;
-		}		
 	#endif
 	
 	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
@@ -333,7 +331,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		//#endif
 		Output.Color.rgb = AmbientColor;
 		#ifdef ZE_SHADER_LIGHT_MAP
-			Output.Color.rgb *= tex2D(LightMap, Input.Texcoord).rgb;
+			//Output.Color.rgb *= tex2D(LightMap, Input.Texcoord).rgb;
 		#endif
 	#endif
 

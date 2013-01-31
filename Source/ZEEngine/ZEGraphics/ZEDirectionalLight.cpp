@@ -55,33 +55,63 @@ void ZEDirectionalLight::CreateRenderTargets()
 {
 	ZEUInt Dimension = ((ZEShadowRenderer*)zeScene->GetShadowRenderer())->GetShadowResolution();
 	
+// 	ZESize I = 0;
+// 	for ( ; I < CascadeCount; ++I)
+// 	{
+// 		if (Cascades[I].ShadowMap == NULL)
+// 		{
+// 			// Create if not allocated
+// 			Cascades[I].ShadowMap = ZETexture2D::CreateInstance();
+// 			Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZE_TPF_INTZ, true);
+// 		}
+// 		else
+// 		{
+// 			// Recreate if changed
+// 			if (Cascades[I].ShadowMap->GetWidth() != Dimension || Cascades[I].ShadowMap->GetHeight() != Dimension)
+// 			{
+// 				Cascades[I].ShadowMap->Destroy();
+// 				Cascades[I].ShadowMap = ZETexture2D::CreateInstance();
+// 				Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZE_TPF_INTZ, true);
+// 			}
+// 		}
+// 	}
+// 	// Destroy unused shadow maps
+// 	for ( ; I < MAX_CASCADE_COUNT; ++I)
+// 	{
+// 		if (Cascades[I].ShadowMap != NULL)
+// 		{
+// 			Cascades[I].ShadowMap->Destroy();
+// 			Cascades[I].ShadowMap = NULL;
+// 		}
+// 	}
+
 	ZESize I = 0;
 	for ( ; I < CascadeCount; ++I)
 	{
-		if (ShadowMaps[I] == NULL)
+		if (Cascades[I].ShadowMap == NULL)
 		{
 			// Create if not allocated
-			ShadowMaps[I] = ZETexture2D::CreateInstance();
-			ShadowMaps[I]->Create(Dimension, Dimension, 1, ZE_TPF_F32, true);
+			Cascades[I].ShadowMap = ZETexture2D::CreateInstance();
+			Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZE_TPF_R32F, true);
 		}
 		else
 		{
 			// Recreate if changed
-			if (ShadowMaps[I]->GetWidth() != Dimension || ShadowMaps[I]->GetHeight() != Dimension)
+			if (Cascades[I].ShadowMap->GetWidth() != Dimension || Cascades[I].ShadowMap->GetHeight() != Dimension)
 			{
-				ShadowMaps[I]->Destroy();
-				ShadowMaps[I] = ZETexture2D::CreateInstance();
-				ShadowMaps[I]->Create(Dimension, Dimension, 1, ZE_TPF_F32, true);
+				Cascades[I].ShadowMap->Destroy();
+				Cascades[I].ShadowMap = ZETexture2D::CreateInstance();
+				Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZE_TPF_R32F, true);
 			}
 		}
 	}
 	// Destroy unused shadow maps
 	for ( ; I < MAX_CASCADE_COUNT; ++I)
 	{
-		if (ShadowMaps[I] != NULL)
+		if (Cascades[I].ShadowMap != NULL)
 		{
-			ShadowMaps[I]->Destroy();
-			ShadowMaps[I] = NULL;
+			Cascades[I].ShadowMap->Destroy();
+			Cascades[I].ShadowMap = NULL;
 		}
 	}
 }
@@ -90,10 +120,10 @@ void ZEDirectionalLight::DestroyRenderTargets()
 {
 	for (ZESize I = 0; I < MAX_CASCADE_COUNT; ++I)
 	{
-		if (ShadowMaps[I] != NULL)
+		if (Cascades[I].ShadowMap != NULL)
 		{
-			ShadowMaps[I]->Destroy();
-			ShadowMaps[I] = NULL;
+			Cascades[I].ShadowMap->Destroy();
+			Cascades[I].ShadowMap = NULL;
 		}
 	}
 }
@@ -116,7 +146,7 @@ float ZEDirectionalLight::GetSplitBias() const
 
 void ZEDirectionalLight::SetCascadeCount(ZESize Count)
 {
-	zeDebugCheck(Count >= MAX_CASCADE_COUNT, "Count should be smaller MAX_CASCADE_COUNT");
+	zeDebugCheck(Count > MAX_CASCADE_COUNT, "Count should be smaller MAX_CASCADE_COUNT");
 	CascadeCount = Count;
 }
 
@@ -125,16 +155,16 @@ ZESize ZEDirectionalLight::GetCascadeCount() const
 	return CascadeCount;
 }
 
-float ZEDirectionalLight::GetSplitDistance(ZESize Index)
+const ZEDirectionalLightCascade& ZEDirectionalLight::GetCascadeData(ZESize Index) const
 {
-	zeDebugCheck(Index >= MAX_CASCADE_COUNT + 1, "Index out of range");
-	return SplitDistances[Index];
+	zeDebugCheck(Index >= MAX_CASCADE_COUNT, "Index out of range");
+	return Cascades[Index];
 }
 
 ZETexture2D* ZEDirectionalLight::GetShadowMap(ZESize Index)
 {
 	zeDebugCheck(Index >= MAX_CASCADE_COUNT, "Index out of range");
-	return ShadowMaps[Index];
+	return Cascades[Index].ShadowMap;
 }
 
 ZESize ZEDirectionalLight::GetViewCount()
@@ -146,14 +176,14 @@ ZESize ZEDirectionalLight::GetViewCount()
 const ZEViewVolume& ZEDirectionalLight::GetViewVolume(ZESize Index)
 {
 	zeDebugCheck(Index >= MAX_CASCADE_COUNT, "Index out of range");
-	return ViewVolumes[Index];
+	return Cascades[Index].ViewVolume;
 }
 
 // Returns the transformation matrix(crop * proj * view) of light's cascade represented by Index
 const ZEMatrix4x4& ZEDirectionalLight::GetViewTransform(ZESize Index)
 {
 	zeDebugCheck(Index >= MAX_CASCADE_COUNT, "Index out of range");
-	return ShadowTransforms[Index];
+	return Cascades[Index].ShadowTransform;
 }
 
 bool ZEDirectionalLight::Initialize()
@@ -172,19 +202,6 @@ void ZEDirectionalLight::Deinitialize()
 		return;
 
 	DestroyRenderTargets();
-}
-
-ZEDirectionalLight::ZEDirectionalLight()
-{
-	CascadeCount = 4;
-	SplitBias = 0.85f;
-	
-	memset(ShadowMaps, NULL, sizeof(ZETexture2D*) * MAX_CASCADE_COUNT);
-}
-
-ZEDirectionalLight::~ZEDirectionalLight()
-{
-	Deinitialize();
 }
 
 ZEDirectionalLight* ZEDirectionalLight::CreateInstance()
@@ -206,102 +223,112 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 
 	// Update cascade transformations
 	ZECamera* Camera = DrawParameters->View->Camera;
+	ZEShadowRenderer* ShadowRenderer = (ZEShadowRenderer*)zeScene->GetShadowRenderer();
 
-	// Fetch constants
-	float FOV = Camera->GetFOV();
-	float NearZ = Camera->GetNearZ();
-	float FarZ = Camera->GetShadowDistance();
-	float AspectRatio = Camera->GetAspectRatio();
+	// Fetch camera constants
+	float CamareFOV = Camera->GetFOV();
+	float TangentHalfFov = ZEAngle::Tan(CamareFOV * 0.5f);
+	float CameraAspectRatio = Camera->GetAspectRatio();
 	ZEVector3 CameraUp = Camera->GetWorldUp();
-	ZEVector3 CameraRight = Camera->GetWorldRight();
 	ZEVector3 CameraFront = Camera->GetWorldFront();
-	ZEVector3 Position = Camera->GetWorldPosition();
-	ZEQuaternion Rotation = Camera->GetWorldRotation();
+	ZEVector3 CameraRight = Camera->GetWorldRight();
+	ZEVector3 CameraPosition = Camera->GetWorldPosition();
+	ZEQuaternion CameraRotation = Camera->GetWorldRotation();
 
-	// For every cascade level
-	ZEVector4 FrustumCorners[8];
-	ZEVector4 TransformedFrustumCorners[8];
+	// Fetch light constants
+	ZEVector3 LightUp = GetWorldUp();
+	ZEVector3 LightFront = GetWorldFront();
+	ZEVector3 LightRight = GetWorldRight();
+	float ShadowNearZ = Camera->GetNearZ();
+	float ShadowFarZ =  ZEMath::Min(Camera->GetFarZ(), Camera->GetShadowDistance());
 
-	// Calculate split distances
-	for (ZESize SplitN = 0; SplitN <= CascadeCount; ++SplitN)
-	{
-		float CascadeRatio = (float)SplitN / (float)CascadeCount;
-		float LinearTerm = NearZ + (FarZ - NearZ) * CascadeRatio;
-		float LogarithmicTerm = NearZ * ZEMath::Power(FarZ / NearZ, CascadeRatio);
-
-		float SplitDistance = SplitBias * LogarithmicTerm + (1.0f - SplitBias) * LinearTerm;
-
-		// Keep distances
-		SplitDistances[SplitN] = SplitDistance;
-	}
-	SplitDistances[0] = NearZ;
-	SplitDistances[CascadeCount] = FarZ;
-
-
-	// Calculate near and far plane corners of frustum
+	// Per cascade calculations and rendering
 	for (ZESize CascadeN = 0; CascadeN < CascadeCount; ++CascadeN)
 	{
-		ZEVector3 NearPlaneCenter = Position + CameraFront * SplitDistances[CascadeN];
-		ZEVector3 FarPlaneCenter = Position + CameraFront * SplitDistances[CascadeN + 1];
+		if (DrawParameters->FrameId % Cascades[CascadeN].UpdateInterval != 0)
+			continue;
 
-		float NearPlaneHalfHeight = ZEAngle::Tan(FOV * 0.5f) * SplitDistances[CascadeN];
-		float NearPlaneHalfWidth = NearPlaneHalfHeight * AspectRatio;
+		// Set Split Distance
+		float CascadeRatioNear = (float)CascadeN / (float)CascadeCount;
+		float LinearTermNear = ShadowNearZ + (ShadowFarZ - ShadowNearZ) * CascadeRatioNear;
+		float LogarithmicTermNear = ShadowNearZ * ZEMath::Power(ShadowFarZ / ShadowNearZ, CascadeRatioNear);
+		
+		float CascadeRatioFar = ((float)CascadeN + 1.0f) / (float)CascadeCount;
+		float LinearTermFar = ShadowNearZ + (ShadowFarZ - ShadowNearZ) * CascadeRatioFar;
+		float LogarithmicTermFar = ShadowNearZ * ZEMath::Power(ShadowFarZ / ShadowNearZ, CascadeRatioFar);
 
-		float FarPlaneHalfHeight = ZEAngle::Tan(FOV * 0.5f) * SplitDistances[CascadeN + 1];
-		float FarPlaneHalfWidth = FarPlaneHalfHeight * AspectRatio;
+		Cascades[CascadeN].FarZ = SplitBias * LogarithmicTermFar + (1.0f - SplitBias) * LinearTermFar;
+		Cascades[CascadeN].NearZ = SplitBias * LogarithmicTermNear + (1.0f - SplitBias) * LinearTermNear;
+		Cascades[CascadeN].Depth = Cascades[CascadeN].FarZ - Cascades[CascadeN].NearZ;
 
+		// near/far plane centers
+		ZEVector3 FarPlaneCenter = CameraPosition + CameraFront * Cascades[CascadeN].FarZ;
+		ZEVector3 NearPlaneCenter = CameraPosition + CameraFront * Cascades[CascadeN].NearZ;
+
+		// near/far plane half with/height
+		float FarPlaneHalfHeight = TangentHalfFov * Cascades[CascadeN].FarZ;
+		float FarPlaneHalfWidth = FarPlaneHalfHeight * CameraAspectRatio;
+		float NearPlaneHalfHeight = TangentHalfFov * Cascades[CascadeN].NearZ;
+		float NearPlaneHalfWidth = NearPlaneHalfHeight * CameraAspectRatio;
+
+		// near/far plane half right/up vectors
 		ZEVector3 FarHalfUpVector = CameraUp * FarPlaneHalfHeight;
 		ZEVector3 NearHalfUpVector = CameraUp * NearPlaneHalfHeight;
 		ZEVector3 FarHalfRightVector = CameraRight * FarPlaneHalfWidth;
 		ZEVector3 NearHalfRightVector = CameraRight * NearPlaneHalfWidth;
 
-		FrustumCorners[0] = ZEVector4(NearPlaneCenter - NearHalfRightVector - NearHalfUpVector, 1.0f);	// Near Left Down
-		FrustumCorners[1] = ZEVector4(NearPlaneCenter - NearHalfRightVector + NearHalfUpVector, 1.0f);	// Near Left Up
-		FrustumCorners[2] = ZEVector4(NearPlaneCenter + NearHalfRightVector + NearHalfUpVector, 1.0f);	// Near Right Up
-		FrustumCorners[3] = ZEVector4(NearPlaneCenter + NearHalfRightVector - NearHalfUpVector, 1.0f);	// Near Right Down
+		// World space frustum corners
+		static ZEVector4 WorldFrustumCorners[8];
+		WorldFrustumCorners[0] = ZEVector4(NearPlaneCenter - NearHalfRightVector - NearHalfUpVector, 1.0f);		// Near Left Down
+		WorldFrustumCorners[1] = ZEVector4(NearPlaneCenter - NearHalfRightVector + NearHalfUpVector, 1.0f);		// Near Left Up
+		WorldFrustumCorners[2] = ZEVector4(NearPlaneCenter + NearHalfRightVector + NearHalfUpVector, 1.0f);		// Near Right Up
+		WorldFrustumCorners[3] = ZEVector4(NearPlaneCenter + NearHalfRightVector - NearHalfUpVector, 1.0f);		// Near Right Down
+		WorldFrustumCorners[4] = ZEVector4(FarPlaneCenter - FarHalfRightVector - FarHalfUpVector, 1.0f);		// Far  Left Down
+		WorldFrustumCorners[5] = ZEVector4(FarPlaneCenter - FarHalfRightVector + FarHalfUpVector, 1.0f);		// Far  Left Up
+		WorldFrustumCorners[6] = ZEVector4(FarPlaneCenter + FarHalfRightVector + FarHalfUpVector, 1.0f);		// Far Right Up
+		WorldFrustumCorners[7] = ZEVector4(FarPlaneCenter + FarHalfRightVector - FarHalfUpVector, 1.0f);		// Far  Right Down
 
-		FrustumCorners[4] = ZEVector4(FarPlaneCenter - FarHalfRightVector - FarHalfUpVector, 1.0f);		// Far  Left Down
-		FrustumCorners[5] = ZEVector4(FarPlaneCenter - FarHalfRightVector + FarHalfUpVector, 1.0f);		// Far  Left CameraUp
-		FrustumCorners[6] = ZEVector4(FarPlaneCenter + FarHalfRightVector + FarHalfUpVector, 1.0f);		// Far Right CameraUp
-		FrustumCorners[7] = ZEVector4(FarPlaneCenter + FarHalfRightVector - FarHalfUpVector, 1.0f);		// Far  CameraRight Down
+		// Look at same position for all cascades other vise frustum wont be covered completely in light clip space
+		ZEVector3 LookAt = CameraPosition;
 
-		// Calculate light view proj transform
-		// Look at transform should contain light's frustum depth info
-		ZEMatrix4x4 LightViewMatrix;
-		ZEMatrix4x4::CreateLookAtTransform(LightViewMatrix, -GetWorldFront() * Range, ZEVector3::Zero, GetWorldUp());
+		// Look at transform
+		// position and look at coordinates should be accurate
+		ZEMatrix4x4 TempLightViewMatrix;
+		ZEMatrix4x4::CreateLookAtTransform(TempLightViewMatrix, LookAt - LightFront * Range, LookAt, LightUp);
 
-		// No need to use accurate near and far z values, crop matrix will make those values meaningless
-		ZEMatrix4x4 LightProjMatrix;
-		float FarPlaneHeight = 2.0f * ZEAngle::Tan(FOV * 0.5f) * FarZ;
-		ZEMatrix4x4::CreateOrthographicProjection(LightProjMatrix, FarPlaneHeight * AspectRatio, FarPlaneHeight, 1.0f, 10.0f);
+		// Symbolic orthographic projection
+		// width, height, near, far does not matter at all
+		ZEMatrix4x4 TempLightProjMatrix;
+		float FarPlaneHeight = 2.0f * TangentHalfFov * ShadowFarZ;
+		ZEMatrix4x4::CreateOrthographicProjection(TempLightProjMatrix, FarPlaneHeight * CameraAspectRatio, FarPlaneHeight, 1.0f, 10.0f);
 
-		ZEMatrix4x4 LightViewProjMatrix = LightProjMatrix * LightViewMatrix;
+		// Lights view projection transform
+		ZEMatrix4x4 LightViewProjMatrix = TempLightProjMatrix * TempLightViewMatrix;
 
 		// Transform world positions to light clip space
+		// Transformation is linear so no need to divide result to its w
+		static ZEVector4 ClipFrustumCorners[8];
 		for (ZESize I = 0; I < 8; ++I)
-		{
-			ZEMatrix4x4::Transform(TransformedFrustumCorners[I], LightViewProjMatrix, FrustumCorners[I]);
-			TransformedFrustumCorners[I] /= TransformedFrustumCorners[I].w;
-		}
+			ZEMatrix4x4::Transform(ClipFrustumCorners[I], LightViewProjMatrix, WorldFrustumCorners[I]);
 
-		// Find min max of transformed vertices
+		// Find min/max of vertices in clip space
 		ZEVector3 Min(FLT_MAX, FLT_MAX, FLT_MAX);
 		ZEVector3 Max(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 		for (ZESize I = 0; I < 8; ++I)
 		{
-			if (TransformedFrustumCorners[I].x < Min.x)	Min.x = TransformedFrustumCorners[I].x;
-			if (TransformedFrustumCorners[I].y < Min.y) Min.y = TransformedFrustumCorners[I].y;
-			if (TransformedFrustumCorners[I].z < Min.z) Min.z = TransformedFrustumCorners[I].z;
+			if (ClipFrustumCorners[I].x < Min.x) Min.x = ClipFrustumCorners[I].x;
+			if (ClipFrustumCorners[I].y < Min.y) Min.y = ClipFrustumCorners[I].y;
+			if (ClipFrustumCorners[I].z < Min.z) Min.z = ClipFrustumCorners[I].z;
 			
-			if (TransformedFrustumCorners[I].x > Max.x) Max.x = TransformedFrustumCorners[I].x;
-			if (TransformedFrustumCorners[I].y > Max.y) Max.y = TransformedFrustumCorners[I].y;
-			if (TransformedFrustumCorners[I].z > Max.z) Max.z = TransformedFrustumCorners[I].z;
-		}
-
+			if (ClipFrustumCorners[I].x > Max.x) Max.x = ClipFrustumCorners[I].x;
+			if (ClipFrustumCorners[I].y > Max.y) Max.y = ClipFrustumCorners[I].y;
+			if (ClipFrustumCorners[I].z > Max.z) Max.z = ClipFrustumCorners[I].z;
+		} 
+								   
 		// Pull z back, to avoid casters between light and light's near z
 		Min.z = 0.0f;
 
-		// Create crop matrix
+		// Create crop matrix that will maximize the bounding box in clip space
 		float ScaleX = 2.0f / (Max.x - Min.x);
 		float ScaleY = 2.0f / (Max.y - Min.y);
 		float ScaleZ = 1.0f / (Max.z - Min.z);
@@ -314,75 +341,88 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 								0.0f,	0.0f,	ScaleZ, OffsetZ,
 								0.0f,	0.0f,	0.0f,	1.0f);
 
-		// Final transformation matrix which is crop * proj * view
-		ShadowTransforms[CascadeN] = CropMatrix * LightViewProjMatrix;
+		// Final shadow transformation matrix
+		ZEMatrix4x4 LightViewProjCropMatrix = CropMatrix * LightViewProjMatrix;
 
-		// Clip Space Corners
-		static const ZEVector4 ClipCorners[8] = {
-			ZEVector4(-1.0f, -1.0f, 0.0f, 1.0f),	// Near Left Down
-			ZEVector4(-1.0f, +1.0f, 0.0f, 1.0f),	// Near Left Up
-			ZEVector4(+1.0f, +1.0f, 0.0f, 1.0f),	// Near Right Up
-			ZEVector4(+1.0f, -1.0f, 0.0f, 1.0f),	// Near Right Down
-			ZEVector4(-1.0f, -1.0f, 1.0f, 1.0f),	// Far  Left Down
-			ZEVector4(-1.0f, +1.0f, 1.0f, 1.0f),	// Far  Left Up
-			ZEVector4(+1.0f, +1.0f, 1.0f, 1.0f),	// Far  Right Up
-			ZEVector4(+1.0f, -1.0f, 1.0f, 1.0f)		// Far  Right Down
-		};
-
+		// Calculate cascades view volume
+		// Clip space to world space transformation
 		ZEMatrix4x4 LightInvViewProjCrop;
-		ZEMatrix4x4::Inverse(LightInvViewProjCrop, ShadowTransforms[CascadeN]);
+		ZEMatrix4x4::Inverse(LightInvViewProjCrop, LightViewProjCropMatrix);
 
-		// World Space Corners
-		ZEVector4 WorldCorners[8];
-		for (ZESize I = 0; I < 8; ++I)
-		{
-			ZEMatrix4x4::Transform(WorldCorners[I], LightInvViewProjCrop, ClipCorners[I]);
-			WorldCorners[I] /= WorldCorners[I].w;
-		}
+		// Clip space min max
+		static const ZEVector4 ClipMin(-1.0f, -1.0f, 0.0f, 1.0f);
+		static const ZEVector4 ClipMax(+1.0f, +1.0f, +1.0f, 1.0f);
 
-		ZEVector3 ViewUp		= ((WorldCorners[1] - WorldCorners[0]).ToVector3()).Normalize();
-		ZEVector3 ViewFront		= ((WorldCorners[4] - WorldCorners[0]).ToVector3()).Normalize();
-		ZEVector3 ViewRight		= ((WorldCorners[3] - WorldCorners[0]).ToVector3()).Normalize();
-		ZEVector3 ViewCenter	= (WorldCorners[6] + WorldCorners[0]).ToVector3() * 0.5f;
+		// Only transform 2 vertices of clip space to world
+		// Transformation is linear(orthographic) so no need to divide result to its w
+		ZEVector4 WorldMin;
+		ZEVector4 WorldMax;
+		ZEMatrix4x4::Transform(WorldMin, LightInvViewProjCrop, ClipMin);
+		ZEMatrix4x4::Transform(WorldMax, LightInvViewProjCrop, ClipMax);
 
-		float ViewHalfDepth		= ((WorldCorners[4] - WorldCorners[0]) * 0.5f).ToVector3().Length();
-		float ViewHalfWidth		= ((WorldCorners[3] - WorldCorners[0]) * 0.5f).ToVector3().Length();
-		float ViewHalfHeight	= ((WorldCorners[1] - WorldCorners[0]) * 0.5f).ToVector3().Length();
-		ZEVector3 ViewHalfSize	= ZEVector3(ViewHalfWidth, ViewHalfHeight, ViewHalfDepth);
-
-		ZEOBBox OBBox(ViewCenter, ViewRight, ViewUp, ViewFront, ViewHalfSize);
-		ViewVolumes[CascadeN].Create(OBBox);
-	}
-
-	ZEShadowRenderer* ShadowRenderer = (ZEShadowRenderer*)zeScene->GetShadowRenderer();
-
-	for (ZESize CascadeN = 0; CascadeN < CascadeCount; ++CascadeN)
-	{
-		struct ZEDirectionalLightShadowData
-		{
-			ZESize				CascadeIndex;
-			ZEMatrix4x4*		ShadowTransform;
-		} CustomData;
-
-		CustomData.CascadeIndex = CascadeN;
-		CustomData.ShadowTransform = &ShadowTransforms[CascadeN];
+		// Find half diagonal vector and view center
+		ZEVector3 HalfDiagonalVector= (WorldMax - WorldMin).ToVector3() * 0.5f;
+		ZEVector3 ViewCenter = HalfDiagonalVector + WorldMin.ToVector3();
 		
-		ZEDrawParameters ShadowDrawParameters;
-		ShadowDrawParameters.ElapsedTime = DrawParameters->ElapsedTime;
-		ShadowDrawParameters.FrameId = DrawParameters->FrameId;
-		ShadowDrawParameters.Pass = ZE_RP_SHADOW_MAP;
-		ShadowDrawParameters.Renderer = ShadowRenderer;
-		ShadowDrawParameters.ViewVolume = &ViewVolumes[CascadeN];
-		ShadowDrawParameters.View = DrawParameters->View;
-		ShadowDrawParameters.ViewPort = ShadowMaps[CascadeN]->GetViewPort();
-		ShadowDrawParameters.CustomData = &CustomData;
+		// Project half diagonal to light axises and find width, height, depth
+		float ViewHalfHeight = ZEVector3::DotProduct(LightUp, HalfDiagonalVector);
+		float ViewHalfWidth	= ZEVector3::DotProduct(LightRight, HalfDiagonalVector);
+		float ViewHalfDepth	= ZEVector3::DotProduct(LightFront, HalfDiagonalVector);
+		ZEVector3 ViewHalfSize(ViewHalfWidth, ViewHalfHeight, ViewHalfDepth);
+
+		Cascades[CascadeN].ViewVolume.Create(ZEOBBox(ViewCenter, LightRight, LightUp, LightFront, ViewHalfSize));
+
+
+		// Create view transform again with final and corrected world space coords
+		ZEMatrix4x4 LightViewMatrix;
+		ZEMatrix4x4::CreateLookAtTransform(LightViewMatrix, ViewCenter + (-LightFront * ViewHalfDepth), ViewCenter + (LightFront * ViewHalfDepth), LightUp);
+
+		// Create projection transform again with final and corrected world space coords
+		ZEMatrix4x4 LightProjMatrix;
+		ZEMatrix4x4::CreateOrthographicProjection(LightProjMatrix, ViewHalfWidth * 2.0f, ViewHalfHeight * 2.0f, 0.0f, ViewHalfDepth * 2.0f);
+
+		Cascades[CascadeN].ShadowTransform = LightProjMatrix * LightViewMatrix;
+
+		// Render shadow map
+		ZEDrawParameters DrawParametersShadow;
+		DrawParametersShadow.Pass = ZE_RP_SHADOW_MAP;
+		DrawParametersShadow.Renderer = ShadowRenderer;
+		DrawParametersShadow.FrameId = DrawParameters->FrameId;
+		DrawParametersShadow.ElapsedTime = DrawParameters->ElapsedTime;
+		DrawParametersShadow.View = DrawParameters->View;
+		DrawParametersShadow.ViewVolume = &Cascades[CascadeN].ViewVolume;
+		DrawParametersShadow.ViewPort = Cascades[CascadeN].ShadowMap->GetViewPort();
+		DrawParametersShadow.CustomData = &Cascades[CascadeN];
 		
-		ShadowRenderer->ClearLists();	
-		zeScene->GetSceneCuller().CullScene(zeScene, &ShadowDrawParameters);
+		ShadowRenderer->ClearLists();
+		zeScene->GetSceneCuller().CullScene(zeScene, &DrawParametersShadow);
 
 		ShadowRenderer->SetLight(this);
-		ShadowRenderer->SetDrawParameters(&ShadowDrawParameters);
+		ShadowRenderer->SetDrawParameters(&DrawParametersShadow);
 
 		ShadowRenderer->Render();
 	}
+}
+
+ZEDirectionalLight::ZEDirectionalLight()
+{
+	CascadeCount = 1;
+	SplitBias = 0.8f;
+
+	SlopeScaledBias = 0.3f;
+	DepthScaledBias = 0.7f;
+	
+	for (ZESize I = 0; I < MAX_CASCADE_COUNT; ++I)
+	{
+		Cascades[I].ShadowMap = NULL;
+		Cascades[I].Index = (ZEUInt)I;
+		Cascades[I].UpdateInterval = (ZEUInt)I + 1;
+		Cascades[I].ShadowTransform = ZEMatrix4x4::Identity;
+		Cascades[I].NearZ = Cascades[I].FarZ = Cascades[I].Depth = 0.0f;
+	}
+}
+
+ZEDirectionalLight::~ZEDirectionalLight()
+{
+	Deinitialize();
 }
