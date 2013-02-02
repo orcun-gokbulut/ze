@@ -38,14 +38,16 @@
 #define __ZE_SOUND_SOURCE_3D_H__
 
 #include "ZEGame/ZEEntity.h"
-#include "ZEMeta/ZEObject.h"
 #include "ZESoundSource.h"
 
-ZE_META_ENTITY_DESCRIPTION(ZESoundSource3D);
+#include "ZENewMeta/ZEObject.h"
+
+ZE_CLASS(ZESoundSource3D)
 
 class ZESoundSource3D : public ZESoundSource
 {
-	ZE_META_ENTITY(ZESoundSource3D);
+	ZE_OBJECT
+
 	protected:
 		float						MinDistance;
 		float						MaxDistance;
@@ -75,44 +77,4 @@ class ZESoundSource3D : public ZESoundSource
 
 		static ZESoundSource3D*		CreateInstance();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZESoundSource3D" noinstance="true" parent="ZESoundSource">
-			<description>Sound Source</description>
-			<property name="MinDistance" type="float" autogetset="yes">
-				<constraints>
-					<minvalue value="0"/>
-				</constraints>
-			</property>
-			<property name="MaxDistance" type="float" autogetset="yes">
-				<constraints>
-					<minvalue value="0"/>
-				</constraints>
-			</property>
-			<property name="ConeInsideAngle" type="integer32" autogetset="yes">
-				<constraints>
-					<minvalue value="0"/>
-					<maxvalue value="360"/>
-				</constraints>
-			</property>
-			<property name="ConeOutsideAngle" type="integer32" autogetset="yes">
-				<constraints>
-					<minvalue value="0"/>
-					<maxvalue value="360"/>
-				</constraints>
-			</property>
-			<property name="ConeOutsideVolume" type="integer32" autogetset="yes">
-				<constraints>
-					<minvalue value="ZE_SS_VOLUME_MIN"/>
-					<maxvalue value="ZE_SS_VOLUME_MAX"/>
-				</constraints>
-			</property>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

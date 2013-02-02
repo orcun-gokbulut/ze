@@ -40,15 +40,16 @@
 #include "ZETypes.h"
 #include "ZEParticle.h"
 #include "ZEDS\ZEArray.h"
-#include "ZEMeta\ZEObject.h"
 
-ZE_META_OBJECT_DESCRIPTION(ZEParticleOperator)
+#include "ZENewMeta\ZEObject.h"
+
+ZE_CLASS(ZEParticleOperator)
 
 class ZEParticleOperator : public ZEObject
 {
-	ZE_META_OBJECT(ZEParticleOperator)
-
 	friend class ZEParticleSystem;
+
+	ZE_OBJECT
 
 	private:
 
@@ -67,16 +68,3 @@ class ZEParticleOperator : public ZEObject
 };
 
 #endif
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticleOperator">		
-			<noinstance>true</noinstance>
-			<description>Base Particle Operator Class</description>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

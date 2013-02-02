@@ -35,6 +35,8 @@
 
 #include "ZEParticleGenerator.h"
 
+ZE_OBJECT_IMPL(ZEParticleGenerator)
+
 const ZEParticleSystem* ZEParticleGenerator::GetOwner() const
 {
 	return Owner;

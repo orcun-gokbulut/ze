@@ -38,6 +38,8 @@
 #include "ZEParticleSystem.h"
 #include "ZEMath\ZEAngle.h"
 
+ZE_OBJECT_IMPL(ZEParticleSphereGenerator)
+
 void ZEParticleSphereGenerator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool)
 {
 	if(GetIsSingleBurst() && SingleBurstParticleCounter >= GetSingleBurstMaxParticleCount())

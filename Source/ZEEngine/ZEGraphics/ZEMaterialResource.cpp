@@ -230,7 +230,8 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(ZEFile* ResourceFile, const
 
 	// Load Material
 	MaterialResource->Material = ZEFixedMaterial::CreateInstance();
-	MaterialResource->Material->Unserialize(ResourceFile);
+	//ZEMETADEBUGCHECK!!!
+	//MaterialResource->Material->Unserialize(ResourceFile);
 
 	// Load Animations
 	MaterialResource->Animations.SetCount((ZESize)HeaderChunk.AnimationCount);

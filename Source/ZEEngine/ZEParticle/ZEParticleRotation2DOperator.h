@@ -46,11 +46,11 @@ struct ZEParticleRotation2DProperties
 	float AngularAcceleration;
 };
 
-ZE_META_OBJECT_DESCRIPTION(ZEParticleRotation2DOperator);
+ZE_CLASS(ZEParticleRotation2DOperator)
 
 class ZEParticleRotation2DOperator : public ZEParticleOperator
 {
-	ZE_META_OBJECT(ZEParticleRotation2DOperator)
+	ZE_OBJECT
 
 	private:
 
@@ -89,22 +89,3 @@ class ZEParticleRotation2DOperator : public ZEParticleOperator
 };
 
 #endif
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticleRotation2DOperator" parent="ZEParticleOperator">		
-			<noinstance>true</noinstance>
-			<description>2D rotation calculation modifier.</description>
-			<property name="MinRotation" type="float" autogetset="yes" description="Minimum rotation that a particle will have just after creation in radians."/>
-			<property name="MaxRotation" type="float" autogetset="yes" description="Maximum rotation that a particle will have just after creation in radians."/>
-			<property name="MinAngularAcceleration" type="float" autogetset="yes" description="Minimum angular acceleration that a particle will have just after creation in radians."/>
-			<property name="MaxAngularAcceleration" type="float" autogetset="yes" description="Maximum angular acceleration that a particle will have just after creation in radians."/>	
-			<property name="MinAngularVelocity" type="float" autogetset="yes" description="Minimum angular velocity that a particle will have just after creation in radians."/>
-			<property name="MaxAngularVelocity" type="float" autogetset="yes" description="Maximum angular velocity that a particle will have just after creation in radians."/>	
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

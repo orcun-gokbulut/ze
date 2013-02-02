@@ -37,13 +37,16 @@
 #include "ZEParticlePhysicsOperator.h"
 #include "ZEParticleSystem.h"
 
+ZE_OBJECT_IMPL(ZEParticleDisplacementOperator)
+
 void ZEParticleDisplacementOperator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool)
 {
 	ZEParticlePhysicsOperator* PhysicsOperator = NULL;
 
 	for(ZESize I = 0; I < GetOwner()->GetOperators().GetCount(); I++)
 	{
-		if(GetOwner()->GetOperators()[I]->GetDescription() == ZEParticlePhysicsOperator::Description())
+		//ZEMETADEBUGCHECK!!!
+		if(GetOwner()->GetOperators()[I]->GetClass() == ZEParticlePhysicsOperator::Class())
 			PhysicsOperator = (ZEParticlePhysicsOperator*)GetOwner()->GetOperators()[I];
 	}
 

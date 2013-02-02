@@ -58,16 +58,17 @@ class ZESteeringPlayerFree : public ZESteering
 
 };
 
-ZE_META_ENTITY_DESCRIPTION(ZEPlayer);
-
 class ZEListener;
 class ZEProjectiveLight;
 class ZECamera;
 class ZEModelIKChain;
 
+ZE_CLASS(ZEPlayer)
+
 class ZEPlayer : public ZEActor
 {
-	ZE_META_ENTITY(ZEPlayer)
+	ZE_OBJECT
+
 	private:
 		ZEInputMap				InputMap;
 		ZECamera*				Camera;
@@ -99,15 +100,4 @@ class ZEPlayer : public ZEActor
 		
 		static ZEPlayer*		CreateInstance();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZEPlayer" parent="ZEActor" description="Player spawn point">
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

@@ -36,6 +36,8 @@
 #include "ZELight.h"
 #include "ZERenderCommand.h"
 
+ZE_OBJECT_IMPL(ZELight)
+
 ZEDrawFlags ZELight::GetDrawFlags() const
 {
 	return ZE_DF_LIGHT_SOURCE;

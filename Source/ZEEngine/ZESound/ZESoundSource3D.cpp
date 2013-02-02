@@ -37,7 +37,7 @@
 #include "ZESoundSource3D.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZESoundSource3D);
+ZE_OBJECT_IMPL(ZESoundSource3D)
 
 ZESoundSource3D::ZESoundSource3D()
 {
@@ -80,9 +80,4 @@ ZEUInt ZESoundSource3D::GetConeOutsideVolume() const
 ZESoundSource3D* ZESoundSource3D::CreateInstance()
 {
 	return zeSound->CreateSoundSource3D();
-}
-
-ZEEntityRunAt ZESoundSource3DDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

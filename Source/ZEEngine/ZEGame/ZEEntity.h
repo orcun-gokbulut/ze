@@ -47,47 +47,12 @@
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEQuaternion.h"
 
+#include "ZENewMeta/ZEObject.h"
+
 struct ZEDrawParameters;
-
-enum ZEEntityRunAt
-{
-	ZE_ERA_NONE			= 0,
-	ZE_ERA_CLIENT		= 1,
-	ZE_ERA_SERVER		= 2,
-	ZE_ERA_BOTH			= 3
-};
-
-#define ZE_META_ENTITY_CLASS_EXTENSION\
-	virtual ZEEntityRunAt GetRunAt() const;
-
-#define ZE_META_ENTITY_DESCRIPTION(ObjectName) ZE_META_EXTENDED_OBJECT_DESCRIPTION(ObjectName, ZEEntityDescription, ZE_META_ENTITY_CLASS_EXTENSION)
-#define ZE_META_ENTITY(Object) ZE_META_EXTENDED_OBJECT(ZEEntityDescription, ,Object)
-
-class ZEEntityDescription : public ZEObjectDescription
-{
-public:
-	virtual const char*						GetName() const;
-	virtual ZEObjectDescription*			GetParent() const;
-	virtual const char*						GetType() const;
-	virtual const char*						GetDescription() const;
-	virtual const char*						GetIcon() const;
-	virtual const ZEPropertyDescription*	GetProperties() const;
-	virtual ZESSize							GetPropertyCount() const;
-	virtual ZESSize							GetPropertyOffset() const;
-	virtual const ZEContainerDescription*	GetContainers() const;
-	virtual ZESSize							GetContainerCount() const;
-	virtual ZESSize							GetContainerOffset() const;
-	virtual const ZEMethodDescription*		GetMethods() const;
-	virtual ZESSize							GetMethodCount() const;
-	virtual ZESSize							GetMethodOffset() const;
-	virtual ZEObjectProvider*				GetProvider() const;
-	virtual ZEObject*						CreateInstance() const;
-	virtual ZEEntityRunAt					GetRunAt() const;
-};
 
 // ZEDrawFlags
 typedef ZEFlags ZEDrawFlags;
@@ -111,11 +76,14 @@ typedef ZEFlags ZEEntityDirtyFlags;
 
 class ZEScene;
 
+ZE_CLASS(ZEEntity)
+
 class ZEEntity : public ZEObject
 {
-	ZE_META_ENTITY(ZEEntity)
 	friend class ZEScene;
 	friend class ZESceneCuller;
+
+	ZE_OBJECT
 
 	private: 
 		ZEEntity*								Owner;
@@ -217,25 +185,5 @@ class ZEEntity : public ZEObject
 		virtual void							Tick(float Time);
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEEntity">		
-			<noinstance>true</noinstance>
-			<description>Base Entity Type</description>
-			<property name="EntityId" type="integer32" autogetset="yes" description="Unique number that indentifes entity"/>	
-			<property name="Name" type="string" autogetset="yes" description="Name of the entity"/>
-			<property name="Position" type="ZEVector3" setfunction="SetWorldPosition" getfunction="GetWorldPosition" description="World position of the entity"/>
-			<property name="Rotation" type="ZEQuaternion" setfunction="SetWorldRotation" getfunction="GetWorldRotation" description="World rotation of the entity"/>
-			<property name="Scale" type="ZEVector3" setfunction="SetWorldScale" getfunction="GetWorldScale" description="World scale of the entity"/>
-			<property name="Enabled" type="boolean" autogetset="yes" description="If entity is disabled it will not recive Ticks so it will not interact with player. However this property does not affect entity physical interactions. A entity can be disabled but physically active."/>
-			<property name="Visible" type="boolean" autogetset="yes" description="Is entity visible"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 
 #endif

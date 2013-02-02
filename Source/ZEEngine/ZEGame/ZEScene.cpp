@@ -234,29 +234,8 @@ const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()
 {
 	return Entities;
 }
-/*
-ZEArray<ZEEntity*> ZEScene::GetEntities(const char* ClassName)
-{
-	ZEArray<ZEEntity*> ProperEntities;
-	ZEEntity* CurrentEntity = NULL;
-	ZEObjectDescription* CurrentDesc = NULL;
-	ProperEntities.Clear();
 
-	for (ZEInt I = 0; I < Entities.GetCount(); I++)
-	{
-		CurrentDesc = CurrentEntity->GetDescription();
-
-		while(CurrentDesc != NULL)
-		{
-			if( strcmp(CurrentDesc->GetName(), ClassName) == 0 )
-
-		}
-	}
-	
-	return ProperEntities;
-}*/
-
-ZEArray<ZEEntity*> ZEScene::GetEntities(ZEObjectDescription* Desc)
+ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClass* Class)
 {
 	ZEArray<ZEEntity*> ProperEntities;
 	ZEEntity* CurrentEntity = NULL;
@@ -266,7 +245,8 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(ZEObjectDescription* Desc)
 	{
 		CurrentEntity = Entities[I];
 
-		if (ZEObjectDescription::CheckParent(Desc, CurrentEntity->GetDescription()))
+		ZEMETADEBUGCHECK!!!
+		if (ZEClass::IsDerivedFrom(Class, CurrentEntity->GetDescription()))
 			ProperEntities.Add(CurrentEntity);
 	}
 
@@ -373,16 +353,17 @@ bool ZEScene::Save(const ZEString& FileName)
 		{
 			char NameBuffer[ZE_MAX_NAME_SIZE];
 			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
-			strcpy(NameBuffer, Entities[I]->GetDescription()->GetName());
+			strcpy(NameBuffer, Entities[I]->GetClass()->GetName());
 			Serializer.Write((void*)NameBuffer, sizeof(char), ZE_MAX_NAME_SIZE);
 
-			if (!Entities[I]->Serialize((ZESerializer*)&Serializer))
+			//ZEMETADEBUGCHECK!!!
+			/*if (!Entities[I]->Serialize((ZESerializer*)&Serializer))
 			{
 				zeError("Serialization of entity \"%s\" has failed.", Entities[I]->GetName());
 				zeError("Serialization failed.");
 				Serializer.Close();
 				return false;
-			}
+			}*/
 		}
 
 		Serializer.Close();
@@ -422,7 +403,9 @@ bool ZEScene::Load(const ZEString& FileName)
 		{
 			ZEEntity* NewEntity;
 			Unserializer.Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
-			NewEntity = (ZEEntity*)ZEEntityProvider::GetInstance()->CreateInstance(EntityTypeName);
+			//ZEMETADEBUGCHECK!!!
+			//Yni NewEntity = ZEProvider::CreateInstance(EntityTypeName);
+			//NewEntity = (ZEEntity*)ZEEntityProvider::GetInstance()->CreateInstance(EntityTypeName);
 			if (NewEntity == NULL)
 			{
 				zeError("Unserialization can not create entity type \"%s\".", EntityTypeName);
@@ -430,13 +413,14 @@ bool ZEScene::Load(const ZEString& FileName)
 				return false;
 			}
 
-			if (!NewEntity->Unserialize((ZEUnserializer*)&Unserializer))
+			//ZEMETADEBUGCHECK!!!
+			/*if (!NewEntity->Unserialize((ZEUnserializer*)&Unserializer))
 			{
 				zeError("Unserialization of entity \"%s\" has failed.", Entities[I]->GetName());
 				zeError("Unserialization failed.");
 				Unserializer.Close();
 				return false;
-			}
+			}*/
 
 			AddEntity(NewEntity);
 		}

@@ -38,10 +38,9 @@
 #define __ZE_TRIGGER_H__
 
 #include "ZEEntity.h"
-#include "ZEMeta/ZEObject.h"
 #include "ZEDS/ZEFastDelegate.h"
 
-ZE_META_ENTITY_DESCRIPTION(ZETrigger);
+#include "ZENewMeta/ZEObject.h"
 
 class ZETrigger;
 
@@ -75,9 +74,12 @@ enum ZEReportBehaviour
 
 typedef fastdelegate::FastDelegate2<ZETrigger*, ZEEntity*, void> ZETriggerCallback;
 
+ZE_CLASS(ZETrigger)
+
 class ZETrigger : public ZEEntity
 {
-	ZE_META_ENTITY(ZETrigger)
+	ZE_OBJECT
+
 	private:
 		ZETriggerCallback			Callback;
 
@@ -118,42 +120,4 @@ class ZETrigger : public ZEEntity
 
 		static ZETrigger*			CreateInstance();
 };
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZETrigger" parent="ZEEntity" icon="" description="Trigger">
-			<property name="TriggerShape" type="integer32" autogetset="true" description="Shape of trigger">
-				<enumurator name="ZETriggerShape">
-					<item name="Sphere" value="ZE_TS_SPHERE"/>
-					<item name="Box" value="ZE_TS_BOX"/>
-				</enumurator>
-			</property>
-			<property name="ActivateTriggerOn" type="integer32" autogetset="true" description="Activation type of trigger">
-				<enumurator name="ZEActivateTriggerOn">
-					<item name="Never Activate" value="ZE_ATO_NONE"/>  
-					<item name="Activate on enter" value="ZE_ATO_ENTER"/>
-					<item name="Activate on leave" value="ZE_ATO_LEAVE"/>
-					<item name="Activate on inside" value="ZE_ATO_INSIDE"/>
-				</enumurator>
-			</property>
-			<property name="FilterObjectsBy" type="integer32" autogetset="true" description= "Filter objects for activate">
-				<enumurator name="ZEFilterObjectsBy">
-					<item name="Filter None" value="ZE_FOB_NONE"/>
-					<item name="Filter by entity instance" value="ZE_FOB_ENTITY_INSTANCE"/>
-					<item name="Filter by entity type" value="ZE_FOB_ENTITY_TYPE"/>
-				</enumurator>
-			</property>
-			<property name="ReportBehaviour" type="integer32" autogetset="true" description="Report behaviour">
-				<enumurator name="ZEReportBehaviour">
-					<item name="Report None" value="ZE_RB_REPORT_NONE"/>
-					<item name="Report Trigger Status" value="ZE_RB_REPORT_TRIGGER_STATUS"/>
-					<item name="Report Entity Status" value="ZE_RB_REPORT_ENTITY_STATUS"/>
-				</enumurator>
-			</property>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END() 
-*/
 #endif

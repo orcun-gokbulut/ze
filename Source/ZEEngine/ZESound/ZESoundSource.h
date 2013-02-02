@@ -39,8 +39,9 @@
 
 #include "ZETypes.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEMeta/ZEObject.h"
 #include "ZESoundResource.h"
+
+#include "ZENewMeta/ZEObject.h"
 
 
 #define ZE_SS_PAN_LEFT				-100
@@ -74,11 +75,12 @@ enum  ZESoundSourceState
 
 class ZESoundSourceEffect;
 
-ZE_META_ENTITY_DESCRIPTION(ZESoundSource);
+ZE_CLASS(ZESoundSource)
 
 class ZESoundSource : public ZEEntity
 {
-	ZE_META_ENTITY(ZESoundSource)
+	ZE_OBJECT
+
 	private:
 		ZESize						StartPosition;
 		ZESize						EndPosition;
@@ -170,54 +172,4 @@ class ZESoundSource : public ZEEntity
 
 		static ZESoundSource*		CreateInstance();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZESoundSource" noinstance="true" parent="ZEEntity">
-			<description>Sound Source</description>
-			<property name="CurrentPosition" type="uinteger32" autogetset="yes">
-				<constraints>
-					<minvalue value="0"/>
-				</constraints>
-			</property>
-			<property name="Volume" type="uinteger32" autogetset="yes">
-				<constraints>
-					<minvalue value="ZE_SS_VOLUME_MIN"/>
-					<maxvalue value="ZE_SS_VOLUME_MAX"/>
-				</constraints>
-			</property>
-			<property name="Pan" type="integer32" autogetset="yes">
-				<constraints>
-					<minvalue value="-ZE_SS_PAN_LEFT"/>
-					<maxvalue value="ZE_SS_PAN_RIGHT"/>
-				</constraints>
-			</property>
-			<property name="PlaybackSpeed" type="float" autogetset="yes">
-				<constraints>
-					<minvalue value="0.1f"/>
-					<maxvalue valıe="2.0f"/>
-				</constraints>
-			</property>
-			<property name="Looping" type="boolean" autogetset="yes"/>
-			<property name="LimitsEnabled" type="boolean" autogetset="yes"/>
-			<property name="StartPosition" type="uinteger32" autogetset="yes"/>
-			<property name="EndPosition" type="uinteger32" autogetset="yes"/>
-			<property name="SoundSourceState" type="integer32" autogetset="yes">
-				<enumurator name="ZESoundSourceState">
-					<item name="Playing" value="ZE_SSS_PLAYING"/>
-					<item name="Stopped" value="ZE_SSS_STOPPED"/>
-					<item name="Paused" value="ZE_SSS_PAUSED"/>
-				</enumurator>
-			</property>
-			<method name="Play" auto="true" description="Starts playing sound sample from the beginning."/>
-			<method name="Resume" auto="true" description="Starts playing sound sample from paused time."/>
-			<method name="Pause" auto="true" description="Pauses sound sample."/>
-			<method name="Stop" auto="true" description="Stops sound sample."/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

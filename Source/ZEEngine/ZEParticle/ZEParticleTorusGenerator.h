@@ -39,11 +39,11 @@
 
 #include "ZEParticleGenerator.h"
 
-ZE_META_OBJECT_DESCRIPTION(ZEParticleTorusGenerator)
+ZE_CLASS(ZEParticleTorusGenerator)
 
 class ZEParticleTorusGenerator : public ZEParticleGenerator
 {
-	ZE_META_OBJECT(ZEParticleTorusGenerator)
+	ZE_OBJECT
 
 	private:
 
@@ -68,18 +68,3 @@ class ZEParticleTorusGenerator : public ZEParticleGenerator
 };
 
 #endif
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticleTorusGenerator" parent="ZEParticleGenerator">		
-			<noinstance>true</noinstance>
-			<description>Torus shaped particle generator.</description>
-			<property name="OuterRadius" type="float" autogetset="yes" description="Outer radius of the generator torus."/>
-			<property name="InnerRadius" type="float" autogetset="yes" description="Inner radius of the generator torus."/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

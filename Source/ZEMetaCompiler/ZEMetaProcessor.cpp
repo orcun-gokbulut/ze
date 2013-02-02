@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPostProcessor.h
+ Zinek Engine - ZEMetaProcessor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_POST_PROCESSOR__
-#define __ZE_POST_PROCESSOR_
+#include "ZEMetaProcessor.h"
+#include "ZEMetaProcessorInternal.h"
 
-#define ZE_POST_PROCESSOR_START(x)
-#define ZE_POST_PROCESSOR_ENDT(x)
-#endif
+bool ZEMetaProcessor::Process(ZEMetaData* MetaData, const ZEMetaCompilerOptions& Options)
+{
+	ZEMetaProcessorInternal::MetaData = MetaData;
+	ZEMetaProcessorInternal::Options = Options;
+	ZEMetaProcessorInternal::InitializeClang();
+	return true;
+}

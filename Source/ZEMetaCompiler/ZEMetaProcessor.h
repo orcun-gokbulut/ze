@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAnimation.h
+ Zinek Engine - ZEMetaProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,93 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_ANIMATION_H__
-#define __ZE_ANIMATION_H__
+#ifndef __ZE_META_PROCESSOR_H__
+#define __ZE_META_PROCESSOR_H__
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEMetaCompilerOptions.h"
+#include "ZEMetaData.h"
 
-enum ZEAnimationState
-{
-	ZE_AS_NONE			= 0,
-	ZE_AS_PLAYING		= 1,
-	ZE_AS_STOPPED		= 2,
-	ZE_AS_PAUSED		= 3
-};
-
-struct ZEPropertyAnimationKey
-{
-	float								Time;
-	ZEVariant							Value;
-};
-
-struct ZEPropertyAnimation
-{
-	ZEInt								PropertyId;
-	ZEVariantType						ValueType;
-	bool								Interpolate;
-	ZEArray<ZEPropertyAnimationKey>		Keys;
-};
-
-class ZEAnimation
+class ZEMetaProcessor
 {
 	public:
-		ZEString						Name;
-		ZEInt							FrameCount;
-		float							FramePerSecond;
-		ZEArray<ZEPropertyAnimation>	PropertyAnimations;
-
-		static bool						ReadFromFile(ZEUnserializer* Unserializer, ZEAnimation* Animation);
-		static bool						WriteToFile(ZESerializer* Serializer, ZEAnimation* Animation);
+		static bool		Process(ZEMetaData* Data, const ZEMetaCompilerOptions& Options);
 };
 
-class ZEObject;
-class ZEAnimationController
-{
-	private:
-		ZEObject*						Owner;
-		ZEAnimation*					Animation;
-		float							StartFrame;
-		float							EndFrame;
-		float							CurrentFrame;
-		bool							Looping;
-		ZEAnimationState				State;
-		float							Speed;
-
-	public:
-		void							SetOwner(ZEObject* Owner);
-		ZEObject*						GetOwner();
-
-		void							SetLooping(bool Loop);
-		bool							GetLooping();
-		
-		void							SetCurrentFrame(float Frame);
-		float							GetCurrentFrame();
-		
-		void							SetStartFrame(float Start);
-		float							GetStartFrame();
-
-		void							SetEndFrame(float End);
-		float							GetEndFrame();
-
-		void							SetAnimationSpeed(float Speed);
-		float							GetAnimationSpeed();
-
-		ZEAnimationState				GetAnimationState();
-
-		void							SetAnimation(ZEAnimation* Animation);
-		ZEAnimation*					GetAnimation();
-
-		void							PlayAnimation();
-		void							PauseAnimation();
-		void							StopAnimation();
-		void							ResumeAnimation();
-
-		void							AdvanceAnimation(float TimeElapsed);
-
-										ZEAnimationController();
-										~ZEAnimationController();
-};
 #endif

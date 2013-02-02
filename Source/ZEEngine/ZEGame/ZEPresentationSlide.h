@@ -41,16 +41,15 @@
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEGraphics/ZERenderCommand.h"
 
-
-ZE_META_ENTITY_DESCRIPTION(ZEPresentationSlide);
-
 class ZERenderer;
 class ZEFixedMaterial;
 class ZETexture2DResource;
 
+ZE_CLASS(ZEPresentationSlide)
+
 class ZEPresentationSlide : public ZEEntity
 {
-	ZE_META_ENTITY(ZEPresentationSlide)
+	ZE_OBJECT
 
 	private:
 		bool							Initialized;
@@ -77,16 +76,4 @@ class ZEPresentationSlide : public ZEEntity
 
 		static ZEPresentationSlide*		CreateInstance();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-	<zinek>
-		<meta>
-			<class name="ZEPresentationSlide" parent="ZEEntity" icon="" description="">
-				<property name="PresentationSlide" type="string" autogetset="true" semantic="ZE_PS_FILENAME" fileextension=""/>
-			</class>
-		</meta>
-	</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

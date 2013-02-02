@@ -42,7 +42,7 @@
 #include "ZEGraphics/ZESimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEGrid);
+ZE_OBJECT_IMPL(ZEGrid)
 
 ZEDrawFlags ZEGrid::GetDrawFlags() const
 {
@@ -104,7 +104,7 @@ void ZEGrid::GenerateGrid()
 		MajorGrid.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y), ZEVector3(GridSize.x * 0.5f, 0.0f, Y * MajorGridUnitSize.y));
 }
 
-void ZEGrid::SetAxisColor( const ZEVector3& Color )
+void ZEGrid::SetAxisColor(const ZEVector3& Color)
 {
 	this->AxisColor = Color;
 }
@@ -221,9 +221,4 @@ ZEGrid::ZEGrid()
 ZEGrid* ZEGrid::CreateInstance()
 {
 	return new ZEGrid();
-}
-
-ZEEntityRunAt ZEGridDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

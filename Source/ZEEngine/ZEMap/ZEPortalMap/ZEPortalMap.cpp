@@ -45,6 +45,8 @@
 #include "ZEMath/ZEViewFrustum.h"
 #include <string.h>
 
+ZE_OBJECT_IMPL(ZEPortalMap)
+
 ZEDrawFlags ZEPortalMap::GetDrawFlags() const
 {
 	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
@@ -453,9 +455,4 @@ void ZEPortalMap::CullPortals(ZEDrawParameters* DrawParameters)
 
 
 	}
-}
-
-ZEEntityRunAt ZEPortalMapDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

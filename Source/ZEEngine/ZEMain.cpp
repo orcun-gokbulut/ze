@@ -44,7 +44,6 @@
 #include "ZECore/ZEOptionManager.h"
 
 #include "ZEUI/ZEUIDebugModule.h"
-#include "ZEMeta/ZEMetaDebugModule.h"
 #include "ZEModel/ZEModelDebugModule.h"
 #include "ZESound/ZESoundDebugModule.h"
 #include "ZEPhysics/ZEPhysicsDebugModule.h"
@@ -68,9 +67,6 @@ ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 	ZESoundDebugModule SoundDebugComponent;
 	//zeCore->SetDebugComponent(&SoundDebugComponent);
-
-	ZEMetaDebugModule MetaDebugComponent;
-	//zeCore->SetDebugComponent(&MetaDebugComponent);
 
 	ZEUIDebugModule UIDebugModule;
 	//zeCore->SetApplicationModule(&UIDebugModule);

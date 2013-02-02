@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEContainer.cpp
+ Zinek Engine - ZEMetaProcessorInternal.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,106 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEContainer.h"
-#include "ZEObject.h"
+#pragma once
+#ifndef __ZE_META_PROCESSOR_INTERNAL_H__
+#define __ZE_META_PROCESSOR_INTERNAL_H__
 
-void ZEContainer::SetContainerMode(ZEContainerMode Mode)
+#include "ZEMetaCompilerOptions.h"
+#include "ZEMetaData.h"
+
+#include "clang/Frontend/CompilerInstance.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Attr.h"
+
+using namespace clang;
+
+class ZEMetaProcessorInternal
 {
-	this->Mode = Mode;
-}
+	public:
+		static CompilerInstance*		Compiler;
+		static ZEMetaData*				MetaData;
+		static ZEMetaCompilerOptions	Options;
 
-ZEContainerMode ZEContainer::GetContainerMode()
-{
-	return Mode;
-}
-
-void ZEContainer::SetBaseClass(ZEObjectDescription* Type)
-{
-	this->Type = Type;
-}
-
-ZEObjectDescription* ZEContainer::GetBaseClass()
-{
-	return Type;
-}
-
-void ZEContainer::SetAllowDerivedClasses(bool Allow)
-{
-	AllowDerivedTypes = Allow;
-}
-
-bool ZEContainer::GetAllowDerivedClasses()
-{
-	return AllowDerivedTypes;
-}
-
-const ZEArray<ZEObject*>& ZEContainer::GetInstances()
-{
-	return Instances;
-}
-
-bool ZEContainer::AddInstance(ZEObject* Instance)
-{
-	if (Type == NULL)
-	{
-		Instances.Add(Instance);
-		return true;
-	}
-
-	if (AllowDerivedTypes)
-	{
-		ZEObjectDescription* CurrentType = Instance->GetDescription();
-		while (CurrentType != NULL)
-		{
-			if (Type == CurrentType)
-			{
-				Instances.Add(Instance);
-				return true;
-			}
-			CurrentType = CurrentType->GetParent();
-		}
-	}
-	else
-	{
-		if (Type == Instance->GetDescription())
-		{
-			Instances.Add(Instance);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	return false;
-}
-
-bool ZEContainer::RemoveInstance(ZEObject* Instance)
-{
-	Instances.DeleteValue(Instance);
-	return true;
-}
-
-ZEContainer::ZEContainer()
-{
-	Mode = ZE_CM_OWNER;
-	Type = NULL;
-	AllowDerivedTypes = true;
-}
-
-ZEContainer::ZEContainer(ZEContainerMode Mode, ZEObjectDescription* Type, bool AllowDerived)
-{
-	this->Mode = Mode;
-	this->Type = Type;
-	this->AllowDerivedTypes = AllowDerived;
-}
-
-ZEContainer::~ZEContainer()
-{
-	if (Mode == ZE_CM_OWNER)
-		for (ZESize I = 0; I < Instances.GetCount(); I++)
-			delete Instances[I];
+		static void						RaiseNote(SourceLocation& Location, const char* WarningText);
+		static void						RaiseWarning(SourceLocation& Location, const char* WarningText);
+		static void						RaiseError(SourceLocation& Location, const char* ErrorText);
+		static void						RaiseCriticalError(SourceLocation& Location, const char* ErrorText);
 	
-	Instances.Clear();
-}
+		static bool						CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class);
+		static bool						CheckClassHasZEObjectMacro(CXXRecordDecl* Class);
+		static bool						CheckClass(CXXRecordDecl* Class);
+
+		static bool						ParseAttribute(ZEAttributeData* Data, const AnnotateAttr* Attribute);
+
+		static void						ProcessEnumerator(EnumDecl* EnumDeclaration);
+		static void						ProcessClass(CXXRecordDecl* Class);
+		static void						ProcessClassAttributes(ZEClassData* ClassData, CXXRecordDecl* ClassDeclaration);
+		static void						ProcessProperty(ZEClassData* ClassData, VarDecl* StaticProperty);
+		static void						ProcessProperty(ZEClassData* ClassData, FieldDecl* NonStaticProperty);
+		static void						ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* Method);
+		static void						ProcessDeclaration(Decl* BaseDeclaration);
+
+		static void						InitializeClang();
+};
+
+#endif

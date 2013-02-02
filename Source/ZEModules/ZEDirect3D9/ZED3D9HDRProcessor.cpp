@@ -43,6 +43,8 @@
 #include "ZECore/ZEConsole.h"
 #include "ZEMath/ZEAngle.h"
 
+ZE_OBJECT_IMPL(ZED3D9HDRProcessor)
+
 static float GausianFunction(float x, float StandartDeviation)
 {
 	return (1.0f / (ZEMath::Sqrt(2.0f * ZE_PI) * StandartDeviation)) * ZEMath::Power(ZE_E, -((x * x) / (2.0f * StandartDeviation * StandartDeviation)));

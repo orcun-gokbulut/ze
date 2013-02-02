@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProvider.cpp
+ Zinek Engine - ZEMetaGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,83 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEProvider.h"
-#include "ZEObject.h"
-#include <string.h>
-#include "ZEError.h"
-void ZEProvider::SetBaseClass(ZEObjectDescription* ClassType)
+#pragma once
+#ifndef __ZE_META_GENERATOR_H__
+#define __ZE_META_GENERATOR_H__
+
+#include "ZEMetaCompilerOptions.h"
+#include "ZEMetaData.h"
+
+class ZEMetaGenerator
 {
-	BaseClass = ClassType;
-}
+	public:
+		static bool			Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* MetaData);
+};
 
-ZEObjectDescription* ZEProvider::GetBaseClass()
-{
-	return BaseClass;
-}
-
-const ZEArray<ZEObjectDescription*>& ZEProvider::GetClasses()
-{
-	return Classes;
-}
-
-bool ZEProvider::RegisterZEClass(ZEObjectDescription* Description)
-{
-	zeDebugCheck(Description == NULL, "Description can not be NULL.");
-
-	if (Classes.Exists(Description))
-	{
-		zeError("Can not add class type to provider. Class type is already exists.");
-		return false;
-	}
-
-
-	if (BaseClass != NULL && !ZEObjectDescription::CheckParent(BaseClass, Description))
-	{
-		zeError("Can not add class type to provider. Class type is not derived from base class.");
-		return false;
-	}
-
-	Classes.Add(Description);
-	return true;
-}
-
-void ZEProvider::UnregisterZEClass(ZEObjectDescription* Description)
-{
-	zeDebugCheck(Description == NULL, "Description can not be NULL.");
-	zeDebugCheck(!Classes.Exists(Description), "Can not remove class type from provider. Class type is not exists. "
-		"Class Type : \"%s\".", Description->GetName());
-
-	Classes.DeleteValue(Description);
-}
-
-ZEObject* ZEProvider::CreateInstance(ZESize Index) const
-{
-	return Classes[Index]->CreateInstance();
-}
-
-ZEObject* ZEProvider::CreateInstance(const char* Name) const
-{
-	for(ZESize I = 0; I < Classes.GetCount(); I++)
-		if (strcmp(Classes[I]->GetName(), Name) == 0)
-		{
-			ZEObject* Instance = Classes[I]->CreateInstance();
-			if (Instance == NULL)
-			{
-				zeError("Can not create instance of a class. NULL instance returned. Class Name : \"%s\".", Name);
-			}
-			return Instance;
-		}
-
-	zeError("Can not create instance of a class. Class does not exists. Class Name : \"%s\".", Name);
-	return NULL;
-}
-
-ZEProvider::ZEProvider()
-{
-	BaseClass = NULL;
-}
-
-ZEProvider::~ZEProvider()
-{
-
-}
+#endif

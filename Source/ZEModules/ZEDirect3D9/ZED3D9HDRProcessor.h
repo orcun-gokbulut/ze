@@ -39,7 +39,8 @@
 
 #include "ZETypes.h"
 #include "ZED3D9ComponentBase.h"
-#include "ZEMeta/ZEObject.h"
+
+#include "ZENewMeta/ZEObject.h"
 
 #include <d3d9.h>
 
@@ -49,11 +50,11 @@ class ZED3D9PixelShader;
 class ZED3D9VertexShader;
 class ZED3D9ViewPort;
 
-ZE_META_OBJECT_DESCRIPTION(ZED3D9HDRProcessor);
+ZE_CLASS(ZED3D9HDRProcessor)
 
 class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 {
-	ZE_META_OBJECT(ZED3D9HDRProcessor);
+	ZE_OBJECT
 
 	private:
 		ZED3D9Texture2D*				Input;
@@ -160,26 +161,4 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 										ZED3D9HDRProcessor();
 										~ZED3D9HDRProcessor();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-	<zinek>
-		<meta> 
-			<class name="ZED3D9HDRProcessor">
-				<noinstance>true</noinstance>
-				<description>ZED3D9HDRProcessor</description>
-				<property name="Key" type="float" autogetset="yes" description="..."/>
-				<property name="BrightPassTreshold" type="float" autogetset="yes" description="..."/>
-				<property name="BloomFactor" type="float" autogetset="yes" description="..."/>
-				<property name="BloomStandardDeviation" type="float" autogetset="yes" description="..."/>
-				<property name="BloomSampleCount" type="integer32" autogetset="yes" description="..."/>
-				<property name="BloomPassCount" type="integer32" autogetset="yes" description="..."/>
-				<property name="MaxLuminanceChangePerSecond" type="float" autogetset="yes" description="..."/>
-				
-			</class>
-		</meta>
-	</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-
 #endif

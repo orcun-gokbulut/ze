@@ -36,6 +36,8 @@
 #include "ZEParticleRotation2DOperator.h"
 #include <math.h>
 
+ZE_OBJECT_IMPL(ZEParticleRotation2DOperator)
+
 void ZEParticleRotation2DOperator::SetMaxRotation(float MaxRotation)
 {
 	this->MaxRotation = MaxRotation;

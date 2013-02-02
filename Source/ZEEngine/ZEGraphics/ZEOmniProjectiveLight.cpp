@@ -40,7 +40,7 @@
 #include "ZETexture2D.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEOmniProjectiveLight);
+ZE_OBJECT_IMPL(ZEOmniProjectiveLight)
 
 ZELightType ZEOmniProjectiveLight::GetLightType()
 {

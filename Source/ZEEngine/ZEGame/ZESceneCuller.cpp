@@ -87,7 +87,8 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{
-		if (ZEObjectDescription::CheckParent(ZELight::Description(), Entities[I]->GetDescription()))
+		//ZEMETADEBUGCHECK!!!
+		//if (ZEClass::CheckParent(ZELight::Description(), Entities[I]->GetDescription()))
 		{
 			if (CullLight((ZELight*)Entities[I], DrawParameters))
 			{
@@ -101,7 +102,8 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 
 		for (ZESize J = 0; J < Components.GetCount(); J++)
 		{
-			if (ZEObjectDescription::CheckParent(ZELight::Description(), Components[J]->GetDescription()))
+			//ZEMETADEBUGCHECK!!!
+			//if (ZEClass::CheckParent(ZELight::Description(), Components[J]->GetDescription()))
 				if (CullLight((ZELight*)Components[J], DrawParameters))
 				{
 					DrawParameters->Renderer->AddToLightList((ZELight*)Components[J]);
@@ -113,7 +115,8 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 
 		for (ZESize K = 0; K < ChildEntities.GetCount(); K++)
 		{
-			if (ZEObjectDescription::CheckParent(ZELight::Description(), ChildEntities[K]->GetDescription()))
+			//ZEMETADEBUGCHECK!!!
+			//if (ZEClass::CheckParent(ZELight::Description(), ChildEntities[K]->GetDescription()))
 				if (CullLight((ZELight*)ChildEntities[K], DrawParameters))
 				{
 					DrawParameters->Renderer->AddToLightList((ZELight*)ChildEntities[K]);

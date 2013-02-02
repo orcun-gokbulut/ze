@@ -39,11 +39,11 @@
 
 #include "ZEParticleOperator.h"
 
-ZE_META_OBJECT_DESCRIPTION(ZEParticleDisplacementOperator)
+ZE_CLASS(ZEParticleDisplacementOperator)
 
 class ZEParticleDisplacementOperator : public ZEParticleOperator
 {
-	ZE_META_OBJECT(ZEParticleDisplacementOperator)
+	ZE_OBJECT
 
 	private: 
 
@@ -62,17 +62,3 @@ class ZEParticleDisplacementOperator : public ZEParticleOperator
 };
 
 #endif
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticleDisplacementOperator" parent="ZEParticleOperator">		
-			<noinstance>true</noinstance>
-			<description>Displacement operator.</description>
-			<property name="Displacement" type="ZEVector3" autogetset="yes" description="Displacement in x,y and z related with time."/>	
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

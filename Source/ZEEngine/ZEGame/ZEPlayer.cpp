@@ -48,8 +48,6 @@
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZEMath/ZEMath.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
-
 #define ACTIONID_FORWARD			0
 #define ACTIONID_BACKWARD			1
 #define ACTIONID_STRAFELEFT			2
@@ -63,7 +61,7 @@ ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
 #define ACTIONID_UP					9
 #define ACTIONID_DOWN				10
 
-
+ZE_OBJECT_IMPL(ZEPlayer)
 
 ZESteeringPlayerFree::~ZESteeringPlayerFree()
 {
@@ -308,9 +306,4 @@ ZEPlayer::~ZEPlayer()
 ZEPlayer* ZEPlayer::CreateInstance()
 {
 	return new ZEPlayer();
-}
-
-ZEEntityRunAt ZEPlayerDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

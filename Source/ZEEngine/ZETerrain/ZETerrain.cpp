@@ -54,6 +54,8 @@
 #define ZE_TPM_EXTEND_NEGATIVE	3
 #define ZE_TPM_EXTEND_POSITIVE	4
 
+ZE_OBJECT_IMPL(ZETerrain)
+
 ZEDrawFlags ZETerrain::GetDrawFlags() const
 {
 	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
@@ -659,9 +661,4 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 ZETerrain* ZETerrain::CreateInstance()
 {
 	return new ZETerrain();
-}
-
-ZEEntityRunAt ZETerrainDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

@@ -37,7 +37,7 @@
 #include "ZEScene.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZETrigger);
+ZE_OBJECT_IMPL(ZETrigger)
 
 ZEUInt32 ZETrigger::GetDrawFlags()
 {
@@ -166,9 +166,4 @@ ZETrigger::ZETrigger()
 ZETrigger* ZETrigger::CreateInstance()
 {
 	return new ZETrigger();
-}
-
-ZEEntityRunAt ZETriggerDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

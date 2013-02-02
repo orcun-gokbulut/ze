@@ -54,7 +54,7 @@ class ZEEntity;
 class ZEPhysicalWorld;
 class ZEPortalMap;
 class ZEPortalMapResource;
-class ZEObjectDescription;
+class ZEClass;
 
 #define ZE_RCF_ENTITY							1
 #define ZE_RCF_COMPONENT						2
@@ -90,8 +90,7 @@ class ZEScene
 		void									RemoveEntity(ZEEntity* Entity);
 
 		const ZESmartArray<ZEEntity*>&			GetEntities();
-		//ZEArray<ZEEntity*>					GetEntities(const char* ClassName);
-		ZEArray<ZEEntity*>						GetEntities(ZEObjectDescription* Desc);
+		ZEArray<ZEEntity*>						GetEntities(ZEClass* Class);
 
 		void									ClearEntities();
 

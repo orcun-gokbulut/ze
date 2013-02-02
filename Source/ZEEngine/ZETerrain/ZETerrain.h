@@ -67,11 +67,14 @@ struct ZETerrainLevel
 	float				MaxHeight;
 };
 
-ZE_META_ENTITY_DESCRIPTION(ZETerrain)
+ZE_CLASS(ZETerrain)
+
 class ZETerrain : public ZEEntity
 {
-	ZE_META_ENTITY(ZETerrain)
 	friend class ZEPortalMapDoor;
+
+	ZE_OBJECT
+
 	private:
 		ZEStaticVertexBuffer*					VertexBuffer;
 		ZEVertexDeclaration*					VertexDeclaration;
@@ -144,14 +147,4 @@ class ZETerrain : public ZEEntity
 		static ZETerrain*						CreateInstance();
 
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZETerrain"	parent="ZEEntity"	description="Terrain" />
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif
