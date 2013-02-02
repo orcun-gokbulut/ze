@@ -44,7 +44,7 @@
 #include "ZEDS/ZEVariant.h"
 #include "ZEML/ZEMLNode.h"
 
-#include "ZENewMeta/ZEObject.h"
+#include "ZEMeta/ZEObject.h"
 
 class ZETextureCube;
 class ZETextureCubeResource;

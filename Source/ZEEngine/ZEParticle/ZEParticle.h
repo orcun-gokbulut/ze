@@ -39,7 +39,7 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZERandom.h"
-#include "ZENewMeta/ZEObject.h"
+#include "ZEMeta/ZEObject.h"
 
 #define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
 

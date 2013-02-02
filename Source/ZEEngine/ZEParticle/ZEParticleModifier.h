@@ -37,7 +37,7 @@
 #ifndef __ZE_PARTICLE_CONTROLLER_H__
 #define __ZE_PARTICLE_CONTROLLER_H__
 
-#include "ZENewMeta/ZEObject.h"
+#include "ZEMeta/ZEObject.h"
 #include "ZEDS/ZEString.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEParticle.h"

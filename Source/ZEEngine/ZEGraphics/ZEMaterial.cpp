@@ -36,7 +36,7 @@
 #include "ZEMaterial.h"
 #include "ZECore/ZECore.h"
 #include "ZEGraphicsModule.h"
-#include "ZENewMeta/ZEAnimation.h"
+#include "ZEMeta/ZEAnimation.h"
 #include <memory.h>
 
 ZE_OBJECT_IMPL(ZEMaterial)

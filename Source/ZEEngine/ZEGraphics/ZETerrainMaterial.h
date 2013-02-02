@@ -39,7 +39,7 @@
 
 #include "ZEMaterial.h"
 #include "ZEMath/ZEVector.h"
-#include "ZENewMeta/ZEObject.h"
+#include "ZEMeta/ZEObject.h"
 
 class ZETextureCube;
 class ZETextureCubeResource;

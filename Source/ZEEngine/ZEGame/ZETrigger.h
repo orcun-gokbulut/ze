@@ -40,7 +40,7 @@
 #include "ZEEntity.h"
 #include "ZEDS/ZEFastDelegate.h"
 
-#include "ZENewMeta/ZEObject.h"
+#include "ZEMeta/ZEObject.h"
 
 class ZETrigger;
 

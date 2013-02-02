@@ -36,10 +36,10 @@
 #include <stdio.h>
 #include "ZEMetaData.h"
 #include "ZEMetaGenerator.h"
-#include "ZENewMeta/ZEMetaAttribute.h"
+#include "ZEMeta/ZEMetaAttribute.h"
 #include "ZEDS/ZEList.h"
-#include "ZENewMeta/ZEType.h"
-#include "ZENewMeta/ZEClass.h"
+#include "ZEMeta/ZEType.h"
+#include "ZEMeta/ZEClass.h"
 
 ZEInt SortPropertiesByHash(ZEPropertyData* const* PropertyDataA, ZEPropertyData* const* PropertyDataB)
 {

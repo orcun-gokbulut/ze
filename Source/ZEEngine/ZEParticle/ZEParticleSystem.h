@@ -38,7 +38,7 @@
 #ifndef __ZE_PARTICLE_SYSTEM_H__
 #define __ZE_PARTICLE_SYSTEM_H__
 
-#include "ZENewMeta/ZEObject.h"
+#include "ZEMeta/ZEObject.h"
 
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEVector.h"

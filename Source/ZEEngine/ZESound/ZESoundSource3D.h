@@ -40,7 +40,7 @@
 #include "ZEGame/ZEEntity.h"
 #include "ZESoundSource.h"
 
-#include "ZENewMeta/ZEObject.h"
+#include "ZEMeta/ZEObject.h"
 
 ZE_CLASS(ZESoundSource3D)
 

@@ -51,7 +51,7 @@ ze_add_source(ZEMetaProcessorInternal.h  	Sources)
 ze_add_source(ZEMetaProcessorClang.cpp		Sources)
 
 ze_add_executable(ZEMetaCompiler	SOURCES ${Sources} CONSOLE 
-	LIBS ZEFoundation ZENewMeta
+	LIBS ZEFoundation ZEMeta
 		clangBasic.lib
 		clangFrontend.lib
 		clangDriver.lib
