@@ -39,11 +39,11 @@
 
 #include "ZEParticleOperator.h"
 
-ZE_META_OBJECT_DESCRIPTION(ZEParticleGrow2DOperator)
+ZE_CLASS(ZEParticleGrow2DOperator)
 
 class ZEParticleGrow2DOperator : public ZEParticleOperator
 {
-	ZE_META_OBJECT(ZEParticleGrow2DOperator)
+	ZE_OBJECT
 
 	private: 
 
@@ -62,17 +62,3 @@ class ZEParticleGrow2DOperator : public ZEParticleOperator
 };
 
 #endif
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticleGrow2DOperator" parent="ZEParticleOperator">		
-			<noinstance>true</noinstance>
-			<description>2D grow and shrink operator.</description>
-			<property name="GrowFactor" type="ZEVector2" autogetset="yes" description="Ammount of grow or shirink in x and y related with time."/>	
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

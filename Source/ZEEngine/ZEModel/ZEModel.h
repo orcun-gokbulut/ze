@@ -59,11 +59,11 @@ class ZEPhysicalJoint;
 
 struct ZEDrawParameters;
 
-ZE_META_ENTITY_DESCRIPTION(ZEModel)
+ZE_CLASS(ZEModel)
 
 class ZEModel : public ZEEntity
 {	
-	ZE_META_ENTITY(ZEModel)
+	ZE_OBJECT
 
 	friend class ZEPhysicalEnvironment;
 	friend class ZEModelAnimationTrack;
@@ -182,18 +182,3 @@ class ZEModel : public ZEEntity
 		static ZEModel*						CreateInstance();
 };
 #endif
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZEModel" parent="ZEEntity" description="Sky Brush">
-			<property name="ModelFile"
-				type="string"
-				autogetset="true"
-				description="Model file"
-				semantic="ZE_PS_FILENAME"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

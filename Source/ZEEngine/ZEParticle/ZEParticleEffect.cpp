@@ -36,7 +36,7 @@
 #include "ZEParticleEffect.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEParticleEffect);
+ZE_OBJECT_IMPL(ZEParticleEffect)
 		
 ZEDrawFlags ZEParticleEffect::GetDrawFlags() const
 {

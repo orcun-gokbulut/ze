@@ -36,7 +36,7 @@
 #include "ZEDirectionalLight.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEDirectionalLight);
+ZE_OBJECT_IMPL(ZEDirectionalLight)
 
 ZELightType ZEDirectionalLight::GetLightType()
 {

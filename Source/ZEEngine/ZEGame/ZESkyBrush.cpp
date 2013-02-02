@@ -45,7 +45,7 @@
 
 #include <string.h>
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZESkyBrush);
+ZE_OBJECT_IMPL(ZESkyBrush)
 
 ZEDrawFlags ZESkyBrush::GetDrawFlags() const
 {
@@ -170,9 +170,4 @@ ZESkyBrush::~ZESkyBrush()
 ZESkyBrush* ZESkyBrush::CreateInstance()
 {
 	return new ZESkyBrush();
-}
-
-ZEEntityRunAt ZESkyBrushDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

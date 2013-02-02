@@ -45,11 +45,11 @@ struct ZEParticlePhysicalProperties
 	ZEVector3 Acceleration;
 };
 
-ZE_META_OBJECT_DESCRIPTION(ZEParticlePhysicsOperator)
+ZE_CLASS(ZEParticlePhysicsOperator)
 
 class ZEParticlePhysicsOperator : public ZEParticleOperator
 {
-	ZE_META_OBJECT(ZEParticlePhysicsOperator)
+	ZE_OBJECT
 
 	private:
 
@@ -80,20 +80,3 @@ class ZEParticlePhysicsOperator : public ZEParticleOperator
 };
 
 #endif
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticlePhysicsOperator" parent="ZEParticleOperator">		
-			<noinstance>true</noinstance>
-			<description>Basic Physical property operator.</description>
-			<property name="MinAcceleration" type="ZEVector3" autogetset="yes" description="Initial minimum acceleration which a particle will have just after creation."/>
-			<property name="MaxAcceleration" type="ZEVector3" autogetset="yes" description="Initial maximum acceleration which a particle will have just after creation."/>
-			<property name="MinVelocity" type="ZEVector3" autogetset="yes" description="Initial minimum velocity which a particle will have just after creation."/>
-			<property name="MaxVelocity" type="ZEVector3" autogetset="yes" description="Initial maximum velocity which a particle will have just after creation."/>	
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

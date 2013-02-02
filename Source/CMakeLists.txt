@@ -42,6 +42,7 @@ ze_add_module(ZEditor			OPTIONAL DEFAULT)
 ze_add_module(ZE3dsMax			OPTIONAL DEFAULT 	PLATFORMS Windows)
 ze_add_module(ZEFoundation)
 ze_add_module(ZEToolComponents)
+ze_add_module(ZEMetaCompiler OPTIONAL DEFAULT)
 ze_add_module(ZEToolSDK			OPTIONAL DEFAULT)
 
 add_subdirectory(QWinWidget)

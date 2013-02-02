@@ -43,7 +43,7 @@
 
 #include "ZEMath/ZEMath.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZECamera)
+ZE_OBJECT_IMPL(ZECamera)
 
 const ZEMatrix4x4& ZECamera::GetViewTransform()
 {

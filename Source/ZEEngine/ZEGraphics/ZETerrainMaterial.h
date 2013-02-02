@@ -39,17 +39,19 @@
 
 #include "ZEMaterial.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
-
-ZE_META_OBJECT_DESCRIPTION(ZETerrainMaterial)
+#include "ZENewMeta/ZEObject.h"
 
 class ZETextureCube;
 class ZETextureCubeResource;
 class ZETexture2D;
 class ZETexture2DResource;
+
+ZE_CLASS(ZETerrainMaterial)
+
 class ZETerrainMaterial : public ZEMaterial
 {
-	ZE_META_OBJECT(ZETerrainMaterial)
+	ZE_OBJECT
+
 	protected:
 		bool							TwoSided;
 		bool							Wireframe;
@@ -144,16 +146,4 @@ class ZETerrainMaterial : public ZEMaterial
 
 		static ZETerrainMaterial*		CreateInstance();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZETerrainMaterial" noinstance="true">
-			<description>Material System</description>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

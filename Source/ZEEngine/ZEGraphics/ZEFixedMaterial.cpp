@@ -48,6 +48,8 @@
 #include "ZETextureCube.h"
 #include "ZEML/ZEMLProperty.h"
 
+ZE_OBJECT_IMPL(ZEFixedMaterial)
+
 ZEFixedMaterial::ZEFixedMaterial()
 {
 	BaseMapResource = NULL;
@@ -1252,7 +1254,9 @@ ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
 
 void ZEFixedMaterial::WriteToFile(ZEFile* File)
 {
-	ZEObjectDescription* ClassDescription = GetDescription();
+	//ZEMETADEBUGCHECK!!!
+	ZEClass* Class = ZEFixedMaterial::Class();
+	/*ZEClass* ClassDescription = GetDescription();
 	ZESSize PropertyCount = ClassDescription->GetPropertyCount();
 	const ZEPropertyDescription* Properties = ClassDescription->GetProperties();
 
@@ -1266,12 +1270,13 @@ void ZEFixedMaterial::WriteToFile(ZEFile* File)
 	}
 
 	RootNode->Write(File);
-	delete RootNode;
+	delete RootNode;*/
 }
 
 void ZEFixedMaterial::ReadFromFile(ZEFile* File)
 {
-	ZEMLNode* RootNode = new ZEMLNode();
+	//ZEMETADEBUGCHECK!!!
+	/*ZEMLNode* RootNode = new ZEMLNode();
 	RootNode->Read(File);
 
 	ZEArray<ZEMLItem*> Props = RootNode->GetProperties();
@@ -1289,5 +1294,5 @@ void ZEFixedMaterial::ReadFromFile(ZEFile* File)
 		}
 	}
 
-	UpdateMaterial();
+	UpdateMaterial();*/
 }

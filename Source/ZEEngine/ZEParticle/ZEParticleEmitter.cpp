@@ -45,6 +45,8 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEScene.h"
 
+ZE_OBJECT_IMPL(ZEParticleEmitter)
+
 void ZEParticleEmitter::Tick(float TimeElapsed)
 {
 	AliveParticleCount = 0;

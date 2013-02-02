@@ -41,6 +41,8 @@
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 
+ZE_OBJECT_IMPL(ZECanvasBrush)
+
 ZEDrawFlags ZECanvasBrush::GetDrawFlags() const
 {
 	return ZE_DF_DRAW | ZE_DF_CULL;
@@ -146,9 +148,4 @@ ZECanvasBrush::~ZECanvasBrush()
 ZECanvasBrush* ZECanvasBrush::CreateInstance()
 {
 	return new ZECanvasBrush();
-}
-
-ZEEntityRunAt ZECanvasBrushDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

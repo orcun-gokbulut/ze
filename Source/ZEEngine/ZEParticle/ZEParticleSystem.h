@@ -38,7 +38,8 @@
 #ifndef __ZE_PARTICLE_SYSTEM_H__
 #define __ZE_PARTICLE_SYSTEM_H__
 
-#include "ZEMeta/ZEObject.h"
+#include "ZENewMeta/ZEObject.h"
+
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEArray.h"
@@ -62,11 +63,11 @@ struct ZEDrawParameters;
 // 	ZEVector3		Size3D;
 // };
 
-ZE_META_OBJECT_DESCRIPTION(ZEParticleSystem)
+ZE_CLASS(ZEParticleSystem)
 
 class ZEParticleSystem : public ZEObject
 {
-	ZE_META_OBJECT(ZEParticleSystem)
+	ZE_OBJECT
 
 	friend class ZEParticleEffect;
 
@@ -113,19 +114,3 @@ class ZEParticleSystem : public ZEObject
 };
 
 #endif
-
-// Correct type of MaximumParticlecount property !!!
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticleSystem">		
-			<noinstance>true</noinstance>
-			<description>Particle system.</description>
-			<property name="MaximumParticleCount" type="integer32" autogetset="yes" description="Maximum particle pool size of the system."/>	
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

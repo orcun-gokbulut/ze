@@ -57,22 +57,26 @@ struct ZEPortalMapCullStatistics
 
 };
 
-ZE_META_ENTITY_DESCRIPTION(ZEPortalMap)
-
-class ZEPortalMapResource;
-class ZEPortalMapPortal;
-class ZEPortalMapDoor;
 struct ZEDrawParameters;
 struct ZEPortalMapCullStatistics;
+
 class ZERay;
 class ZEVector3;
 class ZEViewVolume;
 class ZEViewFrustum;
 
+class ZEPortalMapResource;
+class ZEPortalMapPortal;
+class ZEPortalMapDoor;
+
+ZE_CLASS(ZEPortalMap)
+
 class ZEPortalMap : public ZEEntity
 {
-	ZE_META_ENTITY(ZEPortalMap)
 	friend class ZEPortalMapDoor;
+
+	ZE_OBJECT
+
 	private:
 		ZEString								PortalMapFile;
 		ZEPortalMapResource*					Resource;
@@ -112,22 +116,4 @@ class ZEPortalMap : public ZEEntity
 		static ZEPortalMap*						CreateInstance();
 
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZEPortalMap" parent="ZEEntity" description="Portal map">
-			<property name="MapFile"
-				type="string"
-				autogetset="true"
-				default=""
-				description="Map file"
-				semantic="ZE_PS_FILENAME"
-				fileextension="*.zeMap"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

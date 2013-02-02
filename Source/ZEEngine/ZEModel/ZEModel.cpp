@@ -49,7 +49,7 @@
 
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEModel);
+ZE_OBJECT_IMPL(ZEModel)
 
 void ZEModel::CalculateBoundingBox()
 {
@@ -552,9 +552,4 @@ void ZEModel::Deinitialize()
 ZEModel* ZEModel::CreateInstance()
 {
 	return new ZEModel();
-}
-
-ZEEntityRunAt ZEModelDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

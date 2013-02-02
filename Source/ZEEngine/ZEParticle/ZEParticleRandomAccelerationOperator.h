@@ -39,11 +39,11 @@
 
 #include "ZEParticleOperator.h"
 
-ZE_META_OBJECT_DESCRIPTION(ZEParticleRandomAccelerationOperator)
+ZE_CLASS(ZEParticleRandomAccelerationOperator)
 
 class ZEParticleRandomAccelerationOperator : public ZEParticleOperator
 {
-	ZE_META_OBJECT(ZEParticleRandomAccelerationOperator)
+	ZE_OBJECT
 
 	private:
 
@@ -67,18 +67,3 @@ class ZEParticleRandomAccelerationOperator : public ZEParticleOperator
 };
 
 #endif
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticleRandomAccelerationOperator" parent="ZEParticleOperator">		
-			<noinstance>true</noinstance>
-			<description>Random Acceleration Modifier.</description>
-			<property name="MinStrength" type="ZEVector3" autogetset="yes" description="Minimum random acceleration that will be aplied in a tick time interval."/>
-			<property name="MaxStrength" type="ZEVector3" autogetset="yes" description="Maximum random acceleration that will be aplied in a tick time interval."/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

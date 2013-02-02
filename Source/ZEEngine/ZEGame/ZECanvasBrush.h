@@ -43,14 +43,14 @@
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 
-
-ZE_META_ENTITY_DESCRIPTION(ZECanvasBrush);
-
 class ZERenderer;
 class ZEMaterial;
+
+ZE_CLASS(ZECanvasBrush)
+
 class ZECanvasBrush : public ZEEntity
 {
-	ZE_META_ENTITY(ZECanvasBrush)
+	ZE_OBJECT
 	
 	private:
 		ZERenderCommand					RenderCommand;
@@ -77,14 +77,4 @@ class ZECanvasBrush : public ZEEntity
 
 		static ZECanvasBrush*			CreateInstance();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZECanvasBrush" parent="ZEEntity" icon="" description="Canvas brush"/>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

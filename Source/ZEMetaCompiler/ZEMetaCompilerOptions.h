@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEMetaCompilerOptions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,31 +30,24 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef __ZE_META_COMPILER_OPTIONS_H__
+#define __ZE_META_COMPILER_OPTIONS_H__
 
-ze_add_source(ZEAnimation.cpp		    Sources)
-ze_add_source(ZEAnimation.h				Sources Headers)
-ze_add_source(ZEObject.cpp			    Sources)
-ze_add_source(ZEObject.h					Sources Headers)
-ze_add_source(ZEContainer.cpp		    Sources)
-ze_add_source(ZEContainer.h				Sources Headers)
-ze_add_source(ZEEvent.cpp			    Sources)
-ze_add_source(ZEEvent.h					Sources Headers)
-ze_add_source(ZEMetaDebugModule.cpp		Sources)
-ze_add_source(ZEMetaDebugModule.h		Sources)
-ze_add_source(ZEMethod.cpp				Sources)
-ze_add_source(ZEMethod.h			    Sources Headers)
-ze_add_source(ZEPostProcessor.cpp	    Sources)
-ze_add_source(ZEPostProcessor.h			Sources Headers)
-ze_add_source(ZEProperty.cpp		    Sources)
-ze_add_source(ZEProperty.h				Sources Headers)
-ze_add_source(ZEProvider.cpp		    Sources)
-ze_add_source(ZEProvider.h				Sources Headers)
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
 
-ze_add_library(ZEMeta 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation)
+struct ZEMetaCompilerOptions
+{
+	ZEString BinaryPath;
+	ZEString InputFileName;
+	ZEString OutputFileName;
+	ZEArray<ZEString> IncludeDirectories;
+	ZEArray<ZEString> Definitions;
+	bool Verbose;
+};
+
+#endif

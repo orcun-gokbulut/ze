@@ -38,7 +38,6 @@
 #define __ZE_PARTICLE_EMITTER_H__
 
 #include "ZETypes.h"
-#include "ZEMeta/ZEObject.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
@@ -46,8 +45,7 @@
 #include "ZEParticle.h"
 #include "ZEMath/ZEAABBox.h"
 
-
-ZE_META_OBJECT_DESCRIPTION(ZEParticleEmitter);
+#include "ZENewMeta/ZEObject.h"
 
 enum ZEParticleEmitterType
 {
@@ -57,7 +55,6 @@ enum ZEParticleEmitterType
 	ZE_PET_TORUS,
 	ZE_PET_SPHERE
 };
-
 
 enum ZEParticleBillboardType
 {
@@ -71,11 +68,13 @@ class ZEParticleEffect;
 class ZEParticleModifier;
 struct ZEDrawParameters;
 
+ZE_CLASS(ZEParticleEmitter)
+
 class ZEParticleEmitter : public ZEObject
 {
-	ZE_META_OBJECT(ZEParticleEmitter)
+	friend class ZEParticleModifier;
 
-		friend class ZEParticleModifier;
+	ZE_OBJECT
 
 	private:
 
@@ -218,49 +217,4 @@ class ZEParticleEmitter : public ZEObject
 
 		void							LogSort();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticleEmitter">
-			<description>Particle Emitter Class</description>
-			<property name="Name" type="string" autogetset="yes" description="Name of the particle emitter."/>
-			<property name="Type" type="integer32" autogetset="true" description="Type of the emitter.">
-				<enumurator name="ZEParticleEmitterType">
-					<item name="Point" value="ZE_PET_POINT"/>
-					<item name="Plane" value="ZE_PET_PLANE"/> 
-					<item name="Box" value="ZE_PET_BOX"/> 
-					<item name="Torus" value="ZE_PET_TORUS"/>
-					<item name="Sphere" value="ZE_PET_SPHERE"/>
-				</enumurator>
-			</property>
-			<property name="Position" type="ZEVector3" autogetset="yes" description="Position of the particle emitter."/>
-			<property name="PlaneSize" groupname="Emitter Sizes" type="ZEVector2" autogetset="true" description="Size of plane emitter."/>
-			<property name="BoxSize" groupname="Emitter Sizes" type="ZEVector3" autogetset="true" description="Size of box emitter."/>
-			<property name="TorusSize" groupname="Emitter Sizes" type="ZEVector2" autogetset="true" description="Size of torus emitter."/>
-			<property name="SphereRadius" groupname="Emitter Sizes" type="float" autogetset="true" description="Size of sphere emitter."/>
-			<property name="MaxParticleCount" groupname="Particle Generation" type="integer32" autogetset="true" description="Maximum number of particles will be emitted from this emitter."/>
-			<property name="ParticlesPerSecond" groupname="Particle Generation" type="integer32" autogetset="true" description="Paritcles per secon emitted from this source."/>
-			<property name="Continuity" groupname="Particle Generation" type="boolean" autogetset="true" description="Continuity of particles emitted from this emitter."/>			
-			<property name="MinSize" groupname="Particle Generation" type="ZEVector2" autogetset="true" description="Minimum edge lenght of particles."/>
-			<property name="MaxSize" groupname="Particle Generation" type="ZEVector2" autogetset="true" description="Maximum edge lenght of particles."/>			
-			<property name="MinLife" groupname="Particle Generation" type="float" autogetset="true" description="Minimum life of particles."/>
-			<property name="MaxLife" groupname="Particle Generation" type="float" autogetset="true" description="Maximum life of particles."/>			
-			<property name="MinColor" groupname="Particle Generation" type="ZEVector4" semantic="ZE_PS_COLOR" autogetset="true" description="Minimum color of particles."/>
-			<property name="MaxColor" groupname="Particle Generation" type="ZEVector4" semantic="ZE_PS_COLOR" autogetset="true" description="Maximum color of particles."/>				
-			<property name="BillboardType" type="integer32" autogetset="true" description="Billboarding type of the particles used in this system.">
-				<enumurator name="ZEParticleBillboardType">
-					<item name="None" value="ZE_PBT_AXIS_ORIENTED"/>
-					<item name="Screen Aligned" value="ZE_PBT_SCREEN_ALIGNED"/>
-					<item name="ViewPoint Oriented" value="ZE_PBT_VIEW_POINT_ORIENTED"/>
-				</enumurator>
-			</property>
-			</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-
-
 #endif

@@ -41,15 +41,16 @@
 #include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZERenderCommand.h"
 
-ZE_META_ENTITY_DESCRIPTION(ZEGrid);
-
 class ZEListener;
 class ZEScene;
 class ZESimpleMaterial;
 
+ZE_CLASS(ZEGrid)
+
 class ZEGrid : public ZEEntity
 {
-	ZE_META_ENTITY(ZEGrid)
+	ZE_OBJECT
+
 	private:
 		ZECanvas					MinorGrid;
 		ZECanvas					MajorGrid;
@@ -109,17 +110,4 @@ class ZEGrid : public ZEEntity
 
 		static ZEGrid*				CreateInstance();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEGrid" parent="ZEEntity">
-			<description>Base Entity Type</description>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-
 #endif

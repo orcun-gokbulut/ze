@@ -37,7 +37,7 @@
 #ifndef __ZE_MATERIAL_H__ 
 #define __ZE_MATERIAL_H__
 
-#include "ZEMeta/ZEObject.h"
+#include "ZENewMeta/ZEObject.h"
 
 typedef ZEUInt32 ZEMaterialFlags;
 #define ZE_MTF_NONE						0
@@ -83,11 +83,12 @@ enum ZEMaterialOpacityComponent
 class ZEFrameRenderer;
 class ZERenderCommand;
 
-ZE_META_OBJECT_DESCRIPTION(ZEMaterial)
+ZE_CLASS(ZEMaterial)
 
 class ZEMaterial : public ZEObject
 {
-	ZE_META_OBJECT(ZEMaterial) 
+	ZE_OBJECT
+
 	protected:
 		bool							ShadowCaster;
 		bool							ShadowReciver;
@@ -122,18 +123,4 @@ class ZEMaterial : public ZEObject
 		virtual void					Release() = 0;
 		virtual void					Destroy();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZEMaterial" noinstance="true" description="Base class of materials.">
-			<property name="LightningEnabled" groupname="Shading" type="boolean" autogetset="yes"/>
-			<property name="ShadowReciver" groupname="Shadows" type="boolean" autogetset="yes"/>
-			<property name="ShadowCaster" groupname="Shadows" type="boolean" autogetset="yes"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

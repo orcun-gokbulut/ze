@@ -40,6 +40,7 @@
 #include "ZEScene.h"
 #include <string.h>
 
+ZE_OBJECT_IMPL(ZEEntity)
 
 void ZEEntity::OnTransformChanged()
 {
@@ -465,9 +466,4 @@ void ZEEntity::Tick(float Time)
 void ZEEntity::Draw(ZEDrawParameters* DrawParameters)
 {
 
-}
-
-ZEEntityRunAt ZEEntityDescription::GetRunAt() const
-{
-	return ZE_ERA_NONE;
 }

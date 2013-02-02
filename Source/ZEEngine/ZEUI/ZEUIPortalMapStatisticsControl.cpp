@@ -71,7 +71,8 @@ void ZEUIPortalMapStatisticsControl::Tick( float ElapsedTime )
 	//Portal Culling Calculation
 
 	ZEScene* TempScene = zeScene;
-	ZEPortalMap* TempMap = (ZEPortalMap*)TempScene->GetEntities(ZEPortalMap::Description()).GetFirstItem();
+	//ZEMETADEBUGCHECK!!!
+	ZEPortalMap* TempMap = (ZEPortalMap*)TempScene->GetEntities(ZEPortalMap::Class()).GetFirstItem();
 	ZEVector3 CamPos = TempScene->GetActiveCamera()->GetWorldPosition();
 	ZEPortalMapCullStatistics Stats = TempMap->GetCullStatistics();
 	ZEString Value;

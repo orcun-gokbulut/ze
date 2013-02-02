@@ -45,8 +45,6 @@
 class ZEModel;
 class ZEModelAnimationTrack;
 
-ZE_META_ENTITY_DESCRIPTION(ZEGameCharacter);
-
 enum ZECharacterMovementStatus
 {
 	ZE_CMS_IDLE,
@@ -89,9 +87,12 @@ enum ZECharacterRecordingStatus
 
 class ZEProjectiveLight;
 
+ZE_CLASS(ZEGameCharacter)
+
 class ZEGameCharacter : public ZEEntity
 {
-	ZE_META_ENTITY(ZEGameCharacter)
+	ZE_OBJECT
+
 	private:
 		ZEChunkArray<ZECharacterRecordingKey, 29127> 
 									Records;
@@ -181,14 +182,4 @@ class ZEGameCharacter : public ZEEntity
 		static ZEGameCharacter*			CreateInstance();
 
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZEGameCharacter" parent="ZEEntity" description="Player spawn point"/>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

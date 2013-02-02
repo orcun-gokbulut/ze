@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEProperty.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,7 +30,38 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEProperty.h"
+cmake_minimum_required(VERSION 2.8)
+
+ze_add_source(ZEMain.cpp					Sources)
+ze_add_source(ZEMetaCompilerOptions.cpp 	Sources)
+ze_add_source(ZEMetaCompilerOptions.h   	Sources)
+ze_add_source(ZEMetaData.cpp        		Sources)
+ze_add_source(ZEMetaData.h          		Sources)
+
+ze_add_source(ZEMetaGenerator.cpp			Sources)
+ze_add_source(ZEMetaGenerator.h  			Sources)
+
+ze_add_source(ZEMetaProcessor.cpp			Sources)
+ze_add_source(ZEMetaProcessor.h  			Sources)
+ze_add_source(ZEMetaProcessorInternal.cpp	Sources)
+ze_add_source(ZEMetaProcessorInternal.h  	Sources)
+ze_add_source(ZEMetaProcessorClang.cpp		Sources)
+
+ze_add_executable(ZEMetaCompiler	SOURCES ${Sources} CONSOLE 
+	LIBS ZEFoundation ZENewMeta
+		clangBasic.lib
+		clangFrontend.lib
+		clangDriver.lib
+		clangAST.lib
+		clangParse.lib
+		clangSema.lib
+		clangEdit.lib
+		clangASTMatchers.lib
+		clangAnalysis.lib
+		clangLex.lib
+		clangSerialization.lib
+		LLVMSupport.lib
+		LLVMMC.lib)

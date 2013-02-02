@@ -50,13 +50,15 @@ enum ZELightType
 	ZE_LT_OMNIPROJECTIVE = 4
 };
 
-ZE_META_OBJECT_DESCRIPTION(ZELight);
-
 class ZEShadowRenderer;
 class ZEScene;
+
+ZE_CLASS(ZELight)
+
 class ZELight : public ZEEntity
 {
-	ZE_META_ENTITY(ZELight)
+	ZE_OBJECT
+
 	private:
 		bool							Enabled;
 
@@ -100,23 +102,5 @@ class ZELight : public ZEEntity
 
 										ZELight();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-	<zinek>
-		<meta> 
-			<class name="ZELight" parent="ZEEntity">
-			<noinstance>true</noinstance>
-			<description>Base Light Type</description>
-				<property name="CastsShadow" type="boolean" autogetset="yes" description="Enables or disables shadow casting for this light."/>
-				<property name="Color" type="ZEVector3" autogetset="yes" semantic="ZE_PS_COLOR" description="Color of the light."/>
-				<property name="Intensity" type="float" autogetset="yes" description="Intensity(light amount emmited from light) of the light."/>
-				<property name="Range" type="float" autogetset="yes" description="Maximum effect range of the light."/>
-				<property name="Attenuation" type="ZEVector3" autogetset="yes" description="Light amount decrease according to distance."/>
-			</class>
-		</meta>
-	</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 
 #endif

@@ -36,6 +36,8 @@
 #include "ZEParticlePhysicsOperator.h"
 #include "ZEParticle.h"
 
+ZE_OBJECT_IMPL(ZEParticlePhysicsOperator)
+
 void ZEParticlePhysicsOperator::SetMinAcceleration(const ZEVector3& Acceleration)
 {
 	MinAcceleration = Acceleration;

@@ -37,7 +37,7 @@
 #include "ZESoundModule.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEListener)
+ZE_OBJECT_IMPL(ZEListener)
 
 ZEListener::ZEListener()
 {
@@ -94,9 +94,4 @@ void ZEListener::SetRollOffFactor(float NewRollOffFactor)
 ZEListener* ZEListener::CreateInstance()
 {
 	return zeSound->CreateListener();
-}
-
-ZEEntityRunAt ZEListenerDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

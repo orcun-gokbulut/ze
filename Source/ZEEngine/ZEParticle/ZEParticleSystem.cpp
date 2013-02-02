@@ -39,6 +39,8 @@
 #include "ZEParticleOperator.h"
 #include "ZEParticleGenerator.h"
 
+ZE_OBJECT_IMPL(ZEParticleSystem)
+
 void ZEParticleSystem::SetRenderer(ZEParticleRenderer* Renderer)
 {
 	if(Renderer == NULL)

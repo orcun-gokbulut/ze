@@ -39,7 +39,7 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPointLight);
+ZE_OBJECT_IMPL(ZEPointLight)
 
 ZELightType ZEPointLight::GetLightType()
 {

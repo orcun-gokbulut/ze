@@ -56,11 +56,12 @@ enum ZECameraProjectionType
 
 class ZEViewPort;
 
-ZE_META_OBJECT_DESCRIPTION(ZECamera);
+ZE_CLASS(ZECamera)
 
 class ZECamera : public ZEEntity
 {
-	ZE_META_OBJECT(ZECamera)
+	ZE_OBJECT
+
 	private:
 		bool							UpdateViewFrustum;
 		bool							UpdateView;
@@ -111,21 +112,4 @@ class ZECamera : public ZEEntity
 
 		static ZECamera*				CreateInstance();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZECamera" parent="ZEEntity" noinstance="false">
-			<description>Camera</description>
-			<property name="NearZ" type="float" autogetset="yes" description="The nearest distance that camera can show"/>
-			<property name="FarZ" type="float" autogetset="yes" description="The farest distance that camera can show"/>
-			<property name="FOV" type="float" autogetset="yes" description="Field of view"/>
-			<property name="AspectRatio" type="float" autogetset="yes" description="Width vs Height aspect ratio"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-
 #endif
