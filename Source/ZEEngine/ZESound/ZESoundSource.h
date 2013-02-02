@@ -41,7 +41,7 @@
 #include "ZEGame/ZEEntity.h"
 #include "ZESoundResource.h"
 
-#include "ZENewMeta/ZEObject.h"
+#include "ZEMeta/ZEObject.h"
 
 
 #define ZE_SS_PAN_LEFT				-100

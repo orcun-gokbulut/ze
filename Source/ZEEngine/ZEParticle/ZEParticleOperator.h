@@ -41,7 +41,7 @@
 #include "ZEParticle.h"
 #include "ZEDS\ZEArray.h"
 
-#include "ZENewMeta\ZEObject.h"
+#include "ZEMeta\ZEObject.h"
 
 ZE_CLASS(ZEParticleOperator)
 

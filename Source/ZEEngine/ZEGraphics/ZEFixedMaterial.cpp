@@ -1255,7 +1255,7 @@ ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
 void ZEFixedMaterial::WriteToFile(ZEFile* File)
 {
 	//ZEMETADEBUGCHECK!!!
-	ZEClass* Class = ZEFixedMaterial::Class();
+	//ZEClass* Class = ZEFixedMaterial::Class();
 	/*ZEClass* ClassDescription = GetDescription();
 	ZESSize PropertyCount = ClassDescription->GetPropertyCount();
 	const ZEPropertyDescription* Properties = ClassDescription->GetProperties();

@@ -45,7 +45,7 @@
 #include "ZEParticle.h"
 #include "ZEMath/ZEAABBox.h"
 
-#include "ZENewMeta/ZEObject.h"
+#include "ZEMeta/ZEObject.h"
 
 enum ZEParticleEmitterType
 {

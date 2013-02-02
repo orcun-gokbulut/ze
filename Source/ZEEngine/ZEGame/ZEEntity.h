@@ -50,7 +50,7 @@
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEQuaternion.h"
 
-#include "ZENewMeta/ZEObject.h"
+#include "ZEMeta/ZEObject.h"
 
 struct ZEDrawParameters;
 

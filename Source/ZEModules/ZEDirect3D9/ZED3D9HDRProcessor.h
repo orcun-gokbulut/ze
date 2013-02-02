@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZED3D9ComponentBase.h"
 
-#include "ZENewMeta/ZEObject.h"
+#include "ZEMeta/ZEObject.h"
 
 #include <d3d9.h>
 
