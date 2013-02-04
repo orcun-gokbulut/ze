@@ -726,8 +726,8 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	D3DPERF_BeginEvent(0, L"ABuffer Pass");
 
 	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
-	ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
-	//ZED3D9CommonTools::SetRenderTarget(0, (ZED3D9ViewPort*)ABuffer->GetViewPort());
+	//ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
+	ZED3D9CommonTools::SetRenderTarget(0, (ZED3D9ViewPort*)ABuffer->GetViewPort());
 
 	ZED3D9CommonTools::SetTexture(0, GBuffer1, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, GBuffer2, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
@@ -1219,29 +1219,29 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		FogProcessor.Process();
 		
 		*/
-		/*
+		
 		// HDR Process
 		HDRProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
-		HDRProcessor.SetOutput(ViewPort);
+		HDRProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);
-		*/
-		/*
+		
+		
 		// Color Transform Process
 		ColorTransformProcessor.SetInput(CTInputBuffer);
-		//ColorTransformProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
-		ColorTransformProcessor.SetOutput(ViewPort);
+		ColorTransformProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
+		//ColorTransformProcessor.SetOutput(ViewPort);
 		ColorTransformProcessor.Process();
-		*/
-		/*
+		
+		
 		// Grain
 		GrainProcessor.SetInput(GrainInputBuffer);
 		GrainProcessor.SetOutput((ZED3D9ViewPort*)ZoomBlurInputBuffer->GetViewPort());
 		GrainProcessor.Process(ElaspedTime);
 
 		// Blur Mask
-		BlurMaskProcessor.SetInput(BlurMaskInputBuffer);
-		BlurMaskProcessor.SetOutput(ViewPort);
-		BlurMaskProcessor.Process();
+// 		BlurMaskProcessor.SetInput(BlurMaskInputBuffer);
+// 		BlurMaskProcessor.SetOutput(ViewPort);
+// 		BlurMaskProcessor.Process();
 
 		// Zoom blur
 		ZoomBlurProcessor.SetInput(ZoomBlurInputBuffer);
@@ -1254,35 +1254,35 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		ChannelDisorientProcessor.Process();
 
 		// Texture mask
-		TMProcessor.SetInput(TMInputBuffer);
-		TMProcessor.SetOutput(ViewPort);
-		TMProcessor.Process();
+// 		TMProcessor.SetInput(TMInputBuffer);
+// 		TMProcessor.SetOutput(ViewPort);
+// 		TMProcessor.Process();
 
 		// DOF Process
-		DOFProcessor.SetInputColor(DOFInputBuffer);
-		DOFProcessor.SetInputDepth(GBuffer1);
-		DOFProcessor.SetOutput(ViewPort);
-		DOFProcessor.Process();
+// 		DOFProcessor.SetInputColor(DOFInputBuffer);
+// 		DOFProcessor.SetInputDepth(GBuffer1);
+// 		DOFProcessor.SetOutput(ViewPort);
+// 		DOFProcessor.Process();
 
 		//Anti Aliasing Process (old bad ugly)
-		SSAAProcessor.SetInputDepth(GBuffer1);
-		SSAAProcessor.SetInputNormal(GBuffer2);
-		SSAAProcessor.SetInputColor(ABuffer);
-		SSAAProcessor.SetOutput(ViewPort);
-		SSAAProcessor.Process();
+// 		SSAAProcessor.SetInputDepth(GBuffer1);
+// 		SSAAProcessor.SetInputNormal(GBuffer2);
+// 		SSAAProcessor.SetInputColor(ABuffer);
+// 		SSAAProcessor.SetOutput(ViewPort);
+// 		SSAAProcessor.Process();
 
 		// Edge Detection Process
-		EDProcessor.SetInputDepth(GBuffer1);
-		EDProcessor.SetInputNormal(GBuffer2);
-		EDProcessor.SetInputColor(EDInputBuffer);
-		EDProcessor.SetOutput(ViewPort);
-		EDProcessor.Process();
+// 		EDProcessor.SetInputDepth(GBuffer1);
+// 		EDProcessor.SetInputNormal(GBuffer2);
+// 		EDProcessor.SetInputColor(EDInputBuffer);
+// 		EDProcessor.SetOutput(ViewPort);
+// 		EDProcessor.Process();
 		
 		// Blur Process
 		BlurProcessor.SetInput(BlurInputBuffer);
 		BlurProcessor.SetOutput(ViewPort);
 		BlurProcessor.Process();
-		*/
+		
 	
 
 		Do2DPass();

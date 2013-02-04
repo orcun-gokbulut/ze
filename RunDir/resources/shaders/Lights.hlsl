@@ -193,6 +193,7 @@ struct ZEDirectionalLight_PSInput
 float ZEDirectionalLight_CalculateFilterScale(float ViewDepth, int CascadeIndex)
 {
 	float FilterScale = (PenumbraScale / pow(2.0f, (float)CascadeIndex)) * (1.0f - (CascadeIndex / ZE_MAX_CASCADE_COUNT));
+	//float FilterScale = PenumbraScale * (CASCADE_DEPTH(CascadeIndex) / ShadowDistance);
 	return clamp(FilterScale, 0.4f, PenumbraScale);
 }
 
@@ -206,14 +207,14 @@ float ZEDirectionalLight_GetShadowFactor(float3 PixelViewPos, float3 PixelViewNo
 		float NormalOffset = SlopeFactor *  SlopeScaledBias + DepthFactor * DepthScaledBias;
 		float3 PixelBiasedPos = PixelViewPos + PixelViewNormal * NormalOffset;
 		
-		[unroll]
 		for (int CascadeN = 0; CascadeN < ZE_MAX_CASCADE_COUNT; CascadeN++)
 		{
 			if (PixelViewPos.z <= CASCADE_FAR_Z(CascadeN))
 			{
+				float4 TexSpacePos = mul(LightTransforms[CascadeN], float4(PixelBiasedPos, 1.0f));
 				float FilterScale = ZEDirectionalLight_CalculateFilterScale(PixelViewPos.z, CascadeN);
 				float2 RotationMapCoord = RotationMapTexelSize * ScreenPos;
-				float4 TexSpacePos = mul(LightTransforms[CascadeN], float4(PixelBiasedPos, 1.0f));
+	
 				ShadowFactor = SampleShadowMap(ShadowMaps[CascadeN], TexSpacePos.xy, ShadowMapTexelSize, TexSpacePos.z, RandomRotationMap, RotationMapCoord, FilterScale);
 				break;
 			}

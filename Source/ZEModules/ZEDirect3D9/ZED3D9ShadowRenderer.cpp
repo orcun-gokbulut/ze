@@ -342,14 +342,13 @@ void ZED3D9ShadowRenderer::RenderDirectionalLight()
 {
 	GetDevice()->BeginScene();
 
-	//GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)DrawParameters->ViewPort)->FrameBuffer);
-	//GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)NULLRenderTarget->GetViewPort())->FrameBuffer);
+	GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)DrawParameters->ViewPort)->FrameBuffer);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)NULLRenderTarget->GetViewPort())->FrameBuffer);
+	GetDevice()->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0x00);
 
-	GetDevice()->SetDepthStencilSurface(DepthSurface);
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)DrawParameters->ViewPort)->FrameBuffer);
-	
-	// GetDevice()->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0x00);
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0x00);
+// 	GetDevice()->SetDepthStencilSurface(DepthSurface);
+// 	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)DrawParameters->ViewPort)->FrameBuffer);
+// 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0x00);
 
 	ZEDirectionalLightCascade* CustomData = (ZEDirectionalLightCascade*)DrawParameters->CustomData;
 	for (ZESize CommandN = 0; CommandN < CommandList.GetCount(); CommandN++)
