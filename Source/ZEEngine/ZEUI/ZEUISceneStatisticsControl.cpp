@@ -294,15 +294,8 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 	if (TempScene->GetActiveCamera() != NULL)
 	{
 		ZEVector3 CamPos = TempScene->GetActiveCamera()->GetWorldPosition();
-		//ZEVariant Value;
 
-		//Value.SetUInt32(AverageFPS);
 		FPSCount->SetText(ZEFormat::Format(FPSText, AverageFPS));
-
-		//static char FormatString[100];
-
-		//sprintf(FormatString, "X: %.3lf, Y: %.3lf, Z: %.3lf", CamPos.x, CamPos.y, CamPos.z);
-
 		CameraPosition->SetText(ZEFormat::Format(CamPosText, CamPos.x, CamPos.y, CamPos.z));
 	}
 
