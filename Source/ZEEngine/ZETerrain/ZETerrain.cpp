@@ -515,6 +515,9 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	if (Levels.GetCount() == 0)
 		return;
 
+	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
+		return;
+
 	static ZEInt PositionX;
 	static ZEInt PositionY;
 	static ZEInt OffsetPositionX;

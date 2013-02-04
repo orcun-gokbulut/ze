@@ -135,7 +135,6 @@ float SampleShadowMap(sampler2D ShadowMap, float2 ShadowMapTexCoord, float2 Shad
 	#endif
 	
 	float PcfAverage = 0.0f;
-	[unroll]
 	for (int SampleN = 0; SampleN < ZE_SM_FILTER_TAP_COUNT; SampleN++)
 	{
 		// Rotate if specified

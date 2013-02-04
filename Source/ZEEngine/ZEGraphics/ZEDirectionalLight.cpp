@@ -33,6 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZECamera.h"
 #include "ZETexture2D.h"
 #include "ZECore/ZECore.h"
 #include "ZEGame/ZEScene.h"
@@ -42,7 +43,7 @@
 #include "ZEDirectionalLight.h"
 #include "ZEMath/ZEViewCuboid.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZECamera.h"
+
 #include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMatrix.h"
@@ -55,36 +56,36 @@ void ZEDirectionalLight::CreateRenderTargets()
 {
 	ZEUInt Dimension = ((ZEShadowRenderer*)zeScene->GetShadowRenderer())->GetShadowResolution();
 	
-// 	ZESize I = 0;
-// 	for ( ; I < CascadeCount; ++I)
-// 	{
-// 		if (Cascades[I].ShadowMap == NULL)
-// 		{
-// 			// Create if not allocated
-// 			Cascades[I].ShadowMap = ZETexture2D::CreateInstance();
-// 			Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZE_TPF_INTZ, true);
-// 		}
-// 		else
-// 		{
-// 			// Recreate if changed
-// 			if (Cascades[I].ShadowMap->GetWidth() != Dimension || Cascades[I].ShadowMap->GetHeight() != Dimension)
-// 			{
-// 				Cascades[I].ShadowMap->Destroy();
-// 				Cascades[I].ShadowMap = ZETexture2D::CreateInstance();
-// 				Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZE_TPF_INTZ, true);
-// 			}
-// 		}
-// 	}
-// 	// Destroy unused shadow maps
-// 	for ( ; I < MAX_CASCADE_COUNT; ++I)
-// 	{
-// 		if (Cascades[I].ShadowMap != NULL)
-// 		{
-// 			Cascades[I].ShadowMap->Destroy();
-// 			Cascades[I].ShadowMap = NULL;
-// 		}
-// 	}
-
+	ZESize I = 0;
+	for ( ; I < CascadeCount; ++I)
+	{
+		if (Cascades[I].ShadowMap == NULL)
+		{
+			// Create if not allocated
+			Cascades[I].ShadowMap = ZETexture2D::CreateInstance();
+			Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZE_TPF_INTZ, true);
+		}
+		else
+		{
+			// Recreate if changed
+			if (Cascades[I].ShadowMap->GetWidth() != Dimension || Cascades[I].ShadowMap->GetHeight() != Dimension)
+			{
+				Cascades[I].ShadowMap->Destroy();
+				Cascades[I].ShadowMap = ZETexture2D::CreateInstance();
+				Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZE_TPF_INTZ, true);
+			}
+		}
+	}
+	// Destroy unused shadow maps
+	for ( ; I < MAX_CASCADE_COUNT; ++I)
+	{
+		if (Cascades[I].ShadowMap != NULL)
+		{
+			Cascades[I].ShadowMap->Destroy();
+			Cascades[I].ShadowMap = NULL;
+		}
+	}
+/*
 	ZESize I = 0;
 	for ( ; I < CascadeCount; ++I)
 	{
@@ -113,7 +114,7 @@ void ZEDirectionalLight::CreateRenderTargets()
 			Cascades[I].ShadowMap->Destroy();
 			Cascades[I].ShadowMap = NULL;
 		}
-	}
+	}*/
 }
 
 void ZEDirectionalLight::DestroyRenderTargets()
@@ -307,15 +308,14 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 
 		// Transform world positions to light clip space
 		// Transformation is linear so no need to divide result to its w
+		// Also find min/max of vertices in clip space
 		static ZEVector4 ClipFrustumCorners[8];
-		for (ZESize I = 0; I < 8; ++I)
-			ZEMatrix4x4::Transform(ClipFrustumCorners[I], LightViewProjMatrix, WorldFrustumCorners[I]);
-
-		// Find min/max of vertices in clip space
 		ZEVector3 Min(FLT_MAX, FLT_MAX, FLT_MAX);
 		ZEVector3 Max(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 		for (ZESize I = 0; I < 8; ++I)
 		{
+			ZEMatrix4x4::Transform(ClipFrustumCorners[I], LightViewProjMatrix, WorldFrustumCorners[I]);
+
 			if (ClipFrustumCorners[I].x < Min.x) Min.x = ClipFrustumCorners[I].x;
 			if (ClipFrustumCorners[I].y < Min.y) Min.y = ClipFrustumCorners[I].y;
 			if (ClipFrustumCorners[I].z < Min.z) Min.z = ClipFrustumCorners[I].z;
@@ -323,7 +323,7 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 			if (ClipFrustumCorners[I].x > Max.x) Max.x = ClipFrustumCorners[I].x;
 			if (ClipFrustumCorners[I].y > Max.y) Max.y = ClipFrustumCorners[I].y;
 			if (ClipFrustumCorners[I].z > Max.z) Max.z = ClipFrustumCorners[I].z;
-		} 
+		}
 								   
 		// Pull z back, to avoid casters between light and light's near z
 		Min.z = 0.0f;
@@ -336,6 +336,16 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 		float OffsetY = -0.5f * (Max.y + Min.y) * ScaleY;
 		float OffsetZ = -Min.z * ScaleZ;
 
+		// Correct Shimmering in scale and offset
+//		float ScaleQuantizer = 64.0f;
+//  	ScaleX = 1.0f / ZEMath::Floor(1.0f / ScaleX * ScaleQuantizer) * ScaleQuantizer;
+//  	ScaleY = 1.0f / ZEMath::Floor(1.0f / ScaleY * ScaleQuantizer) * ScaleQuantizer;
+//  
+//  	float HalfShadowResolution = ShadowRenderer->GetShadowResolution() * 0.5f;
+//  	OffsetX = ZEMath::Floor(OffsetX * HalfShadowResolution) / HalfShadowResolution;
+//  	OffsetY = ZEMath::Floor(OffsetY * HalfShadowResolution) / HalfShadowResolution;
+
+		// Create crop matrix
 		ZEMatrix4x4 CropMatrix(	ScaleX, 0.0f,	0.0f,	OffsetX,
 								0.0f,	ScaleY,	0.0f,	OffsetY,
 								0.0f,	0.0f,	ScaleZ, OffsetZ,
