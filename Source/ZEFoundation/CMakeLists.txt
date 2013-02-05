@@ -89,7 +89,7 @@ ze_add_library(ZEFoundation
 	SOURCES ${Sources} 
 	HEADERS ${Headers})
 
-ze_combine_libraries(ZEFoundation LIBS ZEFoundation ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket ZEML ZERegEx)
+#ze_combine_libraries(ZEFoundation LIBS ZEFoundation ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket #ZEML ZERegEx)
 
 ze_add_test(ZEFoundationTests
 	SOURCES ${Tests}

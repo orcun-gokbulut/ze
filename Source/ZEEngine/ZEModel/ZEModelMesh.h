@@ -46,6 +46,8 @@
 class ZEModel;
 struct ZEModelResourceMesh;
 class ZEPhysicsBody;
+class ZEPhysicalCloth;
+
 class ZEModelMesh
 {
 	friend class ZEModel;
@@ -67,6 +69,7 @@ class ZEModelMesh
 
 		bool								PhysicsEnabled;
 		ZEPhysicalRigidBody*				PhysicalBody;
+		ZEPhysicalCloth*					PhysicalCloth;
 
 		bool								AutoLOD;
 		ZEUInt								ActiveLOD;
@@ -81,6 +84,8 @@ class ZEModelMesh
 	public:
 		const char*							GetName();
 		ZEPhysicalRigidBody*				GetPhysicalBody() { return PhysicalBody; }
+		ZEPhysicalCloth*					GetPhysicalCloth() { return PhysicalCloth; }
+		ZEModelMeshLOD*						GetFirstLOD() { return &LODs[0]; }
 
 		const ZEAABBox&						GetLocalBoundingBox();
 		const ZEAABBox&						GetModelBoundingBox();

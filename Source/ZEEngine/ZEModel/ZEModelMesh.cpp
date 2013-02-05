@@ -39,6 +39,7 @@
 #include "ZEGraphics/ZERenderer.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEDrawParameters.h"
+#include "ZEPhysics/ZEPhysicalCloth.h"
 
 void ZEModelMesh::SetActiveLOD(ZEUInt LOD)
 {

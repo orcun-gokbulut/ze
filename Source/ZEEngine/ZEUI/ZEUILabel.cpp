@@ -208,6 +208,9 @@ const ZEVector4& ZEUILabel::GetFontColor() const
 
 void ZEUILabel::SetText(ZEString NewText)
 {
+	if(Text == NewText)
+		return;
+
 	this->Text = "";
 	Characters.Clear();
 	LineTextWidths.Clear();
