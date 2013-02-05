@@ -35,8 +35,11 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEFontBaker.cpp		Sources)
-ze_add_source(ZEFontBaker.h		Sources Headers)
+ze_add_source(ZEFontBaker.cpp				Sources)
+ze_add_source(ZEFontBaker.h					Sources Headers)
+ze_add_source(ZEFreeTypeFontBaker.cpp		Sources)
+ze_add_source(ZEFreeTypeFontBaker.h			Sources Headers)
+
 
 ze_add_library(ZEFontBaker
 	SOURCES ${Sources}

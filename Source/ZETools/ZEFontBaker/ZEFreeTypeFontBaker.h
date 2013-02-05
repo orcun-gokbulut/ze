@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPluginManager.h
+ Zinek Engine - ZEFreeTypeFontBaker.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,32 +34,32 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PLUGIN_MANAGER_H__
-#define __ZE_PLUGIN_MANAGER_H__
+#ifndef __ZET_FREETYPE_FONT_BAKER_H__
+#define __ZET_FREETYPE_FONT_BAKER_H__
 
+#include "ZETexture/ZEBitmap.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEOptionSection.h"
+#include "ZETypes.h"
 
-class ZEPlugin;
-class ZEPluginManager
+struct ZEFTFontCharMetrics;
+
+class ZEFreeTypeFontBaker
 {
-	friend class ZECore;
-	private:
-		ZEArray<ZEPlugin*>					Plugins;
-
-											ZEPluginManager();
-											~ZEPluginManager();
-
 	public:
-		ZEPlugin*							GetPlugin(const ZEString& Name);
-		const ZEArray<ZEPlugin*>&			GetPlugins();
+		static bool	BakeFont(ZEString CharacterSequence, ZEString FontFilePath, ZEString OutputFilePath, ZEString OutputFileName, ZEUInt32 FontSize, 
+							ZEUInt32 HorizontalOutputDPI = 72, ZEUInt32 VerticalOutputDPI = 72, ZEUInt32 PointFactor = 64,
+							ZEUInt32 TextureWidth = 512, ZEUInt32 TextureHeight = 512,
+							ZEUInt32 MarginTop = 8, ZEUInt32 MarginBottom = 8, ZEUInt32 MarginLeft = 8, ZEUInt32 MarginRight = 8,
+							ZEUInt32 HorizontalPadding = 8, ZEUInt32 VerticalPadding = 8);
 
-		bool								RegisterPlugin(ZEPlugin* Plugin);
-		void								UnregisterPlugin(ZEPlugin* Plugin);
-
-		void								LoadExternalPlugins(ZEString& Path, bool Recursive = true);
-
-		static ZEPluginManager*				GetInstance();
+		static bool	BakeFont(const char StartCharacter, const char EndCharacter,
+							ZEString FontFilePath, ZEString OutputFilePath, ZEString OutputFileName, ZEUInt32 FontSize, 
+							ZEUInt32 HorizontalOutputDPI = 72, ZEUInt32 VerticalOutputDPI = 72, ZEUInt32 PointFactor = 64,
+							ZEUInt32 TextureWidth = 512, ZEUInt32 TextureHeight = 512,
+							ZEUInt32 MarginTop = 8, ZEUInt32 MarginBottom = 8, ZEUInt32 MarginLeft = 8, ZEUInt32 MarginRight = 8,
+							ZEUInt32 HorizontalPadding = 8, ZEUInt32 VerticalPadding = 8);
 };
 
 #endif

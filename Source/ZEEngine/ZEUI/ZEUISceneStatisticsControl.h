@@ -38,7 +38,7 @@
 #define __ZE_SCENE_STATISTICS_CONTROL_H__
 
 #include "ZEUI/ZEUIControl.h"
-#include "ZEUI/ZEUITextControl.h"
+#include "ZEUI/ZEUILabel.h"
 #include "ZEInput/ZEInputMap.h"
 
 class ZEUISceneStatisticsControl : public ZEUIControl
@@ -47,70 +47,70 @@ class ZEUISceneStatisticsControl : public ZEUIControl
 
 		ZEInputMap				InputMap;
 
-		ZEUITextControl*		FPSCount;
-		ZEUITextControl*		CameraPosition;
+		ZEUILabel*				FPSCount;
+		ZEUILabel*				CameraPosition;
 
-		ZEUITextControl*		SceneStatisticsDescription;
-		ZEUITextControl*		SceneTotalEntityCount;
-		ZEUITextControl*		SceneDrawableEntityCount;
-		ZEUITextControl*		SceneCulledEntityCount;
-		ZEUITextControl*		SceneDrawedEntityCount;
+		ZEUILabel*				SceneStatisticsDescription;
+		ZEUILabel*				SceneTotalEntityCount;
+		ZEUILabel*				SceneDrawableEntityCount;
+		ZEUILabel*				SceneCulledEntityCount;
+		ZEUILabel*				SceneDrawedEntityCount;
 
-		ZEUITextControl*		SceneTotalLightCount;
-		ZEUITextControl*		SceneCulledLightCount;
-		ZEUITextControl*		SceneDrawedLightCount;
+		ZEUILabel*				SceneTotalLightCount;
+		ZEUILabel*				SceneCulledLightCount;
+		ZEUILabel*				SceneDrawedLightCount;
 
-		ZEUITextControl*		RendererStatisticsDescription;
-		ZEUITextControl*		RendererMeshCount;
-		ZEUITextControl*		RendererInstancedMeshCount;
+		ZEUILabel*				RendererStatisticsDescription;
+		ZEUILabel*				RendererMeshCount;
+		ZEUILabel*				RendererInstancedMeshCount;
 
-		ZEUITextControl*		RendererStageCount;
-		ZEUITextControl*		RendererPostProcessorCount;
+		ZEUILabel*				RendererStageCount;
+		ZEUILabel*				RendererPostProcessorCount;
 
-		ZEUITextControl*		RendererPrimitiveCount;
-		ZEUITextControl*		RendererMinBatchCount;
-		ZEUITextControl*		RendererMaxBatchCount;
-		ZEUITextControl*		RendererAvgBatchCount;
-		ZEUITextControl*		RendererVertexCount;
-		ZEUITextControl*		RendererDrawCallCount;
-		ZEUITextControl*		RendererDrawPrimitiveCount;
+		ZEUILabel*				RendererPrimitiveCount;
+		ZEUILabel*				RendererMinBatchCount;
+		ZEUILabel*				RendererMaxBatchCount;
+		ZEUILabel*				RendererAvgBatchCount;
+		ZEUILabel*				RendererVertexCount;
+		ZEUILabel*				RendererDrawCallCount;
+		ZEUILabel*				RendererDrawPrimitiveCount;
 
-		ZEUITextControl*		GraphicsStatisticsDescription;
-		ZEUITextControl*		GraphicsVertexBufferCount;
-		ZEUITextControl*		GraphicsVertexDeclarationCount;
-		ZEUITextControl*		GraphicsTotalVertexBufferSize;
-		ZEUITextControl*		GraphicsShaderCount;
-		ZEUITextControl*		GraphicsTextureCount;
-		ZEUITextControl*		GraphicsTexture2DCount;
-		ZEUITextControl*		GraphicsTexture3DCount;
-		ZEUITextControl*		GraphicsTextureCubeCount;
-		ZEUITextControl*		GraphicsTotalTextureSize;
-		ZEUITextControl*		GraphicsRenderTargetCount;
-		ZEUITextControl*		GraphicsTotalRenderTargetSize;
-		ZEUITextControl*		GraphicsDepthBufferCount;
-		ZEUITextControl*		GraphicsTotalDepthBufferSize;
+		ZEUILabel*				GraphicsStatisticsDescription;
+		ZEUILabel*				GraphicsVertexBufferCount;
+		ZEUILabel*				GraphicsVertexDeclarationCount;
+		ZEUILabel*				GraphicsTotalVertexBufferSize;
+		ZEUILabel*				GraphicsShaderCount;
+		ZEUILabel*				GraphicsTextureCount;
+		ZEUILabel*				GraphicsTexture2DCount;
+		ZEUILabel*				GraphicsTexture3DCount;
+		ZEUILabel*				GraphicsTextureCubeCount;
+		ZEUILabel*				GraphicsTotalTextureSize;
+		ZEUILabel*				GraphicsRenderTargetCount;
+		ZEUILabel*				GraphicsTotalRenderTargetSize;
+		ZEUILabel*				GraphicsDepthBufferCount;
+		ZEUILabel*				GraphicsTotalDepthBufferSize;
 
-		ZEUITextControl*		ModelStatisticsDescription;
-		ZEUITextControl*		ModelTotalMeshCount;
-		ZEUITextControl*		ModelCulledMeshCount;
-		ZEUITextControl*		ModelDrawnMeshCount;
+		ZEUILabel*				ModelStatisticsDescription;
+		ZEUILabel*				ModelTotalMeshCount;
+		ZEUILabel*				ModelCulledMeshCount;
+		ZEUILabel*				ModelDrawnMeshCount;
 
-		ZEUITextControl*		InteriorStatisticsDescription;
-		ZEUITextControl*		InteriorTotalRoomCount;
-		ZEUITextControl*		InteriorCulledRoomCount;
-		ZEUITextControl*		InteriorDrawedRoomCount;
+		ZEUILabel*				InteriorStatisticsDescription;
+		ZEUILabel*				InteriorTotalRoomCount;
+		ZEUILabel*				InteriorCulledRoomCount;
+		ZEUILabel*				InteriorDrawedRoomCount;
 
-		ZEUITextControl*		InteriorTotalDoorCount;
-		ZEUITextControl*		InteriorSeenDoorCount;
+		ZEUILabel*				InteriorTotalDoorCount;
+		ZEUILabel*				InteriorSeenDoorCount;
 
-		ZEUITextControl*		InteriorTotalPolygonCount;
-		ZEUITextControl*		InteriorCulledPolygonCount;
-		ZEUITextControl*		InteriorDrawedPolygonCount;
+		ZEUILabel*				InteriorTotalPolygonCount;
+		ZEUILabel*				InteriorCulledPolygonCount;
+		ZEUILabel*				InteriorDrawedPolygonCount;
 
-		ZEUITextControl*		ParticleStatisticsDescription;
-		ZEUITextControl*		ParticleTotalParticleCount;
-		ZEUITextControl*		ParticleDrawedParticleCount;
-		ZEUITextControl*		ParticleEmitterCount;
+		ZEUILabel*				ParticleStatisticsDescription;
+		ZEUILabel*				ParticleTotalParticleCount;
+		ZEUILabel*				ParticleDrawedParticleCount;
+		ZEUILabel*				ParticleEmitterCount;
 
 	public:
 

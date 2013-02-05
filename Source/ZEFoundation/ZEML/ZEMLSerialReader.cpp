@@ -246,11 +246,13 @@ bool ZEMLSerialReader::Read()
 			default:
 				zeError("Unsupported ZEMLProperty type.");
 				return false;
-				break;
 		}
 
 		if(IsDataRead != 1)
+		{
 			zeError("Can not read ZEMLProperty value from file. Corrupted ZEML file.");
+			return false;
+		}
 
 		return true;
 	}

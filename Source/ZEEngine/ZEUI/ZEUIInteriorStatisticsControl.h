@@ -38,20 +38,20 @@
 #define __ZE_UI_INTERIOR_STATISTICS_CONTROL_H__
 
 #include "ZEUI/ZEUIControl.h"
-#include "ZEUI/ZEUITextControl.h"
+#include "ZEUI/ZEUILabel.h"
 
 
 class ZEUIInteriorStatisticsControl : public ZEUIControl
 {
 private:
 
-	ZEUITextControl* TotalRoomCount;
-	ZEUITextControl* CulledRoomCount;
-	ZEUITextControl* DrawedRoomCount;
+	ZEUILabel*				TotalRoomCount;
+	ZEUILabel*				CulledRoomCount;
+	ZEUILabel*				DrawedRoomCount;
 
-	ZEUITextControl* TotalPolygonCount;
-	ZEUITextControl* CulledPolygonCount;
-	ZEUITextControl* DrawedPolygonCount;
+	ZEUILabel*				TotalPolygonCount;
+	ZEUILabel*				CulledPolygonCount;
+	ZEUILabel*				DrawedPolygonCount;
 
 public:
 
