@@ -113,6 +113,7 @@ void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 			RenderCommands[I].PrimitiveCount += 2;
 			ZEUIVertex* Buffer = ((ZEArrayVertexBuffer<ZEUIVertex>*)RenderCommands[I].VertexBuffer)->MassAdd(6);
 			Rectangle.ConvertToVertices(Buffer);
+			RenderCommands[I].Priority = (float)Rectangle.ZOrder;
 			return;
 		}
 
@@ -128,6 +129,7 @@ void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 	NewRenderCommand->IndexBuffer = NULL;
 	NewRenderCommand->PrimitiveCount = 2;
 	NewRenderCommand->Order = (float)Rectangle.ZOrder;
+	NewRenderCommand->Priority = (float)Rectangle.ZOrder;
 	ZEUIVertex* Buffer = ((ZEArrayVertexBuffer<ZEUIVertex>*)NewRenderCommand->VertexBuffer)->MassAdd(6);
 	Rectangle.ConvertToVertices(Buffer);
 }

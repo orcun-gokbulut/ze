@@ -64,7 +64,6 @@ class ZEUIFrameControl : public ZEUIControl
 		virtual ZEMaterial*	GetMaterial() const;
 		virtual void		SetMaterial(ZEMaterial* Material);
 
-		virtual void		SetPosition(float X, float Y);
 		virtual void		SetPosition(const ZEVector2& Position);
 
 							ZEUIFrameControl();
