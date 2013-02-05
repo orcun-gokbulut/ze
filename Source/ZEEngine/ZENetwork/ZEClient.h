@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUISliderControl.cpp
+ Zinek Engine - ZEClient.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,62 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUISliderControl.h"
+#pragma once
+#ifndef	__ZE_CLIENT_H__
+#define __ZE_CLIENT_H__
 
-void ZEUISliderControl::SetMaximumValue(float MaximumValue)
+#include "ZEPacketManagerServer.h"
+#include "ZESocket/ZEIPAddress.h"
+
+class ZESocketTCP;
+class ZEConnectionTCP;
+
+class ZEClient
 {
-	this->MaximumValue = MaximumValue;
-}
+	private:
 
-float ZEUISliderControl::GetMaximumValue() const
-{
-	return MaximumValue;
-}
+		ZESocketTCP*					Socket;
+		ZEConnectionTCP*				Connection;
+		ZEPacketManagerServer			PacketManager;
 
-void ZEUISliderControl::SetMinimumValue(float MinimumValue)
-{
-	this->MinimumValue = MinimumValue;
-}
+	public:
 
-float ZEUISliderControl::GetMinimumValue() const
-{
-	return MinimumValue;
-}
+		void							Process(float ElapsedTime);
+		const ZEPacketManagerServer*	GetPacketManager();
 
-void ZEUISliderControl::SetStepSize(float StepSize)
-{
-	this->StepSize = StepSize;
-}
+		bool							Connect(const ZEIPAddress& Address, ZEUInt16 Port);
 
-float ZEUISliderControl::GetStepSize()
-{
-	return StepSize;
-}
+		bool							Send(void* Data, ZESize DataSize);
 
-float ZEUISliderControl::GetCurrentValue() const
-{
-	return CurrentValue;
-}
+										ZEClient();
+										~ZEClient();
+};
 
-void ZEUISliderControl::SetMaterial(ZEMaterial* Material)
-{
-	SliderButtonMaterial = (ZEFixedMaterial*)Material;
-	SliderButton.SetMaterial(SliderButtonMaterial);
-}
-
-ZEMaterial* ZEUISliderControl::GetMaterial() const
-{
-	return SliderButtonMaterial;
-}
-
-ZEUISliderControl::ZEUISliderControl()
-{
-	SliderButtonMaterial = ZEFixedMaterial::CreateInstance();
-	SliderLineMaterial = ZEFixedMaterial::CreateInstance();
-	SliderLine.Material = SliderLineMaterial;
-
-	SetMoveable(false);
-	SliderButton.SetMoveable(true);
-
-	StepSize = 10;
-}
+#endif

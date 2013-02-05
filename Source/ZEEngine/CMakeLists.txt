@@ -73,16 +73,15 @@ ze_add_library(ZEEngine
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEInterior ZEModel ZEParticle ZEAI ZETerrain ZENetwork ZETexture ZEModules
-	INSTALL)
 
 ze_add_library(ZEEnginePlugin 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation ZECore ZEMeta
-	INSTALL)
+	LIBS ZEFoundation ZECore ZEMeta)
 		
 ze_add_executable(ZE 
 	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
 	LIBS ZEEngine
 	INSTALL)
 
+ze_combine_libraries(ZEEngine LIBS ZEEngine ZEAI ZECore ZEGame ZEGraphics ZETexture ZEInput ZEMap ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZETerrain ZENetwork)

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUDPServer.h
+ Zinek Engine - ZEPacketManagerBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-// #pragma once
-// #ifndef	__ZE_UDP_SERVER_H__
-// #define __ZE_UDP_SERVER_H__
-// 
-// class ZESocketUDP;
-// 
-// struct ZEUDPConnection
-// {
-// 	ZEUInt		Id;
-// 	float		TimeOut;
-// 	ZEIPAddress	IPAddress;
-// 	ZEUInt16	Port;
-// };
-// 
-// class ZEUDPServer
-// {
-// 	private:
-// 
-// 		ZESocketUDP*					Socket;
-// 
-// 		ZEArray<ZEUDPConnection>	Connections;
-// 
-// 		void	Broadcast(const void* Data, ZESize DataSize);
-// 		void	SendDataToClient(ZEUInt ConnectionId, const void* Data, ZESize DataSize);
-// 
-// 	public:
-// };
-// 
-// #endif
+#pragma once
+#ifndef	__ZE_PACKET_MANAGER_BUFFER_H__
+#define __ZE_PACKET_MANAGER_BUFFER_H__
+
+#include "ZETypes.h"
+
+class ZEPacketManagerBuffer
+{
+	private:
+		char*	BufferStart;
+		char*	BufferEnd;
+
+		ZESize	BufferSize;
+		ZESize	DataSize;
+
+		char*	Head;
+		char*	Tail;
+
+	public:
+		void	Create(ZESize BufferSize);
+		void	Release();
+
+		bool	AddData(const void* Data, ZESize Size);
+		ZESize	PopData(ZESize Size, void* ToBuffer);
+
+		void	Clear();
+
+				ZEPacketManagerBuffer();
+				~ZEPacketManagerBuffer();
+};
+
+#endif

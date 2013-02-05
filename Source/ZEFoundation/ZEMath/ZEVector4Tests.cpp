@@ -136,7 +136,6 @@ ZETestSuite(ZEVector4)
 
 			ZETestCheckClose(Result, ZEVector4::Zero);
 		}
-
 	}
 
 	ZETest("ZEVector4::Multiply(ZEVector4 & Out, const ZEVector4 & A, const ZEVector4 & B)")
@@ -459,6 +458,33 @@ ZETestSuite(ZEVector4)
 		ZEVector4::Divide(Result, Vector, ScalarValue);
 
 		ZETestCheckClose(Result, ZEVector4(1.0f, 2.0f, 3.0f, 2.0f));
+	}
+
+	ZETest("bool ZEVector4::Equals(const ZEVector4& Vector) const")
+	{
+		ZEVector4 VectorA(1.0f, 2.0f, 3.0f, 4.0f);
+		ZEVector4 VectorB(1.0001f, 2.0f, 3.0f, 4.0f);
+		ZEVector4 VectorC(1.00000001f, 2.0f, 3.0f, 4.0f);
+
+		bool Equal = VectorA.Equals(VectorB);
+		ZETestCheck(!Equal);
+
+		Equal = VectorA.Equals(VectorC);
+		ZETestCheck(Equal);
+	}
+
+	ZETest("bool Equals(const ZEVector4& Vector, float Threshold) const")
+	{
+		float Threshold = 0.1f;
+		ZEVector4 VectorA(1.11f, 2.11f, 3.11f, 4.11f);
+		ZEVector4 VectorB(1.1f, 2.11f, 3.11f, 4.11f);
+		ZEVector4 VectorC(1.0f, 2.11f, 3.11f, 4.11f);
+
+		bool Equal = VectorA.Equals(VectorB, Threshold);
+		ZETestCheck(Equal);
+
+		Equal = VectorA.Equals(VectorC, Threshold);
+		ZETestCheck(!Equal);
 	}
 
 	ZETest("ZEVector4::operator+(const ZEVector4 & RightOperand) const")

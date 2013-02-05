@@ -246,6 +246,30 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			PhysicalBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
 			PhysicalBody->Initialize();
 		}
+		else if(MeshResource->PhysicalBody.Type == ZE_MRPBT_CLOTH)
+		{
+			PhysicalCloth = ZEPhysicalCloth::CreateInstance();
+
+			ZESize VertexCount = MeshResource->LODs[0].Vertices.GetCount();
+			ZEArray<ZEVector3>& ClothVertices = PhysicalCloth->GetVertices();
+			ClothVertices.SetCount(VertexCount);
+
+			for(ZESize I = 0; I < VertexCount; I++)
+				ClothVertices[I] = MeshResource->LODs[0].Vertices[I].Position;
+
+			PhysicalCloth->SetPosition(Owner->GetWorldTransform() * Position);
+			ZEQuaternion TempRotation;
+			ZEQuaternion::CreateFromMatrix(TempRotation, Owner->GetWorldTransform() * GetLocalTransform());
+			PhysicalCloth->SetRotation(TempRotation);
+
+			PhysicalCloth->SetEnabled(true);
+			PhysicalCloth->SetThickness(0.5f);
+			PhysicalCloth->SetBendingMode(true);
+			PhysicalCloth->SetBendingStiffness(1.0f);
+			PhysicalCloth->SetStretchingStiffness(1.0f);
+			PhysicalCloth->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+			PhysicalCloth->Initialize();
+		}
 	}
 
 	LODs.SetCount(MeshResource->LODs.GetCount());

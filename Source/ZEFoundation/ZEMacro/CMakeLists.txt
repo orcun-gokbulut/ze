@@ -55,5 +55,4 @@ ze_add_source(ZEMacroRepeater.h				Headers Sources)
 ze_add_library(ZEMacro 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL)
+	LIBS ZEFoundation)

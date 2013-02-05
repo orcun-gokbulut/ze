@@ -57,5 +57,4 @@ ze_add_source(ZEProvider.h				Sources Headers)
 ze_add_library(ZEMeta 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL)
+	LIBS ZEFoundation)

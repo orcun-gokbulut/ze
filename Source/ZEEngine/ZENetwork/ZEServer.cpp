@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainResource.cpp
+ Zinek Engine - ZEServer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEServer.h"
+#include "ZESocket/ZESocket.h"
+#include "ZEConnectionTCP.h"
+
+#define TCP_PORT_NO	27100
+
+void ZEServer::AcceptConnections()
+{
+	ZESocketTCP* NewTCP = NULL;
+	NewTCP = Listener->Accept();
+
+	Listener->Create(ZEIPAddress::IPv4Any, TCP_PORT_NO);
+
+	if(NewTCP != NULL)
+		PacketManager.AddConnection(new ZEConnectionTCP(NewTCP));
+}
+
+void ZEServer::Process(float ElapsedTime)
+{
+	AcceptConnections();
+	PacketManager.Process(ElapsedTime);
+}
+
+const ZEPacketManagerServer* ZEServer::GetPacketManager()
+{
+	return &PacketManager;
+}
+
+bool ZEServer::SendData(void* Data, ZESize DataSize, ZEConnection* Connection)
+{
+	return Connection->SendData(Data, DataSize);
+}
+
+void ZEServer::BroadCast(void* Data, ZESize DataSize)
+{
+	for (ZESize I = 0; I < PacketManager.GetConnections()->GetCount(); I++)
+		PacketManager.GetConnections()->GetItem(I)->SendData(Data, DataSize);
+}

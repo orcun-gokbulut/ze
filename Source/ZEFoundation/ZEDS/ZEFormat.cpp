@@ -58,7 +58,7 @@ ZEString ZEFormat::FormatInner(const char* Input, const ZEVariant** Arguments, Z
 	const char* CurrentInput = Input;
 	ZESize ArgumentIndex = -1;
 	
-	char ArgumentIndexString[2];
+	char ArgumentIndexString[4];
 	char ArgumentIndexStringIndex = 0;
 
 	char ArgumentFormat[255];

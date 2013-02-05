@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEUISliderControl.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - ze_version.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,63 +30,60 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_UI_SLIDER_CONTROL__
-#define __ZE_UI_SLIDER_CONTROL__
+macro(ze_get_version)
+	file(READ "${ARGV0}/Version.txt" VERSION_STRING)
 
-#include "ZETypes.h"
-#include "ZEUIControl.h"
-#include "ZEUIButtonControl.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+	set(VERSION_MAJOR 0)
+	if ("${VERSION_STRING}" MATCHES "[ \\t]*Version[ \\t]*:[ \\t]*([0-9]+).*")
+		set(VERSION_MAJOR ${CMAKE_MATCH_1})
+	endif()
 
-enum ZESliderControlState
-{
-	ZE_SCS_SLIDING,
-	ZE_SCS_NONSLIDING
-};
+	set(VERSION_MINOR 0)
+	if ("${VERSION_STRING}" MATCHES "[ \\t]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*([0-9]+).*")
+		set(VERSION_MINOR ${CMAKE_MATCH_1})
+	endif()
 
-class ZEUISliderControl : public ZEUIControl
-{
+	set(VERSION_INTERNAL 0)
+	if ("${VERSION_STRING}" MATCHES "[ \\t]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*[0-9]+\\.[ \\t]*([0-9]+).*")
+		set(VERSION_INTERNAL ${CMAKE_MATCH_1})
+	endif()
 
-	protected:
+endmacro()
 
-		ZEUIButtonControl		SliderButton;
-		ZEUIRectangle			SliderLine;
+macro(ze_get_version_branch_name)
+	file(READ "${ARGV0}/Version.txt" VERSION_STRING)
 
-								ZEUISliderControl();
+	set (VERSION_BRANCH_NAME "")
+	if ("${VERSION_STRING}" MATCHES "[ \\t]*Branch[ \\t]*:[ \\t]*(.*)[ \\t]*")
+		set(VERSION_BRANCH_NAME ${CMAKE_MATCH_1})
+	endif()
+endmacro()
 
-		ZESliderControlState	SliderState;
+macro(ze_get_version_revision_number)
+	set (VERSION_REVISION "0")
+	include(External/FindSubversion)
+	Subversion_WC_INFO(${ARGV0} SVN_INFO)
+	if (Subversion_WC_RESULT)
+		set(VERSION_REVISION ${SVN_INFO_WC_REVISION})
+	else()
+		set(VERSION_REVISION "0")
+	endif()
+endmacro()
 
-		ZEFixedMaterial*		SliderButtonMaterial;
-		ZEFixedMaterial*		SliderLineMaterial;
-
-		float					CurrentValue;
-
-		float					MaximumValue;
-		float					MinimumValue;
-		float					StepSize;
-
-		float					SliderLineThickness;
-
-	public:
-
-		virtual void			SetCurretnValue(float NewValue) = 0;
-		float					GetCurrentValue() const;
-
-		void					SetMaximumValue(float MaximumValue);
-		float					GetMaximumValue() const;
-
-		void					SetMinimumValue(float MinimumValue);
-		float					GetMinimumValue() const;
-
-		void					SetStepSize(float StepSize);
-		float					GetStepSize();
-
-		virtual void			SetMaterial(ZEMaterial* Material);
-		virtual ZEMaterial*		GetMaterial() const;
-};
-
-#endif
+macro(ze_check_externals)
+	if (NOT EXISTS "${ARGV0}/Version.txt")
+		set(EXTERNALS_OK -1)
+	else()
+		ze_get_version("${CMAKE_SOURCE_DIR}/Platform")
+		if (NOT ${ARGV1} EQUAL VERSION_MAJOR)
+			set(EXTERNALS_OK -2)
+		elseif (${ARGV2} LESS VERSION_MINOR)
+			set(EXTERNALS_OK -3)
+		else()
+			set(EXTERNALS_OK 0)
+		endif()
+	endif()
+endmacro()

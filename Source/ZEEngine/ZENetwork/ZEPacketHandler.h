@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUDPClient.cpp
+ Zinek Engine - ZEPacketHandler.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUDPClient.h"
+#pragma once
+#ifndef	__ZE_COMMAND_H__
+#define __ZE_COMMAND_H__
+
+#include "ZETypes.h"
+#include "ZEDS/ZEDelegate.h"
+
+class ZEConnection;
+
+typedef	ZEDelegate<void (void* Data, ZESize Size, ZEConnection* Connection)> ZECommandCallback;
+
+class ZEPacketHandler
+{
+	private:
+
+		ZEInt16						HandlerId;
+		ZECommandCallback			Callback;
+
+	public:
+
+		void						SetHandlerId(ZEInt16 Id);
+		ZEInt16						GetHandlerId() const;
+
+		void						SetCallback(const ZECommandCallback& Callback);
+		const ZECommandCallback&	GetCallback() const;
+
+									ZEPacketHandler();
+									~ZEPacketHandler();
+};
+
+#endif

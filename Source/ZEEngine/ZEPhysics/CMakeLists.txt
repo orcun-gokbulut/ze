@@ -35,6 +35,8 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+ze_add_source(ZEPhysicalCloth.cpp				Sources)
+ze_add_source(ZEPhysicalCloth.h					Sources Headers)
 ze_add_source(ZEPhysicalJoint.cpp				Sources)
 ze_add_source(ZEPhysicalJoint.h					Sources Headers)
 ze_add_source(ZEPhysicalMaterial.cpp			Sources)
@@ -61,5 +63,4 @@ ze_add_source(ZEPhysicsPicker.h	        	Sources Headers)
 ze_add_library(ZEPhysics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL)
+	LIBS ZEFoundation)
