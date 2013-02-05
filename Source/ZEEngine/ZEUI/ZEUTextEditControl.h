@@ -58,6 +58,7 @@ class ZEUITextEditControl : public ZEUILabel
 
 	public:
 		virtual void						Tick(float ElapsedTime);
+		virtual void						Draw(ZEUIRenderer* Renderer);
 
 		const ZEMaterial*					GetCursorMaterial() const;
 		void								SetCursorColor(const ZEVector4& Color);

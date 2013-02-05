@@ -40,7 +40,27 @@
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEInput/ZEInputModule.h"
+#include "ZEFontResourceBitmap.h"
+#include "ZEFontResourceDynamic.h"
 
+ZEVector4 ZEUIManager::DefaultBackgroundColor = ZEVector4(0.2f, 0.2f, 0.2f, 1.0f);
+ZEVector4 ZEUIManager::DefaultForegroundColor = ZEVector4(0.0f, 0.8f, 0.0f, 1.0f);
+//ZEFontResource* ZEUIManager::DefaultFontResource = ZEFontResourceBitmap::LoadSharedResource("Courier New.zeFont");
+
+const ZEVector4& ZEUIManager::GetDefaultBackgroundColor()
+{
+	return DefaultBackgroundColor;
+}
+
+const ZEVector4&	ZEUIManager::GetDefaultForegroundColor()
+{
+	return DefaultForegroundColor;
+}
+
+ZEFontResource* ZEUIManager::GetDefaultFontResource()
+{
+	return ZEFontResourceDynamic::LoadSharedResource("TrajanPro-Regular.otf", 16);
+}
 
 ZEUIManager::ZEUIManager() 
 {
@@ -51,7 +71,7 @@ ZEUIManager::ZEUIManager()
 	LastFocusedControl = NULL;
 	MouseMoveEventFlag = false;
 	Cursor = NULL;
-	PreviousPressedButton = ZE_UI_MOUSE_BUTTON_NONE;
+	PreviousPressedButton = ZE_UI_MOUSE_BUTTON_NONE; 
 
 	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_ESCAPE,			ZEInputEvent("Keyboard",ZE_IKB_ESCAPE,			 ZE_IBS_PRESSED)));
 	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_1,				ZEInputEvent("Keyboard",ZE_IKB_1,				 ZE_IBS_PRESSED)));
@@ -206,7 +226,6 @@ ZEArray<ZEUIControl*>& ZEUIManager::GetControls()
 	return Controls;
 }
 
-#include "ZEUITextControl.h"
 #include "ZEFontResource.h"
 #include "ZEUICursorControl.h"
 #include "ZEUIButtonControl.h"
@@ -317,7 +336,7 @@ void ZEUIManager::ProcessEvents()
 
 		if (LastPressedControl != NULL && Cursor->GetCurrentButton() == ZE_UI_MOUSE_BUTTON_NONE)
 		{
-			LastPressedControl->MouseButtonReleased(PressedButton, CursorPosition);
+			LastPressedControl->MouseButtonReleased(PreviousPressedButton, CursorPosition);
 			MouseMoveEventFlag = false;
 
 			if (ZERectangle::IntersectionTest(LastPressedControl->GetVisibleRectangle(), CursorPosition))
@@ -578,11 +597,11 @@ void ZEUIManager::Render(ZERenderer* Renderer)
 
 void ZEUIManager::Tick(float ElapsedTime)
 {
+	ProcessEvents();
+
 	for (size_t I = 0; I < Controls.GetCount(); I++)
 		if (Controls[I]->GetEnabled())
 			Controls[I]->Tick(ElapsedTime);
-
-	ProcessEvents();
 }
 
 void ZEUIManager::Destroy()

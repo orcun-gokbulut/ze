@@ -40,14 +40,13 @@
 
 void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
 {
-	if (GetVisiblity() == false)
-		return;
+	Frame.Color = GetBackgroundColor();
+	ZEUIRectangle TempRect = Frame;
+	TempRect.Positions.SetPosition(GetScreenPosition());
 
 	ZEUIRectangle Output;
-	Output.ZOrder = GetZOrder();
-	Frame.Color = GetBackgroundColor();
 
-	if(!ZEUIRectangle::Clip(Output, Frame, GetVisibleRectangle()))
+	if(!ZEUIRectangle::Clip(Output, TempRect, GetVisibleRectangle()))
 		Renderer->AddRectangle(Output);
 
 	ZEUIControl::Draw(Renderer);
@@ -62,27 +61,13 @@ void ZEUIFrameControl::SetSize(const ZEVector2& Size)
 void ZEUIFrameControl::SetWidth(float Width)
 {
 	ZEUIControl::SetWidth(Width);
- 	Frame.Positions.LeftUp = GetScreenRectangle().LeftUp;
- 	Frame.Positions.RightDown = GetScreenRectangle().RightDown;
+	Frame.Positions.SetWidth(Width);
 }
 
 void ZEUIFrameControl::SetHeight(float Height)
 {
 	ZEUIControl::SetHeight(Height);
- 	Frame.Positions.LeftUp = GetScreenRectangle().LeftUp;
- 	Frame.Positions.RightDown = GetScreenRectangle().RightDown;
-}
-
-void ZEUIFrameControl::SetPosition(float X, float Y)
-{
-	SetPosition(ZEVector2(X, Y));
-}
-
-void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
-{
-	ZEUIControl::SetPosition(Position);
-	Frame.Positions.LeftUp = GetScreenRectangle().LeftUp;
-	Frame.Positions.RightDown = GetScreenRectangle().RightDown;
+	Frame.Positions.SetHeight(Height);
 }
 
 ZEMaterial* ZEUIFrameControl::GetMaterial() const
@@ -96,11 +81,17 @@ void ZEUIFrameControl::SetMaterial(ZEMaterial* Material)
 	Frame.Material = FrameMaterial;
 }
 
+void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
+{
+	ZEUIControl::SetPosition(Position);
+	Frame.Positions.SetPosition(GetScreenPosition());
+}
+
 ZEUIFrameControl::ZEUIFrameControl()
 {
 	FrameMaterial = ZEUIMaterial::CreateInstance();
 	Frame.Material = FrameMaterial;
-	Frame.Color = GetBackgroundColor();
+	Frame.Color = ZEUIManager::GetDefaultBackgroundColor();
 	Frame.Texcoords.LeftUp = ZEVector2::Zero;
 	Frame.Texcoords.RightDown = ZEVector2::One;
 

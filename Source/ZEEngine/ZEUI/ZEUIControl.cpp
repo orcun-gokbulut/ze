@@ -139,6 +139,9 @@ bool ZEUIControl::GetPressed() const
 void ZEUIControl::SetZOrder(int Z)
 {
 	ZOrder = Z;
+
+	for (ZESize I = 0; I < ChildControls.GetCount(); I++)
+		ChildControls[I]->SetZOrder(ZOrder + 1);
 }
 
 int ZEUIControl::GetZOrder() const
@@ -162,7 +165,7 @@ void ZEUIControl::SetParent(ZEUIControl* Parent)
 		ParentControl->RemoveChildControl(this);
 	
 	this->ParentControl = Parent; 
-	//ParentControl->AddChildControl(this); !!! REVISION
+	ParentControl->AddChildControl(this);
 }
 
 const ZEArray<ZEUIControl*>& ZEUIControl::GetChildControls()
@@ -172,6 +175,18 @@ const ZEArray<ZEUIControl*>& ZEUIControl::GetChildControls()
 
 void ZEUIControl::AddChildControl(ZEUIControl* Control)
 {
+	if(Control == NULL)
+	{
+		zeWarning("Child control can not be NULL.");
+		return;
+	}
+
+	if(ChildControls.Exists(Control))
+	{
+		zeWarning("Child control already exists.");
+		return;
+	}
+
 	ChildControls.Add(Control);
 	Control->SetParent(this);
 }
@@ -187,36 +202,17 @@ ZEUIControl* ZEUIControl::GetParentControl() const
 	return ParentControl;
 }
 
-void ZEUIControl::SetPosition(float X, float Y)
-{
-	SetPosition(ZEVector2(X, Y));
-}
-
 void ZEUIControl::SetPosition(const ZEVector2& Position)
 {
-	DirtyVisibleRectangle = true;
-
-	ZEVector2 LocalPosition = GetPosition();
-	ZEVector2 PositionDifference = Position - LocalPosition;
-
 	Rectangle.SetPosition(Position);
-
-	for (size_t I = 0; I < GetChildControls().GetCount(); I++)
-		GetChildControls()[I]->SetPosition(GetChildControls()[I]->GetPosition());
-
 }
 
-const ZEVector2& ZEUIControl::GetScreenPosition()
+ZEVector2 ZEUIControl::GetScreenPosition()
 {
-	if (ParentControl != NULL)
-	{
-		ZEVector2 ParentScreenPosition = ParentControl->GetScreenPosition();
-		ZEVector2 RectPosition  = Rectangle.GetPosition();
-		ZEVector2 ScreenPosition =  RectPosition + ParentScreenPosition;
-		return ScreenPosition;
-	}
-	else
+	if(ParentControl == NULL)
 		return Rectangle.GetPosition();
+	else
+		return (ParentControl->GetScreenPosition() + Rectangle.GetPosition());
 }
 
 const ZEVector2& ZEUIControl::GetPosition()
@@ -229,14 +225,11 @@ void ZEUIControl::SetSize(const ZEVector2& Size)
 	if (IsFixedSized)
 		return;
 
-	DirtyVisibleRectangle = true;
-
 	if (Size.x <= MaximumSize.x && Size.x >= MinimumSize.x)
 		SetWidth(Size.x);
 
 	if (Size.y <= MaximumSize.y && Size.y >= MinimumSize.y)
 		SetHeight(Size.y);
-
 }
 
 ZEVector2 ZEUIControl::GetSize()
@@ -268,8 +261,6 @@ void ZEUIControl::SetWidth(float Width)
 {
 	if (IsFixedSized)
 		return;
-
-	DirtyVisibleRectangle = true;
 	
 	if (Width <= MaximumSize.x && Width >= MinimumSize.x)
 		Rectangle.SetWidth(Width);
@@ -286,8 +277,6 @@ void ZEUIControl::SetHeight(float Height)
 	if (IsFixedSized)
 		return;
 
-	DirtyVisibleRectangle = true;
-
 	if (Height <= MaximumSize.x && Height >= MinimumSize.x)
 		Rectangle.SetHeight(Height);
 }
@@ -297,53 +286,35 @@ float ZEUIControl::GetHeight()
 	return Rectangle.GetHeight();
 }
 
-const ZERectangle& ZEUIControl::GetScreenRectangle()
+ZERectangle ZEUIControl::GetScreenRectangle()
 {
-	if (ParentControl != NULL)
-	{
-		ZEVector2 ParentScreenPosition = ParentControl->GetScreenPosition();
-		ZEVector2 RectPosition  = Rectangle.GetPosition();
-		ZEVector2 ScreenPosition =  RectPosition + ParentScreenPosition;
-
-		ScreenRectangle.SetPosition(ScreenPosition);
-		ScreenRectangle.SetWidth(Rectangle.GetWidth());
-		ScreenRectangle.SetHeight(Rectangle.GetHeight());
-
-		return ScreenRectangle;
-	}
-	else
+	if(ParentControl == NULL)
 		return Rectangle;
+	else
+	{
+		ZERectangle ResultRect = Rectangle;
+		ResultRect.SetPosition(ParentControl->GetScreenPosition() + GetPosition());
+		return ResultRect;
+	}
 }
 
-const ZERectangle& ZEUIControl::GetVisibleRectangle()
+ZERectangle ZEUIControl::GetVisibleRectangle()
 {
 	if (ParentControl == NULL)
-	{
 		return Rectangle;
+	else
+	{
+		ZERectangle Result;
+		if(ZERectangle::IntersectionTest(ParentControl->GetVisibleRectangle(), GetScreenRectangle(), Result))
+			return Result;
+		else
+			return ZERectangle(ZEVector2::Zero, ZEVector2::Zero);
 	}
-	//if(DirtyVisibleRectangle)
-	//{
-		ZERectangle ParentVisibleRectangle = ParentControl->GetVisibleRectangle();
-		ZERectangle::IntersectionTest(GetScreenRectangle(), ParentVisibleRectangle, VisibleRectangle);
-		DirtyVisibleRectangle = false;
-	//}
-
-	return VisibleRectangle;
 }
 
-const ZERectangle& ZEUIControl::GetRectangle()
+ZERectangle ZEUIControl::GetRectangle()
 {
 	return Rectangle;
-}
-
-void ZEUIControl::SetBackgroundType(ZEUIBackgroundType Type)
-{
-	BackgroundType = Type;
-}
-
-ZEUIBackgroundType ZEUIControl::GetBackgroundType()
-{
-	return BackgroundType;
 }
 
 void ZEUIControl::SetBackgroundColor(const ZEVector4& Color)
@@ -477,8 +448,8 @@ void ZEUIControl::MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmoun
 {
 	if (MouseMovedEvent != NULL)
 		MouseMovedEvent(Button, MoveAmount);
-	
-	if(GetMoveable())
+
+	if(IsMoveable)
 		SetPosition(GetPosition() + MoveAmount);
 }
 
@@ -506,21 +477,12 @@ void ZEUIControl::FocusGained()
 
 void ZEUIControl::Draw(ZEUIRenderer* Renderer)
 {
-	if (!IsVisible)
-		return;
-
 	for (size_t I = 0; I < ChildControls.GetCount(); I++)
 		ChildControls[I]->Draw(Renderer);
-
-// 	for (int I = ChildControls.GetCount() - 1; I > 0; I--)
-// 		ChildControls[I]->Draw(Renderer);
 }
 
 void ZEUIControl::Tick(float ElapsedTime)
 {
-	if (!IsEnabled)
-		return;
-
 	for (size_t I = 0; I < ChildControls.GetCount(); I++)
 			ChildControls[I]->Tick(ElapsedTime);
 }
@@ -528,14 +490,8 @@ void ZEUIControl::Tick(float ElapsedTime)
 ZEUIControl::ZEUIControl()
 {
 	ParentControl	= NULL;
-	BackgroundType	= ZE_UI_BT_SOLID;
 
 	BackgroundColor = ZEVector4::One;
-	HoverColor		= ZEVector4::UnitX;
-	PressedColor	= ZEVector4::UnitY;
-	DisabledColor	= ZEVector4(0.2f, 0.2f, 0.2f, 1.0f);
-
-	BackgroundTexture = NULL;
 
 	Rectangle.LeftUp	= ZEVector2::Zero;
 	Rectangle.RightDown = ZEVector2::One;

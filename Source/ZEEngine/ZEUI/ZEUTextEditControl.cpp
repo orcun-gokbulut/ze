@@ -46,8 +46,8 @@ void ZEUITextEditControl::KeyPressed(ZEUIInputKey Key)
 		if(Text.GetLength() != 0)
 		{
 			Text.Remove(Text.GetLength() - 1);
-			TextWidth -= Characters.GetLastItem().RenderableCharacter.Positions.GetWidth();
-			Characters.DeleteAt(Characters.GetCount() - 1);
+			ZEString TempText = Text;
+			SetText(TempText);
 			return;
 		}
 	}
@@ -90,10 +90,10 @@ void ZEUITextEditControl::KeyPressed(ZEUIInputKey Key)
 		case ZE_UI_IKB_EQUALS:
 			Text.Append("=");
 			break;
-		case ZE_UI_IKB_TAB:
-			for (size_t I = 0; I < 4; I++)
-				Text.Append(" ");
-			break;
+// 		case ZE_UI_IKB_TAB:
+// 			for (size_t I = 0; I < 4; I++)
+// 				Text.Append(" ");
+// 			break;
 		case ZE_UI_IKB_Q:
 			Text.Append("q");
 			break;
@@ -229,6 +229,36 @@ void ZEUITextEditControl::Tick(float ElapsedTime)
 	{
 		UpdateCharacters();
 		IsTextDirty = false;
+	}
+}
+
+void ZEUITextEditControl::Draw(ZEUIRenderer* Renderer)
+{
+	ZEUILabel::Draw(Renderer);
+
+	if (GetFocused() && Cursor.GetVisible())
+	{
+		ZEVector2 CursorPosition;
+		Cursor.ZOrder = GetZOrder() + 2;
+
+// 		if(Characters.GetCount() != 0)
+// 		{
+// 			ZEUIRectangle Temp;
+// 			Temp = Characters.GetLastItem().RenderableCharacter;
+// 			Temp.Positions.LeftUp += TextStartPosition + GetScreenPosition();
+// 			Temp.Positions.RightDown += TextStartPosition + GetScreenPosition();
+// 
+// 			CursorPosition = Temp.Positions.RightDown;
+// 			CursorPosition.y -= Characters.GetLastItem().FontCharacter.CharacterMetric.Height;
+// 			Cursor.SetPostion(CursorPosition);
+// 		}
+// 		else
+// 			Cursor.SetPostion(TextStartPosition + GetScreenPosition() + TextMargin);
+	
+		ZEUIRectangle Output;
+	
+		if(!ZEUIRectangle::Clip(Output, Cursor, GetVisibleRectangle()))
+			Renderer->AddRectangle(Output);
 	}
 }
 

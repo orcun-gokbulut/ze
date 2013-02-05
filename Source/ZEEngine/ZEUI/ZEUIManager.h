@@ -41,6 +41,7 @@
 #include "ZEUIRenderer.h"
 #include "ZEUIEvents.h"
 #include "ZEInput/ZEInputMap.h"
+#include "ZEFontResource.h"
 
 enum ZEUIInputKey
 {
@@ -186,13 +187,16 @@ class ZEUIManager
 		ZEUIControl*				LastPressedControl;
 		ZEUIControl*				LastFocusedControl;
 
-		ZEUIMouseKey				PressedButton;
 		ZEUIMouseKey				PreviousPressedButton;
 
 		ZEVector2					OldMousePosition;
 		bool						MouseMoveEventFlag;
 
 		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
+
+		static ZEVector4			DefaultBackgroundColor;
+		static ZEVector4			DefaultForegroundColor;
+		//static ZEFontResource*		DefaultFontResource;
 
 									ZEUIManager();
 									~ZEUIManager();
@@ -215,6 +219,10 @@ class ZEUIManager
 		void						Destroy();
 
 		static ZEUIManager*			CreateInstance();
+
+		static const ZEVector4&		GetDefaultBackgroundColor();
+		static const ZEVector4&		GetDefaultForegroundColor();
+		static ZEFontResource*		GetDefaultFontResource();
 };
 
 #endif

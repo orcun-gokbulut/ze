@@ -38,17 +38,15 @@
 #define __ZE_UI_CHECK_BOX_CONTROL__
 
 #include "ZEUIControl.h"
-#include "ZEUITextControl.h"
-#include "ZEUIButtonControl.h"
 
 enum ZEUICheckBoxState
 {
 	ZE_UI_CBS_UNCHECKED		= 0,
-	ZE_UI_CBS_CHECKED		= 1,
-	ZE_UI_CBS_SEMICHECKED	= 2
+	ZE_UI_CBS_CHECKED		= 1
 };
 
 class ZEString;
+class ZEUILabel;
 
 class ZEUICheckBoxControl : public ZEUIControl
 {
@@ -57,11 +55,9 @@ class ZEUICheckBoxControl : public ZEUIControl
 	private:
 
 		ZEUICheckBoxState	State;
-
-		bool				IsTriState;
-
-		ZEUIButtonControl	Box;
-		ZEUITextControl		Label;
+		ZEUILabel*			Label;
+		ZEUIRectangle		Box;
+		ZEUIMaterial*		BoxMaterial;
 
 	protected:
 
@@ -69,8 +65,7 @@ class ZEUICheckBoxControl : public ZEUIControl
 
 	public:
 
-		void				SetTriState(bool Tristate);
-		bool				GetTristate() const;
+		virtual void		Draw(ZEUIRenderer* Renderer);
 
 		void				SetState(ZEUICheckBoxState State);
 		ZEUICheckBoxState	GetState() const;	
@@ -78,9 +73,10 @@ class ZEUICheckBoxControl : public ZEUIControl
 		void				SetText(ZEString Text);
 		ZEString			GetText();
 
-		virtual ZEMaterial*	GetMaterial() const;
-		virtual void		SetMaterial(ZEMaterial* Material);
+		virtual void		SetWidth(float Width);
+		virtual void		SetHeight(float Height);
 
+		virtual void		SetPosition(const ZEVector2& Position);
 
 							ZEUICheckBoxControl();
 							~ZEUICheckBoxControl();

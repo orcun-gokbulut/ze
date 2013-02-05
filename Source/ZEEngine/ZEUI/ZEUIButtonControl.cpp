@@ -54,10 +54,7 @@ void ZEUIButtonControl::SetWidth(float Width)
 void ZEUIButtonControl::SetHeight(float Height)
 {
 	ZEUIFrameControl::SetHeight(Height);
-	ZEVector2 TextLocalPosition = TextLabel->GetPosition() - GetPosition();
-	ZEInt32 LocalY = (GetHeight() - TextLabel->GetHeight()) / 2;
-	TextLocalPosition.y = LocalY;
-	TextLabel->SetPosition(TextLocalPosition + GetPosition());
+	TextLabel->SetPosition(ZEVector2(TextLabel->GetPosition().x, (GetHeight() - TextLabel->GetHeight()) / 2));
 }
 
 void ZEUIButtonControl::SetSize(const ZEVector2& Size)
@@ -65,6 +62,12 @@ void ZEUIButtonControl::SetSize(const ZEVector2& Size)
 	ZEUIFrameControl::SetSize(Size);
 	SetWidth(Size.x);
 	SetHeight(Size.y);
+}
+
+void ZEUIButtonControl::SetZOrder(ZEInt Z)
+{
+	ZEUIControl::SetZOrder(Z);
+	TextLabel->SetZOrder(Z + 1);
 }
 
 void ZEUIButtonControl::SetText(const ZEString& Text)
@@ -81,17 +84,17 @@ ZEUIButtonControl::ZEUIButtonControl()
 {
 	TextLabel = new ZEUILabel();
 	TextLabel->SetWordWrapping(false);
-	TextLabel->SetFontResource(ZEFontResourceDynamic::LoadSharedResource("Arial.ttf", 18));
-	TextLabel->SetFontColor(ZEVector4::UnitW);
-	TextLabel->SetBackgroundColor(ZEVector4::Zero);
+	TextLabel->SetBackgroundColor(ZEUIManager::GetDefaultBackgroundColor());
+	SetBackgroundColor(ZEUIManager::GetDefaultBackgroundColor());
 	TextLabel->SetHeight(22);
 	TextLabel->SetTextAlignment(ZE_UI_TA_CENTER);
-	///TextLabel->SetText("Button");
 	TextLabel->SetMoveable(false);
-	SetMoveable(true);
 	AddChildControl(TextLabel);
-	SetHeight(25);
+	SetHeight(22);
 	SetWidth(80);
+	TextLabel->SetPosition(ZEVector2(TextLabel->GetPosition().x, (GetHeight() - TextLabel->GetHeight()) / 2));
+	TextLabel->SetText("Button");
+	SetMoveable(false);
 }
 
 ZEUIButtonControl::~ZEUIButtonControl()

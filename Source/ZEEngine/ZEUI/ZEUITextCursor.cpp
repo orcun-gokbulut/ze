@@ -54,7 +54,7 @@ ZEUITextCursor::ZEUITextCursor()
 	SetHeight(Height);
 
 	Material = ZEUIMaterial::CreateInstance();
-	Color = ZEVector4::UnitW;
+	Color = ZEVector4(0.0f, 1.0f, 0.0f, 1.0f);
 }
 
 ZEUITextCursor::~ZEUITextCursor()
