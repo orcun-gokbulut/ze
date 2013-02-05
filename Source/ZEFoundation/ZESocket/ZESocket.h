@@ -55,7 +55,14 @@
 #define ZE_SR_RETRY			((ZESSize)-2)
 #define ZE_SR_IN_PROGRESS	((ZESSize)-3)
 
-class ZESocketTCP
+class ZESocket
+{
+	public:
+		virtual ZESSize	Connect(const ZEIPAddress& Address, ZEUInt16 Port) = 0;
+		virtual ZESSize	Recieve(void* Buffer, ZESize BufferSize) = 0;
+};
+
+class ZESocketTCP : public ZESocket
 {
 	friend class ZESocketTCPListener;
 
@@ -69,8 +76,8 @@ class ZESocketTCP
 		bool				Close();
 
 		ZESSize				Connect(const ZEIPAddress& Address, ZEUInt16 Port);
- 		ZESSize				Send(const void* Buffer, ZESize BufferSize);
- 		ZESSize				Recieve(void* Buffer, ZESize BufferSize);
+		virtual ZESSize		Send(const void* Buffer, ZESize BufferSize);
+		virtual ZESSize		Recieve(void* Buffer, ZESize BufferSize);
 
 		const ZEIPAddress&	GetIpAddress() const;
 		ZEUInt16			GetPort() const;		
@@ -93,12 +100,18 @@ class ZESocketTCPListener
 		ZESocketTCP*		Accept();
 };
 
-class ZESocketUDP
+class ZESocketUDP : public ZESocket
 {
 	private:
 		SOCKET				Socket;
 		ZEIPAddress			IpAddress;
 		ZEUInt16			Port;
+
+		ZEIPAddress			ToIpAddress;
+		ZEUInt16			ToPort;
+
+		ZEIPAddress			FromIpAddress;
+		ZEUInt16			FromPort;
 
 	public:
 		bool				Create(const ZEIPAddress& Address, ZEUInt16 Port);
@@ -107,8 +120,20 @@ class ZESocketUDP
 		const ZEIPAddress&	GetIpAddress() const;
 		ZEUInt16			GetPort() const;
 
-		ZESSize				SendTo(const ZEIPAddress* To, ZEUInt16 ToPort, const void* Buffer, ZESize BufferSize);
-		ZESSize				RecieveFrom(void* Buffer, ZESize BufferSize, const ZEIPAddress* From, ZEUInt16 FromPort);
+		void				SetToIpAddress(ZEIPAddress Address);
+		const ZEIPAddress&	GetToIpAddress();
+
+		void				SetToPort(ZEUInt16 Port);
+		ZEUInt16			GetToPort();
+
+		void				SetFromIpAddress(ZEIPAddress Address);
+		const ZEIPAddress&	GetFromIpAddress();
+
+		void				SetFromPort(ZEUInt16 Port);
+		ZEUInt16			GetFromPort();
+
+		virtual ZESSize		Send(const void* Buffer, ZESize BufferSize);
+		virtual ZESSize		Recieve(void* Buffer, ZESize BufferSize);
 };
 
 #endif

@@ -36,11 +36,6 @@
 #include "ZEUIRectangle.h"
 #include "ZEGraphics/ZEVertexTypes.h"
 
-ZEUIRectangle::ZEUIRectangle()
-{
-	ZOrder = 0;
-}
-
 void ZEUIRectangle::ConvertToVertices(ZEUIVertex* Buffer) const
 {
 	Buffer[0].Position = Positions.LeftUp;
@@ -72,16 +67,10 @@ bool ZEUIRectangle::Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, 
 	}
 	else
 	{
-		Output.Material = Rectangle.Material;
-		Output.Color = Rectangle.Color;
-
 		if (ClipRectangle.LeftUp.x > Rectangle.Positions.LeftUp.x)
 		{
 			Output.Positions.LeftUp.x = ClipRectangle.LeftUp.x;
-			Output.Texcoords.LeftUp.x = Rectangle.Texcoords.LeftUp.x +
-										((ClipRectangle.LeftUp.x - Rectangle.Positions.LeftUp.x) * 
-										(Rectangle.Texcoords.RightDown.x - Rectangle.Texcoords.LeftUp.x)) /
-										(Rectangle.Positions.RightDown.x - Rectangle.Positions.LeftUp.x);
+			Output.Texcoords.LeftUp.x = Rectangle.Texcoords.LeftUp.x + ((Output.Positions.LeftUp.x - Rectangle.Positions.LeftUp.x) * (Rectangle.Texcoords.GetWidth()) / Rectangle.Positions.GetWidth());
 		}
 		else
 		{
@@ -93,10 +82,7 @@ bool ZEUIRectangle::Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, 
 		if (ClipRectangle.LeftUp.y > Rectangle.Positions.LeftUp.y)
 		{
 			Output.Positions.LeftUp.y = ClipRectangle.LeftUp.y;
-			Output.Texcoords.LeftUp.y = Rectangle.Texcoords.LeftUp.y + 
-										((ClipRectangle.LeftUp.y - Rectangle.Positions.LeftUp.y) * 
-										(Rectangle.Texcoords.RightDown.y - Rectangle.Texcoords.LeftUp.y)) /
-										(Rectangle.Positions.RightDown.y - Rectangle.Positions.LeftUp.y);
+			Output.Texcoords.LeftUp.y = Rectangle.Texcoords.LeftUp.y + ((Output.Positions.LeftUp.y - Rectangle.Positions.LeftUp.y) * (Rectangle.Texcoords.GetHeight()) / Rectangle.Positions.GetHeight());
 		}
 		else
 		{
@@ -108,10 +94,7 @@ bool ZEUIRectangle::Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, 
 		if (ClipRectangle.RightDown.x < Rectangle.Positions.RightDown.x)
 		{
 			Output.Positions.RightDown.x = ClipRectangle.RightDown.x;
-			Output.Texcoords.RightDown.x = Rectangle.Texcoords.LeftUp.x + 
-											((ClipRectangle.RightDown.x - Rectangle.Positions.LeftUp.x) * 
-											(Rectangle.Texcoords.RightDown.x - Rectangle.Texcoords.LeftUp.x)) /
-											(Rectangle.Positions.RightDown.x - Rectangle.Positions.LeftUp.x);
+			Output.Texcoords.RightDown.x = Rectangle.Texcoords.RightDown.x + ((Output.Positions.RightDown.x - Rectangle.Positions.RightDown.x) * (Rectangle.Texcoords.GetWidth()) / Rectangle.Positions.GetWidth());
 		}
 		else
 		{
@@ -123,16 +106,17 @@ bool ZEUIRectangle::Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, 
 		if (ClipRectangle.RightDown.y < Rectangle.Positions.RightDown.y)
 		{
 			Output.Positions.RightDown.y = ClipRectangle.RightDown.y;
-			Output.Texcoords.RightDown.y = Rectangle.Texcoords.LeftUp.y +
-											((ClipRectangle.RightDown.y - Rectangle.Positions.LeftUp.y) * 
-											(Rectangle.Texcoords.RightDown.y - Rectangle.Texcoords.LeftUp.y)) / 
-											(Rectangle.Positions.RightDown.y - Rectangle.Positions.LeftUp.y);
+			Output.Texcoords.RightDown.y = Rectangle.Texcoords.RightDown.y + ((Output.Positions.RightDown.y - Rectangle.Positions.RightDown.y) * (Rectangle.Texcoords.GetHeight()) / Rectangle.Positions.GetHeight());
 		}
 		else
 		{
 			Output.Positions.RightDown.y = Rectangle.Positions.RightDown.y;
 			Output.Texcoords.RightDown.y = Rectangle.Texcoords.RightDown.y;
 		}
+
+		Output.Material = Rectangle.Material;
+		Output.Color	= Rectangle.Color;
+		Output.ZOrder	= Rectangle.ZOrder;
 		
 		return false;
 	}

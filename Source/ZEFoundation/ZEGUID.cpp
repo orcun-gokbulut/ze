@@ -120,7 +120,7 @@ ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4Fir
 	this->Data1 = Data1;
 	this->Data2 = Data2;
 	this->Data3 = Data3;
-	this->Data4 = (Data4FirstTwo << 48) | (Data4 & (ZEUInt64)0x0000FFFFFFFFFFFFFF);
+	this->Data4 = (Data4FirstTwo << 48) | (Data4Remaining & (ZEUInt64)0x0000FFFFFFFFFFFFFF);
 }
 
 ZEGUID ZEGUID::Generate()

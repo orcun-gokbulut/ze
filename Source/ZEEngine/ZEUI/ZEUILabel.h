@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIWindowControl.h
+ Zinek Engine - ZEUILabel.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,63 +34,82 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_WINDOW_CONTROL__
-#define __ZE_UI_WINDOW_CONTROL__
+#ifndef __ZE_UI_LABEL__
+#define __ZE_UI_LABEL__
 
-#include "ZEUI/ZEUIControl.h"
-#include "ZEUI/ZEUIRectangle.h"
 #include "ZEUIFrameControl.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
-#include "ZEUITextControl.h"
-#include "ZEUIButtonControl.h"
+#include "ZEFontResource.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 
-class ZEUIWindowTitleBarControl : public ZEUIFrameControl
+enum ZEUITextAlignment
 {
-	friend class ZEUIWindowControl;
-
-	protected:
-	
-		ZEUITextControl				Title;
-		ZEUIButtonControl			CloseButton;
-		ZEUIButtonControl			MinimizeButton;
-
-		virtual void				MouseMoveEvent(const ZEVector2& MoveAmount);
-
-	public:
-
-		void						SetTitleText(const char* TitleText);
-		const char*					GetTitleText();
-
-		virtual void				SetWidth(float Width);
-
-									ZEUIWindowTitleBarControl();
+	ZE_UI_TA_LEFT,
+	ZE_UI_TA_RIGHT,
+	ZE_UI_TA_CENTER
 };
 
-class ZEUIWindowControl : public ZEUIControl
+struct ZEUITextCharacter
 {
-	friend class ZEUIWindowTitleBarControl;
+	char				CChar;
+	ZEFontCharacter		FontCharacter;
+	ZEUIRectangle		RenderableCharacter;
+	int					Line;
+	bool				IsSelected;
+};
 
-	private:
+class ZEUILabel : public ZEUIFrameControl
+{
+	protected:
+		ZEString							Text;
+		ZEArray<ZEUITextCharacter>			Characters;
+		ZEArray<ZEInt32>					LineTextWidths;
 
-		ZEUIWindowTitleBarControl	TitleBar;
-		ZEUIButtonControl			ResizeButton;
-		ZEUIFrameControl			ContentArea;
+		ZEFontResource*						FontResource;
+		ZEMaterial*							FontMaterial;
+		ZEVector4							FontColor;
 
-		virtual void				ResizeWindow(const ZEVector2& ResizeAmount);
-		virtual void				HideContentArea(ZEUIMouseKey Button, const ZEVector2& MousePosition);
-		virtual void				CloseWindow(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+		ZERectangle							TextRenderingArea;
+
+		ZEUITextAlignment					TextAlignment;
+		bool								IsWordWrapping;
+
+		ZEUInt32							CurrentLine;
+		ZEVector4							TextMargins;
+
+		void								UpdateCharacters();
+		ZEVector2							CalculateLineStartPoint(ZESize LineIndex);
+		void								UpdateTextRenderingArea();
 
 	public:
+		virtual void						Draw(ZEUIRenderer* Renderer);
 
-		virtual void				SetMoveable(bool Moveable);
-		virtual void				SetWidth(float Width);
-		virtual void				SetHeight(float Height);
-		virtual void				AddChildControl(ZEUIControl* Control);
+		void								SetFontResource(ZEFontResource* Resource);
+		const ZEFontResource*				GetFontResource() const;
 
-		virtual void				SetMaterial(ZEMaterial* Material);
-		virtual ZEMaterial*			GetMaterial() const;
+		void								SetFontColor(const ZEVector4& Color);
+		const ZEVector4&					GetFontColor() const;
 
-									ZEUIWindowControl();
+		void								SetText(ZEString NewText);
+		const ZEString&						GetText();
+
+		void								SetTextAlignment(ZEUITextAlignment Alignment);
+		ZEUITextAlignment					GetTextAlignment() const;
+
+		void								SetWordWrapping(bool Enabled);
+		bool								GetWordWrapping() const;
+
+		void								SetTextMargins(ZEUInt32 Top = 2, ZEUInt32 Left = 2, ZEUInt32 Bottom = 2, ZEUInt32 Right = 2);
+		void								SetTextMargins(const ZEVector4& Margins);
+		const ZEVector4&					GetTextMargins() const;
+
+		virtual void						SetPosition(const ZEVector2& Position);
+		virtual void						SetSize(const ZEVector2& Size);
+		virtual void						SetWidth(float Width);
+		virtual void						SetHeight(float Height);
+
+											ZEUILabel();
+											~ZEUILabel();
 };
 
 #endif

@@ -37,23 +37,48 @@
 #ifndef __ZE_UI_VERTICAL_SLIDER_CONTROL__
 #define __ZE_UI_VERTICAL_SLIDER_CONTROL__
 
-#include "ZEUISliderControl.h"
+#include "ZEUIControl.h"
 
-class ZEUIVerticalSliderControl : public ZEUISliderControl
+class ZEUIVerticalSliderControl : public ZEUIControl
 {
+	private:
+
+		ZEUIRectangle	SliderButton;
+		ZEUIRectangle	SliderLine;
+
+		float			Value;
+		float			Stepsize;
+		float			MaximumValue;
+		float			MinimumValue;
+
+		ZEUIMaterial*	SliderButtonMaterial;
+		ZEUIMaterial*	SliderLineMaterial;
+
+		bool			IsButtonPressed;
+
 	protected:
 
-		virtual void	SetSliderValueByButton(const ZEVector2& MoveAmount);
 		virtual void	MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+		virtual	void	MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+		virtual void	MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmount);
 
 	public:
 
 		virtual void	Draw(ZEUIRenderer* Renderer);
 
-		virtual void	SetCurretnValue(float NewValue);
+		void			SetValue(float NewValue);
+		float			GetValue() const;
+		void			SetStepsize(float StepSize);
+		float			GetStepsize() const;
+		void			SetMaximumValue(float MaxValue);
+		float			GetMaximumValue() const;
+		void			SetMinimumValue(float MinValue);
+		float			GetMinimumValue() const;
 
-		virtual	void	SetPosition(const ZEVector2& Position);
-		virtual void	SetHeight(float Height);
+		virtual void	SetWidth(float Width);
+		virtual	void	SetHeight(float Height);
+
+		virtual void	SetPosition(const ZEVector2& Position);
 
 						ZEUIVerticalSliderControl();
 };

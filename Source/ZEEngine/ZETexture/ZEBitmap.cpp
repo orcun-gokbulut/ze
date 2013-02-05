@@ -338,7 +338,7 @@ void ZEBitmap::CopyFrom(void* SourceBuffer, ZESize SourcePitch,
 		Width = this->Width;
 
 	for (ZESize I = 0; I < (ZESize)Height; I++)
-		memcpy((ZEUInt8*)Pixels + ((ZESize)SourceOffsetY + I) * Pitch + (ZESize)SourceOffsetX * PixelSize, 
+		memcpy((ZEUInt8*)Pixels + ((ZESize)DestinationOffsetY + I) * Pitch + (ZESize)DestinationOffsetX * PixelSize, 
 			(ZEUInt8*)SourceBuffer + ((ZESize)SourceOffsetY + I) * SourcePitch + (ZESize)SourceOffsetX * PixelSize, 
 			(ZESize)Width * PixelSize);
 }
@@ -410,7 +410,7 @@ bool ZEBitmap::Load(const char* FileName)
 
 void ZEBitmap::Save(const char* FileName, ZEBitmapFileFormat Format)
 {
-	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits((BYTE*)Pixels, (int)Width, (int)Height, (int)Pitch, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits((BYTE*)Pixels, (int)Width, (int)Height, (int)Pitch, PixelSize * 8, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
 	FREE_IMAGE_FORMAT FIFormat;
 	switch(Format)
 	{

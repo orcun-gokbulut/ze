@@ -38,50 +38,36 @@
 #include "ZEIUCheckBoxControl.h"
 #include "ZEUIHorizontalSliderControl.h"
 
-void ZEUIFrameControl::MouseMoveEvent(const ZEVector2& MoveAmount)
-{
-	ZEUIControl::MouseMoveEvent(MoveAmount);
-
-	if (!GetMoveable())
-		return;
-
-	else
-		SetPosition(GetPosition() + MoveAmount);
-}
-
 void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
 {
-	if (GetVisiblity() == false)
-		return;
+	Frame.Color = GetBackgroundColor();
+	ZEUIRectangle TempRect = Frame;
+	TempRect.Positions.SetPosition(GetScreenPosition());
 
 	ZEUIRectangle Output;
-	Output.ZOrder = GetZOrder();
 
-	if(!ZEUIRectangle::Clip(Output, Frame, GetVisibleRectangle()))
+	if(!ZEUIRectangle::Clip(Output, TempRect, GetVisibleRectangle()))
 		Renderer->AddRectangle(Output);
 
 	ZEUIControl::Draw(Renderer);
 }
 
+void ZEUIFrameControl::SetSize(const ZEVector2& Size)
+{
+	SetWidth(Size.x);
+	SetHeight(Size.y);
+}
+
 void ZEUIFrameControl::SetWidth(float Width)
 {
 	ZEUIControl::SetWidth(Width);
-	Frame.Positions.LeftUp = GetRectangle().LeftUp;
-	Frame.Positions.RightDown = GetRectangle().RightDown;
+	Frame.Positions.SetWidth(Width);
 }
 
 void ZEUIFrameControl::SetHeight(float Height)
 {
 	ZEUIControl::SetHeight(Height);
-	Frame.Positions.LeftUp = GetRectangle().LeftUp;
-	Frame.Positions.RightDown = GetRectangle().RightDown;
-}
-
-void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
-{
-	ZEUIControl::SetPosition(Position);
-	Frame.Positions.LeftUp = GetRectangle().LeftUp;
-	Frame.Positions.RightDown = GetRectangle().RightDown;
+	Frame.Positions.SetHeight(Height);
 }
 
 ZEMaterial* ZEUIFrameControl::GetMaterial() const
@@ -95,22 +81,21 @@ void ZEUIFrameControl::SetMaterial(ZEMaterial* Material)
 	Frame.Material = FrameMaterial;
 }
 
-void ZEUIFrameControl::SetZOrder(ZEInt Z)
+void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
 {
-	ZEUIControl::SetZOrder(Z);
-	Frame.ZOrder = Z;
+	ZEUIControl::SetPosition(Position);
+	Frame.Positions.SetPosition(GetScreenPosition());
 }
 
 ZEUIFrameControl::ZEUIFrameControl()
 {
 	FrameMaterial = ZEUIMaterial::CreateInstance();
 	Frame.Material = FrameMaterial;
-	Frame.Color = GetBackgroundColor();
+	Frame.Color = ZEUIManager::GetDefaultBackgroundColor();
 	Frame.Texcoords.LeftUp = ZEVector2::Zero;
 	Frame.Texcoords.RightDown = ZEVector2::One;
 
+	SetPosition(ZEVector2::Zero);
 	SetWidth(200);
 	SetHeight(200);
-
-	SetMoveable(true);
 }

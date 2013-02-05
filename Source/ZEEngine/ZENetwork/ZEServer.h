@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIMultiLineTextEdit.h
+ Zinek Engine - ZEServer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,41 +34,31 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_MULTI_LINE_TEXT_EDIT_CONTROL__
-#define __ZE_UI_MULTI_LINE_TEXT_EDIT_CONTROL__
+#ifndef	__ZE_SERVER_H__
+#define __ZE_SERVER_H__
 
-#include "ZEUI/ZEUIFrameControl.h"
-#include "ZEUITextControl.h"
+#include "ZEPacketManagerServer.h"
 
-class ZEMaterial;
-
-class ZEUIMultiLineTextEdit : public ZEUIFrameControl
+class ZEServer
 {
 	private:
 
-		ZEUITextControl			TextDisplayer;
+		ZESocketTCPListener*	Listener;
+		ZEPacketManagerServer	PacketManager;
 
-		float					CursorBlinkTime;
-		float					TotalTime;
-		ZEUIRectangle			Cursor;
-		bool					CursorVisible;
-
-	protected:
-
-		virtual void			KeyPressed(unsigned char Key);
+		void					AcceptConnections();
 
 	public:
 
-		virtual void			SetMaterial(ZEMaterial* Material);
-		virtual ZEMaterial*		GetMaterial() const;
+		const ZEPacketManagerServer*	GetPacketManager();
 
-		virtual void			Tick(float ElapsedTime);
-		virtual void			Draw(ZEUIRenderer* Renderer);
+		void							Process(float ElapsedTime);
 
-		virtual void			SetWidth(float Width);
-		virtual void			SetHeight(float Height);
+		bool							SendData(void* Data, ZESize DataSize, ZEConnection* Connection);
+		void							BroadCast(void* Data, ZESize DataSize);
 
-								ZEUIMultiLineTextEdit();
+										ZEServer();
+										~ZEServer();
 };
 
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUITextControl.h
+ Zinek Engine - ZEConnectionTCP.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,50 +34,43 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_TEXT_CONTROL__
-#define __ZE_UI_TEXT_CONTROL__
+#ifndef	__ZE_CONNECTION_TCP_H__
+#define __ZE_CONNECTION_TCP_H__
 
-#include "ZEUIControl.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMath/ZEVector.h"
+#include "ZEConnection.h"
 
-class ZEUIRenderer;
-class ZEFontResource;
-class ZEUITextControl : public ZEUIControl
+class ZESocketTCP;
+
+class ZEConnectionTCP : public ZEConnection
 {
 	private:
-		ZEString						Text;
-		ZEVector4						TextColor;
-		bool							TextWrap;
-		ZEFontResource*					FontResource;
-		ZEVector2						FontSize;
+
+		ZESocketTCP*	Socket;
+
+		char*			TempBuffer;
+		char*			ReadBuffer;
+		char*			SendBuffer;
+
+		ZESize			ReadBufferSize;
+		ZESize			TempBufferSize;
+		ZESize			SendBufferSize;
+
+		ZESize			FilledReadBufferSize;
+		ZESize			FilledSendBufferSize;
+
+						ZEConnectionTCP();
 
 	public:
 
-		ZEUIRectangle					Output;
+		virtual bool	SendData(const void* Data, ZESize Size);
+		virtual void*	GetBuffer(ZESize& UsedSize);
 
-		void							SetText(const ZEString& Value);
-		const ZEString&					GetText();
+		virtual void	CleanBuffer();
 
-		void							SetTextColor(const ZEVector4& Color);
-		const ZEVector4&				GetTextColor();
+		virtual void	Process(float ElapsedTime);
 
-		void							SetTextWrap(bool Wrap);
-		bool							GetTextWrap();
-
-		void							SetFont(ZEFontResource* FontResource);
-		ZEFontResource*					GetFont();
-
-		void							SetFontSize(const ZEVector2& FontSize);
-		const ZEVector2&				GetFontSize();
-
-		virtual	void					SetMaterial(ZEMaterial* Material);
-		virtual ZEMaterial*				GetMaterial() const;
-
-		virtual void					Draw(ZEUIRenderer* Renderer);
-
-										ZEUITextControl();
-										~ZEUITextControl();
+						ZEConnectionTCP(ZESocketTCP* Socket, ZEUInt16 MaxPacketSize = 0xFFFF);
+						~ZEConnectionTCP();
 };
 
 #endif

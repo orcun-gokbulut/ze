@@ -40,10 +40,18 @@
 #define ZE_MACRO_COMMA() ,
 #define ZE_MACRO_EMPTY()
 
+#define ZE_MACRO_TO_VALUE(Argument) Argument
+
 #define ZE_MACRO_CONCAT(A, B) ZE_MACRO_CONCAT_INTERNAL(A, B)
 #define ZE_MACRO_CONCAT_INERNAL(A, B) A##B
 
 #define ZE_MACRO_STRING(Value) ZE_MACRO_STRING_INTERNAL(Value)
 #define ZE_MACRO_STRING_INTERNAL(Value) #Value
+
+#define ZE_MACRO_PARAMETERS_TO_STRING_2(Parameter0, Parameter1) ZE_MACRO_STRING_INTERNAL(Parameter0 ZE_MACRO_COMMA Parameter1)
+#define ZE_MACRO_PARAMETERS_TO_STRING_3(Parameter0, Parameter1, Parameter2) ZE_MACRO_STRING_INTERNAL(Parameter0 ZE_MACRO_COMMA Parameter1 ZE_MACRO_COMMA Parameter2)
+#define ZE_MACRO_PARAMETERS_TO_STRING_4(Parameter0, Parameter1, Parameter2, Parameter3) ZE_MACRO_STRING_INTERNAL(Parameter0 ZE_MACRO_COMMA Parameter1 ZE_MACRO_COMMA Parameter2 ZE_MACRO_COMMA Parameter3)
+#define ZE_MACRO_PARAMETERS_TO_STRING_5(Parameter0, Parameter1, Parameter2, Parameter3, Parameter4) ZE_MACRO_STRING_INTERNAL(Parameter0 ZE_MACRO_COMMA Parameter1 ZE_MACRO_COMMA Parameter2 ZE_MACRO_COMMA Parameter3 ZE_MACRO_COMMA Parameter4)
+#define ZE_MACRO_PARAMETERS_TO_STRING_6(Parameter0, Parameter1, Parameter2, Parameter3, Parameter4, Parameter5) ZE_MACRO_STRING_INTERNAL(Parameter0 ZE_MACRO_COMMA Parameter1 ZE_MACRO_COMMA Parameter2 ZE_MACRO_COMMA Parameter3 ZE_MACRO_COMMA Parameter4 ZE_MACRO_COMMA Parameter5)
 
 #endif

@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEUDPClient.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - ze_dependency.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,26 +30,38 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-// #pragma once
-// #ifndef	__ZE_UDP_CLIENT_H__
-// #define __ZE_UDP_CLIENT_H__
-// 
-// class ZESocketUDP;
-// 
-// class ZEUDPClient
-// {
-// 	private:
-// 
-// 		ZESocketUDP*	Socket;
-// 
-// 	public:
-// 
-// 		bool			Connect(const ZEIPAddress& ServerIP);
-// 		ZESSize			SendData(const void* Data, ZESize DataSize);
-// 		ZESSize			ReceiveData(void* Buffer, ZESize BufferSize);
-// };
-// 
-// #endif
+function (ze_add_dependency)
+	parse_arguments(PARAMETER "TARGET;DEPENDENCIES" "" ${ARGV})
+	set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY ZEBUILD_DEPENDENCIES ${PARAMETER_DEPENDENCIES})
+endfunction()
+
+function (ze_get_dependency_list)
+	parse_arguments(PARAMETER "TARGET;RETURN;LIST" "" ${ARGV})
+	
+	if (PARAMETER_LIST)
+		set(RETURN_TEMP ${PARAMETER_LIST} ${PARAMETER_TARGET})
+	else()
+		set(RETURN_TEMP ${PARAMETER_TARGET})
+	endif()
+	
+	if (TARGET ${PARAMETER_TARGET})
+		get_property(TARGET_DEPENDENCIES TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_DEPENDENCIES)
+		foreach(CURRENT_DEPENDENCY ${TARGET_DEPENDENCIES})
+			list(FIND RETURN_TEMP ${CURRENT_DEPENDENCY} RESULT)
+			if (RESULT EQUAL -1)
+				ze_get_dependency_list(TARGET ${CURRENT_DEPENDENCY} LIST ${RETURN_TEMP} RETURN RETURNED_VALUES)
+				foreach(CURRENT_RETURN ${RETURNED_VALUES})
+					list(FIND RETURN_TEMP ${CURRENT_RETURN} RESULT)
+					if (RESULT EQUAL -1)
+						list(APPEND RETURN_TEMP ${CURRENT_RETURN})
+					endif()
+				endforeach()
+			endif()
+		endforeach()
+	endif()
+	
+	set(${PARAMETER_RETURN} ${RETURN_TEMP} PARENT_SCOPE)
+endfunction()

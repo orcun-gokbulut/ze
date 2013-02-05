@@ -33,100 +33,100 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUIRadioButtonControl.h"
-#include "ZEFontResource.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
-#include "ZETexture/ZETexture2DResource.h"
-#include "ZEGraphics/ZEUIMaterial.h"
-
-void ZEUIRadioButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseButtonPressed(Button, MousePosition);
-
-	if (State == ZE_UI_RBS_CHECKED)
-		return;
-
-	if(Button == ZE_UI_MOUSE_BUTTON_LEFT)
-	{
-		SetState(ZE_UI_RBS_CHECKED);
-
-		for (ZESize I = 0; I < InteractingRadioButtons.GetCount(); I++)
-			InteractingRadioButtons[I]->SetState(ZE_UI_RBS_UNCHECKED);
-	}
-}
-
-void ZEUIRadioButtonControl::AddInteractingRadioButton(ZEUIRadioButtonControl* RadioButton)
-{
-	InteractingRadioButtons.Add(RadioButton);
-}
-
-void ZEUIRadioButtonControl::RemoveInteractingRadioButton(ZEUIRadioButtonControl* RadioButton)
-{
-	InteractingRadioButtons.DeleteValue(RadioButton);
-}
-
-void ZEUIRadioButtonControl::SetState(ZEUIRadioButtonState State)
-{
-	this->State = State;
-
-	if (State == ZE_UI_RBS_CHECKED)
-		((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("SemiChecked.png")->GetTexture());
-
-	else if (State == ZE_UI_RBS_UNCHECKED)
-		((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("UnChecked.png")->GetTexture());
-}
-
-ZEUIRadioButtonState ZEUIRadioButtonControl::GetState() const
-{
-	return State;
-}
-
-void ZEUIRadioButtonControl::SetText(ZEString Text)
-{
-	Label.SetText(Text);
-}
-
-ZEString ZEUIRadioButtonControl::GetText()
-{
-	return Label.GetText();
-}
-
-ZEMaterial*	ZEUIRadioButtonControl::GetMaterial() const
-{
-	return NULL;
-}
-
-void ZEUIRadioButtonControl::SetMaterial(ZEMaterial* Material)
-{
-	//Box.Button.Material = Material;
-}
-
-ZEUIRadioButtonControl::ZEUIRadioButtonControl()
-{
-	State = ZE_UI_RBS_UNCHECKED;
-	Label.SetFont(ZEFontResource::LoadResource("OldEnglish.zefont"));
-	Label.SetText(ZEString("Test"));
-
-	Box.SetWidth(24);
-	Box.SetHeight(24);
-	Label.SetWidth(120);
-	Label.SetHeight(25);
-
-	AddChildControl(&Box);
-	AddChildControl(&Label);
-	Box.SetPosition(ZEVector2::Zero);
-	Label.SetPosition(ZEVector2(Box.GetPosition().x + Box.GetWidth(), Box.GetPosition().y));
-
-	SetHeight(Box.GetHeight());
-	SetWidth(Box.GetWidth() + Label.GetWidth());
-
-	Box.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUIRadioButtonControl::MouseButtonPressed));
-	Label.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUIRadioButtonControl::MouseButtonPressed));
-
-	((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("UnChecked.png")->GetTexture());
-}
-
-ZEUIRadioButtonControl::~ZEUIRadioButtonControl()
-{
-
-}
+// #include "ZEUIRadioButtonControl.h"
+// #include "ZEFontResourceBitmap.h"
+// #include "ZEGraphics/ZEFixedMaterial.h"
+// #include "ZETexture//ZETexture2DResource.h"
+// #include "ZEGraphics/ZEUIMaterial.h"
+// 
+// void ZEUIRadioButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
+// {
+// 	ZEUIControl::MouseButtonPressed(Button, MousePosition);
+// 
+// 	if (State == ZE_UI_RBS_CHECKED)
+// 		return;
+// 
+// 	if(Button == ZE_UI_MOUSE_BUTTON_LEFT)
+// 	{
+// 		SetState(ZE_UI_RBS_CHECKED);
+// 
+// 		for (size_t I = 0; I < InteractingRadioButtons.GetCount(); I++)
+// 			InteractingRadioButtons[I]->SetState(ZE_UI_RBS_UNCHECKED);
+// 	}
+// }
+// 
+// void ZEUIRadioButtonControl::AddInteractingRadioButton(ZEUIRadioButtonControl* RadioButton)
+// {
+// 	InteractingRadioButtons.Add(RadioButton);
+// }
+// 
+// void ZEUIRadioButtonControl::RemoveInteractingRadioButton(ZEUIRadioButtonControl* RadioButton)
+// {
+// 	InteractingRadioButtons.DeleteValue(RadioButton);
+// }
+// 
+// void ZEUIRadioButtonControl::SetState(ZEUIRadioButtonState State)
+// {
+// 	this->State = State;
+// 
+// 	if (State == ZE_UI_RBS_CHECKED)
+// 		((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("SemiChecked.png")->GetTexture());
+// 
+// 	else if (State == ZE_UI_RBS_UNCHECKED)
+// 		((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("UnChecked.png")->GetTexture());
+// }
+// 
+// ZEUIRadioButtonState ZEUIRadioButtonControl::GetState() const
+// {
+// 	return State;
+// }
+// 
+// void ZEUIRadioButtonControl::SetText(ZEString Text)
+// {
+// 	Label.SetText(Text);
+// }
+// 
+// ZEString ZEUIRadioButtonControl::GetText()
+// {
+// 	return Label.GetText();
+// }
+// 
+// ZEMaterial*	ZEUIRadioButtonControl::GetMaterial() const
+// {
+// 	return NULL;
+// }
+// 
+// void ZEUIRadioButtonControl::SetMaterial(ZEMaterial* Material)
+// {
+// 	//Box.Button.Material = Material;
+// }
+// 
+// ZEUIRadioButtonControl::ZEUIRadioButtonControl()
+// {
+// 	State = ZE_UI_RBS_UNCHECKED;
+// 	Label.SetFont(ZEFontResourceBitmap::LoadResource("Courier New.zeFont"));
+// 	Label.SetFontSize(ZEVector2::One);
+// 	Label.SetText(ZEString("Test"));
+// 
+// 	Box.SetWidth(24);
+// 	Box.SetHeight(24);
+// 	Label.SetWidth(120);
+// 	Label.SetHeight(Label.GetTextControlCharacters()[0].RenderableCharacter.Positions.GetHeight());
+// 
+// 	AddChildControl(&Box);
+// 	AddChildControl(&Label);
+// 	Box.SetPosition(ZEVector2::Zero);
+// 	Label.SetPosition(ZEVector2(Box.GetPosition().x + Box.GetWidth() + 1, Box.GetPosition().y + (Box.GetHeight() - Label.GetHeight()) / 2));
+// 
+// 	SetHeight(Box.GetHeight());
+// 	SetWidth(Box.GetWidth() + Label.GetWidth());
+// 
+// 	Box.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUIRadioButtonControl::MouseButtonPressed));
+// 
+// 	((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("UnChecked.png")->GetTexture());
+// }
+// 
+// ZEUIRadioButtonControl::~ZEUIRadioButtonControl()
+// {
+// 
+// }

@@ -37,38 +37,37 @@
 #ifndef __ZE_UI_TEXT_EDIT_CONTROL__
 #define __ZE_UI_TEXT_EDIT_CONTROL__
 
-#include "ZEUI/ZEUIFrameControl.h"
-#include "ZEUITextControl.h"
+#include "ZEUILabel.h"
+#include "ZEUITextCursor.h"
 
 class ZEMaterial;
+class ZEUIRectangle;
 
-class ZEUITextEditControl : public ZEUIFrameControl
+class ZEUITextEditControl : public ZEUILabel
 {
 	private:
+		ZEUITextCursor						Cursor;
+		bool								IsTextDirty;
 
-		ZEUITextControl			TextDisplayer;
-
-		float					CursorBlinkTime;
-		float					TotalTime;
-		ZEUIRectangle			Cursor;
-		bool					CursorVisible;
+		ZEUITextAlignment					TextAlignment;
+		bool								IsReadOnly;
+		ZEVector2							TextMargin;
 
 	protected:
-
-		virtual void			KeyPressed(unsigned char Key);
+		virtual void						KeyPressed(ZEUIInputKey Key);
 
 	public:
+		virtual void						Tick(float ElapsedTime);
+		virtual void						Draw(ZEUIRenderer* Renderer);
 
-		virtual void			SetMaterial(ZEMaterial* Material);
-		virtual ZEMaterial*		GetMaterial() const;
+		const ZEMaterial*					GetCursorMaterial() const;
+		void								SetCursorColor(const ZEVector4& Color);
+		const ZEVector4&					GetCursorColor() const;
 
-		virtual void			SetWidth(float Width);
-		virtual void			SetHeight(float Height);
+		void								SetReadOnly(bool ReadOnly);
+		bool								GetReadOnly();
 
-		virtual void			Tick(float ElapsedTime);
-		virtual void			Draw(ZEUIRenderer* Renderer);
-
-								ZEUITextEditControl();
+											ZEUITextEditControl();
 };
 
 #endif

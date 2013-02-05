@@ -81,6 +81,7 @@ class ZETimer
 		void					Reset();
 
 		static ZETimer*			CreateInstance();
+		void					Destroy();
 
 		static void				CreateAutoTimer(float Interval, const ZETimerEvent& Event);
 };
