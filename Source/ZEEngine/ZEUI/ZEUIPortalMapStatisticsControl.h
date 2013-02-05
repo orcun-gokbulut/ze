@@ -38,20 +38,20 @@
 #define __ZE_UI_PORTAL_MAP_STATISTICS_CONTROL_H__
 
 #include "ZEUI/ZEUIControl.h"
-#include "ZEUI/ZEUITextControl.h"
+#include "ZEUI/ZEUILabel.h"
 
 
 class ZEUIPortalMapStatisticsControl : public ZEUIControl
 {
 private:
 
-	ZEUITextControl* TotalPortalCount;
-	ZEUITextControl* CulledPortalCount;
-	ZEUITextControl* DrawedPortalCount;
+	ZEUILabel* TotalPortalCount;
+	ZEUILabel* CulledPortalCount;
+	ZEUILabel* DrawedPortalCount;
 
-	ZEUITextControl* TotalPolygonCount;
-	ZEUITextControl* CulledPolygonCount;
-	ZEUITextControl* DrawedPolygonCount;
+	ZEUILabel* TotalPolygonCount;
+	ZEUILabel* CulledPolygonCount;
+	ZEUILabel* DrawedPolygonCount;
 
 public:
 
