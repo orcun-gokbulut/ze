@@ -192,7 +192,7 @@ void ZEPhysXPhysicalRigidBody::RemovePhysicalShape(ZEPhysicalShape* Shape)
 			ReCreate();
 }
 
-void ZEPhysXPhysicalRigidBody::SetPhysicalBodyType( ZEPhysicalBodyType Type )
+void ZEPhysXPhysicalRigidBody::SetPhysicalBodyType(ZEPhysicalBodyType Type)
 {
 	PhysicalBodyType = Type;
 }

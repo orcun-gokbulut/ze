@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPlugin.cpp
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,3 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPlugin.h"
-
-
-ZEVersion ZEPlugin::GetVersion()
-{
-	return ZEVersion::GetZinekVersion();
-}
-
-ZEVersion ZEPlugin::GetRequiredZinekVersion()
-{
-	return ZEVersion::GetZinekVersion();
-}
-
-ZEClass* ZEPlugin::GetClasses()
-{
-	return NULL;
-}
-
-bool ZEPlugin::Initialize()
-{
-	return true;
-}
-void ZEPlugin::Deinitialize()
-{
-
-}
-
-void ZEPlugin::Destroy()
-{
-	delete this;
-}
