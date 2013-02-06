@@ -35,7 +35,7 @@
 
 #include "ZEModelMeshLOD.h"
 #include "ZEModel.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 
 void ZEModelMeshLOD::ResetMaterial()
@@ -45,7 +45,7 @@ void ZEModelMeshLOD::ResetMaterial()
 
 void ZEModelMeshLOD::SetMaterial(const ZEMaterial* Material)
 {
-	RenderCommand.Material = Material;
+	RenderCommand.Material = (ZEMaterial*)Material;
 }
 
 const ZEMaterial* ZEModelMeshLOD::GetMaterial()
@@ -85,6 +85,7 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DistanceSquare
 
 void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)
 {
+	/*
 	Owner = Model;
 	OwnerMesh = Mesh;
 	this->LODResource = LODResource;
@@ -94,11 +95,12 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	RenderCommand.SetZero();
 	RenderCommand.Priority = 3;
 	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | (Skinned ? ZE_ROF_SKINNED : 0);
-	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
+	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE_LIST;
 	RenderCommand.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();
 	RenderCommand.PrimitiveCount = Skinned ? LODResource->SkinnedVertices.GetCount() / 3: LODResource->Vertices.GetCount() / 3;
 	RenderCommand.VertexDeclaration = Skinned ? ZESkinnedModelVertex::GetVertexDeclaration() : ZEModelVertex::GetVertexDeclaration();
 	RenderCommand.Material = Owner->GetModelResource()->Materials[(ZESize)LODResource->MaterialId];
+	*/
 }
 
 void ZEModelMeshLOD::Deinitialize()

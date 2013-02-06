@@ -51,10 +51,11 @@
 #define ZEWINDOW_WINDOWNAME		"Zinek Engine"
 #define ZEWINDOW_CLASSNAME		"ZINEKENGINE"
 
-char*  Parameters;
 
+char*  Parameters;
 ZEWindow* Window = NULL;
 bool WindowInitialization;
+bool Resizing = false;
 
 static void ManageCursorVisibility(HWND hWnd, LPARAM lParam)
 {
@@ -97,13 +98,53 @@ static void UnlockMousePosition(HWND hWnd)
 	ClipCursor(NULL);
 }
 
+static void ExitValidation(HWND hWnd)
+{
+	if (MessageBox(hWnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
+	{
+		Window->WindowDestroyed();
+	}
+}
+
 LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
 		case WM_CREATE:
 			break;
+		
+		case WM_SYSKEYDOWN:
+		{
+			if (HIWORD(lParam) & KF_ALTDOWN)
+			{
+				switch (wParam)
+				{
+					case VK_RETURN:
+					{
+						zeGraphics->SetFullScreen(!zeGraphics->GetFullScreen());
+						break;
+					}
+					case VK_F4:
+						ExitValidation(hWnd);
+						break;
+				}
+			}		
+			break;
+		}	
+		case WM_ENTERSIZEMOVE:
+			Resizing = true;
+			break;
 
+		case WM_EXITSIZEMOVE:
+		{
+			Resizing = false;
+
+			ZEInt Width = 0, Height = 0;
+			Window->GetWindowSize(Width, Height);
+			Window->WindowResized(Width, Height);
+			
+			break;
+		}
 		case WM_SIZE:
 			if (!WindowInitialization)
 				Window->WindowResized(LOWORD(lParam), HIWORD(lParam));
@@ -150,10 +191,7 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case WM_CLOSE:
-			if (MessageBox(hWnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
-			{
-				Window->WindowDestroyed();
-			}
+			ExitValidation(hWnd);
 			break;
 
 		case WM_DESTROY:
@@ -252,8 +290,8 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
         "ZINEK ENGINE WINDOW", 
         WindowTitle, 
 		Style, 
-        CW_USEDEFAULT,
-		0, 
+        0,
+		0,
 		WindowWidth,
         WindowHeight, 
         NULL, 
@@ -313,8 +351,8 @@ bool ZEWindow::SetComponentWindowHandle(void* Handle)
 
 void ZEWindow::WindowResized(ZEInt Width, ZEInt Height)
 {
-
-/*	if (WindowHandle != NULL && WindowType != ZE_WT_COMPONENT)
+	/*
+	if (WindowHandle != NULL && WindowType != ZE_WT_COMPONENT)
 	{
 		RECT ClientRectangle, WindowRectangle;
 		POINT Difference;
@@ -322,13 +360,14 @@ void ZEWindow::WindowResized(ZEInt Width, ZEInt Height)
 		GetWindowRect((HWND)WindowHandle, &WindowRectangle);
 		Difference.x = (WindowRectangle.right - WindowRectangle.left) - ClientRectangle.right;
 		Difference.y = (WindowRectangle.bottom - WindowRectangle.top) - ClientRectangle.bottom;
-	}*/
-
-	if (zeGraphics != NULL)
-		zeGraphics->SetScreenSize(Width, Height);
+	}
+	*/
 
 	WindowWidth = Width;
 	WindowHeight = Height;
+
+	if (!Resizing && zeGraphics != NULL)
+		zeGraphics->SetScreenSize(WindowWidth, WindowHeight);
 }
 
 void ZEWindow::SetWindowPosition(ZEInt Left, ZEInt Top)
@@ -443,9 +482,9 @@ ZEWindow::ZEWindow()
 	MouseCursorVisibility = false;
 	MouseCursorLockEnabled = true;
 	WindowType = ZE_WT_DEFAULT;
-	WindowPositionLeft = CW_USEDEFAULT;
+	WindowPositionLeft = 0;
 	WindowPositionTop = 0;
-	WindowWidth = CW_USEDEFAULT;
+	WindowWidth = 0;
 	WindowHeight = 0;
 	WindowHandle = NULL;
 	Window = this;

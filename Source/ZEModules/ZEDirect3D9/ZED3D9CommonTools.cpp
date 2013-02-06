@@ -42,6 +42,7 @@
 #include "ZETexture/ZETextureCubeResource.h"
 
 #include <d3dx9.h>
+
 #include <stdio.h>
 #include "ZETexture/ZETexture3DResource.h"
 #include "ZED3D9Texture3D.h"
@@ -54,38 +55,39 @@
 
 class ZED3DXInclude : public ID3DXInclude
 {
-public:
-	virtual HRESULT __stdcall Open(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID * ppData, UINT * pBytes)
-	{
-		char RelativeFileName[258];
-		sprintf(RelativeFileName, "resources\\shaders\\%s", pFileName);
-		FILE* File = fopen(RelativeFileName, "rb");
-		if (File == NULL)
-			return S_FALSE;
+	public:
+		virtual HRESULT __stdcall Open(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID * ppData, UINT * pBytes)
+		{
+			char RelativeFileName[258];
+			sprintf(RelativeFileName, "resources\\shaders\\%s", pFileName);
+			FILE* File = fopen(RelativeFileName, "rb");
+			if (File == NULL)
+				return S_FALSE;
 
-		_fseeki64(File, 0, SEEK_END);
-		*pBytes = (UINT)_ftelli64(File);
-		_fseeki64(File, 0, SEEK_SET);
-		*ppData = (void*)new char[(ZESize)*pBytes];
-		fread((void*)*ppData, 1, (ZESize)*pBytes, File);
-		fclose(File);
+			_fseeki64(File, 0, SEEK_END);
+			*pBytes = (UINT)_ftelli64(File);
+			_fseeki64(File, 0, SEEK_SET);
+			*ppData = (void*)new char[(ZESize)*pBytes];
+			fread((void*)*ppData, 1, (ZESize)*pBytes, File);
+			fclose(File);
 
-		return S_OK;
-	}
+			return S_OK;
+		}
 
-	virtual HRESULT __stdcall Close(LPCVOID pData)
-	{
-		if (pData != NULL)
-			delete[] pData;
-		return S_OK;
-	}
+		virtual HRESULT __stdcall Close(LPCVOID pData)
+		{
+			if (pData != NULL)
+				delete[] pData;
+			return S_OK;
+		}
 } D3DIncludeInterface;
 
+/*
 void ZED3D9CommonTools::SetRenderTarget(DWORD RenderTarget, ZERenderTarget* ViewPort)
 {
 	zeDebugCheck(ViewPort == NULL, "ViewPort is null.");
 
-	GetDevice()->SetRenderTarget(RenderTarget, ((ZED3D9RenderTarget*)ViewPort)->FrameBuffer);
+	Device->SetRenderTarget(RenderTarget, ((ZED3D9RenderTarget*)ViewPort)->Surface);
 }
 
 void ZED3D9CommonTools::SetRenderTarget(DWORD RenderTarget, ZETexture2D* Texture)
@@ -93,46 +95,46 @@ void ZED3D9CommonTools::SetRenderTarget(DWORD RenderTarget, ZETexture2D* Texture
 	zeDebugCheck(!Texture->IsRenderTarget(), "Texture is not render target.");
 	zeDebugCheck(Texture == NULL, "Texture is null.");
 
-	GetDevice()->SetRenderTarget(RenderTarget, ((ZED3D9RenderTarget*)Texture->GetViewPort())->FrameBuffer);
+	Device->SetRenderTarget(RenderTarget, ((ZED3D9RenderTarget*)Texture->GetViewPort())->Surface);
 	
 	return;
 }
 
 void ZED3D9CommonTools::SetTexture(DWORD Stage, const ZETexture2D* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
 {
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Addressing);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Addressing);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
-	GetDevice()->SetTexture(Stage, ((ZED3D9Texture2D*)Texture)->Texture);
+	Device->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Addressing);
+	Device->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Addressing);
+	Device->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
+	Device->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
+	Device->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
+	Device->SetTexture(Stage, ((ZED3D9Texture2D*)Texture)->Texture);
 }
 
 void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture2DResource* TextureResource, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
 {
 	ZETexture2D* Texture = (ZETexture2D*)TextureResource->GetTexture();
 	if (Texture == NULL)
-		GetDevice()->SetTexture(Stage, NULL);
+		Device->SetTexture(Stage, NULL);
 
 	ZED3D9CommonTools::SetTexture(Stage, Texture, Filter, MipMappingFilter, Addressing);
 }
 
 void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETextureCube* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
 {
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Addressing);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Addressing);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSW, Addressing);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
-	GetDevice()->SetTexture(Stage, ((ZED3D9TextureCube*)Texture)->CubeTexture);
+	Device->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Addressing);
+	Device->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Addressing);
+	Device->SetSamplerState(Stage, D3DSAMP_ADDRESSW, Addressing);
+	Device->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
+	Device->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
+	Device->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
+	Device->SetTexture(Stage, ((ZED3D9TextureCube*)Texture)->CubeTexture);
 }
 
 void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETextureCubeResource* TextureResource, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
 {
 	ZETextureCube* Texture = (ZETextureCube*)TextureResource->GetTexture();
 	if (Texture == NULL)
-		GetDevice()->SetTexture(Stage, NULL);
+		Device->SetTexture(Stage, NULL);
 
 	ZED3D9CommonTools::SetTexture(Stage, Texture, Filter, MipMappingFilter, Addressing);
 }
@@ -140,23 +142,24 @@ void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETextureCubeResource* TextureRe
 
 void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture3D* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
 {
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Addressing);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Addressing);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSW, Addressing);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
-	GetDevice()->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
-	GetDevice()->SetTexture(Stage, ((ZED3D9Texture3D*)Texture)->VolumeTexture);
+	Device->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Addressing);
+	Device->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Addressing);
+	Device->SetSamplerState(Stage, D3DSAMP_ADDRESSW, Addressing);
+	Device->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
+	Device->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
+	Device->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
+	Device->SetTexture(Stage, ((ZED3D9Texture3D*)Texture)->VolumeTexture);
 }
 
 void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture3DResource* TextureResource, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
 {
 	ZETexture3D* Texture = (ZETexture3D*)TextureResource->GetTexture();
 	if (Texture == NULL)
-		GetDevice()->SetTexture(Stage, NULL);
+		Device->SetTexture(Stage, NULL);
 
 	ZED3D9CommonTools::SetTexture(Stage, Texture, Filter, MipMappingFilter, Addressing);
 }
+*/
 
 D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 {
@@ -237,7 +240,7 @@ bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShade
 		return false;
 	}
 
-	if (GetDevice()->CreateVertexShader((DWORD*)ShaderBuffer->GetBufferPointer(), VertexShader) != NULL)
+	if (Device->CreateVertexShader((DWORD*)ShaderBuffer->GetBufferPointer(), VertexShader) != NULL)
 	{
 		zeError("Can not create vertex shader.\r\n");
 		*VertexShader = NULL;
@@ -290,7 +293,7 @@ bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, 
 		return false;
 	}
 
-	if (GetDevice()->CreatePixelShader((DWORD*)ShaderBuffer->GetBufferPointer(), PixelShader) != NULL)
+	if (Device->CreatePixelShader((DWORD*)ShaderBuffer->GetBufferPointer(), PixelShader) != NULL)
 	{
 		zeError("Can not create pixel shader.");
 		*PixelShader = NULL;
@@ -334,7 +337,7 @@ bool ZED3D9CommonTools::CompileVertexShaderFromMemory(LPDIRECT3DVERTEXSHADER9* V
 		return false;
 	}
 
-	if (GetDevice()->CreateVertexShader((DWORD*)ShaderBuffer->GetBufferPointer(), VertexShader) != NULL)
+	if (Device->CreateVertexShader((DWORD*)ShaderBuffer->GetBufferPointer(), VertexShader) != NULL)
 	{
 		zeError("Can not create vertex shader.\r\n");
 		*VertexShader = NULL;
@@ -380,7 +383,7 @@ bool ZED3D9CommonTools::CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* Pix
 		return false;
 	}
 
-	if (GetDevice()->CreatePixelShader((DWORD*)ShaderBuffer->GetBufferPointer(), PixelShader) != NULL)
+	if (Device->CreatePixelShader((DWORD*)ShaderBuffer->GetBufferPointer(), PixelShader) != NULL)
 	{
 		zeError("Can not create pixel shader.");
 		*PixelShader = NULL;
@@ -394,101 +397,3 @@ bool ZED3D9CommonTools::CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* Pix
 
 	return true;
 }
-
-/*
-bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, ZEInt Width, ZEInt Height, ZETexturePixelFormat Format)
-{
-	D3DSURFACE_DESC SurDesc;
-	D3DFORMAT D3DFormat = ConvertPixelFormat(Format);
-	if (*Target != NULL)
-	{
-		(*Target)->GetLevelDesc(0, &SurDesc);
-		
-		if (SurDesc.Width != Width ||SurDesc.Height != Height || SurDesc.Format != D3DFormat || SurDesc.Usage != D3DUSAGE_RENDERTARGET)
-			(*Target)->Release();
-		else
-			return true;
-	}
-
-	HRESULT Hr = GetDevice()->CreateTexture(Width, Height, 1, D3DUSAGE_RENDERTARGET, D3DFormat, D3DPOOL_DEFAULT, Target, NULL);
-	if (Hr != D3D_OK)
-	{
-		zeError("Can not create render target.");
-		*Target = NULL;
-		return false;
-	}
-
-	return true;
-}
-
-bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DSURFACE9* Target, ZEInt Width, ZEInt Height, ZETexturePixelFormat Format)
-{
-	D3DSURFACE_DESC SurDesc;
-	D3DFORMAT D3DFormat = ConvertPixelFormat(Format);
-	if (*Target != NULL)
-	{
-		(*Target)->GetDesc(&SurDesc);
-		if (SurDesc.Width != Width ||SurDesc.Height != Height || SurDesc.Format != D3DFormat)
-			(*Target)->Release();
-		else
-			return true;
-	}
-
-	HRESULT Hr = GetDevice()->CreateRenderTarget(Width, Height, D3DFormat, D3DMULTISAMPLE_NONE, 0, FALSE, Target, NULL);
-	if (Hr != D3D_OK)
-	{
-		zeError("Can not create render target.");
-		*Target = NULL;
-		return false;
-	}
-
-	return true;
-}
-
-
-bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, ZEInt Width, ZEInt Height)
-{
-	D3DSURFACE_DESC SurDesc;
-	if (*Target != NULL)
-	{
-		(*Target)->GetDesc(&SurDesc);
-		if (SurDesc.Width != Width ||SurDesc.Height != Height || SurDesc.Format != D3DFMT_D24S8)
-			(*Target)->Release();
-		else
-			return true;
-	}
-
-	HRESULT Hr = GetDevice()->CreateDepthStencilSurface(Width, Height, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, Target, NULL);
-	if (Hr != D3D_OK)
-	{
-		zeError("Can not create depth render target.");
-		*Target = NULL;
-		return false;
-	}
-
-	return true;
-}
-
-bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DTEXTURE9* Target, ZEInt Width, ZEInt Height)
-{
-	D3DSURFACE_DESC SurDesc;
-	if (*Target != NULL)
-	{
-		(*Target)->GetLevelDesc(0, &SurDesc);
-		if (SurDesc.Width != Width ||SurDesc.Height != Height || SurDesc.Format != D3DFMT_D24S8)
-			(*Target)->Release();
-		else
-			return true;
-	}
-
-	HRESULT Hr = GetDevice()->CreateTexture(Width, Height, 0, D3DUSAGE_DEPTHSTENCIL ,D3DFMT_D24S8, D3DPOOL_DEFAULT, Target, NULL);
-	if (Hr != D3D_OK)
-	{
-		zeError("Can not create depth render target.");
-		*Target = NULL;
-		return false;
-	}
-
-	return true;
-}
-*/

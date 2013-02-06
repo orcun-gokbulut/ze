@@ -190,7 +190,7 @@ ZEVector2 ZEVector2::Saturate() const
 	ZEVector2::Saturate(Temp, *this);
 	return Temp;
 }
-	
+
 void ZEVector2::SaturateSelf()
 {
 	ZEVector2::Saturate(*this, *this);
@@ -587,6 +587,16 @@ ZEVector3 ZEVector3::Saturate() const
 	return Temp;
 }
 
+ZEVector2 ZEVector3::ToVector2(const ZEVector3& Vector)
+{
+	return ZEVector2(Vector.x, Vector.y);
+}
+
+ZEVector2 ZEVector3::ToVector2() const
+{
+	return ZEVector2(x, y);
+}
+
 void ZEVector3::SaturateSelf()
 {
 	ZEVector3::Saturate(*this, *this);
@@ -867,6 +877,26 @@ ZEVector4 ZEVector4::Saturate() const
 	ZEVector4 Temp;
 	ZEVector4::Saturate(Temp, *this);
 	return Temp;
+}
+
+ZEVector2 ZEVector4::ToVector2(const ZEVector4& Vector)
+{
+	return ZEVector2(Vector.x, Vector.y);
+}
+
+ZEVector3 ZEVector4::ToVector3(const ZEVector4& Vector)
+{
+	return ZEVector3(Vector.x, Vector.y, Vector.z);
+}
+
+ZEVector2 ZEVector4::ToVector2() const
+{
+	return ZEVector2(x, y);
+}
+
+ZEVector3 ZEVector4::ToVector3() const
+{
+	return ZEVector3(x, y, z);
 }
 
 void ZEVector4::SaturateSelf()

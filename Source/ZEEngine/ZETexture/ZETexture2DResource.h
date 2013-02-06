@@ -52,7 +52,7 @@ class ZETexture2DResource : public ZETextureResource
 		virtual 							~ZETexture2DResource();
 
 	public:
-		const ZETexture2D*					GetTexture() const;
+		ZETexture2D*						GetTexture() const;
 		virtual const char*					GetResourceType() const;
 		virtual ZETextureType				GetTextureType() const;
 

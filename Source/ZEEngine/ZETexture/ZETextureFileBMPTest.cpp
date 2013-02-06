@@ -41,20 +41,7 @@
 #include "ZETextureData.h"
 #include "ZETextureFileBMP.h"
 
-bool CompareImages(ZEBitmap* Original, ZEUInt32* Data, ZESize Width, ZESize Height)
-{
-	if (Original->GetWidth() != Width || Original->GetHeight() != Height)
-		return false;
-
-	for (ZESize y = 0; y < Height; y++)
-		for (ZESize x = 0; x < Width; x++)
-			if (((ZEUInt32*)Original->GetPixels())[y * Width + x] != Data[y * Width + x])
-				return false;
-
-	return true;
-}
-
-bool TestSuccess(ZEString FileName)
+static bool TestSuccess(ZEString FileName)
 {
 	ZEPointer<ZEFile> File = ZEFile::Open(FileName);
 
@@ -83,7 +70,7 @@ bool TestSuccess(ZEString FileName)
 	return true;//CompareImages(&Original, (ZEUInt32*)Level->GetData(), Data->GetWidth(), Data->GetHeight());
 }
 
-bool TestFail(ZEString FileName)
+static bool TestFail(ZEString FileName)
 {
 	ZEPointer<ZEFile> File = ZEFile::Open(FileName);
 

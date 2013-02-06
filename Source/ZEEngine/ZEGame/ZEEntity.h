@@ -115,107 +115,107 @@ class ZEEntity : public ZEObject
 {
 	ZE_META_ENTITY(ZEEntity)
 	friend class ZEScene;
-	friend class ZESceneCuller;
+	friend class ZECuller;
 
 	private: 
-		ZEEntity*								Owner;
-		ZEScene*								OwnerScene;
+		ZEEntity*							Owner;
+		ZEScene*							OwnerScene;
 
-		ZEString								Name;
-		ZEInt									EntityId;
-		ZEVector3								Position;
-		ZEQuaternion							Rotation;
-		ZEVector3								Scale;
+		ZEString							Name;
+		ZEInt								EntityId;
+		ZEVector3							Position;
+		ZEQuaternion						Rotation;
+		ZEVector3							Scale;
 
-		bool									Initialized;
-		bool									Enabled;
-		bool									Visible;
+		bool								Initialized;
+		bool								Enabled;
+		bool								Visible;
 
-		mutable ZEEntityDirtyFlags				DirtyFlags;
+		mutable ZEEntityDirtyFlags			DirtyFlags;
 
-		mutable ZEMatrix4x4						Transform;
-		mutable ZEMatrix4x4						WorldTransform;
+		mutable ZEMatrix4x4					Transform;
+		mutable ZEMatrix4x4					WorldTransform;
 
-		ZEAABBox								BoundingBox;
-		ZEAABBox								WorldBoundingBox;
+		ZEAABBox							BoundingBox;
+		ZEAABBox							WorldBoundingBox;
 		
 	protected:
-		ZEArray<ZEEntity*>						Components;
-		ZEArray<ZEEntity*>						ChildEntities;
+		ZEArray<ZEEntity*>					Components;
+		ZEArray<ZEEntity*>					ChildEntities;
 
-		void									SetBoundingBox(const ZEAABBox& BoundingBox);
+		void								SetBoundingBox(const ZEAABBox& BoundingBox);
 
-		bool									AddComponent(ZEEntity* Entity); 
-		void									RemoveComponent(ZEEntity* Entity);
+		bool								AddComponent(ZEEntity* Entity); 
+		void								RemoveComponent(ZEEntity* Entity);
 
-		const ZEArray<ZEEntity*>&				GetComponents() const;
+		const ZEArray<ZEEntity*>&			GetComponents() const;
 
-												ZEEntity();
-		virtual									~ZEEntity();
+											ZEEntity();
+		virtual								~ZEEntity();
 		
-		virtual void							OnTransformChanged();
+		virtual void						OnTransformChanged();
 
 	public:
-		virtual ZEEntity*						GetOwner() const;
+		virtual ZEEntity*					GetOwner() const;
 
-		void									SetOwnerScene(ZEScene* Scene);
-		ZEScene*								GetOwnerScene() const;
+		void								SetOwnerScene(ZEScene* Scene);
+		ZEScene*							GetOwnerScene() const;
 		
-		void									SetEntityId(ZEInt EntityId);
-		ZEInt									GetEntityId() const;
+		void								SetEntityId(ZEInt EntityId);
+		ZEInt								GetEntityId() const;
 
-		void									SetName(const char* NewName);
-		const char*								GetName() const;
+		void								SetName(const char* NewName);
+		const char*							GetName() const;
 
-		virtual ZEDrawFlags						GetDrawFlags() const;
+		virtual ZEDrawFlags					GetDrawFlags() const;
 
-		const ZEArray<ZEEntity*>&				GetChildEntities() const;
-		bool									AddChildEntity(ZEEntity* Entity);
-		void									RemoveChildEntity(ZEEntity* Entity);
+		const ZEArray<ZEEntity*>&			GetChildEntities() const;
+		bool								AddChildEntity(ZEEntity* Entity);
+		void								RemoveChildEntity(ZEEntity* Entity);
 
-		virtual const ZEAABBox&					GetBoundingBox() const;
-		virtual const ZEAABBox&					GetWorldBoundingBox();
+		virtual const ZEAABBox&				GetBoundingBox() const;
+		virtual const ZEAABBox&				GetWorldBoundingBox();
 
-		virtual const ZEMatrix4x4&				GetTransform() const;
-		virtual const ZEMatrix4x4&				GetWorldTransform() const;
+		virtual const ZEMatrix4x4&			GetTransform() const;
+		virtual const ZEMatrix4x4&			GetWorldTransform() const;
 
-		bool									GetInitialized();
+		bool								GetInitialized();
 
-		virtual void							SetVisible(bool Visibility);
-		virtual bool							GetVisible() const;
+		virtual void						SetVisible(bool Visibility);
+		virtual bool						GetVisible() const;
 
-		virtual void							SetEnabled(bool Enabled);
-		virtual bool							GetEnabled() const;
+		virtual void						SetEnabled(bool Enabled);
+		virtual bool						GetEnabled() const;
 
-		virtual void							SetPosition(const ZEVector3& NewPosition);
-		const ZEVector3&						GetPosition() const;
-		virtual void							SetWorldPosition(const ZEVector3& NewPosition);
-		const ZEVector3							GetWorldPosition() const;
+		virtual void						SetPosition(const ZEVector3& NewPosition);
+		const ZEVector3&					GetPosition() const;
+		virtual void						SetWorldPosition(const ZEVector3& NewPosition);
+		const ZEVector3						GetWorldPosition() const;
 
-		virtual void							SetRotation(const ZEQuaternion& NewRotation);
-		const ZEQuaternion&						GetRotation() const;
-		virtual void							SetWorldRotation(const ZEQuaternion& NewRotation);
-		const ZEQuaternion						GetWorldRotation() const;
+		virtual void						SetRotation(const ZEQuaternion& NewRotation);
+		const ZEQuaternion&					GetRotation() const;
+		virtual void						SetWorldRotation(const ZEQuaternion& NewRotation);
+		const ZEQuaternion					GetWorldRotation() const;
 
-		virtual void							SetScale(const ZEVector3& NewScale);
-		const ZEVector3&						GetScale() const;
-		virtual void							SetWorldScale(const ZEVector3& NewScale);
-		const ZEVector3							GetWorldScale() const;
+		virtual void						SetScale(const ZEVector3& NewScale);
+		const ZEVector3&					GetScale() const;
+		virtual void						SetWorldScale(const ZEVector3& NewScale);
+		const ZEVector3						GetWorldScale() const;
 
-		ZEVector3								GetFront();
-		ZEVector3								GetRight();
-		ZEVector3								GetUp();
+		ZEVector3							GetFront();
+		ZEVector3							GetRight();
+		ZEVector3							GetUp();
 
-		ZEVector3								GetWorldFront() const;
-		ZEVector3								GetWorldRight() const;
-		ZEVector3								GetWorldUp() const;
+		ZEVector3							GetWorldFront() const;
+		ZEVector3							GetWorldRight() const;
+		ZEVector3							GetWorldUp() const;
 
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
-		virtual void							Destroy();
+		virtual bool						Initialize();
+		virtual void						Deinitialize();
+		virtual void						Destroy();
 		
-		virtual void							Tick(float Time);
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
+		virtual void						Tick(float Time);
+		virtual void						Draw(ZEDrawParameters* DrawParameters);
 };
 
 /*

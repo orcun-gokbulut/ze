@@ -62,6 +62,15 @@ bool ZEViewCuboid::CullTest(const ZERectangle3D& Rectangle) const
 	return false;
 }
 
+void ZEViewCuboid::Create(const ZEOBBox& OBBox)
+{
+	Box.Up = OBBox.Up;
+	Box.Front = OBBox.Front;
+	Box.Right = OBBox.Right;
+	Box.Center = OBBox.Center;
+	Box.HalfSize = OBBox.HalfSize;
+}
+
 void ZEViewCuboid::Create(const ZEVector3& Position, const ZEQuaternion& Rotation, float Width, float Height, float NearZ, float FarZ)
 {
 	ZEQuaternion::VectorProduct(Box.Right, Rotation, ZEVector3::UnitX);

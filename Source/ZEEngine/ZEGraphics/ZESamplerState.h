@@ -33,76 +33,97 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_SAMPLER_STATE_H__
-#define __ZE_SAMPLER_STATE_H__
+#ifndef __ZE_DEVICE_STATE_SAMPLER_H__
+#define __ZE_DEVICE_STATE_SAMPLER_H__
 
 #include "ZEFoundation/ZEMath/ZEVector.h"
 #include "ZETexture.h"
 
-enum ZETextureAdressMode
+enum ZETextureAddressMode
 {
-	ZE_TAM_CURRENT				= 0,	
 	ZE_TAM_WRAP				    = 1,
 	ZE_TAM_MIRROR			    = 2,
 	ZE_TAM_CLAMP			    = 3,
 	ZE_TAM_BORDER				= 4
-
 };
 
 enum ZETextureFilterMode
 {
-	ZE_TFM_CURRENT				= 0,
-	ZE_TFM_NONE					= 1,
-	ZE_TFM_POINT				= 2,
-	ZE_TFM_LINEAR				= 3,
-	ZE_TFM_ANISOTROPY			= 4
+	ZE_TFM_POINT				= 1,
+	ZE_TFM_LINEAR				= 2,
+	ZE_TFM_ANISOTROPY			= 3
 };
 
-class ZESamplerState
+class ZEDeviceStateSampler
 {
-protected:
-	ZETextureFilterMode				MinFilter;
-	ZETextureFilterMode				MagFilter;
-	ZETextureFilterMode				MipFilter;
-	ZETextureAdressMode				AddressU;
-	ZETextureAdressMode				AddressV;
-	ZETextureAdressMode				AddressW;
-	ZEUInt							MaxAnisotropy;
-	ZEVector4						BorderColor;
-	float							MaxLOD;
+	friend class ZEGraphicsDevice;
+	friend class ZEDeviceStageShader;
 
-	bool							Changed;
+	// Should be public for only internal usage
+	public:
+		ZEUInt64					Hash;
+		bool						Dirty;
 
-	// Currently Attached Texture
-	ZETexture*						CurrentTexture;
+		struct ZESamplerStateData
+		{
+			ZETextureFilterMode		MinFilter;
+			ZETextureFilterMode		MagFilter;
+			ZETextureFilterMode		MipFilter;
+			ZETextureAddressMode	AddressU;
+			ZETextureAddressMode	AddressV;
+			ZETextureAddressMode	AddressW;
+			float					MipLODBias;
+			ZEUInt					MaxAnisotropy;
+			ZEVector4				BorderColor;
+			float					MinLOD;
+			float					MaxLOD;
+		
+		} StateData;
 
-public:
-	void							SetMinFilter(ZETextureFilterMode FilterMode);
-	ZETextureFilterMode				GetMinFilter() const;
-	void							SetMagFilter(ZETextureFilterMode FilterMode);
-	ZETextureFilterMode				GetMagFilter() const;
-	void							SetMipFilter(ZETextureFilterMode FilterMode);
-	ZETextureFilterMode				GetMipFilter() const;
-	void							SetAddressU(ZETextureAdressMode AdressMode);
-	ZETextureAdressMode				GetAddressU() const;
-	void							SetAddressV(ZETextureAdressMode AdressMode);
-	ZETextureAdressMode				GetAddressV() const;
-	void							SetAddressW(ZETextureAdressMode AdressMode);
-	ZETextureAdressMode				GetAddressW() const;
-	void							SetMaxAnisotrophy(ZEUInt AnisotrophyLevel);
-	ZEUInt							GetMaxAnisotrophy() const;
-	void							SetBorderColor(const ZEVector4& Color);
-	ZEVector4						GetBorderColor() const;
-	void							SetMaxLOD(float LOD);
-	float							GetMaxLOD() const;
-	void							SetChanged(bool Change);
-	bool							GetChanged() const;
-	void							SetCurrentTexture(ZETexture* Texture);
-	ZETexture*						GetTexture() const;
+		void						UpdateHash();
 
-	const ZESamplerState&			operator=(const ZESamplerState& State);
+	public:
+		void						SetMinFilter(ZETextureFilterMode FilterMode);
+		ZETextureFilterMode			GetMinFilter() const;
+		
+		void						SetMagFilter(ZETextureFilterMode FilterMode);
+		ZETextureFilterMode			GetMagFilter() const;
+		
+		void						SetMipFilter(ZETextureFilterMode FilterMode);
+		ZETextureFilterMode			GetMipFilter() const;
+		
+		void						SetAddressU(ZETextureAddressMode AdressMode);
+		ZETextureAddressMode		GetAddressU() const;
+		
+		void						SetAddressV(ZETextureAddressMode AdressMode);
+		ZETextureAddressMode		GetAddressV() const;
+		
+		void						SetAddressW(ZETextureAddressMode AdressMode);
+		ZETextureAddressMode		GetAddressW() const;
+		
+		void						SetMipLODBias(float LODBias);
+		float						GetMipLODBias() const;
 
-									ZESamplerState();
-	virtual							~ZESamplerState();
+		void						SetMaxAnisotrophy(ZEUInt AnisotrophyLevel);
+		ZEUInt						GetMaxAnisotrophy() const;
+		
+		void						SetBorderColor(const ZEVector4& Color);
+		ZEVector4					GetBorderColor() const;
+		
+		void						SetMinLOD(float LOD);
+		float						GetMinLOD() const;
+
+		void						SetMaxLOD(float LOD);
+		float						GetMaxLOD() const;
+
+		void						SetToDefault();
+
+		const ZEDeviceStateSampler&	operator=(const ZEDeviceStateSampler& State);
+		bool						operator==(const ZEDeviceStateSampler& State);
+		bool						operator!=(const ZEDeviceStateSampler& State);
+
+									ZEDeviceStateSampler();
+		virtual						~ZEDeviceStateSampler();
 };
+
 #endif

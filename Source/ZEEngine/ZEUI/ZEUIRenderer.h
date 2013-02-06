@@ -40,15 +40,15 @@
 #include "ZEUIRectangle.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEMatrix.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZERenderer.h"
 
-class ZEVertexDeclaration;
+class ZEVertexLayout;
 class ZEUIRenderer
 {
 	private:
 		ZESmartArray<ZERenderCommand>	RenderCommands;
 		ZEMaterial*						DefaultMaterial;
-		ZEVertexDeclaration*			VertexDeclaration;
+		ZEVertexLayout*					VertexDeclaration;
 		ZEMatrix4x4						ScreenTransform;
 
 	protected:

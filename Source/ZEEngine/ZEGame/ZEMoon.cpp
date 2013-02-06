@@ -37,8 +37,8 @@
 #include "ZEMoon.h"
 #include "ZEMath\ZEVector.h"
 #include "ZEDrawParameters.h"
-#include "ZEGraphics\ZERenderer.h"
-#include "ZEGraphics\ZEMoonMaterial.h"
+#include "ZERenderer\ZERenderer.h"
+#include "ZERenderer\ZEMoonMaterial.h"
 #include "ZETexture\ZETexture3DResource.h"
 
 
@@ -187,10 +187,10 @@ void ZEMoon::Draw(ZEDrawParameters* DrawParameters)
 	MoonRenderCommand.PrimitiveCount	= 0;
 	MoonRenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE_STRIPT;
 	MoonRenderCommand.Flags				= ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	MoonRenderCommand.VertexBufferOffset= 0;
+	MoonRenderCommand.StartVertex= 0;
 	MoonRenderCommand.IndexBuffer		= (ZEIndexBuffer*)-1;
 	MoonRenderCommand.VertexBuffer		= (ZEVertexBuffer*)-1;
-	MoonRenderCommand.VertexDeclaration	= (ZEVertexDeclaration*)-1;
+	MoonRenderCommand.VertexDeclaration	= (ZEVertexLayout*)-1;
 	
 	// ---------------------------------------
 

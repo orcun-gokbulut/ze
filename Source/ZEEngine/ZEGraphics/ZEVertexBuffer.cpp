@@ -33,63 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
 #include "ZEVertexBuffer.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZECore/ZECore.h"
 
 ZEVertexBuffer::ZEVertexBuffer()
 {
+	Static = false;
+	BufferSize = 0;
+	VertexSize = 0;
+	VertexCount = 0;
 }
 
 ZEVertexBuffer::~ZEVertexBuffer()
 {
+
 }
 
-const ZEArray<ZEVertexElement>& ZEVertexBuffer::GetVertexElements() const
+bool ZEVertexBuffer::IsStatic() const
 {
-	return VertexElements;
+	return Static;
 }
 
-void ZEVertexBuffer::AddVertexElements(const ZEVertexElement& NewElement)
+ZESize ZEVertexBuffer::GetBufferSize() const
 {
-	VertexElements.Add(NewElement);
-}
-
-void ZEVertexBuffer::GenerateVertexSize()
-{
-	VertexSize = 0;
-	for(int i = 0; i < VertexElements.GetCount(); i++)
-	{
-		ZEVertexElement E = VertexElements[i];
-		switch(E.Type)
-		{
-			case ZE_VET_FLOAT:
-				VertexSize += sizeof(float);
-				break;
-			case ZE_VET_FLOAT2:
-				VertexSize += sizeof(float) * 2;
-				break;
-			case ZE_VET_FLOAT3:
-				VertexSize += sizeof(float) * 3;
-				break;
-			case ZE_VET_FLOAT4:
-				VertexSize += sizeof(float) * 4;
-				break;
-			case ZE_VET_SHORT2:
-				VertexSize += sizeof(short) * 2;
-				break;
-			case ZE_VET_SHORT4:
-				VertexSize += sizeof(short) * 4;
-				break;
-			case ZE_VET_BYTE4:
-				VertexSize += sizeof(char) * 4;
-				break;
-			case ZE_VET_COLOR:
-				VertexSize += sizeof(char) * 4;
-				break;
-		}
-	}
+	return BufferSize;
 }
 
 ZESize ZEVertexBuffer::GetVertexSize() const
@@ -97,31 +64,17 @@ ZESize ZEVertexBuffer::GetVertexSize() const
 	return VertexSize;
 }
 
-ZEStaticVertexBuffer::ZEStaticVertexBuffer()
+ZESize ZEVertexBuffer::GetVertexCount() const
 {
+	return VertexCount;
 }
 
-ZEStaticVertexBuffer::~ZEStaticVertexBuffer()
-{
-}
-
-bool ZEStaticVertexBuffer::IsStatic()
-{
-	return true;
-}
-
-void ZEStaticVertexBuffer::Destroy()
+void ZEVertexBuffer::Destroy()
 {
 	delete this;
 }
 
-
-ZEStaticVertexBuffer* ZEStaticVertexBuffer::CreateInstance()
+ZEVertexBuffer*	ZEVertexBuffer::CreateInstance()
 {
-	return zeGraphics->CreateStaticVertexBuffer();
-}
-
-bool ZEDynamicVertexBuffer::IsStatic()
-{
-	return false;
+	return zeGraphics->CreateVertexBuffer();
 }

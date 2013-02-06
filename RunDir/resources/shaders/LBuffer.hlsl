@@ -33,31 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sampler2D LBuffer1 : register(s3);
+// Samplers
+SamplerState	LBufferPointSampler : register(s3);
+
+// Textures
+Texture2D<float4>	LBuffer1 : register(t3);
+Texture2D<float4>	LBuffer2 : register(t4);
+
 
 struct ZELBuffer
 {
-	float4 DiffuseSpecular : COLOR0;
+	float4 DiffuseSpecular	: SV_TARGET0;
+	float4 NotDecidedYet	: SV_TARGET1;
 };
 
-void ZELBuffer_SetDiffuse(inout ZELBuffer LBuffer, float3 Diffuse)
+void ZELBuffer_SetDiffuse(inout ZELBuffer LBuffer, in float3 Diffuse)
 {
 	LBuffer.DiffuseSpecular.xyz = Diffuse;
 }
 
-float3 ZELBuffer_GetDiffuse(float2 Texcoord)
+float3 ZELBuffer_GetDiffuse(in float2 Texcoord)
 {
-	return tex2D(LBuffer1, Texcoord).rgb;	
+	return LBuffer1.Sample(LBufferPointSampler, Texcoord).rgb;
 }
 
-void ZELBuffer_SetSpecular(inout ZELBuffer LBuffer, float Specular)
+void ZELBuffer_SetSpecular(inout ZELBuffer LBuffer, in float Specular)
 {
 	LBuffer.DiffuseSpecular.a = Specular;
 }
 
-float3 ZELBuffer_GetSpecular(float2 Texcoord)
+float3 ZELBuffer_GetSpecular(in float2 Texcoord)
 {
-	float4 Total = tex2D(LBuffer1, Texcoord);
-	return normalize(Total.rgb) * Total.a;
+	float4 Sample = LBuffer1.Sample(LBufferPointSampler, Texcoord);
+	
+	// Max(0, normalize(Sample.rgb) * Sample.a) dene
+	float Length = length(Sample.rgb);
+	return Length > 0.0f ? (Sample.rgb / Length) * Sample.a : 0.0f;
 }
 

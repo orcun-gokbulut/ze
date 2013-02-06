@@ -37,7 +37,7 @@
 
 #include "ZECore/ZEConsole.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZERenderer/ZEFixedMaterial.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGame/ZEGame.h"
 #include "ZEGame/ZEPlayer.h"
@@ -52,8 +52,8 @@
 #include "ZEModel/ZEModelMesh.h"
 #include "ZEModel/ZEModelBone.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZEPointLight.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZEPointLight.h"
 #include "ZEMap/ZEPortalMap/ZEPortalMap.h"
 #include "ZEMap/ZEMapResource.h"
 #include "ZEMap/ZEPortalMap/ZEPortalMapPortal.h"
@@ -61,7 +61,7 @@
 
 #include "ZEMap/ZEPortalMap/ZEPortalMapResource.h"
 
-#include "../ZEGraphics/ZEDirectionalLight.h"
+#include "../ZERenderer/ZEDirectionalLight.h"
 
 void ZEPhysicsDebugModule::TransformChanged(const ZEPhysicalTransformChangeEventArgument& TransformChange)
 {

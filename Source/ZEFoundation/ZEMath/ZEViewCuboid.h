@@ -34,27 +34,27 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_VIEWCUBOID_H__
-#define __ZE_VIEWCUBOID_H__
+#ifndef __ZE_VIEW_CUBOID_H__
+#define __ZE_VIEW_CUBOID_H__
 
 #include "ZEViewVolume.h"
 
 class ZEViewCuboid : public ZEViewVolume
 {
-private:
-	ZEOBBox								Box;
+	private:
+		ZEOBBox						Box;
 
-public:
-	virtual ZEViewVolumeType			GetViewVolumeType() const;
+	public:
+		virtual ZEViewVolumeType	GetViewVolumeType() const;
 
-	virtual bool						CullTest(const ZEBSphere& BoundingSphere) const;
-	virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
-	virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
-	virtual bool						CullTest(const ZERectangle3D& Rectangle) const;
+		virtual bool				CullTest(const ZEBSphere& BoundingSphere) const;
+		virtual bool				CullTest(const ZEAABBox& BoundingBox) const;
+		virtual bool				CullTest(const ZEOBBox& BoundingBox) const;
+		virtual bool				CullTest(const ZERectangle3D& Rectangle) const;
 
-	void								Create(const ZEVector3& Position, const ZEQuaternion& Rotation,
-										float Width, float Height, float NearZ, float FarZ);
-
+		void						Create(const ZEOBBox& OBBox);
+		void						Create(const ZEVector3& Position, const ZEQuaternion& Rotation,
+									float Width, float Height, float NearZ, float FarZ);
 };
 
 #endif

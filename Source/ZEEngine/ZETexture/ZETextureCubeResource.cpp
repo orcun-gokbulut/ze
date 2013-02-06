@@ -83,7 +83,7 @@ static void CopyToTextureCube(ZETextureCube* Output, ZETextureData* TextureData)
 	{
 		for(ZESize Level = 0; Level < (ZESize)LevelCount; ++Level)
 		{
-			Output->Lock((ZETextureCubeFace)Surface, (ZEUInt)Level, &TargetBuffer, &TargetPitch);
+			Output->Lock(&TargetBuffer, &TargetPitch, (ZETextureCubeFace)Surface, (ZEUInt)Level);
 			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo(TargetBuffer, TargetPitch);
 			Output->Unlock((ZETextureCubeFace)Surface, (ZEUInt)Level);
 		}
@@ -177,8 +177,8 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 
 	ZEFileCache			FileCache;
 	ZETextureOptions	FinalOptions;
-	ZETextureData	TempTextureData;
-	ZETextureData	ProcessedTextureData;
+	ZETextureData		TempTextureData;
+	ZETextureData		ProcessedTextureData;
 	ZEString			CachePath = "TextureCache.ZECACHE";
 
 	bool CacheIt			= true;
@@ -307,8 +307,12 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
 
+	ZEUInt EdgeLength = ProcessedTextureData.GetWidth();
+	ZEUInt Levels = ProcessedTextureData.GetLevelCount();
+	ZETexturePixelFormat Format = ProcessedTextureData.GetPixelFormat();
+
 	// Create the Texture
-	if (!Texture->Create(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat(), false))
+	if (!Texture->CreateStatic(EdgeLength, Levels, Format, false, &ProcessedTextureData))
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
 		ProcessedTextureData.Destroy();
@@ -317,7 +321,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		return NULL;
 	}
 
-	CopyToTextureCube(Texture, &ProcessedTextureData);
+	//CopyToTextureCube(Texture, &ProcessedTextureData);
 	
 	ProcessedTextureData.Destroy();
 	TempTextureData.Destroy();
@@ -336,7 +340,7 @@ ZETextureType ZETextureCubeResource::GetTextureType() const
 	return ZE_TT_CUBE;
 }
 
-const ZETextureCube* ZETextureCubeResource::GetTexture() const
+ZETextureCube* ZETextureCubeResource::GetTexture() const
 {
 	return Texture;
 }

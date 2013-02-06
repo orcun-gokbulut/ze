@@ -44,8 +44,8 @@
 #include "ZEMath/ZERay.h"
 #include "ZESound/ZEListener.h"
 #include "ZEEntityProvider.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZEProjectiveLight.h"
 #include "ZEMath/ZEMath.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
@@ -293,7 +293,7 @@ ZEPlayer::ZEPlayer()
 	Camera->SetNearZ(zeGraphics->GetNearZ());
 	Camera->SetFarZ(zeGraphics->GetFarZ());
 	Camera->SetFOV(FOV);
-	Camera->SetAspectRatio(zeGraphics->GetAspectRatio());
+	Camera->SetAspectRatio((float)zeGraphics->GetScreenWidth() / (float)zeGraphics->GetScreenHeight());
 	AddComponent(Camera);
 
 	Listener = ZEListener::CreateInstance();

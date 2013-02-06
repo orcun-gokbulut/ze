@@ -50,7 +50,7 @@ class ZEModuleManager
 	private:
 		ZEArray<ZEExtensionDescription*>		ModuleList;
 
-		ZEModuleManager();
+												ZEModuleManager();
 												~ZEModuleManager();
 
 	public:

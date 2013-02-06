@@ -44,7 +44,7 @@
 
 class ZED3D9Texture3D : public ZETexture3D, public ZED3D9ComponentBase
 {
-	friend class ZED3D9Module;
+	friend class ZED3D9GraphicsModule;
 	private:
 										ZED3D9Texture3D();
 		virtual							~ZED3D9Texture3D();
@@ -54,14 +54,11 @@ class ZED3D9Texture3D : public ZETexture3D, public ZED3D9ComponentBase
 
 		virtual bool					IsEmpty() const;
 
-		virtual void					DeviceLost();
-		virtual bool					DeviceRestored();
-
 		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt MipLevel, ZETexturePixelFormat PixelFormat);
-		virtual void					Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt Level);
-		virtual void					Unlock(ZEUInt Level);
+		virtual bool					Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt Level);
+		virtual bool					Unlock(ZEUInt Level);
+		
 		virtual void					Release();
-
 		virtual void					Destroy();
 };
 #endif

@@ -42,12 +42,13 @@
 #include "ZECore/ZEResource.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZETexture/ZETexture2DResource.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZERenderer/ZEFixedMaterial.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
 
 
 #include <string.h>
 #include "ZEFile/ZEFileInfo.h"
+#include "ZETexture/ZETextureCubeResource.h"
 
 // Reading
 #define ZE_SHADER_SKINTRANSFORM				1
@@ -87,7 +88,7 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 	return NewString;
 }
 
-const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(const ZEString& FileName)
+ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(const ZEString& FileName)
 {
 	if (FileName == "")
 		return NULL;
@@ -120,57 +121,124 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEFile* ResourceFile)
 		{
 			zeError("Material chunk's id does not match.");
 			return false;
-		}	
+		}
 		
 		// Fixed Material Hack
 		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();
 		
 		Materials[I] = CurrentMaterial;
-		CurrentMaterial->SetTwoSided(false);
-		CurrentMaterial->SetDiffuseEnabled(true);
-		CurrentMaterial->SetAmbientEnabled(false);
-		CurrentMaterial->SetSpecularEnabled(true);
-		CurrentMaterial->SetEmmisiveEnabled(true);
-		
-		CurrentMaterial->SetDiffuseSubSurfaceScatteringFactor(0.0f);
+
 		CurrentMaterial->SetTwoSided(MaterialChunk.TwoSided);
-		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
+		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
+
+		//Specular
+		// @NOTE: Hack to enable specular mapping
+		// @NOTE: Specular factor always comes 0.0f from exporter
+		MaterialChunk.SpecularFactor = 0.5f;
+		MaterialChunk.SpecularColor = ZEVector3::One;
+		CurrentMaterial->SetSpecularEnabled(true);
+		CurrentMaterial->SetSpecularColor(MaterialChunk.SpecularColor);
+		CurrentMaterial->SetSpecularFactor(MaterialChunk.SpecularFactor);
+		CurrentMaterial->SetSpecularShininess(0.5f);
+		
+		if ((MaterialChunk.ShaderComponents & ZE_SHADER_SPECULAR_MAP) == ZE_SHADER_SPECULAR_MAP)
+		{
+			CurrentMaterial->SetSpecularMapEnabled(true);
+			CurrentMaterial->SetSpecularMap(ManageMapMaterialTextures(MaterialChunk.SpecularMap));
+		}
+		
+		// Emissive
+		CurrentMaterial->SetEmissiveEnabled(true);
+		CurrentMaterial->SetEmissiveColor(MaterialChunk.EmmisiveColor);
+		CurrentMaterial->SetEmissiveFactor(MaterialChunk.EmmisiveFactor);
+
+		if((MaterialChunk.ShaderComponents & ZE_SHADER_EMMISIVE_MAP) == ZE_SHADER_EMMISIVE_MAP)
+		{
+			CurrentMaterial->SetEmissiveMapEnabled(true);
+			CurrentMaterial->SetEmissiveMap(ManageMapMaterialTextures(MaterialChunk.EmmisiveMap));
+		}
+		
+		// Opacity
+		CurrentMaterial->SetOpacityEnabled(true);
+		CurrentMaterial->SetOpacity(MaterialChunk.Transparancy);
 		CurrentMaterial->SetTransparancyMode(MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE : ZE_MTM_NONE);
 
-		CurrentMaterial->SetAmbientColor(MaterialChunk.AmbientColor);
-		CurrentMaterial->SetAmbientColor(ZEVector3::Zero);
+		if ((MaterialChunk.ShaderComponents & ZE_SHADER_OPACITY_MAP) == ZE_SHADER_OPACITY_MAP)
+		{
+			CurrentMaterial->SetOpacityMap(ManageMapMaterialTextures(MaterialChunk.EmmisiveMap));
+		}
+
+		// Diffuse
+		CurrentMaterial->SetDiffuseEnabled(true);
+		CurrentMaterial->SetDiffuseFactor(1.0f);
+		CurrentMaterial->SetDiffuseSubSurfaceScatteringFactor(0.0f);
 		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);
-		CurrentMaterial->SetSpecularColor(MaterialChunk.SpecularColor);
-		CurrentMaterial->SetEmmisiveColor(MaterialChunk.EmmisiveColor);
-		CurrentMaterial->SetEmmisiveFactor(MaterialChunk.EmmisiveFactor);
-		CurrentMaterial->SetSpecularEnabled(false);
-		CurrentMaterial->SetSpecularFactor(1.0f);
-		CurrentMaterial->SetSpecularShininess(MaterialChunk.SpecularFactor);
-		CurrentMaterial->SetOpacity(MaterialChunk.Transparancy);
-		CurrentMaterial->SetReflectionFactor(MaterialChunk.ReflectionFactor);
-		CurrentMaterial->SetRefractionFactor(MaterialChunk.RefractionFactor);
+	
+		// Ambient
+		// @NOTE: Hack to enable ambient, not all materials comes with proper ambient color and factor
+		CurrentMaterial->SetAmbientEnabled(true);
+		CurrentMaterial->SetAmbientFactor(0.1f);
+		CurrentMaterial->SetAmbientColor(MaterialChunk.AmbientColor);
+	
+		// Base map
+		if ((MaterialChunk.ShaderComponents & ZE_SHADER_BASE_MAP) == ZE_SHADER_BASE_MAP)
+		{
+			CurrentMaterial->SetBaseMapEnabled(true);
+			CurrentMaterial->SetBaseMap(ManageMapMaterialTextures(MaterialChunk.DiffuseMap));
+		}
+		
+		// Detail map
+		// @NOTE: These parameters are hard coded since exporter does not support them yet
+		CurrentMaterial->SetDetailDistance(1.0f);
+		CurrentMaterial->SetDetailFadeDistance(3.0f);
 		CurrentMaterial->SetDetailMapTiling(MaterialChunk.DetailMapTiling);
 
-		CurrentMaterial->SetBaseMap(ManageMapMaterialTextures(MaterialChunk.DiffuseMap));
-		
-		CurrentMaterial->SetNormalMapEnabled((MaterialChunk.ShaderComponents & ZE_SHADER_NORMAL_MAP) != 0);
-		CurrentMaterial->SetNormalMap(ManageMapMaterialTextures(MaterialChunk.NormalMap));
-		CurrentMaterial->SetSpecularMap(ManageMapMaterialTextures(MaterialChunk.SpecularMap));
-		CurrentMaterial->SetEmmisiveMap(ManageMapMaterialTextures(MaterialChunk.EmmisiveMap));
-		CurrentMaterial->SetOpacityMap(ManageMapMaterialTextures(MaterialChunk.OpacityMap));
-		
-		//CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_DETAIL_NORMAL_MAP);
-		//CurrentMaterial->SetDetailBaseMap(ManageMapMaterialTextures(MaterialChunk.DetailMap));
-		//CurrentMaterial->SetDetailNormalMap(ManageMapMaterialTextures(MaterialChunk.DetailNormalMap));
+		if ((MaterialChunk.ShaderComponents & ZE_SHADER_DETAIL_BASE_MAP) == ZE_SHADER_DETAIL_BASE_MAP)
+		{
+			CurrentMaterial->SetDetailBaseMapEnabled(true);
+			CurrentMaterial->SetDetailBaseMap(ManageMapMaterialTextures(MaterialChunk.DetailMap));
+		}
+		if ((MaterialChunk.ShaderComponents & ZE_SHADER_DETAIL_NORMAL_MAP) == ZE_SHADER_DETAIL_NORMAL_MAP)
+		{
+			CurrentMaterial->SetDetailNormalMapEnabled(true);
+			CurrentMaterial->SetDetailNormalMap(ManageMapMaterialTextures(MaterialChunk.DetailNormalMap));
+		}
 
-		CurrentMaterial->SetReflectionEnabled(false);
-		CurrentMaterial->SetRefractionEnabled(false);
+		// NormalMap
+		if ((MaterialChunk.ShaderComponents & ZE_SHADER_NORMAL_MAP) == ZE_SHADER_NORMAL_MAP)
+		{
+			CurrentMaterial->SetNormalMapEnabled(true);
+			CurrentMaterial->SetNormalMap(ManageMapMaterialTextures(MaterialChunk.NormalMap));
+		}
 
-		CurrentMaterial->SetLightMapEnabled((MaterialChunk.ShaderComponents & ZE_SHADER_LIGHT_MAP) != 0);
-		CurrentMaterial->SetLightMap(ManageMapMaterialTextures(MaterialChunk.LightMap));
+		// Light Map
+		if ((MaterialChunk.ShaderComponents & ZE_SHADER_LIGHT_MAP) == ZE_SHADER_LIGHT_MAP)
+		{
+			CurrentMaterial->SetLightMapEnabled(true);
+			CurrentMaterial->SetLightMap(ManageMapMaterialTextures(MaterialChunk.LightMap));
+		}
+
+		// Reflection
+		if ((MaterialChunk.ShaderComponents & ZE_SHADER_REFLECTION) == ZE_SHADER_REFLECTION)
+		{
+
+			CurrentMaterial->SetReflectionEnabled(true);
+			CurrentMaterial->SetReflectionFactor(MaterialChunk.ReflectionFactor);
+		}
+
+		// Refraction
+		if ((MaterialChunk.ShaderComponents & ZE_SHADER_REFRACTION) == ZE_SHADER_REFRACTION)
+		{
+
+			CurrentMaterial->SetRefractionEnabled(true);
+			CurrentMaterial->SetRefractionFactor(0.5f);
+			CurrentMaterial->SetRefractionIndex(0.5f);
+			CurrentMaterial->SetRefractionFactor(MaterialChunk.RefractionFactor);
+		}
 
 		CurrentMaterial->UpdateMaterial();
+
 	}
 	return true;
 }

@@ -37,15 +37,15 @@
 
 ZEString ZEVersion::GetShortString() 
 {
-	ZEString Temp;
-	Temp.Format("%02u.%02u.%02u", Major, Minor, Internal);
+	ZEString Temp = "Will be fixed";
+	//Temp.Format("%02u.%02u.%02u", Major, Minor, Internal);
 	return Temp;
 }
 
 ZEString ZEVersion::GetLongString()	
 {
-	ZEString Temp;
-	Temp.Format("%02u.%02u.%02u (%s) - Build %06u", Major, Minor, Internal, ""/*ZE_PLATFORM*/, Build);
+	ZEString Temp = "Will be fixed";
+	//Temp.Format("%02u.%02u.%02u (%s) - Build %06u", Major, Minor, Internal, ""/*ZE_PLATFORM*/, Build);
 	return Temp;
 }
 

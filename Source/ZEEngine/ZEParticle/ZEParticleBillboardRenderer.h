@@ -39,11 +39,28 @@
 
 #include "ZEParticleEmitter.h"
 #include "ZEParticleRenderer.h"
-#include "ZEGraphics\ZERenderCommand.h"
+#include "ZERenderer\ZERenderCommand.h"
+#include "ZEMath\ZEVector.h"
 
-class ZESimpleVertex;
+class ZEVertexLayout;
+
+class ZEParticleVertex
+{
+	private:
+		static ZEVertexLayout	VertexLayout;
+
+	public:
+		ZEVector3				Position;
+		ZEVector3				Normal;
+		ZEVector2				Texcoord;
+		ZEVector4				Color;
+
+		static const ZEVertexLayout*	GetVertexLayout();
+};
+
 struct ZEDrawParameters;
-class ZEStaticVertexBuffer;
+
+class ZEVertexBuffer;
 
 class ZEParticleBillboardRenderer : public ZEParticleRenderer
 {
@@ -51,12 +68,12 @@ class ZEParticleBillboardRenderer : public ZEParticleRenderer
 
 		ZEParticleBillboardType				BillboardType;
 
-		ZEStaticVertexBuffer*				VertexBuffer;
+		ZEVertexBuffer*						VertexBuffer;
 		ZERenderCommand						RenderCommand;
 		ZEVector3							AxisOfOrientation;
 
 		void								UpdateVertexBuffer(ZEDrawParameters* DrawParameters);
-		void								DrawParticle(ZESimpleVertex* Buffer, const ZEParticle* Particle, const ZEVector3& Right, const ZEVector3& Up);
+		void								DrawParticle(ZEParticleVertex* Buffer, const ZEParticle* Particle, const ZEVector3& Right, const ZEVector3& Up);
 
 											ZEParticleBillboardRenderer();
 

@@ -33,93 +33,90 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sampler2D GBuffer1 : register(s0);
-sampler2D GBuffer2 : register(s1);
-sampler2D GBuffer3 : register(s2);
+// Samplers
+SamplerState	GBufferPointSampler		: register(s0);
 
-float3 ZEGBuffer_ViewVector : register(vs, c0);
-float4 ZEGBuffer_PipelineParameters0 : register(ps, c6);
-#define ZEGBuffer_PixelSize_2				ZEGBuffer_PipelineParameters0.xy
-#define ZEGBuffer_FarZ						ZEGBuffer_PipelineParameters0.z
+//Textures
+Texture2D<float>	GBuffer1		: register(t0);
+Texture2D<float4>	GBuffer2		: register(t1);
+Texture2D<float4>	GBuffer3		: register(t2);
 
 struct ZEGBuffer
 {
-	float4 Position : COLOR0;
-	float4 NormalGloss : COLOR1;
-	float4 VelocitySubSurfaceScatteringFactor : COLOR2;
+	float Position								: SV_TARGET0;
+	float4 NormalGloss							: SV_TARGET1;
+	float4 VelocitySubSurfaceScatteringFactor	: SV_TARGET2;
 };
 
 // Depth
-float ZEGBuffer_GetDepth(float2 TexCoord)
+float ZEGBuffer_GetDepth(in float2 TexCoord)
 {
-	return tex2D(GBuffer1, TexCoord).r;
+	return GBuffer1.Sample(GBufferPointSampler, TexCoord);
 }
 
 // View Vector
-float3 ZEGBuffer_GetViewVector(float4 ClipPosition)
+float3 ZEGBuffer_GetViewVector(in float4 ClipPosition)
 {
-	//return float3((ClipPosition.xy / ClipPosition.w) * ZEGBuffer_ViewVector.xy, ZEGBuffer_ViewVector.z);
 	return ClipPosition.xyz;
 }
 
 // View Position
-void ZEGBuffer_SetViewPosition(inout ZEGBuffer Output, float3 ViewPosition)
+void ZEGBuffer_SetViewPosition(inout ZEGBuffer Output, in float3 ViewPosition)
 {
-	//Output.Position = ViewPosition.zxyz;
-	Output.Position.xyzw = length(ViewPosition);
+	Output.Position = length(ViewPosition);
 }
 
-float3 ZEGBuffer_GetViewPosition(float2 Texcoord, float3 ViewVector)
+float3 ZEGBuffer_GetViewPosition(in float2 Texcoord, in float3 ViewVector)
 {
-	//return tex2D(GBuffer1, Texcoord).yzw;
-	return normalize(ViewVector) * tex2D(GBuffer1, Texcoord).x;
+	float Depth = GBuffer1.Sample(GBufferPointSampler, Texcoord);
+	return normalize(ViewVector) * Depth;
 }
 
 // View Normal
-void ZEGBuffer_SetViewNormal(inout ZEGBuffer Output, float3 ViewNormal)
+void ZEGBuffer_SetViewNormal(inout ZEGBuffer Output, in float3 ViewNormal)
 {
-	Output.NormalGloss.xyz = ViewNormal * 0.5f + 0.5f;
+	Output.NormalGloss.xyz = normalize(ViewNormal.xyz) * 0.5f + 0.5f;
 }
 
-float3 ZEGBuffer_GetViewNormal(float2 Texcoord)
+float3 ZEGBuffer_GetViewNormal(in float2 Texcoord)
 {
-	return 2.0f * tex2D(GBuffer2, Texcoord).xyz - 1.0f;
+	return normalize(GBuffer2.Sample(GBufferPointSampler, Texcoord).xyz * 2.0f - 1.0f);
 }
 
 // Specular Glossiness
-void ZEGBuffer_SetSpecularGlossiness(inout ZEGBuffer Output, float SpecularGlossiness)
+void ZEGBuffer_SetSpecularGlossiness(inout ZEGBuffer Output, in float SpecularGlossiness)
 {
 	Output.NormalGloss.w = SpecularGlossiness;
 }
 
-float ZEGBuffer_GetSpecularGlossiness(float2 Texcoord)
+float ZEGBuffer_GetSpecularGlossiness(in float2 Texcoord)
 {
-	return tex2D(GBuffer2, Texcoord).w;
+	return GBuffer2.Sample(GBufferPointSampler, Texcoord).w;
 }
 
-float ZEGBuffer_GetSpecularPower(float2 Texcoord)
+float ZEGBuffer_GetSpecularPower(in float2 Texcoord)
 {
 	return 128.0f - ZEGBuffer_GetSpecularGlossiness(Texcoord) * 120.0f;
 }
 
 // Velocity
-void ZEGBuffer_SetScreenVelocity(inout ZEGBuffer Output, float2 Velocity)
+void ZEGBuffer_SetScreenVelocity(inout ZEGBuffer Output, in float2 Velocity)
 {
 	Output.VelocitySubSurfaceScatteringFactor.xy = Velocity;
 }
 
-float2 ZEGBuffer_GetScreenVelocity(float2 Texcoord)
+float2 ZEGBuffer_GetScreenVelocity(in float2 Texcoord)
 {
-	return tex2D(GBuffer3, Texcoord).xy;
+	return GBuffer3.Sample(GBufferPointSampler, Texcoord).xy;
 }
 
 // Sub Surface Scattering
-void ZEGBuffer_SetSubSurfaceScatteringFactor(inout ZEGBuffer Output, float Factor)
+void ZEGBuffer_SetSubSurfaceScatteringFactor(inout ZEGBuffer Output, in float Factor)
 {
 	Output.VelocitySubSurfaceScatteringFactor.z = Factor;
 }
 
-float2 ZEGBuffer_GetSubSurfaceScatteringFactor(float2 Texcoord)
+float ZEGBuffer_GetSubSurfaceScatteringFactor(in float2 Texcoord)
 {
-	return tex2D(GBuffer3, Texcoord).z;
+	return GBuffer3.Sample(GBufferPointSampler, Texcoord).z;
 }

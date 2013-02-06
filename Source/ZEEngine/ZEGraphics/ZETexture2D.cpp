@@ -36,11 +36,6 @@
 #include "ZETexture2D.h"
 #include "ZEGraphicsModule.h"
 
-ZETextureType ZETexture2D::GetTextureType() const
-{
-	return ZE_TT_2D;
-}
-
 ZEUInt ZETexture2D::GetWidth() const
 {
 	return Width;
@@ -56,22 +51,12 @@ ZEUInt ZETexture2D::GetLevelCount() const
 	return LevelCount;
 }
 
-ZETexturePixelFormat ZETexture2D::GetPixelFormat() const
-{
-	return PixelFormat;
-}
-
-bool ZETexture2D::IsRenderTarget() const
-{
-	return RenderTarget;
-}
-
 ZETexture2D::ZETexture2D()
 {
-	Width = Height = 0;
-	PixelFormat = ZE_TPF_NOTSET;
-	RenderTarget = false;
+	Width = 0;
+	Height = 0;
 	LevelCount = 0;
+	TextureType = ZE_TT_2D;
 };
 
 ZETexture2D::~ZETexture2D()

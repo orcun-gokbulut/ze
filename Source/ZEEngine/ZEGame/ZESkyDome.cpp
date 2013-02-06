@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESkyDome.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZESkyDomeMaterial.h"
+#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZESkyDomeMaterial.h"
 #include "ZEDrawParameters.h"
 
 #define		ZE_SKY_DOME_PATH		"resources\\ClippedUnitDome.zeCanvas"
@@ -237,10 +237,10 @@ bool ZESkyDome::Initialize()
 	SkyDomeRenderCommand.Order = 1.1f;
 	SkyDomeRenderCommand.Pipeline = ZE_RORP_3D;
 	SkyDomeRenderCommand.VertexBuffer = &SkyDomeGeometry;
-	SkyDomeRenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
+	SkyDomeRenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE_LIST;
 	SkyDomeRenderCommand.Flags = ZE_ROF_NONE;
 	SkyDomeRenderCommand.PrimitiveCount = SkyDomeGeometry.Vertices.GetCount() / 3;
-	SkyDomeRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	//SkyDomeRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 
 	return ZEEntity::Initialize();
 }

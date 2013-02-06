@@ -37,98 +37,77 @@
 #ifndef __ZE_SCENE_H__
 #define __ZE_SCENE_H__
 
-#include "ZEDS/ZEArray.h"
-#include "ZESceneDebugDraw.h"
-#include "ZESceneCuller.h"
 #include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZESceneCuller.h"
 
-class ZEViewVolume;
-class ZEBoundingBox;
+class ZEEntity;
 class ZECamera;
 class ZEListener;
-class ZEFrameRenderer;
-class ZEShadowRenderer;
+class ZERenderer;
 class ZEPostProcessor;
-class ZEFixedMaterial;
-class ZEEntity;
 class ZEPhysicalWorld;
-class ZEPortalMap;
-class ZEPortalMapResource;
 class ZEObjectDescription;
 
-#define ZE_RCF_ENTITY							1
-#define ZE_RCF_COMPONENT						2
-#define ZE_RCF_MAP								4
-#define ZE_RCF_POSITON							8
-#define ZE_RCF_NORMAL							16
+#define ZE_RCF_ENTITY					1
+#define ZE_RCF_COMPONENT				2
+#define ZE_RCF_MAP						4
+#define ZE_RCF_POSITON					8
+#define ZE_RCF_NORMAL					16
 
 #define zeScene ZEScene::GetInstance()
 
 class ZEScene
 {
 	private:
-		bool									Initialized;
+		bool							Initialized;
+		ZEUInt							LastEntityId;
 
-		ZEUInt									LastEntityId;
+		ZESmartArray<ZEEntity*>			Entities;
 
-		ZESceneCuller							Culler;
+		ZESceneCuller					Culler;
+		ZERenderer*						Renderer;
+		ZEPhysicalWorld*				PhysicalWorld;
 
-		ZESmartArray<ZEEntity*>					Entities;
+		ZEPostProcessor*				PostProcessor;
+		ZECamera*						ActiveCamera;
+		ZEListener*						ActiveListener;
 
-		ZEPhysicalWorld*						PhysicalWorld;
-
-		ZEFrameRenderer*						Renderer;
-		ZEShadowRenderer*						ShadowRenderer;
-		ZEPostProcessor*						PostProcessor;
-		ZECamera*								ActiveCamera;
-		ZEListener*								ActiveListener;
-
-		void									Tick(ZEEntity* Entity, float ElapsedTime);
+		void							Tick(ZEEntity* Entity, float ElapsedTime);
 
 	public:
-		void									AddEntity(ZEEntity* Entity);
-		void									RemoveEntity(ZEEntity* Entity);
+		void							AddEntity(ZEEntity* Entity);
+		void							RemoveEntity(ZEEntity* Entity);
 
-		const ZESmartArray<ZEEntity*>&			GetEntities();
-		//ZEArray<ZEEntity*>					GetEntities(const char* ClassName);
-		ZEArray<ZEEntity*>						GetEntities(ZEObjectDescription* Desc);
+		const ZESmartArray<ZEEntity*>&	GetEntities();
+		//ZEArray<ZEEntity*>			GetEntities(const char* ClassName);
+		ZEArray<ZEEntity*>				GetEntities(ZEObjectDescription* Desc);
 
-		void									ClearEntities();
+		void							ClearEntities();
 
-		ZERenderer*								GetRenderer();
-		ZEPhysicalWorld*						GetPhysicalWorld();
+		ZERenderer*						GetRenderer();
+		ZEPhysicalWorld*				GetPhysicalWorld();
 
-		void									SetActiveCamera(ZECamera* Camera);
-		ZECamera*								GetActiveCamera();
+		void							SetActiveCamera(ZECamera* Camera);
+		ZECamera*						GetActiveCamera();
 
-		void									SetActiveListener(ZEListener* Listener);
-		ZEListener*								GetActiveListener();
+		void							SetActiveListener(ZEListener* Listener);
+		ZEListener*						GetActiveListener();
 
-		const ZECullStatistics&					GetCullerStatistics();
+		bool							Save(const ZEString& FileName);
+		bool							Load(const ZEString& FileName);
 
-		bool									Save(const ZEString& FileName);
-		bool									Load(const ZEString& FileName);
+		bool							Initialize();
+		void							Deinitialize();
+		void							Destroy();
 
-		bool									Initialize();
-		void									Deinitialize();
-		void									Destroy();
+		void							Tick(float ElapsedTime);
+		void							Render(float ElapsedTime);
 
-		void									Tick(float ElapsedTime);
-		void									Render(float ElapsedTime);
+										ZEScene();
+		virtual							~ZEScene();
 
-												ZEScene();
-		virtual									~ZEScene();
-
-		static ZEScene*							GetInstance();
-};
-
-class ZEPortalScene : public ZEScene
-{
+		static ZEScene*					GetInstance();
 };
 
 #endif
-
-
-
-
-

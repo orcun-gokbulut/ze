@@ -33,79 +33,44 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef	__ZE_VERTEX_BUFFER_H__
 #define __ZE_VERTEX_BUFFER_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEVertexDeclaration.h"
+#include "ZEVertexLayout.h"
 
 class ZEVertexBuffer
 {
+	friend class ZEGraphicsDevice;
+	friend class ZEGraphicsModule;
+
+	// Should be public for only internal usage
+	public:
+		bool					Static;
+		ZESize					BufferSize;
+		ZESize					VertexSize;
+		ZESize					VertexCount;
+
 	protected:
-		ZEArray<ZEVertexElement>					VertexElements;
-		ZESize										VertexSize;
+								ZEVertexBuffer();
+		virtual					~ZEVertexBuffer();
 
 	public:
-		const ZEArray<ZEVertexElement>&				GetVertexElements() const;
-		void										AddVertexElements(const ZEVertexElement& NewElement);
+		bool					IsStatic() const;
+		ZESize					GetBufferSize() const;
+		ZESize					GetVertexSize() const;
+		ZESize					GetVertexCount() const;
+
+		virtual bool			Unlock() = 0;
+		virtual bool			Lock(void** Data) = 0;
+
+		virtual bool			CreateDynamic(ZEUInt VertexCount, ZESize VertexSize) = 0;
+		virtual bool			CreateStatic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData) = 0;
 		
-		void										GenerateVertexSize();
-		ZESize										GetVertexSize() const;
+		virtual void			Destroy();
 
-		virtual bool								IsStatic() = 0;
-		virtual ZESize								GetBufferSize() = 0;
-
-													ZEVertexBuffer();
-		virtual										~ZEVertexBuffer();
-};
-
-class ZEStaticVertexBuffer : public ZEVertexBuffer
-{
-	protected:
-													ZEStaticVertexBuffer();
-		virtual										~ZEStaticVertexBuffer();
-
-	public:
-		virtual bool								IsStatic();
-
-		virtual bool								Create(ZESize BufferSize) = 0;
-		virtual void*								Lock() = 0;
-		virtual void								Unlock() = 0;
-		virtual void								Release() = 0;
-
-		virtual void								Destroy();
-
-		static ZEStaticVertexBuffer*				CreateInstance();
-};
-
-class ZEDynamicVertexBuffer : public ZEVertexBuffer
-{
-	public:
-		virtual bool								IsStatic();
-
-		virtual ZESize								GetBufferSize() = 0;
-		virtual void*								GetVertexBuffer() = 0;
-};	
-
-template<typename _VertexType, typename _Allocator = ZESmartAllocator<_VertexType> >
-class ZEArrayVertexBuffer : public ZEDynamicVertexBuffer, public ZEArray<_VertexType, _Allocator>
-{
-	public:
-		virtual ZESize GetBufferSize()
-		{
-			return GetCount() * sizeof(_VertexType);
-		}
-
-		virtual void* GetVertexBuffer()
-		{
-			return GetCArray();
-		}
+		static ZEVertexBuffer*	CreateInstance();
 };
 
 #endif
-
-
-
-

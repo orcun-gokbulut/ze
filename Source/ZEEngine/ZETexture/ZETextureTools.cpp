@@ -40,7 +40,7 @@
 #include "ZETextureTools.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZETexture2DResource.h"
-#include "ZEModules/ZEDirect3D9/ZED3D9TextureResizer.h"
+// #include "ZEModules/ZEDirect3D9/ZED3D9TextureResizer.h"
 
 #include <windows.h>
 #include <ATI_Compress.h>
@@ -179,10 +179,10 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 	}
 }
 
-void ZETextureTools::CompressTexture(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions)
+void ZETextureTools::Compress(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions)
 {
-	ATI_TC_FORMAT	Format;
-	ATI_TC_Speed	Speed;
+	ATI_TC_FORMAT Format = ATI_TC_FORMAT_Unknown;
+	ATI_TC_Speed Speed = ATI_TC_Speed_SuperFast;
 
 	// Decide Compression Type
 	switch(CompressionOptions->CompressionType)
@@ -225,33 +225,33 @@ void ZETextureTools::CompressTexture(void* DestinationData, const ZESize Destina
 	};
 
 	ATI_TC_Texture srcTexture;
-	srcTexture.dwSize		= sizeof(srcTexture);
-	srcTexture.dwWidth		= SourceWidth;
-	srcTexture.dwHeight		= SourceHeight;
-	srcTexture.dwPitch		= (ATI_TC_DWORD)SourcePitch;
-	srcTexture.format		= ATI_TC_FORMAT_ARGB_8888;
-	srcTexture.pData		= (ATI_TC_BYTE*)SourceData;
-	srcTexture.dwDataSize	= ATI_TC_CalculateBufferSize(&srcTexture);
+	srcTexture.dwSize = sizeof(srcTexture);
+	srcTexture.dwWidth = SourceWidth;
+	srcTexture.dwHeight	= SourceHeight;
+	srcTexture.dwPitch = (ATI_TC_DWORD)SourcePitch;
+	srcTexture.format = ATI_TC_FORMAT_ARGB_8888;
+	srcTexture.pData = (ATI_TC_BYTE*)SourceData;
+	srcTexture.dwDataSize = ATI_TC_CalculateBufferSize(&srcTexture);
 
 	ATI_TC_Texture destTexture;  
-	destTexture.dwSize		= sizeof(destTexture);
-	destTexture.dwWidth		= SourceWidth;
-	destTexture.dwHeight	= SourceHeight;
-	destTexture.dwPitch		= (ATI_TC_DWORD)DestinationPitch;
-	destTexture.format		= Format;
-	destTexture.pData		= (ATI_TC_BYTE*)DestinationData;
-	destTexture.dwDataSize	= ATI_TC_CalculateBufferSize(&destTexture);
+	destTexture.dwSize = sizeof(destTexture);
+	destTexture.dwWidth	= SourceWidth;
+	destTexture.dwHeight = SourceHeight;
+	destTexture.dwPitch	= (ATI_TC_DWORD)DestinationPitch;
+	destTexture.format = Format;
+	destTexture.pData = (ATI_TC_BYTE*)DestinationData;
+	destTexture.dwDataSize = ATI_TC_CalculateBufferSize(&destTexture);
 
 	ATI_TC_CompressOptions options;
 	memset(&options, 0, sizeof(options));
 
-	options.dwSize				= sizeof(options);
-	options.nCompressionSpeed	= Speed;
+	options.dwSize = sizeof(options);
+	options.nCompressionSpeed = Speed;
 
 	ATI_TC_ConvertTexture(&srcTexture, &destTexture, &options, NULL, NULL, NULL);
 }
 
-void ZETextureTools::DownSample2x(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, bool UseGpu)
+void ZETextureTools::DownSample2x(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight)
 {
 	// Check width height
 	if(SourceWidth <= 1 || SourceHeight <= 1)
@@ -260,63 +260,51 @@ void ZETextureTools::DownSample2x(void* DestinationData, const ZESize Destinatio
 	ZEUInt DestinationHeight = SourceHeight / 2;
 	ZEUInt DestinationWidth = SourceWidth / 2;
 
-	if (UseGpu)
+	struct ZEColorRGBA
 	{
-		static ZED3D9TextureResizer Resizer;
+		ZEUInt8 Red;
+		ZEUInt8 Green;
+		ZEUInt8 Blue;
+		ZEUInt8 Alpha;
+	};
 
-		Resizer.Initialize(DestinationData, DestinationPitch, DestinationWidth, DestinationHeight, SourceData, SourcePitch, SourceWidth, SourceHeight);
-		Resizer.Process();
-		Resizer.Deinitialize();
-
-	}
-	else
+	for (ZESize y = 0; y < (ZESize)DestinationHeight; y++)
 	{
-		struct ZEColorARGB
+		for (ZESize x = 0; x < (ZESize)DestinationWidth; x++)
 		{
-			ZEUInt8 Alpha;
-			ZEUInt8 Red;
-			ZEUInt8 Blue;
-			ZEUInt8 Green;
-		};
+			ZEColorRGBA* Source = (ZEColorRGBA*)((ZEUInt8*)SourceData + SourcePitch * y * 2 + x * 8);
 
-		for (ZESize y = 0; y < (ZESize)DestinationHeight; y++)
-		{
-			for (ZESize x = 0; x < (ZESize)DestinationWidth; x++)
-			{
-				ZEColorARGB* Source = (ZEColorARGB*)((ZEUInt8*)SourceData + SourcePitch * y * 2 + x * 8);
+			ZEUInt16 Red, Green, Blue, Alpha;
+			Alpha = Source->Alpha;
+			Red   = Source->Red;
+			Green = Source->Green;
+			Blue  = Source->Blue;
+			Source++;
 
-				ZEUInt16 Red, Green, Blue, Alpha;
-				Alpha = Source->Alpha;
-				Red   = Source->Red;
-				Green = Source->Green;
-				Blue  = Source->Blue;
-				Source++;
+			Alpha += Source->Alpha;
+			Red   += Source->Red;
+			Green += Source->Green;
+			Blue  += Source->Blue;
 
-				Alpha += Source->Alpha;
-				Red   += Source->Red;
-				Green += Source->Green;
-				Blue  += Source->Blue;
+			Source = (ZEColorRGBA*)((ZEUInt8*)Source + SourcePitch - 1 * 4);
+			Alpha += Source->Alpha;
+			Red   += Source->Red;
+			Green += Source->Green;
+			Blue  += Source->Blue;
+			Source++;
 
-				Source = (ZEColorARGB*)((ZEUInt8*)Source + SourcePitch - 1 * 4);
-				Alpha += Source->Alpha;
-				Red   += Source->Red;
-				Green += Source->Green;
-				Blue  += Source->Blue;
-				Source++;
+			Alpha += Source->Alpha;
+			Red   += Source->Red;
+			Green += Source->Green;
+			Blue  += Source->Blue;
 
-				Alpha += Source->Alpha;
-				Red   += Source->Red;
-				Green += Source->Green;
-				Blue  += Source->Blue;
-
-				ZEColorARGB* Destination = (ZEColorARGB*)((ZEUInt8*)DestinationData + DestinationPitch * y + x * 4);
-				Destination->Alpha = Alpha / 4;
-				Destination->Red   = Red   / 4;
-				Destination->Green = Green / 4;
-				Destination->Blue  = Blue  / 4;
-			}
+			ZEColorRGBA* Destination = (ZEColorRGBA*)((ZEUInt8*)DestinationData + DestinationPitch * y + x * 4);
+			Destination->Alpha = Alpha / 4;
+			Destination->Red   = Red   / 4;
+			Destination->Green = Green / 4;
+			Destination->Blue  = Blue  / 4;
 		}
-	}	
+	}
 }
 
 // Takes average of two uncompressed image which have same dimensions
@@ -328,21 +316,21 @@ void ZETextureTools::Average(void* DestinationData, const ZESize DestinationPitc
 		return;
 	}
 
-	struct ZEColorARGB
+	struct ZEColorRGBA
 	{
-		ZEUInt8 Alpha;
 		ZEUInt8 Red;
-		ZEUInt8 Blue;
 		ZEUInt8 Green;
+		ZEUInt8 Blue;
+		ZEUInt8 Alpha;
 	};
 
 	for (ZESize y = 0; y < (ZESize)SourceHeight1; y++)
 	{
 		for (ZESize x = 0; x < (ZESize)SourceWidth1; x++)
 		{
-			ZEColorARGB* Source1 = (ZEColorARGB*)((ZEUInt8*)SourceData1 + SourcePitch1 * y + x * 4);
-			ZEColorARGB* Source2 = (ZEColorARGB*)((ZEUInt8*)SourceData2 + SourcePitch2 * y + x * 4);
-			ZEColorARGB* Destination = (ZEColorARGB*)((ZEUInt8*)DestinationData + DestinationPitch * y + x * 4);
+			ZEColorRGBA* Source1 = (ZEColorRGBA*)((ZEUInt8*)SourceData1 + SourcePitch1 * y + x * 4);
+			ZEColorRGBA* Source2 = (ZEColorRGBA*)((ZEUInt8*)SourceData2 + SourcePitch2 * y + x * 4);
+			ZEColorRGBA* Destination = (ZEColorRGBA*)((ZEUInt8*)DestinationData + DestinationPitch * y + x * 4);
 
 			Destination->Alpha	= (Source1->Alpha + Source2->Alpha) / 2;
 			Destination->Green	= (Source1->Green + Source2->Green) / 2;

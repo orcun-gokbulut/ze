@@ -57,11 +57,11 @@ class ZETextureTools
 		static bool					IsResizeable(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount = 1, const ZEUInt VertTileCount = 1, const ZETextureType TextureType = ZE_TT_2D);
 		static ZEUInt				GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount = 1, const ZEUInt VertTileCount = 1, const ZETextureType TextureType = ZE_TT_2D);
 
-		static void					CompressTexture(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, 
+		static void					Compress(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, 
 													const ZEUInt SourceWidth, const ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions = NULL);
 
 		static void					DownSample2x(	void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch,
-													const ZEUInt SourceWidth, const ZEUInt SourceHeight, bool UseGpu = true);
+													const ZEUInt SourceWidth, const ZEUInt SourceHeight);
 
 		static void					Average(void* DestinationData, const ZESize DestinationPitch, const void* SourceData1, const ZESize SourcePitch1,
 											const ZEUInt SourceWidth1, const ZEUInt SourceHeight1, const void* SourceData2, const ZESize SourcePitch2,

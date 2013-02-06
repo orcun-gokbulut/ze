@@ -35,9 +35,9 @@
 
 #include "ZEModel.h"
 #include "ZEModelFileFormat.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZERenderer/ZESimpleMaterial.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGame/ZEScene.h"
@@ -109,6 +109,7 @@ void ZEModel::UpdateTransforms()
 
 void ZEModel::DebugDraw(ZERenderer* Renderer)
 {
+	/*
 	if (DebugDrawComponents.Material == NULL)
 	{
 		DebugDrawComponents.Material = ZESimpleMaterial::CreateInstance();
@@ -116,23 +117,23 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 		DebugDrawComponents.BonePositionsRenderCommand.SetZero();
 		DebugDrawComponents.BonePositionsRenderCommand.Material = DebugDrawComponents.Material;
 		DebugDrawComponents.BonePositionsRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM;
-		DebugDrawComponents.BonePositionsRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-		DebugDrawComponents.BonePositionsRenderCommand.VertexBuffer = &DebugDrawComponents.BonePositionsCanvas;
-		DebugDrawComponents.BonePositionsRenderCommand.PrimitiveType = ZE_ROPT_POINT;
+		DebugDrawComponents.BonePositionsRenderCommand.InputStage.SetVertexLayout(ZECanvasVertex::GetVertexLayout());
+		DebugDrawComponents.BonePositionsRenderCommand.InputStage.SetVertexBuffer(0, &DebugDrawComponents.BonePositionsCanvas);
+		DebugDrawComponents.BonePositionsRenderCommand.PrimitiveType = ZE_ROPT_POINT_LIST;
 
 		DebugDrawComponents.BonesRenderCommand.SetZero();
 		DebugDrawComponents.BonesRenderCommand.Material = DebugDrawComponents.Material;
 		DebugDrawComponents.BonesRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM;
-		DebugDrawComponents.BonesRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+		DebugDrawComponents.BonesRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexLayout();
 		DebugDrawComponents.BonesRenderCommand.VertexBuffer = &DebugDrawComponents.BonesCanvas;
-		DebugDrawComponents.BonesRenderCommand.PrimitiveType = ZE_ROPT_LINE;
+		DebugDrawComponents.BonesRenderCommand.PrimitiveType = ZE_ROPT_LINE_LIST;
 
 		DebugDrawComponents.BoxRenderCommand.SetZero();
 		DebugDrawComponents.BoxRenderCommand.Material = DebugDrawComponents.Material;
 		DebugDrawComponents.BoxRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_NO_Z_WRITE;
-		DebugDrawComponents.BoxRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+		DebugDrawComponents.BoxRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexLayout();
 		DebugDrawComponents.BoxRenderCommand.VertexBuffer = &DebugDrawComponents.BoxCanvas;
-		DebugDrawComponents.BoxRenderCommand.PrimitiveType = ZE_ROPT_LINE;
+		DebugDrawComponents.BoxRenderCommand.PrimitiveType = ZE_ROPT_LINE_LIST;
 	}
 
 	DebugDrawComponents.BonesCanvas.Clean();
@@ -152,11 +153,11 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 			if (Bones[I].GetParentBone() != NULL)
 				DebugDrawComponents.BonesCanvas.AddLine(Bones[I].GetWorldPosition(), Bones[I].GetParentBone()->GetWorldPosition());
 		}
-		//DebugDrawComponents.BonesRenderCommand.WorldMatrix = GetWorldTransform();
+		DebugDrawComponents.BonesRenderCommand.WorldMatrix = GetWorldTransform();
 		DebugDrawComponents.BonesRenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
 		DebugDrawComponents.BonesRenderCommand.PrimitiveCount = DebugDrawComponents.BonesCanvas.Vertices.GetCount() / 2;
 
-		//DebugDrawComponents.BonePositionsRenderCommand.WorldMatrix = GetWorldTransform();
+		DebugDrawComponents.BonePositionsRenderCommand.WorldMatrix = GetWorldTransform();
 		DebugDrawComponents.BonePositionsRenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
 		DebugDrawComponents.BonePositionsRenderCommand.PrimitiveCount = DebugDrawComponents.BonePositionsCanvas.Vertices.GetCount();
 
@@ -172,6 +173,8 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 	DebugDrawComponents.BoxRenderCommand.PrimitiveCount = DebugDrawComponents.BoxCanvas.Vertices.GetCount() / 2;
 	DebugDrawComponents.BoxRenderCommand.Order = 0.0f;
 	Renderer->AddToRenderList(&DebugDrawComponents.BoxRenderCommand);
+
+	*/
 
 }
 
@@ -531,10 +534,16 @@ ZEModel::ZEModel()
 ZEModel::~ZEModel()
 {
 	if (DebugDrawComponents.Material != NULL)
-		DebugDrawComponents.Material->Release();
+	{
+		DebugDrawComponents.Material->Destroy();
+		DebugDrawComponents.Material = NULL;
+	}
 
 	if (ModelResource != NULL)
+	{
+		// convert release to destroy
 		((ZEModelResource*)ModelResource)->Release();
+	}
 }
 
 bool ZEModel::Initialize()

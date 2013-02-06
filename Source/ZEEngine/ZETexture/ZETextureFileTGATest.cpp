@@ -41,7 +41,7 @@
 #include "ZETextureData.h"
 #include "ZETextureFileTGA.h"
 
-static bool CompareImages(ZEBitmap* Original, ZEUInt32* Data, ZESize Width, ZESize Height)
+static bool TestSuccess(ZEString FileName)
 {
 	if (Original->GetWidth() != Width || Original->GetHeight() != Height)
 		return false;
@@ -80,7 +80,7 @@ static bool TestSuccess(ZEString FileName)
 
 	return true;// CompareImages(&Original, (ZEUInt32*)Level->GetData(), Data->GetWidth(), Data->GetHeight());
 }
-
+ 
 static bool TestFail(ZEString FileName)
 {
 	ZEPointer<ZEFile> File = ZEFile::Open(FileName);

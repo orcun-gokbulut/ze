@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZEUIControl.h"
 #include "ZEUIButtonControl.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZERenderer/ZEFixedMaterial.h"
 
 enum ZESliderControlState
 {

@@ -37,22 +37,10 @@
 #include "ZEDS/ZEPointer.h"
 #include "ZEDS/ZEString.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEBitmap.h"
 #include "ZETextureData.h"
 #include "ZETextureFileTIFF.h"
-
-static bool CompareImages(ZEBitmap* Original, ZEUInt32* Data, ZESize Width, ZESize Height)
-{
-	if (Original->GetWidth() != Width || Original->GetHeight() != Height)
-		return false;
-
-	for (ZESize y = 0; y < Height; y++)
-		for (ZESize x = 0; x < Width; x++)
-			if (((ZEUInt32*)Original->GetPixels())[y * Width + x] != Data[y * Width + x])
-				return false;
-
-	return true;
-}
+#include "ZETextureTestUtils.h"
+#include "ZETextureLoader.h"
 
 static bool TestSuccess(ZEString FileName)
 {
@@ -63,30 +51,25 @@ static bool TestSuccess(ZEString FileName)
 	if (!Loader.LoadInfo(&Info, File))
 		return false;
 
-	ZETextureData* Data = Loader.Load(File);
-
+	ZEPointer<ZETextureData> Data = Loader.Load(&File);
 	if (Data == NULL)
 		return false;
 
-	ZEBitmap Original;
-	if (!Original.Load(FileName))
-		return false;
-	ZETextureLevel* Level = &Data->GetSurfaces()[0].GetLevels()[0];
-
-	ZEBitmap Bitmap;
-	Bitmap.Create(Level->GetWidth(), Level->GetHeight(), 4);
-	Bitmap.CopyFrom(Level->GetData(), Level->GetPitch(), Level->GetWidth(), Level->GetHeight());
-	Bitmap.Save(FileName + ".result.bmp", ZE_BFF_BMP);
-
-	return CompareImages(&Original, (ZEUInt32*)Level->GetData(), Data->GetWidth(), Data->GetHeight());
+	return ZETextureTestUtils::Compare(Data, FileName + ".zeTexture");
 }
 
 static bool TestFail(ZEString FileName)
 {
-	ZEPointer<ZEFile> File = ZEFile::Open(FileName);
+	ZELogType OldLogType = ZELog::GetInstance()->GetMinimumLogLevel();
+	ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_CRITICAL_ERROR);
+
+	ZEFile File;
+	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 
 	ZETextureFileTIFF Loader;
-	ZETextureData* Data = Loader.Load(File);
+	ZEPointer<ZETextureData> Data = Loader.Load(&File);
+
+	ZELog::GetInstance()->SetMinimumLogLevel(OldLogType);
 
 	return Data == NULL;
 }
@@ -95,6 +78,43 @@ ZETestSuite(ZETextureFileTIFFTest)
 {
 	ZETest("Valid Samples")
 	{
-		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/flower-rgb-planar-08.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/INDEXED_LE_NONE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/INDEXED_LZW.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/L16_LE_NONE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/L8_LE_NONE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/L8_NONE_TILE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/L8_RLE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/LA16_BE_NONE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/LA16_LE_NONE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/LA8_LE_NONE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGB16_LE_NONE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGB8_LE_NONE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGB8_LZW.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGB8_LZW_PLANAR.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGB8_LZW_TILE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGB8_NONE_TILE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGBA16_BE_DEFLATE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGBA16_BE_LZW.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGBA16_BE_NONE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGBA16_LE_DEFLATE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGBA16_LE_LZW.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGBA16_LE_NONE.tif"));
+		ZETestCheck(TestSuccess("TestResources/ZETextureFileTIFF/Supported/RGBA8_LE_NONE.tif"));
+
+	}
+
+	ZETest("Ilvalid Samples")
+	{
+		ZETestCheck(TestFail("Non Existent File"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileTIFF/Unsupported/HALFTONE_1.tif"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileTIFF/Unsupported/HALFTONE_2.tif"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileTIFF/Unsupported/HALFTONE_3.tif"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileTIFF/Unsupported/HALFTONE_4.tif"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileTIFF/Unsupported/L1.tif"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileTIFF/Unsupported/L1_2.tif"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileTIFF/Unsupported/L4.tif"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileTIFF/Unsupported/YCbCr_JPEG.tif"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileTIFF/Unsupported/YCbCr_JPEG_2.tif"));
+		ZETestCheck(TestFail("TestResources/ZETextureFileTIFF/Unsupported/YCbCr_LZW.tif"));
 	}
 }

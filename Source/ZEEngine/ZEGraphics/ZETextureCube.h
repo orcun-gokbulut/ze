@@ -33,14 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef __ZE_TEXTURE_CUBE_H__
 #define __ZE_TEXTURE_CUBE_H__
 
 #include "ZETypes.h"
 #include "ZETexture.h"
-
-class ZERenderTarget;
 
 enum ZETextureCubeFace
 {
@@ -52,34 +49,36 @@ enum ZETextureCubeFace
 	ZE_CTF_NEGATIVEZ	= 5
 };
 
+class ZETextureData;
+class ZERenderTarget;
+
 class ZETextureCube : public ZETexture
 {
-	protected:
+	friend class ZEGraphicsDevice;
+	friend class ZEGraphicsModule;
+
+	// Should be public for only internal usage
+	public:
 		ZEUInt						EdgeLength;
 		ZEUInt						LevelCount;
-		ZETexturePixelFormat		PixelFormat;
-		bool						RenderTarget;
 
+	protected:
 									ZETextureCube();
 		virtual						~ZETextureCube();
 
 	public:
-		virtual ZETextureType		GetTextureType() const;
-		ZEUInt						GetLevelCount() const;
 		ZEUInt						GetEdgeLenght() const;
-		ZETexturePixelFormat		GetPixelFormat() const;
-		bool						IsRenderTarget() const;
+		ZEUInt						GetLevelCount() const;
+		
+		virtual	ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
 
-		virtual ZERenderTarget*			GetViewPort(ZETextureCubeFace Face) = 0;
-
-		virtual	bool				Create(ZEUInt EdgeLength, ZEUInt Levels, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
-		virtual bool				Lock(ZETextureCubeFace Face, ZEUInt Level, void** Buffer, ZESize* Pitch) = 0;
-		virtual void				Unlock(ZETextureCubeFace Face, ZEUInt Level) = 0;
+		virtual	bool				CreateDynamic(ZEUInt EdgeLength, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat) = 0;
+		virtual	bool				CreateStatic(ZEUInt EdgeLength, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL) = 0;
+		
+		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZETextureCubeFace Face, ZEUInt Level) = 0;
+		virtual bool				Unlock(ZETextureCubeFace Face, ZEUInt Level) = 0;
 
 		static ZETextureCube*		CreateInstance();
 };
+
 #endif
-
-
-
-

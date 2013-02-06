@@ -131,6 +131,12 @@ ze_add_source(ZETextureOptions.cpp						Sources)
 ze_add_source(ZETextureOptions.h						Sources Headers)
 ze_add_source(ZETextureQualityManager.cpp				Sources)
 ze_add_source(ZETextureQualityManager.h					Sources Headers)
+ze_add_source(ZETextureFilters.cpp						Sources)
+ze_add_source(ZETextureFilters.h						Sources Headers)
+ze_add_source(ZETextureResizer.cpp						Sources)
+ze_add_source(ZETextureResizer.h						Sources Headers)
+ze_add_source(ZETextureCompressor.cpp					Sources)
+ze_add_source(ZETextureCompressor.h						Sources Headers)
 ze_add_source(ZETextureTools.cpp						Sources)
 ze_add_source(ZETextureTools.h							Sources Headers)
 ze_add_source(ZEDecompressorLZW.cpp						Sources)
@@ -142,7 +148,7 @@ ze_add_source(ZEDecompressorLZW.h						Sources Headers)
 ze_add_library(ZETexture 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEDS libATICompress libfreeimage
+	LIBS ZEFoundation libfreeimage libATICompress ZEDirect3D10
 	INSTALL
 	INSTALL_DESTINATION "ZEEngineAPI/ZETexture"
 	INSTALL_COMPONENT Header)

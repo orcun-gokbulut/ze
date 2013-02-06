@@ -342,8 +342,14 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
 
+	ZEUInt Width = ProcessedTextureData.GetWidth();
+	ZEUInt Height = ProcessedTextureData.GetHeight();
+	ZEUInt Surfaces = ProcessedTextureData.GetSurfaceCount();
+	ZEUInt Levels = ProcessedTextureData.GetLevelCount();
+	ZETexturePixelFormat Format = ProcessedTextureData.GetPixelFormat();
+
 	// Create the Texture
-	if (!Texture->Create(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetHeight(), ProcessedTextureData.GetSurfaceCount(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat()))
+	if (!Texture->CreateStatic(Width, Height, Surfaces, Levels, Format, false, &ProcessedTextureData))
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
 		ProcessedTextureData.Destroy();
@@ -352,7 +358,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 		return NULL;
 	}
 
-	CopyToTexture3D(Texture, &ProcessedTextureData);
+	// CopyToTexture3D(Texture, &ProcessedTextureData);
 
 	TempTextureData.Destroy();
 	ProcessedTextureData.Destroy();

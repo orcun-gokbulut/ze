@@ -36,8 +36,8 @@
 #include "ZESceneCuller.h"
 #include "ZEScene.h"
 #include "ZEEntity.h"
-#include "ZEGraphics/ZELight.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZELight.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEDrawParameters.h"
 #include "ZEMath/ZEViewVolume.h"
 
@@ -75,7 +75,7 @@ bool ZESceneCuller::CullLight(ZELight* Light, ZEDrawParameters* DrawParameters)
 		return false;
 	}
 
-	Statistics.DrawedLightCount++;	
+	Statistics.DrawedLightCount++;
 	
 	return true;
 }
@@ -93,7 +93,6 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 			{
 				DrawParameters->Renderer->AddToLightList((ZELight*)Entities[I]);	
 				DebugDrawLight((ZELight*)Entities[I], DrawParameters);
-//				((ZELight*)Entities[I])->RenderShadowMap(this*, ShadowRenderer);
 			}
 		}
 
@@ -190,7 +189,7 @@ void ZESceneCuller::CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 
 	DebugDraw.Clean();
 
-	if (DrawParameters->Renderer->GetRendererType() == ZE_RT_FRAME)
+	//if (DrawParameters->Renderer->GetRendererType() == ZE_RT_FRAME)
 		CullLights(Scene, DrawParameters);
 
 	CullEntities(Scene, DrawParameters);

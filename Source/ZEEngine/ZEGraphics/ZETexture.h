@@ -37,53 +37,69 @@
 #ifndef __ZE_TEXTURE_H__
 #define __ZE_TEXTURE_H__
 
+
+#include "ZETypes.h"
+
 enum ZETextureType
 {
-	ZE_TT_2D,
-	ZE_TT_3D,
-	ZE_TT_CUBE
+	ZE_TT_NONE		= 0,
+	ZE_TT_2D		= 1,
+	ZE_TT_3D		= 2,
+	ZE_TT_CUBE		= 3
 };
 
 enum ZETexturePixelFormat
 {
 	ZE_TPF_NOTSET,
 
-	// Integer Formats
 	ZE_TPF_I8,
 	ZE_TPF_I8_2,
 	ZE_TPF_I8_4,
+
 	ZE_TPF_I16,
 	ZE_TPF_I16_2,
 	ZE_TPF_I16_4,
+
 	ZE_TPF_I32,
 
-	// Floating Point Formats
 	ZE_TPF_F16,
 	ZE_TPF_F16_2,
 	ZE_TPF_F16_4,
+
 	ZE_TPF_F32,
 	ZE_TPF_F32_2,
 	ZE_TPF_F32_4,
 
-	// Compressed Formats
 	ZE_TPF_DXT1,
 	ZE_TPF_DXT3,
-	ZE_TPF_DXT5,
+	ZE_TPF_DXT5
 };
 
 class ZETexture
 {
+	friend class ZEGraphicsDevice;
+	friend class ZEGraphicsModule;
+
+	// Should be public for only internal usage
+	public:
+		bool						Static;
+		bool						RenderTarget;
+		ZETextureType				TextureType;
+		ZETexturePixelFormat		PixelFormat;
+
 	protected:
-										ZETexture();
-		virtual							~ZETexture();
+									ZETexture();
+		virtual						~ZETexture();
 
 	public:
-		virtual ZETextureType			GetTextureType() const = 0;
+		bool						IsStatic() const;
+		bool						IsRenderTarget() const;
+		ZETextureType				GetTextureType() const;
+		ZETexturePixelFormat		GetPixelFormat() const;
 
-		virtual bool					IsEmpty() const = 0;
+		virtual void				Destroy();
 
-		virtual void					Release() = 0;
-		virtual void					Destroy() = 0;
+		virtual bool				IsEmpty() const = 0;
 };
 
 #endif

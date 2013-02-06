@@ -49,7 +49,7 @@ ZESize ZED3D9VertexDeclaration::GetVertexSize()
 
 void ZED3D9VertexDeclaration::SetupVertexDeclaration()
 {
-	GetDevice()->SetVertexDeclaration(VertexDeclaration);
+	Device->SetVertexDeclaration(VertexDeclaration);
 }
 
 bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Elements, ZESize ElementCount)
@@ -149,7 +149,7 @@ bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Ele
 	D3DElements[ElementCount].Usage = 0;
 	D3DElements[ElementCount].UsageIndex = 0;
 
-	if (GetDevice()->CreateVertexDeclaration(D3DElements, &VertexDeclaration) != D3D_OK)
+	if (Device->CreateVertexDeclaration(D3DElements, &VertexDeclaration) != D3D_OK)
 	{
 		zeError("Can not create vertex declaration.");
 		Release();

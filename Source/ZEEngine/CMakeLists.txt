@@ -56,10 +56,11 @@ add_subdirectory(ZEMeta)
 add_subdirectory(ZEModel)
 add_subdirectory(ZEParticle)
 add_subdirectory(ZEPhysics)
+add_subdirectory(ZERenderer)
 add_subdirectory(ZEScript)
 add_subdirectory(ZESound)
 add_subdirectory(ZEUI)
-add_subdirectory(ZETerrain)
+#add_subdirectory(ZETerrain)
 add_subdirectory(ZENetwork)
 
 ze_add_source(ZEAPI.h 						Sources Headers)
@@ -72,9 +73,7 @@ ze_add_source(ZESDK.cpp 					Sources)
 ze_add_library(ZEEngineAPI 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-		ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEMap ZEPortalMap ZEModel ZEParticle
-		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEAI ZETerrain ZENetwork ZETexture ZEOpenGL
+	LIBS ZECore ZEGraphics ZETexture ZERenderer ZEGame ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEMap ZEPortalMap ZEModel ZEParticle ZEAI ZENetwork  ZEModules
 	INSTALL
 	INSTALL_DESTINATION "ZEEngineAPI"
 	INSTALL_COMPONENT ZESDK)

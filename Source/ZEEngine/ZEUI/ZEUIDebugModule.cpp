@@ -39,7 +39,7 @@
 #include "ZEGame/ZEGame.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 
 #include "ZEUI/ZEUICursorControl.h"
 #include "ZEUI/ZEUIManager.h"

@@ -37,13 +37,13 @@
 #include "ZEVertexDeclaration.h"
 #include "ZEError.h"
 
-ZEVertexDeclaration* ZESimpleVertex::VertexDeclaration;
-ZEVertexDeclaration* ZESimpleVertex::GetVertexDeclaration()
+ZEVertexLayout* ZESimpleVertex::VertexDeclaration;
+ZEVertexLayout* ZESimpleVertex::GetVertexDeclaration()
 {
 	if (VertexDeclaration != NULL)
 		return VertexDeclaration;
 
-	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
+	VertexDeclaration = ZEVertexLayout::CreateInstance();
 
 	ZEVertexElement ElementArray[] = {
 										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
@@ -52,25 +52,26 @@ ZEVertexDeclaration* ZESimpleVertex::GetVertexDeclaration()
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT4, 1}
 									};
 
-
+	zeCriticalError("Remove this function");
+	/*
 	if (!VertexDeclaration->Create(ElementArray, 4))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
 	}
-
-	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZESimpleVertex), "Vertex decleration size does not matches.");
+	*/
+	//zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZESimpleVertex), "Vertex decleration size does not matches.");
 
 	return VertexDeclaration;
 }
-
-ZEVertexDeclaration* ZEMapVertex::VertexDeclaration = NULL;
-ZEVertexDeclaration* ZEMapVertex::GetVertexDeclaration()
+/*
+ZEVertexLayout* ZEMapVertex::VertexDeclaration = NULL;
+ZEVertexLayout* ZEMapVertex::GetVertexDeclaration()
 {
 	if (VertexDeclaration != NULL)
 		return VertexDeclaration;
 
-	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
+	VertexDeclaration = ZEVertexLayout::CreateInstance();
 
 	ZEVertexElement ElementArray[] = {
 		{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
@@ -80,24 +81,26 @@ ZEVertexDeclaration* ZEMapVertex::GetVertexDeclaration()
 		{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
 	};
 	
+	zeCriticalError("Remove this function");
+	
 	if (!VertexDeclaration->Create(ElementArray, 5))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
 	}
-
-	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEMapVertex), "Vertex decleration size does not matches.");
+	
+	//zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEMapVertex), "Vertex decleration size does not matches.");
 
 	return VertexDeclaration;
 }
-
-ZEVertexDeclaration* ZEModelVertex::VertexDeclaration = NULL;
-ZEVertexDeclaration* ZEModelVertex::GetVertexDeclaration()
+*/
+ZEVertexLayout* ZEModelVertex::VertexDeclaration = NULL;
+ZEVertexLayout* ZEModelVertex::GetVertexDeclaration()
 {
 	if (VertexDeclaration != NULL)
 		return VertexDeclaration;
 
-	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
+	VertexDeclaration = ZEVertexLayout::CreateInstance();
 
 	ZEVertexElement ElementArray[] = {
 										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
@@ -106,25 +109,26 @@ ZEVertexDeclaration* ZEModelVertex::GetVertexDeclaration()
 										{ZE_VES_BINORMAL, ZE_VET_FLOAT3, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
 									};
-
+	zeCriticalError("Remove this function");
+	/*
 	if (!VertexDeclaration->Create(ElementArray, 5))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
 	}
-
-	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEModelVertex), "Vertex decleration size does not matches.");
+	*/
+	//zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEModelVertex), "Vertex decleration size does not matches.");
 
 	return VertexDeclaration;
 }
 
-ZEVertexDeclaration* ZESkinnedModelVertex::VertexDeclaration = NULL;
-ZEVertexDeclaration* ZESkinnedModelVertex::GetVertexDeclaration()
+ZEVertexLayout* ZESkinnedModelVertex::VertexDeclaration = NULL;
+ZEVertexLayout* ZESkinnedModelVertex::GetVertexDeclaration()
 {
 	if (VertexDeclaration != NULL)
 		return VertexDeclaration;
 
-	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
+	VertexDeclaration = ZEVertexLayout::CreateInstance();
 
 	ZEVertexElement ElementArray[] = {
 										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
@@ -136,61 +140,67 @@ ZEVertexDeclaration* ZESkinnedModelVertex::GetVertexDeclaration()
 										{ZE_VES_BLENDWEIGHT, ZE_VET_FLOAT4, 0},
 									};
 
+	zeCriticalError("Remove this function");
+
+	/*
 	if (!VertexDeclaration->Create(ElementArray, 7))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
 	}
-
-	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZESkinnedModelVertex), "Vertex decleration size does not matches.");
+	*/
+	//zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZESkinnedModelVertex), "Vertex decleration size does not matches.");
 
 	return VertexDeclaration;
 }
 
-ZEVertexDeclaration* ZEUIVertex::VertexDeclaration = NULL;
-ZEVertexDeclaration* ZEUIVertex::GetVertexDeclaration()
+ZEVertexLayout* ZEUIVertex::VertexDeclaration = NULL;
+ZEVertexLayout* ZEUIVertex::GetVertexDeclaration()
 {
 	if (VertexDeclaration != NULL)
 		return VertexDeclaration;
 
-	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
+	VertexDeclaration = ZEVertexLayout::CreateInstance();
 
 	ZEVertexElement ElementArray[] = {
 										{ZE_VES_POSITION, ZE_VET_FLOAT2, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT4, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 1},
 									};
-
+	
+	zeCriticalError("Remove this function");
+	/*
 	if (!VertexDeclaration->Create(ElementArray, 3))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
 	}
-
-	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEUIVertex), "Vertex decleration size does not matches.");
+	*/
+	//zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEUIVertex), "Vertex decleration size does not matches.");
 	return VertexDeclaration;
 }
 
-ZEVertexDeclaration* ZEColoredVertex::VertexDeclaration = NULL;
-ZEVertexDeclaration* ZEColoredVertex::GetVertexDeclaration()
+ZEVertexLayout* ZEColoredVertex::VertexDeclaration = NULL;
+ZEVertexLayout* ZEColoredVertex::GetVertexDeclaration()
 {
 	if (VertexDeclaration != NULL)
 		return VertexDeclaration;
 
-	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
+	VertexDeclaration = ZEVertexLayout::CreateInstance();
 
 	ZEVertexElement ElementArray[] = {
 										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT4, 1},
 									};
-
+	zeCriticalError("Remove this function");
+	/*
 	if (!VertexDeclaration->Create(ElementArray, 2))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
 	}
-
-	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEColoredVertex), "Vertex decleration size does not matches.");
+	*/
+	//zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEColoredVertex), "Vertex decleration size does not matches.");
 	return VertexDeclaration;
 }
 

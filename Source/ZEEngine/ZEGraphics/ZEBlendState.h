@@ -33,15 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_BLEND_STATE_H__
-#define __ZE_BLEND_STATE_H__
+#ifndef __ZE_DEVICE_STATE_BLEND_H__
+#define __ZE_DEVICE_STATE_BLEND_H__
 
+#include "ZETypes.h"
 #include "ZEFoundation/ZEDS/ZEFlags.h"
+
+
+#define ZE_MAX_RENDER_TARGET_SLOT		8
 
 enum ZEBlendOption 
 {	
-	// In OpenGL 'ONE_MINUS' is the equivalent of 'INV'
-	ZE_BO_CURRENT				= 0,
 	ZE_BO_ZERO					= 1,
 	ZE_BO_ONE					= 2,
 	ZE_BO_SRC_COLOR				= 3,
@@ -53,63 +55,94 @@ enum ZEBlendOption
 	ZE_BO_DEST_COLOR			= 9,
 	ZE_BO_INV_DEST_COLOR		= 10,
 	ZE_BO_SRC_ALPHA_SAT			= 11,
-//	ZE_BO_SRC1_COLOR			= 16,
-//	ZE_BO_INV_SRC1_COLOR		= 17,
-//	ZE_BO_SRC1_ALPHA			= 18,
-//	ZE_BO_INV_SRC1_ALPHA		= 19 
+	ZE_BO_BLEND_FACTOR			= 12,
+	ZE_BO_INV_BLEND_FACTOR		= 13,
+	ZE_BO_SRC1_COLOR			= 14,
+	ZE_BO_INV_SRC1_COLOR		= 15,
+	ZE_BO_SRC1_ALPHA			= 16,
+	ZE_BO_INV_SRC1_ALPHA		= 17
 };
 
 enum ZEBlendEquation 
 { 
-	ZE_BE_CURRENT			= 0, 
-	ZE_BE_ADD				= 1,
-	ZE_BE_SUBTRACT			= 2,
-	ZE_BE_REV_SUBTRACT		= 3,
-	ZE_BE_MIN				= 4,
-	ZE_BE_MAX				= 5 
+	ZE_BE_ADD					= 1,
+	ZE_BE_SUBTRACT				= 2,
+	ZE_BE_REV_SUBTRACT			= 3,
+	ZE_BE_MIN					= 4,
+	ZE_BE_MAX					= 5 
 };
 
-typedef ZEFlags ZEColorChannelMask;
-#define	ZE_CCM_RED		0x1
-#define	ZE_CCM_GREEN	0x2
-#define	ZE_CCM_BLUE		0x4
-#define	ZE_CCM_ALPHA	0x8
 
-class ZEBlendState
+#define ZE_CCM_NONE				0x0
+#define	ZE_CCM_RED				0x1
+#define	ZE_CCM_GREEN			0x2
+#define	ZE_CCM_BLUE				0x4
+#define	ZE_CCM_ALPHA			0x8
+#define ZE_CCM_ALL				ZE_CCM_RED | ZE_CCM_GREEN | ZE_CCM_BLUE | ZE_CCM_ALPHA
+typedef ZEFlagsBase<ZEUInt8>	ZEColorChannelMask;
+
+class ZEDeviceStateBlend
 {
-protected:
-	bool						BlendEnable;
-	ZEBlendOption				SourceColorBlendOption;
-	ZEBlendOption				DestinationColorBlendOption;
-	ZEBlendOption				SourceAlphaBlendOption;
-	ZEBlendOption				DestinationAlphaBlendOption;
-	ZEBlendEquation				BlendEquation;
-	ZEColorChannelMask			ColorChannelMask;
+	friend class ZEGraphicsDevice;
+	friend class ZEDeviceStageOutput;
 
-	bool						Changed;
+	// Should be public for only internal usage
+	public:
+		ZEUInt64					Hash;
+		bool						Dirty;
+		
+		struct ZEBlendStateData
+		{
+			bool					AlphaToCoverageEnable;
+			ZEBlendOption			SourceBlendOption;
+			ZEBlendOption			DestinationBlendOption;
+			ZEBlendEquation			BlendEquation;
+			ZEBlendOption			SourceBlendAlphaOption;
+			ZEBlendOption			DestinationBlendAlphaOption;
+			ZEBlendEquation			BlendAlphaEquation;
+			bool					BlendEnable[ZE_MAX_RENDER_TARGET_SLOT];
+			ZEColorChannelMask		ColorChannelMask[ZE_MAX_RENDER_TARGET_SLOT];
 
-public:
-	void						SetBlendEnable(bool Enable);	
-	bool						GetBlendEnable() const;
-	void						SetSourceColorBlendOption(ZEBlendOption Option);
-	ZEBlendOption				GetSourceColorBlendOption() const;
-	void						SetDestinationColorBlendOption(ZEBlendOption Option);
-	ZEBlendOption				GetDestinationColorBlendOption() const;
-	void						SetSourceAlphaBlendOption(ZEBlendOption Option);
-	ZEBlendOption				GetSourceAlphaBlendOption() const;
-	void						SetDestinationAlphaBlendOption(ZEBlendOption Option);
-	ZEBlendOption				GetDestinationAlphaBlendOption() const;
-	void						SetBlendEquation(ZEBlendEquation Equation);
-	ZEBlendEquation				GetBlendEquation() const;
-	void						SetColorChannelMask(ZEUInt Mask);
-	ZEColorChannelMask			GetColorChannelMask() const;
-	void						SetChanged(bool Change);
-	bool						GetChanged() const;
+		} StateData;
 
-	const ZEBlendState&			operator=(const ZEBlendState& State);
+		void						UpdateHash();
+		
+	public:
+		void						SetAlphaToCoverageEnable(bool Enable);
+		bool						GetAlphaToCoverageEnable() const;
 
-								ZEBlendState();
-	virtual						~ZEBlendState();
+		void						SetBlendEnable(ZESize Target, bool Enable);
+		bool						GetBlendEnable(ZESize Target) const;
+		
+		void						SetSourceBlendOption(ZEBlendOption Option);
+		ZEBlendOption				GetSourceBlendOption() const;
+		
+		void						SetDestinationBlendOption(ZEBlendOption Option);
+		ZEBlendOption				GetDestinationBlendOption() const;
+
+		void						SetBlendEquation(ZEBlendEquation Equation);
+		ZEBlendEquation				GetBlendEquation() const;
+
+		void						SetSourceBlendAlphaOption(ZEBlendOption Option);
+		ZEBlendOption				GetSourceBlendAlphaOption() const;
+		
+		void						SetDestinationBlendAlphaOption(ZEBlendOption Option);
+		ZEBlendOption				GetDestinationBlendAlphaOption() const;
+		
+		void						SetBlendAlphaEquation(ZEBlendEquation Equation);
+		ZEBlendEquation				GetBlendAlphaEquation() const;
+
+		void						SetColorChannelMask(ZESize Target, ZEColorChannelMask Mask);
+		ZEColorChannelMask			GetColorChannelMask(ZESize Target) const;
+
+		void						SetToDefault();
+		
+		const ZEDeviceStateBlend&	operator=(const ZEDeviceStateBlend& State);
+		bool						operator==(const ZEDeviceStateBlend& State);
+		bool						operator!=(const ZEDeviceStateBlend& State);
+
+									ZEDeviceStateBlend();
+		virtual						~ZEDeviceStateBlend();
 
 };
 #endif

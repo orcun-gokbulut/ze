@@ -35,7 +35,40 @@
 
 #include "ZERenderTarget.h"
 
+ZERenderTarget::ZERenderTarget()
+{
+	Width = 0;
+	Height = 0;
+	PixelFormat = ZE_TPF_NOTSET;
+	RenderTargetType = ZE_TT_NONE;
+}
+
 ZERenderTarget::~ZERenderTarget()
 {
 
+}
+
+ZEUInt ZERenderTarget::GetWidth() const
+{
+	return Width;
+}
+		
+ZEUInt ZERenderTarget::GetHeight() const
+{
+	return Height;
+}
+		
+ZETexturePixelFormat ZERenderTarget::GetPixelFormat() const
+{
+	return PixelFormat;
+}
+
+ZERenderTargetType ZERenderTarget::GetRenderTargetType() const
+{
+	return RenderTargetType;
+}
+
+void ZERenderTarget::Destroy()
+{
+	delete this;
 }

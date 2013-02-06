@@ -36,7 +36,7 @@
 #include "ZEUIMultiLineTextEdit.h"
 #include "ZEFontResource.h"
 #include "ZEUIRenderer.h"
-#include "ZEGraphics/ZEUIMaterial.h"
+#include "ZERenderer/ZEUIMaterial.h"
 
 void ZEUIMultiLineTextEdit::KeyPressed(unsigned char Key)
 {

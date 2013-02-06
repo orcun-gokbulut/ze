@@ -48,7 +48,7 @@
 template <typename Type>
 class ZEAllocatorBase
 {
-	protected:
+	public:
 		ZESize				Size;
 
 	public:	

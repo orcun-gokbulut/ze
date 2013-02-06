@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESceneDebugDraw.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZESimpleMaterial.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEBSphere.h"
@@ -88,6 +88,7 @@ void ZESceneDebugDraw::Clean()
 
 bool ZESceneDebugDraw::Initialize()
 {
+	/*
 	if (Initialized)
 		return false;
 
@@ -97,12 +98,12 @@ bool ZESceneDebugDraw::Initialize()
 	RenderCommand.SetZero();
 	RenderCommand.Material = Material;
 	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderCommand.PrimitiveType = ZE_ROPT_LINE;
+	//RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	RenderCommand.PrimitiveType = ZE_ROPT_LINE_LIST;
 	RenderCommand.VertexBuffer = &VertexBuffer;
 	
 	Initialized = true;
-
+	*/
 	return true;
 }
 
@@ -115,7 +116,7 @@ void ZESceneDebugDraw::Deinitialize()
 	RenderCommand.SetZero();
 	if (Material != NULL)
 	{
-		Material->Release();
+		Material->Destroy();
 		Material = NULL;
 	}
 

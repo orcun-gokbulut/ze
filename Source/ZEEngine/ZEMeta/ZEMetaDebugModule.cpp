@@ -36,7 +36,7 @@
 #include "ZEMetaDebugModule.h"
 
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZERenderer/ZEFixedMaterial.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGame/ZEGame.h"
 #include "ZEGame/ZEEntityProvider.h"
@@ -47,9 +47,9 @@
 #include "ZESerialization/ZEUnserializer.h"
 #include "ZEMeta/ZEAnimation.h"
 #include "ZEMeta/ZEProvider.h"
-#include "ZEGraphics/ZEMaterial.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZEPointLight.h"
+#include "ZERenderer/ZEMaterial.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZEPointLight.h"
 
 #include "ZEMath/ZEAngle.h"
 

@@ -37,9 +37,13 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZECore/ZECore.h"
 
+
 ZEIndexBuffer::ZEIndexBuffer()
 {
-
+	Static = false;
+	BufferSize = 0;
+	IndexCount = 0;
+	Format = ZE_IBF_NONE;
 }
 
 ZEIndexBuffer::~ZEIndexBuffer()
@@ -47,33 +51,32 @@ ZEIndexBuffer::~ZEIndexBuffer()
 
 }
 
-ZEStaticIndexBuffer::ZEStaticIndexBuffer()
+bool ZEIndexBuffer::IsStatic() const
 {
-
+	return Static;
 }
 
-ZEStaticIndexBuffer::~ZEStaticIndexBuffer()
+ZESize ZEIndexBuffer::GetBufferSize() const
 {
-
+	return BufferSize;
 }
 
-bool ZEStaticIndexBuffer::IsStatic()
+ZESize ZEIndexBuffer::GetIndexCount() const
 {
-	return true;
+	return IndexCount;
 }
 
-void ZEStaticIndexBuffer::Destroy()
+ZEIndexBufferFormat ZEIndexBuffer::GetBufferFormat() const
+{
+	return Format;
+}
+
+void ZEIndexBuffer::Destroy()
 {
 	delete this;
 }
 
-
-ZEStaticIndexBuffer* ZEStaticIndexBuffer::CreateInstance()
+ZEIndexBuffer* ZEIndexBuffer::CreateInstance()
 {
-	return zeGraphics->CreateStaticIndexBuffer();
-}
-
-bool ZEDynamicIndexBuffer::IsStatic()
-{
-	return false;
+	return zeGraphics->CreateIndexBuffer();
 }

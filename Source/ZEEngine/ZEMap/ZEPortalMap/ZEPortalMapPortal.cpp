@@ -34,17 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECore/ZECore.h"
-#include "ZEPortalMapPortal.h"
-#include "ZEPortalMapResource.h"
-#include "ZEPhysics/ZEPhysicalMesh.h"
-#include "ZEGraphics/ZELight.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEMap/ZEPortalMap/ZEPortalMap.h"
+#include "ZEPortalMapPortal.h"
+#include "ZERenderer/ZELight.h"
+#include "ZEPortalMapResource.h"
 #include "ZEMath/ZEViewVolume.h"
+#include "ZERenderer/ZERenderer.h"
+#include "ZEGame/ZEDrawParameters.h"
+#include "ZEPhysics/ZEPhysicalMesh.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEPhysics/ZEPhysicalWorld.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEMap/ZEPortalMap/ZEPortalMap.h"
+
 
 ZEPortalMap* ZEPortalMapPortal::GetOwner()
 {
@@ -97,16 +99,16 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 	if (VertexBuffer == NULL)
 	{
 		RenderCommands.Clear();
-		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
-		if (!VertexBuffer->Create(Resource->Polygons.GetCount() * 3 * sizeof(ZEMapVertex)))
-			return false;
+
+		ZEArray<ZEMapVertex> Vertices;
+		Vertices.SetCount(Resource->Polygons.GetCount() * 3);
 
 		ZEArray<bool> Processed;
 		Processed.SetCount(Resource->Polygons.GetCount());
 		Processed.Fill(false);
 
 		ZESize VertexIndex = 0;
-		ZEMapVertex* Buffer = (ZEMapVertex*)VertexBuffer->Lock();	
+		ZEMapVertex* Buffer = Vertices.GetCArray();	
 		for (ZESize N = 0; N < Resource->Polygons.GetCount(); N++)
 		{
 			if (!Processed[N])
@@ -119,10 +121,8 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 				RenderCommand->Order = 1;
 				RenderCommand->Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 				RenderCommand->Material = Material;
-				RenderCommand->PrimitiveType = ZE_ROPT_TRIANGLE;
-				RenderCommand->VertexBufferOffset = VertexIndex;
-				RenderCommand->VertexBuffer = VertexBuffer;
-				RenderCommand->VertexDeclaration = ZEMapVertex::GetVertexDeclaration();
+				RenderCommand->PrimitiveType = ZE_ROPT_TRIANGLE_LIST;
+				RenderCommand->FirstVertex = (ZEUInt)VertexIndex;
 				ZEMatrix4x4::CreateIdentity(RenderCommand->WorldMatrix);
 
 				RenderCommand->PrimitiveCount = 0;
@@ -136,10 +136,19 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 					RenderCommand->PrimitiveCount++;
 					Processed[I] = true;
 				}
-
 			}
 		}
-		VertexBuffer->Unlock();
+	
+		VertexBuffer = ZEVertexBuffer::CreateInstance();
+		if (!VertexBuffer->CreateStatic((ZEUInt)Resource->Polygons.GetCount() * 3, sizeof(ZEMapVertex), Vertices.GetCArray()))
+			return false;
+
+		// Assign created vertex buffers to render commands
+		for (ZESize I = 0; I < RenderCommands.GetCount(); ++I)
+		{
+			RenderCommands[I].VertexBuffers[0] = VertexBuffer;
+		}
+			
 	}
 
 	ZEArray<ZEVector3> PhysicalVertices;
@@ -186,17 +195,9 @@ void ZEPortalMapPortal::Deinitialize()
 	Owner = NULL;
 	Resource = NULL;
 	RenderCommands.Clear();
-	if (VertexBuffer != NULL)
-	{
-		VertexBuffer->Destroy();
-		VertexBuffer = NULL;
-	}
 
-	if (PhysicalMesh != NULL)
-	{
-		PhysicalMesh->Destroy();
-		PhysicalMesh = NULL;
-	}
+	ZE_DESTROY(VertexBuffer);
+	ZE_DESTROY(PhysicalMesh);
 }
 
 ZEPortalMapPortal::ZEPortalMapPortal()

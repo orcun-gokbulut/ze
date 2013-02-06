@@ -37,7 +37,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEUI/ZEFontResource.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
 #include "ZEMap/ZEPortalMap/ZEPortalMap.h"

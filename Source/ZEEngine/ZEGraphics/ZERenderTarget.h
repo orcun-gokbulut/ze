@@ -33,24 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef __ZE_RENDER_TARGET_H__
 #define __ZE_RENDER_TARGET_H__
 
 #include "ZETypes.h"
+#include "ZETexture.h"
+
+typedef ZETextureType	ZERenderTargetType;
 
 class ZERenderTarget
 {
-	public:
-		virtual float			GetAspectRatio() = 0;
-		virtual ZEUInt			GetWidth() = 0;
-		virtual ZEUInt			GetHeight() = 0;
+	friend class ZEGraphicsModule;
+	friend class ZEGraphicsDevice;
 
+	// Should be public for only internal usage
+	public:
+		ZEUInt					Width;
+		ZEUInt					Height;
+		ZETexturePixelFormat	PixelFormat;
+		ZERenderTargetType		RenderTargetType;
+
+	protected:
+								ZERenderTarget();
 		virtual					~ZERenderTarget();
+
+	public:
+		ZEUInt					GetWidth() const;
+		ZEUInt					GetHeight() const;
+		ZETexturePixelFormat	GetPixelFormat() const;
+		ZERenderTargetType		GetRenderTargetType() const;
+
+		virtual bool			IsEmpty() const = 0;
+
+		virtual void			Destroy();
 };
 
 #endif
-
-
-
-

@@ -34,68 +34,97 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERasterizerState.h"
+#include "ZEDS/ZEHashGenerator.h"
 
-void ZERasterizerState::SetCullEnable(bool Enable)
+void ZEDeviceStateRasterizer::UpdateHash()
 {
-	CullEnable = Enable;
-	Changed = true;
+	if (Dirty)
+	{
+		Hash = 0;
+		Dirty = false;
+		ZEHashGenerator::Hash(Hash, &StateData, sizeof(ZERasterizerStateData));
+	}
 }
 
-bool ZERasterizerState::GetCullEnable() const
+void ZEDeviceStateRasterizer::SetFillMode(ZEFillMode Mode)
 {
-	return CullEnable;
+	if (StateData.FillMode != Mode)
+	{
+		StateData.FillMode = Mode;
+		Dirty = true;
+	}
 }
 
-void ZERasterizerState::SetFillMode(ZEFillMode Mode)
+ZEFillMode ZEDeviceStateRasterizer::GetFillMode() const
 {
-	FillMode = Mode;
-	Changed = true;
+	return StateData.FillMode;
 }
 
-ZEFillMode ZERasterizerState::GetFillMode() const
+void ZEDeviceStateRasterizer::SetCullDirection(ZECullDirection Direction)
 {
-	return FillMode;
+	if (StateData.CullDirection != Direction)
+	{
+		StateData.CullDirection = Direction;
+		Dirty = true;
+	}
 }
 
-void ZERasterizerState::SetCullDirection(ZECullDirection Direction)
+ZECullDirection ZEDeviceStateRasterizer::GetCullDirection() const
 {
-	CullDirection = Direction;
-	Changed = true;
+	return StateData.CullDirection;
 }
 
-ZECullDirection ZERasterizerState::GetCullDirection() const
+void ZEDeviceStateRasterizer::SetFrontIsCounterClockwise(bool IsCounterClockwise)
 {
-	return CullDirection;
+	if (StateData.FrontIsCounterClockwise != IsCounterClockwise)
+	{
+		StateData.FrontIsCounterClockwise = IsCounterClockwise;
+		Dirty = true;
+	}
 }
 
-void ZERasterizerState::SetChanged(bool Change)
+bool ZEDeviceStateRasterizer::GetFrontIsCounterClockwise() const
 {
-	Changed = Changed;
+	return StateData.FrontIsCounterClockwise;
 }
 
-bool ZERasterizerState::GetChanged() const
+void ZEDeviceStateRasterizer::SetToDefault()
 {
-	return Changed;
+	Hash = 0;
+	Dirty = false;
+
+	StateData.FillMode = ZE_FM_SOLID;
+	StateData.CullDirection = ZE_CD_COUNTER_CLOCKWISE;
+	StateData.FrontIsCounterClockwise = false;
+
+	UpdateHash();
 }
 
-const ZERasterizerState& ZERasterizerState::operator=(const ZERasterizerState& State)
+const ZEDeviceStateRasterizer& ZEDeviceStateRasterizer::operator=(const ZEDeviceStateRasterizer& State)
 {
-	CullEnable = State.CullEnable;
-	FillMode = State.FillMode;
-	CullDirection = State.CullDirection;
-	Changed = true;
+	Hash = State.Hash;
+	Dirty = State.Dirty;
+	memcpy(&StateData, &State.StateData, sizeof(ZERasterizerStateData));
 	return *this;
 }
 
-ZERasterizerState::ZERasterizerState() :	CullEnable(false),
-											FillMode(ZE_FM_CURRENT),
-											CullDirection(ZE_CD_CURRENT),
-											Changed(false)
+bool ZEDeviceStateRasterizer::operator==(const ZEDeviceStateRasterizer& State)
 {
-
+	return memcmp(&StateData, &State.StateData, sizeof(ZERasterizerStateData)) == 0 ? true : false;
 }
 
-ZERasterizerState::~ZERasterizerState()
+bool ZEDeviceStateRasterizer::operator!=(const ZEDeviceStateRasterizer& State)
+{
+	return !operator==(State);
+}
+
+ZEDeviceStateRasterizer::ZEDeviceStateRasterizer()
+{
+	memset(&StateData, 0, sizeof(ZERasterizerStateData));
+	SetToDefault();
+}
+
+ZEDeviceStateRasterizer::~ZEDeviceStateRasterizer()
 {
 
 }

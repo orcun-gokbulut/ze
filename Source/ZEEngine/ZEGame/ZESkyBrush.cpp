@@ -35,11 +35,11 @@
 
 #include "ZESkyBrush.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGame/ZEDrawParameters.h"
-#include "ZEGraphics/ZESkyBoxMaterial.h"
-#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZERenderer/ZESkyBoxMaterial.h"
+#include "ZERenderer/ZEDirectionalLight.h"
 #include "ZETexture/ZETextureCubeResource.h"
 
 
@@ -81,10 +81,10 @@ void ZESkyBrush::SetSkyTexture(const char* FileName)
 	}
 
 	SkyTexture = ZETextureCubeResource::LoadResource(FileName, NULL);
-	
+	/*
 	if (SkyMaterial != NULL)
 		SkyMaterial->SetTexture(SkyTexture == NULL ? NULL : SkyTexture->GetTexture());
-
+		*/
 }
 
 const char* ZESkyBrush::GetSkyTexture() const
@@ -96,30 +96,30 @@ const char* ZESkyBrush::GetSkyTexture() const
 }
 
 bool ZESkyBrush::Initialize()
-{
+{/*
 	if (SkyMaterial == NULL)
 	{
 		SkyMaterial = ZESkyBoxMaterial::CreateInstance();
 		SkyMaterial->UpdateMaterial();
 	}
-
+	
 	SkyMaterial->SetColor(SkyColor);
 	SkyMaterial->SetBrightness(SkyBrightness);
-	
+
 	if (SkyTexture != NULL)
 		SkyMaterial->SetTexture(SkyTexture->GetTexture());
-	
+		*/
 	return ZEEntity::Initialize();
 }
 
 void ZESkyBrush::Deinitialize()
-{
+{/*
 	if (SkyMaterial != NULL)
 	{
 		SkyMaterial->Destroy();
 		SkyMaterial = NULL;
 	}
-
+	*/
 	if (SkyTexture != NULL)
 	{
 		SkyTexture->Release();
@@ -130,13 +130,13 @@ void ZESkyBrush::Deinitialize()
 }
 
 void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)
-{
+{/*
 	if (SkyTexture != NULL)
 	{
 		SkyRenderCommand.Material = SkyMaterial;
 		SkyRenderCommand.WorldMatrix = GetWorldTransform();
 		DrawParameters->Renderer->AddToRenderList(&SkyRenderCommand);
-	}
+	}*/
 }
 
 void ZESkyBrush::Tick(float Time)
@@ -145,7 +145,7 @@ void ZESkyBrush::Tick(float Time)
 }
 
 ZESkyBrush::ZESkyBrush()
-{
+{/*
 	SkyMaterial = NULL;
 	SkyTexture = NULL;
 	SkyColor = ZEVector3::One;
@@ -156,10 +156,10 @@ ZESkyBrush::ZESkyBrush()
 	SkyRenderCommand.Priority = 1;
 	SkyRenderCommand.Order = 1.0f;
 	SkyRenderCommand.VertexBuffer = &SkyBox;
-	SkyRenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
+	SkyRenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE_LIST;
 	SkyRenderCommand.PrimitiveCount = SkyBox.Vertices.GetCount() / 3;
 	SkyRenderCommand.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	SkyRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	SkyRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();*/
 }
 
 ZESkyBrush::~ZESkyBrush()

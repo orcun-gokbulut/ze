@@ -52,6 +52,7 @@ enum ZETextureFilterMode
 	ZE_TF_FORCE_ANISOTROPHIC	= 4,
 };
 
+/*
 enum ZETextureAddressMode
 {
 	ZE_TAM_WRAP					= 0,
@@ -75,7 +76,7 @@ enum ZEMaterialOpacityComponent
 	ZE_MOC_DIFFUSE_ALPHA		= 1,
 	ZE_MOC_OPACITYMAP			= 2,
 };
-
+*/
 struct ZEMaterialTexture
 {	
 	public:

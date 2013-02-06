@@ -35,8 +35,9 @@
 
 
 #include "ZED3D9IndexBuffer.h"
-#include "ZED3D9Module.h"
+#include "ZED3D9GraphicsModule.h"
 #include "ZEError.h"
+#include "ZED3D9CommonTools.h"
 
 
 ZESize ZED3D9StaticIndexBuffer::GetBufferSize()
@@ -64,7 +65,7 @@ bool ZED3D9StaticIndexBuffer::Create(ZESize BufferSize, ZEIndexBufferFormat Form
 			break;
 	}
 
-	if (GetDevice()->CreateIndexBuffer((UINT)BufferSize, D3DUSAGE_WRITEONLY, D3D9Format, D3DPOOL_MANAGED, &StaticBuffer, NULL) != D3D_OK)
+	if (Device->CreateIndexBuffer((UINT)BufferSize, D3DUSAGE_WRITEONLY, D3D9Format, D3DPOOL_MANAGED, &StaticBuffer, NULL) != D3D_OK)
 	{
 		zeCriticalError("Can not create static index buffer.");
 		return false;
@@ -107,11 +108,7 @@ void ZED3D9StaticIndexBuffer::Unlock()
 
 void ZED3D9StaticIndexBuffer::Release()
 {
-	if (StaticBuffer != NULL)
-	{
-		StaticBuffer->Release();
-		StaticBuffer = NULL;
-	}
+	ZED3D_RELEASE(StaticBuffer);
 
 	BufferSize = 0;
 }
@@ -119,8 +116,6 @@ void ZED3D9StaticIndexBuffer::Release()
 
 void ZED3D9StaticIndexBuffer::Destroy()
 {
-	GetModule()->IndexBuffers.DeleteValue((ZED3D9StaticIndexBuffer*)this);
-
 	delete this;
 }
 

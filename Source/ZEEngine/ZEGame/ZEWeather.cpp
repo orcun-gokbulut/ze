@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEWeather.h"
-#include "ZEGraphics\ZEDirectionalLight.h"
+#include "ZERenderer\ZEDirectionalLight.h"
 #include "ZEMath\ZEAngle.h"
 #include "ZEScene.h"
 #include "ZEGame.h"
@@ -42,7 +42,6 @@
 #include "ZEMoon.h"
 #include "ZESkyDome.h"
 #include "ZECloud.h"
-#include "ZEModules\ZEDirect3D9\ZED3D9FrameRenderer.h"
 
 
 void ZEWeather::AdjustHDR(float DayTime)
@@ -120,7 +119,7 @@ void ZEWeather::SetFogFactor(float Value)
 {
 	FogFactor = Value;
 
-	((ZED3D9FrameRenderer*)zeScene->GetRenderer())->FogProcessor.SetFogVisibility(Value);
+//	((ZED3D9FrameRenderer*)zeScene->GetRenderer())->FogProcessor.SetFogVisibility(Value);
 }
 
 float ZEWeather::GetFogFactor() const

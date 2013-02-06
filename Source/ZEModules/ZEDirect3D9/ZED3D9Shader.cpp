@@ -39,91 +39,67 @@
 #include "ZED3D9ShaderManager.h"
 #include "ZED3D9CommonTools.h"
 
-// Utility 
-#ifdef ZE_DEBUG_D3D9_DEBUG_SHADERS
-#define ZE_SHADER_COMPILER_PARAMETERS	(D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION)
-#else
-#define ZE_SHADER_COMPILER_PARAMETERS	D3DXSHADER_OPTIMIZATION_LEVEL3
-#endif
-
-// D3DX Include Interface
-class ZED3DXInclude2 : public ID3DXInclude
-{
-public:
-	HRESULT __stdcall Open(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID * ppData, UINT * pBytes)
-	{
-		char RelativeFileName[258];
-		sprintf(RelativeFileName, "resources\\shaders\\%s", pFileName);
-		FILE* File = fopen(RelativeFileName, "rb");
-		if (File == NULL)
-			return S_FALSE;
-
-		_fseeki64(File, 0, SEEK_END);
-		*pBytes = (UINT)_ftelli64(File);
-		_fseeki64(File, 0, SEEK_SET);
-		*ppData = (void*)new char[(ZESize)*pBytes];
-		fread((void*)*ppData, 1, (ZESize)*pBytes, File);
-		fclose(File);
-
-		return S_OK;
-	}
-
-	HRESULT __stdcall Close(LPCVOID pData)
-	{
-		if (pData != NULL)
-			delete[] pData;
-		return S_OK;
-	}
-} D3DIncludeInterface2;
 
 // DX Type Conversion
 ZEShaderConstantDataType ConvertD3DXType(int Column, int Row, D3DXPARAMETER_TYPE Type)
 {
-	if(Type == D3DXPT_FLOAT)
+	switch (Type)
 	{
-		if(Row == 1 && Column == 1)
-			return ZE_SCDT_FLOAT;
-		else if(Row == 3 && Column == 3)
-			return ZE_SCDT_MATRIX3x3;
-		else if(Row == 4 && Column == 4)
-			return ZE_SCDT_MATRIX4x4;
-		else if(Row == 1 && Column == 2)
-			return ZE_SCDT_VECTOR2;
-		else if(Row == 1 && Column == 3)
-			return ZE_SCDT_VECTOR3;
-		else if(Row == 1 && Column == 4)
-			return ZE_SCDT_VECTOR4;
-		else
-		{
-			zeWarning("Undefined ShaderConstant Type in 'ZED3D9Shader'");
-			return ZE_SCDT_UNKNOWN;
-		}
+		case D3DXPT_FLOAT:
+			switch (Row)
+			{
+				case 1:
+					switch (Column)
+					{
+						case 1:
+							return ZE_SCDT_FLOAT;
+							break;
+						case 2:
+							return ZE_SCDT_VECTOR2;
+							break;
+						case 3: 
+							return ZE_SCDT_VECTOR3;
+							break;
+						case 4:
+							return ZE_SCDT_VECTOR4;
+							break;
+					}
+					break;
+
+				case 3:
+					if (Column == 3)
+						return ZE_SCDT_MATRIX3x3;
+					break;
+
+				case 4:
+					if (Column == 4)
+						return ZE_SCDT_MATRIX4x4;
+					break;
+			}
+			break;
+		case D3DXPT_BOOL:
+			if(Row == 1 && Column == 1)
+				return ZE_SCDT_BOOLEAN;
+			break;
+		case D3DXPT_SAMPLER:
+			return ZE_SCDT_SAMPLER;
+			break;
+		case D3DXPT_SAMPLER1D:
+			return ZE_SCDT_SAMPLER1D;
+			break;
+		case D3DXPT_SAMPLER2D:
+			return ZE_SCDT_SAMPLER2D;
+			break;
+		case D3DXPT_SAMPLER3D:
+			return ZE_SCDT_SAMPLER3D;
+			break;
+		case D3DXPT_SAMPLERCUBE:
+			return ZE_SCDT_SAMPLERCUBE;
+			break;
 	}
-	else if(Type == D3DXPT_BOOL)
-	{
-		if(Row == 1 && Column == 1)
-			return ZE_SCDT_BOOLEAN;
-		else
-		{
-			zeWarning("Undefined ShaderConstant Type in 'ZED3D9Shader'");
-			return ZE_SCDT_UNKNOWN;
-		}
-	}
-	else if(Type == D3DXPT_SAMPLER)
-		return ZE_SCDT_SAMPLER;
-	else if(Type == D3DXPT_SAMPLER1D)
-		return ZE_SCDT_SAMPLER1D;
-	else if(Type == D3DXPT_SAMPLER2D)
-		return ZE_SCDT_SAMPLER2D;
-	else if(Type == D3DXPT_SAMPLER3D)
-		return ZE_SCDT_SAMPLER3D;
-	else if(Type == D3DXPT_SAMPLERCUBE)
-		return ZE_SCDT_SAMPLERCUBE;
-	else
-	{
-		zeWarning("Undefined ShaderConstant Type in 'ZED3D9Shader'");
-		return ZE_SCDT_UNKNOWN;
-	}
+	
+	zeError("Undefined ShaderConstant Type in 'ZED3D9Shader'");
+	return ZE_SCDT_NONE;
 }
 
 // ZED3D9Shader
@@ -398,21 +374,21 @@ void ZED3D9PixelShader::SetConstant(const ZEString& Name, const ZEVector2& Value
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ZEVector4(Value.x, Value.y, 0.0f, 0.0f).M, 1);
+		Device->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ZEVector4(Value.x, Value.y, 0.0f, 0.0f).M, 1);
 }
 
 void ZED3D9PixelShader::SetConstant(const ZEString& Name, const ZEVector3& Value) const
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ZEVector4(Value.x, Value.y, Value.z, 0.0f).M, 1);
+		Device->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ZEVector4(Value.x, Value.y, Value.z, 0.0f).M, 1);
 }
 
 void ZED3D9PixelShader::SetConstant(const ZEString& Name, const ZEVector4& Value) const
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, Value.M, 1);
+		Device->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, Value.M, 1);
 }
 
 void ZED3D9PixelShader::SetConstant(const ZEString& Name, const ZEMatrix3x3& Value) const
@@ -424,7 +400,7 @@ void ZED3D9PixelShader::SetConstant(const ZEString& Name, const ZEMatrix3x3& Val
 							0.0f, 0.0f, 0.0f, 0.0f);
 
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ConstMatrix.MA, 3);
+		Device->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ConstMatrix.MA, 3);
 
 }
 
@@ -432,7 +408,7 @@ void ZED3D9PixelShader::SetConstant(const ZEString& Name, const ZEMatrix4x4& Val
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, Value.MA, 4);
+		Device->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, Value.MA, 4);
 }
 
 void ZED3D9PixelShader::SetConstant(const ZEString& Name, bool Value) const
@@ -446,14 +422,14 @@ void ZED3D9PixelShader::SetConstant(const ZEString& Name, bool Value) const
 	BoolRegister = {Value, 0, 0, 0};
 
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetPixelShaderConstantB(ShaderConstants[Index].RegisterNo, (BOOL*)&BoolRegister, 1);
+		Device->SetPixelShaderConstantB(ShaderConstants[Index].RegisterNo, (BOOL*)&BoolRegister, 1);
 }
 
 void ZED3D9PixelShader::SetConstant(const ZEString& Name, float Value) const
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ZEVector4(Value, 0.0f, 0.0f, 0.0f).M, 1);
+		Device->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ZEVector4(Value, 0.0f, 0.0f, 0.0f).M, 1);
 }
 
 void ZED3D9PixelShader::SetConstantArray(const ZEString& Name, const ZEVector2* ValueArray, ZESize Count) const
@@ -464,7 +440,7 @@ void ZED3D9PixelShader::SetConstantArray(const ZEString& Name, const ZEVector2* 
 		{	
 			// Array Registers Guaranteed to be adjacent?
 			ZEVector4 RegValue(ValueArray[i].x, ValueArray[i].y, 0.0f, 0.0f);
-			GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index + i].RegisterNo, RegValue.M, 1);
+			Device->SetPixelShaderConstantF(ShaderConstants[Index + i].RegisterNo, RegValue.M, 1);
 		}
 	
 }
@@ -477,7 +453,7 @@ void ZED3D9PixelShader::SetConstantArray(const ZEString& Name, const ZEVector3* 
 		{	
 			// Array Registers Guaranteed to be adjacent?
 			ZEVector4 RegValue(ValueArray[i].x, ValueArray[i].y, ValueArray[i].z, 0.0f);
-			GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index + i].RegisterNo, RegValue.M, 1);
+			Device->SetPixelShaderConstantF(ShaderConstants[Index + i].RegisterNo, RegValue.M, 1);
 		}
 }
 
@@ -485,7 +461,7 @@ void ZED3D9PixelShader::SetConstantArray(const ZEString& Name, const ZEVector4* 
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, (float*)ValueArray, Count);
+		Device->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, (float*)ValueArray, Count);
 }
 
 void ZED3D9PixelShader::SetConstantArray(const ZEString& Name, const ZEMatrix3x3* ValueArray, ZESize Count) const
@@ -500,7 +476,7 @@ void ZED3D9PixelShader::SetConstantArray(const ZEString& Name, const ZEMatrix3x3
 									0.0f, 0.0f, 0.0f, 0.0f);
 
 			// Array Registers Guaranteed to be adjacent?
-			GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index + i * 3].RegisterNo, ConstMatrix.MA, 3);
+			Device->SetPixelShaderConstantF(ShaderConstants[Index + i * 3].RegisterNo, ConstMatrix.MA, 3);
 		}
 }
 
@@ -508,7 +484,7 @@ void ZED3D9PixelShader::SetConstantArray(const ZEString& Name, const ZEMatrix4x4
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, (float*)ValueArray, Count * 4);
+		Device->SetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, (float*)ValueArray, Count * 4);
 }
 
 void ZED3D9PixelShader::SetConstantArray(const ZEString& Name, const bool* ValueArray, ZESize Count) const
@@ -523,7 +499,7 @@ void ZED3D9PixelShader::SetConstantArray(const ZEString& Name, const bool* Value
 		for(ZEUInt32 i = 0; i < Count; i++)
 		{
 			R.A = ValueArray[i];	// Rest Should Stay Zero
-			GetDevice()->SetPixelShaderConstantB(ShaderConstants[Index + i].RegisterNo, (BOOL*)&R, 1);
+			Device->SetPixelShaderConstantB(ShaderConstants[Index + i].RegisterNo, (BOOL*)&R, 1);
 		}
 }
 
@@ -533,23 +509,23 @@ void ZED3D9PixelShader::SetConstantArray(const ZEString& Name, const float* Valu
 	if(FindConstantLocation(Index, Name))
 		for(ZEUInt32 i = 0; i < Count; i++)
 		{
-			GetDevice()->SetPixelShaderConstantF(ShaderConstants[Index + i].RegisterNo, ZEVector4(ValueArray[i], 0.0f, 0.0f, 0.0f).M, 1);
+			Device->SetPixelShaderConstantF(ShaderConstants[Index + i].RegisterNo, ZEVector4(ValueArray[i], 0.0f, 0.0f, 0.0f).M, 1);
 		}
 }
 
 void ZED3D9PixelShader::SetConstant(int Register, const ZEVector2& Value) const
 {
-	GetDevice()->SetPixelShaderConstantF(Register, ZEVector4(Value.x, Value.y, 0.0f, 0.0f).M, 1);
+	Device->SetPixelShaderConstantF(Register, ZEVector4(Value.x, Value.y, 0.0f, 0.0f).M, 1);
 }
 
 void ZED3D9PixelShader::SetConstant(int Register, const ZEVector3& Value) const
 {
-	GetDevice()->SetPixelShaderConstantF(Register, ZEVector4(Value.x, Value.y, Value.z, 0.0f).M, 1);
+	Device->SetPixelShaderConstantF(Register, ZEVector4(Value.x, Value.y, Value.z, 0.0f).M, 1);
 }
 
 void ZED3D9PixelShader::SetConstant(int Register, const ZEVector4& Value) const
 {
-	GetDevice()->SetPixelShaderConstantF(Register, Value.M, 1);
+	Device->SetPixelShaderConstantF(Register, Value.M, 1);
 }
 
 void ZED3D9PixelShader::SetConstant(int Register, const ZEMatrix3x3& Value) const
@@ -559,12 +535,12 @@ void ZED3D9PixelShader::SetConstant(int Register, const ZEMatrix3x3& Value) cons
 							Value.M31, Value.M32, Value.M33, 0.0f,
 							0.0f, 0.0f, 0.0f, 0.0f);
 
-	GetDevice()->SetPixelShaderConstantF(Register, ConstMatrix.MA, 3);
+	Device->SetPixelShaderConstantF(Register, ConstMatrix.MA, 3);
 }
 
 void ZED3D9PixelShader::SetConstant(int Register, const ZEMatrix4x4& Value) const
 {
-	GetDevice()->SetPixelShaderConstantF(Register, Value.MA, 4);
+	Device->SetPixelShaderConstantF(Register, Value.MA, 4);
 }
 
 void ZED3D9PixelShader::SetConstant(int Register, bool Value) const
@@ -573,30 +549,30 @@ void ZED3D9PixelShader::SetConstant(int Register, bool Value) const
 	{
 		BOOL A, B, C, D;
 	}BoolReg = {Value, 0, 0, 0};
-	GetDevice()->SetPixelShaderConstantB(Register, (BOOL*)&BoolReg, 1);
+	Device->SetPixelShaderConstantB(Register, (BOOL*)&BoolReg, 1);
 }
 
 void ZED3D9PixelShader::SetConstant(int Register, float Value) const
 {
-	GetDevice()->SetPixelShaderConstantF(Register, ZEVector4(Value, 0.0f, 0.0f, 0.0f).M, 1);
+	Device->SetPixelShaderConstantF(Register, ZEVector4(Value, 0.0f, 0.0f, 0.0f).M, 1);
 }
 
 void ZED3D9PixelShader::SetConstantArray(int Register, const ZEVector2* ValueArray, ZESize Count) const
 {
 	for(ZEUInt32 i = 0; i < Count; i++)
-		GetDevice()->SetPixelShaderConstantF(Register + i, ZEVector4(ValueArray[i].x, ValueArray[i].y, 0.0f, 0.0f).M, 1);
+		Device->SetPixelShaderConstantF(Register + i, ZEVector4(ValueArray[i].x, ValueArray[i].y, 0.0f, 0.0f).M, 1);
 
 }
 
 void ZED3D9PixelShader::SetConstantArray(int Register, const ZEVector3* ValueArray, ZESize Count) const
 {
 	for(ZEUInt32 i = 0; i < Count; i++)
-		GetDevice()->SetPixelShaderConstantF(Register + i, ZEVector4(ValueArray[i].x, ValueArray[i].y, ValueArray[i].z, 0.0f).M, 1);
+		Device->SetPixelShaderConstantF(Register + i, ZEVector4(ValueArray[i].x, ValueArray[i].y, ValueArray[i].z, 0.0f).M, 1);
 }
 
 void ZED3D9PixelShader::SetConstantArray(int Register, const ZEVector4* ValueArray, ZESize Count) const
 {
-	GetDevice()->SetPixelShaderConstantF(Register, (float*)ValueArray, Count);
+	Device->SetPixelShaderConstantF(Register, (float*)ValueArray, Count);
 }
 
 void ZED3D9PixelShader::SetConstantArray(int Register, const ZEMatrix3x3* ValueArray, ZESize Count) const
@@ -608,13 +584,13 @@ void ZED3D9PixelShader::SetConstantArray(int Register, const ZEMatrix3x3* ValueA
 			ValueArray[i].M31, ValueArray[i].M32, ValueArray[i].M33, 0.0f,
 			0.0f, 0.0f, 0.0f, 0.0f);
 
-		GetDevice()->SetPixelShaderConstantF(Register + 3 * i, ConstMatrix.MA, 3);
+		Device->SetPixelShaderConstantF(Register + 3 * i, ConstMatrix.MA, 3);
 	}
 }
 
 void ZED3D9PixelShader::SetConstantArray(int Register, const ZEMatrix4x4* ValueArray, ZESize Count) const
 {
-	GetDevice()->SetPixelShaderConstantF(Register, (float*)ValueArray, Count * 4);
+	Device->SetPixelShaderConstantF(Register, (float*)ValueArray, Count * 4);
 }
 
 void ZED3D9PixelShader::SetConstantArray(int Register, const bool* ValueArray, ZESize Count) const
@@ -627,14 +603,14 @@ void ZED3D9PixelShader::SetConstantArray(int Register, const bool* ValueArray, Z
 	for(ZEUInt32 i = 0; i < Count; i++)
 	{
 		BoolReg.A = (int)ValueArray[i];
-		GetDevice()->SetPixelShaderConstantB(Register + i, (BOOL*)&BoolReg, 1);
+		Device->SetPixelShaderConstantB(Register + i, (BOOL*)&BoolReg, 1);
 	}
 }
 
 void ZED3D9PixelShader::SetConstantArray(int Register, const float* ValueArray, ZESize Count) const
 {
 	for(ZEUInt32 i = 0; i < Count; i++)
-		GetDevice()->SetPixelShaderConstantF(Register + i, ZEVector4(ValueArray[i], 0.0f, 0.0f, 0.0f).M, 1);
+		Device->SetPixelShaderConstantF(Register + i, ZEVector4(ValueArray[i], 0.0f, 0.0f, 0.0f).M, 1);
 }
 
 ZEVector2 ZED3D9PixelShader::GetConstantVector2(const char* Name) const
@@ -642,7 +618,7 @@ ZEVector2 ZED3D9PixelShader::GetConstantVector2(const char* Name) const
 	ZEUInt32 Index;
 	ZEVector4 Vector;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, Vector.M, 1);
+		Device->GetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, Vector.M, 1);
 	return ZEVector2(Vector.x, Vector.y);
 }
 
@@ -651,7 +627,7 @@ ZEVector3 ZED3D9PixelShader::GetConstantVector3(const char* Name) const
 	ZEUInt32 Index;
 	ZEVector4 Vector;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, Vector.M, 1);
+		Device->GetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, Vector.M, 1);
 	return ZEVector3(Vector.x, Vector.y, Vector.z);
 }
 
@@ -660,7 +636,7 @@ ZEVector4 ZED3D9PixelShader::GetConstantVector4(const char* Name) const
 	ZEUInt32 Index;
 	ZEVector4 Vector;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, Vector.M, 1);
+		Device->GetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, Vector.M, 1);
 	return Vector;
 }
 
@@ -669,7 +645,7 @@ ZEMatrix3x3 ZED3D9PixelShader::GetConstantMatrix3x3(const char* Name) const
 	ZEUInt32 Index;
 	ZEMatrix4x4 ReturnMatrix;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ReturnMatrix.MA, 3);
+		Device->GetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ReturnMatrix.MA, 3);
 	return ZEMatrix3x3 (ReturnMatrix.M11, ReturnMatrix.M12, ReturnMatrix.M13,
 						ReturnMatrix.M21, ReturnMatrix.M22, ReturnMatrix.M23,
 						ReturnMatrix.M31, ReturnMatrix.M32, ReturnMatrix.M33);		
@@ -680,7 +656,7 @@ ZEMatrix4x4 ZED3D9PixelShader::GetConstantMatrix4x4(const char* Name) const
 	ZEUInt32 Index;
 	ZEMatrix4x4 ReturnMatrix;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ReturnMatrix.MA, 4);
+		Device->GetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ReturnMatrix.MA, 4);
 	return ReturnMatrix;
 }
 
@@ -689,8 +665,8 @@ bool ZED3D9PixelShader::GetConstantBool(const char* Name) const
 	ZEUInt32 Index;
 	BOOL ReturnBool[4];
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetPixelShaderConstantB(ShaderConstants[Index].RegisterNo, ReturnBool, 1);
-	return (bool)ReturnBool[0];
+		Device->GetPixelShaderConstantB(ShaderConstants[Index].RegisterNo, ReturnBool, 1);
+	return ReturnBool[0] == 0 ? false : true;
 }
 
 float ZED3D9PixelShader::GetConstantFloat(const char* Name) const
@@ -698,15 +674,11 @@ float ZED3D9PixelShader::GetConstantFloat(const char* Name) const
 	ZEUInt32 Index;
 	ZEVector4 ReturnFloat;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ReturnFloat.M, 1);
+		Device->GetPixelShaderConstantF(ShaderConstants[Index].RegisterNo, ReturnFloat.M, 1);
 	return ReturnFloat.x;
 }
 
-bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameter[][2],
-										int CompilerParameterCount,
-										ZEString ShaderProfile, 
-										ZEString Source,
-										ZEString MainFunction)
+bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameter[][2], int CompilerParameterCount, ZEString ShaderProfile,  ZEString Source, ZEString MainFunction)
 {
 	if(Compiled)
 		zeWarning("Shader is Already Compiled. You sould not Compile A Shader More Than Once.\r\n");
@@ -743,7 +715,7 @@ bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameter[][2],
 		Compiled = false;
 		return false;
 	}
-
+	
 	if (CompilerOutput != NULL)
 		CompilerOutput->Release();
 
@@ -755,7 +727,7 @@ bool ZED3D9PixelShader::CompileShader(const ZEString CompilerParameter[][2],
 //	FunctionName = MainFunction;
 
 	// Create Shader Handle
-	if (GetDevice()->CreatePixelShader((DWORD*)ShaderBuffer->GetBufferPointer(), &PixelShader) != NULL)
+	if (Device->CreatePixelShader((DWORD*)ShaderBuffer->GetBufferPointer(), &PixelShader) != NULL)
 	{
 		zeError("Can not create vertex shader.\r\n");
 		PixelShader = NULL;
@@ -811,21 +783,21 @@ void ZED3D9VertexShader::SetConstant(const ZEString& Name, const ZEVector2& Valu
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ZEVector4(Value.x, Value.y, 0.0f, 0.0f).M, 1);
+		Device->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ZEVector4(Value.x, Value.y, 0.0f, 0.0f).M, 1);
 }
 
 void ZED3D9VertexShader::SetConstant(const ZEString& Name, const ZEVector3& Value) const
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ZEVector4(Value.x, Value.y, Value.z, 0.0f).M, 1);
+		Device->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ZEVector4(Value.x, Value.y, Value.z, 0.0f).M, 1);
 }
 
 void ZED3D9VertexShader::SetConstant(const ZEString& Name, const ZEVector4& Value) const
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, Value.M, 1);
+		Device->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, Value.M, 1);
 }
 
 void ZED3D9VertexShader::SetConstant(const ZEString& Name, const ZEMatrix3x3& Value) const
@@ -837,7 +809,7 @@ void ZED3D9VertexShader::SetConstant(const ZEString& Name, const ZEMatrix3x3& Va
 		0.0f, 0.0f, 0.0f, 0.0f);
 
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ConstMatrix.MA, 3);
+		Device->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ConstMatrix.MA, 3);
 
 }
 
@@ -845,7 +817,7 @@ void ZED3D9VertexShader::SetConstant(const ZEString& Name, const ZEMatrix4x4& Va
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, Value.MA, 4);
+		Device->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, Value.MA, 4);
 }
 
 void ZED3D9VertexShader::SetConstant(const ZEString& Name, bool Value) const
@@ -859,14 +831,14 @@ void ZED3D9VertexShader::SetConstant(const ZEString& Name, bool Value) const
 	BoolRegister = {Value, 0, 0, 0};
 
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetVertexShaderConstantB(ShaderConstants[Index].RegisterNo, (BOOL*)&BoolRegister, 1);
+		Device->SetVertexShaderConstantB(ShaderConstants[Index].RegisterNo, (BOOL*)&BoolRegister, 1);
 }
 
 void ZED3D9VertexShader::SetConstant(const ZEString& Name, float Value) const
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ZEVector4(Value, 0.0f, 0.0f, 0.0f).M, 1);
+		Device->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ZEVector4(Value, 0.0f, 0.0f, 0.0f).M, 1);
 }
 
 void ZED3D9VertexShader::SetConstantArray(const ZEString& Name, const ZEVector2* ValueArray, ZESize Count) const
@@ -877,7 +849,7 @@ void ZED3D9VertexShader::SetConstantArray(const ZEString& Name, const ZEVector2*
 		{	
 			// Array Registers Guaranteed to be adjacent?
 			ZEVector4 RegValue(ValueArray[i].x, ValueArray[i].y, 0.0f, 0.0f);
-			GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index + i].RegisterNo, RegValue.M, 1);
+			Device->SetVertexShaderConstantF(ShaderConstants[Index + i].RegisterNo, RegValue.M, 1);
 		}
 
 }
@@ -890,7 +862,7 @@ void ZED3D9VertexShader::SetConstantArray(const ZEString& Name, const ZEVector3*
 		{	
 			// Array Registers Guaranteed to be adjacent?
 			ZEVector4 RegValue(ValueArray[i].x, ValueArray[i].y, ValueArray[i].z, 0.0f);
-			GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index + i].RegisterNo, RegValue.M, 1);
+			Device->SetVertexShaderConstantF(ShaderConstants[Index + i].RegisterNo, RegValue.M, 1);
 		}
 }
 
@@ -898,7 +870,7 @@ void ZED3D9VertexShader::SetConstantArray(const ZEString& Name, const ZEVector4*
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, (float*)ValueArray, Count);
+		Device->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, (float*)ValueArray, Count);
 }
 
 void ZED3D9VertexShader::SetConstantArray(const ZEString& Name, const ZEMatrix3x3* ValueArray, ZESize Count) const
@@ -913,7 +885,7 @@ void ZED3D9VertexShader::SetConstantArray(const ZEString& Name, const ZEMatrix3x
 				0.0f, 0.0f, 0.0f, 0.0f);
 
 			// Array Registers Guaranteed to be adjacent?
-			GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index + i * 3].RegisterNo, ConstMatrix.MA, 3);
+			Device->SetVertexShaderConstantF(ShaderConstants[Index + i * 3].RegisterNo, ConstMatrix.MA, 3);
 		}
 }
 
@@ -921,7 +893,7 @@ void ZED3D9VertexShader::SetConstantArray(const ZEString& Name, const ZEMatrix4x
 {
 	ZEUInt32 Index;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, (float*)ValueArray, Count * 4);
+		Device->SetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, (float*)ValueArray, Count * 4);
 }
 
 void ZED3D9VertexShader::SetConstantArray(const ZEString& Name, const bool* ValueArray, ZESize Count) const
@@ -936,7 +908,7 @@ void ZED3D9VertexShader::SetConstantArray(const ZEString& Name, const bool* Valu
 		for(ZEUInt32 i = 0; i < Count; i++)
 		{
 			R.A = ValueArray[i];	// Rest Should Stay Zero
-			GetDevice()->SetVertexShaderConstantB(ShaderConstants[Index + i].RegisterNo, (BOOL*)&R, 1);
+			Device->SetVertexShaderConstantB(ShaderConstants[Index + i].RegisterNo, (BOOL*)&R, 1);
 		}
 }
 
@@ -946,23 +918,23 @@ void ZED3D9VertexShader::SetConstantArray(const ZEString& Name, const float* Val
 	if(FindConstantLocation(Index, Name))
 		for(ZEUInt32 i = 0; i < Count; i++)
 		{
-			GetDevice()->SetVertexShaderConstantF(ShaderConstants[Index + i].RegisterNo, ZEVector4(ValueArray[i], 0.0f, 0.0f, 0.0f).M, 1);
+			Device->SetVertexShaderConstantF(ShaderConstants[Index + i].RegisterNo, ZEVector4(ValueArray[i], 0.0f, 0.0f, 0.0f).M, 1);
 		}
 }
 
 void ZED3D9VertexShader::SetConstant(int Register, const ZEVector2& Value) const
 {
-	GetDevice()->SetVertexShaderConstantF(Register, ZEVector4(Value.x, Value.y, 0.0f, 0.0f).M, 1);
+	Device->SetVertexShaderConstantF(Register, ZEVector4(Value.x, Value.y, 0.0f, 0.0f).M, 1);
 }
 
 void ZED3D9VertexShader::SetConstant(int Register, const ZEVector3& Value) const
 {
-	GetDevice()->SetVertexShaderConstantF(Register, ZEVector4(Value.x, Value.y, Value.z, 0.0f).M, 1);
+	Device->SetVertexShaderConstantF(Register, ZEVector4(Value.x, Value.y, Value.z, 0.0f).M, 1);
 }
 
 void ZED3D9VertexShader::SetConstant(int Register, const ZEVector4& Value) const
 {
-	GetDevice()->SetVertexShaderConstantF(Register, Value.M, 1);
+	Device->SetVertexShaderConstantF(Register, Value.M, 1);
 }
 
 void ZED3D9VertexShader::SetConstant(int Register, const ZEMatrix3x3& Value) const
@@ -972,12 +944,12 @@ void ZED3D9VertexShader::SetConstant(int Register, const ZEMatrix3x3& Value) con
 		Value.M31, Value.M32, Value.M33, 0.0f,
 		0.0f, 0.0f, 0.0f, 0.0f);
 
-	GetDevice()->SetVertexShaderConstantF(Register, ConstMatrix.MA, 3);
+	Device->SetVertexShaderConstantF(Register, ConstMatrix.MA, 3);
 }
 
 void ZED3D9VertexShader::SetConstant(int Register, const ZEMatrix4x4& Value) const
 {
-	GetDevice()->SetVertexShaderConstantF(Register, Value.MA, 4);
+	Device->SetVertexShaderConstantF(Register, Value.MA, 4);
 }
 
 void ZED3D9VertexShader::SetConstant(int Register, bool Value) const
@@ -986,30 +958,30 @@ void ZED3D9VertexShader::SetConstant(int Register, bool Value) const
 	{
 		BOOL A, B, C, D;
 	}BoolReg = {Value, 0, 0, 0};
-	GetDevice()->SetVertexShaderConstantB(Register, (BOOL*)&BoolReg, 1);
+	Device->SetVertexShaderConstantB(Register, (BOOL*)&BoolReg, 1);
 }
 
 void ZED3D9VertexShader::SetConstant(int Register, float Value) const
 {
-	GetDevice()->SetVertexShaderConstantF(Register, ZEVector4(Value, 0.0f, 0.0f, 0.0f).M, 1);
+	Device->SetVertexShaderConstantF(Register, ZEVector4(Value, 0.0f, 0.0f, 0.0f).M, 1);
 }
 
 void ZED3D9VertexShader::SetConstantArray(int Register, const ZEVector2* ValueArray, ZESize Count) const
 {
 	for(ZEUInt32 i = 0; i < Count; i++)
-		GetDevice()->SetVertexShaderConstantF(Register + i, ZEVector4(ValueArray[i].x, ValueArray[i].y, 0.0f, 0.0f).M, 1);
+		Device->SetVertexShaderConstantF(Register + i, ZEVector4(ValueArray[i].x, ValueArray[i].y, 0.0f, 0.0f).M, 1);
 
 }
 
 void ZED3D9VertexShader::SetConstantArray(int Register, const ZEVector3* ValueArray, ZESize Count) const
 {
 	for(ZEUInt32 i = 0; i < Count; i++)
-		GetDevice()->SetVertexShaderConstantF(Register + i, ZEVector4(ValueArray[i].x, ValueArray[i].y, ValueArray[i].z, 0.0f).M, 1);
+		Device->SetVertexShaderConstantF(Register + i, ZEVector4(ValueArray[i].x, ValueArray[i].y, ValueArray[i].z, 0.0f).M, 1);
 }
 
 void ZED3D9VertexShader::SetConstantArray(int Register, const ZEVector4* ValueArray, ZESize Count) const
 {
-	GetDevice()->SetVertexShaderConstantF(Register, (float*)ValueArray, Count);
+	Device->SetVertexShaderConstantF(Register, (float*)ValueArray, Count);
 }
 
 void ZED3D9VertexShader::SetConstantArray(int Register, const ZEMatrix3x3* ValueArray, ZESize Count) const
@@ -1021,13 +993,13 @@ void ZED3D9VertexShader::SetConstantArray(int Register, const ZEMatrix3x3* Value
 			ValueArray[i].M31, ValueArray[i].M32, ValueArray[i].M33, 0.0f,
 			0.0f, 0.0f, 0.0f, 0.0f);
 
-		GetDevice()->SetVertexShaderConstantF(Register + 3 * i, ConstMatrix.MA, 3);
+		Device->SetVertexShaderConstantF(Register + 3 * i, ConstMatrix.MA, 3);
 	}
 }
 
 void ZED3D9VertexShader::SetConstantArray(int Register, const ZEMatrix4x4* ValueArray, ZESize Count) const
 {
-	GetDevice()->SetVertexShaderConstantF(Register, (float*)ValueArray, Count * 4);
+	Device->SetVertexShaderConstantF(Register, (float*)ValueArray, Count * 4);
 }
 
 void ZED3D9VertexShader::SetConstantArray(int Register, const bool* ValueArray, ZESize Count) const
@@ -1040,14 +1012,14 @@ void ZED3D9VertexShader::SetConstantArray(int Register, const bool* ValueArray, 
 	for(ZEUInt32 i = 0; i < Count; i++)
 	{
 		BoolReg.A = (int)ValueArray[i];
-		GetDevice()->SetVertexShaderConstantB(Register + i, (BOOL*)&BoolReg, 1);
+		Device->SetVertexShaderConstantB(Register + i, (BOOL*)&BoolReg, 1);
 	}
 }
 
 void ZED3D9VertexShader::SetConstantArray(int Register, const float* ValueArray, ZESize Count) const
 {
 	for(ZEUInt32 i = 0; i < Count; i++)
-		GetDevice()->SetVertexShaderConstantF(Register + i, ZEVector4(ValueArray[i], 0.0f, 0.0f, 0.0f).M, 1);
+		Device->SetVertexShaderConstantF(Register + i, ZEVector4(ValueArray[i], 0.0f, 0.0f, 0.0f).M, 1);
 }
 
 ZEVector2 ZED3D9VertexShader::GetConstantVector2(const char* Name) const
@@ -1055,7 +1027,7 @@ ZEVector2 ZED3D9VertexShader::GetConstantVector2(const char* Name) const
 	ZEUInt32 Index;
 	ZEVector4 Vector;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, Vector.M, 1);
+		Device->GetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, Vector.M, 1);
 	return ZEVector2(Vector.x, Vector.y);
 }
 
@@ -1064,7 +1036,7 @@ ZEVector3 ZED3D9VertexShader::GetConstantVector3(const char* Name) const
 	ZEUInt32 Index;
 	ZEVector4 Vector;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, Vector.M, 1);
+		Device->GetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, Vector.M, 1);
 	return ZEVector3(Vector.x, Vector.y, Vector.z);
 }
 
@@ -1073,7 +1045,7 @@ ZEVector4 ZED3D9VertexShader::GetConstantVector4(const char* Name) const
 	ZEUInt32 Index;
 	ZEVector4 Vector;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, Vector.M, 1);
+		Device->GetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, Vector.M, 1);
 	return Vector;
 }
 
@@ -1082,7 +1054,7 @@ ZEMatrix3x3 ZED3D9VertexShader::GetConstantMatrix3x3(const char* Name) const
 	ZEUInt32 Index;
 	ZEMatrix4x4 ReturnMatrix;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ReturnMatrix.MA, 3);
+		Device->GetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ReturnMatrix.MA, 3);
 	return ZEMatrix3x3 (ReturnMatrix.M11, ReturnMatrix.M12, ReturnMatrix.M13,
 		ReturnMatrix.M21, ReturnMatrix.M22, ReturnMatrix.M23,
 		ReturnMatrix.M31, ReturnMatrix.M32, ReturnMatrix.M33);		
@@ -1093,7 +1065,7 @@ ZEMatrix4x4 ZED3D9VertexShader::GetConstantMatrix4x4(const char* Name) const
 	ZEUInt32 Index;
 	ZEMatrix4x4 ReturnMatrix;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ReturnMatrix.MA, 4);
+		Device->GetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ReturnMatrix.MA, 4);
 	return ReturnMatrix;
 }
 
@@ -1102,8 +1074,8 @@ bool ZED3D9VertexShader::GetConstantBool(const char* Name) const
 	ZEUInt32 Index;
 	BOOL ReturnBool[4];
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetVertexShaderConstantB(ShaderConstants[Index].RegisterNo, ReturnBool, 1);
-	return (bool)ReturnBool[0];
+		Device->GetVertexShaderConstantB(ShaderConstants[Index].RegisterNo, ReturnBool, 1);
+	return ReturnBool[0] == 0 ? false : true;
 }
 
 float ZED3D9VertexShader::GetConstantFloat(const char* Name) const
@@ -1111,78 +1083,8 @@ float ZED3D9VertexShader::GetConstantFloat(const char* Name) const
 	ZEUInt32 Index;
 	ZEVector4 ReturnFloat;
 	if(FindConstantLocation(Index, Name))
-		GetDevice()->GetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ReturnFloat.M, 1);
+		Device->GetVertexShaderConstantF(ShaderConstants[Index].RegisterNo, ReturnFloat.M, 1);
 	return ReturnFloat.x;
-}
-
-bool ZED3D9VertexShader::CompileShader(const ZEString CompilerParameter[][2],
-										int CompilerParameterCount,
-										ZEString ShaderProfile, 
-										ZEString Source,
-										ZEString MainFunction)
-{
-	if(Compiled)
-		zeWarning("Shader is Already Compiled. You sould not compile A Shader More Than Once.\r\n");
-
-	// Temp Buffer For Constant Table and Compiler Output
-	LPD3DXBUFFER ShaderBuffer = NULL;
-	LPD3DXBUFFER CompilerOutput = NULL;
-	LPD3DXCONSTANTTABLE ConstantTable = NULL;
-	LPD3DXMACRO MacroDefinitions = new D3DXMACRO[CompilerParameterCount + 1];
-
-	int i;
-	for(i = 0; i < CompilerParameterCount; i++)
-	{
-		MacroDefinitions[i].Name = CompilerParameter[i][0];
-		MacroDefinitions[i].Definition = CompilerParameter[i][1];
-
-		ZEShaderCompilerParameter Parameter;
-		Parameter.Name = CompilerParameter[i][0];
-		Parameter.Definition = CompilerParameter[i][1];
-		ShaderCompilerParameters.Add(Parameter);
-	}
-	MacroDefinitions[i].Name = NULL;
-	MacroDefinitions[i].Definition = NULL;
-
-	if(D3DXCompileShader(Source.ToCString(), Source.GetSize(), MacroDefinitions, &D3DIncludeInterface2, MainFunction.ToCString(), ShaderProfile, D3DXSHADER_PACKMATRIX_COLUMNMAJOR | ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, &ConstantTable) != D3D_OK)
-	{
-		if (CompilerOutput == NULL)
-			zeError("Can not compile vertex shader.\r\n");
-		else
-			zeError("Can not compile vertex shader.\r\nCompile output :\r\n%s\r\n", CompilerOutput->GetBufferPointer());
-
-		Compiled = false;
-		return false;
-	}
-
-	if (CompilerOutput != NULL)
-		CompilerOutput->Release();
-
-	// Populate Constants Array and Register Array
-	PopulateConstantTable(ConstantTable);
-
-	// Compile Done! Set FunctionName
-//	FunctionName = MainFunction;
-
-	// Create Shader Handle
-	if (GetDevice()->CreateVertexShader((DWORD*)ShaderBuffer->GetBufferPointer(), &VertexShader) != NULL)
-	{
-		zeError("Can not create vertex shader.\r\n");
-		VertexShader = NULL;
-		return false;
-	}
-
-	if(ShaderBuffer != NULL)
-		ShaderBuffer->Release();
-
-	if(MacroDefinitions != NULL)
-	{	
-		delete [] MacroDefinitions;
-		MacroDefinitions = NULL;
-	}
-
-	Compiled = true;
-	return true;
 }
 
 ZED3D9VertexShader* ZED3D9VertexShader::CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile)
