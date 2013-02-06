@@ -35,24 +35,8 @@
 
 #include "ZELight.h"
 #include "ZERenderCommand.h"
-
-ZEDrawFlags ZELight::GetDrawFlags() const
-{
-	return ZE_DF_LIGHT_SOURCE;
-}
-
-void ZELight::SetPosition(const ZEVector3& NewPosition)
-{
-	UpdateViewVolume = true;
-	ZEEntity::SetPosition(NewPosition);
-}
-
-void ZELight::SetRotation(const ZEQuaternion& NewRotation)
-{
-	UpdateViewVolume = true;
-	ZEEntity::SetRotation(NewRotation);
-}
-
+#include "ZEGame\ZEDrawParameters.h"
+#include "ZERenderer.h"
 
 void ZELight::OnTransformChanged()
 {
@@ -60,15 +44,14 @@ void ZELight::OnTransformChanged()
 	ZEEntity::OnTransformChanged();
 }
 
-
-void ZELight::SetColor(const ZEVector3& NewColor)
+void ZELight::SetRange(float NewValue)
 {
-	Color = NewColor;
+	Range = NewValue;
 }
 
-const ZEVector3& ZELight::GetColor() const
+float ZELight::GetRange() const
 {
-	return Color;
+	return Range;
 }
 
 void ZELight::SetIntensity(float NewValue)
@@ -81,14 +64,44 @@ float ZELight::GetIntensity() const
 	return Intensity;
 }
 
-void ZELight::SetRange(float NewValue)
+void ZELight::SetPenumbraScale(float NewValue)
 {
-	Range = NewValue;
+	PenumbraScale = NewValue;
 }
 
-float ZELight::GetRange() const
+float ZELight::GetPenumbraScale() const
 {
-	return Range;
+	return PenumbraScale;
+}
+
+void ZELight::SetDepthScaledBias(float NewValue)
+{
+	DepthScaledBias = NewValue;
+}
+
+float ZELight::GetDepthScaledBias() const
+{
+	return DepthScaledBias;
+}
+
+void ZELight::SetSlopeScaledBias(float NewValue)
+{
+	SlopeScaledBias = NewValue;
+}
+
+float ZELight::GetSlopeScaledBias() const
+{
+	return SlopeScaledBias;
+}
+
+void ZELight::SetColor(const ZEVector3& NewColor)
+{
+	Color = NewColor;
+}
+
+const ZEVector3& ZELight::GetColor() const
+{
+	return Color;
 }
 
 void ZELight::SetAttenuation(const ZEVector3& Attenuation)
@@ -108,6 +121,11 @@ const ZEVector3& ZELight::GetAttenuation() const
 	return Attenuation;
 }
 
+ZEDrawFlags ZELight::GetDrawFlags() const
+{
+	return ZE_DF_DRAW | ZE_DF_LIGHT_SOURCE;
+}
+
 void ZELight::SetCastsShadow(bool NewValue)
 {
 	CastsShadows = NewValue;
@@ -118,12 +136,47 @@ bool ZELight::GetCastsShadow() const
 	return CastsShadows;
 }
 
+void ZELight::SetPosition(const ZEVector3& NewPosition)
+{
+	if (GetPosition() != NewPosition)
+	{
+		UpdateViewVolume = true;
+		ZEEntity::SetPosition(NewPosition);
+	}
+}
+
+void ZELight::SetRotation(const ZEQuaternion& NewRotation)
+{
+	if (GetRotation() != NewRotation)
+	{
+		UpdateViewVolume = true;
+		ZEEntity::SetRotation(NewRotation);
+	}
+}
+
+void ZELight::Draw(ZEDrawParameters* DrawParameters)
+{
+	DrawParameters->Lights.Add(this);
+}
+
 ZELight::ZELight()
 {
-	Color = ZEVector3(1.0f, 1.0f, 1.0f);
-	Intensity = 1.0f;
-	Range = 100.0f;
-	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
-	CastsShadows = false;
 	Enabled = true;
+	CastsShadows = false;
+	UpdateViewVolume = true;
+
+	PenumbraScale = 1.0f;
+
+	DepthScaledBias = 0.0f;
+	SlopeScaledBias = 0.0f;
+
+	Range = 100.0f;
+	Intensity = 1.0f;
+	Color = ZEVector3(1.0f, 1.0f, 1.0f);
+	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
+}
+
+ZELight::~ZELight()
+{
+	
 }

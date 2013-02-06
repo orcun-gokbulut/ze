@@ -56,8 +56,8 @@ class ZEMLDataProperty : public ZEMLItem
 
 	protected:
 
-		virtual void		WriteToFile(ZEFile* File);
-		virtual void		ReadFromFile(ZEFile* File, bool DeferredDataReading);
+		virtual bool		WriteSelf(ZEFile* File);
+		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading);
 
 	public:
 
@@ -65,6 +65,7 @@ class ZEMLDataProperty : public ZEMLItem
 
 		void				SetData(void* Data, ZEUInt64 DataSize, bool Cache = true);
 		const void*			GetData();
+		//bool				GetData(ZEMemoryFile& File);
 
 							ZEMLDataProperty();
 							ZEMLDataProperty(const ZEString& Name);

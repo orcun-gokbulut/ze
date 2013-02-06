@@ -78,14 +78,14 @@ class ZEMLItem : public ZEListItem
 	friend class ZEMLNode;
 
 	protected:
-
 		ZEString			Name;
 		ZEUInt8				Type;
 		ZEMLItem*			Parent;
 		ZEUInt64			DataSize;
+		ZEUInt64			FilePosition;
 
-		virtual void		ReadFromFile(ZEFile* File, bool DeferredDataReading) = 0;
-		virtual void		WriteToFile(ZEFile* File) = 0;
+		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading) = 0;
+		virtual bool		WriteSelf(ZEFile* File) = 0;
 
 
 		void				SetType(ZEMLItemType Type);
@@ -94,8 +94,9 @@ class ZEMLItem : public ZEListItem
 							~ZEMLItem();
 
 	public:
-
 		ZEMLItemType		GetType() const;
+
+		ZEUInt64			GetFilePosition();
 
 		virtual ZEUInt64	GetTotalSize() = 0;
 		ZEUInt64			GetDataSize();

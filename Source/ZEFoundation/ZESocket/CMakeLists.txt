@@ -37,11 +37,11 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEIPAddress_Unix.cpp			Sources PLATFORMS Unix)
 ze_add_source(ZEIPAddress_Windows.cpp		Sources PLATFORMS Windows)
-ze_add_source(ZEIPAddressTests_Windows.cpp	Tests PLATFORMS Windows)
+#ze_add_source(ZEIPAddressTests_Windows.cpp	Tests PLATFORMS Windows)
 ze_add_source(ZEIPAddress.h					Sources Headers)
 ze_add_source(ZESocket_Unix.cpp				Sources PLATFORMS Unix)
 ze_add_source(ZESocket_Windows.cpp			Sources PLATFORMS Windows)
-ze_add_source(ZESocketTests_Windows.cpp		Tests PLATFORMS Windows)
+#ze_add_source(ZESocketTests_Windows.cpp		Tests PLATFORMS Windows)
 ze_add_source(ZESocket.h					Sources Headers)
 
 ze_add_library(ZESocket 
@@ -49,7 +49,7 @@ ze_add_library(ZESocket
 	HEADERS ${Headers}
     LIBS ZEFoundation)
 	
-ze_add_test(ZESocketTests
-	SOURCES ${Tests}
-	EXTRA_SOURCES
-	TEST_TARGET ZESocket)
+#ze_add_test(ZESocketTests
+#	SOURCES ${Tests}
+#	EXTRA_SOURCES
+#	TEST_TARGET ZESocket)

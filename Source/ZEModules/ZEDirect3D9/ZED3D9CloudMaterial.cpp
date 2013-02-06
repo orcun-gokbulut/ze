@@ -52,7 +52,7 @@
 #include "ZETexture/ZETextureOptions.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEMap/ZEPortalMap/ZEPortalMap.h"
+#include "ZEInterior/ZEInterior.h"
 #include "ZEGraphics/ZEVertexDeclaration.h"
 #include "ZED3D9VertexDeclaration.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
@@ -566,6 +566,9 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	// Update material if its changed. (Recompile shader, etc.)
 	// ((ZED3D9CloudMaterial*)this)->UpdateMaterial();
 	
+	float OriginalFarZ = zeScene->GetActiveCamera()->GetFarZ();
+	zeScene->GetActiveCamera()->SetFarZ(20000.0f);
+
 	((ZED3D9CloudMaterial*)this)->UpdateShadowTransformations();
 
 	IDirect3DSurface9* RenderTarget;
@@ -590,7 +593,8 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00FFFFFF, 1.0f, 0x00);
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)CloudTexture, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_WRAP);
 	*/
-	ZEVector3 CameraPosition = Camera->GetWorldPosition();
+
+	ZEVector3 CameraPosition = zeScene->GetActiveCamera()->GetWorldPosition();
 
 	struct
 	{
@@ -652,7 +656,7 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)CloudFormationTexture, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_WRAP);
 
 	ZEMatrix4x4	WorldViewProjMatrix;
-	ZEMatrix4x4::Multiply(WorldViewProjMatrix, Renderer->GetCamera()->GetViewProjectionTransform(), RenderCommand->WorldMatrix);
+	ZEMatrix4x4::Multiply(WorldViewProjMatrix, zeScene->GetActiveCamera()->GetViewProjectionTransform(), RenderCommand->WorldMatrix);
 
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&WorldViewProjMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(4, (const float*)&VertexShaderParameters, sizeof(VertexShaderParameters) / 16);
@@ -753,7 +757,7 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	LocalESun.z = LightScale * SunLightColor.z / LocalMieRayleighSum.z;
 	LocalESun.w = EarthRadius;
 
-	ZEVector4::Scale(LocalMieRayleighSum, LocalMieRayleighSum, 1.0f / Camera->GetFarZ());
+	ZEVector4::Scale(LocalMieRayleighSum, LocalMieRayleighSum, 1.0f / 20000.0f);//zeScene->GetActiveCamera()->GetFarZ());
 	LocalMieRayleighSum.w = AtmosphereHeight * (2.0f * EarthRadius + AtmosphereHeight);
 
 	ZEVector4 LocalAmbient;
@@ -896,6 +900,8 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	RenderCommand->IndexBuffer			= RenderCloudIndexBuffer;
 	RenderCommand->VertexBuffer			= RenderCloudVertexBuffer;
 	RenderCommand->VertexDeclaration	= RenderCloudVertexDeclaration;
+
+	zeScene->GetActiveCamera()->SetFarZ(OriginalFarZ);
 
 	return true;
 }

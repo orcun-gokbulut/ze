@@ -89,7 +89,7 @@ void ZECamera::SetPosition(const ZEVector3& NewPosition)
 	ZEEntity::SetPosition(NewPosition);
 }	
 
-void ZECamera::SetLocalRotation(const ZEQuaternion& NewRotation)
+void ZECamera::SetRotation(const ZEQuaternion& NewRotation)
 {
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;
@@ -161,6 +161,26 @@ float ZECamera::GetAspectRatio() const
 	return AspectRatio;
 }
 
+void ZECamera::SetShadowDistance(float Value)
+{
+	ShadowDistance = Value;
+}
+
+float ZECamera::GetShadowDistance() const
+{
+	return ShadowDistance;
+}
+
+void ZECamera::SetShadowFadeDistance(float Value)
+{
+	ShadowFadeDistance = Value;
+}
+
+float ZECamera::GetShadowFadeDistance() const
+{
+	return ShadowFadeDistance;
+}
+
 const ZEView& ZECamera::GetView()
 {
 	/*if (!UpdateView)
@@ -202,23 +222,26 @@ void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
 
 	ZEMatrix4x4::Transform3x3(Ray.v, InvViewMatrix, V);
 
-	Ray.p.x = InvViewMatrix.M41;
-	Ray.p.y = InvViewMatrix.M42;
-	Ray.p.z = InvViewMatrix.M43; 
+	Ray.p.x = InvViewMatrix.M14;
+	Ray.p.y = InvViewMatrix.M24;
+	Ray.p.z = InvViewMatrix.M34; 
 	ZEVector3::Normalize(Ray.v, Ray.v);
 }
 
 ZECamera::ZECamera()
 {
-	FOV = ZE_PI_2;
-	AspectRatio = zeGraphics->GetAspectRatio();
-	NearZ = zeGraphics->GetNearZ();
-	FarZ = zeGraphics->GetFarZ();
 	UpdateView = true;
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;
-	UpdateViewProjectionTransform = true;
 	UpdateProjectionTransform = true;
+	UpdateViewProjectionTransform = true;
+
+	FOV = ZE_PI_2;
+	FarZ = zeGraphics->GetFarZ();
+	NearZ = zeGraphics->GetNearZ();
+	AspectRatio = zeGraphics->GetAspectRatio();
+	ShadowDistance = 100.0f;
+	ShadowFadeDistance = ShadowDistance * 0.1f;
 }
 
 ZECamera* ZECamera::CreateInstance()

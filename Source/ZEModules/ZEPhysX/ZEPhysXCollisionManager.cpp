@@ -34,34 +34,55 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPhysXCollisionManager.h"
-#include "ZEPhysics/ZEPhysicalCallbacks.h"
 #include "ZEPhysics/ZEPhysicalRigidBody.h"
+#include "ZEPhysXConversion.h"
 #include <NxActor.h>
 
 void ZEPhysXCollisionManager::onContactNotify(NxContactPair& pair, NxU32 events)
 {
-	ZEPhysicalCollisionEventArgument Collision;
-	if (!pair.isDeletedActor[0])
-		Collision.Collider1 = (ZEPhysicalRigidBody*)pair.actors[0]->userData;
-	else
-		Collision.Collider1 = NULL;
+	ZEPhysicalObject*	Collider1;
+	ZEPhysicalObject*	Collider2;
+	ZEVector3			ContactPosition;
+	ZEVector3			ContactNormal;
+	float				ContactForce; //Basically ContactForce is magnitude of ContactNormal
 
 	if (!pair.isDeletedActor[0])
-		Collision.Collider2 = (ZEPhysicalRigidBody*)pair.actors[1]->userData;
+		Collider1 = (ZEPhysicalRigidBody*)pair.actors[0]->userData;
 	else
-		Collision.Collider2 = NULL;
+		Collider1 = NULL;
 
-	if (Collision.Collider1 != NULL)
+	if (!pair.isDeletedActor[0])
+		Collider2 = (ZEPhysicalRigidBody*)pair.actors[1]->userData;
+	else
+		Collider2 = NULL;
+
+	NxContactStreamIterator ContactIterator(pair.stream);
+
+	while(ContactIterator.goNextPair())
 	{
-		const ZEPhysicalCollisionEvent& Callback = ((ZEPhysicalRigidBody*)Collision.Collider1)->GetCollisionEvent();
-		if (!Callback.empty())
-			Callback(Collision);
+		while(ContactIterator.goNextPatch())
+		{
+			ContactNormal = NX_TO_ZE(ContactIterator.getPatchNormal());
+
+			while(ContactIterator.goNextPoint())
+			{
+				ContactPosition = NX_TO_ZE(ContactIterator.getPoint());
+				ContactForce = ContactIterator.getPointNormalForce();
+			}
+		}
 	}
 
-	if (Collision.Collider2 != NULL)
+	if (Collider1 != NULL)
 	{
-		const ZEPhysicalCollisionEvent& Callback = ((ZEPhysicalRigidBody*)Collision.Collider2)->GetCollisionEvent();
-		if (!Callback.empty())
-			Callback(Collision);
+		const ZEPhysicalCollisionEvent& Callback = ((ZEPhysicalRigidBody*)Collider1)->GetCollisionEvent();
+		if (Callback != NULL)
+			Callback(Collider1, Collider2, ContactPosition, ContactNormal, ContactForce);
+	}
+
+	if (Collider2 != NULL)
+	{
+		const ZEPhysicalCollisionEvent& Callback = ((ZEPhysicalRigidBody*)Collider2)->GetCollisionEvent();
+		if (Callback != NULL)
+			Callback(Collider1, Collider2, ContactPosition, ContactNormal, ContactForce);
 	}
 }

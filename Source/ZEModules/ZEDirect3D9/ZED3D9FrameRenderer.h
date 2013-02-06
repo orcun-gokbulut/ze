@@ -66,6 +66,7 @@ class ZEDirectionalLight;
 class ZED3D9VertexShader;
 class ZEOmniProjectiveLight;
 class ZED3D9StaticVertexBuffer;
+struct ZEDrawParameters;
 
 class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 {
@@ -74,6 +75,8 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 
 	private:
 		ZEUInt32							LightStencilMaskValue;
+
+		ZEDrawParameters*					DrawParameters;
 
 		ZED3D9Texture2D*					ABuffer;
 		ZED3D9ViewPort*						ViewPort;
@@ -126,7 +129,6 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 			ZED3D9PixelShader*				OmniProjectiveLightPS;
 		} LightningComponents;
 
-
 		static bool							CheckRenderCommand(ZERenderCommand* RenderCommand);
 		static void							PumpStreams(ZERenderCommand* RenderCommand);
 
@@ -166,6 +168,9 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9UnsharpenFilterProcessor		UnsharpenProcessor;
 		
 
+		virtual void						SetDrawParameters(ZEDrawParameters* DrawParameters);
+		virtual ZEDrawParameters*			GetDrawParameters();
+
 		virtual void						SetViewPort(ZEViewPort* ViewPort);
 		virtual ZEViewPort*					GetViewPort();
 
@@ -184,10 +189,10 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor);
 
 		virtual void						SetLights(ZESmartArray<ZELight*>& Lights);
-
 		virtual void						AddToLightList(ZELight* Light);
 		virtual void						ClearLightList();
 
+		virtual const ZESmartArray<ZERenderCommand>& GetRenderList() const;
 		virtual void						AddToRenderList(ZERenderCommand* RenderCommand);
 		virtual void						ClearRenderList();
 

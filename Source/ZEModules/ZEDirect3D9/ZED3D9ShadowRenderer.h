@@ -42,45 +42,67 @@
 
 #include <d3d9.h>
 
+
 class ZETexture2D;
 class ZETextureCube;
 class ZERenderCommand;
 class ZEViewPort;
 class ZED3D9ViewPort;
+struct ZEDrawParameters;
 enum ZETextureCubeFace;
+
+enum ZEShadowMapFilterType
+{
+	ZE_SMFT_PCF_1_TAP			= 0,
+	ZE_SMFT_PCF_4_TAP			= 1,
+	ZE_SMFT_PCF_POISSON_4_TAP	= 2,
+	ZE_SMFT_PCF_POISSON_5_TAP	= 3,
+	ZE_SMFT_PCF_POISSON_6_TAP	= 4,
+	ZE_SMFT_PCF_POISSON_8_TAP	= 5,
+	ZE_SMFT_PCF_POISSON_12_TAP	= 6
+};
 
 class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 {
-	friend ZED3D9Module;
+	friend class ZED3D9Module;
 	private:
-		ZED3D9ViewPort*							ViewPort;
+		ZETexture2D*							RandomRotationMap;
+		ZEShadowMapFilterType					FilterType;
 
-		ZESmartArray<ZERenderCommand>			CommandList;
-
-		ZEArray<ZEPostProcessor*>				PostProcessors;
+		ZEDrawParameters*						DrawParameters;
 
 		ZELight*								Light;
-		
+		ZED3D9ViewPort*							ViewPort;
+		ZEUInt									ShadowResolution;
+		ZESmartArray<ZERenderCommand>			CommandList;
+
+		LPDIRECT3DSURFACE9						DepthSurface;
+		ZED3D9Texture2D*						NULLRenderTarget;
+
+		ZEArray<ZEPostProcessor*>				PostProcessors;
 		bool									Face;
 
 		bool									InitializeShaders();
 		void									DeinitializeShaders();
 
-		void									RenderProjectiveLight();
 		void									RenderPointLight();
-		void									RenderOmniProjectiveLight();
+		void									RenderProjectiveLight();
 		void									RenderDirectionalLight();
-
-		LPDIRECT3DSURFACE9						ShadowMapFrameBuffer;
-		LPDIRECT3DSURFACE9						ShadowMapZBuffer;
-
+		void									RenderOmniProjectiveLight();
+		
 	protected:
 												ZED3D9ShadowRenderer();
 		virtual									~ZED3D9ShadowRenderer();
 
-		void									DrawRenderCommand(ZERenderCommand* RenderCommand);
+	public:
+		void									SetDrawParameters(ZEDrawParameters* Parameters);
+		ZEDrawParameters*						GetDrawParameters();
 
-	public:	
+		void									SetShadowResolution(ZEUInt Resolution);
+		ZEUInt									GetShadowResolution() const;
+		
+		const ZETexture2D*						GetRandomRotationMap() const;
+
 		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors();
 		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor);
 		virtual void							RemovePostProcessor(ZEPostProcessor* PostProcessor);
@@ -101,6 +123,7 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		virtual void							SetViewPort(ZEViewPort* ViewPort);
 		virtual ZEViewPort*						GetViewPort();
 
+		virtual const ZESmartArray<ZERenderCommand>& GetRenderList() const;
 		virtual void							AddToRenderList(ZERenderCommand* RenderCommand);
 		virtual void							ClearRenderList();
 

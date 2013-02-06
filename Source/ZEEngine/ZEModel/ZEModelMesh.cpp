@@ -35,14 +35,11 @@
 
 #include "ZEModelMesh.h"
 #include "ZEModel.h"
-#include "ZEModelFileFormat.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZERenderer.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEDrawParameters.h"
-
 #include "ZEPhysics/ZEPhysicalCloth.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
 
 void ZEModelMesh::SetActiveLOD(ZEUInt LOD)
 {
@@ -87,15 +84,14 @@ const ZEAABBox& ZEModelMesh::GetLocalBoundingBox()
 
 const ZEAABBox& ZEModelMesh::GetModelBoundingBox()
 {
-	ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
+	ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetLocalTransform());
 
 	return ModelBoundingBox;
 }
 
 const ZEAABBox& ZEModelMesh::GetWorldBoundingBox()
 {
-
-	ZEAABBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+	ZEAABBox::Transform(WorldBoundingBox, LocalBoundingBox, GetWorldTransform());
 
 	return WorldBoundingBox;
 }
@@ -105,13 +101,6 @@ const ZEMatrix4x4& ZEModelMesh::GetLocalTransform()
 	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
 
 	return LocalTransform;
-}
-
-const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
-{
-	ZEMatrix4x4::Multiply(ModelTransform, Owner->GetTransform(), GetLocalTransform());
-
-	return ModelTransform;	
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
@@ -182,6 +171,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	Position = MeshResource->Position;
 	Rotation = MeshResource->Rotation;
 	Scale = MeshResource->Scale;
+	Visible = MeshResource->IsVisible;
 	LocalBoundingBox = MeshResource->BoundingBox;
 	PhysicsEnabled = false;
 
@@ -200,7 +190,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			PhysicalBody->SetPosition(Owner->GetWorldPosition());
 			PhysicalBody->SetRotation(Owner->GetWorldRotation());
 			PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenter);
-			PhysicalBody->SetTransformChangeEvent(ZEPhysicalTransformChangeEvent(this->Owner, &ZEModel::TransformChangeEvent));
+			PhysicalBody->SetTransformChangeEvent(ZEDelegate<void (ZEPhysicalObject*, ZEVector3, ZEQuaternion)>::Create<ZEModel, &ZEModel::TransformChangeEvent>(this->Owner));
 
 			for (ZESize I = 0; I < MeshResource->PhysicalBody.Shapes.GetCount(); I++)
 			{
@@ -290,6 +280,8 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	for (ZESize I = 0; I < ShapeList.GetCount(); I++)
 		delete ShapeList[I];
 	ShapeList.Clear();
+
+
 }
 
 void ZEModelMesh::Deinitialize()

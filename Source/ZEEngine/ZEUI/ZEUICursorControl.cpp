@@ -158,6 +158,12 @@ ZEUIMouseKey ZEUICursorControl::GetCurrentButton()
 	return CurentButton;
 }
 
+void ZEUICursorControl::SetZOrder(ZEInt Z)
+{
+	ZEUIControl::SetZOrder(Z);
+	Cursor.ZOrder = Z;
+}
+
 ZEMaterial* ZEUICursorControl::GetMaterial() const
 {
 	return CursorMaterial;
@@ -200,7 +206,7 @@ ZEUICursorControl::ZEUICursorControl()
 	Cursor.Texcoords.RightDown = ZEVector2::One;
 
 	CursorMaterial = ZEUIMaterial::CreateInstance();
-	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("Cursor.png")->GetTexture());
+	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/Cursor.png")->GetTexture());
 	Cursor.Material = CursorMaterial;
 	Cursor.Color = GetBackgroundColor();
 

@@ -38,7 +38,6 @@
 #define __ZE_PHYSICS_DEBUG_MODULE_H__
 
 #include "ZECore/ZEApplicationModule.h"
-#include "ZEPhysics/ZEPhysicalCallbacks.h"
 
 class ZEPlayer;
 class ZEPhysicalRigidBody;
@@ -57,8 +56,8 @@ class ZEPhysicsDebugModule : public ZEApplicationModule
 
 		ZEModel*				TestBody;
 
-		void					TransformChanged(const ZEPhysicalTransformChangeEventArgument& TransformChange);
-		void					ColisionDetected(const ZEPhysicalCollisionEventArgument& Collision);
+		void					TransformChanged(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);
+		void					ColisionDetected(ZEPhysicalObject* Collider1, ZEPhysicalObject* Collider2);
 
 	public:
 		virtual void			Process(float ElapsedTime);
@@ -66,7 +65,7 @@ class ZEPhysicsDebugModule : public ZEApplicationModule
 		virtual bool			Initialize();
 		virtual void			Deinitialize();
 
-
+		static	void			ConnectToVisualDebugger(const char* Adress, ZEInt Port);
 
 								ZEPhysicsDebugModule();
 		virtual					~ZEPhysicsDebugModule();

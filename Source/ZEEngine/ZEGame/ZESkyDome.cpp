@@ -38,9 +38,6 @@
 #include "ZEGraphics/ZESkyDomeMaterial.h"
 #include "ZEDrawParameters.h"
 
-#define		ZE_SKY_DOME_PATH		"resources\\ClippedUnitDome.zeCanvas"
-
-
 void ZESkyDome::SetAmbientFactor(float Value)
 {
 	AmbientFactor = Value;
@@ -226,9 +223,9 @@ bool ZESkyDome::Initialize()
 	// Load sky dome
 	if (SkyDomeGeometry.IsEmpty())
 	{
-		if (!SkyDomeGeometry.LoadFromFile(ZE_SKY_DOME_PATH))
+		if (!SkyDomeGeometry.LoadFromFile("ZEEngine/ZEAtmosphere/Meshes/SkyDome.zeCanvas"))
 		{
-			zeDebugCheck("Cannot Load Sky Dome Geometry From: \"%s\"", ZE_SKY_DOME_PATH);
+			zeError("Cannot load sky dome geometry.");
 			return false;
 		}
 	}
@@ -263,6 +260,9 @@ void ZESkyDome::Deinitialize()
 
 void ZESkyDome::Draw(ZEDrawParameters* DrawParameters)
 {
+	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
+		return;
+
 	SkyDomeMaterial->G						= G;
 	SkyDomeMaterial->SunsetAmbientColor		= SunsetAmbientColor;
 	SkyDomeMaterial->MiddayAmbientColor		= MiddayAmbientColor;
@@ -312,7 +312,7 @@ ZESkyDome::ZESkyDome()
 	MiddayAmbientColor		= ZEVector3(0.0f, 0.0f, 0.0f);
 	SunsetAmbientColor		= ZEVector3(0.0f, 0.0f, 0.0f);
 
-	SunLightDirection		= ZEVector3(0.0f, 0.0f, -1.0f);
+	SunLightDirection		= ZEVector3(0.0001f, -1.0f, 0.0001f);
 	SunLightWaveLenght		= ZEVector3(0.650f, 0.570f, 0.475f);
 
 	CameraPosition			= ZEVector3(0.0f, 0.0f, 0.0f);

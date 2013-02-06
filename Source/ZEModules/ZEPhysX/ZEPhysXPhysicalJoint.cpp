@@ -190,9 +190,17 @@ ZEQuaternion ZEPhysXPhysicalJoint::GetRotation()
 void ZEPhysXPhysicalJoint::SetBodyA(ZEPhysicalRigidBody* Object)
 {
 	if (Object != NULL)
+	{
 		JointDesc.actor[0] = ((ZEPhysXPhysicalRigidBody*)Object)->Actor;
+
+		JointDesc.localAnchor[0] = ZE_TO_NX(ZEVector3::Zero);
+		JointDesc.localAxis[0] = ZE_TO_NX(ZEVector3::UnitX);
+		JointDesc.localNormal[0] = ZE_TO_NX(ZEVector3::UnitY);
+	}
 	else
 		JointDesc.actor[0] = NULL;
+
+
 
 	if (Joint != NULL)
 		ReCreate();
@@ -237,7 +245,13 @@ ZEQuaternion ZEPhysXPhysicalJoint::GetBodyAConnectionOrientation() const
 void ZEPhysXPhysicalJoint::SetBodyB(ZEPhysicalRigidBody* Object)
 {
 	if (Object != NULL)
+	{
 		JointDesc.actor[1] = ((ZEPhysXPhysicalRigidBody*)Object)->Actor;
+
+		JointDesc.localAnchor[1] = ZE_TO_NX(ZEVector3::Zero);
+		JointDesc.localAxis[1] = ZE_TO_NX(ZEVector3::UnitX);
+		JointDesc.localNormal[1] = ZE_TO_NX(ZEVector3::UnitY);
+	}
 	else
 		JointDesc.actor[1] = NULL;
 

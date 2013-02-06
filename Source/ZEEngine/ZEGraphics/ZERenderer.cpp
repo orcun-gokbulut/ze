@@ -37,11 +37,17 @@
 
 ZERenderer::ZERenderer()
 {
+	memset(&Statistics, 0, sizeof(ZERendererStatistics));
 }
 
 ZERenderer::~ZERenderer()
 {
 
+}
+
+const ZERendererStatistics& ZERenderer::GetStatistics() const
+{
+	return Statistics;
 }
 
 void ZERenderer::AddToLightList(ZELight* Light)
