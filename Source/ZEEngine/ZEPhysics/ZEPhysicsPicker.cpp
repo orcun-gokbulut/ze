@@ -186,7 +186,7 @@ bool ZEPhysicsPicker::PickObject(ZEInt X, ZEInt Y)
 
 	ZERayCastResultDetails ResultDetails;
 
-	ZEPhysicalShape* ClosestShape = zeScene->GetPhysicalWorld()->RayCastToClosestShape(Ray, ZE_PSMT_ALL_SHAPES, ResultDetails);
+	ZEPhysicalShape* ClosestShape = zeScene->GetPhysicalWorld()->RayCastToClosestShape(Ray, ZE_PRCFST_ALL_SHAPES, ResultDetails);
 
 	if(ClosestShape == NULL)
 		return false;
@@ -200,8 +200,7 @@ bool ZEPhysicsPicker::PickObject(ZEInt X, ZEInt Y)
 		if (ClosestObject->GetPhysicalBodyType() != ZE_PBT_DYNAMIC)
 			return false;
 
-
-		//siktir et forwardproju rayin eye a distanceý ný yeni vector le çarp worldu çýksýn.
+		//forwardproju rayin eye a distanceý ný yeni vector le çarp worldu çýksýn.
 // 
 // 		ZEInt RayCastResultX;
 // 		ZEInt RayCastResultY;
