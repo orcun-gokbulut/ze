@@ -33,10 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-// Transformation matrices 5 matrices
-float4x4 TransformMatrix : register(vs, c0);
-float2 TextureSize : register(vs, c5);
-sampler2D Texture : register(ps, s0);
+Texture2D<float4> Texture	: register(t0);
+SamplerState TextureSampler : register(s0);
 
 struct VSInput 
 {
@@ -58,23 +56,30 @@ struct PSInput
 	float2 Texcoord             : TEXCOORD1;
 };
 
+cbuffer BufferVS : register(b0)
+{
+	float4x4	TransformMatrix : packoffset(c0);
+
+};
+
 VSOutput VSMain(VSInput Input)
 {
 	VSOutput Output;
 
 	Output.Position = mul(TransformMatrix, Input.Position);
-	Output.Texcoord = Input.Texcoord + TextureSize;
+	Output.Texcoord = Input.Texcoord;
 	Output.Color = Input.Color;
 	
 	return Output;
 }
 
-float4 PSMain(PSInput Input) : COLOR0
+float4 PSMain(PSInput Input) : SV_TARGET0
 {
 	return Input.Color;
 }
 
-float4 PSMainTextured(PSInput Input) : COLOR0
+float4 PSMainTextured(PSInput Input) : SV_TARGET0
 {
-	return Input.Color * tex2D(Texture, Input.Texcoord);
+	//return Input.Color * tex2D(Texture, Input.Texcoord);
+	return Input.Color * Texture.Sample(TextureSampler, Input.Texcoord);
 }

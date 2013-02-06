@@ -51,7 +51,7 @@ class ZEMaterial;
 
 struct ZEFontCharacter
 {
-	const ZEMaterial*		Material;
+	ZEMaterial*				Material;
 	const ZETexture2D*		Texture;
 	ZERectangle				CoordinateRectangle;
 };

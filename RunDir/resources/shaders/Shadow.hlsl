@@ -32,7 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-
+/*
 #define ShadowHardwareFiltering		1
 #define ZE_SHF_NONE					0
 #define ZE_SHF_NVIDIA				1
@@ -107,3 +107,5 @@ float SampleShadowMap(sampler2D ShadowMap, float4 Texcoord)
 float SampleParaboloidShadowMap(sampler2D FrontShadowMap, sampler2D BackShadowMap, float3 Position)
 {
 }
+
+*/

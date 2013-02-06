@@ -38,8 +38,8 @@
 #include "ZEPhysics/ZEPhysicalObject.h"
 #include "ZEPhysics/ZEPhysicalRigidBody.h"
 #include "ZEError.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZESimpleMaterial.h"
 #include <NxDebugRenderable.h>
 
 static ZEVector4 NX_TO_ZE(NxU32 color)
@@ -58,106 +58,14 @@ ZEPhysXPhysicalWorld::ZEPhysXPhysicalWorld()
 	SceneDesc.groundPlane = false;
 	SceneDesc.simType = NX_SIMULATION_SW;
 	SceneDesc.upAxis = 1;
-	DebugDraw.Material = NULL;
 	Visualize = false;
 	Enabled = true;
 }
 
 ZEPhysXPhysicalWorld::~ZEPhysXPhysicalWorld()
 {
-	if (DebugDraw.Material != NULL)
-		DebugDraw.Material->Release();
-
 	Deinitialize();
 }
-
-void ZEPhysXPhysicalWorld::InitializeDebugDraw()
-{
-			//GetPhysicsSDK()->setParameter(NX_VISUALIZATION_SCALE, 1.0f);
-	/*GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_AXES, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_MASS_AXES, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_LIN_VELOCITY, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_ANG_VELOCITY, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_JOINT_GROUPS, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_JOINT_LOCAL_AXES, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_JOINT_WORLD_AXES, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_JOINT_LIMITS, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CONTACT_POINT, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CONTACT_NORMAL, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CONTACT_ERROR, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CONTACT_FORCE, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_ACTOR_AXES, 1.0f);*/
-			/*GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_AABBS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_SHAPES, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_AXES, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_COMPOUNDS, 1.0f);*/
-	//GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_VNORMALS, 1.0f);
-	//GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_FNORMALS, 1.0f);
-			/*GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_EDGES, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_SPHERES, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_STATIC, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_DYNAMIC, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_FREE, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_CCD, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_SKELETONS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_EMITTERS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_POSITION, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_VELOCITY, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_KERNEL_RADIUS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_BOUNDS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_PACKETS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_MOTION_LIMIT, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_DYN_COLLISION, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_STC_COLLISION, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_MESH_PACKETS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_DRAINS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_PACKET_DATA, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_MESH, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_COLLISIONS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_SELFCOLLISIONS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_WORKPACKETS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_SLEEP, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_SLEEP_VERTEX, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_TEARABLE_VERTICES, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_TEARING, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_ATTACHMENT, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_VALIDBOUNDS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_MESH, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_COLLISIONS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_WORKPACKETS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_SLEEP, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_SLEEP_VERTEX, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_TEARABLE_VERTICES, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_TEARING, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_ATTACHMENT, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_VALIDBOUNDS, 1.0f);*/
-
-	const NxDebugRenderable* DebugRenderable = Scene->getDebugRenderable();
-
-	DebugDraw.Material = ZESimpleMaterial::CreateInstance();
-
-	DebugDraw.PointsRenderCommand.SetZero();
-	DebugDraw.PointsRenderCommand.Material = DebugDraw.Material;
-	DebugDraw.PointsRenderCommand.PrimitiveType = ZE_ROPT_POINT;
-	DebugDraw.PointsRenderCommand.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
-	DebugDraw.PointsRenderCommand.VertexBuffer = &DebugDraw.PointsVertexBuffer;
-	DebugDraw.PointsRenderCommand.VertexDeclaration = ZEColoredVertex::GetVertexDeclaration();
-
-	DebugDraw.LinesRenderCommand.SetZero();
-	DebugDraw.LinesRenderCommand.Material = DebugDraw.Material;
-	DebugDraw.LinesRenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	DebugDraw.LinesRenderCommand.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
-	DebugDraw.LinesRenderCommand.VertexBuffer = &DebugDraw.LinesVertexBuffer;
-	DebugDraw.LinesRenderCommand.VertexDeclaration = ZEColoredVertex::GetVertexDeclaration();
-
-	DebugDraw.TrianglesRenderCommand.SetZero();
-	DebugDraw.TrianglesRenderCommand.Material = DebugDraw.Material;
-	DebugDraw.TrianglesRenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	DebugDraw.TrianglesRenderCommand.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
-	DebugDraw.TrianglesRenderCommand.VertexBuffer = &DebugDraw.TrianglesVertexBuffer;
-	DebugDraw.TrianglesRenderCommand.VertexDeclaration = ZEColoredVertex::GetVertexDeclaration();
-}
-
 
 NxScene* ZEPhysXPhysicalWorld::GetScene()
 {
@@ -261,55 +169,8 @@ void ZEPhysXPhysicalWorld::Deinitialize()
 
 void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 {
-	if (!Visualize)
-		return;
-
-	if (DebugDraw.Material == NULL)
-		InitializeDebugDraw();
-
-	const NxDebugRenderable* DebugRenderable = Scene->getDebugRenderable();
-
-	DebugDraw.PointsRenderCommand.PrimitiveCount = DebugRenderable->getNbPoints();
-	DebugDraw.PointsVertexBuffer.SetCount(DebugDraw.PointsRenderCommand.PrimitiveCount);
-	const NxDebugPoint* DebugPoints = DebugRenderable->getPoints();
-	for (ZESize I = 0; I < DebugDraw.PointsRenderCommand.PrimitiveCount; I++)
-	{
-		DebugDraw.PointsVertexBuffer[I].Position = NX_TO_ZE(DebugPoints[I].p);
-		DebugDraw.PointsVertexBuffer[I].Color = NX_TO_ZE(DebugPoints[I].color);
-	}
-	if (DebugDraw.PointsRenderCommand.PrimitiveCount != 0)
-		Renderer->AddToRenderList(&DebugDraw.PointsRenderCommand);
-
-
-	DebugDraw.LinesRenderCommand.PrimitiveCount = DebugRenderable->getNbLines();
-	DebugDraw.LinesVertexBuffer.SetCount(DebugDraw.LinesRenderCommand.PrimitiveCount * 2);
-	const NxDebugLine* DebugLines = DebugRenderable->getLines();
-	for (ZESize I = 0; I < DebugDraw.LinesRenderCommand.PrimitiveCount; I++)
-	{
-		DebugDraw.LinesVertexBuffer[2 * I].Position = NX_TO_ZE(DebugLines[I].p0);
-		DebugDraw.LinesVertexBuffer[2 * I].Color = NX_TO_ZE(DebugLines[I].color);
-		DebugDraw.LinesVertexBuffer[2 * I + 1].Position = NX_TO_ZE(DebugLines[I].p1);
-		DebugDraw.LinesVertexBuffer[2 * I + 1].Color = NX_TO_ZE(DebugLines[I].color);
-	}
-	if (DebugDraw.LinesRenderCommand.PrimitiveCount != 0)
-		Renderer->AddToRenderList(&DebugDraw.LinesRenderCommand);
-
-	DebugDraw.TrianglesRenderCommand.PrimitiveCount = DebugRenderable->getNbTriangles();
-	DebugDraw.TrianglesVertexBuffer.SetCount(DebugDraw.TrianglesRenderCommand.PrimitiveCount * 3);
-	const NxDebugTriangle* DebugTriangles = DebugRenderable->getTriangles();
-	for (ZESize I = 0; I < DebugDraw.TrianglesRenderCommand.PrimitiveCount; I++)
-	{
-		DebugDraw.TrianglesVertexBuffer[3 * I].Position = NX_TO_ZE(DebugTriangles[I].p0);
-		DebugDraw.TrianglesVertexBuffer[3 * I].Color = NX_TO_ZE(DebugTriangles[I].color);
-		DebugDraw.TrianglesVertexBuffer[3 * I + 1].Position = NX_TO_ZE(DebugTriangles[I].p1);
-		DebugDraw.TrianglesVertexBuffer[3 * I + 1].Color = NX_TO_ZE(DebugTriangles[I].color);
-		DebugDraw.TrianglesVertexBuffer[3 * I + 2].Position = NX_TO_ZE(DebugTriangles[I].p2);
-		DebugDraw.TrianglesVertexBuffer[3 * I + 2].Color = NX_TO_ZE(DebugTriangles[I].color);
-	}
-	if (DebugDraw.TrianglesRenderCommand.PrimitiveCount != 0)
-		Renderer->AddToRenderList(&DebugDraw.TrianglesRenderCommand);
+	
 }
-
 
 void ZEPhysXPhysicalWorld::Process(float ElapsedTime)
 {

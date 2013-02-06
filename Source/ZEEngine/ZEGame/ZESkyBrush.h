@@ -38,8 +38,8 @@
 #define __ZE_SKYBRUSH_H__
 
 #include "ZEEntity.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZESkyBrush);
 
@@ -52,7 +52,7 @@ class ZESkyBrush : public ZEEntity
 	private:
 		ZECanvas							SkyBox;
 		ZETextureCubeResource*				SkyTexture;
-		ZESkyBoxMaterial*					SkyMaterial;
+		//ZESkyBoxMaterial*					SkyMaterial;
 		ZERenderCommand						SkyRenderCommand;
 
 		ZEVector3							SkyColor;

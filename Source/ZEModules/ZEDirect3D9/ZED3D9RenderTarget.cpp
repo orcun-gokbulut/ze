@@ -34,47 +34,41 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9RenderTarget.h"
-
-float ZED3D9RenderTarget::GetAspectRatio()
-{
-	if (FrameBuffer != NULL)
-	{
-		D3DSURFACE_DESC Desc;
-		FrameBuffer->GetDesc(&Desc);
-		return (float)Desc.Width / (float)Desc.Height;
-	}
-
-	return 0.0f;
-}
+#include "ZEError.h"
 
 ZEUInt ZED3D9RenderTarget::GetWidth()
 {
-	if (FrameBuffer != NULL)
+	D3DSURFACE_DESC Desc;
+	if (Surface == NULL || FAILED(Surface->GetDesc(&Desc)))
 	{
-		D3DSURFACE_DESC Desc;
-		FrameBuffer->GetDesc(&Desc);
-		return Desc.Width;
+		zeError("Cannot get surface description.");
+		return 0;
 	}
 
-	return 0;
+	return Desc.Width;
 }
 
 ZEUInt ZED3D9RenderTarget::GetHeight()
 {
-	if (FrameBuffer != NULL)
+	D3DSURFACE_DESC Desc;
+	if (Surface == NULL || FAILED(Surface->GetDesc(&Desc)))
 	{
-		D3DSURFACE_DESC Desc;
-		FrameBuffer->GetDesc(&Desc);
-		return Desc.Height;
+		zeError("Cannot get surface description.");
+		return 0;
 	}
 
-	return 0;
+	return Desc.Height;
 }
+
+void ZED3D9RenderTarget::SetTexture(ZETexture* Texture)
+{
+	this->Texture = Texture;
+}
+
 
 ZED3D9RenderTarget::ZED3D9RenderTarget()
 {
-	FrameBuffer = NULL;
-	ZBuffer = NULL;
+	Surface = NULL;
 }
 
 ZED3D9RenderTarget::~ZED3D9RenderTarget()

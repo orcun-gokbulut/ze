@@ -38,40 +38,43 @@
 #define __ZE_VERTEX_TYPES_H__
 
 #include "ZEMath/ZEVector.h"
-class ZEVertexDeclaration;
+
+class ZEVertexLayout;
+
 class ZESimpleVertex
 {
 	private:
-		static ZEVertexDeclaration*		VertexDeclaration;
+		static ZEVertexLayout*	VertexDeclaration;
 
 	public:
-		ZEVector3						Position;
-		ZEVector3						Normal;
-		ZEVector2						Texcoord;
-		ZEVector4						Color;
+		ZEVector3				Position;
+		ZEVector3				Normal;
+		ZEVector2				Texcoord;
+		ZEVector4				Color;
 
-		static ZEVertexDeclaration*		GetVertexDeclaration();
+		static ZEVertexLayout*	GetVertexDeclaration();
 };
 
 struct ZEMapVertex
 {
-	private:
-		static ZEVertexDeclaration*		VertexDeclaration;
+	//private:
+		//static ZEVertexLayout*		VertexDeclaration;
 
-	public:
+	//public:
 		ZEVector3						Position;
 		ZEVector3						Normal;
 		ZEVector3						Tangent;
 		ZEVector3						Binormal;
 		ZEVector2						Texcoord;
+		//ZEVector4						Color;
 
-		static ZEVertexDeclaration*		GetVertexDeclaration();
+		//static ZEVertexLayout*		GetVertexDeclaration();
 };
 
 struct ZEModelVertex
 {
 	private:
-		static ZEVertexDeclaration*		VertexDeclaration;
+		static ZEVertexLayout*		VertexDeclaration;
 
 	public:
 		ZEVector3						Position;
@@ -80,13 +83,13 @@ struct ZEModelVertex
 		ZEVector3						Binormal;
 		ZEVector2						Texcoord;
 
-		static ZEVertexDeclaration*		GetVertexDeclaration();
+		static ZEVertexLayout*		GetVertexDeclaration();
 };
 
 struct ZESkinnedModelVertex
 {
 	private:
-		static ZEVertexDeclaration*		VertexDeclaration;
+		static ZEVertexLayout*		VertexDeclaration;
 
 	public:
 		ZEVector3						Position;
@@ -97,32 +100,32 @@ struct ZESkinnedModelVertex
 		unsigned char					BoneIndices[4];
 		float							BoneWeights[4];
 
-		static ZEVertexDeclaration*		GetVertexDeclaration();
+		static ZEVertexLayout*		GetVertexDeclaration();
 };
 
 struct ZEUIVertex
 {
 	private:
-		static ZEVertexDeclaration*		VertexDeclaration;
+		static ZEVertexLayout*		VertexDeclaration;
 
 	public:
 		ZEVector2						Position;
 		ZEVector4						Color;
 		ZEVector2						Texcoord;
 
-		static ZEVertexDeclaration*		GetVertexDeclaration();
+		static ZEVertexLayout*		GetVertexDeclaration();
 };
 
 struct ZEColoredVertex
 {
 	private:
-		static ZEVertexDeclaration*		VertexDeclaration;
+		static ZEVertexLayout*		VertexDeclaration;
 
 	public:
 		ZEVector3						Position;
 		ZEVector4						Color;
 
-		static ZEVertexDeclaration*		GetVertexDeclaration();
+		static ZEVertexLayout*		GetVertexDeclaration();
 };
 
 #endif

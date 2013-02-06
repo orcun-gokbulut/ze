@@ -33,13 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEEntity.h"
-#include "ZEMath/ZERay.h"
 #include "ZEError.h"
-#include "ZEEntityProvider.h"
 #include "ZEScene.h"
-#include <string.h>
-
+#include "ZEEntity.h"
+#include "ZEEntityProvider.h"
 
 void ZEEntity::OnTransformChanged()
 {

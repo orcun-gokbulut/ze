@@ -37,7 +37,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEUI/ZEFontResource.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
 
@@ -71,7 +71,7 @@ void ZEUISceneStatisticsControl::Draw(ZEUIRenderer* Renderer)
 void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 {
 	//FPS Calculation
-
+	/*
 	for(ZESize I = 0; I < GetChildControls().GetCount(); I++)
 		GetChildControls()[I]->SetZOrder(GetZOrder());
 
@@ -131,6 +131,7 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 	CameraPosition->SetText(CamPosText + Value);
 
 	ZEUIControl::Tick(ElapsedTime);
+	*/
 }
 
 ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()

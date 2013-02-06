@@ -47,7 +47,7 @@
 #include "ZEGraphics/ZEVertexTypes.h"
 
 
-class ZEStaticVertexBuffer;
+class ZEVertexBuffer;
 class ZETexture2DResource;
 class ZEMaterial;
 class ZEPhysicalJoint;
@@ -259,7 +259,7 @@ struct ZEModelResourceAnimation
 class ZEModelResourceMeshLOD
 {
 	private:
-		ZEStaticVertexBuffer*					SharedVertexBuffer;
+		ZEVertexBuffer*					SharedVertexBuffer;
 
 	public:
 		ZEInt32									LODLevel;
@@ -268,8 +268,8 @@ class ZEModelResourceMeshLOD
 		ZEArray<ZESkinnedModelVertex>			SkinnedVertices;
 		ZEArray<ZEUInt32>						AffectingBoneIds;
 
-		ZEStaticVertexBuffer*					GetSharedVertexBuffer() const;
-		ZEStaticVertexBuffer*					CreatePrivateVertexBuffer() const;
+		ZEVertexBuffer*					GetSharedVertexBuffer() const;
+		ZEVertexBuffer*					CreatePrivateVertexBuffer() const;
 
 												ZEModelResourceMeshLOD();
 												~ZEModelResourceMeshLOD();

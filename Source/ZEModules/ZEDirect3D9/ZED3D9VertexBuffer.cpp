@@ -34,8 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9VertexBuffer.h"
-#include "ZED3D9Module.h"
+#include "ZED3D9GraphicsModule.h"
 #include "ZEError.h"
+#include "ZED3D9CommonTools.h"
 
 ZESize ZED3D9StaticVertexBuffer::GetBufferSize()
 {
@@ -46,7 +47,7 @@ bool ZED3D9StaticVertexBuffer::Create(ZESize BufferSize)
 {
 	Release();
 	this->BufferSize = BufferSize;
-	if (GetDevice()->CreateVertexBuffer((UINT)BufferSize, D3DUSAGE_WRITEONLY, NULL, D3DPOOL_MANAGED, &StaticBuffer, NULL) != D3D_OK)
+	if (Device->CreateVertexBuffer((UINT)BufferSize, D3DUSAGE_WRITEONLY, NULL, D3DPOOL_MANAGED, &StaticBuffer, NULL) != D3D_OK)
 	{
 		zeCriticalError("Can not create static vertex buffer.");
 		return false;
@@ -75,23 +76,20 @@ void ZED3D9StaticVertexBuffer::Unlock()
 		Result = StaticBuffer->Unlock();
 		if (Result != D3D_OK)
 			zeError("Can not lock static vertex buffer.");
+	
+		GenerateVertexSize();
 	}
 }
 
 void ZED3D9StaticVertexBuffer::Release()
 {
-	if (StaticBuffer != NULL)
-	{
-		StaticBuffer->Release();
-		StaticBuffer = NULL;
-	}
+	ZED3D_RELEASE(StaticBuffer);
+
 	BufferSize = 0;
 }
 
-
 void ZED3D9StaticVertexBuffer::Destroy()
 {
-	GetModule()->VertexBuffers.DeleteValue((ZED3D9StaticVertexBuffer*)this);
 	delete this;
 }
 

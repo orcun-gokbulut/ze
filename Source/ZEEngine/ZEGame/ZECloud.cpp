@@ -34,10 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECloud.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZECloudMaterial.h"
+#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZECloudMaterial.h"
 #include "ZEDrawParameters.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZETexture/ZETexture2DResource.h"
 
 
@@ -241,10 +241,10 @@ bool ZECloud::Initialize()
 	CloudRenderCommand.Order			= 1.3f;
 	CloudRenderCommand.Pipeline			= ZE_RORP_3D;
 	CloudRenderCommand.VertexBuffer		= (ZEVertexBuffer*)-1;
-	CloudRenderCommand.PrimitiveType	= ZE_ROPT_TRIANGLE;
+	CloudRenderCommand.PrimitiveType	= ZE_ROPT_TRIANGLE_LIST;
 	CloudRenderCommand.Flags			= ZE_ROF_NONE;
 	CloudRenderCommand.PrimitiveCount	= 0;
-	CloudRenderCommand.VertexDeclaration = (ZEVertexDeclaration*)-1;
+	CloudRenderCommand.VertexDeclaration = (ZEVertexLayout*)-1;
 	CloudRenderCommand.IndexBuffer		= (ZEIndexBuffer*)-1;
 
 	return ZEEntity::Initialize();
@@ -297,7 +297,7 @@ void ZECloud::Draw(ZEDrawParameters* DrawParameters)
 	CloudRenderCommand.Order				= 1.3f;
 	CloudRenderCommand.Priority				= 1;
 
-	CloudRenderCommand.VertexBufferOffset	= 0;
+	CloudRenderCommand.StartVertex	= 0;
 	CloudRenderCommand.Material				= CloudMaterial;
 	CloudRenderCommand.WorldMatrix			= GetWorldTransform();
 	DrawParameters->Renderer->AddToRenderList(&CloudRenderCommand);

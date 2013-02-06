@@ -36,110 +36,109 @@
 #ifndef __ZE_GRAPHICS_DEVICE_H__ 
 #define __ZE_GRAPHICS_DEVICE_H__
 
+#include "ZEGraphicsModule.h"
+#include "ZEGraphicsDeviceState.h"
+#include "ZEVertexLayout.h"
 #include "ZEBlendState.h"
-#include "ZERasterizerState.h"
 #include "ZESamplerState.h"
-#include "ZEShader.h"
-#include "ZEStencilZState.h"
-#include "ZEVertexDeclaration.h"
-#include "ZERenderTarget.h"
-#include "ZERenderCommand.h"
-#include "ZEDepthBuffer.h"
-
-#define ZE_MAX_SAMPLER_ATTACHMENT	16	// PLACEHOLDER
-#define ZE_MAX_RENDER_TARGETS		4
+#include "ZERasterizerState.h"
+#include "ZEDepthStencilState.h"
 
 class ZEGraphicsDevice
 {
-	// Device Tag in Variable names represents the current State of the GPU.
-	// Requested Tag in the Variable names represents the state that needed by the application.
 	protected:
-		// Current RenderState
-		ZEBlendState			RequestedBlendState;
-		ZERasterizerState		RequestedRasterizerState;
-		ZEStencilZState			RequestedStencilZState;
-
-		ZEBlendState			DeviceBlendState;
-		ZERasterizerState		DeviceRasterizerState;
-		ZEStencilZState			DeviceStencilZState;
-
-		// Shader Sampler States
-		ZESamplerState			RequestedSamplerStates[ZE_MAX_SAMPLER_ATTACHMENT];
-		ZESamplerState			DeviceSamplerStates[ZE_MAX_SAMPLER_ATTACHMENT];
-
-		// Vertex Buffer
-		ZEVertexBuffer*			RequestedVertexBuffer;
-		ZEVertexBuffer*			DeviceVertexBuffer;
-
-		// Index Buffer
-		ZEIndexBuffer*			RequestedIndexBuffer;
-		ZEIndexBuffer*			DeviceIndexBuffer;
-
-		// Shader
-		ZEShader*				RequestedVertexShader;
-		ZEShader*				DeviceVertexShader;
-
-		ZEShader*				RequestedPixelShader;
-		ZEShader*				DevicePixelShader;
-
-		// Frame buffer
-		ZERenderTarget*			RequestedRenderTargets[ZE_MAX_RENDER_TARGETS];
-		ZERenderTarget*			DeviceRenderTargets[ZE_MAX_RENDER_TARGETS];
-		ZEDepthBuffer*			RequestedDepthBuffer;
-		ZEDepthBuffer*			DeviceDepthBuffer;
-		bool					ScreenWriteEnable;
-
-		virtual void			InitDefaultState() = 0;
-
-		virtual void			ApplyRequestedBlendState() = 0;
-		virtual void			ApplyReqestedSamplerStates() = 0;
-		virtual void			ApplyRequestedShaders() = 0;
-		virtual void			ApplyRequestedStencilZState() = 0;
-		virtual void			ApplyRequestedRasterizerState() = 0;
-		virtual void			ApplyRequestedVertexBuffer() = 0;
-		virtual void			ApplyRequestedIndexBuffer() = 0;
-		virtual void			ApplyRequestedRenderTargets() = 0;
-
-		virtual void			ApplyAllRequestedStates() = 0;
+		ZEDeviceState				OldState;
+		ZEDeviceState				CurrentState;
+		
+									ZEGraphicsDevice();
+		virtual						~ZEGraphicsDevice();
 
 	public:
-		// Render States (Can Arbitrary Change)
-		void					SetBlendState(const ZEBlendState &NewBlendState);
-		ZEBlendState&			GetBlendStateEdit();
-		void					SetRasterizerState(const ZERasterizerState &NewRasterizerState);
-		ZERasterizerState&		GetRasterizerStateEdit();
-		void					SetSamplerState(int index, const ZESamplerState &NewSamplerState);
-		ZESamplerState&			GetSamplerStateEdit(int index);
-		void					SetStencilZState(ZEStencilZState NewStencilZState);
-		ZEStencilZState&		GetStencilZStateEdit();
+		void						SetVertexLayout(ZEVertexLayout& Layout);
+		ZEVertexLayout&				GetVertexLayout();
 		
-		// Per Render Command Changes
-		void					SetVertexBuffer(ZEVertexBuffer* VertexBuffer);
-		ZEVertexBuffer*			GetVertexBuffer() const;
-		void					SetIndexBuffer(ZEIndexBuffer* IndexBuffer);
-		ZEIndexBuffer*			GetIndexBuffer() const;
-
-		// Shader Change
-		void					SetVertexShader(ZEShader* VertexShader);
-		ZEShader*				GetVertexShader() const;
-		void					SetPixelShader(ZEShader* PixelShader);
-		ZEShader*				GetPixelShader() const;
+		void						SetVertexBuffer(ZEUInt Index, const ZEVertexBuffer* Buffer);
+		void						SetVertexBufferArray(const ZEVertexBuffer* const Buffer[ZE_MAX_VERTEX_BUFFER_SLOT]);
+		const ZEVertexBuffer*		GetVertexBuffer(ZEUInt Index) const;
 		
-		// Output (Aka. RenderTarget Change)
-		void					SetRenderTarget(int index, ZERenderTarget* RenderTarget);
-		ZERenderTarget*			GetRenderTarget(int index) const;
-		void					SetRenderTargetScreen(ZERenderTarget* RenderTarget);
-		bool					GetScreenWriteEnable() const;
-
-		// Commits the Requested State then Draws
-		virtual void			Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount) = 0;
-		virtual void			DrawIndexed(ZEROPrimitiveType PrimitiveType, int BaseVertexIndex, ZEUInt32 MinIndex, 
-											ZEUInt32 VertexCount, ZEUInt32 StartIndex, ZEUInt32 PrimitiveCount) = 0;
+		void						SetIndexBuffer(const ZEIndexBuffer* Buffer);
+		const ZEIndexBuffer*		GetIndexBuffer() const;
 		
-		// Commit State to GPU without Draw Call
-		void					CommitRequestedState();
-
-								ZEGraphicsDevice();
-		virtual					~ZEGraphicsDevice();
+		void						SetVertexShader(ZEShader* Shader);
+		const ZEShader*				GetVertexShader() const;
+		
+		void						SetVertexShaderBuffer(ZEUInt Index, ZEConstantBuffer* Buffer);
+		const ZEConstantBuffer*		GetVertexShaderBuffer(ZEUInt Index) const;
+		
+		void						SetVertexShaderTexture(ZEUInt Index, const ZETexture* Texture);
+		const ZETexture*			GetVertexShaderTexture(ZEUInt Index) const;
+		
+		void						SetVertexShaderSampler(ZEUInt Index, ZEDeviceStateSampler& Sampler);
+		ZEDeviceStateSampler&		GetVertexShaderSampler(ZEUInt Index);
+		
+		void						SetGeometryShader(ZEShader* Shader);
+		const ZEShader*				GetGeometryShader() const;
+		
+		void						SetGeometryShaderBuffer(ZEUInt Index, ZEConstantBuffer* Buffer);
+		const ZEConstantBuffer*		GetGeometryShaderBuffer(ZEUInt Index) const;
+		
+		void						SetGeometryShaderTexture(ZEUInt Index, const ZETexture* Texture);
+		const ZETexture*			GetGeometryShaderTexture(ZEUInt Index) const;
+		
+		void						SetGeometryShaderSampler(ZEUInt Index, ZEDeviceStateSampler& Sampler);
+		ZEDeviceStateSampler&		GetGeometryShaderSampler(ZEUInt Index);
+		
+		void						SetRasterizerState(ZEDeviceStateRasterizer& State);
+		ZEDeviceStateRasterizer&	GetRasterizerState();
+		
+		void						SetViewport(ZESize Index, ZEViewport& ViewPort);
+		ZEViewport&					GetViewport(ZESize Index);
+		
+		void						SetScissorRectangle(ZESize Index, ZEScissorRectangle& Rectangle);
+		ZEScissorRectangle&			GetScissorRectangle(ZESize Index);
+		
+		void						SetPixelShader(ZEShader* Shader);
+		const ZEShader*				GetPixelShader() const;
+		
+		void						SetPixelShaderBuffer(ZEUInt Index, ZEConstantBuffer* Buffer);
+		const ZEConstantBuffer*		GetPixelShaderBuffer(ZEUInt Index) const;
+		
+		void						SetPixelShaderTexture(ZEUInt Index, const ZETexture* Texture);
+		const ZETexture*			GetPixelShaderTexture(ZEUInt Index) const;
+		
+		void						SetPixelShaderSampler(ZEUInt Index, ZEDeviceStateSampler& SamplerState);
+		ZEDeviceStateSampler&		GetPixelShaderSampler(ZEUInt Index);
+		
+		void						SetBlendState(ZEDeviceStateBlend& State);
+		ZEDeviceStateBlend&			GetBlendState();
+		
+		void						SetDepthStencilState(ZEDeviceStateDepthStencil& State);
+		ZEDeviceStateDepthStencil&	GetDepthStencilState();
+		
+		void						SetRenderTargetScreen(const ZERenderTarget* FrameBuffer);
+		bool						GetScreenWriteEnable() const;
+		
+		void						SetRenderTarget(ZEUInt Index, const ZERenderTarget* Target);
+		void						SetRenderTargetArray(const ZERenderTarget* const Targets[ZE_MAX_RENDER_TARGET_SLOT]);
+		const ZERenderTarget*		GetRenderTarget(ZEUInt Index) const;
+		
+		void						SetDepthStencilBuffer(const ZEDepthStencilBuffer* Buffer);
+		const ZEDepthStencilBuffer*	GetDepthStencilBuffer() const;
+		
+		void						SetDeviceState(ZEDeviceState& State);
+		ZEDeviceState&				GetDeviceState();
+		
+		virtual void				ResetStates();
+		
+		virtual bool				Present() const = 0;
+		
+		virtual void				Draw(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex) = 0;
+		virtual void				DrawIndexed(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt FirstIndex, ZEInt BaseVertex) = 0;
+		virtual void				DrawInstanced(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance) = 0;
+		virtual void				DrawIndexedInstanced(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance) = 0;
+		
+		virtual void				ClearRenderTarget(const ZERenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
+		virtual void				ClearDepthStencilBuffer(const ZEDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;
 };
+
 #endif

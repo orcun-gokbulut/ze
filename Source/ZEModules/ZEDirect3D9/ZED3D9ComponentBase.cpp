@@ -34,17 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9ComponentBase.h"
-#include "ZED3D9Module.h"
+#include "ZED3D9GraphicsModule.h"
 
-ZED3D9Module* ZED3D9ComponentBase::Module;
+ZED3D9GraphicsModule* ZED3D9ComponentBase::Module;
 LPDIRECT3DDEVICE9 ZED3D9ComponentBase::Device;
 LPDIRECT3D9 ZED3D9ComponentBase::Direct3D;
 
-bool ZED3D9ComponentBase::BaseInitialize(ZED3D9Module* Mdl)
+bool ZED3D9ComponentBase::BaseInitialize(ZED3D9GraphicsModule* Mdl)
 {
 	Module = Mdl;
-	Device = Mdl->GetDevice();
 	Direct3D = Mdl->GetDirect3D();
-
+	Device = Mdl->GetDirect3DDevice();
+	
 	return true;
 }

@@ -41,13 +41,13 @@
 #include "ZEMath/ZEPlane.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEMath/ZETriangle.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEMath/ZELineSegment.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZEAngle.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZERenderer/ZESimpleMaterial.h"
 
 ZESimpleMaterial* ZEGizmo::GizmoMaterial = NULL;
 
@@ -1015,7 +1015,7 @@ bool ZEGizmo::Initialize()
 	GizmoMaterial = ZESimpleMaterial::CreateInstance();
 
 	RenderCommand.SetZero();
-	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	//RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 	RenderCommand.Material = GizmoMaterial;
 	
 	return ZEEntity::Initialize();
@@ -1025,7 +1025,7 @@ void ZEGizmo::Deinitialize()
 {	
 	if (GizmoMaterial != NULL)
 	{
-		GizmoMaterial->Release();
+		GizmoMaterial->Destroy();
 		GizmoMaterial = NULL;
 	}
 
@@ -1034,19 +1034,22 @@ void ZEGizmo::Deinitialize()
 
 void ZEGizmo::Draw(ZEDrawParameters* DrawParameters)
 {
+	/*
 	UpdateGizmo();
 
 	RenderCommand.WorldMatrix = GetWorldTransform();
 	RenderCommand.Flags = (Mode == ZE_GM_ROTATE ? ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM : ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM);
-	RenderCommand.PrimitiveType = ZE_ROPT_LINE;
+	RenderCommand.PrimitiveType = ZE_ROPT_LINE_LIST;
 	RenderCommand.PrimitiveCount = GizmoLines.Vertices.GetCount() / 2;
 	RenderCommand.VertexBuffer = &GizmoLines;
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 
-	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
+	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE_LIST;
 	RenderCommand.PrimitiveCount = GizmoTriangles.Vertices.GetCount() / 3;
 	RenderCommand.VertexBuffer = &GizmoTriangles;
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+
+	*/
 }
 
 ZEGizmoAxis ZEGizmo::PickAxis(const ZERay& Ray, float& TRay)

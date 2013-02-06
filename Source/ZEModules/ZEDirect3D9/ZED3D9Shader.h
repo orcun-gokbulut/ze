@@ -43,6 +43,7 @@
 #include "ZEDS/ZEString.h"
 #include <d3d9.h>
 #include <d3dx9.h>
+#include "ZED3D9ShaderCompiler.h"
 
 enum ZED3D9ShaderType
 {
@@ -53,12 +54,14 @@ enum ZED3D9ShaderType
 class ZED3D9Shader : public ZEShader
 {
 	friend class ZED3D9ShaderManager;
+	friend class ZED3D9ShaderCompiler;
+
 	protected:
 		ZESize							ReferanceCount;
 		ZEUInt32						Hash;
-		ZEUInt32						Components;		//??
-		char							FileName[ZE_MAX_SHADER_LENGTH];
-		char							FunctionName[ZE_MAX_SHADER_LENGTH];
+		ZEUInt32						Components;
+		char							FileName[256];
+		char							FunctionName[128];
 
 		void							PopulateConstantTable(LPD3DXCONSTANTTABLE Table);
 
@@ -69,25 +72,26 @@ class ZED3D9Shader : public ZEShader
 		const char*						GetFunctionName();
 		ZEUInt32						GetComponents();
 
-		void							Release();	
+		void							Release();
 		
 		static ZED3D9Shader*			CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile);
 
 										ZED3D9Shader();
 		virtual							~ZED3D9Shader();
+
 };
 
 class ZED3D9PixelShader : public ZED3D9Shader, private ZED3D9ComponentBase
 {
 	friend class ZED3D9ShaderManager;
+	friend class ZED3D9ShaderCompiler;
+
 	private:
 		LPDIRECT3DPIXELSHADER9			PixelShader;
+	
 	protected:
-		virtual	bool					CompileShader(const ZEString CompilerParameters[][2],
-														int CompilerParameterCount,
-														ZEString ShaderProfile, 
-														ZEString Source,
-														ZEString MainFunction);
+		virtual	bool					CompileShader(const ZEString CompilerParameters[][2], int CompilerParameterCount, ZEString ShaderProfile,  ZEString Source, ZEString MainFunction);
+	
 	public:
 		virtual ZED3D9ShaderType		GetShaderType();
 		LPDIRECT3DPIXELSHADER9			GetPixelShader() const;
@@ -145,15 +149,14 @@ class ZED3D9PixelShader : public ZED3D9Shader, private ZED3D9ComponentBase
 class ZED3D9VertexShader : public ZED3D9Shader, private ZED3D9ComponentBase
 {
 	friend class ZED3D9ShaderManager;
+	friend class ZED3D9ShaderCompiler;
+
+	
 	private:
 		LPDIRECT3DVERTEXSHADER9			VertexShader;
 
 	protected:
-		virtual	bool					CompileShader(const ZEString CompilerParameters[][2],
-														int CompilerParameterCount,
-														ZEString ShaderProfile, 
-														ZEString Source,
-														ZEString MainFunction);
+		virtual	bool					CompileShader(const ZEString CompilerParameters[][2], int CompilerParameterCount, ZEString ShaderProfile,  ZEString Source, ZEString MainFunction);
 
 	public:
 		virtual ZED3D9ShaderType		GetShaderType();

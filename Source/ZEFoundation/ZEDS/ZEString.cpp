@@ -653,7 +653,9 @@ void ZEString::TrimSelf()
 
 ZESize ZEString::Hash() const
 {
-	return ZEHashGenerator::Hash(ToCString());
+	ZEUInt64 Hash = 0;
+	ZEHashGenerator::Hash(Hash, ToCString());
+	return Hash;
 }
 
 ZEString ZEString::Lower() const

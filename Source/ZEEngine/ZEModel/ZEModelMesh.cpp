@@ -36,8 +36,8 @@
 #include "ZEModelMesh.h"
 #include "ZEModel.h"
 #include "ZEModelFileFormat.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEDrawParameters.h"
 

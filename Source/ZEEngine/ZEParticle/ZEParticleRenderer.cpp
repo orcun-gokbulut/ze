@@ -36,7 +36,7 @@
 #include "ZEParticleRenderer.h"
 #include "ZEGame\ZEDrawParameters.h"
 #include "ZEGame\ZEScene.h"
-#include "ZEGraphics\ZECamera.h"
+#include "ZERenderer\ZECamera.h"
 #include "ZEParticle\ZEParticleSystem.h"
 
 void ZEParticleRenderer::SortParticles() // GetSystem Pool Solve!!!

@@ -48,7 +48,6 @@
 #include "ZEModel/ZEModelDebugModule.h"
 #include "ZESound/ZESoundDebugModule.h"
 #include "ZEPhysics/ZEPhysicsDebugModule.h"
-#include "ZEGraphics/ZEGraphicsDebugModule.h"
 
 
 extern HINSTANCE ApplicationInstance;
@@ -60,9 +59,7 @@ ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	ZEModelAnimationDebugModule DebugModule;
 	//zeCore->SetDebugComponent(&DebugModule);
 
-	ZEGraphicsDebugModule GraphicsDebugModule;
-	GraphicsDebugModule.SetApplicationName("Graphics Debug Module");
-	zeCore->SetApplicationModule(&GraphicsDebugModule);
+	zeCore->SetApplicationModule(&DebugModule);
 
 	ZEPhysicsDebugModule PhysicsDebugModule;
 	//zeCore->SetDebugComponent(&PhysicsDebugModule);

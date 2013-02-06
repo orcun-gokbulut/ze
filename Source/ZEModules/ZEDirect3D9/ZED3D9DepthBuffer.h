@@ -42,6 +42,14 @@
 class ZED3D9DepthBuffer : public ZEDepthBuffer
 {
 	public:
-		LPDIRECT3DSURFACE9 DepthSurface;
+		LPDIRECT3DSURFACE9		DepthSurface;
+
+		virtual ZEUInt			GetWidth();
+		virtual ZEUInt			GetHeight();
+
+								ZED3D9DepthBuffer();
+		virtual					~ZED3D9DepthBuffer();
+
+		
 };
 #endif

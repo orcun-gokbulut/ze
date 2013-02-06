@@ -150,8 +150,24 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 	TextureData->Create(ZE_TT_2D, ZE_TPF_I8_4, 1, 1, Width, Height);
 	BYTE* TargetData = (BYTE*)TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetData();
 
-	FreeImage_ConvertToRawBits(TargetData, Bitmap32, RowSize, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+	FreeImage_ConvertToRawBits(TargetData, Bitmap32, RowSize, BPP, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
+	
+	// Swap red blue channels
+	ZEUInt8 Red = 0, Blue = 0;
+	for (ZESize H = 0; H < Height; H++)
+	{
+		for (ZESize W = 0; W < Width; W++)
+		{
+			BYTE* PixelData = TargetData + H * Width * PixelSize + W * PixelSize;
 
+			Red = PixelData[0];
+			Blue = PixelData[2];
+
+			PixelData[0] = Blue;
+			PixelData[2] = Red;
+		}
+	}
+	
 	zeLog("Image file loaded successfully: \"%s\".", File->GetPath().GetValue());
 
 	FreeImage_Unload(Bitmap32);
@@ -170,7 +186,7 @@ bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, 
 	}
 
 	zeLog("Saving texture as image file : \"%s\".", File->GetPath().GetValue());
-
+	 
 	//Set callbacks
 	FreeImageIO Callbacks;
 	Callbacks.write_proc = &FreeImageFile_Write_2D;
@@ -187,7 +203,7 @@ bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, 
 	ZEUInt Width		= TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).GetWidth();
 
 	FIBITMAP* Bitmap;
-	Bitmap = FreeImage_ConvertFromRawBits(SourceData, (ZEInt)Width, (ZEInt)Height, (ZEInt)Pitch, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+	Bitmap = FreeImage_ConvertFromRawBits(SourceData, (ZEInt)Width, (ZEInt)Height, (ZEInt)Pitch, BPP, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
 	if(Bitmap == NULL)
 	{
 		zeError("Error during conversion, cannot save image to \"%s\".", File->GetPath().GetValue());

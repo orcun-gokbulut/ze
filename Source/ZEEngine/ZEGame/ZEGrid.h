@@ -39,7 +39,7 @@
 
 #include "ZECanvasBrush.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZEGrid);
 

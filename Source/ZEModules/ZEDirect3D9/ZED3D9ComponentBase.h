@@ -38,39 +38,24 @@
 #define __ZE_D3D9_COMPONENTBASE_H_
 
 #ifdef ZE_DEBUG_ENABLE
-#define D3D_DEBUG_INFO
+	#define D3D_DEBUG_INFO
 #endif
 
 #include <D3D9.h>
 
-class ZED3D9Module;
+class ZED3D9GraphicsModule;
+
 class ZED3D9ComponentBase
 {
-	private:
-		static ZED3D9Module*			Module;
-		static LPDIRECT3DDEVICE9		Device;
-		static LPDIRECT3D9				Direct3D;
-
 	protected:
-		static inline ZED3D9Module*		GetModule()
-		{
-			return Module;
-		}
-
-		static inline LPDIRECT3DDEVICE9	GetDevice()
-		{
-			return Device;
-		}
-
-		static inline LPDIRECT3D9		GetDirect3D()
-		{
-			return Direct3D;
-		}
+		static ZED3D9GraphicsModule*		Module;
+		static LPDIRECT3DDEVICE9			Device;
+		static LPDIRECT3D9					Direct3D;
 
 	public:
-		static bool						BaseInitialize(ZED3D9Module* D3DModule);
+		static bool							BaseInitialize(ZED3D9GraphicsModule* D3DModule);
 
-/*		virtual	void					OnDeviceLost();
-		virtual bool					OnDeviceRestored();*/
 };
+
+
 #endif

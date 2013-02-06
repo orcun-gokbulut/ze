@@ -97,8 +97,3 @@ struct ZEDrawParameters
 };
 
 #endif
-
-
-
-
-

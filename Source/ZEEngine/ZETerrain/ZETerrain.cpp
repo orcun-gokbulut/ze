@@ -38,8 +38,8 @@
 #include "ZETerrain.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZETerrainMaterial.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZETerrainMaterial.h"
 #include "ZEGraphics/ZEVertexDeclaration.h"
 #include "ZETexture/ZEBitmap.h"
 #include "ZEGraphics/ZETexture2D.h"
@@ -451,7 +451,7 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt Po
 	RenderCommand.Order				= 0;
 	RenderCommand.Pipeline			= ZE_RORP_3D;
 	RenderCommand.VertexBuffer		= VertexBuffer;
-	RenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE;
+	RenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE_LIST;
 	RenderCommand.Priority			= 3;
 	RenderCommand.Flags |= 1024;
 

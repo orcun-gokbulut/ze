@@ -40,7 +40,7 @@
 
 #include "ZETypes.h"
 #include "ZEEntity.h"
-#include "ZEGraphics\ZERenderCommand.h"
+#include "ZERenderer\ZERenderCommand.h"
 
 
 class ZEMaterial;

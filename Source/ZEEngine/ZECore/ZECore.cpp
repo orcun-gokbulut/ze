@@ -159,7 +159,7 @@ bool ZECore::SetGraphicsModule(ZEModule* Module)
 	{
 		if (Module->GetDescription()->GetParent() != ZEGraphicsModule::Description())
 		{
-			zeError("Module type mismatch. This module is not a sound module. Module Name : \"%s\"", 
+			zeError("Module type mismatch. This module is not a graphics module. Module Name : \"%s\"", 
 				(const char*)Module->GetDescription()->GetName());
 			return false;
 		}
@@ -638,15 +638,16 @@ void ZECore::MainLoop()
 	
 	if (Application != NULL)
 		Application->Process(FrameTime);
+
 	Game->GetScene()->GetPhysicalWorld()->Draw(Game->GetScene()->GetRenderer());
 
 	// Engine Logic
 	PhysicsModule->Process(FrameTime);
 	SoundModule->ProcessSound(FrameTime);
-	GraphicsModule->ClearFrameBuffer();
+	
 	if (Game != NULL)
 		Game->Render(FrameTime);
-	GraphicsModule->UpdateScreen();
+	
 	PhysicsModule->UpdateWorlds();
 
 	if (Application != NULL)

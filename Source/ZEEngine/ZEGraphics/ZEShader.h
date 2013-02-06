@@ -37,134 +37,30 @@
 #define __ZE_SHADER_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEMatrix.h"
 #include "ZEDS/ZEArray.h"
-
-#define ZE_MAX_SHADER_LENGTH 256		
-#define ZE_MAX_SHADER_FUNCTION_NAME_LENGTH 100
-
-#define ZE_MAX_MACRO_AMOUNT 32
-
-enum ZEShaderConstantDataType
-{
-	ZE_SCDT_VECTOR2,
-	ZE_SCDT_VECTOR3,
-	ZE_SCDT_VECTOR4,
-	ZE_SCDT_MATRIX3x3,
-	ZE_SCDT_MATRIX4x4,
-	ZE_SCDT_FLOAT,
-	ZE_SCDT_BOOLEAN,
-	ZE_SCDT_SAMPLER,
-	ZE_SCDT_SAMPLER1D,
-	ZE_SCDT_SAMPLER2D,
-	ZE_SCDT_SAMPLER3D,
-	ZE_SCDT_SAMPLERCUBE,
-	ZE_SCDT_UNKNOWN
-
-};
-
-struct ZEShaderCompilerParameter
-{
-	ZEString Name;
-	ZEString Definition;
-};
-
-struct ZEShaderConstant
-{
-	ZEString							ConstantName;
-	ZEShaderConstantDataType			Type;
-	ZESize								Count;				
-	ZEString							Semantic;
-	ZEUInt32							RegisterNo;			// Samplers Are Also Considered Constants Therefore This Stores Sampler No if it is Sampler	
-};
+#include "ZEDS/ZEString.h"
+#include "ZEVertexLayout.h"
+#include "ZEConstantBuffer.h"
+#include "ZEShaderMetaTable.h"
 
 class ZEShader
 {
+	friend class ZEShaderCompiler;
+
+	// Should be public for only internal usage
+	public:
+		ZEShaderMetaTable			MetaTable;
+		ZEVertexLayout				DefaultVertexLayout;
+
 	protected:
-		ZEArray<ZEShaderConstant>				ShaderConstants;
-		ZEArray<ZEShaderCompilerParameter>		ShaderCompilerParameters;				
-		bool									Compiled;
-
-		bool									FindConstantLocation(ZEUInt32& OutLocation, const ZEString Name) const;		// Search Algorithm for Shader Constants
-		bool									FindParameterLocation(ZEUInt32& OutLocation, const ZEString Name) const;	// Search Algorithm for Macros
-
-		// Compilation
-		virtual	bool							CompileShader(const ZEString CompilerParameters[][2],
-																int CompilerParameterCount,
-																ZEString ShaderProfile, 
-																ZEString Source,
-																ZEString MainFunction) = 0;
+									ZEShader();
+		virtual						~ZEShader();
 
 	public:
-		// Compilation Query
-		bool									IsCompiled() const;		// Means compiled & Ready to Use
-
-		// Macro Definition Query
-		bool									IsDefined(const ZEString& ParameterName) const;
-		bool									GetCompilerParameterString(ZEString& Out, const ZEString& ParameterName) const;
-
-		// Shader Constant Query
-		bool									GetConstantCount(ZEUInt32& Out, const ZEString& Name) const;
-		bool									GetConstantSemantic(ZEString& Out, const ZEString& Name) const;
-		bool									GetConstantDataType(ZEShaderConstantDataType& Out, const ZEString& Name) const;
-		bool									GetShaderConstantRegister(ZEUInt32& Out, const ZEString& Name) const;
-
-		// This directly calls "GetShaderConstantRegister()" but its has a better logical meaning for sampler constants
-		// This function does not check specified "Name" is a sampler or not it directly returns the Sampler No. / Register No.
-		// It only returns false if "Name" does not match any of the Names stored in the constant table.
-		bool									GetSamplerNumber(ZEUInt32& Out, const ZEString& Name) const;
-
-		// File and Function Name
-		virtual const char*						GetFileName() = 0;
-		virtual const char*						GetFunctionName() = 0;
-		virtual ZEUInt32						GetComponents() = 0;
-
-		// Set Constant
-		virtual void							SetConstant(const ZEString& Name, const ZEVector2& Value) const = 0;
-		virtual void							SetConstant(const ZEString& Name, const ZEVector3& Value) const = 0;
-		virtual void							SetConstant(const ZEString& Name, const ZEVector4& Value) const = 0;		
-		virtual void							SetConstant(const ZEString& Name, const ZEMatrix3x3& Value) const = 0;
-		virtual void							SetConstant(const ZEString& Name, const ZEMatrix4x4& Value) const = 0;
-		virtual void							SetConstant(const ZEString& Name, bool Value) const = 0;
-		virtual void							SetConstant(const ZEString& Name, float Value) const = 0;
-
-		virtual void							SetConstantArray(const ZEString& Name, const ZEVector2* ValueArray, ZESize Count) const = 0;
-		virtual void							SetConstantArray(const ZEString& Name, const ZEVector3* ValueArray, ZESize Count) const = 0;
-		virtual void							SetConstantArray(const ZEString& Name, const ZEVector4* ValueArray, ZESize Count) const = 0;		
-		virtual void							SetConstantArray(const ZEString& Name, const ZEMatrix3x3* ValueArray, ZESize Count) const = 0;
-		virtual void							SetConstantArray(const ZEString& Name, const ZEMatrix4x4* ValueArray, ZESize Count) const = 0;
-		virtual void							SetConstantArray(const ZEString& Name, const bool* ValueArray, ZESize Count) const = 0;
-		virtual void							SetConstantArray(const ZEString& Name, const float* ValueArray, ZESize Count) const = 0;
-
-		virtual void							SetConstant(int Register, const ZEVector2& Value) const = 0;
-		virtual void							SetConstant(int Register, const ZEVector3& Value) const = 0;
-		virtual void							SetConstant(int Register, const ZEVector4& Value) const = 0;		
-		virtual void							SetConstant(int Register, const ZEMatrix3x3& Value) const = 0;
-		virtual void							SetConstant(int Register, const ZEMatrix4x4& Value) const = 0;
-		virtual void							SetConstant(int Register, bool Value) const = 0;
-		virtual void							SetConstant(int Register, float Value) const = 0;
-
-		virtual void							SetConstantArray(int Register, const ZEVector2* ValueArray, ZESize Count) const = 0;
-		virtual void							SetConstantArray(int Register, const ZEVector3* ValueArray, ZESize Count) const = 0;
-		virtual void							SetConstantArray(int Register, const ZEVector4* ValueArray, ZESize Count) const = 0;		
-		virtual void							SetConstantArray(int Register, const ZEMatrix3x3* ValueArray, ZESize Count) const = 0;
-		virtual void							SetConstantArray(int Register, const ZEMatrix4x4* ValueArray, ZESize Count) const = 0;
-		virtual void							SetConstantArray(int Register, const bool* ValueArray, ZESize Count) const = 0;
-		virtual void							SetConstantArray(int Register, const float* ValueArray, ZESize Count) const = 0;
-
-		// Get Constant Value
-		virtual ZEVector2						GetConstantVector2(const char* Name) const = 0;
-		virtual ZEVector3						GetConstantVector3(const char* Name) const = 0;
-		virtual ZEVector4						GetConstantVector4(const char* Name) const = 0;
-		virtual ZEMatrix3x3						GetConstantMatrix3x3(const char* Name) const = 0;
-		virtual ZEMatrix4x4						GetConstantMatrix4x4(const char* Name) const = 0;
-		virtual bool							GetConstantBool(const char* Name) const = 0;
-		virtual float							GetConstantFloat(const char* Name) const = 0;
-
-		virtual void							Release() = 0;
-
-		virtual									~ZEShader();
+		const ZEShaderMetaTable*	GetMetaTable() const;
+		const ZEVertexLayout*		GetDefaultVertexLayout() const;
+		
+		virtual void				Destroy();
 };
+
 #endif

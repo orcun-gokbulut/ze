@@ -33,45 +33,70 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_RASTERIZER_STATE_H__
-#define __ZE_RASTERIZER_STATE_H__
+#ifndef __ZE_DEVICE_STATE_RASTERIZER_H__
+#define __ZE_DEVICE_STATE_RASTERIZER_H__
+
+#include "ZETypes.h"
+
+enum ZEPrimitiveType
+{
+	ZE_ROPT_POINT_LIST			= 0,
+	ZE_ROPT_LINE_LIST			= 1,
+	ZE_ROPT_TRIANGLE_LIST		= 2,
+	ZE_ROPT_TRIANGLE_STRIPT		= 3
+};
 
 enum ZEFillMode
 {
-	ZE_FM_CURRENT		= 0,
-	ZE_FM_WIREFRAME		= 1,
-	ZE_FM_FILL			= 2
+	ZE_FM_WIREFRAME				= 1,
+	ZE_FM_SOLID					= 2
 };
 
 enum ZECullDirection
 {
-	ZE_CD_CURRENT			= 0,
-	ZE_CD_CLOCKWISE 		= 1,
-	ZE_CD_COUNTER_CLOCKWISE = 2
+	ZE_CD_NONE					= 1,
+	ZE_CD_CLOCKWISE 			= 2,
+	ZE_CD_COUNTER_CLOCKWISE		= 3
 };
 
-class ZERasterizerState
+class ZEDeviceStateRasterizer
 {
-protected:
-	bool					CullEnable;
-	ZEFillMode				FillMode;
-	ZECullDirection			CullDirection;
+	friend class ZEGraphicsDevice;
+	friend class ZERasterizerStageData;
 
-	bool					Changed;
+	// Should be public for only internal usage
+	public:
+		ZEUInt64						Hash;
+		bool							Dirty;
+		
+		struct ZERasterizerStateData	
+		{
+			ZEFillMode					FillMode;
+			ZECullDirection				CullDirection;
+			bool						FrontIsCounterClockwise;
+		
+		} StateData;
 
-public:
-	void						SetCullEnable(bool Enable);
-	bool						GetCullEnable() const;
-	void						SetFillMode(ZEFillMode Mode);
-	ZEFillMode					GetFillMode() const;
-	void						SetCullDirection(ZECullDirection Direction);
-	ZECullDirection				GetCullDirection() const;
-	void						SetChanged(bool Change);
-	bool						GetChanged() const;
+		void							UpdateHash();
 
-	const ZERasterizerState&	operator=(const ZERasterizerState& State);
+	public:
+		void							SetFillMode(ZEFillMode Mode);
+		ZEFillMode						GetFillMode() const;
+		
+		void							SetCullDirection(ZECullDirection Direction);
+		ZECullDirection					GetCullDirection() const;
+		
+		void							SetFrontIsCounterClockwise(bool IsCounterClockwise);
+		bool							GetFrontIsCounterClockwise() const;
 
-							ZERasterizerState();
-	virtual					~ZERasterizerState();
+		void							SetToDefault();
+
+		const ZEDeviceStateRasterizer&	operator=(const ZEDeviceStateRasterizer& State);
+		bool							operator==(const ZEDeviceStateRasterizer& State);
+		bool							operator!=(const ZEDeviceStateRasterizer& State);
+
+										ZEDeviceStateRasterizer();
+		virtual							~ZEDeviceStateRasterizer();
 };
+
 #endif

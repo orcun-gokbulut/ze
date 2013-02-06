@@ -35,10 +35,10 @@
 
 #include "ZEUIRenderer.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZEVertexDeclaration.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZEGraphics/ZEVertexLayout.h"
+#include "ZERenderer/ZEFixedMaterial.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 
 ZEInt CompareCommandOrder(const ZERenderCommand* Command1, const ZERenderCommand* Command2)
@@ -64,9 +64,6 @@ ZEUIRenderer::~ZEUIRenderer()
 
 void ZEUIRenderer::Initialize()
 {
-	if (VertexDeclaration == NULL)
-		VertexDeclaration = ZEUIVertex::GetVertexDeclaration();
-
 	if (DefaultMaterial == NULL)
 	{
 		DefaultMaterial = ZEFixedMaterial::CreateInstance();
@@ -76,28 +73,34 @@ void ZEUIRenderer::Initialize()
 		((ZEFixedMaterial*)DefaultMaterial)->UpdateMaterial();
 	}
 
+	//if (VertexDeclaration == NULL)
+		//VertexDeclaration = ZEUIVertex::GetVertexDeclaration();
+
+	
+
 	ZEMatrix4x4::CreateViewPortTransform(ScreenTransform, 0.0f, (float)zeGraphics->GetScreenWidth(), 0.0f, (float)zeGraphics->GetScreenHeight(), 0.0f, 1.0f);
 	
 }
 
 void ZEUIRenderer::Deinitialize()
 {
+	/*
 	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
 		if (RenderCommands[I].VertexBuffer != NULL)
 			delete RenderCommands[I].VertexBuffer;
 
 	if (VertexDeclaration != NULL)
 	{
-		VertexDeclaration->Release();
+		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
 	}
 
 	if (DefaultMaterial != NULL)
 	{
-		DefaultMaterial->Release();
+		DefaultMaterial->Destroy();
 		DefaultMaterial = NULL;
 	}
-
+	*/
 }
 
 void ZEUIRenderer::Destroy()
@@ -107,6 +110,7 @@ void ZEUIRenderer::Destroy()
 
 void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 {
+	/*
 	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
 		if (RenderCommands[I].Material == Rectangle.Material || (Rectangle.Material == NULL && RenderCommands[I].Material == DefaultMaterial))
 		{
@@ -122,14 +126,15 @@ void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 	NewRenderCommand->Pipeline = ZE_RORP_2D;
 	NewRenderCommand->VertexBuffer = new ZEArrayVertexBuffer<ZEUIVertex>();
 	NewRenderCommand->Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_WORLD_TRANSFORM;
-	NewRenderCommand->PrimitiveType = ZE_ROPT_TRIANGLE;
+	NewRenderCommand->PrimitiveType = ZE_ROPT_TRIANGLE_LIST;
 	NewRenderCommand->VertexDeclaration = VertexDeclaration;
-	NewRenderCommand->VertexBufferOffset = 0;
+	NewRenderCommand->FirstVertex = 0;
 	NewRenderCommand->IndexBuffer = NULL;
 	NewRenderCommand->PrimitiveCount = 2;
 	NewRenderCommand->Order = (float)Rectangle.ZOrder;
 	ZEUIVertex* Buffer = ((ZEArrayVertexBuffer<ZEUIVertex>*)NewRenderCommand->VertexBuffer)->MassAdd(6);
 	Rectangle.ConvertToVertices(Buffer);
+	*/
 }
 
 void ZEUIRenderer::Render(ZERenderer* Renderer)
@@ -146,12 +151,14 @@ void ZEUIRenderer::Render(ZERenderer* Renderer)
 
 void ZEUIRenderer::Clean()
 {
+	/*
 	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
 		if (RenderCommands[I].VertexBuffer != NULL)
 		{
 			((ZEArrayVertexBuffer<ZEUIVertex>*)RenderCommands[I].VertexBuffer)->Clear();
 			RenderCommands[I].PrimitiveCount = 0;
 		}
+	*/
 }
 
 ZEUIRenderer* ZEUIRenderer::CreateInstance()

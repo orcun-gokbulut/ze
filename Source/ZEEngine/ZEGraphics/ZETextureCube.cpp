@@ -36,11 +36,6 @@
 #include "ZETextureCube.h"
 #include "ZEGraphicsModule.h"
 
-ZETextureType ZETextureCube::GetTextureType() const
-{
-	return ZE_TT_CUBE;
-}
-
 ZEUInt ZETextureCube::GetLevelCount() const
 {
 	return LevelCount;
@@ -51,23 +46,12 @@ ZEUInt ZETextureCube::GetEdgeLenght() const
 	return EdgeLength;
 }
 
-ZETexturePixelFormat ZETextureCube::GetPixelFormat() const
-{
-	return PixelFormat;
-}
-
-bool ZETextureCube::IsRenderTarget() const
-{
-	return RenderTarget;
-}
-
 ZETextureCube::ZETextureCube()
 {
-	EdgeLength		= 0;
-	LevelCount		= 0;
-	PixelFormat		= ZE_TPF_NOTSET;
-	RenderTarget	= false; 
-};
+	EdgeLength = 0;
+	LevelCount = 0;
+	TextureType = ZE_TT_CUBE;
+}
 
 ZETextureCube::~ZETextureCube()
 {
@@ -78,7 +62,3 @@ ZETextureCube* ZETextureCube::CreateInstance()
 {
 	return zeGraphics->CreateTextureCube();
 }
-
-
-
-

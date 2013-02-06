@@ -45,7 +45,7 @@
 
 class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 {
-	friend class ZED3D9Module;
+	friend class ZED3D9GraphicsModule;
 	protected:
 		ZED3D9RenderTarget				ViewPort;
 
@@ -63,10 +63,10 @@ class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 		virtual ZERenderTarget*			GetViewPort();
 
 		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false);
-		virtual void					Lock(void** Buffer, ZESize* Pitch, ZEUInt Level);
-		virtual void					Unlock(ZEUInt Level);
+		virtual bool					Lock(void** Buffer, ZESize* Pitch, ZEUInt Level);
+		virtual bool					Unlock(ZEUInt Level);
+		
 		virtual void					Release();
-
 		virtual void					Destroy();
 };
 

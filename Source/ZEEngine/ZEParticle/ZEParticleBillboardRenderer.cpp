@@ -39,9 +39,28 @@
 #include "ZEGraphics\ZEVertexBuffer.h"
 #include "ZEGraphics\ZEVertexTypes.h"
 #include "ZEGame\ZEDrawParameters.h"
-#include "ZEGraphics\ZECamera.h"
+#include "ZERenderer\ZECamera.h"
+#include "ZERenderer\ZERenderer.h"
+#include "ZEGraphics\ZEVertexLayout.h"
 
-void ZEParticleBillboardRenderer::DrawParticle(ZESimpleVertex* Buffer, const ZEParticle* Particle, const ZEVector3& Right, const ZEVector3& Up)
+
+const ZEVertexLayout* ZEParticleVertex::GetVertexLayout()
+{
+	if (VertexLayout.GetElementCount() != 0)
+	{
+		return &VertexLayout;
+	}
+
+	static ZEVertexElement Elements[] = {{"POSITION",	0, ZE_VET_FLOAT3, 0, 0,		ZE_VU_PER_VERTEX, 0},
+										 {"NORMAL",		0, ZE_VET_FLOAT3, 0, 12,	ZE_VU_PER_VERTEX, 0},
+										 {"TEXCOORD",	0, ZE_VET_FLOAT2, 0, 24,	ZE_VU_PER_VERTEX, 0},
+										 {"COLOR",		0, ZE_VET_FLOAT4, 0, 32,	ZE_VU_PER_VERTEX, 0}	};
+
+	VertexLayout.SetLayout(Elements, 4);
+	return &VertexLayout;
+}
+
+void ZEParticleBillboardRenderer::DrawParticle(ZEParticleVertex* Buffer, const ZEParticle* Particle, const ZEVector3& Right, const ZEVector3& Up)
 {
 	ZEVector2 ParticleSize_2 = Particle->Size2D * 0.5f;
 
@@ -82,11 +101,11 @@ void ZEParticleBillboardRenderer::UpdateVertexBuffer(ZEDrawParameters* DrawParam
 	ZESize ParticleCount = Particles.GetCount();
 
 	if (VertexBuffer == NULL)
-		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
+		VertexBuffer = ZEVertexBuffer::CreateInstance();
 
-	if (VertexBuffer->GetBufferSize() != ParticleCount * sizeof(ZESimpleVertex) * 6)
+	if (VertexBuffer->GetBufferSize() != ParticleCount * sizeof(ZEParticleVertex) * 6)
 	{
-		if (!VertexBuffer->Create(ParticleCount * sizeof(ZESimpleVertex) * 6))
+		if (!VertexBuffer->CreateDynamic(ParticleCount * 6, sizeof(ZEParticleVertex)))
 		{
 			zeError("Could not create particle vertex buffer.");
 			return;
@@ -95,7 +114,8 @@ void ZEParticleBillboardRenderer::UpdateVertexBuffer(ZEDrawParameters* DrawParam
 
 	RenderCommand.PrimitiveCount = 0;
 
-	ZESimpleVertex* Buffer = (ZESimpleVertex*)VertexBuffer->Lock();
+	ZEParticleVertex* Buffer = NULL;
+	VertexBuffer->Lock((void**)&Buffer);
 	if (Buffer == NULL)
 	{
 		zeError("Could not lock particle vertex buffer.");
@@ -241,7 +261,7 @@ void ZEParticleBillboardRenderer::Draw(ZEDrawParameters* DrawParameters)
 		RenderCommand.WorldMatrix = ScaleMatrix;
 	}
 
-	RenderCommand.VertexBuffer = VertexBuffer;
+//	RenderCommand.InputStage.SetVertexBuffer(0, VertexBuffer);
 	RenderCommand.Material = Material;
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }

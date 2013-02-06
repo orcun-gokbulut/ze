@@ -46,7 +46,7 @@ void ZEFixedMaterialFile::SetZero()
 	TwoSided = false;
 	LightningEnabled = true;
 	Wireframe = false;
-	TransparancyMode = ZE_MTM_NOTRANSPARACY;
+	//TransparancyMode = ZE_MTM_NOTRANSPARACY;
 	TransparancyCullLimit = 0;
 	Opacity = 1.0f;
 	RecivesShadow = false;

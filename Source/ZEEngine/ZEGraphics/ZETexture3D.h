@@ -33,44 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef __ZE_TEXTURE_3D_H__
 #define __ZE_TEXTURE_3D_H__
 
 #include "ZETypes.h"
 #include "ZETexture.h"
 
+class ZERenderTarget;
+class ZETextureData;
+
 class ZETexture3D : public ZETexture
 {
-	protected:
+	friend class ZEGraphicsDevice;
+	friend class ZEGraphicsModule;
+
+	// Should be public for only internal usage
+	public:
 		ZEUInt						Width;
 		ZEUInt						Height;
 		ZEUInt						Depth;
 		ZEUInt						LevelCount;
-		ZETexturePixelFormat		PixelFormat;
 
+	protected:
 									ZETexture3D();
 		virtual						~ZETexture3D();
 
 	public:
-		virtual ZETextureType		GetTextureType() const;
-
 		ZEUInt						GetWidth() const;
 		ZEUInt						GetHeight() const;
 		ZEUInt						GetDepth() const;
 		ZEUInt						GetLevelCount() const;
-		ZETexturePixelFormat		GetPixelFormat() const;
-		bool						IsRenderTarget() const;
 
-		virtual bool				Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat) = 0;
-		virtual void				Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt Level) = 0;
-		virtual void				Unlock(ZEUInt Level) = 0;
+		virtual ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
+
+		virtual bool				CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat) = 0;
+		virtual bool				CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL) = 0;
+		
+		virtual bool				Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt Level) = 0;
+		virtual bool				Unlock(ZEUInt Level) = 0;
 
 		static ZETexture3D*			CreateInstance();
 };
 
 #endif
-
-
-
-

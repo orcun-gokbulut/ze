@@ -42,14 +42,13 @@
 #include "ZEGame/ZECharacter.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZEPointLight.h"
-#include "ZEGraphics/ZEDirectionalLight.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZERenderer/ZEPointLight.h"
+#include "ZERenderer/ZEDirectionalLight.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZEProjectiveLight.h"
 #include "ZEInput/ZEInputModule.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEInput/ZEInputMap.h"
-#include "ZEGame/ZESkyBrush.h"
 #include "ZEGame/ZEPlayer.h"
 #include "ZESound/ZESoundSource.h"
 #include "ZESound/ZESoundResource.h"
@@ -131,12 +130,6 @@ bool ZEModelAnimationDebugModule::Initialize()
 	Character = ZECharacter::CreateInstance();
 	Character->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Scene->AddEntity(Character);
-
-	ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
-	Sky->SetSkyTexture("Night.tga");
-	Sky->SetSkyBrightness(5.5f);
-
-	Scene->AddEntity(Sky);
 	
 	InputMap.InputBindings.Clear();
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_TURN_UP,			ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));

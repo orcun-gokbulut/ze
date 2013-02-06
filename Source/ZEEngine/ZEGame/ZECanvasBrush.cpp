@@ -33,13 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECanvasBrush.h"
 #include "ZEError.h"
+#include "ZECanvasBrush.h"
+#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZEMaterial.h"
 #include "ZEGame/ZEDrawParameters.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZERenderer/ZERenderCommand.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEModules/ZEDirect3D10/ZED3D10GraphicsModule.h"
 
 ZEDrawFlags ZECanvasBrush::GetDrawFlags() const
 {
@@ -49,25 +51,32 @@ ZEDrawFlags ZECanvasBrush::GetDrawFlags() const
 void ZECanvasBrush::UpdateCanvas()
 {
 	if (RenderCommand.VertexBuffer != NULL)
-		delete RenderCommand.VertexBuffer;
+	{
+		VertexBuffer->Destroy();
+		VertexBuffer = NULL;
+	}
 	
 	if (!Canvas.IsEmpty())
 	{
 		if (VertexBuffer == NULL)
-			VertexBuffer = zeGraphics->CreateStaticVertexBuffer();
+			VertexBuffer = zeGraphics->CreateVertexBuffer();
 
 		if (OldVertexCount != Canvas.Vertices.GetCount())
 		{
 			OldVertexCount = Canvas.Vertices.GetCount();
-			VertexBuffer->Release();
-			if (!VertexBuffer->Create(Canvas.GetBufferSize()))
+			VertexBuffer->Destroy();
+			VertexBuffer = ZEVertexBuffer::CreateInstance();
+			if (!VertexBuffer->CreateStatic(Canvas.Vertices.GetCount(), sizeof(ZECanvasVertex), Canvas.GetVertexBuffer()))
 				zeCriticalError("Can not create Static Vertex Buffer.");
 		}
-		
-		void* Buffer = VertexBuffer->Lock();
+
+		/*
+		void* Buffer = NULL;
+		VertexBuffer->Lock(&Buffer);
 		memcpy(Buffer, Canvas.GetVertexBuffer(), Canvas.GetBufferSize());
 		VertexBuffer->Unlock();
-	
+		*/
+
 		ZEAABBox BoundingBox;
 		Canvas.CalculateBoundingBox(BoundingBox);
 		SetBoundingBox(BoundingBox);
@@ -85,13 +94,13 @@ void ZECanvasBrush::Draw(ZEDrawParameters* DrawParameters)
 
 		switch(PrimitiveType)
 		{
-			case ZE_ROPT_POINT:
+			case ZE_ROPT_POINT_LIST:
 				RenderCommand.PrimitiveCount = Canvas.Vertices.GetCount();
 				break;			
-			case ZE_ROPT_LINE:
+			case ZE_ROPT_LINE_LIST:
 				RenderCommand.PrimitiveCount = Canvas.Vertices.GetCount() / 2;
 				break;			
-			case ZE_ROPT_TRIANGLE:
+			case ZE_ROPT_TRIANGLE_LIST:
 				RenderCommand.PrimitiveCount = Canvas.Vertices.GetCount() / 3;
 				break;			
 			case ZE_ROPT_TRIANGLE_STRIPT:
@@ -129,18 +138,16 @@ ZECanvasBrush::ZECanvasBrush()
 	OldVertexCount = 0;
 	RenderCommand.SetZero();
 	Material = NULL;
-	PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	PrimitiveType = ZE_ROPT_TRIANGLE_LIST;
+	//RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 	RenderCommand.Material = Material;
 }
 
 ZECanvasBrush::~ZECanvasBrush()
 {
-	if (Material != NULL)
-		Material->Release();
-	if (RenderCommand.VertexBuffer != NULL)
-		((ZEStaticVertexBuffer*)RenderCommand.VertexBuffer)->Release();
+	ZE_DESTROY(Material);
+	ZE_DESTROY(RenderCommand.VertexBuffer);
 }
 
 ZECanvasBrush* ZECanvasBrush::CreateInstance()

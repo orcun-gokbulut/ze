@@ -38,15 +38,18 @@
 #define __ZE_PORTAL_MAP_PORTAL_H__
 
 #include "ZEDS/ZEArray.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 class ZEPortalMap;
 class ZEPortalMapDoor;
-struct ZEPortalMapResourcePortal;
-class ZEStaticVertexBuffer;
+class ZEVertexBuffer;
 class ZEPhysicalMesh;
-struct ZEDrawParameters;
 class ZEViewVolume;
+class ZEVertexBuffer;
+
+struct ZEDrawParameters;
+struct ZEPortalMapResourcePortal;
 
 class ZEPortalMapPortal
 {
@@ -56,7 +59,7 @@ class ZEPortalMapPortal
 	private:
 		ZEPortalMap*						Owner;
 		const ZEPortalMapResourcePortal*	Resource;
-		ZEStaticVertexBuffer*				VertexBuffer;
+		ZEVertexBuffer*						VertexBuffer;
 		ZEArray<ZERenderCommand>			RenderCommands;
 		ZEArray<ZEPortalMapDoor*>			Doors;
 		ZEPhysicalMesh*						PhysicalMesh;

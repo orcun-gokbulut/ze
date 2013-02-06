@@ -43,15 +43,9 @@
 class ZEHashGenerator
 {
 	public:
-		template<typename Type>
-		static ZESize Hash(Type& Value)
-		{
-			return Hash(Value, sizeof(Type));
-		}
-
-		static ZESize		Hash(void* Value, ZESize Size);
-		static ZESize		Hash(const char* String);
-		static ZESize		Hash(const ZEString& String);
+		static void		Hash(ZEUInt64& HashOutput, const char* String);
+		static void		Hash(ZEUInt64& HashOutput, const ZEString& String);
+		static void		Hash(ZEUInt64& HashOutput, void* Value, ZESize Size);
 };
 
 #endif

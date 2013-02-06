@@ -33,13 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sampler2D Texture			: register(s5);
-float4x4 TransformMatrix	: register(c0);
-
-bool EnableTexture			: register(b0);
-bool EnableVertexColor		: register(b1);
-
-float4 MaterialColor		: register(c10);
+Texture2D<float4> Texture	: register(t5);
+SampleState	TextureSampler	: register(s5);
 
 struct VSInput 
 {
@@ -53,6 +48,11 @@ struct VSOutput
 	float4 Position			: POSITION0;
 	float2 Texcoord			: TEXCOORD0;
 	float4 Color			: TEXCOORD1;
+};
+
+cbuffer VSData : register(b0);
+{
+	float4x4 TransformMatrix	: packoffset(c0);
 };
 
 VSOutput VSMain(VSInput Input)
@@ -72,7 +72,14 @@ struct PSInput
 	float4 Color			    : TEXCOORD1;
 };
 
-float4 PSMain(PSInput Input) : COLOR0
+cbuffer PSData : register(b0);
+{
+	float4 MaterialColor		: packoffset(c0);
+	bool EnableTexture			: packoffset(c1.x);
+	bool EnableVertexColor		: packoffset(c1.y);
+};
+
+float4 PSMain(PSInput Input) : SV_TARGET0
 {
 	float4 Color = MaterialColor;
 	

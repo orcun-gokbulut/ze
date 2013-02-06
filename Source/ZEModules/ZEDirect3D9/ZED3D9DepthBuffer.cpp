@@ -34,3 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9DepthBuffer.h"
+#include "ZEError.h"
+
+ZEUInt ZED3D9DepthBuffer::GetWidth()
+{
+	D3DSURFACE_DESC Desc;
+	if (DepthSurface == NULL || FAILED(DepthSurface->GetDesc(&Desc)))
+	{
+		zeError("Cannot get surface description.");
+		return 0;
+	}
+
+	return Desc.Width;
+}
+
+ZEUInt ZED3D9DepthBuffer::GetHeight()
+{
+	D3DSURFACE_DESC Desc;
+	if (DepthSurface == NULL || FAILED(DepthSurface->GetDesc(&Desc)))
+	{
+		zeError("Cannot get surface description.");
+		return 0;
+	}
+
+	return Desc.Height;
+}
+
+ZED3D9DepthBuffer::ZED3D9DepthBuffer()
+{
+
+}
+
+ZED3D9DepthBuffer::~ZED3D9DepthBuffer()
+{
+
+}

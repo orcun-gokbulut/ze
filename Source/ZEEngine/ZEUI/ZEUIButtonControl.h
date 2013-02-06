@@ -39,7 +39,7 @@
 
 #include "ZEUI/ZEUIControl.h"
 #include "ZEUI/ZEUIRectangle.h"
-#include "ZEGraphics/ZEUIMaterial.h"
+#include "ZERenderer/ZEUIMaterial.h"
 
 class ZEUIButtonControl : public ZEUIControl
 {

@@ -401,7 +401,7 @@ void ZEPortalMap::CullPortal(ZEPortalMapDoor* Door, ZEDrawParameters* DrawParame
 void ZEPortalMap::CullPortals(ZEDrawParameters* DrawParameters)
 {
 	bool NoClip = true;
-
+	/*
 	if (DrawParameters->ViewVolume->GetViewVolumeType() == ZE_VVT_FRUSTUM)
 	{
 		ZEViewFrustum* Frustum = (ZEViewFrustum*)DrawParameters->ViewVolume;
@@ -432,11 +432,13 @@ void ZEPortalMap::CullPortals(ZEDrawParameters* DrawParameters)
 		Statistics.CulledPortalCount = Statistics.TotalPortalCount - Statistics.DrawedPortalCount;
 		Statistics.CulledMapPolygonCount = Statistics.TotalMapPolygonCount - Statistics.DrawedMapPolygonCount;
 	}
-
+	*/
 	if (NoClip)
 	{
 		for (size_t I = 0; I < Portals.GetCount(); I++)
 		{
+			Portals[I]->Draw(DrawParameters);
+			/*
 			if (!DrawParameters->ViewVolume->CullTest(Portals[I]->GetBoundingBox()))
 			{
 				Portals[I]->Draw(DrawParameters);
@@ -449,6 +451,7 @@ void ZEPortalMap::CullPortals(ZEDrawParameters* DrawParameters)
 				Statistics.CulledPortalCount++;
 				Statistics.CulledMapPolygonCount += Portals[I]->GetPolygonCount();
 			}
+			*/
 		}
 
 

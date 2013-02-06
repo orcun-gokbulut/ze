@@ -43,6 +43,20 @@
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9VertexBuffer.h"
 #include "ZED3D9IndexBuffer.h"
+#include "ZED3D9GraphicsModule.h"
+
+
+inline static bool CheckResult(HRESULT Hr)
+{
+	if (FAILED(Hr))
+	{
+		zeError("Cannot set device state.");
+		return false;
+	}
+
+	return true;
+}
+		
 
 inline D3DBLEND ZEBlendOptionToDX9(ZEBlendOption BlendOption)
 {
@@ -84,7 +98,8 @@ inline D3DCMPFUNC ZEComparisionFunctionToDX9(ZEComparisonFunction CompFunc)
 	{
 		(D3DCMPFUNC)0, 
 		D3DCMP_NEVER, 
-		D3DCMP_LESS, D3DCMP_EQUAL, 
+		D3DCMP_LESS,
+		D3DCMP_EQUAL, 
 		D3DCMP_LESSEQUAL, 
 		D3DCMP_GREATER, 
 		D3DCMP_NOTEQUAL, 
@@ -127,13 +142,14 @@ inline D3DCULL ZECullDirectionToDX9(ZECullDirection CullDirection)
 	static const D3DCULL Values[] = 
 	{
 		(D3DCULL)0,
+		D3DCULL_NONE,
 		D3DCULL_CW,
 		D3DCULL_CCW
 	};
 	return Values[CullDirection];
 }
 
-inline D3DTEXTUREADDRESS ZETextureAdressModeToDX9(ZETextureAdressMode TextureAddress)
+inline D3DTEXTUREADDRESS ZETextureAdressModeToDX9(ZETextureAddressMode TextureAddress)
 {
 	static const D3DTEXTUREADDRESS Values[] =
 	{
@@ -158,472 +174,528 @@ inline D3DTEXTUREFILTERTYPE ZETextureFilterModeToDX9(ZETextureFilterMode Texture
 	return Values[TextureFilter];
 }
 
-inline D3DPRIMITIVETYPE ZEPrimitiveTypeToDX9(ZEROPrimitiveType PrimitiveType)
+inline D3DFORMAT ZEIndexBufferFormatToD3D9(ZEIndexBufferFormat BufferFormat)
+{
+	static const D3DFORMAT Values[] = 
+	{
+		D3DFMT_INDEX16,
+		D3DFMT_INDEX32
+	};
+	return Values[BufferFormat];
+}
+
+inline D3DPRIMITIVETYPE ZEPrimitiveTypeToDX9(ZEPrimitiveType PrimitiveType)
 {
 	static const D3DPRIMITIVETYPE Values[] = 
 	{
 		D3DPT_POINTLIST,
 		D3DPT_LINELIST,
 		D3DPT_TRIANGLELIST,
-		D3DPT_TRIANGLEFAN
+		D3DPT_TRIANGLESTRIP
 	};
 	return Values[PrimitiveType];
 }
 
-inline void ZED3D9GraphicsDevice::InitDefaultState()
+void ZED3D9GraphicsDevice::ApplyStates()
 {
-	// TODO: 
-	D3DDevice9->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, true);
-
-	// Default Shaders
-	//	.........
-
-	// Default Vertex Declaration
-	// ..........
-
-	// RenderTargets
-	// ..........
-}
-
-void ZED3D9GraphicsDevice::ApplyRequestedBlendState()
-{
-	// Skip If Requested Blend State didn't changed.
-	if(!RequestedBlendState.GetChanged())
-		return;
-
-	// Enable Disable
-	if(RequestedBlendState.GetBlendEnable() != DeviceBlendState.GetBlendEnable())
+	// Apply Blend States
+	if(BlendState.GetChanged())
 	{
-		DeviceBlendState.SetBlendEnable(RequestedBlendState.GetBlendEnable());
-		D3DDevice9->SetRenderState(D3DRS_ALPHABLENDENABLE, DeviceBlendState.GetBlendEnable());
-	}
-	// Alpha and Color Blending Options
-	if(DeviceBlendState.GetBlendEnable())
-	{
-		if(RequestedBlendState.GetSourceColorBlendOption() != ZE_BO_CURRENT && 
-			RequestedBlendState.GetSourceColorBlendOption() != DeviceBlendState.GetSourceColorBlendOption())
-		{
-			DeviceBlendState.SetSourceColorBlendOption(RequestedBlendState.GetSourceColorBlendOption()); 
-			D3DDevice9->SetRenderState(D3DRS_SRCBLEND, ZEBlendOptionToDX9(DeviceBlendState.GetSourceColorBlendOption()));
-		}
+		if (BlendState.GetAlphaTestEnable() != OldBlendState.GetAlphaTestEnable())
+			CheckResult(Device->SetRenderState(D3DRS_ALPHATESTENABLE, BlendState.GetAlphaTestEnable()));
 
-		if(RequestedBlendState.GetDestinationColorBlendOption() != ZE_BO_CURRENT &&
-			RequestedBlendState.GetDestinationColorBlendOption() != DeviceBlendState.GetDestinationColorBlendOption())
-		{
-			DeviceBlendState.SetDestinationColorBlendOption(RequestedBlendState.GetDestinationColorBlendOption()); 
-			D3DDevice9->SetRenderState(D3DRS_DESTBLEND, ZEBlendOptionToDX9(DeviceBlendState.GetDestinationColorBlendOption()));
-		}
+		if(BlendState.GetAlphaTestEnable())
+			CheckResult(Device->SetRenderState(D3DRS_ALPHAREF, BlendState.GetAlphaReferance()));
+
+		// Check if alpha blending enabled/disabled
+		if(BlendState.GetAlphaBlendEnable() != OldBlendState.GetAlphaBlendEnable())
+			CheckResult(Device->SetRenderState(D3DRS_ALPHABLENDENABLE, BlendState.GetAlphaBlendEnable()));
 		
-		if(RequestedBlendState.GetSourceAlphaBlendOption() != ZE_BO_CURRENT &&
-			RequestedBlendState.GetSourceAlphaBlendOption() != DeviceBlendState.GetSourceAlphaBlendOption())
+		// If alpha blending is enabled
+		if(BlendState.GetAlphaBlendEnable())
 		{
-			DeviceBlendState.SetSourceAlphaBlendOption(RequestedBlendState.GetSourceAlphaBlendOption());
-			D3DDevice9->SetRenderState(D3DRS_SRCBLENDALPHA, ZEBlendOptionToDX9(DeviceBlendState.GetSourceAlphaBlendOption()));
+			// Three more stated must be checked
+			if(BlendState.GetSourceBlendOption() != ZE_BO_CURRENT && BlendState.GetSourceBlendOption() != OldBlendState.GetSourceBlendOption())
+				CheckResult(Device->SetRenderState(D3DRS_SRCBLEND, ZEBlendOptionToDX9(BlendState.GetSourceBlendOption())));
+			
+			if(BlendState.GetDestinationBlendOption() != ZE_BO_CURRENT && BlendState.GetDestinationBlendOption() != OldBlendState.GetDestinationBlendOption())
+				CheckResult(Device->SetRenderState(D3DRS_DESTBLEND, ZEBlendOptionToDX9(BlendState.GetDestinationBlendOption())));
+		
+			if(BlendState.GetBlendEquation() != ZE_BE_CURRENT && BlendState.GetBlendEquation() != OldBlendState.GetBlendEquation())
+				CheckResult(Device->SetRenderState(D3DRS_BLENDOP, ZEBlendEquationToDX9(BlendState.GetBlendEquation())));
 		}
 
-		if(RequestedBlendState.GetDestinationAlphaBlendOption() != ZE_BO_CURRENT &&
-			RequestedBlendState.GetDestinationAlphaBlendOption() != DeviceBlendState.GetDestinationAlphaBlendOption())
+		// Check if separate alpha blending enabled/disabled
+		if (BlendState.GetSeperateAlphaBlendEnable() != OldBlendState.GetSeperateAlphaBlendEnable())
+			CheckResult(Device->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, BlendState.GetAlphaBlendEnable()));
+
+		// If separate alpha blending is enabled
+		if (BlendState.GetSeperateAlphaBlendEnable())
 		{
-			DeviceBlendState.SetDestinationAlphaBlendOption(RequestedBlendState.GetDestinationAlphaBlendOption());
-			D3DDevice9->SetRenderState(D3DRS_DESTBLENDALPHA, ZEBlendOptionToDX9(DeviceBlendState.GetDestinationAlphaBlendOption()));
+			// Three more stated must be checked
+			if(BlendState.GetSourceAlphaBlendOption() != ZE_BO_CURRENT && BlendState.GetSourceAlphaBlendOption() != OldBlendState.GetSourceAlphaBlendOption())
+				CheckResult(Device->SetRenderState(D3DRS_SRCBLENDALPHA, ZEBlendOptionToDX9(BlendState.GetSourceAlphaBlendOption())));
+
+			if(BlendState.GetDestinationAlphaBlendOption() != ZE_BO_CURRENT && BlendState.GetDestinationAlphaBlendOption() != OldBlendState.GetDestinationAlphaBlendOption())
+				CheckResult(Device->SetRenderState(D3DRS_DESTBLENDALPHA, ZEBlendOptionToDX9(BlendState.GetDestinationAlphaBlendOption())));
+
+			if(BlendState.GetAlphaBlendEquation() != ZE_BE_CURRENT && BlendState.GetAlphaBlendEquation() != OldBlendState.GetAlphaBlendEquation())
+				CheckResult(Device->SetRenderState(D3DRS_BLENDOPALPHA, ZEBlendEquationToDX9(BlendState.GetAlphaBlendEquation())));
 		}
+
+		// Check if Color channel mask is changed
+		if(BlendState.GetColorChannelMask() != OldBlendState.GetColorChannelMask())
+			CheckResult(Device->SetRenderState(D3DRS_COLORWRITEENABLE, BlendState.GetColorChannelMask().Value));
+
+		// Mark as not changed
+		BlendState.SetChanged(false);
+
+		// Make a copy
+		OldBlendState = BlendState;
+	}
+
+	// Apply Raster States
+	if(RasterizerState.GetChanged())
+	{
+		if(RasterizerState.GetCullDirection() != ZE_CD_CURRENT && RasterizerState.GetCullDirection() != OldRasterizerState.GetCullDirection())
+			CheckResult(Device->SetRenderState(D3DRS_CULLMODE, ZECullDirectionToDX9(RasterizerState.GetCullDirection())));
+		
+		// Fill Mode
+		if(RasterizerState.GetFillMode() !=  ZE_FM_CURRENT && RasterizerState.GetFillMode() != OldRasterizerState.GetFillMode())
+			CheckResult(Device->SetRenderState(D3DRS_FILLMODE, ZEFillModeToDX9(RasterizerState.GetFillMode())));
+
+		// Mark as not changed
+		RasterizerState.SetChanged(false);
+
+		// Make a copy
+		OldRasterizerState = RasterizerState;
+	}
 	
-		if(RequestedBlendState.GetBlendEquation() != ZE_BE_CURRENT &&
-			RequestedBlendState.GetBlendEquation() != DeviceBlendState.GetBlendEquation())
+	// Apply Stencil States
+	if(StencilZState.GetChanged())
+	{
+		// Z Write
+		if(StencilZState.GetZWriteEnable() != OldStencilZState.GetZWriteEnable())
+			CheckResult(Device->SetRenderState(D3DRS_ZWRITEENABLE, StencilZState.GetZWriteEnable()));
+		
+		// Z Test
+		if(StencilZState.GetZTestEnable() != OldStencilZState.GetZTestEnable())
+			CheckResult(Device->SetRenderState(D3DRS_ZENABLE, StencilZState.GetZTestEnable()));
+		
+		// Z Function
+		if(StencilZState.GetZTestEnable())
+			if(StencilZState.GetZFunction() != ZE_CF_CURRENT && StencilZState.GetZFunction() != OldStencilZState.GetZFunction())
+				CheckResult(Device->SetRenderState(D3DRS_ZFUNC, ZEComparisionFunctionToDX9(StencilZState.GetZFunction())));
+
+		// Stencil Test
+		if(StencilZState.GetStencilTestEnable() != OldStencilZState.GetStencilTestEnable())
+			CheckResult(Device->SetRenderState(D3DRS_STENCILENABLE, StencilZState.GetStencilTestEnable()));
+
+		// Stencil mask
+		if(StencilZState.GetStencilWriteMask() != OldStencilZState.GetStencilWriteMask())
+			CheckResult(Device->SetRenderState(D3DRS_STENCILWRITEMASK, StencilZState.GetStencilWriteMask()));
+
+		// Front Stencil Operation
+		if(StencilZState.GetStencilTestEnable())
 		{
-			DeviceBlendState.SetBlendEquation(RequestedBlendState.GetBlendEquation());
-			D3DDevice9->SetRenderState(D3DRS_BLENDOP, ZEBlendEquationToDX9(DeviceBlendState.GetBlendEquation()));
-			D3DDevice9->SetRenderState(D3DRS_BLENDOPALPHA, ZEBlendEquationToDX9(DeviceBlendState.GetBlendEquation()));
+			// Front Stencil Operation
+			if(StencilZState.GetFrontStencilFail() != ZE_CF_CURRENT && StencilZState.GetFrontStencilFail() != OldStencilZState.GetFrontStencilFail())
+				CheckResult(Device->SetRenderState(D3DRS_STENCILFAIL, ZEStencilOperationToDX9(StencilZState.GetFrontStencilFail())));
+
+			if(OldStencilZState.GetFrontZFail() != ZE_SO_CURRENT && StencilZState.GetFrontZFail() != OldStencilZState.GetFrontZFail())
+				CheckResult(Device->SetRenderState(D3DRS_STENCILZFAIL, ZEStencilOperationToDX9(OldStencilZState.GetFrontZFail())));
+
+			if(StencilZState.GetFrontStencilPass() != ZE_SO_CURRENT && StencilZState.GetFrontStencilPass() != OldStencilZState.GetFrontStencilPass())
+				CheckResult(Device->SetRenderState(D3DRS_STENCILPASS, ZEStencilOperationToDX9(StencilZState.GetFrontStencilPass())));
+
+			if(StencilZState.GetFrontStencilFunction() != ZE_SO_CURRENT && StencilZState.GetFrontStencilFunction() != OldStencilZState.GetFrontStencilFunction())
+				CheckResult(Device->SetRenderState(D3DRS_STENCILFUNC, ZEComparisionFunctionToDX9(StencilZState.GetFrontStencilFunction())));
+
+			// Back Stencil Operation
+			if(StencilZState.GetBackStencilFail() != ZE_CF_CURRENT && StencilZState.GetBackStencilFail() != OldStencilZState.GetBackStencilFail())
+				CheckResult(Device->SetRenderState(D3DRS_CCW_STENCILFAIL, ZEStencilOperationToDX9(StencilZState.GetBackStencilFail())));
+
+			if(StencilZState.GetBackZFail() != ZE_SO_CURRENT && StencilZState.GetBackZFail() != OldStencilZState.GetBackZFail())
+				CheckResult(Device->SetRenderState(D3DRS_CCW_STENCILZFAIL, ZEStencilOperationToDX9(StencilZState.GetBackZFail())));
+
+			if(StencilZState.GetBackStencilPass() != ZE_SO_CURRENT && StencilZState.GetBackStencilPass() != OldStencilZState.GetBackStencilPass())
+				CheckResult(Device->SetRenderState(D3DRS_CCW_STENCILPASS, ZEStencilOperationToDX9(StencilZState.GetBackStencilPass())));
+
+			if(StencilZState.GetBackStencilFunction() != ZE_SO_CURRENT && StencilZState.GetBackStencilFunction() != OldStencilZState.GetBackStencilFunction())
+				CheckResult(Device->SetRenderState(D3DRS_CCW_STENCILFUNC, ZEComparisionFunctionToDX9(StencilZState.GetBackStencilFunction())));
 		}
-	}
-	//ColorMask
-	if(RequestedBlendState.GetColorChannelMask() != DeviceBlendState.GetColorChannelMask())
-	{
-		DeviceBlendState.SetColorChannelMask(RequestedBlendState.GetColorChannelMask());
-		D3DDevice9->SetRenderState(D3DRS_COLORWRITEENABLE, DeviceBlendState.GetColorChannelMask().Value);
-	}
-	// Until Next Apply;
-	// If nothing changes on this state block, this should remain false
-	RequestedBlendState.SetChanged(false);
-}
 
-void ZED3D9GraphicsDevice::ApplyRequestedSamplerStates()
-{
-	bool AdressesHaveBorderColor = false;
-	bool FiltersHaveAnisotrophy = false;
+		// Mark as not changed
+		StencilZState.SetChanged(false);
 
-	for(int i = 0; i < ZE_MAX_SAMPLER_ATTACHMENT; i++)
+		// Make a copy
+		OldStencilZState = StencilZState;
+	}
+
+	// Apply Sampler States
+	bool BorderColorUsed = false;
+	bool AnisotrophyUsed = false;
+
+	for(ZESize I = 0; I < ZE_MAX_SAMPLER_ATTACHMENT; ++I)
 	{
-		// If Requested Not Changed, Skip
-		if(RequestedSamplerStates[i].GetChanged())
+		ZESamplerState* SamplerState = &SamplerStates[I];
+		ZESamplerState* OldSamplerState = &OldSamplerStates[I];
+
+		// If Changed
+		if(SamplerState->GetChanged())
 		{
 			// Addressing Modes
-			if(RequestedSamplerStates[i].GetAddressU() != ZE_TAM_CURRENT &&
-				RequestedSamplerStates[i].GetAddressU() != DeviceSamplerStates[i].GetAddressU())
+			if(SamplerState->GetAddressU() != ZE_TAM_CURRENT && SamplerState->GetAddressU() != OldSamplerState->GetAddressU())
 			{
-				DeviceSamplerStates[i].SetAddressU(RequestedSamplerStates[i].GetAddressU());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_ADDRESSU, ZETextureAdressModeToDX9(DeviceSamplerStates[i].GetAddressU()));
-				if(DeviceSamplerStates[i].GetAddressU() == ZE_TAM_BORDER)
-					AdressesHaveBorderColor = true;
+				CheckResult(Device->SetSamplerState((DWORD)I, D3DSAMP_ADDRESSU, ZETextureAdressModeToDX9(SamplerState->GetAddressU())));
+				if(SamplerState->GetAddressU() == ZE_TAM_BORDER)
+					BorderColorUsed = true;
 			}
-			if(RequestedSamplerStates[i].GetAddressV() != ZE_TAM_CURRENT &&
-				RequestedSamplerStates[i].GetAddressV() != DeviceSamplerStates[i].GetAddressV())
+			if(SamplerState->GetAddressV() != ZE_TAM_CURRENT && SamplerState->GetAddressV() != OldSamplerState->GetAddressV())
 			{
-				DeviceSamplerStates[i].SetAddressV(RequestedSamplerStates[i].GetAddressV());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_ADDRESSU, ZETextureAdressModeToDX9(DeviceSamplerStates[i].GetAddressV()));
-				if(DeviceSamplerStates[i].GetAddressV() == ZE_TAM_BORDER)
-					AdressesHaveBorderColor = true;
+				CheckResult(Device->SetSamplerState((DWORD)I, D3DSAMP_ADDRESSV, ZETextureAdressModeToDX9(SamplerState->GetAddressV())));
+				if(SamplerState->GetAddressV() == ZE_TAM_BORDER)
+					BorderColorUsed = true;
 			}
-			if(RequestedSamplerStates[i].GetAddressW() != ZE_TAM_CURRENT &&
-				RequestedSamplerStates[i].GetAddressW() != DeviceSamplerStates[i].GetAddressW())
+			if(SamplerState->GetAddressW() != ZE_TAM_CURRENT && SamplerState->GetAddressW() != OldSamplerState->GetAddressW())
 			{
-				DeviceSamplerStates[i].SetAddressW(RequestedSamplerStates[i].GetAddressW());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_ADDRESSU, ZETextureAdressModeToDX9(DeviceSamplerStates[i].GetAddressW()));
-				if(DeviceSamplerStates[i].GetAddressW() == ZE_TAM_BORDER)
-					AdressesHaveBorderColor = true;
+				CheckResult(Device->SetSamplerState((DWORD)I, D3DSAMP_ADDRESSW, ZETextureAdressModeToDX9(SamplerState->GetAddressW())));
+				if(SamplerState->GetAddressW() == ZE_TAM_BORDER)
+					BorderColorUsed = true;
 			}
+
 			// Filters
-			if(RequestedSamplerStates[i].GetMinFilter() != ZE_TFM_CURRENT &&
-				RequestedSamplerStates[i].GetMinFilter() != DeviceSamplerStates[i].GetMinFilter())
+			if(SamplerState->GetMinFilter() != ZE_TFM_CURRENT && SamplerState->GetMinFilter() != OldSamplerState->GetMinFilter())
 			{
-				DeviceSamplerStates[i].SetMinFilter(RequestedSamplerStates[i].GetMinFilter());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_MINFILTER, ZETextureFilterModeToDX9(DeviceSamplerStates[i].GetMinFilter()));
-				if(DeviceSamplerStates[i].GetMinFilter() == ZE_TFM_ANISOTROPY)
-					FiltersHaveAnisotrophy = true;
+				CheckResult(Device->SetSamplerState((DWORD)I, D3DSAMP_MINFILTER, ZETextureFilterModeToDX9(SamplerState->GetMinFilter())));
+				if(SamplerState->GetMinFilter() == ZE_TFM_ANISOTROPY)
+					AnisotrophyUsed = true;
 			}
-			if(RequestedSamplerStates[i].GetMagFilter() != ZE_TFM_CURRENT &&
-				RequestedSamplerStates[i].GetMagFilter() != DeviceSamplerStates[i].GetMagFilter())
+			if(SamplerState->GetMagFilter() != ZE_TFM_CURRENT && SamplerState->GetMagFilter() != OldSamplerState->GetMagFilter())
 			{
-				DeviceSamplerStates[i].SetMagFilter(RequestedSamplerStates[i].GetMagFilter());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_MINFILTER, ZETextureFilterModeToDX9(DeviceSamplerStates[i].GetMagFilter()));
-				if(DeviceSamplerStates[i].GetMagFilter() == ZE_TFM_ANISOTROPY)
-					FiltersHaveAnisotrophy = true;
+				CheckResult(Device->SetSamplerState((DWORD)I, D3DSAMP_MAGFILTER, ZETextureFilterModeToDX9(SamplerState->GetMagFilter())));
+				if(SamplerState->GetMagFilter() == ZE_TFM_ANISOTROPY)
+					AnisotrophyUsed = true;
 			}
-			if(RequestedSamplerStates[i].GetMipFilter() != ZE_TFM_CURRENT &&
-				RequestedSamplerStates[i].GetMipFilter() != DeviceSamplerStates[i].GetMipFilter())
+			if(SamplerState->GetMipFilter() != ZE_TFM_CURRENT && SamplerState->GetMipFilter() != OldSamplerState->GetMipFilter())
 			{
-				DeviceSamplerStates[i].SetMipFilter(RequestedSamplerStates[i].GetMipFilter());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_MINFILTER, ZETextureFilterModeToDX9(DeviceSamplerStates[i].GetMipFilter()));
-				if(DeviceSamplerStates[i].GetMipFilter() == ZE_TFM_ANISOTROPY)
-					FiltersHaveAnisotrophy = true;
+				CheckResult(Device->SetSamplerState((DWORD)I, D3DSAMP_MIPFILTER, ZETextureFilterModeToDX9(SamplerState->GetMipFilter())));
+				if(SamplerState->GetMipFilter() == ZE_TFM_ANISOTROPY)
+					AnisotrophyUsed = true;
 			}
+			
 			// Rest
-			if(FiltersHaveAnisotrophy &&
-				RequestedSamplerStates[i].GetMaxAnisotrophy() != DeviceSamplerStates[i].GetMaxAnisotrophy())
+			if(AnisotrophyUsed && SamplerState->GetMaxAnisotrophy() != OldSamplerState->GetMaxAnisotrophy())
 			{
-				DeviceSamplerStates[i].SetMaxAnisotrophy(RequestedSamplerStates[i].GetMaxAnisotrophy());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, DeviceSamplerStates[i].GetMaxAnisotrophy());
+				CheckResult(Device->SetSamplerState((DWORD)I, D3DSAMP_MAXANISOTROPY, SamplerState->GetMaxAnisotrophy()));
 			}
-			if(AdressesHaveBorderColor &&
-				RequestedSamplerStates[i].GetBorderColor() != DeviceSamplerStates[i].GetBorderColor())
+			
+			if(BorderColorUsed && SamplerState->GetBorderColor() != OldSamplerState->GetBorderColor())
 			{	
-				DeviceSamplerStates[i].SetBorderColor(RequestedSamplerStates[i].GetBorderColor());
-
 				// Convert To RGBA
-				int ColorRGBA[4];
-				ZEVector4 Color = RequestedSamplerStates->GetBorderColor().Clamp(0.0f, 1.0f);
-				ColorRGBA[0] = (int)(Color.x * 255);
-				ColorRGBA[1] = (int)(Color.y * 255);
-				ColorRGBA[2] = (int)(Color.z * 255);
-				ColorRGBA[3] = (int)(Color.w * 255);
+				ZEInt ColorRGBA[4];
+				ZEVector4 Color = SamplerStates->GetBorderColor().Clamp(0.0f, 1.0f);
+				ColorRGBA[0] = (ZEInt)(Color.x * 255.0f);
+				ColorRGBA[1] = (ZEInt)(Color.y * 255.0f);
+				ColorRGBA[2] = (ZEInt)(Color.z * 255.0f);
+				ColorRGBA[3] = (ZEInt)(Color.w * 255.0f);
 
-				D3DDevice9->SetSamplerState(i, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(ColorRGBA[0], ColorRGBA[1], ColorRGBA[2], ColorRGBA[3]));
+				CheckResult(Device->SetSamplerState((DWORD)I, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(ColorRGBA[0], ColorRGBA[1], ColorRGBA[2], ColorRGBA[3])));
 			}
-			if(RequestedSamplerStates[i].GetMaxLOD() != DeviceSamplerStates[i].GetMaxLOD())
+			
+			if(SamplerState->GetMaxLOD() != OldSamplerState->GetMaxLOD())
 			{
-				DeviceSamplerStates[i].SetMaxLOD(RequestedSamplerStates[i].GetMaxLOD());
-				D3DDevice9->SetSamplerState(i, D3DSAMP_MAXMIPLEVEL, (int)DeviceSamplerStates[i].GetMaxLOD());
+				CheckResult(Device->SetSamplerState((DWORD)I, D3DSAMP_MAXMIPLEVEL, (ZEInt)SamplerState->GetMaxLOD()));
 			}
-			if(RequestedSamplerStates[i].GetTexture() != DeviceSamplerStates[i].GetTexture())
+			
+			if(SamplerState->GetTexture() != OldSamplerState->GetTexture())
 			{
-				DeviceSamplerStates[i].SetCurrentTexture(RequestedSamplerStates[i].GetTexture());
-
-				ZETextureType TexType = DeviceSamplerStates[i].GetTexture()->GetTextureType();
+				ZETextureType TexType = OldSamplerState->GetTexture()->GetTextureType();
 				switch (TexType)
 				{
 					case ZE_TT_2D :
-						D3DDevice9->SetTexture(i, (((ZED3D9Texture2D*)DeviceSamplerStates[i].GetTexture())->Texture));
+						CheckResult(Device->SetTexture((DWORD)I, (((ZED3D9Texture2D*)SamplerState->GetTexture())->Texture)));
 						break;
 					case ZE_TT_3D :
-						D3DDevice9->SetTexture(i, (((ZED3D9Texture3D*)DeviceSamplerStates[i].GetTexture())->VolumeTexture));
+						CheckResult(Device->SetTexture((DWORD)I, (((ZED3D9Texture3D*)SamplerState->GetTexture())->VolumeTexture)));
 						break;
 					case ZE_TT_CUBE :
-						D3DDevice9->SetTexture(i, (((ZED3D9TextureCube*)DeviceSamplerStates[i].GetTexture())->CubeTexture));
+						CheckResult(Device->SetTexture((DWORD)I, (((ZED3D9TextureCube*)SamplerState->GetTexture())->CubeTexture)));
+						break;
 				}
 
 			}
-			// Until Next Apply;
-			// If nothing changes on this state block, this should remain false
-			RequestedSamplerStates[i].SetChanged(false);
-		}
-	}
-}
 
-void ZED3D9GraphicsDevice::ApplyRequestedShaders()
-{
-	// if RequestedPixelShader is NULL that means use current shader
-	if(RequestedPixelShader != NULL)
-	{
-		// Check the pointers if same address then consider them as same shader
-		if(RequestedPixelShader != DevicePixelShader)
-		{
-			DevicePixelShader = RequestedPixelShader;
-			D3DDevice9->SetPixelShader(((ZED3D9PixelShader*)DevicePixelShader)->GetPixelShader());
-		}
-	}
-	if(RequestedVertexShader != NULL)
-	{
-		if(RequestedVertexShader != DeviceVertexShader)
-		{
-			DeviceVertexShader = RequestedVertexShader;
-			D3DDevice9->SetVertexShader(((ZED3D9VertexShader*)DeviceVertexShader)->GetVertexShader());
-		}
-	}
-}
+			// Mark as not changed
+			SamplerState->SetChanged(false);
 
-void ZED3D9GraphicsDevice::ApplyRequestedStencilZState()
-{
-	// Skip Entire Function if Requested State is same from before
-	if(!RequestedStencilZState.GetChanged())
-		return;
+			// Make a copy
+			*SamplerState = *OldSamplerState;
+		}
+	}
 
-	// Enable, Disable and Mask
-	if(RequestedStencilZState.GetZTestEnable() != DeviceStencilZState.GetZTestEnable())
-	{
-		DeviceStencilZState.SetZTestEnable(RequestedStencilZState.GetZTestEnable());
-		D3DDevice9->SetRenderState(D3DRS_ZENABLE, DeviceStencilZState.GetZTestEnable());
-	}
-	if(RequestedStencilZState.GetStencilTestEnable() != DeviceStencilZState.GetStencilTestEnable())
-	{	
-		DeviceStencilZState.SetStencilTestEnable(RequestedStencilZState.GetStencilTestEnable());
-		D3DDevice9->SetRenderState(D3DRS_STENCILENABLE, DeviceStencilZState.GetStencilTestEnable());
-	}
-	if(RequestedStencilZState.GetZWriteEnable() != DeviceStencilZState.GetZWriteEnable())
-	{
-		DeviceStencilZState.SetZWriteEnable(RequestedStencilZState.GetZWriteEnable());
-		D3DDevice9->SetRenderState(D3DRS_ZWRITEENABLE, DeviceStencilZState.GetZWriteEnable());
-	}
-	if(RequestedStencilZState.GetStencilWriteMask() != DeviceStencilZState.GetStencilWriteMask())
-	{
-		DeviceStencilZState.SetStencilWriteMask(RequestedStencilZState.GetStencilWriteMask());
-		D3DDevice9->SetRenderState(D3DRS_STENCILWRITEMASK, DeviceStencilZState.GetStencilWriteMask());
-	}
-	// Z Function
-	if(DeviceStencilZState.GetZTestEnable() && RequestedStencilZState.GetZFunction() != ZE_CF_CURRENT &&
-		RequestedStencilZState.GetZFunction() != DeviceStencilZState.GetZFunction())
-	{
-		DeviceStencilZState.SetZFunction(RequestedStencilZState.GetZFunction());
-		D3DDevice9->SetRenderState(D3DRS_ZFUNC, ZEComparisionFunctionToDX9(DeviceStencilZState.GetZFunction()));
-	}
-	// Front Stencil Operation
-	if(DeviceStencilZState.GetStencilTestEnable())
-	{
-		// Front Stencil Operation
-		if(RequestedStencilZState.GetFrontStencilFail() != ZE_CF_CURRENT &&
-			RequestedStencilZState.GetFrontStencilFail() != DeviceStencilZState.GetFrontStencilFail())
-		{
-			DeviceStencilZState.SetFrontStencilFail(RequestedStencilZState.GetFrontStencilFail());
-			D3DDevice9->SetRenderState(D3DRS_STENCILFAIL, ZEStencilOperationToDX9(DeviceStencilZState.GetFrontStencilFail()));
-		}
-		if(DeviceStencilZState.GetFrontZFail() != ZE_SO_CURRENT &&
-			RequestedStencilZState.GetFrontZFail() != DeviceStencilZState.GetFrontZFail())
-		{
-			DeviceStencilZState.SetFrontZFail(RequestedStencilZState.GetFrontZFail());
-			D3DDevice9->SetRenderState(D3DRS_STENCILZFAIL, ZEStencilOperationToDX9(DeviceStencilZState.GetFrontZFail()));
-		}
-		if(RequestedStencilZState.GetFrontStencilPass() != ZE_SO_CURRENT &&
-			RequestedStencilZState.GetFrontStencilPass() != DeviceStencilZState.GetFrontStencilPass())
-		{
-			DeviceStencilZState.SetFrontStencilPass(RequestedStencilZState.GetFrontStencilPass());
-			D3DDevice9->SetRenderState(D3DRS_STENCILPASS, ZEStencilOperationToDX9(DeviceStencilZState.GetFrontStencilPass()));
-		}
-		if(RequestedStencilZState.GetFrontStencilFunction() != ZE_SO_CURRENT &&
-			RequestedStencilZState.GetFrontStencilFunction() != DeviceStencilZState.GetFrontStencilFunction())
-		{
-			DeviceStencilZState.SetFrontStencilFunction(RequestedStencilZState.GetFrontStencilFunction());
-			D3DDevice9->SetRenderState(D3DRS_STENCILFUNC, ZEComparisionFunctionToDX9(DeviceStencilZState.GetFrontStencilFunction()));
-		}
-		// Back Stencil Operation
-		if(RequestedStencilZState.GetBackStencilFail() != ZE_CF_CURRENT &&
-			RequestedStencilZState.GetBackStencilFail() != DeviceStencilZState.GetBackStencilFail())
-		{
-			DeviceStencilZState.SetBackStencilFail(RequestedStencilZState.GetBackStencilFail());
-			D3DDevice9->SetRenderState(D3DRS_CCW_STENCILFAIL, ZEStencilOperationToDX9(DeviceStencilZState.GetBackStencilFail()));
-		}
-		if(RequestedStencilZState.GetBackZFail() != ZE_SO_CURRENT &&
-			RequestedStencilZState.GetBackZFail() != DeviceStencilZState.GetBackZFail())
-		{
-			DeviceStencilZState.SetBackZFail(RequestedStencilZState.GetBackZFail());
-			D3DDevice9->SetRenderState(D3DRS_CCW_STENCILZFAIL, ZEStencilOperationToDX9(DeviceStencilZState.GetBackZFail()));
-		}
-		if(RequestedStencilZState.GetBackStencilPass() != ZE_SO_CURRENT &&
-			RequestedStencilZState.GetBackStencilPass() != DeviceStencilZState.GetBackStencilPass())
-		{
-			DeviceStencilZState.SetBackStencilPass(RequestedStencilZState.GetBackStencilPass());
-			D3DDevice9->SetRenderState(D3DRS_CCW_STENCILPASS, ZEStencilOperationToDX9(DeviceStencilZState.GetBackStencilPass()));
-		}
-		if(RequestedStencilZState.GetBackStencilFunction() != ZE_SO_CURRENT &&
-			RequestedStencilZState.GetBackStencilFunction() != DeviceStencilZState.GetBackStencilFunction())
-		{
-			DeviceStencilZState.SetBackStencilFunction(RequestedStencilZState.GetBackStencilFunction());
-			D3DDevice9->SetRenderState(D3DRS_CCW_STENCILFUNC, ZEComparisionFunctionToDX9(DeviceStencilZState.GetBackStencilFunction()));
-		}
-	}
-	// Until Next Apply;
-	// If nothing changes on this state block, this should remain false
-	RequestedStencilZState.SetChanged(false);
-}
-
-void ZED3D9GraphicsDevice::ApplyRequestedRasterizerState()
-{
-	// Return if it did not changed
-	if(!RequestedRasterizerState.GetChanged())
-		return;
-
-	// Cull Side and Cull Enable
-	if(RequestedRasterizerState.GetCullEnable())
-	{
-		if(RequestedRasterizerState.GetCullDirection() != ZE_CD_CURRENT &&
-			RequestedRasterizerState.GetCullDirection() != DeviceRasterizerState.GetCullDirection())
-		{
-			DeviceRasterizerState.SetCullDirection(RequestedRasterizerState.GetCullDirection());
-			D3DDevice9->SetRenderState(D3DRS_CULLMODE, ZECullDirectionToDX9(DeviceRasterizerState.GetCullDirection()));
-		}
-	}	
-	else
-		D3DDevice9->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	// Fill Mode
-	if(RequestedRasterizerState.GetFillMode() !=  ZE_FM_CURRENT &&
-		RequestedRasterizerState.GetFillMode() != DeviceRasterizerState.GetFillMode())
-	{
-		DeviceRasterizerState.SetFillMode(RequestedRasterizerState.GetFillMode());
-		D3DDevice9->SetRenderState(D3DRS_FILLMODE, ZEFillModeToDX9(DeviceRasterizerState.GetFillMode()));
-	}
-	// Until Next Apply;
-	// If nothing changes on this state block, this should remain false
-	RequestedRasterizerState.SetChanged(false);
-}
-
-void ZED3D9GraphicsDevice::ApplyRequestedVertexBuffer()
-{
-	if (RequestedVertexBuffer != NULL && 
-		RequestedVertexBuffer != DeviceVertexBuffer)
-	{
-		DeviceVertexBuffer = RequestedVertexBuffer;
-
-		D3DDevice9->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)DeviceVertexBuffer)->StaticBuffer, 0, ((ZED3D9StaticVertexBuffer*)DeviceVertexBuffer)->GetVertexSize());
-		// Stream ZERO Only for now...
-	}
-}
-
-void ZED3D9GraphicsDevice::ApplyRequestedIndexBuffer()
-{
-	if (RequestedVertexBuffer != NULL && 
-		RequestedVertexBuffer != DeviceVertexBuffer)
-	{
-		DeviceIndexBuffer = RequestedIndexBuffer;
-		D3DDevice9->SetIndices(((ZED3D9StaticIndexBuffer*)DeviceIndexBuffer)->StaticBuffer);
-	}
-}
-
-void ZED3D9GraphicsDevice::ApplyRequestedRenderTargets()
-{
+	// Apply Render Targets
 	if(ScreenWriteEnable)
 	{
-		// Now Only Set RT0 Which Should Have Back buffer
-		D3DDevice9->SetRenderTarget(0, ((ZED3D9RenderTarget*)DeviceRenderTargets[0])->FrameBuffer);
-
-		// Still Try To Set A DepthStencilBuffer
-		if(RequestedDepthBuffer != NULL && RequestedDepthBuffer != DeviceDepthBuffer)
-		{
-			DeviceDepthBuffer = RequestedDepthBuffer;
-			D3DDevice9->SetDepthStencilSurface(((ZED3D9DepthBuffer*)RequestedDepthBuffer)->DepthSurface);
+		if (RenderTargets[0] != NULL && RenderTargets[0] != OldRenderTargets[0])
+		{	
+			// Now Only Set RT0 Which Should Have Back buffer
+			CheckResult(Device->SetRenderTarget(0, ((ZED3D9RenderTarget*)RenderTargets[0])->Surface));
+			OldRenderTargets[0] = RenderTargets[0];
 		}
-		return;
 	}
-
-	for(int i = 0; i < ZE_MAX_RENDER_TARGETS; i++)
+	else
 	{
-		// If NULL skip this render target
-		if (RequestedRenderTargets[i] != NULL)
-		{		
-			// If Pointer Address not same consider it changed
-			if (RequestedRenderTargets[i] != DeviceRenderTargets[i])
-			{
-				DeviceRenderTargets[i] = RequestedRenderTargets[i];
-				D3DDevice9->SetRenderTarget(i, ((ZED3D9RenderTarget*)DeviceRenderTargets[i])->FrameBuffer);
+		for(ZESize I = 0; I < ZE_MAX_RENDER_TARGETS; ++I)
+		{
+			if (RenderTargets[I] != NULL && RenderTargets[I] != OldRenderTargets[I])
+			{		
+				CheckResult(Device->SetRenderTarget((DWORD)I, ((ZED3D9RenderTarget*)RenderTargets[I])->Surface));
+				OldRenderTargets[I] = RenderTargets[I];
 			}
 		}
 	}
 
-	if(RequestedDepthBuffer != NULL && RequestedDepthBuffer != DeviceDepthBuffer)
+	if(DepthStencilBuffer != NULL && DepthStencilBuffer != OldDepthStencilBuffer)
 	{
-		DeviceDepthBuffer = RequestedDepthBuffer;
-		D3DDevice9->SetDepthStencilSurface(((ZED3D9DepthBuffer*)RequestedDepthBuffer)->DepthSurface);
+		CheckResult(Device->SetDepthStencilSurface(((ZED3D9DepthBuffer*)DepthStencilBuffer)->DepthSurface));
+		OldDepthStencilBuffer = DepthStencilBuffer;
+	}
+
+	// Apply static Vertex Buffer
+	if (VertexBuffer != NULL && VertexBuffer != OldVertexBuffer)
+	{
+		if (VertexBuffer->IsStatic())
+			CheckResult(Device->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)VertexBuffer)->StaticBuffer, 0, (UINT)((ZED3D9StaticVertexBuffer*)VertexBuffer)->GetVertexSize()));
+
+		OldVertexBuffer = VertexBuffer;
+	}
+
+	// Apply static Index Buffers
+	if (IndexBuffer != NULL && IndexBuffer != OldIndexBuffer)
+	{
+		if (IndexBuffer->IsStatic())
+			CheckResult(Device->SetIndices(((ZED3D9StaticIndexBuffer*)IndexBuffer)->StaticBuffer));
+
+		OldIndexBuffer = IndexBuffer;
+	}
+
+	// Apply Shaders
+	if(PixelShader != NULL && PixelShader != OldPixelShader)
+	{
+		CheckResult(Device->SetPixelShader(((ZED3D9PixelShader*)PixelShader)->GetPixelShader()));
+		OldPixelShader = PixelShader;
+	}
+
+	if(VertexShader != NULL && VertexShader != OldVertexShader)
+	{
+		CheckResult(Device->SetVertexShader(((ZED3D9VertexShader*)VertexShader)->GetVertexShader()));
+		OldVertexShader = VertexShader;
 	}
 }
 
-void ZED3D9GraphicsDevice::ApplyAllRequestedStates()
+void ZED3D9GraphicsDevice::ResetToDefaultStates()
 {
-	ApplyRequestedBlendState();
-	ApplyRequestedSamplerStates();
-	ApplyRequestedShaders();
-	ApplyRequestedStencilZState();
-	ApplyRequestedRasterizerState();
-	ApplyRequestedRenderTargets();
-	ApplyRequestedVertexBuffer();
+	BlendState = DefaultBlendState;
+	RasterizerState = DefaultRasterStates;
+	StencilZState = DefaultStencilZState;
+
+	for (ZESize I = 0; I < ZE_MAX_SAMPLER_ATTACHMENT; ++I)
+		SamplerStates[I] = DefaultSamplerState;
+	
+	for (ZESize I = 0; I < ZE_MAX_RENDER_TARGETS; ++I)
+		RenderTargets[I] = NULL;
+
+	VertexBuffer = NULL;
+	IndexBuffer = NULL;
+	VertexShader = NULL;
+	PixelShader = NULL;
+	DepthStencilBuffer = NULL;
+	
+	ScreenWriteEnable = false;
 }
 
-void ZED3D9GraphicsDevice::Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount) 
+void ZED3D9GraphicsDevice::Draw(ZEPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 PrimitiveCount) 
 {
 	// Commit State
-	ApplyAllRequestedStates();
+	ApplyStates();
 
-	// Generate A Vertex Declaration From the Buffer
-	ZED3D9VertexDeclaration VertexDeclaration;
-	if (!VertexDeclaration.Create(DeviceVertexBuffer->GetVertexElements().GetConstCArray(), DeviceVertexBuffer->GetVertexElements().GetSize()))
+	if (VertexBuffer->IsStatic())
 	{
-		zeError("Unable To Generate Vertex Declaration!!");
+		// NOTE: vertex declaration creation should not be here in the future.
+		ZED3D9VertexDeclaration VertexDeclaration;
+		if (!VertexDeclaration.Create(OldVertexBuffer->GetVertexElements().GetConstCArray(), OldVertexBuffer->GetVertexElements().GetSize()))
+		{
+			zeError("Unable To Generate Vertex Declaration!!");
+		}
+
+		VertexDeclaration.SetupVertexDeclaration();
+
+		if (!CheckResult(Device->DrawPrimitive(ZEPrimitiveTypeToDX9(PrimitiveType), StartVertex, PrimitiveCount)));
+		{
+			//Device lost check
+			//if ()
+			//	Module->RestoreDevice();
+		}
+
+		VertexDeclaration.Release();
 	}
+	else
+	{
+		ZEDynamicVertexBuffer* Buffer = (ZEDynamicVertexBuffer*)VertexBuffer;
+		
+		// NOTE: vertex size calculation should not be here in the future.
+		Buffer->GenerateVertexSize();
 
-	// Set Vertex Declaration
-	VertexDeclaration.SetupVertexDeclaration();
-
-	// Then Draw
-	D3DDevice9->DrawPrimitive(ZEPrimitiveTypeToDX9(PrimitiveType), StartVertex, VertexCount);
-
-	// Release This Declaration
-	VertexDeclaration.Release();
+		if (!CheckResult(Device->DrawPrimitiveUP(ZEPrimitiveTypeToDX9(PrimitiveType), PrimitiveCount, Buffer->GetVertexBuffer(), Buffer->GetVertexSize())))
+		{
+			//Device lost check
+			//if ()
+			//	Module->RestoreDevice();
+		}
+	}
+	
 }
 
-void ZED3D9GraphicsDevice::DrawIndexed(ZEROPrimitiveType PrimitiveType, ZEInt BaseVertexIndex, ZEUInt32 MinIndex, 
-										ZEUInt32 VertexCount, ZEUInt32 StartIndex, ZEUInt32 PrimitiveCount)
+void ZED3D9GraphicsDevice::DrawIndexed(ZEPrimitiveType PrimitiveType, ZEInt BaseVertexIndex, ZEUInt32 MinIndex, ZEUInt32 VertexCount, ZEUInt32 StartIndex, ZEUInt32 PrimitiveCount)
 {
-	// Commit State
-	ApplyAllRequestedStates();
-	ApplyRequestedIndexBuffer();
+	ApplyStates();
 
-	// Generate A Vertex Declaration From the Buffer
-	ZED3D9VertexDeclaration VertexDeclaration;
-	if (!VertexDeclaration.Create(DeviceVertexBuffer->GetVertexElements().GetConstCArray(), DeviceVertexBuffer->GetVertexElements().GetSize()))
+	if (VertexBuffer->IsStatic())
 	{
-		zeError("Unable To Generate Vertex Declaration!!");
+		// NOTE: vertex declaration creation should not be here in the future.
+		ZED3D9VertexDeclaration VertexDeclaration;
+		if (!VertexDeclaration.Create(OldVertexBuffer->GetVertexElements().GetConstCArray(), OldVertexBuffer->GetVertexElements().GetSize()))
+		{
+			zeError("Unable To Generate Vertex Declaration!!");
+		}
+
+		VertexDeclaration.SetupVertexDeclaration();
+
+		if (!CheckResult(Device->DrawIndexedPrimitive(ZEPrimitiveTypeToDX9(PrimitiveType), BaseVertexIndex, MinIndex, VertexCount, StartIndex, PrimitiveCount)))
+		{
+			// Device lost
+			//if ()
+			//	Module->RestoreDevice();
+		}
+
+		VertexDeclaration.Release();
+	}
+	else
+	{
+		if (IndexBuffer->IsStatic())
+		{
+			zeError("Dynamic index buffer is expected instead of a static one");
+			return;
+		}
+
+		ZEDynamicIndexBuffer* IndBuff = (ZEDynamicIndexBuffer*)IndexBuffer;
+		ZEDynamicVertexBuffer* VertBuff = (ZEDynamicVertexBuffer*)VertexBuffer;
+		
+		// NOTE: vertex size calculation should not be here in the future.
+		VertBuff->GenerateVertexSize();
+
+		if (!CheckResult(Device->DrawIndexedPrimitiveUP(ZEPrimitiveTypeToDX9(PrimitiveType), MinIndex, VertexCount, PrimitiveCount, IndBuff->GetIndexBuffer(), ZEIndexBufferFormatToD3D9(IndBuff->GetBufferFormat()), VertBuff->GetVertexBuffer(), VertBuff->GetVertexSize())))
+		{
+			// Device lost
+			//if ()
+			//	Module->RestoreDevice();
+		}
 	}
 
-	// Set Vertex Declaration
-	VertexDeclaration.SetupVertexDeclaration();
+	
+}
 
-	// Then Draw
-	D3DDevice9->DrawIndexedPrimitive(ZEPrimitiveTypeToDX9(PrimitiveType), BaseVertexIndex, MinIndex,
-										VertexCount, StartIndex, PrimitiveCount);
+bool ZED3D9GraphicsDevice::Present()
+{
+	return CheckResult(Device->Present(NULL, NULL, NULL, NULL));
+}
 
-	VertexDeclaration.Release();
+bool ZED3D9GraphicsDevice::EndScene()
+{
+	return CheckResult(Device->EndScene());
+}
+
+bool ZED3D9GraphicsDevice::BeginScene()
+{
+	return CheckResult(Device->BeginScene());
+}
+
+bool ZED3D9GraphicsDevice::Clear(bool RenderTarget, bool ZBuffer, bool StencilBuffer, const ZEVector4& Color, float ZClearValue, ZEUInt32 StencilClearValue)
+{
+	DWORD Flags = 0;
+	// Set surfaces before cleaning
+	if (RenderTarget)
+	{
+		Flags |= D3DCLEAR_TARGET;
+
+		for(ZESize I = 0; I < ZE_MAX_RENDER_TARGETS; ++I)
+		{
+			if (RenderTargets[I] != NULL && RenderTargets[I] != OldRenderTargets[I])
+			{		
+				CheckResult(Device->SetRenderTarget((DWORD)I, ((ZED3D9RenderTarget*)RenderTargets[I])->Surface));
+				OldRenderTargets[I] = RenderTargets[I];
+			}
+		}
+	}
+	if (ZBuffer || StencilBuffer)
+	{
+		Flags |= ZBuffer ? D3DCLEAR_ZBUFFER : 0;
+		Flags |= StencilBuffer ? D3DCLEAR_STENCIL : 0;
+
+		if(DepthStencilBuffer != NULL && DepthStencilBuffer != OldDepthStencilBuffer)
+		{
+			CheckResult(Device->SetDepthStencilSurface(((ZED3D9DepthBuffer*)DepthStencilBuffer)->DepthSurface));
+			OldDepthStencilBuffer = DepthStencilBuffer;
+		}
+	}
+
+	D3DCOLOR ClearColor = D3DCOLOR_ARGB((ZEUInt8)(Color.w * 255.0f),
+										(ZEUInt8)(Color.x * 255.0f),
+										(ZEUInt8)(Color.y * 255.0f),
+										(ZEUInt8)(Color.z * 255.0f));
+
+	return CheckResult(Device->Clear(0, NULL, Flags, ClearColor, ZClearValue, StencilClearValue));
 }
 
 ZED3D9GraphicsDevice::ZED3D9GraphicsDevice() : ZEGraphicsDevice()
 {
-	D3DDevice9 = GetDevice();
-	InitDefaultState();
+	// Reset states to d3d defaults
+	DefaultRasterStates.SetFillMode(ZE_FM_FILL);
+	DefaultRasterStates.SetCullDirection(ZE_CD_COUNTER_CLOCKWISE);
+	
+	DefaultBlendState.SetAlphaBlendEnable(false);
+	DefaultBlendState.SetSourceBlendOption(ZE_BO_ONE);
+	DefaultBlendState.SetDestinationBlendOption(ZE_BO_ZERO);
+	DefaultBlendState.SetSeperateAlphaBlendEnable(false);
+	DefaultBlendState.SetSourceAlphaBlendOption(ZE_BO_ONE);
+	DefaultBlendState.SetDestinationAlphaBlendOption(ZE_BO_ZERO);
+	DefaultBlendState.SetBlendEquation(ZE_BE_ADD);
+
+	DefaultStencilZState.SetZWriteEnable(true);
+	DefaultStencilZState.SetZTestEnable(false);
+	DefaultStencilZState.SetZFunction(ZE_CF_LESS_EQUAL);
+	DefaultStencilZState.SetStencilWriteMask(0);
+	DefaultStencilZState.SetStencilTestEnable(false);
+	DefaultStencilZState.SetFrontStencilFunction(ZE_CF_ALWAYS);
+	DefaultStencilZState.SetFrontStencilFail(ZE_SO_KEEP);
+	DefaultStencilZState.SetFrontStencilPass(ZE_SO_KEEP);
+	DefaultStencilZState.SetFrontZFail(ZE_SO_KEEP);
+	DefaultStencilZState.SetBackStencilFunction(ZE_CF_ALWAYS);
+	DefaultStencilZState.SetBackStencilFail(ZE_SO_KEEP);
+	DefaultStencilZState.SetBackStencilPass(ZE_SO_KEEP);
+	DefaultStencilZState.SetBackZFail(ZE_SO_KEEP);
+
+	DefaultSamplerState.SetAddressU(ZE_TAM_WRAP);
+	DefaultSamplerState.SetAddressV(ZE_TAM_WRAP);
+	DefaultSamplerState.SetAddressW(ZE_TAM_WRAP);
+	DefaultSamplerState.SetBorderColor(ZEVector4::Zero);
+	DefaultSamplerState.SetMagFilter(ZE_TFM_POINT);
+	DefaultSamplerState.SetMinFilter(ZE_TFM_POINT);
+	DefaultSamplerState.SetMipFilter(ZE_TFM_NONE);
+	DefaultSamplerState.SetMaxAnisotrophy(1);
+	DefaultSamplerState.SetMaxLOD(0);
+	DefaultSamplerState.SetTexture(NULL);
 }
 
 ZED3D9GraphicsDevice::~ZED3D9GraphicsDevice()

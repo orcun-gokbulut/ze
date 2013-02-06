@@ -48,7 +48,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 class ZEMaterial;
 class ZEPhysicalObject;
@@ -58,23 +58,9 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 	private:
 		ZEPhysXCollisionManager						CollisionManager;
 
-		struct 
-		{
-			ZEMaterial* Material;
-			ZEArrayVertexBuffer<ZEColoredVertex>	PointsVertexBuffer;
-			ZEArrayVertexBuffer<ZEColoredVertex>	LinesVertexBuffer;
-			ZEArrayVertexBuffer<ZEColoredVertex>	TrianglesVertexBuffer;
-
-			ZERenderCommand							PointsRenderCommand;
-			ZERenderCommand							LinesRenderCommand;
-			ZERenderCommand							TrianglesRenderCommand;
-
-		} DebugDraw;
 
 		bool										Enabled;
 		bool										Visualize;
-
-		void										InitializeDebugDraw();
 
 	protected:
 		NxSceneDesc									SceneDesc;

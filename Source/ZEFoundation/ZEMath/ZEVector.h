@@ -191,6 +191,9 @@ class ZEVector3
 		static void					ClampUpper(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MaxValue);
 		static void					Saturate(ZEVector3& Out, const ZEVector3& Vector);
 
+		static ZEVector2			ToVector2(const ZEVector3& Vector);
+		ZEVector2					ToVector2() const;
+
 		bool						IsValid() const;
 		bool						IsNormalized() const;
 
@@ -300,6 +303,12 @@ class ZEVector4
 		static void					Clamp(ZEVector4& Out, const ZEVector4& Vector, const ZEVector4& MinValue, const ZEVector4& MaxValue);
 		static void					Saturate(ZEVector4& Out, const ZEVector4& Vector);
 		
+		static ZEVector2			ToVector2(const ZEVector4& Vector);
+		static ZEVector3			ToVector3(const ZEVector4& Vector);
+
+		ZEVector2					ToVector2() const;
+		ZEVector3					ToVector3() const;
+
 		bool						IsValid() const;
 		bool						IsNormalized() const;
 

@@ -34,30 +34,21 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGame.h"
-#include "ZETypes.h"
 #include "ZEScene.h"
 #include "ZEError.h"
 #include "ZEEntity.h"
-#include "ZEMath/ZERay.h"
 #include "ZEFile/ZEFile.h"
 #include "ZECore/ZECore.h"
 #include "ZESceneCuller.h"
 #include "ZEDrawParameters.h"
-#include "ZEEntity.h"
-#include "ZECore/ZEConsole.h"
 #include "ZEEntityProvider.h"
-#include "ZEGraphics/ZELight.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZELight.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZESound/ZESoundModule.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEGraphics/ZEFrameRenderer.h"
-#include "ZEGraphics/ZEShadowRenderer.h"
-#include "ZEMap/ZEPortalMap/ZEPortalMap.h"
 #include "ZESerialization/ZEFileSerializer.h"
 #include "ZESerialization/ZEFileUnserializer.h"
-#include "ZEMap/ZEPortalMap/ZEPortalMapResource.h"
-
-#include <memory.h>
 
 
 static ZEString ConstructResourcePath(const ZEString& Path)
@@ -89,7 +80,7 @@ bool ZEScene::Initialize()
 	Deinitialize();
 
 	if (Renderer == NULL)
-		Renderer = ZEFrameRenderer::CreateInstance();
+		Renderer = ZERenderer::CreateInstance();
 
 	if (Renderer == NULL)
 	{
@@ -103,20 +94,6 @@ bool ZEScene::Initialize()
 		return false;
 	}
 
-	if (ShadowRenderer == NULL)
-		ShadowRenderer = ZEShadowRenderer::CreateInstance();
-
-	if (Renderer == NULL)
-	{
-		zeCriticalError("Can not create shadow renderer.");
-		return false;
-	}
-	
-	if (!ShadowRenderer->Initialize())
-	{
-		zeCriticalError("Can not initialize shadow renderer.");
-		return false;
-	}
 
 	if (PhysicalWorld == NULL)
 		PhysicalWorld = ZEPhysicalWorld::CreateInstance();
@@ -152,9 +129,6 @@ void ZEScene::Deinitialize()
 	if (Renderer != NULL)
 		Renderer->Deinitialize();
 
-	if (ShadowRenderer != NULL)
-		ShadowRenderer->Deinitialize();
-
 	Initialized = false;
 	
 }
@@ -175,12 +149,6 @@ void ZEScene::Destroy()
 	{
 		Renderer->Destroy();
 		Renderer = NULL;
-	}
-
-	if (ShadowRenderer != NULL)
-	{
-		ShadowRenderer->Destroy();
-		ShadowRenderer = NULL;
 	}
 
 	delete this;
@@ -297,11 +265,6 @@ void ZEScene::SetActiveListener(ZEListener* Listener)
 {
 	ActiveListener = Listener;
 	zeSound->SetActiveListener(Listener);
-}
-
-const ZECullStatistics& ZEScene::GetCullerStatistics()
-{
-	return Culler.GetStatistics();
 }
 
 ZEListener* ZEScene::GetActiveListener()
@@ -457,7 +420,6 @@ ZEScene::ZEScene()
 	Initialized = false;
 	LastEntityId = 0;
 	PostProcessor = NULL;
-	ShadowRenderer = NULL;
 	Renderer = NULL;
 	ActiveCamera = NULL;
 	ActiveListener = NULL;

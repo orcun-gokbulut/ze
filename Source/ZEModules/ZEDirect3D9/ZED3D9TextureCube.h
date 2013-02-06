@@ -45,7 +45,7 @@
 
 class ZED3D9TextureCube : public ZETextureCube, public ZED3D9ComponentBase
 {
-	friend class ZED3D9Module;
+	friend class ZED3D9GraphicsModule;
 
 	protected:
 		ZED3D9RenderTarget				ViewPorts[6];
@@ -64,9 +64,9 @@ class ZED3D9TextureCube : public ZETextureCube, public ZED3D9ComponentBase
 
 		virtual bool					Create(ZEUInt EdgeLenght, ZEUInt Levels, ZETexturePixelFormat PixelFormat, bool RenderTarget = false);
 		virtual bool					Lock(ZETextureCubeFace Face, ZEUInt Level, void** Buffer, ZESize* Pitch);
-		virtual void					Unlock(ZETextureCubeFace Face, ZEUInt Level);
+		virtual bool					Unlock(ZETextureCubeFace Face, ZEUInt Level);
+		
 		virtual void					Release();
-
 		virtual void					Destroy();
 };
 #endif

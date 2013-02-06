@@ -40,7 +40,7 @@
 #include "ZEUI/ZEUIControl.h"
 #include "ZEUI/ZEUIRectangle.h"
 #include "ZEUIFrameControl.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZERenderer/ZEFixedMaterial.h"
 #include "ZEUITextControl.h"
 #include "ZEUIButtonControl.h"
 

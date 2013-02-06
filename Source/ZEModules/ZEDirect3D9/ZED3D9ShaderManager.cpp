@@ -36,7 +36,7 @@
 #include "ZED3D9ShaderManager.h"
 #include "ZETypes.h"
 #include "ZED3D9CommonTools.h"
-#include "ZED3D9Module.h"
+#include "ZED3D9GraphicsModule.h"
 
 ZEUInt32 ZED3D9ShaderManager::CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components)
 {
@@ -235,5 +235,5 @@ ZED3D9VertexShader* ZED3D9ShaderManager::GetVertexShader(const char* FileName, c
 
 ZED3D9ShaderManager* ZED3D9ShaderManager::GetInstance()
 {
-	return ((ZED3D9Module*)ZEGraphicsModule::GetInstance())->GetShaderManager();
+	return ((ZED3D9GraphicsModule*)ZEGraphicsModule::GetInstance())->GetShaderManager();
 }

@@ -34,120 +34,197 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEBlendState.h"
+#include "ZEDS/ZEHashGenerator.h"
 
-void ZEBlendState::SetBlendEnable(bool Enable)
+#include <memory.h>
+
+void ZEDeviceStateBlend::UpdateHash()
 {
-	BlendEnable = Enable;
-	Changed = true;
+	if (Dirty)
+	{
+		Hash = 0;
+		Dirty = false;
+		ZEHashGenerator::Hash(Hash, &StateData, sizeof(ZEBlendStateData));
+	}
 }
 
-bool ZEBlendState::GetBlendEnable() const
+void ZEDeviceStateBlend::SetAlphaToCoverageEnable(bool Enable)
 {
-	return BlendEnable;
+	if (StateData.AlphaToCoverageEnable != Enable)
+	{
+		StateData.AlphaToCoverageEnable = Enable;
+		Dirty = true;
+	}
 }
 
-void ZEBlendState::SetSourceColorBlendOption(ZEBlendOption Option)
+bool ZEDeviceStateBlend::GetAlphaToCoverageEnable() const
 {
-	SourceColorBlendOption = Option;
-	Changed = true;
+	return StateData.AlphaToCoverageEnable;
 }
 
-ZEBlendOption ZEBlendState::GetSourceColorBlendOption() const
+void ZEDeviceStateBlend::SetBlendEnable(ZESize Target, bool Enable)
 {
-	return SourceColorBlendOption;
+	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
+
+	if (StateData.BlendEnable[Target] != Enable)
+	{
+		StateData.BlendEnable[Target] = Enable;
+		Dirty = true;
+	}
 }
 
-void ZEBlendState::SetDestinationColorBlendOption(ZEBlendOption Option)
+bool ZEDeviceStateBlend::GetBlendEnable(ZESize Target) const
 {
-	DestinationColorBlendOption = Option;
-	Changed = true;
+	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
+
+	return StateData.BlendEnable[Target];
+}
+		
+void ZEDeviceStateBlend::SetSourceBlendOption(ZEBlendOption Option)
+{
+	if (StateData.SourceBlendOption != Option)
+	{
+		StateData.SourceBlendOption = Option;
+		Dirty = true;
+	}
 }
 
-ZEBlendOption ZEBlendState::GetDestinationColorBlendOption() const
+ZEBlendOption ZEDeviceStateBlend::GetSourceBlendOption() const
 {
-	return DestinationColorBlendOption;
+	return StateData.SourceBlendOption;
 }
 
-void ZEBlendState::SetSourceAlphaBlendOption(ZEBlendOption Option)
+void ZEDeviceStateBlend::SetDestinationBlendOption(ZEBlendOption Option)
 {
-	SourceAlphaBlendOption = Option;
-	Changed = true;
+	if (StateData.DestinationBlendOption != Option)
+	{
+		StateData.DestinationBlendOption = Option;
+		Dirty = true;
+	}
 }
 
-ZEBlendOption ZEBlendState::GetSourceAlphaBlendOption() const
+ZEBlendOption ZEDeviceStateBlend::GetDestinationBlendOption() const
 {
-	return SourceAlphaBlendOption;
+	return StateData.DestinationBlendOption;
 }
 
-void ZEBlendState::SetDestinationAlphaBlendOption(ZEBlendOption Option)
+void ZEDeviceStateBlend::SetBlendEquation(ZEBlendEquation Equation)
 {
-	DestinationAlphaBlendOption = Option;
-	Changed = true;
+	if (StateData.BlendEquation != Equation)
+	{
+		StateData.BlendEquation = Equation;
+		Dirty = true;
+	}
 }
 
-ZEBlendOption ZEBlendState::GetDestinationAlphaBlendOption() const
+ZEBlendEquation ZEDeviceStateBlend::GetBlendEquation() const
 {
-	return DestinationAlphaBlendOption;
+	return StateData.BlendEquation;
 }
 
-void ZEBlendState::SetBlendEquation(ZEBlendEquation Equation)
+void ZEDeviceStateBlend::SetSourceBlendAlphaOption(ZEBlendOption Option)
 {
-	BlendEquation = Equation;
-	Changed = true;
+	if (StateData.SourceBlendAlphaOption != Option)
+	{
+		StateData.SourceBlendAlphaOption = Option;
+		Dirty = true;
+	}
 }
 
-ZEBlendEquation ZEBlendState::GetBlendEquation() const
+ZEBlendOption ZEDeviceStateBlend::GetSourceBlendAlphaOption() const
 {
-	return BlendEquation;
+	return StateData.SourceBlendAlphaOption;
+}
+		
+void ZEDeviceStateBlend::SetDestinationBlendAlphaOption(ZEBlendOption Option)
+{
+	if (StateData.DestinationBlendAlphaOption != Option)
+	{
+		StateData.DestinationBlendAlphaOption = Option;
+		Dirty = true;
+	}
 }
 
-void ZEBlendState::SetColorChannelMask(ZEUInt Mask)
+ZEBlendOption ZEDeviceStateBlend::GetDestinationBlendAlphaOption() const
 {
-	ColorChannelMask.RaiseFlags(Mask);
-	Changed = true;
+	return StateData.DestinationBlendAlphaOption;
+}		
+
+void ZEDeviceStateBlend::SetBlendAlphaEquation(ZEBlendEquation Equation)
+{
+	if (StateData.BlendAlphaEquation != Equation)
+	{
+		StateData.BlendAlphaEquation= Equation;
+		Dirty = true;
+	}
 }
 
-ZEColorChannelMask ZEBlendState::GetColorChannelMask() const
+ZEBlendEquation ZEDeviceStateBlend::GetBlendAlphaEquation() const
 {
-	return ColorChannelMask;
+	return StateData.BlendAlphaEquation;
 }
 
-void ZEBlendState::SetChanged(bool Change)
+void ZEDeviceStateBlend::SetColorChannelMask(ZESize Target, ZEColorChannelMask Mask)
 {
-	Changed = Change;
+	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
+	
+	if (StateData.ColorChannelMask[Target] != Mask)
+	{
+		StateData.ColorChannelMask[Target] = Mask;
+		Dirty = true;
+	}
 }
 
-bool ZEBlendState::GetChanged() const
+ZEColorChannelMask ZEDeviceStateBlend::GetColorChannelMask(ZESize Target) const
 {
-	return Changed;
+	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
+
+	return StateData.ColorChannelMask[Target];
 }
 
-const ZEBlendState& ZEBlendState::operator=(const ZEBlendState& State)
+void ZEDeviceStateBlend::SetToDefault()
 {
-	BlendEnable = State.BlendEnable;
-	SourceColorBlendOption = State.SourceColorBlendOption;
-	DestinationColorBlendOption = State.DestinationColorBlendOption;
-	SourceAlphaBlendOption = State.SourceAlphaBlendOption;
-	DestinationAlphaBlendOption = State.DestinationAlphaBlendOption;
-	BlendEquation = State.BlendEquation;
-	ColorChannelMask = State.ColorChannelMask;
-	Changed = true;
+	Hash = 0;
+	Dirty = false;
+
+	StateData.AlphaToCoverageEnable = false;
+	memset(StateData.BlendEnable, 0, sizeof(bool) * 8);
+	StateData.SourceBlendOption = ZE_BO_ONE;
+	StateData.DestinationBlendOption = ZE_BO_ZERO;
+	StateData.BlendEquation = ZE_BE_ADD;
+	StateData.SourceBlendAlphaOption = ZE_BO_ONE;
+	StateData.DestinationBlendAlphaOption = ZE_BO_ZERO;
+	StateData.BlendAlphaEquation = ZE_BE_ADD;
+	memset(StateData.ColorChannelMask, ZE_CCM_ALL, sizeof(ZEColorChannelMask) * 8);
+
+	UpdateHash();
+}
+
+const ZEDeviceStateBlend& ZEDeviceStateBlend::operator=(const ZEDeviceStateBlend& State)
+{
+	Hash = State.Hash;
+	Dirty = State.Dirty;
+	memcpy(&StateData, &State.StateData, sizeof(ZEBlendStateData));
 	return *this;
 }
 
-ZEBlendState::ZEBlendState() :	BlendEnable(false),
-								SourceColorBlendOption(ZE_BO_CURRENT),
-								DestinationColorBlendOption(ZE_BO_CURRENT),
-								SourceAlphaBlendOption(ZE_BO_CURRENT),
-								DestinationAlphaBlendOption(ZE_BO_CURRENT),
-								BlendEquation(ZE_BE_CURRENT),
-								ColorChannelMask(ZE_CCM_RED | ZE_CCM_GREEN | ZE_CCM_BLUE | ZE_CCM_ALPHA),
-								Changed(false)
+bool ZEDeviceStateBlend::operator==(const ZEDeviceStateBlend& State)
 {
-
+	return memcmp(&StateData, &State.StateData, sizeof(ZEBlendStateData)) == 0 ? true : false;
 }
 
-ZEBlendState::~ZEBlendState()
+bool ZEDeviceStateBlend::operator!=(const ZEDeviceStateBlend& State)
+{
+	return !operator==(State);
+}
+
+ZEDeviceStateBlend::ZEDeviceStateBlend()					
+{
+	memset(&StateData, 0, sizeof(ZEBlendStateData));
+	SetToDefault();
+}
+
+ZEDeviceStateBlend::~ZEDeviceStateBlend()
 {
 
 }

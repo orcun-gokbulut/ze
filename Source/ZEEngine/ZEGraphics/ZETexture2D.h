@@ -33,50 +33,44 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef __ZE_TEXTURE_2D_H__
 #define __ZE_TEXTURE_2D_H__
 
 #include "ZETypes.h"
 #include "ZETexture.h"
 
+class ZETextureData;
 class ZERenderTarget;
 
 class ZETexture2D : public ZETexture
 {
-	protected:
+	friend class ZEGraphicsDevice;
+	friend class ZEGraphicsModule;
+
+	// Should be public for only internal usage
+	public:
 		ZEUInt						Width;
-		ZEUInt						Height;	
+		ZEUInt						Height;
 		ZEUInt						LevelCount;
-
-		ZETexturePixelFormat		PixelFormat;
-		bool						RenderTarget;
-
+		
+	protected:
 									ZETexture2D();
 		virtual						~ZETexture2D();
 
 	public:
-		virtual ZETextureType		GetTextureType() const;
-
 		ZEUInt						GetWidth() const;
 		ZEUInt						GetHeight() const;
 		ZEUInt						GetLevelCount() const;
 
-		ZETexturePixelFormat		GetPixelFormat() const;
-		bool						IsRenderTarget() const;
+		virtual	ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
 
-		virtual bool				IsEmpty() const = 0;
-
-		virtual ZERenderTarget*		GetViewPort() = 0;
-
-		virtual bool				Create(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
-		virtual void				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
-		virtual void				Unlock(ZEUInt Level) = 0;
+		virtual bool				CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat) = 0;
+		virtual bool				CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL) = 0;
+		
+		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
+		virtual bool				Unlock(ZEUInt Level) = 0;
 
 		static ZETexture2D*			CreateInstance();
 };
+
 #endif
-
-
-
-

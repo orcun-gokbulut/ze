@@ -42,26 +42,22 @@
 class ZED3D9GraphicsDevice : public ZEGraphicsDevice, private ZED3D9ComponentBase
 {
 	private:
-		IDirect3DDevice9*		D3DDevice9;		
-
-	protected:
-		virtual void			InitDefaultState();
-
-		virtual void			ApplyRequestedBlendState();
-		virtual void			ApplyRequestedSamplerStates();
-		virtual void			ApplyRequestedShaders();
-		virtual void			ApplyRequestedStencilZState();
-		virtual void			ApplyRequestedRasterizerState();
-		virtual void			ApplyRequestedVertexBuffer();
-		virtual void			ApplyRequestedIndexBuffer();
-		virtual void			ApplyRequestedRenderTargets();
-
-		virtual void			ApplyAllRequestedStates();
+		ZEBlendState			DefaultBlendState;
+		ZERasterizerState		DefaultRasterStates;
+		ZEStencilZState			DefaultStencilZState;
+		ZESamplerState			DefaultSamplerState;
 
 	public:
-		virtual void			Draw(ZEROPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 VertexCount);
-		virtual void			DrawIndexed(ZEROPrimitiveType PrimitiveType, ZEInt BaseVertexIndex, ZEUInt32 MinIndex, 
-											ZEUInt32 VertexCount, ZEUInt32 StartIndex, ZEUInt32 PrimitiveCount);	
+		void					ApplyStates();
+		void					ResetToDefaultStates();
+
+		bool					Present();
+		bool					EndScene();
+		bool					BeginScene();
+		bool					Clear(bool RenderTargets, bool ZBuffer, bool StencilBuffer, const ZEVector4& Color, float ZClearValue, ZEUInt32 StencilClearValue);
+
+		virtual void			Draw(ZEPrimitiveType PrimitiveType, ZEUInt32 StartVertex, ZEUInt32 PrimitiveCount);
+		virtual void			DrawIndexed(ZEPrimitiveType PrimitiveType, ZEInt BaseVertexIndex, ZEUInt32 MinIndex, ZEUInt32 VertexCount, ZEUInt32 StartIndex, ZEUInt32 PrimitiveCount);
 
 								ZED3D9GraphicsDevice();
 		virtual					~ZED3D9GraphicsDevice();

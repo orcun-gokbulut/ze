@@ -45,10 +45,10 @@
 class ZED3D9RenderTarget : public ZERenderTarget
 {
 	public:
-		LPDIRECT3DSURFACE9		FrameBuffer;
-		LPDIRECT3DSURFACE9		ZBuffer;
+		LPDIRECT3DSURFACE9		Surface;
 
-		virtual float			GetAspectRatio();
+		void					SetTexture(ZETexture* Texture);
+
 		virtual ZEUInt			GetWidth();
 		virtual ZEUInt			GetHeight();
 

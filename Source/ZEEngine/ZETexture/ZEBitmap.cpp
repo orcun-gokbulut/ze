@@ -401,7 +401,7 @@ bool ZEBitmap::Load(const char* FileName)
 	PixelSize = 4;
 	this->Create(Width, Height, PixelSize);
 
-	FreeImage_ConvertToRawBits((BYTE*)Pixels, FIConvertedBitmap, (int)Pitch, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+	FreeImage_ConvertToRawBits((BYTE*)Pixels, FIConvertedBitmap, (int)Pitch, 32, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
 
 	FreeImage_Unload(FIConvertedBitmap);
 
@@ -410,7 +410,7 @@ bool ZEBitmap::Load(const char* FileName)
 
 void ZEBitmap::Save(const char* FileName, ZEBitmapFileFormat Format)
 {
-	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits((BYTE*)Pixels, (int)Width, (int)Height, (int)Pitch, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits((BYTE*)Pixels, (int)Width, (int)Height, (int)Pitch, 32, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
 	FREE_IMAGE_FORMAT FIFormat;
 	switch(Format)
 	{

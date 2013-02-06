@@ -38,8 +38,8 @@
 #define __ZE_PRESENTATION_SLIDE_H_
 
 #include "ZEEntity.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 
 ZE_META_ENTITY_DESCRIPTION(ZEPresentationSlide);
@@ -55,7 +55,7 @@ class ZEPresentationSlide : public ZEEntity
 	private:
 		bool							Initialized;
 		ZERenderCommand					RenderCommand;
-		ZEStaticVertexBuffer*			VertexBuffer;
+		ZEVertexBuffer*			VertexBuffer;
 		ZEFixedMaterial*				Material;
 		ZETexture2DResource*			Texture;
 		char							PresentationSlide[255];

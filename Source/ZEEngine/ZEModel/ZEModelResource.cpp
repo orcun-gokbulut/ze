@@ -38,7 +38,7 @@
 #include "ZEModelFileFormat.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZERenderer/ZEFixedMaterial.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZETexture/ZETexture2DResource.h"
 
@@ -70,53 +70,39 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 	return NewString;
 }
 
-ZEStaticVertexBuffer* ZEModelResourceMeshLOD::GetSharedVertexBuffer() const
+ZEVertexBuffer* ZEModelResourceMeshLOD::GetSharedVertexBuffer() const
 {
 	if (SharedVertexBuffer == NULL)
 		if (this->SkinnedVertices.GetCount() != 0)
 		{
-			((ZEModelResourceMeshLOD*)this)->SharedVertexBuffer = zeGraphics->CreateStaticVertexBuffer();
-			SharedVertexBuffer->Create(sizeof(ZESkinnedModelVertex) * SkinnedVertices.GetCount());
-			
-			void* Buffer = SharedVertexBuffer->Lock();
-				memcpy(Buffer, SkinnedVertices.GetConstCArray(), sizeof(ZESkinnedModelVertex) * SkinnedVertices.GetCount());
-			SharedVertexBuffer->Unlock();
+			((ZEModelResourceMeshLOD*)this)->SharedVertexBuffer = ZEVertexBuffer::CreateInstance();
+			SharedVertexBuffer->CreateStatic(SkinnedVertices.GetCount(), sizeof(ZESkinnedModelVertex), SkinnedVertices.GetConstCArray());
 		}
 		else if (Vertices.GetCount() != 0)
 		{
-			((ZEModelResourceMeshLOD*)this)->SharedVertexBuffer = zeGraphics->CreateStaticVertexBuffer();
-			SharedVertexBuffer->Create(sizeof(ZEModelVertex) * Vertices.GetCount());
-			
-			void* Buffer = SharedVertexBuffer->Lock();
-				memcpy(Buffer, Vertices.GetConstCArray(), sizeof(ZEModelVertex) * Vertices.GetCount());
-			SharedVertexBuffer->Unlock();
+			((ZEModelResourceMeshLOD*)this)->SharedVertexBuffer = ZEVertexBuffer::CreateInstance();
+			SharedVertexBuffer->CreateStatic(Vertices.GetCount(), sizeof(ZEModelVertex), Vertices.GetConstCArray());
 		}
 
 	return SharedVertexBuffer;
 }
 
-ZEStaticVertexBuffer* ZEModelResourceMeshLOD::CreatePrivateVertexBuffer() const
+ZEVertexBuffer* ZEModelResourceMeshLOD::CreatePrivateVertexBuffer() const
 {
-	ZEStaticVertexBuffer* VertexBuffer = NULL;
+	ZEVertexBuffer* VertexBuffer = NULL;
 	if (SharedVertexBuffer == NULL)
+	{
 		if (this->SkinnedVertices.GetCount() != 0)
 		{
-			VertexBuffer = zeGraphics->CreateStaticVertexBuffer();
-			VertexBuffer->Create(sizeof(ZESkinnedModelVertex) * SkinnedVertices.GetCount());
-
-			void* Buffer = VertexBuffer->Lock();
-				memcpy(Buffer, SkinnedVertices.GetConstCArray(), sizeof(ZESkinnedModelVertex) * SkinnedVertices.GetCount());
-			VertexBuffer->Unlock();
+			VertexBuffer = ZEVertexBuffer::CreateInstance();
+			VertexBuffer->CreateStatic(SkinnedVertices.GetCount(), sizeof(ZESkinnedModelVertex), SkinnedVertices.GetConstCArray());
 		}
 		else if (Vertices.GetCount() != 0)
 		{
-			VertexBuffer = zeGraphics->CreateStaticVertexBuffer();
-			VertexBuffer->Create(sizeof(ZEModelVertex) * Vertices.GetCount());
-			
-			void* Buffer = VertexBuffer->Lock();
-				memcpy(Buffer, Vertices.GetConstCArray(), sizeof(ZEModelVertex) * Vertices.GetCount());
-			VertexBuffer->Unlock();
+			VertexBuffer = ZEVertexBuffer::CreateInstance();
+			VertexBuffer->CreateStatic(Vertices.GetCount(), sizeof(ZEModelVertex), Vertices.GetConstCArray());
 		}
+	}
 	return VertexBuffer;
 }
 
@@ -136,7 +122,7 @@ ZEModelResourceMeshLOD::~ZEModelResourceMeshLOD()
 
 //////////////////////////////////////////////////////////////// READ ////////////////////////////////////////////////////////////////
 
-static const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArray<ZETexture2DResource*>& TextureResources)
+static ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArray<ZETexture2DResource*>& TextureResources)
 {
 	if (strncmp(FileName, "", ZE_MDLF_MAX_FILENAME_SIZE) == 0)
 		return NULL;
@@ -190,7 +176,7 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 		CurrentMaterial->SetDiffuseEnabled(true);
 		CurrentMaterial->SetAmbientEnabled(false);
 		CurrentMaterial->SetSpecularEnabled(true);
-		CurrentMaterial->SetEmmisiveEnabled(true);
+		CurrentMaterial->SetEmissiveEnabled(true);
 		
 		CurrentMaterial->SetTwoSided(true);//MaterialChunk.TwoSided);
 		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
@@ -206,8 +192,8 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 		CurrentMaterial->SetAmbientColor(MaterialChunk.AmbientColor/* ZEVector3(0.5, 0.5, 0.5)*/);
 		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);
 		CurrentMaterial->SetSpecularColor(MaterialChunk.SpecularColor);
-		CurrentMaterial->SetEmmisiveColor(MaterialChunk.EmmisiveColor);
-		CurrentMaterial->SetEmmisiveFactor(MaterialChunk.EmmisiveFactor);
+		CurrentMaterial->SetEmissiveColor(MaterialChunk.EmmisiveColor);
+		CurrentMaterial->SetEmissiveFactor(MaterialChunk.EmmisiveFactor);
 		CurrentMaterial->SetSpecularFactor(MaterialChunk.SpecularFactor);
 		CurrentMaterial->SetOpacity(MaterialChunk.Opasity);
 		CurrentMaterial->SetReflectionFactor(MaterialChunk.ReflectionFactor);
@@ -219,7 +205,7 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 		CurrentMaterial->SetNormalMapEnabled((MaterialChunk.ShaderComponents & ZE_MFSC_NORMALMAP) != 0);
 		CurrentMaterial->SetNormalMap(ManageModelMaterialTextures(MaterialChunk.NormalMap, Model->TextureResources));
 		CurrentMaterial->SetSpecularMap(ManageModelMaterialTextures(MaterialChunk.SpecularMap, Model->TextureResources));
-		CurrentMaterial->SetEmmisiveMap(ManageModelMaterialTextures(MaterialChunk.EmmisiveMap, Model->TextureResources));
+		CurrentMaterial->SetEmissiveMap(ManageModelMaterialTextures(MaterialChunk.EmmisiveMap, Model->TextureResources));
 		CurrentMaterial->SetOpacityMap(ManageModelMaterialTextures(MaterialChunk.OpasityMap, Model->TextureResources));
 		
 		//CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_DETAILNORMALMAP);

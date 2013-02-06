@@ -41,9 +41,11 @@
 
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEScene.h"
+#include "ZEParticleBillboardRenderer.h"
 
 void ZEParticleEmitter::Tick(float TimeElapsed)
 {
@@ -537,6 +539,7 @@ ZEMaterial* ZEParticleEmitter::GetMaterial() const
 
 ZEParticleEmitter::ZEParticleEmitter()
 {
+	/*
 	EmittedParticleCount = 0;
 	MaxParticleCount = 0;
 	Owner = NULL;
@@ -570,11 +573,13 @@ ZEParticleEmitter::ZEParticleEmitter()
 	RenderCommand.SetZero();
 	RenderCommand.Priority = 4;
 	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_NO_Z_WRITE;
-	RenderCommand.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
-	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
+	RenderCommand.VertexDeclaration = ZEParticleVertex::GetVertexLayout();
+	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE_LIST;
 	
 	BillboardType = ZE_PBT_SCREEN_ALIGNED;
 	AxisOrientation = -ZEVector3::UnitZ;
+
+	*/
 }
 
 ZEParticleEmitter::~ZEParticleEmitter()
@@ -582,7 +587,7 @@ ZEParticleEmitter::~ZEParticleEmitter()
 }
 
 
-static void DrawParticle(ZESimpleVertex* Buffer, const ZEParticle* Particle, const ZEVector3& Right, const ZEVector3& Up)
+static void DrawParticle(ZEParticleVertex* Buffer, const ZEParticle* Particle, const ZEVector3& Right, const ZEVector3& Up)
 {
 	ZEVector2 ParticleSize_2 = Particle->Size2D * 0.5f;
 
@@ -623,11 +628,11 @@ void ZEParticleEmitter::UpdateVertexBuffer(ZEDrawParameters* DrawParameters)
 	ZESize ParticleCount = ParticlePool.GetCount();
 
 	if (VertexBuffer == NULL)
-		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
+		VertexBuffer = ZEVertexBuffer::CreateInstance();
 
 	if (VertexBuffer->GetBufferSize() != ParticlePool.GetCount() * sizeof(ZESimpleVertex) * 6)
 	{
-		if (!VertexBuffer->Create(ParticlePool.GetCount() * sizeof(ZESimpleVertex) * 6))
+		if (!VertexBuffer->CreateDynamic(ParticlePool.GetCount() * 6, sizeof(ZESimpleVertex)))
 		{
 			zeError("Could not create particle vertex buffer.");
 			return;
@@ -636,7 +641,8 @@ void ZEParticleEmitter::UpdateVertexBuffer(ZEDrawParameters* DrawParameters)
 
 	RenderCommand.PrimitiveCount = 0;
 
-	ZESimpleVertex* Buffer = (ZESimpleVertex*)VertexBuffer->Lock();
+	ZEParticleVertex* Buffer = NULL;
+	VertexBuffer->Lock((void**)&Buffer);
 	if (Buffer == NULL)
 	{
 		zeError("Could not lock particle vertex buffer.");
@@ -766,7 +772,7 @@ void ZEParticleEmitter::Draw(ZEDrawParameters* DrawParameters)
 	else
 		RenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
 
-	RenderCommand.VertexBuffer = VertexBuffer;
+//	RenderCommand.InputStage.SetVertexBuffer(0, VertexBuffer);
 	RenderCommand.Material = Material;
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }

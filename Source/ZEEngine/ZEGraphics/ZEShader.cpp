@@ -34,102 +34,30 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEShader.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
+
+ZEShader::ZEShader()
+{
+
+}
 
 ZEShader::~ZEShader()
 {
 
 }
 
-bool ZEShader::FindParameterLocation(ZEUInt32& OutLocation, const ZEString Name) const
+const ZEShaderMetaTable* ZEShader::GetMetaTable() const
 {
-	for(ZEUInt32 i = 0; i < ShaderCompilerParameters.GetCount(); i++)
-	{	
-		if(ShaderCompilerParameters[i].Name == Name)
-		{
-			OutLocation = i;
-			return true;
-		}
-	}
-	return false;
+	return &MetaTable;
 }
 
-bool ZEShader::FindConstantLocation(ZEUInt32& OutLocation, const ZEString Name) const
-{	
-	ZEUInt32 Index = 0;
-	for(ZEUInt32 i = 0; i < ShaderConstants.GetCount(); i++)
-	{	
-		if(ShaderConstants[i].ConstantName == Name)
-		{
-			OutLocation = i;
-			return true;
-		}
-	}
-	return false;
+const ZEVertexLayout* ZEShader::GetDefaultVertexLayout() const
+{
+	return &DefaultVertexLayout;
 }
 
-bool ZEShader::IsCompiled() const
+void ZEShader::Destroy()
 {
-	return Compiled;
-}
-
-bool ZEShader::IsDefined(const ZEString& ParameterName) const
-{
-	ZEUInt32 Index;
-	if(FindParameterLocation(Index, ParameterName))
-			return true;
-	return false;
-}
-
-bool ZEShader::GetCompilerParameterString(ZEString& Out, const ZEString& ParameterName) const
-{
-	ZEUInt32 Index;
-	if(FindParameterLocation(Index, ParameterName))
-	{
-		Out = ShaderCompilerParameters[Index].Definition;
-		return true;
-	}
-	return false;
-}
-
-bool ZEShader::GetConstantCount(ZEUInt32& Out, const ZEString& Name) const
-{
-	ZEUInt32 Index;
-	if(FindConstantLocation(Index, Name))
-	{
-		Out = ShaderConstants[Index].Count;
-		return true;
-	}
-	return false;
-}
-
-bool ZEShader::GetConstantSemantic(ZEString& Out, const ZEString& Name) const
-{
-	return false;
-}
-
-bool ZEShader::GetConstantDataType(ZEShaderConstantDataType& Out, const ZEString& Name) const
-{
-	ZEUInt32 Index;
-	if(FindConstantLocation(Index, Name))
-	{
-		Out = ShaderConstants[Index].Type;
-		return true;
-	}
-	return false;
-}
-
-bool ZEShader::GetShaderConstantRegister(ZEUInt32& Out, const ZEString& Name) const
-{
-	ZEUInt32 Index;
-	if(FindConstantLocation(Index, Name))
-	{
-		Out = ShaderConstants[Index].RegisterNo;
-		return true;
-	}
-	return false;
-}
-
-bool ZEShader::GetSamplerNumber(ZEUInt32& Out, const ZEString& Name) const
-{
-	return GetShaderConstantRegister(Out, Name);
+	delete this;
 }

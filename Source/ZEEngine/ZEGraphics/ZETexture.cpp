@@ -38,7 +38,10 @@
 
 ZETexture::ZETexture()
 {
-
+	Static = true;
+	RenderTarget = false;
+	TextureType = ZE_TT_NONE;
+	PixelFormat = ZE_TPF_NOTSET;
 }
 
 ZETexture::~ZETexture()
@@ -46,6 +49,28 @@ ZETexture::~ZETexture()
 
 }
 
+bool ZETexture::IsStatic() const
+{
+	return Static;
+}
 
+bool ZETexture::IsRenderTarget() const
+{
+	return RenderTarget;
+}
 
+ZETextureType ZETexture::GetTextureType() const
+{
+	return TextureType;
+}
+
+ZETexturePixelFormat ZETexture::GetPixelFormat() const
+{
+	return PixelFormat;
+}
+
+void ZETexture::Destroy()
+{
+	delete this;
+}
 

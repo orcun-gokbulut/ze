@@ -36,16 +36,6 @@
 #include "ZETexture3D.h"
 #include "ZEGraphicsModule.h"
 
-ZETextureType ZETexture3D::GetTextureType() const
-{
-	return ZE_TT_3D;
-}
-
-ZEUInt ZETexture3D::GetLevelCount() const
-{
-	return LevelCount;
-}
-
 ZEUInt ZETexture3D::GetWidth() const
 {
 	return Width;
@@ -61,9 +51,9 @@ ZEUInt ZETexture3D::GetDepth() const
 	return Depth;
 }
 
-ZETexturePixelFormat ZETexture3D::GetPixelFormat() const
+ZEUInt ZETexture3D::GetLevelCount() const
 {
-	return PixelFormat;
+	return LevelCount;
 }
 
 ZETexture3D::ZETexture3D()
@@ -71,7 +61,8 @@ ZETexture3D::ZETexture3D()
 	Width = 0;
 	Height = 0;
 	Depth = 0;
-	PixelFormat = ZE_TPF_NOTSET;
+	LevelCount = 0;
+	TextureType = ZE_TT_3D;
 };
 
 ZETexture3D::~ZETexture3D()

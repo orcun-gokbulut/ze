@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9Texture3D.h"
-#include "ZED3D9Module.h"
+#include "ZED3D9GraphicsModule.h"
 #include "ZED3D9CommonTools.h"
 #include "ZEError.h"
 
@@ -54,69 +54,62 @@ bool ZED3D9Texture3D::IsEmpty() const
 	return VolumeTexture == NULL;
 }
 
-void ZED3D9Texture3D::DeviceLost()
-{
-}
-
-bool ZED3D9Texture3D::DeviceRestored()
-{
-	return true;
-}
-
 bool ZED3D9Texture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat)
 {
-	if (VolumeTexture != NULL)
-		VolumeTexture->Release();
+	if (!IsEmpty())
+		Release();
 
-	HRESULT Hr;
-	Hr = GetDevice()->CreateVolumeTexture(Width, Height, Depth, LevelCount, 0, ZED3D9CommonTools::ConvertPixelFormat(PixelFormat), D3DPOOL_MANAGED, &VolumeTexture, NULL);  
-	if (Hr != D3D_OK)
+	if (FAILED(Device->CreateVolumeTexture(Width, Height, Depth, LevelCount, 0, ZED3D9CommonTools::ConvertPixelFormat(PixelFormat), D3DPOOL_MANAGED, &VolumeTexture, NULL)))
 	{
 		zeError("Can not create volume texture resource.");
+		Release();
 		return false;
 	}
 
 	this->PixelFormat	= PixelFormat;
-	this->LevelCount		= LevelCount;
+	this->LevelCount	= LevelCount;
 	this->Depth			= Depth;
 	this->Width			= Width;
-	this->Height			= Height;
+	this->Height		= Height;
 	
 	return true;
 }
 
-void ZED3D9Texture3D::Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt Level)
-{
-	HRESULT Hr;
-	
+bool ZED3D9Texture3D::Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt Level)
+{	
 	D3DLOCKED_BOX Box = {0};
-	Hr = VolumeTexture->LockBox(Level, &Box, NULL, 0);
-
-	if (Hr != D3D_OK)
+	
+	if (FAILED(VolumeTexture->LockBox(Level, &Box, NULL, 0)))
 	{
 		zeError("Can not lock 3D texture.");
-		return;
+		return false;
 	}
 
 	*Buffer = Box.pBits;
 	*RowPitch = (ZESize)Box.RowPitch;
 	*SlicePitch = (ZESize)Box.SlicePitch;
+
+	return true;
 }
 
-void ZED3D9Texture3D::Unlock(ZEUInt Level)
+bool ZED3D9Texture3D::Unlock(ZEUInt Level)
 {
-	VolumeTexture->UnlockBox(Level);
+	if (FAILED(VolumeTexture->UnlockBox(Level)))
+	{
+		zeError("Can not unlock 3D texture.");
+		return false;
+	}
+
+	return true;
 }
 
 void ZED3D9Texture3D::Release()
 {
-	if (VolumeTexture != NULL)
-		VolumeTexture->Release();
+	ZED3D_RELEASE(VolumeTexture);
 }
 
 void ZED3D9Texture3D::Destroy()
 {
-	GetModule()->Texture3Ds.DeleteValue((ZED3D9Texture3D*)this);
 	delete this;
 }
 
