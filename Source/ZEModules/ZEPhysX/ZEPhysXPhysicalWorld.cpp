@@ -361,7 +361,6 @@ ZEPhysicalShape* ZEPhysXPhysicalWorld::RayCastToClosestShape(ZERay Ray, ZEPhysic
 
 	NxRay TempRay(ZE_TO_NX(Ray.p), ZE_TO_NX(Ray.v));
 	NxRaycastHit TempResult;
-
 	NxShape* TempShape = this->GetScene()->raycastClosestShape(TempRay, (NxShapesType)Type, TempResult);
 
 	if (TempShape != NULL)

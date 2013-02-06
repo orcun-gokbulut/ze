@@ -138,7 +138,13 @@ ze_add_source(ZED3D9ViewPort.cpp						Sources)
 ze_add_source(ZED3D9ViewPort.h							Sources)
 ze_add_source(ZED3D9ZoomBlurProcessor.cpp				Sources)
 ze_add_source(ZED3D9ZoomBlurProcessor.h					Sources)
+ze_add_source(ZED3D9Plugin.h							Sources)
+ze_add_source(ZED3D9Plugin.cpp							Sources)
 	
 ze_add_library(ZEDirect3D9 
 	SOURCES ${Sources}
 	LIBS d3d9 d3dx9)
+	
+#ze_add_plugin(ZEDirect3D9Plugin
+#  SOURCES ${Sources}
+#  LIBS ZEEnginePlugin ZEGraphics ZETexture ZEGame d3d9 d3dx9)

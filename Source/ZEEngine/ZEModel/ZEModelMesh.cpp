@@ -335,6 +335,7 @@ ZEModelMesh::ZEModelMesh()
 	Owner = NULL;
 	MeshResource = NULL;
 	PhysicalBody = NULL;
+	PhysicalCloth = NULL;
 	Visible = true;
 	PhysicsEnabled = false;
 	AutoLOD = false;

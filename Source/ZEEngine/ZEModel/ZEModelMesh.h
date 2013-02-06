@@ -71,6 +71,8 @@ class ZEModelMesh
 		ZEPhysicalRigidBody*				PhysicalBody;
 		ZEPhysicalCloth*					PhysicalCloth;
 
+		ZEPhysicalCloth*					PhysicalCloth;
+
 		bool								AutoLOD;
 		ZEUInt								ActiveLOD;
 
