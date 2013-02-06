@@ -119,6 +119,7 @@ ZETestSuite(ZEList)
 
 		ZEListTestItem* Result = List.Dequeue();
 		ZETestCheckEqual(Result, &Item2);
+		ZETestCheckEqual(List.GetFirstItem(), &Item1);
 		ZETestCheckEqual(List.GetCount(), 1);
 	}
  
@@ -201,6 +202,24 @@ ZETestSuite(ZEList)
 		ZETestCheckEqual(Index, 1);
 		Index = List.FindIndex(&Item3);
 		ZETestCheckEqual(Index, 2);
+
+		Index = List.FindIndex(&Item1, 1);
+		ZETestCheckEqual(Index, -1);
+		Index = List.FindIndex(&Item2, 1);
+		ZETestCheckEqual(Index, 1);
+		Index = List.FindIndex(&Item3, 1);
+		ZETestCheckEqual(Index, 2);
+
+		Index = List.FindIndex(&Item1, 2);
+		ZETestCheckEqual(Index, -1);
+		Index = List.FindIndex(&Item2, 2);
+		ZETestCheckEqual(Index, -1);
+		Index = List.FindIndex(&Item3, 2);
+		ZETestCheckEqual(Index, 2);
+
+		Index = List.FindIndex(&Item3, 3);
+		//error: Index is out of range.
+		ZETestCheckEqual(Index, -1);
 	}
 
 	ZETest("ConstIterator GetConstIterator() const")
@@ -443,7 +462,30 @@ ZETestSuite(ZEList)
 		ZETestCheckEqual(List.GetCount(), 3);
 		ZETestCheckEqual(List[1], &Item3);
 		ZETestCheckEqual(List[2], &Item2);
-		ZETestCheckEqual(List[0], &Item1);	
+		ZETestCheckEqual(List[0], &Item1);
+
+		ZETestCase("for dynamically created ZEListTestItems")
+		{
+			ZEList<ZEListTestItem> List1;
+
+			ZEListTestItem* TestItem1 = new ZEListTestItem();
+			ZEListTestItem* TestItem2 = new ZEListTestItem();
+			ZEListTestItem* TestItem3 = new ZEListTestItem();
+
+			ZEListTestItem* Res1 = List1.Insert(0, TestItem1);
+			ZEListTestItem* Res2 = List1.Insert(1, TestItem2);
+			ZETestCheckEqual(List1.GetCount(), 2);
+			ZETestCheckEqual(List1[0], TestItem1);
+			ZETestCheckEqual(Res1, TestItem1);
+			ZETestCheckEqual(List1[1], TestItem2);
+			ZETestCheckEqual(Res2, TestItem2);
+			ZEListTestItem* Res3 = List1.Insert(1, TestItem3);
+			ZETestCheckEqual(List1.GetCount(), 3);
+			ZETestCheckEqual(Res3, TestItem3);
+			ZETestCheckEqual(List1[0], TestItem1);
+			ZETestCheckEqual(List1[1], TestItem3);
+			ZETestCheckEqual(List1[2], TestItem2);
+		}
 	}
  
 	ZETest("inline ZEType* operator[](ZESize Index)")
@@ -504,8 +546,8 @@ ZETestSuite(ZEList)
 
 		ZEListTestItem* Value = List.Pop();
 		ZETestCheckEqual(List.GetCount(), 1);
-		ZETestCheckEqual(Value, &Item2);
-		ZETestCheckEqual(List[0], &Item1);		
+		ZETestCheckEqual(Value, &Item1);
+		ZETestCheckEqual(List[0], &Item2);		
 	}
  
 	ZETest("inline void Push(ZEType* Value)")
@@ -526,8 +568,8 @@ ZETestSuite(ZEList)
 
 		List.Push(&Item2);
 		ZETestCheckEqual(List.GetCount(), 2);
-		ZETestCheckEqual(List.GetFirstItem(), &Item2);
-		ZETestCheckEqual(List.GetLastItem(), &Item1);
+		ZETestCheckEqual(List.GetFirstItem(), &Item1);
+		ZETestCheckEqual(List.GetLastItem(), &Item2);
 	}
 
 	ZETest("inline void Remove(ZEType* Item)")
@@ -611,6 +653,30 @@ ZETestSuite(ZEList)
 			ZETestCheckEqual(List2.GetFirstItem(), NULL);
 			ZETestCheckEqual(List2.GetLastItem(), NULL);
 			ZETestCheckEqual(List2.GetCount(), 0);
+		}
+
+		ZETestCase("for dynamically created ZEListTestItems")
+		{
+			ZEList<ZEListTestItem> NewList;
+			ZEListTestItem* NewItem1 = new ZEListTestItem();
+			ZEListTestItem* NewItem2 = new ZEListTestItem();
+			ZEListTestItem* NewItem3 = new ZEListTestItem();
+			NewList.Insert(NewItem1);
+			NewList.Append(NewItem2);
+			NewList.Append(NewItem3);
+			ZETestCheckEqual(NewList[0], NewItem1);
+			ZETestCheckEqual(NewList[1], NewItem2);
+			ZETestCheckEqual(NewList[2], NewItem3);
+
+			NewList.Remove(NewItem2);
+			ZETestCheckEqual(NewList[0], NewItem1);
+			ZETestCheckEqual(NewList[1], NewItem3);
+
+			NewList.Remove(NewItem1);
+			ZETestCheckEqual(NewList[0], NewItem3);
+
+			NewList.Remove(NewItem3);
+			ZETestCheckEqual(NewList.GetCount(), 0);
 		}
  	}
  

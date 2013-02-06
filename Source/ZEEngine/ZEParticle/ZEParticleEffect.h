@@ -42,6 +42,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEParticleEmitter.h"
 #include "ZEParticleSystem.h"
+#include "ZEGame/ZEDrawStatistics.h"
 
 struct ZEDrawParameters;
 
@@ -49,12 +50,15 @@ ZE_META_OBJECT_DESCRIPTION(ZEParticleEffect);
 
 class ZEParticleEffect : public ZEEntity
 {
+	friend class ZEParticleEmitter;
 	ZE_META_ENTITY(ZEParticleEffect)
 	private:
 
 		ZEArray<ZEParticleEmitter*>			Emitters;
 		
 		ZEArray<ZEParticleSystem*>			Systems;
+
+		ZEParticleStatistics				Statistics;
 
 	protected:
 
@@ -72,12 +76,16 @@ class ZEParticleEffect : public ZEEntity
 		void								Tick(float TimeElapsed);
 
 		const ZEArray<ZEParticleEmitter*>&	GetEmitters();
+		void								ResetEmitters();
 		void								AddEmitter(ZEParticleEmitter* Emitter);
 		void								RemoveEmitter(ZEParticleEmitter* Emitter);
+
 		
 		const ZEArray<ZEParticleSystem*>&	GetSystems();
 		void								AddSystem(ZEParticleSystem* Emitter);
 		void								RemoveSystem(ZEParticleSystem* Emitter);
+
+		const ZEParticleStatistics&			GetStatistics();
 
 		static ZEParticleEffect*			CreateInstance();
 

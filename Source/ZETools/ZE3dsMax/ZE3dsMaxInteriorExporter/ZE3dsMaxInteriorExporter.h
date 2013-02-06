@@ -69,6 +69,7 @@ class ZE3dsMaxInteriorExporter : public SceneExport
 		Tab<IGameNode*>								SceneGeometryObjects;
 		Tab<IGameNode*>								Rooms;
 		Tab<IGameNode*>								Doors;
+		Tab<IGameNode*>								Helpers;
 		Tab<IGameMaterial*>							Materials;
 
 		void						CollectResources();
@@ -78,17 +79,18 @@ class ZE3dsMaxInteriorExporter : public SceneExport
 		bool						ShowOptionsDialog(HWND ParentWindow);
 		bool						ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath);
 
-		ZEInt						FindRoomIndex(IGameNode* Node);
-		ZEInt						ProcessFaceMaterial(IGameMaterial* Material);
+		ZEInt32						FindRoomIndex(IGameNode* Node);
+		ZEInt32						ProcessFaceMaterial(IGameMaterial* Material);
 
 		bool						ProcessScene();
 		bool						ProcessMaterials(const char* FileName);
 		bool						ProcessRooms();
 		void						ProcessPhysicalMesh(IGameNode* ParentNode, IGameNode* Node, ZEMLNode* PhysicalMeshNode);
 		bool						ProcessDoors();
+		bool						ProcessHelpers();
 
 	protected:
-		ZEInt						GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode = NULL);
+		ZEInt32						GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode = NULL);
 
 	public:	
 		virtual ZEInt				ExtCount();

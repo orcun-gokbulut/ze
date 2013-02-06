@@ -41,6 +41,8 @@ ze_add_source(ZEInteriorDoor.cpp			Sources)
 ze_add_source(ZEInteriorDoor.h				Sources Headers)
 ze_add_source(ZEInteriorRoom.cpp			Sources)
 ze_add_source(ZEInteriorRoom.h				Sources Headers)
+ze_add_source(ZEInteriorHelper.cpp			Sources)
+ze_add_source(ZEInteriorHelper.h			Sources Headers)
 ze_add_source(ZEInteriorResource.cpp		Sources)
 ze_add_source(ZEInteriorResource.h			Sources Headers)
 

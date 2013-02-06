@@ -106,7 +106,7 @@ bool ZEScene::Initialize()
 	if (ShadowRenderer == NULL)
 		ShadowRenderer = ZEShadowRenderer::CreateInstance();
 
-	if (Renderer == NULL)
+	if (ShadowRenderer == NULL)
 	{
 		zeCriticalError("Can not create shadow renderer.");
 		return false;
@@ -278,6 +278,11 @@ ZERenderer* ZEScene::GetRenderer()
 	return Renderer;
 }
 
+ZERenderer*	ZEScene::GetShadowRenderer()
+{
+	return ShadowRenderer;
+}
+
 ZEPhysicalWorld* ZEScene::GetPhysicalWorld()
 {
 	return PhysicalWorld;
@@ -299,7 +304,12 @@ void ZEScene::SetActiveListener(ZEListener* Listener)
 	zeSound->SetActiveListener(Listener);
 }
 
-const ZECullStatistics& ZEScene::GetCullerStatistics()
+ZESceneCuller& ZEScene::GetSceneCuller()
+{
+	return Culler;
+}
+
+const ZESceneStatistics& ZEScene::GetStatistics() const
 {
 	return Culler.GetStatistics();
 }
@@ -338,16 +348,21 @@ void ZEScene::Render(float ElapsedTime)
 
 	Renderer->SetCamera(ActiveCamera);
 	
-	ZEDrawParameters DrawParameters;
-	DrawParameters.ElapsedTime = ElapsedTime;
-	DrawParameters.FrameId = zeCore->GetFrameId();
-	DrawParameters.Pass = ZE_RP_COLOR;
-	DrawParameters.Renderer = Renderer;
-	DrawParameters.ViewVolume = (ZEViewVolume*)&ActiveCamera->GetViewVolume();
-	DrawParameters.View = (ZEView*)&ActiveCamera->GetView();
-	DrawParameters.Lights.Clear();
+	FrameDrawParameters.ElapsedTime = ElapsedTime;
+	FrameDrawParameters.FrameId = zeCore->GetFrameId();
+	FrameDrawParameters.Pass = ZE_RP_COLOR;
+	FrameDrawParameters.Renderer = Renderer;
+	FrameDrawParameters.ViewVolume = (ZEViewVolume*)&ActiveCamera->GetViewVolume();
+	FrameDrawParameters.View = (ZEView*)&ActiveCamera->GetView();
+	FrameDrawParameters.Lights.Clear();
 
-	Culler.CullScene(this, &DrawParameters);
+	memset(&FrameDrawParameters.Statistics, 0, sizeof(ZEDrawStatistics));
+
+	FrameDrawParameters.Renderer->SetDrawParameters(&FrameDrawParameters);
+
+	Culler.CullScene(this, &FrameDrawParameters);
+
+	//Fill Draw Parameters Statistics ZESceneStats section
 }
 
 bool ZEScene::Save(const ZEString& FileName)
@@ -452,6 +467,26 @@ bool ZEScene::Load(const ZEString& FileName)
 	}
 }
 
+void ZEScene::SetAmbientFactor(float Factor)
+{
+	AmbientFactor = Factor;
+}
+
+float ZEScene::GetAmbientFactor() const
+{
+	return AmbientFactor;
+}
+
+void ZEScene::SetAmbientColor(ZEVector3 Color)
+{
+	AmbientColor = Color;
+}
+
+const ZEVector3& ZEScene::GetAmbientColor() const
+{
+	return AmbientColor;
+}
+
 ZEScene::ZEScene()
 {
 	Initialized = false;
@@ -462,6 +497,8 @@ ZEScene::ZEScene()
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
 	PhysicalWorld = NULL;
+	AmbientColor = ZEVector3::One;
+	AmbientFactor = 0.0f;
 }
 
 ZEScene::~ZEScene()

@@ -36,13 +36,14 @@
 cmake_minimum_required(VERSION 2.8)
 
 ze_add_cmake_project(CMakeScripts
-	SOURCES	build_dir_check.cmake
-		CMakeLists.txt
-		cppcheck.cmake
-		parse_arguments.cmake
-		pclint.cmake
-		test_cocoon.cmake
+	SOURCES	
 		ze.cmake
+		ze_check.cmake
+		ze_common.cmake
+		ze_dependency.cmake
 		ze_functions.cmake
+		ze_platform.cmake
 		ze_qt.cmake
-		ZEFindSubversion.cmake)
+		ze_target.cmake
+		ze_utility.cmake
+		ze_version.cmake)

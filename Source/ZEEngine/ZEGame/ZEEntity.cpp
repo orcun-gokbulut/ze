@@ -101,11 +101,11 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 		return false;
 	}
 
-	if (this->OwnerScene != NULL)
-	{
-		zeError("Parent entity is active in a scene. Can not register target entity.");
-		return false;
-	}
+// 	if (this->OwnerScene != NULL)
+// 	{
+// 		zeError("Parent entity is active in a scene. Can not register target entity.");
+// 		return false;
+// 	}
 
 	Entity->OwnerScene = this->OwnerScene;
 	Entity->Owner = this;

@@ -37,6 +37,7 @@
 #include "ZEInteriorResource.h"
 #include "ZEInteriorRoom.h"
 #include "ZEInteriorDoor.h"
+#include "ZEInteriorHelper.h"
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEGame/ZEDrawParameters.h"
@@ -70,6 +71,11 @@ void ZEInterior::LoadInteriorResource(ZEInteriorResource* NewResource)
 			Doors[I]->Deinitialize();
 
 		Doors.SetCount(0);
+
+		for (ZESize I = 0; I < Helpers.GetCount(); I++)
+			Helpers[I]->Deinitialize();
+
+		Helpers.SetCount(0);
 	}
 
 	this->Resource = NewResource;
@@ -78,7 +84,7 @@ void ZEInterior::LoadInteriorResource(ZEInteriorResource* NewResource)
 	for (ZESize I = 0; I < Rooms.GetCount(); I++)
 	{
 		Rooms[I] = ZEInteriorRoom::CreateInstance();
-		Rooms[I]->Initialize(this, (ZEInteriorRoomResource*)&Resource->GetRooms()[I]);
+		Rooms[I]->Initialize(this, (ZEInteriorResourceRoom*)&Resource->GetRooms()[I]);
 	}
 
 	Doors.SetCount(Resource->GetDoors().GetCount());
@@ -87,12 +93,20 @@ void ZEInterior::LoadInteriorResource(ZEInteriorResource* NewResource)
 		Doors[I] = ZEInteriorDoor::CreateInstance();
 		Doors[I]->Initialize(this, &Resource->GetDoors()[I]);
 	}
+
+	Helpers.SetCount(Resource->GetHelpers().GetCount());
+	for (ZESize I = 0; I < Helpers.GetCount(); I++)
+	{
+		Helpers[I] = ZEInteriorHelper::CreateInstance();
+		Helpers[I]->Initialize(this, &Resource->GetHelpers()[I]);
+	}
 }
 
 ZEInterior::ZEInterior()
 {
 	Resource = NULL;
 	CullMode = ZE_ICM_FULL;
+	memset(&Statistics, 0, sizeof(ZEInteriorStatistics));
 }
 
 ZEInterior::~ZEInterior()
@@ -110,7 +124,38 @@ const ZEArray<ZEInteriorDoor*>& ZEInterior::GetDoors()
 	return Doors;
 }
 
-const ZEInteriorCullStatistics& ZEInterior::GetCullStatistics()
+const ZEArray<ZEInteriorHelper*>& ZEInterior::GetHelpers()
+{
+	return Helpers;
+}
+
+ZEInteriorRoom* ZEInterior::GetRoom(const char* Name)
+{
+	for (ZESize I = 0; I < Rooms.GetCount(); I++)
+		if (strcmp(Rooms[I]->GetName(), Name) == 0)
+			return Rooms[I];
+
+	return NULL;
+}
+
+ZEInteriorDoor* ZEInterior::GetDoor(const char* Name)
+{
+	for (ZESize I = 0; I < Doors.GetCount(); I++)
+		if (strcmp(Doors[I]->GetName(), Name) == 0)
+			return Doors[I];
+
+	return NULL;
+}
+
+ZEInteriorHelper* ZEInterior::GetHelper(const char* Name)
+{
+	for (ZESize I = 0; I < Helpers.GetCount(); I++)
+		if (strcmp(Helpers[I]->GetName(), Name) == 0)
+			return Helpers[I];
+
+	return NULL;
+}
+const ZEInteriorStatistics& ZEInterior::GetStatistics() const
 {
 	return Statistics;
 }
@@ -181,7 +226,8 @@ void ZEInterior::Draw(ZEDrawParameters* DrawParameters)
 	if (!GetVisible())
 		return;
 
-	memset(&Statistics, 0, sizeof(ZEInteriorCullStatistics));
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+		memset(&Statistics, 0, sizeof(ZEInteriorStatistics));
 
 	for (size_t I = 0; I < Rooms.GetCount(); I++)
 	{
@@ -190,6 +236,20 @@ void ZEInterior::Draw(ZEDrawParameters* DrawParameters)
 	}
 
 	CullRooms(DrawParameters);
+
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+	{
+		Statistics.TotalDoorCount = GetDoors().GetCount();
+
+		DrawParameters->Statistics.InteriorStatistics.TotalRoomCount += Statistics.TotalRoomCount;
+		DrawParameters->Statistics.InteriorStatistics.CulledRoomCount += Statistics.CulledRoomCount;
+		DrawParameters->Statistics.InteriorStatistics.DrawedRoomCount += Statistics.DrawedRoomCount;
+		DrawParameters->Statistics.InteriorStatistics.TotalDoorCount += Statistics.TotalDoorCount;
+		DrawParameters->Statistics.InteriorStatistics.SeenDoorCount += Statistics.SeenDoorCount;
+		DrawParameters->Statistics.InteriorStatistics.TotalInteriorPolygonCount += Statistics.TotalInteriorPolygonCount;
+		DrawParameters->Statistics.InteriorStatistics.CulledInteriorPolygonCount += Statistics.CulledInteriorPolygonCount;
+		DrawParameters->Statistics.InteriorStatistics.DrawedInteriorPolygonCount += Statistics.DrawedInteriorPolygonCount;
+	}
 }
 
 bool ZEInterior::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT)
@@ -201,7 +261,7 @@ bool ZEInterior::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Norma
 	bool Found = false;
 	for (ZESize I = 0; I < Resource->GetRooms().GetCount(); I++)
 	{
-		const ZEInteriorRoomResource* CurrentRoom = &Resource->GetRooms()[I];
+		const ZEInteriorResourceRoom* CurrentRoom = &Resource->GetRooms()[I];
 		//if (ZEAABBox::IntersectionTest(CurrentPortal->BoundingBox,Ray))
 		for (ZESize N = 0; N < CurrentRoom->Polygons.GetCount(); N++)
 		{
@@ -373,6 +433,9 @@ void ZEInterior::CullRoom(ZEInteriorDoor* Door, ZEDrawParameters* DrawParameters
 	if (ViewVolume->CullTest(Door->GetRectangle()))
 		return;
 
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+		Statistics.SeenDoorCount++;
+
 	ZEInteriorRoom** DoorRooms = Door->GetRooms();
 	for (ZEInt I = 0; I < 2; I++)
 	{
@@ -385,8 +448,11 @@ void ZEInterior::CullRoom(ZEInteriorDoor* Door, ZEDrawParameters* DrawParameters
 		DoorRooms[I]->CullPass = true;
 		DoorRooms[I]->Draw(DrawParameters);
 
-		Statistics.DrawedRoomCount++;
-		Statistics.DrawedInteriorPolygonCount += DoorRooms[I]->GetPolygonCount();
+		if (DrawParameters->Pass == ZE_RP_COLOR)
+		{
+			Statistics.DrawedRoomCount++;
+			Statistics.DrawedInteriorPolygonCount += DoorRooms[I]->GetPolygonCount();
+		}
 
 		const ZEArray<ZEInteriorDoor*>& NextDoors = DoorRooms[I]->GetDoors();
 
@@ -408,10 +474,13 @@ void ZEInterior::CullRooms(ZEDrawParameters* DrawParameters)
 		{
 			Rooms[I]->Draw(DrawParameters);
 
-			Statistics.TotalRoomCount++;
-			Statistics.DrawedRoomCount++;
-			Statistics.TotalInteriorPolygonCount += Rooms[I]->GetPolygonCount();
-			Statistics.DrawedInteriorPolygonCount += Rooms[I]->GetPolygonCount();
+			if (DrawParameters->Pass == ZE_RP_COLOR)
+			{
+				Statistics.TotalRoomCount++;
+				Statistics.DrawedRoomCount++;
+				Statistics.TotalInteriorPolygonCount += Rooms[I]->GetPolygonCount();
+				Statistics.DrawedInteriorPolygonCount += Rooms[I]->GetPolygonCount();
+			}
 		}
 	}
 	else
@@ -425,8 +494,12 @@ void ZEInterior::CullRooms(ZEDrawParameters* DrawParameters)
 
 			for (size_t I = 0; I < Rooms.GetCount(); I++)
 			{
-				Statistics.TotalRoomCount++;
-				Statistics.TotalInteriorPolygonCount += Rooms[I]->GetPolygonCount();
+
+				if (DrawParameters->Pass == ZE_RP_COLOR)
+				{
+					Statistics.TotalRoomCount++;
+					Statistics.TotalInteriorPolygonCount += Rooms[I]->GetPolygonCount();
+				}
 
 				if (CullMode == ZE_ICM_VIEW)
 					continue;
@@ -437,8 +510,12 @@ void ZEInterior::CullRooms(ZEDrawParameters* DrawParameters)
 					Rooms[I]->CullPass = true;
 					Rooms[I]->Draw(DrawParameters);
 
-					Statistics.DrawedRoomCount++;
-					Statistics.DrawedInteriorPolygonCount += Rooms[I]->GetPolygonCount();
+
+					if (DrawParameters->Pass == ZE_RP_COLOR)
+					{
+						Statistics.DrawedRoomCount++;
+						Statistics.DrawedInteriorPolygonCount += Rooms[I]->GetPolygonCount();
+					}
 
 					const ZEArray<ZEInteriorDoor*>& Doors = Rooms[I]->GetDoors();
 					for(size_t J = 0; J < Doors.GetCount(); J++)
@@ -457,8 +534,12 @@ void ZEInterior::CullRooms(ZEDrawParameters* DrawParameters)
 				{
 					Rooms[I]->Draw(DrawParameters);
 
-					Statistics.DrawedRoomCount++;
-					Statistics.DrawedInteriorPolygonCount += Rooms[I]->GetPolygonCount();
+
+					if (DrawParameters->Pass == ZE_RP_COLOR)
+					{
+						Statistics.DrawedRoomCount++;
+						Statistics.DrawedInteriorPolygonCount += Rooms[I]->GetPolygonCount();
+					}
 				}
 			}
 		}
@@ -471,15 +552,23 @@ void ZEInterior::CullRooms(ZEDrawParameters* DrawParameters)
 				{
 					Rooms[I]->Draw(DrawParameters);
 
-					Statistics.DrawedRoomCount++;
-					Statistics.DrawedInteriorPolygonCount += Rooms[I]->GetPolygonCount();
+
+					if (DrawParameters->Pass == ZE_RP_COLOR)
+					{
+						Statistics.DrawedRoomCount++;
+						Statistics.DrawedInteriorPolygonCount += Rooms[I]->GetPolygonCount();
+					}
+
 				}
 			}
 		}
 	}
 
-	Statistics.CulledRoomCount = Statistics.TotalRoomCount - Statistics.DrawedRoomCount;
-	Statistics.CulledInteriorPolygonCount = Statistics.TotalInteriorPolygonCount - Statistics.DrawedInteriorPolygonCount;
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+	{
+		Statistics.CulledRoomCount = Statistics.TotalRoomCount - Statistics.DrawedRoomCount;
+		Statistics.CulledInteriorPolygonCount = Statistics.TotalInteriorPolygonCount - Statistics.DrawedInteriorPolygonCount;
+	}
 }
 
 void ZEInterior::OnTransformChanged()

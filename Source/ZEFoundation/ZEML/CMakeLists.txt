@@ -57,8 +57,7 @@ ze_add_source(ZEMLSerialReaderTests.cpp 	Tests)
 ze_add_library(ZEML 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL)
+	LIBS ZEFoundation)
 
 ze_add_test(ZEMLTests
 	SOURCES ${Tests}

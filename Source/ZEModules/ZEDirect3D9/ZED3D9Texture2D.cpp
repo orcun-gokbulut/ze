@@ -99,11 +99,11 @@ bool ZED3D9Texture2D::Create(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZET
 	D3DPOOL Pool;
 	D3DFORMAT Format;
 
-	Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : 0);
 	MipMap = (RenderTarget ? 1 : LevelCount);
 	Pool = (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
 	Format = ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
-
+	Usage = PixelFormat == ZE_TPF_INTZ ? D3DUSAGE_DEPTHSTENCIL : (RenderTarget ? D3DUSAGE_RENDERTARGET : 0);
+	
 	HRESULT Hr;
 	Hr = GetDevice()->CreateTexture(Width, Height, MipMap, Usage, Format, Pool, &Texture, NULL); 
 	if (Hr != D3D_OK)

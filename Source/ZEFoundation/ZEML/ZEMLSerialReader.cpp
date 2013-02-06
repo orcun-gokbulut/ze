@@ -246,11 +246,13 @@ bool ZEMLSerialReader::Read()
 			default:
 				zeError("Unsupported ZEMLProperty type.");
 				return false;
-				break;
 		}
 
 		if(IsDataRead != 1)
+		{
 			zeError("Can not read ZEMLProperty value from file. Corrupted ZEML file.");
+			return false;
+		}
 
 		return true;
 	}
@@ -418,6 +420,13 @@ bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCou
 	}
 
 	for(ZESize I = 0; I < ItemCount; I++)
+	{
 		if(List[I].Mandatory && !List[I].IsFound)
+		{
 			zeError("List item not found. Item name : %s", List[I].Name);
+			return false;
+		}
+	}
+
+	return true;
 }

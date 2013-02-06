@@ -47,25 +47,17 @@ ZEUIBorderedFrameControl::ZEUIBorderedFrameControl()
 	ZEUIControl::AddChildControl(&RightUpCornerArea);
 	ZEUIControl::AddChildControl(&RightDownCornerArea);
 
-	LeftUpCornerArea.Frame.Color = ZEVector4::UnitX;
-	LeftDownCornerArea.Frame.Color = ZEVector4::UnitX;
-	RightUpCornerArea.Frame.Color = ZEVector4::UnitX;
-	RightDownCornerArea.Frame.Color = ZEVector4::UnitX;
+	MainArea.Frame.Color = ZEVector4(0.0f, 0.0f, 1.0f, 1.0f);
 
-	TopEdgeArea.Frame.Color = ZEVector4::UnitY;
-	LeftEdgeArea.Frame.Color = ZEVector4::UnitY;
-	RightEdgeArea.Frame.Color = ZEVector4::UnitY;
-	BottomEdgeArea.Frame.Color = ZEVector4::UnitY;
+	LeftUpCornerArea.Frame.Color = ZEVector4(1.0f, 0.0f, 0.0f, 1.0f);
+	LeftDownCornerArea.Frame.Color = ZEVector4(1.0f, 0.0f, 0.0f, 1.0f);
+	RightUpCornerArea.Frame.Color = ZEVector4(1.0f, 0.0f, 0.0f, 1.0f);
+	RightDownCornerArea.Frame.Color = ZEVector4(1.0f, 0.0f, 0.0f, 1.0f);
 
-	MainArea.SetMoveable(false);
-	LeftUpCornerArea.SetMoveable(false);
-	LeftDownCornerArea.SetMoveable(false);
-	RightUpCornerArea.SetMoveable(false);
-	RightDownCornerArea.SetMoveable(false);
-	TopEdgeArea.SetMoveable(false);
-	BottomEdgeArea.SetMoveable(false);
-	LeftEdgeArea.SetMoveable(false);
-	RightEdgeArea.SetMoveable(false);
+	TopEdgeArea.Frame.Color = ZEVector4(0.0f, 1.0f, 0.0f, 1.0f);
+	LeftEdgeArea.Frame.Color = ZEVector4(0.0f, 1.0f, 0.0f, 1.0f);
+	RightEdgeArea.Frame.Color = ZEVector4(0.0f, 1.0f, 0.0f, 1.0f);
+	BottomEdgeArea.Frame.Color = ZEVector4(0.0f, 1.0f, 0.0f, 1.0f);
 
 	MainArea.SetWidth(376);
 	MainArea.SetHeight(376);
@@ -97,12 +89,24 @@ ZEUIBorderedFrameControl::ZEUIBorderedFrameControl()
 	ZEUIControl::SetWidth(424);
 	ZEUIControl::SetHeight(424);
 
-	LeftUpCornerArea.SetPosition(GetPosition());
-	LeftDownCornerArea.SetPosition(ZEVector2(GetRectangle().LeftUp.x, GetRectangle().RightDown.y - LeftDownCornerArea.GetHeight()));
-	RightUpCornerArea.SetPosition(ZEVector2(GetRectangle().RightDown.x - LeftUpCornerArea.GetWidth(), GetRectangle().LeftUp.y));
-	RightDownCornerArea.SetPosition(ZEVector2(GetRectangle().RightDown.x - RightDownCornerArea.GetWidth(), GetRectangle().RightDown.y - RightDownCornerArea.GetHeight()));
-	
-	TopEdgeArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x + LeftUpCornerArea.GetWidth(), LeftUpCornerArea.GetPosition().y));
+// 	LeftUpCornerArea.SetPosition(GetPosition());
+// 	LeftDownCornerArea.SetPosition(ZEVector2(GetRectangle().LeftUp.x, GetRectangle().RightDown.y - LeftDownCornerArea.GetHeight()));
+// 	RightUpCornerArea.SetPosition(ZEVector2(GetRectangle().RightDown.x - LeftUpCornerArea.GetWidth(), GetRectangle().LeftUp.y));
+// 	RightDownCornerArea.SetPosition(ZEVector2(GetRectangle().RightDown.x - RightDownCornerArea.GetWidth(), GetRectangle().RightDown.y - RightDownCornerArea.GetHeight()));
+// 	
+// 	TopEdgeArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x + LeftUpCornerArea.GetWidth(), LeftUpCornerArea.GetPosition().y));
+// 	BottomEdgeArea.SetPosition(ZEVector2(LeftDownCornerArea.GetPosition().x + LeftDownCornerArea.GetWidth(), LeftDownCornerArea.GetPosition().y));
+// 	LeftEdgeArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x, LeftUpCornerArea.GetPosition().y + LeftUpCornerArea.GetHeight()));
+// 	RightEdgeArea.SetPosition(ZEVector2(RightUpCornerArea.GetPosition().x, RightUpCornerArea.GetPosition().y + RightUpCornerArea.GetHeight()));
+// 
+// 	MainArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x + LeftUpCornerArea.GetWidth(), LeftUpCornerArea.GetPosition().y + LeftUpCornerArea.GetHeight()));
+
+	LeftUpCornerArea.SetPosition(ZEVector2::Zero);
+	LeftDownCornerArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x, LeftUpCornerArea.GetPosition().y + LeftUpCornerArea.GetHeight() + LeftEdgeArea.GetHeight()));
+	RightUpCornerArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x + LeftUpCornerArea.GetWidth() + TopEdgeArea.GetWidth(), LeftUpCornerArea.GetPosition().y));
+	RightDownCornerArea.SetPosition(ZEVector2(RightUpCornerArea.GetPosition().x, LeftDownCornerArea.GetPosition().y));
+
+	TopEdgeArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x + LeftUpCornerArea.GetWidth(), LeftUpCornerArea.GetPosition().y ));
 	BottomEdgeArea.SetPosition(ZEVector2(LeftDownCornerArea.GetPosition().x + LeftDownCornerArea.GetWidth(), LeftDownCornerArea.GetPosition().y));
 	LeftEdgeArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x, LeftUpCornerArea.GetPosition().y + LeftUpCornerArea.GetHeight()));
 	RightEdgeArea.SetPosition(ZEVector2(RightUpCornerArea.GetPosition().x, RightUpCornerArea.GetPosition().y + RightUpCornerArea.GetHeight()));
@@ -116,13 +120,13 @@ void ZEUIBorderedFrameControl::SetHeight(float Height)
 
 	ZEUIControl::SetHeight(Height);
 
-	LeftDownCornerArea.SetPosition(ZEVector2(GetRectangle().LeftUp.x, GetRectangle().RightDown.y - LeftDownCornerArea.GetHeight()));
-	RightDownCornerArea.SetPosition(ZEVector2(GetRectangle().RightDown.x - RightDownCornerArea.GetWidth(), GetRectangle().RightDown.y - RightDownCornerArea.GetHeight()));
-	BottomEdgeArea.SetPosition(ZEVector2(LeftDownCornerArea.GetPosition().x + LeftDownCornerArea.GetWidth(), LeftDownCornerArea.GetPosition().y));
+	LeftDownCornerArea.SetPosition(ZEVector2(LeftDownCornerArea.GetPosition().x, LeftDownCornerArea.GetPosition().y + HeightDifferance));
+	RightDownCornerArea.SetPosition(ZEVector2(RightDownCornerArea.GetPosition().x, RightDownCornerArea.GetPosition().y + HeightDifferance));
+	BottomEdgeArea.SetPosition(ZEVector2(BottomEdgeArea.GetPosition().x, BottomEdgeArea.GetPosition().y + HeightDifferance));
 
 	LeftEdgeArea.SetHeight(LeftEdgeArea.GetHeight() + HeightDifferance);
 	RightEdgeArea.SetHeight(RightEdgeArea.GetHeight() + HeightDifferance);
-	
+
 	MainArea.SetHeight(MainArea.GetHeight() + HeightDifferance);
 }
 
@@ -132,15 +136,15 @@ void ZEUIBorderedFrameControl::SetWidth(float Width)
 
 	ZEUIControl::SetWidth(Width);
 
-	RightUpCornerArea.SetPosition(ZEVector2(GetRectangle().RightDown.x - LeftUpCornerArea.GetWidth(), GetRectangle().LeftUp.y));
-	RightDownCornerArea.SetPosition(ZEVector2(GetRectangle().RightDown.x - RightDownCornerArea.GetWidth(), GetRectangle().RightDown.y - RightDownCornerArea.GetHeight()));
+	RightUpCornerArea.SetPosition(ZEVector2(RightUpCornerArea.GetPosition().x + WidthDifference, RightUpCornerArea.GetPosition().y));
+	RightDownCornerArea.SetPosition(ZEVector2(RightDownCornerArea.GetPosition().x + WidthDifference, RightDownCornerArea.GetPosition().y));
 
 	TopEdgeArea.SetWidth(TopEdgeArea.GetWidth() + WidthDifference);
 	BottomEdgeArea.SetWidth(BottomEdgeArea.GetWidth() + WidthDifference);
 
-	RightEdgeArea.SetPosition(ZEVector2(RightUpCornerArea.GetPosition().x, RightUpCornerArea.GetPosition().y + RightUpCornerArea.GetHeight()));
+	RightEdgeArea.SetPosition(ZEVector2(RightEdgeArea.GetPosition().x + WidthDifference, RightEdgeArea.GetPosition().y));
 
-	MainArea.SetWidth(MainArea.GetWidth() + WidthDifference);
+ 	MainArea.SetWidth(MainArea.GetWidth() + WidthDifference);
 }
 
 void ZEUIBorderedFrameControl::SetMaterial(ZEMaterial* Material)
@@ -158,7 +162,7 @@ void ZEUIBorderedFrameControl::AddChildControl(ZEUIControl* Control)
 	MainArea.AddChildControl(Control);
 }
 
-void ZEUIBorderedFrameControl::SetElementVisibilities(ZEInt Elements, bool Visibility)
+void ZEUIBorderedFrameControl::SetElementVisibilities(int Elements, bool Visibility)
 {
 	if ((Elements & ZEUI_BFC_EL_ALL) == ZEUI_BFC_EL_ALL)
 	{
@@ -202,9 +206,9 @@ void ZEUIBorderedFrameControl::SetElementVisibilities(ZEInt Elements, bool Visib
 		RightEdgeArea.SetVisiblity(Visibility);
 }
 
-ZEInt ZEUIBorderedFrameControl::GetVisibleElements()
+int ZEUIBorderedFrameControl::GetVisibleElements()
 {
-	ZEInt VisibleElements = 0;
+	int VisibleElements = 0;
 
 	if (MainArea.GetVisiblity())
 		VisibleElements = VisibleElements | ZEUI_BFC_EL_MAINAREA;
@@ -251,22 +255,40 @@ void ZEUIBorderedFrameControl::SetBorderThickness(float Thickness)
 	LeftEdgeArea.SetWidth(Thickness);
 	RightEdgeArea.SetWidth(Thickness);
 
-	LeftUpCornerArea.SetPosition(GetPosition());
-	LeftDownCornerArea.SetPosition(ZEVector2(GetRectangle().LeftUp.x, GetRectangle().RightDown.y - LeftDownCornerArea.GetHeight()));
-	RightUpCornerArea.SetPosition(ZEVector2(GetRectangle().RightDown.x - LeftUpCornerArea.GetWidth(), GetRectangle().LeftUp.y));
-	RightDownCornerArea.SetPosition(ZEVector2(GetRectangle().RightDown.x - RightDownCornerArea.GetWidth(), GetRectangle().RightDown.y - RightDownCornerArea.GetHeight()));
+	MainArea.SetWidth(GetWidth() - Thickness * 2);
+	MainArea.SetHeight(GetHeight() - Thickness * 2);
+	MainArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x + LeftUpCornerArea.GetWidth(), LeftUpCornerArea.GetPosition().y + LeftUpCornerArea.GetHeight()));
 
-	TopEdgeArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x + LeftUpCornerArea.GetWidth(), LeftUpCornerArea.GetPosition().y));
+	LeftUpCornerArea.SetPosition(ZEVector2::Zero);
+	LeftDownCornerArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x, MainArea.GetPosition().y + MainArea.GetHeight()));
+	RightUpCornerArea.SetPosition(ZEVector2(MainArea.GetPosition().x + MainArea.GetWidth(), LeftUpCornerArea.GetPosition().y));
+	RightDownCornerArea.SetPosition(ZEVector2(MainArea.GetPosition().x + MainArea.GetWidth(), MainArea.GetPosition().y + MainArea.GetHeight()));
+
+	TopEdgeArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x + LeftUpCornerArea.GetWidth(), LeftUpCornerArea.GetPosition().y ));
 	BottomEdgeArea.SetPosition(ZEVector2(LeftDownCornerArea.GetPosition().x + LeftDownCornerArea.GetWidth(), LeftDownCornerArea.GetPosition().y));
 	LeftEdgeArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x, LeftUpCornerArea.GetPosition().y + LeftUpCornerArea.GetHeight()));
 	RightEdgeArea.SetPosition(ZEVector2(RightUpCornerArea.GetPosition().x, RightUpCornerArea.GetPosition().y + RightUpCornerArea.GetHeight()));
 
-	TopEdgeArea.SetWidth(RightUpCornerArea.GetPosition().x - LeftUpCornerArea.GetPosition().x - Thickness);
-	BottomEdgeArea.SetWidth(RightDownCornerArea.GetPosition().x - LeftDownCornerArea.GetPosition().x - Thickness);
-	LeftEdgeArea.SetHeight(LeftDownCornerArea.GetPosition().y - LeftUpCornerArea.GetPosition().y - Thickness);
-	RightEdgeArea.SetHeight(RightDownCornerArea.GetPosition().y - RightUpCornerArea.GetPosition().y - Thickness);
+	TopEdgeArea.SetWidth(MainArea.GetWidth());
+	BottomEdgeArea.SetWidth(MainArea.GetWidth());
+	LeftEdgeArea.SetHeight(MainArea.GetHeight());
+	RightEdgeArea.SetHeight(MainArea.GetHeight());
 
-	MainArea.SetWidth(GetWidth() - Thickness * 2);
-	MainArea.SetHeight(GetHeight() - Thickness * 2);
-	MainArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x + LeftUpCornerArea.GetWidth(), LeftUpCornerArea.GetPosition().y + LeftUpCornerArea.GetHeight()));
+
+// 	LeftUpCornerArea.SetPosition(GetPosition());
+// 	LeftDownCornerArea.SetPosition(ZEVector2(GetRectangle().LeftUp.x, GetRectangle().RightDown.y - LeftDownCornerArea.GetHeight()));
+// 	RightUpCornerArea.SetPosition(ZEVector2(GetRectangle().RightDown.x - LeftUpCornerArea.GetWidth(), GetRectangle().LeftUp.y));
+// 	RightDownCornerArea.SetPosition(ZEVector2(GetRectangle().RightDown.x - RightDownCornerArea.GetWidth(), GetRectangle().RightDown.y - RightDownCornerArea.GetHeight()));
+// 
+// 	TopEdgeArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x + LeftUpCornerArea.GetWidth(), LeftUpCornerArea.GetPosition().y));
+// 	BottomEdgeArea.SetPosition(ZEVector2(LeftDownCornerArea.GetPosition().x + LeftDownCornerArea.GetWidth(), LeftDownCornerArea.GetPosition().y));
+// 	LeftEdgeArea.SetPosition(ZEVector2(LeftUpCornerArea.GetPosition().x, LeftUpCornerArea.GetPosition().y + LeftUpCornerArea.GetHeight()));
+// 	RightEdgeArea.SetPosition(ZEVector2(RightUpCornerArea.GetPosition().x, RightUpCornerArea.GetPosition().y + RightUpCornerArea.GetHeight()));
+// 
+// 	TopEdgeArea.SetWidth(RightUpCornerArea.GetPosition().x - LeftUpCornerArea.GetPosition().x - Thickness);
+// 	BottomEdgeArea.SetWidth(RightDownCornerArea.GetPosition().x - LeftDownCornerArea.GetPosition().x - Thickness);
+// 	LeftEdgeArea.SetHeight(LeftDownCornerArea.GetPosition().y - LeftUpCornerArea.GetPosition().y - Thickness);
+// 	RightEdgeArea.SetHeight(RightDownCornerArea.GetPosition().y - RightUpCornerArea.GetPosition().y - Thickness);
+
+
 }

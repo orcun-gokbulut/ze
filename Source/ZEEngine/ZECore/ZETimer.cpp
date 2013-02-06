@@ -60,9 +60,9 @@ bool ZETimer::GetRepeating()
 	return Repeating;
 }
 
-void ZETimer::SetIntervalTime(float MSecs)
+void ZETimer::SetIntervalTime(float Secs)
 {
-	IntervalTime = MSecs;
+	IntervalTime = Secs;
 }
 
 float ZETimer::GetIntervalTime()
@@ -102,6 +102,12 @@ ZETimer* ZETimer::CreateInstance()
 	ZETimerManager::GetInstance()->RegisterTimer(Timer);
 
 	return Timer;
+}
+
+void ZETimer::Destroy()
+{
+	ZETimerManager::GetInstance()->UnregisterTimer(this);
+	delete this;
 }
 
 void ZETimer::CreateAutoTimer(float Interval, const ZETimerEvent& Event)

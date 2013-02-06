@@ -41,6 +41,7 @@
 #include "ZESceneDebugDraw.h"
 #include "ZESceneCuller.h"
 #include "ZETypes.h"
+#include "ZEDrawParameters.h"
 
 class ZEViewVolume;
 class ZEBoundingBox;
@@ -77,11 +78,16 @@ class ZEScene
 
 		ZEPhysicalWorld*						PhysicalWorld;
 
+		ZEDrawParameters						FrameDrawParameters;
+
 		ZEFrameRenderer*						Renderer;
 		ZEShadowRenderer*						ShadowRenderer;
 		ZEPostProcessor*						PostProcessor;
 		ZECamera*								ActiveCamera;
 		ZEListener*								ActiveListener;
+
+		float									AmbientFactor;
+		ZEVector3								AmbientColor;
 
 		void									Tick(ZEEntity* Entity, float ElapsedTime);
 
@@ -96,6 +102,7 @@ class ZEScene
 		void									ClearEntities();
 
 		ZERenderer*								GetRenderer();
+		ZERenderer*								GetShadowRenderer();
 		ZEPhysicalWorld*						GetPhysicalWorld();
 
 		void									SetActiveCamera(ZECamera* Camera);
@@ -104,7 +111,8 @@ class ZEScene
 		void									SetActiveListener(ZEListener* Listener);
 		ZEListener*								GetActiveListener();
 
-		const ZECullStatistics&					GetCullerStatistics();
+		ZESceneCuller&							GetSceneCuller();
+		const ZESceneStatistics&				GetStatistics() const;
 
 		bool									Save(const ZEString& FileName);
 		bool									Load(const ZEString& FileName);
@@ -115,6 +123,12 @@ class ZEScene
 
 		void									Tick(float ElapsedTime);
 		void									Render(float ElapsedTime);
+
+		void									SetAmbientFactor(float Factor);
+		float									GetAmbientFactor() const;
+
+		void									SetAmbientColor(ZEVector3 Color);
+		const ZEVector3&						GetAmbientColor() const;
 
 												ZEScene();
 		virtual									~ZEScene();

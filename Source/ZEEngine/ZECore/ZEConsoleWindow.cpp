@@ -140,7 +140,6 @@ INT_PTR CALLBACK ConsoleCallback(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
 			#else
 				SetWindowLong(GetDlgItem(hwndDlg, IDC_INPUT), GWL_WNDPROC, (LONG)OrgInputBoxCallback);
 			#endif
-			PostQuitMessage(0);
 			break;	
 		default:
 			return FALSE;

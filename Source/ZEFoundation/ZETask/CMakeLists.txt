@@ -44,5 +44,4 @@ ze_add_source(ZETask.h           		Sources Headers)
 
 ze_add_library(ZETask
 	SOURCES ${Sources} 
-	HEADERS ${Headers} 
-	INSTALL)
+	HEADERS ${Headers})

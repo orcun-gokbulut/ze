@@ -161,6 +161,26 @@ float ZECamera::GetAspectRatio() const
 	return AspectRatio;
 }
 
+void ZECamera::SetShadowDistance(float Value)
+{
+	ShadowDistance = Value;
+}
+
+float ZECamera::GetShadowDistance() const
+{
+	return ShadowDistance;
+}
+
+void ZECamera::SetShadowFadeDistance(float Value)
+{
+	ShadowFadeDistance = Value;
+}
+
+float ZECamera::GetShadowFadeDistance() const
+{
+	return ShadowFadeDistance;
+}
+
 const ZEView& ZECamera::GetView()
 {
 	/*if (!UpdateView)
@@ -210,15 +230,18 @@ void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
 
 ZECamera::ZECamera()
 {
-	FOV = ZE_PI_2;
-	AspectRatio = zeGraphics->GetAspectRatio();
-	NearZ = zeGraphics->GetNearZ();
-	FarZ = zeGraphics->GetFarZ();
 	UpdateView = true;
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;
-	UpdateViewProjectionTransform = true;
 	UpdateProjectionTransform = true;
+	UpdateViewProjectionTransform = true;
+
+	FOV = ZE_PI_2;
+	FarZ = zeGraphics->GetFarZ();
+	NearZ = zeGraphics->GetNearZ();
+	AspectRatio = zeGraphics->GetAspectRatio();
+	ShadowDistance = 100.0f;
+	ShadowFadeDistance = ShadowDistance * 0.1f;
 }
 
 ZECamera* ZECamera::CreateInstance()

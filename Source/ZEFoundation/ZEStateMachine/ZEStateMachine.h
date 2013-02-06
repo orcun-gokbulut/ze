@@ -55,7 +55,7 @@ class ZEStateMachine
 		virtual bool				AddState(ZEState* State);
 		virtual bool				DeleteState(ZEState* State);
 
-		virtual bool				SetCurrentState(ZEState* NextState, bool Forced);
+		virtual bool				SetCurrentState(ZEState* NextState, bool Forced = false);
 		virtual const ZEState&		GetCurrentState();
 
 

@@ -41,7 +41,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 
-
+#include "ZEGame/ZEDrawStatistics.h"
 #include "ZEML/ZEMLNode.h"
 
 enum ZEInteriorCullMode
@@ -51,27 +51,12 @@ enum ZEInteriorCullMode
 	ZE_ICM_FULL
 };
 
-struct ZEInteriorCullStatistics
-{
-	size_t	TotalRoomCount;
-	size_t	CulledRoomCount;
-	size_t	DrawedRoomCount;
-
-	size_t	TotalInteriorPolygonCount;
-	size_t	CulledInteriorPolygonCount;
-	size_t	DrawedInteriorPolygonCount;
-
-	size_t	TotalInteriorMaterialCount;
-	size_t	CulledInteriorMaterialCount;
-	size_t	DrawedInteriorMaterialCount;
-
-};
-
 ZE_META_ENTITY_DESCRIPTION(ZEInterior)
 
 class ZEInteriorResource;
 class ZEInteriorRoom;
 class ZEInteriorDoor;
+class ZEInteriorHelper;
 struct ZEDrawParameters;
 struct ZEInteriorCullStatistics;
 class ZERay;
@@ -83,13 +68,18 @@ class ZEInterior : public ZEEntity
 {
 	ZE_META_ENTITY(ZEInterior)
 	friend class ZEInteriorDoor;
+	friend class ZEInteriorHelper;
+
 	private:
 		ZEString								InteriorFile;
 		ZEInteriorResource*						Resource;
+
 		ZEArray<ZEInteriorRoom*>				Rooms;
-		ZEArray<ZEInteriorDoor*>				Doors; 
+		ZEArray<ZEInteriorDoor*>				Doors;
+		ZEArray<ZEInteriorHelper*>				Helpers;
+
 		ZEInteriorCullMode						CullMode;
-		ZEInteriorCullStatistics				Statistics;
+		ZEInteriorStatistics					Statistics;
 
 		void									LoadInteriorResource(ZEInteriorResource* Resource);
 
@@ -105,8 +95,13 @@ class ZEInterior : public ZEEntity
 	public:	
 		const ZEArray<ZEInteriorRoom*>&			GetRooms();
 		const ZEArray<ZEInteriorDoor*>&			GetDoors();
+		const ZEArray<ZEInteriorHelper*>&		GetHelpers();
 
-		const ZEInteriorCullStatistics&			GetCullStatistics();
+		ZEInteriorRoom*							GetRoom(const char* Name);
+		ZEInteriorDoor*							GetDoor(const char* Name);
+		ZEInteriorHelper*						GetHelper(const char* Name);
+
+		const ZEInteriorStatistics&				GetStatistics() const;
 
 		virtual ZEDrawFlags						GetDrawFlags() const;
 

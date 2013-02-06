@@ -102,22 +102,12 @@ ZETexture2D* ZEOmniProjectiveLight::GetBackShadowMap()
 	return BackShadowMap;
 }
 
-void ZEOmniProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
+ZESize ZEOmniProjectiveLight::GetViewCount()
 {
-	if (FrontShadowMap == NULL)
-	{
-		FrontShadowMap = ZETexture2D::CreateInstance();
-		FrontShadowMap->Create(512, 512, 1, ZE_TPF_F32, false);
-	}
-
-	if (BackShadowMap == NULL)
-	{
-		BackShadowMap = ZETexture2D::CreateInstance();
-		BackShadowMap->Create(512, 512, 1, ZE_TPF_F32, false);
-	}
+	return 1;
 }
 
-const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume()
+const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume(ZESize Index)
 {
 	if (UpdateViewVolume)
 	{
@@ -128,12 +118,31 @@ const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume()
 	return ViewVolume;
 }
 
+const ZEMatrix4x4& ZEOmniProjectiveLight::GetViewTransform(ZESize Index)
+{	
+	return ViewProjectionMatrix;
+}
+
+void ZEOmniProjectiveLight::Draw(ZEDrawParameters* DrawParameters)
+{
+	if (DrawParameters->Pass != ZE_RP_COLOR)
+		return;
+
+	ZEBSphere LightBoundingSphere;
+	LightBoundingSphere.Position = GetWorldPosition();
+	LightBoundingSphere.Radius = GetRange();
+
+	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
+		ZELight::Draw(DrawParameters);
+}
+
 ZEOmniProjectiveLight::ZEOmniProjectiveLight()
 {
 	ProjectionTexture = NULL;
 
 	FrontShadowMap = NULL;
 	BackShadowMap = NULL;
+	ViewProjectionMatrix = ZEMatrix4x4::Identity;
 }
 
 ZEOmniProjectiveLight::~ZEOmniProjectiveLight()

@@ -33,77 +33,126 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#define ShadowHardwareFiltering		1
-#define ZE_SHF_NONE					0
-#define ZE_SHF_NVIDIA				1
-#define ZE_SHF_ATI					2
+#define ZE_SM_FILTER_PCF_POISSON_5_TAP
 
+#if defined(ZE_SM_FILTER_PCF_BOX_4_TAP)
 
-#define ShadowFiltering				1
-#define ZE_SF_NONE					0
-#define ZE_SF_PCF_2X2				1
-#define ZE_SF_PCF_4X4				2
-#define ZE_SF_POISSION_PCF			3
-#define ZE_SF_RR_POISSION_PCF		4
+	#define ZE_SM_FILTER_TAP_COUNT	4
+	static const float2 FilterTaps[ZE_SM_FILTER_TAP_COUNT] =
+	{
+		float2(0.0f, 0.0f), // Length = 1.0f
+		float2(1.0f, 0.0f), // Length = 1.0f
+		float2(0.0f, 1.0f), // Length = 1.0f
+		float2(1.0f, 1.0f)  // Length = 1.0f
+	};
+	
+#elif defined (ZE_SM_FILTER_PCF_POISSON_4_TAP)
 
-#define ShadowMapping				1
-#define ZE_SM_DISABLED				0
-#define ZE_SM_ENABLED				1
+	#define ZE_SM_FILTER_TAP_COUNT	4
+	static const float2 FilterTaps[ZE_SM_FILTER_TAP_COUNT] =
+	{
+		float2(-0.2323524f, -0.04344069f),	// Length = 0.2363f
+		float2( 0.3576663f, -0.03434586f),	// Length = 0.3593f
+		float2( 0.4080991f,  0.47325150f),	// Length = 0.6249f
+		float2(-0.8702538f,  0.24977860f)	// Length = 0.9053f
+	};
+	
+#elif defined (ZE_SM_FILTER_PCF_POISSON_5_TAP)
 
-float4 ShadowKernel2x2[2];
-float4 ShadowKernel4x4[2];
+	#define ZE_SM_FILTER_TAP_COUNT	5
+	static const float2 FilterTaps[ZE_SM_FILTER_TAP_COUNT] =
+	{
+		float2(-0.47990960f,  0.2474051f),	// Length = 0.5399f
+		float2( 0.58031870f,  0.0986226f),	// Length = 0.5886f
+		float2( 0.02687145f, -0.6101344f),	// Length = 0.6107f
+		float2(-0.75832520f, -0.4483475f),	// Length = 0.8809f
+		float2(-0.01803716f,  0.9019188f)	// Length = 0.9020f
+	};
+	
+#elif defined (ZE_SM_FILTER_PCF_POISSON_6_TAP)
 
-float SampleShadowMap1x1(sampler2D ShadowMap, float4 Texcoord)
+	#define ZE_SM_FILTER_TAP_COUNT	6
+	static const float2 FilterTaps[ZE_SM_FILTER_TAP_COUNT] =
+	{
+		float2(-0.07402445f, -0.01598004f),	// Length = 0.0757f
+		float2(-0.78336110f,  0.06715248f),	// Length = 0.7862f
+		float2(-0.03588826f, -0.82994880f),	// Length = 0.8307f
+		float2( 0.49020810f,  0.75344700f),	// Length = 0.8988f
+		float2( 0.84350380f, -0.41540620f),	// Length = 0.9402f
+		float2(-0.46744003f,  0.82284230f)	// Length = 0.9463f
+	};
+	
+#elif defined (ZE_SM_FILTER_PCF_POISSON_8_TAP)
+	
+	#define ZE_SM_FILTER_TAP_COUNT	8
+	static const float2 FilterTaps[ZE_SM_FILTER_TAP_COUNT] =
+	{
+		float2( 0.12557910f,  0.07068630f),	// Length = 0.1446f
+		float2(-0.58956410f, -0.08173649f),	// Length = 0.5952f
+		float2( 0.53800000f,  0.50858990f),	// Length = 0.7403f
+		float2(-0.43435290f, -0.71343960f),	// Length = 0.8352f
+		float2( 0.33492010f, -0.83595340f),	// Length = 0.9005f
+		float2( 0.93885600f, -0.03617476f),	// Length = 0.9396f
+		float2(-0.06119142f,  0.94668170f),	// Length = 0.9487f
+		float2(-0.84269830f,  0.47026770f)	// Length = 0.9650f
+	};
+	
+#elif defined (ZE_SM_FILTER_PCF_POISSON_12_TAP)
+	
+	#define ZE_SM_FILTER_TAP_COUNT	12
+	static const float2 FilterTaps[ZE_SM_FILTER_TAP_COUNT] =
+	{
+		float2( 0.1445972f,  0.04697967f),	// Length = 0.1520f
+		float2(-0.1850145f, -0.18422770f),	// Length = 0.2610f
+		float2( 0.2643003f, -0.34810840f),	// Length = 0.4370f
+		float2(-0.4160157f,  0.36924030f),	// Length = 0.5562f
+		float2( 0.5774809f,  0.18828500f),	// Length = 0.6074f
+		float2( 0.3495790f,  0.58869550f),	// Length = 0.6846f
+		float2(-0.4678557f, -0.59755570f),	// Length = 0.7589f
+		float2(-0.2250305f,  0.73181550f),	// Length = 0.7656f
+		float2(-0.8205884f, -0.26081130f),	// Length = 0.8610f
+		float2( 0.2225451f, -0.88668820f),	// Length = 0.9141f
+		float2(-0.8042874f,  0.49058400f),	// Length = 0.9420f
+		float2( 0.6084549f, -0.77020600f)	// Length = 0.9815f
+	};
+	
+#else
+	#define ZE_SM_FILTER_TAP_COUNT	1
+	static const float2 FilterTaps[ZE_SM_FILTER_TAP_COUNT] =
+	{
+		float2(0.0f, 0.0f)	// Length = 0.0f
+	};
+#endif
+
+#define ZE_SM_RANDOM_ROTATION
+
+float SampleShadowMap(sampler2D ShadowMap, float2 ShadowMapTexCoord, float2 ShadowMapTexSize, float ComparisonDepth, sampler2D RotationMap, float2 RotationMapTexCoord, float FilterScale)
 {
-	#if ShadowHardwareFiltering == ZE_SHF_NVIDIA
-		return tex2Dproj(ShadowMap, Texcoord).x; // nVidia - Hardware PCF
-	#else //ShadowHardwareFiltering == ZE_SHF_NONE
-		return tex2Dproj(ShadowMap, Texcoord).x > (Texcoord.z / Texcoord.w); // Standard
+	// Create rotation matrix
+	#if defined(ZE_SM_RANDOM_ROTATION)
+		float2 SinCos = tex2Dlod(RotationMap, float4(RotationMapTexCoord, 0.0f, 0.0f)).rg * 2.0f - 1.0f;
+		float2x2 RotationMat = float2x2(float2(SinCos.y, -SinCos.x), float2(SinCos.x, SinCos.y));
 	#endif
-}
-
-float SampleShadowMap2x2(sampler2D ShadowMap, float4 Texcoord)
-{
-	#if ShadowHardwareFiltering == ZE_SHF_NVIDIA
-		return tex2Dproj(ShadowMap, Texcoord).x;
-	#elif ShadowHardwareFiltering == ZE_SHF_ATI
-		float4 Comparasion = tex2Dproj(ShadowMap, Texcoord).rgba > (Texcoord.z / Texcoord.w).xxxx ? 1.0f : 0.0f;
-		return dot(Comparasion, float4(0.25f, 0.25f, 0.25f, 0.25f));
-	#else //ShadowHardwareFiltering == ZE_SHF_NONE
-		float4 Values = float4(
-			tex2Dproj(ShadowMap, float4(Texcoord.xy + ShadowKernel2x2[0].xy, Texcoord.zw)).x,
-			tex2Dproj(ShadowMap, float4(Texcoord.xy + ShadowKernel2x2[0].wz, Texcoord.zw)).x,
-			tex2Dproj(ShadowMap, float4(Texcoord.xy + ShadowKernel2x2[1].xy, Texcoord.zw)).x,
-			tex2Dproj(ShadowMap, float4(Texcoord.xy + ShadowKernel2x2[1].wz, Texcoord.zw)).x);
-		float Comparasion = Values > (Texcoord.z / Texcoord.w) ? 1.0f : 0.0f;
-		return dot(Comparasion, float4(0.25f, 0.25f, 0.25f, 0.25f));
-	#endif
-}
-
-float SampleShadowMap(sampler2D ShadowMap, float4 Texcoord)
-{
-	#if ShadowMapping == ZE_SM_ENABLED
-		#if ShadowFiltering == ZE_SF_PCF_2X2
-			return SampleShadowMap2x2(ShadowMap, Texcoord);
-		#elif ShadowFiltering == ZE_SF_PCF_4X4
-			float4 Values = float4(
-				SampleShadowMap2x2(ShadowMap, float4(Texcoord.xy + ShadowKernel4x4[0].xy, Texcoord.zw)),
-				SampleShadowMap2x2(ShadowMap, float4(Texcoord.xy + ShadowKernel4x4[0].zw, Texcoord.zw)),
-				SampleShadowMap2x2(ShadowMap, float4(Texcoord.xy + ShadowKernel4x4[1].xy, Texcoord.zw)),
-				SampleShadowMap2x2(ShadowMap, float4(Texcoord.xy + ShadowKernel4x4[1].zw, Texcoord.zw)));
-			return dot(Values, float4(0.25, 0.25, 0.25, 0.25));
-		#elif ShadowFiltering == ZE_SF_POISSION_PCF
-			// Shadow Quality 4: 12 tap Possion Filtering	
-		#elif ShadowFiltering == ZE_SF_RR_POISSION_PCF
-			// Shadow Quality 5: 12 tap Randomly Rotated Possion Filtering
-		#else //ShadowFiltering == ZE_SF_NONE
-			return SampleShadowMap1x1(ShadowMap, Texcoord);
+	
+	float PcfAverage = 0.0f;
+	for (int SampleN = 0; SampleN < ZE_SM_FILTER_TAP_COUNT; SampleN++)
+	{
+		// Rotate if specified
+		float2 FinalTap = float2(0.0f, 0.0f);
+		#if defined(ZE_SM_RANDOM_ROTATION)
+			float2 Temp = FilterTaps[SampleN];
+			FinalTap = mul(RotationMat, Temp);
+		#else
+			FinalTap = FilterTaps[SampleN];
 		#endif
-	#else
-		return 1.0f;
-	#endif
-}
-
-float SampleParaboloidShadowMap(sampler2D FrontShadowMap, sampler2D BackShadowMap, float3 Position)
-{
+		
+		float2 SampleOffset = FinalTap * ShadowMapTexSize * FilterScale;
+		
+		// Sample depth
+		float DepthSample = tex2Dlod(ShadowMap, float4(ShadowMapTexCoord + SampleOffset, 0.0f, 0.0f)).r;
+		
+		// Pcf
+		PcfAverage += ComparisonDepth > DepthSample ? 1.0f : 0.0f;
+	}
+	return PcfAverage * (1.0f / ZE_SM_FILTER_TAP_COUNT);
 }

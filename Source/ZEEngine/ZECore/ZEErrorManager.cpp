@@ -81,7 +81,6 @@ ZEErrorManager* ZEErrorManager::GetInstance()
 
 ZEErrorManager::ZEErrorManager()
 {
-	ZELog::GetInstance()->SetLogFileEnabled(false);
 	ErrorOptions.SetName("Error");
 	ErrorOptions.AddOption(new ZEOption("LogFileEnabled", false, ZE_OA_NORMAL));
 	ErrorOptions.AddOption(new ZEOption("LogFileName", "error.log", ZE_OA_NORMAL));

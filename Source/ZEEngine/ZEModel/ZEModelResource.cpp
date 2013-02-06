@@ -221,14 +221,14 @@ bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSe
 
 	ZEMLSerialListItem PhysicalBodyList[] = 
 	{
-		ZEML_LIST_PROPERTY("Enabled",			Enabled,		ZE_VRT_BOOLEAN,		true),
-		ZEML_LIST_PROPERTY("Type",				Type,			ZE_VRT_INTEGER_32,	true),
-		ZEML_LIST_PROPERTY("IsKinematic",		IsKinematic,	ZE_VRT_BOOLEAN,		true),
-		ZEML_LIST_PROPERTY("Mass",				Mass,			ZE_VRT_FLOAT,		true),
-		ZEML_LIST_PROPERTY("MassCenter",		MassCenter,		ZE_VRT_VECTOR3,		true),
-		ZEML_LIST_PROPERTY("LinearDamping",		LinearDamping,	ZE_VRT_FLOAT,		true),
-		ZEML_LIST_PROPERTY("AngularDamping",	AngularDamping, ZE_VRT_FLOAT,		true),
-		ZEML_LIST_NODE("PhysicalShapes",		PhysicalShapesNodePointer,			true)
+		ZEML_LIST_PROPERTY("Enabled",					Enabled,					ZE_VRT_BOOLEAN,		true),
+		ZEML_LIST_PROPERTY("Type",						Type,						ZE_VRT_INTEGER_32,	true),
+		ZEML_LIST_PROPERTY("IsKinematic",				IsKinematic,				ZE_VRT_BOOLEAN,		true),
+		ZEML_LIST_PROPERTY("Mass",						Mass,						ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("MassCenter",				MassCenter,					ZE_VRT_VECTOR3,		true),
+		ZEML_LIST_PROPERTY("LinearDamping",				LinearDamping,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_PROPERTY("AngularDamping",			AngularDamping,				ZE_VRT_FLOAT,		true),
+		ZEML_LIST_NODE("PhysicalShapes",				PhysicalShapesNodePointer,						true)
 	};
 
 	if (!NodeReader->ReadPropertyList(PhysicalBodyList, 8))
@@ -256,21 +256,22 @@ bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSe
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "PhysicalShape")
 			continue;
 
-		ZEVariant ShapePosition, ShapeRotation, ShapeRestitution, ShapeDynamicFriction, ShapeStaticFriction, ShapeType;
+		ZEVariant ShapePosition, ShapeRotation, ShapeRestitution, ShapeDynamicFriction, ShapeStaticFriction, ShapeType, UserDefinedProperties;
 		ZEMLSerialPointer ShapeNodePointer;
 
 		ZEMLSerialListItem PhysicalShapeList [] = 
 		{
-			ZEML_LIST_PROPERTY("Position",			ShapePosition,			ZE_VRT_VECTOR3,		true),
-			ZEML_LIST_PROPERTY("Rotation",			ShapeRotation,			ZE_VRT_QUATERNION,	true),
-			ZEML_LIST_PROPERTY("Restitution",		ShapeRestitution,		ZE_VRT_FLOAT,		true),
-			ZEML_LIST_PROPERTY("DynamicFriction",	ShapeDynamicFriction,	ZE_VRT_FLOAT,		true),
-			ZEML_LIST_PROPERTY("StaticFriction",	ShapeStaticFriction,	ZE_VRT_FLOAT,		true),
-			ZEML_LIST_PROPERTY("Type",				ShapeType,				ZE_VRT_INTEGER_32,	true),
-			ZEML_LIST_NODE("Shape",					ShapeNodePointer,							true)
+			ZEML_LIST_PROPERTY("Position",					ShapePosition,			ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("Rotation",					ShapeRotation,			ZE_VRT_QUATERNION,	true),
+			ZEML_LIST_PROPERTY("Restitution",				ShapeRestitution,		ZE_VRT_FLOAT,		true),
+			ZEML_LIST_PROPERTY("DynamicFriction",			ShapeDynamicFriction,	ZE_VRT_FLOAT,		true),
+			ZEML_LIST_PROPERTY("StaticFriction",			ShapeStaticFriction,	ZE_VRT_FLOAT,		true),
+			ZEML_LIST_PROPERTY("UserDefinedProperties",		UserDefinedProperties,	ZE_VRT_STRING,		false),
+			ZEML_LIST_PROPERTY("Type",						ShapeType,				ZE_VRT_INTEGER_32,	true),
+			ZEML_LIST_NODE("Shape",							ShapeNodePointer,							true)
 		};
 
-		if (!NodeReader->ReadPropertyList(PhysicalShapeList, 7))
+		if (!NodeReader->ReadPropertyList(PhysicalShapeList, 8))
 			return false;
 
 		ZEModelResourcePhysicalShape* Shape = Body->Shapes.Add();
@@ -281,6 +282,9 @@ bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSe
 		Shape->DynamicFriction = ShapeDynamicFriction;
 		Shape->StaticFriction = ShapeStaticFriction;
 		Shape->Type = (ZEModelResourcePhysicalShapeType)ShapeType.GetInt32();
+
+		if (UserDefinedProperties.GetType() == ZE_VRT_STRING)
+			Shape->UserDefinedProperties = UserDefinedProperties.GetString();
 
 		NodeReader->SeekPointer(ShapeNodePointer);
 
@@ -396,23 +400,24 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Mesh")
 			continue;
 
-		ZEVariant NameValue, PositionValue, RotationValue, ScaleValue, IsVisibleValue, IsSkinnedValue;
+		ZEVariant NameValue, PositionValue, RotationValue, ScaleValue, IsVisibleValue, IsSkinnedValue, UserDefinedPropertiesValue;
 		ZEMLSerialPointer BoundingBoxNodePointer, PhysicalBodyNodePointer, LODsNodePointer;
 
 		ZEMLSerialListItem MeshList[] = 
 		{
-			ZEML_LIST_PROPERTY("Name",			NameValue,				ZE_VRT_STRING,		true),
-			ZEML_LIST_NODE("BoundingBox",		BoundingBoxNodePointer,						true),
-			ZEML_LIST_PROPERTY("Position",		PositionValue,			ZE_VRT_VECTOR3,		true),
-			ZEML_LIST_PROPERTY("Rotation",		RotationValue,			ZE_VRT_QUATERNION,	true),
-			ZEML_LIST_PROPERTY("Scale",			ScaleValue,				ZE_VRT_VECTOR3,		true),
-			ZEML_LIST_PROPERTY("IsVisible",		IsVisibleValue,			ZE_VRT_BOOLEAN,		true),
-			ZEML_LIST_PROPERTY("IsSkinned",		IsSkinnedValue,			ZE_VRT_BOOLEAN,		true),
-			ZEML_LIST_NODE("PhysicalBody",		PhysicalBodyNodePointer,					false),
-			ZEML_LIST_NODE("LODs",				LODsNodePointer,							true)
+			ZEML_LIST_PROPERTY("Name",						NameValue,						ZE_VRT_STRING,		true),
+			ZEML_LIST_NODE("BoundingBox",					BoundingBoxNodePointer,								true),
+			ZEML_LIST_PROPERTY("Position",					PositionValue,					ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("Rotation",					RotationValue,					ZE_VRT_QUATERNION,	true),
+			ZEML_LIST_PROPERTY("Scale",						ScaleValue,						ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("IsVisible",					IsVisibleValue,					ZE_VRT_BOOLEAN,		true),
+			ZEML_LIST_PROPERTY("IsSkinned",					IsSkinnedValue,					ZE_VRT_BOOLEAN,		true),
+			ZEML_LIST_PROPERTY("UserDefinedProperties",		UserDefinedPropertiesValue,		ZE_VRT_STRING,		false),
+			ZEML_LIST_NODE("PhysicalBody",					PhysicalBodyNodePointer,							false),
+			ZEML_LIST_NODE("LODs",							LODsNodePointer,									true)
 		};
 
-		if (!NodeReader->ReadPropertyList(MeshList, 9))
+		if (!NodeReader->ReadPropertyList(MeshList, 10))
 			return false;
 
 		ZEModelResourceMesh* Mesh = Meshes.Add();
@@ -423,6 +428,9 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 		Mesh->Scale = ScaleValue;
 		Mesh->IsVisible = IsVisibleValue;
 		Mesh->IsSkinned = IsSkinnedValue;
+
+		if (UserDefinedPropertiesValue.GetType() == ZE_VRT_STRING)
+			Mesh->UserDefinedProperties = UserDefinedPropertiesValue.GetString();
 
 		NodeReader->SeekPointer(BoundingBoxNodePointer);
 
@@ -759,22 +767,23 @@ bool ZEModelResource::ReadBones(ZEMLSerialReader* NodeReader)
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Bone")
 			continue;
 
-		ZEVariant NameValue, ParentBoneValue, RelativePositionValue, RelativeRotationValue, RelativeScaleValue;
+		ZEVariant NameValue, ParentBoneValue, RelativePositionValue, RelativeRotationValue, RelativeScaleValue, UserDefinedPropertiesValue;
 		ZEMLSerialPointer BoundingBoxNodePointer, PhysicalJointNodePointer, PhysicalBodyNodePointer;
 
 		ZEMLSerialListItem BoneList[] = 
 		{
-			ZEML_LIST_PROPERTY("Name",				NameValue,					ZE_VRT_STRING,		true),
-			ZEML_LIST_PROPERTY("ParentBone",		ParentBoneValue,			ZE_VRT_INTEGER_32,	true),
-			ZEML_LIST_NODE("BoundingBox",			BoundingBoxNodePointer,							true),
-			ZEML_LIST_PROPERTY("RelativePosition",	RelativePositionValue,		ZE_VRT_VECTOR3,		true),
-			ZEML_LIST_PROPERTY("RelativeRotation",	RelativeRotationValue,		ZE_VRT_QUATERNION,	true),
-			ZEML_LIST_PROPERTY("RelativeScale",		RelativeScaleValue,			ZE_VRT_VECTOR3,		true),
-			ZEML_LIST_NODE("PhysicalJoint",			PhysicalJointNodePointer,						true),
-			ZEML_LIST_NODE("PhysicalBody",			PhysicalBodyNodePointer,						false)
+			ZEML_LIST_PROPERTY("Name",					NameValue,					ZE_VRT_STRING,		true),
+			ZEML_LIST_PROPERTY("ParentBone",			ParentBoneValue,			ZE_VRT_INTEGER_32,	true),
+			ZEML_LIST_NODE("BoundingBox",				BoundingBoxNodePointer,							true),
+			ZEML_LIST_PROPERTY("RelativePosition",		RelativePositionValue,		ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("RelativeRotation",		RelativeRotationValue,		ZE_VRT_QUATERNION,	true),
+			ZEML_LIST_PROPERTY("RelativeScale",			RelativeScaleValue,			ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("UserDefinedProperties",	UserDefinedPropertiesValue,	ZE_VRT_STRING,		false),
+			ZEML_LIST_NODE("PhysicalJoint",				PhysicalJointNodePointer,						true),
+			ZEML_LIST_NODE("PhysicalBody",				PhysicalBodyNodePointer,						false)
 		};
 
-		if (!NodeReader->ReadPropertyList(BoneList, 8))
+		if (!NodeReader->ReadPropertyList(BoneList, 9))
 			return false;
 
 		ZEModelResourceBone* Bone = Bones.Add();
@@ -784,6 +793,9 @@ bool ZEModelResource::ReadBones(ZEMLSerialReader* NodeReader)
 		Bone->RelativePosition = RelativePositionValue;
 		Bone->RelativeRotation = RelativeRotationValue;
 		Bone->RelativeScale = RelativeScaleValue;
+
+		if (UserDefinedPropertiesValue.GetType() == ZE_VRT_STRING)
+			Bone->UserDefinedProperties = UserDefinedPropertiesValue.GetString();
 
 		NodeReader->SeekPointer(BoundingBoxNodePointer);
 
@@ -842,19 +854,20 @@ bool ZEModelResource::ReadHelpers(ZEMLSerialReader* NodeReader)
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Helper")
 			continue;
 
-		ZEVariant NameValue, OwnerTypeValue, OwnerIdValue, PositionValue, RotationValue, ScaleValue;
+		ZEVariant NameValue, OwnerTypeValue, OwnerIdValue, PositionValue, RotationValue, ScaleValue, UserDefinedPropertiesValue;
 
 		ZEMLSerialListItem HelperList[] = 
 		{
-			ZEML_LIST_PROPERTY("Name",			NameValue,				ZE_VRT_STRING,		true),
-			ZEML_LIST_PROPERTY("OwnerType",		OwnerTypeValue,			ZE_VRT_INTEGER_32,	true),
-			ZEML_LIST_PROPERTY("OwnerId",		OwnerIdValue,			ZE_VRT_INTEGER_32,	true),
-			ZEML_LIST_PROPERTY("Position",		PositionValue,			ZE_VRT_VECTOR3,		true),
-			ZEML_LIST_PROPERTY("Rotation",		RotationValue,			ZE_VRT_QUATERNION,	true),
-			ZEML_LIST_PROPERTY("Scale",			ScaleValue,				ZE_VRT_VECTOR3,		true)
+			ZEML_LIST_PROPERTY("Name",						NameValue,						ZE_VRT_STRING,		true),
+			ZEML_LIST_PROPERTY("OwnerType",					OwnerTypeValue,					ZE_VRT_INTEGER_32,	true),
+			ZEML_LIST_PROPERTY("OwnerId",					OwnerIdValue,					ZE_VRT_INTEGER_32,	true),
+			ZEML_LIST_PROPERTY("Position",					PositionValue,					ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("Rotation",					RotationValue,					ZE_VRT_QUATERNION,	true),
+			ZEML_LIST_PROPERTY("Scale",						ScaleValue,						ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("UserDefinedProperties",		UserDefinedPropertiesValue,		ZE_VRT_STRING,		false)
 		};
 
-		if (!NodeReader->ReadPropertyList(HelperList, 6))
+		if (!NodeReader->ReadPropertyList(HelperList, 7))
 			return false;
 
 		ZEModelResourceHelper* Helper = Helpers.Add();
@@ -865,6 +878,9 @@ bool ZEModelResource::ReadHelpers(ZEMLSerialReader* NodeReader)
 		Helper->Position = PositionValue;
 		Helper->Rotation = RotationValue;
 		Helper->Scale = ScaleValue;
+
+		if (UserDefinedPropertiesValue.GetType() == ZE_VRT_STRING)
+			Helper->UserDefinedProperties = UserDefinedPropertiesValue.GetString();
 
 		Helper->OwnerType = (ZEModelResourceHelperOwnerType)OwnerTypeValue.GetInt32();
 		Helper->OwnerId = OwnerIdValue;
@@ -1048,7 +1064,7 @@ const ZEArray<ZEModelResourceHelper>& ZEModelResource::GetHelpers() const
 	return Helpers;
 }
 
-const ZEArray<ZEModelResourceAnimation> ZEModelResource::GetAnimations() const
+const ZEArray<ZEModelResourceAnimation>& ZEModelResource::GetAnimations() const
 {
 	return Animations;
 }
