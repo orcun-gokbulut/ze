@@ -57,7 +57,9 @@ void ZELBuffer_SetSpecular(inout ZELBuffer LBuffer, float Specular)
 
 float3 ZELBuffer_GetSpecular(float2 Texcoord)
 {
-	float4 Total = tex2D(LBuffer1, Texcoord);
-	return normalize(Total.rgb) * Total.a;
+	float4 Sample = tex2D(LBuffer1, Texcoord);
+	
+	float Length = length(Sample.rgb);
+	return Length > 0.0f ? (Sample.rgb / Length) * Sample.a : 0.0f;
 }
 

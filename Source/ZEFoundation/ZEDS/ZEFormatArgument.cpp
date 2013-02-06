@@ -40,6 +40,7 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEError.h"
+#include "ZERegEx/TRE/config.h"
 
 #ifdef ZE_PLATFORM_UNIX
     #define sprintf_s snprintf
@@ -129,7 +130,7 @@ static bool CheckArgumentFormat(const char* ArgumentFormat)
 
 	while(*ArgumentFormat != 0)
 	{
-		if (!isdigit(*ArgumentFormat) && *ArgumentFormat != '.' && *ArgumentFormat != '#' && *ArgumentFormat != '.' && *ArgumentFormat != '-' && *ArgumentFormat != '+')
+		if (!isdigit(*ArgumentFormat) && *ArgumentFormat != ' ' && *ArgumentFormat != '#' && *ArgumentFormat != '.' && *ArgumentFormat != '-' && *ArgumentFormat != '+')
 			return false;
 		ArgumentFormat++;
 	}
@@ -142,10 +143,10 @@ static void PrintFloat(ZEStringWriter& Output, float Argument, const char* Forma
 	char Temp[256];
 	char Format[256];
 	if (FormattingOptions == NULL)
-		sprintf_s(Format, 256, "%%f");
+		snprintf(Format, 256, "%%f");
 	else
-		sprintf_s(Format, 256, "%%%sf", FormattingOptions);
-	sprintf_s(Temp, 256, Format, Argument);
+		snprintf(Format, 256, "%%%sf", FormattingOptions);
+	snprintf(Temp, 256, Format, Argument);
 	Output.Append(Temp);
 }
 
@@ -167,10 +168,10 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt Argument, const char
 	char Temp[256];
 	char Format[256];
 	if (FormattingOptions == NULL)
-		sprintf_s(Format, 256, "%%%s", Type);
+		snprintf(Format, 256, "%%%s", Type);
 	else
-		sprintf_s(Format, 256, "%%%s%s", FormattingOptions, Type);
-	sprintf_s(Temp, 256, Format, Argument);
+		snprintf(Format, 256, "%%%s%s", FormattingOptions, Type);
+	snprintf(Temp, 256, Format, Argument);
 	Output.Append(Temp);
 
 	return true;
@@ -198,10 +199,10 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt Argument, const cha
 	char Temp[256];
 	char Format[256];
 	if (FormattingOptions == NULL)
-		sprintf_s(Format, 256, "%%%s", Type);
+		snprintf(Format, 256, "%%%s", Type);
 	else
-		sprintf_s(Format, 256, "%%%s%s", FormattingOptions, Type);
-	sprintf_s(Temp, 256, Format, Argument);
+		snprintf(Format, 256, "%%%s%s", FormattingOptions, Type);
+	snprintf(Temp, 256, Format, Argument);
 	Output.Append(Temp);
 
 	return true;
@@ -233,10 +234,10 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt64 Argument,	const ch
 	char Temp[256];
 	char Format[256];
 	if (FormattingOptions == NULL)
-		sprintf_s(Format, 256, "%%%s", InnerType);
+		snprintf(Format, 256, "%%%s", InnerType);
 	else
-		sprintf_s(Format, 256, "%%%s%s", FormattingOptions, InnerType);
-	sprintf_s(Temp, 256, Format, Argument);
+		snprintf(Format, 256, "%%%s%s", FormattingOptions, InnerType);
+	snprintf(Temp, 256, Format, Argument);
 	Output.Append(Temp);
 
 	return true;
@@ -268,10 +269,10 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt64 Argument, const c
 	char Temp[256];
 	char Format[256];
 	if (FormattingOptions == NULL)
-		sprintf_s(Format, 256, "%%%s", InnerType);
+		snprintf(Format, 256, "%%%s", InnerType);
 	else
-		sprintf_s(Format, 256, "%%%s%s", FormattingOptions, InnerType);
-	sprintf_s(Temp, 256, Format, Argument);
+		snprintf(Format, 256, "%%%s%s", FormattingOptions, InnerType);
+	snprintf(Temp, 256, Format, Argument);
 	Output.Append(Temp);
 
 	return true;
@@ -291,10 +292,10 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, float Argument, const char
 	char Temp[256];
 	char Format[256];
 	if (FormattingOptions == NULL)
-		sprintf_s(Format, 256, "%%f");
+		snprintf(Format, 256, "%%f");
 	else
-		sprintf_s(Format, 256, "%%%sf", FormattingOptions);
-	sprintf_s(Temp, 256, Format, Argument);
+		snprintf(Format, 256, "%%%sf", FormattingOptions);
+	snprintf(Temp, 256, Format, Argument);
 	Output.Append(Temp);
 
 	return true;
@@ -507,9 +508,18 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix4x4& Argumen
 	PrintFloat(Output, Argument.M32, FormattingOptions);
 	Output.Append(Comma);
 	PrintFloat(Output, Argument.M33, FormattingOptions);
-	Output.Append(PostFix);
+	Output.Append(Comma);
 	PrintFloat(Output, Argument.M34, FormattingOptions);
-	
+
+	Output.Append(Seperator);
+
+	PrintFloat(Output, Argument.M41, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M42, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M43, FormattingOptions);
+	Output.Append(Comma);
+	PrintFloat(Output, Argument.M44, FormattingOptions);	
 	Output.Append(PostFix);
 
 	return true;

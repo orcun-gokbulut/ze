@@ -49,6 +49,7 @@
 #include "ZEModelAnimation.h"
 #include "ZEModelAnimationTrack.h"
 #include "ZEModelIKChain.h"
+#include "ZEGame/ZEDrawStatistics.h"
 
 class ZEQuaternion;
 class ZEMatrix4x4;
@@ -74,6 +75,8 @@ class ZEModel : public ZEEntity
 		ZEArray<ZEModelBone*>				Skeleton;
 		ZEArray<ZERenderCommand>			LODRenderCommands;
 		
+		ZEModelStatistics					Statistics;
+
 		ZEArray<ZEModelMesh>				Meshes;
 		ZEArray<ZEModelBone>				Bones;
 		ZEArray<ZEModelHelper>				Helpers;
@@ -114,6 +117,7 @@ class ZEModel : public ZEEntity
 		
 		void								LoadModelResource();
 
+	protected:
 											ZEModel();
 		virtual								~ZEModel();
 
@@ -121,6 +125,8 @@ class ZEModel : public ZEEntity
 		ZEArray<ZEModelIKChain>				IKChains;
 
 		virtual	ZEDrawFlags					GetDrawFlags() const;
+
+		virtual const ZEModelStatistics&	GetStatistics() const;
 
 		virtual const ZEAABBox&				GetWorldBoundingBox();
 
@@ -139,6 +145,7 @@ class ZEModel : public ZEEntity
 		const ZEArray<ZEModelAnimation>*	GetAnimations();
 
 		ZEModelBone*						GetBone(const char* Name);
+		ZEModelMesh*						GetMesh(ZESize Index);
 		ZEModelMesh*						GetMesh(const char* Name);
 		ZEModelHelper*						GetHelper(const char* Name);
 

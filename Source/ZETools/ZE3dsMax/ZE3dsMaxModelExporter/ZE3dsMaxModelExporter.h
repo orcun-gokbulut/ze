@@ -70,8 +70,8 @@ class ZE3dsMaxModelExporter : public SceneExport
 		Tab<IGameNode*>				ProcessedHelpers;
 		Tab<IGameMaterial*>			ProcessedMaterials;
 
-		ZEInt						TotalFrameCount;
-		ZEInt						TicksPerFrame;
+		ZEInt32						TotalFrameCount;
+		ZEInt32						TicksPerFrame;
 
 		void						CollectResources();
 		void						LoadOptions(const char* FilePath);
@@ -81,7 +81,7 @@ class ZE3dsMaxModelExporter : public SceneExport
 
 		bool						ProcessBone(IGameNode* Node, ZEMLNode* BonesNode);
 		bool						ProcessBones();
-		ZEInt						ProcessMeshMaterial(IGameMaterial* Material);
+		ZEInt32						ProcessMeshMaterial(IGameMaterial* Material);
 		bool						ProcessMaterials(const char* FileName);
 		bool						ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* MeshLODNode);
 		void						ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* ShapeNode);
@@ -96,11 +96,11 @@ class ZE3dsMaxModelExporter : public SceneExport
 		bool						ProcessHelpers();
 		bool						ProcessHelper(IGameNode* Node, ZEMLNode* HelpersNode);
 
-		ZEInt						GetBoneId(IGameNode* Node);
-		ZEInt						GetMeshId(IGameNode* Node);
+		ZEInt32						GetBoneId(IGameNode* Node);
+		ZEInt32						GetMeshId(IGameNode* Node);
 
 	protected:
-		ZEInt						GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
+		ZEInt32						GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
 
 	public:
 		

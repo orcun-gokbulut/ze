@@ -104,7 +104,7 @@ void ZE3dsMaxModelExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 
 		for (ZESize I = 0; I < Animations.GetCount(); I++)
 		{
-			ZEInt ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
+			ZEInt32 ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
 
 			QStringList List;
 			List << ((ZEMLProperty*)Animations[I]->GetProperty("Name"))->GetValue().GetString().ToCString() 
@@ -175,9 +175,9 @@ void ZE3dsMaxModelExporterOptionsDialog::SetExportMeshesEnabled(bool IsChecked)
 void ZE3dsMaxModelExporterOptionsDialog::AddAnimation()
 {
 
-	ZEInt ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
+	ZEInt32 ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
 
-	for (ZEInt I = 0; I < ItemCount; I++)
+	for (ZEInt32 I = 0; I < ItemCount; I++)
 		if (Form->AnimationTreeWidget->topLevelItem(I)->text(0) == "Default")
 			return;
 
@@ -194,7 +194,7 @@ void ZE3dsMaxModelExporterOptionsDialog::RemoveAnimation()
 	if(Form->AnimationTreeWidget->currentItem() == NULL)
 		return;
 
-	ZEInt IndexOfItem = Form->AnimationTreeWidget->indexOfTopLevelItem(Form->AnimationTreeWidget->currentItem());
+	ZEInt32 IndexOfItem = Form->AnimationTreeWidget->indexOfTopLevelItem(Form->AnimationTreeWidget->currentItem());
 	Form->AnimationTreeWidget->takeTopLevelItem(IndexOfItem);
 }
 
@@ -212,13 +212,13 @@ void ZE3dsMaxModelExporterOptionsDialog::CollectOptionsFromForm()
 		Options->AddProperty("IsMeshPhysicalBodyExportEnabled", Form->ckbExportMeshPhysicalBodies->isChecked());
 		Options->AddProperty("IsAnimationExportEnabled", Form->grpExportAnimations->isChecked());
 		
-		ZEInt ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
+		ZEInt32 ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
 
 		if (ItemCount > 0)
 		{
 			ZEMLNode* AnimationsNode = Options->AddSubNode("Animations");
 
-			for (ZEInt I = 0; I < ItemCount; I++)
+			for (ZEInt32 I = 0; I < ItemCount; I++)
 			{
 				ZEMLNode* Animation = AnimationsNode->AddSubNode("Animation");
 				Animation->AddProperty("Name", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(0).toUtf8());
@@ -272,13 +272,13 @@ void ZE3dsMaxModelExporterOptionsDialog::CollectOptionsFromForm()
 		if (Options->GetSubNodes("Animations").GetCount() != 0)
 			Options->RemoveItem(Options->GetSubNodes("Animations").GetFirstItem());
 
-		ZEInt ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
+		ZEInt32 ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
 
 		if (ItemCount > 0)
 		{
 			ZEMLNode* AnimationsNode = Options->AddSubNode("Animations");
 
-			for (ZEInt I = 0; I < ItemCount; I++)
+			for (ZEInt32 I = 0; I < ItemCount; I++)
 			{
 				ZEMLNode* Animation = AnimationsNode->AddSubNode("Animation");
 				Animation->AddProperty("Name", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(0).toUtf8());

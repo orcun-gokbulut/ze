@@ -57,6 +57,9 @@ class ZEPluginManager
 		bool								RegisterPlugin(ZEPlugin* Plugin);
 		void								UnregisterPlugin(ZEPlugin* Plugin);
 
+		void								LoadExternalPlugins(ZEString& Path, bool Recursive = true);
+
 		static ZEPluginManager*				GetInstance();
 };
+
 #endif

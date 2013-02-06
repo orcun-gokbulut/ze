@@ -103,7 +103,7 @@ ZEUIInteriorStatisticsControl::ZEUIInteriorStatisticsControl()
 	TotalRoomCount->SetWidth(250.0f);
 	TotalRoomCount->SetHeight(25.0f);
 	TotalRoomCount->SetPosition(ZEVector2(0.0f, 0.0f));
-	TotalRoomCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	TotalRoomCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	TotalRoomCount->SetTextColor(ZEVector4::One);
 	AddChildControl(TotalRoomCount);
 
@@ -111,7 +111,7 @@ ZEUIInteriorStatisticsControl::ZEUIInteriorStatisticsControl()
 	CulledRoomCount->SetWidth(250.0f);
 	CulledRoomCount->SetHeight(25.0f);
 	CulledRoomCount->SetPosition(ZEVector2(0.0f, 25.0f));
-	CulledRoomCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	CulledRoomCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	CulledRoomCount->SetTextColor(ZEVector4::One);
 	AddChildControl(CulledRoomCount);
 
@@ -119,7 +119,7 @@ ZEUIInteriorStatisticsControl::ZEUIInteriorStatisticsControl()
 	DrawedRoomCount->SetWidth(250.0f);
 	DrawedRoomCount->SetHeight(25.0f);
 	DrawedRoomCount->SetPosition(ZEVector2(0.0f, 50.0f));
-	DrawedRoomCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	DrawedRoomCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	DrawedRoomCount->SetTextColor(ZEVector4::One);
 	AddChildControl(DrawedRoomCount);
 
@@ -127,7 +127,7 @@ ZEUIInteriorStatisticsControl::ZEUIInteriorStatisticsControl()
 	TotalPolygonCount->SetWidth(250.0f);
 	TotalPolygonCount->SetHeight(25.0f);
 	TotalPolygonCount->SetPosition(ZEVector2(0.0f, 100.0f));
-	TotalPolygonCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	TotalPolygonCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	TotalPolygonCount->SetTextColor(ZEVector4::One);
 	AddChildControl(TotalPolygonCount);
 
@@ -135,7 +135,7 @@ ZEUIInteriorStatisticsControl::ZEUIInteriorStatisticsControl()
 	CulledPolygonCount->SetWidth(250.0f);
 	CulledPolygonCount->SetHeight(25.0f);
 	CulledPolygonCount->SetPosition(ZEVector2(0.0f, 125.0f));
-	CulledPolygonCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	CulledPolygonCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	CulledPolygonCount->SetTextColor(ZEVector4::One);
 	AddChildControl(CulledPolygonCount);
 
@@ -143,7 +143,7 @@ ZEUIInteriorStatisticsControl::ZEUIInteriorStatisticsControl()
 	DrawedPolygonCount->SetWidth(250.0f);
 	DrawedPolygonCount->SetHeight(25.0f);
 	DrawedPolygonCount->SetPosition(ZEVector2(0.0f, 150.0f));
-	DrawedPolygonCount->SetFont(ZEFontResource::LoadResource("Arial16.zeFont"));
+	DrawedPolygonCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
 	DrawedPolygonCount->SetTextColor(ZEVector4::One);
 	AddChildControl(DrawedPolygonCount);
 

@@ -155,9 +155,9 @@ BOOL ZE3dsMaxInteriorExporter::SupportsOptions(ZEInt ext, DWORD options)
 	return TRUE;
 }
 
-ZEInt ZE3dsMaxInteriorExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
+ZEInt32 ZE3dsMaxInteriorExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
 {
-	ZEInt i;
+	ZEInt32 i;
 	if (i_currentNode == NULL)
 	{
 		i_currentNode = GetCOREInterface()->GetRootNode();
@@ -233,7 +233,7 @@ bool ZE3dsMaxInteriorExporter::ShowOptionsDialog(HWND ParentWindow)
 		OptionsDialog->SetOptions(ExportOptions);
 
 	WinWidget->showCentered();
-	ZEInt DialogResult = OptionsDialog->exec();
+	ZEInt32 DialogResult = OptionsDialog->exec();
 
 	if(DialogResult == QDialog::Rejected)
 		return false;
@@ -259,7 +259,7 @@ bool ZE3dsMaxInteriorExporter::ShowResourceConfigurationDialog(HWND ParentWindow
 	CollectResources();
 
 	WinWidget->showCentered();
-	ZEInt DialogResult = ResourceConfigurationDialog->Show();
+	ZEInt32 DialogResult = ResourceConfigurationDialog->Show();
 
 	if(DialogResult == QDialog::Rejected)
 		return false;
@@ -309,7 +309,6 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 	}
 	ProgressDialog->CloseTask();
 	
-
 	ProgressDialog->OpenTask("Rooms", true);
 	if (!ProcessRooms())
 	{
@@ -326,6 +325,14 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 	}
 	ProgressDialog->CloseTask();
 
+	ProgressDialog->OpenTask("Helpers", true);
+	if (!ProcessHelpers())
+	{
+		zeError("Can not process helpers.");
+		return false;
+	}
+	ProgressDialog->CloseTask();
+
 	ProgressDialog->OpenTask("Materials", true);
 	if (!ProcessMaterials(name))
 	{
@@ -333,9 +340,10 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 		return false;
 	}
 	ProgressDialog->CloseTask();
-		
-	InteriorNode.AddProperty("DoorCount", (ZEUInt32)Doors.Count());
+	
 	InteriorNode.AddProperty("RoomCount", (ZEUInt32)Rooms.Count());
+	InteriorNode.AddProperty("DoorCount", (ZEUInt32)Doors.Count());
+	InteriorNode.AddProperty("HelperCount", (ZEUInt32)Helpers.Count());
 	InteriorNode.AddProperty("MaterialCount", (ZEUInt32)Materials.Count());
 
 	ProgressDialog->OpenTask("Writing File");

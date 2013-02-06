@@ -604,6 +604,11 @@ ZEVector3 ZEVector3::Saturate() const
 	return Temp;
 }
 
+ZEVector2 ZEVector3::ToVector2(const ZEVector3& Vector)
+{
+	return ZEVector2(Vector.x, Vector.y);
+}
+
 void ZEVector3::SaturateSelf()
 {
 	ZEVector3::Saturate(*this, *this);
@@ -647,6 +652,11 @@ bool ZEVector3::Equals(const ZEVector3& Vector, float Threshold) const
 	return ((ZEMath::Abs(this->x - Vector.x) < Threshold) && 
 		(ZEMath::Abs(this->y - Vector.y) < Threshold) &&
 		(ZEMath::Abs(this->z - Vector.z) < Threshold));
+}
+
+ZEVector2 ZEVector3::ToVector2() const
+{
+	return ZEVector2(x, y);
 }
 
 ZEVector3 ZEVector3::operator+(const ZEVector3 &RightOperand) const
@@ -895,6 +905,16 @@ ZEVector4 ZEVector4::Saturate() const
 	return Temp;
 }
 
+ZEVector2 ZEVector4::ToVector2(const ZEVector4& Vector)
+{
+	return ZEVector2(Vector.x, Vector.y);
+}
+
+ZEVector3 ZEVector4::ToVector3(const ZEVector4& Vector)
+{
+	return ZEVector3(Vector.x, Vector.y, Vector.z);
+}
+
 void ZEVector4::SaturateSelf()
 {
 	ZEVector4::Saturate(*this, *this);
@@ -942,6 +962,16 @@ bool ZEVector4::Equals(const ZEVector4& Vector, float Threshold) const
 		(ZEMath::Abs(this->y - Vector.y) < Threshold) &&
 		(ZEMath::Abs(this->z - Vector.z) < Threshold) &&
 		(ZEMath::Abs(this->w - Vector.w) < Threshold));
+}
+
+ZEVector2 ZEVector4::ToVector2() const
+{
+	return ZEVector2(x, y);
+}
+
+ZEVector3 ZEVector4::ToVector3() const
+{
+	return ZEVector3(x, y, z);
 }
 
 ZEVector4 ZEVector4::operator+(const ZEVector4 &RightOperand) const

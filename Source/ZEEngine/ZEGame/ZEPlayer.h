@@ -72,7 +72,7 @@ class ZEPlayer : public ZEActor
 		ZEInputMap				InputMap;
 		ZECamera*				Camera;
 		ZEListener*				Listener;
-		ZEProjectiveLight*		Light;
+		//ZEProjectiveLight*		Light;
 
 		float					FOV;
 

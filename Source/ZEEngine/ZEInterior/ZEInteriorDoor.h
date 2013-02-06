@@ -43,7 +43,7 @@
 
 class ZEInterior;
 class ZEInteriorRoom;
-struct ZEInteriorDoorResource;
+struct ZEInteriorResourceDoor;
 class ZESimpleMaterial;
 class ZECanvas;
 class ZERenderer;
@@ -54,8 +54,8 @@ class ZEInteriorDoor
 	friend class ZEInterior;
 
 	private:
-		ZEInterior*					Owner;
-		const ZEInteriorDoorResource*	Resource;
+		ZEInterior*						Owner;
+		const ZEInteriorResourceDoor*	Resource;
 
 		ZERectangle3D					Rectangle;
 		float							Width;
@@ -85,7 +85,7 @@ class ZEInteriorDoor
 										ZEInteriorDoor();
 
 	public:
-		ZEInterior*					GetOwner();
+		ZEInterior*						GetOwner();
 
 		const char*						GetName();
 
@@ -104,7 +104,7 @@ class ZEInteriorDoor
 		void							SetSeenThrough(bool Value);
 		bool							GetSeenThrough();
 
-		void							Initialize(ZEInterior* Owner, const ZEInteriorDoorResource* Resource);
+		void							Initialize(ZEInterior* Owner, const ZEInteriorResourceDoor* Resource);
 		void							Deinitialize();
 
 		void							SetOpen(bool Open);

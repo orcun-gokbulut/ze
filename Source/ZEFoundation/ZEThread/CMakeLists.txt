@@ -57,8 +57,7 @@ ze_add_source(ZEThreadTests.cpp			Tests)
 ze_add_library(ZEThread
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation 
-	INSTALL)
+	LIBS ZEFoundation)
 
 ze_add_test(ZEThreadTests
 	SOURCES ${Tests}

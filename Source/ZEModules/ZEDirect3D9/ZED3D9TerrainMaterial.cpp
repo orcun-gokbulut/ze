@@ -194,7 +194,8 @@ bool ZED3D9TerrainMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 
 	GetDevice()->SetSamplerState(D3DVERTEXTEXTURESAMPLER0, D3DSAMP_BORDERCOLOR, 0x00);
 	ZED3D9CommonTools::SetTexture(D3DVERTEXTEXTURESAMPLER0, HeightTexture, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
-	ZED3D9CommonTools::SetTexture(4, ColorTexture, D3DTEXF_LINEAR, D3DTEXF_POINT, D3DTADDRESS_BORDER);
+	ZED3D9CommonTools::SetTexture(4, ColorTexture, D3DTEXF_ANISOTROPIC, D3DTEXF_ANISOTROPIC, D3DTADDRESS_BORDER);
+	GetDevice()->SetSamplerState(4, D3DSAMP_MAXANISOTROPY, 4);
 
 	GetDevice()->SetPixelShader(ForwardPassPixelShader->GetPixelShader());
 	GetDevice()->SetVertexShader(ForwardPassVertexShader->GetVertexShader());

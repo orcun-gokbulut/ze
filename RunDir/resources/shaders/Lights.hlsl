@@ -33,38 +33,63 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <Shadow.hlsl>
-
 //* Vertex Shader Constants
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Vertex Transformation
-float4x4 WorldViewMatrix : register(vs, c4);
-float4x4 WorldViewProjMatrix : register(vs, c8);
+float4x4 InvProjMatrix			: register(vs, c0);
+float4x4 WorldViewMatrix		: register(vs, c4);
+float4x4 WorldViewProjMatrix	: register(vs, c8);
 
 // Light Parameters
-float4 LightParameters0 : register(ps, c0);
-float4 LightParameters1 : register(ps, c1);
-float4 LightParameters2 : register(ps, c2);
-float4 LightParameters3 : register(ps, c3);
-float4 ScreenToTextureParams : register(ps, c5);
+float4 LightParameters0			: register(ps, c0);
+float4 LightParameters1			: register(ps, c1);
+float4 LightParameters2			: register(ps, c2);
+float4 LightParameters3			: register(ps, c3);
+float4 ScreenToTextureParams	: register(ps, c5);
 
 #define LightPositionParam			LightParameters0.xyz
 #define LightRange					LightParameters0.w
 #define LightColorParam				LightParameters1.xyz
 #define LightIntensityParam			LightParameters1.w
 #define LightAttenuationParam		LightParameters2.xyz
+#define ShadowVisibleDistance		LightParameters2.w
 #define LightDirectionParam			LightParameters3.xyz
 #define LightFOVParam				LightParameters3.w
 
-float3x3 LightRotationParam : register(ps, c12);
+float3x3 LightRotationParam			: register(ps, c12);
 float4x4 LightProjectionMatrixParam : register(ps, c16);
 
-sampler2D ProjectionMap : register(ps, s2);
-samplerCUBE OmniProjectionMap : register(ps, s3);
-sampler2D ProjectionShadowMap : register(ps, s4);
-samplerCUBE OmniProjectionShadowMap : register(ps, s5);
+sampler2D ProjectionMap				: register(ps, s4);
+samplerCUBE OmniProjectionMap		: register(ps, s5);
 
+// Directional Light parameters
+// ------------------------------------------------------
+#define ZE_MAX_CASCADE_COUNT	4
+
+bool CastShadow									: register(ps, b0);
+float4x4 LightTransforms[ZE_MAX_CASCADE_COUNT]	: register(ps, c90);
+
+float3 CascadeData[ZE_MAX_CASCADE_COUNT]		: register(ps, c118);
+#define	CASCADE_FAR_Z(Index)					CascadeData[Index].x
+#define	CASCADE_NEAR_Z(Index)					CascadeData[Index].y
+#define	CASCADE_DEPTH(Index)					CascadeData[Index].z
+
+float4 ShadowParameters0						: register(ps, c124);
+float4 ShadowParameters1						: register(ps, c125);
+#define DepthScaledBias							ShadowParameters0.x
+#define SlopeScaledBias							ShadowParameters0.y
+#define ShadowDistance							ShadowParameters0.z
+#define ShadowFadeDistance						ShadowParameters0.w
+#define PenumbraScale							ShadowParameters1.x
+#define ShadowMapTexelSize						ShadowParameters1.y
+#define RotationMapTexelSize					ShadowParameters1.z
+
+sampler2D ShadowMaps[ZE_MAX_CASCADE_COUNT]		: register(ps, s6);
+sampler2D RandomRotationMap						: register(ps, s15);
+// ------------------------------------------------------
+
+#include "Shadow.hlsl"
 #include "GBuffer.hlsl"
 #include "LBuffer.hlsl"
 
@@ -72,8 +97,8 @@ samplerCUBE OmniProjectionShadowMap : register(ps, s5);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct ZEPointLight_VSOutput
 {
-	float4 Position : POSITION0;
-	float3 ViewVector : TEXCOORD0;
+	float4 Position		: POSITION0;
+	float3 ViewVector	: TEXCOORD0;
 };
 
 ZEPointLight_VSOutput ZEPointLight_VertexShader(in float4 Position : POSITION0)
@@ -81,7 +106,6 @@ ZEPointLight_VSOutput ZEPointLight_VertexShader(in float4 Position : POSITION0)
 	ZEPointLight_VSOutput Output;
 	
 	Output.Position = mul(WorldViewProjMatrix, Position);
-	
 	Output.ViewVector = ZEGBuffer_GetViewVector(mul(WorldViewMatrix, Position));
 	
 	return Output;
@@ -89,8 +113,8 @@ ZEPointLight_VSOutput ZEPointLight_VertexShader(in float4 Position : POSITION0)
 
 struct ZEPointLight_PSInput
 {
-	float4 ScreenPosition : VPOS;
-	float3 ViewVector : TEXCOORD0;
+	float4 ScreenPosition	: VPOS;
+	float3 ViewVector		: TEXCOORD0;
 };
 
 ZELBuffer ZEPointLight_PixelShader(ZEPointLight_PSInput Input) : COLOR0
@@ -132,7 +156,7 @@ ZELBuffer ZEPointLight_PixelShader(ZEPointLight_PSInput Input) : COLOR0
 			Output.a = 0.0f;
 		}
 	}
-		
+	
 	ZELBuffer_SetDiffuse(LBuffer, Output.rgb);
 	ZELBuffer_SetSpecular(LBuffer, Output.a);
 		
@@ -143,39 +167,83 @@ ZELBuffer ZEPointLight_PixelShader(ZEPointLight_PSInput Input) : COLOR0
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct ZEDirectionalLight_VSOutput
 {
-	float4 Position : POSITION0;
-	float3 ViewVector : TEXCOORD0;
+	float4 Position 	: POSITION0;
+	float3 ViewVector 	: TEXCOORD0;
 };
 
 ZEDirectionalLight_VSOutput ZEDirectionalLight_VertexShader(float4 Position : POSITION0)
 {
 	ZEDirectionalLight_VSOutput Output;
 	
+	// Clip space, screen aligned quad positions.
 	Output.Position = Position;
 
-	Output.ViewVector = ZEGBuffer_GetViewVector(mul(WorldViewMatrix, Position));
+	// Transfrom clip space positions to view space with InvProjMatrix
+	Output.ViewVector = ZEGBuffer_GetViewVector(mul(InvProjMatrix, Position));
 	
 	return Output;
 }
 
 struct ZEDirectionalLight_PSInput
 {
-	float4 ScreenPosition : VPOS;
-	float3 ViewVector : TEXCOORD0;
+	float3 ViewVector 		: TEXCOORD0;
+	float4 ScreenPosition 	: VPOS;
 };
+
+float ZEDirectionalLight_CalculateFilterScale(float ViewDepth, int CascadeIndex)
+{
+	float FilterScale = (PenumbraScale / pow(2.0f, (float)CascadeIndex)) * (1.0f - (CascadeIndex / ZE_MAX_CASCADE_COUNT));
+	//float FilterScale = PenumbraScale * (CASCADE_DEPTH(CascadeIndex) / ShadowDistance);
+	return clamp(FilterScale, 0.4f, PenumbraScale);
+}
+
+float ZEDirectionalLight_GetShadowFactor(float3 PixelViewPos, float3 PixelViewNormal, float2 ScreenPos, float AngularAttenuation)
+{
+	float ShadowFactor = 0.0f;
+	if (CastShadow)
+	{
+		float DepthFactor = PixelViewPos.z / ShadowDistance;
+		float SlopeFactor = 1.0f - saturate(AngularAttenuation);
+		float NormalOffset = SlopeFactor *  SlopeScaledBias + DepthFactor * DepthScaledBias;
+		float3 PixelBiasedPos = PixelViewPos + PixelViewNormal * NormalOffset;
+		
+		for (int CascadeN = 0; CascadeN < ZE_MAX_CASCADE_COUNT; CascadeN++)
+		{
+			if (PixelViewPos.z <= CASCADE_FAR_Z(CascadeN))
+			{
+				float4 TexSpacePos = mul(LightTransforms[CascadeN], float4(PixelBiasedPos, 1.0f));
+				float FilterScale = ZEDirectionalLight_CalculateFilterScale(PixelViewPos.z, CascadeN);
+				float2 RotationMapCoord = RotationMapTexelSize * ScreenPos;
+	
+				ShadowFactor = SampleShadowMap(ShadowMaps[CascadeN], TexSpacePos.xy, ShadowMapTexelSize, TexSpacePos.z, RandomRotationMap, RotationMapCoord, FilterScale);
+				break;
+			}
+		}
+		
+		// Calculate fade out factor
+		float FadeFactor = (ShadowDistance - PixelViewPos.z) / ShadowFadeDistance;
+		ShadowFactor *= saturate(FadeFactor);
+		
+		if (ShadowFactor >= 0.995f)
+			discard;
+	}
+	return ShadowFactor;
+}
 
 ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input) : COLOR0
 {
-	ZELBuffer LBuffer = (ZELBuffer)0;
-		
-	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
+	ZELBuffer LBuffer = (ZELBuffer)0.0f;
+	
+	float2 ScreenPosition = Input.ScreenPosition.xy * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
 	float3 Position = ZEGBuffer_GetViewPosition(ScreenPosition, Input.ViewVector);
 	float3 Normal = ZEGBuffer_GetViewNormal(ScreenPosition);
 	float3 SpecularPower = ZEGBuffer_GetSpecularPower(ScreenPosition);
-
-	// Light Derived Parameters
-	float4 Output;
 	float AngularAttenuation = dot(LightDirectionParam, Normal);
+	
+	float ShadowFactor = ZEDirectionalLight_GetShadowFactor(Position, Normal, Input.ScreenPosition.xy, AngularAttenuation);
+	
+	// Light Derived Parameters
+	float4 Output = (float4)0.0f;
 	if (AngularAttenuation > 0.0f)
 	{
 		float3 ViewDirection = normalize(-Position);
@@ -184,17 +252,18 @@ ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input) : COL
 		Output.rgb = LightIntensityParam * LightColorParam;
 		Output.a = pow(dot(Normal, HalfVector), SpecularPower);
 		Output *= AngularAttenuation;
+		Output *= (1.0f - ShadowFactor);
 	}
 	else
 	{
 		float SubSurfaceScatteringFactor = ZEGBuffer_GetSubSurfaceScatteringFactor(ScreenPosition);
 		if (SubSurfaceScatteringFactor > 0.0f)
 		{
-			Output.rgb = SubSurfaceScatteringFactor * -AngularAttenuation * LightIntensityParam * LightColorParam;
+			Output.rgb = SubSurfaceScatteringFactor * -AngularAttenuation * LightIntensityParam * LightColorParam * (1.0f - ShadowFactor);
 			Output.a = 0.0f;
 		}
 	}
-				
+	
 	ZELBuffer_SetDiffuse(LBuffer, Output.rgb);
 	ZELBuffer_SetSpecular(LBuffer, Output.a);
 

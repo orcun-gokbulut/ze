@@ -10,7 +10,7 @@ HelperAttributes = attributes ZEHelperAttributes
 	rollout ZEHelperRollout "ZE Helper Parameters" rolledUp:false
 	(
 		/* PICK FILTERS */
-		fn HelperFilter obj = (isProperty obj "ZEMeshAttributes" == true or isProperty obj "ZEBoneAttributes" == true) and $ != obj
+		fn HelperFilter obj = (isProperty obj "ZEMeshAttributes" == true or isProperty obj "ZEBoneAttributes" == true or isProperty obj "ZEInteriorRoomAttributes" == true) and $ != obj
 		
 		/* LAYOUT DEFINITION */
 		bitmap				uiLogo							fileName:"zineklogo.bmp"

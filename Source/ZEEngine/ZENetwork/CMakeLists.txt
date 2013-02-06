@@ -37,13 +37,22 @@ cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZENetworkModule.cpp					Sources)
 ze_add_source(ZENetworkModule.h						Sources Headers)
-ze_add_source(ZEUDPClient.cpp						Sources)
-ze_add_source(ZEUDPClient.h							Sources Headers)
-ze_add_source(ZEUDPServer.cpp						Sources)
-ze_add_source(ZEUDPServer.h							Sources Headers)
+ze_add_source(ZEPacketHandler.cpp					Sources)
+ze_add_source(ZEPacketHandler.h						Sources Headers)
+ze_add_source(ZEPacketManagerServer.cpp					Sources)
+ze_add_source(ZEPacketManagerServer.h						Sources Headers)
+ze_add_source(ZEConnection.cpp						Sources)
+ze_add_source(ZEConnection.h						Sources Headers)
+ze_add_source(ZEConnectionTCP.cpp					Sources)
+ze_add_source(ZEConnectionTCP.h						Sources Headers)
+ze_add_source(ZEPacketManagerBuffer.cpp				Sources)
+ze_add_source(ZEPacketManagerBuffer.h				Sources Headers)
+ze_add_source(ZEServer.cpp							Sources)
+ze_add_source(ZEServer.h							Sources Headers)
+ze_add_source(ZEClient.cpp							Sources)
+ze_add_source(ZEClient.h							Sources Headers)
 
 ze_add_library(ZENetwork 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation ws2_32
-	INSTALL)
+	LIBS ZEFoundation ws2_32.lib)

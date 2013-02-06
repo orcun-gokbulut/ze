@@ -56,12 +56,17 @@ ZEInt Compare(const ZEInt *F, const ZEInt *E)
 };
 
 
-
 ZETestSuite(ZEArray)
 {
 	ZETest("~ZEArray()")
 	{
+		ZEArray<ZEInt> Array;
+		Array.Add(1);
+		Array.Add(2);
+		Array.Add(3);
+		ZETestCheckEqual(Array.GetCount(), 3);
 
+		Array.~ZEArray();
 	}
 
 	ZETest("inline Type* Add()")
@@ -200,7 +205,7 @@ ZETestSuite(ZEArray)
 		}
 	}
 
-	ZETest("inline ZEInt BinarySearch(const Type& Element, ZEInt (*CompareFunction)(Type*, Type*))")
+	ZETest("inline ZESSize BinarySearch(const Type& Element, ZEInt (*CompareFunction)(Type*, Type*))")
 	{
 		ZEArray<ZEInt> Array;
 
@@ -213,31 +218,68 @@ ZETestSuite(ZEArray)
 
 		const ZEInt Element = 20;
 
-		ZEInt Result = Array.BinarySearch(Element, &Compare);
+		ZESSize Result = Array.BinarySearch(Element, &Compare);
 		ZETestCheckEqual(Result, 4);
+
+		ZETestCase("for ChunkArray")
+		{
+			ZEChunkArray<ZEInt, 6> ChunkArray;
+
+			ChunkArray.Add(0);
+			ChunkArray.Add(5);
+			ChunkArray.Add(10);
+			ChunkArray.Add(15);
+			ChunkArray.Add(20);
+			ChunkArray.Add(25);
+
+			const ZEInt Item = 15;
+
+			Result = ChunkArray.BinarySearch(Item, &Compare);
+			ZETestCheckEqual(Result, 3);
+		}
+
+		ZETestCase("for SmartArray")
+		{
+			ZESmartArray<ZEInt, 6> SmartArray;
+
+			SmartArray.Add(0);
+			SmartArray.Add(5);
+			SmartArray.Add(10);
+			SmartArray.Add(15);
+			SmartArray.Add(20);
+			SmartArray.Add(25);
+
+			const ZEInt Item = 25;
+
+			Result = SmartArray.BinarySearch(Item, &Compare);
+			ZETestCheckEqual(Result, 5);
+		}
 	}
 
-	ZETest("inline ZESize Circular(ZEInt Index) const")
+	ZETest("inline ZESize Circular(ZESSize Index) const")
 	{
 		ZEArray<ZEInt> Array;
 
 		Array.Add(1);
 		Array.Add(2);
 		Array.Add(3);
-		
+
+		ZESSize Index;
+		ZESize Result;
+
 		ZETestCase("for Index < 0")
 		{
-			ZEInt Index = -5;
+			Index = -5;
 
-			ZESize Result = Array.Circular(Index);
+			Result = Array.Circular(Index);
 			ZETestCheckEqual(Result, 1);
 		}
 
 		ZETestCase("for Index > 0")
 		{
-			ZEInt Index = 5;
+			Index = 5;
 
-			ZESize Result = Array.Circular(Index);
+			Result = Array.Circular(Index);
 			ZETestCheckEqual(Result, 2);
 		}
 
@@ -253,9 +295,9 @@ ZETestSuite(ZEArray)
 			ZETestCheckEqual(ChunkArray.GetCount(), 4);
 			ZETestCheckEqual(ChunkArray.GetSize(), 6);
 
-			ZEInt Index = -4;
+			Index = -4;
 
-			ZESize Result = ChunkArray.Circular(Index);
+			Result = ChunkArray.Circular(Index);
 			ZETestCheckEqual(Result, 0);
 
 			Index = 4;
@@ -278,9 +320,9 @@ ZETestSuite(ZEArray)
 			ZETestCheckEqual(SmartArray.GetCount(), 4);
 			ZETestCheckEqual(SmartArray.GetSize(), 12);
 
-			ZEInt Index = -4;
+			Index = -4;
 
-			ZESize Result = SmartArray.Circular(Index);
+			Result = SmartArray.Circular(Index);
 			ZETestCheckEqual(Result, 0);
 
 			Index = 4;
@@ -431,6 +473,8 @@ ZETestSuite(ZEArray)
 			ChunkArray.CopyFrom(OtherChunkArray.GetCArray(), 2);
 
 			ZETestCheckEqual(ChunkArray.GetCount(), 2);
+			ZETestCheckEqual(ChunkArray[0], 4);
+			ZETestCheckEqual(ChunkArray[1], 5);
 			ZETestCheckEqual(ChunkArray.GetSize(), 3);
 			ZETestCheckEqual(OtherChunkArray.GetSize(), 3);
 		}
@@ -452,6 +496,8 @@ ZETestSuite(ZEArray)
 			SmartArray.CopyFrom(OtherSmartArray.GetCArray(), 2);
 
 			ZETestCheckEqual(SmartArray.GetCount(), 2);
+			ZETestCheckEqual(SmartArray[0], 4);
+			ZETestCheckEqual(SmartArray[1], 5);
 			ZETestCheckEqual(SmartArray.GetSize(), 3);
 			ZETestCheckEqual(OtherSmartArray.GetSize(), 3);
 		}
@@ -492,6 +538,8 @@ ZETestSuite(ZEArray)
 			ChunkArray.CopyFrom(OtherChunkArray);
 
 			ZETestCheckEqual(ChunkArray.GetCount(), 2);
+			ZETestCheckEqual(ChunkArray[0], 4);
+			ZETestCheckEqual(ChunkArray[1], 5);
 			ZETestCheckEqual(ChunkArray.GetSize(), 4);
 			ZETestCheckEqual(OtherChunkArray.GetSize(), 2);
 		}
@@ -513,7 +561,9 @@ ZETestSuite(ZEArray)
 			SmartArray.CopyFrom(OtherSmartArray);
 
 			ZETestCheckEqual(SmartArray.GetCount(), 2);
-			ZETestCheckEqual(SmartArray.GetSize(), 6); //4
+			ZETestCheckEqual(SmartArray[0], 4);
+			ZETestCheckEqual(SmartArray[1], 5);
+			ZETestCheckEqual(SmartArray.GetSize(), 4); //6
 			ZETestCheckEqual(OtherSmartArray.GetSize(), 2);
 		}
 	}
@@ -537,6 +587,58 @@ ZETestSuite(ZEArray)
 		ZETestCheckEqual(OtherArray[0], 1);
 		ZETestCheckEqual(OtherArray[1], 2);
 		ZETestCheckEqual(OtherArray[2], 6);
+
+		ZETestCase("for ChunkArray")
+		{
+			ZEChunkArray<ZEInt, 2> ChunkArray;
+
+			ChunkArray.Add(1);
+			ChunkArray.Add(2);
+			ChunkArray.Add(3);
+			ZETestCheckEqual(ChunkArray.GetSize(), 4);
+
+			ZEChunkArray<ZEInt, 2> OtherChunkArray;
+
+			OtherChunkArray.Add(4);
+			OtherChunkArray.Add(5);
+			OtherChunkArray.Add(6);
+			OtherChunkArray.Add(7);
+			ZETestCheckEqual(OtherChunkArray.GetSize(), 4);
+
+			ChunkArray.CopyTo(OtherChunkArray.GetCArray(), 2);
+			ZETestCheckEqual(OtherChunkArray.GetCount(), 4);
+			ZETestCheckEqual(OtherChunkArray[0], 1);
+			ZETestCheckEqual(OtherChunkArray[1], 2);
+			ZETestCheckEqual(OtherChunkArray[2], 6);
+			ZETestCheckEqual(OtherChunkArray[3], 7);
+			ZETestCheckEqual(OtherChunkArray.GetSize(), 4);
+		}
+
+		ZETestCase("for SmartArray")
+		{
+			ZESmartArray<ZEInt, 2> SmartArray;
+
+			SmartArray.Add(1);
+			SmartArray.Add(2);
+			SmartArray.Add(3);
+			ZETestCheckEqual(SmartArray.GetSize(), 6);
+
+			ZESmartArray<ZEInt, 2>OtherSmartArray;
+
+			OtherSmartArray.Add(4);
+			OtherSmartArray.Add(5);
+			OtherSmartArray.Add(6);
+			OtherSmartArray.Add(7);
+			ZETestCheckEqual(OtherSmartArray.GetSize(), 6);
+
+			SmartArray.CopyTo(OtherSmartArray.GetCArray(), 2);
+			ZETestCheckEqual(OtherSmartArray.GetCount(), 4);
+			ZETestCheckEqual(OtherSmartArray[0], 1);
+			ZETestCheckEqual(OtherSmartArray[1], 2);
+			ZETestCheckEqual(OtherSmartArray[2], 6);
+			ZETestCheckEqual(OtherSmartArray[3], 7);
+			ZETestCheckEqual(OtherSmartArray.GetSize(), 6);
+		}
 	}
 
 	ZETest("void CopyTo(ZEArray<Type, Allocator_>& OtherArray) const")
@@ -580,6 +682,9 @@ ZETestSuite(ZEArray)
 			ChunkArray.CopyTo(OtherChunkArray);
 
 			ZETestCheckEqual(OtherChunkArray.GetCount(), 3);
+			ZETestCheckEqual(OtherChunkArray[0], 1);
+			ZETestCheckEqual(OtherChunkArray[1], 2);
+			ZETestCheckEqual(OtherChunkArray[2], 3);
 			ZETestCheckEqual(OtherChunkArray.GetSize(), 4);
 		}
 
@@ -603,9 +708,11 @@ ZETestSuite(ZEArray)
 			SmartArray.CopyTo(OtherSmartArray);
 
 			ZETestCheckEqual(OtherSmartArray.GetCount(), 3);
+			ZETestCheckEqual(OtherSmartArray[0], 1);
+			ZETestCheckEqual(OtherSmartArray[1], 2);
+			ZETestCheckEqual(OtherSmartArray[2], 3);
 			ZETestCheckEqual(OtherSmartArray.GetSize(), 6);
 		}
-
 	}
 
 	ZETest("inline void DeleteAt(ZESize Index)")
@@ -648,7 +755,7 @@ ZETestSuite(ZEArray)
 			SmartArray.DeleteAt(1);
 
 			ZETestCheckEqual(SmartArray.GetCount(), 2);
-			ZETestCheckEqual(SmartArray.GetSize(), 6); //4
+			ZETestCheckEqual(SmartArray.GetSize(), 4); //6
 		}
 	}
 
@@ -695,7 +802,7 @@ ZETestSuite(ZEArray)
 			SmartArray.DeleteValue(2);
 
 			ZETestCheckEqual(SmartArray.GetCount(), 2);
-			ZETestCheckEqual(SmartArray.GetSize(), 6); //4
+			ZETestCheckEqual(SmartArray.GetSize(), 4); //6
 		}
 	}
 
@@ -803,10 +910,10 @@ ZETestSuite(ZEArray)
 		ZEInt Value1 = 2;
 		ZEInt Value2 = 5;
 
-		bool Result1 = Array.Exists(Value1);
-		bool Result2 = Array.Exists(Value2);
-		ZETestCheckEqual(Result1, true);
-		ZETestCheckEqual(Result2, false);
+		bool Exist = Array.Exists(Value1);
+		ZETestCheck(Exist);
+		Exist = Array.Exists(Value2);		
+		ZETestCheck(!Exist);
 
 		ZETestCase("for ChunkArray")
 		{
@@ -821,10 +928,10 @@ ZETestSuite(ZEArray)
 			ZEInt Value1 = 2;
 			ZEInt Value2 = 5;
 
-			bool Result1 = ChunkArray.Exists(Value1);
-			bool Result2 = ChunkArray.Exists(Value2);
-			ZETestCheckEqual(Result1, true);
-			ZETestCheckEqual(Result2, false);
+			Exist = ChunkArray.Exists(Value1);
+			ZETestCheck(Exist);
+			Exist = ChunkArray.Exists(Value2);
+			ZETestCheck(!Exist);
 		}
 
 		ZETestCase("for SmartArray")
@@ -840,10 +947,10 @@ ZETestSuite(ZEArray)
 			ZEInt Value1 = 2;
 			ZEInt Value2 = 5;
 
-			bool Result1 = SmartArray.Exists(Value1);
-			bool Result2 = SmartArray.Exists(Value2);
-			ZETestCheckEqual(Result1, true);
-			ZETestCheckEqual(Result2, false);
+			Exist = SmartArray.Exists(Value1);
+			ZETestCheck(Exist);
+			Exist = SmartArray.Exists(Value2);
+			ZETestCheck(!Exist);
 		}
 	}
 
@@ -861,6 +968,28 @@ ZETestSuite(ZEArray)
 		ZETestCheckEqual(Array[2], 7);
 		ZETestCheckEqual(Array[3], 7);
 		ZETestCheckEqual(Array[4], 7);
+
+		ZETestCase("for arrays store different types")
+		{
+			ZEArray<ZEString> StringArray;
+			StringArray.SetCount(3);
+			ZEString Item = "TestString";
+
+			StringArray.Fill(Item);
+			ZETestCheckEqual(StringArray.GetCount(), 3);
+			ZETestCheckString(StringArray[0], "TestString");
+			ZETestCheckString(StringArray[1], "TestString");
+			ZETestCheckString(StringArray[2], "TestString");
+
+			ZEArray<ZEInt8> CharString;
+			CharString.SetCount(2);
+			ZEInt8 Char = 'z';
+
+			CharString.Fill(Char);
+			ZETestCheckEqual(CharString.GetCount(), 2);
+			ZETestCheckEqual(CharString[0], 'z');
+			ZETestCheckEqual(CharString[1], 'z');
+		}
 
 		ZETestCase("for ChunkArray")
 		{
@@ -889,7 +1018,7 @@ ZETestSuite(ZEArray)
 		}
 	}
 
-	ZETest("inline ZEInt FindIndex(Type Item, ZEInt StartIndex = 0)const")
+	ZETest("inline ZESSize FindIndex(ZEType Item, ZESize StartIndex = 0) const")
 	{
 		ZEArray<ZEInt> Array;
 
@@ -898,17 +1027,24 @@ ZETestSuite(ZEArray)
 			Array.Add(I);
 		}
 
-		ZEInt Result = Array.FindIndex(12);
+		ZESSize Result = Array.FindIndex(12);
+		ZETestCheckEqual(Result, 2);
+
+		Result = Array.FindIndex(12, 1);
+		ZETestCheckEqual(Result, 2);
+
+		Result = Array.FindIndex(12, 2);
 		ZETestCheckEqual(Result, 2);
 
 		ZETestCase("FindIndex for searched value is not in the array")
 		{
-			ZEInt Result = Array.FindIndex(25);
+			Result = Array.FindIndex(25);
 			ZETestCheckEqual(Result, -1);
 		}
+
 		ZETestCase("FindIndex for searched value is in the array but before the specified starting index")
 		{
-			ZEInt Result = Array.FindIndex(12, 4);
+			Result = Array.FindIndex(12, 4);
 			ZETestCheckEqual(Result, -1);
 		}
 
@@ -923,7 +1059,7 @@ ZETestSuite(ZEArray)
 			ZETestCheckEqual(ChunkArray.GetCount(), 10);
 			ZETestCheckEqual(ChunkArray.GetSize(), 12);
 
-			ZEInt Result = ChunkArray.FindIndex(12);
+			Result = ChunkArray.FindIndex(12);
 			ZETestCheckEqual(Result, 2);
 		}
 
@@ -938,7 +1074,7 @@ ZETestSuite(ZEArray)
 			ZETestCheckEqual(SmartArray.GetCount(), 10);
 			ZETestCheckEqual(SmartArray.GetSize(), 42);
 
-			ZEInt Result = SmartArray.FindIndex(12);
+			Result = SmartArray.FindIndex(12);
 			ZETestCheckEqual(Result, 2);
 		}
 	}
@@ -955,12 +1091,31 @@ ZETestSuite(ZEArray)
 
 		p = Array.GetCArray();
 		ZETestCheckEqual(*p, 1);
+		ZETestCheckEqual(p[0], 1);
+		ZETestCheckEqual(p[1], 2);
+		ZETestCheckEqual(p[2], 3);
 
 		p[0] = 5;
 		ZETestCheckEqual(*p, 5);
 		ZETestCheckEqual(Array[0], 5);
 		ZETestCheckEqual(Array[1], 2);
 		ZETestCheckEqual(Array[2], 3);
+
+		ZETestCase("Array stores ZEStrings")
+		{
+			ZEArray<ZEString> StringArray;
+			StringArray.Add("New");
+			StringArray.Add("Test");
+			StringArray.Add("String");
+
+			ZEString* Items;
+
+			Items = StringArray.GetCArray();
+			ZETestCheckString(*Items, "New");
+			ZETestCheckString(Items[0], "New");
+			ZETestCheckString(Items[1], "Test");
+			ZETestCheckString(Items[2], "String");
+		}
 
 		ZETestCase("for ChunkArray")
 		{
@@ -1006,6 +1161,9 @@ ZETestSuite(ZEArray)
 
 		p = Array.GetConstCArray();
 		ZETestCheckEqual(*p, 10);
+		ZETestCheckEqual(p[0], 10);
+		ZETestCheckEqual(p[1], 11);
+		ZETestCheckEqual(p[9], 19);
 
 		ZETestCase("for ChunkArray")
 		{
@@ -1042,15 +1200,38 @@ ZETestSuite(ZEArray)
 		}
 	}
 
-	ZETest("Iterator GetConstIterator() const")
+	ZETest("ConstIterator GetConstIterator() const")
 	{
 		ZEArray<ZEInt> Array;
 		Array.Add(1);
 		Array.Add(2);
 		Array.Add(3);
 
-		const ZEArrayIteratorConst<ZEInt, ZEAllocatorBase<ZEInt>> it = Array.GetConstIterator();
+		ZEArrayIteratorConst<ZEInt, ZEAllocatorBase<ZEInt>> ConstIterator = Array.GetConstIterator();
+		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
+		ZETestCheckEqual(*ConstIterator.GetItem(), 1);
 
+		ZETestCase("for ChunkArray")
+		{
+			ZEChunkArray<ZEInt8, 4> ChunkArray;
+			ChunkArray.Add('z');
+			ChunkArray.Add('e');
+
+			ZEArrayIteratorConst<ZEInt8, ZEChunkAllocator<ZEInt8, 4>> IteratorConst = ChunkArray.GetConstIterator();
+			ZETestCheckEqual(IteratorConst.GetIndex(), 0);
+			ZETestCheckEqual(*IteratorConst.GetItem(), 'z');
+		}
+
+		ZETestCase("for SmartArray")
+		{
+			ZESmartArray<ZEString, 2> SmartArray;
+			SmartArray.Add("Test");
+			SmartArray.Add("String");
+
+			ZEArrayIteratorConst<ZEString, ZESmartAllocator<ZEString, 2>> IteratorConst = SmartArray.GetConstIterator();
+			ZETestCheckEqual(IteratorConst.GetIndex(), 0);
+			ZETestCheckString(*IteratorConst.GetItem(), "Test");
+		}
 	}
 
 	ZETest("inline ZESize GetCount() const")
@@ -1062,7 +1243,7 @@ ZETestSuite(ZEArray)
 			Array.Add(I);
 		}
 
-		ZEInt Count = Array.GetCount();
+		ZESize Count = Array.GetCount();
 		ZETestCheckEqual(Count, 10);
 
 		ZETestCase("for ZEChunkArray")
@@ -1074,8 +1255,8 @@ ZETestSuite(ZEArray)
 				ChunkArray.Add(I);
 			}
 
-			ZEInt Count = ChunkArray.GetCount();
-			ZEInt Size = ChunkArray.GetSize();
+			Count = ChunkArray.GetCount();
+			ZESize Size = ChunkArray.GetSize();
 			ZETestCheckEqual(Count, 6);
 			ZETestCheckEqual(Size, 10);
 		}
@@ -1273,8 +1454,41 @@ ZETestSuite(ZEArray)
 		Array.Add(2);
 		Array.Add(3);
 
-		ZEArrayIterator<ZEInt, ZEAllocatorBase<ZEInt>> it = Array.GetIterator();
-		
+		ZEArrayIterator<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetIterator();
+		ZETestCheckEqual(Iterator.GetIndex(), 0);
+		ZETestCheckEqual(*Iterator.GetItem(), 1);
+
+		ZETestCase("for an empty array")
+		{
+			ZEArray<ZEInt> A;
+
+			Iterator = A.GetIterator();
+			ZETestCheckEqual(Iterator.GetIndex(), 0);
+			ZETestCheckEqual(Iterator.GetItem(), NULL);
+			//error Index is out of range.
+		}
+
+		ZETestCase("for ChunkArray")
+		{
+			ZEChunkArray<ZEString, 2> ChunkArray;
+			ChunkArray.Add("Chunk");
+			ChunkArray.Add("Array");
+
+			ZEArrayIterator<ZEString, ZEChunkAllocator<ZEString, 2>> IteratorChunk = ChunkArray.GetIterator();
+			ZETestCheckEqual(IteratorChunk.GetIndex(), 0);
+			ZETestCheckString(*IteratorChunk.GetItem(), "Chunk");
+		}
+
+		ZETestCase("for SmartArray")
+		{
+			ZESmartArray<ZEInt8, 2> SmartArray;
+			SmartArray.Add('Z');
+			SmartArray.Add('E');
+
+			ZEArrayIterator<ZEInt8, ZESmartAllocator<ZEInt8, 2>> IteratorSmart = SmartArray.GetIterator();
+			ZETestCheckEqual(IteratorSmart.GetIndex(), 0);
+			ZETestCheckEqual(*IteratorSmart.GetItem(), 'Z');
+		}
 	}
 
 	ZETest("inline Type& GetLastItem()")
@@ -1404,8 +1618,11 @@ ZETestSuite(ZEArray)
 
 		Array.Insert(0, 0);
 		Array.Insert(1, 1);
+		ZETestCheckEqual(Array.GetCount(), 2);
 
 		p = Array.Insert(1);
+		ZETestCheckEqual(Array.GetCount(), 3);
+		ZETestCheckEqual(Array[1], -842150451);
 
 		*p=5;
 
@@ -1423,14 +1640,16 @@ ZETestSuite(ZEArray)
 			{
 				ChunkArray.Add(I);
 			}
+			ZETestCheckEqual(ChunkArray[0], 1);
 			ZETestCheckEqual(ChunkArray.GetSize(), 5);
 
 			p = ChunkArray.Insert(0);
-
-			*p = 8;
-
+			ZETestCheckEqual(ChunkArray[0], -842150451);
 			ZETestCheckEqual(ChunkArray.GetCount(), 6);
 			ZETestCheckEqual(ChunkArray.GetSize(), 10);
+
+			*p = 8;
+			ZETestCheckEqual(ChunkArray[0], 8);
 		}
 
 		ZETestCase("for SmartArray")
@@ -1443,14 +1662,16 @@ ZETestSuite(ZEArray)
 			{
 				SmartArray.Add(I);
 			}
+			ZETestCheckEqual(SmartArray[0], 1);
 			ZETestCheckEqual(SmartArray.GetSize(), 5);
 
 			p = SmartArray.Insert(0);
-
-			*p = 8;
-
+			ZETestCheckEqual(SmartArray[0], -842150451);
 			ZETestCheckEqual(SmartArray.GetCount(), 6);
 			ZETestCheckEqual(SmartArray.GetSize(), 30);
+
+			*p = 8;
+			ZETestCheckEqual(SmartArray[0], 8);
 		}
 	}
 
@@ -1492,6 +1713,10 @@ ZETestSuite(ZEArray)
 
 			ZETestCheckEqual(ChunkArray.GetCount(), 4);
 			ZETestCheckEqual(ChunkArray.GetSize(), 6);
+			ZETestCheckEqual(ChunkArray[0], 3);
+			ZETestCheckEqual(ChunkArray[1], 0);
+			ZETestCheckEqual(ChunkArray[2], 4);
+			ZETestCheckEqual(ChunkArray[3], 5);
 		}
 
 		ZETestCase("for SmartArray")
@@ -1500,13 +1725,17 @@ ZETestSuite(ZEArray)
 
 			ZEInt *p;
 
-			p = SmartArray.Insert(0, 3);
-			p = SmartArray.Insert(1, 4);
+			p = SmartArray.Insert(0, 5);
+			p = SmartArray.Insert(1, 2);
 			p = SmartArray.Insert(2, 5);
 			p = SmartArray.Insert(1, 0);
 
 			ZETestCheckEqual(SmartArray.GetCount(), 4);
 			ZETestCheckEqual(SmartArray.GetSize(), 12);
+			ZETestCheckEqual(SmartArray[0], 5);
+			ZETestCheckEqual(SmartArray[1], 0);
+			ZETestCheckEqual(SmartArray[2], 2);
+			ZETestCheckEqual(SmartArray[3], 5);
 		}
 	}
 
@@ -1562,6 +1791,9 @@ ZETestSuite(ZEArray)
 
 			ZETestCheckEqual(A.GetCount(), 12);
 			ZETestCheckEqual(A.GetSize(), 12);
+			ZETestCheckEqual(A[9], 19);
+			ZETestCheckEqual(A[10], 30);
+			ZETestCheckEqual(A[11], 40);
 		}
 
 		ZETestCase("for SmartArray")
@@ -1590,6 +1822,9 @@ ZETestSuite(ZEArray)
 
 			ZETestCheckEqual(A.GetCount(), 12);
 			ZETestCheckEqual(A.GetSize(), 42);
+			ZETestCheckEqual(A[9], 19);
+			ZETestCheckEqual(A[10], 30);
+			ZETestCheckEqual(A[11], 40);
 		}
 	}
 
@@ -1611,10 +1846,13 @@ ZETestSuite(ZEArray)
 
 		p = A.MassAdd(2);
 
-		p[0] = B[0];
-		p[1] = B[1];
 		ZETestCheckEqual(A.GetCount(), 4);
 		ZETestCheckEqual(A.GetSize(), 4);
+		ZETestCheckEqual(A[2], -842150451);
+		ZETestCheckEqual(A[3], -842150451);
+
+		p[0] = B[0];
+		p[1] = B[1];
 		ZETestCheckEqual(A[0], 1);
 		ZETestCheckEqual(A[1], 2);
 		ZETestCheckEqual(A[2], 30);
@@ -1641,10 +1879,18 @@ ZETestSuite(ZEArray)
 
 			p = A.MassAdd(2);
 
-			p[0] = B[0];
-			p[1] = B[1];
 			ZETestCheckEqual(A.GetCount(), 4);
 			ZETestCheckEqual(A.GetSize(), 6);
+			ZETestCheckEqual(A[2], -842150451);
+			ZETestCheckEqual(A[3], -842150451);
+
+			p[0] = B[0];
+			p[1] = B[1];
+			ZETestCheckEqual(A[0], 1);
+			ZETestCheckEqual(A[1], 2);
+			ZETestCheckEqual(A[2], 30);
+			ZETestCheckEqual(A[3], 40);
+			ZETestCheckEqual(*p, 30);
 		}
 
 		ZETestCase("for SmartArray")
@@ -1655,20 +1901,14 @@ ZETestSuite(ZEArray)
 			A.Add(2);
 			ZETestCheckEqual(A.GetSize(), 2);
 
-			ZESmartArray<ZEInt, 2> B;
-
-			B.Add(30);
-			B.Add(40);
-			B.Add(50);
-			B.Add(60);
-			ZETestCheckEqual(B.GetSize(), 6);
-
 			ZEInt *p;
 
 			p = A.MassAdd(2);
 
 			ZETestCheckEqual(A.GetCount(), 4);
-			ZETestCheckEqual(A.GetSize(), 6); //8
+			ZETestCheckEqual(A.GetSize(), 8); //6
+			ZETestCheckEqual(A[2], -842150451);
+			ZETestCheckEqual(A[3], -842150451);
 		}
 	}
 
@@ -1707,6 +1947,13 @@ ZETestSuite(ZEArray)
 			p = ChunkArray.MassInsert(1, 3);
 			ZETestCheckEqual(ChunkArray.GetCount(), 6);
 			ZETestCheckEqual(ChunkArray.GetSize(), 9);
+			ZETestCheckEqual(ChunkArray[0], 1);
+			ZETestCheckEqual(ChunkArray[1], -842150451);
+			ZETestCheckEqual(ChunkArray[2], -842150451);
+			ZETestCheckEqual(ChunkArray[3], -842150451);
+			ZETestCheckEqual(ChunkArray[4], 2);
+			ZETestCheckEqual(ChunkArray[5], 3);
+			ZETestCheckEqual(*p, ChunkArray[1]);
 		}
 
 		ZETestCase("for SmartArray")
@@ -1722,7 +1969,14 @@ ZETestSuite(ZEArray)
 
 			p = SmartArray.MassInsert(1, 3);
 			ZETestCheckEqual(SmartArray.GetCount(), 6);
-			ZETestCheckEqual(SmartArray.GetSize(), 12); //18
+			ZETestCheckEqual(SmartArray.GetSize(), 18); //12
+			ZETestCheckEqual(SmartArray[0], 1);
+			ZETestCheckEqual(SmartArray[1], -842150451);
+			ZETestCheckEqual(SmartArray[2], -842150451);
+			ZETestCheckEqual(SmartArray[3], -842150451);
+			ZETestCheckEqual(SmartArray[4], 2);
+			ZETestCheckEqual(SmartArray[5], 3);
+			ZETestCheckEqual(*p, SmartArray[1]);
 		}
 	}
 
@@ -1787,6 +2041,10 @@ ZETestSuite(ZEArray)
 
 			ZETestCheckEqual(A.GetCount(), 12);
 			ZETestCheckEqual(A.GetSize(), 15);
+			ZETestCheckEqual(A[4], 14);
+			ZETestCheckEqual(A[5], 30);
+			ZETestCheckEqual(A[6], 40);
+			ZETestCheckEqual(A[7], 15);
 		}
 
 		ZETestCase("for SmartArray")
@@ -1815,6 +2073,10 @@ ZETestSuite(ZEArray)
 
 			ZETestCheckEqual(A.GetCount(), 12);
 			ZETestCheckEqual(A.GetSize(), 30);
+			ZETestCheckEqual(A[4], 14);
+			ZETestCheckEqual(A[5], 30);
+			ZETestCheckEqual(A[6], 40);
+			ZETestCheckEqual(A[7], 15);
 		}
 	}
 
@@ -1833,7 +2095,7 @@ ZETestSuite(ZEArray)
 			Other.Add(2);
 
 			bool Result = (Array != Other);
-			ZETestCheck(Result == false);
+			ZETestCheck(!Result);
 		}
 
 		ZETestCase("for true")
@@ -1849,7 +2111,7 @@ ZETestSuite(ZEArray)
 			Other.Add(3);
 
 			bool Result = (Array != Other);
-			ZETestCheck(Result == true);
+			ZETestCheck(Result);
 		}
 
 		ZETestCase("for ChunkArray")
@@ -1865,7 +2127,7 @@ ZETestSuite(ZEArray)
 			ChunkOther.Add(3);
 
 			bool Result = (ChunkArray != ChunkOther);
-			ZETestCheck(Result == true);
+			ZETestCheck(Result);
 		}
 
 		ZETestCase("for SmartArray")
@@ -1881,7 +2143,7 @@ ZETestSuite(ZEArray)
 			SmartOther.Add(2);
 
 			bool Result = (SmartArray != SmartOther);
-			ZETestCheck(Result == false);
+			ZETestCheck(!Result);
 		}
 	}
 
@@ -2019,11 +2281,8 @@ ZETestSuite(ZEArray)
 			ZETestCheckEqual(OtherChunkArray.GetCount(), 4);
 			ZETestCheckEqual(OtherChunkArray.GetSize(), 4);
 
-			ZEChunkArray<ZEInt, 4> Result;
-
-			/*Result = */ChunkArray + OtherChunkArray;
-			ZETestCheckEqual(Result.GetCount(), 6);
-			ZETestCheckEqual(Result.GetSize(), 8);
+			ZETestCheckEqual((ChunkArray + OtherChunkArray).GetCount(), 6);
+			ZETestCheckEqual((ChunkArray + OtherChunkArray).GetSize(), 8);
 		}
 
 		ZETestCase("for SmartArray")
@@ -2043,16 +2302,12 @@ ZETestSuite(ZEArray)
 			OtherSmartArray.Add(50);
 			OtherSmartArray.Add(60);
 
-			ZETestCheckEqual(SmartArray.GetCount(), 4);
-			ZETestCheckEqual(SmartArray.GetSize(), 4);
+			ZETestCheckEqual(OtherSmartArray.GetCount(), 4);
+			ZETestCheckEqual(OtherSmartArray.GetSize(), 4);
 
-			ZESmartArray<ZEInt, 4> Result;
-
-			/*Result = */SmartArray + OtherSmartArray;
-			ZETestCheckEqual(Result.GetCount(), 6);
-			ZETestCheckEqual(Result.GetSize(), 20);
+			ZETestCheckEqual((SmartArray + OtherSmartArray).GetCount(), 6);
+			ZETestCheckEqual((SmartArray + OtherSmartArray).GetSize(), 24); //20
 		}
-
 	}
 
 	ZETest("ZEArray& operator+=(const ZEArray<Type, Allocator_>& OtherArray)")
@@ -2184,7 +2439,7 @@ ZETestSuite(ZEArray)
 
 			SmartArray = OtherSmartArray;
 			ZETestCheckEqual(SmartArray.GetCount(), 2);
-			ZETestCheckEqual(SmartArray.GetSize(), 6); //4
+			ZETestCheckEqual(SmartArray.GetSize(), 4); //6
 		}
 	}
 
@@ -2203,8 +2458,9 @@ ZETestSuite(ZEArray)
 			Other.Add(2);
 
 			bool Result = (Array == Other);
-			ZETestCheck(Result == true);
+			ZETestCheck(Result);
 		}
+
 		ZETestCase("for false")
 		{
 			ZEArray<ZEInt> Array;
@@ -2218,10 +2474,10 @@ ZETestSuite(ZEArray)
 			Other.Add(3);
 
 			bool Result = (Array == Other);
-			ZETestCheck(Result == false);
+			ZETestCheck(!Result);
 		}
 
-		/*ZETestCase("for ChunkArray")
+		ZETestCase("for ChunkArray")
 		{
 			ZEChunkArray<ZEInt, 2> ChunkArray;
 
@@ -2234,7 +2490,7 @@ ZETestSuite(ZEArray)
 			ChunkOther.Add(3);
 
 			bool Result = (ChunkArray == ChunkOther);
-			ZETestCheck(Result == false);
+			ZETestCheck(!Result);
 		}
 
 		ZETestCase("for SmartArray")
@@ -2250,8 +2506,8 @@ ZETestSuite(ZEArray)
 			SmartOther.Add(2);
 
 			bool Result = (SmartArray == SmartOther);
-			ZETestCheck(Result == true);
-		}*/
+			ZETestCheck(Result);
+		}	
 	}
 
 	ZETest("inline Type Pop()")
@@ -2363,6 +2619,11 @@ ZETestSuite(ZEArray)
 		{
 			Array.Resize(5);
 			ZETestCheckEqual(Array.GetCount(), 5);
+			ZETestCheckEqual(Array[0], 1);
+			ZETestCheckEqual(Array[1], 2);
+			ZETestCheckEqual(Array[2], -842150451);
+			ZETestCheckEqual(Array[3], -842150451);
+			ZETestCheckEqual(Array[4], -842150451);
 		}
 
 		ZETestCase("for ChunkArray")
@@ -2406,7 +2667,7 @@ ZETestSuite(ZEArray)
 
 			SmartArray.Resize(3);
 			ZETestCheckEqual(SmartArray.GetCount(), 3);
-			ZETestCheckEqual(SmartArray.GetSize(), 4); //12
+			ZETestCheckEqual(SmartArray.GetSize(), 12); //4
 
 			SmartArray.Resize(21);
 			ZETestCheckEqual(SmartArray.GetCount(), 21);
@@ -2425,12 +2686,12 @@ ZETestSuite(ZEArray)
 		Array.Add(1);
 		Array.Add(2);
 		Array.Add(3);
-
 		ZETestCheckEqual(Array.GetCount(), 3);
 
 		Array.SetCount(2);
-
 		ZETestCheckEqual(Array.GetCount(), 2);
+		ZETestCheckEqual(Array[0], -842150451);
+		ZETestCheckEqual(Array[1], -842150451);
 
 		ZETestCase("for ChunkArray")
 		{
@@ -2455,16 +2716,15 @@ ZETestSuite(ZEArray)
 
 			SmartArray.SetCount(2);
 			ZETestCheckEqual(SmartArray.GetCount(), 2);
-			ZETestCheckEqual(SmartArray.GetSize(), 3); //6
+			ZETestCheckEqual(SmartArray.GetSize(), 6); //3
 
 			SmartArray.SetCount(4);
 			ZETestCheckEqual(SmartArray.GetCount(), 4);
-			ZETestCheckEqual(SmartArray.GetSize(), 12); //6
+			ZETestCheckEqual(SmartArray.GetSize(), 6); //12
 
 			SmartArray.SetCount(13);
 			ZETestCheckEqual(SmartArray.GetCount(), 13);
 			ZETestCheckEqual(SmartArray.GetSize(), 39);
-
 		}
 	}
 
@@ -2649,165 +2909,8 @@ ZETestSuite(ZEArray)
 
 			ZEArray<ZEInt> B(A);
 			ZETestCheckEqual(B.GetCount(), 2);
+			ZETestCheckEqual(B[0], 1);
+			ZETestCheckEqual(B[1], 2);
 		}
-	}
-
-	//ZEArrayIterators Tests//
-//class ZEArrayIterator
-
-	ZETest("inline bool IsEnd() const")
-	{
-		ZEArray<ZEInt> Array;
-		ZEArrayIterator<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetIterator();
-
-		bool End = Iterator.IsEnd();
-		ZETestCheck(End);
-
-		ZETestCase("for false")
-		{
-			Array.Add(1);
-			Array.Add(2);
-			Array.Add(3);
-			Iterator = Array.GetIterator();
-
-			End = Iterator.IsEnd();
-			ZETestCheck(!End);
-		}
-	}
-
-	ZETest("inline ZEType* GetItem()")
-	{
-		ZEArray<ZEInt> Array;
-		ZEArrayIterator<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetIterator();
-
-		ZEInt* Item = Iterator.GetItem();
-		ZETestCheckEqual(Item, NULL);
-
-		Array.Add(1);
-		Array.Add(2);
-		Iterator = Array.GetIterator();
-
-		Item = Iterator.GetItem();
-		ZETestCheckEqual(*Item, 1);
-	}
-
-	ZETest("inline ZEType* MovePrevious()")
-	{
-		ZEArray<ZEInt> Array;
-		Array.Add(1);
-		Array.Add(2);
-		ZEArrayIterator<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetIterator();
-
-		ZEInt* Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
-
-		Array.Add(3);
-
-		Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
-	}
-
-	ZETest("inline ZEType* MoveNext()")
-	{
-		ZEArray<ZEInt> Array;
-		Array.Add(1);
-		Array.Add(2);
-		ZEArrayIterator<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetIterator();
-
-		ZEInt* Next = Iterator.MoveNext();
-		ZETestCheckEqual(*Next, 2);
-
-		Array.Add(3);
-
-		Next = Iterator.MoveNext();
-		ZETestCheckEqual(*Next, 3);
-	}
-
-	ZETest("inline ZESize GetIndex()")
-	{
-		ZEArray<ZEInt> Array;
-		ZEArrayIterator<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetIterator();
-
-		ZESize Index = Iterator.GetIndex();
-		ZETestCheckEqual(Index, 0);
-	}
-
-//class ZEArrayIteratorConst
-
-	ZETest("inline bool IsEnd() const")
-	{
-		ZEArray<ZEInt> Array;
-		const ZEArrayIteratorConst<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetConstIterator();
-
-		bool End = Iterator.IsEnd();
-		ZETestCheck(End);
-
-		ZETestCase("for false")
-		{
-			Array.Add(1);
-			Array.Add(2);
-			Array.Add(3);
-			const ZEArrayIteratorConst<ZEInt, ZEAllocatorBase<ZEInt>>Iterator1 = Array.GetConstIterator();
-
-			End = Iterator1.IsEnd();
-			ZETestCheck(!End);
-		}
-	}
-
-	ZETest("inline const ZEType* GetItem() const")
-	{
-		ZEArray<ZEInt> Array;
-		const ZEArrayIteratorConst<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetConstIterator();
-
-		const ZEInt* Item = Iterator.GetItem();
-		ZETestCheckEqual(Item, NULL);
-
-		Array.Add(1);
-		Array.Add(2);
-		const ZEArrayIteratorConst<ZEInt, ZEAllocatorBase<ZEInt>> Iterator1 = Array.GetConstIterator();
-
-		Item = Iterator1.GetItem();
-		ZETestCheckEqual(*Item, 1);
-	}
-
-	ZETest("inline const ZEType* MovePrevious() const")
-	{
-// 		ZEArray<ZEInt> Array;
-// 		Array.Add(1);
-// 		Array.Add(2);
-// 		const ZEArrayIteratorConst<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetConstIterator();
-// 
-// 		const ZEInt* Previous = Iterator.MovePrevious();
-// 		ZETestCheckEqual(Previous, NULL);
-// 
-// 		Array.Add(3);
-// 
-// 		Previous = Iterator.MovePrevious();
-//   		ZETestCheckEqual(Previous, NULL);
-	}
-
-	ZETest("inline const ZEType* MoveNext() const")
-	{
-// 		ZEArray<ZEInt> Array;
-// 		Array.Add(1);
-// 		Array.Add(2);
-// 		const ZEArrayIteratorConst<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetConstIterator();
-// 
-// 		const ZEInt* Next = Iterator.MoveNext();
-// 		ZETestCheckEqual(*Next, 2);
-// 
-// 		Array.Add(3);
-// 
-// 		Next = Iterator.MoveNext();
-//  		ZETestCheckEqual(*Next, 3);
-	}
-
-	ZETest("inline ZESize GetIndex()")
-	{
-		ZEArray<ZEInt> Array;
-		ZEArrayIteratorConst<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetConstIterator();
-
-		ZESize Index = Iterator.GetIndex();
-		ZETestCheckEqual(Index, 0);
 	}
 }

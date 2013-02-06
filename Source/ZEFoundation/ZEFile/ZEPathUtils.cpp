@@ -116,14 +116,17 @@ bool ZEPathUtils::IsRelativePath(const ZEString& Path)
 // Extracts root from absolute path and returns the relative path.
 ZEString ZEPathUtils::GetRelativePath(ZEString& RelativeTo, ZEString& Path)
 {	
+	ZEString PathCopy = Path;
+	ZEString RelativeToCopy = RelativeTo;
+	
 	wchar_t* Token0 = NULL;
 	wchar_t* Context0 = NULL;
-	wchar_t* Source0 = (wchar_t*)RelativeTo.ToWCString();
+	wchar_t* Source0 = (wchar_t*)RelativeToCopy.ToWCString();
 
 	wchar_t* Token1 = NULL;
 	wchar_t* PrevToken1 = NULL;
 	wchar_t* Context1 = NULL;
-	wchar_t* Source1 = (wchar_t*)Path.ToWCString();
+	wchar_t* Source1 = (wchar_t*)PathCopy.ToWCString();
 	
 	if (Source0 == NULL)
 		return Path;

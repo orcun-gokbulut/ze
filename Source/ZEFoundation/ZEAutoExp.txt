@@ -1,0 +1,301 @@
+;ZE_VISUALIZER_BEGIN()
+
+ZEVector2{ 
+	preview (#("<x=", [$c.x,f], ", y=", [$c.y,f], ">"))
+	children
+	(
+		#(
+			[Raw]: [$c,!],
+			x: [$c.x, f],
+			y: [$c.y, f]
+		)
+	)
+}
+
+ZEVector3{
+	preview (#("<x=", [$c.x,f], ", y=", [$c.y,f], ", z:", [$c.z,f], ">"))
+	children
+	(
+		#(
+			[Raw]: [$c,!],
+			x: [$c.x, f],
+			y: [$c.y, f],
+			z: [$c.z, f]
+		)
+	)	
+}
+
+ZEVector4{
+	preview (#("<x=", [$c.x,f], ", y=", [$c.y,f], ", z:", [$c.z,f], ", w=", [$c.w,f], ">"))
+	children
+	(
+		#(
+			[Raw]: [$c,!],
+			x: [$c.x, f],
+			y: [$c.y, f],
+			z: [$c.z, f],
+			w: [$c.w, f]
+		)
+	)
+}
+
+ZEQuaternion{
+	preview (#("<w=", [$c.w,f], ", x=", [$c.x,f], ", y=", [$c.y,f], ", z=", [$c.z,f], ">"))
+	children
+	(
+		#(
+			[Raw]: [$c,!],
+			x: [$c.x, f],
+			y: [$c.y, f],
+			z: [$c.z, f],
+			w: [$c.w, f]
+		)
+	)
+}
+
+
+ZEMatrix3x3{
+	preview 
+	(
+		#(
+			"|<", [$c.M11,f], ", ", [$c.M12,f], ", ", [$c.M13,f], ">, ",
+			"<", [$c.M21,f], ", ", [$c.M22,f], ", ", [$c.M23,f], ">, ",
+			"<", [$c.M31,f], ", ", [$c.M32,f], ", ", [$c.M33,f], ">|"
+		)
+	)
+	
+	children 
+	(
+		#(
+			[Raw]: [$c,!],
+			M11: [$c.M11,f], 
+			M12: [$c.M12,f], 
+			M13: [$c.M13,f], 
+			M21: [$c.M21,f], 
+			M22: [$c.M22,f], 
+			M23: [$c.M23,f], 
+			M31: [$c.M31,f], 
+			M32: [$c.M32,f], 
+			M33: [$c.M33,f]
+		)
+	)
+}
+
+ZEMatrix4x4{
+	preview 
+	(
+		#(
+			"|<", [$c.M11,f], ", ", [$c.M12,f], ", ", [$c.M13,f], ", ", [$c.M14,f], ">, ",
+			"<", [$c.M21,f], ", ", [$c.M22,f], ", ", [$c.M23,f], ", ", [$c.M24,f], ">, ",
+			"<", [$c.M31,f], ", ", [$c.M32,f], ", ", [$c.M33,f], ", ", [$c.M34,f], ">, ",
+			"<", [$c.M41,f], ", ", [$c.M42,f], ", ", [$c.M43,f], ", ", [$c.M44,f], ">|"
+		)
+	)
+	children 
+	(
+		#(
+			[Raw]: [$c,!],
+			M11: [$c.M11,f], 
+			M12: [$c.M12,f], 
+			M13: [$c.M13,f], 
+			M14: [$c.M14,f],
+			M21: [$c.M21,f], 
+			M22: [$c.M22,f], 
+			M23: [$c.M23,f], 
+			M24: [$c.M24,f], 
+			M31: [$c.M31,f], 
+			M32: [$c.M32,f], 
+			M33: [$c.M33,f], 
+			M34: [$c.M34,f], 
+			M41: [$c.M41,f], 
+			M42: [$c.M42,f], 
+			M43: [$c.M43,f], 
+			M44: [$c.M44,f]
+		)
+	)
+}
+
+ZEArray<*>{
+	children
+	(
+		#(
+			[Raw]: [$c,!],
+			Count: [$c.Count,i],
+			#array
+			(
+				expr :	($c.Items)[$i],  
+				size :	$c.Count
+			)
+		)
+	)
+}
+
+ZEList<*>{
+	children
+	(
+		#(
+			[Raw]: [$c,!],
+			Count: [$c.Count,i],
+			#list
+			(
+				size: $c.Count,
+				head: $c.FirstItem,
+				next: NextItem
+			) : (($T1*)&$e)
+		)
+	)
+}
+
+ZEString{
+	preview 
+	(
+		#if ($e.Buffer != 0) ([$e.Buffer,s])
+		#else (#(""))
+	)
+	stringview 
+	(
+		#if ($e.Buffer != 0) ([$e.Buffer,sb])
+		#else (#(""))
+	)
+}
+
+ZEVariant{
+    preview
+    (
+        #if ($e.Type == 0) (
+            #("Undefined")
+        ) #elif ($e.Type == 1) (
+            #("Null")
+		) #elif ($e.Type == 2) (
+            #("Float=", [$e.Value.Float])
+		) #elif ($e.Type == 3) (
+            #("Double=", [$e.Value.Double])
+		) #elif ($e.Type == 4) (
+            #("ZEInt8=", [(ZEInt8)$e.Value.Int32])
+		) #elif ($e.Type == 5) (
+            #("ZEInt16=", [(ZEInt16)$e.Value.Int32])
+		) #elif ($e.Type == 6) (
+            #("ZEInt32=", [(ZEInt32)$e.Value.Int32])
+		) #elif ($e.Type == 7) (
+            #("ZEInt64=", [(ZEInt64)$e.Value.Int64])
+		) #elif ($e.Type == 8) (
+            #("ZEUInt8=", [(ZEUInt8)$e.Value.Int32])
+		) #elif ($e.Type == 9) (
+            #("ZEUInt16=", [(ZEUInt16)$e.Value.Int32])
+		) #elif ($e.Type == 10) (
+            #("ZEUInt32=", [(ZEUInt32)$e.Value.Int32])
+		) #elif ($e.Type == 11) (
+            #("ZEUInt64=", [(ZEUInt64)$e.Value.Int64])
+		) #elif ($e.Type == 12) (
+            #("Bool=", [$e.Value.Boolean])
+		) #elif ($e.Type == 13) (
+            #("ZEString=", [$e.Value.String])
+		) #elif ($e.Type == 14) (
+            #("ZEQuaternion=", [*(ZEQuaternion*)&$e.Value.Vectors])
+		) #elif ($e.Type == 15) (
+            #("ZEVector2=", [*(ZEVector2*)&$e.Value.Vectors])
+		) #elif ($e.Type == 16) (
+            #("ZEVector3=", [*(ZEVector3*)&$e.Value.Vectors])
+		) #elif ($e.Type == 17) (
+            #("ZEVector4=", [*(ZEVector4*)&$e.Value.Vectors])
+		) #elif ($e.Type == 18) (
+            #("ZEMatrix3x3=", [*$e.Value.Matrix3x3])
+		) #elif ($e.Type == 19) (
+            #("ZEMatrix4x4=", [*$e.Value.Matrix4x4])
+		) #elif ($e.Type == 20) (
+            #("ZEObject=", [(ZEObject*)$e.Value.Pointer])
+		) #else (
+			#("Unknown")
+		)
+    )
+	
+    children
+    (
+		#(
+			[Raw]: [$c,!],
+			Type: [$e.Type],
+
+			#if ($e.Type == 2) (
+				#(
+					Type: #("Float"),
+					Value: [$e.Value.Float]
+				)
+			) 
+			#elif ($e.Type == 3) (
+				#(
+					Value: [$e.Value.Double]
+				)
+			) #elif ($e.Type == 4) (
+				#(
+					Value: [(ZEInt8)$e.Value.Int32]
+				)
+			) #elif ($e.Type == 5) (
+				#(
+					Value: [(ZEInt16)$e.Value.Int32]
+				)
+			) #elif ($e.Type == 6) (
+				#(
+					Value: [(ZEInt32)$e.Value.Int32]
+				)
+			) #elif ($e.Type == 7) (
+				#(
+					Value: [(ZEInt64)$e.Value.Int64]
+				)
+			) #elif ($e.Type == 8) (
+				#(
+					Value: [(ZEUInt8)$e.Value.Int32]
+				)
+			) #elif ($e.Type == 9) (
+				#(
+					Value: [(ZEUInt16)$e.Value.Int32]
+				)
+			) #elif ($e.Type == 10) (
+				#(
+					Value: [(ZEUInt32)$e.Value.Int32]
+				)
+		) #elif ($e.Type == 11) (
+				#(
+					Value: [(ZEUInt64)$e.Value.Int64]
+				)
+			) #elif ($e.Type == 12) (
+				#(
+					Value: [$e.Value.Boolean]
+				)
+			) #elif ($e.Type == 13) (
+				#(
+					Value: [$e.Value.String]
+				)
+			) #elif ($e.Type == 14) (
+				#(
+					Value: [*(ZEQuaternion*)&$e.Value.Vectors]
+				)
+			) #elif ($e.Type == 15) (
+				#(
+					Value: [*(ZEVector2*)&$e.Value.Vectors]
+				)
+			) #elif ($e.Type == 16) (
+				#(
+					Value: [*(ZEVector3*)&$e.Value.Vectors]
+				)
+			) #elif ($e.Type == 17) (
+				#(
+					Value: [*(ZEVector4*)&$e.Value.Vectors]
+				)
+			) #elif ($e.Type == 18) (
+				#(
+					Value: [*$e.Value.Matrix3x3]
+				)
+			) #elif ($e.Type == 19) (
+				#(
+					Value: [*$e.Value.Matrix4x4]
+				)
+			) #elif ($e.Type == 20) (
+				#(
+					Value: [(ZEObject*)$e.Value.Pointer]
+				)
+			) 
+		)
+    )
+}
+
+;ZE_VISUALIZER_END()
