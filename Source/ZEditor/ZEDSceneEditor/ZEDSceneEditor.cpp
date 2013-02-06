@@ -367,7 +367,7 @@ void MapEditor::BackupSave()
 
 void MapEditor::NewMapActionTriggered()
 {
-	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("New Map"),QString(this->WorkingDirectory),QString("*.ZEMAP"),0,0);
+	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("New Map"),QString(this->WorkingDirectory),QString("*.ZEINTERIOR"),0,0);
 	
 	if(SelectedFilePath.count() != 0)
 	{
@@ -379,7 +379,7 @@ void MapEditor::NewMapActionTriggered()
 
 void MapEditor::LoadMapActionTriggered()
 {
-	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("Load Map"),QString(this->WorkingDirectory),QString("*.ZEMAP"),0,0);
+	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("Load Map"),QString(this->WorkingDirectory),QString("*.ZEINTERIOR"),0,0);
 
 	if(SelectedFilePath.count() != 0)
 	{

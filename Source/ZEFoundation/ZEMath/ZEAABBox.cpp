@@ -350,7 +350,10 @@ bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& Bo
 
 bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& BoundingBox2)
 {
-	return false;
+	ZEOBBox TempBoundingBox;
+	GenerateOBoundingBox(TempBoundingBox, BoundingBox1);
+
+	return ZEOBBox::IntersectionTest(TempBoundingBox, BoundingBox2);
 }
 
 void ZEAABBox::Generate(ZEAABBox& Output, const ZEVector3* Vertices, ZESize Count)

@@ -110,48 +110,8 @@ void ZEGame::Render(float ElapsedTime)
 	Scene->GetRenderer()->ClearLists();
 }
 
-#include "ZEDS/ZEString.h"
-#include "ZEUI/ZEUITextControl.h"
-
-#include <stdio.h>
 void ZEGame::Tick(float ElapsedTime)
-{
-	static float TotalElapsedTime = 0;
-	static ZEUInt AverageFPS = 0;
-	static ZEUInt FrameCount = 0;
-
-	FrameCount++;
-	TotalElapsedTime += ElapsedTime;
-	if (TotalElapsedTime > 1.0f)
-	{
-		TotalElapsedTime = 0.0f;
-		AverageFPS = FrameCount;
-		FrameCount = 0;
-	}
-
-	ZEVector3 Position;
-	ZEQuaternion Rotation;
-
-	if (Scene->GetActiveCamera() != NULL)
-	{
-		Position = Scene->GetActiveCamera()->GetWorldPosition();
-		Rotation = Scene->GetActiveCamera()->GetWorldRotation();
-	}
-	else
-	{
-		Position = ZEVector3::Zero;
-		Rotation = ZEQuaternion::Identity;
-	}
-
-	float Yaw, Pitch, Roll;
-	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, Rotation);
-	
-	char Buffer[400];
-	sprintf(Buffer, "Position : [%.2f, %.2f, %.2f], Rotation : [%.2f, %.2f, %.2f], Average FPS: %u, Current FPS: %.0f", 
-		Position.x, Position.y, Position.z,
-		ZEAngle::ToDegree(Pitch), ZEAngle::ToDegree(Yaw), ZEAngle::ToDegree(Roll), 
-		AverageFPS, 1.0f / ElapsedTime);
-	
+{	
 	Scene->Tick(ElapsedTime);
 	UIManager->Tick(ElapsedTime);
 }

@@ -54,17 +54,26 @@ class ZEModelAnimationTrack
 	private:
 		ZEModel*						Owner;
 		const ZEModelAnimation*			Animation;
+
 		ZEModelAnimationState			State;
+
 		float							BlendFactor;
 		ZEModelAnimationBlendMode		BlendMode;
-		float							Speed;
-		float							CurrentFrame;
+
 		ZEUInt							StartFrame;
 		ZEUInt							EndFrame;
+
+		ZEUInt							EffectiveStartFrame;
+		ZEUInt							EffectiveEndFrame;
+		bool							LimitsEnabled;
+
+		float							Speed;
+		float							CurrentFrame;
 		ZEUInt							LOD;
 		bool							Looping;
 		
 		void							UpdateMeshesAndBones();
+		void							ApplyLimits();
 
 	public:
 		void							SetOwner(ZEModel* Model);
@@ -82,7 +91,7 @@ class ZEModelAnimationTrack
 		void							SetLOD(ZEUInt LOD);
 		ZEUInt							GetLOD();
 
-		void							SetSpeed(float Factor);
+		void							SetSpeed(float FPS);
 		float							GetSpeed();
 
 		void							SetBlendMode(ZEModelAnimationBlendMode Mode);
@@ -94,14 +103,32 @@ class ZEModelAnimationTrack
 		void							SetLooping(bool Looping);
 		bool							GetLooping();
 
-		void							SetCurrentFrame(float Frame);	
+		void							SetLimitsEnabled(bool Enabled);
+		bool							GetLimitsEnabled();
+
+		void							SetCurrentFrame(float Frame);
+		void							SetCurrentFrameByTime(float Seconds);
+		void							SetCurrentFrameByPercentage(float Percentage);
+
 		float 							GetCurrentFrame();
+		float							GetCurrentFrameByTime();
+		float							GetCurrentFrameByPercentage();
 
 		void							SetStartFrame(ZEUInt Frame);
+		void							SetStartFrameByTime(float Seconds);
+		void							SetStartFrameByPercentage(float Percentage);
+
 		ZEUInt							GetStartFrame();
+		float							GetStartFrameByTime();
+		float							GetStartFrameByPercentage();
 
 		void							SetEndFrame(ZEUInt Frame);
+		void							SetEndFrameByTime(float Seconds);
+		void							SetEndFrameByPercentage(float Percentage);
+
 		ZEUInt							GetEndFrame();
+		float							GetEndFrameByTime();
+		float							GetEndFrameByPercentage();
 
 		void							Play(ZEUInt StartFrame, ZEUInt EndFrame);
 		void							Play();

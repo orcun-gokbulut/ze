@@ -116,9 +116,6 @@ class ZEWeather : public ZEEntity
 		void						SetMoonDirection(const ZEVector3& Value);
 		const ZEVector3&			GetMoonDirection() const;
 
-		void						SetSunMoonRotation(const ZEVector3& Value);
-		const ZEVector3&			GetSunMoonRotation() const;
-
 		void						SetSunLightColor(const ZEVector3& Value);
 		const ZEVector3&			GetSunLightColor() const;
 

@@ -42,82 +42,82 @@
 #include "ZETexture\ZETexture3DResource.h"
 
 
-void ZEMoon::SetMoonPhase(float Phase)
+void ZEMoon::SetPhase(float Phase)
 {
-	MoonPhase = Phase;
+	Phase = Phase;
 }
 
-float ZEMoon::GetMoonPhase() const
+float ZEMoon::GetPhase() const
 {
-	return MoonPhase;
+	return Phase;
 }
 
-void ZEMoon::SetMoonScale(float Scale)
+void ZEMoon::SetScale(float Scale)
 {
-	MoonScale = Scale;
+	Scale = Scale;
 }
 
-float ZEMoon::GetMoonScale() const
+float ZEMoon::GetScale() const
 {
-	return MoonScale;
+	return Scale;
 }
 
-void ZEMoon::SetMoonRotation(float Rotation)
+void ZEMoon::SetRotation(float Rotation)
 {
-	MoonRotation = Rotation;
+	Rotation = Rotation;
 }
 
-float ZEMoon::GetMoonRotation() const
+float ZEMoon::GetRotation() const
 {
-	return MoonRotation;
+	return Rotation;
 }
 
-void ZEMoon::SetMoonAmbientFactor(float Value)
+void ZEMoon::SetAmbientFactor(float Value)
 {
-	MoonAmbientFactor = Value;
+	AmbientFactor = Value;
 }
 
-float ZEMoon::GetMoonAmbientFactor() const
+float ZEMoon::GetAmbientFactor() const
 {
-	return MoonAmbientFactor;
+	return AmbientFactor;
 }
 
-void ZEMoon::SetMoonAmbientColor(ZEVector3& Color)
+void ZEMoon::SetAmbientColor(ZEVector3& Color)
 {
-	MoonAmbientColor = Color;
+	AmbientColor = Color;
 }
 
-const ZEVector3& ZEMoon::GetMoonAmbientColor() const
+const ZEVector3& ZEMoon::GetAmbientColor() const
 {
-	return MoonAmbientColor;
+	return AmbientColor;
 }
 
-void ZEMoon::SetMoonDirection(const ZEVector3& Direction)
+void ZEMoon::SetDirection(const ZEVector3& NewDirection)
 {
-	MoonDirection = Direction;
+	Direction = NewDirection;
 }
 
-const ZEVector3& ZEMoon::GetGetMoonDirection() const
+const ZEVector3& ZEMoon::GetGetDirection() const
 {
-	return MoonDirection;
+	return Direction;
 }
 
-void ZEMoon::SetMoonTexture(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount)
+void ZEMoon::SetTexture(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount)
 {
 	// Load the texture
-	if (MoonTexture != NULL)
+	if (Texture != NULL)
 	{
-		MoonTexture->Release();
-		MoonTexture = NULL;
+		Texture->Release();
+		Texture = NULL;
 	}
 
-	MoonTexture = ZETexture3DResource::LoadResource(FileName, HorizTileCount, VertTileCount, NULL);
+	Texture = ZETexture3DResource::LoadResource(FileName, HorizTileCount, VertTileCount, NULL);
 
 }
 
-const ZEString ZEMoon::GetMoonTexture() const
+const ZEString ZEMoon::GetTexture() const
 {
-	return (MoonTexture == NULL) ? "" : MoonTexture->GetFileName();
+	return (Texture == NULL) ? "" : Texture->GetFileName();
 }
 
 ZEDrawFlags ZEMoon::GetDrawFlags() const
@@ -127,20 +127,20 @@ ZEDrawFlags ZEMoon::GetDrawFlags() const
 
 bool ZEMoon::Initialize()
 {
-	if (MoonMaterial == NULL)
+	if (Material == NULL)
 	{
-		MoonMaterial = ZEMoonMaterial::CreateInstance();
-		MoonMaterial->UpdateMaterial();
+		Material = ZEMoonMaterial::CreateInstance();
+		Material->UpdateMaterial();
 
-		MoonMaterial->MoonPhase				= MoonPhase;
-		MoonMaterial->MoonAmbientColor		= MoonAmbientColor;
-		MoonMaterial->MoonAmbientFactor		= MoonAmbientFactor;
-		MoonMaterial->MoonScale				= MoonScale;
-		MoonMaterial->MoonRotation			= MoonRotation;
-		MoonMaterial->MoonDirection			= MoonDirection;
+		Material->MoonPhase				= Phase;
+		Material->MoonAmbientColor		= AmbientColor;
+		Material->MoonAmbientFactor		= AmbientFactor;
+		Material->MoonScale				= Scale;
+		Material->MoonRotation			= Rotation;
+		Material->MoonDirection			= Direction;
 	
-		if (MoonTexture != NULL)
-			MoonMaterial->MoonTexture = MoonTexture->GetTexture();
+		if (Texture != NULL)
+			Material->MoonTexture = Texture->GetTexture();
 	}
 
 	return ZEEntity::Initialize();
@@ -148,55 +148,58 @@ bool ZEMoon::Initialize()
 
 void ZEMoon::Deinitialize()
 {
-	if (MoonMaterial != NULL)
+	if (Material != NULL)
 	{
-		MoonMaterial->Destroy();
-		MoonMaterial = NULL;
+		Material->Destroy();
+		Material = NULL;
 	}
 
-	if (MoonTexture != NULL)
+	if (Texture != NULL)
 	{
-		MoonTexture->Release();
-		MoonTexture = NULL;
+		Texture->Release();
+		Texture = NULL;
 	}
 }
 
 void ZEMoon::Draw(ZEDrawParameters* DrawParameters)
 {
-	if (MoonTexture == NULL || MoonMaterial == NULL)
+	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
+		return;
+
+	if (Texture == NULL || Material == NULL)
 	{
 		zeWarning("Uninitialized variable in ZEMoon");
 		return;
 	}
 
-	MoonMaterial->MoonPhase				= MoonPhase;
-	MoonMaterial->MoonAmbientColor		= MoonAmbientColor;
-	MoonMaterial->MoonAmbientFactor		= MoonAmbientFactor;
-	MoonMaterial->MoonScale				= MoonScale;
-	MoonMaterial->MoonRotation			= MoonRotation;
-	MoonMaterial->MoonDirection			= MoonDirection;
+	Material->MoonPhase				= Phase;
+	Material->MoonAmbientColor		= AmbientColor;
+	Material->MoonAmbientFactor		= AmbientFactor;
+	Material->MoonScale				= Scale;
+	Material->MoonRotation			= Rotation;
+	Material->MoonDirection			= Direction;
 	
-	if (MoonTexture != NULL)
-		MoonMaterial->MoonTexture = MoonTexture->GetTexture();
+	if (Texture != NULL)
+		Material->MoonTexture = Texture->GetTexture();
 
 	// ---------------------------------------
 
-	MoonRenderCommand.Order				= 1.2f;
-	MoonRenderCommand.Priority			= 1;
-	MoonRenderCommand.Pipeline			= ZE_RORP_3D;
-	MoonRenderCommand.PrimitiveCount	= 0;
-	MoonRenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE_STRIPT;
-	MoonRenderCommand.Flags				= ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	MoonRenderCommand.VertexBufferOffset= 0;
-	MoonRenderCommand.IndexBuffer		= (ZEIndexBuffer*)-1;
-	MoonRenderCommand.VertexBuffer		= (ZEVertexBuffer*)-1;
-	MoonRenderCommand.VertexDeclaration	= (ZEVertexDeclaration*)-1;
+	RenderCommand.Order				= 1.2f;
+	RenderCommand.Priority			= 1;
+	RenderCommand.Pipeline			= ZE_RORP_3D;
+	RenderCommand.PrimitiveCount	= 0;
+	RenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE_STRIPT;
+	RenderCommand.Flags				= ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
+	RenderCommand.VertexBufferOffset= 0;
+	RenderCommand.IndexBuffer		= (ZEIndexBuffer*)-1;
+	RenderCommand.VertexBuffer		= (ZEVertexBuffer*)-1;
+	RenderCommand.VertexDeclaration	= (ZEVertexDeclaration*)-1;
 	
 	// ---------------------------------------
 
-	MoonRenderCommand.Material			= (ZEMaterial*)MoonMaterial;
-	MoonRenderCommand.WorldMatrix		= GetWorldTransform();
-	DrawParameters->Renderer->AddToRenderList(&MoonRenderCommand);
+	RenderCommand.Material			= (ZEMaterial*)Material;
+	RenderCommand.WorldMatrix		= GetWorldTransform();
+	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 	
 }
 
@@ -212,26 +215,26 @@ ZEMoon* ZEMoon::CreateInstance()
 
 ZEMoon::ZEMoon()
 {	
-	MoonMaterial			= NULL;
-	MoonTexture				= NULL;
+	Material			= NULL;
+	Texture				= NULL;
 	
-	MoonPhase				= 0.3f;
-	MoonScale				= 1.0f;
-	MoonRotation			= 0.0f;
-	MoonAmbientFactor		= 1.0f;
-	MoonAmbientColor		= ZEVector3::One;
-	MoonDirection			= ZEVector3::UnitY;
+	Phase				= 0.3f;
+	Scale				= 0.05f;
+	Rotation			= 0.0f;
+	AmbientFactor		= 1.0f;
+	AmbientColor		= ZEVector3::One;
+	Direction			= ZEVector3(0.0001f, 1.0f, 0.0001f);
 
 	// Fill render command
-	MoonRenderCommand.SetZero();
-	MoonRenderCommand.Priority				= 4;
-	MoonRenderCommand.Order					= 4.0f;
-	MoonRenderCommand.PrimitiveCount		= 0;
-	MoonRenderCommand.VertexBuffer			= NULL;
-	MoonRenderCommand.IndexBuffer			= NULL;
-	MoonRenderCommand.VertexDeclaration		= NULL;
-	MoonRenderCommand.PrimitiveType			= ZE_ROPT_TRIANGLE_STRIPT;
-	MoonRenderCommand.Flags					= ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
+	RenderCommand.SetZero();
+	RenderCommand.Priority				= 4;
+	RenderCommand.Order					= 4.0f;
+	RenderCommand.PrimitiveCount		= 0;
+	RenderCommand.VertexBuffer			= NULL;
+	RenderCommand.IndexBuffer			= NULL;
+	RenderCommand.VertexDeclaration		= NULL;
+	RenderCommand.PrimitiveType			= ZE_ROPT_TRIANGLE_STRIPT;
+	RenderCommand.Flags					= ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 	
 }
 

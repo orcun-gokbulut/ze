@@ -469,7 +469,7 @@ ZETestSuite(ZEMLNode)
 
 		ZETestCase("for Cache true")
 		{
-			ZEMLDataProperty* DataProperty = Node.AddDataProperty("DataProperty", Data, sizeof(unsigned char), true);
+			ZEMLDataProperty* DataProperty = Node.AddDataProperty("DataProperty2", Data, sizeof(unsigned char), true);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 			ZETestCheckEqual(DataProperty->GetType(), ZEML_IT_INLINE_DATA);
 			ZETestCheck(DataProperty->GetData() != Data);
@@ -654,19 +654,19 @@ ZETestSuite(ZEMLNode)
 		Value.SetBoolean(true);
 
 		ZEMLProperty* Property = Node.AddProperty("Prop1", Value);
-		ZEArray<ZEMLItem*> Properties = Node.GetProperties("ParentNode");
-		ZETestCheckEqual(Properties.GetCount(), 0);
-		Properties = Node.GetProperties("Prop1");
-		ZETestCheckEqual(Properties.GetCount(), 1);
-		ZETestCheckString(Properties[0]->GetName(), "Prop1");
+		const ZEMLItem* PropertyItem = Node.GetProperty("ParentNode");
+		ZETestCheck(PropertyItem == NULL);
+		PropertyItem = Node.GetProperty("Prop1");
+		ZETestCheck(PropertyItem != NULL);
+		ZETestCheckString(PropertyItem->GetName(), "Prop1");
 
 		Value.SetString("Test");
 		Property = Node.AddProperty("Prop2", Value);
-		Properties = Node.GetProperties("ParentNode");
-		ZETestCheckEqual(Properties.GetCount(), 0);
-		Properties = Node.GetProperties("Prop2");
-		ZETestCheckEqual(Properties.GetCount(), 1);
-		ZETestCheckString(Properties[0]->GetName(), "Prop2");
+		PropertyItem = Node.GetProperty("ParentNode");
+		ZETestCheck(PropertyItem == NULL);
+		PropertyItem = Node.GetProperty("Prop2");
+		ZETestCheck(PropertyItem != NULL);
+		ZETestCheckString(PropertyItem->GetName(), "Prop2");
 
 		ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheck(Item1->GetValue().GetBoolean());

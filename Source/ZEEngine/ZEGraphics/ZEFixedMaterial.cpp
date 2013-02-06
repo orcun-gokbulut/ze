@@ -47,6 +47,8 @@
 #include "ZETexture2D.h"
 #include "ZETextureCube.h"
 #include "ZEML/ZEMLProperty.h"
+#include "ZEFile/ZEPathUtils.h"
+#include "ZEFile/ZEFileInfo.h"
 
 ZEFixedMaterial::ZEFixedMaterial()
 {
@@ -98,17 +100,18 @@ ZEFixedMaterial::ZEFixedMaterial()
 	DistortionMapAddressModeU = ZE_TAM_WRAP;
 	DistortionMapAddressModeV = ZE_TAM_WRAP;
 
-	AmbientFactor = 1.0f;
+	AmbientFactor = 0.0f;
 	DiffuseFactor = 1.0f;
-	SpecularFactor = 1.0f;
-	EmmisiveFactor = 1.0f;
+	SpecularFactor = 0.0f;
+	EmmisiveFactor = 0.0f;
 	DistortionFactor = 1.0f;
-	AmbientColor = ZEVector3(0.0f, 0.0f, 0.0f);
-	DiffuseColor = ZEVector3(1.0f, 1.0f, 1.0f);
-	SpecularColor = ZEVector3(0.0f, 0.0f, 0.0f);
-	EmmisiveColor = ZEVector3(0.0f, 0.0f, 0.0f);
+	AmbientColor = ZEVector3::One;
+	DiffuseColor = ZEVector3::One;
+	SpecularColor = ZEVector3::One;
+	EmmisiveColor = ZEVector3::One;
 	SubSurfaceScatteringFactor = 0.0f;
 	MaterialComponentMask = ~0;
+	GlobalAmbientEnabled = true;
 }
 
 ZEFixedMaterial::~ZEFixedMaterial()
@@ -212,6 +215,16 @@ void ZEFixedMaterial::SetAmbientFactor(float Factor)
 float ZEFixedMaterial::GetAmbientFactor() const
 {
 	return AmbientFactor;
+}
+
+void ZEFixedMaterial::SetGlobalAmbientEnabled(bool Enabled)
+{
+	GlobalAmbientEnabled = Enabled;
+}
+
+bool ZEFixedMaterial::GetGlobalAmbientEnabled()
+{
+	return GlobalAmbientEnabled;
 }
 
 void ZEFixedMaterial::SetDiffuseEnabled(bool Enabled)
@@ -441,8 +454,6 @@ void ZEFixedMaterial::SetEmmisiveEnabled(bool Enabled)
 		MaterialComponents |= ZE_SHADER_EMMISIVE;
 	else
 		MaterialComponents &= ~ZE_SHADER_EMMISIVE;
-
-
 }
 
 bool ZEFixedMaterial::GetEmmisiveEnabled() const
@@ -479,8 +490,13 @@ void ZEFixedMaterial::SetEmmisiveMap(const ZETexture2D* Texture)
 		EmmisiveMapResource->Release();
 		EmmisiveMapResource = NULL;
 	}
+	else
+	{
+		MaterialComponents &= ~ZE_SHADER_EMMISIVE_MAP;
+	}
 
 	EmmisiveMap = Texture;
+	MaterialComponents |= ZE_SHADER_EMMISIVE_MAP;
 }
 
 const ZETexture2D* ZEFixedMaterial::GetEmmisiveMap() const
@@ -499,9 +515,15 @@ void ZEFixedMaterial::SetEmmisiveMapFile(const char* Filename)
 	EmmisiveMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
 	if (EmmisiveMapResource != NULL)
+	{
 		EmmisiveMap = EmmisiveMapResource->GetTexture();
+		MaterialComponents |= ZE_SHADER_EMMISIVE_MAP;
+	}
 	else
+	{
 		EmmisiveMap = NULL;
+		MaterialComponents &= ~ZE_SHADER_EMMISIVE_MAP;
+	}
 }
 
 const char* ZEFixedMaterial::GetEmmisiveMapFile() const
@@ -1245,13 +1267,22 @@ bool ZEFixedMaterial::GetVertexColorEnabled()
 	return (MaterialComponents & ZE_SHADER_VERTEX_COLOR) != 0;
 }
 
+void ZEFixedMaterial::Tick(float ElapsedTime)
+{
+
+}
+
 ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
 {
 	return zeGraphics->CreateFixedMaterial();
 }
 
-void ZEFixedMaterial::WriteToFile(ZEFile* File)
+void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 {
+	ZEFile File;
+	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
+		zeError("Can not open given file. File : %s", FilePath.ToCString());
+
 	ZEObjectDescription* ClassDescription = GetDescription();
 	ZESSize PropertyCount = ClassDescription->GetPropertyCount();
 	const ZEPropertyDescription* Properties = ClassDescription->GetProperties();
@@ -1265,16 +1296,28 @@ void ZEFixedMaterial::WriteToFile(ZEFile* File)
 		RootNode->AddProperty(Properties[I].Name, PropertyValue);
 	}
 
-	RootNode->Write(File);
+	RootNode->Write(&File);
+
+	if(File.IsOpen())
+		File.Close();
+
 	delete RootNode;
 }
 
-void ZEFixedMaterial::ReadFromFile(ZEFile* File)
+void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 {
-	ZEMLNode* RootNode = new ZEMLNode();
-	RootNode->Read(File);
+	ZEFile File;
+	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
+		zeError("Can not open given file. File : %s", FilePath.ToCString());
 
-	ZEArray<ZEMLItem*> Props = RootNode->GetProperties();
+	ZEMLNode* RootNode = new ZEMLNode();
+	RootNode->Read(&File);
+
+	if(File.IsOpen())
+		File.Close();
+
+	ZEArray<ZEMLNode*> ConfigurationsNodes = RootNode->GetSubNodes("Configuration");
+	ZEArray<ZEMLItem*> Props = ConfigurationsNodes[0]->GetProperties();
 	
 	for (ZESize I = 0; I < Props.GetCount(); I++)
 	{
@@ -1283,7 +1326,15 @@ void ZEFixedMaterial::ReadFromFile(ZEFile* File)
 			ZEMLProperty* CurrentProperty = ((ZEMLProperty*)Props[I]);
 
 			if(CurrentProperty->GetValue().GetType() == ZE_VRT_STRING && ZEString(CurrentProperty->GetValue().GetString()).GetLength() != 0)
-				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
+			{
+				if(CurrentProperty->GetName() == "Name")
+					continue;
+
+				ZEString Path = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + CurrentProperty->GetValue().GetString();
+				ZEVariant TempVar(Path);
+				SetProperty(Props[I]->GetName(), TempVar);
+			}
+
 			else if(CurrentProperty->GetValue().GetType() != ZE_VRT_STRING)
 				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
 		}

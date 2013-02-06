@@ -58,6 +58,7 @@ set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll wil
 
 
 
+
 ## Compiler & Linker Options
 #########################################################################################
 if ("${ZEBUILD_PLATFORM_COMPILER}" EQUAL "MSVC")
@@ -77,7 +78,8 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/Source/ZEEngine
 	${CMAKE_SOURCE_DIR}/Source/ZEFoundation
 	${CMAKE_SOURCE_DIR}/Source/ZEToolSDK
-	${CMAKE_SOURCE_DIR}/Source/ZETest)
+	${CMAKE_SOURCE_DIR}/Source/ZETest
+	${CMAKE_SOURCE_DIR}/Source/ZEToolComponents)
 
 include_directories(
 	${ZEBUILD_INCLUDE_PATH}/DirectX
@@ -104,6 +106,8 @@ include(ze_qt)
 add_subdirectory(CMake)
 add_subdirectory(Source)
 
+get_property(fancy_lib_location TARGET ZEFC PROPERTY LOCATION)
+message (STATUS "fancy_lib_location == ${fancy_lib_location}")
 
 ## Install & Packing
 #########################################################################################

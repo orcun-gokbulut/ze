@@ -41,83 +41,72 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Vertex Transformation
-float4x4 WorldViewProjMatrix : register(vs, c0);
-float4x4 WorldViewMatrix : register(vs, c4);
-float4x4 WorldViewInvTrpsMatrix : register(vs, c8);
-float4x4 BoneMatrices[58] : register(vs, c32);
-
-// Other general constants 4 vectors
-float MaterialRefractionIndex : register(vs, c16);
+bool EnableSkin						: register(vs, b0);
+float4x4 WorldViewProjMatrix		: register(vs, c0);
+float4x4 WorldViewMatrix			: register(vs, c4);
+float4x4 WorldViewInvTrpsMatrix		: register(vs, c8);
+float4x4 BoneMatrices[58]			: register(vs, c32);
 
 // Pixel Shader Constants
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Fixed Material Properties
-float4 PipelineParamatersPS[10] : register(c0);
-float4 MaterialParametersPS[20] : register(ps, c10);
+float4 ScreenToTextureParams		: register(ps, c9);
+float4 MaterialParametersPS[20]		: register(ps, c10);
 
+#define	MaterialAmbientColor        		MaterialParametersPS[0].xyz
+#define	MaterialOpacity						MaterialParametersPS[0].w
+#define	MaterialDiffuseColor        		MaterialParametersPS[1].xyz
+#define	MaterialSpecularColor       		MaterialParametersPS[2].xyz
+#define	MaterialSpecularFactor				MaterialParametersPS[2].w
+#define	MaterialEmmisiveColor       		MaterialParametersPS[3].xyz
+#define	MaterialEmmisiveFactor				MaterialParametersPS[3].w
+#define	MaterialReflectionFactor			MaterialParametersPS[4].x
+#define	MaterialRefractionFactor    		MaterialParametersPS[4].y
+#define	MaterialDetailMapTiling     		MaterialParametersPS[4].zw
 
-#define	MaterialAmbientColor        			MaterialParametersPS[0].xyz
-#define	MaterialOpacity							MaterialParametersPS[0].w
-#define	MaterialDiffuseColor        			MaterialParametersPS[1].xyz
-#define	MaterialSpecularColor       			MaterialParametersPS[2].xyz
-#define	MaterialSpecularFactor					MaterialParametersPS[2].w
-#define	MaterialEmmisiveColor       			MaterialParametersPS[3].xyz
-#define	MaterialEmmisiveFactor					MaterialParametersPS[3].w
-#define	MaterialReflectionFactor				MaterialParametersPS[4].x
-#define	MaterialRefractionFactor    			MaterialParametersPS[4].y
-#define	MaterialDetailMapTiling     			MaterialParametersPS[4].zw
+#define MaterialSubSurfaceScatteringFactor	MaterialParametersPS[5].x
+#define MaterialAlphaCullLimit				MaterialParametersPS[5].y
 
-/*#define MaterialDistortionFactor				MaterialParametersPS[5].x
-#define MaterialDistortionAmount				MaterialParametersPS[5].y*/
-
-#define MaterialSubSurfaceScatteringFactor		MaterialParametersPS[5].x
-#define MaterialAlphaCullLimit					MaterialParametersPS[5].y
-
-#define MaterialRefractionIndex					0
-#define ScreenToTextureParams					PipelineParamatersPS[0]
-
-#define CameraUp MaterialParametersPS[10]
-
-bool EnableSkin : register(vs, b0);
-bool ShadowReciever : register(ps, b0);
 
 // Textures
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Pipeline Textures
-sampler2D SSAOBuffer : register(s4);
+sampler2D SSAOBuffer		: register(s4);
 
 // Material Textures
-sampler2D BaseMap : register(s5);
-sampler2D NormalMap : register(s6);
-sampler2D ParallaxMap : register(s7);
-sampler2D SpecularMap : register(s8);
-sampler2D OpacityMap : register(s9);
-sampler2D EmmisiveMap : register(s10);
-sampler2D EnvironmentMap : register(s11);
-sampler2D LightMap : register(s12);
-sampler2D DistortionMap : register(s13);
-sampler2D DetailDiffuseMap : register(s14);
-sampler2D DetailNormalMap : register(s15);
+sampler2D BaseMap			: register(s5);
+sampler2D NormalMap			: register(s6);
+sampler2D ParallaxMap		: register(s7);
+sampler2D SpecularMap		: register(s8);
+sampler2D OpacityMap		: register(s9);
+sampler2D EmmisiveMap		: register(s10);
+sampler2D EnvironmentMap	: register(s11);
+sampler2D LightMap			: register(s12);
+sampler2D DistortionMap		: register(s13);
+sampler2D DetailDiffuseMap	: register(s14);
+sampler2D DetailNormalMap	: register(s15);
 sampler2D SubsurfaceScatteringMap : register(s16);
 
 struct ZEFixedMaterial_VSInput 
 {
-	float4 Position : POSITION0;
-	float3 Normal : NORMAL0;
+	float4 Position			: POSITION0;
+	float3 Normal			: NORMAL0;
+	
 	#if defined(ZE_SHADER_TANGENT_SPACE)
-		float3 Binormal : BINORMAL0;
-		float3 Tangent : TANGENT0;
+		float3 Binormal		: BINORMAL0;
+		float3 Tangent		: TANGENT0;
 	#endif
 	
-	float2 Texcoord             : TEXCOORD0;
+	float2 Texcoord         : TEXCOORD0;
 
 	//#if defined(ZE_SHADER_SKIN_TRANSFORM)
-		int4 BoneIndices        : BLENDINDICES0;
-		float4 BoneWeights      : BLENDWEIGHT0;
+		int4 BoneIndices    : BLENDINDICES0;
+		float4 BoneWeights  : BLENDWEIGHT0;
 	//#endif
-	float4 Color : TEXCOORD1;
+	
+	float4 Color			: TEXCOORD1;
 };
 
 #define ZE_SHADER_VERTEX_INPUT_TYPE ZEFixedMaterial_VSInput
@@ -129,14 +118,14 @@ struct ZEFixedMaterial_VSInput
 // Vertex Shader
 struct ZEFixedMaterial_GBuffer_VSOutput 
 {
-	float4 Position_ : POSITION0;
-	float3 Position : TEXCOORD0;
-	float3 Normal : TEXCOORD1;
-	float2 Texcoord : TEXCOORD2;
+	float4 Position_	: POSITION0;
+	float3 Position		: TEXCOORD0;
+	float3 Normal		: TEXCOORD1;
+	float2 Texcoord		: TEXCOORD2;
 	
 	#if defined(ZE_SHADER_TANGENT_SPACE)
 		float3 Binormal : TEXCOORD3;
-		float3 Tangent : TEXCOORD4;
+		float3 Tangent	: TEXCOORD4;
 	#endif
 };
 
@@ -153,6 +142,7 @@ ZEFixedMaterial_GBuffer_VSOutput ZEFixedMaterial_GBuffer_VertexShader(ZEFixedMat
 	
 	Output.Position = mul(WorldViewMatrix, Input.Position).xyz;
 	Output.Normal.xyz = mul(WorldViewInvTrpsMatrix, Input.Normal).xyz;
+	
 	#if defined(ZE_SHADER_TANGENT_SPACE)
 		Output.Tangent = mul(WorldViewInvTrpsMatrix, Input.Tangent).xyz;
 		Output.Binormal = mul(WorldViewInvTrpsMatrix, Input.Binormal).xyz;
@@ -166,15 +156,17 @@ ZEFixedMaterial_GBuffer_VSOutput ZEFixedMaterial_GBuffer_VertexShader(ZEFixedMat
 // Pixel Shader
 struct ZEFixedMaterial_GBuffer_PSInput
 {
-	float Side : VFACE;
-	float3 Position : TEXCOORD0;
-	float3 Normal : TEXCOORD1;
+	float Side				: VFACE;
+	float3 Position			: TEXCOORD0;
+	float3 Normal			: TEXCOORD1;
+	
 	#if defined(ZE_SHADER_SPECULAR_GLOSS_MAP) || defined(ZE_SHADER_NORMAL_MAP) || defined(ZE_SHADER_ALPHA_CULL)
-		float2 Texcoord : TEXCOORD2;
+		float2 Texcoord		: TEXCOORD2;
 	#endif
+	
 	#if defined(ZE_SHADER_TANGENT_SPACE)
-		float3 Binormal : TEXCOORD3;
-		float3 Tangent : TEXCOORD4;
+		float3 Binormal		: TEXCOORD3;
+		float3 Tangent		: TEXCOORD4;
 	#endif
 };
 
@@ -231,31 +223,33 @@ ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput In
 /////////////////////////////////////////////////////////////////////////////////////////
 struct ZEFixedMaterial_ForwardPass_VSOutput
 {
-	float4 Position : POSITION0;
-	float2 Texcoord : TEXCOORD0;
+	float4 Position				: POSITION0;
+	float2 Texcoord				: TEXCOORD0;
 	
 	#ifdef ZE_SHADER_DETAIL_MAP
-		float2 DetailTexcoord : TEXCOORD1;
+		float2 DetailTexcoord	: TEXCOORD1;
 	#endif
 	
 	#ifdef ZE_SHADER_LIGHT_MAP
-		float2 LightMapTexcoord     : TEXCOORD2;
+		float2 LightMapTexcoord : TEXCOORD2;
 	#endif
 	
 	#ifdef ZE_SHADER_REFLECTION
-		float3 ReflectionVector     : TEXCOORD3;
+		float3 ReflectionVector : TEXCOORD3;
 	#endif
 
 	#ifdef ZE_SHADER_REFRACTION
-		float3 RefractionVector     : TEXCOORD4;
-	#endif	
+		float3 RefractionVector : TEXCOORD4;
+	#endif
+
 	float4 Color : TEXCOORD5;
 };
 
 ZEFixedMaterial_ForwardPass_VSOutput ZEFixedMaterial_ForwardPass_VertexShader(ZEFixedMaterial_VSInput Input)
 {
 	ZEFixedMaterial_ForwardPass_VSOutput Output;
-	
+
+
 	if (EnableSkin)
 		SkinTransform(Input);
 
@@ -287,11 +281,11 @@ struct ZEFixedMaterial_ForwardPass_PSOutput
 
 struct ZEFixedMaterial_ForwardPass_PSInput
 {
-	float3 ScreenPosition : VPOS;
-	float2 Texcoord : TEXCOORD0;
+	float3 ScreenPosition			: VPOS;
+	float2 Texcoord					: TEXCOORD0;
 	
 	#ifdef ZE_SHADER_DETAIL_MAP
-		float2 DetailTexcoord : TEXCOORD1;
+		float2 DetailTexcoord		: TEXCOORD1;
 	#endif
 	
 	#ifdef ZE_SHADER_LIGHT_MAP
@@ -325,10 +319,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	
 	#ifdef ZE_SHADER_ALPHA_CULL
 		if (Output.Color.a <= MaterialAlphaCullLimit)
-		{
 			discard;
-			return Output;
-		}		
 	#endif
 	
 	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
@@ -340,7 +331,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		//#endif
 		Output.Color.rgb = AmbientColor;
 		#ifdef ZE_SHADER_LIGHT_MAP
-			Output.Color.rgb *= tex2D(LightMap, Input.Texcoord).rgb;
+			//Output.Color.rgb *= tex2D(LightMap, Input.Texcoord).rgb;
 		#endif
 	#endif
 
@@ -363,10 +354,10 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		Output.Color.rgb *= tex2D(BaseMap, Input.Texcoord).rgb;
 	#endif	
 	
-	#ifdef ZESHADER_EMMISIVE
+	#ifdef ZE_SHADER_EMMISIVE
 		float3 EmmisiveColor = MaterialEmmisiveColor;
 		#ifdef ZE_SHADER_EMMISIVE_MAP
-			EmmisiveColor *= MaterialEmmisiveFactor * tex2D(EmmisiveMap, Input.Texcoord);
+			EmmisiveColor *= tex2D(EmmisiveMap, Input.Texcoord);
 		#endif
 		Output.Color.rgb += EmmisiveColor;
 	#endif

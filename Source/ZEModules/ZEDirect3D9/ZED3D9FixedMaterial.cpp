@@ -42,6 +42,7 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEMaterialComponents.h"
+#include "ZEGame/ZEScene.h"
 
 void ZED3D9FixedMaterial::CreateShaders()
 {
@@ -194,14 +195,22 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCo
 
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if ((RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	{
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
+	}
 	else if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+	{
 		ViewProjMatrix = Camera->GetViewTransform();
+	}
 	else if (RenderCommand->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+	{
 		ViewProjMatrix = Camera->GetProjectionTransform();
+	}
 	else
+	{
 		ViewProjMatrix = ZEMatrix4x4::Identity;
+	}
 
 	ZEMatrix4x4 WorldViewProjMatrix;
 	ZEMatrix4x4 WorldViewMatrix;
@@ -220,16 +229,17 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCo
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&WorldViewMatrix, 4);
 
-	/*if (GetAlphaCullEnabled())
+	/*
+	if (GetAlphaCullEnabled())
 	{
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 		GetDevice()->SetRenderState(D3DRS_ALPHAREF, (ZEInt)(256.0f * AlphaCullLimit));
 		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 		//GetDevice()->SetRenderState(D3DRS_ADAPTIVETESS_Y, (D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C'));
 	}
-	else*/
+	else
+	*/
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-
 
 	// Setup ZCulling
 	if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
@@ -264,7 +274,8 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCo
 	GetDevice()->SetVertexShaderConstantB(0, &SkinEnabled, 1);
 
 	// Setup Material Properties
-	GetDevice()->SetVertexShaderConstantF(14, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants) / 16);
+	//GetDevice()->SetVertexShaderConstantF(14, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants) / 16);
+	GetDevice()->SetPixelShaderConstantF(9, (const float*)&ZEVector4(1.0f / (float)Renderer->GetViewPort()->GetWidth(), 1.0f / (float)Renderer->GetViewPort()->GetHeight(), 0.5f / (float)Renderer->GetViewPort()->GetWidth(), 0.5f / (float)Renderer->GetViewPort()->GetHeight()), 1);
 	GetDevice()->SetPixelShaderConstantF(10, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
 	
 	// Setup Textures
@@ -322,17 +333,25 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if ((RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	{
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
+	}
 	else if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+	{
 		ViewProjMatrix = Camera->GetViewTransform();
+	}
 	else if (RenderCommand->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+	{
 		ViewProjMatrix = Camera->GetProjectionTransform();
+	}
 	else
+	{
 		ViewProjMatrix = ZEMatrix4x4::Identity;
+	}
 
-	ZEMatrix4x4 WorldViewProjMatrix;
 	ZEMatrix4x4 WorldViewMatrix;
+	ZEMatrix4x4 WorldViewProjMatrix;
 	if (RenderCommand->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
 	{
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
@@ -343,11 +362,6 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 		WorldViewProjMatrix = ViewProjMatrix;
 		WorldViewMatrix = Camera->GetViewTransform();
 	}
-
-
-	ZEVector3 UpVector;
-	ZEMatrix4x4::Transform3x3(UpVector, Camera->GetViewTransform(), ZEVector3::UnitY);
-	GetDevice()->SetPixelShaderConstantF(20, (float*)&ZEVector4(UpVector, 0.0f), 4);
 
 	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewMatrix, 4);
@@ -369,14 +383,16 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	else
 		GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 
-	/*if (GetAlphaCullEnabled())
+	/*
+	if (GetAlphaCullEnabled())
 	{
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 		GetDevice()->SetRenderState(D3DRS_ALPHAREF, (ZEInt)(256.0f * AlphaCullLimit));
 		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 		GetDevice()->SetRenderState(D3DRS_ADAPTIVETESS_Y, (D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C'));
 	}
-	else*/
+	else
+	*/
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 	// Setup Wireframe
@@ -428,8 +444,8 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 		GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 
 	// Setup Material Properties
-	GetDevice()->SetVertexShaderConstantF(14, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants) / 16);
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)Renderer->GetViewPort()->GetWidth(), 1.0f / (float)Renderer->GetViewPort()->GetHeight(), 0.5f / (float)Renderer->GetViewPort()->GetWidth(), 0.5f / (float)Renderer->GetViewPort()->GetHeight()), 1);
+	//GetDevice()->SetVertexShaderConstantF(14, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants) / 16);
+	GetDevice()->SetPixelShaderConstantF(9, (const float*)&ZEVector4(1.0f / (float)Renderer->GetViewPort()->GetWidth(), 1.0f / (float)Renderer->GetViewPort()->GetHeight(), 0.5f / (float)Renderer->GetViewPort()->GetWidth(), 0.5f / (float)Renderer->GetViewPort()->GetHeight()), 1);
 	GetDevice()->SetPixelShaderConstantF(10, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
 
 	// Setup Textures
@@ -512,6 +528,13 @@ bool ZED3D9FixedMaterial::SetupShadowPass() const
 
 void ZED3D9FixedMaterial::UpdateMaterial()
 {
+	if(GetGlobalAmbientEnabled())
+	{
+		SetAmbientEnabled(true);
+		SetAmbientFactor(zeScene->GetAmbientFactor());
+		SetAmbientColor(zeScene->GetAmbientColor());
+	}
+
 	if ((MaterialComponents & MaterialComponentMask) != OldMaterialComponents)
 	{
 		CreateShaders();

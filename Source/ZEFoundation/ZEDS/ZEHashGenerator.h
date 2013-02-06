@@ -43,12 +43,6 @@
 class ZEHashGenerator
 {
 	public:
-		template<typename Type>
-		static ZESize Hash(Type& Value)
-		{
-			return Hash(Value, sizeof(Type));
-		}
-
 		static ZESize		Hash(void* Value, ZESize Size);
 		static ZESize		Hash(const char* String);
 		static ZESize		Hash(const ZEString& String);

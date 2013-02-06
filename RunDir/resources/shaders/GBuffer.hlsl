@@ -58,21 +58,19 @@ float ZEGBuffer_GetDepth(float2 TexCoord)
 // View Vector
 float3 ZEGBuffer_GetViewVector(float4 ClipPosition)
 {
-	//return float3((ClipPosition.xy / ClipPosition.w) * ZEGBuffer_ViewVector.xy, ZEGBuffer_ViewVector.z);
-	return ClipPosition.xyz;
+	return ClipPosition.xyz / ClipPosition.w;
 }
 
 // View Position
 void ZEGBuffer_SetViewPosition(inout ZEGBuffer Output, float3 ViewPosition)
 {
-	//Output.Position = ViewPosition.zxyz;
 	Output.Position.xyzw = length(ViewPosition);
 }
 
 float3 ZEGBuffer_GetViewPosition(float2 Texcoord, float3 ViewVector)
 {
-	//return tex2D(GBuffer1, Texcoord).yzw;
-	return normalize(ViewVector) * tex2D(GBuffer1, Texcoord).x;
+	float DepthSample = tex2D(GBuffer1, Texcoord).x;
+	return normalize(ViewVector) * DepthSample;
 }
 
 // View Normal

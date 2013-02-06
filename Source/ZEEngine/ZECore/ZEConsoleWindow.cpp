@@ -203,7 +203,7 @@ void ZEConsoleWindow::HideConsole()
 	ShowWindow((HWND)Handle, SW_HIDE);
 }
 
-void ZEConsoleWindow::TermiantionState()
+void ZEConsoleWindow::TerminationState()
 {
 	ShowConsole();
 	MSG msg;

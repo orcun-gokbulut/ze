@@ -44,7 +44,6 @@
 #include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZERectangle.h"
-#include "ZEGame/ZEPortal.h"
 #include "ZEGame/ZEDrawParameters.h"
 
 enum ZECameraProjectionType
@@ -72,6 +71,8 @@ class ZECamera : public ZEEntity
 		float							NearZ, FarZ;
 		float							FOV, AspectRatio;
 		float							Width, Height;
+		float							ShadowDistance;
+		float							ShadowFadeDistance;
 
 		ZEMatrix4x4						ViewTransform;
 		ZEMatrix4x4						ProjectionTransform;
@@ -97,12 +98,18 @@ class ZECamera : public ZEEntity
 		void							SetAspectRatio(float AspectRatio);
 		float							GetAspectRatio() const;
 
+		void							SetShadowDistance(float Value);
+		float							GetShadowDistance() const;
+
+		void							SetShadowFadeDistance(float Value);
+		float							GetShadowFadeDistance() const;
+
 		const ZEMatrix4x4&				GetViewTransform();
 		const ZEMatrix4x4&				GetProjectionTransform();
 		const ZEMatrix4x4&				GetViewProjectionTransform();
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);	
-		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);
+		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 
 		const ZEView&					GetView();
 		const ZEViewVolume&				GetViewVolume();
