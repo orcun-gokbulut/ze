@@ -43,7 +43,7 @@
 #include "ZEFontResourceBitmap.h"
 #include "ZEFontResourceDynamic.h"
 
-ZEVector4 ZEUIManager::DefaultBackgroundColor = ZEVector4(0.2f, 0.2f, 0.2f, 0.0f);
+ZEVector4 ZEUIManager::DefaultBackgroundColor = ZEVector4(0.2f, 0.2f, 0.2f, 1.0f);
 ZEVector4 ZEUIManager::DefaultForegroundColor = ZEVector4(0.0f, 0.8f, 0.0f, 1.0f);
 //ZEFontResource* ZEUIManager::DefaultFontResource = ZEFontResourceBitmap::LoadSharedResource("Courier New.zeFont");
 
@@ -567,7 +567,7 @@ void ZEUIManager::ProcessEvents()
 
 ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 {
-	for (int I = ParentControl->GetChildControls().GetCount() - 1; I >= 0; I--)
+	for (ZEInt32 I = ParentControl->GetChildControls().GetCount() - 1; I >= 0; I--)
 	{
 		ZEUIControl* CurrentControl = ParentControl->GetChildControls()[I];
 		if (ZERectangle::IntersectionTest(CurrentControl->GetVisibleRectangle(), Cursor->GetPosition()))

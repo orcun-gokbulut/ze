@@ -54,11 +54,11 @@ void ZEUIHorizontalSliderControl::MouseButtonReleased(ZEUIMouseKey Button, const
 
 void ZEUIHorizontalSliderControl::MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmount)
 {
-	if(IsButtonPressed && (ZEInt)MoveAmount.x != 0)
+	if(IsButtonPressed && (ZEInt32)MoveAmount.x != 0)
 	{
 		float MinMaxDifference = GetMaximumValue() - GetMinimumValue();
-		float ValuePerPixel = MinMaxDifference / GetWidth();
-		float ValueChangeAmount = ValuePerPixel / MoveAmount.x;
+		float ValuePerPixel = GetWidth() / MinMaxDifference;
+		float ValueChangeAmount = MoveAmount.x / ValuePerPixel;
 		SetValue(Value + ValueChangeAmount);
 	}
 
