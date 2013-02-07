@@ -104,6 +104,87 @@ void ZEGrid::GenerateGrid()
 		MajorGrid.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y), ZEVector3(GridSize.x * 0.5f, 0.0f, Y * MajorGridUnitSize.y));
 }
 
+void ZEGrid::SetGridSize(const ZEVector2& Size)
+{
+	GridSize = Size;
+}
+
+const ZEVector2& ZEGrid::GetGridSize()
+{
+	return GridSize;
+}
+
+void ZEGrid::SetMinorGridEnabled(bool Enable)
+{
+	MinorGridEnabled = Enable;
+}
+
+bool ZEGrid::GetMinorGridEnabled()
+{
+	return MinorGridEnabled;
+}
+
+void ZEGrid::SetMinorGridUnitSize(const ZEVector2& Size)
+{
+	MinorGridUnitSize = Size;
+}
+
+const ZEVector2& ZEGrid::GetMinorGridUnitSize()
+{
+	return MinorGridUnitSize;
+}
+
+void ZEGrid::SetMinorGridColor(const ZEVector3& Color)
+{
+	MinorGridColor = Color;
+}
+
+const ZEVector3& ZEGrid::GetMinorGridColor()
+{
+	return MinorGridColor;
+}
+
+void ZEGrid::SetMajorGridEnabled(bool Enabled)
+{
+	MajorGridEnabled = Enabled;
+}
+
+bool ZEGrid::GetMajorGridEnabled()
+{
+	return MajorGridEnabled;
+}
+
+void ZEGrid::SetMajorGridUnitSize(const ZEVector2& Size)
+{
+	MajorGridUnitSize = Size;
+}
+
+const ZEVector2& ZEGrid::GetMajorGridUnitSize()
+{
+	return MajorGridUnitSize;
+}
+
+void ZEGrid::SetMajorGridColor(const ZEVector3& Color)
+{
+	MajorGridColor = Color;
+}
+
+const ZEVector3& ZEGrid::GetMajorGridColor()
+{
+	return MajorGridColor;
+}
+
+void ZEGrid::SetAxisEnabled(bool Enabled)
+{
+	AxisEnabled = Enabled;
+}
+
+bool ZEGrid::GetAxisEnabled()
+{
+	return AxisEnabled;
+}
+
+
 void ZEGrid::SetAxisColor(const ZEVector3& Color)
 {
 	this->AxisColor = Color;

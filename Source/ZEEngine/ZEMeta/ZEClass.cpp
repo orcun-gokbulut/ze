@@ -133,12 +133,12 @@ bool ZEClass::CallMethod(ZEObject* Object, ZESize MethodId, ZENewVariant& Return
 	return false;
 }
 
-ZESSize ZEClass::GetPropertyId(const char* PropertyName)
+ZESize ZEClass::GetPropertyId(const char* PropertyName)
 {
 	return -1;
 }
 
-ZESSize	ZEClass::GetMethodId(const char* MethodName, ZESize OverloadIndex)
+ZESize	ZEClass::GetMethodId(const char* MethodName, ZESize OverloadIndex)
 {
 	return -1;
 }
@@ -146,4 +146,23 @@ ZESSize	ZEClass::GetMethodId(const char* MethodName, ZESize OverloadIndex)
 ZEObject* ZEClass::CreateInstance()
 {
 	return NULL;
+}
+
+bool ZEClass::IsDerivedFrom(ZEClass* ParentClass, ZEClass* Class)
+{
+	ZEClass* CurrentClass = Class;
+	while(CurrentClass->GetParentClass() != NULL)
+	{
+		if(ParentClass == CurrentClass->GetParentClass())
+			return true;
+
+		CurrentClass = CurrentClass->GetParentClass();
+	}
+
+	return false;
+}
+
+bool ZEClass::IsSame(ZEClass* ClassA, ZEClass* ClassB)
+{
+	return ClassA == ClassB ? true : false;
 }

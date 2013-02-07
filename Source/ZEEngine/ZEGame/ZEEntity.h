@@ -74,17 +74,17 @@ typedef ZEFlags ZEEntityDirtyFlags;
 #define ZE_EDF_WORLD_BOUNDING_BOX				8
 #define ZE_EDF_ALL								0xFFFFFFFF
 
-class ZEScene;
+ZE_META_FORWARD_DECLARE(ZEScene, "ZEScene.h")
 
 ZE_CLASS(ZEEntity)
 
 class ZEEntity : public ZEObject
 {
+
 	friend class ZEScene;
 	friend class ZESceneCuller;
 
 	ZE_OBJECT
-
 	private: 
 		ZEEntity*								Owner;
 		ZEScene*								OwnerScene;
@@ -184,6 +184,14 @@ class ZEEntity : public ZEObject
 		
 		virtual void							Tick(float Time);
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
-};
 
+		ZE_META_CLASS_ATTRIBUTE_1("Description", "Base class for entities in Zinek Engine")
+		ZE_META_CLASS_ATTRIBUTE_1("VisualizerEntity", "ZEEntityVisualizer")
+		ZE_META_CLASS_ATTRIBUTE_2("Editor", "Icon", "ZEEntity.png")
+		ZE_META_CLASS_ATTRIBUTE_1("Editor", "Hidden")
+		ZE_META_CLASS_ATTRIBUTE_2("Editor", "Group", "Low Level")
+		ZE_META_CLASS_ATTRIBUTE_1("HLA", "AutoSync")
+		ZE_META_CLASS_ATTRIBUTE_1("Network", "AutoSync")
+		ZE_META_CLASS_ATTRIBUTE_1("Network", "AutoSync")
+};
 #endif

@@ -41,7 +41,7 @@
 #include "ZEMeta/ZEType.h"
 #include "ZEMeta/ZEClass.h"
 
-ZEInt SortPropertiesByHash(ZEPropertyData* const* PropertyDataA, ZEPropertyData* const* PropertyDataB)
+static ZEInt SortPropertiesByHash(ZEPropertyData* const* PropertyDataA, ZEPropertyData* const* PropertyDataB)
 {
 	ZEUInt32 HashA = (**PropertyDataA).Hash;
 	ZEUInt32 HashB = (**PropertyDataA).Hash;
@@ -54,7 +54,7 @@ ZEInt SortPropertiesByHash(ZEPropertyData* const* PropertyDataA, ZEPropertyData*
 		return -1;
 }
 
-ZEInt SortMethodsByHash(ZEMethodData* const* MethodDataA, ZEMethodData* const* MethodDataB)
+static ZEInt SortMethodsByHash(ZEMethodData* const* MethodDataA, ZEMethodData* const* MethodDataB)
 {
 	ZEUInt32 HashA = (**MethodDataA).Hash;
 	ZEUInt32 HashB = (**MethodDataB).Hash;
@@ -107,6 +107,9 @@ static const char* GetTypeString(ZEMetaTypeType ParameterType)
 
 		case ZE_MTT_DOUBLE:
 			return "ZE_TT_DOUBLE";
+
+		case ZE_MTT_BOOLEAN:
+			return "ZE_TT_BOOLEAN";
 
 		case ZE_MTT_STRING:
 			return "ZE_TT_STRING";
@@ -203,7 +206,7 @@ static const char* ReturnVariantType(ZEMetaTypeType VariantType)
 			return "Double";
 
 		case ZE_MTT_BOOLEAN:
-			return "Boolean";
+			return "Bool";
 
 		case ZE_MTT_ENUMERATOR:
 			return "Enum";
@@ -231,6 +234,12 @@ static const char* ReturnVariantType(ZEMetaTypeType VariantType)
 
 		case ZE_MTT_ARRAY:
 			return "Array";
+
+		case ZE_MTT_OBJECT:
+			return "Object";
+
+		case ZE_MTT_OBJECT_PTR:
+			return "ObjectPtr";
 
 		case ZE_MTT_CLASS:
 			return "Class";
@@ -306,33 +315,16 @@ static const char* ReturnTypeCast(ZEMetaTypeType VariantType)
 	}
 }
 
-static void PrepareClassDependencies(FILE* File, const char* ClassName, ZEArray<ZEAttributeData*> Attributes, ZEArray<ZEPropertyData*> Properties, ZEArray<ZEMethodData*> Methods)
+static void PrepareClassDependencies(FILE* File, const char* ClassName, ZEArray<ZEForwardDeclared*> ForwardDeclaredClasses)
 {
 	fprintf(File, "#include \"%s.h\"\n", ClassName);
 
-	for(ZESize I = 0; I < Attributes.GetCount(); I++)
+	for(ZESize I = 0; I < ForwardDeclaredClasses.GetCount(); I++)
 	{
-		if(Attributes[I]->Name == "Include")
-			fprintf(File, "#include \"%s.h\"\n", Attributes[I]->Parameters[0].ToCString());
+		if(ForwardDeclaredClasses[I]->HeaderFileDeclaredIn == ClassName)
+			fprintf(File, "#include \"%s\"\n", ForwardDeclaredClasses[I]->HeaderName.ToCString());
 	}
 
-	for(ZESize I = 0; I < Properties.GetCount(); I++)
-	{
-		for(ZESize J = 0; J < Properties[I]->Attributes.GetCount(); J++)
-		{
-			if(Properties[I]->Attributes[J]->Name == "Include")
-				fprintf(File, "#include \"%s.h\"\n", Properties[I]->Attributes[J]->Parameters[0].ToCString());
-		}
-	}
-
-	for(ZESize I = 0; I < Methods.GetCount(); I++)
-	{
-		for(ZESize J = 0; J < Methods[I]->Attributes.GetCount(); J++)
-		{
-			if(Methods[I]->Attributes[J]->Name == "Include")
-				fprintf(File, "#include \"%s.h\"\n", Methods[I]->Attributes[J]->Parameters[0].ToCString());
-		}
-	}
 	fprintf(File, "\n");
 }
 
@@ -760,13 +752,45 @@ static void CreateGetMethodCountMethod(FILE* File, const char* ClassName, ZESize
 		ClassName, MethodCount);
 }
 
+static void CreateGetPropertyIdMethod(FILE* File, const char* ClassName)
+{
+	fprintf(File,
+		"ZESize %sClass::GetPropertyId(const char* PropertyName)\n"
+		"{\n"
+		"\tconst ZEProperty* Properties = GetProperties();\n"
+		"\tZESize PropertyCount = GetPropertyCount();\n\n"
+		"\tfor(ZESize I = 0; I < PropertyCount; I++)\n"
+		"\t{\n"
+		"\t\tif(PropertyName == Properties[I].Name)\n"
+		"\t\t\treturn I;\n"
+		"\t}\n\n"
+		"\treturn -1;\n"
+		"}\n\n", ClassName);
+}
+
+static void CreateGetMethodIdMethod(FILE* File, const char* ClassName)
+{
+	fprintf(File,
+		"ZESSize %sClass::GetMethodId(const char* MethodName, ZESize OverloadIndex)\n"
+		"{\n"
+		"\tconst ZEMethod* Methods = GetMethods();\n"
+		"\tZESize MethodCount = GetMethodCount();\n\n"
+		"\tfor(ZESize I = 0; I < MethodCount; I++)\n"
+		"\t{\n"
+		"\t\tif(MethodName == Methods[I].Name)\n"
+		"\t\t\treturn I;\n"
+		"\t}\n\n"
+		"\treturn -1;\n"
+		"}\n\n", ClassName);
+}
+
 static void CreateSetPropertyMethod(FILE* File, const char* ClassName, ZEArray<ZEPropertyData*> Properties)
 {
 	fprintf(File,
 		"bool %sClass::SetProperty(ZEObject* Object, ZESize PropertyId, const ZENewVariant& Value)\n"
 		"{\n"
-		"\tconst ZEProperty* Property = GetProperties();\n"
-		"\tif(Property[PropertyId].Name == \"\" || Property[PropertyId].Name == NULL)\n"
+		"\tconst ZEProperty* Properties = GetProperties();\n"
+		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n"
 		"\tswitch(PropertyId)\n"
 		"\t{\n", ClassName);
@@ -874,8 +898,8 @@ static void CreateGetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 	fprintf(File,
 		"bool %sClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZENewVariant& Value)\n"
 		"{\n"
-		"\tconst ZEProperty* Property = GetProperties();\n"
-		"\tif(Property[PropertyId].Name == \"\" || Property[PropertyId].Name == NULL)\n"
+		"\tconst ZEProperty* Properties = GetProperties();\n"
+		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n"
 		"\tswitch(PropertyId)\n"
 		"\t{\n",ClassName);
@@ -963,8 +987,8 @@ static void CreateSetPropertyItemMethod(FILE* File, const char* ClassName, ZEArr
 	fprintf(File, 
 		"bool %sClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZENewVariant& Value)\n"
 		"{\n"
-		"\tconst ZEProperty* Property = GetProperties();\n"
-		"\tif(Property[PropertyId].Name == \"\" || Property[PropertyId].Name == NULL)\n"
+		"\tconst ZEProperty* Properties = GetProperties();\n"
+		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n"
 		"\tswitch(PropertyId)\n"
 		"\t{\n", ClassName);
@@ -1028,8 +1052,8 @@ static void CreateGetPropertyItemMethod(FILE* File, const char* ClassName, ZEArr
 	fprintf(File, 
 		"bool %sClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZENewVariant& Value)\n"
 		"{\n"
-		"\tconst ZEProperty* Property = GetProperties();\n"
-		"\tif(Property[PropertyId].Name == \"\" || Property[PropertyId].Name == NULL)\n"
+		"\tconst ZEProperty* Properties = GetProperties();\n"
+		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n"
 		"\tswitch(PropertyId)\n"
 		"\t{\n", ClassName);
@@ -1081,8 +1105,8 @@ static void CreateAddItemToPropertyMethod(FILE* File, const char* ClassName, ZEA
 	fprintf(File, 
 		"bool %sClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZENewVariant& Value)\n"
 		"{\n"
-		"\tconst ZEProperty* Property = GetProperties();\n"
-		"\tif(Property[PropertyId].Name == \"\" || Property[PropertyId].Name == NULL)\n"
+		"\tconst ZEProperty* Properties = GetProperties();\n"
+		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n"
 		"\tswitch(PropertyId)\n"
 		"\t{\n", ClassName);
@@ -1130,8 +1154,8 @@ static void CreateAddItemToPropertyWithIndexMethod(FILE* File, const char* Class
 	fprintf(File, 
 		"bool %sClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZENewVariant& Value)\n"
 		"{\n"
-		"\tconst ZEProperty* Property = GetProperties();\n"
-		"\tif(Property[PropertyId].Name == \"\" || Property[PropertyId].Name == NULL)\n"
+		"\tconst ZEProperty* Properties = GetProperties();\n"
+		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n"
 		"\tswitch(PropertyId)\n"
 		"\t{\n", ClassName);
@@ -1175,8 +1199,8 @@ static void CreateRemoveItemFromPropertyWithIndexMethod(FILE* File, const char* 
 	fprintf(File, 
 		"bool %sClass::RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize Index)\n"
 		"{\n"
-		"\tconst ZEProperty* Property = GetProperties();\n"
-		"\tif(Property[PropertyId].Name == \"\" || Property[PropertyId].Name == NULL)\n"
+		"\tconst ZEProperty* Properties = GetProperties();\n"
+		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n"
 		"\tswitch(PropertyId)\n"
 		"\t{\n", ClassName);
@@ -1218,8 +1242,8 @@ static void CreateGetPropertyItemCountMethod(FILE* File, const char* ClassName, 
 	fprintf(File, 
 		"bool %sClass::GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& Count)\n"
 		"{\n"
-		"\tconst ZEProperty* Property = GetProperties();\n"
-		"\tif(Property[PropertyId].Name == \"\" || Property[PropertyId].Name == NULL)\n"
+		"\tconst ZEProperty* Properties = GetProperties();\n"
+		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n"
 		"\tswitch(PropertyId)\n"
 		"\t{\n", ClassName);
@@ -1315,6 +1339,14 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName, ZEArray<ZE
 								Methods[I]->Parameters[J]->EnumData->Name.ToCString(), J,
 								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "));\n");
 						}
+						else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+						{
+							fprintf(File,
+								"(%s*)Parameters[%d]->GetObjectPtr%sRef()%s", 
+								Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(), J,
+								Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "));\n");
+						}
 						else
 						{
 							fprintf(File,
@@ -1350,6 +1382,14 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName, ZEArray<ZE
 							fprintf(File,
 								"((%s)(Parameters[%d]->GetInt32ConstRef()))%s", 
 								Methods[I]->Parameters[J]->EnumData->Name.ToCString(), J,
+								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+						}
+						else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+						{
+							fprintf(File,
+								"(%s*)Parameters[%d]->GetObjectPtr%sRef()%s", 
+								Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(), J,
+								Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
 								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
 						}
 						else
@@ -1391,6 +1431,14 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName, ZEArray<ZE
 						Methods[I]->Parameters[J]->EnumData->Name.ToCString(), J,
 						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
 				}
+				else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+				{
+					fprintf(File,
+						"(%s*)Parameters[%d]->GetObjectPtr%sRef()%s", 
+						Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(), J,
+						Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+				}
 				else
 				{
 					fprintf(File,
@@ -1412,7 +1460,7 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName, ZEArray<ZE
 		"}\n\n");
 }
 
-static void CreateZEClassImplementation(FILE* File, const char* ClassName, ZEArray<ZEMethodData*> Methods)
+static void CreateZEClassImplementation(FILE* File, const char* ClassName, bool IsAbstract, bool HasPublicConstructor, ZEArray<ZEMethodData*> Methods)
 {
 	fprintf(File,
 	"ZEGUID %sClass::GetGUID()\n"
@@ -1508,13 +1556,21 @@ static void CreateZEClassImplementation(FILE* File, const char* ClassName, ZEArr
 			"\treturn %s::CreateInstance();\n"
 			"}\n\n", ClassName, ClassName);
 	}
-	else
+	else if(HasPublicConstructor && !IsAbstract)
 	{
 		fprintf(File,
 			"ZEObject* %sClass::CreateInstance()\n"
 			"{\n"
 			"\treturn new %s();\n"
 			"}\n\n", ClassName, ClassName);
+	}
+	else
+	{
+		fprintf(File,
+			"ZEObject* %sClass::CreateInstance()\n"
+			"{\n"
+			"\treturn NULL;\n"
+			"}\n\n", ClassName);
 	}
 }
 
@@ -1525,6 +1581,8 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 		ZETypeData* CurrentClassData = MetaData->HeaderTypes[I];
 		const char* ParentClassName = MetaData->HeaderTypes[I - 1]->Name;
 		const char* CurrentClassName = CurrentClassData->Name;
+		bool HasPublicConstructor = ((ZEClassData*)CurrentClassData)->HasPublicConstructor;
+		bool IsAbstract = ((ZEClassData*)CurrentClassData)->IsAbstract;
 
 		ZEString FilePath = "C:\\Users\\Hakan.Candemir\\Desktop\\";
 		FilePath.Append(CurrentClassName);
@@ -1539,7 +1597,7 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 		FILE* File;
 		File = fopen(FilePath.ToCString(), "w");
 
-		PrepareClassDependencies(File, CurrentClassName, CurrentClassData->Attributes, Properties, Methods);
+		PrepareClassDependencies(File, CurrentClassName, MetaData->ForwardDeclaredClasses);
 
 		CreateGetParentClassMethod(File, CurrentClassName, ParentClassName);
 		CreateGetNameMethod(File, CurrentClassName);
@@ -1549,6 +1607,8 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 		CreateGetPropertyCountMethod(File, CurrentClassName, Properties.GetCount());
 		CreateGetMethodsMethod(File, CurrentClassName, Methods);
 		CreateGetMethodCountMethod(File, CurrentClassName, Methods.GetCount());
+		CreateGetPropertyIdMethod(File, CurrentClassName);
+		CreateGetMethodIdMethod(File, CurrentClassName);
 
 		CreateSetPropertyMethod(File, CurrentClassName, Properties);
 		CreateGetPropertyMethod(File, CurrentClassName, Properties);
@@ -1560,7 +1620,7 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 		CreateGetPropertyItemCountMethod(File, CurrentClassName, Properties);
 		CreateCallMethodMethod(File, CurrentClassName, Methods);
 
-		CreateZEClassImplementation(File, CurrentClassName, Methods);
+		CreateZEClassImplementation(File, CurrentClassName, IsAbstract, HasPublicConstructor, Methods);
 
 		fclose(File);
 	}

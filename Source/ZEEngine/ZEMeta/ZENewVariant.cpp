@@ -1277,6 +1277,11 @@ ZENewVariant::ZENewVariant(const ZEMatrix4x4& Matrix)
 	SetMatrix4x4(Matrix);
 }
 
+ZENewVariant::ZENewVariant(ZEClass* Class)
+{
+	SetClass(Class);
+}
+
 ZENewVariant::~ZENewVariant()
 {
 	SetType(ZEType());

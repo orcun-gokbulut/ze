@@ -40,38 +40,29 @@
 #include "ZEMacro/ZEMacro.h"
 #include "ZEClass.h"
 
-#ifdef ZE_CODE_GENERATOR
-	#define object(...) 
-	#define property(...)
-	#define container(...)
-	#define method(...)
-	#define event(...)
-	#define attribute(...)
-#else
-	#define object(...)
-	#define property(...)
-	#define container(...)
-	#define method(...)
-	#define event(...)
-	#define attribute(...)
-#endif
-
 #ifdef ZE_META_COMPILER
-	#define  ZE_META_ATTRIBUTE_INTERNAL(Value) __attribute__ ((annotate(Value)))
+	#define ZE_META_ATTRIBUTE_INTERNAL(Value) __attribute__((annotate(Value)))
+	#define ZE_META_ATTRIBUTE_0(Name)											ZE_META_ATTRIBUTE_INTERNAL(#Name)
+	#define ZE_META_ATTRIBUTE_1(Name, Parameter0)								ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0)
+	#define ZE_META_ATTRIBUTE_2(Name, Parameter0, Parameter1)					ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1)
+	#define ZE_META_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2)		ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2)
+	#define ZE_META_CLASS_ATTRIBUTE_0(Name)										class ZE_META_ATTRIBUTE_INTERNAL("ClassAttribute" "," #Name) {};
+	#define ZE_META_CLASS_ATTRIBUTE_1(Name, Parameter0)							class ZE_META_ATTRIBUTE_INTERNAL("ClassAttribute" "," #Name "," #Parameter0) {};
+	#define ZE_META_CLASS_ATTRIBUTE_2(Name, Parameter0, Parameter1)				class ZE_META_ATTRIBUTE_INTERNAL("ClassAttribute" "," #Name "," #Parameter0 "," #Parameter1) {};
+	#define ZE_META_CLASS_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2)	class ZE_META_ATTRIBUTE_INTERNAL("ClassAttribute" "," #Name "," #Parameter0 "," #Parameter1 "," #Parameter2) {};
+	#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) \
+	class ZE_META_ATTRIBUTE_2("ForwardDeclaration", #ClassName, IncludeFile) ClassName;
 #else
-	#define  ZE_META_ATTRIBUTE_INTERNAL(Value)
+	#define ZE_META_ATTRIBUTE_0(Name)
+	#define ZE_META_ATTRIBUTE_1(Name, Parameter0)
+	#define ZE_META_ATTRIBUTE_2(Name, Parameter0, Parameter1)
+	#define ZE_META_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2)
+	#define ZE_META_CLASS_ATTRIBUTE_0(Name)
+	#define ZE_META_CLASS_ATTRIBUTE_1(Name, Parameter0)
+	#define ZE_META_CLASS_ATTRIBUTE_2(Name, Parameter0, Parameter1)
+	#define ZE_META_CLASS_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2)
+	#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) class ClassName;
 #endif
-
-#define ZE_META_COMMENT(Value) Value
-
-#define ZE_META_ATTRIBUTE_0(Name)										ZE_META_ATTRIBUTE_INTERNAL(Name)
-#define ZE_META_ATTRIBUTE_1(Name, Parameter0)							ZE_META_ATTRIBUTE_INTERNAL(Name "," Parameter0)
-#define ZE_META_ATTRIBUTE_2(Name, Parameter0, Parameter1)				ZE_META_ATTRIBUTE_INTERNAL(Name "," Parameter0 "," Parameter1)
-#define ZE_META_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2)	ZE_META_ATTRIBUTE_INTERNAL(Name "," Parameter0 "," Parameter1 "," Parameter2)
-
-#define ZE_META_NO_EXPORT ZE_META_ATTRIBUTE_0("NoExport")
-#define ZE_META_INCLUDE(Value) ZE_META_ATTRIBUTE_1("Include", Value)
-#define ZE_META_EDITOR_DESCRIPTION(Description, TestVal) ZE_META_ATTRIBUTE_2("EditorDescription", Description, TestVal)
 
 #define ZE_OBJECT \
 	public: \
@@ -109,6 +100,8 @@ class ZEObject
 			virtual ZESize					GetPropertyCount(); \
 			virtual const ZEMethod*			GetMethods(); \
 			virtual ZESize					GetMethodCount(); \
+			virtual ZESize					GetPropertyId(const char* PropertyName); \
+			virtual ZESize					GetMethodId(const char* MethodName, ZESize OverloadIndex = 0); \
 			virtual bool					SetProperty(ZEObject* Object, ZESize PropertyId, const ZENewVariant& Value); \
 			virtual bool					GetProperty(ZEObject* Object, ZESize PropertyId, ZENewVariant& Value); \
 			virtual bool					GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZENewVariant& Value); \
