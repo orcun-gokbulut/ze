@@ -129,7 +129,7 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 		}
 	}
 
-	int WindowWidth, WindowHeight;
+	ZEInt32 WindowWidth, WindowHeight;
 	zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);
 
 	if (GetPosition().x > WindowWidth)
@@ -158,7 +158,7 @@ ZEUIMouseKey ZEUICursorControl::GetCurrentButton()
 	return CurentButton;
 }
 
-void ZEUICursorControl::SetZOrder(ZEInt Z)
+void ZEUICursorControl::SetZOrder(ZEInt32 Z)
 {
 	ZEUIControl::SetZOrder(Z);
 	Cursor.ZOrder = Z;
@@ -195,7 +195,7 @@ ZEUICursorControl::ZEUICursorControl()
 	SetHeight(24);
 	SetWidth(24);	
 
-	int Width, Height;
+	ZEInt32 Width, Height;
 	zeCore->GetWindow()->GetWindowSize(Width, Height);
 	SetPosition(ZEVector2((Width / 2.0f) , (Height / 2.0f)));
 

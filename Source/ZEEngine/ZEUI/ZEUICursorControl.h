@@ -64,7 +64,7 @@ class ZEUICursorControl : public ZEUIControl
 
 		ZEUIMouseKey		GetCurrentButton();
 
-		virtual void		SetZOrder(ZEInt Z);
+		virtual void		SetZOrder(ZEInt32 Z);
 
 							ZEUICursorControl();
 							~ZEUICursorControl();

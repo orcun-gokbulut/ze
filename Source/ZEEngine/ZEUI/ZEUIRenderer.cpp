@@ -41,7 +41,7 @@
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 
-ZEInt CompareCommandOrder(const ZERenderCommand* Command1, const ZERenderCommand* Command2)
+ZEInt32 CompareCommandOrder(const ZERenderCommand* Command1, const ZERenderCommand* Command2)
 {
 	if(Command1->Order > Command2->Order)
 		return 1;
@@ -140,7 +140,7 @@ void ZEUIRenderer::Render(ZERenderer* Renderer)
 	
 	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
 	{
-		RenderCommands[I].Priority = (ZEInt)RenderCommands[I].Order;
+		RenderCommands[I].Priority = (ZEInt32)RenderCommands[I].Order;
 
 		if (RenderCommands[I].Material == NULL)
 			RenderCommands[I].Material = DefaultMaterial;
