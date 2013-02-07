@@ -61,6 +61,8 @@ class ZELight : public ZEEntity
 	private:
 		bool							Enabled;
 
+		float							AttenuationFunction(float RootToTry);
+
 	protected:
 		bool							CastsShadows;
 		bool							UpdateViewVolume;
