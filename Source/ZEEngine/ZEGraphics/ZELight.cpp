@@ -38,6 +38,14 @@
 #include "ZEGame\ZEDrawParameters.h"
 #include "ZERenderer.h"
 
+float ZELight::AttenuationFunction(float RootToTry)
+{
+	float Result = 0.0f;
+	Result = Intensity / (((RootToTry * RootToTry) * Attenuation.z) + (RootToTry * Attenuation.y) + Attenuation.x);
+
+	return Result;
+}
+
 void ZELight::OnTransformChanged()
 {
 	UpdateViewVolume = true;
@@ -106,7 +114,7 @@ const ZEVector3& ZELight::GetColor() const
 
 void ZELight::SetAttenuation(const ZEVector3& Attenuation)
 {
-	this->Attenuation = Attenuation;
+	SetAttenuation(Attenuation.z, Attenuation.y, Attenuation.x);
 }
 
 void ZELight::SetAttenuation(float DistanceSquare, float Distance, float Constant)
@@ -114,6 +122,39 @@ void ZELight::SetAttenuation(float DistanceSquare, float Distance, float Constan
 	Attenuation.x = Constant;
 	Attenuation.y = Distance;
 	Attenuation.z = DistanceSquare;
+
+	if(GetLightType() != ZE_LT_DIRECTIONAL)
+	{
+		float MinRange = 0.0f;
+		float MaxRange = 1000.0f;
+		float ApproximateRoot = 0.0f;
+		float FunctionResult = 0.0f;
+		ZESize IterationCounter = 0;
+
+		do 
+		{
+			IterationCounter++;
+
+			ApproximateRoot = (MaxRange + MinRange) / 2.0f;
+
+			FunctionResult = AttenuationFunction(ApproximateRoot);
+
+			if (FunctionResult < 0) 
+			{
+				MinRange = ApproximateRoot;
+			} 
+			else if (FunctionResult > 0) 
+			{
+				MaxRange = ApproximateRoot;
+			}
+
+			if(IterationCounter >= 100)
+				break;
+		}
+		while(FunctionResult < Intensity / 256.0f);
+
+		SetRange(ApproximateRoot);
+	}
 }
 
 const ZEVector3& ZELight::GetAttenuation() const
