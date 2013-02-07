@@ -431,6 +431,41 @@ void ZEModel::SetScale(const ZEVector3& NewScale)
 	UpdateTransforms();
 }
 
+void ZEModel::SetDrawPhysicalBodies(bool Enabled)
+{
+	DrawPhysicalBodies = Enabled;
+}
+
+void ZEModel::SetDrawPhysicalJoints(bool Enabled)
+{
+	DrawPhysicalJoints = Enabled;
+}
+
+void ZEModel::SetDrawSkeleton(bool Enabled)
+{
+	DrawSkeleton = Enabled;
+}
+
+void ZEModel::SetStaticPoseByIndex(ZESize AnimationIndex, ZEUInt Frame)
+{
+	return;
+}
+
+bool ZEModel::GetDrawPhysicalBodies()
+{
+	return DrawPhysicalBodies;
+}
+
+bool ZEModel::GetDrawPhysicalJoints()
+{
+	return DrawPhysicalJoints;
+}
+
+bool ZEModel::GetDrawSkeleton()
+{
+	return DrawSkeleton;
+}
+
 void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
 {
 	ZEPhysicalJoint* ParentlessBoneJoint = ZEPhysicalJoint::CreateInstance();

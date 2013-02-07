@@ -43,7 +43,6 @@
 #include "ZECore/ZECore.h"
 #include "ZESceneCuller.h"
 #include "ZEDrawParameters.h"
-#include "ZEEntity.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEEntityProvider.h"
 #include "ZEGraphics/ZELight.h"
@@ -244,10 +243,8 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClass* Class)
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{
 		CurrentEntity = Entities[I];
-
-		//ZEMETADEBUGCHECK!!!
-		/*if (ZEClass::IsDerivedFrom(Class, CurrentEntity->GetDescription()))
-			ProperEntities.Add(CurrentEntity);*/
+		if (Class->IsDerivedFrom(Class, CurrentEntity->GetClass()))
+			ProperEntities.Add(CurrentEntity);
 	}
 
 	return ProperEntities;
@@ -404,7 +401,7 @@ bool ZEScene::Load(const ZEString& FileName)
 			ZEEntity* NewEntity;
 			Unserializer.Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
 			//ZEMETADEBUGCHECK!!!
-			//Yni NewEntity = ZEProvider::CreateInstance(EntityTypeName);
+			//NewEntity = ZEProvider::CreateInstance(EntityTypeName);
 			//NewEntity = (ZEEntity*)ZEEntityProvider::GetInstance()->CreateInstance(EntityTypeName);
 			if (NewEntity == NULL)
 			{

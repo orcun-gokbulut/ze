@@ -66,8 +66,8 @@ class ZEClass
 		virtual const ZEMethod*			GetMethods();
 		virtual ZESize					GetMethodCount();
 
-		ZESSize							GetPropertyId(const char* PropertyName);
-		ZESSize							GetMethodId(const char* MethodName, ZESize OverloadIndex = 0);
+		virtual ZESize					GetPropertyId(const char* PropertyName);
+		virtual ZESize					GetMethodId(const char* MethodName, ZESize OverloadIndex = 0);
 
 		virtual bool					SetProperty(ZEObject* Object, ZESize PropertyId, const ZENewVariant& Value);
 		virtual bool					GetProperty(ZEObject* Object, ZESize PropertyId, ZENewVariant& Value);
@@ -111,7 +111,7 @@ class ZEClass
 
 		virtual ZEObject*				CreateInstance();
 
-		static bool						IsInherited(ZEClass* PotentialBaseClass, ZEClass* Class);
+		virtual bool					IsDerivedFrom(ZEClass* ParentClass, ZEClass* Class);
 		static bool						IsSame(ZEClass* ClassA, ZEClass* ClassB);
 };
 

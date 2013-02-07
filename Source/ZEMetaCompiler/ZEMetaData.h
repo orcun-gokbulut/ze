@@ -117,6 +117,14 @@ class ZEEnumParameterData : public ZEListItem
 		ZEUInt32						Value;
 };
 
+class ZEForwardDeclared : public ZEListItem
+{
+	public:
+		ZEString						HeaderFileDeclaredIn;
+		ZEString						ClassName;
+		ZEString						HeaderName;
+};
+
 class ZEEnumData : public ZEListItem
 {
 	public:
@@ -210,6 +218,9 @@ class ZEClassData : public ZETypeData
 		ZEArray<ZEMethodData*>			Methods;
 		ZEArray<ZEEventData*>			Events;
 
+		bool							HasPublicConstructor;
+		bool							IsAbstract;
+
 		virtual							~ZEClassData();
 };
 
@@ -219,6 +230,7 @@ class ZEMetaData
 		ZEArray<ZETypeData*>			Types;
 		ZEArray<ZETypeData*>			HeaderTypes;
 		ZEArray<ZEEnumData*>			EnumTypes;
+		ZEArray<ZEForwardDeclared*>		ForwardDeclaredClasses;
 
 										~ZEMetaData();
 };
