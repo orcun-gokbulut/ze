@@ -43,6 +43,9 @@ struct ZEEnum;
 
 struct ZEProperty
 {
+	ZESize							ID;
+	ZEClass*						MemberOf;
+
 	const char*						Name;
 	ZEUInt32						Hash;
 	ZEType							Type;

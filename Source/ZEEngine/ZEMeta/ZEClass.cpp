@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEClass.h"
+#include "ZEObject.h"
 
 ZEClass* ZEClass::GetParentClass()
 {
@@ -83,7 +84,17 @@ bool ZEClass::SetProperty(ZEObject* Object, ZESize PropertyId, const ZENewVarian
 	return false;
 }
 
+bool ZEClass::SetProperty(ZEObject* Object, ZEString PropertyName, const ZENewVariant& Value)
+{
+	return false;
+}
+
 bool ZEClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZENewVariant& Value)
+{
+	return false;
+}
+
+bool ZEClass::GetProperty(ZEObject* Object, ZEString PropertyName, ZENewVariant& Value)
 {
 	return false;
 }
@@ -93,7 +104,17 @@ bool ZEClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index,
 	return false;
 }
 
+bool ZEClass::GetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZENewVariant& Value)
+{
+	return false;
+}
+
 bool ZEClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZENewVariant& Value)
+{
+	return false;
+}
+
+bool ZEClass::SetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZENewVariant& Value)
 {
 	return false;
 }
@@ -103,7 +124,17 @@ bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZENewVarian
 	return false;
 }
 
+bool ZEClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZENewVariant& Value)
+{
+	return false;
+}
+
 bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZENewVariant& Value)
+{
+	return false;
+}
+
+bool ZEClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZESize Index, ZENewVariant& Value)
 {
 	return false;
 }
@@ -113,7 +144,17 @@ bool ZEClass::RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize
 	return false;
 }
 
+bool ZEClass::RemoveItemFromProperty(ZEObject* Object, ZEString PropertyName, ZESize Index)
+{
+	return false;
+}
+
 bool ZEClass::GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& Count)
+{
+	return false;
+}
+
+bool ZEClass::GetPropertyItemCount(ZEObject* Object, ZEString PropertyName, ZESize& Count)
 {
 	return false;
 }
@@ -123,7 +164,17 @@ bool ZEClass::AddEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBa
 	return false;
 }
 
+bool ZEClass::AddEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler)
+{
+	return false;
+}
+
 bool ZEClass::RemoveEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler)
+{
+	return false;
+}
+
+bool ZEClass::RemoveEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler)
 {
 	return false;
 }
@@ -133,12 +184,17 @@ bool ZEClass::CallMethod(ZEObject* Object, ZESize MethodId, ZENewVariant& Return
 	return false;
 }
 
-ZESize ZEClass::GetPropertyId(const char* PropertyName)
+bool ZEClass::CallMethod(ZEObject* Object, ZEString MethodName, ZENewVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
+{
+	return false;
+}
+
+ZESize ZEClass::GetPropertyId(ZEString PropertyName)
 {
 	return -1;
 }
 
-ZESize	ZEClass::GetMethodId(const char* MethodName, ZESize OverloadIndex)
+ZESize	ZEClass::GetMethodId(ZEString MethodName, ZESize OverloadIndex)
 {
 	return -1;
 }
@@ -162,7 +218,27 @@ bool ZEClass::IsDerivedFrom(ZEClass* ParentClass, ZEClass* Class)
 	return false;
 }
 
+bool ZEClass::IsDerivedFrom(ZEClass* ParentClass, ZEObject* Object)
+{
+	ZEClass* CurrentClass = Object->GetClass();
+	while(CurrentClass->GetParentClass() != NULL)
+	{
+		if(ParentClass == CurrentClass->GetParentClass())
+			return true;
+
+		CurrentClass = CurrentClass->GetParentClass();
+	}
+
+	return false;
+}
+
 bool ZEClass::IsSame(ZEClass* ClassA, ZEClass* ClassB)
 {
 	return ClassA == ClassB ? true : false;
 }
+
+bool ZEClass::IsSame(ZEClass* Class, ZEObject* Object)
+{
+	return Class == Object->GetClass() ? true : false;
+}
+
