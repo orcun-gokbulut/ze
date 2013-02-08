@@ -142,6 +142,8 @@ class ZEAttributeData : public ZEListItem
 	public:
 		ZEString						Name;
 		ZEArray<ZEString>				Parameters;
+
+		ZEString						MemberOf;
 };
 
 class ZETypeData : public ZEListItem
@@ -185,6 +187,9 @@ struct ZEPropertyData : public ZETypeData
 		ZEClassData*					BaseClass;
 		ZEEnumData*						EnumData;
 
+		ZESize							ID;
+		ZEString						MemberOf;
+
 		ZEString						Getter;
 		ZEString						Setter;
 };
@@ -206,6 +211,9 @@ struct ZEMethodData : public ZETypeData
 	
 		ZEMethodParameterData			ReturnParameter;
 		ZEArray<ZEMethodParameterData*>	Parameters;
+
+		ZESize							ID;
+		ZEString						MemberOf;
 
 		virtual							~ZEMethodData();
 };

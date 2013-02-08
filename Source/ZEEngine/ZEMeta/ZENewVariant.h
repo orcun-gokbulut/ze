@@ -46,6 +46,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEList.h"
+#include "ZETypeGenerator.h"
 
 class ZEVector2;
 class ZEVector3;
