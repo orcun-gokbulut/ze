@@ -119,8 +119,6 @@ void ZEMetaProcessorInternal::InitializeClang()
 	std::vector<std::string> SystemDirs = clang::driver::GetWindowsSystemIncludeDirs();
 	for(size_t i = 0; i < SystemDirs.size(); ++i) 
 		Invocation.getHeaderSearchOpts().AddPath(SystemDirs[i], frontend::System, false, false, true, true);
-	Invocation.getHeaderSearchOpts().AddPath(Invocation.getHeaderSearchOpts().ResourceDir + "/../../../../Source/ZEFoundation", clang::frontend::System, false, false, true, true);
-	Invocation.getHeaderSearchOpts().AddPath(Invocation.getHeaderSearchOpts().ResourceDir + "/../../../../Source/ZEEngine", clang::frontend::System, false, false, true, true);
 
 	#ifdef ZE_PLATFORM_WINDOWS
 		Invocation.getPreprocessorOpts().addMacroDef("WIN32");
