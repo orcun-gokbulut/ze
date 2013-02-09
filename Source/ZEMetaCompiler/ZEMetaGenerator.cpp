@@ -1933,159 +1933,213 @@ static void CreateZEClassImplementation(FILE* File, const char* ClassName, bool 
 }
 
 bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* MetaData)
-{	
-	ZEArray<ZEAttributeData*> Attributes;
-	ZEArray<ZEPropertyData*> Properties;
-	ZEArray<ZEMethodData*> Methods;
-
-	for(ZESize Index = 1; Index < MetaData->HeaderTypes.GetCount(); Index++)
+{
+	if(!((ZEClassData*)MetaData->HeaderTypes[MetaData->HeaderTypes.GetCount() - 1])->IsBuiltInClass)
 	{
-		ZEClassData* CurrentClassData = (ZEClassData*)MetaData->HeaderTypes[Index];
-		const char* CurrentClassName = CurrentClassData->Name;
-
-		for(ZESize I = 0; I < CurrentClassData->Attributes.GetCount(); I++)
+		ZESize BuiltInClassEndIndex = 0;
+		for(ZESize I = MetaData->HeaderTypes.GetCount() - 1; I >= 0; I--)
 		{
-			bool IsSameAttributeFound = false;
-
-			for(ZESize J = 0; J < Attributes.GetCount(); J++)
+			if(((ZEClassData*)MetaData->HeaderTypes[I])->IsBuiltInClass)
 			{
-				if(Attributes[J]->Name == CurrentClassData->Attributes[I]->Name)
-				{
-					IsSameAttributeFound = true;
-
-					if(Attributes[J]->Parameters.GetCount() == CurrentClassData->Attributes[I]->Parameters.GetCount())
-					{
-						for(ZESize K = 0; K < Attributes[J]->Parameters.GetCount(); K++)
-						{
-							if(Attributes[J]->Parameters[K] != CurrentClassData->Attributes[I]->Parameters[K])
-								IsSameAttributeFound = false;
-						}
-					}
-					else
-						IsSameAttributeFound = false;
-				}
-			}
-
-			if(IsSameAttributeFound)
-				continue;
-			else
-			{
-				CurrentClassData->Attributes[I]->MemberOf = CurrentClassName;
-				Attributes.Add(CurrentClassData->Attributes[I]);
+				BuiltInClassEndIndex = I + 2; //+2 = [0]BuiltInClassIndex + [1]ZEObject + [2]OurClass
+				break;
 			}
 		}
 
-		for(ZESize I = 0; I < CurrentClassData->Properties.GetCount(); I++)
-		{
-			CurrentClassData->Properties[I]->MemberOf = CurrentClassName;
-			Properties.Add(CurrentClassData->Properties[I]);
-		}
+		ZEArray<ZEAttributeData*> Attributes;
+		ZEArray<ZEPropertyData*> Properties;
+		ZEArray<ZEMethodData*> Methods;
 
-		for(ZESize I = 0; I < CurrentClassData->Methods.GetCount(); I++)
+		for(ZESize Index = BuiltInClassEndIndex; Index < MetaData->HeaderTypes.GetCount(); Index++)
 		{
-			bool IsSameMethodFound = false;
+			ZEClassData* CurrentClassData = (ZEClassData*)MetaData->HeaderTypes[Index];
+			const char* CurrentClassName = CurrentClassData->Name;
 
-			for(ZESize J = 0; J < Methods.GetCount(); J++)
+			for(ZESize I = 0; I < CurrentClassData->Attributes.GetCount(); I++)
 			{
-				if(Methods[J]->Name == CurrentClassData->Methods[I]->Name)
-				{
-					IsSameMethodFound = true;
+				bool IsSameAttributeFound = false;
 
-					if(Methods[J]->Parameters.GetCount() == CurrentClassData->Methods[I]->Parameters.GetCount())
+				for(ZESize J = 0; J < Attributes.GetCount(); J++)
+				{
+					if(Attributes[J]->Name == CurrentClassData->Attributes[I]->Name)
 					{
-						for(ZESize K = 0; K < Methods[J]->Parameters.GetCount(); K++)
+						IsSameAttributeFound = true;
+
+						if(Attributes[J]->Parameters.GetCount() == CurrentClassData->Attributes[I]->Parameters.GetCount())
 						{
-							if(Methods[J]->Parameters[K]->Type != CurrentClassData->Methods[I]->Parameters[K]->Type)
-								IsSameMethodFound = false;
+							for(ZESize K = 0; K < Attributes[J]->Parameters.GetCount(); K++)
+							{
+								if(Attributes[J]->Parameters[K] != CurrentClassData->Attributes[I]->Parameters[K])
+									IsSameAttributeFound = false;
+							}
 						}
+						else
+							IsSameAttributeFound = false;
 					}
-					else
-						IsSameMethodFound = false;
+				}
+
+				if(IsSameAttributeFound)
+					continue;
+				else
+				{
+					CurrentClassData->Attributes[I]->MemberOf = CurrentClassName;
+					Attributes.Add(CurrentClassData->Attributes[I]);
 				}
 			}
 
-			if(IsSameMethodFound)
-				continue;
-			else
+			for(ZESize I = 0; I < CurrentClassData->Properties.GetCount(); I++)
 			{
-				CurrentClassData->Methods[I]->MemberOf = CurrentClassName;
-				Methods.Add(CurrentClassData->Methods[I]);
+				CurrentClassData->Properties[I]->MemberOf = CurrentClassName;
+				Properties.Add(CurrentClassData->Properties[I]);
 			}
+
+			for(ZESize I = 0; I < CurrentClassData->Methods.GetCount(); I++)
+			{
+				bool IsSameMethodFound = false;
+
+				for(ZESize J = 0; J < Methods.GetCount(); J++)
+				{
+					if(Methods[J]->Name == CurrentClassData->Methods[I]->Name)
+					{
+						IsSameMethodFound = true;
+
+						if(Methods[J]->Parameters.GetCount() == CurrentClassData->Methods[I]->Parameters.GetCount())
+						{
+							for(ZESize K = 0; K < Methods[J]->Parameters.GetCount(); K++)
+							{
+								if(Methods[J]->Parameters[K]->Type != CurrentClassData->Methods[I]->Parameters[K]->Type)
+									IsSameMethodFound = false;
+							}
+						}
+						else
+							IsSameMethodFound = false;
+					}
+				}
+
+				if(IsSameMethodFound)
+					continue;
+				else
+				{
+					CurrentClassData->Methods[I]->MemberOf = CurrentClassName;
+					Methods.Add(CurrentClassData->Methods[I]);
+				}
+			}
+		}
+
+		for(ZESize I = 0; I < Properties.GetCount(); I++)
+			Properties[I]->ID = I;
+
+		for(ZESize I = 0; I < Methods.GetCount(); I++)
+			Methods[I]->ID = I;
+
+		if(MetaData->HeaderTypes.GetCount() < 2)
+			return false;
+		else
+		{
+			const char* ParentClassName = MetaData->HeaderTypes[MetaData->HeaderTypes.GetCount() - 2]->Name;
+			const char* CurrentClassName = MetaData->HeaderTypes[MetaData->HeaderTypes.GetCount() - 1]->Name;
+
+			ZEClassData* ClassData = (ZEClassData*)MetaData->HeaderTypes.GetLastItem();
+
+			bool HasPublicConstructor = ClassData->HasPublicConstructor;
+			bool IsAbstract = ClassData->IsAbstract;
+
+			ZEString FilePath = "C:\\Users\\Hakan.Candemir\\Desktop\\";
+			FilePath.Append(CurrentClassName);
+			FilePath.Append(".h.ZEMeta.cpp");
+
+			FILE* File;
+			File = fopen(FilePath.ToCString(), "w");
+
+			PrepareClassDependencies(File, CurrentClassName, MetaData->ForwardDeclaredClasses);
+
+			CreateGetParentClassMethod(File, CurrentClassName, ParentClassName);
+			CreateGetNameMethod(File, CurrentClassName);
+			CreateGetAttributesMethod(File, CurrentClassName, Attributes);
+			CreateGetAttributeCountMethod(File, CurrentClassName, Attributes.GetCount());
+			CreateGetPropertiesMethod(File, CurrentClassName, Properties);
+			CreateGetPropertyCountMethod(File, CurrentClassName, Properties.GetCount());
+			CreateGetMethodsMethod(File, CurrentClassName, Methods);
+			CreateGetMethodCountMethod(File, CurrentClassName, Methods.GetCount());
+
+			CreateSetPropertyMethod(File, CurrentClassName, Properties);
+			CreateSetPropertyMethod(File, CurrentClassName);
+
+			CreateGetPropertyMethod(File, CurrentClassName, Properties);
+			CreateGetPropertyMethod(File, CurrentClassName);
+
+			CreateSetPropertyItemMethod(File, CurrentClassName, Properties);
+			CreateSetPropertyItemMethod(File, CurrentClassName);
+
+			CreateGetPropertyItemMethod(File, CurrentClassName, Properties);
+			CreateGetPropertyItemMethod(File, CurrentClassName);
+
+			CreateAddItemToPropertyMethod(File, CurrentClassName, Properties);
+			CreateAddItemToPropertyMethod(File, CurrentClassName);
+		
+			CreateAddItemToPropertyWithIndexMethod(File, CurrentClassName, Properties);
+			CreateAddItemToPropertyWithIndexMethod(File, CurrentClassName);
+
+			CreateRemoveItemFromPropertyWithIndexMethod(File, CurrentClassName, Properties);
+			CreateRemoveItemFromPropertyWithIndexMethod(File, CurrentClassName);
+
+			CreateGetPropertyItemCountMethod(File, CurrentClassName, Properties);
+			CreateGetPropertyItemCountMethod(File, CurrentClassName);
+
+			CreateCallMethodMethod(File, CurrentClassName, Methods);
+			CreateCallMethodMethod(File, CurrentClassName);
+
+			CreateZEClassImplementation(File, CurrentClassName, IsAbstract, HasPublicConstructor, Methods);
+
+			Properties.Sort(SortPropertiesByHash);
+			Methods.Sort(SortMethodsByHash);
+
+			CreateGetPropertyIdMethod(File, CurrentClassName, Properties);
+			CreateGetMethodIdMethod(File, CurrentClassName, Methods);
+
+			fclose(File);
 		}
 	}
-
-	for(ZESize I = 0; I < Properties.GetCount(); I++)
-		Properties[I]->ID = I;
-
-	for(ZESize I = 0; I < Methods.GetCount(); I++)
-		Methods[I]->ID = I;
-
-	if(MetaData->HeaderTypes.GetCount() < 2)
-		return false;
-	else
+	else//For BuiltIn Class Generation
 	{
-		const char* ParentClassName = MetaData->HeaderTypes[MetaData->HeaderTypes.GetCount() - 2]->Name;
-		const char* CurrentClassName = MetaData->HeaderTypes[MetaData->HeaderTypes.GetCount() - 1]->Name;
+		for(ZESize I = 0; I < MetaData->HeaderTypes.GetCount(); I++)
+		{
+			ZETypeData* CurrentClassData = MetaData->HeaderTypes[I];
+			const char* CurrentClassName = CurrentClassData->Name;
 
-		ZEClassData* ClassData = (ZEClassData*)MetaData->HeaderTypes.GetLastItem();
+			ZEString FilePath = "C:\\Users\\Hakan.Candemir\\Desktop\\";
+			FilePath.Append(CurrentClassName);
+			FilePath.Append(".h.ZEMeta.cpp");
 
-		bool HasPublicConstructor = ClassData->HasPublicConstructor;
-		bool IsAbstract = ClassData->IsAbstract;
+			((ZEClassData*)CurrentClassData)->Methods.Sort(SortMethodsByHash);
 
-		ZEString FilePath = "C:\\Users\\Hakan.Candemir\\Desktop\\";
-		FilePath.Append(CurrentClassName);
-		FilePath.Append(".h.ZEMeta.cpp");
+			ZEArray<ZEMethodData*> Methods = ((ZEClassData*)CurrentClassData)->Methods;
 
-		FILE* File;
-		File = fopen(FilePath.ToCString(), "w");
+			FILE* File;
+			File = fopen(FilePath.ToCString(), "w");
 
-		PrepareClassDependencies(File, CurrentClassName, MetaData->ForwardDeclaredClasses);
+			fprintf(File, "#include \"%s.h\"\n\n", CurrentClassName);
 
-		CreateGetParentClassMethod(File, CurrentClassName, ParentClassName);
-		CreateGetNameMethod(File, CurrentClassName);
-		CreateGetAttributesMethod(File, CurrentClassName, Attributes);
-		CreateGetAttributeCountMethod(File, CurrentClassName, Attributes.GetCount());
-		CreateGetPropertiesMethod(File, CurrentClassName, Properties);
-		CreateGetPropertyCountMethod(File, CurrentClassName, Properties.GetCount());
-		CreateGetMethodsMethod(File, CurrentClassName, Methods);
-		CreateGetMethodCountMethod(File, CurrentClassName, Methods.GetCount());
+			CreateGetNameMethod(File, CurrentClassName);
+			CreateGetMethodsMethod(File, CurrentClassName, Methods);
+			CreateGetMethodCountMethod(File, CurrentClassName, Methods.GetCount());
+			CreateCallMethodMethod(File, CurrentClassName, Methods);
 
-		CreateSetPropertyMethod(File, CurrentClassName, Properties);
-		CreateSetPropertyMethod(File, CurrentClassName);
+			fprintf(File,
+				"%s* %sClass::Class()\n"
+				"{\n"
+				"\tstatic %sClass Class;\n"
+				"\treturn &Class;\n"
+				"}\n\n", CurrentClassName, CurrentClassName, CurrentClassName);
 
-		CreateGetPropertyMethod(File, CurrentClassName, Properties);
-		CreateGetPropertyMethod(File, CurrentClassName);
+			fprintf(File,
+				"%s* %sClass::GetClass() const\n"
+				"{\n"
+				"\treturn %sClass::Class();\n"
+				"}\n\n", CurrentClassName, CurrentClassName, CurrentClassName);
 
-		CreateSetPropertyItemMethod(File, CurrentClassName, Properties);
-		CreateSetPropertyItemMethod(File, CurrentClassName);
-
-		CreateGetPropertyItemMethod(File, CurrentClassName, Properties);
-		CreateGetPropertyItemMethod(File, CurrentClassName);
-
-		CreateAddItemToPropertyMethod(File, CurrentClassName, Properties);
-		CreateAddItemToPropertyMethod(File, CurrentClassName);
-		
-		CreateAddItemToPropertyWithIndexMethod(File, CurrentClassName, Properties);
-		CreateAddItemToPropertyWithIndexMethod(File, CurrentClassName);
-
-		CreateRemoveItemFromPropertyWithIndexMethod(File, CurrentClassName, Properties);
-		CreateRemoveItemFromPropertyWithIndexMethod(File, CurrentClassName);
-
-		CreateGetPropertyItemCountMethod(File, CurrentClassName, Properties);
-		CreateGetPropertyItemCountMethod(File, CurrentClassName);
-
-		CreateCallMethodMethod(File, CurrentClassName, Methods);
-		CreateCallMethodMethod(File, CurrentClassName);
-
-		CreateZEClassImplementation(File, CurrentClassName, IsAbstract, HasPublicConstructor, Methods);
-
-		Properties.Sort(SortPropertiesByHash);
-		Methods.Sort(SortMethodsByHash);
-
-		CreateGetPropertyIdMethod(File, CurrentClassName, Properties);
-		CreateGetMethodIdMethod(File, CurrentClassName, Methods);
-
-		fclose(File);
+			fclose(File);
+		}
 	}
 
 	return true;

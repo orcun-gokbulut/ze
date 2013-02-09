@@ -196,7 +196,7 @@ bool ZEMetaProcessorInternal::CheckClass(CXXRecordDecl* Class)
 	if (!CheckClassHasZEObjectMacro(Class))
 		return false;
 
-	RaiseNote(Class->getLocation(),"ZEObject based class has been checked.");
+	RaiseNote(Class->getLocation(), "ZEObject based class has been checked.");
 
 	return true;
 }
@@ -727,14 +727,34 @@ void ZEMetaProcessorInternal::ProcessClass(CXXRecordDecl* Class)
 	if (!Class->isCompleteDefinition())
 		return;
 
-	if (!CheckClass(Class))
-		return;
+	ZEArray<ZEString> BuiltInClasses;
+	BuiltInClasses.Add("ZEVector2");
+	BuiltInClasses.Add("ZEVector3");
+	BuiltInClasses.Add("ZEVector4");
+	BuiltInClasses.Add("ZEMatrix3x3");
+	BuiltInClasses.Add("ZEMatrix4x4");
+	BuiltInClasses.Add("ZEQuaternion");
+
+	bool IsBuiltInClassFound = false;
+
+	for(ZESize I = 0; I < BuiltInClasses.GetCount(); I++)
+	{
+		if(BuiltInClasses[I] == Class->getNameAsString().c_str())
+			IsBuiltInClassFound = true;
+	}
+
+	if(!IsBuiltInClassFound)
+	{
+		if (!CheckClass(Class))
+			return;
+	}
 
 	ZEClassData* ClassData = new ZEClassData();
 	ClassData->Name = Class->getNameAsString();
 	ClassData->Hash = ClassData->Name.Hash();
 	ClassData->HasPublicConstructor = false;
 	ClassData->IsAbstract = false;
+	ClassData->IsBuiltInClass = IsBuiltInClassFound;
 
 	ZEAttributeData* AttributeData = new ZEAttributeData();
 	for(CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
@@ -747,13 +767,19 @@ void ZEMetaProcessorInternal::ProcessClass(CXXRecordDecl* Class)
 	{
 		if(isa<VarDecl>(*Current))
 		{
-			VarDecl* StaticProperty = ((VarDecl*)*Current);
-			ProcessProperty(ClassData, StaticProperty);
+			if(!IsBuiltInClassFound)
+			{
+				VarDecl* StaticProperty = ((VarDecl*)*Current);
+				ProcessProperty(ClassData, StaticProperty);
+			}
 		}
 		else if(isa<FieldDecl>(*Current))
 		{
-			FieldDecl* NonStaticProperty = ((FieldDecl*)*Current);
-			ProcessProperty(ClassData, NonStaticProperty);
+			if(!IsBuiltInClassFound)
+			{
+				FieldDecl* NonStaticProperty = ((FieldDecl*)*Current);
+				ProcessProperty(ClassData, NonStaticProperty);
+			}
 		}
 		else if(isa<CXXMethodDecl>(*Current))
 		{
@@ -1053,6 +1079,12 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 
 	if(Method->getCanonicalDecl()->isCopyAssignmentOperator())
 		return;
+
+	if(ClassData->IsBuiltInClass)
+	{
+		if(!Method->isStatic())
+			return;
+	}
 
 	if(isa<CXXConstructorDecl>(Method) || isa<CXXDestructorDecl>(Method))
 	{

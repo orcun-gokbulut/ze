@@ -229,6 +229,7 @@ class ZEClassData : public ZETypeData
 
 		bool							HasPublicConstructor;
 		bool							IsAbstract;
+		bool							IsBuiltInClass;
 
 		virtual							~ZEClassData();
 };
