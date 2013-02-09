@@ -37,26 +37,12 @@
 #ifndef __ZE_UI_COMPONENT__
 #define __ZE_UI_COMPONENT__
 
-#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEUIRectangle.h"
 #include "ZEUIEvents.h"
 #include "ZEDS/ZEFastDelegate.h"
-
-enum ZEUIControlVisibility
-{
-	ZE_IUCV_NOT_VISIBLE		= 0,
-	ZE_IUCV_SEMI_VISIBLE	= 1,
-	ZE_IUCV_FULLY_VISIBLE	= 2,
-};
-
-enum ZEUIBackgroundType
-{
-	ZE_UI_BT_NONE			= 1,
-	ZE_UI_BT_SOLID			= 0,
-};
 
 class ZEUIRenderer;
 class ZETexture2D;
@@ -73,15 +59,9 @@ class ZEUIControl
 
 		ZERectangle						Rectangle;
 		ZERectangle						VisibleRectangle;
+		ZERectangle						ScreenRectangle;
 	
 		ZEVector4						BackgroundColor;
-		ZEVector4						HoverColor;
-		ZEVector4						PressedColor;
-		ZEVector4						DisabledColor;
-
-		ZETexture2D*					BackgroundTexture;
-
-		ZEUIBackgroundType				BackgroundType;
 
 		bool							IsFocusable;
 		bool							IsMoveable;
@@ -93,27 +73,26 @@ class ZEUIControl
 		bool							IsFocused;
 		bool							IsPressed;       
 		
-		ZEInt							ZOrder;
+		int								ZOrder;
 
 		ZEVector2						MaximumSize;
 		ZEVector2						MinimumSize;
 
-		ZEUIEventMouseClicked			MouseClickedEvent;		
+		ZEUIEventMouseClicked			MouseClickedEvent;			//Done
 		ZEUIEventMouseDoubleClicked		MouseDoubleClickedEvent;
-		ZEUIEventMouseButtonPressed		MouseButtonPressedEvent;
-		ZEUIEventMouseButtonReleased	MouseButtonReleasedEvent;
-		ZEUIEventMouseHovered			MouseHoveredEvent;
-		ZEUIEventMouseEntered			MouseEnteredEvent;
-		ZEUIEventMouseLeft				MouseLeftEvent;
-		ZEUIEventMouseMoved				MouseMovedEvent;
-		ZEUIEventKeyPressed				KeyPressedEvent;
-		ZEUIEventKeyReleased			KeyReleasedEvent;
-		ZEUIEventFocusGained			FocusGainedEvent;
-		ZEUIEventFocusLost				FocusLostEvent;
+		ZEUIEventMouseButtonPressed		MouseButtonPressedEvent;	//Done
+		ZEUIEventMouseButtonReleased	MouseButtonReleasedEvent;	//Done
+		ZEUIEventMouseHovered			MouseHoveredEvent;			//Done
+		ZEUIEventMouseEntered			MouseEnteredEvent;			//Done
+		ZEUIEventMouseLeft				MouseLeftEvent;				//Done
+		ZEUIEventMouseMoved				MouseMovedEvent;			//Done
+		ZEUIEventKeyPressed				KeyPressedEvent;			//Done
+		ZEUIEventKeyReleased			KeyReleasedEvent;			//Done
+		ZEUIEventFocusGained			FocusGainedEvent;			//Done
+		ZEUIEventFocusLost				FocusLostEvent;				//Done
 
 	protected:
 
-		bool							DirtyVisibleRectangle;
 		void							SetParent(ZEUIControl *ParentName);
 
 		void							SetHovered(bool Hovered);
@@ -123,8 +102,8 @@ class ZEUIControl
 		ZEUIControl*					FindFocusedComponent();
 		ZEUIControl*					FindChildComponent(const ZEVector2& Position);
 
-		virtual void					KeyPressed(unsigned char Key);
-		virtual void					KeyReleased(unsigned char Key);
+		virtual void					KeyPressed(ZEUIInputKey Key);
+		virtual void					KeyReleased(ZEUIInputKey Key);
 
 		virtual void					MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 		virtual void					MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
@@ -132,7 +111,7 @@ class ZEUIControl
 		virtual void					MouseHovered(const ZEVector2& MousePosition);
 		virtual	void					MouseEnterEvent(const ZEVector2& MousePosition);
 		virtual	void					MouseLeaveEvent(const ZEVector2& MousePosition);
-		virtual void					MouseMoveEvent(const ZEVector2& MoveAmount);
+		virtual void					MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmount);
 		virtual void					FocusLost();
 		virtual void					FocusGained();
 
@@ -162,9 +141,6 @@ class ZEUIControl
 		void							SetFocusable(bool Focusable);
 		bool							GetFocusable();
 
-		virtual void					SetMoveable(bool Moveable);
-		bool							GetMoveable() const;
-
 		void							SetFixedSized(bool FixedSized);
 		bool							GetFixedSized() const; 
 
@@ -172,8 +148,11 @@ class ZEUIControl
 		bool							GetFocused() const;
 		bool							GetPressed() const;
 
-		void							SetZOrder(ZEInt Z);
+		virtual void					SetZOrder(ZEInt Z);
 		ZEInt							GetZOrder() const;
+
+		void							SetMoveable(bool IsMoveable);
+		bool							GetMoveable() const;
 
 		void							SetMinimumSize(ZEVector2 MinimumSize);
 		ZEVector2						GetMinimumSize() const;
@@ -182,9 +161,10 @@ class ZEUIControl
 		ZEVector2						GetMaximumSize() const;
 
 		virtual void					SetPosition(const ZEVector2& Position);
-		const ZEVector2&				GetPosition();
+		const ZEVector2&				GetPosition();		
+		ZEVector2						GetScreenPosition();
 
-		virtual void					SetSize(const ZEVector2& Size);
+		void							SetSize(const ZEVector2& Size);
 		ZEVector2						GetSize();
 
 		virtual void					SetWidth(float Width);
@@ -193,14 +173,12 @@ class ZEUIControl
 		virtual void					SetHeight(float Height);
 		float							GetHeight();
 
-		const ZERectangle&				GetVisibleRectangle();
-		const ZERectangle&				GetRectangle();
+		ZERectangle						GetRectangle();
+		ZERectangle						GetScreenRectangle();
+		ZERectangle						GetVisibleRectangle();
 
 		void							SetBackgroundColor(const ZEVector4& Color);
 		const ZEVector4&				GetBackgroundColor();
-
-		void							SetBackgroundType(ZEUIBackgroundType Type);
-		ZEUIBackgroundType				GetBackgroundType();
 
 		void 			 				SetMouseClickedEvent(const ZEUIEventMouseClicked& Event);
 		void 				 			SetMouseDoubleClickedEvent(const ZEUIEventMouseDoubleClicked& Event);
@@ -217,11 +195,8 @@ class ZEUIControl
 		virtual void					Draw(ZEUIRenderer* Renderer);
 		virtual void					Tick(float ElapsedTime);
 
-		virtual ZEMaterial*				GetMaterial() const = 0;
-		virtual void					SetMaterial(ZEMaterial* Material) = 0;
-
 										ZEUIControl();
-		virtual							~ZEUIControl();
+										~ZEUIControl();
 };
 
 

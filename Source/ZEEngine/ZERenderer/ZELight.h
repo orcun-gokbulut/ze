@@ -52,7 +52,7 @@ enum ZELightType
 
 class ZEScene;
 class ZEShadowRenderer;
-class ZEDrawParameters;
+struct ZEDrawParameters;
 
 class ZELight : public ZEEntity
 {

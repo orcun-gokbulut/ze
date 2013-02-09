@@ -64,14 +64,14 @@ ZEUIRenderer::~ZEUIRenderer()
 
 void ZEUIRenderer::Initialize()
 {
-	if (DefaultMaterial == NULL)
-	{
-		DefaultMaterial = ZEFixedMaterial::CreateInstance();
-		((ZEFixedMaterial*)DefaultMaterial)->SetLightningEnabled(false);
-		((ZEFixedMaterial*)DefaultMaterial)->SetAmbientEnabled(true);
-		((ZEFixedMaterial*)DefaultMaterial)->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));
-		((ZEFixedMaterial*)DefaultMaterial)->UpdateMaterial();
-	}
+// 	if (DefaultMaterial == NULL)
+// 	{
+// 		DefaultMaterial = ZEFixedMaterial::CreateInstance();
+// 		((ZEFixedMaterial*)DefaultMaterial)->SetLightningEnabled(false);
+// 		((ZEFixedMaterial*)DefaultMaterial)->SetAmbientEnabled(true);
+// 		((ZEFixedMaterial*)DefaultMaterial)->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));
+// 		((ZEFixedMaterial*)DefaultMaterial)->UpdateMaterial();
+// 	}
 
 	//if (VertexDeclaration == NULL)
 		//VertexDeclaration = ZEUIVertex::GetVertexDeclaration();
@@ -117,6 +117,7 @@ void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 			RenderCommands[I].PrimitiveCount += 2;
 			ZEUIVertex* Buffer = ((ZEArrayVertexBuffer<ZEUIVertex>*)RenderCommands[I].VertexBuffer)->MassAdd(6);
 			Rectangle.ConvertToVertices(Buffer);
+			RenderCommands[I].Priority = (float)Rectangle.ZOrder;
 			return;
 		}
 
@@ -132,6 +133,7 @@ void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 	NewRenderCommand->IndexBuffer = NULL;
 	NewRenderCommand->PrimitiveCount = 2;
 	NewRenderCommand->Order = (float)Rectangle.ZOrder;
+	NewRenderCommand->Priority = (float)Rectangle.ZOrder;
 	ZEUIVertex* Buffer = ((ZEArrayVertexBuffer<ZEUIVertex>*)NewRenderCommand->VertexBuffer)->MassAdd(6);
 	Rectangle.ConvertToVertices(Buffer);
 	*/
@@ -143,6 +145,8 @@ void ZEUIRenderer::Render(ZERenderer* Renderer)
 	
 	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
 	{
+		RenderCommands[I].Priority = (ZEInt)RenderCommands[I].Order;
+
 		if (RenderCommands[I].Material == NULL)
 			RenderCommands[I].Material = DefaultMaterial;
 		Renderer->AddToRenderList(&RenderCommands[I]);
@@ -165,7 +169,3 @@ ZEUIRenderer* ZEUIRenderer::CreateInstance()
 {
 	return new ZEUIRenderer();
 }
-
-
-
-

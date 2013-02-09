@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 
-class ZEStaticVertexBuffer;
+class ZEVertexBuffer;
 
 enum ZETerrainPrimitive
 {
@@ -58,7 +58,7 @@ struct ZETerrainPrimitiveIndices
 class ZETerrainPrimitivesGenerator
 {
 	public:
-		static bool Generate(ZEStaticVertexBuffer** Buffer, ZETerrainPrimitiveIndices* Indices, ZEInt EdgeLenght);
+		static bool Generate(ZEVertexBuffer** Buffer, ZETerrainPrimitiveIndices* Indices, ZEInt EdgeLenght);
 };
 
 #endif

@@ -44,14 +44,16 @@
 
 static bool TestSuccess(ZEString FileName)
 {
-	ZEPointer<ZEFile> File = ZEFile::Open(FileName);
+	ZEFile File;
+	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 
 	ZETextureFileTIFF Loader;
 	ZETextureDataInfo Info;
-	if (!Loader.LoadInfo(&Info, File))
+	if (!Loader.LoadInfo(&Info, &File))
 		return false;
 
-	ZEPointer<ZETextureData> Data = Loader.Load(&File);
+	ZETextureData* Data = Loader.Load(&File);
+
 	if (Data == NULL)
 		return false;
 
@@ -60,14 +62,14 @@ static bool TestSuccess(ZEString FileName)
 
 static bool TestFail(ZEString FileName)
 {
-	ZELogType OldLogType = ZELog::GetInstance()->GetMinimumLogLevel();
-	ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_CRITICAL_ERROR);
+	ZEFile File;
+	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 
 	ZEFile File;
 	File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 
 	ZETextureFileTIFF Loader;
-	ZEPointer<ZETextureData> Data = Loader.Load(&File);
+	ZETextureData* Data = Loader.Load(&File);
 
 	ZELog::GetInstance()->SetMinimumLogLevel(OldLogType);
 

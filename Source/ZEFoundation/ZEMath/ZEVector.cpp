@@ -160,6 +160,13 @@ float ZEVector2::LengthSquare() const
 	return (ZEVector2::DotProduct(*this, *this));
 }
 
+
+float ZEVector2::SignedAngle(const ZEVector2& A, const ZEVector2& B)
+{
+	float PerpDot = A.x * B.y - A.y * B.x;
+	return (float)ZEAngle::ArcTan2(PerpDot, ZEVector2::DotProduct(A, B));
+}
+
 ZEVector2 ZEVector2::Clamp(float MinValue, float MaxValue) const
 {
 	ZEVector2 Temp;
@@ -210,6 +217,18 @@ float ZEVector2::Max() const
 		return x;
 	else
 		return y;
+}
+
+bool ZEVector2::Equals(const ZEVector2& Vector) const
+{
+	return ((ZEMath::Abs(this->x - Vector.x) < ZE_ZERO_THRESHOLD) && 
+		(ZEMath::Abs(this->y - Vector.y) < ZE_ZERO_THRESHOLD));
+}
+
+bool ZEVector2::Equals(const ZEVector2& Vector, float Threshold) const
+{
+	return ((ZEMath::Abs(this->x - Vector.x) < Threshold) && 
+		(ZEMath::Abs(this->y - Vector.y) < Threshold));
 }
 
 ZEVector2 ZEVector2::operator +(const ZEVector2 &RightOperand) const
@@ -299,14 +318,12 @@ ZEVector2& ZEVector2::operator /=(float s)
 
 bool ZEVector2::operator ==(const ZEVector2 &RightOperand) const
 {
-	return ((ZEMath::Abs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
-		(ZEMath::Abs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD));
+	return Equals(RightOperand);
 }
 
 bool ZEVector2::operator !=(const ZEVector2 &RightOperand) const
 {
-	return ((ZEMath::Abs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
-		(ZEMath::Abs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD));
+	return !Equals(RightOperand);
 }
 
 float ZEVector2::operator[](ZESize Index) const
@@ -592,11 +609,6 @@ ZEVector2 ZEVector3::ToVector2(const ZEVector3& Vector)
 	return ZEVector2(Vector.x, Vector.y);
 }
 
-ZEVector2 ZEVector3::ToVector2() const
-{
-	return ZEVector2(x, y);
-}
-
 void ZEVector3::SaturateSelf()
 {
 	ZEVector3::Saturate(*this, *this);
@@ -626,6 +638,25 @@ float ZEVector3::Max() const
 		MaxComponent = z;
 
 	return MaxComponent;
+}
+
+bool ZEVector3::Equals(const ZEVector3& Vector) const
+{
+	return ((ZEMath::Abs(this->x - Vector.x) < ZE_ZERO_THRESHOLD) && 
+		(ZEMath::Abs(this->y - Vector.y) < ZE_ZERO_THRESHOLD) &&
+		(ZEMath::Abs(this->z - Vector.z) < ZE_ZERO_THRESHOLD));
+}
+
+bool ZEVector3::Equals(const ZEVector3& Vector, float Threshold) const
+{
+	return ((ZEMath::Abs(this->x - Vector.x) < Threshold) && 
+		(ZEMath::Abs(this->y - Vector.y) < Threshold) &&
+		(ZEMath::Abs(this->z - Vector.z) < Threshold));
+}
+
+ZEVector2 ZEVector3::ToVector2() const
+{
+	return ZEVector2(x, y);
 }
 
 ZEVector3 ZEVector3::operator+(const ZEVector3 &RightOperand) const
@@ -714,17 +745,12 @@ ZEVector3& ZEVector3::operator /= (float s)
 
 bool ZEVector3::operator == (const ZEVector3 &RightOperand) const
 {
-	return ((ZEMath::Abs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
-			(ZEMath::Abs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD) &&
-			(ZEMath::Abs(this->z - RightOperand.z) < ZE_ZERO_THRESHOLD));
-
+	return Equals(RightOperand);
 }
 
 bool ZEVector3::operator != (const ZEVector3 &RightOperand) const
 {
-	return ((ZEMath::Abs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
-			(ZEMath::Abs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD) ||
-			(ZEMath::Abs(this->z - RightOperand.z) > ZE_ZERO_THRESHOLD));
+	return !Equals(RightOperand);
 }
 
 float ZEVector3::operator[](ZESize Index) const
@@ -889,16 +915,6 @@ ZEVector3 ZEVector4::ToVector3(const ZEVector4& Vector)
 	return ZEVector3(Vector.x, Vector.y, Vector.z);
 }
 
-ZEVector2 ZEVector4::ToVector2() const
-{
-	return ZEVector2(x, y);
-}
-
-ZEVector3 ZEVector4::ToVector3() const
-{
-	return ZEVector3(x, y, z);
-}
-
 void ZEVector4::SaturateSelf()
 {
 	ZEVector4::Saturate(*this, *this);
@@ -930,6 +946,32 @@ float ZEVector4::Max() const
 	}
 
 	return Max;
+}
+
+bool ZEVector4::Equals(const ZEVector4& Vector) const
+{
+	return ((ZEMath::Abs(this->x - Vector.x) < ZE_ZERO_THRESHOLD) && 
+		(ZEMath::Abs(this->y - Vector.y) < ZE_ZERO_THRESHOLD) &&
+		(ZEMath::Abs(this->z - Vector.z) < ZE_ZERO_THRESHOLD) &&
+		(ZEMath::Abs(this->w - Vector.w) < ZE_ZERO_THRESHOLD));
+}
+
+bool ZEVector4::Equals(const ZEVector4& Vector, float Threshold) const
+{
+	return ((ZEMath::Abs(this->x - Vector.x) < Threshold) && 
+		(ZEMath::Abs(this->y - Vector.y) < Threshold) &&
+		(ZEMath::Abs(this->z - Vector.z) < Threshold) &&
+		(ZEMath::Abs(this->w - Vector.w) < Threshold));
+}
+
+ZEVector2 ZEVector4::ToVector2() const
+{
+	return ZEVector2(x, y);
+}
+
+ZEVector3 ZEVector4::ToVector3() const
+{
+	return ZEVector3(x, y, z);
 }
 
 ZEVector4 ZEVector4::operator+(const ZEVector4 &RightOperand) const
@@ -1018,18 +1060,12 @@ ZEVector4 ZEVector4::operator-() const
 
 bool ZEVector4::operator == (const ZEVector4 &RightOperand) const
 {
-	return ((ZEMath::Abs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
-			(ZEMath::Abs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD) &&
-			(ZEMath::Abs(this->z - RightOperand.z) < ZE_ZERO_THRESHOLD) &&
-			(ZEMath::Abs(this->w - RightOperand.w) < ZE_ZERO_THRESHOLD));
+	return Equals(RightOperand);
 }
 
 bool ZEVector4::operator != (const ZEVector4 &RightOperand) const
 {
-	return ((ZEMath::Abs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
-			(ZEMath::Abs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD) ||
-			(ZEMath::Abs(this->z - RightOperand.z) > ZE_ZERO_THRESHOLD) ||
-			(ZEMath::Abs(this->w - RightOperand.w) > ZE_ZERO_THRESHOLD));
+	return !Equals(RightOperand);
 }
 
 float ZEVector4::operator[](ZESize Index) const

@@ -98,9 +98,15 @@ ze_add_source(ZEViewCuboid.cpp			Sources)
 if (ZEBUILD_PLATFORM_ARCHITECTURE_SSE4)
 	ze_add_source(ZEMatrixSSE4.cpp			Sources)
 	ze_add_source(ZEVectorSSE4.cpp			Sources)
+    add_definitions(-D__SSE4__)
+    add_definitions(-D__SSE__)
+    add_definitions(-D__MMX__)
 elseif (ZEBUILD_PLATFORM_ARCHITECTURE_SSE3)
 	ze_add_source(ZEMatrixSSE3.cpp			Sources)
 	ze_add_source(ZEVectorSSE3.cpp			Sources)
+    add_definitions(-D__SSE3__)
+    add_definitions(-D__SSE__)
+    add_definitions(-D__MMX__)
 else()
 	ze_add_source(ZEMatrixGeneric.cpp		Sources)
 	ze_add_source(ZEVectorGeneric.cpp		Sources)
@@ -109,10 +115,7 @@ endif()
 ze_add_library(ZEMath 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEMath
-	INSTALL_COMPONENT ZESDK)
+	LIBS ZEFoundation)
 	
 ze_add_test(ZEMathTests
 	SOURCES ${Tests}

@@ -35,7 +35,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include "ui_ZEDSceneEditor.h"
-#include "ZEModules/ZEDirect3D9/ZED3D9FrameRenderer.h"
+#include "ZERenderer/ZERenderer.h"
 #include <QtGui/QFileDialog.h>
 #include <QtGui/QWidget>
 #include <QtGui/QAction>
@@ -52,14 +52,14 @@
 #include "ZEGame\ZEScene.h"
 #include "ZECore\ZEModuleManager.h"
 #include "ZECore\ZEWindow.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEMath/ZEMath.h"
 
 #include "ZEDCommonEntities/ZEDScreenAxis.h"
 
 
 #include <ZEGame\ZEEntityProvider.h>
-#include <ZEGraphics\ZEDirectionalLight.h>
+#include <ZERenderer\ZEDirectionalLight.h>
 #include <ZECore\ZEOptionManager.h>
 #include <ZEModel\ZEModel.h>
 #include <ZEGame\ZESkyBrush.h>
@@ -367,7 +367,7 @@ void MapEditor::BackupSave()
 
 void MapEditor::NewMapActionTriggered()
 {
-	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("New Map"),QString(this->WorkingDirectory),QString("*.ZEMAP"),0,0);
+	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("New Map"),QString(this->WorkingDirectory),QString("*.ZEINTERIOR"),0,0);
 	
 	if(SelectedFilePath.count() != 0)
 	{
@@ -379,7 +379,7 @@ void MapEditor::NewMapActionTriggered()
 
 void MapEditor::LoadMapActionTriggered()
 {
-	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("Load Map"),QString(this->WorkingDirectory),QString("*.ZEMAP"),0,0);
+	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("Load Map"),QString(this->WorkingDirectory),QString("*.ZEINTERIOR"),0,0);
 
 	if(SelectedFilePath.count() != 0)
 	{

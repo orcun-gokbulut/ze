@@ -123,7 +123,3 @@ class ZEDSModule : public ZESoundModule
 		virtual ZEListener*						CreateListener();
 };		
 #endif
-
-
-
-

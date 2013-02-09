@@ -36,280 +36,293 @@
 #include "ZETexturePixelConverter.h"
 #include "ZETextureData.h"
 
-void ZETexturePixelConverter::ConvertIndexed(ZEBGRA32* Destination, void* Source, ZESize Count, ZEBGRA32* Palette)
+void ZETexturePixelConverter::ConvertIndexed(ZEPixelRGBA8* Destination, void* Source, ZESize Count, ZEPixelRGBA8* Palette)
 {
 	for (ZESize N = 0; N < Count; N++)
 		Destination[N] = Palette[((ZEUInt8*)Source)[N]];	
 }
 
-void ZETexturePixelConverter::ConvertL8(ZEBGRA32* Destination, void* Source, ZESize Count)
+void ZETexturePixelConverter::ConvertIndexed16(ZEPixelRGBA8* Destination, void* Source, ZESize Count, ZEPixelRGBA8* Palette)
 {
-	for (ZESize I = 0; I < Count; I++)
-		((ZEUInt32*)Destination)[I] = (0xFF000000 | (ZEUInt32)((ZEUInt8*)Source)[I] << 16 | (ZEUInt32)((ZEUInt8*)Source)[I] << 8 | ((ZEUInt8*)Source)[I]);
+	for (ZESize N = 0; N < Count; N++)
+		if (((ZEUInt16*)Source)[N] > 0xFF)
+			Destination[N].R = Destination[N].G = Destination[N].B = Destination[N].A = 0;
+		else
+			Destination[N] = Palette[((ZEUInt16*)Source)[N]];	
 }
 
-void ZETexturePixelConverter::ConvertL16(ZEBGRA32* Destination, void* Source, ZESize Count)
+static void ConvertL8_INV(ZEPixelL8* Destination, void* Source, ZESize Count)
 {
-	for (ZESize I = 0; I < Count; I++)
+	ZEPixelL8* End = Destination + Count;
+	while(Destination < End)
 	{
-		ZEUInt16 Value = *(ZEUInt16*)((ZEUInt8*)Source) >> 8;
-		((ZEUInt32*)Destination)[I] = (0xFF000000 | (ZEUInt32)Value << 16 | (ZEUInt32)Value << 8 | Value);
+		Destination->L = ~(*(ZEUInt8*)Source);
+		Source = (ZEUInt8*)Source + 1;
 	}
 }
 
-void ZETexturePixelConverter::ConvertLA8(ZEBGRA32* Destination, void* Source, ZESize Count)
+static void ConvertLA8_INV(ZEPixelLA8* Destination, void* Source, ZESize Count)
 {
-
+	ZEPixelLA8* End = Destination + Count;
+	while(Destination < End)
+	{
+		Destination->L = ~(((ZEUInt8*)Source)[1]);
+		Destination->A =  ((ZEUInt8*)Source)[0];;
+		Source = (ZEUInt8*)Source + 2;
+	}
 }
 
-void ZETexturePixelConverter::ConvertAL8(ZEBGRA32* Destination, void* Source, ZESize Count)
+static void ConvertL16_INV(ZEPixelL16* Destination, void* Source, ZESize Count)
 {
-
+	ZEPixelL16* End = Destination + Count;
+	while(Destination < End)
+	{
+		Destination->L = ~(*(ZEUInt16*)Source);
+		Source = (ZEUInt8*)Source + 2;
+	}
 }
 
-void ZETexturePixelConverter::ConvertLA16(ZEBGRA32* Destination, void* Source, ZESize Count)
+static void ConvertLA16_INV(ZEPixelLA16* Destination, void* Source, ZESize Count)
 {
-
+	ZEPixelLA16* End = Destination + Count;
+	while(Destination < End)
+	{
+		Destination->L = ~((ZEUInt16*)Source)[1];
+		Destination->A =  ((ZEUInt16*)Source)[0];
+		Source = (ZEUInt8*)Source + 4;
+	}
 }
 
-void ZETexturePixelConverter::ConvertAL16(ZEBGRA32* Destination, void* Source, ZESize Count)
+static void ConvertL16_INV_BE(ZEPixelL16* Destination, void* Source, ZESize Count)
 {
-
+	ZEPixelL16* End = Destination + Count;
+	while(Destination < End)
+	{
+		Destination->L = ~ZEEndian::Little(*(ZEUInt16*)Source);
+		Source = (ZEUInt8*)Source + 2;
+	}
 }
 
-void ZETexturePixelConverter::ConvertBGR555(ZEBGRA32* Destination, void* Source, ZESize Count)
+static void ConvertLA16_INV_BE(ZEPixelLA16* Destination, void* Source, ZESize Count)
 {
-	ZEBGRA32* End = Destination + Count;
+	ZEPixelLA16* End = Destination + Count;
+	while(Destination < End)
+	{
+		Destination->L = ~ZEEndian::Little(((ZEUInt16*)Source)[1]);
+		Destination->A =  ZEEndian::Little(((ZEUInt16*)Source)[0]);
+		Source = (ZEUInt8*)Source + 4;
+	}
+}
+
+void ZETexturePixelConverter::ConvertL16_BE(ZEPixelL16* Destination, void* Source, ZESize Count)
+{
+	ZEPixelL16* End = Destination + Count;
+	while(Destination < End)
+	{
+		Destination->L = ZEEndian::Little(*(ZEUInt16*)Source);
+		Source = (ZEUInt8*)Source + 2;
+	}
+}
+
+void ZETexturePixelConverter::ConvertLA16_BE(ZEPixelLA16* Destination, void* Source, ZESize Count)
+{
+	ZEPixelLA16* End = Destination + Count;
+	while(Destination < End)
+	{
+		Destination->L = ZEEndian::Little(((ZEUInt16*)Source)[1]);
+		Destination->A = ZEEndian::Little(((ZEUInt16*)Source)[0]);
+		Source = (ZEUInt8*)Source + 4;
+	}
+}
+
+void ZETexturePixelConverter::ConvertAL8(ZEPixelLA8* Destination, void* Source, ZESize Count)
+{
+	ZEPixelLA8* End = Destination + Count;
+	while(Destination < End)
+	{
+		Destination->L = ZEEndian::Little(((ZEUInt8*)Source)[1]);
+		Destination->A = ZEEndian::Little(((ZEUInt8*)Source)[0]);
+		Source = (ZEUInt8*)Source + 2;
+	}
+}
+
+void ZETexturePixelConverter::ConvertAL16(ZEPixelLA16* Destination, void* Source, ZESize Count)
+{
+	ZEPixelLA16* End = Destination + Count;
+	while(Destination < End)
+	{
+		Destination->L = ZEEndian::Little(((ZEUInt16*)Source)[1]);
+		Destination->A = ZEEndian::Little(((ZEUInt16*)Source)[0]);
+		Source = (ZEUInt8*)Source + 4;
+	}
+}
+
+void ZETexturePixelConverter::ConvertBGRX5551(ZEPixelRGBA8* Destination, void* Source, ZESize Count)
+{
+	ZEPixelRGBA8* End = Destination + Count;
 	while(Destination < End)
 	{
 		#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
-			Destination->R = *(ZEUInt16*)Source >> 7;
-			Destination->G = *(ZEUInt16*)Source >> 2;
-			Destination->B = (*(ZEUInt16*)Source << 3) & 0xF8;
-			Destination->A = 255;			
-		#else	
-			Destination->R = (((ZEUInt8*)Source)[1] << 1) & 0xF8;
-			Destination->G = ((((ZEUInt8*)Source)[1] << 6) | (((ZEUInt8*)Source)[0] >> 2)) & 0xF8; 
-			Destination->B = ((ZEUInt8*)Source)[0] << 3;
-			Destination->A = 255;
+			Destination->R = (*(ZEUInt16*)Source >> 7) | 0x07;
+			Destination->G = (*(ZEUInt16*)Source >> 2) | 0x07;
+			Destination->B = (*(ZEUInt16*)Source << 3) | 0x07;
+			Destination->A = 0xFF;			
+		#else
+			Destination->R = (((ZEUInt8*)Source)[1] << 1) | 0x07;
+			Destination->G = ((((ZEUInt8*)Source)[1] << 6) | (((ZEUInt8*)Source)[0] >> 2)) | 0x07; 
+			Destination->B = ((ZEUInt8*)Source)[0] << 3 | 0x07;
+			Destination->A = 0xFF;
 		#endif
 		Destination++;
 		Source = (ZEUInt8*)Source + 2;
 	}
 }
 
-void ZETexturePixelConverter::ConvertRGB555(ZEBGRA32* Destination, void* Source, ZESize Count)
+void ZETexturePixelConverter::ConvertBGRA5551(ZEPixelRGBA8* Destination, void* Source, ZESize Count)
 {
-	ZEBGRA32* End = Destination + Count;
-	while(Destination < End)
-	{
-		#ifdef ZE_PLATFORM_ENDIANNESS_BIG
-			Destination->R = *(ZEUInt16*)Source >> 7;
-			Destination->G = *(ZEUInt16*)Source >> 2;
-			Destination->B = *(ZEUInt16*)Source & 0xF8;
-			Destination->A = 255;			
-		#else		
-			Destination->R = (((ZEUInt8*)Source)[0] << 1) & 0xF8;
-			Destination->G = ((((ZEUInt8*)Source)[0] << 6) | (((ZEUInt8*)Source)[1] >> 2)) & 0xF8; 
-			Destination->B = ((ZEUInt8*)Source)[1] << 3;
-			Destination->A = 255;
-		#endif
-		Destination++;
-		Source = (ZEUInt8*)Source + 2;
-	}
-}
-
-void ZETexturePixelConverter::ConvertBGRA1555(ZEBGRA32* Destination, void* Source, ZESize Count)
-{
-	ZEBGRA32* End = Destination + Count;
+	ZEPixelRGBA8* End = Destination + Count;
 	while(Destination < End)
 	{
 		#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
-			Destination->R = (*(ZEUInt16*)Source >> 7) & 0xF8;
-			Destination->G = (*(ZEUInt16*)Source >> 2) & 0xF8;
-			Destination->B = (*(ZEUInt16*)Source << 3) & 0xF8;
-			Destination->A = (*(ZEUInt16*)Source & 0x8000) ? 255 : 0;			
+			Destination->R = (*(ZEUInt16*)Source >> 7) | 0x07;
+			Destination->G = (*(ZEUInt16*)Source >> 2) | 0x07;
+			Destination->B = (*(ZEUInt16*)Source << 3) | 0x07;
+			Destination->A = (*(ZEUInt16*)Source & 0x8000) ? 0xFF : 0;			
 		#else
-			Destination->R = (((ZEUInt8*)Source)[1] << 1) & 0xF8;
-			Destination->G = ((((ZEUInt8*)Source)[1] << 6) | (((ZEUInt8*)Source)[0] >> 2)) & 0xF8; 
-			Destination->B = ((ZEUInt8*)Source)[0] << 3;
-			Destination->A = (((ZEUInt8*)Source)[0] & 0x80) ? 255 : 0;
+			Destination->R = (((ZEUInt8*)Source)[1] << 1) | 0x07;
+			Destination->G = ((((ZEUInt8*)Source)[1] << 6) | (((ZEUInt8*)Source)[0] >> 2)) | 0x07; 
+			Destination->B = ((ZEUInt8*)Source)[0] << 3 | 0x07;
+			Destination->A = (((ZEUInt8*)Source)[0] & 0x80) ? 0xFF : 0;
 		#endif
 		Source = (ZEUInt8*)Source + 2;
 		Destination++;
 	}
 }
 
-void ZETexturePixelConverter::ConvertARGB1555(ZEBGRA32* Destination, void* Source, ZESize Count)
+void ZETexturePixelConverter::ConvertBGR565(ZEPixelRGBA8* Destination, void* Source, ZESize Count)
 {
-	ZEBGRA32* End = Destination + Count;
-	while(Destination < End)
-	{
-		#ifdef ZE_PLATFORM_ENDIANNESS_BIG
-			Destination->R = (*(ZEUInt16*)Source >> 7) & 0xF8;
-			Destination->G = (*(ZEUInt16*)Source >> 2) & 0xF8;
-			Destination->B = (*(ZEUInt16*)Source >> 3) & 0xF8;
-			Destination->A = (*(ZEUInt16*) & 0x8000) ? 255 : 0;			
-		#else
-			Destination->R = (((ZEUInt8*)Source)[0] << 1) & 0xF8;
-			Destination->G = ((((ZEUInt8*)Source)[0] << 6) | (((ZEUInt8*)Source)[1] >> 2)) & 0xF8; 
-			Destination->B = ((ZEUInt8*)Source)[1] << 3;
-			Destination->A = (((ZEUInt8*)Source)[1] & 0x80) ? 255 : 0;
-		#endif
-
-		Source = (ZEUInt8*)Source + 2;
-		Destination++;
-	}
-}
-
-void ZETexturePixelConverter::ConvertBGR565(ZEBGRA32* Destination, void* Source, ZESize Count)
-{
-	ZEBGRA32* End = Destination + Count;
+	ZEPixelRGBA8* End = Destination + Count;
 	while(Destination < End)
 	{
 		#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
-			Destination->R = (*(ZEUInt16*)Source >> 8) & 0xF8;
-			Destination->G = (*(ZEUInt16*)Source >> 3) & 0xFC;
-			Destination->B = (*(ZEUInt16*)Source << 3) & 0xF8;
-			Destination->A = 255;			
+			Destination->R = (*(ZEUInt16*)Source >> 8) | 0x07;
+			Destination->G = (*(ZEUInt16*)Source >> 3) | 0x03;
+			Destination->B = (*(ZEUInt16*)Source << 3) | 0x07;
 		#else
-			Destination->R = (((ZEUInt8*)Source)[1]) & 0xF8;
-			Destination->G = ((((ZEUInt8*)Source)[1] << 5) | (((ZEUInt8*)Source)[0] >> 3)) & 0xFC;
-			Destination->B = ((ZEUInt8*)Source)[0] << 3;
-			Destination->A = 255;
+			Destination->R = (((ZEUInt8*)Source)[1]) | 0x07;
+			Destination->G = ((((ZEUInt8*)Source)[1] << 5) | (((ZEUInt8*)Source)[0] >> 3)) | 0x03;
+			Destination->B = ((ZEUInt8*)Source)[0] << 3 | 0x07;
 		#endif
+		Destination->A = 0xFF;
 
 		Source = (ZEUInt8*)Source + 2;
 		Destination++;
 	}
 }
 
-void ZETexturePixelConverter::ConvertRGB565(ZEBGRA32* Destination, void* Source, ZESize Count)
+void ZETexturePixelConverter::ConvertRGB8(ZEPixelRGBA8* Destination, void* Source, ZESize Count)
 {
-	ZEBGRA32* End = Destination + Count;
+	ZEPixelRGBA8* End = Destination + Count;
 	while(Destination < End)
 	{
-		#ifdef ZE_PLATFORM_ENDIANNESS_BIG
-			Destination->R = (*(ZEUInt16*)Source >> 8) & 0xF8;
-			Destination->G = (*(ZEUInt16*)Source >> 3) & 0xFC;
-			Destination->B = (*(ZEUInt16*)Source >> 3) & 0xF8;
-			Destination->A = 255;			
-		#else
-			Destination->R = (((ZEUInt8*)Source)[0]) & 0xF8;
-			Destination->G = ((((ZEUInt8*)Source)[0] << 5) | (((ZEUInt8*)Source)[1] >> 3)) & 0xFC; 
-			Destination->B = ((ZEUInt8*)Source)[1] << 3;
-			Destination->A = 255;
-		#endif
+		Destination->B = ((ZEUInt8*)Source)[2];
+		Destination->G = ((ZEUInt8*)Source)[1];
+		Destination->R = ((ZEUInt8*)Source)[0];
+		Destination->A = 0xFF;
 
-		Source = (ZEUInt8*)Source + 2;
+		Source = (ZEUInt8*)Source + 3;
 		Destination++;
 	}
 }
 
-void ZETexturePixelConverter::ConvertBGR8(ZEBGRA32* Destination, void* Source, ZESize Count)
+void ZETexturePixelConverter::ConvertBGR8(ZEPixelRGBA8* Destination, void* Source, ZESize Count)
 {
-	ZEBGRA32* End = Destination + Count;
+	ZEPixelRGBA8* End = Destination + Count;
 	int Valid = 0;
 	while(Destination < End)
 	{
-/*		#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
-			*(ZEUInt32*)Destination  = *(ZEUInt32*)Source | 0xFF000000;
-			Destination[3].A = 255;
-		#else*/
-			Destination->B = ((ZEUInt8*)Source)[0];
-			Destination->G = ((ZEUInt8*)Source)[1];
-			Destination->R = ((ZEUInt8*)Source)[2];
-			Destination->A = 255;
-		//#endif
+		Destination->B = ((ZEUInt8*)Source)[0];
+		Destination->G = ((ZEUInt8*)Source)[1];
+		Destination->R = ((ZEUInt8*)Source)[2];
+		Destination->A = 0xFF;
 
 		Source = (ZEUInt8*)Source + 3;
 		Destination++;
 		Valid++;
 	}
 }
-void ZETexturePixelConverter::ConvertRGB8(ZEBGRA32* Destination, void* Source, ZESize Count)
+
+void ZETexturePixelConverter::ConvertBGRA8(ZEPixelRGBA8* Destination, void* Source, ZESize Count)
 {
-	ZEBGRA32* End = Destination + Count;
+	ZEPixelRGBA8* End = Destination + Count;
 	while(Destination < End)
 	{
-		#ifdef ZE_PLATFORM_ENDIANNESS_BIG
-			*(ZEUInt32*)Destination  = *(ZEUInt32*)Source;
-		#else
-			Destination->B = ((ZEUInt8*)Source)[2];
-			Destination->G = ((ZEUInt8*)Source)[1];
-			Destination->R = ((ZEUInt8*)Source)[0];
-			Destination->A = 255;
-		#endif
+		Destination->B = ((ZEUInt8*)Source)[0];
+		Destination->G = ((ZEUInt8*)Source)[1];
+		Destination->R = ((ZEUInt8*)Source)[2];
+		Destination->A = ((ZEUInt8*)Source)[3];
 
 		Source = (ZEUInt8*)Source + 4;
 		Destination++;
 	}
 }
 
-void ZETexturePixelConverter::ConvertBGRA8(ZEBGRA32* Destination, void* Source, ZESize Count)
+void ZETexturePixelConverter::ConvertBGRX8(ZEPixelRGBA8* Destination, void* Source, ZESize Count)
 {
-	ZEBGRA32* End = Destination + Count;
+	ZEPixelRGBA8* End = Destination + Count;
 	while(Destination < End)
 	{
-		#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
-			*(ZEUInt32*)Destination  = *(ZEUInt32*)Source;
-		#else
-			Destination->B = ((ZEUInt8*)Source)[0];
-			Destination->G = ((ZEUInt8*)Source)[1];
-			Destination->R = ((ZEUInt8*)Source)[2];
-			Destination->A = ((ZEUInt8*)Source)[4];
-		#endif
+		Destination->B = ((ZEUInt8*)Source)[0];
+		Destination->G = ((ZEUInt8*)Source)[1];
+		Destination->R = ((ZEUInt8*)Source)[2];
+		Destination->A = 255;
 
 		Source = (ZEUInt8*)Source + 4;
 		Destination++;
 	}
 }
 
-void ZETexturePixelConverter::ConvertARGB8(ZEBGRA32* Destination, void* Source, ZESize Count)
+void ZETexturePixelConverter::ConvertRGB16(ZEPixelRGBA16* Destination, void* Source, ZESize Count)
 {
-	ZEBGRA32* End = Destination + Count;
+	ZEPixelRGBA16* End = Destination + Count;
 	while(Destination < End)
 	{
-		#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
-			*(ZEUInt32*)Destination  = *(ZEUInt32*)Source;
-		#else
-			Destination->A = ((ZEUInt8*)Source)[3];
-			Destination->B = ((ZEUInt8*)Source)[2];
-			Destination->G = ((ZEUInt8*)Source)[1];
-			Destination->R = ((ZEUInt8*)Source)[0];
-		#endif
+		Destination->R = ((ZEUInt16*)Source)[0];
+		Destination->G = ((ZEUInt16*)Source)[1];
+		Destination->B = ((ZEUInt16*)Source)[2];
+		Destination->A = 0xFFFF;
 
-		Source = (ZEUInt8*)Source + 4;
+		Source = (ZEUInt8*)Source + 6;
 		Destination++;
 	}
 }
 
-void ZETexturePixelConverter::ConvertABGR8(ZEBGRA32* Destination, void* Source, ZESize Count)
+void ZETexturePixelConverter::ConvertRGB16_BE(ZEPixelRGBA16* Destination, void* Source, ZESize Count)
 {
-	ZEBGRA32* End = Destination + Count;
+	ZEPixelRGBA16* End = Destination + Count;
 	while(Destination < End)
 	{
-		Destination->A = ((ZEUInt8*)Source)[0];
-		Destination->B = ((ZEUInt8*)Source)[1];
-		Destination->G = ((ZEUInt8*)Source)[2];
-		Destination->R = ((ZEUInt8*)Source)[3];
+		Destination->R = ZEEndian::Little(((ZEUInt16*)Source)[0]);
+		Destination->G = ZEEndian::Little(((ZEUInt16*)Source)[1]);
+		Destination->B = ZEEndian::Little(((ZEUInt16*)Source)[2]);
+		Destination->A = 0xFFFF;
 
-		Source = (ZEUInt8*)Source + 4;
+		Source = (ZEUInt8*)Source + 6;
 		Destination++;
 	}
 }
 
-void ZETexturePixelConverter::ConvertRGBA8(ZEBGRA32* Destination, void* Source, ZESize Count)
+void ZETexturePixelConverter::ConvertRGBA16_BE(ZEPixelRGBA16* Destination, void* Source, ZESize Count)
 {
-	ZEBGRA32* End = Destination + Count;
+	ZEPixelRGBA16* End = Destination + Count;
 	while(Destination < End)
 	{
-		Destination->R = ((ZEUInt8*)Source)[0];
-		Destination->B = ((ZEUInt8*)Source)[2];
-		Destination->G = ((ZEUInt8*)Source)[3];
-		Destination->A = ((ZEUInt8*)Source)[4];
+		Destination->R = ZEEndian::Little(((ZEUInt16*)Source)[0]);
+		Destination->G = ZEEndian::Little(((ZEUInt16*)Source)[1]);
+		Destination->B = ZEEndian::Little(((ZEUInt16*)Source)[2]);
+		Destination->A = ZEEndian::Little(((ZEUInt16*)Source)[3]);
 
-		Source = (ZEUInt8*)Source + 4;
+		Source = (ZEUInt8*)Source + 8;
 		Destination++;
 	}
 }

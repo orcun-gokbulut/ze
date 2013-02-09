@@ -34,19 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEApplicationModule.h"
+#include "ZEFile/ZEPathManager.h"
 
 ZE_MODULE_DESCRIPTION_ABSTRACT(ZEApplicationModule, ZEModule, NULL)
-
-
-void ZEApplicationModule::SetApplicationName(const ZEString& Name)
-{
-	ApplicationName = Name;
-}
-
-const ZEString& ZEApplicationModule::GetApplicationName() const
-{
-	return ApplicationName;
-}
 
 void ZEApplicationModule::PreProcess()
 {
@@ -71,9 +61,11 @@ void ZEApplicationModule::ShutDown()
 void ZEApplicationModule::Start()
 {
 }
+
 void ZEApplicationModule::Stop()
 {
 }
+
 void ZEApplicationModule::Tick(float ElapsedTime)
 {
 }
@@ -84,7 +76,11 @@ void ZEApplicationModule::Render(float ElapsedTime)
 
 ZEApplicationModule::ZEApplicationModule()
 {
-	ApplicationName = "";
+	// Set Default Names
+	ZEString DefaultCompanyName = "Zinek";
+	ZEString DefaultApplicationName = "Engine";
+	ZEString DefaultResourcesDirectoryName = "Resources";
+	ZEPathManager::CustomizePaths(&DefaultCompanyName, &DefaultApplicationName, &DefaultResourcesDirectoryName);
 }
 
 ZEApplicationModule::~ZEApplicationModule()

@@ -44,8 +44,3 @@ void			zeTerminate();
 void			zeMainLoop();
 
 #endif
-
-
-
-
-

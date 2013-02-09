@@ -164,7 +164,3 @@ ZERectangle::ZERectangle(const ZEVector2& UpLeft, float Width, float Height)
 	this->RightDown.x = UpLeft.x + Width;
 	this->RightDown.y = UpLeft.y + Height;
 }
-
-
-
-

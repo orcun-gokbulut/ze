@@ -77,7 +77,3 @@ class ZEParticle
 };
 
 #endif
-
-
-
-

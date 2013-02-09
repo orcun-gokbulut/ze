@@ -65,8 +65,3 @@ class ZEExtensionManager
 };
 
 #endif
-
-
-
-
-

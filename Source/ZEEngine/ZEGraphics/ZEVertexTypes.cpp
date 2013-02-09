@@ -34,176 +34,132 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEVertexTypes.h"
-#include "ZEVertexDeclaration.h"
-#include "ZEError.h"
 
-ZEVertexLayout* ZESimpleVertex::VertexDeclaration;
-ZEVertexLayout* ZESimpleVertex::GetVertexDeclaration()
+ZEVertexLayout ZESimpleVertex::Layout;
+const ZEVertexLayout&	ZESimpleVertex::GetVertexLayout()
 {
-	if (VertexDeclaration != NULL)
-		return VertexDeclaration;
-
-	VertexDeclaration = ZEVertexLayout::CreateInstance();
-
-	ZEVertexElement ElementArray[] = {
-										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
-										{ZE_VES_NORMAL, ZE_VET_FLOAT3, 0},
-										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
-										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT4, 1}
-									};
-
-	zeCriticalError("Remove this function");
-	/*
-	if (!VertexDeclaration->Create(ElementArray, 4))
+	static bool Initialized = false;
+	static const ZEVertexElement VertexElements[] = 
 	{
-		VertexDeclaration->Destroy();
-		VertexDeclaration = NULL;
-	}
-	*/
-	//zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZESimpleVertex), "Vertex decleration size does not matches.");
-
-	return VertexDeclaration;
-}
-/*
-ZEVertexLayout* ZEMapVertex::VertexDeclaration = NULL;
-ZEVertexLayout* ZEMapVertex::GetVertexDeclaration()
-{
-	if (VertexDeclaration != NULL)
-		return VertexDeclaration;
-
-	VertexDeclaration = ZEVertexLayout::CreateInstance();
-
-	ZEVertexElement ElementArray[] = {
-		{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
-		{ZE_VES_NORMAL, ZE_VET_FLOAT3, 0},
-		{ZE_VES_TANGENT, ZE_VET_FLOAT3, 0},
-		{ZE_VES_BINORMAL, ZE_VET_FLOAT3, 0},
-		{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
+		{"POSITION",	0, ZE_VET_FLOAT3, 0, 0,		ZE_VU_PER_VERTEX, 0},
+		{"NORMAL",		0, ZE_VET_FLOAT3, 0, 12,	ZE_VU_PER_VERTEX, 0},
+		{"TEXCOORD",	0, ZE_VET_FLOAT2, 0, 24,	ZE_VU_PER_VERTEX, 0},
+		{"COLOR",		0, ZE_VET_FLOAT4, 0, 32,	ZE_VU_PER_VERTEX, 0}
 	};
-	
-	zeCriticalError("Remove this function");
-	
-	if (!VertexDeclaration->Create(ElementArray, 5))
-	{
-		VertexDeclaration->Destroy();
-		VertexDeclaration = NULL;
-	}
-	
-	//zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEMapVertex), "Vertex decleration size does not matches.");
 
-	return VertexDeclaration;
+	if (!Initialized)
+	{
+		Layout.SetLayout(VertexElements, 4);
+		Initialized = true;
+	}
+
+	return Layout;
 }
-*/
-ZEVertexLayout* ZEModelVertex::VertexDeclaration = NULL;
-ZEVertexLayout* ZEModelVertex::GetVertexDeclaration()
+
+ZEVertexLayout ZEInteriorVertex::Layout;
+const ZEVertexLayout& ZEInteriorVertex::GetVertexLayout()
 {
-	if (VertexDeclaration != NULL)
-		return VertexDeclaration;
-
-	VertexDeclaration = ZEVertexLayout::CreateInstance();
-
-	ZEVertexElement ElementArray[] = {
-										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
-										{ZE_VES_NORMAL, ZE_VET_FLOAT3, 0},
-										{ZE_VES_TANGENT, ZE_VET_FLOAT3, 0},
-										{ZE_VES_BINORMAL, ZE_VET_FLOAT3, 0},
-										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
-									};
-	zeCriticalError("Remove this function");
-	/*
-	if (!VertexDeclaration->Create(ElementArray, 5))
+	static bool Initialized = false;
+	static const ZEVertexElement VertexElements[] = 
 	{
-		VertexDeclaration->Destroy();
-		VertexDeclaration = NULL;
-	}
-	*/
-	//zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEModelVertex), "Vertex decleration size does not matches.");
+		{"POSITION",	0, ZE_VET_FLOAT3, 0, 0,		ZE_VU_PER_VERTEX, 0},
+		{"NORMAL",		0, ZE_VET_FLOAT3, 0, 12,	ZE_VU_PER_VERTEX, 0},
+		{"TANGENT",		0, ZE_VET_FLOAT3, 0, 24,	ZE_VU_PER_VERTEX, 0},
+		{"BINORMAL",	0, ZE_VET_FLOAT3, 0, 36,	ZE_VU_PER_VERTEX, 0},
+		{"TEXCOORD",	0, ZE_VET_FLOAT2, 0, 48,	ZE_VU_PER_VERTEX, 0},
+	};
 
-	return VertexDeclaration;
+	if (!Initialized)
+	{
+		Layout.SetLayout(VertexElements, 5);
+		Initialized = true;
+	}
+
+	return Layout;
 }
 
-ZEVertexLayout* ZESkinnedModelVertex::VertexDeclaration = NULL;
-ZEVertexLayout* ZESkinnedModelVertex::GetVertexDeclaration()
+ZEVertexLayout ZEModelVertex::Layout;
+const ZEVertexLayout& ZEModelVertex::GetVertexLayout()
 {
-	if (VertexDeclaration != NULL)
-		return VertexDeclaration;
-
-	VertexDeclaration = ZEVertexLayout::CreateInstance();
-
-	ZEVertexElement ElementArray[] = {
-										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
-										{ZE_VES_NORMAL, ZE_VET_FLOAT3, 0},
-										{ZE_VES_TANGENT, ZE_VET_FLOAT3, 0},
-										{ZE_VES_BINORMAL, ZE_VET_FLOAT3, 0},
-										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
-										{ZE_VES_BLENDINDEX, ZE_VET_BYTE4, 0},
-										{ZE_VES_BLENDWEIGHT, ZE_VET_FLOAT4, 0},
-									};
-
-	zeCriticalError("Remove this function");
-
-	/*
-	if (!VertexDeclaration->Create(ElementArray, 7))
+	static bool Initialized = false;
+	static const ZEVertexElement VertexElements[] = 
 	{
-		VertexDeclaration->Destroy();
-		VertexDeclaration = NULL;
-	}
-	*/
-	//zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZESkinnedModelVertex), "Vertex decleration size does not matches.");
+		{"POSITION",	0, ZE_VET_FLOAT3, 0, 0,		ZE_VU_PER_VERTEX, 0},
+		{"NORMAL",		0, ZE_VET_FLOAT3, 0, 12,	ZE_VU_PER_VERTEX, 0},
+		{"TANGENT",		0, ZE_VET_FLOAT3, 0, 24,	ZE_VU_PER_VERTEX, 0},
+		{"BINORMAL",	0, ZE_VET_FLOAT3, 0, 36,	ZE_VU_PER_VERTEX, 0},
+		{"TEXCOORD",	0, ZE_VET_FLOAT2, 0, 48,	ZE_VU_PER_VERTEX, 0},
+	};
 
-	return VertexDeclaration;
+	if (!Initialized)
+	{
+		Layout.SetLayout(VertexElements, 5);
+		Initialized = true;
+	}
+
+	return Layout;
 }
 
-ZEVertexLayout* ZEUIVertex::VertexDeclaration = NULL;
-ZEVertexLayout* ZEUIVertex::GetVertexDeclaration()
+ZEVertexLayout ZESkinnedModelVertex::Layout;
+const ZEVertexLayout& ZESkinnedModelVertex::GetVertexLayout()
 {
-	if (VertexDeclaration != NULL)
-		return VertexDeclaration;
-
-	VertexDeclaration = ZEVertexLayout::CreateInstance();
-
-	ZEVertexElement ElementArray[] = {
-										{ZE_VES_POSITION, ZE_VET_FLOAT2, 0},
-										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT4, 0},
-										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 1},
-									};
-	
-	zeCriticalError("Remove this function");
-	/*
-	if (!VertexDeclaration->Create(ElementArray, 3))
+	static bool Initialized = false;
+	static const ZEVertexElement VertexElements[] = 
 	{
-		VertexDeclaration->Destroy();
-		VertexDeclaration = NULL;
+		{"POSITION",	0, ZE_VET_FLOAT3,	0, 0,	ZE_VU_PER_VERTEX, 0},
+		{"NORMAL",		0, ZE_VET_FLOAT3,	0, 12,	ZE_VU_PER_VERTEX, 0},
+		{"TANGENT",		0, ZE_VET_FLOAT3,	0, 24,	ZE_VU_PER_VERTEX, 0},
+		{"BINORMAL",	0, ZE_VET_FLOAT3,	0, 36,	ZE_VU_PER_VERTEX, 0},
+		{"TEXCOORD",	0, ZE_VET_FLOAT2,	0, 48,	ZE_VU_PER_VERTEX, 0},
+		{"BLENDINDEX",	0, ZE_VET_UINT,		0, 56,	ZE_VU_PER_VERTEX, 0},
+		{"BLENDWEIGHT",	0, ZE_VET_FLOAT4,	0, 60,	ZE_VU_PER_VERTEX, 0},
+
+	};
+
+	if (!Initialized)
+	{
+		Layout.SetLayout(VertexElements, 7);
+		Initialized = true;
 	}
-	*/
-	//zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEUIVertex), "Vertex decleration size does not matches.");
-	return VertexDeclaration;
+
+	return Layout;
 }
 
-ZEVertexLayout* ZEColoredVertex::VertexDeclaration = NULL;
-ZEVertexLayout* ZEColoredVertex::GetVertexDeclaration()
+ZEVertexLayout ZEUIVertex::Layout;
+const ZEVertexLayout& ZEUIVertex::GetVertexLayout()
 {
-	if (VertexDeclaration != NULL)
-		return VertexDeclaration;
-
-	VertexDeclaration = ZEVertexLayout::CreateInstance();
-
-	ZEVertexElement ElementArray[] = {
-										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
-										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT4, 1},
-									};
-	zeCriticalError("Remove this function");
-	/*
-	if (!VertexDeclaration->Create(ElementArray, 2))
+	static bool Initialized = false;
+	static const ZEVertexElement VertexElements[] = 
 	{
-		VertexDeclaration->Destroy();
-		VertexDeclaration = NULL;
+		{"POSITION",	0, ZE_VET_FLOAT2,	0, 0,	ZE_VU_PER_VERTEX, 0},
+		{"COLOR",		0, ZE_VET_FLOAT4,	0, 8,	ZE_VU_PER_VERTEX, 0},
+		{"TEXCOORD",	0, ZE_VET_FLOAT2,	0, 24,	ZE_VU_PER_VERTEX, 0}
+	};
+
+	if (!Initialized)
+	{
+		Layout.SetLayout(VertexElements, 3);
+		Initialized = true;
 	}
-	*/
-	//zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEColoredVertex), "Vertex decleration size does not matches.");
-	return VertexDeclaration;
+
+	return Layout;
 }
 
+ZEVertexLayout ZEColoredVertex::Layout;
+const ZEVertexLayout& ZEColoredVertex::GetVertexLayout()
+{
+	static bool Initialized = false;
+	static const ZEVertexElement VertexElements[] = 
+	{
+		{"POSITION",	0, ZE_VET_FLOAT3,	0, 0,	ZE_VU_PER_VERTEX, 0},
+		{"COLOR",		0, ZE_VET_FLOAT4,	0, 12,	ZE_VU_PER_VERTEX, 0},
+	};
 
+	if (!Initialized)
+	{
+		Layout.SetLayout(VertexElements, 2);
+		Initialized = true;
+	}
 
-
+	return Layout;
+}

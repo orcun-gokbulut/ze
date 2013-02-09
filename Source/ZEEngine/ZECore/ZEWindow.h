@@ -90,6 +90,9 @@ class ZEWindow
 
 		void*					GetHandle();
 
+		ZEVector2				GetAbsoluteCursorPosition();
+		ZEVector2				GetRelativeCursorPosition();
+
 		bool					Initialize();
 		void					Deinitialize();
 
@@ -99,8 +102,3 @@ class ZEWindow
 								~ZEWindow();
 };
 #endif
-
-
-
-
-

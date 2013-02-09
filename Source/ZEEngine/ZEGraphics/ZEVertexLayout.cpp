@@ -51,7 +51,7 @@ void ZEVertexLayout::UpdateHash()
 			ZEHashGenerator::Hash(Hash, StateData.VertexElements[I].Semantic);
 			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].SemanticIndex, sizeof(ZEUInt));
 			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].Type, sizeof(ZEVertexElementType));	
-			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].Slot, sizeof(ZEUInt));	
+			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].StreamSlot, sizeof(ZEUInt));	
 			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].ByteOffset, sizeof(ZEUInt));	
 			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].Usage, sizeof(ZEVertexUsage));
 			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].InstanceCount, sizeof(ZEUInt));
@@ -84,7 +84,7 @@ void ZEVertexLayout::SetLayout(const ZEVertexElement* VertexElements, ZEUInt Ele
 		sprintf(StateData.VertexElements[I].Semantic, "%s", VertexElements[I].Semantic);
 		StateData.VertexElements[I].SemanticIndex = VertexElements[I].SemanticIndex;
 		StateData.VertexElements[I].Type = VertexElements[I].Type;
-		StateData.VertexElements[I].Slot = VertexElements[I].Slot;
+		StateData.VertexElements[I].StreamSlot = VertexElements[I].StreamSlot;
 		StateData.VertexElements[I].ByteOffset = VertexElements[I].ByteOffset;
 		StateData.VertexElements[I].Usage = VertexElements[I].Usage;
 		StateData.VertexElements[I].InstanceCount = VertexElements[I].InstanceCount;

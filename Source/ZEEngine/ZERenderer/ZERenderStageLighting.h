@@ -63,6 +63,7 @@ class ZERenderStageLighting : public ZERenderStage
 		const ZERenderStageGeometry*	GBufferInput;
 		ZESmartArray<ZELight*>*			LightList;
 		ZEUInt32						StencilMask;
+		ZEVertexBuffer*					VertexBuffer;
 
 		struct
 		{
@@ -78,26 +79,46 @@ class ZERenderStageLighting : public ZERenderStage
 
 		} RenderTargets;
 
-		struct
-		{
-			ZEShader*					PointLightVS;
-			ZEShader*					PointLightPS;
-			ZEShader*					ProjectiveLightVS;
-			ZEShader*					ProjectiveLightPS;
-			ZEShader*					DirectionalLightVS;
-			ZEShader*					DirectionalLightPS;
-			ZEShader*					OmniProjectiveLightVS;
-			ZEShader*					OmniProjectiveLightPS;
-
-		} Shaders;
 
 		struct
 		{
-			ZEConstantBuffer*			PixelShader;
-			ZEConstantBuffer*			VertexShader;
-			ZEVertexBuffer*				LightMeshVertexBuffer;
+			ZEShader*					VertexShader;
+			ZEShader*					PixelShader;
+			ZEConstantBuffer*			Transformations;
+			ZEConstantBuffer*			LightParameters;
+			ZEConstantBuffer*			ShadowParameters;
 
-		} Buffers;
+		} PointLight;
+
+		struct
+		{
+			ZEShader*					VertexShader;
+			ZEShader*					PixelShader;
+			ZEConstantBuffer*			Transformations;
+			ZEConstantBuffer*			LightParameters;
+			ZEConstantBuffer*			ShadowParameters;
+
+		} DirectionalLight;
+
+		struct
+		{
+			ZEShader*					VertexShader;
+			ZEShader*					PixelShader;
+			ZEConstantBuffer*			Transformations;
+			ZEConstantBuffer*			LightParameters;
+			ZEConstantBuffer*			ShadowParameters;
+
+		} ProjectiveLight;
+
+		struct
+		{
+			ZEShader*					VertexShader;
+			ZEShader*					PixelShader;
+			ZEConstantBuffer*			Transformations;
+			ZEConstantBuffer*			LightParameters;
+			ZEConstantBuffer*			ShadowParameters;
+
+		} OmniProjectiveLight;
 
 		void							UpdateShaders();
 		void							DestroyShaders();

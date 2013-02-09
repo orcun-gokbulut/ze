@@ -42,15 +42,13 @@
 
 inline static ZESize GetIndexSize(ZEIndexBufferFormat Format)
 {
-	switch(Format)
+	static const ZESize FormatToIndexSize[3] = 
 	{
-		case ZE_IBF_INDEX16:
-			return 2;
-			break;
-		case ZE_IBF_INDEX32:
-			return 4;
-			break;
-	}
+		0,	// ZE_IBF_NONE
+		2,	// ZE_IBF_INDEX16
+		4	// ZE_IBF_INDEX32
+	};
+	return FormatToIndexSize[Format];
 }
 
 const ID3D10Buffer* ZED3D10IndexBuffer::GetD3D10Buffer() const

@@ -1058,7 +1058,7 @@ void ZEDNodeEditorGraphicsView::mouseMoveEvent(QMouseEvent *Event)
 				InitialMousePos = LastMousePos;
 			}
 			
-			if (SelectedItemsIncludeIOPort == true && IsDeselectionEnabled == false && IsMultipleSelectionEnabled == false ) // Ýf item is IO port then start drawing a line
+			if (SelectedItemsIncludeIOPort == true && IsDeselectionEnabled == false && IsMultipleSelectionEnabled == false ) // Ä°f item is IO port then start drawing a line
 			{
 				LastMousePos = mapToScene(Event->pos());
 

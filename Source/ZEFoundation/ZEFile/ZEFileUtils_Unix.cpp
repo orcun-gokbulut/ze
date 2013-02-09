@@ -97,14 +97,14 @@ static bool OSFileTimetoZEFileTime(ZEFileTime* Time, ZEFileTimeOS* FileTime)
         return false;
 
 
-    Time->Day = (ZEInt16)TimeInfo.tm_mday;
-    Time->Hour = (ZEInt16)TimeInfo.tm_hour;
-    Time->Year = (ZEInt16)TimeInfo.tm_year + 1900;
-    Time->Month = (ZEInt16)TimeInfo.tm_mon;
-    Time->Second = (ZEInt16)TimeInfo.tm_sec;
-    Time->Minute = (ZEInt16)TimeInfo.tm_min;
-    Time->DayOfWeek = (ZEInt16)TimeInfo.tm_wday;
-    Time->Milliseconds = (ZEInt16)0;
+    Time->Day = TimeInfo.tm_mday;
+    Time->Hour = TimeInfo.tm_hour;
+    Time->Year = TimeInfo.tm_year + 1900;
+    Time->Month = TimeInfo.tm_mon + 1;
+    Time->Second = TimeInfo.tm_sec;
+    Time->Minute = TimeInfo.tm_min;
+    Time->DayOfWeek = TimeInfo.tm_wday;
+    Time->Milliseconds = 0;
 
     return true;
 }
@@ -182,6 +182,7 @@ ZEInt64 ZEFileUtils::GetFileSize(const ZEFileSearchStream* FindData)
     return (ZEInt64)FindData->Data.st_size;
 }
 
+/*
 bool ZEFileUtils::GetCreationTime(ZEFileTime* Output, const ZEString& Path)
 {
     struct stat Stat;
@@ -222,6 +223,7 @@ void ZEFileUtils::GetModificationTime(ZEFileTime* Output, const ZEFileSearchStre
     OSFileTimetoZEFileTime(Output, &FileTime);
 }
 
+*/
 
 // Closes the search stream
 bool ZEFileUtils::CloseSearchStream(ZEFileSearchStream* FindData)

@@ -283,7 +283,3 @@ const char*		zeGetKeyboardButtonName(unsigned char Key);
 const char*		zeGetKeyboardButtonShortName(unsigned char Key);
 
 #endif
-
-
-
-

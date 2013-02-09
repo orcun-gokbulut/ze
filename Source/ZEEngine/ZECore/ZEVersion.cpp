@@ -34,19 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEVersion.h"
-
+#include "ZEDS/ZEFormat.h"
 ZEString ZEVersion::GetShortString() 
 {
-	ZEString Temp = "Will be fixed";
-	//Temp.Format("%02u.%02u.%02u", Major, Minor, Internal);
-	return Temp;
+	return ZEFormat::Format("{0:d:02}.{1:d:02}.{2:d:02}:{3:d04} ({3})", Major, Minor, Internal, Build, Platform);
 }
 
 ZEString ZEVersion::GetLongString()	
 {
-	ZEString Temp = "Will be fixed";
-	//Temp.Format("%02u.%02u.%02u (%s) - Build %06u", Major, Minor, Internal, ""/*ZE_PLATFORM*/, Build);
-	return Temp;
+	return ZEFormat::Format("{0:d:02}.{1:d:02}.{2:d:02}:{3:d04} ({3})", Major, Minor, Internal, Build, Platform);
 }
 
 ZEVersion ZEVersion::GetZinekVersion()
@@ -86,7 +82,7 @@ ZEVersion::ZEVersion()
 	this->Minor = 0;
 	this->Internal = 0;
 	this->Build = 0;
-//	this->Platform = ZE_PLATFORM;
+	this->Platform = ""; //ZE_PLATFORM;
 }
 
 ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal)
@@ -95,7 +91,7 @@ ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal)
 	this->Minor = Minor;
 	this->Internal = Internal;
 	this->Build = 0;
-//	this->Platform = ZE_PLATFORM;
+	this->Platform =""; //ZE_PLATFORM;
 }
 
 ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build)
@@ -104,5 +100,5 @@ ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build)
 	this->Minor = Minor;
 	this->Internal = Internal;
 	this->Build = Build;
-//	this->Platform = ZE_PLATFORM;
+	this->Platform = ""; //ZE_PLATFORM;
 }

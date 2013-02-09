@@ -33,54 +33,58 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-class ZETree
+#pragma once
+#ifndef	__ZE_TREE_H__
+#define __ZE_TREE_H__
+
+#include "ZEList.h"
+
+template<typename ZEType>
+class ZETree : public ZEListItem
 {
-    private:
-        ZETree*                  Parent;
-        ZEArray<ZETree<ZEType>*> SubTrees;
-        ZEType                   Item;
+	private:
+		ZEType* Parent;
+		ZEType* NextItem;
+		ZEType* PrevItem;
 
-    public:
-        ZETree<ZEType>  GetParent()
-        {
-            return Parent;
-        }
+		ZEList<ZEType> SubTrees;
 
-        void AddSubTree(ZETree<ZEType>* SubTree)
-        {
-            if (Parent != NULL)
-                return false;
+	public:	
+		ZEType  GetParent()
+		{
+			return Parent;
+		}
 
-            SubTrees.Add(SubTree);
-            SubTree->Parent = this;
+		const ZEList<ZEType>& GetSubTrees()
+		{
+			return SubTrees;
+		}
 
-            return true;
-        }
+		bool AddSubTree(ZEType* SubTree)
+		{
+			if (SubTree->Parent != NULL || SubTree->Parent == this)
+				return false;
 
-        void RemoveSubTree(ZETree<ZEType>* SubTree)
-        {
-            ZESSize Index = SubTrees.FindItem(SubTree);
-            if (Index < 0)
-                return false;
+			SubTrees.Add(SubTree);
+			SubTree->Parent = this;
 
-            SubTrees[Index].Parent = NULL;
-            SubTrees.DeleteAt(Index);
+			return true;
+		}
 
-            return true;
-        }
+		bool RemoveSubTree(ZEType* SubTree)
+		{
+			if (SubTree->Parent != this)
+				return;
 
-        ZEType& GetValue()
-        {
-            return Value;
-        }
+			SubTrees[Index].Parent = NULL;
+			SubTrees.Remove(Index);
 
-        void SetValue(ZEType& Value)
-        {
-            this->Value = Value;
-        }
+			return true;
+		}
 
-        ZETree()
-        {
-            Parent = NULL;
-        }
+		ZETree()
+		{
+			Parent = NULL;
+		}
 };
+#endif

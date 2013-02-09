@@ -172,10 +172,10 @@ ZEScissorRectangle::~ZEScissorRectangle()
 }
 
 /************************************************************************/
-/*                          ZEDeviceState                               */
+/*                          ZEGraphicsDeviceState                               */
 /************************************************************************/
 
-void ZEDeviceState::SetToDefault()
+void ZEGraphicsDeviceState::SetToDefault()
 {
 	IndexBuffer = NULL;
 	VertexLayout.SetToDefault();
@@ -225,12 +225,12 @@ void ZEDeviceState::SetToDefault()
 	ScreenWriteEnable = false;
 }
 
-ZEDeviceState::ZEDeviceState()
+ZEGraphicsDeviceState::ZEGraphicsDeviceState()
 {
 	SetToDefault();
 }
 
-ZEDeviceState::~ZEDeviceState()
+ZEGraphicsDeviceState::~ZEGraphicsDeviceState()
 {
 
 }

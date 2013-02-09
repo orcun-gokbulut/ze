@@ -560,7 +560,3 @@ void ZEALSoundSource::SetSoundResource(ZESoundResource* Resource)
 		SoundSourceState = ZE_SSS_NONE;
 	}
 }
-
-
-
-

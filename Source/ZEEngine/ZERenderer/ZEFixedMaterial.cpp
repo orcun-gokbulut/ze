@@ -41,6 +41,7 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEFixedMaterial.h"
+#include "ZERenderCommand.h"
 #include "ZEML/ZEMLProperty.h"
 #include "ZEGraphics/ZEShader.h"
 #include "ZEMaterialComponents.h"
@@ -55,6 +56,8 @@
 
 #include <Memory.h>
 #include "ZECore/ZECore.h"
+#include "ZEFile/ZEFileInfo.h"
+#include "ZEFile/ZEPathUtils.h"
 
 struct FixedMaterialVertexShaderCommonData
 {
@@ -97,73 +100,6 @@ struct FixedMaterialForwardPassPixelShaderData
 	float		SubSurfaceScatteringFactor;
 	ZEMatrix4x4	InvViewMatrix;
 };
-
-ZEFixedMaterial::ZEFixedMaterial()
-{
-	Recompile = false;
-	DetailDistance = 4.0f;
-	DetailFadeDistance = 4.0f;
-	TwoSided = false;
-	Wireframe = false;
-	TransparancyMode = ZE_MTM_NONE;
-	AlphaCullLimit = 1;
-	OpacityComponent = ZE_MOC_CONSTANT;
-	Opacity = 1.0f;
-	SpecularShininess = 0.1f;
-	AmbientFactor = 1.0f;
-	DiffuseFactor = 1.0f;
-	SpecularFactor = 1.0f;
-	EmissiveFactor = 1.0f;
-	DistortionFactor = 1.0f;
-	AmbientColor = ZEVector3::Zero;
-	DiffuseColor = ZEVector3::One;
-	SpecularColor = ZEVector3::Zero;
-	EmissiveColor = ZEVector3::Zero;
-	MaterialAmbientColor = ZEVector3::Zero;
-	MaterialSpecularColor = ZEVector3::Zero;
-	MaterialEmissiveColor = ZEVector3::Zero;
-	MaterialDiffuseColor = ZEVector3::Zero;
-	SubSurfaceScatteringFactor = 0.0f;
-	SkinTransform = false;
-	ShadowReciver = false;
-	
-	AdressingModes.BaseMapU = ZE_TAM_WRAP;
-	AdressingModes.BaseMapV = ZE_TAM_WRAP;
-	AdressingModes.DetailBaseMapU = ZE_TAM_WRAP;
-	AdressingModes.DetailBaseMapV = ZE_TAM_WRAP;
-	AdressingModes.DetailNormalMapU = ZE_TAM_WRAP;
-	AdressingModes.DetailBaseMapV = ZE_TAM_WRAP;
-	AdressingModes.DetailNormalMapU = ZE_TAM_WRAP;
-	AdressingModes.DetailNormalMapV = ZE_TAM_WRAP;
-	AdressingModes.DistortionMapU = ZE_TAM_WRAP;
-	AdressingModes.DistortionMapV = ZE_TAM_WRAP;
-	AdressingModes.EmissiveMapU = ZE_TAM_WRAP;
-	AdressingModes.EmissiveMapV = ZE_TAM_WRAP;
-	AdressingModes.EnvironmentMapU = ZE_TAM_WRAP;
-	AdressingModes.EnvironmentMapV = ZE_TAM_WRAP;
-	AdressingModes.EnvironmentMapW = ZE_TAM_WRAP;
-	AdressingModes.LightMapU = ZE_TAM_WRAP;
-	AdressingModes.LightMapV = ZE_TAM_WRAP;
-	AdressingModes.NormalMapU = ZE_TAM_WRAP;
-	AdressingModes.NormalMapV = ZE_TAM_WRAP;
-	AdressingModes.OpacityMapU = ZE_TAM_WRAP;
-	AdressingModes.OpacityMapV = ZE_TAM_WRAP;
-	AdressingModes.ParallaxMapU = ZE_TAM_WRAP;
-	AdressingModes.ParallaxMapV = ZE_TAM_WRAP;
-	AdressingModes.SpecularMapU = ZE_TAM_WRAP;
-	AdressingModes.SpecularMapV = ZE_TAM_WRAP;
-	
-	memset((void*)&Components, 0, sizeof (ZEFixedMaterialComponents));
-	memset((void*)&Shaders, 0, sizeof (ZEFixedMaterialShaders));
-	memset((void*)&Textures, 0, sizeof(ZEFixedMaterialTextures));
-	memset((void*)&Resources, 0, sizeof (ZEFixedMaterialResources));
-	memset((void*)&Buffers, 0, sizeof (ZEFixedMaterialBuffers));
-}
-
-ZEFixedMaterial::~ZEFixedMaterial()
-{
-	DestroyShaders();
-}
 
 void ZEFixedMaterial::CreateShaders()
 {
@@ -288,7 +224,7 @@ void ZEFixedMaterial::CreateShaders()
 	}
 
 // 	if (TransparancyMode == ZE_MTM_NONE)
-// 	{	
+// 	{
 		Options.Type = ZE_ST_VERTEX;
 		Options.EntryPoint = "ZEFixedMaterial_GBuffer_VertexShader";
 		Shaders.GBufferPassVertexShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
@@ -519,6 +455,9 @@ void ZEFixedMaterial::SetBaseMap(ZETexture2D* Texture)
 		Resources.BaseMap = NULL;
 	}
 
+	if (Texture != NULL)
+		SetBaseMapEnabled(true);
+
 	Textures.BaseMap = Texture;
 }
 
@@ -541,6 +480,7 @@ void ZEFixedMaterial::SetBaseMapFile(const char* Filename)
 	{
 		Resources.BaseMap = Resource;
 		Textures.BaseMap = Resource->GetTexture();
+		SetBaseMapEnabled(true);
 	}
 	else
 	{
@@ -556,24 +496,14 @@ const char* ZEFixedMaterial::GetBaseMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetBaseMapAddressModeU(ZETextureAddressMode Mode)
+void ZEFixedMaterial::SetBaseMapSampler(const ZESamplerState& Sampler)
 {
-	AdressingModes.BaseMapU = Mode;
+	Samplers.BaseMap = Sampler;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetBaseMapAddressModeU() const
+const ZESamplerState& ZEFixedMaterial::GetBaseMapSampler() const
 {
-	return AdressingModes.BaseMapU;
-}
-
-void ZEFixedMaterial::SetBaseMapAddressModeV(ZETextureAddressMode Mode)
-{
-	AdressingModes.BaseMapV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetBaseMapAddressModeV() const
-{
-	return AdressingModes.BaseMapV;
+	return Samplers.BaseMap;
 }
 
 void ZEFixedMaterial::SetSpecularEnabled(bool Value)
@@ -644,6 +574,9 @@ void ZEFixedMaterial::SetSpecularMap(ZETexture2D* Texture)
 		Resources.SpecularMap = NULL;
 	}
 
+	if (Texture != NULL)
+		SetSpecularMapEnabled(true);
+
 	Textures.SpecularMap = Texture;
 }
 
@@ -666,6 +599,7 @@ void ZEFixedMaterial::SetSpecularMapFile(const char* Filename)
 	{
 		Resources.SpecularMap = Resource;
 		Textures.SpecularMap = Resource->GetTexture();
+		SetSpecularMapEnabled(true);
 	}
 	else
 	{
@@ -681,24 +615,14 @@ const char* ZEFixedMaterial::GetSpecularMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetSpecularMapAddressModeU(ZETextureAddressMode Mode)
+void ZEFixedMaterial::SetSpecularMapSampler(const ZESamplerState& Sampler)
 {
-	AdressingModes.SpecularMapU = Mode;
+	Samplers.SpecularMap = Sampler;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetSpecularMapAddressModeU() const
+const ZESamplerState& ZEFixedMaterial::GetSpecularMapSampler() const
 {
-	return AdressingModes.SpecularMapU;
-}
-
-void ZEFixedMaterial::SetSpecularMapAddressModeV(ZETextureAddressMode Mode)
-{
-	AdressingModes.SpecularMapV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetSpecularMapAddressModeV() const
-{
-	return AdressingModes.SpecularMapV;
+	return Samplers.SpecularMap;
 }
 
 void ZEFixedMaterial::SetEmissiveEnabled(bool Value)
@@ -759,6 +683,9 @@ void ZEFixedMaterial::SetEmissiveMap(ZETexture2D* Texture)
 		Resources.EmissiveMap = NULL;
 	}
 
+	if (Texture != NULL)
+		SetEmissiveMapEnabled(true);
+
 	Textures.EmissiveMap = Texture;
 }
 
@@ -781,6 +708,7 @@ void ZEFixedMaterial::SetEmissiveMapFile(const char* Filename)
 	{
 		Resources.EmissiveMap = Resource;
 		Textures.EmissiveMap = Resource->GetTexture();
+		SetEmissiveMapEnabled(true);
 	}
 	else
 	{
@@ -796,24 +724,14 @@ const char* ZEFixedMaterial::GetEmissiveMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetEmissiveMapAddressModeU(ZETextureAddressMode Mode)
+void ZEFixedMaterial::SetEmissiveMapSampler(const ZESamplerState& Sampler)
 {
-	AdressingModes.EmissiveMapU = Mode;
+	Samplers.EmissiveMap = Sampler;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetEmissiveMapAddressModeU() const
+const ZESamplerState& ZEFixedMaterial::GetEmissiveMapSampler() const
 {
-	return AdressingModes.EmissiveMapU;
-}
-
-void ZEFixedMaterial::SetEmissiveMapAddressModeV(ZETextureAddressMode Mode)
-{
-	AdressingModes.EmissiveMapV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetEmissiveMapAddressModeV() const
-{
-	return AdressingModes.EmissiveMapV;
+	return Samplers.EmissiveMap;
 }
 
 void ZEFixedMaterial::SetNormalMapEnabled(bool Value)
@@ -838,6 +756,9 @@ void ZEFixedMaterial::SetNormalMap(ZETexture2D* Texture)
 		Resources.NormalMap = NULL;
 	}
 
+	if (Texture != NULL)
+		SetNormalMapEnabled(true);
+
 	Textures.NormalMap = Texture;
 }
 
@@ -860,6 +781,7 @@ void ZEFixedMaterial::SetNormalMapFile(const char* Filename)
 	{
 		Resources.NormalMap = Resource;
 		Textures.NormalMap = Resource->GetTexture();
+		SetNormalMapEnabled(true);
 	}
 	else
 	{
@@ -875,24 +797,14 @@ const char* ZEFixedMaterial::GetNormalMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetNormalMapAddressModeU(ZETextureAddressMode Mode)
+void ZEFixedMaterial::SetNormalMapSampler(const ZESamplerState& Sampler)
 {
-	AdressingModes.NormalMapU = Mode;
+	Samplers.NormalMap = Sampler;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetNormalMapAddressModeU() const
+const ZESamplerState& ZEFixedMaterial::GetNormalMapSampler() const
 {
-	return AdressingModes.NormalMapU;
-}
-
-void ZEFixedMaterial::SetNormalMapAddressModeV(ZETextureAddressMode Mode)
-{
-	AdressingModes.NormalMapV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetNormalMapAddressModeV() const
-{
-	return AdressingModes.NormalMapV;
+	return Samplers.NormalMap;
 }
 
 void ZEFixedMaterial::SetParallaxMapEnabled(bool Value)
@@ -917,6 +829,9 @@ void ZEFixedMaterial::SetParallaxMap(ZETexture2D* Texture)
 		Resources.ParallaxMap = NULL;
 	}
 
+	if (Texture != NULL)
+		SetParallaxMapEnabled(true);
+
 	Textures.ParallaxMap = Texture;
 }
 
@@ -934,6 +849,7 @@ void ZEFixedMaterial::SetParallaxMapFile(const char* Filename)
 	{
 		Resources.ParallaxMap = Resource;
 		Textures.ParallaxMap = Resource->GetTexture();
+		SetParallaxMapEnabled(true);
 	}
 	else
 	{
@@ -954,24 +870,14 @@ ZETexture2D* ZEFixedMaterial::GetParallaxMap() const
 	return Textures.ParallaxMap;
 }
 
-void ZEFixedMaterial::SetParallaxMapAddressModeU(ZETextureAddressMode Mode)
+void ZEFixedMaterial::SetParallaxMapSampler(const ZESamplerState& Sampler)
 {
-	AdressingModes.ParallaxMapU = Mode;
+	Samplers.ParallaxMap = Sampler;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetParallaxMapAddressModeU() const
+const ZESamplerState& ZEFixedMaterial::GetParallaxMapSampler() const
 {
-	return AdressingModes.ParallaxMapU;
-}
-
-void ZEFixedMaterial::SetParallaxMapAddressModeV(ZETextureAddressMode Mode)
-{
-	AdressingModes.ParallaxMapV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetParallaxMapAddressModeV() const
-{
-	return AdressingModes.ParallaxMapV;
+	return Samplers.ParallaxMap;
 }
 
 void ZEFixedMaterial::SetOpacityEnabled(bool Value)
@@ -1052,6 +958,9 @@ void ZEFixedMaterial::SetOpacityMap(ZETexture2D* Texture)
 		Resources.OpacityMap = NULL;
 	}
 
+	if (Texture != NULL)
+		SetOpacityMapEnabled(true);
+
 	Textures.OpacityMap = Texture;
 }
 
@@ -1074,6 +983,7 @@ void ZEFixedMaterial::SetOpacityMapFile(const char* Filename)
 	{
 		Resources.OpacityMap = Resource;
 		Textures.OpacityMap = Resource->GetTexture();
+		SetOpacityMapEnabled(true);
 	}
 	else
 	{
@@ -1089,26 +999,15 @@ const char* ZEFixedMaterial::GetOpacityMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetOpacityMapAddressModeU(ZETextureAddressMode Mode)
+void ZEFixedMaterial::SetOpacityMapSampler(const ZESamplerState& Sampler)
 {
-	AdressingModes.OpacityMapU = Mode;
+	Samplers.OpacityMap = Sampler;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetOpacityMapAddressModeU() const
+const ZESamplerState& ZEFixedMaterial::GetOpacityMapSampler() const
 {
-	return AdressingModes.OpacityMapU;
+	return Samplers.OpacityMap;
 }
-
-void ZEFixedMaterial::SetOpacityMapAddressModeV(ZETextureAddressMode Mode)
-{
-	AdressingModes.OpacityMapV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetOpacityMapAddressModeV() const
-{
-	return AdressingModes.OpacityMapV;
-}
-
 
 void ZEFixedMaterial::SetEnvironmentMap(ZETextureCube* Texture)
 {
@@ -1155,34 +1054,14 @@ const char* ZEFixedMaterial::GetEnvironmentMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetEnvironmentMapAddressModeU(ZETextureAddressMode Mode)
+void ZEFixedMaterial::SetEnvironmentMapSampler(const ZESamplerState& Sampler)
 {
-	AdressingModes.EnvironmentMapU = Mode;
+	Samplers.EnvironmentMap = Sampler;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetEnvironmentMapAddressModeU() const
+const ZESamplerState& ZEFixedMaterial::GetEnvironmentMapSampler() const
 {
-	return AdressingModes.EnvironmentMapU;
-}
-
-void ZEFixedMaterial::SetEnvironmentMapAddressModeV(ZETextureAddressMode Mode)
-{
-	AdressingModes.EnvironmentMapV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetEnvironmentMapAddressModeV() const
-{
-	return AdressingModes.EnvironmentMapV;
-}
-
-void ZEFixedMaterial::SetEnvironmentMapAddressModeW(ZETextureAddressMode Mode)
-{
-	AdressingModes.EnvironmentMapW = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetEnvironmentMapAddressModeW() const
-{
-	return AdressingModes.EnvironmentMapW;
+	return Samplers.EnvironmentMap;
 }
 
 void ZEFixedMaterial::SetReflectionEnabled(bool Value)
@@ -1295,6 +1174,9 @@ void ZEFixedMaterial::SetDetailBaseMap(ZETexture2D* Texture)
 		Resources.DetailBaseMap = NULL;
 	}
 
+	if (Texture != NULL)
+		SetDetailBaseMapEnabled(true);
+
 	Textures.DetailBaseMap = Texture;
 }
 
@@ -1317,6 +1199,7 @@ void ZEFixedMaterial::SetDetailBaseMapFile(const char* Filename)
 	{
 		Resources.DetailBaseMap = Resource;
 		Textures.DetailBaseMap = Resource->GetTexture();
+		SetDetailBaseMapEnabled(true);
 	}
 	else
 	{
@@ -1332,24 +1215,14 @@ const char* ZEFixedMaterial::GetDetailBaseMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetDetailBaseMapAddressModeU(ZETextureAddressMode Mode)
+void ZEFixedMaterial::SetDetailBaseMapSampler(const ZESamplerState& Sampler)
 {
-	AdressingModes.DetailBaseMapU = Mode;
+	Samplers.DetailBaseMap = Sampler;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetDetailBaseMapAddressModeU() const
+const ZESamplerState& ZEFixedMaterial::GetDetailBaseMapSampler() const
 {
-	return AdressingModes.DetailBaseMapU;
-}
-
-void ZEFixedMaterial::SetDetailBaseMapAddressModeV(ZETextureAddressMode Mode)
-{
-	AdressingModes.DetailBaseMapV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetDetailBaseMapAddressModeV() const
-{
-	return AdressingModes.DetailBaseMapV;
+	return Samplers.DetailBaseMap;
 }
 
 void ZEFixedMaterial::SetDetailNormalMapEnabled(bool Value)
@@ -1374,6 +1247,9 @@ void ZEFixedMaterial::SetDetailNormalMap(ZETexture2D* Texture)
 		Resources.DetailNormalMap = NULL;
 	}
 
+	if (Texture != NULL)
+		SetDetailNormalMapEnabled(true);
+
 	Textures.DetailNormalMap = Texture;
 }
 
@@ -1396,6 +1272,7 @@ void ZEFixedMaterial::SetDetailNormalMapFile(const char* Filename)
 	{
 		Resources.DetailNormalMap = Resource;
 		Textures.DetailNormalMap = Resource->GetTexture();
+		SetDetailNormalMapEnabled(true);
 	}
 	else
 	{
@@ -1411,24 +1288,14 @@ const char* ZEFixedMaterial::GetDetailNormalMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetDetailNormalMapAddressModeU(ZETextureAddressMode Mode)
+void ZEFixedMaterial::SetDetailNormalMapSampler(const ZESamplerState& Sampler)
 {
-	AdressingModes.DetailNormalMapU = Mode;
+	Samplers.DetailNormalMap = Sampler;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetDetailNormalMapAddressModeU() const
+const ZESamplerState& ZEFixedMaterial::GetDetailNormalMapSampler() const
 {
-	return AdressingModes.DetailNormalMapU;
-}
-
-void ZEFixedMaterial::SetDetailNormalMapAddressModeV(ZETextureAddressMode Mode)
-{
-	AdressingModes.DetailNormalMapV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetDetailNormalMapAddressModeV() const
-{
-	return AdressingModes.DetailNormalMapV;
+	return Samplers.DetailNormalMap;
 }
 
 void ZEFixedMaterial::SetLightMapEnabled(bool Value)
@@ -1463,6 +1330,9 @@ void ZEFixedMaterial::SetLightMap(ZETexture2D* Texture)
 		Resources.LightMap = NULL;
 	}
 
+	if (Texture != NULL)
+		SetLightMapEnabled(true);
+
 	Textures.LightMap = Texture;
 }
 
@@ -1485,6 +1355,7 @@ void ZEFixedMaterial::SetLightMapFile(const char* Filename)
 	{
 		Resources.LightMap = Resource;
 		Textures.LightMap = Resource->GetTexture();
+		SetLightMapEnabled(true);
 	}
 	else
 	{
@@ -1500,24 +1371,14 @@ const char* ZEFixedMaterial::GetLightMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetLightMapAddressModeU(ZETextureAddressMode Mode)
+void ZEFixedMaterial::SetLightMapSampler(const ZESamplerState& Sampler)
 {
-	AdressingModes.LightMapU = Mode;
+	Samplers.LightMap = Sampler;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetLightMapAddressModeU() const
+const ZESamplerState& ZEFixedMaterial::GetLightMapSampler() const
 {
-	return 	AdressingModes.LightMapU;
-}
-
-void ZEFixedMaterial::SetLightMapAddressModeV(ZETextureAddressMode Mode)
-{
-		AdressingModes.LightMapV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetLightMapAddressModeV() const
-{
-	return AdressingModes.LightMapV;
+	return Samplers.LightMap;
 }
 
 void ZEFixedMaterial::SetDistortionEnabled(bool Value)
@@ -1552,6 +1413,9 @@ void ZEFixedMaterial::SetDistortionMap(ZETexture2D* Texture)
 		Resources.DistortionMap = NULL;
 	}
 
+	if (Texture != NULL)
+		SetDistortionEnabled(true);
+
 	Textures.DistortionMap = Texture;
 }
 
@@ -1574,6 +1438,7 @@ void ZEFixedMaterial::SetDistortionMapFile(const char* Filename)
 	{
 		Resources.DistortionMap = Resource;
 		Textures.DistortionMap = Resource->GetTexture();
+		SetDistortionEnabled(true);
 	}
 	else
 	{
@@ -1589,24 +1454,14 @@ const char* ZEFixedMaterial::GetDistortionMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetDistortionMapAddressModeU(ZETextureAddressMode Mode)
+void ZEFixedMaterial::SetDistortionMapSampler(const ZESamplerState& Sampler)
 {
-	AdressingModes.DistortionMapU = Mode;
+	Samplers.DistortionMap = Sampler;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetDistortionMapAddressModeU() const
+const ZESamplerState& ZEFixedMaterial::GetDistortionMapSampler() const
 {
-	return AdressingModes.DistortionMapU;
-}
-
-void ZEFixedMaterial::SetDistortionMapAddressModeV(ZETextureAddressMode Mode)
-{
-	AdressingModes.DistortionMapV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetDistortionMapAddressModeV() const
-{
-	return AdressingModes.DistortionMapV;
+	return Samplers.DistortionMap;
 }
 
 void ZEFixedMaterial::SetVertexColorEnabled(bool Value)
@@ -1736,14 +1591,14 @@ bool ZEFixedMaterial::SetupGeometryPass(const ZERenderStage* Stage, const ZERend
 	Device->SetPixelShaderBuffer(0, Buffers.GBufferPassPixelShader);
 
 
-	ZEDeviceStateDepthStencil DepthStencilState;
+	ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetStencilTestEnable(false);
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
 	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING) == 0 ? false : true);
 	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
 	Device->SetDepthStencilState(DepthStencilState);
 
-	ZEDeviceStateRasterizer RasterizerState;
+	ZERasterizerState RasterizerState;
 	RasterizerState.SetCullDirection(TwoSided ? ZE_CD_NONE : ZE_CD_COUNTER_CLOCKWISE);
 	RasterizerState.SetFillMode(Wireframe ? ZE_FM_WIREFRAME : ZE_FM_SOLID);
 	Device->SetRasterizerState(RasterizerState);
@@ -1760,79 +1615,37 @@ bool ZEFixedMaterial::SetupGeometryPass(const ZERenderStage* Stage, const ZERend
 
 	if ((GetAlphaCullEnabled() || TransparancyMode != ZE_MTM_NONE) && OpacityComponent == ZE_MOC_BASE_MAP_ALPHA && Components.DetailBaseMap && Textures.BaseMap != NULL)
 	{
-		ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.BaseMapU);
-		SamplerState.SetAddressV(AdressingModes.BaseMapV);
-
-		Device->SetPixelShaderSampler(5, SamplerState);
+		Device->SetPixelShaderSampler(5, Samplers.BaseMap);
 		Device->SetPixelShaderTexture(5, Textures.BaseMap);
 	}
 
 	if (Components.NormalMap && Textures.NormalMap != NULL)
 	{
-		ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.NormalMapU);
-		SamplerState.SetAddressV(AdressingModes.NormalMapV);
-
-		Device->SetPixelShaderSampler(6, SamplerState);
+		Device->SetPixelShaderSampler(6, Samplers.NormalMap);
 		Device->SetPixelShaderTexture(6, Textures.NormalMap);
 	}
 
 	if (Components.ParallaxMap && Textures.ParallaxMap != NULL)
 	{
-		ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.ParallaxMapU);
-		SamplerState.SetAddressV(AdressingModes.ParallaxMapV);
-
-		Device->SetPixelShaderSampler(7, SamplerState);
+		Device->SetPixelShaderSampler(7, Samplers.ParallaxMap);
 		Device->SetPixelShaderTexture(7, Textures.ParallaxMap);
 	}
 
 	if (Components.SpecularMap && Textures.SpecularMap != NULL)
 	{
-		ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.SpecularMapU);
-		SamplerState.SetAddressV(AdressingModes.SpecularMapV);
-
-		Device->SetPixelShaderSampler(8, SamplerState);
+		Device->SetPixelShaderSampler(8, Samplers.SpecularMap);
 		Device->SetPixelShaderTexture(8, Textures.SpecularMap);
 	}
 
 	if ((Components.AlphaCull || TransparancyMode != ZE_MTM_NONE) && OpacityComponent == ZE_MOC_OPACITY_MAP && Components.OpacityMap && Opacity != NULL && Textures.OpacityMap != NULL)
-	{
-		ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.OpacityMapU);
-		SamplerState.SetAddressV(AdressingModes.OpacityMapV);
-		
-		Device->SetPixelShaderSampler(9, SamplerState);
+	{		
+		Device->SetPixelShaderSampler(9, Samplers.OpacityMap);
 		Device->SetPixelShaderTexture(9, Textures.OpacityMap);
 	}
 
 	if (Components.DetailNormalMap && Textures.DetailNormalMap != NULL)
 	{
-		ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.DetailNormalMapU);
-		SamplerState.SetAddressV(AdressingModes.DetailNormalMapV);
-
-		Device->SetPixelShaderSampler(15, SamplerState);
+		Device->SetPixelShaderSampler(15, Samplers.DetailNormalMap);
 		Device->SetPixelShaderTexture(15, Textures.DetailNormalMap);
 	}
 
@@ -1915,13 +1728,13 @@ bool ZEFixedMaterial::SetupForwardPass(const ZERenderStage* Stage, const ZERende
 	Device->SetPixelShaderBuffer(0, Buffers.ForwardPassPixelShader);
 
 	// Setup ZCulling
-	ZEDeviceStateDepthStencil DepthStencilState;
+	ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
 	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING) == 0 ? false : true);
 	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
 	Device->SetDepthStencilState(DepthStencilState);
 
-	ZEDeviceStateRasterizer RasterizerState;
+	ZERasterizerState RasterizerState;
 	RasterizerState.SetCullDirection(TwoSided ? ZE_CD_NONE : ZE_CD_COUNTER_CLOCKWISE);
 	RasterizerState.SetFillMode(Wireframe ? ZE_FM_WIREFRAME : ZE_FM_SOLID);
 	Device->SetRasterizerState(RasterizerState);
@@ -1937,144 +1750,67 @@ bool ZEFixedMaterial::SetupForwardPass(const ZERenderStage* Stage, const ZERende
 	// Setup Textures
 	if (Components.BaseMap && Textures.BaseMap != NULL)
 	{
-		static ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.BaseMapU);
-		SamplerState.SetAddressV(AdressingModes.BaseMapV);
-
-		Device->SetPixelShaderSampler(5, SamplerState);
+		Device->SetPixelShaderSampler(5, Samplers.BaseMap);
 		Device->SetPixelShaderTexture(5, Textures.BaseMap);
 	}
 
 	if (Components.NormalMap && Textures.NormalMap != NULL)
 	{
-		static ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.NormalMapU);
-		SamplerState.SetAddressV(AdressingModes.NormalMapV);
-
-		Device->SetPixelShaderSampler(6, SamplerState);
+		Device->SetPixelShaderSampler(6, Samplers.NormalMap);
 		Device->SetPixelShaderTexture(6, Textures.NormalMap);
 	}
 
 	if (Components.ParallaxMap && Textures.ParallaxMap != NULL)
 	{
-		static ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.ParallaxMapU);
-		SamplerState.SetAddressV(AdressingModes.ParallaxMapV);
-
-		Device->SetPixelShaderSampler(7, SamplerState);
+		Device->SetPixelShaderSampler(7, Samplers.ParallaxMap);
 		Device->SetPixelShaderTexture(7, Textures.ParallaxMap);
 	}
 
 	if (Components.SpecularMap && Textures.SpecularMap != NULL)
 	{
-		static ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.SpecularMapU);
-		SamplerState.SetAddressV(AdressingModes.SpecularMapV);
-
-		Device->SetPixelShaderSampler(8, SamplerState);
+		Device->SetPixelShaderSampler(8, Samplers.SpecularMap);
 		Device->SetPixelShaderTexture(8, Textures.SpecularMap);
 	}
 
 	if (Components.OpacityMap && Textures.OpacityMap != NULL)
 	{
-		static ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.OpacityMapU);
-		SamplerState.SetAddressV(AdressingModes.OpacityMapV);
-
-		Device->SetPixelShaderSampler(9, SamplerState);
+		Device->SetPixelShaderSampler(9, Samplers.OpacityMap);
 		Device->SetPixelShaderTexture(9, Textures.OpacityMap);
 	}
 
 	if (Components.EmissiveMap && Textures.EmissiveMap != NULL)
 	{
-		static ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.EmissiveMapU);
-		SamplerState.SetAddressV(AdressingModes.EmissiveMapV);
-
-		Device->SetPixelShaderSampler(10, SamplerState);
+		Device->SetPixelShaderSampler(10, Samplers.EmissiveMap);
 		Device->SetPixelShaderTexture(10, Textures.EmissiveMap);
 	}
 
 	if ((Components.Reflection || Components.Refraction) && Textures.EnvironmentMap != NULL)
 	{
-		static ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.EnvironmentMapU);
-		SamplerState.SetAddressV(AdressingModes.EnvironmentMapV);
-
-		Device->SetPixelShaderSampler(11, SamplerState);
+		Device->SetPixelShaderSampler(11, Samplers.EnvironmentMap);
 		Device->SetPixelShaderTexture(11, Textures.EnvironmentMap);
 	}
 
 	if (Components.LightMap && Textures.LightMap != NULL)
 	{
-		static ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.LightMapU);
-		SamplerState.SetAddressV(AdressingModes.LightMapV);
-
-		Device->SetPixelShaderSampler(12, SamplerState);
+		Device->SetPixelShaderSampler(12, Samplers.LightMap);
 		Device->SetPixelShaderTexture(12, Textures.LightMap);
 	}
 
 	if (Components.DistortionMap && Textures.DistortionMap != NULL)
 	{
-		static ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.DistortionMapU);
-		SamplerState.SetAddressV(AdressingModes.DistortionMapV);
-
-		Device->SetPixelShaderSampler(13, SamplerState);
+		Device->SetPixelShaderSampler(13, Samplers.DistortionMap);
 		Device->SetPixelShaderTexture(13, Textures.DistortionMap);
 	}
 	
 	if (Components.DetailBaseMap && Textures.DetailBaseMap != NULL)
 	{
-		static ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.DetailBaseMapU);
-		SamplerState.SetAddressV(AdressingModes.DetailBaseMapV);
-
-		Device->SetPixelShaderSampler(14, SamplerState);
+		Device->SetPixelShaderSampler(14, Samplers.DetailBaseMap);
 		Device->SetPixelShaderTexture(14, Textures.DetailBaseMap);
 	}
 
 	if (Components.DetailNormalMap && Textures.DetailNormalMap != NULL)
 	{
-		static ZEDeviceStateSampler SamplerState;
-		SamplerState.SetMinFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMagFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetMipFilter(ZE_TFM_ANISOTROPY);
-		SamplerState.SetAddressU(AdressingModes.DetailNormalMapU);
-		SamplerState.SetAddressV(AdressingModes.DetailNormalMapV);
-
-		Device->SetPixelShaderSampler(15, SamplerState);
+		Device->SetPixelShaderSampler(15, Samplers.DetailNormalMap);
 		Device->SetPixelShaderTexture(15, Textures.DetailNormalMap);
 	}
 
@@ -2084,6 +1820,8 @@ bool ZEFixedMaterial::SetupForwardPass(const ZERenderStage* Stage, const ZERende
 bool ZEFixedMaterial::SetupTransparentPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	UpdateMaterial();
+
+	zeCriticalError("Not implemented yet");
 
 	return true;
 }
@@ -2122,34 +1860,47 @@ ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
 	return new ZEFixedMaterial();
 }
 
-void ZEFixedMaterial::WriteToFile(ZEFile* File)
+void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 {
-	/*
+	ZEFile File;
+	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
+		zeError("Can not open given file. File : %s", FilePath.ToCString());
+
 	ZEObjectDescription* ClassDescription = GetDescription();
 	ZESSize PropertyCount = ClassDescription->GetPropertyCount();
 	const ZEPropertyDescription* Properties = ClassDescription->GetProperties();
 
 	ZEMLNode* RootNode = new ZEMLNode("Root");
 
-	for(ZESize I = 0; I < PropertyCount; I++)
+	for(ZESSize I = 0; I < PropertyCount; I++)
 	{
 		ZEVariant PropertyValue;
 		GetProperty(Properties[I].Name, PropertyValue);
 		RootNode->AddProperty(Properties[I].Name, PropertyValue);
 	}
 
-	RootNode->Write(File);
+	RootNode->Write(&File);
+
+	if(File.IsOpen())
+		File.Close();
+
 	delete RootNode;
-	*/
 }
 
-void ZEFixedMaterial::ReadFromFile(ZEFile* File)
+void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 {
-	/*
-	ZEMLNode* RootNode = new ZEMLNode();
-	RootNode->Read(File);
+	ZEFile File;
+	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
+		zeError("Can not open given file. File : %s", FilePath.ToCString());
 
-	ZEArray<ZEMLItem*> Props = RootNode->GetProperties();
+	ZEMLNode* RootNode = new ZEMLNode();
+	RootNode->Read(&File);
+
+	if(File.IsOpen())
+		File.Close();
+
+	ZEArray<ZEMLNode*> ConfigurationsNodes = RootNode->GetSubNodes("Configuration");
+	ZEArray<ZEMLItem*> Props = ConfigurationsNodes[0]->GetProperties();
 	
 	for (ZESize I = 0; I < Props.GetCount(); I++)
 	{
@@ -2158,12 +1909,128 @@ void ZEFixedMaterial::ReadFromFile(ZEFile* File)
 			ZEMLProperty* CurrentProperty = ((ZEMLProperty*)Props[I]);
 
 			if(CurrentProperty->GetValue().GetType() == ZE_VRT_STRING && ZEString(CurrentProperty->GetValue().GetString()).GetLength() != 0)
-				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
+			{
+				if(CurrentProperty->GetName() == "Name")
+					continue;
+
+				ZEString Path = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + CurrentProperty->GetValue().GetString();
+				ZEVariant TempVar(Path);
+				SetProperty(Props[I]->GetName(), TempVar);
+			}
 			else if(CurrentProperty->GetValue().GetType() != ZE_VRT_STRING)
+			{
 				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
+			}
 		}
 	}
 
 	UpdateMaterial();
-	*/
+}
+
+ZEFixedMaterial::ZEFixedMaterial()
+{
+	Recompile = false;
+	DetailDistance = 4.0f;
+	DetailFadeDistance = 4.0f;
+	TwoSided = false;
+	Wireframe = false;
+	TransparancyMode = ZE_MTM_NONE;
+	AlphaCullLimit = 1;
+	OpacityComponent = ZE_MOC_CONSTANT;
+	Opacity = 1.0f;
+	SpecularShininess = 0.1f;
+	AmbientFactor = 1.0f;
+	DiffuseFactor = 1.0f;
+	SpecularFactor = 1.0f;
+	EmissiveFactor = 1.0f;
+	DistortionFactor = 1.0f;
+	AmbientColor = ZEVector3::Zero;
+	DiffuseColor = ZEVector3::One;
+	SpecularColor = ZEVector3::Zero;
+	EmissiveColor = ZEVector3::Zero;
+	MaterialAmbientColor = ZEVector3::Zero;
+	MaterialSpecularColor = ZEVector3::Zero;
+	MaterialEmissiveColor = ZEVector3::Zero;
+	MaterialDiffuseColor = ZEVector3::Zero;
+	SubSurfaceScatteringFactor = 0.0f;
+	SkinTransform = false;
+	ShadowReciver = false;
+	
+	Samplers.BaseMap.SetAddressU(ZE_TAM_WRAP);
+	Samplers.BaseMap.SetAddressV(ZE_TAM_WRAP);
+	Samplers.BaseMap.SetMinFilter(ZE_TFM_ANISOTROPY);
+	Samplers.BaseMap.SetMagFilter(ZE_TFM_ANISOTROPY);
+	Samplers.BaseMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	Samplers.NormalMap.SetAddressU(ZE_TAM_WRAP);
+	Samplers.NormalMap.SetAddressV(ZE_TAM_WRAP);
+	Samplers.NormalMap.SetMinFilter(ZE_TFM_ANISOTROPY);
+	Samplers.NormalMap.SetMagFilter(ZE_TFM_ANISOTROPY);
+	Samplers.NormalMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	Samplers.ParallaxMap.SetAddressU(ZE_TAM_WRAP);
+	Samplers.ParallaxMap.SetAddressV(ZE_TAM_WRAP);
+	Samplers.ParallaxMap.SetMinFilter(ZE_TFM_ANISOTROPY);
+	Samplers.ParallaxMap.SetMagFilter(ZE_TFM_ANISOTROPY);
+	Samplers.ParallaxMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	Samplers.SpecularMap.SetAddressU(ZE_TAM_WRAP);
+	Samplers.SpecularMap.SetAddressV(ZE_TAM_WRAP);
+	Samplers.SpecularMap.SetMinFilter(ZE_TFM_ANISOTROPY);
+	Samplers.SpecularMap.SetMagFilter(ZE_TFM_ANISOTROPY);
+	Samplers.SpecularMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+	
+	Samplers.EmissiveMap.SetAddressU(ZE_TAM_WRAP);
+	Samplers.EmissiveMap.SetAddressV(ZE_TAM_WRAP);
+	Samplers.EmissiveMap.SetMinFilter(ZE_TFM_ANISOTROPY);
+	Samplers.EmissiveMap.SetMagFilter(ZE_TFM_ANISOTROPY);
+	Samplers.EmissiveMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	Samplers.OpacityMap.SetAddressU(ZE_TAM_WRAP);
+	Samplers.OpacityMap.SetAddressV(ZE_TAM_WRAP);
+	Samplers.OpacityMap.SetMinFilter(ZE_TFM_ANISOTROPY);
+	Samplers.OpacityMap.SetMagFilter(ZE_TFM_ANISOTROPY);
+	Samplers.OpacityMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	Samplers.DetailBaseMap.SetAddressU(ZE_TAM_WRAP);
+	Samplers.DetailBaseMap.SetAddressV(ZE_TAM_WRAP);
+	Samplers.DetailBaseMap.SetMinFilter(ZE_TFM_ANISOTROPY);
+	Samplers.DetailBaseMap.SetMagFilter(ZE_TFM_ANISOTROPY);
+	Samplers.DetailBaseMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	Samplers.DetailNormalMap.SetAddressU(ZE_TAM_WRAP);
+	Samplers.DetailNormalMap.SetAddressV(ZE_TAM_WRAP);
+	Samplers.DetailNormalMap.SetMinFilter(ZE_TFM_ANISOTROPY);
+	Samplers.DetailNormalMap.SetMagFilter(ZE_TFM_ANISOTROPY);
+	Samplers.DetailNormalMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	Samplers.EnvironmentMap.SetAddressU(ZE_TAM_WRAP);
+	Samplers.EnvironmentMap.SetAddressV(ZE_TAM_WRAP);
+	Samplers.EnvironmentMap.SetAddressW(ZE_TAM_WRAP);
+	Samplers.EnvironmentMap.SetMinFilter(ZE_TFM_ANISOTROPY);
+	Samplers.EnvironmentMap.SetMagFilter(ZE_TFM_ANISOTROPY);
+	Samplers.EnvironmentMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	Samplers.LightMap.SetAddressU(ZE_TAM_WRAP);
+	Samplers.LightMap.SetAddressV(ZE_TAM_WRAP);
+	Samplers.LightMap.SetMinFilter(ZE_TFM_ANISOTROPY);
+	Samplers.LightMap.SetMagFilter(ZE_TFM_ANISOTROPY);
+	Samplers.LightMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	Samplers.DistortionMap.SetAddressU(ZE_TAM_WRAP);
+	Samplers.DistortionMap.SetAddressV(ZE_TAM_WRAP);
+	Samplers.DistortionMap.SetMinFilter(ZE_TFM_ANISOTROPY);
+	Samplers.DistortionMap.SetMagFilter(ZE_TFM_ANISOTROPY);
+	Samplers.DistortionMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	memset((void*)&Components, 0, sizeof (ZEFixedMaterialComponents));
+	memset((void*)&Shaders, 0, sizeof (ZEFixedMaterialShaders));
+	memset((void*)&Textures, 0, sizeof(ZEFixedMaterialTextures));
+	memset((void*)&Resources, 0, sizeof (ZEFixedMaterialResources));
+	memset((void*)&Buffers, 0, sizeof (ZEFixedMaterialBuffers));
+}
+
+ZEFixedMaterial::~ZEFixedMaterial()
+{
+	DestroyShaders();
 }

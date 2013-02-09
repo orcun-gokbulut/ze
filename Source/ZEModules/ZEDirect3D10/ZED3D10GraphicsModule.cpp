@@ -52,6 +52,7 @@
 #include "ZED3D10ConstantBuffer.h"
 #include "ZECore/ZEOptionManager.h"
 #include "ZED3D10DepthStencilBuffer.h"
+#include "ZED3D10EventTracer.h"
 
 #pragma warning(disable:4267)
 
@@ -225,7 +226,7 @@ bool ZED3D10GraphicsModule::Initialize()
 		ZEUInt MemoryMb = (ZEUInt)(AdapterDesc.DedicatedVideoMemory / 1024 / 1024);
 		VideoCardName = ZEString::FromUInt32(MemoryMb);
 		VideoCardName += "MB - ";
-		VideoCardName += ZEString::FromWString(&AdapterDesc.Description[0]);
+		VideoCardName += ZEString::FromWCString(&AdapterDesc.Description[0]);
 	}
 	
 	UINT DeviceFlags = 0;

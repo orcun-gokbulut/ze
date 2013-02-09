@@ -53,12 +53,13 @@
 
 void ZEVariant::SetType(ZEVariantType NewType)
 {
-	if (Value.Pointer != NULL)
+
+	if (this->Type != NewType && Value.Pointer != NULL)
 	{
+		Value.Pointer = NULL;
 		if (Type == ZE_VRT_STRING)
 		{
-			delete[] Value.String;
-			Value.String = NULL;
+			Value.String.Clear();
 		}
 		else if (Type == ZE_VRT_MATRIX3X3)
 		{
@@ -68,15 +69,12 @@ void ZEVariant::SetType(ZEVariantType NewType)
 		else if (Type == ZE_VRT_MATRIX4X4)
 		{
 			delete Value.Matrix4x4;
-			Value.Matrix3x3 = NULL;
+			Value.Matrix4x4 = NULL;
 		}
 	}
 
 	switch(NewType)
 	{
-		case ZE_VRT_STRING:
-			Value.String = NULL;
-			break;
 		case ZE_VRT_MATRIX3X3:
 			Value.Matrix3x3 = new ZEMatrix3x3();
 			break;
@@ -108,8 +106,8 @@ void ZEVariant::SetVariant(const ZEVariant& NewValue)
 	switch(NewValue.Type)
 	{
 		case ZE_VRT_UNDEFINED:
+			SetNull();
 			Type = ZE_VRT_UNDEFINED;
-			Value.String = NULL;
 			break;
 		case ZE_VRT_NULL:
 			SetNull();
@@ -207,7 +205,7 @@ ZESize ZEVariant::SizeOf() const
 		case ZE_VRT_BOOLEAN:
 			return sizeof(bool);
 		case ZE_VRT_STRING:
-			return strlen(Value.String) + 1;
+			return this->Value.String.GetSize();
 		case ZE_VRT_QUATERNION:
 			return sizeof(ZEQuaternion);
 		case ZE_VRT_VECTOR2:
@@ -274,9 +272,9 @@ bool ZEVariant::Serialize(ZESerializer* Serializer)
 			Serializer->Write(&Value.Boolean, sizeof(bool), 1);
 			break;
 		case ZE_VRT_STRING:
-			StringSize = (ZEUInt32)(strlen(Value.String) + 1);
+			StringSize = (ZEUInt32)this->Value.String.GetSize();
 			Serializer->Write(&StringSize, sizeof(ZEUInt32), 1);
-			Serializer->Write(Value.String, sizeof(char), StringSize);
+			Serializer->Write(Value.String.GetValue(), sizeof(char), StringSize);
 			break;
 		case ZE_VRT_QUATERNION:
 			Serializer->Write(&Value.Vectors, sizeof(ZEQuaternion), 1);
@@ -365,11 +363,15 @@ bool ZEVariant::Unserialize(ZEUnserializer* Unserializer)
 			Unserializer->Read(&Value.Boolean, sizeof(bool), 1);
 			break;
 		case ZE_VRT_STRING:
+		{
 			SetType(ZE_VRT_STRING);
 			Unserializer->Read(&StringSize, sizeof(ZEUInt32), 1);
-			Value.String = new char[(ZESize)StringSize];
-			Unserializer->Read(Value.String, sizeof(char), StringSize);
+			char* Buffer = new char[StringSize];
+			Unserializer->Read(Buffer, sizeof(char), StringSize);
+			Buffer[StringSize - 1] = '\0';
+			Value.String.SetBuffer(Buffer, StringSize);
 			break;
+		}
 		case ZE_VRT_QUATERNION:
 			SetType(ZE_VRT_QUATERNION);
 			Unserializer->Read(&Value.Vectors, sizeof(ZEQuaternion), 1);
@@ -407,11 +409,16 @@ bool ZEVariant::Unserialize(ZEUnserializer* Unserializer)
 }
 
 
-void ZEVariant::SetString(const char *NewValue)
+void ZEVariant::SetString(const char* Value)
 {
 	SetType(ZE_VRT_STRING);
-	Value.String = new char[strlen(NewValue) + 1];
-	strcpy(Value.String, NewValue);
+	this->Value.String.SetValue(Value);
+}
+
+void ZEVariant::SetString(const ZEString& Value)
+{
+	SetType(ZE_VRT_STRING);
+	this->Value.String.SetValue(Value);
 }
 
 void ZEVariant::SetInt8(ZEInt8 Value)
@@ -480,47 +487,47 @@ void ZEVariant::SetBoolean(bool Value)
 	this->Value.Boolean = Value;
 }
 
-void ZEVariant::SetVector2(const ZEVector2& Vector)
+void ZEVariant::SetVector2(const ZEVector2& Value)
 {
 	SetType(ZE_VRT_VECTOR2);
-	(*(ZEVector2*)(&this->Value.Vectors)) = Vector;
+	(*(ZEVector2*)(&this->Value.Vectors)) = Value;
 }
 
-void ZEVariant::SetVector3(const ZEVector3& Vector)
+void ZEVariant::SetVector3(const ZEVector3& Value)
 {
 	SetType(ZE_VRT_VECTOR3);
-  	(*(ZEVector3*)(&this->Value.Vectors)) = Vector;
+  	(*(ZEVector3*)(&this->Value.Vectors)) = Value;
 }
 
-void ZEVariant::SetVector4(const ZEVector4& Vector)
+void ZEVariant::SetVector4(const ZEVector4& Value)
 {
 	SetType(ZE_VRT_VECTOR4);
-  	(*(ZEVector4*)(&this->Value.Vectors)) = Vector;
+  	(*(ZEVector4*)(&this->Value.Vectors)) = Value;
 }
 
-void ZEVariant::SetQuaternion(const ZEQuaternion& Quaternion)
+void ZEVariant::SetQuaternion(const ZEQuaternion& Value)
 {
 	SetType(ZE_VRT_QUATERNION);
-	(*(ZEQuaternion*)(&this->Value.Vectors)) = Quaternion;
+	(*(ZEQuaternion*)(&this->Value.Vectors)) = Value;
 }
 
-void ZEVariant::SetMatrix3x3(const ZEMatrix3x3& Matrix)
+void ZEVariant::SetMatrix3x3(const ZEMatrix3x3& Value)
 {
 	SetType(ZE_VRT_MATRIX3X3);
-	*this->Value.Matrix3x3 = Matrix;
+	*this->Value.Matrix3x3 = Value;
 
 }
 
-void ZEVariant::SetMatrix4x4(const ZEMatrix4x4& Matrix)
+void ZEVariant::SetMatrix4x4(const ZEMatrix4x4& Value)
 {
 	SetType(ZE_VRT_MATRIX4X4);
-	*this->Value.Matrix4x4 = Matrix;
+	*this->Value.Matrix4x4 = Value;
 }
 
-void ZEVariant::SetClass(ZEObject* Class)
+void ZEVariant::SetClass(ZEObject* Value)
 {
 	SetType(ZE_VRT_CLASS);
-	Value.Pointer = Class;
+	this->Value.Pointer = Value;
 }
 
 void ZEVariant::SetNull()
@@ -528,7 +535,7 @@ void ZEVariant::SetNull()
 	SetType(ZE_VRT_NULL);
 }
 
-char* ZEVariant::GetString() const
+const ZEString& ZEVariant::GetString() const
 {
 	zeDebugCheck(this->Type != ZE_VRT_STRING, "ZEVariant::GetString operation failed. Variant type mismatched.");
 	return Value.String;
@@ -646,105 +653,136 @@ bool ZEVariant::IsNull()	const
 	return (Type == ZE_VRT_NULL);
 }
 
-void ZEVariant::operator=(const char* NewValue)
-{
-	SetString(NewValue);
-}
-
-void ZEVariant::operator=(ZEInt8 NewValue)
-{
-	SetInt8(NewValue);
-}
-
-void ZEVariant::operator=(ZEInt16 NewValue)
-{
-	SetInt16(NewValue);
-}
-
-void ZEVariant::operator=(ZEInt32 NewValue)
-{
-	SetInt32(NewValue);
-}
-
-void ZEVariant::operator=(ZEInt64 NewValue)
-{
-	SetInt64(NewValue);
-}
-
-void ZEVariant::operator=(ZEUInt8 NewValue)
-{
-	SetUInt8(NewValue);
-}
-
-void ZEVariant::operator=(ZEUInt16 NewValue)
-{
-	SetUInt16(NewValue);
-}
-
-void ZEVariant::operator=(ZEUInt32 NewValue)
-{
-	SetUInt32(NewValue);
-}
-
-void ZEVariant::operator=(ZEUInt64 NewValue)
-{
-	SetUInt64(NewValue);
-}
-
-void ZEVariant::operator=(float NewValue)
-{
-	SetFloat(NewValue);
-}
-
-void ZEVariant::operator=(double NewValue)
-{
-	SetDouble(NewValue);
-}
-
-void ZEVariant::operator=(bool NewValue)
-{
-	SetBoolean(NewValue);
-}
-
-void ZEVariant::operator=(const ZEVariant& NewValue)
+ZEVariant& ZEVariant::operator=(const ZEVariant& NewValue)
 {
 	SetVariant(NewValue);
+	return *this;
 }
 
-void ZEVariant::operator= (const ZEVector2& Vector)
+ZEVariant& ZEVariant::operator=(const char* NewValue)
+{
+	SetString(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(const ZEString& NewValue)
+{
+	SetString(NewValue.ToCString());
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEInt8 NewValue)
+{
+	SetInt8(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEInt16 NewValue)
+{
+	SetInt16(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEInt32 NewValue)
+{
+	SetInt32(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEInt64 NewValue)
+{
+	SetInt64(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEUInt8 NewValue)
+{
+	SetUInt8(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEUInt16 NewValue)
+{
+	SetUInt16(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEUInt32 NewValue)
+{
+	SetUInt32(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEUInt64 NewValue)
+{
+	SetUInt64(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(float NewValue)
+{
+	SetFloat(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(double NewValue)
+{
+	SetDouble(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(bool NewValue)
+{
+	SetBoolean(NewValue);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(const ZEVector2& Vector)
 {
 	SetVector2(Vector);
+	return *this;
 }
 
-void ZEVariant::operator= (const ZEVector3& Vector)
+ZEVariant& ZEVariant::operator=(const ZEVector3& Vector)
 {
 	SetVector3(Vector);
+	return *this;
 }
 
-void ZEVariant::operator= (const ZEVector4& Vector)
+ZEVariant& ZEVariant::operator=(const ZEVector4& Vector)
 {
 	SetVector4(Vector);
+	return *this;
 }
 
-void ZEVariant::operator= (const ZEQuaternion& Quaternion)
+ZEVariant& ZEVariant::operator=(const ZEQuaternion& Quaternion)
 {
 	SetQuaternion(Quaternion);
+	return *this;
 }
 
-void ZEVariant::operator= (const ZEMatrix3x3& Matrix)
+ZEVariant& ZEVariant::operator=(const ZEMatrix3x3& Matrix)
 {
 	SetMatrix3x3(Matrix);
+	return *this;
 }
 
-void ZEVariant::operator= (const ZEMatrix4x4& Matrix)
+ZEVariant& ZEVariant::operator=(const ZEMatrix4x4& Matrix)
 {
 	SetMatrix4x4(Matrix);
+	return *this;
+}
+
+ZEVariant& ZEVariant::operator=(ZEObject* NewValue)
+{
+	SetClass(NewValue);
+	return *this;
 }
 
 ZEVariant::operator const char*()
 {
 	zeDebugCheck(this->Type != ZE_VRT_STRING, "String conversion operation failed. Variant type mismatched.");
-	return Value.String;
+	return this->Value.String;
 }
 
 ZEVariant::operator ZEInt8()
@@ -1142,72 +1180,77 @@ ZEVariant::operator ZEObject*()
 ZEVariant::ZEVariant()
 {
 	Type = ZE_VRT_UNDEFINED;
-	//Value.Pointer = NULL;
+	Value.Pointer = NULL;
 }
 
-ZEVariant::ZEVariant(const ZEVariant& InitialValue)
+ZEVariant::ZEVariant(const ZEVariant& Value)
 {
-	SetVariant(InitialValue);
+	SetVariant(Value);
 }
 
-ZEVariant::ZEVariant(const char* InitialValue)
+ZEVariant::ZEVariant(const char* Value)
 {
-	SetString(InitialValue);
+	SetString(Value);
 }
 
-ZEVariant::ZEVariant(ZEInt8 InitialValue)
+ZEVariant::ZEVariant(const ZEString& String)
 {
-	SetInt8(InitialValue);
+	SetString(String);
 }
 
-ZEVariant::ZEVariant(ZEInt16 InitialValue)
+ZEVariant::ZEVariant(ZEInt8 Value)
 {
-	SetInt16(InitialValue);
+	SetInt8(Value);
 }
 
-ZEVariant::ZEVariant(ZEInt32 InitialValue)
+ZEVariant::ZEVariant(ZEInt16 Value)
 {
-	SetInt32(InitialValue);
+	SetInt16(Value);
 }
 
-ZEVariant::ZEVariant(ZEInt64 InitialValue)
+ZEVariant::ZEVariant(ZEInt32 Value)
 {
-	SetInt64(InitialValue);
+	SetInt32(Value);
 }
 
-ZEVariant::ZEVariant(ZEUInt8 InitialValue)
+ZEVariant::ZEVariant(ZEInt64 Value)
 {
-	SetUInt8(InitialValue);
+	SetInt64(Value);
 }
 
-ZEVariant::ZEVariant(ZEUInt16 InitialValue)
+ZEVariant::ZEVariant(ZEUInt8 Value)
 {
-	SetUInt16(InitialValue);
+	SetUInt8(Value);
 }
 
-ZEVariant::ZEVariant(ZEUInt32 InitialValue)
+ZEVariant::ZEVariant(ZEUInt16 Value)
 {
-	SetUInt32(InitialValue);
+	SetUInt16(Value);
 }
 
-ZEVariant::ZEVariant(ZEUInt64 InitialValue)
+ZEVariant::ZEVariant(ZEUInt32 Value)
 {
-	SetUInt64(InitialValue);
+	SetUInt32(Value);
 }
 
-ZEVariant::ZEVariant(float InitialValue)
+ZEVariant::ZEVariant(ZEUInt64 Value)
 {
-	SetFloat(InitialValue);
+	SetUInt64(Value);
 }
 
-ZEVariant::ZEVariant(double InitialValue)
+ZEVariant::ZEVariant(float Value)
 {
-	SetDouble(InitialValue);
+	SetFloat(Value);
 }
 
-ZEVariant::ZEVariant(bool InitialValue)
+ZEVariant::ZEVariant(double Value)
 {
-	SetBoolean(InitialValue);
+	SetDouble(Value);
+}
+
+ZEVariant::ZEVariant(bool Value)
+{
+	SetBoolean(Value);
 }
 
 ZEVariant::ZEVariant(const ZEVector2& Vector)

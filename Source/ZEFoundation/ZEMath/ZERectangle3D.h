@@ -61,7 +61,3 @@ class ZERectangle3D
 };
 
 #endif
-
-
-
-

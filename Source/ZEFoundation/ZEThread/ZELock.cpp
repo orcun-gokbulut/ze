@@ -53,7 +53,7 @@ static inline ZEInt32 AtomicIncrement(volatile ZEInt32* NextNumber)
 bool ZELock::IsLocked()
 {
     //CurrentNumber = NextNumber + NumberOfLocks + 1;
-    return (CurrentNumber == NextNumber + 1);
+    return (CurrentNumber != NextNumber + 1);
 }
 /*
 bool ZELock::TryLock()

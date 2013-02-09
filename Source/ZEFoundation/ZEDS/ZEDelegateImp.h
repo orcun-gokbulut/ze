@@ -33,59 +33,67 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-template<typename TReturn ArgumentSeperator TemplateArgumentDefinitions>
-class ZEDelegate<TReturn (TemplateArguments)>
+#include "ZEMacro/ZEMacroRepeater.h"
+#include "ZEMacro/ZEMacroLogic.h"
+#include "ZEMacro/ZEMacroFlowControl.h"
+
+#define ZE_ARGUMENT_SEPERATOR ZE_MACRO_IF_COMMA(ZE_MACRO_BOOL(ZE_MACRO_INCLUDE_INDEX))
+#define ZE_TEMPLATE_ARGUMENT_DEFINITION_MACRO(Index, Parameter)  ZE_MACRO_IF_COMMA(ZE_MACRO_BOOL(Index)) typename TArg##Index
+#define ZE_TEMPLATE_ARGUMENT_DEFINITIONS ZE_MACRO_REPEATER(ZE_MACRO_INCLUDE_INDEX, ZE_TEMPLATE_ARGUMENT_DEFINITION_MACRO, 0)
+#define ZE_TEMPLATE_ARGUMENT_MACRO(Index, Parameter) ZE_MACRO_IF_COMMA(ZE_MACRO_BOOL(Index)) TArg##Index
+#define ZE_TEMPLATE_ARGUMENTS ZE_MACRO_REPEATER(ZE_MACRO_INCLUDE_INDEX, ZE_TEMPLATE_ARGUMENT_MACRO, 0)
+#define ZE_ARGUMENT_DEFINITION_MACRO(Index, Parameter) ZE_MACRO_IF_COMMA(ZE_MACRO_BOOL(Index)) TArg##Index Arg##Index
+#define ZE_ARGUMENT_DEFINITIONS ZE_MACRO_REPEATER(ZE_MACRO_INCLUDE_INDEX, ZE_ARGUMENT_DEFINITION_MACRO, 0)
+#define ZE_ARGUMENT_MACRO(Index, Parameter) ZE_MACRO_IF_COMMA(ZE_MACRO_BOOL(Index)) Arg##Index
+#define ZE_ARGUMENTS ZE_MACRO_REPEATER(ZE_MACRO_INCLUDE_INDEX, ZE_ARGUMENT_MACRO, 0)
+
+template<typename TReturn ZE_ARGUMENT_SEPERATOR ZE_TEMPLATE_ARGUMENT_DEFINITIONS>
+class ZEDelegate<TReturn (ZE_TEMPLATE_ARGUMENTS)>
 {
 	private:
 		void* Object;
-		TReturn (*Wrapper)(void* ArgumentSeperator TemplateArguments);
+		TReturn (*Wrapper)(void* ZE_ARGUMENT_SEPERATOR ZE_TEMPLATE_ARGUMENTS);
 
-		template<typename TClass, TReturn(TClass::*TMethod)(TemplateArguments)>
-		static TReturn WrapperImpMember(void* Object ArgumentSeperator ArgumentDefinitions)
+		template<typename TClass, TReturn(TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS)>
+		static TReturn WrapperImpMember(void* Object ZE_ARGUMENT_SEPERATOR ZE_ARGUMENT_DEFINITIONS)
 		{
 			TClass* ObjectPointer = static_cast<TClass*>(Object);
-			return (ObjectPointer->*TMethod)(Arguments);
+			return (ObjectPointer->*TMethod)(ZE_ARGUMENTS);
 		}
 
-		template<typename TClass, TReturn(TClass::*TMethod)(TemplateArguments) const>
-		static TReturn WrapperImpConst(void* Object ArgumentSeperator ArgumentDefinitions)
+		template<typename TClass, TReturn(TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS) const>
+		static TReturn WrapperImpConst(void* Object ZE_ARGUMENT_SEPERATOR ZE_ARGUMENT_DEFINITIONS)
 		{
 			const TClass* ObjectPointer = static_cast<const TClass*>(Object);
-			return (ObjectPointer->*TMethod)(Arguments);
+			return (ObjectPointer->*TMethod)(ZE_ARGUMENTS);
 		}
 
-		template <TReturn (*TMethod)(TemplateArguments)>
-		static TReturn WrapperImpGlobal(void* ArgumentSeperator ArgumentDefinitions)
+		template <TReturn (*TMethod)(ZE_TEMPLATE_ARGUMENTS)>
+		static TReturn WrapperImpGlobal(void* ZE_ARGUMENT_SEPERATOR ZE_ARGUMENT_DEFINITIONS)
 		{
-			return (TMethod)(Arguments);
+			return (TMethod)(ZE_ARGUMENTS);
 		}
 
 	public:
-        template<typename TClass, TReturn(TClass::*TMethod)(TemplateArguments)>
-		static ZEDelegate Create(TClass* Object)
+		template<TReturn (*TMethod)(ZE_TEMPLATE_ARGUMENTS)>
+		void Bind()
 		{
-			ZEDelegate Delegate;
-			Delegate.Object = Object;
-			Delegate.Wrapper = &ZEDelegate::WrapperImpMember<TClass, TMethod>;
-			return Delegate;
+			this->Object = 0;
+			this->Wrapper = &ZEDelegate::WrapperImpGlobal<TMethod>;
 		}
 
-        template<typename TClass, TReturn (TClass::*TMethod)(TemplateArguments) const>
-		static ZEDelegate CreateConst(const TClass* Object)
+		template<typename TClass, TReturn(TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS)>
+		void Bind(TClass* Object)
 		{
-			ZEDelegate Delegate;
-			Delegate.Object = const_cast<TClass*>(Object);
-			Delegate.Wrapper = &ZEDelegate::WrapperImpConst<TClass, TMethod>;
-			return Delegate;
+			this->Object = Object;
+			this->Wrapper = &ZEDelegate::WrapperImpMember<TClass, TMethod>;
 		}
 
-		template<TReturn (*TMethod)(TemplateArguments)>
-		static ZEDelegate Create()
+		template<typename TClass, TReturn (TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS) const>
+		void BindConst(const TClass* Object)
 		{
-			ZEDelegate Delegate;
-			Delegate.Object = 0;
-			Delegate.Wrapper = &ZEDelegate::WrapperImpGlobal<TMethod>;
-			return Delegate;
+			this->Object = const_cast<TClass*>(Object);
+			this->Wrapper = &ZEDelegate::WrapperImpConst<TClass, TMethod>;
 		}
 
 		void Clear()
@@ -109,100 +117,55 @@ class ZEDelegate<TReturn (TemplateArguments)>
 			return IsNull();
 		}
 
-		TReturn operator()(ArgumentDefinitions) const
+		TReturn Call(ZE_ARGUMENT_DEFINITIONS) const
 		{
-			return (*Wrapper)(Object ArgumentSeperator Arguments);
+			return (*(TReturn (*)(void* ZE_ARGUMENT_SEPERATOR ZE_TEMPLATE_ARGUMENTS))Wrapper)(Object ZE_ARGUMENT_SEPERATOR ZE_ARGUMENTS);
+		}
+
+		TReturn operator()(ZE_ARGUMENT_DEFINITIONS) const
+		{
+			return (*(TReturn (*)(void* ZE_ARGUMENT_SEPERATOR ZE_TEMPLATE_ARGUMENTS))Wrapper)(Object ZE_ARGUMENT_SEPERATOR ZE_ARGUMENTS);
 		}
 
 		ZEDelegate()
 		{
 			Clear();
 		}
+
+		template<TReturn (*TMethod)(ZE_TEMPLATE_ARGUMENTS)>
+		static ZEDelegate Create()
+		{
+			ZEDelegate Delegate;
+			Delegate.Object = 0;
+			Delegate.Wrapper = &ZEDelegate::WrapperImpGlobal<TMethod>;
+			return Delegate;
+		}
+
+		template<typename TClass, TReturn(TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS)>
+		static ZEDelegate Create(TClass* Object)
+		{
+			ZEDelegate Delegate;
+			Delegate.Object = Object;
+			Delegate.Wrapper =&ZEDelegate::WrapperImpMember<TClass, TMethod>;
+			return Delegate;
+		}
+
+		template<typename TClass, TReturn (TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS) const>
+		static ZEDelegate CreateConst(const TClass* Object)
+		{
+			ZEDelegate Delegate;
+			Delegate.Object = const_cast<TClass*>(Object);
+			Delegate.Wrapper = &ZEDelegate::WrapperImpConst<TClass, TMethod>;
+			return Delegate;
+		}
 };
 
-template<typename TReturn ArgumentSeperator TemplateArgumentDefinitions>
-class DelegateName
-{
-    private:
-        void* Object;
-        TReturn (*Wrapper)(void* ArgumentSeperator TemplateArguments);
-
-        template<typename TClass, TReturn(TClass::*TMethod)(TemplateArguments)>
-        static TReturn WrapperImpMember(void* Object ArgumentSeperator ArgumentDefinitions)
-        {
-            TClass* ObjectPointer = static_cast<TClass*>(Object);
-            return (ObjectPointer->*TMethod)(Arguments);
-        }
-
-        template<typename TClass, TReturn(TClass::*TMethod)(TemplateArguments) const>
-        static TReturn WrapperImpConst(void* Object ArgumentSeperator ArgumentDefinitions)
-        {
-            const TClass* ObjectPointer = static_cast<const TClass*>(Object);
-            return (ObjectPointer->*TMethod)(Arguments);
-        }
-
-        template <TReturn (*TMethod)(TemplateArguments)>
-        static TReturn WrapperImpGlobal(void* ArgumentSeperator ArgumentDefinitions)
-        {
-            return (TMethod)(Arguments);
-        }
-
-    public:
-        template<typename TClass, TReturn(TClass::*TMethod)(TemplateArguments)>
-        static DelegateName<TReturn ArgumentSeperator TemplateArguments> Create(TClass* Object)
-        {
-            DelegateName<TReturn ArgumentSeperator TemplateArguments> Delegate;
-            Delegate.Object = Object;
-            Delegate.Wrapper = &DelegateName::WrapperImpMember<TClass, TMethod>;
-            return Delegate;
-        }
-
-        template<typename TClass, TReturn (TClass::*TMethod)(TemplateArguments) const>
-        static DelegateName<TReturn ArgumentSeperator TemplateArguments> CreateConst(const TClass* Object)
-        {
-            DelegateName<TReturn ArgumentSeperator TemplateArguments> Delegate;
-            Delegate.Object = const_cast<TClass*>(Object);
-            Delegate.Wrapper = &DelegateName::WrapperImpConst<TClass, TMethod>;
-            return Delegate;
-        }
-
-        template<TReturn (*TMethod)(TemplateArguments)>
-        static DelegateName<TReturn ArgumentSeperator TemplateArguments> Create()
-        {
-            DelegateName<TReturn ArgumentSeperator TemplateArguments> Delegate;
-            Delegate.Object = 0;
-            Delegate.Wrapper = &DelegateName::WrapperImpGlobal<TMethod>;
-            return Delegate;
-        }
-
-        void Clear()
-        {
-            Object = 0;
-            Wrapper = 0;
-        }
-
-        bool IsNull() const
-        {
-            return Wrapper == 0;
-        }
-
-        operator bool() const
-        {
-            return !IsNull();
-        }
-
-        bool operator!() const
-        {
-            return IsNull();
-        }
-
-        TReturn operator()(ArgumentDefinitions) const
-        {
-            return (*Wrapper)(Object ArgumentSeperator Arguments);
-        }
-
-        DelegateName()
-        {
-            Clear();
-        }
-};
+#undef ZE_ARGUMENT_SEPERATOR
+#undef ZE_TEMPLATE_ARGUMENT_DEFINITION_MACRO
+#undef ZE_TEMPLATE_ARGUMENT_DEFINITIONS
+#undef ZE_TEMPLATE_ARGUMENT_MACRO
+#undef ZE_TEMPLATE_ARGUMENTS
+#undef ZE_ARGUMENT_DEFINITION_MACRO
+#undef ZE_ARGUMENT_DEFINITIONS
+#undef ZE_ARGUMENT_MACRO
+#undef ZE_ARGUMENTS

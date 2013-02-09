@@ -65,9 +65,10 @@ void ZELBuffer_SetSpecular(inout ZELBuffer LBuffer, in float Specular)
 float3 ZELBuffer_GetSpecular(in float2 Texcoord)
 {
 	float4 Sample = LBuffer1.Sample(LBufferPointSampler, Texcoord);
-	
-	// Max(0, normalize(Sample.rgb) * Sample.a) dene
-	float Length = length(Sample.rgb);
-	return Length > 0.0f ? (Sample.rgb / Length) * Sample.a : 0.0f;
+	return max(normalize(Sample.rgb) * Sample.a, 0.0f);
 }
 
+float ZELBuffer_GetLuminance(in float3 Color)
+{
+	return dot(Color, float3(0.299f, 0.587f, 0.114f));
+}

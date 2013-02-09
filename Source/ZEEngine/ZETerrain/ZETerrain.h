@@ -40,13 +40,13 @@
 #include "ZETypes.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZETerrainVertexBuffer.h"
+#include "ZEGraphics/ZEVertexLayout.h"
 
 class ZETexture2D;
-class ZEStaticVertexBuffer;
+class ZEVertexBuffer;
 class ZEMaterial;
 class ZETerrainMaterial;
 class ZERenderer;
-class ZEVertexDeclaration;
 
 struct ZETerrainDataLevel
 {
@@ -71,77 +71,77 @@ ZE_META_ENTITY_DESCRIPTION(ZETerrain)
 class ZETerrain : public ZEEntity
 {
 	ZE_META_ENTITY(ZETerrain)
-	friend class ZEPortalMapDoor;
+	friend class ZEInteriorDoor;
 	private:
-		ZEStaticVertexBuffer*					VertexBuffer;
-		ZEVertexDeclaration*					VertexDeclaration;
-		ZETerrainPrimitiveIndices				Indices;
+		ZEVertexBuffer*					VertexBuffer;
+		ZEVertexLayout					VertexDeclaration;
+		ZETerrainPrimitiveIndices		Indices;
 		
-		ZEArray<ZETerrainDataLevel>				DataLevels;
-		ZEArray<ZETerrainLevel>					Levels;
+		ZEArray<ZETerrainDataLevel>		DataLevels;
+		ZEArray<ZETerrainLevel>			Levels;
 
-		const ZETexture2D*						ColorTexture;
-		const ZETexture2D*						DetailNormalTexture;
+		const ZETexture2D*				ColorTexture;
+		const ZETexture2D*				DetailNormalTexture;
 
-		float									UnitLength;
-		ZEUInt									ChunkSize;
-		ZEUInt									MaxLevel;
+		float							UnitLength;
+		ZEUInt							ChunkSize;
+		ZEUInt							MaxLevel;
 
-		float									HeightOffset;
-		float									HeightScale;
+		float							HeightOffset;
+		float							HeightScale;
 		
-		ZEString								TerrainFileName;
+		ZEString						TerrainFileName;
 
-		ZESSize									OldPositionX;
-		ZESSize									OldPositionY;
+		ZESSize							OldPositionX;
+		ZESSize							OldPositionY;
 
 
-		bool									CreateVertexBuffer();
-		void									DestroyVertexBuffer();
+		bool							CreateVertexBuffer();
+		void							DestroyVertexBuffer();
 
-		bool									CreateLevels();
-		void									DestroyLevels();
+		bool							CreateLevels();
+		void							DestroyLevels();
 
-		bool									LoadLevelData();
-		void									UnloadLevelData();
+		bool							LoadLevelData();
+		void							UnloadLevelData();
 
-		void									Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt PositionY);
-		bool									DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt PositionX, ZEInt PositionY, ZEInt LocalPositionX, ZEInt LocalPositionY, ZEInt Mode, ZESize Level);
+		void							Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt PositionY);
+		bool							DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt PositionX, ZEInt PositionY, ZEInt LocalPositionX, ZEInt LocalPositionY, ZEInt Mode, ZESize Level);
 
-												ZETerrain();
-												~ZETerrain();
+										ZETerrain();
+										~ZETerrain();
 
 	public:	
-		bool									Locked;
-		bool									Wireframe;
-		virtual ZEDrawFlags						GetDrawFlags() const;
+		bool							Locked;
+		bool							Wireframe;
+		virtual ZEDrawFlags				GetDrawFlags() const;
 
-		void									SetUnitLength(float Length);
-		float									GetUnitLength();
+		void							SetUnitLength(float Length);
+		float							GetUnitLength();
 
-		void									SetChunkSize(ZEUInt Size);
-		ZEUInt									GetChunkSize();
+		void							SetChunkSize(ZEUInt Size);
+		ZEUInt							GetChunkSize();
 
-		void									SetMaxLevel(ZEUInt MaxLevel);
-		ZEUInt									GetMaxLevel();
+		void							SetMaxLevel(ZEUInt MaxLevel);
+		ZEUInt							GetMaxLevel();
 
-		void									SetHeightOffset(float Offset);
-		float									GetHeightOffset();
+		void							SetHeightOffset(float Offset);
+		float							GetHeightOffset();
 
-		void									SetHeightScale(float Scale);
-		float									GetHeightScale();
+		void							SetHeightScale(float Scale);
+		float							GetHeightScale();
 
-		float									GetHeight(float X, float Z);
+		float							GetHeight(float X, float Z);
 
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
 	
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
 	
-		virtual void							SetTerrainFile(const ZEString& FileName);
-		virtual const ZEString&					GetTerrainFile();
+		virtual void					SetTerrainFile(const ZEString& FileName);
+		virtual const ZEString&			GetTerrainFile();
 
-		static ZETerrain*						CreateInstance();
+		static ZETerrain*				CreateInstance();
 
 };
 

@@ -37,35 +37,34 @@
 #ifndef __ZE_UI_BUTTON_CONTROL__
 #define __ZE_UI_BUTTON_CONTROL__
 
-#include "ZEUI/ZEUIControl.h"
-#include "ZEUI/ZEUIRectangle.h"
-#include "ZERenderer/ZEUIMaterial.h"
+#include "ZEUIFrameControl.h"
 
-class ZEUIButtonControl : public ZEUIControl
+class ZEUILabel;
+
+class ZEUIButtonControl : public ZEUIFrameControl
 {
 	friend class ZEUIManager;
 	friend class ZEUICheckBoxControl;
 
-	protected:
+	private:
 
-		ZEUIRectangle			Button;
-		ZEUIMaterial*			ButtonMaterial;
+		ZEUILabel*			TextLabel;
 
 	public:
 
-		virtual void			Draw(ZEUIRenderer* Renderer);
+		virtual void		Draw(ZEUIRenderer* Renderer);
 
-		virtual void			SetWidth(float Width);
-		virtual void			SetHeight(float Height);
-		virtual void			SetSize(const ZEVector2& Size);
+		void				SetText(const ZEString& Text);
+		const ZEString&		GetText() const;
 
-		virtual void			SetPosition(const ZEVector2& Position);
+		virtual void		SetWidth(float Width);
+		virtual void		SetHeight(float Height);
+		virtual void		SetSize(const ZEVector2& Size);
 
-		virtual ZEMaterial*		GetMaterial() const;
-		virtual void			SetMaterial(ZEMaterial* Material);
+		virtual void		SetZOrder(ZEInt Z);
 
-								ZEUIButtonControl();
-								~ZEUIButtonControl();
+							ZEUIButtonControl();
+							~ZEUIButtonControl();
 
 };
 

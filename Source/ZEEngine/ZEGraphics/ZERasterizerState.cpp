@@ -36,7 +36,7 @@
 #include "ZERasterizerState.h"
 #include "ZEDS/ZEHashGenerator.h"
 
-void ZEDeviceStateRasterizer::UpdateHash()
+void ZERasterizerState::UpdateHash()
 {
 	if (Dirty)
 	{
@@ -46,7 +46,7 @@ void ZEDeviceStateRasterizer::UpdateHash()
 	}
 }
 
-void ZEDeviceStateRasterizer::SetFillMode(ZEFillMode Mode)
+void ZERasterizerState::SetFillMode(ZEFillMode Mode)
 {
 	if (StateData.FillMode != Mode)
 	{
@@ -55,12 +55,12 @@ void ZEDeviceStateRasterizer::SetFillMode(ZEFillMode Mode)
 	}
 }
 
-ZEFillMode ZEDeviceStateRasterizer::GetFillMode() const
+ZEFillMode ZERasterizerState::GetFillMode() const
 {
 	return StateData.FillMode;
 }
 
-void ZEDeviceStateRasterizer::SetCullDirection(ZECullDirection Direction)
+void ZERasterizerState::SetCullDirection(ZECullDirection Direction)
 {
 	if (StateData.CullDirection != Direction)
 	{
@@ -69,12 +69,12 @@ void ZEDeviceStateRasterizer::SetCullDirection(ZECullDirection Direction)
 	}
 }
 
-ZECullDirection ZEDeviceStateRasterizer::GetCullDirection() const
+ZECullDirection ZERasterizerState::GetCullDirection() const
 {
 	return StateData.CullDirection;
 }
 
-void ZEDeviceStateRasterizer::SetFrontIsCounterClockwise(bool IsCounterClockwise)
+void ZERasterizerState::SetFrontIsCounterClockwise(bool IsCounterClockwise)
 {
 	if (StateData.FrontIsCounterClockwise != IsCounterClockwise)
 	{
@@ -83,12 +83,12 @@ void ZEDeviceStateRasterizer::SetFrontIsCounterClockwise(bool IsCounterClockwise
 	}
 }
 
-bool ZEDeviceStateRasterizer::GetFrontIsCounterClockwise() const
+bool ZERasterizerState::GetFrontIsCounterClockwise() const
 {
 	return StateData.FrontIsCounterClockwise;
 }
 
-void ZEDeviceStateRasterizer::SetToDefault()
+void ZERasterizerState::SetToDefault()
 {
 	Hash = 0;
 	Dirty = false;
@@ -100,7 +100,7 @@ void ZEDeviceStateRasterizer::SetToDefault()
 	UpdateHash();
 }
 
-const ZEDeviceStateRasterizer& ZEDeviceStateRasterizer::operator=(const ZEDeviceStateRasterizer& State)
+const ZERasterizerState& ZERasterizerState::operator=(const ZERasterizerState& State)
 {
 	Hash = State.Hash;
 	Dirty = State.Dirty;
@@ -108,23 +108,23 @@ const ZEDeviceStateRasterizer& ZEDeviceStateRasterizer::operator=(const ZEDevice
 	return *this;
 }
 
-bool ZEDeviceStateRasterizer::operator==(const ZEDeviceStateRasterizer& State)
+bool ZERasterizerState::operator==(const ZERasterizerState& State)
 {
 	return memcmp(&StateData, &State.StateData, sizeof(ZERasterizerStateData)) == 0 ? true : false;
 }
 
-bool ZEDeviceStateRasterizer::operator!=(const ZEDeviceStateRasterizer& State)
+bool ZERasterizerState::operator!=(const ZERasterizerState& State)
 {
 	return !operator==(State);
 }
 
-ZEDeviceStateRasterizer::ZEDeviceStateRasterizer()
+ZERasterizerState::ZERasterizerState()
 {
 	memset(&StateData, 0, sizeof(ZERasterizerStateData));
 	SetToDefault();
 }
 
-ZEDeviceStateRasterizer::~ZEDeviceStateRasterizer()
+ZERasterizerState::~ZERasterizerState()
 {
 
 }

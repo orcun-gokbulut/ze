@@ -42,69 +42,7 @@
 #include "ZEDS/ZEPointer.h"
 #include "ZEFile/ZEFile.h"
 #include "ZETexturePixelConverter.h"
-
-enum ZEBMPRLEDecompressorMode
-{
-	ZE_BMP_RLE_DM_NONE				= 0,
-	ZE_BMP_RLE_DM_MARKER			= 1,
-	ZE_BMP_RLE_DM_DELTA_INIT		= 2,
-	ZE_BMP_RLE_DM_DELTA				= 3,
-	ZE_BMP_RLE_DM_REPEAT_INIT		= 4,
-	ZE_BMP_RLE_DM_REPEAT			= 5,
-	ZE_BMP_RLE_DM_ABSOLUTE_PADDING	= 6,
-	ZE_BMP_RLE_DM_ABSOLUTE			= 7,
-	ZE_BMP_RLE_DM_ABSOLUTE_END		= 8,
-	ZE_BMP_RLE_DM_FILL_BLACK		= 9
-};
-
-enum ZEBMPRLEDecompressorResult
-{
-	ZE_BMP_RLE_OUTPUT_FULL,
-	ZE_BMP_RLE_INPUT_PROCESSED,
-	ZE_BMP_RLE_ERROR
-};
-
-struct ZEBMPRLEDecompressorState
-{
-	// Last State
-	ZEInt Mode;
-	ZESize Count;
-	ZEUInt8 Value;
-	ZEInt DeltaX;
-	bool Wrapped;
-
-	// Palette
-	ZEBGRA32* Palette;
-
-	// Ouput
-	ZEBGRA32* Output;
-	ZESize OutputCursor;
-	ZESize OutputSize;
-
-	// Input
-	ZEUInt8* Input;
-	ZESize InputCursor;
-	ZESize InputSize;
-
-	ZEBMPRLEDecompressorState()
-	{
-		Mode = ZE_BMP_RLE_DM_NONE;
-		Count = 0;
-		Value = 0;
-		DeltaX = 0;
-		Wrapped = false;
-
-		Palette = NULL;
-
-		Output = NULL;
-		OutputCursor = 0;
-		OutputSize = 0;
-
-		Input = NULL;
-		InputCursor = 0;
-		InputSize = 0;
-	}
-};
+#include "ZEDecompressorBMPRLE.h"
 
 ZEPackStruct
 (
@@ -165,168 +103,8 @@ static inline ZESize GetPixelSize(ZEUInt16 BPP)
 	}
 }
 
-static ZEBMPRLEDecompressorResult UncomressRLE(ZEBMPRLEDecompressorState* State)
-{
-	ZESize Remaining = 0;
-	while(true)
-	{
-		if (State->InputCursor >= State->InputSize && State->Mode != ZE_BMP_RLE_DM_FILL_BLACK)
-		{
-			State->InputCursor = 0;
-			return ZE_BMP_RLE_INPUT_PROCESSED;
-		}
 
-		if (State->OutputCursor >= State->OutputSize)
-		{
-			State->Wrapped = true;
-			State->OutputCursor = 0;
-			return ZE_BMP_RLE_OUTPUT_FULL;
-		}
-
-		ZEUInt8* Input = State->Input + State->InputCursor;
-		ZEBGRA32* Output = State->Output + State->OutputCursor;
-
-		switch(State->Mode)
-		{
-			case ZE_BMP_RLE_DM_NONE: // None
-				if (*Input == 0)
-					State->Mode = ZE_BMP_RLE_DM_MARKER;
-				else
-				{
-					State->Mode = ZE_BMP_RLE_DM_REPEAT_INIT;
-					State->Count = *Input;
-				}
-				State->InputCursor++;
-				break;
-
-			case ZE_BMP_RLE_DM_MARKER:
-				if (*Input == 0) // End of Row
-				{
-					if (!State->Wrapped)
-					{
-						State->Count = State->OutputSize - State->OutputCursor;
-						State->Wrapped = false;
-						State->Mode = ZE_BMP_RLE_DM_FILL_BLACK;
-					}
-					else
-						State->Mode = ZE_BMP_RLE_DM_NONE;
-				}
-				else if (*Input == 1) // End of Bitmap
-				{
-					State->Count = (ZESize)-1;
-					State->Mode = ZE_BMP_RLE_DM_FILL_BLACK;
-				}
-				else if (*Input == 2) // Delta
-				{
-					State->Mode = ZE_BMP_RLE_DM_DELTA_INIT;
-				}
-				else // Absolute Mode
-				{
-					State->Count = *Input;
-					/*if (State->Count % 2 == 1)
-						State->Mode = ZE_BMP_RLE_DM_ABSOLUTE_PADDING;
-					else*/
-						State->Mode = ZE_BMP_RLE_DM_ABSOLUTE;
-				}
-				State->InputCursor++;
-				break;
-
-			case ZE_BMP_RLE_DM_DELTA_INIT:
-				State->DeltaX = *Input;
-				State->Mode = ZE_BMP_RLE_DM_DELTA;
-				State->InputCursor++;
-				break;
-
-			case ZE_BMP_RLE_DM_DELTA:
-				if (*Input > 0)
-					State->Count = State->OutputSize * (ZESize)*Input - State->OutputCursor;
-				State->Count += State->DeltaX;
-				if (State->Count == 0)
-					State->Mode = ZE_BMP_RLE_DM_NONE;
-				State->Mode = ZE_BMP_RLE_DM_FILL_BLACK;
-				State->InputCursor++;
-				break;
-
-			case ZE_BMP_RLE_DM_REPEAT_INIT:
-				State->Value = *Input;
-				State->Mode = ZE_BMP_RLE_DM_REPEAT;
-				State->InputCursor++;
-				break;
-
-			case ZE_BMP_RLE_DM_REPEAT:
-
-				if (State->OutputCursor + State->Count <= State->OutputSize)
-					Remaining = State->Count;
-				else
-					Remaining = State->OutputSize - State->OutputCursor;
-
-				for (ZESize I = 0; I < Remaining; I++)
-					*Output++ = State->Palette[State->Value];
-				
-				State->Count -= Remaining;
-				State->OutputCursor += Remaining;
-				State->Wrapped = false;
-
-				if (State->Count == 0)
-					State->Mode = ZE_BMP_RLE_DM_NONE;
-				break;
-
-			case ZE_BMP_RLE_DM_ABSOLUTE_PADDING:
-				if (*Input != 0)
-					return ZE_BMP_RLE_ERROR;
-				State->InputCursor++;
-				State->Mode = ZE_BMP_RLE_DM_ABSOLUTE;
-				break;
-
-			case ZE_BMP_RLE_DM_ABSOLUTE:
-				if (State->OutputCursor + State->Count <= State->OutputSize)
-					Remaining = State->Count;
-				else
-					Remaining = State->OutputSize - State->OutputCursor;
-
-				if (State->InputCursor + Remaining > State->InputSize)
-					Remaining = State->InputSize - State->InputCursor;
-								
-				for (ZESize I = 0; I < Remaining; I++)
-					*Output++ = State->Palette[*Input++];
-
-				State->OutputCursor += Remaining;
-				State->InputCursor += Remaining;
-				State->Count -= Remaining;
-				State->Wrapped = false;
-				
-				if (State->Count == 0)
-					State->Mode = ZE_BMP_RLE_DM_ABSOLUTE_END;
-				break;
-
-			case ZE_BMP_RLE_DM_ABSOLUTE_END:
-				if (*Input != 0)
-					return ZE_BMP_RLE_ERROR;
-				State->InputCursor++;
-				State->Mode = ZE_BMP_RLE_DM_NONE;
-				break;
-
-			case ZE_BMP_RLE_DM_FILL_BLACK:
-				if (State->OutputCursor + State->Count <= State->OutputSize)
-					Remaining = State->Count;
-				else
-					Remaining = State->OutputSize - State->OutputCursor;
-
-				memset(Output, 0, Remaining * sizeof(ZEBGRA32));
-
-				State->OutputCursor += Remaining;
-				State->Count -= Remaining;
-				State->Wrapped = false;
-
-				if (State->Count == 0)
-					State->Mode = ZE_BMP_RLE_DM_NONE;
-
-				break;
-		}
-	}
-}
-
-static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* Palette)
+static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA8* Palette)
 {
 	File->Seek(Header->DataPosition, ZE_SF_BEGINING);
 
@@ -337,10 +115,10 @@ static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* P
 	ZEPointer<ZETextureData> Texture = new ZETextureData();
 	Texture->Create(ZE_TT_2D, ZE_TPF_I8_4, 1, 1, (ZEUInt)Width, (ZEUInt)Height);
 	
-	ZEBGRA32* Destination = (ZEBGRA32*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
-	ZEBGRA32* DestinationRow = Destination + (Header->Height > 0 ? Height - 1 : 0) * Width;
+	ZEPixelRGBA8* Destination = (ZEPixelRGBA8*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
+	ZEPixelRGBA8* DestinationRow = Destination + (Header->Height > 0 ? Height - 1 : 0) * Width;
 	ZESSize DestinationRowStep = (Header->Height > 0 ? -1 : 1) * Width;
-	ZEBGRA32* DestinationEnd = Destination + Width * Height;
+	ZEPixelRGBA8* DestinationEnd = Destination + Width * Height;
 
 	ZESize Align = (Header->BitsPerPixel / 8) * Width;
 	Align += (Align % 4) != 0 ? 4 - (Align % 4) : 0;
@@ -357,33 +135,42 @@ static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* P
 			LastBlockSize = Header->DataSize % BlockSize;
 		}
 
-		ZEBMPRLEDecompressorState State;
-		State.Input = Block;
-		State.InputSize = BlockSize;
-		State.OutputSize = Width;
-		State.Output = DestinationRow;
-		State.Palette = Palette;
+		ZEPointer<ZEUInt16> DecompressedRow = new ZEUInt16[Width];
+		ZEDecompressorBMPRLE Decompressor;
+		Decompressor.SetInput(Block);
+		Decompressor.SetInputSize(BlockSize);
+		Decompressor.SetOutput(DecompressedRow);
+		Decompressor.SetOutputSize(Width);
+
 		for (ZESize I = 0; I < BlockCount; I++)
 		{
 			if (I == BlockCount - 1)
-				State.InputSize = LastBlockSize;
+				Decompressor.SetInputSize(LastBlockSize);
 
-			ZESize BytesRead = File->Read(Block, 1, State.InputSize);
-			if (BytesRead !=  State.InputSize)
-				return false;
+			ZESize BytesRead = File->Read(Block, 1, Decompressor.GetInputSize());
+			if (BytesRead !=  Decompressor.GetInputSize())
+				return NULL;
+			Decompressor.SetInput(Block);
 
 			while(true)
 			{
-				if (State.Output < Destination || State.Output >= DestinationEnd)
+				if (DestinationRow < Destination || DestinationRow >= DestinationEnd)
 					break;
 
-				ZEBMPRLEDecompressorResult Result = UncomressRLE(&State);
-				if (Result == ZE_BMP_RLE_INPUT_PROCESSED)
+				Decompressor.Decompress();
+				if(Decompressor.GetState() == ZE_DS_INPUT_PROCESSED)
+				{
 					break;
-				else if (Result == ZE_BMP_RLE_OUTPUT_FULL)
-					State.Output += DestinationRowStep;
+				}
+				else if (Decompressor.GetState() == ZE_DS_OUTPUT_FULL)
+				{
+					ZETexturePixelConverter::ConvertIndexed16(DestinationRow, DecompressedRow, Width, Palette);
+					DestinationRow += DestinationRowStep;
+				}
 				else
+				{
 					return NULL;
+				}
 			}
 		}
 	}
@@ -411,7 +198,7 @@ static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* P
 						if (File->Read(SourceRow, Align, 1) != 1)
 							return NULL;
 
-						ZETexturePixelConverter::ConvertBGR555(DestinationRow, SourceRow, Width);
+						ZETexturePixelConverter::ConvertBGRX5551(DestinationRow, SourceRow, Width);
 						DestinationRow += DestinationRowStep;
 					}
 				}
@@ -445,7 +232,7 @@ static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* P
 					if (File->Read(SourceRow, Align, 1) != 1)
 						return NULL;
 
-					ZETexturePixelConverter::ConvertABGR8(DestinationRow, SourceRow, Width);
+					ZETexturePixelConverter::ConvertBGRX8(DestinationRow, SourceRow, Width);
 					DestinationRow += DestinationRowStep;
 				}
 				break;
@@ -455,7 +242,7 @@ static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* P
 	return Texture.Transfer();
 }
 
-static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* Palette)
+static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA8* Palette, bool EnableErrorOutput)
 {
 	ZEUInt64 FileSize = File->GetSize();
 
@@ -464,13 +251,15 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* Palette)
 	Result = File->Read(Header, 1, sizeof(ZEBitmapHeader));
 	if (Result < 54)
 	{
-		zeError("Can not load BMP file header.");
+		if (EnableErrorOutput)
+			zeError("Can not load BMP file header.");
 		return false;
 	}
 
 	if (Header->Header != 'MB')
 	{
-		zeError("Unknown BMP file format.");
+		if (EnableErrorOutput)
+			zeError("Unknown BMP file format.");
 		return false;
 	}
 
@@ -479,31 +268,36 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* Palette)
 
 	if (Header->Height == 0 || Header->Width == 0)
 	{
-		zeError("Corrupted or malicious BMP file. Zero width or height.");
+		if (EnableErrorOutput)
+			zeError("Corrupted or malicious BMP file. Zero width or height.");
 		return false;
 	}
 
 	if (Header->Width < 0)
 	{
-		zeError("Corrupted or malicious BMP file. Negative width.");
+		if (EnableErrorOutput)
+			zeError("Corrupted or malicious BMP file. Negative width.");
 		return false;
 	}
 
 	if (Width > 65536 || Height > 65536)
 	{
-		zeError("Corrupted or malicious BMP file. Width or height of a BMP file can not exceed 65536.");
+		if (EnableErrorOutput)
+			zeError("Corrupted or malicious BMP file. Width or height of a BMP file can not exceed 65536.");
 		return false;
 	}
 
 	if (Width * Height * 4 == 0)
 	{
-		zeError("Corrupted or malicious BMP file. 32bit size overflow detected.");
+		if (EnableErrorOutput)
+			zeError("Corrupted or malicious BMP file. 32bit size overflow detected.");
 		return false;
 	}
 
 	if (Header->DataSize > FileSize) 
 	{
-		zeError("Corrupted or malicious BMP file. File size is too small.");
+		if (EnableErrorOutput)
+			zeError("Corrupted or malicious BMP file. File size is too small.");
 		return false;
 	}
 
@@ -531,7 +325,8 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* Palette)
 
 	if (Header->BitsPerPixel != 8 && Header->BitsPerPixel != 16 && Header->BitsPerPixel != 24 && Header->BitsPerPixel != 32)
 	{
-		zeError("Unsuppored BMP file pixel format. Only 8, 16, 24 and 32 bit pixel formats supported.");
+		if (EnableErrorOutput)
+			zeError("Unsuppored BMP file pixel format. Only 8, 16, 24 and 32 bit pixel formats supported.");
 		return false;
 	}
 	
@@ -543,7 +338,8 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* Palette)
 		case 1:
 			if (Header->BitsPerPixel != 8)
 			{
-				zeError("Unsupported compressed format.");
+				if (EnableErrorOutput)
+					zeError("Unsupported compressed format.");
 				return false;
 			}
 			break;
@@ -566,17 +362,19 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* Palette)
 				Header->GreenMask == ZEEndian::Big(0x0000FF00) && 
 				Header->BlueMask  == ZEEndian::Big(0x000000FF)))
 			{
-				zeError("Unsupported color mask.");
+				if (EnableErrorOutput)
+					zeError("Unsupported color mask.");
 				return false;
 			}
 			break;
 
 		default:
-			zeError("Unsupported encoding method.");
+			if (EnableErrorOutput)
+				zeError("Unsupported encoding method.");
 			return false;
 	}
 
-	memset(Palette, 0, 256 * sizeof(ZEBGRA32));
+	memset(Palette, 0, 256 * sizeof(ZEPixelRGBA8));
 	if (Header->BitsPerPixel == 8)
 	{
 		if (Header->PaletteEntryCount == 0)
@@ -584,18 +382,21 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* Palette)
 		
 		if (Header->PaletteEntryCount > 256)
 		{
-			zeError("Only 256 pallette entries supported.");
+			if (EnableErrorOutput)
+				zeError("Only 256 pallette entries supported.");
 			return false;
 		}
 
+		ZEUInt32 PaletteData[256];
 		File->Seek(14 + Header->Size, ZE_SF_BEGINING);
-		if (File->Read(Palette, sizeof(ZEBGRA32), Header->PaletteEntryCount) != Header->PaletteEntryCount)
+		if (File->Read(PaletteData, sizeof(ZEPixelRGBA8), Header->PaletteEntryCount) != Header->PaletteEntryCount)
 		{
-			zeError("Can not load BMP file's palate entries.");
+			if (EnableErrorOutput)
+				zeError("Can not load BMP file's palate entries.");
 			return false;
 		}
 
-		ZETexturePixelConverter::ConvertBGRA8(Palette, Palette, Header->PaletteEntryCount);
+		ZETexturePixelConverter::ConvertBGRX8(Palette, PaletteData, Header->PaletteEntryCount);
 	}
 
 	return true;
@@ -603,14 +404,18 @@ static bool LoadHeader(ZEFile* File, ZEBitmapHeader* Header, ZEBGRA32* Palette)
 
 static ZETextureData* Load(ZEFile* File)
 {
-	ZEBitmapHeader Header;
-	ZEBGRA32 Palette[256];
+	if (File == NULL || !File->IsOpen())
+	{
+		zeError("File is not opened.");
+		return NULL;
+	}
 
-	if (!LoadHeader(File, &Header, Palette))
+	ZEBitmapHeader Header;
+	ZEPixelRGBA8 Palette[256];
+	if (!LoadHeader(File, &Header, Palette, true))
 		return NULL;
 
 	ZETextureData* Data = LoadData(File, &Header, Palette);
-
 	if (Data == NULL)
 		zeError("Can not load pixel data.");
 	
@@ -619,12 +424,15 @@ static ZETextureData* Load(ZEFile* File)
 
 bool ZETextureFileBMP::LoadInfo(ZETextureDataInfo* Info, ZEFile* File)
 {
-	if (File == NULL)
-		return false;
+	if (File == NULL || !File->IsOpen())
+	{
+		zeError("File is not opened.");
+		return NULL;
+	}
 
-	ZEBGRA32 Palette[256];
+	ZEPixelRGBA8 Palette[256];
 	ZEBitmapHeader Header;
-	if (!LoadHeader(File, &Header, Palette))
+	if (!LoadHeader(File, &Header, Palette, false))
 		return false;
 
 	Info->Width = ZEMath::Abs((ZEInt16)Header.Width);

@@ -52,7 +52,7 @@ class ZEDMaterialEditor : public QMainWindow
 	Q_OBJECT
 
 	private:
-
+		
 		Ui::ZEDMaterialEditorClass* ui;
 
 		QTimer						EngineMainLoopTimer;
@@ -80,6 +80,9 @@ class ZEDMaterialEditor : public QMainWindow
 		void						CubeSelected();
 		void						PlaneSelected();
 		void						CylinderSelected();
+
+		void						SaveAs();
+		void						Open();
 
 
 

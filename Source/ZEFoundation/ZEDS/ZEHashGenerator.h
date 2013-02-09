@@ -43,9 +43,13 @@
 class ZEHashGenerator
 {
 	public:
-		static void		Hash(ZEUInt64& HashOutput, const char* String);
-		static void		Hash(ZEUInt64& HashOutput, const ZEString& String);
-		static void		Hash(ZEUInt64& HashOutput, void* Value, ZESize Size);
+		static ZEUInt64		Hash(const char* String);
+		static ZEUInt64		Hash(const ZEString& String);
+		static ZEUInt64		Hash(void* Value, ZESize Size);
+
+		static void			Hash(ZEUInt64& HashOutput, const char* String);
+		static void			Hash(ZEUInt64& HashOutput, const ZEString& String);
+		static void			Hash(ZEUInt64& HashOutput, void* Value, ZESize Size);
 };
 
 #endif

@@ -81,6 +81,7 @@ class ZEVector2
 		static float				LengthSquare(const ZEVector2 &A);
 		static float				Distance(const ZEVector2 &A, const ZEVector2 &B);
 		static float				DistanceSquare(const ZEVector2 &A, const ZEVector2 &B);
+		static float				SignedAngle(const ZEVector2& A, const ZEVector2& B);
 		static void					Normalize(ZEVector2 &Out, const ZEVector2 &A);
 		static void					Lerp(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B, float Factor);	
 		static void					Max(ZEVector2& Out, const ZEVector2& A, const ZEVector2& B);
@@ -104,6 +105,9 @@ class ZEVector2
 		void						SaturateSelf();
 		float						Min() const;
 		float						Max() const;
+
+		bool						Equals(const ZEVector2& Vector) const;
+		bool						Equals(const ZEVector2& Vector, float Threshold) const;
 
 		ZEVector2					operator +(const ZEVector2 &RightOperand) const;
 		ZEVector2					operator -(const ZEVector2 &RightOperand) const;
@@ -192,7 +196,6 @@ class ZEVector3
 		static void					Saturate(ZEVector3& Out, const ZEVector3& Vector);
 
 		static ZEVector2			ToVector2(const ZEVector3& Vector);
-		ZEVector2					ToVector2() const;
 
 		bool						IsValid() const;
 		bool						IsNormalized() const;
@@ -223,6 +226,10 @@ class ZEVector3
 		float						Min() const;
 		float						Max() const;
 
+		bool						Equals(const ZEVector3& Vector) const;
+		bool						Equals(const ZEVector3& Vector, float Threshold) const;
+
+		ZEVector2					ToVector2() const;
 
 		ZEVector3					operator+(const ZEVector3& RightOperand) const;
 		ZEVector3					operator-(const ZEVector3& RightOperand) const;
@@ -306,9 +313,6 @@ class ZEVector4
 		static ZEVector2			ToVector2(const ZEVector4& Vector);
 		static ZEVector3			ToVector3(const ZEVector4& Vector);
 
-		ZEVector2					ToVector2() const;
-		ZEVector3					ToVector3() const;
-
 		bool						IsValid() const;
 		bool						IsNormalized() const;
 
@@ -324,6 +328,12 @@ class ZEVector4
 		void						SaturateSelf();
 		float						Min() const;
 		float						Max() const;
+
+		bool						Equals(const ZEVector4& Vector) const;
+		bool						Equals(const ZEVector4& Vector, float Threshold) const;
+
+		ZEVector2					ToVector2() const;
+		ZEVector3					ToVector3() const;
 
 		ZEVector4					operator+(const ZEVector4 &RightOperand) const;
 		ZEVector4					operator-(const ZEVector4 &RightOperand) const;
@@ -356,7 +366,3 @@ class ZEVector4
 ZEVector4 operator*(float S, const ZEVector4& RightOperand);
 
 #endif
-
-
-
-

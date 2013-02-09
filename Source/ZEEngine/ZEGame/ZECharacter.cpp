@@ -56,12 +56,12 @@
 #define ACTIONID_TURNUP			7
 #define ACTIONID_TURNDOWN		8
 
-ZEDrawFlags ZECharacter::GetDrawFlags()
+ZEDrawFlags ZEGameCharacter::GetDrawFlags()
 {
 	return ZE_DF_DRAW_COMPONENTS | ZE_DF_CULL_COMPONENTS | ZE_DF_LIGHT_SOURCE;
 }
 
-void ZECharacter::Movement(float ElapsedTime)
+void ZEGameCharacter::Movement(float ElapsedTime)
 {
 	switch (MovementStatus)
 	{
@@ -254,7 +254,7 @@ void ZECharacter::Movement(float ElapsedTime)
 	MovementStatus = ZE_CMS_IDLE;
 }
 
-void ZECharacter::Turning(float ElapsedTime)
+void ZEGameCharacter::Turning(float ElapsedTime)
 {
 	switch (TurnStatus)
 	{
@@ -365,7 +365,7 @@ void ZECharacter::Turning(float ElapsedTime)
 	TurnStatus = ZE_CTS_NO_TURN;
 }
 
-void ZECharacter::Strafe(float ElapsedTime)
+void ZEGameCharacter::Strafe(float ElapsedTime)
 {
 	switch (StrafeStatus)
 	{
@@ -477,7 +477,7 @@ void ZECharacter::Strafe(float ElapsedTime)
 #define ZE_CRRE_STRAFE_RIGHT 6 
 #define ZE_CRRE_STRAFE_LEFT 7
 
-void ZECharacter::RecordEvent(ZEUInt32 Event)
+void ZEGameCharacter::RecordEvent(ZEUInt32 Event)
 {
 	if (RecordingStatus != ZE_CRS_RECORDING)
 		return;
@@ -491,7 +491,7 @@ void ZECharacter::RecordEvent(ZEUInt32 Event)
 	Records.Add(Key);
 }
 
-void ZECharacter::AdvanceRecording(float ElapsedTime)
+void ZEGameCharacter::AdvanceRecording(float ElapsedTime)
 {
 	if (RecordingStatus == ZE_CRS_RECORDING)
 	{
@@ -552,7 +552,7 @@ void ZECharacter::AdvanceRecording(float ElapsedTime)
 }
 
 
-void ZECharacter::Tick(float ElapsedTime)
+void ZEGameCharacter::Tick(float ElapsedTime)
 {
 	Turning(ElapsedTime);
 	Movement(ElapsedTime);
@@ -563,60 +563,60 @@ void ZECharacter::Tick(float ElapsedTime)
 	ZEEntity::Tick(ElapsedTime);
 }
 
-void ZECharacter::WalkForward()
+void ZEGameCharacter::WalkForward()
 {
 	MovementStatus = ZE_CMS_WALKING_FORWARD;
 	RecordEvent(ZE_CRRE_WALKING_FORWARD);
 }
 
-void ZECharacter::RunForward()
+void ZEGameCharacter::RunForward()
 {
 	MovementStatus = ZE_CMS_RUNNING_FORWARD;
 	RecordEvent(ZE_CRRE_RUNNING_FORWARD);
 }
 
-void ZECharacter::WalkBackward()
+void ZEGameCharacter::WalkBackward()
 {
 	MovementStatus = ZE_CMS_WALKING_BACKWARD;
 	RecordEvent(ZE_CRRE_WALKING_BACKWARD);
 }
 
-void ZECharacter::SprintForward()
+void ZEGameCharacter::SprintForward()
 {
 	MovementStatus = ZE_CMS_SPRINT_FORWARD;
 	//RecordEvent(ZE_CRRE_WALKING_FORWARD);
 }
 
-void ZECharacter::StrafeLeft()
+void ZEGameCharacter::StrafeLeft()
 {
 	StrafeStatus = ZE_CSS_STRAFE_LEFT;
 	RecordEvent(ZE_CRRE_STRAFE_LEFT);
 }
 
-void ZECharacter::StrafeRight()
+void ZEGameCharacter::StrafeRight()
 {
 	StrafeStatus = ZE_CSS_STRAFE_RIGHT;
 	RecordEvent(ZE_CRRE_STRAFE_RIGHT);
 }
 
-void ZECharacter::Stop()
+void ZEGameCharacter::Stop()
 {
 	MovementStatus = ZE_CMS_IDLE;
 }
 
-void ZECharacter::TurnRight()
+void ZEGameCharacter::TurnRight()
 {
 	TurnStatus = ZE_CTS_TURN_RIGHT;
 	RecordEvent(ZE_CRRE_TURNING_RIGHT);
 }
 
-void ZECharacter::TurnLeft()
+void ZEGameCharacter::TurnLeft()
 {
 	TurnStatus = ZE_CTS_TURN_LEFT;
 	RecordEvent(ZE_CRRE_TURNING_LEFT);
 }
 
-void ZECharacter::StartRecording()
+void ZEGameCharacter::StartRecording()
 {
 	Records.Clear();
 	RecordingTime = 0.0f;
@@ -625,21 +625,21 @@ void ZECharacter::StartRecording()
 	RecordEvent(-1);
 }
 
-void ZECharacter::StopRecording()
+void ZEGameCharacter::StopRecording()
 {
 	RecordingTime = 0.0f;
 	RecordingFrame = 0;
 	RecordingStatus = ZE_CRS_STOPPED;
 }
 
-void ZECharacter::PlayRecording()
+void ZEGameCharacter::PlayRecording()
 {
 	RecordingTime = 0.0f;
 	RecordingFrame = 0;
 	RecordingStatus = ZE_CRS_PLAYING;
 }
 
-void ZECharacter::SaveRecording(const char* FileName)
+void ZEGameCharacter::SaveRecording(const char* FileName)
 {
 	FILE* File = fopen(FileName, "wb");
 
@@ -651,7 +651,7 @@ void ZECharacter::SaveRecording(const char* FileName)
 	fclose(File);
 }
 
-void ZECharacter::LoadRecording(const char* FileName)
+void ZEGameCharacter::LoadRecording(const char* FileName)
 {
 	FILE* File = fopen(FileName, "rb");
 
@@ -664,7 +664,7 @@ void ZECharacter::LoadRecording(const char* FileName)
 	fclose(File);
 }
 
-bool ZECharacter::Initialize()
+bool ZEGameCharacter::Initialize()
 {
 
 	Model->SetModelResource(ZEModelResource::LoadResource("soldier.zemodel"));
@@ -765,7 +765,7 @@ bool ZECharacter::Initialize()
 	return true;
 }
 
-void ZECharacter::Deinitialize()
+void ZEGameCharacter::Deinitialize()
 {
 	if (Model != NULL)
 	{
@@ -774,7 +774,7 @@ void ZECharacter::Deinitialize()
 	}
 }
 
-ZECharacter::ZECharacter()
+ZEGameCharacter::ZEGameCharacter()
 {
 	Model = ZEModel::CreateInstance();
 	AddComponent(Model);
@@ -805,17 +805,17 @@ ZECharacter::ZECharacter()
 	WalkBackwardSpeed = 0.7f;
 }
 
-ZECharacter::~ZECharacter()
+ZEGameCharacter::~ZEGameCharacter()
 {
 	Deinitialize();
 }
 
-ZECharacter* ZECharacter::CreateInstance()
+ZEGameCharacter* ZEGameCharacter::CreateInstance()
 {
-	return new ZECharacter();
+	return new ZEGameCharacter();
 }
 
-ZEEntityRunAt ZECharacterDescription::GetRunAt() const
+ZEEntityRunAt ZEGameCharacterDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }

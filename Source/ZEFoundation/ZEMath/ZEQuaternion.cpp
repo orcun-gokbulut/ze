@@ -131,6 +131,39 @@ void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Di
 	ZEQuaternion::Normalize(Output, Output);
 }
 
+void ZEQuaternion::CreateFromDirectionChecked(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Up)
+{
+	ZEVector3 NewRight, NewUp, NewDirection;
+
+	ZEVector3::Normalize(NewDirection, Direction);
+
+	if (NewDirection == Up)
+	{
+		Output = ZEQuaternion(-ZE_PI_2, ZEVector3::UnitX);
+		return;
+	}
+
+	if (NewDirection == -Up)
+	{
+		Output = ZEQuaternion(ZE_PI_2, ZEVector3::UnitX);
+		return;
+	}
+
+	ZEVector3::CrossProduct(NewRight, Up, NewDirection);
+	ZEVector3::CrossProduct(NewUp, NewDirection, NewRight);
+
+	ZEVector3::Normalize(NewRight, NewRight);
+	ZEVector3::Normalize(NewUp, NewUp);
+
+	ZEMatrix3x3 Basis(
+		NewRight.x, NewUp.x, NewDirection.x,                                       
+		NewRight.y, NewUp.y, NewDirection.y,                         
+		NewRight.z, NewUp.z, NewDirection.z);
+
+	ZEQuaternion::CreateFromMatrix(Output, Basis);
+
+	ZEQuaternion::Normalize(Output, Output);
+}
 void ZEQuaternion::CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix3x3& Matrix)
 {
 	Output.w = ZEMath::Sqrt(ZEMath::Max(0.0f, 1.0f + Matrix.M11 + Matrix.M22 + Matrix.M33)) / 2.0f;
@@ -448,6 +481,22 @@ ZEVector3 ZEQuaternion::RotationAxis() const
 	return Axis;
 }
 
+bool ZEQuaternion::Equals(const ZEQuaternion& Quaternion) const
+{
+	return ((ZEMath::Abs(this->x - Quaternion.x) < ZE_ZERO_THRESHOLD) && 
+		(ZEMath::Abs(this->y - Quaternion.y) < ZE_ZERO_THRESHOLD) &&
+		(ZEMath::Abs(this->z - Quaternion.z) < ZE_ZERO_THRESHOLD) &&
+		(ZEMath::Abs(this->w - Quaternion.w) < ZE_ZERO_THRESHOLD));
+}
+
+bool ZEQuaternion::Equals(const ZEQuaternion& Quaternion, float Threshold) const
+{
+	return ((ZEMath::Abs(this->x - Quaternion.x) < Threshold) && 
+		(ZEMath::Abs(this->y - Quaternion.y) < Threshold) &&
+		(ZEMath::Abs(this->z - Quaternion.z) < Threshold) &&
+		(ZEMath::Abs(this->w - Quaternion.w) < Threshold));
+}
+
 ZEQuaternion ZEQuaternion::operator*(const ZEQuaternion& Other) const
 {
 	ZEQuaternion Temp;
@@ -472,18 +521,12 @@ ZEVector3 ZEQuaternion::operator*(const ZEVector3& Vector) const
 
 bool ZEQuaternion::operator==(const ZEQuaternion& RightOperand) const
 {
-	return ((ZEMath::Abs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
-		(ZEMath::Abs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD) &&
-		(ZEMath::Abs(this->z - RightOperand.z) < ZE_ZERO_THRESHOLD) &&
-		(ZEMath::Abs(this->w - RightOperand.w) < ZE_ZERO_THRESHOLD));
+	return Equals(RightOperand);
 }
 
 bool ZEQuaternion::operator!=(const ZEQuaternion& RightOperand) const
 {
-	return ((ZEMath::Abs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
-			(ZEMath::Abs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD) ||
-			(ZEMath::Abs(this->z - RightOperand.z) > ZE_ZERO_THRESHOLD) ||
-			(ZEMath::Abs(this->w - RightOperand.w) > ZE_ZERO_THRESHOLD));
+	return !Equals(RightOperand);
 }
 
 float ZEQuaternion::operator[](ZESize Index) const

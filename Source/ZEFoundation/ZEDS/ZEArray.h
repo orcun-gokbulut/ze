@@ -283,7 +283,6 @@ class ZEArray
 		inline ZEType* Insert(ZESize Index)
 		{
 			zeDebugCheck(Index > Count, "Index is out of range.");
-			ZESize N = 0;
 			ZEType* TempPointer = this->Items;
 			bool Changed = Allocator.Allocate(&Items, Count + 1);
 
@@ -318,7 +317,6 @@ class ZEArray
 		inline void DeleteAt(ZESize Index)
 		{
 			zeDebugCheck(Index >= Count, "Index is out of range.");
-			ZESize NewCount = Count, N = 0;
 			ZEType* TempPointer = this->Items;
 			bool Changed;
 			

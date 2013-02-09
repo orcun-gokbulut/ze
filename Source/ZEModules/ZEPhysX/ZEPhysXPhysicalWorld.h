@@ -58,9 +58,8 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 	private:
 		ZEPhysXCollisionManager						CollisionManager;
 
-
 		bool										Enabled;
-		bool										Visualize;
+
 
 	protected:
 		NxSceneDesc									SceneDesc;
@@ -82,9 +81,6 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 		virtual void								SetGravity(const ZEVector3& Gravity);
 		virtual ZEVector3							GetGravity();
 
-		virtual void								SetVisualize(bool Enabled);
-		virtual bool								GetVisualize();
-
 		virtual void								SetEnabled(bool Enabled);
 		virtual bool								GetEnabled();
 
@@ -98,11 +94,7 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 		virtual void								Process(float ElapsedTime);
 		virtual void								Update();
 
-
+		virtual ZEPhysicalShape*					RayCastToClosestShape(ZERay Ray, ZEPhysicsRayCastFilterShapeType Type, ZERayCastResultDetails& ResultDetails);
 };
 
 #endif
-
-
-
-

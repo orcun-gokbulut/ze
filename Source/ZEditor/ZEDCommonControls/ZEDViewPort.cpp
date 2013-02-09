@@ -39,12 +39,12 @@
 #include "ZEDSceneEditor/ZEDSceneEditor.h"
 #include "ZEDViewPort.h"
 #include "ZESDK.h"
-#include "ZEGame\ZEGame.h"
-#include "ZEGame\ZEScene.h"
-#include "ZEGraphics\ZECamera.h"
-#include "ZEMath\ZEPlane.h"
-#include "ZEMath\ZERay.h"
-#include "ZECore\ZEWindow.h"
+#include "ZEGame/ZEGame.h"
+#include "ZEGame/ZEScene.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZEMath/ZEPlane.h"
+#include "ZEMath/ZERay.h"
+#include "ZECore/ZEWindow.h"
 #include <float.h>
 #include "ZEMath/ZEAngle.h"
 

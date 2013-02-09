@@ -41,7 +41,7 @@
 #include <ZEGame/ZEPlayer.h>
 #include <ZEGame/ZEGrid.h>
 #include <ZEModel/ZEModel.h>
-#include <ZEGraphics/ZEDirectionalLight.h>
+#include <ZERenderer/ZEDirectionalLight.h>
 #include <QtCore/QPoint>
 
 class ZEDMaterialEditor;
@@ -88,13 +88,13 @@ class ZEDMaterialEditorViewPort : public QFrame
 
 	public:
 
-		void				Initialize();
-		ZEFixedMaterial*	GetModelMaterial();
-		void				SetModelFile(const char* FileName);
-		ZEDirectionalLight*	GetDirectLight1();
-		ZEDirectionalLight*	GetDirectLight2();
-		ZEDirectionalLight*	GetDirectLight3();
-							ZEDMaterialEditorViewPort(ZEDMaterialEditor* ParentEditor, QWidget* parent = 0, Qt::WindowFlags f = 0);
+		void						Initialize();
+		ZEArray<ZEFixedMaterial*>	GetModelMaterials();
+		void						SetModelFile(const char* FileName);
+		ZEDirectionalLight*			GetDirectLight1();
+		ZEDirectionalLight*			GetDirectLight2();
+		ZEDirectionalLight*			GetDirectLight3();
+									ZEDMaterialEditorViewPort(ZEDMaterialEditor* ParentEditor, QWidget* parent = 0, Qt::WindowFlags f = 0);
 };
 
 

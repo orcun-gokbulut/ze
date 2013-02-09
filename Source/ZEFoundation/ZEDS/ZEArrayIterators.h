@@ -59,7 +59,7 @@ class ZEArrayIterator
 	public:
 		inline bool IsEnd() const
 		{
-			return Index >= Array->GetCount();
+			return (ZESSize)Index >= (ZESSize)Array->GetCount() - 1;
 		} 
 
 		inline ZEType* GetItem()
@@ -69,7 +69,7 @@ class ZEArrayIterator
 
 		inline ZEType* MovePrevious()
 		{
-			if ((ZESSize)Index - 1 < (ZESSize)Array->GetSize())
+			if (Index == 0)
 				return NULL;
 
 			Index--;
@@ -78,7 +78,7 @@ class ZEArrayIterator
 
 		inline ZEType* MoveNext()
 		{
-			if (Index + 1 >= Array->GetCount())
+			if ((ZESSize)Index >= (ZESSize)Array->GetCount() - 1)
 				return NULL;
 
 			Index++;
@@ -109,7 +109,7 @@ class ZEArrayIteratorConst
 	public:
 		inline bool IsEnd() const
 		{
-			return Index >= Array->GetCount();
+			return (ZESSize)Index >= (ZESSize)Array->GetCount() - 1;
 		} 
 
 		inline const ZEType* GetItem() const
@@ -119,7 +119,7 @@ class ZEArrayIteratorConst
 
 		inline const ZEType* MovePrevious()
 		{
-			if ((ZESSize)Index - 1 < (ZESSize)Array->GetSize())
+			if (Index == 0)
 				return NULL;
 
 			Index--;
@@ -128,7 +128,7 @@ class ZEArrayIteratorConst
 
 		inline const ZEType* MoveNext()
 		{
-			if (Index + 1 >= Array->GetCount())
+			if ((ZESSize)Index >= (ZESSize)Array->GetCount() - 1)
 				return NULL;
 
 			Index++;

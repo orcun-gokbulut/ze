@@ -115,7 +115,8 @@ class ZEEntity : public ZEObject
 {
 	ZE_META_ENTITY(ZEEntity)
 	friend class ZEScene;
-	friend class ZECuller;
+	friend class ZESceneCuller;
+	friend class ZEDebugDrawer;
 
 	private: 
 		ZEEntity*							Owner;

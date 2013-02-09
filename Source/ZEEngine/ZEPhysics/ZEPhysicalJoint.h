@@ -41,6 +41,7 @@
 #include "ZEPhysicalObject.h"
 
 #include "ZEDS/ZEArray.h"
+#include "ZEDs/ZEDelegate.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEPlane.h"
@@ -103,6 +104,8 @@ enum ZEPhysicalJointMotorType
 	ZE_PJMT_POSITION			= 1<<0,
 	ZE_PJMT_VELOCITY			= 1<<1,
 };
+
+typedef ZEDelegate<void (ZEPhysicalObject*, ZEPhysicalObject*, ZEVector3, ZEQuaternion, bool)> ZEPhysicalJointEvent;
 
 struct ZEPhysicalLimitPlane : ZEPlane
 {

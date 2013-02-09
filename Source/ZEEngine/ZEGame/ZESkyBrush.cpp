@@ -131,6 +131,9 @@ void ZESkyBrush::Deinitialize()
 
 void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)
 {/*
+	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
+		return;
+
 	if (SkyTexture != NULL)
 	{
 		SkyRenderCommand.Material = SkyMaterial;
@@ -176,4 +179,3 @@ ZEEntityRunAt ZESkyBrushDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }
-

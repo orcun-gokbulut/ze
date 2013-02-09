@@ -129,7 +129,7 @@ const ZETexture* ZEGraphicsDevice::GetVertexShaderTexture(ZEUInt Index) const
 	return CurrentState.VertexShaderTextures[Index];
 }
 
-void ZEGraphicsDevice::SetVertexShaderSampler(ZEUInt Index, ZEDeviceStateSampler& Sampler)
+void ZEGraphicsDevice::SetVertexShaderSampler(ZEUInt Index, ZESamplerState& Sampler)
 {
 	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
 	
@@ -141,7 +141,7 @@ void ZEGraphicsDevice::SetVertexShaderSampler(ZEUInt Index, ZEDeviceStateSampler
 	}
 }
 
-ZEDeviceStateSampler& ZEGraphicsDevice::GetVertexShaderSampler(ZEUInt Index)
+ZESamplerState& ZEGraphicsDevice::GetVertexShaderSampler(ZEUInt Index)
 {
 	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
 
@@ -186,7 +186,7 @@ const ZETexture* ZEGraphicsDevice::GetGeometryShaderTexture(ZEUInt Index) const
 	return CurrentState.GeometryShaderTextures[Index];
 }
 
-void ZEGraphicsDevice::SetGeometryShaderSampler(ZEUInt Index, ZEDeviceStateSampler& Sampler)
+void ZEGraphicsDevice::SetGeometryShaderSampler(ZEUInt Index, ZESamplerState& Sampler)
 {
 	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
 	
@@ -198,14 +198,14 @@ void ZEGraphicsDevice::SetGeometryShaderSampler(ZEUInt Index, ZEDeviceStateSampl
 	}
 }
 
-ZEDeviceStateSampler& ZEGraphicsDevice::GetGeometryShaderSampler(ZEUInt Index)
+ZESamplerState& ZEGraphicsDevice::GetGeometryShaderSampler(ZEUInt Index)
 {
 	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
 
 	return CurrentState.GeometryShaderSamplers[Index];
 }
 
-void ZEGraphicsDevice::SetRasterizerState(ZEDeviceStateRasterizer& State)
+void ZEGraphicsDevice::SetRasterizerState(ZERasterizerState& State)
 {
 	State.UpdateHash();
 
@@ -215,7 +215,7 @@ void ZEGraphicsDevice::SetRasterizerState(ZEDeviceStateRasterizer& State)
 	}
 }
 
-ZEDeviceStateRasterizer& ZEGraphicsDevice::GetRasterizerState()
+ZERasterizerState& ZEGraphicsDevice::GetRasterizerState()
 {
 	return CurrentState.RasterizerState;
 }
@@ -290,7 +290,7 @@ const ZETexture* ZEGraphicsDevice::GetPixelShaderTexture(ZEUInt Index) const
 	return CurrentState.PixelShaderTextures[Index];
 }
 
-void ZEGraphicsDevice::SetPixelShaderSampler(ZEUInt Index, ZEDeviceStateSampler& Sampler)
+void ZEGraphicsDevice::SetPixelShaderSampler(ZEUInt Index, ZESamplerState& Sampler)
 {
 	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
 	
@@ -302,14 +302,14 @@ void ZEGraphicsDevice::SetPixelShaderSampler(ZEUInt Index, ZEDeviceStateSampler&
 	}
 }
 
-ZEDeviceStateSampler& ZEGraphicsDevice::GetPixelShaderSampler(ZEUInt Index)
+ZESamplerState& ZEGraphicsDevice::GetPixelShaderSampler(ZEUInt Index)
 {
 	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
 
 	return CurrentState.PixelShaderSamplers[Index];
 }
 
-void ZEGraphicsDevice::SetBlendState(ZEDeviceStateBlend& State)
+void ZEGraphicsDevice::SetBlendState(ZEBlendState& State)
 {
 	State.UpdateHash();
 
@@ -319,12 +319,12 @@ void ZEGraphicsDevice::SetBlendState(ZEDeviceStateBlend& State)
 	}	
 }
 
-ZEDeviceStateBlend& ZEGraphicsDevice::GetBlendState()
+ZEBlendState& ZEGraphicsDevice::GetBlendState()
 {
 	return CurrentState.BlendState;
 }
 
-void ZEGraphicsDevice::SetDepthStencilState(ZEDeviceStateDepthStencil& State)
+void ZEGraphicsDevice::SetDepthStencilState(ZEDepthStencilState& State)
 {
 	State.UpdateHash();
 
@@ -334,7 +334,7 @@ void ZEGraphicsDevice::SetDepthStencilState(ZEDeviceStateDepthStencil& State)
 	}
 }
 
-ZEDeviceStateDepthStencil& ZEGraphicsDevice::GetDepthStencilState()
+ZEDepthStencilState& ZEGraphicsDevice::GetDepthStencilState()
 {
 	return CurrentState.DepthStencilState;
 }
@@ -399,12 +399,12 @@ const ZEDepthStencilBuffer* ZEGraphicsDevice::GetDepthStencilBuffer() const
 	return CurrentState.DepthStencilBuffer;
 }
 
-void ZEGraphicsDevice::SetDeviceState(ZEDeviceState& State)
+void ZEGraphicsDevice::SetDeviceState(ZEGraphicsDeviceState& State)
 {
-	memcpy(&CurrentState, &State, sizeof(ZEDeviceState));
+	memcpy(&CurrentState, &State, sizeof(ZEGraphicsDeviceState));
 }
 
-ZEDeviceState& ZEGraphicsDevice::GetDeviceState()
+ZEGraphicsDeviceState& ZEGraphicsDevice::GetDeviceState()
 {
 	return CurrentState;
 }

@@ -34,21 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
+#include "ZEPathUtils.h"
 #include "ZEFileUtils.h"
+#include "ZEDS\ZEArray.h"
 #include "ZEPathManager.h"
 
 #include <winerror.h>
 #include <shlobj.h>
 #include <shobjidl.h>
 #include <winbase.h>
-#include "ZEDS\ZEArray.h"
-#include "ZEPathUtils.h"
 
-bool ZEPathManager::Initialized = false;
 bool ZEPathManager::EnablePathRestriction = false;
 
 ZEString ZEPathManager::WorkingDrive = "";
-
 ZEString ZEPathManager::UserDataPath = "";
 ZEString ZEPathManager::ResourcesPath = "";
 ZEString ZEPathManager::SystemDataPath = "";
@@ -56,23 +54,19 @@ ZEString ZEPathManager::SavedGamesPath = "";
 ZEString ZEPathManager::WorkingDirectory = "";
 ZEString ZEPathManager::AppResourcesPath = "";
 
-ZEString ZEPathManager::CompanyName = "Zinek";
-ZEString ZEPathManager::ApplicationName = "Engine";
-ZEString ZEPathManager::ResourceDirName = "Resources";
-
 // Helper functions to get OS version Info
 static bool GetOSVersion(ZEUInt& VerMajor, ZEUInt& VerMinor, ZEUInt& Build)
 {
 	BOOL Result;
-	OSVERSIONINFO OSInfo;
+	OSVERSIONINFOW OSInfo;
 	
-	ZESize StructSize = sizeof(OSVERSIONINFO);
+	ZESize StructSize = sizeof(OSVERSIONINFOW);
 	memset((void*)&OSInfo, 0, StructSize);
 	OSInfo.dwOSVersionInfoSize = (DWORD)StructSize;
 	
 	SetLastError(ERROR_SUCCESS);
-	Result = GetVersionEx(&OSInfo);
-	if ( !Result )
+	Result = GetVersionExW(&OSInfo);
+	if (!Result)
 	{
 		ZEString ErrorString;
 		ZEFileUtils::GetErrorString(ErrorString, GetLastError());
@@ -97,23 +91,15 @@ ZEPathManager::~ZEPathManager()
 
 }
 
-void ZEPathManager::InitializePaths()
+void ZEPathManager::CustomizePaths(const ZEString* CompanyName, const ZEString* ApplicationName, const ZEString* ResourceDirectoryName)
 {
-	if (Initialized)
-		return;
-
 	const ZEString PathSeperator = ZEPathUtils::GetSeperator();
 
-	ZEUInt OSVerMajor, OSVerMinor, OSBuild;
-	GetOSVersion(OSVerMajor, OSVerMinor, OSBuild);
+	DWORD Lenght = 0;
+	WCHAR NPath[MAX_PATH] = {0};
 
-	HRESULT Result;
-	DWORD Lenght;
-	PWSTR Path;
-	TCHAR NPath[MAX_PATH+1];
-
-	Lenght = GetCurrentDirectory(MAX_PATH, NPath);
-	if ( Lenght == 0 )
+	Lenght = GetCurrentDirectoryW(MAX_PATH, NPath);
+	if (Lenght == 0)
 	{
 		ZEString ErrorString;
 		ZEFileUtils::GetErrorString(ErrorString, GetLastError());
@@ -121,12 +107,15 @@ void ZEPathManager::InitializePaths()
 		return;
 	}
 
-	char* Token;
-	char* Context;
-	ZEString Temp = NPath;
-	const char* Search = "\\/";
+	// Save working directory
+	WorkingDirectory = NPath;
 
-	Token = strtok_s((char*)Temp.ToCString(), Search, &Context);
+	wchar_t* Token;
+	wchar_t* Context;
+	const wchar_t* Search = L"\\/";
+	
+	// Tokenize working directory and get working drive
+	Token = wcstok_s(NPath, Search, &Context);
 	if (Token == NULL)
 	{
 		ZEString ErrorString;
@@ -135,28 +124,42 @@ void ZEPathManager::InitializePaths()
 		return;
 	}
 
+	// Save working drive
 	WorkingDrive = Token;
-
-	WorkingDirectory = NPath;
-
-	// Get PathToAppResources
-	AppResourcesPath = NPath;
-	AppResourcesPath += PathSeperator;
-	AppResourcesPath += ResourceDirName;
-	AppResourcesPath += PathSeperator;
-	AppResourcesPath += ApplicationName;
 	
-	// Get PathToResources
-	ResourcesPath = NPath;
-	ResourcesPath += PathSeperator;
-	ResourcesPath += ResourceDirName;
+	// Create AppResourcesPath
+	AppResourcesPath = WorkingDirectory;
+	if (ResourceDirectoryName != NULL)
+	{
+		AppResourcesPath += PathSeperator;
+		AppResourcesPath += *ResourceDirectoryName;
+	}
+	if (ApplicationName != NULL)
+	{
+		AppResourcesPath += PathSeperator;
+		AppResourcesPath += *ApplicationName;
+	}
+
+	// Create ResourcesPath
+	ResourcesPath = WorkingDirectory;
+	if (ResourceDirectoryName != NULL)
+	{
+		ResourcesPath += PathSeperator;
+		ResourcesPath += *ResourceDirectoryName;
+	}
+	
+	ZEUInt OSVerMajor, OSVerMinor, OSBuild;
+	GetOSVersion(OSVerMajor, OSVerMinor, OSBuild);
 
 	// Server2008/Vista and later
 	if (OSVerMajor >= 6 && OSVerMinor >= 0)
 	{
-		// Get PathToSystemData
+		PWSTR Path = NULL;
+		HRESULT Result = 0;
+
+		// Create SystemDataPath
 		Result = SHGetKnownFolderPath(FOLDERID_ProgramData, KF_FLAG_CREATE, NULL, &Path);
-		if ( Result != S_OK )
+		if (Result != S_OK)
 		{
 			ZEString ErrorString;
 			ZEFileUtils::GetErrorString(ErrorString, GetLastError());
@@ -164,16 +167,22 @@ void ZEPathManager::InitializePaths()
 			return;
 		}
 
-		SystemDataPath = ZEString::FromWString(Path);
-		SystemDataPath += PathSeperator;
-		SystemDataPath += CompanyName;
-		SystemDataPath += PathSeperator;
-		SystemDataPath += ApplicationName;
+		SystemDataPath = Path;
+		if (CompanyName != NULL)
+		{
+			SystemDataPath += PathSeperator;
+			SystemDataPath += *CompanyName;
+		}
+		if (ApplicationName != NULL)
+		{
+			SystemDataPath += PathSeperator;
+			SystemDataPath += *ApplicationName;
+		}
 		CoTaskMemFree((void*)Path);
 
-		// Get PathToUserData
+		// Create UserDataPath
 		Result = SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &Path);
-		if ( Result != S_OK )
+		if (Result != S_OK)
 		{
 			ZEString ErrorString;
 			ZEFileUtils::GetErrorString(ErrorString, GetLastError());
@@ -181,16 +190,22 @@ void ZEPathManager::InitializePaths()
 			return;
 		}
 
-		UserDataPath = ZEString::FromWString(Path);
-		UserDataPath += PathSeperator;
-		UserDataPath += CompanyName;
-		UserDataPath += PathSeperator;
-		UserDataPath += ApplicationName;
+		UserDataPath = Path;
+		if (CompanyName != NULL)
+		{
+			UserDataPath += PathSeperator;
+			UserDataPath += *CompanyName;
+		}
+		if (ApplicationName != NULL)
+		{
+			UserDataPath += PathSeperator;
+			UserDataPath += *ApplicationName;
+		}
 		CoTaskMemFree((void*)Path);
 
-		// Get PathToSavedGames
+		// Create SavedGamesPath
 		Result = SHGetKnownFolderPath(FOLDERID_SavedGames, KF_FLAG_CREATE, NULL, &Path);
-		if ( Result != S_OK )
+		if (Result != S_OK)
 		{
 			ZEString ErrorString;
 			ZEFileUtils::GetErrorString(ErrorString, GetLastError());
@@ -198,20 +213,28 @@ void ZEPathManager::InitializePaths()
 			return;
 		}
 
-		SavedGamesPath = ZEString::FromWString(Path);
-		SavedGamesPath += PathSeperator;
-		SavedGamesPath += CompanyName;
-		SavedGamesPath += PathSeperator;
-		SavedGamesPath += ApplicationName;
+		SavedGamesPath = Path;
+		if (CompanyName != NULL)
+		{
+			SavedGamesPath += PathSeperator;
+			SavedGamesPath += *CompanyName;
+		}
+		if (ApplicationName != NULL)
+		{
+			SavedGamesPath += PathSeperator;
+			SavedGamesPath += *ApplicationName;
+		}
 		CoTaskMemFree((void*)Path);
 
 	}
 	// Server2003/XP and previous
 	else if (OSVerMajor <= 5 && OSVerMinor <= 2)
-	{
-		// Get PathToSystemData
-		Result = SHGetFolderPath(NULL, CSIDL_FLAG_CREATE | CSIDL_COMMON_APPDATA, NULL, 0, NPath);
-		if ( Result != S_OK )
+	{	
+		HRESULT Result = 0;
+		
+		// Create SystemDataPath
+		Result = SHGetFolderPathW(NULL, CSIDL_FLAG_CREATE | CSIDL_COMMON_APPDATA, NULL, 0, NPath);
+		if (Result != S_OK)
 		{
 			ZEString ErrorString;
 			ZEFileUtils::GetErrorString(ErrorString, GetLastError());
@@ -220,14 +243,20 @@ void ZEPathManager::InitializePaths()
 		}
 
 		SystemDataPath = NPath;
-		SystemDataPath += PathSeperator;
-		SystemDataPath += CompanyName;
-		SystemDataPath += PathSeperator;
-		SystemDataPath += ApplicationName;
+		if (CompanyName != NULL)
+		{
+			SystemDataPath += PathSeperator;
+			SystemDataPath += *CompanyName;
+		}
+		if (ApplicationName != NULL)
+		{
+			SystemDataPath += PathSeperator;
+			SystemDataPath += *ApplicationName;
+		}
 
-		// Get PathToUserData
-		Result = SHGetFolderPath(NULL, CSIDL_FLAG_CREATE | CSIDL_LOCAL_APPDATA, NULL, 0, NPath);
-		if ( Result != S_OK )
+		// Create UserDataPath
+		Result = SHGetFolderPathW(NULL, CSIDL_FLAG_CREATE | CSIDL_LOCAL_APPDATA, NULL, 0, NPath);
+		if (Result != S_OK)
 		{
 			ZEString ErrorString;
 			ZEFileUtils::GetErrorString(ErrorString, GetLastError());
@@ -236,14 +265,20 @@ void ZEPathManager::InitializePaths()
 		}
 
 		UserDataPath = NPath;
-		UserDataPath += PathSeperator;
-		UserDataPath += CompanyName;
-		UserDataPath += PathSeperator;
-		UserDataPath += ApplicationName;
+		if (CompanyName != NULL)
+		{
+			UserDataPath += PathSeperator;
+			UserDataPath += *CompanyName;
+		}
+		if (ApplicationName != NULL)
+		{
+			UserDataPath += PathSeperator;
+			UserDataPath += *ApplicationName;
+		}
 
-		// Get PathToSavedGames
-		Result = SHGetFolderPath(NULL, CSIDL_FLAG_CREATE | CSIDL_MYDOCUMENTS, NULL, 0, NPath);
-		if ( Result != S_OK )
+		// Create SavedGamesPath
+		Result = SHGetFolderPathW(NULL, CSIDL_FLAG_CREATE | CSIDL_MYDOCUMENTS, NULL, 0, NPath);
+		if (Result != S_OK)
 		{
 			ZEString ErrorString;
 			ZEFileUtils::GetErrorString(ErrorString, GetLastError());
@@ -252,57 +287,27 @@ void ZEPathManager::InitializePaths()
 		}
 
 		SavedGamesPath = NPath;
-		SavedGamesPath += PathSeperator;
-		SavedGamesPath += CompanyName;
-		SavedGamesPath += PathSeperator;
-		SavedGamesPath += ApplicationName;
+		if (CompanyName != NULL)
+		{
+			SavedGamesPath += PathSeperator;
+			SavedGamesPath += *CompanyName;
+		}
+		if (ApplicationName != NULL)
+		{
+			SavedGamesPath += PathSeperator;
+			SavedGamesPath += *ApplicationName;
+		}
 	}
-
-	Initialized = true;
 }
 
-bool ZEPathManager::GetInitialized()
+const ZEString& ZEPathManager::GetWorkingDrive()
 {
-	return Initialized;
+	return WorkingDrive;
 }
 
-void ZEPathManager::SetCompanyName(const ZEString& Name)
+const ZEString& ZEPathManager::GetWorkingDirectory()
 {
-	CompanyName = Name;
-	Initialized = false;
-
-	InitializePaths();
-}
-
-const ZEString& ZEPathManager::GetCompanyName()
-{
-	return CompanyName;
-}
-
-void ZEPathManager::SetApplicationName(const ZEString& Name)
-{
-	ApplicationName = Name;
-	Initialized = false;
-
-	InitializePaths();
-}
-
-const ZEString& ZEPathManager::GetApplicationName()
-{
-	return ApplicationName;
-}
-
-void ZEPathManager::SetResourceDirName(const ZEString& Name)
-{
-	ResourceDirName;
-	Initialized = false;
-
-	InitializePaths();
-}
-
-const ZEString& ZEPathManager::GetResourceDirName()
-{
-	return ResourceDirName;
+	return WorkingDirectory;
 }
 
 void ZEPathManager::SetEnablePathRestriction(bool Enable)
@@ -315,108 +320,103 @@ bool ZEPathManager::GetEnablePathRestriction()
 	return EnablePathRestriction;
 }
 
-const ZEString& ZEPathManager::GetWorkingDrive()
+void ZEPathManager::SetUserDataPath(const ZEString& Name)
 {
-	InitializePaths();
-
-	return WorkingDrive;
+	UserDataPath = Name;
 }
 
 const ZEString&	ZEPathManager::GetUserDataPath()
 {
-	InitializePaths();
-
 	return UserDataPath;
+}
+
+void ZEPathManager::SetResourcesPath(const ZEString& Name)
+{
+	ResourcesPath = Name;
 }
 
 const ZEString&	ZEPathManager::GetResourcesPath()
 {
-	InitializePaths();
-
 	return ResourcesPath;
+}
+
+void ZEPathManager::SetSystemDataPath(const ZEString& Name)
+{
+	SystemDataPath = Name;
 }
 
 const ZEString&	ZEPathManager::GetSystemDataPath()
 {
-	InitializePaths();
-
 	return SystemDataPath;
+}
+
+void ZEPathManager::SetSavedGamesPath(const ZEString& Name)
+{
+	SavedGamesPath = Name;
 }
 
 const ZEString&	ZEPathManager::GetSavedGamesPath()
 {
-	InitializePaths();
-
 	return SavedGamesPath;
 }
 
-const ZEString& ZEPathManager::GetWorkingDirectory()
+void ZEPathManager::SetApplicationResourcesPath(const ZEString& Name)
 {
-	InitializePaths();
-
-	return WorkingDirectory;
+	AppResourcesPath = Name;
 }
 
 const ZEString&	ZEPathManager::GetApplicationResourcesPath()
 {
-	InitializePaths();
-
 	return AppResourcesPath;
 }
 
 ZEKnownPath ZEPathManager::GetKnownPath(const ZEString& AbsolutePath)
 {
-#define Compare(Str1, Str2, Length)  (strncmp((Str1), (Str2), (Length)) == 0)
-	
-	InitializePaths();
 
-	ZESize Len = 0;
+	ZESize Length = 0;
 	ZEKnownPath Root = ZE_KP_NONE;
-	ZESize PathLen = AbsolutePath.GetLength();
-	ZESize ResrcLen = ResourcesPath.GetLength();
-	ZESize AppResLen = AppResourcesPath.GetLength();
-	ZESize WrkDirLen = WorkingDirectory.GetLength();
-	ZESize SysDataLen = SystemDataPath.GetLength();
-	ZESize UsrDataLen = UserDataPath.GetLength();
-	ZESize SvdGameLen = SavedGamesPath.GetLength();
-	
-	// Comparison should be done with the order
-	// staring from longest to shortest path
+	ZESize PathLen = strlen(AbsolutePath.ToCString());
+	ZESize ResrcLen = strlen(ResourcesPath.ToCString());
+	ZESize AppResLen = strlen(AppResourcesPath.ToCString());
+	ZESize WrkDirLen = strlen(WorkingDirectory.ToCString());
+	ZESize SysDataLen = strlen(SystemDataPath.ToCString());
+	ZESize UsrDataLen = strlen(UserDataPath.ToCString());
+	ZESize SvdGameLen = strlen(SavedGamesPath.ToCString());
 
-	if (PathLen >= ResrcLen && ResrcLen > Len &&
-		Compare(AbsolutePath, ResourcesPath, ResrcLen))
+	if (PathLen >= ResrcLen && ResrcLen > Length &&
+		(strncmp(AbsolutePath, ResourcesPath, ResrcLen) == 0))
 	{
-		Len = ResrcLen;
+		Length = ResrcLen;
 		Root = ZE_KP_RESOURCES;
 	}
-	if (PathLen >= AppResLen && AppResLen > Len &&
-		Compare(AbsolutePath, AppResourcesPath, AppResLen))
+	if (PathLen >= AppResLen && AppResLen > Length &&
+		(strncmp(AbsolutePath, AppResourcesPath, AppResLen) == 0))
 	{
-		Len = ResrcLen;
+		Length = ResrcLen;
 		Root = ZE_KP_APP_RESOURCES;
 	}
-	if (PathLen >= WrkDirLen && WrkDirLen > Len &&
-		Compare(AbsolutePath, WorkingDirectory, WrkDirLen))
+	if (PathLen >= WrkDirLen && WrkDirLen > Length &&
+		(strncmp(AbsolutePath, WorkingDirectory, WrkDirLen) == 0))
 	{
-		Len = WrkDirLen;
+		Length = WrkDirLen;
 		Root = ZE_KP_WORKING_DIRECTORY;
 	}
-	if (PathLen >= SysDataLen && SysDataLen > Len &&
-		Compare(AbsolutePath, SystemDataPath, SysDataLen))
+	if (PathLen >= SysDataLen && SysDataLen > Length &&
+		(strncmp(AbsolutePath, SystemDataPath, SysDataLen) == 0))
 	{
-		Len = SysDataLen;
+		Length = SysDataLen;
 		Root = ZE_KP_SYSTEM_DATA;
 	}
-	if (PathLen >= UsrDataLen && UsrDataLen > Len &&
-		Compare(AbsolutePath, UserDataPath, UsrDataLen))
+	if (PathLen >= UsrDataLen && UsrDataLen > Length &&
+		(strncmp(AbsolutePath, UserDataPath, UsrDataLen) == 0))
 	{
-		Len = UsrDataLen;
+		Length = UsrDataLen;
 		Root = ZE_KP_USER_DATA;
 	}
-	if (PathLen >= SvdGameLen && SvdGameLen > Len &&
-		Compare(AbsolutePath, SavedGamesPath, SvdGameLen))
+	if (PathLen >= SvdGameLen && SvdGameLen > Length &&
+		(strncmp(AbsolutePath, SavedGamesPath, SvdGameLen) == 0))
 	{
-		Len = SvdGameLen;
+		Length = SvdGameLen;
 		Root = ZE_KP_SAVED_GAMES;
 	}
 	
@@ -425,14 +425,12 @@ ZEKnownPath ZEPathManager::GetKnownPath(const ZEString& AbsolutePath)
 
 const ZEString& ZEPathManager::GetKnownPath(const ZEKnownPath KnownPath)
 {
-	InitializePaths();
-
 	switch (KnownPath)
 	{
 		case ZE_KP_NONE:
 			if (!EnablePathRestriction)
 				return ZEPathUtils::GetEmptyPath();
-			// Fall Through!!!
+			// Fall Through
 		case ZE_KP_WORKING_DIRECTORY:
 			return WorkingDirectory;
 			break;
@@ -469,29 +467,35 @@ void SeperateDriveAndPath(ZEString& Drive, ZEString& RestOfPath, const ZEString&
 		RestOfPath = ZEPathUtils::GetEmptyPath();
 	}
 
-	if (ISSEPERATOR(AbsolutePath[0]))
+	// Create a local copy
+	ZEString Temp = AbsolutePath;
+
+	// Does it start with root
+	if (AbsolutePath[0] == '\\' || AbsolutePath[0] == '/')
 	{
 		Offset += 1;
 		RootFound = true;
 	}
 
-	char* Token;
-	char* Context;
-	ZEString Temp = AbsolutePath;
-	const char* Search = "\\/";
-	char* Source = (char*)Temp.ToCString();
-
-	Token = strtok_s(Source, Search, &Context);
-	if (Token != NULL && strlen(Token) == 2 && ISDRIVELETTER(Token[0]) && Token[1] == ':')
+	wchar_t* Token;
+	wchar_t* Context;
+	wchar_t* Source = (wchar_t*)Temp.ToWCString();
+	const wchar_t* Search = L"\\/";
+	
+	Token = wcstok_s(Source, Search, &Context);
+	if (Token != NULL && wcslen(Token) == 2)
 	{
-		Offset += strlen(Token);
-		DriveFound = true;
+		if ((L'A' < Token[0]) && (Token[0] < L'Z') && (Token[1] == L':'))
+		{
+			Offset += wcslen(Token);
+			DriveFound = true;
+		}
 	}
 
 	if (DriveFound)
 	{
 		// If there is a drive letter use it
-		Drive += Token;
+		Drive = Token;
 		Drive += ZEPathUtils::GetSeperator();
 		RestOfPath = AbsolutePath.Right(AbsolutePath.GetLength() - Offset);
 	}
@@ -500,7 +504,7 @@ void SeperateDriveAndPath(ZEString& Drive, ZEString& RestOfPath, const ZEString&
 		if (RootFound)
 		{
 			// If no drive but root is found
-			Drive += ZEPathManager::GetWorkingDrive();
+			Drive = ZEPathManager::GetWorkingDrive();
 			Drive += ZEPathUtils::GetSeperator();
 			RestOfPath = AbsolutePath.Right(AbsolutePath.GetLength() - Offset);
 		}
@@ -532,15 +536,12 @@ ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEKnownPath* Root)
 	    {
 			// We have a drive, do not stack dots while simplification
 	        FinalPath = Drive + ZEPathUtils::GetSimplifiedPath(RestOfPath, false);
-
 			// Try to get root
 	        RootSymbol = GetKnownPath(FinalPath);
-
 			// Get root symbol path
 	        RootPath = GetKnownPath(RootSymbol);
-
 			// Check for restriction
-	        if (!ZEPathUtils::CheckForRestriction(RootPath, FinalPath))
+	        if (!ZEPathUtils::CheckPathContainsRoot(RootPath, FinalPath))
             {
                 zeError("Final path is restricted!\nPath: \"%s\".\nRoot: \"%s\".", FinalPath, RootPath);
                 return "";
@@ -550,33 +551,26 @@ ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEKnownPath* Root)
 	    {
 	       // We have a drive, do not stack dots while simplification
 	       FinalPath = Drive + ZEPathUtils::GetSimplifiedPath(RestOfPath, false);
-
            RootSymbol = ZE_KP_NONE;
 	    }
 	}
 	// Relative path
-	else	
+	else
 	{
 	    if (EnablePathRestriction)
 	    {
 	        RootSymbol = ZEPathUtils::SearchForSymbol(&RelativePartOfPath, Path);
-
-	        // Get root path
             RootPath = GetKnownPath(RootSymbol);
-
             // Construct temp path
             FinalPath = RootPath;
-            FinalPath += ZEPathUtils::GetSeperator();
             FinalPath += RelativePartOfPath;
-
             // We have a drive since we have path restriction, do not stack dot dot
             FinalPath = ZEPathUtils::GetSimplifiedPath(FinalPath, false);
-
             // Root can change after simplification, check again
             RootSymbol = GetKnownPath(FinalPath);
             RootPath = GetKnownPath(RootSymbol);
 
-            if (!ZEPathUtils::CheckForRestriction(RootPath, FinalPath))
+            if (!ZEPathUtils::CheckPathContainsRoot(RootPath, FinalPath))
             {
                 zeError("Final path is restricted!\nPath: \"%s\".\nRoot: \"%s\".", FinalPath.ToCString(), RootPath.ToCString());
                 return "";
@@ -585,18 +579,12 @@ ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEKnownPath* Root)
 	    else
 	    {
 			RootSymbol = ZEPathUtils::SearchForSymbol(&RelativePartOfPath, Path);
-
 			RootPath = GetKnownPath(RootSymbol);
-
 			FinalPath = RootPath;
-			FinalPath += ZEPathUtils::GetSeperator();
 			FinalPath += RelativePartOfPath;
-
-			// No restriction, dot dots can be stacked
-			FinalPath = ZEPathUtils::GetSimplifiedPath(FinalPath, true);
 			
-			if (FinalPath.IsEmpty())
-				FinalPath = ZEPathUtils::GetDot();
+			// No restriction, dot dots can be stacked since path can be relative
+			FinalPath = ZEPathUtils::GetSimplifiedPath(FinalPath, true);
 
 			// No restriction so there is no need for root
 			RootSymbol = ZE_KP_NONE;

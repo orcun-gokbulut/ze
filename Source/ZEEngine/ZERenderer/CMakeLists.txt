@@ -50,13 +50,13 @@ ze_add_source(ZEProjectiveLight.h 			Sources Header)
 ze_add_source(ZEOmniProjectiveLight.cpp 	Sources)
 ze_add_source(ZEOmniProjectiveLight.h 		Sources Header)
 ze_add_source(ZEMaterial.cpp 				Sources)
-ze_add_source(ZEMaterial.h 					Sources Header)
+ze_add_source(ZEMaterial.h 					Sources Header ZEPP)
 ze_add_source(ZEUIMaterial.cpp 				Sources)
 ze_add_source(ZEUIMaterial.h 				Sources Headers)
 ze_add_source(ZESimpleMaterial.cpp 			Sources)
 ze_add_source(ZESimpleMaterial.h 			Sources Header)
 ze_add_source(ZEFixedMaterial.cpp 			Sources)
-ze_add_source(ZEFixedMaterial.h 			Sources Header)
+ze_add_source(ZEFixedMaterial.h 			Sources Header ZEPP)
 #ze_add_source(ZESkyBoxMaterial.cpp 		Sources)
 #ze_add_source(ZESkyBoxMaterial.h 			Sources Header)
 #ze_add_source(ZESkyDomeMaterial.cpp 		Sources)
@@ -69,7 +69,6 @@ ze_add_source(ZEFixedMaterial.h 			Sources Header)
 #ze_add_source(ZEDecalMaterial.h 			Sources Headers)
 #ze_add_source(ZEMoonMaterial.cpp 			Sources)
 #ze_add_source(ZEMoonMaterial.h 			Sources Header)
-ze_add_source(ZEMaterialFileFormat.h 		Sources)
 ze_add_source(ZEMaterialResource.cpp 		Sources)
 ze_add_source(ZEMaterialResource.h 			Sources Header)
 ze_add_source(ZERenderCommand.cpp 			Sources)
@@ -95,7 +94,4 @@ ze_add_source(ZERenderStagePostProcess.h	Sources Headers)
 ze_add_library(ZERenderer
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEGraphics ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZERenderer"
-	INSTALL_COMPONENT Header)
+	LIBS ZEGraphics ZEFoundation ZEMeta ZEGame)

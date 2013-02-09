@@ -58,6 +58,7 @@ ZEThreadStatus ZEThread::GetStatus()
 
 void ZEThread::SetParameter(void* Parameter)
 {
+	zeDebugCheck(Status == ZE_TS_RUNNING, "You cannot change Parameter while thread is running.");
 	this->Parameter = Parameter;
 }
 
@@ -68,6 +69,7 @@ void* ZEThread::GetParameter()
 
 void ZEThread::SetFunction(ZEThreadFunction Function)
 {
+	zeDebugCheck(Status == ZE_TS_RUNNING, "You cannot change Function while thread is running.");
     this->Function = Function;
 }
 

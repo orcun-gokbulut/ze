@@ -50,8 +50,14 @@ class ZETestManager
 		ZETestSuiteItem*		TestSuites[65536];
 		ZESize					TestSuiteCount;
 		char					PackageName[256];
+		bool					VisualStudioOutput;
+
+								ZETestManager();
 
 	public:
+		void					SetVisualStudioOutput(bool Enabled);
+		bool					GetVisualStudioOutput();
+
 		void					RegisterTestSuite(ZETestSuiteItem* Suite);
 
 		void					SetPackageName(const char* Name);

@@ -72,7 +72,7 @@ struct ZEVertexElement
 	char				Semantic[ZE_MAX_SEMANTIC_NAME_LENGHT];
 	ZEUInt				SemanticIndex;
 	ZEVertexElementType	Type;
-	ZEUInt				Slot;
+	ZEUInt				StreamSlot;
 	ZEUInt				ByteOffset;
 	ZEVertexUsage		Usage;
 	ZEUInt				InstanceCount;

@@ -38,6 +38,7 @@
 #include "ZEPhysXPhysicalRigidBody.h"
 #include "ZEPhysXPhysicalMesh.h"
 #include "ZEPhysXPhysicalJoint.h"
+#include "ZEPhysXPhysicalCloth.h"
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 
@@ -177,7 +178,7 @@ ZEPhysicalJoint* ZEPhysXModule::CreatePhysicalJoint()
 
 ZEPhysicalCloth* ZEPhysXModule::CreatePhysicalCloth()
 {
-	return NULL;
+	return new ZEPhysXPhysicalCloth();
 }
 
 ZEPhysicalSoftBody* ZEPhysXModule::CreatePhysicalSoftBody()
@@ -211,6 +212,3 @@ ZEPhysicalCharacterController* ZEPhysXModule::CreatePhysicalController()
 {
 	return NULL;
 }
-
-
-

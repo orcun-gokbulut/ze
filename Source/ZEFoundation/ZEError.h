@@ -123,9 +123,7 @@ enum ZEErrorType
 				}\
 			}\
 			while(false)
-    #endif
-
-    #ifdef ZE_PLATFORM_COMPILER_GCC
+    #else
 		#define zeDebugCheck(Condition, ...) \
 			do \
 			{\
@@ -296,10 +294,11 @@ class ZEError
 		bool				GetBreakOnWarningEnabled();
 
 		void				SetCallback(ZEErrorCallback Callback);
+		ZEErrorCallback		GetCallBack();
 
 		void				RaiseError(ZEErrorType Type);
 
-		ZE_DLL_METHOD 
+		ZE_ENGINE_EXPORT 
 		static ZEError*		GetInstance();
 };
 

@@ -65,9 +65,9 @@ class ZEVertexBuffer
 		virtual bool			Unlock() = 0;
 		virtual bool			Lock(void** Data) = 0;
 
-		virtual bool			CreateDynamic(ZEUInt VertexCount, ZESize VertexSize) = 0;
 		virtual bool			CreateStatic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData) = 0;
-		
+		virtual bool			CreateDynamic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData = NULL) = 0;
+
 		virtual void			Destroy();
 
 		static ZEVertexBuffer*	CreateInstance();

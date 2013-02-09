@@ -63,8 +63,3 @@ class ZEResourceManager
 		static ZEResourceManager*	GetInstance();
 };
 #endif
-
-
-
-
-

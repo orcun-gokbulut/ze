@@ -51,7 +51,7 @@ add_subdirectory(ZEGame)
 add_subdirectory(ZEGraphics)
 add_subdirectory(ZETexture)
 add_subdirectory(ZEInput)
-add_subdirectory(ZEMap)
+add_subdirectory(ZEInterior)
 add_subdirectory(ZEMeta)
 add_subdirectory(ZEModel)
 add_subdirectory(ZEParticle)
@@ -60,7 +60,7 @@ add_subdirectory(ZERenderer)
 add_subdirectory(ZEScript)
 add_subdirectory(ZESound)
 add_subdirectory(ZEUI)
-#add_subdirectory(ZETerrain)
+add_subdirectory(ZETerrain)
 add_subdirectory(ZENetwork)
 
 ze_add_source(ZEAPI.h 						Sources Headers)
@@ -69,19 +69,18 @@ ze_add_source(ZEDefinitions.h 				Sources Headers)
 ze_add_source(ZESDK.h 						Sources Headers)
 ze_add_source(ZESDK.cpp 					Sources)
 
-
-ze_add_library(ZEEngineAPI 
+ze_add_library(ZEEngine 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZECore ZEGraphics ZETexture ZERenderer ZEGame ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEMap ZEPortalMap ZEModel ZEParticle ZEAI ZENetwork  ZEModules
-	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI"
-	INSTALL_COMPONENT ZESDK)
-	
+	LIBS ZECore ZEGraphics ZERenderer ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEInterior ZEModel ZEParticle ZEAI ZETerrain ZENetwork ZETexture ZEModules)
+
+ze_add_library(ZEEnginePlugin 
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	LIBS ZEFoundation ZECore ZEMeta)
+		
 ze_add_executable(ZE 
 	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
-	LIBS ZEEngineAPI
-	INSTALL
-	INSTALL_DESTINATION Bin
-	INSTALL_COMPONENT Runtime)
+	LIBS ZEEngine)
 
+#ze_combine_libraries(ZEEngine LIBS ZEEngine ZEAI ZECore ZEGame ZEGraphics ZETexture ZEInput ZEMap ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZETerrain ZENetwork)

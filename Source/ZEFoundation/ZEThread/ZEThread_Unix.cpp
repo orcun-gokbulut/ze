@@ -35,15 +35,20 @@
 
 #include "ZEThread.h"
 #include "ZEError.h"
-#include <sys/prctl.h>
 
-static __thread ZEThread* CurrentThread = NULL;
+#ifdef ZE_PLATFORM_LINUX
+    #include <sys/prctl.h>
+#endif
+
+static ZEThread* CurrentThread = NULL;
 
 void* ZEThread::ThreadFunction(void* Thread)
 {
     CurrentThread = (ZEThread*)Thread;
 
-    prctl(PR_SET_NAME, CurrentThread->GetName().ToCString(), 0, 0, 0);
+    #ifdef ZE_PLATFORM_LINUX
+        prctl(PR_SET_NAME, CurrentThread->GetName().ToCString(), 0, 0, 0);
+    #endif
 
 	CurrentThread->Status = ZE_TS_RUNNING;
     CurrentThread->Function(CurrentThread, CurrentThread->GetParameter());
@@ -71,7 +76,7 @@ void ZEThread::Terminate()
     if (Result != 0)
 		zeCriticalError("Can not terminate thread.");
 
-    Status == ZE_TS_TERMINATED;
+    Status = ZE_TS_TERMINATED;
 }
 
 void ZEThread::Sleep(ZEUInt Milliseconds)
@@ -93,22 +98,25 @@ void ZEThread::Wait()
 
 bool ZEThread::Wait(ZEUInt Milliseconds)
 {
-    zeDebugCheck(CurrentThread == this, "A thread can not wait its own.");
+    #ifndef ZE_PLATFORM_LINUX
+        zeCriticalError("Unix does not support ZEThread::Wait(ZEUInt Milliseconds) function.");
+    #else
+        zeDebugCheck(CurrentThread == this, "A thread can not wait its own.");
 
-    if (!IsAlive())
-		return false;
+        if (!IsAlive())
+            return false;
+    
+        if (Milliseconds == 0)
+            return pthread_tryjoin_np(Thread, NULL) == 0;
+        else
+        {
+            timespec Time;
+            Time.tv_sec = Milliseconds / 1000;
+            Time.tv_sec = (Milliseconds % 1000) * 1000;
 
-    if (Milliseconds == 0)
-        return pthread_tryjoin_np(Thread, NULL) == 0;
-    else
-    {
-        timespec Time;
-        Time.tv_sec = Milliseconds / 1000;
-        Time.tv_sec = (Milliseconds % 1000) * 1000;
-
-        return pthread_timedjoin_np(Thread, NULL, &Time) == 0;
-    }
-
+            return pthread_timedjoin_np(Thread, NULL, &Time) == 0;
+        }
+    #endif
     return true;
 }
 

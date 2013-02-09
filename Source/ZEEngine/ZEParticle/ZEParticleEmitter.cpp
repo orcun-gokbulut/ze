@@ -436,6 +436,12 @@ const ZEVector4& ZEParticleEmitter::GetMaxColor() const
 	return MaxColor;
 }
 
+void ZEParticleEmitter::Reset()
+{
+	if (IsContinuous == false)
+		EmittedParticleCount = 0;
+}
+
 void ZEParticleEmitter::SetContinuity(bool Value)
 {
 	IsContinuous = Value;
@@ -632,7 +638,7 @@ void ZEParticleEmitter::UpdateVertexBuffer(ZEDrawParameters* DrawParameters)
 
 	if (VertexBuffer->GetBufferSize() != ParticlePool.GetCount() * sizeof(ZESimpleVertex) * 6)
 	{
-		if (!VertexBuffer->CreateDynamic(ParticlePool.GetCount() * 6, sizeof(ZESimpleVertex)))
+		if (!VertexBuffer->CreateDynamic(ParticlePool.GetCount() * 6, sizeof(ZESimpleVertex), NULL))
 		{
 			zeError("Could not create particle vertex buffer.");
 			return;
@@ -761,11 +767,17 @@ void ZEParticleEmitter::Draw(ZEDrawParameters* DrawParameters)
 
 	UpdateVertexBuffer(DrawParameters);
 
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+		Owner->Statistics.TotalParticleCount += ParticlePool.GetCount();
+
 	if (RenderCommand.PrimitiveCount == 0)
 		return;
 
 	if (VertexBuffer == NULL || Material == NULL)
 		return;
+
+	if (DrawParameters->Pass == ZE_RP_COLOR)
+		Owner->Statistics.DrawedParticleCount += RenderCommand.PrimitiveCount / 2;
 
 	if(IsEmmiterLocal)
 		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, GetOwner()->GetWorldPosition(), ZEQuaternion::Identity, GetOwner()->GetWorldScale());

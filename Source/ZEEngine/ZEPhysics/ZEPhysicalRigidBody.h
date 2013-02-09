@@ -64,7 +64,7 @@ class ZEPhysicalRigidBody : public ZEPhysicalObject
 protected:
 	ZEPhysicalBodyType					PhysicalBodyType;
 
-	ZEPhysicalRigidBody(){}
+										ZEPhysicalRigidBody(){}
 	virtual								~ZEPhysicalRigidBody(){}
 
 public:							
@@ -135,7 +135,3 @@ public:
 };
 
 #endif
-
-
-
-

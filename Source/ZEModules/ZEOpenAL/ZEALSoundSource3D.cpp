@@ -671,7 +671,3 @@ void ZEALSoundSource3D::SetConeOutsideVolume(ZEUInt NewOutsideVolume)
 		alSourcei(ALSource, AL_CONE_OUTER_GAIN, (ALint)(EffectiveVolume / 100.0f));
 	}
 }
-
-
-
-

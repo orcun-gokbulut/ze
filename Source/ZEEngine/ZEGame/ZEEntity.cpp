@@ -98,11 +98,11 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 		return false;
 	}
 
-	if (this->OwnerScene != NULL)
-	{
-		zeError("Parent entity is active in a scene. Can not register target entity.");
-		return false;
-	}
+//  	if (this->OwnerScene != NULL)
+//  	{
+//  		zeError("Parent entity is active in a scene. Can not register target entity.");
+//  		return false;
+//  	}
 
 	Entity->OwnerScene = this->OwnerScene;
 	Entity->Owner = this;
@@ -304,7 +304,6 @@ const ZEVector3 ZEEntity::GetWorldPosition() const
 	{
 		ZEVector3 Temp;
 		ZEMatrix4x4::Transform(Temp, Owner->GetWorldTransform(), GetPosition());
-		//ZEVector3::Add(Temp, Owner->GetPosition(), GetPosition());
 		return Temp;
 	}
 

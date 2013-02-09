@@ -34,48 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEIUCheckBoxControl.h"
-#include "ZEFontResource.h"
-#include "ZERenderer/ZEFixedMaterial.h"
-#include "ZETexture/ZETexture2DResource.h"
-#include "ZERenderer/ZEUIMaterial.h"
+#include "ZEUIManager.h"
+#include "ZEUILabel.h"
 
 void ZEUICheckBoxControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
 {
-	if(Button == ZE_UI_MOUSE_BUTTON_LEFT)
-	{
-		if (State == ZE_UI_CBS_UNCHECKED)
-		{
-			if (IsTriState)
-			{
-				State = ZE_UI_CBS_SEMICHECKED;
-				((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("SemiChecked.png")->GetTexture());
-			}
-			else
-			{
-				State = ZE_UI_CBS_CHECKED;
-				((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("Checked.png")->GetTexture());
-			}
-		}
-		
-		else if (State == ZE_UI_CBS_SEMICHECKED)
-		{	
-			State = ZE_UI_CBS_CHECKED;
-			((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("Checked.png")->GetTexture());
-		}
-		
-		else if (State == ZE_UI_CBS_CHECKED)
-		{	
-			State = ZE_UI_CBS_UNCHECKED;
-			((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("UnChecked.png")->GetTexture());
-		}
-	}
+	if(State == ZE_UI_CBS_UNCHECKED)
+		SetState(ZE_UI_CBS_CHECKED);
+	else
+		SetState(ZE_UI_CBS_UNCHECKED);
 
 	ZEUIControl::MouseButtonPressed(Button, MousePosition);
+}
+
+void ZEUICheckBoxControl::Draw(ZEUIRenderer* Renderer)
+{
+	ZEUIRectangle Output;
+	Output.ZOrder = GetZOrder() + 1;
+
+	if(!ZEUIRectangle::Clip(Output, Box, GetRectangle()))
+		Renderer->AddRectangle(Output);
+
+	ZEUIControl::Draw(Renderer);
 }
 
 void ZEUICheckBoxControl::SetState(ZEUICheckBoxState State)
 {
 	this->State = State;
+	
+	if(State == ZE_UI_CBS_CHECKED)
+		Box.Color = ZEUIManager::GetDefaultForegroundColor();
+	else
+		Box.Color = ZEUIManager::GetDefaultBackgroundColor();
 }
 
 ZEUICheckBoxState ZEUICheckBoxControl::GetState() const
@@ -85,59 +75,68 @@ ZEUICheckBoxState ZEUICheckBoxControl::GetState() const
 
 void ZEUICheckBoxControl::SetText(ZEString Text)
 {
-	Label.SetText(Text);
+	Label->SetText(Text);
 }
 
 ZEString ZEUICheckBoxControl::GetText()
 {
-	return Label.GetText();
+	return Label->GetText();
 }
 
-void ZEUICheckBoxControl::SetTriState(bool Tristate)
+void ZEUICheckBoxControl::SetHeight(float Height)
 {
-	IsTriState = Tristate;
+	ZEUIControl::SetHeight(Height);
+
+	if(Height < Label->GetHeight())
+		Label->SetHeight(Height);
+// 	else
+// 		Label->SetHeight(Label->GetFontResource()->)
+//		Font size height adjustment fix needed
+
+ 	ZEVector2 LabelPos = ZEVector2((Box.Positions.RightDown - Box.Positions.LeftUp).x, (GetHeight() - Label->GetHeight()) / 2);
+ 	Label->SetPosition(LabelPos);
+	Box.Positions.RightDown.y = Box.Positions.LeftUp.y + GetHeight();
 }
 
-bool ZEUICheckBoxControl::GetTristate() const
+void ZEUICheckBoxControl::SetWidth(float Width)
 {
-	return IsTriState;
+	ZEUIControl::SetWidth(Width);
+	Label->SetPosition(ZEVector2((Box.Positions.RightDown - Box.Positions.LeftUp).x , Label->GetPosition().y));
+	ZEInt32 LabelWidth = GetWidth() - (Box.Positions.RightDown - Box.Positions.LeftUp).x;
+
+	if(LabelWidth < 0)
+		Label->SetWidth(0);
+	else
+		Label->SetWidth(LabelWidth);
 }
 
-ZEMaterial*	ZEUICheckBoxControl::GetMaterial() const
+void ZEUICheckBoxControl::SetPosition(const ZEVector2& Position)
 {
-	return NULL;
-}
-
-void ZEUICheckBoxControl::SetMaterial(ZEMaterial* Material)
-{
-	Box.Button.Material = Material;
+	ZEVector2 Displacement = Position - GetPosition();
+	Box.Positions.LeftUp += Displacement;
+	Box.Positions.RightDown += Displacement;
+	ZEUIControl::SetPosition(Position);
 }
 
 ZEUICheckBoxControl::ZEUICheckBoxControl()
 {
 	State = ZE_UI_CBS_UNCHECKED;
-	Label.SetFont(ZEFontResource::LoadResource("OldEnglish.zefont"));
-	Label.SetText(ZEString("Test"));
-
-	IsTriState = false;
-
-	Box.SetWidth(24);
-	Box.SetHeight(24);
-	Label.SetWidth(100);
-	Label.SetHeight(25);
-
-	AddChildControl(&Box);
-	AddChildControl(&Label);
-	Box.SetPosition(ZEVector2::Zero);
-	Label.SetPosition(ZEVector2(Box.GetPosition().x + Box.GetWidth(), Box.GetPosition().y));
-	
-	SetHeight(Box.GetHeight());
-	SetWidth(Box.GetWidth() + Label.GetWidth());
-
-	Box.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUICheckBoxControl::MouseButtonPressed));
-	Label.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUICheckBoxControl::MouseButtonPressed));
-
-	((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("UnChecked.png")->GetTexture());
+	Label = new ZEUILabel();
+	AddChildControl(Label);
+	Label->SetTextMargins(ZEVector4(0, 2, 0, 0));
+	Box.Positions.LeftUp = GetPosition();
+	Box.Positions.RightDown = GetPosition() + ZEVector2::One * 22;
+	Label->SetText("Check Box");
+	Label->SetHeight(16);
+	BoxMaterial = ZEUIMaterial::CreateInstance();
+	Box.Material = BoxMaterial;
+	SetPosition(ZEVector2::Zero);
+	SetWidth(120);
+	SetHeight(22);
+	SetState(ZE_UI_CBS_UNCHECKED);
+	SetMoveable(false);
+	Label->SetMoveable(false);
+	Label->SetBackgroundColor(ZEVector4::Zero);
 }
 
 ZEUICheckBoxControl::~ZEUICheckBoxControl()

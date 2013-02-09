@@ -62,9 +62,13 @@ class ZEModelMeshLOD
 		void								SetMaterial(const ZEMaterial* Material);
 		const ZEMaterial*					GetMaterial();
 
+		const ZEModelResourceMeshLOD*		GetLODResource();
+
 		bool								IsSkinned();
 
 		void								Draw(ZEDrawParameters* DrawParameters, float DistanceSquare);
+
+		bool								UpdateVertexBuffer(ZEArray<ZEVector3> Vertices, ZEArray<ZEUInt32> Indices);
 		
 		void								Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource);
 		void								Deinitialize();
@@ -73,4 +77,3 @@ class ZEModelMeshLOD
 											~ZEModelMeshLOD();
 };
 #endif
-

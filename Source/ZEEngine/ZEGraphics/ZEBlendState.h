@@ -81,7 +81,7 @@ enum ZEBlendEquation
 #define ZE_CCM_ALL				ZE_CCM_RED | ZE_CCM_GREEN | ZE_CCM_BLUE | ZE_CCM_ALPHA
 typedef ZEFlagsBase<ZEUInt8>	ZEColorChannelMask;
 
-class ZEDeviceStateBlend
+class ZEBlendState
 {
 	friend class ZEGraphicsDevice;
 	friend class ZEDeviceStageOutput;
@@ -137,12 +137,12 @@ class ZEDeviceStateBlend
 
 		void						SetToDefault();
 		
-		const ZEDeviceStateBlend&	operator=(const ZEDeviceStateBlend& State);
-		bool						operator==(const ZEDeviceStateBlend& State);
-		bool						operator!=(const ZEDeviceStateBlend& State);
+		const ZEBlendState&	operator=(const ZEBlendState& State);
+		bool						operator==(const ZEBlendState& State);
+		bool						operator!=(const ZEBlendState& State);
 
-									ZEDeviceStateBlend();
-		virtual						~ZEDeviceStateBlend();
+									ZEBlendState();
+		virtual						~ZEBlendState();
 
 };
 #endif

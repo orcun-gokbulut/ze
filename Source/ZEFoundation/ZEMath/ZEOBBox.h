@@ -84,7 +84,3 @@ class ZEOBBox
 								ZEOBBox(const ZEVector3& Center, const ZEVector3& Right, const ZEVector3& Up,const ZEVector3& Direction, const ZEVector3& HalfSize);
 };
 #endif
-
-
-
-

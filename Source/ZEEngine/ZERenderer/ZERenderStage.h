@@ -86,7 +86,7 @@ class ZEConstantBuffer;
 class ZERenderStage
 {
 	protected:
-		ZEDeviceState					DefaultStates;
+		ZEGraphicsDeviceState					DefaultStates;
 		ZEConstantBuffer*				StageBuffer;
 		ZEArray<ZERenderStageConstant>	StageConstants;
 
@@ -99,7 +99,7 @@ class ZERenderStage
 		void							PumpStreams(ZERenderCommand* RenderCommand);
 
 	public:
-		const ZEDeviceState*			GetDefaultStates() const;
+		const ZEGraphicsDeviceState*			GetDefaultStates() const;
 
 		virtual void					Destroy();
 

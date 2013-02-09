@@ -52,12 +52,14 @@ ze_add_source(ZETextureData.h				    		Sources Headers)
 ze_add_source(ZETextureFile.cpp			  				Sources)
 ze_add_source(ZETextureFile.h				    		Sources Headers)
 ze_add_source(ZETextureFileBMP.cpp						Sources)
-ze_add_source(ZETextureFileBMP.h			  			Sources Headers)
+ze_add_source(ZETextureFileBMP.h			  			Sources)
 ze_add_source(ZETextureFileBMPTest.cpp					Tests)
 ze_add_source(ZETextureFileFormat.cpp					Sources)
+#ze_add_source(ZETextureFileDDS.h						Sources)
+#ze_add_source(ZETextureFileDDS.cpp						Sources)
 ze_add_source(ZETextureFileFormat.h						Sources Headers)
 ze_add_source(ZETextureFileJPEG.cpp						Sources)
-ze_add_source(ZETextureFileJPEG.h						Sources Headers)
+ze_add_source(ZETextureFileJPEG.h						Sources)
 ze_add_source(ZETextureFileJPEGChromaUpsampler.cpp		Sources)
 ze_add_source(ZETextureFileJPEGChromaUpsampler.h		Sources)
 ze_add_source(ZETextureFileJPEGColorSpaceConverter.cpp	Sources)
@@ -78,10 +80,11 @@ ze_add_source(ZETextureFileJPEGMCUController.cpp		Sources)
 ze_add_source(ZETextureFileJPEGMCUController.h			Sources)
 ze_add_source(ZETextureFileJPEGTest.cpp					Tests)
 ze_add_source(ZETextureFileTGA.cpp						Sources)
-ze_add_source(ZETextureFileTGA.h						Sources Headers)
-#ze_add_source(ZETextureFileTGATest.cpp					Tests)
+ze_add_source(ZETextureFileTGA.h						Sources)
+ze_add_source(ZETextureFileTGATest.cpp					Tests)
 ze_add_source(ZETextureFileTIFF.cpp						Sources)
-ze_add_source(ZETextureFileTIFF.h			  			Sources Headers)
+ze_add_source(ZETextureFileTIFF.h			  			Sources)
+ze_add_source(ZETextureFileTIFFTest.cpp					Tests)
 ze_add_source(ZETextureLoader.cpp						Sources)
 ze_add_source(ZETextureLoader.h							Sources Headers)
 ze_add_source(ZETextureOptions.cpp						Sources)
@@ -139,19 +142,26 @@ ze_add_source(ZETextureCompressor.cpp					Sources)
 ze_add_source(ZETextureCompressor.h						Sources Headers)
 ze_add_source(ZETextureTools.cpp						Sources)
 ze_add_source(ZETextureTools.h							Sources Headers)
+ze_add_source(ZEPixel.cpp								Sources)
+ze_add_source(ZEPixel.h									Sources Headers)
+ze_add_source(ZETextureTestUtils.cpp					Sources)
+ze_add_source(ZETextureTestUtils.h						Sources Headers)
+
+ze_add_source(ZEDecompressor.cpp						Sources)
+ze_add_source(ZEDecompressor.h							Sources)
 ze_add_source(ZEDecompressorLZW.cpp						Sources)
-ze_add_source(ZEDecompressorLZW.h						Sources Headers)
-
-
-
+ze_add_source(ZEDecompressorLZW.h						Sources)
+ze_add_source(ZEDecompressorDeflate.cpp					Sources)
+ze_add_source(ZEDecompressorDeflate.h					Sources)
+ze_add_source(ZEDecompressorTGARLE.cpp					Sources)
+ze_add_source(ZEDecompressorTGARLE.h					Sources)
+ze_add_source(ZEDecompressorBMPRLE.cpp					Sources)
+ze_add_source(ZEDecompressorBMPRLE.h					Sources)
 
 ze_add_library(ZETexture 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation libfreeimage libATICompress ZEDirect3D10
-	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZETexture"
-	INSTALL_COMPONENT Header)
+	LIBS ZEFoundation libfreeimage libATICompress ZEDirect3D10)
 
 ze_add_test(ZETextureTests 
 	SOURCES ${Tests}

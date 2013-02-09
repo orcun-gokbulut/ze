@@ -155,16 +155,16 @@ bool ZEUIMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZE
 	VertexShaderBuffer->Unlock();
 	Device->SetVertexShaderBuffer(0, VertexShaderBuffer);
 		
-	ZEDeviceStateRasterizer RasterizerState;
+	ZERasterizerState RasterizerState;
 	RasterizerState.SetCullDirection(ZE_CD_COUNTER_CLOCKWISE);
 	RasterizerState.SetFillMode(WireFrame ? ZE_FM_WIREFRAME : ZE_FM_SOLID);
 	Device->SetRasterizerState(RasterizerState);
 
-	ZEDeviceStateDepthStencil DepthStencilState;
+	ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetZTestEnable(false);
 	Device->SetDepthStencilState(DepthStencilState);
 
-	ZEDeviceStateBlend BlendState;
+	ZEBlendState BlendState;
 	BlendState.SetBlendEnable(0, true);
 	BlendState.SetBlendEquation(ZE_BE_ADD);
 	BlendState.SetSourceBlendOption(ZE_BO_SRC_ALPHA);
@@ -181,7 +181,7 @@ bool ZEUIMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZE
 	{
 		Device->SetPixelShader(PixelShaderTextured);
 	
-		ZEDeviceStateSampler SamplerState;
+		ZESamplerState SamplerState;
 		SamplerState.SetMinFilter(ZE_TFM_LINEAR);
 		SamplerState.SetMagFilter(ZE_TFM_LINEAR);
 		SamplerState.SetMipFilter(ZE_TFM_POINT);
@@ -205,20 +205,20 @@ bool ZEUIMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* Rende
 
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
-	static ZEDeviceStateRasterizer RasterizerState;
+	static ZERasterizerState RasterizerState;
 	RasterizerState.SetCullDirection(ZE_CD_NONE);
 	RasterizerState.SetFillMode(WireFrame ? ZE_FM_WIREFRAME : ZE_FM_SOLID);
 	
-	static ZEDeviceStateDepthStencil DepthStencilState;
+	static ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetZTestEnable(false);
 	
-	static ZEDeviceStateBlend BlendState;
+	static ZEBlendState BlendState;
 	BlendState.SetBlendEnable(0, true);
 	BlendState.SetBlendEquation(ZE_BE_ADD);
 	BlendState.SetSourceBlendOption(ZE_BO_SRC_ALPHA);
 	BlendState.SetDestinationBlendOption(ZE_BO_INV_SRC_ALPHA);
 	
-	static ZEDeviceStateSampler SamplerState;
+	static ZESamplerState SamplerState;
 	SamplerState.SetMinFilter(ZE_TFM_LINEAR);
 	SamplerState.SetMagFilter(ZE_TFM_LINEAR);
 	SamplerState.SetMipFilter(ZE_TFM_POINT);

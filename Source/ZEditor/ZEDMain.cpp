@@ -53,9 +53,9 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 
 	QApplication a(argc, argv);
 	// MapEditor w;
-	// ZEDMaterialEditor w;
+	ZEDMaterialEditor w;
 	// ZEDBrowser w;
-	ZEDNodeEditor w;
+	// ZEDNodeEditor w;
 
 	w.show();
 	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));

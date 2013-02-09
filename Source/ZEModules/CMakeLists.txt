@@ -37,7 +37,6 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_set_project_folder("ZEModules")
 
-#ze_add_module(ZEDirect3D9			Modules PLATFORM Windows)
 ze_add_module(ZEDirect3D10			Modules PLATFORM Windows)
 ze_add_module(ZEDirectInput			Modules OPTIONAL PLATFORMS Windows )
 ze_add_module(ZEDummyInput			Modules OPTIONAL)
@@ -48,7 +47,6 @@ ze_add_module(ZEVRPNInput			Modules OPTIONAL DEFAULT PLATFORMS Windows Linux Mac
 ze_add_module(ZEDirectSound			Modules OPTIONAL DEFAULT PLATFORMS Windows)
 ze_add_module(ZEOpenAL				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
 ze_add_module(ZEPhysX				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
-ze_add_module(ZEOpenGL				OPTIONAL PLATFORMS Windows Linux MacOSX BSD)
 
 ze_add_source(ZEModules.h			Sources Headers)
 ze_add_source(ZEModules.cpp			Sources)
@@ -56,5 +54,12 @@ ze_add_source(CMakeLists.txt		Sources)
 
 ze_add_library(ZEModules 
 	SOURCES ${Sources}
-	HEADERS ${Headers}
 	LIBS ${Modules})
+
+#ze_combine_libraries(ZEModules 
+#	LIBS ZEDirect3D10
+#		 ZEWindowsInput
+#		 ZEVRPNInput
+#		 ZEDirectSound
+#		 ZEOpenAL
+#		 ZEPhysX)

@@ -36,154 +36,17 @@
 #ifndef __ZE_DELEGATE_H__
 #define __ZE_DELEGATE_H__
 
+#define ZEBindFunction(Delegate, Function) do {Delegate.Bind<Function>());} while(false)
+#define ZEBindMethod(Delegate, Class, Function, Object) do {Delegate.Bind<Class, Function>(Object));} while(false)
+#define ZEBindMethodConst(Delegate, class, Function, Object) do {Delegate.BindConst<Class, Function>(Object));} while(false)
+
 template <typename TSignature> 
 class ZEDelegate;
 
-#define ArgumentSeperator
-
-#define DelegateName ZEDelegate0
-#define TemplateArgumentDefinitions
-#define TemplateArguments
-#define ArgumentDefinitions
-#define Arguments
-#include "ZEDelegateImp.h"
-#undef DelegateName
-#undef TemplateArgumentDefinitions
-#undef TemplateArguments
-#undef ArgumentDefinitions
-#undef Arguments	
-
-#undef ArgumentSeperator
-
-#define ArgumentSeperator			,
-
-#define DelegateName				ZEDelegate1
-#define TemplateArgumentDefinitions	typename TArg0
-#define TemplateArguments			TArg0 
-#define ArgumentDefinitions			TArg0 Arg0
-#define Arguments					Arg0
-#include "ZEDelegateImp.h"
-#undef DelegateName
-#undef TemplateArgumentDefinitions
-#undef TemplateArguments
-#undef ArgumentDefinitions
-#undef Arguments
-
-#define DelegateName				ZEDelegate2
-#define TemplateArgumentDefinitions	typename TArg0, typename TArg1
-#define TemplateArguments			TArg0, TArg1 
-#define ArgumentDefinitions			TArg0 Arg0, TArg1 Arg1
-#define Arguments					Arg0, Arg1
-#include "ZEDelegateImp.h"
-#undef DelegateName
-#undef TemplateArgumentDefinitions
-#undef TemplateArguments
-#undef ArgumentDefinitions
-#undef Arguments	
-
-
-#define DelegateName				ZEDelegate3
-#define TemplateArgumentDefinitions	typename TArg0, typename TArg1, typename TArg2
-#define TemplateArguments			TArg0, TArg1, TArg2
-#define Arguments					Arg0, Arg1, Arg2
-#define ArgumentDefinitions			TArg0 Arg0, TArg1 Arg1, TArg2 Arg2
-#include "ZEDelegateImp.h"
-#undef DelegateName
-#undef TemplateArgumentDefinitions
-#undef TemplateArguments
-#undef ArgumentDefinitions
-#undef Arguments	
-
-
-#define DelegateName				ZEDelegate4
-#define TemplateArgumentDefinitions	typename TArg0, typename TArg1, typename TArg2, typename TArg3
-#define TemplateArguments			TArg0, TArg1, TArg2, TArg3
-#define Arguments					Arg0, Arg1, Arg2, Arg3
-#define ArgumentDefinitions			TArg0 Arg0, TArg1 Arg1, TArg2 Arg2, TArg3 Arg3
-#include "ZEDelegateImp.h"
-#undef DelegateName
-#undef TemplateArgumentDefinitions
-#undef TemplateArguments
-#undef ArgumentDefinitions
-#undef Arguments	
-
-
-#define DelegateName				ZEDelegate5
-#define TemplateArgumentDefinitions	typename TArg0, typename TArg1, typename TArg2, typename TArg3, typename TArg4
-#define TemplateArguments			TArg0, TArg1, TArg2, TArg3, TArg4
-#define Arguments					Arg0, Arg1, Arg2, Arg3, Arg4
-#define ArgumentDefinitions			TArg0 Arg0, TArg1 Arg1, TArg2 Arg2, TArg3 Arg3, TArg4 Arg4
-#include "ZEDelegateImp.h"
-#undef DelegateName
-#undef TemplateArgumentDefinitions
-#undef TemplateArguments
-#undef ArgumentDefinitions
-#undef Arguments	
-
-
-#define DelegateName				ZEDelegate6
-#define TemplateArgumentDefinitions	typename TArg0, typename TArg1, typename TArg2, typename TArg3, typename TArg4, typename TArg5
-#define TemplateArguments			TArg0, TArg1, TArg2, TArg3, TArg4, TArg5
-#define Arguments					Arg0, Arg1, Arg2, Arg3, Arg4, Arg5
-#define ArgumentDefinitions			TArg0 Arg0, TArg1 Arg1, TArg2 Arg2, TArg3 Arg3, TArg4 Arg4, TArg5 Arg5
-#include "ZEDelegateImp.h"
-#undef DelegateName
-#undef TemplateArgumentDefinitions
-#undef TemplateArguments
-#undef ArgumentDefinitions
-#undef Arguments	
-
-#define DelegateName				ZEDelegate7
-#define TemplateArgumentDefinitions	typename TArg0, typename TArg1, typename TArg2, typename TArg3, typename TArg4, typename TArg5, typename TArg6
-#define TemplateArguments			TArg0, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6
-#define Arguments					Arg0, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6
-#define ArgumentDefinitions			TArg0 Arg0, TArg1 Arg1, TArg2 Arg2, TArg3 Arg3, TArg4 Arg4, TArg5 Arg5, TArg6 Arg6
-#include "ZEDelegateImp.h"
-#undef DelegateName
-#undef TemplateArgumentDefinitions
-#undef TemplateArguments
-#undef ArgumentDefinitions
-#undef Arguments	
-
-
-#define DelegateName				ZEDelegate8
-#define TemplateArgumentDefinitions	typename TArg0, typename TArg1, typename TArg2, typename TArg3, typename TArg4, typename TArg5, typename TArg6, typename TArg7
-#define TemplateArguments			TArg0, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7
-#define Arguments					Arg0, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7
-#define ArgumentDefinitions			TArg0 Arg0, TArg1 Arg1, TArg2 Arg2, TArg3 Arg3, TArg4 Arg4, TArg5 Arg5, TArg6 Arg6, TArg7 Arg7
-#include "ZEDelegateImp.h"
-#undef DelegateName
-#undef TemplateArgumentDefinitions
-#undef TemplateArguments
-#undef ArgumentDefinitions
-#undef Arguments	
-
-
-#define DelegateName				ZEDelegate9
-#define TemplateArgumentDefinitions	typename TArg0, typename TArg1, typename TArg2, typename TArg3, typename TArg4, typename TArg5, typename TArg6, typename TArg7, typename TArg8
-#define TemplateArguments			TArg0, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8
-#define Arguments					Arg0, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8
-#define ArgumentDefinitions			TArg0 Arg0, TArg1 Arg1, TArg2 Arg2, TArg3 Arg3, TArg4 Arg4, TArg5 Arg5, TArg6 Arg6, TArg7 Arg7, TArg8 Arg8
-#include "ZEDelegateImp.h"
-#undef DelegateName
-#undef TemplateArgumentDefinitions
-#undef TemplateArguments
-#undef ArgumentDefinitions
-#undef Arguments	
-
-
-#define DelegateName				ZEDelegate10
-#define TemplateArgumentDefinitions	typename TArg0, typename TArg1, typename TArg2, typename TArg3, typename TArg4, typename TArg5, typename TArg6, typename TArg7, typename TArg8, typename TArg9
-#define TemplateArguments			TArg0, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9
-#define Arguments					Arg0, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9
-#define ArgumentDefinitions			TArg0 Arg0, TArg1 Arg1, TArg2 Arg2, TArg3 Arg3, TArg4 Arg4, TArg5 Arg5, TArg6 Arg6, TArg7 Arg7, TArg8 Arg8, TArg9 Arg9
-#include "ZEDelegateImp.h"
-#undef DelegateName
-#undef TemplateArgumentDefinitions
-#undef TemplateArguments
-#undef ArgumentDefinitions
-#undef Arguments	
-
-#undef ArgumentSeperator
+#define ZE_MACRO_INCLUDE_FILE_NAME "ZEDS/ZEDelegateImp.h"
+#define ZE_MACRO_INCLUDE_COUNT 30
+#include "ZEMacro/ZEMacroIncludeRepeater.h"
+#undef ZE_MACRO_INCLUDE_FILE_NAME
+#undef ZE_MACRO_INCLUDE_COUNT
 
 #endif

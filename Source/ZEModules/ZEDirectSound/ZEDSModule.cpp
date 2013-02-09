@@ -366,7 +366,3 @@ ZEListener* ZEDSModule::CreateListener()
 	Listeners.Add(Listener);
 	return Listener;
 }
-
-
-
-

@@ -35,11 +35,11 @@
 
 #include "ZEModelMesh.h"
 #include "ZEModel.h"
-#include "ZEModelFileFormat.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEDrawParameters.h"
+#include "ZEPhysics/ZEPhysicalCloth.h"
 
 void ZEModelMesh::SetActiveLOD(ZEUInt LOD)
 {
@@ -84,15 +84,14 @@ const ZEAABBox& ZEModelMesh::GetLocalBoundingBox()
 
 const ZEAABBox& ZEModelMesh::GetModelBoundingBox()
 {
-	ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
+	ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetLocalTransform());
 
 	return ModelBoundingBox;
 }
 
 const ZEAABBox& ZEModelMesh::GetWorldBoundingBox()
 {
-
-	ZEAABBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+	ZEAABBox::Transform(WorldBoundingBox, LocalBoundingBox, GetWorldTransform());
 
 	return WorldBoundingBox;
 }
@@ -102,13 +101,6 @@ const ZEMatrix4x4& ZEModelMesh::GetLocalTransform()
 	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
 
 	return LocalTransform;
-}
-
-const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
-{
-	ZEMatrix4x4::Multiply(ModelTransform, Owner->GetTransform(), GetLocalTransform());
-
-	return ModelTransform;	
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
@@ -179,6 +171,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	Position = MeshResource->Position;
 	Rotation = MeshResource->Rotation;
 	Scale = MeshResource->Scale;
+	Visible = MeshResource->IsVisible;
 	LocalBoundingBox = MeshResource->BoundingBox;
 	PhysicsEnabled = false;
 
@@ -197,7 +190,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			PhysicalBody->SetPosition(Owner->GetWorldPosition());
 			PhysicalBody->SetRotation(Owner->GetWorldRotation());
 			PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenter);
-			PhysicalBody->SetTransformChangeEvent(ZEPhysicalTransformChangeEvent(this->Owner, &ZEModel::TransformChangeEvent));
+			PhysicalBody->SetTransformChangeEvent(ZEDelegate<void (ZEPhysicalObject*, ZEVector3, ZEQuaternion)>::Create<ZEModel, &ZEModel::TransformChangeEvent>(this->Owner));
 
 			for (ZESize I = 0; I < MeshResource->PhysicalBody.Shapes.GetCount(); I++)
 			{
@@ -253,6 +246,30 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 
 			PhysicalBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
 			PhysicalBody->Initialize();
+		}
+		else if(MeshResource->PhysicalBody.Type == ZE_MRPBT_CLOTH)
+		{
+			PhysicalCloth = ZEPhysicalCloth::CreateInstance();
+
+			ZESize VertexCount = MeshResource->LODs[0].Vertices.GetCount();
+			ZEArray<ZEVector3>& ClothVertices = PhysicalCloth->GetVertices();
+			ClothVertices.SetCount(VertexCount);
+
+			for(ZESize I = 0; I < VertexCount; I++)
+				ClothVertices[I] = MeshResource->LODs[0].Vertices[I].Position;
+
+			PhysicalCloth->SetPosition(Owner->GetWorldTransform() * Position);
+			ZEQuaternion TempRotation;
+			ZEQuaternion::CreateFromMatrix(TempRotation, Owner->GetWorldTransform() * GetLocalTransform());
+			PhysicalCloth->SetRotation(TempRotation);
+
+			PhysicalCloth->SetEnabled(true);
+			PhysicalCloth->SetThickness(0.5f);
+			PhysicalCloth->SetBendingMode(true);
+			PhysicalCloth->SetBendingStiffness(1.0f);
+			PhysicalCloth->SetStretchingStiffness(1.0f);
+			PhysicalCloth->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+			PhysicalCloth->Initialize();
 		}
 	}
 
@@ -318,6 +335,7 @@ ZEModelMesh::ZEModelMesh()
 	Owner = NULL;
 	MeshResource = NULL;
 	PhysicalBody = NULL;
+	PhysicalCloth = NULL;
 	Visible = true;
 	PhysicsEnabled = false;
 	AutoLOD = false;

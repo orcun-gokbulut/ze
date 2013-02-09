@@ -63,7 +63,7 @@ struct ZEDirectionalLightCascade
 #define	ZE_DL_MAX_CASCADE_COUNT		5
 
 class ZEDirectionalLight : public ZELight
-{	
+{
 	protected:
 		ZESize							CascadeCount;
 		ZEDirectionalLightCascade		Cascades[ZE_DL_MAX_CASCADE_COUNT];

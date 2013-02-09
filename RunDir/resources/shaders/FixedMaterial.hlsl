@@ -134,6 +134,7 @@ ZEFixedMaterial_GBuffer_VSOutput ZEFixedMaterial_GBuffer_VertexShader(ZEFixedMat
 	Output.Position = mul(WorldViewMatrix, float4(Input.Position, 1.0f)).xyz;
 	Output.Normal = mul((float3x3)WorldViewInvTrpsMatrix, Input.Normal);
 
+	
 	#if defined(ZE_SHADER_TANGENT_SPACE)
 		Output.Tangent = mul((float3x3)WorldViewInvTrpsMatrix, Input.Tangent);
 		Output.Binormal = mul((float3x3)WorldViewInvTrpsMatrix, Input.Binormal);
@@ -250,7 +251,7 @@ struct ZEFixedMaterial_ForwardPass_VSOutput
 	#endif
 
 	#ifdef ZE_SHADER_LIGHT_MAP
-		float2 LightMapTexcoord     : TEXCOORD2;
+		float2 LightMapTexcoord : TEXCOORD2;
 	#endif
 
 	#if defined(ZE_SHADER_REFLECTION) || defined(ZE_SHADER_REFRACTION)
@@ -265,7 +266,8 @@ struct ZEFixedMaterial_ForwardPass_VSOutput
 ZEFixedMaterial_ForwardPass_VSOutput ZEFixedMaterial_ForwardPass_VertexShader(ZEFixedMaterial_VSInput Input)
 {
 	ZEFixedMaterial_ForwardPass_VSOutput Output = (ZEFixedMaterial_ForwardPass_VSOutput)0.0f;
-	
+
+
 	//if (EnableSkin)
 		//SkinTransform(Input);
 
@@ -352,7 +354,6 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	
 	#ifdef ZE_SHADER_ALPHA_CULL
 		if (Output.Color.a <= FPDataPS.AlphaCullLimit)
-		{
 			discard;
 			return Output;
 		}

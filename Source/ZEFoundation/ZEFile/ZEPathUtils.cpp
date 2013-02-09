@@ -38,30 +38,42 @@
 #include "ZEDS/ZEArray.h"
 
 #include <string.h>
+#include "ZEFileUtils.h"
 
 static const ZEString Dot = ".";
 static const ZEString DotDot = "..";
 static const ZEString EmptyPath = "";
 
-#ifdef ZE_PLATFORM_WINDOWS
-	#define	Tokenize strtok_s
+#if defined ZE_PLATFORM_WINDOWS
+
+	#define	Tokenize	wcstok_s
+
 	static const ZEString Seperator = "\\";
-#endif
-#ifdef ZE_PLATFORM_UNIX
-	#define	Tokenize strtok_r
+
+#elif defied ZE_PLATFORM_UNIX
+
+	#define	Tokenize	wcstok
+
 	static const ZEString Seperator = "/";
+
 #endif
+
+#define		ZE_PATH_SYMBOL_RESOURCES		L'#'
+#define		ZE_PATH_SYMBOL_APP_RESOURCES	L'~'
+#define		ZE_PATH_SYMBOL_USER_DATA		L'$'
+#define		ZE_PATH_SYMBOL_SYSTEM_DATA		L'&'
+#define		ZE_PATH_SYMBOL_SAVED_GAMES		L'|'
 
 class ZEPathToken
 {
 	public:
 
-		char*		Token;
+		wchar_t*	Token;
 		ZEUInt16	Lenth;
 		bool		Valid;
 
-		bool	IsDot() { return (Lenth == 1) && (strncmp(Token, ".", Lenth) == 0); }
-		bool	IsDotDot() { return (Lenth == 2) && (strncmp(Token, "..", Lenth) == 0); }
+		bool		IsDot() { return (Lenth == 1) && (wcsncmp(Token, L".", 1) == 0); }
+		bool		IsDotDot() { return (Lenth == 2) && (wcsncmp(Token, L"..", 2) == 0); }
 
 };
 
@@ -102,18 +114,96 @@ bool ZEPathUtils::IsRelativePath(const ZEString& Path)
 }
 
 // Extracts root from absolute path and returns the relative path.
-ZEString ZEPathUtils::GetRelativePath(const ZEString& RootPath, const ZEString& AbsolutePath)
-{
-	ZESize PathLength = AbsolutePath.GetLength();
-	ZESize RootLength = RootPath.GetLength();
+ZEString ZEPathUtils::GetRelativePath(ZEString& RelativeTo, ZEString& Path)
+{	
+	ZEString PathCopy = Path;
+	ZEString RelativeToCopy = RelativeTo;
+	
+	wchar_t* Token0 = NULL;
+	wchar_t* Context0 = NULL;
+	wchar_t* Source0 = (wchar_t*)RelativeToCopy.ToWCString();
 
-	if (PathLength >= RootLength)
+	wchar_t* Token1 = NULL;
+	wchar_t* PrevToken1 = NULL;
+	wchar_t* Context1 = NULL;
+	wchar_t* Source1 = (wchar_t*)PathCopy.ToWCString();
+	
+	if (Source0 == NULL)
+		return Path;
+	if (Source1 == NULL)
+		return "";
+
+	const wchar_t* Search = L"\\/";
+	
+	ZEPathToken TempToken;
+	ZESize CommonTokenCount = 0;
+	ZEArray<ZEPathToken> Tokens0;
+	ZEArray<ZEPathToken> Tokens1;
+
+	Token0 = Tokenize(Source0, Search, &Context0);
+	Token1 = Tokenize(Source1, Search, &Context1);
+	while (Token0 != NULL && Token1 != NULL)
 	{
-		if (strncmp(RootPath, AbsolutePath, RootLength) == 0)
-			return AbsolutePath.Right(PathLength - RootLength);
+		// If token is different
+		if (wcscmp(Token0, Token1) != 0)
+			break;
+
+		TempToken.Token = Token0;
+		Tokens0.Add(TempToken);
+
+		TempToken.Token = Token1;
+		Tokens1.Add(TempToken);
+
+		Token0 = Tokenize(NULL, Search, &Context0);
+		Token1 = Tokenize(NULL, Search, &Context1);
+
+		CommonTokenCount++;
 	}
 
-	return EmptyPath;
+	if (CommonTokenCount == 0)
+		return Path;
+
+	ZESize Token0Components = 0;
+	while (Token0 != NULL)
+	{
+		TempToken.Token = Token0;
+		Tokens0.Add(TempToken);
+
+		Token0Components++;
+
+		// check next token
+		Token0 = Tokenize(NULL, Search, &Context0);
+	}
+
+	ZESize Token1Components = 0;
+	while(Token1 != NULL)
+	{
+		TempToken.Token = Token1;
+		Tokens1.Add(TempToken);
+
+		Token1Components++;
+
+		// check next token
+		Token1 = Tokenize(NULL, Search, &Context1);
+	}
+
+	//Start creating relative path
+	ZEString RelativePath = "";
+
+	ZESize Token0Count = Tokens0.GetCount();
+	for (ZESize I = Token0Count-1; I > CommonTokenCount; --I)
+	{
+		RelativePath += GetDotDot();
+		RelativePath += GetSeperator();
+	}
+	
+	for (ZESize I = CommonTokenCount; I < Tokens1.GetCount(); ++I)
+	{
+		RelativePath += ZEString::FromWCString(Tokens1[I].Token);
+		RelativePath += GetSeperator();
+	}
+	
+	return RelativePath.Left(RelativePath.GetLength() - 1);
 }
 
 // Checks if Path is a full path
@@ -122,24 +212,28 @@ bool ZEPathUtils::IsAbsolutePath(const ZEString& Path)
     if (Path.IsEmpty())
         return false;
 
-	// If first char is the root character directly accept it
-	if (ISSEPERATOR(Path[0]))
+	// If first char is the root character(separator) directly accept it
+	if (Path[0] == '\\' || Path[0] == '/')
 		return true;
 
 #ifdef ZE_PLATFORM_WINDOWS
-	// If drive letter is found in windows also accept is as root
-	char* Token;
-	char* Context;
+	
+	// Create local copy
 	ZEString Temp = Path;
-	const char* Search = "\\/";
-	char* Source = (char*)Temp.ToCString();
+
+	// If drive letter is found in windows also accept is as root
+	wchar_t* Token = NULL;
+	wchar_t* Context = NULL;
+	const wchar_t* Search = L"\\/";
+	wchar_t* Source = (wchar_t*)Temp.ToWCString();
 
 	Token = Tokenize(Source, Search, &Context);
-	if (Token == NULL || strlen(Token) != 2)
+	if (Token == NULL || wcslen(Token) != 2)
 		return false;
 
-	if (ISDRIVELETTER(Token[0]) && Token[1] == ':')
+	if ((L'A' < Token[0]) && (Token[0] < L'Z') && (Token[1] == L':'))
 			return true;
+
 #endif
 
 	return false;
@@ -156,27 +250,40 @@ ZEString ZEPathUtils::GetAbsolutePath(const ZEString& RootPath, const ZEString& 
 // If no symbol is found RelativePart is set to SymbolicPath
 ZEKnownPath ZEPathUtils::SearchForSymbol(ZEString* RelativePart, const ZEString& SymbolicPath)
 {
-	char* Token;
-	char* Context;
-	const char* Search = "\\/";
-	ZEString Temp = SymbolicPath;
-	char* Source = (char*)Temp.ToCString();
+	if (RelativePart != NULL)
+		RelativePart->Clear();
 
+	if (SymbolicPath.IsEmpty())
+        return ZE_KP_NONE;
+
+	// Create a local copy
+	ZEString Temp = SymbolicPath;
+	
 	bool SymbolFound = false;
 	ZEKnownPath Root = ZE_KP_NONE;
 
-    if (SymbolicPath.IsEmpty())
-        return Root;
+	wchar_t* Token = NULL;
+	wchar_t* Context = NULL;
+	wchar_t* Source = (wchar_t*)Temp.ToWCString();
+	const wchar_t* Search = L"\\/";
 
 	// Search for symbol
 	Token = Tokenize(Source, Search, &Context);
 	while (Token != NULL && !SymbolFound)
 	{
 		// Check token for known symbols
-		if (strlen(Token) == 1)
+		if (wcslen(Token) == 1)
 		{
 			switch (*Token)
 			{
+				case ZE_PATH_SYMBOL_RESOURCES:
+					Root = ZE_KP_RESOURCES;
+					SymbolFound = true;
+					break;
+				case ZE_PATH_SYMBOL_APP_RESOURCES:
+					Root = ZE_KP_APP_RESOURCES;
+					SymbolFound = true;
+					break;
 				case ZE_PATH_SYMBOL_USER_DATA:
 					Root = ZE_KP_USER_DATA;
 					SymbolFound = true;
@@ -187,14 +294,6 @@ ZEKnownPath ZEPathUtils::SearchForSymbol(ZEString* RelativePart, const ZEString&
 					break;
 				case ZE_PATH_SYMBOL_SAVED_GAMES:
 					Root = ZE_KP_SAVED_GAMES;
-					SymbolFound = true;
-					break;
-				case ZE_PATH_SYMBOL_APP_RESOURCES:
-					Root = ZE_KP_APP_RESOURCES;
-					SymbolFound = true;
-					break;
-				case ZE_PATH_SYMBOL_RESOURCES:
-					Root = ZE_KP_RESOURCES;
 					SymbolFound = true;
 					break;
 			}
@@ -209,7 +308,7 @@ ZEKnownPath ZEPathUtils::SearchForSymbol(ZEString* RelativePart, const ZEString&
 
 	if (SymbolFound)
 	{
-		// Get the rest of the string into RelativePart
+		// Copy the rest of the string to RelativePart
 		while (Token != NULL)
 		{
 			// Add to output
@@ -219,39 +318,41 @@ ZEKnownPath ZEPathUtils::SearchForSymbol(ZEString* RelativePart, const ZEString&
 			Token = Tokenize(NULL, Search, &Context);
 		}
 	}
-	else
+	else // Nothing found
 	{
 		// Copy all the path to output
-		*RelativePart = SymbolicPath;
+		*RelativePart += Seperator;
+		*RelativePart += SymbolicPath;
 	}
 
 	return Root;
 }
 
-// Simplifies the path by operating on "." and ".." directories in the path
-// This function does not care about EnablePathRestriction
+// Simplifies the path by removing "." and ".." components from the path
 ZEString ZEPathUtils::GetSimplifiedPath(const ZEString& Path, bool StackDotDot)
 {
-	ZEString Output;
-	char* Context = NULL;
-	char* NextToken = NULL;
-	char* CurrentToken = NULL;
-	ZEString TempSource = Path;
-	const char* Search = "\\/";
-	char* Source = (char*)TempSource.ToCString();
-	
-    if (Path.IsEmpty())
-        return Output;
+	 if (Path.IsEmpty())
+        return "";
+
+	// Create local copy
+	ZEString Temp = Path;
 
 	ZESmartArray<ZEPathToken> Tokens;
 
+	ZEString Output;
+	wchar_t* Context = NULL;
+	wchar_t* NextToken = NULL;
+	wchar_t* CurrentToken = NULL;
+	const wchar_t* Search = L"\\/";
+	wchar_t* Source = (wchar_t*)Temp.ToWCString();
+	
 	// Tokenize
 	CurrentToken = Tokenize(Source, Search, &Context);
 	while (CurrentToken != NULL)
 	{
 		ZEPathToken Token;
 		Token.Token = CurrentToken;
-		Token.Lenth = (ZEUInt16)strlen(CurrentToken);
+		Token.Lenth = (ZEUInt16)wcslen(CurrentToken);
 		Tokens.Add(Token);
 
 		CurrentToken = Tokenize(NULL, Search, &Context);
@@ -345,23 +446,14 @@ ZEString ZEPathUtils::GetSimplifiedPath(const ZEString& Path, bool StackDotDot)
 	return Output;
 }
 
-// Checks the given path's depth
-// AbsolutePath must be simplified
-// Should be used when path restriction is on
-// When path restriction is on, all the paths must be absolute
-bool ZEPathUtils::CheckForRestriction(const ZEString& RootPath, const ZEString& AbsolutePath)
+bool ZEPathUtils::CheckPathContainsRoot(const ZEString& RootPath, const ZEString& AbsolutePath)
 {
-	ZEString Simplified;
-	ZEString Temp = AbsolutePath;
-	bool AbsoluteWithSlash = false;
-	bool AbsoluteWithDrive = false;
-
-	ZESize RootLenth = RootPath.GetLength();
-	ZESize PathLength = AbsolutePath.GetLength();
+	ZESize RootLength= strlen(RootPath.ToCString());
+	ZESize PathLength = strlen(AbsolutePath.ToCString());
 
 	//Check if path is an extension of root
-	if (PathLength >= RootLenth)
-		if (strncmp(RootPath, AbsolutePath, RootLenth) == 0)
+	if (PathLength >= RootLength)
+		if (strncmp(RootPath, AbsolutePath, RootLength) == 0)
 			return true;
 
 	return false;

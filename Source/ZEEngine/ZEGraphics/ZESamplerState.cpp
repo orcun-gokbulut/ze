@@ -38,7 +38,7 @@
 #include "ZEGraphicsModule.h"
 #include "ZEDS/ZEHashGenerator.h"
 
-void ZEDeviceStateSampler::UpdateHash()
+void ZESamplerState::UpdateHash()
 {
 	if (Dirty)
 	{
@@ -48,7 +48,7 @@ void ZEDeviceStateSampler::UpdateHash()
 	}
 }
 
-void ZEDeviceStateSampler::SetMinFilter(ZETextureFilterMode FilterMode)
+void ZESamplerState::SetMinFilter(ZETextureFilterMode FilterMode)
 {
 	if (StateData.MinFilter != FilterMode)
 	{
@@ -57,12 +57,12 @@ void ZEDeviceStateSampler::SetMinFilter(ZETextureFilterMode FilterMode)
 	}
 }
 
-ZETextureFilterMode ZEDeviceStateSampler::GetMinFilter() const
+ZETextureFilterMode ZESamplerState::GetMinFilter() const
 {
 	return StateData.MinFilter;
 }
 
-void ZEDeviceStateSampler::SetMagFilter(ZETextureFilterMode FilterMode)
+void ZESamplerState::SetMagFilter(ZETextureFilterMode FilterMode)
 {
 	if (StateData.MagFilter != FilterMode)
 	{
@@ -71,12 +71,12 @@ void ZEDeviceStateSampler::SetMagFilter(ZETextureFilterMode FilterMode)
 	}
 }
 
-ZETextureFilterMode	ZEDeviceStateSampler::GetMagFilter() const
+ZETextureFilterMode	ZESamplerState::GetMagFilter() const
 {
 	return StateData.MagFilter;
 }
 
-void ZEDeviceStateSampler::SetMipFilter(ZETextureFilterMode FilterMode)
+void ZESamplerState::SetMipFilter(ZETextureFilterMode FilterMode)
 {
 	if (StateData.MipFilter != FilterMode)
 	{
@@ -85,12 +85,12 @@ void ZEDeviceStateSampler::SetMipFilter(ZETextureFilterMode FilterMode)
 	}
 }
 
-ZETextureFilterMode ZEDeviceStateSampler::GetMipFilter() const
+ZETextureFilterMode ZESamplerState::GetMipFilter() const
 {
 	return StateData.MipFilter;
 }
 
-void ZEDeviceStateSampler::SetAddressU(ZETextureAddressMode AdressMode)
+void ZESamplerState::SetAddressU(ZETextureAddressMode AdressMode)
 {
 	if (StateData.AddressU != AdressMode)
 	{
@@ -99,12 +99,12 @@ void ZEDeviceStateSampler::SetAddressU(ZETextureAddressMode AdressMode)
 	}
 }
 
-ZETextureAddressMode ZEDeviceStateSampler::GetAddressU() const
+ZETextureAddressMode ZESamplerState::GetAddressU() const
 {
 	return StateData.AddressU;
 }
 
-void ZEDeviceStateSampler::SetAddressV(ZETextureAddressMode AdressMode)
+void ZESamplerState::SetAddressV(ZETextureAddressMode AdressMode)
 {
 	if (StateData.AddressV != AdressMode)
 	{
@@ -113,12 +113,12 @@ void ZEDeviceStateSampler::SetAddressV(ZETextureAddressMode AdressMode)
 	}
 }
 
-ZETextureAddressMode ZEDeviceStateSampler::GetAddressV() const
+ZETextureAddressMode ZESamplerState::GetAddressV() const
 {
 	return StateData.AddressV;
 }
 
-void ZEDeviceStateSampler::SetAddressW(ZETextureAddressMode AdressMode)
+void ZESamplerState::SetAddressW(ZETextureAddressMode AdressMode)
 {
 	if (StateData.AddressW != AdressMode)
 	{
@@ -127,12 +127,12 @@ void ZEDeviceStateSampler::SetAddressW(ZETextureAddressMode AdressMode)
 	}
 }
 
-ZETextureAddressMode ZEDeviceStateSampler::GetAddressW() const
+ZETextureAddressMode ZESamplerState::GetAddressW() const
 {
 	return StateData.AddressW;
 }
 
-void ZEDeviceStateSampler::SetMipLODBias(float LODBias)
+void ZESamplerState::SetMipLODBias(float LODBias)
 {
 	if (ZEMath::Abs(StateData.MipLODBias - LODBias) > ZE_ZERO_THRESHOLD)
 	{
@@ -141,12 +141,12 @@ void ZEDeviceStateSampler::SetMipLODBias(float LODBias)
 	}
 }
 
-float ZEDeviceStateSampler::GetMipLODBias() const
+float ZESamplerState::GetMipLODBias() const
 {
 	return StateData.MipLODBias;
 }
 
-void ZEDeviceStateSampler::SetMaxAnisotrophy(unsigned int AnisotrophyLevel)
+void ZESamplerState::SetMaxAnisotrophy(unsigned int AnisotrophyLevel)
 {
 	if (StateData.MaxAnisotropy != AnisotrophyLevel)
 	{
@@ -155,12 +155,12 @@ void ZEDeviceStateSampler::SetMaxAnisotrophy(unsigned int AnisotrophyLevel)
 	}
 }
 
-unsigned int ZEDeviceStateSampler::GetMaxAnisotrophy() const
+unsigned int ZESamplerState::GetMaxAnisotrophy() const
 {
 	return StateData.MaxAnisotropy;
 }
 
-void ZEDeviceStateSampler::SetBorderColor(const ZEVector4 &Color)
+void ZESamplerState::SetBorderColor(const ZEVector4 &Color)
 {
 	if (StateData.BorderColor != Color)
 	{
@@ -169,12 +169,12 @@ void ZEDeviceStateSampler::SetBorderColor(const ZEVector4 &Color)
 	}
 }
 
-ZEVector4 ZEDeviceStateSampler::GetBorderColor() const
+ZEVector4 ZESamplerState::GetBorderColor() const
 {
 	return StateData.BorderColor;
 }
 
-void ZEDeviceStateSampler::SetMinLOD(float LOD)
+void ZESamplerState::SetMinLOD(float LOD)
 {
 	if (ZEMath::Abs(StateData.MinLOD - LOD) > ZE_ZERO_THRESHOLD)
 	{
@@ -183,12 +183,12 @@ void ZEDeviceStateSampler::SetMinLOD(float LOD)
 	}
 }
 
-float ZEDeviceStateSampler::GetMinLOD() const
+float ZESamplerState::GetMinLOD() const
 {
 	return StateData.MinLOD;
 }
 
-void ZEDeviceStateSampler::SetMaxLOD(float LOD)
+void ZESamplerState::SetMaxLOD(float LOD)
 {
 	if (ZEMath::Abs(StateData.MaxLOD - LOD) > ZE_ZERO_THRESHOLD)
 	{
@@ -197,12 +197,12 @@ void ZEDeviceStateSampler::SetMaxLOD(float LOD)
 	}
 }
 
-float ZEDeviceStateSampler::GetMaxLOD() const
+float ZESamplerState::GetMaxLOD() const
 {
 	return StateData.MaxLOD;
 }
 
-void ZEDeviceStateSampler::SetToDefault()
+void ZESamplerState::SetToDefault()
 {
 	Hash = 0;
 	Dirty  = false;
@@ -215,14 +215,14 @@ void ZEDeviceStateSampler::SetToDefault()
 	StateData.AddressW = ZE_TAM_CLAMP;
 	StateData.MaxAnisotropy = zeGraphics->GetAnisotropicFilter();
 	StateData.BorderColor = ZEVector4::Zero;
-	StateData.MipLODBias = -1.0f;
+	StateData.MipLODBias = -0.5f;
 	StateData.MinLOD = ZE_FLOAT_MIN;
 	StateData.MaxLOD = ZE_FLOAT_MAX;
 
 	UpdateHash();
 }
 
-const ZEDeviceStateSampler& ZEDeviceStateSampler::operator=(const ZEDeviceStateSampler& State)
+const ZESamplerState& ZESamplerState::operator=(const ZESamplerState& State)
 {
 	Hash = State.Hash;
 	Dirty = State.Dirty;
@@ -230,23 +230,23 @@ const ZEDeviceStateSampler& ZEDeviceStateSampler::operator=(const ZEDeviceStateS
 	return *this;
 }
 
-bool ZEDeviceStateSampler::operator==(const ZEDeviceStateSampler& State)
+bool ZESamplerState::operator==(const ZESamplerState& State)
 {
 	return memcmp(&StateData, &State.StateData, sizeof(ZESamplerStateData)) == 0 ? true : false;
 }
 
-bool ZEDeviceStateSampler::operator!=(const ZEDeviceStateSampler& State)
+bool ZESamplerState::operator!=(const ZESamplerState& State)
 {
 	return !operator==(State);
 }
 
-ZEDeviceStateSampler::ZEDeviceStateSampler()
+ZESamplerState::ZESamplerState()
 {
 	memset(&StateData, 0, sizeof(ZESamplerStateData));
 	SetToDefault();
 }
 
-ZEDeviceStateSampler::~ZEDeviceStateSampler()
+ZESamplerState::~ZESamplerState()
 {
 
 }

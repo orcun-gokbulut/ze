@@ -36,12 +36,12 @@
 #include "ZEDGrid.h"
 
 #include <ZEGame/ZEScene.h>
-#include <ZEGraphics/ZESimpleMaterial.h>
+#include <ZERenderer/ZESimpleMaterial.h>
 
 void ZEDGrid::GenerateGrid()
 {
 	Grid->Canvas.Clean();
-	this->Grid->PrimitiveType = ZE_ROPT_LINE;
+	this->Grid->PrimitiveType = ZE_ROPT_LINE_LIST;
 
 	ZEInt DrawStartPoint = -GridSize/2;
 
@@ -112,7 +112,7 @@ ZEDGrid::ZEDGrid(ZEScene* Scene, ZEInt Spacing, ZEInt MajorLineSpacing, ZEInt Gr
 	this->GridSize = GridSize;
 	this->Scene = Scene;
 	this->Grid = ZECanvasBrush::CreateInstance();
-	this->Grid->PrimitiveType = ZE_ROPT_LINE;
+	this->Grid->PrimitiveType = ZE_ROPT_LINE_LIST;
 	Scene->AddEntity(this->Grid);
 	Grid->SetName(".:SELECTION__ITEM:.");
 	ZESimpleMaterial* Material = ZESimpleMaterial::CreateInstance();

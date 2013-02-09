@@ -96,7 +96,7 @@ static ZESize CreateHorizontalBlock(ZETerrainVertex* Vertices, ZEInt Height = -1
 	return Index;
 }
 
-bool ZETerrainPrimitivesGenerator::Generate(ZEStaticVertexBuffer** VertexBuffer, ZETerrainPrimitiveIndices* Indices, ZEInt EdgeLength)
+bool ZETerrainPrimitivesGenerator::Generate(ZEVertexBuffer** VertexBuffer, ZETerrainPrimitiveIndices* Indices, ZEInt EdgeLength)
 {
 	::EdgeLength = EdgeLength;
 	
@@ -108,13 +108,13 @@ bool ZETerrainPrimitivesGenerator::Generate(ZEStaticVertexBuffer** VertexBuffer,
 	VertexBufferSize *= 6 * sizeof(ZETerrainVertex);
 
 	if (*VertexBuffer == 0)
-		*VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
+		*VertexBuffer = ZEVertexBuffer::CreateInstance();
 
-	if (!(*VertexBuffer)->Create(VertexBufferSize))
+	if (!(*VertexBuffer)->CreateDynamic(VertexBufferSize / sizeof(ZETerrainVertex), sizeof(ZETerrainVertex), NULL))
 		return false;
 
-	ZETerrainVertex* Vertices = (ZETerrainVertex*)(*VertexBuffer)->Lock();
-	if (Vertices == NULL)
+	ZETerrainVertex* Vertices = NULL;
+	if (!(*VertexBuffer)->Lock((void**)VertexBuffer))
 		return false;
 
 	// Primitives

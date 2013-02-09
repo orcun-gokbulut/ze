@@ -127,7 +127,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight1->SetEnabled(false);
 	PointLight2->SetEnabled(false);
 
-	Character = ZECharacter::CreateInstance();
+	Character = ZEGameCharacter::CreateInstance();
 	Character->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Scene->AddEntity(Character);
 	

@@ -155,82 +155,62 @@ void ZEDecompressorLZW::ResetDictionary()
 	DictionarySize = 258;
 }
 
-void ZEDecompressorLZW::SetInput(void* Buffer)
+void ZEDecompressorLZW::SetOutput(void* Output)
 {
-	Input = Buffer;
-}
-
-void* ZEDecompressorLZW::GetInput()
-{
-	return Input;
-}
-
-void ZEDecompressorLZW::SetInputSize(ZESize Size)
-{
-	InputSize = Size;
-}
-
-ZESize ZEDecompressorLZW::GetInputSize()
-{
-	return InputSize;
-}
-
-void ZEDecompressorLZW::SetOutput(void* Buffer)
-{
-	Output = Buffer;
+	ZEDecompressor::SetOutput(Output);
 	OutputPosition = 0;
 }
 
-void* ZEDecompressorLZW::GetOutput()
+void ZEDecompressorLZW::SetInput(void* Input)
 {
-	return Output;
+	ZEDecompressor::SetInput(Input);
+	InputPosition = 0;
 }
 
-void ZEDecompressorLZW::SetOutputSize(ZESize Size)
-{
-	OutputSize = Size;
-}
-
-ZESize ZEDecompressorLZW::GetOutputSize()
-{
-	return OutputSize;
-}
-
-ZEDecompressorState ZEDecompressorLZW::Decompress()
+void ZEDecompressorLZW::Decompress()
 {
 	if (Input == NULL || Output == NULL)
-		return ZE_DS_ERROR;
+	{
+		State = ZE_DS_ERROR;
+		return;
+	}
 
 	if (State == ZE_DS_ERROR)
-		return ZE_DS_ERROR;
+		return;
 	else if (State == ZE_DS_OUTPUT_FULL)
-	{
-		OutputPosition = 0;
-		State = ZE_DS_NONE;
-	}
+		return;
 	else if (State == ZE_DS_INPUT_PROCESSED)
-	{
-		InputPosition = 0;
-		State = ZE_DS_NONE;
-	}
+		return;
 	else if (State == ZE_DS_DONE)
-		return ZE_DS_NONE;
+		return;
 
 	if (!WriteOutput())
-		return ZE_DS_OUTPUT_FULL;
+	{
+		State = ZE_DS_OUTPUT_FULL;
+		return;
+	}
 
 	while(true)
 	{
 
 		ZEUInt16 CurrentWord;
 		if (!GetNextWord(CurrentWord))
-			return ZE_DS_INPUT_PROCESSED;
+		{
+			State = ZE_DS_INPUT_PROCESSED;
+			return;
+		}
 
 		if (CurrentWord >= DictionarySize)
-			return ZE_DS_ERROR;
+		{
+			State = ZE_DS_ERROR;
+			return;
+		}
 
 		if (CurrentWord == 256)
-			return ZE_DS_DONE;
+		{
+			State = ZE_DS_DONE;
+			return;
+		}
 		else if (CurrentWord == 257)
 			ResetDictionary();
 		else
@@ -238,10 +218,16 @@ ZEDecompressorState ZEDecompressorLZW::Decompress()
 			ZEDictionaryEntryLZW* OutputEntry = &Dictionary[CurrentWord];
 
 			if (OutputEntry->Data == NULL)
-				return ZE_DS_ERROR;
+			{
+				State = ZE_DS_ERROR;
+				return;
+			}
 
-			if (!WriteOutput(OutputEntry));
-				return ZE_DS_OUTPUT_FULL;;
+			if (!WriteOutput(OutputEntry))
+			{
+				State = ZE_DS_OUTPUT_FULL;
+				return;
+			}
 
 			AddToDictionary(OutputEntry);
 			PrevEntry = &Dictionary[CurrentWord];
@@ -265,19 +251,4 @@ void ZEDecompressorLZW::Reset()
 	State = ZE_DS_NONE;
 
 	ResetDictionary();
-}
-
-ZEDecompressorLZW::ZEDecompressorLZW()
-{
-	Input = NULL;
-	InputSize = 0;
-	Output = NULL;
-	OutputSize = 0;
-
-	Reset();
-}
-
-ZEDecompressorLZW::~ZEDecompressorLZW()
-{
-	Reset();
 }

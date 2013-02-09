@@ -306,7 +306,7 @@ ZESocketTCP* ZESocketTCPListener::Accept()
 		SOCKET Result = accept(Socket, NULL, NULL);
 		if(Result == INVALID_SOCKET)
 		{
-			zeError("Accepted socket is not valid. WinSock Error code : %d", WSAGetLastError());
+			//zeError("Accepted socket is not valid. WinSock Error code : %d", WSAGetLastError());
 			return NULL;
 		}
 
@@ -406,19 +406,18 @@ ZEUInt16 ZESocketUDP::GetPort() const
 	return Port;
 }
 
-ZESSize ZESocketUDP::SendTo(const ZEIPAddress* To, ZEUInt16 ToPort, const void* Buffer, ZESize BufferSize)
+ZESSize ZESocketUDP::Send(const void* Buffer, ZESize BufferSize)
 {
 	ZESSize Result = 0;
 
-	if(To == NULL)
+	if(ToIpAddress.Type == ZE_IAT_NONE)
 	{
-		zeError("To Ip address can not be NULL");
+		zeError("From Ip address must be valid.");
 		return ZE_SR_ERROR;
 	}
-
-	if(To->Type == ZE_IAT_IP_V4)
+	if(ToIpAddress.Type == ZE_IAT_IP_V4)
 	{
-		sockaddr_in ToInfo = CreateSockAddr4(*To, ToPort);
+		sockaddr_in ToInfo = CreateSockAddr4(ToIpAddress, ToPort);
 		Result = sendto(Socket, (const char*)Buffer, (int)BufferSize, 0, (SOCKADDR*)&ToInfo, sizeof(ToInfo));
 
 		if(Result == SOCKET_ERROR)
@@ -448,20 +447,20 @@ ZESSize ZESocketUDP::SendTo(const ZEIPAddress* To, ZEUInt16 ToPort, const void* 
 	return Result;
 }
 
-ZESSize ZESocketUDP::RecieveFrom(void* Buffer, ZESize BufferSize, const ZEIPAddress* From, ZEUInt16 FromPort)
+ZESSize ZESocketUDP::Recieve(void* Buffer, ZESize BufferSize)
 {
 	ZESSize Result = 0;
 
-	if(From == NULL)
+	if(FromIpAddress.Type == ZE_IAT_NONE)
 	{
-		zeError("From Ip address can not be NULL");
+		zeError("From Ip address must be valid.");
 		return ZE_SR_ERROR;
 	}
 	else
 	{
-		if(From->Type == ZE_IAT_IP_V4)
+		if(FromIpAddress.Type == ZE_IAT_IP_V4)
 		{
-			sockaddr_in FromInfo = CreateSockAddr4(*From, FromPort);			
+			sockaddr_in FromInfo = CreateSockAddr4(FromIpAddress, FromPort);			
 			int FromInfoSize = sizeof(FromInfo);
 
 			Result = recvfrom(Socket, (char*)Buffer, (int)BufferSize, 0, (SOCKADDR*)&FromInfo, &FromInfoSize);

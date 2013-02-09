@@ -59,7 +59,7 @@ class ZED3D10VertexBuffer : public ZEVertexBuffer, public ZED3D10ComponentBase
 		virtual bool			Unlock();
 		virtual bool			Lock(void** Data);
 
-		virtual bool			CreateDynamic(ZEUInt VertexCount, ZESize VertexSize);
+		virtual bool			CreateDynamic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData);
 		virtual bool			CreateStatic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData);
 };
 
