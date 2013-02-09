@@ -933,6 +933,7 @@ void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, FieldDecl*
 	ZEPropertyData* PropertyData = new ZEPropertyData();
 	PropertyData->Name = NonStaticProperty->getNameAsString();
 	PropertyData->Hash = PropertyData->Name.Hash();
+	PropertyData->IsGeneratedByMetaCompiler = false;
 	PropertyData->IsStatic = false;
 	PropertyData->IsContainer = false;
 	PropertyData->Type = PropertyType;
@@ -1063,8 +1064,109 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 	if (ReturnType.Type == ZE_MTT_UNDEFINED)
 		return;
 
+	ZEString MethodName = Method->getNameAsString();
+
+	if((MethodName.SubString(0, 2) == "Set" && Method->param_size() == 1) || (MethodName.SubString(0, 2) == "Get" && Method->param_size() == 0))
+	{
+		ZEString PropertyName = MethodName.SubString(3, MethodName.GetLength() - 1);
+		
+		bool IsPropertyFound = false;
+		ZESize FoundPropertyIndex = -1;
+
+		for(ZESize I = 0; I < ClassData->Properties.GetCount(); I++)
+		{
+			if(PropertyName == ClassData->Properties[I]->Name)
+			{
+				IsPropertyFound = true;
+				FoundPropertyIndex = I;
+				break;
+			}
+		}
+
+		if(!IsPropertyFound)
+		{
+			ZEPropertyData* PropertyData = new ZEPropertyData();
+			PropertyData->Name = PropertyName;
+			PropertyData->Hash = PropertyName.Hash();
+			PropertyData->IsGeneratedByMetaCompiler = true;
+			PropertyData->IsStatic = false;
+			PropertyData->IsContainer = false;
+
+			if(MethodName.SubString(0, 2) == "Set")
+				PropertyData->Setter = MethodName;
+			else if(MethodName.SubString(0, 2) == "Get")
+				PropertyData->Getter = MethodName;
+			else
+				return;
+
+			if(MethodName.SubString(0, 2) != "Get")
+			{
+				for(clang::FunctionDecl::param_iterator CurrentParameter = Method->param_begin(), LastParameter = Method->param_end(); CurrentParameter != LastParameter; ++CurrentParameter)
+				{
+					ZEMetaType PropertyType = ProcessType(ClassData->Name, (*CurrentParameter)->getType());
+					if (PropertyType.Type == ZE_MTT_UNDEFINED)
+						return;
+
+					PropertyData->Type = PropertyType;
+
+					if(PropertyType.Type == ZE_MTT_ENUMERATOR)
+					{
+						for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
+						{
+							if(PropertyType.EnumName == MetaData->EnumTypes[I]->Name)
+							{
+								PropertyData->EnumData = MetaData->EnumTypes[I];
+								break;
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				ZEMetaType PropertyType = ProcessType(ClassData->Name, Method->getResultType());
+				if (PropertyType.Type == ZE_MTT_UNDEFINED)
+					return;
+
+				if(PropertyType.Type == ZE_MTT_ENUMERATOR)
+				{
+					for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
+					{
+						if(PropertyType.EnumName == MetaData->EnumTypes[I]->Name)
+						{
+							PropertyData->EnumData = MetaData->EnumTypes[I];
+							break;
+						}
+					}
+				}
+
+				PropertyData->Type = PropertyType;
+			}
+			
+			ZEAttributeData* AttributeData = new ZEAttributeData();
+			for(CXXRecordDecl::attr_iterator CurrentAttr = Method->attr_begin(), LastAttr = Method->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
+			{
+				ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
+				PropertyData->Attributes.Add(AttributeData);
+			}
+
+			ClassData->Properties.Add(PropertyData);
+
+			return;
+		}
+		else
+		{
+			if(MethodName.SubString(0, 2) == "Set")
+				ClassData->Properties[FoundPropertyIndex]->Setter = MethodName;
+			else if(MethodName.SubString(0, 2) == "Get")
+				ClassData->Properties[FoundPropertyIndex]->Getter = MethodName;
+
+			return;
+		}
+	}
+
 	ZEMethodData* MethodData = new ZEMethodData();
-	MethodData->Name = Method->getNameAsString();
+	MethodData->Name = MethodName;
 	MethodData->IsStatic = Method->isStatic();
 	MethodData->IsEvent = false;
 	MethodData->Hash = MethodData->Name.Hash();
