@@ -44,7 +44,7 @@
 static ZEInt SortPropertiesByHash(ZEPropertyData* const* PropertyDataA, ZEPropertyData* const* PropertyDataB)
 {
 	ZEUInt32 HashA = (**PropertyDataA).Hash;
-	ZEUInt32 HashB = (**PropertyDataA).Hash;
+	ZEUInt32 HashB = (**PropertyDataB).Hash;
 
 	if(HashA > HashB)
 		return 1;
@@ -942,6 +942,13 @@ static void CreateSetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 						"\t\tcase %d:\n"
 						"\t\t\treturn false;\n", I);
 				}
+				else if(Properties[I]->IsGeneratedByMetaCompiler)
+				{
+					fprintf(File,
+						"\t\tcase %d:\n"
+						"\t\t\t((%s*)Object)->Set%s((%s*)Value.GetObjectPtr());\n"
+						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), Properties[I]->Type.ClassData->Name.ToCString());
+				}
 				else
 				{
 					fprintf(File,
@@ -952,12 +959,24 @@ static void CreateSetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 			}
 			else if(Properties[I]->Type.Type == ZE_MTT_ENUMERATOR)
 			{
-				fprintf(File,
-					"\t\tcase %d:\n"
-					"\t\t\t((%s*)Object)->%s = (%s)Value.Get%s();\n"
-					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(),
-					Properties[I]->Type.Type == ZE_MTT_ENUMERATOR ? Properties[I]->EnumData->Name.ToCString() : "",
-					VariantType.ToCString());
+				if(Properties[I]->IsGeneratedByMetaCompiler)
+				{
+					fprintf(File,
+						"\t\tcase %d:\n"
+						"\t\t\t((%s*)Object)->Set%s((%s)Value.Get%s());\n"
+						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(),
+						Properties[I]->Type.Type == ZE_MTT_ENUMERATOR ? Properties[I]->EnumData->Name.ToCString() : "",
+						VariantType.ToCString());
+				}
+				else
+				{
+					fprintf(File,
+						"\t\tcase %d:\n"
+						"\t\t\t((%s*)Object)->%s = (%s)Value.Get%s();\n"
+						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(),
+						Properties[I]->Type.Type == ZE_MTT_ENUMERATOR ? Properties[I]->EnumData->Name.ToCString() : "",
+						VariantType.ToCString());
+				}
 			}
 			else if(Properties[I]->Type.Type == ZE_MTT_ARRAY)
 			{
@@ -967,11 +986,22 @@ static void CreateSetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 			}
 			else
 			{
-				fprintf(File,
-					"\t\tcase %d:\n"
-					"\t\t\t((%s*)Object)->%s = Value.Get%s();\n"
-					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(),
-					VariantType.ToCString());
+				if(Properties[I]->IsGeneratedByMetaCompiler)
+				{
+					fprintf(File,
+						"\t\tcase %d:\n"
+						"\t\t\t((%s*)Object)->Set%s(Value.Get%s());\n"
+						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(),
+						VariantType.ToCString());
+				}
+				else
+				{
+					fprintf(File,
+						"\t\tcase %d:\n"
+						"\t\t\t((%s*)Object)->%s = Value.Get%s();\n"
+						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(),
+						VariantType.ToCString());
+				}
 			}
 		}
 	}
@@ -1062,10 +1092,20 @@ static void CreateGetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 				}
 				else
 				{
-					fprintf(File,
-						"\t\tcase %d:\n"
-						"\t\t\tValue.SetObjectPtr((ZEObject*)(((%s*)Object)->%s));\n"
-						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
+					if(Properties[I]->IsGeneratedByMetaCompiler)
+					{
+						fprintf(File,
+							"\t\tcase %d:\n"
+							"\t\t\tValue.SetObjectPtr((ZEObject*)(((%s*)Object)->Get%s());\n"
+							"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
+					}
+					else
+					{
+						fprintf(File,
+							"\t\tcase %d:\n"
+							"\t\t\tValue.SetObjectPtr((ZEObject*)(((%s*)Object)->Get%s());\n"
+							"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
+					}
 				}
 			}
 			else if(Properties[I]->Type.Type == ZE_MTT_ARRAY)
@@ -1076,10 +1116,20 @@ static void CreateGetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 			}
 			else
 			{
-				fprintf(File,
-					"\t\tcase %d:\n"
-					"\t\t\tValue.Set%s(((%s*)Object)->%s);\n"
-					"\t\t\treturn true;\n", I, VariantType.ToCString(), ClassName, Properties[I]->Name.ToCString());
+				if(Properties[I]->IsGeneratedByMetaCompiler)
+				{
+					fprintf(File,
+						"\t\tcase %d:\n"
+						"\t\t\tValue.Set%s(((%s*)Object)->Get%s());\n"
+						"\t\t\treturn true;\n", I, VariantType.ToCString(), ClassName, Properties[I]->Name.ToCString());
+				}
+				else
+				{
+					fprintf(File,
+						"\t\tcase %d:\n"
+						"\t\t\tValue.Set%s(((%s*)Object)->%s);\n"
+						"\t\t\treturn true;\n", I, VariantType.ToCString(), ClassName, Properties[I]->Name.ToCString());
+				}
 			}
 		}
 	}
@@ -1599,6 +1649,12 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName, ZEArray<ZE
 					fprintf(File, Methods[I]->Parameters.GetCount() == 0 ? "));\n" : "");
 					fprintf(File, "\t\t\treturn true;\n");
 				}
+				else if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ARRAY)
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\treturn false;\n");
+				}
 				else
 				{
 					if(Methods[I]->IsStatic)
@@ -1714,15 +1770,20 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName)
 		"\tZESize RealId = MethodId;\n\n"
 		"\tbool IsMethodIdFound = false;\n"
 		"\tbool IsReachedTopLimit = false;\n\n"
+		"\t//Looking for exact method in list.\n"
 		"\twhile(!IsMethodIdFound)\n"
 		"\t{\n"
 		"\t\tconst ZEMethod Method = GetMethods()[RealId];\n\n"
 		"\t\tif(Method.Name != MethodName)\n"
 		"\t\t{\n"
 		"\t\t\tif(!IsReachedTopLimit)\n"
-		"\t\t\t\tIsReachedTopLimit = true;\n"
+		"\t\t\t{\n"
+		"\t\t\t\tIsReachedTopLimit = true; //Could not find method through top.We'll look at bottom now.\n"
+		"\t\t\t\tRealId = MethodId + 1; //Original Id + One Id underneath it.\n"
+		"\t\t\t\tcontinue;\n"
+		"\t\t\t}\n"
 		"\t\t\telse\n"
-		"\t\t\t\treturn -1; //ReachedBottomLimit\n"
+		"\t\t\t\treturn -1; //Reached bottom limit.Method could not found.Break\n"
 		"\t\t}\n\n"
 		"\t\tif(Method.ParameterCount == ParameterCount)\n"
 		"\t\t{\n"

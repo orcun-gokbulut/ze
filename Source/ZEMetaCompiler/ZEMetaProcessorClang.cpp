@@ -151,6 +151,5 @@ void ZEMetaProcessorInternal::InitializeClang()
 
 	ZEMetaGenerator::Generate(Options, MetaData);
 
-	//Compiler.getInvocation().Release();
-	Compiler.getDiagnosticClient().EndSourceFile();
+	Compiler.getInvocation().Release();
 }

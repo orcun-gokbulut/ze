@@ -180,6 +180,7 @@ class ZEEventData : public ZETypeData
 struct ZEPropertyData : public ZETypeData
 {
 	public:
+		bool							IsGeneratedByMetaCompiler;
 		bool							IsStatic;
 		bool							IsContainer;
 
