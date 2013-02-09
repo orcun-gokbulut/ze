@@ -55,6 +55,7 @@ class ZEViewCuboid : public ZEViewVolume
 		void						Create(const ZEOBBox& OBBox);
 		void						Create(const ZEVector3& Position, const ZEQuaternion& Rotation,
 									float Width, float Height, float NearZ, float FarZ);
+
 };
 
 #endif

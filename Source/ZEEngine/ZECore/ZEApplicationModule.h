@@ -43,14 +43,8 @@
 class ZEApplicationModule : public ZEModule
 {
 	ZE_MODULE(ZEApplicationModule)
-	
-	private:
-		ZEString			ApplicationName;
 
 	public:
-		void				SetApplicationName(const ZEString& Name);
-		const ZEString&		GetApplicationName() const;
-
 		virtual void		PreProcess();
 		virtual void		Process(float ElapsedTime);
 		virtual void		PostProcess();

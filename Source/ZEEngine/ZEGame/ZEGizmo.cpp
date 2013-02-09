@@ -36,7 +36,7 @@
 
 #include "ZETypes.h"
 #include "ZEGizmo.h"
-#include "ZEMath/ZERay.h"
+#include "ZEMath/ZEAngle.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZECore/ZEConsole.h"
@@ -46,8 +46,9 @@
 #include "ZEMath/ZELineSegment.h"
 #include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
-#include "ZEMath/ZEAngle.h"
 #include "ZERenderer/ZESimpleMaterial.h"
+#include "ZEMath/ZERay.h"
+
 
 ZESimpleMaterial* ZEGizmo::GizmoMaterial = NULL;
 
@@ -1037,6 +1038,7 @@ void ZEGizmo::Draw(ZEDrawParameters* DrawParameters)
 	/*
 	UpdateGizmo();
 
+	RenderCommand.Priority = 4;
 	RenderCommand.WorldMatrix = GetWorldTransform();
 	RenderCommand.Flags = (Mode == ZE_GM_ROTATE ? ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM : ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM);
 	RenderCommand.PrimitiveType = ZE_ROPT_LINE_LIST;

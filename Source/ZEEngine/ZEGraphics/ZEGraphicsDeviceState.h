@@ -113,7 +113,7 @@ class ZEScissorRectangle
 		virtual						~ZEScissorRectangle();
 };
 
-class ZEDeviceState
+class ZEGraphicsDeviceState
 {
 	friend class ZEGraphicsDevice;
 
@@ -125,32 +125,32 @@ class ZEDeviceState
 		ZEShader*						VertexShader;
 		ZEConstantBuffer*				VertexShaderBuffers[ZE_MAX_BUFFER_SLOT];
 		const ZETexture*				VertexShaderTextures[ZE_MAX_TEXTURE_SLOT];
-		ZEDeviceStateSampler			VertexShaderSamplers[ZE_MAX_SAMPLER_SLOT];
+		ZESamplerState			VertexShaderSamplers[ZE_MAX_SAMPLER_SLOT];
 
 		ZEShader*						GeometryShader;
 		ZEConstantBuffer*				GeometryShaderBuffers[ZE_MAX_BUFFER_SLOT];
 		const ZETexture*				GeometryShaderTextures[ZE_MAX_TEXTURE_SLOT];
-		ZEDeviceStateSampler			GeometryShaderSamplers[ZE_MAX_SAMPLER_SLOT];
+		ZESamplerState			GeometryShaderSamplers[ZE_MAX_SAMPLER_SLOT];
 
-		ZEDeviceStateRasterizer			RasterizerState;
+		ZERasterizerState			RasterizerState;
 		ZEViewport						ViewPorts[ZE_MAX_VIEWPORT_SLOT];
 		ZEScissorRectangle				ScissorRectangles[ZE_MAX_SCISSOR_SLOT];
 		
 		ZEShader*						PixelShader;
 		ZEConstantBuffer*				PixelShaderBuffers[ZE_MAX_BUFFER_SLOT];
 		const ZETexture*				PixelShaderTextures[ZE_MAX_TEXTURE_SLOT];
-		ZEDeviceStateSampler			PixelShaderSamplers[ZE_MAX_SAMPLER_SLOT];
+		ZESamplerState			PixelShaderSamplers[ZE_MAX_SAMPLER_SLOT];
 
-		ZEDeviceStateBlend				BlendState;
-		ZEDeviceStateDepthStencil		DepthStencilState;
+		ZEBlendState				BlendState;
+		ZEDepthStencilState		DepthStencilState;
 		const ZERenderTarget*			RenderTargets[ZE_MAX_RENDER_TARGET_SLOT];
 		const ZEDepthStencilBuffer*		DepthStencilBuffer;
 		bool							ScreenWriteEnable;
 		
 		void							SetToDefault();
 
-										ZEDeviceState();
-		virtual							~ZEDeviceState();
+										ZEGraphicsDeviceState();
+		virtual							~ZEGraphicsDeviceState();
 };
 
 #endif

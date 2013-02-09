@@ -38,7 +38,7 @@
 
 #include <memory.h>
 
-void ZEDeviceStateBlend::UpdateHash()
+void ZEBlendState::UpdateHash()
 {
 	if (Dirty)
 	{
@@ -48,7 +48,7 @@ void ZEDeviceStateBlend::UpdateHash()
 	}
 }
 
-void ZEDeviceStateBlend::SetAlphaToCoverageEnable(bool Enable)
+void ZEBlendState::SetAlphaToCoverageEnable(bool Enable)
 {
 	if (StateData.AlphaToCoverageEnable != Enable)
 	{
@@ -57,12 +57,12 @@ void ZEDeviceStateBlend::SetAlphaToCoverageEnable(bool Enable)
 	}
 }
 
-bool ZEDeviceStateBlend::GetAlphaToCoverageEnable() const
+bool ZEBlendState::GetAlphaToCoverageEnable() const
 {
 	return StateData.AlphaToCoverageEnable;
 }
 
-void ZEDeviceStateBlend::SetBlendEnable(ZESize Target, bool Enable)
+void ZEBlendState::SetBlendEnable(ZESize Target, bool Enable)
 {
 	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
 
@@ -73,14 +73,14 @@ void ZEDeviceStateBlend::SetBlendEnable(ZESize Target, bool Enable)
 	}
 }
 
-bool ZEDeviceStateBlend::GetBlendEnable(ZESize Target) const
+bool ZEBlendState::GetBlendEnable(ZESize Target) const
 {
 	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
 
 	return StateData.BlendEnable[Target];
 }
 		
-void ZEDeviceStateBlend::SetSourceBlendOption(ZEBlendOption Option)
+void ZEBlendState::SetSourceBlendOption(ZEBlendOption Option)
 {
 	if (StateData.SourceBlendOption != Option)
 	{
@@ -89,12 +89,12 @@ void ZEDeviceStateBlend::SetSourceBlendOption(ZEBlendOption Option)
 	}
 }
 
-ZEBlendOption ZEDeviceStateBlend::GetSourceBlendOption() const
+ZEBlendOption ZEBlendState::GetSourceBlendOption() const
 {
 	return StateData.SourceBlendOption;
 }
 
-void ZEDeviceStateBlend::SetDestinationBlendOption(ZEBlendOption Option)
+void ZEBlendState::SetDestinationBlendOption(ZEBlendOption Option)
 {
 	if (StateData.DestinationBlendOption != Option)
 	{
@@ -103,12 +103,12 @@ void ZEDeviceStateBlend::SetDestinationBlendOption(ZEBlendOption Option)
 	}
 }
 
-ZEBlendOption ZEDeviceStateBlend::GetDestinationBlendOption() const
+ZEBlendOption ZEBlendState::GetDestinationBlendOption() const
 {
 	return StateData.DestinationBlendOption;
 }
 
-void ZEDeviceStateBlend::SetBlendEquation(ZEBlendEquation Equation)
+void ZEBlendState::SetBlendEquation(ZEBlendEquation Equation)
 {
 	if (StateData.BlendEquation != Equation)
 	{
@@ -117,12 +117,12 @@ void ZEDeviceStateBlend::SetBlendEquation(ZEBlendEquation Equation)
 	}
 }
 
-ZEBlendEquation ZEDeviceStateBlend::GetBlendEquation() const
+ZEBlendEquation ZEBlendState::GetBlendEquation() const
 {
 	return StateData.BlendEquation;
 }
 
-void ZEDeviceStateBlend::SetSourceBlendAlphaOption(ZEBlendOption Option)
+void ZEBlendState::SetSourceBlendAlphaOption(ZEBlendOption Option)
 {
 	if (StateData.SourceBlendAlphaOption != Option)
 	{
@@ -131,12 +131,12 @@ void ZEDeviceStateBlend::SetSourceBlendAlphaOption(ZEBlendOption Option)
 	}
 }
 
-ZEBlendOption ZEDeviceStateBlend::GetSourceBlendAlphaOption() const
+ZEBlendOption ZEBlendState::GetSourceBlendAlphaOption() const
 {
 	return StateData.SourceBlendAlphaOption;
 }
 		
-void ZEDeviceStateBlend::SetDestinationBlendAlphaOption(ZEBlendOption Option)
+void ZEBlendState::SetDestinationBlendAlphaOption(ZEBlendOption Option)
 {
 	if (StateData.DestinationBlendAlphaOption != Option)
 	{
@@ -145,12 +145,12 @@ void ZEDeviceStateBlend::SetDestinationBlendAlphaOption(ZEBlendOption Option)
 	}
 }
 
-ZEBlendOption ZEDeviceStateBlend::GetDestinationBlendAlphaOption() const
+ZEBlendOption ZEBlendState::GetDestinationBlendAlphaOption() const
 {
 	return StateData.DestinationBlendAlphaOption;
 }		
 
-void ZEDeviceStateBlend::SetBlendAlphaEquation(ZEBlendEquation Equation)
+void ZEBlendState::SetBlendAlphaEquation(ZEBlendEquation Equation)
 {
 	if (StateData.BlendAlphaEquation != Equation)
 	{
@@ -159,12 +159,12 @@ void ZEDeviceStateBlend::SetBlendAlphaEquation(ZEBlendEquation Equation)
 	}
 }
 
-ZEBlendEquation ZEDeviceStateBlend::GetBlendAlphaEquation() const
+ZEBlendEquation ZEBlendState::GetBlendAlphaEquation() const
 {
 	return StateData.BlendAlphaEquation;
 }
 
-void ZEDeviceStateBlend::SetColorChannelMask(ZESize Target, ZEColorChannelMask Mask)
+void ZEBlendState::SetColorChannelMask(ZESize Target, ZEColorChannelMask Mask)
 {
 	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
 	
@@ -175,14 +175,14 @@ void ZEDeviceStateBlend::SetColorChannelMask(ZESize Target, ZEColorChannelMask M
 	}
 }
 
-ZEColorChannelMask ZEDeviceStateBlend::GetColorChannelMask(ZESize Target) const
+ZEColorChannelMask ZEBlendState::GetColorChannelMask(ZESize Target) const
 {
 	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
 
 	return StateData.ColorChannelMask[Target];
 }
 
-void ZEDeviceStateBlend::SetToDefault()
+void ZEBlendState::SetToDefault()
 {
 	Hash = 0;
 	Dirty = false;
@@ -200,7 +200,7 @@ void ZEDeviceStateBlend::SetToDefault()
 	UpdateHash();
 }
 
-const ZEDeviceStateBlend& ZEDeviceStateBlend::operator=(const ZEDeviceStateBlend& State)
+const ZEBlendState& ZEBlendState::operator=(const ZEBlendState& State)
 {
 	Hash = State.Hash;
 	Dirty = State.Dirty;
@@ -208,23 +208,23 @@ const ZEDeviceStateBlend& ZEDeviceStateBlend::operator=(const ZEDeviceStateBlend
 	return *this;
 }
 
-bool ZEDeviceStateBlend::operator==(const ZEDeviceStateBlend& State)
+bool ZEBlendState::operator==(const ZEBlendState& State)
 {
 	return memcmp(&StateData, &State.StateData, sizeof(ZEBlendStateData)) == 0 ? true : false;
 }
 
-bool ZEDeviceStateBlend::operator!=(const ZEDeviceStateBlend& State)
+bool ZEBlendState::operator!=(const ZEBlendState& State)
 {
 	return !operator==(State);
 }
 
-ZEDeviceStateBlend::ZEDeviceStateBlend()					
+ZEBlendState::ZEBlendState()					
 {
 	memset(&StateData, 0, sizeof(ZEBlendStateData));
 	SetToDefault();
 }
 
-ZEDeviceStateBlend::~ZEDeviceStateBlend()
+ZEBlendState::~ZEBlendState()
 {
 
 }

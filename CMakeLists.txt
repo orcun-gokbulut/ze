@@ -40,6 +40,7 @@ project(Zinek)
 ## Build system initalization
 #########################################################################################
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
+
 include(ze)
 ze_configure_init()
 ze_configure_version()
@@ -54,6 +55,8 @@ ze_configure_symbol_server()
 ## DLL Options
 #########################################################################################
 set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll will be generated and external plugins will be disabled.")
+
+
 
 
 ## Compiler & Linker Options
@@ -75,7 +78,8 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/Source/ZEEngine
 	${CMAKE_SOURCE_DIR}/Source/ZEFoundation
 	${CMAKE_SOURCE_DIR}/Source/ZEToolSDK
-	${CMAKE_SOURCE_DIR}/Source/ZETest)
+	${CMAKE_SOURCE_DIR}/Source/ZETest
+	${CMAKE_SOURCE_DIR}/Source/ZEToolComponents)
 
 include_directories(
 	${ZEBUILD_INCLUDE_PATH}/DirectX
@@ -105,6 +109,8 @@ include(ze_qt)
 add_subdirectory(CMake)
 add_subdirectory(Source)
 
+get_property(fancy_lib_location TARGET ZEFC PROPERTY LOCATION)
+message (STATUS "fancy_lib_location == ${fancy_lib_location}")
 
 ## Install & Packing
 #########################################################################################

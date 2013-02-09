@@ -49,38 +49,44 @@ class ZETexture2DResource;
 class ZEUIMaterial;
 class ZEMaterial;
 
+struct ZEFontCharacterMetric
+{
+	ZEUInt32	FontSize;
+	ZEUInt32	MaximumHeight;
+
+	ZEInt32		Height;
+	ZEInt32		Width;
+
+	ZEInt32		HorizontalAdvance;
+	ZEInt32		VerticalAdvance;
+
+	ZEInt32		HorizontalBearingX;
+	ZEInt32		HorizontalBearingY;
+
+	ZEInt32		VerticalBearingX;
+	ZEInt32		VerticalBearingY;
+};
+
+enum ZEFontResourceType
+{
+	ZE_FRT_BITMAP,
+	ZE_FRT_DYNAMIC
+};
+
 struct ZEFontCharacter
 {
-	ZEMaterial*				Material;
 	const ZETexture2D*		Texture;
+	ZEUInt32				GlyphIndex;
+	char					Character;
+	ZEFontCharacterMetric	CharacterMetric;
 	ZERectangle				CoordinateRectangle;
 };
 
 class ZEFontResource : public ZEResource
 {
-	private:
-		ZEArray<ZETexture2DResource*>		TextureResources;
-		ZEArray<ZEUIMaterial*>				Materials;
-		ZEFontCharacter						Characters[ZE_FONT_CHARACTER_COUNT];
-
-	protected:
-											ZEFontResource();
-		virtual 							~ZEFontResource();
-
 	public:
-		virtual const char*					GetResourceType() const;
-		const ZEFontCharacter&				GetCharacter(char Character);
-
-		static ZEFontResource*				LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		
-		static ZEFontResource*				LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZEFontResource*				LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
-		
-
+		virtual ZEFontResourceType			GetFontResourceType() const = 0;
+		virtual const ZEFontCharacter&		GetCharacter(char Character) = 0;
+		virtual const ZEFontCharacter&		GetCharacter(char CurrentChar, char NextChar, ZEInt64& KerningDistance) = 0;
 };
 #endif
-
-
-
-

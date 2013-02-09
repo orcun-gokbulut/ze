@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDS/ZEString.h"
-#include <String>
+#include <string>
 #include "ZETest/ZETest.h"
 
 ZETestSuite(ZEString)
@@ -48,24 +48,45 @@ ZETestSuite(ZEString)
 
 		StringA.Append(StringB);
 
-		ZETestCheckEqual(StringA, "Lorem Ipsum");
-		ZETestCheckEqual(StringA.GetSize(), ExpectedSize);
-		ZETestCheckEqual(StringA.GetLength(), ExpectedLength);
+		ZETestCheck(StringA == "Lorem Ipsum");
+		ZETestCheck(StringA.GetSize() == ExpectedSize);
+		ZETestCheck(StringA.GetLength() == ExpectedLength);
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringC = "Işık Ilık";
+			ZEString StringD = " Süt İç";
+
+			StringC.Append(StringD);
+
+			ZETestCheck(StringC == "Işık Ilık Süt İç");
+			ZETestCheck(StringC.GetSize() ==  23);
+			ZETestCheck(StringC.GetLength() == 16);
+		}
 	}
 	ZETest("void ZEString::Append(const char * String)")
 	{
-		ZETestCase("char *string")
+		ZEString StringA = "Lorem";
+		const char* StringB = " Ipsum";
+		ZEUInt ExpectedSize = 12;
+		ZEUInt ExpectedLength = 11;
+
+		StringA.Append(StringB);
+
+		ZETestCheck(StringA == "Lorem Ipsum");
+		ZETestCheck(StringA.GetSize() == ExpectedSize);
+		ZETestCheck(StringA.GetLength() == ExpectedLength);
+
+		ZETestCase("UTF-8 encoding compatibility test")
 		{
-			ZEString StringA = "Lorem";
-			const char* StringB = " Ipsum";
-			ZEUInt ExpectedSize = 12;
-			ZEUInt ExpectedLength = 11;
+			ZEString StringC = "Işık Ilık";
+			const char* StringD = " Süt İç";
 
-			StringA.Append(StringB);
+			StringC.Append(StringD);
 
-			ZETestCheckEqual(StringA, "Lorem Ipsum");
-			ZETestCheckEqual(StringA.GetSize(), ExpectedSize);
-			ZETestCheckEqual(StringA.GetLength(), ExpectedLength);
+			ZETestCheck(StringC == "Işık Ilık Süt İç");
+			ZETestCheck(StringC.GetSize() == 23);
+			ZETestCheck(StringC.GetLength() == 16);
 		}
 	}
 
@@ -75,13 +96,22 @@ ZETestSuite(ZEString)
 
 		String.Clear();
 
-		ZETestCheckEqual(String.GetLength(), 0);
-		ZETestCheckEqual(String.GetSize(), 0);
+		ZETestCheck(String.GetLength() == 0);
+		ZETestCheck(String.GetSize() == 0);
 	}
 
 	ZETest("void ZEString::Compact()")
 	{
-		ZETestCheck(false);
+		ZEString String("ZE");
+		ZETestCheck(String.GetSize() == 3);
+
+		String.SetSize(7);
+		ZETestCheck(String == "ZE");
+		ZETestCheck(String.GetSize() == 7);
+
+		String.Compact();
+		ZETestCheck(String == "ZE");
+		ZETestCheck(String.GetSize() == 3);
 	}
 
 	ZETest("void ZEString::CopyFrom(const ZEString & String)")
@@ -95,9 +125,9 @@ ZETestSuite(ZEString)
 
 			StringA.CopyFrom(StringB);
 
-			ZETestCheckEqual(StringA, "Ipsum");
-			ZETestCheckEqual(StringA.GetLength(), 5);
-			ZETestCheckEqual(StringA.GetSize(), 6);
+			ZETestCheck(StringA == "Ipsum");
+			ZETestCheck(StringA.GetLength() == 5);
+			ZETestCheck(StringA.GetSize() == 6);
 		}
 
 		ZETestCase("Copying a string to a previously empty ZEString")
@@ -109,9 +139,21 @@ ZETestSuite(ZEString)
 
 			StringB.CopyFrom(StringA);
 
-			ZETestCheckEqual(StringB, "Lorem Ipsum");
-			ZETestCheckEqual(StringB.GetLength(), ExpectedLength);
-			ZETestCheckEqual(StringB.GetSize(), ExpectedSize);
+			ZETestCheck(StringB == "Lorem Ipsum");
+			ZETestCheck(StringB.GetLength() == ExpectedLength);
+			ZETestCheck(StringB.GetSize() == ExpectedSize);
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringC = "Işık Ilık";
+			ZEString StringD = "Süt İç";
+
+			StringC.CopyFrom(StringD);
+
+			ZETestCheck(StringC == "Süt İç");
+			ZETestCheck(StringC.GetSize() == 10);
+			ZETestCheck(StringC.GetLength() == 6);
 		}
 	}
 
@@ -126,9 +168,9 @@ ZETestSuite(ZEString)
 
 				StringA.CopyTo(StringB);
 
-				ZETestCheckEqual(StringB, "Lorem Ipsum");
-				ZETestCheckEqual(StringB.GetLength(), ExpectedLength);
-				ZETestCheckEqual(StringB.GetSize(), ExpectedSize);
+				ZETestCheck(StringB == "Lorem Ipsum");
+				ZETestCheck(StringB.GetLength() == ExpectedLength);
+				ZETestCheck(StringB.GetSize() == ExpectedSize);
 			}
 
 			ZETestCase("Copying a string to a previously non-empty ZEString")
@@ -140,9 +182,21 @@ ZETestSuite(ZEString)
 
 				StringA.CopyTo(StringB);
 
-				ZETestCheckEqual(StringB, "Lorem");
-				ZETestCheckEqual(StringB.GetLength(), ExpectedLength);
-				ZETestCheckEqual(StringB.GetSize(), ExpectedSize);
+				ZETestCheck(StringB == "Lorem");
+				ZETestCheck(StringB.GetLength() == ExpectedLength);
+				ZETestCheck(StringB.GetSize() == ExpectedSize);
+			}
+
+			ZETestCase("UTF-8 encoding compatibility test")
+			{
+				ZEString StringC = "Işık Ilık";
+				ZEString StringD = "Süt İç";
+
+				StringC.CopyTo(StringD);
+
+				ZETestCheck(StringD == "Işık Ilık");
+				ZETestCheck(StringD.GetSize() == 13);
+				ZETestCheck(StringD.GetLength() == 9);
 			}
 		}
 
@@ -158,6 +212,16 @@ ZETestSuite(ZEString)
 			const ZEString StringA = "Lorem Ipsum";
 			const ZEString StringB = "Dolor Sit";
 			ZETestCheck(!(StringA.Equals(StringB)));
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringC = "Işık Ilık";
+			ZEString StringD = "Süt İç";
+			ZEString StringE = "Işık Ilık";
+
+			ZETestCheck(StringC.Equals(StringE));
+			ZETestCheck(!(StringC.Equals(StringD)));
 		}
 	}
 
@@ -175,35 +239,15 @@ ZETestSuite(ZEString)
 			const char* StringB = "Dolor Sit";
 			ZETestCheck(!(StringA.Equals(StringB)));
 		}
-	}
 
-	ZETest("ZEString ZEString::Format(const char* Format, ...)")
-	{
-		ZETestCase("char")
+		ZETestCase("UTF-8 encoding compatibility test")
 		{
-			ZEString StringA = ZEString::Format("%corem %cpsum", 'L', 'I');
-			ZETestCheckEqual(StringA, "Lorem Ipsum");
-		}
+			ZEString StringC = "Işık Ilık";
+			const char* StringD = "Süt İç";
+			const char* StringE = "Işık Ilık";
 
-		ZETestCase("ZEInt")
-		{
-			ZEString StringB = ZEString::Format("c%dcTestc%dc", 1, 1);
-			ZETestCheckEqual(StringB, "c1cTestc1c");
-		}
-	}
-
-	ZETest("ZEString ZEString::FromBool(bool Value, const char* TrueText, const char* FalseText)")
-	{
-		ZETestCase("True")
-		{
-			ZEString StringA;
-			ZETestCheckEqual(StringA.FromBool(1,"True","False"), "True");
-		}
-
-		ZETestCase("False")
-		{
-			ZEString StringA;
-			ZETestCheckEqual(StringA.FromBool(0,"True","False"), "False");
+			ZETestCheck(StringC.Equals(StringE));
+			ZETestCheck(!(StringC.Equals(StringD)));
 		}
 	}
 
@@ -213,66 +257,240 @@ ZETestSuite(ZEString)
 
 		ZEString StringA = ZEString::FromChar(C);
 
-		ZETestCheckEqual(StringA, "a");
+		ZETestCheck(StringA == "a");
 	}
 
 	ZETest("ZEString ZEString::FromCString(const char* Value)")
 	{
 		const char* String = "Lorem Ipsum";
 
-		ZEString StringB = ZEString::FromCString(String);
+		ZEString StringA = ZEString::FromCString(String);
 
-		ZETestCheckEqual(StringB, "Lorem Ipsum");
+		ZETestCheck(StringA == "Lorem Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			const char* StringB = "Işık Ilık Süt İç";
+
+			ZEString StringC = ZEString::FromCString(StringB);
+
+			ZETestCheck(StringC == "Işık Ilık Süt İç");
+		}
 	}
 
-	ZETest("ZEString ZEString::FromFloat(float Value, ZEUInt Digits)")
+	ZETest("ZEString ZEString::FromDouble(double Value, const char* Format)")
+	{
+		double Value = 845756.88781;
+
+		ZEString String = ZEString::FromDouble(Value);
+
+		ZETestCheck(String == "845756.875000");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromDouble(Value, ".");
+			ZETestCheck(String == "845757");
+		}
+	}
+
+	ZETest("ZEString ZEString::FromFloat(float Value, const char* Format)")
 	{
 		float Value = 845756.88781f;
-		ZEUInt Digits = 7;
 
-		ZEString String = ZEString::FromFloat(Value, Digits);
+		ZEString String = ZEString::FromFloat(Value);
 
-		ZETestCheckEqual(String, "845756.9");
+		ZETestCheck(String == "845756.875000");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromFloat(Value, "12.1");
+			ZETestCheck(String == "    845756.9");
+		}
 	}
 
-	ZETest("ZEString ZEString::FromInt(ZEInt Value, ZEUInt Base)")
+	ZETest("ZEString ZEString::FromInt16(ZEInt16 Value, const char* Format)")
 	{
-		ZEInt Value = 10;
-		ZEUInt Base = 5;
+		ZEInt16 Value = -150;
 
-		ZEString String = ZEString::FromInt(Value, Base);
+		ZEString String = ZEString::FromInt16(Value);
 
-		ZETestCheckEqual(String, "20");
+		ZETestCheck(String == "-150");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromInt16(Value, "d:.6");
+			ZETestCheck(String == "-000150");
+		}
+	}
+
+	ZETest("ZEString ZEString::FromInt32(ZEInt32 Value, const char* Format)")
+	{
+		ZEInt32 Value = 845756;
+
+		ZEString String = ZEString::FromInt32(Value);
+
+		ZETestCheck(String == "845756");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromInt32(Value, "x:08");
+			ZETestCheck(String == "000ce7bc");
+		}
+	}
+
+	ZETest("ZEString ZEString::FromInt64(ZEInt64 Value, const char* Format)")
+	{
+		ZEInt64 Value = -845756;
+
+		ZEString String = ZEString::FromInt64(Value);
+
+		ZETestCheck(String == "-845756");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromInt64(Value, "d:-11.8");
+			ZETestCheck(String == "-00845756  ");
+		}
+	}
+
+	ZETest("ZEString ZEString::FromInt8(ZEInt8 Value, const char* Format)")
+	{
+		ZEInt8 Value = -20;
+
+		ZEString String = ZEString::FromInt8(Value);
+
+		ZETestCheck(String == "-20");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromInt8(Value, "d:6.3");
+			ZETestCheck(String == "  -020");
+		}
 	}
 
 	ZETest("ZEString ZEString::FromStdString(const std::string& Value)")
 	{
 		std::string Example = "Lorem Ipsum";
 
-		ZEString String = ZEString::FromStdString(Example);
+		ZEString StringA = ZEString::FromStdString(Example);
 
-		ZETestCheckEqual(String, "Lorem Ipsum");
+		ZETestCheck(StringA == "Lorem Ipsum");
 
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			std::string Example2 = "Işık Ilık Süt İç";
+
+			ZEString StringB = ZEString::FromStdString(Example2);
+
+			ZETestCheck(StringB == "Işık Ilık Süt İç");
+		}
 	}
 
-	ZETest("ZEString ZEString::FromUInt(ZEUInt Value, ZEUInt Base)")
+	ZETest("ZEString ZEString::FromUInt16(ZEUInt16 Value, const char* Format)")
 	{
-		ZEUInt Base = 2;
-		ZEUInt Value = 120;
+		ZEUInt16 Value = 150;
 
-		ZEString String = ZEString::FromUInt(Value, Base);
+		ZEString String = ZEString::FromUInt16(Value);
 
-		ZETestCheckEqual(String, "1111000");
+		ZETestCheck(String == "150");
 
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromUInt16(Value, "x:04");
+			ZETestCheck(String == "0096");
+		}
+	}
+
+	ZETest("ZEString ZEString::FromUInt32(ZEUInt32 Value, const char* Format)")
+	{
+		ZEUInt32 Value = 845756;
+
+		ZEString String = ZEString::FromUInt32(Value);
+
+		ZETestCheck(String == "845756");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromUInt32(Value, "X:-10.8");
+			ZETestCheck(String = "000CE7BC  ");
+		}
+	}
+
+	ZETest("ZEString ZEString::FromUInt64(ZEUInt64 Value, const char* Format)")
+	{
+		ZEUInt64 Value = 845756.88781;
+
+		ZEString String = ZEString::FromUInt64(Value);
+
+		ZETestCheck(String == "845756");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromUInt64(Value, "d:8.7");
+			ZETestCheck(String == " 0845756");
+		}
+	}
+
+	ZETest("ZEString ZEString::FromUInt8(ZEUInt8 Value, const char* Format)")
+	{
+		ZEUInt8 Value = 122;
+
+		ZEString String = ZEString::FromUInt8(Value);
+
+		ZETestCheck(String == "122");
+
+		ZETestCase("for Format != NULL")
+		{
+			String = ZEString::FromUInt8(Value, "c:-4");
+			ZETestCheck(String == "z   ");
+		}
+	}
+
+	ZETest("ZEString ZEString::FromWChar(wchar_t Value)")
+	{
+		wchar_t WideCharacter = L'a';
+
+		ZEString StringA = ZEString::FromWChar(WideCharacter);
+
+		ZETestCheck(StringA == L"a");
+	}
+
+	ZETest("ZEString ZEString::FromWCString(const wchar_t* Value)")
+	{
+		wchar_t Example[] = {8364, 0};
+
+		ZEString StringA = ZEString::FromWCString(Example);
+
+		ZETestCheck(StringA == "€");
+	}
+
+	ZETest("ZEString ZEString::FromWStdString(const std::wstring& Value)")
+	{
+		wchar_t CString[] = {8364, 0};
+
+		ZEString StringA = ZEString::FromWStdString(std::wstring(CString));
+
+		ZETestCheck(StringA == "€");
 	}
 
 	ZETest("char ZEString::GetCharacter(ZESize Position) const")
 	{
-		ZEString String = "Lorem Ipsum";
+		ZEString StringA = "Lorem Ipsum";
 
-		char Result = String.GetCharacter(4);
+		char Result1 = StringA.GetCharacter(4);
 
-		ZETestCheckEqual(Result, 'm');
+		ZETestCheck(Result1 == 'm');
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringB = "Işık Ilık Süt İç";
+
+			ZECharacter Result2 = StringB.GetCharacter(3);
+			ZECharacter Result3 = StringB.GetCharacter(11);
+
+			ZETestCheck(Result2 == "k");
+			ZETestCheck(Result3 == "ü");
+		}
 	}
 
 	ZETest("ZESize ZEString::GetLength() const")
@@ -280,7 +498,14 @@ ZETestSuite(ZEString)
 		ZEString String = "Lorem Ipsum";
 		ZEUInt ExpectedLength = 11;
 
-		ZETestCheckEqual(String.GetLength(), ExpectedLength);
+		ZETestCheck(String.GetLength() == ExpectedLength);
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringB = "Işık Ilık Süt İç";
+
+			ZETestCheck(StringB.GetLength() == 16);
+		}
 	}
 
 	ZETest("ZESize ZEString::GetSize() const")
@@ -288,20 +513,30 @@ ZETestSuite(ZEString)
 		ZEString String = "Lorem Ipsum Dolor Sit Amet";
 		ZEUInt ExpectedSize = 27;
 
-		ZETestCheckEqual(String.GetSize(), ExpectedSize);
+		ZETestCheck(String.GetSize() == ExpectedSize);
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringB = "Işık Ilık Süt İç";
+
+			ZETestCheck(StringB.GetSize() == 23);
+		}
 	}
 
 	ZETest("const char* ZEString::GetValue() const")
 	{
 		ZEString String = "Lorem";
-		const char * C;
+		const char* Value = String.GetValue();
 
-		C = String.GetValue();
-		ZETestCheckEqual(C[0], 'L');
-		ZETestCheckEqual(C[1], 'o');
-		ZETestCheckEqual(C[2], 'r');
-		ZETestCheckEqual(C[3], 'e');
-		ZETestCheckEqual(C[4], 'm');
+		ZETestCheck(strcmp(Value, "Lorem") == 0);
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringB = "Işık";
+			const char* Value2 = StringB.GetValue();
+
+			ZETestCheck(strcmp(Value2, "Işık") == 0);
+		}
 	}
 
 	ZETest("void ZEString::Insert(const ZEString & String);")
@@ -310,8 +545,17 @@ ZETestSuite(ZEString)
 		ZEString StringB = "Lorem ";
 
 		StringA.Insert(StringB);
-		ZETestCheckEqual(StringA, "Lorem Ipsum");
+		ZETestCheck(StringA == "Lorem Ipsum");
 
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringC = "Süt İç";
+			ZEString StringD = "Işık Ilık ";
+
+			StringC.Insert(StringD);
+
+			ZETestCheck(StringC == "Işık Ilık Süt İç");
+		}
 	}
 
 	ZETest("void ZEString::Insert(const char * String);")
@@ -320,7 +564,17 @@ ZETestSuite(ZEString)
 		const char* StringB = "Lorem ";
 
 		StringA.Insert(StringB);
-		ZETestCheckEqual(StringA, "Lorem Ipsum");
+		ZETestCheck(StringA == "Lorem Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringC = "Süt İç";
+			const char* StringD = "Işık Ilık ";
+
+			StringC.Insert(StringD);
+
+			ZETestCheck(StringC == "Işık Ilık Süt İç");
+		}
 	}
 
 	ZETest("void ZEString::Insert(ZESize Position, const ZEString & String)")
@@ -333,8 +587,8 @@ ZETestSuite(ZEString)
 
 			StringA.Insert(5, StringB);
 
-			ZETestCheckEqual(StringA, "Lorem Ipsum Dolor Sit Amet");
-			ZETestCheckEqual(StringA.GetLength(), ExpectedLength);
+			ZETestCheck(StringA == "Lorem Ipsum Dolor Sit Amet");
+			ZETestCheck(StringA.GetLength() == ExpectedLength);
 		}
 
 		ZETestCase("Inserting an empty ZEString inside another ZEString")
@@ -345,8 +599,8 @@ ZETestSuite(ZEString)
 
 			StringC.Insert(3, StringD);
 
-			ZETestCheckEqual(StringC, "Lorem");
-			ZETestCheckEqual(StringC.GetLength(), ExpectedLength);
+			ZETestCheck(StringC == "Lorem");
+			ZETestCheck(StringC.GetLength() == ExpectedLength);
 		}
 
 		ZETestCase("Inserting a ZESTring towards the end of the current ZEString")
@@ -356,8 +610,18 @@ ZETestSuite(ZEString)
 
 			StringE.Insert(6, "Ipsum");
 
-			ZETestCheckEqual(StringE, "Lorem Ipsum");
-			ZETestCheckEqual(StringE.GetLength(), ExpectedLength);
+			ZETestCheck(StringE == "Lorem Ipsum");
+			ZETestCheck(StringE.GetLength() == ExpectedLength);
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringC = "Işık Süt İç";
+			ZEString StringD = "Ilık ";
+
+			StringC.Insert(5, StringD);
+
+			ZETestCheck(StringC == "Işık Ilık Süt İç");
 		}
 	}
 
@@ -370,8 +634,18 @@ ZETestSuite(ZEString)
 
 		StringA.Insert(Position, StringB);
 
-		ZETestCheckEqual(StringA, "Lorem Ipsum");
-		ZETestCheckEqual(StringA.GetLength(), ExpectedLength);
+		ZETestCheck(StringA == "Lorem Ipsum");
+		ZETestCheck(StringA.GetLength() == ExpectedLength);
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringC = "Işık Süt İç";
+			const char* StringD = "Ilık ";
+
+			StringC.Insert(5, StringD);
+
+			ZETestCheck(StringC == "Işık Ilık Süt İç");
+		}
 	}
 
 	ZETest("bool ZEString::IsEmpty() const")
@@ -392,6 +666,14 @@ ZETestSuite(ZEString)
 
 			ZETestCheck(!(StringC.IsEmpty()));
 		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringD = "Işık Ilık Süt İç";
+			StringD.Clear();
+
+			ZETestCheck(StringD.IsEmpty());
+		}
 	}
 
 	ZETest("ZEString ZEString::Left(ZESize Count) const")
@@ -400,16 +682,27 @@ ZETestSuite(ZEString)
 
 		ZETestCase("ZEString is empty")
 		{
-			ZETestCheckEqual(String.Left(0), "");
+			ZETestCheck(String.Left(0) == "");
 		}
+
 		ZETestCase("ZEString has a value")
 		{
 			String = "1234Test5678";
 
-			ZETestCheckEqual(String.Left(0), "");
-			ZETestCheckEqual(String.Left(1), "1");
-			ZETestCheckEqual(String.Left(4), "1234");
-			ZETestCheckEqual(String.Left(12), "1234Test5678");
+			ZETestCheck(String.Left(0) == "");
+			ZETestCheck(String.Left(1) == "1");
+			ZETestCheck(String.Left(4) == "1234");
+			ZETestCheck(String.Left(12) == "1234Test5678");
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			String = "Işık Ilık Süt İç";
+
+			ZETestCheck(String.Left(0) == "");
+			ZETestCheck(String.Left(1) == "I");
+			ZETestCheck(String.Left(4) == "Işık");
+			ZETestCheck(String.Left(13) == "Işık Ilık Süt");
 		}
 	}
 
@@ -423,13 +716,40 @@ ZETestSuite(ZEString)
 		StringB = "IPSUM";
 		StringC = "DoLoR";
 
-		ZETestCheckEqual(StringA.Lower(), "lorem");
-		ZETestCheckEqual(StringB.Lower(), "ipsum");
-		ZETestCheckEqual(StringC.Lower(), "dolor");
+		ZETestCheck(StringA.Lower() == "lorem");
+		ZETestCheck(StringB.Lower() == "ipsum");
+		ZETestCheck(StringC.Lower() == "dolor");
 
 		StringA = "";
 
-		ZETestCheckEqual(StringA.Lower(), "");
+		ZETestCheck(StringA.Lower() == "");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			//NO NON-ASCII Character Support at the moment.
+			ZETestCheck(false);
+		}
+	}
+
+	ZETest("void ZEString::LowerSelf()")
+	{
+		ZEString StringA = "lorem";
+		ZEString StringB = "IPSUM";
+		ZEString StringC = "DoLoR";
+
+		StringA.LowerSelf();
+		StringB.LowerSelf();
+		StringC.LowerSelf();
+
+		ZETestCheck(StringA == "lorem");
+		ZETestCheck(StringB == "ipsum");
+		ZETestCheck(StringC == "dolor");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			//NO NON-ASCII Character Support at the moment.
+			ZETestCheck(false);
+		}
 	}
 
 	ZETest("ZEString ZEString::Middle(ZESize Position, ZESize Count) const")
@@ -438,17 +758,61 @@ ZETestSuite(ZEString)
 
 		ZETestCase("ZEString is empty")
 		{
-			ZETestCheckEqual(String.Middle(0, 0), "");
+			ZETestCheck(String.Middle(0, 0) == "");
 		}
 
 		ZETestCase("ZEString has a value")
 		{
 			String = "1234Test5678";
 
-			ZETestCheckEqual(String.Middle(0, 0), "");
-			ZETestCheckEqual(String.Middle(2, 8), "34Test56");
-			ZETestCheckEqual(String.Middle(8, 4), "5678");
-			ZETestCheckEqual(String.Middle(0, 12), "1234Test5678");
+			ZETestCheck(String.Middle(0, 0) == "");
+			ZETestCheck(String.Middle(2, 8) == "34Test56");
+			ZETestCheck(String.Middle(8, 4) == "5678");
+			ZETestCheck(String.Middle(0, 12) == "1234Test5678");
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			String = "Işık Ilık Süt İç";
+
+			ZETestCheck(String.Middle(0, 0) == "");
+			ZETestCheck(String.Middle(2, 8) == "ık Ilık ");
+			ZETestCheck(String.Middle(10, 6) == "Süt İç");
+			ZETestCheck(String.Middle(0, 13) == "Işık Ilık Süt");
+		}
+	}
+
+	ZETest("ZEString::operator const char*() const")
+	{
+		ZEString StringA = "Lorem Ipsum";
+		const char* StringB = StringA;
+
+		ZETestCheck(strcmp(StringB, StringA.GetValue()) == 0);
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringC = "Işık Ilık Süt İç";
+			const char* StringD = StringC;
+
+			ZETestCheck(strcmp(StringD, StringC.GetValue()) == 0);
+		}
+
+	}
+
+	ZETest("ZEString::operator std::string() const")
+	{
+		ZEString StringA = "Lorem Ipsum";
+
+		std::string StringB = StringA;
+
+		ZETestCheck(strcmp(StringB.c_str(), StringA.GetValue()) == 0);
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringC = "Işık Ilık Süt İç";
+			std::string StringD = StringC;
+
+			ZETestCheck(strcmp(StringD.c_str(), StringC.GetValue()) == 0);
 		}
 	}
 
@@ -469,11 +833,20 @@ ZETestSuite(ZEString)
 
 			ZETestCheck(!(StringC != StringD));
 		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringE = "Işık Ilık";
+			ZEString StringF = " Süt İç";
+			ZEString StringG = "Işık Ilık";
+
+			ZETestCheck(StringE != StringF);
+			ZETestCheck(!(StringE != StringG));
+		}
 	}
 
 	ZETest("bool ZEString::operator!=(const char * String) const")
 	{
-
 		ZETestCase("Strings are not equal")
 		{
 			const ZEString StringA = "Lorem";
@@ -489,25 +862,110 @@ ZETestSuite(ZEString)
 
 			ZETestCheck(!(StringC != StringD));
 		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringE = "Işık Ilık";
+			const char* StringF = " Süt İç";
+			const char* StringG = "Işık Ilık";
+
+			ZETestCheck(StringE != StringF);
+			ZETestCheck(!(StringE != StringG));
+		}
+	}
+
+	ZETest("bool ZEString::operator!=(const wchar_t* String) const")
+	{
+		ZETestCase("Strings are not equal")
+		{
+			const ZEString StringA = "A";
+			const wchar_t* StringB = L"B";
+
+			ZETestCheck(StringA != StringB);
+		}
+
+		ZETestCase("Strings are equal")
+		{
+			const ZEString StringC = L"A";
+			const wchar_t* StringD = L"A";
+
+			ZETestCheck(!(StringC != StringD));
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringE = "Işık Ilık Süt İç";
+			wchar_t StringF[] = {8364, 0};
+			const wchar_t* StringG = StringE.ToWCString();
+
+			ZETestCheck(StringE != StringF);
+			ZETestCheck(!(StringE != StringG));
+		}
+	}
+
+	ZETest("bool ZEString::operator!=(const std::wstring& String) const")
+	{
+		ZETestCase("Strings are not equal")
+		{
+			const ZEString StringA = "A";
+			std::wstring StringB = L"B";
+
+			ZETestCheck(StringA != StringB);
+		}
+
+		ZETestCase("Strings are equal")
+		{
+			const ZEString StringC = L"A";
+			std::wstring StringD = L"A";
+
+			ZETestCheck(!(StringC != StringD));
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringE = "Işık Ilık Süt İç";
+			wchar_t Temp[] = {8364, 0};
+			std::wstring StringF = std::wstring(Temp);
+			std::wstring StringG = StringE.ToWCString();
+
+			ZETestCheck(StringE != StringF);
+			ZETestCheck(!(StringE != StringG));
+		}
 	}
 
 	ZETest("char & ZEString::operator[](ZEInt Index)")
 	{
 		ZEString StringA = "Lorem";
 
-		char C = StringA[0];
+		ZETestCheck(StringA[0] == 'L');
 
-		ZETestCheckEqual(C, 'L');
+		ZETestCase("Changing a character of ZEString by index operator");
+		{
+			StringA[4] = 'M';
+
+			ZETestCheck(StringA == "LoreM");
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık Süt İç";
+
+			ZETestCheck(StringA[1] == "ş");
+
+			StringA[1] = "€";
+
+			ZETestCheck(StringA[1] == "€");
+		}
 	}
-
 
 	ZETest("const char & ZEString::operator[](ZEInt Index) const")
 	{
-		const ZEString String = "Lorem";
+		const ZEString StringA = "Lorem";
 
-		const char C = String[2];
+		const char C = StringA[2];
 
-		ZETestCheckEqual(C, 'r');
+		ZETestCheck(StringA[2] == C);
+		ZETestCheck(C == 'r');
 	}
 
 	ZETest("ZEString ZEString::operator+(const ZEString & String)")
@@ -519,6 +977,15 @@ ZETestSuite(ZEString)
 
 		ZETestCheckEqual(Result, "Lorem Ipsum");
 
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık ";
+			StringB = "Süt İç";
+
+			ZEString Result = StringA + StringB;
+
+			ZETestCheck(Result == "Işık Ilık Süt İç");
+		}
 	}
 
 	ZETest("ZEString ZEString::operator+(const char * String)")
@@ -528,7 +995,178 @@ ZETestSuite(ZEString)
 
 		ZEString Result = StringA + StringB;
 
-		ZETestCheckEqual(Result, "Lorem Ipsum");
+		ZETestCheck(Result == "Lorem Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık ";
+			StringB = "Süt İç";
+
+			ZEString Result = StringA + StringB;
+
+			ZETestCheck(Result == "Işık Ilık Süt İç");
+		}
+	}
+
+	ZETest("ZEString ZEString::operator+(const std::string& String)")
+	{
+		ZEString StringA = "Lorem";
+		std::string StringB = " Ipsum";
+
+		ZEString Result = StringA + StringB;
+
+		ZETestCheck(Result == "Lorem Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık ";
+			StringB = "Süt İç";
+
+			ZEString Result = StringA + StringB;
+
+			ZETestCheck(Result == "Işık Ilık Süt İç");
+		}
+	}
+
+	ZETest("ZEString ZEString::operator+(const wchar_t* String)")
+	{
+		ZEString StringA = "Lorem";
+		const wchar_t* StringB = L"a";
+
+		ZEString Result = StringA + StringB;
+
+		ZETestCheck(Result == "Lorema");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "₭";
+			wchar_t StringC[] = {8364, 0};
+
+			ZEString Result = StringA + StringC;
+
+			ZETestCheck(Result == "₭€");
+		}
+	}
+
+	ZETest("ZEString ZEString::operator+(const std::wstring& String)")
+	{
+		ZEString StringA = "Lorem";
+		std::wstring StringB = L"a";
+
+		ZEString Result = StringA + StringB;
+
+		ZETestCheck(Result == "Lorema");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "₭";
+			wchar_t Temp[] = {8364, 0};
+			std::wstring StringC = std::wstring(Temp);
+
+			ZEString Result = StringA + StringC;
+
+			ZETestCheck(Result == "₭€");
+		}
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEInt8 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt8 Value = -120;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ -120");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEInt16 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt16 Value = -6320;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ -6320");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEInt32 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt32 Value = -987654;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ -987654");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEInt64 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt64 Value = -987654321;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ -987654321");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEUInt8 Value)")
+	{
+		ZEString String = "€ ";
+		ZEUInt8 Value = 120;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ 120");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEUInt16 Value)")
+	{
+		ZEString String = "€ ";
+		ZEUInt16 Value = 6320;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ 6320");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEUInt32 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt32 Value = 987654;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ 987654");
+	}
+
+	ZETest("ZEString ZEString::operator+(ZEUInt64 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt64 Value = -987654321;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ -987654321");
+	}
+
+	ZETest("ZEString ZEString::operator+(float Value)")
+	{
+		ZEString String = "€ ";
+		float Value = 98765.8564f;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ 98765.859375");
+	}
+
+	ZETest("ZEString ZEString::operator+(double Value)")
+	{
+		ZEString String = "€ ";
+		double Value = 98765.8564;
+
+		ZEString Result = String + Value;
+
+		ZETestCheck(Result == "€ 98765.859375");
 	}
 
 	ZETest("ZEString & ZEString::operator+=(const ZEString & String)")
@@ -538,6 +1176,16 @@ ZETestSuite(ZEString)
 
 		StringA += StringB;
 		ZETestCheckEqual(StringA, "Lorem Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık ";
+			StringB = "Süt İç";
+
+			StringA += StringB;
+
+			ZETestCheck(StringA == "Işık Ilık Süt İç");
+		}
 	}
 
 	ZETest("ZEString & ZEString::operator+=(const char * String)")
@@ -546,7 +1194,177 @@ ZETestSuite(ZEString)
 		const char* StringB = "Ipsum";
 
 		StringA += StringB;
-		ZETestCheckEqual(StringA, "Lorem Ipsum");
+		ZETestCheck(StringA == "Lorem Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık ";
+			StringB = "Süt İç";
+
+			StringA += StringB;
+
+			ZETestCheck(StringA == "Işık Ilık Süt İç");
+		}
+	}
+
+	ZETest("ZEString& ZEString::operator+=(const std::string& String)")
+	{
+		ZEString StringA = "Lorem ";
+		std::string StringB = "Ipsum";
+
+		StringA += StringB;
+		ZETestCheck(StringA == "Lorem Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık ";
+			StringB = "Süt İç";
+
+			StringA += StringB;
+
+			ZETestCheck(StringA == "Işık Ilık Süt İç");
+		}
+	}
+
+	ZETest("ZEString& ZEString::operator+=(const wchar_t* String)")
+	{
+		ZEString StringA = "Lorem";
+		const wchar_t* StringB = L"a";
+
+		StringA += StringB;
+
+		ZETestCheck(StringA == "Lorema");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "₭";
+			wchar_t StringC[] = {8364, 0};
+
+			StringA += StringC;
+
+			ZETestCheck(StringA == "₭€");
+		}
+	}
+
+	ZETest("ZEString& ZEString::operator+=(const std::wstring& String)")
+	{
+		ZEString StringA = "Lorem";
+		std::wstring StringB = L"a";
+
+		StringA += StringB;
+
+		ZETestCheck(StringA == "Lorema");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "₭";
+			wchar_t Temp[] = {8364, 0};
+			std::wstring StringC = std::wstring(Temp);
+
+			StringA += StringC;
+
+			ZETestCheck(StringA == "₭€");
+		}
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEInt8 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt8 Value = -120;
+
+		String += Value;
+
+		ZETestCheck(String == "€ -120");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEInt16 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt16 Value = -6320;
+
+		String += Value;
+
+		ZETestCheck(String == "€ -6320");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEInt32 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt32 Value = -987654;
+
+		String += Value;
+
+		ZETestCheck(String == "€ -987654");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEInt64 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt64 Value = -987654321;
+
+		String += Value;
+
+		ZETestCheck(String == "€ -987654321");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEUInt8 Value)")
+	{
+		ZEString String = "€ ";
+		ZEUInt8 Value = 120;
+
+		String += Value;
+
+		ZETestCheck(String == "€ 120");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEUInt16 Value)")
+	{
+		ZEString String = "€ ";
+		ZEUInt16 Value = 6320;
+
+		String += Value;
+
+		ZETestCheck(String == "€ 6320");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEUInt32 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt32 Value = 987654;
+
+		String += Value;
+
+		ZETestCheck(String == "€ 987654");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(ZEUInt64 Value)")
+	{
+		ZEString String = "€ ";
+		ZEInt64 Value = 987654321;
+
+		String += Value;
+
+		ZETestCheck(String == "€ 987654321");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(float Value)")
+	{
+		ZEString String = "€ ";
+		float Value = 98765.8564f;
+
+		String += Value;
+
+		ZETestCheck(String == "€ 98765.859375");
+	}
+
+	ZETest("ZEString& ZEString::operator+=(double Value)")
+	{
+		ZEString String = "€ ";
+		float Value = 98765.8564f;
+
+		String += Value;
+
+		ZETestCheck(String == "€ 98765.859375");
 	}
 
 	ZETest("ZEString & ZEString::operator=(const ZEString & String)")
@@ -556,7 +1374,17 @@ ZETestSuite(ZEString)
 
 		StringA = StringB;
 
-		ZETestCheckEqual(StringA, "Ipsum");
+		ZETestCheck(StringA == "Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık";
+			StringB = "Süt İç";
+
+			StringA = StringB;
+
+			ZETestCheck(StringA == "Süt İç");
+		}
 	}
 
 	ZETest("ZEString & ZEString::operator=(const char * String)")
@@ -566,24 +1394,249 @@ ZETestSuite(ZEString)
 
 		StringA = StringB;
 
-		ZETestCheckEqual(StringA, "Ipsum");
+		ZETestCheck(StringA == "Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık";
+			StringB = "Süt İç";
+
+			StringA = StringB;
+
+			ZETestCheck(StringA == "Süt İç");
+		}
 	}
 
-	ZETest(" bool ZEString::operator==(const ZEString & String) const")
+	ZETest("ZEString& ZEString::operator=(const std::string& String)")
+	{
+		ZEString StringA = "Lorem";
+		std::string StringB = "Ipsum";
+
+		StringA = StringB;
+
+		ZETestCheck(StringA == "Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık";
+			StringB = "Süt İç";
+
+			StringA = StringB;
+
+			ZETestCheck(StringA == "Süt İç");
+		}
+	}
+
+	ZETest("ZEString& ZEString::operator=(const wchar_t* String)")
+	{
+		ZEString StringA = "Lorem";
+		const wchar_t* StringB = L"a";
+
+		StringA = StringB;
+
+		ZETestCheck(StringA == "a");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "₭";
+			wchar_t StringC[] = {8364, 0};
+
+			StringA = StringC;
+
+			ZETestCheck(StringA == "€");
+		}
+	}
+
+	ZETest("ZEString& ZEString::operator=(const std::wstring& String)")
+	{
+		ZEString StringA = "Lorem";
+		std::wstring StringB = L"a";
+
+		StringA = StringB;
+
+		ZETestCheck(StringA == "a");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "₭";
+			wchar_t Temp[] = {8364, 0};
+			std::wstring StringC = std::wstring(Temp);
+
+			StringA = StringC;
+
+			ZETestCheck(StringA == "€");
+		}
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEInt8 Value)")
+	{
+		ZEInt8 Value = -20;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "-20");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEInt16 Value)")
+	{
+		ZEInt32 Value = -8765;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "-8765");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEInt32 Value)")
+	{
+		ZEInt32 Value = -87654321;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "-87654321");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEInt64 Value)")
+	{
+		ZEInt64 Value = -87654321;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "-87654321");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEUInt8 Value)")
+	{
+		ZEUInt8 Value = 20;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "20");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEUInt16 Value)")
+	{
+		ZEUInt16 Value = 8765;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "8765");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEUInt32 Value)")
+	{
+		ZEUInt32 Value = 87654321;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "87654321");
+	}
+
+	ZETest("ZEString& ZEString::operator=(ZEUInt64 Value)")
+	{
+		ZEUInt64 Value = 87654321;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "87654321");
+	}
+
+	ZETest("ZEString& ZEString::operator=(float Value)")
+	{
+		float Value = 400.5525252f;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "400.552521");
+	}
+
+	ZETest("ZEString& ZEString::operator=(double Value)")
+	{
+		double Value = 400.5525252;
+
+		ZEString String = Value;
+
+		ZETestCheck(String == "400.552521");
+	}
+
+	ZETest("bool ZEString::operator==(const ZEString & String) const")
 	{
 		ZETestCase("ZEStrings are not equal")
 		{
-			const ZEString StringA = "Lorem";
-			const ZEString StringB = "Ipsum";
+			ZEString StringA = "Lorem";
+			ZEString StringB = "Ipsum";
 
 			ZETestCheck(!(StringA == StringB));
 		}
 		ZETestCase("ZEStrings are equal")
 		{
-			const ZEString StringC = "Lorem Ipsum";
-			const ZEString StringD = "Lorem Ipsum";
+			ZEString StringC = "Lorem Ipsum";
+			ZEString StringD = "Lorem Ipsum";
 
 			ZETestCheck(StringC == StringD);
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringE = "Işık Ilık";
+			ZEString StringF = "Süt İç";
+			ZEString StringG = "Işık Ilık";
+
+			ZETestCheck(StringE == StringG);
+			ZETestCheck(!(StringE == StringF));
+		}
+
+		ZETestCase("Strings are not equal (Wide Character)")
+		{
+			ZEString StringA = "Lorem";
+			const wchar_t* StringB = L"Ipsum";
+
+			ZETestCheck(!(StringA == StringB));
+		}
+
+		ZETestCase("Strings are equal (Wide Character)")
+		{
+			ZEString StringA = "Lorem Ipsum";
+			const wchar_t* StringB = L"Lorem Ipsum";
+
+			ZETestCheck(StringA == StringB);
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test (Wide Character)")
+		{
+			ZEString StringE = "€";
+			wchar_t StringF[] = {8365, 0};
+			wchar_t StringG[] = {8364, 0};
+
+			ZETestCheck(StringE == StringG);
+			ZETestCheck(!(StringE == StringF));
+		}
+
+		ZETestCase("Strings are not equal (Wide Standard String)")
+		{
+			ZEString StringA = "Lorem";
+			std::wstring StringB = L"Ipsum";
+
+			ZETestCheck(!(StringA == StringB));
+		}
+
+		ZETestCase("Strings are equal (Wide Standard String)")
+		{
+			ZEString StringA = "Lorem Ipsum";
+			std::wstring StringB = L"Lorem Ipsum";
+
+			ZETestCheck(StringA == StringB);
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test (Wide Standard String)")
+		{
+			ZEString StringE = "€";
+			wchar_t Temp1[] = {8365, 0};
+			std::wstring StringF = std::wstring(Temp1);
+			wchar_t Temp2[] = {8364, 0};
+			std::wstring StringG = std::wstring(Temp2);
+
+			ZETestCheck(StringE == StringG);
+			ZETestCheck(!(StringE == StringF));
 		}
 	}
 
@@ -591,7 +1644,7 @@ ZETestSuite(ZEString)
 	{
 		ZETestCase("Strings are not equal")
 		{
-			const ZEString StringA = "Lorem";
+			ZEString StringA = "Lorem";
 			const char* StringB = "Ipsum";
 
 			ZETestCheck(!(StringA == StringB));
@@ -599,31 +1652,50 @@ ZETestSuite(ZEString)
 
 		ZETestCase("Strings are equal")
 		{
-			const ZEString StringA = "Lorem Ipsum";
+			ZEString StringA = "Lorem Ipsum";
 			const char* StringB = "Lorem Ipsum";
 
 			ZETestCheck(StringA == StringB);
 		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringE = "Işık Ilık";
+			const char* StringF = "Süt İç";
+			const char* StringG = "Işık Ilık";
+
+			ZETestCheck(StringE == StringG);
+			ZETestCheck(!(StringE == StringF));
+		}
     }
 
-	ZETest("ZEString::operator const char*() const")
+	ZETest("bool ZEString::operator==(const std::string& String) const")
 	{
-		ZEString StringA = "Lorem Ipsum";
-		const char* StringB = (const char*)StringA;
+		ZETestCase("Strings are not equal")
+		{
+			ZEString StringA = "Lorem";
+			std::string StringB = "Ipsum";
 
-		ZETestCheck(strcmp(StringB, StringA.GetValue()) == 0);
-		
-	}
+			ZETestCheck(!(StringA == StringB));
+		}
 
-	ZETest("ZEString::operator std::string() const")
-	{
-		ZEString StringA = "Lorem Ipsum";
-		std::string ExpectedResult = "Lorem Ipsum";
+		ZETestCase("Strings are equal")
+		{
+			ZEString StringA = "Lorem Ipsum";
+			std::string StringB = "Lorem Ipsum";
 
-		std::string StringB = (std::string)StringA;
+			ZETestCheck(StringA == StringB);
+		}
 
-		//ZETestCheck(strcmp(StringB, StringA.GetValue()) == 0);
-		ZETestCheckEqual(StringB, ExpectedResult);
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			ZEString StringE = "Işık Ilık";
+			std::string StringF = "Süt İç";
+			std::string StringG = "Işık Ilık";
+
+			ZETestCheck(StringE == StringG);
+			ZETestCheck(!(StringE == StringF));
+		}
 	}
 
 	ZETest("void ZEString::Remove(ZESize Position, ZEUInt Count = 1)")
@@ -633,8 +1705,19 @@ ZETestSuite(ZEString)
 		ZEUInt Count = 5;
 
 		String.Remove(Position, Count);
-		ZETestCheckEqual(String, "12390");
-		ZETestCheckEqual(String.GetLength(), 5);
+		ZETestCheck(String == "12390");
+		ZETestCheck(String.GetLength() == 5);
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			String = "Işık Ilık Süt İç";
+			Position = 9;
+			Count = 7;
+
+			String.Remove(Position, Count);
+			ZETestCheck(String == "Işık Ilık");
+			ZETestCheck(String.GetLength() == 9);
+		}
 	}
 
 	ZETest("ZEString ZEString::Right(ZESize Count) const")
@@ -643,18 +1726,40 @@ ZETestSuite(ZEString)
 
 		ZETestCase("ZEString is empty")
 		{
-			ZETestCheckEqual(String.Right(0), "");
+			ZETestCheck(String.Right(0) == "");
 		}
 		
 		ZETestCase("ZEString has a value")
 		{
 			String = "1234Test5678";
 
-			ZETestCheckEqual(String.Right(0), "");
-			ZETestCheckEqual(String.Right(1), "8");
-			ZETestCheckEqual(String.Right(4), "5678");
-			ZETestCheckEqual(String.Right(12), "1234Test5678");
+			ZETestCheck(String.Right(0) == "");
+			ZETestCheck(String.Right(1) == "8");
+			ZETestCheck(String.Right(4) == "5678");
+			ZETestCheck(String.Right(12) == "1234Test5678");
 		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			String = "Işık Ilık Süt İç";
+
+			ZETestCheck(String.Right(0) == "");
+			ZETestCheck(String.Right(1) == "ç");
+			ZETestCheck(String.Right(6) == "Süt İç");
+			ZETestCheck(String.Right(11) == "Ilık Süt İç");
+		}
+	}
+
+	ZETest("void ZEString::SetBuffer(void* Buffer, ZESize Size)")
+	{
+		void* Buffer = new unsigned char[1];
+
+		ZEString String("String");
+		ZETestCheck(String.GetSize() == 7);
+
+		String.SetBuffer(Buffer, 1);
+		ZETestCheck(String == "");
+		ZETestCheck(String.GetSize() == 1);
 	}
 
 	ZETest("void ZEString::SetCharacter(ZESize Position, char Value)")
@@ -664,28 +1769,17 @@ ZETestSuite(ZEString)
 		ZESize Position = 5;
 
 		String.SetCharacter(Position, Value);
-		ZETestCheckEqual(String, "01234X6789");
-	}
+		ZETestCheck(String == "01234X6789");
 
-	ZETest("void ZEString::SetValue(bool Value, const char* TrueText, const char* FalseText)")
-	{
-		ZETestCase("ZEString value is set to True")
+		ZETestCase("UTF-8 encoding compatibility test")
 		{
-			ZEString StringA;
+			String = "Işık Ilık Süt İç";
+			const char* Value2 = "€";
 
-			StringA.SetValue(1, "True", "False");
-
-			ZETestCheckEqual(StringA, "True");
+			String.SetCharacter(15, Value2);
+			ZETestCheck(String[15] == "€");
+			ZETestCheck(String == "Işık Ilık Süt İ€");
 		}
-		ZETestCase("ZEString value is set to False")
-		{
-			ZEString StringB;
-
-			StringB.SetValue(0, "True", "False");
-
-			ZETestCheckEqual(StringB, "False");
-		}
-		
 	}
 
 	ZETest("void ZEString::SetValue(const char* String)")
@@ -695,56 +1789,282 @@ ZETestSuite(ZEString)
 
 		StringA.SetValue(StringB);
 
-		ZETestCheckEqual(StringA, "Lorem");
+		ZETestCheck(StringA == "Lorem");
 	}
 
-	ZETest("void ZEString::SetValue(float Value, ZEUInt Digits)")
+	ZETest("void ZEString::SetValue(const wchar_t* String)")
+	{
+		ZEString StringA;
+		wchar_t StringB[] = {8364, 0};
+
+		StringA.SetValue(StringB);
+
+		ZETestCheck(StringA == "€");
+	}
+
+	ZETest("void ZEString::SetValue(const ZEString& String)")
+	{
+		ZEString StringA("Test");
+		ZETestCheck(StringA.GetSize() == 5);
+		ZEString StringB("String");
+		ZETestCheck(StringB.GetSize() == 7);
+
+		StringA.SetValue(StringB);
+		ZETestCheck(StringA == "String");
+		ZETestCheck(StringA.GetSize() == 7);
+	}
+
+	ZETest("void ZEString::SetValue(const ZECharacter& Character)")
+	{
+		ZEString String;
+		const char* Temp = "€";
+		ZECharacter Character = "€";
+
+		String.SetValue(Character);
+
+		ZETestCheck(String == "€");
+	}
+
+	ZETest("void ZEString::SetValue(const std::string& String)")
+	{
+		ZEString StringA;
+		std::string StringB = "Lorem";
+
+		StringA.SetValue(StringB);
+
+		ZETestCheck(StringA == "Lorem");
+	}
+
+	ZETest("void ZEString::SetValue(const std::wstring& String)")
+	{
+		ZEString StringA;
+		wchar_t Temp[] = {8364, 0};
+		std::wstring StringB = std::wstring(Temp);
+
+		StringA.SetValue(StringB);
+
+		ZETestCheck(StringA == "€");
+	}
+
+	ZETest("void ZEString::SetValue(wchar_t Character)")
+	{
+		ZEString StringA;
+		wchar_t Character = 8364;
+
+		StringA.SetValue(Character);
+
+		ZETestCheck(StringA == "€");
+	}
+
+	ZETest("void ZEString::SetValue(float Value, const char* Format)")
 	{
 		float Value = 400.5525252f;
 		ZEString String;
-		ZEUInt Digits = 6;
-		String.SetValue(Value, Digits);
-		ZETestCheckEqual(String, "400.553");
+
+		String.SetValue(Value);
+		ZETestCheck(String == "400.552521");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "-8.1");
+			ZETestCheck(String == "400.6   ");
+		}
 	}
 
-	ZETest("void ZEString::SetValue(ZEInt Value, ZEUInt Base)")
+	ZETest("void ZEString::SetValue(double Value, const char* Format)")
 	{
+		double Value = 400.5525252;
 		ZEString String;
-		ZEInt Value = 10;
-		ZEUInt Base = 2;
 
-		String.SetValue(Value, Base);
-		ZETestCheckEqual(String, "1010");
+		String.SetValue(Value);
+		ZETestCheck(String == "400.552521");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "10.3");
+			ZETestCheck(String == "   400.553");
+		}
 	}
 
-	ZETest("void ZEString::SetValue(ZEUInt Value, ZEUInt Base)")
+	ZETest("void ZEString::SetValue(ZEInt8 Value, const char* Format)")
 	{
+		ZEInt8 Value = -20;
+
 		ZEString String;
-		ZEUInt Value = 6;
-		ZEUInt Base = 2;
+		String.SetValue(Value);
 
-		String.SetValue(Value, Base);
+		ZETestCheck(String == "-20");
 
-		ZETestCheckEqual(String, ZEString("110"));
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "x");
+			ZETestCheck(String == "ffffffec");
+		}
 	}
 
-	ZETest("ZEString::ZEString(const char * String)")
+	ZETest("void ZEString::SetValue(ZEInt16 Value, const char* Format)")
 	{
-		const char* StringA = "Lorem Ipsum";
+		ZEInt16 Value = -8765;
 
-		ZEString StringB(StringA);
+		ZEString String;
+		String.SetValue(Value);
 
-		ZETestCheckEqual(StringB, "Lorem Ipsum");
+		ZETestCheck(String == "-8765");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "d:8");
+			ZETestCheck(String == "   -8765");
+		}
 	}
 
-	ZETest("ZEString::ZEString(const ZEString & String)")
+	ZETest("void ZEString::SetValue(ZEInt32 Value, const char* Format)")
 	{
-		ZEString StringA = "Lorem Ipsum";
+		ZEInt32 Value = -87654321;
 
-		ZEString StringB(StringA);
+		ZEString String;
+		String.SetValue(Value);
 
-		ZETestCheckEqual(StringB, "Lorem Ipsum");
+		ZETestCheck(String == "-87654321");
 
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, ":");
+			ZETestCheck(String == "-87654321");
+		}
+	}
+
+	ZETest("void ZEString::SetValue(ZEInt64 Value, const char* Format)")
+	{
+		ZEInt64 Value = -87654321;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "-87654321");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "d:.12");
+			ZETestCheck(String == "-000087654321");
+		}
+	}
+
+	ZETest("void ZEString::SetValue(ZEUInt8 Value, const char* Format)")
+	{
+		ZEUInt8 Value = 90;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "90");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "c:4");
+			ZETestCheck(String == "   Z");
+		}
+	}
+
+	ZETest("void ZEString::SetValue(ZEUInt16 Value, const char* Format)")
+	{
+		ZEUInt16 Value = 8765;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "8765");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "X:-6");
+			ZETestCheck(String == "223D  ");
+		}
+	}
+
+	ZETest("void ZEString::SetValue(ZEUInt32 Value, const char* Format)")
+	{
+		ZEUInt32 Value = 987654;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "987654");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "d:.8");
+			ZETestCheck(String == "00987654");
+		}
+	}
+
+	ZETest("void ZEString::SetValue(ZEUInt64 Value, const char* Format)")
+	{
+		ZEUInt64 Value = 987654321;
+
+		ZEString String;
+		String.SetValue(Value);
+
+		ZETestCheck(String == "987654321");
+
+		ZETestCase("for Format != NULL")
+		{
+			String.SetValue(Value, "X:-10");
+			ZETestCheck(String == "3ADE68B1  ");
+		}
+	}
+
+	ZETest("void ZEString::SetValue(bool Value, const char* Format)")
+	{
+		ZETestCase("ZEString value is set to True")
+		{
+			ZEString StringA;
+
+			bool Value = 1;
+
+			StringA.SetValue(Value);
+
+			ZETestCheck(StringA == "true");
+		}
+		ZETestCase("ZEString value is set to False")
+		{
+			ZEString StringB;
+
+			bool Value = 0;
+
+			StringB.SetValue(Value);
+
+			ZETestCheck(StringB == "false");
+		}
+
+		ZETestCase("for Format != NULL")
+		{
+			ZEString StringC;
+
+			bool Value = 1;
+
+			StringC.SetValue(Value, "false");
+			ZETestCheck(StringC == "false");
+		}
+	}
+
+	ZETest("void ZEString::SetValue(void* Value, ZESize Size)")
+	{
+		void* Value = "Value";
+		ZEString String("String");
+		ZETestCheck(String.GetSize() == 7);
+
+		String.SetValue(Value, 0);
+		ZETestCheck(String == "");
+		ZETestCheck(String.GetSize() == 1);
+
+		String.SetValue(Value, 1);
+		ZETestCheck(String == "V");
+		ZETestCheck(String.GetSize() == 2);
+
+		String.SetValue(Value, 5);
+		ZETestCheck(String == "Value");
+		ZETestCheck(String.GetSize() == 6);
 	}
 
 	ZETest("ZEString ZEString::SubString(ZESize StartPosition, ZESize EndPosition) const")
@@ -753,54 +2073,217 @@ ZETestSuite(ZEString)
 
 		ZETestCase("ZEString is empty")
 		{
-			ZETestCheckEqual(String.SubString(0, 0), "");
+			ZETestCheck(String.SubString(0, 0) == "");
 		}
 
 		ZETestCase("ZEString has a value")
 		{
 			String = "1234Test5678";
-			ZETestCheckEqual(String.SubString(0, 0), "1");
-			ZETestCheckEqual(String.SubString(0, 1), "12");
-			ZETestCheckEqual(String.SubString(0, 3), "1234");
+			ZETestCheck(String.SubString(0, 0) == "1");
+			ZETestCheck(String.SubString(0, 1) == "12");
+			ZETestCheck(String.SubString(0, 3) == "1234");
 
-			ZETestCheckEqual(String.SubString(4, 4), "T");
-			ZETestCheckEqual(String.SubString(4, 5), "Te");
-			ZETestCheckEqual(String.SubString(4, 7), "Test");
+			ZETestCheck(String.SubString(4, 4) == "T");
+			ZETestCheck(String.SubString(4, 5) == "Te");
+			ZETestCheck(String.SubString(4, 7) == "Test");
 
-			ZETestCheckEqual(String.SubString(8, 8), "5");
-			ZETestCheckEqual(String.SubString(8, 9), "56");
-			ZETestCheckEqual(String.SubString(8, 11), "5678");
+			ZETestCheck(String.SubString(8, 8) == "5");
+			ZETestCheck(String.SubString(8, 9) == "56");
+			ZETestCheck(String.SubString(8, 11) == "5678");
+		}
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			String = "Işık Ilık Süt İç";
+
+			ZETestCheck(String.SubString(0, 0) == "I");
+			ZETestCheck(String.SubString(0, 1) == "Iş");
+			ZETestCheck(String.SubString(0, 3) == "Işık");
+
+			ZETestCheck(String.SubString(5, 5) == "I");
+			ZETestCheck(String.SubString(5, 8) == "Ilık");
+			ZETestCheck(String.SubString(5, 12) == "Ilık Süt");
+
+			ZETestCheck(String.SubString(9, 12) == " Süt");
+			ZETestCheck(String.SubString(10, 13) == "Süt ");
+			ZETestCheck(String.SubString(10, 15) == "Süt İç");
 		}
 	}
 
 	ZETest("const char* ZEString::ToCString() const")
 	{
 		ZEString StringA = "Lorem Ipsum";
-		const char* StringB;
 
-		StringB = StringA.ToCString();
+		const char* StringB = StringA.ToCString();
 
-		ZETestCheck(strcmp(StringB, StringA.GetValue()) == 0);
+		ZETestCheck(StringA == StringB);
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık Süt İç";
+
+			StringB = StringA.ToCString();
+
+			ZETestCheck(StringA == StringB);
+		}
 	}
 
 	ZETest("std::string ZEString::ToStdString() const")
 	{
 		ZEString StringA = "Lorem Ipsum";
-		std::string StringB;
-		std::string ExpectedResult = "Lorem Ipsum";
 
-		StringB = StringA.ToStdString();
+		std::string StringB = StringA.ToStdString();
 
-		//ZETestCheck(strncmp(a.c_str(), A, A.GetSize()) == 0);
-		ZETestCheckEqual(StringB, ExpectedResult);
+		ZETestCheck(StringA == StringB);
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık Süt İç";
+
+			StringB = StringA.ToStdString();
+
+			ZETestCheck(StringA == StringB);
+		}
 	}
 
-	ZETest("ZEUINT32 ZEString::ToUInt() const")
+	ZETest("const wchar_t* ZEString::ToWCString()")
+	{
+		ZEString StringA = "Lorem Ipsum";
+
+		const wchar_t* StringB = StringA.ToWCString();
+
+		ZETestCheck(StringA == StringB);
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık Süt İç";
+
+			StringB = StringA.ToWCString();
+
+			ZETestCheck(StringA == StringB);
+		}
+	}
+
+	ZETest("std::string ZEString::ToStdString() const")
+	{
+		ZEString StringA = "Lorem Ipsum";
+
+		std::wstring StringB = StringA.ToWStdString();
+
+		ZETestCheck(StringA == StringB);
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			StringA = "Işık Ilık Süt İç";
+
+			StringB = StringA.ToWStdString();
+
+			ZETestCheck(StringA == StringB);
+		}
+	}
+
+	ZETest("float ZEString::ToFloat()")
+	{
+		ZEString String = "-255.046";
+
+		float Value = String.ToFloat();
+
+		ZETestCheckClose(Value, -255.04601f);
+	}
+
+	ZETest("double ZEString::ToDouble() const")
+	{
+		ZEString String = "-255.046";
+
+		double Value = String.ToDouble();
+
+		ZETestCheckClose(Value, -255.04601f);
+	}
+
+	ZETest("ZEInt8 ZEString::ToInt8() const")
+	{
+		ZEString StringA = "120";
+		ZEString StringB = "-120.043";
+
+		ZEInt8 ValueA = StringA.ToInt8();
+		ZEInt8 ValueB = StringB.ToInt8();
+
+		ZETestCheckEqual(ValueA, 120);
+		ZETestCheckEqual(ValueB, -120);
+	}
+
+	ZETest("ZEInt16 ZEString::ToInt16() const")
+	{
+		ZEString StringA = "255";
+		ZEString StringB = "-255.043";
+
+		ZEInt16 ValueA = StringA.ToInt16();
+		ZEInt16 ValueB = StringB.ToInt16();
+
+		ZETestCheckEqual(ValueA, 255);
+		ZETestCheckEqual(ValueB, -255);
+	}
+
+	ZETest("ZEInt32 ZEString::ToInt32() const")
+	{
+		ZEString StringA = "255";
+		ZEString StringB = "-255.043";
+
+		ZEInt32 ValueA = StringA.ToInt32();
+		ZEInt32 ValueB = StringB.ToInt32();
+
+		ZETestCheckEqual(ValueA, 255);
+		ZETestCheckEqual(ValueB, -255);
+	}
+
+	ZETest("ZEInt64 ZEString::ToInt64() const")
+	{
+		ZEString StringA = "255";
+		ZEString StringB = "-255.043";
+
+		ZEInt64 ValueA = StringA.ToInt64();
+		ZEInt64 ValueB = StringB.ToInt64();
+
+		ZETestCheckEqual(ValueA, 255);
+		ZETestCheckEqual(ValueB, -255);
+	}
+
+	ZETest("ZEUInt8 ZEString::ToUInt8() const")
 	{
 		ZEString String = "123";
-		ZEUInt32 ExpectedValue = 123;
+		ZEUInt8 ExpectedValue = 123;
 
-		ZEUInt32 Value = String.ToUInt();
+		ZEUInt8 Value = String.ToUInt8();
+
+		ZETestCheckEqual(Value, ExpectedValue);
+	}
+
+	ZETest("ZEUInt16 ZEString::ToUInt16() const")
+	{
+		ZEString String = "123";
+		ZEUInt16 ExpectedValue = 123;
+
+		ZEUInt16 Value = String.ToUInt16();
+
+		ZETestCheckEqual(Value, ExpectedValue);
+	}
+
+	ZETest("ZEUInt32 ZEString::ToUInt32() const")
+	{
+		ZEString String = "123456";
+		ZEUInt32 ExpectedValue = 123456;
+
+		ZEUInt32 Value = String.ToUInt32();
+
+		ZETestCheckEqual(Value, ExpectedValue);
+	}
+
+	ZETest("ZEUInt64 ZEString::ToUInt64() const")
+	{
+		ZEString String = "123456";
+		ZEUInt64 ExpectedValue = 123456;
+
+		ZEUInt64 Value = String.ToUInt64();
 
 		ZETestCheckEqual(Value, ExpectedValue);
 	}
@@ -808,64 +2291,250 @@ ZETestSuite(ZEString)
 	ZETest("ZEString ZEString::Trim() const")
 	{
 		ZEString String;
-		ZETestCheckEqual(String.Trim(), "");
+		ZETestCheck(String.Trim() == "");
 
 		String = "    ";
-		ZETestCheckEqual(String.Trim(), "");
+		ZETestCheck(String.Trim() == "");
 
 		String = "Lorem Ipsum";
-		ZETestCheckEqual(String.Trim(), "Lorem Ipsum");
+		ZETestCheck(String.Trim() == "Lorem Ipsum");
 
 		String = "   Lorem Ipsum   ";
-		ZETestCheckEqual(String.Trim(), "Lorem Ipsum");
+		ZETestCheck(String.Trim() == "Lorem Ipsum");
 
 		String = "\t\tLorem Ipsum\t\t";
-		ZETestCheckEqual(String.Trim(), "Lorem Ipsum");
+		ZETestCheck(String.Trim() == "Lorem Ipsum");
 
 		String = " \t \tLorem Ipsum \t \t";
-		ZETestCheckEqual(String.Trim(), "Lorem Ipsum");
+		ZETestCheck(String.Trim() == "Lorem Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			String = "Işık Ilık Süt İç";
+			ZETestCheck(String.Trim() == "Işık Ilık Süt İç");
+
+			String = "   Işık Ilık Süt İç   ";
+			ZETestCheck(String.Trim() == "Işık Ilık Süt İç");
+
+			String = "\t\tIşık Ilık Süt İç\t\t";
+			ZETestCheck(String.Trim() == "Işık Ilık Süt İç");
+
+			String = " \t \tIşık Ilık Süt İç \t \t";
+			ZETestCheck(String.Trim() == "Işık Ilık Süt İç");
+		}
+	}
+
+	ZETest("void ZEString::TrimSelf()")
+	{
+		ZEString String;
+
+		String.TrimSelf();
+		ZETestCheck(String == "");
+
+		String = "    ";
+		String.TrimSelf();
+		ZETestCheck(String == "");
+
+		String = "Lorem Ipsum";
+		String.TrimSelf();
+		ZETestCheck(String == "Lorem Ipsum");
+
+		String = "   Lorem Ipsum   ";
+		String.TrimSelf();
+		ZETestCheck(String == "Lorem Ipsum");
+
+		String = "\t\tLorem Ipsum\t\t";
+		String.TrimSelf();
+		ZETestCheck(String == "Lorem Ipsum");
+
+		String = " \t \tLorem Ipsum \t \t";
+		String.TrimSelf();
+		ZETestCheck(String == "Lorem Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			String = "Işık Ilık Süt İç";
+			String.TrimSelf();
+			ZETestCheck(String == "Işık Ilık Süt İç");
+
+			String = "   Işık Ilık Süt İç   ";
+			String.TrimSelf();
+			ZETestCheck(String == "Işık Ilık Süt İç");
+
+			String = "\t\tIşık Ilık Süt İç\t\t";
+			String.TrimSelf();
+			ZETestCheck(String == "Işık Ilık Süt İç");
+
+			String = " \t \tIşık Ilık Süt İç \t \t";
+			String.TrimSelf();
+			ZETestCheck(String == "Işık Ilık Süt İç");
+		}
 	}
 
 	ZETest("ZEString ZEString::TrimLeft() const")
 	{
 		ZEString String;
-		ZETestCheckEqual(String.TrimLeft(), "");
+		ZETestCheck(String.TrimLeft() == "");
 
 		String = "    ";
-		ZETestCheckEqual(String.TrimLeft(), "");
+		ZETestCheck(String.TrimLeft() == "");
 
 		String = "Lorem Ipsum";
-		ZETestCheckEqual(String.TrimLeft(), "Lorem Ipsum");
+		ZETestCheck(String.TrimLeft() == "Lorem Ipsum");
 
 		String = "   Lorem Ipsum   ";
-		ZETestCheckEqual(String.TrimLeft(), "Lorem Ipsum   ");
+		ZETestCheck(String.TrimLeft() == "Lorem Ipsum   ");
 
 		String = "\t\tLorem Ipsum\t\t";
-		ZETestCheckEqual(String.TrimLeft(), "Lorem Ipsum\t\t");
+		ZETestCheck(String.TrimLeft() == "Lorem Ipsum\t\t");
 
 		String = " \t \tLorem Ipsum \t \t";
-		ZETestCheckEqual(String.TrimLeft(), "Lorem Ipsum \t \t");
+		ZETestCheck(String.TrimLeft() == "Lorem Ipsum \t \t");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			String = "Işık Ilık Süt İç";
+			ZETestCheck(String.TrimLeft() == "Işık Ilık Süt İç");
+
+			String = "   Işık Ilık Süt İç   ";
+			ZETestCheck(String.TrimLeft() == "Işık Ilık Süt İç   ");
+
+			String = "\t\tIşık Ilık Süt İç\t\t";
+			ZETestCheck(String.TrimLeft() == "Işık Ilık Süt İç\t\t");
+
+			String = " \t \tIşık Ilık Süt İç \t \t";
+			ZETestCheck(String.TrimLeft() == "Işık Ilık Süt İç \t \t");
+		}
+	}
+
+	ZETest("void ZEString::TrimLeftSelf()")
+	{
+		ZEString String;
+
+		String.TrimLeftSelf();
+		ZETestCheck(String == "");
+
+		String = "    ";
+		String.TrimLeftSelf();
+		ZETestCheck(String == "");
+
+		String = "Lorem Ipsum";
+		String.TrimLeftSelf();
+		ZETestCheck(String == "Lorem Ipsum");
+
+		String = "   Lorem Ipsum   ";
+		String.TrimLeftSelf();
+		ZETestCheck(String == "Lorem Ipsum   ");
+
+		String = "\t\tLorem Ipsum\t\t";
+		String.TrimLeftSelf();
+		ZETestCheck(String == "Lorem Ipsum\t\t");
+
+		String = " \t \tLorem Ipsum \t \t";
+		String.TrimLeftSelf();
+		ZETestCheck(String == "Lorem Ipsum \t \t");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			String = "Işık Ilık Süt İç";
+			String.TrimLeftSelf();
+			ZETestCheck(String == "Işık Ilık Süt İç");
+
+			String = "   Işık Ilık Süt İç   ";
+			String.TrimLeftSelf();
+			ZETestCheck(String == "Işık Ilık Süt İç   ");
+
+			String = "\t\tIşık Ilık Süt İç\t\t";
+			String.TrimLeftSelf();
+			ZETestCheck(String == "Işık Ilık Süt İç\t\t");
+
+			String = " \t \tIşık Ilık Süt İç \t \t";
+			String.TrimLeftSelf();
+			ZETestCheck(String == "Işık Ilık Süt İç \t \t");
+		}
 	}
 
 	ZETest("ZEString ZEString::TrimRight() const")
 	{
 		ZEString String;
-		ZETestCheckEqual(String.TrimRight(), "");
+		ZETestCheck(String.TrimRight() == "");
 
 		String = "    ";
-		ZETestCheckEqual(String.TrimRight(), "");
+		ZETestCheck(String.TrimRight() == "");
 
 		String = "Lorem Ipsum";
-		ZETestCheckEqual(String.TrimRight(), "Lorem Ipsum");
+		ZETestCheck(String.TrimRight() == "Lorem Ipsum");
 
 		String = "   Lorem Ipsum   ";
-		ZETestCheckEqual(String.TrimRight(), "   Lorem Ipsum");
+		ZETestCheck(String.TrimRight() == "   Lorem Ipsum");
 
 		String = "\t\tLorem Ipsum\t\t";
-		ZETestCheckEqual(String.TrimRight(), "\t\tLorem Ipsum");
+		ZETestCheck(String.TrimRight() == "\t\tLorem Ipsum");
 
 		String = " \t \tLorem Ipsum \t \t";
-		ZETestCheckEqual(String.TrimRight(), " \t \tLorem Ipsum");
+		ZETestCheck(String.TrimRight() == " \t \tLorem Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			String = "Işık Ilık Süt İç";
+			ZETestCheck(String.TrimRight() == "Işık Ilık Süt İç");
+
+			String = "   Işık Ilık Süt İç   ";
+			ZETestCheck(String.TrimRight() == "   Işık Ilık Süt İç");
+
+			String = "\t\tIşık Ilık Süt İç\t\t";
+			ZETestCheck(String.TrimRight() == "\t\tIşık Ilık Süt İç");
+
+			String = " \t \tIşık Ilık Süt İç \t \t";
+			ZETestCheck(String.TrimRight() == " \t \tIşık Ilık Süt İç");
+		}
+	}
+
+	ZETest("void ZEString::TrimRightSelf()")
+	{
+		ZEString String;
+
+		String.TrimRightSelf();
+		ZETestCheck(String == "");
+
+		String = "    ";
+		String.TrimRightSelf();
+		ZETestCheck(String == "");
+
+		String = "Lorem Ipsum";
+		String.TrimRightSelf();
+		ZETestCheck(String == "Lorem Ipsum");
+
+		String = "   Lorem Ipsum   ";
+		String.TrimRightSelf();
+		ZETestCheck(String == "   Lorem Ipsum");
+
+		String = "\t\tLorem Ipsum\t\t";
+		String.TrimRightSelf();
+		ZETestCheck(String == "\t\tLorem Ipsum");
+
+		String = " \t \tLorem Ipsum \t \t";
+		String.TrimRightSelf();
+		ZETestCheck(String == " \t \tLorem Ipsum");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			String = "Işık Ilık Süt İç";
+			String.TrimRightSelf();
+			ZETestCheck(String == "Işık Ilık Süt İç");
+
+			String = "   Işık Ilık Süt İç   ";
+			String.TrimRightSelf();
+			ZETestCheck(String == "   Işık Ilık Süt İç");
+
+			String = "\t\tIşık Ilık Süt İç\t\t";
+			String.TrimRightSelf();
+			ZETestCheck(String == "\t\tIşık Ilık Süt İç");
+
+			String = " \t \tIşık Ilık Süt İç \t \t";
+			String.TrimRightSelf();
+			ZETestCheck(String == " \t \tIşık Ilık Süt İç");
+		}
 	}
 
 	ZETest(" ZEString ZEString::Upper() const")
@@ -880,32 +2549,172 @@ ZETestSuite(ZEString)
 		StringC = "DoLoR";
 		StringD = "";
 
-		ZETestCheckEqual(StringA.Upper(), "LOREM");
-		ZETestCheckEqual(StringB.Upper(), "IPSUM");
-		ZETestCheckEqual(StringC.Upper(), "DOLOR");
-		ZETestCheckEqual(StringD.Upper(), "");
+		ZETestCheck(StringA.Upper() == "LOREM");
+		ZETestCheck(StringB.Upper() == "IPSUM");
+		ZETestCheck(StringC.Upper() == "DOLOR");
+		ZETestCheck(StringD.Upper() == "");
+
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			//NO NON-ASCII Character Support at the moment.
+			ZETestCheck(false);
+		}
 	}
 
-	ZETest("float ZEString::ToFloat()")
+	ZETest("void ZEString::UpperSelf()")
 	{
-		ZEString String = "-255.046";
+		ZEString StringA = "lorem";
+		ZEString StringB = "IPSUM";
+		ZEString StringC = "DoLoR";
 
-		float Value = String.ToFloat();
+		StringA.UpperSelf();
+		StringB.UpperSelf();
+		StringC.UpperSelf();
 
-		ZETestCheckClose(Value, -255.04601f);
+		ZETestCheck(StringA == "LOREM");
+		ZETestCheck(StringB == "IPSUM");
+		ZETestCheck(StringC == "DOLOR");
 
+		ZETestCase("UTF-8 encoding compatibility test")
+		{
+			//NO NON-ASCII Character Support at the moment.
+			ZETestCheck(false);
+		}
 	}
 
-	ZETest("ZEInt ZEString::ToInt()")
+	ZETest("ZEString::ZEString(const char * String)")
 	{
-		ZEString StringA = "255";
-		ZEString StringB = "-255.043";
+		const char* StringA = "Lorem Ipsum";
 
-		ZEInt ValueA = StringA.ToInt();
-		ZEInt ValueB = StringB.ToInt();
+		ZEString StringB(StringA);
 
-		ZETestCheckEqual(ValueA, 255);
-		ZETestCheckEqual(ValueB, -255);
+		ZETestCheck(StringB == "Lorem Ipsum");
+	}
+
+	ZETest("ZEString::ZEString(const wchar_t* String)")
+	{
+		const wchar_t* StringA = L"Lorem Ipsum";
+
+		ZEString StringB(StringA);
+
+		ZETestCheck(StringB == L"Lorem Ipsum");
+	}
+
+	ZETest("ZEString::ZEString(const std::string& String)")
+	{
+		std::string StringA = "Lorem Ipsum";
+
+		ZEString StringB(StringA);
+
+		ZETestCheck(StringB == "Lorem Ipsum");
+	}
+
+	ZETest("ZEString::ZEString(const std::wstring& String)")
+	{
+		std::wstring StringA = L"Lorem Ipsum";
+
+		ZEString StringB(StringA);
+
+		ZETestCheck(StringB == L"Lorem Ipsum");
+	}
+
+	ZETest("ZEString::ZEString(const ZEString & String)")
+	{
+		ZEString StringA = "Lorem Ipsum";
+
+		ZEString StringB(StringA);
+
+		ZETestCheck(StringB == "Lorem Ipsum");
+	}
+
+	ZETest("ZEString::ZEString(ZEInt8 Value)")
+	{
+		ZEInt8 Value = -20;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "-20");
+	}
+
+	ZETest("ZEString::ZEString(ZEInt16 Value)")
+	{
+		ZEInt16 Value = -8765;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "-8765");
+	}
+
+	ZETest("ZEString::ZEString(ZEInt32 Value)")
+	{
+		ZEInt32 Value = -87654;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "-87654");
+	}
+
+	ZETest("ZEString::ZEString(ZEInt64 Value)")
+	{
+		ZEInt64 Value = -87654321;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "-87654321");
+	}
+
+	ZETest("ZEString::ZEString(ZEUInt8 Value)")
+	{
+		ZEUInt8 Value = 20;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "20");
+	}
+
+	ZETest("ZEString::ZEString(ZEUInt16 Value)")
+	{
+		ZEUInt16 Value = 8765;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "8765");
+	}
+
+	ZETest("ZEString::ZEString(ZEUInt32 Value)")
+	{
+		ZEUInt32 Value = 87654;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "87654");
+	}
+
+	ZETest("ZEString::ZEString(ZEUInt64 Value)")
+	{
+		ZEUInt64 Value = 87654321;
+
+		ZEString StringB(Value);
+
+		ZETestCheck(StringB == "87654321");
+	}
+
+	ZETest("ZEString::ZEString(float Value)")
+	{
+		float Value = 400.5525252f;
+
+		ZEString String(Value);
+
+		ZETestCheck(String == "400.552521");
+	}
+
+	ZETest("ZEString::ZEString(double Value)")
+	{
+		double Value = 400.5525252;
+
+		ZEString String(Value);
+
+		ZETestCheck(String == "400.552521");
 	}
 
 	ZETest("ZEString operator+(const char* String1, const ZEString& String2)")
@@ -916,7 +2725,128 @@ ZETestSuite(ZEString)
 
 		Result = StringB + StringA;
 
-		ZETestCheckEqual(Result, "Lorem Ipsum");
+		ZETestCheck(Result == "Lorem Ipsum");
+	}
+
+	ZETest("ZEString operator+(const wchar_t* String1, const ZEString& String2)")
+	{
+		ZEString StringA = "Ipsum";
+		const wchar_t* StringB = L"Lorem ";
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "Lorem Ipsum");
+	}
+
+	ZETest("ZEString operator+(ZEInt8 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEInt8 StringB = -20;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "-20 €");
+	}
+
+	ZETest("ZEString operator+(ZEInt16 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEInt16 StringB = -8765;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "-8765 €");
+	}
+
+	ZETest("ZEString operator+(ZEInt32 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEInt32 StringB = -87654;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "-87654 €");
+	}
+
+	ZETest("ZEString operator+(ZEInt64 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEInt64 StringB = -8765432;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "-8765432 €");
+	}
+
+	ZETest("ZEString operator+(ZEUInt8 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEUInt8 StringB = 20;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "20 €");
+	}
+
+	ZETest("ZEString operator+(ZEUInt16 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEUInt16 StringB = 8765;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "8765 €");
+	}
+
+	ZETest("ZEString operator+(ZEUInt32 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEUInt32 StringB = 87654;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "87654 €");
+	}
+
+	ZETest("ZEString operator+(ZEUInt64 Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		ZEUInt64 StringB = 8765432;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "8765432 €");
+	}
+
+	ZETest("ZEString operator+(float Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		float StringB = 400.5525252f;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "400.552521 €");
+	}
+
+	ZETest("ZEString operator+(double Value, const ZEString& String);")
+	{
+		ZEString StringA = " €";
+		double StringB = 400.5525252;
+		ZEString Result;
+
+		Result = StringB + StringA;
+
+		ZETestCheck(Result == "400.552521 €");
 	}
 
 	ZETest("bool operator==(const char* String1, const ZEString& String2)")
@@ -938,6 +2868,25 @@ ZETestSuite(ZEString)
 		}
 	}
 
+	ZETest("bool operator==(const wchar_t* String1, const ZEString& String2)")
+	{
+		ZETestCase("Strings are not equal")
+		{
+			const ZEString StringA = "Lorem";
+			const wchar_t* StringB = L"Ipsum";
+
+			ZETestCheck(!(StringB == StringA));
+		}
+
+		ZETestCase("Strings are equal")
+		{
+			const ZEString StringA = "Lorem Ipsum";
+			const wchar_t* StringB = L"Lorem Ipsum";
+
+			ZETestCheck(StringB == StringA);
+		}
+	}
+
 	ZETest("bool operator!=(const char* String1, const ZEString& String2)")
 	{
 		ZETestCase("Strings are not equal")
@@ -952,6 +2901,44 @@ ZETestSuite(ZEString)
 		{
 			const ZEString StringC = "Lorem";
 			const char* StringD = "Lorem";
+
+			ZETestCheck(!(StringD != StringC));
+		}
+	}
+
+	ZETest("bool operator!=(const wchar_t* String1, const ZEString& String2)")
+	{
+		ZETestCase("Strings are not equal")
+		{
+			const ZEString StringA = "Lorem";
+			const wchar_t* StringB = L"Ipsum";
+
+			ZETestCheck(StringB != StringA);
+		}
+
+		ZETestCase("Strings are equal")
+		{
+			const ZEString StringC = "Lorem";
+			const wchar_t* StringD = L"Lorem";
+
+			ZETestCheck(!(StringD != StringC));
+		}
+	}
+
+	ZETest("bool operator!=(const wchar_t* String1, const ZEString& String2)")
+	{
+		ZETestCase("Strings are not equal")
+		{
+			const ZEString StringA = "Lorem";
+			const wchar_t* StringB = L"Ipsum";
+
+			ZETestCheck(StringB != StringA);
+		}
+
+		ZETestCase("Strings are equal")
+		{
+			const ZEString StringC = "Lorem";
+			const wchar_t* StringD = L"Lorem";
 
 			ZETestCheck(!(StringD != StringC));
 		}

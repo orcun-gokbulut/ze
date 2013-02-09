@@ -159,6 +159,3 @@ ZEEntityRunAt ZECanvasBrushDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }
-
-
-

@@ -55,7 +55,7 @@ class ZEConsoleWindow : public ZEConsoleInterface
 		void					HideConsole();
 
 		void					Output(const char* OutputText);
-		void					TermiantionState();
+		void					TerminationState();
 
 		void					ProcessConsole();
 
@@ -63,8 +63,3 @@ class ZEConsoleWindow : public ZEConsoleInterface
 								~ZEConsoleWindow();
 };
 #endif
-
-
-
-
-

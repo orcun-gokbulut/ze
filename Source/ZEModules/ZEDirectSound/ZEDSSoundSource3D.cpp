@@ -629,7 +629,3 @@ void ZEDSSoundSource3D::SetConeOutsideVolume(ZEUInt NewOutsideVolume)
 	if (DSBuffer != NULL)
 		DS3DBuffer->SetConeOutsideVolume((DWORD)(ZEMath::Log10(EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f), DS3D_DEFERRED);
 }
-
-
-
-

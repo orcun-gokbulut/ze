@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZESceneCuller.h"
+#include "ZEDrawParameters.h"
 
 class ZEEntity;
 class ZECamera;
@@ -73,6 +74,8 @@ class ZEScene
 		ZECamera*						ActiveCamera;
 		ZEListener*						ActiveListener;
 
+		ZEDrawParameters				FrameDrawParameters;
+
 		void							Tick(ZEEntity* Entity, float ElapsedTime);
 
 	public:
@@ -80,10 +83,12 @@ class ZEScene
 		void							RemoveEntity(ZEEntity* Entity);
 
 		const ZESmartArray<ZEEntity*>&	GetEntities();
-		//ZEArray<ZEEntity*>			GetEntities(const char* ClassName);
 		ZEArray<ZEEntity*>				GetEntities(ZEObjectDescription* Desc);
 
 		void							ClearEntities();
+
+		ZESceneCuller&					GetSceneCuller();
+		const ZESceneStatistics&		GetStatistics() const;
 
 		ZERenderer*						GetRenderer();
 		ZEPhysicalWorld*				GetPhysicalWorld();

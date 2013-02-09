@@ -35,103 +35,262 @@
 
 #include "ZEUTextEditControl.h"
 #include "ZEFontResource.h"
-#include "ZEUIRenderer.h"
-#include "ZERenderer/ZEUIMaterial.h"
+#include "ZEGraphics/ZETexture2D.h"
 
-void ZEUITextEditControl::KeyPressed(unsigned char Key)
+void ZEUITextEditControl::KeyPressed(ZEUIInputKey Key)
 {
-	ZEString Manupilator = TextDisplayer.GetText();
+	ZEUIFrameControl::KeyPressed(Key);
 
-	if(Key != '\b')
+	if(Key == ZE_UI_IKB_BACKSPACE)
 	{
-		//Manupilator.Append(tolower(Key));
-		TextDisplayer.SetText(Manupilator);
-	}
-	else if (Key == '\b')
-	{	
-		if (Manupilator.GetLength() == 0)
+		if(Text.GetLength() != 0)
+		{
+			Text.Remove(Text.GetLength() - 1);
+			ZEString TempText = Text;
+			SetText(TempText);
 			return;
-
-		Manupilator.Remove(Manupilator.GetLength() - 1);
-		TextDisplayer.SetText(Manupilator);
+		}
 	}
-}	
+
+	switch(Key)
+	{
+		case ZE_UI_IKB_1:
+			Text.Append("1");
+			break;
+		case ZE_UI_IKB_2:
+			Text.Append("2");
+			break;
+		case ZE_UI_IKB_3:
+			Text.Append("3");
+			break;
+		case ZE_UI_IKB_4:
+			Text.Append("4");
+			break;
+		case ZE_UI_IKB_5:
+			Text.Append("5");
+			break;
+		case ZE_UI_IKB_6:
+			Text.Append("6");
+			break;
+		case ZE_UI_IKB_7:
+			Text.Append("7");
+			break;
+		case ZE_UI_IKB_8:
+			Text.Append("8");
+			break;
+		case ZE_UI_IKB_9:
+			Text.Append("9");
+			break;
+		case ZE_UI_IKB_0:
+			Text.Append("0");
+			break;
+		case ZE_UI_IKB_MINUS:
+			Text.Append("-");
+			break;
+		case ZE_UI_IKB_EQUALS:
+			Text.Append("=");
+			break;
+// 		case ZE_UI_IKB_TAB:
+// 			for (size_t I = 0; I < 4; I++)
+// 				Text.Append(" ");
+// 			break;
+		case ZE_UI_IKB_Q:
+			Text.Append("q");
+			break;
+		case ZE_UI_IKB_W:
+			Text.Append("w");
+			break;
+		case ZE_UI_IKB_E:
+			Text.Append("e");
+			break;
+		case ZE_UI_IKB_R:
+			Text.Append("r");
+			break;
+		case ZE_UI_IKB_T:
+			Text.Append("t");
+			break;
+		case ZE_UI_IKB_Y:
+			Text.Append("y");
+			break;
+		case ZE_UI_IKB_U:
+			Text.Append("u");
+			break;
+		case ZE_UI_IKB_I:
+			Text.Append("i");
+			break;
+		case ZE_UI_IKB_O:
+			Text.Append("o");
+			break;
+		case ZE_UI_IKB_P:
+			Text.Append("p");
+			break;
+		case ZE_UI_IKB_LBRACKET:
+			Text.Append("(");
+			break;
+		case ZE_UI_IKB_RBRACKET:
+			Text.Append(")");
+			break;
+		case ZE_UI_IKB_A:
+			Text.Append("a");
+			break;
+		case ZE_UI_IKB_S:
+			Text.Append("s");
+			break;
+		case ZE_UI_IKB_D:
+			Text.Append("d");
+			break;
+		case ZE_UI_IKB_F:
+			Text.Append("f");
+			break;
+		case ZE_UI_IKB_G:
+			Text.Append("g");
+			break;
+		case ZE_UI_IKB_H:
+			Text.Append("h");
+			break;
+		case ZE_UI_IKB_J:
+			Text.Append("j");
+			break;
+		case ZE_UI_IKB_K:
+			Text.Append("k");
+			break;
+		case ZE_UI_IKB_L:
+			Text.Append("l");
+			break;
+		case ZE_UI_IKB_SEMICOLON:
+			Text.Append(";");
+			break;
+		case ZE_UI_IKB_APOSTROPHE:
+			//Text.Append("");
+			break;
+		case ZE_UI_IKB_BACKSLASH:
+			Text.Append("\\");
+			break;
+		case ZE_UI_IKB_Z:
+			Text.Append("z");	
+			break;
+		case ZE_UI_IKB_X:
+			Text.Append("x");
+			break;
+		case ZE_UI_IKB_C:
+			Text.Append("c");
+			break;
+		case ZE_UI_IKB_V:
+			Text.Append("v");
+			break;
+		case ZE_UI_IKB_B:
+			Text.Append("b");
+			break;
+		case ZE_UI_IKB_N:
+			Text.Append("n");
+			break;
+		case ZE_UI_IKB_M:
+			Text.Append("m");
+			break;
+		case ZE_UI_IKB_COMMA:
+			Text.Append(",");
+			break;
+		case ZE_UI_IKB_PERIOD:
+			Text.Append(".");
+			break;
+		case ZE_UI_IKB_SLASH:
+			Text.Append("/");
+			break;
+		case ZE_UI_IKB_MULTIPLY:
+			Text.Append("*");
+			break;
+		case ZE_UI_IKB_SPACE:
+			Text.Append(" ");
+			break;
+		case ZE_UI_IKB_AT:
+			Text.Append("@");
+			break;
+		case ZE_UI_IKB_COLON:
+			break;
+		case ZE_UI_IKB_UNDERLINE:
+			Text.Append("_");
+			break;
+		case ZE_UI_IKB_DIVIDE:
+			Text.Append("/");
+			break;
+		default:
+			return;
+			break;
+	}
+
+	IsTextDirty = true;
+}
 
 void ZEUITextEditControl::Tick(float ElapsedTime)
 {
-	TotalTime = TotalTime + ElapsedTime;
+	ZEUILabel::Tick(ElapsedTime);
 
-	Cursor.Positions.LeftUp = ZEVector2(TextDisplayer.Output.Positions.RightDown.x - 1 , TextDisplayer.Output.Positions.RightDown.y - GetHeight());
-	Cursor.Positions.RightDown = TextDisplayer.Output.Positions.RightDown;
-
-	if (TotalTime > CursorBlinkTime)
+	if(IsTextDirty)
 	{
-		TotalTime = 0;
-		if (CursorVisible == true)
-			CursorVisible = false;
-
-		else if (CursorVisible == false)
-			CursorVisible= true;
+		UpdateCharacters();
+		IsTextDirty = false;
 	}
 }
 
 void ZEUITextEditControl::Draw(ZEUIRenderer* Renderer)
 {
-	ZEUIFrameControl::Draw(Renderer);
+	ZEUILabel::Draw(Renderer);
 
-	if (CursorVisible && TextDisplayer.GetFocused())
-		Renderer->AddRectangle(Cursor);
-}
+	if (GetFocused() && Cursor.GetVisible())
+	{
+		ZEVector2 CursorPosition;
+		Cursor.ZOrder = GetZOrder() + 2;
 
-void ZEUITextEditControl::SetMaterial(ZEMaterial* Material)
-{
+// 		if(Characters.GetCount() != 0)
+// 		{
+// 			ZEUIRectangle Temp;
+// 			Temp = Characters.GetLastItem().RenderableCharacter;
+// 			Temp.Positions.LeftUp += TextStartPosition + GetScreenPosition();
+// 			Temp.Positions.RightDown += TextStartPosition + GetScreenPosition();
+// 
+// 			CursorPosition = Temp.Positions.RightDown;
+// 			CursorPosition.y -= Characters.GetLastItem().FontCharacter.CharacterMetric.Height;
+// 			Cursor.SetPostion(CursorPosition);
+// 		}
+// 		else
+// 			Cursor.SetPostion(TextStartPosition + GetScreenPosition() + TextMargin);
 	
-}
-
-ZEMaterial* ZEUITextEditControl::GetMaterial() const
-{
-	return NULL;
-}
-
-void ZEUITextEditControl::SetWidth(float Width)
-{
-	ZEUIFrameControl::SetWidth(Width);
-	TextDisplayer.SetWidth(Width);
-}
-
-void ZEUITextEditControl::SetHeight(float Height)
-{
-	ZEUIFrameControl::SetHeight(Height);
-	TextDisplayer.SetHeight(Height);
+		ZEUIRectangle Output;
+	
+		if(!ZEUIRectangle::Clip(Output, Cursor, GetVisibleRectangle()))
+			Renderer->AddRectangle(Output);
+	}
 }
 
 ZEUITextEditControl::ZEUITextEditControl()
 {
-	Cursor.Material = ZEUIMaterial::CreateInstance();
-	Cursor.Color = ZEVector4::UnitY;
+	SetFocusable(true);
+	SetMoveable(true);
+	IsTextDirty = false;
+}
 
-	TextDisplayer.SetSize(ZEVector2(400, 25));
-	TextDisplayer.SetBackgroundColor(ZEVector4(1.0f, 0.0f, 0.0f, 1.0f));
-	TextDisplayer.SetTextColor(ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
-	TextDisplayer.SetText("Single Line Text Edit");
-	TextDisplayer.SetTextWrap(false);
-	TextDisplayer.SetFontSize(ZEVector2::One);
-	TextDisplayer.SetFont(ZEFontResource::LoadResource("OldEnglish.zeFont"));
+const ZEMaterial* ZEUITextEditControl::GetCursorMaterial() const
+{
+	return Cursor.Material; 
+}
 
-	SetWidth(400);
-	SetHeight(24);
+void ZEUITextEditControl::SetCursorColor(const ZEVector4& Color)
+{
+	Cursor.Color = Color;
+}
 
-	SetPosition(ZEVector2::Zero);
-	TextDisplayer.SetPosition(ZEVector2(1,1));
+const ZEVector4& ZEUITextEditControl::GetCursorColor() const
+{
+	return Cursor.Color;
+}
 
-	AddChildControl(&TextDisplayer);
+void ZEUITextEditControl::SetReadOnly(bool ReadOnly)
+{
+	IsReadOnly = ReadOnly;
+	SetFocusable(!IsReadOnly);
+}
 
-	TextDisplayer.SetFocusable(true);
-
-	TextDisplayer.SetKeyPressedEvent(BindDelegate(this, &ZEUITextEditControl::KeyPressed));
-
-	CursorBlinkTime = 0.5f;
-	TotalTime = 0;
-	CursorVisible = false;
-	Frame.Color = ZEVector4(0.6f, 0.6f, 0.6f, 1.0f);
+bool ZEUITextEditControl::GetReadOnly()
+{
+	return IsReadOnly;
 }

@@ -243,7 +243,7 @@ void ZERenderStage::DestroyBuffers()
 	ZE_DESTROY(StageBuffer);
 }
 
-const ZEDeviceState* ZERenderStage::GetDefaultStates() const
+const ZEGraphicsDeviceState* ZERenderStage::GetDefaultStates() const
 {
 	return &DefaultStates;
 }

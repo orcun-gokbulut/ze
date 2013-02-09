@@ -78,6 +78,7 @@ class ZERenderer
 		ZEVector2						GetShadowMapDimension() const;
 		
 		virtual void					AddToLightList(ZELight* Light);
+		virtual void					AddToLightList(const ZESmartArray<ZELight*>& Lights);
 		virtual void					ClearLightList();
 
 		virtual void					AddToRenderList(ZERenderCommand* RenderCommand);

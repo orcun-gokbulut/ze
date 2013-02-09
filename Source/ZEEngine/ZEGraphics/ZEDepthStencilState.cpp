@@ -38,7 +38,7 @@
 
 #include <string.h>
 
-void ZEDeviceStateDepthStencil::UpdateHash()
+void ZEDepthStencilState::UpdateHash()
 {
 	if (Dirty)
 	{
@@ -48,7 +48,7 @@ void ZEDeviceStateDepthStencil::UpdateHash()
 	}
 }
 
-void ZEDeviceStateDepthStencil::SetZTestEnable(bool Enable)
+void ZEDepthStencilState::SetZTestEnable(bool Enable)
 {
 	if (StateData.ZTestEnable != Enable)
 	{
@@ -57,12 +57,12 @@ void ZEDeviceStateDepthStencil::SetZTestEnable(bool Enable)
 	}
 }
 
-bool ZEDeviceStateDepthStencil::GetZTestEnable() const
+bool ZEDepthStencilState::GetZTestEnable() const
 {
 	return StateData.ZTestEnable;
 }
 
-void ZEDeviceStateDepthStencil::SetStencilTestEnable(bool Enable)
+void ZEDepthStencilState::SetStencilTestEnable(bool Enable)
 {
 	if (StateData.StencilTestEnable != Enable)
 	{
@@ -71,12 +71,12 @@ void ZEDeviceStateDepthStencil::SetStencilTestEnable(bool Enable)
 	}
 }
 
-bool ZEDeviceStateDepthStencil::GetStencilTestEnable() const
+bool ZEDepthStencilState::GetStencilTestEnable() const
 {
 	return StateData.StencilTestEnable;
 }
 
-void ZEDeviceStateDepthStencil::SetZWriteEnable(bool Enable)
+void ZEDepthStencilState::SetZWriteEnable(bool Enable)
 {
 	if (StateData.ZWriteEnable != Enable)
 	{
@@ -85,12 +85,12 @@ void ZEDeviceStateDepthStencil::SetZWriteEnable(bool Enable)
 	}
 }
 
-bool ZEDeviceStateDepthStencil::GetZWriteEnable() const
+bool ZEDepthStencilState::GetZWriteEnable() const
 {
 	return StateData.ZWriteEnable;
 }
 
-void ZEDeviceStateDepthStencil::SetStencilWriteMask(ZEUInt8 Mask)
+void ZEDepthStencilState::SetStencilWriteMask(ZEUInt8 Mask)
 {
 	if (StateData.StencilWriteMask != Mask)
 	{
@@ -99,12 +99,12 @@ void ZEDeviceStateDepthStencil::SetStencilWriteMask(ZEUInt8 Mask)
 	}
 }
 
-ZEUInt8 ZEDeviceStateDepthStencil::GetStencilWriteMask() const
+ZEUInt8 ZEDepthStencilState::GetStencilWriteMask() const
 {
 	return StateData.StencilWriteMask;
 }
 
-void ZEDeviceStateDepthStencil::SetStencilReadMask(ZEUInt8 Mask)
+void ZEDepthStencilState::SetStencilReadMask(ZEUInt8 Mask)
 {
 	if (StateData.StencilReadMask != Mask)
 	{
@@ -113,12 +113,12 @@ void ZEDeviceStateDepthStencil::SetStencilReadMask(ZEUInt8 Mask)
 	}
 }
 
-ZEUInt8 ZEDeviceStateDepthStencil::GetStencilReadMask() const
+ZEUInt8 ZEDepthStencilState::GetStencilReadMask() const
 {
 	return StateData.StencilReadMask;
 }
 
-void ZEDeviceStateDepthStencil::SetStencilReferance(ZEUInt32 Value)
+void ZEDepthStencilState::SetStencilReferance(ZEUInt32 Value)
 {
 	if (StateData.StencilReferance != Value)
 	{
@@ -127,12 +127,12 @@ void ZEDeviceStateDepthStencil::SetStencilReferance(ZEUInt32 Value)
 	}
 }
 
-ZEUInt32 ZEDeviceStateDepthStencil::GetStencilReferance() const
+ZEUInt32 ZEDepthStencilState::GetStencilReferance() const
 {
 	return StateData.StencilReferance;
 }
 
-void ZEDeviceStateDepthStencil::SetZFunction(ZEComparisonFunction Function)
+void ZEDepthStencilState::SetZFunction(ZEComparisonFunction Function)
 {
 	if (StateData.ZFunction != Function)
 	{
@@ -141,12 +141,12 @@ void ZEDeviceStateDepthStencil::SetZFunction(ZEComparisonFunction Function)
 	}
 }
 
-ZEComparisonFunction ZEDeviceStateDepthStencil::GetZFunction() const
+ZEComparisonFunction ZEDepthStencilState::GetZFunction() const
 {
 	return StateData.ZFunction;
 }
 
-void ZEDeviceStateDepthStencil::SetFrontStencilFail(ZEStencilOperation Operation)
+void ZEDepthStencilState::SetFrontStencilFail(ZEStencilOperation Operation)
 {
 	if (StateData.FrontStencilFailOperation != Operation)
 	{
@@ -155,12 +155,12 @@ void ZEDeviceStateDepthStencil::SetFrontStencilFail(ZEStencilOperation Operation
 	}
 }
 
-ZEStencilOperation ZEDeviceStateDepthStencil::GetFrontStencilFail() const
+ZEStencilOperation ZEDepthStencilState::GetFrontStencilFail() const
 {
 	return StateData.FrontStencilFailOperation;
 }
 
-void ZEDeviceStateDepthStencil::SetFrontZFail(ZEStencilOperation Operation)
+void ZEDepthStencilState::SetFrontZFail(ZEStencilOperation Operation)
 {
 	if (StateData.FrontZFailOperation != Operation)
 	{
@@ -169,12 +169,12 @@ void ZEDeviceStateDepthStencil::SetFrontZFail(ZEStencilOperation Operation)
 	}
 }
 
-ZEStencilOperation ZEDeviceStateDepthStencil::GetFrontZFail() const
+ZEStencilOperation ZEDepthStencilState::GetFrontZFail() const
 {
 	return StateData.FrontZFailOperation;
 }
 
-void ZEDeviceStateDepthStencil::SetFrontStencilPass(ZEStencilOperation Operation)
+void ZEDepthStencilState::SetFrontStencilPass(ZEStencilOperation Operation)
 {
 	if (StateData.FrontStencilPassOperation != Operation)
 	{
@@ -183,12 +183,12 @@ void ZEDeviceStateDepthStencil::SetFrontStencilPass(ZEStencilOperation Operation
 	}
 }
 
-ZEStencilOperation ZEDeviceStateDepthStencil::GetFrontStencilPass() const
+ZEStencilOperation ZEDepthStencilState::GetFrontStencilPass() const
 {
 	return StateData.FrontStencilPassOperation;
 }
 
-void ZEDeviceStateDepthStencil::SetFrontStencilFunction(ZEComparisonFunction Function)
+void ZEDepthStencilState::SetFrontStencilFunction(ZEComparisonFunction Function)
 {
 	if (StateData.FrontStencilFunction != Function)
 	{
@@ -197,12 +197,12 @@ void ZEDeviceStateDepthStencil::SetFrontStencilFunction(ZEComparisonFunction Fun
 	}
 }
 
-ZEComparisonFunction ZEDeviceStateDepthStencil::GetFrontStencilFunction() const
+ZEComparisonFunction ZEDepthStencilState::GetFrontStencilFunction() const
 {
 	return StateData.FrontStencilFunction;
 }
 
-void ZEDeviceStateDepthStencil::SetBackStencilFail(ZEStencilOperation Operation)
+void ZEDepthStencilState::SetBackStencilFail(ZEStencilOperation Operation)
 {
 	if (StateData.BackStencilFailOperation != Operation)
 	{
@@ -211,12 +211,12 @@ void ZEDeviceStateDepthStencil::SetBackStencilFail(ZEStencilOperation Operation)
 	}
 }
 
-ZEStencilOperation ZEDeviceStateDepthStencil::GetBackStencilFail() const
+ZEStencilOperation ZEDepthStencilState::GetBackStencilFail() const
 {
 	return StateData.BackStencilFailOperation;
 }
 
-void ZEDeviceStateDepthStencil::SetBackZFail(ZEStencilOperation Operation)
+void ZEDepthStencilState::SetBackZFail(ZEStencilOperation Operation)
 {
 	if (StateData.BackZFailOperation != Operation)
 	{
@@ -225,12 +225,12 @@ void ZEDeviceStateDepthStencil::SetBackZFail(ZEStencilOperation Operation)
 	}
 }
 
-ZEStencilOperation ZEDeviceStateDepthStencil::GetBackZFail() const
+ZEStencilOperation ZEDepthStencilState::GetBackZFail() const
 {
 	return StateData.BackZFailOperation;
 }
 
-void ZEDeviceStateDepthStencil::SetBackStencilPass(ZEStencilOperation Operation)
+void ZEDepthStencilState::SetBackStencilPass(ZEStencilOperation Operation)
 {
 	if (StateData.BackStencilPassOperation != Operation)
 	{
@@ -239,12 +239,12 @@ void ZEDeviceStateDepthStencil::SetBackStencilPass(ZEStencilOperation Operation)
 	}
 }
 
-ZEStencilOperation ZEDeviceStateDepthStencil::GetBackStencilPass() const
+ZEStencilOperation ZEDepthStencilState::GetBackStencilPass() const
 {
 	return StateData.BackStencilPassOperation;
 }
 
-void ZEDeviceStateDepthStencil::SetBackStencilFunction(ZEComparisonFunction Function)
+void ZEDepthStencilState::SetBackStencilFunction(ZEComparisonFunction Function)
 {
 	if (StateData.BackStencilFunction != Function)
 	{
@@ -253,12 +253,12 @@ void ZEDeviceStateDepthStencil::SetBackStencilFunction(ZEComparisonFunction Func
 	}
 }
 
-ZEComparisonFunction ZEDeviceStateDepthStencil::GetBackStencilFunction() const
+ZEComparisonFunction ZEDepthStencilState::GetBackStencilFunction() const
 {
 	return StateData.BackStencilFunction;
 }
 
-void ZEDeviceStateDepthStencil::SetToDefault()
+void ZEDepthStencilState::SetToDefault()
 {
 	Hash = 0;
 	Dirty = false;
@@ -282,7 +282,7 @@ void ZEDeviceStateDepthStencil::SetToDefault()
 	UpdateHash();
 }
 
-const ZEDeviceStateDepthStencil& ZEDeviceStateDepthStencil::operator=(const ZEDeviceStateDepthStencil& State)
+const ZEDepthStencilState& ZEDepthStencilState::operator=(const ZEDepthStencilState& State)
 {
 	Hash = State.Hash;
 	Dirty = State.Dirty;
@@ -290,23 +290,23 @@ const ZEDeviceStateDepthStencil& ZEDeviceStateDepthStencil::operator=(const ZEDe
 	return *this;
 }
 
-bool ZEDeviceStateDepthStencil::operator==(const ZEDeviceStateDepthStencil& State)
+bool ZEDepthStencilState::operator==(const ZEDepthStencilState& State)
 {
 	return memcmp(&StateData, &State.StateData, sizeof(ZEDepthStencilStateData)) == 0 ? true : false;
 }
 
-bool ZEDeviceStateDepthStencil::operator!=(const ZEDeviceStateDepthStencil& State)
+bool ZEDepthStencilState::operator!=(const ZEDepthStencilState& State)
 {
 	return !operator==(State);
 }
 
-ZEDeviceStateDepthStencil::ZEDeviceStateDepthStencil()
+ZEDepthStencilState::ZEDepthStencilState()
 {
 	memset(&StateData, 0, sizeof(ZEDepthStencilStateData));
 	SetToDefault();
 }
 
-ZEDeviceStateDepthStencil::~ZEDeviceStateDepthStencil()
+ZEDepthStencilState::~ZEDepthStencilState()
 {
 
 }

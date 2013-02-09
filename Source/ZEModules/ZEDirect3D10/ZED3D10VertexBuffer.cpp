@@ -44,7 +44,7 @@ const ID3D10Buffer* ZED3D10VertexBuffer::GetD3D10Buffer() const
 	return D3D10Buffer;
 }
 
-bool ZED3D10VertexBuffer::CreateDynamic(ZEUInt VertexCount, ZESize VertexSize)
+bool ZED3D10VertexBuffer::CreateDynamic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData)
 {	
 	zeDebugCheck(VertexSize == 0, "Zero vertex size");
 	zeDebugCheck(VertexCount == 0, "Zero vertex count.");
@@ -58,7 +58,12 @@ bool ZED3D10VertexBuffer::CreateDynamic(ZEUInt VertexCount, ZESize VertexSize)
 	BufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
 	BufferDesc.ByteWidth = VertexCount * (UINT)VertexSize;
 
-	if (FAILED(D3D10Device->CreateBuffer(&BufferDesc, NULL, &D3D10Buffer)))
+	D3D10_SUBRESOURCE_DATA InitialData;
+	InitialData.pSysMem = VertexData;
+	InitialData.SysMemPitch = 0;
+	InitialData.SysMemSlicePitch = 0;
+
+	if (FAILED(D3D10Device->CreateBuffer(&BufferDesc, VertexData == NULL ? NULL : &InitialData, &D3D10Buffer)))
 	{
 		zeError("Can not create dynamic vertex buffer.");
 		return false;

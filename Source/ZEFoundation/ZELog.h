@@ -39,6 +39,7 @@
 
 #include "ZEDS/ZEString.h"
 #include "ZEDLL.h"
+#include "ZEThread/ZELock.h"
 
 enum ZELogType
 {
@@ -50,12 +51,10 @@ enum ZELogType
 	ZE_LOG_DEBUG			= 0
 };
 
-#ifdef ZE_PLATFORM_COMPILER_GCC
-#define __ZINEK_FUNCTION__ __PRETTY_FUNCTION__
-#endif
-
 #ifdef ZE_PLATFORM_COMPILER_MSVC
-#define __ZINEK_FUNCTION__ __FUNCTION__
+    #define __ZINEK_FUNCTION__ __FUNCTION__
+#else
+    #define __ZINEK_FUNCTION__ __PRETTY_FUNCTION__
 #endif
 
 typedef void (*ZELogCallback)(const char* Module, ZELogType Type, const char* LogText);
@@ -76,6 +75,7 @@ class ZELog
 		ZEString			LogFileName;
 		ZELogCallback		LogCallback;
 		ZELogType			MinimumLogLevel;
+		ZELock				Lock;
 
 							ZELog();
 
@@ -98,7 +98,7 @@ class ZELog
 		void				Log(const char* Module, ZELogType Type, const char* Format, ...);
         void				Log(const char* Module, const char* Format, ...);
 
-		ZE_DLL_METHOD 
+		ZE_ENGINE_EXPORT 
 		static ZELog*		GetInstance();
 };
 

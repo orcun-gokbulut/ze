@@ -38,6 +38,7 @@
 #include "ZEMeta/ZEAnimation.h"
 #include "ZERenderStage.h"
 
+
 ZEMaterial::ZEMaterial()
 {
 	ShadowCaster = true;

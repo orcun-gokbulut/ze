@@ -46,6 +46,8 @@
 class ZEModel;
 struct ZEModelResourceMesh;
 class ZEPhysicsBody;
+class ZEPhysicalCloth;
+
 class ZEModelMesh
 {
 	friend class ZEModel;
@@ -62,11 +64,12 @@ class ZEModelMesh
 		ZEQuaternion						Rotation;
 
 		ZEMatrix4x4							LocalTransform;
-		ZEMatrix4x4							ModelTransform;
+/*		ZEMatrix4x4							ModelTransform;*/
 		ZEMatrix4x4							WorldTransform;
 
 		bool								PhysicsEnabled;
 		ZEPhysicalRigidBody*				PhysicalBody;
+		ZEPhysicalCloth*					PhysicalCloth;
 
 		bool								AutoLOD;
 		ZEUInt								ActiveLOD;
@@ -81,13 +84,15 @@ class ZEModelMesh
 	public:
 		const char*							GetName();
 		ZEPhysicalRigidBody*				GetPhysicalBody() { return PhysicalBody; }
+		ZEPhysicalCloth*					GetPhysicalCloth() { return PhysicalCloth; }
+		ZEModelMeshLOD*						GetFirstLOD() { return &LODs[0]; }
 
 		const ZEAABBox&						GetLocalBoundingBox();
 		const ZEAABBox&						GetModelBoundingBox();
 		const ZEAABBox&						GetWorldBoundingBox();
 
 		const ZEMatrix4x4&					GetLocalTransform();
-		const ZEMatrix4x4&					GetModelTransform();
+/*		const ZEMatrix4x4&					GetModelTransform();*/
 		const ZEMatrix4x4&					GetWorldTransform();
 				
 		void								SetLocalPosition(const ZEVector3& LocalPosition);
@@ -123,4 +128,3 @@ class ZEModelMesh
 											~ZEModelMesh();
 };
 #endif
-

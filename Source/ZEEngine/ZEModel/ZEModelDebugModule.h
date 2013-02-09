@@ -42,7 +42,7 @@
 #include "ZEInput/ZEInputMap.h"
 #include "ZEMath/ZEVector.h"
 
-class ZECharacter;
+class ZEGameCharacter;
 class ZEPointLight;
 class ZEProjectiveLight;
 class ZEGrid;
@@ -65,7 +65,7 @@ class ZEModelAnimationDebugModule : public ZEApplicationModule
 		ZEPointLight*			PointLight0;
 		ZEPointLight*			PointLight1;
 		ZEPointLight*			PointLight2;
-		ZECharacter*			Character;
+		ZEGameCharacter*			Character;
 		ZEInputMap				InputMap;
 		ZEDirectionalLight*		DirectionalLight;
 		ZEProjectiveLight*		ProjectiveLight;
@@ -82,8 +82,3 @@ class ZEModelAnimationDebugModule : public ZEApplicationModule
 };
 
 #endif
-
-
-
-
-

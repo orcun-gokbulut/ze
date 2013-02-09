@@ -45,7 +45,7 @@
 class ZEModel;
 class ZEModelAnimationTrack;
 
-ZE_META_ENTITY_DESCRIPTION(ZECharacter);
+ZE_META_ENTITY_DESCRIPTION(ZEGameCharacter);
 
 enum ZECharacterMovementStatus
 {
@@ -89,9 +89,9 @@ enum ZECharacterRecordingStatus
 
 class ZEProjectiveLight;
 
-class ZECharacter : public ZEEntity
+class ZEGameCharacter : public ZEEntity
 {
-	ZE_META_ENTITY(ZECharacter)
+	ZE_META_ENTITY(ZEGameCharacter)
 	private:
 		ZEChunkArray<ZECharacterRecordingKey, 29127> 
 									Records;
@@ -123,8 +123,8 @@ class ZECharacter : public ZEEntity
 
 	protected:
 
-									ZECharacter();
-									~ZECharacter();
+									ZEGameCharacter();
+									~ZEGameCharacter();
 
 	public:
 		float						TurnAngle;
@@ -178,7 +178,7 @@ class ZECharacter : public ZEEntity
 
 		virtual void				Tick(float ElapsedTime);
 
-		static ZECharacter*			CreateInstance();
+		static ZEGameCharacter*			CreateInstance();
 
 };
 
@@ -186,7 +186,7 @@ class ZECharacter : public ZEEntity
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-		<class name="ZECharacter" parent="ZEEntity" description="Player spawn point"/>
+		<class name="ZEGameCharacter" parent="ZEEntity" description="Player spawn point"/>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()

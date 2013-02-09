@@ -41,10 +41,22 @@
 class ZERandom
 {
 	public:
-		static float GetFloat();
-		static float GetFloatPositive();
-		static ZEInt GetInt();
-		static ZEUInt GetUInt();
+		static float		GetFloat();
+		static float		GetFloatPositive();
+		
+		static ZEInt		GetInt();
+		static ZEInt8		GetInt8();
+		static ZEInt16		GetInt16();
+		static ZEInt32		GetInt32();
+		static ZEInt64		GetInt64();
+		
+		static ZEUInt		GetUInt();
+		static ZEUInt8		GetUInt8();
+		static ZEUInt16		GetUInt16();
+		static ZEUInt32		GetUInt32();
+		static ZEUInt64		GetUInt64();
+
+		static bool			GetBool();
 };
 
 #endif

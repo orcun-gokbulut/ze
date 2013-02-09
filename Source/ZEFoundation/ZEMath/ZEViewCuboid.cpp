@@ -64,10 +64,10 @@ bool ZEViewCuboid::CullTest(const ZERectangle3D& Rectangle) const
 
 void ZEViewCuboid::Create(const ZEOBBox& OBBox)
 {
+	Box.Center = OBBox.Center;
+	Box.Right = OBBox.Right;
 	Box.Up = OBBox.Up;
 	Box.Front = OBBox.Front;
-	Box.Right = OBBox.Right;
-	Box.Center = OBBox.Center;
 	Box.HalfSize = OBBox.HalfSize;
 }
 

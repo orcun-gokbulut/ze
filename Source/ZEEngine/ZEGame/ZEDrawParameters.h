@@ -42,6 +42,7 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZEDrawStatistics.h"
 
 class ZELight;
 class ZECamera;
@@ -88,6 +89,8 @@ struct ZEDrawParameters
 	float					Time;
 	ZERenderer*				Renderer;
 	ZERenderPass			Pass;
+
+	ZEDrawStatistics		Statistics;
 
 	const ZEView*			View;
 	const ZERenderTarget*	ViewPort;

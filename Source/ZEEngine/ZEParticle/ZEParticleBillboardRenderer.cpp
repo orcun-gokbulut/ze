@@ -105,7 +105,7 @@ void ZEParticleBillboardRenderer::UpdateVertexBuffer(ZEDrawParameters* DrawParam
 
 	if (VertexBuffer->GetBufferSize() != ParticleCount * sizeof(ZEParticleVertex) * 6)
 	{
-		if (!VertexBuffer->CreateDynamic(ParticleCount * 6, sizeof(ZEParticleVertex)))
+		if (!VertexBuffer->CreateDynamic(ParticleCount * 6, sizeof(ZEParticleVertex), NULL))
 		{
 			zeError("Could not create particle vertex buffer.");
 			return;

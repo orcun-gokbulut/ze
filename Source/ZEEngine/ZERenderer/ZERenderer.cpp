@@ -51,6 +51,7 @@
 #include "ZERenderStageGeometry.h"
 #include "ZERenderStageTransparent.h"
 #include "ZERenderStagePostProcess.h"
+#include "ZEDS/ZEArray.h"
 
 static ZEInt RenderCommandCompare(const ZERenderCommand* A, const ZERenderCommand* B)
 {
@@ -150,6 +151,11 @@ ZEVector2 ZERenderer::GetShadowMapDimension() const
 void ZERenderer::AddToLightList(ZELight* Light)
 {
 	LightList.Add(Light);
+}
+
+void ZERenderer::AddToLightList(const ZESmartArray<ZELight*>& Lights)
+{
+	LightList.MassAdd(Lights.GetConstCArray(), Lights.GetCount());
 }
 
 void ZERenderer::ClearLightList()

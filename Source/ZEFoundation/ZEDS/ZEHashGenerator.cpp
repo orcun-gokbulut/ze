@@ -35,6 +35,34 @@
 
 #include "ZEHashGenerator.h"
 
+ZEUInt64 ZEHashGenerator::Hash(const char* String)
+{
+	ZEUInt64 HashOutput = 0;
+	while(*String != '\0')
+	{
+		HashOutput = (ZEUInt8)*String + (HashOutput << 6) + (HashOutput << 16) - HashOutput;
+		String++;
+	}
+
+	return HashOutput;
+}
+
+ZEUInt64 ZEHashGenerator::Hash(const ZEString& String)
+{
+	ZEUInt64 HashOutput = 0;
+	Hash(HashOutput, String.ToCString());
+	return HashOutput;
+}
+
+ZEUInt64 ZEHashGenerator::Hash(void* Value, ZESize Size)
+{
+	ZEUInt64 HashOutput = 0;
+	for (ZESize I = 0; I < Size; I++)
+		HashOutput = ((ZEUInt8*)Value)[I] + (HashOutput << 6) + (HashOutput << 16) - HashOutput;
+
+	return HashOutput;
+}
+
 void ZEHashGenerator::Hash(ZEUInt64& HashOutput, const char* String)
 {
 	while(*String != '\0')

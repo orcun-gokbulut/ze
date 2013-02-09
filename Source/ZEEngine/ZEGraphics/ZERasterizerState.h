@@ -59,7 +59,7 @@ enum ZECullDirection
 	ZE_CD_COUNTER_CLOCKWISE		= 3
 };
 
-class ZEDeviceStateRasterizer
+class ZERasterizerState
 {
 	friend class ZEGraphicsDevice;
 	friend class ZERasterizerStageData;
@@ -91,12 +91,12 @@ class ZEDeviceStateRasterizer
 
 		void							SetToDefault();
 
-		const ZEDeviceStateRasterizer&	operator=(const ZEDeviceStateRasterizer& State);
-		bool							operator==(const ZEDeviceStateRasterizer& State);
-		bool							operator!=(const ZEDeviceStateRasterizer& State);
+		const ZERasterizerState&		operator=(const ZERasterizerState& State);
+		bool							operator==(const ZERasterizerState& State);
+		bool							operator!=(const ZERasterizerState& State);
 
-										ZEDeviceStateRasterizer();
-		virtual							~ZEDeviceStateRasterizer();
+										ZERasterizerState();
+		virtual							~ZERasterizerState();
 };
 
 #endif

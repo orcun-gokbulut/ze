@@ -219,7 +219,7 @@ inline static D3D10_INPUT_CLASSIFICATION ZEVertexUsageToD3D10(ZEVertexUsage Usag
 	return Values[Usage];
 }
 
-ID3D10BlendState* ZED3D10StatePool::CreateD3D10BlendState(const ZEDeviceStateBlend* BlendState)
+ID3D10BlendState* ZED3D10StatePool::CreateD3D10BlendState(const ZEBlendState* BlendState)
 {
 	if (BlendStatePool.GetCount() >= ZE_D3D10_STATE_CACHE_CAPACITY)
 	{
@@ -254,7 +254,7 @@ ID3D10BlendState* ZED3D10StatePool::CreateD3D10BlendState(const ZEDeviceStateBle
 	return D3D10State;
 }
 
-ID3D10SamplerState* ZED3D10StatePool::CreateD3D10SamplerState(const ZEDeviceStateSampler* SamplerState)
+ID3D10SamplerState* ZED3D10StatePool::CreateD3D10SamplerState(const ZESamplerState* SamplerState)
 {
 	if (SamplerStatePool.GetCount() >= ZE_D3D10_STATE_CACHE_CAPACITY)
 	{
@@ -291,7 +291,7 @@ ID3D10SamplerState* ZED3D10StatePool::CreateD3D10SamplerState(const ZEDeviceStat
 	return D3D10State;
 }
 
-ID3D10RasterizerState* ZED3D10StatePool::CreateD3D10RasterizerState(const ZEDeviceStateRasterizer* RasterizerState)
+ID3D10RasterizerState* ZED3D10StatePool::CreateD3D10RasterizerState(const ZERasterizerState* RasterizerState)
 {
 	if (RasterizerStatePool.GetCount() >= ZE_D3D10_STATE_CACHE_CAPACITY)
 	{
@@ -323,7 +323,7 @@ ID3D10RasterizerState* ZED3D10StatePool::CreateD3D10RasterizerState(const ZEDevi
 	return D3D10State;
 }
 
-ID3D10DepthStencilState* ZED3D10StatePool::CreateD3D10DepthStencilState(const ZEDeviceStateDepthStencil* DepthStencilState)
+ID3D10DepthStencilState* ZED3D10StatePool::CreateD3D10DepthStencilState(const ZEDepthStencilState* DepthStencilState)
 {
 	if (DepthStencilStatePool.GetCount() >= ZE_D3D10_STATE_CACHE_CAPACITY)
 	{
@@ -376,7 +376,7 @@ ID3D10InputLayout* ZED3D10StatePool::CreateD3D10VertexLayout(const ZEVertexLayou
 		ElementDesc[I].SemanticName = Elements[I].Semantic;
 		ElementDesc[I].SemanticIndex = Elements[I].SemanticIndex;
 		ElementDesc[I].Format = ZEVertexElementTypeToD3D10(Elements[I].Type);
-		ElementDesc[I].InputSlot = Elements[I].Slot;
+		ElementDesc[I].InputSlot = Elements[I].StreamSlot;
 		ElementDesc[I].AlignedByteOffset = Elements[I].ByteOffset;
 		ElementDesc[I].InstanceDataStepRate = Elements[I].InstanceCount;
 		ElementDesc[I].InputSlotClass = ZEVertexUsageToD3D10(Elements[I].Usage);
@@ -492,7 +492,7 @@ ZEUInt ZED3D10StatePool::GetDepthStencilStateCount()
 	return (ZEUInt)DepthStencilStatePool.GetCount();
 }
 
-ID3D10BlendState* ZED3D10StatePool::GetBlendState(const ZEDeviceStateBlend* BlendState)
+ID3D10BlendState* ZED3D10StatePool::GetBlendState(const ZEBlendState* BlendState)
 {
 	ZESize Index = 0;
 	ZEUInt64 Hash = 0;
@@ -525,7 +525,7 @@ ID3D10BlendState* ZED3D10StatePool::GetBlendState(const ZEDeviceStateBlend* Blen
 	return CreateD3D10BlendState(BlendState);
 }
 
-ID3D10SamplerState* ZED3D10StatePool::GetSamplerState(const ZEDeviceStateSampler* SamplerState)
+ID3D10SamplerState* ZED3D10StatePool::GetSamplerState(const ZESamplerState* SamplerState)
 {
 	ZESize Index = 0;
 	ZEUInt64 Hash = 0;
@@ -558,7 +558,7 @@ ID3D10SamplerState* ZED3D10StatePool::GetSamplerState(const ZEDeviceStateSampler
 	return CreateD3D10SamplerState(SamplerState);
 }
 
-ID3D10RasterizerState* ZED3D10StatePool::GetRasterizerState(const ZEDeviceStateRasterizer* RasterizerState)
+ID3D10RasterizerState* ZED3D10StatePool::GetRasterizerState(const ZERasterizerState* RasterizerState)
 {
 	ZESize Index = 0;
 	ZEUInt64 Hash = 0;
@@ -591,7 +591,7 @@ ID3D10RasterizerState* ZED3D10StatePool::GetRasterizerState(const ZEDeviceStateR
 	return CreateD3D10RasterizerState(RasterizerState);
 }
 
-ID3D10DepthStencilState* ZED3D10StatePool::GetDepthStencilState(const ZEDeviceStateDepthStencil* DepthStencilState)
+ID3D10DepthStencilState* ZED3D10StatePool::GetDepthStencilState(const ZEDepthStencilState* DepthStencilState)
 {
 	ZESize Index = 0;
 	ZEUInt64 Hash = 0;

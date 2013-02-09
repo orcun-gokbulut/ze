@@ -59,7 +59,6 @@ class ZEPhysXPhysicalMesh : public ZEPhysicalMesh, private ZEPhysXComponentBase
 		NxTriangleMeshShapeDesc				TriangleMeshShapeDesc;	
 
 		ZEUInt32							CollisionFlags;
-		ZEPhysicalCollisionEventArgument	CollisionCallback;
 
 		ZEVector3							Scale;
 		bool								Enabled;
@@ -103,7 +102,3 @@ class ZEPhysXPhysicalMesh : public ZEPhysicalMesh, private ZEPhysXComponentBase
 };
 
 #endif
-
-
-
-

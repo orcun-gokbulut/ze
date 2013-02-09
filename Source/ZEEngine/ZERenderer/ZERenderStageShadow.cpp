@@ -41,9 +41,9 @@
 #include "ZEGame/ZEScene.h"
 #include "ZERenderer.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
-#include "ZEModules/ZEDirect3D9/ZEGraphicsEventTracer.h"
 #include "ZELight.h"
 #include "ZEGraphics/ZEGraphicsDeviceState.h"
+#include "ZEGraphics/ZEGraphicsEventTracer.h"
 
 void ZERenderStageShadow::DestroyShaders()
 {

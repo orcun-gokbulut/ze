@@ -33,7 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef	__ZE_LISTENER_H__
 #define __ZE_LISTENER_H__
 

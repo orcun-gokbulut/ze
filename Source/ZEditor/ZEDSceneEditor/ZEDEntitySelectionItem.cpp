@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDEntitySelectionItem.h"
-#include "ZEGraphics\ZECamera.h"
+#include "ZERenderer\ZECamera.h"
 
 void ZEDEntitySelectionItem::Update()
 {

@@ -56,7 +56,7 @@ void ZEThread::Run(void* Parameter)
     if (IsAlive())
 		return;
 
-	Handle = CreateThread(NULL, 0,  ThreadFunction, this, CREATE_SUSPENDED, NULL);
+	Handle = CreateThread(NULL, 0, ThreadFunction, this, 0, NULL);
 	if (Handle == NULL)
 		zeCriticalError("Can not create thread.");
 }
@@ -75,7 +75,7 @@ void ZEThread::Terminate()
 
 void ZEThread::Sleep(ZEUInt Milliseconds)
 {
-	zeDebugCheck(CurrentThread == this, "A thread can only use it's own sleep function.");
+	zeDebugCheck(CurrentThread != this, "A thread can only use it's own sleep function.");
 	::Sleep(Milliseconds);
 }
 
@@ -130,7 +130,7 @@ void ZEThread::Exit()
 		ExitThread(EXIT_SUCCESS);
 	}
 	else
-		Status == ZE_TS_EXITING;
+		Status = ZE_TS_EXITING;
 }
 
 
@@ -145,5 +145,12 @@ ZEThread::~ZEThread()
 	Exit();
 
 	if (Handle != NULL)
-		CloseHandle(Handle);
+
+		if (!CloseHandle(Handle))
+		zeCriticalError("Cannot close handle of the thread.");
+}
+
+ZEThread* ZEThread::GetCurrentThread()
+{
+	return CurrentThread;
 }

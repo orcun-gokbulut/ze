@@ -54,7 +54,7 @@ enum ZETextureFilterMode
 	ZE_TFM_ANISOTROPY			= 3
 };
 
-class ZEDeviceStateSampler
+class ZESamplerState
 {
 	friend class ZEGraphicsDevice;
 	friend class ZEDeviceStageShader;
@@ -118,12 +118,12 @@ class ZEDeviceStateSampler
 
 		void						SetToDefault();
 
-		const ZEDeviceStateSampler&	operator=(const ZEDeviceStateSampler& State);
-		bool						operator==(const ZEDeviceStateSampler& State);
-		bool						operator!=(const ZEDeviceStateSampler& State);
+		const ZESamplerState&	operator=(const ZESamplerState& State);
+		bool						operator==(const ZESamplerState& State);
+		bool						operator!=(const ZESamplerState& State);
 
-									ZEDeviceStateSampler();
-		virtual						~ZEDeviceStateSampler();
+									ZESamplerState();
+		virtual						~ZESamplerState();
 };
 
 #endif

@@ -39,8 +39,8 @@
 
 #include "ZETypes.h"
 #include "ZEGame\ZEEntity.h"
-#include "ZEGraphics\ZERenderCommand.h"
-#include "ZEGraphics\ZECanvas.h"
+#include "ZERenderer\ZERenderCommand.h"
+#include "ZERenderer\ZECanvas.h"
 
 class ZESimpleMaterial;
 class ZERenderer;

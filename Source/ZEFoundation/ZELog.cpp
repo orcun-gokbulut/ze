@@ -220,8 +220,14 @@ void ZELog::SetLogFileEnabled(bool Enabled)
 	time_t Temp = time(NULL);                          
 	memcpy(&FileTimeStamp, localtime(&Temp), sizeof(tm));
 
-	if (LogFileEnabled && LogFile == NULL)
-		LogFile = fopen(LogFileName, "a");
+	if (LogFileEnabled && LogFile == NULL && !LogFileName.IsEmpty())
+		LogFile = fopen(LogFileName.ToCString(), "a");
+
+	if (!LogFileEnabled && LogFile != NULL)
+	{
+		fclose((FILE*)LogFile);
+		LogFile = NULL;
+	}
 
 	if (LogFile != NULL)
 	{
@@ -240,12 +246,18 @@ bool ZELog::GetLogFileEnabled()
 
 void ZELog::SetLogFileName(const ZEString& FileName)
 {
+	if (LogFileName == FileName)
+		return;
+
 	LogFileName = FileName;
 	if (LogFile != NULL)
 	{
 		fclose((FILE*)LogFile);
-		LogFile = fopen(FileName, "a");
+		LogFile = NULL;
 	}
+
+	if (LogFileEnabled && !LogFileName.IsEmpty())
+		LogFile = fopen(FileName, "a");
 }
 
 const char* ZELog::GetLogFileName()
@@ -265,6 +277,11 @@ ZELogCallback ZELog::GetCallback()
 
 void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 {
+	Lock.Lock();
+
+	if (Type < GetMinimumLogLevel())
+		return;
+
 	char Buffer[4096];
 
 	va_list VList;
@@ -293,10 +310,17 @@ void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 
 	if (LogCallback != NULL)
 		LogCallback(Module, Type, Buffer);
+	
+	Lock.Unlock();
 }
 
 void ZELog::Log(const char* Module, const char* Format, ...)
 {
+	Lock.Lock();
+
+	if (ZE_LOG_INFO < GetMinimumLogLevel())
+		return;
+
 	char Buffer[4096];
 	va_list VList;
 	va_start(VList, Format);
@@ -324,7 +348,8 @@ void ZELog::Log(const char* Module, const char* Format, ...)
 
 	if (LogCallback != NULL)
 		LogCallback(Module, ZE_LOG_INFO, Buffer);
-
+	
+	Lock.Unlock();
 }
 
 ZELog::ZELog()

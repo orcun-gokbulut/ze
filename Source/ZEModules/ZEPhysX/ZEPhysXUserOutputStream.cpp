@@ -79,7 +79,3 @@ void ZEPhysXUserOutputStream::print(const char* Message)
 {
 	zeLog("PhysX", Message);
 }
-
-
-
-

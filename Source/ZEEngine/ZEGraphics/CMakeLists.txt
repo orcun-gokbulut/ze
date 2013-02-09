@@ -52,6 +52,8 @@ ze_add_source(ZERasterizerState.cpp 		Sources)
 ze_add_source(ZERasterizerState.h 			Sources Headers)
 ze_add_source(ZEVertexLayout.cpp			Sources)
 ze_add_source(ZEVertexLayout.h				Sources Headers)
+ze_add_source(ZEVertexTypes.cpp				Sources)
+ze_add_source(ZEVertexTypes.h				Sources Headers)
 
 ze_add_source(ZETexture.cpp 				Sources)
 ze_add_source(ZETexture.h 					Sources Headers)
@@ -90,7 +92,4 @@ ze_add_source(ZEShaderCompiler.h			Sources Headers)
 ze_add_library(ZEGraphics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI/ZEGraphics"
-	INSTALL_COMPONENT Header)
+	LIBS ZEFoundation)

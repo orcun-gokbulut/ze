@@ -41,6 +41,7 @@
 #include "ZERenderer/ZERenderer.h"
 #include "ZERenderer/ZESimpleMaterial.h"
 #include <NxDebugRenderable.h>
+#include <NxRay.h>
 
 static ZEVector4 NX_TO_ZE(NxU32 color)
 {        
@@ -58,12 +59,12 @@ ZEPhysXPhysicalWorld::ZEPhysXPhysicalWorld()
 	SceneDesc.groundPlane = false;
 	SceneDesc.simType = NX_SIMULATION_SW;
 	SceneDesc.upAxis = 1;
-	Visualize = false;
 	Enabled = true;
 }
 
 ZEPhysXPhysicalWorld::~ZEPhysXPhysicalWorld()
 {
+
 	Deinitialize();
 }
 
@@ -103,16 +104,6 @@ void ZEPhysXPhysicalWorld::SetGravity(const ZEVector3& Gravity)
 ZEVector3 ZEPhysXPhysicalWorld::GetGravity()
 {
 	return NX_TO_ZE(SceneDesc.gravity);
-}
-
-void ZEPhysXPhysicalWorld::SetVisualize(bool Enabled)
-{
-	Visualize = Enabled;
-}
-
-bool ZEPhysXPhysicalWorld::GetVisualize()
-{
-	return Visualize;
 }
 
 void ZEPhysXPhysicalWorld::SetEnabled(bool Enabled)
@@ -169,37 +160,12 @@ void ZEPhysXPhysicalWorld::Deinitialize()
 
 void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 {
-	
+
 }
 
 void ZEPhysXPhysicalWorld::Process(float ElapsedTime)
 {
-	NxU32 TransformCount = 0;
-	NxActiveTransform *ActiveTransforms = Scene->getActiveTransforms(TransformCount);
-
 	Scene->simulate(ElapsedTime);
-
-	for (ZESize I = 0; I < (ZESize)TransformCount; I++)
-	{
-		if (ActiveTransforms[I].userData != NULL)
-		{
-			const ZEPhysicalTransformChangeEvent& Callback = ((ZEPhysicalObject*)ActiveTransforms[I].userData)->GetTransformChangeEvent();
-			if (!Callback.empty())
-			{
-				ZEPhysicalTransformChangeEventArgument Change;
-
-				Change.NewPosition = NX_TO_ZE(ActiveTransforms[I].actor2World.t);
-
-				NxQuat Quat;
-				ActiveTransforms[I].actor2World.M.toQuat(Quat);
-				Change.NewRotation = NX_TO_ZE(Quat);
-
-				Change.PhysicalObject = ((ZEPhysicalObject*)ActiveTransforms[I].userData);
-
-				Callback(Change);
-			}
-		}
-	}
 
 	Scene->flushStream();
 }
@@ -214,8 +180,47 @@ void ZEPhysXPhysicalWorld::Update()
 {
 	Scene->fetchResults(NX_ALL_FINISHED, true);
 
+	NxU32 TransformCount = 0;
+	NxActiveTransform *ActiveTransforms = Scene->getActiveTransforms(TransformCount);
+
+	for (ZESize I = 0; I < (ZESize)TransformCount; I++)
+	{
+		if (ActiveTransforms[I].userData != NULL)
+		{
+			const ZEPhysicalTransformChangeEvent& Callback = ((ZEPhysicalObject*)ActiveTransforms[I].userData)->GetTransformChangeEvent();
+			if (Callback != NULL)
+			{
+				ZEVector3 NewPosition = NX_TO_ZE(ActiveTransforms[I].actor2World.t);
+
+				NxQuat Quat;
+				ActiveTransforms[I].actor2World.M.toQuat(Quat);
+				ZEQuaternion NewRotation = NX_TO_ZE(Quat);
+
+				ZEPhysicalObject* PhysicalObject = ((ZEPhysicalObject*)ActiveTransforms[I].userData);
+
+				Callback(PhysicalObject, NewPosition, NewRotation);
+			}
+		}
+	}
 }
 
+ZEPhysicalShape* ZEPhysXPhysicalWorld::RayCastToClosestShape(ZERay Ray, ZEPhysicsRayCastFilterShapeType Type, ZERayCastResultDetails& Result)
+{
+	if (!Ray.v.IsNormalized())
+		Ray.v.NormalizeSelf();
 
+	NxRay TempRay(ZE_TO_NX(Ray.p), ZE_TO_NX(Ray.v));
+	NxRaycastHit TempResult;
+	NxShape* TempShape = this->GetScene()->raycastClosestShape(TempRay, (NxShapesType)Type, TempResult);
 
+	if (TempShape != NULL)
+	{
+		Result.ImpactWorldPosition = NX_TO_ZE(TempResult.worldImpact);
+		Result.ImpactWorldNormal = NX_TO_ZE(TempResult.worldNormal);
+		Result.ImpactDistance = TempResult.distance;
 
+		return (ZEPhysicalShape*)TempShape->userData;
+	}
+	else
+		return NULL;
+}

@@ -49,15 +49,15 @@
 class ZECanvasVertex
 {
 	private:
-		static ZEVertexLayout VertexLayout;
+		static ZEVertexLayout			Layout;
 	
 	public:
-		ZEVector3		Position;
-		ZEVector3		Normal;		
-		ZEVector2		Texcoord;
-		ZEVector4		Color;
+		ZEVector3						Position;
+		ZEVector3						Normal;		
+		ZEVector2						Texcoord;
+		ZEVector4						Color;
 
-		static ZEVertexLayout*	GetVertexLayout();
+		static const ZEVertexLayout&	GetVertexLayout();
 };
 
 class ZEVertexBuffer;
@@ -144,7 +144,7 @@ class ZECanvas
 		void							SaveToFile(const ZEString& FileName);
 
 										ZECanvas();
-										~ZECanvas();
+		virtual							~ZECanvas();
 
 };
 

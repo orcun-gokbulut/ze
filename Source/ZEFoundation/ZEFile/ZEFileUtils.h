@@ -40,7 +40,8 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 
-#ifdef ZE_PLATFORM_WINDOWS
+#if defined ZE_PLATFORM_WINDOWS
+
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
 
@@ -48,15 +49,16 @@
 
 	struct ZEFileSearchStream
 	{
-		WIN32_FIND_DATA		Data;
+		WIN32_FIND_DATAW	Data;
 		HANDLE				Handle;
 	};
-#endif
 
-#ifdef ZE_PLATFORM_UNIX
+#elif defined ZE_PLATFORM_UNIX
+
     #include "fcntl.h"
     #include <time.h>
     #include <dirent.h>
+    #include <sys/stat.h>
 
 	typedef time_t ZEFileTimeOS;
 
@@ -66,18 +68,19 @@
 		DIR*        Directory;
 		ZEString    Name;
 	};
+
 #endif
 
 struct ZEFileTime
 {
-	ZEUInt16	Year;
-	ZEUInt16	Month;
-	ZEUInt16	DayOfWeek;
-	ZEUInt16	Day;
-	ZEUInt16	Hour;
-	ZEUInt16	Minute;
-	ZEUInt16	Second;
-	ZEUInt16	Milliseconds;
+	ZEInt	Year;
+	ZEInt	Month;
+	ZEInt	DayOfWeek;
+	ZEInt	Day;
+	ZEInt	Hour;
+	ZEInt	Minute;
+	ZEInt	Second;
+	ZEInt	Milliseconds;
 };
 
 class ZEFileUtils

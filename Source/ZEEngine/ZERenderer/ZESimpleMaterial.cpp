@@ -275,19 +275,19 @@ bool ZESimpleMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, cons
 	PixelShaderData->Unlock();
 	Device->SetPixelShaderBuffer(0, PixelShaderData);
 
-	ZEDeviceStateDepthStencil DepthStencilState;
+	ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
 	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING) == 0 ? false : true);
 	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
 	Device->SetDepthStencilState(DepthStencilState);
 	
-	ZEDeviceStateRasterizer RasterizerState;
+	ZERasterizerState RasterizerState;
 	RasterizerState.SetCullDirection(TwoSided ? ZE_CD_NONE : ZE_CD_COUNTER_CLOCKWISE);
 	RasterizerState.SetFillMode(Wireframe ? ZE_FM_WIREFRAME : ZE_FM_SOLID);
 	Device->SetRasterizerState(RasterizerState);
 	
 	// Setup Transparancy
-	ZEDeviceStateBlend BlendState;
+	ZEBlendState BlendState;
 	if (TransparancyMode != ZE_MTM_NONE)
 	{	
 		BlendState.SetBlendEnable(0, true);
@@ -317,7 +317,7 @@ bool ZESimpleMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, cons
 	}
 	Device->SetBlendState(BlendState);
 
-	ZEDeviceStateSampler SamplerState;
+	ZESamplerState SamplerState;
 	SamplerState.SetAddressU(TextureAddressModeU);
 	SamplerState.SetAddressV(TextureAddressModeV);
 	SamplerState.SetMinFilter(ZE_TFM_LINEAR);
@@ -373,19 +373,19 @@ bool ZESimpleMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* R
 	PixelShaderData->Unlock();
 	PixelShaderStage.SetBuffer(0, PixelShaderData);
 
-	static ZEDeviceStateDepthStencil DepthStencilState;
+	static ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
 	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING) == 0 ? false : true);
 	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
 	Device->SetDepthStencilState(&DepthStencilState);
 	
-	ZEDeviceStateRasterizer RasterizerState;
+	ZERasterizerState RasterizerState;
 	RasterizerState.SetCullDirection(TwoSided ? ZE_CD_NONE : ZE_CD_COUNTER_CLOCKWISE);
 	RasterizerState.SetFillMode(Wireframe ? ZE_FM_WIREFRAME : ZE_FM_SOLID);
 	Device->SetRasterizerState(&RasterizerState);
 	
 	// Setup Transparancy
-	static ZEDeviceStateBlend BlendState;
+	static ZEBlendState BlendState;
 	if (TransparancyMode != ZE_MTM_NONE)
 	{	
 		BlendState.SetBlendEnable(0, true);
@@ -414,7 +414,7 @@ bool ZESimpleMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* R
 		BlendState.SetBlendEnable(0, false);
 	}
 
-	static ZEDeviceStateSampler SamplerState;
+	static ZESamplerState SamplerState;
 	SamplerState.SetAddressU(TextureAddressModeU);
 	SamplerState.SetAddressV(TextureAddressModeV);
 	SamplerState.SetMinFilter(ZE_TFM_LINEAR);

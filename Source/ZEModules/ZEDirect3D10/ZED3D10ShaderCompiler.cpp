@@ -714,7 +714,7 @@ ZED3D10VertexShader* ZED3D10ShaderCompiler::CreateVertexShader(ID3D10Blob* ByteC
 		Elements[I].ByteOffset = D3D10_APPEND_ALIGNED_ELEMENT;
 		Elements[I].Usage = ZE_VU_PER_VERTEX;
 		Elements[I].InstanceCount = 0;
-		Elements[I].Slot = 0;
+		Elements[I].StreamSlot = 0;
 	}
 
 	ZED3D_RELEASE(Reflector);

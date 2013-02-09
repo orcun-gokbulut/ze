@@ -55,3 +55,48 @@ ZEUInt ZERandom::GetUInt()
 {
 	return rand();
 }
+
+ZEInt8 ZERandom::GetInt8()
+{
+	return rand();
+}
+
+ZEInt16 ZERandom::GetInt16()
+{
+	return rand();
+}
+
+ZEInt32 ZERandom::GetInt32()
+{
+	return GetUInt32();
+}
+
+ZEInt64 ZERandom::GetInt64()
+{
+	return GetUInt64();
+}
+
+ZEUInt8 ZERandom::GetUInt8()
+{
+	return rand();
+}
+
+ZEUInt16 ZERandom::GetUInt16()
+{
+	return rand();
+}
+
+ZEUInt32 ZERandom::GetUInt32()
+{
+	return (rand() << 16) | rand();
+}
+
+ZEUInt64 ZERandom::GetUInt64()
+{
+	return ((ZEUInt64)GetUInt32() << 32) | (ZEUInt64)GetUInt32();
+}
+
+bool ZERandom::GetBool()
+{
+	return rand() % 2 == 1;
+}

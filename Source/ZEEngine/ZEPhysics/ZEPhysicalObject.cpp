@@ -60,7 +60,3 @@ void ZEPhysicalObject::Destroy()
 	Deinitialize(); 
 	delete this;
 }
-
-
-
-

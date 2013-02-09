@@ -49,7 +49,3 @@ class ZEPhysXUserOutputStream : public NxUserOutputStream
 };
 
 #endif
-
-
-
-

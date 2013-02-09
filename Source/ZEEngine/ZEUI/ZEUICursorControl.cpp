@@ -36,7 +36,7 @@
 #include "ZEUICursorControl.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEInput/ZEInputModule.h"
-#include "ZEUI/ZEUIRenderer.h"
+#include "zeui/ZEUIRenderer.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
 #include "ZETexture/ZETexture2DResource.h"
@@ -61,6 +61,7 @@ void ZEUICursorControl::Draw(ZEUIRenderer* Renderer)
 		return;
 
 	ZEUIControl::Draw(Renderer);
+	Cursor.ZOrder = GetZOrder();
 	Renderer->AddRectangle(Cursor);
 }
 
@@ -68,7 +69,7 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 {
 	zeInput->ProcessInputMap(&InputMap);
 
-	for (ZESize I = 0; I < InputMap.InputActionCount; I++)
+	for (size_t I = 0; I < InputMap.InputActionCount; I++)
 	{
 		switch (InputMap.InputActions[I].Id)
 		{
@@ -128,7 +129,7 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 		}
 	}
 
-	ZEInt WindowWidth, WindowHeight;
+	int WindowWidth, WindowHeight;
 	zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);
 
 	if (GetPosition().x > WindowWidth)
@@ -157,6 +158,12 @@ ZEUIMouseKey ZEUICursorControl::GetCurrentButton()
 	return CurentButton;
 }
 
+void ZEUICursorControl::SetZOrder(ZEInt Z)
+{
+	ZEUIControl::SetZOrder(Z);
+	Cursor.ZOrder = Z;
+}
+
 ZEMaterial* ZEUICursorControl::GetMaterial() const
 {
 	return CursorMaterial;
@@ -182,13 +189,13 @@ ZEUICursorControl::ZEUICursorControl()
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RIGHT_RELEASE,		ZEInputEvent("Mouse", ZE_IMB_BUTTON1,			ZE_IBS_RELEASED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_MIDDLE_RELEASE,		ZEInputEvent("Mouse", ZE_IMB_BUTTON2,			ZE_IBS_RELEASED)));
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_UP,			ZEInputEvent("Mouse", ZE_IMA_WHEEL_AXIS,		ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_DOWN,			ZEInputEvent("Mouse", ZE_IMA_WHEEL_AXIS,		ZE_IAS_NEGATIVE)));
+	//InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_UP,			ZEInputEvent("Mouse", ZE_IMA ZE_IMA_SCROLL_AXIS,		ZE_IAS_POSITIVE)));
+	//InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_DOWN,			ZEInputEvent("Mouse", ZE_IMA_SCROLL_AXIS,		ZE_IAS_NEGATIVE)));
 
 	SetHeight(24);
 	SetWidth(24);	
 
-	ZEInt Width, Height;
+	int Width, Height;
 	zeCore->GetWindow()->GetWindowSize(Width, Height);
 	SetPosition(ZEVector2((Width / 2.0f) , (Height / 2.0f)));
 
@@ -199,7 +206,7 @@ ZEUICursorControl::ZEUICursorControl()
 	Cursor.Texcoords.RightDown = ZEVector2::One;
 
 	CursorMaterial = ZEUIMaterial::CreateInstance();
-	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("Cursor.png")->GetTexture());
+	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/Cursor.png")->GetTexture());
 	Cursor.Material = CursorMaterial;
 	Cursor.Color = GetBackgroundColor();
 

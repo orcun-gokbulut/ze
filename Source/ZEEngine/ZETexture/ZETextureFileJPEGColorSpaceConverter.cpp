@@ -38,6 +38,7 @@
 #include "ZEMath\ZEMath.h"
 #include "ZETextureData.h"
 #include "ZETextureFileJPEGColorSpaceConverter.h"
+#include "ZEPixel.h"
 
 void ZEJpegColorSpaceConverter::NoChange(void* OutputBuffer, void* InputBuffer)
 {
@@ -191,8 +192,8 @@ void ZEJpegColorSpaceConverter::YCbCrToRgb(void* OutputBuffer, void* InputBuffer
 	float Y, Cb, Cr;
 	
 	// Source and destination row pointers
-	ZEBGRA32* OutputPixel = (ZEBGRA32*)OutputBuffer;
-	ZEBGRA32* InputPixel = (ZEBGRA32*)InputBuffer;
+	ZEPixelRGBA8* OutputPixel = (ZEPixelRGBA8*)OutputBuffer;
+	ZEPixelRGBA8* InputPixel = (ZEPixelRGBA8*)InputBuffer;
 
 	ZESize PixelCount = (ZESize)Info->ImageWidth * (ZESize)Info->ImageHeight;
 	ZEUInt8* RangeLimit = Info->SampleRangeLimit + ZE_JPEG_MAX_SAMPLE_VALUE + 1;
@@ -263,8 +264,8 @@ void ZEJpegColorSpaceConverter::YcckToCmyk(void* OutputBuffer, void* InputBuffer
 	ZESize Height = (ZESize)Info->ImageHeight;
 
 	// Source and destination row pointers
-	ZEBGRA32* OutputPixel = (ZEBGRA32*)OutputBuffer;
-	ZEBGRA32* InputPixel = (ZEBGRA32*)InputBuffer;
+	ZEPixelRGBA8* OutputPixel = (ZEPixelRGBA8*)OutputBuffer;
+	ZEPixelRGBA8* InputPixel = (ZEPixelRGBA8*)InputBuffer;
 
 	unsigned char* RangeLimit = Info->SampleRangeLimit + ZE_JPEG_MAX_SAMPLE_VALUE + 1;
 

@@ -38,6 +38,7 @@
 #define __ZE_MATERIAL_H__
 
 #include "ZETypes.h"
+#include "ZEMeta/ZEObject.h"
 
 typedef ZEUInt32 ZEMaterialFlags;
 #define ZE_MTF_NONE						0
@@ -68,8 +69,12 @@ class ZERenderer;
 class ZERenderStage;
 class ZERenderCommand;
 
-class ZEMaterial
+ZE_META_OBJECT_DESCRIPTION(ZEMaterial)
+
+class ZEMaterial : public ZEObject
 {
+	ZE_META_OBJECT(ZEMaterial)
+
 	protected:
 		bool					ShadowCaster;
 		bool					ShadowReciver;
@@ -99,5 +104,19 @@ class ZEMaterial
 
 		virtual void			AdvanceAnimation(float TimeElapsed);
 };
+
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta>
+		<class name="ZEMaterial" noinstance="true" description="Base class of materials.">
+			<property name="LightningEnabled" groupname="Shading" type="boolean" autogetset="yes"/>
+			<property name="ShadowReciver" groupname="Shadows" type="boolean" autogetset="yes"/>
+			<property name="ShadowCaster" groupname="Shadows" type="boolean" autogetset="yes"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 
 #endif

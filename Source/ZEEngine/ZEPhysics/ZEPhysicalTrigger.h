@@ -57,6 +57,8 @@ enum ZEPhysicalTriggerActivationType
 	ZE_PTAT_ON_INSIDE		= 2
 };
 
+typedef ZEDelegate<void (ZEPhysicalObject*, ZEPhysicalObject*, ZEVector3, bool, bool)> ZEPhysicalTriggerEvent;
+
 class ZEPhysicalTrigger: public ZEPhysicalObject
 {
 	protected:
@@ -103,7 +105,3 @@ class ZEPhysicalTrigger: public ZEPhysicalObject
 };
 
 #endif
-
-
-
-

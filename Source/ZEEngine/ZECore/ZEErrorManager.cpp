@@ -68,7 +68,7 @@ void ZEErrorManager::ErrorCallback(ZEErrorType Level)
 		zeCore->SetCoreState(ZE_CS_CRITICAL_ERROR);
 		ZEConsoleWindow ConsoleWindow;
 		ZECore::GetInstance()->GetConsole()->SetConsoleInterface(&ConsoleWindow);
-		ConsoleWindow.TermiantionState();
+		ConsoleWindow.TerminationState();
 		ZECore::GetInstance()->GetConsole()->SetConsoleInterface(NULL);
 		exit(0);
 	}
@@ -81,7 +81,6 @@ ZEErrorManager* ZEErrorManager::GetInstance()
 
 ZEErrorManager::ZEErrorManager()
 {
-	ZELog::GetInstance()->SetLogFileEnabled(false);
 	ErrorOptions.SetName("Error");
 	ErrorOptions.AddOption(new ZEOption("LogFileEnabled", false, ZE_OA_NORMAL));
 	ErrorOptions.AddOption(new ZEOption("LogFileName", "error.log", ZE_OA_NORMAL));
@@ -93,8 +92,3 @@ ZEErrorManager::~ZEErrorManager()
 {
 	ZEOptionManager::GetInstance()->UnregisterSection(&ErrorOptions);
 }
-
-
-
-
-

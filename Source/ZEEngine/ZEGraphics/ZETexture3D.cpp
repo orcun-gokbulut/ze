@@ -74,7 +74,3 @@ ZETexture3D* ZETexture3D::CreateInstance()
 {
 	return zeGraphics->CreateTexture3D();
 }
-
-
-
-

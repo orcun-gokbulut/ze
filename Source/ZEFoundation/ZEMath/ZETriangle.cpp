@@ -192,7 +192,3 @@ ZETriangle::ZETriangle(const ZEVector3& V0, const ZEVector3& V1, const ZEVector3
 {
 	Create(*this, V0, V1, V2);
 }
-
-
-
-

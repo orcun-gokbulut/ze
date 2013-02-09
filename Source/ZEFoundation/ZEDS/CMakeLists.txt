@@ -41,6 +41,7 @@ ze_add_source(ZEArray.cpp				Sources)
 ze_add_source(ZEArray.h					Sources Headers)
 ze_add_source(ZEArrayIterators.cpp		Sources)
 ze_add_source(ZEArrayIterators.h		Sources Headers)
+ze_add_source(ZEArrayIteratorsTests.cpp		Tests)
 ze_add_source(ZEArrayTests.cpp			Tests)
 ze_add_source(ZEDelegate.cpp			Sources)
 ze_add_source(ZEDelegate.h				Sources Headers)
@@ -71,6 +72,8 @@ ze_add_source(ZETree.cpp				Sources)
 ze_add_source(ZETree.h					Sources Headers)
 ze_add_source(ZEGraph.cpp				Sources)
 ze_add_source(ZEGraph.h					Sources Headers)
+ze_add_source(ZEHashGenerator.cpp		Sources)
+ze_add_source(ZEHashGenerator.h			Sources Headers)
 ze_add_source(ZEPointer.cpp				Sources)
 ze_add_source(ZEPointer.h				Sources Headers)
 ze_add_source(ZEPointerTests.cpp		Tests)
@@ -83,6 +86,7 @@ ze_add_source(ZEWeakPointerTests.cpp	Tests)
 ze_add_source(ZEString.cpp				Sources)
 ze_add_source(ZEString.h				Sources Headers)
 ze_add_source(ZEStringTests.cpp			Tests)
+ze_add_source(ZECharacterTests.cpp		Tests)
 ze_add_source(ZETypedVariant.cpp		Sources)
 ze_add_source(ZETypedVariant.h			Sources Headers)
 ze_add_source(ZEVariant.cpp				Sources)
@@ -91,17 +95,19 @@ ze_add_source(ZEVariantTests.cpp		Tests)
 ze_add_source(ZEPointerTestClass.h		Tests)
 ze_add_source(ZEPointerTestClass.cpp	Tests)
 ze_add_source(ZEFormat.h				Sources Headers)
-ze_add_source(ZEFormat.cpp				Sources Headers)
-ze_add_source(ZEFormatOverloads.cpp		Sources Headers)
+ze_add_source(ZEFormat.cpp				Sources)
+ze_add_source(ZEFormatTests.cpp				Tests)
+ze_add_source(ZEFormatArgument.h		Sources)
+ze_add_source(ZEFormatArgument.cpp		Sources)
+ze_add_source(ZEFormatArgumentTests.cpp		Tests)
+ze_add_source(ZEFormatOverloads.cpp		Sources)
 ze_add_source(ZEStringWriter.cpp		Sources)
 ze_add_source(ZEStringWriter.h			Sources Headers)
+
 ze_add_library(ZEDS 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEDS
-	INSTALL_COMPONENT ZESDK)
+	LIBS ZEFoundation)
 	
 ze_add_test(ZEDSTests 
 	SOURCES ${Tests}

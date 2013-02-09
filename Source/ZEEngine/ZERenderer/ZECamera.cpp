@@ -59,7 +59,7 @@ const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 	Width = (float)zeGraphics->GetScreenWidth();
 	Height = (float)zeGraphics->GetScreenHeight();
 	
-	ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, FOV, Width / Height, zeGraphics->GetNearZ(), zeGraphics->GetFarZ());
+	ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, FOV, Width / Height, NearZ, FarZ);
 	
 	UpdateProjectionTransform = false;
 

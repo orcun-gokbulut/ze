@@ -85,22 +85,25 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 	return NewString;
 }
 
-ZEVertexLayout ZECanvasVertex::VertexLayout;
-
-ZEVertexLayout* ZECanvasVertex::GetVertexLayout()
+ZEVertexLayout ZECanvasVertex::Layout;
+const ZEVertexLayout& ZECanvasVertex::GetVertexLayout()
 {
-	if (VertexLayout.GetElementCount() != 0)
+	static bool Initialized = false;
+	static const ZEVertexElement VertexElements[] = 
 	{
-		return &VertexLayout;
+		{"POSITION",	0, ZE_VET_FLOAT3, 0, 0,		ZE_VU_PER_VERTEX, 0},
+		{"NORMAL",		0, ZE_VET_FLOAT3, 0, 12,	ZE_VU_PER_VERTEX, 0},
+		{"TEXCOORD",	0, ZE_VET_FLOAT2, 0, 24,	ZE_VU_PER_VERTEX, 0},
+		{"COLOR",		0, ZE_VET_FLOAT4, 0, 32,	ZE_VU_PER_VERTEX, 0},
+	};
+
+	if (!Initialized)
+	{
+		Layout.SetLayout(VertexElements, 4);
+		Initialized = true;
 	}
 
-	static ZEVertexElement Elements[] = {{"POSITION",	0, ZE_VET_FLOAT3, 0, 0,		ZE_VU_PER_VERTEX, 0},
-										 {"NORMAL",		0, ZE_VET_FLOAT3, 0, 12,	ZE_VU_PER_VERTEX, 0},
-										 {"TEXCOORD",	0, ZE_VET_FLOAT2, 0, 24,	ZE_VU_PER_VERTEX, 0},
-										 {"COLOR",		0, ZE_VET_FLOAT4, 0, 32,	ZE_VU_PER_VERTEX, 0}	};
-
-	VertexLayout.SetLayout(Elements, 4);
-	return &VertexLayout;
+	return Layout;
 }
 
 

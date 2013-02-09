@@ -183,6 +183,3 @@ ZEEntityRunAt ZEPresentationSlideDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }
-
-
-

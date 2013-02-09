@@ -42,6 +42,8 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEGraphics/ZESamplerState.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZEGraphics/ZESamplerState.h"
 
 class ZEFile;
 class ZEShader;
@@ -53,8 +55,12 @@ class ZETextureResource;
 class ZETexture2DResource;
 class ZETextureCubeResource;
 
+ZE_META_OBJECT_DESCRIPTION(ZEFixedMaterial)
+
 class ZEFixedMaterial : public ZEMaterial
 {
+	ZE_META_OBJECT(ZEFixedMaterial)
+
 	protected:
 		bool						Recompile;
 
@@ -145,33 +151,22 @@ class ZEFixedMaterial : public ZEMaterial
 
 		} Textures;
 			
-		struct ZEFixedMaterialAdressingModes
-		{
-			ZETextureAddressMode	BaseMapU;
-			ZETextureAddressMode	BaseMapV;
-			ZETextureAddressMode	NormalMapU;
-			ZETextureAddressMode	NormalMapV;
-			ZETextureAddressMode	ParallaxMapU;
-			ZETextureAddressMode	ParallaxMapV;
-			ZETextureAddressMode	SpecularMapU;
-			ZETextureAddressMode	SpecularMapV;
-			ZETextureAddressMode	EmissiveMapU;
-			ZETextureAddressMode	EmissiveMapV;
-			ZETextureAddressMode	OpacityMapU;
-			ZETextureAddressMode	OpacityMapV;
-			ZETextureAddressMode	DetailBaseMapU;
-			ZETextureAddressMode	DetailBaseMapV;
-			ZETextureAddressMode	DetailNormalMapU;
-			ZETextureAddressMode	DetailNormalMapV;
-			ZETextureAddressMode	EnvironmentMapU;
-			ZETextureAddressMode	EnvironmentMapV;
-			ZETextureAddressMode	EnvironmentMapW;
-			ZETextureAddressMode	LightMapU;
-			ZETextureAddressMode	LightMapV;
-			ZETextureAddressMode	DistortionMapU;
-			ZETextureAddressMode	DistortionMapV;
 
-		} AdressingModes;
+		struct ZEFixedMaterialSamplers
+		{
+			ZESamplerState			BaseMap;
+			ZESamplerState			NormalMap;
+			ZESamplerState			ParallaxMap;
+			ZESamplerState			SpecularMap;
+			ZESamplerState			EmissiveMap;
+			ZESamplerState			OpacityMap;
+			ZESamplerState			DetailBaseMap;
+			ZESamplerState			DetailNormalMap;
+			ZESamplerState			EnvironmentMap;
+			ZESamplerState			LightMap;
+			ZESamplerState			DistortionMap;
+
+		} Samplers;
 
 		struct ZEFixedMaterialResources
 		{
@@ -258,10 +253,8 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETexture2D*				GetBaseMap() const;
 		void						SetBaseMapFile(const char* Filename);
 		const char*					GetBaseMapFile() const;
-		void						SetBaseMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetBaseMapAddressModeU() const;
-		void						SetBaseMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetBaseMapAddressModeV() const;
+		void						SetBaseMapSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&		GetBaseMapSampler() const;
 
 		// Diffuse
 		void						SetDiffuseEnabled(bool Value);
@@ -288,10 +281,8 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETexture2D*				GetSpecularMap() const;
 		void						SetSpecularMapFile(const char* Filename);
 		const char*					GetSpecularMapFile() const;
-		void						SetSpecularMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetSpecularMapAddressModeU() const;
-		void						SetSpecularMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetSpecularMapAddressModeV() const;
+		void						SetSpecularMapSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&		GetSpecularMapSampler() const;
 
 		// Emissive
 		void						SetEmissiveEnabled(bool Value);
@@ -306,10 +297,8 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETexture2D*				GetEmissiveMap() const;
 		void						SetEmissiveMapFile(const char* Filename);
 		const char*					GetEmissiveMapFile() const;
-		void						SetEmissiveMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetEmissiveMapAddressModeU() const;
-		void						SetEmissiveMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetEmissiveMapAddressModeV() const;
+		void						SetEmissiveMapSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&		GetEmissiveMapSampler() const;
 
 		// Normal Map
 		void						SetNormalMapEnabled(bool Value);
@@ -318,10 +307,8 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETexture2D*				GetNormalMap() const;
 		void						SetNormalMapFile(const char* Filename);
 		const char*					GetNormalMapFile() const;
-		void						SetNormalMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetNormalMapAddressModeU() const;
-		void						SetNormalMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetNormalMapAddressModeV() const;
+		void						SetNormalMapSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&		GetNormalMapSampler() const;
 
 		// ParallaxMap
 		void						SetParallaxMapEnabled(bool Value);
@@ -330,10 +317,8 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETexture2D*				GetParallaxMap() const;
 		void						SetParallaxMapFile(const char* Filename);
 		const char*					GetParallaxMapFile() const;
-		void						SetParallaxMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetParallaxMapAddressModeU() const;
-		void						SetParallaxMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetParallaxMapAddressModeV() const;
+		void						SetParallaxMapSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&		GetParallaxMapSampler() const;
 
 		// Opacity
 		void						SetOpacityEnabled(bool Value);
@@ -348,22 +333,16 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETexture2D*				GetOpacityMap() const;
 		void						SetOpacityMapFile(const char* Filename);
 		const char*					GetOpacityMapFile() const;
-		void						SetOpacityMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetOpacityMapAddressModeU() const;
-		void						SetOpacityMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetOpacityMapAddressModeV() const;
+		void						SetOpacityMapSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&		GetOpacityMapSampler() const;
 
 		// Environment Map
 		void						SetEnvironmentMap(ZETextureCube* Texture);
 		ZETextureCube*				GetEnvironmentMap() const;
 		void						SetEnvironmentMapFile(const char* Filename);
 		const char*					GetEnvironmentMapFile() const;
-		void						SetEnvironmentMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetEnvironmentMapAddressModeU() const;
-		void						SetEnvironmentMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetEnvironmentMapAddressModeV() const;
-		void						SetEnvironmentMapAddressModeW(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetEnvironmentMapAddressModeW() const;
+		void						SetEnvironmentMapSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&		GetEnvironmentMapSampler() const;
 
 		// Reflection
 		void						SetReflectionEnabled(bool Value);
@@ -392,20 +371,16 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETexture2D*				GetDetailBaseMap() const;
 		void						SetDetailBaseMapFile(const char* Filename);
 		const char*					GetDetailBaseMapFile() const;
-		void						SetDetailBaseMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetDetailBaseMapAddressModeU() const;
-		void						SetDetailBaseMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetDetailBaseMapAddressModeV() const;
+		void						SetDetailBaseMapSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&		GetDetailBaseMapSampler() const;
 		void						SetDetailNormalMapEnabled(bool Value); 
 		bool						GetDetailNormalMapEnabled() const;
 		void						SetDetailNormalMap(ZETexture2D* Texture);
 		ZETexture2D*				GetDetailNormalMap() const;
 		void						SetDetailNormalMapFile(const char* Filename);
 		const char*					GetDetailNormalMapFile() const;
-		void						SetDetailNormalMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetDetailNormalMapAddressModeU() const;
-		void						SetDetailNormalMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetDetailNormalMapAddressModeV() const;
+		void						SetDetailNormalMapSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&		GetDetailNormalMapSampler() const;
 
 		// LightMap/Ambient Occlusion Map
 		void						SetLightMapEnabled(bool Value);
@@ -416,10 +391,8 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETexture2D*				GetLightMap() const;
 		void						SetLightMapFile(const char* Filename);
 		const char*					GetLightMapFile() const;
-		void						SetLightMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetLightMapAddressModeU() const;
-		void						SetLightMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetLightMapAddressModeV() const;
+		void						SetLightMapSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&		GetLightMapSampler() const;
 
 		// Distortion
 		void						SetDistortionEnabled(bool Value);
@@ -430,18 +403,16 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETexture2D*				GetDistortionMap() const;
 		void						SetDistortionMapFile(const char* Filename);
 		const char*					GetDistortionMapFile() const;
-		void						SetDistortionMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetDistortionMapAddressModeU() const;
-		void						SetDistortionMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetDistortionMapAddressModeV() const;
+		void						SetDistortionMapSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&		GetDistortionMapSampler() const;
 
 		void						SetVertexColorEnabled(bool Value);
 		bool						GetVertexColorEnabled();
 
 		void						Tick(float ElapsedTime);
 
-		void						WriteToFile(ZEFile* File);
-		void						ReadFromFile(ZEFile* File);
+		void						WriteToFile(const ZEString& FilePath);
+		void						ReadFromFile(const ZEString& FilePath);
 
 		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
@@ -449,5 +420,93 @@ class ZEFixedMaterial : public ZEMaterial
 
 		static ZEFixedMaterial*		CreateInstance();
 };
+
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEFixedMaterial" noinstance="true">
+			<description>Material System</description>
+			<property name="TwoSided" groupname="Shading" type="boolean" autogetset="yes"/>
+			<property name="Wireframe" groupname="Shading" type="boolean" autogetset="yes"/>
+			<property name="AlphaCullEnabled" groupname="Transparancy" type="boolean" autogetset="yes"/>
+			<property name="AlphaCullLimit" groupname="Transparancy" type="float" autogetset="yes"/>
+			<property name="TransparancyMode" groupname="Transparancy" type="integer32" autogetset="yes">
+				<enumurator name="ZEMaterialTransparancyMode">
+					<item name="No Transparancy" value="ZE_MTM_NONE"/>
+					<item name="Regular" value="ZE_MTM_REGULAR"/>
+					<item name="Adaptive" value="ZE_MTM_ADDAPTIVE"/>
+					<item name="Subtractive" value="ZE_MTM_SUBTRACTIVE"/>
+				</enumurator>
+			</property>		
+
+			<property name="AmbientEnabled" groupname="Ambient" type="boolean" autogetset="yes"/>
+			<property name="AmbientFactor" groupname="Ambient" type="float" autogetset="yes"/>
+			<property name="AmbientColor" groupname="Ambient" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
+			  
+
+			<property name="DiffuseEnabled" groupname="Diffuse" type="boolean" autogetset="yes"/>
+			<property name="DiffuseColor" groupname="Diffuse" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
+			<property name="DiffuseFactor" groupname="Diffuse" type="float" autogetset="yes"/>
+			<property name="BaseMap" groupname="Diffuse" type="string" semantic="ZE_PS_FILENAME" setfunction="SetBaseMapFile" getfunction="GetBaseMapFile"/>
+
+			<property name="SpecularEnabled" groupname="Specular" type="boolean" autogetset="yes"/>
+			<property name="SpecularFactor" groupname="Specular" type="float" autogetset="yes"/>
+			<property name="SpecularShininess" groupname="Specular" type="float" autogetset="yes"/>
+			<property name="SpecularColor" groupname="Specular" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
+			<property name="SpecularMap" groupname="Specular" type="string" semantic="ZE_PS_FILENAME" setfunction="SetSpecularMapFile" getfunction="GetSpecularMapFile"/>
+
+
+			<property name="EmissiveEnabled" groupname="Emissive" type="boolean" autogetset="yes"/>
+			<property name="EmissiveFactor" groupname="Emissive" type="float" autogetset="yes"/>
+			<property name="EmissiveColor" groupname="Emissive" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
+			<property name="EmissiveMap" groupname="Emissive" type="string" semantic="ZE_PS_FILENAME" setfunction="SetEmissiveMapFile" getfunction="GetEmissiveMapFile"/>
+
+
+			<property name="NormalMapEnabled" groupname="Normal" type="boolean" autogetset="yes"/>
+			<property name="NormalMap" groupname="Normal" type="string" semantic="ZE_PS_FILENAME" setfunction="SetNormalMapFile" getfunction="GetNormalMapFile"/>
+
+
+			<property name="ParallaxMapEnabled" groupname="Parallax" type="boolean" autogetset="yes"/>
+			<property name="ParallaxMap" groupname="Parallax" type="string" semantic="ZE_PS_FILENAME" setfunction="SetParallaxMapFile" getfunction="GetParallaxMapFile"/>
+
+
+			<property name="OpacityEnabled" groupname="Opacity" type="boolean" autogetset="yes"/>
+			<property name="Opacity" groupname="Opacity" type="float" autogetset="yes"/>
+			<property name="OpacityComponent" groupname="Opacity" type="integer32" autogetset="yes">
+				<enumurator name = "ZEMaterialOpacityComponent">
+					<item name="Constant" value="ZE_MOC_CONSTANT"/>
+					<item name="Diffuse Map Alpha" value="ZE_MOC_BASE_MAP_ALPHA"/>
+					<item name="Opacity Map" value="ZE_MOC_OPACITY_MAP"/>
+				</enumurator>
+			</property>
+			<property name="OpacityMap" groupname="Opacity" type="string" semantic="ZE_PS_FILENAME" setfunction="SetOpacityMapFile" getfunction="GetOpacityMapFile"/>
+
+
+			<property name="EnvironmentMap" groupname="Environment" type="string" semantic="ZE_PS_FILENAME" getfunction="GetEnvironmentMapFile" setfunction="SetEnvironmentMapFile"/>
+
+			<property name = "ReflectionEnabled" groupname="Reflection" type="boolean" autogetset="yes" />
+			<property name = "ReflectionFactor" groupname="Reflection" type="float" autogetset="yes" />
+			<property name = "RefractionEnabled" groupname="Refraction" type="boolean" autogetset="yes" />
+			<property name = "RefractionFactor" groupname="Refraction" type="float" autogetset="yes" />
+			<property name = "RefractionIndex" groupname="Refraction" type="float" autogetset="yes" />
+
+			<property name="DetailMapTiling" groupname="Detail" type="ZEVector2" autogetset="yes" />
+			<property name="DetailBaseMap" groupname="Detail" type="string" semantic="ZE_PS_FILENAME" getfunction="GetDetailBaseMapFile" setfunction="SetDetailBaseMapFile" />			
+			<property name="DetailNormalMap" groupname="Detail" type="string" semantic="ZE_PS_FILENAME" getfunction="GetDetailNormalMapFile" setfunction="SetDetailNormalMapFile" />
+
+			<property name="LightMapEnabled" groupname="Light Map" type="boolean" autogetset="yes" />
+			<property name="LightMapFactor" groupname="Light Map" type="float" autogetset="yes" />
+			<property name="LightMap" groupname="Light Map" type="string" semantic="ZE_PS_FILENAME" getfunction="GetLightMapFile" setfunction="SetLightMapFile" />
+
+			<property name="DistortionEnabled" groupname="Distortion" type="boolean" autogetset="yes" />
+			<property name="DistortionFactor" groupname="Distortion" type="float" autogetset="yes" />
+			<property name="DistortionMap" groupname="Distortion" type="string" semantic="ZE_PS_FILENAME" getfunction="GetDistortionMapFile" setfunction="SetDistortionMapFile" />
+			
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 
 #endif

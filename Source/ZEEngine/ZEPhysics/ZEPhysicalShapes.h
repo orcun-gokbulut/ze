@@ -166,7 +166,3 @@ class  ZEPhysicalConvexShape : public  ZEPhysicalShape
 		const ZEArray<ZEVector3>&		GetConvexVertices();
 };
 #endif
-
-
-
-

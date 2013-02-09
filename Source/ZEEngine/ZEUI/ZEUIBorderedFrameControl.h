@@ -37,7 +37,6 @@
 #ifndef __ZE_UI_BORDERED_FRAME_CONTROL__
 #define __ZE_UI_BORDERED_FRAME_CONTROL__
 
-#include "ZETypes.h"
 #include "ZEUIControl.h"
 #include "ZEUIFrameControl.h"
 #include "ZEFontResource.h"
@@ -57,8 +56,8 @@
 struct ZEUIControlStyle
 {
 	bool			BorderVisibility;
-	ZEInt			BorderWidth;
-	ZEInt			ElementVisibilities;
+	int				BorderWidth;
+	int				ElementVisibilities;
 	bool			TileTextures;
 
 	ZEVector4		BoderEdgeColor;
@@ -147,32 +146,32 @@ class ZEUIBorderedFrameControl : public ZEUIControl
 {
 	protected:
 
-		ZEUIFrameControl		MainArea;
-		ZEUIFrameControl		LeftUpCornerArea;
-		ZEUIFrameControl		LeftDownCornerArea;
-		ZEUIFrameControl		RightUpCornerArea;
-		ZEUIFrameControl		RightDownCornerArea;
-		ZEUIFrameControl		TopEdgeArea;
-		ZEUIFrameControl		LeftEdgeArea;
-		ZEUIFrameControl		RightEdgeArea;
-		ZEUIFrameControl		BottomEdgeArea;
+		ZEUIFrameControl	MainArea;
+		ZEUIFrameControl	LeftUpCornerArea;
+		ZEUIFrameControl	LeftDownCornerArea;
+		ZEUIFrameControl	RightUpCornerArea;
+		ZEUIFrameControl	RightDownCornerArea;
+		ZEUIFrameControl	TopEdgeArea;
+		ZEUIFrameControl	LeftEdgeArea;
+		ZEUIFrameControl	RightEdgeArea;
+		ZEUIFrameControl	BottomEdgeArea;
 
 	public:
 
-		virtual void			SetHeight(float Height);
-		virtual void			SetWidth(float Width);
+		virtual void		SetHeight(float Height);
+		virtual void		SetWidth(float Width);
 
-		virtual void			AddChildControl(ZEUIControl* Control);
+		virtual void		AddChildControl(ZEUIControl* Control);
 
-		void					SetElementVisibilities(ZEInt Elements, bool Visibility);
-		ZEInt					GetVisibleElements();
+		void				SetElementVisibilities(int Elements, bool Visibility);
+		int					GetVisibleElements();
 
-		void					SetBorderThickness(float Thickness);
+		void				SetBorderThickness(float Thickness);
 
-		virtual void			SetMaterial(ZEMaterial* Material);
-		virtual ZEMaterial*		GetMaterial() const;
+		virtual void		SetMaterial(ZEMaterial* Material);
+		virtual ZEMaterial*	GetMaterial() const;
 
-								ZEUIBorderedFrameControl();
+							ZEUIBorderedFrameControl();
 
 
 };

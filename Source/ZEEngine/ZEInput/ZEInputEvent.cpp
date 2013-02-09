@@ -37,6 +37,7 @@
 #include "ZEInputDefinitions.h"
 #include "ZEInputModule.h"
 #include "ZEInputDevice.h"
+#include "ZEDS/ZEString.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -59,9 +60,10 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 	ZEParserState ParserState = ZE_PS_DEVICE_IDENTIFIER;
 	ZESize Len = InputString.GetLength();
 	ZESize IdentifierStart = 0;
+
 	for (ZESize I = 0; I < Len; I++)
 	{
-		switch(InputString[I])
+		switch(*InputString[I].GetValue())
 		{
 		case '\n':
 		case '\r':
@@ -124,12 +126,12 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 		default:
 			if (ParserState == ZE_PS_INPUT_IDENTIFIER_START)
 			{
-				if (isdigit(InputString[I]))
+				if (isdigit(*InputString[I].GetValue()))
 					ParserState = ZE_PS_INPUT_INDEX;
 				else
 					return false;
 			}
-			else if (ParserState == ZE_PS_INPUT_INDEX && !isdigit(InputString[I]))
+			else if (ParserState == ZE_PS_INPUT_INDEX && !isdigit(*InputString[I].GetValue()))
 				return false;
 			else if (ParserState == ZE_PS_INPUT_IDENTIFIER_END)
 				return false;

@@ -100,7 +100,7 @@ class ZECacheTextDataIdentifier : public ZECacheDataIdentifier
 			char ItemNameBuffer[ZE_MAX_FILE_NAME_SIZE];
 			if (File->Read(ItemNameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE) != ZE_MAX_FILE_NAME_SIZE)
 			{
-				zeDebugCheck(true, "Cannot read item name from cache: \"%s\".", File->GetFilePath().GetValue());
+				zeDebugCheck(true, "Cannot read item name from cache: \"%s\".", File->GetPath().GetValue());
 				return false;
 			}
 
@@ -126,6 +126,7 @@ ZETestSuite(ZEFileCache)
 	ZETest(" bool ZEFileCache::Open(const ZEString FileName)")
 	{
 		ZEFileCache FileCache;
+
 		FileCache.Open("ZEFileCacheOpenTests.txt");
 		ZETestCheck(FileCache.IsOpen());
 
@@ -136,8 +137,9 @@ ZETestSuite(ZEFileCache)
 	ZETest(" bool ZEFileCache::Open(ZEFile * File)")
 	{
 		ZEFile File;
-		File.Open("ZEFileCacheOpenTests2.txt", ZE_FM_READ_WRITE, true);
+		File.Open("ZEFileCacheOpenTests2.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 		ZEFileCache FileCache;
+
 		FileCache.Open(&File);
 		ZETestCheck(FileCache.IsOpen());
 
@@ -187,6 +189,9 @@ ZETestSuite(ZEFileCache)
 		FileCache.Open("ZEFileCacheGetFileTests.txt");
 
 		ZEFile File = FileCache.GetFile();
+		ZETestCheckEqual(File.GetOpenMode(), ZE_FOM_READ_WRITE);
+		ZETestCheckEqual(File.GetCreationMode(), ZE_FCM_CREATE);
+		ZETestCheckString(File.GetPath(), "ZEFileCacheGetFileTests.txt");
 
 		FileCache.Close();
 		remove("ZEFileCacheGetFileTests.txt");
@@ -197,6 +202,7 @@ ZETestSuite(ZEFileCache)
 		ZEFileCache FileCache;
 		FileCache.Open("ZEFileCacheCloseTests.txt");
 		ZETestCheck(FileCache.IsOpen());
+
 		FileCache.Close();
 		ZETestCheck(!FileCache.IsOpen());
 		
@@ -215,7 +221,7 @@ ZETestSuite(ZEFileCache)
 		ZETestCase("False")
 		{
 // 			ZEFile File;
-// 			File.Open("ZEFileCacheIsFileCacheTests.txt", ZE_FM_READ_WRITE, true);
+// 			File.Open("ZEFileCacheIsFileCacheTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 // 
 // 			bool Result = ZEFileCache::IsFileCache("ZEFileCacheIsFileCacheTests.txt");
 // 			ZETestCheck(!Result);
@@ -371,6 +377,7 @@ ZETestSuite(ZEFileCache)
 			{
 				Buffer[I] = I % 256;
 			}
+
 			FileCache.Open("ZETestData.elif");
 			ZETestCheck(FileCache.Allocate(&PartialFile, &Identifier1, sizeof(unsigned char) * 4999 * 2));
 			ZETestCheck(FileCache.Allocate(&PartialFile2, &Identifier3, sizeof(unsigned char) * 4999 * 4));
@@ -398,6 +405,7 @@ ZETestSuite(ZEFileCache)
 			{
 				Buffer[I] = I % 256;
 			}
+
 			FileCache.Open("ZETestData.cagri2");
 			ZETestCheck(FileCache.Allocate(&PartialFile, &Identifier1, sizeof(unsigned char) * 4999 * 2));
 			ZETestCheck(FileCache.Allocate(&PartialFile2, &Identifier3, sizeof(unsigned char) * 4999 * 4));
@@ -405,7 +413,7 @@ ZETestSuite(ZEFileCache)
 			FileCache.Close();
 			ZETestCheckEqual(PartialFile.Write(Buffer, sizeof(unsigned char), 4999), 4999);
 			ZETestCheckEqual(PartialFile2.Write(Buffer, sizeof(unsigned char), 4999), 4999);
-			ZETestCheck(PartialFile2.Seek(4999, ZE_SF_CURRENT));
+			ZETestCheckEqual(PartialFile2.Seek(4999, ZE_SF_CURRENT), 0);
 			ZETestCheckEqual(PartialFile2.Write(Buffer, sizeof(unsigned char), 4999), 4999);
 			remove("ZETestData.cagri2");
 		}
@@ -428,6 +436,7 @@ ZETestSuite(ZEFileCache)
 		{
 			Buffer[I] = I % 256;
 		}
+
 		FileCache.Open("ZETestData.elif");
 		ZETestCheck(FileCache.Allocate(&PartialFile, &Identifier1, sizeof(unsigned char) * 4999 * 2));
 		ZETestCheck(FileCache.Allocate(&PartialFile2, &Identifier3, sizeof(unsigned char) * 4999 * 2));

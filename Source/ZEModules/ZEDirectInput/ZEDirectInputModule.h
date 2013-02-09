@@ -68,7 +68,3 @@ class ZEDirectInputModule : public ZEInputModule
 		virtual void						UnAcquire();
 };
 #endif
-
-
-
-

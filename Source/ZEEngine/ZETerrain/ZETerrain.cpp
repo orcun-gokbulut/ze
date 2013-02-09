@@ -40,13 +40,16 @@
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZETerrainMaterial.h"
-#include "ZEGraphics/ZEVertexDeclaration.h"
+#include "ZEGraphics/ZEVertexLayout.h"
 #include "ZETexture/ZEBitmap.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
+#include "ZEGame/ZEScene.h"
+#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERenderer.h"
 
 #define ZE_TPM_NORMAL			0
 #define ZE_TPM_SHRINK_NEGATIVE	1
@@ -153,7 +156,6 @@ ZETerrain::ZETerrain()
 	UnitLength = 1.0f;
 	ChunkSize = 16;
 	MaxLevel = 10;
-	VertexDeclaration = NULL;
 	VertexBuffer = NULL;
 	HeightScale = 10.0f;
 	HeightOffset = 0.0f;
@@ -201,28 +203,18 @@ bool ZETerrain::CreateVertexBuffer()
 {
 	ZETerrainPrimitivesGenerator::Generate(&VertexBuffer, &Indices, ChunkSize);
 
-	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
-	ZEVertexElement Elements[] = 
+	static const ZEVertexElement VertexElements[] = 
 	{
-		{ZE_VES_POSITION, ZE_VET_FLOAT3, 0}
+		{"POSITION",	0, ZE_VET_FLOAT3, 0, 0,		ZE_VU_PER_VERTEX, 0}
 	};
-
-	if (!VertexDeclaration->Create(Elements, 1))
-	{
-		zeError("Can not create vertex elements.");
-		return false;
-	}
+	VertexDeclaration.SetLayout(VertexElements, 1);
 
 	return true;
 }
 
 void ZETerrain::DestroyVertexBuffer()
 {
-	VertexDeclaration->Destroy();
-	VertexDeclaration = NULL;
-
-	VertexBuffer->Destroy();
-	VertexBuffer = NULL;
+	ZE_DESTROY(VertexBuffer);
 }
 
 bool ZETerrain::CreateLevels()
@@ -234,7 +226,7 @@ bool ZETerrain::CreateLevels()
 	{
 		ZETerrainLevel* CurrentLevel = &Levels[I];
 		CurrentLevel->ElevationTexture = ZETexture2D::CreateInstance();
-		if (!CurrentLevel->ElevationTexture->Create(ChunkSize * 4 + 8 + 1, ChunkSize * 4 + 8 + 1, 1, ZE_TPF_F32_2, false))
+		if (!CurrentLevel->ElevationTexture->CreateDynamic(ChunkSize * 4 + 8 + 1, ChunkSize * 4 + 8 + 1, 1, ZE_TPF_F32_2))
 			return false;
 
 		CurrentLevel->Material = ZETerrainMaterial::CreateInstance();
@@ -297,8 +289,8 @@ bool ZETerrain::LoadLevelData()
 
 	File.Close();
 
-	DetailNormalTexture = ZETexture2DResource::LoadResource("normal.jpg")->GetTexture();
-	ColorTexture = ZETexture2DResource::LoadResource("Diffuse.bmp")->GetTexture();
+	DetailNormalTexture = ZETexture2DResource::LoadResource("ZESimulationDemo/Terrains/TerrainDetailNormal.jpg")->GetTexture();
+	ColorTexture = ZETexture2DResource::LoadResource("ZESimulationDemo/Terrains/TerrainDiffuse.bmp")->GetTexture();
 	 
 	return true;
 }
@@ -446,11 +438,11 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt Po
 	ZERenderCommand RenderCommand;
 	RenderCommand.SetZero();
 	RenderCommand.Flags				= ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
-	RenderCommand.VertexDeclaration = VertexDeclaration;
+	RenderCommand.VertexLayout		= VertexDeclaration;
 	RenderCommand.Material			= Levels[Level].Material;
 	RenderCommand.Order				= 0;
 	RenderCommand.Pipeline			= ZE_RORP_3D;
-	RenderCommand.VertexBuffer		= VertexBuffer;
+	RenderCommand.VertexBuffers[0]	= VertexBuffer;
 	RenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE_LIST;
 	RenderCommand.Priority			= 3;
 	RenderCommand.Flags |= 1024;
@@ -478,13 +470,13 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt Po
 		BarSize = ChunkSize;
 	}
 	
-	RenderCommand.VertexBufferOffset = Indices.Index[PrimitiveType] + BarSize * 2 * 3;
+	RenderCommand.FirstVertex = Indices.Index[PrimitiveType] + BarSize * 2 * 3;
 	RenderCommand.PrimitiveCount = ChunkSize * BarSize * 2;
 
 	switch (Mode)
 	{
 		case ZE_TPM_SHRINK_NEGATIVE:
-			RenderCommand.VertexBufferOffset += BarSize * 2 * 3;
+			RenderCommand.FirstVertex += BarSize * 2 * 3;
 			RenderCommand.PrimitiveCount -= BarSize * 2;
 			break;
 
@@ -493,7 +485,7 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt Po
 			break;
 		
 		case ZE_TPM_EXTEND_NEGATIVE:
-			RenderCommand.VertexBufferOffset -= BarSize * 2 * 3;
+			RenderCommand.FirstVertex -= BarSize * 2 * 3;
 			RenderCommand.PrimitiveCount += BarSize * 2;
 			break;
 
@@ -512,6 +504,9 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	if (Levels.GetCount() == 0)
+		return;
+
+	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
 		return;
 
 	static ZEInt PositionX;

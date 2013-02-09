@@ -39,9 +39,17 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZEDS/ZEDelegate.h"
 #include "ZETypes.h"
 
-#include "ZEPhysicalCallbacks.h"
+#define ZE_PCCF_ON_TOUCH			1
+#define ZE_PCCF_ON_START_TOUCH		2
+#define ZE_PCCF_ON_END_TOUCH		4
+
+class ZEPhysicalObject;
+
+typedef ZEDelegate<void (ZEPhysicalObject*, ZEPhysicalObject*, ZEVector3, ZEVector3, float)> ZEPhysicalCollisionEvent;
+typedef ZEDelegate<void (ZEPhysicalObject*, ZEVector3, ZEQuaternion)> ZEPhysicalTransformChangeEvent;
 
 enum ZEPhysicalObjectType
 {
@@ -102,7 +110,3 @@ class ZEPhysicalObject
 };
 
 #endif
-
-
-
-

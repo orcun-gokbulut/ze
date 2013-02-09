@@ -62,7 +62,7 @@ enum ZEComparisonFunction
 	ZE_CF_ALWAYS			= 8 
 };
 
-class ZEDeviceStateDepthStencil
+class ZEDepthStencilState
 {
 	friend class ZEGraphicsDevice;
 	friend class ZEDeviceStageOutput;
@@ -142,12 +142,12 @@ class ZEDeviceStateDepthStencil
 
 		void								SetToDefault();
 
-		const ZEDeviceStateDepthStencil&	operator=(const ZEDeviceStateDepthStencil& State);
-		bool								operator==(const ZEDeviceStateDepthStencil& State);
-		bool								operator!=(const ZEDeviceStateDepthStencil& State);
+		const ZEDepthStencilState&	operator=(const ZEDepthStencilState& State);
+		bool								operator==(const ZEDepthStencilState& State);
+		bool								operator!=(const ZEDepthStencilState& State);
 
-											ZEDeviceStateDepthStencil();
-		virtual								~ZEDeviceStateDepthStencil();
+											ZEDepthStencilState();
+		virtual								~ZEDepthStencilState();
 };
 
 #endif

@@ -324,7 +324,10 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEBSphere& Boun
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox1, const ZEAABBox& BoundingBox2)
 {
-	return false;
+	ZEOBBox TempBoundingBox;
+	ZEAABBox::GenerateOBoundingBox(TempBoundingBox, BoundingBox2);
+
+	return IntersectionTest(BoundingBox1, TempBoundingBox);
 }
 
 static inline bool SeparatingAxisTest(const ZEVector3& Axis, const ZEOBBox& A, const ZEOBBox& B)
