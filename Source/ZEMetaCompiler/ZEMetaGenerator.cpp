@@ -1934,11 +1934,14 @@ static void CreateZEClassImplementation(FILE* File, const char* ClassName, bool 
 
 bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* MetaData)
 {
+	//Last item in array is our target header to compile.Is target header NOT contains buildin class?
 	if(!((ZEClassData*)MetaData->HeaderTypes[MetaData->HeaderTypes.GetCount() - 1])->IsBuiltInClass)
 	{
+		//We dont want to compile builtin classes, so we scan recursively until we found one.
 		ZESize BuiltInClassEndIndex = 0;
 		for(ZESize I = MetaData->HeaderTypes.GetCount() - 1; I >= 0; I--)
 		{
+			//if we reach a builtin class one class after it is ZEObject and two after it is our target class
 			if(((ZEClassData*)MetaData->HeaderTypes[I])->IsBuiltInClass)
 			{
 				BuiltInClassEndIndex = I + 2; //+2 = [0]BuiltInClassIndex + [1]ZEObject + [2]OurClass
@@ -1950,6 +1953,7 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 		ZEArray<ZEPropertyData*> Properties;
 		ZEArray<ZEMethodData*> Methods;
 
+		//searching for duplicate class attributes.we only add one item per object type.
 		for(ZESize Index = BuiltInClassEndIndex; Index < MetaData->HeaderTypes.GetCount(); Index++)
 		{
 			ZEClassData* CurrentClassData = (ZEClassData*)MetaData->HeaderTypes[Index];
@@ -1993,6 +1997,7 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 				Properties.Add(CurrentClassData->Properties[I]);
 			}
 
+			//searching for duplicate class methods.we only add one item per object type.
 			for(ZESize I = 0; I < CurrentClassData->Methods.GetCount(); I++)
 			{
 				bool IsSameMethodFound = false;
@@ -2036,7 +2041,9 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 			return false;
 		else
 		{
+			//Target class' parent class is one item before its index.
 			const char* ParentClassName = MetaData->HeaderTypes[MetaData->HeaderTypes.GetCount() - 2]->Name;
+			//Our target class to compile is last item in array
 			const char* CurrentClassName = MetaData->HeaderTypes[MetaData->HeaderTypes.GetCount() - 1]->Name;
 
 			ZEClassData* ClassData = (ZEClassData*)MetaData->HeaderTypes.GetLastItem();
@@ -2100,7 +2107,7 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 			fclose(File);
 		}
 	}
-	else//For BuiltIn Class Generation
+	else//If last item in array is builtin class type we compile all classes to seperate files in found header
 	{
 		for(ZESize I = 0; I < MetaData->HeaderTypes.GetCount(); I++)
 		{
