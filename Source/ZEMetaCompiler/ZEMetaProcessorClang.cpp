@@ -75,9 +75,10 @@ void ZEMetaProcessorInternal::InitializeClang()
 	{
 		"-cc1",
 		
-		"-I", ".",
-		"-I", "..",
-		"-I", "../ZEFoundation",
+		"-I", "../Source/.",
+		"-I", "../Source/..",
+		"-I", "../Source/ZEEngine",
+		"-I", "../Source/ZEFoundation",
 
 		"-v",
 		"-disable-free",
@@ -149,5 +150,5 @@ void ZEMetaProcessorInternal::InitializeClang()
 
 	ZEMetaGenerator::Generate(Options, MetaData);
 
-	Compiler.getInvocation().Release();
+	exit(EXIT_FAILURE);
 }
