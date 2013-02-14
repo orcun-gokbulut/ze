@@ -227,15 +227,15 @@ void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
 
 ZECamera::ZECamera()
 {
-	FOV = ZE_PI_2;
-
 	Width = (float)zeGraphics->GetScreenWidth();
 	Height = (float)zeGraphics->GetScreenHeight();
 
-	AspectRatio = Width / Height;
-	NearZ = zeGraphics->GetNearZ();
-	FarZ = zeGraphics->GetFarZ();
+	NearZ = 0.3f;
+	FarZ = 200.0f;
 	
+	FOV = ZE_PI_2;
+	AspectRatio = Width / Height;
+
 	ShadowFadeDistance = 20.0f;
 	VisibleShadowDistance = 200.0f;
 	

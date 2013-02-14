@@ -37,15 +37,15 @@
 #include "ZECanvas.h"
 #include "ZECamera.h"
 #include "ZERenderer.h"
-#include "ZEPointLight.h"
+#include "ZELightPoint.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEMath/ZEAngle.h"
-#include "ZEProjectiveLight.h"
-#include "ZEDirectionalLight.h"
+#include "ZELightProjective.h"
+#include "ZELightDirectional.h"
 #include "ZEGraphics/ZEShader.h"
 #include "ZERenderStageGeometry.h"
 #include "ZERenderStageLighting.h"
-#include "ZEOmniProjectiveLight.h"
+#include "ZELightOmniProjective.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEGraphics/ZETextureCube.h"
 #include "ZEGraphics/ZERenderTarget.h"
@@ -54,9 +54,11 @@
 #include "ZEGraphics/ZEShaderCompiler.h"
 #include "ZEGraphics/ZEShaderMetaTable.h"
 #include "ZEGraphics/ZEGraphicsEventTracer.h"
+#include "ZEMaterial.h"
 
 void ZERenderStageLighting::DestroyShaders()
 {
+	/*
 	ZE_DESTROY(PointLight.VertexShader);
 	ZE_DESTROY(PointLight.PixelShader);
 	
@@ -68,12 +70,13 @@ void ZERenderStageLighting::DestroyShaders()
 
 	ZE_DESTROY(OmniProjectiveLight.VertexShader);
 	ZE_DESTROY(OmniProjectiveLight.PixelShader);
+	*/
 }
 
 void ZERenderStageLighting::UpdateShaders()
 {
 	ZEShaderCompileOptions Compileoptions;
-
+	/*
 	if (PointLight.VertexShader == NULL)
 	{
 		Compileoptions.Model = ZE_SM_4_0;
@@ -137,7 +140,7 @@ void ZERenderStageLighting::UpdateShaders()
 		Compileoptions.FileName = "OmniProjectiveLight.hlsl";
 		Compileoptions.EntryPoint = "ZEOmniProjectiveLight_PixelShader";
 		OmniProjectiveLight.PixelShader = ZEShaderCompiler::CompileShaderFromFile(&Compileoptions);
-	}
+	}*/
 }
 
 void ZERenderStageLighting::DestroyBuffers()
@@ -146,6 +149,7 @@ void ZERenderStageLighting::DestroyBuffers()
 	ZE_DESTROY(RenderTargets.LBuffer2);
 	ZE_DESTROY(Textures.LBuffer1);
 	ZE_DESTROY(Textures.LBuffer2);
+	/*
 	ZE_DESTROY(VertexBuffer);
 
 	ZE_DESTROY(PointLight.Transformations);
@@ -163,26 +167,25 @@ void ZERenderStageLighting::DestroyBuffers()
 	ZE_DESTROY(OmniProjectiveLight.Transformations);
 	ZE_DESTROY(OmniProjectiveLight.LightParameters);
 	ZE_DESTROY(OmniProjectiveLight.ShadowParameters);
+	*/
 }
 
 void ZERenderStageLighting::UpdateBuffers()
 {
 	// Update parent buffers
 	ZERenderStage::UpdateBuffers();
-
+	/*
 	// Create Static Vertex Buffer
 	if (VertexBuffer == NULL)
 	{
-		/*
 		
-		Primitive	Start		Start(Byte)	Vertex Count	Prim. Count		Size (Bytes)
-		Quad		0			0			6				2				288
-		Sphere12	6			288			936				312				44928
-		Sphere24	942			45216		3600			1200			172800
-		Cone12		4542		218016		18				6				864
-		End			4650
-		
-		*/
+		//	Primitive	Start		Start(Byte)	Vertex Count	Prim. Count		Size (Bytes)
+		//	---------------------------------------------------------------------------------
+		//	Quad		0			0			6				2				288
+		//	Sphere12	6			288			936				312				44928
+		//	Sphere24	942			45216		3600			1200			172800
+		//	Cone12		4542		218016		18				6				864
+		//	End			4650
 
 		ZECanvas Canvas;
 
@@ -216,13 +219,12 @@ void ZERenderStageLighting::UpdateBuffers()
 		PointLight.LightParameters = ZEConstantBuffer::CreateInstance();
 		PointLight.LightParameters->Create(PointLight.PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
 	}
-	/*
+
 	if (PointLight.ShadowParameters == NULL)
 	{
 		PointLight.ShadowParameters = ZEConstantBuffer::CreateInstance();
 		PointLight.ShadowParameters->Create(PointLight.PixelShader->GetMetaTable()->GetBufferInfo("ShadowParametersPS"));
 	}
-	*/
 	if (DirectionalLight.Transformations == NULL)
 	{
 		DirectionalLight.Transformations = ZEConstantBuffer::CreateInstance();
@@ -233,13 +235,11 @@ void ZERenderStageLighting::UpdateBuffers()
 		DirectionalLight.LightParameters = ZEConstantBuffer::CreateInstance();
 		DirectionalLight.LightParameters->Create(DirectionalLight.PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
 	}
-	/*
 	if (DirectionalLight.ShadowParameters == NULL)
 	{
 		DirectionalLight.ShadowParameters = ZEConstantBuffer::CreateInstance();
 		DirectionalLight.ShadowParameters->Create(DirectionalLight.PixelShader->GetMetaTable()->GetBufferInfo("ShadowParametersPS"));
 	}
-	*/
 	if (ProjectiveLight.Transformations == NULL)
 	{
 		ProjectiveLight.Transformations = ZEConstantBuffer::CreateInstance();
@@ -250,13 +250,11 @@ void ZERenderStageLighting::UpdateBuffers()
 		ProjectiveLight.LightParameters = ZEConstantBuffer::CreateInstance();
 		ProjectiveLight.LightParameters->Create(ProjectiveLight.PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
 	}
-	/*
 	if (ProjectiveLight.ShadowParameters == NULL)
 	{
 		ProjectiveLight.ShadowParameters = ZEConstantBuffer::CreateInstance();
 		ProjectiveLight.ShadowParameters->Create(ProjectiveLight.PixelShader->GetMetaTable()->GetBufferInfo("ShadowParametersPS"));
 	}
-	*/
 	if (OmniProjectiveLight.Transformations == NULL)
 	{
 		OmniProjectiveLight.Transformations = ZEConstantBuffer::CreateInstance();
@@ -267,7 +265,6 @@ void ZERenderStageLighting::UpdateBuffers()
 		OmniProjectiveLight.LightParameters = ZEConstantBuffer::CreateInstance();
 		OmniProjectiveLight.LightParameters->Create(OmniProjectiveLight.PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
 	}
-	/*
 	if (OmniProjectiveLight.ShadowParameters == NULL)
 	{
 		OmniProjectiveLight.ShadowParameters = ZEConstantBuffer::CreateInstance();
@@ -309,7 +306,7 @@ void ZERenderStageLighting::ResetStageDefaults()
 	ZERenderStage::ResetStageDefaults();
 
 	// Vertex buffer
-	DefaultStates.VertexBuffers[0] = VertexBuffer;
+	// DefaultStates.VertexBuffers[0] = VertexBuffer;
 
 	// Render targets
 	DefaultStates.RenderTargets[0] = RenderTargets.LBuffer1;
@@ -399,15 +396,16 @@ void ZERenderStageLighting::CommitStageDefaults()
 	Device->SetPixelShaderTexture(1, DefaultStates.PixelShaderTextures[1]);
 	Device->SetPixelShaderTexture(2, DefaultStates.PixelShaderTextures[2]);
 
-	Device->SetVertexBuffer(0, DefaultStates.VertexBuffers[0]);
+	// Device->SetVertexBuffer(0, DefaultStates.VertexBuffers[0]);
 }
 
-void ZERenderStageLighting::RenderPointLight(const ZEPointLight* Light)
+void ZERenderStageLighting::RenderPointLight(const ZELightPoint* Light)
 {
+	/*
 	float Range = Light->GetRange();
 	ZEUInt ScreenWidth = zeGraphics->GetScreenWidth();
 	ZEUInt ScreenHeight = zeGraphics->GetScreenHeight();
-	ZECamera* Camera = zeScene->GetRenderer()->GetCamera();
+	ZECamera* Camera = zeScene->GetActiveCamera();
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	Device->SetVertexShader(PointLight.VertexShader);
@@ -426,7 +424,9 @@ void ZERenderStageLighting::RenderPointLight(const ZEPointLight* Light)
 		ZEVector3		Color;
 		float			Intensity;
 		ZEVector3		Attenuation;
+		float			Dummy0;
 		ZEVector2		PixelSize;
+		float			Dummy1[2];
 	};
 
 	// VS Parameters
@@ -456,16 +456,18 @@ void ZERenderStageLighting::RenderPointLight(const ZEPointLight* Light)
 	PointLight.LightParameters->Unlock();
 	Device->SetPixelShaderBuffer(0, PointLight.LightParameters);
 
-	Device->Draw(ZE_ROPT_TRIANGLE_LIST, 936, 6); // Sphere
+	Device->Draw(ZE_PT_TRIANGLE_LIST, 936, 6); // Sphere
+	*/
 }
 
-void ZERenderStageLighting::RenderProjectiveLight(const ZEProjectiveLight* Light)
+void ZERenderStageLighting::RenderProjectiveLight(const ZELightProjective* Light)
 {
+	/*
 	float FOV = Light->GetFOV();
 	float Range = Light->GetRange();
 	ZEUInt ScreenWidth = zeGraphics->GetScreenWidth();
 	ZEUInt ScreenHeight = zeGraphics->GetScreenHeight();
-	ZECamera* Camera = zeScene->GetRenderer()->GetCamera();
+	ZECamera* Camera = zeScene->GetActiveCamera();
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	Device->SetVertexShader(ProjectiveLight.VertexShader);
@@ -520,7 +522,7 @@ void ZERenderStageLighting::RenderProjectiveLight(const ZEProjectiveLight* Light
 		ZEMatrix4x4 LightViewMatrix;
 		ZEMatrix4x4::CreateViewTransform(LightViewMatrix, Light->GetWorldPosition(), Light->GetWorldRotation());
 		ZEMatrix4x4 LightProjectionMatrix;
-		ZEMatrix4x4::CreatePerspectiveProjection(LightProjectionMatrix, FOV, Light->GetAspectRatio(), zeGraphics->GetNearZ(), Range);
+		ZEMatrix4x4::CreatePerspectiveProjection(LightProjectionMatrix, FOV, Light->GetAspectRatio(), Camera->GetNearZ(), Range);
 		ZEMatrix4x4 LightViewProjectionMatrix;
 		ZEMatrix4x4::Multiply(LightViewProjectionMatrix, LightProjectionMatrix, LightViewMatrix);
 		ZEMatrix4x4 TextureMatrix;
@@ -579,7 +581,7 @@ void ZERenderStageLighting::RenderProjectiveLight(const ZEProjectiveLight* Light
 	Device->SetPixelShaderSampler(5, LinearBorderSampler);
 	Device->SetPixelShaderTexture(5, Light->GetProjectionTexture());
 
-	Device->Draw(ZE_ROPT_TRIANGLE_LIST, 18, 4542);  // Cone 2
+	Device->Draw(ZE_PT_TRIANGLE_LIST, 18, 4542);  // Cone 2
 	
 	RasterizerState.SetCullDirection(ZE_CD_CLOCKWISE);
 	Device->SetRasterizerState(RasterizerState);
@@ -595,11 +597,13 @@ void ZERenderStageLighting::RenderProjectiveLight(const ZEProjectiveLight* Light
 	DepthStencilState.SetFrontZFail(ZE_SO_KEEP);
 	Device->SetDepthStencilState(DepthStencilState);
 
-	Device->Draw(ZE_ROPT_TRIANGLE_LIST, 18, 4542);  // Cone 2
+	Device->Draw(ZE_PT_TRIANGLE_LIST, 18, 4542);  // Cone 2
+	*/
 }
 
-void ZERenderStageLighting::RenderDirectionalLight(const ZEDirectionalLight* Light)
+void ZERenderStageLighting::RenderDirectionalLight(const ZELightDirectional* Light)
 {
+	/*
 	struct LightTransformations
 	{
 		ZEMatrix4x4 InvProjMatrix;
@@ -614,12 +618,13 @@ void ZERenderStageLighting::RenderDirectionalLight(const ZEDirectionalLight* Lig
 		ZEVector3		Direction;
 		float			Dummy1;
 		ZEVector2		PixelSize;
+		float			Dummy2[2];
 	};
 
 	float Range = Light->GetRange();
 	ZEUInt ScreenWidth = zeGraphics->GetScreenWidth();
 	ZEUInt ScreenHeight = zeGraphics->GetScreenHeight();
-	ZECamera* Camera = zeScene->GetRenderer()->GetCamera();
+	ZECamera* Camera = zeScene->GetActiveCamera();
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	Device->SetVertexShader(DirectionalLight.VertexShader);
@@ -648,15 +653,17 @@ void ZERenderStageLighting::RenderDirectionalLight(const ZEDirectionalLight* Lig
 	DirectionalLight.LightParameters->Unlock();
 	Device->SetPixelShaderBuffer(0, DirectionalLight.LightParameters);
 
-	Device->Draw(ZE_ROPT_TRIANGLE_LIST, 6, 0);	// Quad
+	Device->Draw(ZE_PT_TRIANGLE_LIST, 6, 0);	// Quad
+	*/
 }
 
-void ZERenderStageLighting::RenderOmniProjectiveLight(const ZEOmniProjectiveLight* Light)
+void ZERenderStageLighting::RenderOmniProjectiveLight(const ZELightOmniProjective* Light)
 {
+	/*
 	float Range = Light->GetRange();
 	ZEUInt ScreenWidth = zeGraphics->GetScreenWidth();
 	ZEUInt ScreenHeight = zeGraphics->GetScreenHeight();
-	ZECamera* Camera = zeScene->GetRenderer()->GetCamera();
+	ZECamera* Camera = zeScene->GetActiveCamera();
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	Device->SetVertexShader(OmniProjectiveLight.VertexShader);
@@ -725,7 +732,8 @@ void ZERenderStageLighting::RenderOmniProjectiveLight(const ZEOmniProjectiveLigh
 	Device->SetPixelShaderSampler(6, LinearBorderSampler);
 	Device->SetPixelShaderTexture(6, Light->GetProjectionTexture());
 
-	Device->Draw(ZE_ROPT_TRIANGLE_LIST, 936, 6);	 // Sphere 1
+	Device->Draw(ZE_PT_TRIANGLE_LIST, 936, 6);	 // Sphere 1
+	*/
 }
 
 const ZETexture2D* ZERenderStageLighting::GetLBuffer1() const
@@ -750,18 +758,6 @@ const ZERenderStageGeometry* ZERenderStageLighting::GetGBufferInput() const
 	return GBufferInput;
 }
 
-void ZERenderStageLighting::SetLightList(ZESmartArray<ZELight*>* Lights)
-{
-	zeDebugCheck(Lights == NULL, "Null pointer.");
-	
-	LightList = Lights;
-}
-
-ZESmartArray<ZELight*>* ZERenderStageLighting::GetLightList() const
-{
-	return LightList;
-}
-
 void ZERenderStageLighting::Setup()
 {
 	UpdateShaders();
@@ -769,7 +765,7 @@ void ZERenderStageLighting::Setup()
 	ResetStageDefaults();
 	CommitStageDefaults();
 
-	StencilMask = 1;
+	// StencilMask = 1;
 
 	LastLight = ZE_LT_NONE;
 
@@ -781,6 +777,7 @@ void ZERenderStageLighting::Setup()
 
 void ZERenderStageLighting::Process(ZERenderCommand* RenderCommand)
 {
+	/*
 	ZESize LightCount = LightList->GetCount();
 	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
 
@@ -799,29 +796,60 @@ void ZERenderStageLighting::Process(ZERenderCommand* RenderCommand)
 		{
 			case ZE_LT_POINT:
 				Tracer->StartEvent("Point Light Pass");
-				RenderPointLight((ZEPointLight*)Light);
+				RenderPointLight((ZELightPoint*)Light);
 				Tracer->EndEvent();
 				break;
 			
 			case ZE_LT_DIRECTIONAL:
 				Tracer->StartEvent("Directional Light Pass");
-				RenderDirectionalLight((ZEDirectionalLight*)Light);
+				RenderDirectionalLight((ZELightDirectional*)Light);
 				Tracer->EndEvent();
 				break;
 
 			case ZE_LT_PROJECTIVE:
 				Tracer->StartEvent("Projective Light Pass");
-				RenderProjectiveLight((ZEProjectiveLight*)Light);
+				RenderProjectiveLight((ZELightProjective*)Light);
 				Tracer->EndEvent();
 				break;
 
 			case ZE_LT_OMNIPROJECTIVE:
 				Tracer->StartEvent("Omni Projective Light Pass");
-				RenderOmniProjectiveLight((ZEOmniProjectiveLight*)Light);
+				RenderOmniProjectiveLight((ZELightOmniProjective*)Light);
 				Tracer->EndEvent();
 				break;
 		}
 	}
+	*/
+
+	ZEMaterial* Material = RenderCommand->Material;
+
+	zeDebugCheck(RenderCommand->Material == NULL, "Cannot process null material");
+
+	if (!(Material->GetMaterialFlags() & ZE_MTF_L_BUFFER_PASS))
+	{
+		return;
+	}
+
+// 	ZEUInt32 Hash = Material->GetHash();
+// 	if (LastMaterial != Hash)
+// 	{
+// 		// Return to defaults if material is changed
+// 		CommitStageDefaults();
+// 		LastMaterial = Hash;
+// 	}
+
+	zeGraphics->GetEventTracer()->StartEvent("Object Pass");
+
+	bool Done = false;
+	ZEUInt PassId = 0;
+	while (!Done)
+	{
+		Done = RenderCommand->Material->SetupPass(PassId++, this, RenderCommand);
+	}
+
+	PumpStreams(RenderCommand);
+
+	zeGraphics->GetEventTracer()->EndEvent();
 }
 
 ZEUInt32 ZERenderStageLighting::GetStageFlags() const
@@ -833,14 +861,14 @@ ZERenderStageLighting::ZERenderStageLighting()
 {
 	LastLight = ZE_LT_NONE;
 
-	LightList = NULL;
+	//LightList = NULL;
 	GBufferInput = NULL;
 	
 	Textures.LBuffer1 = NULL;
 	Textures.LBuffer2 = NULL;
 	RenderTargets.LBuffer1 = NULL;
 	RenderTargets.LBuffer2 = NULL;
-
+	/*
 	PointLight.VertexShader = NULL;
 	PointLight.PixelShader = NULL;
 	PointLight.Transformations = NULL;
@@ -867,6 +895,7 @@ ZERenderStageLighting::ZERenderStageLighting()
 
 	VertexBuffer = NULL;
 	StencilMask = 1;
+	*/
 }
 
 ZERenderStageLighting::~ZERenderStageLighting()

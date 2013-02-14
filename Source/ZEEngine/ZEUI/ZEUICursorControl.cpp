@@ -171,7 +171,7 @@ ZEMaterial* ZEUICursorControl::GetMaterial() const
 
 void ZEUICursorControl::SetMaterial(ZEMaterial* Material)
 {
-	Cursor.Material = (ZEUIMaterial*)Material;
+	Cursor.Material = (ZEMaterialUserInterface*)Material;
 }
 
 ZEUICursorControl::ZEUICursorControl()
@@ -205,7 +205,7 @@ ZEUICursorControl::ZEUICursorControl()
 	Cursor.Texcoords.LeftUp = ZEVector2::Zero;
 	Cursor.Texcoords.RightDown = ZEVector2::One;
 
-	CursorMaterial = ZEUIMaterial::CreateInstance();
+	CursorMaterial = ZEMaterialUserInterface::CreateInstance();
 	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/Cursor.png")->GetTexture());
 	Cursor.Material = CursorMaterial;
 	Cursor.Color = GetBackgroundColor();

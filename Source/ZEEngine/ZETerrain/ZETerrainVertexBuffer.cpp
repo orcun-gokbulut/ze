@@ -110,7 +110,7 @@ bool ZETerrainPrimitivesGenerator::Generate(ZEVertexBuffer** VertexBuffer, ZETer
 	if (*VertexBuffer == 0)
 		*VertexBuffer = ZEVertexBuffer::CreateInstance();
 
-	if (!(*VertexBuffer)->CreateDynamic(VertexBufferSize / sizeof(ZETerrainVertex), sizeof(ZETerrainVertex), NULL))
+	if (!(*VertexBuffer)->CreateDynamic((ZEUInt)(VertexBufferSize / sizeof(ZETerrainVertex)), sizeof(ZETerrainVertex), NULL))
 		return false;
 
 	ZETerrainVertex* Vertices = NULL;

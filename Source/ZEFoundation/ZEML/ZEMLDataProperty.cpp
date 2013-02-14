@@ -131,7 +131,7 @@ bool ZEMLDataProperty::WriteSelf(ZEFile* File)
 		return false;
 	}
 
-	ZEUInt8 NameLength = Name.GetSize();
+	ZEUInt8 NameLength = (ZEUInt8)Name.GetSize();
 	if(File->Write(&NameLength, sizeof(ZEUInt8), 1) != 1)
 	{
 		zeError("Can not write ZEMLDataProperty name lenght to file.");

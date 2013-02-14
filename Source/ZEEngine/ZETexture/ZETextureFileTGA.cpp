@@ -147,19 +147,19 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8
 	ZEPointer<ZETextureData> Texture = new ZETextureData();
 	if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_COLOR || (Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_INDEXED)
 	{
-		Texture->Create(ZE_TT_2D, ZE_TPF_RGBA8, 1, 1, Width, Height);
+		Texture->Create(ZE_TT_2D, ZE_TPF_RGBA8, 1, 1, (ZEUInt)Width, (ZEUInt)Height);
 		DestinationPixelSize = 4;
 	}
 	else
 	{
 		if (Header->BPP == 8)
 		{
-			Texture->Create(ZE_TT_2D, ZE_TPF_L8, 1, 1, Width, Height);
+			Texture->Create(ZE_TT_2D, ZE_TPF_L8, 1, 1, (ZEUInt)Width, (ZEUInt)Height);
 			DestinationPixelSize = 1;
 		}
 		else
 		{
-			Texture->Create(ZE_TT_2D, ZE_TPF_LA8, 1, 1, Width, Height);
+			Texture->Create(ZE_TT_2D, ZE_TPF_LA8, 1, 1, (ZEUInt)Width, (ZEUInt)Height);
 			DestinationPixelSize = 2;
 		}
 	}

@@ -39,7 +39,6 @@
 #include "ZEPhysics/ZEPhysicalRigidBody.h"
 #include "ZEError.h"
 #include "ZERenderer/ZERenderer.h"
-#include "ZERenderer/ZESimpleMaterial.h"
 #include <NxDebugRenderable.h>
 #include <NxRay.h>
 

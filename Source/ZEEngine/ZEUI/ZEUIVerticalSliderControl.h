@@ -51,8 +51,8 @@ class ZEUIVerticalSliderControl : public ZEUIControl
 		float			MaximumValue;
 		float			MinimumValue;
 
-		ZEUIMaterial*	SliderButtonMaterial;
-		ZEUIMaterial*	SliderLineMaterial;
+		ZEMaterialUserInterface*	SliderButtonMaterial;
+		ZEMaterialUserInterface*	SliderLineMaterial;
 
 		bool			IsButtonPressed;
 

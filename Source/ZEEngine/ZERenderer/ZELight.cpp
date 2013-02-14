@@ -125,14 +125,14 @@ const ZEVector3& ZELight::GetAttenuation() const
 	return Attenuation;
 }
 
-void ZELight::SetCastsShadow(bool NewValue)
+void ZELight::SetShadowCaster(bool NewValue)
 {
-	CastsShadows = NewValue;
+	ShadowCaster = NewValue;
 }
 
-bool ZELight::GetCastsShadow() const
+bool ZELight::GetShadowCaster() const
 {
-	return CastsShadows;
+	return ShadowCaster;
 }
 
 void ZELight::SetShadowPenumbraSize(float Value)
@@ -167,7 +167,7 @@ float ZELight::GetShadowDepthScaledBias() const
 
 ZELight::ZELight()
 {
-	CastsShadows = false;
+	ShadowCaster = false;
 	UpdateViewVolume = true;
 
 	Type = ZE_LT_NONE;

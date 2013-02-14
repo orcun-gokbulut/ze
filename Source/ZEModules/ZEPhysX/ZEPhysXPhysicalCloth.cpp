@@ -222,7 +222,7 @@ void ZEPhysXPhysicalCloth::SetTearableMode(bool IsEnabled)
 
 bool ZEPhysXPhysicalCloth::GetTearableMode() const
 {
-	return ClothDesc.flags & ZE_CBF_TEARABLE == ZE_CBF_TEARABLE;
+	return (ClothDesc.flags & ZE_CBF_TEARABLE) == ZE_CBF_TEARABLE;
 }
 
 void ZEPhysXPhysicalCloth::SetTearFactor(float TearFactor)
@@ -304,7 +304,7 @@ bool ZEPhysXPhysicalCloth::TearVertex(const ZEUInt VertexId, const ZEVector3& No
 
 void WeldVertices(ZEArray<ZEVector3>& InputVertices, ZEArray<ZEVector3>& OutputVertices, ZEArray<ZEUInt32>& OutputIndices)
 {
-	ZEUInt32 ParticleCount = InputVertices.GetCount();
+	ZESize ParticleCount = InputVertices.GetCount();
 
 	OutputVertices.Clear();
 
@@ -313,7 +313,7 @@ void WeldVertices(ZEArray<ZEVector3>& InputVertices, ZEArray<ZEVector3>& OutputV
 
 	for (ZESize I = 0; I < ParticleCount; I++)
 	{
-		OutputIndices[I] = I;
+		OutputIndices[I] = (ZEUInt32)I;
 	}
 
 	ZEArray<ZEVector3> TempVerts = InputVertices;
@@ -342,7 +342,7 @@ void WeldVertices(ZEArray<ZEVector3>& InputVertices, ZEArray<ZEVector3>& OutputV
 		{
 			if(OutputVertices[I] == InputVertices[J])
 			{
-				OutputIndices[J] = I;
+				OutputIndices[J] = (ZEUInt32)I;
 			}
 		}
 	}
@@ -359,15 +359,15 @@ bool ZEPhysXPhysicalCloth::Initialize()
 	ClothDesc.flags |= ZE_CBF_GRAVITY;
 	ClothDesc.flags |= ZE_CBF_COLLISION_TWOWAY;
 
-	ParticleCount = ClothVertices.GetCount();
+	ParticleCount = (ZEUInt32)ClothVertices.GetCount();
 
 	ZEArray<ZEVector3> WeldedVertices;
 	WeldVertices(ClothVertices, WeldedVertices, ClothIndices);
-
-	ClothMeshDesc.numVertices				= WeldedVertices.GetCount();
-	ClothMeshDesc.numTriangles				= ClothIndices.GetCount() / 3;
-	ClothMeshDesc.pointStrideBytes			= sizeof(ZEVector3);
-	ClothMeshDesc.triangleStrideBytes		= sizeof(ZEUInt32) * 3;
+	
+	ClothMeshDesc.numVertices				= (NxU32)WeldedVertices.GetCount();
+	ClothMeshDesc.numTriangles				= (NxU32)ClothIndices.GetCount() / 3;
+	ClothMeshDesc.pointStrideBytes			= (NxU32)sizeof(ZEVector3);
+	ClothMeshDesc.triangleStrideBytes		= (NxU32)sizeof(ZEUInt32) * 3;
 	ClothMeshDesc.points					= WeldedVertices.GetCArray();
 	ClothMeshDesc.triangles					= ClothIndices.GetCArray();
 

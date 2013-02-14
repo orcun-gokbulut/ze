@@ -35,18 +35,17 @@
 
 #include "ZECore/ZECore.h"
 #include "ZEInteriorRoom.h"
-#include "ZEInteriorResource.h"
-#include "ZEPhysics/ZEPhysicalMesh.h"
+#include "ZEGame/ZEScene.h"
 #include "ZERenderer/ZELight.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEInteriorResource.h"
+#include "ZEMath/ZEViewVolume.h"
+#include "ZEInterior/ZEInterior.h"
 #include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
-#include "ZEGame/ZEScene.h"
+#include "ZEPhysics/ZEPhysicalMesh.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEInterior/ZEInterior.h"
-#include "ZEMath/ZEViewVolume.h"
-#include "ZERenderer/ZESimpleMaterial.h"
-
+#include "ZERenderer/ZEMaterialSimple.h"
 
 ZEInterior* ZEInteriorRoom::GetOwner()
 {
@@ -155,10 +154,8 @@ void ZEInteriorRoom::Draw(ZEDrawParameters* DrawParameters)
 		ZEMatrix4x4 LocalTransform;
 		ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
 		RenderCommands[I].WorldMatrix = Owner->GetWorldTransform() * LocalTransform;
-		RenderCommands[I].Lights.Clear();
-		RenderCommands[I].Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
 
-		DrawParameters->Renderer->AddToRenderList(&RenderCommands[I]);
+		DrawParameters->Renderer->AddRenderCommand(&RenderCommands[I]);
 	}
 }
 
@@ -200,15 +197,14 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 				ZEMaterial* Material = Resource->Polygons[N].Material;
 				ZERenderCommand* RenderCommand = RenderCommands.Add();
 
-				RenderCommand->SetZero();
 				RenderCommand->Priority = 2;
 				RenderCommand->Order = 1;
-				RenderCommand->Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
+				RenderCommand->Flags |= (ZE_RCF_ENABLE_WORLD_TRANSFORM | ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_RCF_ENABLE_Z_CULLING);
 				RenderCommand->Material = Material;
 				RenderCommand->WorldMatrix = WorldTransform;
-				RenderCommand->FirstVertex = VertexIndex;
+				RenderCommand->FirstVertex = (ZEUInt)VertexIndex;
 				RenderCommand->VertexBuffers[0] = VertexBuffer;
-				RenderCommand->PrimitiveType = ZE_ROPT_TRIANGLE_LIST;
+				RenderCommand->PrimitiveType = ZE_PT_TRIANGLE_LIST;
 				RenderCommand->VertexLayout = ZEInteriorVertex::GetVertexLayout();
 				
 				RenderCommand->PrimitiveCount = 0;
@@ -228,7 +224,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 			}
 		}
 
-		if (!VertexBuffer->CreateStatic(PolygonCount * 3, sizeof(ZEInteriorVertex), (void*)VertexData.GetCArray()))
+		if (!VertexBuffer->CreateStatic((ZEUInt)PolygonCount * 3, sizeof(ZEInteriorVertex), (void*)VertexData.GetCArray()))
 			return false;
 	}
 

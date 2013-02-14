@@ -190,7 +190,7 @@ ZEMLSerialNode  ZEMLSerialNode::OpenNode(const ZEString& Name)
 	if(File->Write(&Type, sizeof(ZEUInt8), 1) != 1)
 		zeError("Can not write ZEMLSerialNode type to file.");
 
-	ZEUInt8 NameLength = NewNode.Name.GetSize();
+	ZEUInt8 NameLength = (ZEUInt8)NewNode.Name.GetSize();
 	if(File->Write(&NameLength, sizeof(ZEUInt8), 1) != 1)
 		zeError("Can not write ZEMLSerialNode name lenght to file.");
 
@@ -261,7 +261,7 @@ ZEMLSerialNode ZEMLSerialRootNode::OpenNode(const ZEString& Name)
 	if(File->Write(&Type, sizeof(ZEUInt8), 1) != 1)
 		zeError("Can not write ZEMLSerialNode type to file.");
 
-	ZEUInt8 NameLength = NewNode.Name.GetSize();
+	ZEUInt8 NameLength = (ZEUInt8)NewNode.Name.GetSize();
 	if(File->Write(&NameLength, sizeof(ZEUInt8), 1) != 1)
 		zeError("Can not write ZEMLSerialNode name length to file.");
 
@@ -319,7 +319,7 @@ ZEMLSerialRootNode::ZEMLSerialRootNode(const ZEString& Name, ZEFile* File)
 	if(File->Write(&Type, sizeof(ZEUInt8), 1) != 1)
 		zeError("Can not write ZEMLSerialRootNode type to file.");
 
-	ZEUInt8 NameLength = this->Name.GetSize();
+	ZEUInt8 NameLength = (ZEUInt8)this->Name.GetSize();
 	if(File->Write(&NameLength, sizeof(ZEUInt8), 1) != 1)
 		zeError("Can not write ZEMLSerialRootNode name lenght to file.");
 

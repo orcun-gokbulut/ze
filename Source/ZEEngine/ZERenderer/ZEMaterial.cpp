@@ -35,15 +35,15 @@
 
 #include "ZEMaterial.h"
 #include "ZECore/ZECore.h"
-#include "ZEMeta/ZEAnimation.h"
 #include "ZERenderStage.h"
-
+#include "ZEMeta/ZEAnimation.h"
 
 ZEMaterial::ZEMaterial()
 {
 	ShadowCaster = true;
 	ShadowReciver = true;
-	LightningEnabled = true;
+	LightCaster = false;
+	LightReciever = true;
 }
 
 void ZEMaterial::SetShadowCaster(bool Value)
@@ -71,14 +71,24 @@ ZEMaterial::~ZEMaterial()
 
 }
 
-void ZEMaterial::SetLightningEnabled(bool Enabled)
+void ZEMaterial::SetLightCaster(bool Value)
 {
-	LightningEnabled = Enabled;
+	LightCaster = Value;
 }
 
-bool ZEMaterial::GetLightningEnabled() const
+bool ZEMaterial::GetLightCaster() const
 {
-	return LightningEnabled;
+	return LightCaster;
+}
+
+void ZEMaterial::SetLightReciever(bool Value)
+{
+	LightReciever = Value;
+}
+
+bool ZEMaterial::GetLightReciever() const
+{
+	return LightReciever;
 }
 
 bool ZEMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
@@ -93,8 +103,8 @@ void ZEMaterial::UpdateMaterial()
 
 void ZEMaterial::AdvanceAnimation(float TimeElapsed)
 {
-// 	if (GetAnimationController() != NULL)
-// 		GetAnimationController()->AdvanceAnimation(TimeElapsed);
+	if (GetAnimationController() != NULL)
+		GetAnimationController()->AdvanceAnimation(TimeElapsed);
 }
 
 void ZEMaterial::Destroy()

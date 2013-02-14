@@ -39,7 +39,7 @@
 #include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZERenderer/ZESimpleMaterial.h"
+#include "ZERenderer/ZEMaterialSimple.h"
 #include "ZEMath/ZEMath.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEGrid);
@@ -116,7 +116,6 @@ const ZEVector3& ZEGrid::GetAxisColor()
 
 void ZEGrid::Draw(ZEDrawParameters* Parameters)
 {
-
 	/*
 	ZEVector3 CameraPosition = Parameters->View->Camera->GetWorldPosition();
 	
@@ -179,12 +178,11 @@ bool ZEGrid::Initialize()
 	GenerateGrid();
 	
 	if (Material == NULL)
-		Material = ZESimpleMaterial::CreateInstance();
+		Material = ZEMaterialSimple::CreateInstance();
 
-	RenderCommand.SetZero();
-	//RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderCommand.PrimitiveType = ZE_ROPT_LINE_LIST;
-	RenderCommand.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
+	RenderCommand.VertexLayout = ZECanvasVertex::GetVertexLayout();
+	RenderCommand.PrimitiveType = ZE_PT_LINE_LIST;
+	RenderCommand.Flags |= (ZE_RCF_ENABLE_WORLD_TRANSFORM | ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_RCF_ENABLE_Z_CULLING);
 	RenderCommand.Material = Material;
 
 	return true;

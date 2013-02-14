@@ -45,7 +45,7 @@ bool ZEFileOperations::CreateFolder(const ZEString& DestinationParentPath, const
 {
 	ZEString Path = ZEPathManager::GetFinalPath(DestinationParentPath) + "\\" + Name;
 
-	return CreateDirectoryW(Path.ToWCString(), NULL);
+	return CreateDirectoryW(Path.ToWCString(), NULL) != 0;
 }
 
 bool ZEFileOperations::Rename(const ZEString& Name, ZEFileInfo* File, bool OverwriteIfExists)
@@ -98,24 +98,22 @@ bool ZEFileOperations::Copy(const ZEString& DestinationParentPath, ZEFileInfo* F
 			Delete(&ExistingFile);
 		}
 
-	return CopyFileExW(ExistingPath.ToWCString(), NewPath.ToWCString(), NULL, NULL, NULL, COPY_FILE_FAIL_IF_EXISTS);
+	return CopyFileExW(ExistingPath.ToWCString(), NewPath.ToWCString(), NULL, NULL, NULL, COPY_FILE_FAIL_IF_EXISTS) != 0;
 
 }
 
 bool ZEFileOperations::Copy(const ZEString& DestinationParentPath, ZEDirectoryInfo* Folder)
 {
 	ZEArray<ZEFileInfo*>* Files = Folder->GetFileList();
-	ZEInt FileCount = Files->GetCount();
-
-	ZEArray<ZEDirectoryInfo*>* SubFolders = Folder->GetDirectoryList();
-	ZEInt SubFolderCount = SubFolders->GetCount();
+	ZEArray<ZEDirectoryInfo*>* SubFolders = Folder->GetDirectoryList();	
 	
 	ZEString NewPath = ZEPathManager::GetFinalPath(DestinationParentPath) + "\\" + Folder->GetName();
 
 	if(!(CreateFolder(DestinationParentPath, Folder->GetName())))
 		return false;
 
-	for (ZEInt I = 0; I < FileCount; I++)
+	ZESize FileCount = Files->GetCount();
+	for (ZESize I = 0; I < FileCount; I++)
 	{
 		if (!(ZEFileOperations::Copy(NewPath, (*Files)[I])))
 		{
@@ -129,7 +127,8 @@ bool ZEFileOperations::Copy(const ZEString& DestinationParentPath, ZEDirectoryIn
 		}
 	}
 
-	for (ZEInt I = 0; I < SubFolderCount; I++)
+	ZESize SubFolderCount = SubFolders->GetCount();
+	for (ZESize I = 0; I < SubFolderCount; I++)
 	{
 		ZEString Name = (*SubFolders)[I]->GetName();
 
@@ -198,18 +197,16 @@ bool ZEFileOperations::Delete(ZEFileInfo* File)
 {
 	ZEString Path = File->GetPath();
 
-	return DeleteFileW(Path.ToWCString());
+	return DeleteFileW(Path.ToWCString()) != 0;
 }
 
 bool ZEFileOperations::Delete(ZEDirectoryInfo* Folder)
 {
 	ZEArray<ZEFileInfo*>* Files = Folder->GetFileList();
-	ZEInt FileCount = Files->GetCount();
-
 	ZEArray<ZEDirectoryInfo*>* SubFolders = Folder->GetDirectoryList();
-	ZEInt SubFolderCount = SubFolders->GetCount();
-
-	for (ZEInt I = 0; I < FileCount; I++)
+	
+	ZESize FileCount = Files->GetCount();
+	for (ZESize I = 0; I < FileCount; I++)
 	{
 		if (!(ZEFileOperations::Delete((*Files)[I])))
 		{
@@ -220,7 +217,8 @@ bool ZEFileOperations::Delete(ZEDirectoryInfo* Folder)
 		}
 	}
 
-	for (ZEInt I = 0; I < SubFolderCount; I++)
+	ZESize SubFolderCount = SubFolders->GetCount();
+	for (ZESize I = 0; I < SubFolderCount; I++)
 	{
 		ZEString Name = (*SubFolders)[I]->GetName();
 
@@ -241,5 +239,5 @@ bool ZEFileOperations::Delete(ZEDirectoryInfo* Folder)
 
 	ZEString FolderPath = Folder->GetPath();
 
-	return RemoveDirectoryW(FolderPath.ToWCString());
+	return RemoveDirectoryW(FolderPath.ToWCString()) != 0;
 }

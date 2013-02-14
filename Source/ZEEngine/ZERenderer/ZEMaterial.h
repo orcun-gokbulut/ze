@@ -44,11 +44,12 @@ typedef ZEUInt32 ZEMaterialFlags;
 #define ZE_MTF_NONE						0
 #define ZE_MTF_PRE_Z_PASS				1
 #define ZE_MTF_G_BUFFER_PASS			2
-#define ZE_MTF_L_BUFFER_PASS			4
-#define ZE_MTF_FORWARD_PASS				8
-#define ZE_MTF_SUPPORTS_SKINNING		16
-#define ZE_MTF_SUPPORTS_MORPHING		32
-#define ZE_MTF_SUPPORTS_INSTANCING		64
+#define ZE_MTF_SHADOW_PASS				4
+#define ZE_MTF_L_BUFFER_PASS			8
+#define ZE_MTF_FORWARD_PASS				16
+#define ZE_MTF_SUPPORTS_SKINNING		32
+#define ZE_MTF_SUPPORTS_MORPHING		64
+#define ZE_MTF_SUPPORTS_INSTANCING		128
 
 enum ZEMaterialTransparancyMode
 {
@@ -56,7 +57,7 @@ enum ZEMaterialTransparancyMode
 	ZE_MTM_REGULAR				= 2,
 	ZE_MTM_ADDAPTIVE			= 3,
 	ZE_MTM_SUBTRACTIVE			= 4
-}; 
+};
 
 enum ZEMaterialOpacityComponent
 {
@@ -76,33 +77,36 @@ class ZEMaterial : public ZEObject
 	ZE_META_OBJECT(ZEMaterial)
 
 	protected:
-		bool					ShadowCaster;
-		bool					ShadowReciver;
-		bool					LightningEnabled;
+		bool						ShadowCaster;
+		bool						ShadowReciver;
 
-								ZEMaterial();
-		virtual					~ZEMaterial();
+		bool						LightCaster;
+		bool						LightReciever;
+
+									ZEMaterial();
+		virtual						~ZEMaterial();
 
 	public:
-		virtual ZEUInt32		GetHash() const = 0;
-		virtual ZEMaterialFlags	GetMaterialFlags() const = 0;
+		void						SetShadowCaster(bool Value);
+		bool						GetShadowCaster() const;
 
-		// Options
-		void					SetShadowCaster(bool Value);
-		bool					GetShadowCaster() const;
+		void						SetShadowReciver(bool Value);
+		bool						GetShadowReciver() const;
 
-		void					SetShadowReciver(bool Value);
-		bool					GetShadowReciver() const;
+		void						SetLightCaster(bool Value);
+		bool						GetLightCaster() const;
 
-		void					SetLightningEnabled(bool Enabled);
-		bool					GetLightningEnabled() const;
+		void						SetLightReciever(bool Value);
+		bool						GetLightReciever() const;
 
-		virtual void			Destroy();
-		virtual void			UpdateMaterial();
+		virtual void				Destroy();
+		virtual void				UpdateMaterial();
 
-		virtual bool			SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
+		virtual void				AdvanceAnimation(float TimeElapsed);
+		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		virtual void			AdvanceAnimation(float TimeElapsed);
+		virtual ZEUInt32			GetHash() const = 0;
+		virtual ZEMaterialFlags		GetMaterialFlags() const = 0;
 };
 
 /*
@@ -110,7 +114,8 @@ ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
 		<class name="ZEMaterial" noinstance="true" description="Base class of materials.">
-			<property name="LightningEnabled" groupname="Shading" type="boolean" autogetset="yes"/>
+			<property name="LightReciever" groupname="Shading" type="boolean" autogetset="yes"/>
+			<property name="LightCaster" groupname="Shading" type="boolean" autogetset="yes"/>
 			<property name="ShadowReciver" groupname="Shadows" type="boolean" autogetset="yes"/>
 			<property name="ShadowCaster" groupname="Shadows" type="boolean" autogetset="yes"/>
 		</class>

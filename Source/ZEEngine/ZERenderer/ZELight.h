@@ -59,7 +59,7 @@ class ZELight : public ZEEntity
 	protected:
 		ZELightType						Type;
 
-		bool							CastsShadows;
+		bool							ShadowCaster;
 		bool							UpdateViewVolume;
 		
 		float							Range;
@@ -90,8 +90,8 @@ class ZELight : public ZEEntity
 		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
 		const ZEVector3&				GetAttenuation() const;
 
-		virtual void					SetCastsShadow(bool NewValue);
-		bool							GetCastsShadow() const;
+		virtual void					SetShadowCaster(bool NewValue);
+		bool							GetShadowCaster() const;
 		
 		void							SetShadowPenumbraSize(float Value);
 		float							GetShadowPenumbraSize() const;
@@ -111,7 +111,7 @@ class ZELight : public ZEEntity
 
 		virtual void					Draw(ZEDrawParameters* DrawParameters);
 
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index) const = 0;
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index) = 0;
 };
 
 #endif

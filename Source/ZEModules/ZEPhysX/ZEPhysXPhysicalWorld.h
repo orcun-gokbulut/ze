@@ -37,29 +37,29 @@
 #ifndef	__ZE_PHYSX_PHYSICAL_WORLD_H__
 #define __ZE_PHYSX_PHYSICAL_WORLD_H__
 
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEPhysXComponentBase.h"
+#include "ZEPhysXCollisionManager.h"
+#include "ZEGraphics/ZEVertexTypes.h"
+#include "ZEPhysics/ZEPhysicalWorld.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZERenderer/ZERenderCommand.h"
+
 #include <NxScene.h>
 #include <NxSceneDesc.h>
 #include <NxMaterial.h>
 
-#include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEPhysXComponentBase.h"
-#include "ZEPhysXCollisionManager.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZEVertexTypes.h"
-#include "ZERenderer/ZERenderCommand.h"
-
 class ZEMaterial;
 class ZEPhysicalObject;
+
 class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 {
 	friend class ZEPhysXModule;
 	private:
-		ZEPhysXCollisionManager						CollisionManager;
-
 		bool										Enabled;
-
+		
+		ZEPhysXCollisionManager						CollisionManager;
 
 	protected:
 		NxSceneDesc									SceneDesc;

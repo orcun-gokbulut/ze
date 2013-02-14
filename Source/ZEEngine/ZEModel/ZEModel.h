@@ -38,28 +38,26 @@
 #define __ZE_MODEL_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEGame/ZEEntity.h"
-#include "ZERenderer/ZERenderCommand.h"
-#include "ZERenderer/ZECanvas.h"
-#include "ZEModelResource.h"
 #include "ZEModelBone.h"
 #include "ZEModelMesh.h"
+#include "ZEDS/ZEArray.h"
 #include "ZEModelHelper.h"
-#include "ZEModelAnimation.h"
-#include "ZEModelAnimationTrack.h"
 #include "ZEModelIKChain.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEModelResource.h"
+#include "ZEModelAnimation.h"
+#include "ZERenderer/ZECanvas.h"
+#include "ZEModelAnimationTrack.h"
 #include "ZEGame/ZEDrawStatistics.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 class ZEQuaternion;
 class ZEMatrix4x4;
-class ZEFixedMaterial;
-class ZESimpleMaterial;
-
-class ZEPhysicalRigidBody;
+class ZEMaterialDefault;
 class ZEPhysicalJoint;
-
+class ZEMaterialSimple;
 struct ZEDrawParameters;
+class ZEPhysicalRigidBody;
 
 ZE_META_ENTITY_DESCRIPTION(ZEModel)
 
@@ -100,20 +98,6 @@ class ZEModel : public ZEEntity
 		bool								DrawSkeleton;
 		bool								DrawPhysicalBodies;
 		bool								DrawPhysicalJoints;
-
-		struct
-		{
-			ZESimpleMaterial*				Material;
-			ZECanvas						BoxCanvas;
-			ZECanvas						BonesCanvas;
-			ZECanvas						BonePositionsCanvas;
-			ZERenderCommand					BoxRenderCommand;
-			ZERenderCommand					BonesRenderCommand;
-			ZERenderCommand					BonePositionsRenderCommand;
-
-		} DebugDrawComponents;
-
-		void								DebugDraw(ZERenderer* Renderer);
 		
 		void								LoadModelResource();
 
@@ -191,7 +175,7 @@ class ZEModel : public ZEEntity
 
 		static ZEModel*						CreateInstance();
 };
-#endif
+
 /*
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
@@ -207,3 +191,5 @@ ZE_POST_PROCESSOR_START(Meta)
 </zinek>
 ZE_POST_PROCESSOR_END()
 */
+
+#endif

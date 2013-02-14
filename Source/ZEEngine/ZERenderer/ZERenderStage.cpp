@@ -80,29 +80,31 @@ void ZERenderStage::PumpStreams(ZERenderCommand* RenderCommand)
 {
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
-	Device->SetIndexBuffer(RenderCommand->IndexBuffer);
 	Device->SetVertexLayout(RenderCommand->VertexLayout);
 	Device->SetVertexBufferArray(RenderCommand->VertexBuffers);
 
-	if ((RenderCommand->Flags & ZE_ROF_INDEXED) && (RenderCommand->Flags & ZE_ROF_INSTANCED))
+	if ((RenderCommand->Flags & ZE_RCF_INDEXED) && (RenderCommand->Flags & ZE_RCF_INSTANCED))
 	{
-		ZEUInt InstanceCount = (ZEUInt)RenderCommand->Instances.GetCount();
-		ZEUInt IndexCount = (ZEUInt)RenderCommand->IndexBuffer->GetIndexCount();
+		ZERenderCommandIndexed* IndexedCommand = (ZERenderCommandIndexed*)RenderCommand;
+		ZERenderCommandInstanced* InstancedCommand = (ZERenderCommandInstanced*)RenderCommand;
 		
-		Device->DrawIndexedInstanced(RenderCommand->PrimitiveType, IndexCount, InstanceCount, 
-			RenderCommand->FirstIndex, RenderCommand->BaseVertex, RenderCommand->FirstInstance);
+		Device->SetIndexBuffer(IndexedCommand->IndexBuffer);
+		Device->DrawIndexedInstanced(RenderCommand->PrimitiveType, IndexedCommand->IndexCount, InstancedCommand->InstanceCount, 
+										IndexedCommand->FirstIndex, IndexedCommand->BaseVertex, InstancedCommand->FirstInstance);
 	}
-	else if (RenderCommand->Flags & ZE_ROF_INDEXED)
+	else if (RenderCommand->Flags & ZE_RCF_INDEXED)
 	{
-		ZEUInt IndexCount = (ZEUInt)RenderCommand->IndexBuffer->GetIndexCount();
+		ZERenderCommandIndexed* IndexedCommand = (ZERenderCommandIndexed*)RenderCommand;
 
-		Device->DrawIndexed(RenderCommand->PrimitiveType, IndexCount, 
-			RenderCommand->FirstIndex, RenderCommand->BaseVertex);
+		Device->SetIndexBuffer(IndexedCommand->IndexBuffer);
+		Device->DrawIndexed(RenderCommand->PrimitiveType, IndexedCommand->IndexCount, IndexedCommand->FirstIndex, IndexedCommand->BaseVertex);
 	}
-	else if (RenderCommand->Flags & ZE_ROF_INSTANCED)
+	else if (RenderCommand->Flags & ZE_RCF_INSTANCED)
 	{
-		Device->DrawInstanced(RenderCommand->PrimitiveType, RenderCommand->PrimitiveCount * 3, 
-			RenderCommand->FirstVertex, (ZEUInt)RenderCommand->Instances.GetCount(), RenderCommand->FirstInstance);
+		ZERenderCommandInstanced* InstancedCommand = (ZERenderCommandInstanced*)RenderCommand;
+
+		Device->DrawInstanced(RenderCommand->PrimitiveType, RenderCommand->PrimitiveCount * 3, RenderCommand->FirstVertex,
+								InstancedCommand->InstanceCount, InstancedCommand->FirstInstance);
 	}
 	else
 	{

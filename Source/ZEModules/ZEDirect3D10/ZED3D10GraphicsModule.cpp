@@ -188,8 +188,6 @@ bool ZED3D10GraphicsModule::Initialize()
 	#endif
 	
 	// Read options
-	FarZ = ZEOptionManager::GetInstance()->GetOption("Graphics", "FarZ")->GetValue().GetFloat();
-	NearZ = ZEOptionManager::GetInstance()->GetOption("Graphics", "NearZ")->GetValue().GetFloat();
 	ScreenWidth = ZEOptionManager::GetInstance()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInt32();
 	ScreenHeight = ZEOptionManager::GetInstance()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInt32();
 	FullScreen = ZEOptionManager::GetInstance()->GetOption("Graphics", "FullScreen")->GetValue().GetBoolean();

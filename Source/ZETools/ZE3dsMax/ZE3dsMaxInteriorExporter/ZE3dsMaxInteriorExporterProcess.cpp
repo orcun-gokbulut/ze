@@ -458,7 +458,7 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 			zeWarning("Helper \"%s\" has no immediate owner parameter. Interior will be set as owner.", Node->GetName());
 
 			OwnerIndex = -1;
-			OwnerType = ZEInteriorHelperOwnerType::ZE_IHOT_INTERIOR;
+			OwnerType = ZE_IHOT_INTERIOR;
 		}
 		else
 		{
@@ -470,7 +470,7 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 			if (strcmp(Type, "Room") == 0)
 			{
 				OwnerIndex = ZE3dsMaxInteriorExporter::FindRoomIndex(OwnerGameNode);
-				OwnerType = ZEInteriorHelperOwnerType::ZE_IHOT_ROOM;
+				OwnerType = ZE_IHOT_ROOM;
 			}
 			else
 			{

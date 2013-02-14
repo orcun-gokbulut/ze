@@ -114,7 +114,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 	{
 		for (ZESize x = 0; x < Level->GetWidth(); x++)
 		{
-			ZEPixelColor* Current = &Bitmap.GetPixel(x, y);
+			ZEPixelColor* Current = &Bitmap.GetPixel((ZEUInt)x, (ZEUInt)y);
 			switch(Format)
 			{
 				case ZE_TPF_RGBA8:
@@ -141,7 +141,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 				{
 					ZEPixelR32F* Pixel = (ZEPixelR32F*)Source + Level->GetWidth() * y + x;
 					Current->a = 255;
-					Current->r = ZEMath::Saturate(Pixel->R) * 255;
+					Current->r = (ZEUInt8)ZEMath::Saturate(Pixel->R) * 255;
 					Current->g = 0;
 					Current->b = 0;
 					break;
@@ -151,8 +151,8 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 				{
 					ZEPixelRG32F* Pixel = (ZEPixelRG32F*)Source + Level->GetWidth() * y + x;
 					Current->a = 0;
-					Current->r = ZEMath::Saturate(Pixel->R) * 255;
-					Current->g = ZEMath::Saturate(Pixel->G) * 255;
+					Current->r = (ZEUInt8)ZEMath::Saturate(Pixel->R) * 255;
+					Current->g = (ZEUInt8)ZEMath::Saturate(Pixel->G) * 255;
 					Current->b = 0;
 					break;
 				}
@@ -160,10 +160,10 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 				case ZE_TPF_RGBA32F:
 				{
 					ZEPixelRGBA32F* Pixel = (ZEPixelRGBA32F*)Source + Level->GetWidth() * y + x;
-					Current->a = ZEMath::Saturate(Pixel->A) * 255;
-					Current->r = ZEMath::Saturate(Pixel->R) * 255;
-					Current->g = ZEMath::Saturate(Pixel->G) * 255;
-					Current->b = ZEMath::Saturate(Pixel->B) * 255;
+					Current->a = (ZEUInt8)ZEMath::Saturate(Pixel->A) * 255;
+					Current->r = (ZEUInt8)ZEMath::Saturate(Pixel->R) * 255;
+					Current->g = (ZEUInt8)ZEMath::Saturate(Pixel->G) * 255;
+					Current->b = (ZEUInt8)ZEMath::Saturate(Pixel->B) * 255;
 					break;
 				}
 

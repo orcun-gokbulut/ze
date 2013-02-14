@@ -60,7 +60,7 @@ void ZERenderStageShadow::DestroyShaders()
 void ZERenderStageShadow::UpdateShaders()
 {
 	ZEShaderCompileOptions Compileoptions;
-
+	/*
 	if (Shaders.PointLightVS == NULL)
 	{
 		Compileoptions.Model = ZE_SM_4_0;
@@ -124,7 +124,7 @@ void ZERenderStageShadow::UpdateShaders()
 		Compileoptions.FileName = "Lights.hlsl";
 		Compileoptions.EntryPoint = "ZEOmniProjectiveLight_PixelShader";
 		Shaders.OmniProjectiveLightPS = ZEShaderCompiler::CompileShaderFromFile(&Compileoptions);
-	}
+	}*/
 }
 
 void ZERenderStageShadow::UpdateBuffers()
@@ -206,22 +206,23 @@ void ZERenderStageShadow::CommitStageDefaults()
 	Device->SetScissorRectangle(0, DefaultStates.ScissorRectangles[0]);
 }
 
-void ZERenderStageShadow::RenderShadowPointLight(const ZEPointLight* Light)
+void ZERenderStageShadow::RenderShadowPointLight(const ZELightPoint* Light)
 {
 	zeCriticalError("Not implemented yet");
 }
 
-void ZERenderStageShadow::RenderShadowProjectiveLight(const ZEProjectiveLight* Light)
+void ZERenderStageShadow::RenderShadowProjectiveLight(const ZELightProjective* Light)
 {
 	zeCriticalError("Not implemented yet");
 }
 
-void ZERenderStageShadow::RenderShadowDirectionalLight(const ZEDirectionalLight* Light)
+void ZERenderStageShadow::RenderShadowDirectionalLight(const ZELightDirectional* Light)
 {
 	// First cull from light's view
+
 }
 
-void ZERenderStageShadow::RenderShadowOmniProjectiveLight(const ZEOmniProjectiveLight* Light)
+void ZERenderStageShadow::RenderShadowOmniProjectiveLight(const ZELightOmniProjective* Light)
 {
 	zeCriticalError("Not implemented yet");
 }
@@ -266,32 +267,32 @@ void ZERenderStageShadow::Process(ZERenderCommand* RenderCommand)
 		ZELight* Light = LightList->GetItem(I);
 		ZELightType Type = Light->GetLightType();
 
-		if (!Light->GetCastsShadow())
+		if (!Light->GetShadowCaster())
 			continue;
 
 		switch(Type)
 		{
 			case ZE_LT_POINT:
 				Tracer->StartEvent("Point Light Shadow Pass");
-				RenderShadowPointLight((ZEPointLight*)Light);
+				RenderShadowPointLight((ZELightPoint*)Light);
 				Tracer->EndEvent();
 				break;
 			
 			case ZE_LT_DIRECTIONAL:
 				Tracer->StartEvent("Directional Light Shadow Pass");
-				RenderShadowDirectionalLight((ZEDirectionalLight*)Light);
+				RenderShadowDirectionalLight((ZELightDirectional*)Light);
 				Tracer->EndEvent();
 				break;
 
 			case ZE_LT_PROJECTIVE:
 				Tracer->StartEvent("Projective Light Shadow Pass");
-				RenderShadowProjectiveLight((ZEProjectiveLight*)Light);
+				RenderShadowProjectiveLight((ZELightProjective*)Light);
 				Tracer->EndEvent();
 				break;
 
 			case ZE_LT_OMNIPROJECTIVE:
 				Tracer->StartEvent("Omni Projective Light Shadow Pass");
-				RenderShadowOmniProjectiveLight((ZEOmniProjectiveLight*)Light);
+				RenderShadowOmniProjectiveLight((ZELightOmniProjective*)Light);
 				Tracer->EndEvent();
 				break;
 		}

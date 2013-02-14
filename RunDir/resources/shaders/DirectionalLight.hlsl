@@ -55,9 +55,8 @@ cbuffer LightParametersPS : register(b0)
 {
 	float3	Color				: packoffset(c0.x);
 	float	Intensity			: packoffset(c0.w);
-	float3	Attenuation			: packoffset(c1.x);
-	float3	Direction			: packoffset(c2.x);
-	float2	PixelSize			: packoffset(c3.x);
+	float3	Direction			: packoffset(c1.x);
+	float2	PixelSize			: packoffset(c2.x);
 };
 
 cbuffer ShadowParametersPS : register(b1)

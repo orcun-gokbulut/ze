@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEOmniProjectiveLight.cpp
+ Zinek Engine - ZELightOmniProjective.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,97 +33,49 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZETexture.h"
-#include "ZEOmniProjectiveLight.h"
-#include "ZEGraphics/ZETexture2D.h"
-#include "ZEGraphics/ZETextureCube.h"
+#ifndef	__ZE_OMNI_PROJECTIVE_LIGHT_H__
+#define __ZE_OMNI_PROJECTIVE_LIGHT_H__
 
-ZELightType ZEOmniProjectiveLight::GetLightType() const
+#include "ZELight.h"
+#include "ZERenderCommand.h"
+#include "ZEMath/ZEViewSphere.h"
+#include "ZEGraphics/ZESamplerState.h"
+
+class ZETextureCube;
+class ZEVertexBuffer;
+class ZEMaterialOmniProjectiveLight;
+
+class ZELightOmniProjective : public ZELight
 {
-	return ZE_LT_OMNIPROJECTIVE;
-}
+	private:
+		ZESamplerState					TextureSampler;
+		const ZETextureCube*			ProjectionTexture;
 
-const ZETextureCube* ZEOmniProjectiveLight::GetProjectionTexture() const
-{
-	return ProjectionTexture;
-}
+		ZEMaterialOmniProjectiveLight*	Material;
+		ZEVertexBuffer*					Geometry;
+		ZERenderCommand					RenderCommand;
 
-void ZEOmniProjectiveLight::SetProjectionTexture(const ZETextureCube* Texture)
-{
-	ProjectionTexture = Texture;
-}
+		ZEViewSphere					ViewVolume;
 
-void ZEOmniProjectiveLight::SetCastsShadow(bool NewValue)
-{
-	if (NewValue == false)
-	{
-		if (FrontShadowMap != NULL)
-		{
-			FrontShadowMap->Destroy();
-			FrontShadowMap = NULL;
-		}
+										ZELightOmniProjective();
+		virtual							~ZELightOmniProjective();
 
-		if (BackShadowMap != NULL)
-		{
-			BackShadowMap->Destroy();
-			BackShadowMap = NULL;
-		}
-	}
+	public:
+		void							SetTextureSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&			GetTextureSampler() const;
 
-	ZELight::SetCastsShadow(NewValue);
-}
+		void							SetProjectionTexture(const ZETextureCube* Texture);
+		const ZETextureCube*			GetProjectionTexture() const;
 
-void ZEOmniProjectiveLight::Deinitialize()
-{
-	if (FrontShadowMap != NULL)
-	{
-		FrontShadowMap->Destroy();
-		FrontShadowMap = NULL;
-	}
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index);
 
-	if (BackShadowMap != NULL)
-	{
-		BackShadowMap->Destroy();
-		BackShadowMap = NULL;
-	}
-}
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
 
-ZETexture2D* ZEOmniProjectiveLight::GetFrontShadowMap()
-{
-	return FrontShadowMap;
-}
+		virtual void					Tick(float Time);
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
 
-ZETexture2D* ZEOmniProjectiveLight::GetBackShadowMap()
-{
-	return BackShadowMap;
-}
+		static ZELightOmniProjective*	CreateInstance();
+};
 
-const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume(ZESize Index) const
-{
-	if (UpdateViewVolume)
-	{
-// 		ViewVolume.Create(GetWorldPosition(), GetRange(), 0.0f);
-// 		UpdateViewVolume = false;
-	}
-
-	return ViewVolume;
-}
-
-ZEOmniProjectiveLight::ZEOmniProjectiveLight()
-{
-	ProjectionTexture = NULL;
-
-	FrontShadowMap = NULL;
-	BackShadowMap = NULL;
-}
-
-ZEOmniProjectiveLight::~ZEOmniProjectiveLight()
-{
-	Deinitialize();
-}
-
-ZEOmniProjectiveLight* ZEOmniProjectiveLight::CreateInstance()
-{
-	return new ZEOmniProjectiveLight();
-}
+#endif

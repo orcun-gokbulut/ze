@@ -59,7 +59,7 @@ void ZEUILabel::UpdateCharacters()
 	if(Characters.GetCount() == 0)
 	{
 		Output.Positions.LeftUp.x = 0;
-		Output.Positions.LeftUp.y = Character.CharacterMetric.MaximumHeight - Character.CharacterMetric.HorizontalBearingY;
+		Output.Positions.LeftUp.y = (float)(Character.CharacterMetric.MaximumHeight - Character.CharacterMetric.HorizontalBearingY);
 	}
 	else
 	{
@@ -83,7 +83,7 @@ void ZEUILabel::UpdateCharacters()
 	TextCharacter.RenderableCharacter.Texcoords = Character.CoordinateRectangle;
 	TextCharacter.RenderableCharacter.Color = FontColor;
 	TextCharacter.RenderableCharacter.Positions = Output.Positions;
-	((ZEUIMaterial*)TextCharacter.RenderableCharacter.Material)->SetTexture(Character.Texture);
+	((ZEMaterialUserInterface*)TextCharacter.RenderableCharacter.Material)->SetTexture(Character.Texture);
 	TextCharacter.Line = 0;
 
 	if (IsWordWrapping)
@@ -99,7 +99,7 @@ void ZEUILabel::UpdateCharacters()
 		}
 	}
 
-	LineTextWidths.GetLastItem() += TextCharacter.RenderableCharacter.Positions.GetWidth();
+	LineTextWidths.GetLastItem() += (ZEUInt32)TextCharacter.RenderableCharacter.Positions.GetWidth();
 	TextCharacter.Line = CurrentLine;
 	Characters.Add(TextCharacter);
 }
@@ -173,7 +173,7 @@ ZEUILabel::ZEUILabel()
 	Text.Clear();
 	SetFocusable(false);
 	SetMoveable(false);
-	FontMaterial = ZEUIMaterial::CreateInstance();
+	FontMaterial = ZEMaterialUserInterface::CreateInstance();
 	CurrentLine = 0;
 	SetWordWrapping(false);
 	SetSize(ZEVector2::One * 100);
@@ -258,7 +258,7 @@ void ZEUILabel::SetTextMargins(ZEUInt32 Top, ZEUInt32 Left, ZEUInt32 Bottom, ZEU
 	TextRenderingArea.RightDown.y += TextMargins.z;
 	TextRenderingArea.RightDown.x += TextMargins.w;
 
-	TextMargins = ZEVector4(Top, Left, Bottom, Right);
+	TextMargins = ZEVector4((float)Top, (float)Left, (float)Bottom, (float)Right);
 
 	TextRenderingArea.LeftUp.y += TextMargins.x;
 	TextRenderingArea.LeftUp.x += TextMargins.y;
@@ -268,7 +268,7 @@ void ZEUILabel::SetTextMargins(ZEUInt32 Top, ZEUInt32 Left, ZEUInt32 Bottom, ZEU
 
 void ZEUILabel::SetTextMargins(const ZEVector4& Margins)
 {
-	SetTextMargins(Margins.x, Margins.y, Margins.z, Margins.w);
+	SetTextMargins((ZEUInt32)Margins.x, (ZEUInt32)Margins.y, (ZEUInt32)Margins.z, (ZEUInt32)Margins.w);
 }
 
 const ZEVector4& ZEUILabel::GetTextMargins() const

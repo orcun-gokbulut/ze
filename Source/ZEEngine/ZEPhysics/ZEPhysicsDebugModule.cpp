@@ -37,7 +37,7 @@
 
 #include "ZECore/ZEConsole.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZERenderer/ZEFixedMaterial.h"
+#include "ZERenderer/ZEMaterialDefault.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGame/ZEGame.h"
 #include "ZEGame/ZEPlayer.h"
@@ -53,12 +53,12 @@
 #include "ZEModel/ZEModelBone.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZERenderer/ZECamera.h"
-#include "ZERenderer/ZEPointLight.h"
+#include "ZERenderer/ZELightPoint.h"
 #include "ZEInterior/ZEInterior.h"
 #include "ZEInterior/ZEInteriorRoom.h"
 #include "ZEInterior/ZEInteriorResource.h"
 #include "ZEMath/ZEAngle.h"
-#include "ZERenderer/ZEDirectionalLight.h"
+#include "ZERenderer/ZELightDirectional.h"
 #include "NxPhysicsSDK.h"
 #include "PhysXLoader.h"
 
@@ -89,8 +89,6 @@ bool ZEPhysicsDebugModule::Initialize()
 		Player = ZEPlayer::CreateInstance();
 		Player->SetPosition(ZEVector3(-7.0f, 44.0f, 7.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
-		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
-		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
 		Player->AddSteering(new ZESteeringPlayerFree());
 		Scene->SetActiveCamera(Player->GetCamera());
 		Scene->AddEntity(Player);
@@ -98,7 +96,7 @@ bool ZEPhysicsDebugModule::Initialize()
 
 	ZEPhysicalWorld* World = (ZEPhysicalWorld*)zeScene->GetPhysicalWorld();
 
-	ZEDirectionalLight* Light = ZEDirectionalLight::CreateInstance();
+	ZELightDirectional* Light = ZELightDirectional::CreateInstance();
 	ZEQuaternion TempQuat;
 	ZEQuaternion::CreateFromEuler(TempQuat, -ZE_PI_4, -ZE_PI_4, 0);
 	Light->SetRotation(TempQuat);
@@ -133,7 +131,7 @@ bool ZEPhysicsDebugModule::Initialize()
 	//TestBody->SetPosition(ZEVector3(0,60,0));
 	//Scene->AddEntity(TestBody);
 
-	ZEPointLight* PointLight = ZEPointLight::CreateInstance();
+	ZELightPoint* PointLight = ZELightPoint::CreateInstance();
 	PointLight->SetIntensity(2);
 	PointLight->SetAttenuation(ZEVector3(0.01f, 0.0f, 0.01f));
 	PointLight->SetPosition(ZEVector3(0,70,0));

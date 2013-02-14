@@ -36,9 +36,61 @@
 #include "ZERenderCommand.h"
 #include <memory.h>
 
-void ZERenderCommand::SetZero()
+ZERenderCommand::ZERenderCommand()
 {
-	memset(this, 0, sizeof(ZERenderCommand));
-	VertexLayout.SetToDefault();
-	this->Priority = 3;
+	Order = 0.0f;
+	Priority = 0;
+
+	Flags = ZE_RCF_NONE;
+	Pipeline = ZE_RP_NONE;
+
+	PrimitiveType = ZE_PT_NONE;
+	PrimitiveCount = 0;
+	FirstVertex = 0;
+	Material = NULL;
+
+	memset(VertexBuffers, 0, sizeof(ZEVertexBuffer*) * 16);
+}
+
+ZERenderCommand::~ZERenderCommand()
+{
+	
+}
+
+ZERenderCommandSkinned::ZERenderCommandSkinned()
+{
+	Flags |= ZE_RCF_SKINNED;
+}
+
+ZERenderCommandSkinned::~ZERenderCommandSkinned()
+{
+
+}
+
+ZERenderCommandIndexed::ZERenderCommandIndexed()
+{
+	Flags |= ZE_RCF_INDEXED;
+	
+	BaseVertex = 0;
+	FirstIndex = 0;
+	IndexCount = 0;
+	IndexBuffer = NULL;
+}
+
+ZERenderCommandIndexed::~ZERenderCommandIndexed()
+{
+
+}
+
+ZERenderCommandInstanced::ZERenderCommandInstanced()
+{
+	Flags |= ZE_RCF_INSTANCED;
+
+	InstanceCount = 0;
+	FirstInstance = 0;
+}
+
+ZERenderCommandInstanced::~ZERenderCommandInstanced()
+{
+
 }

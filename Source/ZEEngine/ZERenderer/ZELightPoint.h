@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEOmniProjectiveLight.h
+ Zinek Engine - ZELightPoint.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,43 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_OMNI_PROJECTIVE_LIGHT_H__
-#define __ZE_OMNI_PROJECTIVE_LIGHT_H__
+#ifndef	__ZE_POINT_LIGHT_H__
+#define __ZE_POINT_LIGHT_H__
 
 #include "ZELight.h"
+#include "ZERenderCommand.h"
 #include "ZEMath/ZEViewSphere.h"
 
-class ZETextureCube;
 class ZETexture2D;
+class ZEMaterialPointLight;
 
-class ZEOmniProjectiveLight : public ZELight
+class ZELightPoint  : public ZELight
 {
 	private:
 		ZEViewSphere					ViewVolume;
-		ZETexture2D*					FrontShadowMap;
-		ZETexture2D*					BackShadowMap;
-		const ZETextureCube*			ProjectionTexture;
 
-										ZEOmniProjectiveLight();
-		virtual							~ZEOmniProjectiveLight();
+		ZEMaterialPointLight*			Material;
+		ZEVertexBuffer*					Geometry;
+		ZERenderCommand					RenderCommand;
+		
+										ZELightPoint();
+		virtual							~ZELightPoint();
 
 	public:
-		ZELightType						GetLightType() const;
-
-		const ZETextureCube*			GetShadowMap();
-		ZETexture2D*					GetBackShadowMap();
-		ZETexture2D*					GetFrontShadowMap();
-
-		void							SetProjectionTexture(const ZETextureCube* Texture);
-		const ZETextureCube*			GetProjectionTexture() const;
-
-		virtual void					SetCastsShadow(bool NewValue);
-
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index) const;
-
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index);
+		
+		virtual bool					Initialize();
 		virtual void					Deinitialize();
-		static ZEOmniProjectiveLight*	CreateInstance();
+
+		virtual void					Tick(float Time);
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
+
+		static ZELightPoint*			CreateInstance();
 };
 
 #endif

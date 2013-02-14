@@ -36,40 +36,41 @@
 #include "ZECamera.h"
 #include "ZEMaterial.h"
 #include "ZERenderer.h"
-#include "ZEPointLight.h"
+#include "ZEDS/ZEArray.h"
+#include "ZELightPoint.h"
 #include "ZERenderCommand.h"
-#include "ZEProjectiveLight.h"
-#include "ZEDirectionalLight.h"
-#include "ZEOmniProjectiveLight.h"
+#include "ZELightProjective.h"
+#include "ZELightDirectional.h"
+#include "ZELightOmniProjective.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEGraphicsEventTracer.h"
 
 #include "ZERenderStage.h"
+#include "ZERenderStageShadow.h"
 #include "ZERenderStageForward.h"
 #include "ZERenderStageLighting.h"
 #include "ZERenderStageGeometry.h"
 #include "ZERenderStageTransparent.h"
 #include "ZERenderStagePostProcess.h"
-#include "ZEDS/ZEArray.h"
 
-static ZEInt RenderCommandCompare(const ZERenderCommand* A, const ZERenderCommand* B)
+static ZEInt RenderCommandCompare(ZERenderCommand* const* A, ZERenderCommand* const* B)
 {
-	if (A->Priority > B->Priority)
+	if ((*A)->Priority > (*B)->Priority)
 	{
 		return 1;
 	}
-	else if (A->Priority < B->Priority)
+	else if ((*A)->Priority < (*B)->Priority)
 	{
 		return -1;
 	}
 	else
 	{
-		if (A->Order > B->Order)
+		if ((*A)->Order > (*B)->Order)
 		{
 			return 1;
 		}
-		else if (A->Order < B->Order)
+		else if ((*A)->Order < (*B)->Order)
 		{
 			return -1;
 		}
@@ -98,14 +99,12 @@ static ZEInt LightCompare(ZELight* const* A, ZELight* const* B)
 
 bool ZERenderer::Initialize() 
 {
-	LightList.Clear();
-	CommandList.Clear();
-	
 	GeometryStage = new ZERenderStageGeometry();
 	
+	ShadowStage = new ZERenderStageShadow();
+
 	LightingStage = new ZERenderStageLighting();
 	LightingStage->SetGBufferInput(GeometryStage);
-	LightingStage->SetLightList(&LightList);
 
 	ForwardStage = new ZERenderStageForward();
 	ForwardStage->SetGBufferInput(GeometryStage);
@@ -116,6 +115,7 @@ bool ZERenderer::Initialize()
 
 void ZERenderer::Deinitialize()
 {
+	ZE_DESTROY(ShadowStage);
 	ZE_DESTROY(ForwardStage);
 	ZE_DESTROY(LightingStage);
 	ZE_DESTROY(GeometryStage);
@@ -128,14 +128,94 @@ void ZERenderer::Destroy()
 	delete this;
 }
 
-void ZERenderer::SetCamera(ZECamera* Camera)
+void ZERenderer::DoGeomtryPass()
 {
-	this->Camera = Camera;
+	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+
+	Tracer->StartEvent("Geometry Stage");
+	
+	GeometryStage->Setup();
+	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
+		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS)
+			GeometryStage->Process(CommandList[I]);
+	
+	Tracer->EndEvent();
 }
 
-ZECamera* ZERenderer::GetCamera() const
+void ZERenderer::DoShadowPass()
 {
-	return Camera;
+	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+
+	Tracer->StartEvent("Shadow Stage");
+	
+	ShadowStage->Setup();
+	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
+		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_SHADOW_PASS)
+			ShadowStage->Process(CommandList[I]);
+	
+	Tracer->EndEvent();
+}
+
+void ZERenderer::DoLightingPass()
+{
+	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+
+	Tracer->StartEvent("Lighting Stage");
+	
+	LightingStage->Setup();
+	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
+		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_L_BUFFER_PASS)
+			LightingStage->Process(CommandList[I]);
+	
+	Tracer->EndEvent();
+}
+
+void ZERenderer::DoForwardPass()
+{
+	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+
+	Tracer->StartEvent("Forward Stage");
+	
+	ForwardStage->Setup();
+	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
+		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_FORWARD_PASS)
+			ForwardStage->Process(CommandList[I]);
+	
+	Tracer->EndEvent();
+}
+
+void ZERenderer::DoTransparentPass()
+{
+	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+
+	Tracer->StartEvent("Transparent Stage");
+	Tracer->EndEvent();
+}
+
+void ZERenderer::DoPostProcessPass()
+{
+	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+
+	Tracer->StartEvent("PostProcess Stage");
+	Tracer->EndEvent();
+}
+
+void ZERenderer::DoUserInterfacePass()
+{
+	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+
+	Tracer->StartEvent("UserInterface Stage");
+	Tracer->EndEvent();
+}
+
+void ZERenderer::AddRenderCommand(ZERenderCommand* RenderCommand)
+{
+	CommandList.Add(RenderCommand);
+}
+
+void ZERenderer::SetDrawParameters(const ZEDrawParameters& Parameters)
+{
+	DrawParameters = Parameters;
 }
 
 void ZERenderer::SetShadowMapDimension(ZEVector2 Value)
@@ -148,94 +228,31 @@ ZEVector2 ZERenderer::GetShadowMapDimension() const
 	return ShadowMapDimesion;
 }
 
-void ZERenderer::AddToLightList(ZELight* Light)
+const ZEDrawParameters& ZERenderer::GetDrawParameters() const
 {
-	LightList.Add(Light);
-}
-
-void ZERenderer::AddToLightList(const ZESmartArray<ZELight*>& Lights)
-{
-	LightList.MassAdd(Lights.GetConstCArray(), Lights.GetCount());
-}
-
-void ZERenderer::ClearLightList()
-{
-	LightList.Clear();
-}
-
-void ZERenderer::AddToRenderList(ZERenderCommand* RenderCommand)
-{
-	CommandList.Add(*RenderCommand);
-}
-
-void ZERenderer::ClearRenderList()
-{
-	CommandList.Clear(true);
+	return DrawParameters;
 }
 
 void ZERenderer::Render(float ElaspedTime)
 {
 	if (!zeGraphics->GetEnabled())
 	{
-		zeWarning("Cannot render while module is disabled.");
-		return;
-	}
-
-	if (Camera == NULL)
-	{
-		zeWarning("Cannot render without a camera.");
+		zeWarning("zeGraphics disabled.");
 		return;
 	}
 
 	// Sort commands
-	LightList.Sort(LightCompare);
 	CommandList.Sort(RenderCommandCompare);
+	DrawParameters.Lights.Sort(LightCompare);
 	
-	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+	DoShadowPass();
+	DoGeomtryPass();
+	DoLightingPass();
+	DoForwardPass();
+	DoTransparentPass();
+	DoPostProcessPass();
+	DoUserInterfacePass();
 
-	// Shadow stage
-	// -----------------------------------------------
-	// 	Tracer->StartEvent("Shadow Stage");
-	// 
-	// 	ForwardStage->Setup();
-	// 	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
-	// 		if (CommandList[I].Material->GetMaterialFlags() & ZE_MTF_FORWARD_PASS)
-	// 			ForwardStage->Process(&CommandList[I]);
-	// 
-	// 	Tracer->EndEvent();
-
-	// Geometry stage
-	// -----------------------------------------------
-	Tracer->StartEvent("Geometry Stage");
-	
-	GeometryStage->Setup();
-	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
-		if (CommandList[I].Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS)
-			GeometryStage->Process(&CommandList[I]);
-
-	Tracer->EndEvent();
-
-	// Lighting stage
-	// -----------------------------------------------
-	Tracer->StartEvent("Lighting Stage");
-
-	LightingStage->Setup();
-	LightingStage->Process(NULL);
-
-	Tracer->EndEvent();
-
-	// Forward stage
-	// -----------------------------------------------
-	Tracer->StartEvent("Forward Stage");
-	
-	ForwardStage->Setup();
-	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
-		if (CommandList[I].Material->GetMaterialFlags() & ZE_MTF_FORWARD_PASS)
-			ForwardStage->Process(&CommandList[I]);
-
-	Tracer->EndEvent();
-
-	LightList.Clear(false);
 	CommandList.Clear(false);
 
 	zeGraphics->GetDevice()->Present();
@@ -247,9 +264,7 @@ ZERenderer* ZERenderer::CreateInstance()
 }
 
 ZERenderer::ZERenderer()
-{
-	Camera = NULL;
-	
+{	
 	GeometryStage = NULL;
 	LightingStage = NULL;
 	ForwardStage = NULL;

@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIVerticalSliderControl.h"
-#include "ZERenderer\ZEUIMaterial.h"
+#include "ZERenderer\ZEMaterialUserInterface.h"
 
 void ZEUIVerticalSliderControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
 {
@@ -160,8 +160,8 @@ void ZEUIVerticalSliderControl::SetPosition(const ZEVector2& Position)
 
 ZEUIVerticalSliderControl::ZEUIVerticalSliderControl()
 {
-	SliderButtonMaterial = ZEUIMaterial::CreateInstance();
-	SliderLineMaterial = ZEUIMaterial::CreateInstance();
+	SliderButtonMaterial = ZEMaterialUserInterface::CreateInstance();
+	SliderLineMaterial = ZEMaterialUserInterface::CreateInstance();
 
 	SliderButton.Positions.SetPosition(ZEVector2::Zero);
 	SliderButton.Positions.SetWidth(30);

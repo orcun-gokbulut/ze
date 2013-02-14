@@ -301,8 +301,7 @@ void ZEScene::Render(float ElapsedTime)
 
 	Culler.CullScene(this, &FrameDrawParameters);
 
-	Renderer->SetCamera(ActiveCamera);
-	Renderer->AddToLightList(FrameDrawParameters.Lights);
+	Renderer->SetDrawParameters(FrameDrawParameters);
 }
 
 bool ZEScene::Save(const ZEString& FileName)

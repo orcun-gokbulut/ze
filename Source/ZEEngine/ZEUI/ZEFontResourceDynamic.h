@@ -45,7 +45,7 @@
 #include "ZEMath\ZEVector.h"
 
 #include "ZEGraphics\ZETexture2D.h"
-#include "ZERenderer\ZEUIMaterial.h"
+#include "ZERenderer\ZEMaterialUserInterface.h"
 #include "ZEUI\ZEFontResource.h"
 #include "ZEUI\ZEUIRectangle.h"
 

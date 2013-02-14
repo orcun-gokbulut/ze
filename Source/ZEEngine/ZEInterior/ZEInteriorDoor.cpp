@@ -37,7 +37,7 @@
 #include "ZEInteriorResource.h"
 #include "ZEInterior.h"
 #include "ZEInteriorRoom.h"
-#include "ZERenderer\ZESimpleMaterial.h"
+#include "ZERenderer\ZEMaterialSimple.h"
 #include "ZERenderer\ZERenderer.h"
 
 void ZEInteriorDoor::CalculateRectangle()

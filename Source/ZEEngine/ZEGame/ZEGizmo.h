@@ -33,8 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
-
 #pragma once
 #ifndef __ZE_GIZMO_H__
 #define __ZE_GIZMO_H__
@@ -43,8 +41,7 @@
 #include "ZERenderer/ZECanvas.h"
 #include "ZERenderer/ZERenderCommand.h"
 
-
-class ZESimpleMaterial;
+class ZEMaterialSimple;
 class ZERenderer;
 class ZERLLight;
 
@@ -78,7 +75,7 @@ class ZEGizmo : public ZEEntity
 
 		float							AxisLenght;
 
-		static ZESimpleMaterial*		GizmoMaterial;
+		static ZEMaterialSimple*		GizmoMaterial;
 
 		ZERenderCommand					RenderCommand;
 

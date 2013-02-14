@@ -46,22 +46,24 @@
 
 enum ZERenderPipeline
 {
-	ZE_RORP_3D = 0,
-	ZE_RORP_2D = 1
+	ZE_RP_NONE	= 0,
+	ZE_RP_3D	= 1,
+	ZE_RP_2D	= 2
 };
 
 // ZERenderCommandFlags
 typedef ZEUInt32 ZERenderCommandFlags;
-#define	ZE_ROF_NONE									0
-#define	ZE_ROF_ENABLE_Z_CULLING						4
-#define	ZE_ROF_ENABLE_NO_Z_WRITE					8
-#define	ZE_ROF_ENABLE_WORLD_TRANSFORM				16
-#define ZE_ROF_ENABLE_VIEW_TRANSFORM				32
-#define ZE_ROF_ENABLE_PROJECTION_TRANSFORM			64
-#define	ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM		(ZE_ROF_ENABLE_VIEW_TRANSFORM | ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
-#define ZE_ROF_INSTANCED							128
-#define ZE_ROF_SKINNED								256
-#define ZE_ROF_INDEXED								512
+#define	ZE_RCF_NONE									0
+#define	ZE_RCF_ENABLE_Z_CULLING						4
+#define	ZE_RCF_ENABLE_NO_Z_WRITE					8
+#define	ZE_RCF_ENABLE_WORLD_TRANSFORM				16
+#define ZE_RCF_ENABLE_VIEW_TRANSFORM				32
+#define ZE_RCF_ENABLE_PROJECTION_TRANSFORM			64
+#define	ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM		(ZE_RCF_ENABLE_VIEW_TRANSFORM | ZE_RCF_ENABLE_PROJECTION_TRANSFORM)
+#define ZE_RCF_INSTANCED							128
+#define ZE_RCF_SKINNED								256
+#define ZE_RCF_INDEXED								512
+#define ZE_RCF_SHADOWED								2048
 
 class ZELight;
 class ZEMaterial;
@@ -72,38 +74,66 @@ class ZEVertexLayout;
 class ZERenderCommand
 {
 	public:
-		ZERenderPipeline			Pipeline;
-		ZEInt						Priority;
-		float						Order;
-		ZERenderCommandFlags		Flags;
+		float					Order;
+		ZEInt					Priority;
 
-		ZEPrimitiveType				PrimitiveType;
-		void*						PrimitiveParameters;
-		ZEUInt						PrimitiveCount;
+		ZERenderCommandFlags	Flags;
+		ZERenderPipeline		Pipeline;
 
-		ZEMaterial*					Material;
+		ZEPrimitiveType			PrimitiveType;
+		ZEUInt					PrimitiveCount;
+	
+		ZEUInt					FirstVertex;
+		ZEVertexLayout			VertexLayout;
+		ZEVertexBuffer*			VertexBuffers[16];
 
-		ZEUInt						FirstIndex;
-		ZEUInt						BaseVertex;
-		ZEUInt						FirstVertex;
-		ZEUInt						FirstInstance;
-		ZEIndexBuffer*				IndexBuffer;
-		ZEVertexLayout				VertexLayout;
-		ZEVertexBuffer*				VertexBuffers[16];
+		ZEMaterial*				Material;
+		ZEMatrix4x4				LocalMatrix;
+		ZEMatrix4x4				WorldMatrix;
 
-		ZEMatrix4x4					LocalMatrix;
-		ZEMatrix4x4					WorldMatrix;
+								ZERenderCommand();
+								~ZERenderCommand();
+};
+/*
+class ZERenderCommandShadow : public ZERenderCommand
+{
+	public:
+		ZELight*				Light;
+		ZERenderTarget*			RenderTarget;
 
-		ZEArray<ZERenderCommand*>	Instances;
-		ZEArray<ZEMatrix4x4>		BoneTransforms;
+								ZERenderCommandShadow();
+								~ZERenderCommandShadow();
+};
+*/
+class ZERenderCommandSkinned : public ZERenderCommand
+{
+	public:
+		ZEArray<ZEMatrix4x4>	BoneTransforms;
 
-		ZEArray<ZELight*>			Lights;
+								ZERenderCommandSkinned();
+								~ZERenderCommandSkinned();
+};
 
-		void						SetZero();
+class ZERenderCommandIndexed : public ZERenderCommand
+{
+	public:
+		ZEUInt					BaseVertex;
+		ZEUInt					FirstIndex;
+		ZEUInt					IndexCount;
+		ZEIndexBuffer*			IndexBuffer;
+
+								ZERenderCommandIndexed();
+								~ZERenderCommandIndexed();
+};
+
+class  ZERenderCommandInstanced : public ZERenderCommand
+{
+	public:
+		ZEUInt					InstanceCount;
+		ZEUInt					FirstInstance;
+
+								ZERenderCommandInstanced();
+								~ZERenderCommandInstanced();
 };
 
 #endif
-
-
-
-

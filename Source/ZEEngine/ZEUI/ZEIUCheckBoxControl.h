@@ -57,7 +57,7 @@ class ZEUICheckBoxControl : public ZEUIControl
 		ZEUICheckBoxState	State;
 		ZEUILabel*			Label;
 		ZEUIRectangle		Box;
-		ZEUIMaterial*		BoxMaterial;
+		ZEMaterialUserInterface*		BoxMaterial;
 
 	protected:
 

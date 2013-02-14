@@ -54,6 +54,7 @@ class ZEModelMeshLOD
 		const ZEModelResourceMeshLOD*		LODResource;
 		ZEVertexBuffer*						VertexBuffer;
 		ZERenderCommand						RenderCommand;
+		ZERenderCommandSkinned				RenderCommandSkinned;
 		const ZEMaterial*					Material;
 		bool								Skinned;
 

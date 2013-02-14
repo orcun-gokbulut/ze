@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIMaterial.cpp
+ Zinek Engine - ZEMaterialUserInterface.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,11 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 
-#include "ZEUIMaterial.h"
+
 #include "ZERenderCommand.h"
 #include "ZEGraphics/ZEShader.h"
 #include "ZEGraphics/ZETexture.h"
 #include "ZEGraphics/ZETexture2D.h"
+#include "ZEMaterialUserInterface.h"
 #include "ZEGraphics/ZEShaderCompiler.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
@@ -47,16 +48,16 @@
 #include "ZERenderStage.h"
 
 
-ZEShader* ZEUIMaterial::VertexShader = NULL;
-ZEShader* ZEUIMaterial::PixelShader = NULL;
-ZEShader* ZEUIMaterial::PixelShaderTextured = NULL;
+ZEShader* ZEMaterialUserInterface::VertexShader = NULL;
+ZEShader* ZEMaterialUserInterface::PixelShader = NULL;
+ZEShader* ZEMaterialUserInterface::PixelShaderTextured = NULL;
 
 struct ZEUIConstantBuffer
 {
 	ZEMatrix4x4 WorldMatrix;
 };
 
-ZEUIMaterial::ZEUIMaterial()
+ZEMaterialUserInterface::ZEMaterialUserInterface()
 {
 	Texture = NULL;
 	WireFrame = false;
@@ -64,12 +65,12 @@ ZEUIMaterial::ZEUIMaterial()
 	CreateShaders();
 }
 
-ZEUIMaterial::~ZEUIMaterial()
+ZEMaterialUserInterface::~ZEMaterialUserInterface()
 {
 	DestroyShaders();
 }
 
-void ZEUIMaterial::CreateShaders()
+void ZEMaterialUserInterface::CreateShaders()
 {
 	if (VertexShader == NULL)
 	{
@@ -105,42 +106,42 @@ void ZEUIMaterial::CreateShaders()
 	}
 }
 
-void ZEUIMaterial::DestroyShaders()
+void ZEMaterialUserInterface::DestroyShaders()
 {
 	ZE_DESTROY(VertexShaderBuffer);
 }
 
-ZEUInt32 ZEUIMaterial::GetHash() const
+ZEUInt32 ZEMaterialUserInterface::GetHash() const
 {
 	return 1 << 30;
 }
 
-ZEMaterialFlags ZEUIMaterial::GetMaterialFlags() const
+ZEMaterialFlags ZEMaterialUserInterface::GetMaterialFlags() const
 {
 	return ZE_MTF_NONE;
 }
 
-void ZEUIMaterial::SetWireFrame(bool Enabled)
+void ZEMaterialUserInterface::SetWireFrame(bool Enabled)
 {
 	WireFrame = Enabled;
 }
 
-bool ZEUIMaterial::GetWireFrame() const
+bool ZEMaterialUserInterface::GetWireFrame() const
 {
 	return WireFrame;
 }
 
-void ZEUIMaterial::SetTexture(const ZETexture2D* Texture)
+void ZEMaterialUserInterface::SetTexture(const ZETexture2D* Texture)
 {
 	this->Texture = Texture;
 }
 
-const ZETexture2D* ZEUIMaterial::GetTexture() const
+const ZETexture2D* ZEMaterialUserInterface::GetTexture() const
 {
 	return Texture;
 }
 
-bool ZEUIMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+bool ZEMaterialUserInterface::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	if (Stage->GetStageFlags() != ZE_RENDER_STAGE_UI)
 		return true;
@@ -196,7 +197,7 @@ bool ZEUIMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZE
 }
 
 /*
-bool ZEUIMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* RenderCommand) 
+bool ZEMaterialUserInterface::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* RenderCommand) 
 {
 
 	static ZEDeviceStageShader VertexShaderStage;
@@ -249,12 +250,12 @@ bool ZEUIMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* Rende
 	return true;
 }
 	*/
-void ZEUIMaterial::UpdateMaterial()
+void ZEMaterialUserInterface::UpdateMaterial()
 {	
 
 }
 
-ZEUIMaterial* ZEUIMaterial::CreateInstance()
+ZEMaterialUserInterface* ZEMaterialUserInterface::CreateInstance()
 {
-	return new ZEUIMaterial();
+	return new ZEMaterialUserInterface();
 }

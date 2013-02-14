@@ -38,18 +38,17 @@
 #define __ZE_INTERIOR_ROOM_H__
 
 #include "ZEDS/ZEArray.h"
-#include "ZERenderer/ZERenderCommand.h"
 #include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZERenderCommand.h"
 
+class ZERenderer;
 class ZEInterior;
-class ZEInteriorDoor;
-struct ZEInteriorResourceRoom;
+class ZEViewVolume;
 class ZEVertexBuffer;
 class ZEPhysicalMesh;
-class ZERenderer;
+class ZEInteriorDoor;
 struct ZEDrawParameters;
-class ZEViewVolume;
-class ZESimpleMaterial;
+struct ZEInteriorResourceRoom;
 
 class ZEInteriorRoom
 {

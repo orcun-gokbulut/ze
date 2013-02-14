@@ -37,7 +37,7 @@
 #include "ZEFontResourceBitmap.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEFile/ZEPartialFile.h"
-#include "ZERenderer/ZEUIMaterial.h"
+#include "ZERenderer/ZEMaterialUserInterface.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZETexture/ZETextureOptions.h"
 #include "ZECore/ZEResourceManager.h"

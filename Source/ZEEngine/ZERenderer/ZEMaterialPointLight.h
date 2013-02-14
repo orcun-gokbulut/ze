@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDirectionalLight.h
+ Zinek Engine - ZEMaterialPointLight.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,48 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_DIRECTIONAL_LIGHT_H__
-#define __ZE_DIRECTIONAL_LIGHT_H__
+#ifndef __ZE_MATERIAL_POINT_LIGHT_H__
+#define __ZE_MATERIAL_POINT_LIGHT_H__
 
-#include "ZELight.h"
 #include "ZETypes.h"
-#include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEViewCuboid.h"
+#include "ZEMaterialLight.h"
 
-class ZETexture2D;
-class ZERenderTarget;
-struct ZEDrawParameters;
+class ZEShader;
+class ZERenderStage;
+class ZEVertexBuffer;
+class ZERenderCommand;
+class ZEConstantBuffer;
 
-struct ZEDirectionalLightCascade
+class ZEMaterialPointLight : public ZEMaterialLight
 {
-	ZEUInt				Index;
-	float				FarZ;
-	float				NearZ;
-	float				Depth;
-	ZEUInt				UpdateInterval;
+	friend class ZELightPoint;
 
-	ZETexture2D*		ShadowMap;
-	ZERenderTarget*		ShadowMapRenderTarget;
-	ZEViewCuboid		ViewVolume;
-	ZEMatrix4x4			ShadowTransform;
-};
-
-#define	ZE_DL_MAX_CASCADE_COUNT		5
-
-class ZEDirectionalLight : public ZELight
-{
 	protected:
-		ZESize							CascadeCount;
-		ZEDirectionalLightCascade		Cascades[ZE_DL_MAX_CASCADE_COUNT];
+		ZEShader*						VertexShader;
+		ZEShader*						PixelShader;
+		ZEConstantBuffer*				Transformations;
+		ZEConstantBuffer*				LightParameters;
+		ZEConstantBuffer*				ShadowParameters;
 
-		float							CascadeSplitBias;
+		void							UpdateShaders();
+		void							UpdateBuffers();
 
-		void							UpdateCascades();
-		void							UpdateRenderTargets();
-		void							DestroyRenderTargets();
-		
-										ZEDirectionalLight();
-		virtual							~ZEDirectionalLight();
+		void							DestroyShaders();
+		void							DestroyBuffers();
+
+		bool							SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
+
+										ZEMaterialPointLight();
+		virtual							~ZEMaterialPointLight();
 
 	public:
-		void							SetCascadeCount(ZESize Value);
-		ZESize							GetCascadeCount() const;
-		
-		void							SetSplitBias(float Value);
-		float							GetSplitBias() const;
+		virtual ZEUInt32				GetHash() const;
+		virtual ZEMaterialFlags			GetMaterialFlags() const;
 
-		float							GetFarZ(ZESize Index) const;
-		float							GetNearZ(ZESize Index) const;
-		float							GetDepth(ZESize Index) const;
+		virtual void					UpdateMaterial();
+		virtual bool					SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		void							SetUpdateInterval(ZESize Index, ZEUInt Value);
-		ZEUInt							GetUpdateInterval(ZESize Index) const;
-
-		const ZETexture2D*				GetShadowMap(ZESize Index) const;
-		const ZEMatrix4x4&				GetShadowTransform(ZESize Index) const;
-
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index) const;
-
-		virtual void					Draw(ZEDrawParameters* DrawParameters);
-		
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
-
-		static ZEDirectionalLight*		CreateInstance();
+		static ZEMaterialPointLight*	CreateInstance();
 };
 
 #endif

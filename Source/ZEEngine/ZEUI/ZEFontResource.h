@@ -46,7 +46,7 @@
 
 class ZETexture2D;
 class ZETexture2DResource;
-class ZEUIMaterial;
+class ZEMaterialUserInterface;
 class ZEMaterial;
 
 struct ZEFontCharacterMetric

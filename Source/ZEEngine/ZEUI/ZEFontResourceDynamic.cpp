@@ -55,7 +55,7 @@ void ZEFontResourceDynamic::SetFontFile(ZEString FontFilePath)
 
 	FT_Init_FreeType(&Library);
 	FT_New_Face(Library, FontFilePath, 0, &Face);
-	FontSupportsKerning = FT_HAS_KERNING(Face);
+	FontSupportsKerning = (FT_HAS_KERNING(Face) != 0);
 }
 
 void ZEFontResourceDynamic::SetFontSize(ZEUInt32 FontSize)
@@ -149,7 +149,7 @@ const ZEFontCharacter& ZEFontResourceDynamic::GetCharacter(char Character, char 
 	}
 
 	FontCharacters.Add();
-	LastItem = FontCharacters.GetCount() - 1;
+	LastItem = (ZEUInt32)FontCharacters.GetCount() - 1;
 	FontCharacters[LastItem].Character = Character;
 
 	if(isspace(Character))
@@ -165,7 +165,7 @@ const ZEFontCharacter& ZEFontResourceDynamic::GetCharacter(char Character, char 
 		
 	FontCharacters[LastItem].CharacterMetric.FontSize			= FontSize;
 	FontCharacters[LastItem].CharacterMetric.Height				= Face->glyph->metrics.height		/ PointFactor;
-	FontCharacters[LastItem].CharacterMetric.Width				= Face->glyph->metrics.width			/ PointFactor;
+	FontCharacters[LastItem].CharacterMetric.Width				= Face->glyph->metrics.width		/ PointFactor;
 	FontCharacters[LastItem].CharacterMetric.HorizontalAdvance	= Face->glyph->metrics.horiAdvance	/ PointFactor;
 	FontCharacters[LastItem].CharacterMetric.VerticalAdvance	= Face->glyph->metrics.vertAdvance	/ PointFactor;
 	FontCharacters[LastItem].CharacterMetric.HorizontalBearingX	= Face->glyph->metrics.horiBearingX / PointFactor;
@@ -202,7 +202,7 @@ const ZEFontCharacter& ZEFontResourceDynamic::GetCharacter(char Character, char 
 		LastTextureId++;
 	}
 
-	LastCharacterPosition.y = FontSize * LastTextureLine;
+	LastCharacterPosition.y = (float)(FontSize * LastTextureLine);
 
 	Textures[LastTextureId]->Lock((void**)&Buffer, &TexturePitch, 0);
 	ZEFontPixel* CurrentCharPix = Buffer + (ZEUInt32)LastCharacterPosition.x + ((ZEUInt32)(LastCharacterPosition.y * TexturePitch / 4));

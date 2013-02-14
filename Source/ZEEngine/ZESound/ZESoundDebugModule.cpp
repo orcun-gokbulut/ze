@@ -54,10 +54,8 @@ bool ZESoundDebugModule::Initialize()
 	if (Player == NULL)
 	{
 		Player = ZEPlayer::CreateInstance();
-		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
+		Player->SetPosition(ZEVector3::Zero);
 		Player->SetRotation(ZEQuaternion::Identity);
-		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
-		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
 		Scene->SetActiveCamera(Player->GetCamera());
 		Scene->AddEntity(Player);
 	}

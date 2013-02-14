@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUICursorControl.h
+ Zinek Engine - ZEMaterialUserInterface.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,40 +34,51 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_CURSOR_CONTROL__
-#define __ZE_UI_CURSOR_CONTROL__
+#ifndef __ZE_UI_MATERIAL_H__ 
+#define __ZE_UI_MATERIAL_H__
 
-#include "zeui/ZEUIControl.h"
-#include "zeui/ZEUIRectangle.h"
-#include "ZEInput/ZEInputMap.h"
-#include "ZERenderer/ZEMaterialUserInterface.h"
+#include "ZEMaterial.h"
 
-class ZEVector3;
+class ZEShader;
+class ZETexture;
+class ZETexture2D;
+class ZEConstantBuffer;
 
-class ZEUICursorControl : public ZEUIControl
+class ZEMaterialUserInterface : public ZEMaterial
 {
-	private:
+	friend class ZED3D10GraphicsModule;
 
-		ZEMaterialUserInterface*		CursorMaterial;
-		ZEUIRectangle		Cursor;
-		ZEInputMap			InputMap;
+	protected:
+		static ZEShader*		VertexShader;
+		static ZEShader*		PixelShader;
+		static ZEShader*		PixelShaderTextured;
 
-		ZEUIMouseKey		CurentButton;
+		ZEConstantBuffer*		VertexShaderBuffer;
+		const ZETexture2D*		Texture;
+
+		bool					WireFrame;
+
+								ZEMaterialUserInterface();
+								~ZEMaterialUserInterface();
+
+		void					CreateShaders();
+		void					DestroyShaders();
 
 	public:
+		ZEUInt32				GetHash() const;
+		ZEMaterialFlags			GetMaterialFlags() const;
 
-		virtual void		Draw(ZEUIRenderer* Renderer);
-		virtual void		Tick(float ElapsedTime);
+		void					SetWireFrame(bool Enabled);
+		bool					GetWireFrame() const;
 
-		virtual ZEMaterial* GetMaterial() const;
-		virtual void		SetMaterial(ZEMaterial* Material);
+		void					SetTexture(const ZETexture2D* Texture);
+		const ZETexture2D*		GetTexture() const;
 
-		ZEUIMouseKey		GetCurrentButton();
+		bool					SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		virtual void		SetZOrder(ZEInt Z);
+		void					UpdateMaterial();
 
-							ZEUICursorControl();
-							~ZEUICursorControl();
+		static ZEMaterialUserInterface*	CreateInstance();
 };
 
 #endif

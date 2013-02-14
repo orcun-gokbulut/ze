@@ -102,12 +102,8 @@ void ZEUICheckBoxControl::SetWidth(float Width)
 {
 	ZEUIControl::SetWidth(Width);
 	Label->SetPosition(ZEVector2((Box.Positions.RightDown - Box.Positions.LeftUp).x , Label->GetPosition().y));
-	ZEInt32 LabelWidth = GetWidth() - (Box.Positions.RightDown - Box.Positions.LeftUp).x;
-
-	if(LabelWidth < 0)
-		Label->SetWidth(0);
-	else
-		Label->SetWidth(LabelWidth);
+	float LabelWidth = ZEMath::Floor(GetWidth() - (Box.Positions.RightDown - Box.Positions.LeftUp).x);
+	Label->SetWidth(ZEMath::Max(0.0f, LabelWidth));
 }
 
 void ZEUICheckBoxControl::SetPosition(const ZEVector2& Position)
@@ -128,7 +124,7 @@ ZEUICheckBoxControl::ZEUICheckBoxControl()
 	Box.Positions.RightDown = GetPosition() + ZEVector2::One * 22;
 	Label->SetText("Check Box");
 	Label->SetHeight(16);
-	BoxMaterial = ZEUIMaterial::CreateInstance();
+	BoxMaterial = ZEMaterialUserInterface::CreateInstance();
 	Box.Material = BoxMaterial;
 	SetPosition(ZEVector2::Zero);
 	SetWidth(120);

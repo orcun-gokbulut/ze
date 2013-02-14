@@ -61,7 +61,7 @@ class ZESteeringPlayerFree : public ZESteering
 ZE_META_ENTITY_DESCRIPTION(ZEPlayer);
 
 class ZEListener;
-class ZEProjectiveLight;
+class ZELightProjective;
 class ZECamera;
 class ZEModelIKChain;
 
@@ -72,7 +72,7 @@ class ZEPlayer : public ZEActor
 		ZEInputMap				InputMap;
 		ZECamera*				Camera;
 		ZEListener*				Listener;
-		//ZEProjectiveLight*		Light;
+		//ZELightProjective*		Light;
 
 		float					FOV;
 

@@ -40,7 +40,7 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZERenderer/ZEFixedMaterial.h"
+#include "ZERenderer/ZEMaterialDefault.h"
 #include "ZERenderer/ZERenderCommand.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZETexture/ZETexture2DResource.h"
@@ -83,19 +83,13 @@ const char* ZEPresentationSlide::GetPresentationSlide() const
 
 void ZEPresentationSlide::Draw(ZEDrawParameters* DrawParameters)
 {
-	/*
 	if (VertexBuffer != NULL)
 	{
-		RenderCommand.Lights.SetCount(DrawParameters->Lights.GetCount());
-		for (ZESize I = 0; I < DrawParameters->Lights.GetCount(); I++)
-			RenderCommand.Lights[I] = DrawParameters->Lights[I];
-
-		RenderCommand.VertexBuffer = VertexBuffer;
+		RenderCommand.VertexBuffers[0] = VertexBuffer;
 		RenderCommand.Material = Material;
 		RenderCommand.WorldMatrix = GetWorldTransform();
-		DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+		DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
 	}
-	*/
 }
 
 bool ZEPresentationSlide::Initialize()
@@ -113,7 +107,7 @@ bool ZEPresentationSlide::Initialize()
 	if (Material != NULL)
 		Material->Destroy();
 
-	Material = ZEFixedMaterial::CreateInstance();
+	Material = ZEMaterialDefault::CreateInstance();
 	Material->SetTwoSided(true);
 	Material->SetAmbientEnabled(true);
 	Material->SetAmbientColor(ZEVector3(1.0f, 1.0f, 1.0f));
@@ -162,10 +156,9 @@ ZEPresentationSlide::ZEPresentationSlide()
 	Texture = NULL;
 	Material = NULL;
 	
-	RenderCommand.SetZero();
-	//RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE_LIST;
+	RenderCommand.VertexLayout = ZECanvasVertex::GetVertexLayout();
+	RenderCommand.Flags |= (ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_RCF_ENABLE_WORLD_TRANSFORM | ZE_RCF_ENABLE_Z_CULLING);
+	RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
 	RenderCommand.PrimitiveCount = 2;
 }
 
