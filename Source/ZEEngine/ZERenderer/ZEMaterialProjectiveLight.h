@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIMaterial.h
+ Zinek Engine - ZEMaterialProjectiveLight.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,52 +33,55 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_UI_MATERIAL_H__ 
-#define __ZE_UI_MATERIAL_H__
+#ifndef __ZE_MATERIAL_PROJECTIVE_LIGHT_H__
+#define __ZE_MATERIAL_PROJECTIVE_LIGHT_H__
 
-#include "ZEMaterial.h"
+#include "ZETypes.h"
+#include "ZEMaterialLight.h"
+#include "ZEGraphics/ZESamplerState.h"
 
 class ZEShader;
-class ZETexture;
 class ZETexture2D;
+class ZERenderStage;
+class ZEVertexBuffer;
+class ZERenderCommand;
 class ZEConstantBuffer;
 
-class ZEUIMaterial : public ZEMaterial
+class ZEMaterialProjectiveLight : public ZEMaterialLight
 {
-	friend class ZED3D10GraphicsModule;
+	friend class ZELightProjective;
 
 	protected:
-		static ZEShader*		VertexShader;
-		static ZEShader*		PixelShader;
-		static ZEShader*		PixelShaderTextured;
+		const ZETexture2D*			ProjectionTexture;
+		ZESamplerState				SamplerState;
 
-		ZEConstantBuffer*		VertexShaderBuffer;
-		const ZETexture2D*		Texture;
+		ZEUInt32					StencilMask;
 
-		bool					WireFrame;
+		ZEShader*					VertexShader;
+		ZEShader*					PixelShader;
+		ZEConstantBuffer*			Transformations;
+		ZEConstantBuffer*			LightParameters;
+		ZEConstantBuffer*			ShadowParameters;
 
-								ZEUIMaterial();
-								~ZEUIMaterial();
+		void						UpdateShaders();
+		void						UpdateBuffers();
 
-		void					CreateShaders();
-		void					DestroyShaders();
+		void						DestroyShaders();
+		void						DestroyBuffers();
+
+		bool						SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
+
+									ZEMaterialProjectiveLight();
+		virtual						~ZEMaterialProjectiveLight();
 
 	public:
-		ZEUInt32				GetHash() const;
-		ZEMaterialFlags			GetMaterialFlags() const;
+		virtual ZEUInt32			GetHash() const;
+		virtual ZEMaterialFlags		GetMaterialFlags() const;
 
-		void					SetWireFrame(bool Enabled);
-		bool					GetWireFrame() const;
+		virtual void				UpdateMaterial();
+		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		void					SetTexture(const ZETexture2D* Texture);
-		const ZETexture2D*		GetTexture() const;
-
-		bool					SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
-
-		void					UpdateMaterial();
-
-		static ZEUIMaterial*	CreateInstance();
+		static ZEMaterialProjectiveLight*	CreateInstance();
 };
 
 #endif

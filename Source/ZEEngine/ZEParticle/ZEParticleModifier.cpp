@@ -36,9 +36,9 @@
 #include "ZEParticleModifier.h"
 #include "ZEParticleEmitter.h"
 #include "ZEParticleEffect.h"
-#include "ZERenderer\ZEFixedMaterial.h"
+#include "ZERenderer/ZEMaterialDefault.h"
 #include "ZERandom.h"
-#include "ZEMath\ZEAngle.h"
+#include "ZEMath/ZEAngle.h"
 
 void ZEParticleModifier::SetName(const ZEString& Name)
 {
@@ -465,7 +465,7 @@ void ZEParticleDiffuseMapChangerModifier::AddTextureResource(ZETexture2DResource
 
 void ZEParticleDiffuseMapChangerModifier::Tick(float ElapsedTime)
 {
-	((ZEFixedMaterial*)(GetOwner()->GetMaterial()))->SetBaseMap(Textures[Textures.Circular((ZESize)CurrentTextureIndex)]->GetTexture());
+	((ZEMaterialDefault*)(GetOwner()->GetMaterial()))->SetBaseMap(Textures[Textures.Circular((ZESize)CurrentTextureIndex)]->GetTexture());
 
 	if(TotalTime >= Interval)
 	{
@@ -611,7 +611,7 @@ void ZEParticleUVModifier::Tick(float ElapsedTime)
 
 		case ZE_PAS_ALIVE:
 
-			CurrentUVFrame = (Particles[I].TotalLife - Particles[I].Life) * (((float)RowCount * (float)ColumnCount) / Particles[I].TotalLife);
+			CurrentUVFrame = (ZEInt)((Particles[I].TotalLife - Particles[I].Life) * ((float)(RowCount * ColumnCount) / Particles[I].TotalLife));
 
 			Particles[I].MinTexCoord.x = (CurrentUVFrame % ColumnCount) * UVFrameSize.x;
 			Particles[I].MinTexCoord.y = (CurrentUVFrame / ColumnCount) * UVFrameSize.y;

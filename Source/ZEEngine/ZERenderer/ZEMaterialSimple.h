@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelDebugModule.h
+ Zinek Engine - ZEMaterialSimple.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,51 +34,87 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MODEL_ANIMATION_DEBUG_MODULE_H__
-#define __ZE_MODEL_ANIMATION_DEBUG_MODULE_H__
+#ifndef __ZE_SIMPLE_MATERIAL_H__ 
+#define __ZE_SIMPLE_MATERIAL_H__
 
 #include "ZETypes.h"
-#include "ZECore/ZEApplicationModule.h"
-#include "ZEInput/ZEInputMap.h"
+#include "ZEMaterial.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEGraphics/ZESamplerState.h"
 
-class ZEGameCharacter;
-class ZELightPoint;
-class ZELightProjective;
-class ZEGrid;
-class ZECamera;
-class ZESkyBrush;
-class ZEPlayer;
-class ZESoundResource;
-class ZESoundSource;
-class ZEModel;
-class ZELight;
-class ZELightDirectional;
-class ZELightProjective;
+class ZEShader;
+class ZERenderer;
+class ZETexture2D;
+class ZERenderCommand;
+class ZEConstantBuffer;
 
-class ZEModelAnimationDebugModule : public ZEApplicationModule
+class ZEMaterialSimple : public ZEMaterial
 {
-	private:
-		ZECamera*				Camera;
-		ZELightPoint*			Light;
-		ZEGrid*					Grid;
-		ZELightPoint*			PointLight0;
-		ZELightPoint*			PointLight1;
-		ZELightPoint*			PointLight2;
-		ZEGameCharacter*			Character;
-		ZEInputMap				InputMap;
-		ZELightDirectional*		DirectionalLight;
-		ZELightProjective*		ProjectiveLight;
+	friend class ZED3D9GraphicsModule;
+	protected:
+		ZEShader*					VertexShader;
+		ZEShader*					PixelShader;
 
+		ZEConstantBuffer*			VertexShaderData;
+		ZEConstantBuffer*			PixelShaderData;
+
+		bool						TwoSided;
+		bool						Wireframe;
+		bool						VertexColorEnabled;
+
+		ZEMaterialTransparancyMode	TransparancyMode;
+		ZEUInt						TransparancyCullLimit;
+		ZEVector4					MaterialColor;
+
+		ZETexture2D*				Texture;
+		ZETextureAddressMode		TextureAddressModeU;
+		ZETextureAddressMode		TextureAddressModeV;
+
+									ZEMaterialSimple();
+		virtual						~ZEMaterialSimple();
+
+
+		void						CreateShaders();
+		void						ReleaseShaders();
 
 	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Process(float ElapsedTime);
+		ZEUInt32					GetHash() const;
+		ZEMaterialFlags				GetMaterialFlags() const;
 
+		void						SetTwoSided(bool Enable);
+		bool						GetTwoSided() const;
 
-								ZEModelAnimationDebugModule();
-		virtual					~ZEModelAnimationDebugModule();
+		void						SetWireframe(bool Enable);
+		bool						GetWireframe() const;
+
+		void						SetVertexColor(bool Enable);
+		bool						GetVertexColor();
+
+		void						SetMaterialColor(const ZEVector4& Color);
+		const ZEVector4&			GetMaterialColor() const;
+
+		void						SetTransparancyMode(ZEMaterialTransparancyMode Mode);
+		ZEMaterialTransparancyMode	GetTransparancyMode() const;
+
+		void						SetTransparancyCullLimit(ZEUInt Limit);
+		ZEUInt						GetTransparancyCullLimit() const;
+
+		void						SetTexture(ZETexture2D* Texture);
+		ZETexture2D*				GetTexture() const;
+		void						SetTextureAddressModeU(ZETextureAddressMode Mode);
+		ZETextureAddressMode		GetTextureAddressModeU() const;
+		void						SetTextureAddressModeV(ZETextureAddressMode Mode);
+		ZETextureAddressMode		GetTextureAddressModeV() const;
+
+		bool						SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
+
+		void						UpdateMaterial();
+
+		static ZEMaterialSimple*	CreateInstance();
 };
 
 #endif
+
+
+
+

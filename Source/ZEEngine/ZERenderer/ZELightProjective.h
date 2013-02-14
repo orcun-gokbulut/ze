@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPointLight.h
+ Zinek Engine - ZELightProjective.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,38 +33,58 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_POINT_LIGHT_H__
-#define __ZE_POINT_LIGHT_H__
+#ifndef	__ZE_PROJECTIVE_LIGHT_H__
+#define __ZE_PROJECTIVE_LIGHT_H__
 
 #include "ZELight.h"
-#include "ZEMath/ZEViewSphere.h"
+#include "ZERenderCommand.h"
+#include "ZEMath/ZEViewFrustum.h"
+#include "ZEGraphics/ZESamplerState.h"
 
 class ZETexture2D;
+class ZEVertexBuffer;
+class ZEMaterialProjectiveLight;
 
-class ZEPointLight  : public ZELight
+class ZELightProjective : public ZELight
 {
 	private:
-		ZEViewSphere					ViewVolume;
+		float							FOV;
+		float							AspectRatio;
 		
-		ZETexture2D*					FrontShadowMap;
-		ZETexture2D*					BackShadowMap;
+		ZESamplerState					TextureSampler;
+		const ZETexture2D*				ProjectionTexture;
 
-										ZEPointLight();
-		virtual							~ZEPointLight();
+		ZEMaterialProjectiveLight*		Material;
+		ZEVertexBuffer*					Geometry;
+		ZERenderCommand					RenderCommand;
+
+		ZEViewFrustum					ViewVolume;
+
+										ZELightProjective();
+		virtual							~ZELightProjective();
 
 	public:
-		ZELightType						GetLightType() const;
+		void							SetFOV(float Value);
+		float							GetFOV() const;
 
-		ZETexture2D*					GetFrontShadowMap();
-		ZETexture2D*					GetBackShadowMap();
+		void							SetAspectRatio(float Value);
+		float							GetAspectRatio() const;
 
-		virtual void					SetCastShadows(bool NewValue);
+		void							SetTextureSampler(const ZESamplerState& Sampler);
+		const ZESamplerState&			GetTextureSampler() const;
 
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index) const;
-		
+		void							SetProjectionTexture(const ZETexture2D* Texture);
+		const ZETexture2D*				GetProjectionTexture() const;
+
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index);
+
+		virtual bool					Initialize();
 		virtual void					Deinitialize();
-		static ZEPointLight*			CreateInstance();
+
+		virtual void					Tick(float Time);
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
+
+		static ZELightProjective*		CreateInstance();
 };
 
 #endif

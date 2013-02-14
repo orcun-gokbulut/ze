@@ -42,13 +42,13 @@
 class ZEPlayer;
 class ZECanvasBrush;
 class ZELightBrush;
-class ZEPointLight;
+class ZELightPoint;
 
 class ZEMetaDebugModule : public ZEApplicationModule
 {
 	private:
 		ZEPlayer*				Player;
-		ZEPointLight*			Light;
+		ZELightPoint*			Light;
 		ZECanvasBrush*			Canvas;
 
 		bool					IfEnteredFlag;

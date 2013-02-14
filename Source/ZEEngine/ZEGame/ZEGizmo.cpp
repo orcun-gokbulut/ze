@@ -46,11 +46,11 @@
 #include "ZEMath/ZELineSegment.h"
 #include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
-#include "ZERenderer/ZESimpleMaterial.h"
+#include "ZERenderer/ZEMaterialSimple.h"
 #include "ZEMath/ZERay.h"
 
 
-ZESimpleMaterial* ZEGizmo::GizmoMaterial = NULL;
+ZEMaterialSimple* ZEGizmo::GizmoMaterial = NULL;
 
 void ZEGizmo::UpdateMoveGizmo()
 {
@@ -1013,10 +1013,9 @@ bool ZEGizmo::Initialize()
 	if (GetInitialized())
 		return false;
 
-	GizmoMaterial = ZESimpleMaterial::CreateInstance();
+	GizmoMaterial = ZEMaterialSimple::CreateInstance();
 
-	RenderCommand.SetZero();
-	//RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	RenderCommand.VertexLayout = ZECanvasVertex::GetVertexLayout();
 	RenderCommand.Material = GizmoMaterial;
 	
 	return ZEEntity::Initialize();
@@ -1035,13 +1034,12 @@ void ZEGizmo::Deinitialize()
 
 void ZEGizmo::Draw(ZEDrawParameters* DrawParameters)
 {
-	/*
 	UpdateGizmo();
-
+	/*
 	RenderCommand.Priority = 4;
 	RenderCommand.WorldMatrix = GetWorldTransform();
-	RenderCommand.Flags = (Mode == ZE_GM_ROTATE ? ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM : ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM);
-	RenderCommand.PrimitiveType = ZE_ROPT_LINE_LIST;
+	RenderCommand.Flags |= (Mode == ZE_GM_ROTATE ? ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM : ZE_RCF_ENABLE_WORLD_TRANSFORM | ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM);
+	RenderCommand.PrimitiveType = ZE_PT_LINE_LIST;
 	RenderCommand.PrimitiveCount = GizmoLines.Vertices.GetCount() / 2;
 	RenderCommand.VertexBuffer = &GizmoLines;
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
@@ -1050,7 +1048,6 @@ void ZEGizmo::Draw(ZEDrawParameters* DrawParameters)
 	RenderCommand.PrimitiveCount = GizmoTriangles.Vertices.GetCount() / 3;
 	RenderCommand.VertexBuffer = &GizmoTriangles;
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
-
 	*/
 }
 

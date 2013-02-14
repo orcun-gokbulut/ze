@@ -40,23 +40,24 @@
 
 enum ZEPrimitiveType
 {
-	ZE_ROPT_POINT_LIST			= 0,
-	ZE_ROPT_LINE_LIST			= 1,
-	ZE_ROPT_TRIANGLE_LIST		= 2,
-	ZE_ROPT_TRIANGLE_STRIPT		= 3
+	ZE_PT_NONE				= 0,
+	ZE_PT_POINT_LIST		= 1,
+	ZE_PT_LINE_LIST			= 2,
+	ZE_PT_TRIANGLE_LIST		= 3,
+	ZE_PT_TRIANGLE_STRIPT	= 4
 };
 
 enum ZEFillMode
 {
-	ZE_FM_WIREFRAME				= 1,
-	ZE_FM_SOLID					= 2
+	ZE_FM_WIREFRAME			= 1,
+	ZE_FM_SOLID				= 2
 };
 
 enum ZECullDirection
 {
-	ZE_CD_NONE					= 1,
-	ZE_CD_CLOCKWISE 			= 2,
-	ZE_CD_COUNTER_CLOCKWISE		= 3
+	ZE_CD_NONE				= 1,
+	ZE_CD_CLOCKWISE 		= 2,
+	ZE_CD_COUNTER_CLOCKWISE	= 3
 };
 
 class ZERasterizerState

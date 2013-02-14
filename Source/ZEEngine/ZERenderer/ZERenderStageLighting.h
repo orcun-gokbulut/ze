@@ -50,10 +50,10 @@ class ZERenderCommand;
 class ZEConstantBuffer;
 class ZERenderStageGeometry;
 
-class ZEPointLight;
-class ZEProjectiveLight;
-class ZEDirectionalLight;
-class ZEOmniProjectiveLight;
+class ZELightPoint;
+class ZELightProjective;
+class ZELightDirectional;
+class ZELightOmniProjective;
 
 class ZERenderStageLighting : public ZERenderStage
 {
@@ -61,9 +61,9 @@ class ZERenderStageLighting : public ZERenderStage
 		ZELightType						LastLight;
 
 		const ZERenderStageGeometry*	GBufferInput;
-		ZESmartArray<ZELight*>*			LightList;
-		ZEUInt32						StencilMask;
-		ZEVertexBuffer*					VertexBuffer;
+		//ZESmartArray<ZELight*>*		LightList;
+		//ZEUInt32						StencilMask;
+		//ZEVertexBuffer*				VertexBuffer;
 
 		struct
 		{
@@ -79,7 +79,7 @@ class ZERenderStageLighting : public ZERenderStage
 
 		} RenderTargets;
 
-
+		/*
 		struct
 		{
 			ZEShader*					VertexShader;
@@ -119,7 +119,7 @@ class ZERenderStageLighting : public ZERenderStage
 			ZEConstantBuffer*			ShadowParameters;
 
 		} OmniProjectiveLight;
-
+		*/
 		void							UpdateShaders();
 		void							DestroyShaders();
 
@@ -129,10 +129,10 @@ class ZERenderStageLighting : public ZERenderStage
 		void							ResetStageDefaults();
 		void							CommitStageDefaults();
 
-		void							RenderPointLight(const ZEPointLight* Light);
-		void							RenderProjectiveLight(const ZEProjectiveLight* Light);
-		void							RenderDirectionalLight(const ZEDirectionalLight* Light);
-		void							RenderOmniProjectiveLight(const ZEOmniProjectiveLight* Light);
+		void							RenderPointLight(const ZELightPoint* Light);
+		void							RenderProjectiveLight(const ZELightProjective* Light);
+		void							RenderDirectionalLight(const ZELightDirectional* Light);
+		void							RenderOmniProjectiveLight(const ZELightOmniProjective* Light);
 
 	public:
 		ZEUInt32						GetStageFlags() const;
@@ -142,9 +142,6 @@ class ZERenderStageLighting : public ZERenderStage
 
 		void							SetGBufferInput(const ZERenderStageGeometry* Input);
 		const ZERenderStageGeometry*	GetGBufferInput() const;
-
-		void							SetLightList(ZESmartArray<ZELight*>* Lights);
-		ZESmartArray<ZELight*>*			GetLightList() const;
 
 		void							Setup();
 		void							Process(ZERenderCommand* RenderCommand);

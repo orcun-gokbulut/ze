@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESimpleMaterial.h
+ Zinek Engine - ZELightDirectional.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,87 +34,74 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SIMPLE_MATERIAL_H__ 
-#define __ZE_SIMPLE_MATERIAL_H__
+#ifndef	__ZE_DIRECTIONAL_LIGHT_H__
+#define __ZE_DIRECTIONAL_LIGHT_H__
 
+#include "ZELight.h"
 #include "ZETypes.h"
-#include "ZEMaterial.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEGraphics/ZESamplerState.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEViewCuboid.h"
 
-class ZEShader;
-class ZERenderer;
 class ZETexture2D;
-class ZERenderCommand;
-class ZEConstantBuffer;
+class ZERenderTarget;
+struct ZEDrawParameters;
 
-class ZESimpleMaterial : public ZEMaterial
+struct ZEDirectionalLightCascade
 {
-	friend class ZED3D9GraphicsModule;
+	ZEUInt				Index;
+	float				FarZ;
+	float				NearZ;
+	float				Depth;
+	ZEUInt				UpdateInterval;
+
+	ZETexture2D*		ShadowMap;
+	ZERenderTarget*		ShadowMapRenderTarget;
+	ZEViewCuboid		ViewVolume;
+	ZEMatrix4x4			ShadowTransform;
+};
+
+#define	ZE_DL_MAX_CASCADE_COUNT		5
+
+class ZELightDirectional : public ZELight
+{
 	protected:
-		ZEShader*					VertexShader;
-		ZEShader*					PixelShader;
+		ZESize							CascadeCount;
+		ZEDirectionalLightCascade		Cascades[ZE_DL_MAX_CASCADE_COUNT];
 
-		ZEConstantBuffer*			VertexShaderData;
-		ZEConstantBuffer*			PixelShaderData;
+		float							CascadeSplitBias;
 
-		bool						TwoSided;
-		bool						Wireframe;
-		bool						VertexColorEnabled;
-
-		ZEMaterialTransparancyMode	TransparancyMode;
-		ZEUInt						TransparancyCullLimit;
-		ZEVector4					MaterialColor;
-
-		ZETexture2D*				Texture;
-		ZETextureAddressMode		TextureAddressModeU;
-		ZETextureAddressMode		TextureAddressModeV;
-
-									ZESimpleMaterial();
-		virtual						~ZESimpleMaterial();
-
-
-		void						CreateShaders();
-		void						ReleaseShaders();
+		void							UpdateCascades();
+		void							UpdateRenderTargets();
+		void							DestroyRenderTargets();
+		
+										ZELightDirectional();
+		virtual							~ZELightDirectional();
 
 	public:
-		ZEUInt32					GetHash() const;
-		ZEMaterialFlags				GetMaterialFlags() const;
+		void							SetCascadeCount(ZESize Value);
+		ZESize							GetCascadeCount() const;
+		
+		void							SetSplitBias(float Value);
+		float							GetSplitBias() const;
 
-		void						SetTwoSided(bool Enable);
-		bool						GetTwoSided() const;
+		float							GetFarZ(ZESize Index) const;
+		float							GetNearZ(ZESize Index) const;
+		float							GetDepth(ZESize Index) const;
 
-		void						SetWireframe(bool Enable);
-		bool						GetWireframe() const;
+		void							SetUpdateInterval(ZESize Index, ZEUInt Value);
+		ZEUInt							GetUpdateInterval(ZESize Index) const;
 
-		void						SetVertexColor(bool Enable);
-		bool						GetVertexColor();
+		const ZETexture2D*				GetShadowMap(ZESize Index) const;
+		const ZEMatrix4x4&				GetShadowTransform(ZESize Index) const;
 
-		void						SetMaterialColor(const ZEVector4& Color);
-		const ZEVector4&			GetMaterialColor() const;
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index);
 
-		void						SetTransparancyMode(ZEMaterialTransparancyMode Mode);
-		ZEMaterialTransparancyMode	GetTransparancyMode() const;
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
+		
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
 
-		void						SetTransparancyCullLimit(ZEUInt Limit);
-		ZEUInt						GetTransparancyCullLimit() const;
-
-		void						SetTexture(ZETexture2D* Texture);
-		ZETexture2D*				GetTexture() const;
-		void						SetTextureAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetTextureAddressModeU() const;
-		void						SetTextureAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode		GetTextureAddressModeV() const;
-
-		bool						SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
-
-		void						UpdateMaterial();
-
-		static ZESimpleMaterial*	CreateInstance();
+		static ZELightDirectional*		CreateInstance();
 };
 
 #endif
-
-
-
-

@@ -39,7 +39,7 @@
 
 #include "zeui/ZEUIControl.h"
 #include "zeui/ZEUIRectangle.h"
-#include "ZERenderer/ZEUIMaterial.h"
+#include "ZERenderer/ZEMaterialUserInterface.h"
 
 class ZEUIFrameControl : public ZEUIControl
 {
@@ -51,7 +51,7 @@ class ZEUIFrameControl : public ZEUIControl
 	protected:
 
 		ZEUIRectangle		Frame;
-		ZEUIMaterial*		FrameMaterial;
+		ZEMaterialUserInterface*		FrameMaterial;
 
 	public:
 

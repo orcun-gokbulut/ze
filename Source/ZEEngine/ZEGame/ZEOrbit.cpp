@@ -135,8 +135,8 @@ void ZEOrbitalMotion::Process(float ElapsedTime)
 {
 	OrbitalDay += OrbitalVelocity_AnglePerSec  * SpeedFactor * ElapsedTime;
 
-	if(OrbitalDay > ZE_PI * 2)
-		OrbitalDay = ZEMath::Mod(OrbitalDay,ZE_PI * 2);
+	if(OrbitalDay > ZE_PI * 2.0f)
+		OrbitalDay = ZEMath::Mod((float)OrbitalDay, ZE_PI * 2.0f);
 
 	AngularYear += (2 * ZE_PI / SecondsInAYear) * SpeedFactor * ElapsedTime;
 

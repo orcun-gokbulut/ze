@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUICursorControl.h
+ Zinek Engine - ZEMaterialLight.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_UI_CURSOR_CONTROL__
-#define __ZE_UI_CURSOR_CONTROL__
+#ifndef __ZE_MATERIAL_LIGHT_H__
+#define __ZE_MATERIAL_LIGHT_H__
 
-#include "zeui/ZEUIControl.h"
-#include "zeui/ZEUIRectangle.h"
-#include "ZEInput/ZEInputMap.h"
-#include "ZERenderer/ZEMaterialUserInterface.h"
+#include "ZEMaterial.h"
+#include "ZEMath/ZEQuaternion.h"
 
-class ZEVector3;
-
-class ZEUICursorControl : public ZEUIControl
+class ZEMaterialLight : public ZEMaterial
 {
-	private:
+	protected:
+		float				FOV;
+		float				AspectRatio;
+		float				Range;
+		float				Intensity;
+		ZEVector3			Color;
+		ZEVector3			Attenuation;
+		ZEVector3			WorldFront;
+		ZEVector3			WorldPosition;
+		ZEQuaternion		WorldRotation;
 
-		ZEMaterialUserInterface*		CursorMaterial;
-		ZEUIRectangle		Cursor;
-		ZEInputMap			InputMap;
+		float				ShadowPenumbraSize;
+		float				ShadowSlopeScaledBias;
+		float				ShadowDepthScaledBias;
 
-		ZEUIMouseKey		CurentButton;
-
-	public:
-
-		virtual void		Draw(ZEUIRenderer* Renderer);
-		virtual void		Tick(float ElapsedTime);
-
-		virtual ZEMaterial* GetMaterial() const;
-		virtual void		SetMaterial(ZEMaterial* Material);
-
-		ZEUIMouseKey		GetCurrentButton();
-
-		virtual void		SetZOrder(ZEInt Z);
-
-							ZEUICursorControl();
-							~ZEUICursorControl();
+							ZEMaterialLight();
+		virtual				~ZEMaterialLight();
 };
 
 #endif

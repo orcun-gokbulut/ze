@@ -73,8 +73,6 @@ class ZEGraphicsModule : public ZEModule
 	ZE_MODULE(ZEGraphicsModule)
 
 	protected:
-		float							FarZ;
-		float							NearZ;
 		bool							FullScreen;
 		ZEUInt							ScreenWidth;
 		ZEUInt							ScreenHeight;
@@ -100,8 +98,6 @@ class ZEGraphicsModule : public ZEModule
 		static void						BaseInitialize();
 		static void						BaseDeinitialize();
 		virtual ZETextureOptions*		GetTextureOptions();
-		virtual float					GetFarZ() const;
-		virtual float					GetNearZ() const;
 		// -------------------------------------------
 
 		virtual bool					SetFullScreen(bool Enabled) = 0;

@@ -37,7 +37,7 @@
 #include "ZEUIRenderer.h"
 #include "ZEUIControl.h"
 #include "ZEError.h"
-#include "ZERenderer/ZEFixedMaterial.h"
+#include "ZERenderer/ZEMaterialDefault.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEInput/ZEInputModule.h"
 #include "ZEFontResourceBitmap.h"
@@ -255,7 +255,7 @@ void ZEUIManager::ProcessEvents()
 		/************************************************************************/
 		/*                          HOVER ENTER AND LEAVE                       */
 		/************************************************************************/
-		for (size_t I = 0; I < Controls.GetCount(); I++)
+		for (ZESize I = 0; I < Controls.GetCount(); I++)
 		{
 			if (Controls[I] == Cursor)
 			{
@@ -273,7 +273,7 @@ void ZEUIManager::ProcessEvents()
 
 			ZEUIControl* Reciever = NULL;
 
-			for (size_t I = 0; I < Controls.GetCount(); I++)
+			for (ZESize I = 0; I < Controls.GetCount(); I++)
 			{
 				if (Controls[I]->GetVisiblity() == false)
 					continue;
@@ -381,7 +381,7 @@ void ZEUIManager::ProcessEvents()
 	{
 		zeInput->ProcessInputMap(&InputMap);
 
-		for (size_t I = 0; I < InputMap.InputActionCount; I++)
+		for (ZESize I = 0; I < InputMap.InputActionCount; I++)
 		{
 			switch (InputMap.InputActions[I].Id)
 			{
@@ -567,7 +567,7 @@ void ZEUIManager::ProcessEvents()
 
 ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 {
-	for (int I = ParentControl->GetChildControls().GetCount() - 1; I >= 0; I--)
+	for (ZESSize I = (ZESSize)ParentControl->GetChildControls().GetCount() - 1; I >= 0; I--)
 	{
 		ZEUIControl* CurrentControl = ParentControl->GetChildControls()[I];
 		if (ZERectangle::IntersectionTest(CurrentControl->GetVisibleRectangle(), Cursor->GetPosition()))
@@ -576,9 +576,10 @@ ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 			{
 				return FindEventReciever(CurrentControl);
 			}
-
-			else 
+			else
+			{
 				return CurrentControl;
+			}
 		}
 	}
 
@@ -588,7 +589,7 @@ ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 void ZEUIManager::Render(ZERenderer* Renderer)
 {
 	UIRenderer->Clean();
-	for (size_t I = 0; I < Controls.GetCount(); I++)
+	for (ZESize I = 0; I < Controls.GetCount(); I++)
 		if (Controls[I]->GetVisiblity())
 			Controls[I]->Draw(UIRenderer);
 
@@ -599,7 +600,7 @@ void ZEUIManager::Tick(float ElapsedTime)
 {
 	ProcessEvents();
 
-	for (size_t I = 0; I < Controls.GetCount(); I++)
+	for (ZESize I = 0; I < Controls.GetCount(); I++)
 		if (Controls[I]->GetEnabled())
 			Controls[I]->Tick(ElapsedTime);
 }

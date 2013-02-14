@@ -36,7 +36,7 @@
 #include "ZEMetaDebugModule.h"
 
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZERenderer/ZEFixedMaterial.h"
+#include "ZERenderer/ZEMaterialDefault.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGame/ZEGame.h"
 #include "ZEGame/ZEEntityProvider.h"
@@ -49,7 +49,7 @@
 #include "ZEMeta/ZEProvider.h"
 #include "ZERenderer/ZEMaterial.h"
 #include "ZERenderer/ZECamera.h"
-#include "ZERenderer/ZEPointLight.h"
+#include "ZERenderer/ZELightPoint.h"
 
 #include "ZEMath/ZEAngle.h"
 
@@ -67,15 +67,13 @@ bool ZEMetaDebugModule::Initialize()
 		Player = ZEPlayer::CreateInstance();
 
 		Scene->AddEntity(Player);
-		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
+		Player->SetPosition(ZEVector3::Zero);
 		Player->SetRotation(ZEQuaternion::Identity);
-		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
-		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
-		Player->AddToContainer("Components", ZEPointLight::CreateInstance());
+		Player->AddToContainer("Components", ZELightPoint::CreateInstance());
 		Scene->SetActiveCamera(Player->GetCamera());
 	}
 
-	ZEPointLight* Light = ZEPointLight::CreateInstance();
+	ZELightPoint* Light = ZELightPoint::CreateInstance();
 	Light->SetPosition(ZEVector3::Zero);
 	Light->SetColor(ZEVector3(0,1,0));
 	Scene->AddEntity(Light);

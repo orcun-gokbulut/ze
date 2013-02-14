@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef __ZE_RENDERER_H__
 #define __ZE_RENDERER_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEGame/ZEDrawParameters.h"
 
 class ZELight;
 class ZECamera;
@@ -50,47 +50,51 @@ class ZERenderStageGeometry;
 class ZERenderStageLighting;
 class ZERenderStageTransparent;
 class ZERenderStagePostProcess;
+class ZERenderStageUserInterface;
 
 class ZERenderer
 {
 	protected:
-		ZECamera*						Camera;
-		ZESmartArray<ZELight*>			LightList;
-		ZESmartArray<ZERenderCommand>	CommandList;
+		ZERenderStageGeometry*				GeometryStage;
+		ZERenderStageShadow*				ShadowStage;
+		ZERenderStageLighting*				LightingStage;
+		ZERenderStageForward*				ForwardStage;
+		ZERenderStageTransparent*			TransparentStage;
+		ZERenderStagePostProcess*			PostProcessStage;
+		ZERenderStageUserInterface*			UserInterfaceStage;
 
-		ZEVector2						ShadowMapDimesion;
+		ZEDrawParameters					DrawParameters;
+		ZESmartArray<ZERenderCommand*>		CommandList;
 
-		ZERenderStageGeometry*			GeometryStage;
-		ZERenderStageShadow*			ShadowStage;
-		ZERenderStageLighting*			LightingStage;
-		ZERenderStageForward*			ForwardStage;
-		ZERenderStageTransparent*		TransparentStage;
-		ZERenderStagePostProcess*		PostProcessStage;
+		ZEVector2							ShadowMapDimesion;
 
-										ZERenderer();
-		virtual							~ZERenderer();
+											ZERenderer();
+		virtual								~ZERenderer();
+
+		void								DoGeomtryPass();
+		void								DoShadowPass();
+		void								DoLightingPass();
+		void								DoForwardPass();
+		void								DoTransparentPass();
+		void								DoPostProcessPass();
+		void								DoUserInterfacePass();
 
 	public:
-		void							SetCamera(ZECamera* Camera);
-		ZECamera*						GetCamera() const;
-		
-		void							SetShadowMapDimension(ZEVector2 Value);
-		ZEVector2						GetShadowMapDimension() const;
-		
-		virtual void					AddToLightList(ZELight* Light);
-		virtual void					AddToLightList(const ZESmartArray<ZELight*>& Lights);
-		virtual void					ClearLightList();
+		virtual void						AddRenderCommand(ZERenderCommand* RenderCommand);
 
-		virtual void					AddToRenderList(ZERenderCommand* RenderCommand);
-		virtual void					ClearRenderList();
+		void								SetDrawParameters(const ZEDrawParameters& Parameters);
+		const ZEDrawParameters&				GetDrawParameters() const;
 
-		virtual void					Render(float ElaspedTime);
-		
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
+		void								SetShadowMapDimension(ZEVector2 Value);
+		ZEVector2							GetShadowMapDimension() const;
 
-		virtual void					Destroy();
-		static ZERenderer*				CreateInstance();
+		virtual void						Render(float ElaspedTime);
+
+		virtual bool						Initialize();
+		virtual void						Deinitialize();
+
+		virtual void						Destroy();
+		static ZERenderer*					CreateInstance();
 };
 
 #endif

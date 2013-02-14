@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFixedMaterial.cpp
+ Zinek Engine - ZEMaterialDefault.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -40,11 +40,10 @@
 #include "ZERenderStage.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEMath/ZEMatrix.h"
-#include "ZEFixedMaterial.h"
+#include "ZEMaterialDefault.h"
 #include "ZERenderCommand.h"
 #include "ZEML/ZEMLProperty.h"
 #include "ZEGraphics/ZEShader.h"
-#include "ZEMaterialComponents.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEGraphics/ZETextureCube.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
@@ -101,7 +100,7 @@ struct FixedMaterialForwardPassPixelShaderData
 	ZEMatrix4x4	InvViewMatrix;
 };
 
-void ZEFixedMaterial::CreateShaders()
+void ZEMaterialDefault::CreateShaders()
 {
 	DestroyShaders();
 
@@ -271,7 +270,7 @@ void ZEFixedMaterial::CreateShaders()
 	Recompile = false;
 }
 
-void ZEFixedMaterial::DestroyShaders()
+void ZEMaterialDefault::DestroyShaders()
 {
 	ZE_DESTROY(Shaders.GBufferPassVertexShader);
 	ZE_DESTROY(Shaders.GBufferPassPixelShader);
@@ -287,47 +286,47 @@ void ZEFixedMaterial::DestroyShaders()
 	ZE_DESTROY(Buffers.ShadowPassPixelShader);
 }
 
-ZEUInt32 ZEFixedMaterial::GetHash() const
+ZEUInt32 ZEMaterialDefault::GetHash() const
 {
 	return *((ZEUInt32*)&Components);
 }
 
-ZEMaterialFlags ZEFixedMaterial::GetMaterialFlags() const
+ZEMaterialFlags ZEMaterialDefault::GetMaterialFlags() const
 {
 	return ZE_MTF_G_BUFFER_PASS | ZE_MTF_FORWARD_PASS | ZE_MTF_SUPPORTS_SKINNING;
 }
 
-void ZEFixedMaterial::SetTwoSided(bool Enable)
+void ZEMaterialDefault::SetTwoSided(bool Enable)
 {
 	TwoSided = Enable;
 }
 
-bool ZEFixedMaterial::GetTwoSided() const
+bool ZEMaterialDefault::GetTwoSided() const
 {
 	return TwoSided;
 }
 
-void ZEFixedMaterial::SetWireframe(bool Enable)
+void ZEMaterialDefault::SetWireframe(bool Enable)
 {
 	Wireframe = Enable;
 }
 
-bool ZEFixedMaterial::GetWireframe() const
+bool ZEMaterialDefault::GetWireframe() const
 {
 	return Wireframe;
 }
 
-void ZEFixedMaterial::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
+void ZEMaterialDefault::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
 {
 	TransparancyMode = Mode;
 }
 
-ZEMaterialTransparancyMode ZEFixedMaterial::GetTransparancyMode() const
+ZEMaterialTransparancyMode ZEMaterialDefault::GetTransparancyMode() const
 {
 	return TransparancyMode;
 }
 
-void ZEFixedMaterial::SetAlphaCullEnabled(bool Value)
+void ZEMaterialDefault::SetAlphaCullEnabled(bool Value)
 {
 	if (Components.AlphaCull != Value)
 	{
@@ -336,22 +335,22 @@ void ZEFixedMaterial::SetAlphaCullEnabled(bool Value)
 	}
 }
 
-bool ZEFixedMaterial::GetAlphaCullEnabled() const
+bool ZEMaterialDefault::GetAlphaCullEnabled() const
 {
 	return Components.AlphaCull;
 }
 
-void ZEFixedMaterial::SetAlphaCullLimit(float Limit)
+void ZEMaterialDefault::SetAlphaCullLimit(float Limit)
 {
 	AlphaCullLimit = Limit;
 }
 
-float ZEFixedMaterial::GetAlphaCullLimit() const
+float ZEMaterialDefault::GetAlphaCullLimit() const
 {
 	return AlphaCullLimit;
 }
 
-void ZEFixedMaterial::SetAmbientEnabled(bool Value)
+void ZEMaterialDefault::SetAmbientEnabled(bool Value)
 {
 	if (Components.Ambient != Value)
 	{
@@ -360,34 +359,34 @@ void ZEFixedMaterial::SetAmbientEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetAmbientEnabled() const
+bool ZEMaterialDefault::GetAmbientEnabled() const
 {
 	return Components.Ambient;
 }
 
-void ZEFixedMaterial::SetAmbientColor(const ZEVector3& Color)
+void ZEMaterialDefault::SetAmbientColor(const ZEVector3& Color)
 {
 	AmbientColor = Color;
 	MaterialAmbientColor = AmbientColor * AmbientFactor;
 }
 
-const ZEVector3& ZEFixedMaterial::GetAmbientColor() const
+const ZEVector3& ZEMaterialDefault::GetAmbientColor() const
 {
 	return AmbientColor;
 }
 
-void ZEFixedMaterial::SetAmbientFactor(float Factor)
+void ZEMaterialDefault::SetAmbientFactor(float Factor)
 {
 	AmbientFactor = Factor;
 	MaterialAmbientColor = AmbientColor * AmbientFactor;
 }
 
-float ZEFixedMaterial::GetAmbientFactor() const
+float ZEMaterialDefault::GetAmbientFactor() const
 {
 	return AmbientFactor;
 }
 
-void ZEFixedMaterial::SetDiffuseEnabled(bool Value)
+void ZEMaterialDefault::SetDiffuseEnabled(bool Value)
 {
 	if (Components.Diffuse != Value)
 	{
@@ -396,44 +395,44 @@ void ZEFixedMaterial::SetDiffuseEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetDiffuseEnabled() const
+bool ZEMaterialDefault::GetDiffuseEnabled() const
 {
 	return Components.Diffuse;
 }
 
-void ZEFixedMaterial::SetDiffuseColor(const ZEVector3& Color)
+void ZEMaterialDefault::SetDiffuseColor(const ZEVector3& Color)
 {
 	DiffuseColor = Color;
 	MaterialDiffuseColor = DiffuseColor * DiffuseFactor;
 }
 
-const ZEVector3& ZEFixedMaterial::GetDiffuseColor() const
+const ZEVector3& ZEMaterialDefault::GetDiffuseColor() const
 {
 	return DiffuseColor;
 }
 
-void ZEFixedMaterial::SetDiffuseFactor(float Factor)
+void ZEMaterialDefault::SetDiffuseFactor(float Factor)
 {
 	DiffuseFactor = Factor;
 	MaterialDiffuseColor = DiffuseColor * DiffuseFactor;
 }
 
-float ZEFixedMaterial::GetDiffuseFactor() const
+float ZEMaterialDefault::GetDiffuseFactor() const
 {
 	return DiffuseFactor;
 }
 
-void ZEFixedMaterial::SetDiffuseSubSurfaceScatteringFactor(float Factor)
+void ZEMaterialDefault::SetDiffuseSubSurfaceScatteringFactor(float Factor)
 {
 	SubSurfaceScatteringFactor = Factor;
 }
 
-float ZEFixedMaterial::GetDiffuseSubSurfaceScatteringFactor()
+float ZEMaterialDefault::GetDiffuseSubSurfaceScatteringFactor()
 {
 	return SubSurfaceScatteringFactor;
 }
 
-void ZEFixedMaterial::SetBaseMapEnabled(bool Value)
+void ZEMaterialDefault::SetBaseMapEnabled(bool Value)
 {
 	if (Components.BaseMap != Value)
 	{
@@ -442,12 +441,12 @@ void ZEFixedMaterial::SetBaseMapEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetBaseMapEnabled() const
+bool ZEMaterialDefault::GetBaseMapEnabled() const
 {
 	return Components.BaseMap;
 }
 
-void ZEFixedMaterial::SetBaseMap(ZETexture2D* Texture)
+void ZEMaterialDefault::SetBaseMap(ZETexture2D* Texture)
 {
 	if (Resources.BaseMap != NULL)
 	{
@@ -461,12 +460,12 @@ void ZEFixedMaterial::SetBaseMap(ZETexture2D* Texture)
 	Textures.BaseMap = Texture;
 }
 
-ZETexture2D* ZEFixedMaterial::GetBaseMap() const
+ZETexture2D* ZEMaterialDefault::GetBaseMap() const
 {
 	return Textures.BaseMap;
 }
 
-void ZEFixedMaterial::SetBaseMapFile(const char* Filename)
+void ZEMaterialDefault::SetBaseMapFile(const char* Filename)
 {
 	if (Resources.BaseMap != NULL)
 	{
@@ -488,7 +487,7 @@ void ZEFixedMaterial::SetBaseMapFile(const char* Filename)
 	}
 }
 
-const char* ZEFixedMaterial::GetBaseMapFile() const
+const char* ZEMaterialDefault::GetBaseMapFile() const
 {
 	if (Resources.BaseMap != NULL)
 		return Resources.BaseMap->GetFileName().ToCString();
@@ -496,17 +495,17 @@ const char* ZEFixedMaterial::GetBaseMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetBaseMapSampler(const ZESamplerState& Sampler)
+void ZEMaterialDefault::SetBaseMapSampler(const ZESamplerState& Sampler)
 {
 	Samplers.BaseMap = Sampler;
 }
 
-const ZESamplerState& ZEFixedMaterial::GetBaseMapSampler() const
+const ZESamplerState& ZEMaterialDefault::GetBaseMapSampler() const
 {
 	return Samplers.BaseMap;
 }
 
-void ZEFixedMaterial::SetSpecularEnabled(bool Value)
+void ZEMaterialDefault::SetSpecularEnabled(bool Value)
 {
 	if (Components.Specular != Value)
 	{
@@ -515,44 +514,44 @@ void ZEFixedMaterial::SetSpecularEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetSpecularEnabled() const
+bool ZEMaterialDefault::GetSpecularEnabled() const
 {
 	return Components.Specular;
 }
 
-void ZEFixedMaterial::SetSpecularColor(const ZEVector3& Color)
+void ZEMaterialDefault::SetSpecularColor(const ZEVector3& Color)
 {
 	SpecularColor = Color;
 	MaterialSpecularColor = SpecularColor * SpecularFactor;
 }
 
-const ZEVector3& ZEFixedMaterial::GetSpecularColor() const
+const ZEVector3& ZEMaterialDefault::GetSpecularColor() const
 {
 	return SpecularColor;
 }
 
-void ZEFixedMaterial::SetSpecularFactor(float Factor)
+void ZEMaterialDefault::SetSpecularFactor(float Factor)
 {
 	SpecularFactor = Factor;
 	MaterialSpecularColor = SpecularColor * SpecularFactor;
 }
 
-float ZEFixedMaterial::GetSpecularFactor() const
+float ZEMaterialDefault::GetSpecularFactor() const
 {
 	return SpecularFactor;
 }
 
-void ZEFixedMaterial::SetSpecularShininess(float Shininess)
+void ZEMaterialDefault::SetSpecularShininess(float Shininess)
 {
 	SpecularShininess = Shininess;
 }
 
-float ZEFixedMaterial::GetSpecularShininess() const
+float ZEMaterialDefault::GetSpecularShininess() const
 {
 	return SpecularShininess;
 }
 
-void ZEFixedMaterial::SetSpecularMapEnabled(bool Value)
+void ZEMaterialDefault::SetSpecularMapEnabled(bool Value)
 {
 	if (Components.SpecularMap != Value)
 	{
@@ -561,12 +560,12 @@ void ZEFixedMaterial::SetSpecularMapEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetSpecularMapEnabled() const
+bool ZEMaterialDefault::GetSpecularMapEnabled() const
 {
 	return Components.SpecularMap;
 }
 
-void ZEFixedMaterial::SetSpecularMap(ZETexture2D* Texture)
+void ZEMaterialDefault::SetSpecularMap(ZETexture2D* Texture)
 {
 	if (Resources.SpecularMap != NULL)
 	{
@@ -580,12 +579,12 @@ void ZEFixedMaterial::SetSpecularMap(ZETexture2D* Texture)
 	Textures.SpecularMap = Texture;
 }
 
-ZETexture2D* ZEFixedMaterial::GetSpecularMap() const
+ZETexture2D* ZEMaterialDefault::GetSpecularMap() const
 {
 	return Textures.SpecularMap;
 }
 
-void ZEFixedMaterial::SetSpecularMapFile(const char* Filename)
+void ZEMaterialDefault::SetSpecularMapFile(const char* Filename)
 {
 	if (Resources.SpecularMap != NULL)
 	{
@@ -607,7 +606,7 @@ void ZEFixedMaterial::SetSpecularMapFile(const char* Filename)
 	}
 }
 
-const char* ZEFixedMaterial::GetSpecularMapFile() const
+const char* ZEMaterialDefault::GetSpecularMapFile() const
 {
 	if (Resources.SpecularMap != NULL)
 		return Resources.SpecularMap->GetFileName();
@@ -615,17 +614,17 @@ const char* ZEFixedMaterial::GetSpecularMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetSpecularMapSampler(const ZESamplerState& Sampler)
+void ZEMaterialDefault::SetSpecularMapSampler(const ZESamplerState& Sampler)
 {
 	Samplers.SpecularMap = Sampler;
 }
 
-const ZESamplerState& ZEFixedMaterial::GetSpecularMapSampler() const
+const ZESamplerState& ZEMaterialDefault::GetSpecularMapSampler() const
 {
 	return Samplers.SpecularMap;
 }
 
-void ZEFixedMaterial::SetEmissiveEnabled(bool Value)
+void ZEMaterialDefault::SetEmissiveEnabled(bool Value)
 {
 	if (Components.Emissive != Value)
 	{
@@ -634,34 +633,34 @@ void ZEFixedMaterial::SetEmissiveEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetEmissiveEnabled() const
+bool ZEMaterialDefault::GetEmissiveEnabled() const
 {
 	return Components.Emissive;
 }
 
-void ZEFixedMaterial::SetEmissiveFactor(float Factor)
+void ZEMaterialDefault::SetEmissiveFactor(float Factor)
 {
 	EmissiveFactor = Factor;
 	MaterialEmissiveColor = EmissiveColor * EmissiveFactor;
 }
 
-float ZEFixedMaterial::GetEmissiveFactor() const
+float ZEMaterialDefault::GetEmissiveFactor() const
 {
 	return EmissiveFactor;
 }
 
-void ZEFixedMaterial::SetEmissiveColor(const ZEVector3& Color)
+void ZEMaterialDefault::SetEmissiveColor(const ZEVector3& Color)
 {
 	EmissiveColor = Color;
 	MaterialEmissiveColor = EmissiveColor * EmissiveFactor;
 }
 
-const ZEVector3& ZEFixedMaterial::GetEmissiveColor() const
+const ZEVector3& ZEMaterialDefault::GetEmissiveColor() const
 {
 	return EmissiveColor;
 }
 
-void ZEFixedMaterial::SetEmissiveMapEnabled(bool Value)
+void ZEMaterialDefault::SetEmissiveMapEnabled(bool Value)
 {
 	if (Components.EmissiveMap != Value)
 	{
@@ -670,12 +669,12 @@ void ZEFixedMaterial::SetEmissiveMapEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetEmissiveMapEnabled() const
+bool ZEMaterialDefault::GetEmissiveMapEnabled() const
 {
 	return Components.EmissiveMap;
 }
 
-void ZEFixedMaterial::SetEmissiveMap(ZETexture2D* Texture)
+void ZEMaterialDefault::SetEmissiveMap(ZETexture2D* Texture)
 {
 	if (Resources.EmissiveMap != NULL)
 	{
@@ -689,12 +688,12 @@ void ZEFixedMaterial::SetEmissiveMap(ZETexture2D* Texture)
 	Textures.EmissiveMap = Texture;
 }
 
-ZETexture2D* ZEFixedMaterial::GetEmissiveMap() const
+ZETexture2D* ZEMaterialDefault::GetEmissiveMap() const
 {
 	return Textures.EmissiveMap;
 }
 
-void ZEFixedMaterial::SetEmissiveMapFile(const char* Filename)
+void ZEMaterialDefault::SetEmissiveMapFile(const char* Filename)
 {
 	if (Resources.EmissiveMap != NULL)
 	{
@@ -716,7 +715,7 @@ void ZEFixedMaterial::SetEmissiveMapFile(const char* Filename)
 	}
 }
 
-const char* ZEFixedMaterial::GetEmissiveMapFile() const
+const char* ZEMaterialDefault::GetEmissiveMapFile() const
 {
 	if (Resources.EmissiveMap != NULL)
 		return Resources.EmissiveMap->GetFileName();
@@ -724,17 +723,17 @@ const char* ZEFixedMaterial::GetEmissiveMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetEmissiveMapSampler(const ZESamplerState& Sampler)
+void ZEMaterialDefault::SetEmissiveMapSampler(const ZESamplerState& Sampler)
 {
 	Samplers.EmissiveMap = Sampler;
 }
 
-const ZESamplerState& ZEFixedMaterial::GetEmissiveMapSampler() const
+const ZESamplerState& ZEMaterialDefault::GetEmissiveMapSampler() const
 {
 	return Samplers.EmissiveMap;
 }
 
-void ZEFixedMaterial::SetNormalMapEnabled(bool Value)
+void ZEMaterialDefault::SetNormalMapEnabled(bool Value)
 {
 	if (Components.NormalMap != Value)
 	{
@@ -743,12 +742,12 @@ void ZEFixedMaterial::SetNormalMapEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetNormalMapEnabled() const
+bool ZEMaterialDefault::GetNormalMapEnabled() const
 {
 	return Components.NormalMap;
 }
 
-void ZEFixedMaterial::SetNormalMap(ZETexture2D* Texture)
+void ZEMaterialDefault::SetNormalMap(ZETexture2D* Texture)
 {
 	if (Resources.NormalMap != NULL)
 	{
@@ -762,12 +761,12 @@ void ZEFixedMaterial::SetNormalMap(ZETexture2D* Texture)
 	Textures.NormalMap = Texture;
 }
 
-ZETexture2D* ZEFixedMaterial::GetNormalMap() const
+ZETexture2D* ZEMaterialDefault::GetNormalMap() const
 {
 	return Textures.NormalMap;
 }
 
-void ZEFixedMaterial::SetNormalMapFile(const char* Filename)
+void ZEMaterialDefault::SetNormalMapFile(const char* Filename)
 {
 	if (Resources.NormalMap != NULL)
 	{
@@ -789,7 +788,7 @@ void ZEFixedMaterial::SetNormalMapFile(const char* Filename)
 	}
 }
 
-const char* ZEFixedMaterial::GetNormalMapFile() const
+const char* ZEMaterialDefault::GetNormalMapFile() const
 {
 	if (Resources.NormalMap != NULL)
 		return Resources.NormalMap->GetFileName();
@@ -797,17 +796,17 @@ const char* ZEFixedMaterial::GetNormalMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetNormalMapSampler(const ZESamplerState& Sampler)
+void ZEMaterialDefault::SetNormalMapSampler(const ZESamplerState& Sampler)
 {
 	Samplers.NormalMap = Sampler;
 }
 
-const ZESamplerState& ZEFixedMaterial::GetNormalMapSampler() const
+const ZESamplerState& ZEMaterialDefault::GetNormalMapSampler() const
 {
 	return Samplers.NormalMap;
 }
 
-void ZEFixedMaterial::SetParallaxMapEnabled(bool Value)
+void ZEMaterialDefault::SetParallaxMapEnabled(bool Value)
 {
 	if (Components.ParallaxMap != Value)
 	{
@@ -816,12 +815,12 @@ void ZEFixedMaterial::SetParallaxMapEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetParallaxMapEnabled() const
+bool ZEMaterialDefault::GetParallaxMapEnabled() const
 {
 	return Components.ParallaxMap;
 }
 
-void ZEFixedMaterial::SetParallaxMap(ZETexture2D* Texture)
+void ZEMaterialDefault::SetParallaxMap(ZETexture2D* Texture)
 {
 	if (Resources.ParallaxMap != NULL)
 	{
@@ -835,7 +834,7 @@ void ZEFixedMaterial::SetParallaxMap(ZETexture2D* Texture)
 	Textures.ParallaxMap = Texture;
 }
 
-void ZEFixedMaterial::SetParallaxMapFile(const char* Filename)
+void ZEMaterialDefault::SetParallaxMapFile(const char* Filename)
 {
 	if (Resources.ParallaxMap != NULL)
 	{
@@ -857,7 +856,7 @@ void ZEFixedMaterial::SetParallaxMapFile(const char* Filename)
 	}
 }
 
-const char* ZEFixedMaterial::GetParallaxMapFile() const
+const char* ZEMaterialDefault::GetParallaxMapFile() const
 {
 	if (Resources.ParallaxMap != NULL)
 		return Resources.ParallaxMap->GetFileName();
@@ -865,22 +864,22 @@ const char* ZEFixedMaterial::GetParallaxMapFile() const
 		return "";
 }
 
-ZETexture2D* ZEFixedMaterial::GetParallaxMap() const
+ZETexture2D* ZEMaterialDefault::GetParallaxMap() const
 {
 	return Textures.ParallaxMap;
 }
 
-void ZEFixedMaterial::SetParallaxMapSampler(const ZESamplerState& Sampler)
+void ZEMaterialDefault::SetParallaxMapSampler(const ZESamplerState& Sampler)
 {
 	Samplers.ParallaxMap = Sampler;
 }
 
-const ZESamplerState& ZEFixedMaterial::GetParallaxMapSampler() const
+const ZESamplerState& ZEMaterialDefault::GetParallaxMapSampler() const
 {
 	return Samplers.ParallaxMap;
 }
 
-void ZEFixedMaterial::SetOpacityEnabled(bool Value)
+void ZEMaterialDefault::SetOpacityEnabled(bool Value)
 {
 	if (Components.Opacity != Value)
 	{
@@ -889,22 +888,22 @@ void ZEFixedMaterial::SetOpacityEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetOpacityEnabled() const
+bool ZEMaterialDefault::GetOpacityEnabled() const
 {
 	return Components.Opacity;
 }
 
-void ZEFixedMaterial::SetOpacity(float Value)
+void ZEMaterialDefault::SetOpacity(float Value)
 {
 	Opacity = Value;
 }
 
-float ZEFixedMaterial::GetOpacity() const
+float ZEMaterialDefault::GetOpacity() const
 {
 	return Opacity;
 }
 
-void ZEFixedMaterial::SetOpacityComponent(ZEMaterialOpacityComponent Component)
+void ZEMaterialDefault::SetOpacityComponent(ZEMaterialOpacityComponent Component)
 {
 	Components.OpacityMap = false;
 	Components.OpacityConstant = false;
@@ -931,12 +930,12 @@ void ZEFixedMaterial::SetOpacityComponent(ZEMaterialOpacityComponent Component)
 	}
 }
 
-ZEMaterialOpacityComponent ZEFixedMaterial::GetOpacityComponent() const
+ZEMaterialOpacityComponent ZEMaterialDefault::GetOpacityComponent() const
 {
 	return OpacityComponent;
 }
 
-void ZEFixedMaterial::SetOpacityMapEnabled(bool Value)
+void ZEMaterialDefault::SetOpacityMapEnabled(bool Value)
 {
 	if (Components.OpacityMap != Value)
 	{
@@ -945,12 +944,12 @@ void ZEFixedMaterial::SetOpacityMapEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetOpacityMapEnabled() const
+bool ZEMaterialDefault::GetOpacityMapEnabled() const
 {
 	return Components.OpacityMap;
 }
 
-void ZEFixedMaterial::SetOpacityMap(ZETexture2D* Texture)
+void ZEMaterialDefault::SetOpacityMap(ZETexture2D* Texture)
 {
 	if (Resources.OpacityMap != NULL)
 	{
@@ -964,12 +963,12 @@ void ZEFixedMaterial::SetOpacityMap(ZETexture2D* Texture)
 	Textures.OpacityMap = Texture;
 }
 
-ZETexture2D* ZEFixedMaterial::GetOpacityMap() const
+ZETexture2D* ZEMaterialDefault::GetOpacityMap() const
 {
 	return Textures.OpacityMap;
 }
 
-void ZEFixedMaterial::SetOpacityMapFile(const char* Filename)
+void ZEMaterialDefault::SetOpacityMapFile(const char* Filename)
 {
 	if (Resources.OpacityMap != NULL)
 	{
@@ -991,7 +990,7 @@ void ZEFixedMaterial::SetOpacityMapFile(const char* Filename)
 	}
 }
 
-const char* ZEFixedMaterial::GetOpacityMapFile() const
+const char* ZEMaterialDefault::GetOpacityMapFile() const
 {
 	if (Resources.OpacityMap != NULL)
 		return Resources.OpacityMap->GetFileName();
@@ -999,17 +998,17 @@ const char* ZEFixedMaterial::GetOpacityMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetOpacityMapSampler(const ZESamplerState& Sampler)
+void ZEMaterialDefault::SetOpacityMapSampler(const ZESamplerState& Sampler)
 {
 	Samplers.OpacityMap = Sampler;
 }
 
-const ZESamplerState& ZEFixedMaterial::GetOpacityMapSampler() const
+const ZESamplerState& ZEMaterialDefault::GetOpacityMapSampler() const
 {
 	return Samplers.OpacityMap;
 }
 
-void ZEFixedMaterial::SetEnvironmentMap(ZETextureCube* Texture)
+void ZEMaterialDefault::SetEnvironmentMap(ZETextureCube* Texture)
 {
 	if (Resources.EnvironmentMap != NULL)
 	{
@@ -1020,12 +1019,12 @@ void ZEFixedMaterial::SetEnvironmentMap(ZETextureCube* Texture)
 	Textures.EnvironmentMap = Texture;
 }
 
-ZETextureCube* ZEFixedMaterial::GetEnvironmentMap() const
+ZETextureCube* ZEMaterialDefault::GetEnvironmentMap() const
 {
 	return Textures.EnvironmentMap;
 }
 
-void ZEFixedMaterial::SetEnvironmentMapFile(const char* Filename)
+void ZEMaterialDefault::SetEnvironmentMapFile(const char* Filename)
 {
 	if (Resources.EnvironmentMap != NULL)
 	{
@@ -1046,7 +1045,7 @@ void ZEFixedMaterial::SetEnvironmentMapFile(const char* Filename)
 	}
 }
 
-const char* ZEFixedMaterial::GetEnvironmentMapFile() const
+const char* ZEMaterialDefault::GetEnvironmentMapFile() const
 {
 	if (Resources.EnvironmentMap != NULL)
 		return Resources.EnvironmentMap->GetFileName();
@@ -1054,17 +1053,17 @@ const char* ZEFixedMaterial::GetEnvironmentMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetEnvironmentMapSampler(const ZESamplerState& Sampler)
+void ZEMaterialDefault::SetEnvironmentMapSampler(const ZESamplerState& Sampler)
 {
 	Samplers.EnvironmentMap = Sampler;
 }
 
-const ZESamplerState& ZEFixedMaterial::GetEnvironmentMapSampler() const
+const ZESamplerState& ZEMaterialDefault::GetEnvironmentMapSampler() const
 {
 	return Samplers.EnvironmentMap;
 }
 
-void ZEFixedMaterial::SetReflectionEnabled(bool Value)
+void ZEMaterialDefault::SetReflectionEnabled(bool Value)
 {
 	if (Components.Reflection != Value)
 	{
@@ -1073,22 +1072,22 @@ void ZEFixedMaterial::SetReflectionEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetReflectionEnabled() const
+bool ZEMaterialDefault::GetReflectionEnabled() const
 {
 	return Components.Reflection;
 }
 
-void ZEFixedMaterial::SetReflectionFactor(float Factor)
+void ZEMaterialDefault::SetReflectionFactor(float Factor)
 {
 	ReflectionFactor = Factor;
 }
 
-float ZEFixedMaterial::GetReflectionFactor() const
+float ZEMaterialDefault::GetReflectionFactor() const
 {
 	return ReflectionFactor;
 }
 
-void ZEFixedMaterial::SetRefractionEnabled(bool Value)
+void ZEMaterialDefault::SetRefractionEnabled(bool Value)
 {
 	if (Components.Refraction != Value)
 	{
@@ -1097,62 +1096,62 @@ void ZEFixedMaterial::SetRefractionEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetRefractionEnabled() const
+bool ZEMaterialDefault::GetRefractionEnabled() const
 {
 	return Components.Refraction;
 }
 
-void ZEFixedMaterial::SetRefractionIndex(float Index)
+void ZEMaterialDefault::SetRefractionIndex(float Index)
 {
 	RefractionIndex = Index;
 }
 
-float ZEFixedMaterial::GetRefractionIndex() const
+float ZEMaterialDefault::GetRefractionIndex() const
 {
 	return RefractionIndex;
 }
 
-void ZEFixedMaterial::SetRefractionFactor(float Factor)
+void ZEMaterialDefault::SetRefractionFactor(float Factor)
 {
 	RefractionFactor = Factor;
 }
 
-float ZEFixedMaterial::GetRefractionFactor() const
+float ZEMaterialDefault::GetRefractionFactor() const
 {
 	return RefractionFactor;
 }
 
-void ZEFixedMaterial::SetDetailMapTiling(const ZEVector2& Tiling)
+void ZEMaterialDefault::SetDetailMapTiling(const ZEVector2& Tiling)
 {
 	DetailMapTiling = Tiling;
 }
 
-const ZEVector2& ZEFixedMaterial::GetDetailMapTiling() const
+const ZEVector2& ZEMaterialDefault::GetDetailMapTiling() const
 {
 	return DetailMapTiling;
 }
 
-void ZEFixedMaterial::SetDetailDistance(float Factor)
+void ZEMaterialDefault::SetDetailDistance(float Factor)
 {
 	DetailDistance = Factor;
 }
 
-float ZEFixedMaterial::GetDetailDistance() const
+float ZEMaterialDefault::GetDetailDistance() const
 {
 	return DetailDistance;
 }
 
-void ZEFixedMaterial::SetDetailFadeDistance(float Factor)
+void ZEMaterialDefault::SetDetailFadeDistance(float Factor)
 {
 	DetailFadeDistance = Factor;
 }
 
-float ZEFixedMaterial::GetDetailFadeDistance() const
+float ZEMaterialDefault::GetDetailFadeDistance() const
 {
 	return DetailFadeDistance;
 }
 
-void ZEFixedMaterial::SetDetailBaseMapEnabled(bool Value)
+void ZEMaterialDefault::SetDetailBaseMapEnabled(bool Value)
 {
 	if (Components.DetailBaseMap != Value)
 	{
@@ -1161,12 +1160,12 @@ void ZEFixedMaterial::SetDetailBaseMapEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetDetailBaseMapEnabled() const
+bool ZEMaterialDefault::GetDetailBaseMapEnabled() const
 {
 	return Components.DetailBaseMap;
 }
 
-void ZEFixedMaterial::SetDetailBaseMap(ZETexture2D* Texture)
+void ZEMaterialDefault::SetDetailBaseMap(ZETexture2D* Texture)
 {
 	if (Resources.DetailBaseMap != NULL)
 	{
@@ -1180,12 +1179,12 @@ void ZEFixedMaterial::SetDetailBaseMap(ZETexture2D* Texture)
 	Textures.DetailBaseMap = Texture;
 }
 
-ZETexture2D* ZEFixedMaterial::GetDetailBaseMap() const
+ZETexture2D* ZEMaterialDefault::GetDetailBaseMap() const
 {
 	return Textures.DetailBaseMap;
 }
 
-void ZEFixedMaterial::SetDetailBaseMapFile(const char* Filename)
+void ZEMaterialDefault::SetDetailBaseMapFile(const char* Filename)
 {
 	if (Resources.DetailBaseMap != NULL)
 	{
@@ -1207,7 +1206,7 @@ void ZEFixedMaterial::SetDetailBaseMapFile(const char* Filename)
 	}
 }
 
-const char* ZEFixedMaterial::GetDetailBaseMapFile() const
+const char* ZEMaterialDefault::GetDetailBaseMapFile() const
 {
 	if (Resources.DetailBaseMap != NULL)
 		return Resources.DetailBaseMap->GetFileName();
@@ -1215,17 +1214,17 @@ const char* ZEFixedMaterial::GetDetailBaseMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetDetailBaseMapSampler(const ZESamplerState& Sampler)
+void ZEMaterialDefault::SetDetailBaseMapSampler(const ZESamplerState& Sampler)
 {
 	Samplers.DetailBaseMap = Sampler;
 }
 
-const ZESamplerState& ZEFixedMaterial::GetDetailBaseMapSampler() const
+const ZESamplerState& ZEMaterialDefault::GetDetailBaseMapSampler() const
 {
 	return Samplers.DetailBaseMap;
 }
 
-void ZEFixedMaterial::SetDetailNormalMapEnabled(bool Value)
+void ZEMaterialDefault::SetDetailNormalMapEnabled(bool Value)
 {
 	if (Components.DetailNormalMap != Value)
 	{
@@ -1234,12 +1233,12 @@ void ZEFixedMaterial::SetDetailNormalMapEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetDetailNormalMapEnabled() const
+bool ZEMaterialDefault::GetDetailNormalMapEnabled() const
 {
 	return Components.DetailNormalMap;
 }
 
-void ZEFixedMaterial::SetDetailNormalMap(ZETexture2D* Texture)
+void ZEMaterialDefault::SetDetailNormalMap(ZETexture2D* Texture)
 {
 	if (Resources.DetailNormalMap != NULL)
 	{
@@ -1253,12 +1252,12 @@ void ZEFixedMaterial::SetDetailNormalMap(ZETexture2D* Texture)
 	Textures.DetailNormalMap = Texture;
 }
 
-ZETexture2D* ZEFixedMaterial::GetDetailNormalMap() const
+ZETexture2D* ZEMaterialDefault::GetDetailNormalMap() const
 {
 	return Textures.DetailNormalMap;
 }
 
-void ZEFixedMaterial::SetDetailNormalMapFile(const char* Filename)
+void ZEMaterialDefault::SetDetailNormalMapFile(const char* Filename)
 {
 	if (Resources.DetailNormalMap != NULL)
 	{
@@ -1280,7 +1279,7 @@ void ZEFixedMaterial::SetDetailNormalMapFile(const char* Filename)
 	}
 }
 
-const char* ZEFixedMaterial::GetDetailNormalMapFile() const
+const char* ZEMaterialDefault::GetDetailNormalMapFile() const
 {
 	if (Resources.DetailNormalMap != NULL)
 		return Resources.DetailNormalMap->GetFileName();
@@ -1288,17 +1287,17 @@ const char* ZEFixedMaterial::GetDetailNormalMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetDetailNormalMapSampler(const ZESamplerState& Sampler)
+void ZEMaterialDefault::SetDetailNormalMapSampler(const ZESamplerState& Sampler)
 {
 	Samplers.DetailNormalMap = Sampler;
 }
 
-const ZESamplerState& ZEFixedMaterial::GetDetailNormalMapSampler() const
+const ZESamplerState& ZEMaterialDefault::GetDetailNormalMapSampler() const
 {
 	return Samplers.DetailNormalMap;
 }
 
-void ZEFixedMaterial::SetLightMapEnabled(bool Value)
+void ZEMaterialDefault::SetLightMapEnabled(bool Value)
 {
 	if (Components.LightMap != Value)
 	{
@@ -1307,22 +1306,22 @@ void ZEFixedMaterial::SetLightMapEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetLightMapEnabled() const
+bool ZEMaterialDefault::GetLightMapEnabled() const
 {
 	return Components.LightMap;
 }
 
-void ZEFixedMaterial::SetLightMapFactor(float Factor)
+void ZEMaterialDefault::SetLightMapFactor(float Factor)
 {
 	LightMapFactor = Factor;
 }
 
-float ZEFixedMaterial::GetLightMapFactor() const
+float ZEMaterialDefault::GetLightMapFactor() const
 {
 	return LightMapFactor;
 }
 
-void ZEFixedMaterial::SetLightMap(ZETexture2D* Texture)
+void ZEMaterialDefault::SetLightMap(ZETexture2D* Texture)
 {
 	if (Resources.LightMap != NULL)
 	{
@@ -1336,12 +1335,12 @@ void ZEFixedMaterial::SetLightMap(ZETexture2D* Texture)
 	Textures.LightMap = Texture;
 }
 
-ZETexture2D* ZEFixedMaterial::GetLightMap() const
+ZETexture2D* ZEMaterialDefault::GetLightMap() const
 {
 	return Textures.LightMap;
 }
 
-void ZEFixedMaterial::SetLightMapFile(const char* Filename)
+void ZEMaterialDefault::SetLightMapFile(const char* Filename)
 {
 	if (Resources.LightMap != NULL)
 	{
@@ -1363,7 +1362,7 @@ void ZEFixedMaterial::SetLightMapFile(const char* Filename)
 	}
 }
 
-const char* ZEFixedMaterial::GetLightMapFile() const
+const char* ZEMaterialDefault::GetLightMapFile() const
 {
 	if (Resources.LightMap != NULL)
 		return Resources.LightMap->GetFileName();
@@ -1371,17 +1370,17 @@ const char* ZEFixedMaterial::GetLightMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetLightMapSampler(const ZESamplerState& Sampler)
+void ZEMaterialDefault::SetLightMapSampler(const ZESamplerState& Sampler)
 {
 	Samplers.LightMap = Sampler;
 }
 
-const ZESamplerState& ZEFixedMaterial::GetLightMapSampler() const
+const ZESamplerState& ZEMaterialDefault::GetLightMapSampler() const
 {
 	return Samplers.LightMap;
 }
 
-void ZEFixedMaterial::SetDistortionEnabled(bool Value)
+void ZEMaterialDefault::SetDistortionEnabled(bool Value)
 {
 	if (Components.DistortionMap != Value)
 	{
@@ -1390,22 +1389,22 @@ void ZEFixedMaterial::SetDistortionEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetDistortionEnabled() const
+bool ZEMaterialDefault::GetDistortionEnabled() const
 {
 	return Components.DistortionMap;
 }
 
-void ZEFixedMaterial::SetDistortionFactor(float Factor)
+void ZEMaterialDefault::SetDistortionFactor(float Factor)
 {
 	DistortionFactor = Factor;
 }
 
-float ZEFixedMaterial::GetDistortionFactor() const
+float ZEMaterialDefault::GetDistortionFactor() const
 {
 	return DistortionFactor;
 }
 
-void ZEFixedMaterial::SetDistortionMap(ZETexture2D* Texture)
+void ZEMaterialDefault::SetDistortionMap(ZETexture2D* Texture)
 {
 	if (Resources.DistortionMap != NULL)
 	{
@@ -1419,12 +1418,12 @@ void ZEFixedMaterial::SetDistortionMap(ZETexture2D* Texture)
 	Textures.DistortionMap = Texture;
 }
 
-ZETexture2D* ZEFixedMaterial::GetDistortionMap() const
+ZETexture2D* ZEMaterialDefault::GetDistortionMap() const
 {
 	return Textures.DistortionMap; 
 }
 
-void ZEFixedMaterial::SetDistortionMapFile(const char* Filename)
+void ZEMaterialDefault::SetDistortionMapFile(const char* Filename)
 {
 	if (Resources.DistortionMap != NULL)
 	{
@@ -1446,7 +1445,7 @@ void ZEFixedMaterial::SetDistortionMapFile(const char* Filename)
 	}
 }
 
-const char* ZEFixedMaterial::GetDistortionMapFile() const
+const char* ZEMaterialDefault::GetDistortionMapFile() const
 {
 	if (Resources.DistortionMap != NULL)
 		return Resources.DistortionMap->GetFileName();
@@ -1454,17 +1453,17 @@ const char* ZEFixedMaterial::GetDistortionMapFile() const
 		return "";
 }
 
-void ZEFixedMaterial::SetDistortionMapSampler(const ZESamplerState& Sampler)
+void ZEMaterialDefault::SetDistortionMapSampler(const ZESamplerState& Sampler)
 {
 	Samplers.DistortionMap = Sampler;
 }
 
-const ZESamplerState& ZEFixedMaterial::GetDistortionMapSampler() const
+const ZESamplerState& ZEMaterialDefault::GetDistortionMapSampler() const
 {
 	return Samplers.DistortionMap;
 }
 
-void ZEFixedMaterial::SetVertexColorEnabled(bool Value)
+void ZEMaterialDefault::SetVertexColorEnabled(bool Value)
 {
 	if (Components.VertexColor != Value)
 	{
@@ -1473,15 +1472,15 @@ void ZEFixedMaterial::SetVertexColorEnabled(bool Value)
 	} 
 }
 
-bool ZEFixedMaterial::GetVertexColorEnabled()
+bool ZEMaterialDefault::GetVertexColorEnabled()
 {
 	return Components.VertexColor;
 }
 
-void ZEFixedMaterial::UpdateTransformations(const ZERenderCommand* RenderCommand)
+void ZEMaterialDefault::UpdateTransformations(const ZERenderCommand* RenderCommand)
 {
-	static ZEUInt LastFrameId = 0;
-	ZEUInt CurrentFrameId = zeCore->GetFrameId();
+	static ZESize LastFrameId = 0;
+	ZESize CurrentFrameId = zeCore->GetFrameId();
 	
 	if (CurrentFrameId <= LastFrameId)
 		return;
@@ -1491,15 +1490,15 @@ void ZEFixedMaterial::UpdateTransformations(const ZERenderCommand* RenderCommand
 
 	// Update transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
 	}
-	else if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewTransform();
 	}
-	else if (RenderCommand->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_ENABLE_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	}
@@ -1509,7 +1508,7 @@ void ZEFixedMaterial::UpdateTransformations(const ZERenderCommand* RenderCommand
 	}
 	
 
-	if (RenderCommand->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_ENABLE_WORLD_TRANSFORM)
 	{
 		ZEMatrix4x4::Multiply(Transformations.WorldViewProj, ViewProjMatrix, RenderCommand->WorldMatrix);
 		ZEMatrix4x4::Multiply(Transformations.WorldView, Camera->GetViewTransform(), RenderCommand->WorldMatrix);
@@ -1522,7 +1521,7 @@ void ZEFixedMaterial::UpdateTransformations(const ZERenderCommand* RenderCommand
 
 }
 
-bool ZEFixedMaterial::SetupGeometryPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+bool ZEMaterialDefault::SetupGeometryPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	UpdateMaterial();
 	
@@ -1534,15 +1533,15 @@ bool ZEFixedMaterial::SetupGeometryPass(const ZERenderStage* Stage, const ZERend
 	/*
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
 	}
-	else if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewTransform();
 	}
-	else if (RenderCommand->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_ENABLE_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	}
@@ -1553,7 +1552,7 @@ bool ZEFixedMaterial::SetupGeometryPass(const ZERenderStage* Stage, const ZERend
 	
 	ZEMatrix4x4 WorldViewProjMatrix;
 	ZEMatrix4x4 WorldViewMatrix;
-	if (RenderCommand->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_ENABLE_WORLD_TRANSFORM)
 	{
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
 		ZEMatrix4x4::Multiply(WorldViewMatrix, Camera->GetViewTransform(), RenderCommand->WorldMatrix);
@@ -1571,7 +1570,7 @@ bool ZEFixedMaterial::SetupGeometryPass(const ZERenderStage* Stage, const ZERend
 		VSData->WorldViewMatrix = Transformations.WorldView;
 		VSData->WorldViewInvTrpsMatrix = Transformations.WorldView;
 		VSData->WorldViewProjMatrix = Transformations.WorldViewProj;
-		VSData->EnableSkin = (RenderCommand->Flags & ZE_ROF_SKINNED) == ZE_ROF_SKINNED;
+		VSData->EnableSkin = (RenderCommand->Flags & ZE_RCF_SKINNED) == ZE_RCF_SKINNED;
 
 	Buffers.GBufferPassVertexShader->Unlock();
 	Device->SetVertexShaderBuffer(0, Buffers.GBufferPassVertexShader);
@@ -1594,8 +1593,8 @@ bool ZEFixedMaterial::SetupGeometryPass(const ZERenderStage* Stage, const ZERend
 	ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetStencilTestEnable(false);
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
-	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING) == 0 ? false : true);
-	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
+	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_RCF_ENABLE_Z_CULLING) == 0 ? false : true);
+	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_RCF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
 	Device->SetDepthStencilState(DepthStencilState);
 
 	ZERasterizerState RasterizerState;
@@ -1606,7 +1605,7 @@ bool ZEFixedMaterial::SetupGeometryPass(const ZERenderStage* Stage, const ZERend
 	/*
 	// NOTE: Add bone transformation buffer to fixedmaterial.hlsl
 	// Setup Bone Transforms
-	if (RenderCommand->Flags & ZE_ROF_SKINNED && RenderCommand->BoneTransforms.GetCount() < 58)
+	if (RenderCommand->Flags & ZE_RCF_SKINNED && RenderCommand->BoneTransforms.GetCount() < 58)
 	{
 		GetDevice()->SetVertexShaderConstantF(32, (float*)RenderCommand->BoneTransforms.GetCArray(), (UINT)RenderCommand->BoneTransforms.GetCount() * 4);
 		SkinEnabled = true;
@@ -1652,7 +1651,7 @@ bool ZEFixedMaterial::SetupGeometryPass(const ZERenderStage* Stage, const ZERend
 	return true;
 }
 
-bool ZEFixedMaterial::SetupForwardPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+bool ZEMaterialDefault::SetupForwardPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	UpdateMaterial();
 
@@ -1664,15 +1663,15 @@ bool ZEFixedMaterial::SetupForwardPass(const ZERenderStage* Stage, const ZERende
 	/*
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
 	}
-	else if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewTransform();
 	}
-	else if (RenderCommand->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_ENABLE_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	}
@@ -1683,7 +1682,7 @@ bool ZEFixedMaterial::SetupForwardPass(const ZERenderStage* Stage, const ZERende
 
 	ZEMatrix4x4 WorldViewProjMatrix;
 	ZEMatrix4x4 WorldViewMatrix;
-	if (RenderCommand->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_ENABLE_WORLD_TRANSFORM)
 	{
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
 		ZEMatrix4x4::Multiply(WorldViewMatrix, Camera->GetViewTransform(), RenderCommand->WorldMatrix);
@@ -1699,7 +1698,7 @@ bool ZEFixedMaterial::SetupForwardPass(const ZERenderStage* Stage, const ZERende
 
 		VSData->WorldMatrix = RenderCommand->WorldMatrix;
 		VSData->WorldViewProjMatrix = Transformations.WorldViewProj;
-		VSData->EnableSkin = (RenderCommand->Flags & ZE_ROF_SKINNED) == ZE_ROF_SKINNED;
+		VSData->EnableSkin = (RenderCommand->Flags & ZE_RCF_SKINNED) == ZE_RCF_SKINNED;
 		VSData->CameraPosition = ZEVector4(Camera->GetWorldPosition(), 1.0f);
 
 	Buffers.ForwardPassVertexShader->Unlock();
@@ -1730,8 +1729,8 @@ bool ZEFixedMaterial::SetupForwardPass(const ZERenderStage* Stage, const ZERende
 	// Setup ZCulling
 	ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
-	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING) == 0 ? false : true);
-	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
+	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_RCF_ENABLE_Z_CULLING) == 0 ? false : true);
+	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_RCF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
 	Device->SetDepthStencilState(DepthStencilState);
 
 	ZERasterizerState RasterizerState;
@@ -1741,7 +1740,7 @@ bool ZEFixedMaterial::SetupForwardPass(const ZERenderStage* Stage, const ZERende
 
 	/*
 	// Setup Bone Transforms
-	if (RenderCommand->Flags & ZE_ROF_SKINNED && RenderCommand->BoneTransforms.GetCount() < 58)
+	if (RenderCommand->Flags & ZE_RCF_SKINNED && RenderCommand->BoneTransforms.GetCount() < 58)
 	{
 		GetDevice()->SetVertexShaderConstantF(32, (float*)RenderCommand->BoneTransforms.GetCArray(), (UINT)RenderCommand->BoneTransforms.GetCount() * 4);
 	}
@@ -1817,7 +1816,7 @@ bool ZEFixedMaterial::SetupForwardPass(const ZERenderStage* Stage, const ZERende
 	return true;
 }
 
-bool ZEFixedMaterial::SetupTransparentPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+bool ZEMaterialDefault::SetupTransparentPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	UpdateMaterial();
 
@@ -1826,10 +1825,8 @@ bool ZEFixedMaterial::SetupTransparentPass(const ZERenderStage* Stage, const ZER
 	return true;
 }
 
-bool ZEFixedMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+bool ZEMaterialDefault::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
-	zeDebugCheck(PassId > 0, "Fixed material have single pass");
-
 	// Update Buffers
 	UpdateTransformations(RenderCommand);
 
@@ -1849,18 +1846,18 @@ bool ZEFixedMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const
 	return true;
 }
 
-void ZEFixedMaterial::UpdateMaterial()
+void ZEMaterialDefault::UpdateMaterial()
 {
 	if (Recompile)
 		CreateShaders();
 }
 
-ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
+ZEMaterialDefault* ZEMaterialDefault::CreateInstance()
 {
-	return new ZEFixedMaterial();
+	return new ZEMaterialDefault();
 }
 
-void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
+void ZEMaterialDefault::WriteToFile(const ZEString& FilePath)
 {
 	ZEFile File;
 	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
@@ -1887,7 +1884,7 @@ void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 	delete RootNode;
 }
 
-void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
+void ZEMaterialDefault::ReadFromFile(const ZEString& FilePath)
 {
 	ZEFile File;
 	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
@@ -1927,7 +1924,7 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 	UpdateMaterial();
 }
 
-ZEFixedMaterial::ZEFixedMaterial()
+ZEMaterialDefault::ZEMaterialDefault()
 {
 	Recompile = false;
 	DetailDistance = 4.0f;
@@ -2030,7 +2027,7 @@ ZEFixedMaterial::ZEFixedMaterial()
 	memset((void*)&Buffers, 0, sizeof (ZEFixedMaterialBuffers));
 }
 
-ZEFixedMaterial::~ZEFixedMaterial()
+ZEMaterialDefault::~ZEMaterialDefault()
 {
 	DestroyShaders();
 }

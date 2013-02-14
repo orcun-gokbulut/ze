@@ -239,7 +239,7 @@ void ZEInterior::Draw(ZEDrawParameters* DrawParameters)
 
 	if (DrawParameters->Pass == ZE_RP_COLOR)
 	{
-		Statistics.TotalDoorCount = GetDoors().GetCount();
+		Statistics.TotalDoorCount = (ZEUInt32)GetDoors().GetCount();
 
 		DrawParameters->Statistics.InteriorStatistics.TotalRoomCount += Statistics.TotalRoomCount;
 		DrawParameters->Statistics.InteriorStatistics.CulledRoomCount += Statistics.CulledRoomCount;

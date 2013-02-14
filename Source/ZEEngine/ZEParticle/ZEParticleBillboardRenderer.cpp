@@ -105,7 +105,7 @@ void ZEParticleBillboardRenderer::UpdateVertexBuffer(ZEDrawParameters* DrawParam
 
 	if (VertexBuffer->GetBufferSize() != ParticleCount * sizeof(ZEParticleVertex) * 6)
 	{
-		if (!VertexBuffer->CreateDynamic(ParticleCount * 6, sizeof(ZEParticleVertex), NULL))
+		if (!VertexBuffer->CreateDynamic((ZEUInt)ParticleCount * 6, sizeof(ZEParticleVertex), NULL))
 		{
 			zeError("Could not create particle vertex buffer.");
 			return;
@@ -263,7 +263,7 @@ void ZEParticleBillboardRenderer::Draw(ZEDrawParameters* DrawParameters)
 
 //	RenderCommand.InputStage.SetVertexBuffer(0, VertexBuffer);
 	RenderCommand.Material = Material;
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
 }
 
 void ZEParticleBillboardRenderer::SetAxixOfOrientation(const ZEVector3& AxisOfOrientation)

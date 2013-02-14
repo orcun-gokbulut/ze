@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDirectionalLight.cpp
+ Zinek Engine - ZELightDirectional.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -41,14 +41,14 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEOBBox.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEDirectionalLight.h"
+#include "ZELightDirectional.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZERenderTarget.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 
 
-void ZEDirectionalLight::UpdateCascades()
+void ZELightDirectional::UpdateCascades()
 {
 	ZECamera* Camera = zeScene->GetActiveCamera();
 
@@ -222,7 +222,7 @@ void ZEDirectionalLight::UpdateCascades()
 	}
 }
 
-void ZEDirectionalLight::UpdateRenderTargets()
+void ZELightDirectional::UpdateRenderTargets()
 {
 	ZEVector2 Dimension = zeScene->GetRenderer()->GetShadowMapDimension();
 	ZEUInt Width = (ZEUInt)(Dimension.x + 0.5f);
@@ -249,7 +249,7 @@ void ZEDirectionalLight::UpdateRenderTargets()
 	}
 }
 
-void ZEDirectionalLight::DestroyRenderTargets()
+void ZELightDirectional::DestroyRenderTargets()
 {
 	for (ZESize Index = 0; Index < ZE_DL_MAX_CASCADE_COUNT; ++Index)
 	{
@@ -261,87 +261,90 @@ void ZEDirectionalLight::DestroyRenderTargets()
 	}
 }
 
-void ZEDirectionalLight::SetCascadeCount(ZESize Value)
+void ZELightDirectional::SetCascadeCount(ZESize Value)
 {
 	zeDebugCheck(Value > ZE_DL_MAX_CASCADE_COUNT, "Count should be smaller MAX_CASCADE_COUNT");
 	CascadeCount = Value;
 }
 
-ZESize ZEDirectionalLight::GetCascadeCount() const
+ZESize ZELightDirectional::GetCascadeCount() const
 {
 	return CascadeCount;
 }
 		
-void ZEDirectionalLight::SetSplitBias(float Value)
+void ZELightDirectional::SetSplitBias(float Value)
 {
 	CascadeSplitBias = Value;
 }
 
-float ZEDirectionalLight::GetSplitBias() const
+float ZELightDirectional::GetSplitBias() const
 {
 	return CascadeSplitBias;
 }
 
-float ZEDirectionalLight::GetFarZ(ZESize Index) const
+float ZELightDirectional::GetFarZ(ZESize Index) const
 {
 	zeDebugCheck(Index >= ZE_DL_MAX_CASCADE_COUNT, "Index out of range");
 	return Cascades[Index].FarZ;
 }
 
-float ZEDirectionalLight::GetNearZ(ZESize Index) const
+float ZELightDirectional::GetNearZ(ZESize Index) const
 {
 	zeDebugCheck(Index >= ZE_DL_MAX_CASCADE_COUNT, "Index out of range");
 	return Cascades[Index].NearZ;
 }
 
-float ZEDirectionalLight::GetDepth(ZESize Index) const
+float ZELightDirectional::GetDepth(ZESize Index) const
 {
 	zeDebugCheck(Index >= ZE_DL_MAX_CASCADE_COUNT, "Index out of range");
 	return Cascades[Index].Depth;
 }
 
-void ZEDirectionalLight::SetUpdateInterval(ZESize Index, ZEUInt Value)
+void ZELightDirectional::SetUpdateInterval(ZESize Index, ZEUInt Value)
 {
 	zeDebugCheck(Index >= ZE_DL_MAX_CASCADE_COUNT, "Index out of range");
 	Cascades[Index].UpdateInterval = Value;
 }
 
-ZEUInt ZEDirectionalLight::GetUpdateInterval(ZESize Index) const
+ZEUInt ZELightDirectional::GetUpdateInterval(ZESize Index) const
 {
 	zeDebugCheck(Index >= ZE_DL_MAX_CASCADE_COUNT, "Index out of range");
 	return Cascades[Index].UpdateInterval;
 }
 
-const ZETexture2D* ZEDirectionalLight::GetShadowMap(ZESize Index) const
+const ZETexture2D* ZELightDirectional::GetShadowMap(ZESize Index) const
 {
 	zeDebugCheck(Index >= ZE_DL_MAX_CASCADE_COUNT, "Index out of range");
 	return Cascades[Index].ShadowMap;
 }
 
-const ZEMatrix4x4& ZEDirectionalLight::GetShadowTransform(ZESize Index) const
+const ZEMatrix4x4& ZELightDirectional::GetShadowTransform(ZESize Index) const
 {
 	zeDebugCheck(Index >= ZE_DL_MAX_CASCADE_COUNT, "Index out of range");
 	return Cascades[Index].ShadowTransform;
 }
 
-const ZEViewVolume& ZEDirectionalLight::GetViewVolume(ZESize Index) const
+const ZEViewVolume& ZELightDirectional::GetViewVolume(ZESize Index)
 {
 	zeDebugCheck(Index >= ZE_DL_MAX_CASCADE_COUNT, "Index out of range");
 	return Cascades[Index].ViewVolume;
 }
 
-void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
+void ZELightDirectional::Draw(ZEDrawParameters* DrawParameters)
 {
+	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
+		return;
+
 	ZELight::Draw(DrawParameters);
 
-	if (!CastsShadows)
+	if (!ShadowCaster)
 		return;
 
 	UpdateRenderTargets();
 	UpdateCascades();
 }
 
-bool ZEDirectionalLight::Initialize()
+bool ZELightDirectional::Initialize()
 {
 	if (GetInitialized())
 		return false;
@@ -351,7 +354,7 @@ bool ZEDirectionalLight::Initialize()
 	return true;
 }
 
-void ZEDirectionalLight::Deinitialize()
+void ZELightDirectional::Deinitialize()
 {
 	if (!GetInitialized())
 		return;
@@ -359,7 +362,7 @@ void ZEDirectionalLight::Deinitialize()
 	DestroyRenderTargets();
 }
 
-ZEDirectionalLight::ZEDirectionalLight()
+ZELightDirectional::ZELightDirectional()
 {
 	Type = ZE_LT_DIRECTIONAL;
 
@@ -380,12 +383,12 @@ ZEDirectionalLight::ZEDirectionalLight()
 	}
 }
 
-ZEDirectionalLight::~ZEDirectionalLight()
+ZELightDirectional::~ZELightDirectional()
 {
 	Deinitialize();
 }
 
-ZEDirectionalLight* ZEDirectionalLight::CreateInstance()
+ZELightDirectional* ZELightDirectional::CreateInstance()
 {
-	return new ZEDirectionalLight();
+	return new ZELightDirectional();
 }

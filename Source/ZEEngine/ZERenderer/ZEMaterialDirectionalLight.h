@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaterialResource.h
+ Zinek Engine - ZEMaterialDirectionalLight.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,51 +33,49 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATERIAL_RESOURCE_H__ 
-#define __ZE_MATERIAL_RESOURCE_H__
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEFixedMaterial.h"
-#include "ZECore/ZEResource.h"
-#include "ZEMeta/ZEAnimation.h"
+#ifndef __ZE_MATERIAL_DIRECTIONAL_LIGHT_H__
+#define __ZE_MATERIAL_DIRECTIONAL_LIGHT_H__
 
+#include "ZETypes.h"
+#include "ZEMaterialLight.h"
 
-struct ZETextureOptions;
-class ZETextureResource;
+class ZEShader;
+class ZERenderStage;
+class ZEVertexBuffer;
+class ZERenderCommand;
+class ZEConstantBuffer;
 
-class ZEMaterialResource : public ZEResource
+class ZEMaterialDirectionalLight : public ZEMaterialLight
 {
-	private:
-		ZEMaterial*								Material;
-		ZEArray<ZEAnimation>					Animations;
-		ZEArray<ZETextureResource*>				TextureResources;
-
-		static bool								LoadTextures(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile, const ZETextureOptions* UserOptions);
-		static bool								LoadFixedMaterial(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile);
-		static bool								LoadAnimations(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile);
+	friend class ZELightDirectional;
 
 	protected:
-												ZEMaterialResource();
-												~ZEMaterialResource();
+		ZEShader*							VertexShader;
+		ZEShader*							PixelShader;
+		ZEConstantBuffer*					Transformations;
+		ZEConstantBuffer*					LightParameters;
+		ZEConstantBuffer*					ShadowParameters;
+
+		void								UpdateShaders();
+		void								UpdateBuffers();
+
+		void								DestroyShaders();
+		void								DestroyBuffers();
+
+		bool								SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
+
+											ZEMaterialDirectionalLight();
+		virtual								~ZEMaterialDirectionalLight();
 
 	public:
-		virtual const char*						GetResourceType() const;
+		virtual ZEUInt32					GetHash() const;
+		virtual ZEMaterialFlags				GetMaterialFlags() const;
 
-		const ZEMaterial*						GetMaterial() const;
-		const ZEArray<ZETextureResource*>&		GetTextureResources() const;
-		const ZEArray<ZEAnimation>&				GetAnimations() const;
-		const ZEAnimation*						GetAnimationByName(const char* Name) const;
+		virtual void						UpdateMaterial();
+		virtual bool						SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		static const ZEMaterialResource*		LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		
-		static ZEMaterialResource*				LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZEMaterialResource*				LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
+		static ZEMaterialDirectionalLight*	CreateInstance();
 };
 
 #endif
-
-
-
-

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFixedMaterial.h
+ Zinek Engine - ZEMaterialDefault.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -40,7 +40,6 @@
 #include "ZETypes.h"
 #include "ZEMaterial.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEGraphics/ZESamplerState.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZEGraphics/ZESamplerState.h"
@@ -55,11 +54,11 @@ class ZETextureResource;
 class ZETexture2DResource;
 class ZETextureCubeResource;
 
-ZE_META_OBJECT_DESCRIPTION(ZEFixedMaterial)
+ZE_META_OBJECT_DESCRIPTION(ZEMaterialDefault)
 
-class ZEFixedMaterial : public ZEMaterial
+class ZEMaterialDefault : public ZEMaterial
 {
-	ZE_META_OBJECT(ZEFixedMaterial)
+	ZE_META_OBJECT(ZEMaterialDefault)
 
 	protected:
 		bool						Recompile;
@@ -215,8 +214,8 @@ class ZEFixedMaterial : public ZEMaterial
 		void						CreateShaders();
 		void						DestroyShaders();
 
-									ZEFixedMaterial();
-		virtual						~ZEFixedMaterial();
+									ZEMaterialDefault();
+		virtual						~ZEMaterialDefault();
 
 	public:
 		ZEUInt32					GetHash() const;
@@ -418,14 +417,14 @@ class ZEFixedMaterial : public ZEMaterial
 
 		virtual void				UpdateMaterial();
 
-		static ZEFixedMaterial*		CreateInstance();
+		static ZEMaterialDefault*		CreateInstance();
 };
 
 /*
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZEFixedMaterial" noinstance="true">
+		<class name="ZEMaterialDefault" noinstance="true">
 			<description>Material System</description>
 			<property name="TwoSided" groupname="Shading" type="boolean" autogetset="yes"/>
 			<property name="Wireframe" groupname="Shading" type="boolean" autogetset="yes"/>

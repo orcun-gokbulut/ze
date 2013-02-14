@@ -45,7 +45,7 @@
 #include "ZESound/ZEListener.h"
 #include "ZEEntityProvider.h"
 #include "ZERenderer/ZECamera.h"
-#include "ZERenderer/ZEProjectiveLight.h"
+#include "ZERenderer/ZELightProjective.h"
 #include "ZEMath/ZEMath.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
@@ -292,18 +292,14 @@ void ZEPlayer::Deinitialize()
 #include "ZETexture/ZETexture2DResource.h"
 ZEPlayer::ZEPlayer()
 {
-
-	FOV = ZEAngle::ToRadian(50);
+	FOV = ZEAngle::ToRadian(55);
 
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_CONSOLE,			 ZEInputEvent("Keyboard", ZE_IKB_GRAVE, ZE_IBS_PRESSED)));
 
 	Camera = ZECamera::CreateInstance();
-	Camera->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	Camera->SetPosition(ZEVector3::Zero);
 	Camera->SetRotation(ZEQuaternion::Identity);
-	Camera->SetNearZ(zeGraphics->GetNearZ());
-	Camera->SetFarZ(zeGraphics->GetFarZ());
 	Camera->SetFOV(FOV);
-	Camera->SetAspectRatio((float)zeGraphics->GetScreenWidth() / (float)zeGraphics->GetScreenHeight());
 	AddComponent(Camera);
 
 	Listener = ZEListener::CreateInstance();

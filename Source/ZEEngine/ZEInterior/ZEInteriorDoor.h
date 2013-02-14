@@ -37,17 +37,16 @@
 #ifndef __ZE_INTERIOR_DOOR_H__
 #define __ZE_INTERIOR_DOOR_H__
 
+#include "ZERenderer/ZECanvas.h"
 #include "ZEMath/ZERectangle3D.h"
 #include "ZERenderer/ZERenderCommand.h"
-#include "ZERenderer/ZECanvas.h"
 
-class ZEInterior;
-class ZEInteriorRoom;
-struct ZEInteriorResourceDoor;
-class ZESimpleMaterial;
 class ZECanvas;
+class ZEInterior;
 class ZERenderer;
+class ZEInteriorRoom;
 class ZERenderCommand;
+struct ZEInteriorResourceDoor;
 
 class ZEInteriorDoor
 {

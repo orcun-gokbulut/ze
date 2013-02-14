@@ -33,14 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESceneDebugDraw.h"
-#include "ZERenderer/ZESimpleMaterial.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZEMath/ZEOBBox.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEAABBox.h"
-#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEBSphere.h"
+#include "ZESceneDebugDraw.h"
+#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZEMaterialSimple.h"
 
 void ZESceneDebugDraw::DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, const ZEVector4& Color)
 {
@@ -113,7 +113,6 @@ void ZESceneDebugDraw::Deinitialize()
 		return;
 
 	VertexBuffer.Clean();
-	RenderCommand.SetZero();
 	if (Material != NULL)
 	{
 		Material->Destroy();
@@ -128,15 +127,14 @@ void ZESceneDebugDraw::Draw(ZERenderer* Renderer)
 	if (VertexBuffer.Vertices.GetCount() == 0)
 		return;
 
-	RenderCommand.PrimitiveCount = VertexBuffer.Vertices.GetCount() / 2;
-	Renderer->AddToRenderList(&RenderCommand);
+	RenderCommand.PrimitiveCount = (ZEUInt32)VertexBuffer.Vertices.GetCount() / 2;
+	Renderer->AddRenderCommand(&RenderCommand);
 }
 
 ZESceneDebugDraw::ZESceneDebugDraw()
 {
 	Material = NULL;
 	Initialized = false;
-	RenderCommand.SetZero();
 }
 
 ZESceneDebugDraw::~ZESceneDebugDraw()

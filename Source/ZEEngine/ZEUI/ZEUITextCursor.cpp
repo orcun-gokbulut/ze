@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUITextCursor.h"
-#include "ZERenderer/ZEUIMaterial.h"
+#include "ZERenderer/ZEMaterialUserInterface.h"
 
 ZEUITextCursor::ZEUITextCursor()
 {
@@ -53,7 +53,7 @@ ZEUITextCursor::ZEUITextCursor()
 	SetWidth(Width);
 	SetHeight(Height);
 
-	Material = ZEUIMaterial::CreateInstance();
+	Material = ZEMaterialUserInterface::CreateInstance();
 	Color = ZEVector4(0.0f, 1.0f, 0.0f, 1.0f);
 }
 
@@ -62,7 +62,7 @@ ZEUITextCursor::~ZEUITextCursor()
 	Timer->Stop();
 	Timer->Destroy();
 	Timer = NULL;
-	((ZEUIMaterial*)Material)->Destroy();
+	((ZEMaterialUserInterface*)Material)->Destroy();
 }
 
 void ZEUITextCursor::Blink(float Time)
@@ -91,12 +91,12 @@ bool ZEUITextCursor::GetVisible() const
 
 void ZEUITextCursor::Update()
 {
-	Positions.RightDown = Positions.LeftUp + ZEVector2(Width, Height);
+	Positions.RightDown = Positions.LeftUp + ZEVector2((float)Width, (float)Height);
 }
 
 void ZEUITextCursor::SetHeight(ZEInt32 Height)
 {
-	Positions.RightDown.y += Height;
+	Positions.RightDown.y += (float)Height;
 	Update();
 }
 
@@ -108,8 +108,8 @@ void ZEUITextCursor::SetWidth(ZEInt32 Width)
 
 void ZEUITextCursor::SetSize(const ZEVector2& Size)
 {
-	SetWidth(Size.x);
-	SetHeight(Size.y);
+	SetWidth((ZEInt32)Size.x);
+	SetHeight((ZEInt32)Size.y);
 }
 
 void ZEUITextCursor::SetPostion(const ZEVector2& Position)

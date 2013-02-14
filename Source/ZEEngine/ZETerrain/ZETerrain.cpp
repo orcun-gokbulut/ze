@@ -436,15 +436,14 @@ const ZEString& ZETerrain::GetTerrainFile()
 bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt PositionX, ZEInt PositionY, ZEInt LocalPositionX, ZEInt LocalPositionY, ZEInt Mode, ZESize Level)
 {	
 	ZERenderCommand RenderCommand;
-	RenderCommand.SetZero();
-	RenderCommand.Flags				= ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
-	RenderCommand.VertexLayout		= VertexDeclaration;
-	RenderCommand.Material			= Levels[Level].Material;
-	RenderCommand.Order				= 0;
-	RenderCommand.Pipeline			= ZE_RORP_3D;
-	RenderCommand.VertexBuffers[0]	= VertexBuffer;
-	RenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE_LIST;
-	RenderCommand.Priority			= 3;
+	RenderCommand.Flags	|= ZE_RCF_ENABLE_Z_CULLING | ZE_RCF_ENABLE_WORLD_TRANSFORM | ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM;
+	RenderCommand.VertexLayout = VertexDeclaration;
+	RenderCommand.Material = Levels[Level].Material;
+	RenderCommand.Order = 0;
+	RenderCommand.Pipeline = ZE_RP_3D;
+	RenderCommand.VertexBuffers[0] = VertexBuffer;
+	RenderCommand.PrimitiveType	= ZE_PT_TRIANGLE_LIST;
+	RenderCommand.Priority = 3;
 	RenderCommand.Flags |= 1024;
 
 	ZEMatrix4x4 ScaleMatrix;
@@ -493,7 +492,7 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt Po
 			RenderCommand.PrimitiveCount += BarSize * 2;
 	}
 
-	Renderer->AddToRenderList(&RenderCommand);
+	Renderer->AddRenderCommand(&RenderCommand);
 
 	return true;
 }

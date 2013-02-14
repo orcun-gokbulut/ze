@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESimpleMaterial.cpp
+ Zinek Engine - ZEMaterialSimple.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,7 +38,7 @@
 #include "ZERenderStage.h"
 #include "ZEGame/ZEScene.h"
 #include "ZERenderCommand.h"
-#include "ZESimpleMaterial.h"
+#include "ZEMaterialSimple.h"
 #include "ZEGraphics/ZEShader.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
@@ -62,7 +62,7 @@ struct SimpleMaterialPSData
 	ZEInt32		EnableVertexColor;
 };
 
-ZESimpleMaterial::ZESimpleMaterial()
+ZEMaterialSimple::ZEMaterialSimple()
 {
 	Texture = NULL;
 	VertexShader = NULL;
@@ -79,12 +79,12 @@ ZESimpleMaterial::ZESimpleMaterial()
 	CreateShaders();
 }
 
-ZESimpleMaterial::~ZESimpleMaterial()
+ZEMaterialSimple::~ZEMaterialSimple()
 {
 	ReleaseShaders();
 }
 
-void ZESimpleMaterial::CreateShaders()
+void ZEMaterialSimple::CreateShaders()
 {
 	ZEShaderCompileOptions Options;
 	
@@ -107,7 +107,7 @@ void ZESimpleMaterial::CreateShaders()
 	PixelShaderData->Create(VertexShader->GetMetaTable()->GetBufferInfo("SimpleMaterialPSData"));
 }
 
-void ZESimpleMaterial::ReleaseShaders()
+void ZEMaterialSimple::ReleaseShaders()
 {
 	ZE_DESTROY(VertexShader);
 	ZE_DESTROY(PixelShader);
@@ -115,107 +115,107 @@ void ZESimpleMaterial::ReleaseShaders()
 	ZE_DESTROY(PixelShaderData);
 }
 
-ZEMaterialFlags ZESimpleMaterial::GetMaterialFlags() const
+ZEMaterialFlags ZEMaterialSimple::GetMaterialFlags() const
 {
 	return ZE_MTF_FORWARD_PASS;
 }
 
-ZEUInt32 ZESimpleMaterial::GetHash() const
+ZEUInt32 ZEMaterialSimple::GetHash() const
 {
 	return 1 << 31;
 }
 
-void ZESimpleMaterial::SetTwoSided(bool Enable)
+void ZEMaterialSimple::SetTwoSided(bool Enable)
 {
 	TwoSided = Enable;
 }
 
-bool ZESimpleMaterial::GetTwoSided() const
+bool ZEMaterialSimple::GetTwoSided() const
 {
 	return TwoSided;
 }
 
-void ZESimpleMaterial::SetWireframe(bool Enable)
+void ZEMaterialSimple::SetWireframe(bool Enable)
 {
 	Wireframe = Enable;
 }
 
-bool ZESimpleMaterial::GetWireframe() const
+bool ZEMaterialSimple::GetWireframe() const
 {
 	return Wireframe;
 }
 
-void ZESimpleMaterial::SetVertexColor(bool Enable)
+void ZEMaterialSimple::SetVertexColor(bool Enable)
 {
 	VertexColorEnabled = Enable;
 }
 
-bool ZESimpleMaterial::GetVertexColor()
+bool ZEMaterialSimple::GetVertexColor()
 {
 	return VertexColorEnabled;
 }
 
-void ZESimpleMaterial::SetMaterialColor(const ZEVector4& Color)
+void ZEMaterialSimple::SetMaterialColor(const ZEVector4& Color)
 {
 	MaterialColor = Color;
 }
 
-const ZEVector4& ZESimpleMaterial::GetMaterialColor() const
+const ZEVector4& ZEMaterialSimple::GetMaterialColor() const
 {
 	return MaterialColor;
 }
 
-void ZESimpleMaterial::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
+void ZEMaterialSimple::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
 {
 	TransparancyMode = Mode;
 }
 
-ZEMaterialTransparancyMode ZESimpleMaterial::GetTransparancyMode() const
+ZEMaterialTransparancyMode ZEMaterialSimple::GetTransparancyMode() const
 {
 	return TransparancyMode;
 }
 
-void ZESimpleMaterial::SetTransparancyCullLimit(ZEUInt Limit)
+void ZEMaterialSimple::SetTransparancyCullLimit(ZEUInt Limit)
 {
 	Limit = TransparancyCullLimit;
 }
 
-ZEUInt ZESimpleMaterial::GetTransparancyCullLimit() const
+ZEUInt ZEMaterialSimple::GetTransparancyCullLimit() const
 {
 	return TransparancyCullLimit;
 }
 
-void ZESimpleMaterial::SetTexture(ZETexture2D* Texture)
+void ZEMaterialSimple::SetTexture(ZETexture2D* Texture)
 {
 	this->Texture = Texture;
 }
 
-ZETexture2D* ZESimpleMaterial::GetTexture() const
+ZETexture2D* ZEMaterialSimple::GetTexture() const
 {
 	return Texture;
 }
 
-void ZESimpleMaterial::SetTextureAddressModeU(ZETextureAddressMode Mode)
+void ZEMaterialSimple::SetTextureAddressModeU(ZETextureAddressMode Mode)
 {
 	TextureAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZESimpleMaterial::GetTextureAddressModeU() const
+ZETextureAddressMode ZEMaterialSimple::GetTextureAddressModeU() const
 {
 	return TextureAddressModeU;
 }
 
-void ZESimpleMaterial::SetTextureAddressModeV(ZETextureAddressMode Mode)
+void ZEMaterialSimple::SetTextureAddressModeV(ZETextureAddressMode Mode)
 {
 	TextureAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZESimpleMaterial::GetTextureAddressModeV() const
+ZETextureAddressMode ZEMaterialSimple::GetTextureAddressModeV() const
 {
 	return TextureAddressModeV;
 }
 
-bool ZESimpleMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+bool ZEMaterialSimple::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	if (Stage->GetStageFlags() != ZE_RENDER_STAGE_FORWARD)
 		return true;
@@ -228,15 +228,15 @@ bool ZESimpleMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, cons
 
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
 	}
-	else if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewTransform();
 	}
-	else if (RenderCommand->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_ENABLE_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	}
@@ -247,7 +247,7 @@ bool ZESimpleMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, cons
 
 	ZEMatrix4x4 WorldViewMatrix;
 	ZEMatrix4x4 WorldViewProjMatrix;
-	if (RenderCommand->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_ENABLE_WORLD_TRANSFORM)
 	{
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
 	}
@@ -277,8 +277,8 @@ bool ZESimpleMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, cons
 
 	ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
-	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING) == 0 ? false : true);
-	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
+	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_RCF_ENABLE_Z_CULLING) == 0 ? false : true);
+	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_RCF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
 	Device->SetDepthStencilState(DepthStencilState);
 	
 	ZERasterizerState RasterizerState;
@@ -331,7 +331,7 @@ bool ZESimpleMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, cons
 }
 
 /*
-bool ZESimpleMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* RenderCommand)
+bool ZEMaterialSimple::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* RenderCommand)
 {
 	
 	static ZEDeviceStageShader VertexShaderStage;
@@ -342,18 +342,18 @@ bool ZESimpleMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* R
 	
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if ((RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if ((RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
-	else if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_TRANSFORM)
 		ViewProjMatrix = Camera->GetViewTransform();
-	else if (RenderCommand->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_ENABLE_PROJECTION_TRANSFORM)
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	else
 		ViewProjMatrix = ZEMatrix4x4::Identity;
 
 	ZEMatrix4x4 WorldViewMatrix;
 	ZEMatrix4x4 WorldViewProjMatrix;
-	if (RenderCommand->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_ENABLE_WORLD_TRANSFORM)
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
 	else
 		WorldViewProjMatrix = ViewProjMatrix;
@@ -375,8 +375,8 @@ bool ZESimpleMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* R
 
 	static ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
-	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING) == 0 ? false : true);
-	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
+	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_RCF_ENABLE_Z_CULLING) == 0 ? false : true);
+	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_RCF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
 	Device->SetDepthStencilState(&DepthStencilState);
 	
 	ZERasterizerState RasterizerState;
@@ -431,14 +431,14 @@ bool ZESimpleMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* R
 }
 */
 
-void ZESimpleMaterial::UpdateMaterial()
+void ZEMaterialSimple::UpdateMaterial()
 {
 
 }
 
-ZESimpleMaterial* ZESimpleMaterial::CreateInstance()
+ZEMaterialSimple* ZEMaterialSimple::CreateInstance()
 {
-	return new ZESimpleMaterial();
+	return new ZEMaterialSimple();
 }
 
 

@@ -255,7 +255,7 @@ void ZEModelAnimationTrack::SetEndFrameByTime(float Seconds)
 
 		if (TempEndFrameValue > Animation->Frames.GetCount() - 1)
 		{
-			SetEndFrame(Animation->Frames.GetCount() - 1);
+			SetEndFrame((ZEUInt)Animation->Frames.GetCount() - 1);
 		}
 		else
 		{

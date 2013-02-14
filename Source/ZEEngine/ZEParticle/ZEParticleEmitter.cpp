@@ -638,7 +638,7 @@ void ZEParticleEmitter::UpdateVertexBuffer(ZEDrawParameters* DrawParameters)
 
 	if (VertexBuffer->GetBufferSize() != ParticlePool.GetCount() * sizeof(ZESimpleVertex) * 6)
 	{
-		if (!VertexBuffer->CreateDynamic(ParticlePool.GetCount() * 6, sizeof(ZESimpleVertex), NULL))
+		if (!VertexBuffer->CreateDynamic((ZEUInt)ParticlePool.GetCount() * 6, sizeof(ZESimpleVertex), NULL))
 		{
 			zeError("Could not create particle vertex buffer.");
 			return;
@@ -784,9 +784,9 @@ void ZEParticleEmitter::Draw(ZEDrawParameters* DrawParameters)
 	else
 		RenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
 
-//	RenderCommand.InputStage.SetVertexBuffer(0, VertexBuffer);
+	RenderCommand.VertexBuffers[0] = VertexBuffer;
 	RenderCommand.Material = Material;
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
 }
 
 void ZEParticleEmitter::SortParticles()

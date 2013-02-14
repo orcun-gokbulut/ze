@@ -68,8 +68,11 @@ void ZEPhysicsPicker::ForwardViewProjection(ZEInt& CursorXOutput, ZEInt& CursorY
 
 	ZEVector4 ProjectionPosition = ProjectionTransform * ViewPosition;
 
+	float FarZ = zeScene->GetActiveCamera()->GetFarZ();
+	float NearZ = zeScene->GetActiveCamera()->GetNearZ();
+
 	ZEMatrix4x4 ViewPortTransform;
-	ZEMatrix4x4::CreateViewPortTransform(ViewPortTransform, WindowLeftPosition, WindowLeftPosition + WindowWidth, WindowTopPosition + WindowHeight, WindowTopPosition, zeGraphics->GetNearZ(), zeGraphics->GetFarZ());
+	ZEMatrix4x4::CreateViewPortTransform(ViewPortTransform, WindowLeftPosition, WindowLeftPosition + WindowWidth, WindowTopPosition + WindowHeight, WindowTopPosition, NearZ, FarZ);
 
 	ZEVector4 ScreenPosition = ViewPortTransform * ProjectionPosition;
 

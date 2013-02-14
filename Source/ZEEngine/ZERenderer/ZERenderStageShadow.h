@@ -42,10 +42,10 @@
 
 class ZELight;
 class ZEShader;
-class ZEPointLight;
-class ZEProjectiveLight;
-class ZEDirectionalLight;
-class ZEOmniProjectiveLight;
+class ZELightPoint;
+class ZELightProjective;
+class ZELightDirectional;
+class ZELightOmniProjective;
 
 class ZERenderStageShadow : public ZERenderStage
 {
@@ -81,10 +81,10 @@ class ZERenderStageShadow : public ZERenderStage
 		void							ResetStageDefaults();
 		void							CommitStageDefaults();
 
-		void							RenderShadowPointLight(const ZEPointLight* Light);
-		void							RenderShadowProjectiveLight(const ZEProjectiveLight* Light);
-		void							RenderShadowDirectionalLight(const ZEDirectionalLight* Light);
-		void							RenderShadowOmniProjectiveLight(const ZEOmniProjectiveLight* Light);
+		void							RenderShadowPointLight(const ZELightPoint* Light);
+		void							RenderShadowProjectiveLight(const ZELightProjective* Light);
+		void							RenderShadowDirectionalLight(const ZELightDirectional* Light);
+		void							RenderShadowOmniProjectiveLight(const ZELightOmniProjective* Light);
 
 	public:
 		ZEUInt32						GetStageFlags() const;

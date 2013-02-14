@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPointLight.cpp
+ Zinek Engine - ZEMaterialOmniProjectiveLight.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,83 +33,54 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPointLight.h"
-#include "ZEGraphics/ZETexture2D.h"
-#include "ZEGame/ZEScene.h"
+#ifndef __ZE_MATERIAL_OMNI_PROJECTIVE_LIGHT_H__
+#define __ZE_MATERIAL_OMNI_PROJECTIVE_LIGHT_H__
 
-ZELightType ZEPointLight::GetLightType() const
+#include "ZETypes.h"
+#include "ZEMaterialLight.h"
+#include "ZEGraphics/ZESamplerState.h"
+
+class ZEShader;
+class ZERenderStage;
+class ZETextureCube;
+class ZEVertexBuffer;
+class ZERenderCommand;
+class ZEConstantBuffer;
+
+class ZEMaterialOmniProjectiveLight : public ZEMaterialLight
 {
-	return ZE_LT_POINT;
-}
+	friend class ZELightOmniProjective;
 
-void ZEPointLight::SetCastShadows(bool NewValue)
-{
-	if (NewValue == false)
-	{
-		if (FrontShadowMap)
-		{
-			FrontShadowMap->Destroy();
-			FrontShadowMap = NULL;
-		}
+	protected:
+		const ZETextureCube*		ProjectionTexture;
+		ZESamplerState				SamplerState;
 
-		if (BackShadowMap)
-		{
-			BackShadowMap->Destroy();
-			BackShadowMap = NULL;
-		}
-	}
+		ZEShader*					VertexShader;
+		ZEShader*					PixelShader;
+		ZEConstantBuffer*			Transformations;
+		ZEConstantBuffer*			LightParameters;
+		ZEConstantBuffer*			ShadowParameters;
+		ZEVertexBuffer*				VertexBuffer;
 
-	ZELight::SetCastsShadow(NewValue);
-}
+		void						UpdateShaders();
+		void						UpdateBuffers();
 
-ZETexture2D* ZEPointLight::GetFrontShadowMap()
-{
-	return FrontShadowMap;
-}
+		void						DestroyShaders();
+		void						DestroyBuffers();
 
-ZETexture2D* ZEPointLight::GetBackShadowMap()
-{
-	return FrontShadowMap;
-}
+		bool						SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-void ZEPointLight::Deinitialize()
-{
-	if (FrontShadowMap)
-	{
-		FrontShadowMap->Destroy();
-		FrontShadowMap = NULL;
-	}
+									ZEMaterialOmniProjectiveLight();
+		virtual						~ZEMaterialOmniProjectiveLight();
 
-	if (BackShadowMap)
-	{
-		BackShadowMap->Destroy();
-		BackShadowMap = NULL;
-	}
-}
+	public:
+		virtual ZEUInt32			GetHash() const;
+		virtual ZEMaterialFlags		GetMaterialFlags() const;
 
-const ZEViewVolume& ZEPointLight::GetViewVolume(ZESize Index) const
-{
-	if (UpdateViewVolume)
-	{
-// 		ViewVolume.Create(GetWorldPosition(), GetRange(), 0.0f);
-// 		UpdateViewVolume = false;
-	}
-	
-	return ViewVolume;
-}
+		virtual void				UpdateMaterial();
+		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-ZEPointLight::ZEPointLight()
-{
-	FrontShadowMap = NULL;
-	BackShadowMap = NULL;
-}
+		static ZEMaterialOmniProjectiveLight*	CreateInstance();
+};
 
-ZEPointLight::~ZEPointLight()
-{
-	Deinitialize();
-}
-
-ZEPointLight* ZEPointLight::CreateInstance()
-{
-	return new ZEPointLight();
-}
+#endif

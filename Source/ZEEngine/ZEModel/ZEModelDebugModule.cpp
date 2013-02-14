@@ -42,10 +42,10 @@
 #include "ZEGame/ZECharacter.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZERenderer/ZEPointLight.h"
-#include "ZERenderer/ZEDirectionalLight.h"
+#include "ZERenderer/ZELightPoint.h"
+#include "ZERenderer/ZELightDirectional.h"
 #include "ZERenderer/ZECamera.h"
-#include "ZERenderer/ZEProjectiveLight.h"
+#include "ZERenderer/ZELightProjective.h"
 #include "ZEInput/ZEInputModule.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEInput/ZEInputMap.h"
@@ -54,6 +54,7 @@
 #include "ZESound/ZESoundResource.h"
 #include "ZEModel/ZEModel.h"
 #include "ZEMath/ZEAngle.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 #define ZE_ACTIONID_CAMERA_TURN_LEFT		100
 #define ZE_ACTIONID_CAMERA_TURN_RIGHT		101
@@ -80,8 +81,6 @@ bool ZEModelAnimationDebugModule::Initialize()
 	ZEScene* Scene = zeGame->GetScene();
 
 	Camera = ZECamera::CreateInstance();
-	Camera->SetNearZ(zeGraphics->GetNearZ());
-	Camera->SetFarZ(zeGraphics->GetFarZ());
 	Camera->SetFOV(ZE_PI_4 + ZE_PI_8);
 	Scene->AddEntity(Camera);
 	Scene->SetActiveCamera(Camera);
@@ -90,37 +89,37 @@ bool ZEModelAnimationDebugModule::Initialize()
 	Grid->SetVisible(true);
 	Scene->AddEntity(Grid);
 
-	PointLight0 = ZEPointLight::CreateInstance();
+	PointLight0 = ZELightPoint::CreateInstance();
 	PointLight0->SetIntensity(5.0f);
 	PointLight0->SetAttenuation(0.02f, 0.0f, 1.0f);
 	PointLight0->SetColor(ZEVector3(1.0f, 0.7f, 0.8f));
 	Scene->AddEntity(PointLight0);
 
-	PointLight1 = ZEPointLight::CreateInstance();
+	PointLight1 = ZELightPoint::CreateInstance();
 	PointLight1->SetIntensity(5.0f);
 	PointLight1->SetAttenuation(0.02f, 0.0f, 1.0f);
 	PointLight1->SetColor(ZEVector3(1.0f, 0.8f, 0.7f));
 	Scene->AddEntity(PointLight1);
 
-	PointLight2 = ZEPointLight::CreateInstance();
+	PointLight2 = ZELightPoint::CreateInstance();
 	PointLight2->SetIntensity(15.0f);
 	PointLight2->SetAttenuation(0.02f, 0.0f, 1.0f);
 	PointLight2->SetColor(ZEVector3(0.7f, 0.8f, 1.0f));
 	Scene->AddEntity(PointLight2);
 
-	DirectionalLight = ZEDirectionalLight::CreateInstance();
+	DirectionalLight = ZELightDirectional::CreateInstance();
 	DirectionalLight->SetIntensity(2.0f);
 	DirectionalLight->SetAttenuation(0.02f, 0.0f, 1.0f);
 	DirectionalLight->SetColor(ZEVector3(0.7f, 0.8f, 1.0f));
 	DirectionalLight->SetEnabled(false);
 	Scene->AddEntity(DirectionalLight);
 
-	ProjectiveLight = ZEProjectiveLight::CreateInstance();
+	ProjectiveLight = ZELightProjective::CreateInstance();
 	ProjectiveLight->SetPosition(ZEVector3(0.0f, 0.0f, -5.0f));
 	ProjectiveLight->SetIntensity(8.0f);
 	ProjectiveLight->SetAttenuation(0.02f, 0.0f, 1.0f);
 	ProjectiveLight->SetColor(ZEVector3(0.7f, 0.8f, 1.0f));
-	ProjectiveLight->SetProjectionTextureFile("projtest.bmp");
+	ProjectiveLight->SetProjectionTexture(ZETexture2DResource::LoadSharedResource("projtest.bmp")->GetTexture());
 	Scene->AddEntity(ProjectiveLight);
 
 	PointLight0->SetEnabled(false);

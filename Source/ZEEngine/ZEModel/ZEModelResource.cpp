@@ -37,7 +37,7 @@
 #include "ZEModelResource.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZERenderer/ZEFixedMaterial.h"
+#include "ZERenderer/ZEMaterialDefault.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEFile/ZEFileInfo.h"
@@ -78,12 +78,12 @@ ZEVertexBuffer* ZEModelResourceMeshLOD::GetSharedVertexBuffer() const
 		if (this->SkinnedVertices.GetCount() != 0)
 		{
 			((ZEModelResourceMeshLOD*)this)->SharedVertexBuffer = ZEVertexBuffer::CreateInstance();
-			SharedVertexBuffer->CreateDynamic(SkinnedVertices.GetCount(), sizeof(ZESkinnedModelVertex), SkinnedVertices.GetConstCArray());
+			SharedVertexBuffer->CreateDynamic((ZEUInt32)SkinnedVertices.GetCount(), sizeof(ZESkinnedModelVertex), SkinnedVertices.GetConstCArray());
 		}
 		else if (Vertices.GetCount() != 0)
 		{
 			((ZEModelResourceMeshLOD*)this)->SharedVertexBuffer = ZEVertexBuffer::CreateInstance();
-			SharedVertexBuffer->CreateDynamic(Vertices.GetCount(), sizeof(ZEModelVertex), Vertices.GetConstCArray());
+			SharedVertexBuffer->CreateDynamic((ZEUInt32)Vertices.GetCount(), sizeof(ZEModelVertex), Vertices.GetConstCArray());
 		}
 
 	return SharedVertexBuffer;
@@ -97,12 +97,12 @@ ZEVertexBuffer* ZEModelResourceMeshLOD::CreatePrivateVertexBuffer() const
 		if (this->SkinnedVertices.GetCount() != 0)
 		{
 			VertexBuffer = ZEVertexBuffer::CreateInstance();
-			VertexBuffer->CreateStatic(SkinnedVertices.GetCount(), sizeof(ZESkinnedModelVertex), SkinnedVertices.GetConstCArray());
+			VertexBuffer->CreateStatic((ZEUInt32)SkinnedVertices.GetCount(), sizeof(ZESkinnedModelVertex), SkinnedVertices.GetConstCArray());
 		}
 		else if (Vertices.GetCount() != 0)
 		{
 			VertexBuffer = ZEVertexBuffer::CreateInstance();
-			VertexBuffer->CreateStatic(Vertices.GetCount(), sizeof(ZEModelVertex), Vertices.GetConstCArray());
+			VertexBuffer->CreateStatic((ZEUInt32)Vertices.GetCount(), sizeof(ZEModelVertex), Vertices.GetConstCArray());
 		}
 	}
 	return VertexBuffer;
@@ -189,7 +189,7 @@ bool ZEModelResource::ReadMaterials(ZEMLSerialReader* NodeReader)
 		if (!ZEFileInfo::IsFile(MaterialPath))
 			return false;
 
-		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();
+		ZEMaterialDefault* CurrentMaterial = ZEMaterialDefault::CreateInstance();
 		CurrentMaterial->ReadFromFile(MaterialPath);
 		Materials.Add(CurrentMaterial);
 	}

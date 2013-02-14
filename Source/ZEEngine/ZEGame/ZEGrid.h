@@ -45,7 +45,7 @@ ZE_META_ENTITY_DESCRIPTION(ZEGrid);
 
 class ZEListener;
 class ZEScene;
-class ZESimpleMaterial;
+class ZEMaterialSimple;
 
 class ZEGrid : public ZEEntity
 {
@@ -56,7 +56,7 @@ class ZEGrid : public ZEEntity
 		ZECanvas					AxisX;
 		ZECanvas					AxisZ;
 
-		ZESimpleMaterial*			Material;
+		ZEMaterialSimple*			Material;
 		ZERenderCommand				RenderCommand;
 
 		ZEVector2					GridSize;

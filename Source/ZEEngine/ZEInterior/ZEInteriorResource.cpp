@@ -41,7 +41,7 @@
 #include "ZECore/ZEResource.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZETexture/ZETexture2DResource.h"
-#include "ZERenderer/ZEFixedMaterial.h"
+#include "ZERenderer/ZEMaterialDefault.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
 #include <string.h>
 #include "ZEFile/ZEFileInfo.h"
@@ -458,7 +458,7 @@ bool ZEInteriorResource::ReadHelpers(ZEMLSerialReader* Reader)
 bool ZEInteriorResource::ReadMaterials(ZEMLSerialReader* Reader)
 {
 	for(ZESize I = 0; I < Materials.GetCount(); I++)
-		Materials[I] = ZEFixedMaterial::CreateInstance();
+		Materials[I] = ZEMaterialDefault::CreateInstance();
 
 	ZESize SubItemCount = Reader->GetSubItemCount();
 	for (ZESize I = 0; I < SubItemCount; I++)
@@ -483,7 +483,7 @@ bool ZEInteriorResource::ReadMaterials(ZEMLSerialReader* Reader)
 		
 		ZEString MaterialPath = ZEFileInfo::GetParentDirectory(GetFileName()) + ZEPathUtils::GetSeperator() + MaterialRelativePath.GetString();
 
-		ZEFixedMaterial* CurrentMaterial = (ZEFixedMaterial*)Materials[I];
+		ZEMaterialDefault* CurrentMaterial = (ZEMaterialDefault*)Materials[I];
 		CurrentMaterial->ReadFromFile(MaterialPath);
 
 	}

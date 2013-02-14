@@ -45,7 +45,7 @@
 ZE_META_ENTITY_DESCRIPTION(ZEPresentationSlide);
 
 class ZERenderer;
-class ZEFixedMaterial;
+class ZEMaterialDefault;
 class ZETexture2DResource;
 
 class ZEPresentationSlide : public ZEEntity
@@ -56,7 +56,7 @@ class ZEPresentationSlide : public ZEEntity
 		bool							Initialized;
 		ZERenderCommand					RenderCommand;
 		ZEVertexBuffer*			VertexBuffer;
-		ZEFixedMaterial*				Material;
+		ZEMaterialDefault*				Material;
 		ZETexture2DResource*			Texture;
 		char							PresentationSlide[255];
 

@@ -43,7 +43,7 @@ ZEUISequencePlayer::ZEUISequencePlayer()
 	SoundPlayer = ZESoundSource::CreateInstance();
 	Time = 0.0f;
 	TimeRemainder = 0.0f;
-	FrameCounter = 0.0f;
+	FrameCounter = 0;
 	FramesPerSecond = 25.0f;
 	State = ZEUI_SPS_STOPPED;
 	zeScene->AddEntity(SoundPlayer);
@@ -77,7 +77,7 @@ void ZEUISequencePlayer::Tick(float ElapsedTime)
 				Stop();
 			}
 
-			((ZEUIMaterial*)GetMaterial())->SetTexture(Frames[FrameCounter]);
+			((ZEMaterialUserInterface*)GetMaterial())->SetTexture(Frames[FrameCounter]);
 		}
 	}
 }
@@ -116,14 +116,14 @@ void ZEUISequencePlayer::SetAudioFile(const ZEString& FileName)
 void ZEUISequencePlayer::Play()
 {
 	State = ZEUI_SPS_PLAYING;
-	((ZEUIMaterial*)GetMaterial())->SetTexture(Frames[0]);
+	((ZEMaterialUserInterface*)GetMaterial())->SetTexture(Frames[0]);
 }
 
 void ZEUISequencePlayer::Stop()
 {
 	Time = 0.0f;
 	TimeRemainder = 0.0f;
-	FrameCounter = 0.0f;
+	FrameCounter = 0;
 	SoundPlayer->Stop();
 	State = ZEUI_SPS_STOPPED;
 }

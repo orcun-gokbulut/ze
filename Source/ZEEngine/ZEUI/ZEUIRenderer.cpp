@@ -36,7 +36,7 @@
 #include "ZEUIRenderer.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEVertexLayout.h"
-#include "ZERenderer/ZEFixedMaterial.h"
+#include "ZERenderer/ZEMaterialDefault.h"
 #include "ZEGraphics/ZEVertexTypes.h"
 #include "ZERenderer/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
@@ -149,7 +149,7 @@ void ZEUIRenderer::Render(ZERenderer* Renderer)
 
 		if (RenderCommands[I].Material == NULL)
 			RenderCommands[I].Material = DefaultMaterial;
-		Renderer->AddToRenderList(&RenderCommands[I]);
+		Renderer->AddRenderCommand(&RenderCommands[I]);
 	}
 }
 

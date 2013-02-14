@@ -46,8 +46,6 @@ ZEMLSerialReader::ZEMLSerialReader(ZEFile* File)
 
 bool ZEMLSerialReader::Read()
 {
-	ZEUInt64 TempUInt64;
-
 	CurrentItemType			= ZEML_IT_UNDEFINED;
 	CurrentItemValue		= ZEVariant();
 	CurrentItemName			= "";
@@ -139,15 +137,6 @@ bool ZEMLSerialReader::Read()
 		}
 
 		ValueSize = ZEEndian::Little(ValueSize);
-
-		ZEInt64 TempInt64;
-		ZEInt8	TempInt32;
-		ZEInt8	TempInt16;
-		ZEInt8	TempInt8;
-		ZEUInt64 TempUInt64;
-		ZEUInt8 TempUInt32;
-		ZEUInt8 TempUInt16;
-		ZEUInt8 TempUInt8;
 
 		switch(CurrentItemType)
 		{

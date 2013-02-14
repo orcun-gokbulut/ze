@@ -46,8 +46,6 @@ ZE_MODULE_DESCRIPTION_ABSTRACT(ZEGraphicsModule, ZEModule, &ZEGraphicsModule::Gr
 
 ZEGraphicsModule::ZEGraphicsModule()
 {
-	FarZ = 0.0f;
-	NearZ = 0.0f;
 	ScreenWidth = 0;
 	ScreenHeight = 0;
 	VerticalSync = false;
@@ -81,8 +79,6 @@ void ZEGraphicsModule::BaseInitialize()
 	GraphicsOptions.AddOption(new ZEOption("HDRQuality", 5, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ShadowQuality", 1, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("LightQuantity", 1, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("NearZ", 0.1f, ZE_OA_INTERNAL));
-	GraphicsOptions.AddOption(new ZEOption("FarZ", 20000.0f, ZE_OA_INTERNAL));
 	ZEOptionManager::GetInstance()->RegisterSection(&GraphicsOptions);
 }
 
@@ -127,16 +123,6 @@ ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 			return &UltraLow;
 			break;
 	}
-}
-
-float ZEGraphicsModule::GetNearZ() const
-{
-	return NearZ;
-}
-
-float ZEGraphicsModule::GetFarZ() const
-{
-	return FarZ;
 }
 
 bool ZEGraphicsModule::GetVerticalSync() const
