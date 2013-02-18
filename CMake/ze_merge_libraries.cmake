@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEPhysicsDebugModule.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - ze_merge_libraries.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,45 +30,25 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PHYSICS_DEBUG_MODULE_H__
-#define __ZE_PHYSICS_DEBUG_MODULE_H__
-
-#include "ZECore/ZEApplicationModule.h"
-
-class ZEPlayer;
-class ZEPhysicalRigidBody;
-class ZEModel;
-
-#include "ZEPhysics/ZEPhysicalShapes.h"
-
-class ZEPhysicsDebugModule : public ZEApplicationModule
-{
-	private:
-		ZEPlayer*				Player;
-		ZEPhysicalRigidBody*	PhysicalRigidBody;
-		ZEPhysicalCapsuleShape	Shape;	
-		ZEPhysicalCapsuleShape	Shape2;	
-		ZEModel*				Model;
-
-		ZEModel*				TestBody;
-
-		void					TransformChanged(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);
-		void					ColisionDetected(ZEPhysicalObject* Collider1, ZEPhysicalObject* Collider2);
-
-	public:
-		virtual void			Process(float ElapsedTime);
-
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-
-		static	void			ConnectToVisualDebugger(const char* Adress, ZEInt Port);
-
-								ZEPhysicsDebugModule();
-		virtual					~ZEPhysicsDebugModule();
-};
-
-#endif
+function(ze_merge_static_libraries)
+	parse_arguments(PARAMETER "TARGET;LIBS;${ze_check_parameters}" "COMBINABLE" ${ARGV})
+	
+	ze_check()
+	if (NOT CHECK_SUCCEEDED)
+		return()
+	endif()
+	
+	if (ZEBUILD_PLATFORM_WINDOWS)
+		string(REPLACE ";" "\" \"" VARIABLE_ADDITIONAL_FLAGS "${PARAMETER_LIBS}")
+		set(VARIABLE_ADDITIONAL_FLAGS \"${VARIABLE_ADDITIONAL_FLAGS}\")
+		set_property(TARGET ${TARGET} APPEND PROPERTY STATIC_LIBRARY_FLAGS "${VARIABLE_ADDITIONAL_FLAGS}")
+	elseif(ZEBUILD_PLATFORM_DARWIN)
+		string (REPLACE ";" " " VARIABLE_ADDITIONAL_FLAGS "${PARAMETER_LIBS}")
+		set_property (TARGET ${TARGET} APPEND PROPERTY STATIC_LIBRARY_FLAGS "${VARIABLE_ADDITIONAL_FLAGS}")
+	elseif(ZE_BUILD_PLATFORM_UNIX)
+		message(FATAL_ERROR "Library combination. Not implamented.")
+	endif()
+endfunction()

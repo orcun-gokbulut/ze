@@ -42,9 +42,9 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEInput/ZEInputDevice.h"
 
-#include <VRPN\vrpn_Tracker.h>
-#include <VRPN\vrpn_Button.h>
-#include <VRPN\vrpn_Analog.h>
+class vrpn_Tracker_Remote;
+class vrpn_Button_Remote;
+class vrpn_Analog_Remote;
 
 class ZEVRPNInputDevice : public ZEInputDevice
 {

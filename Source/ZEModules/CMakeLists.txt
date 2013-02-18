@@ -37,7 +37,7 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_set_project_folder("ZEModules")
 
-ze_add_module(ZEDirect3D9			Modules PLATFORM Windows)
+ze_add_module(ZEDirect3D9			Modules PLATFORMS Windows)
 ze_add_module(ZEDirectInput			Modules OPTIONAL PLATFORMS Windows )
 ze_add_module(ZEDummyInput			Modules OPTIONAL)
 ze_add_module(ZEVirtualInput		Modules OPTIONAL)

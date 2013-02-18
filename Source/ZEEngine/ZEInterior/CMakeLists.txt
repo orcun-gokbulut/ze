@@ -49,5 +49,4 @@ ze_add_source(ZEInteriorResource.h			Sources Headers)
 ze_add_library(ZEInterior 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation
-	INSTALL)
+	LIBS ZEFoundation)

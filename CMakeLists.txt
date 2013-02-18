@@ -45,7 +45,7 @@ include(ze)
 ze_configure_init()
 ze_configure_version()
 ze_configure_platform()
-ze_configure_externals()
+ze_configure_external()
 ze_configure_debugging()
 ze_configure_unit_tests()
 ze_configure_static_checks()
@@ -55,7 +55,6 @@ ze_configure_symbol_server()
 ## DLL Options
 #########################################################################################
 set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll will be generated and external plugins will be disabled.")
-
 
 
 
@@ -76,38 +75,17 @@ endif()
 include_directories(
 	${CMAKE_SOURCE_DIR}/Source
 	${CMAKE_SOURCE_DIR}/Source/ZEEngine
-	${CMAKE_SOURCE_DIR}/Source/ZEFoundation
-	${CMAKE_SOURCE_DIR}/Source/ZEToolSDK
-	${CMAKE_SOURCE_DIR}/Source/ZETest
-	${CMAKE_SOURCE_DIR}/Source/ZEToolComponents)
-
-include_directories(
-	${ZEBUILD_INCLUDE_PATH}/DirectX
-	${ZEBUILD_INCLUDE_PATH}/PhysX2/Cooking 
-	${ZEBUILD_INCLUDE_PATH}/PhysX2/Foundation 
-	${ZEBUILD_INCLUDE_PATH}/PhysX2/PhysXLoader
-	${ZEBUILD_INCLUDE_PATH}/PhysX2/Physics
-	${ZEBUILD_INCLUDE_PATH}/3dsMax/2010)
-	
-link_directories(
-	${ZEBUILD_LIB_PATH}/$(ConfigurationName)
-	${ZEBUILD_LIB_PATH}/$(ConfigurationName)/vrpn
-	${ZEBUILD_LIB_PATH}/$(ConfigurationName)/Bullet
-	${ZEBUILD_LIB_PATH}/DirectX
-	${ZEBUILD_LIB_PATH}/PhysX2
-	${ZEBUILD_LIB_PATH}/PhysX3
-	${ZEBUILD_LIB_PATH}/3dsMax/2010)
+	${CMAKE_SOURCE_DIR}/Source/ZEFoundation)
 
 include(ze_qt)
 
+add_definitions(-DFREEIMAGE_LIB)
 
 ## Source Files
 #########################################################################################
 add_subdirectory(CMake)
 add_subdirectory(Source)
 
-get_property(fancy_lib_location TARGET ZEFC PROPERTY LOCATION)
-message (STATUS "fancy_lib_location == ${fancy_lib_location}")
 
 ## Install & Packing
 #########################################################################################

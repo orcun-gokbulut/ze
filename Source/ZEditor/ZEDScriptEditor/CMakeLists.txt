@@ -40,7 +40,8 @@ ze_add_source(ZEDScriptEditor.h				Sources QtMocs)
 ze_add_source(ZEDNumberedTextEditor.cpp		Sources)
 ze_add_source(ZEDNumberedTextEditor.h		Sources QtMocs)
 
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+qt4_wrap_cpp (QtMocFiles ${QtMocs})
 
 ze_add_library(ZEDScriptEditor 
-	SOURCES ${Sources} ${QtMocFiles})
+	SOURCES ${Sources} ${QtMocFiles}
+	LIBS libQt)

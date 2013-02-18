@@ -49,13 +49,10 @@ ze_add_source(ZE3dsMaxModelScriptMesh.ms				Sources ZEFC)
 ze_add_source(ZE3dsMaxModelScriptBone.ms				Sources ZEFC)
 ze_add_source(ZE3dsMaxModelScriptPhysicalBody.ms		Sources ZEFC)
 
-
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+qt4_add_resources(QtResourceFiles ${QtResources})
+qt4_wrap_ui(QtUIFiles ${QtUI})
+qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
 ze_add_library(ZE3dsMaxModelExporter 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS ZEFoundation ZE3dsMaxUtils ZEProgressDialog ZEResourceConfigurationWidget QtCore4 QtGui4 QWinWidget)
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+	LIBS ZEFoundation ZE3dsMaxUtils ZEProgressDialog ZEResourceConfigurationWidget libQt lib3dsMax QWinWidget)
