@@ -46,7 +46,6 @@ ze_add_source(ZEDDirectoryTreeWidget.h		Sources)
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 ze_add_library(ZEDBrowser 
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles})
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles}
+	LIBS libQt)

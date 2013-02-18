@@ -41,11 +41,10 @@ ze_add_source(ZEMLVisualizerTreeWidget.h	Sources)
 ze_add_source(ZEMLVisualizerTreeWidget.cpp	Sources)
 ze_add_source(ZEMLVisualizerWidget.ui		Sources QtUI)
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+qt4_add_resources(QtResourceFiles ${QtResources})
+qt4_wrap_ui(QtUIFiles ${QtUI})
+qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
 ze_add_library(ZEMLVisualizerWidget 
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles})
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
+	LIBS libQt)

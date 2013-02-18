@@ -45,8 +45,7 @@ ze_add_source(ZE3dsMaxScriptRemove.ms 			Sources ZEFC)
 
 ze_add_library(ZE3dsMaxUI 
 	SOURCES ${Sources}
-	LIBS ZEFoundation
-		core gup menuman)
+	LIBS ZEFoundation lib3dsMax)
 	
 set(LOCAL_WARNING_FLAGS /W3)
 set(LOCAL_RTTI_FLAGS /GR)

@@ -48,12 +48,10 @@ ze_add_source(ZE3dsMaxInteriorActions.h						Sources)
 ze_add_source(ZE3dsMaxInteriorScriptRoom.ms					Sources ZEFC)
 ze_add_source(ZE3dsMaxInteriorScriptDoor.ms					Sources ZEFC)
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+qt4_add_resources(QtResourceFiles ${QtResources})
+qt4_wrap_ui(QtUIFiles ${QtUI})
+qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
 ze_add_library(ZE3dsMaxInteriorExporter 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS ZEFoundation ZE3dsMaxUtils QtCore4 QtGui4 QWinWidget ZEProgressDialog ZEResourceConfigurationWidget)
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+	LIBS ZEFoundation ZE3dsMaxUtils ZEProgressDialog ZEResourceConfigurationWidget libQt lib3dsMax QWinWidget)

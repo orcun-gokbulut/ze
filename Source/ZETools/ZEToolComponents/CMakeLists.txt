@@ -49,6 +49,5 @@ ze_add_source(ZEToolComponentsMain.cpp		Sources)
 
 ze_add_executable(ZEToolComponents 
 	SOURCES ${Sources}
-	LIBS
-		ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget ZEMLVisualizerWidget ZEResourceConfigurator
-		QtCore4 QtGui4)
+	LIBS ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget ZEMLVisualizerWidget ZEResourceConfigurator
+		libQt)

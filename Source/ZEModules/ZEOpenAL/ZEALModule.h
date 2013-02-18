@@ -42,14 +42,12 @@
 #include "ZESound/ZESoundModule.h"
 #include "ZESound/ZESoundSource.h"
 
-
-#include <AL/al.h>
-#include <AL/alc.h>
-
-
 class ZEALSoundSource;
 class ZEALSoundSource3D;
 class ZEALListener;
+struct ALCdevice_struct;
+struct ALCcontext_struct;
+
 enum ZESoundSourceType;
 
 #undef PlaySound
@@ -66,8 +64,8 @@ class ZEALModule : public ZESoundModule
 
 		float									UpdateTime;
 
-		ALCdevice*								Device;
-		ALCcontext*								Context;
+		ALCdevice_struct*						Device;
+		ALCcontext_struct*						Context;
 
 		ZEUInt									MasterVolume;
 		ZEUInt									TypeVolumes[ZE_SS_MAX_TYPE];
@@ -89,8 +87,8 @@ class ZEALModule : public ZESoundModule
 	public:
 		virtual const ZEArray<ZESoundDevice>&	GetDeviceList();
 
-		ALCdevice*								GetDevice();
-		ALCcontext*								GetContext();
+		ALCdevice_struct*						GetDevice();
+		ALCcontext_struct*						GetContext();
 
 		virtual bool							Initialize();
 		virtual void							Deinitialize();

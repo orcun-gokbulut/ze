@@ -38,7 +38,7 @@
 #define __ZE_D3D9_CHANNEL_DISORIENTATION_PROCESSOR_H__
 
 #include "ZED3D9ComponentBase.h"
-#include "..\..\..\Platform\Windows\x64\Include\DirectX\d3d9.h"
+#include <d3d9.h>
 #include "ZEMath\ZEVector.h"
 
 

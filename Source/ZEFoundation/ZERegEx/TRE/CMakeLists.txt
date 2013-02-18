@@ -59,7 +59,6 @@ ze_add_source(tre.h 					Sources)
 ze_add_source(xmalloc.c 				Sources)
 ze_add_source(xmalloc.h 				Sources)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS HAVE_CONFIG_H)
 
 ze_add_library(TRE SOURCES ${Sources})

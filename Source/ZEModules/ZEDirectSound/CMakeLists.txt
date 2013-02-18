@@ -46,12 +46,7 @@ ze_add_source(ZEDSSoundSource.h				Sources)
 ze_add_source(ZEDSSoundSource3D.cpp			Sources)
 ze_add_source(ZEDSSoundSource3D.h			Sources)
 
-include_directories(
-	${ZEBUILD_INCLUDE_PATH}/DirectX)
-
-link_directories(
-	${ZEBUILD_LIB_PATH}/DirectX)
 
 ze_add_library(ZEDirectSound 
 	SOURCES ${Sources}
-	LIBS dsound dxguid)
+	LIBS libDirectSound)

@@ -35,7 +35,6 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-
 ze_add_source(ZEDNodeEditor.h						Sources QtMocs)
 ze_add_source(ZEDNodeEditorGraphicsView.h			Sources QtMocs)
 ze_add_source(ZEDNodeIOPort.h						Sources QtMocs)
@@ -65,13 +64,10 @@ ze_add_source(ZEDNodeEditorUndoRedo.h				Sources)
 ze_add_source(ZEDNodeIOPort.cpp						Sources)
 ze_add_source(ZEDNodeIOPort.h						Sources)
 
-
 qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 ze_add_library(ZEDNodeEditor 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS libfreeimage)
+	LIBS libFreeImage libQt)

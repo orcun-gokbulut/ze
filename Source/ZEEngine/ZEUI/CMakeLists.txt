@@ -81,6 +81,6 @@ ze_add_source(ZEUITextCursor.h						Sources Headers)
 
 
 ze_add_library(ZEUI
-	LIBS ZEFoundation freetype2410
+	LIBS ZEFoundation libFreeType
 	SOURCES ${Sources}
 	HEADERS ${Headers})

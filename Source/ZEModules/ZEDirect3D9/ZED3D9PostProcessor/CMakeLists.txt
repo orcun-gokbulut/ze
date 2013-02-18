@@ -45,4 +45,4 @@ ze_add_source(ZED3D9PPScreenOutputNode.h	Sources)
 ze_add_library(ZED3D9PostProcessor 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEDirect3D9)
+	LIBS ZEDirect3D9 libDirect3D9)

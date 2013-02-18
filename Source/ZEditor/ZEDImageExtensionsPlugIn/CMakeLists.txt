@@ -46,4 +46,4 @@ qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
 ze_add_library(ZEDImageExtensionsPlugIn 
 	SOURCES ${Sources} ${QtMocFiles}
-	LIBS libfreeimage)
+	LIBS libQt libFreeImage)

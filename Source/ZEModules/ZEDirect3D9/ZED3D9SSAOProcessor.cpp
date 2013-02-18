@@ -47,7 +47,6 @@
 #include <d3d9.h>
 #include <stdlib.h>
 #include "ZEMath/ZEMath.h"
-#include <freeimage.h>
 #include "ZEMath/ZEAngle.h"
 
 void ZED3D9SSAOProcessor::SetRenderer(ZEFrameRenderer* Renderer)
