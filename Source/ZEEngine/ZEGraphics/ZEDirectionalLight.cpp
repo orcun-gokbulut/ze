@@ -187,22 +187,19 @@ const ZEMatrix4x4& ZEDirectionalLight::GetViewTransform(ZESize Index)
 	return Cascades[Index].ShadowTransform;
 }
 
-bool ZEDirectionalLight::Initialize()
+bool ZEDirectionalLight::InitializeSelf()
 {
-	if (GetInitialized())
+	if (!ZEEntity::InitializeSelf())
 		return false;
 	
-	ZEEntity::Initialize();
-
 	return true;
 }
 
-void ZEDirectionalLight::Deinitialize()
+bool ZEDirectionalLight::DeinitializeSelf()
 {
-	if (!GetInitialized())
-		return;
-
 	DestroyRenderTargets();
+
+	return ZEEntity::DeinitializeSelf();
 }
 
 ZEDirectionalLight* ZEDirectionalLight::CreateInstance()

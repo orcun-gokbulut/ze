@@ -44,13 +44,17 @@ ZEDrawFlags ZEParticleEffect::GetDrawFlags() const
 	return ZE_DF_DRAW | ZE_DF_CULL;
 }
 
-bool ZEParticleEffect::Initialize()
+bool ZEParticleEffect::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	return true;
 }
 
-void ZEParticleEffect::Deinitialize()
+bool ZEParticleEffect::DeinitializeSelf()
 {
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZEParticleEffect::Draw(ZEDrawParameters* DrawParameters)

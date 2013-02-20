@@ -234,12 +234,12 @@ bool ZEInteriorResource::ReadDoors(ZEMLSerialReader* Reader)
 		if (UserDefinedProperties.GetType() == ZE_VRT_STRING)
 			Door->UserDefinedProperties = UserDefinedProperties.GetString();
 
-		Door->RoomIds[0] = RoomAIndex.GetUInt32();
+		Door->RoomIds[0] = RoomAIndex.GetInt32();
 		Door->Rooms[0] = &Rooms[(ZESize)Door->RoomIds[0]];
 		Door->Rooms[0]->DoorIds.Add(I);
 		Door->Rooms[0]->Doors.Add(Door);
 
-		Door->RoomIds[1] = RoomBIndex.GetUInt32();
+		Door->RoomIds[1] = RoomBIndex.GetInt32();
 		Door->Rooms[1] = &Rooms[(ZESize)Door->RoomIds[1]];
 		Door->Rooms[1]->DoorIds.Add(I);
 		Door->Rooms[1]->Doors.Add(Door);

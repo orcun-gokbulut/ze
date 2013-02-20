@@ -76,6 +76,10 @@ class ZEDirectionalLight : public ZELight
 											ZEDirectionalLight();
 		virtual								~ZEDirectionalLight();
 
+	protected:
+		bool								InitializeSelf();
+		bool								DeinitializeSelf();
+
 	public:
 		ZELightType							GetLightType();
 
@@ -93,9 +97,6 @@ class ZEDirectionalLight : public ZELight
 		const ZEViewVolume&					GetViewVolume(ZESize Index = 0);
 		const ZEMatrix4x4&					GetViewTransform(ZESize CascadeIndex = 0);
 		
-		bool								Initialize();
-		void								Deinitialize();
-
 		void								Draw(ZEDrawParameters* DrawParameters);
 		static ZEDirectionalLight*			CreateInstance();
 };

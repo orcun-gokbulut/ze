@@ -57,6 +57,9 @@ class ZEPointLight  : public ZELight
 										ZEPointLight();
 		virtual							~ZEPointLight();
 
+	protected:
+		virtual bool					DeinitializeSelf();
+
 	public:
 		ZELightType						GetLightType();
 
@@ -64,8 +67,6 @@ class ZEPointLight  : public ZELight
 
 		ZETexture2D*					GetFrontShadowMap();
 		ZETexture2D*					GetBackShadowMap();
-
-		virtual void					Deinitialize();
 
 		virtual ZESize					GetViewCount();
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);

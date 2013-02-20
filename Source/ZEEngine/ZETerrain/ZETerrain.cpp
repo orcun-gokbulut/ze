@@ -64,7 +64,7 @@ ZEDrawFlags ZETerrain::GetDrawFlags() const
 void ZETerrain::SetChunkSize(ZEUInt Size)
 {
 	ChunkSize = Size;
-	if (GetInitialized())
+	if (IsInitialized())
 		ZETerrainPrimitivesGenerator::Generate(&VertexBuffer, &Indices, ChunkSize);
 }
 
@@ -166,12 +166,12 @@ ZETerrain::ZETerrain()
 
 ZETerrain::~ZETerrain()
 {
-	Deinitialize();
+
 }
 
-bool ZETerrain::Initialize()
+bool ZETerrain::InitializeSelf()
 {
-	if (GetInitialized())
+	if (!ZEEntity::InitializeSelf())
 		return false;
 
 	if (!CreateVertexBuffer())
@@ -183,19 +183,16 @@ bool ZETerrain::Initialize()
 	if (!CreateLevels())
 		return false;
 
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZETerrain::Deinitialize()
+bool ZETerrain::DeinitializeSelf()
 {
-	if (!GetInitialized())
-		return;
-
 	DestroyLevels();
 	UnloadLevelData();
 	DestroyVertexBuffer();
 
-	ZEEntity::Deinitialize();
+	return ZEEntity::DeinitializeSelf();
 }
 
 bool ZETerrain::CreateVertexBuffer()
@@ -433,7 +430,7 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 void ZETerrain::SetTerrainFile(const ZEString& FileName)
 {
 	TerrainFileName = FileName;
-	if (GetInitialized())
+	if (IsInitialized())
 		LoadLevelData();
 }
 

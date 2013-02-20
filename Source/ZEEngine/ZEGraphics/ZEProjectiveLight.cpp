@@ -87,7 +87,7 @@ const ZETexture2D* ZEProjectiveLight::GetProjectionTexture() const
 void ZEProjectiveLight::SetProjectionTextureFile(const char* Filename)
 {
 	strncpy(ProjectionTextureFile, Filename, ZE_MAX_FILE_NAME_SIZE);
-	if (GetInitialized())
+	if (IsInitialized())
 	{
 		if (ProjectionTextureResource != NULL)
 			ProjectionTextureResource->Release();
@@ -146,9 +146,9 @@ void ZEProjectiveLight::SetCastsShadow(bool NewValue)
 	ZELight::SetCastsShadow(NewValue);
 }
 
-bool ZEProjectiveLight::Initialize()
+bool ZEProjectiveLight::InitializeSelf()
 {
-	if (GetInitialized())
+	if (!ZEEntity::InitializeSelf())
 		return false;
 
 	if (strlen(ProjectionTextureFile) != 0)
@@ -163,16 +163,11 @@ bool ZEProjectiveLight::Initialize()
 			zeError("Can not load projection texture.");
 	}
 
-	ZEEntity::Initialize();
-
 	return true;
 }
 
-void ZEProjectiveLight::Deinitialize()
+bool ZEProjectiveLight::DeinitializeSelf()
 {
-	if (!GetInitialized())
-		return;
-
 	if (ProjectionTextureResource != NULL)
 	{
 		ProjectionTextureResource->Release();
@@ -184,6 +179,8 @@ void ZEProjectiveLight::Deinitialize()
 		ShadowMap->Destroy();
 		ShadowMap = NULL;
 	}
+
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZEProjectiveLight::Draw(ZEDrawParameters* DrawParameters)
@@ -212,7 +209,7 @@ ZEProjectiveLight::ZEProjectiveLight()
 
 ZEProjectiveLight::~ZEProjectiveLight()
 {
-	Deinitialize();
+
 }
 
 ZEProjectiveLight* ZEProjectiveLight::CreateInstance()

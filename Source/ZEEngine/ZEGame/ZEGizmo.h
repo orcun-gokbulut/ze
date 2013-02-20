@@ -111,6 +111,10 @@ class ZEGizmo : public ZEEntity
 
 										ZEGizmo();
 
+	protected:
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+	
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
 
@@ -127,9 +131,6 @@ class ZEGizmo : public ZEEntity
 		float							GetAxisLenght();
 
 		ZEVector3						GetPositionChange();
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
 
 		ZEGizmoAxis						PickAxis(const ZERay& Ray, float& TRay);
 		

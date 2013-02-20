@@ -212,8 +212,11 @@ ZEDrawFlags ZECloud::GetDrawFlags() const
 	return ZE_DF_DRAW;
 }
 
-bool ZECloud::Initialize()
+bool ZECloud::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	// Create Material
 	if (CloudMaterial == NULL)
 	{
@@ -247,10 +250,10 @@ bool ZECloud::Initialize()
 	CloudRenderCommand.VertexDeclaration = (ZEVertexDeclaration*)-1;
 	CloudRenderCommand.IndexBuffer		= (ZEIndexBuffer*)-1;
 
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZECloud::Deinitialize()
+bool ZECloud::DeinitializeSelf()
 {
 	if (CloudMaterial != NULL)
 	{
@@ -266,7 +269,7 @@ void ZECloud::Deinitialize()
 
 	CloudRenderCommand.SetZero();
 
-	ZEEntity::Deinitialize();
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZECloud::Draw(ZEDrawParameters* DrawParameters)
@@ -338,5 +341,5 @@ ZECloud::ZECloud()
 
 ZECloud::~ZECloud()
 {
-	this->Deinitialize();
+
 }

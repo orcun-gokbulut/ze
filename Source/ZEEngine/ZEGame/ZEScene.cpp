@@ -86,7 +86,8 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 
 bool ZEScene::Initialize()
 {
-	Deinitialize();
+	if (Initialized)
+		return true;
 
 	if (Renderer == NULL)
 		Renderer = ZEFrameRenderer::CreateInstance();
@@ -133,9 +134,11 @@ bool ZEScene::Initialize()
 		return false;
 	}
 
-
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
+	{
+		Entities[I]->SetOwnerScene(this);
 		Entities[I]->Initialize();
+	}
 
 	Initialized = true;
 	return true;
@@ -143,6 +146,9 @@ bool ZEScene::Initialize()
 
 void ZEScene::Deinitialize()
 {
+	if (!Initialized)
+		return;
+
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Deinitialize();
 
@@ -188,36 +194,31 @@ void ZEScene::Destroy()
 
 void ZEScene::AddEntity(ZEEntity* Entity)
 {
+	if (Entities.Exists(Entity))
+	{
+		zeError("Can not add an already native entity.");
+		return;
+	}
+
 	Entity->SetEntityId(LastEntityId++);
 	Entities.Add(Entity);
 	Entity->SetOwnerScene(this);
 
-	ZEArray<ZEEntity*> Temp = Entity->GetComponents();
-
-	for (ZESize I = 0; I < Temp.GetCount(); I++)
-		Temp[I]->SetOwnerScene(this);
-
-	Temp = Entity->GetChildEntities();
-
-	for (ZESize I = 0; I < Temp.GetCount(); I++)
-		Temp[I]->SetOwnerScene(this);
+	if(Entity->GetName().GetLength() == 0)
+		Entity->SetName(Entity->GetDescription()->GetName() + ZEString(LastEntityId));
 
 	Entity->Initialize();
 }
 
 void ZEScene::RemoveEntity(ZEEntity* Entity)
 {
+	if (!Entities.Exists(Entity))
+	{
+		zeError("Can not remove a foreign entity.");
+		return;
+	}
+
 	Entity->SetOwnerScene(NULL);
-
-	ZEArray<ZEEntity*> Temp = Entity->GetComponents();
-
-	for (ZESize I = 0; I < Temp.GetCount(); I++)
-		Temp[I]->SetOwnerScene(NULL);
-
-	Temp = Entity->GetChildEntities();
-
-	for (ZESize I = 0; I < Temp.GetCount(); I++)
-		Temp[I]->SetOwnerScene(NULL);
 
 	Entities.DeleteValue(Entity);
 }
@@ -328,11 +329,13 @@ void ZEScene::Tick(ZEEntity* Entity, float ElapsedTime)
 	
 	const ZEArray<ZEEntity*>& Components = Entity->GetComponents();
 	for (ZESize N = 0; N < Components.GetCount(); N++)
-		Components[N]->Tick(ElapsedTime);
+		Tick(Components[N], ElapsedTime);
+
 
 	const ZEArray<ZEEntity*>& SubEntities = Entity->GetChildEntities();
 	for (ZESize N = 0; N < SubEntities.GetCount(); N++)
-		SubEntities[N]->Tick(ElapsedTime);
+		Tick(SubEntities[N], ElapsedTime);
+
 }
 
 void ZEScene::Tick(float ElapsedTime)
@@ -504,6 +507,9 @@ ZEScene::ZEScene()
 ZEScene::~ZEScene()
 {
 	Deinitialize();
+
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
+		Entities[I]->Destroy();
 }
 
 ZEScene* ZEScene::GetInstance()
