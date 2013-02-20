@@ -170,8 +170,11 @@ void ZEGrid::Draw(ZEDrawParameters* Parameters)
 	}
 }
 
-bool ZEGrid::Initialize()
+bool ZEGrid::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	GenerateGrid();
 	
 	if (Material == NULL)
@@ -186,7 +189,7 @@ bool ZEGrid::Initialize()
 	return true;
 }
 
-void ZEGrid::Deinitialize()
+bool ZEGrid::DeinitializeSelf()
 {
 	MinorGrid.Clean();
 	MajorGrid.Clean();
@@ -198,6 +201,8 @@ void ZEGrid::Deinitialize()
 		Material->Release();
 		Material = NULL;
 	}
+
+	return ZEEntity::DeinitializeSelf();
 }
 
 ZEGrid::ZEGrid()

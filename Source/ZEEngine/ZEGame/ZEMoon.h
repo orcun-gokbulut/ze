@@ -62,6 +62,9 @@ class ZEMoon : public ZEEntity
 		ZEVector3					AmbientColor;
 		ZEVector3					Direction;
 
+		virtual bool				InitializeSelf();
+		virtual bool				DeinitializeSelf();
+
 									ZEMoon();
 		virtual						~ZEMoon();
 
@@ -90,9 +93,6 @@ class ZEMoon : public ZEEntity
 		const ZEString				GetTexture() const;
 
 		virtual ZEDrawFlags			GetDrawFlags() const;
-
-		virtual bool				Initialize();
-		virtual void				Deinitialize();
 
 		virtual void				Draw(ZEDrawParameters* DrawParameters);
 		virtual void				Tick(float Time);

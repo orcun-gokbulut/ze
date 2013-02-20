@@ -58,6 +58,9 @@ class ZEOmniProjectiveLight : public ZELight
 										ZEOmniProjectiveLight();
 		virtual							~ZEOmniProjectiveLight();
 
+	protected:
+		virtual bool					DeinitializeSelf();
+
 	public:
 		ZELightType						GetLightType();
 
@@ -68,8 +71,6 @@ class ZEOmniProjectiveLight : public ZELight
 
 		virtual void					SetCastsShadow(bool NewValue);
 		
-		virtual void					Deinitialize();
-
 		virtual ZESize					GetViewCount();
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);

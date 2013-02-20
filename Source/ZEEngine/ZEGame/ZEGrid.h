@@ -77,6 +77,10 @@ class ZEGrid : public ZEEntity
 
 									ZEGrid();
 
+	protected:
+		virtual bool				InitializeSelf();
+		virtual bool				DeinitializeSelf();
+
 	public:
 		ZEDrawFlags					GetDrawFlags() const;
 
@@ -103,9 +107,6 @@ class ZEGrid : public ZEEntity
 		const ZEVector3&			GetAxisColor();
 
 		virtual void				Draw(ZEDrawParameters* Parameters);
-
-		virtual bool				Initialize();
-		virtual void				Deinitialize();
 
 		static ZEGrid*				CreateInstance();
 };

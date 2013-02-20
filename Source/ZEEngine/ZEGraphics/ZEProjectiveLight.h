@@ -62,6 +62,10 @@ class ZEProjectiveLight : public ZELight
 										ZEProjectiveLight();
 		virtual							~ZEProjectiveLight();
 
+	protected:
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
 	public:
 		ZELightType						GetLightType();
 
@@ -82,9 +86,6 @@ class ZEProjectiveLight : public ZELight
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
 
 		virtual void					SetCastsShadow(bool NewValue);
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
 
 		ZETexture2D*					GetShadowMap();
 

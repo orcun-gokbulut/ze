@@ -194,8 +194,11 @@ ZEDrawFlags ZESkyDome::GetDrawFlags() const
 	return ZE_DF_DRAW;
 }
 
-bool ZESkyDome::Initialize()
+bool ZESkyDome::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	// Create Material
 	if (SkyDomeMaterial == NULL)
 	{
@@ -239,10 +242,10 @@ bool ZESkyDome::Initialize()
 	SkyDomeRenderCommand.PrimitiveCount = SkyDomeGeometry.Vertices.GetCount() / 3;
 	SkyDomeRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZESkyDome::Deinitialize()
+bool ZESkyDome::DeinitializeSelf()
 {	
 	if (SkyDomeMaterial != NULL)
 	{
@@ -255,7 +258,7 @@ void ZESkyDome::Deinitialize()
 
 	SkyDomeRenderCommand.SetZero();	
 
-	ZEEntity::Deinitialize();
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZESkyDome::Draw(ZEDrawParameters* DrawParameters)
@@ -326,5 +329,5 @@ ZESkyDome::ZESkyDome()
 
 ZESkyDome::~ZESkyDome()
 {
-	Deinitialize();
+
 }

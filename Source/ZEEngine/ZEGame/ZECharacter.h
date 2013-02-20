@@ -122,6 +122,8 @@ class ZEGameCharacter : public ZEEntity
 		float						RunSpeed;
 
 	protected:
+		virtual bool				InitializeSelf();
+		virtual bool				DeinitializeSelf();
 
 									ZEGameCharacter();
 									~ZEGameCharacter();
@@ -156,9 +158,6 @@ class ZEGameCharacter : public ZEEntity
 
 
 		virtual ZEDrawFlags			GetDrawFlags();
-
-		virtual bool				Initialize();
-		virtual void				Deinitialize();
 
 		void						WalkForward();
 		void						RunForward();

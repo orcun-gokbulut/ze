@@ -310,7 +310,7 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 
 	this->ModelResource = ModelResource;
 
-	if (GetInitialized())
+	if (IsInitialized())
 		LoadModelResource();
 }
 
@@ -629,16 +629,19 @@ ZEModel::~ZEModel()
 		((ZEModelResource*)ModelResource)->Release();
 }
 
-bool ZEModel::Initialize()
+bool ZEModel::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	LoadModelResource();
 
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZEModel::Deinitialize()
+bool ZEModel::DeinitializeSelf()
 {
-
+	return ZEEntity::DeinitializeSelf();
 }
 
 ZEModel* ZEModel::CreateInstance()

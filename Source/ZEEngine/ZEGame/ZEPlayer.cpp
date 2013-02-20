@@ -270,23 +270,20 @@ void ZEPlayer::Tick(float Time)
 	ZEActor::Tick(Time);
 }
 
-bool ZEPlayer::Initialize()
+bool ZEPlayer::InitializeSelf()
 {
-	if (GetInitialized())
+	if (!ZEActor::InitializeSelf())
 		return false;
 
 	zeScene->SetActiveCamera(Camera);
 	zeScene->SetActiveListener(Listener);
 
-	return ZEActor::Initialize();
+	return true;
 }
 
-void ZEPlayer::Deinitialize()
+bool ZEPlayer::DeinitializeSelf()
 {
-	if (!GetInitialized())
-		return;
-
-	ZEActor::Deinitialize();
+	return ZEActor::DeinitializeSelf();
 }
 
 #include "ZETexture/ZETexture2DResource.h"

@@ -118,6 +118,9 @@ class ZEModel : public ZEEntity
 		void								LoadModelResource();
 
 	protected:
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
+
 											ZEModel();
 		virtual								~ZEModel();
 
@@ -185,9 +188,6 @@ class ZEModel : public ZEEntity
 
 		void								SetDrawPhysicalJoints(bool Enabled);
 		bool								GetDrawPhysicalJoints();
-
-		bool								Initialize();
-		void								Deinitialize();
 
 		static ZEModel*						CreateInstance();
 };

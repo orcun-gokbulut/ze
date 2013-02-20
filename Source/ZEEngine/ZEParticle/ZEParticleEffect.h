@@ -61,6 +61,8 @@ class ZEParticleEffect : public ZEEntity
 		ZEParticleStatistics				Statistics;
 
 	protected:
+		bool								InitializeSelf();
+		bool								DeinitializeSelf();
 
 											ZEParticleEffect();
 		virtual								~ZEParticleEffect();
@@ -68,9 +70,6 @@ class ZEParticleEffect : public ZEEntity
 
 	public:
 		virtual	ZEDrawFlags					GetDrawFlags() const;
-
-		bool								Initialize();
-		void								Deinitialize();
 
 		void								Draw(ZEDrawParameters* DrawParameters);
 		void								Tick(float TimeElapsed);
@@ -80,7 +79,6 @@ class ZEParticleEffect : public ZEEntity
 		void								AddEmitter(ZEParticleEmitter* Emitter);
 		void								RemoveEmitter(ZEParticleEmitter* Emitter);
 
-		
 		const ZEArray<ZEParticleSystem*>&	GetSystems();
 		void								AddSystem(ZEParticleSystem* Emitter);
 		void								RemoveSystem(ZEParticleSystem* Emitter);

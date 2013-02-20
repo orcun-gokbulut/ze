@@ -77,7 +77,7 @@ void ZEOmniProjectiveLight::SetCastsShadow(bool NewValue)
 	ZELight::SetCastsShadow(NewValue);
 }
 
-void ZEOmniProjectiveLight::Deinitialize()
+bool ZEOmniProjectiveLight::DeinitializeSelf()
 {
 	if (FrontShadowMap != NULL)
 	{
@@ -90,6 +90,8 @@ void ZEOmniProjectiveLight::Deinitialize()
 		BackShadowMap->Destroy();
 		BackShadowMap = NULL;
 	}
+
+	return ZELight::DeinitializeSelf();
 }
 
 ZETexture2D* ZEOmniProjectiveLight::GetFrontShadowMap()
@@ -147,7 +149,7 @@ ZEOmniProjectiveLight::ZEOmniProjectiveLight()
 
 ZEOmniProjectiveLight::~ZEOmniProjectiveLight()
 {
-	Deinitialize();
+
 }
 
 ZEOmniProjectiveLight* ZEOmniProjectiveLight::CreateInstance()

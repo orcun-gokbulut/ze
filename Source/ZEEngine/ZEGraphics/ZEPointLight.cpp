@@ -76,7 +76,7 @@ ZETexture2D* ZEPointLight::GetBackShadowMap()
 	return FrontShadowMap;
 }
 
-void ZEPointLight::Deinitialize()
+bool ZEPointLight::DeinitializeSelf()
 {
 	if (FrontShadowMap)
 	{
@@ -89,6 +89,8 @@ void ZEPointLight::Deinitialize()
 		BackShadowMap->Destroy();
 		BackShadowMap = NULL;
 	}
+
+	return ZELight::DeinitializeSelf();
 }
 
 ZESize ZEPointLight::GetViewCount()
@@ -135,7 +137,7 @@ ZEPointLight::ZEPointLight()
 
 ZEPointLight::~ZEPointLight()
 {
-	Deinitialize();
+
 }
 
 ZEPointLight* ZEPointLight::CreateInstance()
