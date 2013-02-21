@@ -35,35 +35,34 @@
 
 #include "ZEHashGenerator.h"
 
-ZEUInt64 ZEHashGenerator::Hash(const char* String)
+ZESize ZEHashGenerator::Hash(const char* String)
 {
-	ZEUInt64 HashOutput = 0;
+	ZESize HashOutput = 0;
 	while(*String != '\0')
 	{
 		HashOutput = (ZEUInt8)*String + (HashOutput << 6) + (HashOutput << 16) - HashOutput;
 		String++;
 	}
-
 	return HashOutput;
 }
 
-ZEUInt64 ZEHashGenerator::Hash(const ZEString& String)
+ZESize ZEHashGenerator::Hash(const ZEString& String)
 {
-	ZEUInt64 HashOutput = 0;
+	ZESize HashOutput = 0;
 	Hash(HashOutput, String.ToCString());
 	return HashOutput;
 }
 
-ZEUInt64 ZEHashGenerator::Hash(void* Value, ZESize Size)
+ZESize ZEHashGenerator::Hash(void* Value, ZESize Size)
 {
-	ZEUInt64 HashOutput = 0;
+	ZESize HashOutput = 0;
 	for (ZESize I = 0; I < Size; I++)
 		HashOutput = ((ZEUInt8*)Value)[I] + (HashOutput << 6) + (HashOutput << 16) - HashOutput;
 
 	return HashOutput;
 }
 
-void ZEHashGenerator::Hash(ZEUInt64& HashOutput, const char* String)
+void ZEHashGenerator::Hash(ZESize& HashOutput, const char* String)
 {
 	while(*String != '\0')
 	{
@@ -72,12 +71,12 @@ void ZEHashGenerator::Hash(ZEUInt64& HashOutput, const char* String)
 	}
 }
 
-void ZEHashGenerator::Hash(ZEUInt64& HashOutput, const ZEString& String)
+void ZEHashGenerator::Hash(ZESize& HashOutput, const ZEString& String)
 {
 	Hash(HashOutput, String.ToCString());
 }
 
-void ZEHashGenerator::Hash(ZEUInt64& HashOutput, void* Value, ZESize Size)
+void ZEHashGenerator::Hash(ZESize& HashOutput, void* Value, ZESize Size)
 {
 	for (ZESize I = 0; I < Size; I++)
 		HashOutput = ((ZEUInt8*)Value)[I] + (HashOutput << 6) + (HashOutput << 16) - HashOutput;

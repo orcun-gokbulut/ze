@@ -157,7 +157,7 @@ ZEPresentationSlide::ZEPresentationSlide()
 	Material = NULL;
 	
 	RenderCommand.VertexLayout = ZECanvasVertex::GetVertexLayout();
-	RenderCommand.Flags |= (ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_RCF_ENABLE_WORLD_TRANSFORM | ZE_RCF_ENABLE_Z_CULLING);
+	RenderCommand.Flags |= (ZE_RCF_VIEW_PROJECTION_TRANSFORM | ZE_RCF_WORLD_TRANSFORM | ZE_RCF_Z_CULL);
 	RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
 	RenderCommand.PrimitiveCount = 2;
 }

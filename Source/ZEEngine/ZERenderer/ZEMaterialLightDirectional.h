@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaterialPointLight.h
+ Zinek Engine - ZEMaterialLightDirectional.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MATERIAL_POINT_LIGHT_H__
-#define __ZE_MATERIAL_POINT_LIGHT_H__
+
+#ifndef __ZE_MATERIAL_LIGHT_DIRECTIONAL_H__
+#define __ZE_MATERIAL_LIGHT_DIRECTIONAL_H__
 
 #include "ZETypes.h"
 #include "ZEMaterialLight.h"
@@ -45,9 +46,9 @@ class ZEVertexBuffer;
 class ZERenderCommand;
 class ZEConstantBuffer;
 
-class ZEMaterialPointLight : public ZEMaterialLight
+class ZEMaterialLightDirectional : public ZEMaterialLight
 {
-	friend class ZELightPoint;
+	friend class ZELightDirectional;
 
 	protected:
 		ZEShader*						VertexShader;
@@ -64,17 +65,18 @@ class ZEMaterialPointLight : public ZEMaterialLight
 
 		bool							SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-										ZEMaterialPointLight();
-		virtual							~ZEMaterialPointLight();
+										ZEMaterialLightDirectional();
+		virtual							~ZEMaterialLightDirectional();
 
 	public:
-		virtual ZEUInt32				GetHash() const;
+		virtual ZESize					GetHash() const;
+
 		virtual ZEMaterialFlags			GetMaterialFlags() const;
 
 		virtual void					UpdateMaterial();
 		virtual bool					SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		static ZEMaterialPointLight*	CreateInstance();
+		static ZEMaterialLightDirectional*	CreateInstance();
 };
 
 #endif

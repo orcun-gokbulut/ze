@@ -135,34 +135,34 @@ bool ZELight::GetShadowCaster() const
 	return ShadowCaster;
 }
 
-void ZELight::SetShadowPenumbraSize(float Value)
+void ZELight::SetPenumbraSize(float Value)
 {
-	ShadowPenumbraSize = Value;
+	PenumbraSize = Value;
 }
 
-float ZELight::GetShadowPenumbraSize() const
+float ZELight::GetPenumbraSize() const
 {
-	return ShadowPenumbraSize;
+	return PenumbraSize;
 }
 
-void ZELight::SetShadowSlopeScaledBias(float Value)
+void ZELight::SetSlopeScaledBias(float Value)
 {
-	ShadowSlopeScaledBias = Value;
+	SlopeScaledBias = Value;
 }
 
-float ZELight::GetShadowSlopeScaledBias() const
+float ZELight::GetSlopeScaledBias() const
 {
-	return ShadowSlopeScaledBias;
+	return SlopeScaledBias;
 }
 
-void ZELight::SetShadowDepthScaledBias(float Value)
+void ZELight::SetDepthScaledBias(float Value)
 {
-	ShadowDepthScaledBias = Value;
+	DepthScaledBias = Value;
 }
 
-float ZELight::GetShadowDepthScaledBias() const
+float ZELight::GetDepthScaledBias() const
 {
-	return ShadowDepthScaledBias;
+	return DepthScaledBias;
 }
 
 ZELight::ZELight()
@@ -177,9 +177,9 @@ ZELight::ZELight()
 	Color = ZEVector3::One;
 	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
 
-	ShadowPenumbraSize = 1.0f;
-	ShadowSlopeScaledBias = 0.0f;
-	ShadowDepthScaledBias = 0.0f;
+	PenumbraSize = 1.0f;
+	SlopeScaledBias = 0.0f;
+	DepthScaledBias = 0.0f;
 }
 
 ZELight::~ZELight()

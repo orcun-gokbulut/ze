@@ -70,30 +70,30 @@ class ZEMaterialDefault : public ZEMaterial
 
 		} Transformations;
 
-		struct ZEFixedMaterialComponents
+		struct ZEMaterialDefaultComponents
 		{
-			ZEUInt32				Ambient : 1;
-			ZEUInt32				Diffuse	: 1;
-			ZEUInt32				BaseMap	: 1;
-			ZEUInt32				NormalMap : 1;
-			ZEUInt32				ParallaxMap	: 1;
-			ZEUInt32				Specular : 1;
-			ZEUInt32				SpecularMap	: 1;
-			ZEUInt32				Emissive : 1;
-			ZEUInt32				EmissiveMap	: 1;
-			ZEUInt32				Opacity	: 1;
-			ZEUInt32				OpacityBaseAlpha : 1;
-			ZEUInt32				OpacityConstant : 1;
-			ZEUInt32				OpacityMap : 1;
-			ZEUInt32				DetailMap : 1;
-			ZEUInt32				DetailBaseMap : 1;
-			ZEUInt32				DetailNormalMap : 1;
-			ZEUInt32				Reflection : 1;
-			ZEUInt32				Refraction : 1;
-			ZEUInt32				LightMap : 1;
-			ZEUInt32				DistortionMap : 1;
-			ZEUInt32				AlphaCull : 1;
-			ZEUInt32				VertexColor : 1;
+			ZEUInt64				Ambient			: 1;
+			ZEUInt64				Diffuse			: 1;
+			ZEUInt64				BaseMap			: 1;
+			ZEUInt64				NormalMap		: 1;
+			ZEUInt64				ParallaxMap		: 1;
+			ZEUInt64				Specular		: 1;
+			ZEUInt64				SpecularMap		: 1;
+			ZEUInt64				Emissive		: 1;
+			ZEUInt64				EmissiveMap		: 1;
+			ZEUInt64				Opacity			: 1;
+			ZEUInt64				OpacityBaseAlpha : 1;
+			ZEUInt64				OpacityConstant : 1;
+			ZEUInt64				OpacityMap		: 1;
+			ZEUInt64				DetailMap		: 1;
+			ZEUInt64				DetailBaseMap	: 1;
+			ZEUInt64				DetailNormalMap : 1;
+			ZEUInt64				Reflection		: 1;
+			ZEUInt64				Refraction		: 1;
+			ZEUInt64				LightMap		: 1;
+			ZEUInt64				DistortionMap	: 1;
+			ZEUInt64				AlphaCull		: 1;
+			ZEUInt64				VertexColor		: 1;
 			
 		} Components;
 		
@@ -207,18 +207,19 @@ class ZEMaterialDefault : public ZEMaterial
 
 		void						UpdateTransformations(const ZERenderCommand* RenderCommand);
 
+		bool						SetupShadowPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 		bool						SetupGeometryPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 		bool						SetupForwardPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 		bool						SetupTransparentPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		void						CreateShaders();
+		void						UpdateShaders();
 		void						DestroyShaders();
 
 									ZEMaterialDefault();
 		virtual						~ZEMaterialDefault();
 
 	public:
-		ZEUInt32					GetHash() const;
+		ZESize						GetHash() const;
 
 		virtual ZEMaterialFlags		GetMaterialFlags() const;
 
@@ -408,16 +409,15 @@ class ZEMaterialDefault : public ZEMaterial
 		void						SetVertexColorEnabled(bool Value);
 		bool						GetVertexColorEnabled();
 
-		void						Tick(float ElapsedTime);
-
 		void						WriteToFile(const ZEString& FilePath);
 		void						ReadFromFile(const ZEString& FilePath);
 
-		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
-
 		virtual void				UpdateMaterial();
 
-		static ZEMaterialDefault*		CreateInstance();
+		virtual void				Tick(float ElapsedTime);
+		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
+
+		static ZEMaterialDefault*	CreateInstance();
 };
 
 /*

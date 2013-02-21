@@ -35,9 +35,10 @@
 
 #include "ZECanvas.h"
 #include "ZERenderer.h"
+#include "ZEMaterial.h"
 #include "ZELightPoint.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEMaterialPointLight.h"
+#include "ZEMaterialLightPoint.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
@@ -69,7 +70,7 @@ void ZELightPoint::Tick(float Time)
 	RenderCommand.Priority = 3;
 	RenderCommand.Flags = 0;
 	RenderCommand.FirstVertex = 0;
-	RenderCommand.Material = (ZEMaterial*)Material;
+	RenderCommand.Material = Material;
 	RenderCommand.Pipeline = ZE_RP_3D;
 	RenderCommand.PrimitiveCount = 312;
 	RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
@@ -95,7 +96,7 @@ bool ZELightPoint::Initialize()
 	Canvas.AddSphere(1.0f, 12, 12);
 	Geometry = Canvas.CreateStaticVertexBuffer();
 
-	Material = ZEMaterialPointLight::CreateInstance();
+	Material = ZEMaterialLightPoint::CreateInstance();
 
 	return ZEEntity::Initialize();
 }

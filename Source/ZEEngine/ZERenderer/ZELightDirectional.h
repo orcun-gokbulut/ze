@@ -34,17 +34,20 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DIRECTIONAL_LIGHT_H__
-#define __ZE_DIRECTIONAL_LIGHT_H__
+#ifndef	__ZE_LIGHT_DIRECTIONAL_H__
+#define __ZE_LIGHT_DIRECTIONAL_H__
 
 #include "ZELight.h"
 #include "ZETypes.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZERenderCommand.h"
 #include "ZEMath/ZEViewCuboid.h"
 
 class ZETexture2D;
 class ZERenderTarget;
+class ZEVertexBuffer;
 struct ZEDrawParameters;
+class ZEMaterialLightDirectional;
 
 struct ZEDirectionalLightCascade
 {
@@ -65,10 +68,13 @@ struct ZEDirectionalLightCascade
 class ZELightDirectional : public ZELight
 {
 	protected:
+		float							CascadeSplitBias;
 		ZESize							CascadeCount;
 		ZEDirectionalLightCascade		Cascades[ZE_DL_MAX_CASCADE_COUNT];
 
-		float							CascadeSplitBias;
+		ZEMaterialLightDirectional*		Material;
+		ZEVertexBuffer*					Geometry;
+		ZERenderCommand					RenderCommand;
 
 		void							UpdateCascades();
 		void							UpdateRenderTargets();
@@ -96,10 +102,11 @@ class ZELightDirectional : public ZELight
 
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index);
 
-		virtual void					Draw(ZEDrawParameters* DrawParameters);
-		
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
+
+		virtual void					Tick(float Time);
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
 
 		static ZELightDirectional*		CreateInstance();
 };

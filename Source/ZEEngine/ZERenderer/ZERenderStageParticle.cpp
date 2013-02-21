@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERenderStageForward.cpp
+ Zinek Engine - ZERenderStageParticle.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZECamera.h"
+#include "ZERenderer.h"
 #include "ZEMaterial.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEMath/ZEAngle.h"
 #include "ZERenderCommand.h"
+#include "ZEGraphics/ZEShader.h"
+#include "ZERenderStageParticle.h"
 #include "ZERenderStageForward.h"
-#include "ZERenderStageGeometry.h"
-#include "ZERenderStageLighting.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEGraphics/ZERenderTarget.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEShaderMetaTable.h"
 #include "ZEGraphics/ZEGraphicsEventTracer.h"
 
-void ZERenderStageForward::ResetStageDefaults()
+void ZERenderStageParticle::ResetStageDefaults()
 {
 	// Requested pipeline constants
-	StageConstants.SetCount(2);
+	StageConstants.SetCount(5);
+	StageConstants.Add(ZE_PC_CAMERA_WORLD_UP);
+	StageConstants.Add(ZE_PC_CAMERA_WORLD_FRONT);
+	StageConstants.Add(ZE_PC_CAMERA_WORLD_RIGHT);
 	StageConstants.Add(ZE_PC_CAMERA_WORLD_POS);
 	StageConstants.Add(ZE_PC_INV_VIEWPORT_WIDTH_HEIGHT);
 
 	// Reset parent states
 	ZERenderStage::ResetStageDefaults();
-
+	
 	// Outputs
 	DefaultStates.ScreenWriteEnable = true;
-	//DefaultStates.RenderTargets[0] = RenderTargets.ABuffer;
-	DefaultStates.RenderTargets[0] = zeGraphics->GetFrameBuffer();
+	DefaultStates.RenderTargets[0] = ABufferInput->GetABufferRenderTarget();
 	DefaultStates.DepthStencilBuffer = zeGraphics->GetDepthBuffer();
 
 	// Use default viewport and scissor rectangles
@@ -68,9 +75,7 @@ void ZERenderStageForward::ResetStageDefaults()
 		DefaultStates.ScissorRectangles[I] = zeGraphics->GetScissorRectangle(I);
 	}
 
-	// Blend state
-	DefaultStates.BlendState.SetBlendEnable(0, false);
-	DefaultStates.BlendState.SetComponentWriteMask(0, ZE_CM_ALL);
+	// Blend state: Use default
 
 	// Point sampler state
 	DefaultStates.PixelShaderSamplers[0].SetAddressU(ZE_TAM_CLAMP);
@@ -80,7 +85,7 @@ void ZERenderStageForward::ResetStageDefaults()
 	DefaultStates.PixelShaderSamplers[0].SetMipFilter(ZE_TFM_POINT);
 	
 	// Depth stencil state
-	DefaultStates.DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
+	DefaultStates.DepthStencilState.SetZFunction(ZE_CF_GREATER_EQUAL);
 	DefaultStates.DepthStencilState.SetZTestEnable(true);
 	DefaultStates.DepthStencilState.SetZWriteEnable(false);
 
@@ -88,42 +93,27 @@ void ZERenderStageForward::ResetStageDefaults()
 	DefaultStates.RasterizerState.SetCullDirection(ZE_CD_COUNTER_CLOCKWISE);
 	DefaultStates.RasterizerState.SetFillMode(ZE_FM_SOLID);
 
-	if (GBufferInput == NULL || LightBufferInput == NULL)
+	if (ABufferInput == NULL)
 	{
 		zeError("Missing input stage.");
 		return;
 	}
-
-	// Textures
-	DefaultStates.PixelShaderTextures[0] = GBufferInput->GetGBuffer1();
-	DefaultStates.PixelShaderTextures[1] = GBufferInput->GetGBuffer2();
-	DefaultStates.PixelShaderTextures[2] = GBufferInput->GetGBuffer3();
-	DefaultStates.PixelShaderTextures[3] = LightBufferInput->GetLBuffer1();
-	DefaultStates.PixelShaderTextures[4] = LightBufferInput->GetLBuffer2();
 }
 
-void ZERenderStageForward::CommitStageDefaults()
+void ZERenderStageParticle::CommitStageDefaults()
 {
-// 	static ZEUInt PrevFrameId = 0;
-// 	static ZEUInt CommitCount = 0;
-// 
-// 	ZEUInt CurFrameId = zeCore->GetFrameId();
-// 
-// 	if (CurFrameId > PrevFrameId)
-// 	{
-// 		CommitCount = 0;
-// 		PrevFrameId = CurFrameId;
-// 	}
-// 	
-// 	CommitCount++;
-
 	// Commit parent States
 	ZERenderStage::CommitStageDefaults();
 
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
-	Device->SetRenderTargetScreen(DefaultStates.RenderTargets[0]);
+	Device->SetRenderTargetArray(DefaultStates.RenderTargets);
 	Device->SetDepthStencilBuffer(DefaultStates.DepthStencilBuffer);
+
+	Device->SetBlendState(DefaultStates.BlendState);
+	Device->SetDepthStencilState(DefaultStates.DepthStencilState);
+
+	Device->SetRasterizerState(DefaultStates.RasterizerState);
 
 	ZESize ScreenCount = zeGraphics->GetScreenCount();
 	for (ZESize I = 0; I < ScreenCount; ++I)
@@ -131,113 +121,53 @@ void ZERenderStageForward::CommitStageDefaults()
 		Device->SetViewport(I, DefaultStates.ViewPorts[I]);
 		Device->SetScissorRectangle(I, DefaultStates.ScissorRectangles[I]);
 	}
-
-	Device->SetPixelShaderTexture(0, DefaultStates.PixelShaderTextures[0]);
-	Device->SetPixelShaderTexture(1, DefaultStates.PixelShaderTextures[1]);
-	Device->SetPixelShaderTexture(2, DefaultStates.PixelShaderTextures[2]);
-	Device->SetPixelShaderTexture(3, DefaultStates.PixelShaderTextures[3]);
-	Device->SetPixelShaderTexture(4, DefaultStates.PixelShaderTextures[4]);
-
-	Device->SetPixelShaderSampler(0, DefaultStates.PixelShaderSamplers[0]);
-
-	Device->SetBlendState(DefaultStates.BlendState);
-	Device->SetRasterizerState(DefaultStates.RasterizerState);
-	Device->SetDepthStencilState(DefaultStates.DepthStencilState);
 }
 
-void ZERenderStageForward::UpdateBuffers()
+void ZERenderStageParticle::UpdateBuffers()
 {
-	// Update parent buffers
 	ZERenderStage::UpdateBuffers();
-
-	ZEUInt Width = zeGraphics->GetScreenWidth();
-	ZEUInt Height = zeGraphics->GetScreenHeight();
-
-	if (Textures.ABuffer == NULL || Textures.ABuffer->GetWidth() != Width || Textures.ABuffer->GetHeight() != Height)
-	{
-		ZE_DESTROY(RenderTargets.ABuffer);
-		ZE_DESTROY(Textures.ABuffer);
-
-		Textures.ABuffer = ZETexture2D::CreateInstance();
-		Textures.ABuffer->CreateStatic(Width, Height, 1, ZE_TPF_F16_4, true, NULL);
-		RenderTargets.ABuffer = Textures.ABuffer->CreateRenderTarget(0);
-	}
 }
 
-void ZERenderStageForward::DestroyBuffers()
+void ZERenderStageParticle::DestroyBuffers()
 {
-	ZE_DESTROY(RenderTargets.ABuffer);
-	ZE_DESTROY(Textures.ABuffer);
+
 }
 
-const ZETexture2D* ZERenderStageForward::GetABufferTexture() const
+ZEUInt32 ZERenderStageParticle::GetStageFlags() const
 {
-	return Textures.ABuffer;
+	return ZE_RENDER_STAGE_PARTICLE;
+}
+		
+void ZERenderStageParticle::SetABufferInput(const ZERenderStageForward* Input)
+{
+	zeDebugCheck(Input == NULL, "Null pointer.");
+
+	ABufferInput = Input;
 }
 
-const ZERenderTarget* ZERenderStageForward::GetABufferRenderTarget() const
+const ZERenderStageForward* ZERenderStageParticle::GetABufferInput() const
 {
-	return RenderTargets.ABuffer;
+	return ABufferInput;
 }
-
-void ZERenderStageForward::SetGBufferInput(const ZERenderStageGeometry* Input)
+		
+void ZERenderStageParticle::Setup()
 {
-	zeDebugCheck(Input == NULL, "Null pointer");
-
-	GBufferInput = Input;
-}
-
-const ZERenderStageGeometry* ZERenderStageForward::GetGBufferInput() const
-{
-	return GBufferInput;
-}
-
-void ZERenderStageForward::SetLBufferInput(const ZERenderStageLighting* Input)
-{
-	zeDebugCheck(Input == NULL, "Null pointer");
-
-	LightBufferInput = Input;
-}
-
-const ZERenderStageLighting* ZERenderStageForward::GetLBufferInput() const
-{
-	return LightBufferInput;
-}
-
-void ZERenderStageForward::Setup()
-{
-	UpdateBuffers();
 	ResetStageDefaults();
 	CommitStageDefaults();
-
-	LastMaterial = -1;
-
-	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
-
-	Device->ClearRenderTarget(RenderTargets.ABuffer, ZEVector4(0.0f, 1.0f, 0.0f, 1.0f));
-	Device->ClearRenderTarget(zeGraphics->GetFrameBuffer(), ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
 }
 
-void ZERenderStageForward::Process(ZERenderCommand* RenderCommand)
+void ZERenderStageParticle::Process(ZERenderCommand* RenderCommand)
 {
 	ZEMaterial* Material = RenderCommand->Material;
 
 	zeDebugCheck(RenderCommand->Material == NULL, "Cannot process null material");
 
-	if (!(Material->GetMaterialFlags() & ZE_MTF_FORWARD_PASS))
+	if (!(Material->GetMaterialFlags() & ZE_MTF_PARTICLE_PASS))
 	{
 		return;
 	}
 
-// 	ZEUInt32 Hash = Material->GetHash();
-// 	if (LastMaterial != Hash)
-// 	{
-// 		// Return to defaults if material is changed
-// 		CommitStageDefaults();
-// 		LastMaterial = Hash;
-// 	}
-
-	zeGraphics->GetEventTracer()->StartEvent("Object Pass");
+	zeGraphics->GetEventTracer()->StartEvent("Particle Pass");
 
 	bool Done = false;
 	ZEUInt PassId = 0;
@@ -251,23 +181,13 @@ void ZERenderStageForward::Process(ZERenderCommand* RenderCommand)
 	zeGraphics->GetEventTracer()->EndEvent();
 }
 
-ZEUInt32 ZERenderStageForward::GetStageFlags() const
+ZERenderStageParticle::ZERenderStageParticle()
 {
-	return ZE_RENDER_STAGE_FORWARD;
+	ABufferInput = NULL;
+	LastMaterial = 0;
 }
 
-ZERenderStageForward::ZERenderStageForward()
-{	
-	LastMaterial = -1;
-
-	Textures.ABuffer = NULL;
-	RenderTargets.ABuffer = NULL;
-
-	GBufferInput = NULL;
-	LightBufferInput = NULL;
-}
-
-ZERenderStageForward::~ZERenderStageForward()
+ZERenderStageParticle::~ZERenderStageParticle()
 {
-	DestroyBuffers();
+
 }

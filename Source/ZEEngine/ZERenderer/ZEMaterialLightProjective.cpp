@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaterialProjectiveLight.cpp
+ Zinek Engine - ZEMaterialLightProjective.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,20 +35,21 @@
 
 #include "ZECamera.h"
 #include "ZECanvas.h"
+#include "ZEMath/ZEMath.h"
 #include "ZERenderStage.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEGraphics/ZEShader.h"
+#include "ZEDS/ZEHashGenerator.h"
+#include "ZEGraphics/ZETexture2D.h"
 #include "ZEGraphics/ZETextureCube.h"
-#include "ZEMaterialProjectiveLight.h"
+#include "ZEMaterialLightProjective.h"
 #include "ZEGraphics/ZEShaderCompiler.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEShaderCompileOptions.h"
-#include "ZEGraphics/ZETexture2D.h"
-#include "ZEDS/ZEHashGenerator.h"
 
-void ZEMaterialProjectiveLight::UpdateShaders()
+void ZEMaterialLightProjective::UpdateShaders()
 {
 	ZEShaderCompileOptions Compileoptions;
 
@@ -70,7 +71,7 @@ void ZEMaterialProjectiveLight::UpdateShaders()
 	}
 }
 
-void ZEMaterialProjectiveLight::UpdateBuffers()
+void ZEMaterialLightProjective::UpdateBuffers()
 {
 	if (Transformations == NULL)
 	{
@@ -89,20 +90,20 @@ void ZEMaterialProjectiveLight::UpdateBuffers()
 	}
 }
 
-void ZEMaterialProjectiveLight::DestroyShaders()
+void ZEMaterialLightProjective::DestroyShaders()
 {
 	ZE_DESTROY(VertexShader);
 	ZE_DESTROY(PixelShader);
 }
 
-void ZEMaterialProjectiveLight::DestroyBuffers()
+void ZEMaterialLightProjective::DestroyBuffers()
 {
 	ZE_DESTROY(Transformations);
 	ZE_DESTROY(LightParameters);
 	ZE_DESTROY(ShadowParameters);
 }
 
-bool ZEMaterialProjectiveLight::SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+bool ZEMaterialLightProjective::SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	UpdateMaterial();
 
@@ -130,7 +131,6 @@ bool ZEMaterialProjectiveLight::SetupLightingPass(const ZERenderStage* Stage, co
 		ZEMatrix4x4		ProjectionMatrix;
 	};
 
-	// VS parameters
 	ProjectiveLightTransformations* Transforms = NULL;
 	Transformations->Lock((void**)&Transforms);
 	
@@ -144,7 +144,6 @@ bool ZEMaterialProjectiveLight::SetupLightingPass(const ZERenderStage* Stage, co
 	
 	Transformations->Unlock();
 	
-	// PS parameters
 	ProjectiveLightParameters* Parameters = NULL;
 	LightParameters->Lock((void**)&Parameters);
 	
@@ -188,8 +187,8 @@ bool ZEMaterialProjectiveLight::SetupLightingPass(const ZERenderStage* Stage, co
 	BlendState.SetDestinationBlendOption(ZE_BO_ONE);
 	BlendState.SetSourceBlendAlphaOption(ZE_BO_ONE);
 	BlendState.SetDestinationBlendAlphaOption(ZE_BO_ONE);
-	BlendState.SetColorChannelMask(0, ZE_CCM_NONE);
-	BlendState.SetColorChannelMask(1, ZE_CCM_NONE);
+	BlendState.SetComponentWriteMask(0, ZE_CM_NONE);
+	BlendState.SetComponentWriteMask(1, ZE_CM_NONE);
 	
 	ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetZWriteEnable(false);
@@ -200,7 +199,6 @@ bool ZEMaterialProjectiveLight::SetupLightingPass(const ZERenderStage* Stage, co
 	DepthStencilState.SetFrontZFail(ZE_SO_REPLACE);
 	DepthStencilState.SetFrontStencilFail(ZE_SO_KEEP);
 	DepthStencilState.SetFrontStencilPass(ZE_SO_KEEP);
-	DepthStencilState.SetStencilReferance(StencilMask++);
 
 	Device->SetVertexShader(VertexShader);
 	Device->SetPixelShader(PixelShader);
@@ -210,49 +208,50 @@ bool ZEMaterialProjectiveLight::SetupLightingPass(const ZERenderStage* Stage, co
 
 	Device->SetBlendState(BlendState);
 	Device->SetRasterizerState(RasterizerState);
-	Device->SetDepthStencilState(DepthStencilState);
+	Device->SetDepthStencilState(DepthStencilState, StencilMask++);
 	
 	Device->SetPixelShaderSampler(5, SamplerState);
 	Device->SetPixelShaderTexture(5, ProjectionTexture);
 
-	Device->Draw(ZE_PT_TRIANGLE_LIST, 18, 0);  // Cone 2
+	Device->Draw(ZE_PT_TRIANGLE_LIST, 18, 0);
 	
 	RasterizerState.SetCullDirection(ZE_CD_CLOCKWISE);
-	Device->SetRasterizerState(RasterizerState);
-
+	
 	BlendState.SetBlendEnable(0, true);
 	BlendState.SetBlendEnable(1, true);
-	BlendState.SetColorChannelMask(0 , ZE_CCM_ALL);
-	BlendState.SetColorChannelMask(1 , ZE_CCM_ALL);
-	Device->SetBlendState(BlendState);
-
+	BlendState.SetComponentWriteMask(0 , ZE_CM_ALL);
+	BlendState.SetComponentWriteMask(1 , ZE_CM_ALL);
+	
 	DepthStencilState.SetZFunction(ZE_CF_GREATER);
 	DepthStencilState.SetFrontStencilFunction(ZE_CF_NOT_EQUAL);
 	DepthStencilState.SetFrontZFail(ZE_SO_KEEP);
-	Device->SetDepthStencilState(DepthStencilState);
 
-	Device->Draw(ZE_PT_TRIANGLE_LIST, 18, 0);  // Cone 2
+	Device->SetBlendState(BlendState);
+	Device->SetRasterizerState(RasterizerState);
+	Device->SetDepthStencilState(DepthStencilState);
 
 	return true;
 }
 
-ZEUInt32 ZEMaterialProjectiveLight::GetHash() const
+ZESize ZEMaterialLightProjective::GetHash() const
 {
-	return ZEHashGenerator::Hash(ZEString("ZEMaterialProjectiveLight"));
+	return ZEHashGenerator::Hash(ZEString("ZEMaterialLightProjective"));
 }
 
-ZEMaterialFlags ZEMaterialProjectiveLight::GetMaterialFlags() const
+ZEMaterialFlags ZEMaterialLightProjective::GetMaterialFlags() const
 {
-	return ZE_MTF_L_BUFFER_PASS;
+	return ZE_MTF_LIGHTING_PASS;
 }
 
-void ZEMaterialProjectiveLight::UpdateMaterial()
+void ZEMaterialLightProjective::UpdateMaterial()
 {
 	UpdateShaders();
 	UpdateBuffers();
+
+	StencilMask = ZEMath::Circular(StencilMask, (ZEUInt32)0, (ZEUInt32)255);
 }
 
-bool ZEMaterialProjectiveLight::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+bool ZEMaterialLightProjective::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	if ((Stage->GetStageFlags() & ZE_RENDER_STAGE_LIGHTING) == 0)
 		return true;
@@ -260,13 +259,15 @@ bool ZEMaterialProjectiveLight::SetupPass(ZEUInt PassId, const ZERenderStage* St
 	return SetupLightingPass(Stage, RenderCommand);
 }
 
-ZEMaterialProjectiveLight* ZEMaterialProjectiveLight::CreateInstance()
+ZEMaterialLightProjective* ZEMaterialLightProjective::CreateInstance()
 {
-	return new ZEMaterialProjectiveLight();
+	return new ZEMaterialLightProjective();
 }
 
-ZEMaterialProjectiveLight::ZEMaterialProjectiveLight()
+ZEMaterialLightProjective::ZEMaterialLightProjective()
 {
+	StencilMask = 1.0f;
+
 	VertexShader = NULL;
 	PixelShader = NULL;
 	Transformations = NULL;
@@ -283,7 +284,7 @@ ZEMaterialProjectiveLight::ZEMaterialProjectiveLight()
 	SamplerState.SetBorderColor(ZEVector4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-ZEMaterialProjectiveLight::~ZEMaterialProjectiveLight()
+ZEMaterialLightProjective::~ZEMaterialLightProjective()
 {
 	DestroyBuffers();
 	DestroyShaders();

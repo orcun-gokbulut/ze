@@ -199,7 +199,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 
 				RenderCommand->Priority = 2;
 				RenderCommand->Order = 1;
-				RenderCommand->Flags |= (ZE_RCF_ENABLE_WORLD_TRANSFORM | ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_RCF_ENABLE_Z_CULLING);
+				RenderCommand->Flags |= (ZE_RCF_WORLD_TRANSFORM | ZE_RCF_VIEW_PROJECTION_TRANSFORM | ZE_RCF_Z_CULL);
 				RenderCommand->Material = Material;
 				RenderCommand->WorldMatrix = WorldTransform;
 				RenderCommand->FirstVertex = (ZEUInt)VertexIndex;

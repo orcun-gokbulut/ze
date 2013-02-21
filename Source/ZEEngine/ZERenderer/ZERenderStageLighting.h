@@ -58,12 +58,7 @@ class ZELightOmniProjective;
 class ZERenderStageLighting : public ZERenderStage
 {
 	protected:
-		ZELightType						LastLight;
-
 		const ZERenderStageGeometry*	GBufferInput;
-		//ZESmartArray<ZELight*>*		LightList;
-		//ZEUInt32						StencilMask;
-		//ZEVertexBuffer*				VertexBuffer;
 
 		struct
 		{
@@ -79,60 +74,11 @@ class ZERenderStageLighting : public ZERenderStage
 
 		} RenderTargets;
 
-		/*
-		struct
-		{
-			ZEShader*					VertexShader;
-			ZEShader*					PixelShader;
-			ZEConstantBuffer*			Transformations;
-			ZEConstantBuffer*			LightParameters;
-			ZEConstantBuffer*			ShadowParameters;
-
-		} PointLight;
-
-		struct
-		{
-			ZEShader*					VertexShader;
-			ZEShader*					PixelShader;
-			ZEConstantBuffer*			Transformations;
-			ZEConstantBuffer*			LightParameters;
-			ZEConstantBuffer*			ShadowParameters;
-
-		} DirectionalLight;
-
-		struct
-		{
-			ZEShader*					VertexShader;
-			ZEShader*					PixelShader;
-			ZEConstantBuffer*			Transformations;
-			ZEConstantBuffer*			LightParameters;
-			ZEConstantBuffer*			ShadowParameters;
-
-		} ProjectiveLight;
-
-		struct
-		{
-			ZEShader*					VertexShader;
-			ZEShader*					PixelShader;
-			ZEConstantBuffer*			Transformations;
-			ZEConstantBuffer*			LightParameters;
-			ZEConstantBuffer*			ShadowParameters;
-
-		} OmniProjectiveLight;
-		*/
-		void							UpdateShaders();
-		void							DestroyShaders();
-
 		void							UpdateBuffers();
 		void							DestroyBuffers();
 
 		void							ResetStageDefaults();
 		void							CommitStageDefaults();
-
-		void							RenderPointLight(const ZELightPoint* Light);
-		void							RenderProjectiveLight(const ZELightProjective* Light);
-		void							RenderDirectionalLight(const ZELightDirectional* Light);
-		void							RenderOmniProjectiveLight(const ZELightOmniProjective* Light);
 
 	public:
 		ZEUInt32						GetStageFlags() const;

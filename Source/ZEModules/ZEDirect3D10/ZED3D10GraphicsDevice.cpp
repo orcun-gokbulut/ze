@@ -135,25 +135,31 @@ void ZED3D10GraphicsDevice::ApplyStates()
 		// Blend State
 		// ----------------------------------------------------------
 		CurrentState.BlendState.UpdateHash();
-		if (CurrentState.BlendState.Hash != OldState.BlendState.Hash)
+		if (CurrentState.BlendState.Hash != OldState.BlendState.Hash || 
+			CurrentState.ComponentBlendMask != OldState.ComponentBlendMask || 
+			CurrentState.ComponentBlendFactors != OldState.ComponentBlendFactors)
 		{
 			//static const ZEVector4 BlendFactor = ZEVector4::One;
 
 			ID3D10BlendState* D3D10State = ZED3D10StatePool::GetBlendState(&CurrentState.BlendState);
-			D3D10Device->OMSetBlendState(D3D10State, NULL, 0xFFFFFFFF);
+			D3D10Device->OMSetBlendState(D3D10State, CurrentState.ComponentBlendFactors.M, CurrentState.ComponentBlendMask.Value);
 
 			OldState.BlendState = CurrentState.BlendState;
+			CurrentState.ComponentBlendMask = OldState.ComponentBlendMask;
+			CurrentState.ComponentBlendFactors = OldState.ComponentBlendFactors;
 		}
 
 		// Depth Stencil State
 		// ----------------------------------------------------------
 		CurrentState.DepthStencilState.UpdateHash();
-		if (CurrentState.DepthStencilState.Hash != OldState.DepthStencilState.Hash)
+		if (CurrentState.DepthStencilState.Hash != OldState.DepthStencilState.Hash || 
+			CurrentState.StencilReferance != OldState.StencilReferance)
 		{
 			ID3D10DepthStencilState* D3D10State = ZED3D10StatePool::GetDepthStencilState(&CurrentState.DepthStencilState);
-			D3D10Device->OMSetDepthStencilState(D3D10State, CurrentState.DepthStencilState.GetStencilReferance());
+			D3D10Device->OMSetDepthStencilState(D3D10State, CurrentState.StencilReferance);
 
 			OldState.DepthStencilState = CurrentState.DepthStencilState;
+			CurrentState.StencilReferance = OldState.StencilReferance;
 		}
 	}
 	

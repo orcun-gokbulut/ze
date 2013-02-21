@@ -42,6 +42,7 @@
 #include "ZESamplerState.h"
 #include "ZERasterizerState.h"
 #include "ZEDepthStencilState.h"
+#include "ZETypes.h"
 
 class ZEShader;
 class ZETexture;
@@ -125,24 +126,29 @@ class ZEGraphicsDeviceState
 		ZEShader*						VertexShader;
 		ZEConstantBuffer*				VertexShaderBuffers[ZE_MAX_BUFFER_SLOT];
 		const ZETexture*				VertexShaderTextures[ZE_MAX_TEXTURE_SLOT];
-		ZESamplerState			VertexShaderSamplers[ZE_MAX_SAMPLER_SLOT];
+		ZESamplerState					VertexShaderSamplers[ZE_MAX_SAMPLER_SLOT];
 
 		ZEShader*						GeometryShader;
 		ZEConstantBuffer*				GeometryShaderBuffers[ZE_MAX_BUFFER_SLOT];
 		const ZETexture*				GeometryShaderTextures[ZE_MAX_TEXTURE_SLOT];
-		ZESamplerState			GeometryShaderSamplers[ZE_MAX_SAMPLER_SLOT];
+		ZESamplerState					GeometryShaderSamplers[ZE_MAX_SAMPLER_SLOT];
 
-		ZERasterizerState			RasterizerState;
+		ZERasterizerState				RasterizerState;
 		ZEViewport						ViewPorts[ZE_MAX_VIEWPORT_SLOT];
 		ZEScissorRectangle				ScissorRectangles[ZE_MAX_SCISSOR_SLOT];
 		
 		ZEShader*						PixelShader;
 		ZEConstantBuffer*				PixelShaderBuffers[ZE_MAX_BUFFER_SLOT];
 		const ZETexture*				PixelShaderTextures[ZE_MAX_TEXTURE_SLOT];
-		ZESamplerState			PixelShaderSamplers[ZE_MAX_SAMPLER_SLOT];
+		ZESamplerState					PixelShaderSamplers[ZE_MAX_SAMPLER_SLOT];
 
-		ZEBlendState				BlendState;
-		ZEDepthStencilState		DepthStencilState;
+		ZEBlendState					BlendState;
+		ZEComponentMask					ComponentBlendMask;
+		ZEVector4						ComponentBlendFactors;
+
+		ZEDepthStencilState				DepthStencilState;
+		ZEUInt32						StencilReferance;
+
 		const ZERenderTarget*			RenderTargets[ZE_MAX_RENDER_TARGET_SLOT];
 		const ZEDepthStencilBuffer*		DepthStencilBuffer;
 		bool							ScreenWriteEnable;

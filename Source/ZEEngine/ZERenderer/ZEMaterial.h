@@ -43,13 +43,15 @@
 typedef ZEUInt32 ZEMaterialFlags;
 #define ZE_MTF_NONE						0
 #define ZE_MTF_PRE_Z_PASS				1
-#define ZE_MTF_G_BUFFER_PASS			2
+#define ZE_MTF_GEOMETRY_PASS			2
 #define ZE_MTF_SHADOW_PASS				4
-#define ZE_MTF_L_BUFFER_PASS			8
+#define ZE_MTF_LIGHTING_PASS			8
 #define ZE_MTF_FORWARD_PASS				16
-#define ZE_MTF_SUPPORTS_SKINNING		32
-#define ZE_MTF_SUPPORTS_MORPHING		64
-#define ZE_MTF_SUPPORTS_INSTANCING		128
+#define ZE_MTF_PARTICLE_PASS			32
+#define ZE_MTF_SUPPORTS_SKINNING		64
+#define ZE_MTF_SUPPORTS_MORPHING		128
+#define ZE_MTF_SUPPORTS_INSTANCING		256
+#define ZE_MTF_USER_INTERFACE_PASS		512
 
 enum ZEMaterialTransparancyMode
 {
@@ -105,7 +107,7 @@ class ZEMaterial : public ZEObject
 		virtual void				AdvanceAnimation(float TimeElapsed);
 		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		virtual ZEUInt32			GetHash() const = 0;
+		virtual ZESize				GetHash() const = 0;
 		virtual ZEMaterialFlags		GetMaterialFlags() const = 0;
 };
 

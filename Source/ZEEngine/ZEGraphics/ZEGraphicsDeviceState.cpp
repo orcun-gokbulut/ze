@@ -215,7 +215,11 @@ void ZEGraphicsDeviceState::SetToDefault()
 		ScissorRectangles[I].SetZero();
 
 	BlendState.SetToDefault();
+	ComponentBlendMask = ZE_CM_ALL;
+	ComponentBlendFactors = ZEVector4::One;
+
 	DepthStencilState.SetToDefault();
+	StencilReferance = 0;
 
 	for (ZESize I = 0; I < ZE_MAX_RENDER_TARGET_SLOT; ++I)
 		RenderTargets[I] = NULL;

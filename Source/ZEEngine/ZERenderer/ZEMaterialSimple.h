@@ -78,7 +78,7 @@ class ZEMaterialSimple : public ZEMaterial
 		void						ReleaseShaders();
 
 	public:
-		ZEUInt32					GetHash() const;
+		ZESize						GetHash() const;
 		ZEMaterialFlags				GetMaterialFlags() const;
 
 		void						SetTwoSided(bool Enable);

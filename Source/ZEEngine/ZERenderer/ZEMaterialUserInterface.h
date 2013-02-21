@@ -65,7 +65,7 @@ class ZEMaterialUserInterface : public ZEMaterial
 		void					DestroyShaders();
 
 	public:
-		ZEUInt32				GetHash() const;
+		ZESize					GetHash() const;
 		ZEMaterialFlags			GetMaterialFlags() const;
 
 		void					SetWireFrame(bool Enabled);

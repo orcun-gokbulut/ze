@@ -53,6 +53,7 @@
 #include "ZERenderStageGeometry.h"
 #include "ZERenderStageTransparent.h"
 #include "ZERenderStagePostProcess.h"
+#include "ZERenderStageParticle.h"
 
 static ZEInt RenderCommandCompare(ZERenderCommand* const* A, ZERenderCommand* const* B)
 {
@@ -97,10 +98,43 @@ static ZEInt LightCompare(ZELight* const* A, ZELight* const* B)
 	}
 }
 
+// __forceinline bool ZECommandBuffer::CheckBufferFull(ZESize Size) const
+// {
+// 				
+// }
+// 
+// __forceinline bool ZECommandBuffer::ReadCommand(ZEUInt32* Marker, void* Data, ZESize* Size)
+// {
+// 
+// }
+// 
+// __forceinline bool ZECommandBuffer::WriteCommand(ZEUInt32 Marker, const void* Data, ZESize Size)
+// {
+// 
+// }
+// 
+// ZECommandBuffer::ZECommandBuffer()
+// {
+// 	BufferPointer = 0;
+// 	RenderEndMarker = 0;
+// 	RenderStartMarker = 0;
+// 
+// 	CommandBuffer = new ZEUInt8[ZE_COMMAND_BUFFER_SIZE];
+// }
+// 
+// ZECommandBuffer::~ZECommandBuffer()
+// {
+// 	if (CommandBuffer)
+// 	{
+// 		delete [] CommandBuffer;
+// 		CommandBuffer = NULL;
+// 	}
+// }
+
 bool ZERenderer::Initialize() 
 {
 	GeometryStage = new ZERenderStageGeometry();
-	
+
 	ShadowStage = new ZERenderStageShadow();
 
 	LightingStage = new ZERenderStageLighting();
@@ -109,6 +143,9 @@ bool ZERenderer::Initialize()
 	ForwardStage = new ZERenderStageForward();
 	ForwardStage->SetGBufferInput(GeometryStage);
 	ForwardStage->SetLBufferInput(LightingStage);
+
+	ParticleStage = new ZERenderStageParticle();
+	ParticleStage->SetABufferInput(ForwardStage);
 
 	return true;
 }
@@ -136,7 +173,7 @@ void ZERenderer::DoGeomtryPass()
 	
 	GeometryStage->Setup();
 	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
-		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS)
+		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_GEOMETRY_PASS)
 			GeometryStage->Process(CommandList[I]);
 	
 	Tracer->EndEvent();
@@ -164,7 +201,7 @@ void ZERenderer::DoLightingPass()
 	
 	LightingStage->Setup();
 	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
-		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_L_BUFFER_PASS)
+		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_LIGHTING_PASS)
 			LightingStage->Process(CommandList[I]);
 	
 	Tracer->EndEvent();
@@ -180,6 +217,20 @@ void ZERenderer::DoForwardPass()
 	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
 		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_FORWARD_PASS)
 			ForwardStage->Process(CommandList[I]);
+	
+	Tracer->EndEvent();
+}
+
+void ZERenderer::DoParticlePass()
+{
+	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+
+	Tracer->StartEvent("Particle Stage");
+	
+	ParticleStage->Setup();
+	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
+		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_PARTICLE_PASS)
+			ParticleStage->Process(CommandList[I]);
 	
 	Tracer->EndEvent();
 }
@@ -249,6 +300,7 @@ void ZERenderer::Render(float ElaspedTime)
 	DoGeomtryPass();
 	DoLightingPass();
 	DoForwardPass();
+	DoParticlePass();
 	DoTransparentPass();
 	DoPostProcessPass();
 	DoUserInterfacePass();
@@ -264,7 +316,7 @@ ZERenderer* ZERenderer::CreateInstance()
 }
 
 ZERenderer::ZERenderer()
-{	
+{
 	GeometryStage = NULL;
 	LightingStage = NULL;
 	ForwardStage = NULL;

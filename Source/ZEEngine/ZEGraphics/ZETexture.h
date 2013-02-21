@@ -97,7 +97,6 @@ enum ZETexturePixelFormat
 
 	ZE_TPF_L16		= ZE_TPF_I16,
 	ZE_TPF_LA16		= ZE_TPF_I16_2
-
 };
 
 class ZETexture

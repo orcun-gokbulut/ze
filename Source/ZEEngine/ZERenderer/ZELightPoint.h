@@ -33,22 +33,22 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef	__ZE_POINT_LIGHT_H__
-#define __ZE_POINT_LIGHT_H__
+#ifndef	__ZE_LIGHT_POINT_H__
+#define __ZE_LIGHT_POINT_H__
 
 #include "ZELight.h"
 #include "ZERenderCommand.h"
 #include "ZEMath/ZEViewSphere.h"
 
 class ZETexture2D;
-class ZEMaterialPointLight;
+class ZEMaterialLightPoint;
 
 class ZELightPoint  : public ZELight
 {
 	private:
 		ZEViewSphere					ViewVolume;
 
-		ZEMaterialPointLight*			Material;
+		ZEMaterialLightPoint*			Material;
 		ZEVertexBuffer*					Geometry;
 		ZERenderCommand					RenderCommand;
 		

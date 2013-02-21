@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaterialDirectionalLight.h
+ Zinek Engine - ZERenderStageParticle.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
-#ifndef __ZE_MATERIAL_DIRECTIONAL_LIGHT_H__
-#define __ZE_MATERIAL_DIRECTIONAL_LIGHT_H__
+#ifndef __ZE_RENDER_STAGE_PARTICLE_H__
+#define __ZE_RENDER_STAGE_PARTICLE_H__
 
 #include "ZETypes.h"
-#include "ZEMaterialLight.h"
+#include "ZERenderStage.h"
 
-class ZEShader;
-class ZERenderStage;
-class ZEVertexBuffer;
+class ZETexture2D;
+class ZERenderTarget;
 class ZERenderCommand;
-class ZEConstantBuffer;
+class ZERenderStageForward;
 
-class ZEMaterialDirectionalLight : public ZEMaterialLight
+class ZERenderStageParticle : public ZERenderStage
 {
-	friend class ZELightDirectional;
-
 	protected:
-		ZEShader*							VertexShader;
-		ZEShader*							PixelShader;
-		ZEConstantBuffer*					Transformations;
-		ZEConstantBuffer*					LightParameters;
-		ZEConstantBuffer*					ShadowParameters;
+		ZESize							LastMaterial;
 
-		void								UpdateShaders();
-		void								UpdateBuffers();
+		const ZERenderStageForward*		ABufferInput;
 
-		void								DestroyShaders();
-		void								DestroyBuffers();
+		void							ResetStageDefaults();
+		void							CommitStageDefaults();
 
-		bool								SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
-
-											ZEMaterialDirectionalLight();
-		virtual								~ZEMaterialDirectionalLight();
+		void							UpdateBuffers();
+		void							DestroyBuffers();
 
 	public:
-		virtual ZEUInt32					GetHash() const;
-		virtual ZEMaterialFlags				GetMaterialFlags() const;
-
-		virtual void						UpdateMaterial();
-		virtual bool						SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
-
-		static ZEMaterialDirectionalLight*	CreateInstance();
+		ZEUInt32						GetStageFlags() const;
+		
+		void							SetABufferInput(const ZERenderStageForward* Input);
+		const ZERenderStageForward*		GetABufferInput() const;
+		
+		void							Setup();
+		void							Process(ZERenderCommand* RenderCommand);
+		
+										ZERenderStageParticle();
+		virtual							~ZERenderStageParticle();
 };
 
 #endif

@@ -45,7 +45,10 @@
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZERenderTarget.h"
+#include "ZEMaterialLightDirectional.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEMaterial.h"
+#include "ZECanvas.h"
 
 
 void ZELightDirectional::UpdateCascades()
@@ -330,28 +333,21 @@ const ZEViewVolume& ZELightDirectional::GetViewVolume(ZESize Index)
 	return Cascades[Index].ViewVolume;
 }
 
-void ZELightDirectional::Draw(ZEDrawParameters* DrawParameters)
-{
-	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
-		return;
-
-	ZELight::Draw(DrawParameters);
-
-	if (!ShadowCaster)
-		return;
-
-	UpdateRenderTargets();
-	UpdateCascades();
-}
-
 bool ZELightDirectional::Initialize()
 {
 	if (GetInitialized())
-		return false;
-	
-	ZEEntity::Initialize();
+		return true;
 
-	return true;
+	ZECanvas Canvas;
+	Canvas.AddQuad(	ZEVector3( 1.0f,  1.0f, 1.0f),
+					ZEVector3(-1.0f,  1.0f, 1.0f),
+					ZEVector3(-1.0f, -1.0f, 1.0f),
+					ZEVector3( 1.0f, -1.0f, 1.0f));
+	Geometry = Canvas.CreateStaticVertexBuffer();
+
+	Material = ZEMaterialLightDirectional::CreateInstance();
+
+	return ZEEntity::Initialize();
 }
 
 void ZELightDirectional::Deinitialize()
@@ -362,6 +358,41 @@ void ZELightDirectional::Deinitialize()
 	DestroyRenderTargets();
 }
 
+void ZELightDirectional::Tick(float Time)
+{
+	// Update material and render command
+	Material->LightCaster = true;
+	Material->LightReciever = false;
+	Material->ShadowCaster = ShadowCaster;
+	Material->ShadowReciver = false;
+	Material->Color = Color;
+	Material->Intensity = Intensity;
+	Material->WorldFront = GetWorldFront();
+	
+	RenderCommand.Order = 3.0f;
+	RenderCommand.Priority = 3;
+	RenderCommand.Flags = 0;
+	RenderCommand.FirstVertex = 0;
+	RenderCommand.Material = Material;
+	RenderCommand.Pipeline = ZE_RP_3D;
+	RenderCommand.PrimitiveCount = 2;
+	RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
+	RenderCommand.VertexBuffers[0] = Geometry;
+}
+
+void ZELightDirectional::Draw(ZEDrawParameters* DrawParameters)
+{
+	DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
+
+	/*
+	if (!ShadowCaster)
+		return;
+
+	UpdateRenderTargets();
+	UpdateCascades();
+	*/
+}
+
 ZELightDirectional::ZELightDirectional()
 {
 	Type = ZE_LT_DIRECTIONAL;
@@ -369,9 +400,9 @@ ZELightDirectional::ZELightDirectional()
 	CascadeCount = 1;
 	CascadeSplitBias = 0.8f;
 
-	ShadowSlopeScaledBias = 0.4f;
-	ShadowDepthScaledBias = 0.6f;
-	
+	SlopeScaledBias = 0.4f;
+	DepthScaledBias = 0.6f;
+
 	for (ZESize I = 0; I < ZE_DL_MAX_CASCADE_COUNT; ++I)
 	{
 		Cascades[I].Index = (ZEUInt)I;
@@ -381,6 +412,9 @@ ZELightDirectional::ZELightDirectional()
 		Cascades[I].ShadowTransform = ZEMatrix4x4::Identity;
 		Cascades[I].NearZ = Cascades[I].FarZ = Cascades[I].Depth = 0.0f;
 	}
+
+	Material = NULL;
+	Geometry = NULL;
 }
 
 ZELightDirectional::~ZELightDirectional()

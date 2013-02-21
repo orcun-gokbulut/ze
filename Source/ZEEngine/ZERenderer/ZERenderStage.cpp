@@ -43,36 +43,44 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEgraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEConstantBuffer.h"
+#include "ZECore/ZECore.h"
+#include "ZECore/ZERealTimeClock.h"
 
 struct ZEPipelineConstants
 {
-	float			Time_0_N;
-	float			Sin_Time_0_N;
-	float			Cos_Time_0_N;
-	float			Tan_Time_0_N;
-	float			Time_0_1;
-	float			Sin_Time_0_1;
-	float			Cos_Time_0_1;
-	float			Tan_Time_0_1;
+	float			Time0toN;
+	float			SinTime0toN;
+	float			CosTime0toN;
+	float			TanTime0toN;
+	
+	float			Time0to1;
+	float			SinTime0to1;
+	float			CosTime0to1;
+	float			TanTime0to1;
+	
 	float			Fov;
-	ZEVector2		Near_Far_Z;
-	float			Aspect_Ratio;
-	ZEVector3		Camera_Pos;
-	float			Dummy0;
-	ZEVector3		Camera_World_Up;
+	ZEVector2		NearFarZ;
+	float			AspectRatio;
+	
+	ZEVector3		CameraWorldPos;
+	float			ElapsedTime;
+	ZEVector3		CameraWorldUp;
 	float			Dummy1;
-	ZEVector3		Camera_World_Front;
+	ZEVector3		CameraWorldFront;
 	float			Dummy2;
-	ZEVector3		Camera_World_Right;
+	ZEVector3		CameraWorldRight;
 	float			Dummy3;
-	ZEVector2		Viewport_Width_Height;
-	ZEVector2		Inv_Viewport_Width_Height;
-	ZEMatrix4x4		View_Matrix;
-	ZEMatrix4x4		Proj_Matrix;
-	ZEMatrix4x4		Inv_View_Matrix;
-	ZEMatrix4x4		Inv_Proj_Matrix;
-	ZEMatrix4x4		View_Proj_Matrix;
-	ZEMatrix4x4		Inv_View_Proj_Matrix;
+
+	ZEVector2		ViewportWidthHeight;
+	ZEVector2		InvViewportWidthHeight;
+	/*
+	ZEMatrix4x4		ViewMatrix;
+	ZEMatrix4x4		ProjMatrix;
+	ZEMatrix4x4		InvViewMatrix;
+	ZEMatrix4x4		InvProjMatrix;
+	ZEMatrix4x4		ViewProjMatrix;
+	ZEMatrix4x4		InvViewProjMatrix;
+	*/
 };
 
 // NOTE: this method assumes primitive type is triangle list only !
@@ -83,7 +91,7 @@ void ZERenderStage::PumpStreams(ZERenderCommand* RenderCommand)
 	Device->SetVertexLayout(RenderCommand->VertexLayout);
 	Device->SetVertexBufferArray(RenderCommand->VertexBuffers);
 
-	if ((RenderCommand->Flags & ZE_RCF_INDEXED) && (RenderCommand->Flags & ZE_RCF_INSTANCED))
+	if ((RenderCommand->Type & ZE_RCT_INDEXED) && (RenderCommand->Type & ZE_RCT_INSTANCED))
 	{
 		ZERenderCommandIndexed* IndexedCommand = (ZERenderCommandIndexed*)RenderCommand;
 		ZERenderCommandInstanced* InstancedCommand = (ZERenderCommandInstanced*)RenderCommand;
@@ -92,14 +100,14 @@ void ZERenderStage::PumpStreams(ZERenderCommand* RenderCommand)
 		Device->DrawIndexedInstanced(RenderCommand->PrimitiveType, IndexedCommand->IndexCount, InstancedCommand->InstanceCount, 
 										IndexedCommand->FirstIndex, IndexedCommand->BaseVertex, InstancedCommand->FirstInstance);
 	}
-	else if (RenderCommand->Flags & ZE_RCF_INDEXED)
+	else if (RenderCommand->Type & ZE_RCT_INDEXED)
 	{
 		ZERenderCommandIndexed* IndexedCommand = (ZERenderCommandIndexed*)RenderCommand;
 
 		Device->SetIndexBuffer(IndexedCommand->IndexBuffer);
 		Device->DrawIndexed(RenderCommand->PrimitiveType, IndexedCommand->IndexCount, IndexedCommand->FirstIndex, IndexedCommand->BaseVertex);
 	}
-	else if (RenderCommand->Flags & ZE_RCF_INSTANCED)
+	else if (RenderCommand->Type & ZE_RCT_INSTANCED)
 	{
 		ZERenderCommandInstanced* InstancedCommand = (ZERenderCommandInstanced*)RenderCommand;
 
@@ -125,9 +133,9 @@ void ZERenderStage::CommitStageDefaults()
 {
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
-	Device->SetVertexShaderBuffer(5, StageBuffer);
-	Device->SetGeometryShaderBuffer(5, StageBuffer);
-	Device->SetPixelShaderBuffer(5, StageBuffer);
+	Device->SetVertexShaderBuffer(13, StageBuffer);
+	Device->SetGeometryShaderBuffer(13, StageBuffer);
+	Device->SetPixelShaderBuffer(13, StageBuffer);
 }
 
 void ZERenderStage::UpdateBuffers()
@@ -156,82 +164,68 @@ void ZERenderStage::UpdateBuffers()
 			{
 				case ZE_PC_TIME_0_1:
 					// TODO: Temp value used
-					BufferData->Time_0_1 = -1.0f;
+					BufferData->Time0to1 = -1.0f;
 					break;
 				case ZE_PC_SIN_TIME_0_1:
 					// TODO: Temp value used
-					BufferData->Sin_Time_0_1 = -1.0f;
+					BufferData->SinTime0to1 = -1.0f;
 					break;
 				case ZE_PC_COS_TIME_0_1:
 					// TODO: Temp value used
-					BufferData->Cos_Time_0_1 = -1.0f;
+					BufferData->CosTime0to1 = -1.0f;
 					break;
 				case ZE_PC_TAN_TIME_0_1:
 					// TODO: Temp value used
-					BufferData->Tan_Time_0_1 = -1.0f;
+					BufferData->TanTime0to1 = -1.0f;
 					break;
 				case ZE_PC_TIME_0_N:
 					// TODO: Temp value used
-					BufferData->Time_0_N = -1.0f;
+					BufferData->Time0toN = -1.0f;
 					break;
 				case ZE_PC_SIN_TIME_0_N:
 					// TODO: Temp value used
-					BufferData->Sin_Time_0_N = -1.0f;
+					BufferData->SinTime0toN = -1.0f;
 					break;
 				case ZE_PC_COS_TIME_0_N:
 					// TODO: Temp value used
-					BufferData->Cos_Time_0_N = -1.0f;
+					BufferData->CosTime0toN = -1.0f;
 					break;
 				case ZE_PC_TAN_TIME_0_N:
 					// TODO: Temp value used
-					BufferData->Tan_Time_0_N = -1.0f;
+					BufferData->TanTime0toN = -1.0f;
 					break;
 				case ZE_PC_FOV:
 					BufferData->Fov = Camera->GetFOV();
 					break;
 				case ZE_PC_NEAR_FAR_Z:
-					BufferData->Near_Far_Z = ZEVector2(Camera->GetNearZ(), Camera->GetFarZ());
+					BufferData->NearFarZ = ZEVector2(Camera->GetNearZ(), Camera->GetFarZ());
 					break;
 				case ZE_PC_ACPECT_RATIO:
-					BufferData->Aspect_Ratio = Camera->GetAspectRatio();
+					BufferData->AspectRatio = Camera->GetAspectRatio();
 					break;
-				case ZE_PC_CAMERA_POS:
-					BufferData->Camera_Pos = Camera->GetWorldPosition();
+				case ZE_PC_CAMERA_WORLD_POS:
+					BufferData->CameraWorldPos = Camera->GetWorldPosition();
 					break;
+				case ZE_PC_ELAPSED_TIME:
+					BufferData->ElapsedTime = (float)zeCore->GetRealTimeClock()->GetFrameDeltaTime() / 1000000.0f;
+					break;
+
 				case ZE_PC_CAMERA_WORLD_UP:
-					BufferData->Camera_World_Up = Camera->GetWorldUp();
+					BufferData->CameraWorldUp = Camera->GetWorldUp();
 					break;
 				case ZE_PC_CAMERA_WORLD_FRONT:
-					BufferData->Camera_World_Front = Camera->GetWorldFront();
+					BufferData->CameraWorldFront = Camera->GetWorldFront();
 					break;
 				case ZE_PC_CAMERA_WORLD_RIGHT:
-					BufferData->Camera_World_Right = Camera->GetWorldRight();
+					BufferData->CameraWorldRight = Camera->GetWorldRight();
 					break;
 				case ZE_PC_VIEWPORT_WIDTH_HEIGHT:
 					// TODO: Multiple view-ports should be supported
-					BufferData->Viewport_Width_Height = ZEVector2((float)zeGraphics->GetScreenWidth(), (float)zeGraphics->GetScreenHeight());
+					BufferData->ViewportWidthHeight = ZEVector2((float)zeGraphics->GetScreenWidth(), (float)zeGraphics->GetScreenHeight());
 					break;
 				case ZE_PC_INV_VIEWPORT_WIDTH_HEIGHT:
 					// TODO: Multiple view-ports should be supported
-					BufferData->Inv_Viewport_Width_Height = ZEVector2(1.0f / (float)zeGraphics->GetScreenWidth(), 1.0f / (float)zeGraphics->GetScreenHeight());
-					break;
-				case ZE_PC_VIEW_MATRIX:
-					BufferData->View_Matrix = Camera->GetViewTransform();
-					break;
-				case ZE_PC_PROJ_MATRIX:
-					BufferData->Proj_Matrix = Camera->GetProjectionTransform();
-					break;
-				case ZE_PC_INV_VIEW_MATRIX:
-					ZEMatrix4x4::Inverse(BufferData->Proj_Matrix, Camera->GetViewTransform());
-					break;
-				case ZE_PC_INV_PROJ_MATRIX:
-					ZEMatrix4x4::Inverse(BufferData->Inv_Proj_Matrix, Camera->GetProjectionTransform());
-					break;
-				case ZE_PC_VIEW_PROJ_MATRIX:
-					BufferData->View_Proj_Matrix = Camera->GetViewProjectionTransform();
-					break;
-				case ZE_PC_INV_VIEW_PROJ_MATRIX:
-					ZEMatrix4x4::Inverse(BufferData->Inv_Proj_Matrix, Camera->GetViewProjectionTransform());
+					BufferData->InvViewportWidthHeight = ZEVector2(1.0f / (float)zeGraphics->GetScreenWidth(), 1.0f / (float)zeGraphics->GetScreenHeight());
 					break;
 			}
 		}

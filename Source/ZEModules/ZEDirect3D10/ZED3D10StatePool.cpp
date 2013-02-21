@@ -239,7 +239,7 @@ ID3D10BlendState* ZED3D10StatePool::CreateD3D10BlendState(const ZEBlendState* Bl
 	for (ZESize I = 0; I < ZE_MAX_RENDER_TARGET_SLOT; ++I)
 	{
 		BlendDesc.BlendEnable[I] = BlendState->GetBlendEnable(I);
-		BlendDesc.RenderTargetWriteMask[I] = BlendState->GetColorChannelMask(I);
+		BlendDesc.RenderTargetWriteMask[I] = BlendState->GetComponentWriteMask(I);
 	}
 
 	ID3D10BlendState* D3D10State = NULL;

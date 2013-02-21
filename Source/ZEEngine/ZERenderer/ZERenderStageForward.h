@@ -75,7 +75,8 @@ class ZERenderStageForward : public ZERenderStage
 	public:
 		ZEUInt32						GetStageFlags() const;
 		
-		const ZETexture2D*				GetABuffer() const;
+		const ZETexture2D*				GetABufferTexture() const;
+		const ZERenderTarget*			GetABufferRenderTarget() const;
 		
 		void							SetGBufferInput(const ZERenderStageGeometry* Input);
 		const ZERenderStageGeometry*	GetGBufferInput() const;

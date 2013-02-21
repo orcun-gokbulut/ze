@@ -38,73 +38,124 @@
 #define __ZE_RENDER_COMMAND_H__
 
 #include "ZETypes.h"
+#include "ZEDS/ZEFlags.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEGraphics/ZEVertexLayout.h"
 #include "ZEGraphics/ZERasterizerState.h"
+#include "ZEGraphics/ZEGraphicsDeviceState.h"
 
 enum ZERenderPipeline
 {
-	ZE_RP_NONE	= 0,
-	ZE_RP_3D	= 1,
-	ZE_RP_2D	= 2
+	ZE_RP_NONE		= 0,
+	ZE_RP_3D		= 1,
+	ZE_RP_2D		= 2
 };
 
-// ZERenderCommandFlags
+#define ZE_RCT_DEFAULT						1
+#define ZE_RCT_INDEXED						2
+#define ZE_RCT_INSTANCED					4
+#define ZE_RCT_SKINNED						8
+#define ZE_RCT_LIGHT						16
+#define ZE_RCT_SHADOW						32
+#define ZE_RCT_TERRAIN						64
+#define ZE_RCT_PARTICLE						128
+typedef ZEUInt32 ZERenderCommandType;
+
+#define	ZE_RCF_NONE							0
+#define	ZE_RCF_Z_CULL						1
+#define	ZE_RCF_NO_Z_WRITE					2
+#define	ZE_RCF_WORLD_TRANSFORM				4
+#define ZE_RCF_VIEW_TRANSFORM				8
+#define ZE_RCF_PROJECTION_TRANSFORM			16
+#define	ZE_RCF_VIEW_PROJECTION_TRANSFORM	(ZE_RCF_VIEW_TRANSFORM | ZE_RCF_PROJECTION_TRANSFORM)
 typedef ZEUInt32 ZERenderCommandFlags;
-#define	ZE_RCF_NONE									0
-#define	ZE_RCF_ENABLE_Z_CULLING						4
-#define	ZE_RCF_ENABLE_NO_Z_WRITE					8
-#define	ZE_RCF_ENABLE_WORLD_TRANSFORM				16
-#define ZE_RCF_ENABLE_VIEW_TRANSFORM				32
-#define ZE_RCF_ENABLE_PROJECTION_TRANSFORM			64
-#define	ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM		(ZE_RCF_ENABLE_VIEW_TRANSFORM | ZE_RCF_ENABLE_PROJECTION_TRANSFORM)
-#define ZE_RCF_INSTANCED							128
-#define ZE_RCF_SKINNED								256
-#define ZE_RCF_INDEXED								512
-#define ZE_RCF_SHADOWED								2048
 
 class ZELight;
 class ZEMaterial;
 class ZEIndexBuffer;
 class ZEVertexBuffer;
 class ZEVertexLayout;
+class ZERenderTarget;
 
+/************************************************************************/
+/*                        RENDER COMMAND TEST                           */
+/************************************************************************/
+
+class ZERenderCommandTest
+{
+	public:
+		ZERenderCommandType		Type;
+		float					Order;
+		ZEInt32					Priority;
+
+		ZEMaterial*				Material;
+
+		ZEPrimitiveType			PrimitiveType;
+		ZEUInt32				PrimitiveCount;
+
+		ZEUInt32				FirstVertex;
+		ZEVertexLayout*			VertexLayout;
+		ZEVertexBuffer*			VertexBuffers[ZE_MAX_VERTEX_BUFFER_SLOT];
+
+								ZERenderCommandTest();
+								~ZERenderCommandTest();
+};
+
+class ZERenderCommandIndexedTest : public ZERenderCommandTest
+{
+	public:
+		ZEUInt32				BaseVertex;
+		ZEUInt32				FirstIndex;
+		ZEUInt32				IndexCount;
+		ZEIndexBuffer*			IndexBuffer;
+
+								ZERenderCommandIndexedTest();
+								~ZERenderCommandIndexedTest();
+};
+
+class  ZERenderCommandInstancedTest : public ZERenderCommandTest
+{
+	public:
+		ZEUInt32				InstanceCount;
+		ZEUInt32				FirstInstance;
+
+								ZERenderCommandInstancedTest();
+								~ZERenderCommandInstancedTest();
+};
+
+/************************************************************************/
+/*                        OLD RENDER COMMAND                            */
+/************************************************************************/
 class ZERenderCommand
 {
 	public:
 		float					Order;
 		ZEInt					Priority;
 
+		ZERenderCommandType		Type;
 		ZERenderCommandFlags	Flags;
 		ZERenderPipeline		Pipeline;
 
 		ZEPrimitiveType			PrimitiveType;
 		ZEUInt					PrimitiveCount;
-	
+		
 		ZEUInt					FirstVertex;
 		ZEVertexLayout			VertexLayout;
-		ZEVertexBuffer*			VertexBuffers[16];
+		ZEVertexBuffer*			VertexBuffers[ZE_MAX_VERTEX_BUFFER_SLOT];
 
 		ZEMaterial*				Material;
-		ZEMatrix4x4				LocalMatrix;
 		ZEMatrix4x4				WorldMatrix;
+		ZEMatrix4x4				LocalMatrix;
+
+		ZESize					DataSize;
+		void*					CustomData;
 
 								ZERenderCommand();
 								~ZERenderCommand();
 };
-/*
-class ZERenderCommandShadow : public ZERenderCommand
-{
-	public:
-		ZELight*				Light;
-		ZERenderTarget*			RenderTarget;
 
-								ZERenderCommandShadow();
-								~ZERenderCommandShadow();
-};
-*/
 class ZERenderCommandSkinned : public ZERenderCommand
 {
 	public:

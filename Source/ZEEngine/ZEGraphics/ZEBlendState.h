@@ -38,6 +38,7 @@
 
 #include "ZETypes.h"
 #include "ZEFoundation/ZEDS/ZEFlags.h"
+#include "ZEMath/ZEVector.h"
 
 
 #define ZE_MAX_RENDER_TARGET_SLOT		8
@@ -73,13 +74,13 @@ enum ZEBlendEquation
 };
 
 
-#define ZE_CCM_NONE				0x0
-#define	ZE_CCM_RED				0x1
-#define	ZE_CCM_GREEN			0x2
-#define	ZE_CCM_BLUE				0x4
-#define	ZE_CCM_ALPHA			0x8
-#define ZE_CCM_ALL				ZE_CCM_RED | ZE_CCM_GREEN | ZE_CCM_BLUE | ZE_CCM_ALPHA
-typedef ZEFlagsBase<ZEUInt8>	ZEColorChannelMask;
+#define ZE_CM_NONE				0x0
+#define	ZE_CM_RED				0x1
+#define	ZE_CM_GREEN				0x2
+#define	ZE_CM_BLUE				0x4
+#define	ZE_CM_ALPHA				0x8
+#define ZE_CM_ALL				ZE_CM_RED | ZE_CM_GREEN | ZE_CM_BLUE | ZE_CM_ALPHA
+typedef ZEFlagsBase<ZEUInt8>	ZEComponentMask;
 
 class ZEBlendState
 {
@@ -101,7 +102,7 @@ class ZEBlendState
 			ZEBlendOption			DestinationBlendAlphaOption;
 			ZEBlendEquation			BlendAlphaEquation;
 			bool					BlendEnable[ZE_MAX_RENDER_TARGET_SLOT];
-			ZEColorChannelMask		ColorChannelMask[ZE_MAX_RENDER_TARGET_SLOT];
+			ZEComponentMask			ComponentWriteMask[ZE_MAX_RENDER_TARGET_SLOT];
 
 		} StateData;
 
@@ -132,12 +133,12 @@ class ZEBlendState
 		void						SetBlendAlphaEquation(ZEBlendEquation Equation);
 		ZEBlendEquation				GetBlendAlphaEquation() const;
 
-		void						SetColorChannelMask(ZESize Target, ZEColorChannelMask Mask);
-		ZEColorChannelMask			GetColorChannelMask(ZESize Target) const;
+		void						SetComponentWriteMask(ZESize Target, ZEComponentMask Mask);
+		ZEComponentMask				GetComponentWriteMask(ZESize Target) const;
 
 		void						SetToDefault();
 		
-		const ZEBlendState&	operator=(const ZEBlendState& State);
+		const ZEBlendState&			operator=(const ZEBlendState& State);
 		bool						operator==(const ZEBlendState& State);
 		bool						operator!=(const ZEBlendState& State);
 

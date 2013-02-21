@@ -46,7 +46,7 @@ void ZERenderStageGeometry::ResetStageDefaults()
 {
 	// Requested pipeline constants
 	StageConstants.SetCount(2);
-	StageConstants.Add(ZE_PC_CAMERA_POS);
+	StageConstants.Add(ZE_PC_CAMERA_WORLD_POS);
 	StageConstants.Add(ZE_PC_INV_VIEWPORT_WIDTH_HEIGHT);
 
 	// Reset parent states
@@ -67,9 +67,9 @@ void ZERenderStageGeometry::ResetStageDefaults()
 	}
 
 	// Blend state
-	DefaultStates.BlendState.SetColorChannelMask(0, ZE_CCM_RED);   // Output to RT0 is float
-	DefaultStates.BlendState.SetColorChannelMask(1, ZE_CCM_ALL);   // Output to RT1 is float4
-	DefaultStates.BlendState.SetColorChannelMask(2, ZE_CCM_ALL);   // Output to RT2 is float4
+	DefaultStates.BlendState.SetComponentWriteMask(0, ZE_CM_RED);   // Output to RT0 is float
+	DefaultStates.BlendState.SetComponentWriteMask(1, ZE_CM_ALL);   // Output to RT1 is float4
+	DefaultStates.BlendState.SetComponentWriteMask(2, ZE_CM_ALL);   // Output to RT2 is float4
 
 	// Depth Stencil state
 	DefaultStates.DepthStencilState.SetStencilTestEnable(false);
@@ -195,7 +195,7 @@ void ZERenderStageGeometry::Process(ZERenderCommand* RenderCommand)
 	zeDebugCheck(RenderCommand->Material == NULL, "Cannot process null material");
 
 	// Check if material match the stage
-	if (!(Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS))
+	if (!(Material->GetMaterialFlags() & ZE_MTF_GEOMETRY_PASS))
 	{
 		return;
 	}

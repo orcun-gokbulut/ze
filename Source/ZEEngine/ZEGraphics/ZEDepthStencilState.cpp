@@ -118,20 +118,6 @@ ZEUInt8 ZEDepthStencilState::GetStencilReadMask() const
 	return StateData.StencilReadMask;
 }
 
-void ZEDepthStencilState::SetStencilReferance(ZEUInt32 Value)
-{
-	if (StateData.StencilReferance != Value)
-	{
-		StateData.StencilReferance = Value;
-		Dirty = true;
-	}
-}
-
-ZEUInt32 ZEDepthStencilState::GetStencilReferance() const
-{
-	return StateData.StencilReferance;
-}
-
 void ZEDepthStencilState::SetZFunction(ZEComparisonFunction Function)
 {
 	if (StateData.ZFunction != Function)
@@ -268,7 +254,6 @@ void ZEDepthStencilState::SetToDefault()
 	StateData.ZWriteEnable = false;
 	StateData.StencilWriteMask = 0xFF;
 	StateData.StencilReadMask = 0xFF;
-	StateData.StencilReferance = 0;
 	StateData.ZFunction = ZE_CF_LESS;
 	StateData.FrontStencilFailOperation = ZE_SO_KEEP;
 	StateData.FrontZFailOperation = ZE_SO_KEEP;
@@ -302,7 +287,6 @@ bool ZEDepthStencilState::operator!=(const ZEDepthStencilState& State)
 
 ZEDepthStencilState::ZEDepthStencilState()
 {
-	memset(&StateData, 0, sizeof(ZEDepthStencilStateData));
 	SetToDefault();
 }
 

@@ -33,7 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef __ZE_RENDER_STAGE_GEOMETRY_H__
 #define __ZE_RENDER_STAGE_GEOMETRY_H__
 

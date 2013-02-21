@@ -33,29 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-cbuffer	ZEPipelineConstants : register(b5)
+cbuffer	ZEPipelineConstants : register(b13)
 {
-	float	ZE_PC_Time_0_N						: packoffset(c0.x);
-	float	ZE_PC_Time_0_1						: packoffset(c0.y);
-	float	ZE_PC_Sin_Time_0_N					: packoffset(c0.z);
-	float	ZE_PC_Cos_Time_0_N					: packoffset(c0.w);
-	float	ZE_PC_Tan_Time_0_N					: packoffset(c1.x);
-	float	ZE_PC_Sin_Time_0_1					: packoffset(c1.y);
-	float	ZE_PC_Cos_Time_0_1					: packoffset(c1.z);
-	float	ZE_PC_Tan_Time_0_1					: packoffset(c1.w);
-	float	ZE_PSC_Fov							: packoffset(c2.x);
-	float2	ZE_PSC_Near_Far_Z					: packoffset(c2.y);
-	float	ZE_PSC_Aspect_Ratio					: packoffset(c2.w);
-	float3	ZE_PSC_Camera_Pos					: packoffset(c3.x);
-	float3	ZE_PSC_Camera_World_Up				: packoffset(c4.x);
-	float3	ZE_PSC_Camera_World_Front			: packoffset(c5.x);
-	float3	ZE_PSC_Camera_World_Right			: packoffset(c6.x);
-	float2	ZE_PSC_Viewport_Width_Height		: packoffset(c7.x);
-	float2	ZE_PSC_Inv_Viewport_Width_Height	: packoffset(c7.z);
-	flaot4	ZE_PSC_View_Matrix;					: packoffset(c8.x);
-	flaot4	ZE_PSC_Proj_Matrix;					: packoffset(c12.x);
-	flaot4	ZE_PSC_Inv_View_Matrix				: packoffset(c16.x);
-	flaot4	ZE_PSC_Inv_Proj_Matrix				: packoffset(c20.x);
-	flaot4	ZE_PSC_View_Proj_Matrix				: packoffset(c24.x);
-	flaot4	ZE_PSC_Inv_View_Proj_Matrix			: packoffset(c28.x);
+	// Elapsed time
+
+	float		ZETime0toN						: packoffset(c0.x);
+	float		ZESinTime0toN					: packoffset(c0.y);
+	float		ZECosTime0toN					: packoffset(c0.z);
+	float		ZETanTime0toN					: packoffset(c0.w);
+	
+	float		ZETime0to1						: packoffset(c1.x);
+	float		ZESinTime0to1					: packoffset(c1.y);
+	float		ZECosTime0to1					: packoffset(c1.z);
+	float		ZETanTime0to1					: packoffset(c1.w);
+	
+	float		ZEFov							: packoffset(c2.x);
+	float2		ZENearFarZ						: packoffset(c2.y);
+	float		ZEAspectRatio					: packoffset(c2.w);
+	
+	float3		ZECameraWorldPos				: packoffset(c3.x);
+	float		ZEElapsedTime					: packoffset(c3.w);
+	float3		ZECameraWorldUp					: packoffset(c4.x);
+	float3		ZECameraWorldFront				: packoffset(c5.x);
+	float3		ZECameraWorldRight				: packoffset(c6.x);
+	
+	float2		ZEViewportWidthHeight			: packoffset(c7.x);
+	float2		ZEInvViewportWidthHeight		: packoffset(c7.z);
 };
