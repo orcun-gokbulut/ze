@@ -47,8 +47,8 @@
 class ZEGraphicsDevice
 {
 	protected:
-		ZEGraphicsDeviceState				OldState;
-		ZEGraphicsDeviceState				CurrentState;
+		ZEGraphicsDeviceState		OldState;
+		ZEGraphicsDeviceState		CurrentState;
 		
 									ZEGraphicsDevice();
 		virtual						~ZEGraphicsDevice();
@@ -74,7 +74,7 @@ class ZEGraphicsDevice
 		const ZETexture*			GetVertexShaderTexture(ZEUInt Index) const;
 		
 		void						SetVertexShaderSampler(ZEUInt Index, ZESamplerState& Sampler);
-		ZESamplerState&		GetVertexShaderSampler(ZEUInt Index);
+		ZESamplerState&				GetVertexShaderSampler(ZEUInt Index);
 		
 		void						SetGeometryShader(ZEShader* Shader);
 		const ZEShader*				GetGeometryShader() const;
@@ -86,10 +86,10 @@ class ZEGraphicsDevice
 		const ZETexture*			GetGeometryShaderTexture(ZEUInt Index) const;
 		
 		void						SetGeometryShaderSampler(ZEUInt Index, ZESamplerState& Sampler);
-		ZESamplerState&		GetGeometryShaderSampler(ZEUInt Index);
+		ZESamplerState&				GetGeometryShaderSampler(ZEUInt Index);
 		
 		void						SetRasterizerState(ZERasterizerState& State);
-		ZERasterizerState&	GetRasterizerState();
+		ZERasterizerState&			GetRasterizerState();
 		
 		void						SetViewport(ZESize Index, ZEViewport& ViewPort);
 		ZEViewport&					GetViewport(ZESize Index);
@@ -107,13 +107,26 @@ class ZEGraphicsDevice
 		const ZETexture*			GetPixelShaderTexture(ZEUInt Index) const;
 		
 		void						SetPixelShaderSampler(ZEUInt Index, ZESamplerState& SamplerState);
-		ZESamplerState&		GetPixelShaderSampler(ZEUInt Index);
+		ZESamplerState&				GetPixelShaderSampler(ZEUInt Index);
+		
+		void						SetBlendState(ZEBlendState& State, const ZEVector4& ComponentBlendFactors, ZEComponentMask ComponentBlendMask);
 		
 		void						SetBlendState(ZEBlendState& State);
-		ZEBlendState&			GetBlendState();
+		ZEBlendState&				GetBlendState();
+		
+		void						SetComponentBlendMask(ZEComponentMask ComponentBlendMask);
+		ZEComponentMask&			GetComponentBlendMask();
+
+		void						SetComponentBlendFactors(ZEVector4* ComponentBlendFactors);
+		ZEVector4&					GetComponentBlendFactors();
+
+		void						SetDepthStencilState(ZEDepthStencilState& State, ZEUInt32 StencilReferance);
 		
 		void						SetDepthStencilState(ZEDepthStencilState& State);
-		ZEDepthStencilState&	GetDepthStencilState();
+		ZEDepthStencilState&		GetDepthStencilState();
+		
+		void						SetStencilReferance(ZEUInt32 StencilReferance);
+		ZEUInt32&					GetStencilReferance();
 		
 		void						SetRenderTargetScreen(const ZERenderTarget* FrameBuffer);
 		bool						GetScreenWriteEnable() const;
@@ -126,7 +139,7 @@ class ZEGraphicsDevice
 		const ZEDepthStencilBuffer*	GetDepthStencilBuffer() const;
 		
 		void						SetDeviceState(ZEGraphicsDeviceState& State);
-		ZEGraphicsDeviceState&				GetDeviceState();
+		ZEGraphicsDeviceState&		GetDeviceState();
 		
 		virtual void				ResetStates();
 		

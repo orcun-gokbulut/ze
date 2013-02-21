@@ -48,10 +48,10 @@ class ZED3D10GraphicsDevice : public ZEGraphicsDevice, public ZED3D10ComponentBa
 	friend class ZED3D10GraphicsModule;
 
 	protected:
-		void		ApplyStates();
+		void				ApplyStates();
 		
-					ZED3D10GraphicsDevice();
-		virtual		~ZED3D10GraphicsDevice();
+							ZED3D10GraphicsDevice();
+		virtual				~ZED3D10GraphicsDevice();
 
 	public:
 		virtual bool		Present() const;

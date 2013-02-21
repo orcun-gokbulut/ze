@@ -210,7 +210,7 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	if (Skinned)
 	{
 		RenderCommandSkinned.Priority = 3;
-		RenderCommandSkinned.Flags |= ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_RCF_ENABLE_WORLD_TRANSFORM | ZE_RCF_ENABLE_Z_CULLING;
+		RenderCommandSkinned.Flags |= ZE_RCF_VIEW_PROJECTION_TRANSFORM | ZE_RCF_WORLD_TRANSFORM | ZE_RCF_Z_CULL;
 		RenderCommandSkinned.PrimitiveType = ZE_PT_TRIANGLE_LIST;
 		RenderCommandSkinned.VertexBuffers[0] = VertexBuffer = LODResource->GetSharedVertexBuffer();
 		RenderCommandSkinned.PrimitiveCount = (ZEUInt)LODResource->SkinnedVertices.GetCount() / 3;
@@ -220,7 +220,7 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	else
 	{
 		RenderCommand.Priority = 3;
-		RenderCommand.Flags = ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_RCF_ENABLE_WORLD_TRANSFORM | ZE_RCF_ENABLE_Z_CULLING;
+		RenderCommand.Flags = ZE_RCF_VIEW_PROJECTION_TRANSFORM | ZE_RCF_WORLD_TRANSFORM | ZE_RCF_Z_CULL;
 		RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
 		RenderCommand.VertexBuffers[0] = VertexBuffer = LODResource->GetSharedVertexBuffer();
 		RenderCommand.PrimitiveCount = (ZEUInt)LODResource->Vertices.GetCount() / 3;

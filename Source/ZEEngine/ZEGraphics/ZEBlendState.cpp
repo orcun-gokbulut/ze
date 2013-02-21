@@ -37,6 +37,7 @@
 #include "ZEDS/ZEHashGenerator.h"
 
 #include <memory.h>
+#include "ZEMath/ZEVector.h"
 
 void ZEBlendState::UpdateHash()
 {
@@ -164,29 +165,29 @@ ZEBlendEquation ZEBlendState::GetBlendAlphaEquation() const
 	return StateData.BlendAlphaEquation;
 }
 
-void ZEBlendState::SetColorChannelMask(ZESize Target, ZEColorChannelMask Mask)
+void ZEBlendState::SetComponentWriteMask(ZESize Target, ZEComponentMask Mask)
 {
 	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
 	
-	if (StateData.ColorChannelMask[Target] != Mask)
+	if (StateData.ComponentWriteMask[Target] != Mask)
 	{
-		StateData.ColorChannelMask[Target] = Mask;
+		StateData.ComponentWriteMask[Target] = Mask;
 		Dirty = true;
 	}
 }
 
-ZEColorChannelMask ZEBlendState::GetColorChannelMask(ZESize Target) const
+ZEComponentMask ZEBlendState::GetComponentWriteMask(ZESize Target) const
 {
 	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
 
-	return StateData.ColorChannelMask[Target];
+	return StateData.ComponentWriteMask[Target];
 }
 
 void ZEBlendState::SetToDefault()
 {
 	Hash = 0;
 	Dirty = false;
-
+	
 	StateData.AlphaToCoverageEnable = false;
 	memset(StateData.BlendEnable, 0, sizeof(bool) * 8);
 	StateData.SourceBlendOption = ZE_BO_ONE;
@@ -195,7 +196,7 @@ void ZEBlendState::SetToDefault()
 	StateData.SourceBlendAlphaOption = ZE_BO_ONE;
 	StateData.DestinationBlendAlphaOption = ZE_BO_ZERO;
 	StateData.BlendAlphaEquation = ZE_BE_ADD;
-	memset(StateData.ColorChannelMask, ZE_CCM_ALL, sizeof(ZEColorChannelMask) * 8);
+	memset(StateData.ComponentWriteMask, ZE_CM_ALL, sizeof(ZEComponentMask) * 8);
 
 	UpdateHash();
 }
@@ -204,6 +205,7 @@ const ZEBlendState& ZEBlendState::operator=(const ZEBlendState& State)
 {
 	Hash = State.Hash;
 	Dirty = State.Dirty;
+
 	memcpy(&StateData, &State.StateData, sizeof(ZEBlendStateData));
 	return *this;
 }
@@ -220,7 +222,6 @@ bool ZEBlendState::operator!=(const ZEBlendState& State)
 
 ZEBlendState::ZEBlendState()					
 {
-	memset(&StateData, 0, sizeof(ZEBlendStateData));
 	SetToDefault();
 }
 

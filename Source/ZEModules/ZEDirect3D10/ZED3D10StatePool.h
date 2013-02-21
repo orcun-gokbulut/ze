@@ -43,7 +43,7 @@
 #include "ZED3D10ComponentBase.h"
 #include "ZED3D10GraphicsModule.h"
 
-#define	ZE_D3D10_STATE_CACHE_CAPACITY	256
+#define	ZE_D3D10_STATE_CACHE_CAPACITY	128
 
 class ZEStatePoolEntry : public ZEListItem
 {

@@ -309,6 +309,20 @@ ZESamplerState& ZEGraphicsDevice::GetPixelShaderSampler(ZEUInt Index)
 	return CurrentState.PixelShaderSamplers[Index];
 }
 
+void ZEGraphicsDevice::SetBlendState(ZEBlendState& State, const ZEVector4& ComponentBlendFactors, ZEComponentMask ComponentBlendMask)
+{
+	State.UpdateHash();
+
+	if (CurrentState.BlendState.Hash != State.Hash || 
+		CurrentState.ComponentBlendFactors != ComponentBlendFactors || 
+		CurrentState.ComponentBlendMask != ComponentBlendMask)
+	{
+		CurrentState.BlendState = State;
+		CurrentState.ComponentBlendMask = ComponentBlendMask;
+		CurrentState.ComponentBlendFactors = ComponentBlendFactors;
+	}	
+}
+
 void ZEGraphicsDevice::SetBlendState(ZEBlendState& State)
 {
 	State.UpdateHash();
@@ -316,12 +330,44 @@ void ZEGraphicsDevice::SetBlendState(ZEBlendState& State)
 	if (CurrentState.BlendState.Hash != State.Hash)
 	{
 		CurrentState.BlendState = State;
-	}	
+	}
 }
 
 ZEBlendState& ZEGraphicsDevice::GetBlendState()
 {
 	return CurrentState.BlendState;
+}
+		
+void ZEGraphicsDevice::SetComponentBlendMask(ZEComponentMask ComponentBlendMask)
+{
+	CurrentState.ComponentBlendMask = ComponentBlendMask;
+}
+
+ZEComponentMask& ZEGraphicsDevice::GetComponentBlendMask()
+{
+	return CurrentState.ComponentBlendMask;
+}
+
+void ZEGraphicsDevice::SetComponentBlendFactors(ZEVector4* ComponentBlendFactors)
+{
+	CurrentState.ComponentBlendFactors = ComponentBlendFactors == NULL ? ZEVector4::One : *ComponentBlendFactors;
+}
+
+ZEVector4& ZEGraphicsDevice::GetComponentBlendFactors()
+{
+	return CurrentState.ComponentBlendFactors;
+}
+
+void ZEGraphicsDevice::SetDepthStencilState(ZEDepthStencilState& State, ZEUInt32 StencilReferance)
+{
+	State.UpdateHash();
+
+	if (CurrentState.DepthStencilState.Hash != State.Hash || 
+		CurrentState.StencilReferance != StencilReferance)
+	{
+		CurrentState.DepthStencilState = State;
+		CurrentState.StencilReferance = StencilReferance;
+	}
 }
 
 void ZEGraphicsDevice::SetDepthStencilState(ZEDepthStencilState& State)
@@ -337,6 +383,16 @@ void ZEGraphicsDevice::SetDepthStencilState(ZEDepthStencilState& State)
 ZEDepthStencilState& ZEGraphicsDevice::GetDepthStencilState()
 {
 	return CurrentState.DepthStencilState;
+}
+
+void ZEGraphicsDevice::SetStencilReferance(ZEUInt32 StencilReferance)
+{
+	CurrentState.StencilReferance = StencilReferance;
+}
+
+ZEUInt32& ZEGraphicsDevice::GetStencilReferance()
+{
+	return CurrentState.StencilReferance;
 }
 
 void ZEGraphicsDevice::SetRenderTargetScreen(const ZERenderTarget* FrameBuffer)

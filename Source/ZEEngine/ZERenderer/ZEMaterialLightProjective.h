@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaterialProjectiveLight.h
+ Zinek Engine - ZEMaterialLightProjective.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MATERIAL_PROJECTIVE_LIGHT_H__
-#define __ZE_MATERIAL_PROJECTIVE_LIGHT_H__
+#ifndef __ZE_MATERIAL_LIGHT_PROJECTIVE_H__
+#define __ZE_MATERIAL_LIGHT_PROJECTIVE_H__
 
 #include "ZETypes.h"
 #include "ZEMaterialLight.h"
@@ -47,7 +47,7 @@ class ZEVertexBuffer;
 class ZERenderCommand;
 class ZEConstantBuffer;
 
-class ZEMaterialProjectiveLight : public ZEMaterialLight
+class ZEMaterialLightProjective : public ZEMaterialLight
 {
 	friend class ZELightProjective;
 
@@ -71,17 +71,17 @@ class ZEMaterialProjectiveLight : public ZEMaterialLight
 
 		bool						SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-									ZEMaterialProjectiveLight();
-		virtual						~ZEMaterialProjectiveLight();
+									ZEMaterialLightProjective();
+		virtual						~ZEMaterialLightProjective();
 
 	public:
-		virtual ZEUInt32			GetHash() const;
+		virtual ZESize				GetHash() const;
 		virtual ZEMaterialFlags		GetMaterialFlags() const;
 
 		virtual void				UpdateMaterial();
 		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		static ZEMaterialProjectiveLight*	CreateInstance();
+		static ZEMaterialLightProjective*	CreateInstance();
 };
 
 #endif

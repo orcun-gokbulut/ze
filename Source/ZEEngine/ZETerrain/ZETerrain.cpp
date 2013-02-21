@@ -436,7 +436,7 @@ const ZEString& ZETerrain::GetTerrainFile()
 bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt PositionX, ZEInt PositionY, ZEInt LocalPositionX, ZEInt LocalPositionY, ZEInt Mode, ZESize Level)
 {	
 	ZERenderCommand RenderCommand;
-	RenderCommand.Flags	|= ZE_RCF_ENABLE_Z_CULLING | ZE_RCF_ENABLE_WORLD_TRANSFORM | ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM;
+	RenderCommand.Flags	|= ZE_RCF_Z_CULL | ZE_RCF_WORLD_TRANSFORM | ZE_RCF_VIEW_PROJECTION_TRANSFORM;
 	RenderCommand.VertexLayout = VertexDeclaration;
 	RenderCommand.Material = Levels[Level].Material;
 	RenderCommand.Order = 0;

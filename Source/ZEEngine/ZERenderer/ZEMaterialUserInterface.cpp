@@ -46,6 +46,7 @@
 #include "ZEGraphics/ZEConstantBuffer.h"
 #include "ZEGraphics/ZEShaderCompileOptions.h"
 #include "ZERenderStage.h"
+#include "ZEDS/ZEHashGenerator.h"
 
 
 ZEShader* ZEMaterialUserInterface::VertexShader = NULL;
@@ -111,14 +112,14 @@ void ZEMaterialUserInterface::DestroyShaders()
 	ZE_DESTROY(VertexShaderBuffer);
 }
 
-ZEUInt32 ZEMaterialUserInterface::GetHash() const
+ZESize ZEMaterialUserInterface::GetHash() const
 {
-	return 1 << 30;
+	return ZEHashGenerator::Hash(ZEString("ZEMaterialUserInterface"));
 }
 
 ZEMaterialFlags ZEMaterialUserInterface::GetMaterialFlags() const
 {
-	return ZE_MTF_NONE;
+	return ZE_MTF_USER_INTERFACE_PASS;
 }
 
 void ZEMaterialUserInterface::SetWireFrame(bool Enabled)

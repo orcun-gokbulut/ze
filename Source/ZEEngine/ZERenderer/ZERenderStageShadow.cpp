@@ -33,15 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZELight.h"
+#include "ZERenderer.h"
+#include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEShader.h"
 #include "ZERenderStageShadow.h"
+#include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEShaderCompiler.h"
 #include "ZEGraphics/ZEDepthStencilBuffer.h"
-#include "ZEGame/ZEScene.h"
-#include "ZERenderer.h"
-#include "ZEGraphics/ZEGraphicsDevice.h"
-#include "ZELight.h"
 #include "ZEGraphics/ZEGraphicsDeviceState.h"
 #include "ZEGraphics/ZEGraphicsEventTracer.h"
 
@@ -129,6 +129,9 @@ void ZERenderStageShadow::UpdateShaders()
 
 void ZERenderStageShadow::UpdateBuffers()
 {
+	// Update parent buffers
+	ZERenderStage::UpdateBuffers();
+
 	ZEVector2 ShadowMapDimension = zeScene->GetRenderer()->GetShadowMapDimension();
 	ZEUInt32 Width = (ZEUInt32)(ShadowMapDimension.x + 0.5f);
 	ZEUInt32 Height = (ZEUInt32)(ShadowMapDimension.y + 0.5f);
@@ -151,7 +154,7 @@ void ZERenderStageShadow::ResetStageDefaults()
 {
 	// Requested pipeline constants
 	StageConstants.SetCount(2);
-	StageConstants.Add(ZE_PC_CAMERA_POS);
+	StageConstants.Add(ZE_PC_CAMERA_WORLD_POS);
 	StageConstants.Add(ZE_PC_INV_VIEWPORT_WIDTH_HEIGHT);
 
 	// Reset parent states
@@ -181,7 +184,7 @@ void ZERenderStageShadow::ResetStageDefaults()
 	DefaultStates.RasterizerState.SetCullDirection(ZE_CD_COUNTER_CLOCKWISE);
 
 	// Blend state
-	DefaultStates.BlendState.SetColorChannelMask(0, ZE_CCM_RED);
+	DefaultStates.BlendState.SetComponentWriteMask(0, ZE_CM_RED);
 
 	// Depth stencil state
 	DefaultStates.DepthStencilState.SetZTestEnable(true);
@@ -218,8 +221,7 @@ void ZERenderStageShadow::RenderShadowProjectiveLight(const ZELightProjective* L
 
 void ZERenderStageShadow::RenderShadowDirectionalLight(const ZELightDirectional* Light)
 {
-	// First cull from light's view
-
+	zeCriticalError("Not implemented yet");
 }
 
 void ZERenderStageShadow::RenderShadowOmniProjectiveLight(const ZELightOmniProjective* Light)

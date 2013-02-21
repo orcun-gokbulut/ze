@@ -182,7 +182,7 @@ bool ZEGrid::Initialize()
 
 	RenderCommand.VertexLayout = ZECanvasVertex::GetVertexLayout();
 	RenderCommand.PrimitiveType = ZE_PT_LINE_LIST;
-	RenderCommand.Flags |= (ZE_RCF_ENABLE_WORLD_TRANSFORM | ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_RCF_ENABLE_Z_CULLING);
+	RenderCommand.Flags |= (ZE_RCF_WORLD_TRANSFORM | ZE_RCF_VIEW_PROJECTION_TRANSFORM | ZE_RCF_Z_CULL);
 	RenderCommand.Material = Material;
 
 	return true;

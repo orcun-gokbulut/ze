@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaterialOmniProjectiveLight.h
+ Zinek Engine - ZEMaterialLightPoint.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,54 +33,48 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MATERIAL_OMNI_PROJECTIVE_LIGHT_H__
-#define __ZE_MATERIAL_OMNI_PROJECTIVE_LIGHT_H__
+#ifndef __ZE_MATERIAL_LIGHT_POINT_H__
+#define __ZE_MATERIAL_LIGHT_POINT_H__
 
 #include "ZETypes.h"
 #include "ZEMaterialLight.h"
-#include "ZEGraphics/ZESamplerState.h"
 
 class ZEShader;
 class ZERenderStage;
-class ZETextureCube;
 class ZEVertexBuffer;
 class ZERenderCommand;
 class ZEConstantBuffer;
 
-class ZEMaterialOmniProjectiveLight : public ZEMaterialLight
+class ZEMaterialLightPoint : public ZEMaterialLight
 {
-	friend class ZELightOmniProjective;
+	friend class ZELightPoint;
 
 	protected:
-		const ZETextureCube*		ProjectionTexture;
-		ZESamplerState				SamplerState;
+		ZEShader*						VertexShader;
+		ZEShader*						PixelShader;
+		ZEConstantBuffer*				Transformations;
+		ZEConstantBuffer*				LightParameters;
+		ZEConstantBuffer*				ShadowParameters;
 
-		ZEShader*					VertexShader;
-		ZEShader*					PixelShader;
-		ZEConstantBuffer*			Transformations;
-		ZEConstantBuffer*			LightParameters;
-		ZEConstantBuffer*			ShadowParameters;
-		ZEVertexBuffer*				VertexBuffer;
+		void							UpdateShaders();
+		void							UpdateBuffers();
 
-		void						UpdateShaders();
-		void						UpdateBuffers();
+		void							DestroyShaders();
+		void							DestroyBuffers();
 
-		void						DestroyShaders();
-		void						DestroyBuffers();
+		bool							SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		bool						SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
-
-									ZEMaterialOmniProjectiveLight();
-		virtual						~ZEMaterialOmniProjectiveLight();
+										ZEMaterialLightPoint();
+		virtual							~ZEMaterialLightPoint();
 
 	public:
-		virtual ZEUInt32			GetHash() const;
-		virtual ZEMaterialFlags		GetMaterialFlags() const;
+		virtual ZESize					GetHash() const;
+		virtual ZEMaterialFlags			GetMaterialFlags() const;
 
-		virtual void				UpdateMaterial();
-		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
+		virtual void					UpdateMaterial();
+		virtual bool					SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		static ZEMaterialOmniProjectiveLight*	CreateInstance();
+		static ZEMaterialLightPoint*	CreateInstance();
 };
 
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaterialDirectionalLight.cpp
+ Zinek Engine - ZEMaterialLightOmniProjective.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,14 +38,16 @@
 #include "ZERenderStage.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEShader.h"
-#include "ZEMaterialDirectionalLight.h"
+#include "ZEDS/ZEHashGenerator.h"
+#include "ZEGraphics/ZETextureCube.h"
 #include "ZEGraphics/ZEShaderCompiler.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
+#include "ZEMaterialLightOmniProjective.h"
 #include "ZEGraphics/ZEShaderCompileOptions.h"
-#include "ZEDS/ZEHashGenerator.h"
 
-void ZEMaterialDirectionalLight::UpdateShaders()
+
+void ZEMaterialLightOmniProjective::UpdateShaders()
 {
 	ZEShaderCompileOptions Compileoptions;
 
@@ -53,22 +55,29 @@ void ZEMaterialDirectionalLight::UpdateShaders()
 	{
 		Compileoptions.Model = ZE_SM_4_0;
 		Compileoptions.Type = ZE_ST_VERTEX;
-		Compileoptions.FileName = "DirectionalLight.hlsl";
-		Compileoptions.EntryPoint = "ZEDirectionalLight_VertexShader";
+		Compileoptions.FileName = "OmniProjectiveLight.hlsl";
+		Compileoptions.EntryPoint = "ZEOmniProjectiveLight_VertexShader";
 		VertexShader = ZEShaderCompiler::CompileShaderFromFile(&Compileoptions);
 	}
 	if (PixelShader == NULL)
 	{
 		Compileoptions.Model = ZE_SM_4_0;
 		Compileoptions.Type = ZE_ST_PIXEL;
-		Compileoptions.FileName = "DirectionalLight.hlsl";
-		Compileoptions.EntryPoint = "ZEDirectionalLight_PixelShader";
+		Compileoptions.FileName = "OmniProjectiveLight.hlsl";
+		Compileoptions.EntryPoint = "ZEOmniProjectiveLight_PixelShader";
 		PixelShader = ZEShaderCompiler::CompileShaderFromFile(&Compileoptions);
 	}
 }
 
-void ZEMaterialDirectionalLight::UpdateBuffers()
+void ZEMaterialLightOmniProjective::UpdateBuffers()
 {
+	if (VertexBuffer == NULL)
+	{
+		ZECanvas Canvas;
+		Canvas.AddSphere(1.0f, 24, 24);
+
+		VertexBuffer = Canvas.CreateStaticVertexBuffer();
+	}
 	if (Transformations == NULL)
 	{
 		Transformations = ZEConstantBuffer::CreateInstance();
@@ -86,59 +95,74 @@ void ZEMaterialDirectionalLight::UpdateBuffers()
 	}
 }
 
-void ZEMaterialDirectionalLight::DestroyShaders()
+void ZEMaterialLightOmniProjective::DestroyShaders()
 {
 	ZE_DESTROY(VertexShader);
 	ZE_DESTROY(PixelShader);
 }
 
-void ZEMaterialDirectionalLight::DestroyBuffers()
+void ZEMaterialLightOmniProjective::DestroyBuffers()
 {
 	ZE_DESTROY(Transformations);
 	ZE_DESTROY(LightParameters);
 	ZE_DESTROY(ShadowParameters);
 }
 
-bool ZEMaterialDirectionalLight::SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+bool ZEMaterialLightOmniProjective::SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	UpdateMaterial();
-
-	struct DirectionalLightTransformations
-	{
-		ZEMatrix4x4 InvProjMatrix;
-	};
-
-	struct DirectionalLightParameters
-	{
-		ZEVector3		Color;
-		float			Intensity;
-		ZEVector3		Direction;
-		float			Dummy1;
-		ZEVector2		PixelSize;
-		float			Dummy2[2];
-	};
 
 	ZECamera* Camera = zeScene->GetActiveCamera();
 	ZEUInt ScreenWidth = zeGraphics->GetScreenWidth();
 	ZEUInt ScreenHeight = zeGraphics->GetScreenHeight();
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
+	struct OmniProjectiveLightTransformations
+	{
+		ZEMatrix4x4	WorldViewMatrix;
+		ZEMatrix4x4	WorldViewProjMatrix;
+	};
+
+	struct OmniProjectiveLightParameters
+	{
+		ZEVector3		Position;
+		float			Range;
+		ZEVector3		Color;
+		float			Intensity;
+		ZEVector3		Attenuation;
+		float			Dummy0;
+		ZEVector2		PixelSize;
+		float			Dummy1[2];
+		ZEMatrix4x4		ProjectionMatrix;
+	};
+
 	// VS parameters
-	DirectionalLightTransformations* Transforms = NULL;
+	OmniProjectiveLightTransformations* Transforms = NULL;
 	Transformations->Lock((void**)&Transforms);
-		
-		ZEMatrix4x4::Inverse(Transforms->InvProjMatrix, Camera->GetProjectionTransform());
+	
+		ZEMatrix4x4 WorldTransform;
+		ZEMatrix4x4::CreateOrientation(WorldTransform, WorldPosition, ZEQuaternion::Identity, ZEVector3(Range, Range, Range));
+		ZEMatrix4x4::Multiply(Transforms->WorldViewMatrix, Camera->GetViewTransform(), WorldTransform);
+		ZEMatrix4x4::Multiply(Transforms->WorldViewProjMatrix, Camera->GetViewProjectionTransform(), WorldTransform);
 	
 	Transformations->Unlock();
 
-	// PS Parameters
-	DirectionalLightParameters* Parameters = NULL;
+	// PS parameters
+	OmniProjectiveLightParameters* Parameters = NULL;
 	LightParameters->Lock((void**)&Parameters);
 	
+		Parameters->Range = Range;
 		Parameters->Color = Color;
 		Parameters->Intensity = Intensity;
-		ZEMatrix4x4::Transform3x3(Parameters->Direction, Camera->GetViewTransform(), -WorldFront);
+		Parameters->Attenuation = Attenuation;
+		ZEMatrix4x4::Transform(Parameters->Position, Camera->GetViewTransform(), WorldPosition);
 		Parameters->PixelSize = ZEVector2(1.0f / (float)ScreenWidth, 1.0f / (float)ScreenHeight);
+		
+		// Projection Transform
+		ZEQuaternion ProjectionRotation;
+		ZEQuaternion::Product(ProjectionRotation, WorldRotation.Conjugate(), Camera->GetWorldRotation());
+		ZEQuaternion::Normalize(ProjectionRotation, ProjectionRotation);
+		ZEMatrix4x4::CreateRotation(Parameters->ProjectionMatrix, ProjectionRotation);
 	
 	LightParameters->Unlock();
 	
@@ -147,29 +171,30 @@ bool ZEMaterialDirectionalLight::SetupLightingPass(const ZERenderStage* Stage, c
 
 	Device->SetVertexShaderBuffer(0, Transformations);
 	Device->SetPixelShaderBuffer(0, LightParameters);
-
-	Device->Draw(ZE_PT_TRIANGLE_LIST, 6, 0);	// Quad
+	
+	Device->SetPixelShaderSampler(6, SamplerState);
+	Device->SetPixelShaderTexture(6, ProjectionTexture);
 
 	return true;
 }
 
-ZEUInt32 ZEMaterialDirectionalLight::GetHash() const
+ZESize ZEMaterialLightOmniProjective::GetHash() const
 {
-	return ZEHashGenerator::Hash(ZEString("ZEMaterialDirectionalLight"));
+	return ZEHashGenerator::Hash(ZEString("ZEMaterialLightOmniProjective"));
 }
 
-ZEMaterialFlags ZEMaterialDirectionalLight::GetMaterialFlags() const
+ZEMaterialFlags ZEMaterialLightOmniProjective::GetMaterialFlags() const
 {
-	return ZE_MTF_L_BUFFER_PASS;
+	return ZE_MTF_LIGHTING_PASS;
 }
 
-void ZEMaterialDirectionalLight::UpdateMaterial()
+void ZEMaterialLightOmniProjective::UpdateMaterial()
 {
 	UpdateShaders();
 	UpdateBuffers();
 }
 
-bool ZEMaterialDirectionalLight::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+bool ZEMaterialLightOmniProjective::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	if ((Stage->GetStageFlags() & ZE_RENDER_STAGE_LIGHTING) == 0)
 		return true;
@@ -177,21 +202,31 @@ bool ZEMaterialDirectionalLight::SetupPass(ZEUInt PassId, const ZERenderStage* S
 	return SetupLightingPass(Stage, RenderCommand);
 }
 
-ZEMaterialDirectionalLight* ZEMaterialDirectionalLight::CreateInstance()
+ZEMaterialLightOmniProjective* ZEMaterialLightOmniProjective::CreateInstance()
 {
-	return new ZEMaterialDirectionalLight();
+	return new ZEMaterialLightOmniProjective();
 }
 
-ZEMaterialDirectionalLight::ZEMaterialDirectionalLight()
+ZEMaterialLightOmniProjective::ZEMaterialLightOmniProjective()
 {
 	VertexShader = NULL;
 	PixelShader = NULL;
 	Transformations = NULL;
 	LightParameters = NULL;
 	ShadowParameters = NULL;
+	VertexBuffer = NULL;
+	
+	ProjectionTexture = NULL;
+	SamplerState.SetMagFilter(ZE_TFM_LINEAR);
+	SamplerState.SetMinFilter(ZE_TFM_LINEAR);
+	SamplerState.SetMipFilter(ZE_TFM_LINEAR);
+	SamplerState.SetAddressU(ZE_TAM_BORDER);
+	SamplerState.SetAddressV(ZE_TAM_BORDER);
+	SamplerState.SetAddressW(ZE_TAM_BORDER);
+	SamplerState.SetBorderColor(ZEVector4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-ZEMaterialDirectionalLight::~ZEMaterialDirectionalLight()
+ZEMaterialLightOmniProjective::~ZEMaterialLightOmniProjective()
 {
 	DestroyBuffers();
 	DestroyShaders();

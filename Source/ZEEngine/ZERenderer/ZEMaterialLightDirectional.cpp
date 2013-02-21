@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaterialPointLight.cpp
+ Zinek Engine - ZEMaterialLightDirectional.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,14 +38,14 @@
 #include "ZERenderStage.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEShader.h"
-#include "ZEMaterialPointLight.h"
+#include "ZEDS/ZEHashGenerator.h"
+#include "ZEMaterialLightDirectional.h"
 #include "ZEGraphics/ZEShaderCompiler.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEShaderCompileOptions.h"
-#include "ZEDS/ZEHashGenerator.h"
 
-void ZEMaterialPointLight::UpdateShaders()
+void ZEMaterialLightDirectional::UpdateShaders()
 {
 	ZEShaderCompileOptions Compileoptions;
 
@@ -53,21 +53,21 @@ void ZEMaterialPointLight::UpdateShaders()
 	{
 		Compileoptions.Model = ZE_SM_4_0;
 		Compileoptions.Type = ZE_ST_VERTEX;
-		Compileoptions.FileName = "PointLight.hlsl";
-		Compileoptions.EntryPoint = "ZEPointLight_VertexShader";
+		Compileoptions.FileName = "DirectionalLight.hlsl";
+		Compileoptions.EntryPoint = "ZEDirectionalLight_VertexShader";
 		VertexShader = ZEShaderCompiler::CompileShaderFromFile(&Compileoptions);
 	}
 	if (PixelShader == NULL)
 	{
 		Compileoptions.Model = ZE_SM_4_0;
 		Compileoptions.Type = ZE_ST_PIXEL;
-		Compileoptions.FileName = "PointLight.hlsl";
-		Compileoptions.EntryPoint = "ZEPointLight_PixelShader";
+		Compileoptions.FileName = "DirectionalLight.hlsl";
+		Compileoptions.EntryPoint = "ZEDirectionalLight_PixelShader";
 		PixelShader = ZEShaderCompiler::CompileShaderFromFile(&Compileoptions);
 	}
 }
 
-void ZEMaterialPointLight::UpdateBuffers()
+void ZEMaterialLightDirectional::UpdateBuffers()
 {
 	if (Transformations == NULL)
 	{
@@ -86,99 +86,88 @@ void ZEMaterialPointLight::UpdateBuffers()
 	}
 }
 
-void ZEMaterialPointLight::DestroyShaders()
+void ZEMaterialLightDirectional::DestroyShaders()
 {
 	ZE_DESTROY(VertexShader);
 	ZE_DESTROY(PixelShader);
 }
 
-void ZEMaterialPointLight::DestroyBuffers()
+void ZEMaterialLightDirectional::DestroyBuffers()
 {
 	ZE_DESTROY(Transformations);
 	ZE_DESTROY(LightParameters);
 	ZE_DESTROY(ShadowParameters);
 }
 
-bool ZEMaterialPointLight::SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+bool ZEMaterialLightDirectional::SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	UpdateMaterial();
+
+	struct DirectionalLightTransformations
+	{
+		ZEMatrix4x4 InvProjMatrix;
+	};
+
+	struct DirectionalLightParameters
+	{
+		ZEVector3		Color;
+		float			Intensity;
+		ZEVector3		Direction;
+		float			Dummy1;
+		ZEVector2		PixelSize;
+		float			Dummy2[2];
+	};
 
 	ZECamera* Camera = zeScene->GetActiveCamera();
 	ZEUInt ScreenWidth = zeGraphics->GetScreenWidth();
 	ZEUInt ScreenHeight = zeGraphics->GetScreenHeight();
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
-	struct PointLightTransformations
-	{
-		ZEMatrix4x4	WorldViewMatrix;
-		ZEMatrix4x4	WorldViewProjMatrix;
-	};
-
-	struct PointLightParameters
-	{
-		ZEVector3		ViewSpacePosition;
-		float			Range;
-		ZEVector3		Color;
-		float			Intensity;
-		ZEVector3		Attenuation;
-		float			Dummy0;
-		ZEVector2		PixelSize;
-		float			Dummy1[2];
-	};
-
-	// VS Parameters
-	PointLightTransformations* Transforms = NULL;
+	// VS parameters
+	DirectionalLightTransformations* Transforms = NULL;
 	Transformations->Lock((void**)&Transforms);
-	
-		ZEMatrix4x4 WorldTransform;
-		ZEMatrix4x4::CreateOrientation(WorldTransform, WorldPosition, ZEQuaternion::Identity, ZEVector3(Range, Range, Range));
 		
-		ZEMatrix4x4::Multiply(Transforms->WorldViewMatrix, Camera->GetViewTransform(), WorldTransform);
-		ZEMatrix4x4::Multiply(Transforms->WorldViewProjMatrix, Camera->GetViewProjectionTransform(), WorldTransform);
+		ZEMatrix4x4::Inverse(Transforms->InvProjMatrix, Camera->GetProjectionTransform());
 	
 	Transformations->Unlock();
 
-	// PS parameters
-	PointLightParameters* Parameters = NULL;
+	// PS Parameters
+	DirectionalLightParameters* Parameters = NULL;
 	LightParameters->Lock((void**)&Parameters);
 	
-		Parameters->Range = Range;
 		Parameters->Color = Color;
 		Parameters->Intensity = Intensity;
-		Parameters->Attenuation = Attenuation;
-		ZEMatrix4x4::Transform(Parameters->ViewSpacePosition, Camera->GetViewTransform(), WorldPosition);
+		ZEMatrix4x4::Transform3x3(Parameters->Direction, Camera->GetViewTransform(), -WorldFront);
 		Parameters->PixelSize = ZEVector2(1.0f / (float)ScreenWidth, 1.0f / (float)ScreenHeight);
 	
 	LightParameters->Unlock();
 	
 	Device->SetVertexShader(VertexShader);
 	Device->SetPixelShader(PixelShader);
-	
+
 	Device->SetVertexShaderBuffer(0, Transformations);
 	Device->SetPixelShaderBuffer(0, LightParameters);
-
-	Device->Draw(ZE_PT_TRIANGLE_LIST, 936, 0);
 
 	return true;
 }
 
-ZEUInt32 ZEMaterialPointLight::GetHash() const
+ZESize ZEMaterialLightDirectional::GetHash() const
 {
-	return ZEHashGenerator::Hash(ZEString("ZEMaterialPointLight"));
+	return ZEHashGenerator::Hash(ZEString("ZEMaterialLightDirectional"));
 }
 
-ZEMaterialFlags ZEMaterialPointLight::GetMaterialFlags() const
+ZEMaterialFlags ZEMaterialLightDirectional::GetMaterialFlags() const
 {
-	return ZE_MTF_L_BUFFER_PASS;
+	return ZE_MTF_LIGHTING_PASS;
 }
 
-void ZEMaterialPointLight::UpdateMaterial()
+void ZEMaterialLightDirectional::UpdateMaterial()
 {
 	UpdateShaders();
 	UpdateBuffers();
 }
 
-bool ZEMaterialPointLight::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+bool ZEMaterialLightDirectional::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	if ((Stage->GetStageFlags() & ZE_RENDER_STAGE_LIGHTING) == 0)
 		return true;
@@ -186,12 +175,12 @@ bool ZEMaterialPointLight::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, 
 	return SetupLightingPass(Stage, RenderCommand);
 }
 
-ZEMaterialPointLight* ZEMaterialPointLight::CreateInstance()
+ZEMaterialLightDirectional* ZEMaterialLightDirectional::CreateInstance()
 {
-	return new ZEMaterialPointLight();
+	return new ZEMaterialLightDirectional();
 }
 
-ZEMaterialPointLight::ZEMaterialPointLight()
+ZEMaterialLightDirectional::ZEMaterialLightDirectional()
 {
 	VertexShader = NULL;
 	PixelShader = NULL;
@@ -200,7 +189,7 @@ ZEMaterialPointLight::ZEMaterialPointLight()
 	ShadowParameters = NULL;
 }
 
-ZEMaterialPointLight::~ZEMaterialPointLight()
+ZEMaterialLightDirectional::~ZEMaterialLightDirectional()
 {
 	DestroyBuffers();
 	DestroyShaders();

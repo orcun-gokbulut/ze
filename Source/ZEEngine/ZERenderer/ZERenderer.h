@@ -46,15 +46,50 @@ class ZERenderCommand;
 struct ZEDrawParameters;
 class ZERenderStageShadow;
 class ZERenderStageForward;
+class ZERenderStageParticle;
 class ZERenderStageGeometry;
 class ZERenderStageLighting;
 class ZERenderStageTransparent;
 class ZERenderStagePostProcess;
 class ZERenderStageUserInterface;
 
+#define	ZE_COMMAND_BUFFER_SIZE					1024 * 1024	// 1 MB
+
+#define ZE_CMB_COMMAND							0xFFFFFFFF
+#define ZE_CBM_RENDER_START						0x01
+#define ZE_CBM_RENDER_END						0x02
+#define ZE_CBM_FRAME_START						0x03
+#define ZE_CBM_FRAME_END						0x04
+#define ZE_CBM_FRAME_RENDER_COMMAND_START		0x05
+#define ZE_CBM_FRAME_RENDER_COMMAND_END			0x06
+#define ZE_CBM_FRAME_RENDER_COMMAND_TYPE		0x07
+#define ZE_CBM_FRAME_RENDER_COMMAND_DATA		0x08
+
+/*
+class ZECommandBuffer
+{
+	private:
+		ZESize					BufferPointer;
+		void*					CommandBuffer;
+		ZESize					RenderEndMarker;
+		ZESize					RenderStartMarker;
+	
+	public:
+		bool					CheckBufferFull(ZESize Size) const;
+		
+		bool					ReadCommand(ZEUInt32* Marker, void* Data, ZESize* Size);
+		bool					WriteCommand(ZEUInt32 Marker, const void* Data, ZESize Size);
+		
+								ZECommandBuffer();
+								~ZECommandBuffer();
+};
+*/
+
 class ZERenderer
 {
 	protected:
+		/*ZECommandBuffer					CommandBuffer;*/
+
 		ZERenderStageGeometry*				GeometryStage;
 		ZERenderStageShadow*				ShadowStage;
 		ZERenderStageLighting*				LightingStage;
@@ -62,6 +97,7 @@ class ZERenderer
 		ZERenderStageTransparent*			TransparentStage;
 		ZERenderStagePostProcess*			PostProcessStage;
 		ZERenderStageUserInterface*			UserInterfaceStage;
+		ZERenderStageParticle*				ParticleStage;
 
 		ZEDrawParameters					DrawParameters;
 		ZESmartArray<ZERenderCommand*>		CommandList;
@@ -71,10 +107,11 @@ class ZERenderer
 											ZERenderer();
 		virtual								~ZERenderer();
 
-		void								DoGeomtryPass();
 		void								DoShadowPass();
-		void								DoLightingPass();
+		void								DoGeomtryPass();
 		void								DoForwardPass();
+		void								DoLightingPass();
+		void								DoParticlePass();
 		void								DoTransparentPass();
 		void								DoPostProcessPass();
 		void								DoUserInterfacePass();

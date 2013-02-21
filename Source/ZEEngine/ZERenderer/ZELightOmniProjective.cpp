@@ -42,7 +42,8 @@
 #include "ZEGraphics/ZETextureCube.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEMaterialOmniProjectiveLight.h"
+#include "ZEMaterialLightOmniProjective.h"
+#include "ZEMaterial.h"
 
 void ZELightOmniProjective::SetTextureSampler(const ZESamplerState& Sampler)
 {
@@ -84,7 +85,7 @@ bool ZELightOmniProjective::Initialize()
 	ZECanvas Canvas;
 	Canvas.AddSphere(1.0f, 24, 24);
 	Geometry = Canvas.CreateStaticVertexBuffer();
-	Material = ZEMaterialOmniProjectiveLight::CreateInstance();
+	Material = ZEMaterialLightOmniProjective::CreateInstance();
 
 	return ZEEntity::Initialize();
 }
@@ -115,14 +116,14 @@ void ZELightOmniProjective::Tick(float Time)
 	Material->WorldRotation = GetWorldRotation();
 	Material->SamplerState = TextureSampler;
 	Material->ProjectionTexture = ProjectionTexture;
-	
+
 	RenderCommand.Order = 3.0f;
 	RenderCommand.Priority = 3;
 	RenderCommand.Flags = 0;
 	RenderCommand.FirstVertex = 0;
-	RenderCommand.Material = (ZEMaterial*)Material;
+	RenderCommand.Material = Material;
 	RenderCommand.Pipeline = ZE_RP_3D;
-	RenderCommand.PrimitiveCount = 6;
+	RenderCommand.PrimitiveCount = 1200;
 	RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
 	RenderCommand.VertexBuffers[0] = Geometry;
 }

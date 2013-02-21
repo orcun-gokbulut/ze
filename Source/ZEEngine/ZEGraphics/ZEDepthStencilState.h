@@ -80,7 +80,6 @@ class ZEDepthStencilState
 			bool							StencilTestEnable;
 			ZEUInt8							StencilWriteMask;
 			ZEUInt8							StencilReadMask;
-			ZEUInt32						StencilReferance;
 			ZEStencilOperation				FrontStencilFailOperation;
 			ZEStencilOperation				FrontZFailOperation;
 			ZEStencilOperation				FrontStencilPassOperation;
@@ -109,9 +108,6 @@ class ZEDepthStencilState
 		
 		void								SetStencilReadMask(ZEUInt8 Mask);
 		ZEUInt8								GetStencilReadMask() const;
-
-		void								SetStencilReferance(ZEUInt32 Value);
-		ZEUInt32							GetStencilReferance() const;
 
 		void								SetZFunction(ZEComparisonFunction Function);
 		ZEComparisonFunction				GetZFunction() const;

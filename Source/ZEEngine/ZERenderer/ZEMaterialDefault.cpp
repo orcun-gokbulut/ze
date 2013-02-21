@@ -57,6 +57,8 @@
 #include "ZECore/ZECore.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEFile/ZEPathUtils.h"
+#include "ZEDS/ZEHashGenerator.h"
+#include "ZEDS/ZEString.h"
 
 struct FixedMaterialVertexShaderCommonData
 {
@@ -100,8 +102,11 @@ struct FixedMaterialForwardPassPixelShaderData
 	ZEMatrix4x4	InvViewMatrix;
 };
 
-void ZEMaterialDefault::CreateShaders()
+void ZEMaterialDefault::UpdateShaders()
 {
+	if(!Recompile)
+		return;
+
 	DestroyShaders();
 
 	ZEShaderCompileOptions Options;
@@ -222,31 +227,22 @@ void ZEMaterialDefault::CreateShaders()
 		Options.Parameters.Add(TempParam);
 	}
 
-// 	if (TransparancyMode == ZE_MTM_NONE)
-// 	{
-		Options.Type = ZE_ST_VERTEX;
-		Options.EntryPoint = "ZEFixedMaterial_GBuffer_VertexShader";
-		Shaders.GBufferPassVertexShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
+	// Geometry pass shaders
+	Options.Type = ZE_ST_VERTEX;
+	Options.EntryPoint = "ZEFixedMaterial_GBuffer_VertexShader";
+	Shaders.GBufferPassVertexShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
 		
-		Buffers.GBufferPassVertexShader = ZEConstantBuffer::CreateInstance();
-		Buffers.GBufferPassVertexShader->Create(Shaders.GBufferPassVertexShader->GetMetaTable()->GetBufferInfo("CommonVSData"));
+	Buffers.GBufferPassVertexShader = ZEConstantBuffer::CreateInstance();
+	Buffers.GBufferPassVertexShader->Create(Shaders.GBufferPassVertexShader->GetMetaTable()->GetBufferInfo("CommonVSData"));
 
-		Options.Type = ZE_ST_PIXEL;
-		Options.EntryPoint = "ZEFixedMaterial_GBuffer_PixelShader";
-		Shaders.GBufferPassPixelShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
+	Options.Type = ZE_ST_PIXEL;
+	Options.EntryPoint = "ZEFixedMaterial_GBuffer_PixelShader";
+	Shaders.GBufferPassPixelShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
 
-		Buffers.GBufferPassPixelShader = ZEConstantBuffer::CreateInstance();
-		Buffers.GBufferPassPixelShader->Create(Shaders.GBufferPassPixelShader->GetMetaTable()->GetBufferInfo("GPassPixelShaderData"));
-// 	}
-// 	else
-// 	{
-// 		Shaders.GBufferPassVertexShader = NULL;
-// 		Shaders.GBufferPassPixelShader = NULL;
-// 
-// 		Buffers.GBufferPassVertexShader = NULL;
-// 		Buffers.GBufferPassPixelShader = NULL;
-// 	}
-	
+	Buffers.GBufferPassPixelShader = ZEConstantBuffer::CreateInstance();
+	Buffers.GBufferPassPixelShader->Create(Shaders.GBufferPassPixelShader->GetMetaTable()->GetBufferInfo("GPassPixelShaderData"));
+
+	// Forward pass shaders
 	Options.Type = ZE_ST_VERTEX;
 	Options.EntryPoint = "ZEFixedMaterial_ForwardPass_VertexShader";
 	Shaders.ForwardPassVertexShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
@@ -286,14 +282,16 @@ void ZEMaterialDefault::DestroyShaders()
 	ZE_DESTROY(Buffers.ShadowPassPixelShader);
 }
 
-ZEUInt32 ZEMaterialDefault::GetHash() const
+ZESize ZEMaterialDefault::GetHash() const
 {
-	return *((ZEUInt32*)&Components);
+	ZESize Hash = ZEHashGenerator::Hash(ZEString("ZEMaterialDefault"));
+	ZEHashGenerator::Hash(Hash, (void*)&Components, sizeof(ZEMaterialDefaultComponents));
+	return Hash;
 }
 
 ZEMaterialFlags ZEMaterialDefault::GetMaterialFlags() const
 {
-	return ZE_MTF_G_BUFFER_PASS | ZE_MTF_FORWARD_PASS | ZE_MTF_SUPPORTS_SKINNING;
+	return ZE_MTF_GEOMETRY_PASS | ZE_MTF_FORWARD_PASS | ZE_MTF_SUPPORTS_SKINNING;
 }
 
 void ZEMaterialDefault::SetTwoSided(bool Enable)
@@ -1490,15 +1488,15 @@ void ZEMaterialDefault::UpdateTransformations(const ZERenderCommand* RenderComma
 
 	// Update transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_VIEW_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
 	}
-	else if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_VIEW_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewTransform();
 	}
-	else if (RenderCommand->Flags & ZE_RCF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	}
@@ -1507,8 +1505,7 @@ void ZEMaterialDefault::UpdateTransformations(const ZERenderCommand* RenderComma
 		ViewProjMatrix = ZEMatrix4x4::Identity;
 	}
 	
-
-	if (RenderCommand->Flags & ZE_RCF_ENABLE_WORLD_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_WORLD_TRANSFORM)
 	{
 		ZEMatrix4x4::Multiply(Transformations.WorldViewProj, ViewProjMatrix, RenderCommand->WorldMatrix);
 		ZEMatrix4x4::Multiply(Transformations.WorldView, Camera->GetViewTransform(), RenderCommand->WorldMatrix);
@@ -1518,7 +1515,15 @@ void ZEMaterialDefault::UpdateTransformations(const ZERenderCommand* RenderComma
 		Transformations.WorldViewProj = ViewProjMatrix;
 		Transformations.WorldView = Camera->GetViewTransform();
 	}
+}
 
+bool ZEMaterialDefault::SetupShadowPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+{
+	UpdateMaterial();
+
+	zeCriticalError("Not implemented yet");
+
+	return true;
 }
 
 bool ZEMaterialDefault::SetupGeometryPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
@@ -1533,15 +1538,15 @@ bool ZEMaterialDefault::SetupGeometryPass(const ZERenderStage* Stage, const ZERe
 	/*
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_VIEW_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
 	}
-	else if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_VIEW_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewTransform();
 	}
-	else if (RenderCommand->Flags & ZE_RCF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	}
@@ -1552,7 +1557,7 @@ bool ZEMaterialDefault::SetupGeometryPass(const ZERenderStage* Stage, const ZERe
 	
 	ZEMatrix4x4 WorldViewProjMatrix;
 	ZEMatrix4x4 WorldViewMatrix;
-	if (RenderCommand->Flags & ZE_RCF_ENABLE_WORLD_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_WORLD_TRANSFORM)
 	{
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
 		ZEMatrix4x4::Multiply(WorldViewMatrix, Camera->GetViewTransform(), RenderCommand->WorldMatrix);
@@ -1570,7 +1575,7 @@ bool ZEMaterialDefault::SetupGeometryPass(const ZERenderStage* Stage, const ZERe
 		VSData->WorldViewMatrix = Transformations.WorldView;
 		VSData->WorldViewInvTrpsMatrix = Transformations.WorldView;
 		VSData->WorldViewProjMatrix = Transformations.WorldViewProj;
-		VSData->EnableSkin = (RenderCommand->Flags & ZE_RCF_SKINNED) == ZE_RCF_SKINNED;
+		VSData->EnableSkin = (RenderCommand->Flags & ZE_RCT_SKINNED) == ZE_RCT_SKINNED;
 
 	Buffers.GBufferPassVertexShader->Unlock();
 	Device->SetVertexShaderBuffer(0, Buffers.GBufferPassVertexShader);
@@ -1593,8 +1598,8 @@ bool ZEMaterialDefault::SetupGeometryPass(const ZERenderStage* Stage, const ZERe
 	ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetStencilTestEnable(false);
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
-	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_RCF_ENABLE_Z_CULLING) == 0 ? false : true);
-	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_RCF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
+	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_RCF_Z_CULL) == 0 ? false : true);
+	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_RCF_NO_Z_WRITE) == 0 ? true : false);
 	Device->SetDepthStencilState(DepthStencilState);
 
 	ZERasterizerState RasterizerState;
@@ -1660,18 +1665,19 @@ bool ZEMaterialDefault::SetupForwardPass(const ZERenderStage* Stage, const ZERen
 
 	Device->SetVertexShader(Shaders.ForwardPassVertexShader);
 	Device->SetPixelShader(Shaders.ForwardPassPixelShader);
+
 	/*
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_VIEW_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
 	}
-	else if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_VIEW_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewTransform();
 	}
-	else if (RenderCommand->Flags & ZE_RCF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	}
@@ -1682,7 +1688,7 @@ bool ZEMaterialDefault::SetupForwardPass(const ZERenderStage* Stage, const ZERen
 
 	ZEMatrix4x4 WorldViewProjMatrix;
 	ZEMatrix4x4 WorldViewMatrix;
-	if (RenderCommand->Flags & ZE_RCF_ENABLE_WORLD_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_WORLD_TRANSFORM)
 	{
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
 		ZEMatrix4x4::Multiply(WorldViewMatrix, Camera->GetViewTransform(), RenderCommand->WorldMatrix);
@@ -1698,7 +1704,7 @@ bool ZEMaterialDefault::SetupForwardPass(const ZERenderStage* Stage, const ZERen
 
 		VSData->WorldMatrix = RenderCommand->WorldMatrix;
 		VSData->WorldViewProjMatrix = Transformations.WorldViewProj;
-		VSData->EnableSkin = (RenderCommand->Flags & ZE_RCF_SKINNED) == ZE_RCF_SKINNED;
+		VSData->EnableSkin = (RenderCommand->Flags & ZE_RCT_SKINNED) == ZE_RCT_SKINNED;
 		VSData->CameraPosition = ZEVector4(Camera->GetWorldPosition(), 1.0f);
 
 	Buffers.ForwardPassVertexShader->Unlock();
@@ -1729,8 +1735,8 @@ bool ZEMaterialDefault::SetupForwardPass(const ZERenderStage* Stage, const ZERen
 	// Setup ZCulling
 	ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
-	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_RCF_ENABLE_Z_CULLING) == 0 ? false : true);
-	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_RCF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
+	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_RCF_Z_CULL) == 0 ? false : true);
+	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_RCF_NO_Z_WRITE) == 0 ? true : false);
 	Device->SetDepthStencilState(DepthStencilState);
 
 	ZERasterizerState RasterizerState;
@@ -1825,6 +1831,11 @@ bool ZEMaterialDefault::SetupTransparentPass(const ZERenderStage* Stage, const Z
 	return true;
 }
 
+void ZEMaterialDefault::Tick(float ElapsedTime)
+{
+	
+}
+
 bool ZEMaterialDefault::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	// Update Buffers
@@ -1832,6 +1843,9 @@ bool ZEMaterialDefault::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, con
 
 	switch (Stage->GetStageFlags())
 	{
+		case ZE_RENDER_STAGE_SHADOW:
+			SetupShadowPass(Stage, RenderCommand);
+			break;
 		case ZE_RENDER_STAGE_GEOMETRY:
 			SetupGeometryPass(Stage, RenderCommand);
 			break;
@@ -1848,8 +1862,7 @@ bool ZEMaterialDefault::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, con
 
 void ZEMaterialDefault::UpdateMaterial()
 {
-	if (Recompile)
-		CreateShaders();
+	UpdateShaders();
 }
 
 ZEMaterialDefault* ZEMaterialDefault::CreateInstance()
@@ -2020,7 +2033,7 @@ ZEMaterialDefault::ZEMaterialDefault()
 	Samplers.DistortionMap.SetMagFilter(ZE_TFM_ANISOTROPY);
 	Samplers.DistortionMap.SetMipFilter(ZE_TFM_ANISOTROPY);
 
-	memset((void*)&Components, 0, sizeof (ZEFixedMaterialComponents));
+	memset((void*)&Components, 0, sizeof (ZEMaterialDefaultComponents));
 	memset((void*)&Shaders, 0, sizeof (ZEFixedMaterialShaders));
 	memset((void*)&Textures, 0, sizeof(ZEFixedMaterialTextures));
 	memset((void*)&Resources, 0, sizeof (ZEFixedMaterialResources));

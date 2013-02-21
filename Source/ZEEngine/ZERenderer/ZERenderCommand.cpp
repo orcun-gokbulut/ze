@@ -36,11 +36,67 @@
 #include "ZERenderCommand.h"
 #include <memory.h>
 
+/************************************************************************/
+/*                        RENDER COMMAND TEST                           */
+/************************************************************************/
+ZERenderCommandTest::ZERenderCommandTest()
+{
+	Type = ZE_RCT_DEFAULT;
+	Order = 3.0f;
+	Priority = 3;
+	
+	PrimitiveType = ZE_PT_NONE;
+	PrimitiveCount = 0;
+	FirstVertex = 0;
+	
+	Material = NULL;
+	VertexLayout = NULL;
+	memset(VertexBuffers, NULL, sizeof(ZEVertexBuffer*) * ZE_MAX_VERTEX_BUFFER_SLOT);
+}
+
+ZERenderCommandTest::~ZERenderCommandTest()
+{
+
+}
+
+ZERenderCommandIndexedTest::ZERenderCommandIndexedTest()
+{
+	Type |= ZE_RCT_INDEXED;
+	
+	BaseVertex = 0;
+	FirstIndex = 0;
+	IndexCount = 0;
+	IndexBuffer = NULL;
+}
+
+ZERenderCommandIndexedTest::~ZERenderCommandIndexedTest()
+{
+
+}
+
+ZERenderCommandInstancedTest::ZERenderCommandInstancedTest()
+{
+	Type |= ZE_RCT_INSTANCED;
+
+	InstanceCount = 0;
+	FirstInstance = 0;
+}
+
+ZERenderCommandInstancedTest::~ZERenderCommandInstancedTest()
+{
+
+}
+
+/************************************************************************/
+/*                        OLD RENDER COMMAND                            */
+/************************************************************************/
+
 ZERenderCommand::ZERenderCommand()
 {
 	Order = 0.0f;
 	Priority = 0;
 
+	Type = ZE_RCT_DEFAULT;
 	Flags = ZE_RCF_NONE;
 	Pipeline = ZE_RP_NONE;
 
@@ -49,7 +105,7 @@ ZERenderCommand::ZERenderCommand()
 	FirstVertex = 0;
 	Material = NULL;
 
-	memset(VertexBuffers, 0, sizeof(ZEVertexBuffer*) * 16);
+	memset(VertexBuffers, 0, sizeof(ZEVertexBuffer*) * ZE_MAX_VERTEX_BUFFER_SLOT);
 }
 
 ZERenderCommand::~ZERenderCommand()
@@ -59,7 +115,7 @@ ZERenderCommand::~ZERenderCommand()
 
 ZERenderCommandSkinned::ZERenderCommandSkinned()
 {
-	Flags |= ZE_RCF_SKINNED;
+	Flags |= ZE_RCT_SKINNED;
 }
 
 ZERenderCommandSkinned::~ZERenderCommandSkinned()
@@ -69,7 +125,7 @@ ZERenderCommandSkinned::~ZERenderCommandSkinned()
 
 ZERenderCommandIndexed::ZERenderCommandIndexed()
 {
-	Flags |= ZE_RCF_INDEXED;
+	Flags |= ZE_RCT_INDEXED;
 	
 	BaseVertex = 0;
 	FirstIndex = 0;
@@ -84,7 +140,7 @@ ZERenderCommandIndexed::~ZERenderCommandIndexed()
 
 ZERenderCommandInstanced::ZERenderCommandInstanced()
 {
-	Flags |= ZE_RCF_INSTANCED;
+	Flags |= ZE_RCT_INSTANCED;
 
 	InstanceCount = 0;
 	FirstInstance = 0;

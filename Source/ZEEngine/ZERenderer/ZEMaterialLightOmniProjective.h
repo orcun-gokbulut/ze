@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELightProjective.h
+ Zinek Engine - ZEMaterialLightOmniProjective.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,58 +33,54 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef	__ZE_PROJECTIVE_LIGHT_H__
-#define __ZE_PROJECTIVE_LIGHT_H__
+#ifndef __ZE_MATERIAL_LIGHT_OMNI_PROJECTIVE_H__
+#define __ZE_MATERIAL_LIGHT_OMNI_PROJECTIVE_H__
 
-#include "ZELight.h"
-#include "ZERenderCommand.h"
-#include "ZEMath/ZEViewFrustum.h"
+#include "ZETypes.h"
+#include "ZEMaterialLight.h"
 #include "ZEGraphics/ZESamplerState.h"
 
-class ZETexture2D;
+class ZEShader;
+class ZERenderStage;
+class ZETextureCube;
 class ZEVertexBuffer;
-class ZEMaterialLightProjective;
+class ZERenderCommand;
+class ZEConstantBuffer;
 
-class ZELightProjective : public ZELight
+class ZEMaterialLightOmniProjective : public ZEMaterialLight
 {
-	private:
-		float							FOV;
-		float							AspectRatio;
-		
-		ZESamplerState					TextureSampler;
-		const ZETexture2D*				ProjectionTexture;
+	friend class ZELightOmniProjective;
 
-		ZEMaterialLightProjective*		Material;
-		ZEVertexBuffer*					Geometry;
-		ZERenderCommand					RenderCommand;
+	protected:
+		const ZETextureCube*		ProjectionTexture;
+		ZESamplerState				SamplerState;
 
-		ZEViewFrustum					ViewVolume;
+		ZEShader*					VertexShader;
+		ZEShader*					PixelShader;
+		ZEConstantBuffer*			Transformations;
+		ZEConstantBuffer*			LightParameters;
+		ZEConstantBuffer*			ShadowParameters;
+		ZEVertexBuffer*				VertexBuffer;
 
-										ZELightProjective();
-		virtual							~ZELightProjective();
+		void						UpdateShaders();
+		void						UpdateBuffers();
+
+		void						DestroyShaders();
+		void						DestroyBuffers();
+
+		bool						SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
+
+									ZEMaterialLightOmniProjective();
+		virtual						~ZEMaterialLightOmniProjective();
 
 	public:
-		void							SetFOV(float Value);
-		float							GetFOV() const;
+		virtual ZESize				GetHash() const;
+		virtual ZEMaterialFlags		GetMaterialFlags() const;
 
-		void							SetAspectRatio(float Value);
-		float							GetAspectRatio() const;
+		virtual void				UpdateMaterial();
+		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		void							SetTextureSampler(const ZESamplerState& Sampler);
-		const ZESamplerState&			GetTextureSampler() const;
-
-		void							SetProjectionTexture(const ZETexture2D* Texture);
-		const ZETexture2D*				GetProjectionTexture() const;
-
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index);
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
-
-		virtual void					Tick(float Time);
-		virtual void					Draw(ZEDrawParameters* DrawParameters);
-
-		static ZELightProjective*		CreateInstance();
+		static ZEMaterialLightOmniProjective*	CreateInstance();
 };
 
 #endif

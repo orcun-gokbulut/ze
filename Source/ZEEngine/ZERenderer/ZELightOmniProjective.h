@@ -43,7 +43,7 @@
 
 class ZETextureCube;
 class ZEVertexBuffer;
-class ZEMaterialOmniProjectiveLight;
+class ZEMaterialLightOmniProjective;
 
 class ZELightOmniProjective : public ZELight
 {
@@ -51,7 +51,7 @@ class ZELightOmniProjective : public ZELight
 		ZESamplerState					TextureSampler;
 		const ZETextureCube*			ProjectionTexture;
 
-		ZEMaterialOmniProjectiveLight*	Material;
+		ZEMaterialLightOmniProjective*	Material;
 		ZEVertexBuffer*					Geometry;
 		ZERenderCommand					RenderCommand;
 

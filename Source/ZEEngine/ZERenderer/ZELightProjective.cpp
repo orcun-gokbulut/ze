@@ -43,9 +43,10 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZETextureCube.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEMaterialProjectiveLight.h"
+#include "ZEMaterialLightProjective.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZETexture/ZETexture2DResource.h"
+#include "ZECore/ZECore.h"
 
 void ZELightProjective::SetFOV(float Value)
 {
@@ -110,7 +111,7 @@ bool ZELightProjective::Initialize()
 	Canvas.AddPyramid(1.0f, 1.0f, 1.0f);
 	Geometry = Canvas.CreateStaticVertexBuffer();
 	
-	Material = ZEMaterialProjectiveLight::CreateInstance();
+	Material = ZEMaterialLightProjective::CreateInstance();
 
 	return ZEEntity::Initialize();
 }
@@ -148,7 +149,7 @@ void ZELightProjective::Tick(float Time)
 	RenderCommand.Priority = 3;
 	RenderCommand.Flags = 0;
 	RenderCommand.FirstVertex = 0;
-	RenderCommand.Material = (ZEMaterial*)Material;
+	RenderCommand.Material = Material;
 	RenderCommand.Pipeline = ZE_RP_3D;
 	RenderCommand.PrimitiveCount = 6;
 	RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
@@ -156,7 +157,9 @@ void ZELightProjective::Tick(float Time)
 }
 
 void ZELightProjective::Draw(ZEDrawParameters* DrawParameters)
-{
+{	
+	ZEUInt FrameId = zeCore->GetFrameId();
+
 	if (ProjectionTexture == NULL)
 	{
 		zeWarning("NULL projection texture");
@@ -176,10 +179,11 @@ ZELightProjective::ZELightProjective()
 	FOV = ZE_PI_4;
 	AspectRatio = 1.0f;
 	Type = ZE_LT_PROJECTIVE;
-	ProjectionTexture = NULL;
+
 	Material = NULL;
 	Geometry = NULL;
-
+	ProjectionTexture = NULL;
+	
 	TextureSampler.SetMagFilter(ZE_TFM_LINEAR);
 	TextureSampler.SetMinFilter(ZE_TFM_LINEAR);
 	TextureSampler.SetMipFilter(ZE_TFM_LINEAR);

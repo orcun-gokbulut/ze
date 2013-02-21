@@ -48,6 +48,7 @@
 #include "ZEGraphics/ZESamplerState.h"
 #include "ZEGraphics/ZEDepthStencilState.h"
 #include "ZEGraphics/ZERasterizerState.h"
+#include "ZEDS/ZEHashGenerator.h"
 
 
 struct SimpleMaterialVSData
@@ -120,9 +121,9 @@ ZEMaterialFlags ZEMaterialSimple::GetMaterialFlags() const
 	return ZE_MTF_FORWARD_PASS;
 }
 
-ZEUInt32 ZEMaterialSimple::GetHash() const
+ZESize ZEMaterialSimple::GetHash() const
 {
-	return 1 << 31;
+	return ZEHashGenerator::Hash(ZEString("ZEMaterialSimple"));
 }
 
 void ZEMaterialSimple::SetTwoSided(bool Enable)
@@ -228,15 +229,15 @@ bool ZEMaterialSimple::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, cons
 
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_VIEW_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
 	}
-	else if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_VIEW_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetViewTransform();
 	}
-	else if (RenderCommand->Flags & ZE_RCF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_PROJECTION_TRANSFORM)
 	{
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	}
@@ -247,7 +248,7 @@ bool ZEMaterialSimple::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, cons
 
 	ZEMatrix4x4 WorldViewMatrix;
 	ZEMatrix4x4 WorldViewProjMatrix;
-	if (RenderCommand->Flags & ZE_RCF_ENABLE_WORLD_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_WORLD_TRANSFORM)
 	{
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
 	}
@@ -277,8 +278,8 @@ bool ZEMaterialSimple::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, cons
 
 	ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
-	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_RCF_ENABLE_Z_CULLING) == 0 ? false : true);
-	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_RCF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
+	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_RCF_Z_CULL) == 0 ? false : true);
+	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_RCF_NO_Z_WRITE) == 0 ? true : false);
 	Device->SetDepthStencilState(DepthStencilState);
 	
 	ZERasterizerState RasterizerState;
@@ -342,18 +343,18 @@ bool ZEMaterialSimple::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* R
 	
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if ((RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_RCF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if ((RenderCommand->Flags & ZE_RCF_VIEW_PROJECTION_TRANSFORM) == ZE_RCF_VIEW_PROJECTION_TRANSFORM)
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
-	else if (RenderCommand->Flags & ZE_RCF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_VIEW_TRANSFORM)
 		ViewProjMatrix = Camera->GetViewTransform();
-	else if (RenderCommand->Flags & ZE_RCF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_RCF_PROJECTION_TRANSFORM)
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	else
 		ViewProjMatrix = ZEMatrix4x4::Identity;
 
 	ZEMatrix4x4 WorldViewMatrix;
 	ZEMatrix4x4 WorldViewProjMatrix;
-	if (RenderCommand->Flags & ZE_RCF_ENABLE_WORLD_TRANSFORM)
+	if (RenderCommand->Flags & ZE_RCF_WORLD_TRANSFORM)
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
 	else
 		WorldViewProjMatrix = ViewProjMatrix;
@@ -375,8 +376,8 @@ bool ZEMaterialSimple::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* R
 
 	static ZEDepthStencilState DepthStencilState;
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
-	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_RCF_ENABLE_Z_CULLING) == 0 ? false : true);
-	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_RCF_ENABLE_NO_Z_WRITE) == 0 ? true : false);
+	DepthStencilState.SetZTestEnable((RenderCommand->Flags & ZE_RCF_Z_CULL) == 0 ? false : true);
+	DepthStencilState.SetZWriteEnable((RenderCommand->Flags & ZE_RCF_NO_Z_WRITE) == 0 ? true : false);
 	Device->SetDepthStencilState(&DepthStencilState);
 	
 	ZERasterizerState RasterizerState;
