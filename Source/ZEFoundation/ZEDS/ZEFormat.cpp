@@ -89,7 +89,7 @@ ZEString ZEFormat::FormatInner(const char* Input, const ZEVariant** Arguments, Z
 					else
 					{
 						zeError("Formatting error. Mismatch '}' character.");
-						return "";
+						return "!FORMATING_ERROR!";
 					}
 				}
 				else
@@ -108,7 +108,7 @@ ZEString ZEFormat::FormatInner(const char* Input, const ZEVariant** Arguments, Z
 				else
 				{
 					zeError("Formatting error. Argument index must be integer.");
-					return "";
+					return "!FORMATING_ERROR!";
 				}
 				break;
 			
@@ -122,7 +122,7 @@ ZEString ZEFormat::FormatInner(const char* Input, const ZEVariant** Arguments, Z
 					if (ArgumentIndex >= Count)
 					{
 						zeError("Formatting error. Argument index is out of bounds.");
-						return "";
+						return "!FORMATING_ERROR!";
 					}
 
 					if (*CurrentInput == ':')
@@ -147,7 +147,7 @@ ZEString ZEFormat::FormatInner(const char* Input, const ZEVariant** Arguments, Z
 				else
 				{
 					zeError("Formatting Error. Argument index must be integer.");
-					return "";
+					return "!FORMATING_ERROR!";
 				}
 				CurrentInput++;
 				break;
@@ -169,7 +169,7 @@ ZEString ZEFormat::FormatInner(const char* Input, const ZEVariant** Arguments, Z
 				else
 				{
 					zeError("Formatting error. Expected ':' or '}' after argument index.");
-					return "";
+					return "!FORMATING_ERROR!";
 				}
 
 				CurrentInput++;
@@ -196,7 +196,7 @@ ZEString ZEFormat::FormatInner(const char* Input, const ZEVariant** Arguments, Z
 
 			ZEString PrintOutput;
 			if (!ZEFormatArgument::FormatVariant(Writer, *Arguments[ArgumentIndex], ArgumentFormat))
-				return false;
+				Writer.Append("!FORMATING_ARGUMENT_ERROR!");
 
 			ArgumentIndex = -1;
 			ArgumentFormatIndex = 0;
@@ -208,7 +208,7 @@ ZEString ZEFormat::FormatInner(const char* Input, const ZEVariant** Arguments, Z
 	if (State != 0)
 	{
 		zeError("Formatting error. There are non-closed argument available in the format.");
-		return false;
+		return "!FORMATING_ERROR!";
 	}
 
 	ZEString Output;

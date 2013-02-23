@@ -43,37 +43,15 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-class ZESystemMessageHandler;
-
 class ZEWindowsInputKeyboardDevice : public ZEInputDevice
 {
 	friend class ZEWindowsInputModule;
-	friend class ZEWMIKSMH;
-	private:
-		ZEString							DeviceName;
-
-		HANDLE								DeviceHandle;
-		RID_DEVICE_INFO						DeviceInfo;
-
-		bool								ButtonState[256];
-		bool								ButtonStateOld[256];
-
-		ZESystemMessageHandler*				MessageHandler;
-
-		ZEWindowsInputKeyboardDevice();
-		~ZEWindowsInputKeyboardDevice();
-
+	friend class ZEWindowsInputKeyboardMessageHandler;
 	public:
-		virtual const ZEString&				GetDeviceName();
-				virtual ZEUInt32						GetButtonCount();
+		virtual void							UnAcquire();
+		virtual bool							Initialize();
 
-		virtual void						UnAcquire();
+		virtual void							Process(const RAWINPUT& Data);
+};
 
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
-
-		virtual void						ProcessInputs();
-
-		virtual bool						ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction);
-	};
 #endif

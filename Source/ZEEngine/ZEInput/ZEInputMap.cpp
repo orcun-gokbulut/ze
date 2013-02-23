@@ -34,33 +34,134 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInputMap.h"
-#include "ZEInputModule.h"
 
-ZESize ZEInputMap::GetInputActionCount()
+ZESize ZEInputMap::GetActionCount() const
 {
-	return InputActionCount;
+	return ActionCount;
 }
 
-const ZEInputAction* ZEInputMap::GetInputActions()
+const ZEInputAction* ZEInputMap::GetActions() const
 {
-	return InputActions;
+	return Actions;
 }
 
-const ZEInputAction* ZEInputMap::CheckInputAction(ZEInt Id)
+bool ZEInputMap::CheckAction(ZEInt ActionId) const
 {
-	for (ZESize I = 0; I < InputActionCount; I++)
-		if (InputActions[I].Id == Id)
-			return &InputActions[I];
-	
-	return NULL;
+	for (ZESize I = 0; I < ActionCount; I++)
+		if (Actions[I].Id == ActionId)
+			return true;
+
+	return false;
+}
+
+bool ZEInputMap::CheckAction(ZEInt ActionId, ZEInputAction& Action) const
+{
+	for (ZESize I = 0; I < ActionCount; I++)
+		if (Actions[I].Id == ActionId)
+		{
+			Action = Actions[I];
+			return true;
+		}
+
+	return false;
 }
 
 void ZEInputMap::Update()
 {
-	zeInput->ProcessInputMap(this);
+	ActionCount = 0;
+	for (ZESize I = 0; I < Events.GetCount(); I++)
+	{
+		if (Events[I].Check(Actions[ActionCount]))
+			ActionCount++;
+
+		if (ActionCount == ZE_INPUT_MAP_MAX_INPUT_ACTION_COUNT)
+			return;
+	}
 }
+
+
+void ZEInputMap::AddAction(const ZEInput& Input, ZEInputState State, ZEInt ActionId)
+{
+	Events.Add(ZEInputEvent::CreateAction(Input, State, ActionId));
+}
+
+void ZEInputMap::AddAction(const ZEString& InputString, ZEInputState State, ZEInt ActionId)
+{
+	Events.Add(ZEInputEvent::CreateAction(ZEInput::Create(InputString), State, ActionId));
+}
+
+void ZEInputMap::AddButtonAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId)
+{
+	Events.Add(ZEInputEvent::CreateAction(ZEInput::CreateButton(DeviceName, Index), State, ActionId));
+}
+
+void ZEInputMap::AddAxisAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputAxisSign Sign, ZEInputState State, ZEInt ActionId)
+{
+	Events.Add(ZEInputEvent::CreateAction(ZEInput::CreateAxis(DeviceName, Index, Sign), State, ActionId));
+}
+
+void ZEInputMap::AddPOVAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId)
+{
+	Events.Add(ZEInputEvent::CreateAction(ZEInput::CreatePOV(DeviceName, Index), State, ActionId));
+}
+
+void ZEInputMap::AddSwitchAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId)
+{
+	Events.Add(ZEInputEvent::CreateAction(ZEInput::CreateSwitch(DeviceName, Index), State, ActionId));
+}
+
+void ZEInputMap::AddVectorAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId)
+{
+	Events.Add(ZEInputEvent::CreateAction(ZEInput::CreateVector(DeviceName, Index), State, ActionId));
+}
+
+void ZEInputMap::AddQuaternionAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId)
+{
+	Events.Add(ZEInputEvent::CreateAction(ZEInput::CreateQuaternion(DeviceName, Index), State, ActionId));
+}
+
+void ZEInputMap::AddCallback(const ZEInput& Input, ZEInputState State, const ZEInputCallback& Callback)
+{
+	Events.Add(ZEInputEvent::CreateCallback(Input, State, Callback));
+}
+
+void ZEInputMap::AddCallback(const ZEString& InputString, ZEInputState State, const ZEInputCallback& Callback)
+{
+	Events.Add(ZEInputEvent::CreateCallback(ZEInput::Create(InputString), State, Callback));
+}
+
+void ZEInputMap::AddButtonCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback)
+{
+	Events.Add(ZEInputEvent::CreateCallback(ZEInput::CreateButton(DeviceName, Index), State, Callback));
+}
+
+void ZEInputMap::AddAxisCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputAxisSign Sign, ZEInputState State, const ZEInputCallback& Callback)
+{
+	Events.Add(ZEInputEvent::CreateCallback(ZEInput::CreateAxis(DeviceName, Index, Sign), State, Callback));
+}
+
+void ZEInputMap::AddPOVCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback)
+{
+	Events.Add(ZEInputEvent::CreateCallback(ZEInput::CreatePOV(DeviceName, Index), State, Callback));
+}
+
+void ZEInputMap::AddSwitchCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback)
+{
+	Events.Add(ZEInputEvent::CreateCallback(ZEInput::CreateSwitch(DeviceName, Index), State, Callback));
+}
+
+void ZEInputMap::AddVectorCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback)
+{
+	Events.Add(ZEInputEvent::CreateCallback(ZEInput::CreateVector(DeviceName, Index), State, Callback));
+}
+
+void ZEInputMap::AddQuaternionCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback)
+{
+	Events.Add(ZEInputEvent::CreateCallback(ZEInput::CreateQuaternion(DeviceName, Index), State, Callback));
+}
+
 
 ZEInputMap::ZEInputMap()
 {
-	InputActionCount = 0;	
+	ActionCount = 0;	
 }

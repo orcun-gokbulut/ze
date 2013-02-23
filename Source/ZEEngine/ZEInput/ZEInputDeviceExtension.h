@@ -42,12 +42,26 @@
 
 class  ZEExtensionDescription;
 
-class ZEInputDeviceExtension : public ZEExtension
+class ZEInputDeviceModule : public ZEExtension
 {
-	ZE_EXTENSION(ZEInputDeviceExtension)
+	ZE_EXTENSION(ZEInputDeviceModule)
+	private:
+		ZEArray<ZEInputDevice*>				Devices;
+
+	protected:
+		bool								RegisterDevice(ZEInputDevice* Device);
+		void								UnregisterDevice(ZEInputDevice* Device);
 
 	public:
-		virtual ZEArray<ZEInputDevice*>		GetDevices() = 0;
+		const ZEArray<ZEInputDevice*>&		GetDevices();
+
+		virtual void						Deinitialize();
+
+		virtual void						Acquire();
+		virtual void						UnAcquire();
+
+		virtual void						Process() = 0;
+
 };
 
 #endif

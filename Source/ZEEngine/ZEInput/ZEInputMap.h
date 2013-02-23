@@ -39,22 +39,43 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEInputAction.h"
-#include "ZEInputMapBinding.h"
+#include "ZEInputEvent.h"
+
+#define ZE_INPUT_MAP_MAX_INPUT_ACTION_COUNT 50
 
 class ZEInputMap
 {
-	public:
-		ZEInputAction				InputActions[50];
-		ZESize						InputActionCount;
+	friend class ZEInputModule;
+	private:
+		ZEInputAction				Actions[ZE_INPUT_MAP_MAX_INPUT_ACTION_COUNT];
+		ZESize						ActionCount;
 
 	public:
-		ZEArray<ZEInputBinding>		InputBindings;
+		ZEArray<ZEInputEvent>		Events;	
 
-		ZESize						GetInputActionCount();
-		const ZEInputAction*		GetInputActions();
+		ZESize						GetActionCount() const;
+		const ZEInputAction*		GetActions() const;
 
-		const ZEInputAction*		CheckInputAction(ZEInt Id);
+		bool						CheckAction(ZEInt ActionId) const;
+		bool						CheckAction(ZEInt ActionId, ZEInputAction& Action) const;
+
+		void						AddAction(const ZEInput& Input, ZEInputState State, ZEInt ActionId);
+		void						AddAction(const ZEString& InputString, ZEInputState State, ZEInt ActionId);
+		void						AddButtonAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId);
+		void						AddAxisAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputAxisSign Sign, ZEInputState State, ZEInt ActionId);
+		void						AddPOVAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId);
+		void						AddSwitchAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId);
+		void						AddVectorAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId);
+		void						AddQuaternionAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId);
+
+		void						AddCallback(const ZEInput& Input, ZEInputState State, const ZEInputCallback& Callback);
+		void						AddCallback(const ZEString& InputString, ZEInputState State, const ZEInputCallback& Callback);
+		void						AddButtonCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback);
+		void						AddAxisCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputAxisSign Sign, ZEInputState State, const ZEInputCallback& Callback);
+		void						AddPOVCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback);
+		void						AddSwitchCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback);
+		void						AddVectorCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback);
+		void						AddQuaternionCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback);
 
 		void						Update();
 

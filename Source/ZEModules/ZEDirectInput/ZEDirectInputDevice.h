@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFreespaceInputDeviceExtension.h
+ Zinek Engine - ZEDirectInputDevice.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,27 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_FREESPACE_INPUT_MODULE_H__
-#define __ZE_FREESPACE_INPUT_MODULE_H__
+#ifndef	__ZE_DIRECT_INPUT_DEVICE_H__
+#define __ZE_DIRECT_INPUT_DEVICE_H__
 
-#include "ZEInput/ZEInputDeviceExtension.h"
-#include "ZEFreespaceInputDevice.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEInput/ZEInputDevice.h"
 
-class ZEInputDevice;
+#include <dinput.h>
 
-class ZEFreespaceInputDeviceExtension : public ZEInputDeviceExtension
+class ZEDirectInputModule;
+class ZEDirectInputDevice : public ZEInputDevice
 {
-	private:
-		ZEArray<ZEFreespaceInputDevice>	Devices;
-
 	public:
-		ZEExtensionDescription*			ExtensionDescription();
-		virtual ZEExtensionDescription* GetExtensionDescription();
+		ZEString								DeviceName;
+		
+		ZEDirectInputModule*					Module;
+		LPDIRECTINPUTDEVICE8					DirectInputDevice;
+		DIDEVICEINSTANCE						DirectInputInstance;
 
-		ZEArray<ZEInputDevice*>			GetDevices();
+		virtual void							Acquire();
+		virtual void							UnAcquire();
 
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
+		virtual bool							Initialize();
+		virtual void							Deinitialize();
+
+		virtual void							Process();
+
+												ZEDirectInputDevice();
+
 };
 
 #endif

@@ -39,49 +39,142 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEInputEvent.h"
-#include "ZEInputAction.h"
 #include "ZEDS/ZEString.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 
-class ZEInputBinding;
-class ZEInputMap;
+enum ZEInputDeviceType
+{
+	ZE_IDT_NONE,
+	ZE_IDT_MOUSE,
+	ZE_IDT_KEYBOARD,
+	ZE_IDT_JOYSTICK,
+	ZE_IDT_GAMEPAD,
+	ZE_IDT_WHEEL,
+	ZE_IDT_SENSOR,
+	ZE_IDT_OTHER
+};
+
+class ZEInputDeviceDescription
+{
+	public:
+		ZEString							Name;
+		ZEUInt								NameHash;
+		ZEUInt								Index;
+		ZEInputDeviceType					Type;
+
+		ZEString							FullName;
+
+		ZEString							SinkName;
+		ZEUInt								SinkNameHash;
+		bool								Sink;
+
+		ZESize								ButtonCount;
+		ZESize								AxisCount;
+		ZESize								POVCount;
+		ZESize								SwitchCount;
+		ZESize								VectorCount;
+		ZESize								QuaternionCount;
+
+		void								Clear();
+
+											ZEInputDeviceDescription();
+};
+
+class ZEInputDeviceState
+{
+	public:
+		struct  
+		{
+			ZEArray<bool>					OldValues;
+			ZEArray<bool>					CurrentValues;
+
+		} Buttons;
+
+		struct  
+		{
+			ZEArray<float>					OldValues;
+			ZEArray<float>					CurrentValues;
+		} Axises;
+
+		struct  
+		{
+			ZEArray<ZEInt>					OldValues;
+			ZEArray<ZEInt>					CurrentValues;
+		} POVs;
+
+		struct  
+		{
+			ZEArray<ZEUInt>					OldValues;
+			ZEArray<ZEUInt>					CurrentValues;
+		} Switches;
+
+		struct  
+		{
+			ZEArray<ZEVector4>				OldValues;
+			ZEArray<ZEVector4>				CurrentValues;
+		} Vectors;
+
+		struct  
+		{
+			ZEArray<ZEQuaternion>			OldValues;
+			ZEArray<ZEQuaternion>			CurrentValues;
+		} Quaternions;
+
+		void								Initialize(const ZEInputDeviceDescription& Description);
+		void								Reset();
+		void								Advance();
+		void								AdvanceAndReset();
+		void								Clear();
+};
+
+class ZEInputDeviceIndexes
+{
+	private:
+		static ZESize							KeyboardIndex;
+		static ZESize							MouseIndex;
+		static ZESize							JoystickIndex;
+		static ZESize							GamepadIndex;
+		static ZESize							WheelIndex;
+		static ZESize							SensorIndex;
+		static ZESize							OtherIndex;
+
+	public:
+		static ZESize							GetNewDeviceIndex(ZEInputDeviceType Type);
+};
 
 class ZEInputDevice
 {
 	private:
-		bool							Enabled;
-		bool							Acquired;
-		bool							Initialized;
+		bool									Enabled;
+		bool									Acquired;
+		bool									Initialized;
+
+	protected:
+		ZEInputDeviceState						State;
+		ZEInputDeviceDescription				Description;
 
 	public:
-		virtual const ZEString&			GetDeviceName() = 0;
+		const ZEString&							GetName();
+		virtual const ZEInputDeviceDescription&	GetDescription();
 
-		virtual ZEUInt32				GetButtonCount();
-		virtual ZEUInt32				GetAxisCount();
-		virtual ZEUInt32				GetVector2Count();
-		virtual ZEUInt32				GetVector3Count();
-		virtual ZEUInt32				GetVector4Count();
-		virtual ZEUInt32				GetQuaternionCount();
+		virtual void							SetEnabled(bool Enabled);
+		bool									GetEnabled();
 
-		virtual void					SetEnabled(bool Enabled);
-		virtual bool					GetEnabled();
+		bool									IsAcquired();
+		virtual void							Acquire();
+		virtual void							UnAcquire();
 
-		virtual bool					IsAcquired();
-		virtual void					Acquire();
-		virtual void					UnAcquire();
+		bool									IsInitialized();
+		virtual bool							Initialize();
+		virtual void							Deinitialize();
 
-		virtual bool					IsInitialized();
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
+		const ZEInputDeviceState&				GetState();
 
-		virtual void					ProcessInputs() = 0;
+		virtual void							Destroy();
 
-		virtual bool					ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* Action) = 0;
-
-		virtual void					Destroy();
-
-										ZEInputDevice();
-		virtual							~ZEInputDevice();
+												ZEInputDevice();
+		virtual									~ZEInputDevice();
 };
 
 #endif

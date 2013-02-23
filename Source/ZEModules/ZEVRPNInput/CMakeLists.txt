@@ -35,11 +35,11 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEVRPNInputDevice.cpp							Sources)
-ze_add_source(ZEVRPNInputDevice.h							Sources)
-ze_add_source(ZEVRPNInputDeviceExtension.cpp				Sources)
-ze_add_source(ZEVRPNInputDeviceExtension.h					Sources)
-	
+ze_add_source(ZEVRPNInputDevice.cpp						Sources)
+ze_add_source(ZEVRPNInputDevice.h						Sources)
+ze_add_source(ZEVRPNInputModule.cpp						Sources)
+ze_add_source(ZEVRPNInputModule.h						Sources)
+
 ze_add_library(ZEVRPNInput 
 	SOURCES ${Sources}
 	LIBS libVRPN)

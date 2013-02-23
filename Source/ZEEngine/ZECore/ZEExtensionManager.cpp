@@ -111,11 +111,15 @@ class ZEExtensionManager* ZEExtensionManager::GetInstance()
 	return ZECore::GetInstance()->GetExtensionManager();
 }
 
-#include "ZEModules/ZEVRPNInput/ZEVRPNInputDeviceExtension.h"
+#include "ZEModules/ZEVRPNInput/ZEVRPNInputModule.h"
+#include "ZEModules/ZEDirectInput/ZEDirectInputModule.h"
+#include "ZEModules/ZEWindowsInput/ZEWindowsInputModule.h"
+
 ZEExtensionManager::ZEExtensionManager()
 {
-	RegisterExtension(ZEVRPNInputDeviceExtension::Description());
-	//RegisterExtension(new ZEFreespaceInputDeviceExtensionDescription());
+	RegisterExtension(ZEVRPNInputModule::Description());
+	RegisterExtension(ZEDirectInputModule::Description());
+	RegisterExtension(ZEWindowsInputModule::Description());
 }
 
 ZEExtensionManager::~ZEExtensionManager()

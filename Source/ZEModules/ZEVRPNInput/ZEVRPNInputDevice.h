@@ -42,40 +42,27 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEInput/ZEInputDevice.h"
 
-class vrpn_Tracker_Remote;
-class vrpn_Button_Remote;
-class vrpn_Analog_Remote;
+class vrpn_BaseClass;
+
+struct ZEVRPNInputDeviceHandle
+{
+	ZEInputDeviceDescription*	Description;
+	ZEInputDeviceState*			State;
+};
 
 class ZEVRPNInputDevice : public ZEInputDevice
 {
-	friend class ZEVRPNInputDeviceExtension;
-
+	friend class ZEVRPNInputModule;
 	public:
-		ZEString						DeviceName;
-		vrpn_Tracker_Remote*			TrackerRemote;
-		vrpn_Button_Remote*				ButtonRemote;
-		vrpn_Analog_Remote*				AxisRemote;
-
-		float							Axises[3];
-		bool							Buttons[5], OldButtons[5];
-		ZEVector3						Vector;
-		ZEQuaternion					Quaternion;
-
-										ZEVRPNInputDevice();
-		
-		virtual const ZEString&			GetDeviceName();
-
-		virtual ZEUInt32				GetAxisCount();
-		virtual ZEUInt32				GetButtonCount();
-		virtual ZEUInt32				GetVector3Count();
-		virtual ZEUInt32				GetQuaternionCount();
+		ZEVRPNInputDeviceHandle			Handle;
+		vrpn_BaseClass*					VRPNDevice;
 
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
 
-		virtual void					ProcessInputs();
+		virtual void					Process();
 
-		virtual bool					ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction);
+										ZEVRPNInputDevice(const ZEInputDeviceDescription& Description);
 };
 
 #endif

@@ -34,37 +34,239 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInputDevice.h"
-
-ZEUInt32 ZEInputDevice::GetButtonCount()
+void ZEInputDeviceDescription::Clear()
 {
-	return 0;
+	Name = "";
+	NameHash = 0;
+	Index = 0;
+	Type = ZE_IDT_NONE;
+
+	FullName = "";
+
+	Sink = false;
+	SinkName = "";
+	SinkNameHash = 0;
+
+	ButtonCount = 0;
+	AxisCount = 0;
+	POVCount = 0;
+	SwitchCount = 0;
+	VectorCount = 0;
+	QuaternionCount = 0;
 }
 
-ZEUInt32 ZEInputDevice::GetAxisCount()
+ZEInputDeviceDescription::ZEInputDeviceDescription()
 {
-	return 0;
+	Clear();
 }
 
-ZEUInt32 ZEInputDevice::GetVector2Count()
+void ZEInputDeviceState::Initialize(const ZEInputDeviceDescription& Description)
 {
-	return 0;
+	Buttons.OldValues.SetCount(Description.ButtonCount);
+	Buttons.CurrentValues.SetCount(Description.ButtonCount);
+
+	Axises.OldValues.SetCount(Description.AxisCount);
+	Axises.CurrentValues.SetCount(Description.AxisCount);
+
+	POVs.OldValues.SetCount(Description.POVCount);
+	POVs.CurrentValues.SetCount(Description.POVCount);
+
+	Switches.OldValues.SetCount(Description.SwitchCount);
+	Switches.CurrentValues.SetCount(Description.SwitchCount);
+
+	Vectors.OldValues.SetCount(Description.VectorCount);
+	Vectors.CurrentValues.SetCount(Description.VectorCount);
+
+	Quaternions.OldValues.SetCount(Description.QuaternionCount);
+	Quaternions.CurrentValues.SetCount(Description.QuaternionCount);
 }
 
-ZEUInt32 ZEInputDevice::GetVector3Count()
+void ZEInputDeviceState::Clear()
 {
-	return 0;
+	Buttons.OldValues.SetCount(0);
+	Buttons.CurrentValues.SetCount(0);
+
+	Axises.OldValues.SetCount(0);
+	Axises.CurrentValues.SetCount(0);
+
+	POVs.OldValues.SetCount(0);
+	POVs.CurrentValues.SetCount(0);
+
+	Switches.OldValues.SetCount(0);
+	Switches.CurrentValues.SetCount(0);
+
+	Vectors.OldValues.SetCount(0);
+	Vectors.CurrentValues.SetCount(0);
+
+	Quaternions.OldValues.SetCount(0);
+	Quaternions.CurrentValues.SetCount(0);
 }
 
-ZEUInt32 ZEInputDevice::GetVector4Count()
+void ZEInputDeviceState::Reset()
 {
-	return 0;
+	if (Buttons.CurrentValues.GetCount() != 0)
+	{
+		memset(Buttons.CurrentValues.GetCArray(), 0, Buttons.CurrentValues.GetCount() * sizeof(bool));
+		memset(Buttons.OldValues.GetCArray(), 0, Buttons.OldValues.GetCount() * sizeof(bool));
+	}
+
+	if (Axises.CurrentValues.GetCount() != 0)
+	{
+		memset(Axises.CurrentValues.GetCArray(), 0, Axises.CurrentValues.GetCount() * sizeof(float));
+		memset(Axises.OldValues.GetCArray(), 0, Axises.OldValues.GetCount() * sizeof(float));
+	}
+
+	if (POVs.CurrentValues.GetCount() != 0)
+	{
+		memset(POVs.CurrentValues.GetCArray(), 0, POVs.CurrentValues.GetCount() * sizeof(float));
+		memset(POVs.OldValues.GetCArray(), 0, POVs.OldValues.GetCount() * sizeof(float));
+	}
+
+	if (Switches.CurrentValues.GetCount() != 0)
+	{
+		memset(Switches.CurrentValues.GetCArray(), 0, Switches.CurrentValues.GetCount() * sizeof(ZEUInt));
+		memset(Switches.OldValues.GetCArray(), 0, Switches.OldValues.GetCount() * sizeof(ZEUInt));
+	}
+
+	if (Vectors.CurrentValues.GetCount() != 0)
+	{
+		memset(Vectors.CurrentValues.GetCArray(), 0, Vectors.CurrentValues.GetCount() * sizeof(ZEVector4));
+		memset(Vectors.OldValues.GetCArray(), 0, Vectors.OldValues.GetCount() * sizeof(ZEVector4));
+	}
+
+	if (Quaternions.CurrentValues.GetCount() != 0)
+	{
+		memset(Quaternions.CurrentValues.GetCArray(), 0, Quaternions.CurrentValues.GetCount() * sizeof(ZEQuaternion));
+		memset(Quaternions.OldValues.GetCArray(), 0, Quaternions.OldValues.GetCount() * sizeof(ZEQuaternion));
+	}
 }
 
-ZEUInt32 ZEInputDevice::GetQuaternionCount()
+void ZEInputDeviceState::Advance()
 {
-	return 0;
+	if (Buttons.CurrentValues.GetCount() != 0)
+		memcpy(Buttons.OldValues.GetCArray(), Buttons.CurrentValues.GetCArray(), Buttons.CurrentValues.GetCount() * sizeof(bool));
+
+	if (Axises.CurrentValues.GetCount() != 0)
+		memcpy(Axises.OldValues.GetCArray(),Axises.CurrentValues.GetCArray(), Axises.CurrentValues.GetCount() * sizeof(float));
+
+	if (POVs.CurrentValues.GetCount() != 0)
+		memcpy(POVs.OldValues.GetCArray(),POVs.CurrentValues.GetCArray(), POVs.CurrentValues.GetCount() * sizeof(float));
+
+	if (Switches.CurrentValues.GetCount() != 0)
+		memcpy(Switches.OldValues.GetCArray(),Switches.CurrentValues.GetCArray(), Switches.CurrentValues.GetCount() * sizeof(ZEUInt));
+
+	if (Vectors.CurrentValues.GetCount() != 0)
+		memcpy(Vectors.OldValues.GetCArray(),Vectors.CurrentValues.GetCArray(), Vectors.CurrentValues.GetCount() * sizeof(ZEVector4));
+
+	if (Quaternions.CurrentValues.GetCount() != 0)
+		memcpy(Quaternions.OldValues.GetCArray(),Quaternions.CurrentValues.GetCArray(), Quaternions.CurrentValues.GetCount() * sizeof(ZEQuaternion));
 }
 
+void ZEInputDeviceState::AdvanceAndReset()
+{
+	if (Buttons.CurrentValues.GetCount() != 0)
+	{
+		memcpy(Buttons.OldValues.GetCArray(), Buttons.CurrentValues.GetCArray(), Buttons.CurrentValues.GetCount() * sizeof(bool));
+		memset(Buttons.CurrentValues.GetCArray(), 0, Buttons.CurrentValues.GetCount() * sizeof(bool));
+	}
+
+	if (Axises.CurrentValues.GetCount() != 0)
+	{
+		memcpy(Axises.OldValues.GetCArray(), Axises.CurrentValues.GetCArray(), Axises.CurrentValues.GetCount() * sizeof(float));
+		memset(Axises.CurrentValues.GetCArray(), 0, Axises.CurrentValues.GetCount() * sizeof(float));
+	}
+
+	if (POVs.CurrentValues.GetCount() != 0)
+	{
+		memcpy(POVs.OldValues.GetCArray(), POVs.CurrentValues.GetCArray(), POVs.CurrentValues.GetCount() * sizeof(float));
+		memset(POVs.CurrentValues.GetCArray(), 0, POVs.CurrentValues.GetCount() * sizeof(float));
+	}
+
+	if (Switches.CurrentValues.GetCount() != 0)
+	{
+		memcpy(Switches.OldValues.GetCArray(), Switches.CurrentValues.GetCArray(), Switches.CurrentValues.GetCount() * sizeof(ZEUInt));
+		memset(Switches.CurrentValues.GetCArray(), 0, Buttons.CurrentValues.GetCount() * sizeof(ZEUInt));
+	}
+
+	if (Vectors.CurrentValues.GetCount() != 0)
+	{
+		memcpy(Vectors.OldValues.GetCArray(), Vectors.CurrentValues.GetCArray(), Vectors.CurrentValues.GetCount() * sizeof(ZEVector4));
+		memset(Vectors.CurrentValues.GetCArray(), 0, Buttons.CurrentValues.GetCount() * sizeof(ZEVector4));
+	}
+
+	if (Quaternions.CurrentValues.GetCount() != 0)
+	{
+		memcpy(Quaternions.OldValues.GetCArray(), Quaternions.CurrentValues.GetCArray(), Quaternions.CurrentValues.GetCount() * sizeof(ZEQuaternion));
+		memset(Quaternions.CurrentValues.GetCArray(), 0, Quaternions.CurrentValues.GetCount() * sizeof(ZEQuaternion));
+	}
+
+}
+
+ZESize ZEInputDeviceIndexes::KeyboardIndex = 0;
+ZESize ZEInputDeviceIndexes::MouseIndex = 0;
+ZESize ZEInputDeviceIndexes::JoystickIndex = 0;
+ZESize ZEInputDeviceIndexes::GamepadIndex = 0;
+ZESize ZEInputDeviceIndexes::WheelIndex = 0;
+ZESize ZEInputDeviceIndexes::SensorIndex = 0;
+ZESize ZEInputDeviceIndexes::OtherIndex = 0;
+
+ZESize ZEInputDeviceIndexes::GetNewDeviceIndex(ZEInputDeviceType Type)
+{
+	ZESize Index;
+	switch(Type)
+	{
+		case ZE_IDT_KEYBOARD:
+			Index = KeyboardIndex;
+			KeyboardIndex++;
+			break;
+
+		case ZE_IDT_MOUSE:
+			Index = MouseIndex;
+			MouseIndex++;
+			break;
+
+		case ZE_IDT_JOYSTICK:
+			Index = JoystickIndex;
+			JoystickIndex++;
+			break;
+
+		case ZE_IDT_GAMEPAD:
+			Index = GamepadIndex;
+			GamepadIndex++;
+			break;
+
+		case ZE_IDT_WHEEL:
+			Index = WheelIndex;
+			WheelIndex++;
+			break;
+
+		case ZE_IDT_SENSOR:
+			Index = SensorIndex;
+			SensorIndex++;
+			break;
+
+		case ZE_IDT_OTHER:
+			Index = OtherIndex;
+			OtherIndex++;
+			break;
+
+		default:
+			Index = 0;
+			break;
+	}
+
+	return Index;
+}
+
+const ZEString& ZEInputDevice::GetName()
+{
+	return Description.Name;
+}
+
+const ZEInputDeviceDescription&	ZEInputDevice::GetDescription()
+{
+	return Description;
+}
 
 void ZEInputDevice::SetEnabled(bool Enabled)
 {
@@ -99,13 +301,21 @@ bool ZEInputDevice::IsInitialized()
 bool ZEInputDevice::Initialize()
 {
 	Initialized = true;
-
+	Acquire();
 	return true;
 }
 
 void ZEInputDevice::Deinitialize()
 {
+	State.Clear();
+	Description.Clear();
+
 	Initialized = false;
+}
+
+const ZEInputDeviceState& ZEInputDevice::GetState()
+{
+	return State;
 }
 
 void ZEInputDevice::Destroy()

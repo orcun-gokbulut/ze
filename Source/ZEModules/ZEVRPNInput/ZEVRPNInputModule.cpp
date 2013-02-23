@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDebugModule.cpp
+ Zinek Engine - ZEVRPNInputModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,89 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEError.h"
+#include "ZECore/ZEConsole.h"
+#include "ZEVRPNInputModule.h"
 
-#include "ZEGraphicsDebugModule.h"
-#include "ZEGame\ZEScene.h"
-#include "ZEGame\ZEGizmo.h"
-#include "ZEGame\ZEGrid.h"
-#include "ZEGame\ZEGame.h"
-#include "ZEGame\ZEPlayer.h"
-#include "ZEGraphics\ZECamera.h"
-#include "ZEMath\ZEAngle.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEMath\ZEVector.h"
+ZE_EXTENSION_DESCRIPTION(ZEVRPNInputModule, ZEInputDeviceModule, NULL)
 
-
-bool ZEGraphicsDebugModule::Initialize()
+ZEInputDevice* ZEVRPNInputModule::AddNewDevice(const ZEString& Name, const ZEString& URL, const ZEInputDeviceDescription& Description)
 {
-	ZEScene* Scene = zeGame->GetScene();
+	ZEInputDeviceDescription NewDescription = Description;
+	NewDescription.Name = Name;
+	NewDescription.FullName = URL;
 
-	Grid = ZEGrid::CreateInstance();
-	Grid->SetPosition(ZEVector3(0.01f, 0.01f, 0.01f));
-	Scene->AddEntity(Grid);
+	ZEVRPNInputDevice* NewDevice = new ZEVRPNInputDevice(Description);
+	if (!RegisterDevice(NewDevice))
+	{
+		NewDevice->Destroy();
+		return NULL;
+	}
 
-	Gizmo = ZEGizmo::CreateInstance();
-	Gizmo->SetPosition(ZEVector3(-0.01f, -0.01f, -0.01f));
-	Scene->AddEntity(Gizmo);
-
-	PlayerSteering = new ZESteeringPlayerFree();
-
-	Player = ZEPlayer::CreateInstance();
-	Player->SetName("TestPlayer1");
-	Player->SetEnabled(true);
-	Player->SetVisible(true);
-	Player->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	Player->SetRotation(ZEQuaternion::Identity);
-	Player->GetCamera()->SetNearZ(0.01f);
-	Player->GetCamera()->SetFarZ(200.0f);
-	Player->GetCamera()->SetFOV(ZE_PI / 4.0f);
-	Player->AddSteering(PlayerSteering);
-	Player->SetMaxLinearVelocity(20.0f);
-	Player->SetMaxLinearAcceleration(20.0f);
-	Scene->SetActiveCamera(Player->GetCamera());
-	Scene->AddEntity(Player);
-
-	return true;
+	return NewDevice;
 }
 
-void ZEGraphicsDebugModule::Deinitialize()
+void ZEVRPNInputModule::RemoveDevice(ZEInputDevice* Device)
 {
-	if (Grid != NULL)
-	{
-		Grid->Destroy();
-		Grid = NULL;
-	}
-	if (Gizmo != NULL)
-	{
-		Gizmo->Destroy();
-		Gizmo = NULL;
-	}
-	if (Player != NULL)
-	{
-		Player->Destroy();
-		Player = NULL;
-	}
-	if (PlayerSteering != NULL)
-	{
-		delete PlayerSteering;
-		PlayerSteering = NULL;
-	}
+	UnregisterDevice(Device);
 }
 
-void ZEGraphicsDebugModule::Process(float ElapsedTime)
+void ZEVRPNInputModule::Process()
 {
+	const ZEArray<ZEInputDevice*> Devices = GetDevices();
+	for (ZESize I = 0; I < Devices.GetSize(); I++)
+		((ZEVRPNInputModule*)Devices[I])->Process();
 
-}
-
-ZEGraphicsDebugModule::ZEGraphicsDebugModule()
-{
-	Grid = NULL;
-	Gizmo = NULL;
-	Player = NULL;
-	PlayerSteering = NULL;
-}
-
-ZEGraphicsDebugModule::~ZEGraphicsDebugModule()
-{
-	Deinitialize();
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEInputMapBinding.h
+ Zinek Engine - ZEWindowsInputCursorDevice.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,21 +34,23 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_INPUT_MAP_BINDING_H__
-#define __ZE_INPUT_MAP_BINDING_H__
+#ifndef	__ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
+#define __ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
 
 #include "ZETypes.h"
-#include "ZEInputEvent.h"
+#include "ZEInput/ZEInputDevice.h"
 
-class ZEInputBinding
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+class ZEWindowsInputMouseDevice : public ZEInputDevice
 {
-	public: 
-		ZEInt				ActionId;
-		ZEInputEvent		Event;
+	friend class ZEWindowsInputModule;
+	public:
+		virtual void				UnAcquire();
+		virtual bool				Initialize();
 
-							ZEInputBinding(ZEInt ActionId, ZEInputEvent& Event);
-							ZEInputBinding(ZEInt ActionId, const ZEString& InputDescription);
-							ZEInputBinding();
+		virtual void				Process(const RAWINPUT& Data);
 };
 
 #endif
