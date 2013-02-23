@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEWindowsInputMouseDevice.cpp
+ Zinek Engine - ZEWindowsInputCursorDevice.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -58,6 +58,7 @@ bool ZEWindowsInputMouseDevice::Initialize()
 		return false;
 
 	Description.Type = ZE_IDT_MOUSE;
+
 	Description.Sink = true;
 	Description.SinkName = "Mouse";
 	Description.SinkNameHash = ZEHashGenerator::Hash(Description.SinkName);

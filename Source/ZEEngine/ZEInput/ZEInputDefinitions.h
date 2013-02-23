@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_INPUT_KEYBOARD_H__
-#define __ZE_INPUT_KEYBOARD_H__
+#ifndef __ZE_INPUT_DEFINITONS_H__
+#define __ZE_INPUT_DEFINITONS_H__
 
 #define ZE_IDK_DEFAULT_KEYBOARD		0x00
 #define ZE_IDK_DEFAULT_MOUSE		0x00
@@ -243,12 +243,14 @@
 #define ZE_IMB_FORWARDBUTTON		ZE_IMB_BUTTON4
 
 // Joystick Axises
-#define ZE_IJA_AXIS0				0x00
-#define ZE_IJA_AXIS1				0x01
-#define ZE_IJA_AXIS2				0x02
-#define ZE_IJA_AXIS3				0x03
-#define ZE_IJA_AXIS4				0x04
-#define ZE_IJA_AXIS5				0x05
+#define ZE_IJA_X					0x00
+#define ZE_IJA_Y					0x01
+#define ZE_IJA_Z					0x02
+#define ZE_IJA_ROTATION_X			0x03
+#define ZE_IJA_ROTATION_Y			0x04
+#define ZE_IJA_ROTATION_Z			0x05
+#define ZE_IJA_SLIDER0				0x06
+#define ZE_IJA_SLIDER1				0x07
 
 #define ZE_IJA_XAXIS				ZE_IJA_AXIS0
 #define ZE_IJA_YAXIS				ZE_IJA_AXIS1

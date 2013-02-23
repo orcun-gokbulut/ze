@@ -117,18 +117,18 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			ManageCursorVisibility(hWnd, lParam);
 			break;
 
-		case WM_ACTIVATEAPP:
+		/*case WM_ACTIVATEAPP:
 			if (wParam == TRUE)
 			{
-				Window->WindowLostFocus();
+				Window->WindowGainedFocus();
 				LockMousePosition(hWnd);
 			}
 			else
 			{
-				Window->WindowGainedFocus();
+				Window->WindowLostFocus();
 				UnlockMousePosition(hWnd);
 			}
-			break;
+			break;*/
 		
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
@@ -137,14 +137,14 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case WM_ACTIVATE:
-			if (wParam == WA_ACTIVE)
+			if (wParam == WA_ACTIVE || wParam == WA_CLICKACTIVE)
 			{
-				Window->WindowLostFocus();
+				Window->WindowGainedFocus();
 				LockMousePosition(hWnd);
 			}
 			else if (wParam == WA_INACTIVE)
 			{
-				Window->WindowGainedFocus();
+				Window->WindowLostFocus();
 				UnlockMousePosition(hWnd);
 			}
 			break;
@@ -188,16 +188,15 @@ void ShowWindowError()
 void ZEWindow::WindowGainedFocus()
 {
 	zeLog("Main window gained focus.");
-	ZEInputModule* Input = zeInput;
-	if (Input != NULL)
-		Input->Acquire();
+	if (ZEInputModule::GetInstance() != NULL)
+		ZEInputModule::GetInstance()->Acquire();
 }
 
 void ZEWindow::WindowLostFocus()
 {
 	zeLog("Window lost focus.");
-	if (zeInput != NULL)
-		zeInput->UnAcquire();
+	if (ZEInputModule::GetInstance() != NULL)
+		ZEInputModule::GetInstance()->UnAcquire();
 }
 
 void ZEWindow::WindowDestroyed()

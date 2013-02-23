@@ -299,11 +299,11 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 		CameraPosition->SetText(ZEFormat::Format(CamPosText, CamPos.x, CamPos.y, CamPos.z));
 	}
 
-	zeInput->ProcessInputMap(&InputMap);
+	InputMap.Update();
 
-	for (ZESize I = 0; I < InputMap.InputActionCount; I++)
+	for (ZESize I = 0; I < InputMap.GetActionCount(); I++)
 	{
-		switch(InputMap.InputActions[I].Id)
+		switch(InputMap.GetActions()[I].Id)
 		{
 			case ACTIONID_VISIBILITY:
 				if (GetVisiblity())
@@ -825,8 +825,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 
 	this->SetPosition(ZEVector2(3.0f, 0.0f));
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_VISIBILITY, ZEInputEvent("Keyboard", ZE_IKB_F1, ZE_IBS_PRESSED)));
-	
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_F1, ZE_IS_PRESSED, ACTIONID_VISIBILITY);
 }
 	
 	

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaDebugModule.h
+ Zinek Engine - ZEInput.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,34 +34,101 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_META_DEBUG_MODULE_H__
-#define __ZE_META_DEBUG_MODULE_H__
+#ifndef	__ZE_INPUT_H__
+#define __ZE_INPUT_H__
 
-#include "ZECore/ZEApplicationModule.h"
+#include "ZEInputAction.h"
+#include "ZEInputDefinitions.h"
 
-class ZEPlayer;
-class ZECanvasBrush;
-class ZELightBrush;
-class ZEPointLight;
+#include "ZETypes.h"
+#include "ZEDS/ZEString.h"
 
-class ZEMetaDebugModule : public ZEApplicationModule
+enum ZEInputButtonState
+{
+	ZE_IBS_PRESSING,
+	ZE_IBS_PRESSED,
+	ZE_IBS_RELEASED
+};
+
+enum ZEInputAxisSign
+{
+	ZE_IAS_POSITIVE,
+	ZE_IAS_NEGATIVE,
+	ZE_IAS_BOTH
+};
+
+enum ZEInputState
+{
+	ZE_IS_PRESSED,
+	ZE_IS_RELEASED,
+	ZE_IS_PRESSING,
+	ZE_IS_CHANGED,
+	ZE_IS_VALUE
+};
+
+enum ZEInputType
+{
+	ZE_IT_NONE,
+	ZE_IT_BUTTON,
+	ZE_IT_AXIS,
+	ZE_IT_POV,
+	ZE_IT_SWITCH,
+	ZE_IT_VECTOR,
+	ZE_IT_QUATERNION
+};
+
+class ZEInputValue
+{
+	public:
+		union
+		{
+			ZEInputState			ButtonState;
+			float					AxisValue;
+			float					POVValue;
+			ZEInt					SwitchValue;
+		};
+
+		ZEVector4					Vector;
+		ZEQuaternion				Quaternion;
+};
+
+class ZEInputDevice;
+
+class ZEInput
 {
 	private:
-		ZEPlayer*				Player;
-		ZEPointLight*			Light;
-		ZECanvasBrush*			Canvas;
+		ZEInputDevice*			Device;
+		ZEString				DeviceName;
+		ZEUInt					DeviceNameHash;
+		ZEUInt32				Index;
+		ZEInputType				Type;
+		ZEInputAxisSign			AxisSign;
 
-		bool					IfEnteredFlag;
-		float					TotalTime;
+		bool					ConnectToDevice();
+		static bool				ParseInputBinding(ZEString InputString, ZEInput& Input);
 
 	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
+		const char*				GetDeviceName() const;
+		ZEInputDevice*			GetDevice() const;
+		ZEUInt32				GetIndex() const;
+		ZEInputType				GetType() const;
+		ZEInputAxisSign			GetAxisSign() const;
+		ZEString				GetInputString() const;
 
-		virtual void			Process(float ElapsedTime);
+		bool					IsAvailable() const;
 
-								ZEMetaDebugModule();
-		virtual					~ZEMetaDebugModule();
+		bool					Check(ZEInputState State) const;
+		bool					Check(ZEInputState State, ZEInputValue& Value) const;
+
+								ZEInput();
+
+		static ZEInput			Create(const ZEString& InputString);
+		static ZEInput			CreateButton(const ZEString& DeviceName, ZEUInt32 Index);
+		static ZEInput			CreateAxis(const ZEString& DeviceName, ZEUInt32 Index, ZEInputAxisSign Sign = ZE_IAS_BOTH);
+		static ZEInput			CreatePOV(const ZEString& DeviceName, ZEUInt32 Index);
+		static ZEInput			CreateSwitch(const ZEString& DeviceName, ZEUInt32 Index);
+		static ZEInput			CreateVector(const ZEString& DeviceName, ZEUInt32 Index);
+		static ZEInput			CreateQuaternion(const ZEString& DeviceName, ZEUInt32 Index);
 };
 
 #endif

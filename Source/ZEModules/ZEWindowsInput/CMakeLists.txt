@@ -39,6 +39,8 @@ ze_add_source(ZEWindowsInputKeyboardDevice.cpp		Sources)
 ze_add_source(ZEWindowsInputKeyboardDevice.h		Sources)
 ze_add_source(ZEWindowsInputMouseDevice.cpp			Sources)
 ze_add_source(ZEWindowsInputMouseDevice.h			Sources)
+ze_add_source(ZEWindowsInputCursorDevice.cpp		Sources)
+ze_add_source(ZEWindowsInputCursorDevice.h			Sources)
 ze_add_source(ZEWindowsInputModule.cpp				Sources)
 ze_add_source(ZEWindowsInputModule.h				Sources)
 

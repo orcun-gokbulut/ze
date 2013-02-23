@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEVRPNInputDeviceExtension.cpp
+ Zinek Engine - ZEVRPNInputModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,30 +33,24 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEError.h"
-#include "ZECore/ZEConsole.h"
-#include "ZEVRPNInputDeviceExtension.h"
+#pragma once
+#ifndef	__ZE_VRPN_INPUT_MODULE_H__
+#define __ZE_VRPN_INPUT_MODULE_H__
 
-ZE_EXTENSION_DESCRIPTION(ZEVRPNInputDeviceExtension, ZEInputDeviceExtension, NULL)
+#include "ZEInput/ZEInputDeviceExtension.h"
+#include "ZEVRPNInputDevice.h"
 
-ZEArray<ZEInputDevice*> ZEVRPNInputDeviceExtension::GetDevices()
+class ZEInputDevice;
+
+class ZEVRPNInputModule : public ZEInputDeviceModule
 {
-	ZEArray<ZEInputDevice*> Devices;
-	Devices.Add(new ZEVRPNInputDevice());
+	ZE_EXTENSION(ZEVRPNInputModule)
 
-	return Devices;
-}
+	public:
+		ZEInputDevice*				AddNewDevice(const ZEString& Name, const ZEString& URL, const ZEInputDeviceDescription& Description);
+		void						RemoveDevice(ZEInputDevice* Device);
+		
+		virtual void				Process();
+};
 
-bool ZEVRPNInputDeviceExtension::Initialize()
-{
-	return ZEInputDeviceExtension::Initialize();
-}
-
-void ZEVRPNInputDeviceExtension::Deinitialize()
-{
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-		Devices[I].Deinitialize();
-	Devices.Clear();
-
-	ZEInputDeviceExtension::Deinitialize();
-}
+#endif

@@ -35,4 +35,56 @@
 
 #include "ZEInputDeviceExtension.h"
 
-ZE_EXTENSION_DESCRIPTION_ABSTRACT(ZEInputDeviceExtension, ZEExtension, NULL)
+ZE_EXTENSION_DESCRIPTION_ABSTRACT(ZEInputDeviceModule, ZEExtension, NULL)
+
+bool ZEInputDeviceModule::RegisterDevice(ZEInputDevice* Device)
+{
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
+	{
+		if (Devices[I] == Device)
+		{
+			zeError("Input device already registered. Device Name : \"%s\".", Device->GetName());
+			return false;
+		}
+
+		if (Devices[I]->GetName() == Device->GetName())
+		{
+			zeError("A input device with the same name has been already registered. Device Name : \"%s\".", Device->GetName());
+			return false;
+		}
+	}
+
+	Devices.Add(Device);
+
+	return true;
+}
+
+void ZEInputDeviceModule::UnregisterDevice(ZEInputDevice* Device)
+{
+	Devices.DeleteValue(Device);
+}
+
+const ZEArray<ZEInputDevice*>& ZEInputDeviceModule::GetDevices()
+{
+	return Devices;
+}
+
+void ZEInputDeviceModule::Deinitialize()
+{
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
+		Devices[I]->Deinitialize();
+
+	ZEExtension::Deinitialize();
+}
+
+void ZEInputDeviceModule::Acquire()
+{
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
+		Devices[I]->Acquire();
+}
+
+void ZEInputDeviceModule::UnAcquire()
+{
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
+		Devices[I]->UnAcquire();
+}

@@ -34,30 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_ACTION_H__
-#define __ZE_ACTION_H__
+#ifndef	__ZE_INPUT_ACTION_H__
+#define __ZE_INPUT_ACTION_H__
 
 #include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 
-enum ZEInputButtonState;
-class ZEInputBinding;
+enum ZEInputState;
+class ZEInputEvent;
 
-class ZEInputAction
-{
-	public:
-		ZEInt						Id;
-		ZEInputBinding*				From;
 
-		union
-		{
-			ZEInputButtonState		ButtonState;
-			ZEInt					AxisValue;
-		};
-
-		ZEVector3					Vector;
-		ZEQuaternion				Quaternion;
-};
 
 #endif
