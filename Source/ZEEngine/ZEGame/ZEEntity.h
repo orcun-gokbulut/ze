@@ -74,7 +74,7 @@ typedef ZEFlags ZEEntityDirtyFlags;
 #define ZE_EDF_WORLD_BOUNDING_BOX				8
 #define ZE_EDF_ALL								0xFFFFFFFF
 
-ZE_META_FORWARD_DECLARE(ZEScene, "ZEScene.h")
+ZE_META_FORWARD_DECLARE(ZEScene, "ZEGame/ZEScene.h")
 
 ZE_CLASS(ZEEntity)
 
