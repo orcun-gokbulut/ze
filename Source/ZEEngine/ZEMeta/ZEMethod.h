@@ -51,9 +51,10 @@ struct ZEMethodParameter
 
 struct ZEMethod
 {
-	ZESize							ID;
+	ZESize							Id;
 	ZEClass*						MemberOf;
 
+	void*							MethodPtr;
 	const char*						Name;
 	ZEUInt32						Hash;
 	bool							Event;
