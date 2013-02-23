@@ -333,7 +333,6 @@ bool ZEInput::Check(ZEInputState State, ZEInputValue& Action) const
 			if (DeviceState.Buttons.CurrentValues[Index] == true)
 			{
 				Action.ButtonState = ZE_IS_PRESSED;
-				zeLog("Button : %d is pressing.", Index);
 				return true;
 			}
 		}
@@ -342,7 +341,6 @@ bool ZEInput::Check(ZEInputState State, ZEInputValue& Action) const
 			if (DeviceState.Buttons.OldValues[Index] == false && DeviceState.Buttons.CurrentValues[Index] == true)
 			{
 				Action.ButtonState = ZE_IS_PRESSED;
-				zeLog("Button : %d is pressed.", Index);
 				return true;
 			}
 		}
@@ -351,7 +349,6 @@ bool ZEInput::Check(ZEInputState State, ZEInputValue& Action) const
 			if (DeviceState.Buttons.OldValues[Index] == true && DeviceState.Buttons.CurrentValues[Index] == false)
 			{
 				Action.ButtonState = ZE_IS_RELEASED;
-				zeLog("Button : %d is released.", Index);
 				return true;
 			}
 		}
@@ -361,8 +358,6 @@ bool ZEInput::Check(ZEInputState State, ZEInputValue& Action) const
 				Action.ButtonState = ZE_IS_PRESSED;
 			else
 				Action.ButtonState = ZE_IS_RELEASED;
-
-			zeLog("Button : %d is changed. State : %d", Index, Action.ButtonState);
 
 			return true;
 		}
@@ -376,12 +371,6 @@ bool ZEInput::Check(ZEInputState State, ZEInputValue& Action) const
 				if (DeviceState.Axises.CurrentValues[Index] > 0)
 				{
 					Action.AxisValue = DeviceState.Axises.CurrentValues[Index];
-					if (Index == 0)
-						zeLog("Mouse X: %f", Action.AxisValue);
-
-					if (Index == 1)
-						zeLog("Mouse Y: %f", Action.AxisValue);
-
 					return true;
 				}
 			}
@@ -390,14 +379,7 @@ bool ZEInput::Check(ZEInputState State, ZEInputValue& Action) const
 				if (DeviceState.Axises.CurrentValues[Index] < 0)
 				{
 					Action.AxisValue = -DeviceState.Axises.CurrentValues[Index];
-					if (Index == 0)
-						zeLog("Mouse X: %f", Action.AxisValue);
-
-					if (Index == 1)
-						zeLog("Mouse Y: %f", Action.AxisValue);
-
 					return true;
-
 				}
 			}
 			else

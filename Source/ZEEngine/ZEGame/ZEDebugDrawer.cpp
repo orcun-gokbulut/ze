@@ -153,7 +153,7 @@ void ZEDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
 
 bool ZEDebugDrawer::Initialize()
 {
-	if (GetInitialized())
+	if (IsInitialized())
 		return false;
 
 	if (Material == NULL)
@@ -171,7 +171,7 @@ bool ZEDebugDrawer::Initialize()
 
 void ZEDebugDrawer::Deinitialize()
 {
-	if (!GetInitialized())
+	if (!IsInitialized())
 		return;
 
 	Target = NULL;
