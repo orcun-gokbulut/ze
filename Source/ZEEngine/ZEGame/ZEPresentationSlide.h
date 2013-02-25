@@ -62,11 +62,12 @@ class ZEPresentationSlide : public ZEEntity
 		ZEPresentationSlide();
 		virtual							~ZEPresentationSlide();
 
+	protected:
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
 
 		virtual void					SetPresentationSlide(const char* FileName);
 		virtual const char*				GetPresentationSlide() const;

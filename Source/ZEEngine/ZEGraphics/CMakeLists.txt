@@ -50,8 +50,6 @@ ze_add_source(ZEFixedMaterial.cpp 					Sources)
 ze_add_source(ZEFixedMaterial.h 					Sources Headers ZEPP)
 ze_add_source(ZEFrameRenderer.cpp 					Sources)
 ze_add_source(ZEFrameRenderer.h 					Sources Headers)
-ze_add_source(ZEGraphicsDebugModule.cpp				Sources)
-ze_add_source(ZEGraphicsDebugModule.h				Sources)
 ze_add_source(ZEGraphicsModule.cpp 					Sources)
 ze_add_source(ZEGraphicsModule.h 					Sources Headers)
 ze_add_source(ZEIndexBuffer.cpp 					Sources)
@@ -110,4 +108,4 @@ ze_add_source(ZEViewPort.h 							Sources Headers)
 ze_add_library(ZEGraphics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation libfreeimage)
+	LIBS ZEFoundation libFreeImage)

@@ -54,7 +54,7 @@ struct ZEUITextCharacter
 	char				CChar;
 	ZEFontCharacter		FontCharacter;
 	ZEUIRectangle		RenderableCharacter;
-	int					Line;
+	ZEInt32					Line;
 	bool				IsSelected;
 };
 
@@ -63,44 +63,45 @@ class ZEUILabel : public ZEUIFrameControl
 	protected:
 		ZEString							Text;
 		ZEArray<ZEUITextCharacter>			Characters;
+		ZEArray<ZEInt32>					LineTextWidths;
 
 		ZEFontResource*						FontResource;
 		ZEMaterial*							FontMaterial;
 		ZEVector4							FontColor;
 
-		ZESize								TextWidth;
 		ZERectangle							TextRenderingArea;
-		ZEVector2							TextStartPosition;
 
 		ZEUITextAlignment					TextAlignment;
-		ZEVector2							TextMargin;
 		bool								IsWordWrapping;
 
 		ZEUInt32							CurrentLine;
-		ZEUInt32							CurrentLineWidth;
+		ZEVector4							TextMargins;
 
 		void								UpdateCharacters();
-		ZEVector2							CalculateTextStartPoint();
+		ZEVector2							CalculateLineStartPoint(ZESize LineIndex);
+		void								UpdateTextRenderingArea();
 
 	public:
 		virtual void						Draw(ZEUIRenderer* Renderer);
 
 		void								SetFontResource(ZEFontResource* Resource);
+		const ZEFontResource*				GetFontResource() const;
 
 		void								SetFontColor(const ZEVector4& Color);
 		const ZEVector4&					GetFontColor() const;
 
-		void								SetText(ZEString Text);
+		void								SetText(ZEString NewText);
 		const ZEString&						GetText();
 
 		void								SetTextAlignment(ZEUITextAlignment Alignment);
 		ZEUITextAlignment					GetTextAlignment() const;
 
-		void								SetTextMargin(const ZEVector2& Margin);
-		const ZEVector2&					GetTextMargin() const;
-
 		void								SetWordWrapping(bool Enabled);
 		bool								GetWordWrapping() const;
+
+		void								SetTextMargins(ZEUInt32 Top = 2, ZEUInt32 Left = 2, ZEUInt32 Bottom = 2, ZEUInt32 Right = 2);
+		void								SetTextMargins(const ZEVector4& Margins);
+		const ZEVector4&					GetTextMargins() const;
 
 		virtual void						SetPosition(const ZEVector2& Position);
 		virtual void						SetSize(const ZEVector2& Size);

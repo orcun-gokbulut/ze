@@ -73,11 +73,13 @@ class ZEPlayer : public ZEActor
 		ZEInputMap				InputMap;
 		ZECamera*				Camera;
 		ZEListener*				Listener;
-		ZEProjectiveLight*		Light;
+		//ZEProjectiveLight*		Light;
 
 		float					FOV;
 
 	protected:
+		virtual	bool			InitializeSelf();
+		virtual bool			DeinitializeSelf();
 
 								ZEPlayer();
 		virtual					~ZEPlayer();
@@ -94,10 +96,7 @@ class ZEPlayer : public ZEActor
 		void					Activate();
 
 		virtual void			Tick(float Time);
-		
-		virtual	bool			Initialize();
-		virtual void			Deinitialize();
-		
+			
 		static ZEPlayer*		CreateInstance();
 };
 #endif

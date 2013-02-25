@@ -37,12 +37,10 @@
 #include "ZEGraphicsModule.h"
 #include "ZECamera.h"
 #include "ZEGame\ZEScene.h"
-#include "ZEMap\ZEPortalMap\ZEPortalMap.h"
 #include "ZEDS\ZEArray.h"
 #include "ZETypes.h"
 #include "ZEMath\ZEAABBox.h"
 #include "ZEGame\ZEEntity.h"
-#include "ZEMap\ZEPortalMap\ZEPortalMapPortal.h"
 #include "ZETexture2D.h"
 
 
@@ -81,6 +79,9 @@ void ZECloudMaterial::UpdateParameters(float Time)
 {
 	Camera = zeScene->GetActiveCamera();
 
+	if (Camera == NULL)
+		return;
+
 	// Update texture UVOffset
 	ZEVector2 Vector;
 	ZEVector2::Scale(Vector, WindVelocity, Time);
@@ -88,7 +89,8 @@ void ZECloudMaterial::UpdateParameters(float Time)
 
 	// Adjust the height so that clouds are always above.
 	// cloud height = m_fDefaultHeight + m_fFallOffHeight * squaredistance_in_horizontal
-	float Range = 0.5f * Camera->GetFarZ();
+
+	float Range = 0.5f * 20000.0f; //Camera->GetFarZ();
 	float Height = Range * 0.12f;
 	CloudPlaneHeight = Height + Camera->GetWorldPosition().y;
 	CloudPlaneHeightFallOff  = -(0.1f / Range) * (Camera->GetWorldPosition().y / Height + 1.0f);

@@ -75,4 +75,5 @@ qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
 ze_add_library(ZEDPropertyWindowManager 
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles})
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
+	LIBS libQt)

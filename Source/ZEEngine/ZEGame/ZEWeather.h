@@ -76,6 +76,9 @@ class ZEWeather : public ZEEntity
 		ZEVector3					SunLightColor;
 		ZEVector3					MoonLightColor;
 
+		virtual bool				InitializeSelf();
+		virtual bool				DeinitializeSelf();
+
 									ZEWeather();
 		virtual						~ZEWeather();
 
@@ -116,20 +119,13 @@ class ZEWeather : public ZEEntity
 		void						SetMoonDirection(const ZEVector3& Value);
 		const ZEVector3&			GetMoonDirection() const;
 
-		void						SetSunMoonRotation(const ZEVector3& Value);
-		const ZEVector3&			GetSunMoonRotation() const;
-
 		void						SetSunLightColor(const ZEVector3& Value);
 		const ZEVector3&			GetSunLightColor() const;
 
 		void						SetMoonLightColor(const ZEVector3& Value);
 		const ZEVector3&			GetMoonLightColor() const;
 
-
 		virtual ZEDrawFlags			GetDrawFlags() const;
-
-		virtual bool				Initialize();
-		virtual void				Deinitialize();
 
 		virtual void				Draw(ZEDrawParameters* DrawParameters);
 		virtual void				Tick(float Time);

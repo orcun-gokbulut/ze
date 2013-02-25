@@ -64,6 +64,7 @@ class ZEQuaternion
 		static void						CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix3x3& Matrix);
 		static void						CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix4x4& Matrix);
 		static void						CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Up = ZEVector3(0.0f, 1.0f, 0.0f));
+		static void						CreateFromDirectionChecked(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Up = ZEVector3(0.0f, 1.0f, 0.0f));
 		static void						CreateFromAngleAxis(ZEQuaternion& Output, float Angle, const ZEVector3& Axis);
 
 		static void						Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B);

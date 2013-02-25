@@ -53,9 +53,13 @@ class ZEPointLight  : public ZELight
 		ZETexture2D*					BackShadowMap;
 
 		ZEViewSphere					ViewVolume;
+		ZEMatrix4x4						ViewProjectionMatrix;
 
 										ZEPointLight();
 		virtual							~ZEPointLight();
+
+	protected:
+		virtual bool					DeinitializeSelf();
 
 	public:
 		ZELightType						GetLightType();
@@ -65,10 +69,11 @@ class ZEPointLight  : public ZELight
 		ZETexture2D*					GetFrontShadowMap();
 		ZETexture2D*					GetBackShadowMap();
 
-		virtual void					Deinitialize();
+		virtual ZESize					GetViewCount();
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
 
-		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
-		virtual const ZEViewVolume&		GetViewVolume();
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
 
 		static ZEPointLight*			CreateInstance();
 };

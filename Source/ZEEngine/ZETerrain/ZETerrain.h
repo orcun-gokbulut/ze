@@ -71,7 +71,7 @@ ZE_CLASS(ZETerrain)
 
 class ZETerrain : public ZEEntity
 {
-	friend class ZEPortalMapDoor;
+	friend class ZEInteriorDoor;
 
 	ZE_OBJECT
 
@@ -114,6 +114,10 @@ class ZETerrain : public ZEEntity
 												ZETerrain();
 												~ZETerrain();
 
+	protected:
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
+
 	public:	
 		bool									Locked;
 		bool									Wireframe;
@@ -135,9 +139,6 @@ class ZETerrain : public ZEEntity
 		float									GetHeightScale();
 
 		float									GetHeight(float X, float Z);
-
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
 	
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
 	

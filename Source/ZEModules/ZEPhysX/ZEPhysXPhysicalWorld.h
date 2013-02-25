@@ -112,7 +112,7 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 		virtual void								Process(float ElapsedTime);
 		virtual void								Update();
 
-
+		virtual ZEPhysicalShape*					RayCastToClosestShape(ZERay Ray, ZEPhysicsRayCastFilterShapeType Type, ZERayCastResultDetails& ResultDetails);
 };
 
 #endif

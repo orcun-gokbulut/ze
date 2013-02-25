@@ -220,8 +220,14 @@ void ZELog::SetLogFileEnabled(bool Enabled)
 	time_t Temp = time(NULL);                          
 	memcpy(&FileTimeStamp, localtime(&Temp), sizeof(tm));
 
-	if (LogFileEnabled && LogFile == NULL)
-		LogFile = fopen(LogFileName, "a");
+	if (LogFileEnabled && LogFile == NULL && !LogFileName.IsEmpty())
+		LogFile = fopen(LogFileName.ToCString(), "a");
+
+	if (!LogFileEnabled && LogFile != NULL)
+	{
+		fclose((FILE*)LogFile);
+		LogFile = NULL;
+	}
 
 	if (LogFile != NULL)
 	{
@@ -240,12 +246,18 @@ bool ZELog::GetLogFileEnabled()
 
 void ZELog::SetLogFileName(const ZEString& FileName)
 {
+	if (LogFileName == FileName)
+		return;
+
 	LogFileName = FileName;
 	if (LogFile != NULL)
 	{
 		fclose((FILE*)LogFile);
-		LogFile = fopen(FileName, "a");
+		LogFile = NULL;
 	}
+
+	if (LogFileEnabled && !LogFileName.IsEmpty())
+		LogFile = fopen(FileName, "a");
 }
 
 const char* ZELog::GetLogFileName()

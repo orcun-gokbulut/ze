@@ -35,7 +35,6 @@
 
 #include "ZEUICursorControl.h"
 #include "ZEInput/ZEInputDefinitions.h"
-#include "ZEInput/ZEInputModule.h"
 #include "zeui/ZEUIRenderer.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
@@ -67,32 +66,34 @@ void ZEUICursorControl::Draw(ZEUIRenderer* Renderer)
 
 void ZEUICursorControl::Tick(float ElapsedTime)
 {
-	zeInput->ProcessInputMap(&InputMap);
+	InputMap.Update();
 
-	for (size_t I = 0; I < InputMap.InputActionCount; I++)
+	ZESize InputActionCount = InputMap.GetActionCount();
+	const ZEInputAction* InputActions = InputMap.GetActions();
+	for (size_t I = 0; I < InputActionCount; I++)
 	{
-		switch (InputMap.InputActions[I].Id)
+		switch (InputActions[I].Id)
 		{
 			case ACTIONID_UP:
-				SetPosition(ZEVector2(GetPosition().x, GetPosition().y - InputMap.InputActions[I].AxisValue));
+				SetPosition(ZEVector2(GetPosition().x, GetPosition().y - InputActions[I].AxisValue));
 				Cursor.Positions.LeftUp = GetRectangle().LeftUp;
 				Cursor.Positions.RightDown = GetRectangle().RightDown;
 				break;
 
 			case ACTIONID_DOWN:
-				SetPosition(ZEVector2(GetPosition().x, GetPosition().y + InputMap.InputActions[I].AxisValue));
+				SetPosition(ZEVector2(GetPosition().x, GetPosition().y + InputActions[I].AxisValue));
 				Cursor.Positions.LeftUp = GetRectangle().LeftUp;
 				Cursor.Positions.RightDown = GetRectangle().RightDown;
 				break;
 
 			case ACTIONID_LEFT:
-				SetPosition(ZEVector2(GetPosition().x - InputMap.InputActions[I].AxisValue, GetPosition().y));
+				SetPosition(ZEVector2(GetPosition().x - InputActions[I].AxisValue, GetPosition().y));
 				Cursor.Positions.LeftUp = GetRectangle().LeftUp;
 				Cursor.Positions.RightDown = GetRectangle().RightDown;
 				break;
 
 			case ACTIONID_RIGHT:
-				SetPosition(ZEVector2(GetPosition().x + InputMap.InputActions[I].AxisValue, GetPosition().y));
+				SetPosition(ZEVector2(GetPosition().x + InputActions[I].AxisValue, GetPosition().y));
 				Cursor.Positions.LeftUp = GetRectangle().LeftUp;
 				Cursor.Positions.RightDown = GetRectangle().RightDown;
 				break;
@@ -129,7 +130,7 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 		}
 	}
 
-	int WindowWidth, WindowHeight;
+	ZEInt32 WindowWidth, WindowHeight;
 	zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);
 
 	if (GetPosition().x > WindowWidth)
@@ -158,6 +159,12 @@ ZEUIMouseKey ZEUICursorControl::GetCurrentButton()
 	return CurentButton;
 }
 
+void ZEUICursorControl::SetZOrder(ZEInt32 Z)
+{
+	ZEUIControl::SetZOrder(Z);
+	Cursor.ZOrder = Z;
+}
+
 ZEMaterial* ZEUICursorControl::GetMaterial() const
 {
 	return CursorMaterial;
@@ -170,26 +177,22 @@ void ZEUICursorControl::SetMaterial(ZEMaterial* Material)
 
 ZEUICursorControl::ZEUICursorControl()
 {
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_UP,					ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS,		ZE_IAS_NEGATIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_DOWN,				ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS,		ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_LEFT,				ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS,	ZE_IAS_NEGATIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RIGHT,				ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS,	ZE_IAS_POSITIVE)));
+	InputMap.AddAxisAction("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE, ZE_IS_CHANGED, ACTIONID_UP);
+	InputMap.AddAxisAction("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE, ZE_IS_CHANGED, ACTIONID_DOWN);
+	InputMap.AddAxisAction("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE, ZE_IS_CHANGED, ACTIONID_LEFT);
+	InputMap.AddAxisAction("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE, ZE_IS_CHANGED, ACTIONID_RIGHT);
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_LEFT_PRESS,			ZEInputEvent("Mouse", ZE_IMB_BUTTON0,			ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RIGHT_PRESS,			ZEInputEvent("Mouse", ZE_IMB_BUTTON1,			ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_MIDDLE_PRESS,		ZEInputEvent("Mouse", ZE_IMB_BUTTON2,			ZE_IBS_PRESSED)));
-
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_LEFT_RELEASE,		ZEInputEvent("Mouse", ZE_IMB_BUTTON0,			ZE_IBS_RELEASED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RIGHT_RELEASE,		ZEInputEvent("Mouse", ZE_IMB_BUTTON1,			ZE_IBS_RELEASED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_MIDDLE_RELEASE,		ZEInputEvent("Mouse", ZE_IMB_BUTTON2,			ZE_IBS_RELEASED)));
-
-	//InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_UP,			ZEInputEvent("Mouse", ZE_IMA ZE_IMA_SCROLL_AXIS,		ZE_IAS_POSITIVE)));
-	//InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_DOWN,			ZEInputEvent("Mouse", ZE_IMA_SCROLL_AXIS,		ZE_IAS_NEGATIVE)));
+	InputMap.AddButtonAction("Mouse", ZE_IMB_BUTTON0, ZE_IS_PRESSED, ACTIONID_LEFT_PRESS);
+	InputMap.AddButtonAction("Mouse", ZE_IMB_BUTTON1, ZE_IS_PRESSED, ACTIONID_RIGHT_PRESS);
+	InputMap.AddButtonAction("Mouse", ZE_IMB_BUTTON2, ZE_IS_PRESSED, ACTIONID_MIDDLE_PRESS);												  
+	InputMap.AddButtonAction("Mouse", ZE_IMB_BUTTON0, ZE_IS_RELEASED, ACTIONID_LEFT_RELEASE);
+	InputMap.AddButtonAction("Mouse", ZE_IMB_BUTTON1, ZE_IS_RELEASED, ACTIONID_RIGHT_RELEASE);
+	InputMap.AddButtonAction("Mouse", ZE_IMB_BUTTON2, ZE_IS_RELEASED, ACTIONID_MIDDLE_RELEASE);
 
 	SetHeight(24);
 	SetWidth(24);	
 
-	int Width, Height;
+	ZEInt32 Width, Height;
 	zeCore->GetWindow()->GetWindowSize(Width, Height);
 	SetPosition(ZEVector2((Width / 2.0f) , (Height / 2.0f)));
 
@@ -200,7 +203,7 @@ ZEUICursorControl::ZEUICursorControl()
 	Cursor.Texcoords.RightDown = ZEVector2::One;
 
 	CursorMaterial = ZEUIMaterial::CreateInstance();
-	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("Cursor.png")->GetTexture());
+	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/Cursor.png")->GetTexture());
 	Cursor.Material = CursorMaterial;
 	Cursor.Color = GetBackgroundColor();
 

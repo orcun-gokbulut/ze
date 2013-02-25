@@ -193,6 +193,9 @@ ZEArray<ZEDirectoryInfo*>* ZEDirectoryInfo::GetDirectoryList()
 
 bool ZEDirectoryInfo::IsDirectory(const ZEString& DirectoryPath)
 {
+	if(DirectoryPath.GetLength() == 0)
+		return false;
+
 	return ZEFileUtils::IsDirectory(DirectoryPath);
 }
 

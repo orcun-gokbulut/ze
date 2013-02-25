@@ -41,6 +41,7 @@
 #include "ZEGraphics/ZERenderer.h"
 #include "ZEGraphics/ZESimpleMaterial.h"
 #include <NxDebugRenderable.h>
+#include <NxRay.h>
 
 static ZEVector4 NX_TO_ZE(NxU32 color)
 {        
@@ -73,64 +74,66 @@ ZEPhysXPhysicalWorld::~ZEPhysXPhysicalWorld()
 
 void ZEPhysXPhysicalWorld::InitializeDebugDraw()
 {
-			//GetPhysicsSDK()->setParameter(NX_VISUALIZATION_SCALE, 1.0f);
-	/*GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_AXES, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_MASS_AXES, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_LIN_VELOCITY, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_ANG_VELOCITY, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_JOINT_GROUPS, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_JOINT_LOCAL_AXES, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_JOINT_WORLD_AXES, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_JOINT_LIMITS, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CONTACT_POINT, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CONTACT_NORMAL, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CONTACT_ERROR, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CONTACT_FORCE, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_ACTOR_AXES, 1.0f);*/
-			/*GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_AABBS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_SHAPES, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_AXES, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_COMPOUNDS, 1.0f);*/
-	//GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_VNORMALS, 1.0f);
-	//GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_FNORMALS, 1.0f);
-			/*GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_EDGES, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_SPHERES, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_STATIC, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_DYNAMIC, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_FREE, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_CCD, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_SKELETONS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_EMITTERS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_POSITION, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_VELOCITY, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_KERNEL_RADIUS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_BOUNDS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_PACKETS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_MOTION_LIMIT, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_DYN_COLLISION, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_STC_COLLISION, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_MESH_PACKETS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_DRAINS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_PACKET_DATA, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_MESH, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_COLLISIONS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_SELFCOLLISIONS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_WORKPACKETS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_SLEEP, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_SLEEP_VERTEX, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_TEARABLE_VERTICES, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_TEARING, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_ATTACHMENT, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_VALIDBOUNDS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_MESH, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_COLLISIONS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_WORKPACKETS, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_SLEEP, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_SLEEP_VERTEX, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_TEARABLE_VERTICES, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_TEARING, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_ATTACHMENT, 1.0f);
-			GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_VALIDBOUNDS, 1.0f);*/
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZATION_SCALE, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_AXES, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_MASS_AXES, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_LIN_VELOCITY, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_ANG_VELOCITY, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_JOINT_GROUPS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_JOINT_LOCAL_AXES, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_JOINT_WORLD_AXES, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_JOINT_LIMITS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CONTACT_POINT, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CONTACT_NORMAL, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CONTACT_ERROR, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CONTACT_FORCE, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_ACTOR_AXES, 1.0f);
+
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_AABBS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_SHAPES, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_AXES, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_COMPOUNDS, 1.0f);
+
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_VNORMALS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_FNORMALS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_EDGES, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_SPHERES, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_STATIC, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_DYNAMIC, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_FREE, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_CCD, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_SKELETONS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_EMITTERS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_POSITION, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_VELOCITY, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_KERNEL_RADIUS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_BOUNDS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_PACKETS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_MOTION_LIMIT, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_DYN_COLLISION, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_STC_COLLISION, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_MESH_PACKETS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_DRAINS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_FLUID_PACKET_DATA, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_MESH, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_COLLISIONS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_SELFCOLLISIONS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_WORKPACKETS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_SLEEP, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_SLEEP_VERTEX, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_TEARABLE_VERTICES, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_TEARING, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_ATTACHMENT, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_CLOTH_VALIDBOUNDS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_MESH, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_COLLISIONS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_WORKPACKETS, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_SLEEP, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_SLEEP_VERTEX, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_TEARABLE_VERTICES, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_TEARING, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_ATTACHMENT, 1.0f);
+	// 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_SOFTBODY_VALIDBOUNDS, 1.0f);
 
 	const NxDebugRenderable* DebugRenderable = Scene->getDebugRenderable();
 
@@ -310,35 +313,9 @@ void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 		Renderer->AddToRenderList(&DebugDraw.TrianglesRenderCommand);
 }
 
-
 void ZEPhysXPhysicalWorld::Process(float ElapsedTime)
 {
-	NxU32 TransformCount = 0;
-	NxActiveTransform *ActiveTransforms = Scene->getActiveTransforms(TransformCount);
-
 	Scene->simulate(ElapsedTime);
-
-	for (ZESize I = 0; I < (ZESize)TransformCount; I++)
-	{
-		if (ActiveTransforms[I].userData != NULL)
-		{
-			const ZEPhysicalTransformChangeEvent& Callback = ((ZEPhysicalObject*)ActiveTransforms[I].userData)->GetTransformChangeEvent();
-			if (!Callback.empty())
-			{
-				ZEPhysicalTransformChangeEventArgument Change;
-
-				Change.NewPosition = NX_TO_ZE(ActiveTransforms[I].actor2World.t);
-
-				NxQuat Quat;
-				ActiveTransforms[I].actor2World.M.toQuat(Quat);
-				Change.NewRotation = NX_TO_ZE(Quat);
-
-				Change.PhysicalObject = ((ZEPhysicalObject*)ActiveTransforms[I].userData);
-
-				Callback(Change);
-			}
-		}
-	}
 
 	Scene->flushStream();
 }
@@ -352,4 +329,48 @@ void ZEPhysXPhysicalWorld::Destroy()
 void ZEPhysXPhysicalWorld::Update()
 {
 	Scene->fetchResults(NX_ALL_FINISHED, true);
+
+	NxU32 TransformCount = 0;
+	NxActiveTransform *ActiveTransforms = Scene->getActiveTransforms(TransformCount);
+
+	for (ZESize I = 0; I < (ZESize)TransformCount; I++)
+	{
+		if (ActiveTransforms[I].userData != NULL)
+		{
+			const ZEPhysicalTransformChangeEvent& Callback = ((ZEPhysicalObject*)ActiveTransforms[I].userData)->GetTransformChangeEvent();
+			if (Callback != NULL)
+			{
+				ZEVector3 NewPosition = NX_TO_ZE(ActiveTransforms[I].actor2World.t);
+
+				NxQuat Quat;
+				ActiveTransforms[I].actor2World.M.toQuat(Quat);
+				ZEQuaternion NewRotation = NX_TO_ZE(Quat);
+
+				ZEPhysicalObject* PhysicalObject = ((ZEPhysicalObject*)ActiveTransforms[I].userData);
+
+				Callback(PhysicalObject, NewPosition, NewRotation);
+			}
+		}
+	}
+}
+
+ZEPhysicalShape* ZEPhysXPhysicalWorld::RayCastToClosestShape(ZERay Ray, ZEPhysicsRayCastFilterShapeType Type, ZERayCastResultDetails& Result)
+{
+	if (!Ray.v.IsNormalized())
+		Ray.v.NormalizeSelf();
+
+	NxRay TempRay(ZE_TO_NX(Ray.p), ZE_TO_NX(Ray.v));
+	NxRaycastHit TempResult;
+	NxShape* TempShape = this->GetScene()->raycastClosestShape(TempRay, (NxShapesType)Type, TempResult);
+
+	if (TempShape != NULL)
+	{
+		Result.ImpactWorldPosition = NX_TO_ZE(TempResult.worldImpact);
+		Result.ImpactWorldNormal = NX_TO_ZE(TempResult.worldNormal);
+		Result.ImpactDistance = TempResult.distance;
+
+		return (ZEPhysicalShape*)TempShape->userData;
+	}
+	else
+		return NULL;
 }

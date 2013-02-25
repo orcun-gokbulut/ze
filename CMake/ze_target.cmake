@@ -50,26 +50,26 @@ function(ze_link)
 	endif()
 
 	foreach(CURRENT_LIB ${PARAMETER_LIBS})
-		if (TARGET CURRENT_LIB)
-			get_property(CURRENT_LIB_TYPE TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_TYPE)
-			if (ZEBUILD_TYPE EQU "PLATFORMLIB")
-				get_property(CURRENT_LIB_PATH TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_PATH)
-				get_property(CURRENT_LIB_LIBS TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_LIBS)
-				get_property(CURRENT_LIB_SYSTEM_LIBS TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_SYSTEM_LIBS)
-
-				set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY INCLUDE_DIRECTORIES ${CURRENT_LIB_PATH}/Include)
-				link_directories(${CURRENT_LIB_PATH}/Lib)
-				if (ZEBUILD_MULTI_CONFIGURATION)
-					link_directories(${CURRENT_LIB_PATH}/Lib/$<CONFIGURATION>)
-				endif()
-				target_link_libraries(${PARAMETER_TARGET} ${CURRENT_LIB_LIBS} ${CURRENT_LIB_SYSTEM_LIBS})
+		if (TARGET ${CURRENT_LIB})
+			get_property(CURRENT_LIB_TYPE TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_TYPE)				
+			if (CURRENT_LIB_TYPE MATCHES "EXTERNAL")
+			
+				get_property(CURRENT_LIB_DIRECTORY TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_LIB_DIRECTORY)
+				get_property(CURRENT_INCLUDE_DIRECTORY TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_INCLUDE_DIRECTORY)
+				get_property(CURRENT_DLL_DIRECTORY TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_DLL_DIRECTORY)
+				get_property(CURRENT_LIBS TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_LIBS)
+				get_property(CURRENT_SYSTEM_LIBS TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_SYSTEM_LIBS)
+				set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY INCLUDE_DIRECTORIES ${CURRENT_INCLUDE_DIRECTORY})
+			
+				target_link_libraries(${PARAMETER_TARGET} ${CURRENT_LIBS} ${CURRENT_SYSTEM_LIBS})
 			else()
 				target_link_libraries(${PARAMETER_TARGET} ${CURRENT_LIB})
 			endif()
 		else()
+			# Scan Externals
 			target_link_libraries(${PARAMETER_TARGET} ${CURRENT_LIB})
 		endif()
-		ze_add_dependency(TARGET ${PARAMETER_TARGET} DEPENDENCIES ${CURRENT_LIB})
+		ze_add_dependency(TARGET ${PARAMETER_TARGET} DEPENDENCIES ${CURRENT_LIB})	
 	endforeach()
 endfunction()
 
@@ -135,9 +135,6 @@ function(ze_add_executable)
 	# Compile
 	if (PARAMETER_CONSOLE)
 		add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
-	elseif (PARAMETER_DLL)
-		add_library(${PARAMETER_TARGET} SHARED ${PARAMETER_SOURCES})
-		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_TYPE EXECUTABLE)
 	else()
 		if (ZEBUILD_PLATFORM_WINDOWS)
 			add_executable(${PARAMETER_TARGET} WIN32 ${PARAMETER_SOURCES})
@@ -161,19 +158,18 @@ function(ze_add_executable)
 	
 	if (PARAMETER_INSTALL)
 		if (NOT PARAMETER_DESTINATION)
-			set(PARAMETER_DESTINATION "Engine")
+			set(PARAMETER_DESTINATION "Bin")
 		endif()
 		
 		ze_set_property_all_config(TARGET ${PARAMETER_TARGET} PROPERTY PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/Symbol)
-		ze_set_property_all_config(TARGET ${PARAMETER_TARGET} PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/${PARAMETER_DESTINATION}/$(CONFIGURATION))
+		ze_set_property_all_config(TARGET ${PARAMETER_TARGET} PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/${PARAMETER_DESTINATION})
 	endif()
-	
-	ze_get_dependency_list(RETURN BULLUK TARGET ${PARAMETER_TARGET})
-	message("${PARAMETER_TARGET} Dependencies : ${BULLUK}")
+	message(STATUS "[ZEBuild] Executable \"${PARAMETER_TARGET}\" project has been added.")
 endfunction()
 
+
 function(ze_add_plugin)
-	parse_arguments(PARAMETER "SOURCES;LIBS;${ze_check_parameters}" "INSTALL;DLL" ${ARGV})
+	parse_arguments(PARAMETER "SOURCES;LIBS;${ze_check_parameters}" "INSTALL;EDITOR" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
@@ -204,10 +200,12 @@ function(ze_add_plugin)
 		ze_set_property_all_config(TARGET ${PARAMETER_TARGET} PROPERTY PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/Symbol)
 		ze_set_property_all_config(TARGET ${PARAMETER_TARGET} PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/Engine/Plugin/$(CONFIGURATION))
 	endif()
+	
+	message(STATUS "[ZEBuild] Plugin \"${PARAMETER_TARGET}\" project has been added.")
 endfunction()
 
 function (ze_add_library)
-	parse_arguments(PARAMETER "SOURCES;LIBS;HEADERS;${ze_check_parameters}" "INSTALL;DLL" ${ARGV})
+	parse_arguments(PARAMETER "SOURCES;LIBS;HEADERS;${ze_check_parameters}" "INSTALL;DLL;COMBINE" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
@@ -217,13 +215,19 @@ function (ze_add_library)
 	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
 	
 	# Compile
-	add_library(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
+	if (PARAMETER_DLL)
+		add_library(${PARAMETER_TARGET} SHARED ${PARAMETER_SOURCES})
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_TYPE "DLL")
+	else()
+		add_library(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_TYPE "LIB")
+	endif()
 	
-	# Adjust Properties
-	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_TYPE LIBRARY)
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_LIBS ${PARAMETER_LIBS})
 	set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY INCLUDE_DIRECTORIES "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
+	
+	
 	ze_link(TARGET ${PARAMETER_TARGET} LIBS ${PARAMETER_LIBS})
 
 	if (PARAMETER_INSTALL)
@@ -234,7 +238,13 @@ function (ze_add_library)
 	if (PARAMETER_HEADERS)
 		ze_copy_headers(TARGET ${PARAMETER_TARGET} HEADERS ${PARAMETER_HEADERS})
 	endif()
-		
+	
+	if (NOT PARAMETER_DLL)
+		message(STATUS "[ZEBuild] Library \"${PARAMETER_TARGET}\" project has been added.")
+	else()
+		message(STATUS "[ZEBuild] DLL \"${PARAMETER_TARGET}\" project has been added.")
+	endif()
+
 endfunction()
 
 function (ze_add_test)
@@ -323,6 +333,8 @@ function(ze_add_module)
 			set(${PARAMETER_SET} ${${PARAMETER_SET}} PARENT_SCOPE)
 		endif()
 	endif()
+	
+	message(STATUS "[ZEBuild] Module \"${PARAMETER_DIRECTORY}\" has been added.")
 endfunction()
 
 function(ze_add_cmake_project)
@@ -336,4 +348,5 @@ function(ze_add_cmake_project)
 
 	add_custom_target(${PARAMETER_NAME}	SOURCES ${PARAMETER_SOURCES})
 	set_property(TARGET ${PARAMETER_NAME} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
+	message(STATUS "[ZEBuild] CMake \"${PARAMETER_NAME}\" project has been added.")
 endfunction()

@@ -43,33 +43,11 @@
 #include "ZECore/ZEModuleManager.h"
 #include "ZECore/ZEOptionManager.h"
 
-#include "ZEUI/ZEUIDebugModule.h"
-#include "ZEModel/ZEModelDebugModule.h"
-#include "ZESound/ZESoundDebugModule.h"
-#include "ZEPhysics/ZEPhysicsDebugModule.h"
-#include "ZEGraphics/ZEGraphicsDebugModule.h"
-
-
 extern HINSTANCE ApplicationInstance;
 
 ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, ZEInt nCmdShow)
 {
 	ApplicationInstance = hInstance;
-	
-	ZEModelAnimationDebugModule DebugModule;
-	//zeCore->SetDebugComponent(&DebugModule);
-
-	ZEGraphicsDebugModule GraphicsDebugModule;
-	zeCore->SetApplicationModule(&GraphicsDebugModule);
-
-	ZEPhysicsDebugModule PhysicsDebugModule;
-	//zeCore->SetDebugComponent(&PhysicsDebugModule);
-
-	ZESoundDebugModule SoundDebugComponent;
-	//zeCore->SetDebugComponent(&SoundDebugComponent);
-
-	ZEUIDebugModule UIDebugModule;
-	//zeCore->SetApplicationModule(&UIDebugModule);
 
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();

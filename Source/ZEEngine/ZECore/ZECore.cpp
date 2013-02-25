@@ -157,7 +157,7 @@ bool ZECore::SetGraphicsModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetDescription()->GetParent() != ZEGraphicsModule::Description())
+		if (Module->GetDescription() != ZEGraphicsModule::Description() && Module->GetDescription()->GetParent() != ZEGraphicsModule::Description())
 		{
 			zeError("Module type mismatch. This module is not a sound module. Module Name : \"%s\"", 
 				(const char*)Module->GetDescription()->GetName());
@@ -180,7 +180,7 @@ bool ZECore::SetSoundModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetDescription()->GetParent() != ZESoundModule::Description())
+		if (Module->GetDescription() != ZESoundModule::Description() && Module->GetDescription()->GetParent() != ZESoundModule::Description())
 		{
 			zeError("Module type mismatch. This module is not a sound module. Module Name : \"%s\"", 
 				(const char*)Module->GetDescription()->GetName());
@@ -203,9 +203,9 @@ bool ZECore::SetInputModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetDescription()->GetParent() != ZEInputModule::Description())
+		if (Module->GetDescription() != ZEInputModule::Description() && Module->GetDescription()->GetParent() != ZEInputModule::Description())
 		{
-			zeError("Module type mismatch. This module is not a sound module. Module Name : \"%s\"", 
+			zeError("Module type mismatch. This module is not a input module. Module Name : \"%s\"", 
 				(const char*)Module->GetDescription()->GetName());
 			return false;
 		}
@@ -227,7 +227,7 @@ bool ZECore::SetPhysicsModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetDescription()->GetParent() != ZEPhysicsModule::Description())
+		if (Module->GetDescription() != ZEPhysicsModule::Description() && Module->GetDescription()->GetParent() != ZEPhysicsModule::Description())
 		{
 			zeError("Module type mismatch. This module is not a sound module. Module Name : \"%s\"", 
 				(const char*)Module->GetDescription()->GetName());
@@ -627,11 +627,11 @@ void ZECore::MainLoop()
 	float FrameTime = (float)RealTimeClock->GetFrameDeltaTime() / 1000000.0f;
 
 	TimerManager->Tick(FrameTime);
+	
+	SystemMessageManager->ProcessMessages();
 
 	// Game Logic
-	InputModule->ProcessInputs();
-
-	SystemMessageManager->ProcessMessages();
+	InputModule->Process();
 
 	if (Game != NULL)
 		Game->Tick(FrameTime);

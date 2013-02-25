@@ -39,15 +39,16 @@
 
 #include "ZETypes.h"
 #include "ZEGame/ZEEntity.h"
+#include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEViewVolume.h"
 
 enum ZELightType
 {
-	ZE_LT_NONE = 0,
-	ZE_LT_POINT = 1,
-	ZE_LT_DIRECTIONAL = 2,
-	ZE_LT_PROJECTIVE = 3,
-	ZE_LT_OMNIPROJECTIVE = 4
+	ZE_LT_NONE				= 0,
+	ZE_LT_POINT				= 1,
+	ZE_LT_DIRECTIONAL		= 2,
+	ZE_LT_PROJECTIVE		= 3,
+	ZE_LT_OMNIPROJECTIVE	= 4
 };
 
 class ZEShadowRenderer;
@@ -62,45 +63,64 @@ class ZELight : public ZEEntity
 	private:
 		bool							Enabled;
 
+		float							AttenuationFunction(float RootToTry);
+
 	protected:
-		bool							UpdateViewVolume;
 		bool							CastsShadows;
-		ZEVector3						Color;
-		float							Intensity;
+		bool							UpdateViewVolume;
+		
+		float							PenumbraScale;
+		float							DepthScaledBias;
+		float							SlopeScaledBias;
+		
 		float							Range;
+		float							Intensity;
+
+		ZEVector3						Color;
 		ZEVector3						Attenuation;
 
 		virtual void					OnTransformChanged();
 
 	public:
-		virtual ZELightType				GetLightType() = 0;
-
-		virtual ZEDrawFlags				GetDrawFlags() const;
-
-		virtual	void					SetPosition(const ZEVector3& NewPosition);
-		virtual void					SetRotation(const ZEQuaternion& NewRotation);
-
-		void							SetColor(const ZEVector3& NewColor);
-		const ZEVector3&				GetColor() const;
+		void							SetRange(float NewValue);
+		float							GetRange() const;
 
 		void							SetIntensity(float NewValue);
 		float							GetIntensity() const;
 
-		void							SetRange(float NewValue);
-		float							GetRange() const;
+		void							SetPenumbraScale(float NewValue);
+		float							GetPenumbraScale() const;
+
+		void							SetDepthScaledBias(float NewValue);
+		float							GetDepthScaledBias() const;
+
+		void							SetSlopeScaledBias(float NewValue);
+		float							GetSlopeScaledBias() const;
+
+		void							SetColor(const ZEVector3& NewColor);
+		const ZEVector3&				GetColor() const;
 
 		void							SetAttenuation(const ZEVector3& Attenuation);
 		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
 		const ZEVector3&				GetAttenuation() const;
+		
+		virtual ZEDrawFlags				GetDrawFlags() const;
 
 		virtual void					SetCastsShadow(bool NewValue);
 		bool							GetCastsShadow() const;
 		
-		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer) = 0;
+		virtual	void					SetPosition(const ZEVector3& NewPosition);
+		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 
-		virtual const ZEViewVolume&		GetViewVolume() = 0;
+		virtual ZELightType				GetLightType() = 0;
+		virtual ZESize					GetViewCount() = 0;
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) = 0;
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize CascadeIndex = 0) = 0;
+
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
 
 										ZELight();
+		virtual							~ZELight();
 };
 
 #endif

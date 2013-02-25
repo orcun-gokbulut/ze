@@ -47,6 +47,7 @@
 #include "ZEFile/ZEFile.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
+#include "ZEGame/ZEScene.h"
 
 #define ZE_TPM_NORMAL			0
 #define ZE_TPM_SHRINK_NEGATIVE	1
@@ -65,7 +66,7 @@ ZEDrawFlags ZETerrain::GetDrawFlags() const
 void ZETerrain::SetChunkSize(ZEUInt Size)
 {
 	ChunkSize = Size;
-	if (GetInitialized())
+	if (IsInitialized())
 		ZETerrainPrimitivesGenerator::Generate(&VertexBuffer, &Indices, ChunkSize);
 }
 
@@ -167,12 +168,12 @@ ZETerrain::ZETerrain()
 
 ZETerrain::~ZETerrain()
 {
-	Deinitialize();
+
 }
 
-bool ZETerrain::Initialize()
+bool ZETerrain::InitializeSelf()
 {
-	if (GetInitialized())
+	if (!ZEEntity::InitializeSelf())
 		return false;
 
 	if (!CreateVertexBuffer())
@@ -184,19 +185,16 @@ bool ZETerrain::Initialize()
 	if (!CreateLevels())
 		return false;
 
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZETerrain::Deinitialize()
+bool ZETerrain::DeinitializeSelf()
 {
-	if (!GetInitialized())
-		return;
-
 	DestroyLevels();
 	UnloadLevelData();
 	DestroyVertexBuffer();
 
-	ZEEntity::Deinitialize();
+	return ZEEntity::DeinitializeSelf();
 }
 
 bool ZETerrain::CreateVertexBuffer()
@@ -299,8 +297,8 @@ bool ZETerrain::LoadLevelData()
 
 	File.Close();
 
-	DetailNormalTexture = ZETexture2DResource::LoadResource("normal.jpg")->GetTexture();
-	ColorTexture = ZETexture2DResource::LoadResource("Diffuse.bmp")->GetTexture();
+	DetailNormalTexture = ZETexture2DResource::LoadResource("ZESimulationDemo/Terrains/TerrainDetailNormal.jpg")->GetTexture();
+	ColorTexture = ZETexture2DResource::LoadResource("ZESimulationDemo/Terrains/TerrainDiffuse.bmp")->GetTexture();
 	 
 	return true;
 }
@@ -434,7 +432,7 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 void ZETerrain::SetTerrainFile(const ZEString& FileName)
 {
 	TerrainFileName = FileName;
-	if (GetInitialized())
+	if (IsInitialized())
 		LoadLevelData();
 }
 
@@ -516,6 +514,9 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	if (Levels.GetCount() == 0)
 		return;
 
+	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
+		return;
+
 	static ZEInt PositionX;
 	static ZEInt PositionY;
 	static ZEInt OffsetPositionX;
@@ -548,6 +549,9 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	int ActiveLevel = 0;
 	for (ZESize CurrIndex = 0; CurrIndex < LevelCount; CurrIndex++)
 	{
+		Levels[CurrIndex].Material->SetAmbientColor(zeScene->GetAmbientColor());
+		Levels[CurrIndex].Material->SetAmbientFactor(zeScene->GetAmbientFactor());
+
 		ZEInt CurrLevelPositionX = Align(PositionX, 1 << CurrIndex);
 		ZEInt CurrLevelPositionY = Align(PositionY, 1 << CurrIndex);
 		ZEInt NextLevelPositionX = Align(PositionX, 1 << (CurrIndex + 1));

@@ -53,3 +53,4 @@ function (ze_set_property_all_config)
 		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ${PARAMETER_PROPERTY_NAME} ${PARAMETER_PROPERTY})
 	endif()
 endfunction()
+	

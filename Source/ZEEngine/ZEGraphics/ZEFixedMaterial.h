@@ -81,6 +81,8 @@ class ZEFixedMaterial : public ZEMaterial
 		ZEVector3						EmmisiveColor;
 		float							EmmisiveFactor;
 
+		bool							GlobalAmbientEnabled;
+
 		union
 		{
 			struct
@@ -222,6 +224,9 @@ class ZEFixedMaterial : public ZEMaterial
 		float							GetAmbientFactor() const;
 		void							SetAmbientColor(const ZEVector3& Color);
 		const ZEVector3&				GetAmbientColor() const;
+
+		void							SetGlobalAmbientEnabled(bool Enabled);
+		bool							GetGlobalAmbientEnabled();
 
 		void							SetBaseMap(const ZETexture2D* Texture);
 		const ZETexture2D*				GetBaseMap() const;
@@ -400,8 +405,8 @@ class ZEFixedMaterial : public ZEMaterial
 
 		void							Tick(float ElapsedTime);
 
-		void							WriteToFile(ZEFile* File);
-		void							ReadFromFile(ZEFile* File);
+		void							WriteToFile(const ZEString& FilePath);
+		void							ReadFromFile(const ZEString& FilePath);
 
 		static ZEFixedMaterial*			CreateInstance();
 };

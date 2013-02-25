@@ -183,6 +183,7 @@ class ZEParticleEmitter : public ZEObject
 		void							SetMaxParticleCount(ZEUInt Value);
 		ZEUInt							GetMaxParticleCount() const;
 
+		void							Reset();
 		void							SetContinuity(bool Value);
 		bool							GetContinuity() const;
 

@@ -41,7 +41,6 @@
 #define WINDOWS_MEAN_AND_LEAN
 #include <Windows.h>
 
-
 ZESystemMessageManager::ZESystemMessageManager()
 {
 
@@ -77,12 +76,12 @@ void ZESystemMessageManager::ProcessMessages()
 {
 	MSG Msg;
 	ZeroMemory(&Msg, sizeof(Msg));
+
 	while(PeekMessage(&Msg, NULL, 0, 0, PM_REMOVE))
 	{	
 		TranslateMessage(&Msg);
 
 		bool Handled = false;
-
 		for(ZESize I = 0; I < Handlers.GetCount(); I++)
 			if (Msg.message >= Handlers[I]->MinMessage && Msg.message <= Handlers[I]->MaxMessage &&
 				(Handlers[I]->TargetWindow == NULL || Handlers[I]->TargetWindow == Msg.hwnd))

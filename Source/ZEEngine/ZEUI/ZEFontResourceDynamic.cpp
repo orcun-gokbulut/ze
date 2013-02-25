@@ -36,7 +36,6 @@
 #include "ZEFontResourceDynamic.h"
 #include "ZECore\ZEResourceManager.h"
 #include "ZEError.h"
-#include "ZEFontFile.h"
 #include "ZEFile\zepartialfile.h"
 
 #define UTF8_SPACE_CHARACTER 0x00020

@@ -54,9 +54,13 @@ class ZEOmniProjectiveLight : public ZELight
 		ZEViewSphere					ViewVolume;
 		ZETexture2D*					FrontShadowMap;
 		ZETexture2D*					BackShadowMap;
+		ZEMatrix4x4						ViewProjectionMatrix;
 
 										ZEOmniProjectiveLight();
 		virtual							~ZEOmniProjectiveLight();
+
+	protected:
+		virtual bool					DeinitializeSelf();
 
 	public:
 		ZELightType						GetLightType();
@@ -68,14 +72,14 @@ class ZEOmniProjectiveLight : public ZELight
 
 		virtual void					SetCastsShadow(bool NewValue);
 		
-		virtual void					Deinitialize();
-
-		virtual const ZEViewVolume&		GetViewVolume();
+		virtual ZESize					GetViewCount();
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
 
 		ZETexture2D*					GetFrontShadowMap();
 		ZETexture2D*					GetBackShadowMap();
 
-		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
 
 		static ZEOmniProjectiveLight*	CreateInstance();
 };

@@ -61,6 +61,8 @@ class ZEUIButtonControl : public ZEUIFrameControl
 		virtual void		SetHeight(float Height);
 		virtual void		SetSize(const ZEVector2& Size);
 
+		virtual void		SetZOrder(ZEInt32 Z);
+
 							ZEUIButtonControl();
 							~ZEUIButtonControl();
 

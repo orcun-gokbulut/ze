@@ -39,61 +39,28 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZESceneDebugDraw.h"
-
+#include "ZEDrawStatistics.h"
 
 class ZEScene;
 class ZEEntity;
 class ZELight;
 struct ZEDrawParameters;
 
-struct ZECullStatistics
-{
-	ZESize			TotalEntityCount;
-	ZESize			DrawableEntityCount;
-	ZESize			VisibleEntityCount;
-	ZESize			CulledEntityCount;
-	ZESize			DrawedEntityCount;
-
-	ZESize			TotalLightCount;
-	ZESize			VisibleLightCount;
-	ZESize			CulledLightCount;
-	ZESize			DrawedLightCount;
-};
-
-#define ZE_VDE_NONE									0
-#define ZE_VDE_ENTITY_LOCAL_BOUNDING_BOX			1
-#define ZE_VDE_ENTITY_WORLD_BOUNDING_BOX			2
-#define ZE_VDE_LIGHT_RANGE							4
-#define ZE_VDE_ALL									7
-
 class ZESceneCuller
 {
 	private:
-		ZECullStatistics				Statistics;
+		ZESceneStatistics					Statistics;
 
-		ZESceneDebugDraw				DebugDraw;
-		ZEUInt32						DebugDrawElements;
-
-		void							DebugDrawEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters);
-		void							DebugDrawLight(ZELight* Light, ZEDrawParameters* DrawParameters);
-
-		bool							CullLight(ZELight* Light, ZEDrawParameters* DrawParameters);
-		void							CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters);
-
-		bool							CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters);
-		void							CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameters);
+		void								CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters);
+		void								CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameters);
 
 	public:
-		virtual const ZECullStatistics&	GetStatistics();
+		virtual const ZESceneStatistics&	GetStatistics() const;
 
-		void							SetDebugDrawElements(ZEUInt32 Elements);
-		ZEUInt32						SetDebugDrawElements();
+		virtual void						CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters);
 
-		virtual void					CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters);
-
-										ZESceneCuller();
-		virtual							~ZESceneCuller();
+											ZESceneCuller();
+		virtual								~ZESceneCuller();
 };
 
 #endif

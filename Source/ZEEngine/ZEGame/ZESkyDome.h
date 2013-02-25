@@ -49,14 +49,14 @@ class ZEScene;
 class ZESkyDome : public ZEEntity
 {
 	protected:
-		float					G;					
+		float					G;
 
-		float					AmbientFactor;		
+		float					AmbientFactor;
 		ZEVector3				MiddayAmbientColor;		// Ambient color for the midday
 		ZEVector3				SunsetAmbientColor;		// Ambient color for sunset or sundown
 
-		float					MieConstant;		
-		float					RayleighConstant;	
+		float					MieConstant;
+		float					RayleighConstant;
 
 		float					MieScaleDepth;
 		float					RayleighScaleDepth;
@@ -64,10 +64,10 @@ class ZESkyDome : public ZEEntity
 		float					OuterRadius;			// = 61500.0f. Try to maintain Inner / Outer radius ratio 
 		float					InnerRadius;			// = 60000.0f. Try to maintain Inner / Outer radius ratio
 
-		float					SunIntensity;		
+		float					SunIntensity;
 
-		ZEVector3				SunLightDirection;		
-		ZEVector3				SunLightWaveLenght;			
+		ZEVector3				SunLightDirection;
+		ZEVector3				SunLightWaveLenght;
 
 		ZEVector3				CameraPosition;			// This parameter is the real time camera position for when the ground is round. No need to use offset parameter.
 		ZEVector3				CameraPositionOffset;	// = 60000.0f. This parameter is for when the ground is flat and calculations are done 
@@ -76,6 +76,9 @@ class ZESkyDome : public ZEEntity
 		ZECanvas				SkyDomeGeometry;
 		ZESkyDomeMaterial*		SkyDomeMaterial;
 		ZERenderCommand			SkyDomeRenderCommand;
+
+		virtual bool			InitializeSelf();
+		virtual bool			DeinitializeSelf();
 
 								ZESkyDome();
 		virtual					~ZESkyDome();
@@ -129,9 +132,6 @@ class ZESkyDome : public ZEEntity
 		float					GetG() const;
 
 		virtual ZEDrawFlags		GetDrawFlags() const;
-
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
 
 		virtual void			Draw(ZEDrawParameters* DrawParameters);
 		virtual void			Tick(float Time);

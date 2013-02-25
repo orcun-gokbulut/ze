@@ -41,7 +41,9 @@ ze_add_cmake_project(CMakeScripts
 		ze_check.cmake
 		ze_common.cmake
 		ze_dependency.cmake
-		ze_functions.cmake
+		ze_external.cmake
+		ze_merge_libraries.cmake
+		ze_merge_libraries_unix.cmake.in
 		ze_platform.cmake
 		ze_qt.cmake
 		ze_target.cmake

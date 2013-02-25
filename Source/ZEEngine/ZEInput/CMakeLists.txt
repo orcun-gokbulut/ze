@@ -35,20 +35,20 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEInputAction.cpp							Sources)
-ze_add_source(ZEInputAction.h							Sources Headers)
-ze_add_source(ZEInputDefinitions.cpp					Sources)
-ze_add_source(ZEInputDefinitions.h						Sources Headers)
-ze_add_source(ZEInputDevice.cpp							Sources)
-ze_add_source(ZEInputDevice.h							Sources Headers)
-ze_add_source(ZEInputDeviceExtension.cpp				Sources)
-ze_add_source(ZEInputDeviceExtension.h					Sources Headers)
+ze_add_source(ZEInput.cpp								Sources)
+ze_add_source(ZEInput.h									Sources Headers)
 ze_add_source(ZEInputEvent.cpp							Sources)
 ze_add_source(ZEInputEvent.h							Sources Headers)
 ze_add_source(ZEInputMap.cpp							Sources)
 ze_add_source(ZEInputMap.h								Sources Headers)
-ze_add_source(ZEInputMapBinding.cpp						Sources)
-ze_add_source(ZEInputMapBinding.h						Sources Headers)
+
+ze_add_source(ZEInputDefinitions.cpp					Sources)
+ze_add_source(ZEInputDefinitions.h						Sources Headers)
+
+ze_add_source(ZEInputDevice.cpp							Sources)
+ze_add_source(ZEInputDevice.h							Sources Headers)
+ze_add_source(ZEInputDeviceExtension.cpp				Sources)
+ze_add_source(ZEInputDeviceExtension.h					Sources Headers)
 ze_add_source(ZEInputModule.cpp							Sources)
 ze_add_source(ZEInputModule.h							Sources Headers)
 

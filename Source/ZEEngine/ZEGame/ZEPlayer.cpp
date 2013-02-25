@@ -56,10 +56,12 @@
 #define ACTIONID_TURNRIGHT			5
 #define ACTIONID_TURNUP				6
 #define ACTIONID_TURNDOWN			7
-#define ACTIONID_CONSOLE			8
+#define ACTIONID_TURN_CW			8
+#define ACTIONID_TURN_CCW			9
+#define ACTIONID_CONSOLE			10
 
-#define ACTIONID_UP					9
-#define ACTIONID_DOWN				10
+#define ACTIONID_UP					11
+#define ACTIONID_DOWN				12
 
 ZE_OBJECT_IMPL(ZEPlayer)
 
@@ -72,20 +74,20 @@ ZESteeringPlayerFree::ZESteeringPlayerFree()
 {
 	Rx = Ry = Rz = 0.0f;
 
-	Friction = 1.0f;
+	Friction = 30.0f;
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,			 ZEInputEvent("Keyboard", ZE_IKB_W, ZE_IBS_PRESSING)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,		 ZEInputEvent("Keyboard", ZE_IKB_S, ZE_IBS_PRESSING)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFERIGHT,		 ZEInputEvent("Keyboard", ZE_IKB_D, ZE_IBS_PRESSING)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFELEFT,		 ZEInputEvent("Keyboard", ZE_IKB_A, ZE_IBS_PRESSING)));
-
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_UP,				ZEInputEvent("Keyboard", ZE_IKB_Q, ZE_IBS_PRESSING)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_DOWN,			ZEInputEvent("Keyboard", ZE_IKB_E, ZE_IBS_PRESSING)));
-
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNUP,			 ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNDOWN,		 ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNRIGHT,		 ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNLEFT,		 ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE)));
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_W,								ZE_IS_PRESSING,		ACTIONID_FORWARD);
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_S,								ZE_IS_PRESSING,		ACTIONID_BACKWARD);
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_D,								ZE_IS_PRESSING,		ACTIONID_STRAFERIGHT);
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_A,								ZE_IS_PRESSING,		ACTIONID_STRAFELEFT);
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_R,								ZE_IS_PRESSING,		ACTIONID_UP);
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_F,								ZE_IS_PRESSING,		ACTIONID_DOWN);
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_Q,								ZE_IS_PRESSING,		ACTIONID_TURN_CW);
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_E,								ZE_IS_PRESSING,		ACTIONID_TURN_CCW);
+	InputMap.AddAxisAction("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE,		ZE_IS_CHANGED,		ACTIONID_TURNUP);
+	InputMap.AddAxisAction("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE,		ZE_IS_CHANGED,		ACTIONID_TURNDOWN);
+	InputMap.AddAxisAction("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE,	ZE_IS_CHANGED,		ACTIONID_TURNRIGHT);
+	InputMap.AddAxisAction("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE,	ZE_IS_CHANGED,		ACTIONID_TURNLEFT);
 }
 
 ZESteeringOutput ZESteeringPlayerFree::Process(float ElapsedTime)
@@ -97,12 +99,12 @@ ZESteeringOutput ZESteeringPlayerFree::Process(float ElapsedTime)
 
 	ZEQuaternion OwnerCameraRotation = ((ZEPlayer*)GetOwner())->GetCamera()->GetWorldRotation();
 	ZEVector3 MovementDirection = ZEVector3::Zero;
-	ZEInputAction* Current;
-	zeInput->ProcessInputMap(&InputMap);
 
-	for (ZESize I = 0; I < InputMap.InputActionCount; I++)
+	InputMap.Update();
+
+	for (ZESize I = 0; I < InputMap.GetActionCount(); I++)
 	{
-		Current = &InputMap.InputActions[I];
+		const ZEInputAction* Current = &InputMap.GetActions()[I];
 		switch(Current->Id)
 		{
 			case ACTIONID_FORWARD:
@@ -147,6 +149,12 @@ ZESteeringOutput ZESteeringPlayerFree::Process(float ElapsedTime)
 			case ACTIONID_TURNDOWN:
 				Rx = Rx - 0.001f * Current->AxisValue;
 				break;
+			case ACTIONID_TURN_CW:
+				Rz = Rz + 0.001f;
+				break;
+			case ACTIONID_TURN_CCW:
+				Rz = Rz - 0.001f;
+				break;
 		}
 	}
 
@@ -178,7 +186,7 @@ ZESteeringOutput ZESteeringPlayerFree::Process(float ElapsedTime)
 	}
 
 	ZEQuaternion::CreateFromEuler(OwnerCameraRotation, Rx, Ry, Rz);
-	((ZEPlayer*)GetOwner())->GetCamera()->SetLocalRotation(OwnerCameraRotation.Normalize());
+	((ZEPlayer*)GetOwner())->GetCamera()->SetRotation(OwnerCameraRotation.Normalize());
 
 	if(Moved)
 	{
@@ -186,9 +194,9 @@ ZESteeringOutput ZESteeringPlayerFree::Process(float ElapsedTime)
 	}
 	else
 	{
-		if (GetOwner()->GetLinearVelocity().LengthSquare() != 0)
+		if (fabs(Output.LinearAcceleration.LengthSquare()) < 0.1f)
 		{
-			Output.LinearAcceleration = -GetOwner()->GetLinearVelocity().Normalize() * Friction * GetOwner()->GetMaxLinearAcceleration();
+			Output.LinearAcceleration = -GetOwner()->GetLinearVelocity() * Friction;
 		}
 
 		//Output.AngularAcceleration = ZEMath::Sign(GetOwner()->GetAngularVelocity()) * Friction * GetOwner()->GetMaxAngularAcceleration();
@@ -236,14 +244,14 @@ void ZEPlayer::Activate()
 void ZEPlayer::Tick(float Time)
 {
 	ZEQuaternion RotationChange;
-	ZEInputAction* Current;
-	zeInput->ProcessInputMap(&InputMap);
+
+	InputMap.Update();
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 
-	for (size_t I = 0; I < InputMap.InputActionCount; I++)
+	for (size_t I = 0; I < InputMap.GetActionCount(); I++)
 	{
-		Current = &InputMap.InputActions[I];
+		const ZEInputAction* Current = &InputMap.GetActions()[I];
 		switch(Current->Id)
 		{
 			case ACTIONID_CONSOLE:
@@ -258,36 +266,33 @@ void ZEPlayer::Tick(float Time)
 	ZEActor::Tick(Time);
 }
 
-bool ZEPlayer::Initialize()
+bool ZEPlayer::InitializeSelf()
 {
-	if (GetInitialized())
+	if (!ZEActor::InitializeSelf())
 		return false;
 
 	zeScene->SetActiveCamera(Camera);
 	zeScene->SetActiveListener(Listener);
 
-	return ZEActor::Initialize();
+	return true;
 }
 
-void ZEPlayer::Deinitialize()
+bool ZEPlayer::DeinitializeSelf()
 {
-	if (!GetInitialized())
-		return;
-
-	ZEActor::Deinitialize();
+	return ZEActor::DeinitializeSelf();
 }
 
 #include "ZETexture/ZETexture2DResource.h"
 ZEPlayer::ZEPlayer()
 {
 
-	FOV = ZE_PI / 3.0f;
+	FOV = ZEAngle::ToRadian(50);
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_CONSOLE,			 ZEInputEvent("Keyboard", ZE_IKB_GRAVE, ZE_IBS_PRESSED)));
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_GRAVE, ZE_IS_PRESSED, ACTIONID_CONSOLE);
 
 	Camera = ZECamera::CreateInstance();
 	Camera->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	Camera->SetLocalRotation(ZEQuaternion::Identity);
+	Camera->SetRotation(ZEQuaternion::Identity);
 	Camera->SetNearZ(zeGraphics->GetNearZ());
 	Camera->SetFarZ(zeGraphics->GetFarZ());
 	Camera->SetFOV(FOV);

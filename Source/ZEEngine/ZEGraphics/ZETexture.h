@@ -73,6 +73,9 @@ enum ZETexturePixelFormat
 	ZE_TPF_DXT3,
 	ZE_TPF_DXT5,
 
+	// Special formats for shadow mapping
+	ZE_TPF_NULL,
+	ZE_TPF_INTZ,
 
 	// New Formats
 	ZE_TPF_RGBA8	= ZE_TPF_I8_4,

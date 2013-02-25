@@ -51,16 +51,19 @@ class ZETexture3DResource;
 class ZEMoon : public ZEEntity
 {
 	protected:
-		ZEMoonMaterial*				MoonMaterial;
-		ZETexture3DResource*		MoonTexture;
-		ZERenderCommand				MoonRenderCommand;
+		ZEMoonMaterial*				Material;
+		ZETexture3DResource*		Texture;
+		ZERenderCommand				RenderCommand;
 
-		float						MoonPhase;
-		float						MoonScale;
-		float						MoonRotation;
-		float						MoonAmbientFactor;
-		ZEVector3					MoonAmbientColor;
-		ZEVector3					MoonDirection;
+		float						Phase;
+		float						Scale;
+		float						Rotation;
+		float						AmbientFactor;
+		ZEVector3					AmbientColor;
+		ZEVector3					Direction;
+
+		virtual bool				InitializeSelf();
+		virtual bool				DeinitializeSelf();
 
 									ZEMoon();
 		virtual						~ZEMoon();
@@ -68,31 +71,28 @@ class ZEMoon : public ZEEntity
 	private:
 
 	public:
-		virtual void				SetMoonPhase(float Phase);
-		float						GetMoonPhase() const;
+		virtual void				SetPhase(float Phase);
+		float						GetPhase() const;
 
-		virtual void				SetMoonScale(float Scale);
-		float						GetMoonScale() const;
+		virtual void				SetScale(float Scale);
+		float						GetScale() const;
 		
-		virtual void				SetMoonRotation(float Rotation);
-		float						GetMoonRotation() const;
+		virtual void				SetRotation(float Rotation);
+		float						GetRotation() const;
 
-		virtual void				SetMoonAmbientFactor(float Value);
-		float						GetMoonAmbientFactor() const;
+		virtual void				SetAmbientFactor(float Value);
+		float						GetAmbientFactor() const;
 		
-		virtual void				SetMoonAmbientColor(ZEVector3& Color);
-		const ZEVector3&			GetMoonAmbientColor() const;
+		virtual void				SetAmbientColor(ZEVector3& Color);
+		const ZEVector3&			GetAmbientColor() const;
 
-		virtual void				SetMoonDirection(const ZEVector3& Direction);
-		const ZEVector3&			GetGetMoonDirection() const;
+		virtual void				SetDirection(const ZEVector3& NewDirection);
+		const ZEVector3&			GetGetDirection() const;
 
-		virtual void				SetMoonTexture(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
-		const ZEString				GetMoonTexture() const;
+		virtual void				SetTexture(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
+		const ZEString				GetTexture() const;
 
 		virtual ZEDrawFlags			GetDrawFlags() const;
-
-		virtual bool				Initialize();
-		virtual void				Deinitialize();
 
 		virtual void				Draw(ZEDrawParameters* DrawParameters);
 		virtual void				Tick(float Time);

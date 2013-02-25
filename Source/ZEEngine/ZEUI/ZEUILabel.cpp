@@ -84,45 +84,42 @@ void ZEUILabel::UpdateCharacters()
 	TextCharacter.RenderableCharacter.Color = FontColor;
 	TextCharacter.RenderableCharacter.Positions = Output.Positions;
 	((ZEUIMaterial*)TextCharacter.RenderableCharacter.Material)->SetTexture(Character.Texture);
-	TextWidth += TextCharacter.RenderableCharacter.Positions.GetWidth();
+	TextCharacter.Line = 0;
 
 	if (IsWordWrapping)
 	{
-		if((CurrentLineWidth + TextCharacter.RenderableCharacter.Positions.GetWidth()) > TextRenderingArea.GetWidth())
+		if((LineTextWidths.GetLastItem() + TextCharacter.RenderableCharacter.Positions.GetWidth()) >= TextRenderingArea.GetWidth())
 		{
+			LineTextWidths.Add(0);
 			CurrentLine++;
-			CurrentLineWidth = 0;
 			TextCharacter.RenderableCharacter.Positions.LeftUp.y += Characters.GetLastItem().FontCharacter.CharacterMetric.VerticalAdvance;
 			TextCharacter.RenderableCharacter.Positions.RightDown.y += Characters.GetLastItem().FontCharacter.CharacterMetric.VerticalAdvance;
- 			TextCharacter.RenderableCharacter.Positions.LeftUp.x = TextRenderingArea.LeftUp.x - GetPosition().x;
- 			TextCharacter.RenderableCharacter.Positions.RightDown.x = TextCharacter.RenderableCharacter.Positions.LeftUp.x + CharacterSize.x; 
+			TextCharacter.RenderableCharacter.Positions.LeftUp.x = TextRenderingArea.LeftUp.x ;
+			TextCharacter.RenderableCharacter.Positions.RightDown.x = TextCharacter.RenderableCharacter.Positions.LeftUp.x + CharacterSize.x;
 		}
-		
-		CurrentLineWidth += TextCharacter.RenderableCharacter.Positions.GetWidth();
-	}
-	else
-	{
-		CurrentLine = 0;
-		TextCharacter.Line = CurrentLine;
 	}
 
+	LineTextWidths.GetLastItem() += TextCharacter.RenderableCharacter.Positions.GetWidth();
+	TextCharacter.Line = CurrentLine;
 	Characters.Add(TextCharacter);
 }
 
-ZEVector2 ZEUILabel::CalculateTextStartPoint()
+void ZEUILabel::UpdateTextRenderingArea()
+{
+	TextRenderingArea.SetSize(GetSize());
+	SetTextMargins(GetTextMargins());
+}
+
+ZEVector2 ZEUILabel::CalculateLineStartPoint(ZESize LineIndex)
 {
 	ZEVector2 StartPosition = TextRenderingArea.GetPosition();
 
 	if(TextAlignment == ZE_UI_TA_RIGHT)
-	{
-		StartPosition.y = StartPosition.y;
-		StartPosition.x = GetRectangle().RightDown.x - (TextWidth + TextMargin.x);
-	}
+		StartPosition.x = TextRenderingArea.RightDown.x - (LineTextWidths[LineIndex]);
+
 	else if(TextAlignment == ZE_UI_TA_CENTER)
-	{
-		StartPosition.y = StartPosition.y;
-		StartPosition.x += (int)((GetRectangle().GetWidth() - TextWidth) / 2.0f);
-	}
+		StartPosition.x += (ZEInt32)(((TextRenderingArea.GetWidth() - LineTextWidths[LineIndex]) / 2.0f) + 0.5f);
+
 	else
 		StartPosition = StartPosition;
 
@@ -136,36 +133,57 @@ void ZEUILabel::Draw(ZEUIRenderer* Renderer)
 	if(FontResource == NULL)
 		return;
 
-	ZEUIRectangle Output, Temp;
-	TextStartPosition = CalculateTextStartPoint();
+	if(Characters.GetCount() == 0)
+		return;
+
+	ZEUIRectangle OutputCharacter, TempCharacter;
+	ZESSize DrawLineIndex = -1;
+	ZERectangle TempRenderRect = TextRenderingArea;
+	ZEVector2 CharacterPosIncrement, LineStartPosition, ScreenPos = GetScreenPosition();
+	TempRenderRect.SetPosition(ScreenPos);
+	ZERectangle::IntersectionTest(GetVisibleRectangle(), TextRenderingArea, TempRenderRect);
+	ZEInt32 TempTextZOrder = GetZOrder() + 1;
+
+	LineStartPosition = CalculateLineStartPoint(0);
 
 	for (ZESize I = 0; I < Characters.GetCount(); I++)
 	{
-		Temp = Characters[I].RenderableCharacter;
-		Temp.Positions.LeftUp += TextStartPosition;
-		Temp.Positions.RightDown += TextStartPosition;
+		if(Characters[I].Line != DrawLineIndex)
+		{
+			DrawLineIndex = Characters[I].Line;
+			LineStartPosition = CalculateLineStartPoint(DrawLineIndex);
+			CharacterPosIncrement = LineStartPosition + ScreenPos;
+		}
+		
+		TempCharacter = Characters[I].RenderableCharacter;	
+		TempCharacter.Positions.LeftUp += CharacterPosIncrement;
+		TempCharacter.Positions.RightDown += CharacterPosIncrement;
+		TempCharacter.ZOrder = TempTextZOrder;
 
-		if(!ZEUIRectangle::Clip(Output, Temp, TextRenderingArea))
-			Renderer->AddRectangle(Output);
+		if(!ZEUIRectangle::Clip(OutputCharacter, TempCharacter, TempRenderRect))
+			Renderer->AddRectangle(OutputCharacter);
 	}
-
-	TextStartPosition = CalculateTextStartPoint();
 }
 
 ZEUILabel::ZEUILabel()
 {
-	FontResource = NULL;
+	TextRenderingArea.SetPosition(ZEVector2::Zero);
+	TextRenderingArea.SetSize(ZEVector2::Zero);
+	TextMargins = ZEVector4::Zero;
+	SetFontColor(ZEUIManager::GetDefaultForegroundColor());
+	SetBackgroundColor(ZEVector4::Zero);
+	SetFontResource(ZEUIManager::GetDefaultFontResource());
 	Characters.Clear();
 	Text.Clear();
 	SetFocusable(false);
-	SetMoveable(true);
+	SetMoveable(false);
 	FontMaterial = ZEUIMaterial::CreateInstance();
-	SetFontColor(ZEVector4::UnitW);
-	TextWidth = 0;
-	SetTextMargin(ZEVector2::One * 2);
 	CurrentLine = 0;
-	CurrentLineWidth = 0;
 	SetWordWrapping(false);
+	SetSize(ZEVector2::One * 100);
+	SetTextMargins();
+	LineTextWidths.Add(0);
+	TextAlignment = ZE_UI_TA_LEFT;
 }
 
 ZEUILabel::~ZEUILabel()
@@ -193,14 +211,20 @@ const ZEVector4& ZEUILabel::GetFontColor() const
 	return FontColor;
 }
 
-void ZEUILabel::SetText(ZEString Text)
+void ZEUILabel::SetText(ZEString NewText)
 {
+	if(Text == NewText)
+		return;
+
 	this->Text = "";
 	Characters.Clear();
+	LineTextWidths.Clear();
+	LineTextWidths.Add(0);
+	CurrentLine = 0;
 
-	for (ZESize I = 0; I < Text.GetLength(); I++)
+	for (ZESize I = 0; I < NewText.GetLength(); I++)
 	{
-		ZEString NewCharacter = Text[I];
+		ZEString NewCharacter = NewText[I];
 		this->Text.Append(NewCharacter);
 		UpdateCharacters();
 	}
@@ -221,16 +245,6 @@ ZEUITextAlignment ZEUILabel::GetTextAlignment() const
 	return TextAlignment;
 }
 
-void ZEUILabel::SetTextMargin(const ZEVector2& Margin)
-{
-	TextMargin = Margin;
-}
-
-const ZEVector2& ZEUILabel::GetTextMargin() const
-{
-	return TextMargin;
-}
-
 void ZEUILabel::SetWordWrapping(bool Enabled)
 {
 	IsWordWrapping = Enabled;
@@ -242,36 +256,61 @@ bool ZEUILabel::GetWordWrapping() const
 	return IsWordWrapping;
 }
 
+void ZEUILabel::SetTextMargins(ZEUInt32 Top, ZEUInt32 Left, ZEUInt32 Bottom, ZEUInt32 Right)
+{
+	TextRenderingArea.LeftUp.y -= TextMargins.x;
+	TextRenderingArea.LeftUp.x -= TextMargins.y;
+	TextRenderingArea.RightDown.y += TextMargins.z;
+	TextRenderingArea.RightDown.x += TextMargins.w;
+
+	TextMargins = ZEVector4(Top, Left, Bottom, Right);
+
+	TextRenderingArea.LeftUp.y += TextMargins.x;
+	TextRenderingArea.LeftUp.x += TextMargins.y;
+	TextRenderingArea.RightDown.y -= TextMargins.z;
+	TextRenderingArea.RightDown.x -= TextMargins.w;
+}
+
+void ZEUILabel::SetTextMargins(const ZEVector4& Margins)
+{
+	SetTextMargins(Margins.x, Margins.y, Margins.z, Margins.w);
+}
+
+const ZEVector4& ZEUILabel::GetTextMargins() const
+{
+	return TextMargins;
+}
+
 void ZEUILabel::SetPosition(const ZEVector2& Position)
 {
 	ZEUIFrameControl::SetPosition(Position);
-	TextRenderingArea.SetPosition(Position + TextMargin);
-	TextRenderingArea.SetSize(GetSize() - TextMargin * 2);
 }
 
 void ZEUILabel::SetSize(const ZEVector2& Size)
 {
 	ZEUIFrameControl::SetSize(Size);
-	TextRenderingArea.SetPosition(GetPosition() + TextMargin);
-	TextRenderingArea.SetSize(GetSize() - TextMargin * 2);
+	UpdateTextRenderingArea();
 }
 
 void ZEUILabel::SetWidth(float Width)
 {
 	ZEUIFrameControl::SetWidth(Width);
-	TextRenderingArea.SetPosition(GetPosition() + TextMargin);
-	TextRenderingArea.SetSize(GetSize() - TextMargin * 2);
+	UpdateTextRenderingArea();
 }
 
 void ZEUILabel::SetHeight(float Height)
 {
 	ZEUIFrameControl::SetHeight(Height);
-	TextRenderingArea.SetPosition(GetPosition() + TextMargin);
-	TextRenderingArea.SetSize(GetSize() - TextMargin * 2);
+	UpdateTextRenderingArea();
 }
 
 void ZEUILabel::SetFontResource(ZEFontResource* Resource)
 {
 	FontResource = Resource;
 	SetText(Text);
+}
+
+const ZEFontResource* ZEUILabel::GetFontResource() const
+{
+	return FontResource;
 }
