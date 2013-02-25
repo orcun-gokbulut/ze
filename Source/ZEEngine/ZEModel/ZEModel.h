@@ -70,6 +70,7 @@ class ZEModel : public ZEEntity
 	friend class ZEPhysicalEnvironment;
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
+	friend class ZEModelDebugDrawer;
 	private:
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;

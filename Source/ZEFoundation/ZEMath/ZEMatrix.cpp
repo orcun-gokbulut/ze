@@ -926,6 +926,18 @@ void ZEMatrix4x4::CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float
 			0.0f, 0.0f, 0.0f, 1.0f);
 }
 
+void ZEMatrix4x4::CreateScreenTransform(ZEMatrix4x4& Matrix, float ScreenWidth, float ScreenHeight)
+{
+	float Xs = ScreenWidth / 2.0f;
+	float Ys = ScreenHeight / -2.0f;
+
+	Create(Matrix,
+		Xs, 0.0f, 0.0f, Xs,
+		0.0f, Ys, 0.0f, -Ys,
+		0.0f, 0.0f,	1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f);
+}
+
 float ZEMatrix4x4::Determinant(const ZEMatrix4x4 &Matrix)
 {
 	ZEMatrix3x3 A, B, C, D;
