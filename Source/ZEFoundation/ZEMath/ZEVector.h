@@ -195,6 +195,8 @@ class ZEVector3
 		static void					ClampUpper(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MaxValue);
 		static void					Saturate(ZEVector3& Out, const ZEVector3& Vector);
 
+		static ZEVector2			ToVector2(const ZEVector3& Vector);
+
 		bool						IsValid() const;
 		bool						IsNormalized() const;
 
@@ -226,6 +228,8 @@ class ZEVector3
 
 		bool						Equals(const ZEVector3& Vector) const;
 		bool						Equals(const ZEVector3& Vector, float Threshold) const;
+
+		ZEVector2					ToVector2() const;
 
 		ZEVector3					operator+(const ZEVector3& RightOperand) const;
 		ZEVector3					operator-(const ZEVector3& RightOperand) const;
@@ -306,6 +310,9 @@ class ZEVector4
 		static void					Clamp(ZEVector4& Out, const ZEVector4& Vector, const ZEVector4& MinValue, const ZEVector4& MaxValue);
 		static void					Saturate(ZEVector4& Out, const ZEVector4& Vector);
 		
+		static ZEVector2			ToVector2(const ZEVector4& Vector);
+		static ZEVector3			ToVector3(const ZEVector4& Vector);
+
 		bool						IsValid() const;
 		bool						IsNormalized() const;
 
@@ -324,6 +331,9 @@ class ZEVector4
 
 		bool						Equals(const ZEVector4& Vector) const;
 		bool						Equals(const ZEVector4& Vector, float Threshold) const;
+
+		ZEVector2					ToVector2() const;
+		ZEVector3					ToVector3() const;
 
 		ZEVector4					operator+(const ZEVector4 &RightOperand) const;
 		ZEVector4					operator-(const ZEVector4 &RightOperand) const;

@@ -35,52 +35,23 @@
 
 #include "ZELight.h"
 #include "ZERenderCommand.h"
+#include "ZEGame\ZEDrawParameters.h"
+#include "ZERenderer.h"
 
 ZE_OBJECT_IMPL(ZELight)
 
-ZEDrawFlags ZELight::GetDrawFlags() const
+float ZELight::AttenuationFunction(float RootToTry)
 {
-	return ZE_DF_LIGHT_SOURCE;
-}
+	float Result = 0.0f;
+	Result = Intensity / (((RootToTry * RootToTry) * Attenuation.z) + (RootToTry * Attenuation.y) + Attenuation.x);
 
-void ZELight::SetPosition(const ZEVector3& NewPosition)
-{
-	UpdateViewVolume = true;
-	ZEEntity::SetPosition(NewPosition);
+	return Result;
 }
-
-void ZELight::SetRotation(const ZEQuaternion& NewRotation)
-{
-	UpdateViewVolume = true;
-	ZEEntity::SetRotation(NewRotation);
-}
-
 
 void ZELight::OnTransformChanged()
 {
 	UpdateViewVolume = true;
 	ZEEntity::OnTransformChanged();
-}
-
-
-void ZELight::SetColor(const ZEVector3& NewColor)
-{
-	Color = NewColor;
-}
-
-const ZEVector3& ZELight::GetColor() const
-{
-	return Color;
-}
-
-void ZELight::SetIntensity(float NewValue)
-{
-	Intensity = NewValue;
-}
-
-float ZELight::GetIntensity() const
-{
-	return Intensity;
 }
 
 void ZELight::SetRange(float NewValue)
@@ -93,9 +64,59 @@ float ZELight::GetRange() const
 	return Range;
 }
 
+void ZELight::SetIntensity(float NewValue)
+{
+	Intensity = NewValue;
+}
+
+float ZELight::GetIntensity() const
+{
+	return Intensity;
+}
+
+void ZELight::SetPenumbraScale(float NewValue)
+{
+	PenumbraScale = NewValue;
+}
+
+float ZELight::GetPenumbraScale() const
+{
+	return PenumbraScale;
+}
+
+void ZELight::SetDepthScaledBias(float NewValue)
+{
+	DepthScaledBias = NewValue;
+}
+
+float ZELight::GetDepthScaledBias() const
+{
+	return DepthScaledBias;
+}
+
+void ZELight::SetSlopeScaledBias(float NewValue)
+{
+	SlopeScaledBias = NewValue;
+}
+
+float ZELight::GetSlopeScaledBias() const
+{
+	return SlopeScaledBias;
+}
+
+void ZELight::SetColor(const ZEVector3& NewColor)
+{
+	Color = NewColor;
+}
+
+const ZEVector3& ZELight::GetColor() const
+{
+	return Color;
+}
+
 void ZELight::SetAttenuation(const ZEVector3& Attenuation)
 {
-	this->Attenuation = Attenuation;
+	SetAttenuation(Attenuation.z, Attenuation.y, Attenuation.x);
 }
 
 void ZELight::SetAttenuation(float DistanceSquare, float Distance, float Constant)
@@ -103,11 +124,49 @@ void ZELight::SetAttenuation(float DistanceSquare, float Distance, float Constan
 	Attenuation.x = Constant;
 	Attenuation.y = Distance;
 	Attenuation.z = DistanceSquare;
+
+	if(GetLightType() != ZE_LT_DIRECTIONAL)
+	{
+		float MinRange = 0.0f;
+		float MaxRange = 1000.0f;
+		float ApproximateRoot = 0.0f;
+		float FunctionResult = 0.0f;
+		ZESize IterationCounter = 0;
+
+		do 
+		{
+			IterationCounter++;
+
+			ApproximateRoot = (MaxRange + MinRange) / 2.0f;
+
+			FunctionResult = AttenuationFunction(ApproximateRoot);
+
+			if (FunctionResult < 0) 
+			{
+				MinRange = ApproximateRoot;
+			} 
+			else if (FunctionResult > 0) 
+			{
+				MaxRange = ApproximateRoot;
+			}
+
+			if(IterationCounter >= 100)
+				break;
+		}
+		while(FunctionResult < Intensity / 256.0f);
+
+		SetRange(ApproximateRoot);
+	}
 }
 
 const ZEVector3& ZELight::GetAttenuation() const
 {
 	return Attenuation;
+}
+
+ZEDrawFlags ZELight::GetDrawFlags() const
+{
+	return ZE_DF_DRAW | ZE_DF_LIGHT_SOURCE;
 }
 
 void ZELight::SetCastsShadow(bool NewValue)
@@ -120,12 +179,47 @@ bool ZELight::GetCastsShadow() const
 	return CastsShadows;
 }
 
+void ZELight::SetPosition(const ZEVector3& NewPosition)
+{
+	if (GetPosition() != NewPosition)
+	{
+		UpdateViewVolume = true;
+		ZEEntity::SetPosition(NewPosition);
+	}
+}
+
+void ZELight::SetRotation(const ZEQuaternion& NewRotation)
+{
+	if (GetRotation() != NewRotation)
+	{
+		UpdateViewVolume = true;
+		ZEEntity::SetRotation(NewRotation);
+	}
+}
+
+void ZELight::Draw(ZEDrawParameters* DrawParameters)
+{
+	DrawParameters->Lights.Add(this);
+}
+
 ZELight::ZELight()
 {
-	Color = ZEVector3(1.0f, 1.0f, 1.0f);
-	Intensity = 1.0f;
-	Range = 100.0f;
-	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
-	CastsShadows = false;
 	Enabled = true;
+	CastsShadows = false;
+	UpdateViewVolume = true;
+
+	PenumbraScale = 1.0f;
+
+	DepthScaledBias = 0.0f;
+	SlopeScaledBias = 0.0f;
+
+	Range = 100.0f;
+	Intensity = 1.0f;
+	Color = ZEVector3(1.0f, 1.0f, 1.0f);
+	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
+}
+
+ZELight::~ZELight()
+{
+	
 }

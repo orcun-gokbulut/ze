@@ -40,8 +40,7 @@
 #include "ZETypes.h"
 #include "ZESoundResource.h"
 
-#include <mpg123.h>
-
+struct mpg123_handle_struct;
 
 class ZESoundResourceMP3 : public ZESoundResource
 {
@@ -52,7 +51,7 @@ class ZESoundResourceMP3 : public ZESoundResource
 		unsigned char*					Data;
 		ZESize							DataSize;
 
-		mpg123_handle*					mpg123;
+		mpg123_handle_struct*			mpg123;
 		ZESize							MemoryCursor;
 
 										ZESoundResourceMP3();

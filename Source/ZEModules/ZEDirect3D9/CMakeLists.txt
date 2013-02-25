@@ -48,12 +48,6 @@ if(ZEBUILD_D3D9_DEBUG_SHADERS_RELEASE)
 	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_RELEASE ZE_DEBUG_D3D9_DEBUG_SHADERS)
 endif()
 
-include_directories(
-	${ZEBUILD_INCLUDE_PATH}/DirectX)
-
-link_directories(
-	${ZEBUILD_LIB_PATH}/DirectX)
-
 add_subdirectory (ZED3D9PostProcessor)
 
 ze_add_source(ZED3D9BlurMaskProcessor.cpp				Sources)
@@ -143,8 +137,4 @@ ze_add_source(ZED3D9Plugin.cpp							Sources)
 	
 ze_add_library(ZEDirect3D9 
 	SOURCES ${Sources}
-	LIBS d3d9 d3dx9)
-	
-#ze_add_plugin(ZEDirect3D9Plugin
-#  SOURCES ${Sources}
-#  LIBS ZEEnginePlugin ZEGraphics ZETexture ZEGame d3d9 d3dx9)
+	LIBS libDirect3D9)

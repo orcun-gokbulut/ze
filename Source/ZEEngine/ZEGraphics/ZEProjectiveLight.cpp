@@ -86,7 +86,7 @@ const ZETexture2D* ZEProjectiveLight::GetProjectionTexture() const
 void ZEProjectiveLight::SetProjectionTextureFile(const char* Filename)
 {
 	strncpy(ProjectionTextureFile, Filename, ZE_MAX_FILE_NAME_SIZE);
-	if (GetInitialized())
+	if (IsInitialized())
 	{
 		if (ProjectionTextureResource != NULL)
 			ProjectionTextureResource->Release();
@@ -107,37 +107,17 @@ const char* ZEProjectiveLight::GetProjectionTextureFile() const
 		return ProjectionTextureFile;
 }
 
-const ZEMatrix4x4& ZEProjectiveLight::GetProjectionMatrix()
-{
-	return ZEMatrix4x4::Identity;
-}
-
 ZETexture2D* ZEProjectiveLight::GetShadowMap()
 {
 	return ShadowMap;
 }
 
-void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
+ZESize ZEProjectiveLight::GetViewCount()
 {
-/*	if (!GetCastsShadow())
-		return;
-
-	if (ShadowMap == NULL)
-	{
-		ShadowMap = ZETexture2D::CreateInstance();
-		ShadowMap->Create(512, 512, ZE_TPF_SHADOW_MAP, true);
-	}
-
-	ShadowRenderer->SetLight(this);
-	ShadowRenderer->SetViewPort(ShadowMap->GetViewPort());
-
-	ShadowRenderer->ClearList();
-
-	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
-	ShadowRenderer->Render();*/
+	return 1;
 }
 
-const ZEViewVolume& ZEProjectiveLight::GetViewVolume()
+const ZEViewVolume& ZEProjectiveLight::GetViewVolume(ZESize Index)
 {
 	if (UpdateViewVolume)
 	{
@@ -146,6 +126,11 @@ const ZEViewVolume& ZEProjectiveLight::GetViewVolume()
 	}
 
 	return ViewVolume;
+}
+
+const ZEMatrix4x4& ZEProjectiveLight::GetViewTransform(ZESize CascadeIndex)
+{
+	return ViewProjectionMatrix;
 }
 
 void ZEProjectiveLight::SetCastsShadow(bool NewValue)
@@ -160,9 +145,9 @@ void ZEProjectiveLight::SetCastsShadow(bool NewValue)
 	ZELight::SetCastsShadow(NewValue);
 }
 
-bool ZEProjectiveLight::Initialize()
+bool ZEProjectiveLight::InitializeSelf()
 {
-	if (GetInitialized())
+	if (!ZEEntity::InitializeSelf())
 		return false;
 
 	if (strlen(ProjectionTextureFile) != 0)
@@ -177,16 +162,11 @@ bool ZEProjectiveLight::Initialize()
 			zeError("Can not load projection texture.");
 	}
 
-	ZEEntity::Initialize();
-
 	return true;
 }
 
-void ZEProjectiveLight::Deinitialize()
+bool ZEProjectiveLight::DeinitializeSelf()
 {
-	if (!GetInitialized())
-		return;
-
 	if (ProjectionTextureResource != NULL)
 	{
 		ProjectionTextureResource->Release();
@@ -198,6 +178,21 @@ void ZEProjectiveLight::Deinitialize()
 		ShadowMap->Destroy();
 		ShadowMap = NULL;
 	}
+
+	return ZEEntity::DeinitializeSelf();
+}
+
+void ZEProjectiveLight::Draw(ZEDrawParameters* DrawParameters)
+{
+	if (DrawParameters->Pass != ZE_RP_COLOR)
+		return;
+
+	ZEBSphere LightBoundingSphere;
+	LightBoundingSphere.Position = GetWorldPosition();
+	LightBoundingSphere.Radius = GetRange();
+
+	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
+		ZELight::Draw(DrawParameters);
 }
 
 ZEProjectiveLight::ZEProjectiveLight()
@@ -207,12 +202,13 @@ ZEProjectiveLight::ZEProjectiveLight()
 	ShadowMap = NULL;
 	ProjectionTexture = NULL;
 	ProjectionTextureResource = NULL;
+	ViewProjectionMatrix = ZEMatrix4x4::Identity;
 	memset(ProjectionTextureFile, 0, ZE_MAX_FILE_NAME_SIZE);
 }
 
 ZEProjectiveLight::~ZEProjectiveLight()
 {
-	Deinitialize();
+
 }
 
 ZEProjectiveLight* ZEProjectiveLight::CreateInstance()

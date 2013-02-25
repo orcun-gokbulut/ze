@@ -62,7 +62,7 @@ class ZEPathUtils
 		static ZEString				GetAbsolutePath(const ZEString& RootPath, const ZEString& RelativePath);
 
 		static bool					IsRelativePath(const ZEString& Path);
-		static ZEString				GetRelativePath(const ZEString& RootPath, const ZEString& AbsolutePath);
+		static ZEString				GetRelativePath(ZEString& RootPath, ZEString& AbsolutePath);
 };
 
 

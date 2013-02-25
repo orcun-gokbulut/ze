@@ -39,6 +39,7 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEFastDelegate.h"
+#include "ZEDS/ZEDelegate.h"
 #include "ZEUI/ZEUIManager.h"
 
 enum ZEUIInputKey;
@@ -51,30 +52,23 @@ enum ZEUIMouseKey
 };
 
 // Mouse Events
-typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseClicked;
-typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseDoubleClicked;
-typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseButtonPressed;
-typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseButtonReleased;
-typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseHovered;
-typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseEntered;
-typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseLeft;
-typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseMoved;
+
+typedef	ZEDelegate<void (ZEUIMouseKey, const ZEVector2&)>	ZEUIEventMouseClicked;
+typedef	ZEDelegate<void (const ZEVector2&)>					ZEUIEventMouseDoubleClicked;
+typedef	ZEDelegate<void (ZEUIMouseKey, const ZEVector2&)>	ZEUIEventMouseButtonPressed;
+typedef	ZEDelegate<void (ZEUIMouseKey, const ZEVector2&)>	ZEUIEventMouseButtonReleased;
+typedef	ZEDelegate<void (const ZEVector2&)>					ZEUIEventMouseHovered;
+typedef	ZEDelegate<void (const ZEVector2&)>					ZEUIEventMouseEntered;
+typedef	ZEDelegate<void (const ZEVector2&)>					ZEUIEventMouseLeft;
+typedef	ZEDelegate<void (ZEUIMouseKey, const ZEVector2&)>	ZEUIEventMouseMoved;
 
 // Keyboard Events
-typedef fastdelegate::FastDelegate1<ZEUIInputKey, void>						ZEUIEventKeyPressed;
-typedef fastdelegate::FastDelegate1<ZEUIInputKey, void>						ZEUIEventKeyReleased;
+typedef ZEDelegate<void (ZEUIInputKey)>						ZEUIEventKeyPressed;
+typedef ZEDelegate<void (ZEUIInputKey)>						ZEUIEventKeyReleased;
 
 // Component Event
-typedef fastdelegate::FastDelegate0<void>									ZEUIEventDestroyed;
-typedef fastdelegate::FastDelegate0<void>									ZEUIEventCreated;
-typedef fastdelegate::FastDelegate0<void>									ZEUIEventFocusLost;
-typedef fastdelegate::FastDelegate0<void>									ZEUIEventFocusGained;
-
-// Windows
-typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventWindowMoved;
-typedef fastdelegate::FastDelegate2<const ZEVector2&, void>					ZEUIEventWindowResized;
-typedef fastdelegate::FastDelegate1<bool, void>								ZEUIEventWindowClosed;
-typedef fastdelegate::FastDelegate0<void>									ZEUIEventWindowMinimized;
+typedef ZEDelegate<void ()>									ZEUIEventFocusLost;
+typedef ZEDelegate<void ()>									ZEUIEventFocusGained;
 
 #endif
 

@@ -33,58 +33,58 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_UI_RADIO_BUTTON_CONTROL__
-#define __ZE_UI_RADIO_BUTTON_CONTROL__
-
-#include "ZEUIControl.h"
-#include "ZEUITextControl.h"
-#include "ZEUIButtonControl.h"
-
-enum ZEUIRadioButtonState
-{
-	ZE_UI_RBS_UNCHECKED		= 0,
-	ZE_UI_RBS_CHECKED		= 1
-};
-
-class ZEString;
-
-class ZEUIRadioButtonControl : public ZEUIControl
-{
-	friend class ZEUIManager;
-
-	private:
-
-		ZEUIRadioButtonState				State;
-
-		ZEUIButtonControl					Box;
-		ZEUITextControl						Label;
-
-		ZEArray<ZEUIRadioButtonControl*>	InteractingRadioButtons;
-
-
-	protected:
-
-		virtual void 						MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
-
-	public:
-
-		void								AddInteractingRadioButton(ZEUIRadioButtonControl* RadioButton);
-		void								RemoveInteractingRadioButton(ZEUIRadioButtonControl* RadioButton);
-
-		void								SetState(ZEUIRadioButtonState State);
-		ZEUIRadioButtonState				GetState() const;	
-
-		void								SetText(ZEString Text);
-		ZEString							GetText();
-
-		virtual ZEMaterial*					GetMaterial() const;
-		virtual void						SetMaterial(ZEMaterial* Material);
-
-
-											ZEUIRadioButtonControl();
-											~ZEUIRadioButtonControl();
-
-};
-
-#endif
+// #pragma once
+// #ifndef __ZE_UI_RADIO_BUTTON_CONTROL__
+// #define __ZE_UI_RADIO_BUTTON_CONTROL__
+// 
+// #include "ZEUIControl.h"
+// #include "ZEUITextControl.h"
+// #include "ZEUIButtonControl.h"
+// 
+// enum ZEUIRadioButtonState
+// {
+// 	ZE_UI_RBS_UNCHECKED		= 0,
+// 	ZE_UI_RBS_CHECKED		= 1
+// };
+// 
+// class ZEString;
+// 
+// class ZEUIRadioButtonControl : public ZEUIControl
+// {
+// 	friend class ZEUIManager;
+// 
+// 	private:
+// 
+// 		ZEUIRadioButtonState				State;
+// 
+// 		ZEUIButtonControl					Box;
+// 		ZEUITextControl						Label;
+// 
+// 		ZEArray<ZEUIRadioButtonControl*>	InteractingRadioButtons;
+// 
+// 
+// 	protected:
+// 
+// 		virtual void 						MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+// 
+// 	public:
+// 
+// 		void								AddInteractingRadioButton(ZEUIRadioButtonControl* RadioButton);
+// 		void								RemoveInteractingRadioButton(ZEUIRadioButtonControl* RadioButton);
+// 
+// 		void								SetState(ZEUIRadioButtonState State);
+// 		ZEUIRadioButtonState				GetState() const;	
+// 
+// 		void								SetText(ZEString Text);
+// 		ZEString							GetText();
+// 
+// 		virtual ZEMaterial*					GetMaterial() const;
+// 		virtual void						SetMaterial(ZEMaterial* Material);
+// 
+// 
+// 											ZEUIRadioButtonControl();
+// 											~ZEUIRadioButtonControl();
+// 
+// };
+// 
+// #endif

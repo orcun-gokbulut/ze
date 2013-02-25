@@ -44,12 +44,18 @@
 #include <windows.h>
 #endif
 
+static void DefaultErrorCallback(ZEErrorType Level)
+{
+	if (Level >= ZE_ET_CRITICAL_ERROR)
+		exit(EXIT_FAILURE);
+}
+
 ZEError::ZEError()
 {
 	BreakOnAssertEnabled = true;
 	BreakOnErrorEnabled = true;
 	BreakOnWarningEnabled = true;
-	ErrorCallback = NULL;
+	ErrorCallback = DefaultErrorCallback;
 }
 
 void ZEError::SetBreakOnDebugCheckEnabled(bool Enabled)

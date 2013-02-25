@@ -664,11 +664,12 @@ void ZEGameCharacter::LoadRecording(const char* FileName)
 	fclose(File);
 }
 
-bool ZEGameCharacter::Initialize()
+bool ZEGameCharacter::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
 
 	Model->SetModelResource(ZEModelResource::LoadResource("soldier.zemodel"));
-
 
 	IdleAnimationTrack = Model->GetAnimationTracks().Add();
 	IdleAnimationTrack->SetOwner(Model);
@@ -765,13 +766,15 @@ bool ZEGameCharacter::Initialize()
 	return true;
 }
 
-void ZEGameCharacter::Deinitialize()
+bool ZEGameCharacter::DeinitializeSelf()
 {
 	if (Model != NULL)
 	{
 		Model->Destroy();
 		Model = NULL;
 	}
+
+	return ZEEntity::DeinitializeSelf();
 }
 
 ZEGameCharacter::ZEGameCharacter()
@@ -807,7 +810,7 @@ ZEGameCharacter::ZEGameCharacter()
 
 ZEGameCharacter::~ZEGameCharacter()
 {
-	Deinitialize();
+
 }
 
 ZEGameCharacter* ZEGameCharacter::CreateInstance()

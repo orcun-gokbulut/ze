@@ -39,8 +39,25 @@
 
 #include "ZELight.h"
 #include "ZEMath/ZEViewCuboid.h"
+#include "ZEMath/ZEViewFrustum.h"
 
-class ZETexture2D; 
+class ZETexture2D;
+
+#define MAX_CASCADE_COUNT			4
+
+struct ZEDirectionalLightCascade
+{
+	ZEUInt			Index;
+	float			FarZ;
+	float			NearZ;
+	float			Depth;
+	float			FilterScale;
+	ZEUInt			UpdateInterval;
+
+	ZETexture2D*	ShadowMap;
+	ZEViewCuboid	ViewVolume;
+	ZEMatrix4x4		ShadowTransform;
+};
 
 ZE_CLASS(ZEDirectionalLight)
 
@@ -49,19 +66,40 @@ class ZEDirectionalLight : public ZELight
 	ZE_OBJECT
 
 	private:
-		ZETexture2D*					ShadowMap;
+		
+		float								SplitBias;
+		ZESize								CascadeCount;
+		ZEDirectionalLightCascade			Cascades[MAX_CASCADE_COUNT];
 
-										ZEDirectionalLight();
+		void								CreateRenderTargets();
+		void								DestroyRenderTargets();
+
+											ZEDirectionalLight();
+		virtual								~ZEDirectionalLight();
+
+	protected:
+		bool								InitializeSelf();
+		bool								DeinitializeSelf();
 
 	public:
-		ZELightType						GetLightType();
+		ZELightType							GetLightType();
 
-		const ZETexture2D*				GetShadowMap();
+		void								SetSplitBias(float Bias);
+		float								GetSplitBias() const;
 
-		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
-		virtual const ZEViewVolume&		GetViewVolume();
+		void								SetCascadeCount(ZESize Count);
+		ZESize								GetCascadeCount() const;
 
-		static ZEDirectionalLight*		CreateInstance();
+		const ZEDirectionalLightCascade&	GetCascadeData(ZESize Index) const;
+
+		ZETexture2D*						GetShadowMap(ZESize Index = 0);
+		
+		ZESize								GetViewCount();
+		const ZEViewVolume&					GetViewVolume(ZESize Index = 0);
+		const ZEMatrix4x4&					GetViewTransform(ZESize CascadeIndex = 0);
+		
+		void								Draw(ZEDrawParameters* DrawParameters);
+		static ZEDirectionalLight*			CreateInstance();
 };
 
 #endif

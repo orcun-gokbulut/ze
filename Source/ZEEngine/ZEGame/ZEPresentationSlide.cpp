@@ -97,8 +97,11 @@ void ZEPresentationSlide::Draw(ZEDrawParameters* DrawParameters)
 	}
 }
 
-bool ZEPresentationSlide::Initialize()
+bool ZEPresentationSlide::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	ZECanvas Canvas;
 	Canvas.SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3(1.0f, 0.0f, 0.0f)));
 	Canvas.AddPlane(1.0f, 1.0f);
@@ -136,7 +139,7 @@ bool ZEPresentationSlide::Initialize()
 	return true;
 }
 
-void ZEPresentationSlide::Deinitialize()
+bool ZEPresentationSlide::DeinitializeSelf()
 {
 	if (VertexBuffer != NULL)
 		VertexBuffer->Destroy();
@@ -145,6 +148,8 @@ void ZEPresentationSlide::Deinitialize()
 		Material->Destroy();
 	
 	Initialized = false;
+
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZEPresentationSlide::Tick(float ElapsedTime)
@@ -170,7 +175,7 @@ ZEPresentationSlide::ZEPresentationSlide()
 
 ZEPresentationSlide::~ZEPresentationSlide()
 {
-	Deinitialize();
+
 }
 
 ZEPresentationSlide* ZEPresentationSlide::CreateInstance()

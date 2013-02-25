@@ -38,4 +38,4 @@ cmake_minimum_required(VERSION 2.8)
 ze_set_project_folder("ZECodeUtilities")
 
 ze_add_module(ZEFileCompiler)
-#ze_add_module(ZEMetaCompiler)
+ze_add_module(ZEMetaCompiler)

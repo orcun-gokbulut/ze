@@ -45,9 +45,11 @@
 #include "ZEModelResource.h"
 #include "ZEModelBone.h"
 #include "ZEModelMesh.h"
+#include "ZEModelHelper.h"
 #include "ZEModelAnimation.h"
 #include "ZEModelAnimationTrack.h"
 #include "ZEModelIKChain.h"
+#include "ZEGame/ZEDrawStatistics.h"
 
 class ZEQuaternion;
 class ZEMatrix4x4;
@@ -67,13 +69,17 @@ class ZEModel : public ZEEntity
 
 	friend class ZEPhysicalEnvironment;
 	friend class ZEModelAnimationTrack;
+	friend class ZEModelHelper;
 	private:
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
 		ZEArray<ZERenderCommand>			LODRenderCommands;
 		
+		ZEModelStatistics					Statistics;
+
 		ZEArray<ZEModelMesh>				Meshes;
 		ZEArray<ZEModelBone>				Bones;
+		ZEArray<ZEModelHelper>				Helpers;
 
 		ZEPhysicalRigidBody*				ParentlessBoneBody;
 		ZEPhysicalBoxShape*					ParentlessBoneShape;
@@ -87,8 +93,6 @@ class ZEModel : public ZEEntity
 		ZEModelAnimationType				AnimationType;
 
 		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
-
-		/*ZEAABBox							BoundingBox;*/
 
 		void								CalculateBoundingBox();		
 		void								UpdateTransforms();
@@ -113,6 +117,10 @@ class ZEModel : public ZEEntity
 		
 		void								LoadModelResource();
 
+	protected:
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
+
 											ZEModel();
 		virtual								~ZEModel();
 
@@ -120,6 +128,8 @@ class ZEModel : public ZEEntity
 		ZEArray<ZEModelIKChain>				IKChains;
 
 		virtual	ZEDrawFlags					GetDrawFlags() const;
+
+		virtual const ZEModelStatistics&	GetStatistics() const;
 
 		virtual const ZEAABBox&				GetWorldBoundingBox();
 
@@ -134,10 +144,13 @@ class ZEModel : public ZEEntity
 		ZEArray<ZEModelBone>&				GetBones();
 		const ZEArray<ZEMatrix4x4>&			GetBoneTransforms();
 		const ZEArray<ZEModelMesh>&			GetMeshes();
+		const ZEArray<ZEModelHelper>&		GetHelpers();
 		const ZEArray<ZEModelAnimation>*	GetAnimations();
 
 		ZEModelBone*						GetBone(const char* Name);
+		ZEModelMesh*						GetMesh(ZESize Index);
 		ZEModelMesh*						GetMesh(const char* Name);
+		ZEModelHelper*						GetHelper(const char* Name);
 
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();
@@ -163,7 +176,7 @@ class ZEModel : public ZEEntity
 
 		void								Tick(float ElapsedTime);
 		void								Draw(ZEDrawParameters* DrawParameters);
-		void								TransformChangeEvent(const ZEPhysicalTransformChangeEventArgument& TransformChange);
+		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);
 
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
 
@@ -175,9 +188,6 @@ class ZEModel : public ZEEntity
 
 		void								SetDrawPhysicalJoints(bool Enabled);
 		bool								GetDrawPhysicalJoints();
-
-		bool								Initialize();
-		void								Deinitialize();
 
 		static ZEModel*						CreateInstance();
 };

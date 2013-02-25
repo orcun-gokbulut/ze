@@ -1007,9 +1007,9 @@ ZEVector3 ZEGizmo::GetPositionChange()
 	return Result;
 }
 
-bool ZEGizmo::Initialize()
+bool ZEGizmo::InitializeSelf()
 {
-	if (GetInitialized())
+	if (!ZEEntity::InitializeSelf())
 		return false;
 
 	GizmoMaterial = ZESimpleMaterial::CreateInstance();
@@ -1018,10 +1018,10 @@ bool ZEGizmo::Initialize()
 	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 	RenderCommand.Material = GizmoMaterial;
 	
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZEGizmo::Deinitialize()
+bool ZEGizmo::DeinitializeSelf()
 {	
 	if (GizmoMaterial != NULL)
 	{
@@ -1029,13 +1029,14 @@ void ZEGizmo::Deinitialize()
 		GizmoMaterial = NULL;
 	}
 
-	ZEEntity::Deinitialize();
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZEGizmo::Draw(ZEDrawParameters* DrawParameters)
 {
 	UpdateGizmo();
 
+	RenderCommand.Priority = 4;
 	RenderCommand.WorldMatrix = GetWorldTransform();
 	RenderCommand.Flags = (Mode == ZE_GM_ROTATE ? ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM : ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM);
 	RenderCommand.PrimitiveType = ZE_ROPT_LINE;

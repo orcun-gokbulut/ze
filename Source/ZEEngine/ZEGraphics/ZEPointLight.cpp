@@ -76,7 +76,7 @@ ZETexture2D* ZEPointLight::GetBackShadowMap()
 	return FrontShadowMap;
 }
 
-void ZEPointLight::Deinitialize()
+bool ZEPointLight::DeinitializeSelf()
 {
 	if (FrontShadowMap)
 	{
@@ -89,43 +89,16 @@ void ZEPointLight::Deinitialize()
 		BackShadowMap->Destroy();
 		BackShadowMap = NULL;
 	}
+
+	return ZELight::DeinitializeSelf();
 }
 
-void ZEPointLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
+ZESize ZEPointLight::GetViewCount()
 {
-	if (!CastsShadows)
-		return;
-
-	if (FrontShadowMap == NULL)
-	{
-		FrontShadowMap = ZETexture2D::CreateInstance();
-		FrontShadowMap->Create(512, 512, 1, ZE_TPF_F32, true);
-	}
-
-	if (BackShadowMap == NULL)
-	{
-		BackShadowMap = ZETexture2D::CreateInstance();
-		BackShadowMap->Create(512, 512, 1, ZE_TPF_F32, true);
-	}
-
-	/*
-	ShadowRenderer->SetLight(this);
-
-	ShadowRenderer->SetFace(true);
-	ShadowRenderer->SetViewPort(FrontShadowMap->GetViewPort());
-	ShadowRenderer->ClearList();
-	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
-	ShadowRenderer->Render();
-
-	ShadowRenderer->SetFace(false);
-	ShadowRenderer->SetViewPort(BackShadowMap->GetViewPort());
-	ShadowRenderer->ClearLists();
-	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
-	ShadowRenderer->Render();
-	*/
+	return 1;
 }
 
-const ZEViewVolume& ZEPointLight::GetViewVolume()
+const ZEViewVolume& ZEPointLight::GetViewVolume(ZESize Index)
 {
 	if (UpdateViewVolume)
 	{
@@ -136,15 +109,35 @@ const ZEViewVolume& ZEPointLight::GetViewVolume()
 	return ViewVolume;
 }
 
+const ZEMatrix4x4& ZEPointLight::GetViewTransform(ZESize Index)
+{
+	return ViewProjectionMatrix;
+}
+
+void ZEPointLight::Draw(ZEDrawParameters* DrawParameters)
+{
+	if (DrawParameters->Pass != ZE_RP_COLOR)
+		return;
+
+	ZEBSphere LightBoundingSphere;
+	LightBoundingSphere.Position = GetWorldPosition();
+	LightBoundingSphere.Radius = GetRange();
+
+	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
+		ZELight::Draw(DrawParameters);
+
+}
+
 ZEPointLight::ZEPointLight()
 {
 	FrontShadowMap = NULL;
 	BackShadowMap = NULL;
+	ViewProjectionMatrix = ZEMatrix4x4::Identity;
 }
 
 ZEPointLight::~ZEPointLight()
 {
-	Deinitialize();
+
 }
 
 ZEPointLight* ZEPointLight::CreateInstance()

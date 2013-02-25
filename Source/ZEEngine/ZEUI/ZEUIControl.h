@@ -44,19 +44,6 @@
 #include "ZEUIEvents.h"
 #include "ZEDS/ZEFastDelegate.h"
 
-enum ZEUIControlVisibility
-{
-	ZE_IUCV_NOT_VISIBLE		= 0,
-	ZE_IUCV_SEMI_VISIBLE	= 1,
-	ZE_IUCV_FULLY_VISIBLE	= 2,
-};
-
-enum ZEUIBackgroundType
-{
-	ZE_UI_BT_NONE			= 1,
-	ZE_UI_BT_SOLID			= 0,
-};
-
 class ZEUIRenderer;
 class ZETexture2D;
 class ZEUIControl
@@ -75,13 +62,6 @@ class ZEUIControl
 		ZERectangle						ScreenRectangle;
 	
 		ZEVector4						BackgroundColor;
-		ZEVector4						HoverColor;
-		ZEVector4						PressedColor;
-		ZEVector4						DisabledColor;
-
-		ZETexture2D*					BackgroundTexture;
-
-		ZEUIBackgroundType				BackgroundType;
 
 		bool							IsFocusable;
 		bool							IsMoveable;
@@ -93,7 +73,7 @@ class ZEUIControl
 		bool							IsFocused;
 		bool							IsPressed;       
 		
-		int								ZOrder;
+		ZEInt32								ZOrder;
 
 		ZEVector2						MaximumSize;
 		ZEVector2						MinimumSize;
@@ -113,7 +93,6 @@ class ZEUIControl
 
 	protected:
 
-		bool							DirtyVisibleRectangle;
 		void							SetParent(ZEUIControl *ParentName);
 
 		void							SetHovered(bool Hovered);
@@ -169,8 +148,8 @@ class ZEUIControl
 		bool							GetFocused() const;
 		bool							GetPressed() const;
 
-		void							SetZOrder(int Z);
-		int								GetZOrder() const;
+		virtual void					SetZOrder(ZEInt32 Z);
+		ZEInt32							GetZOrder() const;
 
 		void							SetMoveable(bool IsMoveable);
 		bool							GetMoveable() const;
@@ -181,12 +160,11 @@ class ZEUIControl
 		void							SetMaximumSize(ZEVector2 MaximumSize);
 		ZEVector2						GetMaximumSize() const;
 
-		virtual void					SetPosition(float X, float Y);
 		virtual void					SetPosition(const ZEVector2& Position);
 		const ZEVector2&				GetPosition();		
-		const ZEVector2&				GetScreenPosition();
+		ZEVector2						GetScreenPosition();
 
-		virtual void					SetSize(const ZEVector2& Size);
+		void							SetSize(const ZEVector2& Size);
 		ZEVector2						GetSize();
 
 		virtual void					SetWidth(float Width);
@@ -195,15 +173,12 @@ class ZEUIControl
 		virtual void					SetHeight(float Height);
 		float							GetHeight();
 
-		const ZERectangle&				GetVisibleRectangle();
-		const ZERectangle&				GetRectangle();
-		const ZERectangle&				GetScreenRectangle();
+		ZERectangle						GetRectangle();
+		ZERectangle						GetScreenRectangle();
+		ZERectangle						GetVisibleRectangle();
 
 		void							SetBackgroundColor(const ZEVector4& Color);
 		const ZEVector4&				GetBackgroundColor();
-
-		void							SetBackgroundType(ZEUIBackgroundType Type);
-		ZEUIBackgroundType				GetBackgroundType();
 
 		void 			 				SetMouseClickedEvent(const ZEUIEventMouseClicked& Event);
 		void 				 			SetMouseDoubleClickedEvent(const ZEUIEventMouseDoubleClicked& Event);
@@ -219,9 +194,6 @@ class ZEUIControl
 
 		virtual void					Draw(ZEUIRenderer* Renderer);
 		virtual void					Tick(float ElapsedTime);
-
-// 		virtual ZEMaterial*				GetMaterial() const = 0;
-// 		virtual void					SetMaterial(ZEMaterial* Material) = 0;
 
 										ZEUIControl();
 										~ZEUIControl();

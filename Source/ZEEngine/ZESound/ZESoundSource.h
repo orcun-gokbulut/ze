@@ -43,7 +43,6 @@
 
 #include "ZEMeta/ZEObject.h"
 
-
 #define ZE_SS_PAN_LEFT				-100
 #define ZE_SS_PAN_MIDDLE			0
 #define ZE_SS_PAN_RIGHT				100

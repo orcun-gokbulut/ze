@@ -39,8 +39,27 @@
 #include "ZEError.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEInput/ZEInputDefinitions.h"
-#include "ZEInput/ZEInputModule.h"
+#include "ZEFontResourceBitmap.h"
+#include "ZEFontResourceDynamic.h"
 
+ZEVector4 ZEUIManager::DefaultBackgroundColor = ZEVector4(0.2f, 0.2f, 0.2f, 1.0f);
+ZEVector4 ZEUIManager::DefaultForegroundColor = ZEVector4(0.0f, 0.8f, 0.0f, 1.0f);
+//ZEFontResource* ZEUIManager::DefaultFontResource = ZEFontResourceBitmap::LoadSharedResource("Courier New.zeFont");
+
+const ZEVector4& ZEUIManager::GetDefaultBackgroundColor()
+{
+	return DefaultBackgroundColor;
+}
+
+const ZEVector4&	ZEUIManager::GetDefaultForegroundColor()
+{
+	return DefaultForegroundColor;
+}
+
+ZEFontResource* ZEUIManager::GetDefaultFontResource()
+{
+	return ZEFontResourceDynamic::LoadSharedResource("ZEEngine/ZEGUI/Fonts/arialbd.ttf", 12);
+}
 
 ZEUIManager::ZEUIManager() 
 {
@@ -51,130 +70,130 @@ ZEUIManager::ZEUIManager()
 	LastFocusedControl = NULL;
 	MouseMoveEventFlag = false;
 	Cursor = NULL;
-	PreviousPressedButton = ZE_UI_MOUSE_BUTTON_NONE;
+	PreviousPressedButton = ZE_UI_MOUSE_BUTTON_NONE; 
 
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_ESCAPE,			ZEInputEvent("Keyboard",ZE_IKB_ESCAPE,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_1,				ZEInputEvent("Keyboard",ZE_IKB_1,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_2,				ZEInputEvent("Keyboard",ZE_IKB_2,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_3,				ZEInputEvent("Keyboard",ZE_IKB_3,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_4,				ZEInputEvent("Keyboard",ZE_IKB_4,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_5,				ZEInputEvent("Keyboard",ZE_IKB_5,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_6,				ZEInputEvent("Keyboard",ZE_IKB_6,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_7,				ZEInputEvent("Keyboard",ZE_IKB_7,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_8,				ZEInputEvent("Keyboard",ZE_IKB_8,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_9,				ZEInputEvent("Keyboard",ZE_IKB_9,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_0,				ZEInputEvent("Keyboard",ZE_IKB_0,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_MINUS,			ZEInputEvent("Keyboard",ZE_IKB_MINUS,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_EQUALS,			ZEInputEvent("Keyboard",ZE_IKB_EQUALS,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_TAB,				ZEInputEvent("Keyboard",ZE_IKB_TAB,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_Q,				ZEInputEvent("Keyboard",ZE_IKB_Q,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_W,				ZEInputEvent("Keyboard",ZE_IKB_W,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_E,				ZEInputEvent("Keyboard",ZE_IKB_E,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_R,				ZEInputEvent("Keyboard",ZE_IKB_R,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_T,				ZEInputEvent("Keyboard",ZE_IKB_T,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_Y,				ZEInputEvent("Keyboard",ZE_IKB_Y,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_U,				ZEInputEvent("Keyboard",ZE_IKB_U,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_I,				ZEInputEvent("Keyboard",ZE_IKB_I,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_O,				ZEInputEvent("Keyboard",ZE_IKB_O,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_P,				ZEInputEvent("Keyboard",ZE_IKB_P,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_LBRACKET,			ZEInputEvent("Keyboard",ZE_IKB_LBRACKET,			ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_RBRACKET,			ZEInputEvent("Keyboard",ZE_IKB_RBRACKET,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_RETURN,			ZEInputEvent("Keyboard",ZE_IKB_RETURN,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_LCONTROL,			ZEInputEvent("Keyboard",ZE_IKB_LCONTROL,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_A,				ZEInputEvent("Keyboard",ZE_IKB_A,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_S,				ZEInputEvent("Keyboard",ZE_IKB_S,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_D,				ZEInputEvent("Keyboard",ZE_IKB_D,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F,				ZEInputEvent("Keyboard",ZE_IKB_F,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_G,				ZEInputEvent("Keyboard",ZE_IKB_G,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_H,				ZEInputEvent("Keyboard",ZE_IKB_H,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_J,				ZEInputEvent("Keyboard",ZE_IKB_J,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_K,				ZEInputEvent("Keyboard",ZE_IKB_K,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_L,				ZEInputEvent("Keyboard",ZE_IKB_L,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_SEMICOLON, 		ZEInputEvent("Keyboard",ZE_IKB_SEMICOLON, 		 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_APOSTROPHE,		ZEInputEvent("Keyboard",ZE_IKB_APOSTROPHE,		 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_LSHIFT,			ZEInputEvent("Keyboard",ZE_IKB_LSHIFT,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_BACKSLASH, 		ZEInputEvent("Keyboard",ZE_IKB_BACKSLASH, 		 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_Z,				ZEInputEvent("Keyboard",ZE_IKB_Z,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_X,				ZEInputEvent("Keyboard",ZE_IKB_X,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_C,				ZEInputEvent("Keyboard",ZE_IKB_C,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_V,				ZEInputEvent("Keyboard",ZE_IKB_V,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_B,				ZEInputEvent("Keyboard",ZE_IKB_B,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_N,				ZEInputEvent("Keyboard",ZE_IKB_N,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_M,				ZEInputEvent("Keyboard",ZE_IKB_M,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_COMMA,			ZEInputEvent("Keyboard",ZE_IKB_COMMA,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_PERIOD,			ZEInputEvent("Keyboard",ZE_IKB_PERIOD,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_SLASH,			ZEInputEvent("Keyboard",ZE_IKB_SLASH,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_RSHIFT,			ZEInputEvent("Keyboard",ZE_IKB_RSHIFT,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_MULTIPLY,			ZEInputEvent("Keyboard",ZE_IKB_MULTIPLY,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_SPACE	,			ZEInputEvent("Keyboard",ZE_IKB_SPACE	,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_CAPITAL,			ZEInputEvent("Keyboard",ZE_IKB_CAPITAL,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F1,				ZEInputEvent("Keyboard",ZE_IKB_F1,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F2,				ZEInputEvent("Keyboard",ZE_IKB_F2,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F3,				ZEInputEvent("Keyboard",ZE_IKB_F3,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F4,				ZEInputEvent("Keyboard",ZE_IKB_F4,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F5,				ZEInputEvent("Keyboard",ZE_IKB_F5,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F6,				ZEInputEvent("Keyboard",ZE_IKB_F6,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F7,				ZEInputEvent("Keyboard",ZE_IKB_F7,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F8,				ZEInputEvent("Keyboard",ZE_IKB_F8,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F9,				ZEInputEvent("Keyboard",ZE_IKB_F9,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F10,				ZEInputEvent("Keyboard",ZE_IKB_F10,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMLOCK,			ZEInputEvent("Keyboard",ZE_IKB_NUMLOCK,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_SCROLL,			ZEInputEvent("Keyboard",ZE_IKB_SCROLL,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPAD7,			ZEInputEvent("Keyboard",ZE_IKB_NUMPAD7,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPAD8,			ZEInputEvent("Keyboard",ZE_IKB_NUMPAD8,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPAD9,			ZEInputEvent("Keyboard",ZE_IKB_NUMPAD9,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_SUBTRACT,			ZEInputEvent("Keyboard",ZE_IKB_SUBTRACT,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPAD4,			ZEInputEvent("Keyboard",ZE_IKB_NUMPAD4,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPAD5,			ZEInputEvent("Keyboard",ZE_IKB_NUMPAD5,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPAD6,			ZEInputEvent("Keyboard",ZE_IKB_NUMPAD6,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_ADD,				ZEInputEvent("Keyboard",ZE_IKB_ADD,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPAD1,			ZEInputEvent("Keyboard",ZE_IKB_NUMPAD1,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPAD2,			ZEInputEvent("Keyboard",ZE_IKB_NUMPAD2,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPAD3,			ZEInputEvent("Keyboard",ZE_IKB_NUMPAD3,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPAD0,			ZEInputEvent("Keyboard",ZE_IKB_NUMPAD0,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_DECIMAL,			ZEInputEvent("Keyboard",ZE_IKB_DECIMAL,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_OEM_102,			ZEInputEvent("Keyboard",ZE_IKB_OEM_102,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F11,				ZEInputEvent("Keyboard",ZE_IKB_F11,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F12,				ZEInputEvent("Keyboard",ZE_IKB_F12,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F13,				ZEInputEvent("Keyboard",ZE_IKB_F13,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F14,				ZEInputEvent("Keyboard",ZE_IKB_F14,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_F15,				ZEInputEvent("Keyboard",ZE_IKB_F15,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_KANA,				ZEInputEvent("Keyboard",ZE_IKB_KANA,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_ABNT_C1,			ZEInputEvent("Keyboard",ZE_IKB_ABNT_C1,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_CONVERT,			ZEInputEvent("Keyboard",ZE_IKB_CONVERT,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NOCONVERT, 		ZEInputEvent("Keyboard",ZE_IKB_NOCONVERT, 		 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_YEN,				ZEInputEvent("Keyboard",ZE_IKB_YEN,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_ABNT_C2,			ZEInputEvent("Keyboard",ZE_IKB_ABNT_C2,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPADEQUALS,		ZEInputEvent("Keyboard",ZE_IKB_NUMPADEQUALS,		 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_PREVTRACK,		ZEInputEvent("Keyboard",ZE_IKB_PREVTRACK,		 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_AT,				ZEInputEvent("Keyboard",ZE_IKB_AT,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_COLON,			ZEInputEvent("Keyboard",ZE_IKB_COLON,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_UNDERLINE,		ZEInputEvent("Keyboard",ZE_IKB_UNDERLINE,		 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_KANJI,			ZEInputEvent("Keyboard",ZE_IKB_KANJI,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_STOP,				ZEInputEvent("Keyboard",ZE_IKB_STOP,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_AX,				ZEInputEvent("Keyboard",ZE_IKB_AX,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_UNLABELED,		ZEInputEvent("Keyboard",ZE_IKB_UNLABELED,		 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NEXTTRACK,		ZEInputEvent("Keyboard",ZE_IKB_NEXTTRACK,		 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPADENTER,		ZEInputEvent("Keyboard",ZE_IKB_NUMPADENTER,		 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_RCONTROL,			ZEInputEvent("Keyboard",ZE_IKB_RCONTROL,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_MUTE,				ZEInputEvent("Keyboard",ZE_IKB_MUTE,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_CALCULATOR,		ZEInputEvent("Keyboard",ZE_IKB_CALCULATOR,		 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NUMPADCOMMA,		ZEInputEvent("Keyboard",ZE_IKB_NUMPADCOMMA,		 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_DIVIDE,			ZEInputEvent("Keyboard",ZE_IKB_DIVIDE,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_SYSRQ,			ZEInputEvent("Keyboard",ZE_IKB_SYSRQ,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_RMENU,			ZEInputEvent("Keyboard",ZE_IKB_RMENU,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_PAUSE,			ZEInputEvent("Keyboard",ZE_IKB_PAUSE,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_HOME,				ZEInputEvent("Keyboard",ZE_IKB_HOME,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_UP,				ZEInputEvent("Keyboard",ZE_IKB_UP,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_PRIOR,			ZEInputEvent("Keyboard",ZE_IKB_PRIOR,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_LEFT,				ZEInputEvent("Keyboard",ZE_IKB_LEFT,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_RIGHT,			ZEInputEvent("Keyboard",ZE_IKB_RIGHT,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_END,				ZEInputEvent("Keyboard",ZE_IKB_END,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_DOWN,				ZEInputEvent("Keyboard",ZE_IKB_DOWN,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_NEXT,				ZEInputEvent("Keyboard",ZE_IKB_NEXT,				 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_INSERT,			ZEInputEvent("Keyboard",ZE_IKB_INSERT,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_DELETE,			ZEInputEvent("Keyboard",ZE_IKB_DELETE,			 ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding( ZE_IKB_BACKSPACE,		ZEInputEvent("Keyboard",ZE_IKB_BACKSPACE,			ZE_IBS_PRESSED)));
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_ESCAPE,			 ZE_IS_PRESSED, ZE_IKB_ESCAPE);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_1,				 ZE_IS_PRESSED, ZE_IKB_1);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_2,				 ZE_IS_PRESSED, ZE_IKB_2);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_3,				 ZE_IS_PRESSED, ZE_IKB_3);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_4,				 ZE_IS_PRESSED, ZE_IKB_4);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_5,				 ZE_IS_PRESSED, ZE_IKB_5);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_6,				 ZE_IS_PRESSED, ZE_IKB_6);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_7,				 ZE_IS_PRESSED, ZE_IKB_7);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_8,				 ZE_IS_PRESSED, ZE_IKB_8);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_9,				 ZE_IS_PRESSED, ZE_IKB_9);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_0,				 ZE_IS_PRESSED, ZE_IKB_0);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_MINUS,			 ZE_IS_PRESSED, ZE_IKB_MINUS);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_EQUALS,			 ZE_IS_PRESSED, ZE_IKB_EQUALS);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_TAB,				 ZE_IS_PRESSED, ZE_IKB_TAB);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_Q,				 ZE_IS_PRESSED, ZE_IKB_Q);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_W,				 ZE_IS_PRESSED, ZE_IKB_W);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_E,				 ZE_IS_PRESSED, ZE_IKB_E);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_R,				 ZE_IS_PRESSED, ZE_IKB_R);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_T,				 ZE_IS_PRESSED, ZE_IKB_T);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_Y,				 ZE_IS_PRESSED, ZE_IKB_Y);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_U,				 ZE_IS_PRESSED, ZE_IKB_U);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_I,				 ZE_IS_PRESSED, ZE_IKB_I);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_O,				 ZE_IS_PRESSED, ZE_IKB_O);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_P,				 ZE_IS_PRESSED, ZE_IKB_P);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_LBRACKET,		 ZE_IS_PRESSED,  ZE_IKB_LBRACKET);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_RBRACKET,		 ZE_IS_PRESSED, ZE_IKB_RBRACKET);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_RETURN,			 ZE_IS_PRESSED, ZE_IKB_RETURN);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_LCONTROL,		 ZE_IS_PRESSED, ZE_IKB_LCONTROL);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_A,				 ZE_IS_PRESSED, ZE_IKB_A);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_S,				 ZE_IS_PRESSED, ZE_IKB_S);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_D,				 ZE_IS_PRESSED, ZE_IKB_D);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F,				 ZE_IS_PRESSED, ZE_IKB_F);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_G,				 ZE_IS_PRESSED, ZE_IKB_G);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_H,				 ZE_IS_PRESSED, ZE_IKB_H);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_J,				 ZE_IS_PRESSED, ZE_IKB_J);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_K,				 ZE_IS_PRESSED, ZE_IKB_K);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_L,				 ZE_IS_PRESSED, ZE_IKB_L);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_SEMICOLON, 		 ZE_IS_PRESSED, ZE_IKB_SEMICOLON);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_APOSTROPHE,		 ZE_IS_PRESSED, ZE_IKB_APOSTROPHE);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_LSHIFT,			 ZE_IS_PRESSED, ZE_IKB_LSHIFT);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_BACKSLASH, 		 ZE_IS_PRESSED, ZE_IKB_BACKSLASH);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_Z,				 ZE_IS_PRESSED, ZE_IKB_Z);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_X,				 ZE_IS_PRESSED, ZE_IKB_X);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_C,				 ZE_IS_PRESSED, ZE_IKB_C);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_V,				 ZE_IS_PRESSED, ZE_IKB_V);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_B,				 ZE_IS_PRESSED, ZE_IKB_B);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_N,				 ZE_IS_PRESSED, ZE_IKB_N);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_M,				 ZE_IS_PRESSED, ZE_IKB_M);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_COMMA,			 ZE_IS_PRESSED, ZE_IKB_COMMA);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_PERIOD,			 ZE_IS_PRESSED, ZE_IKB_PERIOD);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_SLASH,			 ZE_IS_PRESSED, ZE_IKB_SLASH);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_RSHIFT,			 ZE_IS_PRESSED, ZE_IKB_RSHIFT);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_MULTIPLY,		 ZE_IS_PRESSED, ZE_IKB_MULTIPLY);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_SPACE	,		 ZE_IS_PRESSED, ZE_IKB_SPACE);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_CAPITAL,			 ZE_IS_PRESSED, ZE_IKB_CAPITAL);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F1,				 ZE_IS_PRESSED, ZE_IKB_F1);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F2,				 ZE_IS_PRESSED, ZE_IKB_F2);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F3,				 ZE_IS_PRESSED, ZE_IKB_F3);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F4,				 ZE_IS_PRESSED, ZE_IKB_F4);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F5,				 ZE_IS_PRESSED, ZE_IKB_F5);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F6,				 ZE_IS_PRESSED, ZE_IKB_F6);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F7,				 ZE_IS_PRESSED, ZE_IKB_F7);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F8,				 ZE_IS_PRESSED, ZE_IKB_F8);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F9,				 ZE_IS_PRESSED, ZE_IKB_F9);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F10,				 ZE_IS_PRESSED, ZE_IKB_F10);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMLOCK,			 ZE_IS_PRESSED, ZE_IKB_NUMLOCK);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_SCROLL,			 ZE_IS_PRESSED, ZE_IKB_SCROLL);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPAD7,			 ZE_IS_PRESSED, ZE_IKB_NUMPAD7);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPAD8,			 ZE_IS_PRESSED, ZE_IKB_NUMPAD8);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPAD9,			 ZE_IS_PRESSED, ZE_IKB_NUMPAD9);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_SUBTRACT,		 ZE_IS_PRESSED, ZE_IKB_SUBTRACT);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPAD4,			 ZE_IS_PRESSED, ZE_IKB_NUMPAD4);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPAD5,			 ZE_IS_PRESSED, ZE_IKB_NUMPAD5);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPAD6,			 ZE_IS_PRESSED, ZE_IKB_NUMPAD6);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_ADD,				 ZE_IS_PRESSED, ZE_IKB_ADD);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPAD1,			 ZE_IS_PRESSED, ZE_IKB_NUMPAD1);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPAD2,			 ZE_IS_PRESSED, ZE_IKB_NUMPAD2);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPAD3,			 ZE_IS_PRESSED, ZE_IKB_NUMPAD3);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPAD0,			 ZE_IS_PRESSED, ZE_IKB_NUMPAD0);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_DECIMAL,			 ZE_IS_PRESSED, ZE_IKB_DECIMAL);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_OEM_102,			 ZE_IS_PRESSED, ZE_IKB_OEM_102);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F11,				 ZE_IS_PRESSED, ZE_IKB_F11);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F12,				 ZE_IS_PRESSED, ZE_IKB_F12);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F13,				 ZE_IS_PRESSED, ZE_IKB_F13);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F14,				 ZE_IS_PRESSED, ZE_IKB_F14);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_F15,				 ZE_IS_PRESSED, ZE_IKB_F15);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_KANA,			 ZE_IS_PRESSED, ZE_IKB_KANA);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_ABNT_C1,			 ZE_IS_PRESSED, ZE_IKB_ABNT_C1);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_CONVERT,			 ZE_IS_PRESSED, ZE_IKB_CONVERT);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NOCONVERT, 		 ZE_IS_PRESSED, ZE_IKB_NOCONVERT);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_YEN,				 ZE_IS_PRESSED, ZE_IKB_YEN);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_ABNT_C2,			 ZE_IS_PRESSED, ZE_IKB_ABNT_C2);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPADEQUALS,	 ZE_IS_PRESSED, ZE_IKB_NUMPADEQUALS);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_PREVTRACK,		 ZE_IS_PRESSED, ZE_IKB_PREVTRACK);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_AT,				 ZE_IS_PRESSED, ZE_IKB_AT);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_COLON,			 ZE_IS_PRESSED, ZE_IKB_COLON);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_UNDERLINE,		 ZE_IS_PRESSED, ZE_IKB_UNDERLINE);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_KANJI,			 ZE_IS_PRESSED, ZE_IKB_KANJI);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_STOP,			 ZE_IS_PRESSED, ZE_IKB_STOP);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_AX,				 ZE_IS_PRESSED, ZE_IKB_AX);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_UNLABELED,		 ZE_IS_PRESSED, ZE_IKB_UNLABELED);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NEXTTRACK,		 ZE_IS_PRESSED, ZE_IKB_NEXTTRACK);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPADENTER,		 ZE_IS_PRESSED, ZE_IKB_NUMPADENTER);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_RCONTROL,		 ZE_IS_PRESSED, ZE_IKB_RCONTROL);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_MUTE,			 ZE_IS_PRESSED, ZE_IKB_MUTE);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_CALCULATOR,		 ZE_IS_PRESSED, ZE_IKB_CALCULATOR);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NUMPADCOMMA,		 ZE_IS_PRESSED, ZE_IKB_NUMPADCOMMA);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_DIVIDE,			 ZE_IS_PRESSED, ZE_IKB_DIVIDE);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_SYSRQ,			 ZE_IS_PRESSED, ZE_IKB_SYSRQ);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_RMENU,			 ZE_IS_PRESSED, ZE_IKB_RMENU);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_PAUSE,			 ZE_IS_PRESSED, ZE_IKB_PAUSE);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_HOME,			 ZE_IS_PRESSED, ZE_IKB_HOME);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_UP,				 ZE_IS_PRESSED, ZE_IKB_UP);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_PRIOR,			 ZE_IS_PRESSED, ZE_IKB_PRIOR);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_LEFT,			 ZE_IS_PRESSED, ZE_IKB_LEFT);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_RIGHT,			 ZE_IS_PRESSED, ZE_IKB_RIGHT);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_END,				 ZE_IS_PRESSED, ZE_IKB_END);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_DOWN,			 ZE_IS_PRESSED, ZE_IKB_DOWN);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_NEXT,			 ZE_IS_PRESSED, ZE_IKB_NEXT);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_INSERT,			 ZE_IS_PRESSED, ZE_IKB_INSERT);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_DELETE,			 ZE_IS_PRESSED, ZE_IKB_DELETE);
+	InputMap.AddButtonAction("Keyboard",ZE_IKB_BACKSPACE,		 ZE_IS_PRESSED, ZE_IKB_BACKSPACE);
 
 }
 
@@ -206,7 +225,6 @@ ZEArray<ZEUIControl*>& ZEUIManager::GetControls()
 	return Controls;
 }
 
-#include "ZEUITextControl.h"
 #include "ZEFontResource.h"
 #include "ZEUICursorControl.h"
 #include "ZEUIButtonControl.h"
@@ -317,7 +335,7 @@ void ZEUIManager::ProcessEvents()
 
 		if (LastPressedControl != NULL && Cursor->GetCurrentButton() == ZE_UI_MOUSE_BUTTON_NONE)
 		{
-			LastPressedControl->MouseButtonReleased(PressedButton, CursorPosition);
+			LastPressedControl->MouseButtonReleased(PreviousPressedButton, CursorPosition);
 			MouseMoveEventFlag = false;
 
 			if (ZERectangle::IntersectionTest(LastPressedControl->GetVisibleRectangle(), CursorPosition))
@@ -360,11 +378,11 @@ void ZEUIManager::ProcessEvents()
 
 	if (LastFocusedControl != NULL)
 	{
-		zeInput->ProcessInputMap(&InputMap);
+		InputMap.Update();
 
-		for (size_t I = 0; I < InputMap.InputActionCount; I++)
+		for (size_t I = 0; I < InputMap.GetActionCount(); I++)
 		{
-			switch (InputMap.InputActions[I].Id)
+			switch (InputMap.GetActions()[I].Id)
 			{
 				case ZE_IKB_Q:
 					LastFocusedControl->KeyPressed(ZE_UI_IKB_Q);
@@ -548,7 +566,7 @@ void ZEUIManager::ProcessEvents()
 
 ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 {
-	for (int I = ParentControl->GetChildControls().GetCount() - 1; I >= 0; I--)
+	for (ZEInt32 I = ParentControl->GetChildControls().GetCount() - 1; I >= 0; I--)
 	{
 		ZEUIControl* CurrentControl = ParentControl->GetChildControls()[I];
 		if (ZERectangle::IntersectionTest(CurrentControl->GetVisibleRectangle(), Cursor->GetPosition()))
@@ -578,11 +596,11 @@ void ZEUIManager::Render(ZERenderer* Renderer)
 
 void ZEUIManager::Tick(float ElapsedTime)
 {
+	ProcessEvents();
+
 	for (size_t I = 0; I < Controls.GetCount(); I++)
 		if (Controls[I]->GetEnabled())
 			Controls[I]->Tick(ElapsedTime);
-
-	ProcessEvents();
 }
 
 void ZEUIManager::Destroy()

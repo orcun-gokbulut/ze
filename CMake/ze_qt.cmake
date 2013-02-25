@@ -33,14 +33,10 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-set(QT_MOC_EXECUTABLE ${ZEBUILD_TOOL_PATH}/Qt/moc)
-set(QT_RCC_EXECUTABLE ${ZEBUILD_TOOL_PATH}/Qt/rcc)
-set(QT_UIC_EXECUTABLE ${ZEBUILD_TOOL_PATH}/Qt/uic)
+get_property(LIBQT_ROOT_DIRECTORY TARGET libQt PROPERTY ZEBUILD_ROOT_DIRECTORY)
 
-include_directories(
-	${ZEBUILD_INCLUDE_PATH})
-	
-link_directories(
-	${ZEBUILD_LIB_PATH}/Qt)
+set(QT_MOC_EXECUTABLE ${LIBQT_ROOT_DIRECTORY}/Tool/moc)
+set(QT_RCC_EXECUTABLE ${LIBQT_ROOT_DIRECTORY}/Tool/rcc)
+set(QT_UIC_EXECUTABLE ${LIBQT_ROOT_DIRECTORY}/Tool/uic)
 	
 include(Qt4Macros)

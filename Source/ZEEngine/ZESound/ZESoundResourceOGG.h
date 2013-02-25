@@ -42,7 +42,6 @@
 
 #include <vorbis/vorbisfile.h>
 
-
 class ZESoundResourceOGG : public ZESoundResource
 {
 	friend ZESize	OggMemory_Read(void *ptr, ZESize size, ZESize nmemb, void *datasource);

@@ -42,7 +42,6 @@
 #include "ZEGraphics/ZEDirectionalLight.h"
 #include "ZETexture/ZETextureCubeResource.h"
 
-
 #include <string.h>
 
 ZE_OBJECT_IMPL(ZESkyBrush)
@@ -95,8 +94,11 @@ const char* ZESkyBrush::GetSkyTexture() const
 	return SkyTexture->GetFileName();
 }
 
-bool ZESkyBrush::Initialize()
+bool ZESkyBrush::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	if (SkyMaterial == NULL)
 	{
 		SkyMaterial = ZESkyBoxMaterial::CreateInstance();
@@ -109,10 +111,10 @@ bool ZESkyBrush::Initialize()
 	if (SkyTexture != NULL)
 		SkyMaterial->SetTexture(SkyTexture->GetTexture());
 	
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZESkyBrush::Deinitialize()
+bool ZESkyBrush::DeinitializeSelf()
 {
 	if (SkyMaterial != NULL)
 	{
@@ -126,11 +128,14 @@ void ZESkyBrush::Deinitialize()
 		SkyTexture = NULL;
 	}
 
-	ZEEntity::Deinitialize();
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)
 {
+	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
+		return;
+
 	if (SkyTexture != NULL)
 	{
 		SkyRenderCommand.Material = SkyMaterial;
@@ -164,7 +169,7 @@ ZESkyBrush::ZESkyBrush()
 
 ZESkyBrush::~ZESkyBrush()
 {
-	Deinitialize();
+
 }
 
 ZESkyBrush* ZESkyBrush::CreateInstance()

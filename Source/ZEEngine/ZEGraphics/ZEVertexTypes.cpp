@@ -64,8 +64,8 @@ ZEVertexDeclaration* ZESimpleVertex::GetVertexDeclaration()
 	return VertexDeclaration;
 }
 
-ZEVertexDeclaration* ZEMapVertex::VertexDeclaration = NULL;
-ZEVertexDeclaration* ZEMapVertex::GetVertexDeclaration()
+ZEVertexDeclaration* ZEInteriorVertex::VertexDeclaration = NULL;
+ZEVertexDeclaration* ZEInteriorVertex::GetVertexDeclaration()
 {
 	if (VertexDeclaration != NULL)
 		return VertexDeclaration;
@@ -86,7 +86,7 @@ ZEVertexDeclaration* ZEMapVertex::GetVertexDeclaration()
 		VertexDeclaration = NULL;
 	}
 
-	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEMapVertex), "Vertex decleration size does not matches.");
+	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZEInteriorVertex), "Vertex decleration size does not matches.");
 
 	return VertexDeclaration;
 }

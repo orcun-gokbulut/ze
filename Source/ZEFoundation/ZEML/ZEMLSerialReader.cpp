@@ -40,10 +40,11 @@
 ZEMLSerialReader::ZEMLSerialReader(ZEFile* File)
 {
 	this->File = File;
-	NextItemPosition = 0;
+	MaxPointer = 0;
+	DataItemDataPointer = 0;
 }
 
-bool ZEMLSerialReader::ReadNextItem()
+bool ZEMLSerialReader::Read()
 {
 	ZEUInt64 TempUInt64;
 
@@ -53,23 +54,23 @@ bool ZEMLSerialReader::ReadNextItem()
 	CurrentItemDataSize		= 0;
 	CurrentItemSubItemCount = 0;
 
-	File->Seek(NextItemPosition, ZE_SF_BEGINING);
+	ZEUInt64 Fiepos = File->Tell();
+
+	if(MaxPointer < File->Tell())
+		MaxPointer = File->Tell();
 
 	char Identifier;	
 	if(File->Read(&Identifier, sizeof(char), 1) != 1)
 	{
 		if(!File->Eof())
-		{
 			zeError("Can not read ZEML file. Corrupted ZEML file.");
-			return false;
-		}
 		else
 			return false;
 	}
 
 	if(Identifier != ZEML_ITEM_FILE_IDENTIFIER)
 	{
-		zeError("Corrupted ZEML file. Corrupted ZEML file.");
+		zeError("Identifier mismatch. Corrupted ZEML file.");
 		return false;
 	}
 
@@ -105,7 +106,13 @@ bool ZEMLSerialReader::ReadNextItem()
 
 		CurrentItemSubItemCount = ZEEndian::Little(CurrentItemSubItemCount);
 
-		NextItemPosition = File->Tell() + sizeof(ZEUInt64);
+		if(File->Read(&CurrentItemDataSize, sizeof(ZEUInt64), 1) != 1)
+		{
+			zeError("Can not read ZEMLNode size from file. Corrupted ZEML file.");
+			return false;
+		}
+
+		return true;
 	}
 	else if(CurrentItemType == ZEML_IT_INLINE_DATA)
 	{
@@ -116,8 +123,9 @@ bool ZEMLSerialReader::ReadNextItem()
 		}
 
 		CurrentItemDataSize = ZEEndian::Little(CurrentItemDataSize);
-
-		NextItemPosition = File->Tell() + CurrentItemDataSize;
+		DataItemDataPointer = File->Tell();
+		File->Seek(CurrentItemDataSize, ZE_SF_CURRENT);
+		return true;
 	}
 	else
 	{
@@ -246,10 +254,16 @@ bool ZEMLSerialReader::ReadNextItem()
 			return false;
 		}
 
-		NextItemPosition = File->Tell();
+		return true;
 	}
+}
 
-	return true;
+bool ZEMLSerialReader::SkipNodeAndRead()
+{
+	if(CurrentItemType == ZEML_IT_NODE)
+		File->Seek(CurrentItemDataSize, ZE_SF_CURRENT);
+
+	return Read();
 }
 
 ZEMLItemType ZEMLSerialReader::GetItemType()
@@ -282,6 +296,8 @@ bool ZEMLSerialReader::GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offse
 	if(CurrentItemType != ZEML_IT_INLINE_DATA)
 		return false;
 
+	File->Seek(DataItemDataPointer, ZE_SF_BEGINING);
+
 	if(File->Seek(Offset, ZE_SF_CURRENT))
 	{
 		zeError("Can not seek ZEML file.");
@@ -290,8 +306,126 @@ bool ZEMLSerialReader::GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offse
 	
 	if(File->Read(Buffer, BufferSize, 1) != 1)
 	{
-		zeError("Can not read ZEMLDataProperty data with offset : %d", Offset);
+		if(BufferSize != 0)
+		{
+			zeError("Can not read ZEMLDataProperty data with offset : %d", Offset);
+			return false;
+		}
+		else
+			zeWarning("ZEMLDataProperty data buffer size : 0.");
+	}
+
+	return true;
+}
+
+bool ZEMLSerialReader::GetData(ZEPartialFile& File)
+{
+	if(!File.Open(this->File, DataItemDataPointer, CurrentItemDataSize))
+	{
+		zeError("Can not open partial file.");
 		return false;
+	}
+
+	this->File->Seek(DataItemDataPointer + CurrentItemDataSize, ZE_SF_BEGINING);
+	return true;
+}
+
+void ZEMLSerialReader::SeekPointer(ZEMLSerialPointer Pointer)
+{
+	File->Seek(Pointer, ZE_SF_BEGINING);
+	Read();
+}
+
+ZEMLSerialPointer ZEMLSerialReader::GetCurrentPointer()
+{
+	return MaxPointer;
+}
+
+void ZEMLSerialReader::GoToCurrentPointer()
+{
+	SeekPointer(MaxPointer);
+}
+
+bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCount)
+{
+	if(GetItemType() != ZEML_IT_NODE)
+	{
+		zeError("Current item type is not a ZEMLNode");
+		return false;
+	}
+
+	ZEUInt64 CurrentSubItemCount = CurrentItemSubItemCount;
+
+	for (ZESize I = 0; I < ItemCount; I++)
+	{
+		if(strlen(List[I].Name) == 0)
+		{
+			zeError("ZEMLPropertyListItem name can not be empty.");
+			return false;
+		}
+
+		if(List[I].Pointer != NULL)
+			*(List[I].Pointer) = -1;
+	}
+
+	for (ZESize I = 0; I < CurrentSubItemCount; I++)
+	{
+		if(I == 0)
+		{
+			if(!Read())
+				return false;
+		}
+		else
+		{
+			if(!SkipNodeAndRead())
+				return false;
+		}
+
+		ZEUInt64 ItemFilePosition = File->Tell();
+
+		ZEUInt64 CurrentItemHash = CurrentItemName.Hash();
+		ZESSize CurrentItemIndex = -1;
+
+		for(ZESize J = 0; J < ItemCount; J++)
+		{
+			if(CurrentItemHash == List[J].Hash)
+			{
+				CurrentItemIndex = J;
+				List[J].IsFound = true;
+				break;
+			}
+		}
+
+		if(CurrentItemIndex != -1)
+		{
+			if(CurrentItemType == ZEML_IT_NODE)
+			{
+				*(List[CurrentItemIndex].Pointer) = ItemFilePosition - (sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + CurrentItemName.GetSize() + sizeof(ZEUInt64) + sizeof(ZEUInt64));
+			}
+			else if(CurrentItemType == ZEML_IT_INLINE_DATA)
+			{
+				*(List[CurrentItemIndex].Pointer) = ItemFilePosition - (sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + CurrentItemName.GetSize() + sizeof(ZEUInt64) +  CurrentItemDataSize);
+			}
+			else
+			{
+				if(CurrentItemValue.GetType() != List[CurrentItemIndex].VariantType)
+				{
+					zeError("Property found but property type mismatched. Property name : %s", CurrentItemName.ToCString());
+					return false;
+				}
+
+				List[CurrentItemIndex].Value->SetVariant(CurrentItemValue);
+			}
+		}
+	}
+
+	for(ZESize I = 0; I < ItemCount; I++)
+	{
+		if(List[I].Mandatory && !List[I].IsFound)
+		{
+			zeError("List item not found. Item name : %s", List[I].Name);
+			return false;
+		}
 	}
 
 	return true;

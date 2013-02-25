@@ -37,15 +37,31 @@
 #ifndef	__ZE_PHYSICAL_WORLD_H__
 #define __ZE_PHYSICAL_WORLD_H__
 
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZERay.h"
+
 class ZEPhysicsWorldInfo;
 class ZEPhysicsCollision;
 class ZEPhysicsTrigger;
-class ZEVector3;
-
-#include "ZEDS/ZEArray.h"
-
 class ZEPhysicalObject;
+class ZEPhysicalShape;
 class ZERenderer;
+
+struct ZERayCastResultDetails
+{
+	ZEVector3 ImpactWorldPosition;
+	ZEVector3 ImpactWorldNormal;
+	float	  ImpactDistance;
+};
+
+enum ZEPhysicsRayCastFilterShapeType
+{
+	ZE_PRCFST_STATIC_SHAPES		= 1,
+	ZE_PRCFST_DYNAMIC_SHAPES	= 2,
+	ZE_PRCFST_ALL_SHAPES		= 3,
+};
+
 class ZEPhysicalWorld
 {
 	protected:
@@ -76,6 +92,8 @@ class ZEPhysicalWorld
 		virtual void					Destroy();
 
 		virtual void					Draw(ZERenderer* Renderer) = 0;
+
+		virtual ZEPhysicalShape*		RayCastToClosestShape(ZERay Ray, ZEPhysicsRayCastFilterShapeType Type, ZERayCastResultDetails& ResultDetails) = 0;
 
 		static ZEPhysicalWorld*			CreateInstance();
 };

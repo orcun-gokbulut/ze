@@ -38,9 +38,6 @@
 #include "ZEGraphics/ZESkyDomeMaterial.h"
 #include "ZEDrawParameters.h"
 
-#define		ZE_SKY_DOME_PATH		"resources\\ClippedUnitDome.zeCanvas"
-
-
 void ZESkyDome::SetAmbientFactor(float Value)
 {
 	AmbientFactor = Value;
@@ -197,8 +194,11 @@ ZEDrawFlags ZESkyDome::GetDrawFlags() const
 	return ZE_DF_DRAW;
 }
 
-bool ZESkyDome::Initialize()
+bool ZESkyDome::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	// Create Material
 	if (SkyDomeMaterial == NULL)
 	{
@@ -226,9 +226,9 @@ bool ZESkyDome::Initialize()
 	// Load sky dome
 	if (SkyDomeGeometry.IsEmpty())
 	{
-		if (!SkyDomeGeometry.LoadFromFile(ZE_SKY_DOME_PATH))
+		if (!SkyDomeGeometry.LoadFromFile("ZEEngine/ZEAtmosphere/Meshes/SkyDome.zeCanvas"))
 		{
-			zeDebugCheck("Cannot Load Sky Dome Geometry From: \"%s\"", ZE_SKY_DOME_PATH);
+			zeError("Cannot load sky dome geometry.");
 			return false;
 		}
 	}
@@ -242,10 +242,10 @@ bool ZESkyDome::Initialize()
 	SkyDomeRenderCommand.PrimitiveCount = SkyDomeGeometry.Vertices.GetCount() / 3;
 	SkyDomeRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZESkyDome::Deinitialize()
+bool ZESkyDome::DeinitializeSelf()
 {	
 	if (SkyDomeMaterial != NULL)
 	{
@@ -258,11 +258,14 @@ void ZESkyDome::Deinitialize()
 
 	SkyDomeRenderCommand.SetZero();	
 
-	ZEEntity::Deinitialize();
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZESkyDome::Draw(ZEDrawParameters* DrawParameters)
 {
+	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
+		return;
+
 	SkyDomeMaterial->G						= G;
 	SkyDomeMaterial->SunsetAmbientColor		= SunsetAmbientColor;
 	SkyDomeMaterial->MiddayAmbientColor		= MiddayAmbientColor;
@@ -312,7 +315,7 @@ ZESkyDome::ZESkyDome()
 	MiddayAmbientColor		= ZEVector3(0.0f, 0.0f, 0.0f);
 	SunsetAmbientColor		= ZEVector3(0.0f, 0.0f, 0.0f);
 
-	SunLightDirection		= ZEVector3(0.0f, 0.0f, -1.0f);
+	SunLightDirection		= ZEVector3(0.0001f, -1.0f, 0.0001f);
 	SunLightWaveLenght		= ZEVector3(0.650f, 0.570f, 0.475f);
 
 	CameraPosition			= ZEVector3(0.0f, 0.0f, 0.0f);
@@ -326,5 +329,5 @@ ZESkyDome::ZESkyDome()
 
 ZESkyDome::~ZESkyDome()
 {
-	Deinitialize();
+
 }

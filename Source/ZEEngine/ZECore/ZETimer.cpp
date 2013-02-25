@@ -60,9 +60,9 @@ bool ZETimer::GetRepeating()
 	return Repeating;
 }
 
-void ZETimer::SetIntervalTime(float MSecs)
+void ZETimer::SetIntervalTime(float Secs)
 {
-	IntervalTime = MSecs;
+	IntervalTime = Secs;
 }
 
 float ZETimer::GetIntervalTime()
