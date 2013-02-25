@@ -69,6 +69,7 @@ class ZEInterior : public ZEEntity
 	ZE_META_ENTITY(ZEInterior)
 	friend class ZEInteriorDoor;
 	friend class ZEInteriorHelper;
+	friend class ZEInteriorDebugDrawer;
 
 	private:
 		ZEString								InteriorFile;

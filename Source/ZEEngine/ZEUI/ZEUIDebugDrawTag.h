@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEUIDebugDrawTag.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,25 +30,46 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef __ZE_UI_DEBUG_DRAW_TAG_H__
+#define __ZE_UI_DEBUG_DRAW_TAG_H__
 
-ze_add_source(ZEInterior.cpp				Sources)
-ze_add_source(ZEInterior.h					Sources Headers ZEPP)
-ze_add_source(ZEInteriorDoor.cpp			Sources)
-ze_add_source(ZEInteriorDoor.h				Sources Headers)
-ze_add_source(ZEInteriorRoom.cpp			Sources)
-ze_add_source(ZEInteriorRoom.h				Sources Headers)
-ze_add_source(ZEInteriorHelper.cpp			Sources)
-ze_add_source(ZEInteriorHelper.h			Sources Headers)
-ze_add_source(ZEInteriorResource.cpp		Sources)
-ze_add_source(ZEInteriorResource.h			Sources Headers)
-ze_add_source(ZEInteriorDebugDrawer.cpp		Sources)
-ze_add_source(ZEInteriorDebugDrawer.h		Sources Headers)
 
-ze_add_library(ZEInterior 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation)
+#include "ZEUI/ZEUILabel.h"
+#include "ZEUI/ZEUIFrameControl.h"
+
+class ZEUIDebugDrawTag : public ZEUIFrameControl
+{
+private:
+
+	ZEUIFrameControl*			Icon;
+	ZEUILabel*					Name;
+	ZEUILabel*					Type;
+
+	ZEVector4					FontColor;
+
+								ZEUIDebugDrawTag();
+
+public:
+
+	void						SetFontColor(ZEVector4 Color);
+	ZEVector4					GetFontColor() const;
+
+	void						SetNameField(const ZEString& Name);
+	void						SetTypeField(const ZEString& Type);
+	void						SetIcon(const ZEString& IconPath);
+
+	void						SetPosition(const ZEVector2& Position);
+
+	void						Draw(ZEUIRenderer* Renderer);
+	void						Tick(float ElapsedTime);
+
+	static ZEUIDebugDrawTag*	CreateInstance();
+
+
+};
+
+#endif

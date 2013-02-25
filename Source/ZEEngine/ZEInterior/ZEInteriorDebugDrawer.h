@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEInteriorDebugDrawer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,25 +30,46 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef	__ZE_INTERIOR_DEBUG_DRAWER_H__
+#define __ZE_INTERIOR_DEBUG_DRAWER_H__
 
-ze_add_source(ZEInterior.cpp				Sources)
-ze_add_source(ZEInterior.h					Sources Headers ZEPP)
-ze_add_source(ZEInteriorDoor.cpp			Sources)
-ze_add_source(ZEInteriorDoor.h				Sources Headers)
-ze_add_source(ZEInteriorRoom.cpp			Sources)
-ze_add_source(ZEInteriorRoom.h				Sources Headers)
-ze_add_source(ZEInteriorHelper.cpp			Sources)
-ze_add_source(ZEInteriorHelper.h			Sources Headers)
-ze_add_source(ZEInteriorResource.cpp		Sources)
-ze_add_source(ZEInteriorResource.h			Sources Headers)
-ze_add_source(ZEInteriorDebugDrawer.cpp		Sources)
-ze_add_source(ZEInteriorDebugDrawer.h		Sources Headers)
+#include "ZEGame/ZEDebugDrawer.h"
 
-ze_add_library(ZEInterior 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation)
+class ZEInteriorDebugDrawer : public ZEDebugDrawer
+{
+private:
+	ZEVector4					RoomColor;
+	ZEVector4					DoorColor;
+
+	ZEMaterial*					InteriorMaterial;
+	ZECanvas					InteriorDrawCanvas;
+	ZERenderCommand				InteriorRenderCommand;
+
+protected:
+	virtual void				DebugDrawEntity();
+
+	virtual bool				InitializeSelf();
+	virtual	bool				DeinitializeSelf();
+
+								ZEInteriorDebugDrawer();
+	virtual						~ZEInteriorDebugDrawer();
+
+public:
+	virtual void				SetTarget(ZEEntity* Target);
+
+	void						SetRoomColor(ZEVector4 Color);
+	ZEVector4					GetRoomColor() const;
+	void						SetDoorColor(ZEVector4 Color);
+	ZEVector4					GetDoorColor() const;
+
+	virtual void				Draw(ZEDrawParameters* DrawParameters);
+
+	static ZEInteriorDebugDrawer*	CreateInstance();
+
+};
+
+#endif
