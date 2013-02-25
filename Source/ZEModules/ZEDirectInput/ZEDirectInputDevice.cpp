@@ -42,7 +42,7 @@
 #include "ZEDirectInputModule.h"
 #include "ZEDS/ZEHashGenerator.h"
 
-static BOOL ConfigureAxisRanges(LPCDIDEVICEOBJECTINSTANCE ObjectInstance, LPVOID Device)
+static BOOL FAR PASCAL ConfigureAxisRanges(LPCDIDEVICEOBJECTINSTANCE ObjectInstance, LPVOID Device)
 {
 	if( ObjectInstance->dwType & DIDFT_AXIS )
 	{
