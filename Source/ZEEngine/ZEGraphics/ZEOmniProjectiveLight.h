@@ -55,11 +55,10 @@ class ZEOmniProjectiveLight : public ZELight
 		ZETexture2D*					BackShadowMap;
 		ZEMatrix4x4						ViewProjectionMatrix;
 
+		virtual bool					DeinitializeSelf();
+
 										ZEOmniProjectiveLight();
 		virtual							~ZEOmniProjectiveLight();
-
-	protected:
-		virtual bool					DeinitializeSelf();
 
 	public:
 		ZELightType						GetLightType();

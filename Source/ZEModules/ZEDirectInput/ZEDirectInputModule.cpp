@@ -58,9 +58,9 @@ BOOL CALLBACK CheckDirectInputDevices(const LPCDIDEVICEINSTANCE DeviceInstance, 
 	return TRUE;
 }
 
-bool ZEDirectInputModule::Initialize()
+bool ZEDirectInputModule::InitializeSelf()
 {
-	if (IsInitialized())
+	if (!ZEInputDeviceModule::InitializeSelf())
 		return false;
 
 	HRESULT hr;
@@ -80,10 +80,10 @@ bool ZEDirectInputModule::Initialize()
 		return false;
 	}
 
-	return ZEInputDeviceModule::Initialize();
+	return true;
 }
 
-void ZEDirectInputModule::Deinitialize()
+bool ZEDirectInputModule::DeinitializeSelf()
 {
 	const ZEArray<ZEInputDevice*>& Devices = GetDevices();
 	for(ZESize I = 0; I < Devices.GetCount(); I++)
@@ -95,7 +95,7 @@ void ZEDirectInputModule::Deinitialize()
 		DirectInput = NULL;
 	}
 
-	ZEInputDeviceModule::Deinitialize();
+	return ZEInputDeviceModule::DeinitializeSelf();
 }
 
 void ZEDirectInputModule::Process()

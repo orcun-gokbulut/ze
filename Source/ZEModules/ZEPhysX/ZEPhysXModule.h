@@ -57,6 +57,9 @@ class ZEPhysXModule : public ZEPhysicsModule
 		NxCookingInterface*						CookingInterface;
 		ZEArray<ZEPhysXPhysicalWorld*>			PhysicalWorlds;
 
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
+
 												ZEPhysXModule();
 		virtual									~ZEPhysXModule();
 
@@ -64,9 +67,6 @@ class ZEPhysXModule : public ZEPhysicsModule
 		NxPhysicsSDK*							GetPhysicsSDK();
 		NxCookingInterface*						GetCookingInterface();
 
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
-		
 		virtual	void							Process(float ElapsedTime);
 		virtual void							UpdateWorlds();
 

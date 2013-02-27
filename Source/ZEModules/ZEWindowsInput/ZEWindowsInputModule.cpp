@@ -61,9 +61,12 @@ bool ZEWindowsInputSystemMessageHandler::Callback(MSG* Message)
 	return true;
 }
 
-bool ZEWindowsInputModule::Initialize()
+bool ZEWindowsInputModule::InitializeSelf()
 {	
 	zeLog("Initializing Windows Input.");
+
+	if (!ZEInputDeviceModule::InitializeSelf())
+		return false;
 
 	RAWINPUTDEVICE Rid[2];    
 	// Mouse
@@ -95,13 +98,14 @@ bool ZEWindowsInputModule::Initialize()
 	MessageHandler.Module = this;
 	MessageHandler.Register();
 
-	return ZEInputDeviceModule::Initialize();
+	return true;
 }
 
-void ZEWindowsInputModule::Deinitialize()
+bool ZEWindowsInputModule::DeinitializeSelf()
 {
 	MessageHandler.Unregister();
-	ZEInputDeviceModule::Deinitialize();
+
+	return ZEInputDeviceModule::DeinitializeSelf();
 }
 
 void ZEWindowsInputModule::Process()

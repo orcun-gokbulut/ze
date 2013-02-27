@@ -54,11 +54,10 @@ class ZEPointLight  : public ZELight
 		ZEViewSphere					ViewVolume;
 		ZEMatrix4x4						ViewProjectionMatrix;
 
+		virtual bool					DeinitializeSelf();
+
 										ZEPointLight();
 		virtual							~ZEPointLight();
-
-	protected:
-		virtual bool					DeinitializeSelf();
 
 	public:
 		ZELightType						GetLightType();

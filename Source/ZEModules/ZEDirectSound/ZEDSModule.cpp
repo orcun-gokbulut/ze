@@ -132,12 +132,15 @@ const ZEArray<ZESoundDevice>& ZEDSModule::GetDeviceList()
 	return DeviceList;
 }
 
-bool ZEDSModule::Initialize()
+bool ZEDSModule::InitializeSelf()
 {	
-	HRESULT hr;
-	
 	zeLog("Initializing DirectSound module.");
-	zeLog("Enumurating sound devices.");
+	zeLog("Enumerating sound devices.");
+
+	if (!ZESoundModule::InitializeSelf())
+		return false;
+
+	HRESULT hr;
 	
 	DeviceList.Clear();
 	DeviceList.Add();
@@ -224,10 +227,10 @@ bool ZEDSModule::Initialize()
 
 	zeLog("DirectSound Initialized.");
 
-	return ZESoundModule::Initialize();
+	return true;
 }
 
-void ZEDSModule::Deinitialize()
+bool ZEDSModule::DeinitializeSelf()
 {	
 	zeOutput("Destroying DirectSound.\r\n");
 	if (DSListener != NULL)
@@ -248,7 +251,7 @@ void ZEDSModule::Deinitialize()
 		DS = NULL;
 	}
 
-	ZESoundModule::Deinitialize();
+	return ZESoundModule::DeinitializeSelf();
 }
 
 void ZEDSModule::SetSpeakerLayout(ZESpeakerLayout Layout)
