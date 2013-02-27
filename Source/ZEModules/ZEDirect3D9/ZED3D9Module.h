@@ -115,6 +115,9 @@ class ZED3D9Module : public ZEGraphicsModule
 		ZED3D9ShaderManager*							ShaderManager;
 
 	protected:
+		virtual bool									InitializeSelf();
+		virtual bool									DeinitializeSelf();
+
 														ZED3D9Module();
 											 			~ZED3D9Module();
 
@@ -140,9 +143,6 @@ class ZED3D9Module : public ZEGraphicsModule
 
 		virtual bool									GetEnabled();
 		virtual void									SetEnabled(bool Enabled);
-
-		virtual bool									Initialize();
-		virtual void									Deinitialize();
 
 		bool											IsDeviceLost();
 		void											DeviceLost();

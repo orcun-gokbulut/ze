@@ -111,9 +111,12 @@ void ZED3D9Module::SetEnabled(bool Enabled)
 	this->Enabled = Enabled;
 }
 
-bool ZED3D9Module::Initialize()
+bool ZED3D9Module::InitializeSelf()
 {
 	zeLog("Initializing Direct3D 9 module.");
+
+	if (!ZEGraphicsModule::InitializeSelf())
+		return false;
 
 	// Read options
 	ScreenWidth = ZEOptionManager::GetInstance()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInt32();
@@ -301,7 +304,7 @@ bool ZED3D9Module::Initialize()
 	return true;
 }
 
-void ZED3D9Module::Deinitialize()
+bool ZED3D9Module::DeinitializeSelf()
 {
 	zeLog("Destroying Direct3D.\r\n");
 
@@ -318,6 +321,8 @@ void ZED3D9Module::Deinitialize()
 	ZED3D_RELEASE(FrameBufferViewPort.ZBuffer);
 	ZED3D_RELEASE(Device);
 	ZED3D_RELEASE(D3D);
+
+	return ZEGraphicsModule::DeinitializeSelf();
 }
 
 bool ZED3D9Module::IsDeviceLost()

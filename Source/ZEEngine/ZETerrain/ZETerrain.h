@@ -108,12 +108,11 @@ class ZETerrain : public ZEEntity
 		void									Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt PositionY);
 		bool									DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt PositionX, ZEInt PositionY, ZEInt LocalPositionX, ZEInt LocalPositionY, ZEInt Mode, ZESize Level);
 
-												ZETerrain();
-												~ZETerrain();
-
-	protected:
 		virtual bool							InitializeSelf();
 		virtual bool							DeinitializeSelf();
+
+												ZETerrain();
+												~ZETerrain();
 
 	public:	
 		bool									Locked;
