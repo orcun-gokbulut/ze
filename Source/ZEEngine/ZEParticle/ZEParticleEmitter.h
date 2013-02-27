@@ -215,7 +215,5 @@ class ZEParticleEmitter : public ZEObject
 		void							Draw(ZEDrawParameters* DrawParameters);
 
 		static ZEParticleEmitter*		CreateInstance();
-
-		void							LogSort();
 };
 #endif

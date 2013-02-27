@@ -41,6 +41,8 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMath.h"
 
+ZE_OBJECT_IMPL(ZEActor)
+
 void ZEActor::SetLinearVelocity(const ZEVector3& Velocity)
 {
 	LinearVelocity = Velocity;

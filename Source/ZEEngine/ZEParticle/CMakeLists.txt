@@ -36,7 +36,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEParticle.cpp							Sources)
-ze_add_source(ZEParticle.h								Sources Headers)
+ze_add_source(ZEParticle.h								Sources Headers ZEMC)
 ze_add_source(ZEParticleModifier.cpp					Sources)
 ze_add_source(ZEParticleModifier.h						Sources Headers)
 ze_add_source(ZEParticleEffect.cpp						Sources)
