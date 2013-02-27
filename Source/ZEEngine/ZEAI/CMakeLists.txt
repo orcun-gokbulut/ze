@@ -37,7 +37,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(ZEAI)
 
-ze_add_source(ZEActor.h							Sources Headers)
+ze_add_source(ZEActor.h							Sources Headers ZEMC)
 ze_add_source(ZEActor.cpp						Sources)
 ze_add_source(ZESteering.h						Sources Headers)
 ze_add_source(ZESteering.cpp					Sources)

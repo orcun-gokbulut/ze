@@ -525,6 +525,21 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 		else if (TempType.Type == ZE_MTT_ENUMERATOR)
 		{
 			TempType.EnumName = ClangType->getAs<EnumType>()->getDecl()->getNameAsString();
+
+			EnumDecl* EnumDeclaration = ClangType->getAs<EnumType>()->getDecl();
+
+			ZEEnumData* EnumData = new ZEEnumData();
+			EnumData->Name = TempType.EnumName;
+
+			for(EnumDecl::enumerator_iterator CurrentEnum = EnumDeclaration->enumerator_begin(), EnumEnd = EnumDeclaration->enumerator_end(); CurrentEnum != EnumEnd; ++CurrentEnum)
+			{
+				ZEEnumParameterData* EnumParameterData = new ZEEnumParameterData();
+				EnumParameterData->Name = CurrentEnum->getNameAsString();
+				EnumParameterData->Value = *CurrentEnum->getInitVal().getRawData();
+				EnumData->Parameters.Add(EnumParameterData);
+			}
+
+			ZEMetaProcessorInternal::MetaData->EnumTypes.Add(EnumData);
 		}
 
 		return TempType;
@@ -1134,7 +1149,10 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 			return;
 	}
 
-	if(isa<CXXConstructorDecl>(Method) || isa<CXXDestructorDecl>(Method))
+	if(isa<CXXDestructorDecl>(Method))
+		return;
+
+	if(isa<CXXConstructorDecl>(Method))
 	{
 		ClassData->HasPublicConstructor = true;
 		return;

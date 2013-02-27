@@ -44,10 +44,14 @@
 #include "ZEMath\ZEVector.h"
 #include "ZEGame\ZEEntity.h"
 
-class ZESteering;
+ZE_META_FORWARD_DECLARE(ZESteering, "ZESteering.h")
+
+ZE_CLASS(ZEActor)
 
 class ZEActor : public ZEEntity
 {
+	ZE_OBJECT
+
 	private:
 		ZEVector3					LinearVelocity;
 		ZEQuaternion				AngularVelocity;
