@@ -74,19 +74,13 @@ void ZEMetaProcessorInternal::InitializeClang()
 	const char* Arguments[] =
 	{
 		"-cc1",
-		
-		"-I", "../Source/.",
-		"-I", "../Source/..",
-		"-I", "../Source/ZEEngine",
-		"-I", "../Source/ZEFoundation",
 
-		"-v",
 		"-disable-free",
 		
 		"-fmath-errno",
 		"-ferror-limit", "19",
 		"-fmessage-length", "150",
-
+		"-w",
 		"-fms-extensions",
 		"-fms-compatibility",
 		"-fmsc-version=1600",
@@ -121,17 +115,22 @@ void ZEMetaProcessorInternal::InitializeClang()
 	for(size_t i = 0; i < SystemDirs.size(); ++i)
 		Invocation.getHeaderSearchOpts().AddPath(SystemDirs[i], frontend::System, false, false, true, true);
 
+	for (size_t I = 0; I < Options.IncludeDirectories.GetCount(); I++)
+		Invocation.getHeaderSearchOpts().AddPath(Options.IncludeDirectories[I].ToCString(), frontend::IncludeDirGroup::After, true, false, true);
+
 	#ifdef ZE_PLATFORM_WINDOWS
 		Invocation.getPreprocessorOpts().addMacroDef("WIN32");
 		Invocation.getPreprocessorOpts().addMacroDef("_WINDOWS");
 		Invocation.getPreprocessorOpts().addMacroDef("NDEBUG");
 	#endif
-	
 	Invocation.getPreprocessorOpts().addMacroDef("ZE_META_COMPILER");
 
+	for (size_t I = 0; I < Options.Definitions.GetCount(); I++)
+		Invocation.getPreprocessorOpts().addMacroDef(Options.Definitions[I].ToCString());
+	
 	TargetOptions TO;
 	TO.Triple = llvm::sys::getDefaultTargetTriple();
-	TargetInfo* TI = TargetInfo::CreateTargetInfo(Compiler.getDiagnostics(), &TO);
+	TargetInfo* TI = TargetInfo::CreateTargetInfo(Compiler.getDiagnostics(), TO);
 	TI->setCXXABI(TargetCXXABI::CXXABI_Microsoft);
 	Compiler.setTarget(TI);
 
@@ -150,5 +149,5 @@ void ZEMetaProcessorInternal::InitializeClang()
 
 	ZEMetaGenerator::Generate(Options, MetaData);
 
-	exit(EXIT_FAILURE);
+	exit(EXIT_SUCCESS);
 }

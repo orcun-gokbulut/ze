@@ -73,7 +73,7 @@ function(ze_file_compiler)
 	endif()
 endfunction()
 
-function(ze_meta_compiler)
+function(ze_post_processor)
 	parse_arguments(PARAMETER "OUTPUT" "" ${ARGV})
 	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_INPUT)
 
@@ -82,6 +82,27 @@ function(ze_meta_compiler)
 		COMMAND "${CMAKE_SOURCE_DIR}/External/${ZEBUILD_PLATFORM_NAME}/libZEPP/Tool/zepp"
 		ARGS "\"${PARAMETER_INPUT}\" \"${PARAMETER_OUTPUT}\""
 		MAIN_DEPENDENCY "${PARAMETER_INPUT}")
+endfunction()
+
+function(ze_meta_compiler)
+	parse_arguments(PARAMETER "OUTPUT;INCLUDE_DIRECTORIES;DEFINITIONS" "" ${ARGV})
+	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_INPUT)
+	
+	set(VARIABLE_ARGS "")
+	foreach(VARIABLE_DEFINITION ${PARAMETER_DEFINITIONS})
+		set(VARIABLE_ARGS "${VARIABLE_ARGS}-D \"${VARIABLE_DEFINITION}\" ")
+	endforeach()
+
+	foreach(VARIABLE_INCLUDE_DIRECTORY ${PARAMETER_INCLUDE_DIRECTORIES})
+		set(VARIABLE_ARGS "${VARIABLE_ARGS}-I \"${VARIABLE_INCLUDE_DIRECTORY}\" ")
+	endforeach()
+	
+	add_custom_command(
+		OUTPUT "${PARAMETER_OUTPUT}"
+		COMMAND "$<TARGET_FILE:ZEMetaCompiler>"
+		ARGS "${VARIABLE_ARGS} \"${PARAMETER_INPUT}\" -o \"${PARAMETER_OUTPUT}\""
+		MAIN_DEPENDENCY "${PARAMETER_INPUT}"
+		DEPENDS ZEMetaCompiler)
 endfunction()
 
 function(ze_static_analysis PARAMETER_TARGET)
