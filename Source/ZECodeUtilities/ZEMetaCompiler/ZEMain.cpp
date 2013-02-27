@@ -73,7 +73,7 @@ static void ShowHelp()
 		"  ZEMetaCompiler ZEEntity.h -I . -I ..\\ZEFoundation -D ZE_PLATFORM_WINDOWS -D ZE_VERSION_MAJOR=0 \n\n"
 		"\n"
 		"CMake Example:\n"
-		"  ze_add_source(ZEEntity.h Headers Sources ZEMetaCompiler)\n"
+		"  ze_add_source(ZEEntity.h Headers Sources ZEMC)\n"
 		"\n");
 }
 
@@ -143,7 +143,7 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 int main(int Argc, const char** Argv)
 {
 	printf(
-		"ZEMetaCompiler - Version : 0.3.2\n"
+		"ZEMetaCompiler - Version : 0.3.5\n"
 		"Copyright (C) 2012, Zinek Code House. All rights reserved.\n\n");
 
 	if (Argc == 1)

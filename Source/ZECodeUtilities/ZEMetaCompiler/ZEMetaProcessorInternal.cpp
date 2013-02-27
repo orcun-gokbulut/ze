@@ -369,6 +369,38 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 
 		TempType.TypeQualifier = (ReferenceePtr.isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE);
 
+		if (TempType.Type == ZE_MTT_ARRAY)
+		{
+			const clang::TemplateSpecializationType* TemplateType = ClangType->getPointeeType()->getAs<TemplateSpecializationType>();
+
+			if(TemplateType->getNumArgs() < 1)
+				return ZEMetaType();
+
+			TemplateArgument Argument = TemplateType->getArg(0);
+
+			if(Argument.getAsType().getTypePtr()->isPointerType())
+			{
+				ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr()->getPointeeType().getTypePtr());
+				TempType.SubType = SubTypeData.Type;
+				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
+				TempType.SubTypeClassName = SubTypeData.ClassData->Name;
+				return TempType;
+			}
+			else
+			{
+				if(Argument.getAsType().getTypePtr()->isClassType())
+					return ZEMetaType();
+
+				ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
+				TempType.SubType = SubTypeData.Type;
+				TempType.SubTypeQualifier = SubTypeData.SubTypeQualifier;
+				TempType.SubTypeClassName = SubTypeData.ClassData->Name;
+				return TempType;
+			}
+
+			return TempType;
+		}
+
 		return TempType;
 	}
 	else if (CanonicalType.getTypePtr()->isPointerType())
@@ -410,6 +442,9 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 						}
 						else
 						{
+							if(Argument.getAsType().getTypePtr()->isClassType())
+								return ZEMetaType();
+
 							ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
 							TempType.SubType = SubTypeData.Type;
 							TempType.SubTypeQualifier = ZE_MTQ_VALUE;
@@ -471,6 +506,9 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 			}
 			else
 			{
+				if(Argument.getAsType().getTypePtr()->isClassType())
+					return ZEMetaType();
+
 				ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
 				TempType.SubType = SubTypeData.Type;
 				TempType.SubTypeQualifier = ZE_MTQ_VALUE;
@@ -689,6 +727,10 @@ void ZEMetaProcessorInternal::ProcessEnumerator(EnumDecl* EnumDeclaration)
 {
 	ZEEnumData* EnumData = new ZEEnumData();
 	EnumData->Name = EnumDeclaration->getNameAsString();
+
+	if(EnumData->Name == NULL || EnumData->Name == "")
+		return;
+
 	EnumData->Hash = EnumData->Name.Hash();
 	EnumData->BaseClass = NULL;
 
@@ -755,6 +797,12 @@ void ZEMetaProcessorInternal::ProcessClass(CXXRecordDecl* Class)
 	ClassData->HasPublicConstructor = false;
 	ClassData->IsAbstract = false;
 	ClassData->IsBuiltInClass = IsBuiltInClassFound;
+
+	for(CXXRecordDecl::base_class_iterator CurrentBaseClass = Class->bases_begin(), LastBaseClass = Class->bases_end(); CurrentBaseClass != LastBaseClass; ++CurrentBaseClass)
+	{
+		ClassData->BaseClass = new ZEClassData();
+		ClassData->BaseClass->Name = CurrentBaseClass->getType()->getAsCXXRecordDecl()->getNameAsString();
+	}
 
 	ZEAttributeData* AttributeData = new ZEAttributeData();
 	for(CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)

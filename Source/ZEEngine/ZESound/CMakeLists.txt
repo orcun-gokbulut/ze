@@ -36,7 +36,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEListener.cpp				Sources)
-ze_add_source(ZEListener.h					Sources Headers ZEPP)
+ze_add_source(ZEListener.h					Sources Headers ZEMC)
 ze_add_source(ZESoundFX.h					Sources Headers)
 ze_add_source(ZESoundModule.cpp				Sources)
 ze_add_source(ZESoundModule.h				Sources Headers)
@@ -49,9 +49,9 @@ ze_add_source(ZESoundResourceOGG.h			Sources)
 ze_add_source(ZESoundResourceWAV.cpp		Sources)
 ze_add_source(ZESoundResourceWAV.h			Sources)
 ze_add_source(ZESoundSource.cpp				Sources)
-ze_add_source(ZESoundSource.h				Sources Headers ZEPP)
+ze_add_source(ZESoundSource.h				Sources Headers ZEMC)
 ze_add_source(ZESoundSource3D.cpp			Sources)
-ze_add_source(ZESoundSource3D.h				Sources Headers ZEPP)
+ze_add_source(ZESoundSource3D.h				Sources Headers ZEMC)
 
 ze_add_library(ZESound 
 	SOURCES ${Sources}

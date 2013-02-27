@@ -43,7 +43,7 @@
 class ZEMetaGenerator
 {
 	public:
-		static bool			Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* MetaData);
+		static bool			Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* Data);
 };
 
 #endif

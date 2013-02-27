@@ -110,14 +110,14 @@ class ZEMetaType
 		ZEMetaType(ZEMetaTypeType Type, ZEMetaTypeQualifier TypeQualifier, ZEString ClassName = "", ZEClassData* ClassData = NULL);
 };
 
-class ZEEnumParameterData : public ZEListItem
+class ZEEnumParameterData
 {
 	public:
 		ZEString						Name;
 		ZEUInt32						Value;
 };
 
-class ZEForwardDeclared : public ZEListItem
+class ZEForwardDeclared
 {
 	public:
 		ZEString						HeaderFileDeclaredIn;
@@ -125,7 +125,7 @@ class ZEForwardDeclared : public ZEListItem
 		ZEString						HeaderName;
 };
 
-class ZEEnumData : public ZEListItem
+class ZEEnumData
 {
 	public:
 		ZEString						Name;
@@ -137,7 +137,7 @@ class ZEEnumData : public ZEListItem
 		virtual							~ZEEnumData();
 };
 
-class ZEAttributeData : public ZEListItem
+class ZEAttributeData
 {
 	public:
 		ZEString						Name;
@@ -146,7 +146,7 @@ class ZEAttributeData : public ZEListItem
 		ZEString						MemberOf;
 };
 
-class ZETypeData : public ZEListItem
+class ZETypeData
 {
 	public:
 		ZEString						Name;
@@ -156,7 +156,7 @@ class ZETypeData : public ZEListItem
 		virtual							~ZETypeData();
 };
 
-class ZEEventParameterData : public ZEListItem
+class ZEEventParameterData
 {
 	public:
 		ZEString						Name;
@@ -195,7 +195,7 @@ struct ZEPropertyData : public ZETypeData
 		ZEString						Setter;
 };
 
-class ZEMethodParameterData : public ZEListItem
+class ZEMethodParameterData
 {
 	public:
 		ZEString						Name;

@@ -40,6 +40,7 @@
 #include "ZEDS/ZEList.h"
 #include "ZEMeta/ZEType.h"
 #include "ZEMeta/ZEClass.h"
+#include "ZEFile/ZEFileInfo.h"
 
 static ZEInt SortPropertiesByHash(ZEPropertyData* const* PropertyDataA, ZEPropertyData* const* PropertyDataB)
 {
@@ -324,9 +325,9 @@ static const char* ReturnTypeCast(ZEMetaTypeType VariantType)
 	}
 }
 
-static void PrepareClassDependencies(FILE* File, const char* ClassName, ZEArray<ZEForwardDeclared*> ForwardDeclaredClasses)
+static void PrepareClassDependencies(FILE* File, const char* IncludedFile, const char* ClassName, ZEArray<ZEForwardDeclared*> ForwardDeclaredClasses)
 {
-	fprintf(File, "#include \"%s.h\"\n", ClassName);
+	fprintf(File, "#include \"%s\"\n", IncludedFile);
 
 	for(ZESize I = 0; I < ForwardDeclaredClasses.GetCount(); I++)
 	{
@@ -548,46 +549,100 @@ static void CreateGetPropertyCountMethod(FILE* File, const char* ClassName, ZESi
 		ClassName, PropertyCount);
 }
 
-static void CreateMethodWrappers(FILE* File, const char* CurrentClassName, ZEArray<ZEMethodData*> Methods)
+static void CreateMethodWrappers(FILE* File, const char* CurrentClassName, bool IsAbstract, bool HasPublicConstructor, ZEArray<ZEMethodData*> Methods)
 {
-	//BURASI ONEMLI YENI INSTANCE NEW'LE MI YOKSA CREATE INSTANCE ILE MI YARATILIYOR DIKKAT ET!
-	fprintf(File,
-		"static %s* CreateScriptInstance(%s* This)\n"
-		"{\n"
-		"\treturn new(This) %s();\n"
-		"}\n\n", CurrentClassName, CurrentClassName, CurrentClassName);
+	bool CreateInstanceMethodFound = false;
+	for(ZESize I = 0; I < Methods.GetCount(); I++)
+	{
+		if(Methods[I]->Name == "CreateInstance")
+			CreateInstanceMethodFound = true;
+	}
+
+	if(CreateInstanceMethodFound)
+	{
+		fprintf(File,
+			"static %s* CreateScriptInstance(%s* This)\n"
+			"{\n"
+			"\treturn NULL;\n"
+			"}\n\n", CurrentClassName, CurrentClassName);
+	}
+	else if(HasPublicConstructor && !IsAbstract)
+	{
+		fprintf(File,
+			"static %s* CreateScriptInstance(%s* This)\n"
+			"{\n"
+			"\treturn new(This) %s();\n"
+			"}\n\n", CurrentClassName, CurrentClassName, CurrentClassName);
+	}
+	else
+	{
+		fprintf(File,
+			"static %s* CreateScriptInstance(%s* This)\n"
+			"{\n"
+			"\treturn NULL;\n"
+			"}\n\n", CurrentClassName, CurrentClassName);
+	}
 
 	for(ZESize I = 0; I < Methods.GetCount(); I++)
 	{
 		if(Methods[I]->Parameters.GetCount() > 0)
 		{
-			fprintf(File, "static %s %s(%s* This, ", ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type), Methods[I]->Name.ToCString(), CurrentClassName);
+			fprintf(File, 
+				"static %s%s %s(%s* This, ", 
+				ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
+				Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS ? "*" : "",
+				Methods[I]->Name.ToCString(), CurrentClassName);
 
 			for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
 			{
-				fprintf(File, "%s %s%s", 
-					ReturnTypeCast(Methods[I]->Parameters[J]->Type.Type), 
-					Methods[I]->Parameters[J]->Name.ToCString(), 
-					J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ")\n");
+				if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
+				{
+					fprintf(File, "%s<%s> %s%s", 
+						ReturnTypeCast(Methods[I]->Parameters[J]->Type.Type), 
+						Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
+						Methods[I]->Parameters[J]->Name.ToCString(), 
+						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ")\n");
+				}
+				else
+				{
+					fprintf(File, "%s %s%s", 
+						ReturnTypeCast(Methods[I]->Parameters[J]->Type.Type), 
+						Methods[I]->Parameters[J]->Name.ToCString(), 
+						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ")\n");
+				}
 			}
 
 			fprintf(File, "{\n\treturn This->%s(", Methods[I]->Name.ToCString());
 
 			for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
 			{
-				fprintf(File, "%s%s", 
-					Methods[I]->Parameters[J]->Name.ToCString(), 
-					J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n}\n\n");
+				if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+				{
+					fprintf(File, "(%s*)%s%s", 
+						Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(),
+						Methods[I]->Parameters[J]->Name.ToCString(), 
+						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n}\n\n");
+				}
+				else
+				{
+					fprintf(File, "%s%s", 
+						Methods[I]->Parameters[J]->Name.ToCString(), 
+						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n}\n\n");
+				}
 			}
 		}
 		else
 		{
 			fprintf(File, 
-				"static %s %s(%s* This)\n"
+				"static %s%s %s(%s* This)\n"
 				"{\n"
 				"\treturn This->%s();\n"
 				"}\n\n", 
-				ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type), Methods[I]->Name.ToCString(), CurrentClassName, Methods[I]->Name.ToCString());
+				ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type), 
+				Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS ? "*" : "",
+				Methods[I]->Name.ToCString(), 
+				CurrentClassName, 
+				Methods[I]->Name.ToCString());
 		}
 	}
 }
@@ -752,9 +807,15 @@ static void CreateGetMethodsMethod(FILE* File, const char* ClassName, ZEArray<ZE
 	for(ZESize I = 0; I < Methods.GetCount(); I++)
 	{
 		fprintf(File,
-			"\t\t{%d, %s::Class(), &%s, \"%s\", %#x, %s, %s, ZEType(%s, %s, %s, %s), ",
-			Methods[I]->ID, Methods[I]->MemberOf.ToCString(),
-			Methods[I]->Name.ToCString(),
+			"\t\t{%d, %s::Class(), ", Methods[I]->ID, Methods[I]->MemberOf.ToCString());
+
+		if(Methods[I]->Name == "CreateInstance")
+			fprintf(File, "NULL, ");
+		else
+			fprintf(File, "&%s, ", Methods[I]->Name.ToCString());
+
+		fprintf(File,
+			"\"%s\", %#x, %s, %s, ZEType(%s, %s, %s, %s), ",
 			Methods[I]->Name.ToCString(), Methods[I]->Hash,
 			Methods[I]->IsEvent ? "true" : "false",
 			Methods[I]->IsStatic ? "true" : "false",
@@ -1273,7 +1334,13 @@ static void CreateSetPropertyItemMethod(FILE* File, const char* ClassName, ZEArr
 
 	for(ZESize I = 0; I < Properties.GetCount(); I++)
 	{
-		if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
+		if(Properties[I]->IsGeneratedByMetaCompiler)
+		{
+			fprintf(File, 
+				"\t\tcase %d:\n"
+				"\t\t\treturn false;\n", I);
+		}
+		else if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
 		{
 			if(Properties[I]->Type.SubType != ZE_TT_OBJECT_PTR)
 			{
@@ -1357,7 +1424,13 @@ static void CreateGetPropertyItemMethod(FILE* File, const char* ClassName, ZEArr
 
 	for(ZESize I = 0; I < Properties.GetCount(); I++)
 	{
-		if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
+		if(Properties[I]->IsGeneratedByMetaCompiler)
+		{
+			fprintf(File, 
+				"\t\tcase %d:\n"
+				"\t\t\treturn false;\n", I);
+		}
+		else if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
 		{
 			if(Properties[I]->Type.SubTypeQualifier == ZE_TQ_REFERENCE)
 			{
@@ -1428,7 +1501,13 @@ static void CreateAddItemToPropertyMethod(FILE* File, const char* ClassName, ZEA
 
 	for(ZESize I = 0; I < Properties.GetCount(); I++)
 	{
-		if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
+		if(Properties[I]->IsGeneratedByMetaCompiler)
+		{
+			fprintf(File, 
+				"\t\tcase %d:\n"
+				"\t\t\treturn false;\n", I);
+		}
+		else if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
 		{
 			if(Properties[I]->Type.SubType != ZE_TT_OBJECT_PTR)
 			{
@@ -1495,7 +1574,13 @@ static void CreateAddItemToPropertyWithIndexMethod(FILE* File, const char* Class
 
 	for(ZESize I = 0; I < Properties.GetCount(); I++)
 	{
-		if(Properties[I]->IsContainer)
+		if(Properties[I]->IsGeneratedByMetaCompiler)
+		{
+			fprintf(File, 
+				"\t\tcase %d:\n"
+				"\t\t\treturn false;\n", I);
+		}
+		else if(Properties[I]->IsContainer)
 		{
 			if(Properties[I]->Type.SubType != ZE_TT_CLASS)
 			{
@@ -1559,7 +1644,13 @@ static void CreateRemoveItemFromPropertyWithIndexMethod(FILE* File, const char* 
 
 	for(ZESize I = 0; I < Properties.GetCount(); I++)
 	{
-		if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
+		if(Properties[I]->IsGeneratedByMetaCompiler)
+		{
+			fprintf(File, 
+				"\t\tcase %d:\n"
+				"\t\t\treturn false;\n", I);
+		}
+		else if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
 		{
 			fprintf(File, 
 				"\t\tcase %d:\n"
@@ -1621,7 +1712,13 @@ static void CreateGetPropertyItemCountMethod(FILE* File, const char* ClassName, 
 
 	for(ZESize I = 0; I < Properties.GetCount(); I++)
 	{
-		if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
+		if(Properties[I]->IsGeneratedByMetaCompiler)
+		{
+			fprintf(File, 
+				"\t\tcase %d:\n"
+				"\t\t\treturn false;\n", I);
+		}
+		else if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
 		{
 			fprintf(File, 
 				"\t\tcase %d:\n"
@@ -1737,6 +1834,14 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName, ZEArray<ZE
 								Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
 								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "));\n");
 						}
+						else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
+						{
+							fprintf(File,
+								"Parameters[%d]->GetArray%sRef<%s>()%s", J,
+								Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+								Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
+								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+						}
 						else
 						{
 							fprintf(File,
@@ -1788,6 +1893,14 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName, ZEArray<ZE
 								Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
 								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
 						}
+						else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
+						{
+							fprintf(File,
+								"Parameters[%d]->GetArray%sRef<%s>()%s", J,
+								Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+								Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
+								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+						}
 						else
 						{
 							fprintf(File,
@@ -1833,6 +1946,14 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName, ZEArray<ZE
 						"(%s*)Parameters[%d]->GetObjectPtr%sRef()%s", 
 						Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(), J,
 						Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+				}
+				else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
+				{
+					fprintf(File,
+						"Parameters[%d]->GetArray%sRef<%s>()%s", J,
+						Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+						Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
 						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
 				}
 				else
@@ -1882,7 +2003,7 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName)
 		"\t\t\t\tcontinue;\n"
 		"\t\t\t}\n"
 		"\t\t\telse\n"
-		"\t\t\t\treturn -1; //Reached bottom limit.Method could not found.Break\n"
+		"\t\t\t\treturn false; //Reached bottom limit.Method could not found.Break\n"
 		"\t\t}\n\n"
 		"\t\tif(Method.ParameterCount == ParameterCount)\n"
 		"\t\t{\n"
@@ -2031,29 +2152,39 @@ static void CreateZEClassImplementation(FILE* File, const char* ClassName, bool 
 	}
 }
 
-bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* MetaData)
+bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* Data)
 {
 	//Last item in array is our target header.Is target header NOT contains builtin class?
-	if(!((ZEClassData*)MetaData->HeaderTypes[MetaData->HeaderTypes.GetCount() - 1])->IsBuiltInClass)
-	{
-		//We dont want to compile builtin classes in this case, so we scan recursively until we found one.
-		ZESize BuiltInClassEndIndex = 0;
-		for(ZESize I = MetaData->HeaderTypes.GetCount() - 1; I >= 0; I--)
+	if(((ZEClassData*)Data->HeaderTypes.GetLastItem())->IsBuiltInClass == false)
+	{	
+		ZEMetaData* MetaData = new ZEMetaData();
+		MetaData->HeaderTypes.Add(Data->HeaderTypes.GetLastItem());
+
+		ZESize BaseClassIndex = Data->HeaderTypes.GetCount() - 1;
+		for(ZESize I = Data->HeaderTypes.GetCount() - 2; I >= 0; I--)
 		{
-			//if we reach a builtin class one class before it is ZEObject and two class before it is our target class
-			if(((ZEClassData*)MetaData->HeaderTypes[I])->IsBuiltInClass)
-			{
-				BuiltInClassEndIndex = I + 2; //+2 = [0]BuiltInClassIndex + [1]ZEObject + [2]OurClass
+			ZEClassData* LastClass = ((ZEClassData*)Data->HeaderTypes[BaseClassIndex]);
+			ZEClassData* CurrentClass = ((ZEClassData*)Data->HeaderTypes[I]);
+
+			if(CurrentClass->IsBuiltInClass)
 				break;
+
+			if(LastClass->BaseClass->Name == CurrentClass->Name)
+			{
+				MetaData->HeaderTypes.Add(CurrentClass);
+				BaseClassIndex = I;
 			}
 		}
+
+		MetaData->ForwardDeclaredClasses = Data->ForwardDeclaredClasses;
+		MetaData->EnumTypes = Data->EnumTypes;
 
 		ZEArray<ZEAttributeData*> Attributes;
 		ZEArray<ZEPropertyData*> Properties;
 		ZEArray<ZEMethodData*> Methods;
 
 		//searching for duplicate class attributes.we only add one item per object type.
-		for(ZESize Index = BuiltInClassEndIndex; Index < MetaData->HeaderTypes.GetCount(); Index++)
+		for(int Index = MetaData->HeaderTypes.GetCount() - 2; Index >= 0; Index--)
 		{
 			ZEClassData* CurrentClassData = (ZEClassData*)MetaData->HeaderTypes[Index];
 			const char* CurrentClassName = CurrentClassData->Name;
@@ -2140,24 +2271,22 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 			return false;
 		else
 		{
-			//Target class' parent class is one item before its.
-			const char* ParentClassName = MetaData->HeaderTypes[MetaData->HeaderTypes.GetCount() - 2]->Name;
-			//Our target class is the last item in array
-			const char* CurrentClassName = MetaData->HeaderTypes[MetaData->HeaderTypes.GetCount() - 1]->Name;
+			//Our target class is the first item in array
+			const char* CurrentClassName = MetaData->HeaderTypes[0]->Name;
+			//Target class' parent class is one item after it.
+			const char* ParentClassName = MetaData->HeaderTypes[1]->Name;
 
-			ZEClassData* ClassData = (ZEClassData*)MetaData->HeaderTypes.GetLastItem();
+			ZEClassData* ClassData = (ZEClassData*)MetaData->HeaderTypes[0];
 
 			bool HasPublicConstructor = ClassData->HasPublicConstructor;
 			bool IsAbstract = ClassData->IsAbstract;
 
-			ZEString FilePath = "C:\\Users\\Hakan.Candemir\\Desktop\\";
-			FilePath.Append(CurrentClassName);
-			FilePath.Append(".h.ZEMeta.cpp");
+			ZEString FilePath = Options.OutputFileName.ToCString();
 
 			FILE* File;
 			File = fopen(FilePath.ToCString(), "w");
 
-			PrepareClassDependencies(File, CurrentClassName, MetaData->ForwardDeclaredClasses);
+			PrepareClassDependencies(File, ZEFileInfo::GetFileName(Options.InputFileName).ToCString(), CurrentClassName, MetaData->ForwardDeclaredClasses);
 
 			CreateGetParentClassMethod(File, CurrentClassName, ParentClassName);
 			CreateGetNameMethod(File, CurrentClassName);
@@ -2168,7 +2297,7 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 			CreateGetPropertiesMethod(File, CurrentClassName, Properties);
 			CreateGetPropertyCountMethod(File, CurrentClassName, Properties.GetCount());
 
-			CreateMethodWrappers(File, CurrentClassName, Methods);
+			CreateMethodWrappers(File, CurrentClassName, IsAbstract, HasPublicConstructor, Methods);
 
 			CreateGetMethodsMethod(File, CurrentClassName, Methods);
 			CreateGetMethodCountMethod(File, CurrentClassName, Methods.GetCount());
@@ -2213,14 +2342,12 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 	}
 	else//If last item in array is builtin class type we compile all classes to seperate files in found header
 	{
-		for(ZESize I = 0; I < MetaData->HeaderTypes.GetCount(); I++)
+		for(ZESize I = 0; I < Data->HeaderTypes.GetCount(); I++)
 		{
-			ZETypeData* CurrentClassData = MetaData->HeaderTypes[I];
+			ZETypeData* CurrentClassData = Data->HeaderTypes[I];
 			const char* CurrentClassName = CurrentClassData->Name;
 
-			ZEString FilePath = "C:\\Users\\Hakan.Candemir\\Desktop\\";
-			FilePath.Append(CurrentClassName);
-			FilePath.Append(".h.ZEMeta.cpp");
+			ZEString FilePath = Options.OutputFileName.ToCString();
 
 			((ZEClassData*)CurrentClassData)->Methods.Sort(SortMethodsByHash);
 
