@@ -80,6 +80,8 @@ bool ZEBase::Deinitialize()
 
 	if (State != ZE_BS_NOT_INITIALIZED)
 		return false;
+
+	return true;
 }
 
 void ZEBase::Destroy()
