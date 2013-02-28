@@ -42,6 +42,8 @@
 
 #include <string.h>
 
+ZE_OBJECT_IMPL(ZEGame)
+
 ZEGameDescription* ZEGame::GetGameDescription()
 {
 	return NULL;

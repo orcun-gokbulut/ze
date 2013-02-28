@@ -58,6 +58,7 @@
 
 #include <memory.h>
 
+ZE_OBJECT_IMPL(ZEScene)
 
 static ZEString ConstructResourcePath(const ZEString& Path)
 {

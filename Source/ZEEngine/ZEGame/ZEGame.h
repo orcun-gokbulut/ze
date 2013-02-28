@@ -40,7 +40,7 @@
 #include "ZEScene.h"
 #include "ZEEntity.h"
 #include "ZEDS/ZEArray.h"
-
+#include "ZEMeta/ZEObject.h"
 
 #define zeGame ZEGame::GetInstance()
 
@@ -50,11 +50,8 @@ enum ZEGameType
 	ZEGAMETYPE_MULTIPLAYER
 };
 
-
-class ZERenderer;
-class ZEControl;
-class ZEUIManager;
 class ZEGame;
+
 class ZEGameDescription
 {
 	public:
@@ -65,8 +62,14 @@ class ZEGameDescription
 		virtual ZEGame*					CreateGameInstance() = 0;
 };
 
-class ZEGame
+ZE_META_FORWARD_DECLARE(ZEUIManager, "ZEUI/ZEUIManager.h")
+
+ZE_CLASS(ZEGame)
+
+class ZEGame : public ZEObject
 {
+	ZE_OBJECT
+
 	protected:
 		ZEScene*						Scene;
 

@@ -587,26 +587,38 @@ static void CreateMethodWrappers(FILE* File, const char* CurrentClassName, bool 
 	{
 		if(Methods[I]->Parameters.GetCount() > 0)
 		{
-			fprintf(File, 
-				"static %s%s %s(%s* This, ", 
-				ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
-				Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS ? "*" : "",
-				Methods[I]->Name.ToCString(), CurrentClassName);
+			if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ARRAY)
+			{
+				fprintf(File, 
+					"static ZEArray<%s%s> %s(%s* This, ", 
+					Methods[I]->ReturnParameter.Type.SubTypeClassName.ToCString(),
+					Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT_PTR ? "*" : "",
+					Methods[I]->Name.ToCString(), CurrentClassName);
+			}
+			else
+			{
+				fprintf(File, 
+					"static %s%s %s(%s* This, ", 
+					ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
+					Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS ? "*" : "",
+					Methods[I]->Name.ToCString(), CurrentClassName);
+			}
 
 			for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
 			{
 				if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
 				{
-					fprintf(File, "%s<%s> %s%s", 
-						ReturnTypeCast(Methods[I]->Parameters[J]->Type.Type), 
+					fprintf(File, "ZEArray<%s%s> %s%s",
 						Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
+						Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_OBJECT || Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_OBJECT_PTR ? "*" : "",
 						Methods[I]->Parameters[J]->Name.ToCString(), 
 						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ")\n");
 				}
 				else
 				{
-					fprintf(File, "%s %s%s", 
+					fprintf(File, "%s%s %s%s", 
 						ReturnTypeCast(Methods[I]->Parameters[J]->Type.Type), 
+						Methods[I]->Parameters[J]->Type.Type == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR ? "*" : "",
 						Methods[I]->Parameters[J]->Name.ToCString(), 
 						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ")\n");
 				}
@@ -1064,7 +1076,7 @@ static void CreateSetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 						fprintf(File,
 							"\t\tcase %d:\n"
 							"\t\t\t((%s*)Object)->Set%s((%s*)Value.GetObjectPtr());\n"
-							"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), Properties[I]->Type.ClassData->Name.ToCString());
+							"\t\t\treturn true;\n", I, Properties[I]->MemberOf.ToCString(), Properties[I]->Name.ToCString(), Properties[I]->Type.ClassData->Name.ToCString());
 					}
 					else
 					{
@@ -1078,7 +1090,7 @@ static void CreateSetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 					fprintf(File,
 						"\t\tcase %d:\n"
 						"\t\t\t((%s*)Object)->%s = (%s*)Value.GetObjectPtr();\n"
-						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), Properties[I]->Type.ClassData->Name.ToCString());
+						"\t\t\treturn true;\n", I, Properties[I]->MemberOf.ToCString(), Properties[I]->Name.ToCString(), Properties[I]->Type.ClassData->Name.ToCString());
 				}
 			}
 			else if(Properties[I]->Type.Type == ZE_MTT_ENUMERATOR)
@@ -1090,7 +1102,7 @@ static void CreateSetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 						fprintf(File,
 							"\t\tcase %d:\n"
 							"\t\t\t((%s*)Object)->Set%s((%s)Value.Get%s());\n"
-							"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(),
+							"\t\t\treturn true;\n", I, Properties[I]->MemberOf.ToCString(), Properties[I]->Name.ToCString(),
 							Properties[I]->Type.Type == ZE_MTT_ENUMERATOR ? Properties[I]->EnumData->Name.ToCString() : "",
 							VariantType.ToCString());
 					}
@@ -1106,7 +1118,7 @@ static void CreateSetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 					fprintf(File,
 						"\t\tcase %d:\n"
 						"\t\t\t((%s*)Object)->%s = (%s)Value.Get%s();\n"
-						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(),
+						"\t\t\treturn true;\n", I, Properties[I]->MemberOf.ToCString(), Properties[I]->Name.ToCString(),
 						Properties[I]->Type.Type == ZE_MTT_ENUMERATOR ? Properties[I]->EnumData->Name.ToCString() : "",
 						VariantType.ToCString());
 				}
@@ -1125,9 +1137,10 @@ static void CreateSetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 					{
 						fprintf(File,
 							"\t\tcase %d:\n"
-							"\t\t\t((%s*)Object)->Set%s(Value.Get%s());\n"
-							"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(),
-							VariantType.ToCString());
+							"\t\t\t((%s*)Object)->Set%s(Value.Get%s%s());\n"
+							"\t\t\treturn true;\n", I, Properties[I]->MemberOf.ToCString(), Properties[I]->Name.ToCString(),
+							VariantType.ToCString(),
+							Properties[I]->Type.TypeQualifier == ZE_MTQ_VALUE ? "" : Properties[I]->Type.TypeQualifier == ZE_MTQ_REFERENCE ? "Ref" : "ConstRef");
 					}
 					else
 					{
@@ -1140,9 +1153,10 @@ static void CreateSetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 				{
 					fprintf(File,
 						"\t\tcase %d:\n"
-						"\t\t\t((%s*)Object)->%s = Value.Get%s();\n"
-						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(),
-						VariantType.ToCString());
+						"\t\t\t((%s*)Object)->%s = Value.Get%s%s();\n"
+						"\t\t\treturn true;\n", I, Properties[I]->MemberOf.ToCString(), Properties[I]->Name.ToCString(),
+						VariantType.ToCString(),
+						Properties[I]->Type.TypeQualifier == ZE_MTQ_VALUE ? "" : Properties[I]->Type.TypeQualifier == ZE_MTQ_REFERENCE ? "Ref" : "ConstRef");
 				}
 			}
 		}
@@ -1241,7 +1255,7 @@ static void CreateGetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 							fprintf(File,
 								"\t\tcase %d:\n"
 								"\t\t\tValue.SetObjectPtr((ZEObject*)(((%s*)Object)->Get%s()));\n"
-								"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
+								"\t\t\treturn true;\n", I, Properties[I]->MemberOf.ToCString(), Properties[I]->Name.ToCString());
 						}
 						else
 						{
@@ -1255,7 +1269,7 @@ static void CreateGetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 						fprintf(File,
 							"\t\tcase %d:\n"
 							"\t\t\tValue.SetObjectPtr((ZEObject*)(((%s*)Object)->%s));\n"
-							"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
+							"\t\t\treturn true;\n", I, Properties[I]->MemberOf.ToCString(), Properties[I]->Name.ToCString());
 					}
 				}
 			}
@@ -1274,7 +1288,7 @@ static void CreateGetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 						fprintf(File,
 							"\t\tcase %d:\n"
 							"\t\t\tValue.Set%s(((%s*)Object)->Get%s());\n"
-							"\t\t\treturn true;\n", I, VariantType.ToCString(), ClassName, Properties[I]->Name.ToCString());
+							"\t\t\treturn true;\n", I, VariantType.ToCString(), Properties[I]->MemberOf.ToCString(), Properties[I]->Name.ToCString());
 					}
 					else
 					{
@@ -1288,7 +1302,7 @@ static void CreateGetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 					fprintf(File,
 						"\t\tcase %d:\n"
 						"\t\t\tValue.Set%s(((%s*)Object)->%s);\n"
-						"\t\t\treturn true;\n", I, VariantType.ToCString(), ClassName, Properties[I]->Name.ToCString());
+						"\t\t\treturn true;\n", I, VariantType.ToCString(), Properties[I]->MemberOf.ToCString(), Properties[I]->Name.ToCString());
 				}
 			}
 		}
@@ -1857,7 +1871,7 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName, ZEArray<ZE
 				{
 					fprintf(File, 
 						"\t\tcase %d:\n"
-						"\t\t\treturn false;\n");
+						"\t\t\treturn false;\n", I);
 				}
 				else
 				{

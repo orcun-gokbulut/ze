@@ -51,6 +51,8 @@
 
 ZESimpleMaterial* ZEGizmo::GizmoMaterial = NULL;
 
+ZE_OBJECT_IMPL(ZEGizmo)
+
 void ZEGizmo::UpdateMoveGizmo()
 {
 	ZEVector3 CameraPosition = zeScene->GetActiveCamera()->GetWorldPosition();

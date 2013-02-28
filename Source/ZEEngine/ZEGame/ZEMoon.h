@@ -37,19 +37,19 @@
 #ifndef __ZE_MOON_H__
 #define __ZE_MOON_H__
 
-
 #include "ZETypes.h"
 #include "ZEEntity.h"
 #include "ZEGraphics\ZERenderCommand.h"
 
+ZE_META_FORWARD_DECLARE(ZEMoonMaterial, "ZEGraphics/ZEMoonMaterial.h")
+ZE_META_FORWARD_DECLARE(ZETexture3DResource, "ZETexture/ZETexture3DResource.h")
 
-class ZEMaterial;
-class ZEMoonMaterial;
-class ZETexture3DResource;
-
+ZE_CLASS(ZEMoon)
 
 class ZEMoon : public ZEEntity
 {
+	ZE_OBJECT
+
 	protected:
 		ZEMoonMaterial*				Material;
 		ZETexture3DResource*		Texture;

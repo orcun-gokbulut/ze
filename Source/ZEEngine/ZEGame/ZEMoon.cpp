@@ -41,6 +41,7 @@
 #include "ZEGraphics\ZEMoonMaterial.h"
 #include "ZETexture\ZETexture3DResource.h"
 
+ZE_OBJECT_IMPL(ZEMoon)
 
 void ZEMoon::SetPhase(float Phase)
 {

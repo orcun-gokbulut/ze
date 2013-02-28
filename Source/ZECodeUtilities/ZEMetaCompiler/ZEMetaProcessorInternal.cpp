@@ -393,7 +393,7 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 
 				ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
 				TempType.SubType = SubTypeData.Type;
-				TempType.SubTypeQualifier = SubTypeData.SubTypeQualifier;
+				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
 				TempType.SubTypeClassName = SubTypeData.ClassData->Name;
 				return TempType;
 			}
@@ -447,7 +447,7 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 
 							ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
 							TempType.SubType = SubTypeData.Type;
-							TempType.SubTypeQualifier = ZE_MTQ_VALUE;
+							TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
 							TempType.SubTypeClassName = SubTypeData.ClassData->Name;
 							return TempType;
 						}
@@ -511,7 +511,7 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 
 				ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
 				TempType.SubType = SubTypeData.Type;
-				TempType.SubTypeQualifier = ZE_MTQ_VALUE;
+				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
 				TempType.SubTypeClassName = SubTypeData.ClassData->Name;
 				return TempType;
 			}
