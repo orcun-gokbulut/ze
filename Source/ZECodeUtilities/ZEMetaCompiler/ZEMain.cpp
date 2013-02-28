@@ -143,7 +143,7 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 int main(int Argc, const char** Argv)
 {
 	printf(
-		"ZEMetaCompiler - Version : 0.3.5\n"
+		"ZEMetaCompiler - Version : 0.3.6\n"
 		"Copyright (C) 2012, Zinek Code House. All rights reserved.\n\n");
 
 	if (Argc == 1)

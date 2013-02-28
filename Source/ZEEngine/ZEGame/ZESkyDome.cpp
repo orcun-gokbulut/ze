@@ -38,6 +38,8 @@
 #include "ZEGraphics/ZESkyDomeMaterial.h"
 #include "ZEDrawParameters.h"
 
+ZE_OBJECT_IMPL(ZESkyDome)
+
 void ZESkyDome::SetAmbientFactor(float Value)
 {
 	AmbientFactor = Value;

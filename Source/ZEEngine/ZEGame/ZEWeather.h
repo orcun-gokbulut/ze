@@ -41,16 +41,18 @@
 #include "ZEMath\ZEVector.h"
 #include "ZEDrawParameters.h"
 
+ZE_META_FORWARD_DECLARE(ZEDirectionalLight, "ZEGraphics/ZEDirectionalLight.h")
+ZE_META_FORWARD_DECLARE(ZESkyBrush, "ZESkyBrush.h")
+ZE_META_FORWARD_DECLARE(ZESkyDome, "ZESkyDome.h")
+ZE_META_FORWARD_DECLARE(ZECloud, "ZECloud.h")
+ZE_META_FORWARD_DECLARE(ZEMoon, "ZEMoon.h")
 
-class ZEDirectionalLight;
-class ZEDirectionalLight;	
-class ZESkyBrush;	
-class ZESkyDome;			
-class ZECloud;		
-class ZEMoon;				
+ZE_CLASS(ZEWeather)
 
 class ZEWeather : public ZEEntity
 {
+	ZE_OBJECT
+
 	protected:
 
 		ZEMoon*						Moon;

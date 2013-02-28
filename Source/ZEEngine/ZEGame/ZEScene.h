@@ -42,20 +42,17 @@
 #include "ZESceneCuller.h"
 #include "ZETypes.h"
 #include "ZEDrawParameters.h"
+#include "ZEMeta/ZEObject.h"
 
-class ZEViewVolume;
-class ZEBoundingBox;
-class ZECamera;
-class ZEListener;
-class ZEFrameRenderer;
-class ZEShadowRenderer;
-class ZEPostProcessor;
-class ZEFixedMaterial;
-class ZEEntity;
-class ZEPhysicalWorld;
-class ZEInterior;
-class ZEInteriorResource;
-class ZEClass;
+ZE_META_FORWARD_DECLARE(ZEEntity,			"ZEEntity.h")
+ZE_META_FORWARD_DECLARE(ZECamera,			"ZEGraphics/ZECamera.h")
+ZE_META_FORWARD_DECLARE(ZEFrameRenderer,	"ZEGraphics/ZEFrameRenderer.h")
+ZE_META_FORWARD_DECLARE(ZEShadowRenderer,	"ZEGraphics/ZEShadowRenderer.h")
+ZE_META_FORWARD_DECLARE(ZEPhysicalWorld,	"ZEPhysics/ZEPhysicalWorld.h")
+ZE_META_FORWARD_DECLARE(ZEListener,			"ZESound/ZEListener.h")
+ZE_META_FORWARD_DECLARE(ZEInterior,			"ZEInterior/ZEInterior.h")
+ZE_META_FORWARD_DECLARE(ZEInteriorResource,	"ZEInterior/ZEInteriorResource.h")
+ZE_META_FORWARD_DECLARE(ZEPostProcessor,	"ZEPostProcessor/ZEPostProcessor.h")
 
 #define ZE_RCF_ENTITY							1
 #define ZE_RCF_COMPONENT						2
@@ -65,8 +62,12 @@ class ZEClass;
 
 #define zeScene ZEScene::GetInstance()
 
-class ZEScene
+ZE_CLASS(ZEScene)
+
+class ZEScene : public ZEObject
 {
+	ZE_OBJECT
+
 	private:
 		bool									Initialized;
 

@@ -40,6 +40,7 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZETexture/ZETexture2DResource.h"
 
+ZE_OBJECT_IMPL(ZECloud)
 
 void ZECloud::SetAmbientColor(ZEVector3 Color)
 {
