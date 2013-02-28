@@ -43,6 +43,14 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 
+enum ZEInputDeviceLifeState
+{
+	ZE_IDLS_NOT_INITIALIZED				= 0,
+	ZE_IDLS_INITIALIZING				= 1,
+	ZE_IDLS_INITIALIZED					= 2,
+	ZE_IDLS_DEINITIALIZING				= 3
+};
+
 enum ZEInputDeviceType
 {
 	ZE_IDT_NONE,
@@ -148,11 +156,14 @@ class ZEInputDevice
 	private:
 		bool									Enabled;
 		bool									Acquired;
-		bool									Initialized;
+		ZEInputDeviceLifeState					LifeState;
 
 	protected:
 		ZEInputDeviceState						State;
 		ZEInputDeviceDescription				Description;
+
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
 
 	public:
 		const ZEString&							GetName();
@@ -166,8 +177,8 @@ class ZEInputDevice
 		virtual void							UnAcquire();
 
 		bool									IsInitialized();
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
+		bool									Initialize();
+		bool									Deinitialize();
 
 		const ZEInputDeviceState&				GetState();
 

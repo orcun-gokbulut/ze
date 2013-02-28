@@ -258,6 +258,23 @@ ZESize ZEInputDeviceIndexes::GetNewDeviceIndex(ZEInputDeviceType Type)
 	return Index;
 }
 
+bool ZEInputDevice::InitializeSelf()
+{
+	LifeState = ZE_IDLS_INITIALIZING;
+	
+	return true;
+}
+
+bool ZEInputDevice::DeinitializeSelf()
+{
+	LifeState = ZE_IDLS_NOT_INITIALIZED;
+
+	State.Clear();
+	Description.Clear();
+
+	return true;
+}
+
 const ZEString& ZEInputDevice::GetName()
 {
 	return Description.Name;
@@ -295,22 +312,43 @@ void ZEInputDevice::UnAcquire()
 
 bool ZEInputDevice::IsInitialized()
 {
-	return Initialized;
+	return (LifeState == ZE_IDLS_INITIALIZED);
 }
 
 bool ZEInputDevice::Initialize()
 {
-	Initialized = true;
+	if (IsInitialized())
+		return false;
+
+	if (!InitializeSelf())
+		return false;
+
+	if (LifeState != ZE_IDLS_INITIALIZING)
+		return false;
+
+	LifeState = ZE_IDLS_INITIALIZED;
+
 	Acquire();
+
 	return true;
 }
 
-void ZEInputDevice::Deinitialize()
+bool ZEInputDevice::Deinitialize()
 {
-	State.Clear();
-	Description.Clear();
+	if (!IsInitialized())
+		return true;
 
-	Initialized = false;
+	LifeState = ZE_IDLS_DEINITIALIZING;
+
+	if (!DeinitializeSelf())
+		return false;
+
+	if (LifeState != ZE_IDLS_NOT_INITIALIZED)
+		return false;
+
+	UnAcquire();
+
+	return true;
 }
 
 const ZEInputDeviceState& ZEInputDevice::GetState()
@@ -326,7 +364,7 @@ void ZEInputDevice::Destroy()
 ZEInputDevice::ZEInputDevice()
 {
 	Enabled = true;
-	Initialized = false;
+	LifeState = ZE_IDLS_NOT_INITIALIZED;
 	Acquired = false;
 }
 

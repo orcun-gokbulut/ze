@@ -53,12 +53,13 @@ struct ZEVRPNInputDeviceHandle
 class ZEVRPNInputDevice : public ZEInputDevice
 {
 	friend class ZEVRPNInputModule;
+	protected:
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
 	public:
 		ZEVRPNInputDeviceHandle			Handle;
 		vrpn_BaseClass*					VRPNDevice;
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
 
 		virtual void					Process();
 

@@ -47,10 +47,12 @@ class ZEWindowsInputKeyboardDevice : public ZEInputDevice
 {
 	friend class ZEWindowsInputModule;
 	friend class ZEWindowsInputKeyboardMessageHandler;
+	protected:
+		virtual bool							InitializeSelf();
+
 	public:
 		virtual void							UnAcquire();
-		virtual bool							Initialize();
-
+		
 		virtual void							Process(const RAWINPUT& Data);
 };
 

@@ -221,6 +221,7 @@ bool ZEInput::ConnectToDevice()
 
 ZEInput::ZEInput()
 {
+	Device = NULL;
 	DeviceNameHash = 0;
 	Index = 0;
 	Type = ZE_IT_NONE;
