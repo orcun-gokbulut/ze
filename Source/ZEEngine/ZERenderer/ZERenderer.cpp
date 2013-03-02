@@ -34,118 +34,112 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECamera.h"
-#include "ZEMaterial.h"
 #include "ZERenderer.h"
 #include "ZEDS/ZEArray.h"
-#include "ZELightPoint.h"
-#include "ZERenderCommand.h"
-#include "ZELightProjective.h"
-#include "ZELightDirectional.h"
-#include "ZELightOmniProjective.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZEGraphicsDevice.h"
-#include "ZEGraphics/ZEGraphicsEventTracer.h"
-
 #include "ZERenderStage.h"
+#include "ZERenderCommand.h"
 #include "ZERenderStageShadow.h"
 #include "ZERenderStageForward.h"
 #include "ZERenderStageLighting.h"
 #include "ZERenderStageGeometry.h"
+#include "ZERenderStageParticle.h"
 #include "ZERenderStageTransparent.h"
 #include "ZERenderStagePostProcess.h"
-#include "ZERenderStageParticle.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsDevice.h"
+#include "ZEGraphics/ZEGraphicsEventTracer.h"
 
-static ZEInt RenderCommandCompare(ZERenderCommand* const* A, ZERenderCommand* const* B)
+/************************************************************************/
+/*                        ZECommandBuffer                               */
+/************************************************************************/
+ZECommandBufferEntry::ZECommandBufferEntry()
 {
-	if ((*A)->Priority > (*B)->Priority)
+	EntryType = ZE_CBET_NONE;
+	DataSize = 0;
+	Data = NULL;
+}
+
+ZECommandBufferEntry::~ZECommandBufferEntry()
+{
+
+}
+
+__forceinline void ZECommandBuffer::Clear()
+{
+	EndOfBuffer = 0;
+	CommandList.Clear(true);
+}
+
+__forceinline bool ZECommandBuffer::BufferEmpty() const
+{
+	return CommandList.GetCount() == 0;
+}
+
+__forceinline ZESize ZECommandBuffer::GetCommandCount() const
+{
+	return CommandList.GetCount();
+}
+
+__forceinline const ZECommandBufferEntry* ZECommandBuffer::GetEntry(ZESize Index)
+{
+	ZESize Count = CommandList.GetCount();
+	if (Count == 0 || Index >= Count)
+		return NULL;
+
+	return &CommandList[Index];
+}
+
+__forceinline bool ZECommandBuffer::AddEntry(const ZECommandBufferEntry& Entry)
+{
+	zeDebugCheck(Entry.DataSize == 0, "Zero Size");
+	zeDebugCheck(Entry.Data == NULL, "NULL Pointer.");
+	zeDebugCheck(Entry.EntryType == 0, "Unknown entry type");
+
+	ZESize RemainingSize = ZE_COMMAND_BUFFER_SIZE - EndOfBuffer;
+	if (Entry.DataSize > RemainingSize)
+		return false;
+
+	void* Target = (ZEUInt8*)Buffer + EndOfBuffer + 1;
+
+	memcpy(Target, Entry.Data, Entry.DataSize);
+	EndOfBuffer += Entry.DataSize;
+	
+	ZECommandBufferEntry* Added = CommandList.Add(Entry);
+	Added->Data = Target;
+	
+	return true;
+}
+
+ZECommandBuffer::ZECommandBuffer()
+{
+	EndOfBuffer = 0;
+	Buffer = (void*)new ZEUInt8[ZE_COMMAND_BUFFER_SIZE];
+}
+
+ZECommandBuffer::~ZECommandBuffer()
+{
+	if (Buffer)
 	{
-		return 1;
-	}
-	else if ((*A)->Priority < (*B)->Priority)
-	{
-		return -1;
-	}
-	else
-	{
-		if ((*A)->Order > (*B)->Order)
-		{
-			return 1;
-		}
-		else if ((*A)->Order < (*B)->Order)
-		{
-			return -1;
-		}
-		else
-		{
-			return 0;
-		}
+		delete [] ((ZEUInt8*)Buffer);
+		Buffer = NULL;
 	}
 }
 
-static ZEInt LightCompare(ZELight* const* A, ZELight* const* B)
-{
-	if ((*A)->GetLightType() > (*B)->GetLightType())
-	{
-		return 1;
-	}
-	else if ((*A)->GetLightType() < (*B)->GetLightType())
-	{
-		return -1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-// __forceinline bool ZECommandBuffer::CheckBufferFull(ZESize Size) const
-// {
-// 				
-// }
-// 
-// __forceinline bool ZECommandBuffer::ReadCommand(ZEUInt32* Marker, void* Data, ZESize* Size)
-// {
-// 
-// }
-// 
-// __forceinline bool ZECommandBuffer::WriteCommand(ZEUInt32 Marker, const void* Data, ZESize Size)
-// {
-// 
-// }
-// 
-// ZECommandBuffer::ZECommandBuffer()
-// {
-// 	BufferPointer = 0;
-// 	RenderEndMarker = 0;
-// 	RenderStartMarker = 0;
-// 
-// 	CommandBuffer = new ZEUInt8[ZE_COMMAND_BUFFER_SIZE];
-// }
-// 
-// ZECommandBuffer::~ZECommandBuffer()
-// {
-// 	if (CommandBuffer)
-// 	{
-// 		delete [] CommandBuffer;
-// 		CommandBuffer = NULL;
-// 	}
-// }
-
+/************************************************************************/
+/*								ZERenderer                              */
+/************************************************************************/
 bool ZERenderer::Initialize() 
 {
-	GeometryStage = new ZERenderStageGeometry();
+	ShadowStage		= new ZERenderStageShadow();
+	ForwardStage	= new ZERenderStageForward();
+	GeometryStage	= new ZERenderStageGeometry();
+	LightingStage	= new ZERenderStageLighting();
+	ParticleStage	= new ZERenderStageParticle();
 
-	ShadowStage = new ZERenderStageShadow();
-
-	LightingStage = new ZERenderStageLighting();
-	LightingStage->SetGBufferInput(GeometryStage);
-
-	ForwardStage = new ZERenderStageForward();
-	ForwardStage->SetGBufferInput(GeometryStage);
-	ForwardStage->SetLBufferInput(LightingStage);
-
-	ParticleStage = new ZERenderStageParticle();
-	ParticleStage->SetABufferInput(ForwardStage);
+	LightingStage->SetInputGeometryStage(GeometryStage);
+	ForwardStage->SetInputGeometryStage(GeometryStage);
+	ForwardStage->SetInputLightingStage(LightingStage);
+	ParticleStage->SetInputAccumulationStage(ForwardStage);
 
 	return true;
 }
@@ -154,10 +148,9 @@ void ZERenderer::Deinitialize()
 {
 	ZE_DESTROY(ShadowStage);
 	ZE_DESTROY(ForwardStage);
-	ZE_DESTROY(LightingStage);
 	ZE_DESTROY(GeometryStage);
-	ZE_DESTROY(TransparentStage);
-	ZE_DESTROY(PostProcessStage);
+	ZE_DESTROY(LightingStage);
+	ZE_DESTROY(ParticleStage);
 }
 
 void ZERenderer::Destroy()
@@ -165,108 +158,128 @@ void ZERenderer::Destroy()
 	delete this;
 }
 
-void ZERenderer::DoGeomtryPass()
+static ZESize GetIndex(ZEUInt32 Value)
 {
-	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+	if (Value == 0)
+		return 0;
 
-	Tracer->StartEvent("Geometry Stage");
+	ZESize Index = 0;
+	do
+	{
+		Value >>= 1;
+		Index++;
 	
-	GeometryStage->Setup();
-	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
-		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_GEOMETRY_PASS)
-			GeometryStage->Process(CommandList[I]);
+	} while (Value);
 	
-	Tracer->EndEvent();
+	return Index-1;
 }
 
-void ZERenderer::DoShadowPass()
+/*
+ZEUInt32				SolveDependency(ZEUInt32 Solved = 0, ZEUInt32 StageIdentifier = 0, ZEUInt32 Dependency = 0xFFFFFFFE);
+ZEUInt32 ZERenderer::SolveDependency(ZEUInt32 SolvedDependencies, ZEUInt32 StageIdentifier, ZEUInt32 Dependency)
 {
-	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+	
+	// Check if dependency needs to be solved
+	if ((Dependency & ZE_RENDER_STAGE_NONE) == ZE_RENDER_STAGE_NONE)
+		return StageIdentifier;
 
-	Tracer->StartEvent("Shadow Stage");
-	
-	ShadowStage->Setup();
-	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
-		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_SHADOW_PASS)
-			ShadowStage->Process(CommandList[I]);
-	
-	Tracer->EndEvent();
+	// Check if dependency already solved
+	if ((SolvedDependencies & Dependency) == Dependency)
+		return SolvedDependencies;
+
+	// Loop to find the required stages for the Dependency
+	ZEUInt32 Solved = 0;
+	ZESize StageCount = StageList.GetCount();
+	for (ZESize I = 0; I < StageCount && Dependency != 0; I++)
+	{
+		// if a stage is found that is required for dependency
+		ZEUInt32 Identifier = StageList[I]->GetStageIndentifier();
+		
+		if ((Dependency & Identifier) != Identifier)
+			continue;
+
+		// get current stage dependency and solve it
+		ZEUInt32 NewDependencies = StageList[I]->GetDependencies();
+		
+		Solved = SolveDependency(SolvedDependencies, Identifier, NewDependencies);
+		if (Dependency & Solved)
+		{
+			ZESize Index = GetIndex(Identifier);
+			StageLookupTable[Index] = I;
+		}
+
+		Dependency &= ~Solved;
+		SolvedDependencies |= Solved;
+	}
+
+	return SolvedDependencies | StageIdentifier;
+}
+*/
+
+bool ZERenderer::ProcessEntry(const ZECommandBufferEntry* Entry, ZERenderStage* Stage)
+{
+	bool Result = false;
+	switch(Entry->EntryType)
+	{
+		default:
+		case ZE_CBET_NONE:
+			break;
+
+		case ZE_CBET_RENDER_COMMAND:
+			Stage->Process((ZERenderCommand*)Entry->Data);
+			break;
+
+		case ZE_CBET_RENDERER_SETUP:
+			SetRendererConfiguration((ZERendererConfiguration*)Entry->Data);
+			break;
+
+		case ZE_CBET_RENDER_STAGE_SETUP:
+			Stage->SetStageConfiguration((ZERenderStageConfiguration*)Entry->Data);
+			break;
+	};
+
+	return Result;
 }
 
-void ZERenderer::DoLightingPass()
+void ZERenderer::AddRenderCommand(const ZERenderCommand* Command)
 {
-	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+	zeDebugCheck(Command == NULL, "Null pointer.");
 
-	Tracer->StartEvent("Lighting Stage");
-	
-	LightingStage->Setup();
-	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
-		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_LIGHTING_PASS)
-			LightingStage->Process(CommandList[I]);
-	
-	Tracer->EndEvent();
+	ZECommandBufferEntry Entry;
+	Entry.Data = (const void*)Command;
+	Entry.DataSize = Command->Size;
+	Entry.EntryType = ZE_CBET_RENDER_COMMAND;
+
+	CommandBuffer.AddEntry(Entry);
 }
 
-void ZERenderer::DoForwardPass()
+void ZERenderer::AddRendererConfiguration(const ZERendererConfiguration* Config)
 {
-	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+	zeDebugCheck(Config == NULL, "Null pointer.");
 
-	Tracer->StartEvent("Forward Stage");
-	
-	ForwardStage->Setup();
-	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
-		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_FORWARD_PASS)
-			ForwardStage->Process(CommandList[I]);
-	
-	Tracer->EndEvent();
+	ZECommandBufferEntry Entry;
+	Entry.Data = (const void*)Config;
+	Entry.DataSize = Config->Size;
+	Entry.EntryType = ZE_CBET_RENDERER_SETUP;
+
+	CommandBuffer.AddEntry(Entry);
 }
 
-void ZERenderer::DoParticlePass()
+void ZERenderer::AddRenderStageConfiguration(const ZERenderStageConfiguration* Config)
 {
-	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+	zeDebugCheck(Config == NULL, "Null pointer.");
 
-	Tracer->StartEvent("Particle Stage");
-	
-	ParticleStage->Setup();
-	for (ZESize I = 0; I < CommandList.GetCount(); ++I)
-		if (CommandList[I]->Material->GetMaterialFlags() & ZE_MTF_PARTICLE_PASS)
-			ParticleStage->Process(CommandList[I]);
-	
-	Tracer->EndEvent();
+	ZECommandBufferEntry Entry;
+	Entry.Data = (const void*)Config;
+	Entry.DataSize = Config->Size;
+	Entry.EntryType = ZE_CBET_RENDER_STAGE_SETUP;
+
+	CommandBuffer.AddEntry(Entry);
 }
 
-void ZERenderer::DoTransparentPass()
+void ZERenderer::SetRendererConfiguration(const ZERendererConfiguration* Config)
 {
-	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
 
-	Tracer->StartEvent("Transparent Stage");
-	Tracer->EndEvent();
-}
-
-void ZERenderer::DoPostProcessPass()
-{
-	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
-
-	Tracer->StartEvent("PostProcess Stage");
-	Tracer->EndEvent();
-}
-
-void ZERenderer::DoUserInterfacePass()
-{
-	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
-
-	Tracer->StartEvent("UserInterface Stage");
-	Tracer->EndEvent();
-}
-
-void ZERenderer::AddRenderCommand(ZERenderCommand* RenderCommand)
-{
-	CommandList.Add(RenderCommand);
-}
-
-void ZERenderer::SetDrawParameters(const ZEDrawParameters& Parameters)
-{
-	DrawParameters = Parameters;
 }
 
 void ZERenderer::SetShadowMapDimension(ZEVector2 Value)
@@ -279,11 +292,6 @@ ZEVector2 ZERenderer::GetShadowMapDimension() const
 	return ShadowMapDimesion;
 }
 
-const ZEDrawParameters& ZERenderer::GetDrawParameters() const
-{
-	return DrawParameters;
-}
-
 void ZERenderer::Render(float ElaspedTime)
 {
 	if (!zeGraphics->GetEnabled())
@@ -292,22 +300,66 @@ void ZERenderer::Render(float ElaspedTime)
 		return;
 	}
 
-	// Sort commands
-	CommandList.Sort(RenderCommandCompare);
-	DrawParameters.Lights.Sort(LightCompare);
-	
-	DoShadowPass();
-	DoGeomtryPass();
-	DoLightingPass();
-	DoForwardPass();
-	DoParticlePass();
-	DoTransparentPass();
-	DoPostProcessPass();
-	DoUserInterfacePass();
-
-	CommandList.Clear(false);
+	ZESize CommandCount = CommandBuffer.GetCommandCount();
+	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+	/************************************************************************/
+	/*                         ShadowStage                                  */
+	/************************************************************************/
+// 	Tracer->StartEvent("ShadowStage");
+// 	for (ZESize I = 0; I < CommandCount; ++I)
+// 	{
+// 		const ZECommandBufferEntry* Entry = CommandBuffer.GetEntry(I);
+// 		ProcessEntry(Entry, ShadowStage);
+// 	}
+// 	Tracer->EndEvent();
+	/************************************************************************/
+	/*                         GeometryStage                                */
+	/************************************************************************/
+	Tracer->StartEvent("GeometryStage");
+	GeometryStage->Setup();
+	for (ZESize I = 0; I < CommandCount; ++I)
+	{
+		const ZECommandBufferEntry* Entry = CommandBuffer.GetEntry(I);
+		ProcessEntry(Entry, GeometryStage);
+	}
+	Tracer->EndEvent();
+	/************************************************************************/
+	/*                         LightingStage                                */
+	/************************************************************************/
+	Tracer->StartEvent("LightingStage");
+	LightingStage->Setup();
+	for (ZESize I = 0; I < CommandCount; ++I)
+	{
+		const ZECommandBufferEntry* Entry = CommandBuffer.GetEntry(I);
+		ProcessEntry(Entry, LightingStage);
+	}
+	Tracer->EndEvent();
+	/************************************************************************/
+	/*                         ForwardStage                                 */
+	/************************************************************************/
+	Tracer->StartEvent("ForwardStage");
+	ForwardStage->Setup();
+	for (ZESize I = 0; I < CommandCount; ++I)
+	{
+		const ZECommandBufferEntry* Entry = CommandBuffer.GetEntry(I);
+		ProcessEntry(Entry, ForwardStage);
+	}
+	Tracer->EndEvent();
+	/************************************************************************/
+	/*                         ParticleStage                                */
+	/************************************************************************/
+	Tracer->StartEvent("ParticleStage");
+	for (ZESize I = 0; I < CommandCount; ++I)
+	{
+		const ZECommandBufferEntry* Entry = CommandBuffer.GetEntry(I);
+		ParticleStage->Setup();
+		ProcessEntry(Entry, ParticleStage);
+	}
+	Tracer->EndEvent();
 
 	zeGraphics->GetDevice()->Present();
+
+	CommandBuffer.Clear();
 }
 
 ZERenderer* ZERenderer::CreateInstance()
@@ -317,13 +369,10 @@ ZERenderer* ZERenderer::CreateInstance()
 
 ZERenderer::ZERenderer()
 {
-	GeometryStage = NULL;
-	LightingStage = NULL;
-	ForwardStage = NULL;
-	TransparentStage = NULL;
-	PostProcessStage = NULL;
-
 	ShadowMapDimesion = ZEVector2(1024.0f, 1024.0f);
+
+// 	memset(StageStatusTable, 0, sizeof(bool) * ZE_MAX_STAGE_COUNT);
+// 	memset(StageLookupTable, 0, sizeof(ZESize) * ZE_MAX_STAGE_COUNT);
 }
 
 ZERenderer::~ZERenderer()

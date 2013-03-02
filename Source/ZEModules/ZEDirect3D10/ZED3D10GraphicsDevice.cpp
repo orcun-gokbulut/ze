@@ -75,6 +75,7 @@ inline D3D10_PRIMITIVE_TOPOLOGY ZEPrimitiveTypeToD3D10(ZEPrimitiveType Primitive
 void ZED3D10GraphicsDevice::ApplyStates()
 {
 	bool Commit = false;
+	ZEStatePool* StatePool = zeGraphics->GetStatePool();
 
 	/************************************************************************/
 	/*                         Output Stage                                 */
@@ -131,7 +132,7 @@ void ZED3D10GraphicsDevice::ApplyStates()
 				D3D10Device->OMSetRenderTargets(ZE_MAX_RENDER_TARGET_SLOT, D3D10Targets, D3D10DepthStencil);
 			}
 		}
-	
+		
 		// Blend State
 		// ----------------------------------------------------------
 		CurrentState.BlendState.UpdateHash();
@@ -139,9 +140,7 @@ void ZED3D10GraphicsDevice::ApplyStates()
 			CurrentState.ComponentBlendMask != OldState.ComponentBlendMask || 
 			CurrentState.ComponentBlendFactors != OldState.ComponentBlendFactors)
 		{
-			//static const ZEVector4 BlendFactor = ZEVector4::One;
-
-			ID3D10BlendState* D3D10State = ZED3D10StatePool::GetBlendState(&CurrentState.BlendState);
+			ID3D10BlendState* D3D10State = (ID3D10BlendState*)StatePool->CreateState(&CurrentState.BlendState);
 			D3D10Device->OMSetBlendState(D3D10State, CurrentState.ComponentBlendFactors.M, CurrentState.ComponentBlendMask.Value);
 
 			OldState.BlendState = CurrentState.BlendState;
@@ -155,7 +154,7 @@ void ZED3D10GraphicsDevice::ApplyStates()
 		if (CurrentState.DepthStencilState.Hash != OldState.DepthStencilState.Hash || 
 			CurrentState.StencilReferance != OldState.StencilReferance)
 		{
-			ID3D10DepthStencilState* D3D10State = ZED3D10StatePool::GetDepthStencilState(&CurrentState.DepthStencilState);
+			ID3D10DepthStencilState* D3D10State = (ID3D10DepthStencilState*)StatePool->CreateState(&CurrentState.DepthStencilState);
 			D3D10Device->OMSetDepthStencilState(D3D10State, CurrentState.StencilReferance);
 
 			OldState.DepthStencilState = CurrentState.DepthStencilState;
@@ -203,7 +202,7 @@ void ZED3D10GraphicsDevice::ApplyStates()
 
 			if (CurrentState.PixelShaderSamplers[I].Hash != OldState.PixelShaderSamplers[I].Hash)
 			{
-				ID3D10SamplerState* D3D10Sampler = ZED3D10StatePool::GetSamplerState(&CurrentState.PixelShaderSamplers[I]);
+				ID3D10SamplerState* D3D10Sampler = (ID3D10SamplerState*)StatePool->CreateState(&CurrentState.PixelShaderSamplers[I]);
 
 				OldState.PixelShaderSamplers[I] = CurrentState.PixelShaderSamplers[I];
 				D3D10Device->PSSetSamplers((UINT)I, 1, &D3D10Sampler);
@@ -250,7 +249,7 @@ void ZED3D10GraphicsDevice::ApplyStates()
 		CurrentState.RasterizerState.UpdateHash();
 		if (CurrentState.RasterizerState.Hash != OldState.RasterizerState.Hash)
 		{
-			ID3D10RasterizerState* D3D10State = ZED3D10StatePool::GetRasterizerState(&CurrentState.RasterizerState);
+			ID3D10RasterizerState* D3D10State = (ID3D10RasterizerState*)StatePool->CreateState(&CurrentState.RasterizerState);
 			D3D10Device->RSSetState(D3D10State);
 
 			OldState.RasterizerState = CurrentState.RasterizerState;
@@ -346,7 +345,7 @@ void ZED3D10GraphicsDevice::ApplyStates()
 
 			if (CurrentState.GeometryShaderSamplers[I].Hash != OldState.GeometryShaderSamplers[I].Hash)
 			{
-				ID3D10SamplerState* D3D10Sampler = ZED3D10StatePool::GetSamplerState(&CurrentState.GeometryShaderSamplers[I]);
+				ID3D10SamplerState* D3D10Sampler = (ID3D10SamplerState*)StatePool->CreateState(&CurrentState.GeometryShaderSamplers[I]);
 			
 				OldState.GeometryShaderSamplers[I] = CurrentState.GeometryShaderSamplers[I];
 				D3D10Device->GSSetSamplers((UINT)I, 1, &D3D10Sampler);
@@ -422,13 +421,11 @@ void ZED3D10GraphicsDevice::ApplyStates()
 		// ----------------------------------------------------------
 		for (ZESize I = 0; I < ZE_MAX_SAMPLER_SLOT; ++I)
 		{
-			ID3D10SamplerState* D3D10Sampler = NULL;
-
 			CurrentState.VertexShaderSamplers[I].UpdateHash();
 
 			if (CurrentState.VertexShaderSamplers[I].Hash != OldState.VertexShaderSamplers[I].Hash)
 			{
-				D3D10Sampler = ZED3D10StatePool::GetSamplerState(&CurrentState.VertexShaderSamplers[I]);
+				ID3D10SamplerState* D3D10Sampler = (ID3D10SamplerState*)StatePool->CreateState(&CurrentState.VertexShaderSamplers[I]);
 			
 				OldState.VertexShaderSamplers[I] = CurrentState.VertexShaderSamplers[I];
 				D3D10Device->VSSetSamplers((UINT)I, 1, &D3D10Sampler);
@@ -477,12 +474,12 @@ void ZED3D10GraphicsDevice::ApplyStates()
 		if (CurrentState.VertexLayout.Hash != OldState.VertexLayout.Hash && !CurrentState.VertexLayout.IsEmpty())
 		{
 			// User defined vertex layout
-			Layout = ZED3D10StatePool::GetVertexLayout(&CurrentState.VertexLayout, CurrentState.VertexShader);
+			Layout = (ID3D10InputLayout*)StatePool->CreateState(&CurrentState.VertexLayout, CurrentState.VertexShader);
 		}
 		else
 		{
 			// Automatic layout
-			Layout = ZED3D10StatePool::GetVertexLayout(&CurrentState.VertexShader->DefaultVertexLayout, CurrentState.VertexShader);
+			Layout = (ID3D10InputLayout*)StatePool->CreateState(&CurrentState.VertexShader->DefaultVertexLayout, CurrentState.VertexShader);
 		}
 	
 		// If layout is different

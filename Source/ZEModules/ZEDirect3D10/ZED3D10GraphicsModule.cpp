@@ -53,6 +53,8 @@
 #include "ZECore/ZEOptionManager.h"
 #include "ZED3D10DepthStencilBuffer.h"
 #include "ZED3D10EventTracer.h"
+#include "ZED3D10StatePool.h"
+#include "ZEGraphics/ZEStatePool.h"
 
 #pragma warning(disable:4267)
 
@@ -208,32 +210,58 @@ bool ZED3D10GraphicsModule::Initialize()
 		Deinitialize();
 		return false;
 	}
-	
-	// Create an adapter for the video card
-	if(FAILED(Factory->EnumAdapters(0, &Adapter)))
+
+	VideoCardName = "Unknown Adapter.";
+
+	// Enumerate and choose adapter
+	UINT AdapterId = 0;
+	IDXGIAdapter* TempAdapter = NULL;
+	D3D10_DRIVER_TYPE DriverType = D3D10_DRIVER_TYPE_HARDWARE;
+	while (Factory->EnumAdapters(AdapterId, &TempAdapter) != DXGI_ERROR_NOT_FOUND)
 	{
-		zeCriticalError("Cannot create adapter.");
+		if (TempAdapter != NULL)
+		{
+			AdapterId++;
+			Adapter = TempAdapter;
+
+			// Get adapter info
+			DXGI_ADAPTER_DESC AdapterDesc;
+			if(FAILED(Adapter->GetDesc(&AdapterDesc)))
+			{
+				zeWarning("Cannot get adapter descriptor.");
+				continue;
+			}
+
+			ZEUInt MemoryMb = (ZEUInt)(AdapterDesc.DedicatedVideoMemory / 1024 / 1024);
+			VideoCardName = ZEString::FromUInt32(MemoryMb);
+			VideoCardName += "MB - ";
+			VideoCardName += ZEString::FromWCString(AdapterDesc.Description);
+
+#ifdef ZE_DEBUG_ENABLE
+			// Is it NVIDIA PerfHUD adapter ?
+			if (wcscmp(AdapterDesc.Description, L"NVIDIA PerfHUD") == 0)
+			{
+				DriverType = D3D10_DRIVER_TYPE_REFERENCE;
+				break;
+			}
+#endif
+		}
+	}
+	if (AdapterId == 0)
+	{
+		zeCriticalError("Cannot enumerate adapters.");
 		Deinitialize();
 		return false;
 	}
-	
-	// Get video card info
-	DXGI_ADAPTER_DESC AdapterDesc;
-	if(SUCCEEDED(Adapter->GetDesc(&AdapterDesc)))
-	{
-		ZEUInt MemoryMb = (ZEUInt)(AdapterDesc.DedicatedVideoMemory / 1024 / 1024);
-		VideoCardName = ZEString::FromUInt32(MemoryMb);
-		VideoCardName += "MB - ";
-		VideoCardName += ZEString::FromWCString(&AdapterDesc.Description[0]);
-	}
-	
+
 	UINT DeviceFlags = 0;
 #ifdef ZE_DEBUG_ENABLE
 	//DeviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
 #endif
 
 	// Create the device
-	if(FAILED(D3D10CreateDevice(Adapter, D3D10_DRIVER_TYPE_HARDWARE, NULL, DeviceFlags, D3D10_SDK_VERSION, &Device)))
+	HRESULT Result = D3D10CreateDevice(Adapter, DriverType, NULL, DeviceFlags, D3D10_SDK_VERSION, &Device);
+	if(FAILED(Result))
 	{
 		zeCriticalError("Cannot create device.");
 		Deinitialize();
@@ -270,7 +298,7 @@ bool ZED3D10GraphicsModule::Initialize()
 	// Initialize component base
 	if (!ZED3D10ComponentBase::BaseInitialize(this))
 	{
-		zeCriticalError("Can not initialize D3D9 component base.");
+		zeCriticalError("Can not initialize D3D10 component base.");
 		Deinitialize();
 		return false;
 	}
@@ -308,7 +336,7 @@ bool ZED3D10GraphicsModule::Initialize()
 	SwapChainDesc.OutputWindow = (HWND)zeCore->GetWindow()->GetHandle();
 	SwapChainDesc.SampleDesc.Count = SampleCount;
 	SwapChainDesc.SampleDesc.Quality = SampleQuality != 0 ? SampleQuality - 1 : SampleQuality;
-	
+
 	// Create swap chain
 	if (FAILED(Factory->CreateSwapChain(Device, &SwapChainDesc, &SwapChain)))
 	{
@@ -476,6 +504,12 @@ ZEShaderCompiler* ZED3D10GraphicsModule::GetShaderCompiler() const
 {
 	static ZED3D10ShaderCompiler Compiler;
 	return &Compiler;
+}
+
+ZEStatePool* ZED3D10GraphicsModule::GetStatePool() const
+{
+	static ZED3D10StatePool Pool;
+	return &Pool;
 }
 
 ZEIndexBuffer* ZED3D10GraphicsModule::CreateIndexBuffer() const

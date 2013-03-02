@@ -223,7 +223,22 @@ void ZERenderStageGeometry::Process(ZERenderCommand* RenderCommand)
 	zeGraphics->GetEventTracer()->EndEvent();
 }
 
+void ZERenderStageGeometry::SetStageConfiguration(const ZERenderStageConfiguration* Config)
+{
+	
+}
+
 ZEUInt32 ZERenderStageGeometry::GetStageFlags() const
+{
+	return 0;
+}
+
+ZEUInt32 ZERenderStageGeometry::GetDependencies() const
+{
+	return ZE_RENDER_STAGE_NONE;
+}
+
+ZEUInt32 ZERenderStageGeometry::GetStageIndentifier() const
 {
 	return ZE_RENDER_STAGE_GEOMETRY;
 }

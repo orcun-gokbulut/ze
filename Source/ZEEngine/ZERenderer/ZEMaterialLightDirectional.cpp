@@ -169,7 +169,7 @@ void ZEMaterialLightDirectional::UpdateMaterial()
 
 bool ZEMaterialLightDirectional::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
-	if ((Stage->GetStageFlags() & ZE_RENDER_STAGE_LIGHTING) == 0)
+	if ((Stage->GetStageIndentifier() & ZE_RENDER_STAGE_LIGHTING) == 0)
 		return true;
 
 	return SetupLightingPass(Stage, RenderCommand);

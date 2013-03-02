@@ -69,7 +69,7 @@ void ZEVertexLayout::SetToDefault()
 	Hash = 0;
 	Dirty = false;
 
-	StateData.ElementCount = 0;
+	memset(&StateData, 0, sizeof(ZEVertexLayoutData));
 }
 
 void ZEVertexLayout::SetLayout(const ZEVertexElement* VertexElements, ZEUInt ElementCount)
@@ -128,7 +128,6 @@ bool ZEVertexLayout::operator!=(const ZEVertexLayout& State)
 
 ZEVertexLayout::ZEVertexLayout()
 {
-	memset(&StateData, 0, sizeof(ZEVertexLayoutData));
 	SetToDefault();
 }
 

@@ -45,6 +45,7 @@
 #define zeGraphics ZEGraphicsModule::GetInstance()
 
 class ZEShader;
+class ZEStatePool;
 class ZETexture2D;
 class ZETexture3D;
 class ZETextureCube;
@@ -126,9 +127,10 @@ class ZEGraphicsModule : public ZEModule
 		const ZEDepthStencilBuffer*		GetDepthBuffer(ZESize Index = 0) const;
 
 		virtual ZEGraphicsDevice*		GetDevice() const = 0;
+		virtual ZEStatePool*			GetStatePool() const = 0;
 		virtual ZEGraphicsEventTracer*	GetEventTracer() const = 0;
 		virtual ZEShaderCompiler*		GetShaderCompiler() const = 0;
-
+		
 		virtual ZETexture2D*			CreateTexture2D() const = 0;
 		virtual ZETexture3D*			CreateTexture3D() const = 0;
 		virtual ZETextureCube*			CreateTextureCube() const = 0;

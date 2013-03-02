@@ -63,10 +63,10 @@ class ZERenderStageTransparent : public ZERenderStage
 		void					DestroyBuffers();
 
 	public:
-		ZEUInt32				GetStageFlags() const;
-		
+		virtual ZEUInt32		GetStageFlags() const;
+		virtual ZEUInt32		GetDependencies() const;
+		virtual ZEUInt32		GetStageIndentifier() const;
 
-		
 		void					Process(const ZERenderCommand* RenderCommand);
 		void					Setup();
 

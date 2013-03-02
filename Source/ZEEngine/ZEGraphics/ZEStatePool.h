@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERasterizerState.cpp
+ Zinek Engine - ZEStatePool.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,95 +33,42 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERasterizerState.h"
-#include "ZEDS/ZEHashGenerator.h"
+#pragma once
+#ifndef __ZE_STATE_POOL_H__
+#define __ZE_STATE_POOL_H__
 
-void ZERasterizerState::UpdateHash()
+#include "ZETypes.h"
+
+class ZEShader;
+class ZEBlendState;
+class ZESamplerState;
+class ZEVertexLayout;
+class ZERasterizerState;
+class ZEDepthStencilState;
+
+#define	ZE_D3D10_STATE_CACHE_CAPACITY	128
+
+class ZEStatePool
 {
-	if (Dirty)
-	{
-		Hash = 0;
-		Dirty = false;
-		ZEHashGenerator::Hash(Hash, &StateData, sizeof(ZERasterizerStateData));
-	}
-}
+	protected:
+		
+								ZEStatePool();
+		virtual					~ZEStatePool();
 
-void ZERasterizerState::SetFillMode(ZEFillMode Mode)
-{
-	if (StateData.FillMode != Mode)
-	{
-		StateData.FillMode = Mode;
-		Dirty = true;
-	}
-}
+	public:
+		virtual void			ClearStates() = 0;
 
-ZEFillMode ZERasterizerState::GetFillMode() const
-{
-	return StateData.FillMode;
-}
+		virtual void*			GetBlendState(ZESize Hash) = 0;
+		virtual void*			GetSamplerState(ZESize Hash) = 0;
+		virtual void*			GetVertexLayout(ZESize Hash) = 0;
+		virtual void*			GetRasterizerState(ZESize Hash) = 0;
+		virtual void*			GetDepthStencilState(ZESize Hash) = 0;
+		
+		virtual void*			CreateState(const ZEBlendState* BlendState) = 0;
+		virtual void*			CreateState(const ZESamplerState* SamplerState) = 0;
+		virtual void*			CreateState(const ZERasterizerState* RasterizerState) = 0;
+		virtual void*			CreateState(const ZEDepthStencilState* DepthStencilState) = 0;
+		virtual void*			CreateState(const ZEVertexLayout* VertexLayout, const ZEShader* VertexShader) = 0;
+};
 
-void ZERasterizerState::SetCullDirection(ZECullDirection Direction)
-{
-	if (StateData.CullDirection != Direction)
-	{
-		StateData.CullDirection = Direction;
-		Dirty = true;
-	}
-}
-
-ZECullDirection ZERasterizerState::GetCullDirection() const
-{
-	return StateData.CullDirection;
-}
-
-void ZERasterizerState::SetFrontIsCounterClockwise(bool IsCounterClockwise)
-{
-	if (StateData.FrontIsCounterClockwise != IsCounterClockwise)
-	{
-		StateData.FrontIsCounterClockwise = IsCounterClockwise;
-		Dirty = true;
-	}
-}
-
-bool ZERasterizerState::GetFrontIsCounterClockwise() const
-{
-	return StateData.FrontIsCounterClockwise;
-}
-
-void ZERasterizerState::SetToDefault()
-{
-	Hash = 0;
-	Dirty = false;
-
-	StateData.FillMode = ZE_FM_SOLID;
-	StateData.CullDirection = ZE_CD_COUNTER_CLOCKWISE;
-	StateData.FrontIsCounterClockwise = false;
-}
-
-const ZERasterizerState& ZERasterizerState::operator=(const ZERasterizerState& State)
-{
-	Hash = State.Hash;
-	Dirty = State.Dirty;
-	memcpy(&StateData, &State.StateData, sizeof(ZERasterizerStateData));
-	return *this;
-}
-
-bool ZERasterizerState::operator==(const ZERasterizerState& State)
-{
-	return memcmp(&StateData, &State.StateData, sizeof(ZERasterizerStateData)) == 0 ? true : false;
-}
-
-bool ZERasterizerState::operator!=(const ZERasterizerState& State)
-{
-	return !operator==(State);
-}
-
-ZERasterizerState::ZERasterizerState()
-{
-	SetToDefault();
-}
-
-ZERasterizerState::~ZERasterizerState()
-{
-
-}
+#endif

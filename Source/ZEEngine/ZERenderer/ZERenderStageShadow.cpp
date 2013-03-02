@@ -47,14 +47,7 @@
 
 void ZERenderStageShadow::DestroyShaders()
 {
-	ZE_DESTROY(Shaders.PointLightVS);
-	ZE_DESTROY(Shaders.PointLightPS);
-	ZE_DESTROY(Shaders.ProjectiveLightVS);
-	ZE_DESTROY(Shaders.ProjectiveLightPS);
-	ZE_DESTROY(Shaders.DirectionalLightVS);
-	ZE_DESTROY(Shaders.DirectionalLightPS);
-	ZE_DESTROY(Shaders.OmniProjectiveLightVS);
-	ZE_DESTROY(Shaders.OmniProjectiveLightPS);
+
 }
 
 void ZERenderStageShadow::UpdateShaders()
@@ -209,40 +202,19 @@ void ZERenderStageShadow::CommitStageDefaults()
 	Device->SetScissorRectangle(0, DefaultStates.ScissorRectangles[0]);
 }
 
-void ZERenderStageShadow::RenderShadowPointLight(const ZELightPoint* Light)
-{
-	zeCriticalError("Not implemented yet");
-}
-
-void ZERenderStageShadow::RenderShadowProjectiveLight(const ZELightProjective* Light)
-{
-	zeCriticalError("Not implemented yet");
-}
-
-void ZERenderStageShadow::RenderShadowDirectionalLight(const ZELightDirectional* Light)
-{
-	zeCriticalError("Not implemented yet");
-}
-
-void ZERenderStageShadow::RenderShadowOmniProjectiveLight(const ZELightOmniProjective* Light)
-{
-	zeCriticalError("Not implemented yet");
-}
-
 ZEUInt32 ZERenderStageShadow::GetStageFlags() const
 {
+	return 0;
+}
+
+ZEUInt32 ZERenderStageShadow::GetDependencies() const
+{
+	return ZE_RENDER_STAGE_NONE;
+}
+
+ZEUInt32 ZERenderStageShadow::GetStageIndentifier() const
+{
 	return ZE_RENDER_STAGE_SHADOW;
-}
-
-void ZERenderStageShadow::SetLightList(ZESmartArray<ZELight*>* Lights)
-{
-	zeDebugCheck(Lights == NULL, "Null pointer.");
-	LightList = Lights;
-}
-
-ZESmartArray<ZELight*>* ZERenderStageShadow::GetLightList() const
-{
-	return LightList;
 }
 
 void ZERenderStageShadow::Setup()
@@ -258,63 +230,16 @@ void ZERenderStageShadow::Setup()
 
 void ZERenderStageShadow::Process(ZERenderCommand* RenderCommand)
 {
-	// Be sure our array is large enough
-	CommandList.SetCount(zeScene->GetEntities().GetCount());
-
-	ZESize LightCount = LightList->GetCount();
 	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
+}
 
-	for (ZESize I = 0; I < LightCount; ++I)
-	{
-		ZELight* Light = LightList->GetItem(I);
-		ZELightType Type = Light->GetLightType();
-
-		if (!Light->GetShadowCaster())
-			continue;
-
-		switch(Type)
-		{
-			case ZE_LT_POINT:
-				Tracer->StartEvent("Point Light Shadow Pass");
-				RenderShadowPointLight((ZELightPoint*)Light);
-				Tracer->EndEvent();
-				break;
-			
-			case ZE_LT_DIRECTIONAL:
-				Tracer->StartEvent("Directional Light Shadow Pass");
-				RenderShadowDirectionalLight((ZELightDirectional*)Light);
-				Tracer->EndEvent();
-				break;
-
-			case ZE_LT_PROJECTIVE:
-				Tracer->StartEvent("Projective Light Shadow Pass");
-				RenderShadowProjectiveLight((ZELightProjective*)Light);
-				Tracer->EndEvent();
-				break;
-
-			case ZE_LT_OMNIPROJECTIVE:
-				Tracer->StartEvent("Omni Projective Light Shadow Pass");
-				RenderShadowOmniProjectiveLight((ZELightOmniProjective*)Light);
-				Tracer->EndEvent();
-				break;
-		}
-	}
+void ZERenderStageShadow::SetStageConfiguration(const ZERenderStageConfiguration* Config)
+{
+	
 }
 
 ZERenderStageShadow::ZERenderStageShadow()
 {
-	LightList = NULL;
-	CommandList.Clear(false);
-
-	Shaders.PointLightVS = NULL;
-	Shaders.PointLightPS = NULL;
-	Shaders.ProjectiveLightVS = NULL;
-	Shaders.ProjectiveLightPS = NULL;
-	Shaders.DirectionalLightVS = NULL;
-	Shaders.DirectionalLightPS = NULL;
-	Shaders.OmniProjectiveLightVS = NULL;
-	Shaders.OmniProjectiveLightPS = NULL;
-
 	RenderTargets.DepthStencilBuffer = NULL;
 }
 

@@ -47,24 +47,14 @@ class ZELightProjective;
 class ZELightDirectional;
 class ZELightOmniProjective;
 
+class ZERenderStageShadowConfiguration
+{
+	
+};
+
 class ZERenderStageShadow : public ZERenderStage
 {
 	protected:
-		ZESmartArray<ZELight*>*			LightList;
-		ZESmartArray<ZERenderCommand>	CommandList;
-
-		struct
-		{
-			ZEShader*					PointLightVS;
-			ZEShader*					PointLightPS;
-			ZEShader*					ProjectiveLightVS;
-			ZEShader*					ProjectiveLightPS;
-			ZEShader*					DirectionalLightVS;
-			ZEShader*					DirectionalLightPS;
-			ZEShader*					OmniProjectiveLightVS;
-			ZEShader*					OmniProjectiveLightPS;
-
-		} Shaders;
 
 		struct
 		{
@@ -81,19 +71,15 @@ class ZERenderStageShadow : public ZERenderStage
 		void							ResetStageDefaults();
 		void							CommitStageDefaults();
 
-		void							RenderShadowPointLight(const ZELightPoint* Light);
-		void							RenderShadowProjectiveLight(const ZELightProjective* Light);
-		void							RenderShadowDirectionalLight(const ZELightDirectional* Light);
-		void							RenderShadowOmniProjectiveLight(const ZELightOmniProjective* Light);
-
 	public:
-		ZEUInt32						GetStageFlags() const;
+		virtual ZEUInt32				GetStageFlags() const;
+		virtual ZEUInt32				GetDependencies() const;
+		virtual ZEUInt32				GetStageIndentifier() const;
 
-		void							SetLightList(ZESmartArray<ZELight*>* Lights);
-		ZESmartArray<ZELight*>*			GetLightList() const;
+		virtual void					Setup();
+		virtual void					Process(ZERenderCommand* RenderCommand);
 
-		void							Setup();
-		void							Process(ZERenderCommand* RenderCommand);
+		virtual void					SetStageConfiguration(const ZERenderStageConfiguration* Config);
 
 										ZERenderStageShadow();
 		virtual							~ZERenderStageShadow();

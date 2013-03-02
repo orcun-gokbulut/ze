@@ -71,14 +71,18 @@ class ZERenderStageGeometry : public ZERenderStage
 		void					DestroyBuffers();
 
 	public:
-		ZEUInt32				GetStageFlags() const;
-		
+		virtual ZEUInt32		GetStageFlags() const;
+		virtual ZEUInt32		GetDependencies() const;
+		virtual ZEUInt32		GetStageIndentifier() const;
+
 		const ZETexture2D*		GetGBuffer1() const;
 		const ZETexture2D*		GetGBuffer2() const;
 		const ZETexture2D*		GetGBuffer3() const;
 		
-		void					Setup();
-		void					Process(ZERenderCommand* RenderCommand);
+		virtual void			Setup();
+		virtual void			Process(ZERenderCommand* RenderCommand);
+
+		virtual void			SetStageConfiguration(const ZERenderStageConfiguration* Config);
 		
 								ZERenderStageGeometry();
 		virtual					~ZERenderStageGeometry();

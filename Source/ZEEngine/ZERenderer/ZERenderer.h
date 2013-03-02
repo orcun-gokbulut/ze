@@ -32,106 +32,125 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-
 #ifndef __ZE_RENDERER_H__
 #define __ZE_RENDERER_H__
 
 #include "ZETypes.h"
+#include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEGame/ZEDrawParameters.h"
 
-class ZELight;
-class ZECamera;
-class ZERenderCommand;
-struct ZEDrawParameters;
-class ZERenderStageShadow;
-class ZERenderStageForward;
-class ZERenderStageParticle;
-class ZERenderStageGeometry;
-class ZERenderStageLighting;
-class ZERenderStageTransparent;
-class ZERenderStagePostProcess;
-class ZERenderStageUserInterface;
+#define ZE_CBET_RENDER_STAGE_SETUP		0x00000004
+#define ZE_CBET_RENDERER_SETUP			0x00000002
+#define ZE_CBET_RENDER_COMMAND			0x00000001
+#define ZE_CBET_NONE					0x00000000
+typedef ZEUInt32 ZECommandBufferEntryType;
 
-#define	ZE_COMMAND_BUFFER_SIZE					1024 * 1024	// 1 MB
+#define	ZE_COMMAND_BUFFER_SIZE			1024 * 1024	* 1		// 1 MB
 
-#define ZE_CMB_COMMAND							0xFFFFFFFF
-#define ZE_CBM_RENDER_START						0x01
-#define ZE_CBM_RENDER_END						0x02
-#define ZE_CBM_FRAME_START						0x03
-#define ZE_CBM_FRAME_END						0x04
-#define ZE_CBM_FRAME_RENDER_COMMAND_START		0x05
-#define ZE_CBM_FRAME_RENDER_COMMAND_END			0x06
-#define ZE_CBM_FRAME_RENDER_COMMAND_TYPE		0x07
-#define ZE_CBM_FRAME_RENDER_COMMAND_DATA		0x08
+class ZECommandBufferEntry
+{
+	public:
+		ZEUInt32					EntryType;
+		ZESize						DataSize;
+		const void*					Data;
 
-/*
+									ZECommandBufferEntry();
+									~ZECommandBufferEntry();
+};
+
+typedef ZEArray<ZECommandBufferEntry> ZECommandList;
+
 class ZECommandBuffer
 {
 	private:
-		ZESize					BufferPointer;
-		void*					CommandBuffer;
-		ZESize					RenderEndMarker;
-		ZESize					RenderStartMarker;
-	
+		void*						Buffer;
+		ZESize						EndOfBuffer;
+
+		ZECommandList				CommandList;
+
 	public:
-		bool					CheckBufferFull(ZESize Size) const;
-		
-		bool					ReadCommand(ZEUInt32* Marker, void* Data, ZESize* Size);
-		bool					WriteCommand(ZEUInt32 Marker, const void* Data, ZESize Size);
-		
-								ZECommandBuffer();
-								~ZECommandBuffer();
+		void						Clear();
+
+		bool						BufferEmpty() const;
+		ZESize						GetCommandCount() const;
+
+		const ZECommandBufferEntry*	GetEntry(ZESize Index);
+		bool						AddEntry(const ZECommandBufferEntry& Entry);
+
+									ZECommandBuffer();
+									~ZECommandBuffer();
 };
-*/
+
+/************************************************************************/
+/*							 RENDERER SETUP								*/
+/************************************************************************/
+class ZERenderStage;
+
+class ZERendererConfiguration
+{
+	public:
+		ZESize					Size;
+		ZEArray<ZERenderStage*>	StageList;
+		
+								ZERendererConfiguration(){};
+								~ZERendererConfiguration(){};
+};
+
+
+class ZERenderStage;
+class ZERenderStageConfiguration;
+class ZERenderCommand;
+
+class ZERenderStageShadow;
+class ZERenderStageForward;
+class ZERenderStageGeometry;
+class ZERenderStageLighting;
+class ZERenderStageParticle;
+
+#define ZE_MAX_STAGE_COUNT		32
 
 class ZERenderer
 {
 	protected:
-		/*ZECommandBuffer					CommandBuffer;*/
+		ZECommandBuffer			CommandBuffer;
 
-		ZERenderStageGeometry*				GeometryStage;
-		ZERenderStageShadow*				ShadowStage;
-		ZERenderStageLighting*				LightingStage;
-		ZERenderStageForward*				ForwardStage;
-		ZERenderStageTransparent*			TransparentStage;
-		ZERenderStagePostProcess*			PostProcessStage;
-		ZERenderStageUserInterface*			UserInterfaceStage;
-		ZERenderStageParticle*				ParticleStage;
+		/*
+		ZEArray<ZERenderStage*>	StageList;
+		ZESize					StageLookupTable[ZE_MAX_STAGE_COUNT];
+		bool					StageStatusTable[ZE_MAX_STAGE_COUNT];
+		*/
 
-		ZEDrawParameters					DrawParameters;
-		ZESmartArray<ZERenderCommand*>		CommandList;
+		ZERenderStageShadow*	ShadowStage;
+		ZERenderStageForward*	ForwardStage;
+		ZERenderStageGeometry*	GeometryStage;
+		ZERenderStageLighting*	LightingStage;
+		ZERenderStageParticle*	ParticleStage;
 
-		ZEVector2							ShadowMapDimesion;
+		ZEVector2				ShadowMapDimesion;
 
-											ZERenderer();
-		virtual								~ZERenderer();
+		bool					ProcessEntry(const ZECommandBufferEntry* Entry, ZERenderStage* Stage);
 
-		void								DoShadowPass();
-		void								DoGeomtryPass();
-		void								DoForwardPass();
-		void								DoLightingPass();
-		void								DoParticlePass();
-		void								DoTransparentPass();
-		void								DoPostProcessPass();
-		void								DoUserInterfacePass();
+								ZERenderer();
+		virtual					~ZERenderer();
 
 	public:
-		virtual void						AddRenderCommand(ZERenderCommand* RenderCommand);
+		virtual void			AddRenderCommand(const ZERenderCommand* Command);
+		virtual void			AddRendererConfiguration(const ZERendererConfiguration* Config);
+		virtual void			AddRenderStageConfiguration(const ZERenderStageConfiguration* Config);
+		
+		virtual void			SetRendererConfiguration(const ZERendererConfiguration* Config);
 
-		void								SetDrawParameters(const ZEDrawParameters& Parameters);
-		const ZEDrawParameters&				GetDrawParameters() const;
+		void					SetShadowMapDimension(ZEVector2 Value);
+		ZEVector2				GetShadowMapDimension() const;
 
-		void								SetShadowMapDimension(ZEVector2 Value);
-		ZEVector2							GetShadowMapDimension() const;
+		virtual void			Render(float ElaspedTime);
 
-		virtual void						Render(float ElaspedTime);
+		virtual bool			Initialize();
+		virtual void			Deinitialize();
 
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
+		virtual void			Destroy();
 
-		virtual void						Destroy();
-		static ZERenderer*					CreateInstance();
+		static ZERenderer*		CreateInstance();
 };
 
 #endif
