@@ -218,7 +218,7 @@ ZETextureAddressMode ZEMaterialSimple::GetTextureAddressModeV() const
 
 bool ZEMaterialSimple::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
-	if (Stage->GetStageFlags() != ZE_RENDER_STAGE_FORWARD)
+	if (Stage->GetStageIndentifier() != ZE_RENDER_STAGE_FORWARD)
 		return true;
 
 	ZECamera* Camera = zeScene->GetActiveCamera();

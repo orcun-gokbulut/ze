@@ -63,8 +63,7 @@ void ZERenderStageParticle::ResetStageDefaults()
 	ZERenderStage::ResetStageDefaults();
 	
 	// Outputs
-	DefaultStates.ScreenWriteEnable = true;
-	DefaultStates.RenderTargets[0] = ABufferInput->GetABufferRenderTarget();
+	DefaultStates.RenderTargets[0] = ABufferInput->GetOutputAccumulationRenderTarget();
 	DefaultStates.DepthStencilBuffer = zeGraphics->GetDepthBuffer();
 
 	// Use default viewport and scissor rectangles
@@ -135,17 +134,27 @@ void ZERenderStageParticle::DestroyBuffers()
 
 ZEUInt32 ZERenderStageParticle::GetStageFlags() const
 {
+	return 0;
+}
+
+ZEUInt32 ZERenderStageParticle::GetDependencies() const
+{
+	return ZE_RENDER_STAGE_FORWARD;
+}
+
+ZEUInt32 ZERenderStageParticle::GetStageIndentifier() const
+{
 	return ZE_RENDER_STAGE_PARTICLE;
 }
-		
-void ZERenderStageParticle::SetABufferInput(const ZERenderStageForward* Input)
+
+void ZERenderStageParticle::SetInputAccumulationStage(const ZERenderStageForward* Input)
 {
 	zeDebugCheck(Input == NULL, "Null pointer.");
 
 	ABufferInput = Input;
 }
 
-const ZERenderStageForward* ZERenderStageParticle::GetABufferInput() const
+const ZERenderStageForward* ZERenderStageParticle::GetInputAccumulationStage() const
 {
 	return ABufferInput;
 }
@@ -179,6 +188,11 @@ void ZERenderStageParticle::Process(ZERenderCommand* RenderCommand)
 	PumpStreams(RenderCommand);
 
 	zeGraphics->GetEventTracer()->EndEvent();
+}
+
+void ZERenderStageParticle::SetStageConfiguration(const ZERenderStageConfiguration* Config)
+{
+	
 }
 
 ZERenderStageParticle::ZERenderStageParticle()

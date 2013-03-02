@@ -58,13 +58,17 @@ class ZERenderStageParticle : public ZERenderStage
 		void							DestroyBuffers();
 
 	public:
-		ZEUInt32						GetStageFlags() const;
+		virtual ZEUInt32				GetStageFlags() const;
+		virtual ZEUInt32				GetDependencies() const;
+		virtual ZEUInt32				GetStageIndentifier() const;
+
+		void							SetInputAccumulationStage(const ZERenderStageForward* Input);
+		const ZERenderStageForward*		GetInputAccumulationStage() const;
 		
-		void							SetABufferInput(const ZERenderStageForward* Input);
-		const ZERenderStageForward*		GetABufferInput() const;
-		
-		void							Setup();
-		void							Process(ZERenderCommand* RenderCommand);
+		virtual void					Setup();
+		virtual void					Process(ZERenderCommand* RenderCommand);
+
+		virtual void					SetStageConfiguration(const ZERenderStageConfiguration* Config);
 		
 										ZERenderStageParticle();
 		virtual							~ZERenderStageParticle();

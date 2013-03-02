@@ -111,3 +111,18 @@ void ZEMaterial::Destroy()
 {
 	delete this;
 }
+
+/************************************************************************/
+/*                       NEW MATERIAL                                   */
+/************************************************************************/
+
+ZERenderProgram::ZERenderProgram()
+{
+	Shader = NULL;
+	memset(Buffers, 0, sizeof(const ZEConstantBuffer*) * ZE_MAX_BUFFER_SLOT);
+}
+	
+ZERenderProgram::~ZERenderProgram()
+{
+	
+}

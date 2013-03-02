@@ -73,24 +73,27 @@ typedef ZEUInt32 ZERenderCommandType;
 typedef ZEUInt32 ZERenderCommandFlags;
 
 class ZELight;
+class ZEMaterialNew;
 class ZEMaterial;
 class ZEIndexBuffer;
 class ZEVertexBuffer;
 class ZEVertexLayout;
 class ZERenderTarget;
 
+
 /************************************************************************/
 /*                        RENDER COMMAND TEST                           */
 /************************************************************************/
-
 class ZERenderCommandTest
 {
 	public:
+		ZESize					Size;
+
 		ZERenderCommandType		Type;
 		float					Order;
 		ZEInt32					Priority;
 
-		ZEMaterial*				Material;
+		ZEMaterialNew*			Material;
 
 		ZEPrimitiveType			PrimitiveType;
 		ZEUInt32				PrimitiveCount;
@@ -115,7 +118,7 @@ class ZERenderCommandIndexedTest : public ZERenderCommandTest
 								~ZERenderCommandIndexedTest();
 };
 
-class  ZERenderCommandInstancedTest : public ZERenderCommandTest
+class ZERenderCommandInstancedTest : public ZERenderCommandTest
 {
 	public:
 		ZEUInt32				InstanceCount;
@@ -131,6 +134,8 @@ class  ZERenderCommandInstancedTest : public ZERenderCommandTest
 class ZERenderCommand
 {
 	public:
+		ZESize					Size;
+
 		float					Order;
 		ZEInt					Priority;
 
@@ -148,9 +153,6 @@ class ZERenderCommand
 		ZEMaterial*				Material;
 		ZEMatrix4x4				WorldMatrix;
 		ZEMatrix4x4				LocalMatrix;
-
-		ZESize					DataSize;
-		void*					CustomData;
 
 								ZERenderCommand();
 								~ZERenderCommand();

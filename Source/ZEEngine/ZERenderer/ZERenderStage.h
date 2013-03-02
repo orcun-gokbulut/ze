@@ -39,13 +39,14 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEGraphics/ZEGraphicsDeviceState.h"
 
-#define ZE_RENDER_STAGE_GEOMETRY		1
-#define ZE_RENDER_STAGE_SHADOW			2
-#define ZE_RENDER_STAGE_LIGHTING		4
-#define ZE_RENDER_STAGE_FORWARD			8
-#define ZE_RENDER_STAGE_TRANSPARENT		16
-#define ZE_RENDER_STAGE_UI				32
-#define ZE_RENDER_STAGE_PARTICLE		64
+#define ZE_RENDER_STAGE_NONE			1
+#define ZE_RENDER_STAGE_GEOMETRY		2
+#define ZE_RENDER_STAGE_SHADOW			4
+#define ZE_RENDER_STAGE_LIGHTING		8
+#define ZE_RENDER_STAGE_FORWARD			16
+#define ZE_RENDER_STAGE_TRANSPARENT		32
+#define ZE_RENDER_STAGE_UI				64
+#define ZE_RENDER_STAGE_PARTICLE		128
 
 
 enum ZERenderStageConstant
@@ -78,6 +79,16 @@ class ZEMaterial;
 class ZERenderCommand;
 class ZEConstantBuffer;
 
+
+class ZERenderStageConfiguration
+{
+	public:
+		ZESize					Size;
+
+								ZERenderStageConfiguration(){};
+								~ZERenderStageConfiguration(){};
+};
+
 class ZERenderStage
 {
 	protected:
@@ -98,11 +109,15 @@ class ZERenderStage
 
 		virtual void					Destroy();
 
+		virtual ZEUInt32				GetStageFlags() const = 0;
+		virtual ZEUInt32				GetDependencies() const = 0;
+		virtual ZEUInt32				GetStageIndentifier() const = 0;
+		
 		virtual void					Setup() = 0;
 		virtual void					Process(ZERenderCommand* RenderCommand) = 0;
-
-		virtual ZEUInt32				GetStageFlags() const = 0;
-
+		
+		virtual void					SetStageConfiguration(const ZERenderStageConfiguration* Config) = 0;
+		
 										ZERenderStage();
 		virtual							~ZERenderStage();
 };

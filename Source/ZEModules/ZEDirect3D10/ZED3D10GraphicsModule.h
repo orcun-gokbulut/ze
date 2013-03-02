@@ -44,6 +44,7 @@
 
 class ZETexture2D;
 class ZETexture3D;
+class ZEStatePool;
 class ZETextureCube;
 class ZEIndexBuffer;
 class ZEVertexBuffer;
@@ -104,6 +105,7 @@ class ZED3D10GraphicsModule : public ZEGraphicsModule
 		virtual ZEGraphicsDevice*		GetDevice() const;
 		virtual ZEGraphicsEventTracer*	GetEventTracer() const;
 		virtual ZEShaderCompiler*		GetShaderCompiler() const;
+		virtual ZEStatePool*			GetStatePool() const;
 
 		virtual ZETexture2D*			CreateTexture2D() const;
 		virtual ZETexture3D*			CreateTexture3D() const;

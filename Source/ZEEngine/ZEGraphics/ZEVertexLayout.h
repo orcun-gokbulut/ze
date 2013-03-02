@@ -65,7 +65,7 @@ enum ZEVertexUsage
 	ZE_VU_PER_INSTANCE	= 1
 };
 
-#define ZE_MAX_SEMANTIC_NAME_LENGHT		48
+#define ZE_MAX_SEMANTIC_NAME_LENGHT		32
 
 struct ZEVertexElement
 {
@@ -87,7 +87,7 @@ class ZEVertexLayout
 
 	// Should be public for only internal usage
 	public:
-		ZEUInt64				Hash;
+		ZESize					Hash;
 		bool					Dirty;
 
 		struct ZEVertexLayoutData
@@ -101,11 +101,12 @@ class ZEVertexLayout
 
 	public:
 		bool					IsEmpty() const;
-		ZEUInt					GetElementCount() const;
 		
-		void					SetLayout(const ZEVertexElement* VertexElements, ZEUInt ElementCount);
+		ZEUInt					GetElementCount() const;
 		const ZEVertexElement*	GetLayout() const;
 
+		void					SetLayout(const ZEVertexElement* VertexElements, ZEUInt ElementCount);
+		
 		void					SetToDefault();
 
 		const ZEVertexLayout&	operator=(const ZEVertexLayout& State);
@@ -115,6 +116,5 @@ class ZEVertexLayout
 								ZEVertexLayout();
 								~ZEVertexLayout();
 };
-
 
 #endif

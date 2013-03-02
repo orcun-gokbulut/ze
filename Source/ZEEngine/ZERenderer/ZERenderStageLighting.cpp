@@ -198,14 +198,14 @@ const ZETexture2D* ZERenderStageLighting::GetLBuffer2() const
 	return Textures.LBuffer2;
 }
 		
-void ZERenderStageLighting::SetGBufferInput(const ZERenderStageGeometry* Stage)
+void ZERenderStageLighting::SetInputGeometryStage(const ZERenderStageGeometry* Stage)
 {
 	zeDebugCheck(Stage == NULL, "Null pointer.");
 	
 	GBufferInput = Stage;
 }
 
-const ZERenderStageGeometry* ZERenderStageLighting::GetGBufferInput() const
+const ZERenderStageGeometry* ZERenderStageLighting::GetInputGeometryStage() const
 {
 	return GBufferInput;
 }
@@ -247,7 +247,22 @@ void ZERenderStageLighting::Process(ZERenderCommand* RenderCommand)
 	zeGraphics->GetEventTracer()->EndEvent();
 }
 
+void ZERenderStageLighting::SetStageConfiguration(const ZERenderStageConfiguration* Config)
+{
+	
+}
+
 ZEUInt32 ZERenderStageLighting::GetStageFlags() const
+{
+	return 0;
+}
+
+ZEUInt32 ZERenderStageLighting::GetDependencies() const
+{
+	return ZE_RENDER_STAGE_SHADOW | ZE_RENDER_STAGE_GEOMETRY;
+}
+
+ZEUInt32 ZERenderStageLighting::GetStageIndentifier() const
 {
 	return ZE_RENDER_STAGE_LIGHTING;
 }

@@ -263,8 +263,6 @@ void ZEDepthStencilState::SetToDefault()
 	StateData.BackZFailOperation = ZE_SO_KEEP;
 	StateData.BackStencilPassOperation = ZE_SO_KEEP;
 	StateData.BackStencilFunction = ZE_CF_ALWAYS;
-
-	UpdateHash();
 }
 
 const ZEDepthStencilState& ZEDepthStencilState::operator=(const ZEDepthStencilState& State)

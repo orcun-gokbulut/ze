@@ -52,6 +52,8 @@ ZERenderCommandTest::ZERenderCommandTest()
 	Material = NULL;
 	VertexLayout = NULL;
 	memset(VertexBuffers, NULL, sizeof(ZEVertexBuffer*) * ZE_MAX_VERTEX_BUFFER_SLOT);
+
+	Size = sizeof(ZERenderCommandTest);
 }
 
 ZERenderCommandTest::~ZERenderCommandTest()
@@ -67,6 +69,8 @@ ZERenderCommandIndexedTest::ZERenderCommandIndexedTest()
 	FirstIndex = 0;
 	IndexCount = 0;
 	IndexBuffer = NULL;
+
+	Size = sizeof(ZERenderCommandIndexedTest);
 }
 
 ZERenderCommandIndexedTest::~ZERenderCommandIndexedTest()
@@ -80,6 +84,8 @@ ZERenderCommandInstancedTest::ZERenderCommandInstancedTest()
 
 	InstanceCount = 0;
 	FirstInstance = 0;
+
+	Size = sizeof(ZERenderCommandInstancedTest);
 }
 
 ZERenderCommandInstancedTest::~ZERenderCommandInstancedTest()
@@ -106,6 +112,8 @@ ZERenderCommand::ZERenderCommand()
 	Material = NULL;
 
 	memset(VertexBuffers, 0, sizeof(ZEVertexBuffer*) * ZE_MAX_VERTEX_BUFFER_SLOT);
+
+	Size = sizeof(ZERenderCommand);
 }
 
 ZERenderCommand::~ZERenderCommand()
@@ -116,6 +124,8 @@ ZERenderCommand::~ZERenderCommand()
 ZERenderCommandSkinned::ZERenderCommandSkinned()
 {
 	Flags |= ZE_RCT_SKINNED;
+
+	Size = sizeof(ZERenderCommandSkinned);
 }
 
 ZERenderCommandSkinned::~ZERenderCommandSkinned()
@@ -131,6 +141,8 @@ ZERenderCommandIndexed::ZERenderCommandIndexed()
 	FirstIndex = 0;
 	IndexCount = 0;
 	IndexBuffer = NULL;
+
+	Size = sizeof(ZERenderCommandIndexed);
 }
 
 ZERenderCommandIndexed::~ZERenderCommandIndexed()
@@ -144,6 +156,8 @@ ZERenderCommandInstanced::ZERenderCommandInstanced()
 
 	InstanceCount = 0;
 	FirstInstance = 0;
+
+	Size = sizeof(ZERenderCommandInstanced);
 }
 
 ZERenderCommandInstanced::~ZERenderCommandInstanced()

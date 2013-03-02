@@ -300,8 +300,6 @@ void ZEScene::Render(float ElapsedTime)
 	memset(&FrameDrawParameters.Statistics, 0, sizeof(ZEDrawStatistics));
 
 	Culler.CullScene(this, &FrameDrawParameters);
-
-	Renderer->SetDrawParameters(FrameDrawParameters);
 }
 
 bool ZEScene::Save(const ZEString& FileName)

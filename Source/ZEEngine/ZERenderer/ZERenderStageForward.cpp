@@ -170,36 +170,36 @@ void ZERenderStageForward::DestroyBuffers()
 	ZE_DESTROY(Textures.ABuffer);
 }
 
-const ZETexture2D* ZERenderStageForward::GetABufferTexture() const
+const ZETexture2D* ZERenderStageForward::GetOutputAccumulationTexture() const
 {
 	return Textures.ABuffer;
 }
 
-const ZERenderTarget* ZERenderStageForward::GetABufferRenderTarget() const
+const ZERenderTarget* ZERenderStageForward::GetOutputAccumulationRenderTarget() const
 {
 	return RenderTargets.ABuffer;
 }
 
-void ZERenderStageForward::SetGBufferInput(const ZERenderStageGeometry* Input)
+void ZERenderStageForward::SetInputGeometryStage(const ZERenderStageGeometry* Input)
 {
 	zeDebugCheck(Input == NULL, "Null pointer");
 
 	GBufferInput = Input;
 }
 
-const ZERenderStageGeometry* ZERenderStageForward::GetGBufferInput() const
+const ZERenderStageGeometry* ZERenderStageForward::GetInputGeometryStage() const
 {
 	return GBufferInput;
 }
 
-void ZERenderStageForward::SetLBufferInput(const ZERenderStageLighting* Input)
+void ZERenderStageForward::SetInputLightingStage(const ZERenderStageLighting* Input)
 {
 	zeDebugCheck(Input == NULL, "Null pointer");
 
 	LightBufferInput = Input;
 }
 
-const ZERenderStageLighting* ZERenderStageForward::GetLBufferInput() const
+const ZERenderStageLighting* ZERenderStageForward::GetInputLightingStage() const
 {
 	return LightBufferInput;
 }
@@ -251,10 +251,26 @@ void ZERenderStageForward::Process(ZERenderCommand* RenderCommand)
 	zeGraphics->GetEventTracer()->EndEvent();
 }
 
+void ZERenderStageForward::SetStageConfiguration(const ZERenderStageConfiguration* Config)
+{
+
+}
+
 ZEUInt32 ZERenderStageForward::GetStageFlags() const
+{
+	return 0;
+}
+
+ZEUInt32 ZERenderStageForward::GetDependencies() const
+{
+	return ZE_RENDER_STAGE_GEOMETRY | ZE_RENDER_STAGE_LIGHTING;
+}
+
+ZEUInt32 ZERenderStageForward::GetStageIndentifier() const
 {
 	return ZE_RENDER_STAGE_FORWARD;
 }
+
 
 ZERenderStageForward::ZERenderStageForward()
 {	

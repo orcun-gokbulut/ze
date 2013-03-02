@@ -1841,7 +1841,7 @@ bool ZEMaterialDefault::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, con
 	// Update Buffers
 	UpdateTransformations(RenderCommand);
 
-	switch (Stage->GetStageFlags())
+	switch (Stage->GetStageIndentifier())
 	{
 		case ZE_RENDER_STAGE_SHADOW:
 			SetupShadowPass(Stage, RenderCommand);

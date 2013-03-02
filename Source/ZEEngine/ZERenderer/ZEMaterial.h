@@ -39,8 +39,9 @@
 
 #include "ZETypes.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEGraphics/ZEGraphicsDeviceState.h"
 
-typedef ZEUInt32 ZEMaterialFlags;
+
 #define ZE_MTF_NONE						0
 #define ZE_MTF_PRE_Z_PASS				1
 #define ZE_MTF_GEOMETRY_PASS			2
@@ -52,6 +53,8 @@ typedef ZEUInt32 ZEMaterialFlags;
 #define ZE_MTF_SUPPORTS_MORPHING		128
 #define ZE_MTF_SUPPORTS_INSTANCING		256
 #define ZE_MTF_USER_INTERFACE_PASS		512
+typedef ZEUInt32 ZEMaterialFlags;
+
 
 enum ZEMaterialTransparancyMode
 {
@@ -125,5 +128,34 @@ ZE_POST_PROCESSOR_START(Meta)
 </zinek>
 ZE_POST_PROCESSOR_END()
 */
+
+/************************************************************************/
+/*                         NEW MATERIAL                                 */
+/************************************************************************/
+
+class ZERenderProgram
+{
+	public:
+		const ZEShader*				Shader;
+		const ZEConstantBuffer*		Buffers[ZE_MAX_BUFFER_SLOT];
+		
+									ZERenderProgram();
+									~ZERenderProgram();
+};
+
+class ZEMaterialNew
+{
+	protected:
+									ZEMaterialNew();
+		virtual						~ZEMaterialNew();
+
+	public:
+		ZEArray<ZERenderProgram>	Programs;
+
+		virtual ZESize				GetHash() const = 0;
+		virtual ZEMaterialFlags		GetMaterialFlags() const = 0;
+		
+		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand) = 0;
+};
 
 #endif

@@ -218,8 +218,6 @@ void ZESamplerState::SetToDefault()
 	StateData.MipLODBias = -0.5f;
 	StateData.MinLOD = ZE_FLOAT_MIN;
 	StateData.MaxLOD = ZE_FLOAT_MAX;
-
-	UpdateHash();
 }
 
 const ZESamplerState& ZESamplerState::operator=(const ZESamplerState& State)
@@ -242,7 +240,6 @@ bool ZESamplerState::operator!=(const ZESamplerState& State)
 
 ZESamplerState::ZESamplerState()
 {
-	memset(&StateData, 0, sizeof(ZESamplerStateData));
 	SetToDefault();
 }
 

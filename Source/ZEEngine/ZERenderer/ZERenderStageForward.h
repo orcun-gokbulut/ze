@@ -73,19 +73,23 @@ class ZERenderStageForward : public ZERenderStage
 		void							DestroyBuffers();
 
 	public:
-		ZEUInt32						GetStageFlags() const;
+		virtual ZEUInt32				GetStageFlags() const;
+		virtual ZEUInt32				GetDependencies() const;
+		virtual ZEUInt32				GetStageIndentifier() const;
 		
-		const ZETexture2D*				GetABufferTexture() const;
-		const ZERenderTarget*			GetABufferRenderTarget() const;
+		const ZETexture2D*				GetOutputAccumulationTexture() const;
+		const ZERenderTarget*			GetOutputAccumulationRenderTarget() const;
 		
-		void							SetGBufferInput(const ZERenderStageGeometry* Input);
-		const ZERenderStageGeometry*	GetGBufferInput() const;
+		void							SetInputGeometryStage(const ZERenderStageGeometry* Input);
+		const ZERenderStageGeometry*	GetInputGeometryStage() const;
 		
-		void							SetLBufferInput(const ZERenderStageLighting* Input);
-		const ZERenderStageLighting*	GetLBufferInput() const;
+		void							SetInputLightingStage(const ZERenderStageLighting* Input);
+		const ZERenderStageLighting*	GetInputLightingStage() const;
 
-		void							Setup();
-		void							Process(ZERenderCommand* RenderCommand);
+		virtual void					Setup();
+		virtual void					Process(ZERenderCommand* RenderCommand);
+
+		virtual void					SetStageConfiguration(const ZERenderStageConfiguration* Config);
 
 										ZERenderStageForward();
 		virtual							~ZERenderStageForward();

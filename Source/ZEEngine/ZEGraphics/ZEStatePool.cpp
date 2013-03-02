@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERasterizerState.cpp
+ Zinek Engine - ZEStatePool.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,95 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERasterizerState.h"
-#include "ZEDS/ZEHashGenerator.h"
+#include "ZEStatePool.h"
 
-void ZERasterizerState::UpdateHash()
+ZEStatePool::ZEStatePool()
 {
-	if (Dirty)
-	{
-		Hash = 0;
-		Dirty = false;
-		ZEHashGenerator::Hash(Hash, &StateData, sizeof(ZERasterizerStateData));
-	}
+
 }
 
-void ZERasterizerState::SetFillMode(ZEFillMode Mode)
-{
-	if (StateData.FillMode != Mode)
-	{
-		StateData.FillMode = Mode;
-		Dirty = true;
-	}
-}
-
-ZEFillMode ZERasterizerState::GetFillMode() const
-{
-	return StateData.FillMode;
-}
-
-void ZERasterizerState::SetCullDirection(ZECullDirection Direction)
-{
-	if (StateData.CullDirection != Direction)
-	{
-		StateData.CullDirection = Direction;
-		Dirty = true;
-	}
-}
-
-ZECullDirection ZERasterizerState::GetCullDirection() const
-{
-	return StateData.CullDirection;
-}
-
-void ZERasterizerState::SetFrontIsCounterClockwise(bool IsCounterClockwise)
-{
-	if (StateData.FrontIsCounterClockwise != IsCounterClockwise)
-	{
-		StateData.FrontIsCounterClockwise = IsCounterClockwise;
-		Dirty = true;
-	}
-}
-
-bool ZERasterizerState::GetFrontIsCounterClockwise() const
-{
-	return StateData.FrontIsCounterClockwise;
-}
-
-void ZERasterizerState::SetToDefault()
-{
-	Hash = 0;
-	Dirty = false;
-
-	StateData.FillMode = ZE_FM_SOLID;
-	StateData.CullDirection = ZE_CD_COUNTER_CLOCKWISE;
-	StateData.FrontIsCounterClockwise = false;
-}
-
-const ZERasterizerState& ZERasterizerState::operator=(const ZERasterizerState& State)
-{
-	Hash = State.Hash;
-	Dirty = State.Dirty;
-	memcpy(&StateData, &State.StateData, sizeof(ZERasterizerStateData));
-	return *this;
-}
-
-bool ZERasterizerState::operator==(const ZERasterizerState& State)
-{
-	return memcmp(&StateData, &State.StateData, sizeof(ZERasterizerStateData)) == 0 ? true : false;
-}
-
-bool ZERasterizerState::operator!=(const ZERasterizerState& State)
-{
-	return !operator==(State);
-}
-
-ZERasterizerState::ZERasterizerState()
-{
-	SetToDefault();
-}
-
-ZERasterizerState::~ZERasterizerState()
+ZEStatePool::~ZEStatePool()
 {
 
 }

@@ -81,16 +81,20 @@ class ZERenderStageLighting : public ZERenderStage
 		void							CommitStageDefaults();
 
 	public:
-		ZEUInt32						GetStageFlags() const;
+		virtual ZEUInt32				GetStageFlags() const;
+		virtual ZEUInt32				GetDependencies() const;
+		virtual ZEUInt32				GetStageIndentifier() const;
 
 		const ZETexture2D*				GetLBuffer1() const;
 		const ZETexture2D*				GetLBuffer2() const;
 
-		void							SetGBufferInput(const ZERenderStageGeometry* Input);
-		const ZERenderStageGeometry*	GetGBufferInput() const;
+		void							SetInputGeometryStage(const ZERenderStageGeometry* Input);
+		const ZERenderStageGeometry*	GetInputGeometryStage() const;
 
-		void							Setup();
-		void							Process(ZERenderCommand* RenderCommand);
+		virtual void					Setup();
+		virtual void					Process(ZERenderCommand* RenderCommand);
+
+		virtual void					SetStageConfiguration(const ZERenderStageConfiguration* Config);
 		
 										ZERenderStageLighting();
 		virtual							~ZERenderStageLighting();

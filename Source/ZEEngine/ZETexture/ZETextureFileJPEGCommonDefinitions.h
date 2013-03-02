@@ -40,6 +40,7 @@
 
 
 #include "ZETypes.h"
+#include <memory.h>
 #include <intrin.h>
 
 

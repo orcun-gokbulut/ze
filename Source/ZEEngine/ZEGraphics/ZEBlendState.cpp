@@ -197,8 +197,6 @@ void ZEBlendState::SetToDefault()
 	StateData.DestinationBlendAlphaOption = ZE_BO_ZERO;
 	StateData.BlendAlphaEquation = ZE_BE_ADD;
 	memset(StateData.ComponentWriteMask, ZE_CM_ALL, sizeof(ZEComponentMask) * 8);
-
-	UpdateHash();
 }
 
 const ZEBlendState& ZEBlendState::operator=(const ZEBlendState& State)

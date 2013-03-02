@@ -63,12 +63,14 @@ class ZERenderStagePostProcess : public ZERenderStage
 		void					DestroyBuffers();
 
 	public:
-		ZEUInt32				GetStageFlags() const;
-		
+		virtual ZEUInt32		GetStageFlags() const;
+		virtual ZEUInt32		GetDependencies() const;
+		virtual ZEUInt32		GetStageIndentifier() const;
 
-		
-		void					Process(const ZERenderCommand* RenderCommand);
-		void					Setup();
+		virtual void			Setup();
+		virtual void			Process(ZERenderCommand* RenderCommand);
+
+		virtual void			SetStageConfiguration(const ZERenderStageConfiguration* Config);
 
 								ZERenderStagePostProcess();
 		virtual					~ZERenderStagePostProcess();
