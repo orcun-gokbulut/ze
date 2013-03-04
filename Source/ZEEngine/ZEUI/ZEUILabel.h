@@ -58,8 +58,12 @@ struct ZEUITextCharacter
 	bool				IsSelected;
 };
 
+ZE_CLASS(ZEUILabel)
+
 class ZEUILabel : public ZEUIFrameControl
 {
+	ZE_OBJECT
+
 	protected:
 		ZEString							Text;
 		ZEArray<ZEUITextCharacter>			Characters;

@@ -37,18 +37,23 @@
 #ifndef __ZE_UI_COMPONENT__
 #define __ZE_UI_COMPONENT__
 
+#include "ZEMeta/ZEObject.h"
+#include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
-#include "ZEMath/ZEVector.h"
+#include "ZEDS/ZEFastDelegate.h"
 #include "ZEUIRectangle.h"
 #include "ZEUIEvents.h"
-#include "ZEDS/ZEFastDelegate.h"
 
-class ZEUIRenderer;
-class ZETexture2D;
-class ZEUIControl
+ZE_META_FORWARD_DECLARE(ZEUIRenderer, "ZEUIRenderer.h")
+
+ZE_CLASS(ZEUIControl)
+
+class ZEUIControl : public ZEObject
 {
 	friend class ZEUIManager;
+
+	ZE_OBJECT
 
 	private:
 		ZEString						Name;
@@ -73,7 +78,7 @@ class ZEUIControl
 		bool							IsFocused;
 		bool							IsPressed;       
 		
-		ZEInt32								ZOrder;
+		ZEInt32							ZOrder;
 
 		ZEVector2						MaximumSize;
 		ZEVector2						MinimumSize;
@@ -198,6 +203,5 @@ class ZEUIControl
 										ZEUIControl();
 										~ZEUIControl();
 };
-
 
 #endif

@@ -39,6 +39,8 @@
 #include "ZEUILabel.h"
 #include "ZEFontResourceDynamic.h"
 
+ZE_OBJECT_IMPL(ZEUIButtonControl)
+
 void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
 {
 	TextLabel->SetZOrder(GetZOrder() + 3);

@@ -37,6 +37,8 @@
 #include "ZETexture\ZETexture2DResource.h"
 #include "ZEGame\ZEScene.h"
 
+ZE_OBJECT_IMPL(ZEUISequencePlayer)
+
 ZEUISequencePlayer::ZEUISequencePlayer()
 {
 	Frames.Clear();

@@ -40,11 +40,15 @@
 #include "ZEUILabel.h"
 #include "ZEUITextCursor.h"
 
-class ZEMaterial;
-class ZEUIRectangle;
+ZE_META_FORWARD_DECLARE(ZEMaterial, "ZEGraphics/ZEMaterial.h")
+ZE_META_FORWARD_DECLARE(ZEUIRectangle, "ZEUIRectangle.h")
+
+ZE_CLASS(ZEUITextEditControl)
 
 class ZEUITextEditControl : public ZEUILabel
 {
+	ZE_OBJECT
+
 	private:
 		ZEUITextCursor						Cursor;
 		bool								IsTextDirty;

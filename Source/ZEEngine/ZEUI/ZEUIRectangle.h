@@ -39,9 +39,12 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERectangle.h"
+#include "ZEMeta/ZEObject.h"
 
 struct ZEUIVertex;
+
 class ZEMaterial;
+
 class ZEUIRectangle
 {
 	public:

@@ -41,7 +41,6 @@
 #include "ZEUIFrameControl.h"
 #include "ZEFontResource.h"
 
-
 #define	ZEUI_BFC_EL_MAINAREA		1
 #define	ZEUI_BFC_EL_LEFTUPCORNER	2
 #define	ZEUI_BFC_EL_LEFTDOWNCORNER	4
@@ -141,9 +140,12 @@ struct ZEUIControlStyle
 	}
 };
 
+ZE_CLASS(ZEUIBorderedFrameControl)
 
 class ZEUIBorderedFrameControl : public ZEUIControl
 {
+	ZE_OBJECT
+
 	protected:
 
 		ZEUIFrameControl	MainArea;

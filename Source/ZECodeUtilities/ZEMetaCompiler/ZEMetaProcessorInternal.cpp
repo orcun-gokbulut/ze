@@ -329,12 +329,15 @@ ZEMetaType ProcessInnerType(ZEString MainClassName, const Type* ClangType)
 			}
 			else
 			{
-				for(ZESize I = 0; I < ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses.GetCount(); I++)
+				if(ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses.GetCount() > 0)
 				{
-					if(ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses[I]->ClassName == TempType.ClassData->Name)
+					for(int I = ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses.GetCount() - 1; I >= 0; I--)
 					{
-						ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses[I]->HeaderFileDeclaredIn = MainClassName;
-						return TempType;
+						if(ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses[I]->ClassName == TempType.ClassData->Name)
+						{
+							ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses[I]->HeaderFileDeclaredIn = MainClassName;
+							return TempType;
+						}
 					}
 				}
 
@@ -465,12 +468,15 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 			}
 			else
 			{
-				for(ZESize I = 0; I < ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses.GetCount(); I++)
+				if(ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses.GetCount() > 0)
 				{
-					if(ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses[I]->ClassName == TempType.ClassData->Name)
+					for(int I = ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses.GetCount() - 1; I >= 0; I--)
 					{
-						ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses[I]->HeaderFileDeclaredIn = MainClassName;
-						return TempType;
+						if(ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses[I]->ClassName == TempType.ClassData->Name)
+						{
+							ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses[I]->HeaderFileDeclaredIn = MainClassName;
+							return TempType;
+						}
 					}
 				}
 
@@ -957,7 +963,7 @@ void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, VarDecl* S
 						{
 							for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
 							{
-								if(TemplateEventParameterData->Type.EnumName == MetaData->EnumTypes[I]->Name)
+								if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && TemplateEventParameterData->Type.EnumName == MetaData->EnumTypes[I]->Name)
 								{
 									TemplateEventParameterData->EnumData = MetaData->EnumTypes[I];
 									break;
@@ -992,7 +998,7 @@ void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, VarDecl* S
 	{
 		for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
 		{
-			if(PropertyData->Type.EnumName == MetaData->EnumTypes[I]->Name)
+			if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && PropertyData->Type.EnumName == MetaData->EnumTypes[I]->Name)
 			{
 				PropertyData->EnumData = MetaData->EnumTypes[I];
 				break;
@@ -1076,7 +1082,7 @@ void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, FieldDecl*
 						{
 							for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
 							{
-								if(TemplateEventParameterData->Type.EnumName == MetaData->EnumTypes[I]->Name)
+								if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && TemplateEventParameterData->Type.EnumName == MetaData->EnumTypes[I]->Name)
 								{
 									TemplateEventParameterData->EnumData = MetaData->EnumTypes[I];
 									break;
@@ -1111,7 +1117,7 @@ void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, FieldDecl*
 	{
 		for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
 		{
-			if(PropertyData->Type.EnumName == MetaData->EnumTypes[I]->Name)
+			if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && PropertyData->Type.EnumName == MetaData->EnumTypes[I]->Name)
 			{
 				PropertyData->EnumData = MetaData->EnumTypes[I];
 				break;
@@ -1211,7 +1217,7 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 					{
 						for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
 						{
-							if(PropertyType.EnumName == MetaData->EnumTypes[I]->Name)
+							if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && PropertyType.EnumName == MetaData->EnumTypes[I]->Name)
 							{
 								PropertyData->EnumData = MetaData->EnumTypes[I];
 								break;
@@ -1230,7 +1236,7 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 				{
 					for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
 					{
-						if(PropertyType.EnumName == MetaData->EnumTypes[I]->Name)
+						if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && PropertyType.EnumName == MetaData->EnumTypes[I]->Name)
 						{
 							PropertyData->EnumData = MetaData->EnumTypes[I];
 							break;
@@ -1274,7 +1280,7 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 	{
 		for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
 		{
-			if(MethodData->ReturnParameter.Type.EnumName == MetaData->EnumTypes[I]->Name)
+			if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && MethodData->ReturnParameter.Type.EnumName == MetaData->EnumTypes[I]->Name)
 			{
 				MethodData->ReturnParameter.EnumData = MetaData->EnumTypes[I];
 				break;
@@ -1300,7 +1306,7 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 		{
 			for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
 			{
-				if(ParameterType.EnumName == MetaData->EnumTypes[I]->Name)
+				if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && ParameterType.EnumName == MetaData->EnumTypes[I]->Name)
 				{
 					MethodParameterData->EnumData = MetaData->EnumTypes[I];
 					break;

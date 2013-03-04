@@ -37,6 +37,8 @@
 #include "ZEFontResource.h"
 #include "ZEGraphics/ZETexture2D.h"
 
+ZE_OBJECT_IMPL(ZEUILabel)
+
 void ZEUILabel::UpdateCharacters()
 {
 	ZEInt64 KerningDistance = 0;

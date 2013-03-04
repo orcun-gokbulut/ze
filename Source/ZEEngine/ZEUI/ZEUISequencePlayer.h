@@ -48,8 +48,12 @@ enum ZEUISequencePlayerState
 	ZEUI_SPS_PAUSED
 };
 
+ZE_CLASS(ZEUISequencePlayer)
+
 class ZEUISequencePlayer : public ZEUIFrameControl
 {
+	ZE_OBJECT
+
 	private:
 
 		ZEArray<const ZETexture2D*>	Frames;

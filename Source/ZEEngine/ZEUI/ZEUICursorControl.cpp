@@ -53,6 +53,7 @@
 #define ACTIONID_SCROLL_UP		10
 #define ACTIONID_SCROLL_DOWN	11
 
+ZE_OBJECT_IMPL(ZEUICursorControl)
 
 void ZEUICursorControl::Draw(ZEUIRenderer* Renderer)
 {
