@@ -38,6 +38,8 @@
 #include "ZEGame/ZEScene.h"
 #include <stdio.h>
 
+ZE_OBJECT_IMPL(ZEModelBone)
+
 void ZEModelBone::OnTransformChanged()
 {
 	if (PhysicalBody != NULL)

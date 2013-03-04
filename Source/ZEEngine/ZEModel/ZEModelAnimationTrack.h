@@ -38,8 +38,9 @@
 
 #include "ZETypes.h"
 #include "ZEModelAnimation.h"
+#include "ZEMeta/ZEObject.h"
 
-class ZEModel;
+ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 
 enum ZEModelAnimationBlendMode
 {
@@ -49,8 +50,12 @@ enum ZEModelAnimationBlendMode
 	ZE_MABM_OVERWRITE	= 3,
 };
 
-class ZEModelAnimationTrack
+ZE_CLASS(ZEModelAnimationTrack)
+
+class ZEModelAnimationTrack : public ZEObject
 {
+	ZE_OBJECT
+
 	private:
 		ZEModel*						Owner;
 		const ZEModelAnimation*			Animation;

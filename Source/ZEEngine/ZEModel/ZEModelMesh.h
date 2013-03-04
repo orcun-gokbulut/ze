@@ -42,15 +42,20 @@
 #include "ZEModelMeshLod.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZERenderCommand.h"
+#include "ZEModelResource.h"
+#include "ZEMeta/ZEObject.h"
 
-class ZEModel;
-struct ZEModelResourceMesh;
-class ZEPhysicsBody;
-class ZEPhysicalCloth;
+ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
+ZE_META_FORWARD_DECLARE(ZEPhysicalCloth, "ZEPhysics/ZEPhysicalCloth.h")
 
-class ZEModelMesh
+ZE_CLASS(ZEModelMesh)
+
+class ZEModelMesh : public ZEObject
 {
 	friend class ZEModel;
+
+	ZE_OBJECT
+
 	private:
 		ZEModel*							Owner;
 

@@ -41,6 +41,8 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEPhysics/ZEPhysicalCloth.h"
 
+ZE_OBJECT_IMPL(ZEModelMesh)
+
 void ZEModelMesh::SetActiveLOD(ZEUInt LOD)
 {
 	AutoLOD = false;

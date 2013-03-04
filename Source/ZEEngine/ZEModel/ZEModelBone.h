@@ -40,13 +40,21 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZEMeta/ZEObject.h"
 #include "ZEModelAnimation.h"
 
-class ZEModel;
-class ZEModelBone
+ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
+ZE_META_FORWARD_DECLARE(ZEAABBox, "ZEMath/ZEAABBox.h")
+
+ZE_CLASS(ZEModelBone)
+
+class ZEModelBone : public ZEObject
 {
 	friend class ZEModel;
 	friend class ZEModelIKChain;
+
+	ZE_OBJECT
+
 	private:
 		ZEModel*							Owner;
 		const ZEModelResourceBone*			BoneResource;
@@ -95,15 +103,15 @@ class ZEModelBone
 		const ZEVector3&					GetInitialRelativePosition();
 		const ZEQuaternion&					GetInitialRelativeRotation();
 		
-		const ZEVector3&					GetInitialLocalPosition();
-		const ZEQuaternion&					GetInitialLocalRotation();
+		/*const ZEVector3&					GetInitialLocalPosition();
+		const ZEQuaternion&					GetInitialLocalRotation();*/
 
 		const ZEMatrix4x4&					GetInitialRelativeTransform();
 		const ZEMatrix4x4&					GetInitialLocalTransform();
 
 		const ZEMatrix4x4&					GetInverseTransform();
 		const ZEMatrix4x4&					GetRelativeTransform();
-		const ZEMatrix4x4&					GetForwardTransform();
+		/*const ZEMatrix4x4&					GetForwardTransform();*/
 		const ZEMatrix4x4&					GetVertexTransform();
 
 		const ZEVector3&					GetRelativePosition();
