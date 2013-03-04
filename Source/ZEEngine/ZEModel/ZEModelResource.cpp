@@ -187,7 +187,7 @@ bool ZEModelResource::ReadMaterials(ZEMLSerialReader* NodeReader)
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Material")
 			continue;
 
-		ZEVariant NameValue, FilePathValue;
+		ZEValue NameValue, FilePathValue;
 
 		ZEMLSerialListItem MaterialList[] = 
 		{
@@ -216,7 +216,7 @@ bool ZEModelResource::ReadMaterials(ZEMLSerialReader* NodeReader)
 bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSerialReader* NodeReader)
 {
 
-	ZEVariant Enabled, Type, IsKinematic, Mass, MassCenter, LinearDamping, AngularDamping;
+	ZEValue Enabled, Type, IsKinematic, Mass, MassCenter, LinearDamping, AngularDamping;
 	ZEMLSerialPointer PhysicalShapesNodePointer;
 
 	ZEMLSerialListItem PhysicalBodyList[] = 
@@ -256,7 +256,7 @@ bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSe
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "PhysicalShape")
 			continue;
 
-		ZEVariant ShapePosition, ShapeRotation, ShapeRestitution, ShapeDynamicFriction, ShapeStaticFriction, ShapeType, UserDefinedProperties;
+		ZEValue ShapePosition, ShapeRotation, ShapeRestitution, ShapeDynamicFriction, ShapeStaticFriction, ShapeType, UserDefinedProperties;
 		ZEMLSerialPointer ShapeNodePointer;
 
 		ZEMLSerialListItem PhysicalShapeList [] = 
@@ -288,7 +288,7 @@ bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSe
 
 		NodeReader->SeekPointer(ShapeNodePointer);
 
-		ZEVariant ShapeHeight, ShapeWidth, ShapeLength, ShapeRadius;
+		ZEValue ShapeHeight, ShapeWidth, ShapeLength, ShapeRadius;
 		ZEMLSerialPointer VerticesDataPointer;
 
 		ZEMLSerialListItem ActualShapeList [] = 
@@ -400,7 +400,7 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Mesh")
 			continue;
 
-		ZEVariant NameValue, PositionValue, RotationValue, ScaleValue, IsVisibleValue, IsSkinnedValue, UserDefinedPropertiesValue;
+		ZEValue NameValue, PositionValue, RotationValue, ScaleValue, IsVisibleValue, IsSkinnedValue, UserDefinedPropertiesValue;
 		ZEMLSerialPointer BoundingBoxNodePointer, PhysicalBodyNodePointer, LODsNodePointer;
 
 		ZEMLSerialListItem MeshList[] = 
@@ -434,7 +434,7 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 
 		NodeReader->SeekPointer(BoundingBoxNodePointer);
 
-		ZEVariant BBoxMinValue, BBoxMaxValue;
+		ZEValue BBoxMinValue, BBoxMaxValue;
 
 		ZEMLSerialListItem BoundingBoxList[] = 
 		{
@@ -462,7 +462,7 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 			if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "LOD")
 				continue;
 
-			ZEVariant LODLevelValue, MaterialIdValue;
+			ZEValue LODLevelValue, MaterialIdValue;
 			ZEMLSerialPointer VerticesDataPointer, AffectingBoneIdsDataPointer;
 
 			ZEMLSerialListItem LODList[] = 
@@ -530,20 +530,20 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 bool ZEModelResource::ReadPhysicalJoint(ZEModelResourcePhysicalJoint* Joint, ZEMLSerialReader* NodeReader)
 {
 
-	ZEVariant Enabled, Body1Id, Body2Id;
-	ZEVariant UseGlobalAnchorAxis, LocalAnchor1, LocalAxis1, LocalAnchor2, LocalAxis2, GlobalAnchor, GlobalAxis;
-	ZEVariant JointType, CollideBodies, Breakable, BreakForce, BreakTorque;
-	ZEVariant XMotion, YMotion, ZMotion, LinearLimitValue, LinearLimitRestitution, LinearLimitSpring, LinearLimitDamping;
-	ZEVariant TwistMotion, TwistLowLimitValue, TwistLowLimitRestitution, TwistLowLimitSpring, TwistLowLimitDamping, TwistHighLimitValue, TwistHighLimitRestitution, TwistHighLimitSpring, TwistHighLimitDamping;
-	ZEVariant Swing1Motion, Swing1LimitValue, Swing1LimitRestitution, Swing1LimitSpring, Swing1LimitDamping;
-	ZEVariant Swing2Motion, Swing2LimitValue, Swing2LimitRestitution, Swing2LimitSpring, Swing2LimitDamping;
-	ZEVariant LinearXMotor, LinearXMotorForce, LinearXMotorSpring, LinearXMotorDamper;
-	ZEVariant LinearYMotor, LinearYMotorForce, LinearYMotorSpring, LinearYMotorDamper;
-	ZEVariant LinearZMotor, LinearZMotorForce, LinearZMotorSpring, LinearZMotorDamper;
-	ZEVariant AngularSwingMotor, AngularSwingMotorForce, AngularSwingMotorSpring, AngularSwingMotorDamper;
-	ZEVariant AngularTwistMotor, AngularTwistMotorForce, AngularTwistMotorSpring, AngularTwistMotorDamper;
-	ZEVariant AngularSlerpMotor, AngularSlerpMotorForce, AngularSlerpMotorSpring, AngularSlerpMotorDamper;
-	ZEVariant MotorTargetPosition, MotorTargetVelocity, MotorTargetOrientation, MotorTargetAngularVelocity;
+	ZEValue Enabled, Body1Id, Body2Id;
+	ZEValue UseGlobalAnchorAxis, LocalAnchor1, LocalAxis1, LocalAnchor2, LocalAxis2, GlobalAnchor, GlobalAxis;
+	ZEValue JointType, CollideBodies, Breakable, BreakForce, BreakTorque;
+	ZEValue XMotion, YMotion, ZMotion, LinearLimitValue, LinearLimitRestitution, LinearLimitSpring, LinearLimitDamping;
+	ZEValue TwistMotion, TwistLowLimitValue, TwistLowLimitRestitution, TwistLowLimitSpring, TwistLowLimitDamping, TwistHighLimitValue, TwistHighLimitRestitution, TwistHighLimitSpring, TwistHighLimitDamping;
+	ZEValue Swing1Motion, Swing1LimitValue, Swing1LimitRestitution, Swing1LimitSpring, Swing1LimitDamping;
+	ZEValue Swing2Motion, Swing2LimitValue, Swing2LimitRestitution, Swing2LimitSpring, Swing2LimitDamping;
+	ZEValue LinearXMotor, LinearXMotorForce, LinearXMotorSpring, LinearXMotorDamper;
+	ZEValue LinearYMotor, LinearYMotorForce, LinearYMotorSpring, LinearYMotorDamper;
+	ZEValue LinearZMotor, LinearZMotorForce, LinearZMotorSpring, LinearZMotorDamper;
+	ZEValue AngularSwingMotor, AngularSwingMotorForce, AngularSwingMotorSpring, AngularSwingMotorDamper;
+	ZEValue AngularTwistMotor, AngularTwistMotorForce, AngularTwistMotorSpring, AngularTwistMotorDamper;
+	ZEValue AngularSlerpMotor, AngularSlerpMotorForce, AngularSlerpMotorSpring, AngularSlerpMotorDamper;
+	ZEValue MotorTargetPosition, MotorTargetVelocity, MotorTargetOrientation, MotorTargetAngularVelocity;
 
 	ZEMLSerialListItem JointList[] = 
 	{
@@ -767,7 +767,7 @@ bool ZEModelResource::ReadBones(ZEMLSerialReader* NodeReader)
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Bone")
 			continue;
 
-		ZEVariant NameValue, ParentBoneValue, RelativePositionValue, RelativeRotationValue, RelativeScaleValue, UserDefinedPropertiesValue;
+		ZEValue NameValue, ParentBoneValue, RelativePositionValue, RelativeRotationValue, RelativeScaleValue, UserDefinedPropertiesValue;
 		ZEMLSerialPointer BoundingBoxNodePointer, PhysicalJointNodePointer, PhysicalBodyNodePointer;
 
 		ZEMLSerialListItem BoneList[] = 
@@ -799,7 +799,7 @@ bool ZEModelResource::ReadBones(ZEMLSerialReader* NodeReader)
 
 		NodeReader->SeekPointer(BoundingBoxNodePointer);
 
-		ZEVariant BBoxMinValue, BBoxMaxValue;
+		ZEValue BBoxMinValue, BBoxMaxValue;
 
 		ZEMLSerialListItem BoundingBoxList[] = 
 		{
@@ -854,7 +854,7 @@ bool ZEModelResource::ReadHelpers(ZEMLSerialReader* NodeReader)
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Helper")
 			continue;
 
-		ZEVariant NameValue, OwnerTypeValue, OwnerIdValue, PositionValue, RotationValue, ScaleValue, UserDefinedPropertiesValue;
+		ZEValue NameValue, OwnerTypeValue, OwnerIdValue, PositionValue, RotationValue, ScaleValue, UserDefinedPropertiesValue;
 
 		ZEMLSerialListItem HelperList[] = 
 		{
@@ -922,7 +922,7 @@ bool ZEModelResource::ReadAnimations(ZEMLSerialReader* NodeReader)
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Animation")
 			continue;
 
-		ZEVariant NameValue, BoneKeyCountValue, MeshKeyCountValue;
+		ZEValue NameValue, BoneKeyCountValue, MeshKeyCountValue;
 		ZEMLSerialPointer FramesDataPointer;
 
 		ZEMLSerialListItem AnimationList[] = 

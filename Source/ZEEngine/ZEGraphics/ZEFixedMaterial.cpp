@@ -1293,7 +1293,7 @@ void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 
 	for(ZESSize I = 0; I < PropertyCount; I++)
 	{
-		ZEVariant PropertyValue;
+		ZEValue PropertyValue;
 		GetProperty(Properties[I].Name, PropertyValue);
 		RootNode->AddProperty(Properties[I].Name, PropertyValue);
 	}
@@ -1333,7 +1333,7 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 					continue;
 
 				ZEString Path = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + CurrentProperty->GetValue().GetString();
-				ZEVariant TempVar(Path);
+				ZEValue TempVar(Path);
 				SetProperty(Props[I]->GetName(), TempVar);
 			}
 

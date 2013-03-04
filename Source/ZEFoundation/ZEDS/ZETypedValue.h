@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETypedVariant.h
+ Zinek Engine - ZETypedValue.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -47,36 +47,36 @@
 #pragma warning(push)
 #pragma warning(disable:4482)
 
-#include "ZEVariant.h"
+#include "ZEValue.h"
 #include "ZETypes.h"
 
-class ZETypedVariant : public ZEVariant
+class ZETypedValue : public ZEValue
 {
 	public:
 		void		SetString		(char *NewValue);
 		void		SetInteger		(ZEInt NewValue);
 		void		SetFloat		(float NewValue);
 		void		SetBoolean		(bool NewValue);
-		void		SetVariant		(const ZEVariant& NewValue);
-		void		SetTypedVariant	(const ZETypedVariant& NewValue);
+		void		SetValue		(const ZEValue& NewValue);
+		void		SetTypedValue	(const ZETypedValue& NewValue);
 
-		void		operator=		(ZEVariant& NewValue);
-		void		operator=		(ZETypedVariant& NewValue);
+		void		operator=		(ZEValue& NewValue);
+		void		operator=		(ZETypedValue& NewValue);
 		void		operator=		(char* NewValue);
 		void		operator=		(ZEInt NewValue);
 		void		operator=		(float NewValue);
 		void		operator=		(bool NewValue);
 
 
-					ZETypedVariant	();
-					ZETypedVariant	(ZETypedVariant& InitialType);
-					ZETypedVariant	(ZEVariant& InitialValue);
-					ZETypedVariant	(char* InitialValue);	
-					ZETypedVariant	(ZEInt InitialValue);
-					ZETypedVariant	(float InitialValue);
-					ZETypedVariant	(bool InitialValue);
+					ZETypedValue	();
+					ZETypedValue	(ZETypedValue& InitialType);
+					ZETypedValue	(ZEValue& InitialValue);
+					ZETypedValue	(char* InitialValue);	
+					ZETypedValue	(ZEInt InitialValue);
+					ZETypedValue	(float InitialValue);
+					ZETypedValue	(bool InitialValue);
 
-					~ZETypedVariant();
+					~ZETypedValue();
 				
 };
 

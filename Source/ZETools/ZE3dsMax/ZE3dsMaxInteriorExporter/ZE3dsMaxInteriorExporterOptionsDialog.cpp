@@ -123,26 +123,26 @@ void ZE3dsMaxInteriorExporterOptionsDialog::CollectOptionsFromForm()
 	if(Options == NULL)
 	{
 		Options = new ZEMLNode("Options");
-		Options->AddProperty("ZinekEngineWorkingDirectory", ZEVariant(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
-		Options->AddProperty("IsFileLoggingEnabled", ZEVariant(Form->ckbFileLoggingEnabled->isChecked()));
-		Options->AddProperty("LogFilePath", ZEVariant(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
+		Options->AddProperty("ZinekEngineWorkingDirectory", ZEValue(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
+		Options->AddProperty("IsFileLoggingEnabled", ZEValue(Form->ckbFileLoggingEnabled->isChecked()));
+		Options->AddProperty("LogFilePath", ZEValue(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
 	}
 	else
 	{
 		if(Options->GetProperty("ZinekEngineWorkingDirectory") !=  NULL)
-			((ZEMLProperty*)(Options->GetProperty("ZinekEngineWorkingDirectory")))->SetValue(ZEVariant(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
+			((ZEMLProperty*)(Options->GetProperty("ZinekEngineWorkingDirectory")))->SetValue(ZEValue(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
 		else
-			Options->AddProperty("ZinekEngineWorkingDirectory", ZEVariant(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
+			Options->AddProperty("ZinekEngineWorkingDirectory", ZEValue(ZEString((const char*)Form->txtEngineWorkingDirectory->text().toLatin1())));
 
 		if(Options->GetProperty("IsFileLoggingEnabled") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("IsFileLoggingEnabled")))->SetValue(ZEVariant(Form->ckbFileLoggingEnabled->isChecked()));
+			((ZEMLProperty*)(Options->GetProperty("IsFileLoggingEnabled")))->SetValue(ZEValue(Form->ckbFileLoggingEnabled->isChecked()));
 		else
-			Options->AddProperty("IsFileLoggingEnabled", ZEVariant(Form->ckbFileLoggingEnabled->isChecked()));
+			Options->AddProperty("IsFileLoggingEnabled", ZEValue(Form->ckbFileLoggingEnabled->isChecked()));
 
 		if(Options->GetProperty("LogFilePath") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("LogFilePath")))->SetValue(ZEVariant(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
+			((ZEMLProperty*)(Options->GetProperty("LogFilePath")))->SetValue(ZEValue(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
 		else
-			Options->AddProperty("LogFilePath", ZEVariant(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
+			Options->AddProperty("LogFilePath", ZEValue(ZEString((const char*)Form->txtLogFilePath->text().toLatin1())));
 	}
 }
 

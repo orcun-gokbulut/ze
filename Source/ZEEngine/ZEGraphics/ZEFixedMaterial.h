@@ -41,7 +41,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEDefinitions.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 #include "ZEML/ZEMLNode.h"
 
 #include "ZEMeta/ZEObject.h"

@@ -164,7 +164,7 @@ ZECommand* ZECommandManager::GetCommand(const ZEString& Section, const ZEString&
 		return NULL;
 }
 
-bool ZECommandManager::ExecuteCommand(const ZEString& Section, const ZEString& Name, ZEArray<ZEVariant>* Paramslist)
+bool ZECommandManager::ExecuteCommand(const ZEString& Section, const ZEString& Name, ZEArray<ZEValue>* Paramslist)
 {
 	ZECommandSection* Temp = GetCommandSection(Section);
 	if (Temp != NULL)

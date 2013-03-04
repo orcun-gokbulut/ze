@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 
 enum ZEAnimationState
 {
@@ -53,13 +53,13 @@ enum ZEAnimationState
 struct ZEPropertyAnimationKey
 {
 	float								Time;
-	ZEVariant							Value;
+	ZEValue							Value;
 };
 
 struct ZEPropertyAnimation
 {
 	ZEInt								PropertyId;
-	ZEVariantType						ValueType;
+	ZEValueType						ValueType;
 	bool								Interpolate;
 	ZEArray<ZEPropertyAnimationKey>		Keys;
 };

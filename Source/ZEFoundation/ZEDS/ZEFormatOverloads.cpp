@@ -40,152 +40,152 @@ ZEString ZEFormat::Format(const char* Format)
 	return ZEFormat::FormatInner(Format, NULL, 0);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0)
 {
-	const ZEVariant* ArgumentArray[1] = { &Arg0 };
+	const ZEValue* ArgumentArray[1] = { &Arg0 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 1);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1)
 {
-	const ZEVariant* ArgumentArray[2] =	{ &Arg0, &Arg1 };
+	const ZEValue* ArgumentArray[2] =	{ &Arg0, &Arg1 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 2);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2)
 {
-	const ZEVariant* ArgumentArray[3] = { &Arg0, &Arg1, &Arg2 };
+	const ZEValue* ArgumentArray[3] = { &Arg0, &Arg1, &Arg2 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 3);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3)
 {
-	const ZEVariant* ArgumentArray[4] =	{ &Arg0, &Arg1,	&Arg2, &Arg3 };
+	const ZEValue* ArgumentArray[4] =	{ &Arg0, &Arg1,	&Arg2, &Arg3 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 4);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4)
 {
-	const ZEVariant* ArgumentArray[5] =	{ &Arg0, &Arg1, &Arg2, &Arg3, &Arg4	};
+	const ZEValue* ArgumentArray[5] =	{ &Arg0, &Arg1, &Arg2, &Arg3, &Arg4	};
 	return ZEFormat::FormatInner(Format, ArgumentArray, 5);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5)
 {
-	const ZEVariant* ArgumentArray[6] =	{ &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5 };
+	const ZEValue* ArgumentArray[6] =	{ &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 6);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6)
 {
-	const ZEVariant* ArgumentArray[7] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6 };
+	const ZEValue* ArgumentArray[7] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 7);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7)
 {
-	const ZEVariant* ArgumentArray[8] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7 };
+	const ZEValue* ArgumentArray[8] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 8);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8)
 {
-	const ZEVariant* ArgumentArray[9] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8 };
+	const ZEValue* ArgumentArray[9] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 9);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9)
 {
-	const ZEVariant* ArgumentArray[10] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9 };
+	const ZEValue* ArgumentArray[10] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 10);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10)
 {
-	const ZEVariant* ArgumentArray[11] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10 };
+	const ZEValue* ArgumentArray[11] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 11);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11)
 {
-	const ZEVariant* ArgumentArray[12] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11 };
+	const ZEValue* ArgumentArray[12] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 12);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12)
 {
-	const ZEVariant* ArgumentArray[13] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12 };
+	const ZEValue* ArgumentArray[13] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 13);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12, const ZEValue& Arg13)
 {
-	const ZEVariant* ArgumentArray[14] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13 };
+	const ZEValue* ArgumentArray[14] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 14);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12, const ZEValue& Arg13, const ZEValue& Arg14)
 {
-	const ZEVariant* ArgumentArray[15] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14 };
+	const ZEValue* ArgumentArray[15] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 15);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14, const ZEVariant& Arg15)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12, const ZEValue& Arg13, const ZEValue& Arg14, const ZEValue& Arg15)
 {
-	const ZEVariant* ArgumentArray[16] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15 };
+	const ZEValue* ArgumentArray[16] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 16);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14, const ZEVariant& Arg15, const ZEVariant& Arg16)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12, const ZEValue& Arg13, const ZEValue& Arg14, const ZEValue& Arg15, const ZEValue& Arg16)
 {
-	const ZEVariant* ArgumentArray[17] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16 };
+	const ZEValue* ArgumentArray[17] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 17);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14, const ZEVariant& Arg15, const ZEVariant& Arg16, const ZEVariant& Arg17)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12, const ZEValue& Arg13, const ZEValue& Arg14, const ZEValue& Arg15, const ZEValue& Arg16, const ZEValue& Arg17)
 {
-	const ZEVariant* ArgumentArray[18] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17 };
+	const ZEValue* ArgumentArray[18] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 18);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14, const ZEVariant& Arg15, const ZEVariant& Arg16, const ZEVariant& Arg17, const ZEVariant& Arg18)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12, const ZEValue& Arg13, const ZEValue& Arg14, const ZEValue& Arg15, const ZEValue& Arg16, const ZEValue& Arg17, const ZEValue& Arg18)
 {
-	const ZEVariant* ArgumentArray[19] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18 };
+	const ZEValue* ArgumentArray[19] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 19);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14, const ZEVariant& Arg15, const ZEVariant& Arg16, const ZEVariant& Arg17, const ZEVariant& Arg18, const ZEVariant& Arg19)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12, const ZEValue& Arg13, const ZEValue& Arg14, const ZEValue& Arg15, const ZEValue& Arg16, const ZEValue& Arg17, const ZEValue& Arg18, const ZEValue& Arg19)
 {
-	const ZEVariant* ArgumentArray[20] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18, &Arg19 };
+	const ZEValue* ArgumentArray[20] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18, &Arg19 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 20);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14, const ZEVariant& Arg15, const ZEVariant& Arg16, const ZEVariant& Arg17, const ZEVariant& Arg18, const ZEVariant& Arg19, const ZEVariant& Arg20)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12, const ZEValue& Arg13, const ZEValue& Arg14, const ZEValue& Arg15, const ZEValue& Arg16, const ZEValue& Arg17, const ZEValue& Arg18, const ZEValue& Arg19, const ZEValue& Arg20)
 {
-	const ZEVariant* ArgumentArray[21] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18, &Arg19, &Arg20 };
+	const ZEValue* ArgumentArray[21] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18, &Arg19, &Arg20 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 21);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14, const ZEVariant& Arg15, const ZEVariant& Arg16, const ZEVariant& Arg17, const ZEVariant& Arg18, const ZEVariant& Arg19, const ZEVariant& Arg20, const ZEVariant& Arg21)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12, const ZEValue& Arg13, const ZEValue& Arg14, const ZEValue& Arg15, const ZEValue& Arg16, const ZEValue& Arg17, const ZEValue& Arg18, const ZEValue& Arg19, const ZEValue& Arg20, const ZEValue& Arg21)
 {
-	const ZEVariant* ArgumentArray[22] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18, &Arg19, &Arg20, &Arg21 };
+	const ZEValue* ArgumentArray[22] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18, &Arg19, &Arg20, &Arg21 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 22);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14, const ZEVariant& Arg15, const ZEVariant& Arg16, const ZEVariant& Arg17, const ZEVariant& Arg18, const ZEVariant& Arg19, const ZEVariant& Arg20, const ZEVariant& Arg21, const ZEVariant& Arg22)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12, const ZEValue& Arg13, const ZEValue& Arg14, const ZEValue& Arg15, const ZEValue& Arg16, const ZEValue& Arg17, const ZEValue& Arg18, const ZEValue& Arg19, const ZEValue& Arg20, const ZEValue& Arg21, const ZEValue& Arg22)
 {
-	const ZEVariant* ArgumentArray[23] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18, &Arg19, &Arg20, &Arg21, &Arg22 };
+	const ZEValue* ArgumentArray[23] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18, &Arg19, &Arg20, &Arg21, &Arg22 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 23);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14, const ZEVariant& Arg15, const ZEVariant& Arg16, const ZEVariant& Arg17, const ZEVariant& Arg18, const ZEVariant& Arg19, const ZEVariant& Arg20, const ZEVariant& Arg21, const ZEVariant& Arg22, const ZEVariant& Arg23)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12, const ZEValue& Arg13, const ZEValue& Arg14, const ZEValue& Arg15, const ZEValue& Arg16, const ZEValue& Arg17, const ZEValue& Arg18, const ZEValue& Arg19, const ZEValue& Arg20, const ZEValue& Arg21, const ZEValue& Arg22, const ZEValue& Arg23)
 {
-	const ZEVariant* ArgumentArray[24] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18, &Arg19, &Arg20, &Arg21, &Arg22, &Arg23 };
+	const ZEValue* ArgumentArray[24] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18, &Arg19, &Arg20, &Arg21, &Arg22, &Arg23 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 24);
 }
 
-ZEString ZEFormat::Format(const char* Format, const ZEVariant& Arg0, const ZEVariant& Arg1, const ZEVariant& Arg2, const ZEVariant& Arg3, const ZEVariant& Arg4, const ZEVariant& Arg5, const ZEVariant& Arg6, const ZEVariant& Arg7, const ZEVariant& Arg8, const ZEVariant& Arg9, const ZEVariant& Arg10, const ZEVariant& Arg11, const ZEVariant& Arg12, const ZEVariant& Arg13, const ZEVariant& Arg14, const ZEVariant& Arg15, const ZEVariant& Arg16, const ZEVariant& Arg17, const ZEVariant& Arg18, const ZEVariant& Arg19, const ZEVariant& Arg20, const ZEVariant& Arg21, const ZEVariant& Arg22, const ZEVariant& Arg23, const ZEVariant& Arg24)
+ZEString ZEFormat::Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1, const ZEValue& Arg2, const ZEValue& Arg3, const ZEValue& Arg4, const ZEValue& Arg5, const ZEValue& Arg6, const ZEValue& Arg7, const ZEValue& Arg8, const ZEValue& Arg9, const ZEValue& Arg10, const ZEValue& Arg11, const ZEValue& Arg12, const ZEValue& Arg13, const ZEValue& Arg14, const ZEValue& Arg15, const ZEValue& Arg16, const ZEValue& Arg17, const ZEValue& Arg18, const ZEValue& Arg19, const ZEValue& Arg20, const ZEValue& Arg21, const ZEValue& Arg22, const ZEValue& Arg23, const ZEValue& Arg24)
 {
-	const ZEVariant* ArgumentArray[25] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18, &Arg19, &Arg20, &Arg21, &Arg22, &Arg23, &Arg24 };
+	const ZEValue* ArgumentArray[25] = { &Arg0, &Arg1, &Arg2, &Arg3, &Arg4, &Arg5, &Arg6, &Arg7, &Arg8, &Arg9, &Arg10, &Arg11, &Arg12, &Arg13, &Arg14, &Arg15, &Arg16, &Arg17, &Arg18, &Arg19, &Arg20, &Arg21, &Arg22, &Arg23, &Arg24 };
 	return ZEFormat::FormatInner(Format, ArgumentArray, 25);
 }

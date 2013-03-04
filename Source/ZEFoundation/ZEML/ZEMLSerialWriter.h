@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 
 class ZEFile;
 
@@ -65,7 +65,7 @@ class ZEMLSerialNode
 		virtual ZEMLSerialNode	OpenNode(const ZEString& Name);
 		virtual void			CloseNode();
 
-		void					WriteProperty(const ZEString& Name, const ZEVariant& Value);
+		void					WriteProperty(const ZEString& Name, const ZEValue& Value);
 		void					WriteProperty(const ZEString& Name, float Value);
 		void					WriteProperty(const ZEString& Name, double Value);
 		void					WriteProperty(const ZEString& Name, ZEInt8 Value);

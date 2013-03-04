@@ -1025,7 +1025,7 @@ static void CreateGetMethodIdMethod(FILE* File, const char* ClassName, ZEArray<Z
 static void CreateSetPropertyMethod(FILE* File, const char* ClassName, ZEArray<ZEPropertyData*> Properties)
 {
 	fprintf(File,
-		"bool %sClass::SetProperty(ZEObject* Object, ZESize PropertyId, const ZENewVariant& Value)\n"
+		"bool %sClass::SetProperty(ZEObject* Object, ZESize PropertyId, const ZEVariant& Value)\n"
 		"{\n"
 		"\tconst ZEProperty* Properties = GetProperties();\n"
 		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
@@ -1203,7 +1203,7 @@ static void CreateSetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 static void CreateSetPropertyMethod(FILE* File, const char* ClassName)
 {
 	fprintf(File,
-		"bool %sClass::SetProperty(ZEObject* Object, ZEString PropertyName, const ZENewVariant& Value)\n"
+		"bool %sClass::SetProperty(ZEObject* Object, ZEString PropertyName, const ZEVariant& Value)\n"
 		"{\n"
 		"\treturn SetProperty(Object, GetPropertyId(PropertyName), Value);\n"
 		"}\n\n", ClassName);
@@ -1212,7 +1212,7 @@ static void CreateSetPropertyMethod(FILE* File, const char* ClassName)
 static void CreateGetPropertyMethod(FILE* File, const char* ClassName, ZEArray<ZEPropertyData*> Properties)
 {
 	fprintf(File,
-		"bool %sClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZENewVariant& Value)\n"
+		"bool %sClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)\n"
 		"{\n"
 		"\tconst ZEProperty* Properties = GetProperties();\n"
 		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
@@ -1349,7 +1349,7 @@ static void CreateGetPropertyMethod(FILE* File, const char* ClassName, ZEArray<Z
 static void CreateGetPropertyMethod(FILE* File, const char* ClassName)
 {
 	fprintf(File,
-		"bool %sClass::GetProperty(ZEObject* Object, ZEString PropertyName, ZENewVariant& Value)\n"
+		"bool %sClass::GetProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value)\n"
 		"{\n"
 		"\treturn GetProperty(Object, GetPropertyId(PropertyName), Value);\n"
 		"}\n\n", ClassName);
@@ -1358,7 +1358,7 @@ static void CreateGetPropertyMethod(FILE* File, const char* ClassName)
 static void CreateSetPropertyItemMethod(FILE* File, const char* ClassName, ZEArray<ZEPropertyData*> Properties)
 {
 	fprintf(File, 
-		"bool %sClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZENewVariant& Value)\n"
+		"bool %sClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)\n"
 		"{\n"
 		"\tconst ZEProperty* Properties = GetProperties();\n"
 		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
@@ -1439,7 +1439,7 @@ static void CreateSetPropertyItemMethod(FILE* File, const char* ClassName, ZEArr
 static void CreateSetPropertyItemMethod(FILE* File, const char* ClassName)
 {
 	fprintf(File, 
-		"bool %sClass::SetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZENewVariant& Value)\n"
+		"bool %sClass::SetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)\n"
 		"{\n"
 		"\treturn SetPropertyItem(Object, GetPropertyId(PropertyName), Index, Value);\n"
 		"}\n\n", ClassName);
@@ -1448,7 +1448,7 @@ static void CreateSetPropertyItemMethod(FILE* File, const char* ClassName)
 static void CreateGetPropertyItemMethod(FILE* File, const char* ClassName, ZEArray<ZEPropertyData*> Properties)
 {
 	fprintf(File, 
-		"bool %sClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZENewVariant& Value)\n"
+		"bool %sClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)\n"
 		"{\n"
 		"\tconst ZEProperty* Properties = GetProperties();\n"
 		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
@@ -1516,7 +1516,7 @@ static void CreateGetPropertyItemMethod(FILE* File, const char* ClassName, ZEArr
 static void CreateGetPropertyItemMethod(FILE* File, const char* ClassName)
 {
 	fprintf(File, 
-		"bool %sClass::GetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZENewVariant& Value)\n"
+		"bool %sClass::GetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)\n"
 		"{\n"
 		"\treturn GetPropertyItem(Object, GetPropertyId(PropertyName), Index, Value);\n"
 		"}\n\n", ClassName);
@@ -1525,7 +1525,7 @@ static void CreateGetPropertyItemMethod(FILE* File, const char* ClassName)
 static void CreateAddItemToPropertyMethod(FILE* File, const char* ClassName, ZEArray<ZEPropertyData*> Properties)
 {
 	fprintf(File, 
-		"bool %sClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZENewVariant& Value)\n"
+		"bool %sClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)\n"
 		"{\n"
 		"\tconst ZEProperty* Properties = GetProperties();\n"
 		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
@@ -1589,7 +1589,7 @@ static void CreateAddItemToPropertyMethod(FILE* File, const char* ClassName, ZEA
 static void CreateAddItemToPropertyMethod(FILE* File, const char* ClassName)
 {
 	fprintf(File, 
-		"bool %sClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZENewVariant& Value)\n"
+		"bool %sClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value)\n"
 		"{\n"
 		"\treturn AddItemToProperty(Object, GetPropertyId(PropertyName), Value);\n"
 		"}\n\n", ClassName);
@@ -1598,7 +1598,7 @@ static void CreateAddItemToPropertyMethod(FILE* File, const char* ClassName)
 static void CreateAddItemToPropertyWithIndexMethod(FILE* File, const char* ClassName, ZEArray<ZEPropertyData*> Properties)
 {
 	fprintf(File, 
-		"bool %sClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZENewVariant& Value)\n"
+		"bool %sClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)\n"
 		"{\n"
 		"\tconst ZEProperty* Properties = GetProperties();\n"
 		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
@@ -1659,7 +1659,7 @@ static void CreateAddItemToPropertyWithIndexMethod(FILE* File, const char* Class
 static void CreateAddItemToPropertyWithIndexMethod(FILE* File, const char* ClassName)
 {
 	fprintf(File, 
-		"bool %sClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZESize Index, ZENewVariant& Value)\n"
+		"bool %sClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)\n"
 		"{\n"
 		"\treturn AddItemToProperty(Object, GetPropertyId(PropertyName), Index, Value);\n"
 		"}\n\n", ClassName);
@@ -1804,7 +1804,7 @@ static void CreateGetPropertyItemCountMethod(FILE* File, const char* ClassName)
 static void CreateCallMethodMethod(FILE* File, const char* ClassName, ZEArray<ZEMethodData*> Methods)
 {
 	fprintf(File,
-		"bool %sClass::CallMethod(ZEObject* Object, ZESize MethodId, ZENewVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)\n"
+		"bool %sClass::CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)\n"
 		"{\n"
 		"\tconst ZEMethod Method = GetMethods()[MethodId];\n"
 		"\tif(Method.Name == \"\" || Method.Name == NULL)\n"
@@ -2023,7 +2023,7 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName, ZEArray<ZE
 static void CreateCallMethodMethod(FILE* File, const char* ClassName)
 {
 	fprintf(File,
-		"bool %sClass::CallMethod(ZEObject* Object, ZEString MethodName, ZENewVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)\n"
+		"bool %sClass::CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)\n"
 		"{\n"
 		"\tZESize MethodId = GetMethodId(MethodName);\n"
 		"\tZESize RealId = MethodId;\n\n"
@@ -2059,7 +2059,9 @@ static void CreateCallMethodMethod(FILE* File, const char* ClassName)
 		"\t\t\t\t}\n\n"
 		"\t\t\t\tIsMethodIdFound = true;\n"
 		"\t\t\t}\n"
-		"\t\t}\n"
+		"\t\t}\n\n"
+		"\t\tif(Method.ParameterCount == 0)\n"
+		"\t\t\tbreak;\n"
 		"\t}\n\n"
 		"\treturn CallMethod(Object, RealId, ReturnValue, Parameters, ParameterCount);\n"
 		"}\n\n", ClassName);

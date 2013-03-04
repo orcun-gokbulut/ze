@@ -54,7 +54,7 @@ struct ZEUITextCharacter
 	char				CChar;
 	ZEFontCharacter		FontCharacter;
 	ZEUIRectangle		RenderableCharacter;
-	ZEInt32					Line;
+	ZEInt32				Line;
 	bool				IsSelected;
 };
 

@@ -48,7 +48,7 @@ ZEMLProperty::ZEMLProperty(const ZEString& Name)
 	SetName(Name);
 }
 
-ZEMLProperty::ZEMLProperty(const ZEString& Name ,const ZEVariant& Value)
+ZEMLProperty::ZEMLProperty(const ZEString& Name ,const ZEValue& Value)
 {
 	SetName(Name);
 	SetValue(Value);
@@ -59,7 +59,7 @@ ZEUInt64 ZEMLProperty::GetTotalSize()
 	return sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + GetName().GetSize() + sizeof(ZEUInt64) + (ZEUInt64)Value.SizeOf();
 }
 
-void ZEMLProperty::SetValue(const ZEVariant& Value)
+void ZEMLProperty::SetValue(const ZEValue& Value)
 {
 	this->Value = Value;
 	DataSize = Value.SizeOf();
@@ -126,7 +126,7 @@ void ZEMLProperty::SetValue(const ZEVariant& Value)
 	}
 }
 
-const ZEVariant& ZEMLProperty::GetValue() const
+const ZEValue& ZEMLProperty::GetValue() const
 {
 	return Value;
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZENewVariant.h
+ Zinek Engine - ZEVariant.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_NEW_VARIANT_H__
-#define __ZE_NEW_VARIANT_H__
+#ifndef __ZE_VARIANT_H__
+#define __ZE_VARIANT_H__
 
 #pragma warning(push)
 #pragma warning(disable:4482)
@@ -58,10 +58,10 @@ class ZEClass;
 class ZEObject;
 class ZEReference;
 
-class ZENewVariant
+class ZEVariant
 {
 	public:
-		struct ZENewVariantValue
+		struct ZEVariantValue
 		{
 			union
 			{
@@ -103,7 +103,7 @@ class ZENewVariant
 		////////////////////////////////////////////////
 
 		void							SetUndefined();
-		void							SetVariant(const ZENewVariant& Value);
+		void							SetVariant(const ZEVariant& Value);
 		void							SetReference(const ZEReference& Value);
 
 		void							SetInt8(ZEInt8 Value);
@@ -304,54 +304,54 @@ class ZENewVariant
 		ZEClass* const& 				GetClassConstRef() const;
 
 
-										ZENewVariant();
-										explicit ZENewVariant(const ZEReference& Reference);
-										ZENewVariant(const ZENewVariant& Value);
-										ZENewVariant(const char* Value);
-										ZENewVariant(const ZEString& Value);
-										ZENewVariant(ZEInt8 Value);
-										ZENewVariant(ZEInt16 Value);
-										ZENewVariant(ZEInt32 Value);
-										ZENewVariant(ZEInt64 Value);
-										ZENewVariant(ZEUInt8 Value);
-										ZENewVariant(ZEUInt16 Value);
-										ZENewVariant(ZEUInt32 Value);
-										ZENewVariant(ZEUInt64 Value);
-										ZENewVariant(float Value);
-										ZENewVariant(double Value);
-										ZENewVariant(bool Value);
-										ZENewVariant(const ZEVector2& Value);
-										ZENewVariant(const ZEVector3& Value);
-										ZENewVariant(const ZEVector4& Value);
-										ZENewVariant(const ZEQuaternion& Value);
-										ZENewVariant(const ZEMatrix3x3& Value);
-										ZENewVariant(const ZEMatrix4x4& Value);
+										ZEVariant();
+										explicit ZEVariant(const ZEReference& Reference);
+										ZEVariant(const ZEVariant& Value);
+										ZEVariant(const char* Value);
+										ZEVariant(const ZEString& Value);
+										ZEVariant(ZEInt8 Value);
+										ZEVariant(ZEInt16 Value);
+										ZEVariant(ZEInt32 Value);
+										ZEVariant(ZEInt64 Value);
+										ZEVariant(ZEUInt8 Value);
+										ZEVariant(ZEUInt16 Value);
+										ZEVariant(ZEUInt32 Value);
+										ZEVariant(ZEUInt64 Value);
+										ZEVariant(float Value);
+										ZEVariant(double Value);
+										ZEVariant(bool Value);
+										ZEVariant(const ZEVector2& Value);
+										ZEVariant(const ZEVector3& Value);
+										ZEVariant(const ZEVector4& Value);
+										ZEVariant(const ZEQuaternion& Value);
+										ZEVariant(const ZEMatrix3x3& Value);
+										ZEVariant(const ZEMatrix4x4& Value);
 										
 										template<typename ZEObjectType>
-										ZENewVariant(const ZEObjectType& Value);
-										ZENewVariant(ZEObject* Value);
+										ZEVariant(const ZEObjectType& Value);
+										ZEVariant(ZEObject* Value);
 
 										template<typename ZEArrayType>
-										ZENewVariant(const ZEArray<ZEArrayType>& Value);
+										ZEVariant(const ZEArray<ZEArrayType>& Value);
 
-										ZENewVariant(ZEClass* Class);
-										~ZENewVariant();
+										ZEVariant(ZEClass* Class);
+										~ZEVariant();
 };
 
 template<typename ZETypeInstance>
-void* ZENewVariant::ClonerTemplate(const void* Instance)
+void* ZEVariant::ClonerTemplate(const void* Instance)
 {
 	return new ZETypeInstance(*(const ZETypeInstance*)Instance);
 }
 
 template<typename ZETypeInstance>
-void ZENewVariant::DeleterTemplate(void* Instance)
+void ZEVariant::DeleterTemplate(void* Instance)
 {
 	delete (ZETypeInstance*)Instance;
 }
 
 template<typename ZEItemType>
-void ZENewVariant::SetArray(const ZEArray<ZEItemType>& Array)
+void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array)
 {
 	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
 	if (Type.Type == ZE_TT_UNDEFINED)
@@ -369,7 +369,7 @@ void ZENewVariant::SetArray(const ZEArray<ZEItemType>& Array)
 }
 
 template<typename ZEItemType>
-void ZENewVariant::SetArrayRef(ZEArray<ZEItemType>& Array)
+void ZEVariant::SetArrayRef(ZEArray<ZEItemType>& Array)
 {
 	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
 	if (Type.Type == ZE_TT_UNDEFINED)
@@ -385,7 +385,7 @@ void ZENewVariant::SetArrayRef(ZEArray<ZEItemType>& Array)
 }
 
 template<typename ZEItemType>
-void ZENewVariant::SetArrayRefConst(const ZEArray<ZEItemType>& Array)
+void ZEVariant::SetArrayRefConst(const ZEArray<ZEItemType>& Array)
 {
 	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
 	if (Type.Type == ZE_TT_UNDEFINED)
@@ -401,7 +401,7 @@ void ZENewVariant::SetArrayRefConst(const ZEArray<ZEItemType>& Array)
 }
 
 template<typename ZEObjectType>
-void ZENewVariant::SetObject(const ZEObjectType& Object)
+void ZEVariant::SetObject(const ZEObjectType& Object)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_OBJECT;
@@ -414,7 +414,7 @@ void ZENewVariant::SetObject(const ZEObjectType& Object)
 }
 
 template<typename ZEObjectType>
-void ZENewVariant::SetObjectRef(ZEObjectType& Object)
+void ZEVariant::SetObjectRef(ZEObjectType& Object)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_OBJECT;
@@ -425,7 +425,7 @@ void ZENewVariant::SetObjectRef(ZEObjectType& Object)
 }
 
 template<typename ZEObjectType>
-void ZENewVariant::SetObjectConstRef(const ZEObjectType& Object)
+void ZEVariant::SetObjectConstRef(const ZEObjectType& Object)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_OBJECT;
@@ -436,7 +436,7 @@ void ZENewVariant::SetObjectConstRef(const ZEObjectType& Object)
 }
 
 template<typename ZEItemType>
-const ZEArray<ZEItemType>& ZENewVariant::GetArray() const
+const ZEArray<ZEItemType>& ZEVariant::GetArray() const
 {
 	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
 	if (ValueType.Type != ZE_TT_ARRAY || ValueType.SubType != Type.SubType)
@@ -446,7 +446,7 @@ const ZEArray<ZEItemType>& ZENewVariant::GetArray() const
 }
 
 template<typename ZEItemType>
-ZEArray<ZEItemType>& ZENewVariant::GetArrayRef() const
+ZEArray<ZEItemType>& ZEVariant::GetArrayRef() const
 {
 	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
 	if (ValueType.Type = ZE_TT_ARRAY || ValueType.SubTypeType != Type.Type)
@@ -461,7 +461,7 @@ ZEArray<ZEItemType>& ZENewVariant::GetArrayRef() const
 }
 
 template<typename ZEItemType>
-const ZEArray<ZEItemType>& ZENewVariant::GetArrayConstRef() const
+const ZEArray<ZEItemType>& ZEVariant::GetArrayConstRef() const
 {
 	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
 	if (ValueType.Type = ZE_TT_ARRAY || ValueType.SubTypeType != Type.Type)
@@ -471,7 +471,7 @@ const ZEArray<ZEItemType>& ZENewVariant::GetArrayConstRef() const
 }
 
 template<typename ZEObjectType>
-const ZEObject& ZENewVariant::GetObject() const
+const ZEObject& ZEVariant::GetObject() const
 {
 	if (ValueType.Type != ZE_TT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
@@ -483,7 +483,7 @@ const ZEObject& ZENewVariant::GetObject() const
 }
 
 template<typename ZEObjecType>
-ZEObject& ZENewVariant::GetObjectRef() const
+ZEObject& ZEVariant::GetObjectRef() const
 {
 	if (ValueType.Type != ZE_TT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
@@ -498,7 +498,7 @@ ZEObject& ZENewVariant::GetObjectRef() const
 }
 
 template<typename ZEObjecType>
-const ZEObject& ZENewVariant::GetObjectConstRef() const
+const ZEObject& ZEVariant::GetObjectConstRef() const
 {
 	if (ValueType.Type != ZE_TT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
@@ -510,13 +510,13 @@ const ZEObject& ZENewVariant::GetObjectConstRef() const
 }
 
 template<typename ZEObjectType>
-ZENewVariant::ZENewVariant(const ZEObjectType& Value)
+ZEVariant::ZEVariant(const ZEObjectType& Value)
 {
 	SetObject(Value);
 }
 
 template<typename ZEArrayType>
-ZENewVariant::ZENewVariant(const ZEArray<ZEArrayType>& Value)
+ZEVariant::ZEVariant(const ZEArray<ZEArrayType>& Value)
 {
 	SetArray(Value);
 }
