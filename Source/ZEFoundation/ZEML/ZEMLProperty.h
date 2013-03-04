@@ -39,7 +39,7 @@
 
 #include "ZEMLItem.h"
 #include "ZEDS/ZEString.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 
 class ZEMLProperty : public ZEMLItem
 {
@@ -49,7 +49,7 @@ class ZEMLProperty : public ZEMLItem
 
 	private:
 
-		ZEVariant			Value;
+		ZEValue			Value;
 
 	protected:
 
@@ -60,12 +60,12 @@ class ZEMLProperty : public ZEMLItem
 
 		virtual ZEUInt64	GetTotalSize();
 
-		void				SetValue(const ZEVariant& Value);
-		const ZEVariant&	GetValue() const;
+		void				SetValue(const ZEValue& Value);
+		const ZEValue&	GetValue() const;
 
 							ZEMLProperty();
 							ZEMLProperty(const ZEString& Name);
-							ZEMLProperty(const ZEString& Name ,const ZEVariant& Value);
+							ZEMLProperty(const ZEString& Name ,const ZEValue& Value);
 };
 
 #endif

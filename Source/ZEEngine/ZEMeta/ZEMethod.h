@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETypes.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 #include "ZEType.h"
 
 class ZEClass;

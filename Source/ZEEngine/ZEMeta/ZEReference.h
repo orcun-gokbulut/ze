@@ -60,7 +60,7 @@ class ZEString;
 
 class ZEReference
 {
-	friend class ZENewVariant;
+	friend class ZEVariant;
 	private:
 		ZEType							ValueType;
 		struct

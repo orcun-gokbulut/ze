@@ -49,7 +49,7 @@ bool ZEMLSerialReader::Read()
 	ZEUInt64 TempUInt64;
 
 	CurrentItemType			= ZEML_IT_UNDEFINED;
-	CurrentItemValue		= ZEVariant();
+	CurrentItemValue		= ZEValue();
 	CurrentItemName			= "";
 	CurrentItemDataSize		= 0;
 	CurrentItemSubItemCount = 0;
@@ -281,7 +281,7 @@ ZEUInt64 ZEMLSerialReader::GetSubItemCount()
 	return CurrentItemSubItemCount;
 }
 
-ZEVariant ZEMLSerialReader::GetItemValue()
+ZEValue ZEMLSerialReader::GetItemValue()
 {
 	return CurrentItemValue;
 }
@@ -414,7 +414,7 @@ bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCou
 					return false;
 				}
 
-				List[CurrentItemIndex].Value->SetVariant(CurrentItemValue);
+				List[CurrentItemIndex].Value->SetValue(CurrentItemValue);
 			}
 		}
 	}

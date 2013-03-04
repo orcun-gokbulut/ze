@@ -43,7 +43,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZECommandSection.h"
-#include "ZEDS/ZETypedVariant.h"
+#include "ZEDS/ZETypedValue.h"
 #include "ZEDS/ZEFastDelegate.h"
 
 class ZEOptionSection

@@ -183,7 +183,7 @@ void ZEMLVisualizerWidget::AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem)
 
 		NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
 		ZEMLProperty* CurrentItem = (ZEMLProperty*)Item;
-		ZEVariant Value = CurrentItem->GetValue();
+		ZEValue Value = CurrentItem->GetValue();
 		switch (Value.GetType())
 		{
 		case ZE_VRT_FLOAT:

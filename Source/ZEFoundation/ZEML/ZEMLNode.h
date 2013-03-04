@@ -41,7 +41,7 @@
 #include "ZEDS/ZEList.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 #include "ZEEndian.h"
 
 class ZEFile;
@@ -73,7 +73,7 @@ class ZEMLNode : public ZEMLItem
 		ZEMLProperty*				AddProperty();
 		bool						AddProperty(ZEMLProperty* Property);
 		ZEMLProperty*				AddProperty(const ZEString& Name);
-		ZEMLProperty*				AddProperty(const ZEString& Name, const ZEVariant& Value);
+		ZEMLProperty*				AddProperty(const ZEString& Name, const ZEValue& Value);
 		ZEMLProperty*				AddProperty(const ZEString& Name, float Value);
 		ZEMLProperty*				AddProperty(const ZEString& Name, double Value);
 		ZEMLProperty*				AddProperty(const ZEString& Name, ZEInt8 Value);

@@ -65,11 +65,12 @@ ZE_CLASS(ZEModel)
 
 class ZEModel : public ZEEntity
 {	
-	ZE_OBJECT
-
 	friend class ZEPhysicalEnvironment;
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
+
+	ZE_OBJECT
+
 	private:
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;

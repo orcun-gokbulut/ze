@@ -38,7 +38,7 @@
 #define __ZEML_SERIAL_READER_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMLItem.h"
 #include "ZEDS\ZEHashGenerator.h"
@@ -51,8 +51,8 @@ struct ZEMLSerialListItem
 	bool					IsFound;
 	const char*				Name;
 	ZEUInt64				Hash;
-	ZEVariant*				Value;
-	ZEVariantType			VariantType;
+	ZEValue*				Value;
+	ZEValueType			VariantType;
 	bool					Mandatory;
 
 	ZEMLSerialPointer*		Pointer;
@@ -73,7 +73,7 @@ class ZEMLSerialReader
 		ZEMLSerialPointer	MaxPointer;
 
 		ZEMLItemType		CurrentItemType;
-		ZEVariant			CurrentItemValue;
+		ZEValue			CurrentItemValue;
 		ZEString			CurrentItemName;
 		ZEUInt64			CurrentItemDataSize;
 		ZEUInt64			CurrentItemSubItemCount;
@@ -90,7 +90,7 @@ class ZEMLSerialReader
 		ZEMLItemType		GetItemType();
 		ZEString			GetItemName();
 		ZEUInt64			GetSubItemCount();
-		ZEVariant			GetItemValue();
+		ZEValue			GetItemValue();
 		ZEUInt64			GetDataSize();
 		bool				GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offset = 0);
 		bool				GetData(ZEPartialFile& File);

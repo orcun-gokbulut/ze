@@ -139,7 +139,7 @@ bool ZEAnimation::ReadFromFile(ZEUnserializer* Unserializer, ZEAnimation* Animat
 		ZEPropertyAnimation* PropertyAnimation = &Animation->PropertyAnimations[I];
 		PropertyAnimation->Interpolate = PropertyAnimationChunk.Interpolate;
 		PropertyAnimation->PropertyId = PropertyAnimationChunk.PropertyId;
-		PropertyAnimation->ValueType = (ZEVariantType)PropertyAnimationChunk.ValueType;
+		PropertyAnimation->ValueType = (ZEValueType)PropertyAnimationChunk.ValueType;
 		PropertyAnimation->Keys.SetCount((ZESize)PropertyAnimationChunk.KeyCount);
 		for (ZESize I = 0; I < PropertyAnimation->Keys.GetCount();I++)
 		{
@@ -335,10 +335,10 @@ void ZEAnimationController::AdvanceAnimation(float TimeElapsed)
 				else
 				{
 					// Interpolate
-					ZEVariant* PrevKeyValue;
+					ZEValue* PrevKeyValue;
 					float PrevKeyTime;
 
-					ZEVariant* NextKeyValue = &PropertyAnimation->Keys[NextKeyIndex].Value;
+					ZEValue* NextKeyValue = &PropertyAnimation->Keys[NextKeyIndex].Value;
 					float NextKeyTime		= PropertyAnimation->Keys[NextKeyIndex].Time;
 
 					if (PrevKeyIndex == -1)

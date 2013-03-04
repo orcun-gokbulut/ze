@@ -37,7 +37,7 @@
 #ifndef __ZE_PROPERTY_SIGNATURE_H__
 #define __ZE_PROPERTY_SIGNATURE_H__
 
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 
 enum ZECanonicalType
 {
@@ -53,7 +53,7 @@ class ZEClass;
 class ZEPropertySignature
 {
 	public:
-		ZEVariantType			Type;
+		ZEValueType			Type;
 		ZEClass*				BaseClass;
 		ZECanonicalType			CanonicalType;
 

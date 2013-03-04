@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEVariant.h
+ Zinek Engine - ZEValue.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_VARIANT_H__
-#define __ZE_VARIANT_H__
+#ifndef __ZE_VALUE_H__
+#define __ZE_VALUE_H__
 
 #pragma warning(push)
 #pragma warning(disable:4482)
@@ -50,7 +50,7 @@
 class ZESerializer;
 class ZEUnserializer;
 
-enum ZEVariantType
+enum ZEValueType
 {
 	ZE_VRT_UNDEFINED = 0,
 	ZE_VRT_NULL,
@@ -82,10 +82,10 @@ class ZEVector3;
 class ZEVector4;
 class ZEObject;
 
-class ZEVariant : public ZESerializable
+class ZEValue : public ZESerializable
 {
 	public:
-		struct ZEVariantValue
+		struct ZEValueValue
 		{
 			union
 			{
@@ -110,15 +110,15 @@ class ZEVariant : public ZESerializable
 		};
 
 	protected:
-		ZEVariantType			Type;
-		ZEVariantValue			Value;
+		ZEValueType				Type;
+		ZEValueValue			Value;
 
 	public:
-		void					SetType	(ZEVariantType NewType);
-		ZEVariantType			GetType	() const;
+		void					SetType	(ZEValueType NewType);
+		ZEValueType				GetType	() const;
 
-		ZEVariantValue			GetValue() const;
-		ZEVariantValue&			ImplicitAcesss();
+		ZEValueValue			GetValue() const;
+		ZEValueValue&			ImplicitAcesss();
 
 		void					SetString(const char* Value);
 		void					SetString(const ZEString& Value);
@@ -141,7 +141,7 @@ class ZEVariant : public ZESerializable
 		void					SetMatrix4x4(const ZEMatrix4x4& Value);
 		void					SetClass(ZEObject* Value);
 		void					SetNull();
-		void					SetVariant(const ZEVariant& Value);
+		void					SetValue(const ZEValue& Value);
 
 		const ZEString&			GetString() const;
 		ZEInt8					GetInt8() const;
@@ -169,27 +169,27 @@ class ZEVariant : public ZESerializable
 		bool					Serialize(ZESerializer* Serializer);
 		bool					Unserialize(ZEUnserializer* Unserializer);
 
-		ZEVariant&				operator=(const ZEVariant& Value);
-		ZEVariant&				operator=(const char* Value);
-		ZEVariant&				operator=(const ZEString& Value);
-		ZEVariant&				operator=(ZEInt8 Value);
-		ZEVariant&				operator=(ZEInt16 Value);
-		ZEVariant&				operator=(ZEInt32 Value);
-		ZEVariant&				operator=(ZEInt64 Value);
-		ZEVariant&				operator=(ZEUInt8 Value);
-		ZEVariant&				operator=(ZEUInt16 Value);
-		ZEVariant&				operator=(ZEUInt32 Value);
-		ZEVariant&				operator=(ZEUInt64 Value);
-		ZEVariant&				operator=(float Value);
-		ZEVariant&				operator=(double Value);
-		ZEVariant&				operator=(bool Value);
-		ZEVariant&				operator=(const ZEVector2& Value);
-		ZEVariant&				operator=(const ZEVector3& Value);
-		ZEVariant&				operator=(const ZEVector4& Value);
-		ZEVariant&				operator=(const ZEQuaternion& Value);
-		ZEVariant&				operator=(const ZEMatrix3x3& Value);
-		ZEVariant&				operator=(const ZEMatrix4x4& Value);
-		ZEVariant&				operator=(ZEObject* Value);
+		ZEValue&				operator=(const ZEValue& Value);
+		ZEValue&				operator=(const char* Value);
+		ZEValue&				operator=(const ZEString& Value);
+		ZEValue&				operator=(ZEInt8 Value);
+		ZEValue&				operator=(ZEInt16 Value);
+		ZEValue&				operator=(ZEInt32 Value);
+		ZEValue&				operator=(ZEInt64 Value);
+		ZEValue&				operator=(ZEUInt8 Value);
+		ZEValue&				operator=(ZEUInt16 Value);
+		ZEValue&				operator=(ZEUInt32 Value);
+		ZEValue&				operator=(ZEUInt64 Value);
+		ZEValue&				operator=(float Value);
+		ZEValue&				operator=(double Value);
+		ZEValue&				operator=(bool Value);
+		ZEValue&				operator=(const ZEVector2& Value);
+		ZEValue&				operator=(const ZEVector3& Value);
+		ZEValue&				operator=(const ZEVector4& Value);
+		ZEValue&				operator=(const ZEQuaternion& Value);
+		ZEValue&				operator=(const ZEMatrix3x3& Value);
+		ZEValue&				operator=(const ZEMatrix4x4& Value);
+		ZEValue&				operator=(ZEObject* Value);
 
 								operator const char*();
 								
@@ -212,29 +212,29 @@ class ZEVariant : public ZESerializable
 								operator ZEMatrix4x4();
 								operator ZEObject*();
 
-								ZEVariant();
-								ZEVariant(const ZEVariant& Value);
-								ZEVariant(const char* Value);
-								ZEVariant(const ZEString& Value);
-								ZEVariant(ZEInt8 Value);
-								ZEVariant(ZEInt16 Value);
-								ZEVariant(ZEInt32 Value);
-								ZEVariant(ZEInt64 Value);
-								ZEVariant(ZEUInt8 Value);
-								ZEVariant(ZEUInt16 Value);
-								ZEVariant(ZEUInt32 Value);
-								ZEVariant(ZEUInt64 Value);
-								ZEVariant(float Value);
-								ZEVariant(double Value);
-								ZEVariant(bool Value);
-								ZEVariant(const ZEVector2& Value);
-								ZEVariant(const ZEVector3& Value);
-								ZEVariant(const ZEVector4& Value);
-								ZEVariant(const ZEQuaternion& Quaternion);
-								ZEVariant(const ZEMatrix3x3& Value);
-								ZEVariant(const ZEMatrix4x4& Value);
-								ZEVariant(ZEObject* Value);
-								~ZEVariant();
+								ZEValue();
+								ZEValue(const ZEValue& Value);
+								ZEValue(const char* Value);
+								ZEValue(const ZEString& Value);
+								ZEValue(ZEInt8 Value);
+								ZEValue(ZEInt16 Value);
+								ZEValue(ZEInt32 Value);
+								ZEValue(ZEInt64 Value);
+								ZEValue(ZEUInt8 Value);
+								ZEValue(ZEUInt16 Value);
+								ZEValue(ZEUInt32 Value);
+								ZEValue(ZEUInt64 Value);
+								ZEValue(float Value);
+								ZEValue(double Value);
+								ZEValue(bool Value);
+								ZEValue(const ZEVector2& Value);
+								ZEValue(const ZEVector3& Value);
+								ZEValue(const ZEVector4& Value);
+								ZEValue(const ZEQuaternion& Quaternion);
+								ZEValue(const ZEMatrix3x3& Value);
+								ZEValue(const ZEMatrix4x4& Value);
+								ZEValue(ZEObject* Value);
+								~ZEValue();
 };
 
 

@@ -42,7 +42,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEFlags.h"
 #include "ZEDefinitions.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 #include "ZEMath/ZEOBBox.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEMatrix.h"

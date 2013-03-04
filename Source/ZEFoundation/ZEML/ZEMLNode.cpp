@@ -105,7 +105,7 @@ bool ZEMLNode::AddProperty(ZEMLProperty* Property)
 	return true;
 }
 
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVariant& Value)
+ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEValue& Value)
 {
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 		if(Properties[I]->GetName() == Name)
@@ -157,97 +157,97 @@ bool ZEMLNode::RemoveProperty(ZEMLProperty* Property)
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, float Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, double Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt8 Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt16 Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt32 Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt64 Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt8 Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt16 Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt32 Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt64 Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, bool Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEString& Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const char* Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEQuaternion& Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVector2& Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVector3& Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVector4& Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix3x3& Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix4x4& Value)
 {
-	return AddProperty(Name, ZEVariant(Value));
+	return AddProperty(Name, ZEValue(Value));
 }
 
 bool ZEMLNode::AddDataProperty(ZEMLDataProperty* Property)

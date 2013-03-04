@@ -57,7 +57,7 @@ ZEMLSerialNode::ZEMLSerialNode(const ZEString& Name, ZEFile* File, ZEMLSerialNod
 	Size = 0;
 }
 
-void ZEMLSerialNode::WriteProperty(const ZEString& Name, const ZEVariant& Value)
+void ZEMLSerialNode::WriteProperty(const ZEString& Name, const ZEValue& Value)
 {
 	ZEMLProperty Property;
 	Property.SetName(Name);
@@ -69,97 +69,97 @@ void ZEMLSerialNode::WriteProperty(const ZEString& Name, const ZEVariant& Value)
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, float Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, double Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, ZEInt8 Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, ZEInt16 Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, ZEInt32 Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, ZEInt64 Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, ZEUInt8 Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, ZEUInt16 Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, ZEUInt32 Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, ZEUInt64 Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, bool Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, const ZEString& Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, const char* Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, const ZEQuaternion& Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, const ZEVector2& Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, const ZEVector3& Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, const ZEVector4& Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, const ZEMatrix3x3& Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteProperty(const ZEString& Name, const ZEMatrix4x4& Value)
 {
-	WriteProperty(Name, ZEVariant(Value));
+	WriteProperty(Name, ZEValue(Value));
 }
 
 void ZEMLSerialNode::WriteDataProperty(const ZEString& Name, void* Data, ZEUInt64 DataSize)

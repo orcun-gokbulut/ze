@@ -49,7 +49,7 @@
 #define ZE_FPS_ARGUMENT_FORMATTING			4
 #define ZE_FPS_APPLY						5
 
-ZEString ZEFormat::FormatInner(const char* Input, const ZEVariant** Arguments, ZESize Count)
+ZEString ZEFormat::FormatInner(const char* Input, const ZEValue** Arguments, ZESize Count)
 {
 	ZEStringWriter Writer;
 

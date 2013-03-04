@@ -79,62 +79,62 @@ ZESize ZEClass::GetMethodCount()
 	return 0;
 }
 
-bool ZEClass::SetProperty(ZEObject* Object, ZESize PropertyId, const ZENewVariant& Value)
+bool ZEClass::SetProperty(ZEObject* Object, ZESize PropertyId, const ZEVariant& Value)
 {
 	return false;
 }
 
-bool ZEClass::SetProperty(ZEObject* Object, ZEString PropertyName, const ZENewVariant& Value)
+bool ZEClass::SetProperty(ZEObject* Object, ZEString PropertyName, const ZEVariant& Value)
 {
 	return false;
 }
 
-bool ZEClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZENewVariant& Value)
+bool ZEClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)
 {
 	return false;
 }
 
-bool ZEClass::GetProperty(ZEObject* Object, ZEString PropertyName, ZENewVariant& Value)
+bool ZEClass::GetProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value)
 {
 	return false;
 }
 
-bool ZEClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZENewVariant& Value)
+bool ZEClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)
 {
 	return false;
 }
 
-bool ZEClass::GetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZENewVariant& Value)
+bool ZEClass::GetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)
 {
 	return false;
 }
 
-bool ZEClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZENewVariant& Value)
+bool ZEClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)
 {
 	return false;
 }
 
-bool ZEClass::SetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZENewVariant& Value)
+bool ZEClass::SetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)
 {
 	return false;
 }
 
-bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZENewVariant& Value)
+bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)
 {
 	return false;
 }
 
-bool ZEClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZENewVariant& Value)
+bool ZEClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value)
 {
 	return false;
 }
 
-bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZENewVariant& Value)
+bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)
 {
 	return false;
 }
 
-bool ZEClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZESize Index, ZENewVariant& Value)
+bool ZEClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)
 {
 	return false;
 }
@@ -179,12 +179,12 @@ bool ZEClass::RemoveEventHandler(ZEObject* Target, ZEString EventName, ZEEventHa
 	return false;
 }
 
-bool ZEClass::CallMethod(ZEObject* Object, ZESize MethodId, ZENewVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
+bool ZEClass::CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
 {
 	return false;
 }
 
-bool ZEClass::CallMethod(ZEObject* Object, ZEString MethodName, ZENewVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
+bool ZEClass::CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
 {
 	return false;
 }

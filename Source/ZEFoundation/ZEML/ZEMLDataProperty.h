@@ -39,7 +39,7 @@
 
 #include "ZEMLItem.h"
 #include "ZEDS/ZEString.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 
 class ZEMLDataProperty : public ZEMLItem
 {

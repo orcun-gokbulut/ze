@@ -42,11 +42,11 @@ ze_add_source(ZEClassOverloads.cpp				Sources)
 ze_add_source(ZEObject.cpp						Sources)
 ze_add_source(ZEObject.h						Sources Headers)
 
-ze_add_source(ZEAnimation.cpp         Sources)
-ze_add_source(ZEAnimation.h         Sources Headers)
+ze_add_source(ZEAnimation.cpp					Sources)
+ze_add_source(ZEAnimation.h						Sources Headers)
 
-ze_add_source(ZEPostProcessor.cpp     Sources)
-ze_add_source(ZEPostProcessor.h     Sources Headers)
+ze_add_source(ZEPostProcessor.cpp				Sources)
+ze_add_source(ZEPostProcessor.h					Sources Headers)
 
 ze_add_source(ZEMetaAttribute.cpp				Sources)
 ze_add_source(ZEMetaAttribute.h					Sources Headers)
@@ -99,8 +99,8 @@ ze_add_source(ZETypeGenerator.cpp				Sources)
 ze_add_source(ZETypeGenerator.h					Sources Headers)
 
 
-ze_add_source(ZENewVariant.cpp					Sources)
-ze_add_source(ZENewVariant.h					Sources Headers)
+ze_add_source(ZEVariant.cpp						Sources)
+ze_add_source(ZEVariant.h						Sources Headers)
 ze_add_source(ZEReference.cpp					Sources)
 ze_add_source(ZEReference.h						Sources Headers)
 

@@ -123,7 +123,7 @@ bool ZEInteriorResource::ReadInteriorFromFile(ZEFile* ResourceFile)
 	}
 
 	ZEMLSerialPointer RoomsPointer, DoorsPointer, HelpersPointer, MaterialsPointer;
-	ZEVariant DoorCount, RoomCount, HelperCount, MaterialCount;
+	ZEValue DoorCount, RoomCount, HelperCount, MaterialCount;
 
 	ZEMLSerialListItem InteriorList[] = {
 		ZEML_LIST_NODE("Rooms",					RoomsPointer,										true),
@@ -202,7 +202,7 @@ bool ZEInteriorResource::ReadDoors(ZEMLSerialReader* Reader)
 		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Door")
 			continue;
 
-		ZEVariant DoorName, IsOpen, Width, Length, Position, Rotation, Scale, RoomAIndex, RoomBIndex, UserDefinedProperties;
+		ZEValue DoorName, IsOpen, Width, Length, Position, Rotation, Scale, RoomAIndex, RoomBIndex, UserDefinedProperties;
 		ZEMLSerialPointer RectanglePointer;
 
 		ZEMLSerialListItem DoorPropertiesList[] = { 
@@ -282,7 +282,7 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Room")
 			continue;
 
-		ZEVariant RoomName, Position, Rotation, Scale, PhysicalMeshEnabled, UserDefinedProperties;
+		ZEValue RoomName, Position, Rotation, Scale, PhysicalMeshEnabled, UserDefinedProperties;
 		ZEMLSerialPointer PolygonsPointer, PhysicalMeshPointer;
 
 		ZEMLSerialListItem RoomPropertiesList[] = {
@@ -362,7 +362,7 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 
 		if(PhysicalMeshPointer != -1)
 		{
-			ZEVariant PhysicalMeshEnabledValue, PhysicalUserDefinedPropertiesValue;
+			ZEValue PhysicalMeshEnabledValue, PhysicalUserDefinedPropertiesValue;
 			ZEMLSerialPointer PhysicalVerticesPointer, PhysicalPolygonsPointer;
 
 			Reader->SeekPointer(PhysicalMeshPointer);
@@ -418,7 +418,7 @@ bool ZEInteriorResource::ReadHelpers(ZEMLSerialReader* Reader)
 		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Helper")
 			continue;
 
-		ZEVariant NameValue, OwnerTypeValue, OwnerIndexValue, PositionValue, RotationValue, ScaleValue, UserDefinedProperties;
+		ZEValue NameValue, OwnerTypeValue, OwnerIndexValue, PositionValue, RotationValue, ScaleValue, UserDefinedProperties;
 
 		ZEMLSerialListItem HelperPropertiesList[] = { 
 			ZEML_LIST_PROPERTY("Name",						NameValue,					ZE_VRT_STRING,			true),  
@@ -472,7 +472,7 @@ bool ZEInteriorResource::ReadMaterials(ZEMLSerialReader* Reader)
 		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Material")
 			continue;
 
-		ZEVariant MaterialName, MaterialRelativePath;
+		ZEValue MaterialName, MaterialRelativePath;
 
 		ZEMLSerialListItem MaterialList[] = {
 			ZEML_LIST_PROPERTY("Name",		MaterialName,			ZE_VRT_STRING,	true),

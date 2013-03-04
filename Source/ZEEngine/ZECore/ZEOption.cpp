@@ -64,7 +64,7 @@ void ZEOption::SetAttribute(ZEOptionAttribute NewAttribute)
 	Attribute = NewAttribute;
 }
 
-void ZEOption::SetValue(ZETypedVariant NewValue)
+void ZEOption::SetValue(ZETypedValue NewValue)
 {	
 	bool Cancel = false;
 	if (!OnChanging.empty())
@@ -89,28 +89,28 @@ void ZEOption::SetValue(ZETypedVariant NewValue)
 
 }
 
-void ZEOption::SetValueType(ZEVariantType NewType)
+void ZEOption::SetValueType(ZEValueType NewType)
 {
 	DefaultValue.SetType(NewType);
 	Value.SetType(NewType);
 }
 
-ZEVariantType ZEOption::GetValueType()
+ZEValueType ZEOption::GetValueType()
 {
 	return Value.GetType();
 }
 
-ZETypedVariant ZEOption::GetValue()
+ZETypedValue ZEOption::GetValue()
 {
 	return Value;
 }
 
-void ZEOption::SetDefaultValue(ZETypedVariant NewDefaultValue)
+void ZEOption::SetDefaultValue(ZETypedValue NewDefaultValue)
 {
 	DefaultValue = NewDefaultValue;
 }
 
-ZETypedVariant ZEOption::GetDefaultValue() 
+ZETypedValue ZEOption::GetDefaultValue() 
 {
 	return DefaultValue;
 }
@@ -149,7 +149,7 @@ void ZEOption::ChangeCommitted()
 		Changed = false;
 }
 
-ZEOption::ZEOption(const char *InitialName, ZETypedVariant InitialDefaultValue, ZEOptionAttribute InitialAttribute)
+ZEOption::ZEOption(const char *InitialName, ZETypedValue InitialDefaultValue, ZEOptionAttribute InitialAttribute)
 {
 	Name = InitialName;
 	SetValueType(InitialDefaultValue.GetType());

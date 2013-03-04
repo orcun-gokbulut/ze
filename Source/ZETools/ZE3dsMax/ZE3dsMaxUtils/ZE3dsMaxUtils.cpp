@@ -317,7 +317,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ch
 	if (Prop != NULL && Prop->GetType() == Type)
 	{
 		bool Result;
-		ZEVariant TempValue;
+		ZEValue TempValue;
 
 		switch (Type)
 		{
