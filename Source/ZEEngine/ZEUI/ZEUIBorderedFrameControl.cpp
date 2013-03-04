@@ -35,6 +35,8 @@
 
 #include "ZEUIBorderedFrameControl.h"
 
+ZE_OBJECT_IMPL(ZEUIBorderedFrameControl)
+	
 ZEUIBorderedFrameControl::ZEUIBorderedFrameControl()
 {
 	ZEUIControl::AddChildControl(&MainArea);

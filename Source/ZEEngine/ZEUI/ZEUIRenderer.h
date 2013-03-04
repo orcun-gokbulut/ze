@@ -40,11 +40,17 @@
 #include "ZEUIRectangle.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZEMeta/ZEObject.h"
 #include "ZEGraphics/ZERenderer.h"
 
-class ZEVertexDeclaration;
-class ZEUIRenderer
+ZE_META_FORWARD_DECLARE(ZEVertexDeclaration, "ZEGraphics/ZEVertexDeclaration.h")
+
+ZE_CLASS(ZEUIRenderer)
+
+class ZEUIRenderer : public ZEObject
 {
+	ZE_OBJECT
+
 	private:
 		ZESmartArray<ZERenderCommand>	RenderCommands;
 		ZEMaterial*						DefaultMaterial;

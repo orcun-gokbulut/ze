@@ -39,11 +39,18 @@
 
 #include "ZETypes.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEMeta/ZEObject.h"
 
-class ZEResourceManager;
-class ZEResource
+ZE_META_FORWARD_DECLARE(ZEResourceManager, "ZEResourceManager.h")
+
+ZE_CLASS(ZEResource)
+
+class ZEResource : public ZEObject
 {
 	friend class ZEResourceManager;
+
+	ZE_OBJECT
+
 	private:
 		ZEString				FileName;
 

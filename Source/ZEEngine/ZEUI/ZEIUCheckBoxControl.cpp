@@ -37,6 +37,8 @@
 #include "ZEUIManager.h"
 #include "ZEUILabel.h"
 
+ZE_OBJECT_IMPL(ZEUICheckBoxControl)
+
 void ZEUICheckBoxControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
 {
 	if(State == ZE_UI_CBS_UNCHECKED)

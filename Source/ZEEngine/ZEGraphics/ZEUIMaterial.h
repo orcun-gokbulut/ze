@@ -39,10 +39,14 @@
 
 #include "ZEMaterial.h"
 
-class ZETexture2D;
+ZE_META_FORWARD_DECLARE(ZETexture2D, "ZETexture2D.h")
+
+ZE_CLASS(ZEUIMaterial)
 
 class ZEUIMaterial : public ZEMaterial
 {
+	ZE_OBJECT
+
 	friend class ZED3D9Module;
 	protected:
 		const ZETexture2D*		Texture;

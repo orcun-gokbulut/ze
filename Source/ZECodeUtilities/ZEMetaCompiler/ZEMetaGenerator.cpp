@@ -590,18 +590,18 @@ static void CreateMethodWrappers(FILE* File, const char* CurrentClassName, bool 
 			if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ARRAY)
 			{
 				fprintf(File, 
-					"static ZEArray<%s%s> %s(%s* This, ", 
+					"static ZEArray<%s%s> %s_%d(%s* This, ", 
 					Methods[I]->ReturnParameter.Type.SubTypeClassName.ToCString(),
 					Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT_PTR ? "*" : "",
-					Methods[I]->Name.ToCString(), CurrentClassName);
+					Methods[I]->Name.ToCString(), I, CurrentClassName);
 			}
 			else
 			{
 				fprintf(File, 
-					"static %s%s %s(%s* This, ", 
+					"static %s%s %s_%d(%s* This, ", 
 					ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
-					Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS ? "*" : "",
-					Methods[I]->Name.ToCString(), CurrentClassName);
+					Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.Type == ZE_MTT_OBJECT ? "*" : "",
+					Methods[I]->Name.ToCString(), I, CurrentClassName);
 			}
 
 			for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
@@ -610,7 +610,7 @@ static void CreateMethodWrappers(FILE* File, const char* CurrentClassName, bool 
 				{
 					fprintf(File, "ZEArray<%s%s> %s%s",
 						Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
-						Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_OBJECT || Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_OBJECT_PTR ? "*" : "",
+						Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_OBJECT || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT_PTR  ? "*" : "",
 						Methods[I]->Parameters[J]->Name.ToCString(), 
 						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ")\n");
 				}
@@ -618,7 +618,7 @@ static void CreateMethodWrappers(FILE* File, const char* CurrentClassName, bool 
 				{
 					fprintf(File, "%s%s %s%s", 
 						ReturnTypeCast(Methods[I]->Parameters[J]->Type.Type), 
-						Methods[I]->Parameters[J]->Type.Type == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR ? "*" : "",
+						Methods[I]->Parameters[J]->Type.Type == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT ? "*" : "",
 						Methods[I]->Parameters[J]->Name.ToCString(), 
 						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ")\n");
 				}
@@ -632,7 +632,7 @@ static void CreateMethodWrappers(FILE* File, const char* CurrentClassName, bool 
 				{
 					fprintf(File, "(%s*)%s%s", 
 						Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(),
-						Methods[I]->Parameters[J]->Name.ToCString(), 
+						Methods[I]->Parameters[J]->Name.ToCString(),
 						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n}\n\n");
 				}
 				else
@@ -645,16 +645,41 @@ static void CreateMethodWrappers(FILE* File, const char* CurrentClassName, bool 
 		}
 		else
 		{
-			fprintf(File, 
-				"static %s%s %s(%s* This)\n"
-				"{\n"
-				"\treturn This->%s();\n"
-				"}\n\n", 
-				ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type), 
-				Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS ? "*" : "",
-				Methods[I]->Name.ToCString(), 
-				CurrentClassName, 
-				Methods[I]->Name.ToCString());
+			if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ARRAY)
+			{
+				fprintf(File, 
+					"static ZEArray<%s%s> %s_%d(%s* This)\n"
+					"{\n"
+					"\treturn This->%s();\n"
+					"}\n\n", 
+					Methods[I]->ReturnParameter.Type.SubTypeClassName.ToCString(),
+					Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT_PTR  ? "*" : "",
+					Methods[I]->Name.ToCString(), I, CurrentClassName, Methods[I]->Name.ToCString(), I);
+			}
+			else
+			{
+				if(Methods[I]->Name == "CreateInstance")
+				{
+					fprintf(File, 
+						"static %s %s_%d(%s* This)\n"
+						"{\n"
+						"\treturn This->%s();\n"
+						"}\n\n", 
+						ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
+						Methods[I]->Name.ToCString(), I, CurrentClassName, Methods[I]->Name.ToCString(), I);
+				}
+				else
+				{
+					fprintf(File, 
+						"static %s%s %s_%d(%s* This)\n"
+						"{\n"
+						"\treturn This->%s();\n"
+						"}\n\n", 
+						ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
+						Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.Type == ZE_MTT_OBJECT || Methods[I]->ReturnParameter.Type.Type == ZE_MTT_OBJECT_PTR ? "*" : "",
+						Methods[I]->Name.ToCString(), I, CurrentClassName, Methods[I]->Name.ToCString(), I);
+				}
+			}
 		}
 	}
 }
@@ -824,7 +849,7 @@ static void CreateGetMethodsMethod(FILE* File, const char* ClassName, ZEArray<ZE
 		if(Methods[I]->Name == "CreateInstance")
 			fprintf(File, "NULL, ");
 		else
-			fprintf(File, "&%s, ", Methods[I]->Name.ToCString());
+			fprintf(File, "&%s_%d, ", Methods[I]->Name.ToCString(), I);
 
 		fprintf(File,
 			"\"%s\", %#x, %s, %s, ZEType(%s, %s, %s, %s), ",
@@ -2300,7 +2325,7 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 			FILE* File;
 			File = fopen(FilePath.ToCString(), "w");
 
-			PrepareClassDependencies(File, ZEFileInfo::GetFileName(Options.InputFileName).ToCString(), CurrentClassName, MetaData->ForwardDeclaredClasses);
+			PrepareClassDependencies(File, ZEFileInfo::GetFileName(Options.InputFileName).ToCString(), CurrentClassName, Data->ForwardDeclaredClasses);
 
 			CreateGetParentClassMethod(File, CurrentClassName, ParentClassName);
 			CreateGetNameMethod(File, CurrentClassName);

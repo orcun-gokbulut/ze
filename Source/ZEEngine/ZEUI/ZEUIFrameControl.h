@@ -41,12 +41,16 @@
 #include "zeui/ZEUIRectangle.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 
+ZE_CLASS(ZEUIFrameControl)
+
 class ZEUIFrameControl : public ZEUIControl
 {
 	friend class ZEUIBorderedFrameControl;
 	friend class ZEUIVerticalScrollbar;
 	friend class ZEUIHorizontalScrollbar;
 	friend class ZEUIScrollArea;
+
+	ZE_OBJECT
 
 	protected:
 

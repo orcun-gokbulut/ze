@@ -49,8 +49,12 @@
 #include "ZEUI\ZEFontResource.h"
 #include "ZEUI\ZEUIRectangle.h"
 
+ZE_CLASS(ZEFontResourceDynamic)
+
 class ZEFontResourceDynamic : public ZEFontResource
 {
+	ZE_OBJECT
+
 	private:
 		FT_Library							Library;
 		FT_Face								Face;

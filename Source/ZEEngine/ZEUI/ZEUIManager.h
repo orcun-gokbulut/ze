@@ -37,6 +37,7 @@
 #ifndef	__ZE_UI_MANAGER_H__
 #define __ZE_UI_MANAGER_H__
 
+#include "ZEMeta/ZEObject.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEUIRenderer.h"
 #include "ZEUIEvents.h"
@@ -169,12 +170,17 @@ enum ZEUIInputKey
 	ZE_UI_IKB_BACKSPACE,
 };
 
-class ZEUIControl;
-class ZEUICursorControl;
 enum ZEUIMouseKey;
 
-class ZEUIManager
+ZE_META_FORWARD_DECLARE(ZEUIControl, "ZEUIControl.h")
+ZE_META_FORWARD_DECLARE(ZEUICursorControl, "ZEUICursorControl.h")
+
+ZE_CLASS(ZEUIManager)
+
+class ZEUIManager : public ZEObject
 {
+	ZE_OBJECT
+
 	private:
 		
 		ZEInputMap					InputMap;

@@ -36,6 +36,8 @@
 #include "ZEUIControl.h"
 #include "ZEUIRenderer.h"
 
+ZE_OBJECT_IMPL(ZEUIControl)
+
 void ZEUIControl::SetName(const ZEString& Name)
 {
 	this->Name = Name;

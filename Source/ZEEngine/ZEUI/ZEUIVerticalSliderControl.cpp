@@ -36,6 +36,8 @@
 #include "ZEUIVerticalSliderControl.h"
 #include "ZEGraphics\ZEUIMaterial.h"
 
+ZE_OBJECT_IMPL(ZEUIVerticalSliderControl)
+
 void ZEUIVerticalSliderControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
 {
 	if(Button == ZE_UI_MOUSE_BUTTON_LEFT && ZERectangle::IntersectionTest(SliderButton.Positions, MousePosition) == true)
