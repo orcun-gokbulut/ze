@@ -39,6 +39,8 @@
 #include "ZEModelMesh.h"
 #include "ZEModel.h"
 #include <string.h>
+
+ZE_OBJECT_IMPL(ZEModelAnimationTrack)
 		
 void ZEModelAnimationTrack::SetOwner(ZEModel* Model)
 {
@@ -357,6 +359,16 @@ void ZEModelAnimationTrack::SetSpeed(float FPS)
 float ZEModelAnimationTrack::GetSpeed()
 {
 	return Speed;
+}
+
+void ZEModelAnimationTrack::SetBlendMode(ZEModelAnimationBlendMode Mode)
+{
+	this->BlendMode = Mode;
+}
+
+ZEModelAnimationBlendMode ZEModelAnimationTrack::GetBlendMode()
+{
+	return this->BlendMode;
 }
 
 void ZEModelAnimationTrack::Play()

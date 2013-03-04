@@ -39,6 +39,7 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZEMeta/ZEObject.h"
 
 enum ZEModelHelperOwnerType
 {
@@ -46,14 +47,20 @@ enum ZEModelHelperOwnerType
 	ZE_MHOT_MESH			= 1,
 	ZE_MHOT_BONE			= 2
 };
-
-class ZEModel;
 struct ZEModelResourceHelper;
-class ZEModelMesh;
-class ZEModelBone;
+ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
+ZE_META_FORWARD_DECLARE(ZEModelMesh,"ZEModelMesh.h")
+ZE_META_FORWARD_DECLARE(ZEModelBone,"ZEModelBone.h")
 
-class ZEModelHelper
+#include "ZEModelMesh.h"
+#include "ZEModelBone.h"
+
+ZE_CLASS(ZEModelHelper)
+
+class ZEModelHelper : public ZEObject
 {
+	ZE_OBJECT
+
 	private:
 
 		ZEModel*							OwnerModel;
