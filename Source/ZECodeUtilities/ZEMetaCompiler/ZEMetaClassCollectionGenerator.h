@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaCompilerOptions.h
+ Zinek Engine - ZEMetaClassCollectionGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,32 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_META_COMPILER_OPTIONS_H__
-#define __ZE_META_COMPILER_OPTIONS_H__
+#ifndef __ZE_META_CLASS_COLLECTION_GENERATOR_H__
+#define __ZE_META_CLASS_COLLECTION_GENERATOR_H__
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
+#include "ZEMetaCompilerOptions.h"
+#include "ZEMetaData.h"
 
-enum ZEClassCollectionWriteMode
+class ZEMetaClassCollectionGenerator
 {
-	ZE_CCWM_START,
-	ZE_CCWM_APPEND,
-	ZE_CCWM_END
-};
-
-struct ZEMetaCompilerOptions
-{
-	ZEString					BinaryPath;
-	ZEString					InputFileName;
-	ZEString					OutputFileName;
-	ZEArray<ZEString>			IncludeDirectories;
-	ZEArray<ZEString>			Definitions;
-
-	ZEString					ClassCollectionOutputFileName;
-	ZEString					ClassCollectionName;
-	ZEClassCollectionWriteMode	ClassCollectionWriteMode;
-
-	bool						Verbose;
+	public:
+		static bool			Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* Data);
 };
 
 #endif

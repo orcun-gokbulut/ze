@@ -63,14 +63,19 @@ static void ShowHelp()
 		"Parameters:\n"
 		"  [InputFileName] : The cpp header file that you want to process.\n"
 		"  -h : Shows this help text."
-		"  -I [Include Directory] : Adds new include directory.\n"
-		"  -D [Definition] : Adds new preprocessor definition.\n"
-		"  -D [Definition]=[Value] : Adds new preprocessor definition with value.\n"
-		"  -o [OutputFileName] : Generated output. Default: [HeaderFileName].ZEMeta.cpp\n"
+		"  -I  [Include Directory] : Adds new include directory.\n"
+		"  -D  [Definition] : Adds new preprocessor definition.\n"
+		"  -D  [Definition]=[Value] : Adds new preprocessor definition with value.\n"
+		"  -o  [OutputFileName] : Generated output. Default: [HeaderFileName].ZEMeta.cpp\n"
+		"  -c  [ClassCollectionOutputFileName] : File name of the class collection file that the output will be appended to.\n"
+		"  -cs [ClassCollectionName] : Writes the beginning of class collection files.\n"
+		"  -ca [ClassCollectionName] : Append output into class collection.\n"
+		"  -ce [ClassCollectionName] : Writes ending of class collection files.\n"
 		"  -v : Verbose mode which outputs compilation errors. Default : Not set.\n"
 		"\n"
 		"Example:\n"
-		"  ZEMetaCompiler ZEEntity.h -I . -I ..\\ZEFoundation -D ZE_PLATFORM_WINDOWS -D ZE_VERSION_MAJOR=0 \n\n"
+		"  ZEMetaCompiler ZEEntity.h -I . -I ..\\ZEFoundation -D ZE_PLATFORM_WINDOWS -D ZE_VERSION_MAJOR=0 \n"
+		"\n"
 		"\n"
 		"CMake Example:\n"
 		"  ze_add_source(ZEEntity.h Headers Sources ZEMC)\n"
@@ -115,6 +120,60 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 			I++;
 			Options.OutputFileName = Argv[I];
 		}
+		else if (strncmp(Argv[I], "-c", 2) == 0)
+		{
+			if (strncmp(Argv[I], "-cs", 3) == 0)
+			{
+				if(Options.ClassCollectionOutputFileName.IsEmpty())
+					Error("Class collection output file is not given.");
+
+				Options.ClassCollectionWriteMode = ZE_CCWM_START;
+
+				if (I + 1 >= Argc)
+					Error("Empty parameter value.");
+
+				I++;
+				Options.ClassCollectionName = Argv[I];
+
+				continue;
+			}
+			else if (strncmp(Argv[I], "-ca", 3) == 0)
+			{
+				if(Options.ClassCollectionOutputFileName.IsEmpty())
+					Error("Class collection output file is not given.");
+
+				Options.ClassCollectionWriteMode = ZE_CCWM_APPEND;
+
+				if (I + 1 >= Argc)
+					Error("Empty parameter value.");
+
+				I++;
+				Options.ClassCollectionName = Argv[I];
+
+				continue;
+			}
+			else if (strncmp(Argv[I], "-ce", 3) == 0)
+			{
+				if(Options.ClassCollectionOutputFileName.IsEmpty())
+					Error("Class collection output file is not given.");
+
+				Options.ClassCollectionWriteMode = ZE_CCWM_END;
+
+				if (I + 1 >= Argc)
+					Error("Empty parameter value.");
+
+				I++;
+				Options.ClassCollectionName = Argv[I];
+
+				continue;
+			}
+
+			if (I + 1 >= Argc)
+				Error("Empty parameter value.");
+
+			I++;
+			Options.ClassCollectionOutputFileName = Argv[I];
+		}
 		else if (strncmp(Argv[I], "-v", 2) == 0)
 		{
 			Options.Verbose = true;
@@ -143,8 +202,8 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 int main(int Argc, const char** Argv)
 {
 	printf(
-		"ZEMetaCompiler - Version : 0.3.6\n"
-		"Copyright (C) 2012, Zinek Code House. All rights reserved.\n\n");
+		"ZEMetaCompiler - Version : 0.3.7\n"
+		"Copyright (C) 2013, Zinek Code House. All rights reserved.\n\n");
 
 	if (Argc == 1)
 		Error("Command line arguments are missing.");

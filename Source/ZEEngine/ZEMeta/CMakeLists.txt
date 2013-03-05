@@ -39,6 +39,9 @@ ze_add_source(ZEClass.cpp						Sources)
 ze_add_source(ZEClass.h 						Sources Headers)
 ze_add_source(ZEClassOverloads.cpp				Sources)
 
+ze_add_source(ZEClassCollection.h				Sources Headers)
+ze_add_source(ZEClassCollection.cpp				Sources)
+
 ze_add_source(ZEObject.cpp						Sources)
 ze_add_source(ZEObject.h						Sources Headers)
 
