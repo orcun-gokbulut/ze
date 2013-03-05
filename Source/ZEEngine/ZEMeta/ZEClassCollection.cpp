@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaCompilerOptions.h
+ Zinek Engine - ZEClassCollection.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,33 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_META_COMPILER_OPTIONS_H__
-#define __ZE_META_COMPILER_OPTIONS_H__
+#include "ZEClassCollection.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-
-enum ZEClassCollectionWriteMode
+ZESize ZEClassCollection::GetClassCount()
 {
-	ZE_CCWM_START,
-	ZE_CCWM_APPEND,
-	ZE_CCWM_END
-};
-
-struct ZEMetaCompilerOptions
-{
-	ZEString					BinaryPath;
-	ZEString					InputFileName;
-	ZEString					OutputFileName;
-	ZEArray<ZEString>			IncludeDirectories;
-	ZEArray<ZEString>			Definitions;
-
-	ZEString					ClassCollectionOutputFileName;
-	ZEString					ClassCollectionName;
-	ZEClassCollectionWriteMode	ClassCollectionWriteMode;
-
-	bool						Verbose;
-};
-
-#endif
+	return 0;
+}

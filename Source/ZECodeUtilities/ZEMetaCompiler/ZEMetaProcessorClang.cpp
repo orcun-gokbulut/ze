@@ -50,6 +50,7 @@
 #include "llvm/Support/system_error.h"
 
 #include "ZEMetaGenerator.h"
+#include "ZEMetaClassCollectionGenerator.h"
 
 using namespace clang::driver;
 using namespace clang;
@@ -148,6 +149,8 @@ void ZEMetaProcessorInternal::InitializeClang()
 	ParseAST(Compiler.getPreprocessor(), &Compiler.getASTConsumer(), Compiler.getASTContext(), false, clang::TranslationUnitKind::TU_Complete, NULL, true);
 
 	ZEMetaGenerator::Generate(Options, MetaData);
+
+	ZEMetaClassCollectionGenerator::Generate(Options, MetaData);
 
 	exit(EXIT_SUCCESS);
 }

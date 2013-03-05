@@ -2322,10 +2322,8 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 			bool HasPublicConstructor = ClassData->HasPublicConstructor;
 			bool IsAbstract = ClassData->IsAbstract;
 
-			ZEString FilePath = Options.OutputFileName.ToCString();
-
 			FILE* File;
-			File = fopen(FilePath.ToCString(), "w");
+			File = fopen(Options.OutputFileName.ToCString(), "w");
 
 			PrepareClassDependencies(File, ZEFileInfo::GetFileName(Options.InputFileName).ToCString(), CurrentClassName, Data->ForwardDeclaredClasses);
 
@@ -2388,14 +2386,12 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 			ZETypeData* CurrentClassData = Data->HeaderTypes[I];
 			const char* CurrentClassName = CurrentClassData->Name;
 
-			ZEString FilePath = Options.OutputFileName.ToCString();
-
 			((ZEClassData*)CurrentClassData)->Methods.Sort(SortMethodsByHash);
 
 			ZEArray<ZEMethodData*> Methods = ((ZEClassData*)CurrentClassData)->Methods;
 
 			FILE* File;
-			File = fopen(FilePath.ToCString(), "w");
+			File = fopen(Options.OutputFileName.ToCString(), "w");
 
 			fprintf(File, "#include \"%s.h\"\n\n", CurrentClassName);
 
