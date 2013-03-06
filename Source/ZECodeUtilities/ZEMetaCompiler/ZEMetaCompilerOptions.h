@@ -40,13 +40,6 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 
-enum ZEClassCollectionWriteMode
-{
-	ZE_CCWM_START,
-	ZE_CCWM_APPEND,
-	ZE_CCWM_END
-};
-
 struct ZEMetaCompilerOptions
 {
 	ZEString					BinaryPath;
@@ -55,9 +48,13 @@ struct ZEMetaCompilerOptions
 	ZEArray<ZEString>			IncludeDirectories;
 	ZEArray<ZEString>			Definitions;
 
-	ZEString					ClassCollectionOutputFileName;
+	ZEString					RegisterFileName;
 	ZEString					ClassCollectionName;
-	ZEClassCollectionWriteMode	ClassCollectionWriteMode;
+	ZEString					ClassCollectionHeaderFile;
+	ZEString					ClassCollectionSourceFile;
+	ZEArray<ZEString>			RegisterFiles;
+	bool						IsRegisterSession;
+	bool						IsGenerateSession;
 
 	bool						Verbose;
 };

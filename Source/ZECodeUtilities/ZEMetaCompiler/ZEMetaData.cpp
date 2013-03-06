@@ -157,7 +157,7 @@ ZEClassData::~ZEClassData()
 
 ZEMetaData::~ZEMetaData()
 {
-	ZEArray<ZETypeData*>::Iterator Iterator = Types.GetIterator();
+	ZEArray<ZETypeData*>::Iterator Iterator = TargetTypes.GetIterator();
 
 	while(!Iterator.IsEnd())
 	{
@@ -165,6 +165,6 @@ ZEMetaData::~ZEMetaData()
 		Iterator.MoveNext();
 	}
 
+	TargetTypes.Clear();
 	Types.Clear();
-	HeaderTypes.Clear();
 }

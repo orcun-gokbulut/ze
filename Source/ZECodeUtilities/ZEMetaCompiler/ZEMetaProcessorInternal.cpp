@@ -896,7 +896,9 @@ void ZEMetaProcessorInternal::ProcessClass(CXXRecordDecl* Class)
 		ClassData->Methods.Add(Method);
 	}
 
-	MetaData->HeaderTypes.Add(ClassData);
+	MetaData->Types.Add(ClassData);
+	if (Compiler->getSourceManager().getFileID(Class->getLocation()) == Compiler->getSourceManager().getMainFileID())
+		MetaData->TargetTypes.Add(ClassData);
 }
 
 void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, VarDecl* StaticProperty)

@@ -237,8 +237,8 @@ class ZEClassData : public ZETypeData
 class ZEMetaData
 {
 	public:
+		ZEArray<ZETypeData*>			TargetTypes;
 		ZEArray<ZETypeData*>			Types;
-		ZEArray<ZETypeData*>			HeaderTypes;
 		ZEArray<ZEEnumData*>			EnumTypes;
 		ZEArray<ZEForwardDeclared*>		ForwardDeclaredClasses;
 

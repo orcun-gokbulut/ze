@@ -34,8 +34,3 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEClassCollection.h"
-
-ZESize ZEClassCollection::GetClassCount()
-{
-	return 0;
-}

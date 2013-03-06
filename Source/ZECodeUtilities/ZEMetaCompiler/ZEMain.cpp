@@ -37,6 +37,7 @@
 #include "ZEMetaGenerator.h"
 #include "ZEMetaProcessor.h"
 #include "ZEMetaCompilerOptions.h"
+#include "ZEMetaClassCollectionGenerator.h"
 
 static void Error(const char* Text)
 {
@@ -67,15 +68,18 @@ static void ShowHelp()
 		"  -D  [Definition] : Adds new preprocessor definition.\n"
 		"  -D  [Definition]=[Value] : Adds new preprocessor definition with value.\n"
 		"  -o  [OutputFileName] : Generated output. Default: [HeaderFileName].ZEMeta.cpp\n"
-		"  -c  [ClassCollectionOutputFileName] : File name of the class collection file that the output will be appended to.\n"
-		"  -cs [ClassCollectionName] : Writes the beginning of class collection files.\n"
-		"  -ca [ClassCollectionName] : Append output into class collection.\n"
-		"  -ce [ClassCollectionName] : Writes ending of class collection files.\n"
+		"  -r  [RegisterFileName] : On meta generation mode, Creates a register file with given name. On class collection generation mode, inputs given register file. \n"
+		"  -g  [ClassCollectionName] : Generates ClassCollection file with given register files (-r).\n"
+		"  -gh [ClassCollectionHeader] : Class collection header file name.\n"
+		"  -gs [ClassCollectionSource] : Class collection source file name.\n"
 		"  -v : Verbose mode which outputs compilation errors. Default : Not set.\n"
 		"\n"
-		"Example:\n"
-		"  ZEMetaCompiler ZEEntity.h -I . -I ..\\ZEFoundation -D ZE_PLATFORM_WINDOWS -D ZE_VERSION_MAJOR=0 \n"
+		"Example(s) (Meta Generation):\n"
+		"  ZEMetaCompiler ZEEntity.h -I . -I ..\\ZEFoundation -D ZE_PLATFORM_WINDOWS -D ZE_VERSION_MAJOR=0 -o ZEEntity.ZEMeta.cpp -r ZEEntity.ZEMeta.Register\n"
+		"  ZEMetaCompiler ZEScene.h -I . -I ..\\ZEFoundation -D ZE_PLATFORM_WINDOWS -D ZE_VERSION_MAJOR=0 -o ZEScene.ZEMeta.cpp -r ZEScene.ZEMeta.Register\n"
 		"\n"
+		"Example (Class Collection Generation):\n"
+		"  ZEMetaCompiler -g ZEGameClassCollection -gh ZEGameClassCollection.h -gs ZEGameClassCollection.cpp -r ZEEntity.ZEMeta.Register -r ZEScene.ZEMeta.Register\n"
 		"\n"
 		"CMake Example:\n"
 		"  ze_add_source(ZEEntity.h Headers Sources ZEMC)\n"
@@ -85,6 +89,8 @@ static void ShowHelp()
 static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& Options)
 {
 	Options.BinaryPath = Argv[0];
+	Options.IsRegisterSession = false;
+	Options.IsGenerateSession = false;
 	Options.Verbose = false;
 	for (int I = 1; I < Argc; I++)
 	{
@@ -120,59 +126,60 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 			I++;
 			Options.OutputFileName = Argv[I];
 		}
-		else if (strncmp(Argv[I], "-c", 2) == 0)
+		else if (strncmp(Argv[I], "-r", 2) == 0)
 		{
-			if (strncmp(Argv[I], "-cs", 3) == 0)
+			if(Options.IsGenerateSession)
 			{
-				if(Options.ClassCollectionOutputFileName.IsEmpty())
-					Error("Class collection output file is not given.");
-
-				Options.ClassCollectionWriteMode = ZE_CCWM_START;
-
 				if (I + 1 >= Argc)
 					Error("Empty parameter value.");
 
 				I++;
-				Options.ClassCollectionName = Argv[I];
+				Options.RegisterFiles.Add(Argv[I]);
 
 				continue;
 			}
-			else if (strncmp(Argv[I], "-ca", 3) == 0)
-			{
-				if(Options.ClassCollectionOutputFileName.IsEmpty())
-					Error("Class collection output file is not given.");
 
-				Options.ClassCollectionWriteMode = ZE_CCWM_APPEND;
-
-				if (I + 1 >= Argc)
-					Error("Empty parameter value.");
-
-				I++;
-				Options.ClassCollectionName = Argv[I];
-
-				continue;
-			}
-			else if (strncmp(Argv[I], "-ce", 3) == 0)
-			{
-				if(Options.ClassCollectionOutputFileName.IsEmpty())
-					Error("Class collection output file is not given.");
-
-				Options.ClassCollectionWriteMode = ZE_CCWM_END;
-
-				if (I + 1 >= Argc)
-					Error("Empty parameter value.");
-
-				I++;
-				Options.ClassCollectionName = Argv[I];
-
-				continue;
-			}
+			Options.IsRegisterSession = true;
 
 			if (I + 1 >= Argc)
 				Error("Empty parameter value.");
 
 			I++;
-			Options.ClassCollectionOutputFileName = Argv[I];
+			Options.RegisterFileName = Argv[I];
+		}
+		else if (strncmp(Argv[I], "-g", 2) == 0)
+		{
+			if (strncmp(Argv[I], "-gh", 3) == 0)
+			{
+				if (I + 1 >= Argc)
+					Error("Empty parameter value.");
+
+				I++;
+
+				Options.ClassCollectionHeaderFile = Argv[I];
+
+				continue;
+			}
+			else if (strncmp(Argv[I], "-gs", 3) == 0)
+			{
+				if (I + 1 >= Argc)
+					Error("Empty parameter value.");
+
+				I++;
+
+				Options.ClassCollectionSourceFile = Argv[I];
+
+				continue;
+			}
+
+			Options.IsGenerateSession = true;
+
+			if (I + 1 >= Argc)
+				Error("Empty parameter value.");
+
+			I++;
+
+			Options.ClassCollectionName = Argv[I];
 		}
 		else if (strncmp(Argv[I], "-v", 2) == 0)
 		{
@@ -187,22 +194,20 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 		}
 	}
 
-	if (Options.InputFileName == NULL)
+	if(Options.IsGenerateSession)
+		ZEMetaClassCollectionGenerator::Generate(Options);
+
+	if (Options.InputFileName == NULL && !Options.IsGenerateSession)
 	{
 		zeError("Missing input header file name.");
 		ShowHelp();
 	}
-
-	if (Options.OutputFileName.IsEmpty())
-	{
-		Options.OutputFileName.Append(Options.InputFileName);
-		Options.OutputFileName.Append(".ZEMeta.cpp");
-	}
 }
+
 int main(int Argc, const char** Argv)
 {
 	printf(
-		"ZEMetaCompiler - Version : 0.3.7\n"
+		"ZEMetaCompiler - Version : 0.3.8\n"
 		"Copyright (C) 2013, Zinek Code House. All rights reserved.\n\n");
 
 	if (Argc == 1)
@@ -211,14 +216,15 @@ int main(int Argc, const char** Argv)
 	ZEMetaCompilerOptions Options;
 	ParseParameters(Argc, Argv, Options);
 
-	ZEMetaData MetaData;
-	bool Result = ZEMetaProcessor::Process(&MetaData, Options);
-	if (!Result)
-		Error("Processing failed.");
+	if(!Options.OutputFileName.IsEmpty())
+	{
+		ZEMetaData MetaData;
+		bool Result = false;
 
-	Result = ZEMetaGenerator::Generate(Options, &MetaData);
-	if (!Result)
-		Error("Generation failed.");
+		Result = ZEMetaProcessor::Process(&MetaData, Options);
+		if (!Result)
+			Error("Processing failed.");
+	}
 
 	return EXIT_SUCCESS;
 }
