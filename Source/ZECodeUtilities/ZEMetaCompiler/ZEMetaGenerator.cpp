@@ -2196,23 +2196,23 @@ static void CreateZEClassImplementation(FILE* File, const char* ClassName, bool 
 bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* Data)
 {
 	//Last item in array is our target header.Is target header NOT contains builtin class?
-	if(((ZEClassData*)Data->HeaderTypes.GetLastItem())->IsBuiltInClass == false)
+	if(((ZEClassData*)Data->Types.GetLastItem())->IsBuiltInClass == false)
 	{	
 		ZEMetaData* MetaData = new ZEMetaData();
-		MetaData->HeaderTypes.Add(Data->HeaderTypes.GetLastItem());
+		MetaData->Types.Add(Data->Types.GetLastItem());
 
-		ZESize BaseClassIndex = Data->HeaderTypes.GetCount() - 1;
-		for(ZESize I = Data->HeaderTypes.GetCount() - 2; I >= 0; I--)
+		ZESize BaseClassIndex = Data->Types.GetCount() - 1;
+		for(ZESize I = Data->Types.GetCount() - 2; I >= 0; I--)
 		{
-			ZEClassData* LastClass = ((ZEClassData*)Data->HeaderTypes[BaseClassIndex]);
-			ZEClassData* CurrentClass = ((ZEClassData*)Data->HeaderTypes[I]);
+			ZEClassData* LastClass = ((ZEClassData*)Data->Types[BaseClassIndex]);
+			ZEClassData* CurrentClass = ((ZEClassData*)Data->Types[I]);
 
 			if(CurrentClass->IsBuiltInClass)
 				break;
 
 			if(LastClass->BaseClass->Name == CurrentClass->Name)
 			{
-				MetaData->HeaderTypes.Add(CurrentClass);
+				MetaData->Types.Add(CurrentClass);
 				BaseClassIndex = I;
 			}
 		}
@@ -2225,9 +2225,9 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 		ZEArray<ZEMethodData*> Methods;
 
 		//searching for duplicate class attributes.we only add one item per object type.
-		for(int Index = MetaData->HeaderTypes.GetCount() - 2; Index >= 0; Index--)
+		for(int Index = MetaData->Types.GetCount() - 2; Index >= 0; Index--)
 		{
-			ZEClassData* CurrentClassData = (ZEClassData*)MetaData->HeaderTypes[Index];
+			ZEClassData* CurrentClassData = (ZEClassData*)MetaData->Types[Index];
 			const char* CurrentClassName = CurrentClassData->Name;
 
 			for(ZESize I = 0; I < CurrentClassData->Attributes.GetCount(); I++)
@@ -2308,16 +2308,16 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 		for(ZESize I = 0; I < Methods.GetCount(); I++)
 			Methods[I]->ID = I;
 
-		if(MetaData->HeaderTypes.GetCount() < 2)
+		if(MetaData->Types.GetCount() < 2)
 			return false;
 		else
 		{
 			//Our target class is the first item in array
-			const char* CurrentClassName = MetaData->HeaderTypes[0]->Name;
+			const char* CurrentClassName = MetaData->Types[0]->Name;
 			//Target class' parent class is one item after it.
-			const char* ParentClassName = MetaData->HeaderTypes[1]->Name;
+			const char* ParentClassName = MetaData->Types[1]->Name;
 
-			ZEClassData* ClassData = (ZEClassData*)MetaData->HeaderTypes[0];
+			ZEClassData* ClassData = (ZEClassData*)MetaData->Types[0];
 
 			bool HasPublicConstructor = ClassData->HasPublicConstructor;
 			bool IsAbstract = ClassData->IsAbstract;
@@ -2381,9 +2381,9 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 	}
 	else//If last item in array is builtin class type we compile all classes to seperate files in found header
 	{
-		for(ZESize I = 0; I < Data->HeaderTypes.GetCount(); I++)
+		for(ZESize I = 0; I < Data->Types.GetCount(); I++)
 		{
-			ZETypeData* CurrentClassData = Data->HeaderTypes[I];
+			ZETypeData* CurrentClassData = Data->Types[I];
 			const char* CurrentClassName = CurrentClassData->Name;
 
 			((ZEClassData*)CurrentClassData)->Methods.Sort(SortMethodsByHash);

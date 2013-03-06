@@ -51,6 +51,7 @@
 
 #include "ZEMetaGenerator.h"
 #include "ZEMetaClassCollectionGenerator.h"
+#include "ZEFile/ZEFileInfo.h"
 
 using namespace clang::driver;
 using namespace clang;
@@ -150,7 +151,21 @@ void ZEMetaProcessorInternal::InitializeClang()
 
 	ZEMetaGenerator::Generate(Options, MetaData);
 
-	ZEMetaClassCollectionGenerator::Generate(Options, MetaData);
+	if(Options.IsRegisterSession)
+	{
+		FILE* File;
+		File = fopen(Options.RegisterFileName.ToCString(), "w");
+
+		for(ZESize I = 0; I < MetaData->TargetTypes.GetCount(); I++)
+		{
+			fprintf(File, 
+				"%s,%s;", 
+				MetaData->TargetTypes[I]->Name.ToCString(), 
+				ZEFileInfo::GetFileName(Options.InputFileName).ToCString());
+		}
+
+		fclose(File);
+	}
 
 	exit(EXIT_SUCCESS);
 }

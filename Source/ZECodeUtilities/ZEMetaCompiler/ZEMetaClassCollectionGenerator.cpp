@@ -36,158 +36,131 @@
 #include "ZEMetaClassCollectionGenerator.h"
 #include "ZEFile/ZEFileInfo.h"
 
-static void IncludeHeader(FILE* File, const char* IncludedFile)
+struct ZERegisteredClass
 {
-	fprintf(File, "#include \"%s\"\n", IncludedFile);
-}
+	ZEString RegisteredClassName;
+	ZEString IncludeDirectory;
+};
 
-static void CreateClassInterface(FILE* File, const char* LibraryName)
+void ZEMetaClassCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 {
+	ZEArray<ZERegisteredClass> RegisteredClasses;
+	RegisteredClasses.SetCount(Options.RegisterFiles.GetCount());
+
+	for(ZESize I = 0; I < Options.RegisterFiles.GetCount(); I++)
+	{
+		FILE* File;
+		File = fopen(Options.RegisterFiles[I].ToCString(), "r");
+
+		if(File == NULL)
+			zeError("Error! Register file is not found!");
+
+		fseek(File, 0, SEEK_END);
+		unsigned int FileLength = ftell(File);
+		fseek(File, 0, SEEK_SET);
+
+		ZEArray<ZEInt8> Buffer;
+		Buffer.SetCount(FileLength);
+		ZESize BytesRead = fread(Buffer.GetCArray(), 1, FileLength, File);
+
+		if (BytesRead != FileLength)
+			zeError("Error! Can not read register file!");
+
+		fclose(File);
+
+		ZEString Context = (char*)Buffer.GetConstCArray();
+		ZESize Index = 0;
+
+		for(ZESize J = 0; J < Context.GetLength(); J++)
+		{
+			if(Context[J] == ',')
+			{
+				RegisteredClasses[I].RegisteredClassName = Context.SubString(Index, J - 1);
+				Index = J + 1;
+				continue;
+			}
+
+			if(Context[J] == ';')
+			{
+				RegisteredClasses[I].IncludeDirectory = Context.SubString(Index, J - 1);
+				Index = J + 1;
+				continue;
+			}
+		}
+	}
+
+	ZEString ClassCollectionName = Options.ClassCollectionName;
+	ZEString ClassCollectionHeader = Options.ClassCollectionHeaderFile;
+
+	FILE* File;
+	File = fopen(ClassCollectionHeader.ToCString(), "w");
+
 	fprintf(File,
-		"\n"
+		"#pragma once\n"
+		"#include \"ZEMeta/ZEClassCollection.h\"\n\n"
 		"class %sClassCollection : public ZEClassCollection\n"
 		"{\n"
 		"\tprivate:\n"
 		"\t\t\t\t\t\t\t\t\t\t\t\t%sClassCollection();\n"
 		"\t\tvirtual\t\t\t\t\t\t\t\t\t~%sClassCollection();\n\n"
 		"\tpublic:\n"
-		"\t\tvirtual ZEClass*\t\t\t\t\t\tGetClasses();\n"
-		"\t\tstatic %sClassCollection*\t\tGetInstance();\n"
-		"};\n\n", LibraryName, LibraryName, LibraryName, LibraryName);
-}
+		"\t\tvirtual ZEClass**\t\t\t\t\t\tGetClasses();\n"
+		"\t\tvirtual ZESize\t\t\t\t\t\t\tGetClassCount();\n\n"
+		"\t\tstatic %sClassCollection*\t\t\tGetInstance();\n"
+		"};\n\n", 
+		ClassCollectionName.ToCString(), 
+		ClassCollectionName.ToCString(), 
+		ClassCollectionName.ToCString(), 
+		ClassCollectionName.ToCString());
 
-void CreateClassImplementation(FILE* File, const char* HeaderFile, const char* LibraryName)
-{
+	fclose(File);
+
+	ZEString ClassCollectionCpp = Options.ClassCollectionSourceFile;
+
+	File = fopen(ClassCollectionCpp.ToCString(), "w");
+
+	fprintf(File, "#include \"%s\"\n", ClassCollectionHeader.ToCString());
+
+	for(ZESize I = 0; I < RegisteredClasses.GetCount(); I++)
+		fprintf(File, "#include \"%s\"\n", RegisteredClasses[I].IncludeDirectory.ToCString());
+
 	fprintf(File,
-		"#include \"%s\"\n"
-		"#include \"%sClassCollectionIncludes.h\"\n\n"
-		"ZEClass* %sClassCollection::GetClasses()\n"
+		"\n"
+		"ZEClass** %sClassCollection::GetClasses()\n"
 		"{\n"
-		"\tstatic ZEClass* Classes[] = \n"
-		"\t{\n", HeaderFile, LibraryName, LibraryName);
-}
+		"\tstatic ZEClass* Classes[%d] = \n"
+		"\t{\n", ClassCollectionName.ToCString(), RegisteredClasses.GetCount());
 
-void AppendClassToImplementation(FILE* File, const char* ClassName)
-{
-	fprintf(File, "\t\t%s::Class(),\n", ClassName);
-}
+	for(ZESize I = 0; I < RegisteredClasses.GetCount(); I++)
+		fprintf(File, "\t\t%s::Class()%s\n", RegisteredClasses[I].RegisteredClassName.ToCString(), I < RegisteredClasses.GetCount() - 1 ? "," : "");
 
-void FinishClassImplementation(FILE* File)
-{
 	fprintf(File,
-		"\t\tNULL\n"
 		"\t}\n\n"
 		"\treturn Classes;\n"
-		"}\n\n");
-}
+		"};\n\n");
 
-void CreateClassDependencies(FILE* File, const char* LibraryName)
-{
+	fprintf(File,
+		"ZESize %sClassCollection::GetClassCount()\n"
+		"{\n"
+		"\treturn %d;\n"
+		"}\n\n", ClassCollectionName.ToCString(), RegisteredClasses.GetCount());
+
 	fprintf(File,
 		"%sClassCollection::%sClassCollection()\n"
 		"{\n\n"
-		"}\n\n", LibraryName, LibraryName);
+		"}\n\n", ClassCollectionName.ToCString(), ClassCollectionName.ToCString());
 
 	fprintf(File,
 		"%sClassCollection::~%sClassCollection()\n"
 		"{\n\n"
-		"}\n\n", LibraryName, LibraryName);
+		"}\n\n", ClassCollectionName.ToCString(), ClassCollectionName.ToCString());
 
 	fprintf(File,
 		"%sClassCollection* %sClassCollection::GetInstance()\n"
 		"{\n"
 		"\tstatic %sClassCollection Collection;\n"
 		"\treturn &Collection;\n"
-		"}\n\n", LibraryName, LibraryName, LibraryName);
+		"}\n\n", ClassCollectionName.ToCString(), ClassCollectionName.ToCString(), ClassCollectionName.ToCString());
+
 }
 
-bool ZEMetaClassCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* Data)
-{
-	if(Options.ClassCollectionWriteMode == ZE_CCWM_START)
-	{
-		ZEString HeaderFile = Options.ClassCollectionOutputFileName.ToCString();
-		HeaderFile.Append("ClassCollection.h");
-
-		FILE* File;
-		File = fopen(HeaderFile.ToCString(), "w");
-
-		fprintf(File, "#pragma once\n");
-		fprintf(File, "#include \"ZEMeta/ZEClassCollection.h\"\n");
-		fclose(File);
-
-		ZEString IncludeFiles = Options.ClassCollectionOutputFileName.ToCString();
-		IncludeFiles.Append("ClassCollectionIncludes.h");
-
-		File = fopen(IncludeFiles.ToCString(), "w");
-		IncludeHeader(File, ZEFileInfo::GetFileName(Options.InputFileName).ToCString());
-		fclose(File);
-
-		ZEString CppFile = Options.ClassCollectionOutputFileName.ToCString();
-		CppFile.Append("ClassCollection.cpp");
-
-		File = fopen(CppFile.ToCString(), "w");
-
-		ZEString InterfaceInclude = Options.ClassCollectionOutputFileName;
-		InterfaceInclude.Append("ClassCollection.h");
-
-		CreateClassImplementation(File, InterfaceInclude.ToCString(), Options.ClassCollectionName.ToCString());
-		AppendClassToImplementation(File, Data->HeaderTypes.GetLastItem()->Name.ToCString());
-
-		fclose(File);
-
-		return true;
-	}
-	else if(Options.ClassCollectionWriteMode == ZE_CCWM_APPEND)
-	{
-		ZEString IncludeFiles = Options.ClassCollectionOutputFileName.ToCString();
-		IncludeFiles.Append("ClassCollectionIncludes.h");
-
-		FILE* File;
-		File = fopen(IncludeFiles.ToCString(), "a");
-		IncludeHeader(File, ZEFileInfo::GetFileName(Options.InputFileName).ToCString());
-		fclose(File);
-
-		ZEString CppFile = Options.ClassCollectionOutputFileName.ToCString();
-		CppFile.Append("ClassCollection.cpp");
-
-		File = fopen(CppFile.ToCString(), "a");
-
-		AppendClassToImplementation(File, Data->HeaderTypes.GetLastItem()->Name.ToCString());
-
-		fclose(File);
-
-		return true;
-	}
-	else if(Options.ClassCollectionWriteMode == ZE_CCWM_END)
-	{
-		ZEString HeaderFile = Options.ClassCollectionOutputFileName.ToCString();
-		HeaderFile.Append("ClassCollection.h");
-
-		FILE* File;
-		File = fopen(HeaderFile.ToCString(), "a");
-		CreateClassInterface(File, Options.ClassCollectionName.ToCString());
-		fclose(File);
-
-		ZEString IncludeFiles = Options.ClassCollectionOutputFileName.ToCString();
-		IncludeFiles.Append("ClassCollectionIncludes.h");
-
-		File = fopen(IncludeFiles.ToCString(), "a");
-		IncludeHeader(File, ZEFileInfo::GetFileName(Options.InputFileName).ToCString());
-		fclose(File);
-
-		ZEString CppFile = Options.ClassCollectionOutputFileName.ToCString();
-		CppFile.Append("ClassCollection.cpp");
-
-		File = fopen(CppFile.ToCString(), "a");
-
-		AppendClassToImplementation(File, Data->HeaderTypes.GetLastItem()->Name.ToCString());
-		FinishClassImplementation(File);
-		CreateClassDependencies(File, Options.ClassCollectionName.ToCString());
-
-		fclose(File);
-
-		return true;
-	}
-	
-	return false;
-}

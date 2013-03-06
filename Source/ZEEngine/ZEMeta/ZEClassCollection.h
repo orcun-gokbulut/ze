@@ -43,11 +43,11 @@
 class ZEClassCollection
 {
 	private:
-		virtual				~ZEClassCollection();
+		virtual					~ZEClassCollection();
 
 	public:
-		virtual ZEClass*	GetClasses() = 0;
-		static ZESize		GetClassCount();
+		virtual ZEClass**		GetClasses() = 0;
+		virtual ZESize			GetClassCount() = 0;
 };
 
 #endif
