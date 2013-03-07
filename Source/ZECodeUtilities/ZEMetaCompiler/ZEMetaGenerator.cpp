@@ -2195,123 +2195,126 @@ static void CreateZEClassImplementation(FILE* File, const char* ClassName, bool 
 
 bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* Data)
 {
-	//Last item in array is our target header.Is target header NOT contains builtin class?
-	if(((ZEClassData*)Data->Types.GetLastItem())->IsBuiltInClass == false)
+	FILE* File;
+	File = fopen(Options.OutputFileName.ToCString(), "w");
+
+	//if targettype is not a builtin class container.
+	if(((ZEClassData*)Data->TargetTypes.GetLastItem())->IsBuiltInClass == false)
 	{	
-		ZEMetaData* MetaData = new ZEMetaData();
-		MetaData->Types.Add(Data->Types.GetLastItem());
-
-		ZESize BaseClassIndex = Data->Types.GetCount() - 1;
-		for(ZESize I = Data->Types.GetCount() - 2; I >= 0; I--)
+		for(ZESize TargetIndex = 0; TargetIndex < Data->TargetTypes.GetCount(); TargetIndex++)
 		{
-			ZEClassData* LastClass = ((ZEClassData*)Data->Types[BaseClassIndex]);
-			ZEClassData* CurrentClass = ((ZEClassData*)Data->Types[I]);
+			ZEMetaData* MetaData = new ZEMetaData();
+			MetaData->Types.Add(Data->TargetTypes[TargetIndex]);
 
-			if(CurrentClass->IsBuiltInClass)
-				break;
+			ZEClassData* ProcessedClass = (ZEClassData*)MetaData->Types.GetLastItem();
 
-			if(LastClass->BaseClass->Name == CurrentClass->Name)
+			for(ZESize I = Data->Types.GetCount() - 1; I >= 0; I--)
 			{
-				MetaData->Types.Add(CurrentClass);
-				BaseClassIndex = I;
-			}
-		}
-
-		MetaData->ForwardDeclaredClasses = Data->ForwardDeclaredClasses;
-		MetaData->EnumTypes = Data->EnumTypes;
-
-		ZEArray<ZEAttributeData*> Attributes;
-		ZEArray<ZEPropertyData*> Properties;
-		ZEArray<ZEMethodData*> Methods;
-
-		//searching for duplicate class attributes.we only add one item per object type.
-		for(int Index = MetaData->Types.GetCount() - 2; Index >= 0; Index--)
-		{
-			ZEClassData* CurrentClassData = (ZEClassData*)MetaData->Types[Index];
-			const char* CurrentClassName = CurrentClassData->Name;
-
-			for(ZESize I = 0; I < CurrentClassData->Attributes.GetCount(); I++)
-			{
-				bool IsSameAttributeFound = false;
-
-				for(ZESize J = 0; J < Attributes.GetCount(); J++)
+				if(ProcessedClass->BaseClass->Name == Data->Types[I]->Name)
 				{
-					if(Attributes[J]->Name == CurrentClassData->Attributes[I]->Name)
-					{
-						IsSameAttributeFound = true;
+					if(((ZEClassData*)Data->Types[I])->IsBuiltInClass)
+						break;
 
-						if(Attributes[J]->Parameters.GetCount() == CurrentClassData->Attributes[I]->Parameters.GetCount())
+					MetaData->Types.Add(Data->Types[I]);
+					ProcessedClass = (ZEClassData*)Data->Types[I];
+
+					if(ProcessedClass->Name == "ZEObject")
+						break;
+				}
+			}
+
+			MetaData->ForwardDeclaredClasses = Data->ForwardDeclaredClasses;
+			MetaData->EnumTypes = Data->EnumTypes;
+
+			ZEArray<ZEAttributeData*> Attributes;
+			ZEArray<ZEPropertyData*> Properties;
+			ZEArray<ZEMethodData*> Methods;
+
+			//searching for duplicate class attributes.we only add one item per object type.
+			//Last item in MetaData->Types is ZEObject so we skip it.
+			for(int Index = MetaData->Types.GetCount() - 2; Index >= 0; Index--)
+			{
+				ZEClassData* CurrentClassData = (ZEClassData*)MetaData->Types[Index];
+				const char* CurrentClassName = CurrentClassData->Name;
+
+				for(ZESize I = 0; I < CurrentClassData->Attributes.GetCount(); I++)
+				{
+					bool IsSameAttributeFound = false;
+
+					for(ZESize J = 0; J < Attributes.GetCount(); J++)
+					{
+						if(Attributes[J]->Name == CurrentClassData->Attributes[I]->Name)
 						{
-							for(ZESize K = 0; K < Attributes[J]->Parameters.GetCount(); K++)
+							IsSameAttributeFound = true;
+
+							if(Attributes[J]->Parameters.GetCount() == CurrentClassData->Attributes[I]->Parameters.GetCount())
 							{
-								if(Attributes[J]->Parameters[K] != CurrentClassData->Attributes[I]->Parameters[K])
-									IsSameAttributeFound = false;
+								for(ZESize K = 0; K < Attributes[J]->Parameters.GetCount(); K++)
+								{
+									if(Attributes[J]->Parameters[K] != CurrentClassData->Attributes[I]->Parameters[K])
+										IsSameAttributeFound = false;
+								}
 							}
+							else
+								IsSameAttributeFound = false;
 						}
-						else
-							IsSameAttributeFound = false;
+					}
+
+					if(IsSameAttributeFound)
+						continue;
+					else
+					{
+						CurrentClassData->Attributes[I]->MemberOf = CurrentClassName;
+						Attributes.Add(CurrentClassData->Attributes[I]);
 					}
 				}
 
-				if(IsSameAttributeFound)
-					continue;
-				else
+				for(ZESize I = 0; I < CurrentClassData->Properties.GetCount(); I++)
 				{
-					CurrentClassData->Attributes[I]->MemberOf = CurrentClassName;
-					Attributes.Add(CurrentClassData->Attributes[I]);
+					CurrentClassData->Properties[I]->MemberOf = CurrentClassName;
+					Properties.Add(CurrentClassData->Properties[I]);
 				}
-			}
 
-			for(ZESize I = 0; I < CurrentClassData->Properties.GetCount(); I++)
-			{
-				CurrentClassData->Properties[I]->MemberOf = CurrentClassName;
-				Properties.Add(CurrentClassData->Properties[I]);
-			}
-
-			//searching for duplicate class methods.we only add one item per object type.
-			for(ZESize I = 0; I < CurrentClassData->Methods.GetCount(); I++)
-			{
-				bool IsSameMethodFound = false;
-
-				for(ZESize J = 0; J < Methods.GetCount(); J++)
+				//searching for duplicate class methods.we only add one item per object type.
+				for(ZESize I = 0; I < CurrentClassData->Methods.GetCount(); I++)
 				{
-					if(Methods[J]->Name == CurrentClassData->Methods[I]->Name)
-					{
-						IsSameMethodFound = true;
+					bool IsSameMethodFound = false;
 
-						if(Methods[J]->Parameters.GetCount() == CurrentClassData->Methods[I]->Parameters.GetCount())
+					for(ZESize J = 0; J < Methods.GetCount(); J++)
+					{
+						if(Methods[J]->Name == CurrentClassData->Methods[I]->Name)
 						{
-							for(ZESize K = 0; K < Methods[J]->Parameters.GetCount(); K++)
+							IsSameMethodFound = true;
+
+							if(Methods[J]->Parameters.GetCount() == CurrentClassData->Methods[I]->Parameters.GetCount())
 							{
-								if(Methods[J]->Parameters[K]->Type != CurrentClassData->Methods[I]->Parameters[K]->Type)
-									IsSameMethodFound = false;
+								for(ZESize K = 0; K < Methods[J]->Parameters.GetCount(); K++)
+								{
+									if(Methods[J]->Parameters[K]->Type != CurrentClassData->Methods[I]->Parameters[K]->Type)
+										IsSameMethodFound = false;
+								}
 							}
+							else
+								IsSameMethodFound = false;
 						}
-						else
-							IsSameMethodFound = false;
+					}
+
+					if(IsSameMethodFound)
+						continue;
+					else
+					{
+						CurrentClassData->Methods[I]->MemberOf = CurrentClassName;
+						Methods.Add(CurrentClassData->Methods[I]);
 					}
 				}
-
-				if(IsSameMethodFound)
-					continue;
-				else
-				{
-					CurrentClassData->Methods[I]->MemberOf = CurrentClassName;
-					Methods.Add(CurrentClassData->Methods[I]);
-				}
 			}
-		}
 
-		for(ZESize I = 0; I < Properties.GetCount(); I++)
-			Properties[I]->ID = I;
+			for(ZESize I = 0; I < Properties.GetCount(); I++)
+				Properties[I]->ID = I;
 
-		for(ZESize I = 0; I < Methods.GetCount(); I++)
-			Methods[I]->ID = I;
+			for(ZESize I = 0; I < Methods.GetCount(); I++)
+				Methods[I]->ID = I;
 
-		if(MetaData->Types.GetCount() < 2)
-			return false;
-		else
-		{
 			//Our target class is the first item in array
 			const char* CurrentClassName = MetaData->Types[0]->Name;
 			//Target class' parent class is one item after it.
@@ -2321,9 +2324,6 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 
 			bool HasPublicConstructor = ClassData->HasPublicConstructor;
 			bool IsAbstract = ClassData->IsAbstract;
-
-			FILE* File;
-			File = fopen(Options.OutputFileName.ToCString(), "w");
 
 			PrepareClassDependencies(File, ZEFileInfo::GetFileName(Options.InputFileName).ToCString(), CurrentClassName, Data->ForwardDeclaredClasses);
 
@@ -2355,7 +2355,7 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 
 			CreateAddItemToPropertyMethod(File, CurrentClassName, Properties);
 			CreateAddItemToPropertyMethod(File, CurrentClassName);
-		
+
 			CreateAddItemToPropertyWithIndexMethod(File, CurrentClassName, Properties);
 			CreateAddItemToPropertyWithIndexMethod(File, CurrentClassName);
 
@@ -2375,23 +2375,18 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 
 			CreateGetPropertyIdMethod(File, CurrentClassName, Properties);
 			CreateGetMethodIdMethod(File, CurrentClassName, Methods);
-
-			fclose(File);
 		}
 	}
 	else//If last item in array is builtin class type we compile all classes to seperate files in found header
 	{
-		for(ZESize I = 0; I < Data->Types.GetCount(); I++)
+		for(ZESize TargetIndex = 0; TargetIndex < Data->TargetTypes.GetCount(); TargetIndex++)
 		{
-			ZETypeData* CurrentClassData = Data->Types[I];
+			ZETypeData* CurrentClassData = Data->TargetTypes[TargetIndex];
 			const char* CurrentClassName = CurrentClassData->Name;
 
 			((ZEClassData*)CurrentClassData)->Methods.Sort(SortMethodsByHash);
 
 			ZEArray<ZEMethodData*> Methods = ((ZEClassData*)CurrentClassData)->Methods;
-
-			FILE* File;
-			File = fopen(Options.OutputFileName.ToCString(), "w");
 
 			fprintf(File, "#include \"%s.h\"\n\n", CurrentClassName);
 
@@ -2412,10 +2407,10 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 				"{\n"
 				"\treturn %sClass::Class();\n"
 				"}\n\n", CurrentClassName, CurrentClassName, CurrentClassName);
-
-			fclose(File);
 		}
 	}
+
+	fclose(File);
 
 	return true;
 }
