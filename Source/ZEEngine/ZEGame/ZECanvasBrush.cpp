@@ -40,6 +40,7 @@
 #include "ZEGraphics/ZERenderer.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEMaterial.h"
 
 ZE_OBJECT_IMPL(ZECanvasBrush)
 

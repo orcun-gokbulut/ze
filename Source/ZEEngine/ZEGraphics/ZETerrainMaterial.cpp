@@ -47,8 +47,6 @@
 #include "ZETexture2D.h"
 #include "ZETextureCube.h"
 
-ZE_OBJECT_IMPL(ZETerrainMaterial)
-
 ZETerrainMaterial::ZETerrainMaterial()
 {
 	HeightTexture = NULL;

@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZETextureData.h"
 #include "ZEFile/ZEFile.h"
@@ -45,11 +46,11 @@
 #include "ZETextureLoader.h"
 #include "ZETextureCacheDataIdentifier.h"
 
-
 #include <sys/stat.h>
 #include <stdio.h>
 #include <string.h>
 
+ZE_OBJECT_IMPL(ZETexture2DResource)
 
 static ZEString ConstructResourcePath(const ZEString& Path)
 {

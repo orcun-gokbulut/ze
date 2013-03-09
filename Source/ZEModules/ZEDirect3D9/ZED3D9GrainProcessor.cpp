@@ -41,6 +41,7 @@
 #include "ZED3D9GrainProcessor.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9FrameRenderer.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZETexture/ZETexture2DResource.h"
 

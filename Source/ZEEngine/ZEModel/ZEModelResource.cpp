@@ -48,6 +48,8 @@
 #include <float.h>
 #include "ZEML/ZEMLSerialReader.h"
 
+ZE_OBJECT_IMPL(ZEModelResource)
+
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;

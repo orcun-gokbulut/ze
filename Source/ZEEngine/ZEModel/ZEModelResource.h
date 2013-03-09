@@ -46,7 +46,6 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEGraphics/ZEVertexTypes.h"
 
-
 class ZEStaticVertexBuffer;
 class ZETexture2D;
 class ZETexture2DResource;
@@ -326,10 +325,12 @@ struct ZEModelResourceHelper
 	ZEString									UserDefinedProperties;
 };
 
+ZE_CLASS(ZEModelResource)
 
 class ZEModelResource : public ZEResource
 {
 	ZE_OBJECT
+
 	private:
 		ZEArray<ZEModelResourceMesh>				Meshes;
 		ZEArray<ZEModelResourceBone>				Bones;

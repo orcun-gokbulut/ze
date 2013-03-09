@@ -49,8 +49,12 @@ class ZEFileCacheManager
 		virtual void*						GetFromCache();
 };
 
+ZE_CLASS(ZETextureResource)
+
 class ZETextureResource : public ZEResource
 {
+	ZE_OBJECT
+
 	public:
 		virtual ZETextureType				GetTextureType() const = 0;
 };
