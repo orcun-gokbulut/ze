@@ -80,7 +80,7 @@ ze_add_source(ZESkyBrush.h				Sources Headers ZEMC)
 ze_add_source(ZESkyDome.cpp				Sources)
 ze_add_source(ZESkyDome.h				Sources Headers ZEMC)
 ze_add_source(ZETrigger.cpp				Sources)
-ze_add_source(ZETrigger.h				Sources Headers ZEMC)
+ze_add_source(ZETrigger.h				Sources Headers)
 ze_add_source(ZEWeather.cpp				Sources)
 ze_add_source(ZEWeather.h				Sources Headers ZEMC)
 

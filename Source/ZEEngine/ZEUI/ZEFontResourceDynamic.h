@@ -37,10 +37,6 @@
 #ifndef	__ZE_FONT_RESOURCE_DYNAMIC_H__
 #define __ZE_FONT_RESOURCE_DYNAMIC_H__
 
-#include "ft2build.h"
-#include "freetype\freetype.h"
-#include "freetype\ftglyph.h"
-
 #include "ZEDS\ZEArray.h"
 #include "ZEMath\ZEVector.h"
 
@@ -49,6 +45,8 @@
 #include "ZEUI\ZEFontResource.h"
 #include "ZEUI\ZEUIRectangle.h"
 
+struct ZEFreeType;
+
 ZE_CLASS(ZEFontResourceDynamic)
 
 class ZEFontResourceDynamic : public ZEFontResource
@@ -56,8 +54,7 @@ class ZEFontResourceDynamic : public ZEFontResource
 	ZE_OBJECT
 
 	private:
-		FT_Library							Library;
-		FT_Face								Face;
+		ZEFreeType*							FreeType;
 
 		ZEUInt32							HorizontalOutputDPI;
 		ZEUInt32							VerticalOutputDPI;

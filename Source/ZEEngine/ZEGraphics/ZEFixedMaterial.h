@@ -51,12 +51,8 @@ class ZETextureCubeResource;
 class ZETexture2D;
 class ZETexture2DResource;
 
-ZE_CLASS(ZEFixedMaterial)
-
 class ZEFixedMaterial : public ZEMaterial
 {
-	ZE_OBJECT
-
 	protected:
 		ZEUInt32						OldMaterialComponents;
 		ZEUInt32						MaterialComponents;

@@ -117,8 +117,8 @@ class ZEString
 {
 	friend class ZEStringWriter;
 	private:
-		char*						Buffer;
-		ZEAllocatorBase<char>		Allocator;
+		char*								Buffer;
+		ZEAllocatorBase<char>				Allocator;
 
 		mutable bool						BufferChanged;
 

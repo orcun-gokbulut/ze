@@ -136,8 +136,4 @@ class ZEScene : public ZEObject
 		static ZEScene*							GetInstance();
 };
 
-class ZEPortalScene : public ZEScene
-{
-};
-
 #endif

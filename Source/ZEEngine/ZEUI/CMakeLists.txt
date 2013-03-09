@@ -35,6 +35,7 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+ze_add_source(ZEFreeType.h                  Sources Headers)
 ze_add_source(ZEFontResourceBitmap.cpp				Sources)
 ze_add_source(ZEFontResourceBitmap.h				Sources Headers ZEMC)
 ze_add_source(ZEFontResourceDynamic.cpp				Sources)

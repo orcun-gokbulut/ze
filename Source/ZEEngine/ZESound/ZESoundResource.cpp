@@ -41,6 +41,8 @@
 #include "ZESoundResourceOGG.h"
 #include "ZESoundResourceWAV.h"
 
+ZE_OBJECT_IMPL(ZESoundResource)
+
 ZESoundFileFormat ZESoundResource::GetFileFormat(const ZEString& FileName)
 {
 	if (FileName.Right(3).Lower() == "mp3")

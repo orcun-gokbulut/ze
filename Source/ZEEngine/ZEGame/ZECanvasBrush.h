@@ -41,7 +41,6 @@
 #include "ZEEntity.h"
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
 
 class ZERenderer;
 class ZEMaterial;

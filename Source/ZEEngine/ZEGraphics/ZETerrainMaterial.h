@@ -46,12 +46,8 @@ class ZETextureCubeResource;
 class ZETexture2D;
 class ZETexture2DResource;
 
-ZE_CLASS(ZETerrainMaterial)
-
 class ZETerrainMaterial : public ZEMaterial
 {
-	ZE_OBJECT
-
 	protected:
 		bool							TwoSided;
 		bool							Wireframe;

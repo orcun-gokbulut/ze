@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureResource.cpp
+ Zinek Engine - ZEFreeType.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETextureResource.h"
-#include "ZEMeta/ZEObject.h"
+#pragma once
+#include "ft2build.h"
+#include "freetype\freetype.h"
+#include "freetype\ftglyph.h"
 
-ZE_OBJECT_IMPL(ZETextureResource)
+struct ZEFreeType
+{
+	FT_Library	Library;
+	FT_Face		Face;
+};

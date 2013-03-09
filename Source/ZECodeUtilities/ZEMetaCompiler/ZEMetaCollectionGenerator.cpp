@@ -119,7 +119,10 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 	fprintf(File, "#include \"%s\"\n", ClassCollectionHeader.ToCString());
 
 	for(ZESize I = 0; I < RegisteredClasses.GetCount(); I++)
-		fprintf(File, "#include \"%s\"\n", RegisteredClasses[I].IncludeDirectory.ToCString());
+	{
+		if(!RegisteredClasses[I].IncludeDirectory.IsEmpty())
+			fprintf(File, "#include \"%s\"\n", RegisteredClasses[I].IncludeDirectory.ToCString());
+	}
 
 	fprintf(File,
 		"\n"
@@ -129,7 +132,10 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 		"\t{\n", ClassCollectionName.ToCString(), RegisteredClasses.GetCount());
 
 	for(ZESize I = 0; I < RegisteredClasses.GetCount(); I++)
-		fprintf(File, "\t\t%s::Class()%s\n", RegisteredClasses[I].RegisteredClassName.ToCString(), I < RegisteredClasses.GetCount() - 1 ? "," : "");
+	{
+		if(!RegisteredClasses[I].RegisteredClassName.IsEmpty())
+			fprintf(File, "\t\t%s::Class()%s\n", RegisteredClasses[I].RegisteredClassName.ToCString(), I < RegisteredClasses.GetCount() - 1 ? "," : "");
+	}
 
 	fprintf(File,
 		"\t};\n\n"

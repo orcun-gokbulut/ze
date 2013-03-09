@@ -50,8 +50,6 @@
 #include "ZEFile/ZEPathUtils.h"
 #include "ZEFile/ZEFileInfo.h"
 
-ZE_OBJECT_IMPL(ZEFixedMaterial)
-
 ZEFixedMaterial::ZEFixedMaterial()
 {
 	BaseMapResource = NULL;
