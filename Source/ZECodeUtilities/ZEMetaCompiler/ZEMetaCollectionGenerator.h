@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaClassCollectionGenerator.h
+ Zinek Engine - ZEMetaCollectionGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,13 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_META_CLASS_COLLECTION_GENERATOR_H__
-#define __ZE_META_CLASS_COLLECTION_GENERATOR_H__
+#ifndef __ZE_META_COLLECTION_GENERATOR_H__
+#define __ZE_META_COLLECTION_GENERATOR_H__
 
 #include "ZEMetaCompilerOptions.h"
 #include "ZEMetaData.h"
 
-class ZEMetaClassCollectionGenerator
+class ZEMetaCollectionGenerator
 {
 	public:
 		static void		Generate(const ZEMetaCompilerOptions& Options);

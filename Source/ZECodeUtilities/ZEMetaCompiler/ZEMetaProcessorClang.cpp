@@ -50,7 +50,7 @@
 #include "llvm/Support/system_error.h"
 
 #include "ZEMetaGenerator.h"
-#include "ZEMetaClassCollectionGenerator.h"
+#include "ZEMetaCollectionGenerator.h"
 #include "ZEFile/ZEFileInfo.h"
 
 using namespace clang::driver;
@@ -101,7 +101,7 @@ void ZEMetaProcessorInternal::InitializeClang()
 	CompilerInstance Compiler;
 	ZEMetaProcessorInternal::Compiler = &Compiler;
 	Compiler.createDiagnostics(ArgumentCount, Arguments);
-
+	
 	CompilerInvocation Invocation;
 	bool Result = CompilerInvocation::CreateFromArgs(Invocation, Arguments, Arguments + ArgumentCount, Compiler.getDiagnostics());
 	Compiler.setInvocation(&Invocation);
@@ -142,14 +142,23 @@ void ZEMetaProcessorInternal::InitializeClang()
 	Compiler.createPreprocessor();
 	Compiler.setASTConsumer(new ZECodeGeneratorASTConsumer());
 	Compiler.createASTContext();
+	
+	if (Options.MSVC)
+	{
+		Compiler.getDiagnosticOpts().setFormat(TextDiagnosticFormat::Msvc);
+		Compiler.getDiagnosticOpts().MessageLength = 0;
+	}
 
 	const FileEntry *pFile = Compiler.getFileManager().getFile(Options.InputFileName.ToCString());
 	Compiler.getSourceManager().createMainFileID(pFile);
 	Compiler.getDiagnosticClient().BeginSourceFile(Compiler.getLangOpts(), &Compiler.getPreprocessor());
 
 	ParseAST(Compiler.getPreprocessor(), &Compiler.getASTConsumer(), Compiler.getASTContext(), false, clang::TranslationUnitKind::TU_Complete, NULL, true);
+	if (Compiler.getDiagnostics().hasErrorOccurred())
+		exit(EXIT_FAILURE);
 
-	ZEMetaGenerator::Generate(Options, MetaData);
+	if (!ZEMetaGenerator::Generate(Options, MetaData))
+		exit(EXIT_FAILURE);
 
 	if(Options.IsRegisterSession)
 	{

@@ -54,4 +54,5 @@ qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
 ze_add_library(ZE3dsMaxInteriorExporter 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
+	ZEFC ${ZEFC}
 	LIBS ZEFoundation ZE3dsMaxUtils ZEProgressDialog ZEResourceConfigurationWidget libQt lib3dsMax QWinWidget)

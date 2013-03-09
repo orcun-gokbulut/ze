@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZE3dsMaxUI.h"
-#include "ZE3dsMaxScriptCommonUtilities_ms.h"
-#include "ZE3dsMaxScriptHelper_ms.h"
-#include "ZE3dsMaxScriptRemove_ms.h"
+#include "ZE3dsMaxScriptCommonUtilities.ms.h"
+#include "ZE3dsMaxScriptHelper.ms.h"
+#include "ZE3dsMaxScriptRemove.ms.h"
 #include <imenus.h>
 #include <imenuman.h>
 #include <maxscrpt/maxscrpt.h>

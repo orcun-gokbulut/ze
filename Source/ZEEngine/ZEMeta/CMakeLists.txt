@@ -38,74 +38,56 @@ cmake_minimum_required (VERSION 2.8)
 ze_add_source(ZEClass.cpp						Sources)
 ze_add_source(ZEClass.h 						Sources Headers)
 ze_add_source(ZEClassOverloads.cpp				Sources)
-
-ze_add_source(ZEClassCollection.h				Sources Headers)
-ze_add_source(ZEClassCollection.cpp				Sources)
-
+ze_add_source(ZEMetaCollection.h				Sources Headers)
+ze_add_source(ZEMetaCollection.cpp				Sources)
 ze_add_source(ZEObject.cpp						Sources)
 ze_add_source(ZEObject.h						Sources Headers)
-
 ze_add_source(ZEAnimation.cpp					Sources)
 ze_add_source(ZEAnimation.h						Sources Headers)
-
 ze_add_source(ZEPostProcessor.cpp				Sources)
 ze_add_source(ZEPostProcessor.h					Sources Headers)
-
 ze_add_source(ZEMetaAttribute.cpp				Sources)
 ze_add_source(ZEMetaAttribute.h					Sources Headers)
-
 ze_add_source(ZEProperty.cpp					Sources)
 ze_add_source(ZEProperty.h						Sources Headers)
-
 ze_add_source(ZEPropertySignature.cpp			Sources)
 ze_add_source(ZEPropertySignature.h				Sources Headers)
 ze_add_source(ZEPropertySignatureGenerator.cpp	Sources)
 ze_add_source(ZEPropertySignatureGenerator.h	Sources Headers)
-
 ze_add_source(ZEMethod.cpp						Sources)
 ze_add_source(ZEMethod.h						Sources Headers)
-
 ze_add_source(ZEMethodSignature.cpp				Sources)
 ze_add_source(ZEMethodSignature.h				Sources Headers)
 ze_add_source(ZEMethodSignatureGenerator.cpp	Sources)
 ze_add_source(ZEMethodSignatureGenerator.h		Sources Headers)
 ze_add_source(ZEMethodSignatureGeneratorImp.h	Sources Headers)
-
 ze_add_source(ZEContainer.cpp					Sources)
 ze_add_source(ZEContainer.h						Sources Headers)
-
 ze_add_source(ZEEnumurator.cpp					Sources)
 ze_add_source(ZEEnumurator.h					Sources Headers)
-
 ze_add_source(ZEEnum.cpp						Sources)
 ze_add_source(ZEEnum.h							Sources Headers)
-
 ze_add_source(ZEEvent.cpp						Sources)
 ze_add_source(ZEEvent.h							Sources Headers)
 ze_add_source(ZEEventImp.h						Sources Headers)
 ze_add_source(ZEEventHandler.cpp				Sources)
 ze_add_source(ZEEventHandler.h					Sources Headers)
 ze_add_source(ZEEventHandlerImp.h				Sources Headers)
-
 ze_add_source(ZEProvider.cpp					Sources)
 ze_add_source(ZEProvider.h						Sources Headers)
-
 ze_add_source(ZEMetaTestClass.cpp				Sources)
 ze_add_source(ZEMetaTestClass.h					Sources Headers)
-
 ze_add_source(ZEInteger.cpp						Sources)
 ze_add_source(ZEInteger.h						Sources Headers)
-
 ze_add_source(ZEType.cpp						Sources)
 ze_add_source(ZEType.h							Sources Headers)
 ze_add_source(ZETypeGenerator.cpp				Sources)
 ze_add_source(ZETypeGenerator.h					Sources Headers)
-
-
 ze_add_source(ZEVariant.cpp						Sources)
 ze_add_source(ZEVariant.h						Sources Headers)
 ze_add_source(ZEReference.cpp					Sources)
 ze_add_source(ZEReference.h						Sources Headers)
+
 
 ze_add_library(ZEMeta 
 	SOURCES ${Sources}

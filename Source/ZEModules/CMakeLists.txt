@@ -39,7 +39,7 @@ ze_set_project_folder("ZEModules")
 
 ze_add_module(ZEDirect3D9			Modules PLATFORMS Windows)
 ze_add_module(ZEDirectInput			Modules OPTIONAL DEFAULT PLATFORMS Windows )
-ze_add_module(ZEVirtualInput		Modules OPTIONAL DEFAULT)
+ze_add_module(ZEVirtualInput		Modules OPTIONAL)
 ze_add_module(ZEWindowsInput		Modules OPTIONAL DEFAULT PLATFORMS Windows)
 ze_add_module(ZEVRPNInput			Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
 ze_add_module(ZEDirectSound			Modules OPTIONAL DEFAULT PLATFORMS Windows)

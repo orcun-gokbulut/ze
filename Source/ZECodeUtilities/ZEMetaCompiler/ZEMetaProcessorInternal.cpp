@@ -191,12 +191,8 @@ bool ZEMetaProcessorInternal::CheckClass(CXXRecordDecl* Class)
 	if (Class->isTemplateDecl())
 		RaiseError(Class->getLocation(), "ZEObject based templates are not supported.");
 
-	RaiseNote(Class->getLocation(), "ZEObject based class has found.");
-	
 	if (!CheckClassHasZEObjectMacro(Class))
 		return false;
-
-	RaiseNote(Class->getLocation(), "ZEObject based class has been checked.");
 
 	return true;
 }

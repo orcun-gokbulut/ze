@@ -96,6 +96,7 @@ ze_add_source(ZETimerManager.cpp					Sources)
 ze_add_source(ZETimerManager.h						Sources Headers)
 
 ze_add_library(ZECore 
+	ZEMC ${ZEMC}
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation libPhysX2)

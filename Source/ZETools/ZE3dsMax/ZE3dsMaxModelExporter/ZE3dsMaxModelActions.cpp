@@ -35,9 +35,9 @@
 
 #include "ZE3dsMaxModelActions.h"
 #include <maxscrpt/maxscrpt.h>
-#include "ZE3dsMaxModelScriptMesh_ms.h"
-#include "ZE3dsMaxModelScriptBone_ms.h"
-#include "ZE3dsMaxModelScriptPhysicalBody_ms.h"
+#include "ZE3dsMaxModelScriptMesh.ms.h"
+#include "ZE3dsMaxModelScriptBone.ms.h"
+#include "ZE3dsMaxModelScriptPhysicalBody.ms.h"
 
 
 int ZE3dsMaxModelActionAddMeshAttributes::GetId()

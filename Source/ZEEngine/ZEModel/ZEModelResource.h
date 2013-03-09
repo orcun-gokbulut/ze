@@ -329,6 +329,7 @@ struct ZEModelResourceHelper
 
 class ZEModelResource : public ZEResource
 {
+	ZE_OBJECT
 	private:
 		ZEArray<ZEModelResourceMesh>				Meshes;
 		ZEArray<ZEModelResourceBone>				Bones;
