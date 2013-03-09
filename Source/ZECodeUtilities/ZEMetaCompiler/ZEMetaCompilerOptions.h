@@ -56,7 +56,8 @@ struct ZEMetaCompilerOptions
 	bool						IsRegisterSession;
 	bool						IsGenerateSession;
 
-	bool						Verbose;
+	bool						Quiet;
+	bool						MSVC;
 };
 
 #endif

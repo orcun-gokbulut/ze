@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaClassCollectionGenerator.cpp
+ Zinek Engine - ZEMetaCollectionGenerator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMetaClassCollectionGenerator.h"
+#include "ZEMetaCollectionGenerator.h"
 #include "ZEFile/ZEFileInfo.h"
 
 struct ZERegisteredClass
@@ -42,7 +42,7 @@ struct ZERegisteredClass
 	ZEString IncludeDirectory;
 };
 
-void ZEMetaClassCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
+void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 {
 	ZEArray<ZERegisteredClass> RegisteredClasses;
 	RegisteredClasses.SetCount(Options.RegisterFiles.GetCount());
@@ -97,16 +97,13 @@ void ZEMetaClassCollectionGenerator::Generate(const ZEMetaCompilerOptions& Optio
 
 	fprintf(File,
 		"#pragma once\n"
-		"#include \"ZEMeta/ZEClassCollection.h\"\n\n"
-		"class %sClassCollection : public ZEClassCollection\n"
+		"#include \"ZEMeta/ZEMetaCollection.h\"\n\n"
+		"class %s : public ZEMetaCollection\n"
 		"{\n"
-		"\tprivate:\n"
-		"\t\t\t\t\t\t\t\t\t\t\t\t%sClassCollection();\n"
-		"\t\tvirtual\t\t\t\t\t\t\t\t\t~%sClassCollection();\n\n"
 		"\tpublic:\n"
 		"\t\tvirtual ZEClass**\t\t\t\t\t\tGetClasses();\n"
 		"\t\tvirtual ZESize\t\t\t\t\t\t\tGetClassCount();\n\n"
-		"\t\tstatic %sClassCollection*\t\t\tGetInstance();\n"
+		"\t\tstatic %s*\t\t\tGetInstance();\n"
 		"};\n\n", 
 		ClassCollectionName.ToCString(), 
 		ClassCollectionName.ToCString(), 
@@ -126,7 +123,7 @@ void ZEMetaClassCollectionGenerator::Generate(const ZEMetaCompilerOptions& Optio
 
 	fprintf(File,
 		"\n"
-		"ZEClass** %sClassCollection::GetClasses()\n"
+		"ZEClass** %s::GetClasses()\n"
 		"{\n"
 		"\tstatic ZEClass* Classes[%d] = \n"
 		"\t{\n", ClassCollectionName.ToCString(), RegisteredClasses.GetCount());
@@ -135,30 +132,20 @@ void ZEMetaClassCollectionGenerator::Generate(const ZEMetaCompilerOptions& Optio
 		fprintf(File, "\t\t%s::Class()%s\n", RegisteredClasses[I].RegisteredClassName.ToCString(), I < RegisteredClasses.GetCount() - 1 ? "," : "");
 
 	fprintf(File,
-		"\t}\n\n"
+		"\t};\n\n"
 		"\treturn Classes;\n"
 		"};\n\n");
 
 	fprintf(File,
-		"ZESize %sClassCollection::GetClassCount()\n"
+		"ZESize %s::GetClassCount()\n"
 		"{\n"
 		"\treturn %d;\n"
 		"}\n\n", ClassCollectionName.ToCString(), RegisteredClasses.GetCount());
 
 	fprintf(File,
-		"%sClassCollection::%sClassCollection()\n"
-		"{\n\n"
-		"}\n\n", ClassCollectionName.ToCString(), ClassCollectionName.ToCString());
-
-	fprintf(File,
-		"%sClassCollection::~%sClassCollection()\n"
-		"{\n\n"
-		"}\n\n", ClassCollectionName.ToCString(), ClassCollectionName.ToCString());
-
-	fprintf(File,
-		"%sClassCollection* %sClassCollection::GetInstance()\n"
+		"%s* %s::GetInstance()\n"
 		"{\n"
-		"\tstatic %sClassCollection Collection;\n"
+		"\tstatic %s Collection;\n"
 		"\treturn &Collection;\n"
 		"}\n\n", ClassCollectionName.ToCString(), ClassCollectionName.ToCString(), ClassCollectionName.ToCString());
 

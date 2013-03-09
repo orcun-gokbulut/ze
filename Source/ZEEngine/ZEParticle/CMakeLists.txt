@@ -70,7 +70,9 @@ ze_add_source(ZEParticleDisplacementOperator.h			Sources Headers ZEMC)
 ze_add_source(ZEParticleRandomAccelerationOperator.cpp	Sources)
 ze_add_source(ZEParticleRandomAccelerationOperator.h	Sources Headers ZEMC)
 
+
 ze_add_library(ZEParticle 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
+	ZEMC ${ZEMC}
 	LIBS ZEFoundation)

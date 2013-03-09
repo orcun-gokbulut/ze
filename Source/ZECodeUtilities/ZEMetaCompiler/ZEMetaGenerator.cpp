@@ -912,7 +912,7 @@ static void CreateGetPropertyIdMethod(FILE* File, const char* ClassName, ZEArray
 		"{\n"
 		"\tstruct ZESortedPropertyData\n"
 		"\t{\n"
-		"\t\tZEUInt32\t\tHash;\n"
+		"\t\tZESize\t\tHash;\n"
 		"\t\tZESize\t\t\tID;\n"
 		"\t\tconst char*\t\tPropertyName;\n"
 		"\t};\n\n", ClassName);

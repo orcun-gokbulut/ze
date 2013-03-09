@@ -40,11 +40,11 @@
 #include "ZETypes.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEDirectoryInfo.h"
-#include "ZEToolbarIcons_16a_bmp.h"
-#include "ZEToolbarIcons_16i_bmp.h"
-#include "ZEToolbarIcons_24a_bmp.h"
-#include "ZEToolbarIcons_24i_bmp.h"
-#include "zineklogo_bmp.h"
+#include "ZEToolbarIcons_16a.bmp.h"
+#include "ZEToolbarIcons_16i.bmp.h"
+#include "ZEToolbarIcons_24a.bmp.h"
+#include "ZEToolbarIcons_24i.bmp.h"
+#include "zineklogo.bmp.h"
 #include <IPathConfigMgr.h> 
 
 #define WIN32_LEAN_AND_MEAN

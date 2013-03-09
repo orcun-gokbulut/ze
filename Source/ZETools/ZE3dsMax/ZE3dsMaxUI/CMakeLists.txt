@@ -45,6 +45,7 @@ ze_add_source(ZE3dsMaxScriptRemove.ms 			Sources ZEFC)
 
 ze_add_library(ZE3dsMaxUI 
 	SOURCES ${Sources}
+	ZEFC ${ZEFC}
 	LIBS ZEFoundation lib3dsMax)
 	
 set(LOCAL_WARNING_FLAGS /W3)

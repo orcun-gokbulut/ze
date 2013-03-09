@@ -37,10 +37,10 @@ cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEFileCompiler.cpp 			Sources)
 ze_add_source(ZEFileCompiler.h   			Sources)
-ze_add_source(ZEFileCompilerOptions.cpp		UtilitySources)
-ze_add_source(ZEFileCompilerOptions.h		UtilitySources)
-ze_add_library(ZEFileCompiler SOURCES ${Sources} LIBS ZEFoundation)
-
-
-ze_add_source(ZEMain.cpp					UtilitySources)
-ze_add_executable(ZEFC CONSOLE SOURCES ${UtilitySources} LIBS ZEFoundation ZEFileCompiler)
+ze_add_source(ZEFileCompilerOptions.cpp		Sources)
+ze_add_source(ZEFileCompilerOptions.h		Sources)
+ze_add_source(ZEMain.cpp					Sources)
+ze_add_executable(ZEFileCompiler 
+	CONSOLE 
+	SOURCES ${Sources} 
+	LIBS ZEFoundation)

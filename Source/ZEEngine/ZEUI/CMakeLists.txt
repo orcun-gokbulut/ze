@@ -79,8 +79,8 @@ ze_add_source(ZEUITextCursor.cpp					Sources)
 ze_add_source(ZEUITextCursor.h						Sources Headers ZEMC)
 
 
-
 ze_add_library(ZEUI
 	LIBS ZEFoundation libFreeType
 	SOURCES ${Sources}
-	HEADERS ${Headers})
+	HEADERS ${Headers}
+	ZEMC ${ZEMC})

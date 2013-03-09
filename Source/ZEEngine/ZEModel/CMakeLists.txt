@@ -52,11 +52,13 @@ ze_add_source(ZEModelMesh.h					Sources Headers ZEMC)
 ze_add_source(ZEModelMeshLOD.cpp			Sources)
 ze_add_source(ZEModelMeshLOD.h				Sources Headers)
 ze_add_source(ZEModelResource.cpp			Sources)
-ze_add_source(ZEModelResource.h				Sources Headers)
+ze_add_source(ZEModelResource.h				Sources Headers ZEMC)
 ze_add_source(ZEModelHelper.cpp				Sources)
 ze_add_source(ZEModelHelper.h				Sources Headers ZEMC)
+
 
 ze_add_library(ZEModel 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
+	ZEMC ${ZEMC}
 	LIBS ZEFoundation)

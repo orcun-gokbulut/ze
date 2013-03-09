@@ -37,7 +37,7 @@
 #include "ZEMetaGenerator.h"
 #include "ZEMetaProcessor.h"
 #include "ZEMetaCompilerOptions.h"
-#include "ZEMetaClassCollectionGenerator.h"
+#include "ZEMetaCollectionGenerator.h"
 
 static void Error(const char* Text)
 {
@@ -69,10 +69,11 @@ static void ShowHelp()
 		"  -D  [Definition]=[Value] : Adds new preprocessor definition with value.\n"
 		"  -o  [OutputFileName] : Generated output. Default: [HeaderFileName].ZEMeta.cpp\n"
 		"  -r  [RegisterFileName] : On meta generation mode, Creates a register file with given name. On class collection generation mode, inputs given register file. \n"
-		"  -g  [ClassCollectionName] : Generates ClassCollection file with given register files (-r).\n"
-		"  -gh [ClassCollectionHeader] : Class collection header file name.\n"
-		"  -gs [ClassCollectionSource] : Class collection source file name.\n"
-		"  -v : Verbose mode which outputs compilation errors. Default : Not set.\n"
+		"  -c  [MetaCollectionName] : Generates meta collection file with given register files (-r).\n"
+		"  -ch [MetaCollectionHeader] : Meta collection header file name.\n"
+		"  -cs [MetaCollectionSource] : Meta collection source file name.\n"
+		"  -msvc : Generates Microsoft Visual Studio like error messages. (Default: Not set.)\n"
+		"  -q : Quiet mode, which only outputs errors.\n"
 		"\n"
 		"Example(s) (Meta Generation):\n"
 		"  ZEMetaCompiler ZEEntity.h -I . -I ..\\ZEFoundation -D ZE_PLATFORM_WINDOWS -D ZE_VERSION_MAJOR=0 -o ZEEntity.ZEMeta.cpp -r ZEEntity.ZEMeta.Register\n"
@@ -91,7 +92,8 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 	Options.BinaryPath = Argv[0];
 	Options.IsRegisterSession = false;
 	Options.IsGenerateSession = false;
-	Options.Verbose = false;
+	Options.Quiet = false;
+
 	for (int I = 1; I < Argc; I++)
 	{
 		if (strncmp(Argv[I], "-h", 2) == 0)
@@ -147,9 +149,9 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 			I++;
 			Options.RegisterFileName = Argv[I];
 		}
-		else if (strncmp(Argv[I], "-g", 2) == 0)
+		else if (strncmp(Argv[I], "-c", 2) == 0)
 		{
-			if (strncmp(Argv[I], "-gh", 3) == 0)
+			if (strncmp(Argv[I], "-ch", 3) == 0)
 			{
 				if (I + 1 >= Argc)
 					Error("Empty parameter value.");
@@ -160,7 +162,7 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 
 				continue;
 			}
-			else if (strncmp(Argv[I], "-gs", 3) == 0)
+			else if (strncmp(Argv[I], "-cs", 3) == 0)
 			{
 				if (I + 1 >= Argc)
 					Error("Empty parameter value.");
@@ -181,9 +183,13 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 
 			Options.ClassCollectionName = Argv[I];
 		}
-		else if (strncmp(Argv[I], "-v", 2) == 0)
+		else if (strncmp(Argv[I], "-q", 2) == 0)
 		{
-			Options.Verbose = true;
+			Options.Quiet = true;
+		}
+		else if (strncmp(Argv[I], "-msvc", 5) == 0)
+		{
+			Options.MSVC = true;
 		}
 		else
 		{
@@ -195,7 +201,7 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 	}
 
 	if(Options.IsGenerateSession)
-		ZEMetaClassCollectionGenerator::Generate(Options);
+		ZEMetaCollectionGenerator::Generate(Options);
 
 	if (Options.InputFileName == NULL && !Options.IsGenerateSession)
 	{
@@ -206,15 +212,17 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 
 int main(int Argc, const char** Argv)
 {
-	printf(
-		"ZEMetaCompiler - Version : 0.3.8\n"
-		"Copyright (C) 2013, Zinek Code House. All rights reserved.\n\n");
-
 	if (Argc == 1)
 		Error("Command line arguments are missing.");
 
 	ZEMetaCompilerOptions Options;
 	ParseParameters(Argc, Argv, Options);
+
+	if (!Options.Quiet)
+	{
+		printf("ZEMetaCompiler - Version : 0.3.8\n"
+			"Copyright (C) 2013, Zinek Code House. All rights reserved.\n\n");
+	}
 
 	if(!Options.OutputFileName.IsEmpty())
 	{
