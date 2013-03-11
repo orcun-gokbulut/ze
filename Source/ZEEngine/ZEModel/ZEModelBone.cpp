@@ -57,7 +57,7 @@ ZEModelBone* ZEModelBone::GetParentBone()
 	return ParentBone;
 }
 
-const ZEArray<ZEModelBone*> ZEModelBone::GetChildBones()
+const ZEArray<ZEModelBone*>& ZEModelBone::GetChildBones()
 {
 	return ChildBones;
 }

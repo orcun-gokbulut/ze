@@ -72,6 +72,16 @@ bool ZEModelMesh::GetVisible()
 	return Visible;
 }
 
+ZEModelMesh* ZEModelMesh::GetParentMesh()
+{
+	return ParentMesh;
+}
+
+const ZEArray<ZEModelMesh*>& ZEModelMesh::GetChildMeshes()
+{
+	return ChildMeshes;
+}
+
 const char* ZEModelMesh::GetName()
 {
 	return MeshResource->Name;
@@ -84,7 +94,7 @@ const ZEAABBox& ZEModelMesh::GetLocalBoundingBox()
 
 const ZEAABBox& ZEModelMesh::GetModelBoundingBox()
 {
-	ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetLocalTransform());
+	ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
 
 	return ModelBoundingBox;
 }
@@ -103,11 +113,29 @@ const ZEMatrix4x4& ZEModelMesh::GetLocalTransform()
 	return LocalTransform;
 }
 
+const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
+{
+	if (ParentMesh == NULL)
+		return GetLocalTransform();
+	else
+	{
+		ZEMatrix4x4::Multiply(ModelTransform, ParentMesh->GetModelTransform(), GetLocalTransform());
+		return ModelTransform;
+	}
+}
+
 const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
 {
-	ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetLocalTransform());
-
-	return WorldTransform;	
+	if (ParentMesh == NULL)
+	{
+		ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetLocalTransform());
+		return WorldTransform;
+	}
+	else
+	{
+		ZEMatrix4x4::Multiply(WorldTransform, ParentMesh->GetWorldTransform(), GetLocalTransform());
+		return WorldTransform;
+	}
 }
 	
 void ZEModelMesh::SetLocalPosition(const ZEVector3& LocalPosition)
@@ -140,6 +168,168 @@ const ZEVector3& ZEModelMesh::GetLocalScale()
 	return Scale;
 }
 
+void ZEModelMesh::SetModelPosition(const ZEVector3& ModelPosition)
+{
+	if (ParentMesh == NULL)
+		SetLocalPosition(ModelPosition);
+	else
+		SetLocalPosition(ModelPosition - ParentMesh->GetModelPosition());
+}
+
+const ZEVector3 ZEModelMesh::GetModelPosition()
+{
+	if (ParentMesh == NULL)
+		return Position;
+	else
+	{
+		ZEVector3 Temp;
+		ZEMatrix4x4::Transform(Temp, ParentMesh->GetModelTransform(), Position);
+		return Temp;
+	}
+}
+
+void ZEModelMesh::SetModelRotation(const ZEQuaternion& ModelRotation)
+{
+	if (ParentMesh == NULL)
+		SetLocalRotation(ModelRotation);
+	else
+	{
+		ZEQuaternion Temp, Result;
+		ZEQuaternion::Conjugate(Temp, ParentMesh->GetModelRotation());
+		ZEQuaternion::Product(Result, ModelRotation, Temp);
+		SetLocalRotation(Result);
+	}
+}
+
+const ZEQuaternion ZEModelMesh::GetModelRotation()
+{
+	if (ParentMesh == NULL)
+		return Rotation;
+	else
+	{
+		ZEQuaternion Temp;
+		ZEQuaternion::Product(Temp, Rotation, ParentMesh->GetModelRotation());
+		ZEQuaternion::Normalize(Temp, Temp);
+		return Temp;
+	}
+}
+
+void ZEModelMesh::SetModelScale(const ZEVector3& ModelScale)
+{
+	if (ParentMesh == NULL)
+		SetLocalScale(ModelScale);
+	else
+	{
+		ZEVector3 Temp;
+		ZEVector3::Divide(Temp, ModelScale, ParentMesh->GetModelScale());
+		SetLocalScale(Temp);
+	}		
+}
+
+const ZEVector3 ZEModelMesh::GetModelScale()
+{
+	if (ParentMesh == NULL)
+		return Scale;
+	else
+	{
+		ZEVector3 Temp;
+		ZEVector3::Multiply(Temp, ParentMesh->GetModelScale(), Scale);
+		return Temp;
+	}
+}
+
+void ZEModelMesh::SetWorldPosition(const ZEVector3& WorldPosition)
+{
+	if (ParentMesh == NULL)
+		SetLocalPosition(WorldPosition - Owner->GetWorldPosition());
+	else
+		SetLocalPosition(WorldPosition - ParentMesh->GetWorldPosition());
+}
+
+const ZEVector3 ZEModelMesh::GetWorldPosition()
+{
+	if (ParentMesh == NULL)
+	{
+		ZEVector3 Temp;
+		ZEMatrix4x4::Transform(Temp, Owner->GetWorldTransform(), Position);
+		return Temp;
+	}
+	else
+	{
+		ZEVector3 Temp;
+		ZEMatrix4x4::Transform(Temp, ParentMesh->GetWorldTransform(), Position);
+		return Temp;
+	}
+}
+
+void ZEModelMesh::SetWorldRotation(const ZEQuaternion& WorldRotation)
+{
+	if (ParentMesh == NULL)
+	{	
+		ZEQuaternion Temp, Result;
+		ZEQuaternion::Conjugate(Temp, Owner->GetWorldRotation());
+		ZEQuaternion::Product(Result, WorldRotation, Temp);
+		SetLocalRotation(Result);
+	}
+	else
+	{
+		ZEQuaternion Temp, Result;
+		ZEQuaternion::Conjugate(Temp, ParentMesh->GetWorldRotation());
+		ZEQuaternion::Product(Result, WorldRotation, Temp);
+		SetLocalRotation(Result);
+	}
+}
+
+const ZEQuaternion ZEModelMesh::GetWorldRotation()
+{
+	if (ParentMesh == NULL)
+	{
+		ZEQuaternion Temp;
+		ZEQuaternion::Product(Temp, Owner->GetWorldRotation(), Rotation);
+		ZEQuaternion::Normalize(Temp, Temp);
+		return Temp;
+	}
+	else
+	{
+		ZEQuaternion Temp;
+		ZEQuaternion::Product(Temp, ParentMesh->GetWorldRotation(), Rotation);
+		ZEQuaternion::Normalize(Temp, Temp);
+		return Temp;
+	}
+}
+
+void ZEModelMesh::SetWorldScale(const ZEVector3& WorldScale)
+{
+	if (ParentMesh == NULL)
+	{
+		ZEVector3 Temp;
+		ZEVector3::Divide(Temp, WorldScale, Owner->GetWorldScale());
+		SetLocalScale(Temp);
+	}
+	else
+	{
+		ZEVector3 Temp;
+		ZEVector3::Divide(Temp, WorldScale, ParentMesh->GetWorldScale());
+		SetLocalScale(Temp);
+	}
+}
+
+const ZEVector3 ZEModelMesh::GetWorldScale()
+{
+	if (ParentMesh == NULL)
+	{
+		ZEVector3 Temp;
+		ZEVector3::Multiply(Temp, Owner->GetWorldScale(), Scale);
+		return Temp;
+	}
+	else
+	{
+		ZEVector3 Temp;
+		ZEVector3::Multiply(Temp, ParentMesh->GetWorldScale(), Scale);
+		return Temp;
+	}
+}
+
 void ZEModelMesh::SetAnimationType(ZEModelAnimationType AnimationType)
 {
 	this-> AnimationType = AnimationType;
@@ -150,6 +340,17 @@ ZEModelAnimationType ZEModelMesh::GetAnimationType()
 	return AnimationType;
 }
 
+void ZEModelMesh::AddChild(ZEModelMesh* Mesh)
+{
+	Mesh->ParentMesh = this;
+	ChildMeshes.Add(Mesh);
+}
+
+void ZEModelMesh::RemoveChild(ZEModelMesh* Mesh)
+{
+	Mesh->ParentMesh = NULL;
+	ChildMeshes.DeleteValue(Mesh);
+}
 
 void ZEModelMesh::SetPhysicsEnabled(bool Enabled)
 {
@@ -287,6 +488,15 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 void ZEModelMesh::Deinitialize()
 {
 	Owner = NULL;
+	ParentMesh = NULL;
+
+	if (PhysicalBody != NULL)
+	{
+		PhysicalBody->Destroy();
+		PhysicalBody = NULL;
+	}
+
+	ChildMeshes.Clear();
 	LODs.Clear();
 }
 
@@ -333,6 +543,7 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 ZEModelMesh::ZEModelMesh()
 {
 	Owner = NULL;
+	ParentMesh = NULL;
 	MeshResource = NULL;
 	PhysicalBody = NULL;
 	PhysicalCloth = NULL;

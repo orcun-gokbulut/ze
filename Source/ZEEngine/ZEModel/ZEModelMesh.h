@@ -55,6 +55,9 @@ class ZEModelMesh
 		ZEModel*							Owner;
 
 		const ZEModelResourceMesh*			MeshResource;
+		ZEModelMesh*						ParentMesh;
+		ZEArray<ZEModelMesh*>				ChildMeshes;
+
 		ZEAABBox							LocalBoundingBox;
 		ZEAABBox							ModelBoundingBox;
 		ZEAABBox							WorldBoundingBox;
@@ -64,7 +67,7 @@ class ZEModelMesh
 		ZEQuaternion						Rotation;
 
 		ZEMatrix4x4							LocalTransform;
-/*		ZEMatrix4x4							ModelTransform;*/
+		ZEMatrix4x4							ModelTransform;
 		ZEMatrix4x4							WorldTransform;
 
 		bool								PhysicsEnabled;
@@ -82,6 +85,8 @@ class ZEModelMesh
 		void								OnTransformChanged();
 
 	public:
+		ZEModelMesh*						GetParentMesh();
+		const ZEArray<ZEModelMesh*>&		GetChildMeshes();
 		const char*							GetName();
 		ZEPhysicalRigidBody*				GetPhysicalBody() { return PhysicalBody; }
 		ZEPhysicalCloth*					GetPhysicalCloth() { return PhysicalCloth; }
@@ -92,7 +97,7 @@ class ZEModelMesh
 		const ZEAABBox&						GetWorldBoundingBox();
 
 		const ZEMatrix4x4&					GetLocalTransform();
-/*		const ZEMatrix4x4&					GetModelTransform();*/
+		const ZEMatrix4x4&					GetModelTransform();
 		const ZEMatrix4x4&					GetWorldTransform();
 				
 		void								SetLocalPosition(const ZEVector3& LocalPosition);
@@ -103,6 +108,24 @@ class ZEModelMesh
 
 		void								SetLocalScale(const ZEVector3& LocalScale);
 		const ZEVector3&					GetLocalScale();
+
+		void								SetModelPosition(const ZEVector3& ModelPosition);
+		const ZEVector3						GetModelPosition();
+
+		void								SetModelRotation(const ZEQuaternion& ModelRotation);
+		const ZEQuaternion					GetModelRotation();
+
+		void								SetModelScale(const ZEVector3& ModelScale);
+		const ZEVector3						GetModelScale();
+
+		void								SetWorldPosition(const ZEVector3& WorldPosition);
+		const ZEVector3						GetWorldPosition();
+
+		void								SetWorldRotation(const ZEQuaternion& WorldRotation);
+		const ZEQuaternion					GetWorldRotation();
+
+		void								SetWorldScale(const ZEVector3& WorldScale);
+		const ZEVector3						GetWorldScale();
 
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();
@@ -115,6 +138,9 @@ class ZEModelMesh
 
 		void								SetVisible(bool Visible);
 		bool								GetVisible();
+
+		void								AddChild(ZEModelMesh* Mesh);
+		void								RemoveChild(ZEModelMesh* Mesh);
 
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();

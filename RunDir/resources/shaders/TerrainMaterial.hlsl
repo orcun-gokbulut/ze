@@ -229,7 +229,7 @@ ZEGBuffer ZETerrainMaterial_GBuffer_PixelShader(ZETerrainMaterial_GBuffer_PSInpu
 	
 	
 	float DetailBlend = saturate(length(Input.Position) * 0.01f);
-	float3 Normal = 2.0f * tex2D(DetailNormalTexture, Input.GlobalTexcoord * 1200.0f).xyz - 1.0f;
+	float3 Normal = 2.0f * tex2D(DetailNormalTexture, Input.GlobalTexcoord * 1000.0f).xyz - 1.0f;
 	Normal = normalize(Normal.x * normalize(Input.Tangent) + Normal.y * normalize(Input.Binormal) + Normal.z * normalize(Input.Normal));
 	ZEGBuffer_SetViewNormal(GBuffer, normalize(lerp(Normal, Input.Normal, DetailBlend)));
 

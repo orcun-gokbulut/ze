@@ -217,6 +217,15 @@ void ZEModel::LoadModelResource()
 		return;
 
 	Meshes.SetCount(ModelResource->GetMeshes().GetCount());
+
+	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
+	{
+		if (ModelResource->GetMeshes()[I].ParentMesh != -1)
+		{
+			Meshes[(ZESize)ModelResource->GetMeshes()[I].ParentMesh].AddChild(&Meshes[I]);
+		}
+	}
+
 	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
 	{
 		Meshes[I].Initialize(this, &ModelResource->GetMeshes()[I]);
