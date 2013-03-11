@@ -400,12 +400,13 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Mesh")
 			continue;
 
-		ZEVariant NameValue, PositionValue, RotationValue, ScaleValue, IsVisibleValue, IsSkinnedValue, UserDefinedPropertiesValue;
+		ZEVariant NameValue, ParentMeshValue, PositionValue, RotationValue, ScaleValue, IsVisibleValue, IsSkinnedValue, UserDefinedPropertiesValue;
 		ZEMLSerialPointer BoundingBoxNodePointer, PhysicalBodyNodePointer, LODsNodePointer;
 
 		ZEMLSerialListItem MeshList[] = 
 		{
 			ZEML_LIST_PROPERTY("Name",						NameValue,						ZE_VRT_STRING,		true),
+			ZEML_LIST_PROPERTY("ParentMesh",				ParentMeshValue,				ZE_VRT_INTEGER_32,	false),
 			ZEML_LIST_NODE("BoundingBox",					BoundingBoxNodePointer,								true),
 			ZEML_LIST_PROPERTY("Position",					PositionValue,					ZE_VRT_VECTOR3,		true),
 			ZEML_LIST_PROPERTY("Rotation",					RotationValue,					ZE_VRT_QUATERNION,	true),
@@ -417,12 +418,18 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 			ZEML_LIST_NODE("LODs",							LODsNodePointer,									true)
 		};
 
-		if (!NodeReader->ReadPropertyList(MeshList, 10))
+		if (!NodeReader->ReadPropertyList(MeshList, 11))
 			return false;
 
 		ZEModelResourceMesh* Mesh = Meshes.Add();
 
 		strncpy(Mesh->Name, NameValue.GetString(), ZE_MDLF_MAX_NAME_SIZE);
+
+		if (ParentMeshValue.GetType() == ZE_VRT_INTEGER_32)
+			Mesh->ParentMesh = ParentMeshValue;
+		else
+			Mesh->ParentMesh = -1;
+
 		Mesh->Position = PositionValue;
 		Mesh->Rotation = RotationValue;
 		Mesh->Scale = ScaleValue;

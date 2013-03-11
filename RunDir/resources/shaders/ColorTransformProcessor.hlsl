@@ -249,7 +249,7 @@ PS_OUTPUT ps_main( PS_INPUT Input )
 	RGB += IntensityBoost;
 	
 	Output.PixelColor.a = SampleColor.a;
-	Output.PixelColor.rgb = lerp(SampleColor.rgb, RGB, BlendFactor);
-
+	Output.PixelColor.rgb = TransformedColor;
+	
 	return Output;
 }

@@ -287,6 +287,7 @@ struct ZEModelResourceMesh
 {
 	char										Name[ZE_MDLF_MAX_NAME_SIZE]; 
 	ZEAABBox									BoundingBox;
+	ZEInt32										ParentMesh;
 	ZEVector3									Position;
 	ZEQuaternion								Rotation;
 	ZEVector3									Scale;
