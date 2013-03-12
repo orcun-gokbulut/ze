@@ -97,8 +97,8 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 
 	fprintf(File,
 		"#pragma once\n"
-		"#include \"ZEMeta/ZEMetaCollection.h\"\n\n"
-		"class %s : public ZEMetaCollection\n"
+		"#include \"ZEMeta/ZEMetaRegister.h\"\n\n"
+		"class %s : public ZEMetaRegister\n"
 		"{\n"
 		"\tpublic:\n"
 		"\t\tvirtual ZEClass**\t\t\t\t\t\tGetClasses();\n"

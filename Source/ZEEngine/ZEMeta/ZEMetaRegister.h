@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaCollection.h
+ Zinek Engine - ZEMetaRegister.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,18 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_META_COLLECTION_H__
-#define __ZE_META_COLLECTION_H__
+#ifndef __ZE_META_REGISTER_H__
+#define __ZE_META_REGISTER_H__
 
-#include "ZEMeta/ZEClass.h"
 #include "ZETypes.h"
 
-class ZEMetaCollection
-{
-	protected:
-								ZEMetaCollection();
-		virtual					~ZEMetaCollection();
+class ZEClass;
 
+class ZEMetaRegister
+{
 	public:
 		virtual ZEClass**		GetClasses() = 0;
 		virtual ZESize			GetClassCount() = 0;

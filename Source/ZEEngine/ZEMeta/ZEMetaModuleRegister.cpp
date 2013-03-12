@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleSystem.h
+ Zinek Engine - ZEMetaModuleRegister.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,81 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
-#ifndef __ZE_PARTICLE_SYSTEM_H__
-#define __ZE_PARTICLE_SYSTEM_H__
-
-#include "ZEMeta/ZEObject.h"
-
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEParticle.h"
-
-class ZEParticleRenderer;
-class ZEParticleOperator;
-class ZEParticleGenerator;
-struct ZEDrawParameters;
-
-// struct ZENewParticle
-// {
-// 	ZEQuaternion	Rotation3D;
-// 	float			Rotation2D;
-// 
-// 	ZEVector3		Position;
-// 	ZEVector3		Color;
-// 	float			Transparency;
-// 
-// 	ZEVector2		Size2D;
-// 	ZEVector3		Size3D;
-// };
-
-ZE_CLASS(ZEParticleSystem)
-
-class ZEParticleSystem : public ZEObject
-{
-	ZE_OBJECT
-
-	friend class ZEParticleEffect;
-
-	private:
-
-		ZEParticleEffect*						Owner;
-
-		ZEArray<ZEParticle>						ParticlePool;
-
-		ZEParticleRenderer*						Renderer;
-		ZEArray<ZEParticleOperator*>			Operators;
-		ZEArray<ZEParticleGenerator*>			Generators;
-
-		ZEUInt									MaximumParticleCount;
-
-	public:
-
-		void									SetRenderer(ZEParticleRenderer* Renderer);
-		const ZEParticleRenderer*				GetRenderer() const;
-
-		const ZEArray<ZEParticle>&				GetParticlePool() const;
-
-		const ZEArray<ZEParticleOperator*>&		GetOperators() const;
-		bool									AddOperator(ZEParticleOperator* NewOperator);
-		bool									RemoveOperator(ZEParticleOperator* OperatorToRemove);
-
-		const ZEArray<ZEParticleGenerator*>&	GetGenerators() const;
-		bool									AddGenerator(ZEParticleGenerator* NewOperator);
-		bool									RemoveGenerator(ZEParticleGenerator* OperatorToRemove);
-
-		void									SetMaximumParticleCount(ZEUInt	ParticleCount);
-		ZEUInt									GetMaximumParticleCount() const;
-
-		const ZEParticleEffect*					GetOwner() const;
-
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-		virtual void							Tick(float ElapsedTime);
-
-												ZEParticleSystem();
-												~ZEParticleSystem();
-};
-
-#endif
+#include "ZEMetaModuleRegister.h"
