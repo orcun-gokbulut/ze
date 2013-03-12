@@ -93,9 +93,9 @@ function(ze_meta_compiler)
 		set(VARIABLE_OUTPUTS ${VARIABLE_OUTPUTS} "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.register")
 	endforeach()
 	
-	set(VARIABLE_ARGS "-q -c \"${PARAMETER_TARGET}MetaCollection\" ")
-	set(VARIABLE_ARGS "${VARIABLE_ARGS}-cs \"${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaCollection.cpp\" ")
-	set(VARIABLE_ARGS "${VARIABLE_ARGS}-ch \"${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaCollection.h\" ")
+	set(VARIABLE_ARGS "-q -c \"${PARAMETER_TARGET}MetaRegister\" ")
+	set(VARIABLE_ARGS "${VARIABLE_ARGS}-cs \"${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.cpp\" ")
+	set(VARIABLE_ARGS "${VARIABLE_ARGS}-ch \"${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.h\" ")
 	if (ZEBUILD_PLATFORM_WINDOWS)
 		set(VARIABLE_ARGS "${VARIABLE_ARGS}-msvc ")
 	endif()
@@ -107,14 +107,92 @@ function(ze_meta_compiler)
 	endforeach()
 	
 	add_custom_command(
-		OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaCollection.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaCollection.h"
+		OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.h"
 		COMMAND "$<TARGET_FILE:ZEMetaCompiler>"
 		ARGS "${VARIABLE_ARGS}"
 		DEPENDS ZEMetaCompiler ${VARIABLE_DEPENDENCIES})
 
-	set(VARIABLE_OUTPUTS ${VARIABLE_OUTPUTS} "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaCollection.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaCollection.h")
+	set(VARIABLE_OUTPUTS ${VARIABLE_OUTPUTS} "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.h")
 	
 	set(${PARAMETER_OUTPUTS} ${VARIABLE_OUTPUTS} PARENT_SCOPE)
+endfunction()
+
+function (ze_meta_generate_module_register)
+	parse_arguments(PARAMETER "TARGET" "" ${ARGV})
+
+	set(VARIABLE_REGISTER_CODE "")
+	set(VARIABLE_REGISTER_INCLUDES "")
+	set(VARIABLE_REGISTER_COUNT 0)
+	ze_get_dependency_list_combined(TARGET ${PARAMETER_TARGET} RETURN VARIABLE_DEPENDENCIES)
+	foreach(VARIABLE_DEPENDENCY ${VARIABLE_DEPENDENCIES})
+		if (TARGET ${VARIABLE_DEPENDENCY})
+			get_property(VARIABLE_REGISTER_FILE TARGET ${VARIABLE_DEPENDENCY} PROPERTY ZEBUILD_ZE_META_REGISTER_FILE)
+			if (VARIABLE_REGISTER_FILE)
+				set(VARIABLE_REGISTER_CODE "${VARIABLE_REGISTER_CODE}\t\t${VARIABLE_DEPENDENCY}MetaRegister::GetInstance(),\n")
+				set(VARIABLE_REGISTER_INCLUDES "${VARIABLE_REGISTER_INCLUDES}#include \"${VARIABLE_REGISTER_FILE}.h\"\n")
+				MATH(EXPR VARIABLE_REGISTER_COUNT "${VARIABLE_REGISTER_COUNT} + 1")
+			endif()
+		endif()
+	endforeach()
+	
+	file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaModuleRegister.h"
+		"#pragma once\n"
+		"#include \"ZEMeta/ZEMetaModuleRegister.h\"\n"
+		"\n"
+		"class ${PARAMETER_TARGET}_MetaModuleRegister : public ZEMetaModuleRegister\n"
+		"{\n"
+		"\tpublic:\n"
+		"\t\tvirtual ZEMetaRegister**\t\tGetRegisters();\n"
+		"\t\tvirtual ZESize\t\t\t\t\tGetRegisterCount();\n"
+		"\n"
+		"\t\tstatic ${PARAMETER_TARGET}_MetaModuleRegister*\tGetInstance();\n"
+		"};\n")
+	
+	if (VARIABLE_REGISTER_COUNT EQUAL 0)
+		file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaModuleRegister.cpp"		
+			"#include \"${PARAMETER_TARGET}.ZEMetaModuleRegister.h\"\n"
+			"\n"
+			"ZEMetaRegister** ${PARAMETER_TARGET}_MetaModuleRegister::GetRegisters()\n"
+			"{\n"
+			"\treturn NULL;\n"
+			"}\n"
+			"\n"
+			"ZESize ${PARAMETER_TARGET}_MetaModuleRegister::GetRegisterCount()\n"
+			"{\n"
+			"\treturn 0;\n"
+			"}\n"
+			"\n"
+			"${PARAMETER_TARGET}_MetaModuleRegister* ${PARAMETER_TARGET}_MetaModuleRegister::GetInstance()\n"
+			"{\n"
+			"\tstatic ${PARAMETER_TARGET}_MetaModuleRegister ModuleRegister;\n"
+			"\treturn &ModuleRegister;\n"
+			"}\n")
+	else()
+		file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaModuleRegister.cpp"		
+			"#include \"${PARAMETER_TARGET}.ZEMetaModuleRegister.h\"\n"
+			"${VARIABLE_REGISTER_INCLUDES}"
+			"\n"
+			"ZEMetaRegister** ${PARAMETER_TARGET}_MetaModuleRegister::GetRegisters()\n"
+			"{\n"
+			"\tstatic ZEMetaRegister* Registers[] =\n"
+			"\t{\n"
+			"${VARIABLE_REGISTER_CODE}"
+			"\t};\n"
+			"\t\n"
+			"\treturn Registers;\n"
+			"}\n"
+			"\n"
+			"ZESize ${PARAMETER_TARGET}_MetaModuleRegister::GetRegisterCount()\n"
+			"{\n"
+			"\treturn ${VARIABLE_REGISTER_COUNT};\n"
+			"}\n"
+			"\n"
+			"${PARAMETER_TARGET}_MetaModuleRegister* ${PARAMETER_TARGET}_MetaModuleRegister::GetInstance()\n"
+			"{\n"
+			"\tstatic ${PARAMETER_TARGET}_MetaModuleRegister ModuleRegister;\n"
+			"\treturn &ModuleRegister;\n"
+			"}\n")
+	endif()
 endfunction()
 
 function(ze_static_analysis PARAMETER_TARGET)
@@ -134,7 +212,7 @@ endfunction()
 function(ze_copy_runtime_dlls)
 	parse_arguments(PARAMETER "TARGET" "" ${ARGV})
 
-	ze_get_dependency_list(TARGET ${PARAMETER_TARGET} RETURN VARIABLE_DEPENDENCIES)
+	ze_get_dependency_list_combined(TARGET ${PARAMETER_TARGET} RETURN VARIABLE_DEPENDENCIES)
 	foreach(VARIABLE_DEPENDENCY ${VARIABLE_DEPENDENCIES})
 		if (TARGET ${VARIABLE_DEPENDENCY})
 			get_property(VARIABLE_TYPE TARGET ${VARIABLE_DEPENDENCY} PROPERTY ZEBUILD_TYPE)

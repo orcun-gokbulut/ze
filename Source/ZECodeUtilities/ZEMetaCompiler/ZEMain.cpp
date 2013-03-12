@@ -157,9 +157,7 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 					Error("Empty parameter value.");
 
 				I++;
-
 				Options.ClassCollectionHeaderFile = Argv[I];
-
 				continue;
 			}
 			else if (strncmp(Argv[I], "-cs", 3) == 0)
@@ -168,9 +166,7 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 					Error("Empty parameter value.");
 
 				I++;
-
 				Options.ClassCollectionSourceFile = Argv[I];
-
 				continue;
 			}
 
@@ -195,13 +191,9 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 		{
 			if (Options.InputFileName != NULL)
 				Error("Only one input file can be given.");
-
 			Options.InputFileName = Argv[I];
 		}
 	}
-
-	if(Options.IsGenerateSession)
-		ZEMetaCollectionGenerator::Generate(Options);
 
 	if (Options.InputFileName == NULL && !Options.IsGenerateSession)
 	{
@@ -224,12 +216,15 @@ int main(int Argc, const char** Argv)
 			"Copyright (C) 2013, Zinek Code House. All rights reserved.\n\n");
 	}
 
-	if(!Options.OutputFileName.IsEmpty())
+	if(Options.IsGenerateSession)
+	{
+		ZEMetaCollectionGenerator::Generate(Options);
+		return EXIT_SUCCESS;
+	}
+	else
 	{
 		ZEMetaData MetaData;
-		bool Result = false;
-
-		Result = ZEMetaProcessor::Process(&MetaData, Options);
+		bool Result = ZEMetaProcessor::Process(&MetaData, Options);
 		if (!Result)
 			Error("Processing failed.");
 	}
