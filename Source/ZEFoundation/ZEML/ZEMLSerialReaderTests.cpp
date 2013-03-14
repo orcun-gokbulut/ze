@@ -1553,7 +1553,8 @@ ZETestSuite(ZEMLSerialReader)
 		File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 
 		ZEMLSerialRootNode Root("Root", File);
-		File->Flush();			ZEInt64 PosForDataProp1 = File->Tell();
+		File->Flush();			
+		ZEInt64 PosForDataProp1 = File->Tell();
 		ZETestCheckEqual(PosForDataProp1, 24);
 
 		Root.WriteDataProperty("DataProp1", Data1, sizeof(unsigned char) * DataCount1);
@@ -1568,11 +1569,13 @@ ZETestSuite(ZEMLSerialReader)
 
 		Root.WriteDataProperty("DataProp3", Data3, sizeof(unsigned char) * DataCount3);
 		File->Flush();
-		ZEInt64 PosForNull = File->GetSize();
-		ZETestCheckEqual(PosForNull, 105);
+		ZEInt64 PosForProp = File->GetSize();
+		ZETestCheckEqual(PosForProp, 105);
+
+		Root.WriteProperty("Prop", true);
 
 		Root.CloseNode();
-		File->Seek(-PosForNull * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+		File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
 		ZEMLSerialReader Reader(File);
 
@@ -1626,6 +1629,14 @@ ZETestSuite(ZEMLSerialReader)
 		ZETestCheckEqual(ReadCount, DataCount3);
 		Compare = memcmp(Buffer, Data3, sizeof(unsigned char) * DataCount3);
 		ZETestCheck(Compare == 0);
+		PartialFile.Close();
+
+		ResultForRead = Reader.Read();
+		ZETestCheckString(Reader.GetItemName(), "Prop");
+		ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_BOOLEAN);
+
+		Get = Reader.GetData(PartialFile);
+		ZETestCheck(!Get);
 
 		PartialFile.Close();
 		File->Close();
