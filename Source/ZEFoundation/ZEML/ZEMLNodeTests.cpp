@@ -41,6 +41,7 @@
 #include "ZEMLDataProperty.h"
 #include "ZEDS/ZEList.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEMath/ZEAngle.h"
 
 
 ZETestSuite(ZEMLNode)
@@ -105,11 +106,11 @@ ZETestSuite(ZEMLNode)
 
 		ZETestCase("add SubNode then call function")
 		{
-// 			ZEMLNode Node;
-// 			ZEMLNode* SubNode = Node.AddSubNode("SubNode");
-// 
-// 			TotalSize = Node.GetTotalSize();
-// 			ZETestCheckEqual(TotalSize, 27);
+			ZEMLNode Node;
+			ZEMLNode* SubNode = Node.AddSubNode("SubNode");
+
+			TotalSize = Node.GetTotalSize();
+			ZETestCheckEqual(TotalSize, 27);
  		}
 
 		ZETestCase("add Property, DataProperty and SubNode then call function")
@@ -117,24 +118,26 @@ ZETestSuite(ZEMLNode)
 			ZEMLNode Node;
 			Node.AddProperty("PropFloat", 3.0f);
 			ZEMLDataProperty* DataProperty = Node.AddDataProperty("DataProperty");
-//			ZEMLNode* SubNode = Node.AddSubNode("SubNode");//total 76
+			ZEMLNode* SubNode = Node.AddSubNode("SubNode");
 
 			TotalSize = Node.GetTotalSize();
-			ZETestCheckEqual(TotalSize, 49);
+			ZETestCheckEqual(TotalSize, 76);
 		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(ZEMLProperty* Property)")
+	ZETest("bool ZEMLNode::AddProperty(ZEMLProperty* Property)")
 	{
 		ZEMLProperty* Property = new ZEMLProperty();
 		ZEMLNode Node;
 
-		Node.AddProperty(Property);
+		bool Result = Node.AddProperty(Property);
+		ZETestCheck(Result);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 		ZEMLProperty* Property2 = new ZEMLProperty("Property2");
 
-		Node.AddProperty(Property2);
+		Result = Node.AddProperty(Property2);
+		ZETestCheck(Result);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 		ZETestCheckString(Node.GetProperties()[1]->GetName(), "Property2");
 
@@ -142,9 +145,21 @@ ZETestSuite(ZEMLNode)
 		Value.SetFloat(1.3f);
 		ZEMLProperty* Property3 = new ZEMLProperty("Property3", Value);
 
-		Node.AddProperty(Property3);
+		Result = Node.AddProperty(Property3);
+		ZETestCheck(Result);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 3);
 		ZETestCheckString(Node.GetProperties()[2]->GetName(), "Property3");
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Value.SetBoolean(true);
+			ZEMLProperty* Property4 = new ZEMLProperty("Property3", Value);
+
+			Result = Node.AddProperty(Property4);
+			//error ZEML node can not contain properties with duplicate name : Property3.
+			ZETestCheck(!Result);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 3);
+		}
 	}
 
 	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVariant& Value)")
@@ -158,6 +173,18 @@ ZETestSuite(ZEMLNode)
 		ZETestCheck(!Property->GetValue().GetBoolean());
 		ZETestCheckString(Node.GetName(), "ParentNode");
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Value.SetInt8('Z');
+			Property = Node.AddProperty("TestProperty", Value);
+			//error ZEML node can not contain properties with duplicate name : TestProperty.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+			ZEMLProperty* Prop = (ZEMLProperty*)Node.GetProperties()[0];
+			ZETestCheckEqual(Prop->GetType(), ZEML_IT_BOOLEAN);
+			ZETestCheck(!Prop->GetValue().GetBoolean());
+		}
 	}
 
 	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name)")
@@ -168,6 +195,18 @@ ZETestSuite(ZEMLNode)
 		ZETestCheckString(Property->GetName(), "TestProperty");
 		ZETestCheckString(Node.GetName(), "ParentNode");
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+
+		Property = Node.AddProperty("TestProperty2");
+		ZETestCheckString(Property->GetName(), "TestProperty2");
+		ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Property = Node.AddProperty("TestProperty");
+			//error ZEML node can not contain properties with duplicate name : TestProperty.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
+		}
 	}
 
 	ZETest("ZEMLProperty* ZEMLNode::AddProperty()")
@@ -176,268 +215,397 @@ ZETestSuite(ZEMLNode)
 
 		ZEMLProperty* Property = Node.AddProperty();
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-	}
 
-	ZETest("bool ZEMLNode::RemoveProperty(ZEMLProperty* Property)")
-	{
-		ZEMLNode Node("ParentNode");
-		ZEMLProperty* Property1 = new ZEMLProperty();
-		Property1->SetName("Property1");
-		ZEMLProperty* Property2 = new ZEMLProperty();
-		Property2->SetName("Property2");
-		ZEMLProperty* Property3 = new ZEMLProperty();
-		Property3->SetName("Property3");
-
-		Node.AddProperty(Property1);
-		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-
-		Node.AddProperty(Property2);
+		Property = Node.AddProperty();
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
-
-		bool Removed = Node.RemoveProperty(Property1);
-		ZETestCheck(Removed);
-		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-
-		Removed = Node.RemoveProperty(Property2);
-		ZETestCheck(Removed);
-		ZETestCheckEqual(Node.GetProperties().GetCount(), 0);
-
-		Removed = Node.RemoveProperty(Property3);
-		ZETestCheck(!Removed);
-		ZETestCheckEqual(Node.GetProperties().GetCount(), 0);
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, float Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, float Value)")
 	{
 		ZEMLNode Node("ParentNode");
 
-		Node.AddProperty("PropFloat", 1.3f);
+		ZEMLProperty* Property = Node.AddProperty("PropFloat", 1.3f);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_FLOAT);
 		ZETestCheckEqual(Property->GetValue().GetFloat(), 1.3f);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Property = Node.AddProperty("PropFloat", 5.0f);
+			//error ZEML node can not contain properties with duplicate name : PropFloat.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+			Property = (ZEMLProperty*)Node.GetProperties()[0];
+			ZETestCheckEqual(Property->GetType(), ZEML_IT_FLOAT);
+			ZETestCheckEqual(Property->GetValue().GetFloat(), 1.3f);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, double Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, double Value)")
 	{
 		ZEMLNode Node("ParentNode");
 
-		Node.AddProperty("PropDouble", 5.0);
+		ZEMLProperty* Property = Node.AddProperty("PropDouble", 5.0);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_DOUBLE);
 		ZETestCheckClose(Property->GetValue().GetDouble(), 5.0);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Property = Node.AddProperty("PropDouble", 3.0);
+			//error ZEML node can not contain properties with duplicate name : PropDouble.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+
+			Property = Node.AddProperty("Double", 3.0);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
+			Property = (ZEMLProperty*)Node.GetProperties()[0];
+			ZETestCheckClose(Property->GetValue().GetDouble(), 5.0);
+			Property = (ZEMLProperty*)Node.GetProperties()[1];
+			ZETestCheckClose(Property->GetValue().GetDouble(), 3.0);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, ZEInt8 Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt8 Value)")
 	{
 		ZEMLNode Node("ParentNode");
 		ZEInt8 Value = 'z';
 
-		Node.AddProperty("PropInt8", Value);
+		ZEMLProperty* Property = Node.AddProperty("PropInt8", Value);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_INT8);
 		ZETestCheckEqual(Property->GetValue().GetInt8(), Value);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Value = 'e';
+			Property = Node.AddProperty("PropInt8", Value);
+			//error ZEML node can not contain properties with duplicate name : PropInt8.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, ZEInt16 Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt16 Value)")
 	{
 		ZEMLNode Node("ParentNode");
 		ZEInt16 Value = 30;
 
-		Node.AddProperty("PropInt16", Value);
+		ZEMLProperty* Property = Node.AddProperty("PropInt16", Value);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_INT16);
 		ZETestCheckEqual(Property->GetValue().GetInt16(), Value);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Value = 53;
+			Property = Node.AddProperty("PropInt16", Value);
+			//error ZEML node can not contain properties with duplicate name : PropInt16.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, ZEInt32 Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt32 Value)")
 	{
 		ZEMLNode Node("ParentNode");
 		ZEInt32 Value = 3200;
 
-		Node.AddProperty("PropInt32", Value);
+		ZEMLProperty* Property = Node.AddProperty("PropInt32", Value);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_INT32);
 		ZETestCheckEqual(Property->GetValue().GetInt32(), Value);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Value = 3590;
+			Property = Node.AddProperty("PropInt32", Value);
+			//error ZEML node can not contain properties with duplicate name : PropInt32.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, ZEInt64 Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt64 Value)")
 	{
 		ZEMLNode Node("ParentNode");
 		ZEInt64 Value = 3000000;
 
-		Node.AddProperty("PropInt64", Value);
+		ZEMLProperty* Property = Node.AddProperty("PropInt64", Value);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_INT64);
 		ZETestCheckEqual(Property->GetValue().GetInt64(), Value);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Value = 0;
+			Property = Node.AddProperty("PropInt64", Value);
+			//error ZEML node can not contain properties with duplicate name : PropInt64
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, ZEUInt8 Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt8 Value)")
 	{
 		ZEMLNode Node("ParentNode");
 		ZEUInt8 Value = 'Z';
 
-		Node.AddProperty("PropUInt8", Value);
+		ZEMLProperty* Property = Node.AddProperty("PropUInt8", Value);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_UINT8);
 		ZETestCheckEqual(Property->GetValue().GetUInt8(), Value);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Value = 'E';
+			Property = Node.AddProperty("PropUInt8", Value);
+			//error ZEML node can not contain properties with duplicate name : PropUInt8
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, ZEUInt16 Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt16 Value)")
 	{
 		ZEMLNode Node("ParentNode");
 		ZEUInt16 Value = 1600;
 
-		Node.AddProperty("PropUInt16", Value);
+		ZEMLProperty* Property = Node.AddProperty("PropUInt16", Value);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_UINT16);
 		ZETestCheckEqual(Property->GetValue().GetUInt16(), Value);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Value = 5638;
+			Property = Node.AddProperty("PropUInt16", Value);
+			//error ZEML node can not contain properties with duplicate name : PropUInt16.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, ZEUInt32 Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt32 Value)")
 	{
 		ZEMLNode Node("ParentNode");
 		ZEUInt32 Value = 58000;
 
-		Node.AddProperty("PropUInt32", Value);
+		ZEMLProperty* Property = Node.AddProperty("PropUInt32", Value);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_UINT32);
 		ZETestCheckEqual(Property->GetValue().GetUInt32(), Value);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Value = 37360;
+			Property = Node.AddProperty("PropUInt32", Value);
+			//error ZEML node can not contain properties with duplicate name : PropUInt32.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, ZEUInt64 Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt64 Value)")
 	{
 		ZEMLNode Node("ParentNode");
 		ZEUInt64 Value = 90000000;
 
-		Node.AddProperty("PropUInt64", Value);
+		ZEMLProperty* Property = Node.AddProperty("PropUInt64", Value);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_UINT64);
 		ZETestCheckEqual(Property->GetValue().GetUInt64(), Value);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Value = 332494034;
+			Property = Node.AddProperty("PropUInt64", Value);
+			//error ZEML node can not contain properties with duplicate name : PropUInt64.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, bool Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, bool Value)")
 	{
 		ZEMLNode Node("ParentNode");
 
-		Node.AddProperty("PropBool", true);
+		ZEMLProperty* Property = Node.AddProperty("PropBool", true);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_BOOLEAN);
 		ZETestCheck(Property->GetValue().GetBoolean());
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Property = Node.AddProperty("PropBool", false);
+			//error ZEML node can not contain properties with duplicate name : PropBool.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, const ZEString& Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEString& Value)")
 	{
 		ZEMLNode Node("ParentNode");
 		const ZEString Value = "TestString";
 
-		Node.AddProperty("PropString", Value);
+		ZEMLProperty* Property = Node.AddProperty("PropString", Value);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_STRING);
 		ZETestCheckString(Property->GetValue().GetString(), Value);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			const ZEString Value1 = "String";
+			Property = Node.AddProperty("PropString", Value1);
+			//error ZEML node can not contain properties with duplicate name : PropString.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, const char* Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const char* Value)")
 	{
 		ZEMLNode Node("ParentNode");
 		const char* Value = "TestString";
 
-		Node.AddProperty("PropChar", Value);
+		ZEMLProperty* Property = Node.AddProperty("PropChar", Value);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_STRING);
 		ZETestCheckString(Property->GetValue().GetString(), Value);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Value = "String";
+			Property = Node.AddProperty("PropChar", Value);
+			//error ZEML node can not contain properties with duplicate name : PropChar.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, const ZEQuaternion& Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEQuaternion& Value)")
 	{
 		ZEMLNode Node("ParentNode");
 
-		Node.AddProperty("PropQuat", ZEQuaternion::Identity);
+		ZEMLProperty* Property = Node.AddProperty("PropQuat", ZEQuaternion::Identity);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_QUATERNION);
 		ZETestCheckEqual(Property->GetValue().GetQuaternion(), ZEQuaternion::Identity);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Property = Node.AddProperty("PropQuat", ZEQuaternion(ZE_PI_2, ZEVector3::UnitY));
+			//error ZEML node can not contain properties with duplicate name : PropQuat.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, const ZEVector2& Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVector2& Value)")
 	{
 		ZEMLNode Node("ParentNode");
 
-		Node.AddProperty("PropVec2", ZEVector2::Zero);
+		ZEMLProperty* Property = Node.AddProperty("PropVec2", ZEVector2::Zero);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_VECTOR2);
 		ZETestCheckEqual(Property->GetValue().GetVector2(), ZEVector2::Zero);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Property = Node.AddProperty("PropVec2", ZEVector2::One);
+			//error ZEML node can not contain properties with duplicate name : PropVec2.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, const ZEVector3& Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVector3& Value)")
 	{
 		ZEMLNode Node("ParentNode");
 
-		Node.AddProperty("PropVec3", ZEVector3::One);
+		ZEMLProperty* Property = Node.AddProperty("PropVec3", ZEVector3::One);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_VECTOR3);
 		ZETestCheckEqual(Property->GetValue().GetVector3(), ZEVector3::One);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Property = Node.AddProperty("PropVec3", ZEVector3::Zero);
+			//error ZEML node can not contain properties with duplicate name : PropVec3.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, const ZEVector4& Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVector4& Value)")
 	{
 		ZEMLNode Node("ParentNode");
 
-		Node.AddProperty("PropVec4", ZEVector4::Zero);
+		ZEMLProperty* Property = Node.AddProperty("PropVec4", ZEVector4::Zero);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_VECTOR4);
 		ZETestCheckEqual(Property->GetValue().GetVector4(), ZEVector4::Zero);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Property = Node.AddProperty("PropVec4", ZEVector4::One);
+			//error ZEML node can not contain properties with duplicate name : PropVec4.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix3x3& Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix3x3& Value)")
 	{
 		ZEMLNode Node("ParentNode");
 
-		Node.AddProperty("PropMatrix3x3", ZEMatrix3x3::Identity);
+		ZEMLProperty* Property = Node.AddProperty("PropMatrix3x3", ZEMatrix3x3::Identity);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_MATRIX3X3);
 		ZETestCheckEqual(Property->GetValue().GetMatrix3x3(), ZEMatrix3x3::Identity);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Property = Node.AddProperty("PropMatrix3x3", ZEMatrix3x3::Zero);
+			//error ZEML node can not contain properties with duplicate name : PropMatrix3x3.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix4x4& Value)")
+	ZETest("ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix4x4& Value)")
 	{
 		ZEMLNode Node("ParentNode");
 
-		Node.AddProperty("PropMatrix4x4", ZEMatrix4x4::Zero);
+		ZEMLProperty* Property = Node.AddProperty("PropMatrix4x4", ZEMatrix4x4::Zero);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZEMLProperty* Property = (ZEMLProperty*)Node.GetProperties()[0];
 		ZETestCheckEqual(Property->GetType(), ZEML_IT_MATRIX4X4);
 		ZETestCheckEqual(Property->GetValue().GetMatrix4x4(), ZEMatrix4x4::Zero);
+
+		ZETestCase("try to add a new property with an already existing property name")
+		{
+			Property = Node.AddProperty("PropMatrix4x4", ZEMatrix4x4::Identity);
+			//error ZEML node can not contain properties with duplicate name : PropMatrix4x4.
+			ZETestCheck(Property == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
-	ZETest("void ZEMLNode::AddDataProperty(ZEMLDataProperty* Property)")
+	ZETest("bool ZEMLNode::AddDataProperty(ZEMLDataProperty* Property)")
 	{
 		ZEMLNode Node("ParentNode");
 		ZEMLDataProperty* DataProperty = new ZEMLDataProperty();
 
-		Node.AddDataProperty(DataProperty);
+		bool Result = Node.AddDataProperty(DataProperty);
+		ZETestCheck(Result);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 		ZETestCheckEqual(Node.GetProperties()[0]->GetType(), ZEML_IT_INLINE_DATA);
 
 		ZEMLDataProperty* DataProperty2 = new ZEMLDataProperty("DataProperty2");
 
-		Node.AddDataProperty(DataProperty2);
+		Result = Node.AddDataProperty(DataProperty2);
+		ZETestCheck(Result);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 		ZETestCheckEqual(Node.GetProperties()[1]->GetType(), ZEML_IT_INLINE_DATA);
 		ZETestCheckString(Node.GetProperties()[1]->GetName(), "DataProperty2");
@@ -445,10 +613,31 @@ ZETestSuite(ZEMLNode)
 		void* Data = new char[sizeof(unsigned char)];
 		ZEMLDataProperty* DataProperty3 = new ZEMLDataProperty("DataProperty3", Data, sizeof(unsigned char), false);
 
-		Node.AddDataProperty(DataProperty3);
+		Result = Node.AddDataProperty(DataProperty3);
+		ZETestCheck(Result);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 3);
 		ZETestCheckEqual(Node.GetProperties()[2]->GetType(), ZEML_IT_INLINE_DATA);
 		ZETestCheckString(Node.GetProperties()[2]->GetName(), "DataProperty3");
+
+		ZETestCase("try to add a new data property with an already existing data property name")
+		{
+			ZEMLProperty* Property = Node.AddProperty("Property");
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 4);
+
+			ZEMLDataProperty* DataProperty4 = new ZEMLDataProperty("Property");
+
+			Result = Node.AddDataProperty(DataProperty4);
+			//error ZEML node can not contain data properties with duplicate name : Property.
+			ZETestCheck(!Result);
+
+			ZEMLDataProperty* DataProperty5 = new ZEMLDataProperty("DataProperty2", Data, sizeof(unsigned char), false);
+			 
+			Result = Node.AddDataProperty(DataProperty5);
+			//error ZEML node can not contain data properties with duplicate name : DataProperty2.
+			ZETestCheck(!Result);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 4);
+		}
+		delete Data;
 	}
 
 	ZETest("ZEMLDataProperty* ZEMLNode::AddDataProperty(const ZEString& Name ,void* Data, ZEUInt64 DataSize, bool Cache)")
@@ -478,6 +667,15 @@ ZETestSuite(ZEMLNode)
 			ZETestCheck(Property->GetData() != Data);
 			ZETestCheck(DataProperty->GetData() == Property->GetData());
 		}
+
+		ZETestCase("try to add a new data property with an already existing data property name")
+		{
+			ZEMLDataProperty* DataProperty = Node.AddDataProperty("DataProperty2", Data, sizeof(unsigned char), false);
+			//error ZEML node can not contain data properties with duplicate name : DataProperty2.
+			ZETestCheck(DataProperty == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
+		}
+		delete Data;
 	}
 
 	ZETest("ZEMLDataProperty* ZEMLNode::AddDataProperty(const ZEString& Name)")
@@ -488,9 +686,14 @@ ZETestSuite(ZEMLNode)
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 		ZETestCheckEqual(DataProperty->GetType(), ZEML_IT_INLINE_DATA);
 		ZETestCheck(DataProperty->GetData() == NULL);
-		ZEMLDataProperty* Property = (ZEMLDataProperty*)Node.GetProperties()[0];
-		ZETestCheckEqual(Property->GetType(), ZEML_IT_INLINE_DATA);
-		ZETestCheck(Property->GetData() == NULL);
+
+		ZETestCase("try to add a new data property with an already existing property name")
+		{
+			DataProperty = Node.AddDataProperty("DataProperty");
+			//error ZEML node can not contain data properties with duplicate name : DataProperty.
+			ZETestCheck(DataProperty == NULL);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+		}
 	}
 
 	ZETest("ZEMLDataProperty* ZEMLNode::AddDataProperty()")
@@ -501,119 +704,132 @@ ZETestSuite(ZEMLNode)
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 		ZETestCheckEqual(DataProperty->GetType(), ZEML_IT_INLINE_DATA);
 		ZETestCheck(DataProperty->GetData() == NULL);
-		ZEMLDataProperty* Property = (ZEMLDataProperty*)Node.GetProperties()[0];
-		ZETestCheckEqual(Property->GetType(), ZEML_IT_INLINE_DATA);
-		ZETestCheck(Property->GetData() == NULL);
-	}
-
-	ZETest("bool ZEMLNode::RemoveDataProperty(ZEMLDataProperty* Property)")
-	{
-		ZEMLNode Node("ParentNode");
-
-		ZEMLDataProperty* DataProperty1 = Node.AddDataProperty("DataProperty1");
-		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-		ZETestCheckString(DataProperty1->GetName(), "DataProperty1");
-
-		ZEMLDataProperty* DataProperty2 = Node.AddDataProperty("DataProperty2");
-		ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
-		ZETestCheckString(DataProperty2->GetName(), "DataProperty2");
-
-		bool Removed = Node.RemoveDataProperty(DataProperty1);
-		ZETestCheck(Removed);
-		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
-
-		Removed = Node.RemoveDataProperty(DataProperty2);
-		ZETestCheck(Removed);
-		ZETestCheckEqual(Node.GetProperties().GetCount(), 0);
-
-		Removed = Node.RemoveDataProperty(DataProperty1);
-		ZETestCheck(!Removed);
-		ZETestCheckEqual(Node.GetProperties().GetCount(), 0);
 	}
 
 	ZETest("void ZEMLNode::AddSubNode(ZEMLNode* Node)")
 	{
-// 		ZEMLNode Node("ParentNode");
-//  		ZEMLNode* SubNode1 = new ZEMLNode();
-// 
-// 		Node.AddSubNode(SubNode1);
-//  		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 1);
+		ZEMLNode Node("ParentNode");
+ 		ZEMLNode* SubNode1 = new ZEMLNode();
+
+		Node.AddSubNode(SubNode1);
+ 		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 1);
 	}
 
 	ZETest("ZEMLNode* ZEMLNode::AddSubNode(const ZEString& Name)")
 	{
-// 		ZEMLNode Node("ParentNode");
-// 		
-// 		ZEMLNode* SubNode1 = Node.AddSubNode("SubNode1");
-// 		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 1);
-// 		ZETestCheckString(Node.GetName(), "ParentNode");
-// 		ZETestCheckString(SubNode1->GetName(), "SubNode1");
-// 
-// 		ZEMLNode* SubNode2 = Node.AddSubNode("SubNode2");
-// 		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 2);
-// 		ZETestCheckString(Node.GetName(), "ParentNode");
-//  		ZETestCheckString(SubNode2->GetName(), "SubNode2");
+		ZEMLNode Node("ParentNode");
+		
+		ZEMLNode* SubNode1 = Node.AddSubNode("SubNode1");
+		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 1);
+		ZETestCheckString(Node.GetName(), "ParentNode");
+		ZETestCheckString(SubNode1->GetName(), "SubNode1");
+
+		ZEMLNode* SubNode2 = Node.AddSubNode("SubNode2");
+		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 2);
+		ZETestCheckString(Node.GetName(), "ParentNode");
+ 		ZETestCheckString(SubNode2->GetName(), "SubNode2");
 	}
 
 	ZETest("ZEMLNode* ZEMLNode::AddSubNode()")
 	{
-// 		ZEMLNode Node("ParentNode");
-// 
-// 		ZEMLNode* SubNode = Node.AddSubNode();
-// 		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 1);
-// 
-// 		SubNode = Node.AddSubNode();
-// 		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 2);
+		ZEMLNode Node("ParentNode");
+
+		ZEMLNode* SubNode = Node.AddSubNode();
+		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 1);
+
+		SubNode = Node.AddSubNode();
+ 		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 2);
 	}
 
-	ZETest("bool ZEMLNode::RemoveSubNode(ZEMLNode* SubNode)")
+	ZETest("bool ZEMLNode::InsertSubNode(ZEMLNode* Node, ZESize Index)")
 	{
-// 		ZEMLNode Node("ParentNode");
-// 
-// 		ZEMLNode* SubNode1 = Node.AddSubNode("SubNode1");
-// 		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 1);
-// 
-// 		ZEMLNode* SubNode2 = Node.AddSubNode("SubNode2");
-// 		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 2);
-// 
-// 		bool Removed = Node.RemoveSubNode(SubNode1);
-// 		ZETestCheck(Removed);
-// 		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 1);
-// 
-// 		Removed = Node.RemoveSubNode(SubNode2);
-// 		ZETestCheck(Removed);
-// 		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 0);
-// 
-// 		Removed = Node.RemoveSubNode(SubNode1);
-// 		ZETestCheck(!Removed);
-// 		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 0);
+		ZEMLNode Node("ParentNode");
+		ZEMLNode SubNode1("SubNode1");
+		ZEMLNode SubNode2("SubNode2");
+		
+		bool Result = Node.InsertSubNode(&SubNode1, 0);
+		ZETestCheck(Result);
+		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 1);
+		ZETestCheckString(Node.GetSubNodes()[0]->GetName(), "SubNode1");
+
+		Result = Node.InsertSubNode(&SubNode2, 0);
+		ZETestCheck(Result);
+		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 2);
+		ZETestCheckString(Node.GetSubNodes()[0]->GetName(), "SubNode2");
+		ZETestCheckString(Node.GetSubNodes()[1]->GetName(), "SubNode1");
+
+		ZETestCase("try to add a sub node with an invalid index value")
+		{
+			ZEMLNode SubNode3("SubNode3");
+
+			Result = Node.InsertSubNode(&SubNode3, 3);
+			//error Can not insert sub node index is out of range. Node name : SubNode3, index : 3
+			ZETestCheck(!Result);
+			ZETestCheckEqual(Node.GetSubNodes().GetCount(), 2);
+		}
+
+		ZETestCase("try to add a null node as sub node")
+		{
+
+		}
 	}
+
+	ZETest("ZEMLNode* ZEMLNode::InsertSubNode(const ZEString & Name, ZESize Index)")
+	{
+		ZEMLNode Node("ParentNode");
+
+		ZEMLNode* SubNode = Node.InsertSubNode("SubNode1", 0);
+		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 1);
+		ZETestCheckString(Node.GetSubNodes()[0]->GetName(), SubNode->GetName());
+		ZETestCheckEqual(SubNode->GetParent(), &Node);
+
+		SubNode = Node.InsertSubNode("SubNode2", 1);
+		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 2);
+		ZETestCheckString(Node.GetSubNodes()[1]->GetName(), SubNode->GetName());
+		ZETestCheckEqual(SubNode->GetParent(), &Node);
+	}
+
 
 	ZETest("const ZEList<ZEMLNode>& ZEMLNode::GetSubNodes() const")
 	{
-// 		ZEMLNode Node("ParentNode");
-// 
-// 		ZEMLNode* SubNode = Node.AddSubNode("SubNode1");
-		//ZEList<ZEMLNode> SubNodes = Node.GetSubNodes();
+		ZEMLNode Node("ParentNode");
+
+		ZEMLNode* SubNode1 = Node.AddSubNode("SubNode1");
+		ZEMLNode* SubNode2 = Node.InsertSubNode("SubNode2", 1);
+		ZEMLNode* SubNode3 = Node.AddSubNode("SubNode3");
+
+		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 3);
+		ZETestCheckString(Node.GetSubNodes()[0]->GetName(), "SubNode1");
+		ZETestCheckString(Node.GetSubNodes()[1]->GetName(), "SubNode2");
+		ZETestCheckString(Node.GetSubNodes()[2]->GetName(), "SubNode3");
 	}
 
 	ZETest("const ZEArray<ZEMLNode*> ZEMLNode::GetSubNodes(const ZEString& NodeName)")
 	{
-// 		ZEMLNode Node("ParentNode");
-// 
-// 		ZEMLNode* SubNode = Node.AddSubNode("SubNode1");
-// 		ZEArray<ZEMLNode*> SubNodes = Node.GetSubNodes("SubNode1");
-//  		ZETestCheckEqual(SubNodes.GetCount(), 1);
-// 		ZETestCheckString(SubNodes[0]->GetName(), "SubNode1");
-// 		SubNodes = Node.GetSubNodes("ParentNode");
-// 		ZETestCheckEqual(SubNodes.GetCount(), 0);
-// 
-// 		SubNode = Node.AddSubNode("SubNode2");
-// 		SubNodes = Node.GetSubNodes(Node.GetName());
-//  		ZETestCheckEqual(SubNodes.GetCount(), 0);
-// 		SubNodes = Node.GetSubNodes("SubNode2");
-// 		ZETestCheckEqual(SubNodes.GetCount(), 1);
-// 		ZETestCheckString(SubNodes[0]->GetName(), "SubNode2");
+		ZEMLNode Node("ParentNode");
+
+		ZEMLNode* SubNode = Node.AddSubNode("SubNode1");
+		ZEArray<ZEMLNode*> SubNodes = Node.GetSubNodes("SubNode1");
+ 		ZETestCheckEqual(SubNodes.GetCount(), 1);
+		ZETestCheckString(SubNodes[0]->GetName(), "SubNode1");
+		SubNodes = Node.GetSubNodes("ParentNode");
+		ZETestCheckEqual(SubNodes.GetCount(), 0);
+
+		SubNode = Node.AddSubNode("SubNode2");
+		SubNodes = Node.GetSubNodes(Node.GetName());
+ 		ZETestCheckEqual(SubNodes.GetCount(), 0);
+		SubNodes = Node.GetSubNodes("SubNode2");
+		ZETestCheckEqual(SubNodes.GetCount(), 1);
+		ZETestCheckString(SubNodes[0]->GetName(), "SubNode2");
+
+		ZETestCase("insert more than 1 sub nodes with the same name")
+		{
+			Node.AddSubNode("SubNode");
+			Node.InsertSubNode("SubNode", 0);
+
+			SubNodes = Node.GetSubNodes("SubNode");
+			ZETestCheckEqual(SubNodes.GetCount(), 2);
+		}
 	}
 
 	ZETest("const ZEArray<ZEMLItem*>& ZEMLNode::GetProperties() const")
@@ -645,46 +861,75 @@ ZETestSuite(ZEMLNode)
 		ZETestCheckString(Item2->GetValue().GetString(), "Test");
 		ZEMLDataProperty* Item3 = (ZEMLDataProperty*)Node.GetProperties()[2];
 		ZETestCheck(Item3->GetData() == Data);
+
+		delete Data;
 	}
 
-	ZETest("const ZEArray<ZEMLItem*> ZEMLNode::GetProperties(const ZEString& PropertyName)")
+	ZETest("const ZEMLItem* ZEMLNode::GetProperty(const ZEString& PropertyName)")
 	{
 		ZEMLNode Node("ParentNode");
-		ZEVariant Value;
-		Value.SetBoolean(true);
 
-		ZEMLProperty* Property = Node.AddProperty("Prop1", Value);
-		const ZEMLItem* PropertyItem = Node.GetProperty("ParentNode");
-		ZETestCheck(PropertyItem == NULL);
-		PropertyItem = Node.GetProperty("Prop1");
-		ZETestCheck(PropertyItem != NULL);
-		ZETestCheckString(PropertyItem->GetName(), "Prop1");
+		ZEMLProperty* Prop1 = Node.AddProperty("Prop1", true);
+		ZEMLProperty* Prop2 = Node.AddProperty("Prop2", 3.0f);
 
-		Value.SetString("Test");
-		Property = Node.AddProperty("Prop2", Value);
-		PropertyItem = Node.GetProperty("ParentNode");
-		ZETestCheck(PropertyItem == NULL);
-		PropertyItem = Node.GetProperty("Prop2");
-		ZETestCheck(PropertyItem != NULL);
-		ZETestCheckString(PropertyItem->GetName(), "Prop2");
+		void* Data = new char[sizeof(unsigned char)];
+		ZEMLDataProperty* DataProp1 = Node.AddDataProperty("DataProp1", Data, sizeof(unsigned char), false);
+		ZEMLDataProperty* DataProp2 = Node.AddDataProperty("DataProp2");
 
-		ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
-		ZETestCheck(Item1->GetValue().GetBoolean());
-		ZEMLProperty* Item2 = (ZEMLProperty*)Node.GetProperties()[1];
-		ZETestCheckString(Item2->GetValue().GetString(), "Test");
+		const ZEMLItem* Property = Node.GetProperty("DataProp2");
+		ZETestCheckString(Property->GetName(), "DataProp2");
+		ZETestCheckEqual(Property->GetType(), ZEML_IT_INLINE_DATA);
+
+		Property = Node.GetProperty("DataProp1");
+		ZETestCheckString(Property->GetName(), "DataProp1");
+		ZETestCheckEqual(Property->GetType(), ZEML_IT_INLINE_DATA);
+
+		Property = Node.GetProperty("Prop2");
+		ZETestCheckString(Property->GetName(), "Prop2");
+		ZETestCheckEqual(Property->GetType(), ZEML_IT_FLOAT);
+
+		Property = Node.GetProperty("Prop1");
+		ZETestCheckString(Property->GetName(), "Prop1");
+		ZETestCheckEqual(Property->GetType(), ZEML_IT_BOOLEAN);
+
+		Property = Node.GetProperty("Prop");
+		ZETestCheck(Property ==  NULL);
+
+		delete Data;
 	}
 
-	ZETest("void ZEMLNode::WriteToFile(ZEFile* File)")
+	ZETest("const ZEMLNode* ZEMLNode::GetParent()")
+	{
+		ZEMLNode Node("Node");
+		ZEMLNode* SubNode1 = Node.AddSubNode("SubNode01");
+		ZEMLNode* SubNode2 = SubNode1->AddSubNode("SubNode001");
+		ZEMLNode* SubNode3 = SubNode2->AddSubNode("SubNode0001");
+
+		const ZEMLNode* Parent = Node.GetParent();
+		ZETestCheck(Parent == NULL);
+
+		Parent = SubNode1->GetParent();
+		ZETestCheckString(Parent->GetName(), "Node");
+
+		Parent = SubNode2->GetParent();
+		ZETestCheckString(Parent->GetName(), "SubNode01");
+
+		Parent = SubNode3->GetParent();
+		ZETestCheckString(Parent->GetName(), "SubNode001");
+	}
+
+	ZETest("bool ZEMLNode::WriteSelf(ZEFile* File)")
 	{
 
 	}
 
-	ZETest("void ZEMLNode::Write(ZEFile* File)")
+	ZETest("bool ZEMLNode::Write(ZEFile* File)")
 	{
 		ZEFile* File = new ZEFile();		
 		ZEVariant Value;
 		ZEMLProperty* Prop;
 		ZEMLDataProperty* DataProp;
+		bool ResultForWrite;
 		
 		ZETestCase("node includes Property")
 		{
@@ -698,27 +943,8 @@ ZETestSuite(ZEMLNode)
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 
-			Node.Write(File);
-
-			File->Close();
-			remove("NodeTests.txt");
-		}
-
-		ZETestCase("node includes Proprety, DataProperty")
-		{
-			ZEMLNode Node("ParentNode");
-			Value.SetBoolean(false);
-			Prop = Node.AddProperty("Prop1", Value);
-			Value.SetString("String");
-			Prop = Node.AddProperty("Prop2", Value);
-			DataProp = Node.AddDataProperty("DataProp1");
-			DataProp = Node.AddDataProperty("DataProp2");
-
-			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-
-			Node.Write(File);
-			//error Cannot write ZEMLDataProperty data to file.
-			//error Cannot write ZEMLDataProperty data to file.
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 
 			File->Close();
 			remove("NodeTests.txt");
@@ -736,67 +962,91 @@ ZETestSuite(ZEMLNode)
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 
 			File->Close();
 			remove("NodeTests.txt");
+
+			delete Data;
 		}
 
 		ZETestCase("node includes Property, DataProperty and SubNodes")
 		{
-//			ZEMLNode* SubNode;
+			ZEMLNode* SubNode;
+			ZEMLNode Node("ParentNode");
+			Value.SetBoolean(true);
+			Prop = Node.AddProperty("Prop1", Value);
+			Value.SetString("String");
+			Prop = Node.AddProperty("Prop2", Value);
+			void* Data = new char[sizeof(unsigned char)];
+			DataProp = Node.AddDataProperty("DataProp", Data, sizeof(unsigned char), false);
+			SubNode = Node.AddSubNode("SubNode1");
+			SubNode = Node.AddSubNode("SubNode2");
+
+			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
+
+			File->Close();
+			remove("NodeTests.txt");
+
+			delete Data;
+		}
+
+		ZETestCase("DataProperty with size 0") 
+		{
 // 			ZEMLNode Node("ParentNode");
-// 			Value.SetBoolean(true);
-// 			Prop = Node.AddProperty("Prop1", Value);
-// 			Value.SetString("String");
-// 			Prop = Node.AddProperty("Prop2", Value);
-// 			DataProp = Node.AddDataProperty("DataProp1");
-// 			void* Data = new char[sizeof(unsigned char)];
-// 			DataProp = Node.AddDataProperty("DataProp2", Data, sizeof(unsigned char), false);
-// 			SubNode = Node.AddSubNode("SubNode1");
-// 			SubNode = Node.AddSubNode("SubNode2");
-// 			ZETestCheckEqual(Node.GetTotalSize(), 141);
+// 			bool Added = Node.AddDataProperty(new ZEMLDataProperty("DataProp1"));
+// 			//DataProp = Node.AddDataProperty("DataProp2"); Locked in void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 // 
 // 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 // 
-// 			Node.Write(File);
-// 			//error Cannot write ZEMLDataProperty data to file.
+// 			ResultForWrite = Node.Write(File);
+// 			ZETestCheck(ResultForWrite);
+// 			//warning ZEMLDataProperty DataProp1 data size is : 0
+// 			//warning ZEMLDataProperty DataProp2 data size is : 0
 // 
 // 			File->Close();
 // 			remove("NodeTests.txt");
 		}
 	}
 
-	ZETest("void ZEMLNode::ReadFromFile(ZEFile* File, bool DeferredDataReading)")
+	ZETest("bool ZEMLNode::ReadSelf(ZEFile* File, bool DeferredDataReading)")
 	{
 
 	}
 
-	ZETest("void ZEMLNode::Read(ZEFile* File, bool DeferredDataReading)")
+	ZETest("bool ZEMLNode::Read(ZEFile* File, bool DeferredDataReading)")
 	{
 		ZEFile* File = new ZEFile();
 		ZEVariant Value;
+		ZEMLProperty* Prop;
 		ZEMLDataProperty* DataProp;		
-		
+		bool ResultForWrite;
+		bool ResultForRead;
+
 		ZETestCase("add property and data property, then call Read for DeferredDataReading false")
 		{
 			void* Data = new char[sizeof(unsigned char)];
 			ZEMLNode Node("ParentNode");
-			Value.SetBoolean(true);
-			Node.AddProperty("Prop1", Value);
-			Value.SetString("Test");
-			Node.AddProperty("Prop2", Value);
+			
+			Prop = Node.AddProperty("Prop1", true);
+			Prop = Node.AddProperty("Prop2", "Test");
 			DataProp = Node.AddDataProperty("DataProp1", Data, sizeof(unsigned char), false);
 			DataProp = Node.AddDataProperty("DataProp2", Data, sizeof(unsigned char), true);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 4);
 			ZETestCheckEqual(Node.GetTotalSize(), 84);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, false);
+			ResultForRead = Node.Read(File, false);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 8);
 			ZETestCheckEqual(Node.GetTotalSize(), 168);
 
@@ -848,11 +1098,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetTotalSize(), 84);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 8);
 			ZETestCheckEqual(Node.GetTotalSize(), 168);
 
@@ -897,11 +1149,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 
 			ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
@@ -924,11 +1178,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 
 			ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
@@ -951,11 +1207,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 
 			ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
@@ -978,11 +1236,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 
 			ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
@@ -1005,11 +1265,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 
 			ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
@@ -1031,11 +1293,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 
 			ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
@@ -1058,11 +1322,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 
 			ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
@@ -1085,11 +1351,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 
 			ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
@@ -1111,11 +1379,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 
 			ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
@@ -1151,7 +1421,8 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 8);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
@@ -1173,11 +1444,12 @@ ZETestSuite(ZEMLNode)
 			ZEMLProperty* Item8 = (ZEMLProperty*)Node.GetProperties()[7];
 			ZETestCheckEqual(Item8->GetValue().GetUInt64(), 0);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 16);
 
 			File->Seek(-File->Tell() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
 
 			File->Close();
 			remove("NodeTests.txt");
@@ -1201,37 +1473,32 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 6);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
-			ZETestCheckEqual(Item1->GetValue().GetQuaternion(), Quat);
-			ZEMLProperty* Item2 = (ZEMLProperty*)Node.GetProperties()[1];
-			ZETestCheckEqual(Item2->GetValue().GetVector2(), Vec2);
-			ZEMLProperty* Item3 = (ZEMLProperty*)Node.GetProperties()[2];
-			ZETestCheckEqual(Item3->GetValue().GetVector3(), Vec3);
-			ZEMLProperty* Item4 = (ZEMLProperty*)Node.GetProperties()[3];
-			ZETestCheckEqual(Item4->GetValue().GetVector4(), Vec4);
-			ZEMLProperty* Item5 = (ZEMLProperty*)Node.GetProperties()[4];
-			ZETestCheckEqual(Item5->GetValue().GetMatrix3x3(), Mat3x3);
-			ZEMLProperty* Item6 = (ZEMLProperty*)Node.GetProperties()[5];
-			ZETestCheckEqual(Item6->GetValue().GetMatrix4x4(), Mat4x4);
-
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 12);
 
+			ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
+			ZEMLProperty* Item2 = (ZEMLProperty*)Node.GetProperties()[1];
+			ZEMLProperty* Item3 = (ZEMLProperty*)Node.GetProperties()[2];
+			ZEMLProperty* Item4 = (ZEMLProperty*)Node.GetProperties()[3];
+			ZEMLProperty* Item5 = (ZEMLProperty*)Node.GetProperties()[4];
+			ZEMLProperty* Item6 = (ZEMLProperty*)Node.GetProperties()[5];
 			ZEMLProperty* Item7 = (ZEMLProperty*)Node.GetProperties()[6];
-			ZETestCheckEqual(Item7->GetValue().GetQuaternion(), Item1->GetValue().GetQuaternion());
-			ZEMLProperty* Item8 = (ZEMLProperty*)Node.GetProperties()[7];
-			ZETestCheckEqual(Item8->GetValue().GetVector2(), Item2->GetValue().GetVector2());
+			ZEMLProperty* Item8 = (ZEMLProperty*)Node.GetProperties()[7];			
 			ZEMLProperty* Item9 = (ZEMLProperty*)Node.GetProperties()[8];
-			ZETestCheckEqual(Item9->GetValue().GetVector3(), Item3->GetValue().GetVector3());
 			ZEMLProperty* Item10 = (ZEMLProperty*)Node.GetProperties()[9];
-			ZETestCheckEqual(Item10->GetValue().GetVector4(), Item4->GetValue().GetVector4());
 			ZEMLProperty* Item11 = (ZEMLProperty*)Node.GetProperties()[10];
-			ZETestCheckEqual(Item11->GetValue().GetMatrix3x3(), Item5->GetValue().GetMatrix3x3());
 			ZEMLProperty* Item12 = (ZEMLProperty*)Node.GetProperties()[11];
+			ZETestCheckEqual(Item7->GetValue().GetQuaternion(), Item1->GetValue().GetQuaternion());
+			ZETestCheckEqual(Item8->GetValue().GetVector2(), Item2->GetValue().GetVector2());
+			ZETestCheckEqual(Item9->GetValue().GetVector3(), Item3->GetValue().GetVector3());
+			ZETestCheckEqual(Item10->GetValue().GetVector4(), Item4->GetValue().GetVector4());
+			ZETestCheckEqual(Item11->GetValue().GetMatrix3x3(), Item5->GetValue().GetMatrix3x3());
 			ZETestCheckEqual(Item12->GetValue().GetMatrix4x4(), Item6->GetValue().GetMatrix4x4());
 
 			File->Close();
@@ -1248,11 +1515,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 
 			ZEMLDataProperty* Item1 = (ZEMLDataProperty*)Node.GetProperties()[0];
@@ -1279,11 +1548,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, false);
+			ResultForRead = Node.Read(File, false);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 
 			ZEMLDataProperty* Item1 = (ZEMLDataProperty*)Node.GetProperties()[0];
@@ -1297,7 +1568,8 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Compare, 0);
 
 			File->Seek(-File->Tell() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 
 			File->Close();
 			remove("NodeTests.txt");
@@ -1314,11 +1586,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, false);
+			ResultForRead = Node.Read(File, false);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 			
 			ZEMLDataProperty* Item1 = (ZEMLDataProperty*)Node.GetProperties()[0];
@@ -1328,7 +1602,8 @@ ZETestSuite(ZEMLNode)
 			ZETestCheck(Data1 != Data2);
 
 			File->Seek(-File->Tell() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 
 			File->Close();
 			remove("NodeTests.txt");
@@ -1345,11 +1620,13 @@ ZETestSuite(ZEMLNode)
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
 
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			Node.Write(File);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
 			File->Flush();
 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-			Node.Read(File, true);
+			ResultForRead = Node.Read(File, true);
+			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 	
 			ZEMLDataProperty* Item1 = (ZEMLDataProperty*)Node.GetProperties()[0];
@@ -1361,36 +1638,99 @@ ZETestSuite(ZEMLNode)
 
 			File->Close();
 			remove("NodeTests.txt");
+			delete Data;
 		}
 
 		ZETestCase("for node includes SubNode and DeferredDataReading false")
 		{
-// 			ZEMLNode Node("ParentNode");
-// 			ZEMLNode* SubNode;
-// 			Value.SetBoolean(true);
-// 			Node.AddProperty("Prop1", Value);
-// 			Value.SetString("String");
-// 			Node.AddProperty("Prop2", Value);
-// 			DataProp = Node.AddDataProperty("DataProp1", Data, sizeof(unsigned char), false);
-// 			DataProp = Node.AddDataProperty("DataProp2", Data, sizeof(unsigned char), true);
-// 			SubNode = Node.AddSubNode("SubNode1");
-// 			SubNode = Node.AddSubNode("SubNode2");
-// 			ZETestCheckEqual(Node.GetProperties().GetCount(), 4);
-// 			ZETestCheckEqual(Node.GetSubNodes().GetCount(), 2);
-// 			ZETestCheckEqual(Node.GetTotalSize(), 142);
-// 
-// 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-// 			Node.Write(File);
-// 			File->Flush();
-// 			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-// 
-// 			Node.Read(File, false);
-// 			ZETestCheckEqual(Node.GetProperties().GetCount(), 8);
-// 			ZETestCheckEqual(Node.GetSubNodes().GetCount(), 4);
-// 			ZETestCheckEqual(Node.GetTotalSize(), 284);
-// 
-// 			File->Close();
-// 			remove("NodeTests.txt");
+			void* Data = new char[sizeof(unsigned char)];
+			ZEMLNode Node("ParentNode");
+			ZEMLNode* SubNode;
+			Node.AddProperty("Prop1", true);
+			Node.AddProperty("Prop2", "String");
+			DataProp = Node.AddDataProperty("DataProp1", Data, sizeof(unsigned char), false);
+			DataProp = Node.AddDataProperty("DataProp2", Data, sizeof(unsigned char), true);
+			SubNode = Node.AddSubNode("SubNode1");
+			SubNode = Node.AddSubNode("SubNode2");
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 4);
+			ZETestCheckEqual(Node.GetSubNodes().GetCount(), 2);
+			ZETestCheckEqual(Node.GetTotalSize(), 142);
+
+			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+			ResultForWrite = Node.Write(File);
+			ZETestCheck(ResultForWrite);
+			File->Flush();
+			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+
+			ResultForRead = Node.Read(File, false);
+			ZETestCheck(ResultForRead);
+			ZETestCheckEqual(Node.GetProperties().GetCount(), 8);
+			ZETestCheckEqual(Node.GetSubNodes().GetCount(), 4);
+			ZETestCheckEqual(Node.GetTotalSize(), 284);
+
+			File->Close();
+			remove("NodeTests.txt");
+			delete Data;
 		}
+	}
+
+	ZETest("bool ZEMLNode::AddItem(ZEMLItem* Item)")
+	{
+		ZEMLNode Node("Node");
+
+		ZEMLProperty* Property = new ZEMLProperty("Property", "String");
+		ZEMLNode* SubNode = new ZEMLNode("SubNode");
+		ZEMLDataProperty* DataProperty = new ZEMLDataProperty("DataProperty");
+
+		bool Result = Node.AddItem(Property);
+		ZETestCheck(Result);
+		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+
+		Result = Node.AddItem(SubNode);
+		ZETestCheck(Result);
+		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 1);
+
+		Result = Node.AddItem(DataProperty);
+		ZETestCheck(Result);
+		ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
+
+		Result = Node.AddItem(Property);
+		//error ZEML node can not contain properties with duplicate name : Property.
+		ZETestCheck(!Result);
+
+		ZEMLItem* Item = new ZEMLProperty("Prop");
+		Result = Node.AddItem(Item);
+		ZETestCheck(Result);
+		ZETestCheckEqual(Node.GetProperties().GetCount(), 3);
+	}
+
+	ZETest("bool ZEMLNode::RemoveItem(ZEMLItem* Item)")
+	{
+		ZEMLNode Node("Node");
+		bool Added = Node.AddItem(new ZEMLNode("SubNode"));
+		ZETestCheck(Added);
+		Added = Node.AddItem(new ZEMLProperty("Prop", true));
+		ZETestCheck(Added);
+		ZEMLDataProperty* DataProperty = new ZEMLDataProperty("DataProp");
+		Added = Node.AddItem(DataProperty);
+		ZETestCheck(Added);
+		ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
+		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 1);
+
+		bool Removed = Node.RemoveItem(DataProperty);
+		ZETestCheck(Removed);
+		ZETestCheckEqual(Node.GetProperties().GetCount(), 1);
+
+		Removed = Node.RemoveItem(Node.GetProperties()[0]);
+		ZETestCheck(Removed);
+		ZETestCheckEqual(Node.GetProperties().GetCount(), 0);
+
+		Removed = Node.RemoveItem((ZEMLItem*)Node.GetSubNodes()[0]);
+		ZETestCheck(Removed);
+		ZETestCheckEqual(Node.GetSubNodes().GetCount(), 0);
+
+		ZEMLItem* Item = new ZEMLNode("Node1");
+		Removed = Node.RemoveItem(Item);
+		ZETestCheck(!Removed);
 	}
 }
