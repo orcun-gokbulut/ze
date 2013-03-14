@@ -38,78 +38,29 @@
 #include "ZETest/ZETestCheck.h"
 #include "ZEError.h"
 #include "ZEMLNode.h"
+#include "ZEFile/ZEFile.h"
 
-
-
-class ZEMLTestItem : public ZEMLItem
-{
-	public:
-
-		virtual void		ReadFromFile(ZEFile* File, bool DeferredDataReading)
-		{
-			
-		}
-
-		virtual void		WriteToFile(ZEFile* File)
-		{
-		
-		}
-
-		virtual ZEUInt64	GetTotalSize()
-		{
-			return GetDataSize();
-		}
-
-		ZEMLTestItem()
-		{
-			Type = (ZEUInt8)ZEML_IT_UNDEFINED;
-			DataSize = 0;
-			Parent = NULL;
-		}
-
-		void SetTypeTest(ZEMLItemType Type)
-		{
-			ZEMLItem::SetType(Type);
-		}
-};
 
 ZETestSuite(ZEMLItem)
 {
 	ZETest("void ZEMLItem::SetType(ZEMLItemType Type)")
 	{
-		ZEMLTestItem Item;
 
-		ZEMLItemType Type = Item.GetType();
-		ZETestCheckEqual(Type, ZEML_IT_UNDEFINED);
-
-		Item.SetTypeTest(ZEML_IT_BOOLEAN);
-		Type = Item.GetType();
-		ZETestCheckEqual(Type, ZEML_IT_BOOLEAN);
 	}
 
 	ZETest("ZEMLItemType ZEMItem::GetType() const")
 	{
-		ZEMLTestItem Item;
-
-		ZEMLItemType Type = Item.GetType();
-		ZETestCheckEqual(Type, ZEML_IT_UNDEFINED);
-
 		ZEMLNode Node;
 		ZEInt8 Value = 'z';
 		Node.AddProperty("Prop", Value);
 		ZEMLItem* MLItem = (ZEMLItem*)Node.GetProperties()[0];
 
-		Type = MLItem->GetType();
+		ZEMLItemType Type = MLItem->GetType();
 		ZETestCheckEqual(Type, ZEML_IT_INT8);
 	}
 
 	ZETest("void ZEMLItem::SetName(const ZEString& Name)")
 	{
-		ZEMLTestItem Item;
-
-		Item.SetName("MLItem");
-		ZETestCheckString(Item.GetName(), "MLItem");
-
 		ZEMLNode Node;
 		Node.AddProperty();
 		ZEMLItem* MLItem = (ZEMLItem*)Node.GetProperties()[0];
@@ -120,13 +71,6 @@ ZETestSuite(ZEMLItem)
 
 	ZETest("const ZEString& ZEMLItem::GetName() const")
 	{
-		ZEMLTestItem Item;
-
-		Item.SetName("MLTestItem");
-
-		const ZEString ItemName = Item.GetName();
-		ZETestCheckString(ItemName, "MLTestItem");
-
 		ZEMLNode Node;
 		Node.AddProperty();
 		ZEMLItem* MLItem = (ZEMLItem*)Node.GetProperties()[0];
@@ -138,18 +82,55 @@ ZETestSuite(ZEMLItem)
 
 	ZETest("ZEUInt64 ZEMLItem::GetDataSize()")
 	{
-		ZEMLTestItem Item;
-		Item.SetTypeTest(ZEML_IT_BOOLEAN);
-
-		ZEUInt64 DataSize = Item.GetDataSize();
-		ZETestCheckEqual(DataSize, 0);
-
 		ZEMLNode Node;
 		Node.AddProperty("Prop", "Test");
 		ZEMLItem* MLItem = (ZEMLItem*)Node.GetProperties()[0];
 
-		DataSize = MLItem->GetDataSize();
+		ZEUInt64 DataSize = MLItem->GetDataSize();
 		ZETestCheckEqual(DataSize, 5);
+	}
+
+	ZETest("ZEUInt64 ZEMLItem::GetFilePosition()")
+	{
+		ZEMLNode Node("Node");
+		Node.AddProperty("Prop", "Test");
+		ZEMLItem* MLItem1 = Node.GetProperties()[0];
+		ZEUInt64 FilePosition = MLItem1->GetFilePosition();
+		ZETestCheckEqual(FilePosition, 0);
+
+		void* Data = new char[sizeof(unsigned char)];
+		Node.AddDataProperty("DataProp", Data, sizeof(unsigned char), false);
+		ZEMLItem* MLItem2 = Node.GetProperties()[1];
+		FilePosition = MLItem2->GetFilePosition();
+		ZETestCheckEqual(FilePosition, 0);
+
+		ZEFile* File = new ZEFile();
+		File->Open("MLItemTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+		bool Written = Node.Write(File);
+		ZETestCheck(Written);
+
+		MLItem1 = Node.GetProperties()[0];
+		ZETestCheckEqual(MLItem1->GetFilePosition(), 0);
+		MLItem2 = Node.GetProperties()[1];
+		ZETestCheckEqual(MLItem2->GetFilePosition(), 0);
+
+		File->Flush();
+		File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+		bool Read = Node.Read(File, false);
+		ZETestCheck(Read);
+
+		MLItem1 = Node.GetProperties()[0];
+		ZETestCheckEqual(MLItem1->GetFilePosition(), 0);
+		MLItem2 = Node.GetProperties()[1];
+		ZETestCheckEqual(MLItem2->GetFilePosition(), 0);
+		ZEMLItem* MLItem3 = Node.GetProperties()[2];
+		ZETestCheckEqual(MLItem3->GetFilePosition(), 24);
+		ZEMLItem* MLItem4 = Node.GetProperties()[3];
+		ZETestCheckEqual(MLItem4->GetFilePosition(), 45);
+
+		File->Close();
+		remove("MLItemTests.txt");
+		delete Data;
 	}
 }
 
