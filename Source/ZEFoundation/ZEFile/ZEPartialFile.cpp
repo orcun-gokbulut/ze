@@ -71,8 +71,9 @@ bool ZEPartialFile::Open(const ZEFile* ParentFile, const ZEInt64 Offset, const Z
 {
 	zeDebugCheck(Size < 0, "Negative size");
 	zeDebugCheck(Offset < 0, "Negative offset");
+	zeDebugCheck(!ParentFile->IsOpen() < 0, "Parent file is not open.");
 
-	if (!ZEFile::Open(ParentFile->GetPath(), ParentFile->GetOpenMode(),  ParentFile->GetCreationMode()))	
+	if (!ZEFile::Open(ParentFile->GetPath(), ParentFile->GetOpenMode(),  ZE_FCM_NONE))	
 		return false;
 
 	if (ZEFile::Seek(Offset, ZE_SF_BEGINING) != 0)
