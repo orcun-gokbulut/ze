@@ -304,6 +304,26 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 
 	zeLog("Exporting model to file \"%s\".", name);
 
+	Tab<IGameNode*> Meshes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
+	const char* Type;
+
+	for (ZESize I = 0; I < (ZESize)Meshes.Count(); I++)
+	{
+		Type = NULL;
+		if (ZE3dsMaxUtils::GetProperty(Meshes[I]->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type) && strcmp(Type, "BoundingBox") == 0)
+		{
+			IGameMesh* BoundingBoxMesh = (IGameMesh*)Meshes[I]->GetIGameObject();
+
+			Box3 TempBoundingBox;
+			BoundingBoxMesh->GetBoundingBox(TempBoundingBox);
+			ZEMLNode* UserDefinedBoundingBox = ModelNode.AddSubNode("UserDefinedBoundingBox");
+			UserDefinedBoundingBox->AddProperty("Min", ZE3dsMaxUtils::MaxtoZE(TempBoundingBox.pmin));
+			UserDefinedBoundingBox->AddProperty("Max", ZE3dsMaxUtils::MaxtoZE(TempBoundingBox.pmax));
+
+			break;
+		}
+	}
+
 	ProgressDialog->OpenTask("Bone Process", true);
 	if (!ProcessBones())
 	{

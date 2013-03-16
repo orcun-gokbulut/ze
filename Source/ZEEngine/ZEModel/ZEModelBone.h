@@ -60,7 +60,7 @@ class ZEModelBone
 		ZEMatrix4x4							WorldTransform;
 		ZEMatrix4x4							RelativeTransform;
 		ZEMatrix4x4							LocalTransform;
-		ZEMatrix4x4							InitialRelativeTransform;				
+		ZEMatrix4x4							InitialRelativeTransform;
 
 		ZEMatrix4x4							VertexTransform;
 

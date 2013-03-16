@@ -88,9 +88,8 @@ class ZEModelMesh
 		ZEModelMesh*						GetParentMesh();
 		const ZEArray<ZEModelMesh*>&		GetChildMeshes();
 		const char*							GetName();
-		ZEPhysicalRigidBody*				GetPhysicalBody() { return PhysicalBody; }
-		ZEPhysicalCloth*					GetPhysicalCloth() { return PhysicalCloth; }
-		ZEModelMeshLOD*						GetFirstLOD() { return &LODs[0]; }
+		ZEPhysicalRigidBody*				GetPhysicalBody();
+		ZEPhysicalCloth*					GetPhysicalCloth();
 
 		const ZEAABBox&						GetLocalBoundingBox();
 		const ZEAABBox&						GetModelBoundingBox();

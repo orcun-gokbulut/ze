@@ -1340,6 +1340,9 @@ bool ZE3dsMaxModelExporter::ProcessMeshes()
 						MasterMeshes[J] = Nodes[I];
 					}
 
+					if (CurrentMeshLOD > MasterMeshLOD)
+						MeshLODs.Add(Nodes[I]);
+
 					break;
 				}
 			}

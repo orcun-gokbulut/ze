@@ -987,19 +987,44 @@ bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
 	if (NodeReader.GetItemName() != "ZEModel")
 		return false;
 
-	ZEMLSerialPointer BonesNodePointer, MeshesNodePointer, HelpersNodePointer, MaterialsNodePointer, AnimationsNodePointer;
+	ZEMLSerialPointer UserDefinedBoundingBoxPointer, BonesNodePointer, MeshesNodePointer, HelpersNodePointer, MaterialsNodePointer, AnimationsNodePointer;
 
 	ZEMLSerialListItem ModelList[] = 
 	{
-		ZEML_LIST_NODE("Bones",			BonesNodePointer,		false),
-		ZEML_LIST_NODE("Meshes",		MeshesNodePointer,		false),
-		ZEML_LIST_NODE("Helpers",		HelpersNodePointer,		false),
-		ZEML_LIST_NODE("Animations",	AnimationsNodePointer,	false),
-		ZEML_LIST_NODE("Materials",		MaterialsNodePointer,	true)
+		ZEML_LIST_NODE("UserDefinedBoundingBox",	UserDefinedBoundingBoxPointer,	false),
+		ZEML_LIST_NODE("Bones",						BonesNodePointer,				false),
+		ZEML_LIST_NODE("Meshes",					MeshesNodePointer,				false),
+		ZEML_LIST_NODE("Helpers",					HelpersNodePointer,				false),
+		ZEML_LIST_NODE("Animations",				AnimationsNodePointer,			false),
+		ZEML_LIST_NODE("Materials",					MaterialsNodePointer,			true)
 	};
 
-	if (!NodeReader.ReadPropertyList(ModelList, 5))
+	if (!NodeReader.ReadPropertyList(ModelList, 6))
 		return false;
+
+	if (UserDefinedBoundingBoxPointer != -1)
+	{
+		NodeReader.SeekPointer(UserDefinedBoundingBoxPointer);
+
+		ZEVariant BBoxMinValue, BBoxMaxValue;
+
+		ZEMLSerialListItem BoundingBoxList[] = 
+		{
+			ZEML_LIST_PROPERTY("Min", BBoxMinValue,	ZE_VRT_VECTOR3,	true),
+			ZEML_LIST_PROPERTY("Max", BBoxMaxValue,	ZE_VRT_VECTOR3,	true)
+		};
+
+		if(!NodeReader.ReadPropertyList(BoundingBoxList, 2))
+			return false;
+
+		UserDefinedBoundingBox.Min = BBoxMinValue;
+		UserDefinedBoundingBox.Max = BBoxMaxValue;
+		BoundingBoxIsUserDefined = true;
+	}
+	else
+	{
+		BoundingBoxIsUserDefined = false;
+	}
 
 	if (BonesNodePointer != -1)
 	{
@@ -1044,6 +1069,16 @@ bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
 const char* ZEModelResource::GetResourceType() const
 {
 	return "Model";
+}
+
+bool ZEModelResource::GetUserDefinedBoundingBoxEnabled() const
+{
+	return BoundingBoxIsUserDefined;
+}
+
+const ZEAABBox& ZEModelResource::GetUserDefinedBoundingBox() const
+{
+	return UserDefinedBoundingBox;
 }
 
 const ZESmartArray<ZETexture2DResource*>& ZEModelResource::GetTextures() const

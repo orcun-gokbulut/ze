@@ -51,6 +51,8 @@ enum ZEModelAnimationBlendMode
 
 class ZEModelAnimationTrack
 {
+	friend class ZEModel;
+
 	private:
 		ZEModel*						Owner;
 		const ZEModelAnimation*			Animation;
@@ -72,6 +74,7 @@ class ZEModelAnimationTrack
 		ZEUInt							LOD;
 		bool							Looping;
 		
+		void							UpdateAnimation(ZEModelAnimationUpdateMode OwnerCurrentPhase, float ElapsedTime);
 		void							UpdateMeshesAndBones();
 		void							ApplyLimits();
 
