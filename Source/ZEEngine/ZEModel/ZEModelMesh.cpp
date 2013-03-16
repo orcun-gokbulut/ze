@@ -87,6 +87,16 @@ const char* ZEModelMesh::GetName()
 	return MeshResource->Name;
 }
 
+ZEPhysicalRigidBody* ZEModelMesh::GetPhysicalBody()
+{
+	return PhysicalBody;
+}
+
+ZEPhysicalCloth* ZEModelMesh::GetPhysicalCloth()
+{
+	return PhysicalCloth;
+}
+
 const ZEAABBox& ZEModelMesh::GetLocalBoundingBox()
 {
 	return LocalBoundingBox;

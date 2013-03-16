@@ -92,30 +92,15 @@ class ZEModel : public ZEEntity
 		bool								PhysicsEnabled;
 
 		ZEModelAnimationType				AnimationType;
+		ZEModelAnimationUpdateMode			AnimationUpdateMode;
 
 		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
 
-		void								CalculateBoundingBox();		
+		bool								BoundingBoxIsUserDefined;
+
+		void								CalculateBoundingBox();
 		void								UpdateTransforms();
-
-		bool								DrawSkeleton;
-		bool								DrawPhysicalBodies;
-		bool								DrawPhysicalJoints;
-
-		struct
-		{
-			ZESimpleMaterial*				Material;
-			ZECanvas						BoxCanvas;
-			ZECanvas						BonesCanvas;
-			ZECanvas						BonePositionsCanvas;
-			ZERenderCommand					BoxRenderCommand;
-			ZERenderCommand					BonesRenderCommand;
-			ZERenderCommand					BonePositionsRenderCommand;
-
-		} DebugDrawComponents;
-
-		void								DebugDraw(ZERenderer* Renderer);
-		
+	
 		void								LoadModelResource();
 
 	protected:
@@ -132,6 +117,7 @@ class ZEModel : public ZEEntity
 
 		virtual const ZEModelStatistics&	GetStatistics() const;
 
+		void								SetUserDefinedBoundingBoxEnabled(bool Value);
 		virtual const ZEAABBox&				GetWorldBoundingBox();
 
 		void								SetModelFile(const char* ModelFile);
@@ -155,6 +141,9 @@ class ZEModel : public ZEEntity
 
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();
+
+		void								SetAnimationUpdateMode(ZEModelAnimationUpdateMode AnimationUpdateMode);
+		ZEModelAnimationUpdateMode			GetAnimationUpdateMode();
 
 		ZEArray<ZEModelAnimationTrack>&		GetAnimationTracks();
 

@@ -422,6 +422,18 @@ void ZEModelAnimationTrack::Stop()
 	Tick(0.0f);
 }
 
+void ZEModelAnimationTrack::UpdateAnimation(ZEModelAnimationUpdateMode OwnerCurrentPhase, float ElapsedTime)
+{
+	if (State == ZE_MAS_PLAYING && !(BlendFactor == 0.0f))
+	{
+		if (Owner->AnimationUpdateMode == OwnerCurrentPhase)
+			UpdateMeshesAndBones();
+
+		if (OwnerCurrentPhase == ZE_MAUM_LOGICAL)
+			CurrentFrame += Speed * ElapsedTime;
+	}
+}
+
 void ZEModelAnimationTrack::UpdateMeshesAndBones()
 {
 	// Check whether this track is the root track
@@ -570,13 +582,8 @@ void ZEModelAnimationTrack::Tick(float ElapsedTime)
 		}
 		
 		if (BlendFactor == 0.0f)
-		{
 			return;
-		}
 
-		UpdateMeshesAndBones();
-
-		CurrentFrame += Speed * ElapsedTime;
 	}
 }
 

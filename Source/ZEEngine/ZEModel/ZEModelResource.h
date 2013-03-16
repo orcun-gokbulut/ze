@@ -338,6 +338,9 @@ class ZEModelResource : public ZEResource
 		ZESmartArray<ZETexture2DResource*>			TextureResources;
 		ZEArray<ZEMaterial*>						Materials;
 
+		bool										BoundingBoxIsUserDefined;
+		ZEAABBox									UserDefinedBoundingBox;
+
 		bool										ReadBones(ZEMLSerialReader* NodeReader);
 		void										ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId);
 		bool										ReadMeshes(ZEMLSerialReader* NodeReader);
@@ -355,6 +358,8 @@ class ZEModelResource : public ZEResource
 	public:
 		const char*									GetResourceType() const;
 		
+		bool										GetUserDefinedBoundingBoxEnabled() const;
+		const ZEAABBox&								GetUserDefinedBoundingBox() const;
 		const ZESmartArray<ZETexture2DResource*>&	GetTextures() const;
 		const ZEArray<ZEMaterial*>&					GetMaterials() const;
 		const ZEArray<ZEModelResourceBone>&			GetBones() const;

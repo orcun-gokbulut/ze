@@ -107,86 +107,6 @@ void ZEModel::UpdateTransforms()
 		Meshes[I].OnTransformChanged();
 }
 
-void ZEModel::DebugDraw(ZERenderer* Renderer)
-{
-	if (DebugDrawComponents.Material == NULL)
-	{
-		DebugDrawComponents.Material = ZESimpleMaterial::CreateInstance();
-
-		DebugDrawComponents.BonePositionsRenderCommand.SetZero();
-		DebugDrawComponents.BonePositionsRenderCommand.Material = DebugDrawComponents.Material;
-		DebugDrawComponents.BonePositionsRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM;
-		DebugDrawComponents.BonePositionsRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-		DebugDrawComponents.BonePositionsRenderCommand.VertexBuffer = &DebugDrawComponents.BonePositionsCanvas;
-		DebugDrawComponents.BonePositionsRenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
-		DebugDrawComponents.BonePositionsRenderCommand.Priority = 4;
-
-		DebugDrawComponents.BonesRenderCommand.SetZero();
-		DebugDrawComponents.BonesRenderCommand.Material = DebugDrawComponents.Material;
-		DebugDrawComponents.BonesRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM;
-		DebugDrawComponents.BonesRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-		DebugDrawComponents.BonesRenderCommand.VertexBuffer = &DebugDrawComponents.BonesCanvas;
-		DebugDrawComponents.BonesRenderCommand.PrimitiveType = ZE_ROPT_LINE;
-		DebugDrawComponents.BonesRenderCommand.Priority = 4;
-
-		DebugDrawComponents.BoxRenderCommand.SetZero();
-		DebugDrawComponents.BoxRenderCommand.Material = DebugDrawComponents.Material;
-		DebugDrawComponents.BoxRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM;
-		DebugDrawComponents.BoxRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-		DebugDrawComponents.BoxRenderCommand.VertexBuffer = &DebugDrawComponents.BoxCanvas;
-		DebugDrawComponents.BoxRenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	}
-
-	DebugDrawComponents.BonesCanvas.Clean();
-	DebugDrawComponents.BonePositionsCanvas.Clean();
-	DebugDrawComponents.BoxCanvas.Clean();
-	DebugDrawComponents.BonePositionsCanvas.SetColor(ZEVector4(1.0f, 0.0f, 0.0f, 0.0f));
-	DebugDrawComponents.BonesCanvas.SetColor(ZEVector4(0.0f, 1.0f, 1.0f, 0.0f));
-	DebugDrawComponents.BoxCanvas.SetColor(ZEVector4(0.25f, 1.0f, 0.25f, 1.0f));
-
-	if (DrawSkeleton)
-	{
-		ZEVector3 BonePosition1, BonePosition2;
-		for (ZESize I = 0; I < Bones.GetCount(); I++)
-		{
-			DebugDrawComponents.BonePositionsCanvas.SetTranslation(Bones[I].GetWorldPosition());
-			DebugDrawComponents.BonePositionsCanvas.AddSphere(0.02f, 8, 8);
-
-			if (Bones[I].GetParentBone() != NULL)
-				DebugDrawComponents.BonesCanvas.AddLine(Bones[I].GetWorldPosition(), Bones[I].GetParentBone()->GetWorldPosition());
-		}
-		//DebugDrawComponents.BonesRenderCommand.WorldMatrix = GetWorldTransform();
-		DebugDrawComponents.BonesRenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
-		DebugDrawComponents.BonesRenderCommand.PrimitiveCount = DebugDrawComponents.BonesCanvas.Vertices.GetCount() / 2;
-
-		//DebugDrawComponents.BonePositionsRenderCommand.WorldMatrix = GetWorldTransform();
-		DebugDrawComponents.BonePositionsRenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
-		DebugDrawComponents.BonePositionsRenderCommand.PrimitiveCount = DebugDrawComponents.BonePositionsCanvas.Vertices.GetCount() / 3;
-
-		Renderer->AddToRenderList(&DebugDrawComponents.BonesRenderCommand);
-		Renderer->AddToRenderList(&DebugDrawComponents.BonePositionsRenderCommand);
-	}
-
-	ZEAABBox BoundingBox = GetWorldBoundingBox();
-	DebugDrawComponents.BoxCanvas.SetRotation(ZEQuaternion::Identity);
-	DebugDrawComponents.BoxCanvas.SetTranslation(BoundingBox.GetCenter());
-	DebugDrawComponents.BoxCanvas.AddWireframeBox((BoundingBox.Max.x - BoundingBox.Min.x), (BoundingBox.Max.y - BoundingBox.Min.y), (BoundingBox.Max.z - BoundingBox.Min.z));
-
-	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-	{
-		BoundingBox = Meshes[I].GetWorldBoundingBox();
-		DebugDrawComponents.BoxCanvas.SetRotation(ZEQuaternion::Identity);
-		DebugDrawComponents.BoxCanvas.SetTranslation(BoundingBox.GetCenter());
-		DebugDrawComponents.BoxCanvas.AddWireframeBox((BoundingBox.Max.x - BoundingBox.Min.x), (BoundingBox.Max.y - BoundingBox.Min.y), (BoundingBox.Max.z - BoundingBox.Min.z));
-	}
-
-	DebugDrawComponents.BoxRenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
-	DebugDrawComponents.BoxRenderCommand.PrimitiveCount = DebugDrawComponents.BoxCanvas.Vertices.GetCount() / 2;
-	DebugDrawComponents.BoxRenderCommand.Priority = 4;
-	Renderer->AddToRenderList(&DebugDrawComponents.BoxRenderCommand);
-
-}
-
 ZEDrawFlags ZEModel::GetDrawFlags() const
 {
 	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
@@ -215,6 +135,12 @@ void ZEModel::LoadModelResource()
 
 	if (ModelResource == NULL)
 		return;
+
+	if (ModelResource->GetUserDefinedBoundingBoxEnabled())
+	{
+		BoundingBoxIsUserDefined = true;
+		SetBoundingBox(ModelResource->GetUserDefinedBoundingBox());
+	}
 
 	Meshes.SetCount(ModelResource->GetMeshes().GetCount());
 
@@ -439,6 +365,16 @@ ZEModelAnimationType ZEModel::GetAnimationType()
 	return AnimationType;
 }
 
+void ZEModel::SetAnimationUpdateMode(ZEModelAnimationUpdateMode AnimationUpdateMode)
+{
+	this->AnimationUpdateMode = AnimationUpdateMode;
+}
+
+ZEModelAnimationUpdateMode ZEModel::GetAnimationUpdateMode()
+{
+	return AnimationUpdateMode;
+}
+
 ZEArray<ZEModelAnimationTrack>& ZEModel::GetAnimationTracks()
 {
 	return AnimationTracks;
@@ -458,7 +394,9 @@ bool ZEModel::GetAutoLOD()
 
 const ZEAABBox& ZEModel::GetWorldBoundingBox()
 {
-	((ZEModel*)this)->CalculateBoundingBox();
+	if (!BoundingBoxIsUserDefined)
+		CalculateBoundingBox();
+
 	return ZEEntity::GetWorldBoundingBox();
 }
 
@@ -521,6 +459,12 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 		Statistics.TotalMeshCount = Meshes.GetCount();
 	}
 
+	if (AnimationUpdateMode == ZE_MAUM_VISUAL)
+	{
+		for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
+			AnimationTracks[I].UpdateAnimation(ZE_MAUM_VISUAL, DrawParameters->ElapsedTime);
+	}
+
 	ZEUInt32 EntityDrawFlags = GetDrawFlags();
 
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
@@ -568,7 +512,10 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 void ZEModel::Tick(float ElapsedTime)
 {
 	for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
+	{
 		AnimationTracks[I].Tick(ElapsedTime);
+		AnimationTracks[I].UpdateAnimation(ZE_MAUM_LOGICAL, ElapsedTime);
+	}
 
 	for(ZESize I = 0; I < IKChains.GetCount(); I++)
 		IKChains[I].Process();
@@ -622,18 +569,15 @@ ZEModel::ZEModel()
 	Visibility = true;
 	AutoLOD = true;
 	ActiveLOD = 0;
-	DebugDrawComponents.Material = NULL;
-	DrawSkeleton = true;
 	ParentlessBoneBody = NULL;
+	AnimationUpdateMode = ZE_MAUM_LOGICAL;
+	BoundingBoxIsUserDefined = false;
 
 	memset(&Statistics, 0, sizeof(ZEModelStatistics));
 }
 
 ZEModel::~ZEModel()
 {
-	if (DebugDrawComponents.Material != NULL)
-		DebugDrawComponents.Material->Release();
-
 	if (ModelResource != NULL)
 		((ZEModelResource*)ModelResource)->Release();
 }
@@ -656,6 +600,11 @@ bool ZEModel::DeinitializeSelf()
 ZEModel* ZEModel::CreateInstance()
 {
 	return new ZEModel();
+}
+
+void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
+{
+	BoundingBoxIsUserDefined = Value;
 }
 
 ZEEntityRunAt ZEModelDescription::GetRunAt() const

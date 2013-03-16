@@ -38,6 +38,7 @@
 #include "ZE3dsMaxModelScriptMesh_ms.h"
 #include "ZE3dsMaxModelScriptBone_ms.h"
 #include "ZE3dsMaxModelScriptPhysicalBody_ms.h"
+#include "ZE3dsMaxModelScriptBoundingBox_ms.h"
 
 
 int ZE3dsMaxModelActionAddMeshAttributes::GetId()
@@ -230,4 +231,68 @@ void ZE3dsMaxModelActionAddPhysicalBodyAttributes::DeleteThis()
 ZE3dsMaxModelActionAddPhysicalBodyAttributes::ZE3dsMaxModelActionAddPhysicalBodyAttributes()
 {
 	PhysicalBodyActionIcon = NULL;
+}
+
+int ZE3dsMaxModelActionAddBoundingBoxAttributes::GetId()
+{
+	return ZEModelBoundingBoxAttributesAdd_Action_ID;
+}
+
+BOOL ZE3dsMaxModelActionAddBoundingBoxAttributes::ExecuteAction()
+{
+	ZE3dsMaxModelScriptBoundingBox_ms BoundingBoxScript;
+	return ExecuteMAXScriptScript((char*)BoundingBoxScript.GetData());
+}
+
+void ZE3dsMaxModelActionAddBoundingBoxAttributes::GetButtonText(MSTR& buttonText)
+{
+	buttonText = "Add ZEModel Bounding Box Attributes";
+}
+
+void ZE3dsMaxModelActionAddBoundingBoxAttributes::GetMenuText(MSTR& menuText)
+{
+	menuText = "Add ZEModel Bounding Box Attributes";
+}
+
+void ZE3dsMaxModelActionAddBoundingBoxAttributes::GetDescriptionText(MSTR& descText)
+{
+	descText = "Add ZEModel Bounding Box Attributes";
+}
+
+void ZE3dsMaxModelActionAddBoundingBoxAttributes::GetCategoryText(MSTR& catText)
+{
+	catText	= "Zinek Engine";
+}
+
+BOOL ZE3dsMaxModelActionAddBoundingBoxAttributes::IsChecked()
+{
+	return FALSE;
+}
+
+BOOL ZE3dsMaxModelActionAddBoundingBoxAttributes::IsItemVisible()
+{
+	return TRUE;
+}
+
+BOOL ZE3dsMaxModelActionAddBoundingBoxAttributes::IsEnabled()
+{
+	return TRUE;
+}
+
+MaxIcon* ZE3dsMaxModelActionAddBoundingBoxAttributes::GetIcon()
+{
+	if (BoundingBoxActionIcon == NULL)
+		BoundingBoxActionIcon = new MaxBmpFileIcon("ZEToolbarIcons", 8);
+
+	return BoundingBoxActionIcon;
+}
+
+void ZE3dsMaxModelActionAddBoundingBoxAttributes::DeleteThis()
+{
+	delete BoundingBoxActionIcon;
+}
+
+ZE3dsMaxModelActionAddBoundingBoxAttributes::ZE3dsMaxModelActionAddBoundingBoxAttributes()
+{
+	BoundingBoxActionIcon = NULL;
 }
