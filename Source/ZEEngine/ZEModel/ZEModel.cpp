@@ -84,7 +84,7 @@ void ZEModel::CalculateBoundingBox()
 
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
 	{
-		ZEVector3 BonePosition = Bones[I].GetLocalPosition();
+		ZEVector3 BonePosition = Bones[I].GetModelPosition();
 
 		if (BonePosition.x < BoundingBox.Min.x) BoundingBox.Min.x = BonePosition.x;
 		if (BonePosition.y < BoundingBox.Min.y) BoundingBox.Min.y = BonePosition.y;
@@ -462,7 +462,7 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 	if (AnimationUpdateMode == ZE_MAUM_VISUAL)
 	{
 		for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
-			AnimationTracks[I].UpdateAnimation(ZE_MAUM_VISUAL, DrawParameters->ElapsedTime);
+			AnimationTracks[I].UpdateAnimation();
 	}
 
 	ZEUInt32 EntityDrawFlags = GetDrawFlags();
@@ -514,7 +514,9 @@ void ZEModel::Tick(float ElapsedTime)
 	for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
 	{
 		AnimationTracks[I].Tick(ElapsedTime);
-		AnimationTracks[I].UpdateAnimation(ZE_MAUM_LOGICAL, ElapsedTime);
+
+		if (AnimationUpdateMode == ZE_MAUM_LOGICAL)
+			AnimationTracks[I].UpdateAnimation();
 	}
 
 	for(ZESize I = 0; I < IKChains.GetCount(); I++)
@@ -536,17 +538,17 @@ void ZEModel::TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 N
 			ZEVector3 Position;
 			ZEMatrix4x4::Transform(Position, InvParent, Bones[I].PhysicalBody->GetPosition());
 
-			Bones[I].SetRelativePosition(Position);
+			Bones[I].SetPosition(Position);
 			Inverse.NormalizeSelf();
-			Bones[I].SetRelativeRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
+			Bones[I].SetRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
 		}
 		else
 		{
 			ZEQuaternion Inverse;
 			ZEQuaternion::Conjugate(Inverse, this->GetWorldRotation());
-			Bones[I].SetRelativePosition(Bones[I].PhysicalBody->GetPosition() - GetWorldPosition());
+			Bones[I].SetPosition(Bones[I].PhysicalBody->GetPosition() - GetWorldPosition());
 			Inverse.NormalizeSelf();
-			Bones[I].SetRelativeRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
+			Bones[I].SetRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
 		}
 	}
 

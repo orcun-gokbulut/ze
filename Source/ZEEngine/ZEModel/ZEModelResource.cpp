@@ -736,17 +736,17 @@ bool ZEModelResource::ReadPhysicalJoint(ZEModelResourcePhysicalJoint* Joint, ZEM
 
 void ZEModelResource::ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId)
 {
-	ZEMatrix4x4::CreateOrientation(Bone->RelativeTransform, Bone->RelativePosition, Bone->RelativeRotation, Bone->RelativeScale);
+	ZEMatrix4x4::CreateOrientation(Bone->LocalTransform, Bone->Position, Bone->Rotation, Bone->Scale);
 
 	if (Bone->ParentBone != -1)
 	{
 
-		ZEMatrix4x4::Multiply(Bone->ForwardTransform, Bones[(ZESize)Bone->ParentBone].ForwardTransform, Bone->RelativeTransform);
+		ZEMatrix4x4::Multiply(Bone->ForwardTransform, Bones[(ZESize)Bone->ParentBone].ForwardTransform, Bone->LocalTransform);
 		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
 	}
 	else
 	{
-		Bone->ForwardTransform = Bone->RelativeTransform;
+		Bone->ForwardTransform = Bone->LocalTransform;
 		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
 	}
 
@@ -797,9 +797,9 @@ bool ZEModelResource::ReadBones(ZEMLSerialReader* NodeReader)
 
 		strncpy(Bone->Name, NameValue.GetString(), ZE_MDLF_MAX_NAME_SIZE);
 		Bone->ParentBone = ParentBoneValue;
-		Bone->RelativePosition = RelativePositionValue;
-		Bone->RelativeRotation = RelativeRotationValue;
-		Bone->RelativeScale = RelativeScaleValue;
+		Bone->Position = RelativePositionValue;
+		Bone->Rotation = RelativeRotationValue;
+		Bone->Scale = RelativeScaleValue;
 
 		if (UserDefinedPropertiesValue.GetType() == ZE_VRT_STRING)
 			Bone->UserDefinedProperties = UserDefinedPropertiesValue.GetString();

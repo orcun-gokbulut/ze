@@ -73,8 +73,9 @@ class ZEModelAnimationTrack
 		float							CurrentFrame;
 		ZEUInt							LOD;
 		bool							Looping;
+
 		
-		void							UpdateAnimation(ZEModelAnimationUpdateMode OwnerCurrentPhase, float ElapsedTime);
+		void							UpdateAnimation();
 		void							UpdateMeshesAndBones();
 		void							ApplyLimits();
 
