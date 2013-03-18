@@ -303,10 +303,10 @@ struct ZEModelResourceBone
 	char										Name[ZE_MDLF_MAX_NAME_SIZE];
 	ZEAABBox									BoundingBox;
 	ZEInt32										ParentBone;
-	ZEVector3									RelativePosition;
-	ZEQuaternion								RelativeRotation;
-	ZEVector3									RelativeScale;
-	ZEMatrix4x4									RelativeTransform;
+	ZEVector3									Position;
+	ZEQuaternion								Rotation;
+	ZEVector3									Scale;
+	ZEMatrix4x4									LocalTransform;
 	ZEMatrix4x4									ForwardTransform;
 	ZEMatrix4x4									InverseTransform;
 	ZEModelResourcePhysicalBody					PhysicalBody;
