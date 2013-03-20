@@ -119,10 +119,9 @@ class ZEExtensionManager* ZEExtensionManager::GetInstance()
 
 ZEExtensionManager::ZEExtensionManager()
 {
-	RegisterExtension(ZEXSensInputModule::Description());
-	RegisterExtension(ZEVRPNInputModule::Description());
-	RegisterExtension(ZEDirectInputModule::Description());
 	RegisterExtension(ZEWindowsInputModule::Description());
+	RegisterExtension(ZEDirectInputModule::Description());
+	RegisterExtension(ZEVRPNInputModule::Description());
 	RegisterExtension(ZEXSensInputModule::Description());
 }
 
