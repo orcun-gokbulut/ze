@@ -416,9 +416,9 @@ bool ZEInput::Check(ZEInputState State, ZEInputValue& Action) const
 	}
 	else if (this->Type == ZE_IT_QUATERNION)
 	{
-		if (State == ZE_IS_VALUE || (State == ZE_IS_CHANGED && DeviceState.Quaternions.CurrentValues[Index] == DeviceState.Quaternions.OldValues[Index]))
+		if (State == ZE_IS_VALUE || (State == ZE_IS_CHANGED && DeviceState.Quaternions.CurrentValues[Index] != DeviceState.Quaternions.OldValues[Index]))
 		{
-			Action.POVValue = DeviceState.POVs.CurrentValues[Index];
+			Action.Quaternion = DeviceState.Quaternions.CurrentValues[Index];
 			return true;
 		}
 	}
