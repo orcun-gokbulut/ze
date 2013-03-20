@@ -59,7 +59,7 @@ bool ZEWindowsInputKeyboardDevice::InitializeSelf()
 {	
 	if (!ZEInputDevice::InitializeSelf())
 		return false;
-	
+
 	Description.Type = ZE_IDT_KEYBOARD;
 	Description.FullName = "Keyboard";
 	Description.Sink = true;

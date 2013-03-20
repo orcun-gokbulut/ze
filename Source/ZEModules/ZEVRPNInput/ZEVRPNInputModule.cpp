@@ -39,6 +39,11 @@
 
 ZE_EXTENSION_DESCRIPTION(ZEVRPNInputModule, ZEInputDeviceModule, NULL)
 
+ZEVRPNInputModule::~ZEVRPNInputModule()
+{
+	DestroyDevices();
+}
+
 ZEInputDevice* ZEVRPNInputModule::AddNewDevice(const ZEString& Name, const ZEString& URL, const ZEInputDeviceDescription& Description)
 {
 	ZEInputDeviceDescription NewDescription = Description;
@@ -65,5 +70,4 @@ void ZEVRPNInputModule::Process()
 	const ZEArray<ZEInputDevice*> Devices = GetDevices();
 	for (ZESize I = 0; I < Devices.GetSize(); I++)
 		((ZEVRPNInputModule*)Devices[I])->Process();
-
 }
