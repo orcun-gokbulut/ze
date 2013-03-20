@@ -54,7 +54,7 @@
 
 inline ZEQuaternion XSENS_TO_ZE_QUAD(const CmtQuat& Quaternion)
 {
-	return ZEQuaternion(Quaternion.m_data[0], Quaternion.m_data[1], Quaternion.m_data[2], Quaternion.m_data[3]).Normalize();	
+	return ZEQuaternion(-Quaternion.m_data[3], Quaternion.m_data[1], -Quaternion.m_data[0], Quaternion.m_data[2]).Normalize();	
 }
 
 bool ZEXSensInputDevice::InitializeSelf()
@@ -68,14 +68,15 @@ bool ZEXSensInputDevice::InitializeSelf()
 
 	if (XSensDevice.getDeviceId(1,XSensDeviceId) != XRV_OK)
 		return false;
+
 	if (XSensDevice.gotoConfig() != XRV_OK)
 		return false;
 	
-	CmtDeviceMode DeviceMode(CMT_OUTPUTMODE_ORIENT, CMT_OUTPUTSETTINGS_ORIENTMODE_QUATERNION, XSensDevice.getSampleFrequency());
+	CmtDeviceMode DeviceMode(CMT_OUTPUTMODE_ORIENT, CMT_OUTPUTSETTINGS_ORIENTMODE_QUATERNION, 30);
 	if (XSensDevice.setDeviceMode(DeviceMode, true, XSensDeviceId) != XRV_OK)
 		return false;
 
-	Description.Type = ZE_IDT_KEYBOARD;
+	Description.Type = ZE_IDT_SENSOR;
 	Description.FullName = "xsens";
 	Description.Sink = true;
 	Description.SinkName = "sensor";
@@ -89,8 +90,11 @@ bool ZEXSensInputDevice::InitializeSelf()
 	State.Initialize(Description);
 	State.Reset();
 
-	XSensPacket = new xsens::Packet((unsigned short)1, XSensDevice.isXm());
-	XSensDevice.gotoMeasurement();
+	if (XSensPacket == NULL)
+		XSensPacket = new xsens::Packet((unsigned short)1, XSensDevice.isXm());
+
+	if (XSensDevice.gotoMeasurement() != XRV_OK)
+		return false;
 
 	return true;
 }
@@ -107,12 +111,16 @@ bool ZEXSensInputDevice::DeinitializeSelf()
 
 	return ZEInputDevice::DeinitializeSelf();
 }
+
 void ZEXSensInputDevice::Process()
 {
 	State.Advance();
 		
-	if (XSensDevice.readDataPacket(XSensPacket) == XRV_OK)
+	while (XSensDevice.readDataPacket(XSensPacket) == XRV_OK)
+	{
 		State.Quaternions.CurrentValues[0] = XSENS_TO_ZE_QUAD(XSensPacket->getOriQuat());
+		zeLog("w: %f, x: %f, y: %f, z: %f", State.Quaternions.CurrentValues[0].w, State.Quaternions.CurrentValues[0].z, State.Quaternions.CurrentValues[0].y, State.Quaternions.CurrentValues[0].z);
+	}
 }
 
 ZEXSensInputDevice::ZEXSensInputDevice()
