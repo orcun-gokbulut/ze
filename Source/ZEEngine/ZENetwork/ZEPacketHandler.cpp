@@ -45,12 +45,12 @@ ZEInt16 ZEPacketHandler::GetHandlerId() const
 	return HandlerId;
 }
 
-void ZEPacketHandler::SetCallback(const ZECommandCallback& Callback)
+void ZEPacketHandler::SetCallback(const ZENetworkCommandCallback& Callback)
 {
 	this->Callback = Callback;
 }
 
-const ZECommandCallback& ZEPacketHandler::GetCallback() const
+const ZENetworkCommandCallback& ZEPacketHandler::GetCallback() const
 {
 	return Callback;
 }
