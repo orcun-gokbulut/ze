@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEVirtualInputMouseDevice.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,17 +30,37 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEVirtualInputMouseDevice.h"
+#include "ZEDS\ZEHashGenerator.h"
+#include "ZEDS\ZEFormat.h"
 
-ze_add_source(ZEVirtualInputKeyboardDevice.cpp		Sources)
-ze_add_source(ZEVirtualInputKeyboardDevice.h		Sources)
-ze_add_source(ZEVirtualInputMouseDevice.cpp			Sources)
-ze_add_source(ZEVirtualInputMouseDevice.h			Sources)
-ze_add_source(ZEVirtualInputModule.cpp				Sources)
-ze_add_source(ZEVirtualInputModule.h				Sources)
+void ZEVirtualInputMouseDevice::UnAcquire()
+{
+	State.Reset();
+}
 
-ze_add_library(ZEVirtualInput 
-	SOURCES ${Sources})
+bool ZEVirtualInputMouseDevice::InitializeSelf()
+{	
+	if (!ZEInputDevice::InitializeSelf())
+		return false;
+
+	Description.Type = ZE_IDT_MOUSE;
+	Description.Sink = true;
+	Description.SinkName = "Mouse";
+	Description.SinkNameHash = ZEHashGenerator::Hash(Description.SinkName);
+	Description.AxisCount = 3;
+	Description.ButtonCount = 5;
+
+	Description.Index = ZEInputDeviceIndexes::GetNewDeviceIndex(ZE_IDT_MOUSE);
+	Description.Name = ZEFormat::Format("Mouse{0:d:02}", Description.Index);
+	Description.NameHash = ZEHashGenerator::Hash(Description.Name);
+	Description.FullName = "Mouse";
+
+	State.Initialize(Description);
+	State.Reset();
+
+	return true;
+}
