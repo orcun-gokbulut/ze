@@ -40,6 +40,81 @@ CompilerInstance* ZEMetaProcessorInternal::Compiler;
 ZEMetaData*	ZEMetaProcessorInternal::MetaData;
 ZEMetaCompilerOptions ZEMetaProcessorInternal::Options;
 
+static ZEMetaGeneratorOperatorType GetOperatorType(OverloadedOperatorKind OperatorKind)
+{
+	switch(OperatorKind)
+	{
+		case OO_Plus:
+			return ZE_MGOT_PLUS;
+		case OO_PlusEqual:
+			return ZE_MGOT_PLUSEQUAL;
+		case OO_PlusPlus:
+			return ZE_MGOT_PLUSPLUS;
+		case OO_Minus:
+			return ZE_MGOT_MINUS;
+		case OO_MinusEqual:
+			return ZE_MGOT_MINUSEQUAL;
+		case OO_MinusMinus:
+			return ZE_MGOT_MINUSMINUS;
+		case OO_Star:
+			return ZE_MGOT_STAR;
+		case OO_StarEqual:
+			return ZE_MGOT_STAREQUAL;
+		case OO_Slash:
+			return ZE_MGOT_SLASH;
+		case OO_SlashEqual:
+			return ZE_MGOT_SLASHEQUAL;
+		case OO_Percent:
+			return ZE_MGOT_PERCENT;
+		case OO_PercentEqual:
+			return ZE_MGOT_PERCENTEQUAL;
+		case OO_Amp:
+			return ZE_MGOT_AMP;
+		case OO_AmpEqual:
+			return ZE_MGOT_AMPEQUAL;
+		case OO_AmpAmp:
+			return ZE_MGOT_AMPAMP;
+		case OO_Pipe:
+			return ZE_MGOT_PIPE;
+		case OO_PipeEqual:
+			return ZE_MGOT_PIPEEQUAL;
+		case OO_PipePipe:
+			return ZE_MGOT_PIPEPIPE;
+		case OO_Caret:
+			return ZE_MGOT_CARET;
+		case OO_CaretEqual:
+			return ZE_MGOT_CARETEQUAL;
+		case OO_Equal:
+			return ZE_MGOT_EQUAL;
+		case OO_EqualEqual:
+			return ZE_MGOT_EQUALEQUAL;
+		case OO_ExclaimEqual:
+			return ZE_MGOT_EXCLAIMEQUAL;
+		case OO_Less:
+			return ZE_MGOT_LESS;
+		case OO_LessEqual:
+			return ZE_MGOT_LESSEQUAL;
+		case OO_LessLess:
+			return ZE_MGOT_LESSLESS;
+		case OO_LessLessEqual:
+			return ZE_MGOT_LESSLESSEQUAL;
+		case OO_Greater:
+			return ZE_MGOT_GREATER;
+		case OO_GreaterEqual:
+			return ZE_MGOT_GREATEREQUAL;
+		case OO_GreaterGreater:
+			return ZE_MGOT_GREATERGREATER;
+		case OO_GreaterGreaterEqual:
+			return ZE_MGOT_GREATERGREATEREQUAL;
+		case OO_Call:
+			return ZE_MGOT_CALL;
+		case OO_Subscript:
+			return ZE_MGOT_SUBSCRIPT;
+		default:
+			return ZE_MGOT_UNDEFINED;
+	}
+}
+
 void ZEMetaProcessorInternal::RaiseNote(SourceLocation& Location, const char* WarningText)
 {
 	FullSourceLoc FullLocation(Location, Compiler->getSourceManager());
@@ -311,6 +386,11 @@ ZEMetaType ProcessInnerType(ZEString MainClassName, const Type* ClangType)
 			TempType.Type = ZE_MTT_OBJECT_PTR;
 			TempType.ClassData->Name = ClassPtr->getNameAsString();
 
+			if(ZEMetaProcessorInternal::CheckClass(ClassPtr))
+				return TempType;
+			else
+				return ZEMetaType();
+
 			if(ClassPtr->isCompleteDefinition())
 			{
 				if(TempType.ClassData->Name == "ZEEvent")
@@ -318,10 +398,6 @@ ZEMetaType ProcessInnerType(ZEString MainClassName, const Type* ClangType)
 					TempType.Type = ZE_MTT_CLASS;
 					return TempType;
 				}
-				if(ZEMetaProcessorInternal::CheckClass(ClassPtr))
-					return TempType;
-				else
-					return ZEMetaType();
 			}
 			else
 			{
@@ -410,8 +486,13 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 		if (CanonicalType->getPointeeType()->isClassType())
 		{
 			TempType.Type = ZE_MTT_OBJECT_PTR;
-			TempType.TypeQualifier = ZE_MTQ_REFERENCE;
+			TempType.TypeQualifier = CanonicalType->getPointeeType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
 			TempType.ClassData->Name = CanonicalType.getBaseTypeIdentifier()->getName().str();
+
+			if(ZEMetaProcessorInternal::CheckClass(CanonicalType->getPointeeType()->getAsCXXRecordDecl()))
+				return TempType;
+			else
+				return ZEMetaType();
 
 			CXXRecordDecl* ClassPtr = ClangType->getPointeeType().getTypePtr()->getAsCXXRecordDecl();
 			
@@ -1138,6 +1219,10 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 	if(Method->isPure())
 		ClassData->IsAbstract = true;
 
+	bool IsOperatorFound = false;
+	if(Method->isOverloadedOperator())
+		IsOperatorFound = true;
+
 	if(Method->getAccess() != AccessSpecifier::AS_public)
 		return;
 
@@ -1147,20 +1232,11 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 	if(Method->getCanonicalDecl()->isCopyAssignmentOperator())
 		return;
 
-	if(ClassData->IsBuiltInClass)
-	{
-		if(!Method->isStatic())
-			return;
-	}
-
 	if(isa<CXXDestructorDecl>(Method))
 		return;
 
 	if(isa<CXXConstructorDecl>(Method))
-	{
 		ClassData->HasPublicConstructor = true;
-		return;
-	}
 
 	ZEMetaType ReturnType = ProcessType(ClassData->Name, Method->getResultType());
 	if (ReturnType.Type == ZE_MTT_UNDEFINED)
@@ -1253,8 +1329,6 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 			}
 
 			ClassData->Properties.Add(PropertyData);
-
-			return;
 		}
 		else
 		{
@@ -1262,17 +1336,19 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 				ClassData->Properties[FoundPropertyIndex]->Setter = MethodName;
 			else if(MethodName.SubString(0, 2) == "Get")
 				ClassData->Properties[FoundPropertyIndex]->Getter = MethodName;
-
-			return;
 		}
 	}
 
 	ZEMethodData* MethodData = new ZEMethodData();
 	MethodData->Name = MethodName;
+	MethodData->IsOperator = IsOperatorFound;
 	MethodData->IsStatic = Method->isStatic();
 	MethodData->IsEvent = false;
 	MethodData->Hash = MethodData->Name.Hash();
 	MethodData->ReturnParameter.Type = ReturnType;
+
+	if(IsOperatorFound)
+		MethodData->OperatorType = GetOperatorType(Method->getOverloadedOperator());
 
 	if(MethodData->ReturnParameter.Type.Type == ZE_MTT_ENUMERATOR)
 	{

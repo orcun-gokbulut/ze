@@ -49,24 +49,24 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 
 	for(ZESize I = 0; I < Options.RegisterFiles.GetCount(); I++)
 	{
-		FILE* File;
-		File = fopen(Options.RegisterFiles[I].ToCString(), "r");
+		FILE* RegisterFile;
+		RegisterFile = fopen(Options.RegisterFiles[I].ToCString(), "r");
 
-		if(File == NULL)
+		if(RegisterFile == NULL)
 			zeError("Error! Register file is not found!");
 
-		fseek(File, 0, SEEK_END);
-		unsigned int FileLength = ftell(File);
-		fseek(File, 0, SEEK_SET);
+		fseek(RegisterFile, 0, SEEK_END);
+		unsigned int FileLength = ftell(RegisterFile);
+		fseek(RegisterFile, 0, SEEK_SET);
 
 		ZEArray<ZEInt8> Buffer;
 		Buffer.SetCount(FileLength);
-		ZESize BytesRead = fread(Buffer.GetCArray(), 1, FileLength, File);
+		ZESize BytesRead = fread(Buffer.GetCArray(), 1, FileLength, RegisterFile);
 
 		if (BytesRead != FileLength)
 			zeError("Error! Can not read register file!");
 
-		fclose(File);
+		fclose(RegisterFile);
 
 		ZEString Context = (char*)Buffer.GetConstCArray();
 		ZESize Index = 0;
@@ -92,10 +92,10 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 	ZEString ClassCollectionName = Options.ClassCollectionName;
 	ZEString ClassCollectionHeader = Options.ClassCollectionHeaderFile;
 
-	FILE* File;
-	File = fopen(ClassCollectionHeader.ToCString(), "w");
+	FILE* ClassCollectionHeaderFile;
+	ClassCollectionHeaderFile = fopen(ClassCollectionHeader.ToCString(), "w");
 
-	fprintf(File,
+	fprintf(ClassCollectionHeaderFile,
 		"#pragma once\n"
 		"#include \"ZEMeta/ZEMetaRegister.h\"\n\n"
 		"class %s : public ZEMetaRegister\n"
@@ -110,21 +110,22 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 		ClassCollectionName.ToCString(), 
 		ClassCollectionName.ToCString());
 
-	fclose(File);
+	fclose(ClassCollectionHeaderFile);
 
 	ZEString ClassCollectionCpp = Options.ClassCollectionSourceFile;
 
-	File = fopen(ClassCollectionCpp.ToCString(), "w");
+	FILE* ClassCollectionSourceFile;
+	ClassCollectionSourceFile = fopen(ClassCollectionCpp.ToCString(), "w");
 
-	fprintf(File, "#include \"%s\"\n", ClassCollectionHeader.ToCString());
+	fprintf(ClassCollectionSourceFile, "#include \"%s\"\n", ClassCollectionHeader.ToCString());
 
 	for(ZESize I = 0; I < RegisteredClasses.GetCount(); I++)
 	{
 		if(!RegisteredClasses[I].IncludeDirectory.IsEmpty())
-			fprintf(File, "#include \"%s\"\n", RegisteredClasses[I].IncludeDirectory.ToCString());
+			fprintf(ClassCollectionSourceFile, "#include \"%s\"\n", RegisteredClasses[I].IncludeDirectory.ToCString());
 	}
 
-	fprintf(File,
+	fprintf(ClassCollectionSourceFile,
 		"\n"
 		"ZEClass** %s::GetClasses()\n"
 		"{\n"
@@ -134,26 +135,27 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 	for(ZESize I = 0; I < RegisteredClasses.GetCount(); I++)
 	{
 		if(!RegisteredClasses[I].RegisteredClassName.IsEmpty())
-			fprintf(File, "\t\t%s::Class()%s\n", RegisteredClasses[I].RegisteredClassName.ToCString(), I < RegisteredClasses.GetCount() - 1 ? "," : "");
+			fprintf(ClassCollectionSourceFile, "\t\t%s::Class()%s\n", RegisteredClasses[I].RegisteredClassName.ToCString(), I < RegisteredClasses.GetCount() - 1 ? "," : "");
 	}
 
-	fprintf(File,
+	fprintf(ClassCollectionSourceFile,
 		"\t};\n\n"
 		"\treturn Classes;\n"
 		"};\n\n");
 
-	fprintf(File,
+	fprintf(ClassCollectionSourceFile,
 		"ZESize %s::GetClassCount()\n"
 		"{\n"
 		"\treturn %d;\n"
 		"}\n\n", ClassCollectionName.ToCString(), RegisteredClasses.GetCount());
 
-	fprintf(File,
+	fprintf(ClassCollectionSourceFile,
 		"%s* %s::GetInstance()\n"
 		"{\n"
 		"\tstatic %s Collection;\n"
 		"\treturn &Collection;\n"
 		"}\n\n", ClassCollectionName.ToCString(), ClassCollectionName.ToCString(), ClassCollectionName.ToCString());
 
+	fclose(ClassCollectionSourceFile);
 }
 
