@@ -141,7 +141,7 @@ class ZESoundSource : public ZEEntity
 
 		ZESize						GetEndPosition() const;
 		float						GetEndPositionTime() const;
-		float						GetEndPositionPersentage() const;
+		float						GetEndPositionPercentage() const;
 
 		virtual void				SetLooping(bool Enabled) = 0;
 		bool						GetLooping() const;

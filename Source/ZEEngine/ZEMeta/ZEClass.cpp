@@ -99,6 +99,16 @@ bool ZEClass::GetProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Va
 	return false;
 }
 
+ZESize ZEClass::GetPropertyOffset(ZESize PropertyId)
+{
+	return 0;
+}
+
+ZESize ZEClass::GetPropertyOffset(ZEString PropertyName)
+{
+	return 0;
+}
+
 bool ZEClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)
 {
 	return false;

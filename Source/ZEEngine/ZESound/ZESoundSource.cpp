@@ -301,7 +301,7 @@ float ZESoundSource::GetEndPositionTime() const
 		return 0;
 }
 
-float ZESoundSource::GetEndPositionPersentage() const
+float ZESoundSource::GetEndPositionPercentage() const
 {
 	if (SoundResource != NULL)
 		return ((float)EndPosition / SoundResource->GetSampleCount()) * 100.0f;

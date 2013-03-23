@@ -100,8 +100,10 @@ class ZEObject
 			virtual ZESize					GetPropertyCount(); \
 			virtual const ZEMethod*			GetMethods(); \
 			virtual ZESize					GetMethodCount(); \
-			ZESize							GetPropertyId(ZEString PropertyName); \
-			ZESize							GetMethodId(ZEString MethodName, ZESize OverloadIndex = 0); \
+			virtual ZESize					GetPropertyId(ZEString PropertyName); \
+			virtual ZESize					GetMethodId(ZEString MethodName, ZESize OverloadIndex = 0); \
+			virtual ZESize					GetPropertyOffset(ZESize PropertyId); \
+			virtual ZESize					GetPropertyOffset(ZEString PropertyName); \
 			virtual bool					SetProperty(ZEObject* Object, ZESize PropertyId, const ZEVariant& Value); \
 			bool							SetProperty(ZEObject* Object, ZEString PropertyName, const ZEVariant& Value); \
 			virtual bool					GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value); \
