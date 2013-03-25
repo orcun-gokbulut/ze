@@ -36,6 +36,8 @@
 #include "ZETexture.h"
 #include "ZEGraphicsModule.h"
 
+ZE_OBJECT_IMPL(ZETexture)
+
 ZETexture::ZETexture()
 {
 

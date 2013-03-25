@@ -35,6 +35,8 @@
 
 #include "ZEClass.h"
 #include "ZEObject.h"
+#include "ZEDS/ZEVariant.h"
+#include "ZEReference.h"
 
 ZEClass* ZEClass::GetParentClass()
 {

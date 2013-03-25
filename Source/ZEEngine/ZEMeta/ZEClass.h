@@ -42,13 +42,12 @@
 #include "ZEMethod.h"
 #include "ZEEnum.h"
 #include "ZETypes.h"
-#include "ZEDS/ZEValue.h"
-#include "ZEVariant.h"
 #include "ZEGUID.h"
-#include "ZEReference.h"
 
 class ZEObject;
 class ZEEventHandlerBase;
+class ZEVariant;
+class ZEReference;
 
 class ZEClass
 {

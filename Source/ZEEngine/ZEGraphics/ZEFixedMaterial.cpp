@@ -50,6 +50,8 @@
 #include "ZEFile/ZEPathUtils.h"
 #include "ZEFile/ZEFileInfo.h"
 
+ZE_OBJECT_IMPL(ZEFixedMaterial)
+
 ZEFixedMaterial::ZEFixedMaterial()
 {
 	BaseMapResource = NULL;
@@ -1332,11 +1334,16 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 
 				ZEString Path = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + CurrentProperty->GetValue().GetString();
 				ZEValue TempVar(Path);
-				SetProperty(Props[I]->GetName(), TempVar);
+				this->Class()->SetProperty(this, Props[I]->GetName(), ZEVariant(Path));
 			}
 
 			else if(CurrentProperty->GetValue().GetType() != ZE_VRT_STRING)
-				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
+			{
+				ZEString PropertyName = Props[I]->GetName();
+				ZEVariant Variant = CurrentProperty->GetValue();
+
+				this->Class()->SetProperty(this, Props[I]->GetName(), ZEVariant(CurrentProperty->GetValue()));
+			}
 		}
 	}
 

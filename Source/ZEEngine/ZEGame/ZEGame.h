@@ -52,16 +52,6 @@ enum ZEGameType
 
 class ZEGame;
 
-class ZEGameDescription
-{
-	public:
-		virtual const char*				GetGameName() = 0;
-		virtual ZEGameType				GetGameType() = 0;
-		virtual ZEInt					GetGameVersion() = 0;
-		virtual const char*				GetCopyright() = 0;
-		virtual ZEGame*					CreateGameInstance() = 0;
-};
-
 ZE_META_FORWARD_DECLARE(ZEUIManager, "ZEUI/ZEUIManager.h")
 
 ZE_CLASS(ZEGame)
@@ -75,8 +65,6 @@ class ZEGame : public ZEObject
 
 	public:
 		ZEUIManager*					UIManager;
-
-		virtual ZEGameDescription*		GetGameDescription();
 
 		virtual ZEScene*				GetScene();
 		

@@ -38,7 +38,7 @@
 #include "ZEMetaGenerator.h"
 #include "ZEMeta/ZEMetaAttribute.h"
 #include "ZEDS/ZEList.h"
-#include "ZEMeta/ZEType.h"
+#include "ZEDS/ZEType.h"
 #include "ZEMeta/ZEClass.h"
 #include "ZEFile/ZEFileInfo.h"
 
@@ -1801,67 +1801,66 @@ static void CreateSetPropertyItemMethod(FILE* File, const char* ClassName, ZEArr
 		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n", ClassName);
 
-	if(Properties.GetCount() > 0)
+	bool IsArrayFound = false;
+
+	for(ZESize I = 0; I < Properties.GetCount(); I++)
+	{
+		if((Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED) || Properties[I]->IsContainer)
+		{
+			IsArrayFound = true;
+			break;
+		}
+	}
+
+	if(IsArrayFound)
 	{
 		fprintf(File,
 			"\tswitch(PropertyId)\n"
 			"\t{\n");
-	}
 
-	for(ZESize I = 0; I < Properties.GetCount(); I++)
-	{
-		if(Properties[I]->IsGeneratedByMetaCompiler)
+		for(ZESize I = 0; I < Properties.GetCount(); I++)
 		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\treturn false;\n", I);
-		}
-		else if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
-		{
-			if(Properties[I]->Type.SubType != ZE_TT_OBJECT_PTR)
-			{
-				ZEString VariantType = ReturnVariantType(Properties[I]->Type.SubType);
+			if(Properties[I]->IsGeneratedByMetaCompiler)	
+				continue;
 
-				fprintf(File, 
-					"\t\tcase %d:\n"
-					"\t\t\t((%s*)Object)->%s[Index] = Value.Get%s%s();\n"
-					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), VariantType.ToCString(),
-					Properties[I]->Type.SubTypeQualifier == ZE_MTQ_CONST_REFERENCE ? "Const" : "");
-			}
-			else
+			if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
 			{
-				fprintf(File, 
-					"\t\tcase %d:\n"
-					"\t\t\t((%s*)Object)->%s[Index] = ((%s*)Value.GetObjectPtr());\n"
-					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), Properties[I]->Type.SubTypeClassName.ToCString());
-			}
-		}
-		else if(Properties[I]->IsContainer)
-		{
-			if(Properties[I]->Type.SubType != ZE_TT_OBJECT_PTR)
-			{
-				fprintf(File, 
-					"\t\tcase %d:\n"
-					"\t\t\treturn false;\n", I);
-			}
-			else
-			{
-				fprintf(File, 
-					"\t\tcase %d:\n"
-					"\t\t\t((%s*)Object)->%s->SetItem(Index, ((%s*)Value.GetObjectPtr()));\n"
-					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), Properties[I]->Type.SubTypeClassName.ToCString());
-			}
-		}
-		else
-		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\treturn false;\n", I);
-		}
-	}
+				if(Properties[I]->Type.SubType != ZE_TT_OBJECT_PTR)
+				{
+					ZEString VariantType = ReturnVariantType(Properties[I]->Type.SubType);
 
-	if(Properties.GetCount() > 0)
-	{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\t((%s*)Object)->%s[Index] = Value.Get%s%s();\n"
+						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), VariantType.ToCString(),
+						Properties[I]->Type.SubTypeQualifier == ZE_MTQ_CONST_REFERENCE ? "Const" : "");
+				}
+				else
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\t((%s*)Object)->%s[Index] = ((%s*)Value.GetObjectPtr());\n"
+						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), Properties[I]->Type.SubTypeClassName.ToCString());
+				}
+			}
+			else if(Properties[I]->IsContainer)
+			{
+				if(Properties[I]->Type.SubType != ZE_TT_OBJECT_PTR)
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\treturn false;\n", I);
+				}
+				else
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\t((%s*)Object)->%s->SetItem(Index, ((%s*)Value.GetObjectPtr()));\n"
+						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), Properties[I]->Type.SubTypeClassName.ToCString());
+				}
+			}
+		}
+
 		fprintf(File, 
 			"\t\tdefault:\n"
 			"\t\t\treturn false;\n"
@@ -1891,54 +1890,54 @@ static void CreateGetPropertyItemMethod(FILE* File, const char* ClassName, ZEArr
 		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n", ClassName);
 
-	if(Properties.GetCount() > 0)
+	bool IsArrayFound = false;
+
+	for(ZESize I = 0; I < Properties.GetCount(); I++)
+	{
+		if((Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED) || Properties[I]->IsContainer)
+		{
+			IsArrayFound = true;
+			break;
+		}
+	}
+
+	if(IsArrayFound)
 	{
 		fprintf(File,
 			"\tswitch(PropertyId)\n"
 			"\t{\n");
-	}
 
-	for(ZESize I = 0; I < Properties.GetCount(); I++)
-	{
-		if(Properties[I]->IsGeneratedByMetaCompiler)
+		for(ZESize I = 0; I < Properties.GetCount(); I++)
 		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\treturn false;\n", I);
-		}
-		else if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
-		{
-			if(Properties[I]->Type.SubTypeQualifier == ZE_TQ_REFERENCE)
+			if(Properties[I]->IsGeneratedByMetaCompiler)
+				continue;
+
+			if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
 			{
-				fprintf(File, 
-					"\t\tcase %d:\n"
-					"\t\t\tValue = ((%s*)((%s*)Object)->%s[Index]);\n"
-					"\t\t\treturn true;\n", I, Properties[I]->Type.SubTypeClassName.ToCString(), ClassName, Properties[I]->Name.ToCString());
+				if(Properties[I]->Type.SubTypeQualifier == ZE_TQ_REFERENCE)
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\tValue = ((%s*)((%s*)Object)->%s[Index]);\n"
+						"\t\t\treturn true;\n", I, Properties[I]->Type.SubTypeClassName.ToCString(), ClassName, Properties[I]->Name.ToCString());
+				}
+				else
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\tValue = ((%s*)Object)->%s[Index];\n"
+						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
+				}
 			}
-			else
+			else if(Properties[I]->IsContainer)
 			{
 				fprintf(File, 
 					"\t\tcase %d:\n"
-					"\t\t\tValue = ((%s*)Object)->%s[Index];\n"
+					"\t\t\t((%s*)Object)->%s->GetItem(Index, Value.GetObjectPtrRef());\n"
 					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
 			}
 		}
-		else if(Properties[I]->IsContainer)
-		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\t((%s*)Object)->%s->GetItem(Index, Value.GetObjectPtrRef());\n"
-				"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
-		}
-		else
-		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\treturn false;\n", I);
-		}
-	}
-	if(Properties.GetCount() > 0)
-	{
+
 		fprintf(File, 
 			"\t\tdefault:\n"
 			"\t\t\treturn false;\n"
@@ -1968,50 +1967,50 @@ static void CreateAddItemToPropertyMethod(FILE* File, const char* ClassName, ZEA
 		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n", ClassName);
 
-	if(Properties.GetCount() > 0)
+	bool IsArrayFound = false;
+
+	for(ZESize I = 0; I < Properties.GetCount(); I++)
+	{
+		if((Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED) || Properties[I]->IsContainer)
+		{
+			IsArrayFound = true;
+			break;
+		}
+	}
+
+	if(IsArrayFound)
 	{
 		fprintf(File,
 			"\tswitch(PropertyId)\n"
 			"\t{\n");
-	}
 
-	for(ZESize I = 0; I < Properties.GetCount(); I++)
-	{
-		if(Properties[I]->IsGeneratedByMetaCompiler)
+		for(ZESize I = 0; I < Properties.GetCount(); I++)
 		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\treturn false;\n", I);
-		}
-		else if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
-		{
-			if(Properties[I]->Type.SubType != ZE_TT_OBJECT_PTR)
-			{
-				ZEString VariantType = ReturnVariantType(Properties[I]->Type.SubType);
+			if(Properties[I]->IsGeneratedByMetaCompiler)
+				continue;
 
-				fprintf(File, 
-					"\t\tcase %d:\n"
-					"\t\t\t((%s*)Object)->%s.Add(Value.Get%s%s());\n"
-					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), VariantType.ToCString(),
-					Properties[I]->Type.SubTypeQualifier == ZE_MTQ_CONST_REFERENCE ? "Const" : "");
-			}
-			else
+			if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
 			{
-				fprintf(File, 
-					"\t\tcase %d:\n"
-					"\t\t\t((%s*)Object)->%s.Add(((%s*)Value.GetObjectPtr()));\n"
-					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), Properties[I]->Type.SubTypeClassName.ToCString());
+				if(Properties[I]->Type.SubType != ZE_TT_OBJECT_PTR)
+				{
+					ZEString VariantType = ReturnVariantType(Properties[I]->Type.SubType);
+
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\t((%s*)Object)->%s.Add(Value.Get%s%s());\n"
+						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), VariantType.ToCString(),
+						Properties[I]->Type.SubTypeQualifier == ZE_MTQ_CONST_REFERENCE ? "Const" : "");
+				}
+				else
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\t((%s*)Object)->%s.Add(((%s*)Value.GetObjectPtr()));\n"
+						"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), Properties[I]->Type.SubTypeClassName.ToCString());
+				}
 			}
 		}
-		else
-		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\treturn false;\n", I);
-		}
-	}
-	if(Properties.GetCount() > 0)
-	{
+
 		fprintf(File, 
 			"\t\tdefault:\n"
 			"\t\t\treturn false;\n"
@@ -2041,47 +2040,43 @@ static void CreateAddItemToPropertyWithIndexMethod(FILE* File, const char* Class
 		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n", ClassName);
 
-	if(Properties.GetCount() > 0)
+	bool IsContainerFound = false;
+
+	for(ZESize I = 0; I < Properties.GetCount(); I++)
+	{
+		if(Properties[I]->IsContainer)
+		{
+			IsContainerFound = true;
+			break;
+		}
+	}
+
+	if(IsContainerFound)
 	{
 		fprintf(File,
 			"\tswitch(PropertyId)\n"
 			"\t{\n");
-	}
 
-	for(ZESize I = 0; I < Properties.GetCount(); I++)
-	{
-		if(Properties[I]->IsGeneratedByMetaCompiler)
+		for(ZESize I = 0; I < Properties.GetCount(); I++)
 		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\treturn false;\n", I);
-		}
-		else if(Properties[I]->IsContainer)
-		{
-			if(Properties[I]->Type.SubType != ZE_TT_CLASS)
+			if(Properties[I]->IsGeneratedByMetaCompiler)
 			{
 				fprintf(File, 
 					"\t\tcase %d:\n"
 					"\t\t\treturn false;\n", I);
 			}
-			else
+			else if(Properties[I]->IsContainer)
 			{
+				if(Properties[I]->Type.SubType != ZE_TT_CLASS)
+					continue;
+
 				fprintf(File, 
 					"\t\tcase %d:\n"
 					"\t\t\t((%s*)Object)->%s->Insert(Index, ((%s*)Value.GetObjectPtr()));\n"
 					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString(), Properties[I]->Type.SubTypeClassName.ToCString());
 			}
 		}
-		else
-		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\treturn false;\n", I);
-		}
-	}
 
-	if(Properties.GetCount() > 0)
-	{
 		fprintf(File, 
 			"\t\tdefault:\n"
 			"\t\t\treturn false;\n"
@@ -2111,45 +2106,44 @@ static void CreateRemoveItemFromPropertyWithIndexMethod(FILE* File, const char* 
 		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n", ClassName);
 
-	if(Properties.GetCount() > 0)
+	bool IsArrayFound = false;
+
+	for(ZESize I = 0; I < Properties.GetCount(); I++)
+	{
+		if((Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED) || Properties[I]->IsContainer)
+		{
+			IsArrayFound = true;
+			break;
+		}
+	}
+
+	if(IsArrayFound)
 	{
 		fprintf(File,
 			"\tswitch(PropertyId)\n"
 			"\t{\n");
-	}
 
-	for(ZESize I = 0; I < Properties.GetCount(); I++)
-	{
-		if(Properties[I]->IsGeneratedByMetaCompiler)
+		for(ZESize I = 0; I < Properties.GetCount(); I++)
 		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\treturn false;\n", I);
-		}
-		else if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
-		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\t((%s*)Object)->%s.DeleteAt(Index);\n"
-				"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
-		}
-		else if(Properties[I]->IsContainer)
-		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\t((%s*)Object)->%s->Remove(Index);\n"
-				"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
-		}
-		else
-		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\treturn false;\n", I);
-		}
-	}
+			if(Properties[I]->IsGeneratedByMetaCompiler)
+				continue;
 
-	if(Properties.GetCount() > 0)
-	{
+			if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
+			{
+				fprintf(File, 
+					"\t\tcase %d:\n"
+					"\t\t\t((%s*)Object)->%s.DeleteAt(Index);\n"
+					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
+			}
+			else if(Properties[I]->IsContainer)
+			{
+				fprintf(File, 
+					"\t\tcase %d:\n"
+					"\t\t\t((%s*)Object)->%s->Remove(Index);\n"
+					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
+			}
+		}
+
 		fprintf(File, 
 			"\t\tdefault:\n"
 			"\t\t\treturn false;\n"
@@ -2179,45 +2173,44 @@ static void CreateGetPropertyItemCountMethod(FILE* File, const char* ClassName, 
 		"\tif(Properties[PropertyId].Name == \"\" || Properties[PropertyId].Name == NULL)\n"
 		"\t\treturn false;\n\n", ClassName);
 
-	if(Properties.GetCount() > 0)
+	bool IsArrayFound = false;
+
+	for(ZESize I = 0; I < Properties.GetCount(); I++)
+	{
+		if((Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED) || Properties[I]->IsContainer)
+		{
+			IsArrayFound = true;
+			break;
+		}
+	}
+
+	if(IsArrayFound)
 	{
 		fprintf(File,
 			"\tswitch(PropertyId)\n"
 			"\t{\n");
-	}
 
-	for(ZESize I = 0; I < Properties.GetCount(); I++)
-	{
-		if(Properties[I]->IsGeneratedByMetaCompiler)
+		for(ZESize I = 0; I < Properties.GetCount(); I++)
 		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\treturn false;\n", I);
-		}
-		else if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
-		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\tCount = ((%s*)Object)->%s.GetCount();\n"
-				"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
-		}
-		else if(Properties[I]->IsContainer)
-		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\tCount = ((%s*)Object)->%s->GetCount();\n"
-				"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
-		}
-		else
-		{
-			fprintf(File, 
-				"\t\tcase %d:\n"
-				"\t\t\treturn false;\n", I);
-		}
-	}
+			if(Properties[I]->IsGeneratedByMetaCompiler)
+				continue;
 
-	if(Properties.GetCount() > 0)
-	{
+			if(Properties[I]->Type.Type == ZE_TT_ARRAY && Properties[I]->Type.SubType != ZE_TT_UNDEFINED)
+			{
+				fprintf(File, 
+					"\t\tcase %d:\n"
+					"\t\t\tCount = ((%s*)Object)->%s.GetCount();\n"
+					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
+			}
+			else if(Properties[I]->IsContainer)
+			{
+				fprintf(File, 
+					"\t\tcase %d:\n"
+					"\t\t\tCount = ((%s*)Object)->%s->GetCount();\n"
+					"\t\t\treturn true;\n", I, ClassName, Properties[I]->Name.ToCString());
+			}
+		}
+
 		fprintf(File, 
 			"\t\tdefault:\n"
 			"\t\t\treturn false;\n"
@@ -2677,6 +2670,118 @@ static void CreateZEClassImplementation(FILE* File, const char* ClassName, bool 
 	}
 }
 
+static void CreateBuiltInClassImplementation(FILE* File, const char* ClassName)
+{
+	fprintf(File, 
+		"ZEClass* %sClass::GetParentClass()\n"
+		"{\n"
+		"\treturn NULL;\n"
+		"}\n"
+		"\n"
+		"ZEGUID %sClass::GetGUID();\n"
+		"{\n"
+		"\treturn ZEGUID();\n"
+		"}\n"
+		"\n"
+		"const ZEMetaAttribute*	%sClass::GetAttributes()\n"
+		"{\n"
+		"\treturn NULL;\n"
+		"}\n"
+		"\n"
+		"ZESize %sClass::GetAttributeCount()\n"
+		"{\n"
+		"\treturn 0;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::GetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::SetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize Index)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::RemoveItemFromProperty(ZEObject* Object, ZEString PropertyName, ZESize Index)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& Count)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::GetPropertyItemCount(ZEObject* Object, ZEString PropertyName, ZESize& Count)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::AddEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::AddEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::RemoveEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"bool %sClass::RemoveEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler)\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		"ZEObject* %sClass::CreateInstance()\n"
+		"{\n"
+		"\treturn NULL;\n"
+		"}\n\n", 
+		ClassName, ClassName, ClassName, ClassName, ClassName, ClassName, ClassName,
+		ClassName, ClassName, ClassName, ClassName, ClassName, ClassName, ClassName, 
+		ClassName, ClassName, ClassName, ClassName, ClassName, ClassName, ClassName);
+}
+
 bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* Data)
 {
 	FILE* File;
@@ -2686,6 +2791,8 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 	if(((ZEClassData*)Data->TargetTypes.GetCount() > 0) && ((ZEClassData*)Data->TargetTypes.GetLastItem())->IsBuiltInClass == false)
 	{	
 		fprintf(File, "#include \"%s\"\n", ZEFileInfo::GetFileName(Options.InputFileName).ToCString());
+		fprintf(File, "#include \"ZEDS/ZEVariant.h\"\n");
+		fprintf(File, "#include \"ZEMeta/ZEReference.h\"\n");
 		fprintf(File, "#include <stddef.h>\n");
 
 		for(ZESize TargetIndex = 0; TargetIndex < Data->TargetTypes.GetCount(); TargetIndex++)
@@ -2870,6 +2977,8 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 	else if((ZEClassData*)Data->TargetTypes.GetCount() > 0)//If last item in array is builtin class type we compile all classes to seperate files in found header
 	{
 		fprintf(File, "#include \"%s\"\n", ZEFileInfo::GetFileName(Options.InputFileName).ToCString());
+		fprintf(File, "#include \"ZEDS/ZEVariant.h\"\n");
+		fprintf(File, "#include \"ZEMeta/ZEReference.h\"\n");
 		fprintf(File, "#include <stddef.h>\n\n");
 
 		for(ZESize TargetIndex = 0; TargetIndex < Data->TargetTypes.GetCount(); TargetIndex++)
@@ -2878,6 +2987,7 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 			const char* CurrentClassName = CurrentClassData->Name;
 
 			ZEArray<ZEMethodData*> Methods = ((ZEClassData*)CurrentClassData)->Methods;
+			ZEArray<ZEPropertyData*> Properties = ((ZEClassData*)CurrentClassData)->Properties;
 
 			for(ZESize I = 0; I < Methods.GetCount(); I++)
 			{
@@ -2887,17 +2997,33 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 
 			CreateGetNameMethod(File, CurrentClassName);
 
+			CreateGetPropertiesMethod(File, CurrentClassName, Properties);
+			CreateGetPropertyCountMethod(File, CurrentClassName, Properties.GetCount());
+
+			CreateGetPropertyOffsetMethod(File, CurrentClassName, Properties);
+			CreateGetPropertyOffsetMethod(File, CurrentClassName);
+
 			CreateMethodWrappers(File, CurrentClassName, false, Methods);
 
 			CreateGetMethodsMethod(File, CurrentClassName, false, Methods);
 			CreateGetMethodCountMethod(File, CurrentClassName, Methods.GetCount());
 
+			CreateSetPropertyMethod(File, CurrentClassName, Properties);
+			CreateSetPropertyMethod(File, CurrentClassName);
+
+			CreateGetPropertyMethod(File, CurrentClassName, Properties);
+			CreateGetPropertyMethod(File, CurrentClassName);
+
 			CreateCallMethodMethod(File, CurrentClassName, Methods);
 			CreateCallMethodMethod(File, CurrentClassName);
 
+			Properties.Sort(SortPropertiesByHash);
 			Methods.Sort(SortMethodsByHash);
 
+			CreateGetPropertyIdMethod(File, CurrentClassName, Properties);
 			CreateGetMethodIdMethod(File, CurrentClassName, Methods);
+
+			CreateBuiltInClassImplementation(File, CurrentClassName);
 
 			fprintf(File,
 				"%s* %sClass::Class()\n"

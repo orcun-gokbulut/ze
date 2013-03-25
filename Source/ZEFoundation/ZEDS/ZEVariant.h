@@ -41,11 +41,11 @@
 #pragma warning(disable:4482)
 
 #include "ZETypes.h"
-#include "ZEMeta/ZEType.h"
-
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEList.h"
+#include "ZEString.h"
+#include "ZEArray.h"
+#include "ZEList.h"
+#include "ZEValue.h"
+#include "ZEType.h"
 #include "ZETypeGenerator.h"
 
 class ZEVector2;
@@ -76,7 +76,7 @@ class ZEVariant
 				void*					Pointer;
 			};
 			ZEString					String;
-		} Value;
+		}Value;
 
 		void*							(*Cloner)(const void*);
 		void							(*Deleter)(void*);

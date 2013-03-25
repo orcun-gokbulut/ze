@@ -48,11 +48,12 @@ ZE_META_FORWARD_DECLARE(ZEEntity,			"ZEEntity.h")
 ZE_META_FORWARD_DECLARE(ZECamera,			"ZEGraphics/ZECamera.h")
 ZE_META_FORWARD_DECLARE(ZEFrameRenderer,	"ZEGraphics/ZEFrameRenderer.h")
 ZE_META_FORWARD_DECLARE(ZEShadowRenderer,	"ZEGraphics/ZEShadowRenderer.h")
-ZE_META_FORWARD_DECLARE(ZEPhysicalWorld,	"ZEPhysics/ZEPhysicalWorld.h")
 ZE_META_FORWARD_DECLARE(ZEListener,			"ZESound/ZEListener.h")
 ZE_META_FORWARD_DECLARE(ZEInterior,			"ZEInterior/ZEInterior.h")
 ZE_META_FORWARD_DECLARE(ZEInteriorResource,	"ZEInterior/ZEInteriorResource.h")
 ZE_META_FORWARD_DECLARE(ZEPostProcessor,	"ZEPostProcessor/ZEPostProcessor.h")
+
+class ZEPhysicalWorld;
 
 #define ZE_RCF_ENTITY							1
 #define ZE_RCF_COMPONENT						2

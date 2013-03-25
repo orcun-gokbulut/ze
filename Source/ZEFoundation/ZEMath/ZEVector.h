@@ -38,14 +38,16 @@
 #define __ZE_MATH_VECTOR_H__
 
 #include <ZETypes.h>
+#include "ZEMeta/ZEObject.h"
 
-class ZEMatrix3x3;
-class ZEMatrix4x4;
+//ZE_CLASS(ZEVector2)
 
 // ZEVector2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector2
 {
+	//ZE_OBJECT
+
 	public:
 		union
 		{
@@ -138,11 +140,14 @@ class ZEVector2
 
 ZEVector2 operator*(float S, const ZEVector2& RightOperand);
 
+//ZE_CLASS(ZEVector3)
 
 // ZEVector3
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector3
 {
+	//ZE_OBJECT
+
 	public:
 		union
 		{
@@ -260,11 +265,14 @@ class ZEVector3
 
 ZEVector3 operator*(float S, const ZEVector3& RightOperand);
 
+//ZE_CLASS(ZEVector4)
 
 // ZEVector4
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector4
 {
+	//ZE_OBJECT
+
 	public:
 		union
 		{
