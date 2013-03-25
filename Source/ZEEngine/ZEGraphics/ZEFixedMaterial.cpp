@@ -1306,42 +1306,6 @@ void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 
 void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 {
-// 	ZEFile File;
-// 	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
-// 		zeError("Can not open given file. File : %s", FilePath.ToCString());
-// 
-// 	ZEMLNode* RootNode = new ZEMLNode();
-// 	RootNode->Read(&File);
-// 
-// 	if(File.IsOpen())
-// 		File.Close();
-// 
-// 	ZEArray<ZEMLNode*> ConfigurationsNodes = RootNode->GetSubNodes("Configuration");
-// 	ZEArray<ZEMLItem*> Props = ConfigurationsNodes[0]->GetProperties();
-// 	
-// 	for (ZESize I = 0; I < Props.GetCount(); I++)
-// 	{
-// 		if(Props[I]->GetType() != ZEML_IT_OFFSET_DATA)
-// 		{
-// 			ZEMLProperty* CurrentProperty = ((ZEMLProperty*)Props[I]);
-// 
-// 			if(CurrentProperty->GetValue().GetType() == ZE_VRT_STRING && ZEString(CurrentProperty->GetValue().GetString()).GetLength() != 0)
-// 			{
-// 				if(CurrentProperty->GetName() == "Name")
-// 					continue;
-// 
-// 				ZEString Path = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + CurrentProperty->GetValue().GetString();
-// 				ZEVariant TempVar(Path);
-// 				SetProperty(Props[I]->GetName(), TempVar);
-// 			}
-// 
-// 			else if(CurrentProperty->GetValue().GetType() != ZE_VRT_STRING)
-// 				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
-// 		}
-// 	}
-// 
-// 	UpdateMaterial();
-
 	ZEFile File;
 	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
 		zeError("Can not open given file. File : %s", FilePath.ToCString());
