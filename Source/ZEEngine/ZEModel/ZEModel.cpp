@@ -469,7 +469,7 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 	{
-		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL)
+		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL && !Meshes[I].LODs[0].IsSkinned())
 		{
 			if (DrawParameters->ViewVolume->CullTest(Meshes[I].GetWorldBoundingBox()))
 			{

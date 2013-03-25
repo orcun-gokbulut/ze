@@ -77,6 +77,9 @@ class ZEModelMesh
 		bool								AutoLOD;
 		ZEUInt								ActiveLOD;
 
+		bool								DrawOrderIsUserDefined;
+		ZEUInt8								UserDefinedDrawOrder;
+
 		ZEModelAnimationType				AnimationType;
 		bool								Visible;		
 
@@ -143,6 +146,10 @@ class ZEModelMesh
 
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();
+
+		void								SetCustomDrawOrderEnabled(bool Enabled);
+		void								SetCustomDrawOrder(ZEUInt8 DrawOrder);
+		ZEUInt8								GetCustomDrawOrder();
 
 		void								Initialize(ZEModel* Model, const ZEModelResourceMesh* MeshResource);
 		void								Deinitialize();

@@ -372,6 +372,21 @@ bool ZEModelMesh::GetPhysicsEnabled()
 	return PhysicsEnabled;
 }
 
+void ZEModelMesh::SetCustomDrawOrderEnabled(bool Enabled)
+{
+	DrawOrderIsUserDefined = Enabled;
+}
+
+void ZEModelMesh::SetCustomDrawOrder(ZEUInt8 DrawOrder)
+{
+	UserDefinedDrawOrder = DrawOrder;
+}
+
+ZEUInt8 ZEModelMesh::GetCustomDrawOrder()
+{
+	return UserDefinedDrawOrder;
+}
+
 void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshResource)
 {
 	Owner = Model;
@@ -524,11 +539,18 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 	if (!Visible)
 		return;
 
+	float DrawOrder;
+	ZEInt Lod = 0;
+
 	ZEVector3 WorldPosition;
 	ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), ZEVector3::Zero);
 	float DistanceSquare = ZEVector3::DistanceSquare(DrawParameters->View->Camera->GetWorldPosition(), WorldPosition);
 
-	ZEInt Lod = 0;
+	if (!DrawOrderIsUserDefined)
+		DrawOrder = DistanceSquare;
+	else
+		DrawOrder = DistanceSquare * (UserDefinedDrawOrder + 1);
+	
 	/*ZEInt LastLod = LODs.GetCount() - 1;
 
 	if (DistanceSquare > 40 * 40) 
@@ -546,7 +568,7 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 	if (Lod > LastLod)
 		Lod = LastLod;*/
 
-	LODs[(ZESize)Lod].Draw(DrawParameters, DistanceSquare);
+	LODs[(ZESize)Lod].Draw(DrawParameters, DrawOrder);
 }
 
 
@@ -562,6 +584,8 @@ ZEModelMesh::ZEModelMesh()
 	AutoLOD = false;
 	ActiveLOD = 0;
 	AnimationType = ZE_MAT_NOANIMATION;
+	DrawOrderIsUserDefined = false;
+	UserDefinedDrawOrder = 0.0f;
 }
 
 ZEModelMesh::~ZEModelMesh()

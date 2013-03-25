@@ -50,9 +50,7 @@ BOOL CALLBACK CheckDirectInputDevices(const LPCDIDEVICEINSTANCE DeviceInstance, 
 	Device->DirectInputInstance = *DeviceInstance;
 	Device->Module = Module;
 
-	if (Device->Initialize())
-		Module->RegisterDevice(Device);
-	else
+	if (!Module->RegisterDevice(Device))
 		Device->Destroy();
 
 	return TRUE;

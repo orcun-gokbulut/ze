@@ -46,7 +46,7 @@
 #include "ZETexture/ZETextureCubeResource.h"
 #include "ZETexture2D.h"
 #include "ZETextureCube.h"
-#include "ZEML/ZEMLProperty.h"
+#include "ZEML/ZEMLSerialReader.h"
 #include "ZEFile/ZEPathUtils.h"
 #include "ZEFile/ZEFileInfo.h"
 
@@ -1279,65 +1279,259 @@ ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
 
 void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 {
-	ZEFile File;
-	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
-		zeError("Can not open given file. File : %s", FilePath.ToCString());
-
-	ZEObjectDescription* ClassDescription = GetDescription();
-	ZESSize PropertyCount = ClassDescription->GetPropertyCount();
-	const ZEPropertyDescription* Properties = ClassDescription->GetProperties();
-
-	ZEMLNode* RootNode = new ZEMLNode("Root");
-
-	for(ZESSize I = 0; I < PropertyCount; I++)
-	{
-		ZEVariant PropertyValue;
-		GetProperty(Properties[I].Name, PropertyValue);
-		RootNode->AddProperty(Properties[I].Name, PropertyValue);
-	}
-
-	RootNode->Write(&File);
-
-	if(File.IsOpen())
-		File.Close();
-
-	delete RootNode;
+// 	ZEFile File;
+// 	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
+// 		zeError("Can not open given file. File : %s", FilePath.ToCString());
+// 
+// 	ZEObjectDescription* ClassDescription = GetDescription();
+// 	ZESSize PropertyCount = ClassDescription->GetPropertyCount();
+// 	const ZEPropertyDescription* Properties = ClassDescription->GetProperties();
+// 
+// 	ZEMLNode* RootNode = new ZEMLNode("Root");
+// 
+// 	for(ZESSize I = 0; I < PropertyCount; I++)
+// 	{
+// 		ZEVariant PropertyValue;
+// 		GetProperty(Properties[I].Name, PropertyValue);
+// 		RootNode->AddProperty(Properties[I].Name, PropertyValue);
+// 	}
+// 
+// 	RootNode->Write(&File);
+// 
+// 	if(File.IsOpen())
+// 		File.Close();
+// 
+// 	delete RootNode;
 }
 
 void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 {
+// 	ZEFile File;
+// 	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
+// 		zeError("Can not open given file. File : %s", FilePath.ToCString());
+// 
+// 	ZEMLNode* RootNode = new ZEMLNode();
+// 	RootNode->Read(&File);
+// 
+// 	if(File.IsOpen())
+// 		File.Close();
+// 
+// 	ZEArray<ZEMLNode*> ConfigurationsNodes = RootNode->GetSubNodes("Configuration");
+// 	ZEArray<ZEMLItem*> Props = ConfigurationsNodes[0]->GetProperties();
+// 	
+// 	for (ZESize I = 0; I < Props.GetCount(); I++)
+// 	{
+// 		if(Props[I]->GetType() != ZEML_IT_OFFSET_DATA)
+// 		{
+// 			ZEMLProperty* CurrentProperty = ((ZEMLProperty*)Props[I]);
+// 
+// 			if(CurrentProperty->GetValue().GetType() == ZE_VRT_STRING && ZEString(CurrentProperty->GetValue().GetString()).GetLength() != 0)
+// 			{
+// 				if(CurrentProperty->GetName() == "Name")
+// 					continue;
+// 
+// 				ZEString Path = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + CurrentProperty->GetValue().GetString();
+// 				ZEVariant TempVar(Path);
+// 				SetProperty(Props[I]->GetName(), TempVar);
+// 			}
+// 
+// 			else if(CurrentProperty->GetValue().GetType() != ZE_VRT_STRING)
+// 				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
+// 		}
+// 	}
+// 
+// 	UpdateMaterial();
+
 	ZEFile File;
 	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
 		zeError("Can not open given file. File : %s", FilePath.ToCString());
 
-	ZEMLNode* RootNode = new ZEMLNode();
-	RootNode->Read(&File);
+	ZEMLSerialReader Reader(&File);
 
-	if(File.IsOpen())
-		File.Close();
+	if(!Reader.Read())
+		zeError("Can not read material file.");
 
-	ZEArray<ZEMLNode*> ConfigurationsNodes = RootNode->GetSubNodes("Configuration");
-	ZEArray<ZEMLItem*> Props = ConfigurationsNodes[0]->GetProperties();
-	
-	for (ZESize I = 0; I < Props.GetCount(); I++)
+	ZEVariant Name;
+	ZEMLSerialPointer Configuration;
+
+	ZEMLSerialListItem Material[] = 
 	{
-		if(Props[I]->GetType() != ZEML_IT_OFFSET_DATA)
-		{
-			ZEMLProperty* CurrentProperty = ((ZEMLProperty*)Props[I]);
+		ZEML_LIST_NODE("Configuration",		Configuration,						true),
+		ZEML_LIST_PROPERTY("Name",			Name,			ZE_VRT_STRING,		true),
+	};
 
-			if(CurrentProperty->GetValue().GetType() == ZE_VRT_STRING && ZEString(CurrentProperty->GetValue().GetString()).GetLength() != 0)
-			{
-				if(CurrentProperty->GetName() == "Name")
-					continue;
+	if (!Reader.ReadPropertyList(Material, 2))
+		zeError("Cannot read material configuration");
 
-				ZEString Path = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + CurrentProperty->GetValue().GetString();
-				ZEVariant TempVar(Path);
-				SetProperty(Props[I]->GetName(), TempVar);
-			}
+	Reader.SeekPointer(Configuration);
 
-			else if(CurrentProperty->GetValue().GetType() != ZE_VRT_STRING)
-				SetProperty(Props[I]->GetName(), CurrentProperty->GetValue());
-		}
+	// Simple rendering options
+	ZEVariant WireFrame, TwoSided, ZCull, ZWrite;
+
+	// Material properties
+	ZEVariant Opacity, AlphaCullLimit, DetailMapTiling, DetailDistanceFull, 
+		DetailDistanceFade, SpecularShininess, SubSurfScatFactor,
+		AmbientColor, AmbientFactor, SpecularColor, SpecularFactor, 
+		DiffuseColor, DiffuseFactor, EmissiveColor, EmissiveFactor,
+		RefractionIndex, RefractionFactor, ReflectionFactor;
+
+	// Textures
+	ZEVariant BaseMap, NormalMap, ParallaxMap, SpecularMap, EmissiveMap, OpacityMap, 
+		DetailBaseMap, DetailNormalMap, EnvironmentMap, LightMap;
+
+	// Shader components
+	ZEVariant AmbientEnabled, DiffuseEnabled, BaseMapEnabled, NormalMapEnabled,
+		ParallaxMapEnabled, SpecularEnabled, SpecularMapEnabled, 
+		EmissiveEnabled, EmissiveMapEnabled, OpacityEnabled,
+		OpacityBaseAlphaEnabled, OpacityConstantEnabled, OpacityMapEnabled, 
+		DetailEnabled, DetailBaseMapEnabled, DetailNormalMapEnabled, 
+		ReflectionEnabled, RefractionEnabled, LightMapEnabled, 
+		AlphaCullEnabled, VertexColorEnabled;
+
+	ZEMLSerialListItem Properties[] = 
+	{
+		ZEML_LIST_PROPERTY("Wireframe",					WireFrame,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("TwoSided",					TwoSided,				ZE_VRT_BOOLEAN,		false),
+
+		ZEML_LIST_PROPERTY("BaseMap",					BaseMap,				ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("NormalMap",					NormalMap,				ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("ParallaxMap",				ParallaxMap,			ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("SpecularMap",				SpecularMap,			ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("EmissiveMap",				EmissiveMap,			ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("OpacityMap",				OpacityMap,				ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("DetailNormalMap",			DetailBaseMap,			ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("DetailNormalMap",			DetailNormalMap,		ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("EnvironmentMap",			EnvironmentMap,			ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("LightMap",					LightMap,				ZE_VRT_STRING,		false),
+
+		ZEML_LIST_PROPERTY("AmbientEnabled",			AmbientEnabled,			ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("DiffuseEnabled",			DiffuseEnabled,			ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("BaseMapEnabled",			BaseMapEnabled,			ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("NormalMapEnabled",			NormalMapEnabled,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("ParallaxMapEnabled",		ParallaxMapEnabled,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("SpecularEnabled",			SpecularEnabled,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("SpecularMapEnabled",		SpecularMapEnabled,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("EmissiveEnabled",			EmissiveEnabled,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("EmissiveMapEnabled",		EmissiveMapEnabled,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("OpacityEnabled",			OpacityEnabled,			ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("OpacityMapEnabled",			OpacityMapEnabled,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("OpacityConstantEnabled",	OpacityConstantEnabled,	ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("OpacityBaseAlphaEnabled",	OpacityBaseAlphaEnabled,ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("DetailBaseMapEnabled",		DetailBaseMapEnabled,	ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("DetailNormalMapEnabled",	DetailNormalMapEnabled,	ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("ReflectionEnabled",			ReflectionEnabled,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("RefractionEnabled",			RefractionEnabled,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("LightMapEnabled",			LightMapEnabled,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("AlphaCullEnabled",			AlphaCullEnabled,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("VertexColorEnabled",		VertexColorEnabled,		ZE_VRT_BOOLEAN,		false),
+
+		ZEML_LIST_PROPERTY("Opacity",					Opacity,				ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("AlphaCullLimit",			AlphaCullLimit,			ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("DetailMapTiling",			DetailMapTiling,		ZE_VRT_VECTOR2,		false),
+		ZEML_LIST_PROPERTY("DetailDistanceFull",		DetailDistanceFull,		ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("DetailDistanceFade",		DetailDistanceFade,		ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("SpecularShininess",			SpecularShininess,		ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("SubSurfScatFactor",			SubSurfScatFactor,		ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("AmbientColor",				AmbientColor,			ZE_VRT_VECTOR3,		false),
+		ZEML_LIST_PROPERTY("AmbientFactor",				AmbientFactor,			ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("SpecularColor",				SpecularColor,			ZE_VRT_VECTOR3,		false),
+		ZEML_LIST_PROPERTY("SpecularFactor",			SpecularFactor,			ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("DiffuseColor",				DiffuseColor,			ZE_VRT_VECTOR3,		false),
+		ZEML_LIST_PROPERTY("DiffuseFactor",				DiffuseFactor,			ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("EmissiveColor",				EmissiveColor,			ZE_VRT_VECTOR3,		false),
+		ZEML_LIST_PROPERTY("EmissiveFactor",			EmissiveFactor,			ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("RefractionIndex",			RefractionIndex,		ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("RefractionFactor",			RefractionFactor,		ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("ReflectionFactor",			ReflectionFactor,		ZE_VRT_FLOAT,		false)
+	};
+
+	if (!Reader.ReadPropertyList(Properties, 50))
+		zeError("Cannot read material properties");
+
+	// Configure material
+	SetAmbientEnabled((AmbientEnabled.GetType() != ZE_VRT_UNDEFINED && AmbientEnabled.GetBoolean() ? true : false));
+	SetDiffuseEnabled((DiffuseEnabled.GetType() != ZE_VRT_UNDEFINED && DiffuseEnabled.GetBoolean() ? true : false));
+	SetNormalMapEnabled((NormalMapEnabled.GetType() != ZE_VRT_UNDEFINED && NormalMapEnabled.GetBoolean() ? true : false));
+	SetParallaxMapEnabled((ParallaxMapEnabled.GetType() != ZE_VRT_UNDEFINED && ParallaxMapEnabled.GetBoolean() ? true : false));
+	SetSpecularEnabled((SpecularEnabled.GetType() != ZE_VRT_UNDEFINED && SpecularEnabled.GetBoolean() ? true : false));
+	SetEmmisiveEnabled((EmissiveEnabled.GetType() != ZE_VRT_UNDEFINED && EmissiveEnabled.GetBoolean() ? true : false));
+	SetOpacityEnabled((OpacityEnabled.GetType() != ZE_VRT_UNDEFINED && OpacityEnabled.GetBoolean() ? true : false));
+	SetDetailBaseMapEnabled((DetailBaseMapEnabled.GetType() != ZE_VRT_UNDEFINED && DetailBaseMapEnabled.GetBoolean() ? true : false));
+	SetDetailNormalMapEnabled((DetailNormalMapEnabled.GetType() != ZE_VRT_UNDEFINED && DetailNormalMapEnabled.GetBoolean() ? true : false));
+	SetReflectionEnabled((ReflectionEnabled.GetType() != ZE_VRT_UNDEFINED && ReflectionEnabled.GetBoolean() ? true : false));
+	SetRefractionEnabled((RefractionEnabled.GetType() != ZE_VRT_UNDEFINED && RefractionEnabled.GetBoolean() ? true : false));
+	SetLightMapEnabled((LightMapEnabled.GetType() != ZE_VRT_UNDEFINED && LightMapEnabled.GetBoolean() ? true : false));
+	SetAlphaCullEnabled((AlphaCullEnabled.GetType() != ZE_VRT_UNDEFINED && AlphaCullEnabled.GetBoolean() ? true : false));
+	SetVertexColorEnabled((VertexColorEnabled.GetType() != ZE_VRT_UNDEFINED && VertexColorEnabled.GetBoolean() ? true : false));
+
+	SetOpacity(Opacity.GetType() == ZE_VRT_UNDEFINED ? 1.0f : Opacity.GetFloat());
+	SetDetailMapTiling(DetailMapTiling.GetType() == ZE_VRT_UNDEFINED ? ZEVector2::One : DetailMapTiling.GetVector2());
+	SetAmbientColor(AmbientColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : AmbientColor.GetVector3());
+	SetAmbientFactor(AmbientFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : AmbientFactor.GetFloat());
+	SetSpecularColor(SpecularColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : SpecularColor.GetVector3());
+	SetSpecularFactor(SpecularFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SpecularFactor.GetFloat());
+	SetDiffuseColor(DiffuseColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : DiffuseColor.GetVector3());
+	SetDiffuseFactor(DiffuseFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : DiffuseFactor.GetFloat());
+	SetEmmisiveColor(EmissiveColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : EmissiveColor.GetVector3());
+	SetEmmisiveFactor(EmissiveFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : EmissiveFactor.GetFloat());
+	SetRefractionIndex(RefractionIndex.GetType() == ZE_VRT_UNDEFINED ? 1.0f : RefractionIndex.GetFloat());
+	SetRefractionFactor(RefractionFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : RefractionFactor.GetFloat());
+	SetReflectionFactor(ReflectionFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : ReflectionFactor.GetFloat());
+	SetDiffuseSubSurfaceScatteringFactor(SubSurfScatFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SubSurfScatFactor.GetFloat());
+	SetAlphaCullLimit(AlphaCullLimit.GetType() == ZE_VRT_UNDEFINED ? 1.0f : AlphaCullLimit.GetFloat());
+	SetSpecularShininess(SpecularShininess.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SpecularShininess.GetFloat());
+
+	// Load resources
+	ZEString ResourcePath;
+	if (BaseMap.GetType() != ZE_VRT_UNDEFINED && !BaseMap.GetString().IsEmpty())
+	{
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + BaseMap.GetString();
+		SetBaseMapFile(ResourcePath);
+	}
+	if (NormalMap.GetType() != ZE_VRT_UNDEFINED && !NormalMap.GetString().IsEmpty())
+	{
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + NormalMap.GetString();
+		SetNormalMapFile(ResourcePath);
+	}
+	if (ParallaxMap.GetType() != ZE_VRT_UNDEFINED && !ParallaxMap.GetString().IsEmpty())
+	{
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + ParallaxMap.GetString();
+		SetParallaxMapFile(ResourcePath);
+	}
+	if (SpecularMap.GetType() != ZE_VRT_UNDEFINED && !SpecularMap.GetString().IsEmpty())
+	{
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + SpecularMap.GetString();
+		SetSpecularMapFile(ResourcePath);
+	}
+	if (EmissiveMap.GetType() != ZE_VRT_UNDEFINED && !EmissiveMap.GetString().IsEmpty())
+	{
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + EmissiveMap.GetString();
+		SetEmmisiveMapFile(ResourcePath);
+	}
+	if (OpacityMap.GetType() != ZE_VRT_UNDEFINED && !OpacityMap.GetString().IsEmpty())
+	{
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + OpacityMap.GetString();
+		SetOpacityMapFile(ResourcePath);
+	}
+	if (DetailBaseMap.GetType() != ZE_VRT_UNDEFINED && !DetailBaseMap.GetString().IsEmpty())
+	{
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + DetailBaseMap.GetString();
+		SetDetailBaseMapFile(ResourcePath);
+	}
+	if (DetailNormalMap.GetType() != ZE_VRT_UNDEFINED && !DetailNormalMap.GetString().IsEmpty())
+	{
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + DetailNormalMap.GetString();
+		SetDetailNormalMapFile(ResourcePath);
+	}
+	if (EnvironmentMap.GetType() != ZE_VRT_UNDEFINED && !EnvironmentMap.GetString().IsEmpty())
+	{
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + EnvironmentMap.GetString();
+		SetEnvironmentMapFile(ResourcePath);
+	}
+	if (LightMap.GetType() != ZE_VRT_UNDEFINED && !LightMap.GetString().IsEmpty())
+	{
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + LightMap.GetString();
+		SetLightMapFile(ResourcePath);
 	}
 
 	UpdateMaterial();
