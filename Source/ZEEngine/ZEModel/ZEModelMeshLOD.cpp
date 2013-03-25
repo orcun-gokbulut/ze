@@ -59,7 +59,7 @@ bool ZEModelMeshLOD::IsSkinned()
 	return Skinned;
 }
 
-void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DistanceSquare)
+void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DrawOrder)
 {
 	if (VertexBuffer == NULL)
 		return;
@@ -83,7 +83,7 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DistanceSquare
 		RenderCommand.WorldMatrix = OwnerMesh->GetWorldTransform();
 	}
 
-	RenderCommand.Order = DistanceSquare;
+	RenderCommand.Order = DrawOrder;
 
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }
