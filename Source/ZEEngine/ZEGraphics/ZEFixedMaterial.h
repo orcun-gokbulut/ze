@@ -46,13 +46,17 @@
 
 #include "ZEMeta/ZEObject.h"
 
-class ZETextureCube;
-class ZETextureCubeResource;
-class ZETexture2D;
-class ZETexture2DResource;
+ZE_META_FORWARD_DECLARE(ZETextureCube, "ZETextureCube.h")
+ZE_META_FORWARD_DECLARE(ZETextureCubeResource, "ZETexture/ZETextureCubeResource.h")
+ZE_META_FORWARD_DECLARE(ZETexture2D, "ZETexture2D.h")
+ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
+
+ZE_CLASS(ZEFixedMaterial)
 
 class ZEFixedMaterial : public ZEMaterial
 {
+	ZE_OBJECT
+
 	protected:
 		ZEUInt32						OldMaterialComponents;
 		ZEUInt32						MaterialComponents;
@@ -79,6 +83,7 @@ class ZEFixedMaterial : public ZEMaterial
 
 		bool							GlobalAmbientEnabled;
 
+		#ifndef ZE_META_COMPILER
 		union
 		{
 			struct
@@ -144,6 +149,7 @@ class ZEFixedMaterial : public ZEMaterial
 			};
 			ZETexture2D*				Textures[12];
 		};
+		#endif
 
 		ZETexture2DResource*			BaseMapResource;
 		ZETexture2DResource*			NormalMapResource;

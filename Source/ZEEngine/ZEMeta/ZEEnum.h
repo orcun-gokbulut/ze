@@ -33,6 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+
 #include "ZETypes.h"
 
 struct ZEEnumParameter

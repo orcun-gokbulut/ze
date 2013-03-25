@@ -386,13 +386,13 @@ ZEMetaType ProcessInnerType(ZEString MainClassName, const Type* ClangType)
 			TempType.Type = ZE_MTT_OBJECT_PTR;
 			TempType.ClassData->Name = ClassPtr->getNameAsString();
 
-			if(ZEMetaProcessorInternal::CheckClass(ClassPtr))
-				return TempType;
-			else
-				return ZEMetaType();
-
 			if(ClassPtr->isCompleteDefinition())
 			{
+				if(ZEMetaProcessorInternal::CheckClass(ClassPtr))
+					return TempType;
+				else
+					return ZEMetaType();
+
 				if(TempType.ClassData->Name == "ZEEvent")
 				{
 					TempType.Type = ZE_MTT_CLASS;
@@ -489,15 +489,15 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 			TempType.TypeQualifier = CanonicalType->getPointeeType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
 			TempType.ClassData->Name = CanonicalType.getBaseTypeIdentifier()->getName().str();
 
-			if(ZEMetaProcessorInternal::CheckClass(CanonicalType->getPointeeType()->getAsCXXRecordDecl()))
-				return TempType;
-			else
-				return ZEMetaType();
-
 			CXXRecordDecl* ClassPtr = ClangType->getPointeeType().getTypePtr()->getAsCXXRecordDecl();
 			
 			if(ClassPtr->isCompleteDefinition())
 			{
+				if(ZEMetaProcessorInternal::CheckClass(ClassPtr))
+					return TempType;
+				else
+					return ZEMetaType();
+
 				for(CXXRecordDecl::base_class_iterator CurrentBaseClass = ClassPtr->bases_begin(), LastBaseClass = ClassPtr->bases_end(); CurrentBaseClass != LastBaseClass; ++CurrentBaseClass)
 				{
 					CXXRecordDecl* BaseClassDecl = CurrentBaseClass->getType()->getAsCXXRecordDecl();
@@ -539,9 +539,6 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 					TempType.Type = ZE_MTT_CLASS;
 					return TempType;
 				}
-
-				if (!ZEMetaProcessorInternal::CheckClass(CanonicalType->getPointeeType().getTypePtr()->getAsCXXRecordDecl()))
-					return ZEMetaType();
 			}
 			else
 			{
@@ -603,7 +600,7 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 		}
 		else if (TempType.Type == ZE_MTT_LIST)
 		{
-
+			//TO DO : Handle List type
 		}
 		else if (TempType.Type == ZE_MTT_ENUMERATOR)
 		{
@@ -1216,6 +1213,8 @@ void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, FieldDecl*
 
 void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* Method)
 {
+	ZEString DebugMethodName = Method->getNameAsString();
+
 	if(Method->isPure())
 		ClassData->IsAbstract = true;
 

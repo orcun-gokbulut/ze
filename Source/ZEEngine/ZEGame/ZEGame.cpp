@@ -44,11 +44,6 @@
 
 ZE_OBJECT_IMPL(ZEGame)
 
-ZEGameDescription* ZEGame::GetGameDescription()
-{
-	return NULL;
-}
-
 ZEScene* ZEGame::GetScene()
 {
 	return Scene;

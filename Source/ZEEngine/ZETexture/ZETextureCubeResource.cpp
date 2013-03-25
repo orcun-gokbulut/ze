@@ -45,6 +45,7 @@
 #include "ZECore/ZEResourceManager.h"
 #include "ZETextureCacheDataIdentifier.h"
 
+ZE_OBJECT_IMPL(ZETextureCubeResource)
 
 static ZEString ConstructResourcePath(const ZEString& Path)
 {

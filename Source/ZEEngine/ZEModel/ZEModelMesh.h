@@ -45,8 +45,9 @@
 #include "ZEModelResource.h"
 #include "ZEMeta/ZEObject.h"
 
+class ZEPhysicalCloth;
+
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
-ZE_META_FORWARD_DECLARE(ZEPhysicalCloth, "ZEPhysics/ZEPhysicalCloth.h")
 
 ZE_CLASS(ZEModelMesh)
 

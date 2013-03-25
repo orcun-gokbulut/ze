@@ -36,6 +36,8 @@
 #include "ZETexture2D.h"
 #include "ZEGraphicsModule.h"
 
+ZE_OBJECT_IMPL(ZETexture2D)
+
 ZETextureType ZETexture2D::GetTextureType() const
 {
 	return ZE_TT_2D;
