@@ -105,7 +105,31 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* Event)
 		else
 		{
 			ZEEntity* PickedEntity = NULL;
-//			PickedEntity = RayCaster.PickEntity(Event->pos().x(), Event->pos().y());
+			ZERay Ray;
+			zeScene->GetActiveCamera()->GetScreenRay(Ray, Event->x(), Event->y());
+			const ZESmartArray<ZEEntity*>& Entities = zeScene->GetEntities();
+
+			for (ZESize I = 0; I < zeScene->GetEntities().GetCount(); I++)
+			{
+				ZEEntity* CameraOwner = zeScene->GetActiveCamera()->GetOwner();
+				
+				if(CameraOwner == NULL)
+				{
+					if(Entities[I] == zeScene->GetActiveCamera())
+						continue;
+				}
+				else
+				{
+					if(Entities[I] == CameraOwner)
+						continue;
+				}
+
+				if(ZEAABBox::IntersectionTest(Entities[I]->GetWorldBoundingBox(), Ray))
+				{
+					PickedEntity = Entities[I];
+					break;
+				}
+			}
 
 			for (ZESize I = 0; I < SelectedItems->GetCount(); I++)
 				delete SelectedItems->GetItem(I);
