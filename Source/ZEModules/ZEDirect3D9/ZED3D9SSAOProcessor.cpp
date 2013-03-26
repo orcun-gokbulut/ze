@@ -150,7 +150,7 @@ void ZED3D9SSAOProcessor::Initialize()
 	GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
 
 	// RandomTexture
-	RandomTextureResource = ZETexture2DResource::LoadSharedResource("ZEEngine/ZEPostEffects/Textures/RandomNormal.tga");
+	RandomTextureResource = ZETexture2DResource::LoadSharedResource("ZEEngine\\ZEPostEffects\\Textures\\RandomNormal.tga");
 
 	// Compile Shaders
 	VertexShader = ZED3D9VertexShader::CreateShader("SSOAProcessor.hlsl", "VSMain", 0, "vs_3_0");

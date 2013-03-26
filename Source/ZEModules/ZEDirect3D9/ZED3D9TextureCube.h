@@ -41,6 +41,10 @@
 #include "ZEGraphics/ZETextureCube.h"
 #include "ZED3D9ViewPort.h"
 #include "ZED3D9ComponentBase.h"
+
+#ifdef ZE_DEBUG_ENABLE
+#define D3D_DEBUG_INFO
+#endif
 #include <d3d9.h>
 
 class ZED3D9TextureCube : public ZETextureCube, public ZED3D9ComponentBase

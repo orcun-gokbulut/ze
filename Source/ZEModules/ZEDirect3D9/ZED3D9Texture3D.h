@@ -37,6 +37,10 @@
 #ifndef __ZE_D3D9_TEXTURE_3D_H__
 #define __ZE_D3D9_TEXTURE_3D_H__
 
+#ifdef ZE_DEBUG_ENABLE
+#define D3D_DEBUG_INFO
+#endif
+
 #include "ZETypes.h"
 #include "ZEGraphics/ZETexture3D.h"
 #include "ZED3D9ComponentBase.h"

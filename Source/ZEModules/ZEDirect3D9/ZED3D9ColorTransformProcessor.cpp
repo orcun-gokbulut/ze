@@ -93,6 +93,11 @@ const ZEMatrix4x4 ZEColorMatrix::Black = ZEMatrix4x4(	0.0f, 0.0f, 0.0f, 0.0f,
 														0.0f, 0.0f, 0.0f, 0.0f,
 														0.0f, 0.0f, 0.0f, 1.0f	);
 
+const ZEMatrix4x4 ZEColorMatrix::White = ZEMatrix4x4(	1.0f, 0.0f, 0.0f, 1.0f,
+														0.0f, 1.0f, 0.0f, 1.0f,
+														0.0f, 0.0f, 1.0f, 1.0f,
+														0.0f, 0.0f, 0.0f, 1.0f	);
+
 
 
 void ZED3D9ColorTransformProcessor::SetRenderer(ZEFrameRenderer* Renderer)
@@ -239,6 +244,7 @@ void ZED3D9ColorTransformProcessor::Process()
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	
 	struct VertexShaderParameters
 	{

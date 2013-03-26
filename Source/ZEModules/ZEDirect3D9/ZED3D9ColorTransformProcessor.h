@@ -59,6 +59,7 @@ class ZEColorMatrix : public ZEMatrix4x4
 		static const ZEMatrix4x4		Green;
 		static const ZEMatrix4x4		Blue;
 		static const ZEMatrix4x4		Black;
+		static const ZEMatrix4x4		White;
 		static const ZEMatrix4x4		NightVision;
 		static const ZEMatrix4x4		Inverse;
 };
