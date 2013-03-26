@@ -40,8 +40,13 @@
 #include "ZETypes.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZED3D9ComponentBase.h"
-#include <d3d9.h>
+
 #include "ZED3D9ViewPort.h"
+
+#ifdef ZE_DEBUG_ENABLE
+#define D3D_DEBUG_INFO
+#endif
+#include <d3d9.h>
 
 class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 {
