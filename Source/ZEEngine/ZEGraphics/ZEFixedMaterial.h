@@ -61,6 +61,8 @@ class ZEFixedMaterial : public ZEMaterial
 
 		ZEMaterialOpacityComponent		OpacityComponent;
 
+		ZEString						Name;
+
 		bool							TwoSided;
 		bool							Wireframe;
 	
@@ -122,7 +124,7 @@ class ZEFixedMaterial : public ZEMaterial
 			struct 
 			{
 				bool					SkinTransform;
-				bool					ShadowReciver;
+				bool					ShadowReceiver;
 			};
 			float						PixelShaderBoolConstants[2];
 		};
@@ -199,6 +201,9 @@ class ZEFixedMaterial : public ZEMaterial
 		virtual ZEMaterialFlags			GetMaterialFlags() const;
 
 		// Material Options
+		void							SetName(const ZEString& Name);
+		const ZEString&					GetName() const;
+
 		void							SetTwoSided(bool Enable);
 		bool							GetTwoSided() const;
 
@@ -414,6 +419,7 @@ ZE_POST_PROCESSOR_START(Meta)
 	<meta> 
 		<class name="ZEFixedMaterial" noinstance="true">
 			<description>Material System</description>
+			<property name="Name" groupname="General" type="string" autogetset="yes"/>
 			<property name="TwoSided" groupname="Shading" type="boolean" autogetset="yes"/>
 			<property name="Wireframe" groupname="Shading" type="boolean" autogetset="yes"/>
 			<property name="AlphaCullEnabled" groupname="Transparancy" type="boolean" autogetset="yes"/>
