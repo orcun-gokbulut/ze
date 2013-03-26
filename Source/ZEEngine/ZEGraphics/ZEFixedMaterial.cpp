@@ -124,6 +124,16 @@ ZEMaterialFlags ZEFixedMaterial::GetMaterialFlags() const
 	return (TransparancyMode == ZE_MTM_NONE ? ZE_MTF_G_BUFFER_PASS : 0) | ZE_MTF_PRE_Z_PASS | ZE_MTF_SUPPORTS_SKINNING;
 }
 
+void ZEFixedMaterial::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
+
+const ZEString& ZEFixedMaterial::GetName() const
+{
+	return Name;
+}
+
 void ZEFixedMaterial::SetTwoSided(bool Enable)
 {
 	TwoSided = Enable;
@@ -1279,29 +1289,96 @@ ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
 
 void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 {
-// 	ZEFile File;
-// 	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
-// 		zeError("Can not open given file. File : %s", FilePath.ToCString());
-// 
-// 	ZEObjectDescription* ClassDescription = GetDescription();
-// 	ZESSize PropertyCount = ClassDescription->GetPropertyCount();
-// 	const ZEPropertyDescription* Properties = ClassDescription->GetProperties();
-// 
-// 	ZEMLNode* RootNode = new ZEMLNode("Root");
-// 
-// 	for(ZESSize I = 0; I < PropertyCount; I++)
-// 	{
-// 		ZEVariant PropertyValue;
-// 		GetProperty(Properties[I].Name, PropertyValue);
-// 		RootNode->AddProperty(Properties[I].Name, PropertyValue);
-// 	}
-// 
-// 	RootNode->Write(&File);
-// 
-// 	if(File.IsOpen())
-// 		File.Close();
-// 
-// 	delete RootNode;
+	ZEFile File;
+	if(!File.Open(FilePath, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+		zeError("Can not open given file. File : %s", FilePath.ToCString());
+
+	ZEMLNode* MaterialNode = new ZEMLNode("Material");
+
+	MaterialNode->AddProperty("Name", GetName());
+
+	ZEMLNode* ConfigurationNode = MaterialNode->AddSubNode("Configuration");
+
+	ConfigurationNode->AddProperty("Name", "Default"); //Will be changed when configuration is implemented.
+	ConfigurationNode->AddProperty("Wireframe", GetWireframe());
+	ConfigurationNode->AddProperty("TwoSided", GetTwoSided());
+	ConfigurationNode->AddProperty("TransparencyMode", (ZEInt32)GetTransparancyMode());
+	ConfigurationNode->AddProperty("LightningEnabled", GetLightningEnabled());
+	ConfigurationNode->AddProperty("ShadowReceiver", GetShadowReceiver());
+	ConfigurationNode->AddProperty("ShadowCaster", GetShadowCaster());
+
+	ConfigurationNode->AddProperty("AmbientEnabled", GetAmbientEnabled());
+	ConfigurationNode->AddProperty("DiffuseEnabled", GetDiffuseEnabled());
+	ConfigurationNode->AddProperty("NormalMapEnabled", GetNormalMapEnabled());
+	ConfigurationNode->AddProperty("ParallaxMapEnabled", GetParallaxMapEnabled());
+	ConfigurationNode->AddProperty("SpecularEnabled", GetSpecularEnabled());
+	ConfigurationNode->AddProperty("EmmisiveEnabled", GetEmmisiveEnabled());
+	ConfigurationNode->AddProperty("OpacityEnabled", GetOpacityEnabled());
+	ConfigurationNode->AddProperty("DetailBaseMapEnabled", GetDetailBaseMapEnabled());
+	ConfigurationNode->AddProperty("DetailNormalMapEnabled", GetDetailNormalMapEnabled());
+	ConfigurationNode->AddProperty("ReflectionEnabled", GetReflectionEnabled());
+	ConfigurationNode->AddProperty("RefractionEnabled", GetRefractionEnabled());
+	ConfigurationNode->AddProperty("LightMapEnabled", GetLightMapEnabled());
+	ConfigurationNode->AddProperty("AlphaCullEnabled", GetAlphaCullEnabled());
+	ConfigurationNode->AddProperty("VertexColorEnabled", GetVertexColorEnabled());
+
+	ConfigurationNode->AddProperty("Opacity", GetOpacity());
+	ConfigurationNode->AddProperty("OpacityComponent", (ZEInt32)GetOpacityComponent());
+	ConfigurationNode->AddProperty("AlphaCullLimit", GetAlphaCullLimit());
+	ConfigurationNode->AddProperty("DetailMapTiling", GetDetailMapTiling());
+	ConfigurationNode->AddProperty("SpecularShininess", GetSpecularShininess());
+	ConfigurationNode->AddProperty("SubSurfaceScatteringFactor", GetDiffuseSubSurfaceScatteringFactor());
+
+	ConfigurationNode->AddProperty("AmbientColor", GetAmbientColor());
+	ConfigurationNode->AddProperty("AmbientFactor", GetAmbientFactor());
+	ConfigurationNode->AddProperty("SpecularColor", GetSpecularColor());
+	ConfigurationNode->AddProperty("SpecularFactor", GetSpecularFactor());
+	ConfigurationNode->AddProperty("DiffuseColor", GetDiffuseColor());
+	ConfigurationNode->AddProperty("DiffuseFactor", GetDiffuseFactor());
+	ConfigurationNode->AddProperty("EmmisiveColor", GetEmmisiveColor());
+	ConfigurationNode->AddProperty("EmmisiveFactor", GetEmmisiveFactor());
+	ConfigurationNode->AddProperty("RefractionIndex", GetRefractionIndex());
+	ConfigurationNode->AddProperty("RefractionFactor", GetRefractionFactor());
+	ConfigurationNode->AddProperty("ReflectionFactor", GetReflectionFactor());
+
+	ConfigurationNode->AddProperty("BaseMap", GetBaseMapFile());
+	ConfigurationNode->AddProperty("BaseMapAddressModeU", (ZEInt32)GetBaseMapAddressModeU());
+	ConfigurationNode->AddProperty("BaseMapAddressModeV", (ZEInt32)GetBaseMapAddressModeV());
+	ConfigurationNode->AddProperty("NormalMap", GetNormalMapFile());
+	ConfigurationNode->AddProperty("NormalMapAddressModeU", GetNormalMapAddressModeU());
+	ConfigurationNode->AddProperty("NormalMapAddressModeV", GetNormalMapAddressModeV());
+	ConfigurationNode->AddProperty("ParallaxMap", GetParallaxMapFile());
+	ConfigurationNode->AddProperty("ParallaxMapAddressModeU", GetParallaxMapAddressModeU());
+	ConfigurationNode->AddProperty("ParallaxMapAddressModeV", GetParallaxMapAddressModeV());
+	ConfigurationNode->AddProperty("SpecularMap", GetSpecularMapFile());
+	ConfigurationNode->AddProperty("SpecularMapAddressModeU", GetSpecularMapAddressModeU());
+	ConfigurationNode->AddProperty("SpecularMapAddressModeV", GetSpecularMapAddressModeV());
+	ConfigurationNode->AddProperty("EmmisiveMap", GetEmmisiveMapFile());
+	ConfigurationNode->AddProperty("EmmisiveMapAddressModeU", GetEmmisiveMapAddressModeU());
+	ConfigurationNode->AddProperty("EmmisiveMapAddressModeV", GetEmmisiveMapAddressModeV());
+	ConfigurationNode->AddProperty("OpacityMap", GetOpacityMapFile());
+	ConfigurationNode->AddProperty("OpacityMapAddressModeU", GetOpacityMapAddressModeU());
+	ConfigurationNode->AddProperty("OpacityMapAddressModeV", GetOpacityMapAddressModeV());
+	ConfigurationNode->AddProperty("DetailBaseMap", GetDetailBaseMap());
+	ConfigurationNode->AddProperty("DetailBaseMapAddressModeU", GetDetailBaseMapAddressModeU());
+	ConfigurationNode->AddProperty("DetailBaseMapAddressModeV", GetDetailBaseMapAddressModeV());
+	ConfigurationNode->AddProperty("DetailNormalMap", GetDetailNormalMapFile());
+	ConfigurationNode->AddProperty("DetailNormalMapAddressModeU", GetDetailNormalMapAddressModeU());
+	ConfigurationNode->AddProperty("DetailNormalMapAddressModeV", GetDetailNormalMapAddressModeV());
+	ConfigurationNode->AddProperty("EnvironmentMap", GetEnvironmentMapFile());
+	ConfigurationNode->AddProperty("EnvironmentMapAddressModeU", GetEnvironmentMapAddressModeU());
+	ConfigurationNode->AddProperty("EnvironmentMapAddressModeV", GetEnvironmentMapAddressModeV());
+	ConfigurationNode->AddProperty("EnvironmentMapAddressModeW", GetEnvironmentMapAddressModeW());
+	ConfigurationNode->AddProperty("LightMap", GetLightMapFile());
+	ConfigurationNode->AddProperty("LightMapAddressModeU", GetLightMapAddressModeU());
+	ConfigurationNode->AddProperty("LightMapAddressModeV", GetLightMapAddressModeV());
+
+	MaterialNode->Write(&File);
+
+	if(File.IsOpen())
+		File.Close();
+
+	delete MaterialNode;
 }
 
 void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
@@ -1315,186 +1392,248 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 	if(!Reader.Read())
 		zeError("Can not read material file.");
 
-	ZEVariant Name;
+	ZEVariant NameValue;
 	ZEMLSerialPointer Configuration;
 
 	ZEMLSerialListItem Material[] = 
 	{
-		ZEML_LIST_NODE("Configuration",		Configuration,						true),
-		ZEML_LIST_PROPERTY("Name",			Name,			ZE_VRT_STRING,		true),
+		ZEML_LIST_NODE("Configuration",		Configuration,							true),
+		ZEML_LIST_PROPERTY("Name",			NameValue,			ZE_VRT_STRING,		true),
 	};
 
 	if (!Reader.ReadPropertyList(Material, 2))
 		zeError("Cannot read material configuration");
 
+	SetName(NameValue.GetString());
+
 	Reader.SeekPointer(Configuration);
 
 	// Simple rendering options
-	ZEVariant WireFrame, TwoSided, ZCull, ZWrite;
+	ZEVariant ConfigurationNameValue, WireFrameValue, TwoSidedValue, TransparencyModeValue, LightingEnabledValue, ShadowCasterValue, ShadowReceiverValue;
 
 	// Material properties
-	ZEVariant Opacity, AlphaCullLimit, DetailMapTiling, DetailDistanceFull, 
-		DetailDistanceFade, SpecularShininess, SubSurfScatFactor,
-		AmbientColor, AmbientFactor, SpecularColor, SpecularFactor, 
-		DiffuseColor, DiffuseFactor, EmissiveColor, EmissiveFactor,
-		RefractionIndex, RefractionFactor, ReflectionFactor;
+	ZEVariant OpacityValue, OpacityComponentValue, AlphaCullLimitValue, DetailMapTilingValue, DetailDistanceFullValue, 
+		DetailDistanceFadeValue, SpecularShininessValue, SubSurfaceScatteringFactorValue,
+		AmbientColorValue, AmbientFactorValue, SpecularColorValue, SpecularFactorValue, 
+		DiffuseColorValue, DiffuseFactorValue, EmissiveColorValue, EmissiveFactorValue,
+		RefractionIndexValue, RefractionFactorValue, ReflectionFactorValue;
 
 	// Textures
-	ZEVariant BaseMap, NormalMap, ParallaxMap, SpecularMap, EmissiveMap, OpacityMap, 
-		DetailBaseMap, DetailNormalMap, EnvironmentMap, LightMap;
+	ZEVariant BaseMapValue, BaseMapAddressModeUValue, BaseMapAddressModeVValue, NormalMapValue, NormalMapAddressModeUValue, NormalMapAddressModeVValue, 
+		ParallaxMapValue, ParallaxMapAddressModeUValue, ParallaxMapAddressModeVValue, SpecularMapValue, SpecularMapAddressModeUValue, SpecularMapAddressModeVValue, 
+		EmissiveMapValue, EmissiveMapAddressModeUValue, EmissiveMapAddressModeVValue, OpacityMapValue, OpacityMapAddressModeUValue, OpacityMapAddressModeVValue,
+		DetailBaseMapValue, DetailBaseMapAddressModeUValue, DetailBaseMapAddressModeVValue, DetailNormalMapValue, DetailNormalMapAddressModeUValue, DetailNormalMapAddressModeVValue, 
+		EnvironmentMapValue, EnvironmentMapAddressModeUValue, EnvironmentMapAddressModeVValue, EnvironmentMapAddressModeWValue, LightMapValue, LightMapAddressModeUValue, LightMapAddressModeVValue;
 
 	// Shader components
-	ZEVariant AmbientEnabled, DiffuseEnabled, BaseMapEnabled, NormalMapEnabled,
-		ParallaxMapEnabled, SpecularEnabled, SpecularMapEnabled, 
-		EmissiveEnabled, EmissiveMapEnabled, OpacityEnabled,
-		OpacityBaseAlphaEnabled, OpacityConstantEnabled, OpacityMapEnabled, 
-		DetailEnabled, DetailBaseMapEnabled, DetailNormalMapEnabled, 
-		ReflectionEnabled, RefractionEnabled, LightMapEnabled, 
-		AlphaCullEnabled, VertexColorEnabled;
+	ZEVariant AmbientEnabledValue, DiffuseEnabledValue, BaseMapEnabledValue, NormalMapEnabledValue,
+		ParallaxMapEnabledValue, SpecularEnabledValue, SpecularMapEnabledValue, 
+		EmissiveEnabledValue, EmissiveMapEnabledValue, OpacityEnabledValue,
+		OpacityBaseAlphaEnabledValue, OpacityConstantEnabledValue, OpacityMapEnabledValue, 
+		DetailEnabledValue, DetailBaseMapEnabledValue, DetailNormalMapEnabledValue, 
+		ReflectionEnabledValue, RefractionEnabledValue, LightMapEnabledValue, 
+		AlphaCullEnabledValue, VertexColorEnabledValue;
 
 	ZEMLSerialListItem Properties[] = 
 	{
-		ZEML_LIST_PROPERTY("Wireframe",					WireFrame,				ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("TwoSided",					TwoSided,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("Name",							ConfigurationNameValue,				ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("Wireframe",						WireFrameValue,						ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("TwoSided",						TwoSidedValue,						ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("TransparencyMode",				TransparencyModeValue,				ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("LightningEnabled",				LightingEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("ShadowReceiver",				ShadowReceiverValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("ShadowCaster",					ShadowCasterValue,					ZE_VRT_BOOLEAN,		false),
 
-		ZEML_LIST_PROPERTY("BaseMap",					BaseMap,				ZE_VRT_STRING,		false),
-		ZEML_LIST_PROPERTY("NormalMap",					NormalMap,				ZE_VRT_STRING,		false),
-		ZEML_LIST_PROPERTY("ParallaxMap",				ParallaxMap,			ZE_VRT_STRING,		false),
-		ZEML_LIST_PROPERTY("SpecularMap",				SpecularMap,			ZE_VRT_STRING,		false),
-		ZEML_LIST_PROPERTY("EmissiveMap",				EmissiveMap,			ZE_VRT_STRING,		false),
-		ZEML_LIST_PROPERTY("OpacityMap",				OpacityMap,				ZE_VRT_STRING,		false),
-		ZEML_LIST_PROPERTY("DetailNormalMap",			DetailBaseMap,			ZE_VRT_STRING,		false),
-		ZEML_LIST_PROPERTY("DetailNormalMap",			DetailNormalMap,		ZE_VRT_STRING,		false),
-		ZEML_LIST_PROPERTY("EnvironmentMap",			EnvironmentMap,			ZE_VRT_STRING,		false),
-		ZEML_LIST_PROPERTY("LightMap",					LightMap,				ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("AmbientEnabled",				AmbientEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("DiffuseEnabled",				DiffuseEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("BaseMapEnabled",				BaseMapEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("NormalMapEnabled",				NormalMapEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("ParallaxMapEnabled",			ParallaxMapEnabledValue,			ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("SpecularEnabled",				SpecularEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("SpecularMapEnabled",			SpecularMapEnabledValue,			ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("EmmisiveEnabled",				EmissiveEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("EmmisiveMapEnabled",			EmissiveMapEnabledValue,			ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("OpacityEnabled",				OpacityEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("OpacityMapEnabled",				OpacityMapEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("OpacityConstantEnabled",		OpacityConstantEnabledValue,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("OpacityBaseAlphaEnabled",		OpacityBaseAlphaEnabledValue,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("DetailBaseMapEnabled",			DetailBaseMapEnabledValue,			ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("DetailNormalMapEnabled",		DetailNormalMapEnabledValue,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("ReflectionEnabled",				ReflectionEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("RefractionEnabled",				RefractionEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("LightMapEnabled",				LightMapEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("AlphaCullEnabled",				AlphaCullEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("VertexColorEnabled",			VertexColorEnabledValue,			ZE_VRT_BOOLEAN,		false),
 
-		ZEML_LIST_PROPERTY("AmbientEnabled",			AmbientEnabled,			ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("DiffuseEnabled",			DiffuseEnabled,			ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("BaseMapEnabled",			BaseMapEnabled,			ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("NormalMapEnabled",			NormalMapEnabled,		ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("ParallaxMapEnabled",		ParallaxMapEnabled,		ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("SpecularEnabled",			SpecularEnabled,		ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("SpecularMapEnabled",		SpecularMapEnabled,		ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("EmissiveEnabled",			EmissiveEnabled,		ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("EmissiveMapEnabled",		EmissiveMapEnabled,		ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("OpacityEnabled",			OpacityEnabled,			ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("OpacityMapEnabled",			OpacityMapEnabled,		ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("OpacityConstantEnabled",	OpacityConstantEnabled,	ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("OpacityBaseAlphaEnabled",	OpacityBaseAlphaEnabled,ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("DetailBaseMapEnabled",		DetailBaseMapEnabled,	ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("DetailNormalMapEnabled",	DetailNormalMapEnabled,	ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("ReflectionEnabled",			ReflectionEnabled,		ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("RefractionEnabled",			RefractionEnabled,		ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("LightMapEnabled",			LightMapEnabled,		ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("AlphaCullEnabled",			AlphaCullEnabled,		ZE_VRT_BOOLEAN,		false),
-		ZEML_LIST_PROPERTY("VertexColorEnabled",		VertexColorEnabled,		ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("Opacity",						OpacityValue,						ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("OpacityComponent",				OpacityComponentValue,				ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("AlphaCullLimit",				AlphaCullLimitValue,				ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("DetailMapTiling",				DetailMapTilingValue,				ZE_VRT_VECTOR2,		false),
+		ZEML_LIST_PROPERTY("DetailDistanceFull",			DetailDistanceFullValue,			ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("DetailDistanceFade",			DetailDistanceFadeValue,			ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("SpecularShininess",				SpecularShininessValue,				ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("SubSurfaceScatteringFactor",	SubSurfaceScatteringFactorValue,	ZE_VRT_FLOAT,		false),
 
-		ZEML_LIST_PROPERTY("Opacity",					Opacity,				ZE_VRT_FLOAT,		false),
-		ZEML_LIST_PROPERTY("AlphaCullLimit",			AlphaCullLimit,			ZE_VRT_FLOAT,		false),
-		ZEML_LIST_PROPERTY("DetailMapTiling",			DetailMapTiling,		ZE_VRT_VECTOR2,		false),
-		ZEML_LIST_PROPERTY("DetailDistanceFull",		DetailDistanceFull,		ZE_VRT_FLOAT,		false),
-		ZEML_LIST_PROPERTY("DetailDistanceFade",		DetailDistanceFade,		ZE_VRT_FLOAT,		false),
-		ZEML_LIST_PROPERTY("SpecularShininess",			SpecularShininess,		ZE_VRT_FLOAT,		false),
-		ZEML_LIST_PROPERTY("SubSurfScatFactor",			SubSurfScatFactor,		ZE_VRT_FLOAT,		false),
-		ZEML_LIST_PROPERTY("AmbientColor",				AmbientColor,			ZE_VRT_VECTOR3,		false),
-		ZEML_LIST_PROPERTY("AmbientFactor",				AmbientFactor,			ZE_VRT_FLOAT,		false),
-		ZEML_LIST_PROPERTY("SpecularColor",				SpecularColor,			ZE_VRT_VECTOR3,		false),
-		ZEML_LIST_PROPERTY("SpecularFactor",			SpecularFactor,			ZE_VRT_FLOAT,		false),
-		ZEML_LIST_PROPERTY("DiffuseColor",				DiffuseColor,			ZE_VRT_VECTOR3,		false),
-		ZEML_LIST_PROPERTY("DiffuseFactor",				DiffuseFactor,			ZE_VRT_FLOAT,		false),
-		ZEML_LIST_PROPERTY("EmissiveColor",				EmissiveColor,			ZE_VRT_VECTOR3,		false),
-		ZEML_LIST_PROPERTY("EmissiveFactor",			EmissiveFactor,			ZE_VRT_FLOAT,		false),
-		ZEML_LIST_PROPERTY("RefractionIndex",			RefractionIndex,		ZE_VRT_FLOAT,		false),
-		ZEML_LIST_PROPERTY("RefractionFactor",			RefractionFactor,		ZE_VRT_FLOAT,		false),
-		ZEML_LIST_PROPERTY("ReflectionFactor",			ReflectionFactor,		ZE_VRT_FLOAT,		false)
+		ZEML_LIST_PROPERTY("AmbientColor",					AmbientColorValue,					ZE_VRT_VECTOR3,		false),
+		ZEML_LIST_PROPERTY("AmbientFactor",					AmbientFactorValue,					ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("SpecularColor",					SpecularColorValue,					ZE_VRT_VECTOR3,		false),
+		ZEML_LIST_PROPERTY("SpecularFactor",				SpecularFactorValue,				ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("DiffuseColor",					DiffuseColorValue,					ZE_VRT_VECTOR3,		false),
+		ZEML_LIST_PROPERTY("DiffuseFactor",					DiffuseFactorValue,					ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("EmmisiveColor",					EmissiveColorValue,					ZE_VRT_VECTOR3,		false),
+		ZEML_LIST_PROPERTY("EmmisiveFactor",				EmissiveFactorValue,				ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("RefractionIndex",				RefractionIndexValue,				ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("RefractionFactor",				RefractionFactorValue,				ZE_VRT_FLOAT,		false),
+		ZEML_LIST_PROPERTY("ReflectionFactor",				ReflectionFactorValue,				ZE_VRT_FLOAT,		false),
+
+		ZEML_LIST_PROPERTY("BaseMap",						BaseMapValue,						ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("BaseMapAddressModeU",			BaseMapAddressModeUValue,			ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("BaseMapAddressModeV",			BaseMapAddressModeVValue,			ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("NormalMap",						NormalMapValue,						ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("NormalMapAddressModeU",			NormalMapAddressModeUValue,			ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("NormalMapAddressModeV",			NormalMapAddressModeVValue,			ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("ParallaxMap",					ParallaxMapValue,					ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("ParallaxMapAddressModeU",		ParallaxMapAddressModeUValue,		ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("ParallaxMapAddressModeV",		ParallaxMapAddressModeVValue,		ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("SpecularMap",					SpecularMapValue,					ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("SpecularMapAddressModeU",		SpecularMapAddressModeUValue,		ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("SpecularMapAddressModeV",		SpecularMapAddressModeVValue,		ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("EmmisiveMap",					EmissiveMapValue,					ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("EmmisiveMapAddressModeU",		EmissiveMapAddressModeUValue,		ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("EmmisiveMapAddressModeV",		EmissiveMapAddressModeVValue,		ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("OpacityMap",					OpacityMapValue,					ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("OpacityMapAddressModeU",		OpacityMapAddressModeUValue,		ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("OpacityMapAddressModeV",		OpacityMapAddressModeVValue,		ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("DetailBaseMap",					DetailBaseMapValue,					ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("DetailBaseMapAddressModeU",		DetailBaseMapAddressModeUValue,		ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("DetailBaseMapAddressModeV",		DetailBaseMapAddressModeVValue,		ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("DetailNormalMap",				DetailNormalMapValue,				ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("DetailNormalMapAddressModeU",	DetailNormalMapAddressModeUValue,	ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("DetailNormalMapAddressModeV",	DetailNormalMapAddressModeVValue,	ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("EnvironmentMap",				EnvironmentMapValue,				ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("EnvironmentMapAddressModeU",	EnvironmentMapAddressModeUValue,	ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("EnvironmentMapAddressModeV",	EnvironmentMapAddressModeVValue,	ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("EnvironmentMapAddressModeV",	EnvironmentMapAddressModeWValue,	ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("LightMap",						LightMapValue,						ZE_VRT_STRING,		false),
+		ZEML_LIST_PROPERTY("LightMapAddressModeU",			LightMapAddressModeUValue,			ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("LightMapAddressModeV",			LightMapAddressModeVValue,			ZE_VRT_INTEGER_32,	false)
 	};
 
-	if (!Reader.ReadPropertyList(Properties, 50))
+	if (!Reader.ReadPropertyList(Properties, 76))
 		zeError("Cannot read material properties");
 
 	// Configure material
-	SetAmbientEnabled((AmbientEnabled.GetType() != ZE_VRT_UNDEFINED && AmbientEnabled.GetBoolean() ? true : false));
-	SetDiffuseEnabled((DiffuseEnabled.GetType() != ZE_VRT_UNDEFINED && DiffuseEnabled.GetBoolean() ? true : false));
-	SetNormalMapEnabled((NormalMapEnabled.GetType() != ZE_VRT_UNDEFINED && NormalMapEnabled.GetBoolean() ? true : false));
-	SetParallaxMapEnabled((ParallaxMapEnabled.GetType() != ZE_VRT_UNDEFINED && ParallaxMapEnabled.GetBoolean() ? true : false));
-	SetSpecularEnabled((SpecularEnabled.GetType() != ZE_VRT_UNDEFINED && SpecularEnabled.GetBoolean() ? true : false));
-	SetEmmisiveEnabled((EmissiveEnabled.GetType() != ZE_VRT_UNDEFINED && EmissiveEnabled.GetBoolean() ? true : false));
-	SetOpacityEnabled((OpacityEnabled.GetType() != ZE_VRT_UNDEFINED && OpacityEnabled.GetBoolean() ? true : false));
-	SetDetailBaseMapEnabled((DetailBaseMapEnabled.GetType() != ZE_VRT_UNDEFINED && DetailBaseMapEnabled.GetBoolean() ? true : false));
-	SetDetailNormalMapEnabled((DetailNormalMapEnabled.GetType() != ZE_VRT_UNDEFINED && DetailNormalMapEnabled.GetBoolean() ? true : false));
-	SetReflectionEnabled((ReflectionEnabled.GetType() != ZE_VRT_UNDEFINED && ReflectionEnabled.GetBoolean() ? true : false));
-	SetRefractionEnabled((RefractionEnabled.GetType() != ZE_VRT_UNDEFINED && RefractionEnabled.GetBoolean() ? true : false));
-	SetLightMapEnabled((LightMapEnabled.GetType() != ZE_VRT_UNDEFINED && LightMapEnabled.GetBoolean() ? true : false));
-	SetAlphaCullEnabled((AlphaCullEnabled.GetType() != ZE_VRT_UNDEFINED && AlphaCullEnabled.GetBoolean() ? true : false));
-	SetVertexColorEnabled((VertexColorEnabled.GetType() != ZE_VRT_UNDEFINED && VertexColorEnabled.GetBoolean() ? true : false));
 
-	SetOpacity(Opacity.GetType() == ZE_VRT_UNDEFINED ? 1.0f : Opacity.GetFloat());
-	SetDetailMapTiling(DetailMapTiling.GetType() == ZE_VRT_UNDEFINED ? ZEVector2::One : DetailMapTiling.GetVector2());
-	SetAmbientColor(AmbientColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : AmbientColor.GetVector3());
-	SetAmbientFactor(AmbientFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : AmbientFactor.GetFloat());
-	SetSpecularColor(SpecularColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : SpecularColor.GetVector3());
-	SetSpecularFactor(SpecularFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SpecularFactor.GetFloat());
-	SetDiffuseColor(DiffuseColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : DiffuseColor.GetVector3());
-	SetDiffuseFactor(DiffuseFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : DiffuseFactor.GetFloat());
-	SetEmmisiveColor(EmissiveColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : EmissiveColor.GetVector3());
-	SetEmmisiveFactor(EmissiveFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : EmissiveFactor.GetFloat());
-	SetRefractionIndex(RefractionIndex.GetType() == ZE_VRT_UNDEFINED ? 1.0f : RefractionIndex.GetFloat());
-	SetRefractionFactor(RefractionFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : RefractionFactor.GetFloat());
-	SetReflectionFactor(ReflectionFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : ReflectionFactor.GetFloat());
-	SetDiffuseSubSurfaceScatteringFactor(SubSurfScatFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SubSurfScatFactor.GetFloat());
-	SetAlphaCullLimit(AlphaCullLimit.GetType() == ZE_VRT_UNDEFINED ? 1.0f : AlphaCullLimit.GetFloat());
-	SetSpecularShininess(SpecularShininess.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SpecularShininess.GetFloat());
+	SetWireframe((WireFrameValue.GetType() != ZE_VRT_UNDEFINED && WireFrameValue.GetBoolean() ? true : false));
+	SetTwoSided((TwoSidedValue.GetType() != ZE_VRT_UNDEFINED && TwoSidedValue.GetBoolean() ? true : false));
+	SetLightningEnabled((LightingEnabledValue.GetType() != ZE_VRT_UNDEFINED && LightingEnabledValue.GetBoolean() ? true : false));
+	SetTransparancyMode(TransparencyModeValue.GetType() == ZE_VRT_UNDEFINED ? (ZEMaterialTransparancyMode)0 : (ZEMaterialTransparancyMode)TransparencyModeValue.GetInt32());
+
+	SetAmbientEnabled((AmbientEnabledValue.GetType() != ZE_VRT_UNDEFINED && AmbientEnabledValue.GetBoolean() ? true : false));
+	SetDiffuseEnabled((DiffuseEnabledValue.GetType() != ZE_VRT_UNDEFINED && DiffuseEnabledValue.GetBoolean() ? true : false));
+	SetNormalMapEnabled((NormalMapEnabledValue.GetType() != ZE_VRT_UNDEFINED && NormalMapEnabledValue.GetBoolean() ? true : false));
+	SetParallaxMapEnabled((ParallaxMapEnabledValue.GetType() != ZE_VRT_UNDEFINED && ParallaxMapEnabledValue.GetBoolean() ? true : false));
+	SetSpecularEnabled((SpecularEnabledValue.GetType() != ZE_VRT_UNDEFINED && SpecularEnabledValue.GetBoolean() ? true : false));
+	SetEmmisiveEnabled((EmissiveEnabledValue.GetType() != ZE_VRT_UNDEFINED && EmissiveEnabledValue.GetBoolean() ? true : false));
+	SetOpacityEnabled((OpacityEnabledValue.GetType() != ZE_VRT_UNDEFINED && OpacityEnabledValue.GetBoolean() ? true : false));
+	SetDetailBaseMapEnabled((DetailBaseMapEnabledValue.GetType() != ZE_VRT_UNDEFINED && DetailBaseMapEnabledValue.GetBoolean() ? true : false));
+	SetDetailNormalMapEnabled((DetailNormalMapEnabledValue.GetType() != ZE_VRT_UNDEFINED && DetailNormalMapEnabledValue.GetBoolean() ? true : false));
+	SetReflectionEnabled((ReflectionEnabledValue.GetType() != ZE_VRT_UNDEFINED && ReflectionEnabledValue.GetBoolean() ? true : false));
+	SetRefractionEnabled((RefractionEnabledValue.GetType() != ZE_VRT_UNDEFINED && RefractionEnabledValue.GetBoolean() ? true : false));
+	SetLightMapEnabled((LightMapEnabledValue.GetType() != ZE_VRT_UNDEFINED && LightMapEnabledValue.GetBoolean() ? true : false));
+	SetAlphaCullEnabled((AlphaCullEnabledValue.GetType() != ZE_VRT_UNDEFINED && AlphaCullEnabledValue.GetBoolean() ? true : false));
+	SetVertexColorEnabled((VertexColorEnabledValue.GetType() != ZE_VRT_UNDEFINED && VertexColorEnabledValue.GetBoolean() ? true : false));
+
+	SetOpacity(OpacityValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : OpacityValue.GetFloat());
+	SetOpacityComponent((ZEMaterialOpacityComponent)(OpacityComponentValue.GetType() == ZE_VRT_UNDEFINED ? 0 : OpacityComponentValue.GetInt32()));
+	SetDetailMapTiling(DetailMapTilingValue.GetType() == ZE_VRT_UNDEFINED ? ZEVector2::One : DetailMapTilingValue.GetVector2());
+	SetAmbientColor(AmbientColorValue.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : AmbientColorValue.GetVector3());
+	SetAmbientFactor(AmbientFactorValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : AmbientFactorValue.GetFloat());
+	SetSpecularColor(SpecularColorValue.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : SpecularColorValue.GetVector3());
+	SetSpecularFactor(SpecularFactorValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SpecularFactorValue.GetFloat());
+	SetDiffuseColor(DiffuseColorValue.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : DiffuseColorValue.GetVector3());
+	SetDiffuseFactor(DiffuseFactorValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : DiffuseFactorValue.GetFloat());
+	SetEmmisiveColor(EmissiveColorValue.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : EmissiveColorValue.GetVector3());
+	SetEmmisiveFactor(EmissiveFactorValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : EmissiveFactorValue.GetFloat());
+	SetRefractionIndex(RefractionIndexValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : RefractionIndexValue.GetFloat());
+	SetRefractionFactor(RefractionFactorValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : RefractionFactorValue.GetFloat());
+	SetReflectionFactor(ReflectionFactorValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : ReflectionFactorValue.GetFloat());
+	SetDiffuseSubSurfaceScatteringFactor(SubSurfaceScatteringFactorValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SubSurfaceScatteringFactorValue.GetFloat());
+	SetAlphaCullLimit(AlphaCullLimitValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : AlphaCullLimitValue.GetFloat());
+	SetSpecularShininess(SpecularShininessValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SpecularShininessValue.GetFloat());
+
+	SetBaseMapAddressModeU((ZETextureAddressMode)(BaseMapAddressModeUValue.GetType() == ZE_VRT_UNDEFINED ? 0 : BaseMapAddressModeUValue.GetInt32()));
+	SetBaseMapAddressModeV((ZETextureAddressMode)(BaseMapAddressModeVValue.GetType() == ZE_VRT_UNDEFINED ? 0 : BaseMapAddressModeVValue.GetInt32()));
+	SetNormalMapAddressModeU((ZETextureAddressMode)(NormalMapAddressModeUValue.GetType() == ZE_VRT_UNDEFINED ? 0 : NormalMapAddressModeUValue.GetInt32()));
+	SetNormalMapAddressModeV((ZETextureAddressMode)(NormalMapAddressModeVValue.GetType() == ZE_VRT_UNDEFINED ? 0 : NormalMapAddressModeVValue.GetInt32()));
+	SetParallaxMapAddressModeU((ZETextureAddressMode)(ParallaxMapAddressModeUValue.GetType() == ZE_VRT_UNDEFINED ? 0 : ParallaxMapAddressModeUValue.GetInt32()));
+	SetParallaxMapAddressModeV((ZETextureAddressMode)(ParallaxMapAddressModeVValue.GetType() == ZE_VRT_UNDEFINED ? 0 : ParallaxMapAddressModeVValue.GetInt32()));
+	SetSpecularMapAddressModeU((ZETextureAddressMode)(SpecularMapAddressModeUValue.GetType() == ZE_VRT_UNDEFINED ? 0 : SpecularMapAddressModeUValue.GetInt32()));
+	SetSpecularMapAddressModeV((ZETextureAddressMode)(SpecularMapAddressModeVValue.GetType() == ZE_VRT_UNDEFINED ? 0 : SpecularMapAddressModeVValue.GetInt32()));
+	SetEmmisiveMapAddressModeU((ZETextureAddressMode)(EmissiveMapAddressModeUValue.GetType() == ZE_VRT_UNDEFINED ? 0 : EmissiveMapAddressModeUValue.GetInt32()));
+	SetEmmisiveMapAddressModeV((ZETextureAddressMode)(EmissiveMapAddressModeVValue.GetType() == ZE_VRT_UNDEFINED ? 0 : EmissiveMapAddressModeVValue.GetInt32()));
+	SetOpacityMapAddressModeU((ZETextureAddressMode)(OpacityMapAddressModeUValue.GetType() == ZE_VRT_UNDEFINED ? 0 : OpacityMapAddressModeUValue.GetInt32()));
+	SetOpacityMapAddressModeV((ZETextureAddressMode)(OpacityMapAddressModeVValue.GetType() == ZE_VRT_UNDEFINED ? 0 : OpacityMapAddressModeVValue.GetInt32()));
+	SetDetailBaseMapAddressModeU((ZETextureAddressMode)(DetailBaseMapAddressModeUValue.GetType() == ZE_VRT_UNDEFINED ? 0 : DetailBaseMapAddressModeUValue.GetInt32()));
+	SetDetailBaseMapAddressModeV((ZETextureAddressMode)(DetailBaseMapAddressModeVValue.GetType() == ZE_VRT_UNDEFINED ? 0 : DetailBaseMapAddressModeVValue.GetInt32()));
+	SetDetailNormalMapAddressModeU((ZETextureAddressMode)(DetailNormalMapAddressModeUValue.GetType() == ZE_VRT_UNDEFINED ? 0 : DetailNormalMapAddressModeUValue.GetInt32()));
+	SetDetailNormalMapAddressModeV((ZETextureAddressMode)(DetailNormalMapAddressModeVValue.GetType() == ZE_VRT_UNDEFINED ? 0 : DetailNormalMapAddressModeVValue.GetInt32()));
+	SetEnvironmentMapAddressModeU((ZETextureAddressMode)(EnvironmentMapAddressModeUValue.GetType() == ZE_VRT_UNDEFINED ? 0 : EnvironmentMapAddressModeUValue.GetInt32()));
+	SetEnvironmentMapAddressModeV((ZETextureAddressMode)(EnvironmentMapAddressModeVValue.GetType() == ZE_VRT_UNDEFINED ? 0 : EnvironmentMapAddressModeVValue.GetInt32()));
+	SetEnvironmentMapAddressModeW((ZETextureAddressMode)(EnvironmentMapAddressModeWValue.GetType() == ZE_VRT_UNDEFINED ? 0 : EnvironmentMapAddressModeWValue.GetInt32()));
+	SetLightMapAddressModeU((ZETextureAddressMode)(LightMapAddressModeUValue.GetType() == ZE_VRT_UNDEFINED ? 0 : LightMapAddressModeUValue.GetInt32()));
+	SetLightMapAddressModeV((ZETextureAddressMode)(LightMapAddressModeVValue.GetType() == ZE_VRT_UNDEFINED ? 0 : LightMapAddressModeVValue.GetInt32()));
 
 	// Load resources
 	ZEString ResourcePath;
-	if (BaseMap.GetType() != ZE_VRT_UNDEFINED && !BaseMap.GetString().IsEmpty())
+	if (BaseMapValue.GetType() != ZE_VRT_UNDEFINED && !BaseMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + BaseMap.GetString();
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + BaseMapValue.GetString();
 		SetBaseMapFile(ResourcePath);
 	}
-	if (NormalMap.GetType() != ZE_VRT_UNDEFINED && !NormalMap.GetString().IsEmpty())
+	if (NormalMapValue.GetType() != ZE_VRT_UNDEFINED && !NormalMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + NormalMap.GetString();
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + NormalMapValue.GetString();
 		SetNormalMapFile(ResourcePath);
 	}
-	if (ParallaxMap.GetType() != ZE_VRT_UNDEFINED && !ParallaxMap.GetString().IsEmpty())
+	if (ParallaxMapValue.GetType() != ZE_VRT_UNDEFINED && !ParallaxMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + ParallaxMap.GetString();
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + ParallaxMapValue.GetString();
 		SetParallaxMapFile(ResourcePath);
 	}
-	if (SpecularMap.GetType() != ZE_VRT_UNDEFINED && !SpecularMap.GetString().IsEmpty())
+	if (SpecularMapValue.GetType() != ZE_VRT_UNDEFINED && !SpecularMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + SpecularMap.GetString();
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + SpecularMapValue.GetString();
 		SetSpecularMapFile(ResourcePath);
 	}
-	if (EmissiveMap.GetType() != ZE_VRT_UNDEFINED && !EmissiveMap.GetString().IsEmpty())
+	if (EmissiveMapValue.GetType() != ZE_VRT_UNDEFINED && !EmissiveMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + EmissiveMap.GetString();
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + EmissiveMapValue.GetString();
 		SetEmmisiveMapFile(ResourcePath);
 	}
-	if (OpacityMap.GetType() != ZE_VRT_UNDEFINED && !OpacityMap.GetString().IsEmpty())
+	if (OpacityMapValue.GetType() != ZE_VRT_UNDEFINED && !OpacityMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + OpacityMap.GetString();
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + OpacityMapValue.GetString();
 		SetOpacityMapFile(ResourcePath);
 	}
-	if (DetailBaseMap.GetType() != ZE_VRT_UNDEFINED && !DetailBaseMap.GetString().IsEmpty())
+	if (DetailBaseMapValue.GetType() != ZE_VRT_UNDEFINED && !DetailBaseMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + DetailBaseMap.GetString();
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + DetailBaseMapValue.GetString();
 		SetDetailBaseMapFile(ResourcePath);
 	}
-	if (DetailNormalMap.GetType() != ZE_VRT_UNDEFINED && !DetailNormalMap.GetString().IsEmpty())
+	if (DetailNormalMapValue.GetType() != ZE_VRT_UNDEFINED && !DetailNormalMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + DetailNormalMap.GetString();
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + DetailNormalMapValue.GetString();
 		SetDetailNormalMapFile(ResourcePath);
 	}
-	if (EnvironmentMap.GetType() != ZE_VRT_UNDEFINED && !EnvironmentMap.GetString().IsEmpty())
+	if (EnvironmentMapValue.GetType() != ZE_VRT_UNDEFINED && !EnvironmentMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + EnvironmentMap.GetString();
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + EnvironmentMapValue.GetString();
 		SetEnvironmentMapFile(ResourcePath);
 	}
-	if (LightMap.GetType() != ZE_VRT_UNDEFINED && !LightMap.GetString().IsEmpty())
+	if (LightMapValue.GetType() != ZE_VRT_UNDEFINED && !LightMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + LightMap.GetString();
+		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + LightMapValue.GetString();
 		SetLightMapFile(ResourcePath);
 	}
 

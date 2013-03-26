@@ -43,7 +43,7 @@ ZEMaterial::ZEMaterial()
 {
 	LightningEnabled = true;
 	ShadowCaster = true;
-	ShadowReciver = true;
+	ShadowReceiver = true;
 }
 
 void ZEMaterial::SetShadowCaster(bool Value)
@@ -56,14 +56,14 @@ bool ZEMaterial::GetShadowCaster() const
 	return ShadowCaster;
 }
 
-void ZEMaterial::SetShadowReciver(bool Value)
+void ZEMaterial::SetShadowReceiver(bool Value)
 {
-	ShadowReciver = Value;
+	ShadowReceiver = Value;
 }
 
-bool ZEMaterial::GetShadowReciver() const
+bool ZEMaterial::GetShadowReceiver() const
 {
-	return ShadowReciver;
+	return ShadowReceiver;
 }
 
 ZEMaterial::~ZEMaterial()

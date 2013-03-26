@@ -90,7 +90,7 @@ class ZEMaterial : public ZEObject
 	ZE_META_OBJECT(ZEMaterial) 
 	protected:
 		bool							ShadowCaster;
-		bool							ShadowReciver;
+		bool							ShadowReceiver;
 		bool							LightningEnabled;
 
 										ZEMaterial();
@@ -103,8 +103,8 @@ class ZEMaterial : public ZEObject
 		void							SetShadowCaster(bool Value);
 		bool							GetShadowCaster() const;
 
-		void							SetShadowReciver(bool Value);
-		bool							GetShadowReciver() const;
+		void							SetShadowReceiver(bool Value);
+		bool							GetShadowReceiver() const;
 
 		void							SetLightningEnabled(bool Enabled);
 		bool							GetLightningEnabled() const;
@@ -129,7 +129,7 @@ ZE_POST_PROCESSOR_START(Meta)
 	<meta>
 		<class name="ZEMaterial" noinstance="true" description="Base class of materials.">
 			<property name="LightningEnabled" groupname="Shading" type="boolean" autogetset="yes"/>
-			<property name="ShadowReciver" groupname="Shadows" type="boolean" autogetset="yes"/>
+			<property name="ShadowReceiver" groupname="Shadows" type="boolean" autogetset="yes"/>
 			<property name="ShadowCaster" groupname="Shadows" type="boolean" autogetset="yes"/>
 		</class>
 	</meta>

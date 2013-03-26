@@ -392,6 +392,11 @@ bool ZEModel::GetAutoLOD()
 	return AutoLOD;
 }
 
+void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
+{
+	BoundingBoxIsUserDefined = Value;
+}
+
 const ZEAABBox& ZEModel::GetWorldBoundingBox()
 {
 	if (!BoundingBoxIsUserDefined)
@@ -602,11 +607,6 @@ bool ZEModel::DeinitializeSelf()
 ZEModel* ZEModel::CreateInstance()
 {
 	return new ZEModel();
-}
-
-void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
-{
-	BoundingBoxIsUserDefined = Value;
 }
 
 ZEEntityRunAt ZEModelDescription::GetRunAt() const
