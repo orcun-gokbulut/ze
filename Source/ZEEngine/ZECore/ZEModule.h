@@ -43,25 +43,24 @@
 #define ZE_MODULE_DESCRIPTION ZE_EXTENSION_DESCRIPTION
 #define ZE_MODULE_DESCRIPTION_ABSTRACT ZE_EXTENSION_DESCRIPTION_ABSTRACT
 
+
 class ZEModule : public ZEExtension
 {
 	ZE_MODULE(ZEModule)
 
 	private:
 		bool							Enabled;
-		bool							Initialized;
 
 	protected:
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
 										ZEModule();
 		virtual							~ZEModule();
 
 	public:
 		virtual bool					GetEnabled();
 		virtual void					SetEnabled(bool Enabled);
-
-		virtual bool					IsInitialized();
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
 
 		virtual void					Destroy();
 };

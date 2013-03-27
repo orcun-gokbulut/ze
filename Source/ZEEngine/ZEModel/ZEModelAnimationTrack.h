@@ -54,6 +54,7 @@ ZE_CLASS(ZEModelAnimationTrack)
 
 class ZEModelAnimationTrack : public ZEObject
 {
+	friend class ZEModel;
 	ZE_OBJECT
 
 	private:
@@ -76,7 +77,9 @@ class ZEModelAnimationTrack : public ZEObject
 		float							CurrentFrame;
 		ZEUInt							LOD;
 		bool							Looping;
+
 		
+		void							UpdateAnimation();
 		void							UpdateMeshesAndBones();
 		void							ApplyLimits();
 

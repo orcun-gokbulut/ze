@@ -1140,6 +1140,24 @@ bool ZE3dsMaxModelExporter::ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesN
 	if (!Mesh->InitializeData())
 		zeError("Can not initialize mesh data.");
 
+	ZEInt32 ParentMeshId = -1;
+	if (Node->GetNodeParent() != NULL)
+	{
+		IGameNode* CurrentNode = Node;
+		while(CurrentNode->GetNodeParent() != NULL)
+			if (GetMeshId(CurrentNode->GetNodeParent()) == -1)
+			{
+				CurrentNode = CurrentNode->GetNodeParent();
+				continue;
+			}
+			else
+			{
+				ParentMeshId = GetMeshId(CurrentNode->GetNodeParent());
+				break;
+			}
+	}
+
+	CurrentMeshNode->AddProperty("ParentMesh", ParentMeshId);
 
 	ZEAABBox BoundingBox;
 	ZE3dsMaxUtils::CalculateLocalBoundingBox(BoundingBox, Mesh);
@@ -1150,9 +1168,21 @@ bool ZE3dsMaxModelExporter::ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesN
 	ZE3dsMaxUtils::GetProperty(Mesh,  ZE_BOOL_PROP, "Mesh_Visibility", *CurrentMeshNode->AddProperty("IsVisible"));
 
 	CurrentMeshNode->AddProperty("IsSkinned", Mesh->IsObjectSkinned());
-	CurrentMeshNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Translation()));
-	CurrentMeshNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Rotation()));
-	CurrentMeshNode->AddProperty("Scale", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Scaling()));
+
+	if (ParentMeshId != -1)
+	{
+		GMatrix Transform = Node->GetWorldTM() * ProcessedMasterMeshes[(ZESize)ParentMeshId]->GetWorldTM().Inverse();
+		CurrentMeshNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(Transform.Translation()));
+		CurrentMeshNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(Transform.Rotation()));
+		CurrentMeshNode->AddProperty("Scale", ZE3dsMaxUtils::MaxtoZE(Transform.Scaling()));
+	}
+	else
+	{ 
+		//zeLog("\"%s\" is the Root Bone", Node->GetName());
+		CurrentMeshNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Translation()));
+		CurrentMeshNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Rotation()));
+		CurrentMeshNode->AddProperty("Scale", ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Scaling()));
+	}
 
 	MSTR UserDefinedPropertiesBuffer;
 	Node->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
@@ -1280,6 +1310,13 @@ bool ZE3dsMaxModelExporter::ProcessMeshes()
 			{
 				if (strncmp(MasterMeshes[J]->GetName(), Nodes[I]->GetName(), ZE_EXFL_MAX_NAME_SIZE) == 0)
 				{
+					if (MasterMeshes[J]->GetNodeID() == Nodes[I]->GetNodeID())
+					{
+						// This occurs due to hierarchical links of max nodes. 3ds Max makes a copy of linked object.
+						MeshExists = true;
+						break;
+					}
+
 					MeshExists = true;
 					ZEInt32 MasterMeshLOD;
 					ZEInt32 CurrentMeshLOD;
@@ -1302,6 +1339,11 @@ bool ZE3dsMaxModelExporter::ProcessMeshes()
 						MeshLODs.Add(MasterMeshes[J]);
 						MasterMeshes[J] = Nodes[I];
 					}
+
+					if (CurrentMeshLOD > MasterMeshLOD)
+						MeshLODs.Add(Nodes[I]);
+
+					break;
 				}
 			}
 
@@ -1361,39 +1403,35 @@ void ZE3dsMaxModelExporter::ProcessAnimationFrames(ZESize AnimationStartFrame, Z
 	ZEInt32 ActualAnimationFrame = (ZEInt32)AnimationStartFrame;
 
 	GMatrix Matrix;
+
 	for (ZESize I = 0; I < (ZESize)ProcessedMasterMeshes.Count(); I++)
 	{
-		//Matrix = ProcessedMasterMeshes[I]->GetWorldTM(); //Karsılaştır.
-		Matrix = ProcessedMasterMeshes[I]->GetWorldTM((ZEInt32)AnimationStartFrame * TicksPerFrame);
+		IGameControl* MeshAnimationController = ProcessedMasterMeshes[I]->GetIGameControl();
 
-		ActualAnimationFrame = (ZEInt32)AnimationStartFrame;
-		for (ZESize N = 0; N < AnimationFrameCount; N++)
+		bool Result = ProcessedMasterMeshes[I]->GetNodeParent() == NULL;
+
+		for (ZEInt32 J = 0; J < 13; J++)
 		{
-			if (!(ProcessedMeshes[I]->GetWorldTM(ActualAnimationFrame * TicksPerFrame) == Matrix))
+			if (MeshAnimationController->IsAnimated((IGameControlType)J))
 			{
-				CurrentAnimationAffectedMeshes.Append(1, &ProcessedMeshes[I]);
+				CurrentAnimationAffectedMeshes.Append(1, &ProcessedMasterMeshes[I]);
 				break;
 			}
-
-			ActualAnimationFrame++;
 		}
 	}
 
 	for (ZESize I = 0; I < (ZESize)ProcessedBones.Count(); I++)
 	{
-		//Matrix = ProcessedBones[I]->GetWorldTM();
-		Matrix = ProcessedBones[I]->GetWorldTM((ZEInt32)AnimationStartFrame * TicksPerFrame);
+		IGameControl* BoneAnimationController = ProcessedBones[I]->GetIGameControl();
 
-		ActualAnimationFrame = (ZEInt32)AnimationStartFrame;
-		for (ZESize N = 0; N < AnimationFrameCount; N++)
+		for (ZEInt32 J = 0; J < 13; J++)
 		{
-			if (!(ProcessedBones[I]->GetWorldTM(ActualAnimationFrame * TicksPerFrame) == Matrix))
+			if (BoneAnimationController->IsAnimated((IGameControlType)J))
 			{
 				CurrentAnimationAffectedBones.Append(1, &ProcessedBones[I]);
 				break;
 			}
 
-			ActualAnimationFrame++;
 		}
 	}
 
@@ -1411,48 +1449,49 @@ void ZE3dsMaxModelExporter::ProcessAnimationFrames(ZESize AnimationStartFrame, Z
 	zeLog("Frame Count : %d", AnimationFrameCount);
 	zeLog("Processing Animation Frames: %d - %d", AnimationStartFrame, AnimationStartFrame + AnimationFrameCount - 1);
 
-	for (ZESize I = 0; I < AnimationFrameCount; I++)
+	for (ZESize I = 0; I < (ZESize)CurrentAnimationAffectedBones.Count(); I++)
 	{
-		ZEModelFileAnimationKey* Key;
+		IGameControl* CurrentBoneAnimationController = CurrentAnimationAffectedBones[I]->GetIGameControl();
+		IGameKeyTab CurrentBoneTotalAnimationSampleKeys;
+		CurrentBoneAnimationController->GetFullSampledKeys(CurrentBoneTotalAnimationSampleKeys, 1, IGAME_TM);
 
-		for (ZESize N = 0; N < (ZESize)CurrentAnimationAffectedBones.Count(); N++)
+		ActualAnimationFrame = (ZEInt32)AnimationStartFrame;
+
+		for (ZESize N = 0; N < AnimationFrameCount; N++)
 		{
-			Key = &Frames[(I * FrameKeyCount) + N];
-			Key->ItemId = GetBoneId(CurrentAnimationAffectedBones[N]);
+			ZEModelFileAnimationKey* Key = &Frames[I + (FrameKeyCount * N)];
+			Key->ItemId = GetBoneId(CurrentAnimationAffectedBones[I]);
 
-			ZEMLNode* MainBonesNode = ModelNode.GetSubNodes("Bones").GetFirstItem();
-			ZEArray<ZEMLNode*> BoneNodes = MainBonesNode->GetSubNodes("Bone");
-			ZEInt32 ParentBoneId = ((ZEMLProperty*)BoneNodes[(ZESize)Key->ItemId]->GetProperty("ParentBone"))->GetValue().GetInt32();
-
-			if (ParentBoneId == -1)
-			{
-				GMatrix Matrix = CurrentAnimationAffectedBones[N]->GetWorldTM(ActualAnimationFrame * TicksPerFrame);
-				Key->Position = ZE3dsMaxUtils::MaxtoZE(Matrix.Translation());
-				Key->Rotation = ZE3dsMaxUtils::MaxtoZE(Matrix.Rotation());
-				Key->Scale = ZE3dsMaxUtils::MaxtoZE(Matrix.Scaling());
-			}
-			else
-			{
-				GMatrix Matrix = CurrentAnimationAffectedBones[N]->GetWorldTM(ActualAnimationFrame * TicksPerFrame) * 
-					ProcessedBones[(ZESize)ParentBoneId]->GetWorldTM(ActualAnimationFrame * TicksPerFrame).Inverse();
-				//AnimationEnabledBones[N]->GetNodeParent()->GetWorldTM(I * TicksPerFrame).Inverse();
-				Key->Position = ZE3dsMaxUtils::MaxtoZE(Matrix.Translation());
-				Key->Rotation = ZE3dsMaxUtils::MaxtoZE(Matrix.Rotation());
-				Key->Scale = ZE3dsMaxUtils::MaxtoZE(Matrix.Scaling());
-			}
-		}
-
-		for (ZESize N = 0; N < (ZESize)CurrentAnimationAffectedMeshes.Count(); N++)
-		{
-			Key = &Frames[(I * FrameKeyCount) + BoneKeyCount + N];
-			Key->ItemId = GetMeshId(CurrentAnimationAffectedMeshes[N]);
-			GMatrix Matrix = CurrentAnimationAffectedMeshes[N]->GetWorldTM(ActualAnimationFrame * TicksPerFrame);
+			GMatrix Matrix = CurrentBoneTotalAnimationSampleKeys[ActualAnimationFrame].sampleKey.gval;
 			Key->Position = ZE3dsMaxUtils::MaxtoZE(Matrix.Translation());
 			Key->Rotation = ZE3dsMaxUtils::MaxtoZE(Matrix.Rotation());
 			Key->Scale = ZE3dsMaxUtils::MaxtoZE(Matrix.Scaling());
+
+			ActualAnimationFrame++;
+		}
+	}
+
+	for (ZESize I = 0; I < (ZESize)CurrentAnimationAffectedMeshes.Count(); I++)
+	{
+		IGameControl* CurrentMeshAnimationController = CurrentAnimationAffectedMeshes[I]->GetIGameControl();
+		IGameKeyTab CurrentMeshTotalAnimationSampleKeys;
+		CurrentMeshAnimationController->GetFullSampledKeys(CurrentMeshTotalAnimationSampleKeys, 1, IGAME_TM);
+
+		ActualAnimationFrame = (ZEInt32)AnimationStartFrame;
+
+		for (ZESize N = 0; N < AnimationFrameCount; N++)
+		{
+			ZEModelFileAnimationKey* Key = &Frames[I + BoneKeyCount + (FrameKeyCount * N)];
+			Key->ItemId = GetMeshId(CurrentAnimationAffectedMeshes[I]);
+
+			GMatrix Matrix = CurrentMeshTotalAnimationSampleKeys[ActualAnimationFrame].sampleKey.gval;
+			Key->Position = ZE3dsMaxUtils::MaxtoZE(Matrix.Translation());
+			Key->Rotation = ZE3dsMaxUtils::MaxtoZE(Matrix.Rotation());
+			Key->Scale = ZE3dsMaxUtils::MaxtoZE(Matrix.Scaling());
+
+			ActualAnimationFrame++;
 		}
 
-		ActualAnimationFrame++;
 	}
 
 	AnimationNode->AddDataProperty("Frames", Frames.GetCArray(), Frames.GetCount() * sizeof(ZEModelFileAnimationKey), true);

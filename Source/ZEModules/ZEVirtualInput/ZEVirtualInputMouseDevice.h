@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEConnectionTCP.h
+ Zinek Engine - ZEVirtualInputMouseDevice.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,43 +34,20 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_CONNECTION_TCP_H__
-#define __ZE_CONNECTION_TCP_H__
+#ifndef	__ZE_VIRTUAL_MOUSE_INPUT_DEVICE_H__
+#define __ZE_VIRTUAL_MOUSE_INPUT_DEVICE_H__
 
-#include "ZEConnection.h"
+#include "ZEInput/ZEInputDevice.h"
 
-class ZESocketTCP;
-
-class ZEConnectionTCP : public ZEConnection
+class ZEVirtualInputMouseDevice : public ZEInputDevice
 {
-	private:
+	friend class ZEVirtualInputModule;
 
-		ZESocketTCP*	Socket;
-
-		char*			TempBuffer;
-		char*			ReadBuffer;
-		char*			SendBuffer;
-
-		ZESize			ReadBufferSize;
-		ZESize			TempBufferSize;
-		ZESize			SendBufferSize;
-
-		ZESize			FilledReadBufferSize;
-		ZESize			FilledSendBufferSize;
-
-						ZEConnectionTCP();
+	protected:
+		virtual bool							InitializeSelf();
 
 	public:
-
-		virtual bool	SendData(const void* Data, ZESize Size);
-		virtual void*	GetBuffer(ZESize& UsedSize);
-
-		virtual void	CleanBuffer();
-
-		virtual void	Process(float ElapsedTime);
-
-						ZEConnectionTCP(ZESocketTCP* Socket, ZEUInt16 MaxPacketSize = 0xFFFF);
-						~ZEConnectionTCP();
+		virtual void							UnAcquire();
 };
 
 #endif

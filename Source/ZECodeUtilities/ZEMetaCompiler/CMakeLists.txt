@@ -53,4 +53,4 @@ ze_add_source(ZEMetaCollectionGenerator.cpp  	Sources)
 ze_add_executable(ZEMetaCompiler 
 	CONSOLE 
 	SOURCES ${Sources} 
-	LIBS ZEFoundation ZEMeta libClang)
+	LIBS ZEFoundation libClang)

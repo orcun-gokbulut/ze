@@ -56,6 +56,7 @@ ZETestSuite(ZEMLSerialNode)
 		//RootNode.Size: 0
 		//RootNode.SubItemCount: 0
 
+		ZETestCheckEqual(File->GetSize(), 28);
 		File->Close();
 		remove("SerialWriterTests.txt");
 	}
@@ -75,6 +76,7 @@ ZETestSuite(ZEMLSerialNode)
 		//Node.Size: 0
 		//Node.SubItemCount: 0
 
+		ZETestCheckEqual(File->GetSize(), 52);
 		File->Close();
 		remove("SerialWriterTests.txt");
 	}
@@ -108,6 +110,7 @@ ZETestSuite(ZEMLSerialNode)
 		//SerialNode.SubItemCount: 0
 		//Node.ParentNode: RootNode
 
+		ZETestCheckEqual(File->GetSize(), 82);
 		File->Close();
 		remove("SerialWriterTests.txt");
 	}
@@ -126,6 +129,27 @@ ZETestSuite(ZEMLSerialNode)
 		//Node.Size: 30
 		File->Close();
 		remove("SerialWriterTests.txt");
+
+		ZETestCase("close all nodes")
+		{
+			File->Open("SerialWriterTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+			ZEMLSerialRootNode Root("Root", File);
+			ZEMLSerialNode Node1 = Root.OpenNode("Node01");
+			ZEMLSerialNode Node2 = Node1.OpenNode("Node001");		
+			//Root.Size : 0
+			//Node1.Size : 0
+			//Node2.Size : 0
+
+			Node2.CloseNode();
+			//Node1.Size : 27
+			Node1.CloseNode();
+			//Root.Size : 53
+			Root.CloseNode();
+
+			ZETestCheckEqual(File->GetSize(), 77);
+			File->Close();
+			remove("SerialWriterTests.txt");
+		}
 	}
 
 	ZETest("void ZEMLSerialNode::WriteProperty(const ZEString& Name, const ZEVariant& Value)")

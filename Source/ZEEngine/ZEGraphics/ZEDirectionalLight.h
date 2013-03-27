@@ -74,12 +74,11 @@ class ZEDirectionalLight : public ZELight
 		void								CreateRenderTargets();
 		void								DestroyRenderTargets();
 
-											ZEDirectionalLight();
-		virtual								~ZEDirectionalLight();
-
-	protected:
 		bool								InitializeSelf();
 		bool								DeinitializeSelf();
+
+											ZEDirectionalLight();
+		virtual								~ZEDirectionalLight();
 
 	public:
 		ZELightType							GetLightType();

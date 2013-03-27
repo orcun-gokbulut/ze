@@ -48,7 +48,7 @@ class ZEClient
 	private:
 
 		ZESocketTCP*					Socket;
-		ZEConnectionTCP*				Connection;
+		ZEConnection*					Connection;
 		ZEPacketManagerServer			PacketManager;
 
 	public:

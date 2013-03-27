@@ -27,6 +27,16 @@ for obj in selection do
 			)
 		)
 
+		if isProperty obj "ZEBoundingBoxAttributes" == true then
+		(
+			for i = 1 to custAttributes.count obj  do
+			(
+				if (custAttributes.getdef obj i).name == #ZEBoundingBoxAttributes then 
+					custAttributes.delete obj i
+					obj.xray = false
+			)
+		)
+		
 		if isProperty obj "ZEInteriorDoorAttributes" == true then
 		(
 			for i = 1 to custAttributes.count obj  do

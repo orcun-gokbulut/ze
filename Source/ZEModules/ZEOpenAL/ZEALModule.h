@@ -81,6 +81,9 @@ class ZEALModule : public ZESoundModule
 		void									UpdateVolumes(ZESoundSourceType SourceType);
 		void									UpdateStreams();
 
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
+
 												ZEALModule();
 		virtual									~ZEALModule();
 
@@ -90,9 +93,6 @@ class ZEALModule : public ZESoundModule
 		ALCdevice_struct*						GetDevice();
 		ALCcontext_struct*						GetContext();
 
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
-		
 		virtual void							SetSpeakerLayout(ZESpeakerLayout Layout);
 		virtual ZESpeakerLayout					GetSpeakerLayout();
 

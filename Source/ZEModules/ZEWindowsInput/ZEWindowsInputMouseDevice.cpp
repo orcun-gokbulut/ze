@@ -52,9 +52,9 @@ void ZEWindowsInputMouseDevice::UnAcquire()
 	State.Reset();
 }
 
-bool ZEWindowsInputMouseDevice::Initialize()
+bool ZEWindowsInputMouseDevice::InitializeSelf()
 {	
-	if (IsInitialized())
+	if (!ZEInputDevice::InitializeSelf())
 		return false;
 
 	Description.Type = ZE_IDT_MOUSE;
@@ -72,7 +72,7 @@ bool ZEWindowsInputMouseDevice::Initialize()
 	State.Initialize(Description);
 	State.Reset();
 
-	return ZEInputDevice::Initialize();
+	return true;
 }
 
 void ZEWindowsInputMouseDevice::Process(const RAWINPUT& Data)

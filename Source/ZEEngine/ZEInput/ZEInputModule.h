@@ -53,6 +53,9 @@ class ZEInputModule : public ZEModule
 		ZEArray<ZEInputDeviceModule*>		DeviceModules;
 		bool								Acquired;
 
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
+
 											ZEInputModule();
 
 	public:
@@ -66,9 +69,6 @@ class ZEInputModule : public ZEModule
 		virtual void						Acquire();
 		virtual void						UnAcquire();
 		
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
-
 		virtual void						Process();
 		
 		static ZEInputModule*				GetInstance();

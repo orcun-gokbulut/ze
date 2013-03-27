@@ -51,11 +51,14 @@ class ZEInputDeviceModule : public ZEExtension
 	protected:
 		bool								RegisterDevice(ZEInputDevice* Device);
 		void								UnregisterDevice(ZEInputDevice* Device);
+		void								DestroyDevices();
+
+		virtual bool						DeinitializeSelf();
+
+		virtual								~ZEInputDeviceModule();
 
 	public:
 		const ZEArray<ZEInputDevice*>&		GetDevices();
-
-		virtual void						Deinitialize();
 
 		virtual void						Acquire();
 		virtual void						UnAcquire();

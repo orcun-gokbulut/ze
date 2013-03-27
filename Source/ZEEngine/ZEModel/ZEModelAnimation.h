@@ -54,6 +54,12 @@ enum ZEModelAnimationType
 	ZE_MAT_PHYSICAL
 };
 
+enum ZEModelAnimationUpdateMode
+{
+	ZE_MAUM_LOGICAL,
+	ZE_MAUM_VISUAL
+};
+
 typedef ZEModelResourceAnimation ZEModelAnimation;
 
 #endif

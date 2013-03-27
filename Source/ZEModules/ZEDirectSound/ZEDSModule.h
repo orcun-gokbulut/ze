@@ -84,6 +84,9 @@ class ZEDSModule : public ZESoundModule
 		void									UpdateVolumes(ZESoundSourceType SourceType);
 		void									UpdateStreams();
 
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
+
 												ZEDSModule();
 		virtual									~ZEDSModule();
 
@@ -93,9 +96,6 @@ class ZEDSModule : public ZESoundModule
 		LPDIRECTSOUNDBUFFER						GetPrimaryBuffer();
 		virtual const ZEArray<ZESoundDevice>&	GetDeviceList();
 
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
-		
 		virtual void							SetSpeakerLayout(ZESpeakerLayout Layout);
 		virtual ZESpeakerLayout					GetSpeakerLayout();
 

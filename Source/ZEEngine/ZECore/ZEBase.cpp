@@ -35,30 +35,69 @@
 
 #include "ZEBase.h"
 
+bool ZEBase::InitializeSelf()
+{
+	InitializationState = ZE_IS_INITIALIZING;
+	return true;
+}
+
+bool ZEBase::DeinitializeSelf()
+{
+	InitializationState = ZE_IS_NOT_INITIALIZED;
+	return true;
+}
+
+ZEInitializationState ZEBase::GetInitializationState() const
+{
+	return InitializationState;
+}
+
 bool ZEBase::IsInitialized() const
 {
-	return Initialized;
+	return (InitializationState == ZE_IS_INITIALIZED);
 }
 
 bool ZEBase::Initialize()
 {
-	Initialized = true;
+	if (IsInitialized())
+		return false;
+
+	if (!InitializeSelf())
+		return false;
+
+	if (InitializationState != ZE_IS_INITIALIZING)
+		return false;
+
+	InitializationState = ZE_IS_INITIALIZED;
+
 	return true;
 }
 
-void ZEBase::Deinitialize()
+bool ZEBase::Deinitialize()
 {
-	Initialized = false;
+	if (!IsInitialized())
+		return true;
+
+	InitializationState = ZE_IS_DEINITIALIZING;
+
+	if (!DeinitializeSelf())
+		return false;
+
+	if (InitializationState != ZE_IS_NOT_INITIALIZED)
+		return false;
+
+	return true;
 }
 
 void ZEBase::Destroy()
 {
+	Deinitialize();
 	delete this;
 }
 
 ZEBase::ZEBase()
 {
-	Initialized = false;
+	InitializationState = ZE_IS_NOT_INITIALIZED;
 }
 
 ZEBase::~ZEBase()

@@ -67,10 +67,11 @@ class ZEWindowsInputModule : public ZEInputDeviceModule
 		ZEWindowsInputMouseDevice*			MouseDevice;
 		ZEWindowsInputKeyboardDevice*		KeyboardDevice;
 
-	public:
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
+	protected:
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
 
+	public:
 		virtual void						Process();
 
 											ZEWindowsInputModule();

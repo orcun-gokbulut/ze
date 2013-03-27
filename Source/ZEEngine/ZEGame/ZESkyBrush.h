@@ -59,12 +59,11 @@ class ZESkyBrush : public ZEEntity
 		ZEVector3							SkyColor;
 		float								SkyBrightness;
 
-											ZESkyBrush();
-		virtual								~ZESkyBrush();
-
-	protected:
 		virtual bool						InitializeSelf();
 		virtual bool						DeinitializeSelf();
+
+											ZESkyBrush();
+		virtual								~ZESkyBrush();
 
 	public:
 		virtual ZEDrawFlags					GetDrawFlags() const;

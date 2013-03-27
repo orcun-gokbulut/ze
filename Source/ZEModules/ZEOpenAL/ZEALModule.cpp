@@ -93,9 +93,12 @@ ALCcontext* ZEALModule::GetContext()
 	return Context;
 }
 
-bool ZEALModule::Initialize()
+bool ZEALModule::InitializeSelf()
 {	
 	zeLog("Initializing OpenAL module.");
+
+	if (!ZESoundModule::InitializeSelf())
+		return false;
 	
 	zeLog("Enumurating Sound Devices.");
 	const ALCchar* DeviceNames = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
@@ -179,10 +182,10 @@ bool ZEALModule::Initialize()
 
 	zeLog("OpenAL module initialized.");
 
-	return ZESoundModule::Initialize();
+	return true;
 }
 
-void ZEALModule::Deinitialize()
+bool ZEALModule::DeinitializeSelf()
 {	
 	zeLog("Destroying OpenAL.");
 
@@ -190,7 +193,7 @@ void ZEALModule::Deinitialize()
 	alcDestroyContext(Context);
 	alcCloseDevice(Device);
 
-	ZESoundModule::Deinitialize();
+	return ZESoundModule::DeinitializeSelf();
 }
 
 void ZEALModule::SetSpeakerLayout(ZESpeakerLayout Layout)

@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEClient.h"
-#include "ZEConnectionTCP.h"
+#include "ZEConnection.h"
 #include "ZESocket/ZESocket.h"
 
 #define TCP_CLIENT_PORT_NO	27200
@@ -61,7 +61,6 @@ bool ZEClient::Connect(const ZEIPAddress& Address, ZEUInt16 Port)
 {
 	if(Socket != NULL)
 	{
-		PacketManager.RemoveConnection(Connection);
 		Socket->Close();
 		delete Socket;
 		delete Connection;
@@ -76,15 +75,22 @@ bool ZEClient::Connect(const ZEIPAddress& Address, ZEUInt16 Port)
 	if(Result != ZE_SR_OK)
 		return false;
 
-	Connection = new ZEConnectionTCP(Socket);
-	PacketManager.AddConnection(Connection);
+	Connection = new ZEConnection(Socket);
 
 	return true;
 }
 
 void ZEClient::Process(float ElapsedTime)
 {
-	PacketManager.Process(ElapsedTime);
+	//Fix this shit//////////////////////
+
+	ZEArray<ZEConnection*> Connections;
+	Connections.Add(Connection);
+
+	//Fix this shit//////////////////////
+
+	PacketManager.Process(ElapsedTime, Connections);
+	
 }
 
 const ZEPacketManagerServer* ZEClient::GetPacketManager()
