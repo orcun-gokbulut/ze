@@ -86,9 +86,9 @@ void ZEDirectInputDevice::UnAcquire()
 	ZEInputDevice::UnAcquire();
 }
 
-bool ZEDirectInputDevice::Initialize()
+bool ZEDirectInputDevice::InitializeSelf()
 {
-	if (IsInitialized())
+	if (!ZEInputDevice::InitializeSelf())
 		return false;
 
 	const char* NamePrefix;
@@ -181,14 +181,11 @@ bool ZEDirectInputDevice::Initialize()
 	Description.Name = ZEFormat::Format("{0}{1:d:02}", NamePrefix, Description.Index);
 	Description.NameHash = ZEHashGenerator::Hash(Description.Name);
 
-	return ZEInputDevice::Initialize();
+	return true;
 }
 
-void ZEDirectInputDevice::Deinitialize()
+bool ZEDirectInputDevice::DeinitializeSelf()
 {
-	if (!IsInitialized())
-		return;
-
 	UnAcquire();
 
 	if (DirectInputDevice != NULL)
@@ -197,7 +194,7 @@ void ZEDirectInputDevice::Deinitialize()
 		DirectInputDevice = NULL;
 	}
 
-	return ZEInputDevice::Deinitialize();
+	return ZEInputDevice::DeinitializeSelf();
 }
 
 void ZEDirectInputDevice::Process()

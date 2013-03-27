@@ -45,7 +45,6 @@ struct ZERegisteredClass
 void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 {
 	ZEArray<ZERegisteredClass> RegisteredClasses;
-	RegisteredClasses.SetCount(Options.RegisterFiles.GetCount());
 
 	for(ZESize I = 0; I < Options.RegisterFiles.GetCount(); I++)
 	{
@@ -71,22 +70,38 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 		ZEString Context = (char*)Buffer.GetConstCArray();
 		ZESize Index = 0;
 
+		RegisteredClasses.Add();
 		for(ZESize J = 0; J < Context.GetLength(); J++)
 		{
 			if(Context[J] == ',')
 			{
-				RegisteredClasses[I].RegisteredClassName = Context.SubString(Index, J - 1);
+				RegisteredClasses.GetLastItem().RegisteredClassName = Context.SubString(Index, J - 1);
 				Index = J + 1;
 				continue;
 			}
 
 			if(Context[J] == ';')
 			{
-				RegisteredClasses[I].IncludeDirectory = Context.SubString(Index, J - 1);
+				bool IsDuplicateIncludeFileFound = false;
+				ZEString IncludeDirectory = Context.SubString(Index, J - 1);
+				for(ZESize I = 0 ; I < RegisteredClasses.GetCount(); I++)
+				{
+					if(RegisteredClasses[I].IncludeDirectory == IncludeDirectory)
+					{
+						IsDuplicateIncludeFileFound = true;
+						break;
+					}
+				}
+
+				if(!IsDuplicateIncludeFileFound)
+					RegisteredClasses.GetLastItem().IncludeDirectory = Context.SubString(Index, J - 1);
+
 				Index = J + 1;
+				RegisteredClasses.Add();
 				continue;
 			}
 		}
+		RegisteredClasses.Pop();
 	}
 
 	ZEString ClassCollectionName = Options.ClassCollectionName;
@@ -119,11 +134,24 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 
 	fprintf(ClassCollectionSourceFile, "#include \"%s\"\n", ClassCollectionHeader.ToCString());
 
+	bool IsBuiltInTypeFound = false;
 	for(ZESize I = 0; I < RegisteredClasses.GetCount(); I++)
 	{
 		if(!RegisteredClasses[I].IncludeDirectory.IsEmpty())
-			fprintf(ClassCollectionSourceFile, "#include \"%s\"\n", RegisteredClasses[I].IncludeDirectory.ToCString());
+		{
+			//Is registered class a builtin math class type?
+			if(RegisteredClasses[I].IncludeDirectory == "ZEVector.h" || RegisteredClasses[I].IncludeDirectory == "ZEMatrix.h" || RegisteredClasses[I].IncludeDirectory == "ZEQuaternion.h")
+			{
+				fprintf(ClassCollectionSourceFile, "#include \"ZEMath/%s\"\n", RegisteredClasses[I].IncludeDirectory.ToCString());
+				IsBuiltInTypeFound = true;
+			}
+			else
+				fprintf(ClassCollectionSourceFile, "#include \"%s\"\n", RegisteredClasses[I].IncludeDirectory.ToCString());
+		}
 	}
+
+	if(IsBuiltInTypeFound)
+			fprintf(ClassCollectionSourceFile, "#include \"ZEPrimitiveTypes.h\"\n");
 
 	fprintf(ClassCollectionSourceFile,
 		"\n"
@@ -135,7 +163,13 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 	for(ZESize I = 0; I < RegisteredClasses.GetCount(); I++)
 	{
 		if(!RegisteredClasses[I].RegisteredClassName.IsEmpty())
-			fprintf(ClassCollectionSourceFile, "\t\t%s::Class()%s\n", RegisteredClasses[I].RegisteredClassName.ToCString(), I < RegisteredClasses.GetCount() - 1 ? "," : "");
+		{
+			//Is registered class a builtin class type?
+			if(IsBuiltInTypeFound)
+				fprintf(ClassCollectionSourceFile, "\t\t%sClass::Class()%s\n", RegisteredClasses[I].RegisteredClassName.ToCString(), I < RegisteredClasses.GetCount() - 1 ? "," : "");
+			else
+				fprintf(ClassCollectionSourceFile, "\t\t%s::Class()%s\n", RegisteredClasses[I].RegisteredClassName.ToCString(), I < RegisteredClasses.GetCount() - 1 ? "," : "");
+		}
 	}
 
 	fprintf(ClassCollectionSourceFile,

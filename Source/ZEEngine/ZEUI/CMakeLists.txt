@@ -78,6 +78,8 @@ ze_add_source(ZEUILabel.cpp							Sources)
 ze_add_source(ZEUILabel.h							Sources Headers ZEMC)
 ze_add_source(ZEUITextCursor.cpp					Sources)
 ze_add_source(ZEUITextCursor.h						Sources Headers ZEMC)
+ze_add_source(ZEUIDebugDrawTag.cpp					Sources)
+ze_add_source(ZEUIDebugDrawTag.h					Sources Headers)
 
 
 ze_add_library(ZEUI

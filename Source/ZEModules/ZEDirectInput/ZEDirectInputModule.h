@@ -48,11 +48,12 @@ class ZEDirectInputModule : public ZEInputDeviceModule
 
 	friend BOOL CALLBACK CheckDirectInputDevices(const LPCDIDEVICEINSTANCE DeviceDescription, LPVOID Ref);
 
+	protected:
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
 	public:
 		LPDIRECTINPUT8					DirectInput;
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
 
 		virtual void					Process();
 

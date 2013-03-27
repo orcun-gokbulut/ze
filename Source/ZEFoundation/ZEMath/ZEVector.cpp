@@ -36,12 +36,9 @@
 #include "ZEVector.h"
 #include "ZEMatrix.h"
 #include "ZEMath.h"
-#include "ZEMath.h"
 #include "ZEAngle.h"
 
 #define		ZE_VECTOR4_ELEMENT_COUNT	(ZESize)4
-
-//ZE_OBJECT_IMPL(ZEVector2)
 
 // ZEVector2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -357,8 +354,6 @@ ZEVector2 operator*(float S, const ZEVector2& RightOperand)
 {
 	return RightOperand * S;
 }
-
-//ZE_OBJECT_IMPL(ZEVector3)
 
 // ZEVector3
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -793,8 +788,6 @@ ZEVector3 operator*(float S, const ZEVector3& RightOperand)
 {
 	return RightOperand * S;
 }
-
-//ZE_OBJECT_IMPL(ZEVector4)
 
 // ZEVector4
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -88,9 +88,9 @@ void ZEInputModule::UnAcquire()
 		DeviceModules[I]->UnAcquire();
 }
 
-bool ZEInputModule::Initialize()
+bool ZEInputModule::InitializeSelf()
 {
-	if (IsInitialized())
+	if (!ZEModule::InitializeSelf())
 		return false;
 
 	zeLog("Initializing Input.");
@@ -111,20 +111,17 @@ bool ZEInputModule::Initialize()
 		DeviceModules.Add(DeviceModule);
 	}
 
-	return ZEModule::Initialize();
+	return true;
 }
 
-void ZEInputModule::Deinitialize()
+bool ZEInputModule::DeinitializeSelf()
 {
-	if (!IsInitialized())
-		return;
-
 	for (ZESize I = 0; I < DeviceModules.GetCount(); I++)
 		DeviceModules[I]->Destroy();
 
 	DeviceModules.Clear();
 
-	ZEModule::Deinitialize();
+	return ZEModule::DeinitializeSelf();
 }
 
 void ZEInputModule::Process()

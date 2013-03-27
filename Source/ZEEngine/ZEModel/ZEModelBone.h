@@ -61,17 +61,17 @@ class ZEModelBone : public ZEObject
 		ZEModelBone*						ParentBone;
 		ZEArray<ZEModelBone*>				ChildBones;
 
-		ZEVector3							RelativePosition;
-		ZEQuaternion						RelativeRotation;
+		ZEVector3							Position;
+		ZEQuaternion						Rotation;
 
+		ZEMatrix4x4							InitialLocalTransform;
+		ZEMatrix4x4							LocalTransform;
 		ZEMatrix4x4							ModelTransform;
 		ZEMatrix4x4							WorldTransform;
-		ZEMatrix4x4							RelativeTransform;
-		ZEMatrix4x4							LocalTransform;
-		ZEMatrix4x4							InitialRelativeTransform;				
 
 		ZEMatrix4x4							VertexTransform;
 
+		ZEAABBox							LocalBoundingBox;
 		ZEAABBox							ModelBoundingBox;
 		ZEAABBox							WorldBoundingBox;
 
@@ -86,49 +86,44 @@ class ZEModelBone : public ZEObject
 
 	public:
 		ZEModelBone*						GetParentBone();
-		const ZEArray<ZEModelBone*>			GetChildBones();
+		const ZEArray<ZEModelBone*>&		GetChildBones();
 		const char*							GetName();
 		ZEPhysicalRigidBody*				GetPhysicalBody();
 
 		bool								IsRootBone();
 
-		const ZEAABBox&						GetLocalBoundingBox();
+		const ZEAABBox&						GetBoundingBox();
 		const ZEAABBox&						GetModelBoundingBox();
 		const ZEAABBox&						GetWorldBoundingBox();
 
-		const ZEMatrix4x4&					GetLocalTransform();
+		const ZEMatrix4x4&					GetTransform();
 		const ZEMatrix4x4&					GetWorldTransform();		
 		const ZEMatrix4x4&					GetModelTransform();
 
-		const ZEVector3&					GetInitialRelativePosition();
-		const ZEQuaternion&					GetInitialRelativeRotation();
-		
-		/*const ZEVector3&					GetInitialLocalPosition();
-		const ZEQuaternion&					GetInitialLocalRotation();*/
+		const ZEVector3&					GetInitialPosition();
+		const ZEQuaternion&					GetInitialRotation();
 
-		const ZEMatrix4x4&					GetInitialRelativeTransform();
-		const ZEMatrix4x4&					GetInitialLocalTransform();
-
+		const ZEMatrix4x4&					GetInitialTransform();
 		const ZEMatrix4x4&					GetInverseTransform();
-		const ZEMatrix4x4&					GetRelativeTransform();
-		/*const ZEMatrix4x4&					GetForwardTransform();*/
+		const ZEMatrix4x4&					GetForwardTransform();
 		const ZEMatrix4x4&					GetVertexTransform();
 
-		const ZEVector3&					GetRelativePosition();
-		void								SetRelativePosition(const ZEVector3& Position);
+		void								SetPosition(const ZEVector3& Position);
+		const ZEVector3&					GetPosition();
 
-		const ZEQuaternion&					GetRelativeRotation();
-		void								SetRelativeRotation(const ZEQuaternion& Rotation);
+		void								SetRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion&					GetRotation();
 
+		void								SetModelPosition(const ZEVector3& ModelPosition);
 		const ZEVector3						GetModelPosition();
+
+		void								SetModelRotation(const ZEQuaternion& ModelRotation);
 		const ZEQuaternion					GetModelRotation();
 
-		const ZEVector3						GetLocalPosition();
-		const ZEQuaternion					GetLocalRotation();
-
-		void								SetLocalRotation(const ZEQuaternion& Rotation);
-
+		void								SetWorldPosition(const ZEVector3& WorldPosition);
 		const ZEVector3						GetWorldPosition();
+
+		void								SetWorldRotation(const ZEQuaternion& WorldRotation);
 		const ZEQuaternion					GetWorldRotation();
 
 		void								SetAnimationType(ZEModelAnimationType AnimationType);

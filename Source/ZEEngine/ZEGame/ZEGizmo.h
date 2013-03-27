@@ -109,12 +109,11 @@ class ZEGizmo : public ZEEntity
 		ZEQuaternion					RotationProjection_(ZEGizmoAxis Axis, const ZERay& Ray);
 		ZEVector3						ScaleProjection_(ZEGizmoAxis Axis, const ZERay& Ray);
 
-										ZEGizmo();
-
-	protected:
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
-	
+
+										ZEGizmo();
+
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
 

@@ -54,7 +54,6 @@ enum ZERotationOrder
 	ZE_RO_ZYX
 };
 
-
 // ZEMatrix3x3
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEMatrix3x3
@@ -157,7 +156,6 @@ class ZEMatrix3x3
 
 ZEMatrix3x3 operator*(float S, const ZEMatrix3x3& RightOperand);
 
-
 // ZEMatrix4x4
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEMatrix4x4
@@ -202,6 +200,7 @@ class ZEMatrix4x4
 		static void						CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width, float Height, float NearZ, float FarZ);
 		static void						CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ);
 		static void						CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ);
+		static void						CreateScreenTransform(ZEMatrix4x4& Matrix, float ScreenWidth, float ScreenHeight);
 
 		static void						Add(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
 		static void						Sub(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);

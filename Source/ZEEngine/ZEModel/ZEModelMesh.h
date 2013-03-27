@@ -61,6 +61,9 @@ class ZEModelMesh : public ZEObject
 		ZEModel*							Owner;
 
 		const ZEModelResourceMesh*			MeshResource;
+		ZEModelMesh*						ParentMesh;
+		ZEArray<ZEModelMesh*>				ChildMeshes;
+
 		ZEAABBox							LocalBoundingBox;
 		ZEAABBox							ModelBoundingBox;
 		ZEAABBox							WorldBoundingBox;
@@ -70,7 +73,7 @@ class ZEModelMesh : public ZEObject
 		ZEQuaternion						Rotation;
 
 		ZEMatrix4x4							LocalTransform;
-/*		ZEMatrix4x4							ModelTransform;*/
+		ZEMatrix4x4							ModelTransform;
 		ZEMatrix4x4							WorldTransform;
 
 		bool								PhysicsEnabled;
@@ -80,6 +83,9 @@ class ZEModelMesh : public ZEObject
 		bool								AutoLOD;
 		ZEUInt								ActiveLOD;
 
+		bool								DrawOrderIsUserDefined;
+		ZEUInt8								UserDefinedDrawOrder;
+
 		ZEModelAnimationType				AnimationType;
 		bool								Visible;		
 
@@ -88,17 +94,18 @@ class ZEModelMesh : public ZEObject
 		void								OnTransformChanged();
 
 	public:
+		ZEModelMesh*						GetParentMesh();
+		const ZEArray<ZEModelMesh*>&		GetChildMeshes();
 		const char*							GetName();
-		ZEPhysicalRigidBody*				GetPhysicalBody() { return PhysicalBody; }
-		ZEPhysicalCloth*					GetPhysicalCloth() { return PhysicalCloth; }
-		ZEModelMeshLOD*						GetFirstLOD() { return &LODs[0]; }
+		ZEPhysicalRigidBody*				GetPhysicalBody();
+		ZEPhysicalCloth*					GetPhysicalCloth();
 
 		const ZEAABBox&						GetLocalBoundingBox();
 		const ZEAABBox&						GetModelBoundingBox();
 		const ZEAABBox&						GetWorldBoundingBox();
 
 		const ZEMatrix4x4&					GetLocalTransform();
-/*		const ZEMatrix4x4&					GetModelTransform();*/
+		const ZEMatrix4x4&					GetModelTransform();
 		const ZEMatrix4x4&					GetWorldTransform();
 				
 		void								SetLocalPosition(const ZEVector3& LocalPosition);
@@ -109,6 +116,24 @@ class ZEModelMesh : public ZEObject
 
 		void								SetLocalScale(const ZEVector3& LocalScale);
 		const ZEVector3&					GetLocalScale();
+
+		void								SetModelPosition(const ZEVector3& ModelPosition);
+		const ZEVector3						GetModelPosition();
+
+		void								SetModelRotation(const ZEQuaternion& ModelRotation);
+		const ZEQuaternion					GetModelRotation();
+
+		void								SetModelScale(const ZEVector3& ModelScale);
+		const ZEVector3						GetModelScale();
+
+		void								SetWorldPosition(const ZEVector3& WorldPosition);
+		const ZEVector3						GetWorldPosition();
+
+		void								SetWorldRotation(const ZEQuaternion& WorldRotation);
+		const ZEQuaternion					GetWorldRotation();
+
+		void								SetWorldScale(const ZEVector3& WorldScale);
+		const ZEVector3						GetWorldScale();
 
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();
@@ -122,8 +147,15 @@ class ZEModelMesh : public ZEObject
 		void								SetVisible(bool Visible);
 		bool								GetVisible();
 
+		void								AddChild(ZEModelMesh* Mesh);
+		void								RemoveChild(ZEModelMesh* Mesh);
+
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();
+
+		void								SetCustomDrawOrderEnabled(bool Enabled);
+		void								SetCustomDrawOrder(ZEUInt8 DrawOrder);
+		ZEUInt8								GetCustomDrawOrder();
 
 		void								Initialize(ZEModel* Model, const ZEModelResourceMesh* MeshResource);
 		void								Deinitialize();

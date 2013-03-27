@@ -434,6 +434,14 @@ void ZEModelAnimationTrack::Stop()
 	Tick(0.0f);
 }
 
+void ZEModelAnimationTrack::UpdateAnimation()
+{
+	if (State == ZE_MAS_PLAYING && !(BlendFactor == 0.0f) && !(LOD != -1 && Owner->ActiveLOD > LOD))
+	{
+		UpdateMeshesAndBones();
+	}
+}
+
 void ZEModelAnimationTrack::UpdateMeshesAndBones()
 {
 	// Check whether this track is the root track
@@ -473,8 +481,8 @@ void ZEModelAnimationTrack::UpdateMeshesAndBones()
 		if (RootAnimation || BlendMode == ZE_MABM_OVERWRITE)
 		{
 			// Write the calculated value with out blending
-			Owner->Bones[ItemId].SetRelativePosition(Position);
-			Owner->Bones[ItemId].SetRelativeRotation(Rotation);
+			Owner->Bones[ItemId].SetPosition(Position);
+			Owner->Bones[ItemId].SetRotation(Rotation);
 		}
 		else
 		{
@@ -485,18 +493,18 @@ void ZEModelAnimationTrack::UpdateMeshesAndBones()
 			switch(BlendMode)
 			{
 				case ZE_MABM_INTERPOLATE:
-					ZEVector3::Lerp(PositionBlend, Owner->Bones[ItemId].GetRelativePosition(), Position, BlendFactor);
-					ZEQuaternion::Slerp(RotationBlend, Owner->Bones[ItemId].GetRelativeRotation(), Rotation, BlendFactor);
+					ZEVector3::Lerp(PositionBlend, Owner->Bones[ItemId].GetPosition(), Position, BlendFactor);
+					ZEQuaternion::Slerp(RotationBlend, Owner->Bones[ItemId].GetRotation(), Rotation, BlendFactor);
 					break;
 				case ZE_MABM_ADDAPTIVE:		
-					PositionBlend = Owner->Bones[ItemId].GetRelativePosition() + (Position - Owner->ModelResource->GetBones()[ItemId].RelativePosition) * BlendFactor;
-					RotationBlend = Owner->Bones[ItemId].GetRelativeRotation() * (Owner->ModelResource->GetBones()[ItemId].RelativeRotation.Conjugate() * Rotation);
+					PositionBlend = Owner->Bones[ItemId].GetPosition() + (Position - Owner->ModelResource->GetBones()[ItemId].Position) * BlendFactor;
+					RotationBlend = Owner->Bones[ItemId].GetRotation() * (Owner->ModelResource->GetBones()[ItemId].Rotation.Conjugate() * Rotation);
 					break;
 			}
 
 			// Update bone
-			Owner->Bones[ItemId].SetRelativePosition(PositionBlend);
-			Owner->Bones[ItemId].SetRelativeRotation(RotationBlend);
+			Owner->Bones[ItemId].SetPosition(PositionBlend);
+			Owner->Bones[ItemId].SetRotation(RotationBlend);
 		}
 	}
 
@@ -555,6 +563,9 @@ void ZEModelAnimationTrack::UpdateMeshesAndBones()
 
 void ZEModelAnimationTrack::Tick(float ElapsedTime)
 {
+	if (BlendFactor == 0.0f)
+		return;
+
 	if (State == ZE_MAS_PLAYING)
 	{
 		// Check LOD status if Model's current LOD is lower than current track do not calculate it
@@ -562,6 +573,9 @@ void ZEModelAnimationTrack::Tick(float ElapsedTime)
 		{
 			return;
 		}
+
+		//Update CurrentFrame
+		CurrentFrame += Speed * ElapsedTime;
 
 		// Check animation limits
 		if (CurrentFrame >= (float)EffectiveEndFrame)
@@ -580,15 +594,6 @@ void ZEModelAnimationTrack::Tick(float ElapsedTime)
 				return;
 			}
 		}
-		
-		if (BlendFactor == 0.0f)
-		{
-			return;
-		}
-
-		UpdateMeshesAndBones();
-
-		CurrentFrame += Speed * ElapsedTime;
 	}
 }
 

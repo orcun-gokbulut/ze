@@ -60,12 +60,11 @@ class ZEProjectiveLight : public ZELight
 		ZETexture2DResource*			ProjectionTextureResource;
 		char							ProjectionTextureFile[ZE_MAX_FILE_NAME_SIZE];
 
-										ZEProjectiveLight();
-		virtual							~ZEProjectiveLight();
-
-	protected:
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
+
+										ZEProjectiveLight();
+		virtual							~ZEProjectiveLight();
 
 	public:
 		ZELightType						GetLightType();

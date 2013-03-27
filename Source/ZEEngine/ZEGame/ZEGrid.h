@@ -76,11 +76,10 @@ class ZEGrid : public ZEEntity
 
 		void						GenerateGrid();
 
-									ZEGrid();
-
-	protected:
 		virtual bool				InitializeSelf();
 		virtual bool				DeinitializeSelf();
+
+									ZEGrid();
 
 	public:
 		ZEDrawFlags					GetDrawFlags() const;

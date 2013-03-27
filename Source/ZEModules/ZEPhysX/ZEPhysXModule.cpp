@@ -68,9 +68,9 @@ NxCookingInterface* ZEPhysXModule::GetCookingInterface()
 	return CookingInterface;
 }
 
-bool ZEPhysXModule::Initialize()
+bool ZEPhysXModule::InitializeSelf()
 {
-	if (IsInitialized())
+	if (!ZEPhysicsModule::InitializeSelf())
 		return false;
 
 	zeLog("Initializing PhysX module.");
@@ -101,14 +101,11 @@ bool ZEPhysXModule::Initialize()
 
 	zeLog("PhysX intialized.");
 
-	return ZEPhysicsModule::Initialize();
+	return true;
 }
 
-void ZEPhysXModule::Deinitialize()
+bool ZEPhysXModule::DeinitializeSelf()
 {
-	if (!IsInitialized())
-		return;
-
 	for (ZESize I = 0; I < PhysicalWorlds.GetCount(); I++)
 		PhysicalWorlds[I]->Destroy();
 
@@ -126,7 +123,7 @@ void ZEPhysXModule::Deinitialize()
 		CookingInterface = NULL;
 	}
 
-	ZEPhysicsModule::Deinitialize();
+	return ZEPhysicsModule::DeinitializeSelf();
 }
 
 void ZEPhysXModule::Process(float ElapsedTime)

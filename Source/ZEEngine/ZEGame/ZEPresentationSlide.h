@@ -59,12 +59,11 @@ class ZEPresentationSlide : public ZEEntity
 		ZETexture2DResource*			Texture;
 		char							PresentationSlide[255];
 
-		ZEPresentationSlide();
-		virtual							~ZEPresentationSlide();
-
-	protected:
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
+
+										ZEPresentationSlide();
+		virtual							~ZEPresentationSlide();
 
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;

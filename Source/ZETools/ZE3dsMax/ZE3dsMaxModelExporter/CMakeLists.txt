@@ -48,6 +48,7 @@ ze_add_source(ZE3dsMaxModelActions.cpp					Sources)
 ze_add_source(ZE3dsMaxModelScriptMesh.ms				Sources ZEFC)
 ze_add_source(ZE3dsMaxModelScriptBone.ms				Sources ZEFC)
 ze_add_source(ZE3dsMaxModelScriptPhysicalBody.ms		Sources ZEFC)
+ze_add_source(ZE3dsMaxModelScriptBoundingBox.ms			Sources ZEFC)
 
 qt4_add_resources(QtResourceFiles ${QtResources})
 qt4_wrap_ui(QtUIFiles ${QtUI})

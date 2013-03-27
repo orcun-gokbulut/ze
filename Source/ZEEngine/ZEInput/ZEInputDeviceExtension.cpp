@@ -56,25 +56,46 @@ bool ZEInputDeviceModule::RegisterDevice(ZEInputDevice* Device)
 
 	Devices.Add(Device);
 
+	if (GetInitializationState() == ZE_IS_INITIALIZING || GetInitializationState() == ZE_IS_INITIALIZED)
+	{
+		if (!Device->Initialize())
+		{
+			zeError("Can not initialize input device.");
+			return false;
+		}
+	}
+
 	return true;
 }
 
 void ZEInputDeviceModule::UnregisterDevice(ZEInputDevice* Device)
 {
+	if (GetInitializationState() == ZE_IS_DEINITIALIZING || GetInitializationState() == ZE_IS_NOT_INITIALIZED)
+		Device->Deinitialize();
+
 	Devices.DeleteValue(Device);
 }
+
+void ZEInputDeviceModule::DestroyDevices()
+{
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
+		Devices[I]->Destroy();
+
+	Devices.Clear();
+}
+
 
 const ZEArray<ZEInputDevice*>& ZEInputDeviceModule::GetDevices()
 {
 	return Devices;
 }
 
-void ZEInputDeviceModule::Deinitialize()
+bool ZEInputDeviceModule::DeinitializeSelf()
 {
 	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		Devices[I]->Deinitialize();
 
-	ZEExtension::Deinitialize();
+	return ZEExtension::Deinitialize();
 }
 
 void ZEInputDeviceModule::Acquire()
@@ -87,4 +108,9 @@ void ZEInputDeviceModule::UnAcquire()
 {
 	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		Devices[I]->UnAcquire();
+}
+
+ZEInputDeviceModule::~ZEInputDeviceModule()
+{
+	DestroyDevices();
 }

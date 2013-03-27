@@ -68,6 +68,7 @@ class ZEInterior : public ZEEntity
 {
 	friend class ZEInteriorDoor;
 	friend class ZEInteriorHelper;
+	friend class ZEInteriorDebugDrawer;
 
 	ZE_OBJECT
 

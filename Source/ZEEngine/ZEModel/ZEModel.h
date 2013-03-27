@@ -68,9 +68,8 @@ class ZEModel : public ZEEntity
 	friend class ZEPhysicalEnvironment;
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
-
+	friend class ZEModelDebugDrawer;
 	ZE_OBJECT
-
 	private:
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
@@ -92,30 +91,15 @@ class ZEModel : public ZEEntity
 		bool								PhysicsEnabled;
 
 		ZEModelAnimationType				AnimationType;
+		ZEModelAnimationUpdateMode			AnimationUpdateMode;
 
 		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
 
-		void								CalculateBoundingBox();		
+		bool								BoundingBoxIsUserDefined;
+
+		void								CalculateBoundingBox();
 		void								UpdateTransforms();
-
-		bool								DrawSkeleton;
-		bool								DrawPhysicalBodies;
-		bool								DrawPhysicalJoints;
-
-		struct
-		{
-			ZESimpleMaterial*				Material;
-			ZECanvas						BoxCanvas;
-			ZECanvas						BonesCanvas;
-			ZECanvas						BonePositionsCanvas;
-			ZERenderCommand					BoxRenderCommand;
-			ZERenderCommand					BonesRenderCommand;
-			ZERenderCommand					BonePositionsRenderCommand;
-
-		} DebugDrawComponents;
-
-		void								DebugDraw(ZERenderer* Renderer);
-		
+	
 		void								LoadModelResource();
 
 	protected:
@@ -132,6 +116,7 @@ class ZEModel : public ZEEntity
 
 		virtual const ZEModelStatistics&	GetStatistics() const;
 
+		void								SetUserDefinedBoundingBoxEnabled(bool Value);
 		virtual const ZEAABBox&				GetWorldBoundingBox();
 
 		void								SetModelFile(const char* ModelFile);
@@ -156,6 +141,9 @@ class ZEModel : public ZEEntity
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();
 
+		void								SetAnimationUpdateMode(ZEModelAnimationUpdateMode AnimationUpdateMode);
+		ZEModelAnimationUpdateMode			GetAnimationUpdateMode();
+
 		ZEArray<ZEModelAnimationTrack>&		GetAnimationTracks();
 
 		void								SetAutoLOD(bool Enabled);
@@ -167,10 +155,6 @@ class ZEModel : public ZEEntity
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();
 
-		void								SetStaticPose(const ZEModelAnimation* Animation, ZEUInt Frame);
-		void								SetStaticPoseByIndex(ZESize AnimationIndex, ZEUInt Frame);
-		void								SetStaticPoseByName(const char* AnimationName, ZEUInt Frame);
-
 		virtual void						SetPosition(const ZEVector3& NewPosition);
 		virtual void						SetRotation(const ZEQuaternion& NewRotation);
 		virtual void						SetScale(const ZEVector3& NewScale);
@@ -180,15 +164,6 @@ class ZEModel : public ZEEntity
 		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);
 
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
-
-		void								SetDrawSkeleton(bool Enabled);
-		bool								GetDrawSkeleton();
-
-		void								SetDrawPhysicalBodies(bool Enabled);
-		bool								GetDrawPhysicalBodies();
-
-		void								SetDrawPhysicalJoints(bool Enabled);
-		bool								GetDrawPhysicalJoints();
 
 		static ZEModel*						CreateInstance();
 };

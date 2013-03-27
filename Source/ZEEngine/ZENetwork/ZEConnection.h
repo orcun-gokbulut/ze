@@ -39,16 +39,54 @@
 
 #include "ZETypes.h"
 
+class ZESocket;
+
 class ZEConnection
 {
+	friend class ZEPacketManagerServer;
+
+	protected:
+		ZESocket*					Socket;
+
+		char*						TempBuffer;
+		char*						ReadBuffer;
+		char*						SendBuffer;
+
+		ZESize						ReadBufferSize;
+		ZESize						TempBufferSize;
+		ZESize						SendBufferSize;
+
+		ZESize						FilledReadBufferSize;
+		ZESize						FilledSendBufferSize;
+
+		void						ResizeBuffer(void* Buffer, ZESize OldSize, ZESize NewSize);
+
 	public:
 
-		virtual bool				SendData(const void* Data, ZESize Size) = 0;
-		virtual void*				GetBuffer(ZESize& UsedSize) = 0;
+		void						SetSocket(ZESocket* Socket);
+		const ZESocket*				GetSocket() const;
 
-		virtual void				CleanBuffer() = 0;
+		bool						SendData(const void* Data, ZESize Size);
+		void*						GetReadBuffer(ZESize& UsedSize);
 
-		virtual void				Process(float ElapsedTime) = 0;
+		void						SetReadBufferSize(ZESize BufferSize);
+		ZESize						GetReadBufferSize() const;
+
+		void						SetSendBufferSize(ZESize BufferSize);
+		ZESize						GetSendBufferSize() const;
+
+		void						SetTemporaryBufferSize(ZESize BufferSize);
+		ZESize						GetTemporaryBufferSize() const;
+
+		void						CleanSendBuffer();
+		void						CleanReadBuffer();
+
+		void						Process(float ElapsedTime);
+
+									ZEConnection();
+									ZEConnection(ZESocket* Socket);
+
+									~ZEConnection();
 };
 
 #endif

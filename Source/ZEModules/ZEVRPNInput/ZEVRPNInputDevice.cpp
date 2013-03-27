@@ -85,9 +85,9 @@ static void VRPN_CALLBACK Axis_ChangeHandler(void* UserData, const vrpn_ANALOGCB
 		Handle->State->Axises.CurrentValues[I] = (float)(Data.channel[I]);
 }
 
-bool ZEVRPNInputDevice::Initialize()
+bool ZEVRPNInputDevice::InitializeSelf()
 {
-	if (IsInitialized())
+	if (!ZEInputDevice::InitializeSelf())
 		return false;
 
 	bool Clash = false;
@@ -126,21 +126,18 @@ bool ZEVRPNInputDevice::Initialize()
 		VRPNDevice = TrackerRemote;
 	}
 
-	return ZEInputDevice::Initialize();
+	return true;
 }
 
-void ZEVRPNInputDevice::Deinitialize()
+bool ZEVRPNInputDevice::DeinitializeSelf()
 {
-	if (!IsInitialized())
-		return;
-
 	if (VRPNDevice != NULL)
 	{
 		delete VRPNDevice;
 		VRPNDevice = NULL;
 	}
 
-	return ZEInputDevice::Deinitialize();
+	return ZEInputDevice::DeinitializeSelf();
 }
 
 void ZEVRPNInputDevice::Process()

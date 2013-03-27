@@ -58,8 +58,10 @@
 class ZESocket
 {
 	public:
-		virtual ZESSize	Connect(const ZEIPAddress& Address, ZEUInt16 Port) = 0;
+		virtual bool	Create(const ZEIPAddress& Address, ZEUInt16 Port) = 0;
 		virtual ZESSize	Recieve(void* Buffer, ZESize BufferSize) = 0;
+		virtual ZESSize	Send(const void* Buffer, ZESize BufferSize) = 0;
+		virtual bool	Close() = 0;
 };
 
 class ZESocketTCP : public ZESocket
@@ -72,8 +74,8 @@ class ZESocketTCP : public ZESocket
 		ZEUInt16			Port;
 
 	public:
-		bool				Create(const ZEIPAddress& Address, ZEUInt16 Port);
-		bool				Close();
+		virtual bool		Create(const ZEIPAddress& Address, ZEUInt16 Port);
+		virtual bool		Close();
 
 		ZESSize				Connect(const ZEIPAddress& Address, ZEUInt16 Port);
 		virtual ZESSize		Send(const void* Buffer, ZESize BufferSize);
@@ -81,6 +83,9 @@ class ZESocketTCP : public ZESocket
 
 		const ZEIPAddress&	GetIpAddress() const;
 		ZEUInt16			GetPort() const;		
+
+							ZESocketTCP();
+							~ZESocketTCP();
 };
 
 class ZESocketTCPListener
@@ -98,6 +103,9 @@ class ZESocketTCPListener
 		bool				Close();
 
 		ZESocketTCP*		Accept();
+
+							ZESocketTCPListener();
+							~ZESocketTCPListener();
 };
 
 class ZESocketUDP : public ZESocket
@@ -134,6 +142,9 @@ class ZESocketUDP : public ZESocket
 
 		virtual ZESSize		Send(const void* Buffer, ZESize BufferSize);
 		virtual ZESSize		Recieve(void* Buffer, ZESize BufferSize);
+
+							ZESocketUDP();
+							~ZESocketUDP();
 };
 
 #endif
