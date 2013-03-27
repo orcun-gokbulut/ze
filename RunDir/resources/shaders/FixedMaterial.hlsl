@@ -141,11 +141,11 @@ ZEFixedMaterial_GBuffer_VSOutput ZEFixedMaterial_GBuffer_VertexShader(ZEFixedMat
 	Output.Position_ = mul(WorldViewProjMatrix, Input.Position);
 	
 	Output.Position = mul(WorldViewMatrix, Input.Position).xyz;
-	Output.Normal.xyz = mul(WorldViewInvTrpsMatrix, Input.Normal).xyz;
+	Output.Normal.xyz = mul((float3x3)WorldViewInvTrpsMatrix, Input.Normal).xyz;
 	
 	#if defined(ZE_SHADER_TANGENT_SPACE)
-		Output.Tangent = mul(WorldViewInvTrpsMatrix, Input.Tangent).xyz;
-		Output.Binormal = mul(WorldViewInvTrpsMatrix, Input.Binormal).xyz;
+		Output.Tangent = mul((float3x3)WorldViewInvTrpsMatrix, Input.Tangent).xyz;
+		Output.Binormal = mul((float3x3)WorldViewInvTrpsMatrix, Input.Binormal).xyz;
 	#endif
 	
 	Output.Texcoord = Input.Texcoord;
@@ -313,7 +313,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		#elif defined(ZE_SHADER_OPACITY_BASE_ALPHA)
 				Output.Color.a = MaterialOpacity * tex2D(BaseMap, Input.Texcoord).a;
 		#else 
-			Ouput.Color.a = MaterialOpacity;
+			Output.Color.a = MaterialOpacity;
 		#endif
 	#endif
 	
