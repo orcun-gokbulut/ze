@@ -533,7 +533,7 @@ bool ZEMLNode::ReadSelf(ZEFile* File, bool DeferredDataReading)
 
 	if(File->Read(TempNameBuffer, NameSize, 1) != 1)
 	{
-		zeError("Can not read ZEMLDataProperty name from file. Corrupted ZEML file.");
+		zeError("Can not read ZEMLNode name from file. Corrupted ZEML file.");
 		return false;
 	}
 
