@@ -68,6 +68,7 @@
 #include "ZEDEntitySelectionItem.h"
 #include "ZEGame/ZEGrid.h"
 #include "ZEGraphics/ZEPointLight.h"
+#include "ZEInterior/ZEInterior.h"
 
 
 
@@ -158,6 +159,9 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 
 	ZEPointLight* PointLight = ZEPointLight::CreateInstance();
 	PointLight->Destroy();
+
+	ZEInterior* Interior = ZEInterior::CreateInstance();
+	Interior->Destroy();
 
 	ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
 	Sky->Destroy();
