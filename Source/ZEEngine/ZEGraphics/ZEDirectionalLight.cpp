@@ -413,8 +413,8 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 
 ZEDirectionalLight::ZEDirectionalLight()
 {
-	CascadeCount = 1;
-	SplitBias = 0.8f;
+	CascadeCount = 4;
+	SplitBias = 0.6f;
 
 	SlopeScaledBias = 0.3f;
 	DepthScaledBias = 0.7f;

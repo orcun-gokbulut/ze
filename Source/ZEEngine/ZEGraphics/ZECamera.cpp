@@ -240,7 +240,7 @@ ZECamera::ZECamera()
 	FarZ = zeGraphics->GetFarZ();
 	NearZ = zeGraphics->GetNearZ();
 	AspectRatio = zeGraphics->GetAspectRatio();
-	ShadowDistance = 100.0f;
+	ShadowDistance = 1000.0f;
 	ShadowFadeDistance = ShadowDistance * 0.1f;
 }
 

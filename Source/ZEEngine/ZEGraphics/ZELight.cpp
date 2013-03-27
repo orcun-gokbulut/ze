@@ -177,6 +177,16 @@ bool ZELight::GetCastsShadow() const
 	return CastsShadows;
 }
 
+void ZELight::SetShadowFactor(float Factor)
+{
+	ShadowFactor = Factor;
+}
+
+float ZELight::GetShadowFactor() const
+{
+	return ShadowFactor;
+}
+
 void ZELight::SetPosition(const ZEVector3& NewPosition)
 {
 	if (GetPosition() != NewPosition)
@@ -215,6 +225,8 @@ ZELight::ZELight()
 	Intensity = 1.0f;
 	Color = ZEVector3(1.0f, 1.0f, 1.0f);
 	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
+
+	ShadowFactor = 0.5f;
 }
 
 ZELight::~ZELight()
