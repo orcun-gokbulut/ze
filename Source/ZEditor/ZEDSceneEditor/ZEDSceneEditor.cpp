@@ -69,6 +69,7 @@
 #include "ZEGame/ZEGrid.h"
 #include "ZEGraphics/ZEPointLight.h"
 #include "ZEInterior/ZEInterior.h"
+#include "ZEGame/ZEWeather.h"
 
 
 
@@ -165,6 +166,9 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 
 	ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
 	Sky->Destroy();
+
+	ZEWeather* Weather = ZEWeather::CreateInstance();
+	Weather->Destroy();
 
 	//setStyleSheet(GetCSSFromFile(":/CSS/MapEditor.qss"));
 
