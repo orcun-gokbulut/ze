@@ -77,6 +77,7 @@ float3 CascadeData[ZE_MAX_CASCADE_COUNT]		: register(ps, c118);
 
 float4 ShadowParameters0						: register(ps, c124);
 float4 ShadowParameters1						: register(ps, c125);
+float4 ShadowParameters2						: register(ps, c126);
 #define DepthScaledBias							ShadowParameters0.x
 #define SlopeScaledBias							ShadowParameters0.y
 #define ShadowDistance							ShadowParameters0.z
@@ -84,6 +85,7 @@ float4 ShadowParameters1						: register(ps, c125);
 #define PenumbraScale							ShadowParameters1.x
 #define ShadowMapTexelSize						ShadowParameters1.y
 #define RotationMapTexelSize					ShadowParameters1.z
+#define ShadowTransparencyFactor				ShadowParameters2.x
 
 sampler2D ShadowMaps[ZE_MAX_CASCADE_COUNT]		: register(ps, s6);
 sampler2D RandomRotationMap						: register(ps, s15);
@@ -222,11 +224,9 @@ float ZEDirectionalLight_GetShadowFactor(float3 PixelViewPos, float3 PixelViewNo
 		
 		// Calculate fade out factor
 		float FadeFactor = (ShadowDistance - PixelViewPos.z) / ShadowFadeDistance;
-		ShadowFactor *= saturate(FadeFactor);
-		
-		if (ShadowFactor >= 0.995f)
-			discard;
+		ShadowFactor *= saturate(FadeFactor) * ShadowTransparencyFactor;	
 	}
+	
 	return ShadowFactor;
 }
 
