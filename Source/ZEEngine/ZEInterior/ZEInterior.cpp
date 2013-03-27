@@ -46,6 +46,9 @@
 #include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
+#include "ZEGame/ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEInterior);
 
 ZEDrawFlags ZEInterior::GetDrawFlags() const
 {
@@ -201,11 +204,11 @@ bool ZEInterior::SetInteriorFile(const ZEString& FileName)
 		return true;
 	}
 
-	const ZEInteriorResource* NewResource = ZEInteriorResource::LoadSharedResource(InteriorFile);
+	ZEInteriorResource* NewResource = ZEInteriorResource::LoadSharedResource(InteriorFile);
 	if (NewResource != NULL)
 	{
 		InteriorFile = FileName;
-		LoadInteriorResource(Resource);
+		LoadInteriorResource(NewResource);
 	}
 	else
 	{

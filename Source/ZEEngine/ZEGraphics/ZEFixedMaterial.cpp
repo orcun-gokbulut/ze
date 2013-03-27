@@ -583,9 +583,15 @@ void ZEFixedMaterial::SetNormalMap(const ZETexture2D* Texture)
 	{
 		NormalMapResource->Release();
 		NormalMapResource = NULL;
-	}
 
-	NormalMap = Texture;
+		SetNormalMapEnabled(true);
+		NormalMap = Texture;
+	}
+	else
+	{
+		SetNormalMapEnabled(false);
+		NormalMap = NULL;
+	}
 }
 
 const ZETexture2D* ZEFixedMaterial::GetNormalMap() const
@@ -770,6 +776,11 @@ void ZEFixedMaterial::SetOpacityMap(const ZETexture2D* Texture)
 	}
 
 	OpacityMap = Texture;
+	SetOpacityEnabled(true);
+	SetOpacityComponent(ZE_MOC_OPACITY_MAP);
+
+ 	SetAlphaCullEnabled(true);
+ 	SetAlphaCullLimit(0.5f);
 }
 
 const ZETexture2D* ZEFixedMaterial::GetOpacityMap() const
@@ -788,9 +799,18 @@ void ZEFixedMaterial::SetOpacityMapFile(const char* Filename)
 	OpacityMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
 	if (OpacityMapResource != NULL)
+	{
+		SetOpacityEnabled(true);
+		SetOpacityComponent(ZE_MOC_OPACITY_MAP);
 		OpacityMap = OpacityMapResource->GetTexture();
+
+		SetAlphaCullEnabled(true);
+		SetAlphaCullLimit(0.5f);
+	}
 	else
+	{
 		OpacityMap = NULL;
+	}
 }
 
 const char* ZEFixedMaterial::GetOpacityMapFile() const
