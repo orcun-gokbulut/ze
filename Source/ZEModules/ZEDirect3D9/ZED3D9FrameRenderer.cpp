@@ -311,7 +311,7 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 		ZEVector3		Attenuation;
 		float			ShadowDistance;
 		ZEVector3		Direction;
-		float			Reserverd2;
+		float			Reserved02;
 
 	} LightParameters;
 
@@ -348,6 +348,7 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 
 		ZEVector4 ShadowParameters0;
 		ZEVector4 ShadowParameters1;
+		ZEVector4 ShadowParameters2;
 		ShadowParameters0.x = Light->GetDepthScaledBias();
 		ShadowParameters0.y = Light->GetSlopeScaledBias();
 		ShadowParameters0.z = Camera->GetShadowDistance();
@@ -355,6 +356,7 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 		ShadowParameters1.x = Light->GetPenumbraScale();
 		ShadowParameters1.y = 1.0f / ShadowMapDimension;
 		ShadowParameters1.z = 1.0f / RotationmapDimension;
+		ShadowParameters2.x = Light->GetShadowFactor();
 		
 		ZEVector4 CascadeData[MAX_CASCADE_COUNT];
 		ZEMatrix4x4 LightTransforms[MAX_CASCADE_COUNT];
@@ -379,6 +381,7 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 		GetDevice()->SetPixelShaderConstantF(118, CascadeData->M, MAX_CASCADE_COUNT);
 		GetDevice()->SetPixelShaderConstantF(124, ShadowParameters0.M, 1);
 		GetDevice()->SetPixelShaderConstantF(125, ShadowParameters1.M, 1);
+		GetDevice()->SetPixelShaderConstantF(126, ShadowParameters2.M, 1);
 	}
 
 	GetDevice()->SetPixelShaderConstantB(0, &CastShadow, 1);
@@ -1222,7 +1225,8 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		
 		// HDR Process
 		HDRProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
-		HDRProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
+		//HDRProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
+		HDRProcessor.SetOutput(ViewPort);
 		HDRProcessor.Process(ElaspedTime);
 		
 		
@@ -1230,13 +1234,13 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		ColorTransformProcessor.SetInput(CTInputBuffer);
 		ColorTransformProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
 		//ColorTransformProcessor.SetOutput(ViewPort);
-		ColorTransformProcessor.Process();
+		//ColorTransformProcessor.Process();
 		
 		
 		// Grain
 		GrainProcessor.SetInput(GrainInputBuffer);
 		GrainProcessor.SetOutput((ZED3D9ViewPort*)ZoomBlurInputBuffer->GetViewPort());
-		GrainProcessor.Process(ElaspedTime);
+		//GrainProcessor.Process(ElaspedTime);
 
 		// Blur Mask
 // 		BlurMaskProcessor.SetInput(BlurMaskInputBuffer);
@@ -1246,12 +1250,12 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		// Zoom blur
 		ZoomBlurProcessor.SetInput(ZoomBlurInputBuffer);
 		ZoomBlurProcessor.SetOutput((ZED3D9ViewPort*)CDInputBuffer->GetViewPort());
-		ZoomBlurProcessor.Process();
+		//ZoomBlurProcessor.Process();
 
 		// Channel Disorientation Processor
 		ChannelDisorientProcessor.SetInput(CDInputBuffer);
 		ChannelDisorientProcessor.SetOutput((ZED3D9ViewPort*)BlurInputBuffer->GetViewPort());
-		ChannelDisorientProcessor.Process();
+		//ChannelDisorientProcessor.Process();
 
 		// Texture mask
 // 		TMProcessor.SetInput(TMInputBuffer);
@@ -1281,7 +1285,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		// Blur Process
 		BlurProcessor.SetInput(BlurInputBuffer);
 		BlurProcessor.SetOutput(ViewPort);
-		BlurProcessor.Process();
+		//BlurProcessor.Process();
 		
 	
 

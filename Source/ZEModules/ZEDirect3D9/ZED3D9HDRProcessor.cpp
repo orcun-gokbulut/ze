@@ -594,7 +594,7 @@ ZED3D9HDRProcessor::ZED3D9HDRProcessor()
 
 	//Parameters.Key = 0.7f;
 	Parameters.Key = 0.9f;
-	Parameters.BrightPassTreshold = 0.88f;
+	Parameters.BrightPassTreshold = 0.95f;
 	Parameters.BloomFactor = 1.0f;
 	Parameters.BloomStandardDeviation = 2.0f;
 	Parameters.MaxLuminanceChangePerSecond = 0.0001f;
