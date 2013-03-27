@@ -67,6 +67,7 @@ class ZELight : public ZEEntity
 		bool							CastsShadows;
 		bool							UpdateViewVolume;
 		
+		float							ShadowFactor;
 		float							PenumbraScale;
 		float							DepthScaledBias;
 		float							SlopeScaledBias;
@@ -106,6 +107,9 @@ class ZELight : public ZEEntity
 
 		virtual void					SetCastsShadow(bool NewValue);
 		bool							GetCastsShadow() const;
+
+		void							SetShadowFactor(float Factor);
+		float							GetShadowFactor() const;
 		
 		virtual	void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);
@@ -133,6 +137,7 @@ ZE_POST_PROCESSOR_START(Meta)
 				<property name="Intensity" type="float" autogetset="yes" description="Intensity(light amount emmited from light) of the light."/>
 				<property name="Range" type="float" autogetset="yes" description="Maximum effect range of the light."/>
 				<property name="Attenuation" type="ZEVector3" autogetset="yes" description="Light amount decrease according to distance."/>
+				<property name="ShadowFactor" type="float" autogetset="yes" description="Shadow darkness."/>
 			</class>
 		</meta>
 	</zinek>

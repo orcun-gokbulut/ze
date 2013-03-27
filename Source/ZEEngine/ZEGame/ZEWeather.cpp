@@ -44,7 +44,14 @@
 #include "ZECloud.h"
 #include "ZEModules\ZEDirect3D9\ZED3D9FrameRenderer.h"
 #include "ZEGraphics\ZECamera.h"
+#include "ZEGame/ZEEntityProvider.h"
 
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEWeather);
+
+ZEEntityRunAt ZEWeatherDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}
 
 void ZEWeather::AdjustHDR(float DayTime)
 {
@@ -213,6 +220,26 @@ void ZEWeather::SetSunDirection(const ZEVector3& Value)
 	this->UpdateCloudColor();
 }
 
+void ZEWeather::SetSunCastsShadows(bool Value)
+{
+	SunLight->SetCastsShadow(Value);
+}
+
+bool ZEWeather::GetSunCastsShadows() const
+{
+	return SunLight->GetCastsShadow();
+}
+
+void ZEWeather::SetMoonCastsShadows(bool Value)
+{
+	MoonLight->SetCastsShadow(Value);
+}
+
+bool ZEWeather::GetMoonCastsShadows() const
+{
+	return MoonLight->GetCastsShadow();
+}
+
 const ZEVector3& ZEWeather::GetSunDirection() const
 {
 	return SunDirection;
@@ -296,7 +323,7 @@ ZEWeather::ZEWeather()
 	FogFactor			= 0.1f;
 	MoonPhase			= 0.3f;
 	CloudCover			= 0.3f;
-	MoonLightIntensity	= 0.1f;
+	MoonLightIntensity	= 0.2f;
 	SunLightIntensity	= 1.2f;
 
 	SunDirection		= ZEVector3(0.0001f, -1.0f, 0.0001f);
