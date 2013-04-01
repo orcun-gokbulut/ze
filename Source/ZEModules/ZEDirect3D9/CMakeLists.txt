@@ -134,6 +134,8 @@ ze_add_source(ZED3D9ZoomBlurProcessor.cpp				Sources)
 ze_add_source(ZED3D9ZoomBlurProcessor.h					Sources)
 ze_add_source(ZED3D9Plugin.h							Sources)
 ze_add_source(ZED3D9Plugin.cpp							Sources)
+ze_add_source(ZED3D9SeaMaterial.h						Sources)
+ze_add_source(ZED3D9SeaMaterial.cpp						Sources)
 	
 ze_add_library(ZEDirect3D9 
 	SOURCES ${Sources}

@@ -193,6 +193,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual ZESkyDomeMaterial*						CreateSkyDomeMaterial();
 		virtual ZEFixedMaterial*						CreateCustomMaterial();
 		virtual ZEFixedMaterial*						CreateCGFXMaterial();
+		virtual ZESeaMaterial*							CreateSeaMaterial();
 
 		static LPDIRECT3DDEVICE9						GetD3D9Device();
 		static ZED3D9Module*							GetD3D9Module();
