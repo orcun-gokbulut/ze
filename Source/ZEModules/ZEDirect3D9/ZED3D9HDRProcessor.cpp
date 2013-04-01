@@ -56,10 +56,9 @@ static float GausianFunction(float x, float y, float StandartDeviation)
 void FillGaussianKernel1D(float* Kernel, ZESize KernelSize, float StandartDeviation)
 {
 	ZESize HalfKernelSize = (KernelSize - 1) / 2;
-	for (ZESize x = 0; x < KernelSize; x++)
+	for (ZESize I = 0; I < KernelSize; I++)
 	{
-		Kernel[4 * x] = (float)(x - HalfKernelSize);
-		Kernel[4 * x + 1] = GausianFunction((float)(x - HalfKernelSize), StandartDeviation);
+		Kernel[I] = GausianFunction((float)I - (float)HalfKernelSize, StandartDeviation);
 	}
 }
 

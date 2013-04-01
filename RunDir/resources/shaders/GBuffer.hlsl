@@ -33,20 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sampler2D GBuffer1 : register(s0);
-sampler2D GBuffer2 : register(s1);
-sampler2D GBuffer3 : register(s2);
+sampler2D GBuffer1						: register(s0);
+sampler2D GBuffer2						: register(s1);
+sampler2D GBuffer3						: register(s2);
 
-float3 ZEGBuffer_ViewVector : register(vs, c0);
-float4 ZEGBuffer_PipelineParameters0 : register(ps, c6);
-#define ZEGBuffer_PixelSize_2				ZEGBuffer_PipelineParameters0.xy
-#define ZEGBuffer_FarZ						ZEGBuffer_PipelineParameters0.z
+float3 ZEGBuffer_ViewVector				: register(vs, c0);
+float4 ZEGBuffer_PipelineParameters0	: register(ps, c6);
+
+#define ZEGBuffer_PixelSize_2			ZEGBuffer_PipelineParameters0.xy
+#define ZEGBuffer_FarZ					ZEGBuffer_PipelineParameters0.z
 
 struct ZEGBuffer
 {
-	float4 Position : COLOR0;
-	float4 NormalGloss : COLOR1;
-	float4 VelocitySubSurfaceScatteringFactor : COLOR2;
+	float4 Position								: COLOR0;
+	float4 NormalGloss							: COLOR1;
+	float4 VelocitySubSurfaceScatteringFactor	: COLOR2;
 };
 
 // Depth
@@ -76,12 +77,12 @@ float3 ZEGBuffer_GetViewPosition(float2 Texcoord, float3 ViewVector)
 // View Normal
 void ZEGBuffer_SetViewNormal(inout ZEGBuffer Output, float3 ViewNormal)
 {
-	Output.NormalGloss.xyz = ViewNormal * 0.5f + 0.5f;
+	Output.NormalGloss.xyz = normalize(ViewNormal) * 0.5f + 0.5f;
 }
 
 float3 ZEGBuffer_GetViewNormal(float2 Texcoord)
 {
-	return 2.0f * tex2D(GBuffer2, Texcoord).xyz - 1.0f;
+	return normalize(tex2D(GBuffer2, Texcoord).xyz * 2.0f - 1.0f);
 }
 
 // Specular Glossiness

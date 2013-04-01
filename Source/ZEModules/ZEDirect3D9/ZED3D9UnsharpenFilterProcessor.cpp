@@ -196,7 +196,7 @@ ZED3D9UnsharpenFilterProcessor::ZED3D9UnsharpenFilterProcessor()
 	PixelShader			= NULL;
 	Input				= NULL;
 	Output				= NULL;
-	Amount				= 0.6f;
+	Amount				= 0.0f;
 	
 }
 

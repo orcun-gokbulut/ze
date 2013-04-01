@@ -106,7 +106,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		
 		ZED3D9SSAOProcessor					SSAOProcessor;
 		ZED3D9SSAAProcessor					SSAAProcessor;
-		ZED3D9MLAAProcessor					MLAAProcessor;
+		
 		
 		ZED3D9EDProcessor					EDProcessor;
 		ZESmartArray<ZERenderCommand>		CommandList;
@@ -127,6 +127,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 			ZED3D9PixelShader*				ProjectiveLightPS;
 			ZED3D9VertexShader*				OmniProjectiveLightVS;
 			ZED3D9PixelShader*				OmniProjectiveLightPS;
+
 		} LightningComponents;
 
 		static bool							CheckRenderCommand(ZERenderCommand* RenderCommand);
@@ -155,6 +156,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		virtual								~ZED3D9FrameRenderer();					
 
 	public:
+		ZED3D9MLAAProcessor					MLAAProcessor;
 		ZED3D9FogProcessor					FogProcessor;
 		ZED3D9HDRProcessor					HDRProcessor;
 		ZED3D9DOFProcessor					DOFProcessor;
@@ -167,7 +169,6 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9ZoomBlurProcessor				ZoomBlurProcessor;
 		ZED3D9UnsharpenFilterProcessor		UnsharpenProcessor;
 		
-
 		virtual void						SetDrawParameters(ZEDrawParameters* DrawParameters);
 		virtual ZEDrawParameters*			GetDrawParameters();
 

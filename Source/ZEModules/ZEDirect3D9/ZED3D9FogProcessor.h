@@ -38,6 +38,7 @@
 #ifndef __ZE_D3D9_FOG_PROCESSOR_H__
 #define __ZE_D3D9_FOG_PROCESSOR_H__
 
+#include "ZEMeta/ZEObject.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZED3D9BlurProcessor.h"
 #include "ZEMath\ZEVector.h"
@@ -58,14 +59,25 @@ enum ZED3D9FogModel
 	ZE_D3D9_FM_EXPONENTIAL_SQUARE	= 2
 };
 
-
-class ZED3D9FogProcessor : public ZED3D9ComponentBase
+struct ZEFOGScreenAlignedQuad
 {
+	float Position[3];
+};
+
+
+ZE_META_OBJECT_DESCRIPTION(ZED3D9FogProcessor);
+
+class ZED3D9FogProcessor : public ZED3D9ComponentBase, public ZEObject
+{
+	ZE_META_OBJECT(ZED3D9FogProcessor)
+
 	protected:
+		static ZEFOGScreenAlignedQuad	Vertices[4];
+
 		float							FogHeight;
 		float							FogDistanceFar;
 		float							FogDistanceNear;
-		float							FogVisibility;
+		float							FogFactor;
 		
 		ZEVector3						FogColor;
 		ZEVector3						OutScatterFactor;
@@ -90,28 +102,28 @@ class ZED3D9FogProcessor : public ZED3D9ComponentBase
 		
 	public:
 		void							SetFogModel(ZED3D9FogModel Model);
-		ZED3D9FogModel					GetFogModel();
+		ZED3D9FogModel					GetFogModel() const;
 
 		void							SetFogColor(ZEVector3 Color);
-		ZEVector3						GetFogColor();
+		ZEVector3						GetFogColor() const;
 
 		void							SetOutScatterFactor(ZEVector3 Color);
-		ZEVector3						GetOutScatterFactor();
+		ZEVector3						GetOutScatterFactor() const;
 
 		void							SetInScatterFactor(ZEVector3 Color);
-		ZEVector3						GetInScatterFactor();
+		ZEVector3						GetInScatterFactor() const;
 		
 		void							SetFogHeight(float Value);
-		float							GetFogHeight();
+		float							GetFogHeight() const;
 
 		void							SetFogDistanceFar(float Value);
-		float							GetFogDistanceFar();
+		float							GetFogDistanceFar() const;
 		
 		void							SetFogDistanceNear(float Value);
-		float							GetFogDistanceNear();
+		float							GetFogDistanceNear() const;
 		
-		void							SetFogVisibility(float Value);
-		float							GetFogVisibility();
+		void							SetFogFactor(float Value);
+		float							GetFogFactor() const;
 
 		void							SetRenderer(ZEFrameRenderer* Renderer);
 		ZEFrameRenderer*				GetRenderer();
@@ -136,5 +148,24 @@ class ZED3D9FogProcessor : public ZED3D9ComponentBase
 										ZED3D9FogProcessor();
 		virtual							~ZED3D9FogProcessor();
 };
+
+/*
+ZE_POST_PROCESSOR_START(Meta)
+	<zinek>
+		<meta> 
+			<class name="ZED3D9FogProcessor">
+				<noinstance>true</noinstance>
+				<description>ZED3D9FogProcessor</description>
+				<property name="FogDistanceFar" type="float" autogetset="yes" description="..."/>
+				<property name="FogDistanceNear" type="float" autogetset="yes" description="..."/>
+				<property name="FogFactor" type="float" autogetset="yes" description="..."/>
+				<property name="FogColor" type="ZEVector3" autogetset="yes" description="..." semantic="ZE_PS_COLOR"/>
+				<property name="OutScatterFactor" type="ZEVector3" autogetset="yes" description="..." semantic="ZE_PS_COLOR"/>
+				<property name="InScatterFactor" type="ZEVector3" autogetset="yes" description="..." semantic="ZE_PS_COLOR"/>
+			</class>
+		</meta>
+	</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 
 #endif	/* __ZE_D3D9_FOG_PROCESSOR_H__ */

@@ -85,14 +85,14 @@ bool ZED3D9SeaMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderComm
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
-	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_ANISOTROPIC);
 
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
 
-	GetDevice()->SetTexture(0, ((ZED3D9Texture2D*)DiffuseTexture)->Texture);
+	GetDevice()->SetTexture(0, DiffuseTexture == NULL ? NULL : ((ZED3D9Texture2D*)DiffuseTexture)->Texture);
 	GetDevice()->SetPixelShader(ForwardPassPixelShader->GetPixelShader());
 	GetDevice()->SetVertexShader(ForwardPassVertexShader->GetVertexShader());
 	GetDevice()->SetVertexShaderConstantF(8, ZEVector4(EntityXZScale.x, EntityXZScale.y, DiffuseTextureTile.x, DiffuseTextureTile.y).M, 1);
@@ -129,14 +129,14 @@ bool ZED3D9SeaMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderComm
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
-	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_ANISOTROPIC);
 
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
 
-	GetDevice()->SetTexture(0, ((ZED3D9Texture2D*)NormalTexture)->Texture);
+	GetDevice()->SetTexture(0, NormalTexture == NULL ? NULL : ((ZED3D9Texture2D*)NormalTexture)->Texture);
 	GetDevice()->SetPixelShader(GPassPixelShader->GetPixelShader());
 	GetDevice()->SetVertexShader(GPassVertexShader->GetVertexShader());
 	GetDevice()->SetVertexShaderConstantF(8, ZEVector4(EntityXZScale.x, EntityXZScale.y, NormalTextureTile.x, NormalTextureTile.y).M, 1);

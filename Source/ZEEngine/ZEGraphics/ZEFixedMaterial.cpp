@@ -1578,8 +1578,8 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 	SetRefractionIndex(RefractionIndexValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : RefractionIndexValue.GetFloat());
 	SetRefractionFactor(RefractionFactorValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : RefractionFactorValue.GetFloat());
 	SetReflectionFactor(ReflectionFactorValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : ReflectionFactorValue.GetFloat());
-	SetDiffuseSubSurfaceScatteringFactor(SubSurfaceScatteringFactorValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SubSurfaceScatteringFactorValue.GetFloat());
-	SetAlphaCullLimit(AlphaCullLimitValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : AlphaCullLimitValue.GetFloat());
+	SetDiffuseSubSurfaceScatteringFactor(SubSurfaceScatteringFactorValue.GetType() == ZE_VRT_UNDEFINED ? 0.0f : SubSurfaceScatteringFactorValue.GetFloat());
+	SetAlphaCullLimit(AlphaCullLimitValue.GetType() == ZE_VRT_UNDEFINED ? 0.5f : AlphaCullLimitValue.GetFloat());
 	SetSpecularShininess(SpecularShininessValue.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SpecularShininessValue.GetFloat());
 
 	SetBaseMapAddressModeU((ZETextureAddressMode)(BaseMapAddressModeUValue.GetType() == ZE_VRT_UNDEFINED ? 0 : BaseMapAddressModeUValue.GetInt32()));

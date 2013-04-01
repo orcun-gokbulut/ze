@@ -36,6 +36,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include "ui_ZEDSceneEditor.h"
 #include "ZEModules/ZEDirect3D9/ZED3D9FrameRenderer.h"
+#include "ZEModules/ZEDirect3D9/ZED3D9DOFProcessor.h"
 #include <QtGui/QFileDialog.h>
 #include <QtGui/QWidget>
 #include <QtGui/QAction>
@@ -70,6 +71,7 @@
 #include "ZEGraphics/ZEPointLight.h"
 #include "ZEInterior/ZEInterior.h"
 #include "ZEGame/ZEWeather.h"
+#include "ZEGame/ZESea.h"
 
 
 
@@ -170,11 +172,28 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	ZEWeather* Weather = ZEWeather::CreateInstance();
 	Weather->Destroy();
 
+	ZESea* Sea = ZESea::CreateInstance();
+	Sea->Destroy();
+
 	//setStyleSheet(GetCSSFromFile(":/CSS/MapEditor.qss"));
 
 	ZED3D9FrameRenderer* Renderer = ((ZED3D9FrameRenderer*)(Scene->GetRenderer()));
 
-	new ZEDPropertyWindowManager(0, &Renderer->HDRProcessor, QString());
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HDRProcessor, QString()), QString("HDR"));
+	QVBoxLayout* TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(1));
+	ui->PropertiesTabWidget->widget(1)->setLayout(TempLayout);
+
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->DOFProcessor, QString()), QString("DOF"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(2));
+	ui->PropertiesTabWidget->widget(2)->setLayout(TempLayout);
+
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->MLAAProcessor, QString()), QString("MLAA"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(3));
+	ui->PropertiesTabWidget->widget(3)->setLayout(TempLayout);
+
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->FogProcessor, QString()), QString("FOG"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(4));
+	ui->PropertiesTabWidget->widget(4)->setLayout(TempLayout);
 }
 
 void MapEditor::MakeConnections()

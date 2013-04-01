@@ -128,7 +128,7 @@ void ZEWeather::SetFogFactor(float Value)
 {
 	FogFactor = Value;
 
-	((ZED3D9FrameRenderer*)zeScene->GetRenderer())->FogProcessor.SetFogVisibility(Value);
+	((ZED3D9FrameRenderer*)zeScene->GetRenderer())->FogProcessor.SetFogFactor(Value);
 }
 
 float ZEWeather::GetFogFactor() const
