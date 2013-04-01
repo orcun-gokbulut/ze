@@ -61,6 +61,8 @@
 #include <d3dx9.h>
 #include "ZED3D9SkyDomeMaterial.h"
 #include "ZED3D9CloudMaterial.h"
+#include "ZED3D9SeaMaterial.h"
+#include "ZEGraphics/ZESeaMaterial.h"
 
 
 LPDIRECT3DDEVICE9 D3D9Device;
@@ -670,6 +672,11 @@ ZEFixedMaterial* ZED3D9Module::CreateCGFXMaterial()
 {
 	zeError("CGFX Materials are not implamented.");
 	return NULL;
+}
+
+ZESeaMaterial* ZED3D9Module::CreateSeaMaterial()
+{
+	return new ZED3D9SeaMaterial();
 }
 
 LPDIRECT3DDEVICE9 ZED3D9Module::GetD3D9Device()
