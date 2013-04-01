@@ -52,12 +52,13 @@ class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	protected:
-		ZED3D9ViewPort					ViewPort;
+		
 
 										ZED3D9Texture2D();
 		virtual							~ZED3D9Texture2D();
 
 	public:
+		ZED3D9ViewPort					ViewPort;
 		LPDIRECT3DTEXTURE9				Texture;
 
 		virtual bool					IsEmpty() const;

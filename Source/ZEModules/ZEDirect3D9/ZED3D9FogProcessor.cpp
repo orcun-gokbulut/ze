@@ -52,7 +52,7 @@ void ZED3D9FogProcessor::SetFogModel(ZED3D9FogModel Model)
 	FogModel = Model;
 }
 
-ZED3D9FogModel ZED3D9FogProcessor::GetFogModel()
+ZED3D9FogModel ZED3D9FogProcessor::GetFogModel() const
 {
 	return FogModel;
 }
@@ -62,7 +62,7 @@ void ZED3D9FogProcessor::SetFogColor(ZEVector3 Color)
 	FogColor = Color;
 }
 
-ZEVector3 ZED3D9FogProcessor::GetFogColor()
+ZEVector3 ZED3D9FogProcessor::GetFogColor() const
 {
 	return FogColor;
 }
@@ -77,7 +77,7 @@ void ZED3D9FogProcessor::SetOutScatterFactor(ZEVector3 Color)
 	OutScatterFactor = Color;
 }
 
-ZEVector3 ZED3D9FogProcessor::GetOutScatterFactor()
+ZEVector3 ZED3D9FogProcessor::GetOutScatterFactor() const
 {
 	return OutScatterFactor;
 }
@@ -87,12 +87,12 @@ void ZED3D9FogProcessor::SetInScatterFactor(ZEVector3 Color)
 	InScatterFactor = Color;
 }
 
-ZEVector3 ZED3D9FogProcessor::GetInScatterFactor()
+ZEVector3 ZED3D9FogProcessor::GetInScatterFactor() const
 {
 	return InScatterFactor;
 }
 
-float ZED3D9FogProcessor::GetFogHeight()
+float ZED3D9FogProcessor::GetFogHeight() const
 {
 	return FogHeight;
 }
@@ -102,7 +102,7 @@ void ZED3D9FogProcessor::SetFogDistanceFar(float Value)
 	FogDistanceFar = Value;
 }
 
-float ZED3D9FogProcessor::GetFogDistanceFar()
+float ZED3D9FogProcessor::GetFogDistanceFar() const
 {
 	return FogDistanceFar;
 }
@@ -112,19 +112,19 @@ void ZED3D9FogProcessor::SetFogDistanceNear(float Value)
 	FogDistanceNear = Value;
 }
 
-float ZED3D9FogProcessor::GetFogDistanceNear()
+float ZED3D9FogProcessor::GetFogDistanceNear() const
 {
 	return FogDistanceNear;
 }
 
-void ZED3D9FogProcessor::SetFogVisibility(float Value)
+void ZED3D9FogProcessor::SetFogFactor(float Value)
 {
-	FogVisibility = Value;
+	FogFactor = Value;
 }
 
-float ZED3D9FogProcessor::GetFogVisibility()
+float ZED3D9FogProcessor::GetFogFactor() const
 {
-	return FogVisibility;
+	return FogFactor;
 }
 
 void ZED3D9FogProcessor::SetRenderer(ZEFrameRenderer* Renderer)
@@ -180,17 +180,6 @@ void ZED3D9FogProcessor::OnDeviceRestored()
 void ZED3D9FogProcessor::Process()
 {
 	zeProfilerStart("Fog Pass");
-
-	static struct Vert  
-	{
-		float Position[3];
-
-	} Vertices[] = {
-		{-1.0f,  1.0f, 1.0f},
-		{ 1.0f,  1.0f, 1.0f},
-		{-1.0f, -1.0f, 1.0f},
-		{ 1.0f, -1.0f, 1.0f}
-	};
 
 	GetDevice()->SetVertexDeclaration(VertexDeclaration);
 
@@ -260,7 +249,7 @@ void ZED3D9FogProcessor::Process()
 
 	}PixelShaderParameters = {
 		{FogColor.x, FogColor.y, FogColor.z}, Camera->GetFarZ(),
-		FogDistanceFar, FogDistanceNear, FogHeight, FogVisibility,
+		FogDistanceFar, FogDistanceNear, FogHeight, FogFactor,
 		{OutScatterFactor.x, OutScatterFactor.y, OutScatterFactor.z}, 0.0f,
 		{InScatterFactor.x, InScatterFactor.y, InScatterFactor.z}, 0.0f,
 
@@ -270,7 +259,7 @@ void ZED3D9FogProcessor::Process()
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&VertexShaderParameters, sizeof(VertexShaderParameters) / 16);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PixelShaderParameters, sizeof(PixelShaderParameters) / 16);
 	
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(ZEFOGScreenAlignedQuad));
 
 	zeProfilerEnd();
 }
@@ -308,6 +297,14 @@ void ZED3D9FogProcessor::Deinitialize()
 
 }
 
+ZEFOGScreenAlignedQuad ZED3D9FogProcessor::Vertices[] =
+{
+	{-1.0f,  1.0f, 0.0f},
+	{ 1.0f,  1.0f, 0.0f},
+	{-1.0f, -1.0f, 0.0f},
+	{ 1.0f, -1.0f, 0.0f}
+};
+
 ZED3D9FogProcessor::ZED3D9FogProcessor()
 {
 	Renderer				= NULL;
@@ -320,17 +317,15 @@ ZED3D9FogProcessor::ZED3D9FogProcessor()
 	PixelShaderExpSquareFog	= NULL;
 
 	FogHeight				= 15.0f;
-	FogDistanceFar			= 400.0f;
-	FogDistanceNear			= 20.0f;
-	FogVisibility			= 0.1f;
+	FogDistanceFar			= 1000.0f;
+	FogDistanceNear			= 1.0f;
+	FogFactor				= 0.5f;
 
 	FogModel				= ZE_D3D9_FM_LINEAR;
 
 	OutScatterFactor		= ZEVector3(0.003f, 0.003f, 0.003f);
 	InScatterFactor			= ZEVector3(0.003f, 0.003f, 0.003f);
 	FogColor				= ZEVector3(0.590f, 0.580f, 0.600f);
-
-
 }
 
 ZED3D9FogProcessor::~ZED3D9FogProcessor()

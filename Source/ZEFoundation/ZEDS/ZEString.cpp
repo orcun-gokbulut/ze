@@ -982,7 +982,7 @@ ZESize ZEString::GetLength() const
 		ZESize StringLength = 0;
 		const char* TempBuffer = Buffer;
 
-		while (*TempBuffer != NULL)
+		while (*TempBuffer != '\0')
 		{
 			CharacterSize = GetByteLength(TempBuffer);
 			TempBuffer = TempBuffer + CharacterSize;

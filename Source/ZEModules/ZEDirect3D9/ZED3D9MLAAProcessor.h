@@ -37,6 +37,7 @@
 #ifndef __ZE_D3D9_MLAA_PROCESSOR_H__
 #define __ZE_D3D9_MLAA_PROCESSOR_H__
 
+#include "ZEMeta/ZEObject.h"
 #include "ZED3D9ComponentBase.h"
 
 class ZETexture2D;
@@ -48,9 +49,23 @@ class ZED3D9VertexShader;
 class ZED3D9FrameRenderer;
 class ZETexture2DResource;
 
-class ZED3D9MLAAProcessor : public ZED3D9ComponentBase
+struct ZEMLAAScreenAlignedQuad
 {
+	float Position[3];
+};
+
+ZE_META_OBJECT_DESCRIPTION(ZED3D9MLAAProcessor);
+
+class ZED3D9MLAAProcessor : public ZED3D9ComponentBase, public ZEObject
+{
+	ZE_META_OBJECT(ZED3D9MLAAProcessor)
+
 	private:
+		bool							VisualizeEdges;
+		bool							VisualizeWeights;
+
+		static ZEMLAAScreenAlignedQuad	Vertices[4];
+
 		float							Treshold;
 		float							SearchStep;
 
@@ -61,6 +76,7 @@ class ZED3D9MLAAProcessor : public ZED3D9ComponentBase
 		ZED3D9FrameRenderer*			Renderer;
 
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+
 		ZED3D9VertexShader*				VertexShaderCommon;
 		ZED3D9PixelShader*				PixelShaderEdgeDetection;
 		ZED3D9PixelShader*				PixelShaderWeightBlending;
@@ -75,12 +91,22 @@ class ZED3D9MLAAProcessor : public ZED3D9ComponentBase
 		void							CreateRenderTargets();
 		void							DestroyRenderTargets();
 
+		void							EdgeDetectionPass(ZED3D9Texture2D* Depth, ZED3D9Texture2D* Normal, ZED3D9Texture2D* Output);
+		void							WeightBlendingPass(ZED3D9Texture2D* Endges, ZED3D9Texture2D* AreaTexture, ZED3D9Texture2D* Output);
+		void							ColorBlendingPass(ZED3D9Texture2D* Color, ZED3D9Texture2D* Weights, ZED3D9ViewPort* Output);
+
 	public:
+		void							SetVisualizeEdges(bool Enabled);
+		bool							GetVisualizeEdges() const;
+
+		void							SetVisualizeWeights(bool Enabled);
+		bool							GetVisualizeWeights() const;
+
 		void							SetTreshold(float Value);
-		float							GetTreshold();
+		float							GetTreshold() const;
 		
 		void							SetSearchStep(float Value);
-		float							GetSearchStep();
+		float							GetSearchStep() const;
 
 		void							SetRenderer(ZEFrameRenderer* Renderer);
 		ZEFrameRenderer*				GetRenderer();
@@ -110,5 +136,24 @@ class ZED3D9MLAAProcessor : public ZED3D9ComponentBase
 
 }; // class ZED3D9MLAAProcessor
 
+/*
+ZE_POST_PROCESSOR_START(Meta)
+	<zinek>
+		<meta> 
+			<class name="ZED3D9MLAAProcessor">
+				<noinstance>true</noinstance>
+				<description>ZED3D9MLAAProcessor</description>
+				
+				<property name="VisualizeEdges" type="boolean" autogetset="yes" description="..."/>
+				<property name="VisualizeWeights" type="boolean" autogetset="yes" description="..."/>
+				
+				<property name="Treshold" type="float" autogetset="yes" description="..."/>
+				<property name="SearchStep" type="float" autogetset="yes" description="..."/>
+				
+			</class>
+		</meta>
+	</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 
 #endif // __ZE_D3D9_MLAA_PROCESSOR_H__

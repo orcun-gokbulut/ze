@@ -56,9 +56,16 @@ ZESea::ZESea()
 {
 	Material = ZESeaMaterial::CreateInstance();
 	SetScale(ZEVector3::One * 200);
+	
+	ZETextureOptions Options;
+	Options.CompressionType = ZE_TCT_NONE;
+	Options.CompressionQuality = ZE_TCQ_HIGH;
+	Options.DownSample = ZE_TDS_NONE;
+	Options.FileCaching = ZE_TFC_ENABLED;
+	Options.MipMapping = ZE_TMM_ENABLED;
 
-	SetDiffuseTexture(ZETexture2DResource::LoadSharedResource("ZEEngine\\Sea\\SeaDiffuse.jpg")->GetTexture());
-	SetNormalTexture(ZETexture2DResource::LoadSharedResource("ZEEngine\\Sea\\SeaNormal.jpg")->GetTexture());
+	SetDiffuseTexture(ZETexture2DResource::LoadSharedResource("ZEEngine\\Sea\\SeaDiffuse.jpg", &Options)->GetTexture());
+	SetNormalTexture(ZETexture2DResource::LoadSharedResource("ZEEngine\\Sea\\SeaNormal.jpg", &Options)->GetTexture());
 
 	DiffuseVelocity = ZEVector2::One;
 	NormalVelocity	= -ZEVector2::One;
@@ -66,8 +73,8 @@ ZESea::ZESea()
 	DiffuseOffset = ZEVector2::Zero;
 	NormalOffset = ZEVector2::Zero;
 
-	DiffuseTextureTile = ZEVector2::One;
-	NormalTextureTile = ZEVector2::One;
+	DiffuseTextureTile = ZEVector2::One / 10.0f;
+	NormalTextureTile = ZEVector2::One / 10.0f;
 
 	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
 
