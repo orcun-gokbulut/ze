@@ -103,6 +103,8 @@ ze_add_source(ZEVertexTypes.cpp 					Sources)
 ze_add_source(ZEVertexTypes.h 						Sources Headers)
 ze_add_source(ZEViewPort.cpp 						Sources)
 ze_add_source(ZEViewPort.h 							Sources Headers)
+ze_add_source(ZESeaMaterial.cpp 					Sources)
+ze_add_source(ZESeaMaterial.h 						Sources Headers)
 
 
 ze_add_library(ZEGraphics 
