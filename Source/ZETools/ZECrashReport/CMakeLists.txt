@@ -33,15 +33,29 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-ze_set_project_folder("ZETools")
+ze_add_source(ZECrashReport.cpp										Sources)
+ze_add_source(ZECrashReport.h										Sources)
+ze_add_source(ZECrashReportProvider.cpp								Sources)
+ze_add_source(ZECrashReportProvider.h								Sources)
+ze_add_source(ZECrashReportPackager.cpp								Sources)
+ze_add_source(ZECrashReportPackager.h								Sources)
+ze_add_source(ZECrashReportSender.cpp								Sources)
+ze_add_source(ZECrashReportSender.h								Sources)
+ze_add_source(ZECrashReportMain.cpp									Sources)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
+#ze_add_source(ZECrashReportApplicationInformationProvider.cpp		Sources)
+#ze_add_source(ZECrashReportApplicationInformationProvider.h			Sources)
+#ze_add_source(ZECrashReportSystemInformationProvider.cpp			Sources)
+#ze_add_source(ZECrashReportSystemInformationProvider.h				Sources)
+ze_add_source(ZECrashReportFileProvider.cpp							Sources)
+ze_add_source(ZECrashReportFileProvider.h							Sources)
+ze_add_source(ZECrashReportUserCommentProvider.cpp					Sources)
+ze_add_source(ZECrashReportUserCommentProvider.h					Sources)
 
-ze_add_module(ZE3dsMax)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZEToolComponents)
-ze_add_module(ZECrashReport)
-ze_add_cmake_project(ZETools)
+
+ze_add_executable(ZECrashReport
+	CONSOLE
+	SOURCES ${Sources}
+	LIBS ZEFoundation libCurl Ws2_32)

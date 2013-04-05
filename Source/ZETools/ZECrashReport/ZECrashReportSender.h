@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECrashReportSender.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,18 +30,35 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZEDS/ZEString.h"
+#include "ZETypes.h"
 
-ze_set_project_folder("ZETools")
+class ZECrashReportSender
+{
+	private:
+		ZEString		FileName;
+		ZEString		UploadURL;
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
+		void*			File;
+		void*			Curl;
 
-ze_add_module(ZE3dsMax)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZEToolComponents)
-ze_add_module(ZECrashReport)
-ze_add_cmake_project(ZETools)
+		ZESize			FileSize;
+		ZESize			TransferedDataSize;
+	
+	public:
+		void			SetFileName(const char* FileName);
+		const char*		GetFileName();
+
+		void			SetUploadURL(const char* ServerAddress);
+		const char*		GetUploadURL();
+
+		ZESize			GetFileSize();
+		ZESize			GetTransferedDataSize();
+
+		bool			OpenConnection();
+		bool			TransferChunk();
+		void			CloseConnection();
+};

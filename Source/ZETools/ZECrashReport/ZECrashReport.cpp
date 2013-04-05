@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECrashReport.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,18 +30,44 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZECrashReport.h"
+#include "ZECrashReportProvider.h"
 
-ze_set_project_folder("ZETools")
+const ZEArray<ZECrashReportProvider*>& ZECrashReport::GetProviders()
+{
+	return Providers;
+}
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
+bool ZECrashReport::RegisterProvider(ZECrashReportProvider* Provider)
+{
+	if (Providers.Exists(Provider))
+		return false;
 
-ze_add_module(ZE3dsMax)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZEToolComponents)
-ze_add_module(ZECrashReport)
-ze_add_cmake_project(ZETools)
+	Providers.Add(Provider);
+}
+
+void ZECrashReport::UnregisterProvider(ZECrashReportProvider* Provider)
+{
+	Providers.DeleteValue(Provider);
+	delete Provider;
+}
+
+void ZECrashReport::Generate()
+{
+	for (ZESize I = 0; I < Providers.GetCount(); I++)
+		Providers[I]->Generate();
+}
+
+void ZECrashReport::CleanUp()
+{
+	for (ZESize I = 0; I < Providers.GetCount(); I++)
+		Providers[I]->CleanUp();
+}
+
+ZECrashReport::~ZECrashReport()
+{
+	CleanUp();
+}

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZETerrainExporterMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,18 +30,48 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZEDS/ZEArray.h"
+#include "ZETerrainDatabase.h"
+#include "ZETerrainPatch.h"
+#include "FreeImage.h"
 
-ze_set_project_folder("ZETools")
+void main()
+{
+	FreeImage_Initialise();
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
+	ZETerrainPatchDatabase Database;
+	
+	ZETerrainPatch* Patch = new ZETerrainPatch();
+	Patch->Load("e:\\Test\\0x0.tif", ZE_TPT_COLOR);
+	Patch->SetPriority(0);
+	Patch->SetStartX(0);
+	Patch->SetStartY(0);
+	Patch->SetEndX(Patch->GetStartX() + Patch->GetWidth());
+	Patch->SetEndY(Patch->GetStartY() + Patch->GetHeight());
+	Database.AddPatch(Patch);
 
-ze_add_module(ZE3dsMax)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZEToolComponents)
-ze_add_module(ZECrashReport)
-ze_add_cmake_project(ZETools)
+	Patch = new ZETerrainPatch();
+	Patch->Load("e:\\Test\\5000x0.tif", ZE_TPT_COLOR);
+	Patch->SetPriority(0);
+	Patch->SetStartX(5000);
+	Patch->SetStartY(0);
+	Patch->SetEndX(Patch->GetStartX() + Patch->GetWidth());
+	Patch->SetEndY(Patch->GetStartY() + Patch->GetHeight());
+	Database.AddPatch(Patch);
+
+	Patch = new ZETerrainPatch();
+	Patch->Load("e:\\Test\\5000x5000.tif", ZE_TPT_COLOR);
+	Patch->SetPriority(0);
+	Patch->SetStartX(5000);
+	Patch->SetStartY(5000);
+	Patch->SetEndX(Patch->GetStartX() + Patch->GetWidth());
+	Patch->SetEndY(Patch->GetStartY() + Patch->GetHeight());
+	Database.AddPatch(Patch);
+
+	Database.Save("e:\\Test\\Output");
+
+	FreeImage_DeInitialise();
+}
