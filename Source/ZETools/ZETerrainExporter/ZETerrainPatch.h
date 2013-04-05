@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZETerrainPatch.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,18 +30,73 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
 
-ze_set_project_folder("ZETools")
+#include "ZETypes.h"
+#include "ZETerrainBlock.h"
+#include "ZEMath\ZEVector.h"
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
+class ZETerrainPatch
+{
+	private:
+		ZEUInt					Priority;
+		ZEUInt					Level;
+		double					StartX, StartY;
+		double					EndX, EndY;
+		double					ScaleX, ScaleY;
 
-ze_add_module(ZE3dsMax)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZEToolComponents)
-ze_add_module(ZECrashReport)
-ze_add_cmake_project(ZETools)
+		void*					Data;
+		ZESize					Width, Height;
+		ZESize					Pitch;
+		ZESize					PixelSize;
+		ZETerrainPixelType		PixelType;
+
+		void					UpdateScale();
+
+	public:
+		void					SetStartX(double x);
+		double					GetStartX();
+
+		void					SetStartY(double y);
+		double					GetStartY();
+
+		void					SetEndX(double EndX);
+		double					GetEndX();
+
+		void					SetEndY(double EndY);
+		double					GetEndY();
+
+		double					GetScaleX();
+		double					GetScaleY();
+
+		ZESize					GetWidth();
+		ZESize					GetHeight();
+
+		void*					GetData();
+		ZESize					GetPitch();
+
+		ZETerrainPixelType		GetPixelType();
+		ZESize					GetPixelSize();
+
+		ZEUInt					GetLevel();
+
+		void					SetPriority(ZEUInt Priority);
+		ZEUInt					GetPriority();
+		
+		bool					BoundaryCheck(double x, double y);
+
+		void*					SampleLocalRaw(ZESSize x, ZESSize y);
+		void					SampleLocal(void* Output, double x, double y);
+		void					Sample(void* Output, double x, double y);
+
+		bool					Create(ZESize Width, ZESize Height, ZETerrainPixelType PixelType);
+		void					Clean();
+
+		bool					Load(const char* FileName, ZETerrainPixelType PixelType);
+
+								ZETerrainPatch();
+								~ZETerrainPatch();
+};

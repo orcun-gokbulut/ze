@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECrashReportPackager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,18 +30,79 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZECrashReportPackager.h"
+#include "ZECrashReportProvider.h"
 
-ze_set_project_folder("ZETools")
+void ZECrashReportPackager::SetOutputFileName(const char* FileName)
+{
+	OutputFileName = FileName;
+}
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
+const char* ZECrashReportPackager::GetOutputFileName()
+{
+	return OutputFileName;
+}
 
-ze_add_module(ZE3dsMax)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZEToolComponents)
-ze_add_module(ZECrashReport)
-ze_add_cmake_project(ZETools)
+void ZECrashReportPackager::SetCrashReport(ZECrashReport* CrashReport)
+{
+	this->CrashReport = CrashReport;
+}
+
+ZECrashReport* ZECrashReportPackager::GetCrashReport()
+{
+	return CrashReport;
+}
+
+bool ZECrashReportPackager::Pack()
+{
+	FILE* File = fopen(OutputFileName, "wb");
+	if (File == NULL)
+		return false;
+
+	ZESize ProviderCount = CrashReport->GetProviders().GetCount();
+	if (fwrite(&ProviderCount, sizeof(ZESize), 1, File) != 1)
+	{
+		fclose(File);
+		return false;
+	}
+
+	for (ZESize I = 0; I < ProviderCount; I++)
+	{
+		ZECrashReportProvider* CurrentProvider = CrashReport->GetProviders()[I];
+
+		char Name[256];
+		strcpy(Name, CurrentProvider->GetName());
+		if (fwrite(Name, 256, 1, File) != 1)
+		{
+			fclose(File);
+			return false;
+		}	
+
+		ZESize DataSize = CurrentProvider->GetSize();
+		if (fwrite(&DataSize, sizeof(ZESize), 1, File) != 1)
+		{
+			fclose(File);
+			return false;
+		}
+
+		for (ZESize I = 0; I < DataSize; I += 4096)
+		{
+			ZEUInt8 Buffer[4096];
+			ZESize BlockSize = DataSize - I > 4096 ? 4096 : DataSize - I;
+			CurrentProvider->GetData(Buffer, I,  BlockSize);
+
+			if (fwrite(Buffer, BlockSize, 1, File) != 1)
+			{
+				fclose(File);
+				return false;
+			}
+		}
+	}
+
+	fclose(File);
+
+	return true;
+}

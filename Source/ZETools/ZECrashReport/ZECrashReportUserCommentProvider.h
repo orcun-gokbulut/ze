@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECrashReportUserCommentProvider.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,18 +30,41 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZECrashReportProvider.h"
+#include "ZEDS/ZEString.h"
+#include "ZETypes.h"
 
-ze_set_project_folder("ZETools")
+class ZECrashReportUserCommentProvider : public ZECrashReportProvider
+{
+	private:
+		ZEString							NameSurname;
+		ZEString							EMail;
+		ZEString							Comments;
+		bool								ContactBack;
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
+		ZEString							Data;
+		ZESize								Size;
 
-ze_add_module(ZE3dsMax)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZEToolComponents)
-ze_add_module(ZECrashReport)
-ze_add_cmake_project(ZETools)
+	public:
+		virtual const char*					GetName();
+
+		virtual const char*					GetNameSurname();
+		void								SetNameSurname(const char* Name);
+		
+		virtual const char*					GetEMail();
+		void								SetEMail(const char* EMail);
+
+		virtual const char*					GetComment();
+		void								SetComment(const char* Comment);
+
+		void								SetContactBack(bool Yes);
+		bool								GetContactBack();
+
+		virtual ZESize						GetSize();
+		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size);
+		
+		virtual bool						Generate();
+};
