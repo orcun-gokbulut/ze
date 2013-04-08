@@ -69,7 +69,8 @@ bool ZEXSensInputModule::InitializeSelf()
 bool ZEXSensInputModule::DeinitializeSelf()
 {
 	DestroyDevices();
-	return ZEXSensInputModule::DeinitializeSelf();
+
+	return ZEInputDeviceModule::DeinitializeSelf();
 }
 
 

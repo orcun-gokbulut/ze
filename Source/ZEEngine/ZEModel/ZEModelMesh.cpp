@@ -97,33 +97,33 @@ ZEPhysicalCloth* ZEModelMesh::GetPhysicalCloth()
 	return PhysicalCloth;
 }
 
-const ZEAABBox& ZEModelMesh::GetLocalBoundingBox()
+const ZEAABBox& ZEModelMesh::GetLocalBoundingBox() const
 {
 	return LocalBoundingBox;
 }
 
-const ZEAABBox& ZEModelMesh::GetModelBoundingBox()
+const ZEAABBox& ZEModelMesh::GetModelBoundingBox() const
 {
 	ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
 
 	return ModelBoundingBox;
 }
 
-const ZEAABBox& ZEModelMesh::GetWorldBoundingBox()
+const ZEAABBox& ZEModelMesh::GetWorldBoundingBox() const
 {
 	ZEAABBox::Transform(WorldBoundingBox, LocalBoundingBox, GetWorldTransform());
 
 	return WorldBoundingBox;
 }
 
-const ZEMatrix4x4& ZEModelMesh::GetLocalTransform()
+const ZEMatrix4x4& ZEModelMesh::GetLocalTransform() const
 {
 	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
 
 	return LocalTransform;
 }
 
-const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
+const ZEMatrix4x4& ZEModelMesh::GetModelTransform() const
 {
 	if (ParentMesh == NULL)
 		return GetLocalTransform();
@@ -134,7 +134,7 @@ const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
 	}
 }
 
-const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
+const ZEMatrix4x4& ZEModelMesh::GetWorldTransform() const
 {
 	if (ParentMesh == NULL)
 	{
@@ -153,7 +153,7 @@ void ZEModelMesh::SetLocalPosition(const ZEVector3& LocalPosition)
 	Position = LocalPosition;
 }
 
-const ZEVector3& ZEModelMesh::GetLocalPosition()
+const ZEVector3& ZEModelMesh::GetLocalPosition() const
 {
 	return Position;
 }
@@ -163,7 +163,7 @@ void ZEModelMesh::SetLocalRotation(const ZEQuaternion& LocalRotation)
 	Rotation = LocalRotation;
 }
 
-const ZEQuaternion& ZEModelMesh::GetLocalRotation()
+const ZEQuaternion& ZEModelMesh::GetLocalRotation() const
 {
 	return Rotation;
 }
@@ -173,7 +173,7 @@ void ZEModelMesh::SetLocalScale(const ZEVector3& LocalScale)
 	Scale = LocalScale;
 }
 
-const ZEVector3& ZEModelMesh::GetLocalScale()
+const ZEVector3& ZEModelMesh::GetLocalScale() const
 {
 	return Scale;
 }
@@ -183,10 +183,14 @@ void ZEModelMesh::SetModelPosition(const ZEVector3& ModelPosition)
 	if (ParentMesh == NULL)
 		SetLocalPosition(ModelPosition);
 	else
-		SetLocalPosition(ModelPosition - ParentMesh->GetModelPosition());
+	{
+		ZEVector3 Result;
+		ZEMatrix4x4::Transform(Result, ParentMesh->GetModelTransform().Inverse(), ModelPosition);
+		SetLocalPosition(Result);
+	}
 }
 
-const ZEVector3 ZEModelMesh::GetModelPosition()
+const ZEVector3 ZEModelMesh::GetModelPosition() const
 {
 	if (ParentMesh == NULL)
 		return Position;
@@ -206,19 +210,19 @@ void ZEModelMesh::SetModelRotation(const ZEQuaternion& ModelRotation)
 	{
 		ZEQuaternion Temp, Result;
 		ZEQuaternion::Conjugate(Temp, ParentMesh->GetModelRotation());
-		ZEQuaternion::Product(Result, ModelRotation, Temp);
+		ZEQuaternion::Product(Result, Temp, ModelRotation);
 		SetLocalRotation(Result);
 	}
 }
 
-const ZEQuaternion ZEModelMesh::GetModelRotation()
+const ZEQuaternion ZEModelMesh::GetModelRotation() const
 {
 	if (ParentMesh == NULL)
 		return Rotation;
 	else
 	{
 		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, Rotation, ParentMesh->GetModelRotation());
+		ZEQuaternion::Product(Temp, ParentMesh->GetModelRotation(), Rotation);
 		ZEQuaternion::Normalize(Temp, Temp);
 		return Temp;
 	}
@@ -236,7 +240,7 @@ void ZEModelMesh::SetModelScale(const ZEVector3& ModelScale)
 	}		
 }
 
-const ZEVector3 ZEModelMesh::GetModelScale()
+const ZEVector3 ZEModelMesh::GetModelScale() const
 {
 	if (ParentMesh == NULL)
 		return Scale;
@@ -251,12 +255,20 @@ const ZEVector3 ZEModelMesh::GetModelScale()
 void ZEModelMesh::SetWorldPosition(const ZEVector3& WorldPosition)
 {
 	if (ParentMesh == NULL)
-		SetLocalPosition(WorldPosition - Owner->GetWorldPosition());
+	{
+		ZEVector3 Result;
+		ZEMatrix4x4::Transform(Result, Owner->GetWorldTransform().Inverse(), WorldPosition);
+		SetLocalPosition(Result);
+	}
 	else
-		SetLocalPosition(WorldPosition - ParentMesh->GetWorldPosition());
+	{
+		ZEVector3 Result;
+		ZEMatrix4x4::Transform(Result, ParentMesh->GetWorldTransform().Inverse(), WorldPosition);
+		SetLocalPosition(Result);
+	}
 }
 
-const ZEVector3 ZEModelMesh::GetWorldPosition()
+const ZEVector3 ZEModelMesh::GetWorldPosition() const
 {
 	if (ParentMesh == NULL)
 	{
@@ -278,19 +290,19 @@ void ZEModelMesh::SetWorldRotation(const ZEQuaternion& WorldRotation)
 	{	
 		ZEQuaternion Temp, Result;
 		ZEQuaternion::Conjugate(Temp, Owner->GetWorldRotation());
-		ZEQuaternion::Product(Result, WorldRotation, Temp);
+		ZEQuaternion::Product(Result, Temp, WorldRotation);
 		SetLocalRotation(Result);
 	}
 	else
 	{
 		ZEQuaternion Temp, Result;
 		ZEQuaternion::Conjugate(Temp, ParentMesh->GetWorldRotation());
-		ZEQuaternion::Product(Result, WorldRotation, Temp);
+		ZEQuaternion::Product(Result, Temp, WorldRotation);
 		SetLocalRotation(Result);
 	}
 }
 
-const ZEQuaternion ZEModelMesh::GetWorldRotation()
+const ZEQuaternion ZEModelMesh::GetWorldRotation() const
 {
 	if (ParentMesh == NULL)
 	{
@@ -324,7 +336,7 @@ void ZEModelMesh::SetWorldScale(const ZEVector3& WorldScale)
 	}
 }
 
-const ZEVector3 ZEModelMesh::GetWorldScale()
+const ZEVector3 ZEModelMesh::GetWorldScale() const
 {
 	if (ParentMesh == NULL)
 	{
@@ -367,7 +379,7 @@ void ZEModelMesh::SetPhysicsEnabled(bool Enabled)
 	PhysicsEnabled = Enabled;
 }
 
-bool ZEModelMesh::GetPhysicsEnabled()
+bool ZEModelMesh::GetPhysicsEnabled() const
 {
 	return PhysicsEnabled;
 }

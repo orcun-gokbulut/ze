@@ -337,7 +337,11 @@ const ZEVector3& ZEEntity::GetPosition() const
 void ZEEntity::SetWorldPosition(const ZEVector3& NewPosition)
 {
 	if (Owner != NULL)
-		SetPosition(NewPosition - Owner->GetWorldPosition());
+	{
+		ZEVector3 Result;
+		ZEMatrix4x4::Transform(Result, Owner->GetWorldTransform().Inverse(), NewPosition);
+		SetPosition(Result);
+	}
 	else
 		SetPosition(NewPosition);
 }
@@ -371,7 +375,7 @@ void ZEEntity::SetWorldRotation(const ZEQuaternion& NewRotation)
 	{
 		ZEQuaternion Temp, Result;
 		ZEQuaternion::Conjugate(Temp, Owner->GetWorldRotation());
-		ZEQuaternion::Product(Result, NewRotation, Temp);
+		ZEQuaternion::Product(Result, Temp, NewRotation);
 		SetRotation(Result);
 	}
 	else
