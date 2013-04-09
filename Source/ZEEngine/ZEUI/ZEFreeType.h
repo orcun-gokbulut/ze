@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFontResourceDynamic.h
+ Zinek Engine - ZEFreeType.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,64 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_FONT_RESOURCE_DYNAMIC_H__
-#define __ZE_FONT_RESOURCE_DYNAMIC_H__
+#include "ft2build.h"
+#include "freetype\freetype.h"
+#include "freetype\ftglyph.h"
 
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEVector.h"
-
-#include "ZEGraphics\ZETexture2D.h"
-#include "ZEGraphics\ZEUIMaterial.h"
-#include "ZEUI\ZEFontResource.h"
-#include "ZEUI\ZEUIRectangle.h"
-
-struct ZEFreeType;
-
-
-class ZEFontResourceDynamic : public ZEFontResource
+struct ZEFreeType
 {
-	private:
-		ZEFreeType*							FreeType;
-
-		ZEUInt32							HorizontalOutputDPI;
-		ZEUInt32							VerticalOutputDPI;
-		ZEInt32								PointFactor;
-
-		ZEString							FontFile;
-		ZEUInt32							FontSize;
-		bool								FontSupportsKerning;
-
-		ZEArray<ZEFontCharacter>			FontCharacters;
-		ZEVector2							LastCharacterPosition;
-
-		ZEUInt32							LastTextureId;
-		ZEUInt32							LastTextureLine;
-
-		ZEArray<ZETexture2D*>				Textures;
-
-		void								SetFontFile(ZEString FontFilePath);
-		void								SetFontSize(ZEUInt32 FontSize);
-		void								CreateNewTexture(ZEUInt32 Width, ZEUInt32 Height);
-
-											ZEFontResourceDynamic();
-											~ZEFontResourceDynamic();
-
-	public:
-		virtual const char*					GetResourceType() const;
-		virtual ZEFontResourceType			GetFontResourceType() const;
-
-		ZEUInt32							GetFontSize() const;
-
-		virtual const ZEFontCharacter&		GetCharacter(char Character);
-		virtual const ZEFontCharacter&		GetCharacter(char CurrentChar, char NextChar, ZEInt64& KerningDistance);
-
-		ZETexture2D*						GetTexture(ZEUInt32 TextureId);
-
-		static ZEFontResourceDynamic*		LoadSharedResource(const ZEString& FileName, ZEUInt32 FontSize);
-		static void							CacheResource(const ZEString& FileName, ZEUInt32 FontSize);
-
-		static ZEFontResourceDynamic*		LoadResource(const ZEString& FileName, ZEUInt32 FontSize);
-		static ZEFontResourceDynamic*		LoadResource(ZEFile* ResourceFile, ZEUInt32 FontSize);
-
+	FT_Library	Library;
+	FT_Face		Face;
 };
-#endif
