@@ -160,8 +160,10 @@ void ZEUILabel::Draw(ZEUIRenderer* Renderer)
 		TempCharacter.Positions.RightDown += CharacterPosIncrement;
 		TempCharacter.ZOrder = TempTextZOrder;
 
-		if(!ZEUIRectangle::Clip(OutputCharacter, TempCharacter, TempRenderRect))
-			Renderer->AddRectangle(OutputCharacter);
+		ZERectangle Intersection;
+		if(ZERectangle::IntersectionTest(TempRenderRect, GetVisibleRectangle(), Intersection))
+			if(!ZEUIRectangle::Clip(OutputCharacter, TempCharacter, Intersection))
+				Renderer->AddRectangle(OutputCharacter);
 	}
 }
 

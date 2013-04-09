@@ -150,6 +150,8 @@ bool ZERectangle::IntersectionTest(const ZERectangle& RectangleA, const ZERectan
 
 ZERectangle::ZERectangle()
 {
+	LeftUp = ZEVector2::Zero;
+	RightDown = ZEVector2::Zero;
 }
 
 ZERectangle::ZERectangle(const ZEVector2& UpLeft, const ZEVector2& DownRight)

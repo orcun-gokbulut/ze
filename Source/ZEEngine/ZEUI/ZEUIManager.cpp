@@ -51,14 +51,14 @@ const ZEVector4& ZEUIManager::GetDefaultBackgroundColor()
 	return DefaultBackgroundColor;
 }
 
-const ZEVector4&	ZEUIManager::GetDefaultForegroundColor()
+const ZEVector4& ZEUIManager::GetDefaultForegroundColor()
 {
 	return DefaultForegroundColor;
 }
 
 ZEFontResource* ZEUIManager::GetDefaultFontResource()
 {
-	return ZEFontResourceDynamic::LoadSharedResource("ZEEngine/ZEGUI/Fonts/arialbd.ttf", 12);
+	return ZEFontResourceDynamic::LoadSharedResource("ZEEngine\\ZEGUI\\Fonts\\arialbd.ttf", 12);
 }
 
 ZEUIManager::ZEUIManager() 
