@@ -42,8 +42,8 @@
 #include "ZEMoon.h"
 #include "ZESkyDome.h"
 #include "ZECloud.h"
-#include "ZEModules\ZEDirect3D9\ZED3D9FrameRenderer.h"
-#include "ZEGraphics\ZECamera.h"
+#include "ZEModules/ZEDirect3D9/ZED3D9FrameRenderer.h"
+#include "ZEGraphics/ZECamera.h"
 #include "ZEGame/ZEEntityProvider.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEWeather);
@@ -322,9 +322,9 @@ ZEWeather::ZEWeather()
 
 	FogFactor			= 0.1f;
 	MoonPhase			= 0.3f;
-	CloudCover			= 0.3f;
+	CloudCover			= 0.2f;
 	MoonLightIntensity	= 0.2f;
-	SunLightIntensity	= 1.2f;
+	SunLightIntensity	= 1.0f;
 
 	SunDirection		= ZEVector3(0.0001f, -1.0f, 0.0001f);
 	SunMoonRotation		= ZEVector3(ZE_PI_2, 0.0f, 0.0f);
@@ -385,8 +385,8 @@ ZEWeather::ZEWeather()
 	Moon->SetAmbientColor(ZEVector3(1.0f, 0.99f, 0.92f));
 	Moon->SetDirection(MoonDirection);
 	Moon->SetPhase(MoonPhase);
-	Moon->SetAmbientFactor(2.7f);
-	Moon->SetScale(0.07f);
+	Moon->SetAmbientFactor(0.9f);
+	Moon->SetScale(0.1f);
 	this->AddComponent(Moon);
 
 	// Sky Dome
@@ -394,12 +394,12 @@ ZEWeather::ZEWeather()
 	SkyDome->SetName("SkyDome");
 	SkyDome->SetEnabled(true);
 	SkyDome->SetVisible(true);
-	SkyDome->SetSunIntensity(15.0f);
+	SkyDome->SetSunIntensity(22.0f);
 	SkyDome->SetOuterRadius(61500.0f);
 	SkyDome->SetInnerRadius(60000.0f);
 	SkyDome->SetCameraPositionOffset(ZEVector3(0.0f, 60000.0f, 0.0f));
 	SkyDome->SetSunLightDirection(SunDirection);
-	SkyDome->SetAmbientFactor(0.5f);
+	SkyDome->SetAmbientFactor(0.7f);
 	SkyDome->SetMiddayAmbientColor(ZEVector3(0.04f, 0.04f, 0.055f));
 	SkyDome->SetSunsetAmbientColor(ZEVector3(0.89020f, 0.60392f, 0.21177f));
 	this->AddComponent(SkyDome);

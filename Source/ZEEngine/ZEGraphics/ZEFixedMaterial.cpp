@@ -406,7 +406,7 @@ void ZEFixedMaterial::SetSpecularMap(const ZETexture2D* Texture)
 	}
 
 	SpecularMap = Texture;
-
+	MaterialComponents |= ZE_SHADER_SPECULAR_MAP;
 }
 
 const ZETexture2D* ZEFixedMaterial::GetSpecularMap() const

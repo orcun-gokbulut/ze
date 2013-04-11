@@ -54,7 +54,7 @@
 float4x4	WorldViewProjMatrix		: register(vs, c0);		// Projections matrix.
 float4x4	ScaleMatrix				: register(vs, c4);		// Scaling matrix
 float3		InvWaveLenghtPow4		: register(vs, c8);		// 1 / pow(WaveLenght, 4).
-float3		SunDirection				: register(vs, c9)		// Sun position.
+float3		SunDirection			: register(vs, c9)		// Sun position.
 									: register(ps, c3);
 float4		Parameters3				: register(vs, c10);	// xyz: CameraPositionOffset, w: ScaleOverScaleDepth
 float4		Parameters4				: register(vs, c11);	// xyz: Camera position. w: CameraHeight
@@ -173,10 +173,18 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	{
 		float SamplePointHeight = length(SamplePoint);
 		float SamplePointDepth = exp(ScaleOverScaleDepth * (InnerRadius - SamplePointHeight));
+		
+		// Limit Smaple point Depth not to get extreme color values where SamplePointDepth < 0!!
+		SamplePointDepth = saturate(SamplePointDepth);
+		
 		float SamplePointLightAngle = dot(-SunDirection, SamplePoint) / SamplePointHeight;
 		float SamplePointCameraAngle = dot(Ray, SamplePoint) / SamplePointHeight;
-		float Scatter = (StartOffset + SamplePointDepth * (ScaleAngle(SamplePointLightAngle) - ScaleAngle(SamplePointCameraAngle)));
-		float3 Attenuate = exp(-Scatter * Constant);
+	
+		float ScaledLightAngle = ScaleAngle(SamplePointLightAngle);
+		float ScaledCameraAngle = ScaleAngle(SamplePointCameraAngle);
+
+		float Scatter = (StartOffset + SamplePointDepth * (ScaledLightAngle- ScaledCameraAngle));
+		float3 Attenuate = exp(-Scatter.xxxx * Constant);
 		FrontColor += Attenuate * (SamplePointDepth * ScaledLength);
 		SamplePoint += SampleRay;
 		I++;
@@ -206,23 +214,22 @@ float GetRayleighPhase(float CosinePow2)
 
 PS_OUTPUT ps_main(PS_INPUT Input)
 {
-	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
+	PS_OUTPUT Output;
 	
 	float Cosine = dot(-SunDirection, Input.ScatteringDir) / length(Input.ScatteringDir);
-	float CosinePow2 = Cosine * Cosine;  
-	
-	Output.PixelColor.rgb = GetRayleighPhase(CosinePow2) * Input.VertColorRay.rgb + GetMiePhase(Cosine, CosinePow2, G, GPow2) * Input.VertColorMie.rgb;
-	
-	// Calculate dome ambient color and alpha
-	float Luminance = dot(Output.PixelColor.rgb, float3(0.299f, 0.587f, 0.114f));
+	float CosinePow2 = Cosine * Cosine;
+
+	Output.PixelColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	Output.PixelColor.rgb += GetRayleighPhase(CosinePow2) * Input.VertColorRay.rgb;
+	Output.PixelColor.rgb += GetMiePhase(Cosine, CosinePow2, G, GPow2) * Input.VertColorMie.rgb;
 
 	float3 MiddayColor = lerp((float3)0.0f, MiddayAmbientColor, MiddayFactor);
 	float3 SunsetColor = lerp((float3)0.0f, SunsetAmbientColor, SunsetFactor);
 
-	Output.PixelColor.rgb +=  MiddayColor * (1.0f - AmbientFactor * Luminance);
-	Output.PixelColor.rgb +=  SunsetColor * (AmbientFactor * Luminance);
-	
+	Output.PixelColor.rgb +=  MiddayColor * (1.0f - AmbientFactor);
+	Output.PixelColor.rgb +=  SunsetColor * (AmbientFactor);
+
 	Output.PixelColor.a = saturate((log10(Output.PixelColor.b * 2.0f + 0.025f) + 1.6f));
-	
+
 	return Output;
 }
