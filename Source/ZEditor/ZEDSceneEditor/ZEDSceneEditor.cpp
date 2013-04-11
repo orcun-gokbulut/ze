@@ -194,6 +194,10 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->FogProcessor, QString()), QString("FOG"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(4));
 	ui->PropertiesTabWidget->widget(4)->setLayout(TempLayout);
+
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HDRProcessor, QString()), QString("TESTHDR"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(5));
+	ui->PropertiesTabWidget->widget(5)->setLayout(TempLayout);
 }
 
 void MapEditor::MakeConnections()

@@ -46,15 +46,15 @@
 #include "ZED3D9BlurProcessor.h"
 #include "ZED3D9SSAOProcessor.h"
 #include "ZED3D9SSAAProcessor.h"
-#include "ZEGraphics/ZEFrameRenderer.h"
-#include "ZED3D9ColorTransformProcessor.h"
 #include "ZED3D9MLAAProcessor.h"
 #include "ZED3D9GrainProcessor.h"
-#include "ZED3D9ChannelDisorientationProcessor.h"
-#include "ZED3D9TextureMaskProcessor.h"
 #include "ZED3D9BlurMaskProcessor.h"
 #include "ZED3D9ZoomBlurProcessor.h"
+#include "ZED3D9TextureMaskProcessor.h"
+#include "ZEGraphics/ZEFrameRenderer.h"
+#include "ZED3D9ColorTransformProcessor.h"
 #include "ZED3D9UnsharpenFilterProcessor.h"
+#include "ZED3D9ChannelDisorientationProcessor.h"
 
 class ZELight;
 class ZEPointLight;

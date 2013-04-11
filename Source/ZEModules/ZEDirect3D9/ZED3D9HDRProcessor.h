@@ -44,116 +44,178 @@
 #include <d3d9.h>
 
 class ZETexture2D;
+class ZED3D9ViewPort;
 class ZED3D9Texture2D;
 class ZED3D9PixelShader;
 class ZED3D9VertexShader;
-class ZED3D9ViewPort;
+class ZED3D9FrameRenderer;
+
+struct ZEHDRScreenAlignedQuad
+{
+	float	Position[3];
+	float	TexCoord[2];
+};
+
+enum ZEHDRToneMapOperator
+{
+	ZE_HDR_TMO_LOGARITHMIC		= 0,
+	ZE_HDR_TMO_EXPONENTIAL		= 1,
+	ZE_HDR_TMO_REINHARD			= 2,
+	ZE_HDR_TMO_REINHARD_MOD		= 3,
+	ZE_HDR_TMO_FILMIC			= 4
+};
 
 ZE_META_OBJECT_DESCRIPTION(ZED3D9HDRProcessor);
-
 class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 {
 	ZE_META_OBJECT(ZED3D9HDRProcessor);
 
 	private:
-		ZED3D9Texture2D*				Input;
-		ZED3D9ViewPort*					Output;
-		ZESize							ScreenWidth, ScreenHeight;
+		ZED3D9FrameRenderer*			Renderer;
+		ZED3D9Texture2D*				InputBuffer;
+		ZED3D9ViewPort*					OutputBuffer;
+		
+		ZEUInt							OutputWidth;
+		ZEUInt							OutputHeight;
 
+		ZED3D9Texture2D*				Black1x1;
+		ZED3D9Texture2D*				CurrentLuminance;
+		ZED3D9Texture2D*				PreviousLuminance;
+
+		const ZED3D9Texture2D*			TestImage;
+
+		bool							BloomEnabled;
+		float							LargeBloomWeight;
+		float							MediumBloomWeight;
+		float							SmallBloomWeight;
+		ZEArray<ZED3D9Texture2D*>		BloomLevels;
+		ZEArray<ZED3D9Texture2D*>		BloomLevelsTemp;
+		ZEArray<ZED3D9Texture2D*>		LuminanceMips;
+
+		float							Key;
+		float							Exposure;
+		bool							AutoKey;
+		bool							AutoExposure;
+
+		float							AdaptationRate;
+		float							BloomFactor;
+		float							BloomTreshold;
+		float							BloomDeviation;
+		float							WhiteLevel;
+		float							Saturation;
+		ZEUInt							BloomPassCount;
+		
+		ZEHDRToneMapOperator			ToneMapOperator;
+
+		struct
+		{
+			bool						Recompile;
+			ZED3D9VertexShader*			Vertex;
+			ZED3D9PixelShader*			ConvertToLuminance;
+			ZED3D9PixelShader*			LuminanaceScale3x;
+			ZED3D9PixelShader*			LuminanceAdaptation;
+			ZED3D9PixelShader*			BrightPass;
+			ZED3D9PixelShader*			ColorDownSample2x;
+			ZED3D9PixelShader*			BlurHorizontal;
+			ZED3D9PixelShader*			BlurVerticalUpSample2x;
+			
+			ZED3D9PixelShader*			Combine;
+
+			
+
+			ZED3D9PixelShader*			DebugPrint;
+		
+		} Shaders;
+		
+		static ZEHDRScreenAlignedQuad	Vertices[4];
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 
-		struct 
-		{
-			ZED3D9Texture2D*			Luminance5;
-			ZED3D9Texture2D*			Luminance4;
-			ZED3D9Texture2D*			Luminance3;
-			ZED3D9Texture2D*			Luminance2;
-			ZED3D9Texture2D*			Luminance1;
-			ZED3D9Texture2D*			Luminance;
-			ZED3D9Texture2D*			OldLuminance;
-			ZED3D9Texture2D*			DownSampled2xA;
-			ZED3D9Texture2D*			DownSampled2xB;
-			ZED3D9Texture2D*			DownSampled4xA;
-			ZED3D9Texture2D*			DownSampled4xB;
-			ZED3D9Texture2D*			DownSampled8xA;
-			ZED3D9Texture2D*			DownSampled8xB;
-			ZED3D9Texture2D*			DownSampled16xA;
-			ZED3D9Texture2D*			DownSampled16xB;
-		} Textures;
+		void							UpdateBuffers(ZEUInt Width, ZEUInt Height);
+		void							DestroyBuffers();
 
-		struct
-		{
-			ZED3D9VertexShader*			VertexShader;
-			ZED3D9PixelShader*			MeasureLuminanceStart;
-			ZED3D9PixelShader*			MeasureLuminanceDownSample3x;
-			ZED3D9PixelShader*			MeasureLuminanceEnd;
-			ZED3D9PixelShader*			BrightPass; 
-			ZED3D9PixelShader*			DownSample2x;
-			ZED3D9PixelShader*			VerticalBloom;
-			ZED3D9PixelShader*			HorizontalBloom;
-			ZED3D9PixelShader*			ToneMap;
-		} Shaders;
+		void							UpdateShaders();
+		void							DestroyShaders();
 
-		void							CreateRenderTargets();
-		void							ReleaseRenderTargets();
+		void							DebugPrint(const ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
 
-		void							MeasureLuminance(ZED3D9Texture2D* Input, ZED3D9Texture2D* OldLuminance, ZED3D9ViewPort* Output);
-		void							BrightPass(ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
-		void							BlurPass(ZED3D9Texture2D* Input, ZED3D9Texture2D* Temp, ZED3D9ViewPort* Output);
-		void							DownSample2x(ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
-		void							ToneMap(ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
+		void							ColorDownSample2x(const ZED3D9Texture2D* Input, ZED3D9Texture2D* Output);
+		void							LuminanaceScale3x(ZED3D9Texture2D* Input, ZED3D9Texture2D* Output);
+
+		void							HorizontalBlur(ZED3D9Texture2D* Input, ZED3D9Texture2D* Output);
+		void							VerticalBlurAdditiveUpSample2x(ZED3D9Texture2D* Input, float BloomWeight, ZED3D9Texture2D* Addition, ZED3D9Texture2D* Output);
 		
-		struct 
-		{
-			float						Key;
-			float						BrightPassTreshold;
-			float						BloomFactor;
-			float						BloomStandardDeviation;
-			
-			float						MaxLuminanceChange;
-			float						MaxLuminanceChangePerSecond;
-			float						Reserved1;
-			float						Reserved2;
-		} Parameters;
+		void							ConvertToLuminance(ZED3D9Texture2D* Input, ZED3D9Texture2D* Output);
+		void							MipMapLuminance(ZEArray<ZED3D9Texture2D*>& Input);
+		void							AdaptLuminance(ZED3D9Texture2D* MeasuredLum, ZED3D9Texture2D* PreviousLum, ZED3D9Texture2D* Output);
 
-		struct
-		{
-			ZEInt						BloomSampleCount;
-			ZEInt						BloomPassCount;
-			ZEInt						Reserved0;
-			ZEInt						Reserved1;
-		} IntParameters;
+		void							BrightPass(ZED3D9Texture2D* Color, ZED3D9Texture2D* CurrentLum, ZED3D9Texture2D* Output);
+		void							GenerateBloom(ZED3D9Texture2D* InputOutput, ZEUInt PassCount);
+
+		void							Combine(ZED3D9Texture2D* Color, ZED3D9Texture2D* Bloom, ZED3D9Texture2D* CurrentLum, ZED3D9ViewPort* Output);
+		
+		void							LimitAndCommitConstants(float ElapsedTime);
+		void							SwitchLuminanceBuffers();
 
 	public:
 		void							Initialize();
 		void							Deinitialize();
 
-		void							SetKey(float Key);
+		void							SetKey(float Value);
 		float							GetKey() const;
 
-		void							SetBrightPassTreshold(float Treshold);
-		float							GetBrightPassTreshold() const;
+		void							SetAutoExposure(bool Enabled);
+		bool							GetAutoExposure() const;
 
-		void							SetMaxLuminanceChangePerSecond(float LuminanceChange);
-		float							GetMaxLuminanceChangePerSecond() const;
+		void							SetBloomEnabled(bool Enabled);
+		bool							GetBloomEnabled() const;
 
-		void							SetBloomFactor(float Factor);
+		void							SetLargeBloomWeight(float Value);
+		float							GetLargeBloomWeight() const;
+
+		void							SetMediumBloomWeight(float Value);
+		float							GetMediumBloomWeight() const;
+		
+		void							SetSmallBloomWeight(float Value);
+		float							GetSmallBloomWeight() const;
+
+		void							SetAutoKey(bool Enabled);
+		bool							GetAutoKey() const;
+
+		void							SetExposure(float Value);
+		float							GetExposure() const;
+
+		void							SetAdaptationRate(float Value);
+		float							GetAdaptationRate() const;
+		
+		void							SetBloomFactor(float Value);
 		float							GetBloomFactor() const;
 
-		void							SetBloomStandardDeviation(float Deviation);
-		float							GetBloomStandardDeviation() const;
+		void							SetBloomTreshold(float Value);
+		float							GetBloomTreshold() const;
 
-		void							SetBloomSampleCount(ZEUInt Count);
-		ZEUInt							GetBloomSampleCount() const;
+		void							SetBloomDeviation(float Value);
+		float							GetBloomDeviation() const;
 
-		void							SetBloomPassCount(ZEUInt Count);
+		void							SetWhiteLevel(float Value);
+		float							GetWhiteLevel() const;
+
+		void							SetSaturation(float Value);
+		float							GetSaturation() const;
+
+		void							SetBloomPassCount(ZEUInt Value);
 		ZEUInt							GetBloomPassCount() const;
+
+		void							SetToneMapOperator(ZEHDRToneMapOperator Operator);
+		ZEHDRToneMapOperator			GetToneMapOperator() const;
 
 		void							SetInput(ZED3D9Texture2D* Input);
 		ZED3D9Texture2D*				GetInput();
 
 		void							SetOutput(ZED3D9ViewPort* Output);
 		ZED3D9ViewPort*					GetOutput();
+
+		void							SetRenderer(ZED3D9FrameRenderer* FrameRenderer);
+		ZED3D9FrameRenderer*			SetRenderer() const;
 
 		void							Process(float ElapsedTime);
 
@@ -168,14 +230,34 @@ ZE_POST_PROCESSOR_START(Meta)
 			<class name="ZED3D9HDRProcessor">
 				<noinstance>true</noinstance>
 				<description>ZED3D9HDRProcessor</description>
+
+				<property name="ToneMapOperator" type="integer32" autogetset="yes" description="...">
+					<enumurator name="ZEHDRToneMapOperator">
+						<item name="Logarithmic"	value="ZE_HDR_TMO_LOGARITHMIC"/>
+						<item name="Exponential"	value="ZE_HDR_TMO_EXPONENTIAL"/>
+						<item name="Reinhard"		value="ZE_HDR_TMO_REINHARD"/>
+						<item name="Reinhard Mod"	value="ZE_HDR_TMO_REINHARD_MOD"/>
+						<item name="Filmic"			value="ZE_HDR_TMO_FILMIC"/>
+					</enumurator>
+				</property>
+				<property name="AutoKey" type="boolean" autogetset="yes" description="..."/>
+				<property name="AutoExposure" type="boolean" autogetset="yes" description="..."/>
+				<property name="BloomEnabled" type="boolean" autogetset="yes" description="..."/>
 				<property name="Key" type="float" autogetset="yes" description="..."/>
-				<property name="BrightPassTreshold" type="float" autogetset="yes" description="..."/>
-				<property name="BloomFactor" type="float" autogetset="yes" description="..."/>
-				<property name="BloomStandardDeviation" type="float" autogetset="yes" description="..."/>
-				<property name="BloomSampleCount" type="integer32" autogetset="yes" description="..."/>
-				<property name="BloomPassCount" type="integer32" autogetset="yes" description="..."/>
-				<property name="MaxLuminanceChangePerSecond" type="float" autogetset="yes" description="..."/>
+				<property name="Exposure" type="float" autogetset="yes" description="..."/>
+				<property name="AdaptationRate" type="float" autogetset="yes" description="..."/>
 				
+				<property name="LargeBloomWeight" type="float" autogetset="yes" description="..."/>
+				<property name="MediumBloomWeight" type="float" autogetset="yes" description="..."/>
+				<property name="SmallBloomWeight" type="float" autogetset="yes" description="..."/>
+				
+				<property name="BloomFactor" type="float" autogetset="yes" description="..."/>
+				<property name="BloomTreshold" type="float" autogetset="yes" description="..."/>
+				<property name="BloomDeviation" type="float" autogetset="yes" description="..."/>
+				<property name="BloomPassCount" type="integer32" autogetset="yes" description="..."/>
+				<property name="WhiteLevel" type="float" autogetset="yes" description="..."/>
+				<property name="Saturation" type="float" autogetset="yes" description="..."/>
+
 			</class>
 		</meta>
 	</zinek>
