@@ -119,6 +119,7 @@ class ZEInterior : public ZEEntity
 		virtual const ZEString&					GetInteriorFile() const;
 
 		void									SetCullMode(ZEInteriorCullMode Value);
+		ZEInteriorCullMode						GetCullMode() const;
 
 		static ZEInterior*						CreateInstance();
 
@@ -136,6 +137,14 @@ ZE_POST_PROCESSOR_START(Meta)
 				description="Interior file"
 				semantic="ZE_PS_FILENAME"
 				fileextension="*.zeInterior"/>
+
+				<property name="CullMode" type="integer32" autogetset="yes">
+					<enumurator name="ZEInteriorCullMode">
+						<item name="Node" value="ZE_ICM_NONE"/>
+						<item name="View" value="ZE_ICM_VIEW"/>
+						<item name="Full" value="ZE_ICM_FULL"/>
+					</enumurator>
+				</property>
 		</class>
 	</meta>
 </zinek>

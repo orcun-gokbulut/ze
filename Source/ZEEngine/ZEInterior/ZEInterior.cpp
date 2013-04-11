@@ -599,6 +599,11 @@ void ZEInterior::SetCullMode(ZEInteriorCullMode Value)
 	CullMode = Value;
 }
 
+ZEInteriorCullMode ZEInterior::GetCullMode() const
+{
+	return CullMode;
+}
+
 ZEEntityRunAt ZEInteriorDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
