@@ -277,7 +277,7 @@ void ZEFixedMaterial::SetDiffuseSubSurfaceScatteringFactor(float Factor)
 	SubSurfaceScatteringFactor = Factor;
 }
 
-float ZEFixedMaterial::GetDiffuseSubSurfaceScatteringFactor()
+float ZEFixedMaterial::GetDiffuseSubSurfaceScatteringFactor() const
 {
 	return SubSurfaceScatteringFactor;
 }
@@ -1379,7 +1379,7 @@ void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode->AddProperty("OpacityMap", GetOpacityMapFile());
 	ConfigurationNode->AddProperty("OpacityMapAddressModeU", GetOpacityMapAddressModeU());
 	ConfigurationNode->AddProperty("OpacityMapAddressModeV", GetOpacityMapAddressModeV());
-	ConfigurationNode->AddProperty("DetailBaseMap", GetDetailBaseMap());
+	ConfigurationNode->AddProperty("DetailBaseMap", GetDetailBaseMapFile());
 	ConfigurationNode->AddProperty("DetailBaseMapAddressModeU", GetDetailBaseMapAddressModeU());
 	ConfigurationNode->AddProperty("DetailBaseMapAddressModeV", GetDetailBaseMapAddressModeV());
 	ConfigurationNode->AddProperty("DetailNormalMap", GetDetailNormalMapFile());
