@@ -226,7 +226,7 @@ ZELight::ZELight()
 	Color = ZEVector3(1.0f, 1.0f, 1.0f);
 	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
 
-	ShadowFactor = 0.5f;
+	ShadowFactor = 0.9f;
 }
 
 ZELight::~ZELight()

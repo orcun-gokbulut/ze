@@ -247,7 +247,7 @@ class ZEFixedMaterial : public ZEMaterial
 		void							SetDiffuseFactor(float Factor);
 		float							GetDiffuseFactor() const;
 		void							SetDiffuseSubSurfaceScatteringFactor(float Factor);
-		float							GetDiffuseSubSurfaceScatteringFactor();
+		float							GetDiffuseSubSurfaceScatteringFactor() const;
 
 		// Specular
 		void							SetSpecularEnabled(bool Enabled);
@@ -441,6 +441,7 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="DiffuseEnabled" groupname="Diffuse" type="boolean" autogetset="yes"/>
 			<property name="DiffuseColor" groupname="Diffuse" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
 			<property name="DiffuseFactor" groupname="Diffuse" type="float" autogetset="yes"/>
+			<property name="SubSurfaceScateringFactor" groupname="Diffuse" type="float" setfunction="SetDiffuseSubSurfaceScatteringFactor" getfunction="GetDiffuseSubSurfaceScatteringFactor"/>
 			<property name="BaseMap" groupname="Diffuse" type="string" semantic="ZE_PS_FILENAME" setfunction="SetBaseMapFile" getfunction="GetBaseMapFile"/>
 			<property name="BaseMapAddressModeU" groupname="Diffuse" type="integer32" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
