@@ -72,6 +72,7 @@
 #include "ZEInterior/ZEInterior.h"
 #include "ZEGame/ZEWeather.h"
 #include "ZEGame/ZESea.h"
+#include "ZEFile/ZEPathManager.h"
 
 
 
@@ -87,8 +88,13 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	ui = new Ui::MapEditorClass();
 	ui->setupUi(this);
 
+	ZEString DefaultCompanyName = "Zinek";
+	ZEString DefaultApplicationName = "Engine";
+	ZEString DefaultResourcesDirectoryName = "Resources";
+	ZEPathManager::CustomizePaths(&DefaultCompanyName, &DefaultApplicationName, &DefaultResourcesDirectoryName);
+
 	SplashScreen->SetNotificationText("Reading Working Directory...");
-	this->WorkingDirectory = QDir::currentPath() + QString("/resources");
+	this->WorkingDirectory = ZEPathManager::GetWorkingDirectory() + "\\";
 
 	SplashScreen->SetNotificationText("Setting Up Assert Browser...");
 	//AssertBrowser = new NewZEDAssertBrowser(QDir::currentPath());	
@@ -99,7 +105,7 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	MainLoopTimer->start(0);
 
 	BackupSaveTimer = new QTimer();
-	BackupSaveTimer->start(120000);
+	//BackupSaveTimer->start(120000);
 
 	SplashScreen->SetNotificationText("Making Connections...");
 	MakeConnections();
@@ -195,9 +201,13 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(4));
 	ui->PropertiesTabWidget->widget(4)->setLayout(TempLayout);
 
+
 	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HDRProcessor, QString()), QString("TESTHDR"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(5));
 	ui->PropertiesTabWidget->widget(5)->setLayout(TempLayout);
+
+	Scene->SetAmbientColor(ZEVector3::One);
+	Scene->SetAmbientFactor(0.1f);
 }
 
 void MapEditor::MakeConnections()

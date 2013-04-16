@@ -232,7 +232,7 @@ void ZEFixedMaterial::SetGlobalAmbientEnabled(bool Enabled)
 	GlobalAmbientEnabled = Enabled;
 }
 
-bool ZEFixedMaterial::GetGlobalAmbientEnabled()
+bool ZEFixedMaterial::GetGlobalAmbientEnabled() const
 {
 	return GlobalAmbientEnabled;
 }
@@ -1328,6 +1328,7 @@ void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode->AddProperty("ShadowCaster", GetShadowCaster());
 
 	ConfigurationNode->AddProperty("AmbientEnabled", GetAmbientEnabled());
+	ConfigurationNode->AddProperty("GlobalAmbientEnabled", GetGlobalAmbientEnabled());
 	ConfigurationNode->AddProperty("DiffuseEnabled", GetDiffuseEnabled());
 	ConfigurationNode->AddProperty("NormalMapEnabled", GetNormalMapEnabled());
 	ConfigurationNode->AddProperty("ParallaxMapEnabled", GetParallaxMapEnabled());
@@ -1446,7 +1447,7 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		EnvironmentMapValue, EnvironmentMapAddressModeUValue, EnvironmentMapAddressModeVValue, EnvironmentMapAddressModeWValue, LightMapValue, LightMapAddressModeUValue, LightMapAddressModeVValue;
 
 	// Shader components
-	ZEVariant AmbientEnabledValue, DiffuseEnabledValue, BaseMapEnabledValue, NormalMapEnabledValue,
+	ZEVariant AmbientEnabledValue, GlobalAmbientEnabledValue, DiffuseEnabledValue, BaseMapEnabledValue, NormalMapEnabledValue,
 		ParallaxMapEnabledValue, SpecularEnabledValue, SpecularMapEnabledValue, 
 		EmissiveEnabledValue, EmissiveMapEnabledValue, OpacityEnabledValue,
 		OpacityBaseAlphaEnabledValue, OpacityConstantEnabledValue, OpacityMapEnabledValue, 
@@ -1465,6 +1466,7 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		ZEML_LIST_PROPERTY("ShadowCaster",					ShadowCasterValue,					ZE_VRT_BOOLEAN,		false),
 
 		ZEML_LIST_PROPERTY("AmbientEnabled",				AmbientEnabledValue,				ZE_VRT_BOOLEAN,		false),
+		ZEML_LIST_PROPERTY("GlobalAmbientEnabled",			GlobalAmbientEnabledValue,			ZE_VRT_BOOLEAN,		false),
 		ZEML_LIST_PROPERTY("DiffuseEnabled",				DiffuseEnabledValue,				ZE_VRT_BOOLEAN,		false),
 		ZEML_LIST_PROPERTY("BaseMapEnabled",				BaseMapEnabledValue,				ZE_VRT_BOOLEAN,		false),
 		ZEML_LIST_PROPERTY("NormalMapEnabled",				NormalMapEnabledValue,				ZE_VRT_BOOLEAN,		false),
@@ -1539,7 +1541,7 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		ZEML_LIST_PROPERTY("LightMapAddressModeV",			LightMapAddressModeVValue,			ZE_VRT_INTEGER_32,	false)
 	};
 
-	if (!Reader.ReadPropertyList(Properties, 76))
+	if (!Reader.ReadPropertyList(Properties, 77))
 		zeError("Cannot read material properties");
 
 	// Configure material
@@ -1550,6 +1552,11 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 	SetTransparancyMode(TransparencyModeValue.GetType() == ZE_VRT_UNDEFINED ? (ZEMaterialTransparancyMode)0 : (ZEMaterialTransparancyMode)TransparencyModeValue.GetInt32());
 
 	SetAmbientEnabled((AmbientEnabledValue.GetType() != ZE_VRT_UNDEFINED && AmbientEnabledValue.GetBoolean() ? true : false));
+	SetGlobalAmbientEnabled((GlobalAmbientEnabledValue.GetType() != ZE_VRT_UNDEFINED && GlobalAmbientEnabledValue.GetBoolean() ? true : false));
+
+	if(GlobalAmbientEnabledValue.GetType() == ZE_VRT_UNDEFINED)
+		SetGlobalAmbientEnabled(true);
+
 	SetDiffuseEnabled((DiffuseEnabledValue.GetType() != ZE_VRT_UNDEFINED && DiffuseEnabledValue.GetBoolean() ? true : false));
 	SetNormalMapEnabled((NormalMapEnabledValue.GetType() != ZE_VRT_UNDEFINED && NormalMapEnabledValue.GetBoolean() ? true : false));
 	SetParallaxMapEnabled((ParallaxMapEnabledValue.GetType() != ZE_VRT_UNDEFINED && ParallaxMapEnabledValue.GetBoolean() ? true : false));
