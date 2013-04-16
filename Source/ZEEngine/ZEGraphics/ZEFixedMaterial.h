@@ -228,7 +228,7 @@ class ZEFixedMaterial : public ZEMaterial
 		const ZEVector3&				GetAmbientColor() const;
 
 		void							SetGlobalAmbientEnabled(bool Enabled);
-		bool							GetGlobalAmbientEnabled();
+		bool							GetGlobalAmbientEnabled() const;
 
 		void							SetBaseMap(const ZETexture2D* Texture);
 		const ZETexture2D*				GetBaseMap() const;
@@ -436,8 +436,8 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="AmbientEnabled" groupname="Ambient" type="boolean" autogetset="yes"/>
 			<property name="AmbientFactor" groupname="Ambient" type="float" autogetset="yes"/>
 			<property name="AmbientColor" groupname="Ambient" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
+			<property name="GlobalAmbientEnabled" groupname="Ambient" type="boolean" autogetset="yes"/>  
 			  
-
 			<property name="DiffuseEnabled" groupname="Diffuse" type="boolean" autogetset="yes"/>
 			<property name="DiffuseColor" groupname="Diffuse" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
 			<property name="DiffuseFactor" groupname="Diffuse" type="float" autogetset="yes"/>

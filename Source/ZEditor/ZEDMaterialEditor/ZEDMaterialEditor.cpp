@@ -164,6 +164,7 @@ void ZEDMaterialEditor::Save()
 	ConfigurationNode->AddProperty("ShadowCaster", Material->GetShadowCaster());
 
 	ConfigurationNode->AddProperty("AmbientEnabled", Material->GetAmbientEnabled());
+	ConfigurationNode->AddProperty("GlobalAmbientEnabled", Material->GetGlobalAmbientEnabled());
 	ConfigurationNode->AddProperty("DiffuseEnabled", Material->GetDiffuseEnabled());
 	ConfigurationNode->AddProperty("NormalMapEnabled", Material->GetNormalMapEnabled());
 	ConfigurationNode->AddProperty("ParallaxMapEnabled", Material->GetParallaxMapEnabled());
