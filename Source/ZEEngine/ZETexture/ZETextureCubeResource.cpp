@@ -44,6 +44,7 @@
 #include "ZETextureQualityManager.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZETextureCacheDataIdentifier.h"
+#include "ZEFile/ZEPathUtils.h"
 
 
 static ZEString ConstructResourcePath(const ZEString& Path)
@@ -100,6 +101,9 @@ static void CopyCubeFaceTo(void* Destination, ZESize DestPitch, void* SourceBuff
 void ZETextureCubeResource::CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
+
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
+
 	ZETextureCubeResource* NewResource = (ZETextureCubeResource*)zeResources->GetResource(NewPath);
 	
 	if (NewResource == NULL)
@@ -120,6 +124,8 @@ void ZETextureCubeResource::CacheResource(const ZEString& FileName, const ZEText
 ZETextureCubeResource* ZETextureCubeResource::LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
+
 	ZETextureCubeResource* NewResource =(ZETextureCubeResource*)zeResources->GetResource(NewPath.GetValue());
 	
 	if (NewResource == NULL)
@@ -150,6 +156,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(const ZEString& FileN
 	
 	bool Result;
 	ZEFile File;
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
 	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if (Result)

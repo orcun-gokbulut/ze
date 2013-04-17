@@ -498,27 +498,27 @@ const char* ZEInteriorResource::GetResourceType() const
 	return "Interior Resource";
 }
 
-const ZEArray<ZETexture2DResource*>& ZEInteriorResource::GetTextures()
+const ZEArray<ZETexture2DResource*>& ZEInteriorResource::GetTextures() const
 {
 	return TextureResources;
 }
 
-const ZEArray<ZEMaterial*>& ZEInteriorResource::GetMaterials()
+const ZEArray<ZEMaterial*>& ZEInteriorResource::GetMaterials() const
 {
 	return Materials;
 }
 
-const ZEArray<ZEInteriorResourceRoom>& ZEInteriorResource::GetRooms()
+const ZEArray<ZEInteriorResourceRoom>& ZEInteriorResource::GetRooms() const
 {
 	return Rooms;
 }
 
-const ZEArray<ZEInteriorResourceDoor>& ZEInteriorResource::GetDoors()
+const ZEArray<ZEInteriorResourceDoor>& ZEInteriorResource::GetDoors() const
 {
 	return Doors;
 }
 
-const ZEArray<ZEInteriorResourceHelper>& ZEInteriorResource::GetHelpers()
+const ZEArray<ZEInteriorResourceHelper>& ZEInteriorResource::GetHelpers() const
 {
 	return Helpers;
 }
@@ -527,6 +527,7 @@ ZEInteriorResource* ZEInteriorResource::LoadSharedResource(const ZEString& FileN
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 	// Try to get instance of shared ZEInterior file from resource manager
 	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(NewPath);
 	
@@ -552,6 +553,8 @@ ZEInteriorResource* ZEInteriorResource::LoadSharedResource(const ZEString& FileN
 void ZEInteriorResource::CacheResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
+
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
 	// Try to get instance of shared ZEInterior file from resource manager
 	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(NewPath);
@@ -579,7 +582,7 @@ ZEInteriorResource* ZEInteriorResource::LoadResource(const ZEString& FileName)
 
 	bool Result;
 	ZEFile ResourceFile;
-
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
 	// Open ZEInterior file
 	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);

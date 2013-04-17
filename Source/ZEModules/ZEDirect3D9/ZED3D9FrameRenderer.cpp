@@ -1211,7 +1211,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		MLAAProcessor.SetInputDepth(GBuffer1);
 		MLAAProcessor.SetInputNormal(GBuffer2);
 		MLAAProcessor.SetInputColor(SSAAInputBuffer);
-		MLAAProcessor.SetOutput(ViewPort);
+		MLAAProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
 		MLAAProcessor.Process();
 
 		/*
@@ -1236,13 +1236,13 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		FogProcessor.Process();
 		*/
 
-		/*
+		
 		// Color Transform Process
-		ColorTransformProcessor.SetInput((ZED3D9Texture2D*)ABuffer);
-		ColorTransformProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
-		//ColorTransformProcessor.SetOutput(ViewPort);
-		//ColorTransformProcessor.Process();
-		*/
+		ColorTransformProcessor.SetInput(CTInputBuffer);
+		//ColorTransformProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
+		ColorTransformProcessor.SetOutput((ZED3D9ViewPort*)BlurInputBuffer->GetViewPort());
+		ColorTransformProcessor.Process();
+		
 
 		/*
 		// Grain
@@ -1288,12 +1288,12 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
  		EDProcessor.Process();
 		*/
 
-		/*
+
 		// Blur Process
 		BlurProcessor.SetInput(BlurInputBuffer);
 		BlurProcessor.SetOutput(ViewPort);
-		//BlurProcessor.Process();
-		*/
+		BlurProcessor.Process();
+
 	
 		Do2DPass();
 

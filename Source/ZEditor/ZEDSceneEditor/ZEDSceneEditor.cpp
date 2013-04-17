@@ -298,6 +298,7 @@ void MapEditor::LoadMapActionTriggered()
 void MapEditor::LoadSceneActionTriggered()
 {
 	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("Load Scene"),QString(this->WorkingDirectory),QString("*.ZESCENE"),0,0);
+	SelectedFilePath.replace("/", "\\");
 
 	if(SelectedFilePath.count() != 0)
 	{
@@ -331,8 +332,9 @@ void MapEditor::SaveSceneActionTriggered()
 	
 		if(SelectedFilePath.count() != 0)
 		{
+			SelectedFilePath.replace("/", "\\");
 			SelectedFilePath = SelectedFilePath.remove(this->WorkingDirectory);
-			SelectedFilePath = SelectedFilePath.remove(0,1);
+			
 			zeCore->GetGame()->GetScene()->Save((const char*)SelectedFilePath.toLatin1());
 			this->CurrentFileName = SelectedFilePath;
 			SaveFlag = true;
