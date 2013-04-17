@@ -87,7 +87,7 @@ void ZED3D9HDRProcessor::UpdateBuffers(ZEUInt Width, ZEUInt Height)
 
 	DestroyBuffers();
 
-	TestImage = (ZED3D9Texture2D*)ZETexture2DResource::LoadSharedResource("BlurTest.tga")->GetTexture();
+	//TestImage = (ZED3D9Texture2D*)ZETexture2DResource::LoadSharedResource("BlurTest.tga")->GetTexture();
 	
 	// Create bloom textures
 	for (ZEUInt32 I = 0; I < 6; ++I)

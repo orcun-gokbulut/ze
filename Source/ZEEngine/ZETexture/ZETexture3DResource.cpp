@@ -47,6 +47,7 @@
 #include "ZETextureLoader.h"
 #include "ZEMath/ZEMath.h"
 #include "ZETextureTools.h"
+#include "ZEFile/ZEPathUtils.h"
 
 
 static ZEString ConstructResourcePath(const ZEString& Path)
@@ -128,6 +129,7 @@ ZETexture3DResource::~ZETexture3DResource()
 ZETexture3DResource* ZETexture3DResource::LoadSharedResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
 	ZETexture3DResource* NewResource =(ZETexture3DResource*)zeResources->GetResource(NewPath.GetValue());
 	if(NewResource == NULL)
@@ -162,6 +164,8 @@ void ZETexture3DResource::CacheResource(const ZEString& FileName, ZEUInt HorizTi
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
+
 	ZETexture3DResource* NewResource = (ZETexture3DResource*)zeResources->GetResource(NewPath.GetValue());
 	if (NewResource == NULL)
 	{
@@ -184,6 +188,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(const ZEString& FileName,
 	ZEFile File;
 	ZETexture3DResource* TextureResource;
 	ZEString NewPath = ConstructResourcePath(FileName);
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
 	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if(Result)

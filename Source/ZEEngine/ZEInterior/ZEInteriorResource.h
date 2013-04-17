@@ -145,11 +145,11 @@ class ZEInteriorResource : public ZEResource
 	public:
 		const char*									GetResourceType() const;
 
-		const ZEArray<ZETexture2DResource*>&		GetTextures();
-		const ZEArray<ZEMaterial*>&					GetMaterials();
-		const ZEArray<ZEInteriorResourceRoom>&		GetRooms();
-		const ZEArray<ZEInteriorResourceDoor>&		GetDoors();
-		const ZEArray<ZEInteriorResourceHelper>&	GetHelpers();
+		const ZEArray<ZETexture2DResource*>&		GetTextures() const;
+		const ZEArray<ZEMaterial*>&					GetMaterials() const;
+		const ZEArray<ZEInteriorResourceRoom>&		GetRooms() const;
+		const ZEArray<ZEInteriorResourceDoor>&		GetDoors() const;
+		const ZEArray<ZEInteriorResourceHelper>&	GetHelpers() const;
 
 		static ZEInteriorResource*					LoadResource(const ZEString& FileName);
 		static ZEInteriorResource*					LoadSharedResource(const ZEString& FileName);
