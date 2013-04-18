@@ -417,7 +417,7 @@ class ZEFixedMaterial : public ZEMaterial
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZEFixedMaterial" noinstance="true">
+		<class name="ZEFixedMaterial" parent="ZEMaterial" noinstance="true">
 			<description>Material System</description>
 			<property name="Name" groupname="General" type="string" autogetset="yes"/>
 			<property name="TwoSided" groupname="Shading" type="boolean" autogetset="yes"/>

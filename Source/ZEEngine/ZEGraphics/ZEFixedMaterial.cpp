@@ -801,9 +801,7 @@ void ZEFixedMaterial::SetOpacityMapFile(const char* Filename)
 	if (OpacityMapResource != NULL)
 	{
 		SetOpacityEnabled(true);
-		SetOpacityComponent(ZE_MOC_OPACITY_MAP);
 		OpacityMap = OpacityMapResource->GetTexture();
-
 		SetAlphaCullEnabled(true);
 		SetAlphaCullLimit(0.5f);
 	}

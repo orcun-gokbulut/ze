@@ -1243,14 +1243,6 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		ColorTransformProcessor.SetOutput((ZED3D9ViewPort*)BlurInputBuffer->GetViewPort());
 		ColorTransformProcessor.Process();
 		
-
-		/*
-		// Grain
-		GrainProcessor.SetInput(GrainInputBuffer);
-		GrainProcessor.SetOutput((ZED3D9ViewPort*)ZoomBlurInputBuffer->GetViewPort());
-		//GrainProcessor.Process(ElaspedTime);
-		*/
-
 		/*
 		// Blur Mask
 		BlurMaskProcessor.SetInput(BlurMaskInputBuffer);
@@ -1291,8 +1283,13 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 
 		// Blur Process
 		BlurProcessor.SetInput(BlurInputBuffer);
-		BlurProcessor.SetOutput(ViewPort);
+		BlurProcessor.SetOutput((ZED3D9ViewPort*)GrainInputBuffer->GetViewPort());
 		BlurProcessor.Process();
+
+		// Grain
+		GrainProcessor.SetInput(GrainInputBuffer);
+		GrainProcessor.SetOutput(ViewPort);
+		GrainProcessor.Process(ElaspedTime);
 
 	
 		Do2DPass();

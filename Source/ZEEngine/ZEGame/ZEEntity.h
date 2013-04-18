@@ -153,7 +153,6 @@ class ZEEntity : public ZEObject
 		ZEArray<ZEEntity*>						Components;
 		ZEArray<ZEEntity*>						ChildEntities;
 
-		void									SetBoundingBox(const ZEAABBox& BoundingBox);
 		virtual void							OnTransformChanged();
 
 		bool									AddComponent(ZEEntity* Entity); 
@@ -170,6 +169,9 @@ class ZEEntity : public ZEObject
 		virtual									~ZEEntity();
 
 	public:
+
+		void									SetBoundingBox(const ZEAABBox& BoundingBox);
+
 		virtual ZEEntity*						GetOwner() const;
 		ZEScene*								GetOwnerScene() const;
 		

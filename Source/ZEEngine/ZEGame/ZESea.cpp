@@ -210,7 +210,7 @@ void ZESea::Draw(ZEDrawParameters* DrawParameters)
 	Command.VertexBufferOffset = 0;
 	Command.VertexDeclaration = VertexDeclaration;
 	Command.Order = 100.0f;
-	Command.Priority = 100;
+	Command.Priority = 1;
 	Command.IndexBuffer = NULL;
 	Command.Pipeline = ZE_RORP_3D;
 	Command.PrimitiveParameters = 0;
