@@ -653,7 +653,7 @@ void ZED3D9HDRProcessor::Process(float ElapsedTime)
 
 void ZED3D9HDRProcessor::SetKey(float Key)
 {
-	Key = Key;
+	this->Key = Key;
 }
 
 float ZED3D9HDRProcessor::GetKey() const
