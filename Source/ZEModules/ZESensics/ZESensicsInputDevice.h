@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZESensicsInputDevice.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,36 +30,47 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef	__ZE_SENSICS_INPUT_DEVICE_H__
+#define __ZE_SENSICS_INPUT_DEVICE_H__
 
-ze_set_project_folder("ZEModules")
+#include "ZETypes.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEInput/ZEInputDevice.h"
 
-ze_add_module(ZEDirect3D9			Modules PLATFORMS Windows)
-ze_add_module(ZEDirectInput			Modules OPTIONAL DEFAULT PLATFORMS Windows )
-ze_add_module(ZEVirtualInput		Modules OPTIONAL DEFAULT)
-ze_add_module(ZEWindowsInput		Modules OPTIONAL DEFAULT PLATFORMS Windows)
-ze_add_module(ZEVRPNInput			Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
-ze_add_module(ZEDirectSound			Modules OPTIONAL DEFAULT PLATFORMS Windows)
-ze_add_module(ZEOpenAL				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
-ze_add_module(ZEPhysX				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
-ze_add_module(ZEXSens				Modules OPTIONAL)
-ze_add_module(ZESensics				Modules OPTIONAL)
+class IDirectInput8A;
+class IDirectInputDevice8A;
+struct DIDEVICEINSTANCEA;
+struct DIDEVICEOBJECTINSTANCEA;
 
-ze_add_source(ZEModules.h			Sources Headers)
-ze_add_source(ZEModules.cpp			Sources)
-ze_add_source(CMakeLists.txt		Sources)
+class ZESensicsInputDevice : public ZEInputDevice
+{
+	friend class ZESensicsInputModule;
+	private:
+		ZESensicsInputModule*			Module;
+		IDirectInput8A*					DirectInput;
+		IDirectInputDevice8A*			SensicDevice;
 
-ze_add_library(ZEModules 
-	SOURCES ${Sources}
-	LIBS ${Modules})
+	public:
+		bool							EnumSensicsDeviceCallback(const DIDEVICEINSTANCEA* DeviceInstance);
+		bool							EnumSensicsDeviceObjectCallback(const DIDEVICEOBJECTINSTANCEA* DeviceObjectInstance);
 
-#ze_combine_libraries(ZEModules 
-#	LIBS ZEDirect3D9
-#		 ZEWindowsInput
-#		 ZEVRPNInput
-#		 ZEDirectSound
-#		 ZEOpenAL
-#		 ZEPhysX)
+
+		virtual void					Acquire();
+		virtual void					UnAcquire();
+
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
+		void							Process();
+
+										ZESensicsInputDevice();
+		virtual							~ZESensicsInputDevice();
+
+};
+
+#endif

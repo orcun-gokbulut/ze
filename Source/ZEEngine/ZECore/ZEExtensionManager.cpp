@@ -112,10 +112,10 @@ class ZEExtensionManager* ZEExtensionManager::GetInstance()
 }
 
 #include "ZEModules/ZEVRPNInput/ZEVRPNInputModule.h"
-#include "ZEModules/ZEXSens/ZEXSensInputModule.h"
 #include "ZEModules/ZEDirectInput/ZEDirectInputModule.h"
 #include "ZEModules/ZEWindowsInput/ZEWindowsInputModule.h"
 #include "ZEModules/ZEXSens/ZEXSensInputModule.h"
+#include "ZEModules/ZESensics/ZESensicsInputModule.h"
 
 ZEExtensionManager::ZEExtensionManager()
 {
@@ -123,6 +123,7 @@ ZEExtensionManager::ZEExtensionManager()
 	RegisterExtension(ZEDirectInputModule::Description());
 	RegisterExtension(ZEVRPNInputModule::Description());
 	RegisterExtension(ZEXSensInputModule::Description());
+	RegisterExtension(ZESensicsInputModule::Description());
 }
 
 ZEExtensionManager::~ZEExtensionManager()
