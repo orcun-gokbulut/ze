@@ -36,7 +36,7 @@
 #include "ZESea.h"
 #include "ZEGraphics/ZEVertexDeclaration.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-
+#include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZESeaMaterial.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEDrawParameters.h"
@@ -152,6 +152,26 @@ ZESea::~ZESea()
 	Material->Destroy();
 }
 
+void ZESea::SetAmbientColor(const ZEVector3& Color)
+{
+	Material->SetAmbientColor(ZEVector4(Color, 1.0f));
+}
+
+ZEVector3 ZESea::GetAmbientColor() const
+{
+	return Material->GetAmbientColor().ToVector3();
+}
+
+void ZESea::SetAmbientFactor(float Factor)
+{
+	Material->SetAmbientFactor(Factor);
+}
+
+float ZESea::GetAmbientFactor() const
+{
+	return Material->GetAmbientFactor();
+}
+
 void ZESea::SetDiffuseVelocity(const ZEVector2& Velocity)
 {
 	DiffuseVelocity = Velocity;
@@ -184,6 +204,12 @@ void  ZESea::SetNormalTexture(const ZETexture2D* Texture)
 
 void ZESea::Tick(float ElapsedTime)
 {
+	if(Material->GetGlobalAmbientEnabled())
+	{
+		SetAmbientFactor(zeScene->GetAmbientFactor());
+		SetAmbientColor(zeScene->GetAmbientColor());
+	}
+
 	DiffuseOffset += DiffuseVelocity * ElapsedTime;
 	NormalOffset += NormalVelocity * ElapsedTime;
 

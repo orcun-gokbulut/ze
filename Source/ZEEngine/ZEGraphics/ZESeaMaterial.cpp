@@ -41,6 +41,36 @@ ZEMaterialFlags ZESeaMaterial::GetMaterialFlags() const
 	return ZE_MTF_G_BUFFER_PASS;
 }
 
+void ZESeaMaterial::SetGlobalAmbientEnabled(bool Value)
+{
+	GlobalAmbientEnabled = Value;
+}
+
+bool ZESeaMaterial::GetGlobalAmbientEnabled() const
+{
+	return GlobalAmbientEnabled;
+}
+
+void ZESeaMaterial::SetAmbientColor(const ZEVector4& Color)
+{
+	AmbientColor = Color;
+}
+
+const ZEVector4& ZESeaMaterial::GetAmbientColor() const
+{
+	return AmbientColor;
+}
+
+void ZESeaMaterial::SetAmbientFactor(float Value)
+{
+	AmbientFactor = Value;
+}
+
+float ZESeaMaterial::GetAmbientFactor() const
+{
+	return AmbientFactor;
+}
+
 void ZESeaMaterial::SetDiffuseColor(const ZEVector4& Color)
 {
 	DiffuseColor = Color;
@@ -121,6 +151,9 @@ ZESeaMaterial::ZESeaMaterial()
 	NormalTexture = NULL;
 	DiffuseTexture = NULL;
 
+	GlobalAmbientEnabled = false;
+	AmbientColor = ZEVector4::One;
+	AmbientFactor = 0.0f;
 	DiffuseColor = ZEVector4::One;
 	DiffuseFactor = 1.0f;
 	SpecularColor = ZEVector4::One;

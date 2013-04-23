@@ -51,6 +51,10 @@ class ZESeaMaterial : public ZEMaterial
 		const ZETexture2D*				DiffuseTexture;
 		const ZETexture2D*				NormalTexture;
 
+		bool							GlobalAmbientEnabled;
+		ZEVector4						AmbientColor;
+		float							AmbientFactor;
+
 		ZEVector4						DiffuseColor;
 		float							DiffuseFactor;
 
@@ -73,6 +77,15 @@ class ZESeaMaterial : public ZEMaterial
 	public:
 
 		ZEMaterialFlags					GetMaterialFlags() const;
+
+		void							SetGlobalAmbientEnabled(bool Value);
+		bool							GetGlobalAmbientEnabled() const;
+
+		void							SetAmbientColor(const ZEVector4& Color);
+		const ZEVector4&				GetAmbientColor() const;
+
+		void							SetAmbientFactor(float Value);
+		float							GetAmbientFactor() const;
 
 		void							SetDiffuseColor(const ZEVector4& Color);
 		const ZEVector4&				GetDiffuseColor() const;

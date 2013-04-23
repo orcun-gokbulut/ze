@@ -75,9 +75,13 @@ class ZESea : public ZEEntity
 		virtual					~ZESea();
 
 	public:
-
 		void					SetDiffuseTexture(const ZETexture2D* Texture);
 		void					SetNormalTexture(const ZETexture2D* Texture);
+
+		void					SetAmbientColor(const ZEVector3& Color);
+		ZEVector3				GetAmbientColor() const;
+		void					SetAmbientFactor(float Factor);
+		float					GetAmbientFactor() const;
 
 		void					SetDiffuseVelocity(const ZEVector2& Velocity);
 		ZEVector2				GetDiffuseVelocity() const;
