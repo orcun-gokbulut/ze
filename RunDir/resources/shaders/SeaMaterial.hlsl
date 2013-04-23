@@ -43,6 +43,7 @@ float4x4 WorldViewMatrix 		: register(vs, c4);
 
 float4 TextureOffset 			: register(ps, c0);
 float4 MaterialDiffuseColor		: register(ps, c1);
+float4 MaterialAmbientColor		: register(ps, c5);
 float4 MaterialSpecularColor	: register(ps, c2);
 float4 Factors					: register(ps, c3);
 float  SpecularShineness		: register(ps, c1);
@@ -55,6 +56,7 @@ float4 PixelProperties			: register(ps, c4);
 #define HalfPixelSize			PixelProperties.zw
 #define DiffuseFactor			Factors.x
 #define SpecularFactor			Factors.y
+#define AmbientFactor			Factors.z
 #define DiffuseSampleOffset		TextureOffset.xy
 #define NormalSampleOffset		TextureOffset.zw
 
@@ -153,6 +155,9 @@ float4 PSMainForwardPass(PSInputForwardPass Input) : COLOR0
 	
 	float2 ScreenPosition = Input.ScreenPosition.xy * PixelSize + HalfPixelSize;
 	
+	float3 AmbientColor = MaterialAmbientColor.rgb * AmbientFactor;
+	OutputColor += AmbientColor;
+
 	float3 DiffuseColor = MaterialDiffuseColor.rgb * DiffuseFactor;
 	DiffuseColor *= ZELBuffer_GetDiffuse(ScreenPosition);
 	OutputColor += DiffuseColor;

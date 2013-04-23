@@ -42,6 +42,7 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZED3D9Texture2D.h"
 
+
 void ZED3D9SeaMaterial::CreateShaders()
 {
 	ReleaseShaders();
@@ -86,8 +87,8 @@ bool ZED3D9SeaMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderComm
 	GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
 	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_ANISOTROPIC);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
@@ -99,8 +100,9 @@ bool ZED3D9SeaMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderComm
 
 	GetDevice()->SetPixelShaderConstantF(0, ZEVector4(DiffuseTextureOffset.x, DiffuseTextureOffset.y, NormalTextureOffset.x, NormalTextureOffset.y).M, 1);
 	GetDevice()->SetPixelShaderConstantF(1, DiffuseColor.M, 1);
-	GetDevice()->SetPixelShaderConstantF(2, SpecularColor.M, 1);	
-	GetDevice()->SetPixelShaderConstantF(3, ZEVector4(DiffuseFactor, SpecularFactor, 0.0f, 0.0f).M, 1);
+	GetDevice()->SetPixelShaderConstantF(2, SpecularColor.M, 1);
+	GetDevice()->SetPixelShaderConstantF(5, AmbientColor.M, 1);
+	GetDevice()->SetPixelShaderConstantF(3, ZEVector4(DiffuseFactor, SpecularFactor, AmbientFactor, 0.0f).M, 1);
 	GetDevice()->SetPixelShaderConstantF(8, ZEVector4(EntityXZScale.x, EntityXZScale.y, DiffuseTextureTile.x, DiffuseTextureTile.y).M, 1);
 
 	ZEMatrix4x4 WorldViewProjection;
@@ -130,8 +132,8 @@ bool ZED3D9SeaMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderComm
 	GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
 	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_ANISOTROPIC);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
