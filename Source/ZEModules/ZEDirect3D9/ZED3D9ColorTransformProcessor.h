@@ -40,14 +40,19 @@
 
 #include "ZED3D9ComponentBase.h"
 
-class ZED3D9PixelShader;
-class ZED3D9VertexShader;
-class ZED3D9Texture2D;
 class ZETexture2D;
+class ZED3D9Texture2D;
 class ZED3D9ViewPort;
 class ZEFrameRenderer;
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
 class ZED3D9FrameRenderer;
-class ZETexture2DResource;
+
+struct ZEColorTransformQuad
+{
+	float	Position[3];
+	float	TexCoord[2];
+};
 
 class ZEColorMatrix : public ZEMatrix4x4
 {
@@ -64,16 +69,11 @@ class ZEColorMatrix : public ZEMatrix4x4
 		static const ZEMatrix4x4		Inverse;
 };
 
+#define ZE_MAX_COLOR_TRANSFORM_COUNT	4
+
 class ZED3D9ColorTransformProcessor : public ZED3D9ComponentBase
 {
 	private:
-		float							HueFactor;				// Angle 0-360, Additive
-		float							LightnessFactor;		// 0-1, Additive
-		float							SaturationFactor;		// 0-1, Additive
-
-		float							TransformFactor;
-		ZEMatrix4x4*					ColorMatrix;
-
 		ZED3D9FrameRenderer*			Renderer;
 
 		ZED3D9Texture2D*				InputBuffer;
@@ -81,9 +81,13 @@ class ZED3D9ColorTransformProcessor : public ZED3D9ComponentBase
 
 		ZED3D9VertexShader*				VertexShader;
 		ZED3D9PixelShader*				PixelShader;
+
+		static ZEColorTransformQuad		Vertices[4];
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 
-		
+		ZEMatrix4x4						TransformMatrices[ZE_MAX_COLOR_TRANSFORM_COUNT];
+		float							TransformFactors[ZE_MAX_COLOR_TRANSFORM_COUNT];
+
 	public:
 		void							SetRenderer(ZEFrameRenderer* Renderer);
 		ZEFrameRenderer*				GetRenderer();
@@ -94,26 +98,14 @@ class ZED3D9ColorTransformProcessor : public ZED3D9ComponentBase
 		void							SetOutput(ZED3D9ViewPort* Texture);
 		ZED3D9ViewPort*					GetOutput();
 
-		void							SetColorMatrix(const ZEMatrix4x4* Matrix);
-		ZEMatrix4x4*					GetColorMatrix();
+		void							SetTransformMatrix(ZESize Index, const ZEMatrix4x4& Matrix);
+		const ZEMatrix4x4&				GetTransformMatrix(ZESize Index);
 
-		void							SetTransformFactor(float Factor);
-		float							GetTransformFactor();
-
-		void							SetHueFactor(float Factor);
-		float							GetHueFactor();
-
-		void							SetLightnessFactor(float Factor);
-		float							GetLightnessFactor();
-
-		void							SetSaturationFactor(float Factor);
-		float							GetSaturationFactor();
-		
+		void							SetTransformFactor(ZESize Index, float Factor);
+		float							GetTransformFactor(ZESize Index);
+	
 		void							Initialize();
 		void							Deinitialize();
-
-		void							OnDeviceLost();
-		void							OnDeviceRestored();
 
 		void							Process();
 
@@ -121,4 +113,4 @@ class ZED3D9ColorTransformProcessor : public ZED3D9ComponentBase
 										~ZED3D9ColorTransformProcessor();
 };
 
-#endif	/* __ZE_D3D9_COLOR_TRANSFORM_PROCESSOR_H__ */
+#endif

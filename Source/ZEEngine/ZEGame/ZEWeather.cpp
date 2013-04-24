@@ -322,7 +322,7 @@ ZEWeather::ZEWeather()
 
 	FogFactor			= 0.1f;
 	MoonPhase			= 0.3f;
-	CloudCover			= 0.2f;
+	CloudCover			= 0.3f;
 	MoonLightIntensity	= 0.2f;
 	SunLightIntensity	= 1.0f;
 
@@ -348,6 +348,7 @@ ZEWeather::ZEWeather()
 	SunLight->SetColor(SunLightColor);
 	SunLight->SetIntensity(SunLightIntensity);
 	SunLight->SetCastsShadow(false);
+	SunLight->SetShadowFactor(0.8f);
 	SunLight->SetRange(600.0f);
 	this->AddComponent(SunLight);
 
@@ -371,7 +372,7 @@ ZEWeather::ZEWeather()
 	StarMap->SetName("StarMap");
 	StarMap->SetVisible(true);
 	StarMap->SetEnabled(true);
-	StarMap->SetSkyTexture("ZEEngine/ZEAtmosphere/Textures/StarMap.png");
+	StarMap->SetSkyTexture("ZEEngine\\ZEAtmosphere\\Textures\\StarMap.png");
 	StarMap->SetSkyColor(ZEVector3::One);
 	StarMap->SetSkyBrightness(1.0f);
 	this->AddComponent(StarMap);
@@ -381,7 +382,7 @@ ZEWeather::ZEWeather()
 	Moon->SetName("Moon");
 	Moon->SetEnabled(true);
 	Moon->SetVisible(true);
-	Moon->SetTexture("ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
+	Moon->SetTexture("ZEEngine\\ZEAtmosphere\\Textures\\MoonFrame.png", 53, 1);
 	Moon->SetAmbientColor(ZEVector3(1.0f, 0.99f, 0.92f));
 	Moon->SetDirection(MoonDirection);
 	Moon->SetPhase(MoonPhase);
@@ -399,9 +400,6 @@ ZEWeather::ZEWeather()
 	SkyDome->SetInnerRadius(60000.0f);
 	SkyDome->SetCameraPositionOffset(ZEVector3(0.0f, 60000.0f, 0.0f));
 	SkyDome->SetSunLightDirection(SunDirection);
-	SkyDome->SetAmbientFactor(0.7f);
-	SkyDome->SetMiddayAmbientColor(ZEVector3(0.04f, 0.04f, 0.055f));
-	SkyDome->SetSunsetAmbientColor(ZEVector3(0.89020f, 0.60392f, 0.21177f));
 	this->AddComponent(SkyDome);
 
 	// Planar Cloud
@@ -409,7 +407,7 @@ ZEWeather::ZEWeather()
 	Cloud->SetName("PlanarCloud");
 	Cloud->SetEnabled(true);
 	Cloud->SetVisible(true);
-	Cloud->SetCloudFormationTexture("ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
+	Cloud->SetCloudFormationTexture("ZEEngine\\ZEAtmosphere\\Textures\\Cloud.bmp");
 	Cloud->SetCamera(zeScene->GetActiveCamera());
 	Cloud->SetCloudPlaneHeight(600.0f);
 	Cloud->SetSunLightDirection(SunDirection);

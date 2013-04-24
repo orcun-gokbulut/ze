@@ -82,30 +82,9 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 		ZED3D9Texture2D*				CurrentLuminance;
 		ZED3D9Texture2D*				PreviousLuminance;
 
-		const ZED3D9Texture2D*			TestImage;
-
-		bool							BloomEnabled;
-		float							LargeBloomWeight;
-		float							MediumBloomWeight;
-		float							SmallBloomWeight;
 		ZEArray<ZED3D9Texture2D*>		BloomLevels;
 		ZEArray<ZED3D9Texture2D*>		BloomLevelsTemp;
 		ZEArray<ZED3D9Texture2D*>		LuminanceMips;
-
-		float							Key;
-		float							Exposure;
-		bool							AutoKey;
-		bool							AutoExposure;
-
-		float							AdaptationRate;
-		float							BloomFactor;
-		float							BloomTreshold;
-		float							BloomDeviation;
-		float							WhiteLevel;
-		float							Saturation;
-		ZEUInt							BloomPassCount;
-		
-		ZEHDRToneMapOperator			ToneMapOperator;
 
 		struct
 		{
@@ -118,17 +97,32 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 			ZED3D9PixelShader*			ColorDownSample2x;
 			ZED3D9PixelShader*			BlurHorizontal;
 			ZED3D9PixelShader*			BlurVerticalUpSample2x;
-			
 			ZED3D9PixelShader*			Combine;
-
-			
-
-			ZED3D9PixelShader*			DebugPrint;
 		
 		} Shaders;
-		
+
 		static ZEHDRScreenAlignedQuad	Vertices[4];
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+
+
+		bool							AutoKey;
+		bool							AutoExposure;
+		bool							BloomEnabled;
+
+		float							Key;
+		float							Exposure;
+		float							WhiteLevel;
+		float							Saturation;
+		float							AdaptationRate;
+		ZEHDRToneMapOperator			ToneMapOperator;
+
+		float							BloomFactor;
+		float							BloomTreshold;
+		float							BloomDeviation;
+		float							BloomWeightLarge;
+		float							BloomWeightMedium;
+		float							BloomWeightSmall;
+		ZEUInt							BloomPassCount; // Not active yet
 
 		void							UpdateBuffers(ZEUInt Width, ZEUInt Height);
 		void							DestroyBuffers();
@@ -153,7 +147,7 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 
 		void							Combine(ZED3D9Texture2D* Color, ZED3D9Texture2D* Bloom, ZED3D9Texture2D* CurrentLum, ZED3D9ViewPort* Output);
 		
-		void							LimitAndCommitConstants(float ElapsedTime);
+		void							CommitConstants(float ElapsedTime);
 		void							SwitchLuminanceBuffers();
 
 	public:
@@ -169,14 +163,14 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 		void							SetBloomEnabled(bool Enabled);
 		bool							GetBloomEnabled() const;
 
-		void							SetLargeBloomWeight(float Value);
-		float							GetLargeBloomWeight() const;
+		void							SetBloomWeightLarge(float Value);
+		float							GetBloomWeightLarge() const;
 
-		void							SetMediumBloomWeight(float Value);
-		float							GetMediumBloomWeight() const;
+		void							SetBloomWeightMedium(float Value);
+		float							GetBloomWeightMedium() const;
 		
-		void							SetSmallBloomWeight(float Value);
-		float							GetSmallBloomWeight() const;
+		void							SetBloomWeightSmall(float Value);
+		float							GetBloomWeightSmall() const;
 
 		void							SetAutoKey(bool Enabled);
 		bool							GetAutoKey() const;
@@ -231,6 +225,16 @@ ZE_POST_PROCESSOR_START(Meta)
 				<noinstance>true</noinstance>
 				<description>ZED3D9HDRProcessor</description>
 
+				<property name="AutoKey" type="boolean" autogetset="yes" description="..."/>
+				<property name="AutoExposure" type="boolean" autogetset="yes" description="..."/>
+				<property name="BloomEnabled" type="boolean" autogetset="yes" description="..."/>
+
+
+				<property name="Key" type="float" autogetset="yes" description="..."/>
+				<property name="Exposure" type="float" autogetset="yes" description="..."/>
+				<property name="WhiteLevel" type="float" autogetset="yes" description="..."/>
+				<property name="Saturation" type="float" autogetset="yes" description="..."/>
+				<property name="AdaptationRate" type="float" autogetset="yes" description="..."/>
 				<property name="ToneMapOperator" type="integer32" autogetset="yes" description="...">
 					<enumurator name="ZEHDRToneMapOperator">
 						<item name="Logarithmic"	value="ZE_HDR_TMO_LOGARITHMIC"/>
@@ -240,24 +244,15 @@ ZE_POST_PROCESSOR_START(Meta)
 						<item name="Filmic"			value="ZE_HDR_TMO_FILMIC"/>
 					</enumurator>
 				</property>
-				<property name="AutoKey" type="boolean" autogetset="yes" description="..."/>
-				<property name="AutoExposure" type="boolean" autogetset="yes" description="..."/>
-				<property name="BloomEnabled" type="boolean" autogetset="yes" description="..."/>
-				<property name="Key" type="float" autogetset="yes" description="..."/>
-				<property name="Exposure" type="float" autogetset="yes" description="..."/>
-				<property name="AdaptationRate" type="float" autogetset="yes" description="..."/>
 				
-				<property name="LargeBloomWeight" type="float" autogetset="yes" description="..."/>
-				<property name="MediumBloomWeight" type="float" autogetset="yes" description="..."/>
-				<property name="SmallBloomWeight" type="float" autogetset="yes" description="..."/>
-				
+
 				<property name="BloomFactor" type="float" autogetset="yes" description="..."/>
 				<property name="BloomTreshold" type="float" autogetset="yes" description="..."/>
 				<property name="BloomDeviation" type="float" autogetset="yes" description="..."/>
 				<property name="BloomPassCount" type="integer32" autogetset="yes" description="..."/>
-				<property name="WhiteLevel" type="float" autogetset="yes" description="..."/>
-				<property name="Saturation" type="float" autogetset="yes" description="..."/>
-
+				<property name="BloomWeightLarge" type="float" autogetset="yes" description="..."/>
+				<property name="BloomWeightMedium" type="float" autogetset="yes" description="..."/>
+				<property name="BloomWeightSmall" type="float" autogetset="yes" description="..."/>
 			</class>
 		</meta>
 	</zinek>

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9SkyDomeMaterial.h
+ Zinek Engine - PixelWorldPositionProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,38 +33,27 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_SKY_DOME_MATERIAL_H__
-#define __ZE_D3D9_SKY_DOME_MATERIAL_H__
+#ifndef __ZE_PIXEL_WORLD_POSITION_PROCESSOR_HLSL__
+#define __ZE_PIXEL_WORLD_POSITION_PROCESSOR_HLSL__
 
-#include "ZED3D9ComponentBase.h"
-#include "ZEGraphics\ZESkyDomeMaterial.h"
+#include	"GBuffer.hlsl"
 
-class ZEFrameRenderer;
-class ZERenderCommand;
-class ZED3D9VertexShader;
-class ZED3D9PixelShader;
+float2		SampleCoord				: register(c0);
 
-class ZED3D9SkyDomeMaterial : public ZESkyDomeMaterial, public ZED3D9ComponentBase
+struct VSInput
 {
-	friend class	ZED3D9Module;
-
-	protected:
-		ZED3D9VertexShader*			VertexShader;
-		ZED3D9PixelShader*			PixelShader;
-		
-		void						CreateShaders();
-		void						ReleaseShaders();
-
-	private:
-	public:
-									ZED3D9SkyDomeMaterial();
-		virtual						~ZED3D9SkyDomeMaterial();
-		
-		virtual bool				SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
-		virtual void				UpdateMaterial();
-		virtual void				Release();
-
+	float3 Position		: POSITION0;
+	float2 TexCoord		: TEXCOORD0;
 };
+
+float4 VSMain(VSInput Input) : POSITION0
+{
+	return float4(sign(Input.Position).xyz, 1.0f);
+}
+
+float4 PSMain() : COLOR0
+{
+	return ZEGBuffer_GetDepth(SampleCoord).xxxx;
+}
 
 #endif

@@ -49,8 +49,6 @@ float4		MLAAParameters	: register(ps, c1);
 
 
 #define		Treshold		MLAAParameters.x
-#define		FarZ			MLAAParameters.y
-#define		NearZ			MLAAParameters.z
 
 #define		SEARCH_STEP		12.0f
 #define		NUM_DISTANCES	32.0f
@@ -212,7 +210,7 @@ float SearchDown(float2 TextureCoord)
 
 static const float3 Weights = float3(0.2126f, 0.7152f, 0.0722f);
 
-PS_OUTPUT ps_main_edge_detection_depth(PS_INPUT Input)
+PS_OUTPUT ps_main_edge_detection_color(PS_INPUT Input)
 {
 	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
 
@@ -314,6 +312,3 @@ PS_OUTPUT ps_main_color_blending(PS_INPUT Input)
 
 	return Output;
 }
-
-
-

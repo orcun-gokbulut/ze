@@ -54,6 +54,8 @@
 #include "ZEGraphics/ZEFrameRenderer.h"
 #include "ZED3D9ColorTransformProcessor.h"
 #include "ZED3D9UnsharpenFilterProcessor.h"
+#include "ZED3D9AerialPerspectiveProcessor.h"
+#include "ZED3D9PixelWorldPositionProcessor.h"
 #include "ZED3D9ChannelDisorientationProcessor.h"
 
 class ZELight;
@@ -78,7 +80,6 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 
 		ZEDrawParameters*					DrawParameters;
 
-		ZED3D9Texture2D*					ABuffer;
 		ZED3D9ViewPort*						ViewPort;
 		ZED3D9Texture2D* 					GBuffer1;
 		ZED3D9Texture2D*					GBuffer2;
@@ -86,29 +87,24 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9Texture2D*					LBuffer1;
 		ZED3D9Texture2D*					LBuffer2;
 
+		ZED3D9Texture2D*					HDRBuffer;
+		ZED3D9Texture2D*					FogBuffer;
+		ZED3D9Texture2D*					DOFBuffer;
+		ZED3D9Texture2D*					MLAABuffer;
 		ZED3D9Texture2D*					SSAOBuffer;
-		ZED3D9Texture2D*					CDInputBuffer;
-		ZED3D9Texture2D*					TMInputBuffer;
-		ZED3D9Texture2D*					CTInputBuffer;
-		//ZED3D9Texture2D*					EDInputBuffer;
-		ZED3D9Texture2D*					HDRInputBuffer;
-		ZED3D9Texture2D*					FogInputBuffer;
-		ZED3D9Texture2D*					DOFInputBuffer;
-		ZED3D9Texture2D*					SSAAInputBuffer;
-		ZED3D9Texture2D*					BlurInputBuffer;
-		ZED3D9Texture2D*					GrainInputBuffer;
-		ZED3D9Texture2D*					BlurMaskInputBuffer;
-		ZED3D9Texture2D*					ZoomBlurInputBuffer;
-		ZED3D9Texture2D*					UnsharpenInputBuffer;
-	
-		ZED3D9Texture2D*					SharpenNormalBuffer;
-		ZED3D9Texture2D*					SharpenDepthBuffer;
+		ZED3D9Texture2D*					BlurBuffer;
+		ZED3D9Texture2D*					GrainBuffer;
+		ZED3D9Texture2D*					BlurMaskBuffer;
+		ZED3D9Texture2D*					ZoomBlurBuffer;
+		ZED3D9Texture2D*					UnsharpenBuffer;
+		ZED3D9Texture2D*					TextureMaskBuffer;
+		ZED3D9Texture2D*					ColorTransformBuffer;
+		ZED3D9Texture2D*					AerialPrespectiveBuffer;
+		ZED3D9Texture2D*					ColorDisorientationBuffer;
+
+		ZED3D9Texture2D*					HalfResDepthBuffer;
+		ZED3D9Texture2D*					HalfResNormalBuffer;
 		
-		ZED3D9SSAOProcessor					SSAOProcessor;
-		ZED3D9SSAAProcessor					SSAAProcessor;
-		
-		
-		ZED3D9EDProcessor					EDProcessor;
 		ZESmartArray<ZERenderCommand>		CommandList;
 
 		ZECamera*							Camera;
@@ -156,19 +152,23 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		virtual								~ZED3D9FrameRenderer();					
 
 	public:
+		ZED3D9Texture2D*					ABuffer;
+		ZED3D9SSAOProcessor					SSAOProcessor;
 		ZED3D9MLAAProcessor					MLAAProcessor;
 		ZED3D9FogProcessor					FogProcessor;
 		ZED3D9HDRProcessor					HDRProcessor;
 		ZED3D9DOFProcessor					DOFProcessor;
 		ZED3D9BlurProcessor					BlurProcessor;
 		ZED3D9GrainProcessor				GrainProcessor;
-		ZED3D9ColorTransformProcessor		ColorTransformProcessor;
-		ZED3D9ChannelDisorientationProcessor ChannelDisorientProcessor;
-		ZED3D9TextureMaskProcessor			TextureMaskProcessor;
 		ZED3D9BlurMaskProcessor				BlurMaskProcessor;
 		ZED3D9ZoomBlurProcessor				ZoomBlurProcessor;
 		ZED3D9UnsharpenFilterProcessor		UnsharpenProcessor;
-		
+		ZED3D9TextureMaskProcessor			TextureMaskProcessor;
+		ZED3D9ColorTransformProcessor		ColorTransformProcessor;
+		ZED3D9AerialPerspectiveProcessor	AerialPerspectiveProcessor;
+		ZED3D9PixelWorldPositionProcessor	PixelWorldPositionProcessor;
+		ZED3D9ChannelDisorientationProcessor ChannelDisorientProcessor;
+
 		virtual void						SetDrawParameters(ZEDrawParameters* DrawParameters);
 		virtual ZEDrawParameters*			GetDrawParameters();
 

@@ -88,8 +88,8 @@ class ZED3D9MLAAProcessor : public ZED3D9ComponentBase, public ZEObject
 		
 		ZED3D9ViewPort*					OutputBuffer;
 
-		void							CreateRenderTargets();
-		void							DestroyRenderTargets();
+		void							UpdateBuffers();
+		void							DestroyBuffers();
 
 		void							EdgeDetectionPass(ZED3D9Texture2D* Depth, ZED3D9Texture2D* Normal, ZED3D9Texture2D* Output);
 		void							WeightBlendingPass(ZED3D9Texture2D* Endges, ZED3D9Texture2D* AreaTexture, ZED3D9Texture2D* Output);

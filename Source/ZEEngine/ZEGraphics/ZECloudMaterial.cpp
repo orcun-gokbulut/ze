@@ -52,7 +52,7 @@ ZECloudMaterial::ZECloudMaterial()
 	AmbientScale			= 0.1f;
 	EarthRadius				= 21600000.0f;
 	AtmosphereHeight		= 30000.0f;
-	CloudCover				= 0.5f;
+	CloudCover				= 0.3f;
 	CloudPlaneHeight		= 600.0f;
 	CloudPlaneHeightFallOff = 0.0f;
 	UVOffset				= ZEVector2(0.0f, 0.0f);
