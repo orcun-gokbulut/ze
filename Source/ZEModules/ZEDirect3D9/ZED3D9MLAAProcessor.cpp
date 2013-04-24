@@ -138,7 +138,7 @@ ZED3D9ViewPort* ZED3D9MLAAProcessor::GetOutput()
 	return OutputBuffer;	
 }
 
-void ZED3D9MLAAProcessor::CreateRenderTargets()
+void ZED3D9MLAAProcessor::UpdateBuffers()
 {
 	ZEUInt TargetWidth = Renderer->GetViewPort()->GetWidth();
 	ZEUInt TargetHeight = Renderer->GetViewPort()->GetHeight();
@@ -178,7 +178,7 @@ void ZED3D9MLAAProcessor::CreateRenderTargets()
 	}
 }
 
-void ZED3D9MLAAProcessor::DestroyRenderTargets()
+void ZED3D9MLAAProcessor::DestroyBuffers()
 {
 	ZED3D_DESTROY(EdgeBuffer);
 	ZED3D_DESTROY(BlendWeightBuffer);
@@ -199,14 +199,11 @@ void ZED3D9MLAAProcessor::EdgeDetectionPass(ZED3D9Texture2D* Depth, ZED3D9Textur
 	GetDevice()->SetVertexShader(VertexShaderCommon->GetVertexShader());
 	GetDevice()->SetPixelShader(PixelShaderEdgeDetection->GetPixelShader());
 
-	float FarZ = zeScene->GetActiveCamera()->GetFarZ();
-	float NearZ = zeScene->GetActiveCamera()->GetNearZ();
 	ZEVector4 PixelSize(1.0f / Output->GetWidth(), 1.0f / Output->GetHeight(), 0.0f, 0.0f);
 
 	GetDevice()->SetVertexShaderConstantF(0, PixelSize.M, 1);
 	GetDevice()->SetPixelShaderConstantF(0, PixelSize.M, 1);
-	//GetDevice()->SetPixelShaderConstantF(1, (const float*)&ZEVector4(Treshold, FarZ, 0.0f, 0.0f), 1);
-	GetDevice()->SetPixelShaderConstantF(1, ZEVector4(Treshold, FarZ, NearZ, 0.0f).M, 1);
+	GetDevice()->SetPixelShaderConstantF(1, ZEVector4(Treshold, 0.0f, 0.0f, 0.0f).M, 1);
 
 	if (VisualizeEdges)
 	{
@@ -304,11 +301,11 @@ void ZED3D9MLAAProcessor::Initialize()
 
 	// Compile Shaders
 	this->VertexShaderCommon		= ZED3D9VertexShader::CreateShader("MLAAProcessor.hlsl", "vs_main_common", 0, "vs_3_0");
-	this->PixelShaderEdgeDetection	= ZED3D9PixelShader::CreateShader("MLAAProcessor.hlsl", "ps_main_edge_detection_depth", 0, "ps_3_0");
+	this->PixelShaderEdgeDetection	= ZED3D9PixelShader::CreateShader("MLAAProcessor.hlsl", "ps_main_edge_detection_color", 0, "ps_3_0");
 	this->PixelShaderColorBlending	= ZED3D9PixelShader::CreateShader("MLAAProcessor.hlsl", "ps_main_color_blending", 0, "ps_3_0");
 	this->PixelShaderWeightBlending = ZED3D9PixelShader::CreateShader("MLAAProcessor.hlsl", "ps_main_weight_blending", 0, "ps_3_0");
 	
-	this->CreateRenderTargets();
+	UpdateBuffers();
 }
 
 void ZED3D9MLAAProcessor::Deinitialize()
@@ -325,7 +322,7 @@ void ZED3D9MLAAProcessor::Deinitialize()
 	ZED3D_RELEASE(PixelShaderWeightBlending);
 	ZED3D_RELEASE(PixelShaderColorBlending);
 
-	DestroyRenderTargets();
+	DestroyBuffers();
 }
 
 void ZED3D9MLAAProcessor::OnDeviceLost()
@@ -343,7 +340,10 @@ void ZED3D9MLAAProcessor::Process()
 	zeProfilerStart("MLAA Pass");
 	D3DPERF_BeginEvent(0, L"MLAA Pass");
 
-	CreateRenderTargets();
+	if (Renderer->GetCamera() == NULL)
+		return;
+
+	UpdateBuffers();
 
 	EdgeDetectionPass(InputDepthBuffer, InputNormalBuffer, EdgeBuffer);
 	WeightBlendingPass(EdgeBuffer, AreaBuffer, BlendWeightBuffer);

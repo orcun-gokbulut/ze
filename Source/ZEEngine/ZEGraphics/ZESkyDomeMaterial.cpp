@@ -54,10 +54,6 @@ ZESkyDomeMaterial::ZESkyDomeMaterial()
 	OuterRadius				= 61500.0f;
 	InnerRadius				= 60000.0f;
 
-	AmbientFactor			= 1.0000f;
-	MiddayAmbientColor		= ZEVector3(0.0f, 0.0f, 0.0f);
-	SunsetAmbientColor		= ZEVector3(0.0f, 0.0f, 0.0f);
-
 	SunLightDirection		= ZEVector3(0.0f, 0.0f, -1.0f);
 	SunLightWaveLenght		= ZEVector3(0.650f, 0.570f, 0.475f);
 

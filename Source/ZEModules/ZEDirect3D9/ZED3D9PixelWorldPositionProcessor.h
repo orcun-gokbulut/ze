@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9SkyDomeMaterial.h
+ Zinek Engine - ZED3D9PixelWorldPositionProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,38 +33,66 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_SKY_DOME_MATERIAL_H__
-#define __ZE_D3D9_SKY_DOME_MATERIAL_H__
+#ifndef __ZE_D3D9_PIXEL_WORLD_POSITION_PROCESSOR_H__
+#define __ZE_D3D9_PIXEL_WORLD_POSITION_PROCESSOR_H__
 
+#include "ZEMath/ZEVector.h"
 #include "ZED3D9ComponentBase.h"
-#include "ZEGraphics\ZESkyDomeMaterial.h"
 
+
+class ZETexture2D;
+class ZED3D9ViewPort;
 class ZEFrameRenderer;
-class ZERenderCommand;
-class ZED3D9VertexShader;
+class ZED3D9Texture2D;
 class ZED3D9PixelShader;
+class ZED3D9VertexShader;
+class ZED3D9FrameRenderer;
+class ZETexture2DResource;
 
-class ZED3D9SkyDomeMaterial : public ZESkyDomeMaterial, public ZED3D9ComponentBase
+struct ZEPixelToWorldPositionQuad
 {
-	friend class	ZED3D9Module;
+	float	Position[3];
+	float	TexCoord[2];
+};
 
-	protected:
-		ZED3D9VertexShader*			VertexShader;
-		ZED3D9PixelShader*			PixelShader;
-		
-		void						CreateShaders();
-		void						ReleaseShaders();
-
+class ZED3D9PixelWorldPositionProcessor : public ZED3D9ComponentBase
+{
 	private:
-	public:
-									ZED3D9SkyDomeMaterial();
-		virtual						~ZED3D9SkyDomeMaterial();
-		
-		virtual bool				SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
-		virtual void				UpdateMaterial();
-		virtual void				Release();
+		ZED3D9Texture2D*					InputDepth;
+		ZED3D9FrameRenderer*				Renderer;
 
+		ZED3D9VertexShader*					VertexShader;
+		ZED3D9PixelShader*					PixelShader;
+		ZED3D9Texture2D*					ResultBuffer;
+		IDirect3DSurface9*					ReadBackBuffer;
+
+		static ZEPixelToWorldPositionQuad	Vertices[4];
+		LPDIRECT3DVERTEXDECLARATION9		VertexDeclaration;
+
+		bool								NewInputSet;
+
+		ZEVector2							PixelCoordinate;
+		ZEVector4							WorldCoordinate;
+
+	public:
+		void								SetPixelCoordinate(const ZEVector2& Coord);
+		ZEVector2							GetPixelCoordinate() const;
+		
+		const ZEVector4&					GetWorldCoordinate() const;
+
+		void								Initialize();
+		void								Deinitialize();
+
+		void								SetRenderer(ZED3D9FrameRenderer* FrameRenderer);
+		ZED3D9FrameRenderer*				GetRenderer() const;
+
+		void								SetInputDepth(ZED3D9Texture2D* Texture);
+		ZED3D9Texture2D*					GetInputDepth();
+
+		void								Process();
+
+											ZED3D9PixelWorldPositionProcessor();
+											~ZED3D9PixelWorldPositionProcessor();
 };
 
 #endif

@@ -571,8 +571,6 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 
 	((ZED3D9CloudMaterial*)this)->UpdateShadowTransformations();
 
-// 	IDirect3DSurface9* RenderTarget;
-// 	GetDevice()->GetRenderTarget(0, &RenderTarget);
 
 	// This cloud shadow pass is not functional right now
 

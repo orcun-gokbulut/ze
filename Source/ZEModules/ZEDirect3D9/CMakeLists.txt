@@ -50,6 +50,8 @@ endif()
 
 add_subdirectory (ZED3D9PostProcessor)
 
+ze_add_source(ZED3D9PixelWorldPositionProcessor.cpp		Sources)
+ze_add_source(ZED3D9PixelWorldPositionProcessor.h		Sources)
 ze_add_source(ZED3D9BlurMaskProcessor.cpp				Sources)
 ze_add_source(ZED3D9BlurMaskProcessor.h					Sources)
 ze_add_source(ZED3D9BlurProcessor.cpp					Sources)
@@ -104,6 +106,8 @@ ze_add_source(ZED3D9SkyDomeMaterial.cpp					Sources)
 ze_add_source(ZED3D9SkyDomeMaterial.h					Sources)
 ze_add_source(ZED3D9SSAOProcessor.cpp					Sources)
 ze_add_source(ZED3D9SSAOProcessor.h						Sources)
+ze_add_source(ZED3D9HBAOProcessor.cpp					Sources)
+ze_add_source(ZED3D9HBAOProcessor.h						Sources)
 ze_add_source(ZED3D9SSAAProcessor.cpp					Sources)
 ze_add_source(ZED3D9SSAAProcessor.h						Sources)
 ze_add_source(ZED3D9TerrainMaterial.cpp					Sources)
@@ -137,6 +141,9 @@ ze_add_source(ZED3D9Plugin.cpp							Sources)
 ze_add_source(ZED3D9SeaMaterial.h						Sources)
 ze_add_source(ZED3D9SeaMaterial.cpp						Sources)
 	
+ze_add_source(ZED3D9AerialPerspectiveProcessor.cpp		Sources)
+ze_add_source(ZED3D9AerialPerspectiveProcessor.h		Sources ZEPP)
+
 ze_add_library(ZEDirect3D9 
 	SOURCES ${Sources}
 	LIBS libDirect3D9)

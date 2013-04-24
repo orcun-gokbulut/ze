@@ -48,7 +48,6 @@
 // G					= Paramter to modify symmetry of scattering.
 // GPow2				= G * G.
 
-
 // Application parameters
 // Vertex shader parameters
 float4x4	WorldViewProjMatrix		: register(vs, c0);		// Projections matrix.
@@ -63,10 +62,7 @@ float4		Parameters0				: register(vs, c12);	// x: OuterRadius, y: InnerRadius, z
 float4		Parameters1				: register(vs, c13);	// x: Mie4PI, y: Ray4PI, z: Scale, w: ScaleDepth
 
 // Pixel shader parameters
-float4		MiddayAmbientColor		: register(ps, c0);
-float4		SunsetAmbientColor		: register(ps, c1);
 float4		Parameters2				: register(ps, c2);		// x: G, y: GPow2, z: AmbienFactor
-
 
 #define		CameraPositionOffset	Parameters3.xyz
 #define		ScaleOverScaleDepth		Parameters3.w
@@ -83,13 +79,9 @@ float4		Parameters2				: register(ps, c2);		// x: G, y: GPow2, z: AmbienFactor
 
 #define		G						Parameters2.x
 #define		GPow2					Parameters2.y
-#define		AmbientFactor			Parameters2.z
 
 #define		CameraPosition			Parameters4.xyz
 #define		CameraHeight			Parameters4.w
-
-#define		MiddayFactor			MiddayAmbientColor.w
-#define		SunsetFactor			SunsetAmbientColor.w
 
 #define		SunHeight				-SunDirection.y
 
@@ -223,12 +215,7 @@ PS_OUTPUT ps_main(PS_INPUT Input)
 	Output.PixelColor.rgb += GetRayleighPhase(CosinePow2) * Input.VertColorRay.rgb;
 	Output.PixelColor.rgb += GetMiePhase(Cosine, CosinePow2, G, GPow2) * Input.VertColorMie.rgb;
 
-	float3 MiddayColor = lerp((float3)0.0f, MiddayAmbientColor, MiddayFactor);
-	float3 SunsetColor = lerp((float3)0.0f, SunsetAmbientColor, SunsetFactor);
-
-	Output.PixelColor.rgb +=  MiddayColor * (1.0f - AmbientFactor);
-	Output.PixelColor.rgb +=  SunsetColor * (AmbientFactor);
-
+	// try 11x/(11x / 1.1 +1) for transparency calculation
 	Output.PixelColor.a = saturate((log10(Output.PixelColor.b * 2.0f + 0.025f) + 1.6f));
 
 	return Output;

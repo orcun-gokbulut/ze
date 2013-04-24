@@ -74,10 +74,9 @@ float		Saturation						: register(c8);
 float		ElapsedTime						: register(c9);
 float		BloomWeight 					: register(c10);
 
-#define		BLUR_FILTER_WIDTH				11
+#define		BLUR_FILTER_WIDTH				9
 float4		BlurFilter[BLUR_FILTER_WIDTH]	: register(c15);
-#define		FILTER_OFFSET_X(Index)			BlurFilter[Index].x
-#define		FILTER_OFFSET_Y(Index)			BlurFilter[Index].y
+#define		FILTER_OFFSET(Index)			BlurFilter[Index].xy
 #define		FILTER_TAP(Index)				BlurFilter[Index].z
 
 static const float3 LumWeights = float3(0.299f, 0.587f, 0.114f);
@@ -185,7 +184,7 @@ float4 PSMainBlurHorizontal(PSInput Input) : COLOR0
 	[unroll]
 	for (int I = 0; I < BLUR_FILTER_WIDTH; ++I)
 	{
-		float2 SampleOffset = Input.TexCoord + float2(FILTER_OFFSET_X(I), 0.0f);
+		float2 SampleOffset = Input.TexCoord + FILTER_OFFSET(I);
 		float4 SampleColor = tex2D(ColorTexture, SampleOffset);
 		Color += SampleColor * FILTER_TAP(I);
 	}
@@ -204,7 +203,7 @@ float4 PSMainBlurVerticalUpSample2x(PSInput Input) : COLOR0
 	[unroll]
 	for (int I = 0; I < BLUR_FILTER_WIDTH; ++I)
 	{
-		float2 SampleOffset = Input.TexCoord + float2(0.0f, FILTER_OFFSET_Y(I));
+		float2 SampleOffset = Input.TexCoord + FILTER_OFFSET(I);
 		float4 SampleColor = tex2D(ColorTexture, SampleOffset);
 		Color += SampleColor * FILTER_TAP(I);
 	}
@@ -310,8 +309,7 @@ float4 PSMainLuminanceAdaptation(PSInput Input) : COLOR0
 	}
 	Luminance *= NormFactor3x3;
 
-	// Measured luminance is linear at this point but
-	// previous luminanace is logarithmic
+	// Measured luminance is linear at this point but previous luminanace is logarithmic
 	float PreviousLuminance = exp(tex2D(PreviousAdaptedLuminance, Input.TexCoord).r);
 	
 	// Pattanaik's technique
