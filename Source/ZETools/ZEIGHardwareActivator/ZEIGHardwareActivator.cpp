@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEIGHardwareActivator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,21 +30,43 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZEDS/ZEFormat.h"
+#include "md5.h"
 
-ze_set_project_folder("ZETools")
+#include <stdio.h>
+#include <intrin.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
+int main(int argc, char** argv)
+{
+	printf("Activating this hardware as ZinekIG hardware.");
+	char SystemDirectoryPath[256];
+	GetSystemDirectory(SystemDirectoryPath, 256);
 
-ze_add_module(ZE3dsMax)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZEToolComponents)
-ze_add_module(ZECrashReport)
-#ze_add_module(ZETerrainExporter)
-ze_add_module(ZEIGHardwareActivator)
+	char ActivationFile[512];
+	sprintf(ActivationFile, "%s\\zinekig.act", SystemDirectoryPath);
 
-ze_add_cmake_project(ZETools)
+	char ActivationCode[256];
+	memset(ActivationCode, 0, 256);
+
+	FILE* File = fopen(ActivationFile, "w");
+	if (File == NULL)
+	{
+		printf("Activation failed please run as administrator.");
+		return EXIT_FAILURE;
+	}
+
+	int Values[4];
+	__cpuid(Values, 0);
+	ZEString Key = ZEFormat::Format("8961a9-8sd4f32hl%{0:X:08}%RcasT435%{1:X:08}%4fdgd24**45%{2:X:08}%EaBXA313", Values[1], Values[2], Values[3]);
+	std::string GeneratedActivationCode = md5(Key.ToCString());
+	
+	fputs(GeneratedActivationCode.c_str(), File);
+	fclose(File);
+
+	printf("Done.");
+}

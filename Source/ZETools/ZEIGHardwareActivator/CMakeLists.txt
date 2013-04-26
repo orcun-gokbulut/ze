@@ -33,18 +33,14 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-ze_set_project_folder("ZETools")
+ze_add_source(md5.cpp						Sources)
+ze_add_source(md5.h							Sources)
+ze_add_source(ZEIGHardwareActivator.cpp		Sources)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
 
-ze_add_module(ZE3dsMax)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZEToolComponents)
-ze_add_module(ZECrashReport)
-#ze_add_module(ZETerrainExporter)
-ze_add_module(ZEIGHardwareActivator)
-
-ze_add_cmake_project(ZETools)
+ze_add_executable(ZEIGHardwareActivator
+	CONSOLE
+	SOURCES ${Sources}
+	LIBS ZEFoundation)
