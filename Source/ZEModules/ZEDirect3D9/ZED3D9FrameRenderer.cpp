@@ -1293,12 +1293,13 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		BlurProcessor.SetInput(BlurBuffer);
 		BlurProcessor.SetOutput((ZED3D9ViewPort*)GrainBuffer->GetViewPort());
 		BlurProcessor.Process();
+
 		*/
+		
 		// Grain
 		GrainProcessor.SetInput(GrainBuffer);
 		GrainProcessor.SetOutput(ViewPort);
 		GrainProcessor.Process(ElaspedTime);
-
 	
 		Do2DPass();
 

@@ -423,7 +423,7 @@ ZEDirectionalLight::ZEDirectionalLight()
 	{
 		Cascades[I].ShadowMap = NULL;
 		Cascades[I].Index = (ZEUInt)I;
-		Cascades[I].UpdateInterval = (ZEUInt)I + 1;
+		Cascades[I].UpdateInterval = 1;//(ZEUInt)I + 1;
 		Cascades[I].ShadowTransform = ZEMatrix4x4::Identity;
 		Cascades[I].NearZ = Cascades[I].FarZ = Cascades[I].Depth = 0.0f;
 	}

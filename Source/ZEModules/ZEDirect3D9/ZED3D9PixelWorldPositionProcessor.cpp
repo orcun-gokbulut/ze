@@ -46,11 +46,8 @@
 
 void ZED3D9PixelWorldPositionProcessor::SetPixelCoordinate(const ZEVector2& Coord)
 {
-	if (PixelCoordinate != Coord)
-	{
-		NewInputSet = true;
-		PixelCoordinate = Coord;
-	}
+	NewInputSet = true;
+	PixelCoordinate = Coord;
 }
 
 ZEVector2 ZED3D9PixelWorldPositionProcessor::GetPixelCoordinate() const
@@ -203,7 +200,7 @@ void ZED3D9PixelWorldPositionProcessor::Process()
 	ZERay Ray;
 	Camera->GetScreenRay(Ray, (ZEUInt)(PixelCoordinate.x + 0.5f), (ZEUInt)(PixelCoordinate.y + 0.5f));
 
-	WorldCoordinate = ZEVector4(Ray.v * Depth, 1.0f);
+	WorldCoordinate = ZEVector4(Ray.v * Depth + Camera->GetWorldPosition(), 1.0f);
 
 	NewInputSet = false;
 	D3DPERF_EndEvent();
