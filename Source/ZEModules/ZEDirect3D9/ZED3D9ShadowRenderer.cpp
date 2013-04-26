@@ -531,7 +531,7 @@ ZED3D9ShadowRenderer::ZED3D9ShadowRenderer()
 	RandomRotationMap = NULL;
 	FilterType = ZE_SMFT_PCF_POISSON_5_TAP;
 
-	ShadowResolution = 2048;
+	ShadowResolution = 4096;
 }
 
 ZED3D9ShadowRenderer::~ZED3D9ShadowRenderer()

@@ -113,8 +113,8 @@ void ZEGraphicsModule::BaseInitialize()
 	GraphicsOptions.AddOption(new ZEOption("HDRQuality", 5, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ShadowQuality", 1, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("LightQuantity", 1, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("NearZ", 0.2f, ZE_OA_INTERNAL));
-	GraphicsOptions.AddOption(new ZEOption("FarZ", 2000.0f, ZE_OA_INTERNAL));
+	GraphicsOptions.AddOption(new ZEOption("NearZ", 5.0f, ZE_OA_INTERNAL));
+	GraphicsOptions.AddOption(new ZEOption("FarZ", 20000.0f, ZE_OA_INTERNAL));
 	ZEOptionManager::GetInstance()->RegisterSection(&GraphicsOptions);
 }
 
