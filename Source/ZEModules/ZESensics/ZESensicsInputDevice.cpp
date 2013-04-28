@@ -45,6 +45,7 @@
 #include <windows.h>
 #include <dinput.h>
 #include <memory.h>
+#include "ZEMath/ZEAngle.h"
 
 BOOL CALLBACK EnumDeviceCallback(const DIDEVICEINSTANCE* DeviceInstance, VOID* SensicDevicePtr)
 {
@@ -123,21 +124,23 @@ bool ZESensicsInputDevice::InitializeSelf()
 	}
 
 	DirectInput->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumDeviceCallback, this, DIEDFL_ATTACHEDONLY);
-	if (SensicDevice == NULL)
+	if (SensicDevice != NULL)
 	{
-		Deinitialize();
-		return false;
-	}
+		if (FAILED(SensicDevice->SetDataFormat(&c_dfDIJoystick2)))
+		{
+			Deinitialize();
+			return false;
+		}
 
-	if (FAILED(SensicDevice->SetDataFormat(&c_dfDIJoystick2)))
+		SensicDevice->SetCooperativeLevel((HWND)ZEWindow::GetInstance()->GetHandle(), DISCL_EXCLUSIVE|DISCL_FOREGROUND );
+		SensicDevice->EnumObjects(EnumDeviceObjectCallback, this, DIDFT_AXIS);
+		SensicDevice->Acquire();
+	}
+	else
 	{
-		Deinitialize();
-		return false;
+		DirectInput->Release();
+		DirectInput = NULL;
 	}
-
-	SensicDevice->SetCooperativeLevel((HWND)ZEWindow::GetInstance()->GetHandle(), DISCL_EXCLUSIVE|DISCL_FOREGROUND );
-	SensicDevice->EnumObjects(EnumDeviceObjectCallback, this, DIDFT_AXIS);
-	SensicDevice->Acquire();
 
 	Description.Type = ZE_IDT_SENSOR;
 	Description.FullName = "Sensics HMD Tracker";
@@ -176,7 +179,7 @@ bool ZESensicsInputDevice::DeinitializeSelf()
 
 void ZESensicsInputDevice::Acquire()
 {
-	if (!IsInitialized())
+	if (!IsInitialized() || SensicDevice == NULL)
 		return;
 
 	if (SensicDevice->Acquire() == DI_OK)
@@ -185,17 +188,39 @@ void ZESensicsInputDevice::Acquire()
 
 void ZESensicsInputDevice::UnAcquire()
 {
-	if (!IsInitialized())
+	if (!IsInitialized() || SensicDevice == NULL)
 		return;
 
 	SensicDevice->Unacquire();
 	ZEInputDevice::UnAcquire();
 }
 
+static void quaternionToMatrix( float q[4], float m[3][3] )
+{
+	m[0][0] = q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2];
+	m[0][1] = 2 * (q[0] * q[1] + q[2] * q[3]);
+	m[0][2] = 2 * (q[0] * q[2] - q[1] * q[3]);
+	m[1][0] = 2 * (q[0] * q[1] - q[2] * q[3]);
+	m[1][1] = q[3] * q[3] - q[0] * q[0] + q[1] * q[1] - q[2] * q[2];
+	m[1][2] = 2 * (q[1] * q[2] + q[0] * q[3]);
+	m[2][0] = 2 * (q[0] * q[2] + q[1] * q[3]);
+	m[2][1] = 2 * (q[1] * q[2] - q[0] * q[3]);
+	m[2][2] = q[3] * q[3] - q[0] * q[0] - q[1] * q[1] + q[2] * q[2];
+}
+static void matrixToYPR( const float m[3][3], float ypr[3] )
+{
+	ypr[0] = atan2( m[0][1], m[0][0] ); // yaw
+	ypr[1] = asin( m[0][2] ); // pitch
+	ypr[2] = -atan2( m[1][2], m[2][2] ); // roll
+}
+
 void ZESensicsInputDevice::Process()
 {
 	State.Advance();
 	
+	if (SensicDevice == NULL)
+		return;
+
 	DIJOYSTATE2 Data; // DirectInput joystick state structure
 	if (SensicDevice->GetDeviceState(sizeof(Data), &Data) != DI_OK)
 		return;
@@ -211,7 +236,26 @@ void ZESensicsInputDevice::Process()
 	y = y / mag;
 	z = z / mag;
 
-	State.Quaternions.CurrentValues[0] = ZEQuaternion(-w, -y, z, x);
+	//State.Quaternions.CurrentValues[0] = ZEQuaternion(-w, -y, z, x);
+	//State.Quaternions.CurrentValues[0] = ZEQuaternion(w, -x, -y, -z);
+	//State.Quaternions.CurrentValues[0] = ZEQuaternion(-ZE_PI_2, ZEVector3::UnitZ) * ZEQuaternion(ZE_PI, ZEVector3::UnitX) * ZEQuaternion(w, x, y, -z).Conjugate();
+	
+	float q[4];
+	float m[3][3];
+	float yawPitchRoll[3];
+	q[0] = x;
+	q[1] = y;
+	q[2] = -z;
+	q[3] = w;
+
+	quaternionToMatrix(q, m);
+	matrixToYPR(m, yawPitchRoll);
+
+	float Yaw = yawPitchRoll[0];
+	float Pitch = yawPitchRoll[1];
+	float Roll = yawPitchRoll[2];
+
+	ZEQuaternion::CreateFromEuler(State.Quaternions.CurrentValues[0], -Pitch, Yaw, Roll);
 }
 
 ZESensicsInputDevice::ZESensicsInputDevice()
