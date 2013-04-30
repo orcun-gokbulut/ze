@@ -228,9 +228,7 @@ void ZED3D9AerialPerspectiveProcessor::Process()
 	ZEMatrix4x4::Inverse(InvProjectionMatrix, Camera->GetProjectionTransform());
 
 	GetDevice()->SetVertexShaderConstantF(0, ParameterPixelSize.M, 1);
-	GetDevice()->SetVertexShaderConstantF(14, InvProjectionMatrix.MA, 4);
-
-	GetDevice()->SetPixelShaderConstantF(10, InvViewMatrix.MA, 4);
+	GetDevice()->SetVertexShaderConstantF(1, InvProjectionMatrix.MA, 4);
 	
 	GetDevice()->SetPixelShaderConstantF(1, ParameterScatterSymmetry.M, 1);
 	GetDevice()->SetPixelShaderConstantF(2, ParameterBetaMie.M, 1);
@@ -240,6 +238,8 @@ void ZED3D9AerialPerspectiveProcessor::Process()
 	GetDevice()->SetPixelShaderConstantF(7, ParameterCameraPosition.M, 1);
 	GetDevice()->SetPixelShaderConstantF(8, ParameterSunColor.M, 1);
 	GetDevice()->SetPixelShaderConstantF(9, ParameterExtFactor.M, 1);
+	GetDevice()->SetPixelShaderConstantF(10, InvViewMatrix.MA, 4);
+	
 
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATEREQUAL);
@@ -300,9 +300,9 @@ ZED3D9AerialPerspectiveProcessor::ZED3D9AerialPerspectiveProcessor()
 	MieFactor = 1.0f;
 	RayleighFactor = 1.0f;
 	ExtinctionFactor = 5.0f;
-	ScatterSymmetry = -0.8f;
+	ScatterSymmetry = -0.0f;
 	
-	SunIntensity = 2.3f;
+	SunIntensity = 3.0f;
 	SunColor = ZEVector3::One;
 	
 	SunDirection = ZEVector3(-0.5f, -0.5f, -0.5f);

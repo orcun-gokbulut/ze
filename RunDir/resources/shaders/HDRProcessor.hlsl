@@ -64,15 +64,26 @@ sampler2D	MeasuredLuminance				: register(s4);
 sampler2D	AdditionTexture					: register(s5);
 
 float2		PixelSize						: register(c0);
-float		Key								: register(c1);
-float		Exposure						: register(c3);
-float		AdaptationRate					: register(c4);
-float		BloomFactor						: register(c5);
-float		BloomTreshold					: register(c6);
-float		WhiteLevel						: register(c7);
-float		Saturation						: register(c8);
-float		ElapsedTime						: register(c9);
-float		BloomWeight 					: register(c10);
+
+float4		Parameters1						: register(c1);
+float4		Parameters2						: register(c2);
+float4		Parameters3						: register(c3);
+float4		Parameters4						: register(c4);
+
+#define		Key								Parameters1.x
+#define		Exposure						Parameters1.y
+#define		BloomFactor						Parameters1.z
+#define		WhiteLevel						Parameters1.w
+
+#define		Saturation						Parameters2.x
+#define		BloomTreshold					Parameters2.y
+#define		ElapsedTime						Parameters2.z
+#define		AdaptationRate					Parameters2.w
+
+#define		LuminanceUpper					Parameters3.x
+#define		LuminanceLower					Parameters3.y
+
+#define		BloomWeight						Parameters4.x
 
 #define		BLUR_FILTER_WIDTH				9
 float4		BlurFilter[BLUR_FILTER_WIDTH]	: register(c15);
@@ -240,7 +251,7 @@ float4 PSConvertToLuminance(PSInput Input) : COLOR0
 	}
 	Color *= NormFactor3x3;
 
-	float Luminance = CalculateLuminance(Color.rgb);
+	float Luminance = clamp(CalculateLuminance(Color.rgb), LuminanceLower, LuminanceUpper);
 
 	return float4(Luminance.r, 1.0f, 1.0f, 1.0f);
 }
@@ -313,7 +324,7 @@ float4 PSMainLuminanceAdaptation(PSInput Input) : COLOR0
 	float PreviousLuminance = exp(tex2D(PreviousAdaptedLuminance, Input.TexCoord).r);
 	
 	// Pattanaik's technique
-    float NewLuminance = PreviousLuminance + (Luminance - PreviousLuminance) * (1.0f - exp(-ElapsedTime.x * AdaptationRate.x));
+    float NewLuminance = PreviousLuminance + (Luminance - PreviousLuminance) * (1.0f - exp(-ElapsedTime * AdaptationRate));
 
 	// New luminance is logarithmic
 	return float4(log(NewLuminance), 1.0f, 1.0f, 1.0f);

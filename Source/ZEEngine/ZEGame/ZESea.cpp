@@ -107,6 +107,7 @@ ZESea::ZESea()
 	SeaVertex* Vertices = (SeaVertex*)VertexBuffer->Lock();
 	if (Vertices != NULL)
 	{
+		/*
 		Vertices[0].Position = ZEVector4(-0.5f, 0.0f, 0.5f, 1.0f);
 		Vertices[0].Normal = ZEVector3::UnitY;
 		Vertices[0].BiNormal = ZEVector3::UnitX;
@@ -141,6 +142,43 @@ ZESea::ZESea()
 		Vertices[5].Normal = ZEVector3::UnitY;
 		Vertices[5].BiNormal = ZEVector3::UnitX;
 		Vertices[5].Tangent = ZEVector3::UnitZ;
+		Vertices[5].TextureCoordinate = ZEVector2(0.0f, 1.0f);
+		*/
+
+		Vertices[0].Position = ZEVector4(-0.5f, 0.0f, 0.5f, 1.0f);
+		Vertices[0].Normal = ZEVector3::UnitY;
+		Vertices[0].BiNormal = ZEVector3::UnitX;
+		Vertices[0].Tangent = -ZEVector3::UnitZ;
+		Vertices[0].TextureCoordinate = ZEVector2::Zero;
+
+		Vertices[1].Position = ZEVector4(0.5f, 0.0f, 0.5f, 1.0f);
+		Vertices[1].Normal = ZEVector3::UnitY;
+		Vertices[1].BiNormal = ZEVector3::UnitX;
+		Vertices[1].Tangent = -ZEVector3::UnitZ;
+		Vertices[1].TextureCoordinate = ZEVector2(1.0f, 0.0f);
+
+		Vertices[2].Position = ZEVector4(0.5f, 0.0f, -0.5f, 1.0f);
+		Vertices[2].Normal = ZEVector3::UnitY;
+		Vertices[2].BiNormal = ZEVector3::UnitX;
+		Vertices[2].Tangent = -ZEVector3::UnitZ;
+		Vertices[2].TextureCoordinate = ZEVector2(1.0f, 1.0f);
+
+		Vertices[3].Position = ZEVector4(-0.5f, 0.0f, 0.5f, 1.0f);
+		Vertices[3].Normal = ZEVector3::UnitY;
+		Vertices[3].BiNormal = ZEVector3::UnitX;
+		Vertices[3].Tangent = -ZEVector3::UnitZ;
+		Vertices[3].TextureCoordinate = ZEVector2::Zero;
+
+		Vertices[4].Position = ZEVector4(0.5f, 0.0f, -0.5f, 1.0f);
+		Vertices[4].Normal = ZEVector3::UnitY;
+		Vertices[4].BiNormal = ZEVector3::UnitX;
+		Vertices[4].Tangent = -ZEVector3::UnitZ;
+		Vertices[4].TextureCoordinate = ZEVector2::One;
+
+		Vertices[5].Position = ZEVector4(-0.5f, 0.0f, -0.5f, 1.0f);
+		Vertices[5].Normal = ZEVector3::UnitY;
+		Vertices[5].BiNormal = ZEVector3::UnitX;
+		Vertices[5].Tangent = -ZEVector3::UnitZ;
 		Vertices[5].TextureCoordinate = ZEVector2(0.0f, 1.0f);
 	}
 

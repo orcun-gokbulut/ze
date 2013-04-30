@@ -41,6 +41,8 @@
 sampler2D	ColorTexture			: register(s3);
 
 float2		PixelSize				: register(c0);
+float4x4	InvProjMatrix			: register(c1);
+
 float		ScatterSymmetry			: register(c1);
 float3		BetaMie					: register(c2);
 float3		BetaRayleigh			: register(c3);
@@ -49,9 +51,7 @@ float3		SunDirection			: register(c6);
 float3		CameraPosition			: register(c7);
 float3		SunColor				: register(c8);
 float		ExtinctionFactor		: register(c9);
-
 float4x4	InvViewMatrix			: register(c10);
-float4x4	InvProjMatrix			: register(c14);
 
 struct VSInput
 {
@@ -94,14 +94,14 @@ VSOutput VSMain(VSInput Input)
 
 float GetMiePhase(float Angle)
 {
-	static const float Constant = 1.0f / (4.0f * PI);
-	return  Constant * pow(1.0f - ScatterSymmetry, 2.0f) / pow(1.0f + ScatterSymmetry*ScatterSymmetry - 2.0f * ScatterSymmetry * Angle, 1.5f);
+	static const float MiePhaseConstant = 1.0f / (4.0f * PI);
+	return  MiePhaseConstant * pow(1.0f - ScatterSymmetry, 2.0f) / pow(1.0f + ScatterSymmetry*ScatterSymmetry - 2.0f * ScatterSymmetry * Angle, 1.5f);
 }
 
 float GetRayleighPhase(float Angle)
 {
-	static const float Constant = 3.0f / (16.0f * PI);
-	return Constant * (1.0f + pow(Angle, 2.0f));
+	static const float RayPhaseConstant = 3.0f / (16.0f * PI);
+	return RayPhaseConstant * (1.0f + pow(Angle, 2.0f));
 }
 
 /*
