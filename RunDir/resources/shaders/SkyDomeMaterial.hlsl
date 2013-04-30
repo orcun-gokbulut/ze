@@ -166,7 +166,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 		float SamplePointHeight = length(SamplePoint);
 		float SamplePointDepth = exp(ScaleOverScaleDepth * (InnerRadius - SamplePointHeight));
 		
-		// Limit Smaple point Depth not to get extreme color values where SamplePointDepth < 0!!
+		// Limit extreme output values when SamplePointDepth goes to zero
 		SamplePointDepth = saturate(SamplePointDepth);
 		
 		float SamplePointLightAngle = dot(-SunDirection, SamplePoint) / SamplePointHeight;

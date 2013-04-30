@@ -89,9 +89,9 @@ bool ZED3D9SeaMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderComm
 	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-
-	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
-	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_MIRROR);
+	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
 
 	GetDevice()->SetTexture(0, DiffuseTexture == NULL ? NULL : ((ZED3D9Texture2D*)DiffuseTexture)->Texture);
 	GetDevice()->SetPixelShader(ForwardPassPixelShader->GetPixelShader());
@@ -134,9 +134,9 @@ bool ZED3D9SeaMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderComm
 	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
 
 	GetDevice()->SetTexture(0, NormalTexture == NULL ? NULL : ((ZED3D9Texture2D*)NormalTexture)->Texture);
 	GetDevice()->SetPixelShader(GPassPixelShader->GetPixelShader());

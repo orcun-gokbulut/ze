@@ -89,9 +89,9 @@ VSOutputGPass VSMainGPass(VSInput Input)
 
 	Output.Texcoord = Input.Textcoord * EntityScale;
 	Output.Position = mul(WorldViewPorjMatrix, Input.Position);
-	Output.Normal 	= mul((float3x3)WorldViewMatrix, Input.Normal);
-	Output.BiNormal = mul((float3x3)WorldViewMatrix, Input.BiNormal);
-	Output.Tangent 	= mul((float3x3)WorldViewMatrix, Input.Tangent);
+	Output.Normal 	= normalize(mul((float3x3)WorldViewMatrix, Input.Normal));
+	Output.Tangent 	= normalize(mul((float3x3)WorldViewMatrix, Input.Tangent));
+	Output.BiNormal = normalize(mul((float3x3)WorldViewMatrix, Input.BiNormal));
 	Output.ViewPosition = mul(WorldViewMatrix, Input.Position).xyz;
 	
 	return Output;
@@ -111,7 +111,8 @@ ZEGBuffer PSMainGPass(PSInputGPass Input)
 {
 	ZEGBuffer GBuffer = (ZEGBuffer)0;
 
-	float3 Normal = tex2D(Texture, Input.Texcoord * NormalTileScale + NormalSampleOffset).xyz * 2.0f - 1.0f;
+	float2 SampleCoord = Input.Texcoord * NormalTileScale + NormalSampleOffset;
+	float3 Normal = tex2D(Texture, SampleCoord).xyz * 2.0f - 1.0f;
 	Normal = normalize(Normal.x * Input.Tangent + Normal.y * Input.BiNormal + Normal.z * Input.Normal);
 
 	ZEGBuffer_SetViewNormal(GBuffer, Normal * Input.Side);	

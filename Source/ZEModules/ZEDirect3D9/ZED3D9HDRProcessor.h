@@ -113,6 +113,8 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 		float							Exposure;
 		float							WhiteLevel;
 		float							Saturation;
+		float							LuminanceUpper;
+		float							LuminanceLower;
 		float							AdaptationRate;
 		ZEHDRToneMapOperator			ToneMapOperator;
 
@@ -195,6 +197,12 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 
 		void							SetSaturation(float Value);
 		float							GetSaturation() const;
+
+		void							SetLuminanceUpper(float Value);
+		float							GetLuminanceUpper() const;
+
+		void							SetLuminanceLower(float Value);
+		float							GetLuminanceLower() const;
 
 		void							SetBloomPassCount(ZEUInt Value);
 		ZEUInt							GetBloomPassCount() const;

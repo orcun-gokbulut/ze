@@ -132,7 +132,7 @@ ZELBuffer ZEPointLight_PixelShader(ZEPointLight_PSInput Input) : COLOR0
 	float3 LightDirection = LightDisplacement / LightDistance;
 	
 	float4 Output;
-	float AngularAttenuation = saturate(dot(LightDirection, Normal));
+	float AngularAttenuation = dot(LightDirection, Normal);
 
 	if (AngularAttenuation > 0.0f)
 	{
@@ -241,8 +241,7 @@ ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input) : COL
 	float AngularAttenuation = dot(LightDirectionParam, Normal);
 	
 	float ShadowFactor = ZEDirectionalLight_GetShadowFactor(Position, Normal, Input.ScreenPosition.xy, AngularAttenuation);
-	
-	// Light Derived Parameters
+
 	float4 Output = (float4)0.0f;
 	if (AngularAttenuation > 0.0f)
 	{
@@ -309,7 +308,7 @@ ZELBuffer ZEProjectiveLight_PixelShader(ZEProjectiveLight_PSInput Input) : COLOR
 	float3 LightDirection = LightDisplacement / LightDistance;
 
 	float4 Output;
-	float AngularAttenuation = saturate(dot(LightDirection, Normal));
+	float AngularAttenuation = dot(LightDirection, Normal);
 	if (AngularAttenuation > 0.0f)
 	{
 		float3 SpecularPower = ZEGBuffer_GetSpecularPower(ScreenPosition);
@@ -329,7 +328,6 @@ ZELBuffer ZEProjectiveLight_PixelShader(ZEProjectiveLight_PSInput Input) : COLOR
 		Output *= DistanceAttenuation;
 
 		//Output *= SampleShadowMap(ProjectionShadowMap, TextureLookup);
-		
 	}
 	else
 	{

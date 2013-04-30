@@ -298,7 +298,6 @@ void ZED3D9HDRProcessor::ColorDownSample2x(const ZED3D9Texture2D* Input, ZED3D9T
 	D3DPERF_EndEvent();
 }
 
-// Input and output should be same size
 void ZED3D9HDRProcessor::HorizontalBlur(ZED3D9Texture2D* Input, ZED3D9Texture2D* Output)
 {
 	D3DPERF_BeginEvent(0, L"Horizontal Blur");
@@ -337,7 +336,6 @@ void ZED3D9HDRProcessor::HorizontalBlur(ZED3D9Texture2D* Input, ZED3D9Texture2D*
 	D3DPERF_EndEvent();
 }
 
-// Input and output should be same size
 void ZED3D9HDRProcessor::VerticalBlurAdditiveUpSample2x(ZED3D9Texture2D* Input, float BloomWeight, ZED3D9Texture2D* Addition, ZED3D9Texture2D* Output)
 {
 	D3DPERF_BeginEvent(0, L"Vertical Blur");
@@ -376,7 +374,7 @@ void ZED3D9HDRProcessor::VerticalBlurAdditiveUpSample2x(ZED3D9Texture2D* Input, 
 	GetDevice()->SetPixelShaderConstantF(15, Filter[1].M, NewWidth-2);
 
 	ZEVector4 ParameterBloomWeight = ZEVector4(BloomWeight, 0.0f, 0.0f, 0.0f);
-	GetDevice()->SetPixelShaderConstantF(10, ParameterBloomWeight.M, 1);
+	GetDevice()->SetPixelShaderConstantF(4, ParameterBloomWeight.M, 1);
 
 	GetDevice()->SetPixelShader(Shaders.BlurVerticalUpSample2x->GetPixelShader());
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(ZEHDRScreenAlignedQuad));
@@ -600,26 +598,38 @@ void ZED3D9HDRProcessor::CommitConstants(float ElapsedTime)
 	GetDevice()->SetSamplerState(5, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(5, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(5, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
+	
+	struct HDRParameters
+	{
+		float Key;
+		float Exposure;
+		float BloomFactor;
+		float WhiteLevel;
+		float Saturation;
+		float BloomTreshold;
+		float ElapsedTime;
+		float AdaptationRate;
+		float LuminanceUpper;
+		float LuminanceLower;
 
-	//! PACK THESE PARAMETERS
-	ZEVector4 ParameterKey = ZEVector4(Key, 0.0f, 0.0f, 0.0f);
-	ZEVector4 ParameterExposure = ZEVector4(Exposure, 0.0f, 0.0f, 0.0f);
-	ZEVector4 ParameterBloomFactor = ZEVector4(BloomFactor, 0.0f, 0.0f, 0.0f);
-	ZEVector4 ParameterWhiteLevel = ZEVector4(WhiteLevel, 0.0f, 0.0f, 0.0f);
-	ZEVector4 ParameterSaturation = ZEVector4(Saturation, 0.0f, 0.0f, 0.0f);
-	ZEVector4 ParameterBloomTreshold = ZEVector4(BloomTreshold, 0.0f, 0.0f, 0.0f);
-	ZEVector4 ParameterElapsedTime = ZEVector4(ElapsedTime, 0.0f, 0.0f, 0.0f);
-	ZEVector4 ParameterAdaptRate = ZEVector4(AdaptationRate, 0.0f, 0.0f, 0.0f);
-		
-	GetDevice()->SetPixelShaderConstantF(1, ParameterKey.M, 1);
-	GetDevice()->SetPixelShaderConstantF(3, ParameterExposure.M, 1);
-	GetDevice()->SetPixelShaderConstantF(4, ParameterAdaptRate.M, 1);
-	GetDevice()->SetPixelShaderConstantF(5, ParameterBloomFactor.M, 1);
-	GetDevice()->SetPixelShaderConstantF(6, ParameterBloomTreshold.M, 1);
-	GetDevice()->SetPixelShaderConstantF(7, ParameterWhiteLevel.M, 1);
-	GetDevice()->SetPixelShaderConstantF(8, ParameterSaturation.M, 1);
-	GetDevice()->SetPixelShaderConstantF(9, ParameterElapsedTime.M, 1);
+		float Dummy1;
+		float Dummy2;
+	};
 
+	HDRParameters Parameters = {0.0f};
+	Parameters.Key = Key;
+	Parameters.Exposure = Exposure;
+	Parameters.BloomFactor = BloomFactor;
+	Parameters.WhiteLevel = WhiteLevel;
+	Parameters.Saturation = Saturation;
+	Parameters.BloomTreshold = BloomTreshold;
+	Parameters.ElapsedTime = ElapsedTime;
+	Parameters.AdaptationRate = AdaptationRate;
+	Parameters.LuminanceUpper = LuminanceUpper;
+	Parameters.LuminanceLower = LuminanceLower;
+
+	GetDevice()->SetPixelShaderConstantF(1, (const float*)&Parameters, 3);
+	
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
@@ -831,6 +841,26 @@ float ZED3D9HDRProcessor::GetSaturation() const
 	return Saturation;
 }
 
+void ZED3D9HDRProcessor::SetLuminanceUpper(float Value)
+{
+	LuminanceUpper = Value;
+}
+
+float ZED3D9HDRProcessor::GetLuminanceUpper() const
+{
+	return LuminanceUpper;
+}
+
+void ZED3D9HDRProcessor::SetLuminanceLower(float Value)
+{
+	LuminanceLower = Value;
+}
+
+float ZED3D9HDRProcessor::GetLuminanceLower() const
+{
+	return LuminanceLower;
+}
+
 void ZED3D9HDRProcessor::SetBloomPassCount(ZEUInt Count)
 {
 	BloomPassCount = Count;
@@ -946,8 +976,10 @@ ZED3D9HDRProcessor::ZED3D9HDRProcessor()
 
 	Key = 0.35f;
 	Exposure = 0.3f;
-	WhiteLevel = 5.0f;
 	Saturation = 1.0f;
+	WhiteLevel = 5.0f;
+	LuminanceUpper = 10.0f;
+	LuminanceLower = 0.00f;
 	AdaptationRate = 1.5f;
 	ToneMapOperator = ZE_HDR_TMO_FILMIC;
 
