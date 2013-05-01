@@ -136,6 +136,21 @@ void ZED3D9Texture2D::Lock(void** Buffer, ZESize* Pitch, ZEUInt Level)
 	*Pitch = (ZESize)Rect.Pitch;
 }
 
+void ZED3D9Texture2D::Lock(void** Buffer, ZESize* Pitch, ZEUInt Level, ZEUInt PositionX, ZEUInt PositionY, ZEUInt Width, ZEUInt Height)
+{
+	RECT Region;
+	Region.left = PositionX;
+	Region.right = PositionX + Width;
+	Region.top = PositionY;
+	Region.bottom = PositionY + Height;
+
+	D3DLOCKED_RECT Rect;
+	Texture->LockRect(Level, &Rect, &Region, NULL);
+	*Buffer = Rect.pBits;
+	*Pitch = (ZESize)Rect.Pitch;
+
+}
+
 void ZED3D9Texture2D::Unlock(ZEUInt Level)
 {
 	Texture->UnlockRect(Level);
