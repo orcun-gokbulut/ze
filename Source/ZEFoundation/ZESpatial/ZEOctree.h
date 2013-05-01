@@ -41,6 +41,7 @@
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEMath/ZETriangle.h"
 
 template < typename Type, typename Allocator = ZEAllocatorBase<Type> >
 class ZEOctree
@@ -60,17 +61,27 @@ class ZEOctree
 			return Parent;
 		}
 
-		ZEOctree** GetNodes()
+		const ZEOctree* GetParent() const
+		{
+			return Parent;
+		}
+
+		const ZEOctree** const GetNodes()
 		{
 			return Nodes;
 		}
 
-		ZEUInt GetDepth()
+		const ZEOctree** const GetNodes()  const
+		{
+			return (const ZEOctree** const)Nodes;
+		}
+
+		ZEUInt GetDepth()  const
 		{
 			return Depth;
 		}
 
-		ZEUInt GetOctant()
+		ZEUInt GetOctant()  const
 		{
 			return Octant;
 		}
@@ -80,12 +91,12 @@ class ZEOctree
 			MaxDepth = Depth;
 		}
 
-		ZEUInt GetMaxDepth()
+		ZEUInt GetMaxDepth()  const
 		{
 			return MaxDepth;
 		}
 
-		const ZEAABBox& GetBoundingBox()
+		const ZEAABBox& GetBoundingBox()  const
 		{
 			return BoundingBox;
 		}
@@ -95,7 +106,7 @@ class ZEOctree
 			this->BoundingBox = BoundingBox;
 		}
 
-		ZESize GetItemCount()
+		ZESize GetItemCount()  const
 		{
 			return Items.GetCount();
 		}
@@ -110,7 +121,7 @@ class ZEOctree
 			return Items[Index];
 		}
 
-		const ZEArray<Type, Allocator>& GetItems()
+		const ZEArray<Type, Allocator>& GetItems() const
 		{
 			return Items;
 		}
@@ -179,6 +190,23 @@ class ZEOctree
 			}
 		}
 
+		void AddItem(const Type& Item, const ZETriangle& Triangle)
+		{
+			if (MaxDepth == 0)
+				Items.Add(Item);
+			else
+			{
+				ZEInt ItemOctant = GetOctantIndex(Triangle);
+				if (ItemOctant == -1)
+					Items.Add(Item);
+				else
+				{
+					CreateNode(ItemOctant);
+					Nodes[ItemOctant]->AddItem(Item, Triangle);
+				}
+			}
+		}
+
 		void AddItem(const Type& Item, const ZEAABBox& Volume)
 		{
 			if (MaxDepth == 0)
@@ -212,13 +240,25 @@ class ZEOctree
 				}
 		}
 
-		ZEInt GetOctantIndex(const ZEVector3& Point)
+		ZEInt GetOctantIndex(const ZEVector3& Point) const
 		{
 			ZEVector3& Center = BoundingBox.GetCenter();
 			return (Point.z > Center.z ? 4 : 0) + (Point.y > Center.y ? 2 : 0) + (Point.x > Center.x ? 1 : 0);
 		}
 
-		ZEInt GetOctantIndex(const ZEAABBox& BoundingBox)
+		ZEInt GetOctantIndex(const ZETriangle& Triangle) const
+		{
+			ZEInt OctantIndexA = GetOctantIndex(Triangle.V0);
+			ZEInt OctantIndexB = GetOctantIndex(Triangle.V1);
+			
+			if (OctantIndexA != OctantIndexB)
+				return -1;
+
+			OctantIndexB = GetOctantIndex(Triangle.V2);
+			return (OctantIndexA != OctantIndexB) ? -1 : OctantIndexA;
+		}
+
+		ZEInt GetOctantIndex(const ZEAABBox& BoundingBox) const
 		{
 			ZEInt MinOctantIndex = GetOctantIndex(BoundingBox.Min);
 			ZEInt MaxOctantIndex = GetOctantIndex(BoundingBox.Max);
@@ -233,6 +273,12 @@ class ZEOctree
 			return Nodes[OctantIndex];
 		}
 
+		const ZEOctree* GetNode(ZESize OctantIndex) const 
+		{
+			return Nodes[OctantIndex];
+		}
+
+
 		ZEOctree* GetNode(const ZEVector3& Point)
 		{
 			if (!ZEAABBox::IntersectionTest(BoundingBox, Point))
@@ -245,7 +291,36 @@ class ZEOctree
 				return this;
 		}
 
+		const ZEOctree* GetNode(const ZEVector3& Point) const
+		{
+			if (!ZEAABBox::IntersectionTest(BoundingBox, Point))
+				return NULL;
+
+			ZEInt OctantIndex = GetOctantIndex(Point);
+			if (Nodes[OctantIndex] != NULL)
+				return Nodes[OctantIndex]->GetNode(Point);
+			else
+				return this;
+		}
+
 		ZEOctree* GetNode(const ZEAABBox& SearchVolume)
+		{
+			if (!ZEAABBox::IntersectionTest(BoundingBox, SearchVolume))
+				return NULL;
+
+			ZEInt OctantIndex = GetOctantIndex(SearchVolume);
+			if (OctantIndex == -1)
+				return this;
+			else
+			{
+				if (Nodes[OctantIndex] != NULL)
+					return Nodes[OctantIndex]->GetNode(SearchVolume);
+				else
+					return this;
+			}
+		}
+
+		const ZEOctree* GetNode(const ZEAABBox& SearchVolume) const
 		{
 			if (!ZEAABBox::IntersectionTest(BoundingBox, SearchVolume))
 				return NULL;

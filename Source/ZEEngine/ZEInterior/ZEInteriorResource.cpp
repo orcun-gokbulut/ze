@@ -282,7 +282,7 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Room")
 			continue;
 
-		ZEVariant RoomName, Position, Rotation, Scale, PhysicalMeshEnabled, UserDefinedProperties;
+		ZEVariant RoomName, Position, Rotation, Scale, PhysicalMeshEnabled, UserDefinedProperties, GenerateOctree;
 		ZEMLSerialPointer PolygonsPointer, PhysicalMeshPointer;
 
 		ZEMLSerialListItem RoomPropertiesList[] = {
@@ -290,12 +290,13 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 			ZEML_LIST_PROPERTY("Position",					Position,				ZE_VRT_VECTOR3,		true),
 			ZEML_LIST_PROPERTY("Rotation",					Rotation,				ZE_VRT_QUATERNION,	true),
 			ZEML_LIST_PROPERTY("Scale",						Scale,					ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("GenerateOctree",			GenerateOctree,			ZE_VRT_BOOLEAN,		false),
 			ZEML_LIST_PROPERTY("UserDefinedProperties",		UserDefinedProperties,	ZE_VRT_STRING,		false),
 			ZEML_LIST_DATA("Polygons",						PolygonsPointer,							true),
 			ZEML_LIST_NODE("PhysicalMesh",					PhysicalMeshPointer,						false)	
 		};
 
-		Reader->ReadPropertyList(RoomPropertiesList, 7);
+		Reader->ReadPropertyList(RoomPropertiesList, 8);
 		Reader->SeekPointer(PolygonsPointer);
 
 		ZEInteriorResourceRoom* Room = &Rooms[I];
@@ -397,6 +398,21 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 			zeWarning("Room %s does not have physical mesh.", RoomName.GetString().ToCString());
 		}
 
+		if (true)//GenerateOctree.GetType() == ZE_VRT_BOOLEAN && GenerateOctree.GetBoolean())
+		{
+			Room->HasOctree = true;
+			Room->Octree.SetBoundingBox(Room->BoundingBox);
+			Room->Octree.SetMaxDepth(4);
+			for (ZESize I = 0; I < Room->Polygons.GetCount(); I++)
+			{
+				ZETriangle Triangle(Room->Polygons[I].Vertices[0].Position, Room->Polygons[I].Vertices[1].Position, Room->Polygons[I].Vertices[2].Position);
+				Room->Octree.AddItem(I, Triangle);
+			}
+		}
+		else
+		{
+			Room->HasOctree = false;
+		}
 	}
 
 	Reader->GoToCurrentPointer();
