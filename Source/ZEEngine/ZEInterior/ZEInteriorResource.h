@@ -46,6 +46,7 @@
 #include "ZEDefinitions.h"
 #include "ZECore/ZEResource.h"
 #include "ZEGraphics/ZEVertexTypes.h"
+#include "ZESpatial/ZEOctree.h"
 
 class ZEMaterial;
 class ZETexture2D;
@@ -92,6 +93,8 @@ struct ZEInteriorResourceRoom
 	ZEInteriorResourcePhysicalMesh					PhysicalMesh;
 	bool											HasPhysicalMesh;
 	ZEString										UserDefinedProperties;
+	ZEOctree<ZESize>								Octree;
+	bool											HasOctree;
 };
 
 struct ZEInteriorResourceDoor
@@ -111,14 +114,14 @@ struct ZEInteriorResourceDoor
 
 struct ZEInteriorResourceHelper
 {
-	char										Name[ZE_MAX_NAME_SIZE];
-	ZEInteriorResourceHelperOwnerType			OwnerType;
-	ZEInt32										OwnerIndex;
-	ZEInteriorResourceRoom*						OwnerRoom;
-	ZEVector3									Position;
-	ZEQuaternion								Rotation;
-	ZEVector3									Scale;
-	ZEString									UserDefinedProperties;
+	char											Name[ZE_MAX_NAME_SIZE];
+	ZEInteriorResourceHelperOwnerType				OwnerType;
+	ZEInt32											OwnerIndex;
+	ZEInteriorResourceRoom*							OwnerRoom;
+	ZEVector3										Position;
+	ZEQuaternion									Rotation;
+	ZEVector3										Scale;
+	ZEString										UserDefinedProperties;
 };
 
 class ZEFile;

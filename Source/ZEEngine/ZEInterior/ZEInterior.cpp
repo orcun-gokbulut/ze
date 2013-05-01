@@ -559,16 +559,7 @@ void ZEInterior::CullRooms(ZEDrawParameters* DrawParameters)
 void ZEInterior::OnTransformChanged()
 {
 	for (ZESize I = 0; I < Rooms.GetCount(); I++)
-	{
-		Rooms[I]->TransformChanged = true;
-
-		if (Rooms[I]->PhysicalMesh != NULL)
-		{
-			Rooms[I]->PhysicalMesh->SetPosition(GetWorldPosition() + Rooms[I]->Position);
-			Rooms[I]->PhysicalMesh->SetRotation(GetWorldRotation() * Rooms[I]->Rotation);
-			Rooms[I]->PhysicalMesh->SetScale(GetWorldScale() * Rooms[I]->Scale);
-		}
-	}
+		Rooms[I]->OnTransformChanged();
 
 	for (ZESize I = 0; I < Doors.GetCount(); I++)
 		Doors[I]->TransformChanged = true;
@@ -579,6 +570,18 @@ void ZEInterior::OnTransformChanged()
 void ZEInterior::SetCullMode(ZEInteriorCullMode Value)
 {
 	CullMode = Value;
+}
+
+bool ZEInterior::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	bool Result = false;
+	for (ZESize I = 0; I < Rooms.GetCount(); I++)
+		Result |= Rooms[I]->RayCast(Report, Parameters);
+	
+	if (Result)
+		Report.Entity = this;
+
+	return Result;
 }
 
 ZEInteriorCullMode ZEInterior::GetCullMode() const

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERayCaster.h
+ Zinek Engine - ZERayCast.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,26 +34,41 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_RAY_CASTER_H__
-#define __ZE_RAY_CASTER_H__
+#ifndef __ZE_RAY_CAST_H__
+#define __ZE_RAY_CAST_H__
 
+#include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERay.h"
+#include "ZEDS/ZEDelegate.h"
 
 class ZEEntity;
-class ZEScene;
-class ZERay;
+class ZEClass;
 
-class ZERayCaster
+typedef ZEDelegate<bool (ZEEntity*, ZEClass*)> ZERayCastFilterFunction;
+
+struct ZERayCastParameters
 {
-	public:
-		/*
-		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float Range = 100000000.0f);
-		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float& T, float Range = 100000000.0f);
-		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, float Range = 100000000.0f);
-		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float Range = 100000000.0f);
-		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float& T, ZEVector3& Position, ZEVector3& Normal, float Range = 100000000.0f);
-		*/
+	ZERay						Ray;
+	ZERayCastFilterFunction		FilterFunction;
+	float						MinimumDistance;
+	float						MaximumDistance;
+
+								ZERayCastParameters();
+};
+
+struct ZERayCastReport
+{
+	ZEEntity*					Entity;
+	void*						SubComponent;
+	ZESize						PoligonIndex;
+
+	ZEVector3					Position;
+	ZEVector3					Normal;
+	ZEVector3					Binormal;
+	float						Distance;
+
+								ZERayCastReport();
 };
 
 #endif

@@ -37,12 +37,12 @@
 #ifndef __ZE_INTERIOR_H__
 #define __ZE_INTERIOR_H__
 
-#include "ZEGame/ZEEntity.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
-
-#include "ZEGame/ZEDrawStatistics.h"
 #include "ZEML/ZEMLNode.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEGame/ZEDrawStatistics.h"
+#include "ZEGame/ZERayCast.h"
 
 enum ZEInteriorCullMode
 {
@@ -120,6 +120,8 @@ class ZEInterior : public ZEEntity
 
 		void									SetCullMode(ZEInteriorCullMode Value);
 		ZEInteriorCullMode						GetCullMode() const;
+
+		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZEInterior*						CreateInstance();
 
