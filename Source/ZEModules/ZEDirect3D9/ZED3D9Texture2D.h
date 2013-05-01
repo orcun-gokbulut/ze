@@ -70,6 +70,7 @@ class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 
 		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false);
 		virtual void					Lock(void** Buffer, ZESize* Pitch, ZEUInt Level);
+		virtual void					Lock(void** Buffer, ZESize* Pitch, ZEUInt Level, ZEUInt PositionX, ZEUInt PositionY, ZEUInt Width, ZEUInt Height);
 		virtual void					Unlock(ZEUInt Level);
 		virtual void					Release();
 
