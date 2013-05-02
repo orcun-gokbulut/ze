@@ -115,6 +115,8 @@ float3 uv_to_eye(float2 uv, float eye_z)
 float3 fetch_eye_pos(float2 uv)
 {
     float z = ZEGBuffer_GetDepth(uv);
+	if (z < 0.001f) discard;
+	
     return uv_to_eye(uv, z);
 }
 
