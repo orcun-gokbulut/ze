@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEProtectActivator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,17 +30,37 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEDS/ZEFormat.h"
+#include <stdio.h>
+#include "ZEProtect/ZEProtect.h"
 
-ze_add_source(md5.cpp						Sources)
-ze_add_source(md5.h							Sources)
-ze_add_source(ZEIGHardwareActivator.cpp		Sources)
+int main(int argc, char** argv)
+{
+	char Key[256], Name[256], SystemWide[256];
 
+	printf(" ZinekIG Hardware Activation\n");
+	printf("----------------------------------------------------------------------------------- \n");
+	printf("  Application name : "); scanf("%s", Name);
+	printf("  Key : "); scanf("%s", Key);
+	printf("  System Wide [yes/no] : "); scanf("%s", SystemWide);
 
-ze_add_executable(ZEIGHardwareActivator
-	CONSOLE
-	SOURCES ${Sources}
-	LIBS ZEFoundation)
+	ZEProtect Protect;
+	Protect.SetKey(Key);
+	Protect.SetApplicationName(Name);
+	Protect.SetActivationFileName("Activations.ZEProtect");
+	Protect.SetSystemWide(stricmp(SystemWide, "yes") == 0 ? true : false);
+
+	if (Protect.Activate())
+	{
+		printf("Hardware activated. Activation Code : %s\n", Protect.GenerateActivationCode().ToCString());
+		return EXIT_SUCCESS;
+	}
+	else
+	{
+		printf("Error !!! Can not activate hardware.\n");
+		return EXIT_FAILURE;
+	}
+}

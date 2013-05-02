@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEIGHardwareActivator.cpp
+ Zinek Engine - ZEProtect.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,41 +32,38 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#pragma once
+#ifndef __ZE_PROTECT_H__
+#define __ZE_PROTECT_H__
 
-#include "ZEDS/ZEFormat.h"
-#include "md5.h"
+#include "ZEDS/ZEString.h"
 
-#include <stdio.h>
-#include <intrin.h>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-int main(int argc, char** argv)
+class ZEProtect
 {
-	printf("Activating this hardware as ZinekIG hardware.");
-	char SystemDirectoryPath[256];
-	GetSystemDirectory(SystemDirectoryPath, 256);
+	private:
+		ZEString			ApplicationName;
+		ZEString			Key;
+		ZEString			ActivationFileName;
+		bool				SystemWide;
+		
 
-	char ActivationFile[512];
-	sprintf(ActivationFile, "%s\\zinekig.act", SystemDirectoryPath);
+	public:
+		void				SetApplicationName(const char* Name);
+		const ZEString&		GetApplicationName();
 
-	char ActivationCode[256];
-	memset(ActivationCode, 0, 256);
+		void				SetKey(const char* Key);
+		const ZEString&		GetKey();
 
-	FILE* File = fopen(ActivationFile, "w");
-	if (File == NULL)
-	{
-		printf("Activation failed please run as administrator.");
-		return EXIT_FAILURE;
-	}
+		void				SetActivationFileName(const char* FileName);
+		const ZEString&		GetActivationFileName();
 
-	int Values[4];
-	__cpuid(Values, 0);
-	ZEString Key = ZEFormat::Format("8961a9-8sd4f32hl%{0:X:08}%RcasT435%{1:X:08}%4fdgd24**45%{2:X:08}%EaBXA313", Values[1], Values[2], Values[3]);
-	std::string GeneratedActivationCode = md5(Key.ToCString());
-	
-	fputs(GeneratedActivationCode.c_str(), File);
-	fclose(File);
+		void				SetSystemWide(bool SystemWide);
+		bool				GetSystemWide();
 
-	printf("Done.");
-}
+		ZEString			GenerateActivationCode();
+
+		bool				Activate();
+		bool				Verify();
+};
+
+#endif
