@@ -192,13 +192,12 @@ ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput In
 			return GBuffer;
 		}
 	#endif
-	
 		
 	ZEGBuffer_SetViewPosition(GBuffer, Input.Position);
 
 	#if defined(ZE_SHADER_NORMAL_MAP)
-		float3 Normal = tex2D(NormalMap, Input.Texcoord) * 2.0f - 1.0f;
-		Normal = normalize(Normal.x * Input.Tangent + Normal.y * Input.Binormal + Normal.z * Input.Normal);
+		float3 NormalSample = tex2D(NormalMap, Input.Texcoord) * 2.0f - 1.0f;
+		float3 Normal = normalize(NormalSample.x * Input.Tangent + NormalSample.y * Input.Binormal + NormalSample.z * Input.Normal);
 		ZEGBuffer_SetViewNormal(GBuffer, Normal * Input.Side);	
 	#else
 		ZEGBuffer_SetViewNormal(GBuffer, Input.Normal * Input.Side);
@@ -327,7 +326,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	#ifdef ZE_SHADER_AMBIENT
 		float3 AmbientColor = MaterialAmbientColor;
 		//#ifdef ZE_SHADER_SSAO
-			//AmbientColor *= tex2D(SSAOBuffer, ScreenPosition).r;
+			AmbientColor *= tex2D(SSAOBuffer, ScreenPosition).r;
 		//#endif
 		Output.Color.rgb = AmbientColor;
 		#ifdef ZE_SHADER_LIGHT_MAP

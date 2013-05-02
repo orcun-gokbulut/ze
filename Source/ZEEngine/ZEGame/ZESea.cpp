@@ -63,6 +63,7 @@ ZESea::ZESea()
 	Options.DownSample = ZE_TDS_NONE;
 	Options.FileCaching = ZE_TFC_ENABLED;
 	Options.MipMapping = ZE_TMM_ENABLED;
+	Options.MaximumMipmapLevel = 14;
 
 	SetDiffuseTexture(ZETexture2DResource::LoadSharedResource("ZEEngine\\Sea\\SeaDiffuse.jpg", &Options)->GetTexture());
 	SetNormalTexture(ZETexture2DResource::LoadSharedResource("ZEEngine\\Sea\\SeaNormal.jpg", &Options)->GetTexture());
@@ -144,7 +145,7 @@ ZESea::ZESea()
 		Vertices[5].Tangent = ZEVector3::UnitZ;
 		Vertices[5].TextureCoordinate = ZEVector2(0.0f, 1.0f);
 		*/
-
+		
 		Vertices[0].Position = ZEVector4(-0.5f, 0.0f, 0.5f, 1.0f);
 		Vertices[0].Normal = ZEVector3::UnitY;
 		Vertices[0].BiNormal = ZEVector3::UnitX;

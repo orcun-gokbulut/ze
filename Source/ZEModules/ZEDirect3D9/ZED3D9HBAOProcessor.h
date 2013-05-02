@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZED3D9HBAOProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,157 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#ifndef __ZE_HBAO_PROCESSOR_H__
+#define __ZE_HBAO_PROCESSOR_H__
+
+#include "ZETypes.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZED3D9ComponentBase.h"
+
+class ZETexture2D;
+class ZED3D9ViewPort;
+class ZED3D9Texture2D;
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
+class ZED3D9FrameRenderer;
+
+struct ZEHBAOScreenAlignedQuad
+{
+	float	Position[3];
+	float	TexCoord[2];
+};
+
+ZE_META_OBJECT_DESCRIPTION(ZED3D9HBAOProcessor);
+class ZED3D9HBAOProcessor : public ZED3D9ComponentBase, public ZEObject
+{
+	ZE_META_OBJECT(ZED3D9HBAOProcessor);
+
+	private:
+		ZED3D9FrameRenderer*			Renderer;
+		ZED3D9ViewPort*					Output;
+		ZED3D9Texture2D*				InputDepth;
+		ZED3D9Texture2D*				InputNormal;
+		
+		ZED3D9Texture2D*				TempBuffer0;
+		ZED3D9Texture2D*				TempBuffer1;
+		ZED3D9Texture2D*				RandomAngles;
+		ZED3D9Texture2D*				HalfResDepth;
+		ZED3D9Texture2D*				HalfResNormal;
+
+		struct
+		{
+			ZED3D9VertexShader*			Vertex;
+			ZED3D9PixelShader*			DownSampleDepth;
+			ZED3D9PixelShader*			DownSampleNormal;
+			ZED3D9PixelShader*			AmbientOcclusion;
+			ZED3D9PixelShader*			BiliteralVertical;
+			ZED3D9PixelShader*			BiliteralHorizontal;
+
+		} Shaders;
+
+		static ZEHBAOScreenAlignedQuad	Vertices[4];
+		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+
+		float							OcclusionRadius;
+		float							RadiusMultiplier;
+		ZEUInt							StepCount;
+		ZEUInt							DirectionCount;
+		float							AngleBias;
+		float							Attenuation;
+		float							Contrast;
+
+		float							BlurRadius;
+		float							BlurSharpness;
+		float							BlurEdgeThreshold;
+
+		void							UpdateBuffers();
+		void							DestroyBuffers();
+
+		void							UpdateShaders();
+		void							DestroyShaders();
+
+		void							UpdateStates();
+
+		void							DownSampleDepth(const ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
+		void							DownSampleNormal(const ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
+
+		void							AmbientOcclusion(const ZED3D9Texture2D* InputDepth, const ZED3D9Texture2D* InputNormal, ZED3D9ViewPort* OutputBuffer);
+
+		void							BiliteralFilterVertical(const ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
+		void							BiliteralFilterHorizontal(const ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
+
+	public:
+		void							SetOcclusionRadius(float Value);
+		float							GetOcclusionRadius() const;
+
+		void							SetRadiusMultiplier(float Value);
+		float							GetRadiusMultiplier() const;
+
+		void							SetStepCount(ZEUInt Value);
+		ZEUInt							GetStepCount() const;
+
+		void							SetDirectionCount(ZEUInt Value);
+		ZEUInt							GetDirectionCount() const;
+
+		void							SetAngleBias(float Value);
+		float							GetAngleBias() const;
+
+		void							SetAttenuation(float Value);
+		float							GetAttenuation() const;
+
+		void							SetContrast(float Value);
+		float							GetContrast() const;
+
+		void							SetBlurRadius(float Value);
+		float							GetBlurRadius() const;
+
+		void							SetBlurSharpness(float Value);
+		float							GetBlurSharpness() const;
+
+		void							SetBlurEdgeThreshold(float Value);
+		float							GetBlurEdgeThreshold() const;
+
+		void							SetInputDepth(ZED3D9Texture2D* InputBuffer);
+		ZED3D9Texture2D*				GetInputDepth();
+
+		void							SetInputNormal(ZED3D9Texture2D* InputBuffer);
+		ZED3D9Texture2D*				GetInputNormal();
+
+		void							SetOutput(ZED3D9ViewPort* OutputBuffer);
+		ZED3D9ViewPort*					GetOutput();
+
+		void							SetRenderer(ZED3D9FrameRenderer* FrameRenderer);
+		ZED3D9FrameRenderer*			SetRenderer() const;
+
+		void							Process();
+
+		void							Initialize();
+		void							Deinitialize();
+
+										ZED3D9HBAOProcessor();
+										~ZED3D9HBAOProcessor();
+};
+
+/*
+ZE_POST_PROCESSOR_START(Meta)
+	<zinek>
+		<meta> 
+			<class name="ZED3D9HBAOProcessor">
+				<noinstance>true</noinstance>
+				<description>ZED3D9HBAOProcessor</description>
+
+				<property name="OcclusionRadius" type="float" autogetset="yes" description="..."/>
+				<property name="RadiusMultiplier" type="float" autogetset="yes" description="..."/>
+				<property name="StepCount" type="integer32" autogetset="yes" description="..."/>
+				<property name="DirectionCount" type="integer32" autogetset="yes" description="..."/>
+				<property name="AngleBias" type="float" autogetset="yes" description="..."/>
+				<property name="Attenuation" type="float" autogetset="yes" description="..."/>
+				<property name="Contrast" type="float" autogetset="yes" description="..."/>
+				
+			</class>
+		</meta>
+	</zinek>
+ZE_POST_PROCESSOR_END()
+*/
+
+#endif
