@@ -37,6 +37,9 @@
 
 void ZEStringWriter::Append(const char* String)
 {
+	if (String == NULL)
+		return;
+
 	while(*String != '\0')
 	{
 		if (Size + 1 > Allocator.GetSize())
