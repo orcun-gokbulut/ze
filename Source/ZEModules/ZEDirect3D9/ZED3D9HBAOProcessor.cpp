@@ -538,12 +538,12 @@ ZED3D9HBAOProcessor::ZED3D9HBAOProcessor()
 	VertexDeclaration = NULL;
 
 	OcclusionRadius	 = 1.0f;
-	RadiusMultiplier = 2.0f;
+	RadiusMultiplier = 0.5f;
 	StepCount = 6;
 	DirectionCount = 6;
 	AngleBias = 0.785f;
 	Attenuation = 1.0f;
-	Contrast = 1.5f;
+	Contrast = 1.2f;
 
 	BlurRadius = 7;
 	BlurSharpness = 16;
