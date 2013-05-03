@@ -187,7 +187,7 @@ float biased_tangent(float3 T)
 }
 
 #define		g_NumSteps	5
-#define		g_NumDir	9
+#define		g_NumDir	8
 
 //----------------------------------------------------------------------------------
 float AccumulatedHorizonOcclusion(float2 deltaUV, float2 uv0, float3 P, float numSteps, float randstep, float3 dPdu, float3 dPdv)
