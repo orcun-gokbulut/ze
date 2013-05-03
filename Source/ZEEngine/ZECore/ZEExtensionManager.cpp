@@ -43,6 +43,7 @@
 #include <string.h>
 
 
+
 ZEOptionSection ZEExtensionManager::ExtensionManagerOptions;
 
 ZEExtensionDescription* ZEExtensionManager::GetExtensionDescription(const ZEString& Name)
@@ -116,14 +117,16 @@ class ZEExtensionManager* ZEExtensionManager::GetInstance()
 #include "ZEModules/ZEWindowsInput/ZEWindowsInputModule.h"
 #include "ZEModules/ZEXSens/ZEXSensInputModule.h"
 #include "ZEModules/ZESensics/ZESensicsInputModule.h"
+#include "ZEModules/ZEVirtualInput/ZEVirtualInputModule.h"
 
 ZEExtensionManager::ZEExtensionManager()
 {
 	RegisterExtension(ZEWindowsInputModule::Description());
-	RegisterExtension(ZEDirectInputModule::Description());
+	//RegisterExtension(ZEDirectInputModule::Description());
+	RegisterExtension(ZEVirtualInputModule::Description());
 	RegisterExtension(ZEVRPNInputModule::Description());
 	RegisterExtension(ZEXSensInputModule::Description());
-	RegisterExtension(ZESensicsInputModule::Description());
+	//RegisterExtension(ZESensicsInputModule::Description());
 }
 
 ZEExtensionManager::~ZEExtensionManager()
