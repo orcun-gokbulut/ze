@@ -204,8 +204,13 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->AerialPerspectiveProcessor, QString()), QString("Aerial"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(5));
 	ui->PropertiesTabWidget->widget(5)->setLayout(TempLayout);
+
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HBAOProcessor, QString()), QString("SSAO"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(6));
+	ui->PropertiesTabWidget->widget(6)->setLayout(TempLayout);
+
 	Scene->SetAmbientColor(ZEVector3::One);
-	Scene->SetAmbientFactor(0.1f);
+	Scene->SetAmbientFactor(0.5f);
 }
 
 void MapEditor::MakeConnections()

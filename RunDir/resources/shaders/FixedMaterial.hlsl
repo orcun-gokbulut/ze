@@ -137,7 +137,6 @@ ZEFixedMaterial_GBuffer_VSOutput ZEFixedMaterial_GBuffer_VertexShader(ZEFixedMat
 	if (EnableSkin)
 		SkinTransform(Input);
 
-	// Pipeline 
 	Output.Position_ = mul(WorldViewProjMatrix, Input.Position);
 	
 	Output.Position = mul(WorldViewMatrix, Input.Position).xyz;
@@ -173,9 +172,6 @@ struct ZEFixedMaterial_GBuffer_PSInput
 ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput Input)
 {
 	ZEGBuffer GBuffer = (ZEGBuffer)0;
-	
-	//GBDoParallax(Input);
-
 	
 	#ifdef ZE_SHADER_ALPHA_CULL
 		#ifdef ZE_SHADER_OPACITY_MAP
@@ -248,11 +244,9 @@ ZEFixedMaterial_ForwardPass_VSOutput ZEFixedMaterial_ForwardPass_VertexShader(ZE
 {
 	ZEFixedMaterial_ForwardPass_VSOutput Output;
 
-
 	if (EnableSkin)
 		SkinTransform(Input);
 
-	// Pipeline 
 	Output.Position = mul(WorldViewProjMatrix, Input.Position);
 	Output.Texcoord = Input.Texcoord;
 	

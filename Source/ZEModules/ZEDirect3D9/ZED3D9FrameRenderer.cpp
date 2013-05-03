@@ -646,31 +646,29 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 
 	D3DPERF_EndEvent();
 	zeProfilerEnd();
-
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)SSAOBuffer->GetViewPort())->FrameBuffer);
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0xFFFFFFFF, 1.0f, 0x00);
-
-	if (GeometryCount == 0)
-		return;
 	
+	D3DPERF_BeginEvent(0, L"SSAO Pass");
+
 	HBAOProcessor.SetInputDepth(GBuffer1);
 	HBAOProcessor.SetInputNormal(GBuffer2);
-	HBAOProcessor.SetOutput((ZED3D9ViewPort*)SSAOBuffer->GetViewPort());
+	HBAOProcessor.SetOutput(SSAOBuffer);
 	HBAOProcessor.Process();
+
+	D3DPERF_EndEvent();
 }
 
 void ZED3D9FrameRenderer::DoLightningPass()
 {
 	zeProfilerStart("Lightning Pass");
 
-	if (DrawParameters->Lights.GetCount() == 0)
-		return;
-
 	D3DPERF_BeginEvent(0, L"LBuffer Pass");
 
 	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
 	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00, 0.0f, 0);
+
+	if (DrawParameters->Lights.GetCount() == 0)
+		return;
 
 	// Z-Buffer
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
@@ -857,7 +855,7 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 
 	if (SSAOBuffer == NULL)
 		SSAOBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	SSAOBuffer->Create(ViewPort->GetWidth() / 2, ViewPort->GetHeight() / 2, 1, ZE_TPF_F16, true);
+	SSAOBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), 1, ZE_TPF_F16, true);
 
 	if(BlurBuffer == NULL)
 		BlurBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
@@ -1203,6 +1201,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		DoGBufferPass();
 		DoLightningPass();
 		DoForwardPass();
+		
 		/*
 		AerialPerspectiveProcessor.SetInputDepth(GBuffer1);
 		AerialPerspectiveProcessor.SetInputColor(ABuffer);
@@ -1211,6 +1210,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		*/
 
 		HDRProcessor.SetInput(ABuffer);
+		//HDRProcessor.SetOutput(ViewPort);
 		HDRProcessor.SetOutput((ZED3D9ViewPort*)MLAABuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);
 
