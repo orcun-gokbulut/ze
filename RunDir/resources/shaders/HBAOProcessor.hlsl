@@ -79,6 +79,7 @@ struct PSInput
 {
 	float2 TexCoord		: TEXCOORD0;
 	float2 TexCoordRand : TEXCOORD1;
+	float4 ScreenPosition 	: VPOS;
 };
 
 struct PSOutput
@@ -185,8 +186,8 @@ float biased_tangent(float3 T)
     return tan(min(phi, M_PI * 0.5));
 }
 
-#define		g_NumSteps	6
-#define		g_NumDir	6
+#define		g_NumSteps	5
+#define		g_NumDir	9
 
 //----------------------------------------------------------------------------------
 float AccumulatedHorizonOcclusion(float2 deltaUV, float2 uv0, float3 P, float numSteps, float randstep, float3 dPdu, float3 dPdv)
@@ -246,24 +247,22 @@ PSOutput PSMainAmbientOcclusion( PSInput Input )
 {
 	PSOutput Output = (PSOutput)0.0f;
 
-	float3 P = fetch_eye_pos(Input.TexCoord);
-	
+	float2 Coord = Input.ScreenPosition.xy * PixelSize + PixelSize * 0.5f;
+
+	float3 P = fetch_eye_pos(Coord);
+
 	// Project the radius of influence Radius from eye space to texture space.
 	// The scaling by 0.5 is to go from [-1,1] to [0,1].
 	float2 step_size = 0.5f * Radius  * FocalLenght / P.z;
 	step_size = step_size / (g_NumSteps + 1.0f);
 	
-	// Nearest neighbor pixels on the tangent plane
-	float3 Pr, Pl, Pt, Pb;
-	float4 tangentPlane;
-	
-	float3 N = ZEGBuffer_GetViewNormal(Input.TexCoord);
+	float3 N = ZEGBuffer_GetViewNormal(Coord);
 
-	tangentPlane = float4(N, dot(P, N));
-	Pr = tangent_eye_pos(Input.TexCoord + float2(PixelSize.x, 0.0f), tangentPlane);
-	Pl = tangent_eye_pos(Input.TexCoord + float2(-PixelSize.x, 0.0f), tangentPlane);
-	Pt = tangent_eye_pos(Input.TexCoord + float2(0.0f, PixelSize.y), tangentPlane);
-	Pb = tangent_eye_pos(Input.TexCoord + float2(0.0f, -PixelSize.y), tangentPlane);
+	float4 tangentPlane = float4(N, dot(P, N));
+	float3 Pr = tangent_eye_pos(Input.TexCoord + float2(PixelSize.x, 0.0f), tangentPlane);
+	float3 Pl = tangent_eye_pos(Input.TexCoord + float2(-PixelSize.x, 0.0f), tangentPlane);
+	float3 Pt = tangent_eye_pos(Input.TexCoord + float2(0.0f, PixelSize.y), tangentPlane);
+	float3 Pb = tangent_eye_pos(Input.TexCoord + float2(0.0f, -PixelSize.y), tangentPlane);
 
 	// Screen-aligned basis for the tangent plane
 	float3 dPdu = min_diff(P, Pr, Pl);
@@ -282,13 +281,14 @@ PSOutput PSMainAmbientOcclusion( PSInput Input )
 		float angle = alpha * (float)d;
 		float2 dir = float2(cos(angle), sin(angle));
 		float2 deltaUV = rotate_direction(dir, rand.xy) * step_size.xy;
-		ao += AccumulatedHorizonOcclusion(deltaUV, Input.TexCoord, P, 0.0f, rand.z, dPdu, dPdv);
+		ao += AccumulatedHorizonOcclusion(deltaUV, Coord, P, 0.0f, rand.z, dPdu, dPdv);
 	}
 
-	Output.Color = max(0.0f, (1.0 - ao / g_NumDir * Contrast)).xxxx;
+	float Occlusion = saturate(ao / g_NumDir * Contrast);
+	Output.Color = (1.0 - Occlusion).xxxx;
+
 	return Output;
 }
-
 
 //-------------------------------------------------------------------------
 float fetch_eye_z(float2 uv)
@@ -310,7 +310,7 @@ float BlurFunction(float2 uv, float r, float center_c, float center_d, inout flo
     return w*c;
 }
 
-#define		BlurRadius		7.0f
+#define		BlurRadius		5.0f
 
 //-------------------------------------------------------------------------
 float4 PSMainBlurHorizontal( PSInput Input ): SV_TARGET
@@ -350,7 +350,11 @@ float4 PSMainBlurVertical( PSInput Input ): SV_TARGET
 float4 PSMainDownSampleDepth( PSInput Input ): SV_TARGET
 {
 	float Depth = ZEGBuffer_GetDepth(Input.TexCoord);
-	return Depth.xxxx;
+	float DepthBR = ZEGBuffer_GetDepth(Input.TexCoord + PixelSize);
+	float DepthR = ZEGBuffer_GetDepth(Input.TexCoord + float2(PixelSize.x, 0.0f));
+	float DepthB = ZEGBuffer_GetDepth(Input.TexCoord + float2(0.0f, PixelSize.y));
+	
+	return max(max(max(Depth, DepthBR), DepthR), DepthB).xxxx;
 }
 
 //-------------------------------------------------------------------------

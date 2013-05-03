@@ -68,20 +68,12 @@ void ZED3D9HBAOProcessor::UpdateBuffers()
 		HalfResNormal->Create(InputNormal->GetWidth() / 2, InputNormal->GetHeight() / 2, 1, ZE_TPF_I8_4, true);
 	}
 
-	if (TempBuffer0 == NULL || TempBuffer0->GetWidth() != SSAOBuffer->GetWidth() || TempBuffer0->GetHeight() != SSAOBuffer->GetHeight())
+	if (TempBuffer == NULL || TempBuffer->GetWidth() != SSAOBuffer->GetWidth() || TempBuffer->GetHeight() != SSAOBuffer->GetHeight())
 	{
-		ZED3D_RELEASE(TempBuffer0);
+		ZED3D_RELEASE(TempBuffer);
 
-		TempBuffer0 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		TempBuffer0->Create(SSAOBuffer->GetWidth(), SSAOBuffer->GetHeight(), 1, ZE_TPF_F16, true);
-	}
-
-	if (TempBuffer1 == NULL || TempBuffer1->GetWidth() != SSAOBuffer->GetWidth() || TempBuffer1->GetHeight() != SSAOBuffer->GetHeight())
-	{
-		ZED3D_RELEASE(TempBuffer1);
-
-		TempBuffer1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		TempBuffer1->Create(SSAOBuffer->GetWidth(), SSAOBuffer->GetHeight(), 1, ZE_TPF_F16, true);
+		TempBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+		TempBuffer->Create(SSAOBuffer->GetWidth(), SSAOBuffer->GetHeight(), 1, ZE_TPF_F16, true);
 	}
 	
 	if (RandomAngles == NULL)
@@ -108,8 +100,7 @@ void ZED3D9HBAOProcessor::UpdateBuffers()
 
 void ZED3D9HBAOProcessor::DestroyBuffers()
 {
-	ZED3D_RELEASE(TempBuffer0);
-	ZED3D_RELEASE(TempBuffer1);
+	ZED3D_RELEASE(TempBuffer);
 	ZED3D_RELEASE(RandomAngles);
 }
 
@@ -281,6 +272,11 @@ void ZED3D9HBAOProcessor::AmbientOcclusion(const ZED3D9Texture2D* InputDepth, co
 	GetDevice()->SetTexture(1, InputNormal->Texture);
 	GetDevice()->SetTexture(3, RandomAngles->Texture);
 	GetDevice()->SetRenderTarget(0, OutputBuffer->FrameBuffer);
+	GetDevice()->SetRenderTarget(1, NULL);
+	GetDevice()->SetRenderTarget(2, NULL);
+	GetDevice()->SetRenderTarget(3, NULL);
+
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0xFFFFFFFF, 1.0f, 0x00);
 
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, COLOR_RED);
 
@@ -300,7 +296,7 @@ void ZED3D9HBAOProcessor::BiliteralFilterVertical(const ZED3D9Texture2D* Input, 
 
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, COLOR_RED);
 
-	GetDevice()->SetPixelShader(Shaders.BiliteralHorizontal->GetPixelShader());
+	GetDevice()->SetPixelShader(Shaders.BiliteralVertical->GetPixelShader());
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(ZEHBAOScreenAlignedQuad));
 
 	D3DPERF_EndEvent();
@@ -316,7 +312,7 @@ void ZED3D9HBAOProcessor::BiliteralFilterHorizontal(const ZED3D9Texture2D* Input
 
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, COLOR_RED);
 
-	GetDevice()->SetPixelShader(Shaders.BiliteralVertical->GetPixelShader());
+	GetDevice()->SetPixelShader(Shaders.BiliteralHorizontal->GetPixelShader());
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(ZEHBAOScreenAlignedQuad));
 
 	D3DPERF_EndEvent();
@@ -446,14 +442,14 @@ ZED3D9Texture2D* ZED3D9HBAOProcessor::GetInputNormal()
 	return InputNormal;
 }
 
-void ZED3D9HBAOProcessor::SetOutput(ZED3D9ViewPort* OutputBuffer)
+void ZED3D9HBAOProcessor::SetOutput(ZED3D9Texture2D* OutputBuffer)
 {
 	zeDebugCheck(OutputBuffer == NULL, "Null pointer");
 
 	Output = OutputBuffer;
 }
 
-ZED3D9ViewPort* ZED3D9HBAOProcessor::GetOutput()
+ZED3D9Texture2D* ZED3D9HBAOProcessor::GetOutput()
 {
 	return Output;
 }
@@ -480,12 +476,12 @@ void ZED3D9HBAOProcessor::Process()
 	UpdateBuffers();
 	UpdateStates();
 	
-	DownSampleDepth(InputDepth, &HalfResDepth->ViewPort);
-	DownSampleNormal(InputNormal, &HalfResNormal->ViewPort);
-
-	AmbientOcclusion(HalfResDepth, HalfResNormal, &TempBuffer0->ViewPort);
-	BiliteralFilterHorizontal(TempBuffer0, &TempBuffer1->ViewPort);
-	BiliteralFilterVertical(TempBuffer1, Output);
+	//DownSampleDepth(InputDepth, &HalfResDepth->ViewPort);
+	//DownSampleNormal(InputNormal, &HalfResNormal->ViewPort);
+	
+	AmbientOcclusion(InputDepth, InputNormal, &Output->ViewPort);
+	BiliteralFilterHorizontal(Output, &TempBuffer->ViewPort);
+	BiliteralFilterVertical(TempBuffer, &Output->ViewPort);
 }
 
 void ZED3D9HBAOProcessor::Initialize()
@@ -527,8 +523,7 @@ ZED3D9HBAOProcessor::ZED3D9HBAOProcessor()
 	InputDepth = NULL;
 	InputNormal = NULL;
 	
-	TempBuffer0 = NULL;
-	TempBuffer1 = NULL;
+	TempBuffer = NULL;
 	RandomAngles = NULL;
 	HalfResDepth = NULL;
 	HalfResNormal = NULL;
@@ -543,12 +538,12 @@ ZED3D9HBAOProcessor::ZED3D9HBAOProcessor()
 	VertexDeclaration = NULL;
 
 	OcclusionRadius	 = 1.0f;
-	RadiusMultiplier = 1.0f;
+	RadiusMultiplier = 2.0f;
 	StepCount = 6;
 	DirectionCount = 6;
-	AngleBias = ZEAngle::ToRadian(40.0f);
+	AngleBias = 0.785f;
 	Attenuation = 1.0f;
-	Contrast = 1.25f;
+	Contrast = 1.5f;
 
 	BlurRadius = 7;
 	BlurSharpness = 16;

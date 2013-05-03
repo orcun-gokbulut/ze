@@ -319,15 +319,13 @@ ZELBuffer ZEProjectiveLight_PixelShader(ZEProjectiveLight_PSInput Input) : COLOR
 		float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
 
 		float4 TextureLookup = mul(LightProjectionMatrixParam, float4(Position, 1.0f));
-		float3 ProjLightColor = tex2Dproj(ProjectionMap, TextureLookup) * LightColorParam;
+		float3 ProjLightColor = tex2Dlod(ProjectionMap, float4(TextureLookup.xy / TextureLookup.w, 0.0f, 0.0f)) * LightColorParam;
 
 		Output.rgb = LightIntensityParam * ProjLightColor;
 		Output.a = pow(dot(Normal, HalfVector), SpecularPower);
 
 		Output *= AngularAttenuation;
 		Output *= DistanceAttenuation;
-
-		//Output *= SampleShadowMap(ProjectionShadowMap, TextureLookup);
 	}
 	else
 	{

@@ -60,12 +60,11 @@ class ZED3D9HBAOProcessor : public ZED3D9ComponentBase, public ZEObject
 
 	private:
 		ZED3D9FrameRenderer*			Renderer;
-		ZED3D9ViewPort*					Output;
+		ZED3D9Texture2D*				Output;
 		ZED3D9Texture2D*				InputDepth;
 		ZED3D9Texture2D*				InputNormal;
 		
-		ZED3D9Texture2D*				TempBuffer0;
-		ZED3D9Texture2D*				TempBuffer1;
+		ZED3D9Texture2D*				TempBuffer;
 		ZED3D9Texture2D*				RandomAngles;
 		ZED3D9Texture2D*				HalfResDepth;
 		ZED3D9Texture2D*				HalfResNormal;
@@ -149,8 +148,8 @@ class ZED3D9HBAOProcessor : public ZED3D9ComponentBase, public ZEObject
 		void							SetInputNormal(ZED3D9Texture2D* InputBuffer);
 		ZED3D9Texture2D*				GetInputNormal();
 
-		void							SetOutput(ZED3D9ViewPort* OutputBuffer);
-		ZED3D9ViewPort*					GetOutput();
+		void							SetOutput(ZED3D9Texture2D* OutputBuffer);
+		ZED3D9Texture2D*				GetOutput();
 
 		void							SetRenderer(ZED3D9FrameRenderer* FrameRenderer);
 		ZED3D9FrameRenderer*			SetRenderer() const;
@@ -180,6 +179,9 @@ ZE_POST_PROCESSOR_START(Meta)
 				<property name="Attenuation" type="float" autogetset="yes" description="..."/>
 				<property name="Contrast" type="float" autogetset="yes" description="..."/>
 				
+				<property name="BlurSharpness" type="float" autogetset="yes" description="..."/>
+				<property name="BlurEdgeThreshold" type="float" autogetset="yes" description="..."/>
+
 			</class>
 		</meta>
 	</zinek>
