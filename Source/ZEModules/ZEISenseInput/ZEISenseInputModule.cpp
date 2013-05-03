@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEISenseInputModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,37 +30,37 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEError.h"
+#include "ZECore/ZEConsole.h"
+#include "ZEISenseInputModule.h"
+#include "ZEISenseInputDevice.h"
 
-ze_set_project_folder("ZEModules")
+ZE_EXTENSION_DESCRIPTION(ZEISenseInputModule, ZEInputDeviceModule, NULL)
+bool ZEISenseInputModule::InitializeSelf()
+{
+	if (!ZEInputDeviceModule::InitializeSelf())
+		return false;
 
-ze_add_module(ZEDirect3D9			Modules PLATFORMS Windows)
-ze_add_module(ZEDirectInput			Modules OPTIONAL DEFAULT PLATFORMS Windows )
-ze_add_module(ZEVirtualInput		Modules OPTIONAL DEFAULT)
-ze_add_module(ZEWindowsInput		Modules OPTIONAL DEFAULT PLATFORMS Windows)
-ze_add_module(ZEVRPNInput			Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
-ze_add_module(ZEDirectSound			Modules OPTIONAL DEFAULT PLATFORMS Windows)
-ze_add_module(ZEOpenAL				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
-ze_add_module(ZEPhysX				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
-ze_add_module(ZEXSens				Modules OPTIONAL)
-ze_add_module(ZESensics				Modules OPTIONAL)
-ze_add_module(ZEISenseInput			Modules OPTIONAL)
+	ZEISenseInputDevice* Device = new ZEISenseInputDevice();
+	Device->Module = this;
+	RegisterDevice(Device);
 
-ze_add_source(ZEModules.h			Sources Headers)
-ze_add_source(ZEModules.cpp			Sources)
-ze_add_source(CMakeLists.txt		Sources)
+	return true;
+}
 
-ze_add_library(ZEModules 
-	SOURCES ${Sources}
-	LIBS ${Modules})
+bool ZEISenseInputModule::DeinitializeSelf()
+{
+	DestroyDevices();
+	return ZEInputDeviceModule::DeinitializeSelf();
+}
 
-#ze_combine_libraries(ZEModules 
-#	LIBS ZEDirect3D9
-#		 ZEWindowsInput
-#		 ZEVRPNInput
-#		 ZEDirectSound
-#		 ZEOpenAL
-#		 ZEPhysX)
+
+void ZEISenseInputModule::Process()
+{
+	const ZEArray<ZEInputDevice*>& Devices = GetDevices();
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
+		((ZEISenseInputDevice*)Devices[I])->Process();
+}

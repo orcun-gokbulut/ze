@@ -35,32 +35,12 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_set_project_folder("ZEModules")
+ze_add_source(ZEISenseInputModule.h			Sources)
+ze_add_source(ZEISenseInputDevice.cpp		Sources)
+ze_add_source(ZEISenseInputDevice.h			Sources)
+ze_add_source(ZEISenseInputModule.cpp		Sources)
+ze_add_source(ZEISenseInputModule.h			Sources)
 
-ze_add_module(ZEDirect3D9			Modules PLATFORMS Windows)
-ze_add_module(ZEDirectInput			Modules OPTIONAL DEFAULT PLATFORMS Windows )
-ze_add_module(ZEVirtualInput		Modules OPTIONAL DEFAULT)
-ze_add_module(ZEWindowsInput		Modules OPTIONAL DEFAULT PLATFORMS Windows)
-ze_add_module(ZEVRPNInput			Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
-ze_add_module(ZEDirectSound			Modules OPTIONAL DEFAULT PLATFORMS Windows)
-ze_add_module(ZEOpenAL				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
-ze_add_module(ZEPhysX				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
-ze_add_module(ZEXSens				Modules OPTIONAL)
-ze_add_module(ZESensics				Modules OPTIONAL)
-ze_add_module(ZEISenseInput			Modules OPTIONAL)
-
-ze_add_source(ZEModules.h			Sources Headers)
-ze_add_source(ZEModules.cpp			Sources)
-ze_add_source(CMakeLists.txt		Sources)
-
-ze_add_library(ZEModules 
+ze_add_library(ZEISenseInput
 	SOURCES ${Sources}
-	LIBS ${Modules})
-
-#ze_combine_libraries(ZEModules 
-#	LIBS ZEDirect3D9
-#		 ZEWindowsInput
-#		 ZEVRPNInput
-#		 ZEDirectSound
-#		 ZEOpenAL
-#		 ZEPhysX)
+	LIBS libISense)
