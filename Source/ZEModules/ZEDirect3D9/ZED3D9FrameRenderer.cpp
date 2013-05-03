@@ -661,6 +661,9 @@ void ZED3D9FrameRenderer::DoLightningPass()
 {
 	zeProfilerStart("Lightning Pass");
 
+	if (DrawParameters->Lights.GetCount() == 0)
+		return;
+
 	D3DPERF_BeginEvent(0, L"LBuffer Pass");
 
 	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
@@ -1201,35 +1204,28 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		DoGBufferPass();
 		DoLightningPass();
 		DoForwardPass();
-		
-		/*
+
 		AerialPerspectiveProcessor.SetInputDepth(GBuffer1);
 		AerialPerspectiveProcessor.SetInputColor(ABuffer);
 		AerialPerspectiveProcessor.SetOutput((ZED3D9ViewPort*)AerialPrespectiveBuffer->GetViewPort());
 		AerialPerspectiveProcessor.Process();
-		*/
 
-		HDRProcessor.SetInput(ABuffer);
-		//HDRProcessor.SetOutput(ViewPort);
+		HDRProcessor.SetInput(AerialPrespectiveBuffer);
 		HDRProcessor.SetOutput((ZED3D9ViewPort*)MLAABuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);
 
 		MLAAProcessor.SetInputDepth(GBuffer1);
 		MLAAProcessor.SetInputNormal(GBuffer2);
 		MLAAProcessor.SetInputColor(MLAABuffer);
-		MLAAProcessor.SetOutput((ZED3D9ViewPort*)FogBuffer->GetViewPort());
+		MLAAProcessor.SetOutput((ZED3D9ViewPort*)ColorTransformBuffer->GetViewPort());
 		MLAAProcessor.Process();
 
-		/*
 		ColorTransformProcessor.SetInput(ColorTransformBuffer);
-		ColorTransformProcessor.SetOutput(ViewPort);
+		ColorTransformProcessor.SetOutput((ZED3D9ViewPort*)FogBuffer->GetViewPort());
 		ColorTransformProcessor.Process();
-		*/
 
-		/*
 		PixelWorldPositionProcessor.SetInputDepth(GBuffer1);
 		PixelWorldPositionProcessor.Process();
-		*/
 
 		/*
 		// DOF Process
@@ -1245,11 +1241,13 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		UnsharpenProcessor.Process();
 		*/
 
+		
 		// Fog Process
 		FogProcessor.SetInputColor(FogBuffer);
 		FogProcessor.SetInputDepth(GBuffer1);
-		FogProcessor.SetOutput(ViewPort);
+		FogProcessor.SetOutput((ZED3D9ViewPort*)GrainBuffer->GetViewPort());
 		FogProcessor.Process();
+		
 		
 		/*
 		// Blur Mask
@@ -1287,20 +1285,19 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
  		EDProcessor.SetOutput(ViewPort);
  		EDProcessor.Process();
 		*/
-
 		/*
 		// Blur Process
 		BlurProcessor.SetInput(BlurBuffer);
 		BlurProcessor.SetOutput((ZED3D9ViewPort*)GrainBuffer->GetViewPort());
 		BlurProcessor.Process();
-		*/
 
-		/*
+		*/
+		
+		// Grain
 		GrainProcessor.SetInput(GrainBuffer);
 		GrainProcessor.SetOutput(ViewPort);
 		GrainProcessor.Process(ElaspedTime);
-		*/
-
+	
 		Do2DPass();
 
 	GetDevice()->EndScene();
