@@ -118,7 +118,7 @@ void ZEGBuffer_SetSubSurfaceScatteringFactor(inout ZEGBuffer Output, float Facto
 	Output.VelocitySubSurfaceScatteringFactor.z = Factor;
 }
 
-float2 ZEGBuffer_GetSubSurfaceScatteringFactor(float2 Texcoord)
+float ZEGBuffer_GetSubSurfaceScatteringFactor(float2 Texcoord)
 {
 	return tex2D(GBuffer3, Texcoord).z;
 }
