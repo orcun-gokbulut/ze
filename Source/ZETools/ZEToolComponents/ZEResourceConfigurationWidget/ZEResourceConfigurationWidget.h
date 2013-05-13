@@ -57,6 +57,7 @@ class ZEResourceConfigurationWidget
 		ZEResourceConfigurationWidgetQt*	QtComponents;
 		ZEResourceConfigurator				Configurator;
 		ZEString							ZinekDirectory;
+		ZEString							DefaultExportPath;
 
 	public:
 
@@ -75,6 +76,8 @@ class ZEResourceConfigurationWidget
 		void							SetZEWorkingDir(const ZEString& Path);
 		bool							GetCopyState(const ZEString& Identifier);
 		ZEString						GetResourceRelativePath(ZEString& RelativeTo, const ZEString& Identifier);
+
+		void							SetDefaultExportPath(ZEString Path);
 
 										ZEResourceConfigurationWidget(QWidget* Parent = NULL);
 										~ZEResourceConfigurationWidget();
