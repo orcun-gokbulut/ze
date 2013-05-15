@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEScriptObject.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,19 +30,7 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
-
-ze_add_source(ZEScriptEngine.cpp					Sources)
-ze_add_source(ZEScriptEngine.h						Sources Headers)
-ze_add_source(ZEScriptObject.cpp					Sources)
-ze_add_source(ZEScriptObject.h						Sources Headers)
-ze_add_source(ZEScriptClass.cpp					  Sources)
-ze_add_source(ZEScriptClass.h					  	Sources Headers)
-
-ze_add_library(ZEScript 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation)
+#include "ZEScriptObject.h"

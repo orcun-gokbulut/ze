@@ -320,7 +320,7 @@ class ZEPhysXPhysicalJoint: public ZEPhysicalJoint
 		virtual ZEVector3						GetScale();
 
 		virtual void							SetCollisionEventFlags(ZEUInt32 CollisionEventFlags);
-		virtual ZEUInt32							GetCollisionEventFlags();
+		virtual ZEUInt32						GetCollisionEventFlags();
 
 		//virtual void							SetDefaultValues(ZEPhysicalJointType Type);
 

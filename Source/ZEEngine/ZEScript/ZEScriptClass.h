@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProvider.h
+ Zinek Engine - ZEScriptClass.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,32 +34,56 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PROVIDER_H__
-#define __ZE_PROVIDER_H__
 
+#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEClass.h"
+#include "ZEDS/ZEType.h"
+#include "ZEMeta/ZEReference.h"
 
-class ZEProvider
+#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEMethod.h"
+#include "ZEMeta/ZEMethodParameter.h"
+#include "ZEMeta/ZEProperty.h"
+#include "ZEMeta/ZEMetaAttribute.h"
+
+class ZEObject;
+
+class ZEScriptClass : public ZEClass
 {
 	private:
-		ZEArray<ZEClass*>				ClassList;
+		ZEClass*						ParentClass;
+		ZEString						Name;
+		ZEGUID							GUID;
+		ZEArray<ZEMethod>				Methods;
+		ZEArray<ZEProperty>				Properties;
+		ZEArray<ZEMetaAttribute>		Attributes;
+		ZEArray<ZEMetaAttribute>		AttributeStack;
+		ZEArray<ZEMethodParameter>		ParameterStack;
+
+	protected:
+		void							SetParentClass(ZEClass* ParentClass);
+		void							SetName(const char* Name);
+		void							SetGUID(const ZEGUID& GUID);
+		void							AddAttribute(const char* AttributeName);
+		void							RemoveAttribute(ZEMetaAttribute* Attribute);
+		void							AddProperty(ZEProperty* Property);
+		void							RemovePropery(ZEProperty* Property);
+		void							AddMethod(ZEMethod* Method);
+		void							RemoveMethod(ZEMethod* Method);
 
 	public:
-		bool							RegisterClasses(ZEClass** ClassArray, ZESize ClassCount);
-
-		bool							RegisterClass(ZEClass* Class);
-		bool							UnregisterClass(ZEClass* Class);
-
-		const ZEArray<ZEClass*>&		GetClasses();
-		const ZESize					GetClassCount();
-
-		ZEClass*						GetClass(const ZESize Index);
-		ZEClass*						GetClass(const ZEString& ClassName);
-		ZEObject*						CreateInstance(const ZEString& ClassName);
-
-										ZEProvider();
-										~ZEProvider();
+		virtual ZEClass*				GetParentClass();
+		virtual const char*				GetName();
+		virtual ZEGUID					GetGUID();
+		virtual ZESize					GetSizeOfClass();
+		virtual const ZEMetaAttribute*	GetAttributes();
+		virtual ZESize					GetAttributeCount();
+		virtual const ZEProperty*		GetProperties();
+		virtual ZESize					GetPropertyCount();
+		virtual const ZEMethod*			GetMethods();
+		virtual ZESize					GetMethodCount();
+		virtual ZESize					GetPropertyId(ZEString PropertyName);
+		virtual ZESize					GetMethodId(ZEString MethodName, ZESize OverloadIndex = 0);
+		virtual ZESize					GetPropertyOffset(ZESize PropertyId);
+		virtual ZESize					GetPropertyOffset(ZEString PropertyName);
 };
-
-#endif

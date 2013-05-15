@@ -80,8 +80,8 @@ enum ZEMaterialOpacityComponent
 	ZE_MOC_OPACITY_MAP			= 2,
 };
 
-ZE_META_FORWARD_DECLARE(ZEFrameRenderer, "ZEFrameRenderer.h")
-ZE_META_FORWARD_DECLARE(ZERenderCommand, "ZERenderCommand.h")
+class ZEFrameRenderer;
+class ZERenderCommand;
 
 ZE_CLASS(ZEMaterial)
 

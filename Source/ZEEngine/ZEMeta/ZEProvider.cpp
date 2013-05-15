@@ -35,6 +35,19 @@
 
 #include "ZEProvider.h"
 
+bool ZEProvider::RegisterClasses(ZEClass** ClassArray, ZESize ClassCount)
+{
+	for(ZESize I = 0; I < ClassCount; I++)
+	{
+		if(ClassList.Exists(ClassArray[I]))
+			continue;
+
+		ClassList.Add(ClassArray[I]);
+	}
+
+	return true;
+}
+
 bool ZEProvider::RegisterClass(ZEClass* Class)
 {
 	if (ClassList.Exists(Class))
@@ -61,6 +74,16 @@ bool ZEProvider::UnregisterClass(ZEClass* Class)
 const ZEArray<ZEClass*>& ZEProvider::GetClasses()
 {
 	return ClassList;
+}
+
+const ZESize ZEProvider::GetClassCount()
+{
+	return ClassList.GetCount();
+}
+
+ZEClass* ZEProvider::GetClass(const ZESize Index)
+{
+	return ClassList[Index];
 }
 
 ZEClass* ZEProvider::GetClass(const ZEString& ClassName)

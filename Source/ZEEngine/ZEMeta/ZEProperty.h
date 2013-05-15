@@ -50,6 +50,7 @@ struct ZEProperty
 	const char*						Name;
 	ZEUInt32						Hash;
 	ZEType							Type;
+	bool							IsGeneratedByMeta;
 	bool							Container;
 	bool							IsStatic;
 

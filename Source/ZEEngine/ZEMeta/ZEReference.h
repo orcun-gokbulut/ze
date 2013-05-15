@@ -314,8 +314,8 @@ class ZEReference
 										ZEReference(const ZEInt64& Value);
 										ZEReference(const ZEUInt8& Value);
 										ZEReference(const ZEUInt16& Value);
-										ZEReference(const ZEUInt32& Value);
-										ZEReference(const ZEUInt64& Value);
+										explicit ZEReference(const ZEUInt32& Value);
+										explicit ZEReference(const ZEUInt64& Value);
 										ZEReference(const float& Value);
 										ZEReference(const double& Value);
 										ZEReference(const bool& Value);
@@ -369,7 +369,7 @@ void ZEReference::SetObjectRef(ZEObjectType& Object)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_OBJECT;
-	Type.Class = ZEObjectType::Class();
+	Type.Class = (static_cast<ZEObject*>(Object))->GetClass();
 	SetType(Type);
 
 	Value.Pointer = &Object;
@@ -380,7 +380,7 @@ void ZEReference::SetObjectConstRef(const ZEObjectType& Object)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_OBJECT;
-	Type.Class = ZEObjectType::Class();
+	Type.Class = (static_cast<ZEObject*>(Object))->GetClass();
 	SetType(Type);
 
 	Value.Pointer = const_cast<ZEObjectType*>(&Object);

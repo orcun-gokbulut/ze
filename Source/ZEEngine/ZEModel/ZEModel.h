@@ -69,7 +69,9 @@ class ZEModel : public ZEEntity
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
 	friend class ZEModelDebugDrawer;
+
 	ZE_OBJECT
+
 	private:
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
@@ -122,6 +124,9 @@ class ZEModel : public ZEEntity
 		void								SetModelFile(const char* ModelFile);
 		const char*							GetModelFile() const;
 
+		//i'll remove this method
+		void								SetModelFile(ZEString ModelFile);
+
 		void								SetModelResource(const ZEModelResource* ModelResource);	
 		const ZEModelResource*				GetModelResource();
 		
@@ -167,4 +172,5 @@ class ZEModel : public ZEEntity
 
 		static ZEModel*						CreateInstance();
 };
+
 #endif

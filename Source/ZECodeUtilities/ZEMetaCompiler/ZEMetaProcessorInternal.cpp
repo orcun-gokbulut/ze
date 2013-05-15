@@ -889,6 +889,8 @@ void ZEMetaProcessorInternal::ProcessClass(CXXRecordDecl* Class)
 	ZEClassData* ClassData = new ZEClassData();
 	ClassData->Name = Class->getNameAsString();
 	ClassData->Hash = ClassData->Name.Hash();
+	ClassData->HasCreateInstanceMethod = false;
+	ClassData->HasPublicCopyConstructor = false;
 	ClassData->HasPublicConstructor = false;
 	ClassData->IsAbstract = false;
 	ClassData->IsBuiltInClass = IsBuiltInClassFound;
@@ -1213,14 +1215,12 @@ void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, FieldDecl*
 
 void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* Method)
 {
-	ZEString DebugMethodName = Method->getNameAsString();
-
-	if(Method->isPure())
+	if(Method->isPure() || Method->isVirtual())
 		ClassData->IsAbstract = true;
 
-	bool IsOperatorFound = false;
+	bool IsOperator = false;
 	if(Method->isOverloadedOperator())
-		IsOperatorFound = true;
+		IsOperator = true;
 
 	if(Method->getAccess() != AccessSpecifier::AS_public)
 		return;
@@ -1228,8 +1228,8 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 	if(!Method->getType()->isFunctionType())
 		return;
 
-	if(Method->getCanonicalDecl()->isCopyAssignmentOperator())
-		return;
+	if(Method->isCopyAssignmentOperator())
+		ClassData->HasPublicCopyConstructor = true;
 
 	if(isa<CXXDestructorDecl>(Method))
 		return;
@@ -1242,6 +1242,9 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 		return;
 
 	ZEString MethodName = Method->getNameAsString();
+
+	if(MethodName == "CreateInstance")
+		ClassData->HasCreateInstanceMethod = true;
 
 	if((MethodName.SubString(0, 2) == "Set" && Method->param_size() == 1) || (MethodName.SubString(0, 2) == "Get" && Method->param_size() == 0))
 	{
@@ -1340,13 +1343,13 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 
 	ZEMethodData* MethodData = new ZEMethodData();
 	MethodData->Name = MethodName;
-	MethodData->IsOperator = IsOperatorFound;
+	MethodData->IsOperator = IsOperator;
 	MethodData->IsStatic = Method->isStatic();
 	MethodData->IsEvent = false;
 	MethodData->Hash = MethodData->Name.Hash();
 	MethodData->ReturnParameter.Type = ReturnType;
 
-	if(IsOperatorFound)
+	if(IsOperator)
 		MethodData->OperatorType = GetOperatorType(Method->getOverloadedOperator());
 
 	if(MethodData->ReturnParameter.Type.Type == ZE_MTT_ENUMERATOR)
@@ -1362,6 +1365,7 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 	}
 
 	bool Error = false;
+	ZESize ParameterCount = 0;
 	for(clang::FunctionDecl::param_iterator CurrentParameter = Method->param_begin(), LastParameter = Method->param_end(); CurrentParameter != LastParameter; ++CurrentParameter)
 	{
 		ZEMetaType ParameterType = ProcessType(ClassData->Name, (*CurrentParameter)->getType());
@@ -1372,7 +1376,13 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 		}
 
 		ZEMethodParameterData* MethodParameterData = new ZEMethodParameterData();
-		MethodParameterData->Name = (*CurrentParameter)->getNameAsString();
+		if(!(*CurrentParameter)->getNameAsString().empty())
+			MethodParameterData->Name = (*CurrentParameter)->getNameAsString();
+		else
+		{
+			MethodParameterData->Name = "Arg";
+			MethodParameterData->Name.Append(ParameterCount);
+		}
 		MethodParameterData->Type = ParameterType;
 
 		if(ParameterType.Type == ZE_MTT_ENUMERATOR)
@@ -1388,6 +1398,8 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 		}
 
 		MethodData->Parameters.Add(MethodParameterData);
+
+		ParameterCount++;
 	}
 
 	ZEAttributeData* AttributeData = new ZEAttributeData();

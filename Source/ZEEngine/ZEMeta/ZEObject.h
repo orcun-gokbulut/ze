@@ -94,6 +94,7 @@ class ZEObject
 			virtual ZEClass*				GetParentClass(); \
 			virtual const char*				GetName(); \
 			virtual ZEGUID					GetGUID(); \
+			virtual ZESize					GetSizeOfClass(); \
 			virtual const ZEMetaAttribute*	GetAttributes(); \
 			virtual ZESize					GetAttributeCount(); \
 			virtual const ZEProperty*		GetProperties(); \
@@ -125,7 +126,7 @@ class ZEObject
 			virtual bool					RemoveEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler); \
 			bool							RemoveEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler); \
 			virtual bool					CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount); \
-			bool							CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount); \
+			virtual bool					CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount); \
 			virtual ZEObject*				CreateInstance(); \
 			virtual ZEClass*				GetClass() const; \
 			static ZEClass*					Class(); \

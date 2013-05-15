@@ -49,6 +49,8 @@ ze_add_source(ZEMetaProcessorInternal.h         Sources)
 ze_add_source(ZEMetaProcessorClang.cpp          Sources)
 ze_add_source(ZEMetaCollectionGenerator.h    	Sources)
 ze_add_source(ZEMetaCollectionGenerator.cpp  	Sources)
+ze_add_source(ZEMetaScriptBaseGenerator.h		Sources)
+ze_add_source(ZEMetaScriptBaseGenerator.cpp		Sources)
 
 ze_add_executable(ZEMetaCompiler 
 	CONSOLE 
