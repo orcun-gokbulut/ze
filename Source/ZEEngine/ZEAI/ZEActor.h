@@ -44,7 +44,7 @@
 #include "ZEMath\ZEVector.h"
 #include "ZEGame\ZEEntity.h"
 
-ZE_META_FORWARD_DECLARE(ZESteering, "ZESteering.h")
+class ZESteering;
 
 ZE_CLASS(ZEActor)
 

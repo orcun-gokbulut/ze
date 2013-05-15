@@ -269,6 +269,8 @@ class ZEClassData : public ZETypeData
 		ZEArray<ZEEventData*>			Events;
 
 		bool							HasPublicConstructor;
+		bool							HasPublicCopyConstructor;
+		bool							HasCreateInstanceMethod;
 		bool							IsAbstract;
 		bool							IsBuiltInClass;
 

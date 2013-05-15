@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProvider.h
+ Zinek Engine - ZEScriptEngine.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,32 +34,59 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PROVIDER_H__
-#define __ZE_PROVIDER_H__
 
 #include "ZEDS/ZEArray.h"
-#include "ZEClass.h"
+#include "ZEDS/ZEType.h"
+#include "ZEDS/ZEVariant.h"
 
-class ZEProvider
+class ZEScriptClass;
+struct ZEMethod;
+
+struct ZEScriptProperty
 {
-	private:
-		ZEArray<ZEClass*>				ClassList;
+	void*										PropertyPtr;
+	const char*									Declaration;
 
-	public:
-		bool							RegisterClasses(ZEClass** ClassArray, ZESize ClassCount);
+												ZEScriptProperty() {}
 
-		bool							RegisterClass(ZEClass* Class);
-		bool							UnregisterClass(ZEClass* Class);
-
-		const ZEArray<ZEClass*>&		GetClasses();
-		const ZESize					GetClassCount();
-
-		ZEClass*						GetClass(const ZESize Index);
-		ZEClass*						GetClass(const ZEString& ClassName);
-		ZEObject*						CreateInstance(const ZEString& ClassName);
-
-										ZEProvider();
-										~ZEProvider();
+												ZEScriptProperty(const char* Declaration, void* PropertyPtr) 
+												{
+													this->Declaration = Declaration;
+													this->PropertyPtr = PropertyPtr;
+												}
 };
 
-#endif
+struct ZEScriptFunction
+{
+	void*										FunctionPtr;
+	const char*									Declaration;
+	ZETypeType									ReturnType;
+	ZEArray<ZEVariant>							Parameters;
+
+												ZEScriptFunction() {}
+
+												ZEScriptFunction(ZETypeType ReturnType, const char* Declaration, void* FunctionPtr) 
+												{
+													this->Declaration = Declaration;
+													this->ReturnType = ReturnType;
+													this->FunctionPtr = FunctionPtr;
+												}
+};
+
+class ZEScriptEngine
+{
+	public:
+		virtual void							RegisterNativeClass(ZEClass* Class, bool ValueType) = 0;
+
+		virtual void							RegisterNativeGlobalProperty(ZEScriptProperty* Property) = 0;
+		virtual void							RegisterNativeGlobalFunction(ZEScriptFunction* Function) = 0;
+
+		virtual ZEArray<ZEScriptClass*>&		GetScriptClasses() = 0;
+
+		virtual void							LoadScript(const char* ScriptFileName, bool IsBinary) = 0;
+		virtual void							ReloadScript() = 0;
+		virtual void							ExecuteScript() = 0;
+
+		virtual void*							CallScriptFunction(ZEScriptFunction* Function) = 0;
+		//virtual void							CallMethod(ZEScriptObject* Object, ZEScriptFunction* Function, ...);
+};

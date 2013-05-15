@@ -51,6 +51,20 @@
 
 ZE_OBJECT_IMPL(ZEModel)
 
+//i'll remove this method
+void ZEModel::SetModelFile(ZEString ModelFile)
+{
+	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource(ModelFile);
+
+	if (ModelResource == NULL)
+	{
+		zeError("Can not load model file. File Name : \"%s\"", ModelFile);
+		return;
+	}
+
+	SetModelResource(ModelResource);
+}
+
 void ZEModel::CalculateBoundingBox()
 {
 	if (Meshes.GetCount() == 0 && Bones.GetCount() == 0)

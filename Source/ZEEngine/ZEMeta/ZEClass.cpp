@@ -53,6 +53,11 @@ ZEGUID ZEClass::GetGUID()
 	return ZEGUID(0, 0, 0, 0);
 }
 
+ZESize ZEClass::GetSizeOfClass()
+{
+	return 0;
+}
+
 const ZEMetaAttribute* ZEClass::GetAttributes()
 {
 	return NULL;
@@ -76,6 +81,7 @@ const ZEMethod* ZEClass::GetMethods()
 {
 	return NULL;
 }
+
 ZESize ZEClass::GetMethodCount()
 {
 	return 0;
