@@ -42,7 +42,7 @@
 
 void ZEEntity::OnTransformChanged()
 {
-	DirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM | ZE_EDF_WORLD_TRANSFORM | ZE_EDF_WORLD_BOUNDING_BOX);
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_TRANSFORM | ZE_EDF_WORLD_BOUNDING_BOX);
 
 	for (ZESize I = 0; I < Components.GetCount(); I++)
 		Components[I]->OnTransformChanged();
@@ -144,7 +144,7 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
 {
 	this->BoundingBox = BoundingBox;
-	DirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
 }
 
 bool ZEEntity::SetOwner(ZEEntity* Owner)
@@ -185,7 +185,7 @@ ZEEntity::ZEEntity()
 {
 	Owner = NULL;
 	OwnerScene = NULL;
-	DirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM | ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_TRANSFORM);
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM | ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_TRANSFORM);
 	Position = ZEVector3(0.0f, 0.0f, 0.0f);
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
@@ -237,10 +237,10 @@ const ZEAABBox& ZEEntity::GetBoundingBox() const
 
 const ZEAABBox& ZEEntity::GetWorldBoundingBox()
 {
-	if (DirtyFlags.GetFlags(ZE_EDF_WORLD_BOUNDING_BOX))
+	if (EntityDirtyFlags.GetFlags(ZE_EDF_WORLD_BOUNDING_BOX))
 	{
 		ZEAABBox::Transform(WorldBoundingBox, GetBoundingBox(), GetWorldTransform());
-		DirtyFlags.UnraiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
+		EntityDirtyFlags.UnraiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
 	}
 
 	return WorldBoundingBox;
@@ -248,10 +248,10 @@ const ZEAABBox& ZEEntity::GetWorldBoundingBox()
 
 const ZEMatrix4x4& ZEEntity::GetTransform() const
 {
-	if (DirtyFlags.GetFlags(ZE_EDF_LOCAL_TRANSFORM))
+	if (EntityDirtyFlags.GetFlags(ZE_EDF_LOCAL_TRANSFORM))
 	{
 		ZEMatrix4x4::CreateOrientation(Transform, GetPosition(), GetRotation(), GetScale());
-		DirtyFlags.UnraiseFlags(ZE_EDF_LOCAL_TRANSFORM);
+		EntityDirtyFlags.UnraiseFlags(ZE_EDF_LOCAL_TRANSFORM);
 	}
 
 	return Transform;
@@ -259,18 +259,20 @@ const ZEMatrix4x4& ZEEntity::GetTransform() const
 
 const ZEMatrix4x4& ZEEntity::GetWorldTransform() const
 {
-	if (Owner != NULL)
+	if (Owner == NULL)
 	{
-		if (DirtyFlags.GetFlags(ZE_EDF_WORLD_TRANSFORM))
-		{
-			ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetTransform());
-			DirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
-		}
-
-		return WorldTransform;
+		EntityDirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
+		return GetTransform();
 	}
 
-	return GetTransform();
+	if (EntityDirtyFlags.GetFlags(ZE_EDF_WORLD_TRANSFORM))
+	{
+		ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetTransform());
+		EntityDirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
+	}
+
+	return WorldTransform;
+
 }
 
 bool ZEEntity::IsInitialized()
@@ -326,6 +328,8 @@ bool ZEEntity::GetEnabled() const
 void ZEEntity::SetPosition(const ZEVector3& NewPosition)
 {
 	Position = NewPosition;
+
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
 	OnTransformChanged();
 }
 
@@ -361,6 +365,8 @@ const ZEVector3 ZEEntity::GetWorldPosition() const
 void ZEEntity::SetRotation(const ZEQuaternion& NewRotation)
 {
 	Rotation = NewRotation;
+
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
 	OnTransformChanged();
 }
 
@@ -398,6 +404,8 @@ const ZEQuaternion ZEEntity::GetWorldRotation() const
 void ZEEntity::SetScale(const ZEVector3& NewScale)
 {
 	Scale = NewScale;
+
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
 	OnTransformChanged();
 }
 

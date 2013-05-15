@@ -141,7 +141,7 @@ class ZEEntity : public ZEObject
 		bool									Enabled;
 		bool									Visible;
 
-		mutable ZEEntityDirtyFlags				DirtyFlags;
+		mutable ZEEntityDirtyFlags				EntityDirtyFlags;
 
 		mutable ZEMatrix4x4						Transform;
 		mutable ZEMatrix4x4						WorldTransform;
