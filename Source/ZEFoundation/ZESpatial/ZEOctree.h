@@ -243,6 +243,10 @@ class ZEOctree
 		ZEInt GetOctantIndex(const ZEVector3& Point) const
 		{
 			ZEVector3& Center = BoundingBox.GetCenter();
+
+			if (Point.x == Center.x || Point.y == Center.y || Point.z == Center.z)
+				return -1;
+			
 			return (Point.z > Center.z ? 4 : 0) + (Point.y > Center.y ? 2 : 0) + (Point.x > Center.x ? 1 : 0);
 		}
 
@@ -250,12 +254,14 @@ class ZEOctree
 		{
 			ZEInt OctantIndexA = GetOctantIndex(Triangle.V0);
 			ZEInt OctantIndexB = GetOctantIndex(Triangle.V1);
-			
 			if (OctantIndexA != OctantIndexB)
 				return -1;
 
 			OctantIndexB = GetOctantIndex(Triangle.V2);
-			return (OctantIndexA != OctantIndexB) ? -1 : OctantIndexA;
+			if (OctantIndexA != OctantIndexB)
+				return -1;
+
+			return OctantIndexA;
 		}
 
 		ZEInt GetOctantIndex(const ZEAABBox& BoundingBox) const

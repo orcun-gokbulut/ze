@@ -41,5 +41,4 @@ ze_add_source(ZESensicsInputModule.cpp			Sources)
 ze_add_source(ZESensicsInputModule.h				Sources)
 
 ze_add_library(ZESensics
-	SOURCES ${Sources}
-	LIBS libXSens)
+	SOURCES ${Sources})

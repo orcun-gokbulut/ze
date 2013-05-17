@@ -41,16 +41,27 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERay.h"
 #include "ZEDS/ZEDelegate.h"
+#include "ZEDS/ZEFlags.h"
 
 class ZEEntity;
-class ZEClass;
+class ZEMaterial;
 
-typedef ZEDelegate<bool (ZEEntity*, ZEClass*)> ZERayCastFilterFunction;
+typedef ZEFlags ZERayCastReportExtras;
+#define ZE_RCRE_ALL					0xFFFFFFFF
+#define ZE_RCRE_NONE				0x1
+#define ZE_RCRE_NORMAL				0x1
+#define ZE_RCRE_BINORMAL			0x2
+#define ZE_RCRE_POLIGON_INDEX		0x4
+#define ZE_RCRE_POLYGON_MATERIAL	0x8
+
+typedef ZEDelegate<bool (ZEEntity*, void*)> ZERayCastFilterFunction;
 
 struct ZERayCastParameters
 {
 	ZERay						Ray;
+	ZERayCastReportExtras		Extras;
 	ZERayCastFilterFunction		FilterFunction;
+	void*						FilterFunctionParameter;
 	float						MinimumDistance;
 	float						MaximumDistance;
 
@@ -66,6 +77,9 @@ struct ZERayCastReport
 	ZEVector3					Position;
 	ZEVector3					Normal;
 	ZEVector3					Binormal;
+	
+	ZEMaterial*					Material;
+
 	float						Distance;
 
 								ZERayCastReport();

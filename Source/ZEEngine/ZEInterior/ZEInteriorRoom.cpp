@@ -146,12 +146,12 @@ bool ZEInteriorRoom::RayCastOctree(const ZEOctree<ZESize>& Octree, const ZERay& 
 
 bool ZEInteriorRoom::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	ZEMatrix4x4 InvTransform;
-	ZEMatrix4x4::Inverse(InvTransform, GetWorldTransform());
+	if (!ZEAABBox::IntersectionTest(GetWorldBoundingBox(), Parameters.Ray))
+		return false;
 
 	ZERay LocalRay;
-	ZEMatrix4x4::Transform(LocalRay.p, InvTransform, Parameters.Ray.p);
-	ZEMatrix4x4::Transform3x3(LocalRay.v, InvTransform, Parameters.Ray.v);
+	ZEMatrix4x4::Transform(LocalRay.p, GetInvWorldTransform(), Parameters.Ray.p);
+	ZEMatrix4x4::Transform3x3(LocalRay.v, GetInvWorldTransform(), Parameters.Ray.v);
 	LocalRay.v.NormalizeSelf();
 
 	float RayT;
@@ -180,18 +180,30 @@ bool ZEInteriorRoom::RayCast(ZERayCastReport& Report, const ZERayCastParameters&
 			Report.SubComponent = this;
 			Report.PoligonIndex = PoligonIndex;
 
-			ZEVector3 V0 = Resource->Polygons[Report.PoligonIndex].Vertices[0].Position;
-			ZEVector3 V1 = Resource->Polygons[Report.PoligonIndex].Vertices[1].Position;
-			ZEVector3 V2 = Resource->Polygons[Report.PoligonIndex].Vertices[2].Position;
-			ZEVector3 Binormal = ZEVector3(V0, V1);
-			ZEVector3 Tangent = ZEVector3(V0, V2);
-			ZEVector3 Normal;
-			ZEVector3::CrossProduct(Normal, Binormal, Tangent);
-			ZEMatrix4x4::Transform3x3(Report.Normal, GetWorldTransform(), Normal);
-			ZEMatrix4x4::Transform3x3(Report.Binormal, GetWorldTransform(), Binormal);
-			Report.Normal.NormalizeSelf();
-			Report.Binormal.NormalizeSelf();
+			if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL) || Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
+			{
+				ZEVector3 V0 = Resource->Polygons[Report.PoligonIndex].Vertices[0].Position;
+				ZEVector3 V1 = Resource->Polygons[Report.PoligonIndex].Vertices[1].Position;
+				ZEVector3 V2 = Resource->Polygons[Report.PoligonIndex].Vertices[2].Position;
 
+				ZEVector3 Binormal = ZEVector3(V0, V1);
+				ZEVector3 Tangent = ZEVector3(V0, V2);
+				ZEVector3 Normal;
+				ZEVector3::CrossProduct(Normal, Binormal, Tangent);
+
+				if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL))
+				{
+					ZEMatrix4x4::Transform3x3(Report.Normal, GetWorldTransform(), Normal);
+					Report.Normal.NormalizeSelf();
+				}
+
+				if (Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
+				{
+					ZEMatrix4x4::Transform3x3(Report.Binormal, GetWorldTransform(), Binormal);
+					Report.Binormal.NormalizeSelf();
+				}
+			}
+			
 			return true;
 		}
 	}
@@ -230,12 +242,12 @@ const ZEArray<ZEInteriorDoor*>& ZEInteriorRoom::GetDoors()
 	return Doors;
 }
 
-const ZEAABBox& ZEInteriorRoom::GetBoundingBox()
+const ZEAABBox& ZEInteriorRoom::GetBoundingBox() const
 {
 	return BoundingBox;
 }
 
-const ZEAABBox& ZEInteriorRoom::GetWorldBoundingBox()
+const ZEAABBox& ZEInteriorRoom::GetWorldBoundingBox() const
 {
 	if (DirtyFlags.GetFlags(ZE_IRDF_WORLD_BOUNDING_BOX))
 	{
@@ -247,7 +259,7 @@ const ZEAABBox& ZEInteriorRoom::GetWorldBoundingBox()
 	
 }
 
-const ZEMatrix4x4& ZEInteriorRoom::GetTransform()
+const ZEMatrix4x4& ZEInteriorRoom::GetTransform() const
 {
 	if (DirtyFlags.GetFlags(ZE_IRDF_TRANSFORM))
 	{
@@ -258,7 +270,7 @@ const ZEMatrix4x4& ZEInteriorRoom::GetTransform()
 	return LocalTransform;
 }
 
-const ZEMatrix4x4& ZEInteriorRoom::GetWorldTransform()
+const ZEMatrix4x4& ZEInteriorRoom::GetWorldTransform() const
 {
 	if (DirtyFlags.GetFlags(ZE_IRDF_WORLD_TRANSFORM))
 	{
@@ -267,6 +279,17 @@ const ZEMatrix4x4& ZEInteriorRoom::GetWorldTransform()
 	}
 
 	return WorldTransform;
+}
+
+const ZEMatrix4x4& ZEInteriorRoom::GetInvWorldTransform() const
+{
+	if (DirtyFlags.GetFlags(ZE_IRDF_INV_WORLD_TRANSFORM))
+	{
+		ZEMatrix4x4::Inverse(InvWorldTransform, GetWorldTransform());
+		DirtyFlags.UnraiseFlags(ZE_IRDF_INV_WORLD_TRANSFORM);
+	}
+
+	return InvWorldTransform;
 }
 
 void ZEInteriorRoom::SetPosition(const ZEVector3& NewPosition)

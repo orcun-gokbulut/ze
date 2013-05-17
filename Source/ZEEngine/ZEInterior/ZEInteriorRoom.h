@@ -59,7 +59,8 @@ typedef ZEFlags ZEInteriorRoomDirtyFlags;
 #define ZE_IRDF_NONE							0
 #define ZE_IRDF_TRANSFORM						1
 #define ZE_IRDF_WORLD_TRANSFORM					2
-#define ZE_IRDF_WORLD_BOUNDING_BOX				4
+#define ZE_IRDF_INV_WORLD_TRANSFORM				4
+#define ZE_IRDF_WORLD_BOUNDING_BOX				8
 #define ZE_IRDF_ALL								0xFFFFFFFF
 
 class ZEInteriorRoom
@@ -79,12 +80,14 @@ class ZEInteriorRoom
 		bool								IsDrawn;
 		bool								IsPersistentDraw;
 
-		ZEInteriorRoomDirtyFlags			DirtyFlags;
+		mutable ZEInteriorRoomDirtyFlags	DirtyFlags;
+
 		ZEAABBox							BoundingBox;
-		ZEAABBox							WorldBoundingBox;
+		mutable ZEAABBox					WorldBoundingBox;
 		
-		ZEMatrix4x4							LocalTransform;
-		ZEMatrix4x4							WorldTransform;
+		mutable ZEMatrix4x4					LocalTransform;
+		mutable ZEMatrix4x4					WorldTransform;
+		mutable ZEMatrix4x4					InvWorldTransform;
 
 		ZEVector3							Position;
 		ZEQuaternion						Rotation;
@@ -117,11 +120,12 @@ class ZEInteriorRoom
 		ZEPhysicalMesh*						GetPhysicalMesh();
 		ZESize								GetPolygonCount();
 
-		const ZEAABBox&						GetBoundingBox();
-		const ZEAABBox&						GetWorldBoundingBox();
+		const ZEAABBox&						GetBoundingBox() const;
+		const ZEAABBox&						GetWorldBoundingBox() const;
 
-		const ZEMatrix4x4&					GetTransform();
-		const ZEMatrix4x4&					GetWorldTransform();
+		const ZEMatrix4x4&					GetTransform() const;
+		const ZEMatrix4x4&					GetWorldTransform() const;
+		const ZEMatrix4x4&					GetInvWorldTransform() const;
 
 		void								SetPosition(const ZEVector3& NewPosition);
 		const ZEVector3&					GetPosition() const;
