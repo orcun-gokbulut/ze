@@ -45,7 +45,6 @@ class ZEProtect
 		ZEString			Key;
 		ZEString			ActivationFileName;
 		bool				SystemWide;
-		
 
 	public:
 		void				SetApplicationName(const char* Name);
@@ -64,6 +63,8 @@ class ZEProtect
 
 		bool				Activate();
 		bool				Verify();
+
+							ZEProtect();
 };
 
 #endif

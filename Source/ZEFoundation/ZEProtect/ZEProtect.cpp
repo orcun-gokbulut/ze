@@ -250,3 +250,8 @@ bool ZEProtect::Verify()
 	
 	return false;
 }
+
+ZEProtect::ZEProtect()
+{
+	SystemWide = true;
+}
