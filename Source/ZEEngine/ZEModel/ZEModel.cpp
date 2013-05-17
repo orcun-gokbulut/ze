@@ -51,7 +51,7 @@
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEModel);
 
-void ZEModel::CalculateBoundingBox()
+void ZEModel::CalculateBoundingBox() const
 {
 	if (Meshes.GetCount() == 0 && Bones.GetCount() == 0)
 	{
@@ -397,7 +397,7 @@ void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
 	BoundingBoxIsUserDefined = Value;
 }
 
-const ZEAABBox& ZEModel::GetWorldBoundingBox()
+const ZEAABBox& ZEModel::GetWorldBoundingBox() const
 {
 	if (!BoundingBoxIsUserDefined)
 		CalculateBoundingBox();

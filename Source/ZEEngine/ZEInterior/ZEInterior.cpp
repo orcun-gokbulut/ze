@@ -241,34 +241,6 @@ void ZEInterior::Draw(ZEDrawParameters* DrawParameters)
 	}
 }
 
-bool ZEInterior::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT)
-{
-	if (InteriorResource == NULL)
-		return false;
-
-	float T;
-	bool Found = false;
-	for (ZESize I = 0; I < InteriorResource->GetRooms().GetCount(); I++)
-	{
-		const ZEInteriorResourceRoom* CurrentRoom = &InteriorResource->GetRooms()[I];
-		//if (ZEAABBox::IntersectionTest(CurrentPortal->BoundingBox,Ray))
-		for (ZESize N = 0; N < CurrentRoom->Polygons.GetCount(); N++)
-		{
-			const ZEInteriorPolygon& MapPolygon = CurrentRoom->Polygons[N];
-			ZETriangle Triangle(MapPolygon.Vertices[0].Position, MapPolygon.Vertices[1].Position, MapPolygon.Vertices[2].Position);
-			if (ZETriangle::IntersectionTest(Triangle, Ray, T) && (!Found || MinT > T))
-			{
-				MinT = T;
-				ZERay::GetPointOn(Position, Ray, T);
-				ZETriangle::GetNormal(Triangle, Normal);
-				Found = true;
-			}
-		}
-	}
-
-	return Found;
-}
-
 ZEInterior* ZEInterior::CreateInstance()
 {
 	return new ZEInterior();

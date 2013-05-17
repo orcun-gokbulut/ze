@@ -98,7 +98,7 @@ class ZEModel : public ZEEntity
 
 		bool								BoundingBoxIsUserDefined;
 
-		void								CalculateBoundingBox();
+		void								CalculateBoundingBox() const;
 		void								UpdateTransforms();
 	
 		void								LoadModelResource();
@@ -118,7 +118,7 @@ class ZEModel : public ZEEntity
 		virtual const ZEModelStatistics&	GetStatistics() const;
 
 		void								SetUserDefinedBoundingBoxEnabled(bool Value);
-		virtual const ZEAABBox&				GetWorldBoundingBox();
+		virtual const ZEAABBox&				GetWorldBoundingBox() const;
 
 		void								SetModelFile(const char* ModelFile);
 		const char*							GetModelFile() const;

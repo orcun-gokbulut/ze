@@ -110,7 +110,6 @@ class ZEInterior : public ZEEntity
 		virtual ZEDrawFlags						GetDrawFlags() const;
 
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
-		virtual bool							CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT);
 
 		virtual void							SetInteriorFile(const char* InteriorFile);
 		virtual const char*						GetInteriorFile() const;
