@@ -37,6 +37,7 @@
 #include "ZETypes.h"
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9Module.h"
+#include "ZEData.h"
 
 ZEUInt32 ZED3D9ShaderManager::CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components)
 {
@@ -84,6 +85,122 @@ void ZED3D9ShaderManager::WriteToFileCache(const char* Filenamne, const char* Fu
 
 }
 
+#include "Shaders_AerialPerspectiveProcessor_hlsl.h"
+#include "Shaders_BlurMaskProcessor_hlsl.h"
+#include "Shaders_BlurProcessor_hlsl.h"
+#include "Shaders_ChannelDisorientationProcessor_hlsl.h"
+#include "Shaders_CloudMaterial_hlsl.h"
+#include "Shaders_ColorTransformProcessor_hlsl.h"
+#include "Shaders_DOFProcessor_hlsl.h"
+#include "Shaders_DownSample2x_hlsl.h"
+#include "Shaders_EDProcessor_hlsl.h"
+#include "Shaders_FixedMaterialComponents_hlsl.h"
+#include "Shaders_FixedMaterial_hlsl.h"
+#include "Shaders_FogProcessor_hlsl.h"
+#include "Shaders_GBuffer_hlsl.h"
+#include "Shaders_GrainProcessor_hlsl.h"
+#include "Shaders_HBAOProcessor_hlsl.h"
+#include "Shaders_HDRProcessor_hlsl.h"
+#include "Shaders_LBuffer_hlsl.h"
+#include "Shaders_Lights_hlsl.h"
+#include "Shaders_MLAAProcessor_hlsl.h"
+#include "Shaders_MoonMaterial_hlsl.h"
+#include "Shaders_PixelWorldPositionProcessor_hlsl.h"
+#include "Shaders_SeaMaterial_hlsl.h"
+#include "Shaders_ShadowMaterial_hlsl.h"
+#include "Shaders_Shadow_hlsl.h"
+#include "Shaders_SimpleMaterial_hlsl.h"
+#include "Shaders_SkinTransform_hlsl.h"
+#include "Shaders_SkyBoxMaterial_hlsl.h"
+#include "Shaders_SkyDomeMaterial_hlsl.h"
+#include "Shaders_SSAAProcessor_hlsl.h"
+#include "Shaders_SSOAProcessor_hlsl.h"
+#include "Shaders_TerrainMaterial_hlsl.h"
+#include "Shaders_TextureMaskProcessor_hlsl.h"
+#include "Shaders_TextureResizeProcessor_hlsl.h"
+#include "Shaders_UI_hlsl.h"
+#include "Shaders_UnsharpenFilterProcessor_hlsl.h"
+#include "Shaders_ZoomBlurProcessor_hlsl.h"
+
+const char* ZED3D9ShaderManager::GetInternal(const char* Filename)
+{
+	if (stricmp(Filename, "AerialPerspectiveProcessor.hlsl") == 0)
+		return (const char*)Shaders_AerialPerspectiveProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "BlurMaskProcessor.hlsl") == 0)
+		return (const char*)Shaders_BlurMaskProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "BlurProcessor.hlsl") == 0)
+		return (const char*)Shaders_BlurProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "ChannelDisorientationProcessor.hlsl") == 0)
+		return (const char*)Shaders_ChannelDisorientationProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "CloudMaterial.hlsl") == 0)
+		return (const char*)Shaders_CloudMaterial_hlsl().GetData();
+	else if(stricmp(Filename, "ColorTransformProcessor.hlsl") == 0)
+		return (const char*)Shaders_ColorTransformProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "DOFProcessor.hlsl") == 0)
+		return (const char*)Shaders_DOFProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "DownSample2x.hlsl") == 0)
+		return (const char*)Shaders_DownSample2x_hlsl().GetData();
+	else if(stricmp(Filename, "EDProcessor.hlsl") == 0)
+		return (const char*)Shaders_EDProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "FixedMaterial.hlsl") == 0)
+		return (const char*)Shaders_FixedMaterial_hlsl().GetData();
+	else if(stricmp(Filename, "FixedMaterialComponents.hlsl") == 0)
+		return (const char*)Shaders_FixedMaterialComponents_hlsl().GetData();
+	else if(stricmp(Filename, "FogProcessor.hlsl") == 0)
+		return (const char*)Shaders_FogProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "GBuffer.hlsl") == 0)
+		return (const char*)Shaders_GBuffer_hlsl().GetData();
+	else if(stricmp(Filename, "GrainProcessor.hlsl") == 0)
+		return (const char*)Shaders_GrainProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "HBAOProcessor.hlsl") == 0)
+		return (const char*)Shaders_HBAOProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "HDRProcessor.hlsl") == 0)
+		return (const char*)Shaders_HDRProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "LBuffer.hlsl") == 0)
+		return (const char*)Shaders_LBuffer_hlsl().GetData();
+	else if(stricmp(Filename, "Lights.hlsl") == 0)
+		return (const char*)Shaders_Lights_hlsl().GetData();
+	else if(stricmp(Filename, "MLAAProcessor.hlsl") == 0)
+		return (const char*)Shaders_MLAAProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "MoonMaterial.hlsl") == 0)
+		return (const char*)Shaders_MoonMaterial_hlsl().GetData();
+	else if(stricmp(Filename, "PixelWorldPositionProcessor.hlsl") == 0)
+		return (const char*)Shaders_PixelWorldPositionProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "SeaMaterial.hlsl") == 0)
+		return (const char*)Shaders_SeaMaterial_hlsl().GetData();
+	else if(stricmp(Filename, "Shadow.hlsl") == 0)
+		return (const char*)Shaders_Shadow_hlsl().GetData();
+	else if(stricmp(Filename, "ShadowMaterial.hlsl") == 0)
+		return (const char*)Shaders_ShadowMaterial_hlsl().GetData();
+	else if(stricmp(Filename, "SimpleMaterial.hlsl") == 0)
+		return (const char*)Shaders_SimpleMaterial_hlsl().GetData();
+	else if(stricmp(Filename, "SkinTransform.hlsl") == 0)
+		return (const char*)Shaders_SkinTransform_hlsl().GetData();
+	else if(stricmp(Filename, "SkyBoxMaterial.hlsl") == 0)
+		return (const char*)Shaders_SkyBoxMaterial_hlsl().GetData();
+	else if(stricmp(Filename, "SkyDomeMaterial.hlsl") == 0)
+		return (const char*)Shaders_SkyDomeMaterial_hlsl().GetData();
+	else if(stricmp(Filename, "SSAAProcessor.hlsl") == 0)
+		return (const char*)Shaders_SSAAProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "SSOAProcessor.hlsl") == 0)
+		return (const char*)Shaders_SSOAProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "TerrainMaterial.hlsl") == 0)
+		return (const char*)Shaders_TerrainMaterial_hlsl().GetData();
+	else if(stricmp(Filename, "TextureMaskProcessor.hlsl") == 0)
+		return (const char*)Shaders_TextureMaskProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "TextureResizeProcessor.hlsl") == 0)
+		return (const char*)Shaders_TextureResizeProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "UI.hlsl") == 0)
+		return (const char*)Shaders_UI_hlsl().GetData();
+	else if(stricmp(Filename, "UnsharpenFilterProcessor.hlsl") == 0)
+		return (const char*)Shaders_UnsharpenFilterProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "ZoomBlurProcessor.hlsl") == 0)
+		return (const char*)Shaders_ZoomBlurProcessor_hlsl().GetData();
+	else 
+		return NULL;
+
+}
+
 ZED3D9ShaderManager::ZED3D9ShaderManager()
 {
 
@@ -117,8 +234,17 @@ ZED3D9Shader* ZED3D9ShaderManager::GetShader(const char* FileName, const char* F
 	if (Type == ZE_D3D9_ST_PIXEL)
 	{
 		LPDIRECT3DPIXELSHADER9 PixelShader = NULL;
-		if (!ZED3D9CommonTools::CompilePixelShader(&PixelShader, FileName, FunctionName, Profile, Components))
-			return NULL;
+		const char* ShaderSource = GetInternal(FileName);
+		if (ShaderSource == NULL)
+		{
+			if (!ZED3D9CommonTools::CompilePixelShader(&PixelShader, FileName, FunctionName, Profile, Components))
+				return NULL;
+		}
+		else
+		{
+			if (!ZED3D9CommonTools::CompilePixelShaderFromMemory(&PixelShader, ShaderSource, FunctionName, Profile, Components))
+				return NULL;
+		}
 
 		Shader = new ZED3D9PixelShader();
 		((ZED3D9PixelShader*)Shader)->PixelShader = PixelShader;
@@ -126,8 +252,17 @@ ZED3D9Shader* ZED3D9ShaderManager::GetShader(const char* FileName, const char* F
 	else if (Type == ZE_D3D9_ST_VERTEX)
 	{
 		LPDIRECT3DVERTEXSHADER9 VertexShader = NULL;
-		if (!ZED3D9CommonTools::CompileVertexShader(&VertexShader, FileName, FunctionName, Profile, Components))
-			return NULL;
+		const char* ShaderSource = GetInternal(FileName);
+		if (ShaderSource == NULL)
+		{
+			if (!ZED3D9CommonTools::CompileVertexShader(&VertexShader, FileName, FunctionName, Profile, Components))
+				return NULL;
+		}
+		else
+		{
+			if (!ZED3D9CommonTools::CompileVertexShaderFromMemory(&VertexShader, ShaderSource, FunctionName, Profile, Components))
+				return NULL;
+		}
 
 		Shader = new ZED3D9VertexShader();
 		((ZED3D9VertexShader*)Shader)->VertexShader = VertexShader;

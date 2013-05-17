@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9ShaderManager.h
+ Zinek Engine - ChannelDisorientationProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,66 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_D3D9_SHADER_MANAGER_H__
-#define __ZE_D3D9_SHADER_MANAGER_H__
+sampler2D 	ColorBuffer		: register (s0);
 
-#include "ZETypes.h"
-#include "ZED3D9Shader.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEFile/ZEFileCache.h"
+float2 		VSParameters	: register(vs, c0);
 
-class ZED3D9ShaderManager
+#define		PixelSize		VSParameters.xy
+
+float4 		PSParameters0	: register(ps, c0);
+float4		PSParameters1	: register(ps, c1);
+float4		PSParameters2	: register(ps, c2);
+
+#define		RedOffset		PSParameters0.xy
+#define		GreenOffset		PSParameters0.zw
+#define		BlueOffset		PSParameters1.xy
+#define		AlphaOffset		PSParameters1.zw
+
+
+// Vertex Shader
+struct VS_INPUT
 {
-	friend void ZED3D9Shader::Release();
-	friend ZED3D9Module;
-	private:
-		ZESmartArray<ZED3D9Shader*>		Shaders;
-		//ZEFileCache					ShaderFileCache;
-
-		ZEUInt32						CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components);
-		void							ReleaseShader(ZED3D9Shader* Shader);
-		bool							ReadFromFileCache(const char* Filename, const char* FunctionName, ZEUInt32 Components);
-		void							WriteToFileCache(const char* Filenamne, const char* FunctionName, ZEUInt32 Components);
-
-										ZED3D9ShaderManager();
-										~ZED3D9ShaderManager();
-	public:
-		const char*						GetInternal(const char* Filename);
-		ZED3D9Shader*					GetShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile);
-		ZED3D9PixelShader*				GetPixelShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);	
-		ZED3D9VertexShader*				GetVertexShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
-
-		static ZED3D9ShaderManager*		GetInstance();
+	float4 Position	: POSITION0;
+	
 };
 
-#endif
+struct VS_OUTPUT 
+{
+	float4 Position	: POSITION0;
+	float2 TexCoord : TEXCOORD0;
+};
+
+struct PS_INPUT
+{
+	float2 TexCoord : TEXCOORD0;
+};
+
+struct PS_OUTPUT
+{
+	float4 PixelColor : COLOR0;
+};
+
+VS_OUTPUT vs_main(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
+   
+	Output.Position	= sign(Input.Position);
+
+	Output.TexCoord.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
+	Output.TexCoord.y = 0.5f * (1.0f - Output.Position.y + PixelSize.y);
+	
+	return Output;
+}
+
+
+PS_OUTPUT ps_main( PS_INPUT Input )
+{
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
+
+	Output.PixelColor.r = tex2D(ColorBuffer, Input.TexCoord + RedOffset).r;
+	Output.PixelColor.g = tex2D(ColorBuffer, Input.TexCoord + GreenOffset).g;
+	Output.PixelColor.b = tex2D(ColorBuffer, Input.TexCoord + BlueOffset).b;
+	Output.PixelColor.a = tex2D(ColorBuffer, Input.TexCoord + AlphaOffset).a;
+	
+	return Output;
+}
