@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9ShaderManager.h
+ Zinek Engine - MoonMaterial.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,77 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_D3D9_SHADER_MANAGER_H__
-#define __ZE_D3D9_SHADER_MANAGER_H__
+/************************************************************************/
+/*					        Moon Render Pass		                    */
+/************************************************************************/
 
-#include "ZETypes.h"
-#include "ZED3D9Shader.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEFile/ZEFileCache.h"
+//------------------------------------------------
+// Samplers
+//------------------------------------------------
+sampler3D 	MoonTexture			: register(s0);
 
-class ZED3D9ShaderManager
+//------------------------------------------------
+// VS Constants
+//------------------------------------------------
+float4x4	WorldViewProjMat	: register(vs, c0);
+
+//------------------------------------------------
+// PS Constants
+//------------------------------------------------
+float4		MoonParameters		: register(ps, c0);
+
+#define		MoonAmbientColor		MoonParameters.rgb
+#define		MoonLightIntensity		MoonParameters.a
+
+//------------------------------------------------
+// IO Structures
+//------------------------------------------------
+struct VS_INPUT
 {
-	friend void ZED3D9Shader::Release();
-	friend ZED3D9Module;
-	private:
-		ZESmartArray<ZED3D9Shader*>		Shaders;
-		//ZEFileCache					ShaderFileCache;
-
-		ZEUInt32						CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components);
-		void							ReleaseShader(ZED3D9Shader* Shader);
-		bool							ReadFromFileCache(const char* Filename, const char* FunctionName, ZEUInt32 Components);
-		void							WriteToFileCache(const char* Filenamne, const char* FunctionName, ZEUInt32 Components);
-
-										ZED3D9ShaderManager();
-										~ZED3D9ShaderManager();
-	public:
-		const char*						GetInternal(const char* Filename);
-		ZED3D9Shader*					GetShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile);
-		ZED3D9PixelShader*				GetPixelShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);	
-		ZED3D9VertexShader*				GetVertexShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
-
-		static ZED3D9ShaderManager*		GetInstance();
+	float4 Position			: POSITION0;
+	float3 TextureCoord		: TEXCOORD0;
 };
 
-#endif
+struct VS_OUTPUT
+{
+	float4 Position			: POSITION0;
+	float3 TextureCoord		: TEXCOORD0;
+};
+
+struct PS_INPUT
+{
+	float3 TextureCoord		: TEXCOORD0;
+};
+
+struct PS_OUTPUT
+{
+	float4 PixelColor		: COLOR0;
+};
+
+
+//------------------------------------------------
+// Vertex Shader
+//------------------------------------------------
+VS_OUTPUT vs_main_render_moon(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
+	
+	Output.TextureCoord = Input.TextureCoord;
+
+	Output.Position		= mul(WorldViewProjMat, Input.Position.xyz);
+	Output.Position.z	= Output.Position.w;
+	
+	return Output;
+}
+
+//------------------------------------------------
+// Pixel Shader
+//------------------------------------------------
+PS_OUTPUT ps_main_render_moon(PS_INPUT Input)
+{
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
+
+	Output.PixelColor = MoonLightIntensity * float4(MoonAmbientColor.xyz, 1.0f) * tex3D(MoonTexture, Input.TextureCoord);
+	// Output.PixelColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	return Output;
+}

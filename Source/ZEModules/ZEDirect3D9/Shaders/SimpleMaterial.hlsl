@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9ShaderManager.h
+ Zinek Engine - SimpleMaterial.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,54 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_D3D9_SHADER_MANAGER_H__
-#define __ZE_D3D9_SHADER_MANAGER_H__
+sampler2D Texture			: register(s5);
+float4x4 TransformMatrix	: register(c0);
 
-#include "ZETypes.h"
-#include "ZED3D9Shader.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEFile/ZEFileCache.h"
+bool EnableTexture			: register(b0);
+bool EnableVertexColor		: register(b1);
 
-class ZED3D9ShaderManager
+float4 MaterialColor		: register(c10);
+
+struct VSInput 
 {
-	friend void ZED3D9Shader::Release();
-	friend ZED3D9Module;
-	private:
-		ZESmartArray<ZED3D9Shader*>		Shaders;
-		//ZEFileCache					ShaderFileCache;
-
-		ZEUInt32						CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components);
-		void							ReleaseShader(ZED3D9Shader* Shader);
-		bool							ReadFromFileCache(const char* Filename, const char* FunctionName, ZEUInt32 Components);
-		void							WriteToFileCache(const char* Filenamne, const char* FunctionName, ZEUInt32 Components);
-
-										ZED3D9ShaderManager();
-										~ZED3D9ShaderManager();
-	public:
-		const char*						GetInternal(const char* Filename);
-		ZED3D9Shader*					GetShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile);
-		ZED3D9PixelShader*				GetPixelShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);	
-		ZED3D9VertexShader*				GetVertexShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
-
-		static ZED3D9ShaderManager*		GetInstance();
+	float4 Position			: POSITION0;
+	float2 Textcoord		: TEXCOORD0;
+	float4 Color			: TEXCOORD1;
 };
 
-#endif
+struct VSOutput 
+{
+	float4 Position			: POSITION0;
+	float2 Texcoord			: TEXCOORD0;
+	float4 Color			: TEXCOORD1;
+};
+
+VSOutput VSMain(VSInput Input)
+{
+	VSOutput Output;
+
+	Output.Position = mul(TransformMatrix, Input.Position);
+	Output.Texcoord = Input.Textcoord;
+	Output.Color = Input.Color;
+	
+	return Output;
+}
+
+struct PSInput
+{
+	float2 Texcoord				: TEXCOORD0;
+	float4 Color			    : TEXCOORD1;
+};
+
+float4 PSMain(PSInput Input) : COLOR0
+{
+	float4 Color = MaterialColor;
+	
+	if (EnableVertexColor)
+		Color *= Input.Color;
+	
+	if (EnableTexture)
+		Color *= tex2D(Texture, Input.Texcoord);	
+		
+	return Color;
+}

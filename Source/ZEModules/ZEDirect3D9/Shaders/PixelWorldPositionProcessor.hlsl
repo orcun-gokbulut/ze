@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9ShaderManager.h
+ Zinek Engine - PixelWorldPositionProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,27 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_D3D9_SHADER_MANAGER_H__
-#define __ZE_D3D9_SHADER_MANAGER_H__
+#ifndef __ZE_PIXEL_WORLD_POSITION_PROCESSOR_HLSL__
+#define __ZE_PIXEL_WORLD_POSITION_PROCESSOR_HLSL__
 
-#include "ZETypes.h"
-#include "ZED3D9Shader.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEFile/ZEFileCache.h"
+#include	"GBuffer.hlsl"
 
-class ZED3D9ShaderManager
+float2		SampleCoord				: register(c0);
+
+struct VSInput
 {
-	friend void ZED3D9Shader::Release();
-	friend ZED3D9Module;
-	private:
-		ZESmartArray<ZED3D9Shader*>		Shaders;
-		//ZEFileCache					ShaderFileCache;
-
-		ZEUInt32						CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components);
-		void							ReleaseShader(ZED3D9Shader* Shader);
-		bool							ReadFromFileCache(const char* Filename, const char* FunctionName, ZEUInt32 Components);
-		void							WriteToFileCache(const char* Filenamne, const char* FunctionName, ZEUInt32 Components);
-
-										ZED3D9ShaderManager();
-										~ZED3D9ShaderManager();
-	public:
-		const char*						GetInternal(const char* Filename);
-		ZED3D9Shader*					GetShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile);
-		ZED3D9PixelShader*				GetPixelShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);	
-		ZED3D9VertexShader*				GetVertexShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
-
-		static ZED3D9ShaderManager*		GetInstance();
+	float3 Position		: POSITION0;
+	float2 TexCoord		: TEXCOORD0;
 };
+
+float4 VSMain(VSInput Input) : POSITION0
+{
+	return float4(sign(Input.Position).xyz, 1.0f);
+}
+
+float4 PSMain() : COLOR0
+{
+	return ZEGBuffer_GetDepth(SampleCoord).xxxx;
+}
 
 #endif

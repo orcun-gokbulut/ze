@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9ShaderManager.h
+ Zinek Engine - GrainProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,96 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_D3D9_SHADER_MANAGER_H__
-#define __ZE_D3D9_SHADER_MANAGER_H__
+sampler2D 	ColorBuffer		: register (s0);
+sampler2D 	GrainBuffer		: register (s1);
 
-#include "ZETypes.h"
-#include "ZED3D9Shader.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEFile/ZEFileCache.h"
+float2 		VSParameters	: register(vs, c0);
 
-class ZED3D9ShaderManager
+#define		PixelSize		VSParameters.xy
+
+float4 		PSParameters	: register(ps, c0);
+
+#define		PI				3.1415f
+#define		Time			PSParameters.x
+#define		GrainStrength	PSParameters.y
+
+
+// Vertex Shader
+struct VS_INPUT
 {
-	friend void ZED3D9Shader::Release();
-	friend ZED3D9Module;
-	private:
-		ZESmartArray<ZED3D9Shader*>		Shaders;
-		//ZEFileCache					ShaderFileCache;
-
-		ZEUInt32						CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components);
-		void							ReleaseShader(ZED3D9Shader* Shader);
-		bool							ReadFromFileCache(const char* Filename, const char* FunctionName, ZEUInt32 Components);
-		void							WriteToFileCache(const char* Filenamne, const char* FunctionName, ZEUInt32 Components);
-
-										ZED3D9ShaderManager();
-										~ZED3D9ShaderManager();
-	public:
-		const char*						GetInternal(const char* Filename);
-		ZED3D9Shader*					GetShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile);
-		ZED3D9PixelShader*				GetPixelShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);	
-		ZED3D9VertexShader*				GetVertexShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
-
-		static ZED3D9ShaderManager*		GetInstance();
+	float4 Position	: POSITION0;
+	
 };
 
-#endif
+struct VS_OUTPUT 
+{
+	float4 Position	: POSITION0;
+	float2 TexCoord : TEXCOORD0;
+};
+
+struct PS_INPUT
+{
+	float2 TexCoord : TEXCOORD0;
+};
+
+struct PS_OUTPUT
+{
+	float4 PixelColor : COLOR0;
+};
+
+VS_OUTPUT vs_main_common(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
+   
+	Output.Position	= sign(Input.Position);
+
+	Output.TexCoord.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
+	Output.TexCoord.y = 0.5f * (1.0f - Output.Position.y + PixelSize.y);
+	
+	return Output;
+}
+
+
+float Random(float2 Vector)
+{
+	const float4 Temp = float4( 97.409091f, 148.413159f, 56.205410f, 44.687805f );
+	float4 Result = float4(Vector,Vector);
+  
+	for(int i = 0; i < 3; i++)
+	{
+		Result.x = frac( dot(Result, Temp) );
+		Result.y = frac( dot(Result, Temp) );
+		Result.z = frac( dot(Result, Temp) );
+		Result.w = frac( dot(Result, Temp) );
+	}
+  
+	return (float)Result.xy;
+}
+
+PS_OUTPUT ps_main_grain( PS_INPUT Input )
+{
+	PS_OUTPUT Output = (PS_OUTPUT)1.0f;
+
+	float Rand = Random(Input.TexCoord + Time) * GrainStrength; 
+	float3 Grain = float3(Rand, Rand, Rand);
+
+	Output.PixelColor.rgb *= 1.0f - Grain;
+	Output.PixelColor.rgb *= (1.0f + GrainStrength / 2.0f);
+	
+	return Output;
+}
+
+
+PS_OUTPUT ps_main_blend( PS_INPUT Input )
+{
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
+	
+	float4 Grain = tex2D(GrainBuffer, Input.TexCoord);
+	Output.PixelColor = tex2D(ColorBuffer, Input.TexCoord);
+	
+	[branch]
+	if (Grain.x <= 0.999f)
+		Output.PixelColor *= Grain;
+	
+	return Output;
+}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9ShaderManager.h
+ Zinek Engine - TextureMaskProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,66 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_D3D9_SHADER_MANAGER_H__
-#define __ZE_D3D9_SHADER_MANAGER_H__
+sampler2D 	ColorBuffer		: register (s0);
+sampler2D 	MaskBuffer		: register (s1);
 
-#include "ZETypes.h"
-#include "ZED3D9Shader.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEFile/ZEFileCache.h"
+float4 		VSParameters	: register(vs, c0);
 
-class ZED3D9ShaderManager
+#define		PixelSizeRT		VSParameters.xy
+#define		PixelSizeMask	VSParameters.zw
+
+float4		PSParameters	: register(ps, c0);
+
+#define		MaskFactor		PSParameters.x
+
+
+struct VS_INPUT
 {
-	friend void ZED3D9Shader::Release();
-	friend ZED3D9Module;
-	private:
-		ZESmartArray<ZED3D9Shader*>		Shaders;
-		//ZEFileCache					ShaderFileCache;
-
-		ZEUInt32						CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components);
-		void							ReleaseShader(ZED3D9Shader* Shader);
-		bool							ReadFromFileCache(const char* Filename, const char* FunctionName, ZEUInt32 Components);
-		void							WriteToFileCache(const char* Filenamne, const char* FunctionName, ZEUInt32 Components);
-
-										ZED3D9ShaderManager();
-										~ZED3D9ShaderManager();
-	public:
-		const char*						GetInternal(const char* Filename);
-		ZED3D9Shader*					GetShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile);
-		ZED3D9PixelShader*				GetPixelShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);	
-		ZED3D9VertexShader*				GetVertexShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
-
-		static ZED3D9ShaderManager*		GetInstance();
+	float4 Position	: POSITION0;
+	float2 TexCoord : TEXCOORD0;
+	
 };
 
-#endif
+struct VS_OUTPUT 
+{
+	float4 Position : POSITION0;
+	float2 TexCoordColor : TEXCOORD0;
+	float2 TexCoordMask : TEXCOORD1;
+};
+
+struct PS_INPUT
+{
+	float2 TexCoordColor : TEXCOORD0;
+	float2 TexCoordMask : TEXCOORD1;
+};
+
+struct PS_OUTPUT
+{
+	float4 PixelColor : COLOR0;
+};
+
+VS_OUTPUT vs_main(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
+   
+	Output.Position	= sign(Input.Position);
+
+	Output.TexCoordColor.x = 0.5f * (1.0f + Output.Position.x + PixelSizeRT.x);
+	Output.TexCoordColor.y = 0.5f * (1.0f - Output.Position.y + PixelSizeRT.y);
+	
+	Output.TexCoordMask = Input.TexCoord + (PixelSizeMask * 0.5f);
+
+	return Output;
+}
+
+PS_OUTPUT ps_main( PS_INPUT Input )
+{
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
+
+	Output.PixelColor = tex2D(ColorBuffer, Input.TexCoordColor);
+	float3 Masked = tex2D(MaskBuffer, Input.TexCoordMask).rgb * Output.PixelColor.rgb;
+	
+	Output.PixelColor.rgb = lerp(Output.PixelColor.rgb, Masked, MaskFactor);
+
+	return Output;
+}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9ShaderManager.h
+ Zinek Engine - LBuffer.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_D3D9_SHADER_MANAGER_H__
-#define __ZE_D3D9_SHADER_MANAGER_H__
+sampler2D LBuffer1 : register(s3);
 
-#include "ZETypes.h"
-#include "ZED3D9Shader.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEFile/ZEFileCache.h"
-
-class ZED3D9ShaderManager
+struct ZELBuffer
 {
-	friend void ZED3D9Shader::Release();
-	friend ZED3D9Module;
-	private:
-		ZESmartArray<ZED3D9Shader*>		Shaders;
-		//ZEFileCache					ShaderFileCache;
-
-		ZEUInt32						CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components);
-		void							ReleaseShader(ZED3D9Shader* Shader);
-		bool							ReadFromFileCache(const char* Filename, const char* FunctionName, ZEUInt32 Components);
-		void							WriteToFileCache(const char* Filenamne, const char* FunctionName, ZEUInt32 Components);
-
-										ZED3D9ShaderManager();
-										~ZED3D9ShaderManager();
-	public:
-		const char*						GetInternal(const char* Filename);
-		ZED3D9Shader*					GetShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile);
-		ZED3D9PixelShader*				GetPixelShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);	
-		ZED3D9VertexShader*				GetVertexShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
-
-		static ZED3D9ShaderManager*		GetInstance();
+	float4 DiffuseSpecular : COLOR0;
 };
 
-#endif
+void ZELBuffer_SetDiffuse(inout ZELBuffer LBuffer, float3 Diffuse)
+{
+	LBuffer.DiffuseSpecular.xyz = Diffuse;
+}
+
+float3 ZELBuffer_GetDiffuse(float2 Texcoord)
+{
+	return tex2D(LBuffer1, Texcoord).rgb;	
+}
+
+void ZELBuffer_SetSpecular(inout ZELBuffer LBuffer, float Specular)
+{
+	LBuffer.DiffuseSpecular.a = Specular;
+}
+
+float3 ZELBuffer_GetSpecular(float2 Texcoord)
+{
+	float4 Sample = tex2D(LBuffer1, Texcoord);
+	return max(normalize(Sample.rgb) * Sample.a, 0.0f);
+}
+
+float ZELBuffer_GetLuminance(float3 Color)
+{
+	return dot(Color, float3(0.299f, 0.587f, 0.114f));
+}
