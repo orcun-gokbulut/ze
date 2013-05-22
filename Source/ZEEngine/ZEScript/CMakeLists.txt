@@ -37,9 +37,7 @@ cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEScriptEngine.cpp					Sources)
 ze_add_source(ZEScriptEngine.h						Sources Headers)
-ze_add_source(ZEScriptObject.cpp					Sources)
-ze_add_source(ZEScriptObject.h						Sources Headers)
-ze_add_source(ZEScriptClass.cpp					  Sources)
+ze_add_source(ZEScriptClass.cpp						Sources)
 ze_add_source(ZEScriptClass.h					  	Sources Headers)
 
 ze_add_library(ZEScript 

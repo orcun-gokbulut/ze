@@ -97,6 +97,7 @@ struct ZEMethod
 	const char*						Name;
 	ZEUInt32						Hash;
 	bool							Event;
+	bool							IsVirtual;
 	bool							IsStatic;
 
 	bool							IsOperator;

@@ -51,7 +51,6 @@
 
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEMetaGenerator.h"
-#include "ZEMetaScriptBaseGenerator.h"
 #include "ZEMetaCollectionGenerator.h"
 
 using namespace clang::driver;
@@ -159,9 +158,6 @@ void ZEMetaProcessorInternal::InitializeClang()
 		exit(EXIT_FAILURE);
 
 	if (!ZEMetaGenerator::Generate(Options, MetaData))
-		exit(EXIT_FAILURE);
-
-	if(!ZEMetaScriptBaseGenerator::Generate(Options, MetaData))
 		exit(EXIT_FAILURE);
 
 	if(Options.IsRegisterSession)

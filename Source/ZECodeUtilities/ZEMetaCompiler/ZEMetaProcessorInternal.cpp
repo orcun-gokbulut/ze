@@ -1343,6 +1343,8 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 
 	ZEMethodData* MethodData = new ZEMethodData();
 	MethodData->Name = MethodName;
+	MethodData->IsConst = Method->isConst();
+	MethodData->IsVirtual = Method->isVirtual();
 	MethodData->IsOperator = IsOperator;
 	MethodData->IsStatic = Method->isStatic();
 	MethodData->IsEvent = false;

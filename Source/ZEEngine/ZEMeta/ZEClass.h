@@ -59,6 +59,7 @@ class ZEClass
 		virtual ZEGUID					GetGUID();
 
 		virtual ZESize					GetSizeOfClass();
+		virtual ZESize					GetSizeOfScriptBaseClass();
 
 		virtual const ZEMetaAttribute*	GetAttributes();
 		virtual ZESize					GetAttributeCount();
@@ -161,12 +162,11 @@ class ZEClass
 		bool							CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference& Parameters0, const ZEReference& Parameters1, const ZEReference& Parameters2, const ZEReference& Parameters3, const ZEReference& Parameters4, const ZEReference& Parameters5, const ZEReference& Parameters6, const ZEReference& Parameters7, const ZEReference& Parameters8, const ZEReference& Parameters9, const ZEReference& Parameters10, const ZEReference& Parameters11, const ZEReference& Parameters12, const ZEReference& Parameters13, const ZEReference& Parameters14, const ZEReference& Parameters15, const ZEReference& Parameters16, const ZEReference& Parameters17, const ZEReference& Parameters18, const ZEReference& Parameters19, const ZEReference& Parameters20, const ZEReference& Parameters21, const ZEReference& Parameters22, const ZEReference& Parameters23);
 		bool							CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference& Parameters0, const ZEReference& Parameters1, const ZEReference& Parameters2, const ZEReference& Parameters3, const ZEReference& Parameters4, const ZEReference& Parameters5, const ZEReference& Parameters6, const ZEReference& Parameters7, const ZEReference& Parameters8, const ZEReference& Parameters9, const ZEReference& Parameters10, const ZEReference& Parameters11, const ZEReference& Parameters12, const ZEReference& Parameters13, const ZEReference& Parameters14, const ZEReference& Parameters15, const ZEReference& Parameters16, const ZEReference& Parameters17, const ZEReference& Parameters18, const ZEReference& Parameters19, const ZEReference& Parameters20, const ZEReference& Parameters21, const ZEReference& Parameters22, const ZEReference& Parameters23, const ZEReference& Parameters24);
 
-		//virtual ZEScriptObject*			GetScriptObject(ZEObject* Object) = 0;
-		//virtual ZEScriptObject*			SetScriptObject(ZEObject* Object, ZEScriptObject* Object) = 0;
-
 		virtual ZEObject*				CreateInstance();
-		//virtual ZEObject*				CreateScriptedInstance();
 
+		virtual void*					CreateScriptInstance();
+		virtual void*					GetScriptInstance();
+		
 		static bool						IsDerivedFrom(ZEClass* ParentClass, ZEClass* Class);
 		static bool						IsDerivedFrom(ZEClass* ParentClass, ZEObject* Object);
 
