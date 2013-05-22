@@ -58,6 +58,11 @@ ZESize ZEClass::GetSizeOfClass()
 	return 0;
 }
 
+ZESize ZEClass::GetSizeOfScriptBaseClass()
+{
+	return 0;
+}
+
 const ZEMetaAttribute* ZEClass::GetAttributes()
 {
 	return NULL;
@@ -218,6 +223,16 @@ ZESize	ZEClass::GetMethodId(ZEString MethodName, ZESize OverloadIndex)
 }
 
 ZEObject* ZEClass::CreateInstance()
+{
+	return NULL;
+}
+
+void* ZEClass::CreateScriptInstance()
+{
+	return NULL;
+}
+
+void* ZEClass::GetScriptInstance()
 {
 	return NULL;
 }

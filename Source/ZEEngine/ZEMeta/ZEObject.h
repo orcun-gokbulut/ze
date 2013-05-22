@@ -95,6 +95,7 @@ class ZEObject
 			virtual const char*				GetName(); \
 			virtual ZEGUID					GetGUID(); \
 			virtual ZESize					GetSizeOfClass(); \
+			virtual ZESize					GetSizeOfScriptBaseClass(); \
 			virtual const ZEMetaAttribute*	GetAttributes(); \
 			virtual ZESize					GetAttributeCount(); \
 			virtual const ZEProperty*		GetProperties(); \
@@ -128,6 +129,8 @@ class ZEObject
 			virtual bool					CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount); \
 			virtual bool					CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount); \
 			virtual ZEObject*				CreateInstance(); \
+			virtual void*					CreateScriptInstance(); \
+			virtual void*					GetScriptInstance(); \
 			virtual ZEClass*				GetClass() const; \
 			static ZEClass*					Class(); \
 	};

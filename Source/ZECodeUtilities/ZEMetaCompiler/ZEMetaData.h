@@ -245,6 +245,7 @@ class ZEMethodParameterData
 struct ZEMethodData : public ZETypeData
 {
 	public:
+		bool							IsVirtual;
 		bool							IsStatic;
 		bool							IsEvent;
 		
@@ -252,6 +253,7 @@ struct ZEMethodData : public ZETypeData
 		ZEMetaGeneratorOperatorType		OperatorType;
 	
 		ZEMethodParameterData			ReturnParameter;
+		bool							IsConst;
 		ZEArray<ZEMethodParameterData*>	Parameters;
 
 		ZESize							ID;

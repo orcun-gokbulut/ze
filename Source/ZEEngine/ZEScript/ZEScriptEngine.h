@@ -39,9 +39,6 @@
 #include "ZEDS/ZEType.h"
 #include "ZEDS/ZEVariant.h"
 
-class ZEScriptClass;
-struct ZEMethod;
-
 struct ZEScriptProperty
 {
 	void*										PropertyPtr;
@@ -58,7 +55,9 @@ struct ZEScriptProperty
 
 struct ZEScriptFunction
 {
+	void*										ScriptObject;
 	void*										FunctionPtr;
+	const char*									Name;
 	const char*									Declaration;
 	ZETypeType									ReturnType;
 	ZEArray<ZEVariant>							Parameters;
@@ -81,12 +80,14 @@ class ZEScriptEngine
 		virtual void							RegisterNativeGlobalProperty(ZEScriptProperty* Property) = 0;
 		virtual void							RegisterNativeGlobalFunction(ZEScriptFunction* Function) = 0;
 
-		virtual ZEArray<ZEScriptClass*>&		GetScriptClasses() = 0;
+		virtual void							BindScriptFunctionToNativeFunction(ZEScriptFunction* ScriptFunction, void* ScriptObject) = 0;
+
+		virtual void*							GetScriptClassMethod(void* ScriptObject, const char* MethodName) = 0;
 
 		virtual void							LoadScript(const char* ScriptFileName, bool IsBinary) = 0;
 		virtual void							ReloadScript() = 0;
 		virtual void							ExecuteScript() = 0;
 
 		virtual void*							CallScriptFunction(ZEScriptFunction* Function) = 0;
-		//virtual void							CallMethod(ZEScriptObject* Object, ZEScriptFunction* Function, ...);
 };
+
