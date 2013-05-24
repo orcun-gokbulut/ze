@@ -41,6 +41,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEModelAnimation.h"
+#include "ZEGame/ZERayCast.h"
 
 class ZEModel;
 class ZEModelBone
@@ -60,6 +61,7 @@ class ZEModelBone
 		mutable ZEMatrix4x4					LocalTransform;
 		mutable ZEMatrix4x4					ModelTransform;
 		mutable ZEMatrix4x4					WorldTransform;
+		mutable ZEMatrix4x4					InvWorldTransform;
 
 		mutable ZEMatrix4x4					VertexTransform;
 
@@ -89,8 +91,10 @@ class ZEModelBone
 		const ZEAABBox&						GetWorldBoundingBox() const;
 
 		const ZEMatrix4x4&					GetTransform() const;
-		const ZEMatrix4x4&					GetWorldTransform() const;		
 		const ZEMatrix4x4&					GetModelTransform() const;
+		const ZEMatrix4x4&					GetWorldTransform() const;		
+		const ZEMatrix4x4&					GetInvWorldTransform() const;		
+
 
 		const ZEVector3&					GetInitialPosition() const;
 		const ZEQuaternion&					GetInitialRotation() const;
@@ -129,6 +133,8 @@ class ZEModelBone
 
 		void								Initialize(ZEModel* Model, const ZEModelResourceBone* BoneResource);
 		void								Deinitialize();
+
+		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 											ZEModelBone();
 											~ZEModelBone();

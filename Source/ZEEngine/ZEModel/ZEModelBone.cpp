@@ -123,6 +123,12 @@ const ZEMatrix4x4& ZEModelBone::GetWorldTransform() const
 	}
 }
 
+const ZEMatrix4x4& ZEModelBone::GetInvWorldTransform() const
+{
+	ZEMatrix4x4::Inverse(InvWorldTransform, GetWorldTransform());
+	return InvWorldTransform;
+}
+
 const ZEVector3& ZEModelBone::GetInitialPosition() const
 {
 	return BoneResource->Position;
@@ -573,4 +579,31 @@ ZEModelBone::ZEModelBone()
 ZEModelBone::~ZEModelBone()
 {
 	Deinitialize();
+}
+
+bool ZEModelBone::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	if (!ZEAABBox::IntersectionTest(GetWorldBoundingBox(), Parameters.Ray))
+		return false;
+
+	ZERay LocalRay;
+	ZEMatrix4x4::Transform(LocalRay.p, GetInvWorldTransform(), Parameters.Ray.p);
+	ZEMatrix4x4::Transform3x3(LocalRay.v, GetInvWorldTransform(), Parameters.Ray.v);
+	LocalRay.v.NormalizeSelf();
+
+	float TMin;
+	if (!ZEAABBox::IntersectionTest(GetBoundingBox(), LocalRay, TMin))
+		return false;
+
+	ZEVector3 IntersectionPoint;
+	ZEMatrix4x4::Transform(IntersectionPoint, GetWorldTransform(), LocalRay.GetPointOn(TMin));
+	float DistanceSquare = IntersectionPoint.LengthSquare();
+	if (Report.Distance * Report.Distance > DistanceSquare && Report.Distance * Report.Distance < Parameters.MaximumDistance)
+	{
+		Report.Distance = ZEMath::Sqrt(DistanceSquare);
+		Report.SubComponent = NULL;
+		Report.PoligonIndex = 0;
+		Report.Normal = Report.Binormal = ZEVector3::Zero;
+		ZEMatrix4x4::Transform(Report.Position, WorldTransform, IntersectionPoint);
+	}
 }

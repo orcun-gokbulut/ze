@@ -42,6 +42,7 @@
 #include "ZEModelMeshLod.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZERenderCommand.h"
+#include "ZEGame/ZERayCast.h"
 
 class ZEModel;
 struct ZEModelResourceMesh;
@@ -69,6 +70,7 @@ class ZEModelMesh
 		mutable ZEMatrix4x4					LocalTransform;
 		mutable ZEMatrix4x4					ModelTransform;
 		mutable ZEMatrix4x4					WorldTransform;
+		mutable ZEMatrix4x4					InvWorldTransform;
 
 		bool								PhysicsEnabled;
 		ZEPhysicalRigidBody*				PhysicalBody;
@@ -85,6 +87,7 @@ class ZEModelMesh
 
 		ZEArray<ZEModelMeshLOD>				LODs;
 
+		bool								RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex);
 		void								OnTransformChanged();
 
 	public:
@@ -101,7 +104,8 @@ class ZEModelMesh
 		const ZEMatrix4x4&					GetLocalTransform() const;
 		const ZEMatrix4x4&					GetModelTransform() const;
 		const ZEMatrix4x4&					GetWorldTransform() const;
-				
+		const ZEMatrix4x4&					GetInvWorldTransform() const;
+
 		void								SetLocalPosition(const ZEVector3& LocalPosition);
 		const ZEVector3&					GetLocalPosition() const;
 
@@ -155,6 +159,7 @@ class ZEModelMesh
 		void								Deinitialize();
 
 		void								Draw(ZEDrawParameters* DrawParameters);
+		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 											ZEModelMesh();
 											~ZEModelMesh();
