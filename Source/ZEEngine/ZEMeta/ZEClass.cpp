@@ -232,11 +232,6 @@ void* ZEClass::CreateScriptInstance()
 	return NULL;
 }
 
-void* ZEClass::GetScriptInstance()
-{
-	return NULL;
-}
-
 bool ZEClass::IsDerivedFrom(ZEClass* ParentClass, ZEClass* Class)
 {
 	ZEClass* CurrentClass = Class;

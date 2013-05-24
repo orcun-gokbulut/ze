@@ -892,7 +892,7 @@ void ZEMetaProcessorInternal::ProcessClass(CXXRecordDecl* Class)
 	ClassData->HasCreateInstanceMethod = false;
 	ClassData->HasPublicCopyConstructor = false;
 	ClassData->HasPublicConstructor = false;
-	ClassData->IsAbstract = false;
+	ClassData->IsAbstract = Class->isAbstract();
 	ClassData->IsBuiltInClass = IsBuiltInClassFound;
 
 	for(CXXRecordDecl::base_class_iterator CurrentBaseClass = Class->bases_begin(), LastBaseClass = Class->bases_end(); CurrentBaseClass != LastBaseClass; ++CurrentBaseClass)
@@ -1215,9 +1215,6 @@ void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, FieldDecl*
 
 void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* Method)
 {
-	if(Method->isPure() || Method->isVirtual())
-		ClassData->IsAbstract = true;
-
 	bool IsOperator = false;
 	if(Method->isOverloadedOperator())
 		IsOperator = true;
