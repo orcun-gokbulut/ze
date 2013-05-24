@@ -604,6 +604,21 @@ bool ZEModel::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
+bool ZEModel::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	bool Result = false;
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
+		Result |= Meshes[I].RayCast(Report, Parameters);
+
+	for (ZESize I = 0; I < Bones.GetCount(); I++)
+		Result |= Bones[I].RayCast(Report, Parameters);
+	
+	if (Result)
+		Report.Entity = this;
+
+	return Result;
+}
+
 ZEModel* ZEModel::CreateInstance()
 {
 	return new ZEModel();

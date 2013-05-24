@@ -40,6 +40,7 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEPhysics/ZEPhysicalCloth.h"
+#include "ZEMath/ZETriangle.h"
 
 void ZEModelMesh::SetActiveLOD(ZEUInt LOD)
 {
@@ -147,7 +148,14 @@ const ZEMatrix4x4& ZEModelMesh::GetWorldTransform() const
 		return WorldTransform;
 	}
 }
-	
+
+const ZEMatrix4x4& ZEModelMesh::GetInvWorldTransform() const
+{
+	ZEMatrix4x4::Inverse(InvWorldTransform, GetWorldTransform());
+
+	return InvWorldTransform;
+}
+
 void ZEModelMesh::SetLocalPosition(const ZEVector3& LocalPosition)
 {
 	Position = LocalPosition;
@@ -581,6 +589,93 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 		Lod = LastLod;*/
 
 	LODs[(ZESize)Lod].Draw(DrawParameters, DrawOrder);
+}
+
+bool ZEModelMesh::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex)
+{
+	if (MeshResource->LODs.GetCount() == 0)
+		return false;
+
+	bool HaveIntersection = false;
+	const ZEArray<ZEModelVertex>& Vertices = MeshResource->LODs[0].Vertices;
+
+	for (ZESize I = 0; I < Vertices.GetCount(); I += 3)
+	{
+		ZETriangle Triangle(Vertices[I].Position, Vertices[I + 1].Position, Vertices[I + 2].Position);
+
+		float RayT;
+		if (ZETriangle::IntersectionTest(Triangle, Ray, RayT))
+		{
+			if (RayT < MinT)
+			{
+				MinT = RayT;
+				PoligonIndex = I / 3;
+				HaveIntersection = true;
+			}
+		}
+	}
+
+	return HaveIntersection;
+}
+
+bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	if (MeshResource == NULL || MeshResource->IsSkinned == true)
+		return false;
+
+	ZERay LocalRay;
+	ZEMatrix4x4::Transform(LocalRay.p, GetInvWorldTransform(), Parameters.Ray.p);
+	ZEMatrix4x4::Transform3x3(LocalRay.v, GetInvWorldTransform(), Parameters.Ray.v);
+	LocalRay.v.NormalizeSelf();
+
+	float RayT;
+	if (!ZEAABBox::IntersectionTest(GetLocalBoundingBox(), LocalRay, RayT))
+		return false;
+
+	float MinT = ZE_FLOAT_MAX;
+	ZESize PoligonIndex;
+	if (RayCastPoligons(LocalRay, MinT, PoligonIndex))
+	{
+		ZEVector3 WorldPosition;
+		ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), LocalRay.GetPointOn(MinT));
+
+		float DistanceSquare = ZEVector3::Distance(Parameters.Ray.p, LocalRay.GetPointOn(MinT));
+		if (Report.Distance * Report.Distance > DistanceSquare)
+		{
+			Report.Distance = ZEMath::Sqrt(DistanceSquare);
+			Report.Position = WorldPosition;
+			Report.SubComponent = this;
+			Report.PoligonIndex = PoligonIndex;
+
+			if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL) || Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
+			{
+				ZEVector3 V0 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex].Position;
+				ZEVector3 V1 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex + 1].Position;
+				ZEVector3 V2 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex + 2].Position;
+
+				ZEVector3 Binormal = ZEVector3(V0, V1);
+				ZEVector3 Tangent = ZEVector3(V0, V2);
+				ZEVector3 Normal;
+				ZEVector3::CrossProduct(Normal, Binormal, Tangent);
+
+				if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL))
+				{
+					ZEMatrix4x4::Transform3x3(Report.Normal, GetWorldTransform(), Normal);
+					Report.Normal.NormalizeSelf();
+				}
+
+				if (Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
+				{
+					ZEMatrix4x4::Transform3x3(Report.Binormal, GetWorldTransform(), Binormal);
+					Report.Binormal.NormalizeSelf();
+				}
+			}
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 

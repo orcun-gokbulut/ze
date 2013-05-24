@@ -167,6 +167,8 @@ class ZEModel : public ZEEntity
 		void								Tick(float ElapsedTime);
 		void								Draw(ZEDrawParameters* DrawParameters);
 		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);
+		
+		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
 
@@ -179,6 +181,7 @@ class ZEModel : public ZEEntity
 		void								SetDrawPhysicalJoints(bool Enabled);
 		bool								GetDrawPhysicalJoints();
 
+		
 		static ZEModel*						CreateInstance();
 };
 #endif
