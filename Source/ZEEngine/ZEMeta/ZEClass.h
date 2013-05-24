@@ -165,7 +165,6 @@ class ZEClass
 		virtual ZEObject*				CreateInstance();
 
 		virtual void*					CreateScriptInstance();
-		virtual void*					GetScriptInstance();
 		
 		static bool						IsDerivedFrom(ZEClass* ParentClass, ZEClass* Class);
 		static bool						IsDerivedFrom(ZEClass* ParentClass, ZEObject* Object);

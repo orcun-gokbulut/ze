@@ -72,6 +72,12 @@ struct ZEScriptFunction
 												}
 };
 
+struct ZEScriptBaseClassData
+{
+	ZESize										Id;
+	ZEString									Name;
+};
+
 class ZEScriptEngine
 {
 	public:

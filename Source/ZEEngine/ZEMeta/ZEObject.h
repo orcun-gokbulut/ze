@@ -130,7 +130,6 @@ class ZEObject
 			virtual bool					CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount); \
 			virtual ZEObject*				CreateInstance(); \
 			virtual void*					CreateScriptInstance(); \
-			virtual void*					GetScriptInstance(); \
 			virtual ZEClass*				GetClass() const; \
 			static ZEClass*					Class(); \
 	};
