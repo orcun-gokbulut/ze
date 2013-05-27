@@ -320,6 +320,16 @@ void ZED3D9HBAOProcessor::BiliteralFilterHorizontal(const ZED3D9Texture2D* Input
 	D3DPERF_EndEvent();
 }
 
+void ZED3D9HBAOProcessor::SetEnabled(bool Value)
+{
+	Enabled = Value;
+}
+
+bool ZED3D9HBAOProcessor::GetEnabled() const
+{
+	return Enabled;
+}
+
 void ZED3D9HBAOProcessor::SetOcclusionRadius(float Value)
 {
 	OcclusionRadius = Value;
@@ -468,6 +478,9 @@ ZED3D9FrameRenderer* ZED3D9HBAOProcessor::SetRenderer() const
 
 void ZED3D9HBAOProcessor::Process()
 {
+	if (!Enabled)
+		return;
+
 	if (Renderer == NULL || Output == NULL)
 		return;
 
@@ -482,6 +495,7 @@ void ZED3D9HBAOProcessor::Process()
 	//DownSampleNormal(InputNormal, &HalfResNormal->ViewPort);
 	
 	AmbientOcclusion(InputDepth, InputNormal, &Output->ViewPort);
+	
 	BiliteralFilterHorizontal(Output, &TempBuffer->ViewPort);
 	BiliteralFilterVertical(TempBuffer, &Output->ViewPort);
 }
@@ -538,6 +552,8 @@ ZED3D9HBAOProcessor::ZED3D9HBAOProcessor()
 	Shaders.BiliteralHorizontal = NULL;
 	
 	VertexDeclaration = NULL;
+
+	Enabled = false;
 
 	OcclusionRadius	 = 1.0f;
 	RadiusMultiplier = 0.5f;

@@ -38,83 +38,150 @@
 #define __ZE_D3D9_SSAO_PROCESSOR_H__
 
 #include "ZETypes.h"
+#include "ZEMeta/ZEObject.h"
 #include "ZED3D9ComponentBase.h"
+#include "ZEMath/ZEVector.h"
 
+class ZETexture2D;
+class ZED3D9ViewPort;
+class ZED3D9Texture2D;
 class ZED3D9PixelShader;
 class ZED3D9VertexShader;
-class ZED3D9Texture2D;
-class ZETexture2D;
-class ZEFrameRenderer;
 class ZED3D9FrameRenderer;
-class ZETexture2DResource;
 
-class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
+#define ZE_SSAO_MAX_SAMPLE_COUNT	32
+
+struct ZESSAOScreenAlignedQuad
 {
+	float	Position[3];
+	float	TexCoord[2];
+};
+
+ZE_CLASS(ZED3D9SSAOProcessor)
+
+class ZED3D9SSAOProcessor : public ZED3D9ComponentBase, public ZEObject
+{
+	ZE_OBJECT
+
 	private:
 		ZED3D9FrameRenderer*			Renderer;
-		
-		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
-		ZED3D9VertexShader*				VertexShader;
-		ZED3D9PixelShader*				PixelShader;
-
+		ZED3D9Texture2D*				Output;
 		ZED3D9Texture2D*				InputDepth;
 		ZED3D9Texture2D*				InputNormal;
-		ZED3D9Texture2D*				Output;
-
-		ZEInt							IterationCount;
-		bool							HalfResolution;
+		
+		ZED3D9Texture2D*				TempBuffer;
+		ZED3D9Texture2D*				RandomAngles;
+		ZED3D9Texture2D*				HalfResDepth;
+		ZED3D9Texture2D*				HalfResNormal;
 
 		struct
 		{
-			float						Intensity;
-			float						SampleRadius;
-			float						SampleScale;
-			float						SampleBias;
-		} Parameters;
+			ZED3D9VertexShader*			Vertex;
+			ZED3D9PixelShader*			AmbientOcclusion;
+			ZED3D9PixelShader*			BiliteralVertical;
+			ZED3D9PixelShader*			BiliteralHorizontal;
 
-		ZETexture2DResource*			RandomTextureResource;
+		} Shaders;
+
+		static ZESSAOScreenAlignedQuad	Vertices[4];
+		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+
+		bool							Enabled;
+		bool							UpdateKernel;
+		
+		float							Contrast;
+		float							AngleBias;
+		ZEUInt							SampleCount;
+		float							SampleRadius;
+		ZEVector4						SampleOffsets[ZE_SSAO_MAX_SAMPLE_COUNT];
+
+		float							BlurRadius;
+		float							BlurSharpness;
+		float							BlurEdgeThreshold;
+
+		void							UpdateBuffers();
+		void							DestroyBuffers();
+
+		void							UpdateShaders();
+		void							DestroyShaders();
+
+		void							UpdateStates();
+		void							UpdateFilterKernel();
+
+		void							AmbientOcclusion(const ZED3D9Texture2D* InputDepth, const ZED3D9Texture2D* InputNormal, ZED3D9ViewPort* OutputBuffer);
+
+		void							BiliteralFilterVertical(const ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
+		void							BiliteralFilterHorizontal(const ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
 
 	public:
-		void							SetRenderer(ZEFrameRenderer* Renderer);
-		ZEFrameRenderer*				GetRenderer();
+		void							SetEnabled(bool Value);
+		bool							GetEnabled() const;
 
-		void							SetInputDepth(ZETexture2D* Texture);
-		ZETexture2D*					GetInputDepth();
+		void							SetContrast(float Value);
+		float							GetContrast() const;
 
-		void							SetInputNormal(ZETexture2D* Texture);
-		ZETexture2D*					GetInputNormal();
+		void							SetAngleBias(float Value);
+		float							GetAngleBias() const;
 
-		void							SetOutput(ZETexture2D* Texture);
-		ZETexture2D*					GetOutput();
+		void							SetSampleCount(ZEUInt Value);
+		ZEUInt							GetSampleCount() const;
 
-		void							SetIterationCount(ZEInt Iteration);
-		ZEInt								GetIterationCount();
-
-		void							SetHalfResolution(bool HalfResolution);
-		bool							GetHalfResolution();
-
-		void							SetIntensity(float Intensity);
-		float							GetIntensity() const;
-
-		void							SetSampleRadius(float Radius);
+		void							SetSampleRadius(float Value);
 		float							GetSampleRadius() const;
 
-		void							SetSampleScale(float Scale);
-		float							GetSampleScale() const;
+		void							SetBlurRadius(float Value);
+		float							GetBlurRadius() const;
 
-		void							SetSampleBias(float Bias);
-		float							GetSampleBias() const;
+		void							SetBlurSharpness(float Value);
+		float							GetBlurSharpness() const;
+
+		void							SetBlurEdgeThreshold(float Value);
+		float							GetBlurEdgeThreshold() const;
+
+		void							SetInputDepth(ZED3D9Texture2D* InputBuffer);
+		ZED3D9Texture2D*				GetInputDepth();
+
+		void							SetInputNormal(ZED3D9Texture2D* InputBuffer);
+		ZED3D9Texture2D*				GetInputNormal();
+
+		void							SetOutput(ZED3D9Texture2D* OutputBuffer);
+		ZED3D9Texture2D*				GetOutput();
+
+		void							SetRenderer(ZED3D9FrameRenderer* FrameRenderer);
+		ZED3D9FrameRenderer*			SetRenderer() const;
+
+		void							Process();
 
 		void							Initialize();
 		void							Deinitialize();
 
-		void							OnDeviceLost();
-		void							OnDeviceRestored();
-
-		void							Process();
-	
 										ZED3D9SSAOProcessor();
 										~ZED3D9SSAOProcessor();
 };
+
+/*
+ZE_POST_PROCESSOR_START(Meta)
+	<zinek>
+		<meta> 
+			<class name="ZED3D9SSAOProcessor">
+				<noinstance>true</noinstance>
+				<description>ZED3D9SSAOProcessor</description>
+
+				<property name="Enabled" type="boolean" autogetset="yes" description="..."/>
+
+				<property name="Contrast" type="float" autogetset="yes" description="..."/>
+				<property name="AngleBias" type="float" autogetset="yes" description="..."/>
+				<property name="SampleCount" type="integer32" autogetset="yes" description="..."/>
+				<property name="SampleRadius" type="float" autogetset="yes" description="..."/>
+				
+				<property name="BlurRadius" type="float" autogetset="yes" description="..."/>
+				<property name="BlurSharpness" type="float" autogetset="yes" description="..."/>
+				<property name="BlurEdgeThreshold" type="float" autogetset="yes" description="..."/>
+
+			</class>
+		</meta>
+	</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 
 #endif

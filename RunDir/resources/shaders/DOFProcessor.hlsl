@@ -36,7 +36,7 @@
 //////////////////////////////////////////////////////////////////////////////////////
 //                                                                                  //
 //  DOFProcessor.hlsl - Zinek Engine v0.05.00 Build 1024 Source Code				//
-// -------------------------------------------------------------------------------- //
+// -------------------------------------------------------------------------------//
 //  Copyright (c) 2007-2009 Y. Orçun GÖKBULUT. All rights reserved.                 //
 //                                                                                  //
 //                 READ TERMS BELLOW BEFORE TAKING ANY ACTION !                     //
@@ -67,14 +67,25 @@
 //////////////////////////////////////////////////////////////////////////////////////
 
 // Common parameters
-sampler2D 		ColorBuffer 	: register(s0);		// Color buffer both used by blur and dof
+sampler2D 						ColorBuffer 			: register(s0);
+sampler2D 						DepthBuffer 			: register(s1);
+sampler2D 						ColorBufferBlurred		: register(s2);
 
+float2							PixelSize				: register(c0);
+float4							DOFParameters0			: register(ps, c0);
+float4							DOFParameters1			: register(ps, c1);
+
+#define NearClamp				DOFParameters0.x
+#define NearDistance			DOFParameters0.y
+#define FarClamp				DOFParameters0.z
+#define FarDistance				DOFParameters0.w
+#define FocusDistance			DOFParameters1.x
+#define FullFocusRange			DOFParameters1.y
 
 // Vertex Shader Input Struct
 struct VS_INPUT
 {
-	float4 Position  : POSITION0;
-	float2 Texcoord  : TEXCOORD0;
+	float3 Position  : POSITION0;
 };
 
 // Vertex Shader Output Struct
@@ -96,14 +107,13 @@ struct PS_OUTPUT
 	float4 PixelColor : COLOR0;
 };
 
-/**************************	  Common vertex shader	  *****************************/
+/************************************************************/
+/*						Vertex Shader Common				*/
+/************************************************************/
 
-const float2	PixelSize		: register(vs, c0);			// Color buffer pixel size
-
-// Vertex Shader Main
 VS_OUTPUT vs_main_common( VS_INPUT Input )
 {
-	VS_OUTPUT Output;
+	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
 	
 	Output.Position = float4(sign(Input.Position).xy, 0.0f, 1.0f);
 	Output.Texcoord.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
@@ -112,89 +122,59 @@ VS_OUTPUT vs_main_common( VS_INPUT Input )
 	return Output;
 }
 
-/*************************	 Down sample pixel shaders	  *************************/
+/************************************************************/
+/*					Down/Up sample and blur					*/
+/************************************************************/
 
-PS_OUTPUT ps_main_ds2x( PS_INPUT Input )
+static const float2 SampleOffsets[9] = 
 {
-	PS_OUTPUT Output;
-	Output.PixelColor = (float4)0.0f;
+	{-1.0f, -1.0f},	{+0.0f, -1.0f},	{+1.0f, -1.0f},
+	{-1.0f, +0.0f},	{+0.0f, +0.0f},	{+1.0f, +0.0f},
+	{-1.0f, +1.0f},	{+0.0f, +1.0f},	{+1.0f, +1.0f}
+};
 
-	Output.PixelColor = tex2D(ColorBuffer, Input.TexCoord);
-	return Output;
-}
-
-
-
-/****************************	Gaussian blur shaders	***************************/
-
-const float4		BlurKernel[7]	:	register(ps, c0);	// Kernel for gaussian blur
-
-// Horizontal pass for gaussian blur
-PS_OUTPUT ps_main_gauss_blur_horizontal( PS_INPUT Input )
+PS_OUTPUT ps_main_down_up_sample_blur( PS_INPUT Input )
 {
-	PS_OUTPUT Output;
-	Output.PixelColor = (float4)0.0f;
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
 
-	for (int I = 0; I < 7; I++)
+	for (int I  = 0; I < 9; ++I)
 	{
-		Output.PixelColor += BlurKernel[I].x * tex2D(ColorBuffer, Input.TexCoord + float2(BlurKernel[I].y, 0.0f));
+		Output.PixelColor += tex2D(ColorBuffer, Input.TexCoord + SampleOffsets[I] * PixelSize);
 	}
-	
+	Output.PixelColor /= 9.0f ;
+
 	return Output;
 }
 
-// Vertical pass for gaussian blur
-PS_OUTPUT ps_main_gauss_blur_vertical( PS_INPUT Input )
-{	
-	PS_OUTPUT Output;
-	Output.PixelColor = (float4)0.0f;
+/************************************************************/
+/*						Depth of Field						*/
+/************************************************************/
 
-	for (int I = 0; I < 7; I++)
-	{
-		Output.PixelColor += BlurKernel[I].x * tex2D(ColorBuffer, Input.TexCoord + float2(0.0f, BlurKernel[I].y));
-	}
-	
-	return Output;
-}
-
-/*****************************	Dof pixel shaders	*******************************/
-
-sampler2D 		DepthBuffer 			: register(s1);		// Depth buffer
-sampler2D 		ColorBufferLowResBlur	: register(s2);		// 1/4 sized blurred color buffer
-
-const float		FocusDistance	: register(ps, c0);
-const float		NearDistance	: register(ps, c1);
-const float		FarDistance		: register(ps, c2);
-const float		NearClamp		: register(ps, c3);
-const float		FarClamp		: register(ps, c4);
-
-
-// Pixel shader main
 PS_OUTPUT ps_main_dof( PS_INPUT Input )
 {
-	PS_OUTPUT Output;
-	Output.PixelColor = (float4)0.0f;
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
 	
-	float	Depth			= tex2D(DepthBuffer, Input.TexCoord).r;
-	float4	Color			= tex2D(ColorBuffer, Input.TexCoord);
-	float4	ColorBlurLowRes = tex2D(ColorBufferLowResBlur, Input.TexCoord);
+	float4	Color	= tex2D(ColorBuffer, Input.TexCoord);
+	float	Depth	= tex2D(DepthBuffer, Input.TexCoord).r;
+	float4	Blurred	= tex2D(ColorBufferBlurred, Input.TexCoord);
+
+	float HalfFocusRange = FullFocusRange / 2.0f;
+	float FullFocusEnd = FocusDistance + HalfFocusRange;
+	float FullFocusStart = FocusDistance - HalfFocusRange;
 	
-	//float BlurFactor = saturate(abs(Depth - FocusDistance) / FocusRange);
 	float BlurFactor = 0.0f;
-	
-	if (Depth < FocusDistance)
+	if (Depth < FullFocusStart)
 	{
-		BlurFactor = (FocusDistance - Depth) / (FocusDistance - NearDistance);
+		BlurFactor = (FullFocusStart - Depth) / (FullFocusStart - NearDistance);
 		BlurFactor = clamp(BlurFactor, 0, NearClamp);
 	}
-	else
+	if(Depth > FullFocusEnd)
 	{
-		BlurFactor = (Depth - FocusDistance) / (FarDistance - FocusDistance);
+		BlurFactor = (Depth - FullFocusEnd) / (FarDistance - FullFocusEnd);
 		BlurFactor = clamp(BlurFactor, 0, FarClamp);
 	}
 	
-	Output.PixelColor = lerp(Color, ColorBlurLowRes, BlurFactor);
+	Output.PixelColor = lerp(Color, Blurred, BlurFactor);
 
 	return Output;
 }
-

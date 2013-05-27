@@ -53,7 +53,6 @@ function(ze_file_compiler)
 		get_filename_component(VARIABLE_FILE_NORMALIZED ${VARIABLE_FILE} ABSOLUTE)
 		get_filename_component(VARIABLE_FILE_NAME ${VARIABLE_FILE} NAME)
 		string(REPLACE  "." "_" PARAMETER_CLASS ${VARIABLE_FILE_NAME})
-
 		add_custom_command(
 			OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.h"
 			COMMAND "$<TARGET_FILE:ZEFileCompiler>"
