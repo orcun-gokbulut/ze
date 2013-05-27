@@ -107,6 +107,8 @@ class ZESea : public ZEEntity
 		virtual void			Tick(float ElapsedTime);
 		virtual void			Draw(ZEDrawParameters* DrawParameters);
 
+		virtual bool			RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+
 		virtual ZEDrawFlags		GetDrawFlags() const;
 
 		static ZESea*			CreateInstance();
