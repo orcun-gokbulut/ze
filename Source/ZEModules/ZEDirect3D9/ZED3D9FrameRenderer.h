@@ -37,11 +37,11 @@
 #ifndef __ZE_D3D9_FRAME_RENDERER_H__
 #define __ZE_D3D9_FRAME_RENDERER_H__
 
-
 #include "ZED3D9EDProcessor.h"
 #include "ZED3D9HDRProcessor.h"
 #include "ZED3D9DOFProcessor.h"
 #include "ZED3D9HBAOProcessor.h"
+#include "ZED3D9SSAOProcessor.h"
 #include "ZED3D9FogProcessor.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZED3D9BlurProcessor.h"
@@ -155,6 +155,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9Texture2D*					ABuffer;
 		ZED3D9Texture2D*					SSAOBuffer;
 
+		ZED3D9SSAOProcessor					SSAOProcessor;
 		ZED3D9HBAOProcessor					HBAOProcessor;
 		ZED3D9MLAAProcessor					MLAAProcessor;
 		ZED3D9FogProcessor					FogProcessor;
