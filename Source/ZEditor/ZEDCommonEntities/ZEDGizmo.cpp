@@ -1032,15 +1032,27 @@ void ZEDGizmo::Draw(ZEDrawParameters* DrawParameters)
 	UpdateGizmo();
 
 	RenderCommand.WorldMatrix = GetWorldTransform();
-	RenderCommand.Flags = (Mode == ZED_GM_ROTATE ? ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM : ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM);
+	RenderCommand.Flags = (Mode == ZED_GM_ROTATE ? ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM : ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) | ZE_ROF_ENABLE_NO_Z_WRITE;
 	RenderCommand.PrimitiveType = ZE_ROPT_LINE;
 	RenderCommand.PrimitiveCount = GizmoLines.Vertices.GetCount() / 2;
 	RenderCommand.VertexBuffer = &GizmoLines;
+	RenderCommand.Pipeline = ZE_RORP_3D;
+	RenderCommand.Material = GizmoMaterial;
+	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	RenderCommand.VertexBufferOffset = 0;
+	RenderCommand.IndexBuffer = NULL;
+	RenderCommand.Priority = INT_MAX;
+	RenderCommand.Order = FLT_MAX;
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 
 	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderCommand.PrimitiveCount = GizmoTriangles.Vertices.GetCount() / 3;
 	RenderCommand.VertexBuffer = &GizmoTriangles;
+	RenderCommand.Pipeline = ZE_RORP_3D;
+	RenderCommand.Material = GizmoMaterial;
+	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	RenderCommand.VertexBufferOffset = 0;
+	RenderCommand.IndexBuffer = NULL;
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }
 

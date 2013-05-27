@@ -37,6 +37,7 @@
 #include "ZEError.h"
 #include <mpg123.h>
 #include <stdio.h>
+#include "ZEFile\ZEPathUtils.h"
 
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
@@ -158,7 +159,8 @@ ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
 	ZEString NewPath = ConstructResourcePath(FileName);
 
 	bool Result;
-	ZEFile File; 
+	ZEFile File;
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 	
 	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if(!Result)

@@ -282,7 +282,7 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Room")
 			continue;
 
-		ZEValue RoomName, Position, Rotation, Scale, PhysicalMeshEnabled, UserDefinedProperties;
+		ZEValue RoomName, Position, Rotation, Scale, PhysicalMeshEnabled, UserDefinedProperties, GenerateOctree;
 		ZEMLSerialPointer PolygonsPointer, PhysicalMeshPointer;
 
 		ZEMLSerialListItem RoomPropertiesList[] = {
@@ -290,12 +290,13 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 			ZEML_LIST_PROPERTY("Position",					Position,				ZE_VRT_VECTOR3,		true),
 			ZEML_LIST_PROPERTY("Rotation",					Rotation,				ZE_VRT_QUATERNION,	true),
 			ZEML_LIST_PROPERTY("Scale",						Scale,					ZE_VRT_VECTOR3,		true),
+			ZEML_LIST_PROPERTY("GenerateOctree",			GenerateOctree,			ZE_VRT_BOOLEAN,		false),
 			ZEML_LIST_PROPERTY("UserDefinedProperties",		UserDefinedProperties,	ZE_VRT_STRING,		false),
 			ZEML_LIST_DATA("Polygons",						PolygonsPointer,							true),
 			ZEML_LIST_NODE("PhysicalMesh",					PhysicalMeshPointer,						false)	
 		};
 
-		Reader->ReadPropertyList(RoomPropertiesList, 7);
+		Reader->ReadPropertyList(RoomPropertiesList, 8);
 		Reader->SeekPointer(PolygonsPointer);
 
 		ZEInteriorResourceRoom* Room = &Rooms[I];
@@ -397,6 +398,21 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 			zeWarning("Room %s does not have physical mesh.", RoomName.GetString().ToCString());
 		}
 
+		if (true)//GenerateOctree.GetType() == ZE_VRT_BOOLEAN && GenerateOctree.GetBoolean())
+		{
+			Room->HasOctree = true;
+			Room->Octree.SetBoundingBox(Room->BoundingBox);
+			Room->Octree.SetMaxDepth(4);
+			for (ZESize I = 0; I < Room->Polygons.GetCount(); I++)
+			{
+				ZETriangle Triangle(Room->Polygons[I].Vertices[0].Position, Room->Polygons[I].Vertices[1].Position, Room->Polygons[I].Vertices[2].Position);
+				Room->Octree.AddItem(I, Triangle);
+			}
+		}
+		else
+		{
+			Room->HasOctree = false;
+		}
 	}
 
 	Reader->GoToCurrentPointer();
@@ -498,27 +514,27 @@ const char* ZEInteriorResource::GetResourceType() const
 	return "Interior Resource";
 }
 
-const ZEArray<ZETexture2DResource*>& ZEInteriorResource::GetTextures()
+const ZEArray<ZETexture2DResource*>& ZEInteriorResource::GetTextures() const
 {
 	return TextureResources;
 }
 
-const ZEArray<ZEMaterial*>& ZEInteriorResource::GetMaterials()
+const ZEArray<ZEMaterial*>& ZEInteriorResource::GetMaterials() const
 {
 	return Materials;
 }
 
-const ZEArray<ZEInteriorResourceRoom>& ZEInteriorResource::GetRooms()
+const ZEArray<ZEInteriorResourceRoom>& ZEInteriorResource::GetRooms() const
 {
 	return Rooms;
 }
 
-const ZEArray<ZEInteriorResourceDoor>& ZEInteriorResource::GetDoors()
+const ZEArray<ZEInteriorResourceDoor>& ZEInteriorResource::GetDoors() const
 {
 	return Doors;
 }
 
-const ZEArray<ZEInteriorResourceHelper>& ZEInteriorResource::GetHelpers()
+const ZEArray<ZEInteriorResourceHelper>& ZEInteriorResource::GetHelpers() const
 {
 	return Helpers;
 }
@@ -527,6 +543,7 @@ ZEInteriorResource* ZEInteriorResource::LoadSharedResource(const ZEString& FileN
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 	// Try to get instance of shared ZEInterior file from resource manager
 	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(NewPath);
 	
@@ -552,6 +569,8 @@ ZEInteriorResource* ZEInteriorResource::LoadSharedResource(const ZEString& FileN
 void ZEInteriorResource::CacheResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
+
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
 	// Try to get instance of shared ZEInterior file from resource manager
 	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(NewPath);
@@ -579,7 +598,7 @@ ZEInteriorResource* ZEInteriorResource::LoadResource(const ZEString& FileName)
 
 	bool Result;
 	ZEFile ResourceFile;
-
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
 	// Open ZEInterior file
 	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);

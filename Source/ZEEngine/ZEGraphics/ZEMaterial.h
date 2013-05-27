@@ -91,7 +91,7 @@ class ZEMaterial : public ZEObject
 
 	protected:
 		bool							ShadowCaster;
-		bool							ShadowReciver;
+		bool							ShadowReceiver;
 		bool							LightningEnabled;
 
 										ZEMaterial();
@@ -104,8 +104,8 @@ class ZEMaterial : public ZEObject
 		void							SetShadowCaster(bool Value);
 		bool							GetShadowCaster() const;
 
-		void							SetShadowReciver(bool Value);
-		bool							GetShadowReciver() const;
+		void							SetShadowReceiver(bool Value);
+		bool							GetShadowReceiver() const;
 
 		void							SetLightningEnabled(bool Enabled);
 		bool							GetLightningEnabled() const;
@@ -123,4 +123,5 @@ class ZEMaterial : public ZEObject
 		virtual void					Release() = 0;
 		virtual void					Destroy();
 };
+
 #endif

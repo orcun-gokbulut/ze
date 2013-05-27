@@ -112,7 +112,7 @@ ZETestSuite(ZEMLSerialReader)
 			remove("SerialReaderTests.txt");
 		}
 
-		ZETestCase("write to ZML file with serial writer for bool typed variant")
+		ZETestCase("write to ZEML file with serial writer for bool typed variant")
 		{
 			File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ZEMLSerialRootNode RootNode("RootNode", File);
@@ -122,7 +122,7 @@ ZETestSuite(ZEMLSerialReader)
 			RootNode.CloseNode();
 			ZEMLSerialReader Reader(File);
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
@@ -180,7 +180,7 @@ ZETestSuite(ZEMLSerialReader)
 			RootNode.CloseNode();
 			ZEMLSerialReader Reader(File);
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
@@ -244,7 +244,7 @@ ZETestSuite(ZEMLSerialReader)
 			RootNode.CloseNode();
 			ZEMLSerialReader Reader(File);
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
@@ -266,7 +266,7 @@ ZETestSuite(ZEMLSerialReader)
 			remove("SerialReaderTests.txt");
 		}
 
-		ZETestCase("write to ZML file with serial writer with double")
+		ZETestCase("write to ZEML file with serial writer with double")
 		{
 			File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ZEMLSerialRootNode RootNode("RootNode", File);
@@ -277,7 +277,7 @@ ZETestSuite(ZEMLSerialReader)
 			RootNode.CloseNode();
 			ZEMLSerialReader Reader(File);
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
@@ -310,7 +310,7 @@ ZETestSuite(ZEMLSerialReader)
 			RootNode.CloseNode();
 			ZEMLSerialReader Reader(File);
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
@@ -343,7 +343,7 @@ ZETestSuite(ZEMLSerialReader)
 			RootNode.CloseNode();
 			ZEMLSerialReader Reader(File);
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
@@ -386,7 +386,7 @@ ZETestSuite(ZEMLSerialReader)
 			RootNode.CloseNode();
 			ZEMLSerialReader Reader(File);
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
@@ -483,7 +483,7 @@ ZETestSuite(ZEMLSerialReader)
 			RootNode.CloseNode();
 			ZEMLSerialReader Reader(File);
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
@@ -559,7 +559,7 @@ ZETestSuite(ZEMLSerialReader)
 			remove("SerialReaderTests.txt");
 		}
 
-		ZETestCase("write to ZML file with ZEMLNode Write")
+		ZETestCase("write to ZEML file with ZEMLNode Write")
 		{
 			ZEVariant Value;
 			Value.SetFloat(2.0f);
@@ -577,7 +577,7 @@ ZETestSuite(ZEMLSerialReader)
 			ZETestCheckEqual(Node.GetTotalSize(), 98);
 			ZEMLSerialReader Reader(File);
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
@@ -647,7 +647,7 @@ ZETestSuite(ZEMLSerialReader)
 			ZETestCheckEqual(Node.GetTotalSize(), 31);
 			ZEMLSerialReader Reader(File);
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
@@ -690,7 +690,7 @@ ZETestSuite(ZEMLSerialReader)
 			Node.WriteDataProperty("DataProp", Data, sizeof(unsigned char));
 			ZEMLSerialReader Reader(File);
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
@@ -728,7 +728,7 @@ ZETestSuite(ZEMLSerialReader)
 			Root.WriteDataProperty("DataProp1", Data, sizeof(unsigned char));
 			Root.WriteDataProperty("DataProp2", Data, sizeof(unsigned char));
 			Root.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 			ZEMLSerialReader Reader(File);
 
 			ResultForRead = Reader.Read();
@@ -778,7 +778,6 @@ ZETestSuite(ZEMLSerialReader)
 			Node1.WriteProperty("Prop2", "test");
 			Node1.WriteProperty("Prop3", 5.1f);
 
-			File->Flush();
 			ZEInt64 PositionForNode2 = File->GetSize();
 
 			ZEMLSerialNode Node2 = Root.OpenNode("Node2");
@@ -787,7 +786,6 @@ ZETestSuite(ZEMLSerialReader)
 			Node2.WriteDataProperty("DataProp1", Data1, sizeof(unsigned char) * 5);
 			Node2.WriteDataProperty("DataProp2", Data2, sizeof(unsigned char) * 3);
 
-			File->Flush();
 			ZEInt64 PositionForProp4 = File->GetSize();
 
 			Root.WriteProperty("Prop4", false);
@@ -796,7 +794,7 @@ ZETestSuite(ZEMLSerialReader)
 			Node2.CloseNode();
 			Node1.CloseNode();
 			Root.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ZEMLSerialReader Reader(File);
 
@@ -839,7 +837,7 @@ ZETestSuite(ZEMLSerialReader)
 			ZEMLSerialNode Node = Root.OpenNode("Node");
 			Node.CloseNode();
 			Root.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ZEMLSerialReader Reader(File);
 
@@ -876,7 +874,7 @@ ZETestSuite(ZEMLSerialReader)
 			Node2.CloseNode();
 			Node1.CloseNode();
 			Root.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ZEMLSerialReader Reader(File);
 			bool ResultForRead = Reader.Read();
@@ -926,7 +924,7 @@ ZETestSuite(ZEMLSerialReader)
 			Node3.CloseNode();
 			Root3.CloseNode();
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ZEMLSerialReader Reader(File);
 
@@ -998,7 +996,7 @@ ZETestSuite(ZEMLSerialReader)
 			RootNode.CloseNode();
 			ZEMLSerialReader Reader(File);
 
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
@@ -1024,7 +1022,7 @@ ZETestSuite(ZEMLSerialReader)
 			Node.CloseNode();
 			RootNode.CloseNode();
 			ZEMLSerialReader Reader(File);
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
 
@@ -1075,7 +1073,7 @@ ZETestSuite(ZEMLSerialReader)
 			RootNode.WriteProperty("Prop", Value);
 			RootNode.CloseNode();
 			ZEMLSerialReader Reader(File);
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 			ResultForRead = Reader.Read();
 			ZETestCheck(ResultForRead);
 
@@ -1127,7 +1125,7 @@ ZETestSuite(ZEMLSerialReader)
 			Node2.CloseNode();
 			Node1.CloseNode();
 			Root.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 			ZEMLSerialReader Reader(File);
 
 			ResultForRead = Reader.Read();
@@ -1198,7 +1196,7 @@ ZETestSuite(ZEMLSerialReader)
 		RootNode.WriteProperty("Prop", Value);
 		RootNode.CloseNode();
 		ZEMLSerialReader Reader(File);
-		File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+		File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 		bool ResultForRead = Reader.Read();
 		ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_NODE);
@@ -1224,7 +1222,7 @@ ZETestSuite(ZEMLSerialReader)
 		RootNode.WriteProperty("Prop", Value);
 		RootNode.CloseNode();
 		ZEMLSerialReader Reader(File);
-		File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+		File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 		bool ResultForRead = Reader.Read();
 		ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_NODE);
@@ -1246,7 +1244,7 @@ ZETestSuite(ZEMLSerialReader)
 			Node.AddProperty("Prop", Value);
 			Node.Write(File);
 			ZEMLSerialReader SerialReader(File);
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = SerialReader.Read();
 			ZETestCheck(ResultForRead);
@@ -1276,7 +1274,7 @@ ZETestSuite(ZEMLSerialReader)
 			Node.AddDataProperty("DataProp", Data, sizeof(unsigned char) * DataCount, false);
 			Node.Write(File);
 			ZEMLSerialReader TestReader(File);
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = TestReader.Read();
 			ZETestCheckEqual(TestReader.GetItemType(), ZEML_IT_NODE);
@@ -1306,7 +1304,7 @@ ZETestSuite(ZEMLSerialReader)
 			Node.WriteProperty("Prop", true);
 			Node.CloseNode();
 			Root.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 			ZEMLSerialReader SReader(File);
 
 			ResultForRead = SReader.Read();
@@ -1367,7 +1365,7 @@ ZETestSuite(ZEMLSerialReader)
 			RootNode.WriteProperty("Prop", Value);
 			RootNode.CloseNode();
 			ZEMLSerialReader Reader(File);
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_NODE);
@@ -1393,7 +1391,7 @@ ZETestSuite(ZEMLSerialReader)
 			File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			Node.Write(File);
 			ZEMLSerialReader Reader(File);
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_NODE);
@@ -1426,7 +1424,7 @@ ZETestSuite(ZEMLSerialReader)
 			Node.CloseNode();
 			Root.CloseNode();
 			ZEMLSerialReader Reader(File);
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Reader.Read();
 			ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_NODE);
@@ -1461,13 +1459,12 @@ ZETestSuite(ZEMLSerialReader)
 			ZEMLSerialRootNode Root("RootNode", File);
 			ZEMLSerialNode Node = Root.OpenNode("Node");
 			Node.WriteDataProperty("DataProp1", Data1, sizeof(unsigned char) * 3);
-			File->Flush();
 			ZEInt64 PositionForDataProp2 = File->GetSize();
 			Node.WriteDataProperty("DataProp2", Data2, sizeof(unsigned char) * 4);
 			Node.CloseNode();
 			Root.CloseNode();
 			ZEMLSerialReader Reader(File);
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			Reader.SeekPointer(52);
 			ZETestCheckString(Reader.GetItemName(), "DataProp1");
@@ -1505,7 +1502,7 @@ ZETestSuite(ZEMLSerialReader)
 			Node.WriteDataProperty("DataProp2", Data2, sizeof(unsigned char) * 4);
 			Node.CloseNode();
 			Root.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 			ZEMLSerialReader Reader(File);
 
 			Reader.SeekPointer(52);
@@ -1552,30 +1549,26 @@ ZETestSuite(ZEMLSerialReader)
 
 		File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 
-		ZEMLSerialRootNode Root("Root", File);
-		File->Flush();			
+		ZEMLSerialRootNode Root("Root", File);		
 		ZEInt64 PosForDataProp1 = File->Tell();
 		ZETestCheckEqual(PosForDataProp1, 24);
 
 		Root.WriteDataProperty("DataProp1", Data1, sizeof(unsigned char) * DataCount1);
-		File->Flush();
 		ZEInt64 PosForDataProp2 = File->Tell();
 		ZETestCheckEqual(PosForDataProp2, 50);
 
 		Root.WriteDataProperty("DataProp2", Data2, sizeof(unsigned char) * DataCount2);
-		File->Flush();
 		ZEInt64 PosForDataProp3 = File->Tell();
 		ZETestCheckEqual(PosForDataProp3, 74);
 
 		Root.WriteDataProperty("DataProp3", Data3, sizeof(unsigned char) * DataCount3);
-		File->Flush();
 		ZEInt64 PosForProp = File->GetSize();
 		ZETestCheckEqual(PosForProp, 105);
 
 		Root.WriteProperty("Prop", true);
 
 		Root.CloseNode();
-		File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+		File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 		ZEMLSerialReader Reader(File);
 
@@ -1650,25 +1643,23 @@ ZETestSuite(ZEMLSerialReader)
 	{
 		ZEFile* File = new ZEFile();
 		File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+
 		ZEMLSerialRootNode Root("RootNode", File);
-		File->Flush();
 		ZEInt64 PositionForPropBool = File->GetSize();
-		ZETestCheckEqual(PositionForPropBool, 28);
+
 		Root.WriteProperty("PropBool", true);
-		File->Flush();
 		ZEInt64 PositionForPropFloat = File->GetSize();
-		ZETestCheckEqual(PositionForPropFloat, 49);
+
 		Root.WriteProperty("PropFloat", 3.0f);
-		File->Flush();
 		ZEInt64 PositionForDataProp = File->GetSize();
-		ZETestCheckEqual(PositionForDataProp, 74);
+
 		void* Data = new char[sizeof(unsigned char)];
 		Root.WriteDataProperty("DataProp", Data, sizeof(unsigned char));
-		File->Flush();
 		ZEInt64 PositionForNull = File->GetSize();
-		ZETestCheckEqual(PositionForNull, 95);
+
 		Root.CloseNode();
-		File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+		File->Seek(-File->GetSize(), ZE_SF_CURRENT);
+
 		ZEMLSerialReader Reader(File);
 
 		ZEMLSerialPointer Pointer = 17;
@@ -1680,41 +1671,41 @@ ZETestSuite(ZEMLSerialReader)
 
 		Pointer = PositionForPropBool;
 		Reader.SeekPointer(Pointer);
-		ZETestCheckEqual(Reader.GetCurrentPointer(), 28);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PositionForPropBool);
 		ZETestCheckString(Reader.GetItemName(), "PropBool");
 		ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_BOOLEAN);
 		ZETestCheck(Reader.GetItemValue().GetBoolean());
 
 		Reader.SeekPointer(PositionForPropFloat);
-		ZETestCheckEqual(Reader.GetCurrentPointer(), 49);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PositionForPropFloat);
 		ZETestCheckString(Reader.GetItemName(), "PropFloat");
 		ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_FLOAT);
 		ZETestCheckEqual(Reader.GetItemValue().GetFloat(), 3.0f);
 
 		Reader.SeekPointer(PositionForDataProp);
-		ZETestCheckEqual(Reader.GetCurrentPointer(), 74);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PositionForDataProp);
 		ZETestCheckString(Reader.GetItemName(), "DataProp");
 		ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_INLINE_DATA);
 		ZETestCheckEqual(Reader.GetDataSize(), 1);
 
 		Reader.SeekPointer(PositionForNull);
-		ZETestCheckEqual(Reader.GetCurrentPointer(), 95);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PositionForNull);
 		ZETestCheck(Reader.GetItemName() == "");
 		ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_UNDEFINED);
 
 		Reader.SeekPointer(17);
 		//error Identifier mismatch. Corrupted ZEML file.
-		ZETestCheckEqual(Reader.GetCurrentPointer(), 95);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PositionForNull);
 		ZETestCheck(Reader.GetItemName() == "");
 		ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_UNDEFINED);
 
 		Reader.SeekPointer(PositionForPropBool);
-		ZETestCheckEqual(Reader.GetCurrentPointer(), 95);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PositionForNull);
 		ZETestCheckString(Reader.GetItemName(), "PropBool");
 		ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_BOOLEAN);
 
 		Reader.SeekPointer(PositionForDataProp);
-		ZETestCheckEqual(Reader.GetCurrentPointer(), 95);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PositionForNull);
 		ZETestCheckString(Reader.GetItemName(), "DataProp");
 		ZETestCheckEqual(Reader.GetItemType(), ZEML_IT_INLINE_DATA);
 
@@ -1727,13 +1718,22 @@ ZETestSuite(ZEMLSerialReader)
 	{
 		ZEFile* File = new ZEFile();
 		File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+
 		ZEMLSerialRootNode Root("RootNode", File);
+		ZEInt64 PositionForPropBool = File->Tell();
+
 		Root.WriteProperty("PropBool", true);
+		ZEInt64 PositionForPropFloat = File->Tell();
+
 		Root.WriteProperty("PropFloat", 3.0f);
+		ZEInt64 PositionForDataProp = File->Tell();
+
 		void* Data = new char[sizeof(unsigned char)];
 		Root.WriteDataProperty("DataProp", Data, sizeof(unsigned char));
+		ZEInt64 PositionForNull = File->Tell();
+
 		Root.CloseNode();
-		File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+		File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 		
 		ZEMLSerialReader Reader(File);
 		ZETestCheck(Reader.GetItemName() == "");
@@ -1748,32 +1748,32 @@ ZETestSuite(ZEMLSerialReader)
 		ResultForRead = Reader.Read();
 		ZETestCheckString(Reader.GetItemName(), "PropBool");
 		MaxPointer = Reader.GetCurrentPointer();
-		ZETestCheckEqual(MaxPointer, 28);
+		ZETestCheckEqual(MaxPointer, PositionForPropBool);
 
 		Reader.SeekPointer(13);
 		//error Identifier mismatch. Corrupted ZEML file.
 		ZETestCheck(Reader.GetItemName() == "");
 		MaxPointer = Reader.GetCurrentPointer();
-		ZETestCheckEqual(MaxPointer, 28);
+		ZETestCheckEqual(MaxPointer, PositionForPropBool);
 		Reader.GoToCurrentPointer();
 		ZETestCheckString(Reader.GetItemName(), "PropBool");
 		MaxPointer = Reader.GetCurrentPointer();
-		ZETestCheckEqual(MaxPointer, 28);
+		ZETestCheckEqual(MaxPointer, PositionForPropBool);
 
 		ResultForRead = Reader.Read();
 		ZETestCheckString(Reader.GetItemName(), "PropFloat");
 		MaxPointer = Reader.GetCurrentPointer();
-		ZETestCheckEqual(MaxPointer, 49);
+		ZETestCheckEqual(MaxPointer, PositionForPropFloat);
 
 		ResultForRead = Reader.Read();
 		ZETestCheckString(Reader.GetItemName(), "DataProp");
 		MaxPointer = Reader.GetCurrentPointer();
-		ZETestCheckEqual(MaxPointer, 74);
+		ZETestCheckEqual(MaxPointer, PositionForDataProp);
 
 		ResultForRead = Reader.Read();
 		ZETestCheck(!ResultForRead);
 		MaxPointer = Reader.GetCurrentPointer();
-		ZETestCheckEqual(MaxPointer, 95);
+		ZETestCheckEqual(MaxPointer, PositionForNull);
 
 		File->Close();
 		remove("SerialReaderTests.txt");
@@ -1782,79 +1782,94 @@ ZETestSuite(ZEMLSerialReader)
 
 	ZETest("void ZEMLSerialReader::GoToCurrentPointer()")
 	{
-		ZEFile* File = new ZEFile();
+		void* Data = new char[5];
+		ZEFile* File = new ZEFile;
 		File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+
 		ZEMLSerialRootNode Root("Root", File);
-		File->Flush();
-		ZEInt64 PositionForProp1 = File->GetSize();
+		ZEInt64 PosProp1 = File->Tell();
 
 		Root.WriteProperty("Prop1", true);
-		File->Flush();
-		ZEInt64 PositionForProp2 = File->GetSize();
-
-		Root.WriteProperty("Prop2", false);
-		File->Flush();
-		ZEInt64 PositionForNode1 = File->GetSize();
+		ZEInt64 PosNode1 = File->Tell();
 
 		ZEMLSerialNode Node1 = Root.OpenNode("Node1");
-		File->Flush();
-		ZEInt64 PositionForProp3 = File->GetSize();
+		ZEInt64 PosDataProp1 = File->Tell();
 
-		Node1.WriteProperty("Prop3", 3.4f);
-		File->Flush();
-		ZEInt64 PositionForNode2 = File->GetSize();
+		Node1.WriteDataProperty("DataProp", Data, sizeof(unsigned char) * 5);
+		ZEInt64 PosProp2 = File->Tell();
+
+		Node1.WriteProperty("Prop2", 4.0f);
+		ZEInt64 PosNode2 = File->Tell();
 
 		ZEMLSerialNode Node2 = Root.OpenNode("Node2");
-		File->Flush();
-		ZEInt64 PositionForProp4 = File->GetSize();
+		ZEInt64 PosProp3 = File->Tell();
 
-		Node2.WriteProperty("Prop4", "test");
+		Node2.WriteProperty("Prop3", "test");
+		ZEInt64 PosNull = File->Tell();
+
 		Node2.CloseNode();
 		Node1.CloseNode();
 		Root.CloseNode();
-		File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+		File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 		ZEMLSerialReader Reader(File);
 
-		ZEMLSerialPointer Node1Pointer, Node2Pointer;
+		ZEMLSerialPointer DataPointer, Node1Pointer, Node2Pointer;
 		ZEVariant Prop1, Prop2, Prop3;
 
-		ZEMLSerialListItem RootItemList[4] = {
-			ZEML_LIST_PROPERTY("Prop1", Prop1, ZE_VRT_BOOLEAN, true),
-			ZEML_LIST_PROPERTY("Prop2", Prop2, ZE_VRT_BOOLEAN, true),
-			ZEML_LIST_NODE("Node1", Node1Pointer, true),
-			ZEML_LIST_NODE("Node2", Node2Pointer, true)
+		ZEMLSerialListItem ListRoot[3] = {
+			ZEML_LIST_PROPERTY("Prop1", Prop1,        ZE_VRT_BOOLEAN, true),
+			ZEML_LIST_NODE("Node1",     Node1Pointer,                 true),
+			ZEML_LIST_NODE("Node2",     Node2Pointer,                 true)
 		};
 
-		ZEMLSerialListItem Node1ItemList[1] = ZEML_LIST_PROPERTY("Prop3", Prop3, ZE_VRT_FLOAT, true);
+		ZEMLSerialListItem ListNode1[2] = {
+			ZEML_LIST_DATA("DataProp",  DataPointer,               true),
+			ZEML_LIST_PROPERTY("Prop2", Prop2,       ZE_VRT_FLOAT, true)
+		};
+
+		ZEMLSerialListItem ListNode2[1] = ZEML_LIST_PROPERTY("Prop3", Prop3, ZE_VRT_STRING, true);
 
 		bool ResultForRead = Reader.Read();
 		ZETestCheckString(Reader.GetItemName(), "Root");
 
-		bool ReadPropList = Reader.ReadPropertyList(RootItemList, 4);
+		bool ReadPropList = Reader.ReadPropertyList(ListRoot, 3);
 		ZETestCheck(ReadPropList);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PosNode2);
 		ZETestCheckString(Reader.GetItemName(), "Node2");
-		ZETestCheckEqual(Reader.GetCurrentPointer(), PositionForNode2);
 
-		Reader.SeekPointer(PositionForNode1);
+		Reader.SeekPointer(Node1Pointer);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PosNode2);
 		ZETestCheckString(Reader.GetItemName(), "Node1");
-		ZETestCheckEqual(Reader.GetCurrentPointer(), PositionForNode2);
 
-		ReadPropList = Reader.ReadPropertyList(Node1ItemList, 1);
+		ReadPropList = Reader.ReadPropertyList(ListNode1, 2);
 		ZETestCheck(ReadPropList);
-		ZETestCheckEqual(Reader.GetCurrentPointer(), PositionForNode2);
-		ZETestCheckString(Reader.GetItemName(), "Prop3");
-		
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PosNode2);
+		ZETestCheckString(Reader.GetItemName(), "Prop2");
+
+		ReadPropList = Reader.ReadPropertyList(ListNode2, 1);
+		//error Current item type is not a ZEMLNode
+		ZETestCheck(!ReadPropList);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PosNode2);
+		ZETestCheckString(Reader.GetItemName(), "Prop2");
+
 		Reader.GoToCurrentPointer();
-		ZETestCheckEqual(Reader.GetCurrentPointer(), PositionForNode2);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PosNode2);
 		ZETestCheckString(Reader.GetItemName(), "Node2");
+
+		ReadPropList = Reader.ReadPropertyList(ListNode2, 1);
+		ZETestCheck(ReadPropList);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PosProp3);
+		ZETestCheckString(Reader.GetItemName(), "Prop3");
 
 		ResultForRead = Reader.Read();
-		ZETestCheckString(Reader.GetItemName(), "Prop4");
-		ZETestCheckEqual(Reader.GetCurrentPointer(), PositionForProp4);
+		ZETestCheck(!ResultForRead);
+		ZETestCheckEqual(Reader.GetCurrentPointer(), PosNull);
+		ZETestCheck(Reader.GetItemName() == "");
 
 		File->Close();
 		remove("SerialReaderTests.txt");
+		delete Data;
 	}
 
 	ZETest("bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCount)")
@@ -1865,320 +1880,256 @@ ZETestSuite(ZEMLSerialReader)
 		bool ResultForRead;
 		bool ReadPropList;
 
-		ZETestCase("for a serial root node which includes properties, data properties and nodes")
+		ZETestCase("for a serial root node which includes properties, data properties and serial nodes and the serial nodes include subitems")
 		{
+			void* Data2 = new char[3];
+			void* Data3 = new char[7];
+			ZEVariant Value;
 			File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ZEMLSerialRootNode Root("Root", File);
-			Root.WriteProperty("PropFloat", 7.4f);
-			ZEMLSerialNode Node = Root.OpenNode("Node");
-			Root.WriteDataProperty("DataProp", Data, sizeof(unsigned char));
-			Root.WriteProperty("PropBool", true);
-			Node.CloseNode();
-			Root.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			ZEInt64 PosPropInt32 = File->Tell();
 
-			ZEMLSerialReader Reader(File);
+			Value.SetInt32(364);
+			Root.WriteProperty("PropInt32", Value);
+			ZEInt64 PosPropVec2 = File->Tell();
 
-			ZEMLSerialPointer NodePointer, DataPointer;
-			ZEVariant PropFloat, PropBool;
+			Root.WriteProperty("PropVec2", ZEVector2::UnitX);
+			ZEInt64 PosDataProp1 = File->Tell();
 
-			ZEMLSerialListItem ItemList[4] = {
-				ZEML_LIST_PROPERTY("PropFloat", PropFloat,		ZE_VRT_FLOAT,	true),
-				ZEML_LIST_NODE("Node",			NodePointer,					true),
-				ZEML_LIST_DATA("DataProp",		DataPointer,					true),
-				ZEML_LIST_PROPERTY("PropBool",	PropBool,		ZE_VRT_BOOLEAN, true)
-			};
-
-			ResultForRead = Reader.Read();
-			ZETestCheckString(Reader.GetItemName(), "Root");
-
-			ReadPropList = Reader.ReadPropertyList(ItemList, 4);
-			ZETestCheck(ReadPropList);
-			ZETestCheck(ItemList[0].IsFound);
-			ZETestCheckString(ItemList[0].Name, "PropFloat");
-			ZETestCheck(ItemList[1].IsFound);
-			ZETestCheckString(ItemList[1].Name, "Node");
-			ZETestCheckEqual(*ItemList[1].Pointer, 49);
-			ZETestCheck(ItemList[2].IsFound);
-			ZETestCheckString(ItemList[2].Name, "DataProp");
-			ZETestCheckEqual(*ItemList[2].Pointer, 73);
-			ZETestCheck(ItemList[3].IsFound);
-			ZETestCheckString(ItemList[3].Name, "PropBool");
-
-			File->Close();
-			remove("SerialReaderTests.txt");
-		}
-
-		ZETestCase("List1 for serial root node, List2 for serial node")
-		{
-			File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			ZEMLSerialRootNode Root("RootNode", File);
-			Root.WriteProperty("Prop1", true);
-			Root.WriteProperty("Prop2", 3.0f);
-			Root.WriteProperty("Prop3", "test");
-
-			ZEMLSerialNode Node = Root.OpenNode("Node");
-			Node.WriteProperty("Prop4", "string");
-			Node.WriteProperty("Prop5", false);
-			Node.WriteProperty("Prop6", 4.0f);
-			Node.CloseNode();
-			Root.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-			ZEMLSerialReader Reader(File);
-
-			ZEVariant Prop1, Prop2, Prop3, Prop4, Prop5, Prop6;
-
-			ZEMLSerialListItem List1[3] = {
-				ZEML_LIST_PROPERTY("Prop1", Prop1, ZE_VRT_BOOLEAN,	true),
-				ZEML_LIST_PROPERTY("Prop2", Prop2, ZE_VRT_FLOAT,	true),
-				ZEML_LIST_PROPERTY("Prop3", Prop3, ZE_VRT_STRING,	true)
-			};
-
-			ZEMLSerialListItem List2[3] = {
-				ZEML_LIST_PROPERTY("Prop4", Prop4, ZE_VRT_STRING,	true),
-				ZEML_LIST_PROPERTY("Prop5", Prop5, ZE_VRT_BOOLEAN,	true),
-				ZEML_LIST_PROPERTY("Prop6", Prop6, ZE_VRT_FLOAT,	true)
-			};
-
-			ResultForRead = Reader.Read();
-			ZETestCheckString(Reader.GetItemName(), "RootNode");
-
-			ReadPropList = Reader.ReadPropertyList(List1, 3);
-			ZETestCheck(ReadPropList);
-			ZETestCheck(List1[0].IsFound);
-			ZETestCheck(List1[0].Value->GetBoolean());
-			ZETestCheck(List1[1].IsFound);
-			ZETestCheckEqual(List1[1].Value->GetFloat(), 3.0f);
-			ZETestCheck(List1[2].IsFound);
-			ZETestCheckString(List1[2].Value->GetString(), "test");
-
-			ZETestCheckString(Reader.GetItemName(), "Node");
-			ZETestCheckEqual(Reader.GetCurrentPointer(), 89);
-
-			ReadPropList = Reader.ReadPropertyList(List2, 3);
-			ZETestCheck(ReadPropList);
-			ZETestCheck(List2[0].IsFound);
-			ZETestCheckString(List2[0].Value->GetString(), "string");
-			ZETestCheck(List2[1].IsFound);
-			ZETestCheck(!List2[1].Value->GetBoolean());
-			ZETestCheck(List2[2].IsFound);
-			ZETestCheckEqual(List2[2].Value->GetFloat(), 4.0f);
-
-			File->Close();
-			remove("SerialReaderTests.txt");
-		}
-
-		ZETestCase("List1 for serial root node and includes Node, List2 for serial node")
-		{
-			File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			ZEMLSerialRootNode Root("RootNode", File);
-			Root.WriteProperty("Prop1", true);
-			Root.WriteProperty("Prop2", 3.0f);
-			Root.WriteProperty("Prop3", "test");
-
-			ZEMLSerialNode Node = Root.OpenNode("Node");
-			Node.WriteProperty("Prop4", "string");
-			Node.WriteProperty("Prop5", false);
-			Node.WriteProperty("Prop6", 4.0f);
-			Node.CloseNode();
-			Root.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-
-			ZEMLSerialReader Reader(File);
-
-			ZEMLSerialPointer NodePointer;
-			ZEVariant Prop1, Prop2, Prop3, Prop4, Prop5, Prop6;
-
-			ZEMLSerialListItem List1[4] = {
-				ZEML_LIST_PROPERTY("Prop1", Prop1,		ZE_VRT_BOOLEAN, true),
-				ZEML_LIST_PROPERTY("Prop2", Prop2,		ZE_VRT_FLOAT,	true),
-				ZEML_LIST_PROPERTY("Prop3", Prop3,		ZE_VRT_STRING,	true),
-				ZEML_LIST_NODE("Node",		NodePointer,				true)
-			};
-
-			ZEMLSerialListItem List2[3] = {
-				ZEML_LIST_PROPERTY("Prop4", Prop4, ZE_VRT_STRING,	true),
-				ZEML_LIST_PROPERTY("Prop5", Prop5, ZE_VRT_BOOLEAN,	true),
-				ZEML_LIST_PROPERTY("Prop6", Prop6, ZE_VRT_FLOAT,	true)
-			};
-
-			ResultForRead = Reader.Read();
-			ZETestCheckString(Reader.GetItemName(), "RootNode");
-
-			ReadPropList = Reader.ReadPropertyList(List1, 4);
-
-			ZETestCheckString(Reader.GetItemName(), "Node");
-			ZETestCheckEqual(Reader.GetCurrentPointer(), 89);
-
-			ReadPropList = Reader.ReadPropertyList(List2, 3);
-
-			File->Close();
-			remove("SerialReaderTests.txt");
-		}
-
-		ZETestCase("for more than 1 root")
-		{
-			File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			ZEMLSerialRootNode Root1("Root1", File);
-			Root1.WriteProperty("Prop1", true);
-			Root1.WriteDataProperty("DataProp1", Data, sizeof(unsigned char));
-			Root1.CloseNode();
-
-			ZEMLSerialRootNode Root2("Root2", File);
-			Root2.WriteProperty("Prop2", "test");
-			Root2.WriteDataProperty("DataProp2", Data, sizeof(unsigned char));
-			Root2.CloseNode();
-
-			ZEMLSerialRootNode Root3("Root3", File);
-			Root3.WriteProperty("Prop3", 3.0f);
-			Root3.WriteDataProperty("DataProp3", Data, sizeof(unsigned char));
-			Root3.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
-			ZEMLSerialReader Reader(File);
-
-			ZEVariant Prop1, Prop2, Prop3;
-			ZEMLSerialPointer DataPointer1, DataPointer2, DataPointer3;
-
-			ZEMLSerialListItem List1[2] = {
-				ZEML_LIST_PROPERTY("Prop1", Prop1,			ZE_VRT_BOOLEAN, true),
-				ZEML_LIST_DATA("DataProp1", DataPointer1,					true)
-			};
-
-			ZEMLSerialListItem List2[2] = {
-				ZEML_LIST_PROPERTY("Prop2", Prop2,			ZE_VRT_STRING, true),
-				ZEML_LIST_DATA("DataProp2", DataPointer2,				   true)
-			};
-
-			ZEMLSerialListItem List3[2] = {
-				ZEML_LIST_PROPERTY("Prop3", Prop3,			ZE_VRT_FLOAT,   true),
-				ZEML_LIST_DATA("DataProp3", DataPointer3,					true)
-			};
-
-			ResultForRead = Reader.Read();
-			ZETestCheckString(Reader.GetItemName(), "Root1");
-
-			ReadPropList = Reader.ReadPropertyList(List1, 2);
-			ZETestCheck(ReadPropList);
-			ZETestCheck(List1[0].IsFound);
-			ZETestCheck(List1[0].Value->GetBoolean());
-			ZETestCheck(List1[1].IsFound);
-			ZETestCheckEqual(*List1[1].Pointer, 43);
-
-			ZETestCheckString(Reader.GetItemName(), "DataProp1");
-			ResultForRead = Reader.Read();
-			ZETestCheckString(Reader.GetItemName(), "Root2");
-
-			ReadPropList = Reader.ReadPropertyList(List2, 2);
-			ZETestCheck(ReadPropList);
-			ZETestCheck(List2[0].IsFound);
-			ZETestCheckString(List2[0].Value->GetString(), "test");
-			ZETestCheck(List2[1].IsFound);
-			ZETestCheckEqual(*List2[1].Pointer, 112);
-
-			ZETestCheckString(Reader.GetItemName(), "DataProp2");
-			ResultForRead = Reader.Read();
-			ZETestCheckString(Reader.GetItemName(), "Root3");
-
-			ReadPropList = Reader.ReadPropertyList(List3, 2);
-			ZETestCheck(ReadPropList);
-			ZETestCheck(List3[0].IsFound);
-			ZETestCheckEqual(List3[0].Value->GetFloat(), 3.0f);
-			ZETestCheck(List3[1].IsFound);
-			ZETestCheckEqual(*List3[1].Pointer, 180);
-
-			File->Close();
-			remove("SerialReaderTests.txt");
-		}
-
-		ZETestCase("open nodes over root node and write properties to child nodes")
-		{
-			File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-			ZEMLSerialRootNode Root("Root", File);
 			Root.WriteDataProperty("DataProp1", Data, sizeof(unsigned char));
+			ZEInt64 PosNode1 = File->Tell();
+
 			ZEMLSerialNode Node1 = Root.OpenNode("Node1");
-			Node1.WriteProperty("Prop1", true);
-			Node1.WriteProperty("Prop2", false);
-			ZEMLSerialNode Node2 = Root.OpenNode("Node2");
-			Node2.WriteProperty("Prop3", "test");
-			Node2.WriteProperty("Prop4", 5.5f);
+			ZEInt64 PosPropBool = File->Tell();
+
+			Node1.WriteProperty("PropBool", true);
+			ZEInt64 PosDataProp2 = File->Tell();
+
+			Node1.WriteDataProperty("DataProp2", Data2, sizeof(unsigned char) * 3);
+			ZEInt64 PosNode2 = File->Tell();
+
+			ZEMLSerialNode Node2 = Node1.OpenNode("Node2");
+			ZEInt64 PosPropString = File->Tell();
+
+			Node2.WriteProperty("PropString", "string");
+			ZEInt64 PosNode3 = File->Tell();
+
+			ZEMLSerialNode Node3 = Root.OpenNode("Node3");
+			ZEInt64 PosDataProp3 = File->Tell();
+
+			Root.WriteDataProperty("DataProp3", Data3, sizeof(unsigned char) * 7);
+			ZEInt64 PosNull = File->Tell();
+
+			Node3.CloseNode();
 			Node2.CloseNode();
 			Node1.CloseNode();
 			Root.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
+
 			ZEMLSerialReader Reader(File);
 
-			ZEMLSerialPointer RootPointer, Data1Pointer, Node1Pointer, Node2Pointer;
-			ZEVariant Prop1, Prop2, Prop3, Prop4;
+			ZEMLSerialPointer Data1Pointer, Data2Pointer, Data3Pointer, Node1Pointer, Node2Pointer, Node3Pointer;
+			ZEVariant PropInt32, PropVec2, PropBool, PropString;
 
-			ZEMLSerialListItem RootItemList[4] = {
-				ZEML_LIST_NODE("Root", RootPointer, false),
-				ZEML_LIST_DATA("DataProp1", Data1Pointer, true),
-				ZEML_LIST_NODE("Node1", Node1Pointer, true),
-				ZEML_LIST_NODE("Node2", Node2Pointer, true)
+			ZEMLSerialListItem RootItemList[6] = {
+				ZEML_LIST_PROPERTY("PropInt32",   PropInt32,     ZE_VRT_INTEGER_32,  true),
+				ZEML_LIST_PROPERTY("PropVec2",    PropVec2,      ZE_VRT_VECTOR2,     true),
+				ZEML_LIST_DATA("DataProp1",       Data1Pointer,                      true),
+				ZEML_LIST_NODE("Node1",           Node1Pointer,                      true),
+				ZEML_LIST_NODE("Node3",           Node3Pointer,                      true),
+				ZEML_LIST_DATA("DataProp3",       Data3Pointer,                      true)
 			};
 
 			ZEMLSerialListItem Node1ItemList[3] = {
-				ZEML_LIST_NODE("Node1", Node1Pointer, false),
-				ZEML_LIST_PROPERTY("Prop1", Prop1, ZE_VRT_BOOLEAN, true),
-				ZEML_LIST_PROPERTY("Prop2", Prop2, ZE_VRT_BOOLEAN, true)
+				ZEML_LIST_PROPERTY("PropBool",    PropBool,       ZE_VRT_BOOLEAN,   true),
+				ZEML_LIST_DATA("DataProp2",       Data2Pointer,                     true),
+				ZEML_LIST_NODE("Node2",           Node2Pointer,                     true)
 			};
 
-			ZEMLSerialListItem Node2ItemList[2] = {
-				ZEML_LIST_PROPERTY("Prop3", Prop3, ZE_VRT_STRING, true),
-				ZEML_LIST_PROPERTY("Prop4", Prop4, ZE_VRT_FLOAT, true)
-			};
+			ZEMLSerialListItem Node2ItemList = ZEML_LIST_PROPERTY("PropString", PropString, ZE_VRT_STRING, true);
 
 			ResultForRead = Reader.Read();
 			ZETestCheckString(Reader.GetItemName(), "Root");
 
-			ReadPropList = Reader.ReadPropertyList(RootItemList, 4);
+			ReadPropList = Reader.ReadPropertyList(RootItemList, 6);
 			ZETestCheck(ReadPropList);
-			ZETestCheck(!RootItemList[0].IsFound);
-			ZETestCheckString(RootItemList[0].Name, "Root");
+			ZETestCheck(RootItemList[0].IsFound);
+			ZETestCheckEqual(RootItemList[0].VariantType, ZE_VRT_INTEGER_32);
 			ZETestCheck(RootItemList[1].IsFound);
-			ZETestCheckString(RootItemList[1].Name, "DataProp1");
-			ZETestCheckEqual(*RootItemList[1].Pointer, 24);
+			ZETestCheckEqual(RootItemList[1].VariantType, ZE_VRT_VECTOR2);
 			ZETestCheck(RootItemList[2].IsFound);
-			ZETestCheckString(RootItemList[2].Name, "Node1");
-			ZETestCheckEqual(*RootItemList[2].Pointer, 46);
+			ZETestCheckEqual(*RootItemList[2].Pointer, PosDataProp1);
 			ZETestCheck(RootItemList[3].IsFound);
-			ZETestCheckString(RootItemList[3].Name, "Node2");
-			ZETestCheckEqual(*RootItemList[3].Pointer, 107);
+			ZETestCheckEqual(*RootItemList[3].Pointer, PosNode1);
+			ZETestCheck(RootItemList[4].IsFound);
+			ZETestCheckEqual(*RootItemList[4].Pointer, PosNode3);
+			ZETestCheck(RootItemList[5].IsFound);
+			ZETestCheckEqual(*RootItemList[5].Pointer, PosDataProp3);
+			ZETestCheckEqual(Reader.GetCurrentPointer(), PosDataProp3);
+			ZETestCheckString(Reader.GetItemName(), "DataProp3");
 
-			ZETestCheckEqual(Reader.GetCurrentPointer(), 107);
-			ZETestCheckString(Reader.GetItemName(), "Node2");
-
-			Reader.SeekPointer(46);
+			Reader.SeekPointer(PosNode1);
+			ZETestCheckEqual(Reader.GetCurrentPointer(), PosDataProp3);
 			ZETestCheckString(Reader.GetItemName(), "Node1");
 
 			ReadPropList = Reader.ReadPropertyList(Node1ItemList, 3);
 			ZETestCheck(ReadPropList);
-			ZETestCheck(!Node1ItemList[0].IsFound);
-			ZETestCheckString(Node1ItemList[0].Name, "Node1");
+			ZETestCheck(Node1ItemList[0].IsFound);
+			ZETestCheckEqual(Node1ItemList[0].VariantType, ZE_VRT_BOOLEAN);
 			ZETestCheck(Node1ItemList[1].IsFound);
-			ZETestCheckString(Node1ItemList[1].Name, "Prop1");
-			ZETestCheck(Node1ItemList[1].Value->GetBoolean());
+			ZETestCheckEqual(*Node1ItemList[1].Pointer, PosDataProp2);
 			ZETestCheck(Node1ItemList[2].IsFound);
-			ZETestCheckString(Node1ItemList[2].Name, "Prop2");
-			ZETestCheck(!Node1ItemList[2].Value->GetBoolean());
-
-			ZETestCheckEqual(Reader.GetCurrentPointer(), 107);
-			ZETestCheckString(Reader.GetItemName(), "Prop2");
-			Reader.GoToCurrentPointer();
-			ZETestCheckEqual(Reader.GetCurrentPointer(), 107);
+			ZETestCheckEqual(*Node1ItemList[2].Pointer, PosNode2);
+			ZETestCheckEqual(Reader.GetCurrentPointer(), PosDataProp3);
 			ZETestCheckString(Reader.GetItemName(), "Node2");
 
-			ReadPropList = Reader.ReadPropertyList(Node2ItemList, 2);
+			ReadPropList = Reader.ReadPropertyList(&Node2ItemList, 1);
 			ZETestCheck(ReadPropList);
-			ZETestCheck(Node2ItemList[0].IsFound);
-			ZETestCheckString(Node2ItemList[0].Name, "Prop3");
-			ZETestCheckString(Node2ItemList[0].Value->GetString(), "test");
-			ZETestCheck(Node2ItemList[1].IsFound);
-			ZETestCheckString(Node2ItemList[1].Name, "Prop4");
-			ZETestCheckEqual(Node2ItemList[1].Value->GetFloat(), 5.5f);
+			ZETestCheck(Node2ItemList.IsFound);
+			ZETestCheckEqual(Node2ItemList.VariantType, ZE_VRT_STRING);
+			ZETestCheckEqual(Reader.GetCurrentPointer(), PosDataProp3);
+			ZETestCheckString(Reader.GetItemName(), "PropString");
+
+			Reader.GoToCurrentPointer();
+			ZETestCheckEqual(Reader.GetCurrentPointer(), PosDataProp3);
+			ZETestCheckString(Reader.GetItemName(), "DataProp3");
+
+			ResultForRead = Reader.Read();
+			ZETestCheck(!ResultForRead);
+			ZETestCheckEqual(Reader.GetCurrentPointer(), PosNull);
+			ZETestCheck(Reader.GetItemName() == "");
 
 			File->Close();
 			remove("SerialReaderTests.txt");
+			delete Data3;
+			delete Data2;
+		}
+
+		ZETestCase("items stated in reverse order in the list according to the root node")
+		{
+			File->Open("Test.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+			ZEMLSerialRootNode Root("Root", File);
+			ZEInt64 PosDataProp = File->Tell();
+
+			Root.WriteDataProperty("DataProp", Data, sizeof(unsigned char));
+			ZEInt64 PosNode1 = File->Tell();
+
+			ZEMLSerialNode Node1 = Root.OpenNode("Node1");
+			ZEInt64 PosProp1 = File->Tell();
+
+			Root.WriteProperty("Prop1", true);
+			ZEInt64 PosProp2 = File->Tell();
+
+			Root.WriteProperty("Prop2", "test");
+			ZEInt64 PosNode2 = File->Tell();
+
+			ZEMLSerialNode Node2 = Root.OpenNode("Node2");
+
+			Node2.CloseNode();
+			Node1.CloseNode();
+			Root.CloseNode();
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
+			ZEMLSerialReader Reader(File);
+
+			ZEMLSerialPointer DataPointer, Node1Pointer, Node2Pointer;
+			ZEVariant Prop1, Prop2;
+
+			ZEMLSerialListItem List[5] = {
+				ZEML_LIST_NODE("Node2",       Node2Pointer,                     true),
+				ZEML_LIST_PROPERTY("Prop2",   Prop2,           ZE_VRT_STRING,   true),
+				ZEML_LIST_PROPERTY("Prop1",   Prop1,           ZE_VRT_BOOLEAN,  true),
+				ZEML_LIST_NODE("Node1",       Node1Pointer,                     true),
+				ZEML_LIST_DATA("DataProp",    DataPointer,                      true)
+			};
+			
+			ResultForRead = Reader.Read();
+			ZETestCheckString(Reader.GetItemName(), "Root");
+
+			ReadPropList = Reader.ReadPropertyList(List, 5);
+			ZETestCheck(ReadPropList);
+			ZETestCheckString(List[0].Name, "Node2");
+			ZETestCheckEqual(*List[0].Pointer, PosNode2);
+			ZETestCheckString(List[1].Name, "Prop2");
+			ZETestCheckEqual(List[1].Pointer, NULL);
+			ZETestCheckString(List[2].Name, "Prop1");
+			ZETestCheckEqual(List[2].Pointer, NULL);
+			ZETestCheckString(List[3].Name, "Node1");
+			ZETestCheckEqual(*List[3].Pointer, PosNode1);
+			ZETestCheckString(List[4].Name, "DataProp");
+			ZETestCheckEqual(*List[4].Pointer, PosDataProp);
+
+			File->Close();
+			remove("Test.txt");
+		}
+
+		ZETestCase("for a list item which is not mandotary and is not found in the node's properties")
+		{
+			File->Open("Test.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+			ZEMLSerialRootNode Root("Root", File);
+			void* Data = new char[sizeof(unsigned char)];
+			Root.WriteDataProperty("DataProp1", Data, sizeof(unsigned char));
+			Root.WriteProperty("Prop1", "string");
+
+			ZEMLSerialNode Node = Root.OpenNode("Node");
+			Node.WriteProperty("Prop2", 3.0f);
+			Node.WriteProperty("Prop3", true);
+			Node.WriteDataProperty("DataProp2", Data, sizeof(unsigned char));
+
+			Node.CloseNode();
+			Root.CloseNode();
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
+			ZEMLSerialReader Reader(File);
+
+			ZEMLSerialPointer Data1Pointer, NodePointer, Data2Pointer;
+			ZEVariant Prop1, Prop2, Prop3, Prop;
+
+			ZEMLSerialListItem List1[4] = {
+				ZEML_LIST_DATA("DataProp1",    Data1Pointer,                     true),
+				ZEML_LIST_PROPERTY("Prop1",    Prop1,           ZE_VRT_STRING,   true),
+				ZEML_LIST_NODE("Node",         NodePointer,                      true),
+				ZEML_LIST_PROPERTY("Prop",     Prop,            ZE_VRT_NULL,     false)
+			};
+
+			ZEMLSerialListItem List2[3] = {
+				ZEML_LIST_PROPERTY("Prop2",    Prop2,          ZE_VRT_FLOAT,     true),
+				ZEML_LIST_PROPERTY("Prop3",    Prop3,          ZE_VRT_BOOLEAN,   true),
+				ZEML_LIST_DATA("DataProp2",    Data2Pointer,                     true)
+			};
+
+			ResultForRead = Reader.Read();
+			ZETestCheckString(Reader.GetItemName(), "Root");
+
+			ReadPropList = Reader.ReadPropertyList(List1, 4);
+			ZETestCheck(ReadPropList);
+			ZETestCheck(List1[0].IsFound);
+			ZETestCheckString(List1[0].Name, "DataProp1");
+			ZETestCheckEqual(*List1[0].Pointer, 24);
+			ZETestCheck(List1[1].IsFound);
+			ZETestCheckString(List1[1].Name, "Prop1");
+			ZETestCheckEqual(List1[1].Pointer, NULL);
+			ZETestCheck(List1[2].IsFound);
+			ZETestCheckString(List1[2].Name, "Node");
+			ZETestCheckEqual(*List1[2].Pointer, 70);
+			ZETestCheck(!List1[3].IsFound);
+			ZETestCheckString(List1[3].Name, "Prop");
+
+			ZETestCheckString(Reader.GetItemName(), "Node");
+			ZETestCheckEqual(Reader.GetCurrentPointer(), 70);
+
+			ReadPropList = Reader.ReadPropertyList(List2, 3);
+			ZETestCheck(ReadPropList);
+			ZETestCheck(List2[0].IsFound);
+			ZETestCheckString(List2[0].Name, "Prop2");
+			ZETestCheckEqual(List2[0].Value->GetFloat(), 3.0f);
+			ZETestCheck(List2[1].IsFound);
+			ZETestCheckString(List2[1].Name, "Prop3");
+			ZETestCheckEqual(List2[1].VariantType, ZE_VRT_BOOLEAN);
+			ZETestCheck(List2[2].IsFound);
+			ZETestCheckString(List2[2].Name, "DataProp2");
+			ZETestCheckEqual(*List2[2].Pointer, 133);
+
+			File->Close();
+			remove("Test.txt");
 		}
 
 		ZETestCase("the list includes a data property which doesn't exist in the properties of current node")
@@ -2190,18 +2141,18 @@ ZETestSuite(ZEMLSerialReader)
 			Root.WriteProperty("Prop2", 3.2f);
 			Root.WriteProperty("Prop3", "test");
 			Root.CloseNode();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 			ZEMLSerialReader Reader(File);
 
 			ZEMLSerialPointer Data1Pointer, Data2Pointer;
 			ZEVariant Prop1, Prop2, Prop3;
 
 			ZEMLSerialListItem ItemList[5] = {
-				ZEML_LIST_DATA("DataProp1", Data1Pointer, true),
-				ZEML_LIST_PROPERTY("Prop1", Prop1, ZE_VRT_BOOLEAN, true),
-				ZEML_LIST_PROPERTY("Prop2", Prop2, ZE_VRT_FLOAT, true),
-				ZEML_LIST_PROPERTY("Prop3", Prop3, ZE_VRT_STRING, true),
-				ZEML_LIST_DATA("DataProp2", Data2Pointer, true)
+				ZEML_LIST_DATA("DataProp1",    Data1Pointer,                      true),
+				ZEML_LIST_PROPERTY("Prop1",    Prop1,           ZE_VRT_BOOLEAN,   true),
+				ZEML_LIST_PROPERTY("Prop2",    Prop2,           ZE_VRT_FLOAT,     true),
+				ZEML_LIST_PROPERTY("Prop3",    Prop3,           ZE_VRT_STRING,    true),
+				ZEML_LIST_DATA("DataProp2",    Data2Pointer,                      true)
 			};
 
 			ResultForRead = Reader.Read();
@@ -2229,6 +2180,45 @@ ZETestSuite(ZEMLSerialReader)
 			File->Close();
 			remove("SerialReaderTests.txt");
 		}
+
+		ZETestCase("the specified list and reader includes a property with the same name but in different types")
+		{
+			File->Open("SerialReaderTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+			ZEMLSerialRootNode Root("Root", File);
+			Root.WriteDataProperty("DataProp", Data, sizeof(unsigned char));
+			Root.WriteProperty("Prop", true);
+			ZEMLSerialNode Node = Root.OpenNode("Node");
+			Node.CloseNode();
+			Root.CloseNode();
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
+
+			ZEMLSerialReader Reader(File);
+
+			ZEMLSerialPointer DataPointer, NodePointer;
+			ZEVariant Prop;
+
+			ZEMLSerialListItem List[3] = {
+				ZEML_LIST_DATA("DataProp",    DataPointer,                         true),
+				ZEML_LIST_PROPERTY("Prop",    Prop,           ZE_VRT_INTEGER_16,   true),
+				ZEML_LIST_NODE("Node",        NodePointer,                         true)
+			};
+
+			ResultForRead = Reader.Read();
+			ZETestCheckString(Reader.GetItemName(), "Root");
+
+			ReadPropList = Reader.ReadPropertyList(List, 3);
+			//error Property found but property type mismatched. Property name : Prop
+			ZETestCheck(!ReadPropList);
+			ZETestCheck(List[0].IsFound);
+			ZETestCheckEqual(*List[0].Pointer, DataPointer);
+			ZETestCheck(List[1].IsFound);
+			ZETestCheckEqual(List[1].VariantType, ZE_VRT_INTEGER_16);
+			ZETestCheck(!List[2].IsFound);
+
+			File->Close();
+			remove("SerialReaderTests.txt");
+		}
+
 		delete Data;
 	}
 }

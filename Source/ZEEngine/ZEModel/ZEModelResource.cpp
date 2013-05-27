@@ -1117,6 +1117,8 @@ ZEModelResource* ZEModelResource::LoadSharedResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
+
 	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(NewPath);
 	
 	if (Resource != NULL)
@@ -1141,6 +1143,8 @@ void ZEModelResource::CacheResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
+
 	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(NewPath);
 	if (Resource != NULL)
 		Resource->Cached = true;
@@ -1159,6 +1163,7 @@ ZEModelResource* ZEModelResource::LoadResource(const ZEString& FileName)
 
 	bool Result;
 	ZEFile ResourceFile;
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
 	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if (Result)

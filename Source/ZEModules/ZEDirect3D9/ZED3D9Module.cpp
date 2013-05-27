@@ -61,6 +61,8 @@
 #include <d3dx9.h>
 #include "ZED3D9SkyDomeMaterial.h"
 #include "ZED3D9CloudMaterial.h"
+#include "ZED3D9SeaMaterial.h"
+#include "ZEGraphics/ZESeaMaterial.h"
 
 
 LPDIRECT3DDEVICE9 D3D9Device;
@@ -199,6 +201,13 @@ bool ZED3D9Module::InitializeSelf()
 
 	D3D9Device = Device;
 
+	// Initialize component base
+	if (!ZED3D9ComponentBase::BaseInitialize(this))
+	{
+		zeCriticalError("Can not initialize D3D9 component base.");
+		return false;
+	}
+
 	zeLog("Device Created.");
 
 	// Check hardware capabilities
@@ -292,13 +301,6 @@ bool ZED3D9Module::InitializeSelf()
 
 	this->ClearFrameBuffer();
 
-	// Initialize component base
-	if (!ZED3D9ComponentBase::BaseInitialize(this))
-	{
-		zeCriticalError("Can not initialize D3D9 component base.");
-		return false;
-	}
-
 	ShaderManager = new ZED3D9ShaderManager();
 
 	return true;
@@ -334,7 +336,7 @@ void ZED3D9Module::DeviceLost()
 {
 	DeviceLostState = true;
 	for (ZESize I = 0; I < Texture2Ds.GetCount(); I++)
-		Texture2Ds[I]->DeviceLost();
+		Texture2Ds[I]->DeviceLost();	
 
 	for (ZESize I = 0; I < Texture3Ds.GetCount(); I++)
 		Texture3Ds[I]->DeviceLost();
@@ -357,7 +359,6 @@ void ZED3D9Module::DeviceLost()
 	for (ZESize I = 0; I < ShadowRenderers.GetCount(); I++)
 		ShadowRenderers[I]->DeviceLost();
 
-
 	ZED3D_RELEASE(FrameBufferViewPort.FrameBuffer);
 	ZED3D_RELEASE(FrameBufferViewPort.ZBuffer);
 }
@@ -367,7 +368,15 @@ void ZED3D9Module::DeviceRestored()
 	DeviceLostState = false;
 
 	Device->GetBackBuffer(0, 0,D3DBACKBUFFER_TYPE_MONO, &FrameBufferViewPort.FrameBuffer);
-	Device->GetDepthStencilSurface(&FrameBufferViewPort.ZBuffer);
+	
+	// Get screen's z buffer
+	HRESULT Result = Device->CreateDepthStencilSurface(ScreenWidth, ScreenHeight, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, &FrameBufferViewPort.ZBuffer, NULL);
+	if(FAILED(Result))
+	{
+		zeCriticalError("Can not create Direct3D Backbuffer.");
+		Destroy();
+		return;
+	}
 
 	for (ZESize I = 0; I < Texture2Ds.GetCount(); I++)
 		Texture2Ds[I]->DeviceRestored();
@@ -530,12 +539,16 @@ ZED3D9ShaderManager* ZED3D9Module::GetShaderManager()
 
 ZEFrameRenderer* ZED3D9Module::CreateFrameRenderer()
 {
-	return new ZED3D9FrameRenderer();
+	ZED3D9FrameRenderer* Renderer = new ZED3D9FrameRenderer();
+	Renderers.Add(Renderer);
+	return Renderer;
 }
 
 ZEShadowRenderer* ZED3D9Module::CreateShadowRenderer()
 {
-	return new ZED3D9ShadowRenderer(); 
+	ZED3D9ShadowRenderer* Renderer = new ZED3D9ShadowRenderer();
+	ShadowRenderers.Add(Renderer);
+	return Renderer; 
 }
 
 ZEPostProcessor* ZED3D9Module::CreatePostProcessor()
@@ -659,6 +672,11 @@ ZEFixedMaterial* ZED3D9Module::CreateCGFXMaterial()
 {
 	zeError("CGFX Materials are not implamented.");
 	return NULL;
+}
+
+ZESeaMaterial* ZED3D9Module::CreateSeaMaterial()
+{
+	return new ZED3D9SeaMaterial();
 }
 
 LPDIRECT3DDEVICE9 ZED3D9Module::GetD3D9Device()

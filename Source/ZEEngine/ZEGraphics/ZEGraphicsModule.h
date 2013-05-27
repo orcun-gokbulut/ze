@@ -64,6 +64,7 @@ class ZESimpleMaterial;
 class ZESkyBoxMaterial;
 class ZEMoonMaterial;
 class ZESkyDomeMaterial;
+class ZESeaMaterial;
 enum ZETextureQuality;
 struct ZETextureOptions;
 
@@ -161,6 +162,7 @@ class ZEGraphicsModule : public ZEModule
 		virtual ZESkyDomeMaterial*			CreateSkyDomeMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateCustomMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateCGFXMaterial() = 0;
+		virtual ZESeaMaterial*				CreateSeaMaterial() = 0;
 
 		static ZEGraphicsModule*			GetInstance();
 };

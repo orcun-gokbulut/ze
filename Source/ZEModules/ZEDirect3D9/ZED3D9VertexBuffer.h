@@ -40,6 +40,11 @@
 #include "ZETypes.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZED3D9ComponentBase.h"
+
+
+#ifdef ZE_DEBUG_ENABLE
+#define D3D_DEBUG_INFO
+#endif
 #include <d3d9.h>
 
 class ZED3D9StaticVertexBuffer : public ZEStaticVertexBuffer, public ZED3D9ComponentBase

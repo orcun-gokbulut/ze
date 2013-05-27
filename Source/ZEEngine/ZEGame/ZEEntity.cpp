@@ -44,7 +44,7 @@ ZE_OBJECT_IMPL(ZEEntity)
 
 void ZEEntity::OnTransformChanged()
 {
-	DirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM | ZE_EDF_WORLD_TRANSFORM | ZE_EDF_WORLD_BOUNDING_BOX);
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_ALL & ~ZE_EDF_LOCAL_TRANSFORM);
 
 	for (ZESize I = 0; I < Components.GetCount(); I++)
 		Components[I]->OnTransformChanged();
@@ -146,12 +146,13 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
 {
 	this->BoundingBox = BoundingBox;
-	DirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
 }
 
 bool ZEEntity::SetOwner(ZEEntity* Owner)
 {
 	this->Owner = Owner;
+	OnTransformChanged();
 
 	return true;
 }
@@ -171,6 +172,12 @@ void ZEEntity::SetOwnerScene(ZEScene* Scene)
 		ChildEntities[I]->SetOwnerScene(Scene);
 }
 
+void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox) const
+{
+	this->BoundingBox = BoundingBox;
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
+}
+
 bool ZEEntity::InitializeSelf()
 {
 	State = ZE_ES_INITIALIZING;
@@ -187,7 +194,7 @@ ZEEntity::ZEEntity()
 {
 	Owner = NULL;
 	OwnerScene = NULL;
-	DirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM | ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_TRANSFORM);
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_ALL);
 	Position = ZEVector3(0.0f, 0.0f, 0.0f);
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
@@ -237,12 +244,12 @@ const ZEAABBox& ZEEntity::GetBoundingBox() const
 	return BoundingBox;
 }
 
-const ZEAABBox& ZEEntity::GetWorldBoundingBox()
+const ZEAABBox& ZEEntity::GetWorldBoundingBox() const
 {
-	if (DirtyFlags.GetFlags(ZE_EDF_WORLD_BOUNDING_BOX))
+	if (EntityDirtyFlags.GetFlags(ZE_EDF_WORLD_BOUNDING_BOX))
 	{
 		ZEAABBox::Transform(WorldBoundingBox, GetBoundingBox(), GetWorldTransform());
-		DirtyFlags.UnraiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
+		EntityDirtyFlags.UnraiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
 	}
 
 	return WorldBoundingBox;
@@ -250,10 +257,10 @@ const ZEAABBox& ZEEntity::GetWorldBoundingBox()
 
 const ZEMatrix4x4& ZEEntity::GetTransform() const
 {
-	if (DirtyFlags.GetFlags(ZE_EDF_LOCAL_TRANSFORM))
+	if (EntityDirtyFlags.GetFlags(ZE_EDF_LOCAL_TRANSFORM))
 	{
 		ZEMatrix4x4::CreateOrientation(Transform, GetPosition(), GetRotation(), GetScale());
-		DirtyFlags.UnraiseFlags(ZE_EDF_LOCAL_TRANSFORM);
+		EntityDirtyFlags.UnraiseFlags(ZE_EDF_LOCAL_TRANSFORM);
 	}
 
 	return Transform;
@@ -261,18 +268,31 @@ const ZEMatrix4x4& ZEEntity::GetTransform() const
 
 const ZEMatrix4x4& ZEEntity::GetWorldTransform() const
 {
-	if (Owner != NULL)
+	if (Owner == NULL)
 	{
-		if (DirtyFlags.GetFlags(ZE_EDF_WORLD_TRANSFORM))
-		{
-			ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetTransform());
-			DirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
-		}
-
-		return WorldTransform;
+		EntityDirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
+		return GetTransform();
 	}
 
-	return GetTransform();
+	if (EntityDirtyFlags.GetFlags(ZE_EDF_WORLD_TRANSFORM))
+	{
+		ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetTransform());
+		EntityDirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
+	}
+
+	return WorldTransform;
+
+}
+
+const ZEMatrix4x4& ZEEntity::GetInvWorldTransform() const
+{
+	if (EntityDirtyFlags.GetFlags(ZE_EDF_INV_WORLD_TRANSFORM))
+	{
+		ZEMatrix4x4::Inverse(InvWorldTransform, GetWorldTransform());
+		EntityDirtyFlags.UnraiseFlags(ZE_EDF_INV_WORLD_TRANSFORM);
+	}
+
+	return InvWorldTransform;
 }
 
 bool ZEEntity::IsInitialized()
@@ -328,6 +348,8 @@ bool ZEEntity::GetEnabled() const
 void ZEEntity::SetPosition(const ZEVector3& NewPosition)
 {
 	Position = NewPosition;
+
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
 	OnTransformChanged();
 }
 
@@ -339,7 +361,11 @@ const ZEVector3& ZEEntity::GetPosition() const
 void ZEEntity::SetWorldPosition(const ZEVector3& NewPosition)
 {
 	if (Owner != NULL)
-		SetPosition(NewPosition - Owner->GetWorldPosition());
+	{
+		ZEVector3 Result;
+		ZEMatrix4x4::Transform(Result, Owner->GetInvWorldTransform(), NewPosition);
+		SetPosition(Result);
+	}
 	else
 		SetPosition(NewPosition);
 }
@@ -359,6 +385,8 @@ const ZEVector3 ZEEntity::GetWorldPosition() const
 void ZEEntity::SetRotation(const ZEQuaternion& NewRotation)
 {
 	Rotation = NewRotation;
+
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
 	OnTransformChanged();
 }
 
@@ -373,7 +401,7 @@ void ZEEntity::SetWorldRotation(const ZEQuaternion& NewRotation)
 	{
 		ZEQuaternion Temp, Result;
 		ZEQuaternion::Conjugate(Temp, Owner->GetWorldRotation());
-		ZEQuaternion::Product(Result, NewRotation, Temp);
+		ZEQuaternion::Product(Result, Temp, NewRotation);
 		SetRotation(Result);
 	}
 	else
@@ -396,6 +424,8 @@ const ZEQuaternion ZEEntity::GetWorldRotation() const
 void ZEEntity::SetScale(const ZEVector3& NewScale)
 {
 	Scale = NewScale;
+
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
 	OnTransformChanged();
 }
 
@@ -521,4 +551,32 @@ void ZEEntity::Tick(float Time)
 void ZEEntity::Draw(ZEDrawParameters* DrawParameters)
 {
 
+}
+
+bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	if (!ZEAABBox::IntersectionTest(GetWorldBoundingBox(), Parameters.Ray))
+		return false;
+
+	ZERay LocalRay;
+	ZEMatrix4x4::Transform(LocalRay.p, GetInvWorldTransform(), Parameters.Ray.p);
+	ZEMatrix4x4::Transform3x3(LocalRay.v, GetInvWorldTransform(), Parameters.Ray.v);
+	LocalRay.v.NormalizeSelf();
+
+	float TMin;
+	if (!ZEAABBox::IntersectionTest(BoundingBox, LocalRay, TMin))
+		return false;
+
+	ZEVector3 IntersectionPoint;
+	ZEMatrix4x4::Transform(IntersectionPoint, GetWorldTransform(), LocalRay.GetPointOn(TMin));
+	float DistanceSquare = IntersectionPoint.LengthSquare();
+	if (Report.Distance * Report.Distance > DistanceSquare && Report.Distance * Report.Distance < Parameters.MaximumDistance)
+	{
+		Report.Distance = ZEMath::Sqrt(DistanceSquare);
+		Report.Entity = this;
+		Report.SubComponent = NULL;
+		Report.PoligonIndex = 0;
+		Report.Normal = Report.Binormal = ZEVector3::Zero;
+		ZEMatrix4x4::Transform(Report.Position, WorldTransform, IntersectionPoint);
+	}
 }

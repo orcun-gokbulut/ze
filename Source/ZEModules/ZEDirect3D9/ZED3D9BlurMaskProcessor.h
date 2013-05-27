@@ -39,7 +39,6 @@
 
 #include "ZED3D9ComponentBase.h"
 #include "ZEMath\ZEVector.h"
-#include "ZEDS\ZEString.h"
 
 class ZED3D9PixelShader;
 class ZED3D9VertexShader;

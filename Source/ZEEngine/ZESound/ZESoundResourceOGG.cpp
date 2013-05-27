@@ -38,6 +38,7 @@
 #include <ogg/ogg.h>
 #include <vorbis/vorbisfile.h>
 #include <Memory.h>
+#include "ZEFile/ZEPathUtils.h"
 
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
@@ -159,7 +160,8 @@ ZESoundResource* ZESoundResourceOGG::LoadResource(const ZEString& FileName)
 
 	bool Result;
 	ZEFile File; 
-	
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
+
 	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if(!Result)
 	{

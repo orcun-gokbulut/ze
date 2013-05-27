@@ -40,6 +40,7 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEPhysics/ZEPhysicalCloth.h"
+#include "ZEMath/ZETriangle.h"
 
 ZE_OBJECT_IMPL(ZEModelMesh)
 
@@ -99,33 +100,33 @@ ZEPhysicalCloth* ZEModelMesh::GetPhysicalCloth()
 	return PhysicalCloth;
 }
 
-const ZEAABBox& ZEModelMesh::GetLocalBoundingBox()
+const ZEAABBox& ZEModelMesh::GetLocalBoundingBox() const
 {
 	return LocalBoundingBox;
 }
 
-const ZEAABBox& ZEModelMesh::GetModelBoundingBox()
+const ZEAABBox& ZEModelMesh::GetModelBoundingBox() const
 {
 	ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
 
 	return ModelBoundingBox;
 }
 
-const ZEAABBox& ZEModelMesh::GetWorldBoundingBox()
+const ZEAABBox& ZEModelMesh::GetWorldBoundingBox() const
 {
 	ZEAABBox::Transform(WorldBoundingBox, LocalBoundingBox, GetWorldTransform());
 
 	return WorldBoundingBox;
 }
 
-const ZEMatrix4x4& ZEModelMesh::GetLocalTransform()
+const ZEMatrix4x4& ZEModelMesh::GetLocalTransform() const
 {
 	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
 
 	return LocalTransform;
 }
 
-const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
+const ZEMatrix4x4& ZEModelMesh::GetModelTransform() const
 {
 	if (ParentMesh == NULL)
 		return GetLocalTransform();
@@ -136,7 +137,7 @@ const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
 	}
 }
 
-const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
+const ZEMatrix4x4& ZEModelMesh::GetWorldTransform() const
 {
 	if (ParentMesh == NULL)
 	{
@@ -149,13 +150,20 @@ const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
 		return WorldTransform;
 	}
 }
-	
+
+const ZEMatrix4x4& ZEModelMesh::GetInvWorldTransform() const
+{
+	ZEMatrix4x4::Inverse(InvWorldTransform, GetWorldTransform());
+
+	return InvWorldTransform;
+}
+
 void ZEModelMesh::SetLocalPosition(const ZEVector3& LocalPosition)
 {
 	Position = LocalPosition;
 }
 
-const ZEVector3& ZEModelMesh::GetLocalPosition()
+const ZEVector3& ZEModelMesh::GetLocalPosition() const
 {
 	return Position;
 }
@@ -165,7 +173,7 @@ void ZEModelMesh::SetLocalRotation(const ZEQuaternion& LocalRotation)
 	Rotation = LocalRotation;
 }
 
-const ZEQuaternion& ZEModelMesh::GetLocalRotation()
+const ZEQuaternion& ZEModelMesh::GetLocalRotation() const
 {
 	return Rotation;
 }
@@ -175,7 +183,7 @@ void ZEModelMesh::SetLocalScale(const ZEVector3& LocalScale)
 	Scale = LocalScale;
 }
 
-const ZEVector3& ZEModelMesh::GetLocalScale()
+const ZEVector3& ZEModelMesh::GetLocalScale() const
 {
 	return Scale;
 }
@@ -185,10 +193,14 @@ void ZEModelMesh::SetModelPosition(const ZEVector3& ModelPosition)
 	if (ParentMesh == NULL)
 		SetLocalPosition(ModelPosition);
 	else
-		SetLocalPosition(ModelPosition - ParentMesh->GetModelPosition());
+	{
+		ZEVector3 Result;
+		ZEMatrix4x4::Transform(Result, ParentMesh->GetModelTransform().Inverse(), ModelPosition);
+		SetLocalPosition(Result);
+	}
 }
 
-const ZEVector3 ZEModelMesh::GetModelPosition()
+const ZEVector3 ZEModelMesh::GetModelPosition() const
 {
 	if (ParentMesh == NULL)
 		return Position;
@@ -208,19 +220,19 @@ void ZEModelMesh::SetModelRotation(const ZEQuaternion& ModelRotation)
 	{
 		ZEQuaternion Temp, Result;
 		ZEQuaternion::Conjugate(Temp, ParentMesh->GetModelRotation());
-		ZEQuaternion::Product(Result, ModelRotation, Temp);
+		ZEQuaternion::Product(Result, Temp, ModelRotation);
 		SetLocalRotation(Result);
 	}
 }
 
-const ZEQuaternion ZEModelMesh::GetModelRotation()
+const ZEQuaternion ZEModelMesh::GetModelRotation() const
 {
 	if (ParentMesh == NULL)
 		return Rotation;
 	else
 	{
 		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, Rotation, ParentMesh->GetModelRotation());
+		ZEQuaternion::Product(Temp, ParentMesh->GetModelRotation(), Rotation);
 		ZEQuaternion::Normalize(Temp, Temp);
 		return Temp;
 	}
@@ -238,7 +250,7 @@ void ZEModelMesh::SetModelScale(const ZEVector3& ModelScale)
 	}		
 }
 
-const ZEVector3 ZEModelMesh::GetModelScale()
+const ZEVector3 ZEModelMesh::GetModelScale() const
 {
 	if (ParentMesh == NULL)
 		return Scale;
@@ -253,12 +265,20 @@ const ZEVector3 ZEModelMesh::GetModelScale()
 void ZEModelMesh::SetWorldPosition(const ZEVector3& WorldPosition)
 {
 	if (ParentMesh == NULL)
-		SetLocalPosition(WorldPosition - Owner->GetWorldPosition());
+	{
+		ZEVector3 Result;
+		ZEMatrix4x4::Transform(Result, Owner->GetWorldTransform().Inverse(), WorldPosition);
+		SetLocalPosition(Result);
+	}
 	else
-		SetLocalPosition(WorldPosition - ParentMesh->GetWorldPosition());
+	{
+		ZEVector3 Result;
+		ZEMatrix4x4::Transform(Result, ParentMesh->GetWorldTransform().Inverse(), WorldPosition);
+		SetLocalPosition(Result);
+	}
 }
 
-const ZEVector3 ZEModelMesh::GetWorldPosition()
+const ZEVector3 ZEModelMesh::GetWorldPosition() const
 {
 	if (ParentMesh == NULL)
 	{
@@ -280,19 +300,19 @@ void ZEModelMesh::SetWorldRotation(const ZEQuaternion& WorldRotation)
 	{	
 		ZEQuaternion Temp, Result;
 		ZEQuaternion::Conjugate(Temp, Owner->GetWorldRotation());
-		ZEQuaternion::Product(Result, WorldRotation, Temp);
+		ZEQuaternion::Product(Result, Temp, WorldRotation);
 		SetLocalRotation(Result);
 	}
 	else
 	{
 		ZEQuaternion Temp, Result;
 		ZEQuaternion::Conjugate(Temp, ParentMesh->GetWorldRotation());
-		ZEQuaternion::Product(Result, WorldRotation, Temp);
+		ZEQuaternion::Product(Result, Temp, WorldRotation);
 		SetLocalRotation(Result);
 	}
 }
 
-const ZEQuaternion ZEModelMesh::GetWorldRotation()
+const ZEQuaternion ZEModelMesh::GetWorldRotation() const
 {
 	if (ParentMesh == NULL)
 	{
@@ -326,7 +346,7 @@ void ZEModelMesh::SetWorldScale(const ZEVector3& WorldScale)
 	}
 }
 
-const ZEVector3 ZEModelMesh::GetWorldScale()
+const ZEVector3 ZEModelMesh::GetWorldScale() const
 {
 	if (ParentMesh == NULL)
 	{
@@ -369,7 +389,7 @@ void ZEModelMesh::SetPhysicsEnabled(bool Enabled)
 	PhysicsEnabled = Enabled;
 }
 
-bool ZEModelMesh::GetPhysicsEnabled()
+bool ZEModelMesh::GetPhysicsEnabled() const
 {
 	return PhysicsEnabled;
 }
@@ -571,6 +591,93 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 		Lod = LastLod;*/
 
 	LODs[(ZESize)Lod].Draw(DrawParameters, DrawOrder);
+}
+
+bool ZEModelMesh::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex)
+{
+	if (MeshResource->LODs.GetCount() == 0)
+		return false;
+
+	bool HaveIntersection = false;
+	const ZEArray<ZEModelVertex>& Vertices = MeshResource->LODs[0].Vertices;
+
+	for (ZESize I = 0; I < Vertices.GetCount(); I += 3)
+	{
+		ZETriangle Triangle(Vertices[I].Position, Vertices[I + 1].Position, Vertices[I + 2].Position);
+
+		float RayT;
+		if (ZETriangle::IntersectionTest(Triangle, Ray, RayT))
+		{
+			if (RayT < MinT)
+			{
+				MinT = RayT;
+				PoligonIndex = I / 3;
+				HaveIntersection = true;
+			}
+		}
+	}
+
+	return HaveIntersection;
+}
+
+bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	if (MeshResource == NULL || MeshResource->IsSkinned == true)
+		return false;
+
+	ZERay LocalRay;
+	ZEMatrix4x4::Transform(LocalRay.p, GetInvWorldTransform(), Parameters.Ray.p);
+	ZEMatrix4x4::Transform3x3(LocalRay.v, GetInvWorldTransform(), Parameters.Ray.v);
+	LocalRay.v.NormalizeSelf();
+
+	float RayT;
+	if (!ZEAABBox::IntersectionTest(GetLocalBoundingBox(), LocalRay, RayT))
+		return false;
+
+	float MinT = ZE_FLOAT_MAX;
+	ZESize PoligonIndex;
+	if (RayCastPoligons(LocalRay, MinT, PoligonIndex))
+	{
+		ZEVector3 WorldPosition;
+		ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), LocalRay.GetPointOn(MinT));
+
+		float DistanceSquare = ZEVector3::Distance(Parameters.Ray.p, LocalRay.GetPointOn(MinT));
+		if (Report.Distance * Report.Distance > DistanceSquare)
+		{
+			Report.Distance = ZEMath::Sqrt(DistanceSquare);
+			Report.Position = WorldPosition;
+			Report.SubComponent = this;
+			Report.PoligonIndex = PoligonIndex;
+
+			if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL) || Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
+			{
+				ZEVector3 V0 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex].Position;
+				ZEVector3 V1 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex + 1].Position;
+				ZEVector3 V2 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex + 2].Position;
+
+				ZEVector3 Binormal = ZEVector3(V0, V1);
+				ZEVector3 Tangent = ZEVector3(V0, V2);
+				ZEVector3 Normal;
+				ZEVector3::CrossProduct(Normal, Binormal, Tangent);
+
+				if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL))
+				{
+					ZEMatrix4x4::Transform3x3(Report.Normal, GetWorldTransform(), Normal);
+					Report.Normal.NormalizeSelf();
+				}
+
+				if (Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
+				{
+					ZEMatrix4x4::Transform3x3(Report.Binormal, GetWorldTransform(), Binormal);
+					Report.Binormal.NormalizeSelf();
+				}
+			}
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 

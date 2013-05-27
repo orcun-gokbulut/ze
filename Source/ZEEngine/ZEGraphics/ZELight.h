@@ -69,6 +69,7 @@ class ZELight : public ZEEntity
 		bool							CastsShadows;
 		bool							UpdateViewVolume;
 		
+		float							ShadowFactor;
 		float							PenumbraScale;
 		float							DepthScaledBias;
 		float							SlopeScaledBias;
@@ -108,6 +109,9 @@ class ZELight : public ZEEntity
 
 		virtual void					SetCastsShadow(bool NewValue);
 		bool							GetCastsShadow() const;
+
+		void							SetShadowFactor(float Factor);
+		float							GetShadowFactor() const;
 		
 		virtual	void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);

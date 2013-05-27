@@ -161,7 +161,7 @@ bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZERay& Ray, 
 	GetSurfacePlane(Triangle, Plane);
 	if (ZEPlane::IntersectionTest(Plane, Ray, t))
 	{
-	ZERay::GetPointOn(Point, Ray, t);
+		ZERay::GetPointOn(Point, Ray, t);
 		if (InsideTest(Triangle, Point))
 			return true;
 	}

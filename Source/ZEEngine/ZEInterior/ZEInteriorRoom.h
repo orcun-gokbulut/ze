@@ -38,8 +38,12 @@
 #define __ZE_INTERIOR_ROOM_H__
 
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEFlags.h"
+#include "ZEGame/ZERayCast.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZECanvas.h"
+#include "ZEGraphics/ZEVertexTypes.h"
+#include "ZESpatial/ZEOctree.h"
 
 class ZEInterior;
 class ZEInteriorDoor;
@@ -50,6 +54,14 @@ class ZERenderer;
 struct ZEDrawParameters;
 class ZEViewVolume;
 class ZESimpleMaterial;
+
+typedef ZEFlags ZEInteriorRoomDirtyFlags;
+#define ZE_IRDF_NONE							0
+#define ZE_IRDF_TRANSFORM						1
+#define ZE_IRDF_WORLD_TRANSFORM					2
+#define ZE_IRDF_INV_WORLD_TRANSFORM				4
+#define ZE_IRDF_WORLD_BOUNDING_BOX				8
+#define ZE_IRDF_ALL								0xFFFFFFFF
 
 class ZEInteriorRoom
 {
@@ -68,9 +80,14 @@ class ZEInteriorRoom
 		bool								IsDrawn;
 		bool								IsPersistentDraw;
 
-		bool								TransformChanged;
+		mutable ZEInteriorRoomDirtyFlags	DirtyFlags;
+
 		ZEAABBox							BoundingBox;
-		ZEAABBox							WorldBoundingBox;
+		mutable ZEAABBox					WorldBoundingBox;
+		
+		mutable ZEMatrix4x4					LocalTransform;
+		mutable ZEMatrix4x4					WorldTransform;
+		mutable ZEMatrix4x4					InvWorldTransform;
 
 		ZEVector3							Position;
 		ZEQuaternion						Rotation;
@@ -86,6 +103,12 @@ class ZEInteriorRoom
 
 		void								DebugDraw(ZERenderer* Renderer);
 
+		bool								RayCastPoligons(const ZERay& LocalRay, float& MinT, ZESize& PoligonIndex);
+		bool								RayCastOctreePoligons(const ZEOctree<ZESize>& Octree, const ZERay& LocalRay, float& MinT, ZESize& PoligonIndex);
+		bool								RayCastOctree(const ZEOctree<ZESize>& Octree, const ZERay& LocalRay, float& MinT, ZESize& PoligonIndex);
+
+		void								OnTransformChanged();
+
 											ZEInteriorRoom();
 											~ZEInteriorRoom();
 
@@ -97,8 +120,12 @@ class ZEInteriorRoom
 		ZEPhysicalMesh*						GetPhysicalMesh();
 		ZESize								GetPolygonCount();
 
-		const ZEAABBox&						GetBoundingBox();
-		const ZEAABBox&						GetWorldBoundingBox();
+		const ZEAABBox&						GetBoundingBox() const;
+		const ZEAABBox&						GetWorldBoundingBox() const;
+
+		const ZEMatrix4x4&					GetTransform() const;
+		const ZEMatrix4x4&					GetWorldTransform() const;
+		const ZEMatrix4x4&					GetInvWorldTransform() const;
 
 		void								SetPosition(const ZEVector3& NewPosition);
 		const ZEVector3&					GetPosition() const;
@@ -114,6 +141,8 @@ class ZEInteriorRoom
 
 		void								SetPersistentDraw(bool Enabled);
 		void								Draw(ZEDrawParameters* DrawParameters);
+		
+		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZEInteriorRoom*				CreateInstance();
 };

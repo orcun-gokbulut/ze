@@ -58,10 +58,12 @@ class ZED3D9ShaderManager
 										ZED3D9ShaderManager();
 										~ZED3D9ShaderManager();
 	public:
+		const char*						GetInternal(const char* Filename);
 		ZED3D9Shader*					GetShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile);
 		ZED3D9PixelShader*				GetPixelShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);	
 		ZED3D9VertexShader*				GetVertexShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
 
 		static ZED3D9ShaderManager*		GetInstance();
 };
+
 #endif

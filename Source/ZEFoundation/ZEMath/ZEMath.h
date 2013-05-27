@@ -90,6 +90,9 @@ class ZEMath
 
 		static float		Lerp(float A, float B, float Factor);
 
+		template <typename TypeA, typename TypeB>
+		static TypeA		Align(TypeA Value, TypeB Alignment);
+
 		template <typename Type>
 		static Type			Circular(Type Value, Type MinValue, Type MaxValue);
 
@@ -136,6 +139,12 @@ template <typename Type>
 Type ZEMath::Max(Type A, Type B)
 {
 	return (A > B ? A : B);
+}
+
+template <typename TypeA, typename TypeB>
+TypeA ZEMath::Align(TypeA Value, TypeB Alignment)
+{
+	return (Value / (TypeA)Alignment) * (TypeA)Alignment;
 }
 
 template <typename Type>

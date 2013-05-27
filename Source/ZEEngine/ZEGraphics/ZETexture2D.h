@@ -75,6 +75,8 @@ class ZETexture2D : public ZETexture
 
 		virtual bool				Create(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
 		virtual void				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
+		virtual void				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level, ZEUInt PositionX, ZEUInt PositionY, ZEUInt Width, ZEUInt Height) = 0;
+
 		virtual void				Unlock(ZEUInt Level) = 0;
 
 		static ZETexture2D*			CreateInstance();

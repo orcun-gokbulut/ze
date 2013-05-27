@@ -122,9 +122,9 @@ bool ZEStateMachine::SetCurrentState(ZEState* TargetState, bool Forced)
 	return true;
 }
 
-const ZEState& ZEStateMachine::GetCurrentState()
+const ZEState* ZEStateMachine::GetCurrentState()
 {
-	return *CurrentState;
+	return CurrentState;
 }
 
 ZEStateMachine::ZEStateMachine()

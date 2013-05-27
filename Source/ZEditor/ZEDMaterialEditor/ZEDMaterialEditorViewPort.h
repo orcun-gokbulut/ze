@@ -94,6 +94,7 @@ class ZEDMaterialEditorViewPort : public QFrame
 		ZEDirectionalLight*			GetDirectLight1();
 		ZEDirectionalLight*			GetDirectLight2();
 		ZEDirectionalLight*			GetDirectLight3();
+		ZEModel*					GetModel();
 									ZEDMaterialEditorViewPort(ZEDMaterialEditor* ParentEditor, QWidget* parent = 0, Qt::WindowFlags f = 0);
 };
 

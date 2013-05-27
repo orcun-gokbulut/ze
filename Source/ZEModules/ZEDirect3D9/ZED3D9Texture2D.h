@@ -40,19 +40,25 @@
 #include "ZETypes.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZED3D9ComponentBase.h"
-#include <d3d9.h>
+
 #include "ZED3D9ViewPort.h"
+
+#ifdef ZE_DEBUG_ENABLE
+#define D3D_DEBUG_INFO
+#endif
+#include <d3d9.h>
 
 class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	protected:
-		ZED3D9ViewPort					ViewPort;
+		
 
 										ZED3D9Texture2D();
 		virtual							~ZED3D9Texture2D();
 
 	public:
+		ZED3D9ViewPort					ViewPort;
 		LPDIRECT3DTEXTURE9				Texture;
 
 		virtual bool					IsEmpty() const;
@@ -64,6 +70,7 @@ class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 
 		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false);
 		virtual void					Lock(void** Buffer, ZESize* Pitch, ZEUInt Level);
+		virtual void					Lock(void** Buffer, ZESize* Pitch, ZEUInt Level, ZEUInt PositionX, ZEUInt PositionY, ZEUInt Width, ZEUInt Height);
 		virtual void					Unlock(ZEUInt Level);
 		virtual void					Release();
 

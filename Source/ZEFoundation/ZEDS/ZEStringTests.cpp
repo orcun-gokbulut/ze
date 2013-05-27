@@ -251,6 +251,31 @@ ZETestSuite(ZEString)
 		}
 	}
 
+	ZETest("ZEString ZEString::FromBool(bool Value, const char* Format)")
+	{
+		bool Value = true;
+
+		ZEString String = ZEString::FromBool(Value);
+
+		ZETestCheck(String == "true");
+
+		Value = 0;
+
+		String = ZEString::FromBool(Value);
+		ZETestCheck(String == "false");
+
+		ZETestCase("for Format != NULL")
+		{
+			Value = 1;
+
+			String = ZEString::FromBool(Value, "false");
+			ZETestCheck(String == "false");
+
+			String = ZEString::FromBool(Value, "true");
+			ZETestCheck(String == "true");
+		}
+	}
+
 	ZETest("ZEString ZEString::FromChar(char Value)")
 	{
 		char C = 'a';
@@ -412,7 +437,7 @@ ZETestSuite(ZEString)
 		ZETestCase("for Format != NULL")
 		{
 			String = ZEString::FromUInt32(Value, "X:-10.8");
-			ZETestCheck(String = "000CE7BC  ");
+			ZETestCheck(String == "000CE7BC  ");
 		}
 	}
 

@@ -770,7 +770,12 @@ ZETestSuite(ZEMLNode)
 
 		ZETestCase("try to add a null node as sub node")
 		{
+			const ZEMLItem* SubNode = Node.GetProperty("SubNode");
+			ZETestCheck(SubNode == NULL);
 
+			Result = Node.InsertSubNode((ZEMLNode*)SubNode, 0);
+			//error Node can not be NULL.
+			ZETestCheck(!Result);
 		}
 	}
 
@@ -788,7 +793,6 @@ ZETestSuite(ZEMLNode)
 		ZETestCheckString(Node.GetSubNodes()[1]->GetName(), SubNode->GetName());
 		ZETestCheckEqual(SubNode->GetParent(), &Node);
 	}
-
 
 	ZETest("const ZEList<ZEMLNode>& ZEMLNode::GetSubNodes() const")
 	{
@@ -1042,8 +1046,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, false);
 			ZETestCheck(ResultForRead);
@@ -1100,8 +1103,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1151,8 +1153,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1180,8 +1181,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1209,8 +1209,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1238,8 +1237,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1267,8 +1265,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1295,8 +1292,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1324,8 +1320,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1353,8 +1348,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1381,8 +1375,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1423,11 +1416,9 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ZEMLProperty* Item1 = (ZEMLProperty*)Node.GetProperties()[0];
-			ZEInt8 V1 = Item1->GetValue().GetInt8();
 			ZETestCheckEqual(Item1->GetValue().GetInt8(), 0);
 			ZEMLProperty* Item2 = (ZEMLProperty*)Node.GetProperties()[1];
 			ZETestCheckEqual(Item2->GetValue().GetInt16(), 0);
@@ -1448,7 +1439,7 @@ ZETestSuite(ZEMLNode)
 			ZETestCheck(ResultForRead);
 			ZETestCheckEqual(Node.GetProperties().GetCount(), 16);
 
-			File->Seek(-File->Tell() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->Tell(), ZE_SF_CURRENT);
 			ResultForWrite = Node.Write(File);
 
 			File->Close();
@@ -1475,8 +1466,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1517,8 +1507,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1550,8 +1539,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, false);
 			ZETestCheck(ResultForRead);
@@ -1567,7 +1555,7 @@ ZETestSuite(ZEMLNode)
 			Compare = memcmp(Data2, Data1, sizeof(unsigned char));
 			ZETestCheckEqual(Compare, 0);
 
-			File->Seek(-File->Tell() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->Tell(), ZE_SF_CURRENT);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
 
@@ -1588,8 +1576,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, false);
 			ZETestCheck(ResultForRead);
@@ -1601,7 +1588,7 @@ ZETestSuite(ZEMLNode)
 			const void* Data2 = Item2->GetData();
 			ZETestCheck(Data1 != Data2);
 
-			File->Seek(-File->Tell() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->Tell(), ZE_SF_CURRENT);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
 
@@ -1622,8 +1609,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, true);
 			ZETestCheck(ResultForRead);
@@ -1659,8 +1645,7 @@ ZETestSuite(ZEMLNode)
 			File->Open("NodeTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 			ResultForWrite = Node.Write(File);
 			ZETestCheck(ResultForWrite);
-			File->Flush();
-			File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			File->Seek(-File->GetSize(), ZE_SF_CURRENT);
 
 			ResultForRead = Node.Read(File, false);
 			ZETestCheck(ResultForRead);
@@ -1697,10 +1682,19 @@ ZETestSuite(ZEMLNode)
 		Result = Node.AddItem(Property);
 		//error ZEML node can not contain properties with duplicate name : Property.
 		ZETestCheck(!Result);
+		ZETestCheckEqual(Node.GetProperties().GetCount(), 2);
 
-		ZEMLItem* Item = new ZEMLProperty("Prop");
-		Result = Node.AddItem(Item);
+		ZEMLItem* Prop = new ZEMLProperty("Prop");
+		Result = Node.AddItem(Prop);
 		ZETestCheck(Result);
+		ZETestCheckEqual(Node.GetProperties().GetCount(), 3);
+
+		const ZEMLItem* Item = Node.GetProperty("Item");
+		ZETestCheck(Item == NULL);
+
+		Result = Node.AddItem((ZEMLItem*)Item);
+		//error Given item for addition is NULL.
+		ZETestCheck(!Result);
 		ZETestCheckEqual(Node.GetProperties().GetCount(), 3);
 	}
 

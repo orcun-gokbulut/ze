@@ -45,6 +45,9 @@
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZERectangle.h"
 #include "ZEGame/ZEDrawParameters.h"
+#include "ZEDS/ZEFlags.h"
+
+typedef ZEFlags ZECameraDirtyFlags;
 
 enum ZECameraProjectionType
 {
@@ -62,16 +65,12 @@ class ZECamera : public ZEEntity
 	ZE_OBJECT
 
 	private:
-		bool							UpdateViewFrustum;
-		bool							UpdateView;
-		bool							UpdateViewTransform;
-		bool							UpdateProjectionTransform;
-		bool							UpdateViewProjectionTransform;
-
+		ZECameraDirtyFlags				CameraDirtyFlags;
 
 		float							NearZ, FarZ;
-		float							FOV, AspectRatio;
+		float							FOV, AspectRatio, GlobalAspectRatio;
 		float							Width, Height;
+
 		float							ShadowDistance;
 		float							ShadowFadeDistance;
 

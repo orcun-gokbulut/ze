@@ -46,6 +46,7 @@ class ZEVirtualInputMouseDevice;
 class ZEVirtualInputModule : public ZEInputDeviceModule
 {
 	ZE_EXTENSION(ZEVirtualInputModule)
+
 	private:
 		static ZEVirtualInputModule*		Instance;
 		ZEVirtualInputMouseDevice*			MouseDevice;
