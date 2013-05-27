@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERayCaster.cpp
+ Zinek Engine - ZECrashReportUserCommentProvider.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,87 +33,84 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZECrashReportUserCommentProvider.h"
+
+#include "ZEDS/ZEString.h"
 #include "ZETypes.h"
-#include "ZEScene.h"
-#include "ZEEntity.h"
-#include "ZERayCaster.h"
+#include "ZEDS/ZEFormat.h"
 
+#include <memory.h>
 
-/*
-ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float Range)
+const char* ZECrashReportUserCommentProvider::GetName()
 {
-	float T;
-	ZEVector3 Position, Normal;
-	return ZERayCaster::CastRay(Scene, Ray, T, Position, Normal, Range);
+	return "User Comments";
 }
 
-ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float& T, float Range)
+const char* ZECrashReportUserCommentProvider::GetNameSurname()
 {
-	ZEVector3 Position, Normal;
-	return ZERayCaster::CastRay(Scene, Ray, T, Position, Normal, Range);
+	return NameSurname;
 }
 
-ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, float Range)
+void ZECrashReportUserCommentProvider::SetNameSurname(const char* Name)
 {
-	ZEVector3 Normal;
-	return ZERayCaster::CastRay(Scene, Ray, Position, Normal, Range);
+	NameSurname = Name;
 }
 
-ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float Range)
+const char* ZECrashReportUserCommentProvider::GetEMail()
 {
-	float MinT, MaxT;
-	float CurrentT = Range / Ray.v.Length();
-
-	ZEEntity* IntersectedEntity = NULL;
-
-	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
-
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-	{
-		ZEEntity* CurrentEntity = Entities[I];
-
-		ZEUInt32 RayCastFlags = CurrentEntity->GetRayCastFlags();
-		if (RayCastFlags == ZE_RCF_BOUNDING_BOX)
-		{
-			if (!ZEAABBox::IntersectionTest(CurrentEntity->GetWorldBoundingBox(), Ray, MinT, MaxT))
-				continue;
-
-			if (CurrentT < MinT)
-				continue;
-
-			Position = Ray.GetPointOn(CurrentT);
-			Normal = -Ray.v;
-
-			IntersectedEntity = CurrentEntity;
-			MinT = CurrentT;
-		}
-		else if (RayCastFlags & ZE_RCF_INTERNAL)
-		{
-			if (RayCastFlags & ZE_RCF_BOUNDING_BOX)
-			{
-				if (!ZEAABBox::IntersectionTest(CurrentEntity->GetWorldBoundingBox(), Ray, MinT, MaxT))
-					continue;
-
-				if (CurrentT < MaxT)
-					continue;
-			}
-
-			if (!CurrentEntity->CastRay(Ray, CurrentT, Position, Normal))
-				continue;
-
-			if (MinT < CurrentT)
-				continue;
-
-			IntersectedEntity = CurrentEntity;
-			MinT = CurrentT;
-		}
-	}
-
-	return IntersectedEntity;
+	return EMail;
 }
 
-ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float& T, ZEVector3& Position, ZEVector3& Normal, float Range = 100000000.0f)
+void ZECrashReportUserCommentProvider::SetEMail(const char* EMail)
 {
-	return NULL;
+	this->EMail = EMail;
 }
-*/
+
+const char* ZECrashReportUserCommentProvider::GetComment()
+{
+	return Comments;
+}
+
+void ZECrashReportUserCommentProvider::SetComment(const char* Comment)
+{
+	this->Comments = Comment;
+}
+
+void ZECrashReportUserCommentProvider::SetContactBack(bool ContactBack)
+{
+	this->ContactBack = ContactBack;
+}
+
+bool ZECrashReportUserCommentProvider::GetContactBack()
+{
+	return ContactBack;
+}
+
+ZESize ZECrashReportUserCommentProvider::GetSize()
+{
+	return Size;
+}
+
+bool ZECrashReportUserCommentProvider::GetData(void* Output, ZESize Offset, ZESize Size)
+{
+	memcpy(Output, Data.GetValue() + Offset, Size);
+	return true;
+}
+
+bool ZECrashReportUserCommentProvider::Generate()
+{
+	Data = ZEFormat::Format(
+		"<ZECrashReport>\n"
+		"  <UserComments>\n"
+		"    <NameSurname>{0}</NameSurname>\n"
+		"    <EMail>{1}>\n"
+		"    <ContactBack>{2}</ContactBack>\n"
+		"    <Comments><[!CDATA[\n"
+		"{3}\n"
+		"    ]]></Comments>\n"
+		"  </UserComments>\n"
+		"<ZECrashReport>\n", NameSurname, EMail, ContactBack ? "yes" : "no", Comments);
+	Size = Data.GetLength() + 1;
+	
+	return true;
+}

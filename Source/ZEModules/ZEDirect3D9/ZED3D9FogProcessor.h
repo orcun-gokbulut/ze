@@ -38,6 +38,7 @@
 #ifndef __ZE_D3D9_FOG_PROCESSOR_H__
 #define __ZE_D3D9_FOG_PROCESSOR_H__
 
+#include "ZEMeta/ZEObject.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZED3D9BlurProcessor.h"
 #include "ZEMath\ZEVector.h"
@@ -58,14 +59,24 @@ enum ZED3D9FogModel
 	ZE_D3D9_FM_EXPONENTIAL_SQUARE	= 2
 };
 
-
-class ZED3D9FogProcessor : public ZED3D9ComponentBase
+struct ZEFOGScreenAlignedQuad
 {
+	float Position[3];
+};
+
+ZE_CLASS(ZED3D9FogProcessor)
+
+class ZED3D9FogProcessor : public ZED3D9ComponentBase, public ZEObject
+{
+	ZE_OBJECT
+
 	protected:
+		static ZEFOGScreenAlignedQuad	Vertices[4];
+
 		float							FogHeight;
 		float							FogDistanceFar;
 		float							FogDistanceNear;
-		float							FogVisibility;
+		float							FogFactor;
 		
 		ZEVector3						FogColor;
 		ZEVector3						OutScatterFactor;
@@ -90,28 +101,28 @@ class ZED3D9FogProcessor : public ZED3D9ComponentBase
 		
 	public:
 		void							SetFogModel(ZED3D9FogModel Model);
-		ZED3D9FogModel					GetFogModel();
+		ZED3D9FogModel					GetFogModel() const;
 
 		void							SetFogColor(ZEVector3 Color);
-		ZEVector3						GetFogColor();
+		ZEVector3						GetFogColor() const;
 
 		void							SetOutScatterFactor(ZEVector3 Color);
-		ZEVector3						GetOutScatterFactor();
+		ZEVector3						GetOutScatterFactor() const;
 
 		void							SetInScatterFactor(ZEVector3 Color);
-		ZEVector3						GetInScatterFactor();
+		ZEVector3						GetInScatterFactor() const;
 		
 		void							SetFogHeight(float Value);
-		float							GetFogHeight();
+		float							GetFogHeight() const;
 
 		void							SetFogDistanceFar(float Value);
-		float							GetFogDistanceFar();
+		float							GetFogDistanceFar() const;
 		
 		void							SetFogDistanceNear(float Value);
-		float							GetFogDistanceNear();
+		float							GetFogDistanceNear() const;
 		
-		void							SetFogVisibility(float Value);
-		float							GetFogVisibility();
+		void							SetFogFactor(float Value);
+		float							GetFogFactor() const;
 
 		void							SetRenderer(ZEFrameRenderer* Renderer);
 		ZEFrameRenderer*				GetRenderer();
@@ -137,4 +148,4 @@ class ZED3D9FogProcessor : public ZED3D9ComponentBase
 		virtual							~ZED3D9FogProcessor();
 };
 
-#endif	/* __ZE_D3D9_FOG_PROCESSOR_H__ */
+#endif

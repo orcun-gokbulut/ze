@@ -134,10 +134,10 @@ void ZEInputDeviceState::Reset()
 		memset(Vectors.OldValues.GetCArray(), 0, Vectors.OldValues.GetCount() * sizeof(ZEVector4));
 	}
 
-	if (Quaternions.CurrentValues.GetCount() != 0)
+	for (ZESize I = 0; I < Quaternions.CurrentValues.GetCount(); I++)
 	{
-		memset(Quaternions.CurrentValues.GetCArray(), 0, Quaternions.CurrentValues.GetCount() * sizeof(ZEQuaternion));
-		memset(Quaternions.OldValues.GetCArray(), 0, Quaternions.OldValues.GetCount() * sizeof(ZEQuaternion));
+		Quaternions.CurrentValues[I] = ZEQuaternion::Identity;
+		Quaternions.OldValues[I] = ZEQuaternion::Identity;
 	}
 }
 
@@ -197,7 +197,8 @@ void ZEInputDeviceState::AdvanceAndReset()
 	if (Quaternions.CurrentValues.GetCount() != 0)
 	{
 		memcpy(Quaternions.OldValues.GetCArray(), Quaternions.CurrentValues.GetCArray(), Quaternions.CurrentValues.GetCount() * sizeof(ZEQuaternion));
-		memset(Quaternions.CurrentValues.GetCArray(), 0, Quaternions.CurrentValues.GetCount() * sizeof(ZEQuaternion));
+		for (ZESize I = 0; I < Quaternions.CurrentValues.GetCount(); I++)
+			Quaternions.CurrentValues[I] = ZEQuaternion::Identity;
 	}
 
 }

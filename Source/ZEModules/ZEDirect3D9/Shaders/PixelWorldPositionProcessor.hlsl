@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERayCaster.h
+ Zinek Engine - PixelWorldPositionProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,27 +33,27 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_RAY_CASTER_H__
-#define __ZE_RAY_CASTER_H__
+#ifndef __ZE_PIXEL_WORLD_POSITION_PROCESSOR_HLSL__
+#define __ZE_PIXEL_WORLD_POSITION_PROCESSOR_HLSL__
 
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZERay.h"
+#include	"GBuffer.hlsl"
 
-class ZEEntity;
-class ZEScene;
-class ZERay;
+float2		SampleCoord				: register(c0);
 
-class ZERayCaster
+struct VSInput
 {
-	public:
-		/*
-		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float Range = 100000000.0f);
-		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float& T, float Range = 100000000.0f);
-		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, float Range = 100000000.0f);
-		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float Range = 100000000.0f);
-		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float& T, ZEVector3& Position, ZEVector3& Normal, float Range = 100000000.0f);
-		*/
+	float3 Position		: POSITION0;
+	float2 TexCoord		: TEXCOORD0;
 };
+
+float4 VSMain(VSInput Input) : POSITION0
+{
+	return float4(sign(Input.Position).xyz, 1.0f);
+}
+
+float4 PSMain() : COLOR0
+{
+	return ZEGBuffer_GetDepth(SampleCoord).xxxx;
+}
 
 #endif

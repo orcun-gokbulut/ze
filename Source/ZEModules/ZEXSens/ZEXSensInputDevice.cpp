@@ -46,13 +46,12 @@
 #include "ZEDS/ZEFormat.h"
 #include "ZEThread/ZEThread.h"
 
-
-/*inline ZEVector4 XSENS_TO_ZE_VEC(const vrpn_float64* Position)
+inline ZEVector4 XSENS_TO_ZE_VECTOR(const CmtVector& Vector)
 {
-	return ZEVector4((float)Position[0], (float)Position[1], (float)Position[2], 1.0f);
-}*/
+	return ZEVector4(Vector.m_data[0], Vector.m_data[2], Vector.m_data[1], 1.0f);
+}
 
-inline ZEQuaternion XSENS_TO_ZE_QUAD(const CmtQuat& Quaternion)
+inline ZEQuaternion XSENS_TO_ZE_QUATERNION(const CmtQuat& Quaternion)
 {
 	return ZEQuaternion(-Quaternion.m_data[3], Quaternion.m_data[1], -Quaternion.m_data[0], Quaternion.m_data[2]).Normalize();	
 }
@@ -72,7 +71,7 @@ bool ZEXSensInputDevice::InitializeSelf()
 	if (XSensDevice.gotoConfig() != XRV_OK)
 		return false;
 	
-	CmtDeviceMode DeviceMode(CMT_OUTPUTMODE_ORIENT, CMT_OUTPUTSETTINGS_ORIENTMODE_QUATERNION, 30);
+	CmtDeviceMode DeviceMode(CMT_OUTPUTMODE_ORIENT | CMT_OUTPUTMODE_CALIB, CMT_OUTPUTSETTINGS_ORIENTMODE_QUATERNION, 30);
 	if (XSensDevice.setDeviceMode(DeviceMode, true, XSensDeviceId) != XRV_OK)
 		return false;
 
@@ -82,6 +81,7 @@ bool ZEXSensInputDevice::InitializeSelf()
 	Description.SinkName = "sensor";
 	Description.SinkNameHash = ZEHashGenerator::Hash(Description.SinkName);
 	Description.QuaternionCount = 1;
+	Description.VectorCount = 1;
 
 	Description.Index = ZEInputDeviceIndexes::GetNewDeviceIndex(ZE_IDT_SENSOR);
 	Description.Name = ZEFormat::Format("XSensSensor{0:d:02}", Description.Index);
@@ -118,8 +118,8 @@ void ZEXSensInputDevice::Process()
 		
 	while (XSensDevice.readDataPacket(XSensPacket) == XRV_OK)
 	{
-		State.Quaternions.CurrentValues[0] = XSENS_TO_ZE_QUAD(XSensPacket->getOriQuat());
-		zeLog("w: %f, x: %f, y: %f, z: %f", State.Quaternions.CurrentValues[0].w, State.Quaternions.CurrentValues[0].z, State.Quaternions.CurrentValues[0].y, State.Quaternions.CurrentValues[0].z);
+		State.Quaternions.CurrentValues[0] = XSENS_TO_ZE_QUATERNION(XSensPacket->getOriQuat());
+		State.Vectors.CurrentValues[0] = XSENS_TO_ZE_VECTOR(XSensPacket->getCalAcc());
 	}
 }
 

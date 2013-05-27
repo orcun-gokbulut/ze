@@ -402,7 +402,7 @@ bool ZEInput::Check(ZEInputState State, ZEInputValue& Action) const
 	{
 		if (State == ZE_IS_VALUE || (State == ZE_IS_CHANGED && DeviceState.Vectors.CurrentValues[Index] != DeviceState.Vectors.OldValues[Index]))
 		{
-			Action.POVValue = DeviceState.POVs.CurrentValues[Index];
+			Action.SwitchValue = DeviceState.Switches.CurrentValues[Index];
 			return true;
 		}
 	}
@@ -410,7 +410,7 @@ bool ZEInput::Check(ZEInputState State, ZEInputValue& Action) const
 	{
 		if (State == ZE_IS_VALUE || (State == ZE_IS_CHANGED && DeviceState.Vectors.CurrentValues[Index] != DeviceState.Vectors.OldValues[Index]))
 		{
-			Action.POVValue = DeviceState.POVs.CurrentValues[Index];
+			Action.Vector = DeviceState.Vectors.CurrentValues[Index];
 			return true;
 		}
 	}

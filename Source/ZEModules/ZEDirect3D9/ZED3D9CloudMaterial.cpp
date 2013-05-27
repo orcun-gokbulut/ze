@@ -571,8 +571,6 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 
 	((ZED3D9CloudMaterial*)this)->UpdateShadowTransformations();
 
-	IDirect3DSurface9* RenderTarget;
-	GetDevice()->GetRenderTarget(0, &RenderTarget);
 
 	// This cloud shadow pass is not functional right now
 
@@ -891,7 +889,7 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PixelShaderParametersCloudRender, sizeof(PixelShaderParametersCloudRender) / 16);
 	
 	// Restore render target
-	GetDevice()->SetRenderTarget(0, RenderTarget);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9FrameRenderer*)Renderer)->ABuffer->ViewPort.FrameBuffer);
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)CloudDensityBuffer, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, (ZETexture2D*)CloudDensityBlurBuffer, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
 

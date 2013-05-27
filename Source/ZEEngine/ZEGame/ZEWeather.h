@@ -117,6 +117,12 @@ class ZEWeather : public ZEEntity
 
 		void						SetSunDirection(const ZEVector3& Value);
 		const ZEVector3&			GetSunDirection() const;
+
+		void						SetSunCastsShadows(bool Value);
+		bool						GetSunCastsShadows() const;
+
+		void						SetMoonCastsShadows(bool Value);
+		bool						GetMoonCastsShadows() const;
 		
 		void						SetMoonDirection(const ZEVector3& Value);
 		const ZEVector3&			GetMoonDirection() const;
@@ -135,6 +141,4 @@ class ZEWeather : public ZEEntity
 		static ZEWeather*			CreateInstance();
 };
 
-
-
-#endif // __ZE_WEATHER_H__
+#endif

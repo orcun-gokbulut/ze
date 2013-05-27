@@ -38,6 +38,7 @@
 #ifndef __ZE_D3D9_DOF_PROCESSOR_H__
 #define __ZE_D3D9_DOF_PROCESSOR_H__
 
+#include "ZEMeta/ZEObject.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZED3D9BlurProcessor.h"
 
@@ -50,56 +51,69 @@ class ZEFrameRenderer;
 class ZED3D9FrameRenderer;
 class ZETexture2DResource;
 
-
-class ZED3D9DOFProcessor : public ZED3D9ComponentBase
+struct ZEDOFScreenAlignedQuad
 {
+	float Position[3];
+};
+
+ZE_CLASS(ZED3D9DOFProcessor)
+
+class ZED3D9DOFProcessor : public ZED3D9ComponentBase, public ZEObject
+{
+	ZE_OBJECT
+
 	private:
-		float							FarClamp;			// Max blur between FarDistance and FocusDistance [Range: 0-1]
-		float							NearClamp;			// Max blur between FocusDistance and NearDistance [Range: 0-1]
-		float							FarDistance;		// Far distance [FocusDistance < FarDistance < ZFar where FarDistance is in meters]
-		float							NearDistance;		// Near distance [ZNear < NearDistance < FocusDistance where NearDistance is in meters]
-		float							FocusDistance;		// Focus Distance [NearDistance < FocusDistance < FarDistance where FocusDistance is in meters]
+		static ZEDOFScreenAlignedQuad	Vertices[4];
 
-		ZED3D9BlurKernel*				HorizontalKernel;	// Horizontal blur kernel
-		ZED3D9BlurKernel*				VerticalKernel;		// Vertical blur kernel
+		ZESize							BlurPassCount;
 
-		ZED3D9FrameRenderer*			Renderer;			// Renderer
+		float							FarClamp;				// Max blur amount at FarDistance point. 0 < FarClamp < 1
+		float							NearClamp;				// Max blur amount at NearDistance point. 0 < NearClamp < 1
+		float							FarDistance;			// Point where max far distance blur will be achieved. FarDistance < FarZ
+		float							NearDistance;			// Point where max near distance blur will be achieved. NearDistance > NearZ
+		float							FocusDistance;			// Focus point. NearDistance < FocusDistance < FarDistance
+		float							FullFocusRange;			// Centered on FoucsDistance point and full focus is achieved on this range.
 
-		ZED3D9Texture2D*				ColorBufferDS2xBlur;// 1/4 sized color buffer
-		ZED3D9Texture2D*				ColorBufferDS2xTmp; // 1/4 sized temp buffer
+		ZED3D9FrameRenderer*			Renderer;				// Renderer
 
-		ZED3D9Texture2D*				InputColorBuffer;	// Input color texture
-		ZED3D9Texture2D*				InputDepthBuffer;	// Input depth texture
-		ZED3D9ViewPort*					OutputBuffer;		// DOF applied output texture
+		ZED3D9Texture2D*				BlurBuffers[9];
 
-		ZED3D9VertexShader*				VertexShaderCommon;	// Common vertex shader for all passes
+		ZED3D9Texture2D*				InputColorBuffer;		// Input color texture
+		ZED3D9Texture2D*				InputDepthBuffer;		// Input depth texture
+		ZED3D9ViewPort*					OutputBuffer;			// DOF applied output texture
 
-		ZED3D9PixelShader*				PixelShaderDOF;		// DOF pixel shader
-		ZED3D9PixelShader*				PixelShaderDS2x;	// Down Sampling pixel shader
-		ZED3D9PixelShader*				PixelShaderBlurH;	// Horizontal blur pixel shader
-		ZED3D9PixelShader*				PixelShaderBlurV;	// Vertical blur pixel shader
+		ZED3D9VertexShader*				VertexShaderCommon;		// Common vertex shader for all passes
 
+		ZED3D9PixelShader*				PixelShaderDOF;			// DOF pixel shader
+		ZED3D9PixelShader*				PixelShaderUsDsBlur;	// Up/Down Sampling + Blur pixel shader
 
-		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;	// Vertex deceleration for quadiliteral
+		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;		// Vertex deceleration for quadiliteral
 
-		void							CreateBlurKernels();
 		void							CreateRenderTargets();
 
+		void							UpDownSampleBlur(ZED3D9Texture2D* Input, ZED3D9Texture2D* Output);
+
 	public:
-		float							GetFocusDistance();
+		void							SetBlurPassCount(ZEUInt Count);
+		ZEUInt							GetBlurPassCount() const;
+
 		void							SetFocusDistance(float Value);
+		float							GetFocusDistance() const;
 
-		float							GetFarDistance();
+		void							SetFullFocusRange(float Value);
+		float							GetFullFocusRange() const;
+
 		void							SetFarDistance(float Value);
+		float							GetFarDistance() const;
 
-		float							GetNearDistance();
 		void							SetNearDistance(float Value);
+		float							GetNearDistance() const;
 
-		float							GetFarClamp();
 		void							SetFarClamp(float Value);
+		float							GetFarClamp() const;
 
-		float							GetNearClamp();
 		void							SetNearClamp(float Value);
+		float							GetNearClamp() const;
 
 		void							SetRenderer(ZEFrameRenderer* Renderer);
 		ZEFrameRenderer*				GetRenderer();
@@ -125,4 +139,4 @@ class ZED3D9DOFProcessor : public ZED3D9ComponentBase
 		virtual							~ZED3D9DOFProcessor();
 };
 
-#endif	/* __ZE_D3D9_DOF_PROCESSOR_H__ */
+#endif

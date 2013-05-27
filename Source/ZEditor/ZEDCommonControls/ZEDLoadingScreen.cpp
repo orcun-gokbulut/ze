@@ -53,12 +53,12 @@ void ZEDLoadingScreen::SetNotificationText(const char* Text)
 	QFont Font; 
 
 	this->PictureLabel = new QLabel(this);
-	this->NotificationLabel = new QLabel(QString(" Loading lots of thing..."),this);
+	this->NotificationLabel = new QLabel(QString(" Loading lots of things..."),this);
 
 	this->Layout = new QHBoxLayout(this);
 	this->Layout->setDirection(QBoxLayout::BottomToTop);
 
-	this->PMap.load(":/SplashScreen/ZEditor Splash Screen Flat.png");
+	//this->PMap.load(":/SplashScreen/ZEditor Splash Screen Flat.png");
 
 	this->PictureLabel->setPixmap(this->PMap);
 

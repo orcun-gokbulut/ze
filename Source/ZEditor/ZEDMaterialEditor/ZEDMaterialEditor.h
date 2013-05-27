@@ -41,6 +41,7 @@
 #include "ZEDMaterialEditorViewPort.h"
 
 class ZEDPropertyWindowManager;
+class ZEFixedMaterial;
 
 namespace Ui
 {
@@ -55,9 +56,14 @@ class ZEDMaterialEditor : public QMainWindow
 		
 		Ui::ZEDMaterialEditorClass* ui;
 
+		ZEFixedMaterial*			Material;
+		QString						CurrentFileName;
+
 		QTimer						EngineMainLoopTimer;
 		ZEDMaterialEditorViewPort*	ViewPort;
+
 		ZEDPropertyWindowManager*	MaterialPropertyWindowManager;
+
 		ZEDPropertyWindowManager*	DirectLight1PropertyWindowManager;
 		ZEDPropertyWindowManager*	DirectLight2PropertyWindowManager;
 		ZEDPropertyWindowManager*	DirectLight3PropertyWindowManager;
@@ -76,13 +82,10 @@ class ZEDMaterialEditor : public QMainWindow
 
 	private slots:
 
-		void						SphereSelected();
-		void						CubeSelected();
-		void						PlaneSelected();
-		void						CylinderSelected();
-
 		void						SaveAs();
 		void						Open();
+		void						Close();
+		void						Save();
 
 
 

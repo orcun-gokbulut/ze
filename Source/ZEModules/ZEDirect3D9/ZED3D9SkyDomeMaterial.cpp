@@ -47,7 +47,6 @@ ZED3D9SkyDomeMaterial::ZED3D9SkyDomeMaterial()
 {
 	VertexShader = NULL;
 	PixelShader = NULL;
-	
 }
 
 ZED3D9SkyDomeMaterial::~ZED3D9SkyDomeMaterial()
@@ -72,9 +71,6 @@ void ZED3D9SkyDomeMaterial::ReleaseShaders()
 
 bool ZED3D9SkyDomeMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
-	// Update material if its changed. (Recompile shader, etc.)
-	// ((ZED3D9SkyDomeMaterial*)this)->UpdateMaterial();
-
 	// Setup Shaders
 	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
 	GetDevice()->SetPixelShader(PixelShader->GetPixelShader());
@@ -83,8 +79,6 @@ bool ZED3D9SkyDomeMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	//GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-	//GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
@@ -105,17 +99,6 @@ bool ZED3D9SkyDomeMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 
 	float MiddayFactor, SunsetFactor;
 	float SunHeight = -SunLightDirection.y;
-
-	if (SunHeight < 0.3f)
-	{
-		MiddayFactor = 0.0f;
-		SunsetFactor = ZEMath::Power((SunHeight - 0.3f), 2.0f) / 0.09f;
-	}
-	else
-	{
-		SunsetFactor = 0.0f;
-		MiddayFactor = (SunHeight - 0.3f) / 0.7f;
-	}
 
 	float Scale = 1.0f / (OuterRadius - InnerRadius);
 	struct
@@ -153,18 +136,11 @@ bool ZED3D9SkyDomeMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 		MieConstant * 4.0f * ZE_PI, RayleighConstant * 4.0f * ZE_PI, Scale = 1.0f / (OuterRadius - InnerRadius), RayleighScaleDepth
 	};
 
-
 	struct 
 	{
-		float	MiddayAmbientColor[3];
-		float	MiddayFactor;
-
-		float	SunsetAmbientColor[3];
-		float	SunsetFactor;
-
 		float	G;
 		float	GPow2;
-		float	AmbienFactor;
+		float	Reserved1;
 		float	Reserved2;
 
 		float	SunDirection[3];
@@ -173,14 +149,12 @@ bool ZED3D9SkyDomeMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 	}
 	PixelShaderParameters = 
 	{
-		{MiddayAmbientColor.x, MiddayAmbientColor.y, MiddayAmbientColor.z}, MiddayFactor,
-		{SunsetAmbientColor.x, SunsetAmbientColor.y, SunsetAmbientColor.z}, SunsetFactor,
-		G, G * G, AmbientFactor, 0.0f,
+		G, G * G, 0.0f, 0.0f,
 		{SunLightDirection.x, SunLightDirection.y, SunLightDirection.z}, 0.0f
 	};
 	
 	GetDevice()->SetVertexShaderConstantF(8, (const float*)&VertexShaderParameters, sizeof(VertexShaderParameters) / 16);
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PixelShaderParameters, sizeof(PixelShaderParameters) / 16);
+	GetDevice()->SetPixelShaderConstantF(2, (const float*)&PixelShaderParameters, sizeof(PixelShaderParameters) / 16);
 
 	return true;
 }

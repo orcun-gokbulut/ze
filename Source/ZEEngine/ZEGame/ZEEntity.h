@@ -49,6 +49,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZERayCast.h"
 
 #include "ZEMeta/ZEObject.h"
 
@@ -70,8 +71,8 @@ typedef ZEFlags ZEEntityDirtyFlags;
 #define ZE_EDF_NONE								0
 #define ZE_EDF_LOCAL_TRANSFORM					1
 #define ZE_EDF_WORLD_TRANSFORM					2
-#define ZE_EDF_WORLD_BOUNDING_SPHERE			4
-#define ZE_EDF_WORLD_BOUNDING_BOX				8
+#define ZE_EDF_WORLD_BOUNDING_BOX				4
+#define ZE_EDF_INV_WORLD_TRANSFORM				8
 #define ZE_EDF_ALL								0xFFFFFFFF
 
 enum ZEEntityState
@@ -110,19 +111,19 @@ class ZEEntity : public ZEObject
 		bool									Enabled;
 		bool									Visible;
 
-		mutable ZEEntityDirtyFlags				DirtyFlags;
+		mutable ZEEntityDirtyFlags				EntityDirtyFlags;
 
 		mutable ZEMatrix4x4						Transform;
 		mutable ZEMatrix4x4						WorldTransform;
+		mutable ZEMatrix4x4						InvWorldTransform;
 
-		ZEAABBox								BoundingBox;
-		ZEAABBox								WorldBoundingBox;
+		mutable ZEAABBox						BoundingBox;
+		mutable ZEAABBox						WorldBoundingBox;
 		
 	protected:
 		ZEArray<ZEEntity*>						Components;
 		ZEArray<ZEEntity*>						ChildEntities;
 
-		void									SetBoundingBox(const ZEAABBox& BoundingBox);
 		virtual void							OnTransformChanged();
 
 		bool									AddComponent(ZEEntity* Entity); 
@@ -134,6 +135,8 @@ class ZEEntity : public ZEObject
 
 		virtual bool							InitializeSelf();
 		virtual bool							DeinitializeSelf();
+
+		void									SetBoundingBox(const ZEAABBox& BoundingBox) const;
 
 												ZEEntity();
 		virtual									~ZEEntity();
@@ -154,34 +157,36 @@ class ZEEntity : public ZEObject
 		bool									AddChildEntity(ZEEntity* Entity);
 		void									RemoveChildEntity(ZEEntity* Entity);
 
+		virtual void							SetBoundingBox(const ZEAABBox& BoundingBox);
 		virtual const ZEAABBox&					GetBoundingBox() const;
-		virtual const ZEAABBox&					GetWorldBoundingBox();
+		virtual const ZEAABBox&					GetWorldBoundingBox() const;
 
-		virtual const ZEMatrix4x4&				GetTransform() const;
-		virtual const ZEMatrix4x4&				GetWorldTransform() const;
+		const ZEMatrix4x4&						GetTransform() const;
+		const ZEMatrix4x4&						GetWorldTransform() const;
+		const ZEMatrix4x4&						GetInvWorldTransform() const;
 
 		bool									IsInitialized();
 		ZEEntityState							GetState();
 
 		virtual void							SetVisible(bool Visibility);
-		virtual bool							GetVisible() const;
+		bool									GetVisible() const;
 
 		virtual void							SetEnabled(bool Enabled);
-		virtual bool							GetEnabled() const;
+		bool									GetEnabled() const;
 
 		virtual void							SetPosition(const ZEVector3& NewPosition);
 		const ZEVector3&						GetPosition() const;
-		virtual void							SetWorldPosition(const ZEVector3& NewPosition);
+		void									SetWorldPosition(const ZEVector3& NewPosition);
 		const ZEVector3							GetWorldPosition() const;
 
 		virtual void							SetRotation(const ZEQuaternion& NewRotation);
 		const ZEQuaternion&						GetRotation() const;
-		virtual void							SetWorldRotation(const ZEQuaternion& NewRotation);
+		void									SetWorldRotation(const ZEQuaternion& NewRotation);
 		const ZEQuaternion						GetWorldRotation() const;
 
 		virtual void							SetScale(const ZEVector3& NewScale);
 		const ZEVector3&						GetScale() const;
-		virtual void							SetWorldScale(const ZEVector3& NewScale);
+		void									SetWorldScale(const ZEVector3& NewScale);
 		const ZEVector3							GetWorldScale() const;
 
 		ZEVector3								GetFront();
@@ -199,13 +204,7 @@ class ZEEntity : public ZEObject
 		virtual void							Tick(float Time);
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
 
-		ZE_META_CLASS_ATTRIBUTE_1("Description", "Base class for entities in Zinek Engine")
-		ZE_META_CLASS_ATTRIBUTE_1("VisualizerEntity", "ZEEntityVisualizer")
-		ZE_META_CLASS_ATTRIBUTE_2("Editor", "Icon", "ZEEntity.png")
-		ZE_META_CLASS_ATTRIBUTE_1("Editor", "Hidden")
-		ZE_META_CLASS_ATTRIBUTE_2("Editor", "Group", "Low Level")
-		ZE_META_CLASS_ATTRIBUTE_1("HLA", "AutoSync")
-		ZE_META_CLASS_ATTRIBUTE_1("Network", "AutoSync")
-		ZE_META_CLASS_ATTRIBUTE_1("Network", "AutoSync")
+		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+
 };
 #endif

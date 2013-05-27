@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9Shader.h"
+#include "ZEGame/ZEScene.h"
 #include "ZED3D9ViewPort.h"
 #include "ZED3D9Profiler.h"
 #include "ZED3D9Texture2D.h"
@@ -46,71 +47,75 @@
 
 #include <d3d9.h>
 #include <stdlib.h>
-#include "ZEGame/ZEScene.h"
 
-void ZED3D9DOFProcessor::CreateBlurKernels()
-{
-	unsigned int TargetWidth;
-	unsigned int TargetHeight;
-	unsigned int SourceWidth;
-	unsigned int SourceHeight;
-
-	if (HorizontalKernel != NULL)
-		delete HorizontalKernel;
-	if (VerticalKernel != NULL)
-		delete VerticalKernel;
-
-	TargetWidth = SourceWidth = Renderer->GetViewPort()->GetWidth() / 2;
-	TargetHeight = SourceHeight = Renderer->GetViewPort()->GetHeight() / 2;
-
-	GaussianFilter GaussFilter(3.5f, 1.0f);
-	ZEVector2 SourcePixelSize(1.0f / (float)TargetWidth, 1.0f / (float)TargetHeight);
-
-	HorizontalKernel = new ZED3D9BlurKernel((const ZEFilter*)&GaussFilter, SourceWidth, TargetWidth, 32, SourcePixelSize.x);
-	VerticalKernel = new ZED3D9BlurKernel((const ZEFilter*)&GaussFilter, SourceHeight, TargetHeight, 32, SourcePixelSize.y);
-}
+ZE_OBJECT_IMPL(ZED3D9DOFProcessor)
 
 void ZED3D9DOFProcessor::CreateRenderTargets()
 {
-	unsigned int TargetWidth = Renderer->GetViewPort()->GetWidth() / 2;
-	unsigned int TargetHeight = Renderer->GetViewPort()->GetHeight() / 2;
+	ZEUInt OutputWidth = Renderer->GetViewPort()->GetWidth();
+	ZEUInt OutputHeight = Renderer->GetViewPort()->GetHeight();
 
-	// If ColorBufferDS2x created before
-	if (ColorBufferDS2xBlur != NULL)
+	// Always allocate level 0
+	if (BlurBuffers[0] == NULL || OutputWidth != BlurBuffers[0]->GetWidth() || OutputHeight != BlurBuffers[0]->GetHeight())
 	{
-		// If dimensions needs to change
-		if (TargetWidth != ColorBufferDS2xBlur->GetWidth() || TargetHeight != ColorBufferDS2xBlur->GetHeight())
-		{
-			ColorBufferDS2xBlur->Release();
-			ColorBufferDS2xBlur->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
-		}
-	}
-	else // If ColorBufferDS2x not created before
-	{
-		ColorBufferDS2xBlur = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		ColorBufferDS2xBlur->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
+		ZED3D_DESTROY(BlurBuffers[0]);
+	
+		BlurBuffers[0] = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+		BlurBuffers[0]->Create(OutputWidth, OutputHeight, 1, ZE_TPF_I8_4, true);
 	}
 
-	// If DepthBufferDS2x created before
-	if (ColorBufferDS2xTmp != NULL)
+	// (Re)Allocate buffers
+	for (ZESize I = 1; I < BlurPassCount + 1 && I < 9; ++I)
 	{
-		// If dimensions needs to change
-		if (TargetWidth != ColorBufferDS2xTmp->GetWidth() || TargetHeight != ColorBufferDS2xTmp->GetHeight())
+		ZEUInt LevelWidth = OutputWidth >> I;
+		ZEUInt LevelHeight = OutputHeight >> I;
+
+		if (BlurBuffers[I] == NULL || LevelWidth != BlurBuffers[I]->GetWidth() || LevelHeight != BlurBuffers[I]->GetHeight())
 		{
-			ColorBufferDS2xTmp->Release();
-			ColorBufferDS2xTmp->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
+			ZED3D_DESTROY(BlurBuffers[I]);
+
+			BlurBuffers[I] = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+			BlurBuffers[I]->Create(LevelWidth, LevelHeight, 1, ZE_TPF_I8_4, true);
 		}
 	}
-	else // If DepthBufferDS2x not created before
+
+	// deallocate unused buffers
+	for (ZESize I = BlurPassCount + 1; I < 9; ++I)
 	{
-		ColorBufferDS2xTmp = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		ColorBufferDS2xTmp->Create(TargetWidth, TargetHeight, 1, ZE_TPF_I8_4, true);
+		ZED3D_DESTROY(BlurBuffers[I]);
 	}
 }
 
-float ZED3D9DOFProcessor::GetFocusDistance()
+void ZED3D9DOFProcessor::UpDownSampleBlur(ZED3D9Texture2D* Input, ZED3D9Texture2D* Output)
 {
-	return FocusDistance;
+	GetDevice()->SetPixelShader(PixelShaderUsDsBlur->GetPixelShader());
+	GetDevice()->SetVertexShader(VertexShaderCommon->GetVertexShader());
+
+	GetDevice()->SetRenderTarget(0, Output->ViewPort.FrameBuffer);
+
+	GetDevice()->SetTexture(0, Input->Texture);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
+
+	ZEVector4 PixelSize = ZEVector4(1.0f / Output->GetWidth(), 1.0f / Output->GetHeight(), 0.0f, 0.0f);
+
+	GetDevice()->SetVertexShaderConstantF(0, PixelSize.M, 1);
+	GetDevice()->SetPixelShaderConstantF(0, PixelSize.M, 1);
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(ZEDOFScreenAlignedQuad));
+}
+
+void ZED3D9DOFProcessor::SetBlurPassCount(ZEUInt Count)
+{
+	BlurPassCount = Count;
+}
+
+ZEUInt ZED3D9DOFProcessor::GetBlurPassCount() const
+{
+	return (ZEUInt)BlurPassCount;
 }
 
 void ZED3D9DOFProcessor::SetFocusDistance(float Value)
@@ -118,9 +123,19 @@ void ZED3D9DOFProcessor::SetFocusDistance(float Value)
 	FocusDistance = Value;
 }
 
-float ZED3D9DOFProcessor::GetFarDistance()
+float ZED3D9DOFProcessor::GetFocusDistance() const
 {
-	return FarDistance;
+	return FocusDistance;
+}
+
+void ZED3D9DOFProcessor::SetFullFocusRange(float Value)
+{
+	FullFocusRange = Value;
+}
+
+float ZED3D9DOFProcessor::GetFullFocusRange() const
+{
+	return FullFocusRange;
 }
 
 void ZED3D9DOFProcessor::SetFarDistance(float Value)
@@ -128,9 +143,9 @@ void ZED3D9DOFProcessor::SetFarDistance(float Value)
 	FarDistance = Value;
 }
 
-float ZED3D9DOFProcessor::GetNearDistance()
+float ZED3D9DOFProcessor::GetFarDistance() const
 {
-	return NearDistance;
+	return FarDistance;
 }
 
 void ZED3D9DOFProcessor::SetNearDistance(float Value)
@@ -138,9 +153,9 @@ void ZED3D9DOFProcessor::SetNearDistance(float Value)
 	NearDistance = Value;
 }
 
-float ZED3D9DOFProcessor::GetFarClamp()
+float ZED3D9DOFProcessor::GetNearDistance() const
 {
-	return FarClamp;
+	return NearDistance;
 }
 
 void ZED3D9DOFProcessor::SetFarClamp(float Value)
@@ -148,14 +163,19 @@ void ZED3D9DOFProcessor::SetFarClamp(float Value)
 	FarClamp = Value;
 }
 
-float ZED3D9DOFProcessor::GetNearClamp()
+float ZED3D9DOFProcessor::GetFarClamp() const
 {
-	return NearClamp;
+	return FarClamp;
 }
 
 void ZED3D9DOFProcessor::SetNearClamp(float Value)
 {
 	NearClamp = Value;
+}
+
+float ZED3D9DOFProcessor::GetNearClamp() const
+{
+	return NearClamp;
 }
 
 void ZED3D9DOFProcessor::SetRenderer(ZEFrameRenderer* Renderer)
@@ -212,82 +232,46 @@ void ZED3D9DOFProcessor::Initialize()
 	this->VertexShaderCommon = ZED3D9VertexShader::CreateShader("DOFProcessor.hlsl", "vs_main_common", 0, "vs_3_0");
 
 	this->PixelShaderDOF = ZED3D9PixelShader::CreateShader("DOFProcessor.hlsl", "ps_main_dof", 0, "ps_3_0");
-	this->PixelShaderDS2x = ZED3D9PixelShader::CreateShader("DOFProcessor.hlsl", "ps_main_ds2x", 0, "ps_3_0");
-	this->PixelShaderBlurH = ZED3D9PixelShader::CreateShader("DOFProcessor.hlsl", "ps_main_gauss_blur_horizontal", 0, "ps_3_0");
-	this->PixelShaderBlurV = ZED3D9PixelShader::CreateShader("DOFProcessor.hlsl", "ps_main_gauss_blur_vertical", 0, "ps_3_0");
+	this->PixelShaderUsDsBlur = ZED3D9PixelShader::CreateShader("DOFProcessor.hlsl", "ps_main_down_up_sample_blur", 0, "ps_3_0");
 
-	this->CreateBlurKernels();
 	this->CreateRenderTargets();
 }
 
 void ZED3D9DOFProcessor::Deinitialize()
-{	
+{
 	Renderer			= NULL;
 
 	InputColorBuffer	= NULL;
 	InputDepthBuffer	= NULL;
 	OutputBuffer		= NULL;
 
-	if (ColorBufferDS2xBlur != NULL)
+	for (ZESize I = 0; I < 8; ++I)
 	{
-		ColorBufferDS2xBlur->Destroy();
-		ColorBufferDS2xBlur = NULL;
-	}
-
-	if (ColorBufferDS2xTmp != NULL)
-	{
-		ColorBufferDS2xTmp->Destroy();
-		ColorBufferDS2xTmp = NULL;
-	}
-
-	if (HorizontalKernel)
-	{
-		delete HorizontalKernel;
-		HorizontalKernel = NULL;
-	}
-
-	if (VerticalKernel)
-	{
-		delete VerticalKernel;
-		VerticalKernel = NULL;
+		ZED3D_DESTROY(BlurBuffers[I]);
 	}
 
 	ZED3D_RELEASE(VertexShaderCommon);
 
 	ZED3D_RELEASE(PixelShaderDOF);
-	ZED3D_RELEASE(PixelShaderDS2x);
-	ZED3D_RELEASE(PixelShaderBlurH);
-	ZED3D_RELEASE(PixelShaderBlurV);
+	ZED3D_RELEASE(PixelShaderUsDsBlur);
 }
 
 void ZED3D9DOFProcessor::OnDeviceLost()
 {
-	// Empty
+
 }
 
 void ZED3D9DOFProcessor::OnDeviceRestored()
 {
-	CreateRenderTargets();
-	CreateBlurKernels();
+
 }
 
 void ZED3D9DOFProcessor::Process()
 {
+	CreateRenderTargets();
+
 	zeProfilerStart("DOF Pass");
-
-	ZEVector4* KernelData;
-	ZESize Vector4Count;
-
-	static struct Vert  
-	{
-		float Position[3];
-	} Vertices[] =
-	{
-		{-1.0f,  1.0f, 0.0f},
-		{ 1.0f,  1.0f, 0.0f},
-		{-1.0f, -1.0f, 0.0f},
-		{ 1.0f, -1.0f, 0.0f}
-	};
+	D3DPERF_BeginEvent(0, L"DOF Pass");
 
 	GetDevice()->SetVertexDeclaration(VertexDeclaration);
 
@@ -299,139 +283,97 @@ void ZED3D9DOFProcessor::Process()
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
 	GetDevice()->SetVertexShader(VertexShaderCommon->GetVertexShader());
+	
+	ZED3D9Texture2D* Input = InputColorBuffer;
 
-	// Downsample the color buffer to 1/4 size
-	GetDevice()->SetPixelShader(PixelShaderDS2x->GetPixelShader());
+	// DownSample and blur
+	for (ZESize I = 0; I < BlurPassCount; ++I)
+	{
+		UpDownSampleBlur(Input, BlurBuffers[I+1]);
 
-	ZED3D9CommonTools::SetRenderTarget(0, ColorBufferDS2xBlur);
-	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputColorBuffer, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
+		Input = BlurBuffers[I + 1];
+	}
 
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)InputColorBuffer->GetWidth(), 1.0f / (float)InputColorBuffer->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
-
-	// Horizontal Blur Pass
-	GetDevice()->SetPixelShader(PixelShaderBlurH->GetPixelShader());
-
-	ZED3D9CommonTools::SetRenderTarget(0, ColorBufferDS2xTmp);
-	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)ColorBufferDS2xBlur, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
-
-	KernelData = HorizontalKernel->GetKernel();
-	Vector4Count = HorizontalKernel->GetKernelWindowSize();
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, (UINT)Vector4Count);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)ColorBufferDS2xBlur->GetWidth(), 1.0f / (float)ColorBufferDS2xBlur->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
-
-	// Vertical Blur Pass
-	GetDevice()->SetPixelShader(PixelShaderBlurV->GetPixelShader());
-
-	ZED3D9CommonTools::SetRenderTarget(0, ColorBufferDS2xBlur);
-	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)ColorBufferDS2xTmp, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
-
-	KernelData = VerticalKernel->GetKernel();
-	Vector4Count = VerticalKernel->GetKernelWindowSize();
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, (UINT)Vector4Count);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)ColorBufferDS2xTmp->GetWidth(), 1.0f / (float)ColorBufferDS2xTmp->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
-
-	// Horizontal Blur Pass
-	GetDevice()->SetPixelShader(PixelShaderBlurH->GetPixelShader());
-
-	ZED3D9CommonTools::SetRenderTarget(0, ColorBufferDS2xTmp);
-	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)ColorBufferDS2xBlur, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
-
-	KernelData = HorizontalKernel->GetKernel();
-	Vector4Count = HorizontalKernel->GetKernelWindowSize();
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, (UINT)Vector4Count);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)ColorBufferDS2xBlur->GetWidth(), 1.0f / (float)ColorBufferDS2xBlur->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
-
-	// Vertical Blur Pass
-	GetDevice()->SetPixelShader(PixelShaderBlurV->GetPixelShader());
-
-	ZED3D9CommonTools::SetRenderTarget(0, ColorBufferDS2xBlur);
-	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)ColorBufferDS2xTmp, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
-
-	KernelData = VerticalKernel->GetKernel();
-	Vector4Count = VerticalKernel->GetKernelWindowSize();
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, (UINT)Vector4Count);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)ColorBufferDS2xTmp->GetWidth(), 1.0f / (float)ColorBufferDS2xTmp->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
-
-
-	// Horizontal Blur Pass
-	GetDevice()->SetPixelShader(PixelShaderBlurH->GetPixelShader());
-
-	ZED3D9CommonTools::SetRenderTarget(0, ColorBufferDS2xTmp);
-	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)ColorBufferDS2xBlur, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
-
-	KernelData = HorizontalKernel->GetKernel();
-	Vector4Count = HorizontalKernel->GetKernelWindowSize();
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, (UINT)Vector4Count);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)ColorBufferDS2xBlur->GetWidth(), 1.0f / (float)ColorBufferDS2xBlur->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
-
-	// Vertical Blur Pass
-	GetDevice()->SetPixelShader(PixelShaderBlurV->GetPixelShader());
-
-	ZED3D9CommonTools::SetRenderTarget(0, ColorBufferDS2xBlur);
-	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)ColorBufferDS2xTmp, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
-
-	KernelData = VerticalKernel->GetKernel();
-	Vector4Count = VerticalKernel->GetKernelWindowSize();
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, (UINT)Vector4Count);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)ColorBufferDS2xTmp->GetWidth(), 1.0f / (float)ColorBufferDS2xTmp->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
-
+	// Upsample and blur
+	for (ZESize I = BlurPassCount; I > 0; --I)
+	{
+		UpDownSampleBlur(BlurBuffers[I], BlurBuffers[I - 1]);
+	}
 
 	// Switch to DOF shader
+	GetDevice()->SetVertexShader(VertexShaderCommon->GetVertexShader());
 	GetDevice()->SetPixelShader(PixelShaderDOF->GetPixelShader());
 
-	ZED3D9CommonTools::SetRenderTarget(0, (ZEViewPort*)OutputBuffer);
-	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputColorBuffer, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
-	ZED3D9CommonTools::SetTexture(1, (ZETexture2D*)InputDepthBuffer, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
-	ZED3D9CommonTools::SetTexture(2, (ZETexture2D*)ColorBufferDS2xBlur, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetRenderTarget(0, OutputBuffer);
+	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputColorBuffer, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetTexture(1, (ZETexture2D*)InputDepthBuffer, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetTexture(2, (ZETexture2D*)BlurBuffers[0], D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_MIRROR);
 
+	struct DOFParameters
+	{
+		float		NearClamp;
+		float		NearDistance;
+		float		FarClamp;
+		float		FarDistance;
+		float		FocusDistance;
+		float		FullFocusRange;
+		float		Reserved1;
+		float		Reserved2;
 
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(FocusDistance, 0, 0.0f, 0.0f), 1);
-	GetDevice()->SetPixelShaderConstantF(1, (const float*)&ZEVector4(NearDistance, 0, 0.0f, 0.0f), 1);
-	GetDevice()->SetPixelShaderConstantF(2, (const float*)&ZEVector4(FarDistance, 0, 0.0f, 0.0f), 1);
-	GetDevice()->SetPixelShaderConstantF(3, (const float*)&ZEVector4(NearClamp, 0, 0.0f, 0.0f), 1);
-	GetDevice()->SetPixelShaderConstantF(4, (const float*)&ZEVector4(FarClamp, 0, 0.0f, 0.0f), 1);
+	} Parameters;
 
+	Parameters.NearClamp = NearClamp;
+	Parameters.NearDistance = NearDistance;
+	Parameters.FarClamp = FarClamp;
+	Parameters.FarDistance = FarDistance;
+	Parameters.FocusDistance = FocusDistance;
+	Parameters.FullFocusRange = FullFocusRange;
 
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)InputColorBuffer->GetWidth(), 1.0f / (float)InputColorBuffer->GetHeight(), 0.0f, 0.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)&Parameters, sizeof(DOFParameters) / 16);
 
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(Vert));
+	ZEVector4 PixelSize = ZEVector4(1.0f / OutputBuffer->GetWidth(), 1.0f / OutputBuffer->GetHeight(), 0.0f, 0.0f);
+	GetDevice()->SetVertexShaderConstantF(0, PixelSize.M, 1);
 
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, (UINT)sizeof(ZEDOFScreenAlignedQuad));
+
+	D3DPERF_EndEvent();
 	zeProfilerEnd();
 }
 
+ZEDOFScreenAlignedQuad ZED3D9DOFProcessor::Vertices[] =
+{
+	{-1.0f,  1.0f, 0.0f},
+	{ 1.0f,  1.0f, 0.0f},
+	{-1.0f, -1.0f, 0.0f},
+	{ 1.0f, -1.0f, 0.0f}
+};
+
 ZED3D9DOFProcessor::ZED3D9DOFProcessor()
 {
-	FocusDistance		= 20.0f;
-	FarDistance			= 60.0f;
-	NearDistance		= 3.0f;
-	FarClamp			= 0.6f;
-	NearClamp			= 0.8f;
+	BlurPassCount		= 3;
 
-
+	FocusDistance		= 40.0f;
+	FullFocusRange		= 5.0f;
+	FarDistance			= 80.0f;
+	NearDistance		= 1.0f;
+	FarClamp			= 1.0f;
+	NearClamp			= 1.0f;
+	
 	Renderer			= NULL;
 	VertexDeclaration	= NULL;
 	VertexShaderCommon	= NULL;
 	PixelShaderDOF		= NULL;
 	PixelShaderDOF		= NULL;
-	PixelShaderDS2x		= NULL;
-	PixelShaderBlurH	= NULL;
-	PixelShaderBlurV	= NULL;
-	ColorBufferDS2xBlur	= NULL;
-	ColorBufferDS2xTmp	= NULL;
-
-	HorizontalKernel	= NULL;
-	VerticalKernel		= NULL;
+	PixelShaderUsDsBlur	= NULL;
 
 	InputColorBuffer	= NULL;
 	InputDepthBuffer	= NULL;
 	OutputBuffer		= NULL;
+
+	for (ZESize I = 0; I < 9; ++I)
+	{
+		BlurBuffers[I] = NULL;
+	}
 }
 
 ZED3D9DOFProcessor::~ZED3D9DOFProcessor()

@@ -52,7 +52,6 @@ class ZED3D9SkyDomeMaterial : public ZESkyDomeMaterial, public ZED3D9ComponentBa
 	protected:
 		ZED3D9VertexShader*			VertexShader;
 		ZED3D9PixelShader*			PixelShader;
-
 		
 		void						CreateShaders();
 		void						ReleaseShaders();
@@ -61,7 +60,7 @@ class ZED3D9SkyDomeMaterial : public ZESkyDomeMaterial, public ZED3D9ComponentBa
 	public:
 									ZED3D9SkyDomeMaterial();
 		virtual						~ZED3D9SkyDomeMaterial();
-
+		
 		virtual bool				SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
 		virtual void				UpdateMaterial();
 		virtual void				Release();

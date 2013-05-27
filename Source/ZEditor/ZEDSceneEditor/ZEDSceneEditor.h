@@ -52,8 +52,9 @@
 #include "ZEDSelectionItem.h"
 #include "ZEDSelectionItemPlugin.h"
 #include "ZEDSceneList.h"
-#include "ZEDCommonEntities/ZEDGrid.h"
 #include <ZEModel/ZEModel.h>
+
+class ZEGrid;
 
 using namespace Qt;
 
@@ -79,7 +80,7 @@ class MapEditor : public QMainWindow
 		ZEDSceneList*				SceneList;
 		ZEDUndoRedoManagerOld		UndoRedoManager;
 		ZEDLoadingScreen*			SplashScreen;
-		ZEDGrid*					Grid;
+		ZEGrid*						Grid;
 
 		ZEDSelectionItem*			CreateSelectionItem(ZEEntity* Entity);
 		void						MakeConnections();
@@ -127,12 +128,6 @@ class MapEditor : public QMainWindow
 		void						SelectionsLoop();
 		void						UpdateCamPos();
 
-		//Vegetation
-
-		void						GenerateRandomTree();
-		void						GenerateRandomBush();
-		void						GenerateRandomFlowers();
-
 	public slots:
 
 		void						ConsoleInput();
@@ -146,10 +141,6 @@ class MapEditor : public QMainWindow
 		void						BackupSave();
 
 	public:
-
-		ZEArray<ZEModelResource*>			Trees;
-		ZEArray<ZEModelResource*>			Bushes;
-		ZEArray<ZEModelResource*>			Flowers;
 
 		QString								CurrentFileName;
 		QString								WorkingDirectory;
@@ -171,10 +162,6 @@ class MapEditor : public QMainWindow
 		ZEArray<ZEDSelectionItem*>			SelectedItems;
 //		ZEArray<ZEDPlugin*>					PlugIns;
 		Ui::MapEditorClass*					ui;
-
-		void								LoadTrees();
-		void								LoadBushes();
-		void								LoadFlowers();
 
 											MapEditor(QWidget *parent = 0, WFlags flags = 0);
 											~MapEditor();

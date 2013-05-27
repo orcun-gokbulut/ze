@@ -50,10 +50,6 @@ class ZESkyDomeMaterial : public ZEMaterial
 	protected:
 		float						G;						// Scattering Symmetry input for phase function 
 
-		float						AmbientFactor;			// Ambient Factor to use with ambient color
-		ZEVector3					MiddayAmbientColor;		// Ambient color to add to dark areas in the daylight
-		ZEVector3					SunsetAmbientColor;		// Ambient color to add to light areas at sunset
-
 		float						MieConstant;			// Mie scattering constant
 		float						RayleighConstant;		// Rayleigh scattering constant
 
@@ -82,5 +78,4 @@ class ZESkyDomeMaterial : public ZEMaterial
 
 };
 
-
-#endif // __ZE_SKY_DOME_MATERIAL_H__
+#endif

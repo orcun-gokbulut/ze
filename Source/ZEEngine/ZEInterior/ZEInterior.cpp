@@ -46,6 +46,7 @@
 #include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
+#include "ZEGame/ZEEntityProvider.h"
 
 ZE_OBJECT_IMPL(ZEInterior)
 
@@ -54,66 +55,59 @@ ZEDrawFlags ZEInterior::GetDrawFlags() const
 	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
-void ZEInterior::LoadInteriorResource(ZEInteriorResource* NewResource)
+void ZEInterior::LoadInteriorResource()
 {
-	if (Resource != NULL)
-	{
-		Resource->Release();
-		Resource = NULL;
-	}
+	for (ZESize I = 0; I < Rooms.GetCount(); I++)
+		Rooms[I]->Deinitialize();
 
-	if (NewResource == NULL)
-	{
-		for (ZESize I = 0; I < Rooms.GetCount(); I++)
-			Rooms[I]->Deinitialize();
+	Rooms.SetCount(0);
 
-		Rooms.SetCount(0);
+	for (ZESize I = 0; I < Doors.GetCount(); I++)
+		Doors[I]->Deinitialize();
 
-		for (ZESize I = 0; I < Doors.GetCount(); I++)
-			Doors[I]->Deinitialize();
+	Doors.SetCount(0);
 
-		Doors.SetCount(0);
+	for (ZESize I = 0; I < Helpers.GetCount(); I++)
+		Helpers[I]->Deinitialize();
 
-		for (ZESize I = 0; I < Helpers.GetCount(); I++)
-			Helpers[I]->Deinitialize();
+	Helpers.SetCount(0);
 
-		Helpers.SetCount(0);
-	}
+	if (InteriorResource == NULL)
+		return;
 
-	this->Resource = NewResource;
-
-	Rooms.SetCount(Resource->GetRooms().GetCount());
+	Rooms.SetCount(InteriorResource->GetRooms().GetCount());
 	for (ZESize I = 0; I < Rooms.GetCount(); I++)
 	{
 		Rooms[I] = ZEInteriorRoom::CreateInstance();
-		Rooms[I]->Initialize(this, (ZEInteriorResourceRoom*)&Resource->GetRooms()[I]);
+		Rooms[I]->Initialize(this, (ZEInteriorResourceRoom*)&InteriorResource->GetRooms()[I]);
 	}
 
-	Doors.SetCount(Resource->GetDoors().GetCount());
+	Doors.SetCount(InteriorResource->GetDoors().GetCount());
 	for (ZESize I = 0; I < Doors.GetCount(); I++)
 	{
 		Doors[I] = ZEInteriorDoor::CreateInstance();
-		Doors[I]->Initialize(this, &Resource->GetDoors()[I]);
+		Doors[I]->Initialize(this, &InteriorResource->GetDoors()[I]);
 	}
 
-	Helpers.SetCount(Resource->GetHelpers().GetCount());
+	Helpers.SetCount(InteriorResource->GetHelpers().GetCount());
 	for (ZESize I = 0; I < Helpers.GetCount(); I++)
 	{
 		Helpers[I] = ZEInteriorHelper::CreateInstance();
-		Helpers[I]->Initialize(this, &Resource->GetHelpers()[I]);
+		Helpers[I]->Initialize(this, &InteriorResource->GetHelpers()[I]);
 	}
 }
 
 ZEInterior::ZEInterior()
 {
-	Resource = NULL;
+	InteriorResource = NULL;
 	CullMode = ZE_ICM_FULL;
 	memset(&Statistics, 0, sizeof(ZEInteriorStatistics));
 }
 
 ZEInterior::~ZEInterior()
 {
-
+	if (InteriorResource != NULL)
+		((ZEInteriorResource*)InteriorResource)->Release();
 }
 
 const ZEArray<ZEInteriorRoom*>& ZEInterior::GetRooms()
@@ -167,60 +161,53 @@ bool ZEInterior::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	if (InteriorFile != "")
-	{
-		ZEInteriorResource* NewResource = ZEInteriorResource::LoadSharedResource(ZEString("Resources\\") + InteriorFile);
-		if (NewResource != NULL)
-			LoadInteriorResource(NewResource);
-		else
-		{
-			zeError("Can not load ZEInterior file.");
-			return false;
-		}
-	}
+	LoadInteriorResource();
 
 	return true;
 }
 
 bool ZEInterior::DeinitializeSelf()
 {
-	if (Resource != NULL)
-	{
-		Resource->Release();
-		Resource = NULL;
-	}
-
 	return ZEEntity::DeinitializeSelf();
 }
 
-bool ZEInterior::SetInteriorFile(const ZEString& FileName)
+void ZEInterior::SetInteriorFile(const char* InteriorFile)
 {
-	InteriorFile = FileName;
+	ZEInteriorResource* InteriorResource = ZEInteriorResource::LoadSharedResource(InteriorFile);
 
-	if (!IsInitialized())
+	if (InteriorResource == NULL)
 	{
-		InteriorFile = FileName;
-		return true;
+		zeError("Can not load interior file. File Name : \"%s\"", InteriorFile);
+		return;
 	}
 
-	const ZEInteriorResource* NewResource = ZEInteriorResource::LoadSharedResource(InteriorFile);
-	if (NewResource != NULL)
-	{
-		InteriorFile = FileName;
-		LoadInteriorResource(Resource);
-	}
-	else
-	{
-		zeError("Can not load ZEInterior file.");
-		return false;
-	}
-
-	return false;
+	SetInteriorResource(InteriorResource);
 }
 
-const ZEString& ZEInterior::GetInteriorFile() const
+const char* ZEInterior::GetInteriorFile() const
 {
-	return InteriorFile;
+	if (InteriorResource != NULL)
+		return InteriorResource->GetFileName();
+	else
+		return "";
+}
+
+void ZEInterior::SetInteriorResource(const ZEInteriorResource* InteriorResource)
+{
+	if (this->InteriorResource != NULL)
+		((ZEInteriorResource*)this->InteriorResource)->Release();
+
+	InteriorResource->AddReferance();
+
+	this->InteriorResource = InteriorResource;
+
+	if (IsInitialized())
+		LoadInteriorResource();
+}
+
+const ZEInteriorResource* ZEInterior::GetInteriorResource()
+{
+	return InteriorResource;
 }
 
 void ZEInterior::Draw(ZEDrawParameters* DrawParameters)
@@ -252,39 +239,6 @@ void ZEInterior::Draw(ZEDrawParameters* DrawParameters)
 		DrawParameters->Statistics.InteriorStatistics.CulledInteriorPolygonCount += Statistics.CulledInteriorPolygonCount;
 		DrawParameters->Statistics.InteriorStatistics.DrawedInteriorPolygonCount += Statistics.DrawedInteriorPolygonCount;
 	}
-}
-
-bool ZEInterior::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT)
-{
-	if (Resource == NULL)
-		return false;
-
-	float T;
-	bool Found = false;
-	for (ZESize I = 0; I < Resource->GetRooms().GetCount(); I++)
-	{
-		const ZEInteriorResourceRoom* CurrentRoom = &Resource->GetRooms()[I];
-		//if (ZEAABBox::IntersectionTest(CurrentPortal->BoundingBox,Ray))
-		for (ZESize N = 0; N < CurrentRoom->Polygons.GetCount(); N++)
-		{
-			const ZEInteriorPolygon& MapPolygon = CurrentRoom->Polygons[N];
-			ZETriangle Triangle(MapPolygon.Vertices[0].Position, MapPolygon.Vertices[1].Position, MapPolygon.Vertices[2].Position);
-			if (ZETriangle::IntersectionTest(Triangle, Ray, T) && (!Found || MinT > T))
-			{
-				MinT = T;
-				ZERay::GetPointOn(Position, Ray, T);
-				ZETriangle::GetNormal(Triangle, Normal);
-				Found = true;
-			}
-		}
-	}
-
-	return Found;
-}
-
-ZEInteriorResource* ZEInterior::GetResource() const
-{
-	return Resource;
 }
 
 ZEInterior* ZEInterior::CreateInstance()
@@ -337,6 +291,7 @@ static void IntersectionTest(ZEVector3* IntersectedPoints, ZESize& IntersectedPo
 		CurrentResult = NextResult;
 	}
 }
+
 bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor* Door, const ZEViewVolume* OldViewVolume)
 {
 	ZERectangle3D DoorRectangle = Door->GetRectangle();
@@ -576,16 +531,7 @@ void ZEInterior::CullRooms(ZEDrawParameters* DrawParameters)
 void ZEInterior::OnTransformChanged()
 {
 	for (ZESize I = 0; I < Rooms.GetCount(); I++)
-	{
-		Rooms[I]->TransformChanged = true;
-
-		if (Rooms[I]->PhysicalMesh != NULL)
-		{
-			Rooms[I]->PhysicalMesh->SetPosition(GetWorldPosition() + Rooms[I]->Position);
-			Rooms[I]->PhysicalMesh->SetRotation(GetWorldRotation() * Rooms[I]->Rotation);
-			Rooms[I]->PhysicalMesh->SetScale(GetWorldScale() * Rooms[I]->Scale);
-		}
-	}
+		Rooms[I]->OnTransformChanged();
 
 	for (ZESize I = 0; I < Doors.GetCount(); I++)
 		Doors[I]->TransformChanged = true;
@@ -596,4 +542,21 @@ void ZEInterior::OnTransformChanged()
 void ZEInterior::SetCullMode(ZEInteriorCullMode Value)
 {
 	CullMode = Value;
+}
+
+bool ZEInterior::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	bool Result = false;
+	for (ZESize I = 0; I < Rooms.GetCount(); I++)
+		Result |= Rooms[I]->RayCast(Report, Parameters);
+	
+	if (Result)
+		Report.Entity = this;
+
+	return Result;
+}
+
+ZEInteriorCullMode ZEInterior::GetCullMode() const
+{
+	return CullMode;
 }

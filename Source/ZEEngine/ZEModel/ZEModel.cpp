@@ -51,21 +51,7 @@
 
 ZE_OBJECT_IMPL(ZEModel)
 
-//i'll remove this method
-void ZEModel::SetModelFile(ZEString ModelFile)
-{
-	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource(ModelFile);
-
-	if (ModelResource == NULL)
-	{
-		zeError("Can not load model file. File Name : \"%s\"", ModelFile);
-		return;
-	}
-
-	SetModelResource(ModelResource);
-}
-
-void ZEModel::CalculateBoundingBox()
+void ZEModel::CalculateBoundingBox() const
 {
 	if (Meshes.GetCount() == 0 && Bones.GetCount() == 0)
 	{
@@ -227,6 +213,19 @@ void ZEModel::LoadModelResource()
 	{
 		Helpers[I].Initialize(this, &ModelResource->GetHelpers()[I]);
 	}
+}
+
+void ZEModel::SetModelFile(ZEString ModelFile)
+{
+	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource(ModelFile);
+
+	if (ModelResource == NULL)
+	{
+		zeError("Can not load model file. File Name : \"%s\"", ModelFile.ToCString());
+		return;
+	}
+
+	SetModelResource(ModelResource);
 }
 
 void ZEModel::SetModelFile(const char* ModelFile)
@@ -406,7 +405,12 @@ bool ZEModel::GetAutoLOD()
 	return AutoLOD;
 }
 
-const ZEAABBox& ZEModel::GetWorldBoundingBox()
+void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
+{
+	BoundingBoxIsUserDefined = Value;
+}
+
+const ZEAABBox& ZEModel::GetWorldBoundingBox() const
 {
 	if (!BoundingBoxIsUserDefined)
 		CalculateBoundingBox();
@@ -613,13 +617,23 @@ bool ZEModel::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
+bool ZEModel::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	bool Result = false;
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
+		Result |= Meshes[I].RayCast(Report, Parameters);
+
+	for (ZESize I = 0; I < Bones.GetCount(); I++)
+		Result |= Bones[I].RayCast(Report, Parameters);
+	
+	if (Result)
+		Report.Entity = this;
+
+	return Result;
+}
+
 ZEModel* ZEModel::CreateInstance()
 {
 	return new ZEModel();
-}
-
-void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
-{
-	BoundingBoxIsUserDefined = Value;
 }
 

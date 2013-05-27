@@ -54,6 +54,9 @@ ZEDrawFlags ZESkyBrush::GetDrawFlags() const
 void ZESkyBrush::SetSkyBrightness(float Brightness)
 {
 	SkyBrightness = Brightness;
+
+	if (IsInitialized())
+		SkyMaterial->SetBrightness(Brightness);
 }
 
 float ZESkyBrush::GetSkyBrightness() const
@@ -64,6 +67,9 @@ float ZESkyBrush::GetSkyBrightness() const
 void ZESkyBrush::SetSkyColor(const ZEVector3& Color)
 {
 	SkyColor = Color;
+
+	if (IsInitialized())
+		SkyMaterial->SetColor(Color);
 }
 
 const ZEVector3& ZESkyBrush::GetSkyColor() const
@@ -79,7 +85,15 @@ void ZESkyBrush::SetSkyTexture(const char* FileName)
 		SkyTexture = NULL;
 	}
 
-	SkyTexture = ZETextureCubeResource::LoadResource(FileName, NULL);
+	ZETextureOptions Options;
+	Options.CompressionQuality = ZE_TCQ_HIGH;
+	Options.CompressionType = ZE_TCT_NONE;
+	Options.DownSample = ZE_TDS_NONE;
+	Options.FileCaching = ZE_TFC_DISABLED;
+	Options.MaximumMipmapLevel = 1;
+	Options.MipMapping = ZE_TMM_DISABLED;
+
+	SkyTexture = ZETextureCubeResource::LoadResource(FileName, &Options);
 	
 	if (SkyMaterial != NULL)
 		SkyMaterial->SetTexture(SkyTexture == NULL ? NULL : SkyTexture->GetTexture());

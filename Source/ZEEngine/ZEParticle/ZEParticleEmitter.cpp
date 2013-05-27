@@ -782,6 +782,8 @@ void ZEParticleEmitter::Draw(ZEDrawParameters* DrawParameters)
 
 	RenderCommand.VertexBuffer = VertexBuffer;
 	RenderCommand.Material = Material;
+	RenderCommand.Priority = 1000;
+	RenderCommand.Order = 1001.0f;
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }
 

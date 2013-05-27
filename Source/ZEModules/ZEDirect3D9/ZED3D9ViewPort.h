@@ -40,6 +40,10 @@
 #include "ZETypes.h"
 #include "ZEGraphics/ZEViewPort.h"
 
+
+#ifdef ZE_DEBUG_ENABLE
+#define D3D_DEBUG_INFO
+#endif
 #include <d3d9.h>
 
 class ZED3D9ViewPort : public ZEViewPort

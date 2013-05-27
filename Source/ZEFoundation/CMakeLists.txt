@@ -53,6 +53,7 @@ add_subdirectory(ZETask)
 add_subdirectory(ZESocket)
 add_subdirectory(ZEML)
 add_subdirectory(ZERegEx)
+add_subdirectory(ZEProtect)
 
 ze_add_source(ZEAutoExp.txt				Sources Headers)
 ze_add_source(ZEData.h 					Sources Headers)

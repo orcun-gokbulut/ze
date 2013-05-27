@@ -814,6 +814,15 @@ void ZEMatrix4x4::CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Positi
 	Matrix.M44 = 1.0f;
 }
 
+void ZEMatrix4x4::CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEVector3& Scale)
+{
+	Create(Matrix,
+		Scale.x, 0.0f, 0.0f, Position.x,
+		0.0f, Scale.y, 0.0f, Position.y,
+		0.0f, 0.0f, Scale.z, Position.z,
+		0.0f, 0.0f, 0.0f, 1.0f);
+}
+
 void ZEMatrix4x4::CreateTranslation(ZEMatrix4x4& Matrix, const ZEVector3& Position)
 {
 	Create(Matrix,
