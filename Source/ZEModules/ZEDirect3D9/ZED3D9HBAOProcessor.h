@@ -54,7 +54,6 @@ struct ZEHBAOScreenAlignedQuad
 };
 
 ZE_CLASS(ZED3D9HBAOProcessor)
-
 class ZED3D9HBAOProcessor : public ZED3D9ComponentBase, public ZEObject
 {
 	ZE_OBJECT
@@ -83,6 +82,8 @@ class ZED3D9HBAOProcessor : public ZED3D9ComponentBase, public ZEObject
 
 		static ZEHBAOScreenAlignedQuad	Vertices[4];
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+
+		bool							Enabled;
 
 		float							OcclusionRadius;
 		float							RadiusMultiplier;
@@ -113,6 +114,9 @@ class ZED3D9HBAOProcessor : public ZED3D9ComponentBase, public ZEObject
 		void							BiliteralFilterHorizontal(const ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
 
 	public:
+		void							SetEnabled(bool Value);
+		bool							GetEnabled() const;
+
 		void							SetOcclusionRadius(float Value);
 		float							GetOcclusionRadius() const;
 
@@ -163,5 +167,6 @@ class ZED3D9HBAOProcessor : public ZED3D9ComponentBase, public ZEObject
 										ZED3D9HBAOProcessor();
 										~ZED3D9HBAOProcessor();
 };
+
 
 #endif

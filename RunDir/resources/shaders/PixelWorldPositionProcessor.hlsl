@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - LBuffer.hlsl
+ Zinek Engine - PixelWorldPositionProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,27 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sampler2D LBuffer1 : register(s3);
+#ifndef __ZE_PIXEL_WORLD_POSITION_PROCESSOR_HLSL__
+#define __ZE_PIXEL_WORLD_POSITION_PROCESSOR_HLSL__
 
-struct ZELBuffer
+#include	"GBuffer.hlsl"
+
+float2		SampleCoord				: register(c0);
+
+struct VSInput
 {
-	float4 DiffuseSpecular : COLOR0;
+	float3 Position		: POSITION0;
+	float2 TexCoord		: TEXCOORD0;
 };
 
-void ZELBuffer_SetDiffuse(inout ZELBuffer LBuffer, float3 Diffuse)
+float4 VSMain(VSInput Input) : POSITION0
 {
-	LBuffer.DiffuseSpecular.xyz = Diffuse;
+	return float4(sign(Input.Position).xyz, 1.0f);
 }
 
-float3 ZELBuffer_GetDiffuse(float2 Texcoord)
+float4 PSMain() : COLOR0
 {
-	return tex2D(LBuffer1, Texcoord).rgb;	
+	return ZEGBuffer_GetDepth(SampleCoord).xxxx;
 }
 
-void ZELBuffer_SetSpecular(inout ZELBuffer LBuffer, float Specular)
-{
-	LBuffer.DiffuseSpecular.a = Specular;
-}
-
-float3 ZELBuffer_GetSpecular(float2 Texcoord)
-{
-	float4 Sample = tex2D(LBuffer1, Texcoord);
-	return max(normalize(Sample.rgb) * Sample.a, 0.0f);
-}
-
-float ZELBuffer_GetLuminance(float3 Color)
-{
-	return dot(Color, float3(0.299f, 0.587f, 0.114f));
-}
+#endif

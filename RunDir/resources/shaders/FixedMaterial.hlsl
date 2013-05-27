@@ -137,15 +137,14 @@ ZEFixedMaterial_GBuffer_VSOutput ZEFixedMaterial_GBuffer_VertexShader(ZEFixedMat
 	if (EnableSkin)
 		SkinTransform(Input);
 
-	// Pipeline 
 	Output.Position_ = mul(WorldViewProjMatrix, Input.Position);
 	
 	Output.Position = mul(WorldViewMatrix, Input.Position).xyz;
-	Output.Normal.xyz = mul(WorldViewInvTrpsMatrix, Input.Normal).xyz;
+	Output.Normal.xyz = mul((float3x3)WorldViewInvTrpsMatrix, Input.Normal).xyz;
 	
 	#if defined(ZE_SHADER_TANGENT_SPACE)
-		Output.Tangent = mul(WorldViewInvTrpsMatrix, Input.Tangent).xyz;
-		Output.Binormal = mul(WorldViewInvTrpsMatrix, Input.Binormal).xyz;
+		Output.Tangent = mul((float3x3)WorldViewInvTrpsMatrix, Input.Tangent).xyz;
+		Output.Binormal = mul((float3x3)WorldViewInvTrpsMatrix, Input.Binormal).xyz;
 	#endif
 	
 	Output.Texcoord = Input.Texcoord;
@@ -174,9 +173,6 @@ ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput In
 {
 	ZEGBuffer GBuffer = (ZEGBuffer)0;
 	
-	//GBDoParallax(Input);
-
-	
 	#ifdef ZE_SHADER_ALPHA_CULL
 		#ifdef ZE_SHADER_OPACITY_MAP
 			float Alpha = MaterialOpacity * tex2D(OpacityMap, Input.Texcoord).r;
@@ -192,13 +188,12 @@ ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput In
 			return GBuffer;
 		}
 	#endif
-	
 		
 	ZEGBuffer_SetViewPosition(GBuffer, Input.Position);
 
 	#if defined(ZE_SHADER_NORMAL_MAP)
-		float3 Normal = tex2D(NormalMap, Input.Texcoord) * 2.0f - 1.0f;
-		Normal = normalize(Normal.x * Input.Tangent + Normal.y * Input.Binormal + Normal.z * Input.Normal);
+		float3 NormalSample = tex2D(NormalMap, Input.Texcoord) * 2.0f - 1.0f;
+		float3 Normal = normalize(NormalSample.x * Input.Tangent + NormalSample.y * Input.Binormal + NormalSample.z * Input.Normal);
 		ZEGBuffer_SetViewNormal(GBuffer, Normal * Input.Side);	
 	#else
 		ZEGBuffer_SetViewNormal(GBuffer, Input.Normal * Input.Side);
@@ -249,11 +244,9 @@ ZEFixedMaterial_ForwardPass_VSOutput ZEFixedMaterial_ForwardPass_VertexShader(ZE
 {
 	ZEFixedMaterial_ForwardPass_VSOutput Output;
 
-
 	if (EnableSkin)
 		SkinTransform(Input);
 
-	// Pipeline 
 	Output.Position = mul(WorldViewProjMatrix, Input.Position);
 	Output.Texcoord = Input.Texcoord;
 	
@@ -313,7 +306,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		#elif defined(ZE_SHADER_OPACITY_BASE_ALPHA)
 				Output.Color.a = MaterialOpacity * tex2D(BaseMap, Input.Texcoord).a;
 		#else 
-			Ouput.Color.a = MaterialOpacity;
+			Output.Color.a = MaterialOpacity;
 		#endif
 	#endif
 	
@@ -327,7 +320,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	#ifdef ZE_SHADER_AMBIENT
 		float3 AmbientColor = MaterialAmbientColor;
 		//#ifdef ZE_SHADER_SSAO
-			//AmbientColor *= tex2D(SSAOBuffer, ScreenPosition).r;
+			AmbientColor *= tex2D(SSAOBuffer, ScreenPosition).r;
 		//#endif
 		Output.Color.rgb = AmbientColor;
 		#ifdef ZE_SHADER_LIGHT_MAP
@@ -338,6 +331,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	#ifdef ZE_SHADER_DIFFUSE
 		float3 DiffuseColor = MaterialDiffuseColor;
 		DiffuseColor *= ZELBuffer_GetDiffuse(ScreenPosition);
+		DiffuseColor *= tex2D(SSAOBuffer, ScreenPosition).r;
 		Output.Color.rgb += DiffuseColor;
 	#endif
 	
@@ -352,6 +346,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 
 	#ifdef ZE_SHADER_BASE_MAP
 		Output.Color.rgb *= tex2D(BaseMap, Input.Texcoord).rgb;
+		
 	#endif	
 	
 	#ifdef ZE_SHADER_EMMISIVE
