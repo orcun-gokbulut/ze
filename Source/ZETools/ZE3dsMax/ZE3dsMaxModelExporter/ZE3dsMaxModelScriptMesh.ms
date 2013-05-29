@@ -37,7 +37,7 @@ MeshAttributes = attributes ZEMeshAttributes
 		/* LAYOUT DEFINITION */
 		dropdownlist 			uiPhysicalBody_Type 						"Type:" 						items:#("None", "Rigid Body", "Deformable", "Cloth") 								enabled:(Mesh_LOD == 0)
 		checkbox				uiPhysicalBody_Enabled						"Enabled"																											enabled:(PhysicalBody_Type != 1 and Mesh_LOD == 0)
-		checkbox 				uiPhysicalBody_Kinematic 					"Kinematic Body"				align:#left																			enabled:(PhysicalBody_Type != 1 and Mesh_LOD == 0)
+		checkbox 				uiPhysicalBody_Kinematic 					"Kinematic Body"				align:#left	tooltip:"Indicates whether the body is Kinematic or Dynamic actor."		enabled:(PhysicalBody_Type != 1 and Mesh_LOD == 0)
 		label					uiPhysicalBody_CenterOfMass_Label			"Center Of Mass:"				align:#left																			enabled:(PhysicalBody_Type != 1 and Mesh_LOD == 0)
 		pickbutton				uiPhysicalBody_CenterOfMass					"Pick"							type:#node  across:2 filter:PointHelper_Filter autoDisplay:true						enabled:(PhysicalBody_Type != 1 and Mesh_LOD == 0)
 		button					uiPhysicalBody_CenterOfMass_Clear			"Clear"																												enabled:(PhysicalBody_Type != 1 and Mesh_LOD == 0)
