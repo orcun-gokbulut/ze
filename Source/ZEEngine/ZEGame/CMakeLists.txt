@@ -85,6 +85,9 @@ ze_add_source(ZEWeather.cpp				Sources)
 ze_add_source(ZEWeather.h				Sources Headers ZEPP)
 ze_add_source(ZESea.cpp					Sources)
 ze_add_source(ZESea.h					Sources Headers ZEPP)
+ze_add_source(ZEFoliage.cpp				Sources)
+ze_add_source(ZEFoliage.h				Sources Headers ZEPP)
+
 
 ze_add_library(ZEGame 
 	SOURCES ${Sources}
