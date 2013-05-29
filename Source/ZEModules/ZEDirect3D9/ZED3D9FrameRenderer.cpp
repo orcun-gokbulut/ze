@@ -646,15 +646,6 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 	D3DPERF_EndEvent();
 	zeProfilerEnd();
 	
-	// Clear ssao buffer
-	GetDevice()->SetRenderTarget(0, SSAOBuffer->ViewPort.FrameBuffer);
-	GetDevice()->SetRenderTarget(1, NULL);
-	GetDevice()->SetRenderTarget(2, NULL);
-	GetDevice()->SetRenderTarget(3, NULL);
-	GetDevice()->SetRenderTarget(4, NULL);
-
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0xFFFFFFFF, 1.0f, 0x00);
-
 	D3DPERF_BeginEvent(0, L"SSAO Pass");
 	
 	SSAOProcessor.SetInputDepth(GBuffer1);
