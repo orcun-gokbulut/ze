@@ -40,6 +40,7 @@
 #include "ZEMath\ZEAngle.h"
 #include "ZEEntityProvider.h"
 #include "ZEScene.h"
+#include "ZEInterior\ZEInterior.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEFoliage);
 
@@ -98,13 +99,13 @@ ZEFoliage::~ZEFoliage()
 
 void ZEFoliage::SetSurfaceEntityName(const char* EntityName)
 {
-	ZEArray<ZEEntity*>& Entities = ZEScene::GetInstance()->GetEntities(ZEModel::Description());
+	ZEArray<ZEEntity*>& Entities = ZEScene::GetInstance()->GetEntities(ZEInterior::Description());
 
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{
 		if (Entities[I]->GetName() == EntityName)
 		{
-			SetGround((ZEModel*)Entities[I]);
+			SetGround((ZEInterior*)Entities[I]);
 			break;
 		}
 	}
@@ -142,12 +143,12 @@ float ZEFoliage::GetBrushDensity() const
 	return BrushDensity;
 }
 
-void ZEFoliage::SetGround(ZEModel* Ground)
+void ZEFoliage::SetGround(ZEInterior* Ground)
 {
 	this->Ground = Ground;
 }
 
-ZEModel* ZEFoliage::GetGround() const
+ZEInterior* ZEFoliage::GetGround() const
 {
 	return Ground;
 }
