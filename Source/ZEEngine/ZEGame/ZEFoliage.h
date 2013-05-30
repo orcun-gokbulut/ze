@@ -81,7 +81,7 @@ public:
 	}
 };
 
-class ZEModel;
+class ZEInterior;
 class ZEModelResource;
 
 ZE_META_ENTITY_DESCRIPTION(ZEFoliage);
@@ -96,7 +96,7 @@ class ZEFoliage : public ZEEntity
 		float						MinScale;
 		float						MaxScale;
 
-		ZEModel*					Ground;
+		ZEInterior*					Ground;
 
 // 		ZEModelResource*			Tree1;
 // 		ZEModelResource*			Tree2;
@@ -130,8 +130,8 @@ class ZEFoliage : public ZEEntity
 		void						SetMaxScale(float MaxScale);
 		float						GetMaxScale() const;
 
-		void						SetGround(ZEModel* Ground);
-		ZEModel*					GetGround() const;
+		void						SetGround(ZEInterior* Ground);
+		ZEInterior*					GetGround() const;
 
 		virtual void				Tile();
 		virtual void				Realign();
