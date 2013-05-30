@@ -42,6 +42,7 @@
 #include "ZESceneCuller.h"
 #include "ZETypes.h"
 #include "ZEDrawParameters.h"
+#include "ZERayCast.h"
 
 class ZEViewVolume;
 class ZEBoundingBox;
@@ -123,6 +124,7 @@ class ZEScene
 
 		void									Tick(float ElapsedTime);
 		void									Render(float ElapsedTime);
+		bool									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		void									SetAmbientFactor(float Factor);
 		float									GetAmbientFactor() const;
