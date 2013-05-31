@@ -36,6 +36,15 @@
 #include "ZEDS/ZEString.h"
 #include "ZETypes.h"
 
+struct ZECrashReportSenderProgressInformation
+{
+	double TotalDownloadSize;
+	double DownloadedSize;
+	double TotalUploadSize;
+	double UploadedSize;
+};
+
+
 class ZECrashReportSender
 {
 	private:
@@ -47,6 +56,8 @@ class ZECrashReportSender
 
 		ZESize			FileSize;
 		ZESize			TransferedDataSize;
+
+		ZECrashReportSenderProgressInformation			ProgressInformation;
 	
 	public:
 		void			SetFileName(const char* FileName);

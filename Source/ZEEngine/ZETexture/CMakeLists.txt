@@ -141,17 +141,6 @@ ze_add_source(ZEPixel.h									Sources Headers)
 ze_add_source(ZETextureTestUtils.cpp					Sources)
 ze_add_source(ZETextureTestUtils.h						Sources Headers)
 
-ze_add_source(ZEDecompressor.cpp						Sources)
-ze_add_source(ZEDecompressor.h							Sources)
-ze_add_source(ZEDecompressorLZW.cpp						Sources)
-ze_add_source(ZEDecompressorLZW.h						Sources)
-ze_add_source(ZEDecompressorDeflate.cpp					Sources)
-ze_add_source(ZEDecompressorDeflate.h					Sources)
-ze_add_source(ZEDecompressorTGARLE.cpp					Sources)
-ze_add_source(ZEDecompressorTGARLE.h					Sources)
-ze_add_source(ZEDecompressorBMPRLE.cpp					Sources)
-ze_add_source(ZEDecompressorBMPRLE.h					Sources)
-
 ze_add_library(ZETexture 
 	SOURCES ${Sources}
 	HEADERS ${Headers}

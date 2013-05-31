@@ -48,7 +48,10 @@ class ZECrashReportFileProvider : public ZECrashReportProvider
 		ZESSize								Size;
 		void*								File;
 
+		bool								Binary;
 	public:
+		virtual ZECrashReportProviderType	GetProviderType();
+
 		virtual const char*					GetName();
 		void								SetName(const char* Name);
 
@@ -57,6 +60,9 @@ class ZECrashReportFileProvider : public ZECrashReportProvider
 
 		void								SetDeleteOnExit(bool Delete);
 		bool								GetDeleteOnExit();
+
+		void								SetBinary(bool Binary);
+		bool								isBinary();
 
 		virtual ZESize						GetSize();
 		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size);

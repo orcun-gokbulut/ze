@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZECrashReportProvider.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,38 +30,29 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PROVIDER_H__
-#define __ZE_PROVIDER_H__
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZETypes.h"
+ze_add_source(ZECompressor.cpp							Sources)
+ze_add_source(ZECompressor.h							Sources)
+ze_add_source(ZEDecompressor.cpp						Sources)
+ze_add_source(ZEDecompressor.h							Sources)
+ze_add_source(ZEDecompressorLZW.cpp						Sources)
+ze_add_source(ZEDecompressorLZW.h						Sources)
+ze_add_source(ZEDecompressorDeflate.cpp					Sources)
+ze_add_source(ZEDecompressorDeflate.h					Sources)
+ze_add_source(ZEDecompressorTGARLE.cpp					Sources)
+ze_add_source(ZEDecompressorTGARLE.h					Sources)
+ze_add_source(ZEDecompressorBMPRLE.cpp					Sources)
+ze_add_source(ZEDecompressorBMPRLE.h					Sources)
+ze_add_source(ZECompressorZLIB.h						Sources)
+ze_add_source(ZECompressorZLIB.cpp						Sources)
+ze_add_source(ZEDecompressorZLIB.h						Sources)
+ze_add_source(ZEDecompressorZLIB.cpp					Sources)
 
-enum ZECrashReportProviderType
-{
-	ZE_CRPT_FILE,
-	ZE_CRPT_SYSTEM_INFORMATION,
-	ZE_CRPT_APPLICATION_INFORMATION,
-	ZE_CRPT_USER_COMMENT,
-	ZE_CRPT_OTHER
-};
-
-class ZECrashReportProvider
-{		
-	public:
-		virtual ZECrashReportProviderType	GetProviderType() = 0;
-
-		virtual const char*					GetName() = 0;
-
-		virtual ZESize						GetSize() = 0;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) = 0;
-
-		virtual bool						Generate();
-		virtual void						CleanUp();
-
-		virtual								~ZECrashReportProvider();
-};
-
-#endif
+ze_add_library(ZECompression
+	SOURCES ${Sources} 
+	HEADERS ${Headers}
+	LIBS ZEFoundation libZLib)

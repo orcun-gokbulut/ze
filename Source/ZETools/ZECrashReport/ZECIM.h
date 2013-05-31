@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashReportProvider.h
+ Zinek Engine - ZECIM.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PROVIDER_H__
-#define __ZE_PROVIDER_H__
+#include "ZEDS/ZEString.h"
 
-#include "ZETypes.h"
-
-enum ZECrashReportProviderType
+class ZECIM
 {
-	ZE_CRPT_FILE,
-	ZE_CRPT_SYSTEM_INFORMATION,
-	ZE_CRPT_APPLICATION_INFORMATION,
-	ZE_CRPT_USER_COMMENT,
-	ZE_CRPT_OTHER
-};
-
-class ZECrashReportProvider
-{		
 	public:
-		virtual ZECrashReportProviderType	GetProviderType() = 0;
-
-		virtual const char*					GetName() = 0;
-
-		virtual ZESize						GetSize() = 0;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) = 0;
-
-		virtual bool						Generate();
-		virtual void						CleanUp();
-
-		virtual								~ZECrashReportProvider();
+		static bool				Initialize();
+		static void				DeInitialize();
+		static bool				ExecuteQuery(ZEString& Output, const ZEString& NameSpace, const ZEString& Language, const ZEString& Query);
 };
-
-#endif

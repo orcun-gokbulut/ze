@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashReportProvider.h
+ Zinek Engine - ZECompressorZLIB.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,34 +34,27 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PROVIDER_H__
-#define __ZE_PROVIDER_H__
 
-#include "ZETypes.h"
+#ifndef __ZE_COMPRESSORZLIB_H__
+#define __ZE_COMPRESSORZLIB_H__
 
-enum ZECrashReportProviderType
+#include "ZECompressor.h"
+#include "ZEFile\ZEFile.h"
+#include "zlib.h"
+
+class ZECompressorZLIB : public ZECompressor
 {
-	ZE_CRPT_FILE,
-	ZE_CRPT_SYSTEM_INFORMATION,
-	ZE_CRPT_APPLICATION_INFORMATION,
-	ZE_CRPT_USER_COMMENT,
-	ZE_CRPT_OTHER
-};
+	protected:
+		z_stream				ZStream;
+		ZEInt					ZLevel;
+		bool					Eos;
 
-class ZECrashReportProvider
-{		
 	public:
-		virtual ZECrashReportProviderType	GetProviderType() = 0;
+		void					SetEos(bool Eos);
+		void					Initialize();
+		void					Compress();
+		void					Reset();
 
-		virtual const char*					GetName() = 0;
-
-		virtual ZESize						GetSize() = 0;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) = 0;
-
-		virtual bool						Generate();
-		virtual void						CleanUp();
-
-		virtual								~ZECrashReportProvider();
 };
 
 #endif

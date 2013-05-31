@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashReportProvider.h
+ Zinek Engine - ZECompressor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,34 +34,51 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PROVIDER_H__
-#define __ZE_PROVIDER_H__
 
+#ifndef __ZE_COMPRESSOR_H__
+#define __ZE_COMPRESSOR_H__
 #include "ZETypes.h"
 
-enum ZECrashReportProviderType
+enum ZECompressorState
 {
-	ZE_CRPT_FILE,
-	ZE_CRPT_SYSTEM_INFORMATION,
-	ZE_CRPT_APPLICATION_INFORMATION,
-	ZE_CRPT_USER_COMMENT,
-	ZE_CRPT_OTHER
+	ZE_CS_NONE,
+	ZE_CS_OUTPUT_FULL,	
+	ZE_CS_INPUT_PROCESSED,
+	ZE_CS_ERROR,
+	ZE_CS_DONE
 };
 
-class ZECrashReportProvider
-{		
-	public:
-		virtual ZECrashReportProviderType	GetProviderType() = 0;
+class ZECompressor
+{
+	protected:		
+		void*					Input;
+		ZESize					InputSize;
 
-		virtual const char*					GetName() = 0;
+		void *					Output;
+		ZESize					OutputSize;
 
-		virtual ZESize						GetSize() = 0;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) = 0;
+		ZECompressorState		State;
+	
+	public:		
+		ZECompressorState		GetState();
 
-		virtual bool						Generate();
-		virtual void						CleanUp();
+		virtual void			SetInput(void* Buffer);
+		void*					GetInput();
 
-		virtual								~ZECrashReportProvider();
+		void					SetInputSize(ZESize Size);
+		ZESize					GetInputSize();
+
+		virtual void			SetOutput(void* Buffer);
+		void*					GetOutput();
+
+		void					SetOutputSize(ZESize Size);
+		ZESize					GetOutputSize();
+
+		virtual void			Compress() = 0;
+		virtual void			Reset() = 0;
+
+								ZECompressor();
+								~ZECompressor();
 };
 
 #endif

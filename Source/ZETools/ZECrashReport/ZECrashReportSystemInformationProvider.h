@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashReportProvider.h
+ Zinek Engine - ZECrashReportSystemInformationProvider.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,24 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PROVIDER_H__
-#define __ZE_PROVIDER_H__
+#include "ZECrashReportProvider.h"
+#include "ZEDS/ZEString.h"
 
-#include "ZETypes.h"
 
-enum ZECrashReportProviderType
+class ZECrashReportSystemInformationProvider : public ZECrashReportProvider
 {
-	ZE_CRPT_FILE,
-	ZE_CRPT_SYSTEM_INFORMATION,
-	ZE_CRPT_APPLICATION_INFORMATION,
-	ZE_CRPT_USER_COMMENT,
-	ZE_CRPT_OTHER
-};
+	private:
+		ZEString							Data;
+		ZESize								DataSize;
 
-class ZECrashReportProvider
-{		
 	public:
-		virtual ZECrashReportProviderType	GetProviderType() = 0;
+		virtual ZECrashReportProviderType	GetProviderType();
 
-		virtual const char*					GetName() = 0;
-
-		virtual ZESize						GetSize() = 0;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) = 0;
-
+		virtual const char*					GetName();
+		
+		virtual ZESize						GetSize();
+		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size);
+		
 		virtual bool						Generate();
-		virtual void						CleanUp();
-
-		virtual								~ZECrashReportProvider();
+											ZECrashReportSystemInformationProvider();
 };
-
-#endif

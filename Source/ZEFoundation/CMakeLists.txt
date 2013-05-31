@@ -53,6 +53,7 @@ add_subdirectory(ZETask)
 add_subdirectory(ZESocket)
 add_subdirectory(ZEML)
 add_subdirectory(ZERegEx)
+add_subdirectory(ZECompression)
 add_subdirectory(ZEProtect)
 
 ze_add_source(ZEAutoExp.txt				Sources Headers)
@@ -85,8 +86,11 @@ ze_add_source(ZETimeCounter.h			Headers)
 ze_add_source(ZETimeCounter.cpp			Sources)
 ze_add_source(ZETimeCounterTests.cpp	Tests)
 
+#ze_add_source(ZEBase64.h				Sources Headers)
+#ze_add_source(ZEBase64.cpp				Sources)
+
 ze_add_library(ZEFoundation
-	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket ZEML ZERegEx
+	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket ZEML ZERegEx ZECompression
 	COMBINE
 	SOURCES ${Sources} 
 	HEADERS ${Headers})
