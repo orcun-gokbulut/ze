@@ -40,6 +40,22 @@
 static size_t ReadFunction(void* Ouput, size_t Size, size_t Count, void* File)
 {
 	return fread(Ouput, Size, Count, (FILE*)File);
+	double* UploadSpeed;	
+	//curl_easy_getinfo((CURL*)Curl, CURLINFO_SPEED_UPLOAD, UploadSpeed);
+}
+
+int ProgressFunction(void* Output, double TotalDownloadSize, double Downloaded, double TotalUploadSize, double Uploaded)
+{
+	ZECrashReportSenderProgressInformation* TempInfo = (ZECrashReportSenderProgressInformation*)Output;
+	TempInfo->TotalDownloadSize = TotalDownloadSize;
+	TempInfo->DownloadedSize = Downloaded;
+	TempInfo->TotalUploadSize = TotalUploadSize;
+	TempInfo->UploadedSize = Uploaded;
+
+	double ProcessPercentage = Uploaded / TotalUploadSize;
+	ProcessPercentage *= 100;	
+	//ProcessPercentage = ProcessPercentage / TotalUploadSize;
+	return 0;
 }
 
 void ZECrashReportSender::SetFileName(const char* FileName)
@@ -85,22 +101,32 @@ bool ZECrashReportSender::OpenConnection()
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	Curl = curl_easy_init();
-	if(!Curl)
+	if (!Curl)
 		return false;
 
 	curl_easy_setopt((CURL*)Curl, CURLOPT_UPLOAD, 1L);
 	curl_easy_setopt((CURL*)Curl, CURLOPT_URL, UploadURL.ToCString());
-	curl_easy_setopt((CURL*)Curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)FileSize);
+	curl_easy_setopt((CURL*)Curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)FileSize);	
 	//curl_easy_setopt((CURL*)Curl, CURLOPT_CONNECT_ONLY, 1L);
 	curl_easy_setopt((CURL*)Curl, CURLOPT_READFUNCTION, ReadFunction);
 	curl_easy_setopt((CURL*)Curl, CURLOPT_READDATA, File);
+	curl_easy_setopt((CURL*)Curl, CURLOPT_PUT, 1L);
+	curl_easy_setopt((CURL*)Curl, CURLOPT_NOPROGRESS, 0L);
+	curl_easy_setopt((CURL*)Curl, CURLOPT_PROGRESSFUNCTION, ProgressFunction);
+	curl_easy_setopt((CURL*)Curl, CURLOPT_PROGRESSDATA, ProgressInformation);
 
 	CURLcode Result = curl_easy_perform(Curl);
 	if(Result != CURLE_OK)
+	{
+		fclose((FILE*)File);
 		return false;
-
-	TransferedDataSize = 0;
+	}	
 	
+	TransferedDataSize = 0;
+
+	curl_easy_cleanup((CURL*)Curl);
+	curl_global_cleanup();
+
 	return true;
 }
 

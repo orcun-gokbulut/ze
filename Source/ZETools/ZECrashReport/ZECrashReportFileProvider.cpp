@@ -44,6 +44,11 @@
 	#include <unistd.h>
 #endif
 
+ZECrashReportProviderType ZECrashReportFileProvider::GetProviderType()
+{
+	return ZE_CRPT_FILE;
+}
+
 const char*	ZECrashReportFileProvider::GetName()
 {
 	return Name;
@@ -72,6 +77,16 @@ void ZECrashReportFileProvider::SetDeleteOnExit(bool Delete)
 bool ZECrashReportFileProvider::GetDeleteOnExit()
 {
 	return DeleteOnExit;
+}
+
+void ZECrashReportFileProvider::SetBinary(bool Binary)
+{
+	this->Binary = Binary;
+}
+
+bool ZECrashReportFileProvider::isBinary()
+{
+	return Binary;
 }
 
 ZESize ZECrashReportFileProvider::GetSize()
@@ -120,4 +135,5 @@ void ZECrashReportFileProvider::CleanUp()
 ZECrashReportFileProvider::ZECrashReportFileProvider()
 {
 	DeleteOnExit = true;
+	Binary = false;
 }

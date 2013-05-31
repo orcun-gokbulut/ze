@@ -41,21 +41,21 @@ ze_add_source(ZECrashReportProvider.cpp								Sources)
 ze_add_source(ZECrashReportProvider.h								Sources)
 ze_add_source(ZECrashReportPackager.cpp								Sources)
 ze_add_source(ZECrashReportPackager.h								Sources)
-ze_add_source(ZECrashReportSender.cpp								Sources)
-ze_add_source(ZECrashReportSender.h								Sources)
-ze_add_source(ZECrashReportMain.cpp									Sources)
+ze_add_source(ZECrashReportSender.cpp 								Sources)
+ze_add_source(ZECrashReportSender.h									Sources)
 
-#ze_add_source(ZECrashReportApplicationInformationProvider.cpp		Sources)
-#ze_add_source(ZECrashReportApplicationInformationProvider.h			Sources)
-#ze_add_source(ZECrashReportSystemInformationProvider.cpp			Sources)
-#ze_add_source(ZECrashReportSystemInformationProvider.h				Sources)
+ze_add_source(ZECrashReportApplicationInformationProvider.cpp		Sources)
+ze_add_source(ZECrashReportApplicationInformationProvider.h			Sources)
+ze_add_source(ZECrashReportSystemInformationProvider.cpp			Sources)
+ze_add_source(ZECrashReportSystemInformationProvider.h				Sources)
+ze_add_source(ZECIM.h 												Sources)
+ze_add_source(ZECIM.cpp												Sources)
+
 ze_add_source(ZECrashReportFileProvider.cpp							Sources)
 ze_add_source(ZECrashReportFileProvider.h							Sources)
 ze_add_source(ZECrashReportUserCommentProvider.cpp					Sources)
 ze_add_source(ZECrashReportUserCommentProvider.h					Sources)
 
-
-ze_add_executable(ZECrashReport
-	CONSOLE
+ze_add_library(ZECrashReport		
 	SOURCES ${Sources}
 	LIBS ZEFoundation libCurl Ws2_32)

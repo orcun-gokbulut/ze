@@ -41,6 +41,11 @@
 
 #include <memory.h>
 
+ZECrashReportProviderType ZECrashReportUserCommentProvider::GetProviderType()
+{
+	return ZE_CRPT_USER_COMMENT;
+}
+
 const char* ZECrashReportUserCommentProvider::GetName()
 {
 	return "User Comments";
@@ -103,9 +108,9 @@ bool ZECrashReportUserCommentProvider::Generate()
 		"<ZECrashReport>\n"
 		"  <UserComments>\n"
 		"    <NameSurname>{0}</NameSurname>\n"
-		"    <EMail>{1}>\n"
+		"    <EMail>{1}</Email>\n"
 		"    <ContactBack>{2}</ContactBack>\n"
-		"    <Comments><[!CDATA[\n"
+		"    <Comments><![CDATA[\n"
 		"{3}\n"
 		"    ]]></Comments>\n"
 		"  </UserComments>\n"

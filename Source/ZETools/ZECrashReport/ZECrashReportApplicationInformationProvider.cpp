@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashReportProvider.h
+ Zinek Engine - ZECrashReportApplicationInformationProvider.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,63 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PROVIDER_H__
-#define __ZE_PROVIDER_H__
+#include "ZECrashReportApplicationInformationProvider.h"
+#include "ZECIM.h"
+#include "ZEDS/ZEFormat.h"
+#include <memory.h>
 
-#include "ZETypes.h"
+#include <Windows.h>
 
-enum ZECrashReportProviderType
+ZECrashReportProviderType ZECrashReportApplicationInformationProvider::GetProviderType()
 {
-	ZE_CRPT_FILE,
-	ZE_CRPT_SYSTEM_INFORMATION,
-	ZE_CRPT_APPLICATION_INFORMATION,
-	ZE_CRPT_USER_COMMENT,
-	ZE_CRPT_OTHER
-};
+	return ZE_CRPT_APPLICATION_INFORMATION;
+}
 
-class ZECrashReportProvider
-{		
-	public:
-		virtual ZECrashReportProviderType	GetProviderType() = 0;
+const char* ZECrashReportApplicationInformationProvider::GetName()
+{
+	return "Application Information";
+}
 
-		virtual const char*					GetName() = 0;
+ZESize ZECrashReportApplicationInformationProvider::GetSize()
+{
+	return DataSize;
+}
 
-		virtual ZESize						GetSize() = 0;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) = 0;
+bool ZECrashReportApplicationInformationProvider::GetData(void* Output, ZESize Offset, ZESize Size)
+{
+	memcpy(Output, Data.GetValue() + Offset, Size);
+	return true;
+}
 
-		virtual bool						Generate();
-		virtual void						CleanUp();
+bool ZECrashReportApplicationInformationProvider::Generate()
+{
+	if (!ZECIM::Initialize())
+		return false;
 
-		virtual								~ZECrashReportProvider();
-};
+	Data += "<ZECrashReport>\n";
+	Data += "<ApplicationInformation>\n";
 
-#endif
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Platform", ZE_PLATFORM);
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Compiler", ZE_PLATFORM_COMPILER);
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Endianness", ZE_PLATFORM_ENDIANNESS);	
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "VersionMajor", ZE_VERSION_MAJOR);
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "VersionMinor", ZE_VERSION_MINOR);
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "VersionBuild", ZE_VERSION_BUILD);
+
+	if(!ZECIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", ZEFormat::Format( "SELECT * FROM Win32_Process WHERE ProcessId = '{0}'", (ZEUInt32)GetCurrentProcessId())))
+		return false;
+	
+	ZECIM::DeInitialize();
+	
+	Data += "</ApplicationInformation>\n";
+	Data += "</ZECrashReport>\n";
+
+	DataSize = Data.GetSize();
+
+	return true;
+}
+
+ZECrashReportApplicationInformationProvider::ZECrashReportApplicationInformationProvider()
+{
+	DataSize = 0;
+}

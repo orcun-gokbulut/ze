@@ -38,38 +38,44 @@
 #include "ZECrashReportUserCommentProvider.h"
 #include "ZECrashReportPackager.h"
 #include "ZECrashReportSender.h"
+#include "ZECrashReportSystemInformationProvider.h"
+#include "ZECrashReportApplicationInformationProvider.h"
+#include "ZETypes.h"
 
 void main()
 {
+	
+}
+
+static void ZECrashReportMain(ZEString DumpFileName, ZEString LogFileName)
+{
 	ZECrashReport CrashReport;
 
-	ZECrashReportFileProvider* FileProvider = new ZECrashReportFileProvider();
-	FileProvider->SetName("Log File");
-	FileProvider->SetFileName("c:\\log.txt");
-	FileProvider->SetDeleteOnExit(false);
-	CrashReport.RegisterProvider(FileProvider);
+	/*ZECrashReportUserCommentProvider* UserCommentProvider = new ZECrashReportUserCommentProvider();
+	UserCommentProvider->SetNameSurname("");
+	UserCommentProvider->SetEMail("");
+	UserCommentProvider->SetContactBack(false);
+	UserCommentProvider->SetComment("");
+	CrashReport.RegisterProvider(UserCommentProvider);*/
 
-	ZECrashReportUserCommentProvider* UserCommentProvider = new ZECrashReportUserCommentProvider();
-	UserCommentProvider->SetNameSurname("Orcun");
-	UserCommentProvider->SetEMail("orcun.gokbulut@zinekengine.com");
-	UserCommentProvider->SetContactBack(true);
-	UserCommentProvider->SetComment("Blalbabalbllab\n\n\nagsfadasfasdfasdfasfd");
-	CrashReport.RegisterProvider(UserCommentProvider);
+	ZECrashReportSystemInformationProvider* SystemInformationProvider = new ZECrashReportSystemInformationProvider();
+	CrashReport.RegisterProvider(SystemInformationProvider);
 
+	ZECrashReportApplicationInformationProvider* ApplicationInformationProvider = new ZECrashReportApplicationInformationProvider();
+	CrashReport.RegisterProvider(ApplicationInformationProvider);
+
+	ZECrashReportFileProvider* LogFileProvider = new ZECrashReportFileProvider();
+	LogFileProvider->SetName("Log File");
+	LogFileProvider->SetFileName(LogFileName);
+	LogFileProvider->SetDeleteOnExit(false);
+	CrashReport.RegisterProvider(LogFileProvider);
+
+	ZECrashReportFileProvider* DumpFileProvider = new ZECrashReportFileProvider();
+	DumpFileProvider->SetName("Dump File");
+	DumpFileProvider->SetFileName(DumpFileName);
+	DumpFileProvider->SetDeleteOnExit(false);
+	CrashReport.RegisterProvider(DumpFileProvider);
+	
 	CrashReport.Generate();
 
-	ZECrashReportPackager Packager;
-	Packager.SetCrashReport(&CrashReport);
-	Packager.SetOutputFileName("c:\\temp.dat");
-	Packager.Pack();
-
-
-	ZECrashReportSender Sender;
-	Sender.SetFileName("c:\\temp.dat");
-	Sender.SetUploadURL("http://localhost/test/temp.dat");
-	Sender.OpenConnection();
-	while(Sender.TransferChunk());
-	Sender.CloseConnection();
-
-	CrashReport.CleanUp();
 }

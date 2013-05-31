@@ -46,7 +46,7 @@
 #include "ZETypes.h"
 #include "ZEEndian.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEDecompressorLZW.h"
+#include "ZECompression/ZEDecompressorLZW.h"
 //#include "ZEDecompressorPackBit.h"
 
 ZEPackStruct

@@ -49,6 +49,8 @@ class ZECrashReportUserCommentProvider : public ZECrashReportProvider
 		ZESize								Size;
 
 	public:
+		virtual ZECrashReportProviderType	GetProviderType();
+
 		virtual const char*					GetName();
 
 		virtual const char*					GetNameSurname();

@@ -43,7 +43,7 @@
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZETexturePixelConverter.h"
-#include "ZEDecompressorTGARLE.h"
+#include "ZECompression/ZEDecompressorTGARLE.h"
 
 #define ZE_TIT_TYPE_MASK				0x03
 #define ZE_TIT_NO_IMAGE					0x00
