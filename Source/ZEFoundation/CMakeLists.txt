@@ -85,9 +85,8 @@ ze_add_source(ZERandomTests.cpp			Tests)
 ze_add_source(ZETimeCounter.h			Headers)
 ze_add_source(ZETimeCounter.cpp			Sources)
 ze_add_source(ZETimeCounterTests.cpp	Tests)
-
-#ze_add_source(ZEBase64.h				Sources Headers)
-#ze_add_source(ZEBase64.cpp				Sources)
+ze_add_source(ZEBase64.h				Sources Headers)
+ze_add_source(ZEBase64.cpp				Sources)
 
 ze_add_library(ZEFoundation
 	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket ZEML ZERegEx ZECompression
