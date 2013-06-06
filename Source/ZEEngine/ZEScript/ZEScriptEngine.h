@@ -72,27 +72,27 @@ struct ZEScriptFunction
 												}
 };
 
-struct ZEScriptBaseClassData
+struct ZEScriptClassData
 {
+	ZEClass*									NativeClass;
 	ZESize										Id;
-	ZEString									Name;
 };
 
 class ZEScriptEngine
 {
 	public:
-		virtual void							RegisterNativeClass(ZEClass* Class, bool ValueType) = 0;
+		virtual void							RegisterNativeClass(ZEClass* Class, bool IsValueType) = 0;
 
 		virtual void							RegisterNativeGlobalProperty(ZEScriptProperty* Property) = 0;
 		virtual void							RegisterNativeGlobalFunction(ZEScriptFunction* Function) = 0;
 
-		virtual void							BindScriptFunctionToNativeFunction(ZEScriptFunction* ScriptFunction, void* ScriptObject) = 0;
-
-		virtual void*							GetScriptClassMethod(void* ScriptObject, const char* MethodName) = 0;
+		virtual void							BindScriptFunctionToNativeFunction(ZEScriptFunction* ScriptFunction) = 0;
 
 		virtual void							LoadScript(const char* ScriptFileName, bool IsBinary) = 0;
 		virtual void							ReloadScript() = 0;
 		virtual void							ExecuteScript() = 0;
+
+		virtual void*							CreateScriptClassInstance(ZEClass* Class) = 0;
 
 		virtual void*							CallScriptFunction(ZEScriptFunction* Function) = 0;
 };

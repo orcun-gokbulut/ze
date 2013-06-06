@@ -87,6 +87,6 @@ ze_add_source(ZESea.cpp					Sources)
 ze_add_source(ZESea.h					Sources Headers ZEMC)
 
 ze_add_library(ZEGame 
+	ZEMC ${ZEMC}
 	SOURCES ${Sources}
-	HEADERS ${Headers}
-	ZEMC ${ZEMC})
+	HEADERS ${Headers})

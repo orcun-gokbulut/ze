@@ -47,7 +47,7 @@ inline ZEReturnType& ZEReference::ConvertRef() const
 	if (ValueType.Type != Type)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
-	if (ValueType.SubTypeQualifier == ZE_TQ_REFERENCE)
+	if (ValueType.TypeQualifier == ZE_TQ_REFERENCE)
 		return *(ZEReturnType*)Value.Pointer;
 	else
 		zeCriticalError("Variant is const reference. Can not convert const reference to reference.");
@@ -242,7 +242,7 @@ void ZEReference::SetFloatRef(float& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_FLOAT;
-	Type.SubTypeQualifier = ZE_TQ_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -252,7 +252,7 @@ void ZEReference::SetFloatConstRef(const float& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_FLOAT;
-	Type.SubTypeQualifier = ZE_TQ_CONST_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<float*>(&Value);
@@ -262,7 +262,7 @@ void ZEReference::SetDoubleRef(double& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_DOUBLE;
-	Type.SubTypeQualifier = ZE_TQ_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -272,7 +272,7 @@ void ZEReference::SetDoubleConstRef(const double& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_DOUBLE;
-	Type.SubTypeQualifier = ZE_TQ_CONST_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<double*>(&Value);
@@ -282,7 +282,7 @@ void ZEReference::SetBooleanRef(bool& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_BOOLEAN;
-	Type.SubTypeQualifier = ZE_TQ_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -292,7 +292,7 @@ void ZEReference::SetBoolConstRef(const bool& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_BOOLEAN;
-	Type.SubTypeQualifier = ZE_TQ_CONST_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<bool*>(&Value);
@@ -423,7 +423,7 @@ void ZEReference::SetStringRef(ZEString& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_STRING;
-	Type.SubTypeQualifier = ZE_TQ_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -433,7 +433,7 @@ void ZEReference::SetStringConstRef(const ZEString& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_STRING;
-	Type.SubTypeQualifier = ZE_TQ_CONST_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEString*>(&Value);

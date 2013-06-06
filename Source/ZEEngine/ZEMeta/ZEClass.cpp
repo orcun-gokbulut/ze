@@ -202,6 +202,11 @@ bool ZEClass::RemoveEventHandler(ZEObject* Target, ZEString EventName, ZEEventHa
 	return false;
 }
 
+bool ZEClass::CallWrapperMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
+{
+	return false;
+}
+
 bool ZEClass::CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
 {
 	return false;

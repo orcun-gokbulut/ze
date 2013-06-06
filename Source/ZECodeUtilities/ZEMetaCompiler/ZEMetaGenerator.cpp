@@ -490,17 +490,22 @@ static void AppendScriptEngineCallMethod(FILE* File, ZEMethodData* Method, ZESiz
 {
 	for(ZESize J = 0; J < Method->Parameters.GetCount(); J++)
 	{
-		if(Method->Parameters[J]->Type.TypeQualifier == ZE_MTQ_REFERENCE || Method->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE)
+		if(Method->Parameters[J]->Type.Type == ZE_MTT_OBJECT || Method->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
 		{
-			fprintf(File, "\t\t\t%sScriptFunction%d->Parameters[%d] = (void*)&%s;\n", 
+			fprintf(File, "\t\t\t%sScriptFunction%d->Parameters[%d].SetObjectPtr(%s);\n", 
 				Method->IsOperator && Method->Name == "operator=" ? "opAssign" : Method->Name.ToCString(),
-				Index, J, Method->Parameters[J]->Name.ToCString());
+				Index, J,
+				Method->Parameters[J]->Name.ToCString());
 		}
 		else
 		{
-			fprintf(File, "\t\t\t%sScriptFunction%d->Parameters[%d] = &%s;\n", 
+			fprintf(File, "\t\t\t%sScriptFunction%d->Parameters[%d].Set%s%s%s(%s);\n", 
 				Method->IsOperator && Method->Name == "operator=" ? "opAssign" : Method->Name.ToCString(),
-				Index, J, Method->Parameters[J]->Name.ToCString());
+				Index, J, 
+				ReturnVariantType(Method->Parameters[J]->Type.Type),
+				Method->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "Const" : "",
+				Method->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Method->Parameters[J]->Type.TypeQualifier == ZE_MTQ_REFERENCE ? "Ref" : "",
+				Method->Parameters[J]->Name.ToCString());
 		}
 	}
 
@@ -576,12 +581,22 @@ static void CreateScriptBaseClass(FILE* File, const char* ClassName, ZEArray<ZEM
 	}
 
 	if(HasPublicConstructor && !IsAbstract)
-		fprintf(File, "\n\t\t%sScriptBase(){}\n\t\t~%sScriptBase(){}\n\n", ClassName, ClassName);
+		fprintf(File, "\n\t\t%sScriptBase()\n\t\t{\n\n\t\t}\n\n\t\t~%sScriptBase()\n\t\t{\n\n\t\t}\n\n", ClassName, ClassName);
 
 	for(ZESize I = 0; I < Methods.GetCount(); I++)
 	{
 		if(!Methods[I]->IsVirtual)
 			continue;
+
+		if(Methods[I]->IsPure)
+			continue;
+
+		///////////////////////////////////////////////////////////////////////////
+		//     This augmented method which we create is supposed to prepare stack
+		// for script object that derives from him. Most scripting systems dont
+		// support native C++ class inheritance in scripts. So we are creating
+		// this virtual methods to simulate inheritance mechanisms in scripts.
+		///////////////////////////////////////////////////////////////////////////
 
 		if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ARRAY)
 		{
@@ -589,8 +604,7 @@ static void CreateScriptBaseClass(FILE* File, const char* ClassName, ZEArray<ZEM
 				continue;
 
 			fprintf(File, 
-				"\t\t%s%s%sZEArray<%s%s%s>%s%s %s(", 
-				Methods[I]->IsVirtual ? "virtual " : "",
+				"\t\tvirtual %s%sZEArray<%s%s%s>%s%s %s(", 
 				Methods[I]->IsStatic ? "static " : "",
 				Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
 				Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT_PTR ? Methods[I]->ReturnParameter.Type.SubTypeClassName.ToCString() : ReturnTypeCast(Methods[I]->ReturnParameter.Type.SubType),
@@ -603,8 +617,7 @@ static void CreateScriptBaseClass(FILE* File, const char* ClassName, ZEArray<ZEM
 		else if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ENUMERATOR)
 		{
 			fprintf(File, 
-				"\t\t%s%s%s%s%s %s(", 
-				Methods[I]->IsVirtual ? "virtual " : "",
+				"\t\tvirtual %s%s%s%s %s(", 
 				Methods[I]->IsStatic ? "static " : "",
 				Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
 				Methods[I]->ReturnParameter.EnumData->Name.ToCString(),
@@ -614,8 +627,7 @@ static void CreateScriptBaseClass(FILE* File, const char* ClassName, ZEArray<ZEM
 		else if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_OBJECT_PTR)
 		{
 			fprintf(File, 
-				"\t\t%s%s%s%s* %s(", 
-				Methods[I]->IsVirtual ? "virtual " : "",
+				"\t\tvirtual %s%s%s* %s(", 
 				Methods[I]->IsStatic ? "static " : "",
 				Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
 				Methods[I]->ReturnParameter.Type.ClassData->Name.ToCString(),
@@ -624,8 +636,7 @@ static void CreateScriptBaseClass(FILE* File, const char* ClassName, ZEArray<ZEM
 		else
 		{
 			fprintf(File, 
-				"\t\t%s%s%s%s%s %s(", 
-				Methods[I]->IsVirtual ? "virtual " : "",
+				"\t\tvirtual %s%s%s%s %s(", 
 				Methods[I]->IsStatic ? "static " : "",
 				Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
 				ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
@@ -649,7 +660,7 @@ static void CreateScriptBaseClass(FILE* File, const char* ClassName, ZEArray<ZEM
 					(Methods[I]->Parameters[J]->Type.Type != ZE_MTT_OBJECT_PTR && (Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_REFERENCE)) ? "&" : "",
 					Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR ? "*" : "",
 					Methods[I]->Parameters[J]->Name.ToCString(),
-					J < Methods[I]->Parameters.GetCount() - 1 ? "," : "");
+					J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "");
 			}
 			else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ENUMERATOR)
 			{
@@ -659,7 +670,7 @@ static void CreateScriptBaseClass(FILE* File, const char* ClassName, ZEArray<ZEM
 					Methods[I]->Parameters[J]->EnumData->Name.ToCString(),
 					(Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_REFERENCE) ? "&" : "",
 					Methods[I]->Parameters[J]->Name.ToCString(),
-					J < Methods[I]->Parameters.GetCount() - 1 ? "," : "");
+					J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "");
 			}
 			else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
 			{
@@ -668,7 +679,7 @@ static void CreateScriptBaseClass(FILE* File, const char* ClassName, ZEArray<ZEM
 					Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
 					Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(),
 					Methods[I]->Parameters[J]->Name.ToCString(),
-					J < Methods[I]->Parameters.GetCount() - 1 ? "," : "");
+					J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "");
 			}
 			else
 			{
@@ -678,29 +689,158 @@ static void CreateScriptBaseClass(FILE* File, const char* ClassName, ZEArray<ZEM
 					ReturnTypeCast(Methods[I]->Parameters[J]->Type.Type),
 					(Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_REFERENCE) ? "&" : "",
 					Methods[I]->Parameters[J]->Name.ToCString(),
-					J < Methods[I]->Parameters.GetCount() - 1 ? "," : "");
+					J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "");
 			}
 		}
 
-		fprintf(File, 
-			")%s\n"
-			"\t\t{\n", Methods[I]->IsConst ? " const" : "");
+		fprintf(File, ")%s\n\t\t{\n", Methods[I]->IsConst ? " const" : "");
 
-		if(Methods[I]->IsVirtual)
+		AppendScriptEngineCallMethod(File, Methods[I], I);
+
+		fprintf(File, "\t\t}\n\n");
+
+
+		///////////////////////////////////////////////////////////////////////////
+		//       This second NOT virtual method will be called from script side via
+		// method wrappers for triggering script object's C++ parent. We create this
+		// method for backward inheritance calling mechanism which is not supported 
+		// natively in most scripting systems.
+		///////////////////////////////////////////////////////////////////////////
+
+		if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ARRAY)
 		{
-			AppendScriptEngineCallMethod(File, Methods[I], I);
+			if(Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_UNDEFINED);
+			continue;
+
+			fprintf(File, 
+				"\t\t%s%sZEArray<%s%s%s>%s%s ScriptTriggered%s(", 
+				Methods[I]->IsStatic ? "static " : "",
+				Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+				Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT_PTR ? Methods[I]->ReturnParameter.Type.SubTypeClassName.ToCString() : ReturnTypeCast(Methods[I]->ReturnParameter.Type.SubType),
+				(Methods[I]->ReturnParameter.Type.SubType != ZE_MTT_OBJECT_PTR && (Methods[I]->ReturnParameter.Type.SubTypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->ReturnParameter.Type.SubTypeQualifier == ZE_MTQ_REFERENCE)) ? "&" : "",
+				Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT_PTR ? "*" : "",
+				(Methods[I]->ReturnParameter.Type.Type != ZE_MTT_OBJECT_PTR && (Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_REFERENCE)) ? "&" : "",
+				Methods[I]->ReturnParameter.Type.Type == ZE_MTT_OBJECT_PTR ? "*" : "",
+				Methods[I]->Name.ToCString());
+		}
+		else if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ENUMERATOR)
+		{
+			fprintf(File, 
+				"\t\t%s%s%s%s ScriptTriggered%s(", 
+				Methods[I]->IsStatic ? "static " : "",
+				Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+				Methods[I]->ReturnParameter.EnumData->Name.ToCString(),
+				(Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_REFERENCE) ? "&" : "",
+				Methods[I]->Name.ToCString());
+		}
+		else if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_OBJECT_PTR)
+		{
+			fprintf(File, 
+				"\t\t%s%s%s* ScriptTriggered%s(", 
+				Methods[I]->IsStatic ? "static " : "",
+				Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+				Methods[I]->ReturnParameter.Type.ClassData->Name.ToCString(),
+				Methods[I]->Name.ToCString());
 		}
 		else
 		{
-			fprintf(File, "\t\t\t%s%s::%s(", Methods[I]->ReturnParameter.Type.Type == ZE_MTT_NULL ? "" : "return ", ClassName, Methods[I]->Name.ToCString());
-
-			for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
-				fprintf(File, "%s%s", Methods[I]->Parameters[J]->Name.ToCString(), J < Methods[I]->Parameters.GetCount() - 1 ? "," : "");
-
-			fprintf(File, ");\n");
+			fprintf(File, 
+				"\t\t%s%s%s%s ScriptTriggered%s(", 
+				Methods[I]->IsStatic ? "static " : "",
+				Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+				ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
+				(Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_REFERENCE) ? "&" : "",
+				Methods[I]->Name.ToCString());
 		}
 
-		fprintf(File, "\t\t}\n");
+		for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
+		{
+			if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
+			{
+				if(Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_UNDEFINED);
+				continue;
+
+				fprintf(File,
+					"%sZEArray<%s%s%s>%s%s %s%s",
+					Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+					Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_OBJECT_PTR ? Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString() : ReturnTypeCast(Methods[I]->Parameters[J]->Type.SubType),
+					(Methods[I]->Parameters[J]->Type.SubType != ZE_MTT_OBJECT_PTR && (Methods[I]->Parameters[J]->Type.SubTypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->Parameters[J]->Type.SubTypeQualifier == ZE_MTQ_REFERENCE)) ? "&" : "",
+					Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_OBJECT_PTR ? "*" : "",
+					(Methods[I]->Parameters[J]->Type.Type != ZE_MTT_OBJECT_PTR && (Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_REFERENCE)) ? "&" : "",
+					Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR ? "*" : "",
+					Methods[I]->Parameters[J]->Name.ToCString(),
+					J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "");
+			}
+			else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ENUMERATOR)
+			{
+				fprintf(File, 
+					"%s%s%s %s%s", 
+					Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+					Methods[I]->Parameters[J]->EnumData->Name.ToCString(),
+					(Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_REFERENCE) ? "&" : "",
+					Methods[I]->Parameters[J]->Name.ToCString(),
+					J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "");
+			}
+			else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+			{
+				fprintf(File, 
+					"%s%s* %s%s", 
+					Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+					Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(),
+					Methods[I]->Parameters[J]->Name.ToCString(),
+					J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "");
+			}
+			else
+			{
+				fprintf(File, 
+					"%s%s%s %s%s", 
+					Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+					ReturnTypeCast(Methods[I]->Parameters[J]->Type.Type),
+					(Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_REFERENCE) ? "&" : "",
+					Methods[I]->Parameters[J]->Name.ToCString(),
+					J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "");
+			}
+		}
+
+		fprintf(File, ")%s\n\t\t{\n", Methods[I]->IsConst ? " const" : "");
+
+		fprintf(File, 
+			"\t\t\t%s%s::%s(", 
+			Methods[I]->ReturnParameter.Type.Type == ZE_MTT_NULL ? "" : "return ",
+			ClassName, Methods[I]->Name.ToCString());
+
+		for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
+		{
+			if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+			{
+				if(Methods[I]->Parameters.GetCount() > 0)
+				{
+					fprintf(File, "(%s*)%s%s", 
+						Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(),
+						Methods[I]->Parameters[J]->Name.ToCString(),
+						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+				}
+				else
+				{
+					fprintf(File, "(%s*)%s%s", 
+						Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(),
+						Methods[I]->Parameters[J]->Name.ToCString(),
+						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+				}
+			}
+			else
+			{
+				fprintf(File, "%s%s", 
+					Methods[I]->Parameters[J]->Name.ToCString(), 
+					J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+			}
+		}
+
+		if(Methods[I]->Parameters.GetCount() == 0)
+			fprintf(File, ");\n\t\t}\n\n");
+		else
+			fprintf(File, "\t\t}\n\n");
+
 	}
 
 	fprintf(File, "};\n\n");
@@ -986,20 +1126,22 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 
 	for(ZESize I = 0; I < Methods.GetCount(); I++)
 	{
+		if(Methods[I]->IsPure)
+			continue;
+
 		//FACTORY METHODS - CONSTRUCTORS
 		if(Methods[I]->Name == "CreateInstance")
 		{
 			fprintf(File, 
-				"static %s* %s_%d_CreateInstance(%s* This)\n"
+				"static %s* %s_%d_CreateInstance()\n"
 				"{\n"
-				"\tThis = %s::CreateInstance();\n"
-				"\treturn This;\n"
+				"\treturn %s::CreateInstance();\n"
 				"}\n\n", 
-				Methods[I]->MemberOf.ToCString(), Methods[I]->MemberOf.ToCString(), I, Methods[I]->MemberOf.ToCString(), Methods[I]->MemberOf.ToCString());
+				CurrentClassName, CurrentClassName, I, CurrentClassName);
 
 			continue;
 		}
-		else if((strcmp(Methods[I]->Name.ToCString(), Methods[I]->MemberOf.ToCString()) == 0))
+		else if((strcmp(Methods[I]->Name.ToCString(), Methods[I]->MemberOf.ToCString()) == 0) && !ClassData->IsBuiltInClass)
 		{
 			if(IsAbstract || (strcmp(CurrentClassName, Methods[I]->MemberOf.ToCString()) != 0))
 				continue;
@@ -1007,16 +1149,92 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 			if(Methods[I]->Parameters.GetCount() == 0)
 			{
 				fprintf(File, 
-					"static void %s_%d_%s(%s* This)\n"
+					"static %s* %s_%d_%s()\n"
 					"{\n"
-					"\tnew(This) %s();\n"
-					"}\n\n", Methods[I]->MemberOf.ToCString(), I, Methods[I]->MemberOf.ToCString(), Methods[I]->MemberOf.ToCString(), Methods[I]->MemberOf.ToCString());
+					"\treturn new %s();\n"
+					"}\n\n", CurrentClassName, CurrentClassName, I, CurrentClassName, CurrentClassName);
 				
 				continue;
 			}
 			else
 			{
-				fprintf(File, "static void %s_%d_%s(%s* This, ", Methods[I]->MemberOf.ToCString(), I, CurrentClassName, CurrentClassName);
+				fprintf(File, "static %s* %s_%d_%s(", CurrentClassName, CurrentClassName, I, CurrentClassName);
+
+				for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
+				{
+					if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
+					{
+						if(Methods[I]->ReturnParameter.Type.SubType != ZE_MTT_UNDEFINED)
+						{
+							fprintf(File, "%sZEArray<%s%s>%s %s%s",
+								Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+								Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
+								Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_OBJECT || Methods[I]->Parameters[J]->Type.SubType == ZE_MTT_OBJECT_PTR ? "*" : "",
+								(Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_REFERENCE) && Methods[I]->Parameters[J]->Type.Type != ZE_MTT_OBJECT_PTR ? "&" : "",
+								Methods[I]->Parameters[J]->Name.ToCString(), 
+								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ")\n");
+						}
+					}
+					else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ENUMERATOR)
+					{
+						fprintf(File, "%s%s%s %s%s",
+							Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+							Methods[I]->Parameters[J]->EnumData->Name.ToCString(),
+							(Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_REFERENCE) && Methods[I]->Parameters[J]->Type.Type != ZE_MTT_OBJECT_PTR ? "&" : "",
+							Methods[I]->Parameters[J]->Name.ToCString(), 
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ")\n");
+					}
+					else
+					{
+						fprintf(File, "%s%s%s%s %s%s", 
+							Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+							ReturnTypeCast(Methods[I]->Parameters[J]->Type.Type), 
+							Methods[I]->Parameters[J]->Type.Type == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT ? "*" : "",
+							(Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE || Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_MTQ_REFERENCE) && Methods[I]->Parameters[J]->Type.Type != ZE_MTT_OBJECT_PTR ? "&" : "",
+							Methods[I]->Parameters[J]->Name.ToCString(), 
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ")\n");
+					}
+				}
+
+				fprintf(File, "{\n\treturn new %s(", CurrentClassName);
+
+				for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
+				{
+					if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+					{
+						fprintf(File, "(%s*)%s%s", 
+							Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(),
+							Methods[I]->Parameters[J]->Name.ToCString(),
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+					}
+					else
+					{
+						fprintf(File, "%s%s", 
+							Methods[I]->Parameters[J]->Name.ToCString(), 
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+					}
+				}
+
+				fprintf(File, "}\n\n");
+			}
+
+			continue;
+		}
+		else if((strcmp(Methods[I]->Name.ToCString(), Methods[I]->MemberOf.ToCString()) == 0) && ClassData->IsBuiltInClass)
+		{
+			if(Methods[I]->Parameters.GetCount() == 0)
+			{
+				fprintf(File, 
+					"static void %s_%d_%s(%s* This)\n"
+					"{\n"
+					"\tnew(This) %s();\n"
+					"}\n\n", CurrentClassName, I, CurrentClassName, CurrentClassName, CurrentClassName);
+
+				continue;
+			}
+			else
+			{
+				fprintf(File, "static void %s_%d_%s(%s* This, ", CurrentClassName, I, CurrentClassName, CurrentClassName);
 
 				for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
 				{
@@ -1349,24 +1567,53 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 				}
 			}
 
-			fprintf(File, "{\n\t%sThis->%s(",
-				Methods[I]->ReturnParameter.Type.Type == ZE_MTT_NULL ? "" : "return ",
-				Methods[I]->Name.ToCString());
+			if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
+			{
+				if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_NULL)
+					fprintf(File, "{\n\t((%sScriptBase*)This)->ScriptTriggered%s(", ClassData->Name.ToCString(), Methods[I]->Name.ToCString());
+				else
+					fprintf(File, "{\n\treturn ((%sScriptBase*)This)->ScriptTriggered%s(", ClassData->Name.ToCString(), Methods[I]->Name.ToCString());
+			}
+			else
+			{
+				fprintf(File, "{\n\t%sThis->%s(",
+					Methods[I]->ReturnParameter.Type.Type == ZE_MTT_NULL ? "" : "return ",
+					Methods[I]->Name.ToCString());
+			}
 
 			for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
 			{
-				if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+				if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
 				{
-					fprintf(File, "(%s*)%s%s", 
-						Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(),
-						Methods[I]->Parameters[J]->Name.ToCString(),
-						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n}\n\n");
+					if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+					{
+						fprintf(File, "(%s*)%s%s", 
+							Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(),
+							Methods[I]->Parameters[J]->Name.ToCString(),
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n}\n\n");
+					}
+					else
+					{
+						fprintf(File, "%s%s", 
+							Methods[I]->Parameters[J]->Name.ToCString(), 
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n}\n\n");
+					}
 				}
 				else
 				{
-					fprintf(File, "%s%s", 
-						Methods[I]->Parameters[J]->Name.ToCString(), 
-						J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n}\n\n");
+					if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_CLASS || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT || Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+					{
+						fprintf(File, "(%s*)%s%s", 
+							Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(),
+							Methods[I]->Parameters[J]->Name.ToCString(),
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n}\n\n");
+					}
+					else
+					{
+						fprintf(File, "%s%s", 
+							Methods[I]->Parameters[J]->Name.ToCString(), 
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n}\n\n");
+					}
 				}
 			}
 		}
@@ -1376,63 +1623,138 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 			{
 				if(Methods[I]->ReturnParameter.Type.SubType != ZE_MTT_UNDEFINED)
 				{
+					if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
+					{
+						fprintf(File, 
+							"static %sZEArray<%s%s> %s_%d_%s(%s* This)\n"
+							"{\n"
+							"\treturn ((%sScriptBase*)This)->ScriptTriggered%s();\n"
+							"}\n\n",
+							Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+							Methods[I]->ReturnParameter.Type.SubTypeClassName.ToCString(),
+							Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT  || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT_PTR  ? "*" : "",
+							Methods[I]->MemberOf.ToCString(), I, 
+							Methods[I]->Name.ToCString(), 
+							Methods[I]->MemberOf.ToCString(),
+							ClassData->Name.ToCString(),
+							Methods[I]->Name.ToCString());
+					}
+					else
+					{
+						fprintf(File, 
+							"static %sZEArray<%s%s> %s_%d_%s(%s* This)\n"
+							"{\n"
+							"\treturn This->%s();\n"
+							"}\n\n",
+							Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+							Methods[I]->ReturnParameter.Type.SubTypeClassName.ToCString(),
+							Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT  || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT_PTR  ? "*" : "",
+							Methods[I]->MemberOf.ToCString(), I, 
+							Methods[I]->Name.ToCString(), 
+							Methods[I]->MemberOf.ToCString(), 
+							Methods[I]->Name.ToCString());
+					}
+				}
+			}
+			else if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ENUMERATOR)
+			{
+				if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
+				{
 					fprintf(File, 
-						"static %sZEArray<%s%s> %s_%d_%s(%s* This)\n"
+						"static %s%s %s_%d_%s(%s* This)\n"
+						"{\n"
+						"\treturn ((%sScriptBase*)This)->ScriptTriggered%s();\n"
+						"}\n\n",
+						Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+						Methods[I]->ReturnParameter.EnumData->Name.ToCString(),
+						Methods[I]->MemberOf.ToCString(), I, 
+						Methods[I]->Name.ToCString(), 
+						Methods[I]->MemberOf.ToCString(), 
+						ClassData->Name.ToCString(),
+						Methods[I]->Name.ToCString());
+				}
+				else
+				{
+					fprintf(File, 
+						"static %s%s %s_%d_%s(%s* This)\n"
 						"{\n"
 						"\treturn This->%s();\n"
 						"}\n\n",
 						Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
-						Methods[I]->ReturnParameter.Type.SubTypeClassName.ToCString(),
-						Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT  || Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_OBJECT_PTR  ? "*" : "",
+						Methods[I]->ReturnParameter.EnumData->Name.ToCString(),
 						Methods[I]->MemberOf.ToCString(), I, 
 						Methods[I]->Name.ToCString(), 
 						Methods[I]->MemberOf.ToCString(), 
 						Methods[I]->Name.ToCString());
 				}
 			}
-			else if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ENUMERATOR)
-			{
-				fprintf(File, 
-					"static %s%s %s_%d_%s(%s* This)\n"
-					"{\n"
-					"\treturn This->%s();\n"
-					"}\n\n",
-					Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
-					Methods[I]->ReturnParameter.EnumData->Name.ToCString(),
-					Methods[I]->MemberOf.ToCString(), I, 
-					Methods[I]->Name.ToCString(), 
-					Methods[I]->MemberOf.ToCString(), 
-					Methods[I]->Name.ToCString());
-			}
 			else if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_NULL)
 			{
-				fprintf(File, 
-					"static %s%s%s %s_%d_%s(%s* This)\n"
-					"{\n"
-					"\tThis->%s();\n"
-					"}\n\n",
-					Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
-					ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
-					Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.Type == ZE_MTT_OBJECT ? "*" : "",
-					Methods[I]->MemberOf.ToCString(), I, 
-					Methods[I]->Name.ToCString(), 
-					Methods[I]->MemberOf.ToCString(), 
-					Methods[I]->Name.ToCString());
+				if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
+				{
+					fprintf(File, 
+						"static %s%s%s %s_%d_%s(%s* This)\n"
+						"{\n"
+						"\t((%sScriptBase*)This)->ScriptTriggered%s();\n"
+						"}\n\n",
+						Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+						ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
+						Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.Type == ZE_MTT_OBJECT ? "*" : "",
+						Methods[I]->MemberOf.ToCString(), I, 
+						Methods[I]->Name.ToCString(), 
+						Methods[I]->MemberOf.ToCString(), 
+						ClassData->Name.ToCString(),
+						Methods[I]->Name.ToCString());
+				}
+				else
+				{
+					fprintf(File, 
+						"static %s%s%s %s_%d_%s(%s* This)\n"
+						"{\n"
+						"\tThis->%s();\n"
+						"}\n\n",
+						Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+						ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
+						Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.Type == ZE_MTT_OBJECT ? "*" : "",
+						Methods[I]->MemberOf.ToCString(), I, 
+						Methods[I]->Name.ToCString(), 
+						Methods[I]->MemberOf.ToCString(), 
+						Methods[I]->Name.ToCString());
+				}
 			}
 			else
 			{
-				fprintf(File, 
-					"static %s%s%s %s_%d_%s(%s* This)\n"
-					"{\n"
-					"\treturn This->%s();\n"
-					"}\n\n",
-					Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
-					ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
-					Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.Type == ZE_MTT_OBJECT ? "*" : "",
-					Methods[I]->MemberOf.ToCString(), I, 
-					Methods[I]->Name.ToCString(), 
-					Methods[I]->MemberOf.ToCString(), 
-					Methods[I]->Name.ToCString());
+				if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
+				{
+					fprintf(File, 
+						"static %s%s%s %s_%d_%s(%s* This)\n"
+						"{\n"
+						"\treturn ((%sScriptBase*)This)->ScriptTriggered%s();\n"
+						"}\n\n",
+						Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+						ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
+						Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.Type == ZE_MTT_OBJECT ? "*" : "",
+						Methods[I]->MemberOf.ToCString(), I, 
+						Methods[I]->Name.ToCString(), 
+						Methods[I]->MemberOf.ToCString(), 
+						ClassData->Name.ToCString(),
+						Methods[I]->Name.ToCString());
+				}
+				else
+				{
+					fprintf(File, 
+						"static %s%s%s %s_%d_%s(%s* This)\n"
+						"{\n"
+						"\treturn This->%s();\n"
+						"}\n\n",
+						Methods[I]->ReturnParameter.Type.TypeQualifier == ZE_MTQ_CONST_REFERENCE ? "const " : "",
+						ReturnTypeCast(Methods[I]->ReturnParameter.Type.Type),
+						Methods[I]->ReturnParameter.Type.Type == ZE_MTT_CLASS || Methods[I]->ReturnParameter.Type.Type == ZE_MTT_OBJECT ? "*" : "",
+						Methods[I]->MemberOf.ToCString(), I, 
+						Methods[I]->Name.ToCString(), 
+						Methods[I]->MemberOf.ToCString(), 
+						Methods[I]->Name.ToCString());
+				}
 			}
 		}
 	}
@@ -1441,10 +1763,35 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 	if(!ClassData->IsBuiltInClass && HasPublicConstructor && !IsAbstract)
 	{
 		fprintf(File,
-			"static void %s_CreateScriptBaseClassInstance(%sScriptBase* This)\n"
+			"static %sScriptBase* %s_CreateScriptBaseClassInstance()\n"
 			"{\n"
-			"\tThis = new %sScriptBase();\n"
+			"\treturn new %sScriptBase();\n"
 			"}\n\n", CurrentClassName, CurrentClassName, CurrentClassName);
+
+		fprintf(File,
+			"static void %s_BindScriptBaseClassInstance(%sScriptBase* This, void* ScriptBaseClassInstance)\n"
+			"{\n"
+			"\tThis->ScriptObject = *reinterpret_cast<void**>(ScriptBaseClassInstance);\n"
+			"\t//This->ScriptEngine = ZEAngelScriptEngine::GetInstance();\n\n", CurrentClassName, CurrentClassName);
+
+		for(ZESize I = 0; I < Methods.GetCount(); I++)
+		{
+			if(!Methods[I]->IsVirtual)
+				continue;
+
+			fprintf(File, "\tThis->%sScriptFunction%d = new ZEScriptFunction();\n", strcmp(Methods[I]->Name.ToCString(), "operator=") == 0 ? "opAssign" : Methods[I]->Name.ToCString(), I);
+			fprintf(File, "\tThis->%sScriptFunction%d->Name = \"%s\";\n", strcmp(Methods[I]->Name.ToCString(), "operator=") == 0 ? "opAssign" : Methods[I]->Name.ToCString(), I, Methods[I]->Name.ToCString());
+
+			for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
+				fprintf(File, "\tThis->%sScriptFunction%d->Parameters.Add();\n", strcmp(Methods[I]->Name.ToCString(), "operator=") == 0 ? "opAssign" : Methods[I]->Name.ToCString(), I);
+
+			fprintf(File, "\tThis->%sScriptFunction%d->Declaration = NULL;\n", strcmp(Methods[I]->Name.ToCString(), "operator=") == 0 ? "opAssign" : Methods[I]->Name.ToCString(), I);
+			fprintf(File, "\tThis->%sScriptFunction%d->ReturnType = %s;\n", strcmp(Methods[I]->Name.ToCString(), "operator=") == 0 ? "opAssign" : Methods[I]->Name.ToCString(), I, GetTypeString(Methods[I]->ReturnParameter.Type.Type));
+			fprintf(File, "\tThis->%sScriptFunction%d->ScriptObject = This->ScriptObject;\n", strcmp(Methods[I]->Name.ToCString(), "operator=") == 0 ? "opAssign" : Methods[I]->Name.ToCString(), I);
+			fprintf(File, "\tThis->ScriptEngine->BindScriptFunctionToNativeFunction(This->%sScriptFunction%d);\n\n", strcmp(Methods[I]->Name.ToCString(), "operator=") == 0 ? "opAssign" : Methods[I]->Name.ToCString(), I);
+		}
+
+		fprintf(File, "}\n\n");
 	}
 
 	if(!ClassData->HasPublicCopyConstructor)
@@ -1620,10 +1967,10 @@ static void CreateGetMethodsMethod(FILE* File, ZEClassData* ClassData, ZEArray<Z
 		}
 	}
 
+	ZEString ClassType = "ZE_TT_OBJECT_PTR";
+
 	if(!ClassData->HasPublicCopyConstructor)
 	{
-		ZEString ClassType = "ZE_TT_OBJECT_PTR";
-		
 		if(ClassData->IsBuiltInClass)
 		{
 			if(ClassData->Name == "ZEVector2")
@@ -1657,7 +2004,7 @@ static void CreateGetMethodsMethod(FILE* File, ZEClassData* ClassData, ZEArray<Z
 			{
 				fprintf(File,
 					"\tstatic ZEMethod Methods[%d] =\n\t"
-					"{\n", Methods.GetCount() + 2); // 1 for assign operator 1 for script instance factory
+					"{\n", Methods.GetCount() + 3); // +1 for assign operator, +1 for script instance factory, +1 for bind script instance function
 			}
 			else
 			{
@@ -1673,7 +2020,7 @@ static void CreateGetMethodsMethod(FILE* File, ZEClassData* ClassData, ZEArray<Z
 			{
 				fprintf(File,
 					"\tstatic ZEMethod Methods[%d] =\n\t"
-					"{\n", Methods.GetCount() + 1); // 1 for script instance factory
+					"{\n", Methods.GetCount() + 2); // +1 for script instance factory, +1 for bind script instance function
 			}
 			else
 			{
@@ -1695,12 +2042,16 @@ static void CreateGetMethodsMethod(FILE* File, ZEClassData* ClassData, ZEArray<Z
 
 		if ((Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ARRAY && Methods[I]->ReturnParameter.Type.SubType == ZE_MTT_UNDEFINED))
 			fprintf(File, "NULL, ");
-		else if (Methods[I]->Name.Equals(Methods[I]->MemberOf) && IsAbstract)
+		else if(Methods[I]->IsPure)
 			fprintf(File, "NULL, ");
-		else if ((Methods[I]->Name.Equals(Methods[I]->MemberOf) && strcmp(Methods[I]->Name.ToCString(), ClassName) != 0))
+		else if(Methods[I]->Name.Equals(Methods[I]->MemberOf) && IsAbstract)
 			fprintf(File, "NULL, ");
-		else if (Methods[I]->IsOperator)
+		else if((Methods[I]->Name.Equals(Methods[I]->MemberOf) && strcmp(Methods[I]->Name.ToCString(), ClassName) != 0))
+			fprintf(File, "NULL, ");
+		else if(Methods[I]->IsOperator)
 			fprintf(File, "&%s_%d_%s, ", Methods[I]->MemberOf.ToCString(), I, GetOperatorName(Methods[I]->OperatorType));
+		else if(strcmp(Methods[I]->Name.ToCString(), "CreateInstance") == 0)
+			fprintf(File, "&%s_%d_CreateInstance, ", ClassName, I);
 		else
 			fprintf(File, "&%s_%d_%s, ", Methods[I]->MemberOf.ToCString(), I, Methods[I]->Name.ToCString());
 
@@ -1756,8 +2107,8 @@ static void CreateGetMethodsMethod(FILE* File, ZEClassData* ClassData, ZEArray<Z
 	if(!ClassData->HasPublicCopyConstructor)
 	{
 		ZEString OperatorHash = "operator=";
-		fprintf(File, "\t\t{%d, %s%s::Class(), &%s_opAssign, \"operator=\", %#x, false, false, false, true, ZE_MOT_EQUAL, ZEType(ZE_TT_OBJECT_PTR, ZE_TQ_REFERENCE, ZE_TT_UNDEFINED, ZE_TQ_VALUE, %s%s::Class()), NULL, 0, AssignOperatorParameter, 1, NULL, 0}%s\n",
-			Methods.GetCount(), ClassName, ClassData->IsBuiltInClass ? "Class" : "", ClassName, OperatorHash.Hash(), ClassName, ClassData->IsBuiltInClass ? "Class" : "", ClassData->IsBuiltInClass ? "" : ",");
+		fprintf(File, "\t\t{%d, %s%s::Class(), &%s_opAssign, \"operator=\", %#x, false, false, false, true, ZE_MOT_EQUAL, ZEType(%s, ZE_TQ_REFERENCE, ZE_TT_UNDEFINED, ZE_TQ_VALUE, %s%s::Class()), NULL, 0, AssignOperatorParameter, 1, NULL, 0}%s\n",
+			Methods.GetCount(), ClassName, ClassData->IsBuiltInClass ? "Class" : "", ClassName, OperatorHash.Hash(), ClassType.ToCString(), ClassName, ClassData->IsBuiltInClass ? "Class" : "", ClassData->IsBuiltInClass ? "" : ",");
 	}
 
 	if(!ClassData->IsBuiltInClass && ClassData->HasPublicConstructor && !ClassData->IsAbstract)
@@ -1765,8 +2116,14 @@ static void CreateGetMethodsMethod(FILE* File, ZEClassData* ClassData, ZEArray<Z
 		ZEString ScriptClassWrapperHash = ClassName;
 		ScriptClassWrapperHash.Append("_CreateScriptBaseClassInstance");
 
-		fprintf(File, "\t\t{%d, %s::Class(), &%s_CreateScriptBaseClassInstance, \"CreateScriptBaseClassInstance\", %#x, false, false, false, true, ZE_MOT_UNDEFINED, ZEType(ZE_TT_NULL, ZE_TQ_REFERENCE, ZE_TT_UNDEFINED, ZE_TQ_VALUE, NULL), NULL, 0, NULL, 0, NULL, 0}\n",
+		fprintf(File, "\t\t{%d, %s::Class(), &%s_CreateScriptBaseClassInstance, \"CreateScriptBaseClassInstance\", %#x, false, false, false, true, ZE_MOT_UNDEFINED, ZEType(ZE_TT_NULL, ZE_TQ_REFERENCE, ZE_TT_UNDEFINED, ZE_TQ_VALUE, NULL), NULL, 0, NULL, 0, NULL, 0},\n",
 			ClassData->HasPublicCopyConstructor ? Methods.GetCount() : Methods.GetCount() + 1, ClassName, ClassName, ScriptClassWrapperHash.Hash());
+
+		ScriptClassWrapperHash = ClassName;
+		ScriptClassWrapperHash.Append("_BindScriptBaseClassInstance");
+
+		fprintf(File, "\t\t{%d, %s::Class(), &%s_BindScriptBaseClassInstance, \"BindScriptBaseClassInstance\", %#x, false, false, false, true, ZE_MOT_UNDEFINED, ZEType(ZE_TT_NULL, ZE_TQ_REFERENCE, ZE_TT_UNDEFINED, ZE_TQ_VALUE, NULL), NULL, 0, NULL, 0, NULL, 0}\n",
+			ClassData->HasPublicCopyConstructor ? Methods.GetCount() + 1 : Methods.GetCount() + 2, ClassName, ClassName, ScriptClassWrapperHash.Hash());
 	}
 
 	if(Methods.GetCount() > 0)
@@ -2702,6 +3059,448 @@ static void CreateGetPropertyItemCountMethod(FILE* File, const char* ClassName)
 		"}\n\n", ClassName);
 }
 
+static void CreateCallWrapperMethodMethod(FILE* File, ZEClassData* Class, ZEArray<ZEMethodData*> Methods)
+{
+	const char* ClassName = Class->Name;
+
+	if(!Class->HasPublicConstructor)
+	{
+		fprintf(File,
+			"bool %sClass::CallWrapperMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)\n"
+			"{\n"
+			"\treturn false;\n"
+			"}\n\n", ClassName);
+
+		return;
+	}
+
+	fprintf(File,
+		"bool %sClass::CallWrapperMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)\n"
+		"{\n"
+		"\tconst ZEMethod Method = GetMethods()[MethodId];\n"
+		"\tif(Method.Name == \"\" || Method.Name == NULL)\n"
+		"\t\treturn false;\n\n"
+		"\tif(Method.ParameterCount != ParameterCount)\n"
+		"\t\treturn false;\n\n", ClassName);
+
+	if(Methods.GetCount() > 0)
+	{
+		fprintf(File,
+			"\tswitch(MethodId)\n"
+			"\t{\n");
+	}
+
+	for(ZESize I = 0; I < Methods.GetCount(); I++)
+	{
+		if(Class->HasPublicConstructor && Methods[I]->IsVirtual && !Methods[I]->IsPure)
+		{
+			if(Methods[I]->ReturnParameter.Type.Type != ZE_TT_NULL)
+			{
+				if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ENUMERATOR)
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\tReturnValue = (ZEInt32)(((%sScriptBase*)Object)->ScriptTriggered%s(", I, ClassName, Methods[I]->Name.ToCString());
+
+					for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
+					{
+						ZEString VariantType = ReturnVariantType(Methods[I]->Parameters[J]->Type.Type);
+
+						if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ENUMERATOR)
+						{
+							fprintf(File,
+								"((%s)(Parameters[%d]->GetInt32ConstRef()))%s",
+								Methods[I]->Parameters[J]->EnumData->Name.ToCString(), J,
+								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "));\n");
+						}
+						else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+						{
+							fprintf(File,
+								"%s(%s*)Parameters[%d]->GetObjectPtr%sRef()%s", 
+								Methods[I]->IsOperator ? "*" : "",
+								Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(), J,
+								Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "));\n");
+						}
+						else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
+						{
+							fprintf(File,
+								"Parameters[%d]->GetArray%sRef<%s>()%s", J,
+								Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+								Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
+								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+						}
+						else
+						{
+							fprintf(File,
+								"Parameters[%d]->Get%s%sRef()%s", J, VariantType.ToCString(),
+								Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "));\n");
+						}
+					}
+					fprintf(File, Methods[I]->Parameters.GetCount() == 0 ? "));\n" : "");
+					fprintf(File, "\t\t\treturn true;\n");
+				}
+				else if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ARRAY)
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\treturn false;\n", I);
+				}
+				else
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\tReturnValue = ((%sScriptBase*)Object)->ScriptTriggered%s(", I, ClassName, Methods[I]->Name.ToCString());
+
+					for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
+					{
+						ZEString VariantType = ReturnVariantType(Methods[I]->Parameters[J]->Type.Type);
+
+						if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ENUMERATOR)
+						{
+							fprintf(File,
+								"((%s)(Parameters[%d]->GetInt32ConstRef()))%s", 
+								Methods[I]->Parameters[J]->EnumData->Name.ToCString(), J,
+								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+						}
+						else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+						{
+							if(Methods[I]->IsOperator)
+							{
+								fprintf(File,
+									"%s(%s*)Parameters[%d]->GetObjectPtr%sRef()%s", 
+									Methods[I]->IsOperator ? "*" : "",
+									ClassName, J,
+									Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+									J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+							}
+							else
+							{
+								fprintf(File,
+									"%s(%s*)Parameters[%d]->GetObjectPtr%sRef()%s", 
+									Methods[I]->IsOperator ? "*" : "",
+									Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(), J,
+									Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+									J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+							}
+						}
+						else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
+						{
+							fprintf(File,
+								"Parameters[%d]->GetArray%sRef<%s>()%s", J,
+								Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+								Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
+								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+						}
+						else
+						{
+							fprintf(File,
+								"Parameters[%d]->Get%s%sRef()%s", J, VariantType.ToCString(),
+								Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+								J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+						}
+					}
+					fprintf(File, Methods[I]->Parameters.GetCount() == 0 ? ");\n" : "");
+					fprintf(File, "\t\t\treturn true;\n");
+				}
+			}
+			else
+			{
+				fprintf(File, 
+					"\t\tcase %d:\n"
+					"\t\t\t((%sScriptBase*)Object)->ScriptTriggered%s(", I, ClassName, Methods[I]->Name.ToCString());
+
+				for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
+				{
+					ZEString VariantType = ReturnVariantType(Methods[I]->Parameters[J]->Type.Type);
+
+					if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ENUMERATOR)
+					{
+						fprintf(File,
+							"((%s)(Parameters[%d]->GetInt32ConstRef()))%s", 
+							Methods[I]->Parameters[J]->EnumData->Name.ToCString(), J,
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+					}
+					else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+					{
+						fprintf(File,
+							"(%s*)Parameters[%d]->GetObjectPtr%sRef()%s", 
+							Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(), J,
+							Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+					}
+					else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
+					{
+						fprintf(File,
+							"Parameters[%d]->GetArray%sRef<%s>()%s", J,
+							Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+							Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+					}
+					else
+					{
+						fprintf(File,
+							"Parameters[%d]->Get%s%sRef()%s", J, VariantType.ToCString(),
+							Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+					}
+				}
+				fprintf(File, Methods[I]->Parameters.GetCount() == 0 ? ");\n" : "");
+				fprintf(File, "\t\t\treturn true;\n");
+			}
+		}
+		else
+		{
+			if(Methods[I]->IsOperator && (!Class->HasPublicConstructor || Class->IsAbstract))
+			{
+				fprintf(File, 
+					"\t\tcase %d:\n"
+					"\t\t\treturn false;\n", I);
+
+				continue;
+			}
+
+			if(Methods[I]->ReturnParameter.Type.Type != ZE_TT_NULL)
+			{
+				if(Methods[I]->Name == "Class")
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\tReturnValue.SetClass(%s::Class());\n"
+						"\t\t\treturn true;\n", I, ClassName);
+				}
+				else if(Methods[I]->Name == "CreateInstance")
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\tReturnValue.SetObjectPtr(%s::CreateInstance());\n"
+						"\t\t\treturn true;\n", I, ClassName);
+				}
+				else if(strcmp(Methods[I]->Name.ToCString(), Methods[I]->MemberOf.ToCString()) == 0)
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\treturn false;\n", I);
+				}
+				else
+				{
+					if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ENUMERATOR)
+					{
+						if(Methods[I]->IsStatic)
+						{
+							fprintf(File, 
+								"\t\tcase %d:\n"
+								"\t\t\tReturnValue = (ZEInt32)(%s::%s(", I, Methods[I]->MemberOf.ToCString(), Methods[I]->Name.ToCString());
+						}
+						else
+						{
+							fprintf(File, 
+								"\t\tcase %d:\n"
+								"\t\t\tReturnValue = (ZEInt32)(((%s*)Object)->%s(", I, Methods[I]->MemberOf.ToCString(), Methods[I]->Name.ToCString());
+						}
+
+						for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
+						{
+							ZEString VariantType = ReturnVariantType(Methods[I]->Parameters[J]->Type.Type);
+
+							if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ENUMERATOR)
+							{
+								fprintf(File,
+									"((%s)(Parameters[%d]->GetInt32ConstRef()))%s",
+									Methods[I]->Parameters[J]->EnumData->Name.ToCString(), J,
+									J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "));\n");
+							}
+							else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+							{
+								fprintf(File,
+									"%s(%s*)Parameters[%d]->GetObjectPtr%sRef()%s", 
+									Methods[I]->IsOperator ? "*" : "",
+									Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(), J,
+									Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+									J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "));\n");
+							}
+							else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
+							{
+								fprintf(File,
+									"Parameters[%d]->GetArray%sRef<%s>()%s", J,
+									Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+									Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
+									J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+							}
+							else
+							{
+								fprintf(File,
+									"Parameters[%d]->Get%s%sRef()%s", J, VariantType.ToCString(),
+									Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+									J != Methods[I]->Parameters.GetCount() - 1 ? ", " : "));\n");
+							}
+						}
+						fprintf(File, Methods[I]->Parameters.GetCount() == 0 ? "));\n" : "");
+						fprintf(File, "\t\t\treturn true;\n");
+					}
+					else if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ARRAY)
+					{
+						fprintf(File, 
+							"\t\tcase %d:\n"
+							"\t\t\treturn false;\n", I);
+					}
+					else
+					{
+						if(Methods[I]->IsStatic)
+						{
+							fprintf(File, 
+								"\t\tcase %d:\n"
+								"\t\t\tReturnValue = %s::%s(", I, Methods[I]->MemberOf.ToCString(), Methods[I]->Name.ToCString());
+						}
+						else
+						{
+							if(Methods[I]->IsOperator)
+							{
+								fprintf(File, 
+									"\t\tcase %d:\n"
+									"\t\t\tReturnValue = ((%s*)Object)->%s(", I, ClassName, Methods[I]->Name.ToCString());
+							}
+							else
+							{
+								fprintf(File, 
+									"\t\tcase %d:\n"
+									"\t\t\tReturnValue = ((%s*)Object)->%s(", I, Methods[I]->MemberOf.ToCString(), Methods[I]->Name.ToCString());
+							}
+						}
+
+						for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
+						{
+							ZEString VariantType = ReturnVariantType(Methods[I]->Parameters[J]->Type.Type);
+
+							if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ENUMERATOR)
+							{
+								fprintf(File,
+									"((%s)(Parameters[%d]->GetInt32ConstRef()))%s", 
+									Methods[I]->Parameters[J]->EnumData->Name.ToCString(), J,
+									J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+							}
+							else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+							{
+								if(Methods[I]->IsOperator)
+								{
+									fprintf(File,
+										"%s(%s*)Parameters[%d]->GetObjectPtr%sRef()%s", 
+										Methods[I]->IsOperator ? "*" : "",
+										ClassName, J,
+										Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+										J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+								}
+								else
+								{
+									fprintf(File,
+										"%s(%s*)Parameters[%d]->GetObjectPtr%sRef()%s", 
+										Methods[I]->IsOperator ? "*" : "",
+										Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(), J,
+										Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+										J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+								}
+							}
+							else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
+							{
+								fprintf(File,
+									"Parameters[%d]->GetArray%sRef<%s>()%s", J,
+									Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+									Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
+									J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+							}
+							else
+							{
+								fprintf(File,
+									"Parameters[%d]->Get%s%sRef()%s", J, VariantType.ToCString(),
+									Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+									J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+							}
+						}
+						fprintf(File, Methods[I]->Parameters.GetCount() == 0 ? ");\n" : "");
+						fprintf(File, "\t\t\treturn true;\n");
+					}
+				}
+			}
+			else
+			{
+				if(strcmp(Methods[I]->Name.ToCString(), Methods[I]->MemberOf.ToCString()) == 0)
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\treturn false;\n", I);
+
+					continue;
+				}
+
+				if(Methods[I]->IsStatic)
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\t%s::%s(", I, Methods[I]->MemberOf.ToCString(), Methods[I]->Name.ToCString());
+				}
+				else
+				{
+					fprintf(File, 
+						"\t\tcase %d:\n"
+						"\t\t\t((%s*)Object)->%s(", I, Methods[I]->MemberOf.ToCString(), Methods[I]->Name.ToCString());
+				}
+
+				for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
+				{
+					ZEString VariantType = ReturnVariantType(Methods[I]->Parameters[J]->Type.Type);
+
+					if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ENUMERATOR)
+					{
+						fprintf(File,
+							"((%s)(Parameters[%d]->GetInt32ConstRef()))%s", 
+							Methods[I]->Parameters[J]->EnumData->Name.ToCString(), J,
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+					}
+					else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_OBJECT_PTR)
+					{
+						fprintf(File,
+							"(%s*)Parameters[%d]->GetObjectPtr%sRef()%s", 
+							Methods[I]->Parameters[J]->Type.ClassData->Name.ToCString(), J,
+							Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+					}
+					else if(Methods[I]->Parameters[J]->Type.Type == ZE_MTT_ARRAY)
+					{
+						fprintf(File,
+							"Parameters[%d]->GetArray%sRef<%s>()%s", J,
+							Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+							Methods[I]->Parameters[J]->Type.SubTypeClassName.ToCString(),
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+					}
+					else
+					{
+						fprintf(File,
+							"Parameters[%d]->Get%s%sRef()%s", J, VariantType.ToCString(),
+							Methods[I]->Parameters[J]->Type.TypeQualifier == ZE_TQ_CONST_REFERENCE ? "Const" : "",
+							J != Methods[I]->Parameters.GetCount() - 1 ? ", " : ");\n");
+					}
+				}
+				fprintf(File, Methods[I]->Parameters.GetCount() == 0 ? ");\n" : "");
+				fprintf(File, "\t\t\treturn true;\n");
+			}
+		}
+	}
+
+
+	if(Methods.GetCount() > 0)
+	{
+		fprintf(File, 
+			"\t\tdefault:\n"
+			"\t\t\treturn false;\n"
+			"\t}\n");
+	}
+
+	fprintf(File,
+		"\treturn false;\n"
+		"}\n\n");
+}
+
 static void CreateCallMethodMethod(FILE* File, ZEClassData* Class, ZEArray<ZEMethodData*> Methods)
 {
 	const char* ClassName = Class->Name;
@@ -3186,16 +3985,11 @@ static void CreateZEClassImplementation(FILE* File, ZEClassData* ClassData, ZEAr
 	if(ClassData->HasPublicConstructor && !ClassData->IsAbstract)
 	{
 		fprintf(File, 
-			"static void CreateScriptInstanceWrapper(%sScriptBase* This)\n"
-			"{\n"
-			"\tnew(This) %sScriptBase();\n"
-			"}\n\n", ClassName, ClassName);
-
-		fprintf(File, 
 			"void* %sClass::CreateScriptInstance()\n"
 			"{\n"
-			"\treturn &CreateScriptInstanceWrapper;\n"
-			"}\n\n",ClassName);
+			"\t//return ZEAngelScriptEngine::GetInstance()->CreateScriptClassInstance(%s::Class());\n"
+			"\treturn NULL;\n"
+			"}\n\n",ClassName, ClassName);
 	}
 	else
 	{
@@ -3488,7 +4282,7 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 			ZESize MethodCountAddition = 0;
 
 			if(ClassData->HasPublicConstructor && !IsAbstract)
-				MethodCountAddition++;
+				MethodCountAddition += 2;
 			
 			if(!ClassData->HasPublicCopyConstructor)
 				MethodCountAddition++;
@@ -3518,6 +4312,8 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 
 			CreateGetPropertyItemCountMethod(File, CurrentClassName, Properties);
 			CreateGetPropertyItemCountMethod(File, CurrentClassName);
+
+			CreateCallWrapperMethodMethod(File, ClassData, Methods);
 
 			CreateCallMethodMethod(File, ClassData, Methods);
 			CreateCallMethodMethod(File, CurrentClassName);
@@ -3597,6 +4393,12 @@ bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData*
 			CreateGetMethodIdMethod(File, CurrentClassName, Methods);
 
 			CreateBuiltInClassImplementation(File, CurrentClassName);
+
+			fprintf(File,
+				"bool %sClass::CallWrapperMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)\n"
+				"{\n"
+				"\treturn false;\n"
+				"}\n\n", CurrentClassName);
 
 			fprintf(File,
 				"ZESize %sClass::GetSizeOfClass()\n"

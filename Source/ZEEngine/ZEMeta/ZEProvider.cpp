@@ -39,6 +39,9 @@ bool ZEProvider::RegisterClasses(ZEClass** ClassArray, ZESize ClassCount)
 {
 	for(ZESize I = 0; I < ClassCount; I++)
 	{
+		if(ClassArray[I] == NULL)
+			continue;
+
 		if(ClassList.Exists(ClassArray[I]))
 			continue;
 
