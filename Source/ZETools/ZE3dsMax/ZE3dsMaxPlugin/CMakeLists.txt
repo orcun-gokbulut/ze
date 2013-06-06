@@ -49,9 +49,8 @@ ze_add_library(ZE3dsMaxPlugin
 	LIBS ZEFoundation ZEFile ZE3dsMaxModelExporter ZE3dsMaxInteriorExporter ZE3dsMaxUI ZE3dsMaxUtils Comctl32 lib3dsMax
 	DLL
 	INSTALL)
-	
-set(LOCAL_WARNING_FLAGS /W3)
-set(LOCAL_RTTI_FLAGS /GR)
+
+set_property(TARGET ZE3dsMaxPlugin APPEND PROPERTY COMPILE_FLAGS "/GR")
 
 set_property(TARGET ZE3dsMaxPlugin PROPERTY FOLDER "ZE3dsMax")
 set_property(TARGET ZE3dsMaxPlugin PROPERTY SUFFIX ".gup")

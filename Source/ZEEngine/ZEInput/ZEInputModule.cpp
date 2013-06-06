@@ -104,11 +104,21 @@ bool ZEInputModule::InitializeSelf()
 		bool Result = DeviceModule->Initialize();
 		if (!Result)
 		{
-			zeLog("Can not initialize input device module.");
+			zeError("Can not initialize input device module.");
 			continue;
 		}
 
 		DeviceModules.Add(DeviceModule);
+
+		const ZEArray<ZEInputDevice*>& Devices = DeviceModule->GetDevices();
+		for (ZESize I = 0; I < DeviceModule->GetDevices().GetCount(); I++)
+		{
+			if (Devices[I]->IsInitialized())
+			{
+				if (!Devices[I]->Initialize())
+					zeError("Cannot initialize input device.");
+			}
+		}
 	}
 
 	return true;
