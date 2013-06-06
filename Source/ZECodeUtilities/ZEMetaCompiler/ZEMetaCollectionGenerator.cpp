@@ -67,23 +67,27 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 
 		fclose(RegisterFile);
 
-		ZEString Context = (char*)Buffer.GetConstCArray();
+		ZEString Context = (const char*)Buffer.GetConstCArray();
 		ZESize Index = 0;
 
-		RegisteredClasses.Add();
+		ZERegisteredClass* RegisteredClass;
+
 		for(ZESize J = 0; J < Context.GetLength(); J++)
 		{
-			if(Context[J] == ',')
+			if(Context.GetCharacter(J).GetValue()[0] == ',')
 			{
-				RegisteredClasses.GetLastItem().RegisteredClassName = Context.SubString(Index, J - 1);
+				RegisteredClass = RegisteredClasses.Add();
+				RegisteredClass->RegisteredClassName = Context.SubString(Index, J - 1);
+
 				Index = J + 1;
 				continue;
 			}
 
-			if(Context[J] == ';')
+			if(Context.GetCharacter(J).GetValue()[0] == ';')
 			{
 				bool IsDuplicateIncludeFileFound = false;
 				ZEString IncludeDirectory = Context.SubString(Index, J - 1);
+
 				for(ZESize I = 0 ; I < RegisteredClasses.GetCount(); I++)
 				{
 					if(RegisteredClasses[I].IncludeDirectory == IncludeDirectory)
@@ -94,14 +98,11 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 				}
 
 				if(!IsDuplicateIncludeFileFound)
-					RegisteredClasses.GetLastItem().IncludeDirectory = Context.SubString(Index, J - 1);
+					RegisteredClass->IncludeDirectory = Context.SubString(Index, J - 1);
 
-				Index = J + 1;
-				RegisteredClasses.Add();
-				continue;
+				break;
 			}
 		}
-		RegisteredClasses.Pop();
 	}
 
 	ZEString ClassCollectionName = Options.ClassCollectionName;
@@ -120,8 +121,6 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 		"\t\tvirtual ZESize\t\t\t\t\t\t\tGetClassCount();\n\n"
 		"\t\tstatic %s*\t\t\tGetInstance();\n"
 		"};\n\n", 
-		ClassCollectionName.ToCString(), 
-		ClassCollectionName.ToCString(), 
 		ClassCollectionName.ToCString(), 
 		ClassCollectionName.ToCString());
 
@@ -151,7 +150,7 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 	}
 
 	if(IsBuiltInTypeFound)
-			fprintf(ClassCollectionSourceFile, "#include \"ZEPrimitiveTypes.h\"\n");
+		fprintf(ClassCollectionSourceFile, "#include \"ZEPrimitiveTypes.h\"\n");
 
 	fprintf(ClassCollectionSourceFile,
 		"\n"

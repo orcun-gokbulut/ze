@@ -83,7 +83,7 @@ ze_add_source(ZEUIDebugDrawTag.h					Sources Headers)
 
 
 ze_add_library(ZEUI
-	LIBS ZEFoundation libFreeType
+	ZEMC ${ZEMC}
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	ZEMC ${ZEMC})
+	LIBS ZEFoundation libFreeType)

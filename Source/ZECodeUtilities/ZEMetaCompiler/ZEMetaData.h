@@ -246,6 +246,7 @@ struct ZEMethodData : public ZETypeData
 {
 	public:
 		bool							IsVirtual;
+		bool							IsPure;
 		bool							IsStatic;
 		bool							IsEvent;
 		

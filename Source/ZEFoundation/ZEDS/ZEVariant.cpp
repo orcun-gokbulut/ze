@@ -1009,8 +1009,7 @@ ZEVector3& ZEVariant::GetVector3Ref() const
 
 const ZEVector3& ZEVariant::GetVector3ConstRef() const
 {
-	//return ConvertConstRef<ZEVector3, ZE_TT_VECTOR3>();
-	return const_cast<const ZEVector3&>(*(ZEVector3*)&Value.Vectors);
+	return ConvertConstRef<ZEVector3, ZE_TT_VECTOR3>();
 }
 
 const ZEVector4& ZEVariant::GetVector4() const
