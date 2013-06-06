@@ -65,6 +65,8 @@ class ZEInputModule : public ZEModule
 		const
 		ZEArray<ZEInputDeviceModule*>&		GetDeviceModules();
 
+		void								GetDeviceIndex(const char* DeviceTypeName);
+
 		virtual bool						IsAcquired();
 		virtual void						Acquire();
 		virtual void						UnAcquire();

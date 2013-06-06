@@ -46,6 +46,5 @@ ze_add_source(ZE3dsMaxScriptRemove.ms 			Sources ZEFC)
 ze_add_library(ZE3dsMaxUI 
 	SOURCES ${Sources}
 	LIBS ZEFoundation lib3dsMax)
-	
-set(LOCAL_WARNING_FLAGS /W3)
-set(LOCAL_RTTI_FLAGS /GR)
+
+set_property(TARGET ZE3dsMaxUI APPEND PROPERTY COMPILE_FLAGS "/GR")

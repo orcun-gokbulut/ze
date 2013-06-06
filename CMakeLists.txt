@@ -61,12 +61,14 @@ set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll wil
 ## Compiler & Linker Options
 #########################################################################################
 if ("${ZEBUILD_PLATFORM_COMPILER}" EQUAL "MSVC")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
 	if (ZEBUILD_PLATFORM_ARCHITECTURE_X86)
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")	
 	endif()
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
+	string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR- /EHsc-")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
 	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG")
 	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
 endif()
@@ -75,9 +77,9 @@ endif()
 ## Directories
 #########################################################################################
 include_directories(
-	${CMAKE_SOURCE_DIR}/Source
-	${CMAKE_SOURCE_DIR}/Source/ZEEngine
-	${CMAKE_SOURCE_DIR}/Source/ZEFoundation)
+	${CMAKE_CURRENT_SOURCE_DIR}/Source
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEEngine
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEFoundation)
 
 include(ze_qt)
 

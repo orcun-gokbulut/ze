@@ -35,10 +35,6 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_subdirectory(libXSens)
-
-include_directories(libXSens)
-
 ze_add_source(ZEXSensInputDevice.cpp			Sources)
 ze_add_source(ZEXSensInputDevice.h				Sources)
 ze_add_source(ZEXSensInputModule.cpp			Sources)

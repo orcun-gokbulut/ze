@@ -33,33 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEError.h"
-#include "ZECore/ZEConsole.h"
 #include "ZEXSensInputModule.h"
 #include "ZEXSensInputDevice.h"
 
-#include "xsens_list.h"
-#include "xsens_std.h"
-#include "cmtdef.h"
-#include "cmtscan.h"
+#include "ZEError.h"
+#include "ZECore/ZEConsole.h"
+
+#include "xsensdeviceapi.h"
 
 ZE_EXTENSION_DESCRIPTION(ZEXSensInputModule, ZEInputDeviceModule, NULL)
-using namespace xsens;
+
+ZEXSensInputModule::ZEXSensInputModule()
+{
+	Control = NULL;
+}
+
 bool ZEXSensInputModule::InitializeSelf()
 {
 	if (!ZEInputDeviceModule::InitializeSelf())
 		return false;
 
-	XsensResultValue Result;
-	List<CmtPortInfo> DeviceInfos;
+	Control = XsControl::construct();
+	Control->setSerialKey("BKAM-XDBR-MFNN-9HZ0-V0KY");
 
-	cmtScanPorts(DeviceInfos);
-
-	for(int I = 0; I < DeviceInfos.count(); I++)
+	XsPortInfoList PortInfos = XsScanner::scanPorts();
+	for(int I = 0; I < PortInfos.size(); I++)
 	{
 		ZEXSensInputDevice* Device = new ZEXSensInputDevice();
 		Device->Module = this;
-		Device->Info = DeviceInfos[I];
+		Device->PortInfo = PortInfos[I];
 		RegisterDevice(Device);
 	}
 
@@ -69,6 +71,13 @@ bool ZEXSensInputModule::InitializeSelf()
 bool ZEXSensInputModule::DeinitializeSelf()
 {
 	DestroyDevices();
+
+	if (Control != NULL)
+	{
+		Control->close();
+		Control->destruct();
+		Control = NULL;
+	}
 
 	return ZEInputDeviceModule::DeinitializeSelf();
 }

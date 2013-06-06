@@ -38,18 +38,20 @@
 #define __ZE_XSENS_INPUT_MODULE_H__
 
 #include "ZEInput/ZEInputDeviceExtension.h"
-#include "ZEXSensInputModule.h"
 
 class ZEInputDevice;
+struct XsControl;
 
 class ZEXSensInputModule : public ZEInputDeviceModule
 {
 	ZE_EXTENSION(ZEXSensInputModule)
 	friend class ZEXSensInputDevice;
 	private:
+		XsControl*					Control;
 		bool						InitializeSelf();
 		bool						DeinitializeSelf();
 
+									ZEXSensInputModule();
 	public:
 		virtual void				Process();
 };
