@@ -112,6 +112,8 @@ ZEFixedMaterial::ZEFixedMaterial()
 	SubSurfaceScatteringFactor = 0.0f;
 	MaterialComponentMask = ~0;
 	GlobalAmbientEnabled = true;
+
+	SetSSAOEnabled(true);
 }
 
 ZEFixedMaterial::~ZEFixedMaterial()
@@ -1295,6 +1297,19 @@ bool ZEFixedMaterial::GetVertexColorEnabled()
 	return (MaterialComponents & ZE_SHADER_VERTEX_COLOR) != 0;
 }
 
+void ZEFixedMaterial::SetSSAOEnabled(bool Enabled)
+{
+	if (Enabled)
+		MaterialComponents |= ZE_SHADER_SSAO;
+	else
+		MaterialComponents &= ~ZE_SHADER_SSAO;
+}
+
+bool ZEFixedMaterial::GetSSAOEnabled() const
+{
+	return (MaterialComponents & ZE_SHADER_SSAO) != 0;
+}
+
 void ZEFixedMaterial::Tick(float ElapsedTime)
 {
 
@@ -1661,6 +1676,8 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + LightMapValue.GetString();
 		SetLightMapFile(ResourcePath);
 	}
+
+	SetSSAOEnabled(true);
 
 	UpdateMaterial();
 }

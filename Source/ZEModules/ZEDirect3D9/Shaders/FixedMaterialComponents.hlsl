@@ -154,6 +154,10 @@
 #define ZE_SHADER_VERTEX_COLOR
 #endif
 
+#ifdef ZE_SHADER_COMPONENT_24
+#define ZE_SHADER_SSAO
+#endif
+
 // Derivated Custom Shader Components
 #if defined(ZE_SHADER_NORMAL_MAP) || defined(ZE_SHADER_PARALLAX_MAP) || defined(ZE_SHADER_DETAIL_NORMAL_MAP)
 #define ZE_SHADER_TANGENT_SPACE
