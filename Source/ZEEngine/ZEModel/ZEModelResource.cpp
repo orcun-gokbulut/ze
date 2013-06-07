@@ -966,7 +966,7 @@ bool ZEModelResource::ReadAnimations(ZEMLSerialReader* NodeReader)
 			CurrentAnimationFrame->MeshKeys.SetCount(MeshKeyCount);
 
 			if (MeshKeyCount != 0)
-				NodeReader->GetData(CurrentAnimationFrame->MeshKeys.GetCArray(), MeshKeyCount * sizeof(ZEModelResourceAnimationKey), (I * (FrameKeyCount + BoneKeyCount)) * sizeof(ZEModelResourceAnimationKey));
+				NodeReader->GetData(CurrentAnimationFrame->MeshKeys.GetCArray(), MeshKeyCount * sizeof(ZEModelResourceAnimationKey), (I * FrameKeyCount) * sizeof(ZEModelResourceAnimationKey) + BoneKeyCount * sizeof(ZEModelResourceAnimationKey));
 		}
 
 	}

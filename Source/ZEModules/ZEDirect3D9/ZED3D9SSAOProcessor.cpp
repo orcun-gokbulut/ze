@@ -556,6 +556,7 @@ ZED3D9SSAOProcessor::ZED3D9SSAOProcessor()
 	VertexDeclaration = NULL;
 
 	Enabled = true;
+	UpdateKernel = true;
 	SampleRadius = 1.0f;
 	SampleCount = 16;
 	AngleBias = 0.075f;

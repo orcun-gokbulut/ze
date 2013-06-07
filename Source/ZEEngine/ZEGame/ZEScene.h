@@ -87,6 +87,7 @@ class ZEScene
 		ZECamera*								ActiveCamera;
 		ZEListener*								ActiveListener;
 
+		bool									Enabled;
 		float									AmbientFactor;
 		ZEVector3								AmbientColor;
 
@@ -111,6 +112,9 @@ class ZEScene
 
 		void									SetActiveListener(ZEListener* Listener);
 		ZEListener*								GetActiveListener();
+
+		void									SetEnabled(bool Enabled);
+		bool									GetEnabled() const;
 
 		ZESceneCuller&							GetSceneCuller();
 		const ZESceneStatistics&				GetStatistics() const;
