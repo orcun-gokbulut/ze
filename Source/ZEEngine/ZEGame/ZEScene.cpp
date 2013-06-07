@@ -340,6 +340,9 @@ void ZEScene::Tick(ZEEntity* Entity, float ElapsedTime)
 
 void ZEScene::Tick(float ElapsedTime)
 {
+	if (!Enabled)
+		return;
+
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		Tick(Entities[I], ElapsedTime);
 }
@@ -520,6 +523,7 @@ ZEScene::ZEScene()
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
 	PhysicalWorld = NULL;
+	Enabled = true;
 	AmbientColor = ZEVector3::One;
 	AmbientFactor = 0.0f;
 }
@@ -535,4 +539,14 @@ ZEScene::~ZEScene()
 ZEScene* ZEScene::GetInstance()
 {
 	return zeGame->GetScene();
+}
+
+void ZEScene::SetEnabled(bool Enabled)
+{
+	this->Enabled = Enabled;
+}
+
+bool ZEScene::GetEnabled() const
+{
+	return Enabled;
 }
