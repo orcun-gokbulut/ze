@@ -60,16 +60,6 @@ void ZEXSensCallback::onDataAvailable(XsDevice* XSensDevice, const XsDataPacket*
 	Device->Lock.Unlock();
 }
 
-/*inline ZEVector4 XSENS_TO_ZE_VECTOR(const CmtVector& Vector)
-{
-	return ZEVector4(Vector.m_data[0], Vector.m_data[2], Vector.m_data[1], 1.0f);
-}
-
-inline ZEQuaternion XSENS_TO_ZE_QUATERNION(const CmtQuat& Quaternion)
-{
-	return ZEQuaternion(-Quaternion.m_data[3], Quaternion.m_data[1], -Quaternion.m_data[0], Quaternion.m_data[2]).Normalize();	
-}*/
-
 bool ZEXSensInputDevice::InitializeSelf()
 {
 	if (!ZEInputDevice::InitializeSelf())

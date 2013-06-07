@@ -41,7 +41,7 @@
 class ZELock
 {
 	private:
-		ZEInt32				CurrentNumber;
+		volatile ZEInt32	CurrentNumber;
 		volatile ZEInt32	NextNumber;
 
 	public:
