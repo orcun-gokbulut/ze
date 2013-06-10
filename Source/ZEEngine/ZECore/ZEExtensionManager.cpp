@@ -127,8 +127,8 @@ ZEExtensionManager::ZEExtensionManager()
 	RegisterExtension(ZEVRPNInputModule::Description());
 	RegisterExtension(ZEXSensInputModule::Description());
 	RegisterExtension(ZEVectorNavInputModule::Description());
+	RegisterExtension(ZEISenseInputModule::Description());
 	//RegisterExtension(ZESensicsInputModule::Description());
-	//RegisterExtension(ZEISenseInputModule::Description());
 }
 
 ZEExtensionManager::~ZEExtensionManager()

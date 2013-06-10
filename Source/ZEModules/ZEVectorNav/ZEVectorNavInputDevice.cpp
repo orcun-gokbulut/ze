@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEISenseInputDevice.cpp
+ Zinek Engine - ZEVectorNavInputDevice.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,34 +34,41 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
+#include "ZECore/ZEConsole.h"
 #include "ZEDS/ZEHashGenerator.h"
+
+#include "ZEVectorNavInputModule.h"
+#include "ZEVectorNavInputDevice.h"
+
 #include "ZEDS/ZEFormat.h"
-#include "ZECore/ZEWindow.h"
 
-#include "ZEISenseInputModule.h"
-#include "ZEISenseInputDevice.h"
-
-#include "ZEMath/ZEAngle.h"
-#include "isense/isense.h"
+#include "vn100.h"
 #include "ZECore/ZEOptionManager.h"
 
-
-bool ZEISenseInputDevice::InitializeSelf()
+bool ZEVectorNavInputDevice::InitializeSelf()
 {
 	if (!ZEInputDevice::InitializeSelf())
 		return false;
 
-	Handle = ISD_OpenTracker((Hwnd)NULL, ZEOptionManager::GetInstance()->GetOption("CustHCombat", "HMDSensorPort")->GetValue().GetInt32(), FALSE, FALSE); 
-	if (Handle <= 0)
+	if (vn100_connect(&Device, ZEFormat::Format("COM{0}", ZEOptionManager::GetInstance()->GetOption("CustHCombat", "GunSensorPort")->GetValue().GetInt32()).ToCString(), 115200) != VNERR_NO_ERROR)
 		return false;
-	
-	ISD_STATION_INFO_TYPE Config;
-	ISD_GetStationConfig(Handle, &Config, 0, false);
-	Config.AngleFormat = ISD_QUATERNION;
-	ISD_SetStationConfig(Handle, &Config, 0, false);
+
+	if (vn100_setAsynchronousDataOutputType(&Device, VNASYNC_VNQTN,true) != VNERR_NO_ERROR)
+	{
+		vn100_disconnect(&Device);
+		memset(&Device, 0, sizeof(Vn100));
+		return false;
+	}
+
+	if (vn100_setVpeControl(&Device, 1, 2, 1, 1, true) != VNERR_NO_ERROR)
+	{
+		vn100_disconnect(&Device);
+		memset(&Device, 0, sizeof(Vn100));
+		return false;
+	}
 
 	Description.Type = ZE_IDT_SENSOR;
-	Description.FullName = "ISense";
+	Description.FullName = "VectorNav";
 	Description.Sink = true;
 	Description.SinkName = "sensor";
 	Description.SinkNameHash = ZEHashGenerator::Hash(Description.SinkName);
@@ -69,66 +76,46 @@ bool ZEISenseInputDevice::InitializeSelf()
 	Description.VectorCount = 1;
 
 	Description.Index = ZEInputDeviceIndexes::GetNewDeviceIndex(ZE_IDT_SENSOR);
-	Description.Name = ZEFormat::Format("ISense{0:d:02}", Description.Index);
+	Description.Name = ZEFormat::Format("VectorNav{0:d:02}", Description.Index);
 	Description.NameHash = ZEHashGenerator::Hash(Description.Name);
 
 	State.Initialize(Description);
 	State.Reset();
 
+
 	return true;
 }
 
-bool ZEISenseInputDevice::DeinitializeSelf()
+bool ZEVectorNavInputDevice::DeinitializeSelf()
 {
-	if (Handle != -1)
+	if (Device.isConnected)
 	{
-		ISD_CloseTracker(Handle);
-		Handle = -1;
+		vn100_disconnect(&Device);
+		memset(&Device, 0, sizeof(Vn100));
 	}
 
 	return ZEInputDevice::DeinitializeSelf();
 }
 
-void ZEISenseInputDevice::Acquire()
-{
-	if (Handle == -1)
-		return;
-
-	ZEInputDevice::Acquire();
-}
-
-void ZEISenseInputDevice::UnAcquire()
-{
-	ZEInputDevice::UnAcquire();
-}
-
-void ZEISenseInputDevice::Process()
+void ZEVectorNavInputDevice::Process()
 {
 	State.Advance();
-	
-	if (Handle == -1)
+
+	Vn100CompositeData Data;
+	if (vn100_getCurrentAsyncData(&Device, &Data) != VNERR_NO_ERROR)
 		return;
 
-	ISD_TRACKING_DATA_TYPE Data;
-	if (ISD_GetTrackingData(Handle, &Data))
-	{
-		float Angle;
-		ZEVector3 Axis;
-		ZEQuaternion::ConvertToAngleAxis(Angle, Axis, ZEQuaternion(Data.Station[0].Quaternion[0], Data.Station[0].Quaternion[1], Data.Station[0].Quaternion[2], Data.Station[0].Quaternion[3]));
-		ZEVector3 NewAxis;
-		NewAxis.x = Axis.y;
-		NewAxis.y = -Axis.z;
-		NewAxis.z = Axis.x;
-		ZEQuaternion::CreateFromAngleAxis(State.Quaternions.CurrentValues[0], -Angle, NewAxis);
-	}
+	float Angle;
+	ZEVector3 Axis;
+	ZEQuaternion::ConvertToAngleAxis(Angle, Axis, ZEQuaternion(Data.quaternion.w, Data.quaternion.x, Data.quaternion.y, Data.quaternion.z).Normalize());
+	ZEVector3 NewAxis;
+	NewAxis.x = Axis.y;
+	NewAxis.y = -Axis.z;
+	NewAxis.z = Axis.x;
+	ZEQuaternion::CreateFromAngleAxis(State.Quaternions.CurrentValues[0], -Angle, NewAxis);
 }
 
-ZEISenseInputDevice::ZEISenseInputDevice()
+ZEVectorNavInputDevice::ZEVectorNavInputDevice()
 {
-	Handle = -1;
-}
-
-ZEISenseInputDevice::~ZEISenseInputDevice()
-{
-	Deinitialize();
+	memset(&Device, 0, sizeof(Vn100));
 }
