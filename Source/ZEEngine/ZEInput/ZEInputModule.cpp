@@ -113,7 +113,7 @@ bool ZEInputModule::InitializeSelf()
 		const ZEArray<ZEInputDevice*>& Devices = DeviceModule->GetDevices();
 		for (ZESize I = 0; I < DeviceModule->GetDevices().GetCount(); I++)
 		{
-			if (Devices[I]->IsInitialized())
+			if (!Devices[I]->IsInitialized())
 			{
 				if (!Devices[I]->Initialize())
 					zeError("Cannot initialize input device.");
