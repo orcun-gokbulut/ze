@@ -37,18 +37,15 @@
 #include "ZECore.h"
 #include "ZEDS/ZEFormat.h"
 #include "ZEGUID.h"
+#include "ZEBase64.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <DbgHelp.h>
-#pragma comment(lib, "DbgHelp.lib")
-
+#include "ZEVersion.h"
+#include "ZELog.h"
 
 ZECrashHandler::ZECrashHandler()
 {
-	char TempFolder[MAX_PATH];
-	if (GetTempPath (MAX_PATH, TempFolder) != 0)
-		CrashDumpFilePath = ZEFormat::Format("{0}/{1}.zeDump", TempFolder, ZEGUID::Generate().ToString());
 
 	Enable = true;
 	Initialized = false;
@@ -56,8 +53,8 @@ ZECrashHandler::ZECrashHandler()
 
 	#if(_DEBUG)
 	{
-		CrashReport = false;
-		CreateCrashDump = false;
+		CrashReport = true;
+		CreateCrashDump = true;
 	}
 	#else
 	{
@@ -74,9 +71,14 @@ ZECrashHandler::~ZECrashHandler()
 
 LONG WINAPI ZEUnhandledExceptionHandler(EXCEPTION_POINTERS* Ex)
 {
-	zeCore->GetCrashHandler()->SetCrashReport(false);//test
-	zeCore->GetCrashHandler()->SetCreateCrashDump(true);
-	zeCore->GetCrashHandler()->Crashed();
+	if(zeCore->GetCrashHandler()->GetEnable())
+	{
+		zeCore->GetCrashHandler()->SetCrashDumpType(ZE_CDT_FULL);
+		zeCore->GetCrashHandler()->SetCreateCrashDump(true);
+		zeCore->GetCrashHandler()->SetCrashReport(true);
+		zeCore->GetCrashHandler()->Crashed();		
+	}
+
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
@@ -85,55 +87,35 @@ void ZECrashHandler::Crashed()
 	if (!Enable)
 		return;
 
-	if (CreateCrashDump)
-	{
-		MINIDUMP_TYPE DumpFlags;
-
-		if(CrashDumpType == ZE_CDT_MINIMAL)
-		{			
-			DumpFlags = (MINIDUMP_TYPE)(MiniDumpWithIndirectlyReferencedMemory | MiniDumpScanMemory);
-		}
-
-		if(CrashDumpType == ZE_CDT_NORMAL)
-		{
-			DumpFlags = (MINIDUMP_TYPE)(MiniDumpWithDataSegs | MiniDumpWithHandleData | MiniDumpWithFullMemoryInfo | MiniDumpWithThreadInfo | MiniDumpWithUnloadedModules);
-		}
-
-		if(CrashDumpType == ZE_CDT_FULL)
-		{
-			DumpFlags = (MINIDUMP_TYPE)(MiniDumpWithFullMemory | MiniDumpWithFullMemoryInfo | MiniDumpWithHandleData | MiniDumpWithThreadInfo | MiniDumpWithUnloadedModules);
-		}
-
-		HANDLE hFile = CreateFileA(CrashDumpFilePath, GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-		if(hFile == INVALID_HANDLE_VALUE)
-			return;
-
-		HANDLE hProcess = GetCurrentProcess();
-		DWORD ProcessId = GetProcessId(hProcess);
-
-		if(!MiniDumpWriteDump(hProcess, ProcessId, hFile, DumpFlags, NULL, NULL, NULL))
-		{			
-			CloseHandle(hFile);
-			DeleteFileA(CrashDumpFilePath);
-			return;
-		}
-
-		CloseHandle(hFile);
-		//CrashReport = true;
-	}
-
 	if (CrashReport)
 	{		
-		HMODULE CrashReportDLL = LoadLibrary("ZECrashReport.dll");		
+		HMODULE CrashReportDLL = LoadLibrary("C:/Users/onur.babaoglu/Desktop/ZE/trunk/Build/x64/Source/ZETools/ZECrashReportUI/Debug/ZECrashReportUI.dll");		
 		if (CrashReportDLL == NULL)
 			return;
 
-		void* FunctionPointer = GetProcAddress(CrashReportDLL, "CrashReport");
+		void* FunctionPointer = GetProcAddress(CrashReportDLL, "CrashReportMain");
 		if (FunctionPointer == NULL)
 			return;
 
-		((void (*)(ZECore*))FunctionPointer)(ZECore::GetInstance());
+		ZECrashReportParameters Data;
+		Data.ProcessId = GetCurrentProcessId();
+		Data.CreateDump = GetCreateCrashDump();
+		Data.DumpType = GetCrashDumpType();
+		Data.LogFile = ZELog::GetInstance()->GetLogFileEnabled();
+		//strcpy(Data.LogFilePath, ZELog::GetInstance()->GetLogFileName());
+		strcpy(Data.URL, "http://localhost:8080/puttest/test.dat");
+		Data.Version = ZEVersion::GetZinekVersion();
+
+
+		ZEString NamedPipeName = "\\\\.\\pipe\\fsdf";// + ZEGUID::Generate().ToString();
+		//WinExec(CommandArgument + EncodedParameters, SW_NORMAL);
+
+		HANDLE NamedPipeHandle = CreateNamedPipe(NamedPipeName.ToCString(), PIPE_ACCESS_DUPLEX,	PIPE_TYPE_MESSAGE | PIPE_WAIT, 1, NULL, NULL, INFINITE, NULL);
+		ConnectNamedPipe(NamedPipeHandle, NULL);
+		DWORD Temp;
+		WriteFile(NamedPipeHandle, &Data, sizeof(ZECrashReportParameters), &Temp, NULL);
+		DWORD Result;
+		ReadFile(NamedPipeHandle, &Result, sizeof(DWORD), &Temp, NULL);
 	}
 }
 

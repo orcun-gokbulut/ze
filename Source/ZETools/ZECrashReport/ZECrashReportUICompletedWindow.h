@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEErrorManager.h
+ Zinek Engine - ZECrashReportUICompletedWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,34 +32,43 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
 #pragma once
-#ifndef	__ZE_ERROR_MANAGER_H__
-#define __ZE_ERROR_MANAGER_H__
 
-#include "ZEError.h"
-#include "ZEDS/ZEString.h"
+#ifndef _ZE_CRUI_COMPLETEDWINDOW_H_
+#define _ZE_CRUI_COMPLETEDWINDOW_H_
 
-class ZEOptionSection;
-class ZEOption;
-class ZETypedVariant;
+#include <QtGui/QMainWindow>
+#include "ZECrashReportUIClickableLabel.h"
+#include "ZECrashReport/ZECrashReport.h"
 
-class ZEErrorManager
+namespace Ui
 {
-	friend class					ZECore;
+	class CompletedWindowUI;
+}
+
+class ZECrashReportUICompletedWindow : public QMainWindow
+{
+	Q_OBJECT
+
+	public:		
+										ZECrashReportUICompletedWindow(QMainWindow* ParentWidget);
+										~ZECrashReportUICompletedWindow();
+
 	private:
-		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
-		static void					ErrorCallback(ZEErrorType ErrorType);
+		ZECrashReport*					CrashReport;
+		QMainWindow*					MainWindow;
+		Ui::CompletedWindowUI*			CompletedWindow;
+		ZECrashReportUIClickableLabel*	pbtnEmail;
+		ZECrashReportUIClickableLabel*	pbtnWebSite;
 
-									ZEErrorManager();
-									~ZEErrorManager();
-	public:
-		void						SetLogFileEnabled(bool Enabled);
-		bool						GetLogFileEnabled();
-
-		void						SetLogFileName(const ZEString& NewLogFile);
-		const ZEString&				GetLogFileName();
-		
-		static ZEErrorManager*		GetInstance();
+		void							CreateWindowRawText();
+		void							InitializeLinkButtons();
+		bool							eventFilter(QObject* Obj, QEvent* Event);
+	public slots:
+		void							btnClose_Clicked();
+		void							btnWebSite_Clicked();
+		void							btnEmail_Clicked();
+	
 };
-
 #endif

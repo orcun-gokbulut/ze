@@ -43,7 +43,7 @@
 
 ZECrashReportProviderType ZECrashReportUserCommentProvider::GetProviderType()
 {
-	return ZE_CRPT_USER_COMMENT;
+	return ZE_CRPT_TEXT;
 }
 
 const char* ZECrashReportUserCommentProvider::GetName()

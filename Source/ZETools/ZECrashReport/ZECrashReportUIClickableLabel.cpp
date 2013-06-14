@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEErrorManager.h
+ Zinek Engine - ZECrashReportUIClickableLabel.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,34 +32,33 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#pragma once
-#ifndef	__ZE_ERROR_MANAGER_H__
-#define __ZE_ERROR_MANAGER_H__
 
-#include "ZEError.h"
-#include "ZEDS/ZEString.h"
+#include "ZECrashReportUIClickableLabel.h"
 
-class ZEOptionSection;
-class ZEOption;
-class ZETypedVariant;
-
-class ZEErrorManager
+ZECrashReportUIClickableLabel::ZECrashReportUIClickableLabel(const QString text, QWidget* parent) : QLabel(parent)
 {
-	friend class					ZECore;
-	private:
-		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
-		static void					ErrorCallback(ZEErrorType ErrorType);
+	this->setText(text);
+	QPalette palette;
+	QBrush brush1(QColor(0, 0, 255, 255));
+	palette.setBrush(QPalette::Active, QPalette::WindowText, brush1);
+	palette.setBrush(QPalette::Inactive, QPalette::WindowText, brush1);
+	QBrush brush2(QColor(120, 120, 120, 255));
+	brush2.setStyle(Qt::SolidPattern);
+	palette.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+	this->setPalette(palette);
+	QFont font1;
+	font1.setUnderline(true);
+	this->setFont(font1);
+	this->setCursor(QCursor(Qt::PointingHandCursor));
+}
 
-									ZEErrorManager();
-									~ZEErrorManager();
-	public:
-		void						SetLogFileEnabled(bool Enabled);
-		bool						GetLogFileEnabled();
+ZECrashReportUIClickableLabel::~ZECrashReportUIClickableLabel()
+{
 
-		void						SetLogFileName(const ZEString& NewLogFile);
-		const ZEString&				GetLogFileName();
-		
-		static ZEErrorManager*		GetInstance();
-};
+}
 
-#endif
+void ZECrashReportUIClickableLabel::mousePressEvent (QMouseEvent* Event)
+{
+	QLabel::mousePressEvent(Event);
+	emit clicked();
+}

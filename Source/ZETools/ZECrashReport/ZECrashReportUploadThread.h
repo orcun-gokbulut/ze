@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEVersion.cpp
+ Zinek Engine - ZECrashReportUploadThread.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,72 +33,33 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEVersion.h"
-#include "ZEDS/ZEFormat.h"
-ZEString ZEVersion::GetShortString() 
+#include <QtCore/QThread>
+#include "ZECrashReport/ZECrashReport.h"
+
+
+class ZECrashReportUploadThread : public QThread
 {
-	return ZEFormat::Format("{0:d:02}.{1:d:02}.{2:d:02}:{3:d04} ({3})", Major, Minor, Internal, Build, Platform);
-}
-
-ZEString ZEVersion::GetLongString()	
-{
-	return ZEFormat::Format("{0:d:02}.{1:d:02}.{2:d:02}:{3:d04} ({3})", Major, Minor, Internal, Build, Platform);
-}
-
-ZEVersion ZEVersion::GetZinekVersion()
-{
-	ZEVersion Temp;
-	
-	Temp.Major = ZE_VERSION_MAJOR;
-	Temp.Minor = ZE_VERSION_MINOR;
-	Temp.Internal = ZE_VERSION_INTERNAL;
-	Temp.Build = ZE_VERSION_BUILD;
-	//Temp.Platform = ZE_PLATFORM;
-
-	return Temp;
-}
-
-bool ZEVersion::Check(const ZEVersion& A, const ZEVersion& B, ZEVersionCheckLevel Level)
-{
-	switch(Level)
-	{
-		case ZE_VCL_MAJOR:
-			return A.Major == B.Major;
-
-		case ZE_VCL_MINOR:
-			return A.Major == B.Major && A.Minor >= B.Minor;
-
-		case ZE_VCL_INTERNAL:
-			return A.Major == B.Major && A.Minor >= B.Minor && A.Internal >= B.Internal;
+	Q_OBJECT
 		
-		default:
-			return false;
-	}
-}
+	private:
+		ZECrashReport*		CrashReport;
+		const char*			UploadURL;
+		const char*			FileName;
 
-ZEVersion::ZEVersion()
-{
-	this->Major = 0;
-	this->Minor = 0;
-	this->Internal = 0;
-	this->Build = 0;
-	this->Platform = ""; //ZE_PLATFORM;
-}
+		void				SendReport();
+		bool				PackageItems();
+		bool				CompressPackage();
+		void				CleanUp();
 
-ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal)
-{
-	this->Major = Major;
-	this->Minor = Minor;
-	this->Internal = Internal;
-	this->Build = 0;
-	this->Platform =""; //ZE_PLATFORM;
-}
+	public:
+		void				run();
+		void				SetUploadURL(const char* UploadURL);
+		const char*			GetUploadURL();
 
-ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build)
-{
-	this->Major = Major;
-	this->Minor = Minor;
-	this->Internal = Internal;
-	this->Build = Build;
-	this->Platform = ""; //ZE_PLATFORM;
-}
+							ZECrashReportUploadThread(ZECrashReport& CrashReport);
+							~ZECrashReportUploadThread();
+	signals:
+		void				UploadCompleted();
+		void				UploadError();
+		void				UpdateUploadInformation();
+};

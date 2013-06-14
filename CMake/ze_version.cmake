@@ -53,20 +53,24 @@ macro(ze_get_version)
 
 endmacro()
 
-macro(ze_get_version_branch_name)
-	file(READ "${ARGV0}/Version.txt" VERSION_STRING)
-
-	set (VERSION_BRANCH_NAME "")
-	if ("${VERSION_STRING}" MATCHES "[ \\t]*Branch[ \\t]*:[ \\t]*(.*)[ \\t]*")
-		set(VERSION_BRANCH_NAME ${CMAKE_MATCH_1})
+macro(ze_get_version_branch)
+	set (VERSION_BRANCH "")
+	include(External/FindSubversion)
+	Subversion_WC_INFO(${ARGV0} SVN_INFO)
+	if (SVN_INFO_WC_RESULT)
+		if ("${SVN_INFO_WC_URL}" MATCHES ".*/(.*)[ \\t]*")
+			set(VERSION_BRANCH ${CMAKE_MATCH_1})
+		endif()
 	endif()
+
+
 endmacro()
 
 macro(ze_get_version_revision_number)
 	set (VERSION_REVISION "0")
 	include(External/FindSubversion)
 	Subversion_WC_INFO(${ARGV0} SVN_INFO)
-	if (Subversion_WC_RESULT)
+	if (SVN_INFO_WC_RESULT)
 		set(VERSION_REVISION ${SVN_INFO_WC_REVISION})
 	else()
 		set(VERSION_REVISION "0")

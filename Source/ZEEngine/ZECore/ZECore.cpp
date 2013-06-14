@@ -58,6 +58,7 @@
 #include "ZEPhysics/ZEPhysicsModule.h"
 #include "ZESound/ZESoundModule.h"
 #include "ZEGame/ZEGame.h"
+#include "ZECrashHandler.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -151,6 +152,11 @@ ZERealTimeClock* ZECore::GetRealTimeClock()
 ZEProfiler* ZECore::GetProfiler()
 {
 	return Profiler;
+}
+
+ZECrashHandler* ZECore::GetCrashHandler()
+{
+	return CrashHandler;
 }
 		
 bool ZECore::SetGraphicsModule(ZEModule* Module)
@@ -521,6 +527,8 @@ void ZECore::DeinitializeModules()
 
 bool ZECore::StartUp(void* WindowHandle)
 {
+	CrashHandler->Initialize();
+
 	FrameId = 0;
 
 	Console->DisableInput();
@@ -529,7 +537,7 @@ bool ZECore::StartUp(void* WindowHandle)
 	SetCoreState(ZE_CS_STARTUP);
 	SetUserLevel(ZE_UL_DEVELOPPER);
 
-	zeLog("Zinek Engine %d.%d.%d - Build %d.", ZE_VERSION_MAJOR, ZE_VERSION_MINOR, ZE_VERSION_INTERNAL, ZE_VERSION_BUILD);
+	zeLog("Zinek Engine %s.", ZEVersion::GetZinekVersion().GetLongString());
 	zeLog("Initializing core...");
 
 	zeLog("Initializing main window...");
@@ -611,6 +619,8 @@ void ZECore::ShutDown()
 	zeLog("Core deinitialized.");
 
 	zeLog("Terminating engine.");
+
+	CrashHandler->Deinitialize();
 	exit(0);
 }
 
@@ -684,6 +694,7 @@ ZECore::ZECore()
 	OldPerformanceCount.QuadPart = 0;
 
 	Application	= NULL;
+	CrashHandler			= new ZECrashHandler();
 	RealTimeClock			= new ZERealTimeClock();
 	TimerManager			= new ZETimerManager();
 	Profiler				= new ZEProfiler();
@@ -730,4 +741,5 @@ ZECore::~ZECore()
 	SystemMessageManager->UnregisterMessageHandler(SystemMessageHandler);
 	delete SystemMessageHandler;
 	delete SystemMessageManager;
+	delete CrashHandler;
 }

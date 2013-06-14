@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashHandler.cpp
+ Zinek Engine - ZECrashReportUIMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,72 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECrashHandler.h"
-#include "ZECore.h"
+#pragma once
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <QtGui/QApplication>
+#include "ZETypes.h"
+#include "ZEFoundation/ZEBase64.h"
+#include "ZECrashReportUIMainWindow.h"
+#include "ZECrashReport/ZECrashReportSender.h"
+#include "ZECrashReport/ZECrashReportFileProvider.h"
+#include "ZECrashReport/ZECrashReportApplicationInformationProvider.h"
+#include "ZECrashReport/ZECrashReportSystemInformationProvider.h"
+#include "tinyxml.h"
+#include "tinystr.h"
+#include "ZECore/ZECrashHandler.h"
 #include "ZEDS/ZEFormat.h"
 
-void ZECrashHandler::SetEnable(bool Enable)
+ZEInt RunUI(ZECrashReport& CrashReport, const ZEString& UploadURL)
 {
-	this->Enable = Enable;
-	if (Initialized)
-	{
-		Deinitialize();
-		Initialize();
-	}
+	ZEInt argc = 0;
+	char** argv = NULL;
+
+	QApplication a(argc, argv);
+	ZECrashReportUIMainWindow* MainWindow = new ZECrashReportUIMainWindow(CrashReport, UploadURL);
+
+	return a.exec();
 }
 
-bool ZECrashHandler::GetEnable()
+static void Process(ZEString CommandArguments)
 {
-	return Enable;
+	if(CommandArguments == NULL)
+		return;
+
+	HANDLE File = CreateFile(ZEFormat::Format("\\\\.\\pipe\\{0}", CommandArguments).ToCString(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL); 
+	if (File == INVALID_HANDLE_VALUE)
+		return;
+
+	DWORD Temp;
+	ZECrashReportParameters Data;
+	if (!ReadFile(File, &Data, sizeof(ZECrashReportParameters), &Temp, NULL))
+		return;
+
+	ZECrashReport CrashReport;
+	ZECrashReportApplicationInformationProvider* ApplicationProvider = new ZECrashReportApplicationInformationProvider();
+	CrashReport.RegisterProvider(ApplicationProvider);
+
+	ZECrashReportSystemInformationProvider* SystemInformation = new ZECrashReportSystemInformationProvider();
+	CrashReport.RegisterProvider(SystemInformation);
+
+	CrashReport.Generate();
+
+	DWORD Result = 1;
+	WriteFile(File, &Result, sizeof(DWORD), &Temp, NULL);
+
+	CloseHandle(File);
+
+	RunUI(CrashReport, Data.URL);
 }
 
-void ZECrashHandler::SetCreateCrashDump(bool Enable)
+extern "C" __declspec(dllexport) void CALLBACK CrashReportMain(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
 {
-	CreateCrashDump = Enable;
+	Process(lpszCmdLine);
 }
 
-bool ZECrashHandler::GetCreateCrashDump()
+ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {
-	return CreateCrashDump;
-}
-
-void ZECrashHandler::SetCrashDumpType(ZECrashDumpType CrashDumpType)
-{
-	this->CrashDumpType = CrashDumpType;
-}
-
-ZECrashDumpType ZECrashHandler::GetCrashDumpType()
-{
-	return CrashDumpType;
-}
-
-void ZECrashHandler::SetCrashReport(bool Enable)
-{
-	CrashReport = Enable;
-}
-
-bool ZECrashHandler::GetCrashReport()
-{
-	return CrashReport;
-}
-
-void ZECrashHandler::SetCrashDumpFilePath(const char* DumpFilePath)
-{
-	this->CrashDumpFilePath = DumpFilePath;
-}
-
-const char*	ZECrashHandler::GetCrashDumpFilePath()
-{
-	return CrashDumpFilePath;
-}
-
-ZECrashHandler*	ZECrashHandler::GetInstance()
-{
-	return ZECore::GetInstance()->GetCrashHandler();
-}
-
-ZEString ZECrashHandler::GenerateCommandArguments()
-{
-	ZEString Arguments = "<ZECrashReport>";
-
-	Arguments += "</ZECrashReport>";
-
-	return Arguments;
+	Process(lpCmdLine);
+	return 0;
 }

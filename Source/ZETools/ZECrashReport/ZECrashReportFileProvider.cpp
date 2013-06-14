@@ -46,7 +46,7 @@
 
 ZECrashReportProviderType ZECrashReportFileProvider::GetProviderType()
 {
-	return ZE_CRPT_FILE;
+	return Binary ? ZE_CRPT_BINARY : ZE_CRPT_TEXT;
 }
 
 const char*	ZECrashReportFileProvider::GetName()
@@ -84,7 +84,7 @@ void ZECrashReportFileProvider::SetBinary(bool Binary)
 	this->Binary = Binary;
 }
 
-bool ZECrashReportFileProvider::isBinary()
+bool ZECrashReportFileProvider::GetBinary()
 {
 	return Binary;
 }

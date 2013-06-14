@@ -36,21 +36,30 @@
 #include "ZECrashReportProvider.h"
 #include "ZEDS/ZEString.h"
 #include "ZETypes.h"
+#include "ZEVersion.h"
 
 class ZECrashReportApplicationInformationProvider : public ZECrashReportProvider
 {
 	private:
 		ZEString							Data;
 		ZESize								DataSize;
+		ZEVersion							Version;
+		ZEUInt32							ProcessId;
 
 	public:
+		virtual const char*					GetName();
 		virtual	ZECrashReportProviderType	GetProviderType();
 
-		virtual const char*					GetName();
+		void								SetVersion(const ZEVersion& Version);
+		const ZEVersion&					GetVersion();
+
+		void								SetProcessId(ZEUInt32 ProcessId);
+		ZEUInt32							GetProcessId();
 
 		virtual ZESize						GetSize();
 		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size);
 
 		virtual bool						Generate();
+
 											ZECrashReportApplicationInformationProvider();
 };

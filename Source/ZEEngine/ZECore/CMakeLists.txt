@@ -88,14 +88,18 @@ ze_add_source(ZESystemMessageHandler.h				Sources Headers)
 ze_add_source(ZEWindow.cpp							Sources)
 ze_add_source(ZEWindow.h							Sources Headers)
 ze_add_source(ZEWindowResources.h					Sources)
-ze_add_source(ZEVersion.cpp							Sources)
-ze_add_source(ZEVersion.h							Sources Headers)
 ze_add_source(ZETimer.cpp							Sources)
 ze_add_source(ZETimer.h								Sources Headers)
 ze_add_source(ZETimerManager.cpp					Sources)
 ze_add_source(ZETimerManager.h						Sources Headers)
+ze_add_source(ZECrashHandler.cpp					Sources)
+ze_add_source(ZECrashHandler.h						Sources Headers)
+ze_add_source(ZECrashHandler_Windows.cpp			Sources PLATFORMS Windows)
 
-ze_add_library(ZECore 
+ze_add_source(ZECrashHandlerCommandGenerator.h		Sources Headers)
+ze_add_source(ZECrashHandlerCommandGenerator.cpp	Sources)
+
+ze_add_library(ZECore
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation libPhysX2)
