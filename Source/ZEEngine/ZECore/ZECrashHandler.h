@@ -34,12 +34,24 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDS/ZEString.h"
+#include "ZEVersion.h"
 
 enum ZECrashDumpType
 {
 	ZE_CDT_MINIMAL,
 	ZE_CDT_NORMAL,
 	ZE_CDT_FULL
+};
+
+struct ZECrashReportParameters
+{
+	ZEUInt32				ProcessId;
+	ZEVersion				Version;
+	bool					CreateDump;
+	ZECrashDumpType			DumpType;
+	char					URL[256];
+	bool					LogFile;
+	char					LogFilePath[256];
 };
 
 class ZECrashHandler
@@ -78,5 +90,7 @@ class ZECrashHandler
 		void						Deinitialize();
 
 		static ZECrashHandler*		GetInstance();
+
+		ZEString					GenerateCommandArguments();
 
 };

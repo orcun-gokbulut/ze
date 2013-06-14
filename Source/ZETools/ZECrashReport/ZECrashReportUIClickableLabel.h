@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEVersion.h
+ Zinek Engine - ZECrashReportUIClickableLabel.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,37 +34,28 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_VERSION_H__
-#define __ZE_VERSION_H__
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
+#ifndef _ZM_CLICKABLELABEL_H
+#define _ZM_CLICKABLELABEL_H
 
-enum ZEVersionCheckLevel
+#include "QtGui\qlabel.h"
+
+class ZECrashReportUIClickableLabel : public QLabel
 {
-	ZE_VCL_MAJOR,
-	ZE_VCL_MINOR,
-	ZE_VCL_INTERNAL
-};
+	Q_OBJECT
+		
+		public:
+			explicit ZECrashReportUIClickableLabel (const QString text = "", QWidget* parent = 0);
+			~ZECrashReportUIClickableLabel();
 
-class ZEVersion
-{
-	public:
-		ZEUInt					Major;
-		ZEUInt					Minor;
-		ZEUInt					Internal;
-		ZEUInt					Build;		
-		const char*				Platform;
+			signals:
+				void clicked();
 
-		ZEString				GetShortString();
-		ZEString				GetLongString();
-
-								ZEVersion();
-								ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal);
-								ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build);
-
-		static ZEVersion		GetZinekVersion();
-		static bool				Check(const ZEVersion& A, const ZEVersion& B, ZEVersionCheckLevel Level);
+			protected:
+				void mousePressEvent(QMouseEvent* Event);
 };
 
 #endif
+
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEErrorManager.h
+ Zinek Engine - ZECrashReportUIPrivacyDialog.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,34 +32,35 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
 #pragma once
-#ifndef	__ZE_ERROR_MANAGER_H__
-#define __ZE_ERROR_MANAGER_H__
 
-#include "ZEError.h"
-#include "ZEDS/ZEString.h"
+#ifndef _ZM_PrivacyDialog_H_
+#define _ZM_PrivacyDialog_H_
 
-class ZEOptionSection;
-class ZEOption;
-class ZETypedVariant;
+#include <QtGui/QDialog>
 
-class ZEErrorManager
+namespace Ui
 {
-	friend class					ZECore;
-	private:
-		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
-		static void					ErrorCallback(ZEErrorType ErrorType);
+	class PrivacyDialogUI;
+}
 
-									ZEErrorManager();
-									~ZEErrorManager();
-	public:
-		void						SetLogFileEnabled(bool Enabled);
-		bool						GetLogFileEnabled();
+class ZECrashReportUIPrivacyDialog : public QDialog
+{
+	Q_OBJECT
 
-		void						SetLogFileName(const ZEString& NewLogFile);
-		const ZEString&				GetLogFileName();
-		
-		static ZEErrorManager*		GetInstance();
+public:	
+							ZECrashReportUIPrivacyDialog(QWidget *Parent = 0, Qt::WFlags Flags = 0);
+							~ZECrashReportUIPrivacyDialog();	
+
+private:
+	Ui::PrivacyDialogUI*	PrivacyDialog;
+
+	bool					eventFilter(QObject* Obj, QEvent* Event);
+
+signals:
+	void					DialogClosed();
+
 };
 
 #endif

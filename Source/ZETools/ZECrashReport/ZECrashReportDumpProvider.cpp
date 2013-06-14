@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashHandler.cpp
+ Zinek Engine - ZECrashReportDumpProvider.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,88 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECrashHandler.h"
-#include "ZECore.h"
-#include "ZEDS/ZEFormat.h"
+#include "ZECrashReportDumpProvider.h"
 
-void ZECrashHandler::SetEnable(bool Enable)
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <DbgHelp.h>
+#pragma comment(lib, "DbgHelp.lib")
+#include "ZEDS\ZEFormat.h"
+#include "ZEGUID.h"
+
+ZECrashReportProviderType ZECrashReportDumpProvider::GetProviderType()
 {
-	this->Enable = Enable;
-	if (Initialized)
+	return ZE_CRPT_BINARY;
+}
+
+const char* ZECrashReportDumpProvider::GetName()
+{
+	return "Crash Dump";
+}
+
+void ZECrashReportDumpProvider::SetProcessId(ZEUInt32 ProcessId)
+{
+	this->ProcessId = ProcessId;
+}
+
+ZEUInt32 ZECrashReportDumpProvider::GetProcessId()
+{
+	return ProcessId;
+}
+
+void ZECrashReportDumpProvider::SetDumpType(ZECrashDumpType Type)
+{
+	DumpType = Type;
+}
+ZECrashDumpType ZECrashReportDumpProvider::GetDumpType()
+{
+	return DumpType;
+}
+
+bool ZECrashReportDumpProvider::Generate()
+{
+	MINIDUMP_TYPE DumpFlags;
+
+	switch(DumpType)
 	{
-		Deinitialize();
-		Initialize();
+		case ZE_CDT_MINIMAL:		
+			DumpFlags = (MINIDUMP_TYPE)(MiniDumpNormal);
+			break;
+
+		case ZE_CDT_NORMAL:
+			DumpFlags = (MINIDUMP_TYPE)(MiniDumpWithDataSegs | MiniDumpWithHandleData | MiniDumpWithFullMemoryInfo | MiniDumpWithThreadInfo);
+			break;
+
+		case ZE_CDT_FULL:
+			DumpFlags = (MINIDUMP_TYPE)(MiniDumpWithFullMemory | MiniDumpWithFullMemoryInfo | MiniDumpWithHandleData | MiniDumpWithThreadInfo);
+			break;
 	}
+
+	char TempFolder[MAX_PATH];
+	if (GetTempPath (MAX_PATH, TempFolder) == 0)
+		return false;
+
+	SetFileName(ZEFormat::Format("{0}{1}.zeDump", TempFolder, ZEGUID::Generate().ToString()));
+	HANDLE hFile = CreateFileA(GetFileName(), GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if(hFile == INVALID_HANDLE_VALUE)
+		return false;
+	
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, TRUE, ProcessId);
+	if(!MiniDumpWriteDump(hProcess, ProcessId, hFile, DumpFlags, NULL, NULL, NULL))
+	{			
+		CloseHandle(hFile);
+		DeleteFileA(GetFileName());
+		return false;
+	}
+
+	CloseHandle(hFile);		
+
+	return ZECrashReportFileProvider::Generate();
 }
 
-bool ZECrashHandler::GetEnable()
+ZECrashReportDumpProvider::ZECrashReportDumpProvider()
 {
-	return Enable;
-}
-
-void ZECrashHandler::SetCreateCrashDump(bool Enable)
-{
-	CreateCrashDump = Enable;
-}
-
-bool ZECrashHandler::GetCreateCrashDump()
-{
-	return CreateCrashDump;
-}
-
-void ZECrashHandler::SetCrashDumpType(ZECrashDumpType CrashDumpType)
-{
-	this->CrashDumpType = CrashDumpType;
-}
-
-ZECrashDumpType ZECrashHandler::GetCrashDumpType()
-{
-	return CrashDumpType;
-}
-
-void ZECrashHandler::SetCrashReport(bool Enable)
-{
-	CrashReport = Enable;
-}
-
-bool ZECrashHandler::GetCrashReport()
-{
-	return CrashReport;
-}
-
-void ZECrashHandler::SetCrashDumpFilePath(const char* DumpFilePath)
-{
-	this->CrashDumpFilePath = DumpFilePath;
-}
-
-const char*	ZECrashHandler::GetCrashDumpFilePath()
-{
-	return CrashDumpFilePath;
-}
-
-ZECrashHandler*	ZECrashHandler::GetInstance()
-{
-	return ZECore::GetInstance()->GetCrashHandler();
-}
-
-ZEString ZECrashHandler::GenerateCommandArguments()
-{
-	ZEString Arguments = "<ZECrashReport>";
-
-	Arguments += "</ZECrashReport>";
-
-	return Arguments;
+	ProcessId = 0;
+	DumpType = ZE_CDT_NORMAL;
 }

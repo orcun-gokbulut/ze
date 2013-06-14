@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEErrorManager.h
+ Zinek Engine - ZECrashReportUIProgressWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,34 +32,55 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
 #pragma once
-#ifndef	__ZE_ERROR_MANAGER_H__
-#define __ZE_ERROR_MANAGER_H__
 
-#include "ZEError.h"
-#include "ZEDS/ZEString.h"
+#ifndef _ZE_CRUI_PROGRESSWINDOW_H_
+#define _ZE_CRUI_PROGRESSWINDOW_H_
 
-class ZEOptionSection;
-class ZEOption;
-class ZETypedVariant;
+#include <QtGui/QMainWindow>
+#include <QtGui/QMessageBox>
+#include "ZECrashReportUIClickableLabel.h"
+#include "ZECrashReport/ZECrashReport.h"
+#include "ZECrashReportUICompletedWindow.h"
 
-class ZEErrorManager
+namespace Ui
 {
-	friend class					ZECore;
-	private:
-		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
-		static void					ErrorCallback(ZEErrorType ErrorType);
+	class ProgressWindowUI;
+}
 
-									ZEErrorManager();
-									~ZEErrorManager();
+class ZECrashReportUIProgressWindow : public QMainWindow
+{
+	Q_OBJECT
+
 	public:
-		void						SetLogFileEnabled(bool Enabled);
-		bool						GetLogFileEnabled();
+										ZECrashReportUIProgressWindow(QWidget* Parent = 0, Qt::WFlags Flags = 0);
+										ZECrashReportUIProgressWindow(QMainWindow* ParentWidget, ZECrashReport* CrashReport);
+										~ZECrashReportUIProgressWindow();
 
-		void						SetLogFileName(const ZEString& NewLogFile);
-		const ZEString&				GetLogFileName();
+
+	private:
+		ZECrashReport*					CrashReport;
+		QMainWindow*					MainWindow;
+		Ui::ProgressWindowUI*			ProgressWindow;
+		ZECrashReportUICompletedWindow*	CompletedWindow;
+		ZECrashReportUIClickableLabel*	plblViewReport;
+		ZECrashReportUIClickableLabel*	plblViewPrivacyPolicy;
 		
-		static ZEErrorManager*		GetInstance();
-};
+		void							CreateMainWindowRawText();
+		void							InitializeLinkButtons();
+		void							InitializeCompletedWindow();		
+		bool							eventFilter(QObject* Obj, QEvent* Event);
 
+	public slots:
+		void							btnCancel_Clicked();
+		void							btnSendInBack_Clicked();
+		void							UploadCompleted();
+		void							UploadError();
+		void							UpdateUploadInformation();
+
+	signals:
+		void							ProgressCanceled();
+
+};
 #endif

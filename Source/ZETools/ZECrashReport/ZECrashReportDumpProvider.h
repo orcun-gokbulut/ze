@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEErrorManager.h
+ Zinek Engine - ZECrashReportDumpProvider.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,34 +32,28 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#pragma once
-#ifndef	__ZE_ERROR_MANAGER_H__
-#define __ZE_ERROR_MANAGER_H__
 
-#include "ZEError.h"
-#include "ZEDS/ZEString.h"
+#include "ZECrashReportFileProvider.h"
+#include "ZETypes.h"
+#include "ZECore\ZECrashHandler.h"
 
-class ZEOptionSection;
-class ZEOption;
-class ZETypedVariant;
-
-class ZEErrorManager
+class ZECrashReportDumpProvider : public ZECrashReportFileProvider
 {
-	friend class					ZECore;
 	private:
-		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
-		static void					ErrorCallback(ZEErrorType ErrorType);
+		ZEUInt32							ProcessId;
+		ZECrashDumpType						DumpType;
 
-									ZEErrorManager();
-									~ZEErrorManager();
 	public:
-		void						SetLogFileEnabled(bool Enabled);
-		bool						GetLogFileEnabled();
+		virtual const char*					GetName();
+		virtual	ZECrashReportProviderType	GetProviderType();
 
-		void						SetLogFileName(const ZEString& NewLogFile);
-		const ZEString&				GetLogFileName();
-		
-		static ZEErrorManager*		GetInstance();
+		void								SetProcessId(ZEUInt32 ProcessId);
+		ZEUInt32							GetProcessId();
+
+		void								SetDumpType(ZECrashDumpType Type);
+		ZECrashDumpType						GetDumpType();
+
+		virtual bool						Generate();
+
+											ZECrashReportDumpProvider();
 };
-
-#endif

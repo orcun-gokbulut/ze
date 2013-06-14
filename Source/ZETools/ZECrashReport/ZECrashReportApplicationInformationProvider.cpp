@@ -42,7 +42,7 @@
 
 ZECrashReportProviderType ZECrashReportApplicationInformationProvider::GetProviderType()
 {
-	return ZE_CRPT_APPLICATION_INFORMATION;
+	return ZE_CRPT_TEXT;
 }
 
 const char* ZECrashReportApplicationInformationProvider::GetName()
@@ -61,6 +61,26 @@ bool ZECrashReportApplicationInformationProvider::GetData(void* Output, ZESize O
 	return true;
 }
 
+void ZECrashReportApplicationInformationProvider::SetVersion(const ZEVersion& Version)
+{
+	this->Version = Version;
+}
+
+const ZEVersion& ZECrashReportApplicationInformationProvider::GetVersion()
+{
+	return Version;
+}
+
+void ZECrashReportApplicationInformationProvider::SetProcessId(ZEUInt32 ProcessId)
+{
+	this->ProcessId = ProcessId;
+}
+
+ZEUInt32 ZECrashReportApplicationInformationProvider::GetProcessId()
+{
+	return ProcessId;
+}
+
 bool ZECrashReportApplicationInformationProvider::Generate()
 {
 	if (!ZECIM::Initialize())
@@ -68,19 +88,24 @@ bool ZECrashReportApplicationInformationProvider::Generate()
 
 	Data += "<ZECrashReport>\n";
 	Data += "<ApplicationInformation>\n";
+	Data += "<Version>\n";
 
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Platform", ZE_PLATFORM);
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Compiler", ZE_PLATFORM_COMPILER);
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Endianness", ZE_PLATFORM_ENDIANNESS);	
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "VersionMajor", ZE_VERSION_MAJOR);
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "VersionMinor", ZE_VERSION_MINOR);
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "VersionBuild", ZE_VERSION_BUILD);
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Major", Version.Major);
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Minor", Version.Minor);
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Internal", Version.Internal);
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Revision", Version.Revision);
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Branch", Version.Branch);
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Platform", Version.Platform);
+	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Architecture", Version.Architecture);
+	Data += "</Version>\n";
+	Data += "<Process>\n";
 
-	if(!ZECIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", ZEFormat::Format( "SELECT * FROM Win32_Process WHERE ProcessId = '{0}'", (ZEUInt32)GetCurrentProcessId())))
+	if(!ZECIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", ZEFormat::Format( "SELECT * FROM Win32_Process WHERE ProcessId = '{0}'", ProcessId)))
 		return false;
 	
 	ZECIM::DeInitialize();
-	
+
+	Data += "</Process>\n";	
 	Data += "</ApplicationInformation>\n";
 	Data += "</ZECrashReport>\n";
 
@@ -92,4 +117,5 @@ bool ZECrashReportApplicationInformationProvider::Generate()
 ZECrashReportApplicationInformationProvider::ZECrashReportApplicationInformationProvider()
 {
 	DataSize = 0;
+	ProcessId = 0;
 }

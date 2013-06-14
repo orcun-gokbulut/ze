@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEErrorManager.h
+ Zinek Engine - ZEVersion.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,34 +32,70 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#pragma once
-#ifndef	__ZE_ERROR_MANAGER_H__
-#define __ZE_ERROR_MANAGER_H__
 
-#include "ZEError.h"
-#include "ZEDS/ZEString.h"
-
-class ZEOptionSection;
-class ZEOption;
-class ZETypedVariant;
-
-class ZEErrorManager
+#include "ZEVersion.h"
+#include "ZEDS/ZEFormat.h"
+ZEString ZEVersion::GetShortString() 
 {
-	friend class					ZECore;
-	private:
-		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
-		static void					ErrorCallback(ZEErrorType ErrorType);
+	return ZEFormat::Format("{0:d:02}.{1:d:02}.{2:d:02}:{3:d04}-{3}", Major, Minor, Internal, Revision, Branch);
+}
 
-									ZEErrorManager();
-									~ZEErrorManager();
-	public:
-		void						SetLogFileEnabled(bool Enabled);
-		bool						GetLogFileEnabled();
+ZEString ZEVersion::GetLongString()	
+{
+	return ZEFormat::Format("{0:d:02}.{1:d:02}.{2:d:02}:{3:d04}-{4} ({5}-{6})", Major, Minor, Internal, Revision, Branch, Platform, Architecture);
+}
 
-		void						SetLogFileName(const ZEString& NewLogFile);
-		const ZEString&				GetLogFileName();
+ZEVersion ZEVersion::GetZinekVersion()
+{
+	ZEVersion Temp;
+	
+	Temp.Major = ZE_VERSION_MAJOR;
+	Temp.Minor = ZE_VERSION_MINOR;
+	Temp.Internal = ZE_VERSION_INTERNAL;
+	Temp.Revision = ZE_VERSION_REVISION;
+	strcpy(Temp.Branch, ZE_VERSION_BRANCH);
+	strcpy(Temp.Platform, ZE_PLATFORM);
+	strcpy(Temp.Architecture, ZE_PLATFORM_ARCHITECTURE);
+
+	return Temp;
+}
+
+bool ZEVersion::Check(const ZEVersion& A, const ZEVersion& B, ZEVersionCheckLevel Level)
+{
+	switch(Level)
+	{
+		case ZE_VCL_MAJOR:
+			return A.Major == B.Major;
+
+		case ZE_VCL_MINOR:
+			return A.Major == B.Major && A.Minor >= B.Minor;
+
+		case ZE_VCL_INTERNAL:
+			return A.Major == B.Major && A.Minor >= B.Minor && A.Internal >= B.Internal;
 		
-		static ZEErrorManager*		GetInstance();
-};
+		default:
+			return false;
+	}
+}
 
-#endif
+ZEVersion::ZEVersion()
+{
+	this->Major = 0;
+	this->Minor = 0;
+	this->Internal = 0;
+	this->Revision = 0;
+	strcpy(this->Branch, "");
+	strcpy(this->Platform, "");
+	strcpy(this->Architecture, "");
+}
+
+ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Revision, const char* Branch, const char* Platform, const char* Architecture)
+{
+	this->Major = Major;
+	this->Minor = Minor;
+	this->Internal = Internal;
+	this->Revision = 0;
+	strcpy(this->Branch, Branch);
+	strcpy(this->Platform, Platform);
+	strcpy(this->Architecture, Architecture);
+}

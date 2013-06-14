@@ -53,7 +53,7 @@ int ProgressFunction(void* Output, double TotalDownloadSize, double Downloaded, 
 	TempInfo->UploadedSize = Uploaded;
 
 	double ProcessPercentage = Uploaded / TotalUploadSize;
-	ProcessPercentage *= 100;	
+	ProcessPercentage *= 100;
 	//ProcessPercentage = ProcessPercentage / TotalUploadSize;
 	return 0;
 }
@@ -120,13 +120,7 @@ bool ZECrashReportSender::OpenConnection()
 	{
 		fclose((FILE*)File);
 		return false;
-	}	
-	
-	TransferedDataSize = 0;
-
-	curl_easy_cleanup((CURL*)Curl);
-	curl_global_cleanup();
-
+	}
 	return true;
 }
 

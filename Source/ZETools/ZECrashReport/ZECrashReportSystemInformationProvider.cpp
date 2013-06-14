@@ -38,7 +38,7 @@
 
 ZECrashReportProviderType ZECrashReportSystemInformationProvider::GetProviderType()
 {
-	return ZE_CRPT_SYSTEM_INFORMATION;
+	return ZE_CRPT_TEXT;
 }
 
 const char* ZECrashReportSystemInformationProvider::GetName()

@@ -62,7 +62,7 @@ class ZECrashReportFileProvider : public ZECrashReportProvider
 		bool								GetDeleteOnExit();
 
 		void								SetBinary(bool Binary);
-		bool								isBinary();
+		bool								GetBinary();
 
 		virtual ZESize						GetSize();
 		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size);

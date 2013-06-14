@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEErrorManager.h
+ Zinek Engine - ZEVersion.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,34 +32,40 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#pragma once
-#ifndef	__ZE_ERROR_MANAGER_H__
-#define __ZE_ERROR_MANAGER_H__
 
-#include "ZEError.h"
+#pragma once
+#ifndef	__ZE_VERSION_H__
+#define __ZE_VERSION_H__
+
+#include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 
-class ZEOptionSection;
-class ZEOption;
-class ZETypedVariant;
-
-class ZEErrorManager
+enum ZEVersionCheckLevel
 {
-	friend class					ZECore;
-	private:
-		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
-		static void					ErrorCallback(ZEErrorType ErrorType);
+	ZE_VCL_MAJOR,
+	ZE_VCL_MINOR,
+	ZE_VCL_INTERNAL
+};
 
-									ZEErrorManager();
-									~ZEErrorManager();
+class ZEVersion
+{
 	public:
-		void						SetLogFileEnabled(bool Enabled);
-		bool						GetLogFileEnabled();
+		ZEUInt					Major;
+		ZEUInt					Minor;
+		ZEUInt					Internal;
+		ZEUInt					Revision;		
+		char					Branch[50];
+		char					Platform[50];
+		char					Architecture[50];
 
-		void						SetLogFileName(const ZEString& NewLogFile);
-		const ZEString&				GetLogFileName();
-		
-		static ZEErrorManager*		GetInstance();
+		ZEString				GetShortString();
+		ZEString				GetLongString();
+
+								ZEVersion();
+								ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal = 0, ZEUInt Revision = 0, const char* Branch = "", const char* Platform = "", const char* Architecture = "");
+
+		static ZEVersion		GetZinekVersion();
+		static bool				Check(const ZEVersion& A, const ZEVersion& B, ZEVersionCheckLevel Level);
 };
 
 #endif

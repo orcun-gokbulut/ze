@@ -33,7 +33,7 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.10)
 
 project(Zinek)
 
@@ -55,6 +55,7 @@ ze_configure_symbol_server()
 ## DLL Options
 #########################################################################################
 set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll will be generated and external plugins will be disabled.")
+
 
 
 
