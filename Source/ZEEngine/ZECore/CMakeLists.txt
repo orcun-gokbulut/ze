@@ -96,9 +96,6 @@ ze_add_source(ZECrashHandler.cpp					Sources)
 ze_add_source(ZECrashHandler.h						Sources Headers)
 ze_add_source(ZECrashHandler_Windows.cpp			Sources PLATFORMS Windows)
 
-ze_add_source(ZECrashHandlerCommandGenerator.h		Sources Headers)
-ze_add_source(ZECrashHandlerCommandGenerator.cpp	Sources)
-
 ze_add_library(ZECore
 	SOURCES ${Sources}
 	HEADERS ${Headers}
