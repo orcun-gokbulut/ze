@@ -88,6 +88,8 @@ class ZEPhysXModule : public ZEPhysicsModule
 
 		virtual ZEPhysicalVehicle*				CreatePhysicalVehicle();
 		virtual ZEPhysicalCharacterController*	CreatePhysicalController();
+
+		virtual void							ConnectToVisualDebugger(const char* Adress, ZEInt Port);
 };
 
 #endif
