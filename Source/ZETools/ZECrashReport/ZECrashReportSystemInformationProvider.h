@@ -33,6 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef	__ZE_CRASHREPORT_SYSTEMINFORMATIONPROVIDER_H__
+#define __ZE_CRASHREPORT_SYSTEMINFORMATIONPROVIDER_H__
+
 #include "ZECrashReportProvider.h"
 #include "ZEDS/ZEString.h"
 
@@ -54,3 +58,4 @@ class ZECrashReportSystemInformationProvider : public ZECrashReportProvider
 		virtual bool						Generate();
 											ZECrashReportSystemInformationProvider();
 };
+#endif

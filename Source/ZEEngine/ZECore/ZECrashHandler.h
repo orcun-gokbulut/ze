@@ -33,6 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#ifndef	__ZE_CRASHHANDLER_H__
+#define __ZE_CRASHHANDLER_H__
+
 #include "ZEDS/ZEString.h"
 #include "ZEVersion.h"
 
@@ -94,3 +97,4 @@ class ZECrashHandler
 		ZEString					GenerateCommandArguments();
 
 };
+#endif

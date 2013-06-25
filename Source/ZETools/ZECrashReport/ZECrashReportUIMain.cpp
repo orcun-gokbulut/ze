@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <QtGui/QApplication>
@@ -45,6 +44,7 @@
 #include "ZECrashReport/ZECrashReportFileProvider.h"
 #include "ZECrashReport/ZECrashReportApplicationInformationProvider.h"
 #include "ZECrashReport/ZECrashReportSystemInformationProvider.h"
+#include "ZECrashReport/ZECrashReportDumpProvider.h"
 #include "tinyxml.h"
 #include "tinystr.h"
 #include "ZECore/ZECrashHandler.h"
@@ -62,21 +62,41 @@ ZEInt RunUI(ZECrashReport& CrashReport, const ZEString& UploadURL)
 }
 
 static void Process(ZEString CommandArguments)
-{
+{	
 	if(CommandArguments == NULL)
 		return;
-
+	
 	HANDLE File = CreateFile(ZEFormat::Format("\\\\.\\pipe\\{0}", CommandArguments).ToCString(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL); 
 	if (File == INVALID_HANDLE_VALUE)
 		return;
-
+	
 	DWORD Temp;
 	ZECrashReportParameters Data;
 	if (!ReadFile(File, &Data, sizeof(ZECrashReportParameters), &Temp, NULL))
 		return;
 
 	ZECrashReport CrashReport;
+
+	if(Data.LogFile)
+	{
+		ZECrashReportFileProvider* FileProvider = new ZECrashReportFileProvider();
+		FileProvider->SetName("Log");
+		FileProvider->SetFileName(Data.LogFilePath);
+		FileProvider->SetBinary(false);
+	}
+
+	if(Data.CreateDump)
+	{
+		ZECrashReportDumpProvider*	DumpProvider = new ZECrashReportDumpProvider();
+		DumpProvider->SetName("Dump");
+		DumpProvider->SetBinary(true);
+		DumpProvider->SetProcessId(Data.ProcessId);
+		DumpProvider->SetDumpType(Data.DumpType);
+		CrashReport.RegisterProvider(DumpProvider);
+	}
+
 	ZECrashReportApplicationInformationProvider* ApplicationProvider = new ZECrashReportApplicationInformationProvider();
+	ApplicationProvider->SetProcessId(Data.ProcessId);
 	CrashReport.RegisterProvider(ApplicationProvider);
 
 	ZECrashReportSystemInformationProvider* SystemInformation = new ZECrashReportSystemInformationProvider();
@@ -88,12 +108,12 @@ static void Process(ZEString CommandArguments)
 	WriteFile(File, &Result, sizeof(DWORD), &Temp, NULL);
 
 	CloseHandle(File);
-
+	
 	RunUI(CrashReport, Data.URL);
 }
 
 extern "C" __declspec(dllexport) void CALLBACK CrashReportMain(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
-{
+{	
 	Process(lpszCmdLine);
 }
 

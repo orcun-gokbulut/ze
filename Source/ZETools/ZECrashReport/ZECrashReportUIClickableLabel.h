@@ -34,9 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-
-#ifndef _ZM_CLICKABLELABEL_H
-#define _ZM_CLICKABLELABEL_H
+#ifndef _ZE_CRASHREPORT_CLICKABLELABEL_H__
+#define _ZE_CRASHREPORT_CLICKABLELABEL_H__
 
 #include "QtGui\qlabel.h"
 
