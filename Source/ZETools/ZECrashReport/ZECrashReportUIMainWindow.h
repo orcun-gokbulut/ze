@@ -34,9 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-
-#ifndef _ZM_CRASHMAINWINDOW_H_
-#define _ZM_CRASHMAINWINDOW_H_
+#ifndef __ZE_CRASHREPORT_CRASHMAINWINDOW_H__
+#define __ZE_CRASHREPORT_CRASHMAINWINDOW_H__
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QMessageBox>
@@ -48,8 +47,6 @@
 #include "ZECrashReportUIProgressWindow.h"
 #include "ZECrashReportUIReportDialog.h"
 #include "ZECrashReportUIPrivacyDialog.h"
-#include "ZECrashReportUICompletedWindow.h"
-
 #include "ZECrashReport/ZECrashReport.h"
 #include "ZECrashReport/ZECrashReportUserCommentProvider.h"
 #include "ZEDS/ZEString.h"
@@ -71,13 +68,13 @@ class ZECrashReportUIMainWindow : public QMainWindow
 
 	public:
 		ZECrashReport						CrashReport;
-		ZEString							LogFileName;
-		ZEString							DumpFileName;
+		ZEString							UploadUrl;
+		
 											ZECrashReportUIMainWindow(QWidget *Parent = 0, Qt::WFlags Flags = 0);
 											ZECrashReportUIMainWindow(ZECrashReport& CrashReport, const ZEString& UploadURL);
-											~ZECrashReportUIMainWindow();		
+											~ZECrashReportUIMainWindow();	
+
 	private:		
-		QThread*							CrashReportUploadThread;
 		Ui::CrashMainWindowUI*				CrashMainWindow;
 		ZECrashReportUIClickableLabel*		plblViewReport;
 		ZECrashReportUIClickableLabel*		plblViewPrivacyPolicy;
@@ -85,7 +82,6 @@ class ZECrashReportUIMainWindow : public QMainWindow
 		ZECrashReportUIProgressWindow*		ProgressWindow;		
 		ZECrashReportUIReportDialog*		ReportDialog;
 		ZECrashReportUIPrivacyDialog*		PrivacyDialog;
-		ZECrashReportUICompletedWindow*		CompletedWindow;
 
 		ZECrashReportUserCommentProvider*	UserCommand;
 
@@ -94,28 +90,26 @@ class ZECrashReportUIMainWindow : public QMainWindow
 
 		ZECrashReportUIWindowState			UiWindowState;
 
-		void							CreateMainWindowRawText();
-		void							CreateTrayIcon();
-		void							InitializeMainWindow();
-		void							InitializeLinkButtons();		
-		void							InitializeProgressWindow();
-		void							InitializePrivacyDialog();
-		void							InitializeReportDialog();
-		void							GenerateUserCommentProvider();
-		void							InitializeUploadThread(const ZEString& UploadURL);
-		void							StartUploadThread();
-		bool							eventFilter(QObject* Obj, QEvent* Event);
+		void								CreateMainWindowRawText();
+		void								CreateTrayIcon();
+		void								InitializeMainWindow();
+		void								InitializeLinkButtons();		
+		void								InitializeProgressWindow();
+		void								InitializePrivacyDialog();
+		void								InitializeReportDialog();
+		void								GenerateUserCommentProvider();				
+		bool								eventFilter(QObject* Obj, QEvent* Event);
 
 	public slots:
-		void							UpdateUserCommand();
-		void							btnCloseClicked();
-		void							ShowMainWindow();
-		void							ShowPrivacyPolicy();
-		void							HidePrivacyPolicy();
-		void							ShowReport();
-		void							HideReport();
-		void							ShowProgress();
-		void							TrayRestore();		
+		void								UpdateUserCommand();
+		void								btnCloseClicked();
+		void								ShowMainWindow();
+		void								ShowPrivacyPolicy();
+		void								HidePrivacyPolicy();
+		void								ShowReport();
+		void								HideReport();
+		void								ShowProgress();
+		void								TrayRestore();		
 };
 
 #endif

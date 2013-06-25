@@ -36,25 +36,31 @@
 #define CURL_STATICLIB
 #include "curl/curl.h"
 #include "ZECrashReportSender.h"
+#include "ZEDS/ZEDelegate.h"
+
+ZELock ZECrashReportSender::ProgressInformationLock;
+ZECrashReportSenderProgressInformation ZECrashReportSender::ProgressInformation = {0};
 
 static size_t ReadFunction(void* Ouput, size_t Size, size_t Count, void* File)
 {
-	return fread(Ouput, Size, Count, (FILE*)File);
-	double* UploadSpeed;	
-	//curl_easy_getinfo((CURL*)Curl, CURLINFO_SPEED_UPLOAD, UploadSpeed);
+	return fread(Ouput, Size, Count, (FILE*)File);	
 }
 
-int ProgressFunction(void* Output, double TotalDownloadSize, double Downloaded, double TotalUploadSize, double Uploaded)
+int ZECrashReportSender::ProgressFunction(void* Output, double TotalDownloadSize, double Downloaded, double TotalUploadSize, double Uploaded)
 {
-	ZECrashReportSenderProgressInformation* TempInfo = (ZECrashReportSenderProgressInformation*)Output;
-	TempInfo->TotalDownloadSize = TotalDownloadSize;
-	TempInfo->DownloadedSize = Downloaded;
-	TempInfo->TotalUploadSize = TotalUploadSize;
-	TempInfo->UploadedSize = Uploaded;
+	if(Uploaded == 0)
+		return 0;
 
-	double ProcessPercentage = Uploaded / TotalUploadSize;
-	ProcessPercentage *= 100;
-	//ProcessPercentage = ProcessPercentage / TotalUploadSize;
+	ProgressInformationLock.Lock();
+	
+	ProgressInformation.TotalDownloadSize = TotalDownloadSize;
+	ProgressInformation.DownloadedSize = Downloaded;
+	ProgressInformation.TotalUploadSize = TotalUploadSize;
+	ProgressInformation.UploadedSize = Uploaded;
+
+	ProgressInformation.ProcessPercentage = (ProgressInformation.UploadedSize * 100) / ProgressInformation.TotalUploadSize;
+
+	ProgressInformationLock.Unlock();
 	return 0;
 }
 
@@ -112,7 +118,7 @@ bool ZECrashReportSender::OpenConnection()
 	curl_easy_setopt((CURL*)Curl, CURLOPT_READDATA, File);
 	curl_easy_setopt((CURL*)Curl, CURLOPT_PUT, 1L);
 	curl_easy_setopt((CURL*)Curl, CURLOPT_NOPROGRESS, 0L);
-	curl_easy_setopt((CURL*)Curl, CURLOPT_PROGRESSFUNCTION, ProgressFunction);
+	curl_easy_setopt((CURL*)Curl, CURLOPT_PROGRESSFUNCTION, this->ProgressFunction);
 	curl_easy_setopt((CURL*)Curl, CURLOPT_PROGRESSDATA, ProgressInformation);
 
 	CURLcode Result = curl_easy_perform(Curl);
@@ -121,6 +127,8 @@ bool ZECrashReportSender::OpenConnection()
 		fclose((FILE*)File);
 		return false;
 	}
+
+	fclose((FILE*)File);
 	return true;
 }
 
@@ -144,11 +152,43 @@ bool ZECrashReportSender::TransferChunk()
 		
 	TransferedDataSize += BlockSize;
 	return true;
-
 }
 
 void ZECrashReportSender::CloseConnection()
 {
 	curl_easy_cleanup((CURL*)Curl);
 	curl_global_cleanup();
+}
+
+void ZECrashReportSender::GetProgressInformation(ZECrashReportSenderProgressInformation& Output)
+{
+	ProgressInformationLock.Lock();
+	
+	Output.DownloadedSize = ProgressInformation.DownloadedSize;
+	Output.TotalDownloadSize = ProgressInformation.TotalDownloadSize;
+	Output.TotalUploadSize = ProgressInformation.TotalUploadSize;
+	Output.UploadedSize = ProgressInformation.UploadedSize;
+	Output.ProcessPercentage = ProgressInformation.ProcessPercentage;
+
+	ProgressInformationLock.Unlock();
+	return;
+}
+
+void ZECrashReportSender::ResetProgressInformation()
+{	
+	ProgressInformation.DownloadedSize = 0;	
+	ProgressInformation.TotalDownloadSize = 0;
+	ProgressInformation.TotalUploadSize = 0;
+	ProgressInformation.UploadedSize = 0;
+	ProgressInformation.ProcessPercentage = 0;
+}
+
+ZECrashReportSender::ZECrashReportSender()
+{	
+	ResetProgressInformation();
+}
+
+ZECrashReportSender::~ZECrashReportSender()
+{
+
 }

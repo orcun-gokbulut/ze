@@ -34,15 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-
-#ifndef _ZE_CRUI_PROGRESSWINDOW_H_
-#define _ZE_CRUI_PROGRESSWINDOW_H_
+#ifndef __ZE_CRASHREPORT_PROGRESSWINDOW_H__
+#define __ZE_CRASHREPORT_PROGRESSWINDOW_H__
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QMessageBox>
+#include <QtCore/QTimer>
 #include "ZECrashReportUIClickableLabel.h"
 #include "ZECrashReport/ZECrashReport.h"
 #include "ZECrashReportUICompletedWindow.h"
+#include "ZEThread/ZEThread.h"
+#include "ZECrashReportSender.h"
 
 namespace Ui
 {
@@ -54,33 +56,50 @@ class ZECrashReportUIProgressWindow : public QMainWindow
 	Q_OBJECT
 
 	public:
-										ZECrashReportUIProgressWindow(QWidget* Parent = 0, Qt::WFlags Flags = 0);
-										ZECrashReportUIProgressWindow(QMainWindow* ParentWidget, ZECrashReport* CrashReport);
-										~ZECrashReportUIProgressWindow();
+		void									TerminateProcess();
+		void									Process();
+
+												ZECrashReportUIProgressWindow(QWidget* Parent = 0, Qt::WFlags Flags = 0);
+												ZECrashReportUIProgressWindow(QMainWindow* ParentWidget, ZECrashReport* CrashReport, const ZEString& UploadURL);
+												~ZECrashReportUIProgressWindow();
 
 
-	private:
-		ZECrashReport*					CrashReport;
-		QMainWindow*					MainWindow;
-		Ui::ProgressWindowUI*			ProgressWindow;
-		ZECrashReportUICompletedWindow*	CompletedWindow;
-		ZECrashReportUIClickableLabel*	plblViewReport;
-		ZECrashReportUIClickableLabel*	plblViewPrivacyPolicy;
+	private:		
+		QMainWindow*							MainWindow;
+		Ui::ProgressWindowUI*					ProgressWindow;
+		ZECrashReportUICompletedWindow*			CompletedWindow;
+		ZECrashReportUIClickableLabel*			plblViewReport;
+		ZECrashReportUIClickableLabel*			plblViewPrivacyPolicy;		
+
+		ZECrashReport*							CrashReport;		
+		ZEThread*								SenderThread;
 		
-		void							CreateMainWindowRawText();
-		void							InitializeLinkButtons();
-		void							InitializeCompletedWindow();		
-		bool							eventFilter(QObject* Obj, QEvent* Event);
+		ZECrashReportSender						Sender;
+		ZEString								FileName;
+		ZEString								UploadURL;
+		ZECrashReportSenderProgressInformation	ProgressInformation;
+		QTimer									UpdateInformationTimer;		
 
-	public slots:
-		void							btnCancel_Clicked();
-		void							btnSendInBack_Clicked();
-		void							UploadCompleted();
-		void							UploadError();
-		void							UpdateUploadInformation();
+		void									CreateMainWindowRawText();
+		void									InitializeLinkButtons();
+		void									InitializeSenderThread();
+		void									InitializeSender();
+		bool									PackageItems();
+		bool									CompressPackage();		
+		void									SendReport(ZEThread* Thread, void* Output);	
+
+		bool									eventFilter(QObject* Obj, QEvent* Event);
+
+	public slots:		
+		void									btnCancel_Clicked();
+		void									btnSendInBack_Clicked();		
+		void									UploadError();
+		void									UpdateUploadInformation();
+		void									btnCloseClicked();
+		void									UploadCompleted();
 
 	signals:
-		void							ProgressCanceled();
+		void									ProgressCanceled();
 
 };
 #endif

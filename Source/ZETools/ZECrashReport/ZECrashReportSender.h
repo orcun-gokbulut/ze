@@ -33,43 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef	__ZE_CRASHREPORT_SENDER_H__
+#define __ZE_CRASHREPORT_SENDER_H__
+
 #include "ZEDS/ZEString.h"
 #include "ZETypes.h"
+#include "ZEThread/ZEThread.h"
+#include "ZEThread/ZELock.h"
 
 struct ZECrashReportSenderProgressInformation
-{
-	double TotalDownloadSize;
-	double DownloadedSize;
-	double TotalUploadSize;
-	double UploadedSize;
+{	
+	ZESize			ProcessPercentage;
+	ZESize			TotalDownloadSize;
+	ZESize			DownloadedSize;
+	ZESize			TotalUploadSize;
+	ZESize			UploadedSize;
 };
-
 
 class ZECrashReportSender
-{
+{	
 	private:
-		ZEString		FileName;
-		ZEString		UploadURL;
-
-		void*			File;
-		void*			Curl;
-
-		ZESize			FileSize;
-		ZESize			TransferedDataSize;
-
-		ZECrashReportSenderProgressInformation			ProgressInformation;
+		ZEString										FileName;
+		ZEString										UploadURL;
+		void*											File;
+		void*											Curl;
+		ZESize											FileSize;
+		ZESize											TransferedDataSize;
+		
+		static ZELock									ProgressInformationLock;
+		static ZECrashReportSenderProgressInformation	ProgressInformation;
 	
 	public:
-		void			SetFileName(const char* FileName);
-		const char*		GetFileName();
+		void											SetFileName(const char* FileName);
+		const char*										GetFileName();
 
-		void			SetUploadURL(const char* ServerAddress);
-		const char*		GetUploadURL();
+		void											SetUploadURL(const char* ServerAddress);
+		const char*										GetUploadURL();
 
-		ZESize			GetFileSize();
-		ZESize			GetTransferedDataSize();
+		ZESize											GetFileSize();
+		ZESize											GetTransferedDataSize();
 
-		bool			OpenConnection();
-		bool			TransferChunk();
-		void			CloseConnection();
+		bool											OpenConnection();
+		bool											TransferChunk();
+		void											CloseConnection();
+						
+		void											GetProgressInformation(ZECrashReportSenderProgressInformation& Output);
+		void											ResetProgressInformation();
+
+		static int										ProgressFunction(void* Output, double TotalDownloadSize, double Downloaded, double TotalUploadSize, double Uploaded);
+														ZECrashReportSender();
+														~ZECrashReportSender();
+
 };
+#endif

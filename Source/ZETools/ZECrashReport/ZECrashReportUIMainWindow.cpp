@@ -51,14 +51,15 @@ ZECrashReportUIMainWindow::ZECrashReportUIMainWindow(ZECrashReport& CrashReport,
 	CrashMainWindow->setupUi(this);
 
 	this->CrashReport = CrashReport;
+	this->UploadUrl = UploadURL;
+
 	GenerateUserCommentProvider();
 	InitializeMainWindow();
 	CreateMainWindowRawText();
-	CreateTrayIcon();	
+	CreateTrayIcon();
 	InitializeProgressWindow();
 	InitializePrivacyDialog();
 	InitializeReportDialog();	
-	InitializeUploadThread(UploadURL);
 	installEventFilter(this);
 	this->show();
 }
@@ -88,7 +89,7 @@ void ZECrashReportUIMainWindow::UpdateUserCommand()
 
 void ZECrashReportUIMainWindow::InitializeProgressWindow()
 {
-	ProgressWindow = new ZECrashReportUIProgressWindow(this, &CrashReport);
+	ProgressWindow = new ZECrashReportUIProgressWindow(this, &CrashReport, UploadUrl);	
 }
 
 void ZECrashReportUIMainWindow::InitializePrivacyDialog()
@@ -101,21 +102,6 @@ void ZECrashReportUIMainWindow::InitializeReportDialog()
 {
 	ReportDialog = new ZECrashReportUIReportDialog(this);
 	QObject::connect(ReportDialog, SIGNAL(DialogClosed()), this, SLOT(HideReport()));	
-}
-
-void ZECrashReportUIMainWindow::InitializeUploadThread(const ZEString& UploadURL)
-{
-	CrashReportUploadThread = new ZECrashReportUploadThread(CrashReport);
-	ZECrashReportUploadThread* UploadThread = (ZECrashReportUploadThread*)CrashReportUploadThread;
-	UploadThread->SetUploadURL(UploadURL); //http://localhost:8080/puttest/test.dat
-	QObject::connect(CrashReportUploadThread, SIGNAL(UploadError()), ProgressWindow, SLOT(UploadError()));
-	QObject::connect(CrashReportUploadThread, SIGNAL(UpdateUploadInformation()), ProgressWindow, SLOT(UpdateUploadInformation()));
-	QObject::connect(CrashReportUploadThread, SIGNAL(UploadCompleted()), ProgressWindow, SLOT(UploadCompleted()));
-}
-
-void ZECrashReportUIMainWindow::StartUploadThread()
-{	
-	CrashReportUploadThread->start(QThread::InheritPriority);
 }
 
 void ZECrashReportUIMainWindow::InitializeMainWindow()
@@ -255,9 +241,7 @@ void ZECrashReportUIMainWindow::ShowMainWindow()
 	ProgressWindow->hide();
 	this->show();
 	UiWindowState = ZE_CRUI_WINDOWSTATE_CRASHMAINWINDOW;
-		
-	if(CrashReportUploadThread->isRunning())
-		CrashReportUploadThread->terminate();
+	ProgressWindow->TerminateProcess();
 }
 
 void ZECrashReportUIMainWindow::ShowPrivacyPolicy()
@@ -287,7 +271,7 @@ void ZECrashReportUIMainWindow::ShowProgress()
 	this->hide();
 	ProgressWindow->show();
 	UiWindowState = ZE_CRUI_WINDOWSTATE_PROGRESSWINDOW;
-	StartUploadThread();
+	ProgressWindow->Process();
 }
 
 void ZECrashReportUIMainWindow::TrayRestore()

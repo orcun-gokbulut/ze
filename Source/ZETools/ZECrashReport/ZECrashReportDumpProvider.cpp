@@ -39,7 +39,7 @@
 #include <Windows.h>
 #include <DbgHelp.h>
 #pragma comment(lib, "DbgHelp.lib")
-#include "ZEDS\ZEFormat.h"
+#include "ZEDS/ZEFormat.h"
 #include "ZEGUID.h"
 
 ZECrashReportProviderType ZECrashReportDumpProvider::GetProviderType()
@@ -109,7 +109,7 @@ bool ZECrashReportDumpProvider::Generate()
 	}
 
 	CloseHandle(hFile);		
-
+	
 	return ZECrashReportFileProvider::Generate();
 }
 

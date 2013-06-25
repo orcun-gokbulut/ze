@@ -34,9 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-
-#ifndef _ZM_REPORTDIALOG_H_
-#define _ZM_REPORTDIALOG_H_
+#ifndef __ZE_CRASHREPORT_REPORTDIALOG_H__
+#define __ZE_CRASHREPORT_REPORTDIALOG_H__
 
 #include <QtGui/QDialog>
 #include <QtCore/QFile>

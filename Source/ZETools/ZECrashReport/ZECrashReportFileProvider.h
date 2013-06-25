@@ -33,6 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef	__ZE_CRASHREPORT_FILEPROVIDER_H__
+#define __ZE_CRASHREPORT_FILEPROVIDER_H__
+
 #include "ZECrashReportProvider.h"
 #include "ZEDS/ZEString.h"
 #include "ZETypes.h"
@@ -72,3 +76,4 @@ class ZECrashReportFileProvider : public ZECrashReportProvider
 
 											ZECrashReportFileProvider();
 };
+#endif

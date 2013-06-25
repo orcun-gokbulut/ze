@@ -89,7 +89,7 @@ void ZECrashHandler::Crashed()
 
 	if (CrashReport)
 	{		
-		HMODULE CrashReportDLL = LoadLibrary("C:/Users/onur.babaoglu/Desktop/ZE/trunk/Build/x64/Source/ZETools/ZECrashReportUI/Debug/ZECrashReportUI.dll");		
+		HMODULE CrashReportDLL = LoadLibrary("C:/Users/onur.babaoglu/Desktop/ZE/trunk/Build/x64/Source/ZETools/ZECrashReport/Debug/ZECrashReport.dll");		
 		if (CrashReportDLL == NULL)
 			return;
 
@@ -106,16 +106,20 @@ void ZECrashHandler::Crashed()
 		strcpy(Data.URL, "http://localhost:8080/puttest/test.dat");
 		Data.Version = ZEVersion::GetZinekVersion();
 
-
-		ZEString NamedPipeName = "\\\\.\\pipe\\fsdf";// + ZEGUID::Generate().ToString();
-		//WinExec(CommandArgument + EncodedParameters, SW_NORMAL);
+		ZEString NamedPipeName = "\\\\.\\pipe\\fsdf";//+ ZEGUID::Generate().ToString();		
 
 		HANDLE NamedPipeHandle = CreateNamedPipe(NamedPipeName.ToCString(), PIPE_ACCESS_DUPLEX,	PIPE_TYPE_MESSAGE | PIPE_WAIT, 1, NULL, NULL, INFINITE, NULL);
+		
+		ZEString CommandArgument = "rundll32.exe C:/Users/onur.babaoglu/Desktop/ZE/trunk/Build/x64/Source/ZETools/ZECrashReport/Release/ZECrashReport.dll, CrashReportMain fsdf";
+		
+		if(WinExec(CommandArgument.ToCString(), SW_NORMAL) < 32)
+			return;
+
 		ConnectNamedPipe(NamedPipeHandle, NULL);
 		DWORD Temp;
 		WriteFile(NamedPipeHandle, &Data, sizeof(ZECrashReportParameters), &Temp, NULL);
 		DWORD Result;
-		ReadFile(NamedPipeHandle, &Result, sizeof(DWORD), &Temp, NULL);
+		ReadFile(NamedPipeHandle, &Result, sizeof(DWORD), &Temp, NULL);		
 	}
 }
 

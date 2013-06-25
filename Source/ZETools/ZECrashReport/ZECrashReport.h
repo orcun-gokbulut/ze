@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_CRASH_REPORT_H__
-#define __ZE_CRASH_REPORT_H__
+#ifndef	__ZE_CRASHREPORT_H__
+#define __ZE_CRASHREPORT_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"

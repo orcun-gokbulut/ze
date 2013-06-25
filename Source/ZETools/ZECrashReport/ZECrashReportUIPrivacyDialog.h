@@ -34,9 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-
-#ifndef _ZM_PrivacyDialog_H_
-#define _ZM_PrivacyDialog_H_
+#ifndef __ZE_CRASHREPORT_PRIVACYDIALOG_H__
+#define __ZE_CRASHREPORT_PRIVACYDIALOG_H__
 
 #include <QtGui/QDialog>
 
@@ -62,5 +61,4 @@ signals:
 	void					DialogClosed();
 
 };
-
 #endif
