@@ -126,6 +126,8 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 
 		} LightningComponents;
 
+		IDirect3DQuery9*					EventQuery;
+
 		static bool							CheckRenderCommand(ZERenderCommand* RenderCommand);
 		static void							PumpStreams(ZERenderCommand* RenderCommand);
 
@@ -201,6 +203,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		virtual void						ClearRenderList();
 
 		virtual void						Render(float ElaspedTime);
+		virtual bool						IsGPUBusy();
 };
 
 #endif

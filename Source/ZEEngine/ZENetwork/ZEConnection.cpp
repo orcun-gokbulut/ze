@@ -187,10 +187,10 @@ void ZEConnection::CleanReadBuffer()
 	FilledReadBufferSize = 0;
 }
 
-void ZEConnection::Process(float ElapsedTime)
+bool ZEConnection::Process(float ElapsedTime)
 {
 	if(Socket == NULL)
-		return;
+		return true;
 
 	if(FilledSendBufferSize > 0)
 	{
@@ -201,14 +201,17 @@ void ZEConnection::Process(float ElapsedTime)
 			memmove(SendBuffer, SendBuffer + SentDataSize, SendBufferSize - SentDataSize);
 			FilledSendBufferSize -= SentDataSize;
 		}
+
 	}
 
 	ZESSize ReadDataSize = Socket->Recieve(TempBuffer, TempBufferSize);
+	if (ReadDataSize == 0)
+		return false;
 
 	if(ReadDataSize > (ZESSize)(ReadBufferSize - FilledReadBufferSize))
 	{
 		zeWarning("Read data size is bigger than remaining read buffer space. Dropping Packet!!!");
-		return;
+		return true;
 	}
 
 	if(ReadDataSize > 0)
@@ -216,4 +219,6 @@ void ZEConnection::Process(float ElapsedTime)
 		memcpy(ReadBuffer + FilledReadBufferSize, TempBuffer, ReadDataSize);
 		FilledReadBufferSize += ReadDataSize;
 	}
+
+	return true;
 }

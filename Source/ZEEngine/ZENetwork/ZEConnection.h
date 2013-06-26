@@ -81,7 +81,7 @@ class ZEConnection
 		void						CleanSendBuffer();
 		void						CleanReadBuffer();
 
-		void						Process(float ElapsedTime);
+		bool						Process(float ElapsedTime);
 
 									ZEConnection();
 									ZEConnection(ZESocket* Socket);

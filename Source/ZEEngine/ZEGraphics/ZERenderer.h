@@ -107,6 +107,9 @@ class ZERenderer
 		void									ClearLists();
 		
 		virtual void							Render(float ElaspedTime = 0) = 0;
+
+		virtual bool							IsGPUBusy() = 0;
+		void									WaitGPU();
 };
 
 #endif

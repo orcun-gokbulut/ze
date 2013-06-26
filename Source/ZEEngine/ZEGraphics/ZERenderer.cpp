@@ -70,3 +70,8 @@ void ZERenderer::Destroy()
 {
 	delete this;
 }
+
+void ZERenderer::WaitGPU()
+{
+	while(IsGPUBusy());
+}

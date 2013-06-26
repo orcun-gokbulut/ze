@@ -235,7 +235,7 @@ bool ZECore::SetPhysicsModule(ZEModule* Module)
 	{
 		if (Module->GetDescription() != ZEPhysicsModule::Description() && Module->GetDescription()->GetParent() != ZEPhysicsModule::Description())
 		{
-			zeError("Module type mismatch. This module is not a sound module. Module Name : \"%s\"", 
+			zeError("Module type mismatch. This module is not a physics module. Module Name : \"%s\"", 
 				(const char*)Module->GetDescription()->GetName());
 			return false;
 		}
