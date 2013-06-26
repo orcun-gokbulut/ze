@@ -61,13 +61,14 @@ class ZEServer
 		bool							AddConnection(ZEConnection* Connection);
 		bool							RemoveConnection(ZEConnection* Connection);
 
-		const ZEPacketManagerServer*	GetPacketManager();
+		ZEPacketManagerServer*			GetPacketManager();
 
 		void							Process(float ElapsedTime);
 
 		bool							SendPacket(ZEUInt16 PacketId, void* Data, ZESize DataSize, ZEConnection* Connection);
 		bool							SendData(void* Data, ZESize DataSize, ZEConnection* Connection);
 		void							BroadCast(void* Data, ZESize DataSize);
+		void							BroadCastPacket(ZEUInt16 PacketId, void* Data, ZESize DataSize);
 
 										ZEServer();
 										~ZEServer();

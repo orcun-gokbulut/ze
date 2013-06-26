@@ -82,6 +82,8 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		ZEArray<ZEPostProcessor*>				PostProcessors;
 		bool									Face;
 
+		IDirect3DQuery9*						EventQuery;
+
 		bool									InitializeShaders();
 		void									DeinitializeShaders();
 
@@ -128,6 +130,7 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		virtual void							ClearRenderList();
 
 		virtual void							Render(float ElaspedTime);
+		virtual bool							IsGPUBusy();
 };
 
 #endif

@@ -972,6 +972,8 @@ ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 	LightningComponents.OmniProjectiveLightVS = NULL;
 	LightningComponents.OmniProjectiveLightPS = NULL;
 
+	EventQuery = NULL;
+	
 	SetViewPort(zeGraphics->GetFrameBufferViewPort());
 }
 
@@ -1056,6 +1058,8 @@ bool ZED3D9FrameRenderer::Initialize()
 
 	InitializeLightning();
 
+	GetDevice()->CreateQuery(D3DQUERYTYPE_EVENT, &EventQuery);
+
 	return true; 
 }
 
@@ -1080,6 +1084,12 @@ void ZED3D9FrameRenderer::Deinitialize()
 
 	DeinitializeLightning();
 	DeinitializeRenderTargets();
+
+	if (EventQuery != NULL)
+	{
+		EventQuery->Release();
+		EventQuery = NULL;
+	}
 }
 
 void ZED3D9FrameRenderer::DeviceLost()
@@ -1223,7 +1233,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		MLAAProcessor.SetInputDepth(GBuffer1);
 		MLAAProcessor.SetInputNormal(GBuffer2);
 		MLAAProcessor.SetInputColor(MLAABuffer);
-		MLAAProcessor.SetOutput(ViewPort);
+		MLAAProcessor.SetOutput((ZED3D9ViewPort*)FogBuffer->GetViewPort());
 		MLAAProcessor.Process();
 		
 		/*
@@ -1249,13 +1259,13 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		UnsharpenProcessor.Process();
 		*/
 
-		/*
+		
 		// Fog Process
 		FogProcessor.SetInputColor(FogBuffer);
 		FogProcessor.SetInputDepth(GBuffer1);
-		FogProcessor.SetOutput((ZED3D9ViewPort*)GrainBuffer->GetViewPort());
+		FogProcessor.SetOutput(ViewPort);
 		FogProcessor.Process();
-		*/
+		
 		
 		/*
 		// Blur Mask
@@ -1310,7 +1320,14 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 
 	GetDevice()->EndScene();
 	
+	EventQuery->Issue(D3DISSUE_END);
+
 	zeProfilerEnd();
 
 	D3DPERF_EndEvent();
+}
+
+bool ZED3D9FrameRenderer::IsGPUBusy()
+{
+	return (EventQuery->GetData(NULL, 0, D3DGETDATA_FLUSH) == S_FALSE);
 }

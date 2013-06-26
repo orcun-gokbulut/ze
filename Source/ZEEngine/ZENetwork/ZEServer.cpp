@@ -37,12 +37,12 @@
 #include "ZESocket/ZESocket.h"
 #include "ZEConnection.h"
 
-#define TCP_PORT_NO	27100
+#define TCP_PORT_NO	26100
 
 ZEServer::ZEServer()
 {
 	Listener = new ZESocketTCPListener();
-	if(!Listener->Create(ZEIPAddress(192, 168, 1, 12), TCP_PORT_NO))
+	if(!Listener->Create(ZEIPAddress::IPv4Any, TCP_PORT_NO))
 		zeError("Can not create listener.");
 }
 
@@ -90,7 +90,7 @@ void ZEServer::Process(float ElapsedTime)
 	PacketManager.Process(ElapsedTime, Connections);
 }
 
-const ZEPacketManagerServer* ZEServer::GetPacketManager()
+ZEPacketManagerServer* ZEServer::GetPacketManager()
 {
 	return &PacketManager;
 }
@@ -119,4 +119,18 @@ void ZEServer::BroadCast(void* Data, ZESize DataSize)
 {
 	for (ZESize I = 0; I < Connections.GetCount(); I++)
 		Connections[I]->SendData(Data, DataSize);
+}
+
+void ZEServer::BroadCastPacket(ZEUInt16 PacketId, void* Data, ZESize DataSize)
+{
+	ZEPacketHeader Header;
+	Header.CommandId = PacketId;
+	Header.Identifier = ZE_COMMAND_PACKET_HEADER_IDENTIFIER;
+	Header.DataSize = DataSize;
+
+	for (ZESize I = 0; I < Connections.GetCount(); I++)
+	{
+		Connections[I]->SendData(&Header, sizeof(ZEPacketHeader));
+		Connections[I]->SendData(Data, DataSize);
+	}
 }
