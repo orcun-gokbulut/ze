@@ -41,6 +41,7 @@
 
 #include "ZETypes.h"
 #include <intrin.h>
+#include <memory.h>
 
 
 #define ZE_JPEG_MAX_SAMPLE_FREQUENCY		4

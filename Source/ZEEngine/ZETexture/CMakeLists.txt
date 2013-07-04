@@ -144,7 +144,7 @@ ze_add_source(ZETextureTestUtils.h						Sources Headers)
 ze_add_library(ZETexture 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation libFreeImage libATICompress ZEDirect3D9)
+	LIBS ZEFoundation libFreeImage ZEDirect3D9)
 
 ze_add_test(ZETextureTests 
 	SOURCES ${Tests}
