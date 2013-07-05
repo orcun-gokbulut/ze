@@ -66,7 +66,7 @@ class ZEMaterialUserInterface : public ZEMaterial
 
 	public:
 		ZESize					GetHash() const;
-		ZEMaterialFlags			GetMaterialFlags() const;
+		bool					UpdateMaterial();
 
 		void					SetWireFrame(bool Enabled);
 		bool					GetWireFrame() const;
@@ -75,8 +75,6 @@ class ZEMaterialUserInterface : public ZEMaterial
 		const ZETexture2D*		GetTexture() const;
 
 		bool					SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
-
-		void					UpdateMaterial();
 
 		static ZEMaterialUserInterface*	CreateInstance();
 };

@@ -41,39 +41,36 @@
 
 #include "ZECore/ZEModule.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEInputMap.h"
 
 class ZEInputDevice;
+class ZEInputDeviceModule;
 
 class ZEInputModule : public ZEModule 
 {
 	ZE_MODULE(ZEInputModule)
 
 	private:
-		bool							Acquired;
+		ZEArray<ZEInputDeviceModule*>		DeviceModules;
+		bool								Acquired;
 
-	protected:
-										ZEInputModule();
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
+
+											ZEInputModule();
 
 	public:
-		static void						BaseInitialize();
-		static void						BaseDeinitialize();
+		static void							BaseInitialize();
+		static void							BaseDeinitialize();
 
-		virtual const
-		ZEArray<ZEInputDevice*>&		GetInputDevices() = 0;
+		const
+		ZEArray<ZEInputDeviceModule*>&		GetDeviceModules();
 
-		virtual void					ProcessInputs() = 0;
-		virtual void					ProcessInputMap(ZEInputMap* InputMap) = 0;
-
-		virtual bool					IsAcquired();
-		virtual void					Acquire();
-		virtual void					UnAcquire();
-
-		static ZEInputModule*			GetInstance();
+		virtual bool						IsAcquired();
+		virtual void						Acquire();
+		virtual void						UnAcquire();
+		
+		virtual void						Process();
+		
+		static ZEInputModule*				GetInstance();
 };
 #endif
-   
-
-
-
-  

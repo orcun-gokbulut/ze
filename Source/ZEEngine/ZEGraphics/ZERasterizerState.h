@@ -62,42 +62,38 @@ enum ZECullDirection
 
 class ZERasterizerState
 {
-	friend class ZEGraphicsDevice;
-	friend class ZERasterizerStageData;
-
-	// Should be public for only internal usage
-	public:
-		ZEUInt64						Hash;
-		bool							Dirty;
+	protected:
+		ZESize						Hash;
+		bool						Dirty;
 		
 		struct ZERasterizerStateData	
 		{
-			ZEFillMode					FillMode;
-			ZECullDirection				CullDirection;
-			bool						FrontIsCounterClockwise;
-		
+			ZEFillMode				FillMode : 3;
+			ZECullDirection			CullDirection : 3;
+			bool					FrontIsCounterClockwise : 2;
+			
 		} StateData;
 
-		void							UpdateHash();
-
 	public:
-		void							SetFillMode(ZEFillMode Mode);
-		ZEFillMode						GetFillMode() const;
-		
-		void							SetCullDirection(ZECullDirection Direction);
-		ZECullDirection					GetCullDirection() const;
-		
-		void							SetFrontIsCounterClockwise(bool IsCounterClockwise);
-		bool							GetFrontIsCounterClockwise() const;
+		ZESize						GetHash();
 
-		void							SetToDefault();
+		void						SetFillMode(ZEFillMode Mode);
+		ZEFillMode					GetFillMode() const;
+	
+		void						SetCullDirection(ZECullDirection Direction);
+		ZECullDirection				GetCullDirection() const;
+	
+		void						SetFrontIsCounterClockwise(bool IsCounterClockwise);
+		bool						GetFrontIsCounterClockwise() const;
 
-		const ZERasterizerState&		operator=(const ZERasterizerState& State);
-		bool							operator==(const ZERasterizerState& State);
-		bool							operator!=(const ZERasterizerState& State);
+		void						SetToDefault();
 
-										ZERasterizerState();
-		virtual							~ZERasterizerState();
+		const ZERasterizerState&	operator=(const ZERasterizerState& State);
+		bool						operator==(const ZERasterizerState& State);
+		bool						operator!=(const ZERasterizerState& State);
+
+									ZERasterizerState();
+									~ZERasterizerState();
 };
 
 #endif

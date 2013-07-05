@@ -42,6 +42,7 @@
 #include "ZEDefinitions.h"
 #include "ZECompileOptions.h"
 
+
 ZEOptionSection ZEModuleManager::ModuleManagerOptions;
 
 const ZEArray<ZEExtensionDescription*>& ZEModuleManager::GetModuleDescriptions()
@@ -170,28 +171,24 @@ void ZEModuleManager::UnregisterModule(ZEExtensionDescription* ModuleDesc)
 	ModuleList.DeleteValue(ModuleDesc);
 }
 
-#include "ZEModules/ZEDirect3D10/ZED3D10GraphicsModule.h"
-#include "ZEModules/ZEDirectSound/ZEDSModule.h"
-#include "ZEModules/ZEDirectInput/ZEDirectInputModule.h"
-#include "ZEModules/ZEDummyInput/ZEDummyInputModule.h"
-#include "ZEModules/ZEWindowsInput/ZEWindowsInputModule.h"
-#include "ZEModules/ZEVirtualInput/ZEVirtualInputModule.h"
+#include "ZEInput/ZEInputModule.h"
 #include "ZEModules/ZEOpenAL/ZEALModule.h"
 #include "ZEModules/ZEPhysX/ZEPhysXModule.h"
+#include "ZEModules/ZEDirectSound/ZEDSModule.h"
+#include "ZEModules/ZEDirectInput/ZEDirectInputModule.h"
+#include "ZEModules/ZEDirect3D10/ZED3D10GraphicsModule.h"
 
 ZEModuleManager::ZEModuleManager()
 {
-	RegisterModule(ZED3D10GraphicsModule::Description());
 	RegisterModule(ZEDSModule::Description());
-	/*RegisterModule(ZEDummyInputModule::Description());
-	RegisterModule(ZEVirtualInputModule::Description());
-	RegisterModule(ZEDirectInputModule::Description());*/
 	RegisterModule(ZEALModule::Description());
 	RegisterModule(ZEPhysXModule::Description());
-	RegisterModule(ZEWindowsInputModule::Description());
+	RegisterModule(ZEInputModule::Description());
+	RegisterModule(ZEGraphicsModule::Description());
+	RegisterModule(ZED3D10GraphicsModule::Description());
 
 	ModuleManagerOptions.SetName("ModuleManager");
-	ModuleManagerOptions.AddOption(new ZEOption("ZEGraphicsModule", "ZED3D9GraphicsModule", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("ZEGraphicsModule", "ZED3D10GraphicsModule", ZE_OA_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("ZEInputModule", "ZEWindowsInputModule", ZE_OA_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("ZESoundModule", "ZEDSModule", ZE_OA_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("ZENetworkModule", "ZEWinNetwork", ZE_OA_NORMAL));

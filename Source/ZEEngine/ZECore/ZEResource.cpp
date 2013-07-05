@@ -82,7 +82,7 @@ bool ZEResource::IsInternal() const
 	return this->Internal;
 }
 
-void ZEResource::Release()
+void ZEResource::Destroy()
 {
 	ReferenceCount--;
 

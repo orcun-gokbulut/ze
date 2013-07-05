@@ -65,12 +65,10 @@ class ZEGraphicsEventTracer;
 class ZED3D10GraphicsModule : public ZEGraphicsModule
 {
 	ZE_MODULE(ZED3D10GraphicsModule)
-	
-	friend class ZED3D10GraphicsModuleDescription;
 
 	protected:
 		bool							Enabled;
-		ZEString						VideoCardName;
+		ZEString						AdapterName;
 		ZEArray<DXGI_MODE_DESC>			AvailableModes;
 
 		ID3D10Device*					Device;
@@ -87,13 +85,13 @@ class ZED3D10GraphicsModule : public ZEGraphicsModule
 		bool							CreateBuffers(ZEUInt Width, ZEUInt Height);
 		void							DestroyBuffers();
 
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
 										ZED3D10GraphicsModule();
 		virtual							~ZED3D10GraphicsModule();
 
 	public:
-		bool							Initialize();
-		void							Deinitialize();
-
 		virtual bool					SetFullScreen(bool Enabled);
 		virtual bool					SetSampleCount(ZEUInt Count);
 		virtual void					SetVerticalSync(bool Enabled);
@@ -101,6 +99,8 @@ class ZED3D10GraphicsModule : public ZEGraphicsModule
 		
 		virtual void					SetAnisotropicFilter(ZEUInt Anisotropy);
 		virtual bool					SetScreenSize(ZEUInt Width, ZEUInt Height);
+
+		virtual void					GetStatistics(ZEGraphicsStatistics& Statistics) const;
 
 		virtual ZEGraphicsDevice*		GetDevice() const;
 		virtual ZEGraphicsEventTracer*	GetEventTracer() const;

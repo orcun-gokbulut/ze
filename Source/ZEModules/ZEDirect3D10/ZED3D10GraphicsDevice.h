@@ -48,6 +48,13 @@ class ZED3D10GraphicsDevice : public ZEGraphicsDevice, public ZED3D10ComponentBa
 	friend class ZED3D10GraphicsModule;
 
 	protected:
+		void				ApplyInputStates();
+		void				ApplyVertexShaderStates();
+		void				ApplyGeometryShaderStates();
+		void				ApplyRasterizerStates();
+		void				ApplyPixelShaderStates();
+		void				ApplyOutputStates();
+
 		void				ApplyStates();
 		
 							ZED3D10GraphicsDevice();

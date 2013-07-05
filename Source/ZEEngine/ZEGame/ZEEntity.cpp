@@ -57,31 +57,41 @@ bool ZEEntity::AddComponent(ZEEntity* Entity)
 		return false;
 	}
 
-	Entity->Owner = this;
-	Entity->OwnerScene = OwnerScene;
+	if (!(Entity->OwnerScene == NULL || Entity->OwnerScene == this->OwnerScene))
+	{
+		zeError("Component already has been entitled to another scene. Can not register component.");
+		return false;
+	}
 
-	if (!GetInitialized())
-		Entity->Initialize();
+	if (State == ZE_ES_DEINITIALIZING)
+		return false;
+
+	Entity->Owner = this;
+	Entity->SetOwnerScene(this->OwnerScene);
 
 	Components.Add(Entity);
+
+	if (State == ZE_ES_INITIALIZING || State == ZE_ES_INITIALIZED)
+		Entity->Initialize();
+
+	if(Entity->GetName().GetLength() == 0)
+		Entity->SetName(GetName() + "->" +  Entity->GetDescription()->GetName());
+
 	return true;
 }
 
 void ZEEntity::RemoveComponent(ZEEntity* Entity)
 {
-	if (!Components.Exists(Entity))
+	if (Entity->Owner != this)
 	{
-		zeError("Can not remove non-child entity.");
+		zeError("Can not remove non-component entity.");
 		return;
 	}
-
-	if (GetInitialized())
-		Entity->Deinitialize();
 
 	Components.DeleteValue(Entity);
 
 	Entity->Owner = NULL;
-	Entity->OwnerScene = NULL;
+	Entity->SetOwnerScene(NULL);
 }
 
 bool ZEEntity::AddChildEntity(ZEEntity* Entity)
@@ -92,31 +102,32 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 		return false;
 	}
 
-	if (Entity->OwnerScene != NULL)
+	if (!(Entity->OwnerScene == NULL || Entity->OwnerScene == this->OwnerScene))
 	{
-		zeError("Target entity is active in a scene. Can not register target entity.");
+		zeError("Child entity already has been entitled to another scene. Can not register child entity.");
 		return false;
 	}
 
-//  	if (this->OwnerScene != NULL)
-//  	{
-//  		zeError("Parent entity is active in a scene. Can not register target entity.");
-//  		return false;
-//  	}
+	if (State == ZE_ES_DEINITIALIZING)
+		return false;
 
-	Entity->OwnerScene = this->OwnerScene;
 	Entity->Owner = this;
-
-	if (!GetInitialized())
-		Entity->Initialize();
+	Entity->SetOwnerScene(this->OwnerScene);
 
 	ChildEntities.Add(Entity);
+
+	if (State == ZE_ES_INITIALIZED)
+		Entity->Initialize();
+
+	if(Entity->GetName().GetLength() == 0)
+		Entity->SetName(GetName() + "->" +  Entity->GetDescription()->GetName());
+
 	return true;
 }
 
 void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 {
-	if (!ChildEntities.Exists(Entity))
+	if (Entity->Owner != this)
 	{
 		zeError("Can not remove non-child entity.");
 		return;
@@ -124,17 +135,48 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 
 	ChildEntities.DeleteValue(Entity);
 
-	if (GetInitialized())
-		Entity->Deinitialize();
-	
 	Entity->Owner = NULL;
-	Entity->OwnerScene = NULL;
+	Entity->SetOwnerScene(NULL);
 }
 
 void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
 {
 	this->BoundingBox = BoundingBox;
 	DirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
+}
+
+bool ZEEntity::SetOwner(ZEEntity* Owner)
+{
+	this->Owner = Owner;
+
+	return true;
+}
+
+void ZEEntity::SetOwnerScene(ZEScene* Scene)
+{
+	this->OwnerScene = Scene;
+
+	ZESize SubItemCount = Components.GetCount();
+
+	for (ZESize I = 0; I < SubItemCount; I++)
+		Components[I]->SetOwnerScene(Scene);
+
+	SubItemCount = ChildEntities.GetCount();
+
+	for (ZESize I = 0; I < SubItemCount; I++)
+		ChildEntities[I]->SetOwnerScene(Scene);
+}
+
+bool ZEEntity::InitializeSelf()
+{
+	State = ZE_ES_INITIALIZING;
+	return true;
+}
+
+bool ZEEntity::DeinitializeSelf()
+{
+	State = ZE_ES_NOT_INITIALIZED;
+	return true;
 }
 
 ZEEntity::ZEEntity()
@@ -147,7 +189,7 @@ ZEEntity::ZEEntity()
 	Scale = ZEVector3::One;
 	Enabled = true;
 	Visible = true;
-	Initialized = false;
+	State = ZE_ES_NOT_INITIALIZED;
 }
 
 ZEEntity::~ZEEntity()
@@ -155,10 +197,10 @@ ZEEntity::~ZEEntity()
 	Deinitialize();
 
 	for (ZESize I = 0; I < Components.GetCount(); I++)
-		delete Components[I];
+		Components[I]->Destroy();
 
 	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		delete ChildEntities[I];
+		ChildEntities[I]->Destroy();
 }
 
 ZEDrawFlags ZEEntity::GetDrawFlags() const
@@ -169,11 +211,6 @@ ZEDrawFlags ZEEntity::GetDrawFlags() const
 ZEEntity* ZEEntity::GetOwner() const
 {
 	return Owner;
-}
-
-void ZEEntity::SetOwnerScene( ZEScene* Scene )
-{
-	this->OwnerScene = Scene;
 }
 
 ZEScene* ZEEntity::GetOwnerScene() const
@@ -234,9 +271,14 @@ const ZEMatrix4x4& ZEEntity::GetWorldTransform() const
 	return GetTransform();
 }
 
-bool ZEEntity::GetInitialized()
+bool ZEEntity::IsInitialized()
 {
-	return Initialized;
+	return (State == ZE_ES_INITIALIZED);
+}
+
+ZEEntityState ZEEntity::GetState()
+{
+	return State;
 }
 
 void ZEEntity::SetEntityId(ZEInt EntityId)
@@ -249,12 +291,12 @@ ZEInt ZEEntity::GetEntityId() const
 	return EntityId;
 }
 
-void ZEEntity::SetName(const char* NewName)
+void ZEEntity::SetName(ZEString NewName)
 {
 	Name = NewName;
 }
 
-const char* ZEEntity::GetName() const
+ZEString ZEEntity::GetName() const
 {
 	return Name;
 }
@@ -414,43 +456,56 @@ ZEVector3 ZEEntity::GetWorldUp() const
 
 bool ZEEntity::Initialize()
 {
-	if (GetInitialized())
+	if (IsInitialized())
 		return false;
 
-// 	if (OwnerScene == NULL)
-// 		OwnerScene = zeScene;
+	//Owner Scene mevzusu addChild/Comp da ve AddtoScene de olcak
 
 	for (ZESize I = 0; I < Components.GetCount(); I++)
-		if(!Components[I]->GetInitialized())
-			Components[I]->Initialize();
+		if(!Components[I]->Initialize())
+			return false;
+
+	if (!InitializeSelf())
+		return false;
+
+	if (State != ZE_ES_INITIALIZING)
+		return false;
+
+	State = ZE_ES_INITIALIZED;
 
 	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		if(!ChildEntities[I]->GetInitialized())
-			ChildEntities[I]->Initialize();
+		if(!ChildEntities[I]->Initialize())
+			return false;
 
-	Initialized = true;
 	return true;
 }
 
-void ZEEntity::Deinitialize()
+bool ZEEntity::Deinitialize()
 {
-	if (!GetInitialized())
-		return;
+	if (!IsInitialized())
+		return true;
 	
-	for (ZESize I = 0; I < Components.GetCount(); I++)
-		if(Components[I]->GetInitialized())
-			Components[I]->Deinitialize();
-
 	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		if(ChildEntities[I]->GetInitialized())
-			ChildEntities[I]->Deinitialize();
+		if(!ChildEntities[I]->Deinitialize())
+			return false;
 
-	Initialized = false;
+	State = ZE_ES_DEINITIALIZING;
+
+	if (!DeinitializeSelf())
+		return false;
+
+	if (State != ZE_ES_NOT_INITIALIZED)
+		return false;
+
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+		if(!Components[I]->Deinitialize())
+			return false;
+
+	return true;
 }
 
 void ZEEntity::Destroy()
 {
-	Deinitialize();
 	delete this;
 }
 

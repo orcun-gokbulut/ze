@@ -95,8 +95,11 @@ const char* ZESkyBrush::GetSkyTexture() const
 	return SkyTexture->GetFileName();
 }
 
-bool ZESkyBrush::Initialize()
+bool ZESkyBrush::InitializeSelf()
 {/*
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	if (SkyMaterial == NULL)
 	{
 		SkyMaterial = ZESkyBoxMaterial::CreateInstance();
@@ -109,10 +112,10 @@ bool ZESkyBrush::Initialize()
 	if (SkyTexture != NULL)
 		SkyMaterial->SetTexture(SkyTexture->GetTexture());
 		*/
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZESkyBrush::Deinitialize()
+bool ZESkyBrush::DeinitializeSelf()
 {/*
 	if (SkyMaterial != NULL)
 	{
@@ -126,7 +129,7 @@ void ZESkyBrush::Deinitialize()
 		SkyTexture = NULL;
 	}
 
-	ZEEntity::Deinitialize();
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)
@@ -167,7 +170,7 @@ ZESkyBrush::ZESkyBrush()
 
 ZESkyBrush::~ZESkyBrush()
 {
-	Deinitialize();
+
 }
 
 ZESkyBrush* ZESkyBrush::CreateInstance()

@@ -39,71 +39,54 @@
 
 #include "ZELight.h"
 #include "ZETypes.h"
-#include "ZEMath/ZEMatrix.h"
+#include "ZEShadowCascaded.h"
 #include "ZERenderCommand.h"
-#include "ZEMath/ZEViewCuboid.h"
 
-class ZETexture2D;
-class ZERenderTarget;
 class ZEVertexBuffer;
 struct ZEDrawParameters;
-class ZEMaterialLightDirectional;
-
-struct ZEDirectionalLightCascade
-{
-	ZEUInt				Index;
-	float				FarZ;
-	float				NearZ;
-	float				Depth;
-	ZEUInt				UpdateInterval;
-
-	ZETexture2D*		ShadowMap;
-	ZERenderTarget*		ShadowMapRenderTarget;
-	ZEViewCuboid		ViewVolume;
-	ZEMatrix4x4			ShadowTransform;
-};
-
-#define	ZE_DL_MAX_CASCADE_COUNT		5
 
 class ZELightDirectional : public ZELight
 {
 	protected:
-		float							CascadeSplitBias;
-		ZESize							CascadeCount;
-		ZEDirectionalLightCascade		Cascades[ZE_DL_MAX_CASCADE_COUNT];
+		ZEVector3						Color;
+		float							Intensity;
+	
+		float							PenumbraSize;
+		float							BiasDepthScaled;
+		float							BiasSlopeScaled;
+
+		ZEShadowCascaded				CascadedShadow;
 
 		ZEMaterialLightDirectional*		Material;
-		ZEVertexBuffer*					Geometry;
-		ZERenderCommand					RenderCommand;
+		ZEVertexBuffer*					VertexBuffer;
+		ZEVertexLayout					VertexLayout;
+		ZERenderCommandDefault			RenderCommand;
 
-		void							UpdateCascades();
-		void							UpdateRenderTargets();
-		void							DestroyRenderTargets();
+		void							UpdateBuffers(const ZEDrawParameters* DrawParameters);
 		
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
 										ZELightDirectional();
 		virtual							~ZELightDirectional();
 
 	public:
-		void							SetCascadeCount(ZESize Value);
-		ZESize							GetCascadeCount() const;
+		void							SetColor(const ZEVector3& NewColor);
+		const ZEVector3&				GetColor() const;
 		
-		void							SetSplitBias(float Value);
-		float							GetSplitBias() const;
+		void							SetIntensity(float NewValue);
+		float							GetIntensity() const;
 
-		float							GetFarZ(ZESize Index) const;
-		float							GetNearZ(ZESize Index) const;
-		float							GetDepth(ZESize Index) const;
+		void							SetPenumbraSize(float Value);
+		float							GetPenumbraSize() const;
 
-		void							SetUpdateInterval(ZESize Index, ZEUInt Value);
-		ZEUInt							GetUpdateInterval(ZESize Index) const;
+		void							SetSlopeScaledBias(float Value);
+		float							GetSlopeScaledBias() const;
 
-		const ZETexture2D*				GetShadowMap(ZESize Index) const;
-		const ZEMatrix4x4&				GetShadowTransform(ZESize Index) const;
+		void							SetDepthScaledBias(float Value);
+		float							GetDepthScaledBias() const;
 
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index);
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
+		virtual const ZEViewVolume*		GetLightVolume();
 
 		virtual void					Tick(float Time);
 		virtual void					Draw(ZEDrawParameters* DrawParameters);

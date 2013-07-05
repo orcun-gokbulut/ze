@@ -58,6 +58,9 @@ class ZESkyBrush : public ZEEntity
 		ZEVector3							SkyColor;
 		float								SkyBrightness;
 
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
+
 											ZESkyBrush();
 		virtual								~ZESkyBrush();
 
@@ -72,9 +75,6 @@ class ZESkyBrush : public ZEEntity
 
 		virtual void						SetSkyColor(const ZEVector3& Color);
 		const ZEVector3&					GetSkyColor() const;
-
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
 
 		virtual void						Draw(ZEDrawParameters* DrawParameters);
 		virtual void						Tick(float Time);

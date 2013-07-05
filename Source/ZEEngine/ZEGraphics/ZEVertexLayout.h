@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
-#include "ZEVertexBuffer.h"
+#include "ZEGraphicsDefinitions.h"
 
 enum ZEVertexElementType
 {
@@ -65,28 +65,23 @@ enum ZEVertexUsage
 	ZE_VU_PER_INSTANCE	= 1
 };
 
-#define ZE_MAX_SEMANTIC_NAME_LENGHT		32
-
 struct ZEVertexElement
 {
-	char				Semantic[ZE_MAX_SEMANTIC_NAME_LENGHT];
-	ZEUInt				SemanticIndex;
-	ZEVertexElementType	Type;
-	ZEUInt				StreamSlot;
-	ZEUInt				ByteOffset;
-	ZEVertexUsage		Usage;
-	ZEUInt				InstanceCount;
+	char					Semantic[ZE_MAX_SHADER_VARIABLE_NAME];
+	ZEUInt8					Index;
+	ZEVertexElementType		Type;
+	ZEUInt8					Stream;
+	ZEUInt16				Offset;
+	ZEVertexUsage			Usage;
+	ZEUInt16				InstanceCount;
 };
 
-#define ZE_MAX_VERTEX_LAYOUT_ELEMENT	16		// D3D10_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT
+class ZEShader;
+class ZEVertexBuffer;
 
 class ZEVertexLayout
 {
-	friend class ZEGraphicsDevice;
-	friend class ZEGraphicsModule;
-
-	// Should be public for only internal usage
-	public:
+	protected:
 		ZESize					Hash;
 		bool					Dirty;
 
@@ -96,10 +91,9 @@ class ZEVertexLayout
 			ZEVertexElement		VertexElements[ZE_MAX_VERTEX_LAYOUT_ELEMENT];
 		
 		} StateData;
-		
-		void					UpdateHash();
 
 	public:
+		ZESize					GetHash();
 		bool					IsEmpty() const;
 		
 		ZEUInt					GetElementCount() const;
@@ -112,6 +106,8 @@ class ZEVertexLayout
 		const ZEVertexLayout&	operator=(const ZEVertexLayout& State);
 		bool					operator==(const ZEVertexLayout& State);
 		bool					operator!=(const ZEVertexLayout& State);
+
+		static bool				GenerateLayout(ZEVertexLayout& Output, ZEVertexBuffer* BufferArr[ZE_MAX_VERTEX_BUFFER_SLOT], const ZEShader* VertexShader);
 
 								ZEVertexLayout();
 								~ZEVertexLayout();

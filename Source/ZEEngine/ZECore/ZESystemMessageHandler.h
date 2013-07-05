@@ -47,6 +47,9 @@ class ZESystemMessageHandler
 		UINT					MinMessage;
 		UINT					MaxMessage;
 
+		void					Register();
+		void					Unregister();
+
 		virtual bool			Callback(MSG* Message) = 0;
 
 								ZESystemMessageHandler();

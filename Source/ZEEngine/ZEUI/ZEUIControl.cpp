@@ -136,7 +136,7 @@ bool ZEUIControl::GetPressed() const
 	return IsPressed;
 }
 
-void ZEUIControl::SetZOrder(int Z)
+void ZEUIControl::SetZOrder(ZEInt32 Z)
 {
 	ZOrder = Z;
 
@@ -144,7 +144,7 @@ void ZEUIControl::SetZOrder(int Z)
 		ChildControls[I]->SetZOrder(ZOrder + 1);
 }
 
-int ZEUIControl::GetZOrder() const
+ZEInt32 ZEUIControl::GetZOrder() const
 {
 	return ZOrder;
 }

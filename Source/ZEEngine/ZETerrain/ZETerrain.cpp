@@ -66,7 +66,7 @@ ZEDrawFlags ZETerrain::GetDrawFlags() const
 void ZETerrain::SetChunkSize(ZEUInt Size)
 {
 	ChunkSize = Size;
-	if (GetInitialized())
+	if (IsInitialized())
 		ZETerrainPrimitivesGenerator::Generate(&VertexBuffer, &Indices, ChunkSize);
 }
 
@@ -167,12 +167,12 @@ ZETerrain::ZETerrain()
 
 ZETerrain::~ZETerrain()
 {
-	Deinitialize();
+
 }
 
-bool ZETerrain::Initialize()
+bool ZETerrain::InitializeSelf()
 {
-	if (GetInitialized())
+	if (!ZEEntity::InitializeSelf())
 		return false;
 
 	if (!CreateVertexBuffer())
@@ -184,19 +184,16 @@ bool ZETerrain::Initialize()
 	if (!CreateLevels())
 		return false;
 
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZETerrain::Deinitialize()
+bool ZETerrain::DeinitializeSelf()
 {
-	if (!GetInitialized())
-		return;
-
 	DestroyLevels();
 	UnloadLevelData();
 	DestroyVertexBuffer();
 
-	ZEEntity::Deinitialize();
+	return ZEEntity::DeinitializeSelf();
 }
 
 bool ZETerrain::CreateVertexBuffer()
@@ -424,7 +421,7 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 void ZETerrain::SetTerrainFile(const ZEString& FileName)
 {
 	TerrainFileName = FileName;
-	if (GetInitialized())
+	if (IsInitialized())
 		LoadLevelData();
 }
 
@@ -434,22 +431,19 @@ const ZEString& ZETerrain::GetTerrainFile()
 }
 
 bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt PositionX, ZEInt PositionY, ZEInt LocalPositionX, ZEInt LocalPositionY, ZEInt Mode, ZESize Level)
-{	
-	ZERenderCommand RenderCommand;
-	RenderCommand.Flags	|= ZE_RCF_Z_CULL | ZE_RCF_WORLD_TRANSFORM | ZE_RCF_VIEW_PROJECTION_TRANSFORM;
-	RenderCommand.VertexLayout = VertexDeclaration;
+{
+	ZERenderCommandDefault RenderCommand;
+	RenderCommand.VertexLayout = &VertexDeclaration;
 	RenderCommand.Material = Levels[Level].Material;
 	RenderCommand.Order = 0;
-	RenderCommand.Pipeline = ZE_RP_3D;
 	RenderCommand.VertexBuffers[0] = VertexBuffer;
 	RenderCommand.PrimitiveType	= ZE_PT_TRIANGLE_LIST;
 	RenderCommand.Priority = 3;
-	RenderCommand.Flags |= 1024;
 
 	ZEMatrix4x4 ScaleMatrix;
 	ZEMatrix4x4::CreateOrientation(ScaleMatrix, ZEVector3((float)PositionX, 0.0f, (float)PositionY), ZEQuaternion::Identity, ZEVector3((float)(1 << Level), 1.0f, (float)(1 << Level)));
-	ZEMatrix4x4::Multiply(RenderCommand.WorldMatrix, GetWorldTransform(), ScaleMatrix);
-	ZEMatrix4x4::CreateTranslation(RenderCommand.LocalMatrix, (float)LocalPositionX, 0.0f, (float)LocalPositionY);
+	//ZEMatrix4x4::Multiply(RenderCommand.WorldMatrix, GetWorldTransform(), ScaleMatrix);
+	//ZEMatrix4x4::CreateTranslation(RenderCommand.LocalMatrix, (float)LocalPositionX, 0.0f, (float)LocalPositionY);
 
 	ZEInt BarSize;
 	if (PrimitiveType == ZE_TP_CORNER_2)

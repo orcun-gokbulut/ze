@@ -35,7 +35,9 @@
 
 #include "ZELight.h"
 #include "ZERenderer.h"
+#include "ZEMaterial.h"
 #include "ZEGame/ZEScene.h"
+#include "ZERenderCommand.h"
 #include "ZEGraphics/ZEShader.h"
 #include "ZERenderStageShadow.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
@@ -122,9 +124,6 @@ void ZERenderStageShadow::UpdateShaders()
 
 void ZERenderStageShadow::UpdateBuffers()
 {
-	// Update parent buffers
-	ZERenderStage::UpdateBuffers();
-
 	ZEVector2 ShadowMapDimension = zeScene->GetRenderer()->GetShadowMapDimension();
 	ZEUInt32 Width = (ZEUInt32)(ShadowMapDimension.x + 0.5f);
 	ZEUInt32 Height = (ZEUInt32)(ShadowMapDimension.y + 0.5f);
@@ -143,15 +142,10 @@ void ZERenderStageShadow::DestroyBuffers()
 	ZE_DESTROY(RenderTargets.DepthStencilBuffer);
 }
 
-void ZERenderStageShadow::ResetStageDefaults()
+void ZERenderStageShadow::ResetStates()
 {
-	// Requested pipeline constants
-	StageConstants.SetCount(2);
-	StageConstants.Add(ZE_PC_CAMERA_WORLD_POS);
-	StageConstants.Add(ZE_PC_INV_VIEWPORT_WIDTH_HEIGHT);
-
 	// Reset parent states
-	ZERenderStage::ResetStageDefaults();
+	ZERenderStage::ResetStates();
 
 	// Render targets
 	DefaultStates.DepthStencilBuffer = RenderTargets.DepthStencilBuffer;
@@ -160,17 +154,17 @@ void ZERenderStageShadow::ResetStageDefaults()
 	ZEUInt32 Width = (ZEUInt32)(ShadowMapDimension.x + 0.5f);
 	ZEUInt32 Height = (ZEUInt32)(ShadowMapDimension.y + 0.5f);
 
-	DefaultStates.ViewPorts[0].ViewportData.TopLeftX = 0;
-	DefaultStates.ViewPorts[0].ViewportData.TopLeftY = 0;
-	DefaultStates.ViewPorts[0].ViewportData.MinDepth = 0.0f;
-	DefaultStates.ViewPorts[0].ViewportData.MaxDepth = 1.0f;
-	DefaultStates.ViewPorts[0].ViewportData.Width = Width;
-	DefaultStates.ViewPorts[0].ViewportData.Height = Height;
+	DefaultStates.ViewPorts[0].StateData.TopLeftX = 0;
+	DefaultStates.ViewPorts[0].StateData.TopLeftY = 0;
+	DefaultStates.ViewPorts[0].StateData.MinDepth = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.MaxDepth = 1.0f;
+	DefaultStates.ViewPorts[0].StateData.Width = Width;
+	DefaultStates.ViewPorts[0].StateData.Height = Height;
 
-	DefaultStates.ScissorRectangles[0].ScissorRectangleData.Top = 0;
-	DefaultStates.ScissorRectangles[0].ScissorRectangleData.Left = 0;
-	DefaultStates.ScissorRectangles[0].ScissorRectangleData.Right = (ZEInt)Width;
-	DefaultStates.ScissorRectangles[0].ScissorRectangleData.Bottom = (ZEInt)Height;
+	DefaultStates.ScissorRects[0].StateData.Top = 0;
+	DefaultStates.ScissorRects[0].StateData.Left = 0;
+	DefaultStates.ScissorRects[0].StateData.Right = (ZEInt)Width;
+	DefaultStates.ScissorRects[0].StateData.Bottom = (ZEInt)Height;
 
 	// Rasterizer state
 	DefaultStates.RasterizerState.SetFillMode(ZE_FM_SOLID);
@@ -185,11 +179,8 @@ void ZERenderStageShadow::ResetStageDefaults()
 	DefaultStates.DepthStencilState.SetZWriteEnable(true);
 }
 
-void ZERenderStageShadow::CommitStageDefaults()
+void ZERenderStageShadow::CommitStates()
 {
-	// Commit parent states
-	ZERenderStage::CommitStageDefaults();
-
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	Device->SetDepthStencilBuffer(DefaultStates.DepthStencilBuffer);
@@ -199,43 +190,45 @@ void ZERenderStageShadow::CommitStageDefaults()
 	Device->SetRasterizerState(DefaultStates.RasterizerState);
 
 	Device->SetViewport(0, DefaultStates.ViewPorts[0]);
-	Device->SetScissorRectangle(0, DefaultStates.ScissorRectangles[0]);
+	Device->SetScissorRectangle(0, DefaultStates.ScissorRects[0]);
+
+	// Commit parent states
+	ZERenderStage::CommitStates();
 }
 
-ZEUInt32 ZERenderStageShadow::GetStageFlags() const
+ZERenderStageType ZERenderStageShadow::GetDependencies() const
 {
-	return 0;
+	return ZE_RST_NONE;
 }
 
-ZEUInt32 ZERenderStageShadow::GetDependencies() const
+ZERenderStageType ZERenderStageShadow::GetStageType() const
 {
-	return ZE_RENDER_STAGE_NONE;
-}
-
-ZEUInt32 ZERenderStageShadow::GetStageIndentifier() const
-{
-	return ZE_RENDER_STAGE_SHADOW;
+	return ZE_RST_SHADOW;
 }
 
 void ZERenderStageShadow::Setup()
 {
 	UpdateShaders();
 	UpdateBuffers();
-	ResetStageDefaults();
-	CommitStageDefaults();
+	ResetStates();
+	CommitStates();
 
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 	Device->ClearDepthStencilBuffer(RenderTargets.DepthStencilBuffer, true, true, 1.0f, 0);
 }
 
-void ZERenderStageShadow::Process(ZERenderCommand* RenderCommand)
+void ZERenderStageShadow::Process(const ZERenderCommand* RenderCommand)
 {
-	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
-}
+	zeDebugCheck(RenderCommand->Material == NULL, "Null Pointer.");
 
-void ZERenderStageShadow::SetStageConfiguration(const ZERenderStageConfiguration* Config)
-{
-	
+	bool Done = false;
+	ZEUInt PassId = 0;
+	while (!Done)
+	{
+		Done = RenderCommand->Material->SetupPass(PassId++, this, RenderCommand);
+	}
+
+	PumpStreams(RenderCommand);
 }
 
 ZERenderStageShadow::ZERenderStageShadow()

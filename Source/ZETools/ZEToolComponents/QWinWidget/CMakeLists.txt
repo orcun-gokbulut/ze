@@ -35,15 +35,15 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-qt4_wrap_cpp (QtMocFiles qwinwidget.h qwinhost.h)
+ze_add_source(qwinwidget.h			Sources QtMocs)
+ze_add_source(qwinwidget.cpp		Sources)
+ze_add_source(qwinhost.h			Sources QtMocs)
+ze_add_source(qwinhost.cpp			Sources)
+ze_add_source(qmfcapp.h				Sources)
+ze_add_source(qmfcapp.cpp			Sources)
 
-add_library(QWinWidget SHARED
-	qwinwidget.h
-	qwinwidget.cpp
-	qwinhost.h
-	qwinhost.cpp
-	qmfcapp.h
-	qmfcapp.cpp
-	${QtMocFiles})
+qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
-target_link_libraries(QWinWidget QtCore4.lib QtGui4.lib)
+ze_add_library(QWinWidget 
+	SOURCES ${Sources} ${QtMocFiles}
+	LIBS libQt)

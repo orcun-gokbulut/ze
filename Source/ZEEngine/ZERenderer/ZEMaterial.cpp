@@ -34,95 +34,61 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMaterial.h"
-#include "ZECore/ZECore.h"
-#include "ZERenderStage.h"
-#include "ZEMeta/ZEAnimation.h"
+#include "ZEGraphics/ZEConstantBuffer.h"
+
+void ZEMaterial::Destroy()
+{
+	if (State.InUse)
+	{
+		State.Deleted = true;
+		return;
+	}
+
+	delete this;
+}
+
+void ZEMaterial::EnableStage(ZERenderStageType Stage)
+{
+	EnabledStages |= (SupportedStages & Stage);
+}
+
+void ZEMaterial::DisableStage(ZERenderStageType Stage)
+{
+	EnabledStages &= ~Stage;
+}
+
+void ZEMaterial::WriteToFile(const ZEString& FilePath)
+{
+
+}
+
+void ZEMaterial::ReadFromFile(const ZEString& FilePath)
+{
+
+}
+
+bool ZEMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
+{
+	zeDebugCheck(Stage == NULL, "Null stage.");
+	zeDebugCheck(RenderCommand == NULL, "Null Render command.");
+
+	ZERenderStageType Type = Stage->GetStageType();
+	if (!EnabledStages.GetFlags(Type))
+		return false;
+
+	return true;
+}
 
 ZEMaterial::ZEMaterial()
 {
-	ShadowCaster = true;
-	ShadowReciver = true;
-	LightCaster = false;
-	LightReciever = true;
-}
+	State.InUse = false;
+	State.Deleted = false;
 
-void ZEMaterial::SetShadowCaster(bool Value)
-{
-	ShadowCaster = Value;
-}
-
-bool ZEMaterial::GetShadowCaster() const
-{
-	return ShadowCaster;
-}
-
-void ZEMaterial::SetShadowReciver(bool Value)
-{
-	ShadowReciver = Value;
-}
-
-bool ZEMaterial::GetShadowReciver() const
-{
-	return ShadowReciver;
+	EnabledStages = 0;
+	SupportedStages = 0;
 }
 
 ZEMaterial::~ZEMaterial()
 {
 
-}
-
-void ZEMaterial::SetLightCaster(bool Value)
-{
-	LightCaster = Value;
-}
-
-bool ZEMaterial::GetLightCaster() const
-{
-	return LightCaster;
-}
-
-void ZEMaterial::SetLightReciever(bool Value)
-{
-	LightReciever = Value;
-}
-
-bool ZEMaterial::GetLightReciever() const
-{
-	return LightReciever;
-}
-
-bool ZEMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
-{
-	return false;
-}
-
-void ZEMaterial::UpdateMaterial()
-{
-
-}
-
-void ZEMaterial::AdvanceAnimation(float TimeElapsed)
-{
-	if (GetAnimationController() != NULL)
-		GetAnimationController()->AdvanceAnimation(TimeElapsed);
-}
-
-void ZEMaterial::Destroy()
-{
-	delete this;
-}
-
-/************************************************************************/
-/*                       NEW MATERIAL                                   */
-/************************************************************************/
-
-ZERenderProgram::ZERenderProgram()
-{
-	Shader = NULL;
-	memset(Buffers, 0, sizeof(const ZEConstantBuffer*) * ZE_MAX_BUFFER_SLOT);
-}
-	
-ZERenderProgram::~ZERenderProgram()
-{
-	
 }

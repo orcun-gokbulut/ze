@@ -45,11 +45,10 @@ ze_add_source(ZEProgresDialogSignalHandler.cpp		Sources)
 ze_add_source(ZEProgressDialogTreeWidget.h			Sources)
 ze_add_source(ZEProgressDialogTreeWidget.cpp		Sources)
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+qt4_add_resources(QtResourceFiles ${QtResources})
+qt4_wrap_ui(QtUIFiles ${QtUI})
+qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
 ze_add_library(ZEProgressDialog 
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles})
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
+	LIBS libQt)

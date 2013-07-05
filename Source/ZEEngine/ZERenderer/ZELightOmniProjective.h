@@ -48,29 +48,60 @@ class ZEMaterialLightOmniProjective;
 class ZELightOmniProjective : public ZELight
 {
 	private:
-		ZESamplerState					TextureSampler;
-		const ZETextureCube*			ProjectionTexture;
+		float							Range;
+		ZEVector3						Color;
+		float							Intensity;
+		ZEVector3						Attenuation;
+
+		float							PenumbraSize;
+		float							SlopeScaledBias;
+		float							DepthScaledBias;
 
 		ZEMaterialLightOmniProjective*	Material;
-		ZEVertexBuffer*					Geometry;
-		ZERenderCommand					RenderCommand;
+		ZEVertexBuffer*					VertexBuffer;
+		ZEVertexLayout					VertexLayout;
 
+		ZERenderCommandDefault			RenderCommand;
 		ZEViewSphere					ViewVolume;
+
+		virtual void					UpdateMaterial(const ZEDrawParameters* DrawParameters);
+
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
 
 										ZELightOmniProjective();
 		virtual							~ZELightOmniProjective();
 
 	public:
+		void							SetRange(float NewValue);
+		float							GetRange() const;
+
+		void							SetColor(const ZEVector3& NewColor);
+		const ZEVector3&				GetColor() const;
+		
+		void							SetIntensity(float NewValue);
+		float							GetIntensity() const;
+
+		void							SetAttenuation(const ZEVector3& Attenuation);
+		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
+		const ZEVector3&				GetAttenuation() const;
+
+		void							SetPenumbraSize(float Value);
+		float							GetPenumbraSize() const;
+
+		void							SetSlopeScaledBias(float Value);
+		float							GetSlopeScaledBias() const;
+
+		void							SetDepthScaledBias(float Value);
+		float							GetDepthScaledBias() const;
+
 		void							SetTextureSampler(const ZESamplerState& Sampler);
 		const ZESamplerState&			GetTextureSampler() const;
 
 		void							SetProjectionTexture(const ZETextureCube* Texture);
 		const ZETextureCube*			GetProjectionTexture() const;
 
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index);
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
+		virtual const ZEViewVolume*		GetLightVolume();
 
 		virtual void					Tick(float Time);
 		virtual void					Draw(ZEDrawParameters* DrawParameters);

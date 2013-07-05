@@ -38,124 +38,59 @@
 #define __ZE_MATERIAL_H__
 
 #include "ZETypes.h"
-#include "ZEMeta/ZEObject.h"
-#include "ZEGraphics/ZEGraphicsDeviceState.h"
+#include "ZEDS/ZEArray.h"
+#include "ZERenderStage.h"
 
-
-#define ZE_MTF_NONE						0
-#define ZE_MTF_PRE_Z_PASS				1
-#define ZE_MTF_GEOMETRY_PASS			2
-#define ZE_MTF_SHADOW_PASS				4
-#define ZE_MTF_LIGHTING_PASS			8
-#define ZE_MTF_FORWARD_PASS				16
-#define ZE_MTF_PARTICLE_PASS			32
-#define ZE_MTF_SUPPORTS_SKINNING		64
-#define ZE_MTF_SUPPORTS_MORPHING		128
-#define ZE_MTF_SUPPORTS_INSTANCING		256
-#define ZE_MTF_USER_INTERFACE_PASS		512
-typedef ZEUInt32 ZEMaterialFlags;
-
-
-enum ZEMaterialTransparancyMode
+enum ZETransparancyMode
 {
-	ZE_MTM_NONE					= 0,
-	ZE_MTM_REGULAR				= 2,
-	ZE_MTM_ADDAPTIVE			= 3,
-	ZE_MTM_SUBTRACTIVE			= 4
+	ZE_TM_NONE				= 0,
+	ZE_TM_REGULAR			= 1,
+	ZE_TM_ADDAPTIVE			= 2,
+	ZE_TM_SUBTRACTIVE		= 3
 };
 
-enum ZEMaterialOpacityComponent
+enum ZEOpacityComponent
 {
-	ZE_MOC_CONSTANT				= 0,
-	ZE_MOC_BASE_MAP_ALPHA		= 1,
-	ZE_MOC_OPACITY_MAP			= 2
+	ZE_OC_CONSTANT			= 0,
+	ZE_OC_BASE_MAP_ALPHA	= 1,
+	ZE_OC_OPACITY_MAP		= 2
 };
 
-class ZERenderer;
-class ZERenderStage;
 class ZERenderCommand;
 
-ZE_META_OBJECT_DESCRIPTION(ZEMaterial)
-
-class ZEMaterial : public ZEObject
+class ZEMaterial
 {
-	ZE_META_OBJECT(ZEMaterial)
+	friend class ZERenderer;
+	friend class ZERenderCommand;
+
+	private:
+		struct ZEMaterialState
+		{
+			bool				InUse : 1;
+			bool				Deleted : 1;
+
+		} State;
 
 	protected:
-		bool						ShadowCaster;
-		bool						ShadowReciver;
+		ZERenderStageType		EnabledStages;
+		ZERenderStageType		SupportedStages;
 
-		bool						LightCaster;
-		bool						LightReciever;
-
-									ZEMaterial();
-		virtual						~ZEMaterial();
+								ZEMaterial();
+		virtual					~ZEMaterial();
 
 	public:
-		void						SetShadowCaster(bool Value);
-		bool						GetShadowCaster() const;
+		virtual void			Destroy();
 
-		void						SetShadowReciver(bool Value);
-		bool						GetShadowReciver() const;
+		virtual void			EnableStage(ZERenderStageType Stage);
+		virtual void			DisableStage(ZERenderStageType Stage);
 
-		void						SetLightCaster(bool Value);
-		bool						GetLightCaster() const;
+		virtual void			WriteToFile(const ZEString& FilePath);
+		virtual void			ReadFromFile(const ZEString& FilePath);
 
-		void						SetLightReciever(bool Value);
-		bool						GetLightReciever() const;
+		virtual bool			SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
-		virtual void				Destroy();
-		virtual void				UpdateMaterial();
-
-		virtual void				AdvanceAnimation(float TimeElapsed);
-		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
-
-		virtual ZESize				GetHash() const = 0;
-		virtual ZEMaterialFlags		GetMaterialFlags() const = 0;
-};
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZEMaterial" noinstance="true" description="Base class of materials.">
-			<property name="LightReciever" groupname="Shading" type="boolean" autogetset="yes"/>
-			<property name="LightCaster" groupname="Shading" type="boolean" autogetset="yes"/>
-			<property name="ShadowReciver" groupname="Shadows" type="boolean" autogetset="yes"/>
-			<property name="ShadowCaster" groupname="Shadows" type="boolean" autogetset="yes"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-
-/************************************************************************/
-/*                         NEW MATERIAL                                 */
-/************************************************************************/
-
-class ZERenderProgram
-{
-	public:
-		const ZEShader*				Shader;
-		const ZEConstantBuffer*		Buffers[ZE_MAX_BUFFER_SLOT];
-		
-									ZERenderProgram();
-									~ZERenderProgram();
-};
-
-class ZEMaterialNew
-{
-	protected:
-									ZEMaterialNew();
-		virtual						~ZEMaterialNew();
-
-	public:
-		ZEArray<ZERenderProgram>	Programs;
-
-		virtual ZESize				GetHash() const = 0;
-		virtual ZEMaterialFlags		GetMaterialFlags() const = 0;
-		
-		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand) = 0;
+		virtual ZESize			GetHash() const = 0;
+		virtual bool			UpdateMaterial() = 0;
 };
 
 #endif

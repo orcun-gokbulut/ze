@@ -64,86 +64,85 @@ enum ZEComparisonFunction
 
 class ZEDepthStencilState
 {
-	friend class ZEGraphicsDevice;
-	friend class ZEDeviceStageOutput;
-
-	// Should be public for only internal usage
-	public:
-		ZEUInt64							Hash;
-		bool								Dirty;
+	protected:
+		ZESize							Hash;
+		bool							Dirty;
 
 		struct ZEDepthStencilStateData
 		{
-			bool							ZTestEnable;
-			bool							ZWriteEnable;
-			ZEComparisonFunction			ZFunction;
-			bool							StencilTestEnable;
-			ZEUInt8							StencilWriteMask;
-			ZEUInt8							StencilReadMask;
-			ZEStencilOperation				FrontStencilFailOperation;
-			ZEStencilOperation				FrontZFailOperation;
-			ZEStencilOperation				FrontStencilPassOperation;
-			ZEComparisonFunction			FrontStencilFunction;
-			ZEStencilOperation				BackStencilFailOperation;
-			ZEStencilOperation				BackZFailOperation;
-			ZEStencilOperation				BackStencilPassOperation;
-			ZEComparisonFunction			BackStencilFunction;
+			bool						ZTestEnable : 2;
+			bool						ZWriteEnable : 2;
+			bool						StencilTestEnable : 2;
+			ZEComparisonFunction		ZFunction : 5;
+			ZEUInt8						StencilWriteMask : 8;
+			ZEUInt8						StencilReadMask : 8;
+			ZEStencilOperation			FrontStencilFailOperation : 5;
+			ZEStencilOperation			FrontZFailOperation : 5;
+			ZEStencilOperation			FrontStencilPassOperation : 5;
+			ZEComparisonFunction		FrontStencilFunction : 5;
+			ZEStencilOperation			BackStencilFailOperation : 5;
+			ZEStencilOperation			BackZFailOperation : 5;
+			ZEStencilOperation			BackStencilPassOperation : 5;
+			ZEComparisonFunction		BackStencilFunction : 5;
 
 		} StateData;
-
-		void								UpdateHash();
-		
+	
 	public:
-		void								SetZTestEnable(bool Enable);
-		bool								GetZTestEnable() const;
-		
-		void								SetStencilTestEnable(bool Enable);
-		bool								GetStencilTestEnable() const;
-		
-		void								SetZWriteEnable(bool Enable);
-		bool								GetZWriteEnable() const;
-		
-		void								SetStencilWriteMask(ZEUInt8 Mask);
-		ZEUInt8								GetStencilWriteMask() const;
-		
-		void								SetStencilReadMask(ZEUInt8 Mask);
-		ZEUInt8								GetStencilReadMask() const;
+		ZESize							GetHash();
 
-		void								SetZFunction(ZEComparisonFunction Function);
-		ZEComparisonFunction				GetZFunction() const;
-		
-		void								SetFrontStencilFail(ZEStencilOperation Operation);
-		ZEStencilOperation					GetFrontStencilFail() const;
-		
-		void								SetFrontZFail(ZEStencilOperation Operation);
-		ZEStencilOperation					GetFrontZFail() const;
-		
-		void								SetFrontStencilPass(ZEStencilOperation Operation);
-		ZEStencilOperation					GetFrontStencilPass() const;
-		
-		void								SetFrontStencilFunction(ZEComparisonFunction Function);
-		ZEComparisonFunction				GetFrontStencilFunction() const;
-		
-		void								SetBackStencilFail(ZEStencilOperation Operation);
-		ZEStencilOperation					GetBackStencilFail() const;
-		
-		void								SetBackZFail(ZEStencilOperation Operation);
-		ZEStencilOperation					GetBackZFail() const;
-		
-		void								SetBackStencilPass(ZEStencilOperation Operation);
-		ZEStencilOperation					GetBackStencilPass() const;
-		
-		void								SetBackStencilFunction(ZEComparisonFunction Function);		
-		ZEComparisonFunction				GetBackStencilFunction() const;
+		void							SetZTestEnable(bool Enable);
+		bool							GetZTestEnable() const;
+	
+		void							SetStencilTestEnable(bool Enable);
+		bool							GetStencilTestEnable() const;
+	
+		void							SetZWriteEnable(bool Enable);
+		bool							GetZWriteEnable() const;
+	
+		void							SetStencilWriteMask(ZEUInt8 Mask);
+		ZEUInt8							GetStencilWriteMask() const;
+	
+		void							SetStencilReadMask(ZEUInt8 Mask);
+		ZEUInt8							GetStencilReadMask() const;
 
-		void								SetToDefault();
+		void							SetZFunction(ZEComparisonFunction Function);
+		ZEComparisonFunction			GetZFunction() const;
+	
+		void							SetFrontStencilFail(ZEStencilOperation Operation);
+		ZEStencilOperation				GetFrontStencilFail() const;
+	
+		void							SetFrontZFail(ZEStencilOperation Operation);
+		ZEStencilOperation				GetFrontZFail() const;
+	
+		void							SetFrontStencilPass(ZEStencilOperation Operation);
+		ZEStencilOperation				GetFrontStencilPass() const;
+	
+		void							SetFrontStencilFunction(ZEComparisonFunction Function);
+		ZEComparisonFunction			GetFrontStencilFunction() const;
+	
+		void							SetBackStencilFail(ZEStencilOperation Operation);
+		ZEStencilOperation				GetBackStencilFail() const;
+	
+		void							SetBackZFail(ZEStencilOperation Operation);
+		ZEStencilOperation				GetBackZFail() const;
+	
+		void							SetBackStencilPass(ZEStencilOperation Operation);
+		ZEStencilOperation				GetBackStencilPass() const;
+	
+		void							SetBackStencilFunction(ZEComparisonFunction Function);		
+		ZEComparisonFunction			GetBackStencilFunction() const;
 
-		const ZEDepthStencilState&	operator=(const ZEDepthStencilState& State);
-		bool								operator==(const ZEDepthStencilState& State);
-		bool								operator!=(const ZEDepthStencilState& State);
+										// Remove
+		void							DebugPrint() const;
 
-											ZEDepthStencilState();
-		virtual								~ZEDepthStencilState();
+		void							SetToDefault();
+
+		const ZEDepthStencilState&		operator=(const ZEDepthStencilState& State);
+		bool							operator==(const ZEDepthStencilState& State);
+		bool							operator!=(const ZEDepthStencilState& State);
+
+										ZEDepthStencilState();
+										~ZEDepthStencilState();
 };
 
 #endif

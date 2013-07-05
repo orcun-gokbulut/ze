@@ -41,26 +41,18 @@
 #include "ZERenderCommand.h"
 #include "ZEGraphics/ZEShader.h"
 #include "ZERenderStageParticle.h"
-#include "ZERenderStageForward.h"
 #include "ZEGraphics/ZETexture2D.h"
+#include "ZERenderStageAccumulation.h"
 #include "ZEGraphics/ZERenderTarget.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEShaderMetaTable.h"
 #include "ZEGraphics/ZEGraphicsEventTracer.h"
 
-void ZERenderStageParticle::ResetStageDefaults()
+void ZERenderStageParticle::ResetStates()
 {
-	// Requested pipeline constants
-	StageConstants.SetCount(5);
-	StageConstants.Add(ZE_PC_CAMERA_WORLD_UP);
-	StageConstants.Add(ZE_PC_CAMERA_WORLD_FRONT);
-	StageConstants.Add(ZE_PC_CAMERA_WORLD_RIGHT);
-	StageConstants.Add(ZE_PC_CAMERA_WORLD_POS);
-	StageConstants.Add(ZE_PC_INV_VIEWPORT_WIDTH_HEIGHT);
-
 	// Reset parent states
-	ZERenderStage::ResetStageDefaults();
+	ZERenderStage::ResetStates();
 	
 	// Outputs
 	DefaultStates.RenderTargets[0] = ABufferInput->GetOutputAccumulationRenderTarget();
@@ -71,7 +63,7 @@ void ZERenderStageParticle::ResetStageDefaults()
 	for (ZESize I = 0; I < ScreenCount; ++I)
 	{
 		DefaultStates.ViewPorts[I] = zeGraphics->GetViewport(I);
-		DefaultStates.ScissorRectangles[I] = zeGraphics->GetScissorRectangle(I);
+		DefaultStates.ScissorRects[I] = zeGraphics->GetScissorRectangle(I);
 	}
 
 	// Blend state: Use default
@@ -99,11 +91,8 @@ void ZERenderStageParticle::ResetStageDefaults()
 	}
 }
 
-void ZERenderStageParticle::CommitStageDefaults()
+void ZERenderStageParticle::CommitStates()
 {
-	// Commit parent States
-	ZERenderStage::CommitStageDefaults();
-
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	Device->SetRenderTargetArray(DefaultStates.RenderTargets);
@@ -118,13 +107,16 @@ void ZERenderStageParticle::CommitStageDefaults()
 	for (ZESize I = 0; I < ScreenCount; ++I)
 	{
 		Device->SetViewport(I, DefaultStates.ViewPorts[I]);
-		Device->SetScissorRectangle(I, DefaultStates.ScissorRectangles[I]);
+		Device->SetScissorRectangle(I, DefaultStates.ScissorRects[I]);
 	}
+
+	// Commit parent States
+	ZERenderStage::CommitStates();
 }
 
 void ZERenderStageParticle::UpdateBuffers()
 {
-	ZERenderStage::UpdateBuffers();
+
 }
 
 void ZERenderStageParticle::DestroyBuffers()
@@ -132,51 +124,38 @@ void ZERenderStageParticle::DestroyBuffers()
 
 }
 
-ZEUInt32 ZERenderStageParticle::GetStageFlags() const
+ZERenderStageType ZERenderStageParticle::GetDependencies() const
 {
-	return 0;
+	return ZE_RST_ACCUMULATION;
 }
 
-ZEUInt32 ZERenderStageParticle::GetDependencies() const
+ZERenderStageType ZERenderStageParticle::GetStageType() const
 {
-	return ZE_RENDER_STAGE_FORWARD;
+	return ZE_RST_PARTICLE;
 }
 
-ZEUInt32 ZERenderStageParticle::GetStageIndentifier() const
-{
-	return ZE_RENDER_STAGE_PARTICLE;
-}
-
-void ZERenderStageParticle::SetInputAccumulationStage(const ZERenderStageForward* Input)
+void ZERenderStageParticle::SetInputAccumulationStage(const ZERenderStageAccumulation* Input)
 {
 	zeDebugCheck(Input == NULL, "Null pointer.");
 
 	ABufferInput = Input;
 }
 
-const ZERenderStageForward* ZERenderStageParticle::GetInputAccumulationStage() const
+const ZERenderStageAccumulation* ZERenderStageParticle::GetInputAccumulationStage() const
 {
 	return ABufferInput;
 }
 		
 void ZERenderStageParticle::Setup()
 {
-	ResetStageDefaults();
-	CommitStageDefaults();
+	UpdateBuffers();
+	ResetStates();
+	CommitStates();
 }
 
-void ZERenderStageParticle::Process(ZERenderCommand* RenderCommand)
+void ZERenderStageParticle::Process(const ZERenderCommand* RenderCommand)
 {
-	ZEMaterial* Material = RenderCommand->Material;
-
-	zeDebugCheck(RenderCommand->Material == NULL, "Cannot process null material");
-
-	if (!(Material->GetMaterialFlags() & ZE_MTF_PARTICLE_PASS))
-	{
-		return;
-	}
-
-	zeGraphics->GetEventTracer()->StartEvent("Particle Pass");
+	zeDebugCheck(RenderCommand->Material == NULL, "Null Pointer.");
 
 	bool Done = false;
 	ZEUInt PassId = 0;
@@ -186,13 +165,6 @@ void ZERenderStageParticle::Process(ZERenderCommand* RenderCommand)
 	}
 
 	PumpStreams(RenderCommand);
-
-	zeGraphics->GetEventTracer()->EndEvent();
-}
-
-void ZERenderStageParticle::SetStageConfiguration(const ZERenderStageConfiguration* Config)
-{
-	
 }
 
 ZERenderStageParticle::ZERenderStageParticle()

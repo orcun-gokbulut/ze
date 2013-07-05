@@ -42,7 +42,6 @@
 #include "ZEPhysics/ZEPhysicsModule.h"
 #include "ZEPhysics/ZEPhysicalShapes.h"
 #include "ZEPhysics/ZEPhysicalRigidBody.h"
-#include "ZEGraphics/ZEVertexTypes.h"
 #include "ZEDS/ZEFlags.h"
 
 enum ZEClothVertexAttachmentStatus

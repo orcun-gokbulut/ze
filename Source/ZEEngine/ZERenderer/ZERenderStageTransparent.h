@@ -57,21 +57,21 @@ class ZERenderStageTransparent : public ZERenderStage
 
 		} RenderTargets;
 
-		void					ResetStageDefaults();
+		void						ResetStates();
+		void						CommitStates();
 
-		void					UpdateBuffers();
-		void					DestroyBuffers();
+		void						UpdateBuffers();
+		void						DestroyBuffers();
 
 	public:
-		virtual ZEUInt32		GetStageFlags() const;
-		virtual ZEUInt32		GetDependencies() const;
-		virtual ZEUInt32		GetStageIndentifier() const;
+		virtual ZERenderStageType	GetStageType() const;
+		virtual ZERenderStageType	GetDependencies() const;
+		
+		void						Process(const ZERenderCommand* RenderCommand);
+		void						Setup();
 
-		void					Process(const ZERenderCommand* RenderCommand);
-		void					Setup();
-
-								ZERenderStageTransparent();
-		virtual					~ZERenderStageTransparent();
+									ZERenderStageTransparent();
+		virtual						~ZERenderStageTransparent();
 };
 
 #endif

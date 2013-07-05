@@ -37,19 +37,30 @@
 #ifndef	__ZE_BASE_H__
 #define __ZE_BASE_H__
 
+enum ZEBaseState
+{
+	ZE_BS_NOT_INITIALIZED				= 0,
+	ZE_BS_INITIALIZING					= 1,
+	ZE_BS_INITIALIZED					= 2,
+	ZE_BS_DEINITIALIZING				= 3
+};
+
 class ZEBase
 {
 	private:
-		bool				Initialized;
+		ZEBaseState			State;
 
 	protected:
+		virtual bool		InitializeSelf();
+		virtual bool		DeinitializeSelf();
+
 							ZEBase();
 		virtual				~ZEBase();
 
 	public:
 		bool				IsInitialized() const;
-		virtual bool		Initialize();
-		virtual void		Deinitialize();
+		bool				Initialize();
+		bool				Deinitialize();
 
 		virtual void		Destroy();
 };

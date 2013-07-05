@@ -47,14 +47,12 @@ class ZETexture3D : public ZETexture
 	friend class ZEGraphicsDevice;
 	friend class ZEGraphicsModule;
 
-	// Should be public for only internal usage
-	public:
+	protected:
 		ZEUInt						Width;
 		ZEUInt						Height;
 		ZEUInt						Depth;
 		ZEUInt						LevelCount;
 
-	protected:
 									ZETexture3D();
 		virtual						~ZETexture3D();
 

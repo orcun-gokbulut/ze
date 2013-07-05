@@ -38,7 +38,7 @@
 #define __ZE_MATERIAL_LIGHT_DIRECTIONAL_H__
 
 #include "ZETypes.h"
-#include "ZEMaterialLight.h"
+#include "ZEMaterial.h"
 
 class ZEShader;
 class ZERenderStage;
@@ -46,35 +46,50 @@ class ZEVertexBuffer;
 class ZERenderCommand;
 class ZEConstantBuffer;
 
-class ZEMaterialLightDirectional : public ZEMaterialLight
+class ZEMaterialLightDirectional : public ZEMaterial
 {
 	friend class ZELightDirectional;
 
 	protected:
-		ZEShader*						VertexShader;
-		ZEShader*						PixelShader;
-		ZEConstantBuffer*				Transformations;
-		ZEConstantBuffer*				LightParameters;
-		ZEConstantBuffer*				ShadowParameters;
+		ZEShader*					VertexShader;
+		ZEShader*					PixelShader;
 
-		void							UpdateShaders();
-		void							UpdateBuffers();
+		ZEConstantBuffer*			LightTransformations;
+		ZEConstantBuffer*			LightProperties;
 
-		void							DestroyShaders();
-		void							DestroyBuffers();
+		void						UpdateShaders();
+		void						UpdateBuffers();
 
-		bool							SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
+		void						DestroyShaders();
+		void						DestroyBuffers();
 
-										ZEMaterialLightDirectional();
-		virtual							~ZEMaterialLightDirectional();
+		bool						SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
+
+									ZEMaterialLightDirectional();
+		virtual						~ZEMaterialLightDirectional();
 
 	public:
-		virtual ZESize					GetHash() const;
+		__declspec(align(16))
+		struct Transformations
+		{
+			ZEMatrix4x4				InvProjectionMatrix;
+		};
 
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
+		__declspec(align(16))
+		struct Properties
+		{
+			ZEVector3				Color;
+			float					Intensity;
+			ZEVector3				Direction;
+			float					PenumbraSize;
+			float					BiasDepthScaled;
+			float					BiasSlopeScaled;
+		};
 
-		virtual void					UpdateMaterial();
-		virtual bool					SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
+		virtual ZESize				GetHash() const;
+		virtual bool				UpdateMaterial();
+
+		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
 		static ZEMaterialLightDirectional*	CreateInstance();
 };

@@ -33,19 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEStatePool.h"
+#include "ZEFoundation/ZELog.h"
 #include "ZEDepthStencilState.h"
 #include "ZEDS/ZEHashGenerator.h"
 
 #include <string.h>
 
-void ZEDepthStencilState::UpdateHash()
+ZESize ZEDepthStencilState::GetHash()
 {
 	if (Dirty)
 	{
-		Hash = 0;
+		Hash = ZEHashGenerator::Hash(&StateData, sizeof(ZEDepthStencilStateData));;
 		Dirty = false;
-		ZEHashGenerator::Hash(Hash, &StateData, sizeof(ZEDepthStencilStateData));
 	}
+	return Hash;
 }
 
 void ZEDepthStencilState::SetZTestEnable(bool Enable)
@@ -244,11 +246,74 @@ ZEComparisonFunction ZEDepthStencilState::GetBackStencilFunction() const
 	return StateData.BackStencilFunction;
 }
 
+#include "ZEFoundation/ZELog.h"
+#include "ZEFoundation/ZEError.h"
+
+void ZEDepthStencilState::DebugPrint() const
+{
+	static const char* ComparisonFunctionStrings[] =
+	{		
+		"NULL",
+		"ZE_CF_NEVER",
+		"ZE_CF_LESS",
+		"ZE_CF_EQUAL",
+		"ZE_CF_LESS_EQUAL",
+		"ZE_CF_GREATER",
+		"ZE_CF_NOT_EQUAL",
+		"ZE_CF_GREATER_EQUAL",
+		"ZE_CF_ALWAYS"
+	};
+
+	static const char* StencilOperationStrings[] = 
+	{ 
+		"NULL",
+		"ZE_SO_KEEP",
+		"ZE_SO_ZERO",
+		"ZE_SO_REPLACE",
+		"ZE_SO_INCR_SAT",
+		"ZE_SO_DECR_SAT",
+		"ZE_SO_INVERT",
+		"ZE_SO_INCR",
+		"ZE_SO_DECR",
+	};
+
+	ZEString ZTestEnable = StateData.ZTestEnable ? "ZTestEnable: TRUE" : "ZTestEnable: FALSE";
+	ZEString ZWriteEnable = StateData.ZWriteEnable ? "ZWriteEnable: TRUE" : "ZWriteEnable: FALSE";
+	ZEString ZFunction = ZEString("ZFunction: ") + ComparisonFunctionStrings[StateData.ZFunction];
+	ZEString StencilTestEnable = StateData.StencilTestEnable ? "StencilTestEnable: TRUE" : "StencilTestEnable: FALSE";
+	ZEString StencilWriteMask = ZEString("StencilWriteMask: ") + ZEString::FromUInt8(StateData.StencilWriteMask);
+	ZEString StencilReadMask = ZEString("StencilReadMask: ") + ZEString::FromUInt8(StateData.StencilReadMask);
+	ZEString FrontStencilFailOperation = ZEString("FrontStencilFailOperation: ") + StencilOperationStrings[StateData.FrontStencilFailOperation];
+	ZEString FrontZFailOperation = ZEString("FrontZFailOperation: ") + StencilOperationStrings[StateData.FrontZFailOperation];
+	ZEString FrontStencilPassOperation = ZEString("FrontStencilPassOperation: ") + StencilOperationStrings[StateData.FrontStencilPassOperation];
+	ZEString FrontStencilFunction = ZEString("FrontStencilFunction: ") + ComparisonFunctionStrings[StateData.FrontStencilFunction];
+	ZEString BackStencilFailOperation = ZEString("BackStencilFailOperation: ") + StencilOperationStrings[StateData.BackStencilFailOperation];
+	ZEString BackZFailOperation = ZEString("BackZFailOperation: ") + StencilOperationStrings[StateData.BackZFailOperation];
+	ZEString BackStencilPassOperation = ZEString("BackStencilPassOperation: ") + StencilOperationStrings[StateData.BackStencilPassOperation];
+	ZEString BackStencilFunction = ZEString("BackStencilFunction: ") + ComparisonFunctionStrings[StateData.BackStencilFunction];
+
+	zeLog(ZTestEnable.ToCString());
+	zeLog(ZWriteEnable.ToCString());
+	zeLog(ZFunction.ToCString());
+	zeLog(StencilTestEnable.ToCString());
+	zeLog(StencilWriteMask.ToCString());
+	zeLog(StencilReadMask.ToCString());
+	zeLog(FrontStencilFailOperation.ToCString());
+	zeLog(FrontZFailOperation.ToCString());
+	zeLog(FrontStencilPassOperation.ToCString());
+	zeLog(FrontStencilFunction.ToCString());
+	zeLog(BackStencilFailOperation.ToCString());
+	zeLog(BackZFailOperation.ToCString());
+	zeLog(BackStencilPassOperation.ToCString());
+	zeLog(BackStencilFunction.ToCString());
+}
+
 void ZEDepthStencilState::SetToDefault()
 {
 	Hash = 0;
 	Dirty = false;
 
+	memset(&StateData, 0, sizeof(ZEDepthStencilStateData));
 	StateData.ZTestEnable = true;
 	StateData.StencilTestEnable = false;
 	StateData.ZWriteEnable = false;

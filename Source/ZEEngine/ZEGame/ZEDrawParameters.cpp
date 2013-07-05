@@ -34,3 +34,28 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDrawParameters.h"
+
+ZEDrawParameters::ZEDrawParameters()
+{
+	Clear();
+}
+
+ZEDrawParameters::~ZEDrawParameters()
+{
+
+}
+
+void ZEDrawParameters::Clear()
+{
+	FrameId = 0;
+	ElapsedTime = 0.0f;
+	Time = 0.0f;
+	
+	Renderer = NULL;
+
+	OwnerBucket = NULL;
+	Stages = ZE_RST_ALL;
+
+	View = NULL;
+	ViewVolume = NULL;
+}

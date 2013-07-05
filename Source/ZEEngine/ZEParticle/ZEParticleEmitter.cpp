@@ -40,7 +40,6 @@
 #include "ZERandom.h"
 
 #include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZEVertexTypes.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
@@ -634,11 +633,23 @@ void ZEParticleEmitter::UpdateVertexBuffer(ZEDrawParameters* DrawParameters)
 	ZESize ParticleCount = ParticlePool.GetCount();
 
 	if (VertexBuffer == NULL)
-		VertexBuffer = ZEVertexBuffer::CreateInstance();
-
-	if (VertexBuffer->GetBufferSize() != ParticlePool.GetCount() * sizeof(ZESimpleVertex) * 6)
 	{
-		if (!VertexBuffer->CreateDynamic((ZEUInt)ParticlePool.GetCount() * 6, sizeof(ZESimpleVertex), NULL))
+		VertexBuffer = ZEVertexBuffer::CreateInstance();
+	
+		// Register buffer content
+		ZEVertexBufferElement Elements[] = 
+		{
+			{"POSITION",	0, ZE_VET_FLOAT3, 0,	ZE_VU_PER_VERTEX, 0},
+			{"NORMAL",		0, ZE_VET_FLOAT3, 12,	ZE_VU_PER_VERTEX, 0},
+			{"TEXCOORD",	0, ZE_VET_FLOAT2, 24,	ZE_VU_PER_VERTEX, 0},
+			{"VERTEXCOLOR",	0, ZE_VET_FLOAT4, 32,	ZE_VU_PER_VERTEX, 0},
+		};
+		VertexBuffer->RegisterElements(Elements, 4);
+	}
+
+	if (VertexBuffer->GetBufferSize() != ParticlePool.GetCount() * sizeof(ZEParticleVertex) * 6)
+	{
+		if (!VertexBuffer->CreateDynamic((ZEUInt)ParticlePool.GetCount() * 6, sizeof(ZEParticleVertex), NULL))
 		{
 			zeError("Could not create particle vertex buffer.");
 			return;
@@ -779,10 +790,10 @@ void ZEParticleEmitter::Draw(ZEDrawParameters* DrawParameters)
 	if (DrawParameters->Pass == ZE_RP_COLOR)
 		Owner->Statistics.DrawedParticleCount += RenderCommand.PrimitiveCount / 2;
 
-	if(IsEmmiterLocal)
-		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, GetOwner()->GetWorldPosition(), ZEQuaternion::Identity, GetOwner()->GetWorldScale());
-	else
-		RenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
+	//if(IsEmmiterLocal)
+	//	ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, GetOwner()->GetWorldPosition(), ZEQuaternion::Identity, GetOwner()->GetWorldScale());
+	//else
+	//	RenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
 
 	RenderCommand.VertexBuffers[0] = VertexBuffer;
 	RenderCommand.Material = Material;

@@ -49,11 +49,10 @@ ze_add_source(ZEDSelectionItem.h				Sources)
 ze_add_source(ZEDSelectionItemPlugin.cpp		Sources)
 ze_add_source(ZEDSelectionItemPlugin.h			Sources)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
 ze_add_library(ZEDSceneEditor 
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles})
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
+	LIBS libQt)

@@ -118,12 +118,14 @@ void ZECanvasBrush::Draw(ZEDrawParameters* DrawParameters)
 	}
 }
 
-void ZECanvasBrush::Deinitialize()
+bool ZECanvasBrush::DeinitializeSelf()
 {
 	if (VertexBuffer != NULL)
 		VertexBuffer->Destroy();
 
 	Canvas.Clean();
+
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZECanvasBrush::Tick(float ElapsedTime)

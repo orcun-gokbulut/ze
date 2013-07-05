@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIRectangle.h"
-#include "ZEGraphics/ZEVertexTypes.h"
+#include "ZEUIRenderer.h"
 
 void ZEUIRectangle::ConvertToVertices(ZEUIVertex* Buffer) const
 {

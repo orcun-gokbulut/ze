@@ -42,15 +42,10 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEGraphicsEventTracer.h"
 
-void ZERenderStageGeometry::ResetStageDefaults()
+void ZERenderStageGeometry::ResetStates()
 {
-	// Requested pipeline constants
-	StageConstants.SetCount(2);
-	StageConstants.Add(ZE_PC_CAMERA_WORLD_POS);
-	StageConstants.Add(ZE_PC_INV_VIEWPORT_WIDTH_HEIGHT);
-
 	// Reset parent states
-	ZERenderStage::ResetStageDefaults();
+	ZERenderStage::ResetStates();
 
 	// Render targets
 	DefaultStates.RenderTargets[0] = RenderTargets.GBuffer1;
@@ -63,7 +58,7 @@ void ZERenderStageGeometry::ResetStageDefaults()
 	for (ZESize I = 0; I < ScreenCount; ++I)
 	{
 		DefaultStates.ViewPorts[I] = zeGraphics->GetViewport(I);
-		DefaultStates.ScissorRectangles[I] = zeGraphics->GetScissorRectangle(I);
+		DefaultStates.ScissorRects[I] = zeGraphics->GetScissorRectangle(I);
 	}
 
 	// Blend state
@@ -82,11 +77,8 @@ void ZERenderStageGeometry::ResetStageDefaults()
 	DefaultStates.RasterizerState.SetFillMode(ZE_FM_SOLID);
 }
 
-void ZERenderStageGeometry::CommitStageDefaults()
+void ZERenderStageGeometry::CommitStates()
 {
-	// Commit parent States
-	ZERenderStage::CommitStageDefaults();
-
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	Device->SetRenderTargetArray(DefaultStates.RenderTargets);
@@ -101,15 +93,15 @@ void ZERenderStageGeometry::CommitStageDefaults()
 	for (ZESize I = 0; I < ScreenCount; ++I)
 	{
 		Device->SetViewport(I, DefaultStates.ViewPorts[I]);
-		Device->SetScissorRectangle(I, DefaultStates.ScissorRectangles[I]);
+		Device->SetScissorRectangle(I, DefaultStates.ScissorRects[I]);
 	}
+
+	// Commit parent States
+	ZERenderStage::CommitStates();
 }
 
 void ZERenderStageGeometry::UpdateBuffers()
 {
-	// Update parent buffers
-	ZERenderStage::UpdateBuffers();
-
 	ZEUInt Width = zeGraphics->GetScreenWidth();
 	ZEUInt Height = zeGraphics->GetScreenHeight();
 
@@ -174,8 +166,8 @@ const ZETexture2D* ZERenderStageGeometry::GetGBuffer3() const
 void ZERenderStageGeometry::Setup()
 {
 	UpdateBuffers();
-	ResetStageDefaults();
-	CommitStageDefaults();
+	ResetStates();
+	CommitStates();
 
 	LastMaterial = -1;
 
@@ -188,59 +180,28 @@ void ZERenderStageGeometry::Setup()
 	Device->ClearDepthStencilBuffer(zeGraphics->GetDepthBuffer(), true, true, 1.0f, 0);
 }
 
-void ZERenderStageGeometry::Process(ZERenderCommand* RenderCommand)
+void ZERenderStageGeometry::Process(const ZERenderCommand* RenderCommand)
 {
-	ZEMaterial* Material = RenderCommand->Material;
-
-	zeDebugCheck(RenderCommand->Material == NULL, "Cannot process null material");
-
-	// Check if material match the stage
-	if (!(Material->GetMaterialFlags() & ZE_MTF_GEOMETRY_PASS))
-	{
-		return;
-	}
-	
-// 	ZEUInt32 Hash = Material->GetHash();
-// 	if (LastMaterial != Hash)
-// 	{
-// 		// Return to defaults if material is changed
-// 		CommitStageDefaults();
-// 		LastMaterial = Hash;
-// 	}
-
-	zeGraphics->GetEventTracer()->StartEvent("Object Pass");
+	zeDebugCheck(RenderCommand->Material == NULL, "Null Pointer.");
 
 	bool Done = false;
 	ZEUInt PassId = 0;
 	while (!Done)
 	{
-		// Call setup till material passes are done
 		Done = RenderCommand->Material->SetupPass(PassId++, this, RenderCommand);
 	}
 
 	PumpStreams(RenderCommand);
-
-	zeGraphics->GetEventTracer()->EndEvent();
 }
 
-void ZERenderStageGeometry::SetStageConfiguration(const ZERenderStageConfiguration* Config)
+ZERenderStageType ZERenderStageGeometry::GetDependencies() const
 {
-	
+	return ZE_RST_NONE;
 }
 
-ZEUInt32 ZERenderStageGeometry::GetStageFlags() const
+ZERenderStageType ZERenderStageGeometry::GetStageType() const
 {
-	return 0;
-}
-
-ZEUInt32 ZERenderStageGeometry::GetDependencies() const
-{
-	return ZE_RENDER_STAGE_NONE;
-}
-
-ZEUInt32 ZERenderStageGeometry::GetStageIndentifier() const
-{
-	return ZE_RENDER_STAGE_GEOMETRY;
+	return ZE_RST_GEOMETRY;
 }
 
 ZERenderStageGeometry::ZERenderStageGeometry()

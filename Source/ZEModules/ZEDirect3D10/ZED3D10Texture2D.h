@@ -51,8 +51,11 @@ class ZED3D10Texture2D : public ZETexture2D, public ZED3D10ComponentBase
 	friend class ZED3D10GraphicsDevice;
 
 	protected:
-		ID3D10Texture2D*					Texture2D;
-		ID3D10ShaderResourceView*			ShaderResourceView;
+		static ZEUInt16						GlobalCount;
+		static ZESize						GlobalSize;
+
+		ID3D10Texture2D*					D3D10Texture2D;
+		ID3D10ShaderResourceView*			D3D10ShaderResourceView;
 
 											ZED3D10Texture2D();
 		virtual								~ZED3D10Texture2D();

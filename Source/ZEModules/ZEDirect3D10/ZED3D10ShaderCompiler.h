@@ -56,7 +56,7 @@ class ZED3D10ShaderCompiler : public ZEShaderCompiler, public ZED3D10ComponentBa
 		ZED3D10PixelShader*			CreatePixelShader(ID3D10Blob* ByteCode);
 		ZED3D10VertexShader*		CreateVertexShader(ID3D10Blob* ByteCode);
 		ZED3D10GeometryShader*		CreateGeometryShader(ID3D10Blob* ByteCode);
-		
+
 		bool						CreateMetaTable(ZED3D10Shader* Shader, ID3D10Blob* ByteCode);
 
 		ZEShader*					CompileShader(ZEShaderCompileOptions* Options);

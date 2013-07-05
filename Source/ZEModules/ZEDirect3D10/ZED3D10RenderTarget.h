@@ -42,7 +42,6 @@
 
 struct ID3D10RenderTargetView;
 
-
 class ZED3D10RenderTarget : public ZERenderTarget, public ZED3D10ComponentBase
 {
 	friend class ZED3D10Texture2D;
@@ -52,9 +51,11 @@ class ZED3D10RenderTarget : public ZERenderTarget, public ZED3D10ComponentBase
 	friend class ZED3D10GraphicsDevice;
 
 	protected:
+		static ZEUInt16					GlobalCount;
+
 		ID3D10RenderTargetView*			D3D10RenderTargetView;
 
-										ZED3D10RenderTarget();
+										ZED3D10RenderTarget(ZEUInt Width, ZEUInt Height, ZEVector3 PixelSize, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType, ID3D10RenderTargetView* RenderTargtetView);
 		virtual							~ZED3D10RenderTarget();
 	
 	public:

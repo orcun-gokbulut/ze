@@ -46,21 +46,20 @@
 class ZEShader
 {
 	friend class ZEShaderCompiler;
-
-	// Should be public for only internal usage
-	public:
-		ZEShaderMetaTable			MetaTable;
-		ZEVertexLayout				DefaultVertexLayout;
+	friend class ZEGraphicsModule;
 
 	protected:
+		ZEShaderMetaTable			MetaTable;
+
 									ZEShader();
 		virtual						~ZEShader();
 
 	public:
 		const ZEShaderMetaTable*	GetMetaTable() const;
-		const ZEVertexLayout*		GetDefaultVertexLayout() const;
 		
 		virtual void				Destroy();
+
+		virtual ZEShaderType		GetShaderType() const = 0;
 };
 
 #endif

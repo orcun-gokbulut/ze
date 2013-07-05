@@ -46,7 +46,6 @@
 #include "ZEMaterialLightOmniProjective.h"
 #include "ZEGraphics/ZEShaderCompileOptions.h"
 
-
 void ZEMaterialLightOmniProjective::UpdateShaders()
 {
 	ZEShaderCompileOptions Compileoptions;
@@ -71,27 +70,15 @@ void ZEMaterialLightOmniProjective::UpdateShaders()
 
 void ZEMaterialLightOmniProjective::UpdateBuffers()
 {
-	if (VertexBuffer == NULL)
+	if (LightTransformations == NULL)
 	{
-		ZECanvas Canvas;
-		Canvas.AddSphere(1.0f, 24, 24);
-
-		VertexBuffer = Canvas.CreateStaticVertexBuffer();
+		LightTransformations = ZEConstantBuffer::CreateInstance();
+		LightTransformations->Create(VertexShader->GetMetaTable()->GetBufferInfo("TransformationsVS"));
 	}
-	if (Transformations == NULL)
+	if (LightProperties == NULL)
 	{
-		Transformations = ZEConstantBuffer::CreateInstance();
-		Transformations->Create(VertexShader->GetMetaTable()->GetBufferInfo("TransformationsVS"));
-	}
-	if (LightCaster && LightParameters == NULL)
-	{
-		LightParameters = ZEConstantBuffer::CreateInstance();
-		LightParameters->Create(PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
-	}
-	if (ShadowCaster && ShadowParameters == NULL)
-	{
-		ShadowParameters = ZEConstantBuffer::CreateInstance();
-		ShadowParameters->Create(PixelShader->GetMetaTable()->GetBufferInfo("ShadowParametersPS"));
+		LightProperties = ZEConstantBuffer::CreateInstance();
+		LightProperties->Create(PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
 	}
 }
 
@@ -103,74 +90,21 @@ void ZEMaterialLightOmniProjective::DestroyShaders()
 
 void ZEMaterialLightOmniProjective::DestroyBuffers()
 {
-	ZE_DESTROY(Transformations);
-	ZE_DESTROY(LightParameters);
-	ZE_DESTROY(ShadowParameters);
+	ZE_DESTROY(LightTransformations);
+	ZE_DESTROY(LightProperties);
 }
 
 bool ZEMaterialLightOmniProjective::SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	UpdateMaterial();
 
-	ZECamera* Camera = zeScene->GetActiveCamera();
-	ZEUInt ScreenWidth = zeGraphics->GetScreenWidth();
-	ZEUInt ScreenHeight = zeGraphics->GetScreenHeight();
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
-
-	struct OmniProjectiveLightTransformations
-	{
-		ZEMatrix4x4	WorldViewMatrix;
-		ZEMatrix4x4	WorldViewProjMatrix;
-	};
-
-	struct OmniProjectiveLightParameters
-	{
-		ZEVector3		Position;
-		float			Range;
-		ZEVector3		Color;
-		float			Intensity;
-		ZEVector3		Attenuation;
-		float			Dummy0;
-		ZEVector2		PixelSize;
-		float			Dummy1[2];
-		ZEMatrix4x4		ProjectionMatrix;
-	};
-
-	// VS parameters
-	OmniProjectiveLightTransformations* Transforms = NULL;
-	Transformations->Lock((void**)&Transforms);
-	
-		ZEMatrix4x4 WorldTransform;
-		ZEMatrix4x4::CreateOrientation(WorldTransform, WorldPosition, ZEQuaternion::Identity, ZEVector3(Range, Range, Range));
-		ZEMatrix4x4::Multiply(Transforms->WorldViewMatrix, Camera->GetViewTransform(), WorldTransform);
-		ZEMatrix4x4::Multiply(Transforms->WorldViewProjMatrix, Camera->GetViewProjectionTransform(), WorldTransform);
-	
-	Transformations->Unlock();
-
-	// PS parameters
-	OmniProjectiveLightParameters* Parameters = NULL;
-	LightParameters->Lock((void**)&Parameters);
-	
-		Parameters->Range = Range;
-		Parameters->Color = Color;
-		Parameters->Intensity = Intensity;
-		Parameters->Attenuation = Attenuation;
-		ZEMatrix4x4::Transform(Parameters->Position, Camera->GetViewTransform(), WorldPosition);
-		Parameters->PixelSize = ZEVector2(1.0f / (float)ScreenWidth, 1.0f / (float)ScreenHeight);
-		
-		// Projection Transform
-		ZEQuaternion ProjectionRotation;
-		ZEQuaternion::Product(ProjectionRotation, WorldRotation.Conjugate(), Camera->GetWorldRotation());
-		ZEQuaternion::Normalize(ProjectionRotation, ProjectionRotation);
-		ZEMatrix4x4::CreateRotation(Parameters->ProjectionMatrix, ProjectionRotation);
-	
-	LightParameters->Unlock();
 	
 	Device->SetVertexShader(VertexShader);
 	Device->SetPixelShader(PixelShader);
 
-	Device->SetVertexShaderBuffer(0, Transformations);
-	Device->SetPixelShaderBuffer(0, LightParameters);
+	Device->SetVertexShaderBuffer(0, LightTransformations);
+	Device->SetPixelShaderBuffer(0, LightProperties);
 	
 	Device->SetPixelShaderSampler(6, SamplerState);
 	Device->SetPixelShaderTexture(6, ProjectionTexture);
@@ -183,21 +117,18 @@ ZESize ZEMaterialLightOmniProjective::GetHash() const
 	return ZEHashGenerator::Hash(ZEString("ZEMaterialLightOmniProjective"));
 }
 
-ZEMaterialFlags ZEMaterialLightOmniProjective::GetMaterialFlags() const
-{
-	return ZE_MTF_LIGHTING_PASS;
-}
-
-void ZEMaterialLightOmniProjective::UpdateMaterial()
+bool ZEMaterialLightOmniProjective::UpdateMaterial()
 {
 	UpdateShaders();
 	UpdateBuffers();
+
+	return true;
 }
 
 bool ZEMaterialLightOmniProjective::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
-	if ((Stage->GetStageIndentifier() & ZE_RENDER_STAGE_LIGHTING) == 0)
-		return true;
+	if (Stage->GetStageType().GetFlags(ZE_RST_LIGHTING))
+		return false;
 
 	return SetupLightingPass(Stage, RenderCommand);
 }
@@ -211,10 +142,8 @@ ZEMaterialLightOmniProjective::ZEMaterialLightOmniProjective()
 {
 	VertexShader = NULL;
 	PixelShader = NULL;
-	Transformations = NULL;
-	LightParameters = NULL;
-	ShadowParameters = NULL;
-	VertexBuffer = NULL;
+	LightTransformations = NULL;
+	LightProperties = NULL;
 	
 	ProjectionTexture = NULL;
 	SamplerState.SetMagFilter(ZE_TFM_LINEAR);

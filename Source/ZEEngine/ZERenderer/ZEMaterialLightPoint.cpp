@@ -38,12 +38,12 @@
 #include "ZERenderStage.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEShader.h"
+#include "ZEDS/ZEHashGenerator.h"
 #include "ZEMaterialLightPoint.h"
 #include "ZEGraphics/ZEShaderCompiler.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEShaderCompileOptions.h"
-#include "ZEDS/ZEHashGenerator.h"
 
 void ZEMaterialLightPoint::UpdateShaders()
 {
@@ -69,21 +69,17 @@ void ZEMaterialLightPoint::UpdateShaders()
 
 void ZEMaterialLightPoint::UpdateBuffers()
 {
-	if (Transformations == NULL)
+	if (LightTransformations == NULL)
 	{
-		Transformations = ZEConstantBuffer::CreateInstance();
-		Transformations->Create(VertexShader->GetMetaTable()->GetBufferInfo("TransformationsVS"));
+		LightTransformations = ZEConstantBuffer::CreateInstance();
+		LightTransformations->Create(VertexShader->GetMetaTable()->GetBufferInfo("TransformationsVS"));
 	}
-	if (LightCaster && LightParameters == NULL)
+	if (LightProperties == NULL)
 	{
-		LightParameters = ZEConstantBuffer::CreateInstance();
-		LightParameters->Create(PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
+		LightProperties = ZEConstantBuffer::CreateInstance();
+		LightProperties->Create(PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
 	}
-	if (ShadowCaster && ShadowParameters == NULL)
-	{
-		ShadowParameters = ZEConstantBuffer::CreateInstance();
-		ShadowParameters->Create(PixelShader->GetMetaTable()->GetBufferInfo("ShadowParametersPS"));
-	}
+
 }
 
 void ZEMaterialLightPoint::DestroyShaders()
@@ -94,69 +90,22 @@ void ZEMaterialLightPoint::DestroyShaders()
 
 void ZEMaterialLightPoint::DestroyBuffers()
 {
-	ZE_DESTROY(Transformations);
-	ZE_DESTROY(LightParameters);
-	ZE_DESTROY(ShadowParameters);
+	ZE_DESTROY(LightTransformations);
+	ZE_DESTROY(LightProperties);
 }
 
 bool ZEMaterialLightPoint::SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	UpdateMaterial();
 
-	ZECamera* Camera = zeScene->GetActiveCamera();
-	ZEUInt ScreenWidth = zeGraphics->GetScreenWidth();
-	ZEUInt ScreenHeight = zeGraphics->GetScreenHeight();
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
-
-	struct PointLightTransformations
-	{
-		ZEMatrix4x4	WorldViewMatrix;
-		ZEMatrix4x4	WorldViewProjMatrix;
-	};
-
-	struct PointLightParameters
-	{
-		ZEVector3		ViewSpacePosition;
-		float			Range;
-		ZEVector3		Color;
-		float			Intensity;
-		ZEVector3		Attenuation;
-		float			Dummy0;
-		ZEVector2		PixelSize;
-		float			Dummy1[2];
-	};
-
-	// VS Parameters
-	PointLightTransformations* Transforms = NULL;
-	Transformations->Lock((void**)&Transforms);
-	
-		ZEMatrix4x4 WorldTransform;
-		ZEMatrix4x4::CreateOrientation(WorldTransform, WorldPosition, ZEQuaternion::Identity, ZEVector3(Range, Range, Range));
-		
-		ZEMatrix4x4::Multiply(Transforms->WorldViewMatrix, Camera->GetViewTransform(), WorldTransform);
-		ZEMatrix4x4::Multiply(Transforms->WorldViewProjMatrix, Camera->GetViewProjectionTransform(), WorldTransform);
-	
-	Transformations->Unlock();
-
-	// PS parameters
-	PointLightParameters* Parameters = NULL;
-	LightParameters->Lock((void**)&Parameters);
-	
-		Parameters->Range = Range;
-		Parameters->Color = Color;
-		Parameters->Intensity = Intensity;
-		Parameters->Attenuation = Attenuation;
-		ZEMatrix4x4::Transform(Parameters->ViewSpacePosition, Camera->GetViewTransform(), WorldPosition);
-		Parameters->PixelSize = ZEVector2(1.0f / (float)ScreenWidth, 1.0f / (float)ScreenHeight);
-	
-	LightParameters->Unlock();
 	
 	Device->SetVertexShader(VertexShader);
 	Device->SetPixelShader(PixelShader);
 	
-	Device->SetVertexShaderBuffer(0, Transformations);
-	Device->SetPixelShaderBuffer(0, LightParameters);
-
+	Device->SetPixelShaderBuffer(0, LightProperties);
+	Device->SetVertexShaderBuffer(0, LightTransformations);
+	
 	return true;
 }
 
@@ -165,20 +114,20 @@ ZESize ZEMaterialLightPoint::GetHash() const
 	return ZEHashGenerator::Hash(ZEString("ZEMaterialLightPoint"));
 }
 
-ZEMaterialFlags ZEMaterialLightPoint::GetMaterialFlags() const
-{
-	return ZE_MTF_LIGHTING_PASS;
-}
-
-void ZEMaterialLightPoint::UpdateMaterial()
+bool ZEMaterialLightPoint::UpdateMaterial()
 {
 	UpdateShaders();
 	UpdateBuffers();
+
+	return true;
 }
 
 bool ZEMaterialLightPoint::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
-	if ((Stage->GetStageIndentifier() & ZE_RENDER_STAGE_LIGHTING) == 0)
+	zeDebugCheck(Stage == NULL, "Null pointer.");
+	zeDebugCheck(RenderCommand == NULL, "Null pointer.");
+
+	if (!Stage->GetStageType().GetFlags(ZE_RST_LIGHTING))
 		return true;
 
 	return SetupLightingPass(Stage, RenderCommand);
@@ -193,9 +142,8 @@ ZEMaterialLightPoint::ZEMaterialLightPoint()
 {
 	VertexShader = NULL;
 	PixelShader = NULL;
-	Transformations = NULL;
-	LightParameters = NULL;
-	ShadowParameters = NULL;
+	LightTransformations = NULL;
+	LightProperties = NULL;
 }
 
 ZEMaterialLightPoint::~ZEMaterialLightPoint()

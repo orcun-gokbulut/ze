@@ -61,7 +61,7 @@ ZESoundSource::ZESoundSource()
 ZESoundSource::~ZESoundSource()
 {
 	if (SoundResource != NULL)
-		SoundResource->Release();
+		SoundResource->Destroy();
 }
 
 bool ZESoundSource::IsStreaming() const
@@ -385,8 +385,11 @@ void ZESoundSource::Destroy()
 void ZESoundSource::SetSoundResource(ZESoundResource* Resource)
 {
 	if (SoundResource != NULL)
-		SoundResource->Release();
-
+	{
+		SoundResource->Destroy();
+		SoundResource = NULL;
+	}
+		
 	if (!LimitsEnabled)
 	{
 		EffectiveStartPosition = 0;

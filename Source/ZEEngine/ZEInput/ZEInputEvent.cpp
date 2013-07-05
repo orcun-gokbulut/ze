@@ -34,383 +34,123 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInputEvent.h"
-#include "ZEInputDefinitions.h"
-#include "ZEInputModule.h"
-#include "ZEInputDevice.h"
-#include "ZEDS/ZEString.h"
 
-#include <string.h>
-#include <stdio.h>
-
-static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
+bool ZEInputEvent::IsAvailable() const
 {
-	ZEString DeviceName, DeviceAddress, InputType, InputIndex, InputModifier;
+	return Input.IsAvailable();
+}
 
-	enum ZEParserState
-	{
-		ZE_PS_DEVICE_IDENTIFIER,
-		ZE_PS_DEVICE_ADDRESS,
-		ZE_PS_INPUT_TYPE,
-		ZE_PS_INPUT_IDENTIFIER_START,
-		ZE_PS_INPUT_INDEX,
-		ZE_PS_INPUT_IDENTIFIER_END,
-		ZE_PS_INPUT_MODIFIER
-	};
+bool ZEInputEvent::Check() const
+{
+	return Input.Check(State);
+}
 
-	ZEParserState ParserState = ZE_PS_DEVICE_IDENTIFIER;
-	ZESize Len = InputString.GetLength();
-	ZESize IdentifierStart = 0;
-
-	for (ZESize I = 0; I < Len; I++)
-	{
-		switch(*InputString[I].GetValue())
-		{
-		case '\n':
-		case '\r':
-			return false;
-
-		case ' ':
-		case '\t':
-			break;
-
-		case '@':
-			if (ParserState == ZE_PS_DEVICE_IDENTIFIER)
-				DeviceName = InputString.SubString(IdentifierStart, I - 1).Trim();
-			else
-				return false;
-
-			IdentifierStart = I + 1;
-			ParserState = ZE_PS_DEVICE_ADDRESS;
-			break;
-
-		case ':':
-			if (ParserState == ZE_PS_DEVICE_IDENTIFIER)
-				DeviceName = InputString.SubString(IdentifierStart, I - 1).Trim();
-			else if (ParserState == ZE_PS_DEVICE_ADDRESS)
-				DeviceAddress = InputString.SubString(IdentifierStart, I - 1).Trim();
-			else
-				return false;
-
-			IdentifierStart = I + 1;
-			ParserState = ZE_PS_INPUT_TYPE;
-			break;
-
-		case '[':
-			if (ParserState == ZE_PS_INPUT_TYPE)
-				InputType = InputString.SubString(IdentifierStart, I - 1).Trim();
-			else
-				return false;
-
-			IdentifierStart = I + 1;
-			ParserState = ZE_PS_INPUT_IDENTIFIER_START;
-			break;
-
-		case ']':
-			if (ParserState == ZE_PS_INPUT_INDEX)
-			{
-				InputIndex = InputString.SubString(IdentifierStart, I - 1).Trim();
-				ParserState = ZE_PS_INPUT_IDENTIFIER_END;
-			}
-			else
-				return false;
-			break;
-
-		case '.':
-			if (ParserState == ZE_PS_INPUT_IDENTIFIER_END)
-			{
-				ParserState = ZE_PS_INPUT_MODIFIER;
-				IdentifierStart = I + 1;
-			}
-			break;
-
-		default:
-			if (ParserState == ZE_PS_INPUT_IDENTIFIER_START)
-			{
-				if (isdigit(*InputString[I].GetValue()))
-					ParserState = ZE_PS_INPUT_INDEX;
-				else
-					return false;
-			}
-			else if (ParserState == ZE_PS_INPUT_INDEX && !isdigit(*InputString[I].GetValue()))
-				return false;
-			else if (ParserState == ZE_PS_INPUT_IDENTIFIER_END)
-				return false;
-		}
-	}
-
-	if (ParserState == ZE_PS_INPUT_MODIFIER)
-	{
-		InputModifier = InputString.SubString(IdentifierStart, Len - 1).Trim();
-		ParserState = ZE_PS_INPUT_IDENTIFIER_END;
-	}
-
-	if (ParserState != ZE_PS_INPUT_IDENTIFIER_END)
-		return false;
-
-	ZEString InputTypeLower = InputType.Lower();
-	if (InputTypeLower == "button")
-		Event.Type = ZE_IT_AXIS;
-	else if (InputTypeLower == "axis")
-		Event.Type = ZE_IT_AXIS;
-	else if (InputTypeLower == "vector2")
-		Event.Type = ZE_IT_AXIS;
-	else if (InputTypeLower == "vector3")
-		Event.Type = ZE_IT_AXIS;
-	else if (InputTypeLower == "vector4")
-		Event.Type = ZE_IT_AXIS;
-	else if (InputTypeLower == "quaternion")
-		Event.Type = ZE_IT_AXIS;
-	else
-		return false;
-
-	if (InputModifier.IsEmpty())
-	{
-		if (Event.Type == ZE_IT_AXIS)
-			Event.AxisSign = ZE_IAS_ALL;
-		else if (Event.Type == ZE_IT_BUTTON)
-			Event.ButtonState = ZE_IBS_PRESSING;
-		else if (Event.Type == ZE_IT_VECTOR2 || Event.Type == ZE_IT_VECTOR3 || Event.Type == ZE_IT_VECTOR4)
-			Event.VectorState = ZE_IVS_ALWAYS;
-		else if (Event.Type == ZE_IT_QUATERNION)
-			Event.QuaternionState = ZE_IQS_ALWAYS;
-	}
-	else
-	{
-		if (Event.Type == ZE_IT_AXIS)
-		{
-			ZEString InputModifierLower = InputModifier.Lower();
-			if (InputModifierLower == "negative")
-				Event.AxisSign = ZE_IAS_NEGATIVE;
-			else if (InputModifierLower == "positive")
-				Event.AxisSign = ZE_IAS_POSITIVE;
-			else if (InputModifierLower == "all")
-				Event.AxisSign = ZE_IAS_ALL;
-			else
-				return false;
-		}
-
-		if (Event.Type == ZE_IT_BUTTON)
-		{
-			ZEString InputModifierLower = InputModifier.Lower();
-			if (InputModifierLower == "pressed")
-				Event.ButtonState = ZE_IBS_PRESSED;
-			else if (InputModifierLower == "released")
-				Event.ButtonState = ZE_IBS_RELEASED;
-			else if (InputModifierLower == "pressing")
-				Event.ButtonState = ZE_IBS_PRESSING;
-			else
-				return false;
-		}
-
-		if (Event.Type == ZE_IT_VECTOR2 || Event.Type == ZE_IT_VECTOR3 || Event.Type == ZE_IT_VECTOR4)
-		{
-			ZEString InputModifierLower = InputModifier.Lower();
-			if (InputModifierLower == "changed")
-				Event.VectorState = ZE_IVS_CHANGED;
-			else if (InputModifierLower == "always")
-				Event.VectorState = ZE_IVS_ALWAYS;
-			else
-				return false;
-		}
-
-		if (Event.Type == ZE_IT_QUATERNION)
-		{
-			ZEString InputModifierLower = InputModifier.Lower();
-			if (InputModifierLower == "changed")
-				Event.QuaternionState = ZE_IQS_CHANGED;
-			else if (InputModifierLower == "always")
-				Event.QuaternionState = ZE_IQS_ALWAYS;
-			else
-				return false;
-		}
-	}
-
-	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-		if (Devices[I]->GetDeviceName() == DeviceName)
-		{
-			Event.Device = Devices[I];
-			break;
-		}
-
-	if (Event.Device == NULL)
-		return false;
+bool ZEInputEvent::Check(ZEInputAction& Action) const
+{
+	bool Result = Input.Check(State, Action);
 	
-	if (!InputIndex.IsEmpty())
+	if (Result)
 	{
-		Event.Index = InputIndex.ToInt32();
+		Action.From = const_cast<ZEInputEvent*>(this);
+		Action.Id = ActionId;
 	}
 
-	return false;
+	return Result;
 }
 
-
-void ZEInputEvent::Create(ZEString InputString)
-{
-	ParseInputBinding(InputString, *this);
-}
-
-ZEString ZEInputEvent::GetInputString()
-{
-	char Temp[256], *TypeString, *ModifierString;
-
-	switch(Type)
-	{
-		case ZE_IT_AXIS:
-			TypeString = "Axis";
-			switch(AxisSign)
-			{
-				case ZE_IAS_NEGATIVE:
-					ModifierString = "Negative";
-					break;
-				case ZE_IAS_POSITIVE:
-					ModifierString = "Positive";
-					break;
-				case ZE_IAS_ALL:
-					ModifierString = "All";
-					break;
-				default:
-					return "";
-			}
-			break;
-
-		case ZE_IT_BUTTON:
-			TypeString = "Button";
-			switch(ButtonState)
-			{
-				case ZE_IBS_PRESSED:
-					ModifierString = "Pressed";
-					break;
-				case ZE_IBS_RELEASED:
-					ModifierString = "Released";
-					break;
-				case ZE_IBS_PRESSING:
-					ModifierString = "Pressing";
-					break;
-				default:
-					return "";
-			}
-			break;
-
-		case ZE_IT_VECTOR2:
-			TypeString = "Vector2";
-			break;
-
-		case ZE_IT_VECTOR3:
-			TypeString = "Vector3";
-			break;
-
-		case ZE_IT_VECTOR4:
-			TypeString = "Vector4";
-			break;
-		case ZE_IT_QUATERNION:
-			TypeString = "Quaternion";
-			break;
-		default:
-			return "";
-	}
-
-	if (Type == ZE_IT_VECTOR2 || Type == ZE_IT_VECTOR3 || Type == ZE_IT_VECTOR4)		
-		switch(VectorState)
-		{
-			case ZE_IVS_ALWAYS:
-				ModifierString = "Always";
-				break;
-			case ZE_IVS_CHANGED:
-				ModifierString = "Changed";
-				break;
-			default:
-				return "";
-		}
-	else if (Type == ZE_IT_QUATERNION)
-		switch(VectorState)
-	{
-		case ZE_IQS_ALWAYS:
-			ModifierString = "Always";
-			break;
-		case ZE_IQS_CHANGED:
-			ModifierString = "Changed";
-			break;
-		default:
-			return "";
-	}
-
-	sprintf(Temp, "%s:%s[%d%].%s", Device->GetDeviceName().ToCString(), TypeString, Index, ModifierString);
-
-	return Temp;
-
-
-}
-									
 ZEInputEvent::ZEInputEvent()
 {
-	Device = NULL;
+	Processed = false;
 }
 
-ZEInputEvent::ZEInputEvent(const ZEString& InputString)
+
+ZEInputEvent ZEInputEvent::CreateAction(const ZEInput& Input, ZEInputState State, ZEInt ActionId)
 {
-	Create(InputString);
+	ZEInputEvent Event;
+	Event.Input = Input;
+	Event.State = State;
+	Event.ActionId = ActionId;
+	Event.Processed = false;
+	return Event;
 }
 
-ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEUInt32 Index, ZEInputButtonState ButtonState)
+ZEInputEvent ZEInputEvent::CreateAction(const ZEString& InputString, ZEInputState State, ZEInt ActionId)
 {
-	this->Device = NULL;
-	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-		if (Devices[I]->GetDeviceName() == DeviceName)
-		{
-			this->Device = Devices[I];
-			break;
-		}
-
-	this->Type = ZE_IT_BUTTON;
-	this->Index = Index;
-	this->ButtonState = ButtonState;
+	return ZEInputEvent::CreateAction(ZEInput::Create(InputString), State, ActionId);
 }
 
-ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEUInt32 Index, ZEInputAxisSign AxisSign)
+ZEInputEvent ZEInputEvent::CreateButtonAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId)
 {
-	this->Device = NULL;
-	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-		if (Devices[I]->GetDeviceName() == DeviceName)
-		{
-			this->Device = Devices[I];
-			break;
-		}
-
-	this->Type = ZE_IT_AXIS;
-	this->Index = Index;
-	this->AxisSign = AxisSign;
+	return ZEInputEvent::CreateAction(ZEInput::CreateButton(DeviceName, Index), State, ActionId);
 }
 
-ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEInputType InputType, ZEUInt32 Index, ZEInputVectorState State)
+ZEInputEvent ZEInputEvent::CreateAxisAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputAxisSign Sign, ZEInputState State, ZEInt ActionId)
 {
-	this->Device = NULL;
-	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-		if (Devices[I]->GetDeviceName() == DeviceName)
-		{
-			this->Device = Devices[I];
-			break;
-		}
-
-	this->Type = InputType;
-	this->Index = Index;
-	this->VectorState = State;
+	return ZEInputEvent::CreateAction(ZEInput::CreateAxis(DeviceName, Index, Sign), State, ActionId);
 }
 
-ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEUInt32 Index, ZEInputQuaternionState State)
+ZEInputEvent ZEInputEvent::CreatePOVAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId)
 {
-	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-		if (Devices[I]->GetDeviceName() == DeviceName)
-		{
-			this->Device = Devices[I];
-			break;
-		}
+	return ZEInputEvent::CreateAction(ZEInput::CreatePOV(DeviceName, Index), State, ActionId);
+}
 
-	this->Type = ZE_IT_QUATERNION;
-	this->Index = Index;
-	this->QuaternionState = State;
+ZEInputEvent ZEInputEvent::CreateSwitchAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId)
+{
+	return ZEInputEvent::CreateAction(ZEInput::CreateSwitch(DeviceName, Index), State, ActionId);
+}
+
+ZEInputEvent ZEInputEvent::CreateVectorAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId)
+{
+	return ZEInputEvent::CreateAction(ZEInput::CreateVector(DeviceName, Index), State, ActionId);
+}
+
+ZEInputEvent ZEInputEvent::CreateQuaternionAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId)
+{
+	return ZEInputEvent::CreateAction(ZEInput::CreateQuaternion(DeviceName, Index), State, ActionId);
+}
+
+ZEInputEvent ZEInputEvent::CreateCallback(const ZEInput& Input, ZEInputState State, const ZEInputCallback& Callback)
+{
+	ZEInputEvent Event;
+	Event.Input = Input;
+	Event.State = State;
+	Event.ActionId = -1;
+	Event.Callback = Callback;
+	Event.Processed = false;
+	return Event;
+}
+
+ZEInputEvent ZEInputEvent::CreateCallback(const ZEString& InputString, ZEInputState State, const ZEInputCallback& Callback)
+{
+	return ZEInputEvent::CreateCallback(ZEInput::Create(InputString), State, Callback);
+}
+
+ZEInputEvent ZEInputEvent::CreateButtonCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback)
+{
+	return ZEInputEvent::CreateCallback(ZEInput::CreateButton(DeviceName, Index), State, Callback);
+}
+
+ZEInputEvent ZEInputEvent::CreateAxisCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputAxisSign Sign, ZEInputState State, const ZEInputCallback& Callback)
+{
+	return ZEInputEvent::CreateCallback(ZEInput::CreateAxis(DeviceName, Index, Sign), State, Callback);
+}
+
+ZEInputEvent ZEInputEvent::CreatePOVCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback)
+{
+	return ZEInputEvent::CreateCallback(ZEInput::CreatePOV(DeviceName, Index), State, Callback);
+}
+
+ZEInputEvent ZEInputEvent::CreateSwitchCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback)
+{
+	return ZEInputEvent::CreateCallback(ZEInput::CreateSwitch(DeviceName, Index), State, Callback);
+}
+
+ZEInputEvent ZEInputEvent::CreateVectorCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback)
+{
+	return ZEInputEvent::CreateCallback(ZEInput::CreateVector(DeviceName, Index), State, Callback);
+}
+
+ZEInputEvent ZEInputEvent::CreateQuaternionCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback)
+{
+	return ZEInputEvent::CreateCallback(ZEInput::CreateQuaternion(DeviceName, Index), State, Callback);
 }

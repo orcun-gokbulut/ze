@@ -538,7 +538,7 @@ void ZEALSoundSource::SetSoundResource(ZESoundResource* Resource)
 {
 	if (SoundResource != NULL)
 	{
-		SoundResource->Release();
+		SoundResource->Destroy();
 		SoundResource = NULL;
 	}
 

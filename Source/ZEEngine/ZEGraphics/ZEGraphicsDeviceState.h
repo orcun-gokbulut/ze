@@ -34,15 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_DEVICE_STATE_H__
-#define __ZE_DEVICE_STATE_H__
+#ifndef __ZE_GRAPHICS_DEVICE_STATE_H__
+#define __ZE_GRAPHICS_DEVICE_STATE_H__
 
-#include "ZEVertexLayout.h"
+#include "ZETypes.h"
 #include "ZEBlendState.h"
+#include "ZEVertexLayout.h"
 #include "ZESamplerState.h"
 #include "ZERasterizerState.h"
 #include "ZEDepthStencilState.h"
-#include "ZETypes.h"
+#include "ZEGraphicsDefinitions.h"
 
 class ZEShader;
 class ZETexture;
@@ -52,20 +53,8 @@ class ZERenderTarget;
 class ZEConstantBuffer;
 class ZEDepthStencilBuffer;
 
-#define ZE_MAX_VERTEX_BUFFER_SLOT		16	// D3D10_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT
-#define ZE_MAX_SAMPLER_SLOT				16	// D3D10_COMMONSHADER_SAMPLER_SLOT_COUNT 16
-#define ZE_MAX_TEXTURE_SLOT				32	// D3D10_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT	128
-#define ZE_MAX_BUFFER_SLOT				14	// D3D10_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT 14
-#define ZE_MAX_VIEWPORT_SLOT			16	// D3D10_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE
-#define ZE_MAX_SCISSOR_SLOT				16	// D3D10_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE
-
 class ZEViewport
 {
-	// Should be public for only internal usage
-	public:
-		ZEUInt64					Hash;
-		void						UpdateHash();
-
 	public:
 		struct ZEViewportData
 		{
@@ -76,25 +65,22 @@ class ZEViewport
 			float					MinDepth;
 			float					MaxDepth;
 
-		} ViewportData;
-		
+		} StateData;
+	
+		ZESize						GetHash() const;
+
 		void						SetZero();
-		
+	
 		const ZEViewport&			operator =(const ZEViewport& Other);
 		bool						operator ==(const ZEViewport& Other);
 		bool						operator !=(const ZEViewport& Other);
 
 									ZEViewport();
-		virtual						~ZEViewport();
+									~ZEViewport();
 };
 
 class ZEScissorRectangle
 {
-	// Should be public for only internal usage
-	public:
-		ZEUInt64					Hash;
-		void						UpdateHash();
-
 	public:
 		struct ZEScissorRectangleData
 		{
@@ -102,7 +88,10 @@ class ZEScissorRectangle
 			ZEInt					Left;
 			ZEInt					Right;
 			ZEInt					Top;
-		} ScissorRectangleData;
+
+		} StateData;
+
+		ZESize						GetHash() const;
 
 		void						SetZero();
 
@@ -111,52 +100,99 @@ class ZEScissorRectangle
 		bool						operator !=(const ZEScissorRectangle& Other);
 
 									ZEScissorRectangle();
-		virtual						~ZEScissorRectangle();
+									~ZEScissorRectangle();
 };
+
+typedef ZEComponentMask ColorBlendMask;
 
 class ZEGraphicsDeviceState
 {
 	friend class ZEGraphicsDevice;
 
 	public:
-		ZEVertexLayout					VertexLayout;
-		const ZEIndexBuffer*			IndexBuffer;
-		const ZEVertexBuffer*			VertexBuffers[ZE_MAX_VERTEX_BUFFER_SLOT];
+		ZEVertexLayout*				VertexLayout;
+		ZEIndexBuffer*				IndexBuffer;
+		ZEVertexBuffer*				VertexBuffers[ZE_MAX_VERTEX_BUFFER_SLOT];
 
-		ZEShader*						VertexShader;
-		ZEConstantBuffer*				VertexShaderBuffers[ZE_MAX_BUFFER_SLOT];
-		const ZETexture*				VertexShaderTextures[ZE_MAX_TEXTURE_SLOT];
-		ZESamplerState					VertexShaderSamplers[ZE_MAX_SAMPLER_SLOT];
+		ZEShader*					VertexShader;
+		ZEConstantBuffer*			VertexShaderBuffers[ZE_MAX_CONSTANT_BUFFER_SLOT];
+		const ZETexture*			VertexShaderTextures[ZE_MAX_TEXTURE_SLOT];
+		ZESamplerState				VertexShaderSamplers[ZE_MAX_SAMPLER_SLOT];
 
-		ZEShader*						GeometryShader;
-		ZEConstantBuffer*				GeometryShaderBuffers[ZE_MAX_BUFFER_SLOT];
-		const ZETexture*				GeometryShaderTextures[ZE_MAX_TEXTURE_SLOT];
-		ZESamplerState					GeometryShaderSamplers[ZE_MAX_SAMPLER_SLOT];
+		ZEShader*					GeometryShader;
+		ZEConstantBuffer*			GeometryShaderBuffers[ZE_MAX_CONSTANT_BUFFER_SLOT];
+		const ZETexture*			GeometryShaderTextures[ZE_MAX_TEXTURE_SLOT];
+		ZESamplerState				GeometryShaderSamplers[ZE_MAX_SAMPLER_SLOT];
 
-		ZERasterizerState				RasterizerState;
-		ZEViewport						ViewPorts[ZE_MAX_VIEWPORT_SLOT];
-		ZEScissorRectangle				ScissorRectangles[ZE_MAX_SCISSOR_SLOT];
+		ZERasterizerState			RasterizerState;
+		ZEViewport					ViewPorts[ZE_MAX_VIEWPORT_SLOT];
+		ZEScissorRectangle			ScissorRects[ZE_MAX_SCISSOR_SLOT];
 		
-		ZEShader*						PixelShader;
-		ZEConstantBuffer*				PixelShaderBuffers[ZE_MAX_BUFFER_SLOT];
-		const ZETexture*				PixelShaderTextures[ZE_MAX_TEXTURE_SLOT];
-		ZESamplerState					PixelShaderSamplers[ZE_MAX_SAMPLER_SLOT];
+		ZEShader*					PixelShader;
+		ZEConstantBuffer*			PixelShaderBuffers[ZE_MAX_CONSTANT_BUFFER_SLOT];
+		const ZETexture*			PixelShaderTextures[ZE_MAX_TEXTURE_SLOT];
+		ZESamplerState				PixelShaderSamplers[ZE_MAX_SAMPLER_SLOT];
 
-		ZEBlendState					BlendState;
-		ZEComponentMask					ComponentBlendMask;
-		ZEVector4						ComponentBlendFactors;
+		ZEBlendState				BlendState;
+		ColorBlendMask				ComponentBlendMask;
+		ZEVector4					ComponentBlendFactors;
 
-		ZEDepthStencilState				DepthStencilState;
-		ZEUInt32						StencilReferance;
+		ZEDepthStencilState			DepthStencilState;
+		ZEUInt32					StencilReferance;
 
-		const ZERenderTarget*			RenderTargets[ZE_MAX_RENDER_TARGET_SLOT];
-		const ZEDepthStencilBuffer*		DepthStencilBuffer;
-		bool							ScreenWriteEnable;
+		const ZERenderTarget*		RenderTargets[ZE_MAX_RENDER_TARGET_SLOT];
+		const ZEDepthStencilBuffer*	DepthStencilBuffer;
+		bool						ScreenWriteEnable;
 		
-		void							SetToDefault();
+		void						SetToDefault();
 
-										ZEGraphicsDeviceState();
-		virtual							~ZEGraphicsDeviceState();
+									ZEGraphicsDeviceState();
+									~ZEGraphicsDeviceState();
+};
+
+class ZEGraphicsDeviceHashState
+{
+	friend class ZEGraphicsDevice;
+
+	public:
+		ZESize						VertexLayoutHash;
+		ZEIndexBuffer*				IndexBuffer;
+		ZEVertexBuffer*				VertexBuffers[ZE_MAX_VERTEX_BUFFER_SLOT];
+
+		ZEShader*					VertexShader;
+		ZEConstantBuffer*			VertexShaderBuffers[ZE_MAX_CONSTANT_BUFFER_SLOT];
+		const ZETexture*			VertexShaderTextures[ZE_MAX_TEXTURE_SLOT];
+		ZESize						VertexShaderSamplerHashes[ZE_MAX_SAMPLER_SLOT];
+
+		ZEShader*					GeometryShader;
+		ZEConstantBuffer*			GeometryShaderBuffers[ZE_MAX_CONSTANT_BUFFER_SLOT];
+		const ZETexture*			GeometryShaderTextures[ZE_MAX_TEXTURE_SLOT];
+		ZESize						GeometryShaderSamplerHashes[ZE_MAX_SAMPLER_SLOT];
+
+		ZESize						RasterizerStateHash;
+		ZESize						ViewPortHashes[ZE_MAX_VIEWPORT_SLOT];
+		ZESize						ScissorRectHashes[ZE_MAX_SCISSOR_SLOT];
+		
+		ZEShader*					PixelShader;
+		ZEConstantBuffer*			PixelShaderBuffers[ZE_MAX_CONSTANT_BUFFER_SLOT];
+		const ZETexture*			PixelShaderTextures[ZE_MAX_TEXTURE_SLOT];
+		ZESize						PixelShaderSamplerHashes[ZE_MAX_SAMPLER_SLOT];
+
+		ZESize						BlendStateHash;
+		ColorBlendMask				ComponentBlendMask;
+		ZEVector4					ComponentBlendFactors;
+
+		ZESize						DepthStencilStateHash;
+		ZEUInt32					StencilReferance;
+
+		const ZERenderTarget*		RenderTargets[ZE_MAX_RENDER_TARGET_SLOT];
+		const ZEDepthStencilBuffer*	DepthStencilBuffer;
+		bool						ScreenWriteEnable;
+		
+		void						SetToDefault();
+
+									ZEGraphicsDeviceHashState();
+									~ZEGraphicsDeviceHashState();
 };
 
 #endif

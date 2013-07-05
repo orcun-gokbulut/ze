@@ -69,26 +69,26 @@ struct ZERendererStatistics
 	ZEUInt32	DrawPrimitiveCount;
 };
 
-struct ZEGraphicsStatistics
-{
-	ZEUInt32	VertexBufferCount;
-	ZEUInt32	VertexDeclarationCount;
-	ZESize		TotalVertexBufferSize;
-
-	ZEUInt32	ShaderCount;
-
-	ZEUInt32	TextureCount;
-	ZEUInt32	Texture2DCount;
-	ZEUInt32	Texture3DCount;
-	ZEUInt32	TextureCubeCount;
-	ZESize		TotalTextureSize;
-
-	ZEUInt32	RenderTargetCount;
-	ZESize		TotalRenderTargetSize;
-
-	ZEUInt32	DepthBufferCount;
-	ZESize		TotalDepthBufferSize;
-};
+//struct ZEGraphicsStatistics
+//{
+//	ZEUInt32	VertexBufferCount;
+//	ZEUInt32	VertexDeclarationCount;
+//	ZESize		TotalVertexBufferSize;
+//
+//	ZEUInt32	ShaderCount;
+//
+//	ZEUInt32	TextureCount;
+//	ZEUInt32	Texture2DCount;
+//	ZEUInt32	Texture3DCount;
+//	ZEUInt32	TextureCubeCount;
+//	ZESize		TotalTextureSize;
+//
+//	ZEUInt32	RenderTargetCount;
+//	ZESize		TotalRenderTargetSize;
+//
+//	ZEUInt32	DepthBufferCount;
+//	ZESize		TotalDepthBufferSize;
+//};
 
 struct ZEModelStatistics
 {
@@ -128,7 +128,7 @@ struct ZEDrawStatistics
 {
 	ZESceneStatistics		SceneStatistics;
 	ZERendererStatistics	RendererStatistics;
-	ZEGraphicsStatistics	GraphicsStatistics;
+	//ZEGraphicsStatistics	GraphicsStatistics;
 	ZEModelStatistics		ModelStatistics;
 	ZEInteriorStatistics	InteriorStatistics;
 	ZEParticleStatistics	ParticleStatistics;

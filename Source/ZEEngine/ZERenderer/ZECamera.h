@@ -51,62 +51,62 @@ enum ZECameraProjectionType
 class ZECamera : public ZEEntity
 {
 	private:
-		bool							UpdateViewFrustum;
-		bool							UpdateView;
-		bool							UpdateViewTransform;
-		bool							UpdateProjectionTransform;
-		bool							UpdateViewProjectionTransform;
+		bool						UpdateView;
+		bool						UpdateViewFrustum;
+		bool						UpdateViewTransform;
+		bool						UpdateProjectionTransform;
+		bool						UpdateViewProjectionTransform;
 
-		float							NearZ, FarZ;
-		float							FOV, AspectRatio;
-		float							Width, Height;
+		float						NearZ, FarZ;
+		float						FOV, AspectRatio;
+		float						Width, Height;
 
-		float							ShadowFadeDistance;
-		float							VisibleShadowDistance;
+		float						ShadowFadeDistance;
+		float						VisibleShadowDistance;
 
-		ZEMatrix4x4						ViewTransform;
-		ZEMatrix4x4						ProjectionTransform;
-		ZEMatrix4x4						ViewProjectionTransform;
+		ZEMatrix4x4					ViewTransform;
+		ZEMatrix4x4					ProjectionTransform;
+		ZEMatrix4x4					ViewProjectionTransform;
 
-		ZEViewFrustum					ViewFrustum;
-		ZEView							View;
+		ZEView						View;
+		ZEViewFrustum				ViewFrustum;
+		
+									ZECamera();
 
-										ZECamera();
-
-		virtual void					OnTransformChanged();
+		virtual void				OnTransformChanged();
 
 	public:
-		void							SetNearZ(float NearZ);
-		float							GetNearZ() const;
+		void						SetNearZ(float NearZ);
+		float						GetNearZ() const;
 
-		void							SetFarZ(float FarZ);
-		float							GetFarZ() const;
+		void						SetFarZ(float FarZ);
+		float						GetFarZ() const;
 
-		void							SetFOV(float FOV);
-		float							GetFOV() const;
+		void						SetFOV(float FOV);
+		float						GetFOV() const;
 
-		void							SetAspectRatio(float AspectRatio);
-		float							GetAspectRatio() const;
+		void						SetAspectRatio(float AspectRatio);
+		float						GetAspectRatio() const;
 
-		void							SetShadowFadeDistance(float Value);
-		float							GetShadowFadeDistance() const;
-		
-		void							SetVisibleShadowDistance(float Value);
-		float							GetVisibleShadowDistance() const;
+		void						SetShadowFadeDistance(float Value);
+		float						GetShadowFadeDistance() const;
+	
+		void						SetVisibleShadowDistance(float Value);
+		float						GetVisibleShadowDistance() const;
 
-		const ZEMatrix4x4&				GetViewTransform();
-		const ZEMatrix4x4&				GetProjectionTransform();
-		const ZEMatrix4x4&				GetViewProjectionTransform();
+		const ZEMatrix4x4&			GetViewTransform();
+		const ZEMatrix4x4&			GetProjectionTransform();
+		const ZEMatrix4x4&			GetViewProjectionTransform();
 
-		virtual void					SetPosition(const ZEVector3& NewPosition);	
-		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);
+		virtual void				SetPosition(const ZEVector3& NewPosition);
+		virtual void				SetRotation(const ZEQuaternion& NewRotation);
 
-		const ZEView&					GetView();
-		const ZEViewVolume&				GetViewVolume();
+		const ZEView&				GetView();
+		const ZEViewVolume&			GetViewVolume();
 
-		void							GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
+		void						GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
 
-		static ZECamera*				CreateInstance();
+		static ZECamera*			CreateInstance();
 };
 
 #endif

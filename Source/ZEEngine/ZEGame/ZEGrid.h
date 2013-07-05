@@ -57,7 +57,7 @@ class ZEGrid : public ZEEntity
 		ZECanvas					AxisZ;
 
 		ZEMaterialSimple*			Material;
-		ZERenderCommand				RenderCommand;
+		ZERenderCommandDefault		RenderCommand;
 
 		ZEVector2					GridSize;
 		bool						FollowerGrid;
@@ -74,6 +74,9 @@ class ZEGrid : public ZEEntity
 		ZEVector3					AxisColor;
 
 		void						GenerateGrid();
+
+		virtual bool				InitializeSelf();
+		virtual bool				DeinitializeSelf();
 
 									ZEGrid();
 
@@ -103,9 +106,6 @@ class ZEGrid : public ZEEntity
 		const ZEVector3&			GetAxisColor();
 
 		virtual void				Draw(ZEDrawParameters* Parameters);
-
-		virtual bool				Initialize();
-		virtual void				Deinitialize();
 
 		static ZEGrid*				CreateInstance();
 };

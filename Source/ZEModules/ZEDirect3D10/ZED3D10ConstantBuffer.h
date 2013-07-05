@@ -48,10 +48,13 @@ class ZED3D10ConstantBuffer : public ZEConstantBuffer, public ZED3D10ComponentBa
 	friend class ZED3D10GraphicsDevice;
 	friend class ZED3D10GraphicsModule;
 
-	public:
+	protected:
+		static ZESize		GlobalSize;
+		static ZEUInt16		GlobalCount;
+
 		ID3D10Buffer*		D3D10Buffer;
 		
-		virtual void		UpdateData();
+		virtual bool		UpdateBuffer();
 
 							ZED3D10ConstantBuffer();
 		virtual				~ZED3D10ConstantBuffer();
@@ -59,17 +62,8 @@ class ZED3D10ConstantBuffer : public ZEConstantBuffer, public ZED3D10ComponentBa
 	public:
 		ID3D10Buffer*		GetD3D10Buffer() const;
 
-		virtual bool		Lock(void** ConstantData);
-		virtual void		Unlock();
-
-		virtual bool		SetConstant(ZESize Index, const void* Data);
-		virtual bool		GetConstant(ZESize Index, void* Data) const;
-
-		virtual bool		SetConstant(const ZEString& Name, const void* Data);
-		virtual bool		GetConstant(const ZEString& Name, void* Data) const;
-
 		virtual bool		Create(ZESize BufferSize);
-		virtual bool		Create(const ZEShaderBufferInfo* BufferInfo);
+		virtual bool		Create(const ZEShaderBuffer* BufferInfo);
 };
 
 #endif

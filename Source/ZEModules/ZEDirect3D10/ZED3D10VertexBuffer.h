@@ -47,7 +47,10 @@ class ZED3D10VertexBuffer : public ZEVertexBuffer, public ZED3D10ComponentBase
 	friend class ZED3D10GraphicsDevice;
 	friend class ZED3D10GraphicsModule;
 
-	private:
+	protected:
+		static ZESize			GlobalSize;
+		static ZEUInt16			GlobalCount;
+		
 		ID3D10Buffer*			D3D10Buffer;
 	
 								ZED3D10VertexBuffer();

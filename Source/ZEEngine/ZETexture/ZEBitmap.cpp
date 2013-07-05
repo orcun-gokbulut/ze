@@ -36,8 +36,14 @@
 #include "ZEBitmap.h"
 #include "ZEError.h"
 #include "ZETypes.h"
-#include <memory.h>
 #include "ZEMath/ZEMath.h"
+
+#include <memory.h>
+
+#ifdef FREEIMAGE_LIB
+	// Workaround to avoid multiple definition
+	#undef FREEIMAGE_LIB
+#endif
 
 #include <FreeImage.h>
 

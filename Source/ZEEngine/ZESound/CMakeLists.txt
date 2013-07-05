@@ -40,8 +40,6 @@ ze_add_source(ZEListener.h					Sources Headers ZEPP)
 ze_add_source(ZESoundFX.h					Sources Headers)
 ze_add_source(ZESoundModule.cpp				Sources)
 ze_add_source(ZESoundModule.h				Sources Headers)
-ze_add_source(ZESoundDebugModule.cpp		Sources)
-ze_add_source(ZESoundDebugModule.h			Sources)
 ze_add_source(ZESoundResource.cpp			Sources)
 ze_add_source(ZESoundResource.h				Sources Headers)
 ze_add_source(ZESoundResourceMP3.cpp		Sources)
@@ -58,4 +56,4 @@ ze_add_source(ZESoundSource3D.h				Sources Headers ZEPP)
 ze_add_library(ZESound 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation libmpg123 libogg libvorbis libvorbisfile)
+	LIBS ZEFoundation libmpg123 libOGG libVorbis)

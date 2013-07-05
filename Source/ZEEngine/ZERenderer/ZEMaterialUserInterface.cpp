@@ -117,11 +117,6 @@ ZESize ZEMaterialUserInterface::GetHash() const
 	return ZEHashGenerator::Hash(ZEString("ZEMaterialUserInterface"));
 }
 
-ZEMaterialFlags ZEMaterialUserInterface::GetMaterialFlags() const
-{
-	return ZE_MTF_USER_INTERFACE_PASS;
-}
-
 void ZEMaterialUserInterface::SetWireFrame(bool Enabled)
 {
 	WireFrame = Enabled;
@@ -144,6 +139,7 @@ const ZETexture2D* ZEMaterialUserInterface::GetTexture() const
 
 bool ZEMaterialUserInterface::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
+	/*
 	if (Stage->GetStageFlags() != ZE_RENDER_STAGE_UI)
 		return true;
 
@@ -193,7 +189,7 @@ bool ZEMaterialUserInterface::SetupPass(ZEUInt PassId, const ZERenderStage* Stag
 		Device->SetPixelShaderSampler(0, SamplerState);
 		Device->SetPixelShaderTexture(0, Texture);
 	}
-
+	*/
 	return true;
 }
 
@@ -251,12 +247,12 @@ bool ZEMaterialUserInterface::SetupForwardPass(ZERenderer* Renderer, ZERenderCom
 	return true;
 }
 	*/
-void ZEMaterialUserInterface::UpdateMaterial()
+bool ZEMaterialUserInterface::UpdateMaterial()
 {	
-
+	return true;
 }
 
 ZEMaterialUserInterface* ZEMaterialUserInterface::CreateInstance()
 {
-	return new ZEMaterialUserInterface();
+	return NULL; //  new ZEMaterialUserInterface();
 }

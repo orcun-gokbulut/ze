@@ -118,7 +118,7 @@ ZEVector2 ZEUILabel::CalculateLineStartPoint(ZESize LineIndex)
 		StartPosition.x = TextRenderingArea.RightDown.x - (LineTextWidths[LineIndex]);
 
 	else if(TextAlignment == ZE_UI_TA_CENTER)
-		StartPosition.x += (int)(((TextRenderingArea.GetWidth() - LineTextWidths[LineIndex]) / 2.0f) + 0.5f);
+		StartPosition.x += (ZEInt32)(((TextRenderingArea.GetWidth() - LineTextWidths[LineIndex]) / 2.0f) + 0.5f);
 
 	else
 		StartPosition = StartPosition;
@@ -144,6 +144,8 @@ void ZEUILabel::Draw(ZEUIRenderer* Renderer)
 	ZERectangle::IntersectionTest(GetVisibleRectangle(), TextRenderingArea, TempRenderRect);
 	ZEInt32 TempTextZOrder = GetZOrder() + 1;
 
+	LineStartPosition = CalculateLineStartPoint(0);
+
 	for (ZESize I = 0; I < Characters.GetCount(); I++)
 	{
 		if(Characters[I].Line != DrawLineIndex)
@@ -165,9 +167,11 @@ void ZEUILabel::Draw(ZEUIRenderer* Renderer)
 
 ZEUILabel::ZEUILabel()
 {
+	TextRenderingArea.SetPosition(ZEVector2::Zero);
+	TextRenderingArea.SetSize(ZEVector2::Zero);
 	TextMargins = ZEVector4::Zero;
 	SetFontColor(ZEUIManager::GetDefaultForegroundColor());
-	SetBackgroundColor(ZEUIManager::GetDefaultBackgroundColor());
+	SetBackgroundColor(ZEVector4::Zero);
 	SetFontResource(ZEUIManager::GetDefaultFontResource());
 	Characters.Clear();
 	Text.Clear();
@@ -179,6 +183,7 @@ ZEUILabel::ZEUILabel()
 	SetSize(ZEVector2::One * 100);
 	SetTextMargins();
 	LineTextWidths.Add(0);
+	TextAlignment = ZE_UI_TA_LEFT;
 }
 
 ZEUILabel::~ZEUILabel()

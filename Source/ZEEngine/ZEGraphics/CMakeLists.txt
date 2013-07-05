@@ -36,11 +36,13 @@
 cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEGraphicsModule.cpp 			Sources)
-ze_add_source(ZEGraphicsModule.h 			Sources Header)
+ze_add_source(ZEGraphicsModule.h 			Sources Headers)
 ze_add_source(ZEGraphicsDevice.cpp			Sources)
 ze_add_source(ZEGraphicsDevice.h			Sources Headers)
 ze_add_source(ZEGraphicsDeviceState.cpp		Sources)
 ze_add_source(ZEGraphicsDeviceState.h		Sources Headers)
+
+ze_add_source(ZEGraphicsDefinitions.h		Sources)
 
 ze_add_source(ZEBlendState.cpp				Sources)
 ze_add_source(ZEBlendState.h				Sources Headers)
@@ -52,8 +54,6 @@ ze_add_source(ZERasterizerState.cpp 		Sources)
 ze_add_source(ZERasterizerState.h 			Sources Headers)
 ze_add_source(ZEVertexLayout.cpp			Sources)
 ze_add_source(ZEVertexLayout.h				Sources Headers)
-ze_add_source(ZEVertexTypes.cpp				Sources)
-ze_add_source(ZEVertexTypes.h				Sources Headers)
 ze_add_source(ZEStatePool.cpp				Sources)
 ze_add_source(ZEStatePool.h					Sources Headers)
 
@@ -73,7 +73,7 @@ ze_add_source(ZERenderTarget.h 				Sources Headers)
 ze_add_source(ZEConstantBuffer.cpp			Sources)
 ze_add_source(ZEConstantBuffer.h			Sources Headers)
 ze_add_source(ZEIndexBuffer.cpp 			Sources)
-ze_add_source(ZEIndexBuffer.h 				Sources Header)
+ze_add_source(ZEIndexBuffer.h 				Sources Headers)
 ze_add_source(ZEVertexBuffer.cpp 			Sources)
 ze_add_source(ZEVertexBuffer.h 				Sources Headers)
 
@@ -84,7 +84,8 @@ ze_add_source(ZEGraphicsEventTracer.h		Sources Headers)
 
 ze_add_source(ZEShader.cpp 					Sources)
 ze_add_source(ZEShader.h 					Sources Headers)
-ze_add_source(ZEShaderMetaInfo.h			Sources Headers)
+ze_add_source(ZEShaderMeta.cpp				Sources)
+ze_add_source(ZEShaderMeta.h				Sources Headers)
 ze_add_source(ZEShaderMetaTable.cpp			Sources)
 ze_add_source(ZEShaderMetaTable.h			Sources Headers)
 ze_add_source(ZEShaderCompileOptions.h		Sources Headers)
@@ -94,4 +95,4 @@ ze_add_source(ZEShaderCompiler.h			Sources Headers)
 ze_add_library(ZEGraphics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation)
+	LIBS ZEFoundation libFreeImage)

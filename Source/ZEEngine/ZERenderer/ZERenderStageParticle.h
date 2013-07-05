@@ -42,36 +42,33 @@
 class ZETexture2D;
 class ZERenderTarget;
 class ZERenderCommand;
-class ZERenderStageForward;
+class ZERenderStageAccumulation;
 
 class ZERenderStageParticle : public ZERenderStage
 {
 	protected:
-		ZESize							LastMaterial;
+		ZESize								LastMaterial;
 
-		const ZERenderStageForward*		ABufferInput;
+		const ZERenderStageAccumulation*	ABufferInput;
 
-		void							ResetStageDefaults();
-		void							CommitStageDefaults();
+		void								ResetStates();
+		void								CommitStates();
 
-		void							UpdateBuffers();
-		void							DestroyBuffers();
+		void								UpdateBuffers();
+		void								DestroyBuffers();
 
 	public:
-		virtual ZEUInt32				GetStageFlags() const;
-		virtual ZEUInt32				GetDependencies() const;
-		virtual ZEUInt32				GetStageIndentifier() const;
+		virtual ZERenderStageType			GetStageType() const;
+		virtual ZERenderStageType			GetDependencies() const;
 
-		void							SetInputAccumulationStage(const ZERenderStageForward* Input);
-		const ZERenderStageForward*		GetInputAccumulationStage() const;
+		void								SetInputAccumulationStage(const ZERenderStageAccumulation* Input);
+		const ZERenderStageAccumulation*	GetInputAccumulationStage() const;
 		
-		virtual void					Setup();
-		virtual void					Process(ZERenderCommand* RenderCommand);
+		virtual void						Process(const ZERenderCommand* RenderCommand);
+		virtual void						Setup();
 
-		virtual void					SetStageConfiguration(const ZERenderStageConfiguration* Config);
-		
-										ZERenderStageParticle();
-		virtual							~ZERenderStageParticle();
+											ZERenderStageParticle();
+		virtual								~ZERenderStageParticle();
 };
 
 #endif

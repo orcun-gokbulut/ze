@@ -40,4 +40,4 @@ ze_add_source(ZE3dsMaxUtils.cpp				Sources)
 
 ze_add_library(ZE3dsMaxUtils
 	SOURCES ${Sources}
-	LIBS ZEFoundation core geom gfx mesh maxutil maxscrpt paramblk2 igame)
+	LIBS ZEFoundation lib3dsMax)

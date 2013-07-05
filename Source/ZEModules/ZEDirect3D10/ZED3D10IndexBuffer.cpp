@@ -80,6 +80,14 @@ bool ZED3D10IndexBuffer::CreateDynamic(ZESize IndexCount, ZEIndexBufferFormat Fo
 	this->IndexCount = IndexCount;
 	this->BufferSize = IndexCount * GetIndexSize(Format);
 
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Dynamic index buffer created. IndexCount: %u, Format: %u, Size: %u.", 
+			IndexCount, Format, BufferDesc.ByteWidth);
+#endif
+
+	GlobalSize += BufferSize;
+	GlobalCount++;
+
 	return true;
 }
 
@@ -113,6 +121,14 @@ bool ZED3D10IndexBuffer::CreateStatic(ZESize IndexCount, ZEIndexBufferFormat For
 	this->IndexCount = IndexCount;
 	this->BufferSize = IndexCount * GetIndexSize(Format);
 
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Static index buffer created. IndexCount: %u, Format: %u, Size: %u.", 
+			IndexCount, Format, BufferDesc.ByteWidth);
+#endif
+
+	GlobalSize += BufferSize;
+	GlobalCount++;
+	
 	return true;
 }
 
@@ -139,6 +155,9 @@ bool ZED3D10IndexBuffer::Unlock()
 	return true;
 }
 
+ZESize		ZED3D10IndexBuffer::GlobalSize = 0;
+ZEUInt16	ZED3D10IndexBuffer::GlobalCount = 0;
+
 ZED3D10IndexBuffer::ZED3D10IndexBuffer()
 {
 	D3D10Buffer = NULL;
@@ -147,4 +166,7 @@ ZED3D10IndexBuffer::ZED3D10IndexBuffer()
 ZED3D10IndexBuffer::~ZED3D10IndexBuffer()
 {
 	ZED3D_RELEASE(D3D10Buffer);
+
+	GlobalSize -= BufferSize;
+	GlobalCount--;
 }

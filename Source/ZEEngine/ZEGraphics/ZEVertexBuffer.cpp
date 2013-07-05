@@ -34,20 +34,27 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEVertexBuffer.h"
+#include "ZEDS/ZEHashGenerator.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 
-ZEVertexBuffer::ZEVertexBuffer()
+#include <memory.h>
+
+/************************************************************************/
+/*						ZEVertexBufferElement							*/
+/************************************************************************/
+
+ZESize ZEVertexBufferElement::GetHash(const char* Semantic, ZEUInt8 Index)
 {
-	Static = false;
-	BufferSize = 0;
-	VertexSize = 0;
-	VertexCount = 0;
+	ZESize Hash = 0;
+	ZEHashGenerator::Hash(Hash, (const char*)Semantic);
+	ZEHashGenerator::Hash(Hash, (void*)&Index, sizeof(ZEUInt8));
+
+	return Hash;
 }
 
-ZEVertexBuffer::~ZEVertexBuffer()
-{
-
-}
+/************************************************************************/
+/*							ZEVertexBuffer								*/
+/************************************************************************/
 
 bool ZEVertexBuffer::IsStatic() const
 {
@@ -69,6 +76,49 @@ ZESize ZEVertexBuffer::GetVertexCount() const
 	return VertexCount;
 }
 
+const ZEVertexBufferElement* ZEVertexBuffer::GetElements() const
+{
+	return Elements;
+}
+
+ZESize ZEVertexBuffer::GetElementCount() const
+{
+	return ElementCount;
+}
+
+void ZEVertexBuffer::ClearElements()
+{
+	ElementCount = 0;
+
+	memset(Hashes, 0, sizeof(ZESize) * ZE_MAX_VERTEX_LAYOUT_ELEMENT);
+	memset(Elements, 0, sizeof(ZEVertexBufferElement) * ZE_MAX_VERTEX_LAYOUT_ELEMENT);
+}
+
+void ZEVertexBuffer::RegisterElements(const ZEVertexBufferElement* ElementArr, ZESize Count)
+{
+	zeDebugCheck(ElementArr == NULL, "NULL pointer");
+	zeDebugCheck(Count == 0, "Zero element count");
+	zeDebugCheck(Count >= ZE_MAX_VERTEX_LAYOUT_ELEMENT, "Too many elements");
+
+	ClearElements();
+
+	ElementCount = Count;
+	for (ZESize I = 0; I < Count; ++I)
+	{
+		zeDebugCheck(strnlen(ElementArr[I].Semantic, ZE_MAX_SHADER_VARIABLE_NAME) == ZE_MAX_SHADER_VARIABLE_NAME, 
+						"Wrong vertex buffer element semantic");
+
+		sprintf(Elements[I].Semantic, "%s", ElementArr[I].Semantic);
+		Elements[I].Index = ElementArr[I].Index;
+		Elements[I].Type = ElementArr[I].Type;
+		Elements[I].Offset = ElementArr[I].Offset;
+		Elements[I].Usage = ElementArr[I].Usage;
+		Elements[I].InstanceCount = ElementArr[I].InstanceCount;
+
+		Hashes[I] = ZEVertexBufferElement::GetHash(Elements[I].Semantic, Elements[I].Index);
+	}
+}
+
 void ZEVertexBuffer::Destroy()
 {
 	delete this;
@@ -77,4 +127,19 @@ void ZEVertexBuffer::Destroy()
 ZEVertexBuffer*	ZEVertexBuffer::CreateInstance()
 {
 	return zeGraphics->CreateVertexBuffer();
+}
+
+ZEVertexBuffer::ZEVertexBuffer()
+{
+	Static = false;
+	BufferSize = 0;
+	VertexSize = 0;
+	VertexCount = 0;
+
+	ClearElements();
+}
+
+ZEVertexBuffer::~ZEVertexBuffer()
+{
+
 }

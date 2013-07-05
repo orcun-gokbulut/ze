@@ -77,7 +77,7 @@ class ZEGizmo : public ZEEntity
 
 		static ZEMaterialSimple*		GizmoMaterial;
 
-		ZERenderCommand					RenderCommand;
+		ZERenderCommandDefault			RenderCommand;
 
 		ZEGizmoMode						Mode;
 		ZEGizmoAxis						HoveredAxis;
@@ -106,6 +106,9 @@ class ZEGizmo : public ZEEntity
 		ZEQuaternion					RotationProjection_(ZEGizmoAxis Axis, const ZERay& Ray);
 		ZEVector3						ScaleProjection_(ZEGizmoAxis Axis, const ZERay& Ray);
 
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
 										ZEGizmo();
 
 	public:
@@ -124,9 +127,6 @@ class ZEGizmo : public ZEEntity
 		float							GetAxisLenght();
 
 		ZEVector3						GetPositionChange();
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
 
 		ZEGizmoAxis						PickAxis(const ZERay& Ray, float& TRay);
 		

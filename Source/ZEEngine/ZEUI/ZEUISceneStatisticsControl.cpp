@@ -275,8 +275,8 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 {
 	//FPS Calculation
 
-	for(ZESize I = 0; I < GetChildControls().GetCount(); I++)
-		GetChildControls()[I]->SetZOrder(GetZOrder());
+// 	for(ZESize I = 0; I < GetChildControls().GetCount(); I++)
+// 		GetChildControls()[I]->SetZOrder(GetZOrder());
 
 	static float TotalElapsedTime = 0;
 	static ZEUInt32 AverageFPS = 0;
@@ -301,11 +301,11 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 		CameraPosition->SetText(ZEFormat::Format(CamPosText, CamPos.x, CamPos.y, CamPos.z));
 	}
 
-	zeInput->ProcessInputMap(&InputMap);
+	InputMap.Update();
 
-	for (ZESize I = 0; I < InputMap.InputActionCount; I++)
+	for (ZESize I = 0; I < InputMap.GetActionCount(); I++)
 	{
-		switch(InputMap.InputActions[I].Id)
+		switch(InputMap.GetActions()[I].Id)
 		{
 			case ACTIONID_VISIBILITY:
 				if (GetVisiblity())
@@ -328,6 +328,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	CameraPosition->SetPosition(ZEVector2(0.0f, 0.0f));
 	CameraPosition->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	CameraPosition->SetFontColor(GreenTextColor);
+	CameraPosition->SetZOrder(0);
 	AddChildControl(CameraPosition);
 
 	FPSCount = new ZEUILabel();
@@ -336,6 +337,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	FPSCount->SetPosition(ZEVector2(355.0f, 0.0f));
 	FPSCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	FPSCount->SetFontColor(GreenTextColor);
+	FPSCount->SetZOrder(0);
 	AddChildControl(FPSCount);
 
 	//Scene Statistics
@@ -347,6 +349,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	SceneStatisticsDescription->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	SceneStatisticsDescription->SetFontColor(RedTextColor);
 	SceneStatisticsDescription->SetText("- Scene Statistics -");
+	SceneStatisticsDescription->SetZOrder(0);
 	AddChildControl(SceneStatisticsDescription);
 
 	SceneTotalEntityCount = new ZEUILabel();
@@ -355,6 +358,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	SceneTotalEntityCount->SetPosition(ZEVector2(0.0f, 50.0f));
 	SceneTotalEntityCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	SceneTotalEntityCount->SetFontColor(GreenTextColor);
+	SceneTotalEntityCount->SetZOrder(0);
 	AddChildControl(SceneTotalEntityCount);
 
 	SceneDrawableEntityCount= new ZEUILabel();
@@ -363,6 +367,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	SceneDrawableEntityCount->SetPosition(ZEVector2(155.0f, 50.0f));
 	SceneDrawableEntityCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	SceneDrawableEntityCount->SetFontColor(GreenTextColor);
+	SceneDrawableEntityCount->SetZOrder(0);
 	AddChildControl(SceneDrawableEntityCount);
 
 	SceneCulledEntityCount = new ZEUILabel();
@@ -371,6 +376,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	SceneCulledEntityCount->SetPosition(ZEVector2(0.0f, 75.0f));
 	SceneCulledEntityCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	SceneCulledEntityCount->SetFontColor(GreenTextColor);
+	SceneCulledEntityCount->SetZOrder(0);
 	AddChildControl(SceneCulledEntityCount);
 
 	SceneDrawedEntityCount = new ZEUILabel();
@@ -379,6 +385,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	SceneDrawedEntityCount->SetPosition(ZEVector2(155.0f, 75.0f));
 	SceneDrawedEntityCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	SceneDrawedEntityCount->SetFontColor(GreenTextColor);
+	SceneDrawedEntityCount->SetZOrder(0);
 	AddChildControl(SceneDrawedEntityCount);
 
 	SceneTotalLightCount = new ZEUILabel();
@@ -387,6 +394,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	SceneTotalLightCount->SetPosition(ZEVector2(0.0f, 100.0f));
 	SceneTotalLightCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	SceneTotalLightCount->SetFontColor(GreenTextColor);
+	SceneTotalLightCount->SetZOrder(0);
 	AddChildControl(SceneTotalLightCount);
 
 	SceneCulledLightCount = new ZEUILabel();
@@ -395,6 +403,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	SceneCulledLightCount->SetPosition(ZEVector2(155.0f, 100.0f));
 	SceneCulledLightCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	SceneCulledLightCount->SetFontColor(GreenTextColor);
+	SceneCulledLightCount->SetZOrder(0);
 	AddChildControl(SceneCulledLightCount);
 
 	SceneDrawedLightCount = new ZEUILabel();
@@ -403,6 +412,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	SceneDrawedLightCount->SetPosition(ZEVector2(310.0f, 100.0f));
 	SceneDrawedLightCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	SceneDrawedLightCount->SetFontColor(GreenTextColor);
+	SceneDrawedLightCount->SetZOrder(0);
 	AddChildControl(SceneDrawedLightCount);
 
 	//Model Statistics
@@ -414,6 +424,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	ModelStatisticsDescription->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	ModelStatisticsDescription->SetFontColor(RedTextColor);
 	ModelStatisticsDescription->SetText("- Model Statistics -");
+	ModelStatisticsDescription->SetZOrder(0);
 	AddChildControl(ModelStatisticsDescription);
 
 	ModelTotalMeshCount = new ZEUILabel();
@@ -422,6 +433,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	ModelTotalMeshCount->SetPosition(ZEVector2(0.0f, 150.0f));
 	ModelTotalMeshCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	ModelTotalMeshCount->SetFontColor(GreenTextColor);
+	ModelTotalMeshCount->SetZOrder(0);
 	AddChildControl(ModelTotalMeshCount);
 
 	ModelCulledMeshCount = new ZEUILabel();
@@ -430,6 +442,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	ModelCulledMeshCount->SetPosition(ZEVector2(155.0f, 150.0f));
 	ModelCulledMeshCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	ModelCulledMeshCount->SetFontColor(GreenTextColor);
+	ModelCulledMeshCount->SetZOrder(0);
 	AddChildControl(ModelCulledMeshCount);
 
 	ModelDrawnMeshCount = new ZEUILabel();
@@ -438,6 +451,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	ModelDrawnMeshCount->SetPosition(ZEVector2(310.0f, 150.0f));
 	ModelDrawnMeshCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	ModelDrawnMeshCount->SetFontColor(GreenTextColor);
+	ModelDrawnMeshCount->SetZOrder(0);
 	AddChildControl(ModelDrawnMeshCount);
 
 	// Renderer Statistics
@@ -449,6 +463,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	RendererStatisticsDescription->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	RendererStatisticsDescription->SetFontColor(RedTextColor);
 	RendererStatisticsDescription->SetText("- Renderer Statistics -");
+	RendererStatisticsDescription->SetZOrder(0);
 	AddChildControl(RendererStatisticsDescription);
 
 	RendererMeshCount = new ZEUILabel();
@@ -457,6 +472,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	RendererMeshCount->SetPosition(ZEVector2(0.0f, 200.0f));
 	RendererMeshCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	RendererMeshCount->SetFontColor(GreenTextColor);
+	RendererMeshCount->SetZOrder(0);
 	AddChildControl(RendererMeshCount);
 
 	RendererInstancedMeshCount = new ZEUILabel();
@@ -465,6 +481,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	RendererInstancedMeshCount->SetPosition(ZEVector2(155.0f, 200.0f));
 	RendererInstancedMeshCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	RendererInstancedMeshCount->SetFontColor(GreenTextColor);
+	RendererInstancedMeshCount->SetZOrder(0);
 	AddChildControl(RendererInstancedMeshCount);
 
 	RendererStageCount = new ZEUILabel();
@@ -473,6 +490,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	RendererStageCount->SetPosition(ZEVector2(310.0f, 200.0f));
 	RendererStageCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	RendererStageCount->SetFontColor(GreenTextColor);
+	RendererStageCount->SetZOrder(0);
 	AddChildControl(RendererStageCount);
 
 	RendererPostProcessorCount = new ZEUILabel();
@@ -481,6 +499,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	RendererPostProcessorCount->SetPosition(ZEVector2(465.0f, 200.0f));
 	RendererPostProcessorCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	RendererPostProcessorCount->SetFontColor(GreenTextColor);
+	RendererPostProcessorCount->SetZOrder(0);
 	AddChildControl(RendererPostProcessorCount);
 
 	RendererPrimitiveCount = new ZEUILabel();
@@ -489,6 +508,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	RendererPrimitiveCount->SetPosition(ZEVector2(0.0f, 225.0f));
 	RendererPrimitiveCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	RendererPrimitiveCount->SetFontColor(GreenTextColor);
+	RendererPrimitiveCount->SetZOrder(0);
 	AddChildControl(RendererPrimitiveCount);
 
 	RendererMinBatchCount = new ZEUILabel();
@@ -497,6 +517,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	RendererMinBatchCount->SetPosition(ZEVector2(155.0f, 225.0f));
 	RendererMinBatchCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	RendererMinBatchCount->SetFontColor(GreenTextColor);
+	RendererMinBatchCount->SetZOrder(0);
 	AddChildControl(RendererMinBatchCount);
 
 	RendererMaxBatchCount = new ZEUILabel();
@@ -505,6 +526,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	RendererMaxBatchCount->SetPosition(ZEVector2(310.0f, 225.0f));
 	RendererMaxBatchCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	RendererMaxBatchCount->SetFontColor(GreenTextColor);
+	RendererMaxBatchCount->SetZOrder(0);
 	AddChildControl(RendererMaxBatchCount);
 
 	RendererAvgBatchCount = new ZEUILabel();
@@ -513,6 +535,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	RendererAvgBatchCount->SetPosition(ZEVector2(465.0f, 225.0f));
 	RendererAvgBatchCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	RendererAvgBatchCount->SetFontColor(GreenTextColor);
+	RendererAvgBatchCount->SetZOrder(0);
 	AddChildControl(RendererAvgBatchCount);
 
 	RendererVertexCount = new ZEUILabel();
@@ -521,6 +544,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	RendererVertexCount->SetPosition(ZEVector2(0.0f, 250.0f));
 	RendererVertexCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	RendererVertexCount->SetFontColor(GreenTextColor);
+	RendererVertexCount->SetZOrder(0);
 	AddChildControl(RendererVertexCount);
 
 	RendererDrawCallCount = new ZEUILabel();
@@ -529,6 +553,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	RendererDrawCallCount->SetPosition(ZEVector2(155.0f, 250.0f));
 	RendererDrawCallCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	RendererDrawCallCount->SetFontColor(GreenTextColor);
+	RendererDrawCallCount->SetZOrder(0);
 	AddChildControl(RendererDrawCallCount);
 
 	RendererDrawPrimitiveCount = new ZEUILabel();
@@ -537,6 +562,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	RendererDrawPrimitiveCount->SetPosition(ZEVector2(310.0f, 250.0f));
 	RendererDrawPrimitiveCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	RendererDrawPrimitiveCount->SetFontColor(GreenTextColor);
+	RendererDrawPrimitiveCount->SetZOrder(0);
 	AddChildControl(RendererDrawPrimitiveCount);
 
 	//Graphics Statistics
@@ -548,6 +574,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsStatisticsDescription->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsStatisticsDescription->SetFontColor(RedTextColor);
 	GraphicsStatisticsDescription->SetText("- Graphics Statistics -");
+	GraphicsStatisticsDescription->SetZOrder(0);
 	AddChildControl(GraphicsStatisticsDescription);
 
 	GraphicsVertexBufferCount = new ZEUILabel();
@@ -556,6 +583,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsVertexBufferCount->SetPosition(ZEVector2(0.0f, 300.0f));
 	GraphicsVertexBufferCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsVertexBufferCount->SetFontColor(GreenTextColor);
+	GraphicsVertexBufferCount->SetZOrder(0);
 	AddChildControl(GraphicsVertexBufferCount);
 
 	GraphicsVertexDeclarationCount = new ZEUILabel();
@@ -564,6 +592,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsVertexDeclarationCount->SetPosition(ZEVector2(155.0f, 300.0f));
 	GraphicsVertexDeclarationCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsVertexDeclarationCount->SetFontColor(GreenTextColor);
+	GraphicsVertexDeclarationCount->SetZOrder(0);
 	AddChildControl(GraphicsVertexDeclarationCount);
 
 	GraphicsTotalVertexBufferSize = new ZEUILabel();
@@ -572,6 +601,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsTotalVertexBufferSize->SetPosition(ZEVector2(340.0f, 300.0f));
 	GraphicsTotalVertexBufferSize->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsTotalVertexBufferSize->SetFontColor(GreenTextColor);
+	GraphicsTotalVertexBufferSize->SetZOrder(0);
 	AddChildControl(GraphicsTotalVertexBufferSize);
 
 	GraphicsShaderCount = new ZEUILabel();
@@ -580,6 +610,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsShaderCount->SetPosition(ZEVector2(0.0f, 325.0f));
 	GraphicsShaderCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsShaderCount->SetFontColor(GreenTextColor);
+	GraphicsShaderCount->SetZOrder(0);
 	AddChildControl(GraphicsShaderCount);
 
 	GraphicsTextureCount = new ZEUILabel();
@@ -588,6 +619,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsTextureCount->SetPosition(ZEVector2(0.0f, 350.0f));
 	GraphicsTextureCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsTextureCount->SetFontColor(GreenTextColor);
+	GraphicsTextureCount->SetZOrder(0);
 	AddChildControl(GraphicsTextureCount);
 
 	GraphicsTexture2DCount = new ZEUILabel();
@@ -596,6 +628,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsTexture2DCount->SetPosition(ZEVector2(155.0f, 350.0f));
 	GraphicsTexture2DCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsTexture2DCount->SetFontColor(GreenTextColor);
+	GraphicsTexture2DCount->SetZOrder(0);
 	AddChildControl(GraphicsTexture2DCount);
 
 	GraphicsTexture3DCount = new ZEUILabel();
@@ -604,6 +637,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsTexture3DCount->SetPosition(ZEVector2(310.0f, 350.0f));
 	GraphicsTexture3DCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsTexture3DCount->SetFontColor(GreenTextColor);
+	GraphicsTexture3DCount->SetZOrder(0);
 	AddChildControl(GraphicsTexture3DCount);
 
 	GraphicsTextureCubeCount = new ZEUILabel();
@@ -612,6 +646,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsTextureCubeCount->SetPosition(ZEVector2(465.0f, 350.0f));
 	GraphicsTextureCubeCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsTextureCubeCount->SetFontColor(GreenTextColor);
+	GraphicsTextureCubeCount->SetZOrder(0);
 	AddChildControl(GraphicsTextureCubeCount);
 
 	GraphicsTotalTextureSize = new ZEUILabel();
@@ -620,6 +655,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsTotalTextureSize->SetPosition(ZEVector2(620.0f, 350.0f));
 	GraphicsTotalTextureSize->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsTotalTextureSize->SetFontColor(GreenTextColor);
+	GraphicsTotalTextureSize->SetZOrder(0);
 	AddChildControl(GraphicsTotalTextureSize);
 
 	GraphicsRenderTargetCount = new ZEUILabel();
@@ -628,6 +664,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsRenderTargetCount->SetPosition(ZEVector2(0.0f, 375.0f));
 	GraphicsRenderTargetCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsRenderTargetCount->SetFontColor(GreenTextColor);
+	GraphicsRenderTargetCount->SetZOrder(0);
 	AddChildControl(GraphicsRenderTargetCount);
 
 	GraphicsTotalRenderTargetSize = new ZEUILabel();
@@ -636,6 +673,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsTotalRenderTargetSize->SetPosition(ZEVector2(155.0f, 375.0f));
 	GraphicsTotalRenderTargetSize->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsTotalRenderTargetSize->SetFontColor(GreenTextColor);
+	GraphicsTotalRenderTargetSize->SetZOrder(0);
 	AddChildControl(GraphicsTotalRenderTargetSize);
 
 	GraphicsDepthBufferCount = new ZEUILabel();
@@ -644,6 +682,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsDepthBufferCount->SetPosition(ZEVector2(340.0f, 375.0f));
 	GraphicsDepthBufferCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsDepthBufferCount->SetFontColor(GreenTextColor);
+	GraphicsDepthBufferCount->SetZOrder(0);
 	AddChildControl(GraphicsDepthBufferCount);
 
 	GraphicsTotalDepthBufferSize = new ZEUILabel();
@@ -652,6 +691,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	GraphicsTotalDepthBufferSize->SetPosition(ZEVector2(525.0f, 375.0f));
 	GraphicsTotalDepthBufferSize->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	GraphicsTotalDepthBufferSize->SetFontColor(GreenTextColor);
+	GraphicsTotalDepthBufferSize->SetZOrder(0);
 	AddChildControl(GraphicsTotalDepthBufferSize);
 
 	// Particle Statistics
@@ -663,6 +703,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	ParticleStatisticsDescription->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	ParticleStatisticsDescription->SetFontColor(RedTextColor);
 	ParticleStatisticsDescription->SetText("- Particle Statistics -");
+	ParticleStatisticsDescription->SetZOrder(0);
 	AddChildControl(ParticleStatisticsDescription);
 
 	ParticleEmitterCount = new ZEUILabel();
@@ -671,6 +712,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	ParticleEmitterCount->SetPosition(ZEVector2(0.0f, 425.0f));
 	ParticleEmitterCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	ParticleEmitterCount->SetFontColor(GreenTextColor);
+	ParticleEmitterCount->SetZOrder(0);
 	AddChildControl(ParticleEmitterCount);
 
 	ParticleTotalParticleCount = new ZEUILabel();
@@ -679,6 +721,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	ParticleTotalParticleCount->SetPosition(ZEVector2(155.0f, 425.0f));
 	ParticleTotalParticleCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	ParticleTotalParticleCount->SetFontColor(GreenTextColor);
+	ParticleTotalParticleCount->SetZOrder(0);
 	AddChildControl(ParticleTotalParticleCount);
 
 	ParticleDrawedParticleCount = new ZEUILabel();
@@ -687,6 +730,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	ParticleDrawedParticleCount->SetPosition(ZEVector2(340.0f, 425.0f));
 	ParticleDrawedParticleCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	ParticleDrawedParticleCount->SetFontColor(GreenTextColor);
+	ParticleDrawedParticleCount->SetZOrder(0);
 	AddChildControl(ParticleDrawedParticleCount);
 
 	// Interior Statistics
@@ -698,6 +742,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	InteriorStatisticsDescription->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	InteriorStatisticsDescription->SetFontColor(RedTextColor);
 	InteriorStatisticsDescription->SetText("- Interior Statistics -");
+	InteriorStatisticsDescription->SetZOrder(0);
 	AddChildControl(InteriorStatisticsDescription);
 
 	InteriorTotalRoomCount = new ZEUILabel();
@@ -706,6 +751,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	InteriorTotalRoomCount->SetPosition(ZEVector2(0.0f, 475.0f));
 	InteriorTotalRoomCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	InteriorTotalRoomCount->SetFontColor(GreenTextColor);
+	InteriorTotalRoomCount->SetZOrder(0);
 	AddChildControl(InteriorTotalRoomCount);
 
 	InteriorCulledRoomCount = new ZEUILabel();
@@ -714,6 +760,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	InteriorCulledRoomCount->SetPosition(ZEVector2(155.0f, 475.0f));
 	InteriorCulledRoomCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	InteriorCulledRoomCount->SetFontColor(GreenTextColor);
+	InteriorCulledRoomCount->SetZOrder(0);
 	AddChildControl(InteriorCulledRoomCount);
 
 	InteriorDrawedRoomCount = new ZEUILabel();
@@ -722,6 +769,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	InteriorDrawedRoomCount->SetPosition(ZEVector2(310.0f, 475.0f));
 	InteriorDrawedRoomCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	InteriorDrawedRoomCount->SetFontColor(GreenTextColor);
+	InteriorDrawedRoomCount->SetZOrder(0);
 	AddChildControl(InteriorDrawedRoomCount);
 
 	InteriorTotalDoorCount = new ZEUILabel();
@@ -730,6 +778,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	InteriorTotalDoorCount->SetPosition(ZEVector2(0.0f, 500.0f));
 	InteriorTotalDoorCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	InteriorTotalDoorCount->SetFontColor(GreenTextColor);
+	InteriorTotalDoorCount->SetZOrder(0);
 	AddChildControl(InteriorTotalDoorCount);
 
 	InteriorSeenDoorCount = new ZEUILabel();
@@ -738,6 +787,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	InteriorSeenDoorCount->SetPosition(ZEVector2(155.0f, 500.0f));
 	InteriorSeenDoorCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	InteriorSeenDoorCount->SetFontColor(GreenTextColor);
+	InteriorSeenDoorCount->SetZOrder(0);
 	AddChildControl(InteriorSeenDoorCount);
 
 	InteriorTotalPolygonCount = new ZEUILabel();
@@ -746,6 +796,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	InteriorTotalPolygonCount->SetPosition(ZEVector2(0.0f, 525.0f));
 	InteriorTotalPolygonCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	InteriorTotalPolygonCount->SetFontColor(GreenTextColor);
+	InteriorTotalPolygonCount->SetZOrder(0);
 	AddChildControl(InteriorTotalPolygonCount);
 
 	InteriorCulledPolygonCount = new ZEUILabel();
@@ -754,6 +805,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	InteriorCulledPolygonCount->SetPosition(ZEVector2(205.0f, 525.0f));
 	InteriorCulledPolygonCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	InteriorCulledPolygonCount->SetFontColor(GreenTextColor);
+	InteriorCulledPolygonCount->SetZOrder(0);
 	AddChildControl(InteriorCulledPolygonCount);
 
 	InteriorDrawedPolygonCount = new ZEUILabel();
@@ -762,20 +814,20 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	InteriorDrawedPolygonCount->SetPosition(ZEVector2(410.0f, 525.0f));
 	InteriorDrawedPolygonCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
 	InteriorDrawedPolygonCount->SetFontColor(GreenTextColor);
+	InteriorDrawedPolygonCount->SetZOrder(0);
 	AddChildControl(InteriorDrawedPolygonCount);
 
 	this->SetHeight(600.0f);
 	this->SetWidth(900.0f);
 
-// 	int WindowWidth = 0;
-// 	int WindowHeight = 0;
+// 	ZEInt32 WindowWidth = 0;
+// 	ZEInt32 WindowHeight = 0;
 // 	zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);
 //	WindowWidth - GetWidth()
 
 	this->SetPosition(ZEVector2(3.0f, 0.0f));
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_VISIBILITY, ZEInputEvent("Keyboard", ZE_IKB_F1, ZE_IBS_PRESSED)));
-	
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_F1, ZE_IS_PRESSED, ACTIONID_VISIBILITY);
 }
 	
 	

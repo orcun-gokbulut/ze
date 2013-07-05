@@ -42,7 +42,52 @@
 #include "ZECore/ZEOptionSection.h"
 #include "ZETexture/ZETextureOptions.h"
 
+#define ZE_DESTROY(x)		\
+{							\
+	if ((x) != NULL)		\
+	{						\
+		(x)->Destroy();		\
+		(x) = NULL;			\
+	}						\
+}
+
 #define zeGraphics ZEGraphicsModule::GetInstance()
+
+struct ZEGraphicsStatistics
+{
+	ZEUInt16	ShaderCount;
+	ZESize		ShaderSize;
+
+	ZEUInt16	Texture2DCount;
+	ZESize		Texture2DSize;
+
+	ZEUInt16	Texture3DCount;
+	ZESize		Texture3DSize;
+
+	ZEUInt16	TextureCubeCount;
+	ZESize		TextureCubeSize;
+
+	ZEUInt16	DepthStancilBufferCount;
+	ZESize		DepthStancilBufferSize;
+
+	ZEUInt16	IndexBufferCount;
+	ZESize		IndexBufferSize;
+
+	ZEUInt16	VertexBufferCount;
+	ZESize		VertexBufferSize;
+
+	ZEUInt16	ConstantBufferCount;
+	ZESize		ConstantBufferSize;	
+
+	ZEUInt16	RenderTargetCount;
+
+	ZEUInt16	BlendStateCount;
+	ZEUInt16	SamplerStateCount;
+	ZEUInt16	DepthStencilCount;
+	ZEUInt16	RasterizerCount;
+	ZEUInt16	VertexLayoutCount;
+	ZEUInt16	StatesPerSecond;
+};
 
 class ZEShader;
 class ZEStatePool;
@@ -60,18 +105,11 @@ class ZEConstantBuffer;
 class ZEDepthStencilBuffer;
 class ZEGraphicsEventTracer;
 
-#define ZE_DESTROY(x)		\
-{							\
-	if ((x) != NULL)		\
-	{						\
-		(x)->Destroy();		\
-		(x) = NULL;			\
-	}						\
-}
-
 class ZEGraphicsModule : public ZEModule
 {
 	ZE_MODULE(ZEGraphicsModule)
+
+	friend class ZEGraphicsDevice;
 
 	protected:
 		bool							FullScreen;
@@ -81,7 +119,7 @@ class ZEGraphicsModule : public ZEModule
 		ZEUInt							SampleCount;
 		ZEUInt							SampleQuality;
 		ZEUInt							AnisotropicFilter;
-		
+
 		ZEUInt							ScreenCount;
 		ZEArray<ZEViewport>				Viewports;
 		ZEArray<ZEScissorRectangle>		ScissorRects;
@@ -116,8 +154,9 @@ class ZEGraphicsModule : public ZEModule
 
 		virtual void					SetAnisotropicFilter(ZEUInt Anisotropy) = 0;
 		ZEUInt							GetAnisotropicFilter() const;
-
+		
 		virtual bool					SetScreenSize(ZEUInt WindowWidth, ZEUInt WindowHeight) = 0;
+		ZEVector2						GetScreenSize() const;
 		ZEUInt							GetScreenWidth() const;
 		ZEUInt							GetScreenHeight() const;
 
@@ -125,6 +164,8 @@ class ZEGraphicsModule : public ZEModule
 		const ZEScissorRectangle&		GetScissorRectangle(ZESize Index = 0) const;
 		const ZERenderTarget*			GetFrameBuffer(ZESize Index = 0) const;
 		const ZEDepthStencilBuffer*		GetDepthBuffer(ZESize Index = 0) const;
+
+		virtual void					GetStatistics(ZEGraphicsStatistics& Statistics) const = 0;
 
 		virtual ZEGraphicsDevice*		GetDevice() const = 0;
 		virtual ZEStatePool*			GetStatePool() const = 0;
@@ -138,9 +179,6 @@ class ZEGraphicsModule : public ZEModule
 		virtual ZEVertexBuffer*			CreateVertexBuffer() const = 0;
 		virtual ZEConstantBuffer*		CreateConstantBuffer() const = 0;
 		virtual ZEDepthStencilBuffer*	CreateDepthStencilBuffer() const = 0;
-
-		virtual bool					Initialize() = 0;
-		virtual void					Deinitialize() = 0;
 
 		static ZEGraphicsModule*		GetInstance();
 };

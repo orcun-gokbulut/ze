@@ -36,10 +36,17 @@
 macro (ze_configure_init)
 	SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
-	include(build_dir_check)
-	include(parse_arguments)
-	include(ze_functions)
-
+	include(External/build_dir_check)
+	include(External/parse_arguments)
+	include(ze_check)
+	include(ze_common)
+	include(ze_dependency)
+	include(ze_utility)
+	include(ze_target)
+	include(ze_platform)
+	include(ze_version)
+	include(ze_external)
+	include(ze_merge_libraries)
 	macro_ensure_out_of_source_build("[ZEBuild] Error : Project requires an out of source build.")
 endmacro()
 
@@ -55,15 +62,15 @@ macro (ze_configure_version)
 	set(ZEBUILD_VERSION_INTERNAL ${VERSION_INTERNAL})
 	set(ZEBUILD_VERSION_BUILD ${VERSION_REVISION})
 	set(ZEBUILD_VERSION_BRANCH_NAME ${VERSION_BRANCH_NAME})
-	message(STATUS "[ZEBuild] Version information has been collected.")
-	message(STATUS "")
 
-	message(STATUS "[ZEBuild] Version           : " "v${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}.${ZEBUILD_VERSION_INTERNAL} Build ${ZEBUILD_VERSION_BUILD}")
-	message(STATUS "[ZEBuild] Major Version     : " ${ZEBUILD_VERSION_MAJOR})
-	message(STATUS "[ZEBuild] Minor Version     : " ${ZEBUILD_VERSION_MINOR})
-	message(STATUS "[ZEBuild] Internal Version  : " ${ZEBUILD_VERSION_INTERNAL})
-	message(STATUS "[ZEBuild] Build             : " ${ZEBUILD_VERSION_BUILD})
-	message(STATUS "[ZEBuild] Branch Name       : " ${ZEBUILD_VERSION_BRANCH_NAME})
+
+	message(STATUS "[ZEBuild] Version           : v${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}.${ZEBUILD_VERSION_INTERNAL} Build ${ZEBUILD_VERSION_BUILD}")
+	message(STATUS "[ZEBuild] Major Version     : ${ZEBUILD_VERSION_MAJOR}")
+	message(STATUS "[ZEBuild] Minor Version     : ${ZEBUILD_VERSION_MINOR}")
+	message(STATUS "[ZEBuild] Internal Version  : ${ZEBUILD_VERSION_INTERNAL}")
+	message(STATUS "[ZEBuild] Build             : ${ZEBUILD_VERSION_BUILD}")
+	message(STATUS "[ZEBuild] Branch Name       : ${ZEBUILD_VERSION_BRANCH_NAME}")
+	message(STATUS "[ZEBuild] Version information has been collected.")
 	message(STATUS "")
 	message(STATUS "")
 	
@@ -88,7 +95,7 @@ macro (ze_configure_platform)
 	elseif (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" OR ${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD") 
 		set(ZEBUILD_PLATFORM "BSD")
 	else()
-		message(SEND_ERROR "[ZEBuild] Error: Platform is not supported. Operating System : ${CMAKE_SYSTEM_NAME}, Achitecture : ${CMAKE_SYSTEM_PROCESSOR}, Compiler : ${CMAKE_CXX_COMPILER}")
+		message(FATAL_ERROR "[ZEBuild] Error: Platform is not supported. Operating System : ${CMAKE_SYSTEM_NAME}, Achitecture : ${CMAKE_SYSTEM_PROCESSOR}, Compiler : ${CMAKE_CXX_COMPILER}")
 	endif()
 	
 	if (ZEBUILD_PLATFORM MATCHES "MacOSX")
@@ -127,12 +134,14 @@ macro (ze_configure_platform)
 			set(ZEBUILD_PLATFORM_WORD_SIZE "64")
 		endif()
 	
-		if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_32" OR
-			${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86" OR
-			${CMAKE_SYSTEM_PROCESSOR} MATCHES "i386" OR
-			${CMAKE_SYSTEM_PROCESSOR} MATCHES "i486" OR
-			${CMAKE_SYSTEM_PROCESSOR} MATCHES "i586" OR
-			${CMAKE_SYSTEM_PROCESSOR} MATCHES "i686")
+
+		if (WIN32 OR
+		    (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_32") OR
+			(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86") OR
+			(${CMAKE_SYSTEM_PROCESSOR} MATCHES "i386") OR
+			(${CMAKE_SYSTEM_PROCESSOR} MATCHES "i486") OR
+			(${CMAKE_SYSTEM_PROCESSOR} MATCHES "i586") OR
+			(${CMAKE_SYSTEM_PROCESSOR} MATCHES "i686"))
 			if (${ZEBUILD_PLATFORM_WORD_SIZE} MATCHES "32")
 				set(ZEBUILD_PLATFORM_ARCHITECTURE "x86")
 			else()
@@ -181,31 +190,6 @@ macro (ze_configure_platform)
 		set(ZEBUILD_PLATFORM_UNIX TRUE)
 	endif()
 		
-	message(STATUS "[ZEBuild] Platform has been detected.")
-	message(STATUS "")
-
-	message(STATUS "[ZEBuild] Platform      : " ${ZEBUILD_PLATFORM})
-	if (ZEBUILD_PLATFORM_WINDOWS)
-		message(STATUS "[ZEBuild] Base Platform : Windows")
-	endif()
-	if (ZEBUILD_PLATFORM_LINUX)
-		message(STATUS "[ZEBuild] Base Platform : Linux")
-	endif()
-	if (ZEBUILD_PLATFORM_DARWIN)
-		message(STATUS "[ZEBuild] Base Platform : Darwin")
-	endif()
-	if (ZEBUILD_PLATFORM_BSD)
-		message(STATUS "[ZEBuild] Base Platform : BSD")
-	endif()
-	if (ZEBUILD_PLATFORM_UNIX)
-		message(STATUS "[ZEBuild] Base Platform : Unix")
-	endif()
-	message(STATUS "[ZEBuild] Architecture  : " ${ZEBUILD_PLATFORM_ARCHITECTURE})
-	message(STATUS "[ZEBuild] Word Size     : " ${ZEBUILD_PLATFORM_WORD_SIZE})
-	message(STATUS "[ZEBuild] Endianness    : " ${ZEBUILD_PLATFORM_ENDIANNESS})
-	message(STATUS "[ZEBuild] Compiler      : " ${ZEBUILD_PLATFORM_COMPILER})
-	message(STATUS "")
-	message(STATUS "")
 
 	string(TOUPPER ${ZEBUILD_PLATFORM} TEMP)
 	set(ZEBUILD_PLATFORM_${TEMP} TRUE)
@@ -281,42 +265,92 @@ macro (ze_configure_platform)
 				ZE_PLATFORM_ARCHITECTURE_SSE3)
 		endif()
 	endif()
+	
+	if (ZEBUILD_PLATFORM_WINDOWS)
+		set(ZEBUILD_PLATFORM_DLL_EXTENSION "dll")
+		set(ZEBUILD_PLATFORM_LIB_EXTENSION "lib")
+		set(ZEBUILD_PLATFORM_BIN_EXTENSION "exe")
+	else (ZEBUILD_PLATFORM_UNIX)
+		set(ZEBUILD_PLATFORM_DLL_EXTENSION "so")
+		set(ZEBUILD_PLATFORM_LIB_EXTENSION "a")
+		set(ZEBUILD_PLATFORM_BIN_EXTENSION "")
+	endif()
+	
+	set(ZEBUILD_PLATFORM_NAME "${ZEBUILD_PLATFORM}-${ZEBUILD_PLATFORM_ARCHITECTURE}")
+	
+	message(STATUS "[ZEBuild] Platform      : ${ZEBUILD_PLATFORM}")
+	if (ZEBUILD_PLATFORM_WINDOWS)
+		message(STATUS "[ZEBuild] Base Platform : Windows")
+	endif()
+	if (ZEBUILD_PLATFORM_LINUX)
+		message(STATUS "[ZEBuild] Base Platform : Linux")
+	endif()
+	if (ZEBUILD_PLATFORM_DARWIN)
+		message(STATUS "[ZEBuild] Base Platform : Darwin")
+	endif()
+	if (ZEBUILD_PLATFORM_BSD)
+		message(STATUS "[ZEBuild] Base Platform : BSD")
+	endif()
+	if (ZEBUILD_PLATFORM_UNIX)
+		message(STATUS "[ZEBuild] Base Platform : Unix")
+	endif()
+	message(STATUS "[ZEBuild] Architecture  : ${ZEBUILD_PLATFORM_ARCHITECTURE}")
+	message(STATUS "[ZEBuild] Platform Name : ${ZEBUILD_PLATFORM_NAME}")
+	message(STATUS "[ZEBuild] Word Size     : ${ZEBUILD_PLATFORM_WORD_SIZE}")
+	message(STATUS "[ZEBuild] Endianness    : ${ZEBUILD_PLATFORM_ENDIANNESS}")
+	message(STATUS "[ZEBuild] Compiler      : ${ZEBUILD_PLATFORM_COMPILER}")
+	message(STATUS "[ZEBuild] Lib Extension : ${ZEBUILD_PLATFORM_LIB_EXTENSION}")
+	message(STATUS "[ZEBuild] DLL Extension : ${ZEBUILD_PLATFORM_DLL_EXTENSION}")
+	message(STATUS "[ZEBuild] Bin Extension : ${ZEBUILD_PLATFORM_BIN_EXTENSION}")
+	message(STATUS "[ZEBuild] Platform has been detected.")
+	message(STATUS "")
+	message(STATUS "")
 endmacro()
 
-macro (ze_configure_externals)
-	message(STATUS "[ZEBUILD] Checking externals...")
-	ze_check_externals("${CMAKE_SOURCE_DIR}/Platform" 0 0)
-	if (CHECK_EXTERNALS_RESULT EQUAL 1) # Not found
-		message(SEND_ERROR "[ZEBuild] Error: Could not dectect externals. Please check Platforms directory that you have the external.")
-	elseif (CHECK_EXTERNALS_RESULT EQUAL 2) # version Mismatch
-		message(SEND_ERROR "[ZEBuild] Error: Externals version is mismatched.")
-	endif() 
-	message(STATUS "[ZEBuild] Externals has been checked.")
-	message(STATUS "")
-
+macro (ze_configure_external)
+	message(STATUS "[ZEBUILD] Checking Externals...")
+	
+	if (NOT IS_DIRECTORY "${CMAKE_SOURCE_DIR}/External/${ZEBUILD_PLATFORM_NAME}")
+		message(WARNING "External/${ZEBUILD_PLATFORM_NAME} folder is missing.")
+		return()
+	endif()
+	
+	if ((NOT EXISTS "${CMAKE_SOURCE_DIR}/External/${ZEBUILD_PLATFORM_NAME}/CMakeLists.txt") AND (NOT IS_DIRECTORY "${CMAKE_SOURCE_DIR}/External/${ZEBUILD_PLATFORM_NAME}/CMakeLists.txt"))
+		message(WARNING "External/${ZEBUILD_PLATFORM_NAME}/CMakeLists.txt file is missing.")
+		return()
+	endif()
+	
 	ze_get_version(${CMAKE_SOURCE_DIR})
 	ze_get_version_revision_number(${CMAKE_SOURCE_DIR})
 
-	message(STATUS "[ZEBuild] Externals Version             : " "v${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_INTERNAL} Build ${VERSION_BUILD}")
-	message(STATUS "[ZEBuild] Externals Major Version       : " ${VERSION_MAJOR})
-	message(STATUS "[ZEBuild] Externals Minor Version       : " ${VERSION_MINOR})
-	message(STATUS "[ZEBuild] Externals Internal Version    : " ${VERSION_INTERNAL})
-	message(STATUS "[ZEBuild] Externals Build               : " ${VERSION_BUILD})
-	message(STATUS "")
-	message(STATUS "")
+	message(STATUS "[ZEBuild] External Version             : " "v${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_INTERNAL} Build ${VERSION_BUILD}")
+	message(STATUS "[ZEBuild] External Major Version       : " ${VERSION_MAJOR})
+	message(STATUS "[ZEBuild] External Minor Version       : " ${VERSION_MINOR})
+	message(STATUS "[ZEBuild] External Internal Version    : " ${VERSION_INTERNAL})
+	message(STATUS "[ZEBuild] External Build               : " ${VERSION_BUILD})
 	
-    set(ZEBUILD_EXTERNAL_PATH ${CMAKE_SOURCE_DIR}/Platform/${ZEBUILD_PLATFORM}/${ZEBUILD_PLATFORM_ARCHITECTURE})
-	set(ZEBUILD_INCLUDE_PATH ${ZEBUILD_EXTERNAL_PATH}/Include)
-	set(ZEBUILD_LIB_PATH ${ZEBUILD_EXTERNAL_PATH}/Lib)
-	set(ZEBUILD_DLL_PATH ${ZEBUILD_EXTERNAL_PATH}/Dll)
-	set(ZEBUILD_TOOL_PATH ${ZEBUILD_EXTERNAL_PATH}/Tool)
-	
-	include_directories(
-		${ZEBUILD_INCLUDE_PATH})
+	set(ZEBUILD_EXTERNALS_DISABLE_VERSION_CHECK FALSE CACHE BOOL "Disables external version check.")
+	if (NOT ZEBUILD_EXTERNALS_DISABLE_VERSION_CHECK)
+		if (NOT (VERSION_MAJOR EQUAL ZEBUILD_VERSION_MAJOR))
+			message(FATAL_ERROR "[ZEBuild] Error : External major version mismatch.")
+		endif()
 		
-	link_directories(
-		${ZEBUILD_LIB_PATH}
-		${ZEBUILD_LIB_PATH}/$(ConfigurationName))
+		if (NOT (VERSION_MINOR EQUAL ZEBUILD_VERSION_MINOR))
+			message(WARNING "[ZEBuild] Error : External minor version mismatch.")
+		endif()
+	endif()
+	
+    set(ZEBUILD_EXTERNALS_PATH "${CMAKE_SOURCE_DIR}/External/${ZEBUILD_PLATFORM_NAME}")
+	
+	message(STATUS "[ZEBuild] Externals has been checked.")
+	message(STATUS "")
+	message(STATUS "")
+	
+	message(STATUS "[ZEBuild] Initializing Externals...")
+	add_subdirectory(${ZEBUILD_EXTERNALS_PATH})
+	message(STATUS "[ZEBuild] Externals initialized.")
+	message(STATUS "")
+	message(STATUS "")
 endmacro()
 
 macro (ze_configure_debugging)
@@ -352,7 +386,7 @@ macro(ze_configure_unit_tests)
 	endif()
 	
 	if (ZEBUILD_UNIT_TESTS_ENABLE AND ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE)
-		include(test_cocoon)
+		include(External/test_cocoon)
 	endif()
 endmacro()
 
@@ -362,11 +396,11 @@ macro(ze_configure_static_checks)
 	set(ZEBUILD_STATIC_CHECKS_ENABLE_PCLINT   FALSE CACHE BOOL "Enable pc-lint static checker.")
 	
 	if (ZEBUILD_STATIC_CHECKS_ENABLE AND ZEBUILD_STATIC_CHECKS_ENABLE_CPPCHECK)
-		include(cppcheck.cmake)
+		include(External/cppcheck.cmake)
 	endif()
 
 	if (ZEBUILD_STATIC_CHECKS_ENABLE AND ZEBUILD_STATIC_CHECKS_ENABLE_PCLINT)
-		include(pc-lint.cmake)
+		include(External/pc-lint.cmake)
 	endif()
 endmacro()
 

@@ -45,20 +45,16 @@
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEGraphics/ZEVertexLayout.h"
+#include "ZEFoundation/ZEPacking.h"
 
-class ZECanvasVertex
+ZEPackStruct(
+struct ZECanvasVertex
 {
-	private:
-		static ZEVertexLayout			Layout;
-	
-	public:
-		ZEVector3						Position;
-		ZEVector3						Normal;		
-		ZEVector2						Texcoord;
-		ZEVector4						Color;
-
-		static const ZEVertexLayout&	GetVertexLayout();
-};
+	ZEVector3			Position;
+	ZEVector3			Normal;		
+	ZEVector2			Texcoord;
+	ZEVector4			Color;
+};)
 
 class ZEVertexBuffer;
 
@@ -133,16 +129,16 @@ class ZECanvas
 		void							Clean();
 		bool							IsEmpty() const;
 
+		virtual void*					GetVertices() const;
 		virtual ZESize					GetBufferSize() const;
-		virtual void*					GetVertexBuffer() const;
 		
+		ZEVertexBuffer*					CreateStaticVertexBuffer() const;
+
 		void							CalculateBoundingBox(ZEAABBox& BoundingBox);
 
-		ZEVertexBuffer*					CreateStaticVertexBuffer();
-
-		bool							LoadFromFile(const ZEString& FileName);
 		void							SaveToFile(const ZEString& FileName);
-
+		bool							LoadFromFile(const ZEString& FileName);
+		
 										ZECanvas();
 		virtual							~ZECanvas();
 

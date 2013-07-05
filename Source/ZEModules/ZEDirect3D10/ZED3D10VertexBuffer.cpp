@@ -74,6 +74,14 @@ bool ZED3D10VertexBuffer::CreateDynamic(ZEUInt VertexCount, ZESize VertexSize, c
 	this->VertexCount = VertexCount;
 	this->BufferSize = VertexCount * VertexSize;
 	
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Dynamic vertex buffer created. BufferSize: %u, VertexCount: %u, VertexSize: %u", 
+			VertexCount * (UINT)VertexSize, VertexCount, (UINT)VertexSize);
+#endif
+
+	GlobalCount++;
+	GlobalSize += BufferSize;
+
 	return true;
 }
 
@@ -108,6 +116,14 @@ bool ZED3D10VertexBuffer::CreateStatic(ZEUInt VertexCount, ZESize VertexSize, co
 	this->VertexCount = VertexCount;
 	this->BufferSize = VertexCount * VertexSize;
 	
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Static vertex buffer created. BufferSize: %u, VertexCount: %u, VertexSize: %u", 
+			VertexCount * (UINT)VertexSize, VertexCount, (UINT)VertexSize);
+#endif
+
+	GlobalCount++;
+	GlobalSize += BufferSize;
+
 	return true;
 }
 
@@ -134,6 +150,9 @@ bool ZED3D10VertexBuffer::Unlock()
 	return true;
 }
 
+ZESize		ZED3D10VertexBuffer::GlobalSize = 0;
+ZEUInt16	ZED3D10VertexBuffer::GlobalCount = 0;
+
 ZED3D10VertexBuffer::ZED3D10VertexBuffer()
 {
 	D3D10Buffer = NULL;
@@ -142,6 +161,9 @@ ZED3D10VertexBuffer::ZED3D10VertexBuffer()
 ZED3D10VertexBuffer::~ZED3D10VertexBuffer()
 {
 	ZED3D_RELEASE(D3D10Buffer);
+
+	GlobalSize -= BufferSize;
+	GlobalCount--;	
 }
 
 

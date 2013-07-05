@@ -56,7 +56,7 @@ void ZEInterior::LoadInteriorResource(ZEInteriorResource* NewResource)
 {
 	if (Resource != NULL)
 	{
-		Resource->Release();
+		Resource->Destroy();
 		Resource = NULL;
 	}
 
@@ -111,7 +111,7 @@ ZEInterior::ZEInterior()
 
 ZEInterior::~ZEInterior()
 {
-	Deinitialize();
+
 }
 
 const ZEArray<ZEInteriorRoom*>& ZEInterior::GetRooms()
@@ -160,9 +160,9 @@ const ZEInteriorStatistics& ZEInterior::GetStatistics() const
 	return Statistics;
 }
 
-bool ZEInterior::Initialize()
+bool ZEInterior::InitializeSelf()
 {
-	if (GetInitialized())
+	if (!ZEEntity::InitializeSelf())
 		return false;
 
 	if (InteriorFile != "")
@@ -177,25 +177,25 @@ bool ZEInterior::Initialize()
 		}
 	}
 
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZEInterior::Deinitialize()
+bool ZEInterior::DeinitializeSelf()
 {
 	if (Resource != NULL)
 	{
-		Resource->Release();
+		Resource->Destroy();
 		Resource = NULL;
 	}
 
-	ZEEntity::Deinitialize();
+	return ZEEntity::DeinitializeSelf();
 }
 
 bool ZEInterior::SetInteriorFile(const ZEString& FileName)
 {
 	InteriorFile = FileName;
 
-	if (!GetInitialized())
+	if (!IsInitialized())
 	{
 		InteriorFile = FileName;
 		return true;

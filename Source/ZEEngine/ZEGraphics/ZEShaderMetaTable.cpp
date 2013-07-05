@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEShaderMetaTable.h"
+#include "ZEDS/ZEHashGenerator.h"
 
 ZEShaderMetaTable::ZEShaderMetaTable()
 {
@@ -51,16 +52,18 @@ ZESize ZEShaderMetaTable::GetSamplerCount() const
 	return Samplers.GetCount();
 }
 
-const ZEShaderSamplerInfo* ZEShaderMetaTable::GetSamplerInfo(ZESize Index) const
+const ZEShaderSampler* ZEShaderMetaTable::GetSamplerInfo(ZESize Index) const
 {
 	zeDebugCheck(Index > Samplers.GetCount(), "Index out of range");
 
 	return &Samplers[Index];
 }
 
-const ZEShaderSamplerInfo* ZEShaderMetaTable::GetSamplerInfo(const ZEString& Name) const
+const ZEShaderSampler* ZEShaderMetaTable::GetSamplerInfo(const char* Name) const
 {
-	ZEUInt64 Hash = Name.Hash();
+	zeDebugCheck(Name == NULL, "NULL Pointer.");
+
+	ZESize Hash = ZEHashGenerator::Hash(Name);
 	ZESize Count = Samplers.GetCount();
 	
 	for(ZESize I = 0; I < Count; ++I)
@@ -77,18 +80,18 @@ ZESize ZEShaderMetaTable::GetTextureCount() const
 	return Textures.GetCount();
 }
 
-const ZEShaderTextureInfo* ZEShaderMetaTable::GetTextureInfo(ZESize Index) const
+const ZEShaderTexture* ZEShaderMetaTable::GetTextureInfo(ZESize Index) const
 {
 	zeDebugCheck(Index > Textures.GetCount(), "Index out of range");
 
 	return &Textures[Index];
 }
 
-const ZEShaderTextureInfo* ZEShaderMetaTable::GetTextureInfo(const ZEString& Name) const
+const ZEShaderTexture* ZEShaderMetaTable::GetTextureInfo(const char* Name) const
 {
-	zeDebugCheck(Name.IsEmpty(), "Empty string.");
+	zeDebugCheck(Name == NULL, "NULL Pointer.");
 
-	ZEUInt64 Hash = Name.Hash();
+	ZESize Hash = ZEHashGenerator::Hash(Name);
 	ZESize Count = Textures.GetCount();
 	
 	for(ZESize I = 0; I < Count; ++I)
@@ -105,18 +108,18 @@ ZESize ZEShaderMetaTable::GetBufferCount() const
 	return Buffers.GetCount();
 }
 
-const ZEShaderBufferInfo* ZEShaderMetaTable::GetBufferInfo(ZESize Index) const
+const ZEShaderBuffer* ZEShaderMetaTable::GetBufferInfo(ZESize Index) const
 {
 	zeDebugCheck(Index > Buffers.GetCount(), "Index out of range");
 
 	return &Buffers[Index];
 }
 
-const ZEShaderBufferInfo* ZEShaderMetaTable::GetBufferInfo(const ZEString& Name) const
+const ZEShaderBuffer* ZEShaderMetaTable::GetBufferInfo(const char* Name) const
 {
-	zeDebugCheck(Name.IsEmpty(), "Empty string.");
+	zeDebugCheck(Name == NULL, "NULL Pointer.");
 
-	ZEUInt64 Hash = Name.Hash();
+	ZESize Hash = ZEHashGenerator::Hash(Name);
 	ZESize Count = Buffers.GetCount();
 	
 	for(ZESize I = 0; I < Count; ++I)
@@ -135,7 +138,7 @@ ZESize ZEShaderMetaTable::GetConstantCount(ZESize BufferIndex) const
 	return Buffers[BufferIndex].Constants.GetCount();
 }
 
-const ZEShaderConstantInfo* ZEShaderMetaTable::GetConstantInfo(ZESize BufferIndex, ZESize Index) const
+const ZEShaderConstant* ZEShaderMetaTable::GetConstantInfo(ZESize BufferIndex, ZESize Index) const
 {
 	zeDebugCheck(BufferIndex > Buffers.GetCount(), "Index out of range");
 	zeDebugCheck(Index > Buffers[BufferIndex].Constants.GetCount(), "Index out of range");
@@ -143,11 +146,12 @@ const ZEShaderConstantInfo* ZEShaderMetaTable::GetConstantInfo(ZESize BufferInde
 	return &Buffers[BufferIndex].Constants[Index];
 }
 
-const ZEShaderConstantInfo* ZEShaderMetaTable::GetConstantInfo(ZESize BufferIndex, const ZEString& Name) const
+const ZEShaderConstant* ZEShaderMetaTable::GetConstantInfo(ZESize BufferIndex, const char* Name) const
 {
+	zeDebugCheck(Name == NULL, "NULL Pointer.");
 	zeDebugCheck(BufferIndex > Buffers.GetCount(), "Index out of range");
 
-	ZEUInt64 Hash = Name.Hash();
+	ZESize Hash = ZEHashGenerator::Hash(Name);
 	ZESize Count = Buffers[BufferIndex].Constants.GetCount();
 
 	for(ZESize I = 0; I < Count; ++I)
@@ -164,25 +168,24 @@ ZESize ZEShaderMetaTable::GetInputCount() const
 	return Inputs.GetCount();
 }
 
-const ZEShaderInputInfo* ZEShaderMetaTable::GetInputInfo(ZESize Index) const
+const ZEShaderInput* ZEShaderMetaTable::GetInputInfo(ZESize Index) const
 {
 	zeDebugCheck(Index > Inputs.GetCount(), "Index out of range");
 
 	return &Inputs[Index];
 }
 
-
-const ZEShaderInputInfo* ZEShaderMetaTable::GetInputInfo(const ZEString& Semantic, ZEUInt32 SemanticIndex) const
+const ZEShaderInput* ZEShaderMetaTable::GetInputInfo(const char* Semantic, ZEUInt8 SemanticIndex) const
 {
-	zeDebugCheck(Semantic.IsEmpty(), "Empty string.");
+	zeDebugCheck(Semantic == NULL, "Null pointer.");
 
-	ZEUInt64 Hash = Semantic.Hash();
+	ZESize Hash = ZEHashGenerator::Hash(Semantic);
 	ZESize Count = Inputs.GetCount();
 	
 	for(ZESize I = 0; I < Count; ++I)
 		if (Inputs[I].Hash == Hash)
-			if (Inputs[I].SemanticIndex == SemanticIndex)
-				if (Inputs[I].Semantic.Equals(Semantic))
+			if (Inputs[I].Index == SemanticIndex)
+				if (strcmp(Inputs[I].Semantic, Semantic) == 0)
 					return &Inputs[I];
 	
 	return NULL;
@@ -214,16 +217,16 @@ ZESize ZEShaderMetaTable::GetShaderParameterCount() const
 	return CompileOptions.Parameters.GetCount();
 }
 
-const ZEShaderCompilerParameter* ZEShaderMetaTable::GetShaderParameter(ZESize Index) const
+const ZEShaderParameter* ZEShaderMetaTable::GetShaderParameter(ZESize Index) const
 {
 	zeDebugCheck(Index > CompileOptions.Parameters.GetCount(), "Index out of range");
 
 	return &CompileOptions.Parameters[Index];
 }
 
-const ZEShaderCompilerParameter* ZEShaderMetaTable::GetShaderParameter(const ZEString& Name) const
+const ZEShaderParameter* ZEShaderMetaTable::GetShaderParameter(const char* Name) const
 {
-	ZEUInt64 Hash = Name.Hash();
+	ZESize Hash = ZEHashGenerator::Hash(Name);
 	ZESize Count = CompileOptions.Parameters.GetCount();
 
 	for(ZESize I = 0; I < Count; ++I)

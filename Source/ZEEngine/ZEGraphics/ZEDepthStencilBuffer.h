@@ -51,27 +51,25 @@ class ZEDepthStencilBuffer
 	friend class ZEGraphicsModule;
 	friend class ZEGraphicsDevice;
 
-	// Should be public for only internal usage
-	public:
-		ZEUInt						Width;
-		ZEUInt						Height;
-		ZEDepthStencilPixelFormat	PixelFormat;
-
 	protected:
-									ZEDepthStencilBuffer();
-		virtual						~ZEDepthStencilBuffer();
+		ZEUInt							Width;
+		ZEUInt							Height;
+		ZEDepthStencilPixelFormat		PixelFormat;
+
+										ZEDepthStencilBuffer();
+		virtual							~ZEDepthStencilBuffer();
 
 	public:
-		ZEUInt						GetWidth() const;
-		ZEUInt						GetHeight() const;
-		ZEDepthStencilPixelFormat	GetPixelFormat() const;
+		ZEUInt							GetWidth() const;
+		ZEUInt							GetHeight() const;
+		ZEDepthStencilPixelFormat		GetPixelFormat() const;
 
-		virtual bool				IsEmpty() const = 0;
+		virtual bool					IsEmpty() const = 0;
 		
-		virtual void				Destroy();
-		virtual bool				Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat) = 0;
+		virtual void					Destroy();
+		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat) = 0;
 
-		static ZEDepthStencilBuffer* CreateInstance();
+		static ZEDepthStencilBuffer*	CreateInstance();
 };
 
 #endif

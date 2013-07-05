@@ -41,15 +41,12 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMeta/ZEObject.h"
 
-ZE_META_OBJECT_DESCRIPTION(ZETerrainMaterial)
-
 class ZETextureCube;
 class ZETextureCubeResource;
 class ZETexture2D;
 class ZETexture2DResource;
 class ZETerrainMaterial : public ZEMaterial
 {
-	ZE_META_OBJECT(ZETerrainMaterial)
 	protected:
 		bool							TwoSided;
 		bool							Wireframe;
@@ -92,7 +89,6 @@ class ZETerrainMaterial : public ZEMaterial
 
 	public:
 		ZESize							Level;
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
 
 		// Material Options
 		void							SetTwoSided(bool Enable);

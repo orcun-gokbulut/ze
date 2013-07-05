@@ -43,8 +43,6 @@ ze_add_source(ZEModelAnimationTrack.cpp		Sources)
 ze_add_source(ZEModelAnimationTrack.h		Sources Headers)
 ze_add_source(ZEModelBone.cpp				Sources)
 ze_add_source(ZEModelBone.h					Sources Headers)
-ze_add_source(ZEModelDebugModule.cpp		Sources)
-ze_add_source(ZEModelDebugModule.h			Sources)
 ze_add_source(ZEModelIKChain.cpp			Sources)
 ze_add_source(ZEModelIKChain.h				Sources Headers)
 ze_add_source(ZEModelIKChainNode.cpp		Sources)
@@ -57,6 +55,9 @@ ze_add_source(ZEModelResource.cpp			Sources)
 ze_add_source(ZEModelResource.h				Sources Headers)
 ze_add_source(ZEModelHelper.cpp				Sources)
 ze_add_source(ZEModelHelper.h				Sources Headers)
+ze_add_source(ZEModelDebugDrawer.cpp		Sources)
+ze_add_source(ZEModelDebugDrawer.h			Sources Headers)
+
 
 ze_add_library(ZEModel 
 	SOURCES ${Sources}

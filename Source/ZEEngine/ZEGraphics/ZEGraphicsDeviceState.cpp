@@ -33,60 +33,43 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
-#include "ZEGraphicsDeviceState.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEDS/ZEHashGenerator.h"
+#include "ZEGraphicsDeviceState.h"
 
 /************************************************************************/
 /*                         ZEViewport                                   */
 /************************************************************************/
-void ZEViewport::UpdateHash()
+ZESize ZEViewport::GetHash() const
 {
-	Hash = 0;
-	ZEHashGenerator::Hash(Hash, &ViewportData, sizeof(ZEViewportData));
+	return ZEHashGenerator::Hash((void*)&StateData, sizeof(ZEViewportData));
 }
 
 void ZEViewport::SetZero()
 {
-	memset(&ViewportData, 0, sizeof(ZEViewportData));
-
-// 	ViewportData.Width		= 0;
-// 	ViewportData.Height		= 0;
-// 	ViewportData.TopLeftX	= 0;
-// 	ViewportData.TopLeftY	= 0;
-// 	ViewportData.MinDepth	= 0.0f;
-// 	ViewportData.MaxDepth	= 0.0f;
+	memset(&StateData, 0, sizeof(ZEViewportData));
 }
 
 const ZEViewport& ZEViewport::operator =(const ZEViewport& Other)
 {
-	Hash = Other.Hash;
-	memcpy(&ViewportData, &Other.ViewportData, sizeof(ZEViewportData));
-
-// 	ViewportData.Width		= Other.ViewportData.Width;
-// 	ViewportData.Height		= Other.ViewportData.Height;
-// 	ViewportData.TopLeftX	= Other.ViewportData.TopLeftX;
-// 	ViewportData.TopLeftY	= Other.ViewportData.TopLeftY;
-// 	ViewportData.MinDepth	= Other.ViewportData.MinDepth;
-// 	ViewportData.MaxDepth	= Other.ViewportData.MaxDepth;
+	memcpy(&StateData, &Other.StateData, sizeof(ZEViewportData));
 
 	return *this;
 }
 
 bool ZEViewport::operator ==(const ZEViewport& Other)
 {
-	if (ViewportData.Width != Other.ViewportData.Width)
+	if (StateData.Width != Other.StateData.Width)
 		return false;
-	if (ViewportData.Height != Other.ViewportData.Height)
+	if (StateData.Height != Other.StateData.Height)
 		return false;
-	if (ViewportData.TopLeftX != Other.ViewportData.TopLeftX)
+	if (StateData.TopLeftX != Other.StateData.TopLeftX)
 		return false;
-	if (ViewportData.TopLeftY != Other.ViewportData.TopLeftY)
+	if (StateData.TopLeftY != Other.StateData.TopLeftY)
 		return false;
-	if (ZEMath::Abs(ViewportData.MinDepth - Other.ViewportData.MinDepth) > ZE_ZERO_THRESHOLD)
+	if (ZEMath::Abs(StateData.MinDepth - Other.StateData.MinDepth) > ZE_ZERO_THRESHOLD)
 		return false;
-	if (ZEMath::Abs(ViewportData.MaxDepth - Other.ViewportData.MaxDepth) > ZE_ZERO_THRESHOLD)
+	if (ZEMath::Abs(StateData.MaxDepth - Other.StateData.MaxDepth) > ZE_ZERO_THRESHOLD)
 		return false;
 
 	return true;
@@ -99,8 +82,6 @@ bool ZEViewport::operator !=(const ZEViewport& Other)
 
 ZEViewport::ZEViewport()
 {
-	Hash = 0;
-
 	SetZero();
 }
 
@@ -112,47 +93,26 @@ ZEViewport::~ZEViewport()
 /************************************************************************/
 /*                       ZEScissorRectangle                             */
 /************************************************************************/
-void ZEScissorRectangle::UpdateHash()
+ZESize ZEScissorRectangle::GetHash() const
 {
-	Hash = 0;
-	ZEHashGenerator::Hash(Hash, &ScissorRectangleData, sizeof(ZEScissorRectangleData));
+	return ZEHashGenerator::Hash((void*)&StateData, sizeof(ZEScissorRectangleData));
 }
 
 void ZEScissorRectangle::SetZero()
 {
-	memset(&ScissorRectangleData, 0, sizeof(ZEScissorRectangleData));
-
-// 	ScissorRectangleData.Bottom = 0;
-// 	ScissorRectangleData.Left = 0;
-// 	ScissorRectangleData.Right = 0;
-// 	ScissorRectangleData.Top = 0;
+	memset(&StateData, 0, sizeof(ZEScissorRectangleData));
 }
 
 const ZEScissorRectangle& ZEScissorRectangle::operator =(const ZEScissorRectangle& Other)
 {
-	Hash = Other.Hash;
-	memcpy(&ScissorRectangleData, &Other.ScissorRectangleData, sizeof(ZEScissorRectangleData));
-
-// 	ScissorRectangleData.Bottom = Other.ScissorRectangleData.Bottom;
-// 	ScissorRectangleData.Left	= Other.ScissorRectangleData.Left;
-// 	ScissorRectangleData.Right	= Other.ScissorRectangleData.Right;
-// 	ScissorRectangleData.Top	= Other.ScissorRectangleData.Top;
+	memcpy(&StateData, &Other.StateData, sizeof(ZEScissorRectangleData));
 
 	return *this;
 }
 
 bool ZEScissorRectangle::operator ==(const ZEScissorRectangle& Other)
 {
-	if (ScissorRectangleData.Bottom != Other.ScissorRectangleData.Bottom)
-		return false;
-	if (ScissorRectangleData.Right != Other.ScissorRectangleData.Right)
-		return false;
-	if (ScissorRectangleData.Left != Other.ScissorRectangleData.Left)
-		return false;
-	if (ScissorRectangleData.Top != Other.ScissorRectangleData.Top)
-		return false;
-
-	return true;
+	return memcmp(&StateData, &Other.StateData, sizeof(ZEScissorRectangleData)) == 0 ? true : false;
 }
 
 bool ZEScissorRectangle::operator !=(const ZEScissorRectangle& Other)
@@ -162,7 +122,6 @@ bool ZEScissorRectangle::operator !=(const ZEScissorRectangle& Other)
 
 ZEScissorRectangle::ZEScissorRectangle()
 {
-	Hash = 0;
 	SetZero();
 }
 
@@ -172,32 +131,25 @@ ZEScissorRectangle::~ZEScissorRectangle()
 }
 
 /************************************************************************/
-/*                          ZEGraphicsDeviceState                               */
+/*                          ZEGraphicsDeviceState                       */
 /************************************************************************/
-
 void ZEGraphicsDeviceState::SetToDefault()
 {
 	IndexBuffer = NULL;
-	VertexLayout.SetToDefault();
-	
-	for (ZESize I = 0; I < ZE_MAX_VERTEX_BUFFER_SLOT; ++I)
-		VertexBuffers[I] = NULL;
-
+	VertexLayout = NULL;
+	PixelShader = NULL;
 	VertexShader = NULL;
-	
-	for (ZESize I = 0; I < ZE_MAX_BUFFER_SLOT; ++I)
-	{
-		VertexShaderBuffers[I] = NULL;
-		GeometryShaderBuffers[I] = NULL;
-		PixelShaderBuffers[I] = NULL;
-	}
-	
-	for (ZESize I = 0; I < ZE_MAX_TEXTURE_SLOT; ++I)
-	{
-		VertexShaderTextures[I] = NULL;
-		GeometryShaderTextures[I] = NULL;
-		PixelShaderTextures[I] = NULL;
-	}
+	GeometryShader = NULL;
+	DepthStencilBuffer = NULL;
+
+	StencilReferance = 0;
+	ComponentBlendMask = ZE_CM_ALL;
+	ComponentBlendFactors = ZEVector4::One;
+	ScreenWriteEnable = false;
+
+	BlendState.SetToDefault();
+	RasterizerState.SetToDefault();
+	DepthStencilState.SetToDefault();
 
 	for (ZESize I = 0; I < ZE_MAX_SAMPLER_SLOT; ++I)
 	{
@@ -206,27 +158,20 @@ void ZEGraphicsDeviceState::SetToDefault()
 		PixelShaderSamplers[I].SetToDefault();
 	}
 
-	RasterizerState.SetToDefault();
+	memset(ViewPorts, 0, sizeof(ZEScissorRectangle) * ZE_MAX_SCISSOR_SLOT);
+	memset(ScissorRects, 0, sizeof(ZEViewport) * ZE_MAX_VIEWPORT_SLOT);
 
-	for (ZESize I = 0; I < ZE_MAX_VIEWPORT_SLOT; ++I)
-		ViewPorts[I].SetZero();
+	memset(PixelShaderTextures, 0, sizeof(const ZETexture*) * ZE_MAX_TEXTURE_SLOT);
+	memset(VertexShaderTextures, 0, sizeof(const ZETexture*) * ZE_MAX_TEXTURE_SLOT);
+	memset(GeometryShaderTextures, 0, sizeof(const ZETexture*) * ZE_MAX_TEXTURE_SLOT);
 
-	for (ZESize I = 0; I < ZE_MAX_SCISSOR_SLOT; ++I)
-		ScissorRectangles[I].SetZero();
+	memset(RenderTargets, 0, sizeof(const ZERenderTarget*) * ZE_MAX_RENDER_TARGET_SLOT);
 
-	BlendState.SetToDefault();
-	ComponentBlendMask = ZE_CM_ALL;
-	ComponentBlendFactors = ZEVector4::One;
+	memset(VertexBuffers, 0, sizeof(ZEVertexBuffer*) * ZE_MAX_VERTEX_BUFFER_SLOT);
 
-	DepthStencilState.SetToDefault();
-	StencilReferance = 0;
-
-	for (ZESize I = 0; I < ZE_MAX_RENDER_TARGET_SLOT; ++I)
-		RenderTargets[I] = NULL;
-
-	DepthStencilBuffer = NULL;
-
-	ScreenWriteEnable = false;
+	memset(PixelShaderBuffers, 0, sizeof(ZEConstantBuffer*) * ZE_MAX_CONSTANT_BUFFER_SLOT);
+	memset(VertexShaderBuffers, 0, sizeof(ZEConstantBuffer*) * ZE_MAX_CONSTANT_BUFFER_SLOT);
+	memset(GeometryShaderBuffers, 0, sizeof(ZEConstantBuffer*) * ZE_MAX_CONSTANT_BUFFER_SLOT);
 }
 
 ZEGraphicsDeviceState::ZEGraphicsDeviceState()
@@ -235,6 +180,58 @@ ZEGraphicsDeviceState::ZEGraphicsDeviceState()
 }
 
 ZEGraphicsDeviceState::~ZEGraphicsDeviceState()
+{
+
+}
+
+/************************************************************************/
+/*                      ZEGraphicsDeviceHashState                       */
+/************************************************************************/
+
+void ZEGraphicsDeviceHashState::SetToDefault()
+{
+	VertexLayoutHash = 0;
+
+	IndexBuffer = NULL;
+	memset(VertexBuffers, NULL, sizeof(ZEVertexBuffer*) * ZE_MAX_VERTEX_BUFFER_SLOT);
+	
+	VertexShader = NULL;
+	memset(VertexShaderBuffers, NULL, sizeof(ZEConstantBuffer*) * ZE_MAX_CONSTANT_BUFFER_SLOT);
+	memset(VertexShaderTextures, NULL, sizeof(const ZETexture*) * ZE_MAX_TEXTURE_SLOT);
+	memset(VertexShaderSamplerHashes, 0, sizeof(ZESize) * ZE_MAX_SAMPLER_SLOT);
+
+	GeometryShader = NULL;
+	memset(GeometryShaderBuffers, NULL, sizeof(ZEConstantBuffer*) * ZE_MAX_CONSTANT_BUFFER_SLOT);
+	memset(GeometryShaderTextures, NULL, sizeof(const ZETexture*) * ZE_MAX_TEXTURE_SLOT);
+	memset(GeometryShaderSamplerHashes, 0, sizeof(ZESize) * ZE_MAX_SAMPLER_SLOT);
+
+	RasterizerStateHash = 0;
+	memset(ViewPortHashes, 0, sizeof(ZESize) * ZE_MAX_VIEWPORT_SLOT);
+	memset(ScissorRectHashes, 0, sizeof(ZESize) * ZE_MAX_SCISSOR_SLOT);
+	
+	PixelShader = NULL;
+	memset(PixelShaderBuffers, NULL, sizeof(ZEConstantBuffer*) * ZE_MAX_CONSTANT_BUFFER_SLOT);
+	memset(PixelShaderTextures, NULL, sizeof(const ZETexture*) * ZE_MAX_TEXTURE_SLOT);
+	memset(PixelShaderSamplerHashes, 0, sizeof(ZESize) * ZE_MAX_SAMPLER_SLOT);
+
+	BlendStateHash = 0;
+	ComponentBlendMask = ZE_CM_ALL;
+	ComponentBlendFactors = ZEVector4::One;
+	
+	DepthStencilStateHash = 0;
+	StencilReferance = 0;
+	
+	DepthStencilBuffer = NULL;
+	ScreenWriteEnable = false;
+	memset(RenderTargets, NULL, sizeof(const ZERenderTarget*) * ZE_MAX_RENDER_TARGET_SLOT);
+}
+
+ZEGraphicsDeviceHashState::ZEGraphicsDeviceHashState()
+{
+	SetToDefault();
+}
+
+ZEGraphicsDeviceHashState::~ZEGraphicsDeviceHashState()
 {
 
 }

@@ -36,17 +36,21 @@
 #include "ZEError.h"
 #include "ZECanvas.h"
 #include "ZERenderer.h"
+#include "ZECore/ZECore.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEGame/ZEScene.h"
 #include "ZELightProjective.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZETextureCube.h"
+#include "ZEGraphics/ZERenderTarget.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEMaterialLightProjective.h"
+#include "ZEGraphics/ZEConstantBuffer.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZETexture/ZETexture2DResource.h"
-#include "ZECore/ZECore.h"
 
 void ZELightProjective::SetFOV(float Value)
 {
@@ -68,103 +72,235 @@ float ZELightProjective::GetAspectRatio() const
 	return AspectRatio;
 }
 
+void ZELightProjective::SetColor(const ZEVector3& NewColor)
+{
+	Changed = true;
+	Color = NewColor;
+}
+
+const ZEVector3& ZELightProjective::GetColor() const
+{
+	return Color;
+}
+
+void ZELightProjective::SetIntensity(float NewValue)
+{
+	Changed = true;
+	Intensity = NewValue;
+}
+
+float ZELightProjective::GetIntensity() const
+{
+	return Intensity;
+}
+
+void ZELightProjective::SetRange(float NewValue)
+{
+	Changed = true;
+	UpdateViewVolume = true;
+	Range = NewValue;
+}
+
+float ZELightProjective::GetRange() const
+{
+	return Range;
+}
+
+void ZELightProjective::SetAttenuation(const ZEVector3& Attenuation)
+{
+	Changed = true;
+	this->Attenuation = Attenuation;
+}
+
+void ZELightProjective::SetAttenuation(float DistanceSquare, float Distance, float Constant)
+{
+	Changed = true;
+	Attenuation.x = Constant;
+	Attenuation.y = Distance;
+	Attenuation.z = DistanceSquare;
+}
+
+const ZEVector3& ZELightProjective::GetAttenuation() const
+{
+	return Attenuation;
+}
+
+void ZELightProjective::SetPenumbraSize(float Value)
+{
+	Changed = true;
+	PenumbraSize = Value;
+}
+
+float ZELightProjective::GetPenumbraSize() const
+{
+	return PenumbraSize;
+}
+
+void ZELightProjective::SetSlopeScaledBias(float Value)
+{
+	Changed = true;
+	SlopeScaledBias = Value;
+}
+
+float ZELightProjective::GetSlopeScaledBias() const
+{
+	return SlopeScaledBias;
+}
+
+void ZELightProjective::SetDepthScaledBias(float Value)
+{
+	Changed = true;
+	DepthScaledBias = Value;
+}
+
+float ZELightProjective::GetDepthScaledBias() const
+{
+	return DepthScaledBias;
+}
+
 void ZELightProjective::SetTextureSampler(const ZESamplerState& Sampler)
 {
-	TextureSampler = Sampler;
+	zeDebugCheck(Material == NULL, "Null material");
+	Material->SamplerState = Sampler;
 }
 
 const ZESamplerState& ZELightProjective::GetTextureSampler() const
 {
-	return TextureSampler;
+	zeDebugCheck(Material == NULL, "Null material");
+	return Material->SamplerState;
 }
 
 void ZELightProjective::SetProjectionTexture(const ZETexture2D* Texture)
 {
 	zeDebugCheck(Texture == NULL, "Null Pointer");
-	ProjectionTexture = Texture;
+	Material->ProjectionTexture = Texture;
 }
 
 const ZETexture2D* ZELightProjective::GetProjectionTexture() const
 {
-	return ProjectionTexture;
+	zeDebugCheck(Material == NULL, "Null material");
+	return Material->ProjectionTexture;
 }
 
-const ZEViewVolume& ZELightProjective::GetViewVolume(ZESize Index)
+const ZEViewVolume* ZELightProjective::GetLightVolume()
 {
 	if (UpdateViewVolume)
 	{
- 		ViewVolume.Create(GetWorldPosition(), GetWorldRotation(), FOV, AspectRatio, 0.0f, GetRange());
+ 		ViewVolume.Create(GetWorldPosition(), GetWorldRotation(), FOV, AspectRatio, 0.01f, Range);
  		UpdateViewVolume = false;
 	}
 
-	return ViewVolume;
+	return &ViewVolume;
 }
 
-bool ZELightProjective::Initialize()
+void ZELightProjective::UpdateMaterial(const ZEDrawParameters* DrawParameters)
 {
-	if (GetInitialized())
-		return true;
+	if (!Changed)
+		return;
 
+	if (DrawParameters->View->Type != ZE_VT_CAMERA)
+		return;
+
+	ZECamera* Camera = DrawParameters->View->Camera;
+
+	ZEMaterialLightProjective::Transformations* Transformations = NULL;
+	Material->LightTransformations->Lock((void**)&Transformations);
+	
+		ZEMatrix4x4 WorldTransform;
+		float TanFovRange = ZEAngle::Tan(FOV * 0.5f) * Range;
+		ZEVector3 Scale(TanFovRange * AspectRatio * 2.0f, TanFovRange * 2.0f, Range);
+		ZEMatrix4x4::CreateOrientation(WorldTransform, GetWorldPosition(), GetWorldRotation(), Scale);
+
+		Transformations->WorldView = Camera->GetViewTransform() * WorldTransform;
+		Transformations->WorldViewProjection = Camera->GetViewProjectionTransform() * WorldTransform;
+	
+	Material->LightTransformations->Unlock();
+	
+	ZEMaterialLightProjective::Properties* Properties = NULL;
+	Material->LightProperties->Lock((void**)&Properties);
+	
+		Properties->Range = Range;
+		Properties->Color = Color;
+		Properties->Attenuation = Attenuation;	
+		Properties->Intensity = Intensity;
+		Properties->PenumbraSize = PenumbraSize;
+		Properties->DepthScaledBias = DepthScaledBias;
+		Properties->SlopeScaledBias = SlopeScaledBias;
+		Properties->ViewSpacePosition = Camera->GetViewTransform() * GetWorldPosition();
+		Properties->PixelSize = DrawParameters->RenderTarget->GetPixelSize().ToVector2();
+
+		// Projection Transformation
+		ZEMatrix4x4 LightViewMatrix;
+		ZEMatrix4x4::CreateViewTransform(LightViewMatrix, GetWorldPosition(), GetWorldRotation());
+		ZEMatrix4x4 LightProjectionMatrix;
+		ZEMatrix4x4::CreatePerspectiveProjection(LightProjectionMatrix, FOV, AspectRatio, Camera->GetNearZ(), Range);
+		ZEMatrix4x4 LightViewProjectionMatrix;
+		LightViewProjectionMatrix = LightProjectionMatrix * LightViewMatrix;
+		ZEMatrix4x4 TextureMatrix;
+		ZEMatrix4x4::Create(TextureMatrix,	0.5f,  0.0f, 0.0f, 0.5f,
+											0.0f, -0.5f, 0.0f, 0.5f,
+											0.0f,  0.0f, 1.0f, 0.0f,
+											0.0f,  0.0f, 0.0f, 1.0f);
+
+		ZEMatrix4x4 InvCameraViewMatrix;
+		ZEMatrix4x4::Inverse(InvCameraViewMatrix, Camera->GetViewTransform());
+		Properties->ProjectionMatrix = TextureMatrix * LightViewProjectionMatrix * InvCameraViewMatrix;;
+	
+	Material->LightProperties->Unlock();
+
+	Changed = false;
+}
+
+bool ZELightProjective::InitializeSelf()
+{
+	if (!ZELight::InitializeSelf())
+		return false;
+
+	// Vertex buffer
 	ZECanvas Canvas;
 	Canvas.SetRotation(ZEQuaternion(-ZE_PI_2, ZEVector3::UnitX));
 	Canvas.SetTranslation(ZEVector3::UnitZ);
 	Canvas.AddPyramid(1.0f, 1.0f, 1.0f);
-	Geometry = Canvas.CreateStaticVertexBuffer();
+	VertexBuffer = Canvas.CreateStaticVertexBuffer();
 	
+	// Material
 	Material = ZEMaterialLightProjective::CreateInstance();
 
-	return ZEEntity::Initialize();
+	// Vertex layout
+	static const ZEVertexElement Element[] = 
+	{
+		{"POSITION", 0, ZE_VET_FLOAT4, 0, 0, ZE_VU_PER_VERTEX, 0}
+	};
+	VertexLayout.SetLayout(Element, 1);
+
+	RenderCommand.Order = 3.0f;
+	RenderCommand.Priority = 3;
+	RenderCommand.FirstVertex = 0;
+	RenderCommand.Material = Material;
+	RenderCommand.PrimitiveCount = 6;
+	RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
+	RenderCommand.VertexLayout = &VertexLayout;
+	RenderCommand.VertexBuffers[0] = VertexBuffer;
+
+	return true;
 }
 
-void ZELightProjective::Deinitialize()
+bool ZELightProjective::DeinitializeSelf()
 {
-	if (!GetInitialized())
-		return;
-
-	ProjectionTexture = NULL;
-
 	ZE_DESTROY(Material);
-	ZE_DESTROY(Geometry);
+	ZE_DESTROY(VertexBuffer);
+
+	return ZELight::DeinitializeSelf();
 }
 
 void ZELightProjective::Tick(float Time)
 {
-	// Update material and render command
-	Material->LightCaster = true;
-	Material->LightReciever = false;
-	Material->ShadowCaster = ShadowCaster;
-	Material->ShadowReciver = false;
-	Material->Range = Range;
-	Material->Color = Color;
-	Material->FOV = FOV;
-	Material->AspectRatio = AspectRatio;
-	Material->Intensity = Intensity;
-	Material->Attenuation = Attenuation;
-	Material->WorldPosition = GetWorldPosition();
-	Material->WorldRotation = GetWorldRotation();
-	Material->SamplerState = TextureSampler;
-	Material->ProjectionTexture = ProjectionTexture;
-	
-	RenderCommand.Order = 3.0f;
-	RenderCommand.Priority = 3;
-	RenderCommand.Flags = 0;
-	RenderCommand.FirstVertex = 0;
-	RenderCommand.Material = Material;
-	RenderCommand.Pipeline = ZE_RP_3D;
-	RenderCommand.PrimitiveCount = 6;
-	RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
-	RenderCommand.VertexBuffers[0] = Geometry;
+
 }
 
 void ZELightProjective::Draw(ZEDrawParameters* DrawParameters)
-{	
-	ZEUInt FrameId = zeCore->GetFrameId();
-
-	if (ProjectionTexture == NULL)
-	{
-		zeWarning("NULL projection texture");
-		return;
-	}
+{
+	UpdateMaterial(DrawParameters);
 
 	ZEBSphere LightBoundingSphere;
 	LightBoundingSphere.Radius = GetRange();
@@ -172,25 +308,26 @@ void ZELightProjective::Draw(ZEDrawParameters* DrawParameters)
 	
 	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
 		DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
+
+	ZELight::Draw(DrawParameters);
 }
 
-ZELightProjective::ZELightProjective()
+ZELightProjective::ZELightProjective() : ZELight(ZE_LT_PROJECTIVE)
 {
 	FOV = ZE_PI_4;
 	AspectRatio = 1.0f;
-	Type = ZE_LT_PROJECTIVE;
+	
+	Range = 20.0f;
+	Intensity = 1.0f;
+	Color = ZEVector3::One;
+	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
+
+	PenumbraSize = 1.0f;
+	SlopeScaledBias = 0.0f;
+	DepthScaledBias = 0.0f;
 
 	Material = NULL;
-	Geometry = NULL;
-	ProjectionTexture = NULL;
-	
-	TextureSampler.SetMagFilter(ZE_TFM_LINEAR);
-	TextureSampler.SetMinFilter(ZE_TFM_LINEAR);
-	TextureSampler.SetMipFilter(ZE_TFM_LINEAR);
-	TextureSampler.SetAddressU(ZE_TAM_BORDER);
-	TextureSampler.SetAddressV(ZE_TAM_BORDER);
-	TextureSampler.SetAddressW(ZE_TAM_BORDER);
-	TextureSampler.SetBorderColor(ZEVector4(0.0f, 0.0f, 0.0f, 1.0f));
+	VertexBuffer = NULL;
 }
 
 ZELightProjective::~ZELightProjective()

@@ -37,27 +37,44 @@
 #ifndef	__ZE_WINDOWS_INPUT_MODULE_H__
 #define __ZE_WINDOWS_INPUT_MODULE_H__
 
-#include "ZEInput/ZEInputModule.h"
+#include "ZEInput/ZEInputDeviceExtension.h"
+#include "ZECore/ZESystemMessageHandler.h"
 
 class ZEInputDevice;
-class ZEInputDeviceExtension;
 
-class ZEWindowsInputModule : public ZEInputModule
+#define ZE_MAX_RAW_INPUT_COUNT 256
+
+class ZEWindowsInputModule;
+class ZEWindowsInputKeyboardDevice;
+class ZEWindowsInputMouseDevice;
+
+class ZEWindowsInputSystemMessageHandler : public ZESystemMessageHandler
 {
-	ZE_MODULE(ZEWindowsInputModule)
+	public:
+		ZEWindowsInputModule*		Module;
+		virtual bool				Callback(MSG* Message);
+};
 
+class ZEWindowsInputModule : public ZEInputDeviceModule
+{
+	ZE_EXTENSION(ZEWindowsInputModule)
+
+	friend class ZEWindowsInputSystemMessageHandler;
 	private:
-		ZEArray<ZEInputDevice*>				Devices;
+		ZEWindowsInputSystemMessageHandler	MessageHandler;
+		RAWINPUT							RawInputs[ZE_MAX_RAW_INPUT_COUNT];
+		ZESize								RawInputCount;
+		ZEWindowsInputMouseDevice*			MouseDevice;
+		ZEWindowsInputKeyboardDevice*		KeyboardDevice;
+
+	protected:
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
 
 	public:
-		virtual const
-		ZEArray<ZEInputDevice*>&			GetInputDevices();
+		virtual void						Process();
 
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
-
-		virtual void						ProcessInputs();
-		virtual void						ProcessInputMap(ZEInputMap* InputMap);
+											ZEWindowsInputModule();
 };
 
 #endif

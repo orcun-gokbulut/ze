@@ -125,8 +125,11 @@ ZEDrawFlags ZEMoon::GetDrawFlags() const
 	return ZE_DF_DRAW;
 }
 
-bool ZEMoon::Initialize()
+bool ZEMoon::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	if (Material == NULL)
 	{
 		Material = ZEMoonMaterial::CreateInstance();
@@ -143,10 +146,10 @@ bool ZEMoon::Initialize()
 			Material->MoonTexture = Texture->GetTexture();
 	}
 
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZEMoon::Deinitialize()
+bool ZEMoon::DeinitializeSelf()
 {
 	if (Material != NULL)
 	{
@@ -159,6 +162,8 @@ void ZEMoon::Deinitialize()
 		Texture->Release();
 		Texture = NULL;
 	}
+
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZEMoon::Draw(ZEDrawParameters* DrawParameters)
@@ -240,5 +245,5 @@ ZEMoon::ZEMoon()
 
 ZEMoon::~ZEMoon()
 {
-	this->Deinitialize();
+	
 }

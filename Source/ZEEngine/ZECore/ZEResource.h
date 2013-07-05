@@ -70,6 +70,6 @@ class ZEResource
 
 		ZESize					GetReferanceCount() const;
 
-		void					Release();
+		void					Destroy();
 };
 #endif

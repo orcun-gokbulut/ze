@@ -41,14 +41,13 @@
 #include "ZEGame/ZEEntity.h"
 #include "ZEMath/ZEViewVolume.h"
 
-enum ZELightType
-{
-	ZE_LT_NONE				= 0,
-	ZE_LT_POINT				= 1,
-	ZE_LT_DIRECTIONAL		= 2,
-	ZE_LT_PROJECTIVE		= 3,
-	ZE_LT_OMNIPROJECTIVE	= 4
-};
+#define	ZE_LT_NONE				0
+#define	ZE_LT_POINT				1
+#define	ZE_LT_DIRECTIONAL		2
+#define	ZE_LT_PROJECTIVE		4
+#define	ZE_LT_OMNIPROJECTIVE	8
+typedef ZEUInt32				ZELightType;
+
 
 class ZEScene;
 class ZEShadowRenderer;
@@ -57,61 +56,27 @@ struct ZEDrawParameters;
 class ZELight : public ZEEntity
 {
 	protected:
+		bool							Changed;
 		ZELightType						Type;
 
 		bool							ShadowCaster;
 		bool							UpdateViewVolume;
 
-		float							Range;
-		float							Intensity;
-		ZEVector3						Color;
-		ZEVector3						Attenuation;
-
-		float							PenumbraSize;
-		float							SlopeScaledBias;
-		float							DepthScaledBias;
-
 		virtual void					OnTransformChanged();
 
-										ZELight();
+										ZELight(ZELightType LightType);
 		virtual							~ZELight();
 
 	public:
-		void							SetRange(float NewValue);
-		float							GetRange() const;
-
-		void							SetIntensity(float NewValue);
-		float							GetIntensity() const;
-
-		void							SetColor(const ZEVector3& NewColor);
-		const ZEVector3&				GetColor() const;
-
-		void							SetAttenuation(const ZEVector3& Attenuation);
-		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
-		const ZEVector3&				GetAttenuation() const;
-
 		virtual void					SetShadowCaster(bool NewValue);
 		bool							GetShadowCaster() const;
 
-		void							SetPenumbraSize(float Value);
-		float							GetPenumbraSize() const;
-
-		void							SetSlopeScaledBias(float Value);
-		float							GetSlopeScaledBias() const;
-
-		void							SetDepthScaledBias(float Value);
-		float							GetDepthScaledBias() const;
-
 		virtual ZEDrawFlags				GetDrawFlags() const;
-
 		virtual ZELightType				GetLightType() const;
-
-		virtual	void					SetPosition(const ZEVector3& NewPosition);
-		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 
 		virtual void					Draw(ZEDrawParameters* DrawParameters);
 
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index) = 0;
+		virtual const ZEViewVolume*		GetLightVolume() = 0;
 };
 
 #endif

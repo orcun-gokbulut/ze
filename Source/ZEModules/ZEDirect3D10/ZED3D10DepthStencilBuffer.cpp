@@ -39,6 +39,30 @@
 
 #include <D3D10.h>
 
+inline static ZESize GetPixelSize(ZEDepthStencilPixelFormat Format)
+{
+	ZESize Size = 0;
+	switch(Format)
+	{
+		case ZE_DSPF_DEPTH16:
+			Size = 2;
+			break;
+		case ZE_DSPF_DEPTH24_STENCIL8:
+			Size = 4;
+			break;
+		case ZE_DSPF_DEPTHD32_FLOAT:
+			Size = 4;
+			break;
+	}
+	return Size;
+}
+
+inline static ZESize CalculateBufferSize(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat Format)
+{
+	return Width * Height * GetPixelSize(Format);
+}
+
+
 inline static DXGI_FORMAT ConvertPixelFormat(ZEDepthStencilPixelFormat Format)
 {
 	DXGI_FORMAT DXGIFormat = DXGI_FORMAT_UNKNOWN;
@@ -60,16 +84,6 @@ inline static DXGI_FORMAT ConvertPixelFormat(ZEDepthStencilPixelFormat Format)
 	return DXGIFormat;
 }
 
-ZED3D10DepthStencilBuffer::ZED3D10DepthStencilBuffer()
-{
-	D3D10DepthStencilView = NULL;
-}
-
-ZED3D10DepthStencilBuffer::~ZED3D10DepthStencilBuffer()
-{
-	ZED3D_RELEASE(D3D10DepthStencilView);
-}
-
 const ID3D10DepthStencilView* ZED3D10DepthStencilBuffer::GetD3D10DepthStencilView() const
 {
 	return D3D10DepthStencilView;
@@ -84,8 +98,8 @@ bool ZED3D10DepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEDepthStenc
 {
 	zeDebugCheck(Width == 0, "Width cannot be zero");
 	zeDebugCheck(Height == 0, "Height cannot be zero");
-	zeDebugCheck(D3D10DepthStencilView, "Depth stencil buffer alread created");
 	zeDebugCheck(PixelFormat == ZE_DSPF_NOTSET, "PixelFormat must be valid");
+	zeDebugCheck(D3D10DepthStencilView, "Depth stencil buffer alread created");
 	zeDebugCheck(Width > 8191 || Height > 8191, "Depth stencil buffer dimensions exceeds the limits, 0-8191.");
 
 	D3D10_TEXTURE2D_DESC DepthStencilDesc;
@@ -121,12 +135,36 @@ bool ZED3D10DepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEDepthStenc
 		ZED3D_RELEASE(DepthTexture);
 		return false;
 	}
-
+	
 	ZED3D_RELEASE(DepthTexture);
 
 	this->PixelFormat = PixelFormat;
 	this->Height = Height;
 	this->Width = Width;
 	
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Depth stencil buffer created. Width: %u, Height: %u, PixelFormat: %u.", 
+			Width, Height, PixelFormat);
+#endif
+
+	GlobalSize += CalculateBufferSize(Width, Height, PixelFormat);
+	GlobalCount++;
+
 	return true;
+}
+
+ZESize		ZED3D10DepthStencilBuffer::GlobalSize = 0;
+ZEUInt16	ZED3D10DepthStencilBuffer::GlobalCount = 0;
+
+ZED3D10DepthStencilBuffer::ZED3D10DepthStencilBuffer()
+{
+	D3D10DepthStencilView = NULL;
+}
+
+ZED3D10DepthStencilBuffer::~ZED3D10DepthStencilBuffer()
+{
+	ZED3D_RELEASE(D3D10DepthStencilView);
+
+	GlobalSize -= CalculateBufferSize(Width, Height, PixelFormat);
+	GlobalCount--;
 }

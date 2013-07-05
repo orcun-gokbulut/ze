@@ -248,7 +248,7 @@ ZEDrawFlags ZEWeather::GetDrawFlags() const
 	return ZE_DF_DRAW;
 }
 
-void ZEWeather::Deinitialize()
+bool ZEWeather::DeinitializeSelf()
 {
 	MoonLight->Deinitialize();
 	SunLight->Deinitialize();
@@ -256,6 +256,8 @@ void ZEWeather::Deinitialize()
 	SkyDome->Deinitialize();
 	Cloud->Deinitialize();
 	Moon->Deinitialize();
+
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZEWeather::Draw(ZEDrawParameters* DrawParameters)
@@ -273,9 +275,10 @@ ZEWeather* ZEWeather::CreateInstance()
 	return new ZEWeather();
 }
 
-bool ZEWeather::Initialize()
+bool ZEWeather::InitializeSelf()
 {
-	ZEEntity::Initialize();
+	if (!ZEEntity::InitializeSelf())
+		return false;
 
 	return true;
 }
@@ -389,5 +392,5 @@ ZEWeather::ZEWeather()
 
 ZEWeather::~ZEWeather()
 {
-	this->Deinitialize();
+
 }

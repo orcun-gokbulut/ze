@@ -37,7 +37,7 @@
 #define __ZE_MATERIAL_LIGHT_POINT_H__
 
 #include "ZETypes.h"
-#include "ZEMaterialLight.h"
+#include "ZEMaterial.h"
 
 class ZEShader;
 class ZERenderStage;
@@ -45,21 +45,21 @@ class ZEVertexBuffer;
 class ZERenderCommand;
 class ZEConstantBuffer;
 
-class ZEMaterialLightPoint : public ZEMaterialLight
+class ZEMaterialLightPoint : public ZEMaterial
 {
 	friend class ZELightPoint;
 
 	protected:
 		ZEShader*						VertexShader;
 		ZEShader*						PixelShader;
-		ZEConstantBuffer*				Transformations;
-		ZEConstantBuffer*				LightParameters;
-		ZEConstantBuffer*				ShadowParameters;
 
+		ZEConstantBuffer*				LightProperties;
+		ZEConstantBuffer*				LightTransformations;
+		
 		void							UpdateShaders();
-		void							UpdateBuffers();
-
 		void							DestroyShaders();
+
+		void							UpdateBuffers();
 		void							DestroyBuffers();
 
 		bool							SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
@@ -68,10 +68,30 @@ class ZEMaterialLightPoint : public ZEMaterialLight
 		virtual							~ZEMaterialLightPoint();
 
 	public:
-		virtual ZESize					GetHash() const;
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
+		__declspec(align(16))
+		struct Transformations
+		{
+			ZEMatrix4x4					WorldViewMatrix;
+			ZEMatrix4x4					WorldViewProjMatrix;
+		};
 
-		virtual void					UpdateMaterial();
+		__declspec(align(16))
+		struct Properties
+		{
+			ZEVector3					ViewSpacePosition;
+			float						Range;
+			ZEVector3					Color;
+			float						Intensity;
+			ZEVector3					Attenuation;
+			float						PenumbraSize;
+			ZEVector2					PixelSize;
+			float						SlopeScaledBias;
+			float						DepthScaledBias;
+		};
+
+		virtual ZESize					GetHash() const;
+		virtual bool					UpdateMaterial();
+
 		virtual bool					SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
 		static ZEMaterialLightPoint*	CreateInstance();

@@ -71,7 +71,7 @@ ZEMaterialSimple::ZEMaterialSimple()
 	Wireframe = false;
 	TwoSided = false;
 	VertexColorEnabled = true;
-	TransparancyMode = ZE_MTM_NONE;
+	TransparancyMode = ZE_TM_NONE;
 	TransparancyCullLimit = 128;
 	MaterialColor = ZEVector4::One;
 	TextureAddressModeU = ZE_TAM_MIRROR;
@@ -114,11 +114,6 @@ void ZEMaterialSimple::ReleaseShaders()
 	ZE_DESTROY(PixelShader);
 	ZE_DESTROY(VertexShaderData);
 	ZE_DESTROY(PixelShaderData);
-}
-
-ZEMaterialFlags ZEMaterialSimple::GetMaterialFlags() const
-{
-	return ZE_MTF_FORWARD_PASS;
 }
 
 ZESize ZEMaterialSimple::GetHash() const
@@ -166,12 +161,12 @@ const ZEVector4& ZEMaterialSimple::GetMaterialColor() const
 	return MaterialColor;
 }
 
-void ZEMaterialSimple::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
+void ZEMaterialSimple::SetTransparancyMode(ZETransparancyMode Mode)
 {
 	TransparancyMode = Mode;
 }
 
-ZEMaterialTransparancyMode ZEMaterialSimple::GetTransparancyMode() const
+ZETransparancyMode ZEMaterialSimple::GetTransparancyMode() const
 {
 	return TransparancyMode;
 }
@@ -218,6 +213,7 @@ ZETextureAddressMode ZEMaterialSimple::GetTextureAddressModeV() const
 
 bool ZEMaterialSimple::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
+	/*
 	if (Stage->GetStageIndentifier() != ZE_RENDER_STAGE_FORWARD)
 		return true;
 
@@ -289,23 +285,23 @@ bool ZEMaterialSimple::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, cons
 	
 	// Setup Transparancy
 	ZEBlendState BlendState;
-	if (TransparancyMode != ZE_MTM_NONE)
+	if (TransparancyMode != ZE_TM_NONE)
 	{	
 		BlendState.SetBlendEnable(0, true);
 
 		switch(TransparancyMode)
 		{
-			case ZE_MTM_ADDAPTIVE:
+			case ZE_TM_ADDAPTIVE:
 				BlendState.SetBlendEquation(ZE_BE_ADD);
 				BlendState.SetSourceBlendOption(ZE_BO_SRC_ALPHA);
 				BlendState.SetDestinationBlendOption(ZE_BO_ONE);
 				break;
-			case ZE_MTM_SUBTRACTIVE:
+			case ZE_TM_SUBTRACTIVE:
 				BlendState.SetBlendEquation(ZE_BE_SUBTRACT);
 				BlendState.SetSourceBlendOption(ZE_BO_SRC_ALPHA);
 				BlendState.SetDestinationBlendOption(ZE_BO_ONE);
 				break;
-			case ZE_MTM_REGULAR:
+			case ZE_TM_REGULAR:
 				BlendState.SetBlendEquation(ZE_BE_ADD);
 				BlendState.SetSourceBlendOption(ZE_BO_SRC_ALPHA);
 				BlendState.SetDestinationBlendOption(ZE_BO_INV_SRC_ALPHA);
@@ -328,13 +324,14 @@ bool ZEMaterialSimple::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, cons
 	Device->SetPixelShaderSampler(5, SamplerState);
 	Device->SetPixelShaderTexture(5, Texture);
 
+	*/
 	return true;
 }
 
-/*
+	/*
 bool ZEMaterialSimple::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* RenderCommand)
 {
-	
+
 	static ZEDeviceStageShader VertexShaderStage;
 	static ZEDeviceStageShader PixelShaderStage;
 	
@@ -427,21 +424,17 @@ bool ZEMaterialSimple::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* R
 	
 	Device->SetVertexShaderStage(&VertexShaderStage);
 	Device->SetPixelShaderStage(&PixelShaderStage);
-	
+
 	return true;
 }
 */
 
-void ZEMaterialSimple::UpdateMaterial()
+bool ZEMaterialSimple::UpdateMaterial()
 {
-
+	return true;
 }
 
 ZEMaterialSimple* ZEMaterialSimple::CreateInstance()
 {
-	return new ZEMaterialSimple();
+	return NULL; //new ZEMaterialSimple();
 }
-
-
-
-

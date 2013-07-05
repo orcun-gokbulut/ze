@@ -46,55 +46,35 @@
 #include "ZEGraphics/ZERasterizerState.h"
 #include "ZEGraphics/ZEGraphicsDeviceState.h"
 
-enum ZERenderPipeline
+#define ZE_RCT_NONE						0
+#define ZE_RCT_DEFAULT					1
+#define ZE_RCT_INDEXED					2
+#define ZE_RCT_INSTANCED				4
+#define ZE_RCT_INDEXED_INSTANCED		8
+typedef ZEFlagsBase<ZEUInt32>			ZERenderCommandType;
+
+struct ZESkinningBuffer
 {
-	ZE_RP_NONE		= 0,
-	ZE_RP_3D		= 1,
-	ZE_RP_2D		= 2
+	ZEMatrix4x4	BoneMatrices[58];
 };
 
-#define ZE_RCT_DEFAULT						1
-#define ZE_RCT_INDEXED						2
-#define ZE_RCT_INSTANCED					4
-#define ZE_RCT_SKINNED						8
-#define ZE_RCT_LIGHT						16
-#define ZE_RCT_SHADOW						32
-#define ZE_RCT_TERRAIN						64
-#define ZE_RCT_PARTICLE						128
-typedef ZEUInt32 ZERenderCommandType;
+struct ZETransformationBuffer
+{
+	ZEMatrix4x4	WorldView;
+	ZEMatrix4x4	WorldViewProjection;
+};
 
-#define	ZE_RCF_NONE							0
-#define	ZE_RCF_Z_CULL						1
-#define	ZE_RCF_NO_Z_WRITE					2
-#define	ZE_RCF_WORLD_TRANSFORM				4
-#define ZE_RCF_VIEW_TRANSFORM				8
-#define ZE_RCF_PROJECTION_TRANSFORM			16
-#define	ZE_RCF_VIEW_PROJECTION_TRANSFORM	(ZE_RCF_VIEW_TRANSFORM | ZE_RCF_PROJECTION_TRANSFORM)
-typedef ZEUInt32 ZERenderCommandFlags;
-
-class ZELight;
-class ZEMaterialNew;
+/********************************************************************/
+/*					Render Command Base Classes						*/
+/********************************************************************/
 class ZEMaterial;
-class ZEIndexBuffer;
-class ZEVertexBuffer;
 class ZEVertexLayout;
-class ZERenderTarget;
+class ZEVertexBuffer;
+class ZEConstantBuffer;
 
-
-/************************************************************************/
-/*                        RENDER COMMAND TEST                           */
-/************************************************************************/
-class ZERenderCommandTest
+class _ZERenderCommandDefaultBase
 {
 	public:
-		ZESize					Size;
-
-		ZERenderCommandType		Type;
-		float					Order;
-		ZEInt32					Priority;
-
-		ZEMaterialNew*			Material;
-
 		ZEPrimitiveType			PrimitiveType;
 		ZEUInt32				PrimitiveCount;
 
@@ -102,11 +82,14 @@ class ZERenderCommandTest
 		ZEVertexLayout*			VertexLayout;
 		ZEVertexBuffer*			VertexBuffers[ZE_MAX_VERTEX_BUFFER_SLOT];
 
-								ZERenderCommandTest();
-								~ZERenderCommandTest();
+	protected:
+								_ZERenderCommandDefaultBase();
+								~_ZERenderCommandDefaultBase();
 };
 
-class ZERenderCommandIndexedTest : public ZERenderCommandTest
+class ZEIndexBuffer;
+
+class _ZERenderCommandIndexedBase
 {
 	public:
 		ZEUInt32				BaseVertex;
@@ -114,79 +97,93 @@ class ZERenderCommandIndexedTest : public ZERenderCommandTest
 		ZEUInt32				IndexCount;
 		ZEIndexBuffer*			IndexBuffer;
 
-								ZERenderCommandIndexedTest();
-								~ZERenderCommandIndexedTest();
+	protected:
+								_ZERenderCommandIndexedBase();
+								~_ZERenderCommandIndexedBase();
 };
 
-class ZERenderCommandInstancedTest : public ZERenderCommandTest
+class _ZERenderCommandInstancedBase
 {
 	public:
 		ZEUInt32				InstanceCount;
 		ZEUInt32				FirstInstance;
 
-								ZERenderCommandInstancedTest();
-								~ZERenderCommandInstancedTest();
+	protected:
+								_ZERenderCommandInstancedBase();
+								~_ZERenderCommandInstancedBase();
 };
 
-/************************************************************************/
-/*                        OLD RENDER COMMAND                            */
-/************************************************************************/
+class _ZERenderCommandIndexedInstancedBase : public _ZERenderCommandIndexedBase, 
+											 public _ZERenderCommandInstancedBase
+{
+	protected:
+								_ZERenderCommandIndexedInstancedBase();
+								~_ZERenderCommandIndexedInstancedBase();
+};
+
+/********************************************************************/
+/*						Render Command Classes						*/
+/********************************************************************/
+
 class ZERenderCommand
 {
-	public:
+	friend class ZERenderer;
+	friend class ZERenderStage;
+	friend class ZECommandBuffer;
+
+	protected:
+		ZEUInt32				Id;
 		ZESize					Size;
-
-		float					Order;
-		ZEInt					Priority;
-
 		ZERenderCommandType		Type;
-		ZERenderCommandFlags	Flags;
-		ZERenderPipeline		Pipeline;
 
-		ZEPrimitiveType			PrimitiveType;
-		ZEUInt					PrimitiveCount;
-		
-		ZEUInt					FirstVertex;
-		ZEVertexLayout			VertexLayout;
-		ZEVertexBuffer*			VertexBuffers[ZE_MAX_VERTEX_BUFFER_SLOT];
-
-		ZEMaterial*				Material;
-		ZEMatrix4x4				WorldMatrix;
-		ZEMatrix4x4				LocalMatrix;
-
-								ZERenderCommand();
+								ZERenderCommand(ZESize CommandSize, ZERenderCommandType CommandType);
 								~ZERenderCommand();
+
+	public:
+		float					Order;
+		ZEInt32					Priority;
+		
+		ZEMaterial*				Material;
+		
+		bool					Skinned;
+		ZEConstantBuffer*		SkinningBuffer;
+		ZEConstantBuffer*		TransformationBuffer;
+
 };
 
-class ZERenderCommandSkinned : public ZERenderCommand
+class ZERenderCommandDefault :	public ZERenderCommand,
+								public _ZERenderCommandDefaultBase
 {
 	public:
-		ZEArray<ZEMatrix4x4>	BoneTransforms;
-
-								ZERenderCommandSkinned();
-								~ZERenderCommandSkinned();
+								ZERenderCommandDefault();
+								~ZERenderCommandDefault();
 };
 
-class ZERenderCommandIndexed : public ZERenderCommand
+class ZERenderCommandIndexed :	public ZERenderCommand, 
+								public _ZERenderCommandDefaultBase, 
+								public _ZERenderCommandIndexedBase
 {
 	public:
-		ZEUInt					BaseVertex;
-		ZEUInt					FirstIndex;
-		ZEUInt					IndexCount;
-		ZEIndexBuffer*			IndexBuffer;
-
 								ZERenderCommandIndexed();
 								~ZERenderCommandIndexed();
 };
 
-class  ZERenderCommandInstanced : public ZERenderCommand
+class ZERenderCommandInstanced : public ZERenderCommand,
+								 public _ZERenderCommandDefaultBase,
+								 public _ZERenderCommandInstancedBase
 {
 	public:
-		ZEUInt					InstanceCount;
-		ZEUInt					FirstInstance;
-
 								ZERenderCommandInstanced();
 								~ZERenderCommandInstanced();
+};
+
+class ZERenderCommandIndexedInstanced : public ZERenderCommand,
+										public _ZERenderCommandDefaultBase,
+										public _ZERenderCommandIndexedInstancedBase
+{
+	public:
+								ZERenderCommandIndexedInstanced();
+								~ZERenderCommandIndexedInstanced();
 };
 
 #endif

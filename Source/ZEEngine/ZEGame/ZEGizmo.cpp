@@ -1008,20 +1008,20 @@ ZEVector3 ZEGizmo::GetPositionChange()
 	return Result;
 }
 
-bool ZEGizmo::Initialize()
+bool ZEGizmo::InitializeSelf()
 {
-	if (GetInitialized())
+	if (!ZEEntity::InitializeSelf())
 		return false;
 
 	GizmoMaterial = ZEMaterialSimple::CreateInstance();
 
-	RenderCommand.VertexLayout = ZECanvasVertex::GetVertexLayout();
+	RenderCommand.VertexLayout = NULL;
 	RenderCommand.Material = GizmoMaterial;
 	
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZEGizmo::Deinitialize()
+bool ZEGizmo::DeinitializeSelf()
 {	
 	if (GizmoMaterial != NULL)
 	{
@@ -1029,7 +1029,7 @@ void ZEGizmo::Deinitialize()
 		GizmoMaterial = NULL;
 	}
 
-	ZEEntity::Deinitialize();
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZEGizmo::Draw(ZEDrawParameters* DrawParameters)

@@ -53,8 +53,11 @@ class ZED3D10Texture3D : public ZETexture3D, public ZED3D10ComponentBase
 	friend class ZED3D10GraphicsDevice;
 
 	private:
-		ID3D10Texture3D*					Texture3D;
-		ID3D10ShaderResourceView*			ShaderResourceView;
+		static ZESize						GlobalSize;
+		static ZEUInt16						GlobalCount;
+
+		ID3D10Texture3D*					D3D10Texture3D;
+		ID3D10ShaderResourceView*			D3D10ShaderResourceView;
 
 											ZED3D10Texture3D();
 		virtual								~ZED3D10Texture3D();

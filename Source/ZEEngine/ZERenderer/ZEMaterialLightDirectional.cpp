@@ -69,20 +69,15 @@ void ZEMaterialLightDirectional::UpdateShaders()
 
 void ZEMaterialLightDirectional::UpdateBuffers()
 {
-	if (Transformations == NULL)
+	if (LightTransformations == NULL)
 	{
-		Transformations = ZEConstantBuffer::CreateInstance();
-		Transformations->Create(VertexShader->GetMetaTable()->GetBufferInfo("TransformationsVS"));
+		LightTransformations = ZEConstantBuffer::CreateInstance();
+		LightTransformations->Create(VertexShader->GetMetaTable()->GetBufferInfo("TransformationsVS"));
 	}
-	if (LightCaster && LightParameters == NULL)
+	if (LightProperties == NULL)
 	{
-		LightParameters = ZEConstantBuffer::CreateInstance();
-		LightParameters->Create(PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
-	}
-	if (ShadowCaster && ShadowParameters == NULL)
-	{
-		ShadowParameters = ZEConstantBuffer::CreateInstance();
-		ShadowParameters->Create(PixelShader->GetMetaTable()->GetBufferInfo("ShadowParametersPS"));
+		LightProperties = ZEConstantBuffer::CreateInstance();
+		LightProperties->Create(PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
 	}
 }
 
@@ -94,59 +89,21 @@ void ZEMaterialLightDirectional::DestroyShaders()
 
 void ZEMaterialLightDirectional::DestroyBuffers()
 {
-	ZE_DESTROY(Transformations);
-	ZE_DESTROY(LightParameters);
-	ZE_DESTROY(ShadowParameters);
+	ZE_DESTROY(LightTransformations);
+	ZE_DESTROY(LightProperties);
 }
 
 bool ZEMaterialLightDirectional::SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	UpdateMaterial();
 
-	struct DirectionalLightTransformations
-	{
-		ZEMatrix4x4 InvProjMatrix;
-	};
-
-	struct DirectionalLightParameters
-	{
-		ZEVector3		Color;
-		float			Intensity;
-		ZEVector3		Direction;
-		float			Dummy1;
-		ZEVector2		PixelSize;
-		float			Dummy2[2];
-	};
-
-	ZECamera* Camera = zeScene->GetActiveCamera();
-	ZEUInt ScreenWidth = zeGraphics->GetScreenWidth();
-	ZEUInt ScreenHeight = zeGraphics->GetScreenHeight();
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
-
-	// VS parameters
-	DirectionalLightTransformations* Transforms = NULL;
-	Transformations->Lock((void**)&Transforms);
-		
-		ZEMatrix4x4::Inverse(Transforms->InvProjMatrix, Camera->GetProjectionTransform());
-	
-	Transformations->Unlock();
-
-	// PS Parameters
-	DirectionalLightParameters* Parameters = NULL;
-	LightParameters->Lock((void**)&Parameters);
-	
-		Parameters->Color = Color;
-		Parameters->Intensity = Intensity;
-		ZEMatrix4x4::Transform3x3(Parameters->Direction, Camera->GetViewTransform(), -WorldFront);
-		Parameters->PixelSize = ZEVector2(1.0f / (float)ScreenWidth, 1.0f / (float)ScreenHeight);
-	
-	LightParameters->Unlock();
 	
 	Device->SetVertexShader(VertexShader);
 	Device->SetPixelShader(PixelShader);
 
-	Device->SetVertexShaderBuffer(0, Transformations);
-	Device->SetPixelShaderBuffer(0, LightParameters);
+	Device->SetVertexShaderBuffer(0, LightTransformations);
+	Device->SetPixelShaderBuffer(0, LightProperties);
 
 	return true;
 }
@@ -156,21 +113,18 @@ ZESize ZEMaterialLightDirectional::GetHash() const
 	return ZEHashGenerator::Hash(ZEString("ZEMaterialLightDirectional"));
 }
 
-ZEMaterialFlags ZEMaterialLightDirectional::GetMaterialFlags() const
-{
-	return ZE_MTF_LIGHTING_PASS;
-}
-
-void ZEMaterialLightDirectional::UpdateMaterial()
+bool ZEMaterialLightDirectional::UpdateMaterial()
 {
 	UpdateShaders();
 	UpdateBuffers();
+
+	return true;
 }
 
 bool ZEMaterialLightDirectional::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
-	if ((Stage->GetStageIndentifier() & ZE_RENDER_STAGE_LIGHTING) == 0)
-		return true;
+	if (Stage->GetStageType().GetFlags(ZE_RST_LIGHTING))
+		return false;
 
 	return SetupLightingPass(Stage, RenderCommand);
 }
@@ -184,9 +138,9 @@ ZEMaterialLightDirectional::ZEMaterialLightDirectional()
 {
 	VertexShader = NULL;
 	PixelShader = NULL;
-	Transformations = NULL;
-	LightParameters = NULL;
-	ShadowParameters = NULL;
+
+	LightTransformations = NULL;
+	LightProperties = NULL;
 }
 
 ZEMaterialLightDirectional::~ZEMaterialLightDirectional()

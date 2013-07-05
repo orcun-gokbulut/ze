@@ -39,12 +39,7 @@ ze_set_project_folder("ZETools/ZE3dsMax")
 
 set(ZEBUILD_3DS_MAX_BINARY_DIRECTORY "C:\\Program Files (x86)\\Autodesk\\3ds Max 2010" CACHE STRING "Directory of 3ds max.")
 
-include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}
-	${ZEBUILD_INCLUDE_PATH}/3dsMax/2010)
-	
-link_directories(
-	${ZEBUILD_LIB_PATH}/3dsMax/2010)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(ZE3dsMaxUI)	
 add_subdirectory(ZE3dsMaxModelExporter)

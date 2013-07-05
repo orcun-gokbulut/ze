@@ -75,10 +75,9 @@ class ZEParticleEmitter : public ZEObject
 {
 	ZE_META_OBJECT(ZEParticleEmitter)
 
-		friend class ZEParticleModifier;
+	friend class ZEParticleModifier;
 
 	private:
-
 		ZEString						Name;
 		ZEParticleEffect*				Owner;
 
@@ -87,8 +86,8 @@ class ZEParticleEmitter : public ZEObject
 		ZEArray<ZEParticleModifier*>	Modifiers;
 
 		ZEMaterial*						Material;
-		ZEVertexBuffer*			VertexBuffer;
-		ZERenderCommand					RenderCommand;
+		ZEVertexBuffer*					VertexBuffer;
+		ZERenderCommandDefault			RenderCommand;
 
 		ZEParticleBillboardType			BillboardType;
 

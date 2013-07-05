@@ -38,17 +38,6 @@
 #include "ZEGraphicsModule.h"
 #include "ZEShader.h"
 
-
-ZEShaderCompiler::ZEShaderCompiler()
-{
-
-}
-
-ZEShaderCompiler::~ZEShaderCompiler()
-{
-
-}
-
 ZEShader* ZEShaderCompiler::CompileShaderFromSource(ZEShaderCompileOptions* Options)
 {
 	return zeGraphics->GetShaderCompiler()->CompileShader(Options);
@@ -77,4 +66,14 @@ ZEShader* ZEShaderCompiler::CompileShaderFromFile(ZEShaderCompileOptions* Option
 	Options->SourceData = SourceArray.GetConstCArray();
 
 	return CompileShaderFromSource(Options);
+}
+
+ZEShaderCompiler::ZEShaderCompiler()
+{
+
+}
+
+ZEShaderCompiler::~ZEShaderCompiler()
+{
+
 }

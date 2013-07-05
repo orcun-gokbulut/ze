@@ -52,8 +52,11 @@ class ZED3D10TextureCube : public ZETextureCube, public ZED3D10ComponentBase
 	friend class ZED3D10GraphicsDevice;
 	
 	protected:
-		ID3D10Texture2D*					TextureCube;
-		ID3D10ShaderResourceView*			ShaderResourceView;
+		static ZESize						GlobalSize;
+		static ZEUInt16						GlobalCount;
+
+		ID3D10Texture2D*					D3D10TextureCube;
+		ID3D10ShaderResourceView*			D3D10ShaderResourceView;
 
 											ZED3D10TextureCube();
 		virtual								~ZED3D10TextureCube();

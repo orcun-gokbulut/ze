@@ -40,44 +40,86 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 
-struct ZEShaderBufferInfo;
+#define ZE_MAX_CONSTANT_BUFFER_INSTANCE		4096
+
+class ZEConstantBuffer;
+struct ZEShaderConstant;
+
+class ZEConstantBufferLink
+{
+	friend class ZEConstantBuffer;
+
+	protected:
+		ZEConstantBuffer*			Buffer;
+		ZESSize						BufferId;
+		ZESize						Index;
+
+									ZEConstantBufferLink(ZEConstantBuffer* ConstantBuffer, ZESSize ConstantBufferId, ZESize ConstantIndex);
+									~ZEConstantBufferLink();
+
+	public:
+		const ZEShaderConstant*		GetShaderConstant() const;
+
+		virtual bool				SetValue(const void* Source);
+		virtual bool				GetValue(void* Destination) const;
+		
+};
+
+
+struct ZEShaderBuffer;
 
 class ZEConstantBuffer
 {
+	friend class ZEMaterial;
+	friend class ZERenderCommand;
 	friend class ZEGraphicsDevice;
 	friend class ZEGraphicsModule;
 
-	// Should be public for only internal usage
+	private:
+		struct ZEConstantBufferState
+		{
+			ZEUInt8		Deleted	: 1;	// Is buffer deleted ?
+			ZEUInt8		InUse	: 1;	// Is buffer set to renderer ?
+			ZEUInt8		Changed	: 1;	// Is level buffer changed ?
+			ZEUInt8		Locked	: 1;	// Is level buffer locked ?
+
+		} State;
+
+	protected:
+		ZESSize							Id;
+		void*							Data;
+		ZESize							Size;
+		const ZEShaderBuffer*			Info;
+
+		bool							NeedUpdate() const;
+
+		virtual bool					UpdateBuffer();
+
+										ZEConstantBuffer();
+		virtual							~ZEConstantBuffer();
+
 	public:
-		bool						NeedUpdate;
-		
-		void*						Data;
-		ZESize						Size;
-		const ZEShaderBufferInfo*	Info;
+		ZESize							GetSize() const;
+		const ZEShaderBuffer*			GetInfo() const;
 
-		virtual void				UpdateData() = 0;
+		virtual bool					Lock(void** ConstantData);
+		virtual void					Unlock(bool NotChanged = false);
 
-									ZEConstantBuffer();
-		virtual						~ZEConstantBuffer();
+		virtual ZEConstantBufferLink	GetConstantLink(ZESize Index);
+		virtual ZEConstantBufferLink	GetConstantLink(const char* Name);
 
-	public:
-		ZESize						GetSize() const;
-		const ZEShaderBufferInfo*	GetInfo() const;
+		virtual bool					SetConstant(ZESize Index, const void* SourceData);
+		virtual bool					SetConstant(const char* Name, const void* SourceData);
 
-		virtual void				Unlock() = 0;
-		virtual bool				Lock(void** ConstantData) = 0;
-		
-		virtual bool				SetConstant(ZESize Index, const void* SourceData) = 0;
-		virtual bool				GetConstant(ZESize Index, void* DestinationData) const = 0;
-		
-		virtual bool				SetConstant(const ZEString& Name, const void* SourceData) = 0;
-		virtual bool				GetConstant(const ZEString& Name, void* DestinationData) const = 0;
+		virtual bool					GetConstant(ZESize Index, void* DestinationData) const;
+		virtual bool					GetConstant(const char* Name, void* DestinationData) const;
 
-		virtual void				Destroy();
-		virtual bool				Create(ZESize BufferSize) = 0;
-		virtual bool				Create(const ZEShaderBufferInfo* BufferInfo) = 0;
-		
-		static ZEConstantBuffer*	CreateInstance();
+		virtual bool					Create(const ZEShaderBuffer* BufferInfo);
+		virtual bool					Create(ZESize BufferSize);
+
+		virtual void					Destroy();
+
+		static ZEConstantBuffer*		CreateInstance();
 };
 
 #endif
