@@ -639,9 +639,16 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 		zeProfilerEnd();
 	}
 	
+
+	GetDevice()->SetRenderTarget(0, SSAOBuffer->ViewPort.FrameBuffer);
 	GetDevice()->SetRenderTarget(1, NULL);
 	GetDevice()->SetRenderTarget(2, NULL);
 	GetDevice()->SetRenderTarget(3, NULL);
+
+	if (FAILED(GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0xFFFFFFFF, 1.0f, 0x00)))
+	{
+		zeCriticalError("Clear failed");
+	}
 
 	D3DPERF_EndEvent();
 	zeProfilerEnd();
