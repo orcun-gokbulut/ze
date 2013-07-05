@@ -33,30 +33,42 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-cbuffer	ZEPipelineConstants : register(b13)
+cbuffer	ZETimeConstants : register(b12)
 {
-	// Elapsed time
+	float		ZETime0toN				: packoffset(c0.x);
+	float		ZESinTime0toN			: packoffset(c0.y);
+	float		ZECosTime0toN			: packoffset(c0.z);
+	float		ZETanTime0toN			: packoffset(c0.w);
+	
+	float		ZETime0to1				: packoffset(c1.x);
+	float		ZESinTime0to1			: packoffset(c1.y);
+	float		ZECosTime0to1			: packoffset(c1.z);
+	float		ZETanTime0to1			: packoffset(c1.w);
 
-	float		ZETime0toN						: packoffset(c0.x);
-	float		ZESinTime0toN					: packoffset(c0.y);
-	float		ZECosTime0toN					: packoffset(c0.z);
-	float		ZETanTime0toN					: packoffset(c0.w);
+	float		ZEElapsedTime			: packoffset(c2.x);
+};
+
+
+cbuffer	ZECameraConstants : register(b13)
+{
+	float2		ZEViewPortDimension		: packoffset(c0.x);
+	float2		ZEInvViewPortDimension	: packoffset(c0.z);
+
+	float		ZENearZ					: packoffset(c1.x);
+	float		ZEFarZ					: packoffset(c1.y);
+	float		ZEFov					: packoffset(c1.z);
+	float		ZEAspectRatio			: packoffset(c1.w);
+
+	float3		ZECameraWorldPos		: packoffset(c2.x);
+	float3		ZECameraWorldUp			: packoffset(c3.x);
+	float3		ZECameraWorldFront		: packoffset(c4.x);
+	float3		ZECameraWorldRight		: packoffset(c5.x);
 	
-	float		ZETime0to1						: packoffset(c1.x);
-	float		ZESinTime0to1					: packoffset(c1.y);
-	float		ZECosTime0to1					: packoffset(c1.z);
-	float		ZETanTime0to1					: packoffset(c1.w);
-	
-	float		ZEFov							: packoffset(c2.x);
-	float2		ZENearFarZ						: packoffset(c2.y);
-	float		ZEAspectRatio					: packoffset(c2.w);
-	
-	float3		ZECameraWorldPos				: packoffset(c3.x);
-	float		ZEElapsedTime					: packoffset(c3.w);
-	float3		ZECameraWorldUp					: packoffset(c4.x);
-	float3		ZECameraWorldFront				: packoffset(c5.x);
-	float3		ZECameraWorldRight				: packoffset(c6.x);
-	
-	float2		ZEViewportWidthHeight			: packoffset(c7.x);
-	float2		ZEInvViewportWidthHeight		: packoffset(c7.z);
+	float4x4	ZEViewProjection		: packoffset(c6.x);
+	float4x4	ZEProjection			: packoffset(c10.x);
+	float4x4	ZEView					: packoffset(c14.x);
+
+	float4x4	ZEInvViewProjection		: packoffset(c18.x);
+	float4x4	ZEInvProjection			: packoffset(c22.x);
+	float4x4	ZEInvView				: packoffset(c26.x);
 };

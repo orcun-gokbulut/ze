@@ -44,9 +44,12 @@
 
 #define WIN32_LEAN_AND_MEAN
 
-//#define FREEIMAGE_LIB
-#include <FreeImage.h>
+#ifdef FREEIMAGE_LIB
+	// Workaround to avoid multiple definition
+	#undef FREEIMAGE_LIB
+#endif
 
+#include <FreeImage.h>
 
 
 static unsigned DLL_CALLCONV	FreeImageFile_Write_2D(void *buffer, unsigned size, unsigned count, fi_handle handle);
@@ -429,7 +432,8 @@ bool ZETextureLoader::GetImageInfo(ZETextureDataInfo* TextureInfo, ZEFile* File)
 
 	ZEUInt64 Cursor = File->Tell();
 	File->Seek(0, ZE_SF_BEGINING);
-
+	Cursor = File->Tell();
+	File->Flush();
 	FreeImageIO Callbacks;
 	Callbacks.write_proc	= &FreeImageFile_Write_2D;
 	Callbacks.read_proc		= &FreeImageFile_Read_2D;

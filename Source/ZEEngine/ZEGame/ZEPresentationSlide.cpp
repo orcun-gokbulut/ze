@@ -60,7 +60,7 @@ void ZEPresentationSlide::SetPresentationSlide(const char* FileName)
 	{
 		if (Texture != NULL)
 		{
-			Texture->Release();
+			Texture->Destroy();
 			Texture = NULL;
 		}
 
@@ -92,8 +92,11 @@ void ZEPresentationSlide::Draw(ZEDrawParameters* DrawParameters)
 	}
 }
 
-bool ZEPresentationSlide::Initialize()
+bool ZEPresentationSlide::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	ZECanvas Canvas;
 	Canvas.SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3(1.0f, 0.0f, 0.0f)));
 	Canvas.AddPlane(1.0f, 1.0f);
@@ -107,16 +110,20 @@ bool ZEPresentationSlide::Initialize()
 	if (Material != NULL)
 		Material->Destroy();
 
+	
+
 	Material = ZEMaterialDefault::CreateInstance();
-	Material->SetTwoSided(true);
-	Material->SetAmbientEnabled(true);
-	Material->SetAmbientColor(ZEVector3(1.0f, 1.0f, 1.0f));
-	Material->SetDiffuseEnabled(true);
-	Material->SetDiffuseColor(ZEVector3(1.0f, 1.0f, 1.0f));
+	Material->TwoSided = true;
+	Material->Components.Ambient = true;
+	Material->Components.Diffuse = true;
+	
+	ZEAccumulationPassBufferPS* Parameters = Material->GetAccumulationPassParameters();
+	Parameters->AmbientColor = ZEVector3(1.0f, 1.0f, 1.0f);
+	Parameters->DiffuseColor = ZEVector3(1.0f, 1.0f, 1.0f); 
 
 	if (Texture != NULL)
 	{
-		Texture->Release();
+		Texture->Destroy();
 		Texture = NULL;
 	}
 
@@ -124,14 +131,14 @@ bool ZEPresentationSlide::Initialize()
 		Texture = ZETexture2DResource::LoadSharedResource(PresentationSlide);
 
 	if (Texture != NULL)
-		Material->SetBaseMap(Texture->GetTexture());
+		Material->Textures.BaseMap = Texture->GetTexture();
 
 	Initialized = true;
 
 	return true;
 }
 
-void ZEPresentationSlide::Deinitialize()
+bool ZEPresentationSlide::DeinitializeSelf()
 {
 	if (VertexBuffer != NULL)
 		VertexBuffer->Destroy();
@@ -140,6 +147,8 @@ void ZEPresentationSlide::Deinitialize()
 		Material->Destroy();
 	
 	Initialized = false;
+
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZEPresentationSlide::Tick(float ElapsedTime)
@@ -156,15 +165,14 @@ ZEPresentationSlide::ZEPresentationSlide()
 	Texture = NULL;
 	Material = NULL;
 	
-	RenderCommand.VertexLayout = ZECanvasVertex::GetVertexLayout();
-	RenderCommand.Flags |= (ZE_RCF_VIEW_PROJECTION_TRANSFORM | ZE_RCF_WORLD_TRANSFORM | ZE_RCF_Z_CULL);
+	RenderCommand.VertexLayout = &ZECanvasVertex::GetVertexLayout();
 	RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
 	RenderCommand.PrimitiveCount = 2;
 }
 
 ZEPresentationSlide::~ZEPresentationSlide()
 {
-	Deinitialize();
+
 }
 
 ZEPresentationSlide* ZEPresentationSlide::CreateInstance()

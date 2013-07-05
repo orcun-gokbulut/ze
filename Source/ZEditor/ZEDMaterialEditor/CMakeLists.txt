@@ -46,8 +46,6 @@ qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 ze_add_library(ZEDMaterialEditor 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS libfreeimage)
+	LIBS libFreeImage libQt)

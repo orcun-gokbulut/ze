@@ -35,8 +35,8 @@
 
 #include "ZETypes.h"
 #include "ZED3D10Shader.h"
-#include "ZEGraphics/ZEShader.h"
 #include "ZED3D10StatePool.h"
+#include "ZEGraphics/ZEShader.h"
 #include "ZEDS/ZEListIterators.h"
 #include "ZED3D10GraphicsModule.h"
 #include "ZEGraphics/ZEBlendState.h"
@@ -44,6 +44,7 @@
 #include "ZEGraphics/ZESamplerState.h"
 #include "ZEGraphics/ZERasterizerState.h"
 #include "ZEGraphics/ZEDepthStencilState.h"
+#include "ZEGraphics/ZEGraphicsDefinitions.h"
 
 #include <d3d10.h>
 
@@ -62,7 +63,7 @@ inline static D3D10_BLEND ZEBlendOptionToD3D10(ZEBlendOption BlendOption)
 		D3D10_BLEND_INV_DEST_ALPHA,		// ZE_BO_INV_DEST_ALPHA		= 8,
 		D3D10_BLEND_DEST_COLOR,			// ZE_BO_DEST_COLOR			= 9,
 		D3D10_BLEND_INV_DEST_COLOR,		// ZE_BO_INV_DEST_COLOR		= 10,
-		D3D10_BLEND_SRC_ALPHA_SAT,		// ZE_BO_SRC_ALPHA_SAT		= 11
+		D3D10_BLEND_SRC_ALPHA_SAT,		// ZE_BO_SRC_ALPHA_SAT		= 11,
 		D3D10_BLEND_BLEND_FACTOR,		// ZE_BO_BLEND_FACTOR		= 12,
 		D3D10_BLEND_INV_BLEND_FACTOR,	// ZE_BO_INV_BLEND_FACTOR	= 13,
 		D3D10_BLEND_SRC1_COLOR,			// ZE_BO_SRC1_COLOR			= 14,
@@ -219,9 +220,9 @@ inline static D3D10_INPUT_CLASSIFICATION ZEVertexUsageToD3D10(ZEVertexUsage Usag
 	return Values[Usage];
 }
 
-ID3D10BlendState* ZED3D10StatePool::CreateD3D10State(const ZEBlendState* BlendState)
+ID3D10BlendState* ZED3D10StatePool::CreateD3D10State(ZEBlendState* BlendState)
 {
-	if (BlendStatePool.GetCount() >= ZE_D3D10_STATE_CACHE_CAPACITY)
+	if (BlendStatePool.GetCount() >= ZE_STATE_POOL_CACHE_CAPACITY)
 	{
 		zeError("Max blend state count reached.");
 		return NULL;
@@ -243,20 +244,26 @@ ID3D10BlendState* ZED3D10StatePool::CreateD3D10State(const ZEBlendState* BlendSt
 	}
 
 	ID3D10BlendState* D3D10State = NULL;
-	if (FAILED(D3D10Device->CreateBlendState(&BlendDesc, &D3D10State)))
+	HRESULT Result = D3D10Device->CreateBlendState(&BlendDesc, &D3D10State);
+	if (FAILED(Result))
 	{
-		zeError("cannot create depth stencil state");
+		zeError("D3D10 Blend state creation failed. ErrorCode: %d.", Result);
 		return NULL;
 	}
 
-	BlendStatePool.Append(new ZEBlendStateEntry(D3D10State, BlendState->Hash, 1));
-	
+	BlendStatePool.Append(new ZEBlendStateEntry(D3D10State, BlendState->GetHash(), 1));
+	BlendStateCount++;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Blend state created. Hash: %Iu.", (ZEUInt64)BlendState->GetHash());
+#endif
+
 	return D3D10State;
 }
 
-ID3D10SamplerState* ZED3D10StatePool::CreateD3D10State(const ZESamplerState* SamplerState)
+ID3D10SamplerState* ZED3D10StatePool::CreateD3D10State(ZESamplerState* SamplerState)
 {
-	if (SamplerStatePool.GetCount() >= ZE_D3D10_STATE_CACHE_CAPACITY)
+	if (SamplerStatePool.GetCount() >= ZE_STATE_POOL_CACHE_CAPACITY)
 	{
 		zeError("Max sampler state count reached.");
 		return NULL;
@@ -280,57 +287,70 @@ ID3D10SamplerState* ZED3D10StatePool::CreateD3D10State(const ZESamplerState* Sam
 	SamplerDesc.Filter = ZETextureFilterModeToD3D10(SamplerState->GetMinFilter(), SamplerState->GetMagFilter(), SamplerState->GetMipFilter());
 	
 	ID3D10SamplerState* D3D10State = NULL;
-	if (FAILED(D3D10Device->CreateSamplerState(&SamplerDesc, &D3D10State)))
+	HRESULT Result = D3D10Device->CreateSamplerState(&SamplerDesc, &D3D10State);
+	if (FAILED(Result))
 	{
-		zeError("Cannot create depth stencil state");
+		zeError("D3D10 Sampler state creation failed. ErrorCode: %d.", Result);
 		return NULL;
 	}
 
-	SamplerStatePool.Append(new ZESamplerStateEntry(D3D10State, SamplerState->Hash, 1));
+	SamplerStatePool.Append(new ZESamplerStateEntry(D3D10State, SamplerState->GetHash(), 1));
+	SamplerStateCount++;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Sampler state created. Hash: %Iu.", (ZEUInt64)SamplerState->GetHash());
+#endif
 
 	return D3D10State;
 }
 
-ID3D10RasterizerState* ZED3D10StatePool::CreateD3D10State(const ZERasterizerState* RasterizerState)
+ID3D10RasterizerState* ZED3D10StatePool::CreateD3D10State(ZERasterizerState* RasterizerState)
 {
-	if (RasterizerStatePool.GetCount() >= ZE_D3D10_STATE_CACHE_CAPACITY)
+	if (RasterizerStatePool.GetCount() >= ZE_STATE_POOL_CACHE_CAPACITY)
 	{
 		zeError("Max rasterizer state count reached.");
 		return NULL;
 	}
 
 	D3D10_RASTERIZER_DESC RasterizerDesc;
-	RasterizerDesc.FillMode = ZEFillModeToD3D10(RasterizerState->GetFillMode());
-	RasterizerDesc.CullMode = ZECullDirectionToD3D10(RasterizerState->GetCullDirection());
-	RasterizerDesc.FrontCounterClockwise = RasterizerState->GetFrontIsCounterClockwise();
+	RasterizerDesc.DepthBias = 0;
+	RasterizerDesc.DepthBiasClamp = 0.0f;
+	RasterizerDesc.SlopeScaledDepthBias = 0.0f;
 	RasterizerDesc.ScissorEnable = false;
 	RasterizerDesc.DepthClipEnable = true;
 	RasterizerDesc.MultisampleEnable = false;
 	RasterizerDesc.AntialiasedLineEnable = false;
-	RasterizerDesc.DepthBias = 0;
-	RasterizerDesc.DepthBiasClamp = 0.0f;
-	RasterizerDesc.SlopeScaledDepthBias = 0.0f;
+	RasterizerDesc.FillMode = ZEFillModeToD3D10(RasterizerState->GetFillMode());
+	RasterizerDesc.CullMode = ZECullDirectionToD3D10(RasterizerState->GetCullDirection());
+	RasterizerDesc.FrontCounterClockwise = RasterizerState->GetFrontIsCounterClockwise();
+
 
 	ID3D10RasterizerState* D3D10State = NULL;
-	if (FAILED(D3D10Device->CreateRasterizerState(&RasterizerDesc, &D3D10State)))
+	HRESULT Result = D3D10Device->CreateRasterizerState(&RasterizerDesc, &D3D10State);
+	if (FAILED(Result))
 	{
-		zeError("Cannot create depth stencil state");
+		zeError("D3D10 Rasterizer state creation failed. ErrorCode: %d.", Result);
 		return NULL;
 	}
 
-	RasterizerStatePool.Append(new ZERasterizerStateEntry(D3D10State, RasterizerState->Hash, 1));
+	RasterizerStatePool.Append(new ZERasterizerStateEntry(D3D10State, RasterizerState->GetHash(), 1));
+	RasterizerStateCount++;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Rasterizer state created. Hash: %Iu.", (ZEUInt64)RasterizerState->GetHash());
+#endif
 
 	return D3D10State;
 }
 
-ID3D10DepthStencilState* ZED3D10StatePool::CreateD3D10State(const ZEDepthStencilState* DepthStencilState)
+ID3D10DepthStencilState* ZED3D10StatePool::CreateD3D10State(ZEDepthStencilState* DepthStencilState)
 {
-	if (DepthStencilStatePool.GetCount() >= ZE_D3D10_STATE_CACHE_CAPACITY)
+	if (DepthStencilStatePool.GetCount() >= ZE_STATE_POOL_CACHE_CAPACITY)
 	{
 		zeError("Max depth stencil state count reached.");
 		return NULL;
 	}
-
+	
 	D3D10_DEPTH_STENCIL_DESC DepthStencilDesc;
 	DepthStencilDesc.DepthEnable = DepthStencilState->GetZTestEnable();
 	DepthStencilDesc.DepthFunc = ZEComparisionFunctionToD3D10(DepthStencilState->GetZFunction());
@@ -348,20 +368,26 @@ ID3D10DepthStencilState* ZED3D10StatePool::CreateD3D10State(const ZEDepthStencil
 	DepthStencilDesc.FrontFace.StencilFunc = ZEComparisionFunctionToD3D10(DepthStencilState->GetFrontStencilFunction());
 
 	ID3D10DepthStencilState* D3D10State = NULL;
-	if (FAILED(D3D10Device->CreateDepthStencilState(&DepthStencilDesc, &D3D10State)))
+	HRESULT Result = D3D10Device->CreateDepthStencilState(&DepthStencilDesc, &D3D10State);
+	if (FAILED(Result))
 	{
-		zeError("Cannot create depth stencil state");
+		zeError("D3D10 Depth stencil state creation failed. ErrorCode: %d.", Result);
 		return NULL;
 	}
 
-	DepthStencilStatePool.Append(new ZEDepthStencilStateEntry(D3D10State, DepthStencilState->Hash, 1));
+	DepthStencilStatePool.Append(new ZEDepthStencilStateEntry(D3D10State, DepthStencilState->GetHash(), 1));
+	DepthStencilStateCount++;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Depth stencil state created. Hash: %Iu.", (ZEUInt64)DepthStencilState->GetHash());
+#endif
 
 	return D3D10State;
 }
 
-ID3D10InputLayout* ZED3D10StatePool::CreateD3D10State(const ZEVertexLayout* VertexLayout, ID3D10Blob* ByteCode)
+ID3D10InputLayout* ZED3D10StatePool::CreateD3D10State(ZEVertexLayout* VertexLayout, ID3D10Blob* ByteCode)
 {
-	if (VertexLayoutPool.GetCount() >= ZE_D3D10_STATE_CACHE_CAPACITY)
+	if (VertexLayoutPool.GetCount() >= ZE_STATE_POOL_CACHE_CAPACITY)
 	{
 		zeError("Max input layout count reached.");
 		return NULL;
@@ -374,10 +400,10 @@ ID3D10InputLayout* ZED3D10StatePool::CreateD3D10State(const ZEVertexLayout* Vert
 	for (ZESize I = 0; I < ElementCount; ++I)
 	{
 		ElementDesc[I].SemanticName = Elements[I].Semantic;
-		ElementDesc[I].SemanticIndex = Elements[I].SemanticIndex;
+		ElementDesc[I].SemanticIndex = Elements[I].Index;
 		ElementDesc[I].Format = ZEVertexElementTypeToD3D10(Elements[I].Type);
-		ElementDesc[I].InputSlot = Elements[I].StreamSlot;
-		ElementDesc[I].AlignedByteOffset = Elements[I].ByteOffset;
+		ElementDesc[I].InputSlot = Elements[I].Stream;
+		ElementDesc[I].AlignedByteOffset = Elements[I].Offset;
 		ElementDesc[I].InstanceDataStepRate = Elements[I].InstanceCount;
 		ElementDesc[I].InputSlotClass = ZEVertexUsageToD3D10(Elements[I].Usage);
 	}
@@ -385,13 +411,20 @@ ID3D10InputLayout* ZED3D10StatePool::CreateD3D10State(const ZEVertexLayout* Vert
 	ID3D10InputLayout* D3D10State = NULL;
 	SIZE_T Lenght = ByteCode->GetBufferSize();
 	const void* Code = ByteCode->GetBufferPointer();
-	if (FAILED(D3D10Device->CreateInputLayout(ElementDesc, ElementCount, Code, Lenght, &D3D10State)))
+	
+	HRESULT Result = D3D10Device->CreateInputLayout(ElementDesc, ElementCount, Code, Lenght, &D3D10State);
+	if (FAILED(Result))
 	{
-		zeError("Can not create automatic vertex declaration.");
-		return false;
+		zeError("D3D10 Vertex layout creation failed. ErrorCode: %d.", Result);
+		return NULL;
 	}
 
-	VertexLayoutPool.Append(new ZEVertexLayoutEntry(D3D10State, VertexLayout->Hash, 1));
+	VertexLayoutPool.Append(new ZEVertexLayoutEntry(D3D10State, VertexLayout->GetHash(), 1));
+	VertexlayoutCount++;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Vertex layout created. Hash: %Iu.", (ZEUInt64)VertexLayout->GetHash());
+#endif
 
 	return D3D10State;
 }
@@ -413,6 +446,12 @@ ZEStatePoolEntry* ZED3D10StatePool::FindPoolEntry(ZEList<ZEStatePoolEntry>& Pool
 	return NULL;
 }
 
+ZEUInt16 ZED3D10StatePool::BlendStateCount = 0;
+ZEUInt16 ZED3D10StatePool::SamplerStateCount = 0;
+ZEUInt16 ZED3D10StatePool::VertexlayoutCount = 0;
+ZEUInt16 ZED3D10StatePool::RasterizerStateCount = 0;
+ZEUInt16 ZED3D10StatePool::DepthStencilStateCount = 0;
+ZEUInt16 ZED3D10StatePool::StatesPerSecond = 0;
 ZED3D10StatePool::ZED3D10StatePool()
 {
 
@@ -461,6 +500,13 @@ void ZED3D10StatePool::ClearStates()
 		ZEStatePoolEntry* Entry = DepthStencilStatePool.Dequeue();
 		delete Entry;
 	}
+
+	BlendStateCount = 0;
+	SamplerStateCount = 0;
+	VertexlayoutCount = 0;
+	RasterizerStateCount = 0;
+	DepthStencilStateCount = 0;
+	StatesPerSecond = 0;
 }
 
 void* ZED3D10StatePool::GetBlendState(ZESize Hash)
@@ -498,37 +544,44 @@ void* ZED3D10StatePool::GetVertexLayout(ZESize Hash)
 	return Entry == NULL ? NULL : ((ZEVertexLayoutEntry*)Entry)->VertexLayout;
 }
 
-void* ZED3D10StatePool::CreateState(const ZEBlendState* BlendState)
+void* ZED3D10StatePool::CreateState(ZEBlendState* BlendState)
 {
-	ZEStatePoolEntry* Entry = FindPoolEntry(BlendStatePool, BlendState->Hash);
+	zeDebugCheck(BlendState == NULL, "NULL pointer.");
 
+	ZEStatePoolEntry* Entry = FindPoolEntry(BlendStatePool, BlendState->GetHash());
 	return Entry == NULL ? CreateD3D10State(BlendState) : ((ZEBlendStateEntry*)Entry)->BlendState;
 }
 
-void* ZED3D10StatePool::CreateState(const ZESamplerState* SamplerState)
+void* ZED3D10StatePool::CreateState(ZESamplerState* SamplerState)
 {
-	ZEStatePoolEntry* Entry = FindPoolEntry(SamplerStatePool, SamplerState->Hash);
+	zeDebugCheck(SamplerState == NULL, "NULL pointer.");
 
+	ZEStatePoolEntry* Entry = FindPoolEntry(SamplerStatePool, SamplerState->GetHash());
 	return Entry == NULL ? CreateD3D10State(SamplerState) : ((ZESamplerStateEntry*)Entry)->SamplerState;
 }
 
-void* ZED3D10StatePool::CreateState(const ZERasterizerState* RasterizerState)
+void* ZED3D10StatePool::CreateState(ZERasterizerState* RasterizerState)
 {
-	ZEStatePoolEntry* Entry = FindPoolEntry(RasterizerStatePool, RasterizerState->Hash);
+	zeDebugCheck(RasterizerState == NULL, "NULL pointer.");
 
+	ZEStatePoolEntry* Entry = FindPoolEntry(RasterizerStatePool, RasterizerState->GetHash());
 	return Entry == NULL ? CreateD3D10State(RasterizerState) : ((ZERasterizerStateEntry*)Entry)->RasterizerState;
 }
 
-void* ZED3D10StatePool::CreateState(const ZEDepthStencilState* DepthStencilState)
+void* ZED3D10StatePool::CreateState(ZEDepthStencilState* DepthStencilState)
 {
-	ZEStatePoolEntry* Entry = FindPoolEntry(DepthStencilStatePool, DepthStencilState->Hash);
+	zeDebugCheck(DepthStencilState == NULL, "NULL pointer.");
 
+	ZEStatePoolEntry* Entry = FindPoolEntry(DepthStencilStatePool, DepthStencilState->GetHash());
 	return Entry == NULL ? CreateD3D10State(DepthStencilState) : ((ZEDepthStencilStateEntry*)Entry)->DepthStencilState;
 }
 
-void* ZED3D10StatePool::CreateState(const ZEVertexLayout* VertexLayout, const ZEShader* VertexShader)
+void* ZED3D10StatePool::CreateState(ZEVertexLayout* VertexLayout, const ZEShader* VertexShader)
 {
-	ZEStatePoolEntry* Entry = FindPoolEntry(VertexLayoutPool, VertexLayout->Hash);
+	zeDebugCheck(VertexLayout == NULL, "NULL pointer.");
+	zeDebugCheck(VertexShader == NULL, "NULL pointer.");
+	zeDebugCheck(VertexShader->GetShaderType() != ZE_ST_VERTEX, "Wrong shader type.");
 
+	ZEStatePoolEntry* Entry = FindPoolEntry(VertexLayoutPool, VertexLayout->GetHash());
 	return Entry == NULL ? CreateD3D10State(VertexLayout, ((ZED3D10Shader*)VertexShader)->D3D10ByteCode) : ((ZEVertexLayoutEntry*)Entry)->VertexLayout;
 }

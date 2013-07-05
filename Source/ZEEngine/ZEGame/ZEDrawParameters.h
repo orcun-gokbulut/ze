@@ -40,9 +40,8 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
 #include "ZEDrawStatistics.h"
+#include "ZERenderer/ZERenderStage.h"
 
 class ZELight;
 class ZECamera;
@@ -59,44 +58,44 @@ enum ZERenderPass
 
 enum ZEViewType
 {
-	ZE_VPT_CAMERA,
-	ZE_VPT_LIGHT
+	ZE_VT_CAMERA,
+	ZE_VT_LIGHT
 };
 
 struct ZEView
 {
 	ZEViewType				Type;
-	ZELight*				Light;
-	ZECamera*				Camera;
 
-	ZEVector3				Position;
-	ZEQuaternion			Rotation;
-	ZEVector3				Direction;
+	union
+	{
+		ZELight*			Light;
+		ZECamera*			Camera;
 
-	float					FOV;
-
-	ZEMatrix4x4				ViewTransform;
-	ZEMatrix4x4				ProjectionTransform;
-	ZEMatrix4x4				ViewProjectionTransform;
+	};
 };
 
 class ZERenderTarget;
+class ZECommandBucket;
 
-struct ZEDrawParameters
+class ZEDrawParameters
 {
-	ZESize					FrameId;
-	float					ElapsedTime;
-	float					Time;
-	ZERenderer*				Renderer;
-	ZERenderPass			Pass;
+	public:
+		ZESize					FrameId;
+		float					ElapsedTime;
+		float					Time;
 
-	ZEDrawStatistics		Statistics;
+		ZERenderer*				Renderer;
+		
+		ZERenderStageType		Stages;
+		ZECommandBucket*		OwnerBucket;
 
-	const ZEView*			View;
-	const ZERenderTarget*	ViewPort;
-	const ZEViewVolume*		ViewVolume;
+		const ZEView*			View;
+		const ZEViewVolume*		ViewVolume;
 
-	ZESmartArray<ZELight*>	Lights;
+		void					Clear();
+
+								ZEDrawParameters();
+								~ZEDrawParameters();
 };
 
 #endif

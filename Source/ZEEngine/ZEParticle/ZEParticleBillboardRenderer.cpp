@@ -37,28 +37,10 @@
 #include "ZEParticle\ZEParticleEffect.h"
 #include "ZEParticle\ZEParticleSystem.h"
 #include "ZEGraphics\ZEVertexBuffer.h"
-#include "ZEGraphics\ZEVertexTypes.h"
 #include "ZEGame\ZEDrawParameters.h"
 #include "ZERenderer\ZECamera.h"
 #include "ZERenderer\ZERenderer.h"
 #include "ZEGraphics\ZEVertexLayout.h"
-
-
-const ZEVertexLayout* ZEParticleVertex::GetVertexLayout()
-{
-	if (VertexLayout.GetElementCount() != 0)
-	{
-		return &VertexLayout;
-	}
-
-	static ZEVertexElement Elements[] = {{"POSITION",	0, ZE_VET_FLOAT3, 0, 0,		ZE_VU_PER_VERTEX, 0},
-										 {"NORMAL",		0, ZE_VET_FLOAT3, 0, 12,	ZE_VU_PER_VERTEX, 0},
-										 {"TEXCOORD",	0, ZE_VET_FLOAT2, 0, 24,	ZE_VU_PER_VERTEX, 0},
-										 {"COLOR",		0, ZE_VET_FLOAT4, 0, 32,	ZE_VU_PER_VERTEX, 0}	};
-
-	VertexLayout.SetLayout(Elements, 4);
-	return &VertexLayout;
-}
 
 void ZEParticleBillboardRenderer::DrawParticle(ZEParticleVertex* Buffer, const ZEParticle* Particle, const ZEVector3& Right, const ZEVector3& Up)
 {
@@ -101,7 +83,20 @@ void ZEParticleBillboardRenderer::UpdateVertexBuffer(ZEDrawParameters* DrawParam
 	ZESize ParticleCount = Particles.GetCount();
 
 	if (VertexBuffer == NULL)
+	{
 		VertexBuffer = ZEVertexBuffer::CreateInstance();
+
+		// Register buffer content
+		ZEVertexBufferElement Elements[] = 
+		{
+			{"POSITION",	0, ZE_VET_FLOAT3, 0,	ZE_VU_PER_VERTEX, 0},
+			{"NORMAL",		0, ZE_VET_FLOAT3, 12,	ZE_VU_PER_VERTEX, 0},
+			{"TEXCOORD",	0, ZE_VET_FLOAT2, 24,	ZE_VU_PER_VERTEX, 0},
+			{"VERTEXCOLOR",	0, ZE_VET_FLOAT4, 32,	ZE_VU_PER_VERTEX, 0},
+		};
+		VertexBuffer->RegisterElements(Elements, 4);
+	}
+		
 
 	if (VertexBuffer->GetBufferSize() != ParticleCount * sizeof(ZEParticleVertex) * 6)
 	{
@@ -252,13 +247,13 @@ void ZEParticleBillboardRenderer::Draw(ZEDrawParameters* DrawParameters)
 		ZEMatrix4x4::CreateScale(ScaleMatrix, OwnerScale);
 		ZEMatrix4x4::CreateTranslation(TranslationMatrix, OwnerWorldPos);
 
-		RenderCommand.WorldMatrix = ScaleMatrix * TranslationMatrix; //May be bug swap multiplication order.
+//		RenderCommand.WorldMatrix = ScaleMatrix * TranslationMatrix; //May be bug swap multiplication order.
 	}
  	else
 	{
 		ZEMatrix4x4 ScaleMatrix;
 		ZEMatrix4x4::CreateScale(ScaleMatrix, OwnerScale);
-		RenderCommand.WorldMatrix = ScaleMatrix;
+	//	RenderCommand.WorldMatrix = ScaleMatrix;
 	}
 
 //	RenderCommand.InputStage.SetVertexBuffer(0, VertexBuffer);

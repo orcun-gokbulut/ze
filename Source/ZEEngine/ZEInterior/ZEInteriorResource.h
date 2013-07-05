@@ -45,7 +45,7 @@
 #include "ZEMath/ZEAABBox.h"
 #include "ZEDefinitions.h"
 #include "ZECore/ZEResource.h"
-#include "ZEGraphics/ZEVertexTypes.h"
+
 
 class ZEMaterial;
 class ZETexture2D;
@@ -57,6 +57,16 @@ enum ZEInteriorResourceHelperOwnerType
 {
 	ZE_IRHOT_INTERIOR		= 0,
 	ZE_IRHOT_ROOM			= 1
+};
+
+
+struct ZEInteriorVertex
+{
+	ZEVector3				Position;
+	ZEVector3				Normal;
+	ZEVector3				Tangent;
+	ZEVector3				Binormal;
+	ZEVector2				Texcoord;
 };
 
 struct ZEInteriorPolygon

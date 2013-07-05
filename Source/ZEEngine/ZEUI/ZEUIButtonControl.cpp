@@ -64,7 +64,7 @@ void ZEUIButtonControl::SetSize(const ZEVector2& Size)
 	SetHeight(Size.y);
 }
 
-void ZEUIButtonControl::SetZOrder(ZEInt Z)
+void ZEUIButtonControl::SetZOrder(ZEInt32 Z)
 {
 	ZEUIControl::SetZOrder(Z);
 	TextLabel->SetZOrder(Z + 1);

@@ -38,11 +38,11 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZERenderStage.h"
-#include "ZERenderCommand.h"
 
 class ZELight;
 class ZEShader;
 class ZELightPoint;
+class ZERenderCommand;
 class ZELightProjective;
 class ZELightDirectional;
 class ZELightOmniProjective;
@@ -68,18 +68,15 @@ class ZERenderStageShadow : public ZERenderStage
 		void							UpdateBuffers();
 		void							DestroyBuffers();
 
-		void							ResetStageDefaults();
-		void							CommitStageDefaults();
+		void							ResetStates();
+		void							CommitStates();
 
 	public:
-		virtual ZEUInt32				GetStageFlags() const;
-		virtual ZEUInt32				GetDependencies() const;
-		virtual ZEUInt32				GetStageIndentifier() const;
-
+		virtual ZERenderStageType		GetStageType() const;
+		virtual ZERenderStageType		GetDependencies() const;
+		
+		virtual void					Process(const ZERenderCommand* RenderCommand);
 		virtual void					Setup();
-		virtual void					Process(ZERenderCommand* RenderCommand);
-
-		virtual void					SetStageConfiguration(const ZERenderStageConfiguration* Config);
 
 										ZERenderStageShadow();
 		virtual							~ZERenderStageShadow();

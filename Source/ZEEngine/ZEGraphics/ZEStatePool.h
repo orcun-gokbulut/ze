@@ -38,6 +38,7 @@
 #define __ZE_STATE_POOL_H__
 
 #include "ZETypes.h"
+#include "ZEGraphicsDefinitions.h"
 
 class ZEShader;
 class ZEBlendState;
@@ -46,29 +47,26 @@ class ZEVertexLayout;
 class ZERasterizerState;
 class ZEDepthStencilState;
 
-#define	ZE_D3D10_STATE_CACHE_CAPACITY	128
-
 class ZEStatePool
 {
 	protected:
-		
-								ZEStatePool();
-		virtual					~ZEStatePool();
+									ZEStatePool();
+		virtual						~ZEStatePool();
 
 	public:
-		virtual void			ClearStates() = 0;
+		virtual void				ClearStates() = 0;
 
-		virtual void*			GetBlendState(ZESize Hash) = 0;
-		virtual void*			GetSamplerState(ZESize Hash) = 0;
-		virtual void*			GetVertexLayout(ZESize Hash) = 0;
-		virtual void*			GetRasterizerState(ZESize Hash) = 0;
-		virtual void*			GetDepthStencilState(ZESize Hash) = 0;
-		
-		virtual void*			CreateState(const ZEBlendState* BlendState) = 0;
-		virtual void*			CreateState(const ZESamplerState* SamplerState) = 0;
-		virtual void*			CreateState(const ZERasterizerState* RasterizerState) = 0;
-		virtual void*			CreateState(const ZEDepthStencilState* DepthStencilState) = 0;
-		virtual void*			CreateState(const ZEVertexLayout* VertexLayout, const ZEShader* VertexShader) = 0;
+		virtual void*				GetBlendState(ZESize Hash) = 0;
+		virtual void*				GetSamplerState(ZESize Hash) = 0;
+		virtual void*				GetVertexLayout(ZESize Hash) = 0;
+		virtual void*				GetRasterizerState(ZESize Hash) = 0;
+		virtual void*				GetDepthStencilState(ZESize Hash) = 0;
+
+		virtual void*				CreateState(ZEBlendState* BlendState) = 0;
+		virtual void*				CreateState(ZESamplerState* SamplerState) = 0;
+		virtual void*				CreateState(ZERasterizerState* RasterizerState) = 0;
+		virtual void*				CreateState(ZEDepthStencilState* DepthStencilState) = 0;
+		virtual void*				CreateState(ZEVertexLayout* VertexLayout, const ZEShader* VertexShader) = 0;
 };
 
 #endif

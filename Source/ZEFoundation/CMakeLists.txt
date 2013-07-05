@@ -86,10 +86,9 @@ ze_add_source(ZETimeCounterTests.cpp	Tests)
 
 ze_add_library(ZEFoundation
 	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket ZEML ZERegEx
+	COMBINE
 	SOURCES ${Sources} 
 	HEADERS ${Headers})
-
-#ze_combine_libraries(ZEFoundation LIBS ZEFoundation ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket #ZEML ZERegEx)
 
 ze_add_test(ZEFoundationTests
 	SOURCES ${Tests}

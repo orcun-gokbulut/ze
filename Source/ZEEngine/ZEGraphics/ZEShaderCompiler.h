@@ -37,16 +37,12 @@
 #ifndef __ZE_SHADER_COMPILER_H__
 #define __ZE_SHADER_COMPILER_H__
 
-
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEShaderMetaTable.h"
 #include "ZEShaderCompileOptions.h"
 
 class ZEShader;
-
-#define ZE_PIPELINE_CONSTANT_PREFIX				L"ZE_PC_"
-#define ZE_PIPELINE_STAGE_CONSTANT_PREFIX		L"ZE_PSC_"
 
 class ZEShaderCompiler
 {
@@ -57,10 +53,9 @@ class ZEShaderCompiler
 		virtual					~ZEShaderCompiler();
 		
 	public:
-		static ZEShader*		CompileShaderFromSource(ZEShaderCompileOptions* Options);
 		static ZEShader*		CompileShaderFromFile(ZEShaderCompileOptions* Options);
+		static ZEShader*		CompileShaderFromSource(ZEShaderCompileOptions* Options);
 		
 };
-
 
 #endif

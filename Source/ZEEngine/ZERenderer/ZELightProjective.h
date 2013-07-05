@@ -47,18 +47,28 @@ class ZEMaterialLightProjective;
 
 class ZELightProjective : public ZELight
 {
-	private:
+	protected:
 		float							FOV;
 		float							AspectRatio;
-		
-		ZESamplerState					TextureSampler;
-		const ZETexture2D*				ProjectionTexture;
+		float							Range;
+		ZEVector3						Color;
+		float							Intensity;
+		ZEVector3						Attenuation;
+
+		float							PenumbraSize;
+		float							SlopeScaledBias;
+		float							DepthScaledBias;
 
 		ZEMaterialLightProjective*		Material;
-		ZEVertexBuffer*					Geometry;
-		ZERenderCommand					RenderCommand;
-
+		ZEVertexLayout					VertexLayout;
+		ZEVertexBuffer*					VertexBuffer;
+		ZERenderCommandDefault			RenderCommand;
 		ZEViewFrustum					ViewVolume;
+
+		virtual void					UpdateMaterial(const ZEDrawParameters* DrawParameters);
+
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
 
 										ZELightProjective();
 		virtual							~ZELightProjective();
@@ -70,16 +80,35 @@ class ZELightProjective : public ZELight
 		void							SetAspectRatio(float Value);
 		float							GetAspectRatio() const;
 
+		void							SetRange(float NewValue);
+		float							GetRange() const;
+
+		void							SetColor(const ZEVector3& NewColor);
+		const ZEVector3&				GetColor() const;
+		
+		void							SetIntensity(float NewValue);
+		float							GetIntensity() const;
+
+		void							SetAttenuation(const ZEVector3& Attenuation);
+		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
+		const ZEVector3&				GetAttenuation() const;
+
+		void							SetPenumbraSize(float Value);
+		float							GetPenumbraSize() const;
+
+		void							SetSlopeScaledBias(float Value);
+		float							GetSlopeScaledBias() const;
+
+		void							SetDepthScaledBias(float Value);
+		float							GetDepthScaledBias() const;
+
 		void							SetTextureSampler(const ZESamplerState& Sampler);
 		const ZESamplerState&			GetTextureSampler() const;
 
 		void							SetProjectionTexture(const ZETexture2D* Texture);
 		const ZETexture2D*				GetProjectionTexture() const;
 
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index);
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
+		virtual const ZEViewVolume*		GetLightVolume();
 
 		virtual void					Tick(float Time);
 		virtual void					Draw(ZEDrawParameters* DrawParameters);

@@ -45,7 +45,6 @@
 #include <windows.h>
 #include <ATI_Compress.h>
 
-
 ZETextureTools::ZETextureTools()
 {
 	
@@ -130,7 +129,6 @@ bool ZETextureTools::IsResizeable(const ZEUInt Width, const ZEUInt Height, const
 	}
 }
 
-// Surface count is used only when texture type is 3D 
 ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount, const ZEUInt VertTileCount, const ZETextureType TextureType)
 {
 	if (!IsResizeable(Width, Height, HorizTileCount, VertTileCount, TextureType))
@@ -142,8 +140,9 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 	{
 		case ZE_TT_2D:
 		{
-			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)Width) / ZEMath::Log(2.0f));
-			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)Height) / ZEMath::Log(2.0f));
+			float Log2 = ZEMath::Log(2.0f);
+			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)Width) / Log2);
+			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)Height) / Log2);
 			return ZEMath::Min(MaxMipX, MaxMipY) + 1;
 			break;
 		}
@@ -152,8 +151,9 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 			ZEUInt TileWidth = Width / HorizTileCount;
 			ZEUInt TileHeight = Height / VertTileCount;
 			
-			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)TileWidth) / ZEMath::Log(2.0f));
-			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)TileHeight) / ZEMath::Log(2.0f));
+			float Log2 = ZEMath::Log(2.0f);
+			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)TileWidth) / Log2);
+			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)TileHeight) / Log2);
 			return ZEMath::Min(MaxMipX, MaxMipY) + 1;
 			break;
 		}
@@ -164,9 +164,10 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 			ZEUInt TileHeight = Height / VertTileCount;
 			ZEUInt SurfaceCount = HorizTileCount * VertTileCount;
 
-			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)Width) / ZEMath::Log(2.0f));
-			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)Height) / ZEMath::Log(2.0f));
-			ZEUInt MaxMipZ	= (ZEUInt)(ZEMath::Log((float)SurfaceCount) / ZEMath::Log(2.0f));
+			float Log2 = ZEMath::Log(2.0f);
+			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)Width) / Log2);
+			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)Height) / Log2);
+			ZEUInt MaxMipZ	= (ZEUInt)(ZEMath::Log((float)SurfaceCount) / Log2);
 			return ZEMath::Min(ZEMath::Min(MaxMipX, MaxMipY), MaxMipZ) + 1;
 			break;
 		}
@@ -178,14 +179,184 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 		}
 	}
 }
-
-void ZETextureTools::Compress(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions)
+/*
+class ZEOutputHandler : public OutputHandler
 {
+	private:
+		void* Output;
+		ZESize Cursor;
+
+		ZESize Size;
+		ZEUInt32 Width;
+		ZEUInt32 Height;
+		ZEUInt32 Depth;
+		ZEUInt32 Face;
+		ZEUInt32 MipLevel;
+
+	public:
+		void SetOutput(void* Output)
+		{
+			this->Output = Output;
+		}
+		
+		void beginImage(int size, int width, int height, int depth, int face, int miplevel)
+		{
+			Size = size;
+			Width = width;
+			Height = height;
+			Depth = depth;
+			Face = face;
+			MipLevel = miplevel;
+		}
+	
+		bool writeData(const void * data, int size)
+		{
+			if (Output == NULL)
+				return false;
+
+			if (Cursor + size == Size)
+				int x = 3;
+
+			void* Destination = (void*)((ZEUInt8*)Output + Cursor);
+			if (memcpy(Destination, data, size) == Destination)
+			{
+				Cursor += size;
+				return true;
+			}
+
+			return false;
+		}
+
+		ZEOutputHandler()
+		{
+			Cursor = 0;
+			Output = NULL;
+		}
+	
+		virtual ~ZEOutputHandler()
+		{
+
+		}
+};
+
+class ZEErrorHandler : public ErrorHandler
+{
+	public:
+		void error(Error e)
+		{
+			switch(e)
+			{
+				case Error_Unknown:
+					zeWarning("Cannot open file for compression.");
+					break;
+				case Error_InvalidInput:
+					zeWarning("Invalid compression output.");
+					break;
+				case Error_UnsupportedFeature:
+					zeWarning("Unsupported compression feature.");
+					break;
+				case Error_CudaError:
+					zeWarning("Cuda error during compression.");
+					break;
+				case Error_FileOpen:
+					zeWarning("Cannot open file for compression.");
+					break;
+				case Error_FileWrite:
+					zeWarning("Cannot write to file");
+					break;
+			}
+		}
+};
+*/
+void ZETextureTools::Compress(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, const ZETextureOptions* Options)
+{
+	/*
+	Format TargetFormat;
+	Quality TargetQuality;
+
+	// Decide Compression Type
+	switch(Options->CompressionType)
+	{
+		case ZE_TCT_DXT1:
+			TargetFormat = Format_DXT1;
+			break;
+
+		case ZE_TCT_DXT3:
+			TargetFormat = Format_DXT3;
+			break;
+
+		case ZE_TCT_DXT5:
+			TargetFormat = Format_DXT5;
+			break;
+
+		default:
+			return;
+			break;
+	};
+
+	// Decide compression Speed
+	switch(Options->CompressionQuality)
+	{
+		case ZE_TCQ_HIGH:
+			TargetQuality = Quality_Highest;
+			break;
+
+		
+		case ZE_TCQ_NORMAL:
+			TargetQuality = Quality_Normal;
+			break;
+
+		default:
+		case ZE_TCQ_LOW:
+			TargetQuality = Quality_Fastest;
+			break;
+	};
+
+	TargetQuality = Quality_Fastest;
+
+	InputOptions Input;
+	Input.reset();
+	Input.setMipmapGeneration(false);
+	Input.setNormalizeMipmaps(false);
+	Input.setConvertToNormalMap(false);
+	Input.setAlphaMode(AlphaMode_None);
+	Input.setRoundMode(RoundMode_None);
+	Input.setWrapMode(WrapMode_Mirror);
+	Input.setFormat(InputFormat_BGRA_8UB);
+	Input.setColorTransform(ColorTransform_None);
+	Input.setTextureLayout(TextureType_2D, SourceWidth, SourceHeight, 1);
+	Input.setMipmapData(SourceData, SourceWidth, SourceHeight, 1, 0, 0);
+	
+	ZEErrorHandler ErrHandler;
+
+	ZEOutputHandler	OutHandler;
+	OutHandler.SetOutput(DestinationData);
+	
+	OutputOptions Output;
+	Output.reset();
+	Output.setOutputHeader(false);
+	Output.setErrorHandler(&ErrHandler);
+	Output.setOutputHandler(&OutHandler);
+	
+	CompressionOptions CompOptions;
+	CompOptions.reset();
+	CompOptions.setFormat(TargetFormat);
+	CompOptions.setQuality(TargetQuality);
+	CompOptions.setColorWeights(1.0f, 1.0f, 1.0f, 1.0f);
+	CompOptions.setPixelFormat(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+
+	Compressor Comp;
+	Comp.enableCudaAcceleration(false);
+
+	bool Result = Comp.process(Input, CompOptions, Output);
+	*/
+
+
 	ATI_TC_FORMAT Format = ATI_TC_FORMAT_Unknown;
 	ATI_TC_Speed Speed = ATI_TC_Speed_SuperFast;
 
 	// Decide Compression Type
-	switch(CompressionOptions->CompressionType)
+	switch(Options->CompressionType)
 	{
 		case ZE_TCT_DXT1:
 			Format = ATI_TC_FORMAT_DXT1;
@@ -208,7 +379,7 @@ void ZETextureTools::Compress(void* DestinationData, const ZESize DestinationPit
 	};
 
 	// Decide compression Speed
-	switch(CompressionOptions->CompressionQuality)
+	switch(Options->CompressionQuality)
 	{
 		case ZE_TCQ_HIGH:
 			Speed = ATI_TC_Speed_Normal;

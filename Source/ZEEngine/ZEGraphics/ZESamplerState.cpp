@@ -33,19 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEStatePool.h"
 #include "ZEMath/ZEMath.h"
 #include "ZESamplerState.h"
 #include "ZEGraphicsModule.h"
 #include "ZEDS/ZEHashGenerator.h"
 
-void ZESamplerState::UpdateHash()
+ZESize ZESamplerState::GetHash()
 {
 	if (Dirty)
 	{
-		Hash = 0;
+		Hash = ZEHashGenerator::Hash(&StateData, sizeof(ZESamplerStateData));
 		Dirty = false;
-		ZEHashGenerator::Hash(Hash, &StateData, sizeof(ZESamplerStateData));
 	}
+	return Hash;
 }
 
 void ZESamplerState::SetMinFilter(ZETextureFilterMode FilterMode)
@@ -206,7 +207,8 @@ void ZESamplerState::SetToDefault()
 {
 	Hash = 0;
 	Dirty  = false;
-
+	
+	memset(&StateData, 0, sizeof(ZESamplerStateData));
 	StateData.MinFilter = ZE_TFM_POINT;
 	StateData.MagFilter = ZE_TFM_POINT;
 	StateData.MipFilter = ZE_TFM_POINT;
@@ -215,7 +217,7 @@ void ZESamplerState::SetToDefault()
 	StateData.AddressW = ZE_TAM_CLAMP;
 	StateData.MaxAnisotropy = zeGraphics->GetAnisotropicFilter();
 	StateData.BorderColor = ZEVector4::Zero;
-	StateData.MipLODBias = -0.5f;
+	StateData.MipLODBias = -0.25f;
 	StateData.MinLOD = ZE_FLOAT_MIN;
 	StateData.MaxLOD = ZE_FLOAT_MAX;
 }
@@ -245,5 +247,5 @@ ZESamplerState::ZESamplerState()
 
 ZESamplerState::~ZESamplerState()
 {
-
+	
 }

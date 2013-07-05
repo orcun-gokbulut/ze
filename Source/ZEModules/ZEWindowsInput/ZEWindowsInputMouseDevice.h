@@ -39,45 +39,21 @@
 
 #include "ZETypes.h"
 #include "ZEInput/ZEInputDevice.h"
+#include "ZECore/ZESystemMessageHandler.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-class ZESystemMessageHandler;
-
 class ZEWindowsInputMouseDevice : public ZEInputDevice
 {
 	friend class ZEWindowsInputModule;
-	friend class ZEWMIKSH;
-	private:
-		ZEString						DeviceName;
-
-		HANDLE							DeviceHandle;
-		RID_DEVICE_INFO					DeviceInfo;
-
-		ZEInt							AxisState[3];
-		ZEInt							AxisStateOld[3];
-		bool							ButtonState[5];
-		bool							ButtonStateOld[5];
-
-		ZESystemMessageHandler*			MessageHandler;
-
-										ZEWindowsInputMouseDevice();
-										~ZEWindowsInputMouseDevice();
+	protected:
+		virtual bool				InitializeSelf();
 
 	public:
-		virtual const ZEString&			GetDeviceName();
+		virtual void				UnAcquire();
 
-		virtual ZEUInt32				GetButtonCount();
-		virtual ZEUInt32				GetAxisCount();
-		
-		virtual void					UnAcquire();
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
-
-		virtual void					ProcessInputs();
-
-		virtual bool					ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction);
+		virtual void				Process(const RAWINPUT& Data);
 };
+
 #endif

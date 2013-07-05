@@ -59,7 +59,7 @@ class ZEInteriorRoom
 		ZEInterior*							Owner;
 		const ZEInteriorResourceRoom*		Resource;
 		ZEVertexBuffer*						VertexBuffer;
-		ZEArray<ZERenderCommand>			RenderCommands;
+		ZEArray<ZERenderCommandDefault>		RenderCommands;
 		ZEArray<ZEInteriorDoor*>			Doors;
 		ZEPhysicalMesh*						PhysicalMesh;
 

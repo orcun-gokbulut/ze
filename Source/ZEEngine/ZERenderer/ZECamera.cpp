@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECamera.h"
+#include "ZELight.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
@@ -84,9 +85,9 @@ void ZECamera::SetPosition(const ZEVector3& NewPosition)
 	UpdateViewTransform = true;
 	UpdateViewProjectionTransform = true;
 	ZEEntity::SetPosition(NewPosition);
-}	
+}
 
-void ZECamera::SetLocalRotation(const ZEQuaternion& NewRotation)
+void ZECamera::SetRotation(const ZEQuaternion& NewRotation)
 {
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;
@@ -227,9 +228,6 @@ void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
 
 ZECamera::ZECamera()
 {
-	Width = (float)zeGraphics->GetScreenWidth();
-	Height = (float)zeGraphics->GetScreenHeight();
-
 	NearZ = 0.3f;
 	FarZ = 200.0f;
 	
@@ -239,6 +237,9 @@ ZECamera::ZECamera()
 	ShadowFadeDistance = 20.0f;
 	VisibleShadowDistance = 200.0f;
 	
+	Width = (float)zeGraphics->GetScreenWidth();
+	Height = (float)zeGraphics->GetScreenHeight();
+
 	UpdateView = true;
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;

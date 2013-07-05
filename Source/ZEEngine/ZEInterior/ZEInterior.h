@@ -69,6 +69,7 @@ class ZEInterior : public ZEEntity
 	ZE_META_ENTITY(ZEInterior)
 	friend class ZEInteriorDoor;
 	friend class ZEInteriorHelper;
+	friend class ZEInteriorDebugDrawer;
 
 	private:
 		ZEString								InteriorFile;
@@ -89,8 +90,12 @@ class ZEInterior : public ZEEntity
 
 		virtual	void							OnTransformChanged();
 
+	protected:
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
+
 												ZEInterior();
-												~ZEInterior();
+		virtual									~ZEInterior();
 
 	public:	
 		const ZEArray<ZEInteriorRoom*>&			GetRooms();
@@ -104,9 +109,6 @@ class ZEInterior : public ZEEntity
 		const ZEInteriorStatistics&				GetStatistics() const;
 
 		virtual ZEDrawFlags						GetDrawFlags() const;
-
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
 
 		ZEInteriorResource*						GetResource() const;
 

@@ -34,13 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEHashGenerator.h"
+#include "ZEFoundation/ZEError.h"
 
 ZESize ZEHashGenerator::Hash(const char* String)
 {
+	zeDebugCheck(String == NULL, "NULL Pointer.");
+
 	ZESize HashOutput = 0;
 	while(*String != '\0')
 	{
-		HashOutput = (ZEUInt8)*String + (HashOutput << 6) + (HashOutput << 16) - HashOutput;
+		HashOutput = (ZESize)((ZEUInt8)*String) + (HashOutput << 6) + (HashOutput << 16) - HashOutput;
 		String++;
 	}
 	return HashOutput;
@@ -53,20 +56,24 @@ ZESize ZEHashGenerator::Hash(const ZEString& String)
 	return HashOutput;
 }
 
-ZESize ZEHashGenerator::Hash(void* Value, ZESize Size)
+ZESize ZEHashGenerator::Hash(const void* Value, ZESize Size)
 {
+	zeDebugCheck(Value == NULL, "NULL Pointer.");
+
 	ZESize HashOutput = 0;
 	for (ZESize I = 0; I < Size; I++)
-		HashOutput = ((ZEUInt8*)Value)[I] + (HashOutput << 6) + (HashOutput << 16) - HashOutput;
+		HashOutput = (ZESize)((ZEUInt8*)Value)[I] + (HashOutput << 6) + (HashOutput << 16) - HashOutput;
 
 	return HashOutput;
 }
 
 void ZEHashGenerator::Hash(ZESize& HashOutput, const char* String)
 {
+	zeDebugCheck(String == NULL, "NULL Pointer.");
+
 	while(*String != '\0')
 	{
-		HashOutput = (ZEUInt8)*String + (HashOutput << 6) + (HashOutput << 16) - HashOutput;
+		HashOutput = (ZESize)((ZEUInt8)*String) + (HashOutput << 6) + (HashOutput << 16) - HashOutput;
 		String++;
 	}
 }
@@ -76,8 +83,10 @@ void ZEHashGenerator::Hash(ZESize& HashOutput, const ZEString& String)
 	Hash(HashOutput, String.ToCString());
 }
 
-void ZEHashGenerator::Hash(ZESize& HashOutput, void* Value, ZESize Size)
+void ZEHashGenerator::Hash(ZESize& HashOutput, const void* Value, ZESize Size)
 {
+	zeDebugCheck(Value == NULL, "NULL Pointer.");
+
 	for (ZESize I = 0; I < Size; I++)
-		HashOutput = ((ZEUInt8*)Value)[I] + (HashOutput << 6) + (HashOutput << 16) - HashOutput;
+		HashOutput = (ZESize)((ZEUInt8*)Value)[I] + (HashOutput << 6) + (HashOutput << 16) - HashOutput;
 }

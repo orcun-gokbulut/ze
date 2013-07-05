@@ -38,83 +38,220 @@
 #include "ZEMaterial.h"
 #include "ZELightPoint.h"
 #include "ZEGame/ZEScene.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEMaterialLightPoint.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEGame/ZEDrawParameters.h"
+#include "ZEGraphics/ZERenderTarget.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 
-const ZEViewVolume& ZELightPoint::GetViewVolume(ZESize Index)
+void ZELightPoint::SetColor(const ZEVector3& NewColor)
+{
+	Changed = true;
+	Color = NewColor;
+}
+
+const ZEVector3& ZELightPoint::GetColor() const
+{
+	return Color;
+}
+
+void ZELightPoint::SetIntensity(float NewValue)
+{
+	Changed = true;
+	Intensity = NewValue;
+}
+
+float ZELightPoint::GetIntensity() const
+{
+	return Intensity;
+}
+
+void ZELightPoint::SetRange(float NewValue)
+{
+	Changed = true;
+	UpdateViewVolume = true;
+	Range = NewValue;
+}
+
+float ZELightPoint::GetRange() const
+{
+	return Range;
+}
+
+void ZELightPoint::SetAttenuation(const ZEVector3& Attenuation)
+{
+	Changed = true;
+	this->Attenuation = Attenuation;
+}
+
+void ZELightPoint::SetAttenuation(float DistanceSquare, float Distance, float Constant)
+{
+	Changed = true;
+	Attenuation.x = Constant;
+	Attenuation.y = Distance;
+	Attenuation.z = DistanceSquare;
+}
+
+const ZEVector3& ZELightPoint::GetAttenuation() const
+{
+	return Attenuation;
+}
+
+void ZELightPoint::SetPenumbraSize(float Value)
+{
+	Changed = true;
+	PenumbraSize = Value;
+}
+
+float ZELightPoint::GetPenumbraSize() const
+{
+	return PenumbraSize;
+}
+
+void ZELightPoint::SetSlopeScaledBias(float Value)
+{
+	Changed = true;
+	SlopeScaledBias = Value;
+}
+
+float ZELightPoint::GetSlopeScaledBias() const
+{
+	return SlopeScaledBias;
+}
+
+void ZELightPoint::SetDepthScaledBias(float Value)
+{
+	Changed = true;
+	DepthScaledBias = Value;
+}
+
+float ZELightPoint::GetDepthScaledBias() const
+{
+	return DepthScaledBias;
+}
+
+const ZEViewVolume* ZELightPoint::GetLightVolume()
 {
 	if (UpdateViewVolume)
 	{
  		ViewVolume.Create(GetWorldPosition(), GetRange(), 0.0f);
  		UpdateViewVolume = false;
 	}
-	return ViewVolume;
+
+	return &ViewVolume;
+}
+
+void ZELightPoint::UpdateMaterial(const ZEDrawParameters* DrawParameters)
+{
+	if (!Changed)
+		return;
+
+	if (DrawParameters->View->Type != ZE_VT_CAMERA)
+		return;
+
+	ZECamera* Camera = DrawParameters->View->Camera;
+
+	ZEMaterialLightPoint::Transformations* Transforms = NULL;
+	Material->LightTransformations->Lock((void**)&Transforms);
+
+		Transforms->WorldViewMatrix = Camera->GetViewTransform() * GetWorldTransform();
+		Transforms->WorldViewProjMatrix = Camera->GetViewProjectionTransform() * GetWorldTransform();
+
+	Material->LightTransformations->Unlock();
+
+	ZEMaterialLightPoint::Properties* Properties = NULL;
+	Material->LightProperties->Lock((void**)&Properties);
+
+		Properties->Range = Range;
+		Properties->Color = Color;
+		Properties->Intensity = Intensity;
+		Properties->Attenuation = Attenuation;
+		Properties->PenumbraSize = PenumbraSize;
+		Properties->DepthScaledBias = DepthScaledBias;
+		Properties->SlopeScaledBias = SlopeScaledBias;
+		Properties->PixelSize = DrawParameters->RenderTarget->GetPixelSize().ToVector2();
+		Properties->ViewSpacePosition = Camera->GetViewTransform() * GetWorldPosition();
+
+	Material->LightProperties->Unlock();
+
+	Changed = false;
 }
 
 void ZELightPoint::Tick(float Time)
-{
-	// Update material and render command
-	Material->LightCaster = true;
-	Material->LightReciever = false;
-	Material->ShadowCaster = ShadowCaster;
-	Material->ShadowReciver = false;
-	Material->Range = Range;
-	Material->Color = Color;
-	Material->Intensity = Intensity;
-	Material->Attenuation = Attenuation;
-	Material->WorldPosition = GetWorldPosition();
-	
-	RenderCommand.Order = 3.0f;
-	RenderCommand.Priority = 3;
-	RenderCommand.Flags = 0;
-	RenderCommand.FirstVertex = 0;
-	RenderCommand.Material = Material;
-	RenderCommand.Pipeline = ZE_RP_3D;
-	RenderCommand.PrimitiveCount = 312;
-	RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
-	RenderCommand.VertexBuffers[0] = Geometry;
+{	
+
 }
 
 void ZELightPoint::Draw(ZEDrawParameters* DrawParameters)
 {
+	UpdateMaterial(DrawParameters);
+
 	ZEBSphere LightBoundingSphere;
-	LightBoundingSphere.Radius = GetRange();
+	LightBoundingSphere.Radius = Range;
 	LightBoundingSphere.Position = GetWorldPosition();
 	
 	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
 		DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
+
+	ZELight::Draw(DrawParameters);
 }
 
-bool ZELightPoint::Initialize()
+bool ZELightPoint::InitializeSelf()
 {
-	if (GetInitialized())
-		return true;
+	if (!ZELight::InitializeSelf())
+		return false;
 
+	// Vertex buffer
 	ZECanvas Canvas;
 	Canvas.AddSphere(1.0f, 12, 12);
-	Geometry = Canvas.CreateStaticVertexBuffer();
+	Vertices = Canvas.CreateStaticVertexBuffer();
 
+	// Vertex layout
+	static const ZEVertexElement Element[] = 
+	{
+		{"POSITION", 0, ZE_VET_FLOAT4, 0, 0, ZE_VU_PER_VERTEX, 0}
+	};
+	VertexLayout.SetLayout(Element, 1);
+
+	// Material
 	Material = ZEMaterialLightPoint::CreateInstance();
 
-	return ZEEntity::Initialize();
+	// Render command
+	RenderCommand.Order = 3.0f;
+	RenderCommand.Priority = 3;
+	RenderCommand.FirstVertex = 0;
+	RenderCommand.Material = Material;
+	RenderCommand.PrimitiveCount = 312;
+	RenderCommand.VertexLayout = &VertexLayout;
+	RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
+	RenderCommand.VertexBuffers[0] = Vertices;
+
+	return true;
 }
 
-void ZELightPoint::Deinitialize()
+bool ZELightPoint::DeinitializeSelf()
 {
-	if (!GetInitialized())
-		return;
-
 	ZE_DESTROY(Material);
-	ZE_DESTROY(Geometry);
+	ZE_DESTROY(Vertices);
+
+	return ZELight::DeinitializeSelf();
 }
 
-ZELightPoint::ZELightPoint()
+ZELightPoint::ZELightPoint() : ZELight(ZE_LT_POINT)
 {
-	Type = ZE_LT_POINT;
 	Material = NULL;
-	Geometry = NULL;
+	Vertices = NULL;
+
+	Range = 20.0f;
+	Intensity = 1.0f;
+	Color = ZEVector3::One;
+	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
+
+	PenumbraSize = 1.0f;
+	SlopeScaledBias = 0.0f;
+	DepthScaledBias = 0.0f;
 }
 
 ZELightPoint::~ZELightPoint()

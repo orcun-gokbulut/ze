@@ -45,69 +45,69 @@
 class ZEFilter
 {
 	protected:
-		float			FilterWidth;
+		float				FilterWidth;
 
 	public:
-						ZEFilter();
-						~ZEFilter();
+							ZEFilter();
+							~ZEFilter();
 
-		float			GetFilterWidth() const;
+		float				GetFilterWidth() const;
 
-		virtual float	Sample(float Position) const = 0;
-		float			SampleBox(float Position, float Scale, ZEInt SampleCount) const;
+		virtual float		Sample(float Position) const = 0;
+		float				SampleBox(float Position, float Scale, ZEInt SampleCount) const;
 };
 
 class ZEMeanFilter : public ZEFilter
 {
 	public:
-						ZEMeanFilter();
-						ZEMeanFilter(float FilterWidth);
-						~ZEMeanFilter();
+							ZEMeanFilter();
+							ZEMeanFilter(float FilterWidth);
+							~ZEMeanFilter();
 
-		float			Sample(float Position) const;
+		float				Sample(float Position) const;
 
 };
 
 class ZEBilinearFilter : public ZEFilter
 {
 	public:
-						ZEBilinearFilter();
-						ZEBilinearFilter(float FilterWidth);
-						~ZEBilinearFilter();
+							ZEBilinearFilter();
+							ZEBilinearFilter(float FilterWidth);
+							~ZEBilinearFilter();
 
-		float			Sample(float Position) const;
+		float				Sample(float Position) const;
 
 };
 
 class ZEGaussianFilter : public ZEFilter
 {
 	private:
-		float			Alpha;
+		float				Alpha;
 
 	public:
-						ZEGaussianFilter();
-						ZEGaussianFilter(float FilterWidth, float Alpha);
-						~ZEGaussianFilter();
+							ZEGaussianFilter();
+							ZEGaussianFilter(float FilterWidth, float Alpha);
+							~ZEGaussianFilter();
 
-		float			GetAlpha() const;
-		float			Sample(float Position) const;
+		float				GetAlpha() const;
+		float				Sample(float Position) const;
 
 };
 
 class ZEKaiserFilter : public ZEFilter
 {
 	private:
-		float			Alpha;
-		float			Stretch;
+		float				Alpha;
+		float				Stretch;
 
 	public:
-						ZEKaiserFilter();
-						ZEKaiserFilter(float FilterWidth, float Alpha, float Stretch);
-						~ZEKaiserFilter();
+							ZEKaiserFilter();
+							ZEKaiserFilter(float FilterWidth, float Alpha, float Stretch);
+							~ZEKaiserFilter();
 
-		float			GetAlpha() const;
-		float			GetStretch() const;
-		float			Sample(float Position) const;
+		float				GetAlpha() const;
+		float				GetStretch() const;
+		float				Sample(float Position) const;
 
 };
 

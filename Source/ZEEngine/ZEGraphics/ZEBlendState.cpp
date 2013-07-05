@@ -33,20 +33,22 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEStatePool.h"
 #include "ZEBlendState.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEGraphicsModule.h"
 #include "ZEDS/ZEHashGenerator.h"
 
 #include <memory.h>
-#include "ZEMath/ZEVector.h"
 
-void ZEBlendState::UpdateHash()
+ZESize ZEBlendState::GetHash()
 {
 	if (Dirty)
 	{
-		Hash = 0;
+		Hash = ZEHashGenerator::Hash(&StateData, sizeof(ZEBlendStateData));;
 		Dirty = false;
-		ZEHashGenerator::Hash(Hash, &StateData, sizeof(ZEBlendStateData));
 	}
+	return Hash;
 }
 
 void ZEBlendState::SetAlphaToCoverageEnable(bool Enable)
@@ -165,7 +167,7 @@ ZEBlendEquation ZEBlendState::GetBlendAlphaEquation() const
 	return StateData.BlendAlphaEquation;
 }
 
-void ZEBlendState::SetComponentWriteMask(ZESize Target, ZEComponentMask Mask)
+void ZEBlendState::SetComponentWriteMask(ZESize Target, ZEColorWriteMask Mask)
 {
 	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
 	
@@ -176,7 +178,7 @@ void ZEBlendState::SetComponentWriteMask(ZESize Target, ZEComponentMask Mask)
 	}
 }
 
-ZEComponentMask ZEBlendState::GetComponentWriteMask(ZESize Target) const
+ZEColorWriteMask ZEBlendState::GetComponentWriteMask(ZESize Target) const
 {
 	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
 
@@ -188,6 +190,7 @@ void ZEBlendState::SetToDefault()
 	Hash = 0;
 	Dirty = false;
 	
+	memset(&StateData, 0, sizeof(ZEBlendStateData));
 	StateData.AlphaToCoverageEnable = false;
 	memset(StateData.BlendEnable, 0, sizeof(bool) * 8);
 	StateData.SourceBlendOption = ZE_BO_ONE;

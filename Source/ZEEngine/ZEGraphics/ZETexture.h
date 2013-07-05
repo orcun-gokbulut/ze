@@ -38,6 +38,7 @@
 #define __ZE_TEXTURE_H__
 
 #include "ZETypes.h"
+#include "ZEMath/ZEVector.h"
 
 enum ZETextureType
 {
@@ -104,14 +105,13 @@ class ZETexture
 	friend class ZEGraphicsDevice;
 	friend class ZEGraphicsModule;
 
-	// Should be public for only internal usage
-	public:
+	protected:
 		bool						Static;
 		bool						RenderTarget;
 		ZETextureType				TextureType;
+		ZEVector3					PixelSize;
 		ZETexturePixelFormat		PixelFormat;
-
-	protected:
+	
 									ZETexture();
 		virtual						~ZETexture();
 
@@ -120,10 +120,11 @@ class ZETexture
 		bool						IsRenderTarget() const;
 		ZETextureType				GetTextureType() const;
 		ZETexturePixelFormat		GetPixelFormat() const;
-
-		virtual void				Destroy();
+		const ZEVector3&			GetPixelSize() const;
 
 		virtual bool				IsEmpty() const = 0;
+
+		virtual void				Destroy();
 };
 
 #endif

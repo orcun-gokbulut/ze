@@ -36,7 +36,7 @@
 #include "ZEVertexTypes.h"
 
 ZEVertexLayout ZESimpleVertex::Layout;
-const ZEVertexLayout&	ZESimpleVertex::GetVertexLayout()
+ZEVertexLayout&	ZESimpleVertex::GetVertexLayout()
 {
 	static bool Initialized = false;
 	static const ZEVertexElement VertexElements[] = 
@@ -57,7 +57,7 @@ const ZEVertexLayout&	ZESimpleVertex::GetVertexLayout()
 }
 
 ZEVertexLayout ZEInteriorVertex::Layout;
-const ZEVertexLayout& ZEInteriorVertex::GetVertexLayout()
+ZEVertexLayout& ZEInteriorVertex::GetVertexLayout()
 {
 	static bool Initialized = false;
 	static const ZEVertexElement VertexElements[] = 
@@ -79,7 +79,7 @@ const ZEVertexLayout& ZEInteriorVertex::GetVertexLayout()
 }
 
 ZEVertexLayout ZEModelVertex::Layout;
-const ZEVertexLayout& ZEModelVertex::GetVertexLayout()
+ZEVertexLayout& ZEModelVertex::GetVertexLayout()
 {
 	static bool Initialized = false;
 	static const ZEVertexElement VertexElements[] = 
@@ -101,7 +101,7 @@ const ZEVertexLayout& ZEModelVertex::GetVertexLayout()
 }
 
 ZEVertexLayout ZESkinnedModelVertex::Layout;
-const ZEVertexLayout& ZESkinnedModelVertex::GetVertexLayout()
+ZEVertexLayout& ZESkinnedModelVertex::GetVertexLayout()
 {
 	static bool Initialized = false;
 	static const ZEVertexElement VertexElements[] = 
@@ -126,7 +126,7 @@ const ZEVertexLayout& ZESkinnedModelVertex::GetVertexLayout()
 }
 
 ZEVertexLayout ZEUIVertex::Layout;
-const ZEVertexLayout& ZEUIVertex::GetVertexLayout()
+ZEVertexLayout& ZEUIVertex::GetVertexLayout()
 {
 	static bool Initialized = false;
 	static const ZEVertexElement VertexElements[] = 
@@ -146,7 +146,7 @@ const ZEVertexLayout& ZEUIVertex::GetVertexLayout()
 }
 
 ZEVertexLayout ZEColoredVertex::Layout;
-const ZEVertexLayout& ZEColoredVertex::GetVertexLayout()
+ZEVertexLayout& ZEColoredVertex::GetVertexLayout()
 {
 	static bool Initialized = false;
 	static const ZEVertexElement VertexElements[] = 

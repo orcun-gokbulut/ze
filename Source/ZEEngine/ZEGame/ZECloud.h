@@ -74,11 +74,11 @@ class ZECloud : public ZEEntity
 		ZECloudMaterial*		CloudMaterial;
 		ZERenderCommand			CloudRenderCommand;
 
+		virtual bool			InitializeSelf();
+		virtual bool			DeinitializeSelf();
+
 								ZECloud();
 		virtual					~ZECloud();
-
-	private:
-
 
 	public:
 
@@ -128,9 +128,6 @@ class ZECloud : public ZEEntity
 		const ZEString			GetCloudFormationTexture() const;
 
 		virtual ZEDrawFlags		GetDrawFlags() const;
-
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
 
 		virtual void			Draw(ZEDrawParameters* DrawParameters);
 		virtual void			Tick(float Time);

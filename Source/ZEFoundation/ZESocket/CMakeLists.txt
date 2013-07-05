@@ -41,7 +41,7 @@ ze_add_source(ZEIPAddress_Windows.cpp		Sources PLATFORMS Windows)
 ze_add_source(ZEIPAddress.h					Sources Headers)
 ze_add_source(ZESocket_Unix.cpp				Sources PLATFORMS Unix)
 ze_add_source(ZESocket_Windows.cpp			Sources PLATFORMS Windows)
-#ze_add_source(ZESocketTests_Windows.cpp		Tests PLATFORMS Windows)
+#ze_add_source(ZESocketTests_Windows.cpp	Tests PLATFORMS Windows)
 ze_add_source(ZESocket.h					Sources Headers)
 
 ze_add_library(ZESocket 

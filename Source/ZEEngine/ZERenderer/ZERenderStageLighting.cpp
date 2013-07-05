@@ -60,9 +60,6 @@ void ZERenderStageLighting::DestroyBuffers()
 
 void ZERenderStageLighting::UpdateBuffers()
 {
-	// Update parent buffers
-	ZERenderStage::UpdateBuffers();
-
 	ZEUInt Width = zeGraphics->GetScreenWidth();
 	ZEUInt Height = zeGraphics->GetScreenHeight();
 
@@ -87,15 +84,10 @@ void ZERenderStageLighting::UpdateBuffers()
 	}
 }
 
-void ZERenderStageLighting::ResetStageDefaults()
+void ZERenderStageLighting::ResetStates()
 {
-	// Requested pipeline constants
-	StageConstants.SetCount(2);
-	StageConstants.Add(ZE_PC_CAMERA_WORLD_POS);
-	StageConstants.Add(ZE_PC_INV_VIEWPORT_WIDTH_HEIGHT);
-
 	// Reset parent states
-	ZERenderStage::ResetStageDefaults();
+	ZERenderStage::ResetStates();
 
 	// Vertex buffer
 	// DefaultStates.VertexBuffers[0] = VertexBuffer;
@@ -110,7 +102,7 @@ void ZERenderStageLighting::ResetStageDefaults()
 	for (ZESize I = 0; I < ScreenCount; ++I)
 	{
 		DefaultStates.ViewPorts[I] = zeGraphics->GetViewport(I);
-		DefaultStates.ScissorRectangles[I] = zeGraphics->GetScissorRectangle(I);
+		DefaultStates.ScissorRects[I] = zeGraphics->GetScissorRectangle(I);
 	}
 
 	// Rasterizer state
@@ -160,11 +152,8 @@ void ZERenderStageLighting::ResetStageDefaults()
 	DefaultStates.PixelShaderTextures[2] = GBufferInput->GetGBuffer3();
 }
 
-void ZERenderStageLighting::CommitStageDefaults()
+void ZERenderStageLighting::CommitStates()
 {
-	// Commit parent states
-	ZERenderStage::CommitStageDefaults();
-
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	Device->SetRenderTargetArray(DefaultStates.RenderTargets);
@@ -179,13 +168,16 @@ void ZERenderStageLighting::CommitStageDefaults()
 	for (ZESize I = 0; I < ScreenCount; ++I)
 	{
 		Device->SetViewport(I, DefaultStates.ViewPorts[I]);
-		Device->SetScissorRectangle(I, DefaultStates.ScissorRectangles[I]);
+		Device->SetScissorRectangle(I, DefaultStates.ScissorRects[I]);
 	}
 
 	Device->SetPixelShaderSampler(0, DefaultStates.PixelShaderSamplers[0]);
 	Device->SetPixelShaderTexture(0, DefaultStates.PixelShaderTextures[0]);
 	Device->SetPixelShaderTexture(1, DefaultStates.PixelShaderTextures[1]);
 	Device->SetPixelShaderTexture(2, DefaultStates.PixelShaderTextures[2]);
+
+	// Commit parent states
+	ZERenderStage::CommitStates();
 }
 
 const ZETexture2D* ZERenderStageLighting::GetLBuffer1() const
@@ -213,8 +205,8 @@ const ZERenderStageGeometry* ZERenderStageLighting::GetInputGeometryStage() cons
 void ZERenderStageLighting::Setup()
 {
 	UpdateBuffers();
-	ResetStageDefaults();
-	CommitStageDefaults();
+	ResetStates();
+	CommitStates();
 
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
@@ -222,18 +214,9 @@ void ZERenderStageLighting::Setup()
 	Device->ClearRenderTarget(RenderTargets.LBuffer2, ZEVector4::Zero);
 }
 
-void ZERenderStageLighting::Process(ZERenderCommand* RenderCommand)
+void ZERenderStageLighting::Process(const ZERenderCommand* RenderCommand)
 {
-	ZEMaterial* Material = RenderCommand->Material;
-
-	zeDebugCheck(RenderCommand->Material == NULL, "Cannot process null material");
-
-	if (!(Material->GetMaterialFlags() & ZE_MTF_LIGHTING_PASS))
-	{
-		return;
-	}
-
-	zeGraphics->GetEventTracer()->StartEvent("Light Pass");
+	zeDebugCheck(RenderCommand->Material == NULL, "Null Pointer.");
 
 	bool Done = false;
 	ZEUInt PassId = 0;
@@ -243,28 +226,16 @@ void ZERenderStageLighting::Process(ZERenderCommand* RenderCommand)
 	}
 
 	PumpStreams(RenderCommand);
-
-	zeGraphics->GetEventTracer()->EndEvent();
 }
 
-void ZERenderStageLighting::SetStageConfiguration(const ZERenderStageConfiguration* Config)
+ZERenderStageType ZERenderStageLighting::GetDependencies() const
 {
-	
+	return ZE_RST_SHADOW | ZE_RST_GEOMETRY;
 }
 
-ZEUInt32 ZERenderStageLighting::GetStageFlags() const
+ZERenderStageType ZERenderStageLighting::GetStageType() const
 {
-	return 0;
-}
-
-ZEUInt32 ZERenderStageLighting::GetDependencies() const
-{
-	return ZE_RENDER_STAGE_SHADOW | ZE_RENDER_STAGE_GEOMETRY;
-}
-
-ZEUInt32 ZERenderStageLighting::GetStageIndentifier() const
-{
-	return ZE_RENDER_STAGE_LIGHTING;
+	return ZE_RST_LIGHTING;
 }
 
 ZERenderStageLighting::ZERenderStageLighting()

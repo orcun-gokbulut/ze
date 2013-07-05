@@ -48,14 +48,14 @@ enum ZEIndexBufferFormat
 
 class ZEIndexBuffer
 {
-	// Should be public for only internal usage
-	public:
+	friend class ZEGraphicsModule;
+
+	protected:
 		bool					Static;
 		ZESize					BufferSize;
 		ZESize					IndexCount;
 		ZEIndexBufferFormat		Format;
-		
-	protected:
+
 								ZEIndexBuffer();
 		virtual					~ZEIndexBuffer();
 

@@ -48,12 +48,6 @@ if(ZEBUILD_D3D9_DEBUG_SHADERS_RELEASE)
 	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_RELEASE ZE_DEBUG_D3D10_DEBUG_SHADERS)
 endif()
 
-include_directories(
-	${ZEBUILD_INCLUDE_PATH}/DirectX)
-
-link_directories(
-	${ZEBUILD_LIB_PATH}/DirectX)
-
 ze_add_source(ZED3D10ComponentBase.cpp			Sources)
 ze_add_source(ZED3D10ComponentBase.h			Sources)
 ze_add_source(ZED3D10DepthStencilBuffer.cpp		Sources)
@@ -86,7 +80,7 @@ ze_add_source(ZED3D10TextureCube.cpp			Sources)
 ze_add_source(ZED3D10TextureCube.h				Sources)
 ze_add_source(ZED3D10VertexBuffer.cpp			Sources)
 ze_add_source(ZED3D10VertexBuffer.h				Sources)
-	
+
 ze_add_library(ZEDirect3D10
 	SOURCES ${Sources}
-	LIBS dxgi d3d9 d3d10 d3dx10 d3dcompiler dxguid)
+	LIBS libDXGI libDirect3D9 libDirect3D10 libDirect3DCompiler)

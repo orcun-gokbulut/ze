@@ -50,14 +50,14 @@
 
 ZEStreeringUserTankControl::ZEStreeringUserTankControl()
 {
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,			 ZEInputEvent("Keyboard", ZE_IKB_W, ZE_IBS_PRESSING)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,		 ZEInputEvent("Keyboard", ZE_IKB_S, ZE_IBS_PRESSING)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFERIGHT,		 ZEInputEvent("Keyboard", ZE_IKB_D, ZE_IBS_PRESSING)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFELEFT,		 ZEInputEvent("Keyboard", ZE_IKB_A, ZE_IBS_PRESSING)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNUP,			 ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNDOWN,		 ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNRIGHT,		 ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNLEFT,		 ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE)));
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_W, ZE_IS_PRESSING, ACTIONID_FORWARD	);
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_S, ZE_IS_PRESSING, ACTIONID_BACKWARD);
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_D, ZE_IS_PRESSING, ACTIONID_STRAFELEFT);
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_A, ZE_IS_PRESSING, ACTIONID_STRAFERIGHT);
+	InputMap.AddAxisAction("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE, ZE_IS_CHANGED, ACTIONID_TURNLEFT);
+	InputMap.AddAxisAction("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE, ZE_IS_CHANGED, ACTIONID_TURNRIGHT);
+	InputMap.AddAxisAction("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE, ZE_IS_CHANGED, ACTIONID_TURNUP);
+	InputMap.AddAxisAction("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE, ZE_IS_CHANGED, ACTIONID_TURNDOWN);
 }
 
 ZESteeringOutput ZEStreeringUserTankControl::Process(float ElapsedTime)
@@ -65,8 +65,7 @@ ZESteeringOutput ZEStreeringUserTankControl::Process(float ElapsedTime)
 	ZESteeringOutput Output;
 	Output.SetZero();
 
-	ZEInputAction* Current;
-	zeInput->ProcessInputMap(&InputMap);
+	InputMap.Update();
 
 	float Friction = 1.0f;
 
@@ -74,9 +73,9 @@ ZESteeringOutput ZEStreeringUserTankControl::Process(float ElapsedTime)
 
 	bool Linear = false;
 	bool Angular = false;
-	for (size_t I = 0; I < InputMap.InputActionCount; I++)
+	for (size_t I = 0; I < InputMap.GetActionCount(); I++)
 	{
-		Current = &InputMap.InputActions[I];
+		const ZEInputAction* Current = &InputMap.GetActions()[I];
 		switch(Current->Id)
 		{
 		case ACTIONID_FORWARD:

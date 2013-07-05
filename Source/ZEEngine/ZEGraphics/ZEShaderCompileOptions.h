@@ -59,7 +59,7 @@ enum ZEShaderType
 	ZE_ST_COMPUTE	= 6
 };
 
-struct ZEShaderCompilerParameter
+struct ZEShaderParameter
 {
 	ZESize		Hash;
 	ZEString	Name;
@@ -68,12 +68,12 @@ struct ZEShaderCompilerParameter
 
 struct ZEShaderCompileOptions
 {
-	ZEShaderType							Type;
-	ZEShaderModel							Model;
-	ZEString								FileName;
-	ZEString								EntryPoint;
-	ZEString								SourceData;
-	ZEArray<ZEShaderCompilerParameter>		Parameters;
+	ZEShaderType				Type;
+	ZEShaderModel				Model;
+	ZEString					FileName;
+	ZEString					EntryPoint;
+	ZEString					SourceData;
+	ZEArray<ZEShaderParameter>	Parameters;
 };
 
 #endif

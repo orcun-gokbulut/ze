@@ -44,18 +44,12 @@
 
 class ZEVertexLayout;
 
-class ZEParticleVertex
+struct ZEParticleVertex
 {
-	private:
-		static ZEVertexLayout	VertexLayout;
-
-	public:
-		ZEVector3				Position;
-		ZEVector3				Normal;
-		ZEVector2				Texcoord;
-		ZEVector4				Color;
-
-		static const ZEVertexLayout*	GetVertexLayout();
+	ZEVector3		Position;
+	ZEVector3		Normal;
+	ZEVector2		Texcoord;
+	ZEVector4		Color;
 };
 
 struct ZEDrawParameters;
@@ -69,7 +63,7 @@ class ZEParticleBillboardRenderer : public ZEParticleRenderer
 		ZEParticleBillboardType				BillboardType;
 
 		ZEVertexBuffer*						VertexBuffer;
-		ZERenderCommand						RenderCommand;
+		ZERenderCommandDefault				RenderCommand;
 		ZEVector3							AxisOfOrientation;
 
 		void								UpdateVertexBuffer(ZEDrawParameters* DrawParameters);

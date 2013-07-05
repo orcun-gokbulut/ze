@@ -33,37 +33,60 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
+#include "ZEShader.h"
 #include "ZECore/ZECore.h"
+#include "ZEIndexBuffer.h"
 #include "ZECore/ZEOption.h"
+#include "ZEVertexBuffer.h"
 #include "ZEGraphicsModule.h"
+#include "ZEConstantBuffer.h"
+
 #include "ZECore/ZEOptionManager.h"
 
+#ifdef FREEIMAGE_LIB
+	// Workaround to avoid multiple definition
+	#undef FREEIMAGE_LIB
+#endif
+
+#include <FreeImage.h>
 
 ZEOptionSection ZEGraphicsModule::GraphicsOptions;
 
 ZE_MODULE_DESCRIPTION_ABSTRACT(ZEGraphicsModule, ZEModule, &ZEGraphicsModule::GraphicsOptions)
 
-ZEGraphicsModule::ZEGraphicsModule()
-{
-	ScreenWidth = 0;
-	ScreenHeight = 0;
-	VerticalSync = false;
-	FullScreen = false;
-	SampleCount = 1;
-	SampleQuality = 0;
-	AnisotropicFilter = 16;
-	ScreenCount = 0;
-	TextureQuality = ZE_TQ_HIGH;
-}
+//void ZEGraphicsModule::LockHardwareBuffer(ZEConstantBuffer* Buffer)
+//{
+//	zeDebugCheck(Buffer == NULL, "NUll pointer.");
+//
+//	Buffer->UpdateBuffer();
+//	Buffer->State.InUse = true;
+//
+//	BuffersInUse.Enqueue(Buffer);
+//}
+//
+//void ZEGraphicsModule::UnlockHardwareBuffers()
+//{
+//	ZESize BufferCount = BuffersInUse.GetCount();
+//	for (ZESize I = 0; I < BufferCount; ++I)
+//	{
+//		ZEConstantBuffer* Buffer = BuffersInUse.Dequeue();
+//
+//		Buffer->State.InUse = false;
+//		if (Buffer->State.Deleted)
+//			ZE_DESTROY(Buffer);
+//	}
+//}
 
-ZEGraphicsModule::~ZEGraphicsModule()
+void FreeImageOutput(FREE_IMAGE_FORMAT Bitmap, const char* Message)
 {
-
+	zeLog("%s", Message);
 }
 
 void ZEGraphicsModule::BaseInitialize()
 {
+	FreeImage_Initialise();
+	FreeImage_SetOutputMessage(FreeImageOutput);
+
 	GraphicsOptions.SetName("Graphics");
 	GraphicsOptions.AddOption(new ZEOption("ScreenWidth", 640, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ScreenHeight", 480, ZE_OA_NORMAL));
@@ -79,11 +102,13 @@ void ZEGraphicsModule::BaseInitialize()
 	GraphicsOptions.AddOption(new ZEOption("HDRQuality", 5, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ShadowQuality", 1, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("LightQuantity", 1, ZE_OA_NORMAL));
-	ZEOptionManager::GetInstance()->RegisterSection(&GraphicsOptions);
+	// ZEOptionManager::GetInstance()->RegisterSection(&GraphicsOptions);
 }
 
 void ZEGraphicsModule::BaseDeinitialize()
 {
+	FreeImage_DeInitialise();
+
 	ZEOptionManager::GetInstance()->UnregisterSection(&GraphicsOptions);
 }
 
@@ -150,6 +175,11 @@ bool ZEGraphicsModule::GetFullScreen() const
 	return FullScreen;
 }
 
+ZEVector2 ZEGraphicsModule::GetScreenSize() const
+{
+	return ZEVector2((float)ScreenWidth, (float)ScreenHeight);
+}
+
 ZEUInt ZEGraphicsModule::GetScreenWidth() const
 {
 	return ScreenWidth;
@@ -196,4 +226,22 @@ const ZEDepthStencilBuffer* ZEGraphicsModule::GetDepthBuffer(ZESize Index) const
 ZEGraphicsModule* ZEGraphicsModule::GetInstance()
 {
 	return ZECore::GetInstance()->GetGraphicsModule();
+}
+
+ZEGraphicsModule::ZEGraphicsModule()
+{
+	ScreenWidth = 0;
+	ScreenHeight = 0;
+	VerticalSync = false;
+	FullScreen = false;
+	SampleCount = 1;
+	SampleQuality = 0;
+	AnisotropicFilter = 16;
+	ScreenCount = 0;
+	TextureQuality = ZE_TQ_HIGH;
+}
+
+ZEGraphicsModule::~ZEGraphicsModule()
+{
+
 }

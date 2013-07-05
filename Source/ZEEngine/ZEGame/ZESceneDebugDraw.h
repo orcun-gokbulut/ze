@@ -51,7 +51,7 @@ class ZESceneDebugDraw
 	private:
 		ZEMaterial*				Material;
 		ZECanvas				VertexBuffer;
-		ZERenderCommand			RenderCommand;
+		ZERenderCommandDefault	RenderCommand;
 
 		bool					Initialized;
 

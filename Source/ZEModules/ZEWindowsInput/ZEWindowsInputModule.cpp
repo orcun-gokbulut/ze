@@ -33,16 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEError.h"
 #include "ZEWindowsInputModule.h"
-#include "ZEInput/ZEInputDeviceExtension.h"
-#include "ZEInput/ZEInputDevice.h"
-#include "ZECore/ZEExtensionManager.h"
 #include "ZEWindowsInputMouseDevice.h"
 #include "ZEWindowsInputKeyboardDevice.h"
-
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEConsole.h"
-#include "ZEError.h"
+#include "ZECore\ZESystemMessageManager.h"
 
 #define WINDIWS_LEAN_AND_MEAN
 #include <windows.h>
@@ -50,16 +45,28 @@
 #include <memory.h>
 #include <stdio.h>
 
-ZE_MODULE_DESCRIPTION(ZEWindowsInputModule, ZEInputModule, NULL)
+ZE_EXTENSION_DESCRIPTION(ZEWindowsInputModule, ZEInputDeviceModule, NULL)
 
-const ZEArray<ZEInputDevice*>& ZEWindowsInputModule::GetInputDevices()
+bool ZEWindowsInputSystemMessageHandler::Callback(MSG* Message)
 {
-	return Devices;
+	if (Module->RawInputCount >= ZE_MAX_RAW_INPUT_COUNT)
+		return false;
+
+	UINT InputSize = sizeof(RAWINPUT);
+	if (GetRawInputData((HRAWINPUT)Message->lParam, RID_INPUT, &Module->RawInputs[Module->RawInputCount], &InputSize, sizeof(RAWINPUTHEADER)) == (UINT)-1)
+		return false;
+
+	Module->RawInputCount++;
+
+	return true;
 }
 
-bool ZEWindowsInputModule::Initialize()
+bool ZEWindowsInputModule::InitializeSelf()
 {	
 	zeLog("Initializing Windows Input.");
+
+	if (!ZEInputDeviceModule::InitializeSelf())
+		return false;
 
 	RAWINPUTDEVICE Rid[2];    
 	// Mouse
@@ -80,100 +87,46 @@ bool ZEWindowsInputModule::Initialize()
 		return false;
 	}
 
-	UINT NumberOfDevices;
-	ZEArray<RAWINPUTDEVICELIST> DeviceList;
+	MouseDevice = new ZEWindowsInputMouseDevice();
+	MouseDevice->Initialize();
+	RegisterDevice(MouseDevice);
+	
+	KeyboardDevice = new ZEWindowsInputKeyboardDevice();
+	KeyboardDevice->Initialize();
+	RegisterDevice(KeyboardDevice);
 
-	if (GetRawInputDeviceList(NULL, &NumberOfDevices, sizeof(RAWINPUTDEVICELIST)) != 0) 
-	{ 
-		zeError("Can not load input device list.");
-		return false;
-	}
+	MessageHandler.Module = this;
+	MessageHandler.Register();
 
-	DeviceList.SetCount((ZESize)NumberOfDevices);
-	if (GetRawInputDeviceList(DeviceList.GetCArray(), &NumberOfDevices, sizeof(RAWINPUTDEVICELIST)) == (UINT)-1)
-	{
-		zeError("Can not load input device list.");
-		return false;
-	}
-
-	ZESize MouseIndex = 0;
-	ZESize KeyboardIndex = 0;
-	for (ZESize I = 0; I < DeviceList.GetCount(); I++)
-	{
-		if (DeviceList[I].dwType == RIM_TYPEMOUSE)
-		{
-			ZEWindowsInputMouseDevice* Device = new ZEWindowsInputMouseDevice();
-			Device->DeviceName = "Mouse";
-			Device->DeviceHandle = DeviceList[I].hDevice;
-
-			UINT Size = sizeof(RID_DEVICE_INFO);
-			GetRawInputDeviceInfo(Device->DeviceHandle, RIDI_DEVICEINFO, &Device->DeviceInfo, &Size);
-
-			Devices.Add(Device);
-
-			MouseIndex++;
-		}
-		else if (DeviceList[I].dwType == RIM_TYPEKEYBOARD)
-		{
-			ZEWindowsInputKeyboardDevice* Device = new ZEWindowsInputKeyboardDevice();
-
-			Device->DeviceName = "Keyboard";
-			Device->DeviceHandle = DeviceList[I].hDevice;
-
-			UINT Size = sizeof(RID_DEVICE_INFO);
-			GetRawInputDeviceInfo(Device->DeviceHandle, RIDI_DEVICEINFO, &Device->DeviceInfo, &Size);
-
-			Devices.Add(Device);
-
-			KeyboardIndex++;
-		}
-	}
-
-	ZEArray<ZEExtensionDescription*> ExtensionDescriptions = ZEExtensionManager::GetInstance()->GetExtensionDescriptions(ZEInputDeviceExtension::Description());
-
-	for (ZESize I = 0; I < ExtensionDescriptions.GetCount(); I++)
-	{
-		ZEInputDeviceExtension* Extension = (ZEInputDeviceExtension*)ExtensionDescriptions[I]->CreateInstance();
-
-		ZEArray<ZEInputDevice*> ExtensionDevices = Extension->GetDevices();
-		for (ZESize N = 0; N < ExtensionDevices.GetCount(); N++)
-		{
-			Devices.Add(ExtensionDevices[N]);
-		}
-	}
-
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-	{
-		if (!Devices[I]->Initialize())
-		{
-			zeError("Can not initialize input device. Name : \"\"", Devices[I]->GetDeviceName().ToCString());
-		}
-	}
-
-	return ZEInputModule::Initialize();
+	return true;
 }
 
-void ZEWindowsInputModule::Deinitialize()
+bool ZEWindowsInputModule::DeinitializeSelf()
 {
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-		Devices[I]->Destroy();
-	Devices.Clear();
+	MessageHandler.Unregister();
 
-	ZEInputModule::Deinitialize();
+	return ZEInputDeviceModule::DeinitializeSelf();
 }
 
-void ZEWindowsInputModule::ProcessInputs()
-{   
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-		Devices[I]->ProcessInputs();
-}
-
-void ZEWindowsInputModule::ProcessInputMap(ZEInputMap* InputMap)
+void ZEWindowsInputModule::Process()
 {
-	InputMap->InputActionCount = 0;
+	KeyboardDevice->State.Advance();
+	MouseDevice->State.Advance();
+	for (ZESize I = 0; I < MouseDevice->State.Axises.CurrentValues.GetCount(); I++)
+		MouseDevice->State.Axises.CurrentValues[I] = 0.0f;
 
-	for (ZESize I = 0; I < InputMap->InputBindings.GetCount(); I++)
-		for (ZESize N = 0; N < Devices.GetCount(); N++)
-			if (Devices[N]->ProcessInputBinding(&InputMap->InputBindings[I], &InputMap->InputActions[InputMap->InputActionCount]))
-				InputMap->InputActionCount++;
+	for (ZESize I = 0; I < RawInputCount; I++)
+	{
+		if (RawInputs[I].header.dwType== RIM_TYPEMOUSE)
+			MouseDevice->Process(RawInputs[I]);
+		else if (RawInputs[I].header.dwType== RIM_TYPEKEYBOARD)
+			KeyboardDevice->Process(RawInputs[I]);
+	}
+
+	RawInputCount = 0;
+}
+
+ZEWindowsInputModule::ZEWindowsInputModule()
+{
+	RawInputCount = 0;
 }

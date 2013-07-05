@@ -34,74 +34,31 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
+#include "ZEDS/ZEHashGenerator.h"
 #include "ZED3D10ConstantBuffer.h"
 #include "ZED3D10GraphicsModule.h"
-#include "ZEGraphics/ZEShaderMetaInfo.h"
+#include "ZEGraphics/ZEShaderMeta.h"
 
 #include <d3d10.h>
 
-inline static ZESSize FindConstantIndex(const ZEArray<ZEShaderConstantInfo>& Constants, const ZEString& Name)
+bool ZED3D10ConstantBuffer::UpdateBuffer()
 {
-	ZEUInt64 Hash = Name.Hash();
-	ZESize ConstCount = Constants.GetCount();
-	
-	for (ZESize I = 0; I < ConstCount; ++I)
-		if (Constants[I].Hash == Hash)
-			if (Constants[I].Name.Equals(Name))
-				return I;
+	if (!NeedUpdate())
+		return true;
 
-	return -1;
-}
-
-inline static void CopyFrom(const ZEShaderConstantInfo& Variable, void* DestData, const void* SourceData)
-{
-	ZEUInt32* Source = (ZEUInt32*)SourceData;
-	ZEUInt32* Destination = (ZEUInt32*)DestData;
-
-	for (ZESize RowN = 0; RowN < (ZESize)Variable.RowCount; ++RowN, Destination += 4)
-		for (ZESize ColN = 0; ColN < (ZESize)Variable.ColumnCount; ++ColN)
-			Destination[ColN]  = *Source++;
-}
-
-inline static void CopyTo(const ZEShaderConstantInfo& Variable, void* DestData, const void* SourceData)
-{
-	ZEUInt32* Source = (ZEUInt32*)SourceData;
-	ZEUInt32* Destination = (ZEUInt32*)DestData;
-
-	for (ZESize RowN = 0; RowN < (ZESize)Variable.RowCount; ++RowN, Source += 4)
-		for (ZESize ColN = 0; ColN < (ZESize)Variable.ColumnCount; ++ColN)
-			Source[ColN]  = *Destination++;
-}
-
-void ZED3D10ConstantBuffer::UpdateData()
-{
-	if (NeedUpdate)
+	void* Mapped = NULL;
+	HRESULT Result = D3D10Buffer->Map(D3D10_MAP_WRITE_DISCARD, 0, &Mapped);
+	if (FAILED(Result))
 	{
-		void* Mapped = NULL;
-		if (FAILED(D3D10Buffer->Map(D3D10_MAP_WRITE_DISCARD, 0, &Mapped)))
-		{
-			zeError("Cannot update constant buffer data.");
-			return;
-		}
-
-		memcpy(Mapped, Data, Size);
-
-		D3D10Buffer->Unmap();
-		NeedUpdate = false;
+		zeError("D3D10 Constant buffer mapping failed. ErrorCode: %d.", Result);
+		return false;
 	}
-}
 
-ZED3D10ConstantBuffer::ZED3D10ConstantBuffer()
-{
-	D3D10Buffer = NULL;
-}
+	memcpy(Mapped, Data, Size);
 
-ZED3D10ConstantBuffer::~ZED3D10ConstantBuffer()
-{
-	ZED3D_RELEASE(D3D10Buffer);
+	D3D10Buffer->Unmap();
 
-	if (Data != NULL)
-		delete [] Data;
+	return ZEConstantBuffer::UpdateBuffer();
 }
 
 ID3D10Buffer* ZED3D10ConstantBuffer::GetD3D10Buffer() const
@@ -109,86 +66,10 @@ ID3D10Buffer* ZED3D10ConstantBuffer::GetD3D10Buffer() const
 	return D3D10Buffer;
 }
 
-bool ZED3D10ConstantBuffer::Lock(void** ConstantData)
-{
-	zeDebugCheck(ConstantData == NULL, "Null pointer.");
-	
-	*ConstantData = Data;
-	
-	return true;
-}
-
-void ZED3D10ConstantBuffer::Unlock()
-{
-	NeedUpdate = true;
-}
-
-bool ZED3D10ConstantBuffer::SetConstant(ZESize Index, const void* SourceData)
-{
-	zeDebugCheck(SourceData == NULL, "Null pointer.");
-	zeDebugCheck(Info == NULL, "Buffer not created with a ZEShaderBufferInfo");
-	zeDebugCheck(Index >= Info->Constants.GetCount(), "Index out of range.");
-	
-	const ZEShaderConstantInfo& Constant = Info->Constants[Index]; 
-	CopyFrom(Constant, (ZEUInt8*)Data + Constant.Offset, SourceData);
-
-	NeedUpdate = true;
-
-	return true;
-}
-
-bool ZED3D10ConstantBuffer::GetConstant(ZESize Index, void* DestinationData) const
-{
-	zeDebugCheck(DestinationData == NULL, "Null pointer.");
-	zeDebugCheck(Info == NULL, "Buffer not created with a ZEShaderBufferInfo");
-	zeDebugCheck(Index >= Info->Constants.GetCount(), "Index out of range.");
-	
-	const ZEShaderConstantInfo& Constant = Info->Constants[Index]; 
-	CopyTo(Constant, DestinationData, (ZEUInt8*)Data + Constant.Offset);
-
-	return true;
-}
-
-bool ZED3D10ConstantBuffer::SetConstant(const ZEString& Name, const void* SourceData)
-{
-	zeDebugCheck(SourceData == NULL, "Null pointer.");
-	zeDebugCheck(Name.IsEmpty(), "Index out of range.");
-	zeDebugCheck(Info == NULL, "Buffer not created with a ZEShaderBufferInfo");
-
-	ZESSize Index = FindConstantIndex(Info->Constants, Name);
-
-	if (Index < 0)
-		return false;
-
-	const ZEShaderConstantInfo& Constant = Info->Constants[Index]; 
-	CopyFrom(Constant, (ZEUInt8*)Data + Constant.Offset, SourceData);
-
-	NeedUpdate = true;
-
-	return true;
-}
-
-bool ZED3D10ConstantBuffer::GetConstant(const ZEString& Name, void* DestinationData) const
-{
-	zeDebugCheck(Name.IsEmpty(), "Index out of range.");
-	zeDebugCheck(DestinationData == NULL, "Null pointer.");
-	zeDebugCheck(Info == NULL, "Buffer not created with a ZEShaderBufferInfo");
-
-	ZESSize Index = FindConstantIndex(Info->Constants, Name);
-
-	if (Index < 0)
-		return false;
-
-	const ZEShaderConstantInfo& Constant = Info->Constants[Index]; 
-	CopyTo(Constant, DestinationData, (ZEUInt8*)Data + Constant.Offset);
-
-	return true;
-}
-
-bool ZED3D10ConstantBuffer::Create(ZESize BufferSize)
+bool ZED3D10ConstantBuffer::Create(ZESize Size)
 {
 	zeDebugCheck(Data != NULL, "Already created");
-	zeDebugCheck(BufferSize == 0, "Zero size.");
+	zeDebugCheck(Size == 0, "Zero size.");
 	
 	// Create buffer
 	D3D10_BUFFER_DESC Desc;
@@ -196,22 +77,26 @@ bool ZED3D10ConstantBuffer::Create(ZESize BufferSize)
 	Desc.Usage = D3D10_USAGE_DYNAMIC;
 	Desc.BindFlags = D3D10_BIND_CONSTANT_BUFFER;
 	Desc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
-	Desc.ByteWidth = (UINT)BufferSize;
+	Desc.ByteWidth = (UINT)Size;
 	
-	if (FAILED(D3D10Device->CreateBuffer(&Desc, NULL, &D3D10Buffer)))
+	HRESULT Result = D3D10Device->CreateBuffer(&Desc, NULL, &D3D10Buffer);
+	if (FAILED(Result))
 	{
-		zeError("Cannot create constant buffer");
+		zeError("D3D10 Constant buffer creation failed. ErrorCode: %d.", Result);
 		return false;
 	}
 
-	Data = new ZEUInt8[BufferSize];
-	Size = BufferSize;
-	Info = NULL;
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Constant buffer created by size. Size: %u.", Size);
+#endif
 
-	return true;
+	GlobalSize += Size;
+	GlobalCount++;
+
+	return ZEConstantBuffer::Create(Size);
 }
 
-bool ZED3D10ConstantBuffer::Create(const ZEShaderBufferInfo* BufferInfo)
+bool ZED3D10ConstantBuffer::Create(const ZEShaderBuffer* BufferInfo)
 {
 	zeDebugCheck(Data != NULL, "Already created");
 	zeDebugCheck(BufferInfo == NULL, "NUll pointer");
@@ -225,15 +110,36 @@ bool ZED3D10ConstantBuffer::Create(const ZEShaderBufferInfo* BufferInfo)
 	Desc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
 	Desc.ByteWidth = (UINT)BufferInfo->Size;
 	
-	if (FAILED(D3D10Device->CreateBuffer(&Desc, NULL, &D3D10Buffer)))
+	HRESULT Result = D3D10Device->CreateBuffer(&Desc, NULL, &D3D10Buffer);
+	if (FAILED(Result))
 	{
-		zeError("Cannot create constant buffer");
+		zeError("D3D10 Constant buffer creation failed. ErrorCode: %d.", Result);
 		return false;
 	}
 
-	Data = new ZEUInt8[BufferInfo->Size];
-	Size = BufferInfo->Size;
-	Info = BufferInfo;
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Constant buffer created by buffer info. Name: %s, ConstantCount: %u, Size: %u.", 
+			BufferInfo->Name, BufferInfo->Constants.GetCount(), BufferInfo->Size);
+#endif
 
-	return true;
+	GlobalSize += BufferInfo->Size;
+	GlobalCount++;
+
+	return ZEConstantBuffer::Create(BufferInfo);
+}
+
+ZESize		ZED3D10ConstantBuffer::GlobalSize = 0;
+ZEUInt16	ZED3D10ConstantBuffer::GlobalCount = 0;
+
+ZED3D10ConstantBuffer::ZED3D10ConstantBuffer()
+{
+	D3D10Buffer = NULL;
+}
+
+ZED3D10ConstantBuffer::~ZED3D10ConstantBuffer()
+{	
+	ZED3D_RELEASE(D3D10Buffer);
+
+	GlobalSize -= Size;
+	GlobalCount--;
 }

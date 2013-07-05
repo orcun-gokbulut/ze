@@ -58,8 +58,10 @@ class ZECanvasBrush : public ZEEntity
 		ZESize					OldVertexCount;
 		
 	protected:
-								ZECanvasBrush();
-		virtual					~ZECanvasBrush();
+		virtual bool					DeinitializeSelf();
+
+										ZECanvasBrush();
+		virtual							~ZECanvasBrush();
 
 	public:
 		ZEPrimitiveType			PrimitiveType;
@@ -73,7 +75,6 @@ class ZECanvasBrush : public ZEEntity
 		virtual void			Draw(ZEDrawParameters* DrawParameters);
 		virtual void			Tick(float ElapsedTime);
 
-		virtual void			Deinitialize();
 		static ZECanvasBrush*	CreateInstance();
 };
 

@@ -39,30 +39,64 @@
 #include "ZELight.h"
 #include "ZERenderCommand.h"
 #include "ZEMath/ZEViewSphere.h"
+#include "ZEGraphics/ZEConstantBuffer.h"
 
 class ZETexture2D;
 class ZEMaterialLightPoint;
 
 class ZELightPoint  : public ZELight
 {
-	private:
-		ZEViewSphere					ViewVolume;
+	protected:
+		float							Range;
+		ZEVector3						Color;
+		float							Intensity;
+		ZEVector3						Attenuation;
 
+		float							PenumbraSize;
+		float							SlopeScaledBias;
+		float							DepthScaledBias;
+
+		ZEViewSphere					ViewVolume;
+		ZEVertexLayout					VertexLayout;
+		ZEVertexBuffer*					Vertices;
 		ZEMaterialLightPoint*			Material;
-		ZEVertexBuffer*					Geometry;
-		ZERenderCommand					RenderCommand;
+		ZERenderCommandDefault			RenderCommand;
 		
+		virtual void					UpdateMaterial(const ZEDrawParameters* DrawParameters);
+
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
 										ZELightPoint();
 		virtual							~ZELightPoint();
 
 	public:
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index);
+		void							SetRange(float NewValue);
+		float							GetRange() const;
+
+		void							SetColor(const ZEVector3& NewColor);
+		const ZEVector3&				GetColor() const;
 		
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
+		void							SetIntensity(float NewValue);
+		float							GetIntensity() const;
+
+		void							SetAttenuation(const ZEVector3& Attenuation);
+		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
+		const ZEVector3&				GetAttenuation() const;
+
+		void							SetPenumbraSize(float Value);
+		float							GetPenumbraSize() const;
+
+		void							SetSlopeScaledBias(float Value);
+		float							GetSlopeScaledBias() const;
+
+		void							SetDepthScaledBias(float Value);
+		float							GetDepthScaledBias() const;
 
 		virtual void					Tick(float Time);
 		virtual void					Draw(ZEDrawParameters* DrawParameters);
+		
+		virtual const ZEViewVolume*		GetLightVolume();
 
 		static ZELightPoint*			CreateInstance();
 };

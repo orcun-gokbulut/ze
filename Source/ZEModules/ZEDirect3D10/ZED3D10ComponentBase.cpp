@@ -36,8 +36,6 @@
 #include "ZED3D10ComponentBase.h"
 #include "ZED3D10GraphicsModule.h"
 
-#include <D3D10.h>
-
 ZED3D10GraphicsModule*	ZED3D10ComponentBase::GraphicsModule = NULL;
 ID3D10Device*			ZED3D10ComponentBase::D3D10Device = NULL;
 

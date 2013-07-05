@@ -47,82 +47,11 @@ ZELightType ZELight::GetLightType() const
 	return Type;
 }
 
-void ZELight::SetPosition(const ZEVector3& NewPosition)
-{
-	if (GetPosition() != NewPosition)
-	{
-		UpdateViewVolume = true;
-		ZEEntity::SetPosition(NewPosition);
-	}
-}
-
-void ZELight::SetRotation(const ZEQuaternion& NewRotation)
-{
-	if (GetRotation() != NewRotation)
-	{
-		UpdateViewVolume = true;
-		ZEEntity::SetRotation(NewRotation);
-	}
-}
-
-void ZELight::Draw(ZEDrawParameters* DrawParameters)
-{
-	
-}
-
 void ZELight::OnTransformChanged()
 {
+	Changed = true;
 	UpdateViewVolume = true;
 	ZEEntity::OnTransformChanged();
-}
-
-
-void ZELight::SetColor(const ZEVector3& NewColor)
-{
-	Color = NewColor;
-}
-
-const ZEVector3& ZELight::GetColor() const
-{
-	return Color;
-}
-
-void ZELight::SetIntensity(float NewValue)
-{
-	Intensity = NewValue;
-}
-
-float ZELight::GetIntensity() const
-{
-	return Intensity;
-}
-
-void ZELight::SetRange(float NewValue)
-{
-	UpdateViewVolume = true;
-	Range = NewValue;
-}
-
-float ZELight::GetRange() const
-{
-	return Range;
-}
-
-void ZELight::SetAttenuation(const ZEVector3& Attenuation)
-{
-	this->Attenuation = Attenuation;
-}
-
-void ZELight::SetAttenuation(float DistanceSquare, float Distance, float Constant)
-{
-	Attenuation.x = Constant;
-	Attenuation.y = Distance;
-	Attenuation.z = DistanceSquare;
-}
-
-const ZEVector3& ZELight::GetAttenuation() const
-{
-	return Attenuation;
 }
 
 void ZELight::SetShadowCaster(bool NewValue)
@@ -135,51 +64,18 @@ bool ZELight::GetShadowCaster() const
 	return ShadowCaster;
 }
 
-void ZELight::SetPenumbraSize(float Value)
+void ZELight::Draw(ZEDrawParameters* DrawParameters)
 {
-	PenumbraSize = Value;
+
 }
 
-float ZELight::GetPenumbraSize() const
+ZELight::ZELight(ZELightType LightType)
 {
-	return PenumbraSize;
-}
+	Type = LightType;
 
-void ZELight::SetSlopeScaledBias(float Value)
-{
-	SlopeScaledBias = Value;
-}
-
-float ZELight::GetSlopeScaledBias() const
-{
-	return SlopeScaledBias;
-}
-
-void ZELight::SetDepthScaledBias(float Value)
-{
-	DepthScaledBias = Value;
-}
-
-float ZELight::GetDepthScaledBias() const
-{
-	return DepthScaledBias;
-}
-
-ZELight::ZELight()
-{
+	Changed = true;
 	ShadowCaster = false;
 	UpdateViewVolume = true;
-
-	Type = ZE_LT_NONE;
-
-	Range = 50.0f;
-	Intensity = 1.0f;
-	Color = ZEVector3::One;
-	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
-
-	PenumbraSize = 1.0f;
-	SlopeScaledBias = 0.0f;
-	DepthScaledBias = 0.0f;
 }
 
 ZELight::~ZELight()

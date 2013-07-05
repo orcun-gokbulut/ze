@@ -77,6 +77,8 @@ class ZEPlayer : public ZEActor
 		float					FOV;
 
 	protected:
+		virtual	bool			InitializeSelf();
+		virtual bool			DeinitializeSelf();
 
 								ZEPlayer();
 		virtual					~ZEPlayer();
@@ -93,10 +95,7 @@ class ZEPlayer : public ZEActor
 		void					Activate();
 
 		virtual void			Tick(float Time);
-		
-		virtual	bool			Initialize();
-		virtual void			Deinitialize();
-		
+			
 		static ZEPlayer*		CreateInstance();
 };
 

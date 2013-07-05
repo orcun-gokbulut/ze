@@ -42,6 +42,7 @@
 
 struct ZEUIVertex;
 class ZEMaterial;
+
 class ZEUIRectangle
 {
 	public:
@@ -49,7 +50,7 @@ class ZEUIRectangle
 		ZERectangle			Texcoords;
 		const ZEMaterial*	Material;
 		ZEVector4			Color;
-		ZEInt				ZOrder;
+		ZEInt32				ZOrder;
 
 		static bool			Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, const ZERectangle& ClipRectangle);
 		void				ConvertToVertices(ZEUIVertex* Buffer) const;

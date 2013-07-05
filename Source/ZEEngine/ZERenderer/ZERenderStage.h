@@ -37,87 +37,48 @@
 #define __ZE_RENDER_STAGE_H__
 
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEFlags.h"
 #include "ZEGraphics/ZEGraphicsDeviceState.h"
 
-#define ZE_RENDER_STAGE_NONE			1
-#define ZE_RENDER_STAGE_GEOMETRY		2
-#define ZE_RENDER_STAGE_SHADOW			4
-#define ZE_RENDER_STAGE_LIGHTING		8
-#define ZE_RENDER_STAGE_FORWARD			16
-#define ZE_RENDER_STAGE_TRANSPARENT		32
-#define ZE_RENDER_STAGE_UI				64
-#define ZE_RENDER_STAGE_PARTICLE		128
-
-
-enum ZERenderStageConstant
-{
-	// Time
-	ZE_PC_TIME_0_1,
-	ZE_PC_SIN_TIME_0_1,
-	ZE_PC_COS_TIME_0_1,
-	ZE_PC_TAN_TIME_0_1,
-	ZE_PC_TIME_0_N,
-	ZE_PC_SIN_TIME_0_N,
-	ZE_PC_COS_TIME_0_N,
-	ZE_PC_TAN_TIME_0_N,
-
-	// Camera View-port
-	ZE_PC_FOV,
-	ZE_PC_NEAR_FAR_Z,
-	ZE_PC_ACPECT_RATIO,
-	ZE_PC_CAMERA_WORLD_POS,
-	ZE_PC_ELAPSED_TIME,
-	ZE_PC_CAMERA_WORLD_UP,
-	ZE_PC_CAMERA_WORLD_FRONT,
-	ZE_PC_CAMERA_WORLD_RIGHT,
-	ZE_PC_VIEWPORT_WIDTH_HEIGHT,
-	ZE_PC_INV_VIEWPORT_WIDTH_HEIGHT,
-};
+#define ZE_RST_NONE				0x00000000
+#define ZE_RST_GEOMETRY			0x00000001
+#define ZE_RST_SHADOW			0x00000002
+#define ZE_RST_LIGHTING			0x00000004
+#define ZE_RST_ACCUMULATION		0x00000008
+#define ZE_RST_TRANSPARENT		0x00000010
+#define ZE_RST_USER_INTERFACE	0x00000020
+#define ZE_RST_PARTICLE			0x00000040
+#define ZE_RST_ALL				0xFFFFFFFF
+typedef ZEFlagsBase<ZEUInt32>	ZERenderStageType;
 
 class ZECamera;
 class ZEMaterial;
 class ZERenderCommand;
 class ZEConstantBuffer;
 
-
-class ZERenderStageConfiguration
-{
-	public:
-		ZESize					Size;
-
-								ZERenderStageConfiguration(){};
-								~ZERenderStageConfiguration(){};
-};
-
 class ZERenderStage
 {
+	friend class ZERenderer;
+
 	protected:
 		ZEGraphicsDeviceState			DefaultStates;
-		ZEConstantBuffer*				StageBuffer;
-		ZEArray<ZERenderStageConstant>	StageConstants;
 
-		void							DestroyBuffers();
-		virtual void					UpdateBuffers();
-				
-		virtual void					ResetStageDefaults();
-		virtual void					CommitStageDefaults();
-
-		void							PumpStreams(ZERenderCommand* RenderCommand);
+		virtual void					PumpStreams(const ZERenderCommand* RenderCommand);
+		
+		virtual void					ResetStates();
+		virtual void					CommitStates();
 
 	public:
 		const ZEGraphicsDeviceState*	GetDefaultStates() const;
 
 		virtual void					Destroy();
 
-		virtual ZEUInt32				GetStageFlags() const = 0;
-		virtual ZEUInt32				GetDependencies() const = 0;
-		virtual ZEUInt32				GetStageIndentifier() const = 0;
+		virtual ZERenderStageType		GetStageType() const = 0;
+		virtual ZERenderStageType		GetDependencies() const = 0;
 		
+		virtual void					Process(const ZERenderCommand* RenderCommand) = 0;
 		virtual void					Setup() = 0;
-		virtual void					Process(ZERenderCommand* RenderCommand) = 0;
-		
-		virtual void					SetStageConfiguration(const ZERenderStageConfiguration* Config) = 0;
-		
+
 										ZERenderStage();
 		virtual							~ZERenderStage();
 };

@@ -41,6 +41,7 @@
 
 #include <NxUserOutputStream.h>
 
+
 class ZEPhysXUserOutputStream : public NxUserOutputStream
 {
 	virtual void				reportError(NxErrorCode Code, const char* Message, const char* File, ZEInt Line);

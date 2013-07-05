@@ -37,11 +37,9 @@
 #define __ZE_DEVICE_STATE_BLEND_H__
 
 #include "ZETypes.h"
-#include "ZEFoundation/ZEDS/ZEFlags.h"
 #include "ZEMath/ZEVector.h"
-
-
-#define ZE_MAX_RENDER_TARGET_SLOT		8
+#include "ZEGraphicsDefinitions.h"
+#include "ZEFoundation/ZEDS/ZEFlags.h"
 
 enum ZEBlendOption 
 {	
@@ -73,42 +71,31 @@ enum ZEBlendEquation
 	ZE_BE_MAX					= 5 
 };
 
-
-#define ZE_CM_NONE				0x0
-#define	ZE_CM_RED				0x1
-#define	ZE_CM_GREEN				0x2
-#define	ZE_CM_BLUE				0x4
-#define	ZE_CM_ALPHA				0x8
-#define ZE_CM_ALL				ZE_CM_RED | ZE_CM_GREEN | ZE_CM_BLUE | ZE_CM_ALPHA
-typedef ZEFlagsBase<ZEUInt8>	ZEComponentMask;
+typedef ZEComponentMask ZEColorWriteMask;
 
 class ZEBlendState
 {
-	friend class ZEGraphicsDevice;
-	friend class ZEDeviceStageOutput;
-
-	// Should be public for only internal usage
-	public:
-		ZEUInt64					Hash;
+	protected:
+		ZESize						Hash;
 		bool						Dirty;
 		
 		struct ZEBlendStateData
 		{
-			bool					AlphaToCoverageEnable;
-			ZEBlendOption			SourceBlendOption;
-			ZEBlendOption			DestinationBlendOption;
-			ZEBlendEquation			BlendEquation;
-			ZEBlendOption			SourceBlendAlphaOption;
-			ZEBlendOption			DestinationBlendAlphaOption;
-			ZEBlendEquation			BlendAlphaEquation;
+			bool					AlphaToCoverageEnable : 2;
+			ZEBlendOption			SourceBlendOption : 6;
+			ZEBlendOption			DestinationBlendOption : 6;
+			ZEBlendEquation			BlendEquation : 4;
+			ZEBlendOption			SourceBlendAlphaOption : 6;
+			ZEBlendOption			DestinationBlendAlphaOption : 6;
+			ZEBlendEquation			BlendAlphaEquation : 4;
 			bool					BlendEnable[ZE_MAX_RENDER_TARGET_SLOT];
-			ZEComponentMask			ComponentWriteMask[ZE_MAX_RENDER_TARGET_SLOT];
+			ZEColorWriteMask		ComponentWriteMask[ZE_MAX_RENDER_TARGET_SLOT];
 
 		} StateData;
-
-		void						UpdateHash();
 		
 	public:
+		ZESize						GetHash();
+
 		void						SetAlphaToCoverageEnable(bool Enable);
 		bool						GetAlphaToCoverageEnable() const;
 
@@ -133,8 +120,8 @@ class ZEBlendState
 		void						SetBlendAlphaEquation(ZEBlendEquation Equation);
 		ZEBlendEquation				GetBlendAlphaEquation() const;
 
-		void						SetComponentWriteMask(ZESize Target, ZEComponentMask Mask);
-		ZEComponentMask				GetComponentWriteMask(ZESize Target) const;
+		void						SetComponentWriteMask(ZESize Target, ZEColorWriteMask Mask);
+		ZEColorWriteMask			GetComponentWriteMask(ZESize Target) const;
 
 		void						SetToDefault();
 		
@@ -143,7 +130,7 @@ class ZEBlendState
 		bool						operator!=(const ZEBlendState& State);
 
 									ZEBlendState();
-		virtual						~ZEBlendState();
+									~ZEBlendState();
 
 };
 #endif

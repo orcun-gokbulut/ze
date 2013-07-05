@@ -48,6 +48,9 @@ class ZED3D10DepthStencilBuffer : public ZEDepthStencilBuffer, public ZED3D10Com
 	friend class ZED3D10GraphicsDevice;
 
 	protected:
+		static ZESize					GlobalSize;
+		static ZEUInt16					GlobalCount;
+
 		ID3D10DepthStencilView*			D3D10DepthStencilView;
 
 										ZED3D10DepthStencilBuffer();

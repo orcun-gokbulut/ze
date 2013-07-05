@@ -37,6 +37,16 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 
+const ZEShaderMetaTable* ZEShader::GetMetaTable() const
+{
+	return &MetaTable;
+}
+
+void ZEShader::Destroy()
+{
+	delete this;
+}
+
 ZEShader::ZEShader()
 {
 
@@ -45,19 +55,4 @@ ZEShader::ZEShader()
 ZEShader::~ZEShader()
 {
 
-}
-
-const ZEShaderMetaTable* ZEShader::GetMetaTable() const
-{
-	return &MetaTable;
-}
-
-const ZEVertexLayout* ZEShader::GetDefaultVertexLayout() const
-{
-	return &DefaultVertexLayout;
-}
-
-void ZEShader::Destroy()
-{
-	delete this;
 }

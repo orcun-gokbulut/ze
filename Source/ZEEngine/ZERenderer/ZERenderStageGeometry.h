@@ -46,46 +46,43 @@ class ZERenderCommand;
 class ZERenderStageGeometry : public ZERenderStage
 {
 	protected:
-		ZEUInt32				LastMaterial;
+		ZEUInt32					LastMaterial;
 
 		struct
 		{
-			ZETexture2D*		GBuffer1;	// Depth
-			ZETexture2D*		GBuffer2;	// Normal + Specular
-			ZETexture2D*		GBuffer3;	// Sub surface scattering + pixel velocity
+			ZETexture2D*			GBuffer1;	// Depth
+			ZETexture2D*			GBuffer2;	// Normal + Specular
+			ZETexture2D*			GBuffer3;	// Sub surface scattering + pixel velocity
 
 		} Textures;
 
 		struct
 		{
-			ZERenderTarget*		GBuffer1;
-			ZERenderTarget*		GBuffer2;
-			ZERenderTarget*		GBuffer3;
+			ZERenderTarget*			GBuffer1;
+			ZERenderTarget*			GBuffer2;
+			ZERenderTarget*			GBuffer3;
 
 		} RenderTargets;
 
-		void					ResetStageDefaults();
-		void					CommitStageDefaults();
+		void						ResetStates();
+		void						CommitStates();
 
-		void					UpdateBuffers();
-		void					DestroyBuffers();
+		void						UpdateBuffers();
+		void						DestroyBuffers();
 
 	public:
-		virtual ZEUInt32		GetStageFlags() const;
-		virtual ZEUInt32		GetDependencies() const;
-		virtual ZEUInt32		GetStageIndentifier() const;
+		virtual ZERenderStageType	GetStageType() const;
+		virtual ZERenderStageType	GetDependencies() const;
 
-		const ZETexture2D*		GetGBuffer1() const;
-		const ZETexture2D*		GetGBuffer2() const;
-		const ZETexture2D*		GetGBuffer3() const;
+		const ZETexture2D*			GetGBuffer1() const;
+		const ZETexture2D*			GetGBuffer2() const;
+		const ZETexture2D*			GetGBuffer3() const;
 		
-		virtual void			Setup();
-		virtual void			Process(ZERenderCommand* RenderCommand);
+		virtual void				Process(const ZERenderCommand* RenderCommand);
+		virtual void				Setup();
 
-		virtual void			SetStageConfiguration(const ZERenderStageConfiguration* Config);
-		
-								ZERenderStageGeometry();
-		virtual					~ZERenderStageGeometry();
+									ZERenderStageGeometry();
+		virtual						~ZERenderStageGeometry();
 };
 
 #endif

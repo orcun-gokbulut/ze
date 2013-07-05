@@ -38,47 +38,61 @@
 #define __ZE_DEBUG_DRAWER_H__
 
 #include "ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECanvas.h"
+#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZECanvas.h"
 
+#define ZE_DDE_NONE									0
+#define ZE_DDE_ENTITY_WORLD_BOUNDING_BOX			1
+#define ZE_DDE_LIGHT_RANGE							2
+#define ZE_DDE_ALL									3
 
 class ZEAABBox;
 class ZEMatrix4x4;
-class ZEVector4;
+class ZERectangle3D;
 class ZEMaterial;
+class ZEUIDebugDrawTag;
 
 class ZEDebugDrawer : public ZEEntity
 {
 	private:
-		ZEEntity*				Target;
+		ZEVector4				DrawColor;
+		ZEFlags					DebugDrawElements;
 
 		ZEMaterial*				Material;
 		ZECanvas				DrawCanvas;
 		ZERenderCommand			RenderCommand;
 
-		void					DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, const ZEVector4& Color);
-		void					DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, const ZEVector4& Color);
-		void					DrawBoundingSphere(const ZEBSphere& BoundingSphere, const ZEVector4& Color);
-		void					DebugDrawEntity(ZEEntity* Entity);
+	protected:
+		ZEEntity*				Target;
+		ZEUIDebugDrawTag*		EntityTag;
+
+		void					DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, const ZEVector4& Color, ZECanvas& Canvas);
+		void					DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, const ZEVector4& Color, ZECanvas& Canvas);
+		void					DrawBoundingSphere(const ZEBSphere& BoundingSphere, const ZEVector4& Color, ZECanvas& Canvas);
+		void					DrawLineSegment(const ZEVector3& StartPosition, const ZEVector3& EndPosition, const ZEVector4& Color, ZECanvas& Canvas);
+		void					DrawRectangle(const ZERectangle3D& Rectangle, const ZEVector4& Color, ZECanvas& Canvas);
+
+		virtual void			DebugDrawEntity();
+
+		virtual bool			InitializeSelf();
+		virtual	bool			DeinitializeSelf();
 
 								ZEDebugDrawer();
 		virtual					~ZEDebugDrawer();
 
 	public:
-
-		void					SetTarget(ZEEntity* Target);
+		virtual void			SetTarget(ZEEntity* Target);
 		ZEEntity*				GetTarget();
+
+		void					SetDebugDrawColor(ZEVector4 Color);
+		ZEVector4				GetDebugDrawColor() const;
+
+		void					SetDebugDrawElements(ZEUInt Elements);
+		ZEUInt					GetDebugDrawElements() const;
 
 		virtual ZEDrawFlags		GetDrawFlags() const;
 
-		void					Clean();
-
-		virtual void			Tick(float ElapsedTime);
 		virtual void			Draw(ZEDrawParameters* DrawParameters);
-
-		virtual bool			Initialize();
-		virtual	void			Deinitialize();
-		virtual void			Destroy();
 
 		static ZEDebugDrawer*	CreateInstance();
 

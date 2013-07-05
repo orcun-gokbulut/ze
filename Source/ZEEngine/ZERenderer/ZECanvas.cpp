@@ -40,10 +40,10 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEGraphics/ZEVertexLayout.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
 #include <stdio.h>
-#include "ZEGraphics/ZEVertexBuffer.h"
-
 
 #define ZECANVAS_ADDVERTEX(Vertex, Matrix, Pos, Nor, Texcrd)\
 	ZEMatrix4x4::Transform((Vertex).Position, (Matrix), (Pos));\
@@ -56,9 +56,6 @@
 	(Vertex).Normal = ZEVector3(0.0f, 0.0f, 0.0f);\
 	(Vertex).Texcoord = ZEVector2(0.0f, 0.0f);\
 	(Vertex).Color = Color
-
-
-
 
 
 static ZEString ConstructResourcePath(const ZEString& Path)
@@ -84,28 +81,6 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 
 	return NewString;
 }
-
-ZEVertexLayout ZECanvasVertex::Layout;
-const ZEVertexLayout& ZECanvasVertex::GetVertexLayout()
-{
-	static bool Initialized = false;
-	static const ZEVertexElement VertexElements[] = 
-	{
-		{"POSITION",	0, ZE_VET_FLOAT3, 0, 0,		ZE_VU_PER_VERTEX, 0},
-		{"NORMAL",		0, ZE_VET_FLOAT3, 0, 12,	ZE_VU_PER_VERTEX, 0},
-		{"TEXCOORD",	0, ZE_VET_FLOAT2, 0, 24,	ZE_VU_PER_VERTEX, 0},
-		{"COLOR",		0, ZE_VET_FLOAT4, 0, 32,	ZE_VU_PER_VERTEX, 0},
-	};
-
-	if (!Initialized)
-	{
-		Layout.SetLayout(VertexElements, 4);
-		Initialized = true;
-	}
-
-	return Layout;
-}
-
 
 void ZECanvas::PushTransformation()
 {
@@ -840,10 +815,24 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 	return true;
 }
 
-ZEVertexBuffer* ZECanvas::CreateStaticVertexBuffer()
+ZEVertexBuffer* ZECanvas::CreateStaticVertexBuffer() const
 {
 	ZEVertexBuffer* Buffer = ZEVertexBuffer::CreateInstance();
-	Buffer->CreateStatic((ZEUInt)Vertices.GetCount(), sizeof(ZECanvasVertex), Vertices.GetCArray());
+	bool Result = Buffer->CreateStatic((ZEUInt)Vertices.GetCount(), sizeof(ZECanvasVertex), Vertices.GetConstCArray());
+	if (!Result)
+	{
+		ZE_DESTROY(Buffer);
+		return NULL;
+	}
+
+	ZEVertexBufferElement Elements[] = 
+	{
+		{"POSITION",	0, ZE_VET_FLOAT3, 0,	ZE_VU_PER_VERTEX, 0},
+		{"NORMAL",		0, ZE_VET_FLOAT3, 12,	ZE_VU_PER_VERTEX, 0},
+		{"TEXCOORD",	0, ZE_VET_FLOAT2, 24,	ZE_VU_PER_VERTEX, 0},
+		{"VERTEXCOLOR",	0, ZE_VET_FLOAT4, 32,	ZE_VU_PER_VERTEX, 0},
+	};
+	Buffer->RegisterElements(Elements, 4);
 
 	return Buffer;
 }
@@ -853,7 +842,7 @@ ZESize ZECanvas::GetBufferSize() const
 	return Vertices.GetCount() * sizeof(ZECanvasVertex);
 }
 
-void* ZECanvas::GetVertexBuffer() const
+void* ZECanvas::GetVertices() const
 {
 	return (void*)Vertices.GetConstCArray();
 }

@@ -42,7 +42,7 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
-#include "ZEShaderMetaInfo.h"
+#include "ZEShaderMeta.h"
 #include "ZEShaderCompileOptions.h"
 
 
@@ -53,50 +53,50 @@ class ZEShaderMetaTable
 
 	// Should be public for only internal usage
 	public:
-		ZEArray<ZEShaderSamplerInfo>		Samplers;
-		ZEArray<ZEShaderTextureInfo>		Textures;
-		ZEArray<ZEShaderBufferInfo>			Buffers;
-		ZEArray<ZEShaderInputInfo>			Inputs;
-		ZEShaderCompileOptions				CompileOptions;
+		ZEArray<ZEShaderSampler>		Samplers;
+		ZEArray<ZEShaderTexture>		Textures;
+		ZEArray<ZEShaderBuffer>			Buffers;
+		ZEArray<ZEShaderInput>			Inputs;
+		ZEShaderCompileOptions			CompileOptions;
 
 	protected:
-											ZEShaderMetaTable();
-		virtual								~ZEShaderMetaTable();
+										ZEShaderMetaTable();
+		virtual							~ZEShaderMetaTable();
 
 	public:
-											// Compile Options
-		ZEShaderType						GetShaderType() const;
-		ZEShaderModel						GetShaderModel() const;
-		const ZEString&						GetShaderFileName() const;
-		const ZEString&						GetShaderEntryPoint() const;
-		ZESize								GetShaderParameterCount() const;
-		const ZEShaderCompilerParameter*	GetShaderParameter(ZESize Index) const;
-		const ZEShaderCompilerParameter*	GetShaderParameter(const ZEString& Name) const;
+										// Compile Options
+		ZEShaderType					GetShaderType() const;
+		ZEShaderModel					GetShaderModel() const;
+		const ZEString&					GetShaderFileName() const;
+		const ZEString&					GetShaderEntryPoint() const;
+		ZESize							GetShaderParameterCount() const;
+		const ZEShaderParameter*		GetShaderParameter(ZESize Index) const;
+		const ZEShaderParameter*		GetShaderParameter(const char* Name) const;
 
-											// Sampler
-		ZESize								GetSamplerCount() const;
-		const ZEShaderSamplerInfo*			GetSamplerInfo(ZESize Index) const;
-		const ZEShaderSamplerInfo*			GetSamplerInfo(const ZEString& Name) const;
+										// Sampler
+		ZESize							GetSamplerCount() const;
+		const ZEShaderSampler*			GetSamplerInfo(ZESize Index) const;
+		const ZEShaderSampler*			GetSamplerInfo(const char* Name) const;
 		
-											// Texture
-		ZESize								GetTextureCount() const;
-		const ZEShaderTextureInfo*			GetTextureInfo(ZESize Index) const;
-		const ZEShaderTextureInfo*			GetTextureInfo(const ZEString& Name) const;
+										// Texture
+		ZESize							GetTextureCount() const;
+		const ZEShaderTexture*			GetTextureInfo(ZESize Index) const;
+		const ZEShaderTexture*			GetTextureInfo(const char* Name) const;
 
-											// Buffer
-		ZESize								GetBufferCount() const;
-		const ZEShaderBufferInfo*			GetBufferInfo(ZESize Index) const;
-		const ZEShaderBufferInfo*			GetBufferInfo(const ZEString& Name) const;
+										// Buffer
+		ZESize							GetBufferCount() const;
+		const ZEShaderBuffer*			GetBufferInfo(ZESize Index) const;
+		const ZEShaderBuffer*			GetBufferInfo(const char* Name) const;
 													
-											// Constant
-		ZESize								GetConstantCount(ZESize BufferIndex) const;
-		const ZEShaderConstantInfo*			GetConstantInfo(ZESize BufferIndex, ZESize Index) const;
-		const ZEShaderConstantInfo*			GetConstantInfo(ZESize BufferIndex, const ZEString& Name) const;
+										// Constant
+		ZESize							GetConstantCount(ZESize BufferIndex) const;
+		const ZEShaderConstant*			GetConstantInfo(ZESize BufferIndex, ZESize Index) const;
+		const ZEShaderConstant*			GetConstantInfo(ZESize BufferIndex, const char* Name) const;
 
-											// Input Signature
-		ZESize								GetInputCount() const;
-		const ZEShaderInputInfo*			GetInputInfo(ZESize Index) const;
-		const ZEShaderInputInfo*			GetInputInfo(const ZEString& Semantic, ZEUInt32 SemantixIndex) const;
+										// Input Signature
+		ZESize							GetInputCount() const;
+		const ZEShaderInput*			GetInputInfo(ZESize Index) const;
+		const ZEShaderInput*			GetInputInfo(const char* Semantic, ZEUInt8 SemantixIndex) const;
 
 };
 

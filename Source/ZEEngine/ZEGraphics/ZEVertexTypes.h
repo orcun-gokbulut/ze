@@ -43,88 +43,40 @@
 class ZESimpleVertex
 {
 	private:
-		static ZEVertexLayout			Layout;
+		static ZEVertexLayout	Layout;
 
 	public:
-		ZEVector3						Position;
-		ZEVector3						Normal;
-		ZEVector2						Texcoord;
-		ZEVector4						Color;
+		ZEVector3				Position;
+		ZEVector3				Normal;
+		ZEVector2				Texcoord;
+		ZEVector4				Color;
 
-		static const ZEVertexLayout&	GetVertexLayout();
-};
-
-struct ZEInteriorVertex
-{
-	private:
-		static ZEVertexLayout			Layout;
-
-	public:
-		ZEVector3						Position;
-		ZEVector3						Normal;
-		ZEVector3						Tangent;
-		ZEVector3						Binormal;
-		ZEVector2						Texcoord;
-		ZEVector4						Color;
-
-		static const ZEVertexLayout&	GetVertexLayout();
-};
-
-struct ZEModelVertex
-{
-	private:
-		static ZEVertexLayout			Layout;
-
-	public:
-		ZEVector3						Position;
-		ZEVector3						Normal;
-		ZEVector3						Tangent;
-		ZEVector3						Binormal;
-		ZEVector2						Texcoord;
-
-		static const ZEVertexLayout&	GetVertexLayout();
-};
-
-struct ZESkinnedModelVertex
-{
-	private:
-		static ZEVertexLayout			Layout;
-
-	public:
-		ZEVector3						Position;
-		ZEVector3						Normal;
-		ZEVector3						Tangent;
-		ZEVector3						Binormal;
-		ZEVector2						Texcoord;
-		unsigned char					BoneIndices[4];
-		float							BoneWeights[4];
-
-		static const ZEVertexLayout&	GetVertexLayout();
+		static ZEVertexLayout&	GetVertexLayout();
 };
 
 struct ZEUIVertex
 {
 	private:
-		static ZEVertexLayout			Layout;
+		static ZEVertexLayout	Layout;
 
 	public:
-		ZEVector2						Position;
-		ZEVector4						Color;
-		ZEVector2						Texcoord;
+		ZEVector2				Position;
+		ZEVector4				Color;
+		ZEVector2				Texcoord;
 
-		static const ZEVertexLayout&	GetVertexLayout();
+		static ZEVertexLayout&	GetVertexLayout();
 };
 
 struct ZEColoredVertex
 {
 	private:
-		static ZEVertexLayout			Layout;
+		static ZEVertexLayout	Layout;
 
 	public:
-		ZEVector3						Position;
-		ZEVector4						Color;
+		ZEVector3				Position;
+		ZEVector4				Color;
 
-		static const ZEVertexLayout&	GetVertexLayout();
+		static ZEVertexLayout&	GetVertexLayout();
 };
 
 #endif

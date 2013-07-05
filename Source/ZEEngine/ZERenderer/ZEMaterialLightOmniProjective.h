@@ -37,7 +37,7 @@
 #define __ZE_MATERIAL_LIGHT_OMNI_PROJECTIVE_H__
 
 #include "ZETypes.h"
-#include "ZEMaterialLight.h"
+#include "ZEMaterial.h"
 #include "ZEGraphics/ZESamplerState.h"
 
 class ZEShader;
@@ -47,7 +47,7 @@ class ZEVertexBuffer;
 class ZERenderCommand;
 class ZEConstantBuffer;
 
-class ZEMaterialLightOmniProjective : public ZEMaterialLight
+class ZEMaterialLightOmniProjective : public ZEMaterial
 {
 	friend class ZELightOmniProjective;
 
@@ -57,10 +57,9 @@ class ZEMaterialLightOmniProjective : public ZEMaterialLight
 
 		ZEShader*					VertexShader;
 		ZEShader*					PixelShader;
-		ZEConstantBuffer*			Transformations;
-		ZEConstantBuffer*			LightParameters;
-		ZEConstantBuffer*			ShadowParameters;
-		ZEVertexBuffer*				VertexBuffer;
+
+		ZEConstantBuffer*			LightTransformations;
+		ZEConstantBuffer*			LightProperties;
 
 		void						UpdateShaders();
 		void						UpdateBuffers();
@@ -74,10 +73,31 @@ class ZEMaterialLightOmniProjective : public ZEMaterialLight
 		virtual						~ZEMaterialLightOmniProjective();
 
 	public:
-		virtual ZESize				GetHash() const;
-		virtual ZEMaterialFlags		GetMaterialFlags() const;
+		__declspec(align(16))
+		struct Transformations
+		{
+			ZEMatrix4x4				WorldView;
+			ZEMatrix4x4				WorldViewProjection;
+		};
 
-		virtual void				UpdateMaterial();
+		__declspec(align(16))
+		struct Properties
+		{
+			ZEVector3				ViewSpacePosition;
+			float					Range;
+			ZEVector3				Color;
+			float					Intensity;
+			ZEVector3				Attenuation;
+			float					PenumbraSize;
+			ZEVector2				PixelSize;
+			float					DepthScaledBias;
+			float					SlopeScaledBias;
+			ZEMatrix4x4				ProjectionMatrix;
+		};
+
+		virtual ZESize				GetHash() const;
+		virtual bool				UpdateMaterial();
+
 		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
 		static ZEMaterialLightOmniProjective*	CreateInstance();

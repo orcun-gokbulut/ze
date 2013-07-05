@@ -33,116 +33,112 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEMaterial.h"
 #include "ZERenderCommand.h"
+#include "ZEGraphics/ZEConstantBuffer.h"
+
 #include <memory.h>
 
-/************************************************************************/
-/*                        RENDER COMMAND TEST                           */
-/************************************************************************/
-ZERenderCommandTest::ZERenderCommandTest()
+/********************************************************************/
+/*					Render Command Base Classes						*/
+/********************************************************************/
+_ZERenderCommandDefaultBase::_ZERenderCommandDefaultBase()
 {
-	Type = ZE_RCT_DEFAULT;
-	Order = 3.0f;
-	Priority = 3;
-	
-	PrimitiveType = ZE_PT_NONE;
-	PrimitiveCount = 0;
 	FirstVertex = 0;
+	PrimitiveCount = 0;
+	PrimitiveType = ZE_PT_NONE;
 	
-	Material = NULL;
+	FirstVertex = 0;
 	VertexLayout = NULL;
 	memset(VertexBuffers, NULL, sizeof(ZEVertexBuffer*) * ZE_MAX_VERTEX_BUFFER_SLOT);
-
-	Size = sizeof(ZERenderCommandTest);
 }
 
-ZERenderCommandTest::~ZERenderCommandTest()
+_ZERenderCommandDefaultBase::~_ZERenderCommandDefaultBase()
 {
 
 }
 
-ZERenderCommandIndexedTest::ZERenderCommandIndexedTest()
+_ZERenderCommandIndexedBase::_ZERenderCommandIndexedBase()
 {
-	Type |= ZE_RCT_INDEXED;
-	
 	BaseVertex = 0;
 	FirstIndex = 0;
 	IndexCount = 0;
 	IndexBuffer = NULL;
-
-	Size = sizeof(ZERenderCommandIndexedTest);
 }
 
-ZERenderCommandIndexedTest::~ZERenderCommandIndexedTest()
+_ZERenderCommandIndexedBase::~_ZERenderCommandIndexedBase()
 {
 
 }
 
-ZERenderCommandInstancedTest::ZERenderCommandInstancedTest()
+_ZERenderCommandInstancedBase::_ZERenderCommandInstancedBase()
 {
-	Type |= ZE_RCT_INSTANCED;
-
 	InstanceCount = 0;
 	FirstInstance = 0;
-
-	Size = sizeof(ZERenderCommandInstancedTest);
 }
 
-ZERenderCommandInstancedTest::~ZERenderCommandInstancedTest()
+_ZERenderCommandInstancedBase::~_ZERenderCommandInstancedBase()
 {
 
 }
 
-/************************************************************************/
-/*                        OLD RENDER COMMAND                            */
-/************************************************************************/
-
-ZERenderCommand::ZERenderCommand()
+_ZERenderCommandIndexedInstancedBase::_ZERenderCommandIndexedInstancedBase()
 {
-	Order = 0.0f;
-	Priority = 0;
 
-	Type = ZE_RCT_DEFAULT;
-	Flags = ZE_RCF_NONE;
-	Pipeline = ZE_RP_NONE;
+}
 
-	PrimitiveType = ZE_PT_NONE;
-	PrimitiveCount = 0;
-	FirstVertex = 0;
+_ZERenderCommandIndexedInstancedBase::~_ZERenderCommandIndexedInstancedBase()
+{
+
+}
+
+/********************************************************************/
+/*						Render Command Classes						*/
+/********************************************************************/
+
+static ZEUInt32	NextId = 0;
+
+ZERenderCommand::ZERenderCommand(ZESize CommandSize, ZERenderCommandType CommandType)
+{
+	Id = NextId++;
+	Size = CommandSize;
+	Type = CommandType;
+
+
+	Order = 3.0f;
+	Priority = 3;
+	
 	Material = NULL;
 
-	memset(VertexBuffers, 0, sizeof(ZEVertexBuffer*) * ZE_MAX_VERTEX_BUFFER_SLOT);
+	Skinned = false;
 
-	Size = sizeof(ZERenderCommand);
+	SkinningBuffer = ZEConstantBuffer::CreateInstance();
+	SkinningBuffer->Create(sizeof(ZESkinningBuffer));
+
+	TransformationBuffer = ZEConstantBuffer::CreateInstance();
+	TransformationBuffer->Create(sizeof(ZETransformationBuffer));
 }
 
 ZERenderCommand::~ZERenderCommand()
 {
-	
+
 }
 
-ZERenderCommandSkinned::ZERenderCommandSkinned()
+ZERenderCommandDefault::ZERenderCommandDefault()
+	: ZERenderCommand(sizeof(ZERenderCommandDefault), ZE_RCT_DEFAULT)
 {
-	Flags |= ZE_RCT_SKINNED;
 
-	Size = sizeof(ZERenderCommandSkinned);
 }
 
-ZERenderCommandSkinned::~ZERenderCommandSkinned()
+ZERenderCommandDefault::~ZERenderCommandDefault()
 {
 
 }
 
 ZERenderCommandIndexed::ZERenderCommandIndexed()
+	: ZERenderCommand(sizeof(ZERenderCommandIndexed), ZE_RCT_INDEXED)
 {
-	Flags |= ZE_RCT_INDEXED;
-	
-	BaseVertex = 0;
-	FirstIndex = 0;
-	IndexCount = 0;
-	IndexBuffer = NULL;
 
-	Size = sizeof(ZERenderCommandIndexed);
 }
 
 ZERenderCommandIndexed::~ZERenderCommandIndexed()
@@ -151,16 +147,23 @@ ZERenderCommandIndexed::~ZERenderCommandIndexed()
 }
 
 ZERenderCommandInstanced::ZERenderCommandInstanced()
+	: ZERenderCommand(sizeof(ZERenderCommandInstanced), ZE_RCT_INSTANCED)
 {
-	Flags |= ZE_RCT_INSTANCED;
 
-	InstanceCount = 0;
-	FirstInstance = 0;
-
-	Size = sizeof(ZERenderCommandInstanced);
 }
 
 ZERenderCommandInstanced::~ZERenderCommandInstanced()
+{
+
+}
+
+ZERenderCommandIndexedInstanced::ZERenderCommandIndexedInstanced()
+	: ZERenderCommand(sizeof(ZERenderCommandIndexedInstanced), ZE_RCT_INDEXED_INSTANCED)
+{
+
+}
+
+ZERenderCommandIndexedInstanced::~ZERenderCommandIndexedInstanced()
 {
 
 }

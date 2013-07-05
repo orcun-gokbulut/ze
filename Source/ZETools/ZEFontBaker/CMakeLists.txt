@@ -43,4 +43,4 @@ ze_add_source(ZEFreeTypeFontBaker.h			Sources Headers)
 
 ze_add_library(ZEFontBaker
 	SOURCES ${Sources}
-	LIBS ZEFoundation)
+	LIBS ZEFoundation libFreeType)

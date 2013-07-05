@@ -36,8 +36,8 @@
 #ifndef __ZE_DEVICE_STATE_SAMPLER_H__
 #define __ZE_DEVICE_STATE_SAMPLER_H__
 
-#include "ZEFoundation/ZEMath/ZEVector.h"
 #include "ZETexture.h"
+#include "ZEFoundation/ZEMath/ZEVector.h"
 
 enum ZETextureAddressMode
 {
@@ -56,33 +56,30 @@ enum ZETextureFilterMode
 
 class ZESamplerState
 {
-	friend class ZEGraphicsDevice;
-	friend class ZEDeviceStageShader;
-
-	// Should be public for only internal usage
-	public:
-		ZEUInt64					Hash;
+	protected:
+		ZESize						Hash;
 		bool						Dirty;
 
 		struct ZESamplerStateData
 		{
-			ZETextureFilterMode		MinFilter;
-			ZETextureFilterMode		MagFilter;
-			ZETextureFilterMode		MipFilter;
-			ZETextureAddressMode	AddressU;
-			ZETextureAddressMode	AddressV;
-			ZETextureAddressMode	AddressW;
-			float					MipLODBias;
-			ZEUInt					MaxAnisotropy;
-			ZEVector4				BorderColor;
+			ZETextureAddressMode	AddressU : 4;
+			ZETextureAddressMode	AddressV : 4;
+			ZETextureAddressMode	AddressW : 4;
+			ZETextureFilterMode		MinFilter : 4;
+			ZETextureFilterMode		MagFilter : 4;
+			ZETextureFilterMode		MipFilter : 4;
+			ZEUInt32				MaxAnisotropy : 6;
+
 			float					MinLOD;
 			float					MaxLOD;
+			float					MipLODBias;
+			ZEVector4				BorderColor;
 		
 		} StateData;
 
-		void						UpdateHash();
-
 	public:
+		ZESize						GetHash();
+
 		void						SetMinFilter(ZETextureFilterMode FilterMode);
 		ZETextureFilterMode			GetMinFilter() const;
 		
@@ -118,12 +115,12 @@ class ZESamplerState
 
 		void						SetToDefault();
 
-		const ZESamplerState&	operator=(const ZESamplerState& State);
+		const ZESamplerState&		operator=(const ZESamplerState& State);
 		bool						operator==(const ZESamplerState& State);
 		bool						operator!=(const ZESamplerState& State);
 
 									ZESamplerState();
-		virtual						~ZESamplerState();
+									~ZESamplerState();
 };
 
 #endif

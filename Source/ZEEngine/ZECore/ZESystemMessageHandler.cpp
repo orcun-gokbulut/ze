@@ -34,6 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESystemMessageHandler.h"
+#include "ZESystemMessageManager.h"
+
+void ZESystemMessageHandler::Register()
+{
+	ZESystemMessageManager::GetInstance()->RegisterMessageHandler(this);
+}
+
+void ZESystemMessageHandler::Unregister()
+{
+	ZESystemMessageManager::GetInstance()->UnregisterMessageHandler(this);
+}
 
 ZESystemMessageHandler::ZESystemMessageHandler()
 {

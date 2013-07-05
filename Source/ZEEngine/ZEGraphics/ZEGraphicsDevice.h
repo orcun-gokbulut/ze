@@ -36,32 +36,32 @@
 #ifndef __ZE_GRAPHICS_DEVICE_H__ 
 #define __ZE_GRAPHICS_DEVICE_H__
 
-#include "ZEGraphicsModule.h"
-#include "ZEGraphicsDeviceState.h"
-#include "ZEVertexLayout.h"
 #include "ZEBlendState.h"
 #include "ZESamplerState.h"
+#include "ZEVertexLayout.h"
+#include "ZEGraphicsModule.h"
 #include "ZERasterizerState.h"
 #include "ZEDepthStencilState.h"
+#include "ZEGraphicsDeviceState.h"
 
 class ZEGraphicsDevice
 {
 	protected:
-		ZEGraphicsDeviceState		OldState;
 		ZEGraphicsDeviceState		CurrentState;
-		
+		ZEGraphicsDeviceHashState	OldState;
+
 									ZEGraphicsDevice();
 		virtual						~ZEGraphicsDevice();
 
 	public:
-		void						SetVertexLayout(ZEVertexLayout& Layout);
-		ZEVertexLayout&				GetVertexLayout();
+		void						SetVertexLayout(ZEVertexLayout* Layout);
+		ZEVertexLayout*				GetVertexLayout();
 		
-		void						SetVertexBuffer(ZEUInt Index, const ZEVertexBuffer* Buffer);
-		void						SetVertexBufferArray(const ZEVertexBuffer* const Buffer[ZE_MAX_VERTEX_BUFFER_SLOT]);
+		void						SetVertexBuffer(ZEUInt Index, ZEVertexBuffer* Buffer);
+		void						SetVertexBufferArray(ZEVertexBuffer* const Buffer[ZE_MAX_VERTEX_BUFFER_SLOT]);
 		const ZEVertexBuffer*		GetVertexBuffer(ZEUInt Index) const;
 		
-		void						SetIndexBuffer(const ZEIndexBuffer* Buffer);
+		void						SetIndexBuffer(ZEIndexBuffer* Buffer);
 		const ZEIndexBuffer*		GetIndexBuffer() const;
 		
 		void						SetVertexShader(ZEShader* Shader);
@@ -109,13 +109,13 @@ class ZEGraphicsDevice
 		void						SetPixelShaderSampler(ZEUInt Index, ZESamplerState& SamplerState);
 		ZESamplerState&				GetPixelShaderSampler(ZEUInt Index);
 		
-		void						SetBlendState(ZEBlendState& State, const ZEVector4& ComponentBlendFactors, ZEComponentMask ComponentBlendMask);
+		void						SetBlendState(ZEBlendState& State, ZEVector4& ComponentBlendFactors, ZEComponentMask ComponentBlendMask);
 		
 		void						SetBlendState(ZEBlendState& State);
 		ZEBlendState&				GetBlendState();
 		
-		void						SetComponentBlendMask(ZEComponentMask ComponentBlendMask);
-		ZEComponentMask&			GetComponentBlendMask();
+		void						SetComponentBlendMask(ColorBlendMask ComponentBlendMask);
+		ColorBlendMask&				GetComponentBlendMask();
 
 		void						SetComponentBlendFactors(ZEVector4* ComponentBlendFactors);
 		ZEVector4&					GetComponentBlendFactors();

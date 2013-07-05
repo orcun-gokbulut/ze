@@ -37,20 +37,6 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZECore/ZECore.h"
 
-
-ZEIndexBuffer::ZEIndexBuffer()
-{
-	Static = false;
-	BufferSize = 0;
-	IndexCount = 0;
-	Format = ZE_IBF_NONE;
-}
-
-ZEIndexBuffer::~ZEIndexBuffer()
-{
-
-}
-
 bool ZEIndexBuffer::IsStatic() const
 {
 	return Static;
@@ -74,6 +60,19 @@ ZEIndexBufferFormat ZEIndexBuffer::GetBufferFormat() const
 void ZEIndexBuffer::Destroy()
 {
 	delete this;
+}
+
+ZEIndexBuffer::ZEIndexBuffer()
+{
+	Static = false;
+	BufferSize = 0;
+	IndexCount = 0;
+	Format = ZE_IBF_NONE;
+}
+
+ZEIndexBuffer::~ZEIndexBuffer()
+{
+
 }
 
 ZEIndexBuffer* ZEIndexBuffer::CreateInstance()

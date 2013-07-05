@@ -35,10 +35,13 @@
 
 #include "ZEError.h"
 #include "ZECore/ZECore.h"
+#include "ZED3D10Shader.h"
 #include "ZECore/ZEModule.h"
 #include "ZECore/ZEWindow.h"
+#include "ZED3D10StatePool.h"
 #include "ZED3D10Texture2D.h"
 #include "ZED3D10Texture3D.h"
+#include "ZED3D10EventTracer.h"
 #include "ZED3D10TextureCube.h"
 #include "ZED3D10EventTracer.h"
 #include "ZED3D10IndexBuffer.h"
@@ -52,17 +55,10 @@
 #include "ZED3D10ConstantBuffer.h"
 #include "ZECore/ZEOptionManager.h"
 #include "ZED3D10DepthStencilBuffer.h"
-#include "ZED3D10EventTracer.h"
-#include "ZED3D10StatePool.h"
-#include "ZEGraphics/ZEStatePool.h"
 
 #pragma warning(disable:4267)
 
 ZE_MODULE_DESCRIPTION(ZED3D10GraphicsModule, ZEGraphicsModule, NULL)
-
-#ifdef ZE_DEBUG_ENABLE
-	#define ZE_DEBUG_GRAPHICS_EVENTS
-#endif
 
 bool ZED3D10GraphicsModule::ResizeFrontBuffer(DXGI_MODE_DESC& ModeToSwitchTo)
 {
@@ -72,7 +68,10 @@ bool ZED3D10GraphicsModule::ResizeFrontBuffer(DXGI_MODE_DESC& ModeToSwitchTo)
 		return false;
 	}
 
-	zeLog("Front buffer is resized to %d x %d.", ModeToSwitchTo.Width, ModeToSwitchTo.Height);
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Front buffer is resized. Width: %u, Height: %u.", ModeToSwitchTo.Width, ModeToSwitchTo.Height);
+#endif
+
 	return true;
 }
 
@@ -88,7 +87,10 @@ bool ZED3D10GraphicsModule::ResizeBackBuffers(ZEUInt Width, ZEUInt Height)
 
 	GetDevice()->ResetStates();
 
-	zeLog("Back buffers are resized to %d x %d.", Width, Height);
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Back buffers(frame buffers) are resized. Width: %u, Height: %u", Width, Height);
+#endif
+
 	return true;
 }
 
@@ -100,7 +102,10 @@ bool ZED3D10GraphicsModule::SetFullScreenState(bool Value)
 		return false;
 	}
 
-	zeLog("Full screen state is set to %d.", Value);
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Full screen state changed to: %u.", (ZEUInt32)Value);
+#endif
+
 	return true;
 }
 
@@ -112,12 +117,18 @@ DXGI_MODE_DESC ZED3D10GraphicsModule::FindMatchingDisplayMode(ZEUInt Width, ZEUI
 	ModeToSearch.Width = Width;
 	ModeToSearch.Height = Height;
 
-	if (FAILED(AdapterOutput->FindClosestMatchingMode(&ModeToSearch, &ModeFound, Device)))
+	HRESULT Result = AdapterOutput->FindClosestMatchingMode(&ModeToSearch, &ModeFound, Device);
+	if (FAILED(Result))
 	{
-		zeCriticalError("Cannot find a matching mode");
+		zeCriticalError("Cannot find d3d10 matching display mode. Error: %d", Result);
 		Deinitialize();
 		return ModeFound;
 	}
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Found matching display mode. Width: %u, Height: %u, RefreshRate: %u/%u ", 
+			Width, Height, ModeFound.RefreshRate.Numerator, ModeFound.RefreshRate.Denominator);
+#endif
 
 	return ModeFound;
 }
@@ -127,46 +138,49 @@ bool ZED3D10GraphicsModule::CreateBuffers(ZEUInt Width, ZEUInt Height)
 {
 	// Get back buffer as a texture
 	ID3D10Texture2D* BackBuffer = NULL;
-	if (FAILED(SwapChain->GetBuffer(0, __uuidof(ID3D10Texture2D), (void**)&BackBuffer)))
+	HRESULT Result = SwapChain->GetBuffer(0, __uuidof(ID3D10Texture2D), (void**)&BackBuffer);
+	if (FAILED(Result))
 	{
-		zeCriticalError("Cannot get swap chain buffer as a texture2d.");
+		zeCriticalError("Cannot get back buffer pointer. Error: %d", Result);
 		Deinitialize();
 		return false;
 	}
 
 	// Create frame buffer render target
-	FrameBuffers[0] = new ZED3D10RenderTarget();
-	FrameBuffers[0]->RenderTargetType = ZE_TT_2D;
-	FrameBuffers[0]->PixelFormat = ZE_TPF_I8_4;
-	FrameBuffers[0]->Height = Height;
-	FrameBuffers[0]->Width = Width;
-
-	if (FAILED(Device->CreateRenderTargetView(BackBuffer, NULL, &((ZED3D10RenderTarget*)FrameBuffers[0])->D3D10RenderTargetView)))
+	ID3D10RenderTargetView* RenderTarget = NULL;
+	Result = Device->CreateRenderTargetView(BackBuffer, NULL, &RenderTarget);
+	if (FAILED(Result))
 	{
-		zeCriticalError("Cannot create frame buffer");
+		zeCriticalError("Cannot create frame buffer. Error: %d", Result);
 		Deinitialize();
 		return false;
 	}
 
-	ZED3D_RELEASE(BackBuffer);
+	FrameBuffers[0] = new ZED3D10RenderTarget(Width, Height, ZE_TPF_I8_4, ZE_TT_2D, RenderTarget);
 
 	// Create default depth stencil buffer
 	DepthBuffers[0] = ZEDepthStencilBuffer::CreateInstance();
 	DepthBuffers[0]->Create(Width, Height, ZE_DSPF_DEPTH24_STENCIL8);
 
 	// Create default view-ports
-	Viewports[0].ViewportData.Width = Width;
-	Viewports[0].ViewportData.Height = Height;
-	Viewports[0].ViewportData.MinDepth = 0.0f;
-	Viewports[0].ViewportData.MaxDepth = 1.0f;
-	Viewports[0].ViewportData.TopLeftX = 0;
-	Viewports[0].ViewportData.TopLeftY = 0;
+	Viewports[0].StateData.Width = Width;
+	Viewports[0].StateData.Height = Height;
+	Viewports[0].StateData.MinDepth = 0.0f;
+	Viewports[0].StateData.MaxDepth = 1.0f;
+	Viewports[0].StateData.TopLeftX = 0;
+	Viewports[0].StateData.TopLeftY = 0;
 
 	// Create default scissor rectangles
-	ScissorRects[0].ScissorRectangleData.Top = 0;
-	ScissorRects[0].ScissorRectangleData.Left = 0;
-	ScissorRects[0].ScissorRectangleData.Right = Width;
-	ScissorRects[0].ScissorRectangleData.Bottom = Height;
+	ScissorRects[0].StateData.Top = 0;
+	ScissorRects[0].StateData.Left = 0;
+	ScissorRects[0].StateData.Right = Width;
+	ScissorRects[0].StateData.Bottom = Height;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Frame buffers are created. Width: %u, Height: %u.", Width, Height);
+#endif
+
+	ZED3D_RELEASE(BackBuffer);
 
 	return true;
 }
@@ -175,20 +189,21 @@ void ZED3D10GraphicsModule::DestroyBuffers()
 {
 	ZE_DESTROY(FrameBuffers[0]);
 	ZE_DESTROY(DepthBuffers[0]);
-
-	zeLog("Buffers are destroyed");
 }
 
-bool ZED3D10GraphicsModule::Initialize()
+bool ZED3D10GraphicsModule::InitializeSelf()
 {
-	zeLog("Initializing Direct3D 10 module.");
+	if (!ZEGraphicsModule::InitializeSelf())
+		return false;
 
-	#ifdef ZE_DEBUG_GRAPHICS_EVENTS
+	#ifdef ZE_DEBUG_ENABLE
 		ZEGraphicsEventTracer::GetInstance()->SetTracingEnabled(true);
 	#else
 		ZEGraphicsEventTracer::GetInstance()->SetTracingEnabled(false);
 	#endif
 	
+	HRESULT Result;
+
 	// Read options
 	ScreenWidth = ZEOptionManager::GetInstance()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInt32();
 	ScreenHeight = ZEOptionManager::GetInstance()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInt32();
@@ -204,14 +219,19 @@ bool ZED3D10GraphicsModule::Initialize()
 	ScissorRects.SetCount(ScreenCount);
 
 	// Create a DirectX graphics interface factory.
-	if(FAILED(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&Factory)))
+	Result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&Factory);
+	if(FAILED(Result))
 	{
-		zeCriticalError("Cannot create graphics interface factory.");
+		zeCriticalError("Cannot create graphics interface factory. Error: %d.", Result);
 		Deinitialize();
 		return false;
 	}
 
-	VideoCardName = "Unknown Adapter.";
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("DXGI Factory created.");
+#endif
+
+	AdapterName = "Unknown Adapter.";
 
 	// Enumerate and choose adapter
 	UINT AdapterId = 0;
@@ -233,45 +253,54 @@ bool ZED3D10GraphicsModule::Initialize()
 			}
 
 			ZEUInt MemoryMb = (ZEUInt)(AdapterDesc.DedicatedVideoMemory / 1024 / 1024);
-			VideoCardName = ZEString::FromUInt32(MemoryMb);
-			VideoCardName += "MB - ";
-			VideoCardName += ZEString::FromWCString(AdapterDesc.Description);
+			AdapterName = ZEString::FromUInt32(MemoryMb);
+			AdapterName += "MB - ";
+			AdapterName += ZEString::FromWCString(AdapterDesc.Description);
 
-#ifdef ZE_DEBUG_ENABLE
-			// Is it NVIDIA PerfHUD adapter ?
-			if (wcscmp(AdapterDesc.Description, L"NVIDIA PerfHUD") == 0)
-			{
-				DriverType = D3D10_DRIVER_TYPE_REFERENCE;
-				break;
-			}
-#endif
+			#ifdef ZE_DEBUG_D3D10_ENABLE_PERFHUD
+				// Is it NVIDIA PerfHUD adapter ?
+				if (wcscmp(AdapterDesc.Description, L"NVIDIA PerfHUD") == 0)
+				{
+					DriverType = D3D10_DRIVER_TYPE_REFERENCE;
+					break;
+				}
+			#endif
 		}
 	}
 	if (AdapterId == 0)
 	{
-		zeCriticalError("Cannot enumerate adapters.");
+		zeCriticalError("Cannot enumerate adapters. Error: %d", DXGI_ERROR_NOT_FOUND);
 		Deinitialize();
 		return false;
 	}
 
-	UINT DeviceFlags = 0;
-#ifdef ZE_DEBUG_ENABLE
-	//DeviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Adaptor choosed. Name: %s", AdapterName.ToCString());
 #endif
 
+	UINT DeviceFlags = 0;
+	#ifdef ZE_DEBUG_ENABLE
+		//DeviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
+	#endif
+
 	// Create the device
-	HRESULT Result = D3D10CreateDevice(Adapter, DriverType, NULL, DeviceFlags, D3D10_SDK_VERSION, &Device);
+	Result = D3D10CreateDevice(Adapter, DriverType, NULL, DeviceFlags, D3D10_SDK_VERSION, &Device);
 	if(FAILED(Result))
 	{
-		zeCriticalError("Cannot create device.");
+		zeCriticalError("Cannot create device. Error: %d", Result);
 		Deinitialize();
 		return false;
 	}
 
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Graphics device created.");
+#endif
+
 	// Enumerate adapter outputs
-	if(FAILED(Adapter->EnumOutputs(0, &AdapterOutput)))
+	Result = Adapter->EnumOutputs(0, &AdapterOutput);
+	if(FAILED(Result))
 	{
-		zeCriticalError("Cannot enumerate adapter outputs.");
+		zeCriticalError("Cannot enumerate adapter outputs., Error: %d", Result);
 		Deinitialize();
 		return false;
 	}
@@ -279,22 +308,28 @@ bool ZED3D10GraphicsModule::Initialize()
 	ZEUInt DisplayModeCount = 0;
 	ZEUInt DisplayModeFlags = DXGI_ENUM_MODES_INTERLACED;
 	DXGI_FORMAT DisplayFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-	if(FAILED(AdapterOutput->GetDisplayModeList(DisplayFormat, DisplayModeFlags, &DisplayModeCount, NULL)))
+	Result = AdapterOutput->GetDisplayModeList(DisplayFormat, DisplayModeFlags, &DisplayModeCount, NULL);
+	if(FAILED(Result))
 	{
-		zeCriticalError("Cannot get display mode count.");
+		zeCriticalError("Cannot get display mode count. Error: %d", Result);
 		Deinitialize();
 		return false;
 	}
 
 	// Get all display modes
 	AvailableModes.SetCount(DisplayModeCount);
-	if(FAILED(AdapterOutput->GetDisplayModeList(DisplayFormat, DisplayModeFlags, &DisplayModeCount, AvailableModes.GetCArray())))
+	Result = AdapterOutput->GetDisplayModeList(DisplayFormat, DisplayModeFlags, &DisplayModeCount, AvailableModes.GetCArray());
+	if(FAILED(Result))
 	{
-		zeCriticalError("Cannot get display modes.");
+		zeCriticalError("Cannot get display modes. Error: %d", Result);
 		Deinitialize();
 		return false;
 	}
 	
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Display mode list gathered.");
+#endif
+
 	// Initialize component base
 	if (!ZED3D10ComponentBase::BaseInitialize(this))
 	{
@@ -304,13 +339,14 @@ bool ZED3D10GraphicsModule::Initialize()
 	}
 
 	// Check multi sample count
-	if (FAILED(Device->CheckMultisampleQualityLevels(DisplayFormat, SampleCount, &SampleQuality)))
+	Result = Device->CheckMultisampleQualityLevels(DisplayFormat, SampleCount, &SampleQuality);
+	if (FAILED(Result))
 	{
-		zeCriticalError("Cannot query sample count/quality support");
+		zeCriticalError("Cannot query sample count/quality support. Error: %d", Result);
 		Deinitialize();
 		return false;
 	}
-	
+
 	if (SampleQuality == 0)
 	{
 		zeWarning("Sample count not supported by device. Multisampling disabled.");
@@ -338,17 +374,21 @@ bool ZED3D10GraphicsModule::Initialize()
 	SwapChainDesc.SampleDesc.Quality = SampleQuality != 0 ? SampleQuality - 1 : SampleQuality;
 
 	// Create swap chain
-	if (FAILED(Factory->CreateSwapChain(Device, &SwapChainDesc, &SwapChain)))
+	Result = Factory->CreateSwapChain(Device, &SwapChainDesc, &SwapChain);
+	if (FAILED(Result))
 	{
-		zeCriticalError("Cannot create swap chain.");
+		zeCriticalError("Cannot create swap chain. Error: %d", Result);
 		Deinitialize();
 		return false;
 	}
 
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Swap chain created for matching display mode. BufferCount: %u, SampleCount: %u", SwapChainDesc.BufferCount, SampleCount);
+#endif
+
 	// Create default depth stencil buffers and frame buffers
 	if (!CreateBuffers(ScreenWidth, ScreenHeight))
 	{
-		zeCriticalError("Can not create buffers");
 		Deinitialize();
 		return false;
 	}
@@ -357,19 +397,22 @@ bool ZED3D10GraphicsModule::Initialize()
 	
 	// Disable DXGI defaults for alt + enter and print screen
 	ZEUInt AssociationFlags = DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_PRINT_SCREEN;
-	if (FAILED(Factory->MakeWindowAssociation((HWND)zeCore->GetWindow()->GetHandle(), AssociationFlags)))
+	Result = Factory->MakeWindowAssociation((HWND)zeCore->GetWindow()->GetHandle(), AssociationFlags);
+	if (FAILED(Result))
 	{
 		zeWarning("Cannot disable default DXGI Window Association .");
 	}
 
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Direct3D 10 module initialized.");
+#endif
+
 	return true;
 }
 
-void ZED3D10GraphicsModule::Deinitialize()
+bool ZED3D10GraphicsModule::DeinitializeSelf()
 {
-	zeLog("Destroying Direct3D.\r\n");
-
-	VideoCardName.Clear();
+	AdapterName.Clear();
 	AvailableModes.Clear(false);
 
 	DestroyBuffers();
@@ -379,6 +422,12 @@ void ZED3D10GraphicsModule::Deinitialize()
 	ZED3D_RELEASE(AdapterOutput);
 	ZED3D_RELEASE(Adapter);
 	ZED3D_RELEASE(Factory);
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Direct3D 10 module destroyed.");
+#endif
+
+	return ZEGraphicsModule::DeinitializeSelf();
 }
 
 void ZED3D10GraphicsModule::SetVerticalSync(bool Enabled)
@@ -432,9 +481,10 @@ bool ZED3D10GraphicsModule::SetSampleCount(ZEUInt Count)
 {	
 	ZEUInt Quality = 0;
 	DXGI_FORMAT DisplayFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-	if (FAILED(Device->CheckMultisampleQualityLevels(DisplayFormat, Count, &Quality)))
+	HRESULT Result = Device->CheckMultisampleQualityLevels(DisplayFormat, Count, &Quality);
+	if (FAILED(Result))
 	{
-		zeCriticalError("Cannot query sample count/quality support");
+		zeCriticalError("Cannot query sample count/quality support. Error: %d", Result);
 		Deinitialize();
 		return false;
 	}
@@ -471,12 +521,17 @@ bool ZED3D10GraphicsModule::SetSampleCount(ZEUInt Count)
 	SwapChainDesc.SampleDesc.Quality = SampleQuality != 0 ? SampleQuality - 1 : SampleQuality;
 	
 	// Create swap chain
-	if (FAILED(Factory->CreateSwapChain(Device, &SwapChainDesc, &SwapChain)))
+	Result = Factory->CreateSwapChain(Device, &SwapChainDesc, &SwapChain);
+	if (FAILED(Result))
 	{
-		zeCriticalError("Cannot create swap chain.");
+		zeCriticalError("Cannot create swap chain. Error: %d", Result);
 		Deinitialize();
 		return false;
 	}
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Swap chain created for matching display mode. BufferCount: %u, SampleCount: %u", SwapChainDesc.BufferCount, SampleCount);
+#endif
 
 	if (!CreateBuffers(ScreenWidth, ScreenHeight))
 	{
@@ -486,6 +541,42 @@ bool ZED3D10GraphicsModule::SetSampleCount(ZEUInt Count)
 	}
 
 	return SetFullScreen(FullScreen);
+}
+
+void ZED3D10GraphicsModule::GetStatistics(ZEGraphicsStatistics& Statistics) const
+{
+	Statistics.BlendStateCount			= ZED3D10StatePool::BlendStateCount;
+	Statistics.SamplerStateCount		= ZED3D10StatePool::SamplerStateCount;
+	Statistics.DepthStencilCount		= ZED3D10StatePool::DepthStencilStateCount;
+	Statistics.RasterizerCount			= ZED3D10StatePool::RasterizerStateCount;
+	Statistics.VertexLayoutCount		= ZED3D10StatePool::VertexlayoutCount;
+	Statistics.StatesPerSecond			= ZED3D10StatePool::StatesPerSecond;
+
+	Statistics.ShaderCount				= ZED3D10Shader::GlobalCount;
+	Statistics.ShaderSize				= ZED3D10Shader::GlobalSize;
+
+	Statistics.Texture2DCount			= ZED3D10Texture2D::GlobalCount;
+	Statistics.Texture2DSize			= ZED3D10Texture2D::GlobalSize;
+	
+	Statistics.Texture3DCount			= ZED3D10Texture3D::GlobalCount;
+	Statistics.Texture3DSize			= ZED3D10Texture3D::GlobalSize;
+	
+	Statistics.TextureCubeCount			= ZED3D10TextureCube::GlobalCount;
+	Statistics.TextureCubeSize			= ZED3D10TextureCube::GlobalSize;
+	
+	Statistics.DepthStancilBufferCount	= ZED3D10DepthStencilBuffer::GlobalCount;
+	Statistics.DepthStancilBufferSize	= ZED3D10DepthStencilBuffer::GlobalSize;
+	
+	Statistics.IndexBufferCount			= ZED3D10IndexBuffer::GlobalCount;
+	Statistics.IndexBufferSize			= ZED3D10IndexBuffer::GlobalSize;
+	
+	Statistics.VertexBufferCount		= ZED3D10VertexBuffer::GlobalCount;
+	Statistics.VertexBufferSize			= ZED3D10VertexBuffer::GlobalSize;
+	
+	Statistics.ConstantBufferCount		= ZED3D10ConstantBuffer::GlobalCount;
+	Statistics.ConstantBufferSize		= ZED3D10ConstantBuffer::GlobalSize;	
+	
+	Statistics.RenderTargetCount		= ZED3D10RenderTarget::GlobalCount;	
 }
 
 ZEGraphicsDevice* ZED3D10GraphicsModule::GetDevice() const

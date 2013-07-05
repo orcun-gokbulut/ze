@@ -57,23 +57,21 @@ class ZERenderStagePostProcess : public ZERenderStage
 
 		} RenderTargets;
 
-		void					ResetStageDefaults();
+		void						ResetStates();
+		void						CommitStates();
 
-		void					UpdateBuffers();
-		void					DestroyBuffers();
+		void						UpdateBuffers();
+		void						DestroyBuffers();
 
 	public:
-		virtual ZEUInt32		GetStageFlags() const;
-		virtual ZEUInt32		GetDependencies() const;
-		virtual ZEUInt32		GetStageIndentifier() const;
+		virtual ZERenderStageType	GetStageType() const;
+		virtual ZERenderStageType	GetDependencies() const;
+		
+		virtual void				Process(const ZERenderCommand* RenderCommand);
+		virtual void				Setup();
 
-		virtual void			Setup();
-		virtual void			Process(ZERenderCommand* RenderCommand);
-
-		virtual void			SetStageConfiguration(const ZERenderStageConfiguration* Config);
-
-								ZERenderStagePostProcess();
-		virtual					~ZERenderStagePostProcess();
+									ZERenderStagePostProcess();
+		virtual						~ZERenderStagePostProcess();
 };
 
 #endif

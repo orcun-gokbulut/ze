@@ -44,7 +44,6 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEGraphics/ZEVertexTypes.h"
 
 
 class ZEVertexBuffer;
@@ -264,20 +263,40 @@ struct ZEModelResourceAnimation
 };
 
 
+struct ZEModelVertex
+{
+	ZEVector3		Position;
+	ZEVector3		Normal;
+	ZEVector3		Tangent;
+	ZEVector3		Binormal;
+	ZEVector2		Texcoord;
+};
+
+struct ZEModelVertexSkinned
+{
+	ZEVector3		Position;
+	ZEVector3		Normal;
+	ZEVector3		Tangent;
+	ZEVector3		Binormal;
+	ZEVector2		Texcoord;
+	unsigned char	BoneIndices[4];
+	ZEVector4		BoneWeights[4];
+};
+
 class ZEModelResourceMeshLOD
 {
 	private:
-		ZEVertexBuffer*					SharedVertexBuffer;
+		ZEVertexBuffer*							SharedVertexBuffer;
 
 	public:
 		ZEInt32									LODLevel;
 		ZEInt32									MaterialId;
 		ZEArray<ZEModelVertex>					Vertices;
-		ZEArray<ZESkinnedModelVertex>			SkinnedVertices;
+		ZEArray<ZEModelVertexSkinned>			SkinnedVertices;
 		ZEArray<ZEUInt32>						AffectingBoneIds;
 
-		ZEVertexBuffer*					GetSharedVertexBuffer() const;
-		ZEVertexBuffer*					CreatePrivateVertexBuffer() const;
+		ZEVertexBuffer*							GetSharedVertexBuffer() const;
+		ZEVertexBuffer*							CreatePrivateVertexBuffer() const;
 
 												ZEModelResourceMeshLOD();
 												~ZEModelResourceMeshLOD();

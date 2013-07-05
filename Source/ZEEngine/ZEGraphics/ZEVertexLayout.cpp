@@ -34,29 +34,24 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
+#include "ZEShader.h"
+#include "ZEStatePool.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEDefinitions.h"
 #include "ZEVertexLayout.h"
+#include "ZEVertexBuffer.h"
 #include "ZEDS/ZEHashGenerator.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 
-void ZEVertexLayout::UpdateHash()
+ZESize ZEVertexLayout::GetHash()
 {
 	if (Dirty)
 	{
-		Hash = 0;
 		Dirty = false;
-		for (ZESize I = 0; I < StateData.ElementCount; ++I)
-		{
-			ZEHashGenerator::Hash(Hash, StateData.VertexElements[I].Semantic);
-			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].SemanticIndex, sizeof(ZEUInt));
-			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].Type, sizeof(ZEVertexElementType));	
-			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].StreamSlot, sizeof(ZEUInt));	
-			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].ByteOffset, sizeof(ZEUInt));	
-			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].Usage, sizeof(ZEVertexUsage));
-			ZEHashGenerator::Hash(Hash, &StateData.VertexElements[I].InstanceCount, sizeof(ZEUInt));
-		}
+		Hash = ZEHashGenerator::Hash(&StateData, sizeof(ZEVertexLayoutData));
 	}
+
+	return Hash;
 }
 
 bool ZEVertexLayout::IsEmpty() const
@@ -67,8 +62,8 @@ bool ZEVertexLayout::IsEmpty() const
 void ZEVertexLayout::SetToDefault()
 {
 	Hash = 0;
-	Dirty = false;
-
+	Dirty = false; 
+	
 	memset(&StateData, 0, sizeof(ZEVertexLayoutData));
 }
 
@@ -78,14 +73,19 @@ void ZEVertexLayout::SetLayout(const ZEVertexElement* VertexElements, ZEUInt Ele
 	zeDebugCheck(ElementCount == 0, "Zero element count");
 	zeDebugCheck(ElementCount >= ZE_MAX_VERTEX_LAYOUT_ELEMENT, "Too many elements");
 
+	SetToDefault();
+
 	StateData.ElementCount = ElementCount;
 	for (ZESize I = 0; I < ElementCount; ++I)
 	{
+		zeDebugCheck(strnlen(VertexElements[I].Semantic, ZE_MAX_SHADER_VARIABLE_NAME) == ZE_MAX_SHADER_VARIABLE_NAME, 
+						"Wrong vertex buffer element semantic");
+
 		sprintf(StateData.VertexElements[I].Semantic, "%s", VertexElements[I].Semantic);
-		StateData.VertexElements[I].SemanticIndex = VertexElements[I].SemanticIndex;
+		StateData.VertexElements[I].Index = VertexElements[I].Index;
 		StateData.VertexElements[I].Type = VertexElements[I].Type;
-		StateData.VertexElements[I].StreamSlot = VertexElements[I].StreamSlot;
-		StateData.VertexElements[I].ByteOffset = VertexElements[I].ByteOffset;
+		StateData.VertexElements[I].Stream = VertexElements[I].Stream;
+		StateData.VertexElements[I].Offset = VertexElements[I].Offset;
 		StateData.VertexElements[I].Usage = VertexElements[I].Usage;
 		StateData.VertexElements[I].InstanceCount = VertexElements[I].InstanceCount;
 	}
@@ -126,6 +126,76 @@ bool ZEVertexLayout::operator!=(const ZEVertexLayout& State)
 	return !operator==(State);
 }
 
+// Registered Vertex buffer elements must have the same arrangement/order with shader inputs!
+bool ZEVertexLayout::GenerateLayout(ZEVertexLayout& Output, ZEVertexBuffer* BufferArr[ZE_MAX_VERTEX_BUFFER_SLOT], const ZEShader* VertexShader)
+{
+	zeDebugCheck(VertexShader == NULL, "NUll pointer.");
+	zeDebugCheck(VertexShader->GetShaderType() != ZE_ST_VERTEX, "Wrong shader type");
+
+	const ZEShaderMetaTable* MetaTable = VertexShader->GetMetaTable();
+	ZESize ShaderInputCount = MetaTable->Inputs.GetCount();
+	if (ShaderInputCount == 0)
+		return true;
+
+	Output.SetToDefault();
+
+	ZESize HashSearchList[ZE_MAX_VERTEX_LAYOUT_ELEMENT] = {0};
+	
+	ZEArray<ZEVertexElement> FinalLayout;
+	FinalLayout.SetCount(ShaderInputCount);
+
+	// Generate search list of hashes
+	for (ZESize I = 0; I < ShaderInputCount; ++I)
+		HashSearchList[I] = MetaTable->Inputs[I].Hash;
+
+	// Iterate all buffers in list only once
+	ZESize InputN = 0;
+	ZESize BufferN = 0;
+	ZESize ElementN = 0;
+	for (; InputN < ShaderInputCount && BufferN != ZE_MAX_VERTEX_BUFFER_SLOT; )
+	{
+		for (; BufferN < ZE_MAX_VERTEX_BUFFER_SLOT; ++BufferN)
+		{
+			const ZEVertexBuffer* Buffer = BufferArr[BufferN];
+
+			if (Buffer == NULL)
+				continue;
+
+			ZESize BufferElementCount = Buffer->GetElementCount();
+			const ZEVertexBufferElement* BufferElements = Buffer->GetElements();
+
+			for (; ElementN < BufferElementCount; ++ElementN)
+			{
+				if (HashSearchList[InputN] != Buffer->Hashes[ElementN])
+					continue;
+			
+				const ZEVertexBufferElement* BufferElement = &BufferElements[ElementN];
+
+				zeDebugCheck(BufferElement->Type != MetaTable->Inputs[InputN].ElementType,
+								"Shader input type and registerd vertex buffer element type does not match!");
+				
+				// Match found
+				// Generate layout for the buffer element
+				strcpy(FinalLayout[InputN].Semantic, BufferElement->Semantic);
+				FinalLayout[InputN].Index = BufferElement->Index;
+				FinalLayout[InputN].Type = BufferElement->Type;
+				FinalLayout[InputN].Stream = (ZEUInt8)BufferN;
+				FinalLayout[InputN].Offset = BufferElement->Offset;
+				FinalLayout[InputN].Usage = BufferElement->Usage;
+				FinalLayout[InputN].InstanceCount = BufferElement->InstanceCount;
+
+				InputN++;
+			}
+		}
+	}
+
+	if (InputN != ShaderInputCount)
+		return false;
+
+	Output.SetLayout(FinalLayout.GetConstCArray(), (ZEUInt)ShaderInputCount);
+	return true;
+}
+
 ZEVertexLayout::ZEVertexLayout()
 {
 	SetToDefault();
@@ -133,5 +203,5 @@ ZEVertexLayout::ZEVertexLayout()
 
 ZEVertexLayout::~ZEVertexLayout()
 {
-
+	
 }

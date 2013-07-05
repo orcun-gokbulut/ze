@@ -77,6 +77,9 @@ class ZESkyDome : public ZEEntity
 		ZESkyDomeMaterial*		SkyDomeMaterial;
 		ZERenderCommand			SkyDomeRenderCommand;
 
+		virtual bool			InitializeSelf();
+		virtual bool			DeinitializeSelf();
+
 								ZESkyDome();
 		virtual					~ZESkyDome();
 
@@ -129,9 +132,6 @@ class ZESkyDome : public ZEEntity
 		float					GetG() const;
 
 		virtual ZEDrawFlags		GetDrawFlags() const;
-
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
 
 		virtual void			Draw(ZEDrawParameters* DrawParameters);
 		virtual void			Tick(float Time);

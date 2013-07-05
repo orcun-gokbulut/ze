@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 
-typedef ZEDWORD ZEModuleAttribute;
+typedef ZEUInt32 ZEModuleAttribute;
 
 #define ZE_MA_NONE				0
 #define ZE_MA_INTERNAL			1

@@ -45,11 +45,11 @@ class ZEHashGenerator
 	public:
 		static ZESize		Hash(const char* String);
 		static ZESize		Hash(const ZEString& String);
-		static ZESize		Hash(void* Value, ZESize Size);
+		static ZESize		Hash(const void* Value, ZESize Size);
 
 		static void			Hash(ZESize& HashOutput, const char* String);
 		static void			Hash(ZESize& HashOutput, const ZEString& String);
-		static void			Hash(ZESize& HashOutput, void* Value, ZESize Size);
+		static void			Hash(ZESize& HashOutput, const void* Value, ZESize Size);
 };
 
 #endif

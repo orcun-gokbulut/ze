@@ -62,7 +62,7 @@ class ZEMaterialSimple : public ZEMaterial
 		bool						Wireframe;
 		bool						VertexColorEnabled;
 
-		ZEMaterialTransparancyMode	TransparancyMode;
+		ZETransparancyMode			TransparancyMode;
 		ZEUInt						TransparancyCullLimit;
 		ZEVector4					MaterialColor;
 
@@ -79,7 +79,7 @@ class ZEMaterialSimple : public ZEMaterial
 
 	public:
 		ZESize						GetHash() const;
-		ZEMaterialFlags				GetMaterialFlags() const;
+		bool						UpdateMaterial();
 
 		void						SetTwoSided(bool Enable);
 		bool						GetTwoSided() const;
@@ -93,8 +93,8 @@ class ZEMaterialSimple : public ZEMaterial
 		void						SetMaterialColor(const ZEVector4& Color);
 		const ZEVector4&			GetMaterialColor() const;
 
-		void						SetTransparancyMode(ZEMaterialTransparancyMode Mode);
-		ZEMaterialTransparancyMode	GetTransparancyMode() const;
+		void						SetTransparancyMode(ZETransparancyMode Mode);
+		ZETransparancyMode			GetTransparancyMode() const;
 
 		void						SetTransparancyCullLimit(ZEUInt Limit);
 		ZEUInt						GetTransparancyCullLimit() const;
@@ -107,8 +107,6 @@ class ZEMaterialSimple : public ZEMaterial
 		ZETextureAddressMode		GetTextureAddressModeV() const;
 
 		bool						SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
-
-		void						UpdateMaterial();
 
 		static ZEMaterialSimple*	CreateInstance();
 };

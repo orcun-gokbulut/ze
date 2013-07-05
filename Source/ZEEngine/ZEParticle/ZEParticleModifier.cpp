@@ -465,7 +465,7 @@ void ZEParticleDiffuseMapChangerModifier::AddTextureResource(ZETexture2DResource
 
 void ZEParticleDiffuseMapChangerModifier::Tick(float ElapsedTime)
 {
-	((ZEMaterialDefault*)(GetOwner()->GetMaterial()))->SetBaseMap(Textures[Textures.Circular((ZESize)CurrentTextureIndex)]->GetTexture());
+//	((ZEMaterialDefault*)(GetOwner()->GetMaterial()))->SetBaseMap(Textures[Textures.Circular((ZESize)CurrentTextureIndex)]->GetTexture());
 
 	if(TotalTime >= Interval)
 	{

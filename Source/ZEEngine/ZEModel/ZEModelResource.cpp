@@ -75,17 +75,18 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 ZEVertexBuffer* ZEModelResourceMeshLOD::GetSharedVertexBuffer() const
 {
 	if (SharedVertexBuffer == NULL)
+	{
 		if (this->SkinnedVertices.GetCount() != 0)
 		{
 			((ZEModelResourceMeshLOD*)this)->SharedVertexBuffer = ZEVertexBuffer::CreateInstance();
-			SharedVertexBuffer->CreateDynamic((ZEUInt32)SkinnedVertices.GetCount(), sizeof(ZESkinnedModelVertex), SkinnedVertices.GetConstCArray());
+			SharedVertexBuffer->CreateDynamic((ZEUInt32)SkinnedVertices.GetCount(), sizeof(ZEModelVertexSkinned), SkinnedVertices.GetConstCArray());
 		}
 		else if (Vertices.GetCount() != 0)
 		{
 			((ZEModelResourceMeshLOD*)this)->SharedVertexBuffer = ZEVertexBuffer::CreateInstance();
 			SharedVertexBuffer->CreateDynamic((ZEUInt32)Vertices.GetCount(), sizeof(ZEModelVertex), Vertices.GetConstCArray());
 		}
-
+	}
 	return SharedVertexBuffer;
 }
 
@@ -97,7 +98,7 @@ ZEVertexBuffer* ZEModelResourceMeshLOD::CreatePrivateVertexBuffer() const
 		if (this->SkinnedVertices.GetCount() != 0)
 		{
 			VertexBuffer = ZEVertexBuffer::CreateInstance();
-			VertexBuffer->CreateStatic((ZEUInt32)SkinnedVertices.GetCount(), sizeof(ZESkinnedModelVertex), SkinnedVertices.GetConstCArray());
+			VertexBuffer->CreateStatic((ZEUInt32)SkinnedVertices.GetCount(), sizeof(ZEModelVertexSkinned), SkinnedVertices.GetConstCArray());
 		}
 		else if (Vertices.GetCount() != 0)
 		{
@@ -191,6 +192,8 @@ bool ZEModelResource::ReadMaterials(ZEMLSerialReader* NodeReader)
 
 		ZEMaterialDefault* CurrentMaterial = ZEMaterialDefault::CreateInstance();
 		CurrentMaterial->ReadFromFile(MaterialPath);
+		
+
 		Materials.Add(CurrentMaterial);
 	}
 
@@ -473,7 +476,7 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 					return false;
 
 				NodeReader->SeekPointer(VerticesDataPointer);
-				LOD->SkinnedVertices.SetCount((ZESize)NodeReader->GetDataSize() / sizeof(ZESkinnedModelVertex));
+				LOD->SkinnedVertices.SetCount((ZESize)NodeReader->GetDataSize() / sizeof(ZEModelVertexSkinned));
 				NodeReader->GetData(LOD->SkinnedVertices.GetCArray(), (ZESize)NodeReader->GetDataSize());
 
 				NodeReader->SeekPointer(AffectingBoneIdsDataPointer);
@@ -1132,5 +1135,5 @@ ZEModelResource* ZEModelResource::LoadResource(const ZEString& FileName)
 ZEModelResource::~ZEModelResource()
 {
 	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
-		TextureResources[I]->Release();
+		TextureResources[I]->Destroy();
 }

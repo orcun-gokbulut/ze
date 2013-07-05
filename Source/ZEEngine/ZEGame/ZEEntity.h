@@ -109,6 +109,14 @@ typedef ZEFlags ZEEntityDirtyFlags;
 #define ZE_EDF_WORLD_BOUNDING_BOX				8
 #define ZE_EDF_ALL								0xFFFFFFFF
 
+enum ZEEntityState
+{
+	ZE_ES_NOT_INITIALIZED				= 0,
+	ZE_ES_INITIALIZING					= 1,
+	ZE_ES_INITIALIZED					= 2,
+	ZE_ES_DEINITIALIZING				= 3
+};
+
 class ZEScene;
 
 class ZEEntity : public ZEObject
@@ -128,7 +136,8 @@ class ZEEntity : public ZEObject
 		ZEQuaternion						Rotation;
 		ZEVector3							Scale;
 
-		bool								Initialized;
+		ZEEntityState						State;
+
 		bool								Enabled;
 		bool								Visible;
 
@@ -145,28 +154,30 @@ class ZEEntity : public ZEObject
 		ZEArray<ZEEntity*>					ChildEntities;
 
 		void								SetBoundingBox(const ZEAABBox& BoundingBox);
+		virtual void						OnTransformChanged();
 
 		bool								AddComponent(ZEEntity* Entity); 
 		void								RemoveComponent(ZEEntity* Entity);
-
 		const ZEArray<ZEEntity*>&			GetComponents() const;
+
+		virtual bool						SetOwner(ZEEntity* Owner);
+		void								SetOwnerScene(ZEScene* Scene);
+
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
 
 											ZEEntity();
 		virtual								~ZEEntity();
-		
-		virtual void						OnTransformChanged();
 
 	public:
 		virtual ZEEntity*					GetOwner() const;
-
-		void								SetOwnerScene(ZEScene* Scene);
 		ZEScene*							GetOwnerScene() const;
 		
 		void								SetEntityId(ZEInt EntityId);
 		ZEInt								GetEntityId() const;
 
-		void								SetName(const char* NewName);
-		const char*							GetName() const;
+		void								SetName(ZEString NewName);
+		ZEString							GetName() const;
 
 		virtual ZEDrawFlags					GetDrawFlags() const;
 
@@ -180,7 +191,8 @@ class ZEEntity : public ZEObject
 		virtual const ZEMatrix4x4&			GetTransform() const;
 		virtual const ZEMatrix4x4&			GetWorldTransform() const;
 
-		bool								GetInitialized();
+		bool								IsInitialized();
+		ZEEntityState						GetState();
 
 		virtual void						SetVisible(bool Visibility);
 		virtual bool						GetVisible() const;
@@ -211,8 +223,8 @@ class ZEEntity : public ZEObject
 		ZEVector3							GetWorldRight() const;
 		ZEVector3							GetWorldUp() const;
 
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
+		bool								Initialize();
+		bool								Deinitialize();
 		virtual void						Destroy();
 		
 		virtual void						Tick(float Time);

@@ -47,15 +47,19 @@ class ZED3D10Shader : public ZEShader
 	friend class ZED3D10StatePool;
 	friend class ZED3D10ShaderCompiler;
 	friend class ZED3D10GraphicsDevice;
-	
-	protected:
-		ID3D10Blob*				D3D10ByteCode;
+	friend class ZED3D10GraphicsModule;
 
-								ZED3D10Shader();
-		virtual					~ZED3D10Shader();
+	protected:
+		static ZESize				GlobalSize;
+		static ZEUInt16				GlobalCount;
+	
+		ID3D10Blob*					D3D10ByteCode;
+
+									ZED3D10Shader(ID3D10Blob* ByteCode);
+		virtual						~ZED3D10Shader();
 
 	public:
-		const ID3D10Blob*		GetD3D10ByteCode();
+		const ID3D10Blob*			GetD3D10ByteCode();
 };
 
 struct ID3D10PixelShader;
@@ -68,10 +72,12 @@ class ZED3D10PixelShader : public ZED3D10Shader, private ZED3D10ComponentBase
 	protected:
 		ID3D10PixelShader*			D3D10PixelShader;
 	
-									ZED3D10PixelShader();
+									ZED3D10PixelShader(ID3D10Blob* ByteCode, ID3D10PixelShader*	PixelShader);
 		virtual						~ZED3D10PixelShader();
 
 	public:
+		ZEShaderType				GetShaderType() const;
+
 		const ID3D10PixelShader*	GetD3D10PixelShader() const;
 
 };
@@ -86,10 +92,12 @@ class ZED3D10VertexShader : public ZED3D10Shader, private ZED3D10ComponentBase
 	protected:
 		ID3D10VertexShader*			D3D10VertexShader;
 
-									ZED3D10VertexShader();
+									ZED3D10VertexShader(ID3D10Blob* ByteCode, ID3D10VertexShader* VertexShader);
 		virtual						~ZED3D10VertexShader();
 
 	public:
+		ZEShaderType				GetShaderType() const;
+
 		const ID3D10VertexShader*	GetD3D10VertexShader() const;
 };
 
@@ -103,10 +111,12 @@ class ZED3D10GeometryShader : public ZED3D10Shader, private ZED3D10ComponentBase
 	protected:
 		ID3D10GeometryShader*		D3D10GeometryShader;
 
-									ZED3D10GeometryShader();
+									ZED3D10GeometryShader(ID3D10Blob* ByteCode, ID3D10GeometryShader* GeometryShader);
 		virtual						~ZED3D10GeometryShader();
 
 	public:
+		ZEShaderType				GetShaderType() const;
+
 		const ID3D10GeometryShader*	GetD3D10GeometryShader() const;
 };
 

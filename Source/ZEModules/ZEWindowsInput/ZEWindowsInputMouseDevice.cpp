@@ -39,202 +39,71 @@
 #include "ZECore/ZEConsole.h"
 #include "ZEError.h"
 
-#include "ZEInput/ZEInputEvent.h"
-#include "ZEInput/ZEInputMapBinding.h"
-#include "ZEInput/ZEInputAction.h"
-
 #include "ZECore/ZESystemMessageHandler.h"
 #include "ZECore/ZESystemMessageManager.h"
 
 #define WINDIWS_LEAN_AND_MEAN
 #include <windows.h>
-
-class ZEWMIKSH : public ZESystemMessageHandler
-{
-	public:	
-		ZEWindowsInputMouseDevice* Device;
-		virtual bool Callback(MSG* Message);
-		ZEWMIKSH(ZEWindowsInputMouseDevice* Device);
-};
-
-bool ZEWMIKSH::Callback(MSG* Message)
-{
-	switch(Message->message)
-	{
-		case WM_INPUT:
-		{
-			RAWINPUT Input;
-			UINT InputSize = sizeof(RAWINPUT);
-			if (GetRawInputData((HRAWINPUT)Message->lParam, RID_INPUT, &Input, &InputSize, sizeof(RAWINPUTHEADER)) == (UINT)-1)
-			{
-				zeError("Can not read raw input data.");
-				return false;
-			}
-			
-			if (Input.header.dwType != RIM_TYPEMOUSE/* && Input.header.hDevice != Device->DeviceHandle*/)
-				return false;
-
-			Device->AxisState[ZE_IMA_HORIZANTAL_AXIS] += Input.data.mouse.lLastX;
-			Device->AxisState[ZE_IMA_VERTICAL_AXIS] += Input.data.mouse.lLastY;
-
-			if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) == RI_MOUSE_BUTTON_1_DOWN)
-				Device->ButtonState[0] = true;
-			else if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_UP) == RI_MOUSE_BUTTON_1_UP)
-				Device->ButtonState[0] = false;
-
-			if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) == RI_MOUSE_BUTTON_2_DOWN)
-				Device->ButtonState[1] = true;
-			else if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_UP) == RI_MOUSE_BUTTON_2_UP)
-				Device->ButtonState[1] = false;
-
-			if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) == RI_MOUSE_BUTTON_3_DOWN)
-				Device->ButtonState[2] = true;
-			else if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_UP) == RI_MOUSE_BUTTON_3_UP)
-				Device->ButtonState[2] = false;
-
-			if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) == RI_MOUSE_BUTTON_4_DOWN)
-				Device->ButtonState[3] = true;
-			else if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP) == RI_MOUSE_BUTTON_4_UP)
-				Device->ButtonState[3] = false;
-
-			if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) == RI_MOUSE_BUTTON_5_DOWN)
-				Device->ButtonState[4] = true;
-			else if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP) == RI_MOUSE_BUTTON_5_UP)
-				Device->ButtonState[4] = false;
-
-			if (Input.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				Device->AxisState[2] += *((SHORT*)&Input.data.mouse.usButtonData);
-
-			return true;
-		}
-
-		default:
-			return false;
-	}
-}
-
-ZEWMIKSH::ZEWMIKSH(ZEWindowsInputMouseDevice* Device)
-{
-	this->Device = Device;
-}
-
-ZEWindowsInputMouseDevice::ZEWindowsInputMouseDevice()
-{
-	DeviceName = "Mouse";
-	MessageHandler = new ZEWMIKSH(this);
-}
-
-ZEWindowsInputMouseDevice::~ZEWindowsInputMouseDevice()
-{
-	delete MessageHandler;
-}
-
-const ZEString& ZEWindowsInputMouseDevice::GetDeviceName()
-{
-	return DeviceName;
-}
-
-ZEUInt32 ZEWindowsInputMouseDevice::GetButtonCount()
-{
-	return 5;
-}
-
-ZEUInt32 ZEWindowsInputMouseDevice::GetAxisCount()
-{
-	return 3;
-}
+#include "ZEDS/ZEFormat.h"
+#include "ZEDS/ZEHashGenerator.h"
 
 void ZEWindowsInputMouseDevice::UnAcquire()
 {
-	memset(&ButtonState, 0, sizeof(ButtonState));
+	State.Reset();
 }
 
-bool ZEWindowsInputMouseDevice::Initialize()
+bool ZEWindowsInputMouseDevice::InitializeSelf()
 {	
-	ZESystemMessageManager::GetInstance()->RegisterMessageHandler(MessageHandler);
+	if (!ZEInputDevice::InitializeSelf())
+		return false;
 
-	memset(&ButtonState, 0, sizeof(ButtonState));
+	Description.Type = ZE_IDT_MOUSE;
+	Description.Sink = true;
+	Description.SinkName = "Mouse";
+	Description.SinkNameHash = ZEHashGenerator::Hash(Description.SinkName);
+	Description.AxisCount = 3;
+	Description.ButtonCount = 5;
 
-	return ZEInputDevice::Initialize();
+	Description.Index = ZEInputDeviceIndexes::GetNewDeviceIndex(ZE_IDT_MOUSE);
+	Description.Name = ZEFormat::Format("Mouse{0:d:02}", Description.Index);
+	Description.NameHash = ZEHashGenerator::Hash(Description.Name);
+	Description.FullName = "Mouse";
+
+	State.Initialize(Description);
+	State.Reset();
+
+	return true;
 }
 
-void ZEWindowsInputMouseDevice::Deinitialize()
-{
-	ZESystemMessageManager::GetInstance()->UnregisterMessageHandler(MessageHandler);
-
-	return ZEInputDevice::Deinitialize();
-}
-
-void ZEWindowsInputMouseDevice::ProcessInputs()
+void ZEWindowsInputMouseDevice::Process(const RAWINPUT& Data)
 {   
-	AxisStateOld[0] = AxisState[0];
-	AxisStateOld[1] = AxisState[1];
-	AxisStateOld[2] = AxisState[2];
+	State.Axises.CurrentValues[ZE_IMA_HORIZANTAL_AXIS] += Data.data.mouse.lLastX;
+	State.Axises.CurrentValues[ZE_IMA_VERTICAL_AXIS] += Data.data.mouse.lLastY;
+	if (Data.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
+		State.Axises.CurrentValues[ZE_IMA_WHEEL_AXIS] += *((SHORT*)&Data.data.mouse.usButtonData);
 
-	AxisState[0] = 0;
-	AxisState[1] = 0;
-	AxisState[2] = 0;
+	if ((Data.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) == RI_MOUSE_BUTTON_1_DOWN)
+		State.Buttons.CurrentValues[0] = true;
+	else if ((Data.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_UP) == RI_MOUSE_BUTTON_1_UP)
+		State.Buttons.CurrentValues[0] = false;
 
-	memcpy(ButtonStateOld, ButtonState, sizeof(ButtonState));
-}
+	if ((Data.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) == RI_MOUSE_BUTTON_2_DOWN)
+		State.Buttons.CurrentValues[1] = true;
+	else if ((Data.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_UP) == RI_MOUSE_BUTTON_2_UP)
+		State.Buttons.CurrentValues[1] = false;
 
-bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction)
-{
-	if (InputBinding->Event.Device == this)
-	{
-		if (InputBinding->Event.Type == ZE_IT_BUTTON)
-		{
-			ZEInt ButtonIndex = InputBinding->Event.Index;
+	if ((Data.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) == RI_MOUSE_BUTTON_3_DOWN)
+		State.Buttons.CurrentValues[2] = true;
+	else if ((Data.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_UP) == RI_MOUSE_BUTTON_3_UP)
+		State.Buttons.CurrentValues[2] = false;
 
-			if (ButtonIndex >= 5)
-				return false;
+	if ((Data.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) == RI_MOUSE_BUTTON_4_DOWN)
+		State.Buttons.CurrentValues[3] = true;
+	else if ((Data.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP) == RI_MOUSE_BUTTON_4_UP)
+		State.Buttons.CurrentValues[3] = false;
 
-			if ((InputBinding->Event.ButtonState == ZE_IBS_PRESSED && ButtonStateOld[ButtonIndex] == false && ButtonState[ButtonIndex] == true) ||
-				(InputBinding->Event.ButtonState == ZE_IBS_PRESSING && ButtonState[ButtonIndex] == true))
-			{
-				InputAction->Id = InputBinding->ActionId;
-				InputAction->ButtonState = ZE_IBS_PRESSED;
-				InputAction->From = InputBinding;
-				return true;
-			}
-			else if (InputBinding->Event.ButtonState == ZE_IBS_RELEASED && ButtonStateOld[ButtonIndex] == true && ButtonState[ButtonIndex] == false)
-			{
-				InputAction->Id = InputBinding->ActionId;
-				InputAction->ButtonState = ZE_IBS_RELEASED;
-				InputAction->From = InputBinding;
-				return true;
-			}
-		}
-		else if (InputBinding->Event.Type == ZE_IT_AXIS)
-		{
-			ZEInt AxisIndex = InputBinding->Event.Index;
-
-			if (AxisIndex > 2)
-				return false;
-
-			if (InputBinding->Event.AxisSign == ZE_IAS_POSITIVE && AxisState[AxisIndex] > 0)
-			{
-				InputAction->Id = InputBinding->ActionId;
-				InputAction->AxisValue = AxisState[AxisIndex];
-				InputAction->From = InputBinding;
-				return true;
-			}
-			else if (InputBinding->Event.AxisSign == ZE_IAS_NEGATIVE && AxisState[AxisIndex] < 0)
-			{
-				InputAction->Id = InputBinding->ActionId;
-				InputAction->AxisValue = -AxisState[InputBinding->Event.Index];
-				InputAction->From = InputBinding;
-				return true;
-			}
-			else if (InputBinding->Event.AxisSign == ZE_IAS_ALL)
-			{
-				InputAction->Id = InputBinding->ActionId;
-				InputAction->AxisValue = AxisState[InputBinding->Event.Index];
-				InputAction->From = InputBinding;
-				return true;
-			}
-		}
-	}
-
-	return false;
+	if ((Data.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) == RI_MOUSE_BUTTON_5_DOWN)
+		State.Buttons.CurrentValues[4] = true;
+	else if ((Data.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP) == RI_MOUSE_BUTTON_5_UP)
+		State.Buttons.CurrentValues[4] = false;
 }

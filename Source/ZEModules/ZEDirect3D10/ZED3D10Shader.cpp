@@ -38,29 +38,41 @@
 
 #include <d3d10.h>
 
-ZED3D10Shader::ZED3D10Shader()
-{
-	D3D10ByteCode = NULL;
-}
-
-ZED3D10Shader::~ZED3D10Shader()
-{
-	ZED3D_RELEASE(D3D10ByteCode);
-}
+/************************************************************************/
+/*							ZED3D10Shader                               */
+/************************************************************************/
 
 const ID3D10Blob* ZED3D10Shader::GetD3D10ByteCode()
 {
 	return D3D10ByteCode;
 }
 
-ZED3D10PixelShader::ZED3D10PixelShader()
+ZESize		ZED3D10Shader::GlobalSize = 0;
+ZEUInt16	ZED3D10Shader::GlobalCount = 0;
+
+ZED3D10Shader::ZED3D10Shader(ID3D10Blob* ByteCode)
 {
-	D3D10PixelShader = NULL;
+	D3D10ByteCode = ByteCode;
+
+	GlobalSize += ByteCode->GetBufferSize();
+	GlobalCount++;
 }
 
-ZED3D10PixelShader::~ZED3D10PixelShader()
+ZED3D10Shader::~ZED3D10Shader()
 {
-	ZED3D_RELEASE(D3D10PixelShader);
+	ZED3D_RELEASE(D3D10ByteCode);
+
+	GlobalSize -= D3D10ByteCode->GetBufferSize();
+	GlobalCount--;
+}
+
+/************************************************************************/
+/*					ZED3D10PixelShader									*/
+/************************************************************************/
+
+ZEShaderType ZED3D10PixelShader::GetShaderType() const
+{
+	return ZE_ST_PIXEL;
 }
 
 const ID3D10PixelShader* ZED3D10PixelShader::GetD3D10PixelShader() const
@@ -68,14 +80,23 @@ const ID3D10PixelShader* ZED3D10PixelShader::GetD3D10PixelShader() const
 	return D3D10PixelShader;
 }
 
-ZED3D10VertexShader::ZED3D10VertexShader()
+ZED3D10PixelShader::ZED3D10PixelShader(ID3D10Blob* ByteCode, ID3D10PixelShader*	PixelShader) : ZED3D10Shader(ByteCode)
 {
-	D3D10VertexShader = NULL;
+	D3D10PixelShader = PixelShader;
 }
 
-ZED3D10VertexShader::~ZED3D10VertexShader()
+ZED3D10PixelShader::~ZED3D10PixelShader()
 {
-	ZED3D_RELEASE(D3D10VertexShader);
+	ZED3D_RELEASE(D3D10PixelShader);
+}
+
+/************************************************************************/
+/*					ZED3D10VertexShader									*/
+/************************************************************************/
+
+ZEShaderType ZED3D10VertexShader::GetShaderType() const
+{
+	return ZE_ST_VERTEX;
 }
 
 const ID3D10VertexShader* ZED3D10VertexShader::GetD3D10VertexShader() const
@@ -83,17 +104,36 @@ const ID3D10VertexShader* ZED3D10VertexShader::GetD3D10VertexShader() const
 	return D3D10VertexShader;
 }
 
-ZED3D10GeometryShader::ZED3D10GeometryShader()
+ZED3D10VertexShader::ZED3D10VertexShader(ID3D10Blob* ByteCode, ID3D10VertexShader* VertexShader) : ZED3D10Shader(ByteCode)
 {
-	D3D10GeometryShader = NULL;
+	D3D10VertexShader = VertexShader;
 }
 
-ZED3D10GeometryShader::~ZED3D10GeometryShader()
+ZED3D10VertexShader::~ZED3D10VertexShader()
 {
-	ZED3D_RELEASE(D3D10GeometryShader);
+	ZED3D_RELEASE(D3D10VertexShader);
+}
+
+/************************************************************************/
+/*					ZED3D10GeometryShader								*/
+/************************************************************************/
+
+ZEShaderType ZED3D10GeometryShader::GetShaderType() const
+{
+	return ZE_ST_GEOMETRY;
 }
 
 const ID3D10GeometryShader*	ZED3D10GeometryShader::GetD3D10GeometryShader() const
 {
 	return D3D10GeometryShader;
+}
+
+ZED3D10GeometryShader::ZED3D10GeometryShader(ID3D10Blob* ByteCode, ID3D10GeometryShader* GeometryShader) : ZED3D10Shader(ByteCode)
+{
+	D3D10GeometryShader = GeometryShader;
+}
+
+ZED3D10GeometryShader::~ZED3D10GeometryShader()
+{
+	ZED3D_RELEASE(D3D10GeometryShader);
 }

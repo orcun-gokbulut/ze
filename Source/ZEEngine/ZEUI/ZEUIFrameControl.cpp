@@ -43,6 +43,7 @@ void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
 	Frame.Color = GetBackgroundColor();
 	ZEUIRectangle TempRect = Frame;
 	TempRect.Positions.SetPosition(GetScreenPosition());
+	TempRect.ZOrder = GetZOrder();
 
 	ZEUIRectangle Output;
 

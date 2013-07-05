@@ -220,13 +220,13 @@ const char* ZEModel::GetModelFile() const
 void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 {
 	if (this->ModelResource != NULL)
-		((ZEModelResource*)this->ModelResource)->Release();
+		((ZEModelResource*)this->ModelResource)->Destroy();
 
 	ModelResource->AddReferance();
 
 	this->ModelResource = ModelResource;
 
-	if (GetInitialized())
+	if (IsInitialized())
 		LoadModelResource();
 }
 
@@ -533,20 +533,23 @@ ZEModel::~ZEModel()
 	if (ModelResource != NULL)
 	{
 		// convert release to destroy
-		((ZEModelResource*)ModelResource)->Release();
+		((ZEModelResource*)ModelResource)->Destroy();
 	}
 }
 
-bool ZEModel::Initialize()
+bool ZEModel::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	LoadModelResource();
 
-	return ZEEntity::Initialize();
+	return true;
 }
 
-void ZEModel::Deinitialize()
+bool ZEModel::DeinitializeSelf()
 {
-
+	return ZEEntity::DeinitializeSelf();
 }
 
 ZEModel* ZEModel::CreateInstance()

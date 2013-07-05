@@ -78,7 +78,7 @@ ZEFontResourceBitmap::~ZEFontResourceBitmap()
 {
 	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
 	{
-		TextureResources[I]->Release();
+		TextureResources[I]->Destroy();
 	}
 }
 

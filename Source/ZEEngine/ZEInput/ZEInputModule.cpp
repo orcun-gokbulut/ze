@@ -36,8 +36,11 @@
 #include "ZEInputModule.h"
 #include "ZEInputDevice.h"
 #include "ZECore/ZECore.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEInputDeviceExtension.h"
+#include "ZECore/ZEExtensionManager.h"
 
-ZE_MODULE_DESCRIPTION_ABSTRACT(ZEInputModule, ZEModule, NULL)
+ZE_MODULE_DESCRIPTION(ZEInputModule, ZEModule, NULL)
 
 ZEInputModule::ZEInputModule()
 {
@@ -52,6 +55,11 @@ void ZEInputModule::BaseDeinitialize()
 {
 }
 
+const ZEArray<ZEInputDeviceModule*>& ZEInputModule::GetDeviceModules()
+{
+	return DeviceModules;
+}
+
 bool ZEInputModule::IsAcquired()
 {
 	if (!IsInitialized())
@@ -62,30 +70,68 @@ bool ZEInputModule::IsAcquired()
 
 void ZEInputModule::Acquire()
 {
-	if (IsInitialized())
-	{
-		Acquired = true;
+	if (!IsInitialized())
+		return;
 
-		const ZEArray<ZEInputDevice*>& Devices = GetInputDevices();
-		for (ZESize I = 0; I < Devices.GetCount(); I++)
-		{
-			Devices[I]->Acquire();
-		}
-	}
+	Acquired = true;
+	for (ZESize I = 0; I < DeviceModules.GetCount(); I++)
+		DeviceModules[I]->Acquire();
 }
 
 void ZEInputModule::UnAcquire()
 {
-	if (IsInitialized())
-	{
-		Acquired = false;
+	if (!IsInitialized())
+		return;
 
-		const ZEArray<ZEInputDevice*>& Devices = GetInputDevices();
-		for (ZESize I = 0; I < Devices.GetCount(); I++)
+	Acquired = false;
+	for (ZESize I = 0; I < DeviceModules.GetCount(); I++)
+		DeviceModules[I]->UnAcquire();
+}
+
+bool ZEInputModule::InitializeSelf()
+{
+	if (!ZEModule::InitializeSelf())
+		return false;
+
+	zeLog("Initializing Input.");
+
+	zeLog("Loading Input Device modules.");
+	ZEArray<ZEExtensionDescription*> DeviceModuleDescriptions = ZEExtensionManager::GetInstance()->GetExtensionDescriptions(ZEInputDeviceModule::Description());
+
+	for (ZESize I = 0; I < DeviceModuleDescriptions.GetCount(); I++)
+	{
+		ZEInputDeviceModule* DeviceModule = (ZEInputDeviceModule*)DeviceModuleDescriptions[I]->CreateInstance();
+		bool Result = DeviceModule->Initialize();
+		if (!Result)
 		{
-			Devices[I]->UnAcquire();
+			zeLog("Can not initialize input device module.");
+			continue;
 		}
+
+		DeviceModules.Add(DeviceModule);
 	}
+
+	return true;
+}
+
+bool ZEInputModule::DeinitializeSelf()
+{
+	for (ZESize I = 0; I < DeviceModules.GetCount(); I++)
+		DeviceModules[I]->Destroy();
+
+	DeviceModules.Clear();
+
+	return ZEModule::DeinitializeSelf();
+}
+
+void ZEInputModule::Process()
+{
+	if (!IsInitialized())
+		return;
+
+	Acquired = false;
+	for (ZESize I = 0; I < DeviceModules.GetCount(); I++)
+		DeviceModules[I]->Process();
 }
 
 ZEInputModule* ZEInputModule::GetInstance()

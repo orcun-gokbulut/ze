@@ -173,22 +173,24 @@ void ZEGrid::Draw(ZEDrawParameters* Parameters)
 	*/
 }
 
-bool ZEGrid::Initialize()
+bool ZEGrid::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	GenerateGrid();
 	
 	if (Material == NULL)
 		Material = ZEMaterialSimple::CreateInstance();
 
-	RenderCommand.VertexLayout = ZECanvasVertex::GetVertexLayout();
+	RenderCommand.VertexLayout = NULL;
 	RenderCommand.PrimitiveType = ZE_PT_LINE_LIST;
-	RenderCommand.Flags |= (ZE_RCF_WORLD_TRANSFORM | ZE_RCF_VIEW_PROJECTION_TRANSFORM | ZE_RCF_Z_CULL);
 	RenderCommand.Material = Material;
 
 	return true;
 }
 
-void ZEGrid::Deinitialize()
+bool ZEGrid::DeinitializeSelf()
 {
 	MinorGrid.Clean();
 	MajorGrid.Clean();
@@ -200,6 +202,8 @@ void ZEGrid::Deinitialize()
 		Material->Destroy();
 		Material = NULL;
 	}
+
+	return ZEEntity::DeinitializeSelf();
 }
 
 ZEGrid::ZEGrid()

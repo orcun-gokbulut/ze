@@ -46,20 +46,20 @@ class ZERenderTarget
 	friend class ZEGraphicsModule;
 	friend class ZEGraphicsDevice;
 
-	// Should be public for only internal usage
-	public:
+	protected:
 		ZEUInt					Width;
 		ZEUInt					Height;
+		ZEVector3				PixelSize;
 		ZETexturePixelFormat	PixelFormat;
 		ZERenderTargetType		RenderTargetType;
 
-	protected:
-								ZERenderTarget();
+								ZERenderTarget(ZEUInt Width, ZEUInt Height, ZEVector3 PixelSize, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType);
 		virtual					~ZERenderTarget();
 
 	public:
 		ZEUInt					GetWidth() const;
 		ZEUInt					GetHeight() const;
+		const ZEVector3&		GetPixelSize() const;
 		ZETexturePixelFormat	GetPixelFormat() const;
 		ZERenderTargetType		GetRenderTargetType() const;
 

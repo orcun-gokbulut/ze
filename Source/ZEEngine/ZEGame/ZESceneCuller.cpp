@@ -106,7 +106,7 @@ void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameter
 
 	if (DrawParameters->Pass == ZE_RP_COLOR)
 	{
-		Statistics.DrawedLightCount = (ZEUInt32)DrawParameters->Lights.GetCount();
+		//Statistics.DrawedLightCount = (ZEUInt32)DrawParameters->Lights.GetCount();
 		Statistics.CulledLightCount = Statistics.TotalLightCount - Statistics.DrawedLightCount;
 	}
 

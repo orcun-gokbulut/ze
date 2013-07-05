@@ -77,10 +77,12 @@ ze_add_source(ZEUILabel.cpp							Sources)
 ze_add_source(ZEUILabel.h							Sources Headers)
 ze_add_source(ZEUITextCursor.cpp					Sources)
 ze_add_source(ZEUITextCursor.h						Sources Headers)
+ze_add_source(ZEUIDebugDrawTag.cpp					Sources)
+ze_add_source(ZEUIDebugDrawTag.h					Sources Headers)
 
 
 
 ze_add_library(ZEUI
-	LIBS ZEFoundation freetype2410
+	LIBS ZEFoundation libFreeType
 	SOURCES ${Sources}
 	HEADERS ${Headers})

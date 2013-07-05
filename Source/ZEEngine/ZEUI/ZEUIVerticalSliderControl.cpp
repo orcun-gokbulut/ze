@@ -54,7 +54,7 @@ void ZEUIVerticalSliderControl::MouseButtonReleased(ZEUIMouseKey Button, const Z
 
 void ZEUIVerticalSliderControl::MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmount)
 {
-	if(IsButtonPressed && (ZEInt)MoveAmount.y != 0)
+	if(IsButtonPressed && (ZEInt32)MoveAmount.y != 0)
 	{
 		float MinMaxDifference = GetMaximumValue() - GetMinimumValue();
 		float ValuePerPixel = MinMaxDifference / GetHeight();

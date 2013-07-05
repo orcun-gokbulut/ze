@@ -37,34 +37,27 @@
 #ifndef	__ZE_DIRECT_INPUT_MODULE_H__
 #define __ZE_DIRECT_INPUT_MODULE_H__
 
-#include "ZEInput\ZEInputModule.h"
+#include "ZEInput/ZEInputDeviceExtension.h"
+#include "ZEDirectInputDevice.h"
 
-class ZEDirectInputModule : public ZEInputModule
+#include <dinput.h>
+
+class ZEDirectInputModule : public ZEInputDeviceModule
 {
-	ZE_MODULE(ZEDirectInputModule)
+	ZE_EXTENSION(ZEDirectInputModule)
 
-	private:
-		bool								Enabled;
+	friend BOOL CALLBACK CheckDirectInputDevices(const LPCDIDEVICEINSTANCE DeviceDescription, LPVOID Ref);
 
 	protected:
-											ZEDirectInputModule();
-        virtual								~ZEDirectInputModule();
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
 
 	public:
-		virtual ZEModuleDescription*		GetModuleDescription();
-		static ZEModuleDescription*			ModuleDescription();
+		LPDIRECTINPUT8					DirectInput;
 
-		virtual bool						GetEnabled();
-		virtual void						SetEnabled(bool Enabled);
+		virtual void					Process();
 
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
-
-		virtual void						ProcessInputs();
-		virtual void						ProcessInputMap(ZEInputMap* InputMap);
-		virtual bool						GetRawInputEvent(ZEInputEvent& InputEvent);
-
-		virtual void						Acquire();
-		virtual void						UnAcquire();
+										ZEDirectInputModule();
 };
+
 #endif

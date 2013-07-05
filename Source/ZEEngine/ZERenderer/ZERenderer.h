@@ -36,121 +36,91 @@
 #define __ZE_RENDERER_H__
 
 #include "ZETypes.h"
-#include "ZEMath/ZEVector.h"
+#include "ZEDS/ZEList.h"
 #include "ZEDS/ZEArray.h"
+#include "ZERenderStage.h"
+#include "ZEMath/ZEVector.h"
 
-#define ZE_CBET_RENDER_STAGE_SETUP		0x00000004
-#define ZE_CBET_RENDERER_SETUP			0x00000002
-#define ZE_CBET_RENDER_COMMAND			0x00000001
-#define ZE_CBET_NONE					0x00000000
-typedef ZEUInt32 ZECommandBufferEntryType;
+#define ZE_MAX_STAGE_COUNT			32
+#define	ZE_COMMAND_BUFFER_SIZE		1024 * 1024	* 1	// 1 MB
 
-#define	ZE_COMMAND_BUFFER_SIZE			1024 * 1024	* 1		// 1 MB
-
-class ZECommandBufferEntry
-{
-	public:
-		ZEUInt32					EntryType;
-		ZESize						DataSize;
-		const void*					Data;
-
-									ZECommandBufferEntry();
-									~ZECommandBufferEntry();
-};
-
-typedef ZEArray<ZECommandBufferEntry> ZECommandList;
+typedef ZESmartArray<const ZERenderCommand*>	ZECommandList;
 
 class ZECommandBuffer
 {
 	private:
-		void*						Buffer;
-		ZESize						EndOfBuffer;
+		void*					Buffer;
+		ZESize					EndOfBuffer;
 
-		ZECommandList				CommandList;
+		ZECommandList			CommandList;
+
+		void					SortCommands(ZESize StartIndex, ZESize EndIndex);
 
 	public:
-		void						Clear();
+		void					Clear();
+		void					SortFrames();
 
-		bool						BufferEmpty() const;
-		ZESize						GetCommandCount() const;
+		bool					IsEmpty() const;
+		ZESize					GetCount() const;
 
-		const ZECommandBufferEntry*	GetEntry(ZESize Index);
-		bool						AddEntry(const ZECommandBufferEntry& Entry);
-
-									ZECommandBuffer();
-									~ZECommandBuffer();
+		bool					AddCommand(const ZERenderCommand* Entry);
+		const ZERenderCommand*	GetCommand(ZESize Index) const;
+	
+								ZECommandBuffer();
+								~ZECommandBuffer();
 };
 
-/************************************************************************/
-/*							 RENDERER SETUP								*/
-/************************************************************************/
-class ZERenderStage;
-
-class ZERendererConfiguration
+class ZECommandBucket : public ZEListItem
 {
 	public:
-		ZESize					Size;
-		ZEArray<ZERenderStage*>	StageList;
-		
-								ZERendererConfiguration(){};
-								~ZERendererConfiguration(){};
+		ZEDrawParameters		Parameters;
+		ZECommandBuffer			Commands;
+
+		void					Clear();
+
+								ZECommandBucket();
+								~ZECommandBucket();
 };
 
-
+class ZECamera;
 class ZERenderStage;
-class ZERenderStageConfiguration;
-class ZERenderCommand;
-
+class ZEDrawParameters;
 class ZERenderStageShadow;
-class ZERenderStageForward;
+class ZERenderStageAccumulation;
 class ZERenderStageGeometry;
 class ZERenderStageLighting;
 class ZERenderStageParticle;
 
-#define ZE_MAX_STAGE_COUNT		32
-
 class ZERenderer
 {
 	protected:
-		ZECommandBuffer			CommandBuffer;
+		ZEList<ZECommandBucket>		Buckets;
 
-		/*
-		ZEArray<ZERenderStage*>	StageList;
-		ZESize					StageLookupTable[ZE_MAX_STAGE_COUNT];
-		bool					StageStatusTable[ZE_MAX_STAGE_COUNT];
-		*/
+		ZERenderStageShadow*		ShadowStage;
+		ZERenderStageGeometry*		GeometryStage;
+		ZERenderStageLighting*		LightingStage;
+		ZERenderStageParticle*		ParticleStage;
+		ZERenderStageAccumulation*	AccumulationStage;
 
-		ZERenderStageShadow*	ShadowStage;
-		ZERenderStageForward*	ForwardStage;
-		ZERenderStageGeometry*	GeometryStage;
-		ZERenderStageLighting*	LightingStage;
-		ZERenderStageParticle*	ParticleStage;
+									ZERenderer();
+		virtual						~ZERenderer();
 
-		ZEVector2				ShadowMapDimesion;
-
-		bool					ProcessEntry(const ZECommandBufferEntry* Entry, ZERenderStage* Stage);
-
-								ZERenderer();
-		virtual					~ZERenderer();
+		void						ProcessStage(ZERenderStage* Stage);
 
 	public:
-		virtual void			AddRenderCommand(const ZERenderCommand* Command);
-		virtual void			AddRendererConfiguration(const ZERendererConfiguration* Config);
-		virtual void			AddRenderStageConfiguration(const ZERenderStageConfiguration* Config);
-		
-		virtual void			SetRendererConfiguration(const ZERendererConfiguration* Config);
+		virtual ZECommandBucket*	CreateCommandBucket(const ZEDrawParameters* Parameters);
 
-		void					SetShadowMapDimension(ZEVector2 Value);
-		ZEVector2				GetShadowMapDimension() const;
+		virtual bool				PreRender();
+		virtual bool				PostRender();
 
-		virtual void			Render(float ElaspedTime);
+		virtual bool				Render(float ElaspedTime);
 
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
+		virtual bool				Initialize();
+		virtual void				Deinitialize();
 
-		virtual void			Destroy();
+		virtual void				Destroy();
 
-		static ZERenderer*		CreateInstance();
+		static ZERenderer*			CreateInstance();
 };
 
 #endif

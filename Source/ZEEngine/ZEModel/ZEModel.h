@@ -68,10 +68,11 @@ class ZEModel : public ZEEntity
 	friend class ZEPhysicalEnvironment;
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
+	friend class ZEModelDebugDrawer;
 	private:
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
-		ZEArray<ZERenderCommand>			LODRenderCommands;
+		ZEArray<ZERenderCommandDefault>		LODRenderCommands;
 		
 		ZEModelStatistics					Statistics;
 
@@ -102,6 +103,9 @@ class ZEModel : public ZEEntity
 		void								LoadModelResource();
 
 	protected:
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
+
 											ZEModel();
 		virtual								~ZEModel();
 
@@ -169,9 +173,6 @@ class ZEModel : public ZEEntity
 
 		void								SetDrawPhysicalJoints(bool Enabled);
 		bool								GetDrawPhysicalJoints();
-
-		bool								Initialize();
-		void								Deinitialize();
 
 		static ZEModel*						CreateInstance();
 };

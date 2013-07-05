@@ -33,17 +33,18 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEStatePool.h"
 #include "ZERasterizerState.h"
 #include "ZEDS/ZEHashGenerator.h"
 
-void ZERasterizerState::UpdateHash()
+ZESize ZERasterizerState::GetHash()
 {
 	if (Dirty)
 	{
-		Hash = 0;
+		Hash = ZEHashGenerator::Hash(&StateData, sizeof(ZERasterizerStateData));
 		Dirty = false;
-		ZEHashGenerator::Hash(Hash, &StateData, sizeof(ZERasterizerStateData));
 	}
+	return Hash;
 }
 
 void ZERasterizerState::SetFillMode(ZEFillMode Mode)
@@ -93,6 +94,7 @@ void ZERasterizerState::SetToDefault()
 	Hash = 0;
 	Dirty = false;
 
+	memset(&StateData, 0, sizeof(ZERasterizerStateData));
 	StateData.FillMode = ZE_FM_SOLID;
 	StateData.CullDirection = ZE_CD_COUNTER_CLOCKWISE;
 	StateData.FrontIsCounterClockwise = false;
