@@ -37,6 +37,9 @@
 
 void ZEStringWriter::Append(const char* String)
 {
+	if (String == NULL)
+		return;
+
 	while(*String != '\0')
 	{
 		if (Size + 1 > Allocator.GetSize())
@@ -76,6 +79,7 @@ void ZEStringWriter::AppendUTF8(char* Character)
 		Size++;
 	}
 }
+
 void ZEStringWriter::AppendEnd()
 {
 	Append('\0');
@@ -94,6 +98,8 @@ void ZEStringWriter::Output(ZEString& String)
 	
 	Buffer = NULL;
 	Size = 0;
+
+	Allocator.Reallocate(&Buffer, Size);
 }
 
 ZEStringWriter::ZEStringWriter()

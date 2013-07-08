@@ -44,6 +44,12 @@
 #include "ZECloud.h"
 #include "ZEGraphics\ZECamera.h"
 
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEWeather);
+
+ZEEntityRunAt ZEWeatherDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}
 
 void ZEWeather::AdjustHDR(float DayTime)
 {
@@ -212,6 +218,26 @@ void ZEWeather::SetSunDirection(const ZEVector3& Value)
 	this->UpdateCloudColor();
 }
 
+void ZEWeather::SetSunCastsShadows(bool Value)
+{
+	SunLight->SetCastsShadow(Value);
+}
+
+bool ZEWeather::GetSunCastsShadows() const
+{
+	return SunLight->GetCastsShadow();
+}
+
+void ZEWeather::SetMoonCastsShadows(bool Value)
+{
+	MoonLight->SetCastsShadow(Value);
+}
+
+bool ZEWeather::GetMoonCastsShadows() const
+{
+	return MoonLight->GetCastsShadow();
+}
+
 const ZEVector3& ZEWeather::GetSunDirection() const
 {
 	return SunDirection;
@@ -295,8 +321,8 @@ ZEWeather::ZEWeather()
 	FogFactor			= 0.1f;
 	MoonPhase			= 0.3f;
 	CloudCover			= 0.3f;
-	MoonLightIntensity	= 0.1f;
-	SunLightIntensity	= 1.2f;
+	MoonLightIntensity	= 0.2f;
+	SunLightIntensity	= 1.0f;
 
 	SunDirection		= ZEVector3(0.0001f, -1.0f, 0.0001f);
 	SunMoonRotation		= ZEVector3(ZE_PI_2, 0.0f, 0.0f);
@@ -320,6 +346,7 @@ ZEWeather::ZEWeather()
 	SunLight->SetColor(SunLightColor);
 	SunLight->SetIntensity(SunLightIntensity);
 	SunLight->SetCastsShadow(false);
+	SunLight->SetShadowFactor(0.8f);
 	SunLight->SetRange(600.0f);
 	this->AddComponent(SunLight);
 
@@ -343,7 +370,7 @@ ZEWeather::ZEWeather()
 	StarMap->SetName("StarMap");
 	StarMap->SetVisible(true);
 	StarMap->SetEnabled(true);
-	StarMap->SetSkyTexture("ZEEngine/ZEAtmosphere/Textures/StarMap.png");
+	StarMap->SetSkyTexture("ZEEngine\\ZEAtmosphere\\Textures\\StarMap.png");
 	StarMap->SetSkyColor(ZEVector3::One);
 	StarMap->SetSkyBrightness(1.0f);
 	this->AddComponent(StarMap);
@@ -353,12 +380,12 @@ ZEWeather::ZEWeather()
 	Moon->SetName("Moon");
 	Moon->SetEnabled(true);
 	Moon->SetVisible(true);
-	Moon->SetTexture("ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
+	Moon->SetTexture("ZEEngine\\ZEAtmosphere\\Textures\\MoonFrame.png", 53, 1);
 	Moon->SetAmbientColor(ZEVector3(1.0f, 0.99f, 0.92f));
 	Moon->SetDirection(MoonDirection);
 	Moon->SetPhase(MoonPhase);
-	Moon->SetAmbientFactor(2.7f);
-	Moon->SetScale(0.07f);
+	Moon->SetAmbientFactor(0.9f);
+	Moon->SetScale(0.1f);
 	this->AddComponent(Moon);
 
 	// Sky Dome
@@ -366,14 +393,11 @@ ZEWeather::ZEWeather()
 	SkyDome->SetName("SkyDome");
 	SkyDome->SetEnabled(true);
 	SkyDome->SetVisible(true);
-	SkyDome->SetSunIntensity(15.0f);
+	SkyDome->SetSunIntensity(22.0f);
 	SkyDome->SetOuterRadius(61500.0f);
 	SkyDome->SetInnerRadius(60000.0f);
 	SkyDome->SetCameraPositionOffset(ZEVector3(0.0f, 60000.0f, 0.0f));
 	SkyDome->SetSunLightDirection(SunDirection);
-	SkyDome->SetAmbientFactor(0.5f);
-	SkyDome->SetMiddayAmbientColor(ZEVector3(0.04f, 0.04f, 0.055f));
-	SkyDome->SetSunsetAmbientColor(ZEVector3(0.89020f, 0.60392f, 0.21177f));
 	this->AddComponent(SkyDome);
 
 	// Planar Cloud
@@ -381,7 +405,7 @@ ZEWeather::ZEWeather()
 	Cloud->SetName("PlanarCloud");
 	Cloud->SetEnabled(true);
 	Cloud->SetVisible(true);
-	Cloud->SetCloudFormationTexture("ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
+	Cloud->SetCloudFormationTexture("ZEEngine\\ZEAtmosphere\\Textures\\Cloud.bmp");
 	Cloud->SetCamera(zeScene->GetActiveCamera());
 	Cloud->SetCloudPlaneHeight(600.0f);
 	Cloud->SetSunLightDirection(SunDirection);

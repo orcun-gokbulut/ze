@@ -283,6 +283,9 @@ void ZEScene::Tick(ZEEntity* Entity, float ElapsedTime)
 
 void ZEScene::Tick(float ElapsedTime)
 {
+	if (!Enabled)
+		return;
+
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		Tick(Entities[I], ElapsedTime);
 }
@@ -305,6 +308,26 @@ void ZEScene::Render(float ElapsedTime)
 	memset(&FrameDrawParameters.Statistics, 0, sizeof(ZEDrawStatistics));
 
 	Culler.CullScene(this, &FrameDrawParameters);
+}
+
+bool ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	bool Result = false;
+	if (!Parameters.FilterFunction.IsNull())
+	{
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+		{
+			if (Parameters.FilterFunction(Entities[I], Parameters.FilterFunctionParameter))
+				Result |= Entities[I]->RayCast(Report, Parameters);
+		}
+	}
+	else
+	{
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+			Result |= Entities[I]->RayCast(Report, Parameters);
+	}
+
+	return Result;
 }
 
 bool ZEScene::Save(const ZEString& FileName)
@@ -418,6 +441,7 @@ ZEScene::ZEScene()
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
 	PhysicalWorld = NULL;
+	Enabled = true;
 }
 
 ZEScene::~ZEScene()
@@ -431,4 +455,14 @@ ZEScene::~ZEScene()
 ZEScene* ZEScene::GetInstance()
 {
 	return zeGame->GetScene();
+}
+
+void ZEScene::SetEnabled(bool Enabled)
+{
+	this->Enabled = Enabled;
+}
+
+bool ZEScene::GetEnabled() const
+{
+	return Enabled;
 }

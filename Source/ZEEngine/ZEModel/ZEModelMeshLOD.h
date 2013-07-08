@@ -66,7 +66,7 @@ class ZEModelMeshLOD
 
 		bool								IsSkinned();
 
-		void								Draw(ZEDrawParameters* DrawParameters, float DistanceSquare);
+		void								Draw(ZEDrawParameters* DrawParameters, float DrawOrder);
 
 		bool								UpdateVertexBuffer(ZEArray<ZEVector3> Vertices, ZEArray<ZEUInt32> Indices);
 		

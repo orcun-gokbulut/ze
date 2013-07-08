@@ -79,6 +79,20 @@ static sockaddr_in CreateSockAddr4(const ZEIPAddress& IpAddress, ZEUInt16 Port)
 
 // ZESocketTCP
 
+ZESocketTCP::ZESocketTCP()
+{
+	Socket = NULL;
+}
+
+ZESocketTCP::~ZESocketTCP()
+{
+	if(Socket != NULL)
+	{
+		Close();
+		Socket = NULL;
+	}
+}
+
 bool ZESocketTCP::Create(const ZEIPAddress& Address, ZEUInt16 Port)
 {
 	if(Address.Type == ZE_IAT_NONE)
@@ -241,6 +255,20 @@ ZEUInt16 ZESocketTCP::GetPort() const
 
 // ZESocketTCPListener
 
+ZESocketTCPListener::ZESocketTCPListener()
+{
+	Socket = NULL;
+}
+
+ZESocketTCPListener::~ZESocketTCPListener()
+{
+	if(Socket != NULL)
+	{
+		Close();
+		Socket = NULL;
+	}
+}
+
 bool ZESocketTCPListener::Create(const ZEIPAddress& Address, ZEUInt16 Port)
 {
 	if(Address.Type == ZE_IAT_NONE)
@@ -299,8 +327,6 @@ bool ZESocketTCPListener::Close()
 
 ZESocketTCP* ZESocketTCPListener::Accept()
 {
-
-
 	if(IpAddress.Type == ZE_IAT_IP_V4)
 	{
 		SOCKET Result = accept(Socket, NULL, NULL);
@@ -350,6 +376,20 @@ ZEUInt16 ZESocketTCPListener::GetPort() const
 }
 
 // ZESocketUDP
+
+ZESocketUDP::ZESocketUDP()
+{
+	Socket = NULL;
+}
+
+ZESocketUDP::~ZESocketUDP()
+{
+	if(Socket != NULL)
+	{
+		Close();
+		Socket = NULL;
+	}
+}
 
 bool ZESocketUDP::Create(const ZEIPAddress& Address, ZEUInt16 Port)
 {
@@ -404,6 +444,46 @@ const ZEIPAddress&	ZESocketUDP::GetIpAddress() const
 ZEUInt16 ZESocketUDP::GetPort() const
 {
 	return Port;
+}
+
+void ZESocketUDP::SetToIpAddress(ZEIPAddress Address)
+{
+	ToIpAddress = Address;
+}
+
+const ZEIPAddress& ZESocketUDP::GetToIpAddress()
+{
+	return ToIpAddress;
+}
+
+void ZESocketUDP::SetToPort(ZEUInt16 Port)
+{
+	ToPort = Port;
+}
+
+ZEUInt16 ZESocketUDP::GetToPort()
+{
+	return ToPort;
+}
+
+void ZESocketUDP::SetFromIpAddress(ZEIPAddress Address)
+{
+	FromIpAddress = Address;
+}
+
+const ZEIPAddress& ZESocketUDP::GetFromIpAddress()
+{
+	return FromIpAddress;
+}
+
+void ZESocketUDP::SetFromPort(ZEUInt16 Port)
+{
+	FromPort = Port;
+}
+
+ZEUInt16 ZESocketUDP::GetFromPort()
+{
+	return FromPort;
 }
 
 ZESSize ZESocketUDP::Send(const void* Buffer, ZESize BufferSize)
@@ -471,7 +551,7 @@ ZESSize ZESocketUDP::Recieve(void* Buffer, ZESize BufferSize)
 
 				if(Error == WSAEWOULDBLOCK)
 				{
-					zeLog("WinSock notification code on recvfrom() : %d", Error);
+					//zeLog("WinSock notification code on recvfrom() : %d", Error);
 					return ZE_SR_RETRY;
 				}
 

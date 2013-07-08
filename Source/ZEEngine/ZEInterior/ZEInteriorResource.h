@@ -45,6 +45,7 @@
 #include "ZEMath/ZEAABBox.h"
 #include "ZEDefinitions.h"
 #include "ZECore/ZEResource.h"
+#include "ZESpatial/ZEOctree.h"
 
 
 class ZEMaterial;
@@ -102,6 +103,8 @@ struct ZEInteriorResourceRoom
 	ZEInteriorResourcePhysicalMesh					PhysicalMesh;
 	bool											HasPhysicalMesh;
 	ZEString										UserDefinedProperties;
+	ZEOctree<ZESize>								Octree;
+	bool											HasOctree;
 };
 
 struct ZEInteriorResourceDoor
@@ -121,14 +124,14 @@ struct ZEInteriorResourceDoor
 
 struct ZEInteriorResourceHelper
 {
-	char										Name[ZE_MAX_NAME_SIZE];
-	ZEInteriorResourceHelperOwnerType			OwnerType;
-	ZEInt32										OwnerIndex;
-	ZEInteriorResourceRoom*						OwnerRoom;
-	ZEVector3									Position;
-	ZEQuaternion								Rotation;
-	ZEVector3									Scale;
-	ZEString									UserDefinedProperties;
+	char											Name[ZE_MAX_NAME_SIZE];
+	ZEInteriorResourceHelperOwnerType				OwnerType;
+	ZEInt32											OwnerIndex;
+	ZEInteriorResourceRoom*							OwnerRoom;
+	ZEVector3										Position;
+	ZEQuaternion									Rotation;
+	ZEVector3										Scale;
+	ZEString										UserDefinedProperties;
 };
 
 class ZEFile;
@@ -155,11 +158,11 @@ class ZEInteriorResource : public ZEResource
 	public:
 		const char*									GetResourceType() const;
 
-		const ZEArray<ZETexture2DResource*>&		GetTextures();
-		const ZEArray<ZEMaterial*>&					GetMaterials();
-		const ZEArray<ZEInteriorResourceRoom>&		GetRooms();
-		const ZEArray<ZEInteriorResourceDoor>&		GetDoors();
-		const ZEArray<ZEInteriorResourceHelper>&	GetHelpers();
+		const ZEArray<ZETexture2DResource*>&		GetTextures() const;
+		const ZEArray<ZEMaterial*>&					GetMaterials() const;
+		const ZEArray<ZEInteriorResourceRoom>&		GetRooms() const;
+		const ZEArray<ZEInteriorResourceDoor>&		GetDoors() const;
+		const ZEArray<ZEInteriorResourceHelper>&	GetHelpers() const;
 
 		static ZEInteriorResource*					LoadResource(const ZEString& FileName);
 		static ZEInteriorResource*					LoadSharedResource(const ZEString& FileName);

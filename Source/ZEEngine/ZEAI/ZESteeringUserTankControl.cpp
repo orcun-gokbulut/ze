@@ -52,8 +52,8 @@ ZEStreeringUserTankControl::ZEStreeringUserTankControl()
 {
 	InputMap.AddButtonAction("Keyboard", ZE_IKB_W, ZE_IS_PRESSING, ACTIONID_FORWARD	);
 	InputMap.AddButtonAction("Keyboard", ZE_IKB_S, ZE_IS_PRESSING, ACTIONID_BACKWARD);
-	InputMap.AddButtonAction("Keyboard", ZE_IKB_D, ZE_IS_PRESSING, ACTIONID_STRAFELEFT);
-	InputMap.AddButtonAction("Keyboard", ZE_IKB_A, ZE_IS_PRESSING, ACTIONID_STRAFERIGHT);
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_D, ZE_IS_PRESSING, ACTIONID_STRAFERIGHT);
+	InputMap.AddButtonAction("Keyboard", ZE_IKB_A, ZE_IS_PRESSING, ACTIONID_STRAFELEFT);
 	InputMap.AddAxisAction("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE, ZE_IS_CHANGED, ACTIONID_TURNLEFT);
 	InputMap.AddAxisAction("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE, ZE_IS_CHANGED, ACTIONID_TURNRIGHT);
 	InputMap.AddAxisAction("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE, ZE_IS_CHANGED, ACTIONID_TURNUP);

@@ -96,7 +96,7 @@ bool ZEMLNode::AddProperty(ZEMLProperty* Property)
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 		if(Properties[I]->GetName() == Property->GetName())
 		{
-			zeError("ZEML node can not contain properties with duplicate name : %s.", Name);
+			zeError("ZEML node can not contain properties with duplicate name : %s.", Property->Name);
 			return false;
 		}
 
@@ -255,7 +255,7 @@ bool ZEMLNode::AddDataProperty(ZEMLDataProperty* Property)
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 		if(Properties[I]->GetName() == Property->GetName())
 		{
-			zeError("ZEML node can not contain data properties with duplicate name : %s.", Name);
+			zeError("ZEML node can not contain data properties with duplicate name : %s.", Property->Name);
 			return false;
 		}
 
@@ -533,7 +533,7 @@ bool ZEMLNode::ReadSelf(ZEFile* File, bool DeferredDataReading)
 
 	if(File->Read(TempNameBuffer, NameSize, 1) != 1)
 	{
-		zeError("Can not read ZEMLDataProperty name from file. Corrupted ZEML file.");
+		zeError("Can not read ZEMLNode name from file. Corrupted ZEML file.");
 		return false;
 	}
 

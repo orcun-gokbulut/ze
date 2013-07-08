@@ -77,7 +77,7 @@ class ZE3dsMaxInteriorExporter : public SceneExport
 		void						LoadOptions(const char* FilePath);
 		void						SaveOptions(const char* FilePath);
 		bool						ShowOptionsDialog(HWND ParentWindow);
-		bool						ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath);
+		bool						ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath, ZEString ExportPath);
 
 		ZEInt32						FindRoomIndex(IGameNode* Node);
 		ZEInt32						ProcessFaceMaterial(IGameMaterial* Material);

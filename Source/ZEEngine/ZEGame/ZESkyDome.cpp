@@ -38,36 +38,6 @@
 #include "ZERenderer/ZESkyDomeMaterial.h"
 #include "ZEDrawParameters.h"
 
-void ZESkyDome::SetAmbientFactor(float Value)
-{
-	AmbientFactor = Value;
-}
-
-float ZESkyDome::GetAmbientFactor() const
-{
-	return AmbientFactor;
-}
-
-void ZESkyDome::SetMiddayAmbientColor(ZEVector3& Color)
-{
-	MiddayAmbientColor = Color;
-}
-
-ZEVector3 ZESkyDome::GetMiddayAmbientColor() const
-{
-	return MiddayAmbientColor;
-}
-
-void ZESkyDome::SetSunsetAmbientColor(ZEVector3& Color)
-{
-	SunsetAmbientColor = Color;
-}
-
-ZEVector3 ZESkyDome::GetSunsetAmbientColor() const
-{
-	return SunsetAmbientColor;
-}
-
 void ZESkyDome::SetSetMieConstant(float Value)
 {
 	MieConstant = Value;
@@ -207,9 +177,6 @@ bool ZESkyDome::InitializeSelf()
 
 		// Set initial parameters
 		SkyDomeMaterial->G						= G;
-		SkyDomeMaterial->SunsetAmbientColor		= SunsetAmbientColor;
-		SkyDomeMaterial->MiddayAmbientColor		= MiddayAmbientColor;
-		SkyDomeMaterial->AmbientFactor			= AmbientFactor;
 		SkyDomeMaterial->MieConstant			= MieConstant;
 		SkyDomeMaterial->RayleighConstant		= RayleighConstant;
 		SkyDomeMaterial->MieScaleDepth			= MieScaleDepth;
@@ -267,9 +234,6 @@ void ZESkyDome::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	SkyDomeMaterial->G						= G;
-	SkyDomeMaterial->SunsetAmbientColor		= SunsetAmbientColor;
-	SkyDomeMaterial->MiddayAmbientColor		= MiddayAmbientColor;
-	SkyDomeMaterial->AmbientFactor			= AmbientFactor;
 	SkyDomeMaterial->MieConstant			= MieConstant;
 	SkyDomeMaterial->RayleighConstant		= RayleighConstant;
 	SkyDomeMaterial->MieScaleDepth			= MieScaleDepth;
@@ -305,15 +269,11 @@ ZESkyDome::ZESkyDome()
 	RayleighConstant		= 0.0025f;
 	RayleighScaleDepth		= 0.2500f;
 
-	SunIntensity			= 20.0f;
+	SunIntensity			= 22.0f;
 	G						= -0.99f;
 
 	OuterRadius				= 61500.0f;
 	InnerRadius				= 60000.0f;
-
-	AmbientFactor			= 1.0000f;
-	MiddayAmbientColor		= ZEVector3(0.0f, 0.0f, 0.0f);
-	SunsetAmbientColor		= ZEVector3(0.0f, 0.0f, 0.0f);
 
 	SunLightDirection		= ZEVector3(0.0001f, -1.0f, 0.0001f);
 	SunLightWaveLenght		= ZEVector3(0.650f, 0.570f, 0.475f);
@@ -324,7 +284,7 @@ ZESkyDome::ZESkyDome()
 	SkyDomeMaterial			= NULL;
 	
 	SkyDomeGeometry.Clean();
-	SkyDomeRenderCommand.SetZero();	
+	SkyDomeRenderCommand.SetZero();
 }
 
 ZESkyDome::~ZESkyDome()

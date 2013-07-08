@@ -264,9 +264,6 @@ void ZEALSoundSource::StreamDecodeAndFill(ZESize BufferPosition, ZESize Position
 
 
 	alBufferData((ALuint)BufferPosition, GetBufferFormat(SoundResource), InnerStreamBuffer, (ALsizei)(BufferSampleCount * SoundResource->GetBlockAlign()), (ALsizei)SoundResource->GetSamplesPerSecond());
-
-	zeLog("Stream Position %d, Buffer Id : %d, Error: %d", StreamPosition, BufferPosition, alGetError());
-
 }
 
 void ZEALSoundSource::Stream()

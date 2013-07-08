@@ -51,10 +51,6 @@ class ZESkyDome : public ZEEntity
 	protected:
 		float					G;
 
-		float					AmbientFactor;
-		ZEVector3				MiddayAmbientColor;		// Ambient color for the midday
-		ZEVector3				SunsetAmbientColor;		// Ambient color for sunset or sundown
-
 		float					MieConstant;
 		float					RayleighConstant;
 
@@ -72,7 +68,6 @@ class ZESkyDome : public ZEEntity
 		ZEVector3				CameraPosition;			// This parameter is the real time camera position for when the ground is round. No need to use offset parameter.
 		ZEVector3				CameraPositionOffset;	// = 60000.0f. This parameter is for when the ground is flat and calculations are done 
 														// with a fixed camera height. No need to use real time camera position.
-		
 		ZECanvas				SkyDomeGeometry;
 		ZESkyDomeMaterial*		SkyDomeMaterial;
 		ZERenderCommand			SkyDomeRenderCommand;
@@ -86,15 +81,6 @@ class ZESkyDome : public ZEEntity
 	private:
 		
 	public:
-		void					SetAmbientFactor(float Value);
-		float					GetAmbientFactor() const;
-
-		void					SetMiddayAmbientColor(ZEVector3& Color);
-		ZEVector3				GetMiddayAmbientColor() const;
-
-		void					SetSunsetAmbientColor(ZEVector3& Color);
-		ZEVector3				GetSunsetAmbientColor() const;
-
 		void					SetSetMieConstant(float Value);
 		float					GetGetMieConstant() const;
 

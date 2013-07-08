@@ -40,10 +40,9 @@
 #include "ZETextureTools.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZETexture2DResource.h"
-// #include "ZEModules/ZEDirect3D9/ZED3D9TextureResizer.h"
+#include "ZEModules/ZEDirect3D9/ZED3D9TextureResizer.h"
 
 #include <windows.h>
-#include <ATI_Compress.h>
 
 ZETextureTools::ZETextureTools()
 {
@@ -129,6 +128,7 @@ bool ZETextureTools::IsResizeable(const ZEUInt Width, const ZEUInt Height, const
 	}
 }
 
+// Surface count is used only when texture type is 3D 
 ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount, const ZEUInt VertTileCount, const ZETextureType TextureType)
 {
 	if (!IsResizeable(Width, Height, HorizTileCount, VertTileCount, TextureType))
@@ -140,9 +140,8 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 	{
 		case ZE_TT_2D:
 		{
-			float Log2 = ZEMath::Log(2.0f);
-			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)Width) / Log2);
-			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)Height) / Log2);
+			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)Width) / ZEMath::Log(2.0f));
+			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)Height) / ZEMath::Log(2.0f));
 			return ZEMath::Min(MaxMipX, MaxMipY) + 1;
 			break;
 		}
@@ -151,9 +150,8 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 			ZEUInt TileWidth = Width / HorizTileCount;
 			ZEUInt TileHeight = Height / VertTileCount;
 			
-			float Log2 = ZEMath::Log(2.0f);
-			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)TileWidth) / Log2);
-			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)TileHeight) / Log2);
+			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)TileWidth) / ZEMath::Log(2.0f));
+			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)TileHeight) / ZEMath::Log(2.0f));
 			return ZEMath::Min(MaxMipX, MaxMipY) + 1;
 			break;
 		}
@@ -164,10 +162,9 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 			ZEUInt TileHeight = Height / VertTileCount;
 			ZEUInt SurfaceCount = HorizTileCount * VertTileCount;
 
-			float Log2 = ZEMath::Log(2.0f);
-			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)Width) / Log2);
-			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)Height) / Log2);
-			ZEUInt MaxMipZ	= (ZEUInt)(ZEMath::Log((float)SurfaceCount) / Log2);
+			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)Width) / ZEMath::Log(2.0f));
+			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)Height) / ZEMath::Log(2.0f));
+			ZEUInt MaxMipZ	= (ZEUInt)(ZEMath::Log((float)SurfaceCount) / ZEMath::Log(2.0f));
 			return ZEMath::Min(ZEMath::Min(MaxMipX, MaxMipY), MaxMipZ) + 1;
 			break;
 		}
@@ -179,250 +176,13 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 		}
 	}
 }
-/*
-class ZEOutputHandler : public OutputHandler
+
+void ZETextureTools::CompressTexture(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions)
 {
-	private:
-		void* Output;
-		ZESize Cursor;
 
-		ZESize Size;
-		ZEUInt32 Width;
-		ZEUInt32 Height;
-		ZEUInt32 Depth;
-		ZEUInt32 Face;
-		ZEUInt32 MipLevel;
-
-	public:
-		void SetOutput(void* Output)
-		{
-			this->Output = Output;
-		}
-		
-		void beginImage(int size, int width, int height, int depth, int face, int miplevel)
-		{
-			Size = size;
-			Width = width;
-			Height = height;
-			Depth = depth;
-			Face = face;
-			MipLevel = miplevel;
-		}
-	
-		bool writeData(const void * data, int size)
-		{
-			if (Output == NULL)
-				return false;
-
-			if (Cursor + size == Size)
-				int x = 3;
-
-			void* Destination = (void*)((ZEUInt8*)Output + Cursor);
-			if (memcpy(Destination, data, size) == Destination)
-			{
-				Cursor += size;
-				return true;
-			}
-
-			return false;
-		}
-
-		ZEOutputHandler()
-		{
-			Cursor = 0;
-			Output = NULL;
-		}
-	
-		virtual ~ZEOutputHandler()
-		{
-
-		}
-};
-
-class ZEErrorHandler : public ErrorHandler
-{
-	public:
-		void error(Error e)
-		{
-			switch(e)
-			{
-				case Error_Unknown:
-					zeWarning("Cannot open file for compression.");
-					break;
-				case Error_InvalidInput:
-					zeWarning("Invalid compression output.");
-					break;
-				case Error_UnsupportedFeature:
-					zeWarning("Unsupported compression feature.");
-					break;
-				case Error_CudaError:
-					zeWarning("Cuda error during compression.");
-					break;
-				case Error_FileOpen:
-					zeWarning("Cannot open file for compression.");
-					break;
-				case Error_FileWrite:
-					zeWarning("Cannot write to file");
-					break;
-			}
-		}
-};
-*/
-void ZETextureTools::Compress(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, const ZETextureOptions* Options)
-{
-	/*
-	Format TargetFormat;
-	Quality TargetQuality;
-
-	// Decide Compression Type
-	switch(Options->CompressionType)
-	{
-		case ZE_TCT_DXT1:
-			TargetFormat = Format_DXT1;
-			break;
-
-		case ZE_TCT_DXT3:
-			TargetFormat = Format_DXT3;
-			break;
-
-		case ZE_TCT_DXT5:
-			TargetFormat = Format_DXT5;
-			break;
-
-		default:
-			return;
-			break;
-	};
-
-	// Decide compression Speed
-	switch(Options->CompressionQuality)
-	{
-		case ZE_TCQ_HIGH:
-			TargetQuality = Quality_Highest;
-			break;
-
-		
-		case ZE_TCQ_NORMAL:
-			TargetQuality = Quality_Normal;
-			break;
-
-		default:
-		case ZE_TCQ_LOW:
-			TargetQuality = Quality_Fastest;
-			break;
-	};
-
-	TargetQuality = Quality_Fastest;
-
-	InputOptions Input;
-	Input.reset();
-	Input.setMipmapGeneration(false);
-	Input.setNormalizeMipmaps(false);
-	Input.setConvertToNormalMap(false);
-	Input.setAlphaMode(AlphaMode_None);
-	Input.setRoundMode(RoundMode_None);
-	Input.setWrapMode(WrapMode_Mirror);
-	Input.setFormat(InputFormat_BGRA_8UB);
-	Input.setColorTransform(ColorTransform_None);
-	Input.setTextureLayout(TextureType_2D, SourceWidth, SourceHeight, 1);
-	Input.setMipmapData(SourceData, SourceWidth, SourceHeight, 1, 0, 0);
-	
-	ZEErrorHandler ErrHandler;
-
-	ZEOutputHandler	OutHandler;
-	OutHandler.SetOutput(DestinationData);
-	
-	OutputOptions Output;
-	Output.reset();
-	Output.setOutputHeader(false);
-	Output.setErrorHandler(&ErrHandler);
-	Output.setOutputHandler(&OutHandler);
-	
-	CompressionOptions CompOptions;
-	CompOptions.reset();
-	CompOptions.setFormat(TargetFormat);
-	CompOptions.setQuality(TargetQuality);
-	CompOptions.setColorWeights(1.0f, 1.0f, 1.0f, 1.0f);
-	CompOptions.setPixelFormat(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-
-	Compressor Comp;
-	Comp.enableCudaAcceleration(false);
-
-	bool Result = Comp.process(Input, CompOptions, Output);
-	*/
-
-
-	ATI_TC_FORMAT Format = ATI_TC_FORMAT_Unknown;
-	ATI_TC_Speed Speed = ATI_TC_Speed_SuperFast;
-
-	// Decide Compression Type
-	switch(Options->CompressionType)
-	{
-		case ZE_TCT_DXT1:
-			Format = ATI_TC_FORMAT_DXT1;
-			break;
-
-		case ZE_TCT_DXT3:
-			Format = ATI_TC_FORMAT_DXT3;
-			break;
-
-		case ZE_TCT_DXT5:
-			Format = ATI_TC_FORMAT_DXT5;
-			break;
-
-		case ZE_TCT_3DC:
-			Format = ATI_TC_FORMAT_BC5;
-			break;
-
-		default:
-			break;
-	};
-
-	// Decide compression Speed
-	switch(Options->CompressionQuality)
-	{
-		case ZE_TCQ_HIGH:
-			Speed = ATI_TC_Speed_Normal;
-			break;
-
-		default:
-		case ZE_TCQ_NORMAL:
-			Speed = ATI_TC_Speed_Fast;
-			break;
-
-		case ZE_TCQ_LOW:
-			Speed = ATI_TC_Speed_SuperFast;
-			break;
-	};
-
-	ATI_TC_Texture srcTexture;
-	srcTexture.dwSize = sizeof(srcTexture);
-	srcTexture.dwWidth = SourceWidth;
-	srcTexture.dwHeight	= SourceHeight;
-	srcTexture.dwPitch = (ATI_TC_DWORD)SourcePitch;
-	srcTexture.format = ATI_TC_FORMAT_ARGB_8888;
-	srcTexture.pData = (ATI_TC_BYTE*)SourceData;
-	srcTexture.dwDataSize = ATI_TC_CalculateBufferSize(&srcTexture);
-
-	ATI_TC_Texture destTexture;  
-	destTexture.dwSize = sizeof(destTexture);
-	destTexture.dwWidth	= SourceWidth;
-	destTexture.dwHeight = SourceHeight;
-	destTexture.dwPitch	= (ATI_TC_DWORD)DestinationPitch;
-	destTexture.format = Format;
-	destTexture.pData = (ATI_TC_BYTE*)DestinationData;
-	destTexture.dwDataSize = ATI_TC_CalculateBufferSize(&destTexture);
-
-	ATI_TC_CompressOptions options;
-	memset(&options, 0, sizeof(options));
-
-	options.dwSize = sizeof(options);
-	options.nCompressionSpeed = Speed;
-
-	ATI_TC_ConvertTexture(&srcTexture, &destTexture, &options, NULL, NULL, NULL);
 }
 
-void ZETextureTools::DownSample2x(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight)
+void ZETextureTools::DownSample2x(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, bool UseGpu)
 {
 	// Check width height
 	if(SourceWidth <= 1 || SourceHeight <= 1)
@@ -431,51 +191,63 @@ void ZETextureTools::DownSample2x(void* DestinationData, const ZESize Destinatio
 	ZEUInt DestinationHeight = SourceHeight / 2;
 	ZEUInt DestinationWidth = SourceWidth / 2;
 
-	struct ZEColorRGBA
+	if (UseGpu)
 	{
-		ZEUInt8 Red;
-		ZEUInt8 Green;
-		ZEUInt8 Blue;
-		ZEUInt8 Alpha;
-	};
+		static ZED3D9TextureResizer Resizer;
 
-	for (ZESize y = 0; y < (ZESize)DestinationHeight; y++)
-	{
-		for (ZESize x = 0; x < (ZESize)DestinationWidth; x++)
-		{
-			ZEColorRGBA* Source = (ZEColorRGBA*)((ZEUInt8*)SourceData + SourcePitch * y * 2 + x * 8);
+		Resizer.Initialize(DestinationData, DestinationPitch, DestinationWidth, DestinationHeight, SourceData, SourcePitch, SourceWidth, SourceHeight);
+		Resizer.Process();
+		Resizer.Deinitialize();
 
-			ZEUInt16 Red, Green, Blue, Alpha;
-			Alpha = Source->Alpha;
-			Red   = Source->Red;
-			Green = Source->Green;
-			Blue  = Source->Blue;
-			Source++;
-
-			Alpha += Source->Alpha;
-			Red   += Source->Red;
-			Green += Source->Green;
-			Blue  += Source->Blue;
-
-			Source = (ZEColorRGBA*)((ZEUInt8*)Source + SourcePitch - 1 * 4);
-			Alpha += Source->Alpha;
-			Red   += Source->Red;
-			Green += Source->Green;
-			Blue  += Source->Blue;
-			Source++;
-
-			Alpha += Source->Alpha;
-			Red   += Source->Red;
-			Green += Source->Green;
-			Blue  += Source->Blue;
-
-			ZEColorRGBA* Destination = (ZEColorRGBA*)((ZEUInt8*)DestinationData + DestinationPitch * y + x * 4);
-			Destination->Alpha = Alpha / 4;
-			Destination->Red   = Red   / 4;
-			Destination->Green = Green / 4;
-			Destination->Blue  = Blue  / 4;
-		}
 	}
+	else
+	{
+		struct ZEColorARGB
+		{
+			ZEUInt8 Alpha;
+			ZEUInt8 Red;
+			ZEUInt8 Blue;
+			ZEUInt8 Green;
+		};
+
+		for (ZESize y = 0; y < (ZESize)DestinationHeight; y++)
+		{
+			for (ZESize x = 0; x < (ZESize)DestinationWidth; x++)
+			{
+				ZEColorARGB* Source = (ZEColorARGB*)((ZEUInt8*)SourceData + SourcePitch * y * 2 + x * 8);
+
+				ZEUInt16 Red, Green, Blue, Alpha;
+				Alpha = Source->Alpha;
+				Red   = Source->Red;
+				Green = Source->Green;
+				Blue  = Source->Blue;
+				Source++;
+
+				Alpha += Source->Alpha;
+				Red   += Source->Red;
+				Green += Source->Green;
+				Blue  += Source->Blue;
+
+				Source = (ZEColorARGB*)((ZEUInt8*)Source + SourcePitch - 1 * 4);
+				Alpha += Source->Alpha;
+				Red   += Source->Red;
+				Green += Source->Green;
+				Blue  += Source->Blue;
+				Source++;
+
+				Alpha += Source->Alpha;
+				Red   += Source->Red;
+				Green += Source->Green;
+				Blue  += Source->Blue;
+
+				ZEColorARGB* Destination = (ZEColorARGB*)((ZEUInt8*)DestinationData + DestinationPitch * y + x * 4);
+				Destination->Alpha = Alpha / 4;
+				Destination->Red   = Red   / 4;
+				Destination->Green = Green / 4;
+				Destination->Blue  = Blue  / 4;
+			}
+		}
+	}	
 }
 
 // Takes average of two uncompressed image which have same dimensions
@@ -487,21 +259,21 @@ void ZETextureTools::Average(void* DestinationData, const ZESize DestinationPitc
 		return;
 	}
 
-	struct ZEColorRGBA
+	struct ZEColorARGB
 	{
-		ZEUInt8 Red;
-		ZEUInt8 Green;
-		ZEUInt8 Blue;
 		ZEUInt8 Alpha;
+		ZEUInt8 Red;
+		ZEUInt8 Blue;
+		ZEUInt8 Green;
 	};
 
 	for (ZESize y = 0; y < (ZESize)SourceHeight1; y++)
 	{
 		for (ZESize x = 0; x < (ZESize)SourceWidth1; x++)
 		{
-			ZEColorRGBA* Source1 = (ZEColorRGBA*)((ZEUInt8*)SourceData1 + SourcePitch1 * y + x * 4);
-			ZEColorRGBA* Source2 = (ZEColorRGBA*)((ZEUInt8*)SourceData2 + SourcePitch2 * y + x * 4);
-			ZEColorRGBA* Destination = (ZEColorRGBA*)((ZEUInt8*)DestinationData + DestinationPitch * y + x * 4);
+			ZEColorARGB* Source1 = (ZEColorARGB*)((ZEUInt8*)SourceData1 + SourcePitch1 * y + x * 4);
+			ZEColorARGB* Source2 = (ZEColorARGB*)((ZEUInt8*)SourceData2 + SourcePitch2 * y + x * 4);
+			ZEColorARGB* Destination = (ZEColorARGB*)((ZEUInt8*)DestinationData + DestinationPitch * y + x * 4);
 
 			Destination->Alpha	= (Source1->Alpha + Source2->Alpha) / 2;
 			Destination->Green	= (Source1->Green + Source2->Green) / 2;

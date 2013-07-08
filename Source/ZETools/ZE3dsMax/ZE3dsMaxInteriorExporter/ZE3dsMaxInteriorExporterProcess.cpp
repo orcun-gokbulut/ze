@@ -909,7 +909,7 @@ void ZE3dsMaxInteriorExporter::CollectResources()
 
 	for (ZESize I = 0; I < (ZESize)Nodes.Count(); I++)
 	{
-		IGameNode* CurrentNode = Nodes[I];;
+		IGameNode* CurrentNode = Nodes[I];
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		const char* NodeZEType;
 
@@ -990,6 +990,8 @@ void ZE3dsMaxInteriorExporter::CollectResources()
 				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 				break; 
 			case ID_RR: // Refraction 
+				break;
+			default:
 				break;
 			}
 			

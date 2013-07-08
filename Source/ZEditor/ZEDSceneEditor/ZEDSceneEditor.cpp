@@ -36,6 +36,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include "ui_ZEDSceneEditor.h"
 #include "ZERenderer/ZERenderer.h"
+#include "ZEModules/ZEDirect3D9/ZED3D9DOFProcessor.h"
 #include <QtGui/QFileDialog.h>
 #include <QtGui/QWidget>
 #include <QtGui/QAction>
@@ -65,6 +66,14 @@
 #include <ZEGame\ZESkyBrush.h>
 #include "ZEDCommonControls\CSS.h"
 #include "ZEMath/ZEAngle.h"
+#include "ZEDEntitySelectionItem.h"
+#include "ZEGame/ZEGrid.h"
+#include "ZEGraphics/ZEPointLight.h"
+#include "ZEInterior/ZEInterior.h"
+#include "ZEGame/ZEWeather.h"
+#include "ZEGame/ZESea.h"
+#include "ZEFile/ZEPathManager.h"
+#include "ZEGame/ZEFoliage.h"
 
 
 
@@ -80,8 +89,13 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	ui = new Ui::MapEditorClass();
 	ui->setupUi(this);
 
+	ZEString DefaultCompanyName = "Zinek";
+	ZEString DefaultApplicationName = "Engine";
+	ZEString DefaultResourcesDirectoryName = "Resources";
+	ZEPathManager::CustomizePaths(&DefaultCompanyName, &DefaultApplicationName, &DefaultResourcesDirectoryName);
+
 	SplashScreen->SetNotificationText("Reading Working Directory...");
-	this->WorkingDirectory = QDir::currentPath() + QString("/resources");
+	this->WorkingDirectory = ZEPathManager::GetWorkingDirectory() + "\\";
 
 	SplashScreen->SetNotificationText("Setting Up Assert Browser...");
 	//AssertBrowser = new NewZEDAssertBrowser(QDir::currentPath());	
@@ -92,7 +106,7 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	MainLoopTimer->start(0);
 
 	BackupSaveTimer = new QTimer();
-	BackupSaveTimer->start(120000);
+	//BackupSaveTimer->start(120000);
 
 	SplashScreen->SetNotificationText("Making Connections...");
 	MakeConnections();
@@ -141,7 +155,8 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	SplashScreen->hide();
 	showMaximized();
 	this->statusBar()->showMessage("Ready");
-	//Grid = new ZEDGrid(Scene);
+	Grid = ZEGrid::CreateInstance();
+	Scene->AddEntity(Grid);
 
 	//ZEDScreenAxisHelper* Helper = new ZEDScreenAxisHelper(Player);
 	//Scene->AddEntity(Helper);
@@ -152,19 +167,58 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	ZEModel* Model = ZEModel::CreateInstance();
 	Model->Destroy();
 
+	ZEPointLight* PointLight = ZEPointLight::CreateInstance();
+	PointLight->Destroy();
+
+	ZEInterior* Interior = ZEInterior::CreateInstance();
+	Interior->Destroy();
+
 	ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
 	Sky->Destroy();
+
+	ZEWeather* Weather = ZEWeather::CreateInstance();
+	Weather->Destroy();
+
+	ZESea* Sea = ZESea::CreateInstance();
+	Sea->Destroy();
+
+	ZEFoliage* Foliage = ZEFoliage::CreateInstance();
+	Foliage->Destroy();
 
 	//setStyleSheet(GetCSSFromFile(":/CSS/MapEditor.qss"));
 
 	ZED3D9FrameRenderer* Renderer = ((ZED3D9FrameRenderer*)(Scene->GetRenderer()));
 
-	new ZEDPropertyWindowManager(0, &Renderer->HDRProcessor, QString());
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HDRProcessor, QString()), QString("HDR"));
+	QVBoxLayout* TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(1));
+	ui->PropertiesTabWidget->widget(1)->setLayout(TempLayout);
 
-	LoadTrees();
-	LoadBushes();
-	LoadFlowers();
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->DOFProcessor, QString()), QString("DOF"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(2));
+	ui->PropertiesTabWidget->widget(2)->setLayout(TempLayout);
 
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->MLAAProcessor, QString()), QString("MLAA"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(3));
+	ui->PropertiesTabWidget->widget(3)->setLayout(TempLayout);
+
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->FogProcessor, QString()), QString("FOG"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(4));
+	ui->PropertiesTabWidget->widget(4)->setLayout(TempLayout);
+
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->AerialPerspectiveProcessor, QString()), QString("Aerial"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(5));
+	ui->PropertiesTabWidget->widget(5)->setLayout(TempLayout);
+
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HBAOProcessor, QString()), QString("HBAO"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(6));
+	ui->PropertiesTabWidget->widget(6)->setLayout(TempLayout);
+
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->SSAOProcessor, QString()), QString("SSAO"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(7));
+	ui->PropertiesTabWidget->widget(7)->setLayout(TempLayout);
+
+	Scene->SetAmbientColor(ZEVector3::One);
+	Scene->SetAmbientFactor(0.2f);
 }
 
 void MapEditor::MakeConnections()
@@ -177,164 +231,29 @@ void MapEditor::MakeConnections()
 	QObject::connect(BackupSaveTimer,				SIGNAL(timeout()),			this,					SLOT(BackupSave()));
 
 	QObject::connect(ui->NewAction,					SIGNAL(triggered(bool)),	this,					SLOT(NewMapActionTriggered()));
-	QObject::connect(ui->LoadAction,				SIGNAL(triggered(bool)),	this,					SLOT(LoadMapActionTriggered()));
-	QObject::connect(ui->SaveAction,				SIGNAL(triggered(bool)),	this,					SLOT(SaveSceneActionTriggered()));
+	QObject::connect(ui->LoadAction,					SIGNAL(triggered(bool)),	this,					SLOT(LoadMapActionTriggered()));
+	QObject::connect(ui->SaveAction,					SIGNAL(triggered(bool)),	this,					SLOT(SaveSceneActionTriggered()));
 	QObject::connect(ui->LoadSceneAction,			SIGNAL(triggered(bool)),	this,					SLOT(LoadSceneActionTriggered()));
 	QObject::connect(ui->ConsoleInput,				SIGNAL(returnPressed()),	this,					SLOT(ConsoleInput()));
 	QObject::connect(ui->EntityBrowserOpenAction,	SIGNAL(triggered(bool)),	this,					SLOT(ShowEntitySelector()));
 	QObject::connect(ui->AddButton,					SIGNAL(clicked()),			this,					SLOT(NewEntityToScene()));
-	QObject::connect(ui->MoveAction,				SIGNAL(triggered(bool)),	this,					SLOT(MoveActionTriggered()));
+	QObject::connect(ui->MoveAction,					SIGNAL(triggered(bool)),	this,					SLOT(MoveActionTriggered()));
 	QObject::connect(ui->RotateAction,				SIGNAL(triggered(bool)),	this,					SLOT(RotateActionTriggered()));
 	QObject::connect(ui->ScaleAction,				SIGNAL(triggered(bool)),	this,					SLOT(ScaleActionTriggered()));
 	QObject::connect(ui->SelectAction,				SIGNAL(triggered(bool)),	this,					SLOT(SelectActionTriggered()));
-	QObject::connect(ui->StepSizeSpinBox,			SIGNAL(valueChanged(double)),	this,					SLOT(StepSizeChanged()));
+	QObject::connect(ui->StepSizeSpinBox,			SIGNAL(valueChanged(double)),	this,				SLOT(StepSizeChanged()));
 	QObject::connect(ui->DeleteAction,				SIGNAL(triggered(bool)),	this,					SLOT(DeleteActionTriggered()));
-	QObject::connect(ui->CopyAction,				SIGNAL(triggered(bool)),	this,					SLOT(CopyActionTriggered()));
+	QObject::connect(ui->CopyAction,					SIGNAL(triggered(bool)),	this,					SLOT(CopyActionTriggered()));
 	QObject::connect(ui->GoToEntityAction,			SIGNAL(triggered(bool)),	this,					SLOT(GoToEntityActionTriggered()));
 	QObject::connect(ui->CloseAction,				SIGNAL(triggered(bool)),	this,					SLOT(CloseMapActionTriggered()));
 	QObject::connect(ui->SaveSceneAsAction,			SIGNAL(triggered(bool)),	this,					SLOT(SaveSceneAsActionTriggered()));
 	//QObject::connect(ui->AssertsWindowOpenAction,	SIGNAL(triggered(bool)),	this->AssertBrowser,	SLOT(show()));
-	QObject::connect(ui->actionUndo,				SIGNAL(triggered(bool)),	this,					SLOT(UndoActionTriggered()));
-	QObject::connect(ui->actionRedo,				SIGNAL(triggered(bool)),	this,					SLOT(RedoActionTriggered()));
-	QObject::connect(ui->HideAction,				SIGNAL(triggered(bool)),	this,					SLOT(HideActionTriggered()));
+	QObject::connect(ui->actionUndo,					SIGNAL(triggered(bool)),	this,					SLOT(UndoActionTriggered()));
+	QObject::connect(ui->actionRedo,					SIGNAL(triggered(bool)),	this,					SLOT(RedoActionTriggered()));
+	QObject::connect(ui->HideAction,					SIGNAL(triggered(bool)),	this,					SLOT(HideActionTriggered()));
 	QObject::connect(ui->UnhideAction,				SIGNAL(triggered(bool)),	this,					SLOT(UnHideActionTriggered()));
 	QObject::connect(ui->SceneListOpenAction,		SIGNAL(triggered(bool)),	this,					SLOT(SceneListOpenActionTriggered(bool)));
-	QObject::connect(this->ui->GridToogleAction,	SIGNAL(toggled(bool)),		this,					SLOT(ChangeGridVisibility(bool)));
-
-	QObject::connect(ui->actionGenerate_Random_Tree, SIGNAL(triggered(bool)), this, SLOT(GenerateRandomTree()));
-	QObject::connect(ui->actionGenerate_Random_Bush, SIGNAL(triggered(bool)), this, SLOT(GenerateRandomBush()));
-	QObject::connect(ui->actionGenerate_Random_Flower, SIGNAL(triggered(bool)), this, SLOT(GenerateRandomFlowers()));
-}
-
-//Vegetation
-
-void MapEditor::LoadTrees()
-{
-	Trees.SetCount(0);
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree11.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree12.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree13.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree14.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree15.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree21.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree22.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree23.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree24.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree25.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree31.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree32.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree33.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree34.zemodel"));
-	Trees.Add(ZEModelResource::LoadSharedResource("Tree35.zemodel"));
-}
-
-void MapEditor::LoadBushes()
-{
-	Bushes.SetCount(0);
-	Bushes.Add(ZEModelResource::LoadSharedResource("Bush11.zemodel"));
-	Bushes.Add(ZEModelResource::LoadSharedResource("Bush21.zemodel"));
-	Bushes.Add(ZEModelResource::LoadSharedResource("Bush31.zemodel"));
-}
-
-void MapEditor::LoadFlowers()
-{
-	Flowers.SetCount(0);
-	Flowers.Add(ZEModelResource::LoadSharedResource("Flower11.zemodel"));
-	Flowers.Add(ZEModelResource::LoadSharedResource("Flower21.zemodel"));
-}
-
-void MapEditor::GenerateRandomFlowers()
-{
-	for (ZEInt I = 0; I < 150; I++)
-	{
-		ZEModel* Flower = ZEModel::CreateInstance();
-		Flower->SetModelResource(Flowers[rand() % 2]);
-
-		ZEVector3 TempScale;
-		float RandomFloat;
-		RandomFloat = (float(rand() % 10));
-
-		if (RandomFloat < 3.0f)
-			RandomFloat = 5.0f;
-
-		TempScale.x = RandomFloat;
-		TempScale.y = RandomFloat;
-		TempScale.z = RandomFloat;
-		Flower->SetScale(TempScale);
-
-		ZEVector3 RandomPosition;
-		RandomPosition.x = -50 + rand() % 100;
-		RandomPosition.z = -100 + rand() % 200;
-		RandomPosition.y = 3;
-		Flower->SetPosition(RandomPosition);
-		Scene->AddEntity(Flower);
-	}
-
-	SceneList->Update();
-}
-
-void MapEditor::GenerateRandomTree()
-{
-	for (ZEInt I = 0; I < 150; I++)
-	{
-		ZEModel* Tree = ZEModel::CreateInstance();
-		Tree->SetModelResource(Trees[rand() % 15]);
-		/*ZEQuaternion Temp;
-		ZEQuaternion::CreateFromEuler(Temp, 0, rand() % 360, 0);
-		Tree->SetRotation(Temp);*/
-		ZEVector3 TempScale;
-		float RandomFloat;
-		RandomFloat = float(rand() % 10) / 25.0;
-
-		if (RandomFloat < 0.2f)
-			RandomFloat = 0.2f;
-
-		TempScale.x = RandomFloat;
-		TempScale.y = RandomFloat;
-		TempScale.z = RandomFloat;
-		Tree->SetScale(TempScale);
-
-		ZEVector3 RandomPosition;
-		RandomPosition.x = -50 + rand() % 100;
-		RandomPosition.z = -100 + rand() % 200;
-		RandomPosition.y = 2;
-		Tree->SetPosition(RandomPosition);
-		Scene->AddEntity(Tree);
-	}
-
-	SceneList->Update();
-}
-
-void MapEditor::GenerateRandomBush()
-{
-	for (ZEInt I = 0; I < 150; I++)
-	{
-		ZEModel* Bush = ZEModel::CreateInstance();
-		Bush->SetModelResource(Bushes[rand() % 3]);
-		/*ZEQuaternion Temp;
-		ZEQuaternion::CreateFromEuler(Temp, 0, rand() % 360, 0);
-		Tree->SetRotation(Temp);*/
-		ZEVector3 TempScale;
-		float RandomFloat;
-		RandomFloat = (float(rand() % 4) / 2.0f);
-
-		if (RandomFloat < 1.0f)
-			RandomFloat = 1.2f;
-
-		TempScale.x = RandomFloat;
-		TempScale.y = RandomFloat;
-		TempScale.z = RandomFloat;
-		Bush->SetScale(TempScale);
-
-		ZEVector3 RandomPosition;
-		RandomPosition.x = -50 + rand() % 100;
-		RandomPosition.z = -100 + rand() % 200;
-		RandomPosition.y = 1.8f;
-		Bush->SetPosition(RandomPosition);
-		Scene->AddEntity(Bush);
-	}
-
-	SceneList->Update();
+	QObject::connect(this->ui->GridToogleAction,		SIGNAL(toggled(bool)),		this,					SLOT(ChangeGridVisibility(bool)));
 }
 
 void MapEditor::StartEngine()
@@ -344,7 +263,6 @@ void MapEditor::StartEngine()
 	zeCore->GetWindow()->SetWindowType(ZE_WT_COMPONENT);
 	zeCore->GetWindow()->SetComponentWindowHandle(ui->ViewPort->winId());
 	zeInitialize(GetModuleHandle(NULL), ui->ViewPort->winId());
-	//zeCore->GetGame()->GetScene()->SetVisualDebugElements(ZE_VDE_NONE);
 }
 
 MapEditor::~MapEditor()
@@ -391,6 +309,7 @@ void MapEditor::LoadMapActionTriggered()
 void MapEditor::LoadSceneActionTriggered()
 {
 	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("Load Scene"),QString(this->WorkingDirectory),QString("*.ZESCENE"),0,0);
+	SelectedFilePath.replace("/", "\\");
 
 	if(SelectedFilePath.count() != 0)
 	{
@@ -410,14 +329,23 @@ void MapEditor::LoadSceneActionTriggered()
 void MapEditor::SaveSceneActionTriggered()
 {
 
+	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
+	{
+		delete SelectedItems[I];
+	}
+
+	SelectedItems.Clear();
+	SelectionDirtyFlag = true;
+
 	if(SaveFlag == false)
 	{
 		QString SelectedFilePath = QFileDialog::getSaveFileName(0,QString("Save Scene"),QString(this->WorkingDirectory),QString("*.ZESCENE"),0,0);
 	
 		if(SelectedFilePath.count() != 0)
 		{
+			SelectedFilePath.replace("/", "\\");
 			SelectedFilePath = SelectedFilePath.remove(this->WorkingDirectory);
-			SelectedFilePath = SelectedFilePath.remove(0,1);
+			
 			zeCore->GetGame()->GetScene()->Save((const char*)SelectedFilePath.toLatin1());
 			this->CurrentFileName = SelectedFilePath;
 			SaveFlag = true;
@@ -432,6 +360,14 @@ void MapEditor::SaveSceneActionTriggered()
 
 void MapEditor::SaveSceneAsActionTriggered()
 {
+	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
+	{
+		delete SelectedItems[I];
+	}
+
+	SelectedItems.Clear();
+	SelectionDirtyFlag = true;
+
 	QString SelectedFilePath = QFileDialog::getSaveFileName(0,QString("Save Scene As"),QString(this->WorkingDirectory),QString("*.ZESCENE"),0,0);
 
 	if(SelectedFilePath.count() != 0)
@@ -855,7 +791,9 @@ ZEDSelectionItem* MapEditor::CreateSelectionItem(ZEEntity* Entity)
 			return SelectionItemPlugIns[I]->CreateSelectionItem(((ZEObject*)(Entity)), GizmoMode, Scene);
 	}
 
-	return SelectionItemPlugIns[3]->CreateSelectionItem(((ZEObject*)Entity), GizmoMode, Scene); //Fix hard-coded index
+	//return SelectionItemPlugIns[3]->CreateSelectionItem(((ZEObject*)Entity), GizmoMode, Scene); //Fix hard-coded index
+
+	return new ZEDEntitySelectionItem(Entity, GizmoMode, Scene);
 
 	//return NULL;
 }

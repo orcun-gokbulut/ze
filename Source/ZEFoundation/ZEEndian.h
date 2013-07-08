@@ -64,6 +64,17 @@ class ZEEndian
 			#endif
 		}
 
+		static ZE_FORCE_INLINE ZEUInt8 Little(ZEUInt8 Value)
+		{
+			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
+				return Value;
+			#endif
+
+			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
+				return Value;
+			#endif
+		}
+
 		static ZE_FORCE_INLINE ZEUInt16 Little(ZEUInt16 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
@@ -94,6 +105,17 @@ class ZEEndian
 
 			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
 				return ZESwap::Swap(Value);
+			#endif
+		}
+
+		static ZE_FORCE_INLINE ZEInt8 Little(ZEInt8 Value)
+		{
+			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
+				return Value;
+			#endif
+
+			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
+				return Value;
 			#endif
 		}
 
@@ -130,6 +152,43 @@ class ZEEndian
 			#endif
 		}
 
+		static ZE_FORCE_INLINE float Little(float Value)
+		{
+			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
+				return Value;
+			#endif
+
+			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
+				ZEUInt32 Temp = *(ZEUInt32*)&Value;
+				Temp = ZESwap::Swap((ZEUInt32)Temp);
+				return *(float*)&Temp;
+			#endif
+		}
+
+		static ZE_FORCE_INLINE double Little(double Value)
+		{
+			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
+				return Value;
+			#endif
+
+			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
+				ZEUInt64 Temp = *(ZEUInt64*)&Value;
+				Temp = ZESwap::Swap((ZEUInt64)Temp);
+				return *(double*)&Temp;
+			#endif
+		}
+
+		static ZE_FORCE_INLINE ZEUInt8 Big(ZEUInt8 Value)
+		{
+			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
+				return Value;
+			#endif
+
+			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
+				return Value;
+			#endif
+		}
+
 		static ZE_FORCE_INLINE ZEUInt16 Big(ZEUInt16 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
@@ -163,6 +222,17 @@ class ZEEndian
 			#endif
 		}
 
+		static ZE_FORCE_INLINE ZEInt8 Big(ZEInt8 Value)
+		{
+			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
+				return Value;
+			#endif
+
+			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
+				return Value;
+			#endif
+		}
+
 		static ZE_FORCE_INLINE ZEInt16 Big(ZEInt16 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
@@ -189,6 +259,32 @@ class ZEEndian
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return ZESwap::Swap((ZEUInt64)Value);
+			#endif
+
+			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
+				return Value;
+			#endif
+		}
+
+		static ZE_FORCE_INLINE float Big(float Value)
+		{
+			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
+				ZEUInt32 Temp = *(ZEUInt32*)&Value;
+				Temp = ZESwap::Swap((ZEUInt32)Temp);
+				return *(float*)&Temp;
+			#endif
+
+			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
+				return Value;
+			#endif
+		}
+
+		static ZE_FORCE_INLINE double Big(double Value)
+		{
+			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
+				ZEUInt64 Temp = *(ZEUInt64*)&Value;
+				Temp = ZESwap::Swap((ZEUInt64)Temp);
+				return *(double*)&Temp;
 			#endif
 
 			#ifdef ZE_PLATFORM_ENDIANNESS_BIG

@@ -37,45 +37,38 @@
 #ifndef	__ZE_VIRTUAL_INPUT_MODULE_H__
 #define __ZE_VIRTUAL_INPUT_MODULE_H__
 
-#define ZE_VIRTUAL_INPUT_MAX_INPUT_COUNT	50
-#include "ZEInput\ZEInputModule.h"
+#include "ZEInput/ZEInputDeviceExtension.h"
+#include "ZEInput/ZEInput.h"
 
-class ZEVirtualInputModule: public ZEInputModule 
+class ZEVirtualInputKeyboardDevice;
+class ZEVirtualInputMouseDevice;
+
+class ZEVirtualInputModule : public ZEInputDeviceModule
 {
-	ZE_MODULE(ZEVirtualInputModule)
-
+	ZE_EXTENSION(ZEVirtualInputModule)
 	private:
-		bool							Enabled;
+		static ZEVirtualInputModule*		Instance;
+		ZEVirtualInputMouseDevice*			MouseDevice;
+		ZEVirtualInputKeyboardDevice*		KeyboardDevice;
 
-		ZEInputEvent					VirtualInputEvents[ZE_VIRTUAL_INPUT_MAX_INPUT_COUNT];
-		unsigned int					VirtualInputAxisValues[ZE_VIRTUAL_INPUT_MAX_INPUT_COUNT];
-		size_t							VirtualInputEventCount;
+	protected:
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
 
-										ZEVirtualInputModule();
-	public:
-		virtual ZEModuleDescription*	GetModuleDescription();
+	public:	
+		void								MoveMouse(ZEInt X, ZEInt Y, ZEInt Wheel);
 
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
+		void								SetKeyboardKeyState(ZEUInt Index, bool State);
+		bool								GetKeyboardKeyState(ZEUInt Index);
 
-		virtual bool					GetEnabled();
-		virtual void					SetEnabled(bool Enabled);
+		void								SetMouseKeyState(ZEUInt Index, bool Pressed);
+		bool								GetMouseKeyState(ZEUInt Index);
 
-		virtual void					ProcessInputs();
-		virtual void					ProcessInputMap(ZEInputMap* InputMap);
+		virtual void						Process();
 
-		virtual void					Acquire();
-		virtual void					UnAcquire();
+											ZEVirtualInputModule();
 
-		virtual void					GetInputEventName(char* Name, size_t MaxSize);
-		virtual void					GetInputEventShortName(char* ShortName, size_t MaxSize);
-		virtual bool					GetRawInputEvent(ZEInputEvent& InputEvent);
-
-		void							ClearInputEvents();
-		void							PushInputEvent(ZEInputEvent& InputEvent, unsigned int AxisValue = 0);
-		void							MoveMouse(int X, int Y, int Z);
-		void							ClickMouse(bool LeftButton, bool RightButton, bool MiddleButton);
-		void							PressKey(unsigned char ButtonId);
-		void							ReleaseKey(unsigned char ButtonId);
+		static ZEVirtualInputModule*		GetInstance();
 };
+
 #endif

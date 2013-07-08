@@ -40,6 +40,7 @@
 #define ZEModelMeshAttributesAdd_Action_ID 900
 #define ZEModelBoneAttributesAdd_Action_ID 910
 #define ZEModelPhysicalBodyAttributesAdd_Action_ID 920
+#define ZEModelBoundingBoxAttributesAdd_Action_ID 930
 
 
 #include <Max.h>
@@ -122,6 +123,32 @@ class ZE3dsMaxModelActionAddPhysicalBodyAttributes : public ActionItem
 		void				DeleteThis();
 
 							ZE3dsMaxModelActionAddPhysicalBodyAttributes();
+};
+
+class ZE3dsMaxModelActionAddBoundingBoxAttributes : public ActionItem
+{
+private:
+
+	MaxBmpFileIcon*		BoundingBoxActionIcon;
+
+public:
+	int					GetId();
+	BOOL				ExecuteAction();
+
+	void				GetButtonText(MSTR& buttonText);
+	void				GetMenuText(MSTR& menuText);
+	void				GetDescriptionText(MSTR& descText);
+	void				GetCategoryText(MSTR& catText);
+
+	BOOL				IsChecked();
+	BOOL				IsItemVisible();
+	BOOL				IsEnabled();
+
+	MaxIcon*			GetIcon();
+
+	void				DeleteThis();
+
+						ZE3dsMaxModelActionAddBoundingBoxAttributes();
 };
 
 #endif

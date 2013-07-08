@@ -49,6 +49,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <string.h>
+#include "ZEFile/ZEPathUtils.h"
 
 
 static ZEString ConstructResourcePath(const ZEString& Path)
@@ -126,6 +127,7 @@ ZETexture2DResource::~ZETexture2DResource()
 ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {	
 	ZEString NewPath = ConstructResourcePath(FileName);
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
 	ZETexture2DResource* NewResource =(ZETexture2DResource*)zeResources->GetResource(NewPath.GetValue());
 	if(NewResource == NULL)
@@ -158,6 +160,8 @@ void ZETexture2DResource::CacheResource(const ZEString& FileName, const ZETextur
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
+
 	ZETexture2DResource* NewResource = (ZETexture2DResource*)zeResources->GetResource(NewPath.GetValue());
 	if (NewResource == NULL)
 	{
@@ -181,6 +185,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName,
 	
 	bool Result;
 	ZEFile File;
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
 	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if(Result)

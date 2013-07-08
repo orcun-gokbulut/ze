@@ -41,6 +41,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZESceneCuller.h"
 #include "ZEDrawParameters.h"
+#include "ZERayCast.h"
 
 class ZEEntity;
 class ZECamera;
@@ -96,8 +97,11 @@ class ZEScene
 		void							SetActiveCamera(ZECamera* Camera);
 		ZECamera*						GetActiveCamera();
 
-		void							SetActiveListener(ZEListener* Listener);
-		ZEListener*						GetActiveListener();
+		void									SetEnabled(bool Enabled);
+		bool									GetEnabled() const;
+
+		ZESceneCuller&							GetSceneCuller();
+		const ZESceneStatistics&				GetStatistics() const;
 
 		bool							Save(const ZEString& FileName);
 		bool							Load(const ZEString& FileName);
@@ -108,6 +112,7 @@ class ZEScene
 
 		void							Tick(float ElapsedTime);
 		void							Render(float ElapsedTime);
+		bool									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 										ZEScene();
 		virtual							~ZEScene();

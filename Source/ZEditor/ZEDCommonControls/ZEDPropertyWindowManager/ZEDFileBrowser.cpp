@@ -102,10 +102,11 @@ void ZEDFileBrowser::ShowFileBrowser()
 	//const QString Extention(ClassAttribute->FileExtensionFilter);
 
 	FileName = QFileDialog::getOpenFileName(this->FileButton, QString(), QString()/*,"*." + Extention,0,0*/);
+	FileName.replace("/", "\\");
 
 	if(FileName.count() != 0)
 	{
-		FileName = FileName.remove(WorkingDirectory);
+		FileName = FileName.remove(WorkingDirectory, Qt::CaseInsensitive);
 		this->LineEdit->setText(FileName);
 		this->Changed();	
 	}

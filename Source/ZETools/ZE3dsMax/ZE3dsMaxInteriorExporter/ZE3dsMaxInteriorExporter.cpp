@@ -241,7 +241,7 @@ bool ZE3dsMaxInteriorExporter::ShowOptionsDialog(HWND ParentWindow)
 	return true;
 }
 
-bool ZE3dsMaxInteriorExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath)
+bool ZE3dsMaxInteriorExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath, ZEString ExportPath)
 {
 	int Argc = 0;
 	if(QApplication::instance() == NULL)
@@ -255,6 +255,7 @@ bool ZE3dsMaxInteriorExporter::ShowResourceConfigurationDialog(HWND ParentWindow
 	if(ResourceConfigurationDialog == NULL)
 		ResourceConfigurationDialog = new ZEResourceConfigurationWidget(WinWidget);
 
+	ResourceConfigurationDialog->SetDefaultExportPath(ExportPath);
 	ResourceConfigurationDialog->LoadPreset(ZEString(MaxFilePath) + ".ZEPRESET");
 	CollectResources();
 
@@ -283,7 +284,7 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 	if(!ShowOptionsDialog(i->GetMAXHWnd()))
 		return true;
 
-	if(!ShowResourceConfigurationDialog(i->GetMAXHWnd(), i->GetCurFilePath()))
+	if(!ShowResourceConfigurationDialog(i->GetMAXHWnd(), i->GetCurFilePath(), ExportPath))
 		return true;
 
 	SaveOptions(i->GetCurFilePath());

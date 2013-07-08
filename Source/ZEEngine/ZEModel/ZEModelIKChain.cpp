@@ -104,7 +104,7 @@ void ZEModelIKChain::Process()
 
 	for (ZEUInt I = 0; I < MaxIterationCount; I++)
 	{	
-		if (ZEVector3::LengthSquare(Nodes[Nodes.GetCount() - 1].Bone->GetLocalPosition() - EffectorPosition) < ErrorThreshold * ErrorThreshold)
+		if (ZEVector3::LengthSquare(Nodes[Nodes.GetCount() - 1].Bone->GetModelPosition() - EffectorPosition) < ErrorThreshold * ErrorThreshold)
 			return;
 		Iterate();
 
@@ -123,11 +123,11 @@ void ZEModelIKChain::Iterate()
 		if (CurrentNode.EnabledRotation)
 		{
 			// Calculate Effector Direction
-			ZEVector3 EffectorDirection = EffectorPosition - CurrentNode.Bone->GetLocalPosition();
+			ZEVector3 EffectorDirection = EffectorPosition - CurrentNode.Bone->GetModelPosition();
 			EffectorDirection.NormalizeSelf();
 
 			// Calculate Knob Direction
-			ZEVector3 KnobDirection = Knob->GetLocalPosition() - CurrentNode.Bone->GetLocalPosition();
+			ZEVector3 KnobDirection = Knob->GetModelPosition() - CurrentNode.Bone->GetModelPosition();
 			KnobDirection.NormalizeSelf();
 
 			// Calculate Normal
@@ -156,17 +156,17 @@ void ZEModelIKChain::Iterate()
 
 			ZEQuaternion Rotation = ZEQuaternion(Angle, Normal); //Local Space
 
-			Rotation *= CurrentNode.Bone->GetLocalRotation();
+			Rotation *= CurrentNode.Bone->GetModelRotation();
 			Rotation.NormalizeSelf();
-			CurrentNode.Bone->SetLocalRotation(Rotation);
+			CurrentNode.Bone->SetModelRotation(Rotation);
 			
 			// Limit Angles
 			if (CurrentNode.LimitRotation)
 			{
 				ZEVector3 Angles;			
-				ZEQuaternion::ConvertToEulerAngles(Angles, CurrentNode.Bone->GetRelativeRotation());
+				ZEQuaternion::ConvertToEulerAngles(Angles, CurrentNode.Bone->GetRotation());
 				ZEQuaternion::CreateFromEuler(Rotation, Angles.Clamp(CurrentNode.MinRotationAngle, CurrentNode.MaxRotationAngle));
-				CurrentNode.Bone->SetRelativeRotation(Rotation);
+				CurrentNode.Bone->SetRotation(Rotation);
 			}
 		}
 	}

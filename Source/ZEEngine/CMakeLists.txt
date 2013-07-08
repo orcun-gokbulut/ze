@@ -61,6 +61,7 @@ add_subdirectory(ZEScript)
 add_subdirectory(ZESound)
 add_subdirectory(ZEUI)
 add_subdirectory(ZETerrain)
+add_subdirectory(ZETerrain2)
 add_subdirectory(ZENetwork)
 
 ze_add_source(ZEAPI.h 						Sources Headers)

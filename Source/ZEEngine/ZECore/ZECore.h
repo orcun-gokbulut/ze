@@ -85,6 +85,7 @@ class ZESystemMessageHandler;
 class ZERealTimeClock;
 class ZEProfiler;
 class ZETimerManager;
+class ZECrashHandler;
 
 class ZECore
 {
@@ -100,6 +101,7 @@ class ZECore
 		ZERealTimeClock*				RealTimeClock;
 		ZEProfiler*						Profiler;
 
+		ZECrashHandler*					CrashHandler;
 		ZEModuleManager*				ModuleManager;
 		ZEExtensionManager*				ExtensionManager;
 		ZEPluginManager*				PluginManager;
@@ -144,6 +146,7 @@ class ZECore
 		ZETimerManager*					GetTimerManager();
 		ZERealTimeClock*				GetRealTimeClock();
 		ZEProfiler*						GetProfiler();
+		ZECrashHandler*					GetCrashHandler();
 
 		void							SetResourceDirector(const char* Directory);
 		const char*						GetResourceDirectory();

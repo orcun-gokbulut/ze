@@ -34,157 +34,97 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
-#include "ZECore\ZEConsole.h"
 #include "ZEVirtualInputModule.h"
+#include "ZEVirtualInputMouseDevice.h"
+#include "ZEVirtualInputKeyboardDevice.h"
 
-ZE_MODULE_DESCRIPTION(ZEVirtualInputModule, ZEInputModule, NULL)
+ZE_EXTENSION_DESCRIPTION(ZEVirtualInputModule, ZEInputDeviceModule, NULL)
 
-ZEModuleDescription* ZEVirtualInputModule::GetModuleDescription()
-{
-	static ZEVirtualInputModuleDescription Desc;
-	return &Desc;
-}
+ZEVirtualInputModule* ZEVirtualInputModule::Instance = NULL;
 
-bool ZEVirtualInputModule::Initialize()
-{
-	zeLog("Initializing Virtual Input module.");
-	Enabled = true;
-	zeLog("Virtual Input module initialized.");
+bool ZEVirtualInputModule::InitializeSelf()
+{	
+	zeLog("Initializing Virtual Input.");
+
+	if (!ZEInputDeviceModule::InitializeSelf())
+		return false;
+
+	if (MouseDevice == NULL)
+	{
+		MouseDevice = new ZEVirtualInputMouseDevice();
+		RegisterDevice(MouseDevice);
+	}
+	
+	if (KeyboardDevice == NULL)
+	{
+		KeyboardDevice = new ZEVirtualInputKeyboardDevice();
+		RegisterDevice(KeyboardDevice);
+	}
+
 	return true;
 }
 
-void ZEVirtualInputModule::Deinitialize()
+bool ZEVirtualInputModule::DeinitializeSelf()
 {
-	zeLog("Virtual Input module destroyed.");
+	KeyboardDevice->Deinitialize();
+	MouseDevice->Deinitialize();
+
+	return ZEInputDeviceModule::DeinitializeSelf();
 }
 
-bool ZEVirtualInputModule::GetEnabled()
+void ZEVirtualInputModule::MoveMouse(ZEInt X, ZEInt Y, ZEInt Z)
 {
-	return Enabled;
+	MouseDevice->State.Axises.CurrentValues[0] = X;
+	MouseDevice->State.Axises.CurrentValues[1] = X;
+	MouseDevice->State.Axises.CurrentValues[2] = X;
 }
 
-void ZEVirtualInputModule::SetEnabled(bool Enabled)
+void ZEVirtualInputModule::SetKeyboardKeyState(ZEUInt Index, bool Pressed)
 {
-	this->Enabled = Enabled;
-}
-
-void ZEVirtualInputModule::ProcessInputs()
-{
-	ClearInputEvents();
-}
-
-void ZEVirtualInputModule::ProcessInputMap(ZEInputMap* InputMap)
-{
-	InputMap->InputActionCount = 0;
-	for (size_t I = 0; I < VirtualInputEventCount; I++)
-	{
-		ZEInputEvent* CurrentEvent = &VirtualInputEvents[I];
-		for (size_t N = 0; N < InputMap->InputBindings.GetCount(); N++)
-		{
-			ZEInputEvent* BindingEvent = &InputMap->InputBindings[N].Event;
-			if (CurrentEvent->DeviceType == BindingEvent->DeviceType
-				&& CurrentEvent->DeviceIndex == BindingEvent->DeviceIndex)
-			{
-				if (BindingEvent->InputType == ZE_IT_AXIS)
-				{
-					if(CurrentEvent->AxisId == BindingEvent->AxisId && CurrentEvent->AxisSign == BindingEvent->AxisSign)
-					{
-						InputMap->InputActions[InputMap->InputActionCount].Id = InputMap->InputBindings[N].ActionId;
-						InputMap->InputActions[InputMap->InputActionCount].From = &InputMap->InputBindings[N];
-						InputMap->InputActions[InputMap->InputActionCount].AxisValue = VirtualInputAxisValues[I];					
-						InputMap->InputActionCount++;
-					}
-				}
-				else
-				{
-					if(CurrentEvent->ButtonId == BindingEvent->ButtonId && (CurrentEvent->ButtonState == BindingEvent->ButtonState || BindingEvent->ButtonState != ZE_IBS_ALL))
-					{
-						InputMap->InputActions[InputMap->InputActionCount].Id = InputMap->InputBindings[N].ActionId;
-						InputMap->InputActions[InputMap->InputActionCount].From = &InputMap->InputBindings[N];
-						InputMap->InputActions[InputMap->InputActionCount].ButtonState = CurrentEvent->ButtonState;					
-						InputMap->InputActionCount++;
-					}
-				}
-			}
-		}
-
-	}
-}
-
-void ZEVirtualInputModule::Acquire()
-{
-	zeNotice("Virtual input acquired.");
-}
-
-void ZEVirtualInputModule::UnAcquire()
-{
-	zeNotice("Virtual input unacquired.");
-}
-
-void ZEVirtualInputModule::GetInputEventName(char* Name, size_t MaxSize)
-{
-	strncpy(Name, "DUM", MaxSize);
-}
-
-void ZEVirtualInputModule::GetInputEventShortName(char* ShortName, size_t MaxSize)
-{
-	strncpy(ShortName, "Virtual Input", MaxSize);
-}
-
-bool ZEVirtualInputModule::GetRawInputEvent(ZEInputEvent& InputEvent)
-{
-	return false;
-}
-
-void ZEVirtualInputModule::ClearInputEvents()
-{
-	VirtualInputEventCount = 0;
-}
-
-void ZEVirtualInputModule::PushInputEvent(ZEInputEvent& InputEvent, unsigned int AxisValue)
-{
-	if (VirtualInputEventCount > ZE_VIRTUAL_INPUT_MAX_INPUT_COUNT)
+	if (Index >= KeyboardDevice->Description.ButtonCount)
 		return;
-	VirtualInputEvents[VirtualInputEventCount] = InputEvent;
-	VirtualInputAxisValues[VirtualInputEventCount] = AxisValue;
-	VirtualInputEventCount++;
+
+	KeyboardDevice->State.Buttons.CurrentValues[Index] = Pressed;
 }
 
-void ZEVirtualInputModule::MoveMouse(int X, int Y, int Z)
+bool ZEVirtualInputModule::GetKeyboardKeyState(ZEUInt Index)
 {
-	if (X != 0)
-		PushInputEvent(ZEInputEvent(ZE_IDT_MOUSE, 0, 0, (X > 0 ? ZE_IAS_POSITIVE : ZE_IAS_NEGATIVE)), abs(X));
+	if (Index >= KeyboardDevice->Description.ButtonCount)
+		return false;
 
-	if (Y != 0)
-		PushInputEvent(ZEInputEvent(ZE_IDT_MOUSE, 0, 1, (Y > 0 ? ZE_IAS_POSITIVE : ZE_IAS_NEGATIVE)), abs(Y));
-
-	if (Z != 0)
-		PushInputEvent(ZEInputEvent(ZE_IDT_MOUSE, 0, 2, (Z > 0 ? ZE_IAS_POSITIVE : ZE_IAS_NEGATIVE)), abs(Z));
+	return KeyboardDevice->State.Buttons.CurrentValues[Index];
 }
 
-void ZEVirtualInputModule::ClickMouse(bool LeftButton, bool RightButton, bool MiddleButton)
+void ZEVirtualInputModule::SetMouseKeyState(ZEUInt Index, bool Pressed)
 {
-	if (LeftButton)
-		PushInputEvent(ZEInputEvent(ZE_IDT_MOUSE, 0, 0, ZE_IBS_PRESSED));
-	
-	if (RightButton)
-		PushInputEvent(ZEInputEvent(ZE_IDT_MOUSE, 0, 1, ZE_IBS_PRESSED));
+	if (Index >= MouseDevice->Description.ButtonCount)
+		return;
 
-	if (MiddleButton)
-		PushInputEvent(ZEInputEvent(ZE_IDT_MOUSE, 0, 2, ZE_IBS_PRESSED));
+	MouseDevice->State.Buttons.CurrentValues[Index] = Pressed;
 }
 
-void ZEVirtualInputModule::PressKey(unsigned char ButtonId)
+bool ZEVirtualInputModule::GetMouseKeyState(ZEUInt Index)
 {
-	PushInputEvent(ZEInputEvent(ZE_IDT_KEYBOARD, 0, ButtonId, ZE_IBS_PRESSED));
+	if (Index >= MouseDevice->Description.ButtonCount)
+		return false;
+
+	return MouseDevice->State.Buttons.CurrentValues[Index];
 }
 
-void ZEVirtualInputModule::ReleaseKey(unsigned char ButtonId)
+void ZEVirtualInputModule::Process()
 {
-	PushInputEvent(ZEInputEvent(ZE_IDT_KEYBOARD, 0, ButtonId, ZE_IBS_RELEASED));
+	KeyboardDevice->State.Advance();
+	MouseDevice->State.Advance();
 }
 
 ZEVirtualInputModule::ZEVirtualInputModule()
 {
-	VirtualInputEventCount = 0;
+	Instance = this;
+	MouseDevice = NULL;
+	KeyboardDevice = NULL;
+}
+
+ZEVirtualInputModule* ZEVirtualInputModule::GetInstance()
+{
+	return Instance;
 }

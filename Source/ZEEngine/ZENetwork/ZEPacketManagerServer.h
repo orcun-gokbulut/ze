@@ -42,39 +42,32 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEConnection.h"
 #include "ZEDS/ZEDelegate.h"
+#include "ZEPacking.h"
 
-#define ZE_MAX_PACKET_SIZE 0xFFFF
-#define ZE_COMMAND_PACKET_HEADER_IDENTIFIER "ZE_C_P_H_I"
+#define ZE_MAX_PACKET_SIZE 0x0400
+#define ZE_COMMAND_PACKET_HEADER_IDENTIFIER 0xFFFFFFFF
 
-class ZESocketTCP;
-class ZESerialPort;
-class ZESocketTCPListener;
 
+ZEPackStruct4(
 struct ZEPacketHeader
 {
-	char	 Identifier[10];
-	ZEInt16	 CommandId;
+	ZEUInt32 Identifier;
+	ZEUInt16 CommandId;
 	ZEUInt16 DataSize;
-};
+});
 
 class ZEPacketManagerServer
 {
 	private:
 
-		ZEArray<ZEConnection*>		Connections;
 		ZEArray<ZEPacketHandler*>	Handlers;
 
 	public:
 
-		void						Process(float ElapsedTime);
+		void						Process(float ElapsedTime, ZEArray<ZEConnection*>& Connections);
 
 		bool						RegisterHander(ZEPacketHandler* Handler);
 		bool						UnRegisterHandler(ZEPacketHandler* Handler);
-
-		bool						AddConnection(ZEConnection* Connection);
-		bool						RemoveConnection(ZEConnection* Connection);
-
-		const ZEArray<ZEConnection*>* GetConnections();
 
 									ZEPacketManagerServer();
 									~ZEPacketManagerServer();

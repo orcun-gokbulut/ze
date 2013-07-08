@@ -37,25 +37,38 @@
 #ifndef	__ZE_SERVER_H__
 #define __ZE_SERVER_H__
 
+#include "ZEDS/ZEArray.h"
 #include "ZEPacketManagerServer.h"
+
+#define zeServer ZEServer::GetInstance()
+
+class ZESocketTCPListener;
 
 class ZEServer
 {
 	private:
 
-		ZESocketTCPListener*	Listener;
-		ZEPacketManagerServer	PacketManager;
+		ZESocketTCPListener*			Listener;
+		ZEPacketManagerServer			PacketManager;
+		ZEArray<ZEConnection*>			Connections;
 
-		void					AcceptConnections();
+		void							AcceptConnections();
+
+
 
 	public:
 
-		const ZEPacketManagerServer*	GetPacketManager();
+		bool							AddConnection(ZEConnection* Connection);
+		bool							RemoveConnection(ZEConnection* Connection);
+
+		ZEPacketManagerServer*			GetPacketManager();
 
 		void							Process(float ElapsedTime);
 
+		bool							SendPacket(ZEUInt16 PacketId, void* Data, ZESize DataSize, ZEConnection* Connection);
 		bool							SendData(void* Data, ZESize DataSize, ZEConnection* Connection);
 		void							BroadCast(void* Data, ZESize DataSize);
+		void							BroadCastPacket(ZEUInt16 PacketId, void* Data, ZESize DataSize);
 
 										ZEServer();
 										~ZEServer();

@@ -67,7 +67,7 @@ ZETestSuite(ZEFormatArgument)
 		ZETestCheck(String == "048567");
 	}
 
-	ZETest("bool Format(ZEStringWriter& Output, ZEInt64 Argument, const char* ArgumentFormat)")
+	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt64 Argument, const char* ArgumentFormat)")
 	{
 		ZEInt64 Argument = 987654321;
 		ZEString String;
@@ -98,19 +98,18 @@ ZETestSuite(ZEFormatArgument)
 		float ArgumentPos = 10.236;
 		float ArgumentNeg = -10.236;
 		ZEString String;
-		ZEStringWriter Output1;
-		ZEStringWriter Output2;
+		ZEStringWriter Output;
 
-		bool Result = ZEFormatArgument::Format(Output1, ArgumentPos, "5.");
+		bool Result = ZEFormatArgument::Format(Output, ArgumentPos, "5.");
 		ZETestCheck(Result);
-		Output1.AppendEnd();
-		Output1.Output(String);
+		Output.AppendEnd();
+		Output.Output(String);
 		ZETestCheck(String == "   10");
 
-		Result = ZEFormatArgument::Format(Output2, ArgumentNeg, "5.");
+		Result = ZEFormatArgument::Format(Output, ArgumentNeg, "5.");
 		ZETestCheck(Result);
-		Output2.AppendEnd();
-		Output2.Output(String);
+		Output.AppendEnd();
+		Output.Output(String);
 		ZETestCheck(String == "  -10");
 	}
 
@@ -141,11 +140,10 @@ ZETestSuite(ZEFormatArgument)
 
 		ZETestCase("ArgumentFormat ':' ")
 		{
-			ZEStringWriter Output1;
-			Result = ZEFormatArgument::Format(Output1, Argument, ":");
+			Result = ZEFormatArgument::Format(Output, Argument, ":");
 			ZETestCheck(Result);
-			Output1.AppendEnd();
-			Output1.Output(String);
+			Output.AppendEnd();
+			Output.Output(String);
 			ZETestCheck(String == "<3.800, -5.700>");
 		}
 	}
@@ -240,6 +238,7 @@ ZETestSuite(ZEFormatArgument)
 
 	ZETest("bool ZEFormatArgument::FormatVariant(ZEStringWriter& Output, const ZEVariant& Argument, const char* ArgumentFormat)")
 	{
+		ZEStringWriter Output;
 		ZEVariant Argument;
 		ZEString String;
 		bool Result;
@@ -247,7 +246,7 @@ ZETestSuite(ZEFormatArgument)
 		ZETestCase("for ZE_VRT_FLOAT")
 		{
 			Argument.SetFloat(3.7f);
-			ZEStringWriter Output;
+			
 			Result = ZEFormatArgument::FormatVariant(Output, Argument, "-+7.3");
 			ZETestCheck(Result);
 			Output.AppendEnd();
@@ -258,7 +257,7 @@ ZETestSuite(ZEFormatArgument)
 		ZETestCase("for ZE_VRT_DOUBLE")
 		{
 			Argument.SetDouble(3.7);
-			ZEStringWriter Output;
+
 			Result = ZEFormatArgument::FormatVariant(Output, Argument, "+.");
 			ZETestCheck(Result);
 			Output.AppendEnd();
@@ -269,7 +268,7 @@ ZETestSuite(ZEFormatArgument)
 		ZETestCase("Invalid ArgumentFormat for ZE_VRT_INTEGER_64")
 		{
 			Argument.SetInt64(6824610);
-			ZEStringWriter Output;
+
 			Result = ZEFormatArgument::FormatVariant(Output, Argument, "10");
 			ZETestCheck(!Result);
 			Output.AppendEnd();
@@ -280,7 +279,7 @@ ZETestSuite(ZEFormatArgument)
 		ZETestCase("Invalid ArgumentFormat for ZE_VRT_VECTOR2")
 		{
 			Argument.SetVector2(ZEVector2(5.82, 11.3));
-			ZEStringWriter Output;
+
 			Result = ZEFormatArgument::FormatVariant(Output, Argument, "05d");
 			ZETestCheck(!Result);
 			Output.AppendEnd();

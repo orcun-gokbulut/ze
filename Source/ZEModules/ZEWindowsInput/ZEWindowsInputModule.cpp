@@ -87,13 +87,17 @@ bool ZEWindowsInputModule::InitializeSelf()
 		return false;
 	}
 
-	MouseDevice = new ZEWindowsInputMouseDevice();
-	MouseDevice->Initialize();
-	RegisterDevice(MouseDevice);
+	if (MouseDevice == NULL)
+	{
+		MouseDevice = new ZEWindowsInputMouseDevice();
+		RegisterDevice(MouseDevice);
+	}
 	
-	KeyboardDevice = new ZEWindowsInputKeyboardDevice();
-	KeyboardDevice->Initialize();
-	RegisterDevice(KeyboardDevice);
+	if (KeyboardDevice == NULL)
+	{
+		KeyboardDevice = new ZEWindowsInputKeyboardDevice();
+		RegisterDevice(KeyboardDevice);
+	}
 
 	MessageHandler.Module = this;
 	MessageHandler.Register();
@@ -103,6 +107,8 @@ bool ZEWindowsInputModule::InitializeSelf()
 
 bool ZEWindowsInputModule::DeinitializeSelf()
 {
+	KeyboardDevice->Deinitialize();
+	MouseDevice->Deinitialize();
 	MessageHandler.Unregister();
 
 	return ZEInputDeviceModule::DeinitializeSelf();
@@ -128,5 +134,7 @@ void ZEWindowsInputModule::Process()
 
 ZEWindowsInputModule::ZEWindowsInputModule()
 {
+	MouseDevice = NULL;
+	KeyboardDevice = NULL;
 	RawInputCount = 0;
 }
