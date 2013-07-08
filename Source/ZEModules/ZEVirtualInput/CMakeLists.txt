@@ -33,10 +33,14 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
+ze_add_source(ZEVirtualInputKeyboardDevice.cpp		Sources)
+ze_add_source(ZEVirtualInputKeyboardDevice.h		Sources)
+ze_add_source(ZEVirtualInputMouseDevice.cpp			Sources)
+ze_add_source(ZEVirtualInputMouseDevice.h			Sources)
 ze_add_source(ZEVirtualInputModule.cpp				Sources)
-ze_add_source(ZEVirtualInputModule.h				Sources ZESDK)
+ze_add_source(ZEVirtualInputModule.h				Sources)
 
 ze_add_library(ZEVirtualInput 
 	SOURCES ${Sources})

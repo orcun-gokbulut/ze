@@ -47,10 +47,14 @@ class ZEDirectionalLight;
 class ZESkyBrush;	
 class ZESkyDome;			
 class ZECloud;		
-class ZEMoon;				
+class ZEMoon;	
+
+ZE_META_ENTITY_DESCRIPTION(ZEWeather)
 
 class ZEWeather : public ZEEntity
 {
+	ZE_META_ENTITY(ZEModel)
+
 	protected:
 
 		ZEMoon*						Moon;
@@ -115,6 +119,12 @@ class ZEWeather : public ZEEntity
 
 		void						SetSunDirection(const ZEVector3& Value);
 		const ZEVector3&			GetSunDirection() const;
+
+		void						SetSunCastsShadows(bool Value);
+		bool						GetSunCastsShadows() const;
+
+		void						SetMoonCastsShadows(bool Value);
+		bool						GetMoonCastsShadows() const;
 		
 		void						SetMoonDirection(const ZEVector3& Value);
 		const ZEVector3&			GetMoonDirection() const;
@@ -133,6 +143,26 @@ class ZEWeather : public ZEEntity
 		static ZEWeather*			CreateInstance();
 };
 
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta>
+		<class name="ZEWeather" parent="ZEEntity" description="Weather">
+			<property name="SunDirection" type="ZEVector3" autogetset="true" description="Sun's Direction"/>
+			<property name="MoonDirection" type="ZEVector3" autogetset="true" description="Moon's Direction"/>
+			<property name="SunLightIntensity" type="float" autogetset="true" description="Sun Light's Intensity"/>
+			<property name="MoonLightIntensity" type="float" autogetset="true" description="Moon  Light's Intensity"/>
+			<property name="MoonPhase" type="float" autogetset="true" description="Moon's Phase"/>
+			<property name="FogFactor" type="float" autogetset="true" description="Fog Density"/>
+			<property name="CloudCover" type="float" autogetset="true" description="Cloud Cover"/>
+			<property name="SunCastsShadows" type="boolean" autogetset="true" description="Sun shadow casting option"/>
+			<property name="MoonCastsShadows" type="boolean" autogetset="true" description="Moon shadow casting option"/>
+			<property name="SunLightColor" type="ZEVector3" autogetset="true" description="Sun Light's Color" semantic="ZE_PS_COLOR"/>
+			<property name="MoonLightColor" type="ZEVector3" autogetset="true" description="Moon Light's Color" semantic="ZE_PS_COLOR"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 
 #endif // __ZE_WEATHER_H__

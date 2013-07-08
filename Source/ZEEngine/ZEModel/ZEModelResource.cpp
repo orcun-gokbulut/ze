@@ -389,12 +389,13 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Mesh")
 			continue;
 
-		ZEVariant NameValue, PositionValue, RotationValue, ScaleValue, IsVisibleValue, IsSkinnedValue, UserDefinedPropertiesValue;
+		ZEVariant NameValue, ParentMeshValue, PositionValue, RotationValue, ScaleValue, IsVisibleValue, IsSkinnedValue, UserDefinedPropertiesValue;
 		ZEMLSerialPointer BoundingBoxNodePointer, PhysicalBodyNodePointer, LODsNodePointer;
 
 		ZEMLSerialListItem MeshList[] = 
 		{
 			ZEML_LIST_PROPERTY("Name",						NameValue,						ZE_VRT_STRING,		true),
+			ZEML_LIST_PROPERTY("ParentMesh",				ParentMeshValue,				ZE_VRT_INTEGER_32,	false),
 			ZEML_LIST_NODE("BoundingBox",					BoundingBoxNodePointer,								true),
 			ZEML_LIST_PROPERTY("Position",					PositionValue,					ZE_VRT_VECTOR3,		true),
 			ZEML_LIST_PROPERTY("Rotation",					RotationValue,					ZE_VRT_QUATERNION,	true),
@@ -406,12 +407,18 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 			ZEML_LIST_NODE("LODs",							LODsNodePointer,									true)
 		};
 
-		if (!NodeReader->ReadPropertyList(MeshList, 10))
+		if (!NodeReader->ReadPropertyList(MeshList, 11))
 			return false;
 
 		ZEModelResourceMesh* Mesh = Meshes.Add();
 
 		strncpy(Mesh->Name, NameValue.GetString(), ZE_MDLF_MAX_NAME_SIZE);
+
+		if (ParentMeshValue.GetType() == ZE_VRT_INTEGER_32)
+			Mesh->ParentMesh = ParentMeshValue;
+		else
+			Mesh->ParentMesh = -1;
+
 		Mesh->Position = PositionValue;
 		Mesh->Rotation = RotationValue;
 		Mesh->Scale = ScaleValue;
@@ -718,17 +725,17 @@ bool ZEModelResource::ReadPhysicalJoint(ZEModelResourcePhysicalJoint* Joint, ZEM
 
 void ZEModelResource::ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId)
 {
-	ZEMatrix4x4::CreateOrientation(Bone->RelativeTransform, Bone->RelativePosition, Bone->RelativeRotation, Bone->RelativeScale);
+	ZEMatrix4x4::CreateOrientation(Bone->LocalTransform, Bone->Position, Bone->Rotation, Bone->Scale);
 
 	if (Bone->ParentBone != -1)
 	{
 
-		ZEMatrix4x4::Multiply(Bone->ForwardTransform, Bones[(ZESize)Bone->ParentBone].ForwardTransform, Bone->RelativeTransform);
+		ZEMatrix4x4::Multiply(Bone->ForwardTransform, Bones[(ZESize)Bone->ParentBone].ForwardTransform, Bone->LocalTransform);
 		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
 	}
 	else
 	{
-		Bone->ForwardTransform = Bone->RelativeTransform;
+		Bone->ForwardTransform = Bone->LocalTransform;
 		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
 	}
 
@@ -779,9 +786,9 @@ bool ZEModelResource::ReadBones(ZEMLSerialReader* NodeReader)
 
 		strncpy(Bone->Name, NameValue.GetString(), ZE_MDLF_MAX_NAME_SIZE);
 		Bone->ParentBone = ParentBoneValue;
-		Bone->RelativePosition = RelativePositionValue;
-		Bone->RelativeRotation = RelativeRotationValue;
-		Bone->RelativeScale = RelativeScaleValue;
+		Bone->Position = RelativePositionValue;
+		Bone->Rotation = RelativeRotationValue;
+		Bone->Scale = RelativeScaleValue;
 
 		if (UserDefinedPropertiesValue.GetType() == ZE_VRT_STRING)
 			Bone->UserDefinedProperties = UserDefinedPropertiesValue.GetString();
@@ -948,7 +955,7 @@ bool ZEModelResource::ReadAnimations(ZEMLSerialReader* NodeReader)
 			CurrentAnimationFrame->MeshKeys.SetCount(MeshKeyCount);
 
 			if (MeshKeyCount != 0)
-				NodeReader->GetData(CurrentAnimationFrame->MeshKeys.GetCArray(), MeshKeyCount * sizeof(ZEModelResourceAnimationKey), (I * (FrameKeyCount + BoneKeyCount)) * sizeof(ZEModelResourceAnimationKey));
+				NodeReader->GetData(CurrentAnimationFrame->MeshKeys.GetCArray(), MeshKeyCount * sizeof(ZEModelResourceAnimationKey), (I * FrameKeyCount) * sizeof(ZEModelResourceAnimationKey) + BoneKeyCount * sizeof(ZEModelResourceAnimationKey));
 		}
 
 	}
@@ -969,19 +976,44 @@ bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
 	if (NodeReader.GetItemName() != "ZEModel")
 		return false;
 
-	ZEMLSerialPointer BonesNodePointer, MeshesNodePointer, HelpersNodePointer, MaterialsNodePointer, AnimationsNodePointer;
+	ZEMLSerialPointer UserDefinedBoundingBoxPointer, BonesNodePointer, MeshesNodePointer, HelpersNodePointer, MaterialsNodePointer, AnimationsNodePointer;
 
 	ZEMLSerialListItem ModelList[] = 
 	{
-		ZEML_LIST_NODE("Bones",			BonesNodePointer,		false),
-		ZEML_LIST_NODE("Meshes",		MeshesNodePointer,		false),
-		ZEML_LIST_NODE("Helpers",		HelpersNodePointer,		false),
-		ZEML_LIST_NODE("Animations",	AnimationsNodePointer,	false),
-		ZEML_LIST_NODE("Materials",		MaterialsNodePointer,	true)
+		ZEML_LIST_NODE("UserDefinedBoundingBox",	UserDefinedBoundingBoxPointer,	false),
+		ZEML_LIST_NODE("Bones",						BonesNodePointer,				false),
+		ZEML_LIST_NODE("Meshes",					MeshesNodePointer,				false),
+		ZEML_LIST_NODE("Helpers",					HelpersNodePointer,				false),
+		ZEML_LIST_NODE("Animations",				AnimationsNodePointer,			false),
+		ZEML_LIST_NODE("Materials",					MaterialsNodePointer,			true)
 	};
 
-	if (!NodeReader.ReadPropertyList(ModelList, 5))
+	if (!NodeReader.ReadPropertyList(ModelList, 6))
 		return false;
+
+	if (UserDefinedBoundingBoxPointer != -1)
+	{
+		NodeReader.SeekPointer(UserDefinedBoundingBoxPointer);
+
+		ZEVariant BBoxMinValue, BBoxMaxValue;
+
+		ZEMLSerialListItem BoundingBoxList[] = 
+		{
+			ZEML_LIST_PROPERTY("Min", BBoxMinValue,	ZE_VRT_VECTOR3,	true),
+			ZEML_LIST_PROPERTY("Max", BBoxMaxValue,	ZE_VRT_VECTOR3,	true)
+		};
+
+		if(!NodeReader.ReadPropertyList(BoundingBoxList, 2))
+			return false;
+
+		UserDefinedBoundingBox.Min = BBoxMinValue;
+		UserDefinedBoundingBox.Max = BBoxMaxValue;
+		BoundingBoxIsUserDefined = true;
+	}
+	else
+	{
+		BoundingBoxIsUserDefined = false;
+	}
 
 	if (BonesNodePointer != -1)
 	{
@@ -1028,6 +1060,16 @@ const char* ZEModelResource::GetResourceType() const
 	return "Model";
 }
 
+bool ZEModelResource::GetUserDefinedBoundingBoxEnabled() const
+{
+	return BoundingBoxIsUserDefined;
+}
+
+const ZEAABBox& ZEModelResource::GetUserDefinedBoundingBox() const
+{
+	return UserDefinedBoundingBox;
+}
+
 const ZESmartArray<ZETexture2DResource*>& ZEModelResource::GetTextures() const
 {
 	return TextureResources;
@@ -1062,6 +1104,8 @@ ZEModelResource* ZEModelResource::LoadSharedResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
+
 	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(NewPath);
 	
 	if (Resource != NULL)
@@ -1086,6 +1130,8 @@ void ZEModelResource::CacheResource(const ZEString& FileName)
 {
 	ZEString NewPath = ConstructResourcePath(FileName);
 
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
+
 	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(NewPath);
 	if (Resource != NULL)
 		Resource->Cached = true;
@@ -1104,6 +1150,7 @@ ZEModelResource* ZEModelResource::LoadResource(const ZEString& FileName)
 
 	bool Result;
 	ZEFile ResourceFile;
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
 	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if (Result)

@@ -271,7 +271,7 @@ class ZEArray
 			return &Items[Count - 1];
 		}
 		
-		inline bool Exists(ZEType& Value)
+		inline bool Exists(ZEType Value) const
 		{
 			for (ZESize I = 0; I < Count; I++)
 				if (Items[I] == Value)

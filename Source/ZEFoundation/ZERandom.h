@@ -57,6 +57,8 @@ class ZERandom
 		static ZEUInt64		GetUInt64();
 
 		static bool			GetBool();
+
+		static void			Reset();
 };
 
 #endif

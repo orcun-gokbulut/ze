@@ -35,30 +35,79 @@
 
 #include "ZEServer.h"
 #include "ZESocket/ZESocket.h"
-#include "ZEConnectionTCP.h"
+#include "ZEConnection.h"
 
-#define TCP_PORT_NO	27100
+#define TCP_PORT_NO	26100
+
+ZEServer::ZEServer()
+{
+	Listener = new ZESocketTCPListener();
+	if(!Listener->Create(ZEIPAddress::IPv4Any, TCP_PORT_NO))
+		zeError("Can not create listener.");
+}
+
+ZEServer::~ZEServer()
+{
+
+}
 
 void ZEServer::AcceptConnections()
 {
 	ZESocketTCP* NewTCP = NULL;
 	NewTCP = Listener->Accept();
 
-	Listener->Create(ZEIPAddress::IPv4Any, TCP_PORT_NO);
-
 	if(NewTCP != NULL)
-		PacketManager.AddConnection(new ZEConnectionTCP(NewTCP));
+		AddConnection(new ZEConnection(NewTCP));
+}
+
+bool ZEServer::AddConnection(ZEConnection* Connection)
+{
+	if(Connection == NULL)
+		return false;
+
+	if(Connections.Exists(Connection))
+		return false;
+
+	Connections.Add(Connection);
+	return true;
+}
+
+bool ZEServer::RemoveConnection(ZEConnection* Connection)
+{
+	if(Connection == NULL)
+		return false;
+
+	if(!Connections.Exists(Connection))
+		return false;
+
+	Connections.DeleteValue(Connection);
+	return true;
 }
 
 void ZEServer::Process(float ElapsedTime)
 {
 	AcceptConnections();
-	PacketManager.Process(ElapsedTime);
+	PacketManager.Process(ElapsedTime, Connections);
 }
 
-const ZEPacketManagerServer* ZEServer::GetPacketManager()
+ZEPacketManagerServer* ZEServer::GetPacketManager()
 {
 	return &PacketManager;
+}
+
+bool ZEServer::SendPacket(ZEUInt16 PacketId, void* Data, ZESize DataSize, ZEConnection* Connection)
+{
+	bool  Result = false;
+	ZEPacketHeader Header;
+	Header.CommandId = PacketId;
+	Header.Identifier = ZE_COMMAND_PACKET_HEADER_IDENTIFIER;
+	Header.DataSize = DataSize;
+
+	Result = SendData(&Header, sizeof(ZEPacketHeader), Connection);
+	if(!Result)
+		return false;
+
+	return SendData(Data, DataSize, Connection);
 }
 
 bool ZEServer::SendData(void* Data, ZESize DataSize, ZEConnection* Connection)
@@ -68,6 +117,20 @@ bool ZEServer::SendData(void* Data, ZESize DataSize, ZEConnection* Connection)
 
 void ZEServer::BroadCast(void* Data, ZESize DataSize)
 {
-	for (ZESize I = 0; I < PacketManager.GetConnections()->GetCount(); I++)
-		PacketManager.GetConnections()->GetItem(I)->SendData(Data, DataSize);
+	for (ZESize I = 0; I < Connections.GetCount(); I++)
+		Connections[I]->SendData(Data, DataSize);
+}
+
+void ZEServer::BroadCastPacket(ZEUInt16 PacketId, void* Data, ZESize DataSize)
+{
+	ZEPacketHeader Header;
+	Header.CommandId = PacketId;
+	Header.Identifier = ZE_COMMAND_PACKET_HEADER_IDENTIFIER;
+	Header.DataSize = DataSize;
+
+	for (ZESize I = 0; I < Connections.GetCount(); I++)
+	{
+		Connections[I]->SendData(&Header, sizeof(ZEPacketHeader));
+		Connections[I]->SendData(Data, DataSize);
+	}
 }

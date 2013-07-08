@@ -43,34 +43,55 @@ ZETestSuite(ZEFormat)
 	ZETest("ZEString ZEFormat::Format(const char* Format)")
 	{
 		ZEString Result;
-		Result = ZEFormat::Format("test format string");
-		ZETestCheck(Result == "test format string");
+		Result = ZEFormat::Format("A format item must have an index value and ':' character inside the opening and closing braces.");
+		ZETestCheck(Result == "A format item must have an index value and ':' character inside the opening and closing braces.");
 
-		ZETestCase("empty string")
+		ZETestCase("for function parameter empty string")
 		{
 			Result = ZEFormat::Format("");
 			ZETestCheck(Result == NULL);
 		}
 
-		ZETestCase("{test}")
+		ZETestCase("for function parameter: {test}")
 		{
 			Result = ZEFormat::Format("{test}");
-			ZETestCheck(Result == NULL);
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
 			//error: Formatting error. Argument index must be integer.
 		}
 
-		ZETestCase("{0}")
+		ZETestCase("for function parameter: {0}")
 		{
 			Result = ZEFormat::Format("{0}");
-			ZETestCheck(Result == NULL);
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
 			//error: Formatting error. Argument index is out of bounds.
 		}
 
-		ZETestCase("{}")
+		ZETestCase("for function parameter: {}")
 		{
 			Result = ZEFormat::Format("{}");
-			ZETestCheck(Result == NULL);
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
 			//error: Formatting error. Argument index must be integer.
+		}
+
+		ZETestCase("for function parameter: {")
+		{
+			Result = ZEFormat::Format("{");
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
+			//error Formatting error. There are non-closed argument available in the format.
+		}
+
+		ZETestCase("for function parameter: test}")
+		{
+			Result = ZEFormat::Format("test}");
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
+			//error Formatting error. Mismatch '}' character.
+		}
+
+		ZETestCase("for function parameter: {0:test}")
+		{
+			Result = ZEFormat::Format("{0:test}");
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
+			//error Formatting error. Argument index is out of bounds.
 		}
 	}
 
@@ -82,21 +103,65 @@ ZETestSuite(ZEFormat)
 		ZETestCase("for ZE_VRT_UNDEFINED typed argument")
 		{
 			Result = ZEFormat::Format("{0:}", Arg0);
-			ZETestCheck(Result == "false");
+			ZETestCheckString(Result, "!FORMATING_ARGUMENT_ERROR!");
 		}
 
 		ZETestCase("for ZE_VRT_NULL typed argument")
 		{
 			Arg0.SetNull();
 			Result = ZEFormat::Format("{0:}", Arg0);
-			ZETestCheck(Result == "false");
+			ZETestCheckString(Result, "!FORMATING_ARGUMENT_ERROR!");
 		}
 
 		ZETestCase("for an invalid format item")
 		{
 			Arg0.SetInt16(46);
 			Result = ZEFormat::Format("{0:+5}", Arg0);
-			ZETestCheck(Result == "false");
+			ZETestCheckString(Result, "!FORMATING_ARGUMENT_ERROR!");
+		}
+
+		ZETestCase("for a format item which has not closing brace")
+		{
+			Arg0.SetFloat(2.7f);
+			Result = ZEFormat::Format("{0:-5", Arg0);
+			//error Formatting error. There are non-closed argument available in the format.
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
+		}
+
+		ZETestCase("for a format item which is invalid for the argument type and hasn't got closing brace")
+		{
+			Arg0.SetFloat(2.7f);
+			Result = ZEFormat::Format("{0:x", Arg0);
+			//error Formatting error. There are non-closed argument available in the format.
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
+		}
+
+		ZETestCase("for a format item which hasn't got an index value")
+		{
+			Arg0.SetFloat(2.7f);
+			Result = ZEFormat::Format("{:-}", Arg0);
+			//error Formatting error. Argument index must be integer.
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
+		}
+
+		ZETestCase("for a format item which hasn't got ':' character after index value")
+		{
+			Arg0.SetVector2(ZEVector2::UnitX);
+			Result = ZEFormat::Format("{0 .5}", Arg0);
+			//error Formatting error. Expected ':' or '}' after argument index.
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
+
+			Result = ZEFormat::Format("{0", Arg0);
+			//error Formatting error. There are non-closed argument available in the format.
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
+		}
+
+		ZETestCase("for a format item which hasn't got opening brace")
+		{
+			Arg0.SetBoolean(false);
+			Result = ZEFormat::Format("0:true}", Arg0);
+			//error Formatting error. Mismatch '}' character.
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
 		}
 
 		ZETestCase("multiple format items for Arg0")
@@ -147,7 +212,22 @@ ZETestSuite(ZEFormat)
 		ZETestCase("invalid format for Arg1")
 		{
 			Result = ZEFormat::Format("{0:d:5}-{1:5d}", Arg0, Arg1);
-			ZETestCheck(Result == "false");
+			ZETestCheckString(Result, "   90-!FORMATING_ARGUMENT_ERROR!");
+		}
+
+		ZETestCase("for Arg0 type ZE_VRT_NULL and invalid format for Arg1")
+		{
+			Arg0.SetNull();
+
+			Result = ZEFormat::Format("{0:d}-{1:5d}", Arg0, Arg1);
+			ZETestCheckString(Result, "!FORMATING_ARGUMENT_ERROR!-!FORMATING_ARGUMENT_ERROR!");
+		}
+
+		ZETestCase("format item hasn't got index value")
+		{
+			Result = ZEFormat::Format("{0:c}-{:c}", Arg0, Arg1);
+			//error Formatting error. Argument index must be integer.
+			ZETestCheckString(Result, "!FORMATING_ERROR!");
 		}
 	}
 

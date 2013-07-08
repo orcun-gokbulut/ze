@@ -110,7 +110,7 @@ ZEDEnumComboBox::ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *paren
 
 	ParentTree->setItemWidget(this, 1, XValue);	
 	XValue->setCurrentIndex(Value.GetInt32());////////////////////Buggggggggggg
-	connect(this->XValue, SIGNAL(currentIndexChanged(ZEInt)), this, SLOT(Changed()));
+	connect(this->XValue, SIGNAL(currentIndexChanged(int)), this, SLOT(Changed()));
 }
 
 void ZEDEnumComboBox::UpdateValues()

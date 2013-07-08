@@ -37,12 +37,12 @@ function(ze_copy_headers)
 	parse_arguments(PARAMETER "TARGET;HEADERS;${ze_check_parameters}" "" ${ARGV})
 
 	foreach(CURRENT_FILE ${PARAMETER_HEADERS})
-		string(REPLACE "${CMAKE_SOURCE_DIR}/Source" "\0" MODIFIED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${CURRENT_FILE})
+		get_filename_component(MODIFIED_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/${CURRENT_FILE} NAME)
 		add_custom_command(
 			TARGET ${PARAMETER_TARGET}
 			POST_BUILD			
 			COMMAND ${CMAKE_COMMAND} 
-			ARGS "-E copy_if_different \"${CMAKE_CURRENT_SOURCE_DIR}/${CURRENT_FILE}\" \"${CMAKE_SOURCE_DIR}/Output/Include${MODIFIED_PATH}\"")
+			ARGS -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${CURRENT_FILE}" "${CMAKE_SOURCE_DIR}/Output/Include/${MODIFIED_FILENAME}")
 	endforeach()
 endfunction()
 
@@ -54,7 +54,7 @@ function(ze_file_compiler)
 	add_custom_command(
 		OUTPUT "${PARAMETER_OUTPUT}.cpp" "${PARAMETER_OUTPUT}.h"
 		COMMAND $<TARGET_FILE:ZEFC>
-		ARGS "\"${PARAMETER_INPUT}\" -C \"${PARAMETER_CLASS}\" -S \"${PARAMETER_OUTPUT}.cpp\" -H \"${PARAMETER_OUTPUT}.h\""
+		ARGS "${PARAMETER_INPUT}" -C "${PARAMETER_CLASS}" -S "${PARAMETER_OUTPUT}.cpp" -H "${PARAMETER_OUTPUT}.h"
 		MAIN_DEPENDENCY "${PARAMETER_INPUT}"
 		DEPENDS ZEFC)
 	
@@ -80,7 +80,7 @@ function(ze_meta_compiler)
 	add_custom_command(
 		OUTPUT "${PARAMETER_OUTPUT}"
 		COMMAND "${CMAKE_SOURCE_DIR}/External/${ZEBUILD_PLATFORM_NAME}/libZEPP/Tool/zepp"
-		ARGS "\"${PARAMETER_INPUT}\" \"${PARAMETER_OUTPUT}\""
+		ARGS "${PARAMETER_INPUT}" "${PARAMETER_OUTPUT}"
 		MAIN_DEPENDENCY "${PARAMETER_INPUT}")
 endfunction()
 
@@ -115,14 +115,14 @@ function(ze_copy_runtime_dlls)
 						TARGET ${PARAMETER_TARGET}
 						POST_BUILD
 						COMMAND ${CMAKE_COMMAND}
-						ARGS "-E copy_if_different \"${VARIABLE_DLL}\" \"$<TARGET_FILE_DIR:${PARAMETER_TARGET}>/${VARIABLE_DLL_BASENAME}\"")
+						ARGS -E copy_if_different "${VARIABLE_DLL}" "$<TARGET_FILE_DIR:${PARAMETER_TARGET}>/${VARIABLE_DLL_BASENAME}")
 				endforeach()
 			elseif (VARIABLE_TYPE MATCHES "DLL")
 				add_custom_command(
 					TARGET ${PARAMETER_TARGET}
 					POST_BUILD
 					COMMAND ${CMAKE_COMMAND}
-					ARGS "-E copy_if_different \"$<TARGET_FILE:${VARIABLE_DEPENDENCY}>\" \"$<TARGET_FILE_DIR:${PARAMETER_TARGET}>\"")
+					ARGS -E copy_if_different "$<TARGET_FILE:${VARIABLE_DEPENDENCY}>" "$<TARGET_FILE_DIR:${PARAMETER_TARGET}>")
 			endif()
 		endif()
 	endforeach()

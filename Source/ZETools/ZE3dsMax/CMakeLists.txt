@@ -49,5 +49,3 @@ add_subdirectory(ZE3dsMaxUtils)
 
 add_custom_target(ZE3dsMax
 	SOURCES CMakeLists.txt)
-
-set_property(TARGET ZE3dsMax PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})

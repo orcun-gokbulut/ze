@@ -57,7 +57,7 @@ ZEModelBone* ZEModelBone::GetParentBone()
 	return ParentBone;
 }
 
-const ZEArray<ZEModelBone*> ZEModelBone::GetChildBones()
+const ZEArray<ZEModelBone*>& ZEModelBone::GetChildBones()
 {
 	return ChildBones;
 }
@@ -72,198 +72,228 @@ bool ZEModelBone::IsRootBone()
 	return ParentBone == NULL;
 }
 
-const ZEAABBox& ZEModelBone::GetLocalBoundingBox()
+const ZEAABBox& ZEModelBone::GetBoundingBox() const
 {
 	return BoneResource->BoundingBox;
 }
 
-const ZEAABBox& ZEModelBone::GetModelBoundingBox()
+const ZEAABBox& ZEModelBone::GetModelBoundingBox() const
 {
 	ZEAABBox::Transform(ModelBoundingBox, BoneResource->BoundingBox, GetModelTransform());
 
 	return ModelBoundingBox;
 }
 
-const ZEAABBox& ZEModelBone::GetWorldBoundingBox()
+const ZEAABBox& ZEModelBone::GetWorldBoundingBox() const
 {
 	ZEAABBox::Transform(WorldBoundingBox, BoneResource->BoundingBox, GetWorldTransform());
 
 	return WorldBoundingBox;
 }
 
-const ZEMatrix4x4& ZEModelBone::GetInverseTransform()
+const ZEMatrix4x4& ZEModelBone::GetTransform() const
 {
-	return BoneResource->InverseTransform;
-}
-
-const ZEMatrix4x4& ZEModelBone::GetLocalTransform()
-{
-
-	if (ParentBone == NULL)
-		LocalTransform = GetRelativeTransform();
-	else
-	{
-		ZEMatrix4x4::Multiply(LocalTransform, ParentBone->GetLocalTransform(), GetRelativeTransform());
-		return LocalTransform;
-	}
+	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation);
 
 	return LocalTransform;
 }
 
-const ZEMatrix4x4& ZEModelBone::GetWorldTransform()
+const ZEMatrix4x4& ZEModelBone::GetModelTransform() const
 {
-	ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetLocalTransform());
-
-	return WorldTransform;
+	if (ParentBone == NULL)
+		return GetTransform();
+	else
+	{
+		ZEMatrix4x4::Multiply(ModelTransform, ParentBone->GetModelTransform(), GetTransform());
+		return ModelTransform;
+	}
 }
 
-const ZEMatrix4x4& ZEModelBone::GetModelTransform()
+const ZEMatrix4x4& ZEModelBone::GetWorldTransform() const
 {
-	ZEMatrix4x4::Multiply(WorldTransform, Owner->GetTransform(), GetLocalTransform());
-
-	return WorldTransform;
+	if (ParentBone == NULL)
+	{
+		ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetTransform());
+		return WorldTransform;
+	}
+	else
+	{
+		ZEMatrix4x4::Multiply(WorldTransform, ParentBone->GetWorldTransform(), GetTransform());
+		return WorldTransform;
+	}
 }
 
-const ZEVector3& ZEModelBone::GetInitialRelativePosition()
+const ZEMatrix4x4& ZEModelBone::GetInvWorldTransform() const
 {
-	return BoneResource->RelativePosition;
+	ZEMatrix4x4::Inverse(InvWorldTransform, GetWorldTransform());
+	return InvWorldTransform;
 }
 
-const ZEQuaternion& ZEModelBone::GetInitialRelativeRotation()
+const ZEVector3& ZEModelBone::GetInitialPosition() const
 {
-	return BoneResource->RelativeRotation;
+	return BoneResource->Position;
 }
 
-const ZEMatrix4x4& ZEModelBone::GetInitialRelativeTransform()
+const ZEQuaternion& ZEModelBone::GetInitialRotation() const
 {
-	return BoneResource->RelativeTransform;
+	return BoneResource->Rotation;
 }
 
-const ZEMatrix4x4& ZEModelBone::GetInitialLocalTransform()
+const ZEMatrix4x4& ZEModelBone::GetInitialTransform() const
+{
+	return BoneResource->LocalTransform;
+}
+
+const ZEMatrix4x4& ZEModelBone::GetForwardTransform() const
 {
 	return BoneResource->ForwardTransform;
 }
 
-const ZEMatrix4x4& ZEModelBone::GetVertexTransform()
+const ZEMatrix4x4& ZEModelBone::GetInverseTransform() const
 {
-	ZEMatrix4x4::Multiply(VertexTransform, GetLocalTransform(), BoneResource->InverseTransform);
+	return BoneResource->InverseTransform;
+}
+
+const ZEMatrix4x4& ZEModelBone::GetVertexTransform() const
+{
+	ZEMatrix4x4::Multiply(VertexTransform, GetModelTransform(), BoneResource->InverseTransform);
 	return VertexTransform;
 }
 
-const ZEMatrix4x4& ZEModelBone::GetRelativeTransform()
+void ZEModelBone::SetPosition(const ZEVector3& Position)
 {
-	ZEMatrix4x4 PositionTransform, RotationTransform;
-	ZEMatrix4x4::CreateTranslation(PositionTransform, RelativePosition);
-	ZEMatrix4x4::CreateRotation(RotationTransform, RelativeRotation);
-	ZEMatrix4x4::Multiply(RelativeTransform, PositionTransform, RotationTransform);
-
-	return RelativeTransform;
+	this->Position = Position;
 }
 
-const ZEVector3& ZEModelBone::GetRelativePosition()
+const ZEVector3& ZEModelBone::GetPosition() const
 {
-	return RelativePosition;
+	return Position;
 }
 
-void ZEModelBone::SetRelativePosition(const ZEVector3& Position)
+void ZEModelBone::SetRotation(const ZEQuaternion& Rotation)
 {
-	RelativePosition = Position;
+	this->Rotation = Rotation;
 }
 
-const ZEQuaternion& ZEModelBone::GetRelativeRotation()
+const ZEQuaternion& ZEModelBone::GetRotation() const
 {
-	return RelativeRotation;
+	return Rotation;
 }
 
-void ZEModelBone::SetRelativeRotation(const ZEQuaternion& Rotation)
-{
-	RelativeRotation = Rotation;
-}
-
-const ZEVector3 ZEModelBone::GetLocalPosition()
+void ZEModelBone::SetModelPosition(const ZEVector3& ModelPosition)
 {
 	if (ParentBone == NULL)
-		return RelativePosition;
+		SetPosition(ModelPosition);
+	else
+	{
+		ZEVector3 Result;
+		ZEMatrix4x4::Transform(Result, ParentBone->GetModelTransform().Inverse(), ModelPosition);
+		SetPosition(Result);
+	}
+}
+
+const ZEVector3 ZEModelBone::GetModelPosition() const
+{
+	if (ParentBone == NULL)
+		return Position;
 	else
 	{
 		ZEVector3 Temp;
-		ZEMatrix4x4::Transform(Temp, ParentBone->GetLocalTransform(), RelativePosition);
+		ZEMatrix4x4::Transform(Temp, ParentBone->GetModelTransform(), Position);
 		return Temp;
 	}
 }
 
-const ZEQuaternion ZEModelBone::GetLocalRotation()
+void ZEModelBone::SetModelRotation(const ZEQuaternion& ModelRotation)
 {
 	if (ParentBone == NULL)
-		return RelativeRotation;
+		SetRotation(ModelRotation);
+	else
+	{
+		ZEQuaternion Temp, Result;
+		ZEQuaternion::Conjugate(Temp, ParentBone->GetModelRotation());
+		ZEQuaternion::Product(Result, Temp, ModelRotation);
+		SetRotation(Result);
+	}
+}
+
+const ZEQuaternion ZEModelBone::GetModelRotation() const
+{
+	if (ParentBone == NULL)
+		return Rotation;
 	else
 	{
 		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, ParentBone->GetLocalRotation(), RelativeRotation);
+		ZEQuaternion::Product(Temp, ParentBone->GetModelRotation(), Rotation);
+		ZEQuaternion::Normalize(Temp, Temp);
 		return Temp;
 	}
 }
 
-void ZEModelBone::SetLocalRotation(const ZEQuaternion& Rotation)
+void ZEModelBone::SetWorldPosition(const ZEVector3& WorldPosition)
 {
 	if (ParentBone == NULL)
-		RelativeRotation = Rotation;
-	else
-		ZEQuaternion::Product(RelativeRotation, ParentBone->GetLocalRotation().Conjugate(), Rotation);
-}
-
-const ZEVector3 ZEModelBone::GetModelPosition()
-{
-	if (ParentBone == NULL)
-		return RelativePosition;
+	{
+		ZEVector3 Result;
+		ZEMatrix4x4::Transform(Result, Owner->GetWorldTransform().Inverse(), WorldPosition);
+		SetPosition(Result);
+	}
 	else
 	{
-		ZEVector3 Temp;
-		ZEMatrix4x4::Transform(Temp, ParentBone->GetModelTransform(), RelativePosition);
-		return Temp;
+		ZEVector3 Result;
+		ZEMatrix4x4::Transform(Result, ParentBone->GetWorldTransform(), WorldPosition);
+		SetPosition(Result);
 	}
 }
 
-const ZEQuaternion ZEModelBone::GetModelRotation()
-{
-	if (ParentBone == NULL)
-		return RelativeRotation;
-	else
-	{
-		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, RelativeRotation, ParentBone->GetModelRotation());
-		return Temp;
-	}
-}
-
-const ZEVector3 ZEModelBone::GetWorldPosition()
+const ZEVector3 ZEModelBone::GetWorldPosition() const
 {
 	if (ParentBone == NULL)
 	{
 		ZEVector3 Temp;
-		ZEMatrix4x4::Transform(Temp, Owner->GetWorldTransform(), RelativePosition);
+		ZEMatrix4x4::Transform(Temp, Owner->GetWorldTransform(), Position);
 		return Temp;
 	}
 	else
 	{
 		ZEVector3 Temp;
-		ZEMatrix4x4::Transform(Temp, ParentBone->GetWorldTransform(), RelativePosition);
+		ZEMatrix4x4::Transform(Temp, ParentBone->GetWorldTransform(), Position);
 		return Temp;
 	}
 }
 
-const ZEQuaternion ZEModelBone::GetWorldRotation()
+void ZEModelBone::SetWorldRotation(const ZEQuaternion& WorldRotation)
+{
+	if (ParentBone == NULL)
+	{	
+		ZEQuaternion Temp, Result;
+		ZEQuaternion::Conjugate(Temp, Owner->GetWorldRotation());
+		ZEQuaternion::Product(Result, Temp, WorldRotation);
+		SetRotation(Result);
+	}
+	else
+	{
+		ZEQuaternion Temp, Result;
+		ZEQuaternion::Conjugate(Temp, ParentBone->GetWorldRotation());
+		ZEQuaternion::Product(Result, Temp, WorldRotation);
+		SetRotation(Result);
+	}
+}
+
+const ZEQuaternion ZEModelBone::GetWorldRotation() const
 {
 	if (ParentBone == NULL)
 	{
 		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, Owner->GetWorldRotation(), RelativeRotation);
+		ZEQuaternion::Product(Temp, Owner->GetWorldRotation(), Rotation);
+		ZEQuaternion::Normalize(Temp, Temp);
 		return Temp;
 	}
 	else
 	{
 		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, ParentBone->GetWorldRotation(), RelativeRotation);
+		ZEQuaternion::Product(Temp, ParentBone->GetWorldRotation(), Rotation);
+		ZEQuaternion::Normalize(Temp, Temp);
 		return Temp;
 	}
 }
@@ -273,7 +303,7 @@ void ZEModelBone::SetAnimationType(ZEModelAnimationType AnimationType)
 	this->AnimationType = AnimationType;
 }
 
-ZEModelAnimationType ZEModelBone::GetAnimationType()
+ZEModelAnimationType ZEModelBone::GetAnimationType() const
 {
 	return AnimationType;
 }
@@ -295,7 +325,7 @@ void ZEModelBone::SetPhysicsEnabled(bool Enabled)
 	PhysicsEnabled = Enabled;
 }
 
-bool ZEModelBone::GetPhysicsEnabled()
+bool ZEModelBone::GetPhysicsEnabled() const
 {
 	return PhysicsEnabled;
 }
@@ -304,8 +334,8 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 {
 	Owner = Model;
 	this->BoneResource = BoneResource;
-	RelativePosition = BoneResource->RelativePosition;
-	RelativeRotation = BoneResource->RelativeRotation;
+	Position = BoneResource->Position;
+	Rotation = BoneResource->Rotation;
 
 	ZEArray<ZEPhysicalShape*> ShapeList;
 
@@ -549,4 +579,31 @@ ZEModelBone::ZEModelBone()
 ZEModelBone::~ZEModelBone()
 {
 	Deinitialize();
+}
+
+bool ZEModelBone::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	if (!ZEAABBox::IntersectionTest(GetWorldBoundingBox(), Parameters.Ray))
+		return false;
+
+	ZERay LocalRay;
+	ZEMatrix4x4::Transform(LocalRay.p, GetInvWorldTransform(), Parameters.Ray.p);
+	ZEMatrix4x4::Transform3x3(LocalRay.v, GetInvWorldTransform(), Parameters.Ray.v);
+	LocalRay.v.NormalizeSelf();
+
+	float TMin;
+	if (!ZEAABBox::IntersectionTest(GetBoundingBox(), LocalRay, TMin))
+		return false;
+
+	ZEVector3 IntersectionPoint;
+	ZEMatrix4x4::Transform(IntersectionPoint, GetWorldTransform(), LocalRay.GetPointOn(TMin));
+	float DistanceSquare = IntersectionPoint.LengthSquare();
+	if (Report.Distance * Report.Distance > DistanceSquare && Report.Distance * Report.Distance < Parameters.MaximumDistance)
+	{
+		Report.Distance = ZEMath::Sqrt(DistanceSquare);
+		Report.SubComponent = NULL;
+		Report.PoligonIndex = 0;
+		Report.Normal = Report.Binormal = ZEVector3::Zero;
+		ZEMatrix4x4::Transform(Report.Position, WorldTransform, IntersectionPoint);
+	}
 }

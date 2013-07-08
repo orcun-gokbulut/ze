@@ -116,6 +116,7 @@ void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 			ZEUIVertex* Buffer = ((ZEArrayVertexBuffer<ZEUIVertex>*)RenderCommands[I].VertexBuffer)->MassAdd(6);
 			Rectangle.ConvertToVertices(Buffer);
 			RenderCommands[I].Priority = (float)Rectangle.ZOrder;
+			RenderCommands[I].Order = Rectangle.ZOrder;
 			return;
 		}
 

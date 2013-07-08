@@ -81,6 +81,8 @@ class ZEPhysicsModule : public ZEModule
 		virtual	void							Process(float ElapsedTime) = 0;
 		virtual void							UpdateWorlds() = 0;
 
+		virtual void							ConnectToVisualDebugger(const char* Adress, ZEInt Port) = 0;
+
 		static ZEPhysicsModule*					GetInstance();
 };
 

@@ -56,6 +56,8 @@ ze_add_source(ZEVertexLayout.cpp			Sources)
 ze_add_source(ZEVertexLayout.h				Sources Headers)
 ze_add_source(ZEStatePool.cpp				Sources)
 ze_add_source(ZEStatePool.h					Sources Headers)
+ze_add_source(ZESeaMaterial.cpp 					Sources)
+ze_add_source(ZESeaMaterial.h 						Sources Headers)
 
 ze_add_source(ZETexture.cpp 				Sources)
 ze_add_source(ZETexture.h 					Sources Headers)

@@ -36,22 +36,21 @@
 #include "ZEPacketManagerServer.h"
 #include "ZESerialPort/ZESerialPort.h"
 #include "ZEDS/ZEString.h"
-#include "ZEConnectionTCP.h"
+#include "ZEConnection.h"
 #include "ZESocket/ZESocket.h"
 #include "ZESocket/ZEIPAddress.h"
 
 #include <memory.h>
+#include <string.h>
 
 ZEPacketManagerServer::ZEPacketManagerServer()
 {
 	Handlers.Clear();
-	Connections.Clear();
 }
 
 ZEPacketManagerServer::~ZEPacketManagerServer()
 {
 	Handlers.Clear();
-	Connections.Clear();
 }
 
 bool ZEPacketManagerServer::RegisterHander(ZEPacketHandler* Handler)
@@ -65,8 +64,20 @@ bool ZEPacketManagerServer::RegisterHander(ZEPacketHandler* Handler)
 		if(Handlers[HandlerId] != NULL)
 			return false;
 
-	if(HandlerId > Handlers.GetCount())
-		Handlers.Resize(HandlerId);
+	if(HandlerId >= Handlers.GetCount())
+	{
+		ZEArray<ZEPacketHandler*> NewHandlers;
+		NewHandlers.SetCount(HandlerId + 1);
+
+		for(ZESize I = 0; I < NewHandlers.GetCount(); I++)
+			NewHandlers[I] = NULL;
+
+		for(ZESize I = 0; I < Handlers.GetCount(); I++)
+			NewHandlers[I] = Handlers[I];
+
+		Handlers = NewHandlers;
+	}
+		
 
 	Handlers[HandlerId] = Handler;
 	return true;
@@ -86,81 +97,57 @@ bool ZEPacketManagerServer::UnRegisterHandler(ZEPacketHandler* Handler)
 	return true;
 }
 
-bool ZEPacketManagerServer::AddConnection(ZEConnection* Connection)
-{
-	if(Connection == NULL)
-		return false;
-
-	if(Connections.Exists(Connection))
-		return false;
-
-	Connections.Add(Connection);
-	return true;
-}
-
-bool ZEPacketManagerServer::RemoveConnection(ZEConnection* Connection)
-{
-	if(Connection == NULL)
-		return false;
-
-	if(!Connections.Exists(Connection))
-		return false;
-
-	Connections.DeleteValue(Connection);
-	return false;
-}
-
-const ZEArray<ZEConnection*>* ZEPacketManagerServer::GetConnections()
-{
-	return &Connections;
-}
-
-void ZEPacketManagerServer::Process(float ElapsedTime)
+void ZEPacketManagerServer::Process(float ElapsedTime, ZEArray<ZEConnection*>& Connections)
 {
 	for (ZESize I = 0; I < Connections.GetCount(); I++)
 	{
 		ZEConnection* CurrentConnection = Connections[I];
-		CurrentConnection->Process(ElapsedTime);
-
-
-		ZESize UsedBufferSize = 0;
-		char* ReadBuffer = (char*)CurrentConnection->GetBuffer(UsedBufferSize);
-
-		if(UsedBufferSize < sizeof(ZEPacketHeader))
-			continue;
-
-		ZEPacketHeader Header;
-		memcpy(&Header, ReadBuffer, sizeof(ZEPacketHeader));
-
-		if(Header.Identifier != ZE_COMMAND_PACKET_HEADER_IDENTIFIER)
+		for (ZEInt P = 0; P < 100; P++)
 		{
-			zeError("Header Mismatch !!!");
-			CurrentConnection->CleanBuffer();
-			continue;
+			if (!CurrentConnection->Process(ElapsedTime))
+				continue;
+
+			ZESize UsedBufferSize = 0;
+			char* ReadBuffer = (char*)CurrentConnection->GetReadBuffer(UsedBufferSize);
+
+			if(UsedBufferSize < sizeof(ZEPacketHeader))
+				continue;
+
+			ZEPacketHeader Header;
+			memcpy(&Header, ReadBuffer, sizeof(ZEPacketHeader));
+
+			if(Header.Identifier != ZE_COMMAND_PACKET_HEADER_IDENTIFIER)
+			{
+				zeError("Header Mismatch !!!");
+				CurrentConnection->CleanReadBuffer();
+				continue;
+			}
+
+			ZESize HeaderAndDataSize = sizeof(ZEPacketHeader) + Header.DataSize;
+
+			if(UsedBufferSize < HeaderAndDataSize)
+				continue;
+
+			//Invalid Packet Handler ID Check
+			ZEPacketHandler* Handler = Handlers[Header.CommandId];
+
+			if(Handler == NULL)
+			{
+				zeError("No command found with ID : %d", Header.CommandId);
+				CurrentConnection->CleanReadBuffer();
+				continue;
+			}
+
+			if(Handler->GetCallback().IsNull())
+			{
+				zeError("Command callback is NULL command ID : %d", Header.CommandId);
+				CurrentConnection->CleanReadBuffer();
+				continue;
+			}
+
+			Handler->GetCallback()(ReadBuffer + sizeof(ZEPacketHeader), Header.DataSize, CurrentConnection);
+			memmove(ReadBuffer, ReadBuffer + HeaderAndDataSize, CurrentConnection->GetReadBufferSize() - HeaderAndDataSize);
+			CurrentConnection->FilledReadBufferSize -= sizeof(ZEPacketHeader) + Header.DataSize;
 		}
-
-		ZESize HeaderAndDataSize = sizeof(ZEPacketHeader) + Header.DataSize;
-
-		if(UsedBufferSize < HeaderAndDataSize)
-			continue;
-
-		ZEPacketHandler* Handler = Handlers[Header.CommandId];
-
-		if(Handler == NULL)
-		{
-			zeError("No command found with ID : %d", Header.CommandId);
-			CurrentConnection->CleanBuffer();
-			continue;
-		}
-
-		if(Handler->GetCallback().IsNull())
-		{
-			zeError("Command callback is NULL command ID : %d", Header.CommandId);
-			CurrentConnection->CleanBuffer();
-			continue;
-		}
-
-		Handler->GetCallback()(ReadBuffer + sizeof(ZEPacketHeader), Header.DataSize, CurrentConnection);
-		memmove(ReadBuffer, ReadBuffer + HeaderAndDataSize, ZE_MAX_PACKET_SIZE - HeaderAndDataSize);
 	}
 }

@@ -77,7 +77,6 @@ void ZEDMaterialEditorViewPort::Initialize()
 	zeCore->GetGame()->GetScene()->AddEntity(Grid);
 
 	Model = ZEModel::CreateInstance();
-	Model->SetModelFile("Box.ZEMODEL");
 	zeCore->GetGame()->GetScene()->AddEntity(Model);
 
 	DirectLight1 = ZEDirectionalLight::CreateInstance();
@@ -171,16 +170,19 @@ void ZEDMaterialEditorViewPort::SetModelFile(const char* FileName)
 {
 	ZEModelResource* TempResource = ZEModelResource::LoadSharedResource(FileName);
 
-	for (ZESize I = 0; I < Model->GetModelResource()->GetMaterials()[0]->GetDescription()->GetPropertyCount(); I++)
-	{
-		ZEVariant TempVariant;
-		Model->GetModelResource()->GetMaterials()[0]->GetProperty(I, TempVariant);
-
-		if (TempVariant.GetType() == ZE_VRT_STRING && strcmp(TempVariant.GetString(), "") == 0)
-			continue;
-
-		TempResource->GetMaterials()[0]->SetProperty(I, TempVariant);
-	}
+// 	if(Model->GetModelResource() != NULL)
+// 	{
+// 		for (ZESize I = 0; I < Model->GetModelResource()->GetMaterials()[0]->GetDescription()->GetPropertyCount(); I++)
+// 		{
+// 			ZEVariant TempVariant;
+// 			Model->GetModelResource()->GetMaterials()[0]->GetProperty(I, TempVariant);
+// 
+// 			if (TempVariant.GetType() == ZE_VRT_STRING && strcmp(TempVariant.GetString(), "") == 0)
+// 				continue;
+// 
+// 			TempResource->GetMaterials()[0]->SetProperty(I, TempVariant);
+// 		}
+// 	}
 
 	Model->SetModelResource(TempResource);
 }
@@ -243,4 +245,9 @@ ZEDirectionalLight*	ZEDMaterialEditorViewPort::GetDirectLight2()
 ZEDirectionalLight*	ZEDMaterialEditorViewPort::GetDirectLight3()
 {
 	return DirectLight3;
+}
+
+ZEModel* ZEDMaterialEditorViewPort::GetModel()
+{
+	return Model;
 }

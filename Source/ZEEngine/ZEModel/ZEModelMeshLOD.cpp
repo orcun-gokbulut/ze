@@ -63,7 +63,7 @@ bool ZEModelMeshLOD::IsSkinned()
 	return Skinned;
 }
 
-void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DistanceSquare)
+void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DrawOrder)
 {
 	if (VertexBuffer == NULL)
 		return;

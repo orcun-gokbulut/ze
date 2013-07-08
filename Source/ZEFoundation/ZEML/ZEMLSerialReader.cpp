@@ -309,6 +309,9 @@ bool ZEMLSerialReader::GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offse
 
 bool ZEMLSerialReader::GetData(ZEPartialFile& File)
 {
+	if(CurrentItemType != ZEML_IT_INLINE_DATA)
+		return false;
+
 	if(!File.Open(this->File, DataItemDataPointer, CurrentItemDataSize))
 	{
 		zeError("Can not open partial file.");

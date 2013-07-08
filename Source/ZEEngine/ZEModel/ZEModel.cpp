@@ -47,7 +47,7 @@
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEModel);
 
-void ZEModel::CalculateBoundingBox()
+void ZEModel::CalculateBoundingBox() const
 {
 	if (Meshes.GetCount() == 0 && Bones.GetCount() == 0)
 	{
@@ -80,7 +80,7 @@ void ZEModel::CalculateBoundingBox()
 
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
 	{
-		ZEVector3 BonePosition = Bones[I].GetLocalPosition();
+		ZEVector3 BonePosition = Bones[I].GetModelPosition();
 
 		if (BonePosition.x < BoundingBox.Min.x) BoundingBox.Min.x = BonePosition.x;
 		if (BonePosition.y < BoundingBox.Min.y) BoundingBox.Min.y = BonePosition.y;
@@ -132,7 +132,22 @@ void ZEModel::LoadModelResource()
 	if (ModelResource == NULL)
 		return;
 
+	if (ModelResource->GetUserDefinedBoundingBoxEnabled())
+	{
+		BoundingBoxIsUserDefined = true;
+		SetBoundingBox(ModelResource->GetUserDefinedBoundingBox());
+	}
+
 	Meshes.SetCount(ModelResource->GetMeshes().GetCount());
+
+	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
+	{
+		if (ModelResource->GetMeshes()[I].ParentMesh != -1)
+		{
+			Meshes[(ZESize)ModelResource->GetMeshes()[I].ParentMesh].AddChild(&Meshes[I]);
+		}
+	}
+
 	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
 	{
 		Meshes[I].Initialize(this, &ModelResource->GetMeshes()[I]);
@@ -346,6 +361,16 @@ ZEModelAnimationType ZEModel::GetAnimationType()
 	return AnimationType;
 }
 
+void ZEModel::SetAnimationUpdateMode(ZEModelAnimationUpdateMode AnimationUpdateMode)
+{
+	this->AnimationUpdateMode = AnimationUpdateMode;
+}
+
+ZEModelAnimationUpdateMode ZEModel::GetAnimationUpdateMode()
+{
+	return AnimationUpdateMode;
+}
+
 ZEArray<ZEModelAnimationTrack>& ZEModel::GetAnimationTracks()
 {
 	return AnimationTracks;
@@ -363,9 +388,16 @@ bool ZEModel::GetAutoLOD()
 	return AutoLOD;
 }
 
-const ZEAABBox& ZEModel::GetWorldBoundingBox()
+void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
 {
-	((ZEModel*)this)->CalculateBoundingBox();
+	BoundingBoxIsUserDefined = Value;
+}
+
+const ZEAABBox& ZEModel::GetWorldBoundingBox() const
+{
+	if (!BoundingBoxIsUserDefined)
+		CalculateBoundingBox();
+
 	return ZEEntity::GetWorldBoundingBox();
 }
 
@@ -428,11 +460,17 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 		Statistics.TotalMeshCount = (ZEUInt32)Meshes.GetCount();
 	}
 
+	if (AnimationUpdateMode == ZE_MAUM_VISUAL)
+	{
+		for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
+			AnimationTracks[I].UpdateAnimation();
+	}
+
 	ZEUInt32 EntityDrawFlags = GetDrawFlags();
 
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 	{
-		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL)
+		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL && !Meshes[I].LODs[0].IsSkinned())
 		{
 			if (DrawParameters->ViewVolume->CullTest(Meshes[I].GetWorldBoundingBox()))
 			{
@@ -469,7 +507,12 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 void ZEModel::Tick(float ElapsedTime)
 {
 	for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
+	{
 		AnimationTracks[I].Tick(ElapsedTime);
+
+		if (AnimationUpdateMode == ZE_MAUM_LOGICAL)
+			AnimationTracks[I].UpdateAnimation();
+	}
 
 	for(ZESize I = 0; I < IKChains.GetCount(); I++)
 		IKChains[I].Process();
@@ -489,17 +532,17 @@ void ZEModel::TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 N
 			ZEVector3 Position;
 			ZEMatrix4x4::Transform(Position, InvParent, Bones[I].PhysicalBody->GetPosition());
 
-			Bones[I].SetRelativePosition(Position);
+			Bones[I].SetPosition(Position);
 			Inverse.NormalizeSelf();
-			Bones[I].SetRelativeRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
+			Bones[I].SetRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
 		}
 		else
 		{
 			ZEQuaternion Inverse;
 			ZEQuaternion::Conjugate(Inverse, this->GetWorldRotation());
-			Bones[I].SetRelativePosition(Bones[I].PhysicalBody->GetPosition() - GetWorldPosition());
+			Bones[I].SetPosition(Bones[I].PhysicalBody->GetPosition() - GetWorldPosition());
 			Inverse.NormalizeSelf();
-			Bones[I].SetRelativeRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
+			Bones[I].SetRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
 		}
 	}
 
@@ -522,8 +565,9 @@ ZEModel::ZEModel()
 	Visibility = true;
 	AutoLOD = true;
 	ActiveLOD = 0;
-	DrawSkeleton = true;
 	ParentlessBoneBody = NULL;
+	AnimationUpdateMode = ZE_MAUM_LOGICAL;
+	BoundingBoxIsUserDefined = false;
 
 	memset(&Statistics, 0, sizeof(ZEModelStatistics));
 }
@@ -550,6 +594,21 @@ bool ZEModel::InitializeSelf()
 bool ZEModel::DeinitializeSelf()
 {
 	return ZEEntity::DeinitializeSelf();
+}
+
+bool ZEModel::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	bool Result = false;
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
+		Result |= Meshes[I].RayCast(Report, Parameters);
+
+	for (ZESize I = 0; I < Bones.GetCount(); I++)
+		Result |= Bones[I].RayCast(Report, Parameters);
+	
+	if (Result)
+		Report.Entity = this;
+
+	return Result;
 }
 
 ZEModel* ZEModel::CreateInstance()

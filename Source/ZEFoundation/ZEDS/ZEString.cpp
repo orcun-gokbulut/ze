@@ -705,6 +705,7 @@ void ZEString::Compact()
 
 void ZEString::Clear()
 {
+	BufferChanged = true;
 	Allocator.Deallocate(&Buffer);
 	Buffer = NULL;
 }
@@ -714,6 +715,10 @@ void ZEString::SetBuffer(void* Buffer, ZESize Size)
 	BufferChanged = true;
 
 	Clear();
+
+	if (Size == 0)
+		return;
+
 	this->Buffer = (char*)Buffer;
 	this->Buffer[Size - 1] = '\0';
 	this->Allocator.Size = Size;
@@ -743,11 +748,11 @@ void ZEString::SetValue(const char* String)
 	}
 
 	ZESize StringSize = strlen(String);
-	if (StringSize == 0)
-	{
-		Clear();
-		return;
-	}
+ 	if (StringSize == 0)
+ 	{
+ 		Clear();
+ 		return;
+ 	}
 
 	ZESize Size = ((StringSize) + 1) * sizeof(char);
 
@@ -982,7 +987,7 @@ ZESize ZEString::GetLength() const
 		ZESize StringLength = 0;
 		const char* TempBuffer = Buffer;
 
-		while (*TempBuffer != NULL)
+		while (*TempBuffer != '\0')
 		{
 			CharacterSize = GetByteLength(TempBuffer);
 			TempBuffer = TempBuffer + CharacterSize;
@@ -1720,7 +1725,7 @@ void ZEString::UpperSelf()
 
 const char* ZEString::ToCString() const
 {
-	return Buffer;
+	return GetValue();
 }
 
 const wchar_t* ZEString::ToWCString() const
@@ -1749,7 +1754,6 @@ const wchar_t* ZEString::ToWCString() const
 	}
 
 	return WBuffer;
-
 }
 
 std::wstring ZEString::ToWStdString() const
@@ -2282,7 +2286,7 @@ ZEString::operator std::string() const
 
 ZEString::operator const char*() const
 {
-	return Buffer;
+	return GetValue();
 }
 
 ZEString::ZEString()

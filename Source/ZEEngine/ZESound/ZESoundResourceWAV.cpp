@@ -36,6 +36,7 @@
 #include "ZESoundResourceWAV.h"
 #include "ZEError.h"
 #include <memory.h>
+#include "ZEFile\ZEPathUtils.h"
 
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
@@ -94,6 +95,7 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
 	
 	bool Result;
 	ZEFile File;
+	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
 	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
 	if (!Result)

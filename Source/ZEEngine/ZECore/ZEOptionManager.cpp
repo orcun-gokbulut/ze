@@ -322,7 +322,7 @@ void ZEOptionManager::Save(const ZEString& FileName)
 							fprintf(File, "\n");
 							break;
 						case ZE_VRT_STRING:
-							fprintf(File, "%s = %s\n", Current->GetName().ToCString(), Current->GetValue().GetString());
+							fprintf(File, "%s = %s\n", Current->GetName().ToCString(), Current->GetValue().GetString().ToCString());
 							break;
 						case ZE_VRT_INTEGER_32:
 							fprintf(File, "%s = %d\n", Current->GetName().ToCString(), Current->GetValue().GetInt32());

@@ -38,26 +38,28 @@
 #define __ZE_MODEL_H__
 
 #include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEGraphics/ZERenderCommand.h"
+#include "ZEGraphics/ZECanvas.h"
+#include "ZEModelResource.h"
 #include "ZEModelBone.h"
 #include "ZEModelMesh.h"
-#include "ZEDS/ZEArray.h"
 #include "ZEModelHelper.h"
-#include "ZEModelIKChain.h"
-#include "ZEGame/ZEEntity.h"
-#include "ZEModelResource.h"
 #include "ZEModelAnimation.h"
-#include "ZERenderer/ZECanvas.h"
 #include "ZEModelAnimationTrack.h"
+#include "ZEModelIKChain.h"
 #include "ZEGame/ZEDrawStatistics.h"
-#include "ZERenderer/ZERenderCommand.h"
 
 class ZEQuaternion;
 class ZEMatrix4x4;
-class ZEMaterialDefault;
-class ZEPhysicalJoint;
-class ZEMaterialSimple;
-struct ZEDrawParameters;
+class ZEFixedMaterial;
+class ZESimpleMaterial;
+
 class ZEPhysicalRigidBody;
+class ZEPhysicalJoint;
+
+struct ZEDrawParameters;
 
 ZE_META_ENTITY_DESCRIPTION(ZEModel)
 
@@ -72,6 +74,7 @@ class ZEModel : public ZEEntity
 	private:
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
+
 		ZEArray<ZERenderCommandDefault>		LODRenderCommands;
 		
 		ZEModelStatistics					Statistics;
@@ -90,16 +93,15 @@ class ZEModel : public ZEEntity
 		bool								PhysicsEnabled;
 
 		ZEModelAnimationType				AnimationType;
+		ZEModelAnimationUpdateMode			AnimationUpdateMode;
 
 		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
 
-		void								CalculateBoundingBox();		
-		void								UpdateTransforms();
+		bool								BoundingBoxIsUserDefined;
 
-		bool								DrawSkeleton;
-		bool								DrawPhysicalBodies;
-		bool								DrawPhysicalJoints;
-		
+		void								CalculateBoundingBox() const;
+		void								UpdateTransforms();
+	
 		void								LoadModelResource();
 
 	protected:
@@ -116,7 +118,8 @@ class ZEModel : public ZEEntity
 
 		virtual const ZEModelStatistics&	GetStatistics() const;
 
-		virtual const ZEAABBox&				GetWorldBoundingBox();
+		void								SetUserDefinedBoundingBoxEnabled(bool Value);
+		virtual const ZEAABBox&				GetWorldBoundingBox() const;
 
 		void								SetModelFile(const char* ModelFile);
 		const char*							GetModelFile() const;
@@ -140,6 +143,9 @@ class ZEModel : public ZEEntity
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();
 
+		void								SetAnimationUpdateMode(ZEModelAnimationUpdateMode AnimationUpdateMode);
+		ZEModelAnimationUpdateMode			GetAnimationUpdateMode();
+
 		ZEArray<ZEModelAnimationTrack>&		GetAnimationTracks();
 
 		void								SetAutoLOD(bool Enabled);
@@ -162,6 +168,8 @@ class ZEModel : public ZEEntity
 		void								Tick(float ElapsedTime);
 		void								Draw(ZEDrawParameters* DrawParameters);
 		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);
+		
+		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
 
@@ -174,9 +182,10 @@ class ZEModel : public ZEEntity
 		void								SetDrawPhysicalJoints(bool Enabled);
 		bool								GetDrawPhysicalJoints();
 
+		
 		static ZEModel*						CreateInstance();
 };
-
+#endif
 /*
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
@@ -192,5 +201,3 @@ ZE_POST_PROCESSOR_START(Meta)
 </zinek>
 ZE_POST_PROCESSOR_END()
 */
-
-#endif

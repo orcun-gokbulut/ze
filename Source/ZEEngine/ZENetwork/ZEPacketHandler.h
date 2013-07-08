@@ -34,30 +34,30 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_COMMAND_H__
-#define __ZE_COMMAND_H__
+#ifndef	__ZE_PACKET_HANDLER_H__
+#define __ZE_PACKET_HANDLER_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEDelegate.h"
 
 class ZEConnection;
 
-typedef	ZEDelegate<void (void* Data, ZESize Size, ZEConnection* Connection)> ZECommandCallback;
+typedef	ZEDelegate<void (void* Data, ZESize Size, ZEConnection* Connection)> ZENetworkCommandCallback;
 
 class ZEPacketHandler
 {
 	private:
 
 		ZEInt16						HandlerId;
-		ZECommandCallback			Callback;
+		ZENetworkCommandCallback	Callback;
 
 	public:
 
 		void						SetHandlerId(ZEInt16 Id);
 		ZEInt16						GetHandlerId() const;
 
-		void						SetCallback(const ZECommandCallback& Callback);
-		const ZECommandCallback&	GetCallback() const;
+		void							SetCallback(const ZENetworkCommandCallback& Callback);
+		const ZENetworkCommandCallback&	GetCallback() const;
 
 									ZEPacketHandler();
 									~ZEPacketHandler();

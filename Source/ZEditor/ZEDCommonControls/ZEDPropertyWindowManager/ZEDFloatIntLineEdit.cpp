@@ -405,7 +405,7 @@ ZEDFloatIntLineEdit::ZEDFloatIntLineEdit(FloatIntLineEditMode Mode, QWidget* Par
 {
 	this->Mode = Mode;
 	this->IntegerStepSize = 1;
-	this->FloatStepSize = 0.1f;
+	this->FloatStepSize = 0.001f;
 	this->LastValidIntVlaue = 0;
 	this->LastValidFloatValue = 0;
 

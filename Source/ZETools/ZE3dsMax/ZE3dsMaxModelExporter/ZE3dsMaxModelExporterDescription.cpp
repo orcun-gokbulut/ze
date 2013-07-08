@@ -94,6 +94,9 @@ ActionTable* ZE3dsMaxModelExporterDescription::GetActionTable(int i)
 	ZE3dsMaxModelActionAddPhysicalBodyAttributes* AddZEModelPhysicalBodyAttributesAction = new ZE3dsMaxModelActionAddPhysicalBodyAttributes();
 	MainActionTable->AppendOperation(AddZEModelPhysicalBodyAttributesAction);
 
+	ZE3dsMaxModelActionAddBoundingBoxAttributes* AddZEModelBoundingBoxAttributesAction = new ZE3dsMaxModelActionAddBoundingBoxAttributes();
+	MainActionTable->AppendOperation(AddZEModelBoundingBoxAttributesAction);
+
 	return MainActionTable;
 }
 

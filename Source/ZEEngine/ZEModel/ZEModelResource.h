@@ -306,6 +306,7 @@ struct ZEModelResourceMesh
 {
 	char										Name[ZE_MDLF_MAX_NAME_SIZE]; 
 	ZEAABBox									BoundingBox;
+	ZEInt32										ParentMesh;
 	ZEVector3									Position;
 	ZEQuaternion								Rotation;
 	ZEVector3									Scale;
@@ -321,10 +322,10 @@ struct ZEModelResourceBone
 	char										Name[ZE_MDLF_MAX_NAME_SIZE];
 	ZEAABBox									BoundingBox;
 	ZEInt32										ParentBone;
-	ZEVector3									RelativePosition;
-	ZEQuaternion								RelativeRotation;
-	ZEVector3									RelativeScale;
-	ZEMatrix4x4									RelativeTransform;
+	ZEVector3									Position;
+	ZEQuaternion								Rotation;
+	ZEVector3									Scale;
+	ZEMatrix4x4									LocalTransform;
 	ZEMatrix4x4									ForwardTransform;
 	ZEMatrix4x4									InverseTransform;
 	ZEModelResourcePhysicalBody					PhysicalBody;
@@ -356,6 +357,9 @@ class ZEModelResource : public ZEResource
 		ZESmartArray<ZETexture2DResource*>			TextureResources;
 		ZEArray<ZEMaterial*>						Materials;
 
+		bool										BoundingBoxIsUserDefined;
+		ZEAABBox									UserDefinedBoundingBox;
+
 		bool										ReadBones(ZEMLSerialReader* NodeReader);
 		void										ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId);
 		bool										ReadMeshes(ZEMLSerialReader* NodeReader);
@@ -373,6 +377,8 @@ class ZEModelResource : public ZEResource
 	public:
 		const char*									GetResourceType() const;
 		
+		bool										GetUserDefinedBoundingBoxEnabled() const;
+		const ZEAABBox&								GetUserDefinedBoundingBox() const;
 		const ZESmartArray<ZETexture2DResource*>&	GetTextures() const;
 		const ZEArray<ZEMaterial*>&					GetMaterials() const;
 		const ZEArray<ZEModelResourceBone>&			GetBones() const;

@@ -45,6 +45,8 @@ class ZEInputDevice;
 class ZEVRPNInputModule : public ZEInputDeviceModule
 {
 	ZE_EXTENSION(ZEVRPNInputModule)
+	private:
+		virtual						~ZEVRPNInputModule();
 
 	public:
 		ZEInputDevice*				AddNewDevice(const ZEString& Name, const ZEString& URL, const ZEInputDeviceDescription& Description);

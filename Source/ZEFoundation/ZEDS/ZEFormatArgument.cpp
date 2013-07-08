@@ -42,8 +42,13 @@
 #include "ZEError.h"
 #include "ZERegEx/TRE/config.h"
 
+#include <stdio.h>
 #ifdef ZE_PLATFORM_UNIX
     #define sprintf_s snprintf
+#endif
+
+#ifdef ZE_PLATFORM_WINDOWS
+	#define _sprintf snprintf
 #endif
 
 

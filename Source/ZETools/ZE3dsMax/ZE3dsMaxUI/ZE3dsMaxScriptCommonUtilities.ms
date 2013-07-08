@@ -85,6 +85,11 @@ fn CheckZEAttributes CurrentSelection AttributeFilterValue =
 			if AttributeFilterValue != 6 do
 				return true
 		)
+		else if isProperty CurrentObject "ZEBoundingBoxAttributes" == true then
+		(
+			if AttributeFilterValue != 7 do
+				return true
+		)
 	)
 	
 	return false

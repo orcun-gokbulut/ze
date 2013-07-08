@@ -209,3 +209,8 @@ ZEPhysicalCharacterController* ZEPhysXModule::CreatePhysicalController()
 {
 	return NULL;
 }
+
+void ZEPhysXModule::ConnectToVisualDebugger(const char* Adress, ZEInt Port)
+{
+	PhysicsSDK->getFoundationSDK().getRemoteDebugger()->connect(Adress, Port);
+}
