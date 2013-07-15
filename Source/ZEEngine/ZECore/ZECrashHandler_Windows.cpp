@@ -119,7 +119,7 @@ void ZECrashHandler::Crashed()
 		DWORD Temp;
 		WriteFile(NamedPipeHandle, &Data, sizeof(ZECrashReportParameters), &Temp, NULL);
 		DWORD Result;
-		ReadFile(NamedPipeHandle, &Result, sizeof(DWORD), &Temp, NULL);		
+		ReadFile(NamedPipeHandle, &Result, sizeof(DWORD), &Temp, NULL);
 	}
 }
 
