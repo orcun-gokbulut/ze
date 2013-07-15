@@ -683,6 +683,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
+			<property name="SSAOEnabled" groupname="Shading" type="boolean" autogetset="yes"/>
 		</class>
 	</meta>
 </zinek>

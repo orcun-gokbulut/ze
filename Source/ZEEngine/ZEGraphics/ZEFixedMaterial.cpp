@@ -1466,7 +1466,7 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		OpacityBaseAlphaEnabledValue, OpacityConstantEnabledValue, OpacityMapEnabledValue, 
 		DetailEnabledValue, DetailBaseMapEnabledValue, DetailNormalMapEnabledValue, 
 		ReflectionEnabledValue, RefractionEnabledValue, LightMapEnabledValue, 
-		AlphaCullEnabledValue, VertexColorEnabledValue;
+		AlphaCullEnabledValue, VertexColorEnabledValue, SSAOEnabledValue;
 
 	ZEMLSerialListItem Properties[] = 
 	{
@@ -1551,7 +1551,8 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		ZEML_LIST_PROPERTY("EnvironmentMapAddressModeV",	EnvironmentMapAddressModeWValue,	ZE_VRT_INTEGER_32,	false),
 		ZEML_LIST_PROPERTY("LightMap",						LightMapValue,						ZE_VRT_STRING,		false),
 		ZEML_LIST_PROPERTY("LightMapAddressModeU",			LightMapAddressModeUValue,			ZE_VRT_INTEGER_32,	false),
-		ZEML_LIST_PROPERTY("LightMapAddressModeV",			LightMapAddressModeVValue,			ZE_VRT_INTEGER_32,	false)
+		ZEML_LIST_PROPERTY("LightMapAddressModeV",			LightMapAddressModeVValue,			ZE_VRT_INTEGER_32,	false),
+		ZEML_LIST_PROPERTY("SSAOEnabled",					SSAOEnabledValue,					ZE_VRT_BOOLEAN,		false)
 	};
 
 	if (!Reader.ReadPropertyList(Properties, 77))
@@ -1623,6 +1624,7 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 	SetEnvironmentMapAddressModeW((ZETextureAddressMode)(EnvironmentMapAddressModeWValue.GetType() == ZE_VRT_UNDEFINED ? 0 : EnvironmentMapAddressModeWValue.GetInt32()));
 	SetLightMapAddressModeU((ZETextureAddressMode)(LightMapAddressModeUValue.GetType() == ZE_VRT_UNDEFINED ? 0 : LightMapAddressModeUValue.GetInt32()));
 	SetLightMapAddressModeV((ZETextureAddressMode)(LightMapAddressModeVValue.GetType() == ZE_VRT_UNDEFINED ? 0 : LightMapAddressModeVValue.GetInt32()));
+	SetLightMapAddressModeV((ZETextureAddressMode)(SSAOEnabledValue.GetType() == ZE_VRT_UNDEFINED ? true : SSAOEnabledValue.GetBoolean()));
 
 	// Load resources
 	ZEString ResourcePath;
@@ -1676,8 +1678,6 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + LightMapValue.GetString();
 		SetLightMapFile(ResourcePath);
 	}
-
-	SetSSAOEnabled(true);
 
 	UpdateMaterial();
 }
