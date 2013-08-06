@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEClient.h
+ Zinek Engine - ZENetworkObjectMessageManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_CLIENT_H__
-#define __ZE_CLIENT_H__
-
-#include "ZEPacketManagerServer.h"
-#include "ZESocket/ZEIPAddress.h"
-
-class ZESocketTCP;
-class ZEConnectionTCP;
-
-class ZEClient
-{
-	private:
-
-		ZESocketTCP*					Socket;
-		ZEConnection*					Connection;
-		ZEPacketManagerServer			PacketManager;
-
-	public:
-
-		void							Process(float ElapsedTime);
-		const ZEPacketManagerServer*	GetPacketManager();
-
-		bool							Connect(const ZEIPAddress& Address, ZEUInt16 Port);
-
-		bool							Send(void* Data, ZESize DataSize);
-
-										ZEClient();
-										~ZEClient();
-};
-
-#endif
+#include "ZENetworkObjectMessageManager.h"

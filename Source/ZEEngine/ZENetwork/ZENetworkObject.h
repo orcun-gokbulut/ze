@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEServer.h
+ Zinek Engine - ZENetworkObject.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,44 +34,45 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SERVER_H__
-#define __ZE_SERVER_H__
+#ifndef	__ZE_NETWORK_OBJECT_H__
+#define __ZE_NETWORK_OBJECT_H__
 
-#include "ZEDS/ZEArray.h"
-#include "ZEPacketManagerServer.h"
+#include "ZETypes.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEDelegate.h"
+#include "ZENetworkObjectStateLocal.h"
+#include "ZENetworkObjectStateRemote.h"
+#include "ZENetworkObjectMessageManager.h"
 
-#define zeServer ZEServer::GetInstance()
+class ZENetworkConnection;
 
-class ZESocketTCPListener;
-
-class ZEServer
+class ZENetworkObject
 {
 	private:
-
-		ZESocketTCPListener*			Listener;
-		ZEPacketManagerServer			PacketManager;
-		ZEArray<ZEConnection*>			Connections;
-
-		void							AcceptConnections();
-
-
-
+		ZENetworkConnection*					Connection;
+		ZEUInt32								ObjectId;
+		ZEUInt32								ObjectClassId;
+		ZENetworkObjectStateLocal				StateLocal;
+		ZENetworkObjectStateRemote				StateRemote;
+		ZENetworkObjectMessageManager			MessageManager;
+		
 	public:
+		bool									SetEnabled(bool Enabled);
+		void									GetEnabled();
 
-		bool							AddConnection(ZEConnection* Connection);
-		bool							RemoveConnection(ZEConnection* Connection);
+		void									SetObjectId(ZEUInt32 ObjectId);
+		ZEUInt32								GetObjectId();
 
-		ZEPacketManagerServer*			GetPacketManager();
+		void									SetObjectClassId(ZEUInt32 ObjectClassId);
+		ZEUInt32								GetObjectClassId();
 
-		void							Process(float ElapsedTime);
+		ZENetworkObjectStateLocal*				GetLocalState();
+		ZENetworkObjectStateRemote*				GetRemoteState();
+		ZENetworkObjectMessageManager*			GetMessageManager();
 
-		bool							SendPacket(ZEUInt16 PacketId, void* Data, ZESize DataSize, ZEConnection* Connection);
-		bool							SendData(void* Data, ZESize DataSize, ZEConnection* Connection);
-		void							BroadCast(void* Data, ZESize DataSize);
-		void							BroadCastPacket(ZEUInt16 PacketId, void* Data, ZESize DataSize);
+		bool									HasLocalChanges();
 
-										ZEServer();
-										~ZEServer();
+		void									Reset();
+		void									Advance();
 };
-
 #endif

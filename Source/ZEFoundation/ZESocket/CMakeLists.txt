@@ -35,20 +35,44 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEIPAddress_Unix.cpp			Sources PLATFORMS Unix)
-ze_add_source(ZEIPAddress_Windows.cpp		Sources PLATFORMS Windows)
-#ze_add_source(ZEIPAddressTests_Windows.cpp	Tests PLATFORMS Windows)
-ze_add_source(ZEIPAddress.h					Sources Headers)
-ze_add_source(ZESocket_Unix.cpp				Sources PLATFORMS Unix)
-ze_add_source(ZESocket_Windows.cpp			Sources PLATFORMS Windows)
-#ze_add_source(ZESocketTests_Windows.cpp	Tests PLATFORMS Windows)
-ze_add_source(ZESocket.h					Sources Headers)
+ze_add_source(ZEIPAddress.cpp							Sources)
+ze_add_source(ZEIPAddress_Unix.cpp						Sources PLATFORMS Unix)
+ze_add_source(ZEIPAddress_Windows.cpp					Sources PLATFORMS Windows)
+ze_add_source(ZEIPAddress.h								Sources Headers)
+
+ze_add_source(ZESocketDefinitions.cpp					Sources)
+ze_add_source(ZESocketDefinitions.h						Sources Headers)
+
+ze_add_source(ZESocketUDP.cpp							Sources)
+ze_add_source(ZESocketUDP_Unix.cpp						Sources PLATFORMS Unix)
+ze_add_source(ZESocketUDP_Windows.cpp					Sources PLATFORMS Windows)
+ze_add_source(ZESocketUDP.h								Sources Headers)
+
+ze_add_source(ZESocketTCPClient.cpp						Sources)
+ze_add_source(ZESocketTCPClient_Unix.cpp				Sources PLATFORMS Unix)
+ze_add_source(ZESocketTCPClient_Windows.cpp				Sources PLATFORMS Windows)
+ze_add_source(ZESocketTCPClient.h						Sources Headers)
+
+ze_add_source(ZESocketTCPServer.cpp						Sources)
+ze_add_source(ZESocketTCPServer_Unix.cpp				Sources PLATFORMS Unix)
+ze_add_source(ZESocketTCPServer_Windows.cpp				Sources PLATFORMS Windows)
+ze_add_source(ZESocketTCPServer.h						Sources Headers)
+
+ze_add_source(ZESocketTCPServerListener.cpp				Sources)
+ze_add_source(ZESocketTCPServerListener_Unix.cpp		Sources PLATFORMS Unix)
+ze_add_source(ZESocketTCPServerListener_Windows.cpp		Sources PLATFORMS Windows)
+ze_add_source(ZESocketTCPServerListener.h				Sources Headers)
+
+#ze_add_source(ZEIPAddressTests_Windows.cpp				Tests PLATFORMS Windows)
+#ze_add_source(ZESocketTests_Windows.cpp				Tests PLATFORMS Windows)
 
 ze_add_library(ZESocket 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
     LIBS ZEFoundation)
-	
+
+ze_link(TARGET ZESocket LIBS ws2_32.lib PLATFORMS Windows)
+
 #ze_add_test(ZESocketTests
 #	SOURCES ${Tests}
 #	EXTRA_SOURCES

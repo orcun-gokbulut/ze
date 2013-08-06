@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEClient.cpp
+ Zinek Engine - ZENetworkServer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,72 +33,85 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEClient.h"
-#include "ZEConnection.h"
-#include "ZESocket/ZESocket.h"
+#include "ZENetworkServer.h"
 
-#define TCP_CLIENT_PORT_NO	27200
-
-ZEClient::ZEClient()
+const ZEArray<ZENetworkConnection*>& ZENetworkServer::GetConnections()
 {
-	Socket = NULL;
-	Connection = NULL;
+	return Connections;
 }
 
-ZEClient::~ZEClient()
+void ZENetworkServer::RegisterObject(ZENetworkObject* Object)
 {
-	if(Socket != NULL)
-	{
-		Socket->Close();
-		delete Socket;
-		delete Connection;
-		Socket = NULL;
-		Connection = NULL;
-	}
+	if (Objects.Exists(Object))
+		return;
+
+	Objects.Add(Object);
 }
 
-bool ZEClient::Connect(const ZEIPAddress& Address, ZEUInt16 Port)
+void ZENetworkServer::UnregisterObject(ZENetworkObject* Object)
 {
-	if(Socket != NULL)
-	{
-		Socket->Close();
-		delete Socket;
-		delete Connection;
-		Socket = NULL;
-		Connection = NULL;
-	}
-
-	Socket = new ZESocketTCP();
-	Socket->Create(ZEIPAddress::IPv4Any, TCP_CLIENT_PORT_NO);
-	ZESize Result = Socket->Connect(Address, Port);
-
-	if(Result != ZE_SR_OK)
-		return false;
-
-	Connection = new ZEConnection(Socket);
-
-	return true;
+	Objects.DeleteValue(Object);
 }
 
-void ZEClient::Process(float ElapsedTime)
+void ZENetworkServer::SetIPAddress(const ZEIPAddress& Address)
 {
-	//Fix this shit//////////////////////
-
-	ZEArray<ZEConnection*> Connections;
-	Connections.Add(Connection);
-
-	//Fix this shit//////////////////////
-
-	PacketManager.Process(ElapsedTime, Connections);
-	
+	Socket.SetBindIPAddress(Address);
 }
 
-const ZEPacketManagerServer* ZEClient::GetPacketManager()
+const ZEIPAddress& ZENetworkServer::GetIPAddress()
 {
-	return &PacketManager;
+	return Socket.GetBindIPAddress();
 }
 
-bool ZEClient::Send(void* Data, ZESize DataSize)
+void ZENetworkServer::SetPort(ZEUInt16 Port)
 {
-	return Connection->SendData(Data, DataSize);
+	Socket.SetPort(Port);
+}
+
+ZEUInt16 ZENetworkServer::GetPort()
+{
+	return Socket.GetPort();
+}
+
+ZENetworkServerStatus ZENetworkServer::GetStatus()
+{
+	return Status;
+}
+
+void ZENetworkServer::Start()
+{
+	if (Status == ZE_NSS_RUNNING)
+		return;
+
+}
+
+void ZENetworkServer::Stop()
+{
+}
+
+void ZENetworkServer::Process()
+{
+	ProcessConnections();
+	ProcessObjects();
+}
+
+void ZENetworkServer::Disconnect(ZEUInt ClientId)
+{
+
+}
+
+ZENetworkServer::ZENetworkServer()
+{
+
+	ServerId = 0;
+	NextClientId = 0;
+	Socket.SetBindIPAddress(ZEIPAddress::Any);
+	Socket.SetPort(30000);
+	Status = ZE_NSS_NOT_RUNNING;
+	Enabled = true;
+}
+
+ZENetworkServer* ZENetworkServer::GetInstance()
+{
+	return NULL;
 }

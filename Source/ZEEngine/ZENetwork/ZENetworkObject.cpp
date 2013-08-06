@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPacketHandler.cpp
+ Zinek Engine - ZENetworkObject.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPacketHandler.h"
-
-void ZEPacketHandler::SetHandlerId(ZEInt16 Id)
-{
-	HandlerId = Id;
-}
-
-ZEInt16 ZEPacketHandler::GetHandlerId() const
-{
-	return HandlerId;
-}
-
-void ZEPacketHandler::SetCallback(const ZENetworkCommandCallback& Callback)
-{
-	this->Callback = Callback;
-}
-
-const ZENetworkCommandCallback& ZEPacketHandler::GetCallback() const
-{
-	return Callback;
-}
-
-ZEPacketHandler::ZEPacketHandler()
-{
-	Callback.Clear();
-	HandlerId = 0;
-}
-
-ZEPacketHandler::~ZEPacketHandler()
-{
-	Callback.Clear();
-}
+#include "ZENetworkObject.h"

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEIPAddress.h
+ Zinek Engine - ZENetworkObjectStateLocal.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,33 +34,36 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_IP_ADDRESS_H__
-#define __ZE_IP_ADDRESS_H__
+#ifndef	__ZE_NETWORK_OBJECT_STATE_LOCAL_H__
+#define __ZE_NETWORK_OBJECT_STATE_LOCAL_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZEArray.h"
+#include "ZEDS\ZEArray.h"
 
-class ZEIPAddress
+class ZENetworkObjectStateLocal
 {
 	public:
-		static const ZEIPAddress		Any;
-		static const ZEIPAddress		Broadcast;
+		ZEArray<ZEUInt8>						State;
+		ZEArray<ZEUInt8>						LastAcknowledgedState;
 
-		ZEUInt8							Address[4];
+		ZESize									SquenceNumber;
+		ZESize									LastAcknowledgedSquenceNumber;
 
-		bool							operator == (const ZEIPAddress &RightOperand) const;
-		bool							operator != (const ZEIPAddress &RightOperand) const;
+	private:
+		void									GetSquenceNumber();
+		void									GetLastAcknowledgedSquenceNumber();
 
-										ZEIPAddress();
-										ZEIPAddress(ZEUInt8 Byte0, ZEUInt8 Byte1, ZEUInt8 Byte2, ZEUInt8 Byte3);
+		void									SetSize(ZESize Size);
+		ZESize									GetSize();
 
-		static ZEIPAddress				Parse(const ZEString& String);
-		static ZEArray<ZEIPAddress>		Lookup(const ZEString& String);
-		static ZEArray<ZEIPAddress>		HostIPs();
+		void									SetState(const void* State);
+		void*									GetState();
+		const void*								GetStateReadOnly();
 
-		static void						ToSockaddr_in(void* Buffer, const ZEIPAddress& IPAddress);
-		static void						FromSockaddr_in(ZEIPAddress& IPAddress, const void* Buffer);
+		bool									HasChanges();
+
+		void									Reset();
+		void									Advance();
 };
 
 #endif
