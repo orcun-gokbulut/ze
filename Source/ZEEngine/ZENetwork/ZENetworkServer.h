@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPacketManagerServer.h
+ Zinek Engine - ZENetworkServer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,43 +34,66 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PACKET_MANAGER_H__
-#define __ZE_PACKET_MANAGER_H__
+#ifndef	__ZE_NETWORK_SERVER_H__
+#define __ZE_NETWORK_SERVER_H__
 
 #include "ZETypes.h"
-#include "ZEPacketHandler.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEConnection.h"
-#include "ZEDS/ZEDelegate.h"
-#include "ZEPacking.h"
+#include "ZEDS\ZEArray.h"
+#include "ZESocket\ZEIPAddress.h"
+#include "ZESocket\ZESocketUDP.h"
 
-#define ZE_MAX_PACKET_SIZE 0x0400
-#define ZE_COMMAND_PACKET_HEADER_IDENTIFIER 0xFFFFFFFF
-
-
-ZEPackStruct4(
-struct ZEPacketHeader
+enum ZENetworkServerStatus
 {
-	ZEUInt32 Identifier;
-	ZEUInt16 CommandId;
-	ZEUInt16 DataSize;
-});
+	ZE_NSS_NOT_RUNNING,
+	ZE_NSS_RUNNING
+};
 
-class ZEPacketManagerServer
+class ZENetworkConnection;
+class ZENetworkObject;
+
+class ZENetworkServer
 {
 	private:
+		ZEArray<ZENetworkConnection*>			Connections;
+		ZEArray<ZENetworkObject*>				Objects;
 
-		ZEArray<ZEPacketHandler*>	Handlers;
+		ZEUInt									ServerId;
+		ZEUInt									NextClientId;
+
+		ZESocketUDP								Socket;
+		ZENetworkServerStatus					Status;
+
+		bool									Enabled;
+
+		void									ProcessNewConnections();
+		void									ProcessConnections();
+		void									ProcessObjects();
 
 	public:
+		const ZEArray<ZENetworkConnection*>&	GetConnections();
 
-		void						Process(float ElapsedTime, ZEArray<ZEConnection*>& Connections);
+		void									RegisterObject(ZENetworkObject* Object);
+		void									UnregisterObject(ZENetworkObject* Object);
 
-		bool						RegisterHander(ZEPacketHandler* Handler);
-		bool						UnRegisterHandler(ZEPacketHandler* Handler);
+		void									SetIPAddress(const ZEIPAddress& Address);
+		const ZEIPAddress&						GetIPAddress();
 
-									ZEPacketManagerServer();
-									~ZEPacketManagerServer();
+		void									SetPort(ZEUInt16 Port);
+		ZEUInt16								GetPort();
+
+		ZENetworkServerStatus					GetStatus();
+
+		void									Start();
+		void									Stop();
+
+		void									Disconnect(ZEUInt ClientId);
+
+		void									Process();
+
+		ZENetworkServer();
+
+		static ZENetworkServer*					GetInstance();
 };
+
 
 #endif

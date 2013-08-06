@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEConnection.h
+ Zinek Engine - ZENetworkObjectMessageManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,59 +34,50 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_CONNECTION_H__
-#define __ZE_CONNECTION_H__
+#ifndef	__ZE_NETWORK_OBJECT_MESSAGE_MANAGER_H__
+#define __ZE_NETWORK_OBJECT_MESSAGE_MANAGER_H__
 
 #include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEDelegate.h"
+#include "ZEDS/ZEBuffer.h"
 
-class ZESocket;
+typedef ZEDelegate<void (ZEUInt32, const void*, ZESize)> ZENetworkObjectMessageHandler;
 
-class ZEConnection
+struct ZENetworkObjectMessage
 {
-	friend class ZEPacketManagerServer;
+	ZEUInt32			Id;
+	ZESize				Size;
+	void*				Data;
+};
 
-	protected:
-		ZESocket*					Socket;
+class ZENetworkObjectMessageManager
+{
+	private:
+		ZEUInt32								SquenceNumber;
+		ZEUInt32								LastSequenceNumber;
+	
+		ZEBuffer								ReceiveBuffer;
+		ZEBuffer								SendBuffer;
 
-		char*						TempBuffer;
-		char*						ReadBuffer;
-		char*						SendBuffer;
+		ZENetworkObjectMessageHandler			GenericHandler;
+		ZEArray<ZENetworkObjectMessageHandler>	Handlers;
 
-		ZESize						ReadBufferSize;
-		ZESize						TempBufferSize;
-		ZESize						SendBufferSize;
-
-		ZESize						FilledReadBufferSize;
-		ZESize						FilledSendBufferSize;
-
-		void						ResizeBuffer(void* Buffer, ZESize OldSize, ZESize NewSize);
-
+	
 	public:
+		void									SetGenericHandler(const ZENetworkObjectMessageHandler& GenericHandler);
+		const ZENetworkObjectMessageHandler&	GetGenericHandler();
 
-		void						SetSocket(ZESocket* Socket);
-		const ZESocket*				GetSocket() const;
+		void									RegisterHandler(ZEUInt32 MessageId, const ZENetworkObjectMessageHandler& Handler);
+		void									UnregisterHandler(ZEUInt32 MessageId, const ZENetworkObjectMessageHandler& EventHandler);
 
-		bool						SendData(const void* Data, ZESize Size);
-		void*						GetReadBuffer(ZESize& UsedSize);
+		void									SendMessage(const ZENetworkObjectMessage* Message);
+		
+		void									DistributeMessages();
+		void									ClearMessages();
 
-		void						SetReadBufferSize(ZESize BufferSize);
-		ZESize						GetReadBufferSize() const;
-
-		void						SetSendBufferSize(ZESize BufferSize);
-		ZESize						GetSendBufferSize() const;
-
-		void						SetTemporaryBufferSize(ZESize BufferSize);
-		ZESize						GetTemporaryBufferSize() const;
-
-		void						CleanSendBuffer();
-		void						CleanReadBuffer();
-
-		bool						Process(float ElapsedTime);
-
-									ZEConnection();
-									ZEConnection(ZESocket* Socket);
-
-									~ZEConnection();
+		const ZENetworkObjectMessage*			GetReceivedMessage();
+		void									RemoveReceivedMessage();
 };
 
 #endif

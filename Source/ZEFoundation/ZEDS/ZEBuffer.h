@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPacketManagerBuffer.h
+ Zinek Engine - ZEBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,34 +34,53 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PACKET_MANAGER_BUFFER_H__
-#define __ZE_PACKET_MANAGER_BUFFER_H__
+#ifndef __ZE_BUFFER_H__
+#define __ZE_BUFFER_H__
 
 #include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
 
-class ZEPacketManagerBuffer
+#undef GetFreeSpace
+
+typedef ZESize ZEBufferBlockPointer;
+#define ZE_BP_NONE (ZEBufferBlockPointer)-1
+
+class ZEBuffer
 {
 	private:
-		char*	BufferStart;
-		char*	BufferEnd;
-
-		ZESize	BufferSize;
-		ZESize	DataSize;
-
-		char*	Head;
-		char*	Tail;
+		ZEArray<ZEUInt8>		Buffer;
+		ZESize					BufferStart;
+		ZESize					BufferEnd;
+		ZESize					UsedSpace;
+		ZESize					BlockCount;
 
 	public:
-		void	Create(ZESize BufferSize);
-		void	Release();
+		void					SetSize(ZESize Size);
+		ZESize					GetSize();
 
-		bool	AddData(const void* Data, ZESize Size);
-		ZESize	PopData(ZESize Size, void* ToBuffer);
+		ZESize					GetUsedSpace();
+		ZESize					GetFreeSpace();
+		ZESize					GetBlockCount();
 
-		void	Clear();
+		void					Clear();
 
-				ZEPacketManagerBuffer();
-				~ZEPacketManagerBuffer();
+		bool					AddBlock(const void* Data, ZESize Size);
+		bool					DeleteBlock();
+	
+		ZEBufferBlockPointer	GetFirstBlock();
+		ZEBufferBlockPointer	MoveNextBlock(ZEBufferBlockPointer PrevPointer);
+
+		bool					GetBlockData(void* Data);
+		bool					GetBlockData(void* Data, ZESize Size);	
+		bool					GetBlockData(ZEBufferBlockPointer Pointer, void* Data);
+		bool					GetBlockData(ZEBufferBlockPointer Pointer, void* Data, ZESize Size);
+
+		ZESize					GetBlockSize();
+		ZESize					GetBlockSize(ZEBufferBlockPointer Pointer);
+
+		void					Reset();
+
+								ZEBuffer();
 };
 
 #endif
