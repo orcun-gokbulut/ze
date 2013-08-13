@@ -97,7 +97,7 @@ bool ZED3D9SkyDomeMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 	GetDevice()->SetVertexShaderConstantF(4, (const float*)&ScaleMatrix, 4);
 	
 
-	float MiddayFactor, SunsetFactor;
+	float MiddayFactor;
 	float SunHeight = -SunLightDirection.y;
 
 	float Scale = 1.0f / (OuterRadius - InnerRadius);

@@ -39,13 +39,16 @@ ze_add_cmake_project(CMakeScripts
 	SOURCES	
 		ze.cmake
 		ze_check.cmake
-		ze_common.cmake
+		ze_debugging.cmake
 		ze_dependency.cmake
 		ze_external.cmake
 		ze_merge_libraries.cmake
 		ze_merge_libraries_unix.cmake.in
 		ze_platform.cmake
 		ze_qt.cmake
+		ze_static_check.cmake
+		ze_symbol_server.cmake
 		ze_target.cmake
+		ze_unit_test.cmake
 		ze_utility.cmake
 		ze_version.cmake)

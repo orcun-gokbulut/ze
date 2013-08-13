@@ -42,14 +42,14 @@ project(Zinek)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
 
 include(ze)
-ze_configure_init()
-ze_configure_version()
-ze_configure_platform()
-ze_configure_external()
-ze_configure_debugging()
-ze_configure_unit_tests()
-ze_configure_static_checks()
-ze_configure_symbol_server()
+ze_init()
+ze_version_init()
+ze_platform_init()
+ze_external_init()
+ze_debugging_init()
+ze_unit_test_init()
+ze_static_check_init()
+ze_symbol_server_init()
 
 
 ## DLL Options
