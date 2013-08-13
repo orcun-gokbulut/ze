@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZECrashReport.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - ze_debugging.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,46 +30,29 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECrashReport.h"
-#include "ZECrashReportProvider.h"
+macro (ze_debugging_init)
+	set(ZEBUILD_DEBUG_ENABLE                  TRUE  CACHE BOOL "Enable debug extensions.")
+	set(ZEBUILD_DEBUG_HEAP_CHECK_ENABLE       FALSE CACHE BOOL "Enable heap checking.")
+	set(ZEBUILD_DEBUG_BREAK_ON_ERROR          TRUE  CACHE BOOL "Break if an error occures.")
+	set(ZEBUILD_DEBUG_BREAK_ON_WARNING        FALSE CACHE BOOL "Break if an warning occures.")
+	set(ZEBUILD_VERBOSE	                      FALSE CACHE BOOL "Enable ZEBuild verbose mode.")
 
-const ZEArray<ZECrashReportProvider*>& ZECrashReport::GetProviders()
-{
-	return Providers;
-}
+	if (ZEBUILD_DEBUG_ENABLE)
+		ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_ENABLE)
+		
+		if (ZEBUILD_DEBUG_BREAK_ON_ERROR)
+			ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_BREAK_ON_ERROR)
+		endif()
 
-bool ZECrashReport::RegisterProvider(ZECrashReportProvider* Provider)
-{
-	if (Providers.Exists(Provider))
-		return false;
+		if (ZEBUILD_DEBUG_BREAK_ON_WARNING)
+			ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG _ZE_DEBUG_BREAK_ON_WARNING)
+		endif()
 
-	Providers.Add(Provider);
-
-	return true;
-}
-
-void ZECrashReport::UnregisterProvider(ZECrashReportProvider* Provider)
-{
-	Providers.DeleteValue(Provider);
-	delete Provider;
-}
-
-void ZECrashReport::Generate()
-{
-	for (ZESize I = 0; I < Providers.GetCount(); I++)
-		Providers[I]->Generate();
-}
-
-void ZECrashReport::CleanUp()
-{
-	for (ZESize I = 0; I < Providers.GetCount(); I++)
-		Providers[I]->CleanUp();
-}
-
-ZECrashReport::~ZECrashReport()
-{
-	CleanUp();
-}
+		if (ZEBUILD_DEBUG_HEAP_CHECK_ENABLE)
+			ze_append_property(GLOBAL PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_MEMORY_CHECKS_ENABLE)
+		endif()
+	endif()
+endmacro()

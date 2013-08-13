@@ -33,7 +33,7 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-macro(ze_get_version)
+macro(ze_version_get)
 	file(READ "${ARGV0}/Version.txt" VERSION_STRING)
 
 	set(VERSION_MAJOR 0)
@@ -53,7 +53,7 @@ macro(ze_get_version)
 
 endmacro()
 
-macro(ze_get_version_branch)
+macro(ze_version_get_branch)
 	set (VERSION_BRANCH "")
 	include(External/FindSubversion)
 	Subversion_WC_INFO(${ARGV0} SVN_INFO)
@@ -66,7 +66,7 @@ macro(ze_get_version_branch)
 
 endmacro()
 
-macro(ze_get_version_revision_number)
+macro(ze_version_get_revision_number)
 	set (VERSION_REVISION "0")
 	include(External/FindSubversion)
 	Subversion_WC_INFO(${ARGV0} SVN_INFO)
@@ -75,4 +75,37 @@ macro(ze_get_version_revision_number)
 	else()
 		set(VERSION_REVISION "0")
 	endif()
+endmacro()
+
+macro (ze_version_init)
+	message(STATUS "[ZEBuild] Collecting version information...")
+
+	ze_version_get(${CMAKE_SOURCE_DIR})
+	ze_version_get_revision_number(${CMAKE_SOURCE_DIR})
+	ze_version_get_branch(${CMAKE_SOURCE_DIR})
+
+	set(ZEBUILD_VERSION_MAJOR ${VERSION_MAJOR})
+	set(ZEBUILD_VERSION_MINOR ${VERSION_MINOR})
+	set(ZEBUILD_VERSION_INTERNAL ${VERSION_INTERNAL})
+	set(ZEBUILD_VERSION_REVISION ${VERSION_REVISION})
+	set(ZEBUILD_VERSION_BRANCH ${VERSION_BRANCH})
+
+
+	message(STATUS "[ZEBuild] Version           : v${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}.${ZEBUILD_VERSION_INTERNAL} Build ${ZEBUILD_VERSION_BUILD}")
+	message(STATUS "[ZEBuild] Major Version     : ${ZEBUILD_VERSION_MAJOR}")
+	message(STATUS "[ZEBuild] Minor Version     : ${ZEBUILD_VERSION_MINOR}")
+	message(STATUS "[ZEBuild] Internal Version  : ${ZEBUILD_VERSION_INTERNAL}")
+	message(STATUS "[ZEBuild] Build             : ${ZEBUILD_VERSION_REVISION}")
+	message(STATUS "[ZEBuild] Branch            : ${ZEBUILD_VERSION_BRANCH}")
+	message(STATUS "[ZEBuild] Version information has been collected.")
+	message(STATUS "")
+	message(STATUS "")
+	
+	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
+		ZE_ZINEK
+		ZE_VERSION_MAJOR=${ZEBUILD_VERSION_MAJOR}
+		ZE_VERSION_MINOR=${ZEBUILD_VERSION_MINOR}
+		ZE_VERSION_INTERNAL=${ZEBUILD_VERSION_INTERNAL}
+		ZE_VERSION_REVISION=${ZEBUILD_VERSION_REVISION}
+		ZE_VERSION_BRANCH="${ZEBUILD_VERSION_BRANCH}")
 endmacro()

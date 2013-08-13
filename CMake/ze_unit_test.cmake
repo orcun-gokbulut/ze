@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZECrashReport.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - ze_unit_test.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,46 +30,18 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECrashReport.h"
-#include "ZECrashReportProvider.h"
-
-const ZEArray<ZECrashReportProvider*>& ZECrashReport::GetProviders()
-{
-	return Providers;
-}
-
-bool ZECrashReport::RegisterProvider(ZECrashReportProvider* Provider)
-{
-	if (Providers.Exists(Provider))
-		return false;
-
-	Providers.Add(Provider);
-
-	return true;
-}
-
-void ZECrashReport::UnregisterProvider(ZECrashReportProvider* Provider)
-{
-	Providers.DeleteValue(Provider);
-	delete Provider;
-}
-
-void ZECrashReport::Generate()
-{
-	for (ZESize I = 0; I < Providers.GetCount(); I++)
-		Providers[I]->Generate();
-}
-
-void ZECrashReport::CleanUp()
-{
-	for (ZESize I = 0; I < Providers.GetCount(); I++)
-		Providers[I]->CleanUp();
-}
-
-ZECrashReport::~ZECrashReport()
-{
-	CleanUp();
-}
+macro(ze_unit_test_init)
+	set(ZEBUILD_UNIT_TESTS_ENABLE             FALSE CACHE BOOL "Enable unit tests.")
+	set(ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE    FALSE CACHE BOOL "Enables code coverage instrumentation.")
+	
+	if (ZEBUILD_UNIT_TESTS_ENABLE)
+		ENABLE_TESTING()
+	endif()
+	
+	if (ZEBUILD_UNIT_TESTS_ENABLE AND ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE)
+		include(External/test_cocoon)
+	endif()
+endmacro()

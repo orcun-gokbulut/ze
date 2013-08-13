@@ -305,7 +305,7 @@ bool ZECrashReportUIProgressWindow::CompressPackage()
 		if(ProcessError)
 			Reading = false;
 
-		ZESize Readed = fread(InputBuffer, 1, 2048, PackedFile);
+		ZESize Readed = fread(InputBuffer, sizeof(char), 2048, PackedFile);
 
 		if(Readed != 2048)
 		{
@@ -314,7 +314,15 @@ bool ZECrashReportUIProgressWindow::CompressPackage()
 				Compressor->SetEos(true);
 				Compressor->SetInputSize(Readed);
 				Compressor->Compress();
-				fwrite(OutputBuffer, 1, Compressor->GetOutputSize(), CompressedFile);
+				fwrite(OutputBuffer, sizeof(char), Compressor->GetOutputSize(), CompressedFile);
+				
+				while(Compressor->GetState() == ZE_CS_OUTPUT_FULL)
+				{
+					Compressor->Compress();
+
+					fwrite(OutputBuffer, sizeof(char), Compressor->GetOutputSize(), CompressedFile);
+				}
+				
 				Reading = false;
 				continue;
 			}
@@ -323,7 +331,7 @@ bool ZECrashReportUIProgressWindow::CompressPackage()
 		Compressor->Compress();
 
 		if(Compressor->GetState() == ZE_CS_OUTPUT_FULL)
-			fwrite(OutputBuffer, 1, Compressor->GetOutputSize(), CompressedFile);
+			fwrite(OutputBuffer, sizeof(char), Compressor->GetOutputSize(), CompressedFile);
 
 		if(Compressor->GetState() == ZE_CS_ERROR)
 			ProcessError = true;

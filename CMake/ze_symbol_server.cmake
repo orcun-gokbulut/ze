@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZECrashReport.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - ze_symbol_server.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,46 +30,11 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECrashReport.h"
-#include "ZECrashReportProvider.h"
-
-const ZEArray<ZECrashReportProvider*>& ZECrashReport::GetProviders()
-{
-	return Providers;
-}
-
-bool ZECrashReport::RegisterProvider(ZECrashReportProvider* Provider)
-{
-	if (Providers.Exists(Provider))
-		return false;
-
-	Providers.Add(Provider);
-
-	return true;
-}
-
-void ZECrashReport::UnregisterProvider(ZECrashReportProvider* Provider)
-{
-	Providers.DeleteValue(Provider);
-	delete Provider;
-}
-
-void ZECrashReport::Generate()
-{
-	for (ZESize I = 0; I < Providers.GetCount(); I++)
-		Providers[I]->Generate();
-}
-
-void ZECrashReport::CleanUp()
-{
-	for (ZESize I = 0; I < Providers.GetCount(); I++)
-		Providers[I]->CleanUp();
-}
-
-ZECrashReport::~ZECrashReport()
-{
-	CleanUp();
-}
+macro(ze_symbol_server_init)
+	set(ZEBUILD_SYMBOL_SERVER_ENABLE FALSE CACHE BOOL "Upload symbols to symbol server.")
+	set(ZEBUILD_SYMBOL_SERVER_ADDRESS "\\\\Server\\Symbols" CACHE STRING "Symbol server address.")
+	set(ZEBUILD_SYMBOL_SERVER_SOURCE_INDEX FALSE CACHE BOOL "Index code in sybols with svn address.")
+endmacro()
