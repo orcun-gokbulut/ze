@@ -133,7 +133,7 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	this->Scene->SetActiveCamera(this->Player->GetCamera());
 	this->Scene->AddEntity(this->Player);
 	Player->SetPosition(ZEVector3(0.0f, 2.0f, 0.0f));
-	this->Player->GetCamera()->SetFOV(ZE_PI / 3);
+	this->Player->GetCamera()->SetHorizontalFOV(ZE_PI / 3);
 
 	this->GenerateAssertList();	
 	EntitySelector = new ZEDEntitySelector();

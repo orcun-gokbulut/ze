@@ -144,12 +144,13 @@ void ZED3D9HBAOProcessor::DestroyShaders()
 
 void ZED3D9HBAOProcessor::UpdateStates()
 {
-	float Fov = Renderer->GetCamera()->GetFOV();
+	float Fov = Renderer->GetCamera()->GetHorizontalFOV();
 	float Width = Output->GetWidth();
 	float Height = Output->GetHeight();
 
-	float FocalWidth = 1.0f / ZEAngle::Tan(Fov * 0.5f) *  Height / Width;
-	float FocalHeight = 1.0f / ZEAngle::Tan(Fov * 0.5f);
+	float FocalWidth = 1.0f / ZEAngle::Tan(Fov * 0.5f);
+	float FocalHeight = 1.0f / ZEAngle::Tan(Fov * 0.5f) *  Width / Height;
+	
 
 	ZEVector4 ParameterRadius = ZEVector4(OcclusionRadius * RadiusMultiplier, 0.0f, 0.0f, 0.0f);
 	ZEVector4 ParameterRadiusInv = ZEVector4(1.0f / ParameterRadius.x, 0.0f, 0.0f, 0.0f);

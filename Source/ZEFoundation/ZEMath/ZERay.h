@@ -45,7 +45,7 @@ class ZELineSegment;
 class ZERay : public ZELine
 {
 	public:
-		static void			Create(ZERay & Ray,const ZEVector3 & Start,const ZEVector3 & End);
+		static void			Create(ZERay & Ray,const ZEVector3 & P0,const ZEVector3 & P1);
 		static void			CreateParametric(ZERay & Ray,const ZEVector3 & v,const ZEVector3 & p);
 
 		static float		MinimumDistance(const ZERay& Ray, const ZEVector3& Point);
@@ -62,7 +62,7 @@ class ZERay : public ZELine
 
 		const ZEVector3&	GetStartPoint() const;
 
-							ZERay(const ZEVector3 &v, const ZEVector3 &p);
+							ZERay(const ZEVector3 &Direction, const ZEVector3 &Position);
 							ZERay();
 };
 #endif

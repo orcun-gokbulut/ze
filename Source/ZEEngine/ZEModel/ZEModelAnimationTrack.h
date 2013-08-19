@@ -45,7 +45,7 @@ enum ZEModelAnimationBlendMode
 {
 	ZE_MABM_NONE		= 0,
 	ZE_MABM_INTERPOLATE = 1,
-	ZE_MABM_ADDAPTIVE	= 2,
+	ZE_MABM_ADDITIVE	= 2,
 	ZE_MABM_OVERWRITE	= 3,
 };
 

@@ -383,6 +383,16 @@ void ZEQuaternion::Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQu
 	zeDebugCheck(!Output.IsNormalized(), "Output quaternion is not normalized.");
 }
 
+void ZEQuaternion::Nlerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor)
+{
+		Output.w = A.w + (B.w - A.w) * Factor;
+		Output.x = A.x + (B.x - A.x) * Factor;
+		Output.y = A.y + (B.y - A.y) * Factor;
+		Output.z = A.z + (B.z - A.z) * Factor;
+
+		Output.NormalizeSelf();
+}
+
 void ZEQuaternion::Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion)
 {
 //	zeDebugCheck(!Quaternion.IsValid(), "Parameter quaternion is not valid.");

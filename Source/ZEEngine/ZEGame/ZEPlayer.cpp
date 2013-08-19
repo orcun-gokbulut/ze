@@ -229,7 +229,7 @@ ZEListener* ZEPlayer::GetListener()
 void ZEPlayer::SetFOV(float FOV)
 {
 	this->FOV = FOV;
-	Camera->SetFOV(FOV);
+	Camera->SetHorizontalFOV(FOV);
 }
 
 float ZEPlayer::GetFOV()
@@ -297,7 +297,7 @@ ZEPlayer::ZEPlayer()
 	Camera->SetRotation(ZEQuaternion::Identity);
 	Camera->SetNearZ(zeGraphics->GetNearZ());
 	Camera->SetFarZ(zeGraphics->GetFarZ());
-	Camera->SetFOV(FOV);
+	Camera->SetHorizontalFOV(FOV);
 	Camera->SetAspectRatio(zeGraphics->GetAspectRatio());
 	AddComponent(Camera);
 
