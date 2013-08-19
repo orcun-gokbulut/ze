@@ -277,13 +277,9 @@ const ZEArray<ZEModelHelper>& ZEModel::GetHelpers()
 const ZEArray<ZEModelAnimation>* ZEModel::GetAnimations()
 {
 	if (ModelResource == NULL)
-	{
 		return  NULL;
-	}
-	else 
-	{
-		return &ModelResource->GetAnimations();
-	}
+
+	return &ModelResource->GetAnimations();
 }
 
 void ZEModel::SetActiveLOD(ZEUInt LOD)

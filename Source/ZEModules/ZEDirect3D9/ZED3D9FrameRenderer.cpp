@@ -707,7 +707,7 @@ void ZED3D9FrameRenderer::DoLightningPass()
 
 	// ViewVector & PixelSize
 	ZEVector4 ViewVector;
-	ViewVector.y = ZEAngle::Tan(Camera->GetFOV() * 0.5f);
+	ViewVector.y = ZEAngle::Tan(Camera->GetVerticalFOV() * 0.5f);
 	ViewVector.x = ViewVector.y * ViewPort->GetAspectRatio();
 	ViewVector.z = 1.0f;
 	ViewVector.w = 0.0f;
@@ -1013,8 +1013,8 @@ bool ZED3D9FrameRenderer::Initialize()
 { 
 	InitializeRenderTargets();
 
-	HBAOProcessor.SetRenderer(this);
-	HBAOProcessor.Initialize();
+	//HBAOProcessor.SetRenderer(this);
+	//HBAOProcessor.Initialize();
 	
 	SSAOProcessor.SetRenderer(this);
 	SSAOProcessor.Initialize();

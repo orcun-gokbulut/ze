@@ -41,9 +41,9 @@
 
 #include "ZEMath/ZEMath.h"
 
-void ZERay::Create(ZERay & Ray, const ZEVector3 & Start,const ZEVector3 & End)
+void ZERay::Create(ZERay & Ray, const ZEVector3 & P0,const ZEVector3 & P1)
 {
-	ZELine::Create(Ray,Start,End);
+	ZELine::Create(Ray, P0, P1);
 }
 
 void ZERay::CreateParametric(ZERay & Ray,const ZEVector3 & v,const ZEVector3 & p)
@@ -224,10 +224,10 @@ const ZEVector3& ZERay::GetStartPoint() const
 }
 
 
-ZERay::ZERay(const ZEVector3 & v,const ZEVector3 &p)
+ZERay::ZERay(const ZEVector3 & Direction,const ZEVector3 &Position)
 {
-	this->v = v;
-	this->p = p;
+	this->v = Direction.Normalize();
+	this->p = Position;
 }
 
 ZERay::ZERay() 

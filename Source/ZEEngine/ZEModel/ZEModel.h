@@ -171,16 +171,6 @@ class ZEModel : public ZEEntity
 		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
-
-		void								SetDrawSkeleton(bool Enabled);
-		bool								GetDrawSkeleton();
-
-		void								SetDrawPhysicalBodies(bool Enabled);
-		bool								GetDrawPhysicalBodies();
-
-		void								SetDrawPhysicalJoints(bool Enabled);
-		bool								GetDrawPhysicalJoints();
-
 		
 		static ZEModel*						CreateInstance();
 };

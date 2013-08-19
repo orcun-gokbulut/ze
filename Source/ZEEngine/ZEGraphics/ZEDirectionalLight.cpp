@@ -224,8 +224,8 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 	ZEShadowRenderer* ShadowRenderer = (ZEShadowRenderer*)zeScene->GetShadowRenderer();
 
 	// Fetch camera constants
-	float CamareFOV = Camera->GetFOV();
-	float TangentHalfFov = ZEAngle::Tan(CamareFOV * 0.5f);
+	float CameraFOV = Camera->GetHorizontalFOV();
+	float TangentHalfFov = ZEAngle::Tan(CameraFOV * 0.5f);
 	float CameraAspectRatio = Camera->GetAspectRatio();
 	ZEVector3 CameraUp = Camera->GetWorldUp();
 	ZEVector3 CameraFront = Camera->GetWorldFront();
