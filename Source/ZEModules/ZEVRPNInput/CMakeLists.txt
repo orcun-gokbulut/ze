@@ -40,6 +40,6 @@ ze_add_source(ZEVRPNInputDevice.h						Sources)
 ze_add_source(ZEVRPNInputModule.cpp						Sources)
 ze_add_source(ZEVRPNInputModule.h						Sources)
 
-ze_add_library(ZEVRPNInput 
+ze_add_library(TARGET ZEVRPNInput 
 	SOURCES ${Sources}
 	LIBS libVRPN)

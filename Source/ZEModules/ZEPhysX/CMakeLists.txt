@@ -58,6 +58,6 @@ ze_add_source(ZEPhysXStream.h					Sources)
 ze_add_source(ZEPhysXUserOutputStream.cpp		Sources)
 ze_add_source(ZEPhysXUserOutputStream.h			Sources)
 
-ze_add_library(ZEPhysX 
+ze_add_library(TARGET ZEPhysX 
 	SOURCES ${Sources}
 	LIBS libPhysX2)

@@ -46,6 +46,6 @@ ze_add_source(ZEDPreviewWidget.h	Sources)
 ze_add_source(ZEDPlugInManager.cpp	Sources)
 ze_add_source(ZEDPlugInManager.h	Sources)
 
-ze_add_library(ZEDCore 
+ze_add_library(TARGET ZEDCore 
 	SOURCES ${Sources}
 	LIBS libQt)

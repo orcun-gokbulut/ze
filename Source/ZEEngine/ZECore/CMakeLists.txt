@@ -96,7 +96,7 @@ ze_add_source(ZECrashHandler.cpp					Sources)
 ze_add_source(ZECrashHandler.h						Sources Headers)
 ze_add_source(ZECrashHandler_Windows.cpp			Sources PLATFORMS Windows)
 
-ze_add_library(ZECore
+ze_add_library(TARGET ZECore
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation libPhysX2)

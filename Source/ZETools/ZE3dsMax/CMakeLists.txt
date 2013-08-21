@@ -41,7 +41,7 @@ set(ZEBUILD_3DS_MAX_BINARY_DIRECTORY "C:\\Program Files (x86)\\Autodesk\\3ds Max
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_subdirectory(ZE3dsMaxUI)	
+add_subdirectory(ZE3dsMaxUI)
 add_subdirectory(ZE3dsMaxModelExporter)
 add_subdirectory(ZE3dsMaxInteriorExporter)
 add_subdirectory(ZE3dsMaxPlugin)

@@ -44,7 +44,7 @@ ze_add_source(ZEToolbarIcons_24a.bmp		Sources ZEFC)
 ze_add_source(ZEToolbarIcons_24i.bmp		Sources ZEFC)
 ze_add_source(zineklogo.bmp					Sources ZEFC)
 
-ze_add_library(ZE3dsMaxPlugin 
+ze_add_library(TARGET ZE3dsMaxPlugin 
 	SOURCES ${Sources}
 	LIBS ZEFoundation ZEFile ZE3dsMaxModelExporter ZE3dsMaxInteriorExporter ZE3dsMaxUI ZE3dsMaxUtils Comctl32 lib3dsMax
 	DLL

@@ -51,7 +51,8 @@ function(ze_link)
 
 	foreach(CURRENT_LIB ${PARAMETER_LIBS})
 		if (TARGET ${CURRENT_LIB})
-			get_property(CURRENT_LIB_TYPE TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_TYPE)				
+			get_property(CURRENT_LIB_TYPE TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_TYPE)
+			
 			if (CURRENT_LIB_TYPE MATCHES "EXTERNAL")
 			
 				get_property(CURRENT_LIB_DIRECTORY TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_LIB_DIRECTORY)
@@ -126,15 +127,13 @@ endfunction()
 
 
 function(ze_add_executable)
-	parse_arguments(PARAMETER "SOURCES;LIBS;DESTINATION;${ze_check_parameters}" "INSTALL;CONSOLE;DLL;BUNDLE" ${ARGV})
+	parse_arguments(PARAMETER "TARGET;SOURCES;LIBS;DESTINATION;${ze_check_parameters}" "INSTALL;CONSOLE;DLL;BUNDLE" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
 		return()
 	endif()
 
-	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
-	
 	# Compile
 	set(VARIABLE_EXECUTABLE_TYPE "")
 	if (PARAMETER_CONSOLE)
@@ -173,15 +172,13 @@ endfunction()
 
 
 function(ze_add_plugin)
-	parse_arguments(PARAMETER "SOURCES;LIBS;${ze_check_parameters}" "INSTALL;EDITOR" ${ARGV})
+	parse_arguments(PARAMETER "TARGET;SOURCES;LIBS;${ze_check_parameters}" "INSTALL;EDITOR" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
 		return()
 	endif()
 
-	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
-	
 	# Compile
 	add_library(${PARAMETER_TARGET} SHARED ${PARAMETER_SOURCES})
 
@@ -209,14 +206,12 @@ function(ze_add_plugin)
 endfunction()
 
 function (ze_add_library)
-	parse_arguments(PARAMETER "SOURCES;LIBS;HEADERS;${ze_check_parameters}" "INSTALL;DLL;COMBINE" ${ARGV})
+	parse_arguments(PARAMETER "TARGET;SOURCES;LIBS;HEADERS;${ze_check_parameters}" "INSTALL;DLL;COMBINE" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
 		return()
 	endif()
-
-	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
 	
 	# Compile
 	if (PARAMETER_DLL)
@@ -256,16 +251,13 @@ function (ze_add_test)
 		return()
 	endif()
 
-	parse_arguments(PARAMETER "SOURCES;TEST_TARGET;EXTRA_SOURCES;LIBS;${ze_check_parameters}" "" ${ARGV})
+	parse_arguments(PARAMETER "TARGET;SOURCES;TEST_TARGET;EXTRA_SOURCES;LIBS;${ze_check_parameters}" "" ${ARGV})
 		
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
 		return()
 	endif()
-
-	# Get Target Name
-	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
-			
+	
 	add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES} ${PARAMETER_EXTRA_SOURCES})
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
 	#set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER "${ZEBUILD_PROJECT_FOLDER}/Tests")

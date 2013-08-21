@@ -48,7 +48,7 @@ ze_add_source(ZEInteriorResource.h			Sources Headers)
 ze_add_source(ZEInteriorDebugDrawer.cpp		Sources)
 ze_add_source(ZEInteriorDebugDrawer.h		Sources Headers)
 
-ze_add_library(ZEInterior 
+ze_add_library(TARGET ZEInterior 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation)

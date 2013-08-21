@@ -52,7 +52,7 @@ ze_add_source(ZEProperty.h				Sources Headers)
 ze_add_source(ZEProvider.cpp		    Sources)
 ze_add_source(ZEProvider.h				Sources Headers)
 
-ze_add_library(ZEMeta 
+ze_add_library(TARGET ZEMeta 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation)

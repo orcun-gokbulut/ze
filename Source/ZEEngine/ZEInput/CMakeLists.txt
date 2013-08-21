@@ -52,7 +52,7 @@ ze_add_source(ZEInputDeviceExtension.h					Sources Headers)
 ze_add_source(ZEInputModule.cpp							Sources)
 ze_add_source(ZEInputModule.h							Sources Headers)
 
-ze_add_library(ZEInput 
+ze_add_library(TARGET ZEInput 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation)

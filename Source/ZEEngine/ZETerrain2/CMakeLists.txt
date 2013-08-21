@@ -54,7 +54,7 @@ ze_add_source(ZETerrainPrimitiveBuffer.h		Sources)
 ze_add_source(ZETextureSampler.h				Sources)
 ze_add_source(ZETextureSampler.cpp				Sources)
 
-ze_add_library(ZETerrain2
+ze_add_library(TARGET ZETerrain2
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation)

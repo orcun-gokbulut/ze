@@ -47,6 +47,6 @@ ze_add_source(ZEDSSoundSource3D.cpp			Sources)
 ze_add_source(ZEDSSoundSource3D.h			Sources)
 
 
-ze_add_library(ZEDirectSound 
+ze_add_library(TARGET ZEDirectSound 
 	SOURCES ${Sources}
 	LIBS libDirectSound)

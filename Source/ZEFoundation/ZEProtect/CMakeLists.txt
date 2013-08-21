@@ -40,6 +40,6 @@ ze_add_source(md5.h     			Sources)
 ze_add_source(ZEProtect.cpp        	Sources)
 ze_add_source(ZEProtect.h          	Sources)
 
-ze_add_library(ZEProtect
+ze_add_library(TARGET ZEProtect
 	SOURCES ${Sources} 
 	HEADERS ${Headers})

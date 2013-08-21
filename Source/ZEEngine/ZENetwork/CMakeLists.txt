@@ -54,7 +54,7 @@ ze_add_source(ZENetworkObjectMessageManager.h		 	Sources Headers)
 ze_add_source(ZENetworkServer.cpp				Sources)
 ze_add_source(ZENetworkServer.h	 				Sources Headers)
 
-ze_add_library(ZENetwork 
+ze_add_library(TARGET ZENetwork 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation)

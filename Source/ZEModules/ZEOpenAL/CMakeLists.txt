@@ -46,6 +46,6 @@ ze_add_source(ZEALSoundSource.h				Sources)
 ze_add_source(ZEALSoundSource3D.cpp			Sources)
 ze_add_source(ZEALSoundSource3D.h			Sources)
 	
-ze_add_library(ZEOpenAL 
+ze_add_library(TARGET ZEOpenAL 
 	SOURCES ${Sources}
 	LIBS libOpenAL)

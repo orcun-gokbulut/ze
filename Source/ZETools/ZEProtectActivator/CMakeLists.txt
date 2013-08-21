@@ -37,7 +37,7 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEProtectActivator.cpp		Sources)
 
-ze_add_executable(ZEProtectActivator
+ze_add_executable(TARGET ZEProtectActivator
 	CONSOLE
 	SOURCES ${Sources}
 	LIBS ZEFoundation ZEProtect)

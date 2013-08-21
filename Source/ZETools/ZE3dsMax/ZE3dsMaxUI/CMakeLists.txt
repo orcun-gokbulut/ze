@@ -43,7 +43,7 @@ ze_add_source(ZE3dsMaxScriptCommonUtilities.ms 	Sources ZEFC)
 ze_add_source(ZE3dsMaxScriptHelper.ms			Sources ZEFC)
 ze_add_source(ZE3dsMaxScriptRemove.ms 			Sources ZEFC)
 
-ze_add_library(ZE3dsMaxUI 
+ze_add_library(TARGET ZE3dsMaxUI 
 	SOURCES ${Sources}
 	LIBS ZEFoundation lib3dsMax)
 

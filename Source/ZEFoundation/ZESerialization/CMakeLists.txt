@@ -46,6 +46,6 @@ ze_add_source(ZEFileSerializer.h		Sources Headers)
 ze_add_source(ZEFileUnserializer.cpp	Sources)
 ze_add_source(ZEFileUnserializer.h		Sources Headers)
 
-ze_add_library(ZESerialization 
+ze_add_library(TARGET ZESerialization 
 	SOURCES ${Sources} 
 	HEADERS ${Headers})

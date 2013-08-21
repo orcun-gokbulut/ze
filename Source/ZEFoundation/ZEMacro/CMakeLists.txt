@@ -52,7 +52,7 @@ ze_add_source(ZEMacroLogic.h				Headers Sources)
 ze_add_source(ZEMacroRepeater.cpp			Sources)
 ze_add_source(ZEMacroRepeater.h				Headers Sources)
 
-ze_add_library(ZEMacro 
+ze_add_library(TARGET ZEMacro 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation)

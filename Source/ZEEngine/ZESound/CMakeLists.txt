@@ -53,7 +53,7 @@ ze_add_source(ZESoundSource.h				Sources Headers ZEPP)
 ze_add_source(ZESoundSource3D.cpp			Sources)
 ze_add_source(ZESoundSource3D.h				Sources Headers ZEPP)
 
-ze_add_library(ZESound 
+ze_add_library(TARGET ZESound 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation libmpg123 libOGG libVorbis)

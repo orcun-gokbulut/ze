@@ -104,11 +104,11 @@ ze_add_source(ZEFormatOverloads.cpp		Sources)
 ze_add_source(ZEStringWriter.cpp		Sources)
 ze_add_source(ZEStringWriter.h			Sources Headers)
 ze_add_source(ZEStringWriterTests.cpp		Tests)
-ze_add_library(ZEDS 
+ze_add_library(TARGET ZEDS 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation)
 	
-ze_add_test(ZEDSTests 
+ze_add_test(TARGET ZEDSTests 
 	SOURCES ${Tests}
 	TEST_TARGET ZEDS)

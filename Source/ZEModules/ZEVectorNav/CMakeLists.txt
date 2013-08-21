@@ -40,6 +40,6 @@ ze_add_source(ZEVectorNavInputDevice.h				Sources)
 ze_add_source(ZEVectorNavInputModule.cpp			Sources)
 ze_add_source(ZEVectorNavInputModule.h				Sources)
 
-ze_add_library(ZEVectorNav 
+ze_add_library(TARGET ZEVectorNav 
 	SOURCES ${Sources}
 	LIBS libVectorNav)

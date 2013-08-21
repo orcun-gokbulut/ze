@@ -52,6 +52,6 @@ qt4_wrap_cpp(QtMocFiles ${QtMocs})
 
 include_directories(${CMAKE_BINARY_DIR})
 
-ze_add_library(ZEResourceConfigurationWidget 
+ze_add_library(TARGET ZEResourceConfigurationWidget 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
 	LIBS ZEResourceConfigurator libQt)

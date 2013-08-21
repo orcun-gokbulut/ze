@@ -90,13 +90,13 @@ ze_add_source(ZEBase64.cpp				Sources)
 ze_add_source(ZEVersion.cpp				Sources)
 ze_add_source(ZEVersion.h				Sources Headers)
 
-ze_add_library(ZEFoundation
+ze_add_library(TARGET ZEFoundation
 	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket ZEML ZERegEx ZECompression
 	COMBINE
 	SOURCES ${Sources} 
 	HEADERS ${Headers})
 
-ze_add_test(ZEFoundationTests
+ze_add_test(TARGET ZEFoundationTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES
 	TEST_TARGET ZEFoundation)

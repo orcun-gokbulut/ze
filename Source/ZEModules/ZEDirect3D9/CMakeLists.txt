@@ -181,6 +181,6 @@ ze_add_source(Shaders/UI.hlsl									Sources ZEFC)
 ze_add_source(Shaders/UnsharpenFilterProcessor.hlsl				Sources ZEFC)
 ze_add_source(Shaders/ZoomBlurProcessor.hlsl					Sources ZEFC)
 
-ze_add_library(ZEDirect3D9 
+ze_add_library(TARGET ZEDirect3D9 
 	SOURCES ${Sources}
 	LIBS libDirect3D9)

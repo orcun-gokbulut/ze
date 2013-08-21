@@ -40,6 +40,6 @@ ze_add_source(ZEXSensInputDevice.h				Sources)
 ze_add_source(ZEXSensInputModule.cpp			Sources)
 ze_add_source(ZEXSensInputModule.h				Sources)
 
-ze_add_library(ZEXSens 
+ze_add_library(TARGET ZEXSens 
 	SOURCES ${Sources}
 	LIBS libXSens)
