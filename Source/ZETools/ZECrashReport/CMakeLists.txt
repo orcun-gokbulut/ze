@@ -79,6 +79,6 @@ qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-ze_add_executable(ZECrashReport
+ze_add_executable(TARGET ZECrashReport
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
 	LIBS ZEFoundation libQt libTinyXML libZLib libCurl Ws2_32)

@@ -44,6 +44,6 @@ ze_add_source(ZEDGrid.h				Sources)
 ze_add_source(ZEDScreenAxis.cpp		Sources)
 ze_add_source(ZEDScreenAxis.h		Sources)
 
-ze_add_library(ZEDCommonEntities 
+ze_add_library(TARGET ZEDCommonEntities 
 	SOURCES ${Sources}
 	LIBS libQt)

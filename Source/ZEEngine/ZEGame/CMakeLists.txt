@@ -89,6 +89,6 @@ ze_add_source(ZEFoliage.cpp				Sources)
 ze_add_source(ZEFoliage.h				Sources Headers ZEPP)
 
 
-ze_add_library(ZEGame 
+ze_add_library(TARGET ZEGame 
 	SOURCES ${Sources}
 	HEADERS ${Headers})

@@ -42,5 +42,5 @@ ze_add_source(ZEVirtualInputMouseDevice.h			Sources)
 ze_add_source(ZEVirtualInputModule.cpp				Sources)
 ze_add_source(ZEVirtualInputModule.h				Sources)
 
-ze_add_library(ZEVirtualInput 
+ze_add_library(TARGET ZEVirtualInput 
 	SOURCES ${Sources})

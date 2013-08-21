@@ -49,5 +49,5 @@ ze_add_source(ZETestSuite.h			Source)
 ze_add_source(ZETestManager.cpp		Source)
 ze_add_source(ZETestManager.h		Source)
 
-ze_add_library(ZETest SOURCES ${Source})
+ze_add_library(TARGET ZETest SOURCES ${Source})
 

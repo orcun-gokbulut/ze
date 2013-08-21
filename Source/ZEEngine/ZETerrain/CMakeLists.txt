@@ -42,7 +42,7 @@ ze_add_source(ZETerrainResource.h			Sources Headers)
 ze_add_source(ZETerrainVertexBuffer.cpp		Sources)
 ze_add_source(ZETerrainVertexBuffer.h		Sources)
 
-ze_add_library(ZETerrain 
+ze_add_library(TARGET ZETerrain 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation)

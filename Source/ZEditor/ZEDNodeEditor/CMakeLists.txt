@@ -68,6 +68,6 @@ qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-ze_add_library(ZEDNodeEditor 
+ze_add_library(TARGET ZEDNodeEditor 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
 	LIBS libFreeImage libQt)

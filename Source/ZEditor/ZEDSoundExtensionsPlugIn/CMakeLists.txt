@@ -46,6 +46,6 @@ qt4_add_resources(QtResourceFiles ${QtResources})
 qt4_wrap_ui(QtUIFiles ${QtUI})
 qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
-ze_add_library(ZEDSoundExtensionsPlugIn 
+ze_add_library(TARGET ZEDSoundExtensionsPlugIn 
 	SOURCES ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles} 
 	LIBS ZESound libQt)

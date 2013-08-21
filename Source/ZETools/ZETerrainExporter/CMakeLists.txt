@@ -44,7 +44,7 @@ ze_add_source(ZETerrainDatabase.h			Sources)
 ze_add_source(ZETerrainExporterMain.cpp		Sources)
 
 
-ze_add_executable(ZETerrainExporter
+ze_add_executable(TARGET ZETerrainExporter
 	CONSOLE
 	SOURCES ${Sources}
 	LIBS ZEFoundation libFreeImage)

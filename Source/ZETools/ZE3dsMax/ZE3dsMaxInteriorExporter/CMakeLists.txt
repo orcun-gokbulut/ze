@@ -52,7 +52,7 @@ qt4_add_resources(QtResourceFiles ${QtResources})
 qt4_wrap_ui(QtUIFiles ${QtUI})
 qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
-ze_add_library(ZE3dsMaxInteriorExporter 
+ze_add_library(TARGET ZE3dsMaxInteriorExporter 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
 	LIBS ZEFoundation ZE3dsMaxUtils ZEProgressDialog ZEResourceConfigurationWidget libQt lib3dsMax QWinWidget)
 

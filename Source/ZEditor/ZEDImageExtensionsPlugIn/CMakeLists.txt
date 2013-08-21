@@ -44,6 +44,6 @@ ze_add_source(ZEDImageFilePreviewWidget.cpp		Sources)
 
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-ze_add_library(ZEDImageExtensionsPlugIn 
+ze_add_library(TARGET ZEDImageExtensionsPlugIn 
 	SOURCES ${Sources} ${QtMocFiles}
 	LIBS libQt libFreeImage)

@@ -41,6 +41,6 @@ ze_add_source(ZEISenseInputDevice.h			Sources)
 ze_add_source(ZEISenseInputModule.cpp		Sources)
 ze_add_source(ZEISenseInputModule.h			Sources)
 
-ze_add_library(ZEISenseInput
+ze_add_library(TARGET ZEISenseInput
 	SOURCES ${Sources}
 	LIBS libISense)

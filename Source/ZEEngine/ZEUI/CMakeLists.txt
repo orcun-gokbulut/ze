@@ -83,7 +83,7 @@ ze_add_source(ZEFreeType.h							Sources Headers)
 
 
 
-ze_add_library(ZEUI
+ze_add_library(TARGET ZEUI
 	LIBS ZEFoundation libFreeType
 	SOURCES ${Sources}
 	HEADERS ${Headers})

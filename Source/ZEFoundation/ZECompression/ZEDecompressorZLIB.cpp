@@ -52,6 +52,12 @@ void ZEDecompressorZLIB::Initialize()
 	ZStream.zalloc = Z_NULL;
 	ZStream.zfree = Z_NULL;
 	ZStream.opaque = Z_NULL;
+
+	if(inflateInit(&ZStream, Z_DEFAULT_COMPRESSION) != Z_OK)
+	{
+		State = ZE_DS_ERROR;
+		return;
+	}
 }
 
 void ZEDecompressorZLIB::Decompress()
@@ -97,12 +103,6 @@ void ZEDecompressorZLIB::Decompress()
 
 	if(State == ZE_DS_NONE)
 	{
-		if(inflateInit(&ZStream, Z_DEFAULT_COMPRESSION) != Z_OK)
-		 {
-			 State = ZE_DS_ERROR;
-			 return;
-		 }
-
 		ZStream.avail_in = InputSize;
 		ZStream.next_in = (unsigned char*)Input;
 

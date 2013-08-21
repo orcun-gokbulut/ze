@@ -70,17 +70,17 @@ ze_add_source(ZESDK.h 						Sources Headers)
 ze_add_source(ZESDK.cpp 					Sources)
 
 
-ze_add_library(ZEEngine 
+ze_add_library(TARGET ZEEngine 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEInterior ZEModel ZEParticle ZEAI ZETerrain ZENetwork ZETexture ZEModules)
 
-ze_add_library(ZEEnginePlugin 
+ze_add_library(TARGET ZEEnginePlugin 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation ZECore ZEMeta)
 		
-ze_add_executable(ZE 
+ze_add_executable(TARGET ZE 
 	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
 	LIBS ZEEngine
 	INSTALL)
