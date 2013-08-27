@@ -45,6 +45,16 @@ const ZEIPAddress& ZESocketUDP::GetBindIPAddress() const
 	return BindIPAddress;
 }
 
+void ZESocketUDP::SetBindPort(ZEUInt16 Port)
+{
+	BindPort = Port;
+}
+
+ZEUInt16 ZESocketUDP::GetBindPort() const
+{
+	return BindPort;
+}
+
 void ZESocketUDP::SetRemoteIPAddress(const ZEIPAddress& IPAddress)
 {
 	RemoteIPAddress = IPAddress;
@@ -55,27 +65,37 @@ const ZEIPAddress& ZESocketUDP::GetRemoteIPAddress() const
 	return RemoteIPAddress;
 }
 
-void ZESocketUDP::SetPort(ZEUInt16 Port)
+void ZESocketUDP::SetRemotePort(ZEUInt16 Port)
 {
-	this->Port = Port;
+	RemotePort = Port;
 }
 
-ZEUInt16 ZESocketUDP::GetPort() const
+ZEUInt16 ZESocketUDP::GetRemotePort()
 {
-	return Port;
+	return RemotePort;
 }
 
 ZESSize ZESocketUDP::Send(const void* Buffer, ZESize BufferSize)
 {
-	return Send(RemoteIPAddress, Buffer, BufferSize);
+	return Send(RemoteIPAddress, (RemotePort != -1 ? RemotePort : BindPort), Buffer, BufferSize);
 }
 
 ZESSize ZESocketUDP::Receive(void* Buffer, ZESize BufferSize)
 {
 	ZEIPAddress Address;
-	ZESSize Result = Receive(Address, Buffer, BufferSize);
+	ZEUInt16 Port;
+	ZESSize Result = Receive(Address, Port, Buffer, BufferSize);
+
+	if (Result < 0)
+		return Result;
+	
 	if (Address != RemoteIPAddress)
-		return ZE_SR_RETRY;
+		return ZE_SR_PACKET_DROPPED;
+
+	if (RemotePort != -1 && Port != RemotePort)
+		return ZE_SR_PACKET_DROPPED;
+
+	return Result;
 }
 
 ZESocketUDP::ZESocketUDP()
@@ -83,7 +103,9 @@ ZESocketUDP::ZESocketUDP()
 	Socket = NULL;
 	Status = ZE_SUS_CLOSED;
 	BindIPAddress = ZEIPAddress::Any;
-	Port = 0;
+	BindPort = 0;
+	RemoteIPAddress = ZEIPAddress::Any;
+	RemotePort = -1;
 }
 
 ZESocketUDP::~ZESocketUDP()

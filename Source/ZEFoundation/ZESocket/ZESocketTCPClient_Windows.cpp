@@ -142,12 +142,20 @@ ZESSize ZESocketTCPClient::Send(const void* Buffer, ZESize BufferSize)
 		ZEInt Error = WSAGetLastError();
 		if (Error == WSAEWOULDBLOCK)
 		{
-			return ZE_SR_RETRY;
+			return BufferSize;
+		}
+		else if (Error == WSAEMSGSIZE)
+		{
+			return ZE_SR_PACKET_SIZE;
+		}
+		else if (Error == WSAENOBUFS)
+		{
+			return ZE_SR_BUFFER_FULL;
 		}
 		else
 		{
 			Close();
-			return ZE_SR_ERROR;
+			return BufferSize;
 		}
 	}
 
@@ -165,7 +173,7 @@ ZESSize ZESocketTCPClient::Receive(void* Buffer, ZESize BufferSize)
 		ZEInt Error = WSAGetLastError();
 		if (Error == WSAEWOULDBLOCK)
 		{
-			return ZE_SR_RETRY;
+			return ZE_SR_NO_PACKET;
 		}
 		else
 		{

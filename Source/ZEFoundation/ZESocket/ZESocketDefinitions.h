@@ -55,6 +55,9 @@
 
 #define ZE_SR_OK					((ZESSize)0)
 #define ZE_SR_ERROR					((ZESSize)-1)
-#define ZE_SR_RETRY					((ZESSize)-2)
+#define ZE_SR_PACKET_DROPPED		((ZESSize)-2)
+#define ZE_SR_NO_PACKET				((ZESSize)-3)
+#define ZE_SR_BUFFER_FULL			((ZESSize)-4)
+#define ZE_SR_PACKET_SIZE			((ZESSize)-5)
 
 #endif

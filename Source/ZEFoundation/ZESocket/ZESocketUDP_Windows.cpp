@@ -58,7 +58,7 @@ bool ZESocketUDP::Open()
 	{
 		sockaddr_in LocalInfo;
 		ZEIPAddress::ToSockaddr_in(&LocalInfo, BindIPAddress);
-		LocalInfo.sin_port = htons(Port);
+		LocalInfo.sin_port = htons(BindPort);
 
 		if(bind(Socket, (SOCKADDR*)&LocalInfo, sizeof(LocalInfo)) == SOCKET_ERROR)
 		{
@@ -91,14 +91,14 @@ void ZESocketUDP::Close()
 	Status = ZE_SUS_CLOSED;
 }
 
-ZESSize ZESocketUDP::Send(const ZEIPAddress& RemoteAddress, const void* Buffer, ZESize BufferSize)
+ZESSize ZESocketUDP::Send(const ZEIPAddress& RemoteAddress, ZEUInt16 RemotePort, const void* Buffer, ZESize BufferSize)
 {
 	if (GetStatus() != ZE_SUS_OPEN)
 		return ZE_SR_ERROR;
 
 	sockaddr_in SocketAddress;
 	ZEIPAddress::ToSockaddr_in(&SocketAddress, RemoteAddress);
-	SocketAddress.sin_port = htons(Port);
+	SocketAddress.sin_port = htons(RemotePort);
 
 	ZESSize Result = sendto(Socket, (const char*)Buffer, (int)BufferSize, 0, (sockaddr*)&SocketAddress, sizeof(sockaddr_in));
 	if(Result < 0)
@@ -106,7 +106,15 @@ ZESSize ZESocketUDP::Send(const ZEIPAddress& RemoteAddress, const void* Buffer, 
 		ZEInt Error = WSAGetLastError();
 		if (Error == WSAEWOULDBLOCK)
 		{
-			return ZE_SR_RETRY;
+			return BufferSize;
+		}
+		else if (Error == WSAEMSGSIZE)
+		{
+			return ZE_SR_PACKET_SIZE;
+		}
+		else if (Error == WSAENOBUFS)
+		{
+			return ZE_SR_BUFFER_FULL;
 		}
 		else
 		{
@@ -118,14 +126,12 @@ ZESSize ZESocketUDP::Send(const ZEIPAddress& RemoteAddress, const void* Buffer, 
 	return Result;
 }
 
-ZESSize ZESocketUDP::Receive(ZEIPAddress& RemoteAddress, void* Buffer, ZESize BufferSize)
+ZESSize ZESocketUDP::Receive(ZEIPAddress& RemoteAddress, ZEUInt16& RemotePort, void* Buffer, ZESize BufferSize)
 {
 	if (GetStatus() != ZE_SUS_OPEN)
 		return ZE_SR_ERROR;
 
 	sockaddr_in SocketAddress;
-	ZEIPAddress::ToSockaddr_in(&SocketAddress, RemoteAddress);
-	SocketAddress.sin_port = htons(Port);
 	int SocketAddressSize = sizeof(sockaddr_in);
 
 	ZESSize Result = recvfrom(Socket, (char*)Buffer, (int)BufferSize, 0, (sockaddr*)&SocketAddress, &SocketAddressSize);
@@ -134,7 +140,11 @@ ZESSize ZESocketUDP::Receive(ZEIPAddress& RemoteAddress, void* Buffer, ZESize Bu
 		ZEInt Error = WSAGetLastError();
 		if (Error == WSAEWOULDBLOCK)
 		{
-			return ZE_SR_RETRY;
+			return ZE_SR_NO_PACKET;
+		}
+		else if (Error == WSAEMSGSIZE)
+		{
+			return ZE_SR_PACKET_SIZE;
 		}
 		else
 		{
@@ -142,6 +152,9 @@ ZESSize ZESocketUDP::Receive(ZEIPAddress& RemoteAddress, void* Buffer, ZESize Bu
 			return ZE_SR_ERROR;
 		}
 	}
+
+	ZEIPAddress::FromSockaddr_in(RemoteAddress, &SocketAddress);
+	RemotePort = htons(SocketAddress.sin_port);
 
 	return Result;
 }
