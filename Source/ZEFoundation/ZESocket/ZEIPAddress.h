@@ -48,6 +48,9 @@ class ZEIPAddress
 		static const ZEIPAddress		Broadcast;
 
 		ZEUInt8							Address[4];
+		
+		bool							IsAny() const;
+		bool							IsBroadcast() const;
 
 		bool							operator == (const ZEIPAddress &RightOperand) const;
 		bool							operator != (const ZEIPAddress &RightOperand) const;

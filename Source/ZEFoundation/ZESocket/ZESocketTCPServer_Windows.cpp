@@ -64,7 +64,11 @@ ZESSize ZESocketTCPServer::Send(const void* Buffer, ZESize BufferSize)
 		ZEInt Error = WSAGetLastError();
 		if(Error == WSAEWOULDBLOCK)
 		{
-			return ZE_SR_RETRY;
+			return BufferSize;
+		}
+		else if (Error == WSAENOBUFS)
+		{
+			return ZE_SR_BUFFER_FULL;
 		}
 		else
 		{
@@ -87,7 +91,11 @@ ZESSize ZESocketTCPServer::Receive(void* Buffer, ZESize BufferSize)
 		ZEInt Error = WSAGetLastError();
 		if(Error == WSAEWOULDBLOCK)
 		{
-			return ZE_SR_RETRY;
+			return ZE_SR_NO_PACKET;
+		}
+		else if (Error == WSAENOBUFS)
+		{
+			return ZE_SR_BUFFER_FULL;
 		}
 		else
 		{

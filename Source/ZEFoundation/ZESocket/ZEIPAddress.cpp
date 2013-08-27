@@ -35,11 +35,18 @@
 
 #include "ZEIPAddress.h"
 
-#include "ZETypes.h"
-#include <memory.h>
-
 const ZEIPAddress ZEIPAddress::Any = ZEIPAddress(0, 0, 0, 0);
 const ZEIPAddress ZEIPAddress::Broadcast = ZEIPAddress(255, 255, 255, 255);
+
+bool ZEIPAddress::IsAny() const
+{
+	return (*(ZEUInt32*)Address == 0x00000000);
+}
+
+bool ZEIPAddress::IsBroadcast() const
+{
+	return (*(ZEUInt32*)Address == 0xFFFFFFFF);
+}
 
 ZEIPAddress::ZEIPAddress()
 {
@@ -82,18 +89,14 @@ ZEIPAddress ZEIPAddress::Parse(const ZEString& String)
 
 bool ZEIPAddress::operator == (const ZEIPAddress &RightOperand) const
 {
-	return ((Address[0] == RightOperand.Address[0]) &&
-			(Address[1] == RightOperand.Address[1]) &&
-			(Address[2] == RightOperand.Address[2]) &&
-			(Address[3] == RightOperand.Address[3]));
-
-	return false;
+	return (IsAny() ||
+		RightOperand.IsAny() ||
+		*(ZEUInt32*)Address == *(ZEUInt32*)RightOperand.Address);
 }
 
 bool ZEIPAddress::operator != (const ZEIPAddress &RightOperand) const
 {
-	return ((Address[0] != RightOperand.Address[0]) ||
-			(Address[1] != RightOperand.Address[1]) ||
-			(Address[2] != RightOperand.Address[2]) ||
-			(Address[3] != RightOperand.Address[3]));
+	return (!IsAny() &&
+		!RightOperand.IsAny() &&
+		*(ZEUInt32*)Address != *(ZEUInt32*)RightOperand.Address);
 }
