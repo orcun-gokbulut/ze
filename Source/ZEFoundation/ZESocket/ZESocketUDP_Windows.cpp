@@ -50,11 +50,27 @@ bool ZESocketUDP::Open()
 	Socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if(Socket == INVALID_SOCKET)
 	{
-		zeError("Can not create TCP Socket, WinSock Error code : %d", WSAGetLastError());
-		return false;
+		if (WSAGetLastError() == WSANOTINITIALISED)
+		{
+			int iResult;
+			WSADATA wsaData;
+			iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+			if (iResult != 0) 
+			{
+				zeError("WSAStartup failed. WinSock Error code : %d", iResult);
+				return false;
+			}
+
+			return Open();
+		}
+		else
+		{
+			zeError("Can not create UDP socket. WinSock Error code : %d", WSAGetLastError());
+			return false;
+		}
 	}
 
-	if (BindIPAddress != ZEIPAddress::Any)
+	if (!BindIPAddress.IsAny() || BindPort != ZE_SP_ANY)
 	{
 		sockaddr_in LocalInfo;
 		ZEIPAddress::ToSockaddr_in(&LocalInfo, BindIPAddress);
@@ -62,7 +78,7 @@ bool ZESocketUDP::Open()
 
 		if(bind(Socket, (SOCKADDR*)&LocalInfo, sizeof(LocalInfo)) == SOCKET_ERROR)
 		{
-			zeError("Can not bind IPv4 TCP Socket, WinSock Error code : %d", WSAGetLastError());
+			zeError("Can not bind UDP Socket, WinSock Error code : %d", WSAGetLastError());
 			Close();
 			return false;
 		}

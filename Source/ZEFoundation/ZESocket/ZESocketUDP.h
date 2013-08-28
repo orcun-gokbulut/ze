@@ -53,7 +53,7 @@ class ZESocketUDP
 	private:
 		SOCKET_TYPE					Socket;
 		ZEIPAddress					BindIPAddress;
-		ZEUInt16					BindPort;
+		ZEInt						BindPort;
 		ZEIPAddress					RemoteIPAddress;
 		ZEInt						RemotePort;
 		ZESocketUDPStatus			Status;
@@ -64,8 +64,8 @@ class ZESocketUDP
 		void						SetBindIPAddress(const ZEIPAddress& IPAddress);
 		const ZEIPAddress&			GetBindIPAddress() const;
 
-		void						SetBindPort(ZEUInt16 Port);
-		ZEUInt16					GetBindPort() const;		
+		void						SetBindPort(ZEInt Port);
+		ZEInt						GetBindPort() const;
 
 		void						SetRemoteIPAddress(const ZEIPAddress& IPAddress);
 		const ZEIPAddress&			GetRemoteIPAddress() const;
