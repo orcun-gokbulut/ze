@@ -51,8 +51,24 @@ bool ZESocketTCPServerListener::Open()
 	Socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if(Socket == INVALID_SOCKET)
 	{
-		zeError("Can not create TCP Socket, WinSock Error code : %d", WSAGetLastError());
-		return false;
+		if (WSAGetLastError() == WSANOTINITIALISED)
+		{
+			int iResult;
+			WSADATA wsaData;
+			iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+			if (iResult != 0) 
+			{
+				zeError("WSAStartup failed. WinSock Error code : %d", iResult);
+				return false;
+			}
+
+			return Open();
+		}
+		else
+		{
+			zeError("Can not create TCP listener socket. WinSock Error code : %d", WSAGetLastError());
+			return false;
+		}
 	}
 
 	if (BindIPAddress != ZEIPAddress::Any)

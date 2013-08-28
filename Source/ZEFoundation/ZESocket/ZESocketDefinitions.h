@@ -53,6 +53,8 @@
 	#define SOCKET_TYPE int
 #endif
 
+#define ZE_SP_ANY					0
+
 #define ZE_SR_OK					((ZESSize)0)
 #define ZE_SR_ERROR					((ZESSize)-1)
 #define ZE_SR_PACKET_DROPPED		((ZESSize)-2)

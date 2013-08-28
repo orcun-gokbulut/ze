@@ -89,14 +89,10 @@ ZEIPAddress ZEIPAddress::Parse(const ZEString& String)
 
 bool ZEIPAddress::operator == (const ZEIPAddress &RightOperand) const
 {
-	return (IsAny() ||
-		RightOperand.IsAny() ||
-		*(ZEUInt32*)Address == *(ZEUInt32*)RightOperand.Address);
+	return *(ZEUInt32*)Address == *(ZEUInt32*)RightOperand.Address;
 }
 
 bool ZEIPAddress::operator != (const ZEIPAddress &RightOperand) const
 {
-	return (!IsAny() &&
-		!RightOperand.IsAny() &&
-		*(ZEUInt32*)Address != *(ZEUInt32*)RightOperand.Address);
+	return *(ZEUInt32*)Address != *(ZEUInt32*)RightOperand.Address;
 }
