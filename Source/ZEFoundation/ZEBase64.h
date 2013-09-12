@@ -41,18 +41,15 @@
 
 class ZEBase64
 {
-	private:
-		static ZEString					Base64Characters;
-
-		static bool						isBase64(unsigned char Character);
-
 	public:
-		static ZEString					Encode(unsigned char const* Input, ZESize InputLength);
-		static ZEString					Decode(std::string const& Input);
+		static bool						IsBase64(ZEBYTE Character);
+		static bool						IsBase64(void* Data, ZESize Size);
 
-										ZEBase64();
-										~ZEBase64();
+		static ZESize					EncodeSize(ZESize Size);
+		static ZESize					DecodeSize(void* Data, ZESize Size);
 
+		static void						Encode(void* Output, void* Input, ZESize InputSize);
+		static bool						Decode(void* Output, void* Input, ZESize InputSize);
 };
 
 #endif
