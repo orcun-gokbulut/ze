@@ -36,119 +36,155 @@
 #include "ZEBase64.h"
 #include <string>
 
-ZEString ZEBase64::Base64Characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-ZEBase64::ZEBase64()
+bool ZEBase64::IsBase64(ZEBYTE Character)
 {
+	return (Character >= 'a' && Character <= 'z') ||
+		(Character >= 'A' && Character <= 'Z') ||
+		(Character >= '0' && Character <= '9') ||
+		Character == '+' ||
+		Character == '/';
+}
+
+bool ZEBase64::IsBase64(void* Data, ZESize Size)
+{
+	if (Size != 0 && (Size % 4) != 0)
+		return false;
+
+	for (ZESize I = 0; I < Size - 2; I++)
+		if (!IsBase64(((ZEBYTE*)Data)[I]))
+			return false;
+
+	if (!IsBase64(((ZEBYTE*)Data)[Size - 2]) && ((ZEBYTE*)Data)[Size - 2] != '=')
+		return false;
+
+	if (!IsBase64(((ZEBYTE*)Data)[Size - 2]) && ((ZEBYTE*)Data)[Size - 1] != '=')
+		return false;
+}
+
+ZESize ZEBase64::EncodeSize(ZESize Size)
+{
+	return ZEMath::Ceil(Size / 3) * 4;
+}
+
+ZESize ZEBase64::DecodeSize(void* Data, ZESize Size)
+{
+	if ((Size % 4) != 0)
+		return 0;
+
+	return (Size / 4) * 3 - 
+		(((ZEBYTE*)Data)[Size - 1] == '=' ? -1 : 0) -
+		(((ZEBYTE*)Data)[Size - 2] == '=' ? -1 : 0);
+}
+
+void ZEBase64::Encode(void* Output, void* Input, ZESize InputSize)
+{
+	static char Table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+	ZESize I;
+	for (I = 0; I < InputSize / 3; I++)
+	{
+		ZEBYTE* InputByte = (ZEBYTE*)Input + I * 3;
+		ZEBYTE* OutputByte = (ZEBYTE*)Output + I * 4;
+
+		OutputByte[0] = Table[InputByte[0] >> 2];
+		OutputByte[1] = Table[(InputByte[0] << 4) & 0x3F | (InputByte[1] >> 4)];
+		OutputByte[2] = Table[(InputByte[1] << 2) & 0x3F | (InputByte[2] >> 6)];
+		OutputByte[3] = Table[InputByte[2] & 0x3F];
+	}
 	
-}
+	if ((InputSize % 3) == 0)
+		return;
 
-ZEBase64::~ZEBase64()
-{
+	ZEBYTE* InputByte = (ZEBYTE*)Input + I * 3;
+	ZEBYTE* OutputByte = (ZEBYTE*)Output + I * 4;
 
-}
-
-ZEString ZEBase64::Encode(unsigned char const* Input, ZESize InputLength)
-{
-	ZEString Result;
-	const std::string BaseCharacters = Base64Characters.ToStdString();
-	ZEUInt64 I = 0;
-	ZEUInt64 J = 0;
-
-	unsigned char CharacterArray3[3];
-	unsigned char CharacterArray4[4];
-
-	while(InputLength--)
+	if ((InputSize % 3) == 1)
 	{
-		CharacterArray3[I++] = *(Input++);
-		if(I == 3)
+		OutputByte[0] = Table[InputByte[0] >> 2];
+		OutputByte[1] = Table[(InputByte[0] << 4) & 0x3F];
+		OutputByte[2] = '=';
+		OutputByte[3] = '=';
+	}
+	else if ((InputSize % 3) == 2)
+	{
+		OutputByte[0] = Table[InputByte[0] >> 2];
+		OutputByte[1] = Table[(InputByte[0] << 4) & 0x3F | (InputByte[1] >> 4)];
+		OutputByte[2] = Table[(InputByte[1] << 2) & 0x3F];
+		OutputByte[3] = '=';
+	}
+}
+
+bool ZEBase64::Decode(void* Output, void* Input, ZESize InputSize)
+{
+	static char Table[128] = 
+	{
+			   /*  0   1   2   3   4   5   6   7   8   9  */
+		/*  00 */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		/*  10 */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		/*  20 */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		/*  30 */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		/*  40 */ -1, -1, -1, 62, -1, -1, -1, 63, 52, 53,
+		/*  50 */ 54, 55, 56, 57, 58, 59, 60, 61, -1, -1,
+		/*  60 */ -1, -1, -1, -1, -1, -1,  1,  2,  3,  4,
+		/*  70 */  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+		/*  80 */ 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+		/*  90 */ 25, -1, -1, -1, -1, -1, -1, 26, 27, 28,
+		/* 100 */ 29, 30, 31, 32, 33, 34, 35, 36, 37, 38,
+		/* 110 */ 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
+		/* 120 */ 49, 50, 51, -1, -1, -1, -1, -1
+	};
+
+	if (InputSize == 0)
+		return true;
+	
+	if (InputSize % 4 != 0)
+		return false;
+
+	ZESize I;
+	for (I = 0; I < (InputSize / 4) - 1; I++)
+	{
+		ZEBYTE* InputByte = (ZEBYTE*)Input + I * 4;
+		ZEBYTE* OutputByte = (ZEBYTE*)Output + I * 3;
+
+		if ((InputByte[0] > 127 || Table[InputByte[0]] == -1) ||
+			(InputByte[1] > 127 || Table[InputByte[1]] == -1) ||
+			(InputByte[2] > 127 || Table[InputByte[2]] == -1) ||
+			(InputByte[3] > 127 || Table[InputByte[3]] == -1))
 		{
-			CharacterArray4[0] = (CharacterArray3[0] & 0xfc) >> 2;
-			CharacterArray4[1] = ((CharacterArray3[0] & 0x03) << 4) + ((CharacterArray3[1] & 0xf0) >> 4);
-			CharacterArray4[2] = ((CharacterArray3[1] & 0x0f) << 2) + ((CharacterArray3[2] & 0xc0) >> 6);
-			CharacterArray4[3] = CharacterArray3[2] & 0x3f;
-
-			for(I = 0; I < 4; I++)
-				Result += ZEString::FromChar(BaseCharacters[CharacterArray4[I]]);
-			
-			I = 0;
+			return false;
 		}
-	}
-
-	if(I)
-	{
-		for(J = I; J < 3; J++)
-			CharacterArray3[J] = '\0';
-
-		CharacterArray4[0] = (CharacterArray3[0] & 0xfc) >> 2;
-		CharacterArray4[1] = ((CharacterArray3[0] & 0x03) << 4) + ((CharacterArray3[1] & 0xf0) >> 4);
-		CharacterArray4[2] = ((CharacterArray3[1] & 0x0f) << 2) + ((CharacterArray3[2] & 0xc0) >> 6);
-		CharacterArray4[3] = CharacterArray3[2] & 0x3f;
-
-		for (J = 0; J < I + 1; J++)
-			Result += ZEString::FromChar(BaseCharacters[CharacterArray4[J]]);
-
-		while((I++ < 3))
-			Result += "=";
-	}
-
-	return Result;
-}
-
-ZEString ZEBase64::Decode(std::string const& Input)
-{
-	ZEString Result;
-	const std::string BaseCharacters = Base64Characters.ToStdString();
-	int InputLength = Input.size();
-	ZESize I = 0;
-	ZESize J = 0;
-	int Index = 0;
-
-	unsigned char* CharacterArray3 = new unsigned char[3];
-	unsigned char* CharacterArray4 = new unsigned char[4];
-
-	while(InputLength-- && (Input[Index] != '=') && isBase64(Input[Index]))
-	{
-		CharacterArray4[I++] = Input[Index];
-		Index++;
 		
-		if(I == 4)
-		{
-			for(I = 0; I < 4; I++)
-				CharacterArray4[I] = BaseCharacters.find(CharacterArray4[I]);
-
-			CharacterArray3[0] = (CharacterArray4[0] << 2) + ((CharacterArray4[1] & 0x30) >> 4);
-			CharacterArray3[1] = ((CharacterArray4[1] & 0xf) << 4) + ((CharacterArray4[2] & 0x3c) >> 2);
-			CharacterArray3[2] = ((CharacterArray4[2] & 0x3) << 6) + CharacterArray4[3];
-
-			for (I = 0; I < 3; I++)
-				Result += ZEString::FromChar(CharacterArray3[I]);
-
-			I = 0;
-		}
+		OutputByte[0] = (Table[InputByte[0]] << 2) | (Table[InputByte[1]] >> 4);
+		OutputByte[1] = (Table[InputByte[1]] << 4) | (Table[InputByte[2]] >> 2);
+		OutputByte[2] = (Table[InputByte[2]] << 6) | (Table[InputByte[3]]);
 	}
+	
+	ZEBYTE* InputByte = (ZEBYTE*)Input + I * 4;
+	ZEBYTE* OutputByte = (ZEBYTE*)Output + I * 3;
 
-	if(I)
+	if ((InputByte[0] > 127 || Table[InputByte[0]] == -1) ||
+		(InputByte[1] > 127 || Table[InputByte[1]] == -1) ||
+		(InputByte[2] > 127 || Table[InputByte[2]] == -1) ||
+		(InputByte[3] > 127 || Table[InputByte[3]] == -1))
 	{
-		for(J = I; J < 4; J++)
-			CharacterArray4[J] = 0;
-
-		for(J = 0; J < 4; J++)
-			CharacterArray4[J] = BaseCharacters.find(CharacterArray4[J]);
-
-		CharacterArray3[0] = (CharacterArray4[0] << 2) + ((CharacterArray4[1] & 0x30) >> 4);
-		CharacterArray3[1] = ((CharacterArray4[1] & 0xf) << 4) + ((CharacterArray4[2] & 0x3c) >> 2);
-		CharacterArray3[2] = ((CharacterArray4[2] & 0x3) << 6) + CharacterArray4[3];
-		
-		for(J = 0; J < I - 1; J++)
-			Result += ZEString::FromChar(CharacterArray3[J]);
+		return false;
 	}
 
-	return Result;
-}
+	if (InputByte[3] == '=' && InputByte[2] == '=')
+	{
+		OutputByte[0] = (Table[InputByte[0]] << 2) | (Table[InputByte[1]] >> 4);
+	}
+	else if (InputByte[3] == '=')
+	{
+		OutputByte[0] = (Table[InputByte[0]] << 2) | (Table[InputByte[1]] >> 4);
+		OutputByte[1] = (Table[InputByte[1]] << 4) | (Table[InputByte[2]] >> 2);
+	}
+	else
+	{
+		OutputByte[0] = (Table[InputByte[0]] << 2) | (Table[InputByte[1]] >> 4);
+		OutputByte[1] = (Table[InputByte[1]] << 4) | (Table[InputByte[2]] >> 2);
+		OutputByte[2] = (Table[InputByte[2]] << 6) | (Table[InputByte[3]]);
+	}
 
-bool ZEBase64::isBase64(unsigned char Character)
-{
-	return (isalnum(Character) || (Character == '+') || (Character == '/'));
+	return true;
 }
-
