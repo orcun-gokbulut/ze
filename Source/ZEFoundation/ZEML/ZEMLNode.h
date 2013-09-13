@@ -47,6 +47,7 @@
 class ZEFile;
 class ZEMLProperty;
 class ZEMLDataProperty;
+class TiXmlElement;
 
 class ZEMLNode : public ZEMLItem
 {
@@ -57,7 +58,9 @@ class ZEMLNode : public ZEMLItem
 
 	protected:
 		virtual bool				WriteSelf(ZEFile* File);
+		virtual bool				WriteSelfToXML(TiXmlElement* XMLElement);
 		virtual bool				ReadSelf(ZEFile* File, bool DeferredDataReading);
+		bool						ReadFromXML(TiXmlElement* Element);
 
 		bool						RemoveSubNode(ZEMLNode* SubNode);
 		bool						RemoveProperty(ZEMLProperty* Property);
@@ -114,7 +117,9 @@ class ZEMLNode : public ZEMLItem
 		const ZEMLNode*				GetParent();
 
 		bool						Write(ZEFile* File);
+		bool						WriteToXMLFile(const char* FilePath);
 		bool						Read(ZEFile* File, bool DeferredDataReading = false);
+		bool						ReadFromXMLFile(const char* FilePath);
 
 									ZEMLNode();
 									ZEMLNode(const ZEString& Name);

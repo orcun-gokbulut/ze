@@ -37,6 +37,7 @@
 #include "ZEMLProperty.h"
 #include "ZEMLDataProperty.h"
 #include "ZEFile/ZEFile.h"
+#include "TinyXML.h"
 
 ZEMLNode::ZEMLNode()
 {
@@ -462,7 +463,7 @@ bool ZEMLNode::WriteSelf(ZEFile* File)
 	{
 		ZEMLItemType CurrentItemType = Properties[I]->GetType();
 
-		if(CurrentItemType == ZEML_IT_OFFSET_DATA)
+		if(CurrentItemType == ZEML_IT_INLINE_DATA)
 		{
 			if(!((ZEMLDataProperty*)Properties[I])->WriteSelf(File))
 			{
@@ -493,10 +494,64 @@ bool ZEMLNode::WriteSelf(ZEFile* File)
 	return true;
 }
 
+bool ZEMLNode::WriteSelfToXML(TiXmlElement* XMLElement)
+{
+	ZEUInt64 TempUInt64;
+
+	XMLElement->SetAttribute("Type", GetTypeText()); 
+
+	for (ZESize I = 0; I < Properties.GetCount(); I++)
+	{
+		ZEMLItemType CurrentItemType = Properties[I]->GetType();
+
+		if(CurrentItemType == ZEML_IT_INLINE_DATA)
+		{
+			if(!((ZEMLDataProperty*)Properties[I])->WriteSelfToXML(XMLElement))
+			{
+				zeError("Can not write data property, name : %s", Properties[I]->GetName());
+				return false;
+			}
+		}
+
+		else
+		{
+			if(!((ZEMLProperty*)Properties[I])->WriteSelfToXML(XMLElement))
+			{
+				zeError("Can not write property, name : %s", Properties[I]->GetName());
+				return false;
+			}
+		}
+	}
+
+	for (ZESize I = 0; I < SubNodes.GetCount(); I++)
+	{
+		TiXmlElement* NewSubNode = new TiXmlElement(SubNodes[I]->GetName());
+		XMLElement->LinkEndChild(NewSubNode);
+
+		if(!SubNodes[I]->WriteSelfToXML(NewSubNode))
+		{
+			zeError("Can not write sub node, sub node name : %s", SubNodes[I]->GetName().ToCString());
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool ZEMLNode::Write(ZEFile* File)
 {
 	GetTotalSize();
 	return WriteSelf(File);
+}
+
+bool ZEMLNode::WriteToXMLFile(const char* FilePath)
+{
+	TiXmlDocument XMLDocument(FilePath);	
+	TiXmlElement RootElement(GetName());
+	XMLDocument.LinkEndChild(&RootElement);
+	WriteSelfToXML(&RootElement);
+	bool Result = XMLDocument.SaveFile(FilePath);
+	return Result;
 }
 
 bool ZEMLNode::ReadSelf(ZEFile* File, bool DeferredDataReading)
@@ -604,9 +659,55 @@ bool ZEMLNode::Read(ZEFile* File, bool DeferredDataReading)
 	return ReadSelf(File, DeferredDataReading);
 }
 
+bool ZEMLNode::ReadFromXMLFile(const char* FilePath)
+{
+	TiXmlDocument XMLDocument(FilePath);
+	
+	if (!XMLDocument.LoadFile())
+	{
+		zeError("Can not read XML file, file name : %s.", FilePath);
+		return false;
+	}
+
+	TiXmlElement* CurrentNode = XMLDocument.FirstChildElement();
+
+	if (CurrentNode == NULL)
+	{
+		zeError("Can not read XML file's first element.");
+		return false;
+	}
+
+	ReadFromXML(CurrentNode);	
+
+	return true;
+}
+
+bool ZEMLNode::ReadFromXML(TiXmlElement* Element)
+{
+	SetName(Element->Value());
+	TiXmlNode* CurrentNode = NULL;
+
+	while(CurrentNode = Element->IterateChildren(CurrentNode ))
+	{
+		if(CurrentNode == NULL)
+			return false;
+
+		TiXmlElement* CurrentElement = CurrentNode->ToElement();
+
+		if(strcmp(CurrentElement->Attribute("Type"), "ZEML_IT_NODE") == 0)
+			AddSubNode()->ReadFromXML(CurrentElement);
+		else if(strcmp(CurrentElement->Attribute("Type"), "ZEML_IT_INLINE_DATA") == 0)
+			AddDataProperty()->ReadFromXML(CurrentElement);
+		else
+			AddProperty()->ReadFromXML(CurrentElement);
+	}
+
+	return true;
+}
+
 bool ZEMLNode::AddItem(ZEMLItem* Item)
 {
-	if(Item == NULL)
+	if (Item == NULL)
 	{
 		zeError("Given item for addition is NULL.");
 		return false;
