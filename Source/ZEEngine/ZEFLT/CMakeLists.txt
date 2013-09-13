@@ -33,57 +33,21 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-project(ZinekEngine)
+ze_add_source(ZEFLTOpcodes.h			Sources Headers)
+ze_add_source(ZEFLTReader.cpp			Sources)
+ze_add_source(ZEFLTReader.h			Sources Headers)
+ze_add_source(ZEFLTHandlerCallbacks.cpp		Sources)
+ze_add_source(ZEFLTHandlerCallbacks.h		Sources Headers)
+ze_add_source(ZEFLTResource.cpp			Sources)
+ze_add_source(ZEFLTResource.h			Sources Headers)
+ze_add_source(ZEFLTResourceNode.cpp		Sources)
+ze_add_source(ZEFLTResourceNode.h		Sources Headers)
+ze_add_source(ZEFLTResourceRecords.cpp		Sources)
+ze_add_source(ZEFLTResourceRecords.h		Sources Headers)
 
-ze_set_project_folder("ZEEngine")
-
-set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
-
-ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
-	ZE_ZINEK_ENGINE)
-
-add_subdirectory(ZEAI)
-add_subdirectory(ZECore)
-add_subdirectory(ZEDebug)
-add_subdirectory(ZEGame)
-add_subdirectory(ZEGraphics)
-add_subdirectory(ZETexture)
-add_subdirectory(ZEInput)
-add_subdirectory(ZEInterior)
-add_subdirectory(ZEMeta)
-add_subdirectory(ZEModel)
-add_subdirectory(ZEParticle)
-add_subdirectory(ZEPhysics)
-add_subdirectory(ZEScript)
-add_subdirectory(ZESound)
-add_subdirectory(ZEUI)
-add_subdirectory(ZETerrain)
-add_subdirectory(ZETerrain2)
-add_subdirectory(ZENetwork)
-add_subdirectory(ZEFLT)
-
-ze_add_source(ZEAPI.h 						Sources Headers)
-ze_add_source(ZECompileOptions.h 			Sources Headers)
-ze_add_source(ZEDefinitions.h 				Sources Headers)
-ze_add_source(ZESDK.h 						Sources Headers)
-ze_add_source(ZESDK.cpp 					Sources)
-
-
-ze_add_library(TARGET ZEEngine 
+ze_add_library(TARGET ZEFLT 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEInterior ZEModel ZEParticle ZEAI ZETerrain ZENetwork ZETexture ZEModules ZEFLT)
-
-ze_add_library(TARGET ZEEnginePlugin 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation ZECore ZEMeta)
-		
-ze_add_executable(TARGET ZE 
-	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
-	LIBS ZEEngine
-	INSTALL)
-
-#ze_combine_libraries(ZEEngine LIBS ZEEngine ZEAI ZECore ZEGame ZEGraphics ZETexture ZEInput ZEMap ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZETerrain ZENetwork)
+	LIBS ZEFoundation)
