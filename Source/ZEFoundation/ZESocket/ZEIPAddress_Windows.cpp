@@ -86,7 +86,7 @@ void ZEIPAddress::ToSockaddr_in(void* Buffer, const ZEIPAddress& IPAddress)
 	SocketAddress->sin_family = AF_INET;
 	SocketAddress->sin_port = htons(0);
 
-	if(IPAddress == ZEIPAddress::Any)
+	if(IPAddress.IsAny())
 	{
 		SocketAddress->sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 	}
