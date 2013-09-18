@@ -49,24 +49,24 @@ class ZEDepthStencilState;
 
 class ZEStatePool
 {
-	protected:
-									ZEStatePool();
-		virtual						~ZEStatePool();
+	public:
+		static ZEUInt16			BlendStateCount;
+		static ZEUInt16			SamplerStateCount;
+		static ZEUInt16			VertexLayoutCount;
+		static ZEUInt16			RasterizerStateCount;
+		static ZEUInt16			DepthStencilStateCount;
+
+								ZEStatePool();
+		virtual					~ZEStatePool();
 
 	public:
-		virtual void				ClearStates() = 0;
+		virtual void			ClearStates();
 
-		virtual void*				GetBlendState(ZESize Hash) = 0;
-		virtual void*				GetSamplerState(ZESize Hash) = 0;
-		virtual void*				GetVertexLayout(ZESize Hash) = 0;
-		virtual void*				GetRasterizerState(ZESize Hash) = 0;
-		virtual void*				GetDepthStencilState(ZESize Hash) = 0;
-
-		virtual void*				CreateState(ZEBlendState* BlendState) = 0;
-		virtual void*				CreateState(ZESamplerState* SamplerState) = 0;
-		virtual void*				CreateState(ZERasterizerState* RasterizerState) = 0;
-		virtual void*				CreateState(ZEDepthStencilState* DepthStencilState) = 0;
-		virtual void*				CreateState(ZEVertexLayout* VertexLayout, const ZEShader* VertexShader) = 0;
+		virtual void*			GetState(ZEBlendState* BlendState) = 0;
+		virtual void*			GetState(ZESamplerState* SamplerState) = 0;
+		virtual void*			GetState(ZERasterizerState* RasterizerState) = 0;
+		virtual void*			GetState(ZEDepthStencilState* DepthStencilState) = 0;
+		virtual void*			GetState(ZEVertexLayout* VertexLayout, const ZEShader* VertexShader) = 0;
 };
 
 #endif

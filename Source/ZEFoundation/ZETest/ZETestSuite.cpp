@@ -79,9 +79,9 @@ bool ZETestSuiteItem::RunTests()
 	Result = CurrentResult ? ZE_TR_PASSED : ZE_TR_FAILED;
 
 	if (CurrentResult)
-		printf("Test suite \"%s\" has passed. Total Time : %f ms \n", GetName(), ElapsedTime);
+		printf("Test suite \"%s\" has passed. Total Time : %f ms \n", GetName(), (float)ElapsedTime);
 	else
-		printf("Test suite \"%s\" has FAILED !!! Elapsed time : %f, Passed test count : %u, Failed test count : %u.\n", GetName(), ElapsedTime, PassedTestCount, TotalTestCount - PassedTestCount);
+		printf("Test suite \"%s\" has FAILED !!! Elapsed time : %f, Passed test count : %u, Failed test count : %u.\n", GetName(), (float)ElapsedTime, PassedTestCount, TotalTestCount - PassedTestCount);
 
 	return CurrentResult;
 }
@@ -100,7 +100,7 @@ ZETestResult ZETestSuiteItem::GetResult()
 	return Result;
 }
 
-float ZETestSuiteItem::GetElapsedTime()
+ZEUInt64 ZETestSuiteItem::GetElapsedTime()
 {
 	return ElapsedTime;
 }

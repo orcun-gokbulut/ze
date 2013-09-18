@@ -39,6 +39,8 @@
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
 #include "ZETexture/ZETexture2DResource.h"
+#include "ZEGraphics/ZEGraphicsWindow.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
 #define ACTIONID_UP				0
 #define ACTIONID_DOWN			1
@@ -130,8 +132,8 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 		}
 	}
 
-	ZEInt32 WindowWidth, WindowHeight;
-	zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);
+	ZEInt WindowWidth, WindowHeight;
+	zeGraphics->GetWindow()->GetSize(WindowWidth, WindowHeight);
 
 	if (GetPosition().x > WindowWidth)
 	{
@@ -193,7 +195,7 @@ ZEUICursorControl::ZEUICursorControl()
 	SetWidth(24);	
 
 	ZEInt32 Width, Height;
-	zeCore->GetWindow()->GetWindowSize(Width, Height);
+	zeGraphics->GetWindow()->GetSize(Width, Height);
 	SetPosition(ZEVector2((Width / 2.0f) , (Height / 2.0f)));
 
 	Cursor.Positions.LeftUp = GetVisibleRectangle().LeftUp;

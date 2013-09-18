@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_RENDER_STAGE_POSTPROCESS_H__
-#define __ZE_RENDER_STAGE_POSTPROCESS_H__
+#ifndef __ZE_RENDER_STAGE_POST_PROCESS_H__
+#define __ZE_RENDER_STAGE_POST_PROCESS_H__
 
 #include "ZETypes.h"
 #include "ZERenderStage.h"
@@ -57,9 +57,6 @@ class ZERenderStagePostProcess : public ZERenderStage
 
 		} RenderTargets;
 
-		void						ResetStates();
-		void						CommitStates();
-
 		void						UpdateBuffers();
 		void						DestroyBuffers();
 
@@ -67,8 +64,10 @@ class ZERenderStagePostProcess : public ZERenderStage
 		virtual ZERenderStageType	GetStageType() const;
 		virtual ZERenderStageType	GetDependencies() const;
 		
-		virtual void				Process(const ZERenderCommand* RenderCommand);
-		virtual void				Setup();
+		virtual bool				Setup();
+		virtual bool				Process(const ZERenderCommand* RenderCommand);
+
+		virtual bool				ResetStates(const ZEMaterial* Material);
 
 									ZERenderStagePostProcess();
 		virtual						~ZERenderStagePostProcess();

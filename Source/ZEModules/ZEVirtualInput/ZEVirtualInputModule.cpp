@@ -74,9 +74,9 @@ bool ZEVirtualInputModule::DeinitializeSelf()
 
 void ZEVirtualInputModule::MoveMouse(ZEInt X, ZEInt Y, ZEInt Z)
 {
-	MouseDevice->State.Axises.CurrentValues[0] = X;
-	MouseDevice->State.Axises.CurrentValues[1] = X;
-	MouseDevice->State.Axises.CurrentValues[2] = X;
+	MouseDevice->State.Axises.CurrentValues[0] = (float)X;
+	MouseDevice->State.Axises.CurrentValues[1] = (float)Y;
+	MouseDevice->State.Axises.CurrentValues[2] = (float)Z;
 }
 
 void ZEVirtualInputModule::SetKeyboardKeyState(ZEUInt Index, bool Pressed)

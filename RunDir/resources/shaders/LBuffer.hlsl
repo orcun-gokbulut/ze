@@ -38,13 +38,15 @@ SamplerState	LBufferPointSampler : register(s3);
 
 // Textures
 Texture2D<float4>	LBuffer1 : register(t3);
-Texture2D<float4>	LBuffer2 : register(t4);
+//Texture2D<float4>	LBuffer2 : register(t4);
 
+#define	ZE_LIGHT_ZERO_TRESOLD		0.01f
+#define	ZE_LIGHT_ZERO_CHECK(Value)	((abs( (Value) ) - 0.01f) < (0.0f))
 
 struct ZELBuffer
 {
 	float4 DiffuseSpecular	: SV_TARGET0;
-	float4 NotDecidedYet	: SV_TARGET1;
+	//float4 NotDecidedYet	: SV_TARGET1;
 };
 
 void ZELBuffer_SetDiffuse(inout ZELBuffer LBuffer, in float3 Diffuse)

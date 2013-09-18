@@ -33,17 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D10_TEXTURE_2D_H__
-#define __ZE_D3D10_TEXTURE_2D_H__
+#ifndef __ZE_D3D11_TEXTURE_2D_H__
+#define __ZE_D3D11_TEXTURE_2D_H__
+
+#include <d3d11.h>
 
 #include "ZETypes.h"
 #include "ZED3D10ComponentBase.h"
 #include "ZEGraphics/ZETexture2D.h"
 
 class ZETextureData;
-
-struct ID3D10Texture2D;
-struct ID3D10ShaderResourceView;
+class ZERenderTarget;
 
 class ZED3D10Texture2D : public ZETexture2D, public ZED3D10ComponentBase
 {
@@ -51,28 +51,22 @@ class ZED3D10Texture2D : public ZETexture2D, public ZED3D10ComponentBase
 	friend class ZED3D10GraphicsDevice;
 
 	protected:
-		static ZEUInt16						GlobalCount;
-		static ZESize						GlobalSize;
+		ID3D11Texture2D*					D3D10Texture2D;
+		ID3D11ShaderResourceView*			D3D10ShaderResourceView;
 
-		ID3D10Texture2D*					D3D10Texture2D;
-		ID3D10ShaderResourceView*			D3D10ShaderResourceView;
+		bool								UpdateWith(ZEUInt ShadowIndex);
 
 											ZED3D10Texture2D();
 		virtual								~ZED3D10Texture2D();
 
 	public:
-		bool								IsEmpty() const;
+		const ID3D11Texture2D*				GetD3D10Texture() const;
+		const ID3D11ShaderResourceView*		GetD3D10ResourceView() const;
 		
-		const ID3D10Texture2D*				GetD3D10Texture() const;
-		const ID3D10ShaderResourceView*		GetD3D10ResourceView() const;
-		
-		virtual ZERenderTarget*				CreateRenderTarget(ZEUInt MipLevel = 0) const;
+		ZERenderTarget*						CreateRenderTarget(ZEUInt MipLevel = 0) const;
 
-		virtual bool						CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat);
-		virtual bool						CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
-
-		virtual bool						Lock(void** Buffer, ZESize* Pitch, ZEUInt Level);
-		virtual bool						Unlock(ZEUInt Level);
+		bool								CreateDynamic(ZEUInt Width, ZEUInt Height, ZETexturePixelFormat PixelFormat, ZETextureData* Data = NULL);
+		bool								CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
 };
 
 #endif

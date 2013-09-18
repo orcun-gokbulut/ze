@@ -170,7 +170,7 @@ class ZEFlagsBase
 			return *this;
 		}
 
-		inline ZEFlagsBase<Type>& operator~() const
+		inline ZEFlagsBase<Type> operator~() const
 		{
 			return ZEFlagsBase<Type>(~this->Value);
 		}

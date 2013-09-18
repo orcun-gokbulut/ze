@@ -57,7 +57,7 @@ class ZEInteriorResource;
 class ZEInteriorRoom;
 class ZEInteriorDoor;
 class ZEInteriorHelper;
-struct ZEDrawParameters;
+class ZEDrawParameters;
 struct ZEInteriorCullStatistics;
 class ZERay;
 class ZEVector3;
@@ -114,8 +114,8 @@ class ZEInterior : public ZEEntity
 		virtual void							SetInteriorFile(const char* InteriorFile);
 		virtual const char*						GetInteriorFile() const;
 
-		void									SetInteriorResource(const ZEInteriorResource* InteriorResource);	
-		const ZEInteriorResource*				GetInteriorResource();
+		void									SetResource(const ZEInteriorResource* InteriorResource);	
+		const ZEInteriorResource*				GetResource();
 
 		void									SetCullMode(ZEInteriorCullMode Value);
 		ZEInteriorCullMode						GetCullMode() const;

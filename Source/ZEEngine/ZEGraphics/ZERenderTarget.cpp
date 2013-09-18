@@ -33,6 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEError.h"
 #include "ZERenderTarget.h"
 
 ZEUInt ZERenderTarget::GetWidth() const
@@ -43,6 +44,11 @@ ZEUInt ZERenderTarget::GetWidth() const
 ZEUInt ZERenderTarget::GetHeight() const
 {
 	return Height;
+}
+
+ZEUInt ZERenderTarget::GetDepth() const
+{
+	return Depth;
 }
 
 const ZEVector3& ZERenderTarget::GetPixelSize() const
@@ -65,16 +71,27 @@ void ZERenderTarget::Destroy()
 	delete this;
 }
 
-ZERenderTarget::ZERenderTarget(ZEUInt Width, ZEUInt Height, ZEVector3 PixelSize, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType)
+ZEUInt16	ZERenderTarget::TotalCount = 0;
+
+ZERenderTarget::ZERenderTarget(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType)
 {
+	zeDebugCheck(Width == 0, "Width cannot be zero");
+	zeDebugCheck(Height == 0, "Height cannot be zero");
+	zeDebugCheck(Depth == 0, "Depth cannot be zero");
+	zeDebugCheck(PixelFormat == ZE_TT_NONE, "RenderTargetType must be set");
+	zeDebugCheck(PixelFormat == ZE_TPF_NOTSET, "PixelFormat must be set");
+
 	this->Width = Width;
 	this->Height = Height;
-	this->PixelSize = PixelSize;
+	this->Depth = Depth;
+	this->PixelSize = ZEVector3(1.0f / Width, 1.0f / Height, 1.0f / Depth);
 	this->PixelFormat = PixelFormat;
 	this->RenderTargetType = RenderTargetType;
+
+	TotalCount++;
 }
 
 ZERenderTarget::~ZERenderTarget()
 {
-
+	TotalCount--;
 }

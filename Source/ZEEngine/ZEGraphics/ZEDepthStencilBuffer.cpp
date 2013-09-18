@@ -36,17 +36,27 @@
 #include "ZEDepthStencilBuffer.h"
 #include "ZEGraphicsModule.h"
 
-
-ZEDepthStencilBuffer::ZEDepthStencilBuffer()
+inline static ZESize GetPixelSize(ZEDepthStencilPixelFormat Format)
 {
-	Width = 0;
-	Height = 0;
-	PixelFormat = ZE_DSPF_NOTSET;
+	ZESize Size = 0;
+	switch(Format)
+	{
+		case ZE_DSPF_DEPTH16:
+			Size = 2;
+			break;
+		case ZE_DSPF_DEPTH24_STENCIL8:
+			Size = 4;
+			break;
+		case ZE_DSPF_DEPTHD32_FLOAT:
+			Size = 4;
+			break;
+	}
+	return Size;
 }
 
-ZEDepthStencilBuffer::~ZEDepthStencilBuffer()
+inline static ZESize CalculateBufferSize(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat Format)
 {
-
+	return Width * Height * GetPixelSize(Format);
 }
 
 ZEUInt ZEDepthStencilBuffer::GetWidth() const
@@ -67,6 +77,44 @@ ZEDepthStencilPixelFormat ZEDepthStencilBuffer::GetPixelFormat() const
 void ZEDepthStencilBuffer::Destroy()
 {
 	delete this;
+}
+
+bool ZEDepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat)
+{
+	zeDebugCheck(Width == 0, "Width cannot be zero");
+	zeDebugCheck(Height == 0, "Height cannot be zero");
+	zeDebugCheck(PixelFormat == ZE_DSPF_NOTSET, "PixelFormat must be valid");
+	zeDebugCheck(Width > 8192 || Height > 8192, "Depth stencil buffer dimensions exceeds the limits.");
+
+	this->PixelFormat = PixelFormat;
+	this->Height = Height;
+	this->Width = Width;
+	
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Depth stencil buffer created. Width: %u, Height: %u, PixelFormat: %u.", 
+			Width, Height, PixelFormat);
+#endif
+
+	TotalSize += CalculateBufferSize(Width, Height, PixelFormat);
+	TotalCount++;
+
+	return true;
+}
+
+ZESize		ZEDepthStencilBuffer::TotalSize = 0;
+ZEUInt16	ZEDepthStencilBuffer::TotalCount = 0;
+
+ZEDepthStencilBuffer::ZEDepthStencilBuffer()
+{
+	Width = 0;
+	Height = 0;
+	PixelFormat = ZE_DSPF_NOTSET;
+}
+
+ZEDepthStencilBuffer::~ZEDepthStencilBuffer()
+{
+	TotalSize -= CalculateBufferSize(Width, Height, PixelFormat);
+	TotalCount--;
 }
 
 ZEDepthStencilBuffer* ZEDepthStencilBuffer::CreateInstance()

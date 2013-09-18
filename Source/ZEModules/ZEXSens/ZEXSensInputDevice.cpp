@@ -50,7 +50,7 @@ void ZEXSensCallback::onDataAvailable(XsDevice* XSensDevice, const XsDataPacket*
 {
 	Device->Lock.Lock();
 	XsQuaternion Quaternion = Packet->orientationQuaternion();
-	Device->State.Quaternions.CurrentValues[0] =  ZEQuaternion(Quaternion.w(), Quaternion.x(), Quaternion.y(), Quaternion.z());
+	Device->State.Quaternions.CurrentValues[0] =  ZEQuaternion((float)Quaternion.w(), (float)Quaternion.x(), (float)Quaternion.y(), (float)Quaternion.z());
 	
 	float Angle;
 	ZEVector3 Axis;

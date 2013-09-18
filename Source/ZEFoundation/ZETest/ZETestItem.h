@@ -78,7 +78,7 @@ class ZETestItem
 		bool					RunTest();
 		void					Reset();
 		ZETestResult			GetResult();
-		float					GetEleapsedTime();
+		ZEUInt64				GetEleapsedTime();
 
 								ZETestItem(const char* Name, ZETestSuiteItem* Owner);
 };

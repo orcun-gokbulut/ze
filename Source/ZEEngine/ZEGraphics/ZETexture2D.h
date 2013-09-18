@@ -48,25 +48,38 @@ class ZETexture2D : public ZETexture
 	friend class ZEGraphicsModule;
 
 	protected:
+		static ZEUInt16				TotalCount;
+		static ZESize				TotalSize;
+
+		ZEShadowCopy				ShadowCopy;
+
+		ZESize						Size;
 		ZEUInt						Width;
 		ZEUInt						Height;
 		ZEUInt						LevelCount;
-		
+		ZEVector2					PixelSize;
+
+		virtual bool				UpdateWith(ZEUInt ShadowIndex);
+
 									ZETexture2D();
 		virtual						~ZETexture2D();
 
 	public:
+		ZEGraphicsResourceType		GetResourceType() const;
+
+		ZESize						GetSize() const;
 		ZEUInt						GetWidth() const;
 		ZEUInt						GetHeight() const;
 		ZEUInt						GetLevelCount() const;
+		const ZEVector2&			GetPixelSize() const;
 
-		virtual	ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
+		virtual bool				Unlock();
+		virtual bool				Lock(void** Buffer, ZESize* Pitch);
 
-		virtual bool				CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat) = 0;
-		virtual bool				CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL) = 0;
+		virtual bool				CreateDynamic(ZEUInt Width, ZEUInt Height, ZETexturePixelFormat PixelFormat, ZETextureData* Data = NULL);
+		virtual bool				CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
 		
-		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
-		virtual bool				Unlock(ZEUInt Level) = 0;
+		virtual	ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
 
 		static ZETexture2D*			CreateInstance();
 };

@@ -61,7 +61,7 @@ class ZETestSuiteItem
 		bool				RunTests();
 		void				Reset();
 		ZETestResult		GetResult();
-		float				GetElapsedTime();
+		ZEUInt64			GetElapsedTime();
 
 		ZEUInt				GetTotalTestCount();
 		ZEUInt				GetFailedTestCount();

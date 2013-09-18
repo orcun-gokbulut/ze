@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include <d3d9.h>
+
 #include "ZEError.h"
 #include "ZED3D10EventTracer.h"
 #include "ZED3D10GraphicsModule.h"
-
-#include <d3d9.h>
 
 void ZED3D10EventTracer::SetTracingEnabled(bool Enabled)
 {

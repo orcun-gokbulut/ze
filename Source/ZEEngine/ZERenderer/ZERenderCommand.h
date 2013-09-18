@@ -53,17 +53,6 @@
 #define ZE_RCT_INDEXED_INSTANCED		8
 typedef ZEFlagsBase<ZEUInt32>			ZERenderCommandType;
 
-struct ZESkinningBuffer
-{
-	ZEMatrix4x4	BoneMatrices[58];
-};
-
-struct ZETransformationBuffer
-{
-	ZEMatrix4x4	WorldView;
-	ZEMatrix4x4	WorldViewProjection;
-};
-
 /********************************************************************/
 /*					Render Command Base Classes						*/
 /********************************************************************/
@@ -132,23 +121,32 @@ class ZERenderCommand
 	friend class ZECommandBuffer;
 
 	protected:
-		ZEUInt32				Id;
-		ZESize					Size;
-		ZERenderCommandType		Type;
+		ZEUInt32					Id;
+		ZESize						Size;
+		ZERenderCommandType			Type;
 
-								ZERenderCommand(ZESize CommandSize, ZERenderCommandType CommandType);
-								~ZERenderCommand();
+									ZERenderCommand(ZESize CommandSize, ZERenderCommandType CommandType);
+									~ZERenderCommand();
 
 	public:
-		float					Order;
-		ZEInt32					Priority;
-		
-		ZEMaterial*				Material;
-		
-		bool					Skinned;
-		ZEConstantBuffer*		SkinningBuffer;
-		ZEConstantBuffer*		TransformationBuffer;
+		float						Order;
+		ZEInt32						Priority;
+	
+		ZEMaterial*					Material;
+	
+		struct ZESkinningBuffer
+		{
+			ZEMatrix4x4				BoneMatrices[58];
+		};
 
+		bool						Skinned;
+		ZEConstantBuffer*			SkinningBuffer;
+		
+		ZEMatrix4x4					WorldTransform;
+
+		ZEUInt32					GetId() const;
+		ZESize						GetSize() const;
+		ZERenderCommandType			GetType() const;
 };
 
 class ZERenderCommandDefault :	public ZERenderCommand,

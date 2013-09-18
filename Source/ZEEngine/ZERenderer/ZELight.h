@@ -48,35 +48,26 @@
 #define	ZE_LT_OMNIPROJECTIVE	8
 typedef ZEUInt32				ZELightType;
 
-
 class ZEScene;
 class ZEShadowRenderer;
-struct ZEDrawParameters;
+class ZEDrawParameters;
 
 class ZELight : public ZEEntity
 {
 	protected:
-		bool							Changed;
-		ZELightType						Type;
+		bool						ShadowCaster;
 
-		bool							ShadowCaster;
-		bool							UpdateViewVolume;
-
-		virtual void					OnTransformChanged();
-
-										ZELight(ZELightType LightType);
-		virtual							~ZELight();
+									ZELight();
+		virtual						~ZELight();
 
 	public:
-		virtual void					SetShadowCaster(bool NewValue);
-		bool							GetShadowCaster() const;
+		void						SetShadowCaster(bool NewValue);
+		bool						GetShadowCaster() const;
 
-		virtual ZEDrawFlags				GetDrawFlags() const;
-		virtual ZELightType				GetLightType() const;
+		virtual ZEDrawFlags			GetDrawFlags() const;
+		virtual ZELightType			GetLightType() const;
 
-		virtual void					Draw(ZEDrawParameters* DrawParameters);
-
-		virtual const ZEViewVolume*		GetLightVolume() = 0;
+		virtual void				Draw(ZEDrawParameters* DrawParameters);
 };
 
 #endif

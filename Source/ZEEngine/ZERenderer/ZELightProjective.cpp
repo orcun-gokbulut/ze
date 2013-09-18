@@ -74,8 +74,8 @@ float ZELightProjective::GetAspectRatio() const
 
 void ZELightProjective::SetColor(const ZEVector3& NewColor)
 {
-	Changed = true;
 	Color = NewColor;
+	PropertyChanged = true;
 }
 
 const ZEVector3& ZELightProjective::GetColor() const
@@ -85,8 +85,8 @@ const ZEVector3& ZELightProjective::GetColor() const
 
 void ZELightProjective::SetIntensity(float NewValue)
 {
-	Changed = true;
 	Intensity = NewValue;
+	PropertyChanged = true;
 }
 
 float ZELightProjective::GetIntensity() const
@@ -96,9 +96,8 @@ float ZELightProjective::GetIntensity() const
 
 void ZELightProjective::SetRange(float NewValue)
 {
-	Changed = true;
-	UpdateViewVolume = true;
 	Range = NewValue;
+	PropertyChanged = true;
 }
 
 float ZELightProjective::GetRange() const
@@ -108,16 +107,16 @@ float ZELightProjective::GetRange() const
 
 void ZELightProjective::SetAttenuation(const ZEVector3& Attenuation)
 {
-	Changed = true;
 	this->Attenuation = Attenuation;
+	PropertyChanged = true;
 }
 
 void ZELightProjective::SetAttenuation(float DistanceSquare, float Distance, float Constant)
 {
-	Changed = true;
 	Attenuation.x = Constant;
 	Attenuation.y = Distance;
 	Attenuation.z = DistanceSquare;
+	PropertyChanged = true;
 }
 
 const ZEVector3& ZELightProjective::GetAttenuation() const
@@ -127,8 +126,8 @@ const ZEVector3& ZELightProjective::GetAttenuation() const
 
 void ZELightProjective::SetPenumbraSize(float Value)
 {
-	Changed = true;
 	PenumbraSize = Value;
+	PropertyChanged = true;
 }
 
 float ZELightProjective::GetPenumbraSize() const
@@ -138,8 +137,8 @@ float ZELightProjective::GetPenumbraSize() const
 
 void ZELightProjective::SetSlopeScaledBias(float Value)
 {
-	Changed = true;
 	SlopeScaledBias = Value;
+	PropertyChanged = true;
 }
 
 float ZELightProjective::GetSlopeScaledBias() const
@@ -149,8 +148,8 @@ float ZELightProjective::GetSlopeScaledBias() const
 
 void ZELightProjective::SetDepthScaledBias(float Value)
 {
-	Changed = true;
 	DepthScaledBias = Value;
+	PropertyChanged = true;
 }
 
 float ZELightProjective::GetDepthScaledBias() const
@@ -173,7 +172,7 @@ const ZESamplerState& ZELightProjective::GetTextureSampler() const
 void ZELightProjective::SetProjectionTexture(const ZETexture2D* Texture)
 {
 	zeDebugCheck(Texture == NULL, "Null Pointer");
-	Material->ProjectionTexture = Texture;
+	ProjectionTexture = Texture;
 }
 
 const ZETexture2D* ZELightProjective::GetProjectionTexture() const
@@ -182,73 +181,73 @@ const ZETexture2D* ZELightProjective::GetProjectionTexture() const
 	return Material->ProjectionTexture;
 }
 
-const ZEViewVolume* ZELightProjective::GetLightVolume()
-{
-	if (UpdateViewVolume)
-	{
- 		ViewVolume.Create(GetWorldPosition(), GetWorldRotation(), FOV, AspectRatio, 0.01f, Range);
- 		UpdateViewVolume = false;
-	}
-
-	return &ViewVolume;
-}
-
 void ZELightProjective::UpdateMaterial(const ZEDrawParameters* DrawParameters)
 {
-	if (!Changed)
-		return;
+	Material->ProjectionTexture = ProjectionTexture;
 
-	if (DrawParameters->View->Type != ZE_VT_CAMERA)
-		return;
+	const ZEView* View = DrawParameters->View;
 
-	ZECamera* Camera = DrawParameters->View->Camera;
-
-	ZEMaterialLightProjective::Transformations* Transformations = NULL;
-	Material->LightTransformations->Lock((void**)&Transformations);
+	if (TransformChanged)
+	{
+		ZEMaterialLightProjective::VSProperties0* Transformations = NULL;
+		Material->LightVSProperties0->Lock((void**)&Transformations);
 	
-		ZEMatrix4x4 WorldTransform;
-		float TanFovRange = ZEAngle::Tan(FOV * 0.5f) * Range;
-		ZEVector3 Scale(TanFovRange * AspectRatio * 2.0f, TanFovRange * 2.0f, Range);
-		ZEMatrix4x4::CreateOrientation(WorldTransform, GetWorldPosition(), GetWorldRotation(), Scale);
+			ZEMatrix4x4 WorldTransform;
+			float TanFovRange = ZEAngle::Tan(FOV * 0.5f) * Range;
+			ZEVector3 Scale(TanFovRange * AspectRatio * 2.0f, TanFovRange * 2.0f, Range);
+			ZEMatrix4x4::CreateOrientation(WorldTransform, GetWorldPosition(), GetWorldRotation(), Scale);
 
-		Transformations->WorldView = Camera->GetViewTransform() * WorldTransform;
-		Transformations->WorldViewProjection = Camera->GetViewProjectionTransform() * WorldTransform;
-	
-	Material->LightTransformations->Unlock();
-	
-	ZEMaterialLightProjective::Properties* Properties = NULL;
-	Material->LightProperties->Lock((void**)&Properties);
-	
-		Properties->Range = Range;
-		Properties->Color = Color;
-		Properties->Attenuation = Attenuation;	
-		Properties->Intensity = Intensity;
-		Properties->PenumbraSize = PenumbraSize;
-		Properties->DepthScaledBias = DepthScaledBias;
-		Properties->SlopeScaledBias = SlopeScaledBias;
-		Properties->ViewSpacePosition = Camera->GetViewTransform() * GetWorldPosition();
-		Properties->PixelSize = DrawParameters->RenderTarget->GetPixelSize().ToVector2();
+			Transformations->WorldMatrix = WorldTransform;
 
+		Material->LightVSProperties0->Unlock();
+		TransformChanged = false;
+	}
+
+	if (PropertyChanged)
+	{
+		ZEMaterialLightProjective::PSProperties0* Properties = NULL;
+		Material->LightPSProperties0->Lock((void**)&Properties);
+	
+			Properties->Color = Color;
+			Properties->Attenuation = Attenuation;	
+			Properties->Intensity = Intensity;
+	
+		Material->LightPSProperties0->Unlock();
+		PropertyChanged = false;
+	}
+
+	// Use a dirty flag here to check if view transform is changed ?
+	if (true)
+	{
 		// Projection Transformation
-		ZEMatrix4x4 LightViewMatrix;
-		ZEMatrix4x4::CreateViewTransform(LightViewMatrix, GetWorldPosition(), GetWorldRotation());
-		ZEMatrix4x4 LightProjectionMatrix;
-		ZEMatrix4x4::CreatePerspectiveProjection(LightProjectionMatrix, FOV, AspectRatio, Camera->GetNearZ(), Range);
-		ZEMatrix4x4 LightViewProjectionMatrix;
-		LightViewProjectionMatrix = LightProjectionMatrix * LightViewMatrix;
+		ZEMatrix4x4 ViewMatrix;
+		ZEMatrix4x4 ProjectionMatrix;
 		ZEMatrix4x4 TextureMatrix;
+		ZEMatrix4x4 InvCameraViewMatrix;
+		ZEMatrix4x4::Inverse(InvCameraViewMatrix, View->GetViewTransform());
+
+		ZEMatrix4x4::CreateViewTransform(ViewMatrix, GetWorldPosition(), GetWorldRotation());
+		ZEMatrix4x4::CreatePerspectiveProjection(ProjectionMatrix, FOV, AspectRatio, 0.01f, Range);
 		ZEMatrix4x4::Create(TextureMatrix,	0.5f,  0.0f, 0.0f, 0.5f,
 											0.0f, -0.5f, 0.0f, 0.5f,
 											0.0f,  0.0f, 1.0f, 0.0f,
 											0.0f,  0.0f, 0.0f, 1.0f);
 
-		ZEMatrix4x4 InvCameraViewMatrix;
-		ZEMatrix4x4::Inverse(InvCameraViewMatrix, Camera->GetViewTransform());
-		Properties->ProjectionMatrix = TextureMatrix * LightViewProjectionMatrix * InvCameraViewMatrix;;
-	
-	Material->LightProperties->Unlock();
+		ZEMaterialLightProjective::PSProperties1* Properties = NULL;
+		Material->LightPSProperties1->Lock((void**)&Properties);
 
-	Changed = false;
+			Properties->ViewSpaceCenter = View->GetViewTransform() * GetWorldPosition();
+			Properties->ProjectionMatrix = TextureMatrix * ProjectionMatrix * ViewMatrix * InvCameraViewMatrix;
+
+		Material->LightPSProperties1->Unlock();		
+	}
+}
+
+void ZELightProjective::OnTransformChanged()
+{
+	TransformChanged = true;
+
+	ZELight::OnTransformChanged();	
 }
 
 bool ZELightProjective::InitializeSelf()
@@ -269,7 +268,7 @@ bool ZELightProjective::InitializeSelf()
 	// Vertex layout
 	static const ZEVertexElement Element[] = 
 	{
-		{"POSITION", 0, ZE_VET_FLOAT4, 0, 0, ZE_VU_PER_VERTEX, 0}
+		{"POSITION", 0, ZE_VET_FLOAT3, 0, 0, ZE_VU_PER_VERTEX, 0}
 	};
 	VertexLayout.SetLayout(Element, 1);
 
@@ -293,6 +292,11 @@ bool ZELightProjective::DeinitializeSelf()
 	return ZELight::DeinitializeSelf();
 }
 
+ZELightType ZELightProjective::GetLightType() const
+{
+	return ZE_LT_PROJECTIVE;
+}
+
 void ZELightProjective::Tick(float Time)
 {
 
@@ -300,20 +304,31 @@ void ZELightProjective::Tick(float Time)
 
 void ZELightProjective::Draw(ZEDrawParameters* DrawParameters)
 {
-	UpdateMaterial(DrawParameters);
+	// Draw if only viewed by a camera
+	if (DrawParameters->View->GetViewType() != ZE_VT_CAMERA)
+		return;
+
+	if (ProjectionTexture == NULL)
+		return;
 
 	ZEBSphere LightBoundingSphere;
 	LightBoundingSphere.Radius = GetRange();
 	LightBoundingSphere.Position = GetWorldPosition();
 	
-	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
-		DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
+	if (DrawParameters->View->GetViewVolume()->CullTest(LightBoundingSphere))
+		return;
+
+	UpdateMaterial(DrawParameters);
+	DrawParameters->Bucket->AddRenderCommand(&RenderCommand);
 
 	ZELight::Draw(DrawParameters);
 }
 
-ZELightProjective::ZELightProjective() : ZELight(ZE_LT_PROJECTIVE)
+ZELightProjective::ZELightProjective()
 {
+	PropertyChanged = true;
+	TransformChanged = true;
+
 	FOV = ZE_PI_4;
 	AspectRatio = 1.0f;
 	
@@ -326,8 +341,10 @@ ZELightProjective::ZELightProjective() : ZELight(ZE_LT_PROJECTIVE)
 	SlopeScaledBias = 0.0f;
 	DepthScaledBias = 0.0f;
 
-	Material = NULL;
+	ProjectionTexture = NULL;
+
 	VertexBuffer = NULL;
+	Material = NULL;
 }
 
 ZELightProjective::~ZELightProjective()

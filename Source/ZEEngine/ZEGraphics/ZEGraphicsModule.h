@@ -38,6 +38,7 @@
 
 #include "ZETypes.h"
 #include "ZECore/ZEModule.h"
+#include "ZEGraphicsMonitor.h"
 #include "ZEGraphicsDeviceState.h"
 #include "ZECore/ZEOptionSection.h"
 #include "ZETexture/ZETextureOptions.h"
@@ -50,8 +51,6 @@
 		(x) = NULL;			\
 	}						\
 }
-
-#define zeGraphics ZEGraphicsModule::GetInstance()
 
 struct ZEGraphicsStatistics
 {
@@ -102,8 +101,13 @@ class ZERenderTarget;
 class ZEShaderCompiler;
 class ZEGraphicsDevice;
 class ZEConstantBuffer;
+class ZEGraphicsWindow;
 class ZEDepthStencilBuffer;
 class ZEGraphicsEventTracer;
+
+
+
+#define zeGraphics ZEGraphicsModule::GetInstance()
 
 class ZEGraphicsModule : public ZEModule
 {
@@ -112,75 +116,51 @@ class ZEGraphicsModule : public ZEModule
 	friend class ZEGraphicsDevice;
 
 	protected:
-		bool							FullScreen;
-		ZEUInt							ScreenWidth;
-		ZEUInt							ScreenHeight;
-		bool							VerticalSync;
-		ZEUInt							SampleCount;
-		ZEUInt							SampleQuality;
-		ZEUInt							AnisotropicFilter;
+		ZEArray<ZEGraphicsWindow*>			Windows;
+		ZEArray<ZEGraphicsMonitor*>			Monitors;
+		ZEArray<ZEGraphicsDevice*>			Devices;
 
-		ZEUInt							ScreenCount;
-		ZEArray<ZEViewport>				Viewports;
-		ZEArray<ZEScissorRectangle>		ScissorRects;
-		ZEArray<ZERenderTarget*>		FrameBuffers;
-		ZEArray<ZEDepthStencilBuffer*>	DepthBuffers;
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
 
-										ZEGraphicsModule();
-		virtual							~ZEGraphicsModule();
+											ZEGraphicsModule();
+		virtual								~ZEGraphicsModule();
 
 	public:
-		// NOTE: These methods should not be here ?
+		// NOTE: These methods should be here ?
 		// -------------------------------------------
-		ZETextureQuality				TextureQuality;
-		static ZEOptionSection			GraphicsOptions;
-		static void						BaseInitialize();
-		static void						BaseDeinitialize();
-		virtual ZETextureOptions*		GetTextureOptions();
+		ZETextureQuality					TextureQuality;
+		static ZEOptionSection				GraphicsOptions;
+		static void							BaseInitialize();
+		static void							BaseDeinitialize();
+		virtual ZETextureOptions*			GetTextureOptions();
 		// -------------------------------------------
 
-		virtual bool					SetFullScreen(bool Enabled) = 0;
-		bool							GetFullScreen() const;
+		ZEGraphicsWindow*					GetWindow(ZEUInt WindowId = 0) const;
+		const ZEArray<ZEGraphicsWindow*>&	GetWindows() const;
 
-		virtual bool					SetSampleCount(ZEUInt Count) = 0;
-		ZEUInt							GetSampleCount() const;
-		ZEUInt							GetSampleQuality() const;
+		const ZEGraphicsMonitor*			GetMonitor(ZEUInt MonitorId = 0) const;
+		const ZEArray<ZEGraphicsMonitor*>&	GetMonitors() const;
 
-		virtual void					SetVerticalSync(bool Enabled) = 0;
-		bool							GetVerticalSync() const;
+		ZEGraphicsDevice*					GetDevice(ZESize Index = 0) const;
+		const ZEArray<ZEGraphicsDevice*>&	GetDevices() const;
 
-		virtual bool					SetScreenCount(ZEUInt Count) = 0;
-		ZEUInt							GetScreenCount() const;
+		virtual ZEStatePool*				GetStatePool() const = 0;
+		virtual ZEGraphicsEventTracer*		GetEventTracer() const = 0;
+		virtual ZEShaderCompiler*			GetShaderCompiler() const = 0;
 
-		virtual void					SetAnisotropicFilter(ZEUInt Anisotropy) = 0;
-		ZEUInt							GetAnisotropicFilter() const;
-		
-		virtual bool					SetScreenSize(ZEUInt WindowWidth, ZEUInt WindowHeight) = 0;
-		ZEVector2						GetScreenSize() const;
-		ZEUInt							GetScreenWidth() const;
-		ZEUInt							GetScreenHeight() const;
+		virtual ZETexture2D*				CreateTexture2D() = 0;
+		virtual ZETexture3D*				CreateTexture3D() = 0;
+		virtual ZETextureCube*				CreateTextureCube() = 0;
+		virtual ZEIndexBuffer*				CreateIndexBuffer() = 0;
+		virtual ZEVertexBuffer*				CreateVertexBuffer() = 0;
+		virtual ZEGraphicsWindow*			CreateGraphicsWindow() = 0;
+		virtual ZEConstantBuffer*			CreateConstantBuffer() = 0;
+		virtual ZEDepthStencilBuffer*		CreateDepthStencilBuffer() = 0;
 
-		const ZEViewport&				GetViewport(ZESize Index = 0) const;
-		const ZEScissorRectangle&		GetScissorRectangle(ZESize Index = 0) const;
-		const ZERenderTarget*			GetFrameBuffer(ZESize Index = 0) const;
-		const ZEDepthStencilBuffer*		GetDepthBuffer(ZESize Index = 0) const;
+		virtual void						GetStatistics(ZEGraphicsStatistics& Statistics) const;
 
-		virtual void					GetStatistics(ZEGraphicsStatistics& Statistics) const = 0;
-
-		virtual ZEGraphicsDevice*		GetDevice() const = 0;
-		virtual ZEStatePool*			GetStatePool() const = 0;
-		virtual ZEGraphicsEventTracer*	GetEventTracer() const = 0;
-		virtual ZEShaderCompiler*		GetShaderCompiler() const = 0;
-		
-		virtual ZETexture2D*			CreateTexture2D() const = 0;
-		virtual ZETexture3D*			CreateTexture3D() const = 0;
-		virtual ZETextureCube*			CreateTextureCube() const = 0;
-		virtual ZEIndexBuffer*			CreateIndexBuffer() const = 0;
-		virtual ZEVertexBuffer*			CreateVertexBuffer() const = 0;
-		virtual ZEConstantBuffer*		CreateConstantBuffer() const = 0;
-		virtual ZEDepthStencilBuffer*	CreateDepthStencilBuffer() const = 0;
-
-		static ZEGraphicsModule*		GetInstance();
+		static ZEGraphicsModule*			GetInstance();
 };
 
 #endif

@@ -52,6 +52,9 @@ class ZEDepthStencilBuffer
 	friend class ZEGraphicsDevice;
 
 	protected:
+		static ZESize					TotalSize;
+		static ZEUInt16					TotalCount;
+
 		ZEUInt							Width;
 		ZEUInt							Height;
 		ZEDepthStencilPixelFormat		PixelFormat;
@@ -67,7 +70,7 @@ class ZEDepthStencilBuffer
 		virtual bool					IsEmpty() const = 0;
 		
 		virtual void					Destroy();
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat) = 0;
+		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
 
 		static ZEDepthStencilBuffer*	CreateInstance();
 };

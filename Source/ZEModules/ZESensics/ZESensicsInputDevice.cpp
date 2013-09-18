@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
+#include "ZECore/ZECore.h"
 #include "ZEDS/ZEHashGenerator.h"
 #include "ZEDS/ZEFormat.h"
-#include "ZECore/ZEWindow.h"
 
 #include "ZESensicsInputModule.h"
 #include "ZESensicsInputDevice.h"
@@ -46,6 +46,8 @@
 #include <dinput.h>
 #include <memory.h>
 #include "ZEMath/ZEAngle.h"
+#include "ZEGraphics/ZEGraphicsWindow.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
 BOOL CALLBACK EnumDeviceCallback(const DIDEVICEINSTANCE* DeviceInstance, VOID* SensicDevicePtr)
 {
@@ -132,7 +134,7 @@ bool ZESensicsInputDevice::InitializeSelf()
 			return false;
 		}
 
-		SensicDevice->SetCooperativeLevel((HWND)ZEWindow::GetInstance()->GetHandle(), DISCL_EXCLUSIVE|DISCL_FOREGROUND );
+		SensicDevice->SetCooperativeLevel((HWND)zeGraphics->GetWindow()->GetHandle(), DISCL_EXCLUSIVE|DISCL_FOREGROUND );
 		SensicDevice->EnumObjects(EnumDeviceObjectCallback, this, DIDFT_AXIS);
 		SensicDevice->Acquire();
 	}

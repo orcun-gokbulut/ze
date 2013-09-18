@@ -56,7 +56,7 @@ void ZEFontResourceDynamic::SetFontFile(ZEString FontFilePath)
 
 	FT_Init_FreeType(&FreeType->Library);
 	FT_New_Face(FreeType->Library, FontFilePath, 0, &FreeType->Face);
-	FontSupportsKerning = FT_HAS_KERNING(FreeType->Face);
+	FontSupportsKerning = (FT_HAS_KERNING(FreeType->Face) == FT_FACE_FLAG_KERNING);
 }
 
 void ZEFontResourceDynamic::SetFontSize(ZEUInt32 FontSize)
@@ -92,7 +92,7 @@ void ZEFontResourceDynamic::CreateNewTexture(ZEUInt32 Width, ZEUInt32 Height)
 {
 	Textures.Add();
 	Textures.GetLastItem() = ZETexture2D::CreateInstance();
-	Textures.GetLastItem()->Create(Width, Height, 1, ZE_TPF_I8_4);
+	Textures.GetLastItem()->CreateDynamic(Width, Height, ZE_TPF_I8_4);
 }
 
 const char* ZEFontResourceDynamic::GetResourceType() const
@@ -203,9 +203,9 @@ const ZEFontCharacter& ZEFontResourceDynamic::GetCharacter(char Character, char 
 		LastTextureId++;
 	}
 
-	LastCharacterPosition.y = FontSize * LastTextureLine;
+	LastCharacterPosition.y = (float)(FontSize * LastTextureLine);
 
-	Textures[LastTextureId]->Lock((void**)&Buffer, &TexturePitch, 0);
+	Textures[LastTextureId]->Lock((void**)&Buffer, &TexturePitch);
 	ZEFontPixel* CurrentCharPix = Buffer + (ZEUInt32)LastCharacterPosition.x + ((ZEUInt32)(LastCharacterPosition.y * TexturePitch / 4));
 	for (ZESize y = 0; y < FTBitmap.rows; y++)
 	{
@@ -225,7 +225,7 @@ const ZEFontCharacter& ZEFontResourceDynamic::GetCharacter(char Character, char 
 			}
 		}
 	}
-	Textures[LastTextureId]->Unlock(0);
+	Textures[LastTextureId]->Unlock();
 
 	FontCharacters[LastItem].CoordinateRectangle.LeftUp.x = LastCharacterPosition.x  / Textures[LastTextureId]->GetWidth();
 	FontCharacters[LastItem].CoordinateRectangle.LeftUp.y = (LastCharacterPosition.y) / Textures[LastTextureId]->GetHeight();

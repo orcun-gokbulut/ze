@@ -117,9 +117,9 @@ void ZEParticleBillboardRenderer::UpdateVertexBuffer(ZEDrawParameters* DrawParam
 		return;
 	}
 
-	ZEVector3 CameraRight = DrawParameters->View->Camera->GetWorldRight();
-	ZEVector3 CameraUp = DrawParameters->View->Camera->GetWorldUp();
-	ZEVector3 CameraLook = DrawParameters->View->Camera->GetWorldFront();
+	ZEVector3 CameraRight = DrawParameters->View->GetWorldRight();
+	ZEVector3 CameraUp = DrawParameters->View->GetWorldUp();
+	ZEVector3 CameraLook = DrawParameters->View->GetWorldFront();
 
 	if (BillboardType == ZE_PBT_AXIS_ORIENTED)
 	{
@@ -184,7 +184,7 @@ void ZEParticleBillboardRenderer::UpdateVertexBuffer(ZEDrawParameters* DrawParam
 		{
 			ZEParticle Particle = Particles[ParticleCount - N - 1];
 
-			ZEVector3 ParticleFaceDirection = DrawParameters->View->Camera->GetWorldPosition() - Particle.Position;
+			ZEVector3 ParticleFaceDirection = DrawParameters->View->GetWorldPosition() - Particle.Position;
 			ParticleFaceDirection.NormalizeSelf();
 
 			if (Particle.State != ZE_PAS_DEAD)
@@ -258,7 +258,7 @@ void ZEParticleBillboardRenderer::Draw(ZEDrawParameters* DrawParameters)
 
 //	RenderCommand.InputStage.SetVertexBuffer(0, VertexBuffer);
 	RenderCommand.Material = Material;
-	DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
+//	DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
 }
 
 void ZEParticleBillboardRenderer::SetAxixOfOrientation(const ZEVector3& AxisOfOrientation)

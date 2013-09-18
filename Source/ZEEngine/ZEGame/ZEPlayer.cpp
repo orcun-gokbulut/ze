@@ -229,7 +229,7 @@ ZEListener* ZEPlayer::GetListener()
 void ZEPlayer::SetFOV(float FOV)
 {
 	this->FOV = FOV;
-	Camera->SetFOV(FOV);
+	Camera->SetFov(FOV);
 }
 
 float ZEPlayer::GetFOV()
@@ -294,7 +294,7 @@ ZEPlayer::ZEPlayer()
 	Camera = ZECamera::CreateInstance();
 	Camera->SetPosition(ZEVector3::Zero);
 	Camera->SetRotation(ZEQuaternion::Identity);
-	Camera->SetFOV(FOV);
+	Camera->SetFov(FOV);
 	AddComponent(Camera);
 
 	Listener = ZEListener::CreateInstance();

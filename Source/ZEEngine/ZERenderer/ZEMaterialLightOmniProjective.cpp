@@ -44,6 +44,7 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEMaterialLightOmniProjective.h"
+#include "ZEGraphics/ZEGraphicsEventTracer.h"
 #include "ZEGraphics/ZEShaderCompileOptions.h"
 
 void ZEMaterialLightOmniProjective::UpdateShaders()
@@ -70,15 +71,23 @@ void ZEMaterialLightOmniProjective::UpdateShaders()
 
 void ZEMaterialLightOmniProjective::UpdateBuffers()
 {
-	if (LightTransformations == NULL)
+	if (LightVSProperties0 == NULL)
 	{
-		LightTransformations = ZEConstantBuffer::CreateInstance();
-		LightTransformations->Create(VertexShader->GetMetaTable()->GetBufferInfo("TransformationsVS"));
+		LightVSProperties0 = ZEConstantBuffer::CreateInstance();
+		LightVSProperties0->Create(sizeof(VSProperties0));
+		LightVSProperties0->SetZero();
 	}
-	if (LightProperties == NULL)
+	if (LightPSProperties0 == NULL)
 	{
-		LightProperties = ZEConstantBuffer::CreateInstance();
-		LightProperties->Create(PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
+		LightPSProperties0 = ZEConstantBuffer::CreateInstance();
+		LightPSProperties0->Create(sizeof(PSProperties0));	
+		LightPSProperties0->SetZero();
+	}
+	if (LightPSProperties1 == NULL)
+	{
+		LightPSProperties1 = ZEConstantBuffer::CreateInstance();
+		LightPSProperties1->Create(sizeof(PSProperties1));
+		LightPSProperties1->SetZero();
 	}
 }
 
@@ -90,26 +99,27 @@ void ZEMaterialLightOmniProjective::DestroyShaders()
 
 void ZEMaterialLightOmniProjective::DestroyBuffers()
 {
-	ZE_DESTROY(LightTransformations);
-	ZE_DESTROY(LightProperties);
+	ZE_DESTROY(LightVSProperties0);
+	ZE_DESTROY(LightPSProperties0);
+	ZE_DESTROY(LightPSProperties1);
 }
 
 bool ZEMaterialLightOmniProjective::SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
-{
-	UpdateMaterial();
-
+{	
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 	
 	Device->SetVertexShader(VertexShader);
 	Device->SetPixelShader(PixelShader);
 
-	Device->SetVertexShaderBuffer(0, LightTransformations);
-	Device->SetPixelShaderBuffer(0, LightProperties);
+	Device->SetVertexShaderBuffer(0, LightVSProperties0);
+	Device->SetPixelShaderBuffer(0, LightPSProperties0);
+	Device->SetPixelShaderBuffer(1, LightPSProperties1);
 	
 	Device->SetPixelShaderSampler(6, SamplerState);
 	Device->SetPixelShaderTexture(6, ProjectionTexture);
 
-	return true;
+	// No more passes
+	return false;
 }
 
 ZESize ZEMaterialLightOmniProjective::GetHash() const
@@ -117,18 +127,16 @@ ZESize ZEMaterialLightOmniProjective::GetHash() const
 	return ZEHashGenerator::Hash(ZEString("ZEMaterialLightOmniProjective"));
 }
 
-bool ZEMaterialLightOmniProjective::UpdateMaterial()
-{
-	UpdateShaders();
-	UpdateBuffers();
-
-	return true;
-}
-
 bool ZEMaterialLightOmniProjective::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
-	if (Stage->GetStageType().GetFlags(ZE_RST_LIGHTING))
+	zeDebugCheck(Stage == NULL, "Null pointer.");
+	zeDebugCheck(RenderCommand == NULL, "Null pointer.");
+
+	if(!ZEMaterial::SetupPass(PassId, Stage, RenderCommand))
 		return false;
+
+	UpdateShaders();
+	UpdateBuffers();
 
 	return SetupLightingPass(Stage, RenderCommand);
 }
@@ -142,10 +150,13 @@ ZEMaterialLightOmniProjective::ZEMaterialLightOmniProjective()
 {
 	VertexShader = NULL;
 	PixelShader = NULL;
-	LightTransformations = NULL;
-	LightProperties = NULL;
+	
+	LightVSProperties0 = NULL;
+	LightPSProperties0 = NULL;
+	LightPSProperties1 = NULL;
 	
 	ProjectionTexture = NULL;
+	
 	SamplerState.SetMagFilter(ZE_TFM_LINEAR);
 	SamplerState.SetMinFilter(ZE_TFM_LINEAR);
 	SamplerState.SetMipFilter(ZE_TFM_LINEAR);
@@ -153,6 +164,11 @@ ZEMaterialLightOmniProjective::ZEMaterialLightOmniProjective()
 	SamplerState.SetAddressV(ZE_TAM_BORDER);
 	SamplerState.SetAddressW(ZE_TAM_BORDER);
 	SamplerState.SetBorderColor(ZEVector4(0.0f, 0.0f, 0.0f, 1.0f));
+
+	SupportedStages = ZE_RST_LIGHTING;
+	EnableStage(SupportedStages);
+	
+	UpdateBuffers();
 }
 
 ZEMaterialLightOmniProjective::~ZEMaterialLightOmniProjective()

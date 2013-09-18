@@ -44,9 +44,21 @@
 #include "ZEDepthStencilState.h"
 #include "ZEGraphicsDeviceState.h"
 
+struct ZEMSAAMode
+{
+	ZEUInt		SampleCount;
+	ZEUInt		SampleQuality;
+};
+
 class ZEGraphicsDevice
 {
 	protected:
+		ZEUInt						ActiveAF;
+		ZEArray<ZEUInt>				AFModeList;
+
+		ZEUInt						ActiveMSAA;
+		ZEArray<ZEMSAAMode>			MSAAModeList;
+
 		ZEGraphicsDeviceState		CurrentState;
 		ZEGraphicsDeviceHashState	OldState;
 
@@ -54,11 +66,26 @@ class ZEGraphicsDevice
 		virtual						~ZEGraphicsDevice();
 
 	public:
+		const ZEArray<ZEUInt>&		GetModesAF() const;
+		const ZEArray<ZEMSAAMode>&	GetModesMSAA() const;
+
+		bool						SetSampleCountAF(ZEUInt SampleCount);
+		ZEUInt						GetSampleCountAF() const;
+
+		bool						SetSampleCountMSAA(ZEUInt SampleCount);
+		ZEUInt						GetSampleCountMSAA() const;
+
+		bool						CheckSupportAF(ZEUInt SampleCount);
+		bool						CheckSupportMSAA(ZEUInt SampleCount);
+
+		void						SetVerticalSync(bool Enabled);
+		bool						GetVerticalSync() const;
+
 		void						SetVertexLayout(ZEVertexLayout* Layout);
 		ZEVertexLayout*				GetVertexLayout();
 		
-		void						SetVertexBuffer(ZEUInt Index, ZEVertexBuffer* Buffer);
 		void						SetVertexBufferArray(ZEVertexBuffer* const Buffer[ZE_MAX_VERTEX_BUFFER_SLOT]);
+		void						SetVertexBuffer(ZEUInt Index, ZEVertexBuffer* Buffer);
 		const ZEVertexBuffer*		GetVertexBuffer(ZEUInt Index) const;
 		
 		void						SetIndexBuffer(ZEIndexBuffer* Buffer);
@@ -91,11 +118,11 @@ class ZEGraphicsDevice
 		void						SetRasterizerState(ZERasterizerState& State);
 		ZERasterizerState&			GetRasterizerState();
 		
-		void						SetViewport(ZESize Index, ZEViewport& ViewPort);
-		ZEViewport&					GetViewport(ZESize Index);
+		void						SetViewport(ZEUInt Index, ZEViewport& ViewPort);
+		ZEViewport&					GetViewport(ZEUInt Index);
 		
-		void						SetScissorRectangle(ZESize Index, ZEScissorRectangle& Rectangle);
-		ZEScissorRectangle&			GetScissorRectangle(ZESize Index);
+		void						SetScissorRectangle(ZEUInt Index, ZEScissorRectangle& Rectangle);
+		ZEScissorRectangle&			GetScissorRectangle(ZEUInt Index);
 		
 		void						SetPixelShader(ZEShader* Shader);
 		const ZEShader*				GetPixelShader() const;
@@ -131,8 +158,8 @@ class ZEGraphicsDevice
 		void						SetRenderTargetScreen(const ZERenderTarget* FrameBuffer);
 		bool						GetScreenWriteEnable() const;
 		
-		void						SetRenderTarget(ZEUInt Index, const ZERenderTarget* Target);
 		void						SetRenderTargetArray(const ZERenderTarget* const Targets[ZE_MAX_RENDER_TARGET_SLOT]);
+		void						SetRenderTarget(ZEUInt Index, const ZERenderTarget* Target);
 		const ZERenderTarget*		GetRenderTarget(ZEUInt Index) const;
 		
 		void						SetDepthStencilBuffer(const ZEDepthStencilBuffer* Buffer);
@@ -142,8 +169,6 @@ class ZEGraphicsDevice
 		ZEGraphicsDeviceState&		GetDeviceState();
 		
 		virtual void				ResetStates();
-		
-		virtual bool				Present() const = 0;
 		
 		virtual void				Draw(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex) = 0;
 		virtual void				DrawIndexed(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt FirstIndex, ZEInt BaseVertex) = 0;

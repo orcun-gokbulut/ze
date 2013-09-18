@@ -36,6 +36,7 @@
 #include "ZESceneCuller.h"
 #include "ZEScene.h"
 #include "ZEEntity.h"
+#include "ZERenderer/ZEView.h"
 #include "ZERenderer/ZELight.h"
 #include "ZERenderer/ZERenderer.h"
 #include "ZEDrawParameters.h"
@@ -46,41 +47,41 @@ void ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameter
 {
 	ZEUInt32 EntityDrawFlags = Entity->GetDrawFlags();
 
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-	{
-		Statistics.TotalEntityCount++;
+	//if (DrawParameters->Pass == ZE_RP_COLOR)
+	//{
+	//	Statistics.TotalEntityCount++;
 
-		if ((EntityDrawFlags & ZE_DF_LIGHT_SOURCE) == ZE_DF_LIGHT_SOURCE)
-			Statistics.TotalLightCount++;
-	}
+	//	if ((EntityDrawFlags & ZE_DF_LIGHT_SOURCE) == ZE_DF_LIGHT_SOURCE)
+	//		Statistics.TotalLightCount++;
+	//}
 
 	if (!Entity->GetVisible())
 		return;
 
 	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)
 	{
-		if (DrawParameters->Pass == ZE_RP_COLOR)
-			Statistics.DrawableEntityCount++;
+		/*if (DrawParameters->Pass == ZE_RP_COLOR)
+			Statistics.DrawableEntityCount++;*/
 
 		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL)
 		{
-			if (DrawParameters->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
+			if (DrawParameters->View->GetViewVolume()->CullTest(Entity->GetWorldBoundingBox()))
 			{
-				if (DrawParameters->Pass == ZE_RP_COLOR)
-					Statistics.CulledEntityCount++;
+				//if (DrawParameters->Pass == ZE_RP_COLOR)
+				//	Statistics.CulledEntityCount++;
 			}
 			else
 			{
-				if (DrawParameters->Pass == ZE_RP_COLOR)
-					Statistics.DrawedEntityCount++;
+				//if (DrawParameters->Pass == ZE_RP_COLOR)
+				//	Statistics.DrawedEntityCount++;
 
 				Entity->Draw(DrawParameters);
 			}
 		}
 		else
 		{
-			if (DrawParameters->Pass == ZE_RP_COLOR)
-				Statistics.DrawedEntityCount++;
+			//if (DrawParameters->Pass == ZE_RP_COLOR)
+			//	Statistics.DrawedEntityCount++;
 
 			Entity->Draw(DrawParameters);
 		}
@@ -104,23 +105,17 @@ void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameter
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		CullEntity(Entities[I], DrawParameters);
 
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-	{
-		//Statistics.DrawedLightCount = (ZEUInt32)DrawParameters->Lights.GetCount();
-		Statistics.CulledLightCount = Statistics.TotalLightCount - Statistics.DrawedLightCount;
-	}
+	//if (DrawParameters->Pass == ZE_RP_COLOR)
+	//{
+	//	Statistics.DrawedLightCount = (ZEUInt32)DrawParameters->Lights.GetCount();
+	//	Statistics.CulledLightCount = Statistics.TotalLightCount - Statistics.DrawedLightCount;
+	//}
 
 }
 
 void ZESceneCuller::CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 {
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-		memset(&Statistics, 0, sizeof(ZESceneStatistics));
-
 	CullEntities(Scene, DrawParameters);
-
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-		DrawParameters->Statistics.SceneStatistics = Statistics;
 }
 
 const ZESceneStatistics& ZESceneCuller::GetStatistics() const

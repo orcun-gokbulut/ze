@@ -53,8 +53,9 @@ class ZEMaterialLightPoint : public ZEMaterial
 		ZEShader*						VertexShader;
 		ZEShader*						PixelShader;
 
-		ZEConstantBuffer*				LightProperties;
-		ZEConstantBuffer*				LightTransformations;
+		ZEConstantBuffer*				LightVSProperties0;
+		ZEConstantBuffer*				LightPSProperties0;
+		ZEConstantBuffer*				LightPSProperties1;
 		
 		void							UpdateShaders();
 		void							DestroyShaders();
@@ -68,29 +69,27 @@ class ZEMaterialLightPoint : public ZEMaterial
 		virtual							~ZEMaterialLightPoint();
 
 	public:
-		__declspec(align(16))
-		struct Transformations
+		struct VSProperties0
 		{
-			ZEMatrix4x4					WorldViewMatrix;
-			ZEMatrix4x4					WorldViewProjMatrix;
+			ZEMatrix4x4					WorldTransform;
 		};
 
-		__declspec(align(16))
-		struct Properties
+		struct PSProperties0
 		{
-			ZEVector3					ViewSpacePosition;
-			float						Range;
 			ZEVector3					Color;
 			float						Intensity;
 			ZEVector3					Attenuation;
-			float						PenumbraSize;
-			ZEVector2					PixelSize;
-			float						SlopeScaledBias;
-			float						DepthScaledBias;
+			float						Reserved;
 		};
 
+		struct PSProperties1
+		{
+			ZEVector3					ViewSpaceCenter;
+			float						Reserved;
+		};
+
+
 		virtual ZESize					GetHash() const;
-		virtual bool					UpdateMaterial();
 
 		virtual bool					SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 

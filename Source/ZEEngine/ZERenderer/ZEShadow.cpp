@@ -35,9 +35,34 @@
 
 #include "ZEShadow.h"
 
+void ZEShadow::SetResolution(const ZEVector2& Value)
+{
+	MapResolution = Value;
+}
+
+const ZEVector2& ZEShadow::GetResolution() const
+{
+	return MapResolution;
+}
+
+const ZELight* ZEShadow::GetOwnerLight() const
+{
+	return OwnerLight;
+}
+
+bool ZEShadow::GetInitialized() const
+{
+	return Initialized;
+}
+
 bool ZEShadow::Initialize(ZELight* Light)
 {
+	if (Initialized)
+		return false;
+
 	OwnerLight = Light;
+
+	Initialized = true;
 
 	return true;
 }
@@ -45,24 +70,16 @@ bool ZEShadow::Initialize(ZELight* Light)
 void ZEShadow::Deinitialize()
 {
 	OwnerLight = NULL;
+
+	Initialized = false;
 }
 
 ZEShadow::ZEShadow()
 {
-	ShadowMapDimension = ZEVector2::Zero;
+	MapResolution = ZEVector2::Zero;
 }
 
 ZEShadow::~ZEShadow()
 {
 	Deinitialize();
-}
-
-void ZEShadow::SetShadowMapDimension(const ZEVector2& Value)
-{
-	ShadowMapDimension = Value;
-}
-
-const ZEVector2& ZEShadow::GetShadowMapDimension() const
-{
-	return ShadowMapDimension;
 }

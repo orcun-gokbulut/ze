@@ -48,30 +48,33 @@
 #include "ZETexture/ZETextureCubeResource.h"
 #include "ZEGraphics/ZEShaderCompileOptions.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEFile/ZEFileInfo.h"
-#include "ZEFile/ZEPathUtils.h"
 #include "ZEML/ZEMLNode.h"
 #include "ZEML/ZEMLItem.h"
+#include "ZEDS/ZEString.h"
 #include "ZEML/ZEMLProperty.h"
+#include "ZEFile/ZEFileInfo.h"
+#include "ZEFile/ZEPathUtils.h"
 #include "ZEML/ZEMLSerialReader.h"
-
-#include <memory.h>
 
 #define PROPERTY_BUFFER_SLOT			0
 #define TRANSFORMATION_BUFFER_SLOT		0
 #define SKINNING_BUFFER_SLOT			1
 
+struct Transformations
+{
+	ZEMatrix4x4		WorldTransform;
+};
+
 void ZEMaterialDefault::DestroyShaders()
 {
-	ZE_DESTROY(Shaders.ShadowPassVS);
-	ZE_DESTROY(Shaders.ShadowPassPS);
-	ZE_DESTROY(Shaders.GeometryPassVS);
-	ZE_DESTROY(Shaders.GeometryPassPS);
-	ZE_DESTROY(Shaders.AccumulationPassVS);
-	ZE_DESTROY(Shaders.AccumulationPassPS);
-	ZE_DESTROY(Shaders.TransparentPassVS);
-	ZE_DESTROY(Shaders.TransparentPassPS);
+	ZE_DESTROY(ShaderShadowPassVS);
+	ZE_DESTROY(ShaderShadowPassPS);
+	ZE_DESTROY(ShaderGeometryPassVS);
+	ZE_DESTROY(ShaderGeometryPassPS);
+	ZE_DESTROY(ShaderAccumulationPassVS);
+	ZE_DESTROY(ShaderAccumulationPassPS);
+	ZE_DESTROY(ShaderTransparentPassVS);
+	ZE_DESTROY(ShaderTransparentPassPS);
 }
 
 void ZEMaterialDefault::UpdateShaders()
@@ -121,12 +124,12 @@ void ZEMaterialDefault::UpdateShaders()
 	}
 	if (Components.GetFlags(ZE_MDC_EMISSIVE))
 	{
-		TempParameter.Name = "ZE_SHADER_EMMISIVE";
+		TempParameter.Name = "ZE_SHADER_EMISSIVE";
 		Options.Parameters.Add(TempParameter);
 	}
 	if (Components.GetFlags(ZE_MDC_EMISSIVE_MAP))
 	{
-		TempParameter.Name = "ZE_SHADER_EMMISIVE_MAP";
+		TempParameter.Name = "ZE_SHADER_EMISSIVE_MAP";
 		Options.Parameters.Add(TempParameter);
 	}
 	if (Components.GetFlags(ZE_MDC_OPACITY))
@@ -197,109 +200,124 @@ void ZEMaterialDefault::UpdateShaders()
 	// Geometry pass shaders
 	Options.Type = ZE_ST_VERTEX;
 	Options.EntryPoint = "ZEMaterialDefault_GeometryPass_VertexShader";
-	Shaders.GeometryPassVS = ZEShaderCompiler::CompileShaderFromFile(&Options);
+	ShaderGeometryPassVS = ZEShaderCompiler::CompileShaderFromFile(&Options);
 
 	Options.Type = ZE_ST_PIXEL;
 	Options.EntryPoint = "ZEMaterialDefault_GeometryPass_PixelShader";
-	Shaders.GeometryPassPS = ZEShaderCompiler::CompileShaderFromFile(&Options);
+	ShaderGeometryPassPS = ZEShaderCompiler::CompileShaderFromFile(&Options);
 
 	// Accumulation pass shaders
 	Options.Type = ZE_ST_VERTEX;
 	Options.EntryPoint = "ZEMaterialDefault_AccumulationPass_VertexShader";
-	Shaders.AccumulationPassVS = ZEShaderCompiler::CompileShaderFromFile(&Options);
+	ShaderAccumulationPassVS = ZEShaderCompiler::CompileShaderFromFile(&Options);
 
 	Options.Type = ZE_ST_PIXEL;
 	Options.EntryPoint = "ZEMaterialDefault_AccumulationPass_PixelShader";
-	Shaders.AccumulationPassPS = ZEShaderCompiler::CompileShaderFromFile(&Options);
+	ShaderAccumulationPassPS = ZEShaderCompiler::CompileShaderFromFile(&Options);
 
 	// Transparent pass shaders
 	Options.Type = ZE_ST_VERTEX;
 	Options.EntryPoint = "ZEMaterialDefault_TransparentPass_VertexShader";
-	//Shaders.TransparentPassVertexShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
+	//ShaderTransparentPassVertexShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
 
 	Options.Type = ZE_ST_PIXEL;
 	Options.EntryPoint = "ZEMaterialDefault_TransparentPass_PixelShader";
-	//Shaders.TransparentPassPixelShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
+	//ShaderTransparentPassPixelShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
 
 	// ShadowPass pass shaders
 	Options.Type = ZE_ST_VERTEX;
 	Options.EntryPoint = "ZEMaterialDefault_ShadowPass_VertexShader";
-	//Shaders.ShadowPassVertexShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
+	//ShaderShadowPassVertexShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
 
 	Options.Type = ZE_ST_PIXEL;
 	Options.EntryPoint = "ZEMaterialDefault_ShadowPasss_PixelShader";
-	//Shaders.ShadowPassPixelShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
+	//ShaderShadowPassPixelShader = ZEShaderCompiler::CompileShaderFromFile(&Options);
 }
 
 void ZEMaterialDefault::DestroyBuffers()
 {
-	ZE_DESTROY(Buffers.MaterialProperties);
+	ZE_DESTROY(MaterialProperties);
 }
 
-void ZEMaterialDefault::UpdateBuffers()
+void ZEMaterialDefault::InitializeBuffers()
 {
 	DestroyBuffers();
 
-	Buffers.MaterialProperties = ZEConstantBuffer::CreateInstance();
-	Buffers.MaterialProperties->Create(sizeof(ZEMaterialDefaultProperties));
+	MaterialProperties = ZEConstantBuffer::CreateInstance();
+	MaterialProperties->Create(sizeof(ZEMaterialDefault::Properties));
 
 	// Set default values
-	ZEMaterialDefaultProperties* Properties = NULL;
-	Buffers.MaterialProperties->Lock((void**)&Properties);
+	ZEMaterialDefault::Properties* Properties = NULL;
+	MaterialProperties->Lock((void**)&Properties);
 	
-	Properties->Opacity = 1.0f;
-	Properties->DetailMapTiling = ZEVector2::One;
-	Properties->DetailDistanceFull = 4.0f;
-	Properties->DetailDistanceFade = 2.0f;
-	Properties->AmbientColor = ZEVector3::One;
-	Properties->AmbientFactor = 1.0f;
-	Properties->SpecularColor = ZEVector3::One;
-	Properties->SpecularFactor = 1.0f;
-	Properties->DiffuseColor = ZEVector3::One;
-	Properties->DiffuseFactor = 1.0f;
-	Properties->EmissiveColor = ZEVector3::One;
-	Properties->EmissiveFactor = 1.0f;
-	Properties->RefractionIndex = 1.0f;
-	Properties->RefractionFactor = 1.0f;
-	Properties->ReflectionFactor = 1.0f;
-	Properties->SubSurfScatFactor = 1.0f;
-	Properties->AlphaCullLimit = 1.0f;
-	Properties->SpecularShininess = 1.0f;
+		Properties->Opacity = 1.0f;
+		Properties->DetailMapTiling = ZEVector2::One;
+		Properties->DetailDistanceFull = 4.0f;
+		Properties->DetailDistanceFade = 2.0f;
+		Properties->AmbientColor = ZEVector3::One;
+		Properties->AmbientFactor = 1.0f;
+		Properties->SpecularColor = ZEVector3::One;
+		Properties->SpecularFactor = 1.0f;
+		Properties->DiffuseColor = ZEVector3::One;
+		Properties->DiffuseFactor = 1.0f;
+		Properties->EmissiveColor = ZEVector3::One;
+		Properties->EmissiveFactor = 1.0f;
+		Properties->RefractionIndex = 1.0f;
+		Properties->RefractionFactor = 1.0f;
+		Properties->ReflectionFactor = 1.0f;
+		Properties->SubSurfScatFactor = 1.0f;
+		Properties->AlphaCullLimit = 1.0f;
+		Properties->SpecularShininess = 1.0f;
 	
-	Buffers.MaterialProperties->Unlock();
+	MaterialProperties->Unlock();
+
+	if (WorldTransform == NULL)
+	{
+		WorldTransform = ZEConstantBuffer::CreateInstance();
+		WorldTransform->Create(sizeof(Transformations));
+
+		// Set default values
+		Transformations* Transforms = NULL;
+		WorldTransform->Lock((void**)&Transforms);
+
+			Transforms->WorldTransform = ZEMatrix4x4::Identity;
+
+		WorldTransform->Unlock();
+	}
 }
 
 bool ZEMaterialDefault::SetupPassShadow(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	if (!ShadowCaster)
-		return true;
+		return false;
 
 	zeCriticalError("Not implemented yet");
 
-	return true;
+	// No more passes
+	return false;
 }
 
 bool ZEMaterialDefault::SetupPassGeometry(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	if (TransparencyMode != ZE_TM_NONE)
-		return true;
+		return false;
 
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 	
 	// SetShaders
-	Device->SetVertexShader(Shaders.GeometryPassVS);
-	Device->SetPixelShader(Shaders.GeometryPassPS);
+	Device->SetVertexShader(ShaderGeometryPassVS);
+	Device->SetPixelShader(ShaderGeometryPassPS);
 	
 	// Set Buffers
-	Device->SetVertexShaderBuffer(TRANSFORMATION_BUFFER_SLOT, RenderCommand->TransformationBuffer);
-	Device->SetPixelShaderBuffer(PROPERTY_BUFFER_SLOT, Buffers.MaterialProperties);
+	Device->SetVertexShaderBuffer(TRANSFORMATION_BUFFER_SLOT, WorldTransform);
+	Device->SetPixelShaderBuffer(PROPERTY_BUFFER_SLOT, MaterialProperties);
 
 	if (RenderCommand->Skinned)
 		Device->SetVertexShaderBuffer(SKINNING_BUFFER_SLOT, RenderCommand->SkinningBuffer);
 
 	ZEDepthStencilState DepthStencilState;
-	DepthStencilState.SetZTestEnable(ZCull);
-	DepthStencilState.SetZWriteEnable(ZWrite);
+	DepthStencilState.SetZTestEnable(true);
+	DepthStencilState.SetZWriteEnable(true);
 	DepthStencilState.SetStencilTestEnable(false);
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
 	Device->SetDepthStencilState(DepthStencilState);
@@ -311,129 +329,126 @@ bool ZEMaterialDefault::SetupPassGeometry(ZEUInt PassId, const ZERenderStage* St
 
 	bool Opacity = Components.GetFlags(ZE_MDC_OPACITY);
 	bool AlphaCull = Components.GetFlags(ZE_MDC_ALPHA_CULL);
-	bool UseBaseMap = (OpacityComponent == ZE_OC_BASE_MAP_ALPHA) && Components.GetFlags(ZE_MDC_BASE_MAP) && (Textures.BaseMap != NULL);
-	bool UseOpacityMap = (OpacityComponent == ZE_OC_OPACITY_MAP) && Components.GetFlags(ZE_MDC_OPACITY_MAP) && (Textures.OpacityMap != NULL);
+	bool UseBaseMap = (OpacityComponent == ZE_OC_BASE_MAP_ALPHA) && Components.GetFlags(ZE_MDC_BASE_MAP) && (TextureBaseMap != NULL);
+	bool UseOpacityMap = (OpacityComponent == ZE_OC_OPACITY_MAP) && Components.GetFlags(ZE_MDC_OPACITY_MAP) && (TextureOpacityMap != NULL);
 	
 	if ((AlphaCull || TransparencyMode != ZE_TM_NONE) && Opacity && UseBaseMap)
 	{
-		Device->SetPixelShaderSampler(5, Samplers.BaseMap);
-		Device->SetPixelShaderTexture(5, Textures.BaseMap);
+		Device->SetPixelShaderSampler(5, SamplerBaseMap);
+		Device->SetPixelShaderTexture(5, TextureBaseMap);
 	}
 	if ((AlphaCull || TransparencyMode != ZE_TM_NONE) && Opacity && UseOpacityMap)
 	{		
-		Device->SetPixelShaderSampler(9, Samplers.OpacityMap);
-		Device->SetPixelShaderTexture(9, Textures.OpacityMap);
+		Device->SetPixelShaderSampler(9, SamplerOpacityMap);
+		Device->SetPixelShaderTexture(9, TextureOpacityMap);
 	}
-	if (Components.GetFlags(ZE_MDC_NORMAL_MAP) && Textures.NormalMap != NULL)
+	if (Components.GetFlags(ZE_MDC_NORMAL_MAP) && TextureNormalMap != NULL)
 	{
-		Device->SetPixelShaderSampler(6, Samplers.NormalMap);
-		Device->SetPixelShaderTexture(6, Textures.NormalMap);
+		Device->SetPixelShaderSampler(6, SamplerNormalMap);
+		Device->SetPixelShaderTexture(6, TextureNormalMap);
 	}
-	if (Components.GetFlags(ZE_MDC_PARALLAX_MAP) && Textures.ParallaxMap != NULL)
+	if (Components.GetFlags(ZE_MDC_PARALLAX_MAP) && TextureParallaxMap != NULL)
 	{
-		Device->SetPixelShaderSampler(7, Samplers.ParallaxMap);
-		Device->SetPixelShaderTexture(7, Textures.ParallaxMap);
+		Device->SetPixelShaderSampler(7, SamplerParallaxMap);
+		Device->SetPixelShaderTexture(7, TextureParallaxMap);
 	}
-	if (Components.GetFlags(ZE_MDC_SPECULAR_MAP) && Textures.SpecularMap != NULL)
+	if (Components.GetFlags(ZE_MDC_SPECULAR_MAP) && TextureSpecularMap != NULL)
 	{
-		Device->SetPixelShaderSampler(8, Samplers.SpecularMap);
-		Device->SetPixelShaderTexture(8, Textures.SpecularMap);
+		Device->SetPixelShaderSampler(8, SamplerSpecularMap);
+		Device->SetPixelShaderTexture(8, TextureSpecularMap);
 	}
-	if (Components.GetFlags(ZE_MDC_DETAIL_NORMAL_MAP) && Textures.DetailNormalMap != NULL)
+	if (Components.GetFlags(ZE_MDC_DETAIL_NORMAL_MAP) && TextureDetailNormalMap != NULL)
 	{
-		Device->SetPixelShaderSampler(15, Samplers.DetailNormalMap);
-		Device->SetPixelShaderTexture(15, Textures.DetailNormalMap);
+		Device->SetPixelShaderSampler(15, SamplerDetailNormalMap);
+		Device->SetPixelShaderTexture(15, TextureDetailNormalMap);
 	}
 
-	return true;
+	// No more passes
+	return false;
 }
 
 bool ZEMaterialDefault::SetupPassAccumulation(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	// No semi transparency
 	if (TransparencyMode != ZE_TM_NONE)
-		return true;
+		return false;
 
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	// SetShaders
-	Device->SetVertexShader(Shaders.AccumulationPassVS);
-	Device->SetPixelShader(Shaders.AccumulationPassPS);
+	Device->SetVertexShader(ShaderAccumulationPassVS);
+	Device->SetPixelShader(ShaderAccumulationPassPS);
 	
 	// Set Buffers
-	Device->SetVertexShaderBuffer(TRANSFORMATION_BUFFER_SLOT, RenderCommand->TransformationBuffer);
-	Device->SetPixelShaderBuffer(PROPERTY_BUFFER_SLOT, Buffers.MaterialProperties);
+	Device->SetVertexShaderBuffer(TRANSFORMATION_BUFFER_SLOT, WorldTransform);
+	Device->SetPixelShaderBuffer(PROPERTY_BUFFER_SLOT, MaterialProperties);
 
 	if (RenderCommand->Skinned)
 		Device->SetVertexShaderBuffer(SKINNING_BUFFER_SLOT, RenderCommand->SkinningBuffer);
 
 	// Setup ZCulling
 	ZEDepthStencilState DepthStencilState;
-	DepthStencilState.SetZTestEnable(ZCull);
-	DepthStencilState.SetZWriteEnable(ZWrite);
-	Device->SetDepthStencilState(DepthStencilState);
+	DepthStencilState.SetZTestEnable(true);
+	DepthStencilState.SetZWriteEnable(false);
 	DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
-
+	Device->SetDepthStencilState(DepthStencilState);
+	
 	ZERasterizerState RasterizerState;
 	RasterizerState.SetFillMode(Wireframe ? ZE_FM_WIREFRAME : ZE_FM_SOLID);
 	RasterizerState.SetCullDirection(TwoSided ? ZE_CD_NONE : ZE_CD_COUNTER_CLOCKWISE);
 	Device->SetRasterizerState(RasterizerState);
 
 	// Setup Textures
-	if (Components.GetFlags(ZE_MDC_BASE_MAP) && Textures.BaseMap != NULL)
+	if (Components.GetFlags(ZE_MDC_BASE_MAP) && TextureBaseMap != NULL)
 	{
-		Device->SetPixelShaderSampler(5, Samplers.BaseMap);
-		Device->SetPixelShaderTexture(5, Textures.BaseMap);
+		Device->SetPixelShaderSampler(5, SamplerBaseMap);
+		Device->SetPixelShaderTexture(5, TextureBaseMap);
 	}
-	if (Components.GetFlags(ZE_MDC_PARALLAX_MAP) && Textures.ParallaxMap != NULL)
+	if (Components.GetFlags(ZE_MDC_PARALLAX_MAP) && TextureParallaxMap != NULL)
 	{
-		Device->SetPixelShaderSampler(7, Samplers.ParallaxMap);
-		Device->SetPixelShaderTexture(7, Textures.ParallaxMap);
+		Device->SetPixelShaderSampler(7, SamplerParallaxMap);
+		Device->SetPixelShaderTexture(7, TextureParallaxMap);
 	}
-	if (Components.GetFlags(ZE_MDC_SPECULAR_MAP) && Textures.SpecularMap != NULL)
+	if (Components.GetFlags(ZE_MDC_SPECULAR_MAP) && TextureSpecularMap != NULL)
 	{
-		Device->SetPixelShaderSampler(8, Samplers.SpecularMap);
-		Device->SetPixelShaderTexture(8, Textures.SpecularMap);
+		Device->SetPixelShaderSampler(8, SamplerSpecularMap);
+		Device->SetPixelShaderTexture(8, TextureSpecularMap);
 	}
-	if (Components.GetFlags(ZE_MDC_OPACITY_MAP) && Textures.OpacityMap != NULL)
+	if (Components.GetFlags(ZE_MDC_OPACITY_MAP) && TextureOpacityMap != NULL)
 	{
-		Device->SetPixelShaderSampler(9, Samplers.OpacityMap);
-		Device->SetPixelShaderTexture(9, Textures.OpacityMap);
+		Device->SetPixelShaderSampler(9, SamplerOpacityMap);
+		Device->SetPixelShaderTexture(9, TextureOpacityMap);
 	}
-	if (Components.GetFlags(ZE_MDC_EMISSIVE_MAP) && Textures.EmissiveMap != NULL)
+	if (Components.GetFlags(ZE_MDC_EMISSIVE_MAP) && TextureEmissiveMap != NULL)
 	{
-		Device->SetPixelShaderSampler(10, Samplers.EmissiveMap);
-		Device->SetPixelShaderTexture(10, Textures.EmissiveMap);
+		Device->SetPixelShaderSampler(10, SamplerEmissiveMap);
+		Device->SetPixelShaderTexture(10, TextureEmissiveMap);
 	}
-	if ((Components.GetFlags(ZE_MDC_REFLECTION) || Components.GetFlags(ZE_MDC_REFRACTION)) && Textures.EnvironmentMap != NULL)
+	if ((Components.GetFlags(ZE_MDC_REFLECTION) || Components.GetFlags(ZE_MDC_REFRACTION)) && TextureEnvironmentMap != NULL)
 	{
-		Device->SetPixelShaderSampler(11, Samplers.EnvironmentMap);
-		Device->SetPixelShaderTexture(11, Textures.EnvironmentMap);
+		Device->SetPixelShaderSampler(11, SamplerEnvironmentMap);
+		Device->SetPixelShaderTexture(11, TextureEnvironmentMap);
 	}
-	if (Components.GetFlags(ZE_MDC_LIGHT_MAP) && Textures.LightMap != NULL)
+	if (Components.GetFlags(ZE_MDC_DETAIL_BASE_MAP) && TextureDetailBaseMap != NULL)
 	{
-		Device->SetPixelShaderSampler(12, Samplers.LightMap);
-		Device->SetPixelShaderTexture(12, Textures.LightMap);
+		Device->SetPixelShaderSampler(14, SamplerDetailBaseMap);
+		Device->SetPixelShaderTexture(14, TextureDetailBaseMap);
 	}
-	if (Components.GetFlags(ZE_MDC_DETAIL_BASE_MAP) && Textures.DetailBaseMap != NULL)
+	if (Components.GetFlags(ZE_MDC_DETAIL_NORMAL_MAP) && TextureDetailNormalMap != NULL)
 	{
-		Device->SetPixelShaderSampler(14, Samplers.DetailBaseMap);
-		Device->SetPixelShaderTexture(14, Textures.DetailBaseMap);
-	}
-	if (Components.GetFlags(ZE_MDC_DETAIL_NORMAL_MAP) && Textures.DetailNormalMap != NULL)
-	{
-		Device->SetPixelShaderSampler(15, Samplers.DetailNormalMap);
-		Device->SetPixelShaderTexture(15, Textures.DetailNormalMap);
+		Device->SetPixelShaderSampler(15, SamplerDetailNormalMap);
+		Device->SetPixelShaderTexture(15, TextureDetailNormalMap);
 	}
 
-	return true;
+	// No more passes
+	return false;
 }
 
 bool ZEMaterialDefault::SetupPassTransparent(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	zeCriticalError("Not implemented yet");
-
-	return true;
+		
+	return false;
 }
 
 ZESize ZEMaterialDefault::GetHash() const
@@ -441,18 +456,6 @@ ZESize ZEMaterialDefault::GetHash() const
 	ZESize Hash = ZEHashGenerator::Hash("ZEMaterialDefaultNew");
 	ZEHashGenerator::Hash(Hash, (void*)&Components, sizeof(ZEMaterialDefaultComponents));
 	return Hash;
-}
-
-bool ZEMaterialDefault::UpdateMaterial()
-{
-	bool Result = true;
-	if (Components != OldComponents)
-	{
-		Result = UpdateMaterial();
-		OldComponents = Components;
-	}
-
-	return Result;
 }
 
 void ZEMaterialDefault::WriteToFile(const ZEString& FilePath)
@@ -576,65 +579,59 @@ void ZEMaterialDefault::ReadFromFile(const ZEString& FilePath)
 	if (BaseMap.GetType() != ZE_VRT_UNDEFINED && !BaseMap.GetString().IsEmpty())
 	{
 		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + BaseMap.GetString();
-		Textures.BaseMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
+		TextureBaseMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
 		Components.RaiseFlags(ZE_MDC_BASE_MAP);
 		Components.RaiseFlags(ZE_MDC_DIFFUSE);
 	}
 	if (NormalMap.GetType() != ZE_VRT_UNDEFINED && !NormalMap.GetString().IsEmpty())
 	{
 		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + NormalMap.GetString();
-		Textures.NormalMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
+		TextureNormalMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
 		Components.RaiseFlags(ZE_MDC_NORMAL_MAP);
 	}
 	if (ParallaxMap.GetType() != ZE_VRT_UNDEFINED && !ParallaxMap.GetString().IsEmpty())
 	{
 		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + ParallaxMap.GetString();
-		Textures.ParallaxMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
+		TextureParallaxMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
 		Components.RaiseFlags(ZE_MDC_PARALLAX_MAP);
 	}
 	if (SpecularMap.GetType() != ZE_VRT_UNDEFINED && !SpecularMap.GetString().IsEmpty())
 	{
 		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + SpecularMap.GetString();
-		Textures.SpecularMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
+		TextureSpecularMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
 		Components.RaiseFlags(ZE_MDC_SPECULAR_MAP);
 		Components.RaiseFlags(ZE_MDC_SPECULAR);
 	}
 	if (EmissiveMap.GetType() != ZE_VRT_UNDEFINED && !EmissiveMap.GetString().IsEmpty())
 	{
 		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + EmissiveMap.GetString();
-		Textures.EmissiveMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
+		TextureEmissiveMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
 		Components.RaiseFlags(ZE_MDC_EMISSIVE_MAP);
 		Components.RaiseFlags(ZE_MDC_EMISSIVE);
 	}
 	if (OpacityMap.GetType() != ZE_VRT_UNDEFINED && !OpacityMap.GetString().IsEmpty())
 	{
 		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + OpacityMap.GetString();
-		Textures.OpacityMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
+		TextureOpacityMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
 		Components.RaiseFlags(ZE_MDC_OPACITY_MAP);
 		Components.RaiseFlags(ZE_MDC_OPACITY);
 	}
 	if (DetailBaseMap.GetType() != ZE_VRT_UNDEFINED && !DetailBaseMap.GetString().IsEmpty())
 	{
 		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + DetailBaseMap.GetString();
-		Textures.DetailBaseMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
+		TextureDetailBaseMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
 		Components.RaiseFlags(ZE_MDC_DETAIL_BASE_MAP);
 	}
 	if (DetailNormalMap.GetType() != ZE_VRT_UNDEFINED && !DetailNormalMap.GetString().IsEmpty())
 	{
 		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + DetailNormalMap.GetString();
-		Textures.DetailNormalMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
+		TextureDetailNormalMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
 		Components.RaiseFlags(ZE_MDC_DETAIL_NORMAL_MAP);
 	}
 	if (EnvironmentMap.GetType() != ZE_VRT_UNDEFINED && !EnvironmentMap.GetString().IsEmpty())
 	{
 		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + EnvironmentMap.GetString();
-		Textures.EnvironmentMap = ZETextureCubeResource::LoadSharedResource(ResourcePath)->GetTexture();
-	}
-	if (LightMap.GetType() != ZE_VRT_UNDEFINED && !LightMap.GetString().IsEmpty())
-	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + LightMap.GetString();
-		Textures.LightMap = ZETexture2DResource::LoadSharedResource(ResourcePath)->GetTexture();
-		Components.RaiseFlags(ZE_MDC_LIGHT_MAP);
+		TextureEnvironmentMap = ZETextureCubeResource::LoadSharedResource(ResourcePath)->GetTexture();
 	}
 
 	// Configure material
@@ -660,37 +657,51 @@ void ZEMaterialDefault::ReadFromFile(const ZEString& FilePath)
 	Components.RaiseFlags(VertexColorEnabled.GetType() != ZE_VRT_UNDEFINED && VertexColorEnabled.GetBoolean() ? ZE_MDC_VERTEX_COLOR : 0);
 
 	// Set parameters
-	ZEMaterialDefaultProperties* MaterialProperties = NULL;
-	Buffers.MaterialProperties->Lock((void**)&MaterialProperties);
+	ZEMaterialDefault::Properties* MaterialProps = NULL;
+	MaterialProperties->Lock((void**)&MaterialProps);
 
-	MaterialProperties->Opacity				= Opacity.GetType() == ZE_VRT_UNDEFINED ? 1.0f : Opacity.GetFloat();
-	MaterialProperties->DetailMapTiling		= DetailMapTiling.GetType() == ZE_VRT_UNDEFINED ? ZEVector2::One : DetailMapTiling.GetVector2();
-	MaterialProperties->DetailDistanceFull	= DetailDistanceFull.GetType() == ZE_VRT_UNDEFINED ? 4.0f : DetailDistanceFull.GetFloat();
-	MaterialProperties->DetailDistanceFade	= DetailDistanceFade.GetType() == ZE_VRT_UNDEFINED ? 2.0f : DetailDistanceFade.GetFloat();
-	MaterialProperties->AmbientColor		= AmbientColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : AmbientColor.GetVector3();
-	MaterialProperties->AmbientFactor		= AmbientFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : AmbientFactor.GetFloat();
-	MaterialProperties->SpecularColor		= SpecularColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : SpecularColor.GetVector3();
-	MaterialProperties->SpecularFactor		= SpecularFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SpecularFactor.GetFloat();
-	MaterialProperties->DiffuseColor		= DiffuseColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : DiffuseColor.GetVector3();
-	MaterialProperties->DiffuseFactor		= DiffuseFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : DiffuseFactor.GetFloat();
-	MaterialProperties->EmissiveColor		= EmissiveColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : EmissiveColor.GetVector3();
-	MaterialProperties->EmissiveFactor		= EmissiveFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : EmissiveFactor.GetFloat();
-	MaterialProperties->RefractionIndex		= RefractionIndex.GetType() == ZE_VRT_UNDEFINED ? 1.0f : RefractionIndex.GetFloat();
-	MaterialProperties->RefractionFactor	= RefractionFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : RefractionFactor.GetFloat();
-	MaterialProperties->ReflectionFactor	= ReflectionFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : ReflectionFactor.GetFloat();
-	MaterialProperties->SubSurfScatFactor	= SubSurfScatFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SubSurfScatFactor.GetFloat();
-	MaterialProperties->AlphaCullLimit		= AlphaCullLimit.GetType() == ZE_VRT_UNDEFINED ? 1.0f : AlphaCullLimit.GetFloat();
-	MaterialProperties->SpecularShininess	= SpecularShininess.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SpecularShininess.GetFloat();
+		MaterialProps->Opacity				= Opacity.GetType() == ZE_VRT_UNDEFINED ? 1.0f : Opacity.GetFloat();
+		MaterialProps->DetailMapTiling		= DetailMapTiling.GetType() == ZE_VRT_UNDEFINED ? ZEVector2::One : DetailMapTiling.GetVector2();
+		MaterialProps->DetailDistanceFull	= DetailDistanceFull.GetType() == ZE_VRT_UNDEFINED ? 4.0f : DetailDistanceFull.GetFloat();
+		MaterialProps->DetailDistanceFade	= DetailDistanceFade.GetType() == ZE_VRT_UNDEFINED ? 2.0f : DetailDistanceFade.GetFloat();
+		MaterialProps->AmbientColor			= AmbientColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : AmbientColor.GetVector3();
+		MaterialProps->AmbientFactor		= AmbientFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : AmbientFactor.GetFloat();
+		MaterialProps->SpecularColor		= SpecularColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : SpecularColor.GetVector3();
+		MaterialProps->SpecularFactor		= SpecularFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SpecularFactor.GetFloat();
+		MaterialProps->DiffuseColor			= DiffuseColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : DiffuseColor.GetVector3();
+		MaterialProps->DiffuseFactor		= DiffuseFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : DiffuseFactor.GetFloat();
+		MaterialProps->EmissiveColor		= EmissiveColor.GetType() == ZE_VRT_UNDEFINED ? ZEVector3::One : EmissiveColor.GetVector3();
+		MaterialProps->EmissiveFactor		= EmissiveFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : EmissiveFactor.GetFloat();
+		MaterialProps->RefractionIndex		= RefractionIndex.GetType() == ZE_VRT_UNDEFINED ? 1.0f : RefractionIndex.GetFloat();
+		MaterialProps->RefractionFactor		= RefractionFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : RefractionFactor.GetFloat();
+		MaterialProps->ReflectionFactor		= ReflectionFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : ReflectionFactor.GetFloat();
+		MaterialProps->SubSurfScatFactor	= SubSurfScatFactor.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SubSurfScatFactor.GetFloat();
+		MaterialProps->AlphaCullLimit		= AlphaCullLimit.GetType() == ZE_VRT_UNDEFINED ? 1.0f : AlphaCullLimit.GetFloat();
+		MaterialProps->SpecularShininess	= SpecularShininess.GetType() == ZE_VRT_UNDEFINED ? 1.0f : SpecularShininess.GetFloat();
 
-	Buffers.MaterialProperties->Unlock();
+	MaterialProperties->Unlock();
 
-	UpdateMaterial();
+	UpdateShaders();
 }
 
 bool ZEMaterialDefault::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
 	if(!ZEMaterial::SetupPass(PassId, Stage, RenderCommand))
 		return false;
+
+	if (Components != OldComponents)
+	{
+		UpdateShaders();
+		OldComponents = Components;
+	}
+
+	// Copy world matrix to buffer
+	Transformations* Transforms = NULL;
+	WorldTransform->Lock((void**)&Transforms);
+
+		Transforms->WorldTransform = RenderCommand->WorldTransform;
+
+	WorldTransform->Unlock();
 
 	bool Result = false;
 	switch (Stage->GetStageType())
@@ -699,11 +710,11 @@ bool ZEMaterialDefault::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, con
 		case ZE_RST_NONE:
 			zeWarning("Cannot setup pass, unknown render stage type.");
 			break;
-		case ZE_RST_SHADOW:
-			Result = SetupPassShadow(PassId, Stage, RenderCommand);
-			break;
 		case ZE_RST_GEOMETRY:
 			Result = SetupPassGeometry(PassId, Stage, RenderCommand);
+			break;
+		case ZE_RST_SHADOW:
+			Result = SetupPassShadow(PassId, Stage, RenderCommand);
 			break;
 		case ZE_RST_ACCUMULATION:
 			Result = SetupPassAccumulation(PassId, Stage, RenderCommand);
@@ -721,6 +732,7 @@ ZEMaterialDefault* ZEMaterialDefault::CreateInstance()
 	return new ZEMaterialDefault();
 }
 
+ZEConstantBuffer* ZEMaterialDefault::WorldTransform = NULL;
 ZEMaterialDefault::ZEMaterialDefault()
 {
 	ZCull = true;
@@ -737,18 +749,94 @@ ZEMaterialDefault::ZEMaterialDefault()
 	TransparencyMode = ZE_TM_NONE;
 	OpacityComponent = ZE_OC_CONSTANT;
 
-	SupportedStages = ZE_RST_SHADOW | 
-					ZE_RST_GEOMETRY | 
-					ZE_RST_ACCUMULATION | 
-					ZE_RST_TRANSPARENT | 
-					ZE_RST_USER_INTERFACE;
+	ShaderShadowPassVS = NULL;
+	ShaderShadowPassPS = NULL;
+	ShaderGeometryPassVS = NULL;
+	ShaderGeometryPassPS = NULL;
+	ShaderAccumulationPassVS = NULL;
+	ShaderAccumulationPassPS = NULL;
+	ShaderTransparentPassVS = NULL;
+	ShaderTransparentPassPS = NULL;
 
-	memset((void*)&Shaders, 0, sizeof(ZEMaterialDefaultShaders));
-	memset((void*)&Buffers, 0, sizeof(ZEMaterialDefaultBuffers));
-	memset((void*)&Textures, 0, sizeof(ZEMaterialDefaultTextures));
+	MaterialProperties = NULL;
 
-	// Create buffers at creation time
-	UpdateBuffers();
+	TextureBaseMap = NULL;
+	TextureNormalMap = NULL;
+	TextureParallaxMap = NULL;
+	TextureSpecularMap = NULL;
+	TextureEmissiveMap = NULL;
+	TextureOpacityMap = NULL;
+	TextureDetailBaseMap = NULL;
+	TextureDetailNormalMap = NULL;
+	TextureEnvironmentMap = NULL;
+
+	SupportedStages = ZE_RST_SHADOW | ZE_RST_GEOMETRY | ZE_RST_ACCUMULATION | ZE_RST_TRANSPARENT | ZE_RST_SHADOW;
+	EnableStage(SupportedStages);
+	
+	SamplerBaseMap.SetAddressU(ZE_TAM_WRAP);
+	SamplerBaseMap.SetAddressV(ZE_TAM_WRAP);
+	SamplerBaseMap.SetAddressW(ZE_TAM_WRAP);
+	SamplerBaseMap.SetMagFilter(ZE_TFM_LINEAR);
+	SamplerBaseMap.SetMinFilter(ZE_TFM_LINEAR);
+	SamplerBaseMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+	
+	SamplerNormalMap.SetAddressU(ZE_TAM_WRAP);
+	SamplerNormalMap.SetAddressV(ZE_TAM_WRAP);
+	SamplerNormalMap.SetAddressW(ZE_TAM_WRAP);
+	SamplerNormalMap.SetMagFilter(ZE_TFM_LINEAR);
+	SamplerNormalMap.SetMinFilter(ZE_TFM_LINEAR);
+	SamplerNormalMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	SamplerParallaxMap.SetAddressU(ZE_TAM_WRAP);
+	SamplerParallaxMap.SetAddressV(ZE_TAM_WRAP);
+	SamplerParallaxMap.SetAddressW(ZE_TAM_WRAP);
+	SamplerParallaxMap.SetMagFilter(ZE_TFM_LINEAR);
+	SamplerParallaxMap.SetMinFilter(ZE_TFM_LINEAR);
+	SamplerParallaxMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	SamplerSpecularMap.SetAddressU(ZE_TAM_WRAP);
+	SamplerSpecularMap.SetAddressV(ZE_TAM_WRAP);
+	SamplerSpecularMap.SetAddressW(ZE_TAM_WRAP);
+	SamplerSpecularMap.SetMagFilter(ZE_TFM_LINEAR);
+	SamplerSpecularMap.SetMinFilter(ZE_TFM_LINEAR);
+	SamplerSpecularMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	SamplerEmissiveMap.SetAddressU(ZE_TAM_WRAP);
+	SamplerEmissiveMap.SetAddressV(ZE_TAM_WRAP);
+	SamplerEmissiveMap.SetAddressW(ZE_TAM_WRAP);
+	SamplerEmissiveMap.SetMagFilter(ZE_TFM_LINEAR);
+	SamplerEmissiveMap.SetMinFilter(ZE_TFM_LINEAR);
+	SamplerEmissiveMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	SamplerOpacityMap.SetAddressU(ZE_TAM_WRAP);
+	SamplerOpacityMap.SetAddressV(ZE_TAM_WRAP);
+	SamplerOpacityMap.SetAddressW(ZE_TAM_WRAP);
+	SamplerOpacityMap.SetMagFilter(ZE_TFM_LINEAR);
+	SamplerOpacityMap.SetMinFilter(ZE_TFM_LINEAR);
+	SamplerOpacityMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	SamplerDetailBaseMap.SetAddressU(ZE_TAM_WRAP);
+	SamplerDetailBaseMap.SetAddressV(ZE_TAM_WRAP);
+	SamplerDetailBaseMap.SetAddressW(ZE_TAM_WRAP);
+	SamplerDetailBaseMap.SetMagFilter(ZE_TFM_LINEAR);
+	SamplerDetailBaseMap.SetMinFilter(ZE_TFM_LINEAR);
+	SamplerDetailBaseMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+
+	SamplerDetailNormalMap.SetAddressU(ZE_TAM_WRAP);
+	SamplerDetailNormalMap.SetAddressV(ZE_TAM_WRAP);
+	SamplerDetailNormalMap.SetAddressW(ZE_TAM_WRAP);
+	SamplerDetailNormalMap.SetMagFilter(ZE_TFM_LINEAR);
+	SamplerDetailNormalMap.SetMinFilter(ZE_TFM_LINEAR);
+	SamplerDetailNormalMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+	
+	SamplerEnvironmentMap.SetAddressU(ZE_TAM_WRAP);
+	SamplerEnvironmentMap.SetAddressV(ZE_TAM_WRAP);
+	SamplerEnvironmentMap.SetAddressW(ZE_TAM_WRAP);
+	SamplerEnvironmentMap.SetMagFilter(ZE_TFM_LINEAR);
+	SamplerEnvironmentMap.SetMinFilter(ZE_TFM_LINEAR);
+	SamplerEnvironmentMap.SetMipFilter(ZE_TFM_ANISOTROPY);
+	
+	InitializeBuffers();
 }
 
 ZEMaterialDefault::~ZEMaterialDefault()

@@ -34,13 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_D3D10_SHADER_COMPILER_H__
-#define __ZE_D3D10_SHADER_COMPILER_H__
+#ifndef __ZE_D3D11_SHADER_COMPILER_H__
+#define __ZE_D3D11_SHADER_COMPILER_H__
+
+#include <d3d11.h>
 
 #include "ZED3D10ComponentBase.h"
 #include "ZEGraphics/ZEShaderCompiler.h"
-
-struct ID3D10Blob;
 
 class ZEShader;
 class ZED3D10Shader;
@@ -53,11 +53,14 @@ class ZED3D10ShaderCompiler : public ZEShaderCompiler, public ZED3D10ComponentBa
 	friend class ZED3D10GraphicsModule;
 
 	protected:
-		ZED3D10PixelShader*			CreatePixelShader(ID3D10Blob* ByteCode);
-		ZED3D10VertexShader*		CreateVertexShader(ID3D10Blob* ByteCode);
-		ZED3D10GeometryShader*		CreateGeometryShader(ID3D10Blob* ByteCode);
+		ZED3D10VertexShader*		CreateVertexShader(ID3DBlob* ByteCode);
+		ZED3D10GeometryShader*		CreateGeometryShader(ID3DBlob* ByteCode);
+		ZED3D10DomainShader*		CreateDomainShader(ID3DBlob* ByteCode);
+		ZED3D10HullShader*			CreateHullShader(ID3DBlob* ByteCode);
+		ZED3D10PixelShader*			CreatePixelShader(ID3DBlob* ByteCode);
+		ZED3D10ComputeShader*		CreateComputeShader(ID3DBlob* ByteCode);
 
-		bool						CreateMetaTable(ZED3D10Shader* Shader, ID3D10Blob* ByteCode);
+		bool						CreateMetaTable(ZED3D10Shader* Shader, ID3DBlob* ByteCode);
 
 		ZEShader*					CompileShader(ZEShaderCompileOptions* Options);
 

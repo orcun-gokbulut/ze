@@ -102,7 +102,7 @@ ZETestResult ZETestItem::GetResult()
 	return Result;
 }
 
-float ZETestItem::GetEleapsedTime()
+ZEUInt64 ZETestItem::GetEleapsedTime()
 {
 	return ElapsedTime;
 }

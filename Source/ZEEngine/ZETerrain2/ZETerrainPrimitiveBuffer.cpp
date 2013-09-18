@@ -37,7 +37,7 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZEVertexDeclaration.h"
+#include "ZEGraphics/ZEVertexLayout.h"
 #include "ZERandom.h"
 
 static void CreateQuad(ZETerrainVertex* Output, ZEInt x, ZEInt y)

@@ -79,7 +79,6 @@ class ZEMaterialSimple : public ZEMaterial
 
 	public:
 		ZESize						GetHash() const;
-		bool						UpdateMaterial();
 
 		void						SetTwoSided(bool Enable);
 		bool						GetTwoSided() const;

@@ -33,10 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEShaderCompiler.h"
-#include "ZEFile/ZEFile.h"
-#include "ZEGraphicsModule.h"
 #include "ZEShader.h"
+#include "ZEFile/ZEFile.h"
+#include "ZEShaderCompiler.h"
+#include "ZEGraphicsModule.h"
+
 
 ZEShader* ZEShaderCompiler::CompileShaderFromSource(ZEShaderCompileOptions* Options)
 {
@@ -49,7 +50,7 @@ ZEShader* ZEShaderCompiler::CompileShaderFromFile(ZEShaderCompileOptions* Option
 	if (!ShaderFile.Open("resources\\shaders\\" + Options->FileName, ZE_FOM_READ, ZE_FCM_NONE))
 		return NULL;
 		
-	ZESize SourceSize = ShaderFile.GetSize();
+	ZESize SourceSize = (ZESize)ShaderFile.GetSize();
 	ZEArray<char> SourceArray;
 	SourceArray.Resize(SourceSize + 1);
 	SourceArray[SourceSize] = '\0';

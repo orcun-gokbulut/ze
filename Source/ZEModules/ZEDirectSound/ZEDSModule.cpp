@@ -43,6 +43,8 @@
 #include "ZEDSSoundSource.h"
 #include "ZEDSSoundSource3D.h"
 #include <dsound.h>
+#include "ZEGraphics/ZEGraphicsWindow.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
 ZE_MODULE_DESCRIPTION(ZEDSModule, ZESoundModule, NULL)
 
@@ -180,7 +182,7 @@ bool ZEDSModule::InitializeSelf()
 		return false;
 	}
 
-	hr=DS->SetCooperativeLevel((HWND)zeWindow->GetHandle(), DSSCL_PRIORITY);
+	hr=DS->SetCooperativeLevel((HWND)zeGraphics->GetWindow()->GetHandle(), DSSCL_PRIORITY);
 	
 	if (FAILED(hr))
 	{	

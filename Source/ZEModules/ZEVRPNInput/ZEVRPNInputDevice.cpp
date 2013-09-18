@@ -59,11 +59,11 @@ static void VRPN_CALLBACK Tracker_ChangeHandler(void* UserData, const vrpn_TRACK
 {
 	ZEVRPNInputDeviceHandle* Handle = (ZEVRPNInputDeviceHandle*)UserData;
 	
-	if (Data.sensor < Handle->Description->VectorCount)
-		Handle->State->Vectors.CurrentValues[Data.sensor] = VRPN_TO_ZE_VEC(Data.pos);
+	if ((ZESize)Data.sensor < Handle->Description->VectorCount)
+		Handle->State->Vectors.CurrentValues[(ZESize)Data.sensor] = VRPN_TO_ZE_VEC(Data.pos);
 	
-	if (Data.sensor < Handle->Description->VectorCount)
-		Handle->State->Quaternions.CurrentValues[Data.sensor] = VRPN_TO_ZE_QUAD(Data.quat);
+	if ((ZESize)Data.sensor < Handle->Description->VectorCount)
+		Handle->State->Quaternions.CurrentValues[(ZESize)Data.sensor] = VRPN_TO_ZE_QUAD(Data.quat);
 
 }
 
@@ -71,8 +71,8 @@ static void VRPN_CALLBACK Button_ChangeHandler(void* UserData, const vrpn_BUTTON
 {
 	ZEVRPNInputDeviceHandle* Handle = (ZEVRPNInputDeviceHandle*)UserData;
 
-	if (Data.button < Handle->Description->ButtonCount)
-		Handle->State->Buttons.CurrentValues[Data.button] = Data.state == 0 ? false : true;
+	if ((ZESize)Data.button < Handle->Description->ButtonCount)
+		Handle->State->Buttons.CurrentValues[(ZESize)Data.button] = Data.state == 0 ? false : true;
 
 }
 
@@ -80,7 +80,7 @@ static void VRPN_CALLBACK Axis_ChangeHandler(void* UserData, const vrpn_ANALOGCB
 {
 	ZEVRPNInputDeviceHandle* Handle = (ZEVRPNInputDeviceHandle*)UserData;
 
-	ZEInt AxisCount = Data.num_channel > Handle->Description->AxisCount ? Handle->Description->AxisCount : Data.num_channel;
+	ZEInt AxisCount = (ZESize)Data.num_channel > Handle->Description->AxisCount ? Handle->Description->AxisCount : Data.num_channel;
 	for (ZEInt I = 0; I < AxisCount; I++)
 		Handle->State->Axises.CurrentValues[I] = (float)(Data.channel[I]);
 }

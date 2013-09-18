@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIRenderer.h"
+#include "ZEGraphics/ZEGraphicsWindow.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEVertexLayout.h"
 #include "ZERenderer/ZEMaterialDefault.h"
@@ -74,10 +75,10 @@ void ZEUIRenderer::Initialize()
 	//if (VertexDeclaration == NULL)
 		//VertexDeclaration = ZEUIVertex::GetVertexDeclaration();
 
-	
+	ZEInt Width, Height;
+	zeGraphics->GetWindow()->GetSize(Width, Height);
 
-	ZEMatrix4x4::CreateViewPortTransform(ScreenTransform, 0.0f, (float)zeGraphics->GetScreenWidth(), 0.0f, (float)zeGraphics->GetScreenHeight(), 0.0f, 1.0f);
-	
+	ZEMatrix4x4::CreateViewPortTransform(ScreenTransform, 0.0f, (float)Width, 0.0f, (float)Height, 0.0f, 1.0f);
 }
 
 void ZEUIRenderer::Deinitialize()
@@ -148,7 +149,8 @@ void ZEUIRenderer::Render(ZERenderer* Renderer)
 
 		if (RenderCommands[I].Material == NULL)
 			RenderCommands[I].Material = DefaultMaterial;
-		Renderer->AddRenderCommand(&RenderCommands[I]);
+		
+		//Renderer->AddRenderCommand(&RenderCommands[I]);
 	}
 }
 

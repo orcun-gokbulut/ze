@@ -38,6 +38,7 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEMath/ZEViewVolume.h"
+#include "ZERenderer/ZEView.h"
 #include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntityProvider.h"
@@ -453,12 +454,12 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 	if(!GetVisible())
 		return;
 
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-	{
-		memset(&Statistics, 0, sizeof(ZEModelStatistics));
+	//if (DrawParameters->Pass == ZE_RP_COLOR)
+	//{
+	//	memset(&Statistics, 0, sizeof(ZEModelStatistics));
 
-		Statistics.TotalMeshCount = (ZEUInt32)Meshes.GetCount();
-	}
+	//	Statistics.TotalMeshCount = (ZEUInt32)Meshes.GetCount();
+	//}
 
 	if (AnimationUpdateMode == ZE_MAUM_VISUAL)
 	{
@@ -472,36 +473,36 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 	{
 		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL && !Meshes[I].LODs[0].IsSkinned())
 		{
-			if (DrawParameters->ViewVolume->CullTest(Meshes[I].GetWorldBoundingBox()))
+			if (DrawParameters->View->GetViewVolume()->CullTest(Meshes[I].GetWorldBoundingBox()))
 			{
-				if (DrawParameters->Pass == ZE_RP_COLOR)
-					Statistics.CulledMeshCount++;
+				//if (DrawParameters->Pass == ZE_RP_COLOR)
+				//	Statistics.CulledMeshCount++;
 
 				continue;
 			}
 			else
 			{
-				if (DrawParameters->Pass == ZE_RP_COLOR)
-					Statistics.DrawnMeshCount++;
+				//if (DrawParameters->Pass == ZE_RP_COLOR)
+				//	Statistics.DrawnMeshCount++;
 
 				Meshes[I].Draw(DrawParameters);
 			}
 		}
 		else
 		{
-			if (DrawParameters->Pass == ZE_RP_COLOR)
-				Statistics.DrawnMeshCount++;
+			//if (DrawParameters->Pass == ZE_RP_COLOR)
+			//	Statistics.DrawnMeshCount++;
 
 			Meshes[I].Draw(DrawParameters);
 		}
 	}
 
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-	{
-		DrawParameters->Statistics.ModelStatistics.TotalMeshCount += Statistics.TotalMeshCount;
-		DrawParameters->Statistics.ModelStatistics.CulledMeshCount += Statistics.CulledMeshCount;
-		DrawParameters->Statistics.ModelStatistics.DrawnMeshCount += Statistics.DrawnMeshCount;
-	}
+	//if (DrawParameters->Pass == ZE_RP_COLOR)
+	//{
+	//	DrawParameters->Statistics.ModelStatistics.TotalMeshCount += Statistics.TotalMeshCount;
+	//	DrawParameters->Statistics.ModelStatistics.CulledMeshCount += Statistics.CulledMeshCount;
+	//	DrawParameters->Statistics.ModelStatistics.DrawnMeshCount += Statistics.DrawnMeshCount;
+	//}
 }
 
 void ZEModel::Tick(float ElapsedTime)

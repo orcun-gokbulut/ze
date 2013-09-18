@@ -52,7 +52,7 @@ struct ZEParticleVertex
 	ZEVector4		Color;
 };
 
-struct ZEDrawParameters;
+class ZEDrawParameters;
 
 class ZEVertexBuffer;
 

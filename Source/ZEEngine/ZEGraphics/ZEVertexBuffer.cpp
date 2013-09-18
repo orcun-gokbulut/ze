@@ -42,7 +42,6 @@
 /************************************************************************/
 /*						ZEVertexBufferElement							*/
 /************************************************************************/
-
 ZESize ZEVertexBufferElement::GetHash(const char* Semantic, ZEUInt8 Index)
 {
 	ZESize Hash = 0;
@@ -55,10 +54,15 @@ ZESize ZEVertexBufferElement::GetHash(const char* Semantic, ZEUInt8 Index)
 /************************************************************************/
 /*							ZEVertexBuffer								*/
 /************************************************************************/
-
-bool ZEVertexBuffer::IsStatic() const
+bool ZEVertexBuffer::UpdateWith(ZEUInt ShadowIndex)
 {
-	return Static;
+	ShadowCopy.SetChanged(ShadowIndex, false);
+	return true;
+}
+
+ZEGraphicsResourceType ZEVertexBuffer::GetResourceType() const
+{
+	return ZE_GRT_BUFFER;
 }
 
 ZESize ZEVertexBuffer::GetBufferSize() const
@@ -71,7 +75,7 @@ ZESize ZEVertexBuffer::GetVertexSize() const
 	return VertexSize;
 }
 
-ZESize ZEVertexBuffer::GetVertexCount() const
+ZEUInt ZEVertexBuffer::GetVertexCount() const
 {
 	return VertexCount;
 }
@@ -105,9 +109,6 @@ void ZEVertexBuffer::RegisterElements(const ZEVertexBufferElement* ElementArr, Z
 	ElementCount = Count;
 	for (ZESize I = 0; I < Count; ++I)
 	{
-		zeDebugCheck(strnlen(ElementArr[I].Semantic, ZE_MAX_SHADER_VARIABLE_NAME) == ZE_MAX_SHADER_VARIABLE_NAME, 
-						"Wrong vertex buffer element semantic");
-
 		sprintf(Elements[I].Semantic, "%s", ElementArr[I].Semantic);
 		Elements[I].Index = ElementArr[I].Index;
 		Elements[I].Type = ElementArr[I].Type;
@@ -119,19 +120,91 @@ void ZEVertexBuffer::RegisterElements(const ZEVertexBufferElement* ElementArr, Z
 	}
 }
 
-void ZEVertexBuffer::Destroy()
+void ZEVertexBuffer::Unlock()
 {
-	delete this;
+	zeDebugCheck(!GetIsCreated(), "Buffer not created.");
+	zeDebugCheck(State.IsStatic, "Static buffer not be locked/unlocked.");
+
+	State.IsLocked = false;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Dynamic vertex buffer unlocked. VertexBuffer: %p", this);
+#endif
 }
 
-ZEVertexBuffer*	ZEVertexBuffer::CreateInstance()
+bool ZEVertexBuffer::Lock(void** Data)
 {
-	return zeGraphics->CreateVertexBuffer();
+	zeDebugCheck(Data == NULL, "Null pointer.");
+	zeDebugCheck(*Data == NULL, "Null pointer.");
+	zeDebugCheck(State.IsLocked, "Already locked.");
+	zeDebugCheck(!GetIsCreated(), "Buffer not created.");
+	zeDebugCheck(State.IsStatic, "Static buffer not be locked/unlocked.");
+
+	*Data = ShadowCopy.GetData();
+	State.IsLocked = true;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Dynamic vartex buffer locked. VertexBuffer: %p, Data: %p.", this, *Data);
+#endif
+
+	return true;
 }
+
+bool ZEVertexBuffer::CreateDynamic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData)
+{
+	zeDebugCheck(GetIsCreated(), "Buffer already created.");
+	zeDebugCheck(VertexSize == 0, "Zero vertex size.");
+	zeDebugCheck(VertexCount == 0, "Zero vertex count.");
+
+	ZESize Size = (ZESize)VertexCount * VertexSize;
+	ShadowCopy.CreateBuffer(Size, VertexData);
+
+	this->VertexSize = VertexSize;
+	this->VertexCount = VertexCount;
+	this->BufferSize = (ZESize)VertexCount * VertexSize;
+	this->State.IsStatic = false;
+	this->State.IsCreated = true;
+
+	TotalCount++;
+	TotalSize += BufferSize;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Dynamic vertex buffer created. BufferSize: %u, VertexCount: %u, VertexSize: %u", 
+			VertexCount * (ZEUInt)VertexSize, VertexCount, (ZEUInt)VertexSize);
+#endif
+
+	return true;
+}
+
+bool ZEVertexBuffer::CreateStatic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData)
+{
+	zeDebugCheck(VertexSize == 0, "Zero vertex size");
+	zeDebugCheck(VertexCount == 0, "Zero vertex count.");
+	zeDebugCheck(GetIsCreated(), "Buffer already created.");
+	zeDebugCheck(VertexData == NULL, "Buffer must have initial data.");
+
+	this->VertexSize = VertexSize;
+	this->VertexCount = VertexCount;
+	this->BufferSize = (ZESize)VertexCount * VertexSize;
+	this->State.IsStatic = true;
+	this->State.IsCreated = true;
+
+	TotalCount++;
+	TotalSize += BufferSize;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Static vertex buffer created. BufferSize: %u, VertexCount: %u, VertexSize: %u", 
+			BufferSize, VertexCount, (ZEUInt)VertexSize);
+#endif
+
+	return true;
+}
+
+ZESize		ZEVertexBuffer::TotalSize = 0;
+ZEUInt16	ZEVertexBuffer::TotalCount = 0;
 
 ZEVertexBuffer::ZEVertexBuffer()
 {
-	Static = false;
 	BufferSize = 0;
 	VertexSize = 0;
 	VertexCount = 0;
@@ -141,5 +214,14 @@ ZEVertexBuffer::ZEVertexBuffer()
 
 ZEVertexBuffer::~ZEVertexBuffer()
 {
+	if (GetIsCreated())
+	{
+		TotalSize -= BufferSize;
+		TotalCount--;
+	}
+}
 
+ZEVertexBuffer*	ZEVertexBuffer::CreateInstance()
+{
+	return zeGraphics->CreateVertexBuffer();
 }

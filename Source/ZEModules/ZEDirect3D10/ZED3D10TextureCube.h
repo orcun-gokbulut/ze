@@ -33,8 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D10_TEXTURE_CUBE_H__
-#define __ZE_D3D10_TEXTURE_CUBE_H__
+#ifndef __ZE_D3D11_TEXTURE_CUBE_H__
+#define __ZE_D3D11_TEXTURE_CUBE_H__
+
+#include <d3d11.h>
 
 #include "ZETypes.h"
 #include "ZED3D10ComponentBase.h"
@@ -43,37 +45,28 @@
 class ZETextureData;
 class ZERenderTarget;
 
-struct ID3D10Texture2D;
-struct ID3D10ShaderResourceView;
-
 class ZED3D10TextureCube : public ZETextureCube, public ZED3D10ComponentBase
 {
 	friend class ZED3D10GraphicsModule;
 	friend class ZED3D10GraphicsDevice;
 	
 	protected:
-		static ZESize						GlobalSize;
-		static ZEUInt16						GlobalCount;
+		ID3D11Texture2D*					D3D10TextureCube;
+		ID3D11ShaderResourceView*			D3D10ShaderResourceView;
 
-		ID3D10Texture2D*					D3D10TextureCube;
-		ID3D10ShaderResourceView*			D3D10ShaderResourceView;
+		bool								UpdateWith(ZEUInt ShadowIndex);
 
 											ZED3D10TextureCube();
 		virtual								~ZED3D10TextureCube();
 
-	public:
-		bool								IsEmpty() const;
+	public:		
+		const ID3D11Texture2D*				GetD3D10Texture() const;
+		const ID3D11ShaderResourceView*		GetD3D10ResourceView() const;
 		
-		const ID3D10Texture2D*				GetD3D10Texture() const;
-		const ID3D10ShaderResourceView*		GetD3D10ResourceView() const;
-		
-		virtual ZERenderTarget*				CreateRenderTarget(ZEUInt MipLevel = 0) const;
+		bool								CreateDynamic(ZEUInt EdgeLength, ZETexturePixelFormat PixelFormat, ZETextureData* InitialData = NULL);
+		bool								CreateStatic(ZEUInt EdgeLength, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* InitialData = NULL);
 
-		virtual bool						CreateDynamic(ZEUInt EdgeLenght, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat);
-		virtual bool						CreateStatic(ZEUInt EdgeLength, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
-
-		virtual bool						Lock(void** Buffer, ZESize* Pitch, ZETextureCubeFace Face, ZEUInt Level);
-		virtual bool						Unlock(ZETextureCubeFace Face, ZEUInt Level);
+		ZERenderTarget*						CreateRenderTarget(ZEUInt MipLevel = 0) const;
 };
 
 #endif

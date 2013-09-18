@@ -33,12 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D10_GRAPHICS_DEVICE_H__
-#define __ZE_D3D10_GRAPHICS_DEVICE_H__
+#ifndef __ZE_D3D11_GRAPHICS_DEVICE_H__
+#define __ZE_D3D11_GRAPHICS_DEVICE_H__
 
 #include "ZED3D10StatePool.h"
 #include "ZED3D10ComponentBase.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
+
+#include "d3d11.h"
 
 class ZERenderTarget;
 class ZEDepthStencilBuffer;
@@ -48,28 +50,32 @@ class ZED3D10GraphicsDevice : public ZEGraphicsDevice, public ZED3D10ComponentBa
 	friend class ZED3D10GraphicsModule;
 
 	protected:
-		void				ApplyInputStates();
-		void				ApplyVertexShaderStates();
-		void				ApplyGeometryShaderStates();
-		void				ApplyRasterizerStates();
-		void				ApplyPixelShaderStates();
-		void				ApplyOutputStates();
+		ZEUInt					ContextIndex;
+		bool					RenderTargetChanged;
+		D3D_FEATURE_LEVEL		FeatureLevel;
 
-		void				ApplyStates();
+		void					ApplyInputStates();
+		void					ApplyVertexShaderStates();
+		void					ApplyGeometryShaderStates();
+		void					ApplyRasterizerStates();
+		void					ApplyPixelShaderStates();
+		void					ApplyOutputStates();
+
+		void					ApplyStates();
 		
-							ZED3D10GraphicsDevice();
-		virtual				~ZED3D10GraphicsDevice();
+								ZED3D10GraphicsDevice(ID3D11Device* D3D10Device, ZEUInt ContextIndex);
+		virtual					~ZED3D10GraphicsDevice();
 
 	public:
-		virtual bool		Present() const;
+		virtual void			Draw(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex);
+		virtual void			DrawIndexed(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt FirstIndex, ZEInt BaseVertex);
+		virtual void			DrawInstanced(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance);
+		virtual void			DrawIndexedInstanced(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance);
 
-		virtual void		Draw(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex);
-		virtual void		DrawIndexed(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt FirstIndex, ZEInt BaseVertex);
-		virtual void		DrawInstanced(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance);
-		virtual void		DrawIndexedInstanced(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance);
+		virtual void			ClearRenderTarget(const ZERenderTarget* RenderTarget, const ZEVector4& ClearColor);
+		virtual void			ClearDepthStencilBuffer(const ZEDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
 
-		virtual void		ClearRenderTarget(const ZERenderTarget* RenderTarget, const ZEVector4& ClearColor);
-		virtual void		ClearDepthStencilBuffer(const ZEDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
+		D3D_FEATURE_LEVEL		GetD3DFeatureLevel() const;
 };
 
 #endif

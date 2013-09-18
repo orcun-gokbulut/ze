@@ -33,15 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
-#pragma once
-#ifndef __ZE_D3D10_CONSTANT_BUFFER_H__
-#define __ZE_D3D10_CONSTANT_BUFFER_H__
+#ifndef __ZE_D3D11_CONSTANT_BUFFER_H__
+#define __ZE_D3D11_CONSTANT_BUFFER_H__
 
 #include "ZED3D10ComponentBase.h"
 #include "ZEGraphics/ZEConstantBuffer.h"
 
-struct ID3D10Buffer;
+struct ID3D11Buffer;
 
 class ZED3D10ConstantBuffer : public ZEConstantBuffer, public ZED3D10ComponentBase
 {
@@ -49,21 +47,18 @@ class ZED3D10ConstantBuffer : public ZEConstantBuffer, public ZED3D10ComponentBa
 	friend class ZED3D10GraphicsModule;
 
 	protected:
-		static ZESize		GlobalSize;
-		static ZEUInt16		GlobalCount;
-
-		ID3D10Buffer*		D3D10Buffer;
+		ID3D11Buffer*			D3D10Buffer;
 		
-		virtual bool		UpdateBuffer();
+		bool					UpdateWith(ZEUInt ShadowIndex);
 
-							ZED3D10ConstantBuffer();
-		virtual				~ZED3D10ConstantBuffer();
+								ZED3D10ConstantBuffer();
+		virtual					~ZED3D10ConstantBuffer();
 
 	public:
-		ID3D10Buffer*		GetD3D10Buffer() const;
+		const ID3D11Buffer*		GetD3D10Buffer() const;
 
-		virtual bool		Create(ZESize BufferSize);
-		virtual bool		Create(const ZEShaderBuffer* BufferInfo);
+		bool					Create(const ZEShaderBuffer* BufferInfo);
+		bool					Create(ZESize BufferSize);
 };
 
 #endif

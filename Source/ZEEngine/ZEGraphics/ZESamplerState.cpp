@@ -215,11 +215,11 @@ void ZESamplerState::SetToDefault()
 	StateData.AddressU = ZE_TAM_CLAMP;
 	StateData.AddressV = ZE_TAM_CLAMP;
 	StateData.AddressW = ZE_TAM_CLAMP;
-	StateData.MaxAnisotropy = zeGraphics->GetAnisotropicFilter();
-	StateData.BorderColor = ZEVector4::Zero;
-	StateData.MipLODBias = -0.25f;
 	StateData.MinLOD = ZE_FLOAT_MIN;
 	StateData.MaxLOD = ZE_FLOAT_MAX;
+	StateData.MaxAnisotropy = 8;
+	StateData.MipLODBias = 0.0f;
+	StateData.BorderColor = ZEVector4::Zero;
 }
 
 const ZESamplerState& ZESamplerState::operator=(const ZESamplerState& State)

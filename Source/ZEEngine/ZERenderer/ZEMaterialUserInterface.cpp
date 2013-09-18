@@ -247,11 +247,6 @@ bool ZEMaterialUserInterface::SetupForwardPass(ZERenderer* Renderer, ZERenderCom
 	return true;
 }
 	*/
-bool ZEMaterialUserInterface::UpdateMaterial()
-{	
-	return true;
-}
-
 ZEMaterialUserInterface* ZEMaterialUserInterface::CreateInstance()
 {
 	return NULL; //  new ZEMaterialUserInterface();

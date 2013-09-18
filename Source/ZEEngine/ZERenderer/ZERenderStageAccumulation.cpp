@@ -42,87 +42,100 @@
 #include "ZEGraphics/ZERenderTarget.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsWindow.h"
 #include "ZEGraphics/ZEGraphicsEventTracer.h"
 
-void ZERenderStageAccumulation::ResetStates()
+bool ZERenderStageAccumulation::ResetStates(const ZEMaterial* Material)
 {
-	// Reset parent states
-	ZERenderStage::ResetStates();
+	// Reset to default states
+	// ---------------------------------------------------------
+	if (!ZERenderStage::ResetStates(Material))
+		return false;
 
 	// Outputs
 	DefaultStates.ScreenWriteEnable = true;
-	//DefaultStates.RenderTargets[0] = RenderTargets.ABuffer;
-	DefaultStates.RenderTargets[0] = zeGraphics->GetFrameBuffer();
-	DefaultStates.DepthStencilBuffer = zeGraphics->GetDepthBuffer();
+	//DefaultStates.RenderTargets[0] = RenderTargets.Accumulation;
+	DefaultStates.RenderTargets[0] = zeGraphics->GetWindow()->GetBackBuffer();
+	DefaultStates.DepthStencilBuffer = zeGraphics->GetWindow()->GetDepthBuffer();
+
+	ZEInt Width, Height;
+	zeGraphics->GetWindow()->GetSize(Width, Height);
 
 	// Use default viewport and scissor rectangles
-	ZESize ScreenCount = zeGraphics->GetScreenCount();
-	for (ZESize I = 0; I < ScreenCount; ++I)
-	{
-		DefaultStates.ViewPorts[I] = zeGraphics->GetViewport(I);
-		DefaultStates.ScissorRects[I] = zeGraphics->GetScissorRectangle(I);
-	}
+	DefaultStates.ViewPorts[0].StateData.TopLeftX = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.TopLeftY = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.Width = (float)Width;
+	DefaultStates.ViewPorts[0].StateData.Height = (float)Height;
+	DefaultStates.ViewPorts[0].StateData.MinDepth = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.MaxDepth = 1.0f;
 
+	DefaultStates.ScissorRects[0].StateData.Left = 0;
+	DefaultStates.ScissorRects[0].StateData.Top = 0;
+	DefaultStates.ScissorRects[0].StateData.Right = Width;
+	DefaultStates.ScissorRects[0].StateData.Bottom = Height;
+	
 	// Blend state
 	DefaultStates.BlendState.SetBlendEnable(0, false);
 	DefaultStates.BlendState.SetComponentWriteMask(0, ZE_CM_ALL);
 
-	// Point sampler state
+	// Depth stencil state
+	DefaultStates.DepthStencilState.SetZTestEnable(true);
+	DefaultStates.DepthStencilState.SetZWriteEnable(false);
+	DefaultStates.DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
+
+	// Rasterizer state
+	DefaultStates.RasterizerState.SetFillMode(ZE_FM_SOLID);
+	DefaultStates.RasterizerState.SetFrontIsCounterClockwise(false);
+	DefaultStates.RasterizerState.SetCullDirection(ZE_CD_COUNTER_CLOCKWISE);
+
+	// Sampler
 	DefaultStates.PixelShaderSamplers[0].SetAddressU(ZE_TAM_CLAMP);
 	DefaultStates.PixelShaderSamplers[0].SetAddressV(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[0].SetAddressW(ZE_TAM_CLAMP);
 	DefaultStates.PixelShaderSamplers[0].SetMagFilter(ZE_TFM_POINT);
 	DefaultStates.PixelShaderSamplers[0].SetMinFilter(ZE_TFM_POINT);
 	DefaultStates.PixelShaderSamplers[0].SetMipFilter(ZE_TFM_POINT);
+
+	DefaultStates.PixelShaderSamplers[1].SetAddressU(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[1].SetAddressV(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[1].SetAddressW(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[1].SetMagFilter(ZE_TFM_POINT);
+	DefaultStates.PixelShaderSamplers[1].SetMinFilter(ZE_TFM_POINT);
+	DefaultStates.PixelShaderSamplers[1].SetMipFilter(ZE_TFM_POINT);
+
+	DefaultStates.PixelShaderSamplers[2].SetAddressU(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[2].SetAddressV(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[2].SetAddressW(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[2].SetMagFilter(ZE_TFM_POINT);
+	DefaultStates.PixelShaderSamplers[2].SetMinFilter(ZE_TFM_POINT);
+	DefaultStates.PixelShaderSamplers[2].SetMipFilter(ZE_TFM_POINT);
 	
-	// Depth stencil state
-	DefaultStates.DepthStencilState.SetZFunction(ZE_CF_LESS_EQUAL);
-	DefaultStates.DepthStencilState.SetZTestEnable(true);
-	DefaultStates.DepthStencilState.SetZWriteEnable(false);
-
-	// Rasterizer state
-	DefaultStates.RasterizerState.SetCullDirection(ZE_CD_COUNTER_CLOCKWISE);
-	DefaultStates.RasterizerState.SetFillMode(ZE_FM_SOLID);
-
-	if (GBufferInput == NULL || LightBufferInput == NULL)
-	{
-		zeError("Missing input stage.");
-		return;
-	}
+	DefaultStates.PixelShaderSamplers[3].SetAddressU(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[3].SetAddressV(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[3].SetAddressW(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[3].SetMagFilter(ZE_TFM_POINT);
+	DefaultStates.PixelShaderSamplers[3].SetMinFilter(ZE_TFM_POINT);
+	DefaultStates.PixelShaderSamplers[3].SetMipFilter(ZE_TFM_POINT);
 
 	// Textures
-	DefaultStates.PixelShaderTextures[0] = GBufferInput->GetGBuffer1();
-	DefaultStates.PixelShaderTextures[1] = GBufferInput->GetGBuffer2();
-	DefaultStates.PixelShaderTextures[2] = GBufferInput->GetGBuffer3();
-	DefaultStates.PixelShaderTextures[3] = LightBufferInput->GetLBuffer1();
-	DefaultStates.PixelShaderTextures[4] = LightBufferInput->GetLBuffer2();
-}
+	DefaultStates.PixelShaderTextures[0] = InputStageGeometry->GetTextureDepth();
+	DefaultStates.PixelShaderTextures[1] = InputStageGeometry->GetTextureNormalSpecular();
+	DefaultStates.PixelShaderTextures[2] = InputStageGeometry->GetTextureSSScatteringVelocity();
+	DefaultStates.PixelShaderTextures[3] = InputStageLighting->GetTextureLightSpecular();
 
-void ZERenderStageAccumulation::CommitStates()
-{
-// 	static ZEUInt PrevFrameId = 0;
-// 	static ZEUInt CommitCount = 0;
-// 
-// 	ZEUInt CurFrameId = zeCore->GetFrameId();
-// 
-// 	if (CurFrameId > PrevFrameId)
-// 	{
-// 		CommitCount = 0;
-// 		PrevFrameId = CurFrameId;
-// 	}
-// 	
-// 	CommitCount++;
-
+	// Commit default states
+	// ----------------------------------------------------------
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	Device->SetRenderTargetScreen(DefaultStates.RenderTargets[0]);
 	Device->SetDepthStencilBuffer(DefaultStates.DepthStencilBuffer);
 
-	ZESize ScreenCount = zeGraphics->GetScreenCount();
-	for (ZESize I = 0; I < ScreenCount; ++I)
-	{
-		Device->SetViewport(I, DefaultStates.ViewPorts[I]);
-		Device->SetScissorRectangle(I, DefaultStates.ScissorRects[I]);
-	}
+	Device->SetViewport(0, DefaultStates.ViewPorts[0]);
+	Device->SetScissorRectangle(0, DefaultStates.ScissorRects[0]);
+
+	Device->SetBlendState(DefaultStates.BlendState);
+	Device->SetRasterizerState(DefaultStates.RasterizerState);
+	Device->SetDepthStencilState(DefaultStates.DepthStencilState);
 
 	Device->SetPixelShaderTexture(0, DefaultStates.PixelShaderTextures[0]);
 	Device->SetPixelShaderTexture(1, DefaultStates.PixelShaderTextures[1]);
@@ -131,97 +144,111 @@ void ZERenderStageAccumulation::CommitStates()
 	Device->SetPixelShaderTexture(4, DefaultStates.PixelShaderTextures[4]);
 
 	Device->SetPixelShaderSampler(0, DefaultStates.PixelShaderSamplers[0]);
+	Device->SetPixelShaderSampler(1, DefaultStates.PixelShaderSamplers[1]);
+	Device->SetPixelShaderSampler(2, DefaultStates.PixelShaderSamplers[2]);
+	Device->SetPixelShaderSampler(3, DefaultStates.PixelShaderSamplers[3]);
+	Device->SetPixelShaderSampler(4, DefaultStates.PixelShaderSamplers[4]);
 
-	Device->SetBlendState(DefaultStates.BlendState);
-	Device->SetRasterizerState(DefaultStates.RasterizerState);
-	Device->SetDepthStencilState(DefaultStates.DepthStencilState);
-
-	// Commit parent States
-	ZERenderStage::CommitStates();
+	return true;
 }
 
 void ZERenderStageAccumulation::UpdateBuffers()
 {
-	ZEUInt Width = zeGraphics->GetScreenWidth();
-	ZEUInt Height = zeGraphics->GetScreenHeight();
+	ZETexture2D* Texture = NULL;
 
-	if (Textures.ABuffer == NULL || Textures.ABuffer->GetWidth() != Width || Textures.ABuffer->GetHeight() != Height)
+	ZEInt Width, Height;
+	zeGraphics->GetWindow()->GetSize(Width, Height);
+
+	Texture = Textures.Accumulation;
+	if (Texture == NULL || Texture->GetWidth() != Width || Texture->GetHeight() != Height)
 	{
-		ZE_DESTROY(RenderTargets.ABuffer);
-		ZE_DESTROY(Textures.ABuffer);
+		ZE_DESTROY(RenderTargets.Accumulation);
+		ZE_DESTROY(Textures.Accumulation);
 
-		Textures.ABuffer = ZETexture2D::CreateInstance();
-		Textures.ABuffer->CreateStatic(Width, Height, 1, ZE_TPF_F16_4, true, NULL);
-		RenderTargets.ABuffer = Textures.ABuffer->CreateRenderTarget(0);
+		Textures.Accumulation = ZETexture2D::CreateInstance();
+		Textures.Accumulation->CreateStatic(Width, Height, 1, ZE_TPF_F16_4, true, NULL);
+		RenderTargets.Accumulation = Textures.Accumulation->CreateRenderTarget(0);
 	}
 }
 
 void ZERenderStageAccumulation::DestroyBuffers()
 {
-	ZE_DESTROY(RenderTargets.ABuffer);
-	ZE_DESTROY(Textures.ABuffer);
+	ZE_DESTROY(RenderTargets.Accumulation);
+	ZE_DESTROY(Textures.Accumulation);
 }
 
-const ZETexture2D* ZERenderStageAccumulation::GetOutputAccumulationTexture() const
+const ZETexture2D* ZERenderStageAccumulation::GetTextureAccumulation() const
 {
-	return Textures.ABuffer;
+	return Textures.Accumulation;
 }
 
-const ZERenderTarget* ZERenderStageAccumulation::GetOutputAccumulationRenderTarget() const
+const ZERenderTarget* ZERenderStageAccumulation::GetRenderTargetAccumulation() const
 {
-	return RenderTargets.ABuffer;
+	return RenderTargets.Accumulation;
 }
 
-void ZERenderStageAccumulation::SetInputGeometryStage(const ZERenderStageGeometry* Input)
-{
-	zeDebugCheck(Input == NULL, "Null pointer");
-
-	GBufferInput = Input;
-}
-
-const ZERenderStageGeometry* ZERenderStageAccumulation::GetInputGeometryStage() const
-{
-	return GBufferInput;
-}
-
-void ZERenderStageAccumulation::SetInputLightingStage(const ZERenderStageLighting* Input)
+void ZERenderStageAccumulation::SetInputStageGeometry(const ZERenderStageGeometry* Input)
 {
 	zeDebugCheck(Input == NULL, "Null pointer");
 
-	LightBufferInput = Input;
+	InputStageGeometry = Input;
 }
 
-const ZERenderStageLighting* ZERenderStageAccumulation::GetInputLightingStage() const
+const ZERenderStageGeometry* ZERenderStageAccumulation::GetInputStageGeometry() const
 {
-	return LightBufferInput;
+	return InputStageGeometry;
 }
 
-void ZERenderStageAccumulation::Setup()
+void ZERenderStageAccumulation::SetInputStageLighting(const ZERenderStageLighting* Input)
 {
+	zeDebugCheck(Input == NULL, "Null pointer");
+
+	InputStageLighting = Input;
+}
+
+const ZERenderStageLighting* ZERenderStageAccumulation::GetInputStageLighting() const
+{
+	return InputStageLighting;
+}
+
+bool ZERenderStageAccumulation::Setup()
+{
+	if (!ZERenderStage::Setup())
+		return false;
+
 	UpdateBuffers();
-	ResetStates();
-	CommitStates();
-
-	LastMaterial = -1;
 
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
-	Device->ClearRenderTarget(RenderTargets.ABuffer, ZEVector4(0.0f, 1.0f, 0.0f, 1.0f));
-	Device->ClearRenderTarget(zeGraphics->GetFrameBuffer(), ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
+	Device->ClearRenderTarget(RenderTargets.Accumulation, ZEVector4(0.0f, 1.0f, 0.0f, 1.0f));
+	Device->ClearRenderTarget(zeGraphics->GetWindow()->GetBackBuffer(), ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
+
+	return true;
 }
 
-void ZERenderStageAccumulation::Process(const ZERenderCommand* RenderCommand)
+bool ZERenderStageAccumulation::Process(const ZERenderCommand* RenderCommand)
 {
-	zeDebugCheck(RenderCommand->Material == NULL, "Null Pointer.");
+	if (!ZERenderStage::Process(RenderCommand))
+		return false;
 
-	bool Done = false;
-	ZEUInt PassId = 0;
-	while (!Done)
+	if (InputStageGeometry == NULL || InputStageLighting == NULL)
 	{
-		Done = RenderCommand->Material->SetupPass(PassId++, this, RenderCommand);
+		zeWarning("Null input stage");
+		return false;
 	}
 
+	ZEUInt PassId = 0;
+	bool Continue = false;
+
+	do
+	{
+		Continue = RenderCommand->Material->SetupPass(PassId++, this, RenderCommand);
+	
+	} while (Continue);
+
 	PumpStreams(RenderCommand);
+
+	return true;
 }
 
 ZERenderStageType ZERenderStageAccumulation::GetDependencies() const
@@ -236,13 +263,11 @@ ZERenderStageType ZERenderStageAccumulation::GetStageType() const
 
 ZERenderStageAccumulation::ZERenderStageAccumulation()
 {	
-	LastMaterial = -1;
+	Textures.Accumulation = NULL;
+	RenderTargets.Accumulation = NULL;
 
-	Textures.ABuffer = NULL;
-	RenderTargets.ABuffer = NULL;
-
-	GBufferInput = NULL;
-	LightBufferInput = NULL;
+	InputStageGeometry = NULL;
+	InputStageLighting = NULL;
 }
 
 ZERenderStageAccumulation::~ZERenderStageAccumulation()

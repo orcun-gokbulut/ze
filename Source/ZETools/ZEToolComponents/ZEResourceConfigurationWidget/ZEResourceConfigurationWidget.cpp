@@ -98,7 +98,7 @@ void ZEResourceConfigurationWidget::AddResource(const ZEString& Identifier, cons
 	{
 		bool IsFound = false;
 
-		for (ZESize I = 0; I < QtComponents->Form->ResourcesTreeWidget->topLevelItemCount(); I++)
+		for (ZESize I = 0; I < (ZESize)QtComponents->Form->ResourcesTreeWidget->topLevelItemCount(); I++)
 		{
 			ZEResourceOption* CurrentResourceOption = ((ZEResourceOptionTreeItem*)(QtComponents->Form->ResourcesTreeWidget->topLevelItem(I)))->GetResourceOption();
 

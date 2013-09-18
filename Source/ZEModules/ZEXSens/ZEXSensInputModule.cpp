@@ -57,7 +57,7 @@ bool ZEXSensInputModule::InitializeSelf()
 	Control->setSerialKey("BKAM-XDBR-MFNN-9HZ0-V0KY");
 
 	XsPortInfoList PortInfos = XsScanner::scanPorts();
-	for(int I = 0; I < PortInfos.size(); I++)
+	for(ZESize I = 0; I < PortInfos.size(); I++)
 	{
 		ZEXSensInputDevice* Device = new ZEXSensInputDevice();
 		Device->Module = this;

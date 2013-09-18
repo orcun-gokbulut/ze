@@ -37,126 +37,41 @@
 #include "ZELight.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEMath.h"
-#include "ZEMath/ZEAngle.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 
-const ZEMatrix4x4& ZECamera::GetViewTransform()
+const ZEMatrix4x4& ZECamera::GetViewTransform() const
 {
-	if (!UpdateViewTransform)
+	if (!DirtyViewTransform)
 		return ViewTransform;
 	
 	ZEMatrix4x4::CreateViewTransform(ViewTransform, GetWorldPosition(), GetWorldRotation())	;
 
-	UpdateViewTransform = false;
+	DirtyViewTransform = false;
 	
 	return ViewTransform;
 }
 
-const ZEMatrix4x4& ZECamera::GetProjectionTransform()
+const ZEMatrix4x4& ZECamera::GetProjectionTransform() const
 {
-	if (!UpdateProjectionTransform)
+	if (!DirtyProjectionTransform)
 		return ProjectionTransform;
-
-	Width = (float)zeGraphics->GetScreenWidth();
-	Height = (float)zeGraphics->GetScreenHeight();
 	
-	ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, FOV, Width / Height, NearZ, FarZ);
+	float AspectRatio = ViewDimension.x / ViewDimension.y;
+	ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, Fov, AspectRatio, NearZ, FarZ);
 	
-	UpdateProjectionTransform = false;
+	DirtyProjectionTransform = false;
 
 	return ProjectionTransform;
 }
 
-const ZEMatrix4x4& ZECamera::GetViewProjectionTransform()
-{
-	if (!UpdateViewProjectionTransform)
+const ZEMatrix4x4& ZECamera::GetViewProjectionTransform() const
+{	
+	if (!DirtyViewProjectionTransform)
 		return ViewProjectionTransform;
 
-	ZEMatrix4x4::Multiply(ViewProjectionTransform, GetProjectionTransform(), GetViewTransform());
-	
-	UpdateViewTransform = false;
-	
+	ViewProjectionTransform = GetProjectionTransform() * GetViewTransform();
+
 	return ViewProjectionTransform;
-}
-
-void ZECamera::SetPosition(const ZEVector3& NewPosition)
-{
-	UpdateViewFrustum = true;
-	UpdateViewTransform = true;
-	UpdateViewProjectionTransform = true;
-	ZEEntity::SetPosition(NewPosition);
-}
-
-void ZECamera::SetRotation(const ZEQuaternion& NewRotation)
-{
-	UpdateViewFrustum = true;
-	UpdateViewTransform = true;
-	UpdateViewProjectionTransform = true;
-	ZEEntity::SetRotation(NewRotation);
-}
-
-void ZECamera::OnTransformChanged()
-{
-	UpdateViewFrustum = true;
-	UpdateViewTransform = true;
-	UpdateViewProjectionTransform = true;
-	ZEEntity::OnTransformChanged();
-}
-
-void ZECamera::SetNearZ(float NearZ)
-{
-	this->NearZ = NearZ;
-
-	UpdateViewFrustum = true;
-	UpdateProjectionTransform = true;
-	UpdateViewProjectionTransform = true;
-}
-
-float ZECamera::GetNearZ() const
-{
-	return NearZ;
-}
-
-void ZECamera::SetFarZ(float FarZ)
-{
-	this->FarZ = FarZ;
-
-	UpdateViewFrustum = true;
-	UpdateProjectionTransform = true;
-	UpdateViewProjectionTransform = true;
-}
-
-float ZECamera::GetFarZ() const
-{
-	return FarZ;
-}
-
-void ZECamera::SetFOV(float FOV)
-{
-	this->FOV = FOV;
-
-	UpdateViewFrustum = true;
-	UpdateProjectionTransform = true;
-	UpdateViewProjectionTransform = true;
-}
-
-float ZECamera::GetFOV() const
-{
-	return FOV;
-}
-
-void ZECamera::SetAspectRatio(float AspectRatio)
-{
-	this->AspectRatio = AspectRatio;
-
-	UpdateViewFrustum = true;
-	UpdateProjectionTransform = true;
-	UpdateViewProjectionTransform = true;
-}
-
-float ZECamera::GetAspectRatio() const
-{
-	return AspectRatio;
 }
 
 void ZECamera::SetShadowFadeDistance(float Value)
@@ -179,40 +94,30 @@ float ZECamera::GetVisibleShadowDistance() const
 	return VisibleShadowDistance;
 }
 
-const ZEView& ZECamera::GetView()
+ZEViewType ZECamera::GetViewType() const
 {
-	if (!UpdateView)
-		return View;
-
-	View.Type = ZE_VPT_CAMERA;
-	View.Camera = this;
-	View.FOV = GetFOV();
-	View.ProjectionTransform = GetProjectionTransform();
-	View.ViewTransform = GetViewTransform();
-	View.ViewProjectionTransform = GetViewProjectionTransform();
-	View.Rotation = GetWorldRotation();
-	View.Direction = GetWorldFront();
-
-	UpdateView = false;
-	return View;
+	return ZE_VT_CAMERA;
 }
 
-const ZEViewVolume& ZECamera::GetViewVolume()
+const ZEViewVolume* ZECamera::GetViewVolume() const
 {
-	if (!UpdateViewFrustum)
-		return ViewFrustum;
+	if (!DirtyViewVolume)
+		return &ViewVolume;
 
-	ViewFrustum.Create(GetWorldPosition(), GetWorldRotation(), FOV, AspectRatio, NearZ, FarZ);
+	float AspectRatio = ViewDimension.x / ViewDimension.y;
+	ViewVolume.Create(GetWorldPosition(), GetWorldRotation(), Fov, AspectRatio, NearZ, FarZ);
 
-	return ViewFrustum;
+	DirtyViewVolume = false;
+
+	return &ViewVolume;
 }
 
 void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
 {
 	ZEVector3 V;
 	const ZEMatrix4x4& ProjMatrix = GetProjectionTransform();
-	V.x =  (((2.0f * ScreenX ) / zeGraphics->GetScreenWidth()) - 1) / ProjMatrix.M11;
-	V.y = -(((2.0f * ScreenY ) / zeGraphics->GetScreenHeight()) - 1) / ProjMatrix.M22;
+	V.x =  (((2.0f * ScreenX ) / (ZEUInt)ViewDimension.x) - 1) / ProjMatrix.M11;
+	V.y = -(((2.0f * ScreenY ) / (ZEUInt)ViewDimension.y) - 1) / ProjMatrix.M22;
 	V.z =  1.0f;
 
 	ZEMatrix4x4 InvViewMatrix;
@@ -222,29 +127,23 @@ void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
 
 	Ray.p.x = InvViewMatrix.M41;
 	Ray.p.y = InvViewMatrix.M42;
-	Ray.p.z = InvViewMatrix.M43; 
+	Ray.p.z = InvViewMatrix.M43;
 	ZEVector3::Normalize(Ray.v, Ray.v);
 }
 
 ZECamera::ZECamera()
 {
-	NearZ = 0.3f;
-	FarZ = 200.0f;
-	
-	FOV = ZE_PI_2;
-	AspectRatio = Width / Height;
-
-	ShadowFadeDistance = 20.0f;
 	VisibleShadowDistance = 200.0f;
-	
-	Width = (float)zeGraphics->GetScreenWidth();
-	Height = (float)zeGraphics->GetScreenHeight();
+	ShadowFadeDistance = VisibleShadowDistance * 0.1f;
 
-	UpdateView = true;
-	UpdateViewFrustum = true;
-	UpdateViewTransform = true;
-	UpdateProjectionTransform = true;
-	UpdateViewProjectionTransform = true;
+	ViewTransform = ZEMatrix4x4::Identity;
+	ProjectionTransform = ZEMatrix4x4::Identity;
+	ViewProjectionTransform = ZEMatrix4x4::Identity;
+}
+
+ZECamera::~ZECamera()
+{
+
 }
 
 ZECamera* ZECamera::CreateInstance()

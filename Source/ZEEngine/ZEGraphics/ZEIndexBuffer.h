@@ -38,6 +38,7 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEGraphicsResource.h"
 
 enum ZEIndexBufferFormat
 {
@@ -46,31 +47,40 @@ enum ZEIndexBufferFormat
 	ZE_IBF_INDEX32		= 2
 };
 
-class ZEIndexBuffer
+class ZEIndexBuffer : public ZEGraphicsResource
 {
 	friend class ZEGraphicsModule;
 
 	protected:
-		bool					Static;
+		static ZESize			TotalSize;
+		static ZEUInt16			TotalCount;
+
+		ZEShadowCopy			ShadowCopy;
+
+		ZEIndexBufferFormat		Format;
 		ZESize					BufferSize;
 		ZESize					IndexCount;
-		ZEIndexBufferFormat		Format;
+
+		virtual bool			UpdateWith(ZEUInt ShadowIndex);
 
 								ZEIndexBuffer();
 		virtual					~ZEIndexBuffer();
 
 	public:
-		bool					IsStatic() const;
+		ZEGraphicsResourceType	GetResourceType() const;
+
 		ZESize					GetBufferSize() const;
 		ZESize					GetIndexCount() const;
 		ZEIndexBufferFormat		GetBufferFormat() const;
 
-		virtual bool			Unlock() = 0;
-		virtual bool			Lock(void** Data) = 0;
+		void					SetZero();
+		void					SetData(void* ConstantData);
+
+		void					Unlock();
+		bool					Lock(void** Data);
 		
-		virtual void			Destroy();
-		virtual bool			CreateDynamic(ZESize IndexCount, ZEIndexBufferFormat Format) = 0;
-		virtual bool			CreateStatic(ZESize IndexCount, ZEIndexBufferFormat Format, const void* IndexData) = 0;
+		virtual bool			CreateDynamic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData = NULL);
+		virtual bool			CreateStatic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData);
 		
 		static ZEIndexBuffer*	CreateInstance();
 };

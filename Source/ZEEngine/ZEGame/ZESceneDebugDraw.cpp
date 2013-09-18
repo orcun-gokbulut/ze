@@ -128,7 +128,7 @@ void ZESceneDebugDraw::Draw(ZERenderer* Renderer)
 		return;
 
 	RenderCommand.PrimitiveCount = (ZEUInt32)VertexBuffer.Vertices.GetCount() / 2;
-	Renderer->AddRenderCommand(&RenderCommand);
+//	Renderer->AddRenderCommand(&RenderCommand);
 }
 
 ZESceneDebugDraw::ZESceneDebugDraw()

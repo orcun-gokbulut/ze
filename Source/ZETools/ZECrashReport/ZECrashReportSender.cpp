@@ -53,10 +53,10 @@ int ZECrashReportSender::ProgressFunction(void* Output, double TotalDownloadSize
 
 	ProgressInformationLock.Lock();
 	
-	ProgressInformation.TotalDownloadSize = TotalDownloadSize;
-	ProgressInformation.DownloadedSize = Downloaded;
-	ProgressInformation.TotalUploadSize = TotalUploadSize;
-	ProgressInformation.UploadedSize = Uploaded;
+	ProgressInformation.TotalDownloadSize = (ZESize)TotalDownloadSize;
+	ProgressInformation.DownloadedSize = (ZESize)Downloaded;
+	ProgressInformation.TotalUploadSize = (ZESize)TotalUploadSize;
+	ProgressInformation.UploadedSize = (ZESize)Uploaded;
 
 	ProgressInformation.ProcessPercentage = (ProgressInformation.UploadedSize * 100) / ProgressInformation.TotalUploadSize;
 

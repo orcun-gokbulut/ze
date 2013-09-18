@@ -45,7 +45,8 @@ enum ZEShaderModel
 	ZE_SM_NONE		= 0,
 	ZE_SM_3_0		= 1,
 	ZE_SM_4_0		= 2,
-	ZE_SM_5_0		= 3
+	ZE_SM_4_1		= 3,
+	ZE_SM_5_0		= 4
 };
 
 enum ZEShaderType

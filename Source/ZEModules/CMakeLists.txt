@@ -58,11 +58,3 @@ ze_add_source(CMakeLists.txt		Sources)
 ze_add_library(ZEModules 
 	SOURCES ${Sources}
 	LIBS ${Modules})
-
-#ze_combine_libraries(ZEModules 
-#	LIBS ZEDirect3D10
-#		 ZEWindowsInput
-#		 ZEVRPNInput
-#		 ZEDirectSound
-#		 ZEOpenAL
-#		 ZEPhysX)

@@ -99,8 +99,8 @@ class ZEBlendState
 		void						SetAlphaToCoverageEnable(bool Enable);
 		bool						GetAlphaToCoverageEnable() const;
 
-		void						SetBlendEnable(ZESize Target, bool Enable);
-		bool						GetBlendEnable(ZESize Target) const;
+		void						SetBlendEnable(ZEUInt RenderTarget, bool Enable);
+		bool						GetBlendEnable(ZEUInt RenderTarget) const;
 		
 		void						SetSourceBlendOption(ZEBlendOption Option);
 		ZEBlendOption				GetSourceBlendOption() const;
@@ -120,8 +120,8 @@ class ZEBlendState
 		void						SetBlendAlphaEquation(ZEBlendEquation Equation);
 		ZEBlendEquation				GetBlendAlphaEquation() const;
 
-		void						SetComponentWriteMask(ZESize Target, ZEColorWriteMask Mask);
-		ZEColorWriteMask			GetComponentWriteMask(ZESize Target) const;
+		void						SetComponentWriteMask(ZEUInt RenderTarget, ZEColorWriteMask Mask);
+		ZEColorWriteMask			GetComponentWriteMask(ZEUInt RenderTarget) const;
 
 		void						SetToDefault();
 		

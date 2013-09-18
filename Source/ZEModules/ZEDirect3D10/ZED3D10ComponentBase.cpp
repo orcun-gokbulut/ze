@@ -36,13 +36,17 @@
 #include "ZED3D10ComponentBase.h"
 #include "ZED3D10GraphicsModule.h"
 
-ZED3D10GraphicsModule*	ZED3D10ComponentBase::GraphicsModule = NULL;
-ID3D10Device*			ZED3D10ComponentBase::D3D10Device = NULL;
+ZEArray<ID3D11Device*> ZED3D10ComponentBase::D3DDevices;
+ZEArray<ID3D11DeviceContext*> ZED3D10ComponentBase::D3DContexes;
+
+ZED3D10GraphicsModule* ZED3D10ComponentBase::GraphicsModule = NULL;
 
 bool ZED3D10ComponentBase::BaseInitialize(ZED3D10GraphicsModule* Module)
 {
 	GraphicsModule = Module;
-	D3D10Device = Module->GetD3D10Device();
-	
+
+	D3DDevices = Module->GetD3D10Devices();
+	D3DContexes = Module->GetD3D10Contexes();
+
 	return true;
 }

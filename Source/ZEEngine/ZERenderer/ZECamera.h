@@ -37,72 +37,37 @@
 #ifndef	__ZE_CAMERA_H__
 #define __ZE_CAMERA_H__
 
-#include "ZEGame/ZEEntity.h"
+#include "ZERenderer/ZEView.h"
 #include "ZEMath/ZEViewFrustum.h"
-#include "ZEGame/ZEDrawParameters.h"
 
-enum ZECameraProjectionType
+class ZECamera : public ZEView
 {
-	ZE_CPT_NONE,
-	ZE_CPT_ORTHOGRAPHICAL,
-	ZE_CPT_PERSPECTIVE
-};
-
-class ZECamera : public ZEEntity
-{
-	private:
-		bool						UpdateView;
-		bool						UpdateViewFrustum;
-		bool						UpdateViewTransform;
-		bool						UpdateProjectionTransform;
-		bool						UpdateViewProjectionTransform;
-
-		float						NearZ, FarZ;
-		float						FOV, AspectRatio;
-		float						Width, Height;
-
+	protected:
 		float						ShadowFadeDistance;
 		float						VisibleShadowDistance;
 
-		ZEMatrix4x4					ViewTransform;
-		ZEMatrix4x4					ProjectionTransform;
-		ZEMatrix4x4					ViewProjectionTransform;
+		mutable ZEMatrix4x4			ViewTransform;
+		mutable ZEMatrix4x4			ProjectionTransform;
+		mutable ZEMatrix4x4			ViewProjectionTransform;
 
-		ZEView						View;
-		ZEViewFrustum				ViewFrustum;
+		mutable ZEViewFrustum		ViewVolume;
 		
 									ZECamera();
-
-		virtual void				OnTransformChanged();
+		virtual						~ZECamera();
 
 	public:
-		void						SetNearZ(float NearZ);
-		float						GetNearZ() const;
-
-		void						SetFarZ(float FarZ);
-		float						GetFarZ() const;
-
-		void						SetFOV(float FOV);
-		float						GetFOV() const;
-
-		void						SetAspectRatio(float AspectRatio);
-		float						GetAspectRatio() const;
-
 		void						SetShadowFadeDistance(float Value);
 		float						GetShadowFadeDistance() const;
 	
 		void						SetVisibleShadowDistance(float Value);
 		float						GetVisibleShadowDistance() const;
+		
+		virtual ZEViewType			GetViewType() const;
+		virtual const ZEViewVolume*	GetViewVolume() const;
 
-		const ZEMatrix4x4&			GetViewTransform();
-		const ZEMatrix4x4&			GetProjectionTransform();
-		const ZEMatrix4x4&			GetViewProjectionTransform();
-
-		virtual void				SetPosition(const ZEVector3& NewPosition);
-		virtual void				SetRotation(const ZEQuaternion& NewRotation);
-
-		const ZEView&				GetView();
-		const ZEViewVolume&			GetViewVolume();
+		virtual const ZEMatrix4x4&	GetViewTransform() const;
+		virtual const ZEMatrix4x4&	GetProjectionTransform() const;
+		virtual const ZEMatrix4x4&	GetViewProjectionTransform() const;
 
 		void						GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
 

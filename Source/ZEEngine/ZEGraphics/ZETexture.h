@@ -39,6 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEGraphicsResource.h"
 
 enum ZETextureType
 {
@@ -100,31 +101,23 @@ enum ZETexturePixelFormat
 	ZE_TPF_LA16		= ZE_TPF_I16_2
 };
 
-class ZETexture
+class ZETexture : public ZEGraphicsResource
 {
 	friend class ZEGraphicsDevice;
 	friend class ZEGraphicsModule;
 
 	protected:
-		bool						Static;
-		bool						RenderTarget;
-		ZETextureType				TextureType;
-		ZEVector3					PixelSize;
 		ZETexturePixelFormat		PixelFormat;
-	
+		ZETextureType				TextureType;
+		bool						IsRenderTarget;
+
 									ZETexture();
 		virtual						~ZETexture();
 
 	public:
-		bool						IsStatic() const;
-		bool						IsRenderTarget() const;
-		ZETextureType				GetTextureType() const;
 		ZETexturePixelFormat		GetPixelFormat() const;
-		const ZEVector3&			GetPixelSize() const;
-
-		virtual bool				IsEmpty() const = 0;
-
-		virtual void				Destroy();
+		ZETextureType				GetTextureType() const;
+		bool						GetIsRenderTarget() const;
 };
 
 #endif

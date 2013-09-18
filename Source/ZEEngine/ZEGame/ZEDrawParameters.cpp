@@ -53,9 +53,8 @@ void ZEDrawParameters::Clear()
 	
 	Renderer = NULL;
 
-	OwnerBucket = NULL;
-	Stages = ZE_RST_ALL;
-
+	Stages = ZE_RST_NONE;
+	Bucket = NULL;
+	
 	View = NULL;
-	ViewVolume = NULL;
 }

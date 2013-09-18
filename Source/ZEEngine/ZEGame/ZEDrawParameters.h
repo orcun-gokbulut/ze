@@ -38,64 +38,32 @@
 #define __ZE_DRAW_PARAMETERS_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEDrawStatistics.h"
 #include "ZERenderer/ZERenderStage.h"
 
-class ZELight;
-class ZECamera;
+class ZEView;
 class ZERenderer;
-class ZEViewVolume;
-
-enum ZERenderPass
-{
-	ZE_RP_COLOR,
-	ZE_RP_DEPTH,
-	ZE_RP_SHADOW_MAP,
-	ZE_RP_OCCLUSION_MAP
-};
-
-enum ZEViewType
-{
-	ZE_VT_CAMERA,
-	ZE_VT_LIGHT
-};
-
-struct ZEView
-{
-	ZEViewType				Type;
-
-	union
-	{
-		ZELight*			Light;
-		ZECamera*			Camera;
-
-	};
-};
-
 class ZERenderTarget;
 class ZECommandBucket;
 
 class ZEDrawParameters
 {
 	public:
-		ZESize					FrameId;
-		float					ElapsedTime;
-		float					Time;
+		float				Time;
+		float				ElapsedTime;
+		ZESize				FrameId;
 
-		ZERenderer*				Renderer;
-		
-		ZERenderStageType		Stages;
-		ZECommandBucket*		OwnerBucket;
+		const ZEView*		View;
+		ZERenderer*			Renderer;
 
-		const ZEView*			View;
-		const ZEViewVolume*		ViewVolume;
+		ZERenderStageType	Stages;
+		ZECommandBucket*	Bucket;
 
-		void					Clear();
+		void				Clear();
 
-								ZEDrawParameters();
-								~ZEDrawParameters();
+							ZEDrawParameters();
+							~ZEDrawParameters();
 };
 
 #endif

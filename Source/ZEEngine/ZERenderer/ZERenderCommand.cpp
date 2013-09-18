@@ -104,24 +104,35 @@ ZERenderCommand::ZERenderCommand(ZESize CommandSize, ZERenderCommandType Command
 	Size = CommandSize;
 	Type = CommandType;
 
-
 	Order = 3.0f;
 	Priority = 3;
-	
+
 	Material = NULL;
 
 	Skinned = false;
+	SkinningBuffer = NULL;
 
-	SkinningBuffer = ZEConstantBuffer::CreateInstance();
-	SkinningBuffer->Create(sizeof(ZESkinningBuffer));
-
-	TransformationBuffer = ZEConstantBuffer::CreateInstance();
-	TransformationBuffer->Create(sizeof(ZETransformationBuffer));
+	WorldTransform = ZEMatrix4x4::Identity;	
 }
 
 ZERenderCommand::~ZERenderCommand()
 {
 
+}
+
+ZEUInt32 ZERenderCommand::GetId() const
+{
+	return Id;
+}
+
+ZESize ZERenderCommand::GetSize() const
+{
+	return Size;
+}
+
+ZERenderCommandType ZERenderCommand::GetType() const
+{
+	return Type;
 }
 
 ZERenderCommandDefault::ZERenderCommandDefault()

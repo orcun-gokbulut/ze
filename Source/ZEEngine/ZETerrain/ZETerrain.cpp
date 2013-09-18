@@ -486,7 +486,7 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt Po
 			RenderCommand.PrimitiveCount += BarSize * 2;
 	}
 
-	Renderer->AddRenderCommand(&RenderCommand);
+//	Renderer->AddRenderCommand(&RenderCommand);
 
 	return true;
 }
@@ -499,7 +499,7 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	if (Levels.GetCount() == 0)
 		return;
 
-	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
+	if (DrawParameters->Stages.GetFlags(ZE_RST_SHADOW))
 		return;
 
 	static ZEInt PositionX;

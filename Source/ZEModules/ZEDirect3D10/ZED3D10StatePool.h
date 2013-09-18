@@ -34,8 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_D3D10_STATE_POOL_H__
-#define __ZE_D3D10_STATE_POOL_H__
+#ifndef __ZE_D3D11_STATE_POOL_H__
+#define __ZE_D3D11_STATE_POOL_H__
+
+#include <d3d11.h>
 
 #include "ZETypes.h"
 #include "ZEDS/ZEList.h"
@@ -55,7 +57,7 @@ class ZEStatePoolEntry : public ZEListItem
 			Hash = 0;
 			AccessCount = 0;
 		}
-		ZEStatePoolEntry(ZEUInt64 Hash, ZEUInt64 AccessCount)
+		ZEStatePoolEntry(ZESize Hash, ZESize AccessCount)
 		{
 			this->Hash = Hash;
 			this->AccessCount = AccessCount;
@@ -66,22 +68,16 @@ class ZEStatePoolEntry : public ZEListItem
 		}
 };
 
-struct ID3D10InputLayout;
-struct ID3D10BlendState;
-struct ID3D10SamplerState;
-struct ID3D10RasterizerState;
-struct ID3D10DepthStencilState;
-
 class ZEBlendStateEntry : public ZEStatePoolEntry
 {
 	public:
-		ID3D10BlendState* BlendState;
+		ID3D11BlendState* BlendState;
 
 		ZEBlendStateEntry()
 		{
 			BlendState = NULL;
 		}
-		ZEBlendStateEntry(ID3D10BlendState* BlendState, ZEUInt64 Hash, ZEUInt64 AccessCount) : ZEStatePoolEntry(Hash, AccessCount)
+		ZEBlendStateEntry(ID3D11BlendState* BlendState, ZESize Hash, ZESize AccessCount) : ZEStatePoolEntry(Hash, AccessCount)
 		{
 			this->BlendState = BlendState;
 		}
@@ -94,13 +90,13 @@ class ZEBlendStateEntry : public ZEStatePoolEntry
 class ZESamplerStateEntry : public ZEStatePoolEntry
 {
 	public:
-		ID3D10SamplerState*	SamplerState;
+		ID3D11SamplerState*	SamplerState;
 
 		ZESamplerStateEntry()
 		{
 			SamplerState = NULL;
 		}
-		ZESamplerStateEntry(ID3D10SamplerState* SamplerState, ZEUInt64 Hash, ZEUInt64 AccessCount) : ZEStatePoolEntry(Hash, AccessCount)
+		ZESamplerStateEntry(ID3D11SamplerState* SamplerState, ZESize Hash, ZESize AccessCount) : ZEStatePoolEntry(Hash, AccessCount)
 		{
 			this->SamplerState = SamplerState;
 		}
@@ -113,13 +109,13 @@ class ZESamplerStateEntry : public ZEStatePoolEntry
 class ZERasterizerStateEntry : public ZEStatePoolEntry
 {
 	public:
-		ID3D10RasterizerState* RasterizerState;
+		ID3D11RasterizerState* RasterizerState;
 
 		ZERasterizerStateEntry()
 		{
 			RasterizerState = NULL;
 		}
-		ZERasterizerStateEntry(ID3D10RasterizerState* RasterizerState, ZEUInt64 Hash, ZEUInt64 AccessCount) : ZEStatePoolEntry(Hash, AccessCount)
+		ZERasterizerStateEntry(ID3D11RasterizerState* RasterizerState, ZESize Hash, ZESize AccessCount) : ZEStatePoolEntry(Hash, AccessCount)
 		{
 			this->RasterizerState = RasterizerState;
 		}
@@ -132,13 +128,13 @@ class ZERasterizerStateEntry : public ZEStatePoolEntry
 class ZEDepthStencilStateEntry : public ZEStatePoolEntry
 {
 	public:
-		ID3D10DepthStencilState* DepthStencilState;
+		ID3D11DepthStencilState* DepthStencilState;
 
 		ZEDepthStencilStateEntry()
 		{
 			DepthStencilState = NULL;
 		}
-		ZEDepthStencilStateEntry(ID3D10DepthStencilState* DepthStencilState, ZEUInt64 Hash, ZEUInt64 AccessCount) : ZEStatePoolEntry(Hash, AccessCount)
+		ZEDepthStencilStateEntry(ID3D11DepthStencilState* DepthStencilState, ZESize Hash, ZESize AccessCount) : ZEStatePoolEntry(Hash, AccessCount)
 		{
 			this->DepthStencilState = DepthStencilState;
 		}
@@ -151,13 +147,13 @@ class ZEDepthStencilStateEntry : public ZEStatePoolEntry
 class ZEVertexLayoutEntry : public ZEStatePoolEntry
 {
 	public:
-		ID3D10InputLayout* VertexLayout;
+		ID3D11InputLayout* VertexLayout;
 
 		ZEVertexLayoutEntry()
 		{
 			VertexLayout = NULL;
 		}
-		ZEVertexLayoutEntry(ID3D10InputLayout* VertexLayout, ZEUInt64 Hash, ZEUInt64 AccessCount) : ZEStatePoolEntry(Hash, AccessCount)
+		ZEVertexLayoutEntry(ID3D11InputLayout* VertexLayout, ZESize Hash, ZESize AccessCount) : ZEStatePoolEntry(Hash, AccessCount)
 		{
 			this->VertexLayout = VertexLayout;
 		}
@@ -174,33 +170,24 @@ class ZESamplerState;
 class ZERasterizerState;
 class ZEDepthStencilState;
 
-struct ID3D10Blob;
-
 class ZED3D10StatePool : public ZEStatePool, public ZED3D10ComponentBase
 {
 	friend class ZED3D10GraphicsModule;
 
 	protected:
-		static ZEUInt16				BlendStateCount;
-		static ZEUInt16				SamplerStateCount;
-		static ZEUInt16				VertexlayoutCount;
-		static ZEUInt16				RasterizerStateCount;
-		static ZEUInt16				DepthStencilStateCount;
-		static ZEUInt16				StatesPerSecond;	// Not active yet
-
 		ZEList<ZEStatePoolEntry>	BlendStatePool;
 		ZEList<ZEStatePoolEntry>	VertexLayoutPool;
 		ZEList<ZEStatePoolEntry>	SamplerStatePool;
 		ZEList<ZEStatePoolEntry>	RasterizerStatePool;
 		ZEList<ZEStatePoolEntry>	DepthStencilStatePool;
 		
-		ZEStatePoolEntry*			FindPoolEntry(ZEList<ZEStatePoolEntry>& Pool, ZESize Hash);
+		ID3D11BlendState*			CreateD3D10State(ZEBlendState* BlendState);
+		ID3D11SamplerState*			CreateD3D10State(ZESamplerState* SamplerState);
+		ID3D11RasterizerState*		CreateD3D10State(ZERasterizerState* RasterizerState);
+		ID3D11DepthStencilState*	CreateD3D10State(ZEDepthStencilState* DepthStencilState);
+		ID3D11InputLayout*			CreateD3D10State(ZEVertexLayout* VertexLayout, ID3DBlob* ByteCode);
 
-		ID3D10BlendState*			CreateD3D10State(ZEBlendState* BlendState);
-		ID3D10SamplerState*			CreateD3D10State(ZESamplerState* SamplerState);
-		ID3D10RasterizerState*		CreateD3D10State(ZERasterizerState* RasterizerState);
-		ID3D10DepthStencilState*	CreateD3D10State(ZEDepthStencilState* DepthStencilState);
-		ID3D10InputLayout*			CreateD3D10State(ZEVertexLayout* VertexLayout, ID3D10Blob* ByteCode);
+		ZEStatePoolEntry*			FindPoolEntry(ZEList<ZEStatePoolEntry>& Pool, ZESize Hash);
 
 									ZED3D10StatePool();
 		virtual						~ZED3D10StatePool();
@@ -208,17 +195,11 @@ class ZED3D10StatePool : public ZEStatePool, public ZED3D10ComponentBase
 	public:
 		virtual void				ClearStates();
 
-		virtual void*				GetBlendState(ZESize Hash);
-		virtual void*				GetSamplerState(ZESize Hash);
-		virtual void*				GetVertexLayout(ZESize Hash);
-		virtual void*				GetRasterizerState(ZESize Hash);
-		virtual void*				GetDepthStencilState(ZESize Hash);
-
-		virtual void*				CreateState(ZEBlendState* BlendState);
-		virtual void*				CreateState(ZESamplerState* SamplerState);
-		virtual void*				CreateState(ZERasterizerState* RasterizerState);
-		virtual void*				CreateState(ZEDepthStencilState* DepthStencilState);
-		virtual void*				CreateState(ZEVertexLayout* VertexLayout, const ZEShader* VertexShader);
+		virtual void*				GetState(ZEBlendState* BlendState);
+		virtual void*				GetState(ZESamplerState* SamplerState);
+		virtual void*				GetState(ZERasterizerState* RasterizerState);
+		virtual void*				GetState(ZEDepthStencilState* DepthStencilState);
+		virtual void*				GetState(ZEVertexLayout* VertexLayout, const ZEShader* VertexShader);
 };
 
 #endif

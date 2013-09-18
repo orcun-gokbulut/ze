@@ -47,7 +47,10 @@ class ZEMaterialLightOmniProjective;
 
 class ZELightOmniProjective : public ZELight
 {
-	private:
+	protected:
+		bool							PropertyChanged;
+		bool							TransformChanged;
+
 		float							Range;
 		ZEVector3						Color;
 		float							Intensity;
@@ -57,14 +60,18 @@ class ZELightOmniProjective : public ZELight
 		float							SlopeScaledBias;
 		float							DepthScaledBias;
 
+		const ZETextureCube*			ProjectionTexture;
+
 		ZEMaterialLightOmniProjective*	Material;
 		ZEVertexBuffer*					VertexBuffer;
 		ZEVertexLayout					VertexLayout;
 
 		ZERenderCommandDefault			RenderCommand;
-		ZEViewSphere					ViewVolume;
+		mutable ZEViewSphere			ViewVolume;
 
 		virtual void					UpdateMaterial(const ZEDrawParameters* DrawParameters);
+
+		virtual void					OnTransformChanged();
 
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
@@ -101,7 +108,7 @@ class ZELightOmniProjective : public ZELight
 		void							SetProjectionTexture(const ZETextureCube* Texture);
 		const ZETextureCube*			GetProjectionTexture() const;
 
-		virtual const ZEViewVolume*		GetLightVolume();
+		virtual ZELightType				GetLightType() const;
 
 		virtual void					Tick(float Time);
 		virtual void					Draw(ZEDrawParameters* DrawParameters);

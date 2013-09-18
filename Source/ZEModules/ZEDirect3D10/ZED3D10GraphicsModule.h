@@ -33,14 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef	__ZE_D3D10_GRAPHICS_MODULE_H__
-#define __ZE_D3D10_GRAPHICS_MODULE_H__
+#ifndef	__ZE_D3D11_GRAPHICS_MODULE_H__
+#define __ZE_D3D11_GRAPHICS_MODULE_H__
+
+#include <dxgi1_2.h>
+#include <d3d11.h>
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-
-#include <D3D10.h>
+#include "ZEGraphics/ZEGraphicsMonitor.h"
 
 class ZETexture2D;
 class ZETexture3D;
@@ -52,6 +54,7 @@ class ZEShaderCompiler;
 class ZEGraphicsDevice;
 class ZEDepthStencilBuffer;
 class ZEGraphicsEventTracer;
+class ZED3D10GraphicsDevice;
 
 #define ZED3D_RELEASE(x)	\
 {							\
@@ -62,61 +65,69 @@ class ZEGraphicsEventTracer;
 	}						\
 }
 
+#define ZE_MAX_MULTI_SAMPLE_COUNT		D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT
+#define ZE_MAX_ANISOTROPY_LEVEL			D3D11_MAX_MAXANISOTROPY
+
 class ZED3D10GraphicsModule : public ZEGraphicsModule
 {
 	ZE_MODULE(ZED3D10GraphicsModule)
 
 	protected:
-		bool							Enabled;
-		ZEString						AdapterName;
-		ZEArray<DXGI_MODE_DESC>			AvailableModes;
+		IDXGIFactory2*							DXGIFactory;
 
-		ID3D10Device*					Device;
-		IDXGISwapChain*					SwapChain;
-		IDXGIOutput*					AdapterOutput;
-		IDXGIAdapter*					Adapter;
-		IDXGIFactory*					Factory;
+		ZEArray<IDXGIAdapter2*>					Adapters;
+		ZEArray<ID3D11Device*>					D3DDevices;
+		ZEArray<ID3D11DeviceContext*>			D3DContexes;
+
+		DXGI_FORMAT								DisplayFormat;
+
+		void									ReleaseWindows();
+
+		void									ReleaseFactory();
+		bool									CreateFactory();
+
+		void									ReleaseAdapters();
+		bool									EnumerateAdapters();
+
+		void									ReleaseMonitors();
+		bool									EnumerateMonitors();
+
+		void									ReleaseDevices();
+		bool									CreateDevices();
+
+		bool									DisableAssociations();
 		
-		bool							SetFullScreenState(bool Value);
-		bool							ResizeBackBuffers(ZEUInt Width, ZEUInt Height);
-		bool							ResizeFrontBuffer(DXGI_MODE_DESC& ModeToSwitchTo);
-		DXGI_MODE_DESC					FindMatchingDisplayMode(ZEUInt Width, ZEUInt Height);
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
 
-		bool							CreateBuffers(ZEUInt Width, ZEUInt Height);
-		void							DestroyBuffers();
-
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
-
-										ZED3D10GraphicsModule();
-		virtual							~ZED3D10GraphicsModule();
+												ZED3D10GraphicsModule();
+		virtual									~ZED3D10GraphicsModule();
 
 	public:
-		virtual bool					SetFullScreen(bool Enabled);
-		virtual bool					SetSampleCount(ZEUInt Count);
-		virtual void					SetVerticalSync(bool Enabled);
-		virtual bool					SetScreenCount(ZEUInt Count);
+		virtual ZEStatePool*					GetStatePool() const;
+		virtual ZEGraphicsEventTracer*			GetEventTracer() const;
+		virtual ZEShaderCompiler*				GetShaderCompiler() const;
+
+		virtual ZETexture2D*					CreateTexture2D();
+		virtual ZETexture3D*					CreateTexture3D();
+		virtual ZETextureCube*					CreateTextureCube();
+		virtual ZEIndexBuffer*					CreateIndexBuffer();
+		virtual ZEVertexBuffer*					CreateVertexBuffer();
+		virtual ZEGraphicsWindow*				CreateGraphicsWindow();
+		virtual ZEConstantBuffer*				CreateConstantBuffer();
+		virtual ZEDepthStencilBuffer*			CreateDepthStencilBuffer();
 		
-		virtual void					SetAnisotropicFilter(ZEUInt Anisotropy);
-		virtual bool					SetScreenSize(ZEUInt Width, ZEUInt Height);
+		ID3D11Device*							GetD3D10Device(ZESize Index = 0) const;
+		const ZEArray<ID3D11Device*>&			GetD3D10Devices() const;
+		
+		ID3D11DeviceContext*					GetD3D10Context(ZESize Index = 0) const;
+		const ZEArray<ID3D11DeviceContext*>&	GetD3D10Contexes() const;
 
-		virtual void					GetStatistics(ZEGraphicsStatistics& Statistics) const;
-
-		virtual ZEGraphicsDevice*		GetDevice() const;
-		virtual ZEGraphicsEventTracer*	GetEventTracer() const;
-		virtual ZEShaderCompiler*		GetShaderCompiler() const;
-		virtual ZEStatePool*			GetStatePool() const;
-
-		virtual ZETexture2D*			CreateTexture2D() const;
-		virtual ZETexture3D*			CreateTexture3D() const;
-		virtual ZETextureCube*			CreateTextureCube() const;
-		virtual ZEIndexBuffer*			CreateIndexBuffer() const;
-		virtual ZEVertexBuffer*			CreateVertexBuffer() const;
-		virtual ZEConstantBuffer*		CreateConstantBuffer() const;
-		virtual ZEDepthStencilBuffer*	CreateDepthStencilBuffer() const;
-
-		ID3D10Device*					GetD3D10Device() const;
-		IDXGISwapChain*					GetDXGISwapChain() const;
+		IDXGIFactory2*							GetDXGIFactory() const;
+		DXGI_FORMAT								GetDXGIDisplayFormat() const;
 };
+
+
+
 
 #endif

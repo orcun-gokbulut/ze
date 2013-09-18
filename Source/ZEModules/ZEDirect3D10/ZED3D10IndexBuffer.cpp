@@ -33,12 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
+#include "ZEError.h"
 #include "ZED3D10IndexBuffer.h"
 #include "ZED3D10GraphicsModule.h"
-#include "ZEError.h"
-
-#include <D3D10.h>
 
 inline static ZESize GetIndexSize(ZEIndexBufferFormat Format)
 {
@@ -51,112 +48,100 @@ inline static ZESize GetIndexSize(ZEIndexBufferFormat Format)
 	return FormatToIndexSize[Format];
 }
 
-const ID3D10Buffer* ZED3D10IndexBuffer::GetD3D10Buffer() const
+bool ZED3D10IndexBuffer::UpdateWith(ZEUInt ShadowIndex)
+{
+	if (!ShadowCopy.GetChanged(ShadowIndex))
+		return true;
+
+	D3D11_MAPPED_SUBRESOURCE Mapped;
+	HRESULT Result = D3DContexes[0]->Map(D3D10Buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &Mapped);
+	if (FAILED(Result))
+	{
+		zeError("D3D10 Index buffer mapping failed. ErrorCode: %d.", Result);
+		return false;
+	}
+
+	ZESize Size = ShadowCopy.GetSliceCount() * ShadowCopy.GetSliceSize();
+	const void* Data = ShadowCopy.GetConstData(ShadowIndex);
+
+	memcpy(Mapped.pData, Data, Size);
+
+	D3DContexes[0]->Unmap(D3D10Buffer, 0);
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Index buffer contents updated. IndexBuffer: %p, ShadowCOpyIdnex: %u.", this, ShadowIndex);
+#endif
+
+	return ZEIndexBuffer::UpdateWith(ShadowIndex);
+}
+
+const ID3D11Buffer* ZED3D10IndexBuffer::GetD3D10Buffer() const
 {
 	return D3D10Buffer;
 }
 
-bool ZED3D10IndexBuffer::CreateDynamic(ZESize IndexCount, ZEIndexBufferFormat Format)
+bool ZED3D10IndexBuffer::CreateDynamic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData)
 {
-	zeDebugCheck(IndexCount == 0, "Zero vertex count.");
-	zeDebugCheck(Format == ZE_IBF_NONE, "Format not set");
-	zeDebugCheck(D3D10Buffer != NULL, "Buffer already created.");
-	
-	D3D10_BUFFER_DESC BufferDesc;
+	zeDebugCheck(GetIsCreated(), "Buffer already created.");
+	zeDebugCheck(IndexCount == 0, "Cannot create empty buffer.");
+	zeDebugCheck(Format == ZE_IBF_NONE, "Unknown buffer format.");
+
+	ZESize Size = GetIndexSize(Format) * (ZESize)IndexCount;
+	zeDebugCheck(Size > 134217728, "Buffer too large");
+
+	D3D11_BUFFER_DESC BufferDesc;
 	BufferDesc.MiscFlags = 0;
-	BufferDesc.Usage = D3D10_USAGE_DYNAMIC;
-	BufferDesc.BindFlags = D3D10_BIND_INDEX_BUFFER;
-	BufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
-	BufferDesc.ByteWidth = (UINT)(IndexCount * GetIndexSize(Format));
+	BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	BufferDesc.ByteWidth = (UINT)Size;
 
-	if (FAILED(D3D10Device->CreateBuffer(&BufferDesc, NULL, &D3D10Buffer)))
+	D3D11_SUBRESOURCE_DATA Data;
+	Data.pSysMem = InitialData;
+	Data.SysMemPitch = 0;
+	Data.SysMemSlicePitch = 0;
+
+	HRESULT Result = D3DDevices[0]->CreateBuffer(&BufferDesc, InitialData == NULL ? NULL : &Data, &D3D10Buffer);
+	if (FAILED(Result))
 	{
-		zeError("Can not create index buffer.");
+		zeError("D3D10 Dynamic index buffer creation failed. ErrorCode: %d.", Result);
 		return false;
 	}
-	
-	this->Static = false;
-	this->Format = Format;
-	this->IndexCount = IndexCount;
-	this->BufferSize = IndexCount * GetIndexSize(Format);
 
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Dynamic index buffer created. IndexCount: %u, Format: %u, Size: %u.", 
-			IndexCount, Format, BufferDesc.ByteWidth);
-#endif
-
-	GlobalSize += BufferSize;
-	GlobalCount++;
-
-	return true;
+	return ZEIndexBuffer::CreateDynamic(IndexCount, Format, InitialData);
 }
 
-bool ZED3D10IndexBuffer::CreateStatic(ZESize IndexCount, ZEIndexBufferFormat Format, const void* IndexData)
+bool ZED3D10IndexBuffer::CreateStatic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData)
 {
-	zeDebugCheck(IndexData == NULL, "NULL pointer.");
-	zeDebugCheck(IndexCount == 0, "Zero vertex count.");
-	zeDebugCheck(Format == ZE_IBF_NONE, "Format not set");
-	zeDebugCheck(D3D10Buffer != NULL, "Buffer already created.");
+	zeDebugCheck(GetIsCreated(), "Buffer already created.");
+	zeDebugCheck(IndexCount == 0, "Cannot create empty buffer.");
+	zeDebugCheck(InitialData == NULL, "Buffer must have initial data.");
+	zeDebugCheck(Format == ZE_IBF_NONE, "Unknown buffer format");
 
-	D3D10_BUFFER_DESC BufferDesc;
+	ZESize Size = GetIndexSize(Format) * (ZESize)IndexCount;
+	zeDebugCheck(Size > 134217728, "Buffer too large");
+	
+	D3D11_BUFFER_DESC BufferDesc;
 	BufferDesc.MiscFlags = 0;
-	BufferDesc.Usage = D3D10_USAGE_DYNAMIC;
-	BufferDesc.BindFlags = D3D10_BIND_INDEX_BUFFER;
-	BufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
-	BufferDesc.ByteWidth = (UINT)(IndexCount * GetIndexSize(Format));
+	BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	BufferDesc.ByteWidth = (UINT)Size;
 
-	D3D10_SUBRESOURCE_DATA InitialData;
-	InitialData.pSysMem = IndexData;
-	InitialData.SysMemPitch = 0;
-	InitialData.SysMemSlicePitch = 0;
+	D3D11_SUBRESOURCE_DATA Data;
+	Data.pSysMem = InitialData;
+	Data.SysMemPitch = 0;
+	Data.SysMemSlicePitch = 0;
 
-	if (FAILED(D3D10Device->CreateBuffer(&BufferDesc, &InitialData, &D3D10Buffer)))
+	HRESULT Result = D3DDevices[0]->CreateBuffer(&BufferDesc, &Data, &D3D10Buffer);
+	if (FAILED(Result))
 	{
-		zeError("Can not create static index buffer.");
+		zeError("D3D10 Static index buffer creation failed. ErrorCode: %d.", Result);
 		return false;
 	}
 	
-	this->Static = true;
-	this->Format = Format;
-	this->IndexCount = IndexCount;
-	this->BufferSize = IndexCount * GetIndexSize(Format);
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Static index buffer created. IndexCount: %u, Format: %u, Size: %u.", 
-			IndexCount, Format, BufferDesc.ByteWidth);
-#endif
-
-	GlobalSize += BufferSize;
-	GlobalCount++;
-	
-	return true;
+	return ZEIndexBuffer::CreateStatic(IndexCount, Format, InitialData);
 }
-
-bool ZED3D10IndexBuffer::Lock(void** Data)
-{
-	zeDebugCheck(D3D10Buffer == NULL, "Buffer not created.");
-	zeDebugCheck(Static, "Static buffer not be locked/unlocked.");
-	
-	if (FAILED(D3D10Buffer->Map(D3D10_MAP_WRITE_DISCARD, 0, Data)))
-	{
-		zeError("Can not lock dynamic index buffer.");
-		return false;
-	}
-
-	return true;
-}
-
-bool ZED3D10IndexBuffer::Unlock()
-{
-	zeDebugCheck(D3D10Buffer == NULL, "Buffer not created.");
-	zeDebugCheck(Static, "Static buffer not be locked/unlocked.");
-		
-	D3D10Buffer->Unmap();
-	return true;
-}
-
-ZESize		ZED3D10IndexBuffer::GlobalSize = 0;
-ZEUInt16	ZED3D10IndexBuffer::GlobalCount = 0;
 
 ZED3D10IndexBuffer::ZED3D10IndexBuffer()
 {
@@ -166,7 +151,4 @@ ZED3D10IndexBuffer::ZED3D10IndexBuffer()
 ZED3D10IndexBuffer::~ZED3D10IndexBuffer()
 {
 	ZED3D_RELEASE(D3D10Buffer);
-
-	GlobalSize -= BufferSize;
-	GlobalCount--;
 }

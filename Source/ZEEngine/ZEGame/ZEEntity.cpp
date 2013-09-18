@@ -575,7 +575,11 @@ bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 		Report.PoligonIndex = 0;
 		Report.Normal = ZEVector3::Zero;
 		Report.Binormal = ZEVector3::Zero;
+
+		return true;
 	}
+
+	return false;
 }
 
 ZEEntityRunAt ZEEntityDescription::GetRunAt() const

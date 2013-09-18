@@ -81,8 +81,10 @@ class ZEMaterial
 	public:
 		virtual void			Destroy();
 
-		virtual void			EnableStage(ZERenderStageType Stage);
-		virtual void			DisableStage(ZERenderStageType Stage);
+		ZERenderStageType		GetEnabledStages() const;
+
+		void					EnableStage(ZERenderStageType Stage);
+		void					DisableStage(ZERenderStageType Stage);
 
 		virtual void			WriteToFile(const ZEString& FilePath);
 		virtual void			ReadFromFile(const ZEString& FilePath);
@@ -90,7 +92,6 @@ class ZEMaterial
 		virtual bool			SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 
 		virtual ZESize			GetHash() const = 0;
-		virtual bool			UpdateMaterial() = 0;
 };
 
 #endif

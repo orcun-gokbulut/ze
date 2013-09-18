@@ -58,6 +58,10 @@ ze_add_source(ZED3D10GraphicsDevice.cpp			Sources)
 ze_add_source(ZED3D10GraphicsDevice.h			Sources)
 ze_add_source(ZED3D10GraphicsModule.cpp			Sources)
 ze_add_source(ZED3D10GraphicsModule.h			Sources)
+ze_add_source(ZED3D10GraphicsWindow.cpp			Sources)
+ze_add_source(ZED3D10GraphicsWindow.h			Sources)
+ze_add_source(ZED3D10GraphicsMonitor.cpp		Sources)
+ze_add_source(ZED3D10GraphicsMonitor.h			Sources)
 ze_add_source(ZED3D10IndexBuffer.cpp			Sources)
 ze_add_source(ZED3D10IndexBuffer.h				Sources)
 ze_add_source(ZED3D10RenderTarget.cpp			Sources)
@@ -83,4 +87,6 @@ ze_add_source(ZED3D10VertexBuffer.h				Sources)
 
 ze_add_library(ZEDirect3D10
 	SOURCES ${Sources}
-	LIBS libDXGI libDirect3D9 libDirect3D10 libDirect3DCompiler)
+	LIBS libDirect3DCompiler libDirect3D11 libDirect3D9 libDXGI)
+	
+	

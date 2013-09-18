@@ -42,7 +42,7 @@
 
 class ZETerrain2;
 class ZEMaterial;
-struct ZEDrawParameters;
+class ZEDrawParameters;
 
 class ZETerrainDrawer
 {

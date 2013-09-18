@@ -32,6 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
 #ifndef __ZE_RENDERER_H__
 #define __ZE_RENDERER_H__
 
@@ -40,61 +41,68 @@
 #include "ZEDS/ZEArray.h"
 #include "ZERenderStage.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEGame/ZEDrawParameters.h"
 
-#define ZE_MAX_STAGE_COUNT			32
-#define	ZE_COMMAND_BUFFER_SIZE		1024 * 1024	* 1	// 1 MB
+#define	ZE_COMMAND_BUFFER_SIZE		(1024 * 1024) / 4	// 256KB
 
 typedef ZESmartArray<const ZERenderCommand*>	ZECommandList;
 
 class ZECommandBuffer
 {
 	private:
-		void*					Buffer;
-		ZESize					EndOfBuffer;
+		void*						Buffer;
+		ZESize						EndOfBuffer;
 
-		ZECommandList			CommandList;
-
-		void					SortCommands(ZESize StartIndex, ZESize EndIndex);
+		ZECommandList				CommandList;
 
 	public:
-		void					Clear();
-		void					SortFrames();
+		void						Clear();
+		void						SortCommands();
 
-		bool					IsEmpty() const;
-		ZESize					GetCount() const;
+		bool						IsEmpty() const;
+		ZESize						GetCount() const;
 
-		bool					AddCommand(const ZERenderCommand* Entry);
-		const ZERenderCommand*	GetCommand(ZESize Index) const;
+		bool						AddCommand(const ZERenderCommand* Entry);
+		const ZERenderCommand*		GetCommand(ZESize Index) const;
 	
-								ZECommandBuffer();
-								~ZECommandBuffer();
+									ZECommandBuffer();
+									~ZECommandBuffer();
 };
 
 class ZECommandBucket : public ZEListItem
 {
+	friend class ZERenderer;
+
+	protected:
+		ZERenderStageType			TargetStages;
+		ZERenderStageData*			StageData;
+		ZECommandBuffer				CommandBuffer;
+
 	public:
-		ZEDrawParameters		Parameters;
-		ZECommandBuffer			Commands;
+		void						Clear();
 
-		void					Clear();
+		bool						AddRenderCommand(const ZERenderCommand* Command);
 
-								ZECommandBucket();
-								~ZECommandBucket();
+									ZECommandBucket();
+									~ZECommandBucket();
 };
 
 class ZECamera;
 class ZERenderStage;
 class ZEDrawParameters;
 class ZERenderStageShadow;
-class ZERenderStageAccumulation;
 class ZERenderStageGeometry;
 class ZERenderStageLighting;
 class ZERenderStageParticle;
+class ZERenderStageAccumulation;
 
 class ZERenderer
 {
 	protected:
-		ZEList<ZECommandBucket>		Buckets;
+		ZEList<ZECommandBucket>		BucketList;
+		ZEList<ZECommandBucket>		EmptyBuckets;
+
+		ZEConstantBuffer*			TimerConstants;
 
 		ZERenderStageShadow*		ShadowStage;
 		ZERenderStageGeometry*		GeometryStage;
@@ -102,13 +110,13 @@ class ZERenderer
 		ZERenderStageParticle*		ParticleStage;
 		ZERenderStageAccumulation*	AccumulationStage;
 
+		void						ProcessStage(ZERenderStage* Stage);
+
 									ZERenderer();
 		virtual						~ZERenderer();
 
-		void						ProcessStage(ZERenderStage* Stage);
-
 	public:
-		virtual ZECommandBucket*	CreateCommandBucket(const ZEDrawParameters* Parameters);
+		virtual ZECommandBucket*	CreateCommandBucket(ZERenderStageType TargetStages, ZERenderStageData* StageData);
 
 		virtual bool				PreRender();
 		virtual bool				PostRender();

@@ -115,6 +115,8 @@ bool ZECrashReportFileProvider::Generate()
 
 	fseek((FILE*)File, 0, SEEK_END);
 	Size = ftell((FILE*)File);
+
+	return true;
 }
 
 void ZECrashReportFileProvider::CleanUp()

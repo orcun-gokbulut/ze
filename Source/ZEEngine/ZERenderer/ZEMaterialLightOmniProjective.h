@@ -58,8 +58,9 @@ class ZEMaterialLightOmniProjective : public ZEMaterial
 		ZEShader*					VertexShader;
 		ZEShader*					PixelShader;
 
-		ZEConstantBuffer*			LightTransformations;
-		ZEConstantBuffer*			LightProperties;
+		ZEConstantBuffer*			LightVSProperties0;
+		ZEConstantBuffer*			LightPSProperties0;
+		ZEConstantBuffer*			LightPSProperties1;
 
 		void						UpdateShaders();
 		void						UpdateBuffers();
@@ -73,30 +74,27 @@ class ZEMaterialLightOmniProjective : public ZEMaterial
 		virtual						~ZEMaterialLightOmniProjective();
 
 	public:
-		__declspec(align(16))
-		struct Transformations
+		struct VSProperties0
 		{
-			ZEMatrix4x4				WorldView;
-			ZEMatrix4x4				WorldViewProjection;
+			ZEMatrix4x4				WorldMatrix;
 		};
 
-		__declspec(align(16))
-		struct Properties
+		struct PSProperties0
 		{
-			ZEVector3				ViewSpacePosition;
-			float					Range;
 			ZEVector3				Color;
 			float					Intensity;
 			ZEVector3				Attenuation;
-			float					PenumbraSize;
-			ZEVector2				PixelSize;
-			float					DepthScaledBias;
-			float					SlopeScaledBias;
+			float					Reserved;
+		};
+
+		struct PSProperties1
+		{
+			ZEVector3				ViewSpaceCenter;
+			float					Reserved;
 			ZEMatrix4x4				ProjectionMatrix;
 		};
 
 		virtual ZESize				GetHash() const;
-		virtual bool				UpdateMaterial();
 
 		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 

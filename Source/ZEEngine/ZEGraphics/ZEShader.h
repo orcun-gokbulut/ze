@@ -49,6 +49,9 @@ class ZEShader
 	friend class ZEGraphicsModule;
 
 	protected:
+		static ZESize				TotalSize;
+		static ZEUInt16				TotalCount;
+
 		ZEShaderMetaTable			MetaTable;
 
 									ZEShader();

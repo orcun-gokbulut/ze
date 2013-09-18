@@ -102,7 +102,7 @@ void ZEInteriorDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	InteriorRenderCommand.PrimitiveCount = InteriorDrawCanvas.Vertices.GetCount() / 2;
-	DrawParameters->Renderer->AddRenderCommand(&InteriorRenderCommand);
+	//DrawParameters->Renderer->AddRenderCommand(&InteriorRenderCommand);
 }
 
 bool ZEInteriorDebugDrawer::InitializeSelf()

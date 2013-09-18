@@ -39,18 +39,22 @@
 
 #include "ZELight.h"
 #include "ZETypes.h"
-#include "ZEShadowCascaded.h"
 #include "ZERenderCommand.h"
+#include "ZEShadowCascaded.h"
 
 class ZEVertexBuffer;
-struct ZEDrawParameters;
+class ZEDrawParameters;
+class ZEMaterialLightDirectional;
 
 class ZELightDirectional : public ZELight
 {
 	protected:
+		bool							PropertyChanged;
+		bool							TransformChanged;
+
 		ZEVector3						Color;
 		float							Intensity;
-	
+		
 		float							PenumbraSize;
 		float							BiasDepthScaled;
 		float							BiasSlopeScaled;
@@ -62,8 +66,10 @@ class ZELightDirectional : public ZELight
 		ZEVertexLayout					VertexLayout;
 		ZERenderCommandDefault			RenderCommand;
 
-		void							UpdateBuffers(const ZEDrawParameters* DrawParameters);
-		
+		virtual void					UpdateMaterial(const ZEDrawParameters* DrawParameters);
+
+		virtual void					OnTransformChanged();
+
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
 
@@ -86,7 +92,7 @@ class ZELightDirectional : public ZELight
 		void							SetDepthScaledBias(float Value);
 		float							GetDepthScaledBias() const;
 
-		virtual const ZEViewVolume*		GetLightVolume();
+		virtual ZELightType				GetLightType() const;
 
 		virtual void					Tick(float Time);
 		virtual void					Draw(ZEDrawParameters* DrawParameters);

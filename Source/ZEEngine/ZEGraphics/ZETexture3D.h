@@ -48,28 +48,41 @@ class ZETexture3D : public ZETexture
 	friend class ZEGraphicsModule;
 
 	protected:
+		static ZEUInt16				TotalCount;
+		static ZESize				TotalSize;
+
+		ZEShadowCopy				ShadowCopy;
+
+		ZESize						Size;
 		ZEUInt						Width;
 		ZEUInt						Height;
 		ZEUInt						Depth;
 		ZEUInt						LevelCount;
+		ZEVector3					PixelSize;
+
+		virtual bool				UpdateWith(ZEUInt ShadowIndex);
 
 									ZETexture3D();
 		virtual						~ZETexture3D();
 
 	public:
+		ZEGraphicsResourceType		GetResourceType() const;
+
+		ZESize						GetSize() const;
 		ZEUInt						GetWidth() const;
 		ZEUInt						GetHeight() const;
 		ZEUInt						GetDepth() const;
 		ZEUInt						GetLevelCount() const;
+		const ZEVector3&			GetPixelSize() const;
 
-		virtual ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
-
-		virtual bool				CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat) = 0;
-		virtual bool				CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL) = 0;
+		virtual bool				Unlock();
+		virtual bool				Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch);
 		
-		virtual bool				Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt Level) = 0;
-		virtual bool				Unlock(ZEUInt Level) = 0;
-
+		virtual bool				CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZETextureData* Data = NULL);
+		virtual bool				CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
+		
+		virtual ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
+		
 		static ZETexture3D*			CreateInstance();
 };
 

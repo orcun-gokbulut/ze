@@ -99,9 +99,14 @@ void ZEGame::Destroy()
 
 void ZEGame::Render(float ElapsedTime)
 {
+	Scene->GetRenderer()->PreRender();
 	Scene->Render(ElapsedTime);
+
 	UIManager->Render(Scene->GetRenderer());
+	
 	Scene->GetRenderer()->Render(ElapsedTime);
+
+	Scene->GetRenderer()->PostRender();
 }
 
 void ZEGame::Tick(float ElapsedTime)

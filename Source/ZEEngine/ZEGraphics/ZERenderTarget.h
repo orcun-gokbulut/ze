@@ -38,6 +38,8 @@
 
 #include "ZETypes.h"
 #include "ZETexture.h"
+#include "ZEViewPort.h"
+#include "ZEScissorRectangle.h"
 
 typedef ZETextureType	ZERenderTargetType;
 
@@ -47,25 +49,29 @@ class ZERenderTarget
 	friend class ZEGraphicsDevice;
 
 	protected:
-		ZEUInt					Width;
-		ZEUInt					Height;
-		ZEVector3				PixelSize;
-		ZETexturePixelFormat	PixelFormat;
-		ZERenderTargetType		RenderTargetType;
+		static ZEUInt16				TotalCount;
 
-								ZERenderTarget(ZEUInt Width, ZEUInt Height, ZEVector3 PixelSize, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType);
-		virtual					~ZERenderTarget();
+		ZEUInt						Width;
+		ZEUInt						Height;
+		ZEUInt						Depth;
+		ZEVector3					PixelSize;
+		ZETexturePixelFormat		PixelFormat;
+		ZERenderTargetType			RenderTargetType;
+
+									ZERenderTarget(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType);
+		virtual						~ZERenderTarget();
 
 	public:
-		ZEUInt					GetWidth() const;
-		ZEUInt					GetHeight() const;
-		const ZEVector3&		GetPixelSize() const;
-		ZETexturePixelFormat	GetPixelFormat() const;
-		ZERenderTargetType		GetRenderTargetType() const;
+		ZEUInt						GetWidth() const;
+		ZEUInt						GetHeight() const;
+		ZEUInt						GetDepth() const;
+		const ZEVector3&			GetPixelSize() const;
+		ZETexturePixelFormat		GetPixelFormat() const;
+		ZERenderTargetType			GetRenderTargetType() const;
 
-		virtual bool			IsEmpty() const = 0;
+		virtual bool				IsEmpty() const = 0;
 
-		virtual void			Destroy();
+		virtual void				Destroy();
 };
 
 #endif

@@ -176,7 +176,7 @@ void ZEModuleManager::UnregisterModule(ZEExtensionDescription* ModuleDesc)
 #include "ZEModules/ZEPhysX/ZEPhysXModule.h"
 #include "ZEModules/ZEDirectSound/ZEDSModule.h"
 #include "ZEModules/ZEDirectInput/ZEDirectInputModule.h"
-#include "ZEModules/ZEDirect3D10/ZED3D10GraphicsModule.h"
+#include "ZEModules/ZEDirect3D10/ZED3D11GraphicsModule.h"
 
 ZEModuleManager::ZEModuleManager()
 {
@@ -188,7 +188,7 @@ ZEModuleManager::ZEModuleManager()
 	RegisterModule(ZED3D10GraphicsModule::Description());
 
 	ModuleManagerOptions.SetName("ModuleManager");
-	ModuleManagerOptions.AddOption(new ZEOption("ZEGraphicsModule", "ZED3D10GraphicsModule", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("ZEGraphicsModule", "ZED3D11GraphicsModule", ZE_OA_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("ZEInputModule", "ZEWindowsInputModule", ZE_OA_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("ZESoundModule", "ZEDSModule", ZE_OA_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("ZENetworkModule", "ZEWinNetwork", ZE_OA_NORMAL));

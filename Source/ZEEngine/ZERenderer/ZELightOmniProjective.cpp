@@ -50,8 +50,8 @@
 
 void ZELightOmniProjective::SetColor(const ZEVector3& NewColor)
 {
-	Changed = true;
 	Color = NewColor;
+	PropertyChanged = true;
 }
 
 const ZEVector3& ZELightOmniProjective::GetColor() const
@@ -61,8 +61,8 @@ const ZEVector3& ZELightOmniProjective::GetColor() const
 
 void ZELightOmniProjective::SetIntensity(float NewValue)
 {
-	Changed = true;
 	Intensity = NewValue;
+	PropertyChanged = true;
 }
 
 float ZELightOmniProjective::GetIntensity() const
@@ -72,9 +72,8 @@ float ZELightOmniProjective::GetIntensity() const
 
 void ZELightOmniProjective::SetRange(float NewValue)
 {
-	Changed = true;
-	UpdateViewVolume = true;
 	Range = NewValue;
+	PropertyChanged = true;
 }
 
 float ZELightOmniProjective::GetRange() const
@@ -84,16 +83,16 @@ float ZELightOmniProjective::GetRange() const
 
 void ZELightOmniProjective::SetAttenuation(const ZEVector3& Attenuation)
 {
-	Changed = true;
 	this->Attenuation = Attenuation;
+	PropertyChanged = true;
 }
 
 void ZELightOmniProjective::SetAttenuation(float DistanceSquare, float Distance, float Constant)
 {
-	Changed = true;
 	Attenuation.x = Constant;
 	Attenuation.y = Distance;
 	Attenuation.z = DistanceSquare;
+	PropertyChanged = true;
 }
 
 const ZEVector3& ZELightOmniProjective::GetAttenuation() const
@@ -103,8 +102,8 @@ const ZEVector3& ZELightOmniProjective::GetAttenuation() const
 
 void ZELightOmniProjective::SetPenumbraSize(float Value)
 {
-	Changed = true;
 	PenumbraSize = Value;
+	PropertyChanged = true;
 }
 
 float ZELightOmniProjective::GetPenumbraSize() const
@@ -114,8 +113,8 @@ float ZELightOmniProjective::GetPenumbraSize() const
 
 void ZELightOmniProjective::SetSlopeScaledBias(float Value)
 {
-	Changed = true;
 	SlopeScaledBias = Value;
+	PropertyChanged = true;
 }
 
 float ZELightOmniProjective::GetSlopeScaledBias() const
@@ -125,8 +124,8 @@ float ZELightOmniProjective::GetSlopeScaledBias() const
 
 void ZELightOmniProjective::SetDepthScaledBias(float Value)
 {
-	Changed = true;
 	DepthScaledBias = Value;
+	PropertyChanged = true;
 }
 
 float ZELightOmniProjective::GetDepthScaledBias() const
@@ -149,7 +148,7 @@ const ZESamplerState& ZELightOmniProjective::GetTextureSampler() const
 void ZELightOmniProjective::SetProjectionTexture(const ZETextureCube* Texture)
 {
 	zeDebugCheck(Texture == NULL, "Null Pointer");
-	Material->ProjectionTexture = Texture;
+	ProjectionTexture = Texture;
 }
 
 const ZETextureCube* ZELightOmniProjective::GetProjectionTexture() const
@@ -158,59 +157,65 @@ const ZETextureCube* ZELightOmniProjective::GetProjectionTexture() const
 	return Material->ProjectionTexture;
 }
 
-const ZEViewVolume* ZELightOmniProjective::GetLightVolume()
-{
-	if (UpdateViewVolume)
-	{
-		ViewVolume.Create(GetWorldPosition(), Range, 0.0f);
- 		UpdateViewVolume = false;
-	}
-
-	return &ViewVolume;
-}
-
 void ZELightOmniProjective::UpdateMaterial(const ZEDrawParameters* DrawParameters)
 {
-	if (!Changed)
-		return;
+	Material->ProjectionTexture = ProjectionTexture;
 
-	if (DrawParameters->View->Type != ZE_VT_CAMERA)
-		return;
+	const ZEView* View = DrawParameters->View;
 
-	ZECamera* Camera = DrawParameters->View->Camera;
+	if (TransformChanged)
+	{
+		ZEMatrix4x4 WorldTransform;
+		ZEMatrix4x4::CreateOrientation(WorldTransform, GetWorldPosition(), GetWorldRotation(), ZEVector3(Range, Range, Range));
 
-	ZEMaterialLightOmniProjective::Transformations* Transformations = NULL;
-	Material->LightTransformations->Lock((void**)&Transformations);
+		ZEMaterialLightOmniProjective::VSProperties0* Properties = NULL;
+		Material->LightVSProperties0->Lock((void**)&Properties);
 
-		Transformations->WorldView = Camera->GetViewTransform() * GetWorldTransform();
-		Transformations->WorldViewProjection = Camera->GetViewProjectionTransform() * GetWorldTransform();
+			Properties->WorldMatrix = WorldTransform;
 
-	Material->LightTransformations->Unlock();
+		Material->LightVSProperties0->Unlock();
+		TransformChanged = false;
+	}
 
-	// Projection Transform
-	ZEMatrix4x4 ProjectionMatrix;
-	ZEQuaternion ProjectionRotation;
-	ZEQuaternion::Product(ProjectionRotation, GetWorldRotation().Conjugate(), Camera->GetWorldRotation());
-	ZEQuaternion::Normalize(ProjectionRotation, ProjectionRotation);
-	ZEMatrix4x4::CreateRotation(ProjectionMatrix, ProjectionRotation);
+	if (PropertyChanged)
+	{
+		ZEMaterialLightOmniProjective::PSProperties0* Properties = NULL;
+		Material->LightPSProperties0->Lock((void**)&Properties);
 
-	ZEMaterialLightOmniProjective::Properties* Properties = NULL;
-	Material->LightProperties->Lock((void**)&Properties);
+			Properties->Color = Color;
+			Properties->Intensity = Intensity;
+			Properties->Attenuation = Attenuation;
+			
+		Material->LightPSProperties0->Unlock();
+		PropertyChanged = false;
+	}
 
-		Properties->Range = Range;
-		Properties->Color = Color;
-		Properties->Intensity = Intensity;
-		Properties->Attenuation = Attenuation;
-		Properties->PenumbraSize = PenumbraSize;
-		Properties->DepthScaledBias = DepthScaledBias;
-		Properties->SlopeScaledBias = SlopeScaledBias;
-		Properties->ProjectionMatrix = ProjectionMatrix;
-		Properties->PixelSize = DrawParameters->RenderTarget->GetPixelSize().ToVector2();
-		Properties->ViewSpacePosition = Camera->GetViewTransform() * GetWorldPosition();
+	// Use a dirty flag here to check if view transform is changed ?
+	if (true)
+	{
+		// Projection Transform
+		ZEMatrix4x4 ProjectionMatrix;
+		ZEQuaternion ProjectionRotation;
+		
+		ZEQuaternion::Product(ProjectionRotation, GetWorldRotation().Conjugate(), View->GetWorldRotation());
+		ZEQuaternion::Normalize(ProjectionRotation, ProjectionRotation);
+		ZEMatrix4x4::CreateRotation(ProjectionMatrix, ProjectionRotation);
 
-	Material->LightProperties->Unlock();
+		ZEMaterialLightOmniProjective::PSProperties1* Properties = NULL;
+		Material->LightPSProperties1->Lock((void**)&Properties);
 
-	Changed = false;
+			Properties->ProjectionMatrix = ProjectionMatrix;
+			Properties->ViewSpaceCenter = View->GetViewTransform() * GetWorldPosition();
+
+		Material->LightPSProperties1->Unlock();
+	}
+}
+
+void ZELightOmniProjective::OnTransformChanged()
+{
+	TransformChanged = true;
+
+	ZELight::OnTransformChanged();	
 }
 
 bool ZELightOmniProjective::InitializeSelf()
@@ -223,14 +228,13 @@ bool ZELightOmniProjective::InitializeSelf()
 	Canvas.AddSphere(1.0f, 24, 24);
 	VertexBuffer = Canvas.CreateStaticVertexBuffer();
 
-
 	// Material
 	Material = ZEMaterialLightOmniProjective::CreateInstance();
 
 	// Vertex layout
 	static const ZEVertexElement Element[] = 
 	{
-		{"POSITION", 0, ZE_VET_FLOAT4, 0, 0, ZE_VU_PER_VERTEX, 0}
+		{"POSITION", 0, ZE_VET_FLOAT3, 0, 0, ZE_VU_PER_VERTEX, 0}
 	};
 	VertexLayout.SetLayout(Element, 1);
 
@@ -255,6 +259,11 @@ bool ZELightOmniProjective::DeinitializeSelf()
 	return ZELight::DeinitializeSelf();
 }
 
+ZELightType ZELightOmniProjective::GetLightType() const
+{
+	return ZE_LT_OMNIPROJECTIVE;
+}
+
 void ZELightOmniProjective::Tick(float Time)
 {
 
@@ -262,20 +271,31 @@ void ZELightOmniProjective::Tick(float Time)
 
 void ZELightOmniProjective::Draw(ZEDrawParameters* DrawParameters)
 {
-	UpdateMaterial(DrawParameters);
+	// Draw if only viewed by a camera
+	if (DrawParameters->View->GetViewType() != ZE_VT_CAMERA)
+		return;
+
+	if (ProjectionTexture == NULL)
+		return;
 
 	ZEBSphere LightBoundingSphere;
 	LightBoundingSphere.Radius = Range;
 	LightBoundingSphere.Position = GetWorldPosition();
 	
-	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
-		DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
+	if (DrawParameters->View->GetViewVolume()->CullTest(LightBoundingSphere))
+		return;
+
+	UpdateMaterial(DrawParameters);
+	DrawParameters->Bucket->AddRenderCommand(&RenderCommand);
 
 	ZELight::Draw(DrawParameters);
 }
 
-ZELightOmniProjective::ZELightOmniProjective() : ZELight(ZE_LT_OMNIPROJECTIVE)
+ZELightOmniProjective::ZELightOmniProjective()
 {
+	PropertyChanged = true;
+	TransformChanged = true;
+
 	Material = NULL;
 	VertexBuffer = NULL;
 
@@ -283,6 +303,8 @@ ZELightOmniProjective::ZELightOmniProjective() : ZELight(ZE_LT_OMNIPROJECTIVE)
 	Intensity = 1.0f;
 	Color = ZEVector3::One;
 	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
+
+	ProjectionTexture = NULL;
 
 	PenumbraSize = 1.0f;
 	SlopeScaledBias = 0.0f;
