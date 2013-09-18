@@ -54,7 +54,7 @@
 
 void ZELightDirectional::SetColor(const ZEVector3& NewColor)
 {
-	Changed = true;
+	PropertyChanged = true;
 	Color = NewColor;
 }
 
@@ -65,7 +65,7 @@ const ZEVector3& ZELightDirectional::GetColor() const
 
 void ZELightDirectional::SetIntensity(float NewValue)
 {
-	Changed = true;
+	PropertyChanged = true;
 	Intensity = NewValue;
 }
 
@@ -76,7 +76,7 @@ float ZELightDirectional::GetIntensity() const
 
 void ZELightDirectional::SetPenumbraSize(float Value)
 {
-	Changed = true;
+	PropertyChanged = true;
 	PenumbraSize = Value;
 }
 
@@ -87,7 +87,7 @@ float ZELightDirectional::GetPenumbraSize() const
 
 void ZELightDirectional::SetSlopeScaledBias(float Value)
 {
-	Changed = true;
+	PropertyChanged = true;
 	BiasSlopeScaled = Value;
 }
 
@@ -98,7 +98,7 @@ float ZELightDirectional::GetSlopeScaledBias() const
 
 void ZELightDirectional::SetDepthScaledBias(float Value)
 {
-	Changed = true;
+	PropertyChanged = true;
 	BiasDepthScaled = Value;
 }
 
@@ -107,41 +107,46 @@ float ZELightDirectional::GetDepthScaledBias() const
 	return BiasDepthScaled;
 }
 
-void ZELightDirectional::UpdateBuffers(const ZEDrawParameters* DrawParameters)
+void ZELightDirectional::UpdateMaterial(const ZEDrawParameters* DrawParameters)
 {
-	if (!Changed)
-		return;
+	const ZEView* View = DrawParameters->View;
 
-	if (DrawParameters->View->Type != ZE_VT_CAMERA)
-		return;
+	// Use a dirty flag here to check if projection transform is changed ?
+	if (true)
+	{
+		ZEMaterialLightDirectional::Transformations* Transformations = NULL;
+		Material->LightTransformations->Lock((void**)&Transformations);
 
-	ZECamera* Camera = DrawParameters->View->Camera;
+			Transformations->InvProjectionMatrix = View->GetProjectionTransform().Inverse();
 
-	ZEMaterialLightDirectional::Transformations* Transformations = NULL;
-	Material->LightTransformations->Lock((void**)&Transformations);
+		Material->LightTransformations->Unlock();
+		TransformChanged = false;
+	}
 
-		Transformations->InvProjectionMatrix = Camera->GetProjectionTransform().Inverse();
-
-	Material->LightTransformations->Unlock();
-
-	ZEMaterialLightDirectional::Properties* Properties = NULL;
-	Material->LightProperties->Lock((void**)&Properties);
+	if (PropertyChanged)
+	{
+		ZEMaterialLightDirectional::Properties* Properties = NULL;
+		Material->LightProperties->Lock((void**)&Properties);
 	
-		Properties->Color = Color;
-		Properties->Intensity = Intensity;
-		Properties->Direction =  Camera->GetViewTransform() * -GetWorldFront();
-		Properties->PenumbraSize = PenumbraSize;
-		Properties->BiasDepthScaled = BiasDepthScaled;
-		Properties->BiasSlopeScaled = BiasSlopeScaled;
+			Properties->Color = Color;
+			Properties->Intensity = Intensity;
+			Properties->Direction =  View->GetViewTransform() * -GetWorldFront();
+			Properties->PenumbraSize = PenumbraSize;
+			Properties->BiasDepthScaled = BiasDepthScaled;
+			Properties->BiasSlopeScaled = BiasSlopeScaled;
 			
-	Material->LightProperties->Unlock();
+		Material->LightProperties->Unlock();
+		PropertyChanged = false;
+	}
 }
 
-const ZEViewVolume* ZELightDirectional::GetLightVolume()
+void ZELightDirectional::OnTransformChanged()
 {
-	// No culling and no Light volume for directional light.
-	return NULL;
+	TransformChanged = true;
+
+	ZELight::OnTransformChanged();	
 }
+
 
 bool ZELightDirectional::InitializeSelf()
 {
@@ -159,7 +164,7 @@ bool ZELightDirectional::InitializeSelf()
 	// Vertex layout
 	static const ZEVertexElement Element[] = 
 	{
-		{"POSITION", 0, ZE_VET_FLOAT4, 0, 0, ZE_VU_PER_VERTEX, 0}
+		{"POSITION", 0, ZE_VET_FLOAT3, 0, 0, ZE_VU_PER_VERTEX, 0}
 	};
 	VertexLayout.SetLayout(Element, 1);
 
@@ -186,6 +191,11 @@ bool ZELightDirectional::DeinitializeSelf()
 	return ZELight::DeinitializeSelf();
 }
 
+ZELightType ZELightDirectional::GetLightType() const
+{
+	return ZE_LT_DIRECTIONAL;
+}
+
 void ZELightDirectional::Tick(float Time)
 {
 
@@ -193,20 +203,29 @@ void ZELightDirectional::Tick(float Time)
 
 void ZELightDirectional::Draw(ZEDrawParameters* DrawParameters)
 {
+	zeDebugCheck(DrawParameters == NULL, "Null pointer");
+
+	// Draw if only viewed by a camera
+	if (DrawParameters->View->GetViewType() != ZE_VT_CAMERA)
+		return;
+
 	if (ShadowCaster)
 	{
-		CascadedShadow.Update(DrawParameters->View->Camera);
+		CascadedShadow.Update((ZECamera*)DrawParameters->View);
 		CascadedShadow.Draw(DrawParameters);
 	}
 	
-	UpdateBuffers(DrawParameters);
-	DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
+	UpdateMaterial(DrawParameters);
+	DrawParameters->Bucket->AddRenderCommand(&RenderCommand);
 
 	ZELight::Draw(DrawParameters);
 }
 
-ZELightDirectional::ZELightDirectional() : ZELight(ZE_LT_DIRECTIONAL)
+ZELightDirectional::ZELightDirectional()
 {
+	TransformChanged = true;
+	PropertyChanged = true;
+
 	Color = ZEVector3::One;
 	Intensity = 1.0f;
 	PenumbraSize = 1.0f;
@@ -219,7 +238,7 @@ ZELightDirectional::ZELightDirectional() : ZELight(ZE_LT_DIRECTIONAL)
 
 ZELightDirectional::~ZELightDirectional()
 {
-	Deinitialize();
+
 }
 
 ZELightDirectional* ZELightDirectional::CreateInstance()

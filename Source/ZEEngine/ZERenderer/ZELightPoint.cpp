@@ -48,8 +48,8 @@
 
 void ZELightPoint::SetColor(const ZEVector3& NewColor)
 {
-	Changed = true;
 	Color = NewColor;
+	PropertyChanged = true;
 }
 
 const ZEVector3& ZELightPoint::GetColor() const
@@ -59,8 +59,8 @@ const ZEVector3& ZELightPoint::GetColor() const
 
 void ZELightPoint::SetIntensity(float NewValue)
 {
-	Changed = true;
 	Intensity = NewValue;
+	PropertyChanged = true;
 }
 
 float ZELightPoint::GetIntensity() const
@@ -70,9 +70,8 @@ float ZELightPoint::GetIntensity() const
 
 void ZELightPoint::SetRange(float NewValue)
 {
-	Changed = true;
-	UpdateViewVolume = true;
 	Range = NewValue;
+	PropertyChanged = true;
 }
 
 float ZELightPoint::GetRange() const
@@ -82,16 +81,16 @@ float ZELightPoint::GetRange() const
 
 void ZELightPoint::SetAttenuation(const ZEVector3& Attenuation)
 {
-	Changed = true;
 	this->Attenuation = Attenuation;
+	PropertyChanged = true;
 }
 
 void ZELightPoint::SetAttenuation(float DistanceSquare, float Distance, float Constant)
 {
-	Changed = true;
 	Attenuation.x = Constant;
 	Attenuation.y = Distance;
 	Attenuation.z = DistanceSquare;
+	PropertyChanged = true;
 }
 
 const ZEVector3& ZELightPoint::GetAttenuation() const
@@ -101,8 +100,8 @@ const ZEVector3& ZELightPoint::GetAttenuation() const
 
 void ZELightPoint::SetPenumbraSize(float Value)
 {
-	Changed = true;
 	PenumbraSize = Value;
+	PropertyChanged = true;
 }
 
 float ZELightPoint::GetPenumbraSize() const
@@ -112,8 +111,8 @@ float ZELightPoint::GetPenumbraSize() const
 
 void ZELightPoint::SetSlopeScaledBias(float Value)
 {
-	Changed = true;
 	SlopeScaledBias = Value;
+	PropertyChanged = true;
 }
 
 float ZELightPoint::GetSlopeScaledBias() const
@@ -123,8 +122,8 @@ float ZELightPoint::GetSlopeScaledBias() const
 
 void ZELightPoint::SetDepthScaledBias(float Value)
 {
-	Changed = true;
 	DepthScaledBias = Value;
+	PropertyChanged = true;
 }
 
 float ZELightPoint::GetDepthScaledBias() const
@@ -132,51 +131,58 @@ float ZELightPoint::GetDepthScaledBias() const
 	return DepthScaledBias;
 }
 
-const ZEViewVolume* ZELightPoint::GetLightVolume()
-{
-	if (UpdateViewVolume)
-	{
- 		ViewVolume.Create(GetWorldPosition(), GetRange(), 0.0f);
- 		UpdateViewVolume = false;
-	}
-
-	return &ViewVolume;
-}
-
 void ZELightPoint::UpdateMaterial(const ZEDrawParameters* DrawParameters)
 {
-	if (!Changed)
-		return;
+	const ZEView* View = DrawParameters->View;
 
-	if (DrawParameters->View->Type != ZE_VT_CAMERA)
-		return;
+	if (TransformChanged)
+	{
+		ZEMaterialLightPoint::VSProperties0* Transformations = NULL;
+		Material->LightVSProperties0->Lock((void**)&Transformations);
 
-	ZECamera* Camera = DrawParameters->View->Camera;
+			ZEMatrix4x4::CreateOrientation(Transformations->WorldTransform, GetWorldPosition(), ZEQuaternion::Identity, ZEVector3(Range, Range, Range));
+			
+		Material->LightVSProperties0->Unlock();
 
-	ZEMaterialLightPoint::Transformations* Transforms = NULL;
-	Material->LightTransformations->Lock((void**)&Transforms);
+		TransformChanged = false;
+	}
 
-		Transforms->WorldViewMatrix = Camera->GetViewTransform() * GetWorldTransform();
-		Transforms->WorldViewProjMatrix = Camera->GetViewProjectionTransform() * GetWorldTransform();
+	if (PropertyChanged)
+	{
+		ZEMaterialLightPoint::PSProperties0* Properties0 = NULL;
+		Material->LightPSProperties0->Lock((void**)&Properties0);
 
-	Material->LightTransformations->Unlock();
+			Properties0->Color = Color;
+			Properties0->Intensity = Intensity;
+			Properties0->Attenuation = Attenuation;
 
-	ZEMaterialLightPoint::Properties* Properties = NULL;
-	Material->LightProperties->Lock((void**)&Properties);
+		Material->LightPSProperties0->Unlock();
+	
+		PropertyChanged = false;
+	}
 
-		Properties->Range = Range;
-		Properties->Color = Color;
-		Properties->Intensity = Intensity;
-		Properties->Attenuation = Attenuation;
-		Properties->PenumbraSize = PenumbraSize;
-		Properties->DepthScaledBias = DepthScaledBias;
-		Properties->SlopeScaledBias = SlopeScaledBias;
-		Properties->PixelSize = DrawParameters->RenderTarget->GetPixelSize().ToVector2();
-		Properties->ViewSpacePosition = Camera->GetViewTransform() * GetWorldPosition();
+	// Use a dirty flag here to check if view transform is changed ?
+	if (true)
+	{
+		ZEMaterialLightPoint::PSProperties1* Properties1 = NULL;
+		Material->LightPSProperties1->Lock((void**)&Properties1);
 
-	Material->LightProperties->Unlock();
+			Properties1->ViewSpaceCenter = View->GetViewTransform() * GetWorldPosition();
 
-	Changed = false;
+		Material->LightPSProperties1->Unlock();
+	}
+}
+
+void ZELightPoint::OnTransformChanged()
+{
+	TransformChanged = true;
+
+	ZELight::OnTransformChanged();	
+}
+
+ZELightType ZELightPoint::GetLightType() const
+{
+	return ZE_LT_POINT;
 }
 
 void ZELightPoint::Tick(float Time)
@@ -186,14 +192,19 @@ void ZELightPoint::Tick(float Time)
 
 void ZELightPoint::Draw(ZEDrawParameters* DrawParameters)
 {
-	UpdateMaterial(DrawParameters);
+	// Draw if only viewed by a camera
+	if (DrawParameters->View->GetViewType() != ZE_VT_CAMERA)
+		return;
 
 	ZEBSphere LightBoundingSphere;
 	LightBoundingSphere.Radius = Range;
 	LightBoundingSphere.Position = GetWorldPosition();
 	
-	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
-		DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
+	if (DrawParameters->View->GetViewVolume()->CullTest(LightBoundingSphere))
+		return;
+
+	UpdateMaterial(DrawParameters);
+	DrawParameters->Bucket->AddRenderCommand(&RenderCommand);
 
 	ZELight::Draw(DrawParameters);
 }
@@ -211,7 +222,7 @@ bool ZELightPoint::InitializeSelf()
 	// Vertex layout
 	static const ZEVertexElement Element[] = 
 	{
-		{"POSITION", 0, ZE_VET_FLOAT4, 0, 0, ZE_VU_PER_VERTEX, 0}
+		{"POSITION", 0, ZE_VET_FLOAT3, 0, 0, ZE_VU_PER_VERTEX, 0}
 	};
 	VertexLayout.SetLayout(Element, 1);
 
@@ -239,8 +250,11 @@ bool ZELightPoint::DeinitializeSelf()
 	return ZELight::DeinitializeSelf();
 }
 
-ZELightPoint::ZELightPoint() : ZELight(ZE_LT_POINT)
+ZELightPoint::ZELightPoint()
 {
+	PropertyChanged = true;
+	TransformChanged = true;
+
 	Material = NULL;
 	Vertices = NULL;
 

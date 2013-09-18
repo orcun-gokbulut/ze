@@ -41,7 +41,7 @@
 #include "ZEParticle.h"
 #include "ZEDS\ZEArray.h"
 
-struct ZEDrawParameters;
+class ZEDrawParameters;
 class ZEParticleSystem;
 class ZEMaterial;
 

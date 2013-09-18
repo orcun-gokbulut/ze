@@ -62,6 +62,7 @@ class ZEObjectDescription;
 class ZEScene
 {
 	private:
+		bool							Enabled;
 		bool							Initialized;
 		ZEUInt							LastEntityId;
 
@@ -95,13 +96,13 @@ class ZEScene
 		ZEPhysicalWorld*				GetPhysicalWorld();
 
 		void							SetActiveCamera(ZECamera* Camera);
-		ZECamera*						GetActiveCamera();
+		ZECamera*						GetActiveCamera() const;
 
-		void									SetEnabled(bool Enabled);
-		bool									GetEnabled() const;
+		void							SetActiveListener(ZEListener* Listener);
+		ZEListener*						GetActiveListener() const;
 
-		ZESceneCuller&							GetSceneCuller();
-		const ZESceneStatistics&				GetStatistics() const;
+		void							SetEnabled(bool Enabled);
+		bool							GetEnabled() const;
 
 		bool							Save(const ZEString& FileName);
 		bool							Load(const ZEString& FileName);
@@ -112,7 +113,8 @@ class ZEScene
 
 		void							Tick(float ElapsedTime);
 		void							Render(float ElapsedTime);
-		bool									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		
+		bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 										ZEScene();
 		virtual							~ZEScene();

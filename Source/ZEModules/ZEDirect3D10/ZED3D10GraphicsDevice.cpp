@@ -33,6 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include <d3d11.h>
+
 #include "ZED3D10Shader.h"
 #include "ZED3D10Texture2D.h"
 #include "ZED3D10Texture3D.h"
@@ -46,8 +48,6 @@
 #include "ZED3D10DepthStencilBuffer.h"
 #include "ZEGraphics/ZEGraphicsDefinitions.h"
 
-#include <D3D10.h>
-
 inline DXGI_FORMAT ZEIndexBufferFormatToD3D10(ZEIndexBufferFormat BufferFormat)
 {
 	static const DXGI_FORMAT Values[] = 
@@ -58,15 +58,15 @@ inline DXGI_FORMAT ZEIndexBufferFormatToD3D10(ZEIndexBufferFormat BufferFormat)
 	return Values[BufferFormat];
 }
 
-inline D3D10_PRIMITIVE_TOPOLOGY ZEPrimitiveTypeToD3D10(ZEPrimitiveType PrimitiveType)
+inline D3D11_PRIMITIVE_TOPOLOGY ZEPrimitiveTypeToD3D10(ZEPrimitiveType PrimitiveType)
 {
-	static const D3D10_PRIMITIVE_TOPOLOGY Values[] = 
+	static const D3D11_PRIMITIVE_TOPOLOGY Values[] = 
 	{
-		D3D10_PRIMITIVE_TOPOLOGY_UNDEFINED,
-		D3D10_PRIMITIVE_TOPOLOGY_POINTLIST,
-		D3D10_PRIMITIVE_TOPOLOGY_LINELIST,
-		D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-		D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP
+		D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED,
+		D3D11_PRIMITIVE_TOPOLOGY_POINTLIST,
+		D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP
 	};
 
 	return Values[PrimitiveType];
@@ -103,16 +103,19 @@ void ZED3D10GraphicsDevice::ApplyInputStates()
 
 	if (OldState.VertexLayoutHash != LayoutHash)
 	{
-		ID3D10InputLayout* D3D10Layout = (ID3D10InputLayout*)StatePool->CreateState(LayoutPtr, CurrentState.VertexShader);
-		D3D10Device->IASetInputLayout(D3D10Layout);
+		ID3D11InputLayout* D3D10Layout = (ID3D11InputLayout*)StatePool->GetState(LayoutPtr, CurrentState.VertexShader);
+		D3DContexes[ContextIndex]->IASetInputLayout(D3D10Layout);
 
 		OldState.VertexLayoutHash = LayoutHash;
 	}
 	
+	if (CurrentState.IndexBuffer != NULL)
+		((ZED3D10IndexBuffer*)CurrentState.IndexBuffer)->UpdateWith(0);
+
 	if (CurrentState.IndexBuffer != OldState.IndexBuffer)
 	{
 		DXGI_FORMAT D3D10Format = DXGI_FORMAT_UNKNOWN;
-		ID3D10Buffer* D3D10IndexBuffer = NULL;
+		ID3D11Buffer* D3D10IndexBuffer = NULL;
 		
 		if (CurrentState.IndexBuffer != NULL)
 		{
@@ -120,7 +123,7 @@ void ZED3D10GraphicsDevice::ApplyInputStates()
 			D3D10Format = ZEIndexBufferFormatToD3D10(CurrentState.IndexBuffer->GetBufferFormat());
 		}
 
-		D3D10Device->IASetIndexBuffer(D3D10IndexBuffer, D3D10Format, 0);
+		D3DContexes[ContextIndex]->IASetIndexBuffer(D3D10IndexBuffer, D3D10Format, 0);
 
 		OldState.IndexBuffer = CurrentState.IndexBuffer;
 	}
@@ -129,20 +132,24 @@ void ZED3D10GraphicsDevice::ApplyInputStates()
 	{
 		UINT D3D10VertexBufferOffset = 0;
 		UINT D3D10VertexBufferStride = 0;
-		ID3D10Buffer* D3D10VertexBuffer = NULL;
+		ID3D11Buffer* D3D10VertexBuffer = NULL;
+
+		if (CurrentState.VertexBuffers[I] != NULL)
+			((ZED3D10VertexBuffer*)CurrentState.VertexBuffers[I])->UpdateWith(0);
 
 		if (CurrentState.VertexBuffers[I] != OldState.VertexBuffers[I])
 		{
 			const ZED3D10VertexBuffer* VertexBuffer = (ZED3D10VertexBuffer*)CurrentState.VertexBuffers[I];
 			if (VertexBuffer != NULL)
 			{
+
 				D3D10VertexBuffer = VertexBuffer->D3D10Buffer;
 				D3D10VertexBufferOffset = 0;
 				D3D10VertexBufferStride = (UINT)VertexBuffer->VertexSize;
 			}
 
 			OldState.VertexBuffers[I] = CurrentState.VertexBuffers[I];
-			D3D10Device->IASetVertexBuffers((UINT)I, 1, &D3D10VertexBuffer, &D3D10VertexBufferStride, &D3D10VertexBufferOffset);
+			D3DContexes[ContextIndex]->IASetVertexBuffers((UINT)I, 1, &D3D10VertexBuffer, &D3D10VertexBufferStride, &D3D10VertexBufferOffset);
 		}
 	}
 }
@@ -156,8 +163,8 @@ void ZED3D10GraphicsDevice::ApplyVertexShaderStates()
 	// ----------------------------------------------------------
 	if (CurrentState.VertexShader != OldState.VertexShader)
 	{
-		ID3D10VertexShader* D3D10Shader = (CurrentState.VertexShader == NULL) ? NULL : ((ZED3D10VertexShader*)CurrentState.VertexShader)->D3D10VertexShader;
-		D3D10Device->VSSetShader(D3D10Shader);
+		ID3D11VertexShader* D3D10Shader = (CurrentState.VertexShader == NULL) ? NULL : ((ZED3D10VertexShader*)CurrentState.VertexShader)->D3D10VertexShader;
+		D3DContexes[ContextIndex]->VSSetShader(D3D10Shader, NULL, 0);
 
 		OldState.VertexShader = CurrentState.VertexShader;
 	}
@@ -166,14 +173,17 @@ void ZED3D10GraphicsDevice::ApplyVertexShaderStates()
 	// ----------------------------------------------------------
 	for (ZESize I = 0; I < ZE_MAX_CONSTANT_BUFFER_SLOT; ++I)
 	{
-		ID3D10Buffer* D3D10Buffer = NULL;
+		ID3D11Buffer* D3D10Buffer = NULL;
 		
+		if (CurrentState.VertexShaderBuffers[I] != NULL)
+			((ZED3D10ConstantBuffer*)CurrentState.VertexShaderBuffers[I])->UpdateWith(0);
+	
 		if (CurrentState.VertexShaderBuffers[I] != OldState.VertexShaderBuffers[I])
 		{
 			D3D10Buffer = CurrentState.VertexShaderBuffers[I] == NULL ? NULL : ((ZED3D10ConstantBuffer*)CurrentState.VertexShaderBuffers[I])->D3D10Buffer;
 			
 			OldState.VertexShaderBuffers[I] = CurrentState.VertexShaderBuffers[I];
-			D3D10Device->VSSetConstantBuffers((UINT)I, 1, &D3D10Buffer);
+			D3DContexes[ContextIndex]->VSSetConstantBuffers((UINT)I, 1, &D3D10Buffer);
 		}
 	}
 
@@ -183,10 +193,10 @@ void ZED3D10GraphicsDevice::ApplyVertexShaderStates()
 	{
 		if (CurrentState.VertexShaderSamplers[I].GetHash() != OldState.VertexShaderSamplerHashes[I])
 		{
-			ID3D10SamplerState* D3D10Sampler = (ID3D10SamplerState*)StatePool->CreateState(&CurrentState.VertexShaderSamplers[I]);
+			ID3D11SamplerState* D3D10Sampler = (ID3D11SamplerState*)StatePool->GetState(&CurrentState.VertexShaderSamplers[I]);
 			
 			OldState.VertexShaderSamplerHashes[I] = CurrentState.VertexShaderSamplers[I].GetHash();
-			D3D10Device->VSSetSamplers((UINT)I, 1, &D3D10Sampler);
+			D3DContexes[ContextIndex]->VSSetSamplers((UINT)I, 1, &D3D10Sampler);
 		}
 	}
 
@@ -194,29 +204,32 @@ void ZED3D10GraphicsDevice::ApplyVertexShaderStates()
 	// ----------------------------------------------------------
 	for (ZESize I = 0; I < ZE_MAX_TEXTURE_SLOT; ++I)
 	{
-		ID3D10ShaderResourceView* D3D10Resource = NULL;
+		ID3D11ShaderResourceView* D3D10Resource = NULL;
 		const ZETexture* Texture = CurrentState.VertexShaderTextures[I];
 
-		if ((Texture != OldState.VertexShaderTextures[I]) || (Texture != NULL && Texture->IsRenderTarget()))
+		if ((Texture != OldState.VertexShaderTextures[I]) || (Texture != NULL && Texture->GetIsRenderTarget()))
 		{
 			if (Texture != NULL)
 			{
 				switch(Texture->GetTextureType())
 				{
 					case ZE_TT_2D:
+						((ZED3D10Texture2D*)Texture)->UpdateWith(0);
 						D3D10Resource = ((ZED3D10Texture2D*)Texture)->D3D10ShaderResourceView;
 						break;
 					case ZE_TT_3D:
+						((ZED3D10Texture3D*)Texture)->UpdateWith(0);
 						D3D10Resource = ((ZED3D10Texture3D*)Texture)->D3D10ShaderResourceView;
 						break;
 					case ZE_TT_CUBE:
+						((ZED3D10TextureCube*)Texture)->UpdateWith(0);
 						D3D10Resource = ((ZED3D10TextureCube*)Texture)->D3D10ShaderResourceView;
 						break;
 				}
 			}
 
 			OldState.VertexShaderTextures[I] = CurrentState.VertexShaderTextures[I];
-			D3D10Device->VSSetShaderResources((UINT)I, 1, &D3D10Resource);
+			D3DContexes[ContextIndex]->VSSetShaderResources((UINT)I, 1, &D3D10Resource);
 		}
 	}
 }
@@ -230,8 +243,8 @@ void ZED3D10GraphicsDevice::ApplyGeometryShaderStates()
 	// ----------------------------------------------------------
 	if (CurrentState.GeometryShader != OldState.GeometryShader)
 	{		
-		ID3D10GeometryShader* D3D10Shader = (CurrentState.GeometryShader == NULL) ? NULL : ((ZED3D10GeometryShader*)CurrentState.GeometryShader)->D3D10GeometryShader;
-		D3D10Device->GSSetShader(D3D10Shader);
+		ID3D11GeometryShader* D3D10Shader = (CurrentState.GeometryShader == NULL) ? NULL : ((ZED3D10GeometryShader*)CurrentState.GeometryShader)->D3D10GeometryShader;
+		D3DContexes[ContextIndex]->GSSetShader(D3D10Shader, NULL, 0);
 
 		OldState.GeometryShader = CurrentState.GeometryShader;
 	}
@@ -240,12 +253,15 @@ void ZED3D10GraphicsDevice::ApplyGeometryShaderStates()
 	// ----------------------------------------------------------
 	for (ZESize I = 0; I < ZE_MAX_CONSTANT_BUFFER_SLOT; ++I)
 	{		
+		if (CurrentState.GeometryShaderBuffers[I] != NULL)
+			((ZED3D10ConstantBuffer*)CurrentState.GeometryShaderBuffers[I])->UpdateWith(0);
+
 		if (CurrentState.GeometryShaderBuffers[I] != OldState.GeometryShaderBuffers[I])
 		{
-			ID3D10Buffer* D3D10Buffer = CurrentState.GeometryShaderBuffers[I] == NULL ? NULL : ((ZED3D10ConstantBuffer*)CurrentState.GeometryShaderBuffers[I])->D3D10Buffer;
+			ID3D11Buffer* D3D10Buffer = CurrentState.GeometryShaderBuffers[I] == NULL ? NULL : ((ZED3D10ConstantBuffer*)CurrentState.GeometryShaderBuffers[I])->D3D10Buffer;
 			
 			OldState.GeometryShaderBuffers[I] = CurrentState.GeometryShaderBuffers[I];
-			D3D10Device->GSSetConstantBuffers((UINT)I, 1, &D3D10Buffer);
+			D3DContexes[ContextIndex]->GSSetConstantBuffers((UINT)I, 1, &D3D10Buffer);
 		}
 	}
 
@@ -255,10 +271,10 @@ void ZED3D10GraphicsDevice::ApplyGeometryShaderStates()
 	{
 		if (CurrentState.GeometryShaderSamplers[I].GetHash() != OldState.GeometryShaderSamplerHashes[I])
 		{
-			ID3D10SamplerState* D3D10Sampler = (ID3D10SamplerState*)StatePool->CreateState(&CurrentState.GeometryShaderSamplers[I]);
+			ID3D11SamplerState* D3D10Sampler = (ID3D11SamplerState*)StatePool->GetState(&CurrentState.GeometryShaderSamplers[I]);
 			
 			OldState.GeometryShaderSamplerHashes[I] = CurrentState.GeometryShaderSamplers[I].GetHash();
-			D3D10Device->GSSetSamplers((UINT)I, 1, &D3D10Sampler);
+			D3DContexes[ContextIndex]->GSSetSamplers((UINT)I, 1, &D3D10Sampler);
 		}
 	}
 
@@ -266,29 +282,32 @@ void ZED3D10GraphicsDevice::ApplyGeometryShaderStates()
 	// ----------------------------------------------------------
 	for (ZESize I = 0; I < ZE_MAX_TEXTURE_SLOT; ++I)
 	{
-		ID3D10ShaderResourceView* D3D10Resource = NULL;
+		ID3D11ShaderResourceView* D3D10Resource = NULL;
 		const ZETexture* Texture = CurrentState.GeometryShaderTextures[I];
 
-		if ((Texture != OldState.GeometryShaderTextures[I]) || (Texture != NULL && Texture->IsRenderTarget()))
+		if ((Texture != OldState.GeometryShaderTextures[I]) || (Texture != NULL && Texture->GetIsRenderTarget()))
 		{
 			if (Texture != NULL)
 			{
 				switch(Texture->GetTextureType())
 				{
 					case ZE_TT_2D:
+						((ZED3D10Texture2D*)Texture)->UpdateWith(0);
 						D3D10Resource = ((ZED3D10Texture2D*)Texture)->D3D10ShaderResourceView;
 						break;
 					case ZE_TT_3D:
+						((ZED3D10Texture3D*)Texture)->UpdateWith(0);
 						D3D10Resource = ((ZED3D10Texture3D*)Texture)->D3D10ShaderResourceView;
 						break;
 					case ZE_TT_CUBE:
+						((ZED3D10TextureCube*)Texture)->UpdateWith(0);
 						D3D10Resource = ((ZED3D10TextureCube*)Texture)->D3D10ShaderResourceView;
 						break;
 				}
 			}
 
 			OldState.GeometryShaderTextures[I] = CurrentState.GeometryShaderTextures[I];
-			D3D10Device->GSSetShaderResources((UINT)I, 1, &D3D10Resource);
+			D3DContexes[ContextIndex]->GSSetShaderResources((UINT)I, 1, &D3D10Resource);
 		}
 	}
 }
@@ -302,19 +321,19 @@ void ZED3D10GraphicsDevice::ApplyRasterizerStates()
 	// ----------------------------------------------------------
 	if (CurrentState.RasterizerState.GetHash() != OldState.RasterizerStateHash)
 	{
-		ID3D10RasterizerState* D3D10State = (ID3D10RasterizerState*)StatePool->CreateState(&CurrentState.RasterizerState);
-		D3D10Device->RSSetState(D3D10State);
+		ID3D11RasterizerState* D3D10State = (ID3D11RasterizerState*)StatePool->GetState(&CurrentState.RasterizerState);
+		D3DContexes[ContextIndex]->RSSetState(D3D10State);
 
 		OldState.RasterizerStateHash = CurrentState.RasterizerState.GetHash();
 	}
-
+	
 	// Viewports
 	// ----------------------------------------------------------
 	Commit = false;
-	D3D10_VIEWPORT D3D10Viewports[ZE_MAX_VIEWPORT_SLOT] = {0};
+	D3D11_VIEWPORT D3D10Viewports[ZE_MAX_VIEWPORT_SLOT] = {0};
 	for (ZESize I = 0; I < ZE_MAX_VIEWPORT_SLOT; ++I)
 	{
-		if (CurrentState.ViewPorts[I].GetHash() != OldState.ViewPortHashes[I])
+		if (RenderTargetChanged || (CurrentState.ViewPorts[I].GetHash() != OldState.ViewPortHashes[I]))
 		{
 			D3D10Viewports[I].Width = CurrentState.ViewPorts[I].StateData.Width;
 			D3D10Viewports[I].Height = CurrentState.ViewPorts[I].StateData.Height;
@@ -329,16 +348,16 @@ void ZED3D10GraphicsDevice::ApplyRasterizerStates()
 	}
 	if (Commit)
 	{
-		D3D10Device->RSSetViewports(ZE_MAX_VIEWPORT_SLOT, D3D10Viewports);
+		D3DContexes[ContextIndex]->RSSetViewports(ZE_MAX_VIEWPORT_SLOT, D3D10Viewports);
 	}
-	
+
 	// Scissor Rectangles
 	// ----------------------------------------------------------
 	Commit = false;
-	D3D10_RECT D3D10Rectangles[ZE_MAX_SCISSOR_SLOT] = {0};
+	D3D11_RECT D3D10Rectangles[ZE_MAX_SCISSOR_SLOT] = {0};
 	for (ZESize I = 0; I < ZE_MAX_SCISSOR_SLOT; ++I)
 	{		
-		if (CurrentState.ScissorRects[I].GetHash() != OldState.ScissorRectHashes[I])
+		if (RenderTargetChanged || (CurrentState.ScissorRects[I].GetHash() != OldState.ScissorRectHashes[I]))
 		{
 			D3D10Rectangles[I].top = CurrentState.ScissorRects[I].StateData.Top;
 			D3D10Rectangles[I].left	= CurrentState.ScissorRects[I].StateData.Left;
@@ -351,8 +370,10 @@ void ZED3D10GraphicsDevice::ApplyRasterizerStates()
 	}
 	if (Commit)
 	{
-		D3D10Device->RSSetScissorRects(ZE_MAX_SCISSOR_SLOT, D3D10Rectangles);
+		D3DContexes[ContextIndex]->RSSetScissorRects(ZE_MAX_SCISSOR_SLOT, D3D10Rectangles);
 	}
+
+	RenderTargetChanged = false;
 }
 
 void ZED3D10GraphicsDevice::ApplyPixelShaderStates()
@@ -364,9 +385,9 @@ void ZED3D10GraphicsDevice::ApplyPixelShaderStates()
 	// ----------------------------------------------------------
 	if (CurrentState.PixelShader != OldState.PixelShader)
 	{
-		ID3D10PixelShader* D3D10Shader = (CurrentState.PixelShader == NULL) ? NULL : ((ZED3D10PixelShader*)CurrentState.PixelShader)->D3D10PixelShader;
+		ID3D11PixelShader* D3D10Shader = (CurrentState.PixelShader == NULL) ? NULL : ((ZED3D10PixelShader*)CurrentState.PixelShader)->D3D10PixelShader;
 			
-		D3D10Device->PSSetShader(D3D10Shader);
+		D3DContexes[ContextIndex]->PSSetShader(D3D10Shader, NULL, 0);
 		OldState.PixelShader = CurrentState.PixelShader;
 	}
 
@@ -374,12 +395,15 @@ void ZED3D10GraphicsDevice::ApplyPixelShaderStates()
 	// ----------------------------------------------------------
 	for (ZESize I = 0; I < ZE_MAX_CONSTANT_BUFFER_SLOT; ++I)
 	{
+		if (CurrentState.PixelShaderBuffers[I] != NULL)
+			((ZED3D10ConstantBuffer*)CurrentState.PixelShaderBuffers[I])->UpdateWith(0);
+
 		if (CurrentState.PixelShaderBuffers[I] != OldState.PixelShaderBuffers[I])
 		{
-			ID3D10Buffer* D3D10Buffer = CurrentState.PixelShaderBuffers[I] == NULL ? NULL : ((ZED3D10ConstantBuffer*)CurrentState.PixelShaderBuffers[I])->D3D10Buffer;
+			ID3D11Buffer* D3D10Buffer = CurrentState.PixelShaderBuffers[I] == NULL ? NULL : ((ZED3D10ConstantBuffer*)CurrentState.PixelShaderBuffers[I])->D3D10Buffer;
 			
 			OldState.PixelShaderBuffers[I] = CurrentState.PixelShaderBuffers[I];
-			D3D10Device->PSSetConstantBuffers((UINT)I, 1, &D3D10Buffer);
+			D3DContexes[ContextIndex]->PSSetConstantBuffers((UINT)I, 1, &D3D10Buffer);
 		}
 	}
 
@@ -389,10 +413,10 @@ void ZED3D10GraphicsDevice::ApplyPixelShaderStates()
 	{
 		if (CurrentState.PixelShaderSamplers[I].GetHash() != OldState.PixelShaderSamplerHashes[I])
 		{
-			ID3D10SamplerState* D3D10Sampler = (ID3D10SamplerState*)StatePool->CreateState(&CurrentState.PixelShaderSamplers[I]);
+			ID3D11SamplerState* D3D10Sampler = (ID3D11SamplerState*)StatePool->GetState(&CurrentState.PixelShaderSamplers[I]);
 
 			OldState.PixelShaderSamplerHashes[I] = CurrentState.PixelShaderSamplers[I].GetHash();
-			D3D10Device->PSSetSamplers((UINT)I, 1, &D3D10Sampler);
+			D3DContexes[ContextIndex]->PSSetSamplers((UINT)I, 1, &D3D10Sampler);
 		}
 	}
 		
@@ -400,29 +424,32 @@ void ZED3D10GraphicsDevice::ApplyPixelShaderStates()
 	// ----------------------------------------------------------
 	for (ZESize I = 0; I < ZE_MAX_TEXTURE_SLOT; ++I)
 	{
-		ID3D10ShaderResourceView* D3D10Resource = NULL;
+		ID3D11ShaderResourceView* D3D10Resource = NULL;
 		const ZETexture* Texture = CurrentState.PixelShaderTextures[I];
 
-		if ((Texture != OldState.GeometryShaderTextures[I]) || (Texture != NULL && Texture->IsRenderTarget()))
+		if ((Texture != OldState.GeometryShaderTextures[I]) || (Texture != NULL && Texture->GetIsRenderTarget()))
 		{
 			if (Texture != NULL)
 			{
 				switch(Texture->GetTextureType())
 				{
 					case ZE_TT_2D:
+						((ZED3D10Texture2D*)Texture)->UpdateWith(0);
 						D3D10Resource = ((ZED3D10Texture2D*)Texture)->D3D10ShaderResourceView;
 						break;
 					case ZE_TT_3D:
+						((ZED3D10Texture3D*)Texture)->UpdateWith(0);
 						D3D10Resource = ((ZED3D10Texture3D*)Texture)->D3D10ShaderResourceView;
 						break;
 					case ZE_TT_CUBE:
+						((ZED3D10TextureCube*)Texture)->UpdateWith(0);
 						D3D10Resource = ((ZED3D10TextureCube*)Texture)->D3D10ShaderResourceView;
 						break;
 				}
 			}
 
 			OldState.PixelShaderTextures[I] = CurrentState.PixelShaderTextures[I];
-			D3D10Device->PSSetShaderResources((UINT)I, 1, &D3D10Resource);
+			D3DContexes[ContextIndex]->PSSetShaderResources((UINT)I, 1, &D3D10Resource);
 		}
 	}
 }
@@ -434,14 +461,15 @@ void ZED3D10GraphicsDevice::ApplyOutputStates()
 
 	// Render targets
 	// ----------------------------------------------------------
-	ID3D10DepthStencilView* D3D10DepthStencil = NULL;
-	ID3D10RenderTargetView* D3D10Targets[ZE_MAX_RENDER_TARGET_SLOT] = {NULL};
+	ID3D11DepthStencilView* D3D10DepthStencil = NULL;
+	ID3D11RenderTargetView* D3D10Targets[ZE_MAX_RENDER_TARGET_SLOT] = {NULL};
 
 	D3D10DepthStencil = CurrentState.DepthStencilBuffer == NULL ? NULL : ((const ZED3D10DepthStencilBuffer*)CurrentState.DepthStencilBuffer)->D3D10DepthStencilView;
 
 	if (OldState.DepthStencilBuffer != CurrentState.DepthStencilBuffer)
 	{
 		OldState.DepthStencilBuffer = CurrentState.DepthStencilBuffer;
+		RenderTargetChanged = true;
 		Commit = true;
 	}
 
@@ -452,12 +480,13 @@ void ZED3D10GraphicsDevice::ApplyOutputStates()
 			D3D10Targets[0] = CurrentState.RenderTargets[0] == NULL ? NULL : ((const ZED3D10RenderTarget*)CurrentState.RenderTargets[0])->D3D10RenderTargetView;
 			
 			OldState.RenderTargets[0] = CurrentState.RenderTargets[0];
+			RenderTargetChanged = true;
 			Commit = true;
 		}
 		
 		if (Commit)
 		{
-			D3D10Device->OMSetRenderTargets(ZE_MAX_RENDER_TARGET_SLOT, D3D10Targets, D3D10DepthStencil);
+			D3DContexes[ContextIndex]->OMSetRenderTargets(ZE_MAX_RENDER_TARGET_SLOT, D3D10Targets, D3D10DepthStencil);
 		}
 		
 		OldState.ScreenWriteEnable = CurrentState.ScreenWriteEnable;
@@ -470,41 +499,44 @@ void ZED3D10GraphicsDevice::ApplyOutputStates()
 			D3D10Targets[I] = CurrentState.RenderTargets[I] == NULL ? NULL : ((const ZED3D10RenderTarget*)CurrentState.RenderTargets[I])->D3D10RenderTargetView;
 
 			if (OldState.RenderTargets[I] != CurrentState.RenderTargets[I])
+			{
 				Commit = true;
+				RenderTargetChanged = true;
+			}
 
 			OldState.RenderTargets[I] = CurrentState.RenderTargets[I];
 		}
 
 		if (Commit)
 		{
-			D3D10Device->OMSetRenderTargets(ZE_MAX_RENDER_TARGET_SLOT, D3D10Targets, D3D10DepthStencil);
+			D3DContexes[ContextIndex]->OMSetRenderTargets(ZE_MAX_RENDER_TARGET_SLOT, D3D10Targets, D3D10DepthStencil);
 		}
 	}
-		
+	
 	// Blend State
 	// ----------------------------------------------------------
-	if (CurrentState.BlendState.GetHash() != OldState.BlendStateHash || 
-		CurrentState.ComponentBlendMask != OldState.ComponentBlendMask || 
-		CurrentState.ComponentBlendFactors != OldState.ComponentBlendFactors)
+	if ( (CurrentState.BlendState.GetHash() != OldState.BlendStateHash) || 
+		 (CurrentState.ComponentBlendMask != OldState.ComponentBlendMask) || 
+		 (CurrentState.ComponentBlendFactors != OldState.ComponentBlendFactors))
 	{
-		ID3D10BlendState* D3D10State = (ID3D10BlendState*)StatePool->CreateState(&CurrentState.BlendState);
-		D3D10Device->OMSetBlendState(D3D10State, CurrentState.ComponentBlendFactors.M, CurrentState.ComponentBlendMask.Value);
+		ID3D11BlendState* D3D10State = (ID3D11BlendState*)StatePool->GetState(&CurrentState.BlendState);
+		D3DContexes[ContextIndex]->OMSetBlendState(D3D10State, CurrentState.ComponentBlendFactors.M, 0xffffffff/*CurrentState.ComponentBlendMask.Value*/);
 
 		OldState.BlendStateHash = CurrentState.BlendState.GetHash();
-		CurrentState.ComponentBlendMask = OldState.ComponentBlendMask;
-		CurrentState.ComponentBlendFactors = OldState.ComponentBlendFactors;
+		OldState.ComponentBlendMask = CurrentState.ComponentBlendMask;
+		OldState.ComponentBlendFactors = CurrentState.ComponentBlendFactors;
 	}
 
 	// Depth Stencil State
 	// ----------------------------------------------------------
-	if (CurrentState.DepthStencilState.GetHash() != OldState.DepthStencilStateHash || 
-		CurrentState.StencilReferance != OldState.StencilReferance)
+	if ( (CurrentState.DepthStencilState.GetHash() != OldState.DepthStencilStateHash) || 
+		 (CurrentState.StencilReferance != OldState.StencilReferance))
 	{
-		ID3D10DepthStencilState* D3D10State = (ID3D10DepthStencilState*)StatePool->CreateState(&CurrentState.DepthStencilState);
-		D3D10Device->OMSetDepthStencilState(D3D10State, CurrentState.StencilReferance);
+		ID3D11DepthStencilState* D3D10State = (ID3D11DepthStencilState*)StatePool->GetState(&CurrentState.DepthStencilState);
+		D3DContexes[ContextIndex]->OMSetDepthStencilState(D3D10State, CurrentState.StencilReferance);
 
 		OldState.DepthStencilStateHash = CurrentState.DepthStencilState.GetHash();
-		CurrentState.StencilReferance = OldState.StencilReferance;
+		OldState.StencilReferance = CurrentState.StencilReferance;
 	}
 }
 
@@ -521,58 +553,92 @@ void ZED3D10GraphicsDevice::ApplyStates()
 void ZED3D10GraphicsDevice::Draw(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex)
 {
 	ApplyStates();
-	D3D10Device->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
-	D3D10Device->Draw(VertexCount, FirstVertex);
+	D3DContexes[ContextIndex]->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
+	D3DContexes[ContextIndex]->Draw(VertexCount, FirstVertex);
 }
 
 void ZED3D10GraphicsDevice::DrawIndexed(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt FirstIndex, ZEInt BaseVertex)
 {
 	ApplyStates();
-	D3D10Device->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
-	D3D10Device->DrawIndexed(IndexCount, FirstIndex, BaseVertex);
+	D3DContexes[ContextIndex]->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
+	D3DContexes[ContextIndex]->DrawIndexed(IndexCount, FirstIndex, BaseVertex);
 }
 
 void ZED3D10GraphicsDevice::DrawInstanced(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance)
 {
 	ApplyStates();
-	D3D10Device->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
-	D3D10Device->DrawInstanced(VertexCount, InstanceCount, FirstVertex, FirstInstance);
+	D3DContexes[ContextIndex]->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
+	D3DContexes[ContextIndex]->DrawInstanced(VertexCount, InstanceCount, FirstVertex, FirstInstance);
 }
 
 void ZED3D10GraphicsDevice::DrawIndexedInstanced(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance)
 {
 	ApplyStates();
-	D3D10Device->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
-	D3D10Device->DrawIndexedInstanced(IndexCount, InstanceCount, FirstIndex, BaseVertex, FirstInstance);
-}
-
-bool ZED3D10GraphicsDevice::Present() const
-{
-	UINT SynchInterval = zeGraphics->GetVerticalSync() ? 1 : 0;
-
-	if (FAILED(GraphicsModule->GetDXGISwapChain()->Present(SynchInterval, 0)))
-		return false;
-
-	return false;
+	D3DContexes[ContextIndex]->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
+	D3DContexes[ContextIndex]->DrawIndexedInstanced(IndexCount, InstanceCount, FirstIndex, BaseVertex, FirstInstance);
 }
 
 void ZED3D10GraphicsDevice::ClearRenderTarget(const ZERenderTarget* RenderTarget, const ZEVector4& ClearColor)
 {
-	D3D10Device->ClearRenderTargetView(((ZED3D10RenderTarget*)RenderTarget)->D3D10RenderTargetView, ClearColor.M);
+	D3DContexes[ContextIndex]->ClearRenderTargetView(((ZED3D10RenderTarget*)RenderTarget)->D3D10RenderTargetView, ClearColor.M);
 }
 
 void ZED3D10GraphicsDevice::ClearDepthStencilBuffer(const ZEDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue)
 {
 	UINT ClearFlag = 0;
-	ClearFlag |= Depth ? D3D10_CLEAR_DEPTH : 0;
-	ClearFlag |= Stencil ? D3D10_CLEAR_STENCIL : 0;
+	ClearFlag |= Depth ? D3D11_CLEAR_DEPTH : 0;
+	ClearFlag |= Stencil ? D3D11_CLEAR_STENCIL : 0;
 
-	D3D10Device->ClearDepthStencilView(((ZED3D10DepthStencilBuffer*)DepthStencil)->D3D10DepthStencilView, ClearFlag, DepthValue, StencilValue);
+	D3DContexes[ContextIndex]->ClearDepthStencilView(((ZED3D10DepthStencilBuffer*)DepthStencil)->D3D10DepthStencilView, ClearFlag, DepthValue, StencilValue);
 }
 
-ZED3D10GraphicsDevice::ZED3D10GraphicsDevice()
+D3D_FEATURE_LEVEL ZED3D10GraphicsDevice::GetD3DFeatureLevel() const
 {
+	return FeatureLevel;
+}
 
+ZED3D10GraphicsDevice::ZED3D10GraphicsDevice(ID3D11Device* D3D10Device, ZEUInt ContextIndex) : ContextIndex(ContextIndex)
+{
+	RenderTargetChanged = false;
+
+	ZEUInt CurrentSampleCount = 1;
+	ZEUInt CurrentSampleQuality = 0;
+	DXGI_FORMAT Format = ((ZED3D10GraphicsModule*)zeGraphics)->GetDXGIDisplayFormat();
+	do
+	{
+		HRESULT Result = D3D10Device->CheckMultisampleQualityLevels(Format, CurrentSampleCount, &CurrentSampleQuality);
+		if (FAILED(Result))
+		{
+			zeCriticalError("Cannot query sample count/quality support. Error: %d", Result);
+			return;
+		}
+
+		if (CurrentSampleQuality != 0)
+		{
+			ZEMSAAMode CurrentMS;
+			CurrentMS.SampleCount = CurrentSampleCount;
+			CurrentMS.SampleQuality = CurrentSampleQuality - 1;
+
+			MSAAModeList.AddByRef(CurrentMS);
+		}
+
+		CurrentSampleCount *= 2;
+
+	} while(CurrentSampleCount <= ZE_MAX_MULTI_SAMPLE_COUNT);
+
+	ZEUInt AnisotropyLevel = 1;
+	do
+	{
+		AFModeList.Add(AnisotropyLevel);
+		AnisotropyLevel *= 2;
+
+	} while (AnisotropyLevel <= ZE_MAX_ANISOTROPY_LEVEL);
+
+	FeatureLevel = D3D10Device->GetFeatureLevel();
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Multi sampling modes enumerated.");
+#endif
 }
 
 ZED3D10GraphicsDevice::~ZED3D10GraphicsDevice()

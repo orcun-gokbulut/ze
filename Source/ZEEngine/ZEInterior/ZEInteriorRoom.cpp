@@ -38,16 +38,17 @@
 #include "ZEGame/ZEScene.h"
 #include "ZERenderer/ZELight.h"
 #include "ZEInteriorResource.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEMath/ZEViewVolume.h"
 #include "ZEInterior/ZEInterior.h"
 #include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
 #include "ZERenderer/ZEMaterialSimple.h"
-
+#include "ZEGraphics/ZEConstantBuffer.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
 bool ZEInteriorRoom::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex)
 {
@@ -320,35 +321,30 @@ void ZEInteriorRoom::SetPersistentDraw(bool Enabled)
 {
 	IsPersistentDraw = Enabled;
 }
-#include "ZEGraphics/ZEConstantBuffer.h"
-#include "ZERenderer/ZECamera.h"
+
 void ZEInteriorRoom::Draw(ZEDrawParameters* DrawParameters)
 {
 	IsDrawn = true;
+
+	ZECamera* Camera = zeScene->GetActiveCamera();
 
 	for(ZESize I = 0; I < RenderCommands.GetCount(); I++)
 	{
 		ZERenderCommand* Command = &RenderCommands[I];
 
-		ZETransformationBuffer* Buffer = NULL;
-		Command->TransformationBuffer->Lock((void**)&Buffer);
-
 		ZEMatrix4x4 LocalTransform;
 		ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
 		
-		Buffer->WorldMatrix = Owner->GetWorldTransform() * LocalTransform;
-		Buffer->ViewMatrix = zeScene->GetActiveCamera()->GetViewTransform();
-		Buffer->ProjectionMatrix = zeScene->GetActiveCamera()->GetProjectionTransform();
-		
-		Command->TransformationBuffer->Unlock();
+		ZEMatrix4x4 WorldTransform = Owner->GetWorldTransform() * LocalTransform;
 
-		DrawParameters->Renderer->AddRenderCommand(Command);
+		Command->WorldTransform = WorldTransform;
+
+		DrawParameters->Bucket->AddRenderCommand(Command);
 	}
 }
 
 bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resource)
 {	
-
 	this->Owner = Owner;
 	this->Resource = Resource;
 	this->BoundingBox = Resource->BoundingBox;

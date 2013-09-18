@@ -35,8 +35,8 @@
 
 
 #pragma once
-#ifndef __ZE_D3D10_SHADER_MANAGER_H__
-#define __ZE_D3D10_SHADER_MANAGER_H__
+#ifndef __ZE_D3D11_SHADER_MANAGER_H__
+#define __ZE_D3D11_SHADER_MANAGER_H__
 
 
 class ZED3D10ShaderManager

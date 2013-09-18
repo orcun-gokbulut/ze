@@ -48,6 +48,9 @@ class ZEMaterialLightProjective;
 class ZELightProjective : public ZELight
 {
 	protected:
+		bool							PropertyChanged;
+		bool							TransformChanged;
+
 		float							FOV;
 		float							AspectRatio;
 		float							Range;
@@ -59,13 +62,18 @@ class ZELightProjective : public ZELight
 		float							SlopeScaledBias;
 		float							DepthScaledBias;
 
+		const ZETexture2D*				ProjectionTexture;
+
 		ZEMaterialLightProjective*		Material;
 		ZEVertexLayout					VertexLayout;
 		ZEVertexBuffer*					VertexBuffer;
 		ZERenderCommandDefault			RenderCommand;
-		ZEViewFrustum					ViewVolume;
+		
+		mutable ZEViewFrustum			ViewVolume;
 
 		virtual void					UpdateMaterial(const ZEDrawParameters* DrawParameters);
+
+		virtual void					OnTransformChanged();
 
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
@@ -108,7 +116,7 @@ class ZELightProjective : public ZELight
 		void							SetProjectionTexture(const ZETexture2D* Texture);
 		const ZETexture2D*				GetProjectionTexture() const;
 
-		virtual const ZEViewVolume*		GetLightVolume();
+		virtual ZELightType				GetLightType() const;
 
 		virtual void					Tick(float Time);
 		virtual void					Draw(ZEDrawParameters* DrawParameters);

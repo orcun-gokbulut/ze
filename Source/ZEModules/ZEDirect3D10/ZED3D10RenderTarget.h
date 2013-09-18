@@ -33,14 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D10_RENDER_TARGET_H__
-#define __ZE_D3D10_RENDER_TARGET_H__
+#ifndef __ZE_D3D11_RENDER_TARGET_H__
+#define __ZE_D3D11_RENDER_TARGET_H__
+
+#include <d3d11.h>
 
 #include "ZETypes.h"
 #include "ZED3D10ComponentBase.h"
 #include "ZEGraphics/ZERenderTarget.h"
 
-struct ID3D10RenderTargetView;
+struct ID3D11RenderTargetView;
 
 class ZED3D10RenderTarget : public ZERenderTarget, public ZED3D10ComponentBase
 {
@@ -49,17 +51,16 @@ class ZED3D10RenderTarget : public ZERenderTarget, public ZED3D10ComponentBase
 	friend class ZED3D10TextureCube;
 	friend class ZED3D10GraphicsModule;
 	friend class ZED3D10GraphicsDevice;
+	friend class ZED3D10GraphicsWindow;
 
 	protected:
-		static ZEUInt16					GlobalCount;
+		ID3D11RenderTargetView*			D3D10RenderTargetView;
 
-		ID3D10RenderTargetView*			D3D10RenderTargetView;
-
-										ZED3D10RenderTarget(ZEUInt Width, ZEUInt Height, ZEVector3 PixelSize, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType, ID3D10RenderTargetView* RenderTargtetView);
+										ZED3D10RenderTarget(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType, ID3D11RenderTargetView* RenderTargtetView);
 		virtual							~ZED3D10RenderTarget();
 	
 	public:
-		const ID3D10RenderTargetView*	GetD3D10RenderTargetView() const;
+		const ID3D11RenderTargetView*	GetD3D10RenderTargetView() const;
 		
 		virtual bool					IsEmpty() const;
 };

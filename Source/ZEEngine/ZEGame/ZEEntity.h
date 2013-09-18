@@ -52,7 +52,7 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZERayCast.h"
 
-struct ZEDrawParameters;
+class ZEDrawParameters;
 
 enum ZEEntityRunAt
 {

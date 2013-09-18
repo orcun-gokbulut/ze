@@ -51,7 +51,6 @@ class ZEShaderMetaTable
 	friend class ZEShader;
 	friend class ZEShaderCompiler;
 
-	// Should be public for only internal usage
 	public:
 		ZEArray<ZEShaderSampler>		Samplers;
 		ZEArray<ZEShaderTexture>		Textures;
@@ -64,38 +63,32 @@ class ZEShaderMetaTable
 		virtual							~ZEShaderMetaTable();
 
 	public:
-										// Compile Options
 		ZEShaderType					GetShaderType() const;
 		ZEShaderModel					GetShaderModel() const;
 		const ZEString&					GetShaderFileName() const;
 		const ZEString&					GetShaderEntryPoint() const;
 		ZESize							GetShaderParameterCount() const;
-		const ZEShaderParameter*		GetShaderParameter(ZESize Index) const;
+		const ZEShaderParameter*		GetShaderParameter(ZEUInt Index) const;
 		const ZEShaderParameter*		GetShaderParameter(const char* Name) const;
 
-										// Sampler
 		ZESize							GetSamplerCount() const;
-		const ZEShaderSampler*			GetSamplerInfo(ZESize Index) const;
+		const ZEShaderSampler*			GetSamplerInfo(ZEUInt Index) const;
 		const ZEShaderSampler*			GetSamplerInfo(const char* Name) const;
 		
-										// Texture
 		ZESize							GetTextureCount() const;
-		const ZEShaderTexture*			GetTextureInfo(ZESize Index) const;
+		const ZEShaderTexture*			GetTextureInfo(ZEUInt Index) const;
 		const ZEShaderTexture*			GetTextureInfo(const char* Name) const;
 
-										// Buffer
 		ZESize							GetBufferCount() const;
-		const ZEShaderBuffer*			GetBufferInfo(ZESize Index) const;
+		const ZEShaderBuffer*			GetBufferInfo(ZEUInt Index) const;
 		const ZEShaderBuffer*			GetBufferInfo(const char* Name) const;
-													
-										// Constant
-		ZESize							GetConstantCount(ZESize BufferIndex) const;
-		const ZEShaderConstant*			GetConstantInfo(ZESize BufferIndex, ZESize Index) const;
-		const ZEShaderConstant*			GetConstantInfo(ZESize BufferIndex, const char* Name) const;
+		
+		ZESize							GetConstantCount(ZEUInt BufferIndex) const;
+		const ZEShaderConstant*			GetConstantInfo(ZEUInt BufferIndex, ZEUInt Index) const;
+		const ZEShaderConstant*			GetConstantInfo(ZEUInt BufferIndex, const char* Name) const;
 
-										// Input Signature
 		ZESize							GetInputCount() const;
-		const ZEShaderInput*			GetInputInfo(ZESize Index) const;
+		const ZEShaderInput*			GetInputInfo(ZEUInt Index) const;
 		const ZEShaderInput*			GetInputInfo(const char* Semantic, ZEUInt8 SemantixIndex) const;
 
 };

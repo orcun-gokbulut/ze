@@ -46,26 +46,37 @@
 #include "ZEGraphics/ZERenderTarget.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsWindow.h"
 #include "ZEGraphics/ZEShaderMetaTable.h"
 #include "ZEGraphics/ZEGraphicsEventTracer.h"
 
-void ZERenderStageParticle::ResetStates()
+bool ZERenderStageParticle::ResetStates(const ZEMaterial* Material)
 {
-	// Reset parent states
-	ZERenderStage::ResetStates();
-	
+	// Reset to default states
+	// ---------------------------------------------------------
+	if (!ZERenderStage::ResetStates(Material))
+		return false;
+
 	// Outputs
-	DefaultStates.RenderTargets[0] = ABufferInput->GetOutputAccumulationRenderTarget();
-	DefaultStates.DepthStencilBuffer = zeGraphics->GetDepthBuffer();
+	DefaultStates.RenderTargets[0] = InputStageAccumulation->GetRenderTargetAccumulation();
+	DefaultStates.DepthStencilBuffer = zeGraphics->GetWindow()->GetDepthBuffer();
+
+	ZEInt Width, Height;
+	zeGraphics->GetWindow()->GetSize(Width, Height);
 
 	// Use default viewport and scissor rectangles
-	ZESize ScreenCount = zeGraphics->GetScreenCount();
-	for (ZESize I = 0; I < ScreenCount; ++I)
-	{
-		DefaultStates.ViewPorts[I] = zeGraphics->GetViewport(I);
-		DefaultStates.ScissorRects[I] = zeGraphics->GetScissorRectangle(I);
-	}
+	DefaultStates.ViewPorts[0].StateData.TopLeftX = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.TopLeftY = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.Width = (float)Width;
+	DefaultStates.ViewPorts[0].StateData.Height = (float)Height;
+	DefaultStates.ViewPorts[0].StateData.MinDepth = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.MaxDepth = 1.0f;
 
+	DefaultStates.ScissorRects[0].StateData.Left = 0;
+	DefaultStates.ScissorRects[0].StateData.Top = 0;
+	DefaultStates.ScissorRects[0].StateData.Right = Width;
+	DefaultStates.ScissorRects[0].StateData.Bottom = Height;
+	
 	// Blend state: Use default
 
 	// Point sampler state
@@ -84,15 +95,8 @@ void ZERenderStageParticle::ResetStates()
 	DefaultStates.RasterizerState.SetCullDirection(ZE_CD_COUNTER_CLOCKWISE);
 	DefaultStates.RasterizerState.SetFillMode(ZE_FM_SOLID);
 
-	if (ABufferInput == NULL)
-	{
-		zeError("Missing input stage.");
-		return;
-	}
-}
-
-void ZERenderStageParticle::CommitStates()
-{
+	// Commit default states
+	// ----------------------------------------------------------
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	Device->SetRenderTargetArray(DefaultStates.RenderTargets);
@@ -103,15 +107,11 @@ void ZERenderStageParticle::CommitStates()
 
 	Device->SetRasterizerState(DefaultStates.RasterizerState);
 
-	ZESize ScreenCount = zeGraphics->GetScreenCount();
-	for (ZESize I = 0; I < ScreenCount; ++I)
-	{
-		Device->SetViewport(I, DefaultStates.ViewPorts[I]);
-		Device->SetScissorRectangle(I, DefaultStates.ScissorRects[I]);
-	}
+	Device->SetViewport(0, DefaultStates.ViewPorts[0]);
+	Device->SetScissorRectangle(0, DefaultStates.ScissorRects[0]);
 
-	// Commit parent States
-	ZERenderStage::CommitStates();
+
+	return true;
 }
 
 void ZERenderStageParticle::UpdateBuffers()
@@ -134,43 +134,58 @@ ZERenderStageType ZERenderStageParticle::GetStageType() const
 	return ZE_RST_PARTICLE;
 }
 
-void ZERenderStageParticle::SetInputAccumulationStage(const ZERenderStageAccumulation* Input)
+void ZERenderStageParticle::SetInputStageAccumulation(const ZERenderStageAccumulation* Input)
 {
 	zeDebugCheck(Input == NULL, "Null pointer.");
 
-	ABufferInput = Input;
+	InputStageAccumulation = Input;
 }
 
-const ZERenderStageAccumulation* ZERenderStageParticle::GetInputAccumulationStage() const
+const ZERenderStageAccumulation* ZERenderStageParticle::GetInputStageAccumulation() const
 {
-	return ABufferInput;
+	return InputStageAccumulation;
 }
 		
-void ZERenderStageParticle::Setup()
+bool ZERenderStageParticle::Setup()
 {
+	if (!ZERenderStage::Setup())
+		return false;
+
 	UpdateBuffers();
-	ResetStates();
-	CommitStates();
+
+	return true;
 }
 
-void ZERenderStageParticle::Process(const ZERenderCommand* RenderCommand)
+bool ZERenderStageParticle::Process(const ZERenderCommand* RenderCommand)
 {
-	zeDebugCheck(RenderCommand->Material == NULL, "Null Pointer.");
+	zeDebugCheck(RenderCommand == NULL, "Null pointer");
+
+	if (!ZERenderStage::Process(RenderCommand))
+		return false;	
+
+	if (InputStageAccumulation == NULL)
+	{
+		zeWarning("Null input stage");
+		return false;
+	}
 
 	bool Done = false;
 	ZEUInt PassId = 0;
-	while (!Done)
+	
+	do
 	{
 		Done = RenderCommand->Material->SetupPass(PassId++, this, RenderCommand);
-	}
+	
+	} while (!Done);
 
 	PumpStreams(RenderCommand);
+
+	return true;
 }
 
 ZERenderStageParticle::ZERenderStageParticle()
 {
-	ABufferInput = NULL;
-	LastMaterial = 0;
+	InputStageAccumulation = NULL;
 }
 
 ZERenderStageParticle::~ZERenderStageParticle()

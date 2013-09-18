@@ -36,14 +36,9 @@
 #include "ZETexture.h"
 #include "ZEGraphicsModule.h"
 
-bool ZETexture::IsStatic() const
+bool ZETexture::GetIsRenderTarget() const
 {
-	return Static;
-}
-
-bool ZETexture::IsRenderTarget() const
-{
-	return RenderTarget;
+	return IsRenderTarget;
 }
 
 ZETextureType ZETexture::GetTextureType() const
@@ -56,23 +51,11 @@ ZETexturePixelFormat ZETexture::GetPixelFormat() const
 	return PixelFormat;
 }
 
-const ZEVector3& ZETexture::GetPixelSize() const
-{
-	return PixelSize;
-}
-
-void ZETexture::Destroy()
-{
-	delete this;
-}
-
 ZETexture::ZETexture()
 {
-	Static = true;
-	RenderTarget = false;
+	IsRenderTarget = false;
 	TextureType = ZE_TT_NONE;
 	PixelFormat = ZE_TPF_NOTSET;
-	PixelSize = ZEVector3::Zero;
 }
 
 ZETexture::~ZETexture()

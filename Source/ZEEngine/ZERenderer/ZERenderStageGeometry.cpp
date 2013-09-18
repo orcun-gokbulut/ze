@@ -40,26 +40,128 @@
 #include "ZEGraphics/ZERenderTarget.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsWindow.h"
 #include "ZEGraphics/ZEGraphicsEventTracer.h"
 
-void ZERenderStageGeometry::ResetStates()
+void ZERenderStageGeometry::UpdateBuffers()
 {
-	// Reset parent states
-	ZERenderStage::ResetStates();
+	ZETexture2D* Texture = NULL;
+	ZEInt Width, Height;
+	zeGraphics->GetWindow()->GetSize(Width, Height);
+
+	Texture = Textures.Depth;
+	if (Texture == NULL || Texture->GetWidth() != Width || Texture->GetHeight() != Height)
+	{
+		ZE_DESTROY(RenderTargets.Depth);
+		ZE_DESTROY(Textures.Depth);
+
+		Textures.Depth = ZETexture2D::CreateInstance();
+		Textures.Depth->CreateStatic(Width, Height, 1, ZE_TPF_F32, true, NULL);
+		RenderTargets.Depth = Textures.Depth->CreateRenderTarget(0);
+	}
+	
+	Texture = Textures.NormalSpecular;
+	if (Texture == NULL || Texture->GetWidth() != Width || Texture->GetHeight() != Height)
+	{
+		ZE_DESTROY(RenderTargets.NormalSpecular);
+		ZE_DESTROY(Textures.NormalSpecular);
+
+		Textures.NormalSpecular = ZETexture2D::CreateInstance();
+		Textures.NormalSpecular->CreateStatic(Width, Height, 1, ZE_TPF_F16_4, true, NULL);
+		RenderTargets.NormalSpecular = Textures.NormalSpecular->CreateRenderTarget(0);
+	}
+
+	Texture = Textures.SSScatteringVelocity;
+	if (Texture == NULL || Texture->GetWidth() != Width || Texture->GetHeight() != Height)
+	{
+		ZE_DESTROY(RenderTargets.SSScatteringVelocity);
+		ZE_DESTROY(Textures.SSScatteringVelocity);
+
+		Textures.SSScatteringVelocity = ZETexture2D::CreateInstance();
+		Textures.SSScatteringVelocity->CreateStatic(Width, Height, 1, ZE_TPF_I8_4, true, NULL);
+		RenderTargets.SSScatteringVelocity = Textures.SSScatteringVelocity->CreateRenderTarget(0);
+	}
+}
+
+void ZERenderStageGeometry::DestroyBuffers()
+{
+	ZE_DESTROY(RenderTargets.Depth);
+	ZE_DESTROY(RenderTargets.NormalSpecular);
+	ZE_DESTROY(RenderTargets.SSScatteringVelocity);
+
+	ZE_DESTROY(Textures.Depth);
+	ZE_DESTROY(Textures.NormalSpecular);
+	ZE_DESTROY(Textures.SSScatteringVelocity);
+}
+
+const ZETexture2D* ZERenderStageGeometry::GetTextureDepth() const
+{
+	return Textures.Depth;
+}
+
+const ZETexture2D* ZERenderStageGeometry::GetTextureNormalSpecular() const
+{
+	return Textures.NormalSpecular;
+}
+
+const ZETexture2D* ZERenderStageGeometry::GetTextureSSScatteringVelocity() const
+{
+	return Textures.SSScatteringVelocity;
+}
+
+const ZERenderTarget* ZERenderStageGeometry::GetRenderTargetDepth() const
+{
+	return RenderTargets.Depth;
+}
+
+const ZERenderTarget* ZERenderStageGeometry::GetRenderTargetNormalSpecular() const
+{
+	return RenderTargets.NormalSpecular;
+}
+
+const ZERenderTarget* ZERenderStageGeometry::GetRenderTargetSSScatteringVelocity() const
+{
+	return RenderTargets.SSScatteringVelocity;
+}
+
+ZERenderStageType ZERenderStageGeometry::GetStageType() const
+{
+	return ZE_RST_GEOMETRY;
+}
+
+ZERenderStageType ZERenderStageGeometry::GetDependencies() const
+{
+	return ZE_RST_NONE;
+}
+
+bool ZERenderStageGeometry::ResetStates(const ZEMaterial* Material)
+{
+	// Reset to default states
+	// ----------------------------------------------------------
+	if (!ZERenderStage::ResetStates(Material))
+		return false;
 
 	// Render targets
-	DefaultStates.RenderTargets[0] = RenderTargets.GBuffer1;
-	DefaultStates.RenderTargets[1] = RenderTargets.GBuffer2;
-	DefaultStates.RenderTargets[2] = RenderTargets.GBuffer3;
-	DefaultStates.DepthStencilBuffer = zeGraphics->GetDepthBuffer();
+	DefaultStates.RenderTargets[0] = RenderTargets.Depth;
+	DefaultStates.RenderTargets[1] = RenderTargets.NormalSpecular;
+	DefaultStates.RenderTargets[2] = RenderTargets.SSScatteringVelocity;
+	DefaultStates.DepthStencilBuffer = zeGraphics->GetWindow()->GetDepthBuffer();
+
+	ZEInt Width, Height;
+	zeGraphics->GetWindow()->GetSize(Width, Height);
 
 	// Use default viewport and scissor rectangles
-	ZESize ScreenCount = zeGraphics->GetScreenCount();
-	for (ZESize I = 0; I < ScreenCount; ++I)
-	{
-		DefaultStates.ViewPorts[I] = zeGraphics->GetViewport(I);
-		DefaultStates.ScissorRects[I] = zeGraphics->GetScissorRectangle(I);
-	}
+	DefaultStates.ViewPorts[0].StateData.TopLeftX = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.TopLeftY = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.Width = (float)Width;
+	DefaultStates.ViewPorts[0].StateData.Height = (float)Height;
+	DefaultStates.ViewPorts[0].StateData.MinDepth = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.MaxDepth = 1.0f;
+
+	DefaultStates.ScissorRects[0].StateData.Left = 0;
+	DefaultStates.ScissorRects[0].StateData.Top = 0;
+	DefaultStates.ScissorRects[0].StateData.Right = Width;
+	DefaultStates.ScissorRects[0].StateData.Bottom = Height;
 
 	// Blend state
 	DefaultStates.BlendState.SetComponentWriteMask(0, ZE_CM_RED);   // Output to RT0 is float
@@ -75,10 +177,10 @@ void ZERenderStageGeometry::ResetStates()
 	// Rasterizer state
 	DefaultStates.RasterizerState.SetCullDirection(ZE_CD_COUNTER_CLOCKWISE);
 	DefaultStates.RasterizerState.SetFillMode(ZE_FM_SOLID);
-}
 
-void ZERenderStageGeometry::CommitStates()
-{
+
+	// Commit default states
+	// ----------------------------------------------------------
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	Device->SetRenderTargetArray(DefaultStates.RenderTargets);
@@ -89,133 +191,58 @@ void ZERenderStageGeometry::CommitStates()
 
 	Device->SetRasterizerState(DefaultStates.RasterizerState);
 
-	ZESize ScreenCount = zeGraphics->GetScreenCount();
-	for (ZESize I = 0; I < ScreenCount; ++I)
-	{
-		Device->SetViewport(I, DefaultStates.ViewPorts[I]);
-		Device->SetScissorRectangle(I, DefaultStates.ScissorRects[I]);
-	}
+	Device->SetViewport(0, DefaultStates.ViewPorts[0]);
+	Device->SetScissorRectangle(0, DefaultStates.ScissorRects[0]);
 
-	// Commit parent States
-	ZERenderStage::CommitStates();
+	return true;
 }
 
-void ZERenderStageGeometry::UpdateBuffers()
+bool ZERenderStageGeometry::Process(const ZERenderCommand* RenderCommand)
 {
-	ZEUInt Width = zeGraphics->GetScreenWidth();
-	ZEUInt Height = zeGraphics->GetScreenHeight();
+	if (!ZERenderStage::Process(RenderCommand))
+		return false;	
 
-	if (Textures.GBuffer1 == NULL || Textures.GBuffer1->GetWidth() != Width || Textures.GBuffer1->GetHeight() != Height)
+	ZEUInt PassId = 0;
+	bool Continue = false;
+
+	do
 	{
-		ZE_DESTROY(RenderTargets.GBuffer1);
-		ZE_DESTROY(Textures.GBuffer1);
-
-		Textures.GBuffer1 = ZETexture2D::CreateInstance();
-		Textures.GBuffer1->CreateStatic(Width, Height, 1, ZE_TPF_F32, true, NULL);
-		RenderTargets.GBuffer1 = Textures.GBuffer1->CreateRenderTarget(0);
-	}
+		Continue = RenderCommand->Material->SetupPass(PassId++, this, RenderCommand);
 	
-	if (Textures.GBuffer2 == NULL || Textures.GBuffer2->GetWidth() != Width || Textures.GBuffer2->GetHeight() != Height)
-	{
-		ZE_DESTROY(RenderTargets.GBuffer2);
-		ZE_DESTROY(Textures.GBuffer2);
+	} while (Continue);
 
-		Textures.GBuffer2 = ZETexture2D::CreateInstance();
-		Textures.GBuffer2->CreateStatic(Width, Height, 1, ZE_TPF_F16_4, true, NULL);
-		RenderTargets.GBuffer2 = Textures.GBuffer2->CreateRenderTarget(0);
-	}
+	PumpStreams(RenderCommand);
 
-	if (Textures.GBuffer3 == NULL || Textures.GBuffer3->GetWidth() != Width || Textures.GBuffer3->GetHeight() != Height)
-	{
-		ZE_DESTROY(RenderTargets.GBuffer3);
-		ZE_DESTROY(Textures.GBuffer3);
-
-		Textures.GBuffer3 = ZETexture2D::CreateInstance();
-		Textures.GBuffer3->CreateStatic(Width, Height, 1, ZE_TPF_I8_4, true, NULL);
-		RenderTargets.GBuffer3 = Textures.GBuffer3->CreateRenderTarget(0);
-	}
+	return true;
 }
 
-void ZERenderStageGeometry::DestroyBuffers()
+bool ZERenderStageGeometry::Setup()
 {
-	ZE_DESTROY(RenderTargets.GBuffer1);
-	ZE_DESTROY(Textures.GBuffer1);
-	
-	ZE_DESTROY(RenderTargets.GBuffer2);
-	ZE_DESTROY(Textures.GBuffer2);
+	if (!ZERenderStage::Setup())
+		return false;
 
-	ZE_DESTROY(RenderTargets.GBuffer3);
-	ZE_DESTROY(Textures.GBuffer3);
-}
-
-const ZETexture2D* ZERenderStageGeometry::GetGBuffer1() const
-{
-	return Textures.GBuffer1;
-}
-
-const ZETexture2D* ZERenderStageGeometry::GetGBuffer2() const
-{
-	return Textures.GBuffer2;
-}
-
-const ZETexture2D* ZERenderStageGeometry::GetGBuffer3() const
-{
-	return Textures.GBuffer3;
-}
-
-void ZERenderStageGeometry::Setup()
-{
 	UpdateBuffers();
-	ResetStates();
-	CommitStates();
-
-	LastMaterial = -1;
 
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	// Clear targets
-	Device->ClearRenderTarget(RenderTargets.GBuffer1, ZEVector4::Zero);
-	Device->ClearRenderTarget(RenderTargets.GBuffer2, ZEVector4::Zero);
-	Device->ClearRenderTarget(RenderTargets.GBuffer3, ZEVector4::Zero);
-	Device->ClearDepthStencilBuffer(zeGraphics->GetDepthBuffer(), true, true, 1.0f, 0);
-}
-
-void ZERenderStageGeometry::Process(const ZERenderCommand* RenderCommand)
-{
-	zeDebugCheck(RenderCommand->Material == NULL, "Null Pointer.");
-
-	bool Done = false;
-	ZEUInt PassId = 0;
-	while (!Done)
-	{
-		Done = RenderCommand->Material->SetupPass(PassId++, this, RenderCommand);
-	}
-
-	PumpStreams(RenderCommand);
-}
-
-ZERenderStageType ZERenderStageGeometry::GetDependencies() const
-{
-	return ZE_RST_NONE;
-}
-
-ZERenderStageType ZERenderStageGeometry::GetStageType() const
-{
-	return ZE_RST_GEOMETRY;
+	Device->ClearRenderTarget(RenderTargets.Depth, ZEVector4::Zero);
+	Device->ClearRenderTarget(RenderTargets.NormalSpecular, ZEVector4::Zero);
+	Device->ClearRenderTarget(RenderTargets.SSScatteringVelocity, ZEVector4::Zero);
+	Device->ClearDepthStencilBuffer(zeGraphics->GetWindow()->GetDepthBuffer(), true, true, 1.0f, 0);
+	
+	return true;
 }
 
 ZERenderStageGeometry::ZERenderStageGeometry()
 {	
-	LastMaterial = -1;
+	Textures.Depth = NULL;
+	Textures.NormalSpecular = NULL;
+	Textures.SSScatteringVelocity = NULL;
 
-	Textures.GBuffer1 = NULL;
-	RenderTargets.GBuffer1 = NULL;
-
-	Textures.GBuffer2 = NULL;
-	RenderTargets.GBuffer2 = NULL;
-
-	Textures.GBuffer3 = NULL;
-	RenderTargets.GBuffer3 = NULL;
+	RenderTargets.Depth = NULL;
+	RenderTargets.NormalSpecular = NULL;	
+	RenderTargets.SSScatteringVelocity = NULL;
 }
 
 ZERenderStageGeometry::~ZERenderStageGeometry()

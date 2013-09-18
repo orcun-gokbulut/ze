@@ -57,12 +57,12 @@ enum ZEViewVolumeType
 class ZEViewVolume
 {
 	public:
-		virtual ZEViewVolumeType			GetViewVolumeType() const = 0;
+		virtual ZEViewVolumeType	GetViewVolumeType() const = 0;
 
-		virtual bool						CullTest(const ZEBSphere& BoundingBox) const = 0;
-		virtual bool						CullTest(const ZEAABBox& BoundingBox) const = 0;
-		virtual bool						CullTest(const ZEOBBox& BoundingBox) const = 0;
-		virtual bool						CullTest(const ZERectangle3D& PortalDoor) const = 0;
+		virtual bool				CullTest(const ZEBSphere& BoundingBox) const = 0;
+		virtual bool				CullTest(const ZEAABBox& BoundingBox) const = 0;
+		virtual bool				CullTest(const ZEOBBox& BoundingBox) const = 0;
+		virtual bool				CullTest(const ZERectangle3D& PortalDoor) const = 0;
 };
 
 #endif

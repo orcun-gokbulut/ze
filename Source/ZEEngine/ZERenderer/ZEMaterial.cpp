@@ -47,6 +47,11 @@ void ZEMaterial::Destroy()
 	delete this;
 }
 
+ZERenderStageType ZEMaterial::GetEnabledStages() const
+{
+	return EnabledStages;
+}
+
 void ZEMaterial::EnableStage(ZERenderStageType Stage)
 {
 	EnabledStages |= (SupportedStages & Stage);
@@ -72,8 +77,9 @@ bool ZEMaterial::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERe
 	zeDebugCheck(Stage == NULL, "Null stage.");
 	zeDebugCheck(RenderCommand == NULL, "Null Render command.");
 
-	ZERenderStageType Type = Stage->GetStageType();
-	if (!EnabledStages.GetFlags(Type))
+	ZERenderStageType StageType = Stage->GetStageType();
+
+	if (!EnabledStages.GetFlags(StageType))
 		return false;
 
 	return true;
@@ -86,6 +92,9 @@ ZEMaterial::ZEMaterial()
 
 	EnabledStages = 0;
 	SupportedStages = 0;
+
+	SupportedStages = 0;
+	EnabledStages = 0;
 }
 
 ZEMaterial::~ZEMaterial()

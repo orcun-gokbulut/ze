@@ -257,10 +257,10 @@ bool ZEFreeTypeFontBaker::BakeFont(const char StartCharacter, const char EndChar
 	ZEString CharacterSequence;
 
 	if(StartCharacter < EndCharacter)
-		for(ZESize I = StartCharacter; I <= EndCharacter; I++)
+		for(char I = StartCharacter; I <= EndCharacter; I++)
 			CharacterSequence.Append(ZEString::FromChar(I));
 	else
-		for(ZESize I = EndCharacter; I <= StartCharacter; I++)
+		for(char I = EndCharacter; I <= StartCharacter; I++)
 			CharacterSequence.Append(ZEString::FromChar(I));
 
 

@@ -47,25 +47,22 @@ class ZERenderStageAccumulation;
 class ZERenderStageParticle : public ZERenderStage
 {
 	protected:
-		ZESize								LastMaterial;
-
-		const ZERenderStageAccumulation*	ABufferInput;
-
-		void								ResetStates();
-		void								CommitStates();
-
 		void								UpdateBuffers();
 		void								DestroyBuffers();
+
+		const ZERenderStageAccumulation*	InputStageAccumulation;
 
 	public:
 		virtual ZERenderStageType			GetStageType() const;
 		virtual ZERenderStageType			GetDependencies() const;
 
-		void								SetInputAccumulationStage(const ZERenderStageAccumulation* Input);
-		const ZERenderStageAccumulation*	GetInputAccumulationStage() const;
+		void								SetInputStageAccumulation(const ZERenderStageAccumulation* Input);
+		const ZERenderStageAccumulation*	GetInputStageAccumulation() const;
 		
-		virtual void						Process(const ZERenderCommand* RenderCommand);
-		virtual void						Setup();
+		virtual bool						Setup();
+		virtual bool						Process(const ZERenderCommand* RenderCommand);
+		
+		virtual bool						ResetStates(const ZEMaterial* Material);
 
 											ZERenderStageParticle();
 		virtual								~ZERenderStageParticle();

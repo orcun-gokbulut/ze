@@ -33,7 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef __ZE_GRAPHICS_DEVICE_STATE_H__
 #define __ZE_GRAPHICS_DEVICE_STATE_H__
 
@@ -44,6 +43,8 @@
 #include "ZERasterizerState.h"
 #include "ZEDepthStencilState.h"
 #include "ZEGraphicsDefinitions.h"
+#include "ZEScissorRectangle.h"
+#include "ZEViewPort.h"
 
 class ZEShader;
 class ZETexture;
@@ -52,56 +53,6 @@ class ZEVertexBuffer;
 class ZERenderTarget;
 class ZEConstantBuffer;
 class ZEDepthStencilBuffer;
-
-class ZEViewport
-{
-	public:
-		struct ZEViewportData
-		{
-			ZEUInt					Width;
-			ZEUInt					Height;
-			ZEInt					TopLeftX;
-			ZEInt					TopLeftY;
-			float					MinDepth;
-			float					MaxDepth;
-
-		} StateData;
-	
-		ZESize						GetHash() const;
-
-		void						SetZero();
-	
-		const ZEViewport&			operator =(const ZEViewport& Other);
-		bool						operator ==(const ZEViewport& Other);
-		bool						operator !=(const ZEViewport& Other);
-
-									ZEViewport();
-									~ZEViewport();
-};
-
-class ZEScissorRectangle
-{
-	public:
-		struct ZEScissorRectangleData
-		{
-			ZEInt					Bottom;
-			ZEInt					Left;
-			ZEInt					Right;
-			ZEInt					Top;
-
-		} StateData;
-
-		ZESize						GetHash() const;
-
-		void						SetZero();
-
-		const ZEScissorRectangle&	operator =(const ZEScissorRectangle& Other);
-		bool						operator ==(const ZEScissorRectangle& Other);
-		bool						operator !=(const ZEScissorRectangle& Other);
-
-									ZEScissorRectangle();
-									~ZEScissorRectangle();
-};
 
 typedef ZEComponentMask ColorBlendMask;
 

@@ -47,7 +47,7 @@
 class ZEParticleRenderer;
 class ZEParticleOperator;
 class ZEParticleGenerator;
-struct ZEDrawParameters;
+class ZEDrawParameters;
 
 // struct ZENewParticle
 // {

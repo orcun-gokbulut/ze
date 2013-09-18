@@ -66,7 +66,6 @@ class ZEMaterialUserInterface : public ZEMaterial
 
 	public:
 		ZESize					GetHash() const;
-		bool					UpdateMaterial();
 
 		void					SetWireFrame(bool Enabled);
 		bool					GetWireFrame() const;

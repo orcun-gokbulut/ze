@@ -39,7 +39,7 @@
 
 #define zeWindow ZEWindow::GetInstance()
 
-enum ZEWindowType
+enum ZEWindowTypeasd
 {
 	ZE_WT_DEFAULT			= 0,
 	ZE_WT_FIXEDSIZE			= 1,
@@ -48,13 +48,15 @@ enum ZEWindowType
 	ZE_WT_FULLSCREEN		= 4,
 };
 
+class ZEGraphicsWindowNew;
+
 class ZEWindow
 {
 	protected:
 		void*					WindowHandle;
 		ZEInt					WindowPositionLeft, WindowPositionTop;
 		ZEInt					WindowWidth, WindowHeight;
-		ZEWindowType			WindowType;
+		ZEWindowTypeasd			WindowType;
 		
 		bool					MouseCursorVisibility;
 		bool					MouseCursorLockEnabled;
@@ -68,8 +70,8 @@ class ZEWindow
 		void					WindowDestroyed();
 		void					WindowResized(ZEInt Width, ZEInt Height);
 
-		void					SetWindowType(ZEWindowType WindowType);
-		ZEWindowType			GetWindowType();
+		void					SetWindowType(ZEWindowTypeasd WindowType);
+		ZEWindowTypeasd			GetWindowType();
 
 		bool					SetComponentWindowHandle(void* Handle);
 
@@ -96,7 +98,7 @@ class ZEWindow
 		bool					Initialize();
 		void					Deinitialize();
 
-		static ZEWindow*		GetInstance();
+		static ZEGraphicsWindowNew*	GetInstance();
 							
 								ZEWindow();
 								~ZEWindow();

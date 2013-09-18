@@ -149,15 +149,14 @@ void ZECrashReportUIReportDialog::InitiazeTree()
 	ReportDialog->trwItems->setHeaderLabel("Items");
 	
 	QList<QTreeWidgetItem*> ItemList;
-	void* ptrData;
 
-	for (int I = 0; I < Report->CrashReport.GetProviders().GetCount(); I++)
+	for (ZESize I = 0; I < Report->CrashReport.GetProviders().GetCount(); I++)
 	{		
 		QTreeWidgetItem* treeWidgetItem = new QTreeWidgetItem();
 		treeWidgetItem->setText(ReportDialog->trwItems->topLevelItemCount(), Report->CrashReport.GetProviders()[I]->GetName());
-		QVariant Index(I);
-		treeWidgetItem->setData(1, 0, Index);		
-		ItemList.append(treeWidgetItem);		
+		QVariant Index((ZEInt)I);
+		treeWidgetItem->setData(1, 0, Index);
+		ItemList.append(treeWidgetItem);
 	}
 
 	ReportDialog->trwItems->addTopLevelItems(ItemList);

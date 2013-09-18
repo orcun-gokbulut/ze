@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_D3D10_EVENT_TRACER_H__
-#define __ZE_D3D10_EVENT_TRACER_H__
+#ifndef __ZE_D3D11_EVENT_TRACER_H__
+#define __ZE_D3D11_EVENT_TRACER_H__
 
 #include "ZETypes.h"
 #include "ZED3D10ComponentBase.h"

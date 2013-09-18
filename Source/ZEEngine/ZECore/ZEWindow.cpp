@@ -42,6 +42,7 @@
 #include "ZESystemMessageManager.h"
 #include "ZESystemMessageHandler.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsWindow.h"
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -324,12 +325,12 @@ bool ZEWindow::DestroyMainWindow()
 	return true;
 }
 
-void ZEWindow::SetWindowType(ZEWindowType WindowType)
+void ZEWindow::SetWindowType(ZEWindowTypeasd WindowType)
 {
 	this->WindowType = WindowType;
 }
 
-ZEWindowType ZEWindow::GetWindowType()
+ZEWindowTypeasd ZEWindow::GetWindowType()
 {
 	return WindowType;
 }
@@ -342,7 +343,7 @@ bool ZEWindow::SetComponentWindowHandle(void* Handle)
 	WindowWidth = Rect.right - Rect.left;
 	WindowHeight = Rect.bottom - Rect.top;
 	if (zeGraphics != NULL)
-		zeGraphics->SetScreenSize(WindowWidth, WindowHeight);
+		zeGraphics->SetWindowSize(WindowWidth, WindowHeight);
 
 	WindowType = ZE_WT_COMPONENT;
 	return true;
@@ -366,7 +367,7 @@ void ZEWindow::WindowResized(ZEInt Width, ZEInt Height)
 	WindowHeight = Height;
 
 	if (!Resizing && zeGraphics != NULL)
-		zeGraphics->SetScreenSize(WindowWidth, WindowHeight);
+		zeGraphics->SetWindowSize(WindowWidth, WindowHeight);
 }
 
 void ZEWindow::SetWindowPosition(ZEInt Left, ZEInt Top)
@@ -492,7 +493,7 @@ void ZEWindow::Deinitialize()
 	Window = NULL;
 }
 
-ZEWindow* ZEWindow::GetInstance()
+ZEGraphicsWindowNew* ZEWindow::GetInstance()
 {
 	return ZECore::GetInstance()->GetWindow();
 }

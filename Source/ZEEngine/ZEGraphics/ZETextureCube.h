@@ -58,23 +58,36 @@ class ZETextureCube : public ZETexture
 	friend class ZEGraphicsModule;
 
 	protected:
+		static ZEUInt16				TotalCount;
+		static ZESize				TotalSize;
+
+		ZEShadowCopy				ShadowCopy;
+
+		ZESize						Size;
 		ZEUInt						EdgeLength;
 		ZEUInt						LevelCount;
+		ZEVector2					PixelSize;
+
+		virtual bool				UpdateWith(ZEUInt ShadowIndex);
 
 									ZETextureCube();
 		virtual						~ZETextureCube();
 
 	public:
+		ZEGraphicsResourceType		GetResourceType() const;
+
+		ZESize						GetSize() const;
 		ZEUInt						GetEdgeLenght() const;
 		ZEUInt						GetLevelCount() const;
+		const ZEVector2&			GetPixelSize() const;
+
+		virtual bool				Unlock(ZETextureCubeFace Face);
+		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZETextureCubeFace Face);
+		
+		virtual	bool				CreateDynamic(ZEUInt EdgeLength, ZETexturePixelFormat PixelFormat, ZETextureData* InitialData = NULL);
+		virtual	bool				CreateStatic(ZEUInt EdgeLength, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* InitialData = NULL);
 		
 		virtual	ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
-
-		virtual	bool				CreateDynamic(ZEUInt EdgeLength, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat) = 0;
-		virtual	bool				CreateStatic(ZEUInt EdgeLength, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL) = 0;
-		
-		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZETextureCubeFace Face, ZEUInt Level) = 0;
-		virtual bool				Unlock(ZETextureCubeFace Face, ZEUInt Level) = 0;
 
 		static ZETextureCube*		CreateInstance();
 };

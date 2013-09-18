@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEVICE_STATE_RASTERIZER_H__
-#define __ZE_DEVICE_STATE_RASTERIZER_H__
+#ifndef __ZE_DEVICE_RASTERIZER_STATE_H__
+#define __ZE_DEVICE_RASTERIZER_STATE_H__
 
 #include "ZETypes.h"
 

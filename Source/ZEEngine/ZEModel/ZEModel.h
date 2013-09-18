@@ -40,8 +40,8 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECanvas.h"
+#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZECanvas.h"
 #include "ZEModelResource.h"
 #include "ZEModelBone.h"
 #include "ZEModelMesh.h"
@@ -59,7 +59,7 @@ class ZESimpleMaterial;
 class ZEPhysicalRigidBody;
 class ZEPhysicalJoint;
 
-struct ZEDrawParameters;
+class ZEDrawParameters;
 
 ZE_META_ENTITY_DESCRIPTION(ZEModel)
 

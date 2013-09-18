@@ -38,18 +38,49 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEmatrix.h"
 #include "ZEGraphics/ZEGraphicsDeviceState.h"
 
-#define ZE_RST_NONE				0x00000000
-#define ZE_RST_GEOMETRY			0x00000001
-#define ZE_RST_SHADOW			0x00000002
-#define ZE_RST_LIGHTING			0x00000004
-#define ZE_RST_ACCUMULATION		0x00000008
-#define ZE_RST_TRANSPARENT		0x00000010
-#define ZE_RST_USER_INTERFACE	0x00000020
+#define ZE_MAX_STAGE_COUNT		32
+
+#define ZE_RST_POST_PROCESS		0x00000080
 #define ZE_RST_PARTICLE			0x00000040
+#define ZE_RST_USER_INTERFACE	0x00000020
+#define ZE_RST_TRANSPARENT		0x00000010
+#define ZE_RST_ACCUMULATION		0x00000008
+#define ZE_RST_LIGHTING			0x00000004
+#define ZE_RST_SHADOW			0x00000002
+#define ZE_RST_GEOMETRY			0x00000001
+#define ZE_RST_NONE				0x00000000
 #define ZE_RST_ALL				0xFFFFFFFF
 typedef ZEFlagsBase<ZEUInt32>	ZERenderStageType;
+
+class ZEView;
+
+class ZERenderStageData
+{
+	public:
+		float				Fov;
+		float				FarZ;
+		float				NearZ;
+		float				AspectRatio;
+
+		ZEVector2			ViewDimension;
+
+		ZEVector3			WorldPos;
+		ZEVector3			WorldUp;
+		ZEVector3			WorldFront;
+		ZEVector3			WorldRight;
+
+		ZEMatrix4x4			ViewTransform;
+		ZEMatrix4x4			ProjectionTransform;
+
+		void				Create(const ZEView* View);
+
+							ZERenderStageData();
+							~ZERenderStageData();
+};
 
 class ZECamera;
 class ZEMaterial;
@@ -61,23 +92,29 @@ class ZERenderStage
 	friend class ZERenderer;
 
 	protected:
+		ZESize							LastMaterialHash;
 		ZEGraphicsDeviceState			DefaultStates;
 
+		ZEConstantBuffer*				ViewConstants;
+		const ZERenderStageData*		StageData;
+
 		virtual void					PumpStreams(const ZERenderCommand* RenderCommand);
-		
-		virtual void					ResetStates();
-		virtual void					CommitStates();
 
 	public:
 		const ZEGraphicsDeviceState*	GetDefaultStates() const;
+		
+		void							SetData(const ZERenderStageData* Data);
+		const ZERenderStageData*		GetData() const;
 
 		virtual void					Destroy();
+		
+		virtual bool					Setup();
+		virtual bool					Process(const ZERenderCommand* RenderCommand);
+		
+		virtual bool					ResetStates(const ZEMaterial* Material);
 
 		virtual ZERenderStageType		GetStageType() const = 0;
 		virtual ZERenderStageType		GetDependencies() const = 0;
-		
-		virtual void					Process(const ZERenderCommand* RenderCommand) = 0;
-		virtual void					Setup() = 0;
 
 										ZERenderStage();
 		virtual							~ZERenderStage();

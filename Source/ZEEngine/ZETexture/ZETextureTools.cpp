@@ -40,7 +40,6 @@
 #include "ZETextureTools.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZETexture2DResource.h"
-#include "ZEModules/ZEDirect3D9/ZED3D9TextureResizer.h"
 
 #include <windows.h>
 
@@ -177,12 +176,12 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 	}
 }
 
-void ZETextureTools::CompressTexture(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions)
+void ZETextureTools::Compress(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions)
 {
 
 }
 
-void ZETextureTools::DownSample2x(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, bool UseGpu)
+void ZETextureTools::DownSample2x(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight)
 {
 	// Check width height
 	if(SourceWidth <= 1 || SourceHeight <= 1)
@@ -191,63 +190,51 @@ void ZETextureTools::DownSample2x(void* DestinationData, const ZESize Destinatio
 	ZEUInt DestinationHeight = SourceHeight / 2;
 	ZEUInt DestinationWidth = SourceWidth / 2;
 
-	if (UseGpu)
+	struct ZEColorARGB
 	{
-		static ZED3D9TextureResizer Resizer;
+		ZEUInt8 Alpha;
+		ZEUInt8 Red;
+		ZEUInt8 Blue;
+		ZEUInt8 Green;
+	};
 
-		Resizer.Initialize(DestinationData, DestinationPitch, DestinationWidth, DestinationHeight, SourceData, SourcePitch, SourceWidth, SourceHeight);
-		Resizer.Process();
-		Resizer.Deinitialize();
-
-	}
-	else
+	for (ZESize y = 0; y < (ZESize)DestinationHeight; y++)
 	{
-		struct ZEColorARGB
+		for (ZESize x = 0; x < (ZESize)DestinationWidth; x++)
 		{
-			ZEUInt8 Alpha;
-			ZEUInt8 Red;
-			ZEUInt8 Blue;
-			ZEUInt8 Green;
-		};
+			ZEColorARGB* Source = (ZEColorARGB*)((ZEUInt8*)SourceData + SourcePitch * y * 2 + x * 8);
 
-		for (ZESize y = 0; y < (ZESize)DestinationHeight; y++)
-		{
-			for (ZESize x = 0; x < (ZESize)DestinationWidth; x++)
-			{
-				ZEColorARGB* Source = (ZEColorARGB*)((ZEUInt8*)SourceData + SourcePitch * y * 2 + x * 8);
+			ZEUInt16 Red, Green, Blue, Alpha;
+			Alpha = Source->Alpha;
+			Red   = Source->Red;
+			Green = Source->Green;
+			Blue  = Source->Blue;
+			Source++;
 
-				ZEUInt16 Red, Green, Blue, Alpha;
-				Alpha = Source->Alpha;
-				Red   = Source->Red;
-				Green = Source->Green;
-				Blue  = Source->Blue;
-				Source++;
+			Alpha += Source->Alpha;
+			Red   += Source->Red;
+			Green += Source->Green;
+			Blue  += Source->Blue;
 
-				Alpha += Source->Alpha;
-				Red   += Source->Red;
-				Green += Source->Green;
-				Blue  += Source->Blue;
+			Source = (ZEColorARGB*)((ZEUInt8*)Source + SourcePitch - 1 * 4);
+			Alpha += Source->Alpha;
+			Red   += Source->Red;
+			Green += Source->Green;
+			Blue  += Source->Blue;
+			Source++;
 
-				Source = (ZEColorARGB*)((ZEUInt8*)Source + SourcePitch - 1 * 4);
-				Alpha += Source->Alpha;
-				Red   += Source->Red;
-				Green += Source->Green;
-				Blue  += Source->Blue;
-				Source++;
+			Alpha += Source->Alpha;
+			Red   += Source->Red;
+			Green += Source->Green;
+			Blue  += Source->Blue;
 
-				Alpha += Source->Alpha;
-				Red   += Source->Red;
-				Green += Source->Green;
-				Blue  += Source->Blue;
-
-				ZEColorARGB* Destination = (ZEColorARGB*)((ZEUInt8*)DestinationData + DestinationPitch * y + x * 4);
-				Destination->Alpha = Alpha / 4;
-				Destination->Red   = Red   / 4;
-				Destination->Green = Green / 4;
-				Destination->Blue  = Blue  / 4;
-			}
+			ZEColorARGB* Destination = (ZEColorARGB*)((ZEUInt8*)DestinationData + DestinationPitch * y + x * 4);
+			Destination->Alpha = Alpha / 4;
+			Destination->Red   = Red   / 4;
+			Destination->Green = Green / 4;
+			Destination->Blue  = Blue  / 4;
 		}
-	}	
+	}
 }
 
 // Takes average of two uncompressed image which have same dimensions

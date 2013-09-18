@@ -68,105 +68,11 @@
 #define ZE_MDC_SSAO					1 << 21
 typedef	ZEFlagsBase<ZEUInt32>		ZEMaterialDefaultComponents;
 
-__declspec(align(16))
-struct ZEMaterialDefaultProperties
-{
-	float			Opacity;
-	float			AlphaCullLimit;	
-	float			SpecularShininess;
-	float			SubSurfScatFactor;
-	
-	ZEVector2		DetailMapTiling;
-	float			DetailDistanceFull;
-	float			DetailDistanceFade;
-
-	ZEVector3		AmbientColor;
-	float			AmbientFactor;
-
-	ZEVector3		DiffuseColor;
-	float			DiffuseFactor;
-	
-	ZEVector3		EmissiveColor;
-	float			EmissiveFactor;
-	
-	ZEVector3		SpecularColor;
-	float			SpecularFactor;
-	
-	float			RefractionIndex;
-	float			RefractionFactor;
-	float			ReflectionFactor;
-};
-
-class ZEShader;
-
-struct ZEMaterialDefaultShaders
-{
-	ZEShader*				ShadowPassVS;
-	ZEShader*				ShadowPassPS;
-	ZEShader*				GeometryPassVS;
-	ZEShader*				GeometryPassPS;
-	ZEShader*				AccumulationPassVS;
-	ZEShader*				AccumulationPassPS;
-	ZEShader*				TransparentPassVS;
-	ZEShader*				TransparentPassPS;
-};
-
-struct ZEMaterialDefaultSamplers
-{
-	ZESamplerState			BaseMap;
-	ZESamplerState			NormalMap;
-	ZESamplerState			ParallaxMap;
-	ZESamplerState			SpecularMap;
-	ZESamplerState			EmissiveMap;
-	ZESamplerState			OpacityMap;
-	ZESamplerState			DetailBaseMap;
-	ZESamplerState			DetailNormalMap;
-	ZESamplerState			EnvironmentMap;
-	ZESamplerState			LightMap;
-};
-
 class ZETexture2D;
 class ZETextureCube;
-
-struct ZEMaterialDefaultTextures
-{
-	ZETexture2D*			BaseMap;
-	ZETexture2D*			NormalMap;
-	ZETexture2D*			ParallaxMap;
-	ZETexture2D*			SpecularMap;
-	ZETexture2D*			EmissiveMap;
-	ZETexture2D*			OpacityMap;
-	ZETexture2D*			DetailBaseMap;
-	ZETexture2D*			DetailNormalMap;
-	ZETextureCube*			EnvironmentMap;
-	ZETexture2D*			LightMap;
-};
-
-class ZETexture2DResource;
-class ZETextureCubeResource;
-
-struct ZEMaterialDefaultResources
-{
-	ZETexture2DResource*	BaseMap;
-	ZETexture2DResource*	NormalMap;
-	ZETexture2DResource*	ParallaxMap;
-	ZETexture2DResource*	SpecularMap;
-	ZETexture2DResource*	EmissiveMap;
-	ZETexture2DResource*	OpacityMap;
-	ZETexture2DResource*	DetailBaseMap;
-	ZETexture2DResource*	DetailNormalMap;
-	ZETextureCubeResource*	EnvironmentMap;
-	ZETexture2DResource*	LightMap;
-};
-
-class ZEConstantBuffer;
-
-struct ZEMaterialDefaultBuffers
-{
-	ZEConstantBuffer*		MaterialProperties;
-};
-
+class ZEShader;
 class ZERenderStage;
+class ZEConstantBuffer;
 class ZERenderCommand;
 
 class ZEMaterialDefault : public ZEMaterial
@@ -174,13 +80,24 @@ class ZEMaterialDefault : public ZEMaterial
 	friend class ZERenderer;
 
 	protected:
+		static ZEConstantBuffer*		WorldTransform;
+
 		ZEMaterialDefaultComponents		OldComponents;
 
-		void							DestroyShaders();
+		ZEShader*						ShaderShadowPassVS;
+		ZEShader*						ShaderShadowPassPS;
+		ZEShader*						ShaderGeometryPassVS;
+		ZEShader*						ShaderGeometryPassPS;
+		ZEShader*						ShaderAccumulationPassVS;
+		ZEShader*						ShaderAccumulationPassPS;
+		ZEShader*						ShaderTransparentPassVS;
+		ZEShader*						ShaderTransparentPassPS;
+		
+		void							InitializeBuffers();
 		void							DestroyBuffers();
 
 		void							UpdateShaders();
-		void							UpdateBuffers();
+		void							DestroyShaders();
 
 		bool							SetupPassShadow(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 		bool							SetupPassGeometry(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
@@ -202,16 +119,60 @@ class ZEMaterialDefault : public ZEMaterial
 		ZEOpacityComponent				OpacityComponent;
 		ZETransparancyMode				TransparencyMode;
 
-		ZEMaterialDefaultShaders		Shaders;
-		ZEMaterialDefaultBuffers		Buffers;
-		ZEMaterialDefaultSamplers		Samplers;
-		ZEMaterialDefaultTextures		Textures;
-		ZEMaterialDefaultResources		Resources;
 		ZEMaterialDefaultComponents		Components;
 
-		virtual ZESize					GetHash() const;
+		struct Properties
+		{
+			float						Opacity;
+			float						AlphaCullLimit;	
+			float						SpecularShininess;
+			float						SubSurfScatFactor;
+	
+			ZEVector2					DetailMapTiling;
+			float						DetailDistanceFull;
+			float						DetailDistanceFade;
 
-		virtual bool					UpdateMaterial();
+			ZEVector3					AmbientColor;
+			float						AmbientFactor;
+
+			ZEVector3					DiffuseColor;
+			float						DiffuseFactor;
+	
+			ZEVector3					EmissiveColor;
+			float						EmissiveFactor;
+	
+			ZEVector3					SpecularColor;
+			float						SpecularFactor;
+	
+			float						RefractionIndex;
+			float						RefractionFactor;
+			float						ReflectionFactor;
+			float						Dummy;
+		};
+
+		ZEConstantBuffer*				MaterialProperties;
+
+		ZETexture2D*					TextureBaseMap;
+		ZETexture2D*					TextureNormalMap;
+		ZETexture2D*					TextureParallaxMap;
+		ZETexture2D*					TextureSpecularMap;
+		ZETexture2D*					TextureEmissiveMap;
+		ZETexture2D*					TextureOpacityMap;
+		ZETexture2D*					TextureDetailBaseMap;
+		ZETexture2D*					TextureDetailNormalMap;
+		ZETextureCube*					TextureEnvironmentMap;
+
+		ZESamplerState					SamplerBaseMap;
+		ZESamplerState					SamplerNormalMap;
+		ZESamplerState					SamplerParallaxMap;
+		ZESamplerState					SamplerSpecularMap;
+		ZESamplerState					SamplerEmissiveMap;
+		ZESamplerState					SamplerOpacityMap;
+		ZESamplerState					SamplerDetailBaseMap;
+		ZESamplerState					SamplerDetailNormalMap;
+		ZESamplerState					SamplerEnvironmentMap;
+
+		virtual ZESize					GetHash() const;
 
 		void							WriteToFile(const ZEString& FilePath);
 		void							ReadFromFile(const ZEString& FilePath);

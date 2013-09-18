@@ -34,12 +34,29 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEIndexBuffer.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZECore/ZECore.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
-bool ZEIndexBuffer::IsStatic() const
+inline static ZESize GetIndexSize(ZEIndexBufferFormat Format)
 {
-	return Static;
+	static const ZESize FormatToIndexSize[3] = 
+	{
+		0,	// ZE_IBF_NONE
+		2,	// ZE_IBF_INDEX16
+		4	// ZE_IBF_INDEX32
+	};
+	return FormatToIndexSize[Format];
+}
+
+bool ZEIndexBuffer::UpdateWith(ZEUInt ShadowIndex)
+{
+	ShadowCopy.SetChanged(ShadowIndex, false);
+	return true;
+}
+
+ZEGraphicsResourceType ZEIndexBuffer::GetResourceType() const
+{
+	return ZE_GRT_BUFFER;
 }
 
 ZESize ZEIndexBuffer::GetBufferSize() const
@@ -57,14 +74,91 @@ ZEIndexBufferFormat ZEIndexBuffer::GetBufferFormat() const
 	return Format;
 }
 
-void ZEIndexBuffer::Destroy()
+void ZEIndexBuffer::Unlock()
 {
-	delete this;
+	zeDebugCheck(!GetIsCreated(), "Buffer not created.");
+	zeDebugCheck(State.IsStatic, "Static buffer not be locked/unlocked.");
+
+	State.IsLocked = false;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Dynamic index buffer unlocked. IndexBuffer: %p", this);
+#endif
 }
+
+bool ZEIndexBuffer::Lock(void** Data)
+{
+	zeDebugCheck(Data == NULL, "Null pointer.");
+	zeDebugCheck(State.IsLocked, "Already locked.");
+	zeDebugCheck(*Data == NULL, "Null pointer.");
+	zeDebugCheck(!GetIsCreated(), "Buffer not created.");
+	zeDebugCheck(State.IsStatic, "Static buffer not be locked/unlocked.");
+
+	*Data = ShadowCopy.GetData();
+	State.IsLocked = true;
+	
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Dynamic index buffer locked. IndexBuffer: %p, Data: %p.", this, *Data);
+#endif
+
+	return true;
+}
+
+bool ZEIndexBuffer::CreateDynamic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData)
+{
+	zeDebugCheck(GetIsCreated(), "Buffer already created.");
+	zeDebugCheck(IndexCount == 0, "Cannot create empty buffer.");
+	zeDebugCheck(Format == ZE_IBF_NONE, "Unknown buffer format.");
+
+	ZESize Size = GetIndexSize(Format) * (ZESize)IndexCount;
+	ShadowCopy.CreateBuffer(Size, InitialData);
+
+	this->Format = Format;
+	this->IndexCount = IndexCount;
+	this->BufferSize = Size;
+	this->State.IsStatic = false;
+	this->State.IsCreated = true;
+
+	TotalSize += Size;
+	TotalCount++;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Dynamic index buffer created. IndexCount: %u, Format: %u, Size: %u.", 
+			IndexCount, Format, (ZEUInt)Size);
+#endif
+
+	return true;
+}
+
+bool ZEIndexBuffer::CreateStatic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData)
+{
+	zeDebugCheck(GetIsCreated(), "Buffer already created.");
+	zeDebugCheck(IndexCount == 0, "Cannot create empty buffer.");
+	zeDebugCheck(InitialData == NULL, "InitialData cannot be null.");
+	zeDebugCheck(Format == ZE_IBF_NONE, "Unknown buffer format");
+
+	this->Format = Format;
+	this->IndexCount = IndexCount;
+	this->BufferSize = GetIndexSize(Format) * (ZESize)IndexCount;
+	this->State.IsStatic = true;
+	this->State.IsCreated = true;
+
+	TotalSize += BufferSize;
+	TotalCount++;
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Static index buffer created. IndexCount: %u, Format: %u, Size: %u.", 
+			IndexCount, Format, (ZEUInt)BufferSize);
+#endif
+
+	return true;
+}
+
+ZESize		ZEIndexBuffer::TotalSize = 0;
+ZEUInt16	ZEIndexBuffer::TotalCount = 0;
 
 ZEIndexBuffer::ZEIndexBuffer()
 {
-	Static = false;
 	BufferSize = 0;
 	IndexCount = 0;
 	Format = ZE_IBF_NONE;
@@ -72,7 +166,11 @@ ZEIndexBuffer::ZEIndexBuffer()
 
 ZEIndexBuffer::~ZEIndexBuffer()
 {
-
+	if (GetIsCreated())
+	{
+		TotalSize -= BufferSize;
+		TotalCount--;
+	}
 }
 
 ZEIndexBuffer* ZEIndexBuffer::CreateInstance()

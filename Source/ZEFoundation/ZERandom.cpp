@@ -119,7 +119,7 @@ static int Mix(int a, int b, int c)
 
 void ZERandom::Reset()
 {
-	srand(Mix(getpid(), time(NULL), clock()));
+	srand(Mix(getpid(), (int)time(NULL), (int)clock()));
 }
 
 class ZERandomInitializer

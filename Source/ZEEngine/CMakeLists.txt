@@ -60,8 +60,8 @@ add_subdirectory(ZERenderer)
 add_subdirectory(ZEScript)
 add_subdirectory(ZESound)
 add_subdirectory(ZEUI)
-add_subdirectory(ZETerrain)
-add_subdirectory(ZETerrain2)
+#add_subdirectory(ZETerrain)
+#add_subdirectory(ZETerrain2)
 add_subdirectory(ZENetwork)
 
 ze_add_source(ZEAPI.h 						Sources Headers)
@@ -73,7 +73,7 @@ ze_add_source(ZESDK.cpp 					Sources)
 ze_add_library(ZEEngine 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZECore ZEGraphics ZERenderer ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEInterior ZEModel ZEParticle ZEAI ZETerrain ZENetwork ZETexture ZEModules)
+	LIBS ZECore ZEGraphics ZERenderer ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEInterior ZEModel ZEParticle ZEAI ZENetwork ZETexture ZEModules)
 
 ze_add_library(ZEEnginePlugin 
 	SOURCES ${Sources}
@@ -83,5 +83,3 @@ ze_add_library(ZEEnginePlugin
 ze_add_executable(ZE 
 	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
 	LIBS ZEEngine)
-
-#ze_combine_libraries(ZEEngine LIBS ZEEngine ZEAI ZECore ZEGame ZEGraphics ZETexture ZEInput ZEMap ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZETerrain ZENetwork)

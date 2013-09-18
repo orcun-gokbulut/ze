@@ -40,22 +40,30 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEViewVolume.h"
 
+class ZEView;
 class ZELight;
 class ZECamera;
 class ZEDrawParameters;
 
 class ZEShadow
 {
+	private:
+		bool						Initialized;
+
 	protected:
 		ZELight*					OwnerLight;
-		ZEVector2					ShadowMapDimension;
+		ZEVector2					MapResolution;
+
+		bool						GetInitialized() const;
 
 									ZEShadow();
 		virtual						~ZEShadow();
 
 	public:
-		virtual void				SetShadowMapDimension(const ZEVector2& Value);
-		virtual const ZEVector2&	GetShadowMapDimension() const;
+		void						SetResolution(const ZEVector2& Value);
+		const ZEVector2&			GetResolution() const;
+
+		const ZELight*				GetOwnerLight() const;
 
 		virtual bool				Initialize(ZELight* Light);
 		virtual void				Deinitialize();
@@ -63,8 +71,8 @@ class ZEShadow
 		virtual void				Update(ZECamera* Camera) = 0;
 		virtual void				Draw(ZEDrawParameters* LightDrawParameters) = 0;
 		
-		virtual ZEUInt				GetShadowVolumeCount() const = 0;
-		virtual const ZEViewVolume*	GetShadowVolume(ZESize Index) const = 0;
+		virtual ZEUInt				GetViewCount() const = 0;
+		virtual const ZEView*		GetView(ZESize Index) const = 0;
 };
 
 #endif

@@ -42,15 +42,16 @@
 #include "ZESceneCuller.h"
 #include "ZEDrawParameters.h"
 #include "ZEEntityProvider.h"
+#include "ZERenderer/ZEView.h"
 #include "ZERenderer/ZECamera.h"
+#include "ZEInterior/ZEInterior.h"
 #include "ZERenderer/ZERenderer.h"
 #include "ZESound/ZESoundModule.h"
+#include "ZERenderer/ZERenderStage.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEInterior/ZEInterior.h"
+#include "ZEInterior/ZEInteriorResource.h"
 #include "ZESerialization/ZEFileSerializer.h"
 #include "ZESerialization/ZEFileUnserializer.h"
-#include "ZEInterior/ZEInteriorResource.h"
-
 
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
@@ -237,7 +238,7 @@ void ZEScene::SetActiveCamera(ZECamera* Camera)
 	ActiveCamera = Camera;
 }
 
-ZECamera* ZEScene::GetActiveCamera()
+ZECamera* ZEScene::GetActiveCamera() const
 {
 	return ActiveCamera;
 }
@@ -248,6 +249,11 @@ void ZEScene::SetActiveListener(ZEListener* Listener)
 	zeSound->SetActiveListener(Listener);
 }
 
+ZEListener* ZEScene::GetActiveListener() const
+{
+	return ActiveListener;
+}
+
 ZESceneCuller& ZEScene::GetSceneCuller()
 {
 	return Culler;
@@ -256,11 +262,6 @@ ZESceneCuller& ZEScene::GetSceneCuller()
 const ZESceneStatistics& ZEScene::GetStatistics() const
 {
 	return Culler.GetStatistics();
-}
-
-ZEListener* ZEScene::GetActiveListener()
-{
-	return ActiveListener;
 }
 
 void ZEScene::Tick(ZEEntity* Entity, float ElapsedTime)
@@ -295,17 +296,18 @@ void ZEScene::Render(float ElapsedTime)
 	if (ActiveCamera == NULL)
 		return;
 
-	Renderer->SetCamera(ActiveCamera);
+	ZERenderStageType Stages = ZE_RST_GEOMETRY | ZE_RST_LIGHTING | ZE_RST_ACCUMULATION | ZE_RST_PARTICLE;
 
+	ZERenderStageData* Data = new ZERenderStageData();
+	Data->Create(ActiveCamera);
+
+	FrameDrawParameters.Clear();
+	FrameDrawParameters.Stages = Stages;
+	FrameDrawParameters.Bucket = Renderer->CreateCommandBucket(Stages, Data);
+	FrameDrawParameters.View = ActiveCamera;
+	FrameDrawParameters.Renderer = Renderer;
 	FrameDrawParameters.ElapsedTime = ElapsedTime;
 	FrameDrawParameters.FrameId = zeCore->GetFrameId();
-	FrameDrawParameters.Pass = ZE_RP_COLOR;
-	FrameDrawParameters.Renderer = Renderer;
-	FrameDrawParameters.ViewVolume = (ZEViewVolume*)&ActiveCamera->GetViewVolume();
-	FrameDrawParameters.View = (ZEView*)&ActiveCamera->GetView();
-	FrameDrawParameters.Lights.Clear();
-
-	memset(&FrameDrawParameters.Statistics, 0, sizeof(ZEDrawStatistics));
 
 	Culler.CullScene(this, &FrameDrawParameters);
 }

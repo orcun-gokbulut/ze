@@ -40,8 +40,8 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
 #include "ZEGame/ZERayCast.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECanvas.h"
+#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZECanvas.h"
 #include "ZEGraphics/ZEVertexTypes.h"
 #include "ZESpatial/ZEOctree.h"
 
@@ -51,7 +51,7 @@ struct ZEInteriorResourceRoom;
 class ZEStaticVertexBuffer;
 class ZEPhysicalMesh;
 class ZERenderer;
-struct ZEDrawParameters;
+class ZEDrawParameters;
 class ZEViewVolume;
 class ZESimpleMaterial;
 
@@ -94,13 +94,13 @@ class ZEInteriorRoom
 		ZEQuaternion						Rotation;
 		ZEVector3							Scale;
 
-		struct
-		{
-			ZESimpleMaterial*				Material;
-			ZECanvas						BoxCanvas;
-			ZERenderCommand					BoxRenderCommand;
+		//struct
+		//{
+		//	ZESimpleMaterial*				Material;
+		//	ZECanvas						BoxCanvas;
+		//	ZERenderCommand					BoxRenderCommand;
 
-		} DebugDrawComponents;
+		//} DebugDrawComponents;
 
 		void								DebugDraw(ZERenderer* Renderer);
 

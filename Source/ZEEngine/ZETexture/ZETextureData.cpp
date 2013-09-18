@@ -338,7 +338,113 @@ void ZETextureLevel::CopyTo(void* Dest, ZESize DestPitch)
 		memcpy((ZEUInt8*)Dest + I * DestPitch, (ZEUInt8*)SourceData + I * SourcePitch, SourcePitch);
 }
 
-// Const
+ZESize ZETextureLevel::GetRowSize(ZEUInt Width, ZETexturePixelFormat PixelFormat)
+{
+	ZESize Pitch = 0;
+	
+	switch (PixelFormat)
+	{		
+		case ZE_TPF_I8:
+			Pitch = ((ZESize)Width / ZE_I8_COMPRESSION_BLOCK_WIDTH) * ZE_I8_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_I16:
+			Pitch = ((ZESize)Width / ZE_I16_COMPRESSION_BLOCK_WIDTH) * ZE_I16_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_I16_2:
+			Pitch = ((ZESize)Width / ZE_I16_2_COMPRESSION_BLOCK_WIDTH) * ZE_I16_2_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_I32:
+			Pitch = ((ZESize)Width / ZE_I32_COMPRESSION_BLOCK_WIDTH) * ZE_I32_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_F32:
+			Pitch = ((ZESize)Width / ZE_F32_COMPRESSION_BLOCK_WIDTH) * ZE_F32_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_F32_2:
+			Pitch = ((ZESize)Width / ZE_F32_2_COMPRESSION_BLOCK_WIDTH) * ZE_F32_2_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_F32_4:
+			Pitch = ((ZESize)Width / ZE_F32_4_COMPRESSION_BLOCK_WIDTH) * ZE_F32_4_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_I8_4:
+			Pitch = ((ZESize)Width / ZE_I8_4_COMPRESSION_BLOCK_WIDTH) * ZE_I8_4_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_DXT1:
+			Pitch = ((ZESize)Width / ZE_DXT_1_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_1_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_DXT3:
+			Pitch = ((ZESize)Width / ZE_DXT_3_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_3_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_DXT5:
+			Pitch = ((ZESize)Width / ZE_DXT_5_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_5_OUTPUT_BLOCK_SIZE;
+			break;
+		case ZE_TPF_F16:
+		case ZE_TPF_F16_2:
+		case ZE_TPF_F16_4:
+			zeCriticalError("16 Bit floating point data is not supported.");
+			break;
+		case ZE_TPF_NOTSET:
+		default:
+			zeCriticalError("Unknown Pixel Format");
+			break;
+
+	}
+
+	return Pitch;
+}
+
+ZEUInt ZETextureLevel::GetRowCount(ZEUInt Height, ZETexturePixelFormat	PixelFormat)
+{
+	ZEUInt RowCount = 0;
+
+	switch (PixelFormat)
+	{
+		case ZE_TPF_I8:
+			RowCount = Height / ZE_I8_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_I16:
+			RowCount = Height / ZE_I16_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_I16_2:
+			RowCount = Height / ZE_I16_2_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_I32:
+			RowCount = Height / ZE_I32_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_F32:
+			RowCount = Height / ZE_F32_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_F32_2:
+			RowCount = Height / ZE_F32_2_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_F32_4:
+			RowCount = Height / ZE_F32_4_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_I8_4:
+			RowCount = Height / ZE_I8_4_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_DXT1:
+			RowCount = Height / ZE_DXT_1_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_DXT3:
+			RowCount = Height / ZE_DXT_3_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_DXT5:
+			RowCount = Height / ZE_DXT_5_COMPRESSION_BLOCK_HEIGHT;
+			break;
+		case ZE_TPF_F16:
+		case ZE_TPF_F16_2:
+		case ZE_TPF_F16_4:
+			zeCriticalError("16 Bit floating point data is not supported.");
+			break;
+		case ZE_TPF_NOTSET:
+		default:
+			zeCriticalError("Unknown Pixel Format");
+			break;
+	}
+
+	return RowCount;
+}
+
 ZETextureLevel::ZETextureLevel()
 {
 	Data	= NULL;
@@ -347,7 +453,6 @@ ZETextureLevel::ZETextureLevel()
 	
 }
 
-// Dest
 ZETextureLevel::~ZETextureLevel()
 {
 	if (Data)	
@@ -399,14 +504,17 @@ ZESize ZETextureSurface::GetSize()
 	return SurfaceSize;
 }
 
-// Const
+ZESize ZETextureSurface::GetSurfaceSize(ZEUInt RowCount, ZESize RowSize)
+{
+	return (ZESize)RowCount * RowSize;
+}
+
 ZETextureSurface::ZETextureSurface()
 {
 	Owner = NULL;
 	Levels.Clear(false);
 }
 
-// Dest
 ZETextureSurface::~ZETextureSurface()
 {
 	Levels.Clear(false);

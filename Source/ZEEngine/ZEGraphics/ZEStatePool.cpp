@@ -35,6 +35,22 @@
 
 #include "ZEStatePool.h"
 
+
+void ZEStatePool::ClearStates()
+{
+	BlendStateCount = 0;
+	SamplerStateCount = 0;
+	VertexLayoutCount = 0;
+	RasterizerStateCount = 0;
+	DepthStencilStateCount = 0;
+}
+
+ZEUInt16 ZEStatePool::BlendStateCount = 0;
+ZEUInt16 ZEStatePool::SamplerStateCount = 0;
+ZEUInt16 ZEStatePool::VertexLayoutCount = 0;
+ZEUInt16 ZEStatePool::RasterizerStateCount = 0;
+ZEUInt16 ZEStatePool::DepthStencilStateCount = 0;
+
 ZEStatePool::ZEStatePool()
 {
 

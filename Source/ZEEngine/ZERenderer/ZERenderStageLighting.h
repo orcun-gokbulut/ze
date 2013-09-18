@@ -58,40 +58,38 @@ class ZELightOmniProjective;
 class ZERenderStageLighting : public ZERenderStage
 {
 	protected:
-		const ZERenderStageGeometry*	GBufferInput;
-
 		struct
 		{
-			ZETexture2D*				LBuffer1;
-			ZETexture2D*				LBuffer2;
+			ZETexture2D*				LightSpecular;
 
 		} Textures;
 
 		struct
 		{
-			ZERenderTarget*				LBuffer1;
-			ZERenderTarget*				LBuffer2;
+			ZERenderTarget*				LightSpecular;
 
 		} RenderTargets;
+
+		const ZERenderStageGeometry*	InputStageGeometry;
 
 		void							UpdateBuffers();
 		void							DestroyBuffers();
 
-		void							ResetStates();
-		void							CommitStates();
-
 	public:
+		const ZETexture2D*				GetTextureLightSpecular() const;
+
+		const ZERenderTarget*			GetRenderTargetLightSpecular() const;
+
+		void							SetInputStageGeometry(const ZERenderStageGeometry* Input);
+		const ZERenderStageGeometry*	GetInputStageGeometry() const;
+
 		virtual ZERenderStageType		GetStageType() const;
 		virtual ZERenderStageType		GetDependencies() const;
+
+		virtual bool					Setup();
+		virtual bool					Process(const ZERenderCommand* RenderCommand);
 		
-		const ZETexture2D*				GetLBuffer1() const;
-		const ZETexture2D*				GetLBuffer2() const;
-
-		void							SetInputGeometryStage(const ZERenderStageGeometry* Input);
-		const ZERenderStageGeometry*	GetInputGeometryStage() const;
-
-		virtual void					Process(const ZERenderCommand* RenderCommand);
-		virtual void					Setup();
+		virtual bool					ResetStates(const ZEMaterial* Material);
 
 										ZERenderStageLighting();
 		virtual							~ZERenderStageLighting();

@@ -33,35 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include <d3d11.h>
+
 #include "ZEError.h"
-#include "ZED3D10DepthStencilBuffer.h"
 #include "ZED3D10GraphicsModule.h"
-
-#include <D3D10.h>
-
-inline static ZESize GetPixelSize(ZEDepthStencilPixelFormat Format)
-{
-	ZESize Size = 0;
-	switch(Format)
-	{
-		case ZE_DSPF_DEPTH16:
-			Size = 2;
-			break;
-		case ZE_DSPF_DEPTH24_STENCIL8:
-			Size = 4;
-			break;
-		case ZE_DSPF_DEPTHD32_FLOAT:
-			Size = 4;
-			break;
-	}
-	return Size;
-}
-
-inline static ZESize CalculateBufferSize(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat Format)
-{
-	return Width * Height * GetPixelSize(Format);
-}
-
+#include "ZED3D10DepthStencilBuffer.h"
 
 inline static DXGI_FORMAT ConvertPixelFormat(ZEDepthStencilPixelFormat Format)
 {
@@ -84,7 +60,7 @@ inline static DXGI_FORMAT ConvertPixelFormat(ZEDepthStencilPixelFormat Format)
 	return DXGIFormat;
 }
 
-const ID3D10DepthStencilView* ZED3D10DepthStencilBuffer::GetD3D10DepthStencilView() const
+const ID3D11DepthStencilView* ZED3D10DepthStencilBuffer::GetD3D10DepthStencilView() const
 {
 	return D3D10DepthStencilView;
 }
@@ -98,63 +74,51 @@ bool ZED3D10DepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEDepthStenc
 {
 	zeDebugCheck(Width == 0, "Width cannot be zero");
 	zeDebugCheck(Height == 0, "Height cannot be zero");
+	zeDebugCheck(!IsEmpty(), "Depth stencil buffer alread created");
 	zeDebugCheck(PixelFormat == ZE_DSPF_NOTSET, "PixelFormat must be valid");
-	zeDebugCheck(D3D10DepthStencilView, "Depth stencil buffer alread created");
 	zeDebugCheck(Width > 8191 || Height > 8191, "Depth stencil buffer dimensions exceeds the limits, 0-8191.");
 
-	D3D10_TEXTURE2D_DESC DepthStencilDesc;
+	D3D11_TEXTURE2D_DESC DepthStencilDesc;
 	DepthStencilDesc.ArraySize = 1;
 	DepthStencilDesc.MipLevels = 1;
 	DepthStencilDesc.Width = Width;
 	DepthStencilDesc.Height = Height;
 	DepthStencilDesc.Format = ConvertPixelFormat(PixelFormat);
-	DepthStencilDesc.Usage = D3D10_USAGE_DEFAULT;
-	DepthStencilDesc.BindFlags = D3D10_BIND_DEPTH_STENCIL;
+	DepthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+	DepthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	DepthStencilDesc.CPUAccessFlags = 0;
 	DepthStencilDesc.MiscFlags = 0;
 	DepthStencilDesc.SampleDesc.Count = 1;
 	DepthStencilDesc.SampleDesc.Quality = 0;
 
 	// Create depth stencil texture
-	ID3D10Texture2D* DepthTexture = NULL;
-	if(FAILED(D3D10Device->CreateTexture2D(&DepthStencilDesc, NULL, &DepthTexture)))
+	ID3D11Texture2D* DepthTexture = NULL;
+	HRESULT Result = D3DDevices[0]->CreateTexture2D(&DepthStencilDesc, NULL, &DepthTexture);
+	if(FAILED(Result))
 	{
-		zeError("Cannot create depth stencil texture.");
+		zeError("D3D10 depth stencil texture creation failed. ErrorCode: %d.", Result);
 		return false;
 	}
 
 	// Create depth stencil view
-	D3D10_DEPTH_STENCIL_VIEW_DESC DepthStencilViewDesc;
+	D3D11_DEPTH_STENCIL_VIEW_DESC DepthStencilViewDesc;
 	DepthStencilViewDesc.Format = DepthStencilDesc.Format;
+	DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	DepthStencilViewDesc.Texture2D.MipSlice = 0;
-	DepthStencilViewDesc.ViewDimension = D3D10_DSV_DIMENSION_TEXTURE2D;
+	DepthStencilViewDesc.Flags = 0;
 
-	if (FAILED(D3D10Device->CreateDepthStencilView(DepthTexture, &DepthStencilViewDesc, &D3D10DepthStencilView)))
+	Result = D3DDevices[0]->CreateDepthStencilView(DepthTexture, &DepthStencilViewDesc, &D3D10DepthStencilView);
+	if (FAILED(Result))
 	{	
-		zeCriticalError("Cannot create depth stencil view");
+		zeError("D3D10 depth stencil view creation failed. ErrorCode: %d.", Result);
 		ZED3D_RELEASE(DepthTexture);
 		return false;
 	}
 	
 	ZED3D_RELEASE(DepthTexture);
 
-	this->PixelFormat = PixelFormat;
-	this->Height = Height;
-	this->Width = Width;
-	
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Depth stencil buffer created. Width: %u, Height: %u, PixelFormat: %u.", 
-			Width, Height, PixelFormat);
-#endif
-
-	GlobalSize += CalculateBufferSize(Width, Height, PixelFormat);
-	GlobalCount++;
-
-	return true;
+	return ZEDepthStencilBuffer::Create(Width, Height, PixelFormat);
 }
-
-ZESize		ZED3D10DepthStencilBuffer::GlobalSize = 0;
-ZEUInt16	ZED3D10DepthStencilBuffer::GlobalCount = 0;
 
 ZED3D10DepthStencilBuffer::ZED3D10DepthStencilBuffer()
 {
@@ -164,7 +128,4 @@ ZED3D10DepthStencilBuffer::ZED3D10DepthStencilBuffer()
 ZED3D10DepthStencilBuffer::~ZED3D10DepthStencilBuffer()
 {
 	ZED3D_RELEASE(D3D10DepthStencilView);
-
-	GlobalSize -= CalculateBufferSize(Width, Height, PixelFormat);
-	GlobalCount--;
 }

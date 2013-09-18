@@ -54,40 +54,35 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEConstantBuffer.h"
+#include "ZEGraphics/ZEGraphicsWindow.h"
 #include "ZEGraphics/ZEGraphicsEventTracer.h"
 
 /************************************************************************/
 /*                        ZECommandBuffer                               */
 /************************************************************************/
-inline void ZECommandBuffer::Clear()
+void ZECommandBuffer::Clear()
 {
 	EndOfBuffer = 0;
 	CommandList.Clear(true);
 }
 
-void ZECommandBuffer::SortCommands(ZESize StartIndex, ZESize EndIndex)
+void ZECommandBuffer::SortCommands()
 {
 	zeCriticalError("Not implemented yet.");
-	// Sort draw commands between the frame start and frame end
+	// Sort commands that are in commadlist
 }
 
-void ZECommandBuffer::SortFrames()
-{
-	zeCriticalError("Not implemented yet.");
-	// Find frames in the command buffer and send frame start-end to sort commands
-}
-
-inline bool ZECommandBuffer::IsEmpty() const
+bool ZECommandBuffer::IsEmpty() const
 {
 	return CommandList.GetCount() == 0;
 }
 
-inline ZESize ZECommandBuffer::GetCount() const
+ZESize ZECommandBuffer::GetCount() const
 {
 	return CommandList.GetCount();
 }
 
-inline bool ZECommandBuffer::AddCommand(const ZERenderCommand* Entry)
+bool ZECommandBuffer::AddCommand(const ZERenderCommand* Entry)
 {
 	zeDebugCheck(Entry == NULL, "NULL Pointer.");
 
@@ -104,15 +99,11 @@ inline bool ZECommandBuffer::AddCommand(const ZERenderCommand* Entry)
 	return true;
 }
 
-inline const ZERenderCommand* ZECommandBuffer::GetCommand(ZESize Index) const
+const ZERenderCommand* ZECommandBuffer::GetCommand(ZESize Index) const
 {
 	zeDebugCheck(Index >= CommandList.GetCount(), "Index out of range");
 
-	ZESize Count = CommandList.GetCount();
-	if (Count == 0 || Index >= Count)
-		return NULL;
-
-	return CommandList[Index];
+	return CommandList.GetCount() == 0 ? NULL : CommandList[Index];
 }
 
 ZECommandBuffer::ZECommandBuffer()
@@ -123,7 +114,7 @@ ZECommandBuffer::ZECommandBuffer()
 
 ZECommandBuffer::~ZECommandBuffer()
 {
-	if (Buffer)
+	if (Buffer !=  NULL)
 	{
 		delete [] ((ZEUInt8*)Buffer);
 		Buffer = NULL;
@@ -133,16 +124,30 @@ ZECommandBuffer::~ZECommandBuffer()
 /**************************************************************************/
 /*								ZECommandBucket                           */
 /**************************************************************************/
-
 void ZECommandBucket::Clear()
 {
-	Parameters.Clear();
-	Commands.Clear();
+	TargetStages = 0;
+
+	if (StageData != NULL)
+	{
+		delete StageData;
+		StageData = NULL;
+	}
+
+	CommandBuffer.Clear();
+}
+
+bool ZECommandBucket::AddRenderCommand(const ZERenderCommand* Command)
+{
+	zeDebugCheck(Command == NULL, "Null pointer");
+
+	return CommandBuffer.AddCommand(Command);
 }
 
 ZECommandBucket::ZECommandBucket()
 {
-
+	TargetStages = 0;
+	StageData = NULL;
 }
 
 ZECommandBucket::~ZECommandBucket()
@@ -153,156 +158,91 @@ ZECommandBucket::~ZECommandBucket()
 /************************************************************************/
 /*								ZERenderer                              */
 /************************************************************************/
+void ZERenderer::ProcessStage(ZERenderStage* Stage)
+{	
+	ZERenderStageType StageType = Stage->GetStageType();
+	ZEListIterator<ZECommandBucket> Iterator = BucketList.GetIterator();
+	
+	while (!Iterator.IsEnd())
+	{
+		ZECommandBucket* Bucket = Iterator.GetItem();
 
-__declspec(align(16))
+		// Skip if bucket is not for this stage
+		if (!Bucket->TargetStages.GetFlags(StageType))
+		{
+			Iterator.MoveNext();
+			continue;
+		}
+			
+		// Setup stage
+		Stage->SetData(Bucket->StageData);
+		Stage->Setup();
+		Stage->ResetStates(NULL);
+
+		// Process all commands in bucket with given stage
+		ZESize CommandCount = Bucket->CommandBuffer.GetCount();
+		for (ZESize J = 0; J < CommandCount; ++J)
+		{
+			const ZERenderCommand* Command = Bucket->CommandBuffer.GetCommand(J);
+			Stage->Process(Command);
+		}
+
+		// Move to next bucket
+		Iterator.MoveNext();
+
+		// Remove stage from target stages
+		Bucket->TargetStages.UnraiseFlags(StageType);
+
+		// If there are no more target stages
+		if (Bucket->TargetStages == 0)
+		{
+			ZECommandBucket* OldBucket = BucketList.Dequeue();
+			OldBucket->Clear();
+
+			EmptyBuckets.Append(OldBucket);
+		}
+	}
+}
+
+ZECommandBucket* ZERenderer::CreateCommandBucket(ZERenderStageType TargetStages, ZERenderStageData* StageData)
+{
+	zeDebugCheck(StageData == NULL, "NULL Pointer");
+	zeDebugCheck(TargetStages == 0, "There must be at least one target stage");
+
+	ZECommandBucket* NewBucket = NULL;
+
+	if (EmptyBuckets.GetCount() == 0)
+	{
+		NewBucket = new ZECommandBucket();
+	}
+	else
+	{
+		NewBucket = EmptyBuckets.Dequeue();
+	}
+	
+	NewBucket->StageData = StageData;
+	NewBucket->TargetStages = TargetStages;
+	BucketList.Append(NewBucket);
+
+	return NewBucket;
+}
+
+// Move this struct to renderer!
 struct ZEShaderTimeConstants
 {
 	float			Time0toN;
 	float			SinTime0toN;
 	float			CosTime0toN;
 	float			TanTime0toN;
-	
+
 	float			Time0to1;
 	float			SinTime0to1;
 	float			CosTime0to1;
 	float			TanTime0to1;
 
 	float			ElapsedTime;
+	float			Reserved[3];
 };
-
-__declspec(align(16))
-struct ZEShaderCameraConstants
-{
-	ZEVector2		ViewPortDimension;
-	ZEVector2		InvViewPortDimension;
-
-	float			NearZ;
-	float			FarZ;
-	float			Fov;
-	float			AspectRatio;
-	
-	ZEVector3		ViewWorldPos;
-	ZEVector3		ViewWorldUp;
-	ZEVector3		ViewWorldFront;
-	ZEVector3		ViewWorldRight;
-	
-	ZEMatrix4x4		ViewProjection;
-	ZEMatrix4x4		Projection;
-	ZEMatrix4x4		View;
-	
-	ZEMatrix4x4		InvViewProjection;
-	ZEMatrix4x4		InvProjection;
-	ZEMatrix4x4		InvView;
-};
-
-/*
-void ZERenderer::UpdateConstants(bool ForceUpdate)
-{
-	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
-
-	// Time Constants
-	// -----------------------------------------------------------------
-	if (ForceUpdate || UpdateTimeConstants)
-	{	
-		float ElapsedTime = (float)zeCore->GetRealTimeClock()->GetFrameDeltaTime() / 1000000.0f;
-		float Time0ToN = (float)zeCore->GetRealTimeClock()->GetCurrentTime() / 1000000.0f;
-		float Time0To1 = Time0ToN - ZEMath::Floor(Time0ToN);
-
-		ZEShaderTimeConstants* TimeBuffer = NULL;
-		TimeConstants->Lock((void**)&TimeBuffer);
-	
-			TimeBuffer->ElapsedTime = ElapsedTime;
-			TimeBuffer->Time0to1 = Time0To1;
-			TimeBuffer->SinTime0to1 = ZEAngle::Sin(Time0To1);
-			TimeBuffer->CosTime0to1 = ZEAngle::Cos(Time0To1);
-			TimeBuffer->TanTime0to1 = ZEAngle::Tan(Time0To1);
-			TimeBuffer->Time0toN = Time0ToN;
-			TimeBuffer->SinTime0toN = ZEAngle::Sin(Time0ToN);
-			TimeBuffer->CosTime0toN = ZEAngle::Cos(Time0ToN);
-			TimeBuffer->TanTime0toN = ZEAngle::Tan(Time0ToN);
-
-		TimeConstants->Unlock();
-		UpdateTimeConstants = false;
-	}
-
-	// Camera Constants
-	// -----------------------------------------------------------------
-	if (ForceUpdate || UpdateCameraConstants)
-	{
-		ZEVector2 WidthHeight = zeGraphics->GetScreenSize();
-
-		ZEShaderCameraConstants* CameraBuffer = NULL;
-		CameraConstants->Lock((void**)&CameraBuffer);
-
-			CameraBuffer->ViewPortDimension = WidthHeight;
-			CameraBuffer->InvViewPortDimension = ZEVector2::One / WidthHeight;
-
-			CameraBuffer->NearZ = Camera->GetNearZ();
-			CameraBuffer->FarZ = Camera->GetFarZ();
-			CameraBuffer->Fov = Camera->GetFOV();
-			CameraBuffer->AspectRatio = Camera->GetAspectRatio();
-		
-			CameraBuffer->ViewWorldPos = Camera->GetWorldPosition();
-			CameraBuffer->ViewWorldRight = Camera->GetWorldRight();
-			CameraBuffer->ViewWorldUp = Camera->GetWorldUp();
-			CameraBuffer->ViewWorldFront = Camera->GetWorldFront();
-		
-			CameraBuffer->View = Camera->GetViewTransform();
-			CameraBuffer->Projection = Camera->GetProjectionTransform();
-			CameraBuffer->ViewProjection = Camera->GetViewProjectionTransform();
-		
-			CameraBuffer->InvView = Camera->GetViewTransform().Inverse();
-			CameraBuffer->InvProjection = Camera->GetProjectionTransform().Inverse();
-			CameraBuffer->InvViewProjection = Camera->GetViewProjectionTransform().Inverse();
-
-		CameraConstants->Unlock();
-		UpdateCameraConstants = false;
-	}
-
-	Device->SetVertexShaderBuffer(12, TimeConstants);
-	Device->SetGeometryShaderBuffer(12, TimeConstants);
-	Device->SetPixelShaderBuffer(12, TimeConstants);
-
-	Device->SetVertexShaderBuffer(13, CameraConstants);
-	Device->SetGeometryShaderBuffer(13, CameraConstants);
-	Device->SetPixelShaderBuffer(13, CameraConstants);
-}
-*/
-
-void ZERenderer::ProcessStage(ZERenderStage* Stage)
-{
-	ZESize BucketCount = Buckets.GetCount();
-	ZERenderStageType BucketStage = Stage->GetStageType();
-	
-	ZEListIteratorConst<ZECommandBucket> Iterator = Buckets.GetConstIterator();
-
-	while (!Iterator.IsEnd())
-	{
-		const ZECommandBucket* Bucket = Iterator.GetItem();
-		ZERenderStageType Stages =  Bucket->Parameters.Stages;
-
-		if (Stage->GetStageType().GetFlags(Stages))
-			continue;
-
-		ZESize CommandCount = Bucket->Commands.GetCount();
-		for (ZESize J = 0; J < CommandCount; ++J)
-		{
-			const ZERenderCommand* Command = Bucket->Commands.GetCommand(J);
-			Stage->Process(Command);
-		}
-
-		Iterator.MoveNext();
-	}
-}
-
-ZECommandBucket* ZERenderer::CreateCommandBucket(const ZEDrawParameters* Parameters)
-{
-	ZECommandBucket* NewBucket = new ZECommandBucket();
-	NewBucket->Parameters = *Parameters;
-	Buckets.Append(NewBucket);
-
-	return NewBucket;
-}
 
 bool ZERenderer::PreRender()
 {
@@ -311,66 +251,137 @@ bool ZERenderer::PreRender()
 		zeWarning("zeGraphics disabled.");
 		return false;
 	}
+
+	const ZEArray<ZEGraphicsWindow*>& Windows = zeGraphics->GetWindows();
+	for (ZESize I = 0; I < Windows.GetCount(); ++I)
+	{
+		if (!Windows[I]->Update())
+			return false;
+	}
+
+	float ElapsedTime = (float)zeCore->GetRealTimeClock()->GetFrameDeltaTime() / 1000000.0f;
+	float Time0ToN = (float)zeCore->GetRealTimeClock()->GetCurrentTime() / 1000000.0f;
+	float Time0To1 = Time0ToN - ZEMath::Floor(Time0ToN);
+
+	ZEShaderTimeConstants* Constants = NULL;
+	TimerConstants->Lock((void**)&Constants);
+
+		Constants->ElapsedTime = ElapsedTime;
+		
+		Constants->Time0to1	= Time0To1;
+		Constants->SinTime0to1 = ZEAngle::Sin(Time0To1);
+		Constants->CosTime0to1 = ZEAngle::Cos(Time0To1);
+		Constants->TanTime0to1 = ZEAngle::Tan(Time0To1);
+
+		Constants->Time0toN	= Time0ToN;
+		Constants->SinTime0toN = ZEAngle::Sin(Time0ToN);
+		Constants->CosTime0toN = ZEAngle::Cos(Time0ToN);
+		Constants->TanTime0toN = ZEAngle::Tan(Time0ToN);
+
+	TimerConstants->Unlock();
+
+	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
+	Device->SetVertexShaderBuffer(12, TimerConstants);
+	Device->SetGeometryShaderBuffer(12, TimerConstants);
+	Device->SetPixelShaderBuffer(12, TimerConstants);
+
+	ZEListIterator<ZECommandBucket> Iterator = BucketList.GetIterator();
+	
+	while (!Iterator.IsEnd())
+	{
+		ZECommandBucket* Bucket = Iterator.GetItem();
+		Bucket->CommandBuffer.SortCommands();
+	}
+
+	return true;
 }
 
 bool ZERenderer::PostRender()
 {
-	zeGraphics->GetDevice()->Present();
-	Buckets.RemoveAll();
+	const ZEArray<ZEGraphicsWindow*>& Windows = zeGraphics->GetWindows();
+	for (ZESize I = 0; I < Windows.GetCount(); ++I)
+	{
+		if (!Windows[I]->Present())
+			return false;
+	}
+
+	return true;
 }
 
 bool ZERenderer::Render(float ElaspedTime)
 {
 	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
 	
-	//	ShadowStage
-	//------------------------------------------------
+	//zeLog("<=====================Shadow Stage===========================>");
+
 	Tracer->StartEvent("Shadow Stage");
-	ShadowStage->Setup();
 	ProcessStage(ShadowStage);
 	Tracer->EndEvent();	
 
-	//	GeometryStage
-	//------------------------------------------------
+	//zeLog("<=====================Geometry Stage===========================>");
+
 	Tracer->StartEvent("Geometry Stage");
-	GeometryStage->Setup();
 	ProcessStage(GeometryStage);
 	Tracer->EndEvent();
 	
-	//	LightingStage
-	//------------------------------------------------
+	//zeLog("<=====================Lighting Stage===========================>");
+
 	Tracer->StartEvent("Lighting Stage");
-	LightingStage->Setup();
 	ProcessStage(LightingStage);
 	Tracer->EndEvent();
+	
+	//zeLog("<=====================Accumulation Stage===========================>");
 
-	//	ForwardStage
-	//------------------------------------------------
-	Tracer->StartEvent("Forward Stage");
-	AccumulationStage->Setup();
+	Tracer->StartEvent("Accumulation Stage");
 	ProcessStage(AccumulationStage);
 	Tracer->EndEvent();
 
-	//	ParticleStage
-	//-----------------------------------------------
+	//zeLog("<=====================Particle Stage===========================>");
+
 	Tracer->StartEvent("Particle Stage");
-	ParticleStage->Setup();
 	ProcessStage(ParticleStage);
 	Tracer->EndEvent();
+	
+	return true;
 }
 
 bool ZERenderer::Initialize() 
 {
-	ShadowStage	= new ZERenderStageShadow();
-	AccumulationStage = new ZERenderStageAccumulation();
-	GeometryStage = new ZERenderStageGeometry();
-	LightingStage = new ZERenderStageLighting();
-	ParticleStage = new ZERenderStageParticle();
+	if (ShadowStage == NULL)
+	{
+		ShadowStage	= new ZERenderStageShadow();
+	}
 
-	LightingStage->SetInputGeometryStage(GeometryStage);
-	AccumulationStage->SetInputGeometryStage(GeometryStage);
-	AccumulationStage->SetInputLightingStage(LightingStage);
-	ParticleStage->SetInputAccumulationStage(AccumulationStage);
+	if (GeometryStage == NULL)
+	{
+		GeometryStage = new ZERenderStageGeometry();
+	}
+	
+	if (LightingStage == NULL)
+	{
+		LightingStage = new ZERenderStageLighting();
+		LightingStage->SetInputStageGeometry(GeometryStage);
+	}
+	
+	if (AccumulationStage == NULL)
+	{
+		AccumulationStage = new ZERenderStageAccumulation();
+		AccumulationStage->SetInputStageGeometry(GeometryStage);
+		AccumulationStage->SetInputStageLighting(LightingStage);
+	}
+	
+	if (ParticleStage == NULL)
+	{
+		ParticleStage = new ZERenderStageParticle();
+		ParticleStage->SetInputStageAccumulation(AccumulationStage);
+	}	
+
+	if (TimerConstants == NULL)
+	{
+		TimerConstants = ZEConstantBuffer::CreateInstance();
+		TimerConstants->Create(sizeof(ZEShaderTimeConstants));
+		TimerConstants->SetZero();
+	}
 
 	return true;
 }
@@ -382,6 +393,26 @@ void ZERenderer::Deinitialize()
 	ZE_DESTROY(GeometryStage);
 	ZE_DESTROY(LightingStage);
 	ZE_DESTROY(ParticleStage);
+
+	ZE_DESTROY(TimerConstants);
+
+	ZESize BucketCount = EmptyBuckets.GetCount();
+	for (ZESize I = 0; I < BucketCount; ++I)
+	{
+		ZECommandBucket* Bucket = EmptyBuckets.Dequeue();
+		
+		Bucket->Clear();
+		delete Bucket;
+	}
+
+	BucketCount = BucketList.GetCount();
+	for (ZESize I = 0; I < BucketCount; ++I)
+	{
+		ZECommandBucket* Bucket = BucketList.Dequeue();
+		
+		Bucket->Clear();
+		delete Bucket;
+	}
 }
 
 void ZERenderer::Destroy()
@@ -401,6 +432,8 @@ ZERenderer::ZERenderer()
 	LightingStage = NULL;
 	AccumulationStage = NULL;
 	ParticleStage = NULL;
+
+	TimerConstants = NULL;
 }
 
 ZERenderer::~ZERenderer()

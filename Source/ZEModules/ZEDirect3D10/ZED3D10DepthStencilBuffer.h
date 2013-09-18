@@ -33,14 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D10_DEPTH_BUFFER_H__ 
-#define __ZE_D3D10_DEPTH_BUFFER_H__
+#ifndef __ZE_D3D11_DEPTH_BUFFER_H__ 
+#define __ZE_D3D11_DEPTH_BUFFER_H__
 
 #include "ZETypes.h"
 #include "ZED3D10ComponentBase.h"
 #include "ZEGraphics/ZEDepthStencilBuffer.h"
 
-struct ID3D10DepthStencilView;
+struct ID3D11DepthStencilView;
 
 class ZED3D10DepthStencilBuffer : public ZEDepthStencilBuffer, public ZED3D10ComponentBase
 {
@@ -48,16 +48,13 @@ class ZED3D10DepthStencilBuffer : public ZEDepthStencilBuffer, public ZED3D10Com
 	friend class ZED3D10GraphicsDevice;
 
 	protected:
-		static ZESize					GlobalSize;
-		static ZEUInt16					GlobalCount;
-
-		ID3D10DepthStencilView*			D3D10DepthStencilView;
+		ID3D11DepthStencilView*			D3D10DepthStencilView;
 
 										ZED3D10DepthStencilBuffer();
 		virtual							~ZED3D10DepthStencilBuffer();
 
 	public:
-		const ID3D10DepthStencilView*	GetD3D10DepthStencilView() const;
+		const ID3D11DepthStencilView*	GetD3D10DepthStencilView() const;
 
 		virtual bool					IsEmpty() const;
 

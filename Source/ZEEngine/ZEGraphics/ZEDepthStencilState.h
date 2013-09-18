@@ -132,9 +132,6 @@ class ZEDepthStencilState
 		void							SetBackStencilFunction(ZEComparisonFunction Function);		
 		ZEComparisonFunction			GetBackStencilFunction() const;
 
-										// Remove
-		void							DebugPrint() const;
-
 		void							SetToDefault();
 
 		const ZEDepthStencilState&		operator=(const ZEDepthStencilState& State);

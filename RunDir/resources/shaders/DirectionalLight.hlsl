@@ -40,6 +40,7 @@
 #include "GBuffer.hlsl"
 #include "LBuffer.hlsl"
 #include "Shadow.hlsl"
+#include "PipelineConstants.hlsl"
 
 #define ZE_MAX_CASCADE_COUNT	4
 
@@ -56,26 +57,28 @@ cbuffer LightParametersPS : register(b0)
 	float3	Color				: packoffset(c0.x);
 	float	Intensity			: packoffset(c0.w);
 	float3	Direction			: packoffset(c1.x);
-	float2	PixelSize			: packoffset(c2.x);
+	float	PenumbraSize		: packoffset(c1.w);
+	float	BiasDepthScaled		: packoffset(c2.x);
+	float	BiasSlopeScaled		: packoffset(c2.y);
 };
 
-cbuffer ShadowParametersPS : register(b1)
-{
-	float	DepthScaledBias		: packoffset(c4.x);
-	float	SlopeScaledBias		: packoffset(c4.y);
-	float	ShadowDistance		: packoffset(c4.z);
-	float	ShadowFadeDistance	: packoffset(c4.w);
-	float	PenumbraScale		: packoffset(c5.x);
-	float	ShadowMapTexelSize	: packoffset(c5.y);
-	
-	struct
-	{
-		float	FarZ;
-		float	NearZ;
-		float	Depth;
-		
-	}CascadeData[ZE_MAX_CASCADE_COUNT] : packoffset(c6.x);
-};
+//cbuffer ShadowParametersPS : register(b1)
+//{
+//	float	DepthScaledBias		: packoffset(c0.x);
+//	float	SlopeScaledBias		: packoffset(c0.y);
+//	float	ShadowDistance		: packoffset(c0.z);
+//	float	ShadowFadeDistance	: packoffset(c0.w);
+//	float	PenumbraScale		: packoffset(c1.x);
+//	float	ShadowMapTexelSize	: packoffset(c1.y);
+//	
+//	struct
+//	{
+//		float	FarZ;
+//		float	NearZ;
+//		float	Depth;
+//		
+//	}CascadeData[ZE_MAX_CASCADE_COUNT] : packoffset(c2.x);
+//};
 
 struct ZEDirectionalLight_VSInput
 {
@@ -110,7 +113,7 @@ ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input)
 {
 	ZELBuffer LBuffer = (ZELBuffer)0.0f;
 		
-	float2 ScreenPosition = Input.ScreenPosition.xy * PixelSize;
+	float2 ScreenPosition = Input.ScreenPosition.xy * ZEInvViewDimension;
 	
 	float3 Normal = ZEGBuffer_GetViewNormal(ScreenPosition);
 	float SpecularPower = ZEGBuffer_GetSpecularPower(ScreenPosition);
@@ -118,20 +121,20 @@ ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input)
 	float SubSurfaceScatteringFactor = ZEGBuffer_GetSubSurfaceScatteringFactor(ScreenPosition);
 	
 	float AngularAttenuation = dot(Direction, Normal);
-	if (abs(AngularAttenuation) - 0.01f < 0.0f)
+	
+	if (ZE_LIGHT_ZERO_CHECK(AngularAttenuation))
 		discard;
 	
-	
-	float4 Output = (float4)0.0f;
+	float4 Output = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	if (AngularAttenuation > 0.0f)
-	{
-		Output.rgb = Intensity * Color;
-	
+	{	
 		float3 ViewDirection = normalize(-ViewPosition);
 		float3 HalfVector = normalize(Direction + ViewDirection);
 		
 		float Specular = pow(abs(dot(Normal, HalfVector)), SpecularPower);
 		float Luminance = ZELBuffer_GetLuminance(Output.rgb);
+	
+		Output.rgb = Intensity * Color;
 		Output.a =  Specular * Luminance;
 		
 		Output *= AngularAttenuation;

@@ -67,8 +67,10 @@ class ZERenderStageTransparent : public ZERenderStage
 		virtual ZERenderStageType	GetStageType() const;
 		virtual ZERenderStageType	GetDependencies() const;
 		
-		void						Process(const ZERenderCommand* RenderCommand);
-		void						Setup();
+		virtual bool				Setup();
+		virtual bool				Process(const ZERenderCommand* RenderCommand);
+		
+		virtual bool				ResetStates(const ZEMaterial* Material);
 
 									ZERenderStageTransparent();
 		virtual						~ZERenderStageTransparent();

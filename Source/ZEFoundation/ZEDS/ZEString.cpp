@@ -1478,7 +1478,7 @@ void ZEString::TrimSelf()
 
 ZESize ZEString::Hash() const
 {
-	ZEUInt64 Hash = 0;
+	ZESize Hash = 0;
 	ZEHashGenerator::Hash(Hash, ToCString());
 	return Hash;
 }

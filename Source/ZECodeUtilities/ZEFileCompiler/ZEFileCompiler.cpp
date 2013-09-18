@@ -130,7 +130,7 @@ bool ZEFileCompiler::Compile(const ZEFileCompilerOptions& Options)
 			else
 			{
 				fprintf(SourceFile, "\t\t");
-				for (int I = 0; I < FileSize - BytesRead; I++)
+				for (ZESize I = 0; I < (ZESize)FileSize - BytesRead; I++)
 				{
 					fprintf(SourceFile,"0x%02X, ", *Current);
 					Current++;

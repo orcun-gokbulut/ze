@@ -564,7 +564,7 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 
 	ZEVector3 WorldPosition;
 	ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), ZEVector3::Zero);
-	float DistanceSquare = ZEVector3::DistanceSquare(DrawParameters->View->Camera->GetWorldPosition(), WorldPosition);
+	float DistanceSquare = ZEVector3::DistanceSquare(DrawParameters->View->GetWorldPosition(), WorldPosition);
 
 	if (!DrawOrderIsUserDefined)
 		DrawOrder = DistanceSquare;

@@ -429,11 +429,6 @@ bool ZEMaterialSimple::SetupForwardPass(ZERenderer* Renderer, ZERenderCommand* R
 }
 */
 
-bool ZEMaterialSimple::UpdateMaterial()
-{
-	return true;
-}
-
 ZEMaterialSimple* ZEMaterialSimple::CreateInstance()
 {
 	return NULL; //new ZEMaterialSimple();

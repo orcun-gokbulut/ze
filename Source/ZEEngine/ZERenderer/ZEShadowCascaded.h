@@ -36,29 +36,52 @@
 #ifndef __ZE_SHADOW_CASCADED_H__
 #define __ZE_SHADOW_CASCADED_H__
 
+#include "ZEView.h"
 #include "ZETypes.h"
 #include "ZEShadow.h"
+#include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEViewCuboid.h"
 
+class ZEShadowCascaded;
 
-class ZETexture2D;
-class ZERenderTarget;
-
-struct ZECascade
+class ZEViewCascaded : public ZEView
 {
-	float				Start;
-	float				End;
-	float				Depth;
+	protected:
+		ZEUInt							CascadeIndex;
+		const ZEShadowCascaded*			OwnerShadow;
 
-	ZETexture2D*		ShadowMap;
-	ZERenderTarget*		RenderTarget;
-	ZEViewCuboid		ShadowView;
-	ZEMatrix4x4			ShadowTransform;
+		ZEViewCuboid					ShadowVolume;
+
+		ZEMatrix4x4						ViewTransform;
+		ZEMatrix4x4						ProjectionTransform;
+		ZEMatrix4x4						ViewProjectionTransform;
+
+	public:
+										ZEViewCascaded();
+		virtual							~ZEViewCascaded();
+
+		void							SetCascadeIndex(ZEUInt Index);
+		ZEUInt							GetCascadeIndex() const;
+
+		void							SetOwnerShadow(const ZEShadowCascaded* Owner);
+		const ZEShadowCascaded*			GetOwnerShadow() const;
+
+		virtual void					Update(ZECamera* Camera, ZEUInt CascadeCount, float SplitBias, float ViewDepth);
+		
+		virtual ZEViewType				GetViewType() const;
+		virtual const ZEViewVolume*		GetViewVolume() const;
+		
+		virtual const ZEMatrix4x4&		GetViewTransform() const;
+		virtual const ZEMatrix4x4&		GetProjectionTransform() const;
+		virtual const ZEMatrix4x4&		GetViewProjectionTransform() const;
 };
 
 class ZELight;
 class ZECamera;
+class ZETexture2D;
+class ZERenderTarget;
 class ZEDrawParameters;
 
 #define ZE_SHADOW_MAX_CASCADE_COUNT		4
@@ -68,38 +91,47 @@ class ZEShadowCascaded : public ZEShadow
 	friend class ZELightDirectional;
 
 	protected:
-		float						SplitBias;
-		ZEUInt						CascadeCount;
-		float						ShadowViewDepth;
+		float							SplitBias;
+		float							ViewDepth;
+		ZEUInt							CascadeCount;
+		
+		ZETexture2D*					ShadowMaps[ZE_SHADOW_MAX_CASCADE_COUNT];
+		ZERenderTarget*					RenderTargets[ZE_SHADOW_MAX_CASCADE_COUNT];
+		ZEViewCascaded					CascadeViews[ZE_SHADOW_MAX_CASCADE_COUNT];
 
-		ZECascade					Cascades[ZE_SHADOW_MAX_CASCADE_COUNT];
+		float							CameraOldFarZ;
+		float							CameraOldNearZ;
+		float							CameraOldFov;
+		float							CameraOldShadowRange;
+		float							CameraOldAspectRatio;
+		ZEVector3						CameraOldPosition;
+		ZEQuaternion					CameraOldRotation;
+		ZEQuaternion					LightOldRotation;
 
-		void						UpdateBuffers();
-		void						DestroyBuffers();
-
-									ZEShadowCascaded();
-		virtual						~ZEShadowCascaded();
+		void							UpdateBuffers();
+		void							DestroyBuffers();
 
 	public:
-		void						SetCascadeCount(ZEUInt Value);
-		ZEUInt						GetCascadeCount() const;
+										ZEShadowCascaded();
+		virtual							~ZEShadowCascaded();
 
-		void						SetSplitBias(float Value);
-		float						GetSplitBias() const;
+		void							SetCascadeCount(ZEUInt Value);
+		ZEUInt							GetCascadeCount() const;
 
-		void						SetShadowViewDepth(float Value);
-		float						GetShadowViewDepth() const;
+		void							SetSplitBias(float Value);
+		float							GetSplitBias() const;
 
-		const ZECascade*			GetCascade(ZESize Index) const;
+		void							SetViewDepth(float Value);
+		float							GetViewDepth() const;
 
-		virtual ZEUInt				GetShadowVolumeCount() const;
-		virtual const ZEViewVolume*	GetShadowVolume(ZESize Index) const;
+		virtual ZEUInt					GetViewCount() const;
+		virtual const ZEView*			GetView(ZESize Index) const;
 
-		virtual bool				Initialize(ZELight* Light);
-		virtual void				Deinitialize();
+		virtual bool					Initialize(ZELight* Light);
+		virtual void					Deinitialize();
 
-		virtual void				Update(ZECamera* Camera);
-		virtual void				Draw(ZEDrawParameters* LightDrawParameters);
+		virtual void					Update(ZECamera* Camera);
+		virtual void					Draw(ZEDrawParameters* LightDrawParameters);
 };
 
 #endif

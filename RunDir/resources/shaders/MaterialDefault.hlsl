@@ -114,8 +114,6 @@ struct ZEMaterialDefault_VSInput
 cbuffer ZETransformationBuffer : register(b0)
 {
 	float4x4	WorldMatrix;
-	float4x4	ViewMatrix;
-	float4x4	ProjectionMatrix;
 };
 
 cbuffer ZEMaterialDefaultProperties : register(b0)
@@ -173,8 +171,8 @@ ZEMaterialDefault_GeometryPass_VSOutput ZEMaterialDefault_GeometryPass_VertexSha
 	SkinTransform(Input);
 
 	// Calculate transofrmation matrices
-	float4x4 WorldViewMatrix = mul(ViewMatrix, WorldMatrix);
-	float4x4 WorldViewProjMatrix = mul(ProjectionMatrix, WorldViewMatrix);
+	float4x4 WorldViewMatrix = mul(ZEViewMatrix, WorldMatrix);
+	float4x4 WorldViewProjMatrix = mul(ZEProjMatrix, WorldViewMatrix);
 
 	// Rasterizer position
 	Output.Position_ = mul(WorldViewProjMatrix, float4(Input.Position, 1.0f));
@@ -320,8 +318,8 @@ ZEMaterialDefault_AccumulationPass_VSOutput ZEMaterialDefault_AccumulationPass_V
 	SkinTransform(Input);
 
 	// Calculate transofrmation matrices
-	float4x4 WorldViewMatrix = mul(ViewMatrix, WorldMatrix);
-	float4x4 WorldViewProjMatrix = mul(ProjectionMatrix, WorldViewMatrix);
+	float4x4 WorldViewMatrix = mul(ZEViewMatrix, WorldMatrix);
+	float4x4 WorldViewProjMatrix = mul(ZEProjMatrix, WorldViewMatrix);
 
 	// Rasterizer position
 	Output.Position = mul(WorldViewProjMatrix, float4(Input.Position, 1.0f));
@@ -383,9 +381,9 @@ struct ZEFixedMaterial_ForwardPass_PSInput
 
 ZEFixedMaterial_ForwardPass_PSOutput ZEMaterialDefault_AccumulationPass_PixelShader(ZEFixedMaterial_ForwardPass_PSInput Input)
 {
-	ZEFixedMaterial_ForwardPass_PSOutput Output = (ZEFixedMaterial_ForwardPass_PSOutput)0.0f;
-	//Output.Color = float4(0.0f, 0.0f, 0.0f, 1.0f);
-	
+	ZEFixedMaterial_ForwardPass_PSOutput Output;
+	Output.Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
 	// If alpha cull enabled.
 	#ifdef ZE_SHADER_ALPHA_CULL
 		float Alpha = Opacity;
@@ -403,7 +401,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEMaterialDefault_AccumulationPass_PixelSha
 	#endif
 	
 	// Calculate sampling position for gbuffer
-	float2 ScreenPosition = Input.ScreenPosition.xy * ZEViewportDimensionInv;
+	float2 ScreenPosition = Input.ScreenPosition.xy * ZEInvViewDimension;
 
 	// If ambient is enabled
 	#ifdef ZE_SHADER_AMBIENT
@@ -452,9 +450,9 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEMaterialDefault_AccumulationPass_PixelSha
 		Output.Color.rgb += MaterialSpecular;
 	#endif
 
-	#ifdef ZE_SHADER_EMMISIVE
+	#ifdef ZE_SHADER_EMISSIVE
 		float3 MaterialEmissive = EmissiveColor * EmissiveFactor;
-		#ifdef ZE_SHADER_EMMISIVE_MAP
+		#ifdef ZE_SHADER_EMISSIVE_MAP
 			MaterialEmissive *= EmmisiveMap.Sample(EmmisiveMapSampler, Input.TexCoord);
 		#endif
 		Output.Color.rgb += MaterialEmissive;

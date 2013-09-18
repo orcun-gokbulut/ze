@@ -107,7 +107,7 @@ void ZEVectorNavInputDevice::Process()
 
 	float Angle;
 	ZEVector3 Axis;
-	ZEQuaternion::ConvertToAngleAxis(Angle, Axis, ZEQuaternion(Data.quaternion.w, Data.quaternion.x, Data.quaternion.y, Data.quaternion.z).Normalize());
+	ZEQuaternion::ConvertToAngleAxis(Angle, Axis, ZEQuaternion((float)Data.quaternion.w, (float)Data.quaternion.x, (float)Data.quaternion.y, (float)Data.quaternion.z).Normalize());
 	ZEVector3 NewAxis;
 	NewAxis.x = Axis.y;
 	NewAxis.y = -Axis.z;

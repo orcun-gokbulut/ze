@@ -69,13 +69,11 @@ class ZEMaterialLightDirectional : public ZEMaterial
 		virtual						~ZEMaterialLightDirectional();
 
 	public:
-		__declspec(align(16))
 		struct Transformations
 		{
 			ZEMatrix4x4				InvProjectionMatrix;
 		};
 
-		__declspec(align(16))
 		struct Properties
 		{
 			ZEVector3				Color;
@@ -87,7 +85,6 @@ class ZEMaterialLightDirectional : public ZEMaterial
 		};
 
 		virtual ZESize				GetHash() const;
-		virtual bool				UpdateMaterial();
 
 		virtual bool				SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand);
 

@@ -33,103 +33,96 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include <d3d11.h>
+
 #include "ZEError.h"
 #include "ZEDS/ZEHashGenerator.h"
 #include "ZED3D10ConstantBuffer.h"
 #include "ZED3D10GraphicsModule.h"
 #include "ZEGraphics/ZEShaderMeta.h"
 
-#include <d3d10.h>
-
-bool ZED3D10ConstantBuffer::UpdateBuffer()
+bool ZED3D10ConstantBuffer::UpdateWith(ZEUInt ShadowIndex)
 {
-	if (!NeedUpdate())
+	if (!ShadowCopy.GetChanged(ShadowIndex))
 		return true;
 
-	void* Mapped = NULL;
-	HRESULT Result = D3D10Buffer->Map(D3D10_MAP_WRITE_DISCARD, 0, &Mapped);
+	D3D11_MAPPED_SUBRESOURCE Mapped;
+	HRESULT Result = D3DContexes[0]->Map(D3D10Buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &Mapped);
 	if (FAILED(Result))
 	{
 		zeError("D3D10 Constant buffer mapping failed. ErrorCode: %d.", Result);
 		return false;
 	}
 
-	memcpy(Mapped, Data, Size);
+	ZESize Size = ShadowCopy.GetSliceCount() * ShadowCopy.GetSliceSize();
+	const void* Data = ShadowCopy.GetConstData(ShadowIndex);
 
-	D3D10Buffer->Unmap();
+	memcpy(Mapped.pData, Data, Size);
 
-	return ZEConstantBuffer::UpdateBuffer();
+	D3DContexes[0]->Unmap(D3D10Buffer, 0);
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Constant buffer contents updated. ConstantBuffer: %p, ShadowCOpyIdnex: %u.", this, ShadowIndex);
+#endif
+
+	return ZEConstantBuffer::UpdateWith(ShadowIndex);
 }
 
-ID3D10Buffer* ZED3D10ConstantBuffer::GetD3D10Buffer() const
+const ID3D11Buffer* ZED3D10ConstantBuffer::GetD3D10Buffer() const
 {
 	return D3D10Buffer;
 }
 
-bool ZED3D10ConstantBuffer::Create(ZESize Size)
-{
-	zeDebugCheck(Data != NULL, "Already created");
-	zeDebugCheck(Size == 0, "Zero size.");
-	
-	// Create buffer
-	D3D10_BUFFER_DESC Desc;
-	Desc.MiscFlags = 0;
-	Desc.Usage = D3D10_USAGE_DYNAMIC;
-	Desc.BindFlags = D3D10_BIND_CONSTANT_BUFFER;
-	Desc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
-	Desc.ByteWidth = (UINT)Size;
-	
-	HRESULT Result = D3D10Device->CreateBuffer(&Desc, NULL, &D3D10Buffer);
-	if (FAILED(Result))
-	{
-		zeError("D3D10 Constant buffer creation failed. ErrorCode: %d.", Result);
-		return false;
-	}
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Constant buffer created by size. Size: %u.", Size);
-#endif
-
-	GlobalSize += Size;
-	GlobalCount++;
-
-	return ZEConstantBuffer::Create(Size);
-}
-
 bool ZED3D10ConstantBuffer::Create(const ZEShaderBuffer* BufferInfo)
 {
-	zeDebugCheck(Data != NULL, "Already created");
-	zeDebugCheck(BufferInfo == NULL, "NUll pointer");
-	zeDebugCheck(BufferInfo->Constants.GetCount() == 0, "Empty table");
+	zeDebugCheck(BufferInfo == NULL, "NUll pointer.");
+	zeDebugCheck(GetIsCreated(), "Buffer already created.");
+	zeDebugCheck(BufferInfo->Constants.GetCount() == 0, "Cannot create with empty table");
+	zeDebugCheck(BufferInfo->Size == 0, "Cannot create zero sized buffer.");
 
-	// Create buffer
-	D3D10_BUFFER_DESC Desc;
+	zeDebugCheck(BufferInfo->Size > 65536, "Buffer too large");
+
+	D3D11_BUFFER_DESC Desc;
 	Desc.MiscFlags = 0;
-	Desc.Usage = D3D10_USAGE_DYNAMIC;
-	Desc.BindFlags = D3D10_BIND_CONSTANT_BUFFER;
-	Desc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
+	Desc.Usage = D3D11_USAGE_DYNAMIC;
+	Desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	Desc.ByteWidth = (UINT)BufferInfo->Size;
 	
-	HRESULT Result = D3D10Device->CreateBuffer(&Desc, NULL, &D3D10Buffer);
+	HRESULT Result = D3DDevices[0]->CreateBuffer(&Desc, NULL, &D3D10Buffer);
 	if (FAILED(Result))
 	{
 		zeError("D3D10 Constant buffer creation failed. ErrorCode: %d.", Result);
 		return false;
 	}
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Constant buffer created by buffer info. Name: %s, ConstantCount: %u, Size: %u.", 
-			BufferInfo->Name, BufferInfo->Constants.GetCount(), BufferInfo->Size);
-#endif
-
-	GlobalSize += BufferInfo->Size;
-	GlobalCount++;
 
 	return ZEConstantBuffer::Create(BufferInfo);
 }
 
-ZESize		ZED3D10ConstantBuffer::GlobalSize = 0;
-ZEUInt16	ZED3D10ConstantBuffer::GlobalCount = 0;
+bool ZED3D10ConstantBuffer::Create(ZESize BufferSize)
+{	
+	zeDebugCheck(GetIsCreated(), "Buffer already created.");
+	zeDebugCheck(BufferSize == 0, "Cannot create zero sized buffer.");
+	zeDebugCheck((BufferSize % 16) != 0, "Buffer size must be multiple of 16.");
+
+	zeDebugCheck(BufferSize > 65536, "Buffer too large");
+
+	D3D11_BUFFER_DESC Desc;
+	Desc.MiscFlags = 0;
+	Desc.Usage = D3D11_USAGE_DYNAMIC;
+	Desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	Desc.ByteWidth = (UINT)BufferSize;
+	
+	HRESULT Result = D3DDevices[0]->CreateBuffer(&Desc, NULL, &D3D10Buffer);
+	if (FAILED(Result))
+	{
+		zeError("D3D10 Constant buffer creation failed. ErrorCode: %d.", Result);
+		return false;
+	}
+
+	return ZEConstantBuffer::Create(BufferSize);
+}
 
 ZED3D10ConstantBuffer::ZED3D10ConstantBuffer()
 {
@@ -139,7 +132,4 @@ ZED3D10ConstantBuffer::ZED3D10ConstantBuffer()
 ZED3D10ConstantBuffer::~ZED3D10ConstantBuffer()
 {	
 	ZED3D_RELEASE(D3D10Buffer);
-
-	GlobalSize -= Size;
-	GlobalCount--;
 }

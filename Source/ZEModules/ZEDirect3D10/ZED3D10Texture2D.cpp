@@ -39,69 +39,6 @@
 #include "ZED3D10GraphicsModule.h"
 #include "ZETexture/ZETextureData.h"
 
-#include <D3D10.h>
-inline static float GetAveragePixelSize(ZETexturePixelFormat PixelFormat)
-{
-	float Size = 0.0f;
-	switch (PixelFormat)
-	{
-		case ZE_TPF_R32F: // 4 byte
-		case ZE_TPF_RGBA8:
-		case ZE_TPF_RG16F:
-		case ZE_TPF_RG16:
-		case ZE_TPF_INTZ:
-			Size = 4.0f;
-			break;
-
-		case ZE_TPF_R16F: // 2 byte
-		case ZE_TPF_R16:	
-		case ZE_TPF_LA8:
-			Size = 2.0f;
-			break;
-
-		case ZE_TPF_RG32F: // 8 byte
-		case ZE_TPF_RGBA16F:
-		case ZE_TPF_RGBA16:	
-			Size = 8.0f;
-			break;
-
-		case ZE_TPF_L8: // 1 byte
-			Size = 1.0f;
-			break;
-			
-		case ZE_TPF_NULL: // 0 byte
-			Size = 0.0f;
-			break;
-
-		case ZE_TPF_DXT1: // 8 byte per 4x4 block
-			Size = 8.0f / 16.0f;
-			break;
-		case ZE_TPF_DXT3: // 16 byte per 4x4 block
-			Size = 16.0f / 16.0f;
-			break;
-		case ZE_TPF_DXT5: // 16 byte per 4x4 block
-			Size = 16.0f / 16.0f;
-			break;
-
-	};
-	return Size;
-}
-
-static ZESize CalculateTexture2DSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat)
-{
-	float TotalSize = 0;
-	float PixelSize = GetAveragePixelSize(PixelFormat);
-	
-	for (ZESize LevelN = LevelCount; LevelCount > 0; --LevelN)
-	{
-		ZEUInt32 LevelIndex = (ZEUInt32)LevelN - 1;
-
-		float PixelCount = (float)((Width >> LevelIndex) * (Height >> LevelIndex));
-		TotalSize += PixelCount * PixelSize;
-	}
-	return (ZESize)TotalSize;
-}
-
 inline static DXGI_FORMAT ConvertPixelFormat(ZETexturePixelFormat Format)
 {
 	switch(Format)
@@ -142,8 +79,218 @@ inline static DXGI_FORMAT ConvertPixelFormat(ZETexturePixelFormat Format)
 	}
 }
 
-ZESize		ZED3D10Texture2D::GlobalSize = 0;
-ZEUInt16	ZED3D10Texture2D::GlobalCount = 0;
+bool ZED3D10Texture2D::UpdateWith(ZEUInt ShadowIndex)
+{
+	if (!ShadowCopy.GetChanged(ShadowIndex))
+		return true;
+
+	UINT SubResourceIndex = D3D11CalcSubresource(0, 0, 1);
+
+	D3D11_MAPPED_SUBRESOURCE Mapped;
+	HRESULT Result = D3DContexes[0]->Map(D3D10Texture2D, SubResourceIndex, D3D11_MAP_WRITE_DISCARD, 0, &Mapped);
+	if (FAILED(Result))
+	{
+		zeError("D3D10 dynamic texture 2D mapping failed. ErrorCode: %d.", Result);
+		return false;
+	}
+
+	ZESize RowSize = ShadowCopy.GetRowSize();
+	ZESize RowCount = ShadowCopy.GetRowCount();
+	
+	ZEUInt8* Destination = (ZEUInt8*)Mapped.pData;
+	const ZEUInt8* Source = (const ZEUInt8*)ShadowCopy.GetConstData(ShadowIndex);
+	
+	for (ZESize RowN = 0; RowN < RowCount; ++RowN)
+	{
+		ZEUInt8* DestinationRow = Destination + RowN * Mapped.RowPitch;
+		const ZEUInt8* SourceRow = Source + RowN * RowSize;
+		
+		memcpy(DestinationRow, SourceRow, RowSize);
+	}
+
+	D3DContexes[0]->Unmap(D3D10Texture2D, SubResourceIndex);
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Texture 2D contents updated. Texture2D: %p, ShadowCOpyIdnex: %u.", this, ShadowIndex);
+#endif
+
+	return ZETexture2D::UpdateWith(ShadowIndex);
+}
+
+const ID3D11Texture2D* ZED3D10Texture2D::GetD3D10Texture() const
+{
+	return D3D10Texture2D;
+}
+
+const ID3D11ShaderResourceView* ZED3D10Texture2D::GetD3D10ResourceView() const
+{
+	return D3D10ShaderResourceView;
+}
+
+ZERenderTarget* ZED3D10Texture2D::CreateRenderTarget(ZEUInt MipLevel) const
+{
+	zeDebugCheck(!GetIsCreated(), "Texture not created.");
+	zeDebugCheck(!State.IsStatic, "Dynamic textures cannot be render target");
+	zeDebugCheck(!IsRenderTarget, "Texture is not created with render target flag");
+	zeDebugCheck(MipLevel >= LevelCount, "Texture dont have specified Mipmap level");
+	
+	// Create render target view
+	D3D11_RENDER_TARGET_VIEW_DESC RenderTargetDesc;
+	RenderTargetDesc.Format = ConvertPixelFormat(PixelFormat);
+	RenderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	RenderTargetDesc.Texture2D.MipSlice = MipLevel;
+
+	ID3D11RenderTargetView* D3D10RenderTargetView = NULL;
+	HRESULT Result = D3DDevices[0]->CreateRenderTargetView(D3D10Texture2D, &RenderTargetDesc, &D3D10RenderTargetView);
+	if(FAILED(Result))
+	{
+		zeError("D3D10 texture 2D render target creation failed. ErrorCode: %d.", Result);
+		return NULL;
+	}
+
+	ZED3D10RenderTarget* RenderTarget = new ZED3D10RenderTarget(Width >> MipLevel, Height >> MipLevel, 1, PixelFormat, TextureType, D3D10RenderTargetView);
+	
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Render target view created. Texture2D: %p, MipLevel: %u, Width: %u, Height: %u", 
+			this, MipLevel, RenderTarget->Width, RenderTarget->Height);
+#endif
+
+	return RenderTarget;
+}
+
+bool ZED3D10Texture2D::CreateDynamic(ZEUInt Width, ZEUInt Height, ZETexturePixelFormat PixelFormat, ZETextureData* Data)
+{
+	zeDebugCheck(GetIsCreated(), "Texture already created.");
+	zeDebugCheck(Width == 0, "Width cannot be zero");
+	zeDebugCheck(Height == 0, "Height cannot be zero");
+	zeDebugCheck(PixelFormat == ZE_TPF_NOTSET, "PixelFormat must be set");
+	zeDebugCheck(Width > 8192 || Height > 8192, "Texture2D dimensions exceeds the limits");
+
+	D3D11_USAGE Usage;
+	Usage = D3D11_USAGE_DYNAMIC;
+
+	UINT CPUAccess = 0;
+	CPUAccess |= D3D11_CPU_ACCESS_WRITE;
+	
+	UINT BindFlags = 0;
+	BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+	
+	D3D11_TEXTURE2D_DESC TextureDesc;
+	TextureDesc.MiscFlags = 0;
+	TextureDesc.ArraySize = 1;
+	TextureDesc.Usage = Usage;
+	TextureDesc.Width = Width;
+	TextureDesc.Height = Height;
+	TextureDesc.BindFlags = BindFlags;
+	TextureDesc.MipLevels = 1;
+	TextureDesc.CPUAccessFlags = CPUAccess;
+	TextureDesc.SampleDesc.Count = 1;
+	TextureDesc.SampleDesc.Quality = 0;
+	TextureDesc.Format = ConvertPixelFormat(PixelFormat);
+	
+	D3D11_SUBRESOURCE_DATA InitialData;
+	if (Data != NULL)
+	{
+		InitialData.pSysMem = Data->GetSurfaces()[0].GetLevels()[0].GetData();
+		InitialData.SysMemPitch = (UINT)Data->GetSurfaces()[0].GetLevels()[0].GetPitch();
+		InitialData.SysMemSlicePitch = 0;
+	}
+
+	HRESULT Result = D3DDevices[0]->CreateTexture2D(&TextureDesc, Data == NULL ? NULL : &InitialData, &D3D10Texture2D);
+	if (FAILED(Result))
+	{
+		zeError("D3D10 dynamic texture 2D creation failed. ErrorCode: %d.", Result);
+		return false;
+	}
+
+	// Create shader resource view
+	D3D11_SHADER_RESOURCE_VIEW_DESC ResourceDesc;
+	ResourceDesc.Format = TextureDesc.Format;
+	ResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	ResourceDesc.Texture2D.MostDetailedMip = 0;
+	ResourceDesc.Texture2D.MipLevels = 1;
+	
+	Result = D3DDevices[0]->CreateShaderResourceView(D3D10Texture2D, &ResourceDesc, &D3D10ShaderResourceView);
+	if(FAILED(Result))
+	{
+		zeError("D3D10 dynamic texture 2D shader resource view creation failed. ErrorCode: %d.", Result);
+		return false;
+	}
+	
+	return ZETexture2D::CreateDynamic(Width, Height, PixelFormat, Data);
+}
+
+bool ZED3D10Texture2D::CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget, ZETextureData* Data)
+{
+	zeDebugCheck(GetIsCreated(), "Texture already created.");
+	zeDebugCheck(Width == 0, "Width cannot be zero");
+	zeDebugCheck(Height == 0, "Height cannot be zero");
+	zeDebugCheck(LevelCount == 0, "LevelCount cannot be zero");
+	zeDebugCheck(PixelFormat == ZE_TPF_NOTSET, "PixelFormat must be valid");
+	zeDebugCheck(RenderTarget && LevelCount != 1, "Render target's LevelCount must be one ");
+	zeDebugCheck(Width > 8192 || Height > 8192, "Texture2D dimensions exceeds the limits.");
+	
+	D3D11_USAGE Usage;
+	Usage = RenderTarget ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
+
+	UINT CPUAccess = 0;
+	UINT BindFlags = 0;
+	BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+	BindFlags |= RenderTarget ? D3D11_BIND_RENDER_TARGET : 0;
+
+	// Create texture 2D
+	D3D11_TEXTURE2D_DESC TextureDesc;
+	TextureDesc.MiscFlags = 0;
+	TextureDesc.ArraySize = 1;
+	TextureDesc.Width = Width;
+	TextureDesc.Height = Height;
+	TextureDesc.MipLevels = LevelCount;
+	TextureDesc.Usage = Usage;
+	TextureDesc.BindFlags = BindFlags;
+	TextureDesc.CPUAccessFlags = CPUAccess;
+	TextureDesc.Format = ConvertPixelFormat(PixelFormat);
+	TextureDesc.SampleDesc.Count = 1;
+	TextureDesc.SampleDesc.Quality = 0;
+
+	bool UseInitialData = !RenderTarget && Data != NULL;
+
+	ZEArray<D3D11_SUBRESOURCE_DATA> InitialData;
+	if (UseInitialData)
+	{
+		ZEUInt LevelCount = Data->GetLevelCount();
+		InitialData.Resize(LevelCount);
+
+		for (ZESize LevelN = 0; LevelN < LevelCount; ++ LevelN)
+		{
+			InitialData[LevelN].pSysMem = Data->GetSurfaces()[0].GetLevels()[LevelN].GetData();
+			InitialData[LevelN].SysMemPitch = (UINT)Data->GetSurfaces()[0].GetLevels()[LevelN].GetPitch();
+			InitialData[LevelN].SysMemSlicePitch = 0;
+		}
+	}
+
+	HRESULT Result = D3DDevices[0]->CreateTexture2D(&TextureDesc, UseInitialData ? InitialData.GetConstCArray() : NULL, &D3D10Texture2D);
+	if (FAILED(Result))
+	{
+		zeError("D3D10 static texture 2D creation failed. ErrorCode: %d.", Result);
+		return false;
+	}
+
+	// Create shader resource view
+	D3D11_SHADER_RESOURCE_VIEW_DESC ResourceDesc;
+	ResourceDesc.Format = TextureDesc.Format;
+	ResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	ResourceDesc.Texture2D.MostDetailedMip = 0;
+	ResourceDesc.Texture2D.MipLevels = LevelCount;
+	
+	Result = D3DDevices[0]->CreateShaderResourceView(D3D10Texture2D, &ResourceDesc, &D3D10ShaderResourceView);
+	if(FAILED(Result))
+	{
+		zeError("D3D10 static texture 2D shader resource view creation failed. ErrorCode: %d.", Result);
+		return false;
+	}
+
+	return ZETexture2D::CreateStatic(Width, Height, LevelCount, PixelFormat, RenderTarget, Data);
+}
 
 ZED3D10Texture2D::ZED3D10Texture2D()
 {
@@ -155,246 +302,4 @@ ZED3D10Texture2D::~ZED3D10Texture2D()
 {
 	ZED3D_RELEASE(D3D10ShaderResourceView);
 	ZED3D_RELEASE(D3D10Texture2D);
-	
-	GlobalSize -= CalculateTexture2DSize(Width, Height, LevelCount, PixelFormat);
-	GlobalCount--;
-}
-
-bool ZED3D10Texture2D::IsEmpty() const
-{
-	return D3D10Texture2D == NULL;
-}
-
-const ID3D10Texture2D* ZED3D10Texture2D::GetD3D10Texture() const
-{
-	return D3D10Texture2D;
-}
-
-const ID3D10ShaderResourceView* ZED3D10Texture2D::GetD3D10ResourceView() const
-{
-	return D3D10ShaderResourceView;
-}
-
-ZERenderTarget* ZED3D10Texture2D::CreateRenderTarget(ZEUInt MipLevel) const
-{
-	zeDebugCheck(IsEmpty(), "Texture not created!");
-	zeDebugCheck(!Static, "Dynamic textures cannot be render target");
-	zeDebugCheck(!RenderTarget, "Texture is not created with render target flag");
-	zeDebugCheck(MipLevel >= LevelCount, "Texture dont have specified Mipmap level");
-	
-	// Create render target view
-	D3D10_RENDER_TARGET_VIEW_DESC RenderTargetDesc;
-	RenderTargetDesc.Format = ConvertPixelFormat(PixelFormat);
-	RenderTargetDesc.ViewDimension = D3D10_RTV_DIMENSION_TEXTURE2D;
-	RenderTargetDesc.Texture2D.MipSlice = MipLevel;
-
-	ID3D10RenderTargetView* D3D10RenderTargetView = NULL;
-	if(FAILED(D3D10Device->CreateRenderTargetView(D3D10Texture2D, &RenderTargetDesc, &D3D10RenderTargetView)))
-	{
-		zeError("Cannot create render target view for static texture 2D.");
-		return NULL;
-	}
-
-	ZED3D10RenderTarget* RenderTarget = new ZED3D10RenderTarget(Width >> MipLevel, Height >> MipLevel, PixelSize, PixelFormat, TextureType, D3D10RenderTargetView);
-	
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Render target view created. Texture2D: %p, MipLevel: %u, Width: %u, Height: %u", 
-			this, MipLevel, RenderTarget->Width, RenderTarget->Height);
-#endif
-
-	return RenderTarget;
-}
-
-bool ZED3D10Texture2D::CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat)
-{
-	zeDebugCheck(D3D10Texture2D, "Texture alread created");
-	zeDebugCheck(Width == 0, "Width cannot be zero");
-	zeDebugCheck(Height == 0, "Height cannot be zero");
-	zeDebugCheck(LevelCount != 1, "LevelCount must be one");
-	zeDebugCheck(PixelFormat == ZE_TPF_NOTSET, "PixelFormat must be set");
-	zeDebugCheck(Width > 8191 || Height > 8191, "Texture2D dimensions exceeds the limits, 0-8191");
-
-	D3D10_USAGE Usage;
-	Usage = D3D10_USAGE_DYNAMIC;
-
-	UINT CPUAccess = 0;
-	CPUAccess |= D3D10_CPU_ACCESS_WRITE;
-	
-	UINT BindFlags = 0;
-	BindFlags |= D3D10_BIND_SHADER_RESOURCE;
-	
-	D3D10_TEXTURE2D_DESC TextureDesc;
-	TextureDesc.MiscFlags = 0;
-	TextureDesc.ArraySize = 1;
-	TextureDesc.Usage = Usage;
-	TextureDesc.Width = Width;
-	TextureDesc.Height = Height;
-	TextureDesc.BindFlags = BindFlags;
-	TextureDesc.MipLevels = LevelCount;
-	TextureDesc.CPUAccessFlags = CPUAccess;
-	TextureDesc.SampleDesc.Count = 1;
-	TextureDesc.SampleDesc.Quality = 0;
-	TextureDesc.Format = ConvertPixelFormat(PixelFormat);
-	
-	if (FAILED(D3D10Device->CreateTexture2D(&TextureDesc, NULL, &D3D10Texture2D)))
-	{
-		zeError("Can not create dynamic texture 2D.");
-		return false;
-	}
-
-	// Create shader resource view
-	D3D10_SHADER_RESOURCE_VIEW_DESC ResourceDesc;
-	ResourceDesc.Format = TextureDesc.Format;
-	ResourceDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
-	ResourceDesc.Texture2D.MostDetailedMip = 0;
-	ResourceDesc.Texture2D.MipLevels = LevelCount;
-	
-	if(FAILED(D3D10Device->CreateShaderResourceView(D3D10Texture2D, &ResourceDesc, &D3D10ShaderResourceView)))
-	{
-		zeError("Cannot create shader resource view for dynamic texture 2D.");
-		return false;
-	}
-
-	this->Static = false;
-	this->Width = Width;
-	this->Height = Height;
-	this->RenderTarget = false;
-	this->LevelCount = LevelCount;
-	this->PixelFormat = PixelFormat;
-	this->PixelSize = ZEVector3(1.0f / Width, 1.0f / Height, 0.0f);
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Dynamic 2D texture created. Texture2D: %p, Width: %u, Height: %u, LevelCount: %u, PixelFormat: %u", 
-			this, Width, Height, LevelCount, PixelFormat);
-#endif
-
-	GlobalSize += CalculateTexture2DSize(Width, Height, LevelCount, PixelFormat);
-	GlobalCount++;
-	
-	return true;
-}
-
-bool ZED3D10Texture2D::CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget, ZETextureData* Data)
-{
-	zeDebugCheck(D3D10Texture2D, "Texture alread created");
-	zeDebugCheck(Width == 0, "Width cannot be zero");
-	zeDebugCheck(Height == 0, "Height cannot be zero");
-	zeDebugCheck(LevelCount == 0, "LevelCount cannot be zero");
-	zeDebugCheck(PixelFormat == ZE_TPF_NOTSET, "PixelFormat must be valid");
-	zeDebugCheck(RenderTarget && LevelCount != 1, "Render target's LevelCount must be one ");
-	zeDebugCheck(RenderTarget && Data != NULL, "Render target specified, ignoring intial data.");
-	zeDebugCheck(Width > 8191 || Height > 8191, "Texture2D dimensions exceeds the limits, 0-8191.");
-	
-	D3D10_USAGE Usage;
-	Usage = RenderTarget ? D3D10_USAGE_DEFAULT : D3D10_USAGE_IMMUTABLE;
-
-	UINT CPUAccess = 0;
-	
-	UINT BindFlags = 0;
-	BindFlags |= D3D10_BIND_SHADER_RESOURCE;
-	BindFlags |= RenderTarget ? D3D10_BIND_RENDER_TARGET : 0;
-	
-	ZEUInt SampleCount = zeGraphics->GetSampleCount();
-	ZEUInt SampleQuality = zeGraphics->GetSampleQuality();
-
-	// Create texture 2D
-	D3D10_TEXTURE2D_DESC TextureDesc;
-	TextureDesc.MiscFlags = 0;
-	TextureDesc.ArraySize = 1;
-	TextureDesc.Width = Width;
-	TextureDesc.Height = Height;
-	TextureDesc.MipLevels = LevelCount;
-	TextureDesc.Usage = Usage;
-	TextureDesc.BindFlags = BindFlags;
-	TextureDesc.CPUAccessFlags = CPUAccess;
-	TextureDesc.Format = ConvertPixelFormat(PixelFormat);
-	TextureDesc.SampleDesc.Count = 1;
-	TextureDesc.SampleDesc.Quality = 0;
-
-	ZEArray<D3D10_SUBRESOURCE_DATA> InitialData;
-	if (!RenderTarget && Data != NULL)
-	{
-		ZEUInt LevelCount = Data->GetLevelCount();
-		ZEUInt SurfaceCount = Data->GetSurfaceCount();
-		InitialData.Resize(LevelCount * SurfaceCount);
-
-		for (ZESize SurfaceN = 0; SurfaceN < SurfaceCount; ++ SurfaceN)
-		{
-			for (ZESize LevelN = 0; LevelN < LevelCount; ++ LevelN)
-			{
-				InitialData[SurfaceN * LevelCount + LevelN].pSysMem = Data->GetSurfaces()[SurfaceN].GetLevels()[LevelN].GetData();
-				InitialData[SurfaceN * LevelCount + LevelN].SysMemPitch = (UINT)Data->GetSurfaces()[SurfaceN].GetLevels()[LevelN].GetPitch();
-				InitialData[SurfaceN * LevelCount + LevelN].SysMemSlicePitch = 0;
-			}
-		}
-	}
-
-	if (FAILED(D3D10Device->CreateTexture2D(&TextureDesc, InitialData.GetConstCArray(), &D3D10Texture2D)))
-	{
-		zeError("Can not create static texture 2D.");
-		return false;
-	}
-
-	// Create shader resource view
-	D3D10_SHADER_RESOURCE_VIEW_DESC ResourceDesc;
-	ResourceDesc.Format = TextureDesc.Format;
-	ResourceDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
-	ResourceDesc.Texture2D.MostDetailedMip = 0;
-	ResourceDesc.Texture2D.MipLevels = LevelCount;
-	
-	if(FAILED(D3D10Device->CreateShaderResourceView(D3D10Texture2D, &ResourceDesc, &D3D10ShaderResourceView)))
-	{
-		zeError("Cannot create shader resource view for static texture 2D.");
-		return false;
-	}
-
-	this->Static = true;
-	this->Width = Width;
-	this->Height = Height;
-	this->LevelCount = LevelCount;
-	this->PixelFormat = PixelFormat;
-	this->RenderTarget = RenderTarget;
-	this->PixelSize = ZEVector3(1.0f / Width, 1.0f / Height, 0.0f);
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Static 2D texture created. Texture2D: %p, Width: %u, Height: %u, LevelCount: %u, PixelFormat: %u", 
-			this, Width, Height, LevelCount, PixelFormat);
-#endif
-
-	GlobalSize += CalculateTexture2DSize(Width, Height, LevelCount, PixelFormat);
-	GlobalCount++;
-
-	return true;
-}
-
-bool ZED3D10Texture2D::Lock(void** Buffer, ZESize* Pitch, ZEUInt Level)
-{
-	zeDebugCheck(Pitch == NULL, "Pitch cannot be null");
-	zeDebugCheck(*Buffer == NULL, "Buffer cannot be null");
-	zeDebugCheck(D3D10Texture2D == NULL, "Cannot lock empty texture 2D");
-	zeDebugCheck(Level >= LevelCount, "Level is greater than LevelCount");
-	zeDebugCheck(Static, "Texture must be dynamic to lock or unlock");
-
-	D3D10_MAPPED_TEXTURE2D Mapped;
-	if (FAILED(D3D10Texture2D->Map(D3D10CalcSubresource(Level, 0, 1), D3D10_MAP_WRITE_DISCARD, 0, &Mapped)))
-	{
-		zeError("Cannot lock dynamic texture 2d.");
-		return false;
-	}
-
-	*Buffer = Mapped.pData;
-	*Pitch = (ZESize)Mapped.RowPitch;
-
-	return true;
-}
-
-bool ZED3D10Texture2D::Unlock(ZEUInt Level)
-{
-	zeDebugCheck(D3D10Texture2D == NULL, "Cannot unlock empty texture 2D");
-	zeDebugCheck(Static, "Texture must be dynamic to lock or unlock");
-	zeDebugCheck(Level >= LevelCount, "Level is greater than LevelCount");
-
-	D3D10Texture2D->Unmap(D3D10CalcSubresource(Level, 0, 1));
-	
-	return true;
 }

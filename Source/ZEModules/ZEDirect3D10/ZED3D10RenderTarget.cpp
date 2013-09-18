@@ -37,9 +37,7 @@
 #include "ZED3D10RenderTarget.h"
 #include "ZED3D10GraphicsModule.h"
 
-#include <D3D10.h>
-
-const ID3D10RenderTargetView* ZED3D10RenderTarget::GetD3D10RenderTargetView() const
+const ID3D11RenderTargetView* ZED3D10RenderTarget::GetD3D10RenderTargetView() const
 {
 	return D3D10RenderTargetView;
 }
@@ -49,19 +47,15 @@ bool ZED3D10RenderTarget::IsEmpty() const
 	return D3D10RenderTargetView == NULL;
 }
 
-ZEUInt16	ZED3D10RenderTarget::GlobalCount = 0;
-
-ZED3D10RenderTarget::ZED3D10RenderTarget(ZEUInt Width, ZEUInt Height, ZEVector3 PixelSize, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType, ID3D10RenderTargetView* RenderTargtetView) 
-	: ZERenderTarget(Width, Height, PixelSize, PixelFormat, RenderTargetType)
+ZED3D10RenderTarget::ZED3D10RenderTarget(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType, ID3D11RenderTargetView* RenderTargtetView) 
+	: ZERenderTarget(Width, Height, Depth, PixelFormat, RenderTargetType)
 {
-	D3D10RenderTargetView = RenderTargtetView;
+	zeDebugCheck(RenderTargtetView == NULL, "Null Pointer.");
 
-	GlobalCount++;
+	D3D10RenderTargetView = RenderTargtetView;
 }
 
 ZED3D10RenderTarget::~ZED3D10RenderTarget()
 {
 	ZED3D_RELEASE(D3D10RenderTargetView);	
-
-	GlobalCount--;
 }

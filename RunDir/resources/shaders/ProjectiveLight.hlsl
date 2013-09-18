@@ -40,36 +40,38 @@
 #include "GBuffer.hlsl"
 #include "LBuffer.hlsl"
 #include "Shadow.hlsl"
+#include "PipelineConstants.hlsl"
 
-SamplerState	ProjectionMapSampler			: register(s5);
+SamplerState		ProjectionMapSampler		: register(s5);
 Texture2D<float4>	ProjectionMap				: register(t5);
 
-cbuffer TransformationsVS : register(b0)
+cbuffer LightVSParameters0 : register(b0)
 {
-	float4x4 WorldViewMatrix		: packoffset(c0);
-	float4x4 WorldViewProjMatrix	: packoffset(c4);
+	float4x4 WorldMatrix		: packoffset(c0);
 };
 
-cbuffer LightParametersPS : register(b0)
+cbuffer LightPSParameters0 : register(b0)
 {
-	float3	Position			: packoffset(c0.x);
-	float	Range				: packoffset(c0.w);
-	float3	Color				: packoffset(c1.x);
-	float	Intensity			: packoffset(c1.w);
-	float3	Attenuation			: packoffset(c2.x);
-	float2	PixelSize			: packoffset(c3.x);
-	float4x4 ProjectionMatrix	: packoffset(c4.x);
+	float3	Color				: packoffset(c0.x);
+	float	Intensity			: packoffset(c0.w);
+	float3	Attenuation			: packoffset(c1.x);
 };
 
-cbuffer ShadowParametersPS : register(b1)
+cbuffer LightPSParameters1 : register(b1)
 {
-	float	DepthScaledBias		: packoffset(c8.x);
-	float	SlopeScaledBias		: packoffset(c8.y);
-	float	ShadowDistance		: packoffset(c8.z);
-	float	ShadowFadeDistance	: packoffset(c8.w);
-	float	PenumbraScale		: packoffset(c9.x);
-	float	ShadowMapTexelSize	: packoffset(c9.y);
+	float3 ViewSpaceCenter		: packoffset(c0);
+	float4x4 ProjectionMatrix	: packoffset(c1);
 };
+
+//cbuffer ShadowParametersPS : register(b1)
+//{
+//	float	DepthScaledBias		: packoffset(c0.x);
+//	float	SlopeScaledBias		: packoffset(c0.y);
+//	float	ShadowDistance		: packoffset(c0.z);
+//	float	ShadowFadeDistance	: packoffset(c0.w);
+//	float	PenumbraScale		: packoffset(c1.x);
+//	float	ShadowMapTexelSize	: packoffset(c1.y);
+//};
 
 struct ZEProjectiveLight_VSInput
 {
@@ -86,11 +88,14 @@ ZEProjectiveLight_VSOutput ZEProjectiveLight_VertexShader(ZEProjectiveLight_VSIn
 {
 	ZEProjectiveLight_VSOutput Output;
 	
+	float4x4 WorldViewMatrix = mul(ZEViewMatrix, WorldMatrix);
+	float4x4 WorldViewProjMatrix = mul(ZEProjMatrix, WorldViewMatrix);
+
 	float4 ViewSpacePos = mul(WorldViewMatrix, float4(Input.Position, 1.0f));
 	
 	Output.Position = mul(WorldViewProjMatrix, float4(Input.Position, 1.0f));
 	Output.ViewVector = ZEGBuffer_GetViewVector(ViewSpacePos);
-	
+
 	return Output;
 }
 
@@ -104,39 +109,44 @@ ZELBuffer ZEProjectiveLight_PixelShader(ZEProjectiveLight_PSInput Input)
 {
 	ZELBuffer LBuffer = (ZELBuffer)0.0f;
 
-	float2 ScreenPosition = Input.ScreenPosition.xy * PixelSize;
+	float2 ScreenPosition = Input.ScreenPosition.xy * ZEInvViewDimension;
 	
 	float3 Normal = ZEGBuffer_GetViewNormal(ScreenPosition);
 	float SpecularPower = ZEGBuffer_GetSpecularPower(ScreenPosition);
 	float3 ViewPosition = ZEGBuffer_GetViewPosition(ScreenPosition, Input.ViewVector);
 	float SubSurfaceScatteringFactor = ZEGBuffer_GetSubSurfaceScatteringFactor(ScreenPosition);
 	
-	float3 LightDisplacement = Position - ViewPosition;
+	float3 LightDisplacement = ViewSpaceCenter - ViewPosition;
 	float LightDistance = length(LightDisplacement);
 	float3 LightDirection = LightDisplacement / LightDistance;
 
-	float AngularAttenuation = saturate(dot(LightDirection, Normal));
-	float DistanceAttenuation = 1.0f / dot(Attenuation, float3(1.0f, LightDistance, LightDistance * LightDistance));
+	float AngularAttenuation = dot(LightDirection, Normal);
+	
+	float3 AttenuationMultiplier = float3(1.0f, LightDistance, LightDistance * LightDistance);
+	float DistanceAttenuation = 1.0f / dot(Attenuation, AttenuationMultiplier);
 
-	if (abs(AngularAttenuation * DistanceAttenuation) - 0.01f < 0.0f)
+	float FinalAttenuation = AngularAttenuation * DistanceAttenuation;
+
+	if (ZE_LIGHT_ZERO_CHECK(FinalAttenuation))
 		discard;
 
-	float4 SampleCoord = mul(ProjectionMatrix, float4(ViewPosition, 1.0f));
-	float3 SampleColor = ProjectionMap.SampleLevel(ProjectionMapSampler, SampleCoord.xy / SampleCoord.w, -1.0f).rgb;
+	float4 TextureCoord = mul(ProjectionMatrix, float4(ViewPosition, 1.0f));
+	float2 SampleCoord = TextureCoord.xy / TextureCoord.w;
+	float3 SampleColor = ProjectionMap.SampleLevel(ProjectionMapSampler, SampleCoord, -1.0f).rgb;
 	
-	float4 Output = (float4)0.0f;
+	float4 Output = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	if (AngularAttenuation > 0.0f)
 	{
 		float3 ViewDirection = normalize(-ViewPosition);
 		float3 HalfVector = normalize(LightDirection + ViewDirection);
 
-		Output.rgb = Intensity * Color * SampleColor;
 		float Specular = pow(abs(dot(Normal, HalfVector)), SpecularPower);
 		float Luminance = ZELBuffer_GetLuminance(Output.rgb);
+		
+		Output.rgb = Intensity * Color * SampleColor;
 		Output.a =  Specular * Luminance;
 	
-		Output *= AngularAttenuation;
-		Output *= DistanceAttenuation;		
+		Output *= FinalAttenuation;
 	}
 	else
 	{
@@ -145,10 +155,8 @@ ZELBuffer ZEProjectiveLight_PixelShader(ZEProjectiveLight_PSInput Input)
 			Output.rgb = Intensity * SampleColor * Color;
 			Output.a = 0.0f;
 			
-			// NOTE: -AngularAttenuation hatalý.
 			Output *= SubSurfaceScatteringFactor;
-			Output *= -AngularAttenuation;
-			Output *= DistanceAttenuation;
+			Output *= -FinalAttenuation;
 		}
 	}
 	

@@ -34,48 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEShader.h"
+#include "ZEStatePool.h"
+#include "ZETexture2D.h"
+#include "ZETexture3D.h"
 #include "ZECore/ZECore.h"
 #include "ZEIndexBuffer.h"
-#include "ZECore/ZEOption.h"
+#include "ZETextureCube.h"
+#include "ZERenderTarget.h"
 #include "ZEVertexBuffer.h"
+#include "ZECore/ZEOption.h"
 #include "ZEGraphicsModule.h"
 #include "ZEConstantBuffer.h"
-
+#include "ZEGraphicsWindow.h"
+#include "ZEDepthStencilBuffer.h"
 #include "ZECore/ZEOptionManager.h"
-
-#ifdef FREEIMAGE_LIB
-	// Workaround to avoid multiple definition
-	#undef FREEIMAGE_LIB
-#endif
 
 #include <FreeImage.h>
 
 ZEOptionSection ZEGraphicsModule::GraphicsOptions;
 
 ZE_MODULE_DESCRIPTION_ABSTRACT(ZEGraphicsModule, ZEModule, &ZEGraphicsModule::GraphicsOptions)
-
-//void ZEGraphicsModule::LockHardwareBuffer(ZEConstantBuffer* Buffer)
-//{
-//	zeDebugCheck(Buffer == NULL, "NUll pointer.");
-//
-//	Buffer->UpdateBuffer();
-//	Buffer->State.InUse = true;
-//
-//	BuffersInUse.Enqueue(Buffer);
-//}
-//
-//void ZEGraphicsModule::UnlockHardwareBuffers()
-//{
-//	ZESize BufferCount = BuffersInUse.GetCount();
-//	for (ZESize I = 0; I < BufferCount; ++I)
-//	{
-//		ZEConstantBuffer* Buffer = BuffersInUse.Dequeue();
-//
-//		Buffer->State.InUse = false;
-//		if (Buffer->State.Deleted)
-//			ZE_DESTROY(Buffer);
-//	}
-//}
 
 void FreeImageOutput(FREE_IMAGE_FORMAT Bitmap, const char* Message)
 {
@@ -93,8 +71,7 @@ void ZEGraphicsModule::BaseInitialize()
 	GraphicsOptions.AddOption(new ZEOption("FullScreen", false, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("VerticalSync", false, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("SampleCount", 1, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("SampleQuality", 0, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilter", 0, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilter", 1, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ShaderQuality", 5, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("TextureQuality", ZE_TQ_HIGH, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ModelQuality", 5, ZE_OA_NORMAL));
@@ -122,7 +99,7 @@ ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 	static ZETextureOptions UltraLow	= {ZE_TCT_DXT5,		ZE_TCQ_LOW,		ZE_TDS_8X,		ZE_TFC_ENABLED,		ZE_TMM_ENABLED,		25};
 
 	switch(TextureQuality)
-	{		
+	{
 		case ZE_TQ_VERY_HIGH:
 			return &VeryHigh;
 			break;
@@ -150,77 +127,86 @@ ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 	}
 }
 
-bool ZEGraphicsModule::GetVerticalSync() const
+ZEGraphicsWindow* ZEGraphicsModule::GetWindow(ZEUInt WindowId) const
 {
-	return VerticalSync;
+	ZESize Count = Windows.GetCount();
+	for (ZESize I = 0; I < Count; ++I)
+	{
+		if (Windows[I]->GetId() == WindowId)
+		{
+			return Windows[I];
+		}
+	}
+	return NULL;
 }
 
-ZEUInt ZEGraphicsModule::GetAnisotropicFilter() const
+const ZEArray<ZEGraphicsWindow*>& ZEGraphicsModule::GetWindows() const
 {
-	return AnisotropicFilter;
+	return Windows;
 }
 
-ZEUInt ZEGraphicsModule::GetSampleCount() const
+const ZEGraphicsMonitor* ZEGraphicsModule::GetMonitor(ZEUInt MonitorId) const
 {
-	return SampleCount;
+	ZESize Count = Monitors.GetCount();
+	for (ZESize I = 0; I < Count; ++I)
+	{
+		if (Monitors[I]->GetId() == MonitorId)
+		{
+			return Monitors[I];
+		}
+	}
+	return NULL;
 }
 
-ZEUInt ZEGraphicsModule::GetSampleQuality() const
+const ZEArray<ZEGraphicsMonitor*>& ZEGraphicsModule::GetMonitors() const
 {
-	return SampleQuality;
+	return Monitors;
 }
 
-bool ZEGraphicsModule::GetFullScreen() const
+ZEGraphicsDevice* ZEGraphicsModule::GetDevice(ZESize Index) const
 {
-	return FullScreen;
+	zeDebugCheck(Index >= Devices.GetCount(), "Index out of range");
+	return Devices[Index];
 }
 
-ZEVector2 ZEGraphicsModule::GetScreenSize() const
+const ZEArray<ZEGraphicsDevice*>& ZEGraphicsModule::GetDevices() const
 {
-	return ZEVector2((float)ScreenWidth, (float)ScreenHeight);
+	return Devices;
 }
 
-ZEUInt ZEGraphicsModule::GetScreenWidth() const
+void ZEGraphicsModule::GetStatistics(ZEGraphicsStatistics& Statistics) const
 {
-	return ScreenWidth;
-}
+	Statistics.BlendStateCount = ZEStatePool::BlendStateCount;
+	Statistics.SamplerStateCount = ZEStatePool::SamplerStateCount;
+	Statistics.DepthStencilCount = ZEStatePool::DepthStencilStateCount;
+	Statistics.RasterizerCount = ZEStatePool::RasterizerStateCount;
+	Statistics.VertexLayoutCount = ZEStatePool::VertexLayoutCount;
 
-ZEUInt ZEGraphicsModule::GetScreenHeight() const
-{
-	return ScreenHeight;
-}
+	Statistics.ShaderCount = ZEShader::TotalCount;
+	Statistics.ShaderSize = ZEShader::TotalSize;
 
-ZEUInt ZEGraphicsModule::GetScreenCount() const
-{
-	return ScreenCount;
-}
-
-const ZEViewport& ZEGraphicsModule::GetViewport(ZESize Index) const
-{
-	zeDebugCheck(Index >= ScreenCount, "Index out of range");
-
-	return Viewports[Index];
-}
-
-const ZEScissorRectangle& ZEGraphicsModule::GetScissorRectangle(ZESize Index) const
-{
-	zeDebugCheck(Index >= ScreenCount, "Index out of range");
-
-	return ScissorRects[Index];
-}
-
-const ZERenderTarget* ZEGraphicsModule::GetFrameBuffer(ZESize Index) const
-{
-	zeDebugCheck(Index >= ScreenCount, "Index out of range");
-
-	return FrameBuffers[Index];
-}
-
-const ZEDepthStencilBuffer* ZEGraphicsModule::GetDepthBuffer(ZESize Index) const
-{
-	zeDebugCheck(Index >= ScreenCount, "Index out of range");
-
-	return DepthBuffers[Index];
+	Statistics.Texture2DCount = ZETexture2D::TotalCount;
+	Statistics.Texture2DSize = ZETexture2D::TotalSize;
+	
+	Statistics.Texture3DCount = ZETexture3D::TotalCount;
+	Statistics.Texture3DSize = ZETexture3D::TotalSize;
+	
+	Statistics.TextureCubeCount	= ZETextureCube::TotalCount;
+	Statistics.TextureCubeSize = ZETextureCube::TotalSize;
+	
+	Statistics.DepthStancilBufferCount = ZEDepthStencilBuffer::TotalCount;
+	Statistics.DepthStancilBufferSize = ZEDepthStencilBuffer::TotalSize;
+	
+	Statistics.IndexBufferCount	= ZEIndexBuffer::TotalCount;
+	Statistics.IndexBufferSize = ZEIndexBuffer::TotalSize;
+	
+	Statistics.VertexBufferCount = ZEVertexBuffer::TotalCount;
+	Statistics.VertexBufferSize	= ZEVertexBuffer::TotalSize;
+	
+	Statistics.ConstantBufferCount = ZEConstantBuffer::TotalCount;
+	Statistics.ConstantBufferSize = ZEConstantBuffer::TotalSize;	
+	
+	Statistics.RenderTargetCount = ZERenderTarget::TotalCount;	
 }
 
 ZEGraphicsModule* ZEGraphicsModule::GetInstance()
@@ -228,16 +214,34 @@ ZEGraphicsModule* ZEGraphicsModule::GetInstance()
 	return ZECore::GetInstance()->GetGraphicsModule();
 }
 
+bool ZEGraphicsModule::InitializeSelf()
+{
+	if (!ZEModule::InitializeSelf())
+		return false;
+
+	ZEGraphicsWindow* MainWindow = ZEGraphicsWindow::CreateInstance();
+	MainWindow->Initialize();
+
+	return true;
+}
+
+bool ZEGraphicsModule::DeinitializeSelf()
+{
+	Devices.Clear();
+	Monitors.Clear(false);
+
+	ZESize WindowCount = Windows.GetCount();
+	for (ZESize I = 0; I < WindowCount; ++I)
+	{
+		ZE_DESTROY(Windows[I]);
+	}
+	Windows.Clear(false);
+
+	return ZEModule::Deinitialize();
+}
+
 ZEGraphicsModule::ZEGraphicsModule()
 {
-	ScreenWidth = 0;
-	ScreenHeight = 0;
-	VerticalSync = false;
-	FullScreen = false;
-	SampleCount = 1;
-	SampleQuality = 0;
-	AnisotropicFilter = 16;
-	ScreenCount = 0;
 	TextureQuality = ZE_TQ_HIGH;
 }
 

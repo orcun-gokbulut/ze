@@ -33,37 +33,33 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D10_VERTEX_BUFFER_H__
-#define __ZE_D3D10_VERTEX_BUFFER_H__
+#ifndef __ZE_D3D11_VERTEX_BUFFER_H__
+#define __ZE_D3D11_VERTEX_BUFFER_H__
+
+#include <d3d11.h>
 
 #include "ZETypes.h"
 #include "ZED3D10ComponentBase.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-
-struct ID3D10Buffer;
 
 class ZED3D10VertexBuffer : public ZEVertexBuffer, public ZED3D10ComponentBase
 {
 	friend class ZED3D10GraphicsDevice;
 	friend class ZED3D10GraphicsModule;
 
-	protected:
-		static ZESize			GlobalSize;
-		static ZEUInt16			GlobalCount;
-		
-		ID3D10Buffer*			D3D10Buffer;
+	protected:		
+		ID3D11Buffer*			D3D10Buffer;
 	
+		bool					UpdateWith(ZEUInt ShadowIndex);
+
 								ZED3D10VertexBuffer();
 		virtual					~ZED3D10VertexBuffer();
 
 	public:
-		const ID3D10Buffer*		GetD3D10Buffer() const;
+		const ID3D11Buffer*		GetD3D10Buffer() const;
 
-		virtual bool			Unlock();
-		virtual bool			Lock(void** Data);
-
-		virtual bool			CreateDynamic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData);
-		virtual bool			CreateStatic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData);
+		bool					CreateDynamic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData);
+		bool					CreateStatic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData);
 };
 
 #endif

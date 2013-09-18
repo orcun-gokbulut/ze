@@ -44,14 +44,7 @@ ZEDrawFlags ZELight::GetDrawFlags() const
 
 ZELightType ZELight::GetLightType() const
 {
-	return Type;
-}
-
-void ZELight::OnTransformChanged()
-{
-	Changed = true;
-	UpdateViewVolume = true;
-	ZEEntity::OnTransformChanged();
+	return ZE_LT_NONE;
 }
 
 void ZELight::SetShadowCaster(bool NewValue)
@@ -69,13 +62,9 @@ void ZELight::Draw(ZEDrawParameters* DrawParameters)
 
 }
 
-ZELight::ZELight(ZELightType LightType)
+ZELight::ZELight()
 {
-	Type = LightType;
-
-	Changed = true;
 	ShadowCaster = false;
-	UpdateViewVolume = true;
 }
 
 ZELight::~ZELight()

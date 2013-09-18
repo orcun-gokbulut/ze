@@ -65,22 +65,22 @@ bool ZEBlendState::GetAlphaToCoverageEnable() const
 	return StateData.AlphaToCoverageEnable;
 }
 
-void ZEBlendState::SetBlendEnable(ZESize Target, bool Enable)
+void ZEBlendState::SetBlendEnable(ZEUInt Target, bool Enable)
 {
 	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
 
-	if (StateData.BlendEnable[Target] != Enable)
+	if (StateData.BlendEnable[(ZESize)Target] != Enable)
 	{
-		StateData.BlendEnable[Target] = Enable;
+		StateData.BlendEnable[(ZESize)Target] = Enable;
 		Dirty = true;
 	}
 }
 
-bool ZEBlendState::GetBlendEnable(ZESize Target) const
+bool ZEBlendState::GetBlendEnable(ZEUInt Target) const
 {
 	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
 
-	return StateData.BlendEnable[Target];
+	return StateData.BlendEnable[(ZESize)Target];
 }
 		
 void ZEBlendState::SetSourceBlendOption(ZEBlendOption Option)
@@ -167,22 +167,22 @@ ZEBlendEquation ZEBlendState::GetBlendAlphaEquation() const
 	return StateData.BlendAlphaEquation;
 }
 
-void ZEBlendState::SetComponentWriteMask(ZESize Target, ZEColorWriteMask Mask)
+void ZEBlendState::SetComponentWriteMask(ZEUInt Target, ZEColorWriteMask Mask)
 {
 	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
 	
-	if (StateData.ComponentWriteMask[Target] != Mask)
+	if (StateData.ComponentWriteMask[(ZESize)Target] != Mask)
 	{
-		StateData.ComponentWriteMask[Target] = Mask;
+		StateData.ComponentWriteMask[(ZESize)Target] = Mask;
 		Dirty = true;
 	}
 }
 
-ZEColorWriteMask ZEBlendState::GetComponentWriteMask(ZESize Target) const
+ZEColorWriteMask ZEBlendState::GetComponentWriteMask(ZEUInt Target) const
 {
 	zeDebugCheck(Target >= ZE_MAX_RENDER_TARGET_SLOT, "Index out of range");
 
-	return StateData.ComponentWriteMask[Target];
+	return StateData.ComponentWriteMask[(ZESize)Target];
 }
 
 void ZEBlendState::SetToDefault()
@@ -191,6 +191,7 @@ void ZEBlendState::SetToDefault()
 	Dirty = false;
 	
 	memset(&StateData, 0, sizeof(ZEBlendStateData));
+	
 	StateData.AlphaToCoverageEnable = false;
 	memset(StateData.BlendEnable, 0, sizeof(bool) * 8);
 	StateData.SourceBlendOption = ZE_BO_ONE;
@@ -213,7 +214,7 @@ const ZEBlendState& ZEBlendState::operator=(const ZEBlendState& State)
 
 bool ZEBlendState::operator==(const ZEBlendState& State)
 {
-	return memcmp(&StateData, &State.StateData, sizeof(ZEBlendStateData)) == 0 ? true : false;
+	return memcmp(&StateData, &State.StateData, sizeof(ZEBlendStateData)) == 0;
 }
 
 bool ZEBlendState::operator!=(const ZEBlendState& State)

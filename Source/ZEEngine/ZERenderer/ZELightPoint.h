@@ -47,58 +47,65 @@ class ZEMaterialLightPoint;
 class ZELightPoint  : public ZELight
 {
 	protected:
-		float							Range;
-		ZEVector3						Color;
-		float							Intensity;
-		ZEVector3						Attenuation;
+		bool						PropertyChanged;
+		bool						TransformChanged;
 
-		float							PenumbraSize;
-		float							SlopeScaledBias;
-		float							DepthScaledBias;
+		float						Range;
+		ZEVector3					Color;
+		float						Intensity;
+		ZEVector3					Attenuation;
 
-		ZEViewSphere					ViewVolume;
-		ZEVertexLayout					VertexLayout;
-		ZEVertexBuffer*					Vertices;
-		ZEMaterialLightPoint*			Material;
-		ZERenderCommandDefault			RenderCommand;
-		
-		virtual void					UpdateMaterial(const ZEDrawParameters* DrawParameters);
+		float						PenumbraSize;
+		float						SlopeScaledBias;
+		float						DepthScaledBias;
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		mutable ZEViewSphere		ViewVolume;
 
-										ZELightPoint();
-		virtual							~ZELightPoint();
+		ZEMaterialLightPoint*		Material;
+		ZEVertexBuffer*				Vertices;
+		ZEVertexLayout				VertexLayout;
+
+		ZERenderCommandDefault		RenderCommand;
+	
+		virtual void				UpdateMaterial(const ZEDrawParameters* DrawParameters);
+
+		virtual void				OnTransformChanged();
+
+		virtual bool				InitializeSelf();
+		virtual bool				DeinitializeSelf();
+
+									ZELightPoint();
+		virtual						~ZELightPoint();
 
 	public:
-		void							SetRange(float NewValue);
-		float							GetRange() const;
+		void						SetRange(float NewValue);
+		float						GetRange() const;
 
-		void							SetColor(const ZEVector3& NewColor);
-		const ZEVector3&				GetColor() const;
-		
-		void							SetIntensity(float NewValue);
-		float							GetIntensity() const;
+		void						SetColor(const ZEVector3& NewColor);
+		const ZEVector3&			GetColor() const;
+	
+		void						SetIntensity(float NewValue);
+		float						GetIntensity() const;
 
-		void							SetAttenuation(const ZEVector3& Attenuation);
-		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
-		const ZEVector3&				GetAttenuation() const;
+		void						SetAttenuation(const ZEVector3& Attenuation);
+		void						SetAttenuation(float DistanceSquare, float Distance, float Constant);
+		const ZEVector3&			GetAttenuation() const;
 
-		void							SetPenumbraSize(float Value);
-		float							GetPenumbraSize() const;
+		void						SetPenumbraSize(float Value);
+		float						GetPenumbraSize() const;
 
-		void							SetSlopeScaledBias(float Value);
-		float							GetSlopeScaledBias() const;
+		void						SetSlopeScaledBias(float Value);
+		float						GetSlopeScaledBias() const;
 
-		void							SetDepthScaledBias(float Value);
-		float							GetDepthScaledBias() const;
+		void						SetDepthScaledBias(float Value);
+		float						GetDepthScaledBias() const;
 
-		virtual void					Tick(float Time);
-		virtual void					Draw(ZEDrawParameters* DrawParameters);
-		
-		virtual const ZEViewVolume*		GetLightVolume();
+		virtual ZELightType			GetLightType() const;
 
-		static ZELightPoint*			CreateInstance();
+		virtual void				Tick(float Time);
+		virtual void				Draw(ZEDrawParameters* DrawParameters);
+
+		static ZELightPoint*		CreateInstance();
 };
 
 #endif

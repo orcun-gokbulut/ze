@@ -44,7 +44,7 @@
 #include "ZEParticleSystem.h"
 #include "ZEGame/ZEDrawStatistics.h"
 
-struct ZEDrawParameters;
+class ZEDrawParameters;
 
 ZE_META_OBJECT_DESCRIPTION(ZEParticleEffect);
 

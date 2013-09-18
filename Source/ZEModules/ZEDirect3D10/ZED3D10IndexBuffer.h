@@ -33,37 +33,33 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D10_INDEX_BUFFER_H__
-#define __ZE_D3D10_INDEX_BUFFER_H__
+#ifndef __ZE_D3D11_INDEX_BUFFER_H__
+#define __ZE_D3D11_INDEX_BUFFER_H__
+
+#include <d3d11.h>
 
 #include "ZETypes.h"
 #include "ZED3D10ComponentBase.h"
 #include "ZEGraphics/ZEIndexBuffer.h"
-
-struct ID3D10Buffer;
 
 class ZED3D10IndexBuffer : public ZEIndexBuffer, public ZED3D10ComponentBase
 {
 	friend class ZED3D10GraphicsDevice;
 	friend class ZED3D10GraphicsModule;
 	
-	protected:
-		static ZESize			GlobalSize;
-		static ZEUInt16			GlobalCount;
-		
-		ID3D10Buffer*			D3D10Buffer;
+	protected:	
+		ID3D11Buffer*			D3D10Buffer;
+
+		bool					UpdateWith(ZEUInt ShadowIndex);
 
 								ZED3D10IndexBuffer();
-		virtual					~ZED3D10IndexBuffer();
+								~ZED3D10IndexBuffer();
 
 	public:
-		const ID3D10Buffer*		GetD3D10Buffer() const;
-		
-		virtual bool			Unlock();
-		virtual bool			Lock(void** Data);
+		const ID3D11Buffer*		GetD3D10Buffer() const;
 
-		virtual bool			CreateDynamic(ZESize IndexCount, ZEIndexBufferFormat Format);
-		virtual bool			CreateStatic(ZESize IndexCount, ZEIndexBufferFormat Format, const void* IndexData);
+		bool					CreateDynamic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData = NULL);
+		bool					CreateStatic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData);
 };
 
 #endif

@@ -33,93 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_SHADER_CONSTANT_DATA_H__
-#define __ZE_SHADER_CONSTANT_DATA_H__
+#ifndef __ZE_SHADER_CONSTANT_BUFFER_H__
+#define __ZE_SHADER_CONSTANT_BUFFER_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
-
-#define ZE_MAX_CONSTANT_BUFFER_INSTANCE		4096
-
-class ZEConstantBuffer;
-struct ZEShaderConstant;
-
-class ZEConstantBufferLink
-{
-	friend class ZEConstantBuffer;
-
-	protected:
-		ZEConstantBuffer*			Buffer;
-		ZESSize						BufferId;
-		ZESize						Index;
-
-									ZEConstantBufferLink(ZEConstantBuffer* ConstantBuffer, ZESSize ConstantBufferId, ZESize ConstantIndex);
-									~ZEConstantBufferLink();
-
-	public:
-		const ZEShaderConstant*		GetShaderConstant() const;
-
-		virtual bool				SetValue(const void* Source);
-		virtual bool				GetValue(void* Destination) const;
-		
-};
-
+#include "ZEGraphicsResource.h"
+#include "ZEGraphicsDefinitions.h"
 
 struct ZEShaderBuffer;
 
-class ZEConstantBuffer
+class ZEConstantBuffer : public ZEGraphicsResource
 {
-	friend class ZEMaterial;
-	friend class ZERenderCommand;
 	friend class ZEGraphicsDevice;
 	friend class ZEGraphicsModule;
 
-	private:
-		struct ZEConstantBufferState
-		{
-			ZEUInt8		Deleted	: 1;	// Is buffer deleted ?
-			ZEUInt8		InUse	: 1;	// Is buffer set to renderer ?
-			ZEUInt8		Changed	: 1;	// Is level buffer changed ?
-			ZEUInt8		Locked	: 1;	// Is level buffer locked ?
-
-		} State;
-
 	protected:
-		ZESSize							Id;
-		void*							Data;
-		ZESize							Size;
-		const ZEShaderBuffer*			Info;
+		static ZESize				TotalSize;
+		static ZEUInt16				TotalCount;
 
-		bool							NeedUpdate() const;
+		ZEShadowCopy				ShadowCopy;
 
-		virtual bool					UpdateBuffer();
+		ZESize						Size;
+		const ZEShaderBuffer*		Info;
 
-										ZEConstantBuffer();
-		virtual							~ZEConstantBuffer();
+		virtual bool				UpdateWith(ZEUInt ShadowIndex);
+
+									ZEConstantBuffer();
+		virtual						~ZEConstantBuffer();
 
 	public:
-		ZESize							GetSize() const;
-		const ZEShaderBuffer*			GetInfo() const;
+		ZESize						GetSize() const;
+		const ZEShaderBuffer*		GetInfo() const;
 
-		virtual bool					Lock(void** ConstantData);
-		virtual void					Unlock(bool NotChanged = false);
+		ZEGraphicsResourceType		GetResourceType() const;
 
-		virtual ZEConstantBufferLink	GetConstantLink(ZESize Index);
-		virtual ZEConstantBufferLink	GetConstantLink(const char* Name);
+		void						SetZero();
+		void						SetData(void* ConstantData);
 
-		virtual bool					SetConstant(ZESize Index, const void* SourceData);
-		virtual bool					SetConstant(const char* Name, const void* SourceData);
+		bool						SetConstant(ZEUInt Index, const void* SourceData);
+		bool						SetConstant(const char* Name, const void* SourceData);
 
-		virtual bool					GetConstant(ZESize Index, void* DestinationData) const;
-		virtual bool					GetConstant(const char* Name, void* DestinationData) const;
+		bool						GetConstant(ZEUInt Index, void* DestinationData) const;
+		bool						GetConstant(const char* Name, void* DestinationData) const;
 
-		virtual bool					Create(const ZEShaderBuffer* BufferInfo);
-		virtual bool					Create(ZESize BufferSize);
+		void						Unlock();
+		bool						Lock(void** Data);
+		
+		virtual bool				Create(const ZEShaderBuffer* BufferInfo);
+		virtual bool				Create(ZESize BufferSize);
 
-		virtual void					Destroy();
-
-		static ZEConstantBuffer*		CreateInstance();
+		static ZEConstantBuffer*	CreateInstance();
 };
 
 #endif

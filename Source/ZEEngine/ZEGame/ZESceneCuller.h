@@ -44,7 +44,7 @@
 class ZEScene;
 class ZEEntity;
 class ZELight;
-struct ZEDrawParameters;
+class ZEDrawParameters;
 
 class ZESceneCuller
 {

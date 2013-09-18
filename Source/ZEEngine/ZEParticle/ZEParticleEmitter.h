@@ -69,7 +69,7 @@ enum ZEParticleBillboardType
 class ZEVertexBuffer;
 class ZEParticleEffect;
 class ZEParticleModifier;
-struct ZEDrawParameters;
+class ZEDrawParameters;
 
 class ZEParticleEmitter : public ZEObject
 {

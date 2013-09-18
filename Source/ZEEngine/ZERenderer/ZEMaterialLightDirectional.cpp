@@ -44,6 +44,7 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEShaderCompileOptions.h"
+#include "ZEGraphics/ZEGraphicsEventTracer.h"
 
 void ZEMaterialLightDirectional::UpdateShaders()
 {
@@ -72,12 +73,12 @@ void ZEMaterialLightDirectional::UpdateBuffers()
 	if (LightTransformations == NULL)
 	{
 		LightTransformations = ZEConstantBuffer::CreateInstance();
-		LightTransformations->Create(VertexShader->GetMetaTable()->GetBufferInfo("TransformationsVS"));
+		LightTransformations->Create(sizeof(Transformations));
 	}
 	if (LightProperties == NULL)
 	{
 		LightProperties = ZEConstantBuffer::CreateInstance();
-		LightProperties->Create(PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
+		LightProperties->Create(sizeof(Properties));
 	}
 }
 
@@ -95,8 +96,6 @@ void ZEMaterialLightDirectional::DestroyBuffers()
 
 bool ZEMaterialLightDirectional::SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
-	UpdateMaterial();
-
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 	
 	Device->SetVertexShader(VertexShader);
@@ -105,7 +104,8 @@ bool ZEMaterialLightDirectional::SetupLightingPass(const ZERenderStage* Stage, c
 	Device->SetVertexShaderBuffer(0, LightTransformations);
 	Device->SetPixelShaderBuffer(0, LightProperties);
 
-	return true;
+	// No more passes
+	return false;
 }
 
 ZESize ZEMaterialLightDirectional::GetHash() const
@@ -113,18 +113,16 @@ ZESize ZEMaterialLightDirectional::GetHash() const
 	return ZEHashGenerator::Hash(ZEString("ZEMaterialLightDirectional"));
 }
 
-bool ZEMaterialLightDirectional::UpdateMaterial()
-{
-	UpdateShaders();
-	UpdateBuffers();
-
-	return true;
-}
-
 bool ZEMaterialLightDirectional::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
-	if (Stage->GetStageType().GetFlags(ZE_RST_LIGHTING))
+	zeDebugCheck(Stage == NULL, "Null pointer.");
+	zeDebugCheck(RenderCommand == NULL, "Null pointer.");
+
+	if(!ZEMaterial::SetupPass(PassId, Stage, RenderCommand))
 		return false;
+
+	UpdateShaders();
+	UpdateBuffers();
 
 	return SetupLightingPass(Stage, RenderCommand);
 }
@@ -141,6 +139,11 @@ ZEMaterialLightDirectional::ZEMaterialLightDirectional()
 
 	LightTransformations = NULL;
 	LightProperties = NULL;
+
+	SupportedStages = ZE_RST_LIGHTING;
+	EnableStage(SupportedStages);
+	
+	UpdateBuffers();
 }
 
 ZEMaterialLightDirectional::~ZEMaterialLightDirectional()

@@ -71,26 +71,6 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 	return NewString;
 }
 
-static void CopyToTextureCube(ZETextureCube* Output, ZETextureData* TextureData)
-{
-	ZEUInt LevelCount = TextureData->GetLevelCount();
-	ZEUInt SurfaceCount = TextureData->GetSurfaceCount();
-
-	// Copy texture data into ZETextureCube
-	void* TargetBuffer = NULL;
-	ZESize TargetPitch = 0;
-
-	for(ZESize Surface = 0; Surface < (ZESize)SurfaceCount; ++Surface)
-	{
-		for(ZESize Level = 0; Level < (ZESize)LevelCount; ++Level)
-		{
-			Output->Lock(&TargetBuffer, &TargetPitch, (ZETextureCubeFace)Surface, (ZEUInt)Level);
-			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo(TargetBuffer, TargetPitch);
-			Output->Unlock((ZETextureCubeFace)Surface, (ZEUInt)Level);
-		}
-	}
-}
-
 static void CopyCubeFaceTo(void* Destination, ZESize DestPitch, void* SourceBuffer, ZESize SourcePitch, ZEUInt EdgeLenght, ZEUInt OffsetX, ZEUInt OffsetY)
 {
 	for (ZESize I = 0; I < (ZESize)EdgeLenght; I++)
@@ -327,8 +307,6 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		delete TextureResource;
 		return NULL;
 	}
-
-	//CopyToTextureCube(Texture, &ProcessedTextureData);
 	
 	ProcessedTextureData.Destroy();
 	TempTextureData.Destroy();

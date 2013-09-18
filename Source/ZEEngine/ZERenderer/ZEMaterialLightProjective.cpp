@@ -47,6 +47,7 @@
 #include "ZEGraphics/ZEShaderCompiler.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
+#include "ZEGraphics/ZEGraphicsEventTracer.h"
 #include "ZEGraphics/ZEShaderCompileOptions.h"
 
 void ZEMaterialLightProjective::UpdateShaders()
@@ -73,15 +74,23 @@ void ZEMaterialLightProjective::UpdateShaders()
 
 void ZEMaterialLightProjective::UpdateBuffers()
 {
-	if (LightTransformations == NULL)
+	if (LightVSProperties0 == NULL)
 	{
-		LightTransformations = ZEConstantBuffer::CreateInstance();
-		LightTransformations->Create(VertexShader->GetMetaTable()->GetBufferInfo("TransformationsVS"));
+		LightVSProperties0 = ZEConstantBuffer::CreateInstance();
+		LightVSProperties0->Create(sizeof(VSProperties0));
+		LightVSProperties0->SetZero();
 	}
-	if (LightProperties == NULL)
+	if (LightPSProperties0 == NULL)
 	{
-		LightProperties = ZEConstantBuffer::CreateInstance();
-		LightProperties->Create(PixelShader->GetMetaTable()->GetBufferInfo("LightParametersPS"));	
+		LightPSProperties0 = ZEConstantBuffer::CreateInstance();
+		LightPSProperties0->Create(sizeof(PSProperties0));
+		LightPSProperties0->SetZero();
+	}
+	if (LightPSProperties1 == NULL)
+	{
+		LightPSProperties1 = ZEConstantBuffer::CreateInstance();
+		LightPSProperties1->Create(sizeof(PSProperties1));
+		LightPSProperties1->SetZero();
 	}
 }
 
@@ -93,14 +102,13 @@ void ZEMaterialLightProjective::DestroyShaders()
 
 void ZEMaterialLightProjective::DestroyBuffers()
 {
-	ZE_DESTROY(LightTransformations);
-	ZE_DESTROY(LightProperties);
+	ZE_DESTROY(LightVSProperties0);
+	ZE_DESTROY(LightPSProperties0);
+	ZE_DESTROY(LightPSProperties1);
 }
 
 bool ZEMaterialLightProjective::SetupLightingPass(const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
-	UpdateMaterial();
-
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 	
 	ZERasterizerState RasterizerState;
@@ -131,13 +139,16 @@ bool ZEMaterialLightProjective::SetupLightingPass(const ZERenderStage* Stage, co
 	Device->SetVertexShader(VertexShader);
 	Device->SetPixelShader(PixelShader);
 
-	Device->SetVertexShaderBuffer(0, LightTransformations);
-	Device->SetPixelShaderBuffer(0, LightProperties);
+	Device->SetVertexShaderBuffer(0, LightVSProperties0);
+	Device->SetPixelShaderBuffer(0, LightPSProperties0);
+	Device->SetPixelShaderBuffer(1, LightPSProperties1);
 
 	Device->SetBlendState(BlendState);
 	Device->SetRasterizerState(RasterizerState);
 	Device->SetDepthStencilState(DepthStencilState, StencilMask++);
 	
+	StencilMask %= 255;
+
 	Device->SetPixelShaderSampler(5, SamplerState);
 	Device->SetPixelShaderTexture(5, ProjectionTexture);
 
@@ -158,7 +169,8 @@ bool ZEMaterialLightProjective::SetupLightingPass(const ZERenderStage* Stage, co
 	Device->SetRasterizerState(RasterizerState);
 	Device->SetDepthStencilState(DepthStencilState);
 
-	return true;
+	// No more passes
+	return false;
 }
 
 ZESize ZEMaterialLightProjective::GetHash() const
@@ -166,20 +178,16 @@ ZESize ZEMaterialLightProjective::GetHash() const
 	return ZEHashGenerator::Hash(ZEString("ZEMaterialLightProjective"));
 }
 
-bool ZEMaterialLightProjective::UpdateMaterial()
-{
-	UpdateShaders();
-	UpdateBuffers();
-
-	StencilMask %= 255;
-
-	return true;
-}
-
 bool ZEMaterialLightProjective::SetupPass(ZEUInt PassId, const ZERenderStage* Stage, const ZERenderCommand* RenderCommand)
 {
-	if (!Stage->GetStageType().GetFlags(ZE_RST_LIGHTING))
-		return true;
+	zeDebugCheck(Stage == NULL, "Null pointer.");
+	zeDebugCheck(RenderCommand == NULL, "Null pointer.");
+
+	if(!ZEMaterial::SetupPass(PassId, Stage, RenderCommand))
+		return false;
+
+	UpdateShaders();
+	UpdateBuffers();
 
 	return SetupLightingPass(Stage, RenderCommand);
 }
@@ -195,10 +203,13 @@ ZEMaterialLightProjective::ZEMaterialLightProjective()
 
 	VertexShader = NULL;
 	PixelShader = NULL;
-	LightTransformations = NULL;
-	LightProperties = NULL;
 	
+	LightVSProperties0	= NULL;
+	LightPSProperties0	= NULL;
+	LightPSProperties1	= NULL;
+
 	ProjectionTexture = NULL;
+
 	SamplerState.SetMagFilter(ZE_TFM_LINEAR);
 	SamplerState.SetMinFilter(ZE_TFM_LINEAR);
 	SamplerState.SetMipFilter(ZE_TFM_LINEAR);
@@ -206,6 +217,11 @@ ZEMaterialLightProjective::ZEMaterialLightProjective()
 	SamplerState.SetAddressV(ZE_TAM_BORDER);
 	SamplerState.SetAddressW(ZE_TAM_BORDER);
 	SamplerState.SetBorderColor(ZEVector4(0.0f, 0.0f, 0.0f, 1.0f));
+
+	SupportedStages = ZE_RST_LIGHTING;
+	EnableStage(SupportedStages);
+
+	UpdateBuffers();
 }
 
 ZEMaterialLightProjective::~ZEMaterialLightProjective()

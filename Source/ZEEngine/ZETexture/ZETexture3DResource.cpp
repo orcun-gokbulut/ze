@@ -74,32 +74,6 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 	return NewString;
 }
 
-static void CopyToTexture3D(ZETexture3D* Texture, ZETextureData* TextureData)
-{
-	// Copy texture data into ZETexture3D
-	void* TargetBuffer	= NULL;
-	ZESize SlicePitch	= 0;
-	ZESize RowPitch		= 0;
-
-	// Get texture specs
-	ZESize SurfaceLevelCount	= (ZESize)TextureData->GetLevelCount();
-	ZESize TextureSurfaceCount	= (ZESize)TextureData->GetSurfaceCount();
-
-
-	for (ZESize Level = 0,  SurfaceIncrement = 1; Level < SurfaceLevelCount; ++Level, SurfaceIncrement *= 2)
-	{
-		Texture->Lock(&TargetBuffer, &RowPitch, &SlicePitch, (ZEUInt	)Level);
-
-		for (ZESize Surface = 0, SurfaceCopyCount = 0; Surface < TextureSurfaceCount; Surface += SurfaceIncrement, ++SurfaceCopyCount)
-		{
-			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo((void*)((ZEUInt8*)TargetBuffer + SlicePitch * SurfaceCopyCount), RowPitch);
-		}
-
-		Texture->Unlock((ZEUInt	)Level);
-	}
-
-}
-
 const char* ZETexture3DResource::GetResourceType() const
 {
 	return "Volume Texture Resource";
@@ -362,8 +336,6 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 		delete TextureResource;
 		return NULL;
 	}
-
-	// CopyToTexture3D(Texture, &ProcessedTextureData);
 
 	TempTextureData.Destroy();
 	ProcessedTextureData.Destroy();

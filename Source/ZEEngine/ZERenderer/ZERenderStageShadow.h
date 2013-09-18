@@ -47,39 +47,29 @@ class ZELightProjective;
 class ZELightDirectional;
 class ZELightOmniProjective;
 
-class ZERenderStageShadowConfiguration
+class ZERenderStageShadowData : public ZERenderStageData
 {
-	
+	public:
+		ZERenderTarget*				RenderTarget;
+		ZEDepthStencilBuffer*		DepthBuffer;
+
+									ZERenderStageShadowData();
+									~ZERenderStageShadowData();
 };
 
 class ZERenderStageShadow : public ZERenderStage
 {
-	protected:
-
-		struct
-		{
-			ZEDepthStencilBuffer*		DepthStencilBuffer;
-
-		} RenderTargets;
-
-		void							UpdateShaders();
-		void							DestroyShaders();
-		
-		void							UpdateBuffers();
-		void							DestroyBuffers();
-
-		void							ResetStates();
-		void							CommitStates();
-
 	public:
-		virtual ZERenderStageType		GetStageType() const;
-		virtual ZERenderStageType		GetDependencies() const;
-		
-		virtual void					Process(const ZERenderCommand* RenderCommand);
-		virtual void					Setup();
+		virtual ZERenderStageType	GetStageType() const;
+		virtual ZERenderStageType	GetDependencies() const;
+	 
+		virtual bool			 	Setup();
+		virtual bool			 	Process(const ZERenderCommand* RenderCommand);
 
-										ZERenderStageShadow();
-		virtual							~ZERenderStageShadow();
+		virtual bool			 	ResetStates(const ZEMaterial* Material);
+
+								 	ZERenderStageShadow();
+		virtual					 	~ZERenderStageShadow();
 };
 
 #endif

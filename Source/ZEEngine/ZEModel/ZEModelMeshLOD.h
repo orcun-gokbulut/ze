@@ -39,12 +39,13 @@
 
 #include "ZERenderer/ZERenderCommand.h"
 
-struct ZEDrawParameters;
 class ZEModel;
+class ZERenderer;
 class ZEMaterial;
 class ZEModelMesh;
+class ZEDrawParameters;
 class ZEModelResourceMeshLOD;
-class ZERenderer;
+
 
 class ZEModelMeshLOD
 {
@@ -56,6 +57,7 @@ class ZEModelMeshLOD
 		ZERenderCommandDefault				RenderCommand;
 		const ZEMaterial*					Material;
 		bool								Skinned;
+		ZEConstantBuffer*					BoneMatrices;
 
 	public:
 		void								ResetMaterial();

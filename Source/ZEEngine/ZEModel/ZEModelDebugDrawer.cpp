@@ -120,7 +120,7 @@ void ZEModelDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	ModelRenderCommand.PrimitiveCount = ModelDrawCanvas.Vertices.GetCount() / 2;
-	DrawParameters->Renderer->AddRenderCommand(&ModelRenderCommand);
+	//DrawParameters->Renderer->AddRenderCommand(&ModelRenderCommand);
 }
 
 bool ZEModelDebugDrawer::InitializeSelf()

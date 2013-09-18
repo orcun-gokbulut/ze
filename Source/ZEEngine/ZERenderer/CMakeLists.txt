@@ -35,6 +35,9 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+ze_add_source(ZEView.cpp						Sources)
+ze_add_source(ZEView.h							Sources Header)
+
 ze_add_source(ZECamera.cpp						Sources)
 ze_add_source(ZECamera.h						Sources Header)
 ze_add_source(ZECanvas.cpp						Sources)

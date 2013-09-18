@@ -42,7 +42,8 @@
 #include "ZEPhysicalRigidBody.h"
 #include "ZEPhysicalJoint.h"
 #include "ZEPhysicalShapes.h"
-#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsWindow.h"
 
 void ZEPhysicsPicker::ForwardViewProjection(ZEInt& CursorXOutput, ZEInt& CursorYOutput, float& Depth, const ZEVector3& Input)
 {
@@ -52,13 +53,11 @@ void ZEPhysicsPicker::ForwardViewProjection(ZEInt& CursorXOutput, ZEInt& CursorY
 	WorldSpacePosition.z = Input.z;
 	WorldSpacePosition.w = 1.0f;
 
-	ZEInt WindowLeftPosition;
-	ZEInt WindowTopPosition;
-	ZEInt WindowWidth;
-	ZEInt WindowHeight;
+	ZEInt WindowWidth, WindowHeight;
+	ZEInt WindowLeftPosition, WindowTopPosition;
 
-	zeCore->GetWindow()->GetWindowPosition(WindowLeftPosition, WindowTopPosition);
-	zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);
+	zeGraphics->GetWindow()->GetPosition(WindowLeftPosition, WindowTopPosition);
+	zeGraphics->GetWindow()->GetSize(WindowWidth, WindowHeight);
 
 	ZEMatrix4x4 ViewTransform = zeScene->GetActiveCamera()->GetViewTransform();
 
@@ -72,21 +71,24 @@ void ZEPhysicsPicker::ForwardViewProjection(ZEInt& CursorXOutput, ZEInt& CursorY
 	float NearZ = zeScene->GetActiveCamera()->GetNearZ();
 
 	ZEMatrix4x4 ViewPortTransform;
-	ZEMatrix4x4::CreateViewPortTransform(ViewPortTransform, WindowLeftPosition, WindowLeftPosition + WindowWidth, WindowTopPosition + WindowHeight, WindowTopPosition, NearZ, FarZ);
+	ZEMatrix4x4::CreateViewPortTransform(ViewPortTransform, (float)WindowLeftPosition, (float)(WindowLeftPosition + WindowWidth), (float)(WindowTopPosition + WindowHeight), (float)WindowTopPosition, NearZ, FarZ);
 
 	ZEVector4 ScreenPosition = ViewPortTransform * ProjectionPosition;
 
-	CursorXOutput = ScreenPosition.x;
-	CursorYOutput = ScreenPosition.y;
+	CursorXOutput = (ZEInt)ScreenPosition.x;
+	CursorYOutput = (ZEInt)ScreenPosition.y;
 	Depth = ScreenPosition.z;
 }
 
 void ZEPhysicsPicker::ReverseViewProjection(ZEVector3& Output, const ZEInt& CursorXInput, const ZEInt& CursorYInput, const float& Depth)
 {
+	ZEInt Width, Height;
+	zeGraphics->GetWindow()->GetSize(Width, Height);
+
 	ZEVector3 TempVector;
 	const ZEMatrix4x4& ProjMatrix = zeScene->GetActiveCamera()->GetProjectionTransform();
-	TempVector.x =  (((2.0f * CursorXInput ) / zeGraphics->GetScreenWidth()) - 1) / ProjMatrix.M11;
-	TempVector.y = -(((2.0f * CursorYInput ) / zeGraphics->GetScreenHeight()) - 1) / ProjMatrix.M22;
+	TempVector.x =  (((2.0f * CursorXInput ) / Width) - 1) / ProjMatrix.M11;
+	TempVector.y = -(((2.0f * CursorYInput ) / Height) - 1) / ProjMatrix.M22;
 	TempVector.z =  1.0f;
 
 	ZEMatrix4x4 InvViewMatrix;

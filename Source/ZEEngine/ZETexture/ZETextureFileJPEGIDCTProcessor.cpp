@@ -54,8 +54,8 @@ void ZEJpegIDCTProcessor::ApplyIdct(ZEJpegComponentInfo* Component, ZEJpegDataBl
 	float	Z5, Z10, Z11, Z12, Z13;
 
 	float	Temp0, Temp1, Temp2, Temp3, Temp4, 
-			Temp5, Temp6, Temp7, Temp8, Temp9,
-			Temp10, Temp11, Temp12, Temp13;
+			Temp5, Temp6, Temp7, Temp10, Temp11, 
+			Temp12, Temp13;
 
 	float* DctTable = Component->DCTTable;
 	ZEInt* SrcBlockData = Block->BlockData.OneDim;

@@ -47,6 +47,9 @@ void ZEShader::Destroy()
 	delete this;
 }
 
+ZESize		ZEShader::TotalSize = 0;
+ZEUInt16	ZEShader::TotalCount = 0;
+
 ZEShader::ZEShader()
 {
 

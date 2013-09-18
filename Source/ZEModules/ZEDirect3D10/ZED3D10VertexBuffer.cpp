@@ -37,121 +37,100 @@
 #include "ZED3D10VertexBuffer.h"
 #include "ZED3D10GraphicsModule.h"
 
-#include <D3D10.h>
+bool ZED3D10VertexBuffer::UpdateWith(ZEUInt ShadowIndex)
+{
+	if (!ShadowCopy.GetChanged(ShadowIndex))
+		return true;
 
-const ID3D10Buffer* ZED3D10VertexBuffer::GetD3D10Buffer() const
+	D3D11_MAPPED_SUBRESOURCE Mapped;
+	HRESULT Result = D3DContexes[0]->Map(D3D10Buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &Mapped);
+	if (FAILED(Result))
+	{
+		zeError("D3D10 Vertex buffer mapping failed. ErrorCode: %d.", Result);
+		return false;
+	}
+
+	ZESize Size = ShadowCopy.GetSliceCount() * ShadowCopy.GetSliceSize();
+	const void* Data = ShadowCopy.GetData(ShadowIndex);
+
+	memcpy(Mapped.pData, Data, Size);
+
+	D3DContexes[0]->Unmap(D3D10Buffer, 0);
+
+#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Vertex buffer contents updated. VertexBuffer: %p, ShadowCOpyIdnex: %u.", this, ShadowIndex);
+#endif
+
+	return ZEVertexBuffer::UpdateWith(ShadowIndex);
+}
+
+const ID3D11Buffer* ZED3D10VertexBuffer::GetD3D10Buffer() const
 {
 	return D3D10Buffer;
 }
 
 bool ZED3D10VertexBuffer::CreateDynamic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData)
-{	
-	zeDebugCheck(VertexSize == 0, "Zero vertex size");
+{
+	zeDebugCheck(GetIsCreated(), "Buffer already created.");
+	zeDebugCheck(VertexSize == 0, "Zero vertex size.");
 	zeDebugCheck(VertexCount == 0, "Zero vertex count.");
-	zeDebugCheck(D3D10Buffer != NULL, "Buffer already created.");
-	zeDebugCheck(VertexSize * VertexCount > 134217728, "Too big to create.");
-	
-	D3D10_BUFFER_DESC BufferDesc;
+
+	ZESize Size = VertexSize * (ZESize)VertexCount;
+	zeDebugCheck(Size > 134217728, "Buffer too large.");
+
+	D3D11_BUFFER_DESC BufferDesc;
 	BufferDesc.MiscFlags = 0;
-	BufferDesc.Usage = D3D10_USAGE_DYNAMIC;
-	BufferDesc.BindFlags = D3D10_BIND_VERTEX_BUFFER;
-	BufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
+	BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	BufferDesc.ByteWidth = VertexCount * (UINT)VertexSize;
 
-	D3D10_SUBRESOURCE_DATA InitialData;
+	D3D11_SUBRESOURCE_DATA InitialData;
 	InitialData.pSysMem = VertexData;
 	InitialData.SysMemPitch = 0;
 	InitialData.SysMemSlicePitch = 0;
 
-	if (FAILED(D3D10Device->CreateBuffer(&BufferDesc, VertexData == NULL ? NULL : &InitialData, &D3D10Buffer)))
+	HRESULT Result = D3DDevices[0]->CreateBuffer(&BufferDesc, VertexData == NULL ? NULL : &InitialData, &D3D10Buffer);
+	if (FAILED(Result))
 	{
 		zeError("Can not create dynamic vertex buffer.");
 		return false;
 	}
-	
-	this->Static = false;
-	this->VertexSize = VertexSize;
-	this->VertexCount = VertexCount;
-	this->BufferSize = VertexCount * VertexSize;
-	
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Dynamic vertex buffer created. BufferSize: %u, VertexCount: %u, VertexSize: %u", 
-			VertexCount * (UINT)VertexSize, VertexCount, (UINT)VertexSize);
-#endif
 
-	GlobalCount++;
-	GlobalSize += BufferSize;
-
-	return true;
+	return ZEVertexBuffer::CreateDynamic(VertexCount, VertexSize, VertexData);
 }
 
 bool ZED3D10VertexBuffer::CreateStatic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData)
 {	
-	zeDebugCheck(VertexData == NULL, "NULL pointer.");
 	zeDebugCheck(VertexSize == 0, "Zero vertex size");
 	zeDebugCheck(VertexCount == 0, "Zero vertex count.");
-	zeDebugCheck(D3D10Buffer != NULL, "Buffer already created.");
-	zeDebugCheck(VertexSize * VertexCount > 134217728, "Too big to create.");
-	
-	D3D10_BUFFER_DESC BufferDesc;
+	zeDebugCheck(GetIsCreated(), "Buffer already created.");
+	zeDebugCheck(VertexData == NULL, "Buffer must have initial data.");
+
+	ZESize Size = VertexSize * (ZESize)VertexCount;
+	zeDebugCheck(Size > 134217728, "Buffer too large.");
+
+	D3D11_BUFFER_DESC BufferDesc;
 	BufferDesc.MiscFlags = 0;
 	BufferDesc.CPUAccessFlags = 0;
-	BufferDesc.Usage = D3D10_USAGE_IMMUTABLE;
-	BufferDesc.BindFlags = D3D10_BIND_VERTEX_BUFFER;
-	BufferDesc.ByteWidth = VertexCount * (UINT)VertexSize;
+	BufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	BufferDesc.ByteWidth = Size;
 	
-	D3D10_SUBRESOURCE_DATA InitialData;
+	D3D11_SUBRESOURCE_DATA InitialData;
 	InitialData.pSysMem = VertexData;
 	InitialData.SysMemPitch = 0;
 	InitialData.SysMemSlicePitch = 0;
 
-	if (FAILED(D3D10Device->CreateBuffer(&BufferDesc, &InitialData, &D3D10Buffer)))
+	HRESULT Result = D3DDevices[0]->CreateBuffer(&BufferDesc, &InitialData, &D3D10Buffer);
+	if (FAILED(Result))
 	{
 		zeError("Can not create static vertex buffer.");
 		return false;
 	}
-	
-	this->Static = true;
-	this->VertexSize = VertexSize;
-	this->VertexCount = VertexCount;
-	this->BufferSize = VertexCount * VertexSize;
-	
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Static vertex buffer created. BufferSize: %u, VertexCount: %u, VertexSize: %u", 
-			VertexCount * (UINT)VertexSize, VertexCount, (UINT)VertexSize);
-#endif
 
-	GlobalCount++;
-	GlobalSize += BufferSize;
-
-	return true;
+	return ZEVertexBuffer::CreateStatic(VertexCount, VertexSize, VertexData);
 }
-
-bool ZED3D10VertexBuffer::Lock(void** Data)
-{
-	zeDebugCheck(D3D10Buffer == NULL, "Buffer not created.");
-	zeDebugCheck(Static, "Static buffer not be locked/unlocked.");
-
-	if (FAILED(D3D10Buffer->Map(D3D10_MAP_WRITE_DISCARD, 0, Data)))
-	{
-		zeError("Can not lock dynamic vertex buffer.");
-		return false;
-	}
-
-	return true;
-}
-
-bool ZED3D10VertexBuffer::Unlock()
-{
-	zeDebugCheck(D3D10Buffer == NULL, "Buffer not created.");
-	zeDebugCheck(Static, "Static buffer not be locked/unlocked.");
-
-	D3D10Buffer->Unmap();
-	return true;
-}
-
-ZESize		ZED3D10VertexBuffer::GlobalSize = 0;
-ZEUInt16	ZED3D10VertexBuffer::GlobalCount = 0;
 
 ZED3D10VertexBuffer::ZED3D10VertexBuffer()
 {
@@ -161,9 +140,6 @@ ZED3D10VertexBuffer::ZED3D10VertexBuffer()
 ZED3D10VertexBuffer::~ZED3D10VertexBuffer()
 {
 	ZED3D_RELEASE(D3D10Buffer);
-
-	GlobalSize -= BufferSize;
-	GlobalCount--;	
 }
 
 

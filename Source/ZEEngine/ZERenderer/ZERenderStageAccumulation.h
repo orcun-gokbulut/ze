@@ -49,44 +49,42 @@ class ZERenderStageLighting;
 class ZERenderStageAccumulation : public ZERenderStage
 {
 	protected:
-		ZEUInt32						LastMaterial;
-
-		const ZERenderStageGeometry*	GBufferInput;
-		const ZERenderStageLighting*	LightBufferInput;
-
 		struct
 		{
-			ZETexture2D*				ABuffer;
+			ZETexture2D*				Accumulation;
 		
 		} Textures;
 
 		struct
 		{
-			ZERenderTarget*				ABuffer;
+			ZERenderTarget*				Accumulation;
 
 		} RenderTargets;
 
-		void							ResetStates();
-		void							CommitStates();
+		const ZERenderStageGeometry*	InputStageGeometry;
+		const ZERenderStageLighting*	InputStageLighting;
 
 		void							UpdateBuffers();
 		void							DestroyBuffers();
 
 	public:
+		const ZETexture2D*				GetTextureAccumulation() const;
+
+		const ZERenderTarget*			GetRenderTargetAccumulation() const;
+		
+		void							SetInputStageGeometry(const ZERenderStageGeometry* Input);
+		const ZERenderStageGeometry*	GetInputStageGeometry() const;
+		
+		void							SetInputStageLighting(const ZERenderStageLighting* Input);
+		const ZERenderStageLighting*	GetInputStageLighting() const;
+
 		virtual ZERenderStageType		GetStageType() const;
 		virtual ZERenderStageType		GetDependencies() const;
-		
-		const ZETexture2D*				GetOutputAccumulationTexture() const;
-		const ZERenderTarget*			GetOutputAccumulationRenderTarget() const;
-		
-		void							SetInputGeometryStage(const ZERenderStageGeometry* Input);
-		const ZERenderStageGeometry*	GetInputGeometryStage() const;
-		
-		void							SetInputLightingStage(const ZERenderStageLighting* Input);
-		const ZERenderStageLighting*	GetInputLightingStage() const;
 
-		virtual void					Process(const ZERenderCommand* RenderCommand);
-		virtual void					Setup();
+		virtual bool					Setup();
+		virtual bool					Process(const ZERenderCommand* RenderCommand);
+		
+		virtual bool					ResetStates(const ZEMaterial* Material);
 
 										ZERenderStageAccumulation();
 		virtual							~ZERenderStageAccumulation();

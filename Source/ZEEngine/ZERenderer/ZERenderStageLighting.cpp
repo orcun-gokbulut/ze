@@ -46,114 +46,112 @@
 #include "ZEGraphics/ZERenderTarget.h"
 #include "ZEGraphics/ZEGraphicsDevice.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsWindow.h"
 #include "ZEGraphics/ZEShaderMetaTable.h"
 #include "ZEGraphics/ZEGraphicsEventTracer.h"
 
 
 void ZERenderStageLighting::DestroyBuffers()
 {
-	ZE_DESTROY(RenderTargets.LBuffer1);
-	ZE_DESTROY(RenderTargets.LBuffer2);
-	ZE_DESTROY(Textures.LBuffer1);
-	ZE_DESTROY(Textures.LBuffer2);
+	ZE_DESTROY(RenderTargets.LightSpecular);
+	ZE_DESTROY(Textures.LightSpecular);
 }
 
 void ZERenderStageLighting::UpdateBuffers()
 {
-	ZEUInt Width = zeGraphics->GetScreenWidth();
-	ZEUInt Height = zeGraphics->GetScreenHeight();
+	ZETexture2D* Texture = NULL;
+	ZEInt Width, Height;
+	zeGraphics->GetWindow()->GetSize(Width, Height);
 
-	if (Textures.LBuffer1 == NULL || Textures.LBuffer1->GetWidth() != Width || Textures.LBuffer1->GetHeight() != Height)
+	Texture = Textures.LightSpecular;
+	if (Texture == NULL || Texture->GetWidth() != Width || Texture->GetHeight() != Height)
 	{
-		ZE_DESTROY(RenderTargets.LBuffer1);
-		ZE_DESTROY(Textures.LBuffer1);
+		ZE_DESTROY(RenderTargets.LightSpecular);
+		ZE_DESTROY(Textures.LightSpecular);
 
-		Textures.LBuffer1 = ZETexture2D::CreateInstance();
-		Textures.LBuffer1->CreateStatic(Width, Height, 1, ZE_TPF_F16_4, true, NULL);
-		RenderTargets.LBuffer1 = Textures.LBuffer1->CreateRenderTarget(0);
-	}
-
-	if (Textures.LBuffer2 == NULL || Textures.LBuffer2->GetWidth() != Width || Textures.LBuffer2->GetHeight() != Height)
-	{
-		ZE_DESTROY(RenderTargets.LBuffer2);
-		ZE_DESTROY(Textures.LBuffer2);
-
-		Textures.LBuffer2 = ZETexture2D::CreateInstance();
-		Textures.LBuffer2->CreateStatic(Width, Height, 1, ZE_TPF_I8_4, true, NULL);
-		RenderTargets.LBuffer2 = Textures.LBuffer2->CreateRenderTarget(0);
+		Textures.LightSpecular = ZETexture2D::CreateInstance();
+		Textures.LightSpecular->CreateStatic(Width, Height, 1, ZE_TPF_F16_4, true, NULL);
+		RenderTargets.LightSpecular = Textures.LightSpecular->CreateRenderTarget(0);
 	}
 }
 
-void ZERenderStageLighting::ResetStates()
+bool ZERenderStageLighting::ResetStates(const ZEMaterial* Material)
 {
-	// Reset parent states
-	ZERenderStage::ResetStates();
-
-	// Vertex buffer
-	// DefaultStates.VertexBuffers[0] = VertexBuffer;
+	// Reset to default states
+	// ----------------------------------------------------------
+	if (!ZERenderStage::ResetStates(Material))
+		return false;
 
 	// Render targets
-	DefaultStates.RenderTargets[0] = RenderTargets.LBuffer1;
-	DefaultStates.RenderTargets[1] = RenderTargets.LBuffer2;
-	DefaultStates.DepthStencilBuffer = zeGraphics->GetDepthBuffer();
+	DefaultStates.RenderTargets[0] = RenderTargets.LightSpecular;
+	DefaultStates.DepthStencilBuffer = zeGraphics->GetWindow()->GetDepthBuffer();
+
+	ZEInt Width, Height;
+	zeGraphics->GetWindow()->GetSize(Width, Height);
 
 	// Use default viewport and scissor rectangles
-	ZESize ScreenCount = zeGraphics->GetScreenCount();
-	for (ZESize I = 0; I < ScreenCount; ++I)
-	{
-		DefaultStates.ViewPorts[I] = zeGraphics->GetViewport(I);
-		DefaultStates.ScissorRects[I] = zeGraphics->GetScissorRectangle(I);
-	}
+	DefaultStates.ViewPorts[0].StateData.TopLeftX = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.TopLeftY = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.Width = (float)Width;
+	DefaultStates.ViewPorts[0].StateData.Height = (float)Height;
+	DefaultStates.ViewPorts[0].StateData.MinDepth = 0.0f;
+	DefaultStates.ViewPorts[0].StateData.MaxDepth = 1.0f;
 
+	DefaultStates.ScissorRects[0].StateData.Left = 0;
+	DefaultStates.ScissorRects[0].StateData.Top = 0;
+	DefaultStates.ScissorRects[0].StateData.Right = Width;
+	DefaultStates.ScissorRects[0].StateData.Bottom = Height;
+	
 	// Rasterizer state
+	DefaultStates.RasterizerState.SetFrontIsCounterClockwise(false);
 	DefaultStates.RasterizerState.SetCullDirection(ZE_CD_CLOCKWISE);
 	DefaultStates.RasterizerState.SetFillMode(ZE_FM_SOLID);
 
-	// Sampler
-	DefaultStates.PixelShaderSamplers[3].SetAddressU(ZE_TAM_CLAMP);
-	DefaultStates.PixelShaderSamplers[3].SetAddressV(ZE_TAM_CLAMP);
-	DefaultStates.PixelShaderSamplers[3].SetMinFilter(ZE_TFM_POINT);
-	DefaultStates.PixelShaderSamplers[3].SetMagFilter(ZE_TFM_POINT);
-	DefaultStates.PixelShaderSamplers[3].SetMipFilter(ZE_TFM_POINT);
-
 	// Blend state
 	DefaultStates.BlendState.SetBlendEnable(0, true);
-	DefaultStates.BlendState.SetBlendEnable(1, true);
 	DefaultStates.BlendState.SetComponentWriteMask(0, ZE_CM_ALL);
-	DefaultStates.BlendState.SetComponentWriteMask(1, ZE_CM_ALL);
 	DefaultStates.BlendState.SetBlendEquation(ZE_BE_ADD);
+	DefaultStates.BlendState.SetBlendAlphaEquation(ZE_BE_ADD);
 	DefaultStates.BlendState.SetSourceBlendOption(ZE_BO_ONE);
-	DefaultStates.BlendState.SetDestinationBlendOption(ZE_BO_ONE);
 	DefaultStates.BlendState.SetSourceBlendAlphaOption(ZE_BO_ONE);
+	DefaultStates.BlendState.SetDestinationBlendOption(ZE_BO_ONE);
 	DefaultStates.BlendState.SetDestinationBlendAlphaOption(ZE_BO_ONE);
 
 	// Depth stencil state
 	DefaultStates.DepthStencilState.SetZTestEnable(true);
-	DefaultStates.DepthStencilState.SetZFunction(ZE_CF_GREATER);
+	DefaultStates.DepthStencilState.SetZFunction(ZE_CF_GREATER_EQUAL);
 	DefaultStates.DepthStencilState.SetZWriteEnable(false);
 	DefaultStates.DepthStencilState.SetStencilTestEnable(false);
 
-	// Point Sampler State
+	// Samplers
 	DefaultStates.PixelShaderSamplers[0].SetAddressU(ZE_TAM_CLAMP);
 	DefaultStates.PixelShaderSamplers[0].SetAddressV(ZE_TAM_CLAMP);
-	DefaultStates.PixelShaderSamplers[0].SetMagFilter(ZE_TFM_POINT);
+	DefaultStates.PixelShaderSamplers[0].SetAddressW(ZE_TAM_CLAMP);
 	DefaultStates.PixelShaderSamplers[0].SetMinFilter(ZE_TFM_POINT);
+	DefaultStates.PixelShaderSamplers[0].SetMagFilter(ZE_TFM_POINT);
 	DefaultStates.PixelShaderSamplers[0].SetMipFilter(ZE_TFM_POINT);
 
-	if (GBufferInput == NULL)
-	{
-		zeWarning("Input stage not set");
-		return;
-	}
+	DefaultStates.PixelShaderSamplers[1].SetAddressU(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[1].SetAddressV(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[1].SetAddressW(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[1].SetMinFilter(ZE_TFM_POINT);
+	DefaultStates.PixelShaderSamplers[1].SetMagFilter(ZE_TFM_POINT);
+	DefaultStates.PixelShaderSamplers[1].SetMipFilter(ZE_TFM_POINT);
+
+	DefaultStates.PixelShaderSamplers[2].SetAddressU(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[2].SetAddressV(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[2].SetAddressW(ZE_TAM_CLAMP);
+	DefaultStates.PixelShaderSamplers[2].SetMinFilter(ZE_TFM_POINT);
+	DefaultStates.PixelShaderSamplers[2].SetMagFilter(ZE_TFM_POINT);
+	DefaultStates.PixelShaderSamplers[2].SetMipFilter(ZE_TFM_POINT);
 
 	// Textures
-	DefaultStates.PixelShaderTextures[0] = GBufferInput->GetGBuffer1();
-	DefaultStates.PixelShaderTextures[1] = GBufferInput->GetGBuffer2();
-	DefaultStates.PixelShaderTextures[2] = GBufferInput->GetGBuffer3();
-}
+	DefaultStates.PixelShaderTextures[0] = InputStageGeometry->GetTextureDepth();
+	DefaultStates.PixelShaderTextures[1] = InputStageGeometry->GetTextureNormalSpecular();
+	DefaultStates.PixelShaderTextures[2] = InputStageGeometry->GetTextureSSScatteringVelocity();
 
-void ZERenderStageLighting::CommitStates()
-{
+	// Commit default states
+	// ----------------------------------------------------------
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
 
 	Device->SetRenderTargetArray(DefaultStates.RenderTargets);
@@ -164,68 +162,78 @@ void ZERenderStageLighting::CommitStates()
 	
 	Device->SetRasterizerState(DefaultStates.RasterizerState);
 
-	ZESize ScreenCount = zeGraphics->GetScreenCount();
-	for (ZESize I = 0; I < ScreenCount; ++I)
-	{
-		Device->SetViewport(I, DefaultStates.ViewPorts[I]);
-		Device->SetScissorRectangle(I, DefaultStates.ScissorRects[I]);
-	}
+	Device->SetViewport(0, DefaultStates.ViewPorts[0]);
+	Device->SetScissorRectangle(0, DefaultStates.ScissorRects[0]);
 
 	Device->SetPixelShaderSampler(0, DefaultStates.PixelShaderSamplers[0]);
+	Device->SetPixelShaderSampler(1, DefaultStates.PixelShaderSamplers[1]);
+	Device->SetPixelShaderSampler(2, DefaultStates.PixelShaderSamplers[2]);
+	
 	Device->SetPixelShaderTexture(0, DefaultStates.PixelShaderTextures[0]);
 	Device->SetPixelShaderTexture(1, DefaultStates.PixelShaderTextures[1]);
 	Device->SetPixelShaderTexture(2, DefaultStates.PixelShaderTextures[2]);
 
-	// Commit parent states
-	ZERenderStage::CommitStates();
+	return true;
 }
 
-const ZETexture2D* ZERenderStageLighting::GetLBuffer1() const
+const ZETexture2D* ZERenderStageLighting::GetTextureLightSpecular() const
 {
-	return Textures.LBuffer1;
+	return Textures.LightSpecular;
 }
 
-const ZETexture2D* ZERenderStageLighting::GetLBuffer2() const
+const ZERenderTarget* ZERenderStageLighting::GetRenderTargetLightSpecular() const
 {
-	return Textures.LBuffer2;
+	return RenderTargets.LightSpecular;
 }
-		
-void ZERenderStageLighting::SetInputGeometryStage(const ZERenderStageGeometry* Stage)
+
+void ZERenderStageLighting::SetInputStageGeometry(const ZERenderStageGeometry* Stage)
 {
 	zeDebugCheck(Stage == NULL, "Null pointer.");
 	
-	GBufferInput = Stage;
+	InputStageGeometry = Stage;
 }
 
-const ZERenderStageGeometry* ZERenderStageLighting::GetInputGeometryStage() const
+const ZERenderStageGeometry* ZERenderStageLighting::GetInputStageGeometry() const
 {
-	return GBufferInput;
+	return InputStageGeometry;
 }
 
-void ZERenderStageLighting::Setup()
+bool ZERenderStageLighting::Setup()
 {
+	if (!ZERenderStage::Setup())
+		return false;
+
 	UpdateBuffers();
-	ResetStates();
-	CommitStates();
 
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();
+	Device->ClearRenderTarget(RenderTargets.LightSpecular, ZEVector4::Zero);
 
-	Device->ClearRenderTarget(RenderTargets.LBuffer1, ZEVector4::Zero);
-	Device->ClearRenderTarget(RenderTargets.LBuffer2, ZEVector4::Zero);
+	return true;
 }
 
-void ZERenderStageLighting::Process(const ZERenderCommand* RenderCommand)
+bool ZERenderStageLighting::Process(const ZERenderCommand* RenderCommand)
 {
-	zeDebugCheck(RenderCommand->Material == NULL, "Null Pointer.");
+	if (!ZERenderStage::Process(RenderCommand))
+		return false;
 
-	bool Done = false;
-	ZEUInt PassId = 0;
-	while (!Done)
+	if (InputStageGeometry == NULL)
 	{
-		Done = RenderCommand->Material->SetupPass(PassId++, this, RenderCommand);
+		zeWarning("Null input stage");
+		return false;
 	}
 
+	ZEUInt PassId = 0;
+	bool Continue = false;
+
+	do
+	{
+		Continue = RenderCommand->Material->SetupPass(PassId++, this, RenderCommand);
+	
+	} while (Continue);
+
 	PumpStreams(RenderCommand);
+
+	return true;
 }
 
 ZERenderStageType ZERenderStageLighting::GetDependencies() const
@@ -240,12 +248,10 @@ ZERenderStageType ZERenderStageLighting::GetStageType() const
 
 ZERenderStageLighting::ZERenderStageLighting()
 {
-	GBufferInput = NULL;
+	InputStageGeometry = NULL;
 	
-	Textures.LBuffer1 = NULL;
-	Textures.LBuffer2 = NULL;
-	RenderTargets.LBuffer1 = NULL;
-	RenderTargets.LBuffer2 = NULL;
+	Textures.LightSpecular = NULL;
+	RenderTargets.LightSpecular = NULL;
 }
 
 ZERenderStageLighting::~ZERenderStageLighting()

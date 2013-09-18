@@ -41,7 +41,6 @@
 #include "ZEConsole.h"
 #include "ZEConsoleWindow.h"
 #include "ZEResourceManager.h"
-#include "ZEWindow.h"
 #include "ZEApplicationModule.h"
 #include "ZEOptionManager.h"
 #include "ZECommandManager.h"
@@ -52,13 +51,14 @@
 #include "ZERealTimeClock.h"
 #include "ZEProfiler.h"
 #include "ZETimerManager.h"
-
+#include "ZEGraphics/ZEGraphicsWindow.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEInput/ZEInputModule.h"
 #include "ZEPhysics/ZEPhysicsModule.h"
 #include "ZESound/ZESoundModule.h"
 #include "ZEGame/ZEGame.h"
 #include "ZECrashHandler.h"
+#include "ZEGraphics/ZEGraphicsWindow.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -112,11 +112,6 @@ ZECommandManager* ZECore::GetCommands()
 ZEConsole* ZECore::GetConsole()
 {
 	return Console;
-}
-
-ZEWindow* ZECore::GetWindow()
-{
-	return Window;
 }
 
 ZEModuleManager* ZECore::GetModuleManager()
@@ -540,16 +535,10 @@ bool ZECore::StartUp(void* WindowHandle)
 	zeLog("Zinek Engine %s.", ZEVersion::GetZinekVersion().GetLongString());
 	zeLog("Initializing core...");
 
-	zeLog("Initializing main window...");
-	if (WindowHandle != NULL)
-		Window->SetComponentWindowHandle(WindowHandle);
-
-	if (Window->Initialize() == false)
-		zeCriticalError("Can not create main window.");
-
 	zeLog("Initializing Modules...");
 	if (!InitializeModules())
 		zeCriticalError("Can not initialize modules.");
+
 	zeLog("Modules initialized.");
 
 	Console->EnableInput();
@@ -615,7 +604,6 @@ void ZECore::ShutDown()
 		PhysicsModule->Destroy();
 	}
 
-	Window->Deinitialize();
 	zeLog("Core deinitialized.");
 
 	zeLog("Terminating engine.");
@@ -688,6 +676,8 @@ ZECore* ZECore::GetInstance()
 	return &Engine;
 }
 
+
+
 ZECore::ZECore() 
 {
 	PerformanceCounterFreq.QuadPart = 0;
@@ -709,7 +699,6 @@ ZECore::ZECore()
 	ModuleManager			= new ZEModuleManager();
 	ExtensionManager		= new ZEExtensionManager();
 	PluginManager			= new ZEPluginManager();
-	Window					= new ZEWindow();
 	Game					= new ZEGame();
 
 	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
@@ -717,18 +706,15 @@ ZECore::ZECore()
 	ZEGraphicsModule::BaseInitialize();
 	ZESoundModule::BaseInitialize();
 	ZEInputModule::BaseInitialize();
-
 }
 
 ZECore::~ZECore()
 {
-	
 	ZEGraphicsModule::BaseDeinitialize();
 	ZESoundModule::BaseDeinitialize();
 	ZEInputModule::BaseDeinitialize();
 
 	delete Game;
-	delete Window;
 	delete PluginManager;
 	delete ExtensionManager;
 	delete ModuleManager;

@@ -82,9 +82,11 @@ class ZETextureLevel
 		void						CopyFrom(void* SourceData, ZESize SourcePitch);
 		void						CopyTo(void* Dest, ZESize DestPitch);
 
+		static ZESize				GetRowSize(ZEUInt Width, ZETexturePixelFormat PixelFormat);
+		static ZEUInt				GetRowCount(ZEUInt Height, ZETexturePixelFormat	PixelFormat);
+
 									ZETextureLevel();
 		virtual						~ZETextureLevel();
-
 };
 
 
@@ -107,9 +109,10 @@ class ZETextureSurface
 
 		ZESize						GetSize();
 
+		static ZESize				GetSurfaceSize(ZEUInt RowCount, ZESize RowSize);
+
 									ZETextureSurface();
 		virtual						~ZETextureSurface();
-
 };
 
 

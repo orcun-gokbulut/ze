@@ -41,7 +41,7 @@
 
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEScene.h"
 
@@ -573,11 +573,11 @@ ZEParticleEmitter::ZEParticleEmitter()
 	VertexBuffer = NULL;
 	Material = NULL;
 
-	RenderCommand.SetZero();
-	RenderCommand.Priority = 4;
-	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_NO_Z_WRITE;
-	RenderCommand.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
-	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
+	//RenderCommand.
+	//RenderCommand.Priority = 4;
+	//RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_NO_Z_WRITE;
+	//RenderCommand.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
+	//RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
 	
 	BillboardType = ZE_PBT_SCREEN_ALIGNED;
 	AxisOrientation = -ZEVector3::UnitZ;
@@ -629,11 +629,11 @@ void ZEParticleEmitter::UpdateVertexBuffer(ZEDrawParameters* DrawParameters)
 	ZESize ParticleCount = ParticlePool.GetCount();
 
 	if (VertexBuffer == NULL)
-		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
+		VertexBuffer = ZEVertexBuffer::CreateInstance();
 
 	if (VertexBuffer->GetBufferSize() != ParticlePool.GetCount() * sizeof(ZESimpleVertex) * 6)
 	{
-		if (!VertexBuffer->Create(ParticlePool.GetCount() * sizeof(ZESimpleVertex) * 6))
+		if (!VertexBuffer->CreateDynamic(ParticlePool.GetCount(), sizeof(ZESimpleVertex) * 6), NULL)
 		{
 			zeError("Could not create particle vertex buffer.");
 			return;
@@ -642,16 +642,17 @@ void ZEParticleEmitter::UpdateVertexBuffer(ZEDrawParameters* DrawParameters)
 
 	RenderCommand.PrimitiveCount = 0;
 
-	ZESimpleVertex* Buffer = (ZESimpleVertex*)VertexBuffer->Lock();
+	ZESimpleVertex* Buffer = NULL;
+	VertexBuffer->Lock((void**)&Buffer);
 	if (Buffer == NULL)
 	{
 		zeError("Could not lock particle vertex buffer.");
 		return;
 	}
 
-	ZEVector3 CameraRight = DrawParameters->View->Camera->GetWorldRight();
-	ZEVector3 CameraUp = DrawParameters->View->Camera->GetWorldUp();
-	ZEVector3 CameraLook = DrawParameters->View->Camera->GetWorldFront();
+	ZEVector3 CameraRight = DrawParameters->View->GetWorldRight();
+	ZEVector3 CameraUp = DrawParameters->View->GetWorldUp();
+	ZEVector3 CameraLook = DrawParameters->View->GetWorldFront();
 
 	if (BillboardType == ZE_PBT_AXIS_ORIENTED)
 	{
@@ -716,7 +717,7 @@ void ZEParticleEmitter::UpdateVertexBuffer(ZEDrawParameters* DrawParameters)
 		{
 			ZEParticle* Particle = &ParticlePool[ParticleCount - N - 1];
 
-			ZEVector3 ParticleFaceDirection = DrawParameters->View->Camera->GetWorldPosition() - Particle->Position;
+			ZEVector3 ParticleFaceDirection = DrawParameters->View->GetWorldPosition() - Particle->Position;
 			ParticleFaceDirection.NormalizeSelf();
 
 			if (Particle->State != ZE_PAS_DEAD)
@@ -761,8 +762,8 @@ void ZEParticleEmitter::Draw(ZEDrawParameters* DrawParameters)
 
 	UpdateVertexBuffer(DrawParameters);
 
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-		Owner->Statistics.TotalParticleCount += ParticlePool.GetCount();
+	//if (DrawParameters->Pass == ZE_RP_COLOR)
+	//	Owner->Statistics.TotalParticleCount += ParticlePool.GetCount();
 
 	if (RenderCommand.PrimitiveCount == 0)
 		return;
@@ -770,19 +771,21 @@ void ZEParticleEmitter::Draw(ZEDrawParameters* DrawParameters)
 	if (VertexBuffer == NULL || Material == NULL)
 		return;
 
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-		Owner->Statistics.DrawedParticleCount += RenderCommand.PrimitiveCount / 2;
+	/*if (DrawParameters->Pass == ZE_RP_COLOR)
+		Owner->Statistics.DrawedParticleCount += RenderCommand.PrimitiveCount / 2;*/
 
-	if(IsEmmiterLocal)
+	/*if(IsEmmiterLocal)
 		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, GetOwner()->GetWorldPosition(), ZEQuaternion::Identity, GetOwner()->GetWorldScale());
 	else
 		RenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
+	*/
 
-	RenderCommand.VertexBuffer = VertexBuffer;
-	RenderCommand.Material = Material;
-	RenderCommand.Priority = 1000;
-	RenderCommand.Order = 1001.0f;
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	//RenderCommand.VertexBuffer = VertexBuffer;
+	//RenderCommand.Material = Material;
+	//RenderCommand.Priority = 1000;
+	//RenderCommand.Order = 1001.0f;
+	
+	//DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }
 
 void ZEParticleEmitter::SortParticles()

@@ -34,20 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_D3D10_COMPONENT_BASE_H_
-#define __ZE_D3D10_COMPONENT_BASE_H_
+#ifndef	__ZE_D3D11_COMPONENT_BASE_H_
+#define __ZE_D3D11_COMPONENT_BASE_H_
 
-struct ID3D10Device;
+#include <d3d11.h>
+
+#include "ZEDS/ZEArray.h"
+
 class ZED3D10GraphicsModule;
 
 class ZED3D10ComponentBase
 {
 	protected:
-		static ZED3D10GraphicsModule*		GraphicsModule;
-		static ID3D10Device*				D3D10Device;
+		static ZED3D10GraphicsModule*			GraphicsModule;
+		
+		static ZEArray<ID3D11Device*>			D3DDevices;
+		static ZEArray<ID3D11DeviceContext*>	D3DContexes;
+		
 		
 	public:
-		static bool							BaseInitialize(ZED3D10GraphicsModule* Module);
+		static bool								BaseInitialize(ZED3D10GraphicsModule* Module);
 
 };
 

@@ -68,43 +68,38 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DrawOrder)
 	if (VertexBuffer == NULL)
 		return;
 
-	ZETransformationBuffer* TransformBuffer = NULL;
-	RenderCommand.TransformationBuffer->Lock((void**)&TransformBuffer);
+	ZECamera* Camera = zeScene->GetActiveCamera();
 
 	if (Skinned)
 	{
-		ZESkinningBuffer* SkinningBuffer = NULL;
-		RenderCommand.SkinningBuffer->Lock((void**)&SkinningBuffer);
+		ZERenderCommand::ZESkinningBuffer* SkinningBuffer = NULL;
+		BoneMatrices->Lock((void**)&SkinningBuffer);
 		
-		for (ZESize I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
-			ZEMatrix4x4::Multiply(SkinningBuffer->BoneMatrices[I], Owner->GetBones()[(ZESize)LODResource->AffectingBoneIds[I]].GetVertexTransform(), this->OwnerMesh->GetLocalTransform());
-
-		RenderCommand.SkinningBuffer->Unlock();
+			ZEArray<ZEModelBone>& Bones = Owner->GetBones();
+			for (ZESize I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
+			{
+				ZESize BoneId = (ZESize)LODResource->AffectingBoneIds[I];
+				SkinningBuffer->BoneMatrices[I] =  Bones[BoneId].GetVertexTransform() * OwnerMesh->GetLocalTransform();
+			}
+		
+		BoneMatrices->Unlock();
 
 		// Set transformations
-		TransformBuffer->WorldMatrix = OwnerMesh->GetWorldTransform();
-		TransformBuffer->ViewMatrix = zeScene->GetActiveCamera()->GetViewTransform();
-		TransformBuffer->ProjectionMatrix = zeScene->GetActiveCamera()->GetProjectionTransform();
+		RenderCommand.SkinningBuffer = BoneMatrices;
+		RenderCommand.WorldTransform = OwnerMesh->GetWorldTransform();
 	}
 	else if(OwnerMesh->GetPhysicalCloth() != NULL)
 	{		
 		// Set transformations
-		TransformBuffer->WorldMatrix = ZEMatrix4x4::Identity;
-		TransformBuffer->ViewMatrix = zeScene->GetActiveCamera()->GetViewTransform();
-		TransformBuffer->ProjectionMatrix = zeScene->GetActiveCamera()->GetProjectionTransform();
+		RenderCommand.WorldTransform = ZEMatrix4x4::Identity;
 	}
 	else
 	{		
 		// Set transformations
-		TransformBuffer->WorldMatrix = OwnerMesh->GetWorldTransform();
-		TransformBuffer->ViewMatrix = zeScene->GetActiveCamera()->GetViewTransform();
-		TransformBuffer->ProjectionMatrix = zeScene->GetActiveCamera()->GetProjectionTransform();
+		RenderCommand.WorldTransform = OwnerMesh->GetWorldTransform();
 	}
 
-	RenderCommand.TransformationBuffer->Unlock();
-	RenderCommand.Order = DistanceSquare;
-
-	DrawParameters->Renderer->AddRenderCommand(&RenderCommand);
+	DrawParameters->Bucket->AddRenderCommand(&RenderCommand);
 }
 
 bool ZEModelMeshLOD::UpdateVertexBuffer(ZEArray<ZEVector3> Vertices, ZEArray<ZEUInt32> Indices)
@@ -226,6 +221,12 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 
 	Skinned = LODResource->Vertices.GetCount() == 0 ? true : false;
 
+	if (Skinned && BoneMatrices == NULL)
+	{
+		BoneMatrices = ZEConstantBuffer::CreateInstance();
+		BoneMatrices->Create(sizeof(ZERenderCommand::ZESkinningBuffer));
+	}
+
 	RenderCommand.Priority = 3;
 	RenderCommand.Skinned = Skinned;
 	RenderCommand.PrimitiveType = ZE_PT_TRIANGLE_LIST;
@@ -247,6 +248,7 @@ void ZEModelMeshLOD::Deinitialize()
 
 ZEModelMeshLOD::ZEModelMeshLOD()
 {
+	BoneMatrices = NULL;
 	Skinned = false;
 	Owner = NULL;
 	OwnerMesh = NULL;
