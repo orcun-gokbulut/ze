@@ -64,14 +64,20 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 
 bool ZEFLTResource::ReadOpenflightSceneFromFile(ZEFile* ResourceFile)
 {
-	ZEFLTReader Reader(ResourceFile);
+	ZEFLTReader Reader;
 
-	do
+	if (!Reader.SetResourceFile(ResourceFile))
 	{
-		if (!Reader.ReadRecord())
-			return false;
+		zeError("Can not read FLT file.");
+		return false;
 	}
-	while (!ResourceFile->Eof());
+
+	ZEInt64 ReadCursor = 0;
+
+	while(ReadCursor != ResourceFile->GetSize())
+	{
+		ReadCursor = Reader.ReadRecord();
+	}
 
 	Node = Reader.GetRootNode();
 
