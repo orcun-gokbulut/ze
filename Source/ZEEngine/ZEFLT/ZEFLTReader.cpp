@@ -47,40 +47,41 @@ ZEFLTRecordType ZEFLTReader::GetRecordType(ZEUInt8 OpCode)
 	return Handlers[OpCode].RecordType;
 };
 
-bool ZEFLTReader::ReadRecord()
+bool ZEFLTReader::SetResourceFile(ZEFile* File)
+{
+	ResourceFile = File;
+
+	Buffer = new char[ResourceFile->GetSize()];
+
+	if (ResourceFile->Read(Buffer, ResourceFile->GetSize(), 1) != 1)
+	{
+		delete [] Buffer;
+		Buffer = NULL;
+		return false;
+	}
+	
+	return true;
+};
+
+ZEInt64 ZEFLTReader::ReadRecord()
 {
 	PreviousRecordIdentifier.Opcode = CurrentRecordIdentifier.Opcode;
 	PreviousRecordIdentifier.Size = CurrentRecordIdentifier.Size;
 
-	if (ResourceFile->Read(&CurrentRecordIdentifier, sizeof(ZEFLTRecordIdentifier), 1) == 1)
+	memcpy(&CurrentRecordIdentifier, Buffer + CursorPointer, sizeof(ZEFLTRecordIdentifier));
+
+	if (Handlers[CurrentRecordIdentifier.Opcode].RecordType == ZE_FLT_RECORD_UNUSED)
 	{
-		if (Handlers[CurrentRecordIdentifier.Opcode].RecordType == ZE_FLT_RECORD_UNUSED)
-		{
-			zeLog("Unsupported FLT record. Opcode: %d", (ZEInt16)CurrentRecordIdentifier.Opcode);
-			SkipRecord();
-		}
-		else
-		{
-			ResourceFile->Seek(-sizeof(ZEFLTRecordIdentifier), ZE_SF_CURRENT);
-			Handlers[CurrentRecordIdentifier.Opcode].Callback(ResourceFile, &CurrentNode, PreviousRecordIdentifier.Opcode, PreviousRecordIdentifier.Size, CurrentRecordIdentifier.Opcode, CurrentRecordIdentifier.Size);
-		}
+		zeLog("Unsupported FLT record. Opcode: %d", (ZEInt16)CurrentRecordIdentifier.Opcode);
+		CursorPointer += CurrentRecordIdentifier.Size;
 	}
 	else
 	{
-		if(!ResourceFile->Eof())
-		{
-			zeError("Can not read FLT file.");
-			return false;
-		}
+		Handlers[CurrentRecordIdentifier.Opcode].Callback(Buffer + CursorPointer, &CurrentNode, PreviousRecordIdentifier.Opcode, CurrentRecordIdentifier.Size);
+		CursorPointer += CurrentRecordIdentifier.Size;
 	}
 
-	return true;
-};
-
-void ZEFLTReader::SkipRecord()
-{
-	ZESize RemainingRecordSize = CurrentRecordIdentifier.Size - sizeof(ZEFLTRecordIdentifier);
-	ResourceFile->Seek(RemainingRecordSize, ZE_SF_CURRENT);
+	return CursorPointer;
 };
 
 ZEFLTResourceNode* ZEFLTReader::GetRootNode()
@@ -93,12 +94,12 @@ ZEFLTResourceNode* ZEFLTReader::GetCurrentNode()
 	return CurrentNode;
 };
 
-ZEFLTReader::ZEFLTReader(ZEFile* File)
+ZEFLTReader::ZEFLTReader()
 {
-	ResourceFile = File;
-
+	ResourceFile = NULL;
+	Buffer = NULL;
 	CursorPointer = 0;
-
+	
 	memset(&CurrentRecordIdentifier, 0, sizeof(ZEFLTRecordIdentifier));
 	memset(&PreviousRecordIdentifier, 0, sizeof(ZEFLTRecordIdentifier));
 
@@ -111,7 +112,7 @@ ZEFLTReader::ZEFLTReader(ZEFile* File)
 
 ZEFLTReader::~ZEFLTReader()
 {
-
+	delete [] Buffer;
 };
 
 void ZEFLTReader::RegisterHandlers()

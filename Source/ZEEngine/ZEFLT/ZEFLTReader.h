@@ -49,7 +49,7 @@ class ZEFLTResourceNode;
 
 typedef ZEInt64 ZEFLTReaderPointer;
 
-typedef	ZEDelegate<void (ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)> ZEFLTRecordCallback;
+typedef	ZEDelegate<void (char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)> ZEFLTRecordCallback;
 
 enum ZEFLTRecordType
 {
@@ -79,11 +79,11 @@ class ZEFLTReader
 
 		ZEArray<ZEFLTRecordHandler>				Handlers;
 		ZEFile*									ResourceFile;
+		char*									Buffer;
+		ZEFLTReaderPointer						CursorPointer;
 
 		ZEFLTResourceNode*						RootNode;
 		ZEFLTResourceNode*						CurrentNode;
-
-		ZEFLTReaderPointer*						CursorPointer;
 
 		ZEFLTRecordIdentifier					CurrentRecordIdentifier;
 		ZEFLTRecordIdentifier					PreviousRecordIdentifier;
@@ -95,13 +95,13 @@ class ZEFLTReader
 		const char*								GetRecordName(ZEUInt8 OpCode);
 		ZEFLTRecordType							GetRecordType(ZEUInt8 OpCode);
 
-		bool									ReadRecord();
-		void									SkipRecord();
+		bool									SetResourceFile(ZEFile* File);
+		ZEInt64									ReadRecord();
 
 		ZEFLTResourceNode*						GetRootNode();
 		ZEFLTResourceNode*						GetCurrentNode();
 
-												ZEFLTReader(ZEFile* File);
+												ZEFLTReader();
 												~ZEFLTReader();
 };
 

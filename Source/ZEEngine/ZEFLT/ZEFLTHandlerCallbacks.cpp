@@ -38,260 +38,236 @@
 #include "ZEFLTOpcodes.h"
 #include "ZEFile/ZEFile.h"
 
-void ReadRecordHeader(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordHeader(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordHeader* Header = new ZEFLTRecordHeader();
 
-	File->Read(Header, CurrentLength, 1);
+	memcpy(Header, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(Header);
 };
 
-void ReadRecordGroup(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordGroup(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordGroup* Group = new ZEFLTRecordGroup();
 
-	File->Read(Group, CurrentLength, 1);
+	memcpy(Group, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(Group);
 };
 
-void ReadRecordObject(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordObject(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordObject* Object = new ZEFLTRecordObject();
 
-	File->Read(Object, CurrentLength, 1);
+	memcpy(Object, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(Object);
 };
 
-void ReadRecordFace(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordFace(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordFace* Face = new ZEFLTRecordFace();
 
-	File->Read(Face, CurrentLength, 1);
+	memcpy(Face, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(Face);
 };
 
-void ReadRecordMesh(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordMesh(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordMesh* Mesh = new ZEFLTRecordMesh();
 
-	File->Read(Mesh, CurrentLength, 1);
+	memcpy(Mesh, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(Mesh);
 };
 
-void ReadRecordLocalVertexPool(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordLocalVertexPool(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordLocalVertexPool* LocalVertexPool = new ZEFLTRecordLocalVertexPool();
 
-	File->Read(LocalVertexPool, 12, 1);
+	memcpy(LocalVertexPool, BufferAtNode, 12);
 
 	LocalVertexPool->Vertices.SetCount(LocalVertexPool->NumberOfVertices);
-	ZEFLTRecordLocalVertexPoolVertex Vertex;
-
-	for (ZESize I = 0; I < LocalVertexPool->NumberOfVertices; I++)
-	{
-		File->Read(&Vertex, sizeof(ZEFLTRecordLocalVertexPoolVertex), 1);
-		LocalVertexPool->Vertices[I] = Vertex;
-	}
+	
+	memcpy(LocalVertexPool->Vertices.GetCArray(), BufferAtNode + 12, LocalVertexPool->NumberOfVertices * sizeof(ZEFLTRecordLocalVertexPoolVertex));
 
 	(*Node)->SetRecord(LocalVertexPool);
 
 };
 
-void ReadRecordMeshPrimitive(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordMeshPrimitive(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordMeshPrimitive* MeshPrimitive = new ZEFLTRecordMeshPrimitive();
 
-	File->Read(MeshPrimitive, 12, 1);
+	memcpy(MeshPrimitive, BufferAtNode, 12);
 
 	MeshPrimitive->Indices.SetCount(MeshPrimitive->VertexCount);
 	MeshPrimitive->Indices.Fill(NULL);
-	ZEBigEndian<ZEInt32> Index;
 
 	for (ZESize I = 0; I < MeshPrimitive->VertexCount; I++)
 	{
-		File->Read(&Index, sizeof(ZEInt32), 1);
-		MeshPrimitive->Indices[I] = Index;
+		memcpy(&MeshPrimitive->Indices[I], (BufferAtNode + 12) + I * MeshPrimitive->IndexSize, MeshPrimitive->IndexSize);
 	}
 
 	(*Node)->SetRecord(MeshPrimitive);
 };
 
-void ReadRecordIndexedLightPoint(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordIndexedLightPoint(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordIndexedLightPoint* IndexedLightPoint = new ZEFLTRecordIndexedLightPoint();
 
-	File->Read(IndexedLightPoint, CurrentLength, 1);
+	memcpy(IndexedLightPoint, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(IndexedLightPoint);
 };
 
-void ReadRecordLightPoint(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordLightPoint(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordLightPoint* LightPoint = new ZEFLTRecordLightPoint();
 
-	File->Read(LightPoint, CurrentLength, 1);
+	memcpy(LightPoint, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(LightPoint);
 };
 
-void ReadRecordLightPointSystem(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordLightPointSystem(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordLightPointSystem* LightPointSystem = new ZEFLTRecordLightPointSystem();
 
-	File->Read(LightPointSystem, CurrentLength, 1);
+	memcpy(LightPointSystem, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(LightPointSystem);
 };
 
-void ReadRecordDegreeOfFreedom(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordDegreeOfFreedom(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordDegreeOfFreedom* DegreeOfFreedom = new ZEFLTRecordDegreeOfFreedom();
 
-	File->Read(DegreeOfFreedom, CurrentLength, 1);
+	memcpy(DegreeOfFreedom, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(DegreeOfFreedom);
 };
 
-void ReadRecordVertexList(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordVertexList(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
-	ZESize NumberOfVertices = (CurrentLength - sizeof(ZEFLTRecordBase)) / 4;
+	ZESize NumberOfVertices = (NodeLength - sizeof(ZEFLTRecordBase)) / 4;
 
 	ZEFLTRecordVertexList* VertexList = new ZEFLTRecordVertexList();
-	File->Read(VertexList, sizeof(ZEFLTRecordBase), 1);
+
+	memcpy(VertexList, BufferAtNode, sizeof(ZEFLTRecordBase));
 
 	VertexList->VertexOffsets.SetCount(NumberOfVertices);
-	ZEBigEndian<ZEInt32> Offset;
 
-	for (ZESize I = 0; I < NumberOfVertices; I++)
-	{
-		File->Read(&Offset, sizeof(ZEInt32), 1);
-		VertexList->VertexOffsets[I] = Offset;
-	}
+	memcpy(VertexList->VertexOffsets.GetCArray(), BufferAtNode + sizeof(ZEFLTRecordBase), NumberOfVertices * sizeof(ZEInt32));
 
 	(*Node)->SetRecord(VertexList);
 };
 
-void ReadRecordMorphList(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordMorphList(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
-	ZESize NumberOfVertices = (CurrentLength - sizeof(ZEFLTRecordBase)) / 8;
+	ZESize NumberOfVertices = (NodeLength - sizeof(ZEFLTRecordBase)) / 8;
 
 	ZEFLTRecordMorphList* MorphVertexList = new ZEFLTRecordMorphList();
-	File->Read(MorphVertexList, sizeof(ZEFLTRecordBase), 1);
+
+	memcpy(MorphVertexList, BufferAtNode, sizeof(ZEFLTRecordBase));
 
 	MorphVertexList->VertexOffsets.SetCount(NumberOfVertices);
-	ZEFLTRecordMorphListVertex Offsets;
 
-	for (ZESize I = 0; I < NumberOfVertices; I++)
-	{
-		File->Read(&Offsets, sizeof(ZEFLTRecordMorphListVertex), 1);
-		MorphVertexList->VertexOffsets[I] = Offsets;
-	}
+	memcpy(MorphVertexList->VertexOffsets.GetCArray(), BufferAtNode + sizeof(ZEFLTRecordBase), NumberOfVertices * sizeof(ZEFLTRecordMorphListVertex));
 
 	(*Node)->SetRecord(MorphVertexList);
 };
 
-void ReadRecordBinarySeparatingPlane(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordBinarySeparatingPlane(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordBinarySeparatingPlane* BinarySeparatingPlane = new ZEFLTRecordBinarySeparatingPlane();
 
-	File->Read(BinarySeparatingPlane, CurrentLength, 1);
+	memcpy(BinarySeparatingPlane, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(BinarySeparatingPlane);
 };
 
-void ReadRecordExternalReference(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExternalReference(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExternalReference* ExternalReference = new ZEFLTRecordExternalReference();
 
-	File->Read(ExternalReference, CurrentLength, 1);
+	memcpy(ExternalReference, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(ExternalReference);
 };
 
-void ReadRecordLevelOfDetail(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordLevelOfDetail(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordLevelOfDetail* LevelOfDetail = new ZEFLTRecordLevelOfDetail();
 
-	File->Read(LevelOfDetail, CurrentLength, 1);
+	memcpy(LevelOfDetail, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(LevelOfDetail);
 };
 
-void ReadRecordSound(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordSound(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordSound* Sound = new ZEFLTRecordSound();
 
-	File->Read(Sound, CurrentLength, 1);
+	memcpy(Sound, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(Sound);
 };
 
-void ReadRecordLightSource(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordLightSource(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordLightSource* LightSource = new ZEFLTRecordLightSource();
 
-	File->Read(LightSource, CurrentLength, 1);
+	memcpy(LightSource, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(LightSource);
 };
 
-void ReadRecordClipRegion(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordClipRegion(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordClipRegion* ClipRegion = new ZEFLTRecordClipRegion();
 
-	File->Read(ClipRegion, CurrentLength, 1);
+	memcpy(ClipRegion, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(ClipRegion);
 };
 
-void ReadRecordText(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordText(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordText* Text = new ZEFLTRecordText();
 
-	File->Read(Text, CurrentLength, 1);
+	memcpy(Text, BufferAtNode, NodeLength);
 
 	(*Node)->SetRecord(Text);
 };
 
-void ReadRecordSwitch(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordSwitch(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordSwitch* Switch = new ZEFLTRecordSwitch();
-	File->Read(Switch, 28, 1);
+	memcpy(Switch, BufferAtNode, 28);
 
 	Switch->MaskWords.SetCount(Switch->NumberOfMasks * Switch->NumberOfWordsPerMask);
-	ZEBigEndian<ZEUInt32> Words;
-
-	for (ZESize I = 0; I < Switch->MaskWords.GetCount(); I++)
-	{
-		File->Read(&Words, sizeof(ZEUInt32), 1);
-		Switch->MaskWords[I] = Words;
-	}
+	memcpy(Switch->MaskWords.GetCArray(), BufferAtNode + 28, (Switch->NumberOfMasks * Switch->NumberOfWordsPerMask) * sizeof(ZEUInt32));
 
 	(*Node)->SetRecord(Switch);
 };
 
-void ReadRecordExtension(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtension(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 
 };
 
-void ReadRecordMultitexture(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordMultitexture(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordMultitexture* Multitexture = new ZEFLTRecordMultitexture();
-	File->Read(Multitexture, sizeof(ZEFLTRecordBase) + 4, 1);
+	memcpy(Multitexture, BufferAtNode, sizeof(ZEFLTRecordBase) + 4);
 	
-	ZESize NumberOfLayers = (CurrentLength - 8) / sizeof(ZEFLTRecordMultitextureLayer);
+	ZESize NumberOfLayers = (NodeLength - 8) / sizeof(ZEFLTRecordMultitextureLayer);
 	Multitexture->Layers.SetCount(NumberOfLayers);
 
-	for (ZESize I = 0; I < NumberOfLayers; I++)
-	{
-		File->Read(&Multitexture->Layers[I], sizeof(ZEFLTRecordMultitextureLayer), 1);
-	}
+	memcpy(Multitexture->Layers.GetCArray(), BufferAtNode + (sizeof(ZEFLTRecordBase) + 4), NumberOfLayers * sizeof(ZEFLTRecordMultitextureLayer));
 
 	ZEFLTResourceNode* MultitextureNode = ZEFLTResourceNode::CreateInstance();
 
@@ -299,28 +275,25 @@ void ReadRecordMultitexture(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt1
 	(*Node)->RegisterAncillary(MultitextureNode);
 };
 
-void ReadRecordUVList(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordUVList(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordBase UVListBase;
-	File->Read(&UVListBase, sizeof(ZEFLTRecordBase), 1);
+	memcpy(&UVListBase, BufferAtNode, sizeof(ZEFLTRecordBase));
 
 	ZEFLTResourceNode* UVListNode = ZEFLTResourceNode::CreateInstance();
 
-	if (PreviousOpCode == ZE_FLT_OPCODE_VERTEX_LIST)
+	if (PreceedingOpCode == ZE_FLT_OPCODE_VERTEX_LIST)
 	{
 		ZEFLTRecordUVList<ZEFLTRecordUVListItemVertex>* UVList = new ZEFLTRecordUVList<ZEFLTRecordUVListItemVertex>();
 		UVList->Opcode = UVListBase.Opcode;
 		UVList->Length = UVListBase.Length;
 
-		File->Read(&UVList->AttributeMask, sizeof(ZEInt32), 1);
+		memcpy(&UVList->AttributeMask, BufferAtNode + sizeof(ZEFLTRecordBase), sizeof(ZEInt32));
 
-		ZESize NumberOfCoordinates = (CurrentLength - 8) / sizeof(ZEFLTRecordUVListItemVertex);
+		ZESize NumberOfCoordinates = (NodeLength - 8) / sizeof(ZEFLTRecordUVListItemVertex);
 		UVList->TextureCoordinates.SetCount(NumberOfCoordinates);
 
-		for (ZESize I = 0; I < NumberOfCoordinates; I++)
-		{
-			File->Read(&UVList->TextureCoordinates[I], sizeof(ZEFLTRecordUVListItemVertex), 1);
-		}
+		memcpy(UVList->TextureCoordinates.GetCArray(), BufferAtNode + (sizeof(ZEFLTRecordBase) + sizeof(ZEInt32)), NumberOfCoordinates * sizeof(ZEFLTRecordUVListItemVertex));
 
 		UVListNode->SetRecord(UVList);
 	}
@@ -330,15 +303,12 @@ void ReadRecordUVList(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& Pre
 		UVList->Opcode = UVListBase.Opcode;
 		UVList->Length = UVListBase.Length;
 
-		File->Read(&UVList->AttributeMask, sizeof(ZEInt32), 1);
+		memcpy(&UVList->AttributeMask, BufferAtNode + sizeof(ZEFLTRecordBase), sizeof(ZEInt32));
 
-		ZESize NumberOfCoordinates = (CurrentLength - 8) / sizeof(ZEFLTRecordUVListItemMorph);
+		ZESize NumberOfCoordinates = (NodeLength - 8) / sizeof(ZEFLTRecordUVListItemMorph);
 		UVList->TextureCoordinates.SetCount(NumberOfCoordinates);
 
-		for (ZESize I = 0; I < NumberOfCoordinates; I++)
-		{
-			File->Read(&UVList->TextureCoordinates[I], sizeof(ZEFLTRecordUVListItemMorph), 1);
-		}
+		memcpy(UVList->TextureCoordinates.GetCArray(), BufferAtNode + (sizeof(ZEFLTRecordBase) + sizeof(ZEInt32)), NumberOfCoordinates * sizeof(ZEFLTRecordUVListItemMorph));
 
 		UVListNode->SetRecord(UVList);
 	}
@@ -346,11 +316,11 @@ void ReadRecordUVList(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& Pre
 	(*Node)->RegisterAncillary(UVListNode);
 };
 
-void ReadRecordReplicate(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordReplicate(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordReplicate* Replicate = new ZEFLTRecordReplicate();
 
-	File->Read(Replicate, CurrentLength, 1);
+	memcpy(Replicate, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ReplicateNode = ZEFLTResourceNode::CreateInstance();
 
@@ -358,11 +328,11 @@ void ReadRecordReplicate(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& 
 	(*Node)->RegisterAncillary(ReplicateNode);
 };
 
-void ReadRecordMatrix(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordMatrix(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordMatrix* Matrix = new ZEFLTRecordMatrix();
 
-	File->Read(Matrix, CurrentLength, 1);
+	memcpy(Matrix, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* MatrixNode = ZEFLTResourceNode::CreateInstance();
 
@@ -370,11 +340,11 @@ void ReadRecordMatrix(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& Pre
 	(*Node)->RegisterAncillary(MatrixNode);
 };
 
-void ReadRecordRotateAboutEdge(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordRotateAboutEdge(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordRotateAboutEdge* RotateAboutEdge = new ZEFLTRecordRotateAboutEdge();
 
-	File->Read(RotateAboutEdge, CurrentLength, 1);
+	memcpy(RotateAboutEdge, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* RotateAboutEdgeNode = ZEFLTResourceNode::CreateInstance();
 
@@ -382,23 +352,23 @@ void ReadRecordRotateAboutEdge(ZEFile* File, ZEFLTResourceNode** Node, const ZEI
 	(*Node)->RegisterAncillary(RotateAboutEdgeNode);
 };
 
-void ReadRecordTranslate(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordTranslate(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
-	ZEFLTRecordRotateAboutEdge* RotateAboutEdge = new ZEFLTRecordRotateAboutEdge();
+	ZEFLTRecordTranslate* Translate = new ZEFLTRecordTranslate();
 
-	File->Read(RotateAboutEdge, CurrentLength, 1);
+	memcpy(Translate, BufferAtNode, NodeLength);
 
-	ZEFLTResourceNode* RotateAboutEdgeNode = ZEFLTResourceNode::CreateInstance();
+	ZEFLTResourceNode* TranslateNode = ZEFLTResourceNode::CreateInstance();
 
-	RotateAboutEdgeNode->SetRecord(RotateAboutEdge);
-	(*Node)->RegisterAncillary(RotateAboutEdgeNode);
+	TranslateNode->SetRecord(Translate);
+	(*Node)->RegisterAncillary(TranslateNode);
 };
 
-void ReadRecordScale(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordScale(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordScale* Scale = new ZEFLTRecordScale();
 
-	File->Read(Scale, CurrentLength, 1);
+	memcpy(Scale, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ScaleNode = ZEFLTResourceNode::CreateInstance();
 
@@ -406,11 +376,11 @@ void ReadRecordScale(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& Prev
 	(*Node)->RegisterAncillary(ScaleNode);
 };
 
-void ReadRecordRotateAboutPoint(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordRotateAboutPoint(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordRotateAboutPoint* RotateAboutPoint = new ZEFLTRecordRotateAboutPoint();
 
-	File->Read(RotateAboutPoint, CurrentLength, 1);
+	memcpy(RotateAboutPoint, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* RotateAboutPointNode = ZEFLTResourceNode::CreateInstance();
 
@@ -418,11 +388,11 @@ void ReadRecordRotateAboutPoint(ZEFile* File, ZEFLTResourceNode** Node, const ZE
 	(*Node)->RegisterAncillary(RotateAboutPointNode);
 };
 
-void ReadRecordRotateScaleToPoint(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordRotateScaleToPoint(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordRotateScaleToPoint* RotateScaleToPoint = new ZEFLTRecordRotateScaleToPoint();
 
-	File->Read(RotateScaleToPoint, CurrentLength, 1);
+	memcpy(RotateScaleToPoint, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* RotateScaleToPointNode = ZEFLTResourceNode::CreateInstance();
 
@@ -430,11 +400,11 @@ void ReadRecordRotateScaleToPoint(ZEFile* File, ZEFLTResourceNode** Node, const 
 	(*Node)->RegisterAncillary(RotateScaleToPointNode);
 };
 
-void ReadRecordPut(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordPut(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordPut* Put = new ZEFLTRecordPut();
 
-	File->Read(Put, CurrentLength, 1);
+	memcpy(Put, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* PutNode = ZEFLTResourceNode::CreateInstance();
 
@@ -442,11 +412,11 @@ void ReadRecordPut(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& Previo
 	(*Node)->RegisterAncillary(PutNode);
 };
 
-void ReadRecordGeneralMatrix(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordGeneralMatrix(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordGeneralMatrix* GeneralMatrix = new ZEFLTRecordGeneralMatrix();
 
-	File->Read(GeneralMatrix, CurrentLength, 1);
+	memcpy(GeneralMatrix, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* GeneralMatrixNode = ZEFLTResourceNode::CreateInstance();
 
@@ -454,23 +424,23 @@ void ReadRecordGeneralMatrix(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt
 	(*Node)->RegisterAncillary(GeneralMatrixNode);
 };
 
-void ReadRecordVector(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordVector(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
-	ZEFLTRecordVector* RecordVector = new ZEFLTRecordVector();
+	ZEFLTRecordVector* Vector = new ZEFLTRecordVector();
 
-	File->Read(RecordVector, CurrentLength, 1);
+	memcpy(Vector, BufferAtNode, NodeLength);
 
-	ZEFLTResourceNode* RecordVectorNode = ZEFLTResourceNode::CreateInstance();
+	ZEFLTResourceNode* VectorNode = ZEFLTResourceNode::CreateInstance();
 
-	RecordVectorNode->SetRecord(RecordVector);
-	(*Node)->RegisterAncillary(RecordVectorNode);
+	VectorNode->SetRecord(Vector);
+	(*Node)->RegisterAncillary(VectorNode);
 };
 
-void ReadRecordBoundingBox(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordBoundingBox(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordBoundingBox* BoundingBox = new ZEFLTRecordBoundingBox();
 
-	File->Read(BoundingBox, CurrentLength, 1);
+	memcpy(BoundingBox, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* BoundingBoxNode = ZEFLTResourceNode::CreateInstance();
 
@@ -478,11 +448,11 @@ void ReadRecordBoundingBox(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16
 	(*Node)->RegisterAncillary(BoundingBoxNode);
 };
 
-void ReadRecordBoundingSphere(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordBoundingSphere(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordBoundingSphere* BoundingSphere = new ZEFLTRecordBoundingSphere();
 
-	File->Read(BoundingSphere, CurrentLength, 1);
+	memcpy(BoundingSphere, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* BoundingSphereNode = ZEFLTResourceNode::CreateInstance();
 
@@ -490,11 +460,11 @@ void ReadRecordBoundingSphere(ZEFile* File, ZEFLTResourceNode** Node, const ZEIn
 	(*Node)->RegisterAncillary(BoundingSphereNode);
 };
 
-void ReadRecordBoundingCylinder(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordBoundingCylinder(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordBoundingCylinder* BoundingCylinder = new ZEFLTRecordBoundingCylinder();
 
-	File->Read(BoundingCylinder, CurrentLength, 1);
+	memcpy(BoundingCylinder, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* BoundingCylinderNode = ZEFLTResourceNode::CreateInstance();
 
@@ -502,15 +472,14 @@ void ReadRecordBoundingCylinder(ZEFile* File, ZEFLTResourceNode** Node, const ZE
 	(*Node)->RegisterAncillary(BoundingCylinderNode);
 };
 
-void ReadRecordBoundingConvexHull(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordBoundingConvexHull(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordBoundingConvexHull* ConvexHull = new ZEFLTRecordBoundingConvexHull();
 
-	File->Read(ConvexHull, sizeof(ZEFLTRecordBase) + 4, 1);
+	memcpy(ConvexHull, BufferAtNode, sizeof(ZEFLTRecordBase) + 4);
 	ConvexHull->Triangles.SetCount(ConvexHull->NumberOfTriangles);
 
-	for(ZESize I = 0; I < ConvexHull->NumberOfTriangles; I++)
-		File->Read(&ConvexHull->Triangles[I], sizeof(ZEFLTRecordBoundingConvexHullTriangles), 1);
+	memcpy(ConvexHull->Triangles.GetCArray(), BufferAtNode + (sizeof(ZEFLTRecordBase) + 4), ConvexHull->NumberOfTriangles * sizeof(ZEFLTRecordBoundingConvexHullTriangles));
 
 	ZEFLTResourceNode* ConvexHullNode = ZEFLTResourceNode::CreateInstance();
 
@@ -518,11 +487,11 @@ void ReadRecordBoundingConvexHull(ZEFile* File, ZEFLTResourceNode** Node, const 
 	(*Node)->RegisterAncillary(ConvexHullNode);
 };
 
-void ReadRecordBoundingVolumeCenter(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordBoundingVolumeCenter(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordBoundingVolumeCenter* VolumeCenter = new ZEFLTRecordBoundingVolumeCenter();
 
-	File->Read(VolumeCenter, CurrentLength, 1);
+	memcpy(VolumeCenter, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* VolumeCenterNode = ZEFLTResourceNode::CreateInstance();
 
@@ -530,11 +499,11 @@ void ReadRecordBoundingVolumeCenter(ZEFile* File, ZEFLTResourceNode** Node, cons
 	(*Node)->RegisterAncillary(VolumeCenterNode);
 };
 
-void ReadRecordBoundingVolumeOrientation(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordBoundingVolumeOrientation(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordBoundingVolumeOrientation* VolumeOrientation = new ZEFLTRecordBoundingVolumeOrientation();
 
-	File->Read(VolumeOrientation, CurrentLength, 1);
+	memcpy(VolumeOrientation, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* VolumeOrientationNode = ZEFLTResourceNode::CreateInstance();
 
@@ -542,11 +511,11 @@ void ReadRecordBoundingVolumeOrientation(ZEFile* File, ZEFLTResourceNode** Node,
 	(*Node)->RegisterAncillary(VolumeOrientationNode);
 };
 
-void ReadRecordExtensionFieldBoolean(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtensionFieldBoolean(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtensionFieldBoolean* ExtensionFieldBoolean = new ZEFLTRecordExtensionFieldBoolean();
 
-	File->Read(ExtensionFieldBoolean, CurrentLength, 1);
+	memcpy(ExtensionFieldBoolean, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtensionFieldBooleanNode = ZEFLTResourceNode::CreateInstance();
 
@@ -554,11 +523,11 @@ void ReadRecordExtensionFieldBoolean(ZEFile* File, ZEFLTResourceNode** Node, con
 	(*Node)->RegisterAncillary(ExtensionFieldBooleanNode);
 };
 
-void ReadRecordExtensionFieldInteger(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtensionFieldInteger(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtensionFieldInteger* ExtensionFieldInteger = new ZEFLTRecordExtensionFieldInteger();
 
-	File->Read(ExtensionFieldInteger, CurrentLength, 1);
+	memcpy(ExtensionFieldInteger, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtensionFieldIntegerNode = ZEFLTResourceNode::CreateInstance();
 
@@ -566,11 +535,11 @@ void ReadRecordExtensionFieldInteger(ZEFile* File, ZEFLTResourceNode** Node, con
 	(*Node)->RegisterAncillary(ExtensionFieldIntegerNode);
 };
 
-void ReadRecordExtensionFieldFloat(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtensionFieldFloat(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtensionFieldFloat* ExtensionFieldFloat = new ZEFLTRecordExtensionFieldFloat();
 
-	File->Read(ExtensionFieldFloat, CurrentLength, 1);
+	memcpy(ExtensionFieldFloat, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtensionFieldFloatNode = ZEFLTResourceNode::CreateInstance();
 
@@ -578,11 +547,11 @@ void ReadRecordExtensionFieldFloat(ZEFile* File, ZEFLTResourceNode** Node, const
 	(*Node)->RegisterAncillary(ExtensionFieldFloatNode);
 };
 
-void ReadRecordExtensionFieldDouble(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtensionFieldDouble(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtensionFieldDouble* ExtensionFieldDouble = new ZEFLTRecordExtensionFieldDouble();
 
-	File->Read(ExtensionFieldDouble, CurrentLength, 1);
+	memcpy(ExtensionFieldDouble, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtensionFieldDoubleNode = ZEFLTResourceNode::CreateInstance();
 
@@ -590,11 +559,11 @@ void ReadRecordExtensionFieldDouble(ZEFile* File, ZEFLTResourceNode** Node, cons
 	(*Node)->RegisterAncillary(ExtensionFieldDoubleNode);
 };
 
-void ReadRecordExtensionFieldString(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtensionFieldString(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtensionFieldString* ExtensionFieldString = new ZEFLTRecordExtensionFieldString();
 
-	File->Read(ExtensionFieldString, CurrentLength, 1);
+	memcpy(ExtensionFieldString, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtensionFieldStringNode = ZEFLTResourceNode::CreateInstance();
 
@@ -602,11 +571,11 @@ void ReadRecordExtensionFieldString(ZEFile* File, ZEFLTResourceNode** Node, cons
 	(*Node)->RegisterAncillary(ExtensionFieldStringNode);
 };
 
-void ReadRecordExtensionFieldXML(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtensionFieldXML(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtensionFieldXML* ExtensionFieldXML = new ZEFLTRecordExtensionFieldXML();
 
-	File->Read(ExtensionFieldXML, CurrentLength, 1);
+	memcpy(ExtensionFieldXML, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtensionFieldXMLNode = ZEFLTResourceNode::CreateInstance();
 
@@ -614,12 +583,12 @@ void ReadRecordExtensionFieldXML(ZEFile* File, ZEFLTResourceNode** Node, const Z
 	(*Node)->RegisterAncillary(ExtensionFieldXMLNode);
 };
 
-void ReadRecordContinuation(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordContinuation(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordBase ContinuationBase;
-	File->Read(&ContinuationBase, sizeof(ZEFLTRecordBase), 1);
+	memcpy(&ContinuationBase, BufferAtNode, sizeof(ZEFLTRecordBase));
 
-	if (PreviousOpCode == ZE_FLT_OPCODE_LOCAL_VERTEX_POOL)
+	if (PreceedingOpCode == ZE_FLT_OPCODE_LOCAL_VERTEX_POOL)
 	{
 		ZEFLTRecordContinuation<ZEFLTRecordLocalVertexPoolVertex>* Continuation = new ZEFLTRecordContinuation<ZEFLTRecordLocalVertexPoolVertex>();
 		Continuation->Opcode = ContinuationBase.Opcode;
@@ -628,19 +597,13 @@ void ReadRecordContinuation(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt1
 		ZESize NumberOfVertices = (Continuation->Length - 4) / sizeof(ZEFLTRecordLocalVertexPoolVertex);
 		Continuation->Data.SetCount(NumberOfVertices);
 
-		ZEFLTRecordLocalVertexPoolVertex Vertex;
-
-		for (ZESize I = 0; I < NumberOfVertices; I++)
-		{
-			File->Read(&Vertex, sizeof(ZEFLTRecordLocalVertexPoolVertex), 1);
-			Continuation->Data[I] = Vertex;
-		};
+		memcpy(Continuation->Data.GetCArray(), BufferAtNode + sizeof(ZEFLTRecordBase), NumberOfVertices * sizeof(ZEFLTRecordLocalVertexPoolVertex));
 
 		ZEFLTResourceNode* ContinuationNode = ZEFLTResourceNode::CreateInstance();
 		ContinuationNode->SetRecord(Continuation);
 		(*Node)->RegisterAncillary(ContinuationNode);
 	}
-	else if (PreviousOpCode == ZE_FLT_OPCODE_MESH_PRIMITIVE)
+	else if (PreceedingOpCode == ZE_FLT_OPCODE_MESH_PRIMITIVE)
 	{
 		ZEFLTRecordContinuation<ZEBigEndian<ZEInt32>>* Continuation = new ZEFLTRecordContinuation<ZEBigEndian<ZEInt32>>();
 		Continuation->Opcode = ContinuationBase.Opcode;
@@ -654,14 +617,14 @@ void ReadRecordContinuation(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt1
 
 		for (ZESize I = 0; I < NumberOfVertices; I++)
 		{
-			File->Read(&Continuation->Data[I], IndexSize, 1);
-		};
+			memcpy(&Continuation->Data[I], BufferAtNode + (sizeof(ZEFLTRecordBase) + I * IndexSize), IndexSize);
+		}
 
 		ZEFLTResourceNode* ContinuationNode = ZEFLTResourceNode::CreateInstance();
 		ContinuationNode->SetRecord(Continuation);
 		(*Node)->RegisterAncillary(ContinuationNode);
 	}
-	else if (PreviousOpCode == ZE_FLT_OPCODE_VERTEX_LIST)
+	else if (PreceedingOpCode == ZE_FLT_OPCODE_VERTEX_LIST)
 	{
 		ZEFLTRecordContinuation<ZEBigEndian<ZEInt32>>* Continuation = new ZEFLTRecordContinuation<ZEBigEndian<ZEInt32>>();
 		Continuation->Opcode = ContinuationBase.Opcode;
@@ -670,17 +633,14 @@ void ReadRecordContinuation(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt1
 		ZESize NumberOfVertices = (Continuation->Length - 4) / sizeof(ZEInt32);
 		Continuation->Data.SetCount(NumberOfVertices);
 
-		for (ZESize I = 0; I < NumberOfVertices; I++)
-		{
-			File->Read(&Continuation->Data[I], sizeof(ZEInt32), 1);
-		};
+		memcpy(Continuation->Data.GetCArray(), BufferAtNode + sizeof(ZEFLTRecordBase), NumberOfVertices * sizeof(ZEInt32));
 
 		ZEFLTResourceNode* ContinuationNode = ZEFLTResourceNode::CreateInstance();
 		ContinuationNode->SetRecord(Continuation);
 		(*Node)->RegisterAncillary(ContinuationNode);
 
 	}
-	else if (PreviousOpCode == ZE_FLT_OPCODE_MORPH_VERTEX_LIST)
+	else if (PreceedingOpCode == ZE_FLT_OPCODE_MORPH_VERTEX_LIST)
 	{
 		ZEFLTRecordContinuation<ZEFLTRecordMorphListVertex>* Continuation = new ZEFLTRecordContinuation<ZEFLTRecordMorphListVertex>();
 		Continuation->Opcode = ContinuationBase.Opcode;
@@ -689,20 +649,17 @@ void ReadRecordContinuation(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt1
 		ZESize NumberOfVertices = (Continuation->Length - 4) / sizeof(ZEFLTRecordMorphListVertex);
 		Continuation->Data.SetCount(NumberOfVertices);
 
-		for (ZESize I = 0; I < NumberOfVertices; I++)
-		{
-			File->Read(&Continuation->Data[I], sizeof(ZEFLTRecordMorphListVertex), 1);
-		};
+		memcpy(Continuation->Data.GetCArray(), BufferAtNode + sizeof(ZEFLTRecordBase), NumberOfVertices * sizeof(ZEFLTRecordMorphListVertex));
 
 		ZEFLTResourceNode* ContinuationNode = ZEFLTResourceNode::CreateInstance();
 		ContinuationNode->SetRecord(Continuation);
 		(*Node)->RegisterAncillary(ContinuationNode);
 	}
-	else if (PreviousOpCode == ZE_FLT_OPCODE_EXTENSION)
+	else if (PreceedingOpCode == ZE_FLT_OPCODE_EXTENSION)
 	{
-		File->Seek(ContinuationBase.Length - 4, ZE_SF_CURRENT);
+		//File->Seek(ContinuationBase.Length - 4, ZE_SF_CURRENT);
 	}
-	else if (PreviousOpCode == ZE_FLT_OPCODE_BOUNDING_CONVEX_HULL)
+	else if (PreceedingOpCode == ZE_FLT_OPCODE_BOUNDING_CONVEX_HULL)
 	{
 		ZEFLTRecordContinuation<ZEFLTRecordBoundingConvexHullTriangles>* Continuation = new ZEFLTRecordContinuation<ZEFLTRecordBoundingConvexHullTriangles>();
 		Continuation->Opcode = ContinuationBase.Opcode;
@@ -711,30 +668,29 @@ void ReadRecordContinuation(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt1
 		ZESize NumberOfTriangles = (Continuation->Length - 4) / sizeof(ZEFLTRecordBoundingConvexHullTriangles);
 		Continuation->Data.SetCount(NumberOfTriangles);
 
-		for (ZESize I = 0; I < NumberOfTriangles; I++)
-		{
-			File->Read(&Continuation->Data[I], sizeof(ZEFLTRecordBoundingConvexHullTriangles), 1);
-		};
+		memcpy(Continuation->Data.GetCArray(), BufferAtNode + sizeof(ZEFLTRecordBase), NumberOfTriangles * sizeof(ZEFLTRecordBoundingConvexHullTriangles));
 
 		ZEFLTResourceNode* ContinuationNode = ZEFLTResourceNode::CreateInstance();
 		ContinuationNode->SetRecord(Continuation);
 		(*Node)->RegisterAncillary(ContinuationNode);
 	}
-	else if (PreviousOpCode == ZE_FLT_OPCODE_NAME_TABLE)
+	else if (PreceedingOpCode == ZE_FLT_OPCODE_NAME_TABLE)
 	{
 		ZEFLTRecordContinuation<ZEFLTRecordNameTableEntry>* Continuation = new ZEFLTRecordContinuation<ZEFLTRecordNameTableEntry>();
 		Continuation->Opcode = ContinuationBase.Opcode;
 		Continuation->Length = ContinuationBase.Length;
+		ZEUInt32 ContinuationCursor = sizeof(ZEFLTRecordBase);
 
-		ZESize NumberOfEntries= (Continuation->Length - 4) / sizeof(ZEFLTRecordNameTableEntry);
-		Continuation->Data.SetCount(NumberOfEntries);
+		ZEFLTRecordNameTableEntry TempNameTableEntry;
+		ZEInt32	TempEntryLength;
 
-		for (ZESize I = 0; I < NumberOfEntries; I++)
+		while (ContinuationCursor != Continuation->Length)
 		{
-			File->Read(&Continuation->Data[I].Length, sizeof(ZEInt32), 1);
-			File->Read(&Continuation->Data[I].NameIndex, sizeof(ZEUInt16), 1);
-			File->Read(&Continuation->Data[I].NameString, Continuation->Data[I].Length - 6, 1);
-		};
+			memcpy(&TempEntryLength, BufferAtNode + ContinuationCursor, sizeof(ZEInt32));
+			memcpy(&TempNameTableEntry, BufferAtNode + ContinuationCursor, TempEntryLength);
+			Continuation->Data.Add(TempNameTableEntry);
+			ContinuationCursor += TempEntryLength;
+		}
 
 		ZEFLTResourceNode* ContinuationNode = ZEFLTResourceNode::CreateInstance();
 		ContinuationNode->SetRecord(Continuation);
@@ -743,18 +699,16 @@ void ReadRecordContinuation(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt1
 	}
 	else
 	{
-
-		File->Seek(ContinuationBase.Length - 4, ZE_SF_CURRENT);
-
+		return;
 	}
 
 };
 
-void ReadRecordVertexPalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordVertexPalette(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordPaletteVertex* VertexPalette = new ZEFLTRecordPaletteVertex();
 
-	File->Read(VertexPalette, CurrentLength, 1);
+	memcpy(VertexPalette, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* VertexPaletteNode = ZEFLTResourceNode::CreateInstance();
 
@@ -762,11 +716,11 @@ void ReadRecordVertexPalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt
 	(*Node)->RegisterAncillary(VertexPaletteNode);
 };
 
-void ReadRecordVertexWithColor(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordVertexWithColor(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordVertexWithColor* VertexWithColor = new ZEFLTRecordVertexWithColor();
 
-	File->Read(VertexWithColor, CurrentLength, 1);
+	memcpy(VertexWithColor, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* VertexWithColorNode = ZEFLTResourceNode::CreateInstance();
 
@@ -774,11 +728,11 @@ void ReadRecordVertexWithColor(ZEFile* File, ZEFLTResourceNode** Node, const ZEI
 	(*Node)->RegisterAncillary(VertexWithColorNode);
 };
 
-void ReadRecordVertexWithColorNormal(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordVertexWithColorNormal(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordVertexWithColorNormal* VertexWithColorNormal = new ZEFLTRecordVertexWithColorNormal();
 
-	File->Read(VertexWithColorNormal, CurrentLength, 1);
+	memcpy(VertexWithColorNormal, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* VertexWithColorNormalNode = ZEFLTResourceNode::CreateInstance();
 
@@ -786,11 +740,11 @@ void ReadRecordVertexWithColorNormal(ZEFile* File, ZEFLTResourceNode** Node, con
 	(*Node)->RegisterAncillary(VertexWithColorNormalNode);
 };
 
-void ReadRecordVertexWithColorUV(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordVertexWithColorUV(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordVertexWithColorUV* VertexWithColorUV = new ZEFLTRecordVertexWithColorUV();
 
-	File->Read(VertexWithColorUV, CurrentLength, 1);
+	memcpy(VertexWithColorUV, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* VertexWithColorUVNode = ZEFLTResourceNode::CreateInstance();
 
@@ -798,11 +752,11 @@ void ReadRecordVertexWithColorUV(ZEFile* File, ZEFLTResourceNode** Node, const Z
 	(*Node)->RegisterAncillary(VertexWithColorUVNode);
 };
 
-void ReadRecordVertexWithColorNormalUV(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordVertexWithColorNormalUV(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordVertexWithColorNormalUV* VertexWithColorNormalUV = new ZEFLTRecordVertexWithColorNormalUV();
 
-	File->Read(VertexWithColorNormalUV, CurrentLength, 1);
+	memcpy(VertexWithColorNormalUV, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* VertexWithColorNormalUVNode = ZEFLTResourceNode::CreateInstance();
 
@@ -810,21 +764,25 @@ void ReadRecordVertexWithColorNormalUV(ZEFile* File, ZEFLTResourceNode** Node, c
 	(*Node)->RegisterAncillary(VertexWithColorNormalUVNode);
 };
 
-void ReadRecordColorPalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordColorPalette(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordPaletteColor* ColorPalette = new ZEFLTRecordPaletteColor();
 
-	File->Read(ColorPalette, sizeof(ZEInt16) + sizeof(ZEUInt16) + 128 * sizeof(char) + 1024 * sizeof(ZEInt32), 1);
+	memcpy(ColorPalette, BufferAtNode, sizeof(ZEInt16) + sizeof(ZEUInt16) + 128 * sizeof(char) + 1024 * sizeof(ZEInt32));
 
 	if (ColorPalette->Length > 4228)
 	{
-		File->Read(&ColorPalette->NumberofColorNames, sizeof(ZEInt32), 1);
+		memcpy(&ColorPalette->NumberofColorNames, BufferAtNode + 4228, sizeof(ZEInt32));
+
 		ColorPalette->ColorNames.SetCount(ColorPalette->NumberofColorNames);
+		ZEUInt32 ColorPaletteCursor = 4228;
+		ZEUInt16 ColorNameLength;
 
 		for (ZESize I = 0; I < ColorPalette->NumberofColorNames; I++)
 		{
-			File->Read(&ColorPalette->ColorNames[I], 4 * sizeof(ZEInt16), 1);
-			File->Read(&ColorPalette->ColorNames[I].ColorName, ColorPalette->ColorNames[I].Length - (4 * sizeof(ZEInt16)), 1);
+			memcpy(&ColorNameLength, BufferAtNode + ColorPaletteCursor, sizeof(ZEInt16));
+			memcpy(&ColorPalette->ColorNames[I], BufferAtNode + ColorPaletteCursor, ColorNameLength);
+			ColorPaletteCursor += ColorNameLength;
 		}
 	}
 	else
@@ -837,17 +795,21 @@ void ReadRecordColorPalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt1
 
 };
 
-void ReadRecordNameTable(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordNameTable(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordNameTable* NameTable = new ZEFLTRecordNameTable();
 
-	File->Read(NameTable, 10, 1);
+	memcpy(NameTable, BufferAtNode, 10);
 
 	NameTable->Names.SetCount(NameTable->NumberOfNames);
+	ZEUInt32 NameTableCursor = 10;
+	ZEUInt16 NameEntryLength;
 
 	for (ZESize I = 0; I < NameTable->NumberOfNames; I++)
 	{
-		File->Read(&NameTable->Names[I], sizeof(ZEFLTRecordNameTableEntry), 1);
+		memcpy(&NameEntryLength, BufferAtNode + NameTableCursor, sizeof(ZEInt32));
+		memcpy(&NameTable->Names[I], BufferAtNode + NameTableCursor, NameEntryLength);
+		NameTableCursor += NameEntryLength;
 	};
 
 	ZEFLTResourceNode* NameTableNode = ZEFLTResourceNode::CreateInstance();
@@ -856,21 +818,21 @@ void ReadRecordNameTable(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& 
 	(*Node)->RegisterAncillary(NameTableNode);
 };
 
-void ReadRecordMaterialPalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordMaterialPalette(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordPaletteMaterial* MaterialPalette = new ZEFLTRecordPaletteMaterial();
 
-	File->Read(MaterialPalette, CurrentLength, 1);
+	memcpy(MaterialPalette, BufferAtNode, NodeLength);
 
 	((ZEFLTResourceNodeHeader*)(*Node))->RegisterStandardMaterial(MaterialPalette);
 
 };
 
-void ReadRecordExtendedMaterialHeader(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtendedMaterialHeader(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtendedMaterialHeader* ExtendedMaterialHeader = new ZEFLTRecordExtendedMaterialHeader();
 
-	File->Read(ExtendedMaterialHeader, CurrentLength, 1);
+	memcpy(ExtendedMaterialHeader, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtendedMaterialHeaderNode = ZEFLTResourceNode::CreateInstance();
 
@@ -878,11 +840,11 @@ void ReadRecordExtendedMaterialHeader(ZEFile* File, ZEFLTResourceNode** Node, co
 	(*Node)->RegisterAncillary(ExtendedMaterialHeaderNode);
 };
 
-void ReadRecordExtendedMaterialAmbient(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtendedMaterialAmbient(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtendedMaterialAmbient* ExtendedMaterialAmbient = new ZEFLTRecordExtendedMaterialAmbient();
 
-	File->Read(ExtendedMaterialAmbient, CurrentLength, 1);
+	memcpy(ExtendedMaterialAmbient, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtendedMaterialAmbientNode = ZEFLTResourceNode::CreateInstance();
 
@@ -890,11 +852,11 @@ void ReadRecordExtendedMaterialAmbient(ZEFile* File, ZEFLTResourceNode** Node, c
 	(*Node)->RegisterAncillary(ExtendedMaterialAmbientNode);
 };
 
-void ReadRecordExtendedMaterialDiffuse(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtendedMaterialDiffuse(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtendedMaterialDiffuse* ExtendedMaterialDiffuse = new ZEFLTRecordExtendedMaterialDiffuse();
 
-	File->Read(ExtendedMaterialDiffuse, CurrentLength, 1);
+	memcpy(ExtendedMaterialDiffuse, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtendedMaterialDiffuseNode = ZEFLTResourceNode::CreateInstance();
 
@@ -902,11 +864,11 @@ void ReadRecordExtendedMaterialDiffuse(ZEFile* File, ZEFLTResourceNode** Node, c
 	(*Node)->RegisterAncillary(ExtendedMaterialDiffuseNode);
 };
 
-void ReadRecordExtendedMaterialSpecular(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtendedMaterialSpecular(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtendedMaterialSpecular* ExtendedMaterialSpecular = new ZEFLTRecordExtendedMaterialSpecular();
 
-	File->Read(ExtendedMaterialSpecular, CurrentLength, 1);
+	memcpy(ExtendedMaterialSpecular, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtendedMaterialSpecularNode = ZEFLTResourceNode::CreateInstance();
 
@@ -914,11 +876,11 @@ void ReadRecordExtendedMaterialSpecular(ZEFile* File, ZEFLTResourceNode** Node, 
 	(*Node)->RegisterAncillary(ExtendedMaterialSpecularNode);
 };
 
-void ReadRecordExtendedMaterialEmissive(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtendedMaterialEmissive(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtendedMaterialEmissive* ExtendedMaterialEmissive = new ZEFLTRecordExtendedMaterialEmissive();
 
-	File->Read(ExtendedMaterialEmissive, CurrentLength, 1);
+	memcpy(ExtendedMaterialEmissive, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtendedMaterialEmissiveNode = ZEFLTResourceNode::CreateInstance();
 
@@ -926,11 +888,11 @@ void ReadRecordExtendedMaterialEmissive(ZEFile* File, ZEFLTResourceNode** Node, 
 	(*Node)->RegisterAncillary(ExtendedMaterialEmissiveNode);
 };
 
-void ReadRecordExtendedMaterialAlpha(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtendedMaterialAlpha(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtendedMaterialAlpha* ExtendedMaterialAlpha = new ZEFLTRecordExtendedMaterialAlpha();
 
-	File->Read(ExtendedMaterialAlpha, CurrentLength, 1);
+	memcpy(ExtendedMaterialAlpha, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtendedMaterialAlphaNode = ZEFLTResourceNode::CreateInstance();
 
@@ -938,11 +900,11 @@ void ReadRecordExtendedMaterialAlpha(ZEFile* File, ZEFLTResourceNode** Node, con
 	(*Node)->RegisterAncillary(ExtendedMaterialAlphaNode);
 };
 
-void ReadRecordExtendedMaterialLightMap(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtendedMaterialLightMap(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtendedMaterialLightMap* ExtendedMaterialLightMap = new ZEFLTRecordExtendedMaterialLightMap();
 
-	File->Read(ExtendedMaterialLightMap, CurrentLength, 1);
+	memcpy(ExtendedMaterialLightMap, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtendedMaterialLightMapNode = ZEFLTResourceNode::CreateInstance();
 
@@ -950,11 +912,11 @@ void ReadRecordExtendedMaterialLightMap(ZEFile* File, ZEFLTResourceNode** Node, 
 	(*Node)->RegisterAncillary(ExtendedMaterialLightMapNode);
 };
 
-void ReadRecordExtendedMaterialNormalMap(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtendedMaterialNormalMap(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtendedMaterialNormalMap* ExtendedMaterialNormalMap = new ZEFLTRecordExtendedMaterialNormalMap();
 
-	File->Read(ExtendedMaterialNormalMap, CurrentLength, 1);
+	memcpy(ExtendedMaterialNormalMap, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtendedMaterialNormalMapNode = ZEFLTResourceNode::CreateInstance();
 
@@ -962,11 +924,11 @@ void ReadRecordExtendedMaterialNormalMap(ZEFile* File, ZEFLTResourceNode** Node,
 	(*Node)->RegisterAncillary(ExtendedMaterialNormalMapNode);
 };
 
-void ReadRecordExtendedMaterialBumpMap(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtendedMaterialBumpMap(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtendedMaterialBumpMap* ExtendedMaterialBumpMap = new ZEFLTRecordExtendedMaterialBumpMap();
 
-	File->Read(ExtendedMaterialBumpMap, CurrentLength, 1);
+	memcpy(ExtendedMaterialBumpMap, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtendedMaterialBumpMapNode = ZEFLTResourceNode::CreateInstance();
 
@@ -974,11 +936,11 @@ void ReadRecordExtendedMaterialBumpMap(ZEFile* File, ZEFLTResourceNode** Node, c
 	(*Node)->RegisterAncillary(ExtendedMaterialBumpMapNode);
 };
 
-void ReadRecordExtendedMaterialShadowMap(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtendedMaterialShadowMap(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtendedMaterialShadowMap* ExtendedMaterialShadowMap = new ZEFLTRecordExtendedMaterialShadowMap();
 
-	File->Read(ExtendedMaterialShadowMap, CurrentLength, 1);
+	memcpy(ExtendedMaterialShadowMap, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtendedMaterialShadowMapNode = ZEFLTResourceNode::CreateInstance();
 
@@ -986,11 +948,11 @@ void ReadRecordExtendedMaterialShadowMap(ZEFile* File, ZEFLTResourceNode** Node,
 	(*Node)->RegisterAncillary(ExtendedMaterialShadowMapNode);
 };
 
-void ReadRecordExtendedMaterialReflectionMap(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordExtendedMaterialReflectionMap(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordExtendedMaterialReflectionMap* ExtendedMaterialReflectionMap = new ZEFLTRecordExtendedMaterialReflectionMap();
 
-	File->Read(ExtendedMaterialReflectionMap, CurrentLength, 1);
+	memcpy(ExtendedMaterialReflectionMap, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* ExtendedMaterialReflectionMapNode = ZEFLTResourceNode::CreateInstance();
 
@@ -998,30 +960,37 @@ void ReadRecordExtendedMaterialReflectionMap(ZEFile* File, ZEFLTResourceNode** N
 	(*Node)->RegisterAncillary(ExtendedMaterialReflectionMapNode);
 };
 
-void ReadRecordTexturePalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordTexturePalette(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordPaletteTexture* TexturePalette = new ZEFLTRecordPaletteTexture();
 
-	File->Read(TexturePalette, CurrentLength, 1);
+	memcpy(TexturePalette, BufferAtNode, NodeLength);
 
 	((ZEFLTResourceNodeHeader*)(*Node))->RegisterTexture(TexturePalette);
 
 };
 
-void ReadRecordEyepointTrackPlanePalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordEyepointTrackPlanePalette(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordPaletteEyePointsAndTrackPlanes* EyePointsAndTrackPlanesPalette = new ZEFLTRecordPaletteEyePointsAndTrackPlanes();
 
-	File->Read(EyePointsAndTrackPlanesPalette, sizeof(ZEFLTRecordBase) + sizeof(ZEInt32), 1);
+	memcpy(EyePointsAndTrackPlanesPalette, BufferAtNode, sizeof(ZEFLTRecordBase) + sizeof(ZEInt32));
 
 	EyePointsAndTrackPlanesPalette->EyePoints.SetCount(10);
 	EyePointsAndTrackPlanesPalette->TrackPlanes.SetCount(10);
+	ZEUInt32 EyeTrackCursor = sizeof(ZEFLTRecordBase) + sizeof(ZEInt32);
 
 	for (ZESize I = 0; I < 10; I++)
-		File->Read(&EyePointsAndTrackPlanesPalette->EyePoints[I], sizeof(ZEFLTRecordEyePoint), 1);
+	{
+		memcpy(&EyePointsAndTrackPlanesPalette->EyePoints[I], BufferAtNode + EyeTrackCursor, sizeof(ZEFLTRecordEyePoint));
+		EyeTrackCursor += sizeof(ZEFLTRecordEyePoint);
+	}
 
 	for (ZESize I = 0; I < 10; I++)
-		File->Read(&EyePointsAndTrackPlanesPalette->TrackPlanes[I], sizeof(ZEFLTRecordTrackPlane), 1);
+	{
+		memcpy(&EyePointsAndTrackPlanesPalette->TrackPlanes[I], BufferAtNode + EyeTrackCursor, sizeof(ZEFLTRecordTrackPlane));
+		EyeTrackCursor += sizeof(ZEFLTRecordTrackPlane);
+	}
 
 	ZEFLTResourceNode* EyePointsAndTrackPlanesPaletteNode = ZEFLTResourceNode::CreateInstance();
 
@@ -1029,13 +998,14 @@ void ReadRecordEyepointTrackPlanePalette(ZEFile* File, ZEFLTResourceNode** Node,
 	(*Node)->RegisterAncillary(EyePointsAndTrackPlanesPaletteNode);
 };
 
-void ReadRecordSoundPalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordSoundPalette(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordBase SoundPaletteBase;
 	ZEBigEndian<ZEInt32> Subtype;
 
-	File->Read(&SoundPaletteBase, sizeof(ZEFLTRecordBase), 1);
-	File->Read(&Subtype, sizeof(ZEInt32), 1);
+	memcpy(&SoundPaletteBase, BufferAtNode, sizeof(ZEFLTRecordBase));
+	memcpy(&Subtype, BufferAtNode + sizeof(ZEFLTRecordBase), sizeof(ZEInt32));
+	ZEUInt32 SoundPaletteCursor = sizeof(ZEFLTRecordBase) + sizeof(ZEInt32);
 
 	ZEFLTResourceNode* SoundPaletteNode = ZEFLTResourceNode::CreateInstance();
 
@@ -1046,15 +1016,22 @@ void ReadRecordSoundPalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt1
 		SoundPaletteHeader->Length = SoundPaletteBase.Length;
 		SoundPaletteHeader->Subtype = Subtype;
 
-		File->Read(&SoundPaletteHeader->MaxNumber, sizeof(ZEInt32), 1);
-		File->Read(&SoundPaletteHeader->ActualNumber, sizeof(ZEInt32), 1);
-		File->Read(&SoundPaletteHeader->TotalLength, sizeof(ZEInt32), 1);
-		File->Read(&SoundPaletteHeader->Reserved, 3 * sizeof(ZEInt32), 1);
+		memcpy(&SoundPaletteHeader->MaxNumber, BufferAtNode + SoundPaletteCursor, sizeof(ZEInt32));
+		SoundPaletteCursor += sizeof(ZEInt32);
+		memcpy(&SoundPaletteHeader->ActualNumber, BufferAtNode + SoundPaletteCursor, sizeof(ZEInt32));
+		SoundPaletteCursor += sizeof(ZEInt32);
+		memcpy(&SoundPaletteHeader->TotalLength, BufferAtNode + SoundPaletteCursor, sizeof(ZEInt32));
+		SoundPaletteCursor += sizeof(ZEInt32);
+		memcpy(&SoundPaletteHeader->Reserved, BufferAtNode + SoundPaletteCursor, 3 * sizeof(ZEInt32));
+		SoundPaletteCursor += 3 * sizeof(ZEInt32);
 
 		SoundPaletteHeader->Indices.SetCount(SoundPaletteHeader->ActualNumber);
 
 		for (ZESize I = 0; I < SoundPaletteHeader->ActualNumber; I++)
-			File->Read(&SoundPaletteHeader->Indices[I], sizeof(ZEFLTRecordPaletteSoundIndex), 1);
+		{
+			memcpy(&SoundPaletteHeader->Indices[I], BufferAtNode + SoundPaletteCursor, sizeof(ZEFLTRecordPaletteSoundIndex));
+			SoundPaletteCursor += sizeof(ZEFLTRecordPaletteSoundIndex);
+		}
 
 		SoundPaletteNode->SetRecord(SoundPaletteHeader);
 	}
@@ -1065,9 +1042,10 @@ void ReadRecordSoundPalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt1
 		SoundPaletteData->Length = SoundPaletteBase.Length;
 		SoundPaletteData->Subtype = Subtype;
 
-		File->Read(&SoundPaletteData->TotalLength, sizeof(ZEInt32), 1);
-		SoundPaletteData->PackedFileNames.SetCount(SoundPaletteData->Length - (sizeof(ZEFLTRecordBase) + 2 * sizeof(ZEInt32)));
-		File->Read(SoundPaletteData->PackedFileNames.GetCArray(), 1, SoundPaletteData->Length - (sizeof(ZEFLTRecordBase) + 2 * sizeof(ZEInt32)));
+		memcpy(&SoundPaletteData->TotalLength, BufferAtNode + SoundPaletteCursor, sizeof(ZEInt32));
+		SoundPaletteCursor += sizeof(ZEInt32);
+		SoundPaletteData->PackedFileNames.SetCount(SoundPaletteData->Length - SoundPaletteCursor);
+		memcpy(SoundPaletteData->PackedFileNames.GetCArray(), BufferAtNode + SoundPaletteCursor, SoundPaletteData->Length - SoundPaletteCursor);
 
 		SoundPaletteNode->SetRecord(SoundPaletteData);
 	}
@@ -1076,11 +1054,11 @@ void ReadRecordSoundPalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt1
 
 };
 
-void ReadRecordLightSourcePalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordLightSourcePalette(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordPaletteLightSource* LightSourcePalette = new ZEFLTRecordPaletteLightSource();
 
-	File->Read(LightSourcePalette, CurrentLength, 1);
+	memcpy(LightSourcePalette, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* LightSourcePaletteNode = ZEFLTResourceNode::CreateInstance();
 
@@ -1088,11 +1066,11 @@ void ReadRecordLightSourcePalette(ZEFile* File, ZEFLTResourceNode** Node, const 
 	(*Node)->RegisterAncillary(LightSourcePaletteNode);
 };
 
-void ReadRecordLightPointAppearancePalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordLightPointAppearancePalette(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordPaletteLightPointAppearance* LightAppearancePalette = new ZEFLTRecordPaletteLightPointAppearance();
 
-	File->Read(LightAppearancePalette, CurrentLength, 1);
+	memcpy(LightAppearancePalette, BufferAtNode, NodeLength);
 
 	ZEFLTResourceNode* LightAppearancePaletteNode = ZEFLTResourceNode::CreateInstance();
 
@@ -1100,16 +1078,20 @@ void ReadRecordLightPointAppearancePalette(ZEFile* File, ZEFLTResourceNode** Nod
 	(*Node)->RegisterAncillary(LightAppearancePaletteNode);
 };
 
-void ReadRecordLightPointAnimationPalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordLightPointAnimationPalette(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordPaletteLightPointAnimation* LightAnimationPalette = new ZEFLTRecordPaletteLightPointAnimation();
 
-	File->Read(LightAnimationPalette, 1340, 1);
+	memcpy(LightAnimationPalette, BufferAtNode, 1340);
 
 	LightAnimationPalette->Sequences.SetCount(LightAnimationPalette->NumberOfSequences);
+	ZEUInt32 LightAnimationPaletteCursor = 1340;
 
 	for (ZESize I = 0; I < LightAnimationPalette->NumberOfSequences; I++)
-		File->Read(&LightAnimationPalette->Sequences[I], sizeof(ZEFLTRecordPaletteLightPointAnimationSequence), 1);
+	{
+		memcpy(&LightAnimationPalette->Sequences[I], BufferAtNode + LightAnimationPaletteCursor, sizeof(ZEFLTRecordPaletteLightPointAnimationSequence));
+		LightAnimationPaletteCursor += sizeof(ZEFLTRecordPaletteLightPointAnimationSequence);
+	}
 
 	ZEFLTResourceNode* LightAnimationPaletteNode = ZEFLTResourceNode::CreateInstance();
 
@@ -1117,35 +1099,40 @@ void ReadRecordLightPointAnimationPalette(ZEFile* File, ZEFLTResourceNode** Node
 	(*Node)->RegisterAncillary(LightAnimationPaletteNode);
 };
 
-void ReadRecordTextureMappingPalette(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordTextureMappingPalette(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 	ZEFLTRecordPaletteTextureMapping* TextureMappingPalette = new ZEFLTRecordPaletteTextureMapping();
 
-	File->Read(TextureMappingPalette, 168, 1);
+	memcpy(TextureMappingPalette, BufferAtNode, 168);
+	ZEUInt32 TextureMappingPaletteCursor = 168;
 
 	if (TextureMappingPalette->Type == 1)
 	{
 		ZEFLTRecordPaletteTextureMapping3PointPut* ThreePointPutParameters = new ZEFLTRecordPaletteTextureMapping3PointPut();
-		File->Read(ThreePointPutParameters, sizeof(ZEFLTRecordPaletteTextureMapping3PointPut), 1);
+		memcpy(ThreePointPutParameters, BufferAtNode + TextureMappingPaletteCursor, sizeof(ZEFLTRecordPaletteTextureMapping3PointPut));
 		TextureMappingPalette->Parameters = ThreePointPutParameters;
+		TextureMappingPaletteCursor += sizeof(ZEFLTRecordPaletteTextureMapping3PointPut);
 	}
 	else if (TextureMappingPalette->Type == 2)
 	{
 		ZEFLTRecordPaletteTextureMapping4PointPut* FourPointPutParameters = new ZEFLTRecordPaletteTextureMapping4PointPut();
-		File->Read(FourPointPutParameters, sizeof(ZEFLTRecordPaletteTextureMapping4PointPut), 1);
+		memcpy(FourPointPutParameters, BufferAtNode + TextureMappingPaletteCursor, sizeof(ZEFLTRecordPaletteTextureMapping4PointPut));
 		TextureMappingPalette->Parameters = FourPointPutParameters;
+		TextureMappingPaletteCursor += sizeof(ZEFLTRecordPaletteTextureMapping4PointPut);
 	}
 	else if (TextureMappingPalette->Type == 4)
 	{
 		ZEFLTRecordPaletteTextureMappingSphericalProject* SphericalParameters = new ZEFLTRecordPaletteTextureMappingSphericalProject();
-		File->Read(SphericalParameters, sizeof(ZEFLTRecordPaletteTextureMappingSphericalProject), 1);
+		memcpy(SphericalParameters, BufferAtNode + TextureMappingPaletteCursor, sizeof(ZEFLTRecordPaletteTextureMappingSphericalProject));
 		TextureMappingPalette->Parameters = SphericalParameters;
+		TextureMappingPaletteCursor += sizeof(ZEFLTRecordPaletteTextureMappingSphericalProject);
 	}
 	else if (TextureMappingPalette->Type == 5)
 	{
 		ZEFLTRecordPaletteTextureMappingRadialProject* RadialParameters = new ZEFLTRecordPaletteTextureMappingRadialProject();
-		File->Read(RadialParameters, sizeof(ZEFLTRecordPaletteTextureMappingRadialProject), 1);
+		memcpy(RadialParameters, BufferAtNode + TextureMappingPaletteCursor, sizeof(ZEFLTRecordPaletteTextureMappingRadialProject));
 		TextureMappingPalette->Parameters = RadialParameters;
+		TextureMappingPaletteCursor += sizeof(ZEFLTRecordPaletteTextureMappingRadialProject);
 	}
 	else
 	{
@@ -1155,7 +1142,7 @@ void ReadRecordTextureMappingPalette(ZEFile* File, ZEFLTResourceNode** Node, con
 	if (TextureMappingPalette->WarpedFlag == 1)
 	{
 		ZEFLTRecordPaletteTextureMappingWarped* WarpedParameters = new ZEFLTRecordPaletteTextureMappingWarped();
-		File->Read(WarpedParameters, sizeof(ZEFLTRecordPaletteTextureMappingWarped), 1);
+		memcpy(WarpedParameters, BufferAtNode + TextureMappingPaletteCursor, sizeof(ZEFLTRecordPaletteTextureMappingWarped));
 		TextureMappingPalette->WarpedParameters = WarpedParameters;
 	}
 	else
@@ -1169,10 +1156,8 @@ void ReadRecordTextureMappingPalette(ZEFile* File, ZEFLTResourceNode** Node, con
 	(*Node)->RegisterAncillary(TextureMappingNode);
 };
 
-void ReadRecordPushLevel(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordPushLevel(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
-	File->Seek(sizeof(ZEFLTRecordBase), ZE_SF_CURRENT);
-
 	ZEFLTResourceNode* Child = ZEFLTResourceNode::CreateInstance();
 
 	(*Node)->RegisterChild(Child);
@@ -1180,49 +1165,47 @@ void ReadRecordPushLevel(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& 
 	*Node = Child;
 };
 
-void ReadRecordPopLevel(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordPopLevel(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
-	File->Seek(sizeof(ZEFLTRecordBase), ZE_SF_CURRENT);
-
 	*Node = (*Node)->GetParent();
 };
 
-void ReadRecordPushSubface(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordPushSubface(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 
 };
 
-void ReadRecordPopSubface(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordPopSubface(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 
 };
 
-void ReadRecordPushExtension(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordPushExtension(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 
 };
 
-void ReadRecordPopExtension(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordPopExtension(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 
 };
 
-void ReadRecordInstanceReference(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordInstanceReference(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 
 };
 
-void ReadRecordInstanceDefinition(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordInstanceDefinition(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 
 };
 
-void ReadRecordPushAttribute(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordPushAttribute(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 
 };
 
-void ReadRecordPopAttribute(ZEFile* File, ZEFLTResourceNode** Node, const ZEInt16& PreviousOpCode, const ZEUInt16& PreviousLength, const ZEInt16& CurrentOpCode, const ZEUInt16& CurrentLength)
+void ReadRecordPopAttribute(char* BufferAtNode, ZEFLTResourceNode** Node, const ZEInt16& PreceedingOpCode, const ZEUInt16& NodeLength)
 {
 
 };
