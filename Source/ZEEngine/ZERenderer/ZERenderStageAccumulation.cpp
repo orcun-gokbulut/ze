@@ -166,8 +166,11 @@ void ZERenderStageAccumulation::UpdateBuffers()
 		ZE_DESTROY(Textures.Accumulation);
 
 		Textures.Accumulation = ZETexture2D::CreateInstance();
+		Textures.Accumulation->SetDebugName("ABufferTexture");
 		Textures.Accumulation->CreateStatic(Width, Height, 1, ZE_TPF_F16_4, true, NULL);
+		
 		RenderTargets.Accumulation = Textures.Accumulation->CreateRenderTarget(0);
+		RenderTargets.Accumulation->SetDebugName("ABufferRT");
 	}
 }
 

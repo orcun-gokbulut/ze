@@ -74,6 +74,22 @@ ZEDepthStencilPixelFormat ZEDepthStencilBuffer::GetPixelFormat() const
 	return PixelFormat;
 }
 
+void ZEDepthStencilBuffer::SetDebugName(const char* String)
+{
+#ifdef ZE_DEBUG_ENABLE
+	DebugName = String;
+#endif
+}
+
+const char* ZEDepthStencilBuffer::GetDebugName() const
+{
+#ifdef ZE_DEBUG_ENABLE
+	return DebugName.ToCString();
+#else
+	return NULL;
+#endif
+}
+
 void ZEDepthStencilBuffer::Destroy()
 {
 	delete this;

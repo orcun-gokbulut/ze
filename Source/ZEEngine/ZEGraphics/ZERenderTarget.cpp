@@ -66,6 +66,22 @@ ZERenderTargetType ZERenderTarget::GetRenderTargetType() const
 	return RenderTargetType;
 }
 
+void ZERenderTarget::SetDebugName(const char* String)
+{
+#ifdef ZE_DEBUG_ENABLE
+	DebugName = String;
+#endif
+}
+
+const char* ZERenderTarget::GetDebugName() const
+{
+#ifdef ZE_DEBUG_ENABLE
+	return DebugName.ToCString();
+#else
+	return NULL;
+#endif
+}
+
 void ZERenderTarget::Destroy()
 {
 	delete this;

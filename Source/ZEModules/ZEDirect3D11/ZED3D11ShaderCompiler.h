@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthStencilBuffer.h
+ Zinek Engine - ZED3D11ShaderCompiler.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEPTH_STENCIL_BUFFER_H__ 
-#define __ZE_DEPTH_STENCIL_BUFFER_H__
+#pragma once
+#ifndef __ZE_D3D11_SHADER_COMPILER_H__
+#define __ZE_D3D11_SHADER_COMPILER_H__
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
+#include <d3d11.h>
 
-enum ZEDepthStencilPixelFormat
+#include "ZED3D11ComponentBase.h"
+#include "ZEGraphics/ZEShaderCompiler.h"
+
+class ZEShader;
+class ZED3D11Shader;
+class ZED3D11PixelShader;
+class ZED3D11VertexShader;
+class ZED3D11GeometryShader;
+
+class ZED3D11ShaderCompiler : public ZEShaderCompiler, public ZED3D11ComponentBase
 {
-	ZE_DSPF_NOTSET				= 0,
-	ZE_DSPF_DEPTH16				= 1,	// 16 bit unsigned normalized depth values
-	ZE_DSPF_DEPTH24_STENCIL8	= 2,	// 24 bit unsigned normalized depth values + 8 bit unsigned int stencil values
-	ZE_DSPF_DEPTHD32_FLOAT		= 3,	// 32 bit float depth values
-};
-
-class ZEDepthStencilBuffer
-{
-	friend class ZEGraphicsModule;
-	friend class ZEGraphicsDevice;
+	friend class ZED3D11GraphicsModule;
 
 	protected:
-		static ZESize					TotalSize;
-		static ZEUInt16					TotalCount;
+		ZED3D11VertexShader*		CreateVertexShader(ID3DBlob* ByteCode);
+		ZED3D11GeometryShader*		CreateGeometryShader(ID3DBlob* ByteCode);
+		ZED3D11DomainShader*		CreateDomainShader(ID3DBlob* ByteCode);
+		ZED3D11HullShader*			CreateHullShader(ID3DBlob* ByteCode);
+		ZED3D11PixelShader*			CreatePixelShader(ID3DBlob* ByteCode);
+		ZED3D11ComputeShader*		CreateComputeShader(ID3DBlob* ByteCode);
 
-#ifdef ZE_DEBUG_ENABLE
-		ZEString						DebugName;
-#endif
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEDepthStencilPixelFormat		PixelFormat;
+		bool						CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* ByteCode);
 
-										ZEDepthStencilBuffer();
-		virtual							~ZEDepthStencilBuffer();
+		ZEShader*					CompileShader(ZEShaderCompileOptions* Options);
 
-	public:
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEDepthStencilPixelFormat		GetPixelFormat() const;
-
-		void							SetDebugName(const char* String);
-		const char*						GetDebugName() const;
-
-		virtual bool					IsEmpty() const = 0;
-		
-		virtual void					Destroy();
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
-
-		static ZEDepthStencilBuffer*	CreateInstance();
+									ZED3D11ShaderCompiler();
+		virtual						~ZED3D11ShaderCompiler();
 };
 
 #endif

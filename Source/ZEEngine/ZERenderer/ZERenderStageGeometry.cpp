@@ -57,7 +57,10 @@ void ZERenderStageGeometry::UpdateBuffers()
 
 		Textures.Depth = ZETexture2D::CreateInstance();
 		Textures.Depth->CreateStatic(Width, Height, 1, ZE_TPF_F32, true, NULL);
+		Textures.Depth->SetDebugName("GBufferDepthTexture");
+
 		RenderTargets.Depth = Textures.Depth->CreateRenderTarget(0);
+		RenderTargets.Depth->SetDebugName("GBufferDepthRT");
 	}
 	
 	Texture = Textures.NormalSpecular;
@@ -68,7 +71,10 @@ void ZERenderStageGeometry::UpdateBuffers()
 
 		Textures.NormalSpecular = ZETexture2D::CreateInstance();
 		Textures.NormalSpecular->CreateStatic(Width, Height, 1, ZE_TPF_F16_4, true, NULL);
+		Textures.NormalSpecular->SetDebugName("GBufferNormalSpecularTexture");
+
 		RenderTargets.NormalSpecular = Textures.NormalSpecular->CreateRenderTarget(0);
+		RenderTargets.NormalSpecular->SetDebugName("GBufferNormalSpecularRT");
 	}
 
 	Texture = Textures.SSScatteringVelocity;
@@ -79,7 +85,10 @@ void ZERenderStageGeometry::UpdateBuffers()
 
 		Textures.SSScatteringVelocity = ZETexture2D::CreateInstance();
 		Textures.SSScatteringVelocity->CreateStatic(Width, Height, 1, ZE_TPF_I8_4, true, NULL);
+		Textures.SSScatteringVelocity->SetDebugName("GBufferSSSVelovityTexture");
+
 		RenderTargets.SSScatteringVelocity = Textures.SSScatteringVelocity->CreateRenderTarget(0);
+		RenderTargets.SSScatteringVelocity->SetDebugName("GBufferSSSVelovityRT");
 	}
 }
 
@@ -220,7 +229,7 @@ bool ZERenderStageGeometry::Setup()
 {
 	if (!ZERenderStage::Setup())
 		return false;
-
+	
 	UpdateBuffers();
 
 	ZEGraphicsDevice* Device = zeGraphics->GetDevice();

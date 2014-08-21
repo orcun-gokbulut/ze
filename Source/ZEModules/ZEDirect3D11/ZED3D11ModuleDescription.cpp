@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthStencilBuffer.h
+ Zinek Engine - ZED3D11ModuleDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEPTH_STENCIL_BUFFER_H__ 
-#define __ZE_DEPTH_STENCIL_BUFFER_H__
+#include "ZED3D10ModuleDescription.h"
+#include "ZED3D10GraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZECore/ZEModuleDescription.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
-
-enum ZEDepthStencilPixelFormat
+ZEModuleDescription* ZED3D10ModuleDescription::GetBaseModuleDescription()
 {
-	ZE_DSPF_NOTSET				= 0,
-	ZE_DSPF_DEPTH16				= 1,	// 16 bit unsigned normalized depth values
-	ZE_DSPF_DEPTH24_STENCIL8	= 2,	// 24 bit unsigned normalized depth values + 8 bit unsigned int stencil values
-	ZE_DSPF_DEPTHD32_FLOAT		= 3,	// 32 bit float depth values
-};
+	return NULL; //ZEGraphicsModule::ModuleDescription();
+}
 
-class ZEDepthStencilBuffer
+ZEModuleAttribute ZED3D10ModuleDescription::GetAttributes()
 {
-	friend class ZEGraphicsModule;
-	friend class ZEGraphicsDevice;
+	return ZE_MA_DEBUG;
+}
 
-	protected:
-		static ZESize					TotalSize;
-		static ZEUInt16					TotalCount;
+int ZED3D10ModuleDescription::GetRequiredZinekEngineVersion()
+{
+	return 0;
+}
 
-#ifdef ZE_DEBUG_ENABLE
-		ZEString						DebugName;
-#endif
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEDepthStencilPixelFormat		PixelFormat;
+int ZED3D10ModuleDescription::GetMajorVersion()
+{
+	return 0;
+}
 
-										ZEDepthStencilBuffer();
-		virtual							~ZEDepthStencilBuffer();
+int ZED3D10ModuleDescription::GetMinorVersion()
+{
+	return 9;
+}
 
-	public:
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEDepthStencilPixelFormat		GetPixelFormat() const;
+const char* ZED3D10ModuleDescription::GetCopyright()
+{
+	return "Copyright (C) 2008, Zinek Engine Group.";
+}
 
-		void							SetDebugName(const char* String);
-		const char*						GetDebugName() const;
+const char* ZED3D10ModuleDescription::GetName()
+{
+	return "Direct3D10GraphicsModule";
+}
 
-		virtual bool					IsEmpty() const = 0;
-		
-		virtual void					Destroy();
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
+ZEOptionSection* ZED3D10ModuleDescription::GetOptions()
+{
+	return NULL;
+}
 
-		static ZEDepthStencilBuffer*	CreateInstance();
-};
+ZEModule* ZED3D10ModuleDescription::CreateModuleInstance()
+{
+	return new ZED3D10GraphicsModule();
+}
 
-#endif
+bool ZED3D10ModuleDescription::CheckCompatible()
+{
+	return true;
+}

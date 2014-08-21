@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthStencilBuffer.h
+ Zinek Engine - ZED3D11RenderTarget.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,36 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEPTH_STENCIL_BUFFER_H__ 
-#define __ZE_DEPTH_STENCIL_BUFFER_H__
+#ifndef __ZE_D3D11_RENDER_TARGET_H__
+#define __ZE_D3D11_RENDER_TARGET_H__
+
+#include <d3d11.h>
 
 #include "ZETypes.h"
-#include "ZEDS/ZEString.h"
+#include "ZED3D11ComponentBase.h"
+#include "ZEGraphics/ZERenderTarget.h"
 
-enum ZEDepthStencilPixelFormat
-{
-	ZE_DSPF_NOTSET				= 0,
-	ZE_DSPF_DEPTH16				= 1,	// 16 bit unsigned normalized depth values
-	ZE_DSPF_DEPTH24_STENCIL8	= 2,	// 24 bit unsigned normalized depth values + 8 bit unsigned int stencil values
-	ZE_DSPF_DEPTHD32_FLOAT		= 3,	// 32 bit float depth values
-};
+struct ID3D11RenderTargetView;
 
-class ZEDepthStencilBuffer
+class ZED3D11RenderTarget : public ZERenderTarget, public ZED3D11ComponentBase
 {
-	friend class ZEGraphicsModule;
-	friend class ZEGraphicsDevice;
+	friend class ZED3D11Texture2D;
+	friend class ZED3D11Texture3D;
+	friend class ZED3D11TextureCube;
+	friend class ZED3D11GraphicsModule;
+	friend class ZED3D11GraphicsDevice;
+	friend class ZED3D11GraphicsWindow;
 
 	protected:
-		static ZESize					TotalSize;
-		static ZEUInt16					TotalCount;
+		ID3D11RenderTargetView*			D3D10RenderTargetView;
 
-#ifdef ZE_DEBUG_ENABLE
-		ZEString						DebugName;
-#endif
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEDepthStencilPixelFormat		PixelFormat;
-
-										ZEDepthStencilBuffer();
-		virtual							~ZEDepthStencilBuffer();
-
+										ZED3D11RenderTarget(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType, ID3D11RenderTargetView* RenderTargtetView);
+		virtual							~ZED3D11RenderTarget();
+	
 	public:
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEDepthStencilPixelFormat		GetPixelFormat() const;
-
-		void							SetDebugName(const char* String);
-		const char*						GetDebugName() const;
-
-		virtual bool					IsEmpty() const = 0;
+		const ID3D11RenderTargetView*	GetD3D10RenderTargetView() const;
 		
-		virtual void					Destroy();
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
-
-		static ZEDepthStencilBuffer*	CreateInstance();
+		virtual bool					IsEmpty() const;
 };
 
 #endif

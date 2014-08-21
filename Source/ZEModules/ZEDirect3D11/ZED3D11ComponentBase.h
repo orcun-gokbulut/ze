@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthStencilBuffer.h
+ Zinek Engine - ZED3D11ComponentBase.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEPTH_STENCIL_BUFFER_H__ 
-#define __ZE_DEPTH_STENCIL_BUFFER_H__
+#pragma once
+#ifndef	__ZE_D3D11_COMPONENT_BASE_H_
+#define __ZE_D3D11_COMPONENT_BASE_H_
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
+#include <d3d11.h>
 
-enum ZEDepthStencilPixelFormat
+#include "ZEDS/ZEArray.h"
+
+class ZED3D11GraphicsModule;
+
+class ZED3D11ComponentBase
 {
-	ZE_DSPF_NOTSET				= 0,
-	ZE_DSPF_DEPTH16				= 1,	// 16 bit unsigned normalized depth values
-	ZE_DSPF_DEPTH24_STENCIL8	= 2,	// 24 bit unsigned normalized depth values + 8 bit unsigned int stencil values
-	ZE_DSPF_DEPTHD32_FLOAT		= 3,	// 32 bit float depth values
-};
-
-class ZEDepthStencilBuffer
-{
-	friend class ZEGraphicsModule;
-	friend class ZEGraphicsDevice;
-
 	protected:
-		static ZESize					TotalSize;
-		static ZEUInt16					TotalCount;
-
-#ifdef ZE_DEBUG_ENABLE
-		ZEString						DebugName;
-#endif
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEDepthStencilPixelFormat		PixelFormat;
-
-										ZEDepthStencilBuffer();
-		virtual							~ZEDepthStencilBuffer();
-
-	public:
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEDepthStencilPixelFormat		GetPixelFormat() const;
-
-		void							SetDebugName(const char* String);
-		const char*						GetDebugName() const;
-
-		virtual bool					IsEmpty() const = 0;
+		static ZED3D11GraphicsModule*			GraphicsModule;
 		
-		virtual void					Destroy();
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
+		static ZEArray<ID3D11Device*>			D3DDevices;
+		static ZEArray<ID3D11DeviceContext*>	D3DContexes;
+		
+		
+	public:
+		static bool								BaseInitialize(ZED3D11GraphicsModule* Module);
 
-		static ZEDepthStencilBuffer*	CreateInstance();
 };
 
 #endif

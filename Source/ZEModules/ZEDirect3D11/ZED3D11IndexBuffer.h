@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthStencilBuffer.h
+ Zinek Engine - ZED3D11IndexBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,33 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEPTH_STENCIL_BUFFER_H__ 
-#define __ZE_DEPTH_STENCIL_BUFFER_H__
+#ifndef __ZE_D3D11_INDEX_BUFFER_H__
+#define __ZE_D3D11_INDEX_BUFFER_H__
+
+#include <d3d11.h>
 
 #include "ZETypes.h"
-#include "ZEDS/ZEString.h"
+#include "ZED3D11ComponentBase.h"
+#include "ZEGraphics/ZEIndexBuffer.h"
 
-enum ZEDepthStencilPixelFormat
+class ZED3D11IndexBuffer : public ZEIndexBuffer, public ZED3D11ComponentBase
 {
-	ZE_DSPF_NOTSET				= 0,
-	ZE_DSPF_DEPTH16				= 1,	// 16 bit unsigned normalized depth values
-	ZE_DSPF_DEPTH24_STENCIL8	= 2,	// 24 bit unsigned normalized depth values + 8 bit unsigned int stencil values
-	ZE_DSPF_DEPTHD32_FLOAT		= 3,	// 32 bit float depth values
-};
+	friend class ZED3D11GraphicsDevice;
+	friend class ZED3D11GraphicsModule;
+	
+	protected:	
+		ID3D11Buffer*			D3D10Buffer;
 
-class ZEDepthStencilBuffer
-{
-	friend class ZEGraphicsModule;
-	friend class ZEGraphicsDevice;
+		bool					UpdateWith(ZEUInt ShadowIndex);
 
-	protected:
-		static ZESize					TotalSize;
-		static ZEUInt16					TotalCount;
-
-#ifdef ZE_DEBUG_ENABLE
-		ZEString						DebugName;
-#endif
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEDepthStencilPixelFormat		PixelFormat;
-
-										ZEDepthStencilBuffer();
-		virtual							~ZEDepthStencilBuffer();
+								ZED3D11IndexBuffer();
+								~ZED3D11IndexBuffer();
 
 	public:
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEDepthStencilPixelFormat		GetPixelFormat() const;
+		const ID3D11Buffer*		GetD3D10Buffer() const;
 
-		void							SetDebugName(const char* String);
-		const char*						GetDebugName() const;
-
-		virtual bool					IsEmpty() const = 0;
-		
-		virtual void					Destroy();
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
-
-		static ZEDepthStencilBuffer*	CreateInstance();
+		bool					CreateDynamic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData = NULL);
+		bool					CreateStatic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData);
 };
 
 #endif

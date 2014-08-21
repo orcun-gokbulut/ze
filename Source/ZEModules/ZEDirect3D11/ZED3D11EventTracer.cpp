@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthStencilBuffer.h
+ Zinek Engine - ZED3D11EventTracer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,54 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEPTH_STENCIL_BUFFER_H__ 
-#define __ZE_DEPTH_STENCIL_BUFFER_H__
+#include <d3d9.h>
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
+#include "ZEError.h"
+#include "ZED3D11EventTracer.h"
+#include "ZED3D11GraphicsModule.h"
 
-enum ZEDepthStencilPixelFormat
+void ZED3D11EventTracer::SetTracingEnabled(bool Enabled)
 {
-	ZE_DSPF_NOTSET				= 0,
-	ZE_DSPF_DEPTH16				= 1,	// 16 bit unsigned normalized depth values
-	ZE_DSPF_DEPTH24_STENCIL8	= 2,	// 24 bit unsigned normalized depth values + 8 bit unsigned int stencil values
-	ZE_DSPF_DEPTHD32_FLOAT		= 3,	// 32 bit float depth values
-};
+	if (Enabled)
+	{
+		D3DPERF_SetOptions(0);
+	}
+	else
+	{
+		D3DPERF_SetOptions(1);
+	}
+	
+	TracingEnabled = Enabled;
+}
 
-class ZEDepthStencilBuffer
+void ZED3D11EventTracer::Mark(const char* MakerName)
 {
-	friend class ZEGraphicsModule;
-	friend class ZEGraphicsDevice;
+	wchar_t Temp[150];
+	mbstowcs(Temp, MakerName, 150);
+	D3DPERF_SetMarker(0x00, Temp);
+}
 
-	protected:
-		static ZESize					TotalSize;
-		static ZEUInt16					TotalCount;
+void ZED3D11EventTracer::StartEvent(const char* EventName)
+{
+	wchar_t Temp[150];
+	mbstowcs(Temp, EventName, 150);
+	D3DPERF_BeginEvent(0x00, Temp);
+	EventCount++;
+}
 
-#ifdef ZE_DEBUG_ENABLE
-		ZEString						DebugName;
-#endif
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEDepthStencilPixelFormat		PixelFormat;
+void ZED3D11EventTracer::EndEvent()
+{
+	zeDebugCheck(EventCount == 0, "No started event available.");
+	D3DPERF_EndEvent();
+	EventCount--;
+}
 
-										ZEDepthStencilBuffer();
-		virtual							~ZEDepthStencilBuffer();
+ZED3D11EventTracer::ZED3D11EventTracer()
+{
+	EventCount = 0;
+}
 
-	public:
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEDepthStencilPixelFormat		GetPixelFormat() const;
+ZED3D11EventTracer::~ZED3D11EventTracer()
+{
 
-		void							SetDebugName(const char* String);
-		const char*						GetDebugName() const;
-
-		virtual bool					IsEmpty() const = 0;
-		
-		virtual void					Destroy();
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
-
-		static ZEDepthStencilBuffer*	CreateInstance();
-};
-
-#endif
+}

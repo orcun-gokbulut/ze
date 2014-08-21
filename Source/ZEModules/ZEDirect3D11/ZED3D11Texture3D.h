@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthStencilBuffer.h
+ Zinek Engine - ZED3D11Texture3D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEPTH_STENCIL_BUFFER_H__ 
-#define __ZE_DEPTH_STENCIL_BUFFER_H__
+#ifndef __ZE_D3D11_TEXTURE_3D_H__
+#define __ZE_D3D11_TEXTURE_3D_H__
+
+#include <d3d11.h>
 
 #include "ZETypes.h"
-#include "ZEDS/ZEString.h"
+#include "ZEGraphics/ZETexture3D.h"
+#include "ZED3D11ComponentBase.h"
+#include "ZED3D11RenderTarget.h"
 
-enum ZEDepthStencilPixelFormat
+class ZETextureData;
+class ZERenderTarget;
+
+class ZED3D11Texture3D : public ZETexture3D, public ZED3D11ComponentBase
 {
-	ZE_DSPF_NOTSET				= 0,
-	ZE_DSPF_DEPTH16				= 1,	// 16 bit unsigned normalized depth values
-	ZE_DSPF_DEPTH24_STENCIL8	= 2,	// 24 bit unsigned normalized depth values + 8 bit unsigned int stencil values
-	ZE_DSPF_DEPTHD32_FLOAT		= 3,	// 32 bit float depth values
-};
+	friend class ZED3D11GraphicsModule;
+	friend class ZED3D11GraphicsDevice;
 
-class ZEDepthStencilBuffer
-{
-	friend class ZEGraphicsModule;
-	friend class ZEGraphicsDevice;
+	private:
+		ID3D11Texture3D*					D3D10Texture3D;
+		ID3D11ShaderResourceView*			D3D10ShaderResourceView;
 
-	protected:
-		static ZESize					TotalSize;
-		static ZEUInt16					TotalCount;
+		bool								UpdateWith(ZEUInt ShadowIndex);
 
-#ifdef ZE_DEBUG_ENABLE
-		ZEString						DebugName;
-#endif
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEDepthStencilPixelFormat		PixelFormat;
-
-										ZEDepthStencilBuffer();
-		virtual							~ZEDepthStencilBuffer();
+											ZED3D11Texture3D();
+		virtual								~ZED3D11Texture3D();
 
 	public:
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEDepthStencilPixelFormat		GetPixelFormat() const;
-
-		void							SetDebugName(const char* String);
-		const char*						GetDebugName() const;
-
-		virtual bool					IsEmpty() const = 0;
+		const ID3D11Texture3D*				GetD3D10Texture() const;
+		const ID3D11ShaderResourceView*		GetD3D10ResourceView() const;
 		
-		virtual void					Destroy();
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
+		bool								CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZETextureData* Data = NULL);
+		bool								CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
 
-		static ZEDepthStencilBuffer*	CreateInstance();
+		ZERenderTarget*						CreateRenderTarget(ZEUInt MipLevel = 0) const;
 };
 
 #endif
