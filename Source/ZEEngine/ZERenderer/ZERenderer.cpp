@@ -311,7 +311,7 @@ bool ZERenderer::PostRender()
 bool ZERenderer::Render(float ElaspedTime)
 {
 	ZEGraphicsEventTracer* Tracer = ZEGraphicsEventTracer::GetInstance();
-	
+
 	//zeLog("<=====================Shadow Stage===========================>");
 
 	Tracer->StartEvent("Shadow Stage");

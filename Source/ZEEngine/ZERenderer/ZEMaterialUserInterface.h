@@ -46,8 +46,6 @@ class ZEConstantBuffer;
 
 class ZEMaterialUserInterface : public ZEMaterial
 {
-	friend class ZED3D10GraphicsModule;
-
 	protected:
 		static ZEShader*		VertexShader;
 		static ZEShader*		PixelShader;

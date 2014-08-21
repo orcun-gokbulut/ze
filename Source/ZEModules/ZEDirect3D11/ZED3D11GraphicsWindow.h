@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthStencilBuffer.h
+ Zinek Engine - ZED3D11GraphicsWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,55 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEPTH_STENCIL_BUFFER_H__ 
-#define __ZE_DEPTH_STENCIL_BUFFER_H__
+#ifndef	__ZE_D3D11_GRAPHICS_WINDOW_H__
+#define __ZE_D3D11_GRAPHICS_WINDOW_H__
+
+#include <dxgi1_2.h>
+#include <d3d11.h>
 
 #include "ZETypes.h"
-#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEGraphics/ZEGraphicsWindow.h"
 
-enum ZEDepthStencilPixelFormat
-{
-	ZE_DSPF_NOTSET				= 0,
-	ZE_DSPF_DEPTH16				= 1,	// 16 bit unsigned normalized depth values
-	ZE_DSPF_DEPTH24_STENCIL8	= 2,	// 24 bit unsigned normalized depth values + 8 bit unsigned int stencil values
-	ZE_DSPF_DEPTHD32_FLOAT		= 3,	// 32 bit float depth values
-};
+class ZED3D11Texture2D;
+class ZED3D11RenderTarget;
+class ZED3D11DepthStencilBuffer;
 
-class ZEDepthStencilBuffer
+class ZED3D11GraphicsWindow : public ZEGraphicsWindow
 {
-	friend class ZEGraphicsModule;
-	friend class ZEGraphicsDevice;
+	friend class ZED3D11GraphicsModule;
 
 	protected:
-		static ZESize					TotalSize;
-		static ZEUInt16					TotalCount;
+		IDXGISwapChain1*					SwapChain;
+		
+		ZED3D11DepthStencilBuffer*			DepthBuffer;
+		ZED3D11RenderTarget*				BackBuffer;
+		ZED3D11Texture2D*					BackBufferTexture;
 
-#ifdef ZE_DEBUG_ENABLE
-		ZEString						DebugName;
-#endif
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEDepthStencilPixelFormat		PixelFormat;
+		void								ReleaseSwapChain();
+		bool								CreateSwapChain();
 
-										ZEDepthStencilBuffer();
-		virtual							~ZEDepthStencilBuffer();
+		void								ReleaseBackBuffer();
+		bool								CreateBackBuffer();
+
+		bool								ManageFlagCreated();
+		bool								ManageFlagDestroyed();
+		bool								ManageFlagResized();
+		bool								ManageFlagWindowed();
+		bool								ManageFlagFullScreen();
+
+											ZED3D11GraphicsWindow();
+		virtual								~ZED3D11GraphicsWindow();
 
 	public:
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEDepthStencilPixelFormat		GetPixelFormat() const;
+		IDXGISwapChain1*					GetDXGISwapChain() const;
 
-		void							SetDebugName(const char* String);
-		const char*						GetDebugName() const;
+		virtual bool						Update();
+		virtual bool						Present();
 
-		virtual bool					IsEmpty() const = 0;
-		
-		virtual void					Destroy();
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
-
-		static ZEDepthStencilBuffer*	CreateInstance();
+		virtual const ZETexture2D*			GetBackBufferTexture();
+		virtual const ZERenderTarget*		GetBackBuffer();
+		virtual const ZEDepthStencilBuffer*	GetDepthBuffer();
 };
 
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthStencilBuffer.h
+ Zinek Engine - ZED3D11GraphicsMonitor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,70 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEPTH_STENCIL_BUFFER_H__ 
-#define __ZE_DEPTH_STENCIL_BUFFER_H__
+#include "ZEError.h"
+#include "ZED3D11GraphicsMonitor.h"
+#include "ZED3D11GraphicsModule.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
-
-enum ZEDepthStencilPixelFormat
+ZED3D11GraphicsMonitor::ZED3D11GraphicsMonitor(IDXGIOutput1* Output, IDXGIAdapter2* OwnerAdapter)
 {
-	ZE_DSPF_NOTSET				= 0,
-	ZE_DSPF_DEPTH16				= 1,	// 16 bit unsigned normalized depth values
-	ZE_DSPF_DEPTH24_STENCIL8	= 2,	// 24 bit unsigned normalized depth values + 8 bit unsigned int stencil values
-	ZE_DSPF_DEPTHD32_FLOAT		= 3,	// 32 bit float depth values
-};
+	HRESULT Result = S_FALSE;
+	DXGI_OUTPUT_DESC Descriptor = {0};
+	
+	Result = Output->GetDesc(&Descriptor);
+	if (FAILED(Result))
+	{
+		zeCriticalError("Cannot get monitor info.");
+		return;
+	}
+	
+	DXGI_FORMAT Format = ((ZED3D11GraphicsModule*)zeGraphics)->GetDXGIDisplayFormat();
 
-class ZEDepthStencilBuffer
+	ZEUInt DisplayModeCount = 0;
+	ZEUInt DisplayModeFlags = DXGI_ENUM_MODES_INTERLACED | DXGI_ENUM_MODES_SCALING;
+	Result = Output->GetDisplayModeList1(Format, DisplayModeFlags, &DisplayModeCount, NULL);
+	if(FAILED(Result))
+	{
+		zeCriticalError("Cannot get display mode count. Error: %d", Result);
+		return;
+	}
+
+	// Get display modes
+	DXGIModes.SetCount(DisplayModeCount);
+	Result = Output->GetDisplayModeList1(Format, DisplayModeFlags, &DisplayModeCount, DXGIModes.GetCArray());
+	if(FAILED(Result))
+	{
+		zeCriticalError("Cannot get display modes. Error: %d", Result);
+		return;
+	}
+
+	Area.LeftUp.x = (float)Descriptor.DesktopCoordinates.left;
+	Area.LeftUp.y = (float)Descriptor.DesktopCoordinates.top;
+	Area.RightDown.x = (float)Descriptor.DesktopCoordinates.right;
+	Area.RightDown.y = (float)Descriptor.DesktopCoordinates.bottom;
+
+	Name = ZEString::FromWCString(Descriptor.DeviceName);
+
+	Handle = Descriptor.Monitor;
+	DXGIAdapter = OwnerAdapter;
+	DXGIOutput = Output;
+}
+
+ZED3D11GraphicsMonitor::~ZED3D11GraphicsMonitor()
 {
-	friend class ZEGraphicsModule;
-	friend class ZEGraphicsDevice;
+	
+}
 
-	protected:
-		static ZESize					TotalSize;
-		static ZEUInt16					TotalCount;
+IDXGIAdapter2* ZED3D11GraphicsMonitor::GetDXGIAdapter() const
+{
+	return DXGIAdapter;
+}
 
-#ifdef ZE_DEBUG_ENABLE
-		ZEString						DebugName;
-#endif
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEDepthStencilPixelFormat		PixelFormat;
+IDXGIOutput1* ZED3D11GraphicsMonitor::GetDXGIOutput() const
+{
+	return DXGIOutput;
+}
 
-										ZEDepthStencilBuffer();
-		virtual							~ZEDepthStencilBuffer();
-
-	public:
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEDepthStencilPixelFormat		GetPixelFormat() const;
-
-		void							SetDebugName(const char* String);
-		const char*						GetDebugName() const;
-
-		virtual bool					IsEmpty() const = 0;
-		
-		virtual void					Destroy();
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
-
-		static ZEDepthStencilBuffer*	CreateInstance();
-};
-
-#endif
+const ZEArray<DXGI_MODE_DESC1>& ZED3D11GraphicsMonitor::GetDXGIModes() const
+{
+	return DXGIModes;
+}

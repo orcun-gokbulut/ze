@@ -84,7 +84,7 @@ inline static float GetSizePerPixel(ZETexturePixelFormat PixelFormat)
 	return Size;
 }
 
-static ZESize CalculateTexture2DSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat)
+ZESize ZETexture2D::CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat)
 {
 	float TotalSize = 0;
 	float PixelSize = GetSizePerPixel(PixelFormat);
@@ -187,7 +187,7 @@ bool ZETexture2D::CreateDynamic(ZEUInt Width, ZEUInt Height, ZETexturePixelForma
 	this->Height = Height;
 	this->LevelCount = 1;
 	this->PixelFormat = PixelFormat;
-	this->Size = CalculateTexture2DSize(Width, Height, LevelCount, PixelFormat);
+	this->Size = ZETexture2D::CalculateSize(Width, Height, LevelCount, PixelFormat);
 	this->PixelSize = ZEVector2::One / ZEVector2((float)Width, (float)Height);
 
 	this->IsRenderTarget = false;
@@ -219,7 +219,7 @@ bool ZETexture2D::CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, Z
 	this->Height = Height;
 	this->LevelCount = LevelCount;
 	this->PixelFormat = PixelFormat;
-	this->Size = CalculateTexture2DSize(Width, Height, LevelCount, PixelFormat);
+	this->Size = ZETexture2D::CalculateSize(Width, Height, LevelCount, PixelFormat);
 	this->PixelSize = ZEVector2(1.0f / Width, 1.0f / Height);
 
 	this->IsRenderTarget = RenderTarget;

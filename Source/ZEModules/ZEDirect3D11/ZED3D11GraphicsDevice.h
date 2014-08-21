@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthStencilBuffer.h
+ Zinek Engine - ZED3D11GraphicsDevice.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,49 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEPTH_STENCIL_BUFFER_H__ 
-#define __ZE_DEPTH_STENCIL_BUFFER_H__
+#ifndef __ZE_D3D11_GRAPHICS_DEVICE_H__
+#define __ZE_D3D11_GRAPHICS_DEVICE_H__
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
+#include "ZED3D11StatePool.h"
+#include "ZED3D11ComponentBase.h"
+#include "ZEGraphics/ZEGraphicsDevice.h"
 
-enum ZEDepthStencilPixelFormat
+#include "d3d11.h"
+
+class ZERenderTarget;
+class ZEDepthStencilBuffer;
+
+class ZED3D11GraphicsDevice : public ZEGraphicsDevice, public ZED3D11ComponentBase
 {
-	ZE_DSPF_NOTSET				= 0,
-	ZE_DSPF_DEPTH16				= 1,	// 16 bit unsigned normalized depth values
-	ZE_DSPF_DEPTH24_STENCIL8	= 2,	// 24 bit unsigned normalized depth values + 8 bit unsigned int stencil values
-	ZE_DSPF_DEPTHD32_FLOAT		= 3,	// 32 bit float depth values
-};
-
-class ZEDepthStencilBuffer
-{
-	friend class ZEGraphicsModule;
-	friend class ZEGraphicsDevice;
+	friend class ZED3D11GraphicsModule;
 
 	protected:
-		static ZESize					TotalSize;
-		static ZEUInt16					TotalCount;
+		ZEUInt					ContextIndex;
+		bool					RenderTargetChanged;
+		D3D_FEATURE_LEVEL		FeatureLevel;
 
-#ifdef ZE_DEBUG_ENABLE
-		ZEString						DebugName;
-#endif
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEDepthStencilPixelFormat		PixelFormat;
+		void					ApplyInputStates();
+		void					ApplyVertexShaderStates();
+		void					ApplyGeometryShaderStates();
+		void					ApplyRasterizerStates();
+		void					ApplyPixelShaderStates();
+		void					ApplyOutputStates();
 
-										ZEDepthStencilBuffer();
-		virtual							~ZEDepthStencilBuffer();
+		void					ApplyStates();
+		
+								ZED3D11GraphicsDevice(ID3D11Device* D3D10Device, ZEUInt ContextIndex);
+		virtual					~ZED3D11GraphicsDevice();
 
 	public:
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEDepthStencilPixelFormat		GetPixelFormat() const;
+		virtual void			Draw(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex);
+		virtual void			DrawIndexed(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt FirstIndex, ZEInt BaseVertex);
+		virtual void			DrawInstanced(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance);
+		virtual void			DrawIndexedInstanced(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance);
 
-		void							SetDebugName(const char* String);
-		const char*						GetDebugName() const;
+		virtual void			ClearRenderTarget(const ZERenderTarget* RenderTarget, const ZEVector4& ClearColor);
+		virtual void			ClearDepthStencilBuffer(const ZEDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
 
-		virtual bool					IsEmpty() const = 0;
-		
-		virtual void					Destroy();
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
-
-		static ZEDepthStencilBuffer*	CreateInstance();
+		D3D_FEATURE_LEVEL		GetD3DFeatureLevel() const;
 };
 
 #endif

@@ -46,6 +46,7 @@ class ZETexture2D : public ZETexture
 {
 	friend class ZEGraphicsDevice;
 	friend class ZEGraphicsModule;
+	friend class ZETexture2D;
 
 	protected:
 		static ZEUInt16				TotalCount;
@@ -81,6 +82,7 @@ class ZETexture2D : public ZETexture
 		
 		virtual	ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
 
+		static ZESize				CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat);
 		static ZETexture2D*			CreateInstance();
 };
 

@@ -82,7 +82,7 @@ ZEErrorManager* ZEErrorManager::GetInstance()
 ZEErrorManager::ZEErrorManager()
 {
 	ErrorOptions.SetName("Error");
-	ErrorOptions.AddOption(new ZEOption("LogFileEnabled", false, ZE_OA_NORMAL));
+	ErrorOptions.AddOption(new ZEOption("LogFileEnabled", true, ZE_OA_NORMAL));
 	ErrorOptions.AddOption(new ZEOption("LogFileName", "error.log", ZE_OA_NORMAL));
 	ZEOptionManager::GetInstance()->RegisterSection(&ErrorOptions);
 	ZEError::GetInstance()->SetCallback(&ZEErrorManager::ErrorCallback);

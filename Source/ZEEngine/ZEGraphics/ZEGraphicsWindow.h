@@ -112,6 +112,7 @@ struct ZEWindowStyle
 #define ZE_GWF_FULLSCREEN			1 << 4
 typedef ZEFlagsBase<ZEUInt32>		ZEGraphicsWindowFlags;
 
+class ZETexture2D;
 class ZERenderTarget;
 class ZEGraphicsMonitor;
 class ZEDepthStencilBuffer;
@@ -221,6 +222,7 @@ class ZEGraphicsWindow
 		virtual bool						Update();
 		virtual bool						Present() = 0;
 
+		virtual const ZETexture2D*			GetBackBufferTexture() = 0;
 		virtual const ZERenderTarget*		GetBackBuffer() = 0;
 		virtual const ZEDepthStencilBuffer*	GetDepthBuffer() = 0;
 

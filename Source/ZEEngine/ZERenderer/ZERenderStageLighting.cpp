@@ -71,7 +71,10 @@ void ZERenderStageLighting::UpdateBuffers()
 
 		Textures.LightSpecular = ZETexture2D::CreateInstance();
 		Textures.LightSpecular->CreateStatic(Width, Height, 1, ZE_TPF_F16_4, true, NULL);
+		Textures.LightSpecular->SetDebugName("LBufferDiffuseSpecularTexture");
+
 		RenderTargets.LightSpecular = Textures.LightSpecular->CreateRenderTarget(0);
+		RenderTargets.LightSpecular->SetDebugName("LBufferDiffuseSpecularRT");
 	}
 }
 

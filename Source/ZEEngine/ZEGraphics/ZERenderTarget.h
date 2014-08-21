@@ -40,6 +40,7 @@
 #include "ZETexture.h"
 #include "ZEViewPort.h"
 #include "ZEScissorRectangle.h"
+#include "ZEDS/ZEString.h"
 
 typedef ZETextureType	ZERenderTargetType;
 
@@ -51,6 +52,9 @@ class ZERenderTarget
 	protected:
 		static ZEUInt16				TotalCount;
 
+#ifdef ZE_DEBUG_ENABLE
+		ZEString					DebugName;
+#endif
 		ZEUInt						Width;
 		ZEUInt						Height;
 		ZEUInt						Depth;
@@ -68,6 +72,9 @@ class ZERenderTarget
 		const ZEVector3&			GetPixelSize() const;
 		ZETexturePixelFormat		GetPixelFormat() const;
 		ZERenderTargetType			GetRenderTargetType() const;
+
+		void						SetDebugName(const char* String);
+		const char*					GetDebugName() const;
 
 		virtual bool				IsEmpty() const = 0;
 
