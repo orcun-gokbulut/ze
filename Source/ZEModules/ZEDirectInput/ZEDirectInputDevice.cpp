@@ -208,7 +208,7 @@ void ZEDirectInputDevice::Process()
 
 		State.Advance();
 		for (ZESize I = 0; I < 256; I++)
-			State.Buttons.CurrentValues[I] = Buttons[I] & 0x80;
+			State.Buttons.CurrentValues[I] = (Buttons[I] & 0x80) == 0x80;
 	}
 	else if (Description.Type == ZE_IDT_MOUSE)
 	{
@@ -222,14 +222,14 @@ void ZEDirectInputDevice::Process()
 		State.Axises.CurrentValues[1] = DirectInputState.lY;
 		State.Axises.CurrentValues[2] = DirectInputState.lZ;
 		
-		State.Buttons.CurrentValues[0] = DirectInputState.rgbButtons[0] & 0x80;
-		State.Buttons.CurrentValues[1] = DirectInputState.rgbButtons[1] & 0x80;
-		State.Buttons.CurrentValues[2] = DirectInputState.rgbButtons[2] & 0x80;
-		State.Buttons.CurrentValues[3] = DirectInputState.rgbButtons[3] & 0x80;
-		State.Buttons.CurrentValues[4] = DirectInputState.rgbButtons[4] & 0x80;
-		State.Buttons.CurrentValues[5] = DirectInputState.rgbButtons[5] & 0x80;
-		State.Buttons.CurrentValues[6] = DirectInputState.rgbButtons[6] & 0x80;
-		State.Buttons.CurrentValues[7] = DirectInputState.rgbButtons[7] & 0x80;
+		State.Buttons.CurrentValues[0] = (DirectInputState.rgbButtons[0] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[1] = (DirectInputState.rgbButtons[1] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[2] = (DirectInputState.rgbButtons[2] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[3] = (DirectInputState.rgbButtons[3] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[4] = (DirectInputState.rgbButtons[4] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[5] = (DirectInputState.rgbButtons[5] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[6] = (DirectInputState.rgbButtons[6] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[7] = (DirectInputState.rgbButtons[7] & 0x80) == 0x80;
 	}
 	else if (Description.Type == ZE_IDT_GAMEPAD || Description.Type == ZE_IDT_JOYSTICK || Description.Type == ZE_IDT_WHEEL)
 	{
@@ -248,43 +248,43 @@ void ZEDirectInputDevice::Process()
 		State.Axises.CurrentValues[6] = (float)DirectInputState.rglSlider[0] / -2000.0f + 0.5f; 
 		State.Axises.CurrentValues[7] = (float)DirectInputState.rglSlider[1] / -2000.0f + 0.5f; 
 		
-		State.POVs.CurrentValues[0] = DirectInputState.rgdwPOV[0];
-		State.POVs.CurrentValues[1] = DirectInputState.rgdwPOV[1];
-		State.POVs.CurrentValues[2] = DirectInputState.rgdwPOV[2];
-		State.POVs.CurrentValues[3] = DirectInputState.rgdwPOV[3];
+		State.POVs.CurrentValues[0] = (DirectInputState.rgdwPOV[0]) == 0x80;
+		State.POVs.CurrentValues[1] = (DirectInputState.rgdwPOV[1]) == 0x80;
+		State.POVs.CurrentValues[2] = (DirectInputState.rgdwPOV[2]) == 0x80;
+		State.POVs.CurrentValues[3] = (DirectInputState.rgdwPOV[3]) == 0x80;
 
-		State.Buttons.CurrentValues[0] = DirectInputState.rgbButtons[0] & 0x80;
-		State.Buttons.CurrentValues[1] = DirectInputState.rgbButtons[1] & 0x80;
-		State.Buttons.CurrentValues[2] = DirectInputState.rgbButtons[2] & 0x80;
-		State.Buttons.CurrentValues[3] = DirectInputState.rgbButtons[3] & 0x80;
-		State.Buttons.CurrentValues[4] = DirectInputState.rgbButtons[4] & 0x80;
-		State.Buttons.CurrentValues[5] = DirectInputState.rgbButtons[5] & 0x80;
-		State.Buttons.CurrentValues[6] = DirectInputState.rgbButtons[6] & 0x80;
-		State.Buttons.CurrentValues[7] = DirectInputState.rgbButtons[7] & 0x80;
-		State.Buttons.CurrentValues[8] = DirectInputState.rgbButtons[8] & 0x80;
-		State.Buttons.CurrentValues[9] = DirectInputState.rgbButtons[9] & 0x80;
-		State.Buttons.CurrentValues[10] = DirectInputState.rgbButtons[10] & 0x80;
-		State.Buttons.CurrentValues[11] = DirectInputState.rgbButtons[11] & 0x80;
-		State.Buttons.CurrentValues[12] = DirectInputState.rgbButtons[12] & 0x80;
-		State.Buttons.CurrentValues[13] = DirectInputState.rgbButtons[13] & 0x80;
-		State.Buttons.CurrentValues[14] = DirectInputState.rgbButtons[14] & 0x80;
-		State.Buttons.CurrentValues[15] = DirectInputState.rgbButtons[15] & 0x80;
-		State.Buttons.CurrentValues[16] = DirectInputState.rgbButtons[16] & 0x80;
-		State.Buttons.CurrentValues[17] = DirectInputState.rgbButtons[17] & 0x80;
-		State.Buttons.CurrentValues[18] = DirectInputState.rgbButtons[18] & 0x80;
-		State.Buttons.CurrentValues[19] = DirectInputState.rgbButtons[19] & 0x80;
-		State.Buttons.CurrentValues[20] = DirectInputState.rgbButtons[20] & 0x80;
-		State.Buttons.CurrentValues[21] = DirectInputState.rgbButtons[21] & 0x80;
-		State.Buttons.CurrentValues[22] = DirectInputState.rgbButtons[22] & 0x80;
-		State.Buttons.CurrentValues[23] = DirectInputState.rgbButtons[23] & 0x80;
-		State.Buttons.CurrentValues[24] = DirectInputState.rgbButtons[24] & 0x80;
-		State.Buttons.CurrentValues[25] = DirectInputState.rgbButtons[25] & 0x80;
-		State.Buttons.CurrentValues[26] = DirectInputState.rgbButtons[26] & 0x80;
-		State.Buttons.CurrentValues[27] = DirectInputState.rgbButtons[27] & 0x80;
-		State.Buttons.CurrentValues[28] = DirectInputState.rgbButtons[28] & 0x80;
-		State.Buttons.CurrentValues[29] = DirectInputState.rgbButtons[29] & 0x80;
-		State.Buttons.CurrentValues[30] = DirectInputState.rgbButtons[30] & 0x80;
-		State.Buttons.CurrentValues[31] = DirectInputState.rgbButtons[31] & 0x80;
+		State.Buttons.CurrentValues[0] = (DirectInputState.rgbButtons[0] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[1] = (DirectInputState.rgbButtons[1] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[2] = (DirectInputState.rgbButtons[2] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[3] = (DirectInputState.rgbButtons[3] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[4] = (DirectInputState.rgbButtons[4] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[5] = (DirectInputState.rgbButtons[5] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[6] = (DirectInputState.rgbButtons[6] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[7] = (DirectInputState.rgbButtons[7] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[8] = (DirectInputState.rgbButtons[8] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[9] = (DirectInputState.rgbButtons[9] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[10] = (DirectInputState.rgbButtons[10] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[11] = (DirectInputState.rgbButtons[11] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[12] = (DirectInputState.rgbButtons[12] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[13] = (DirectInputState.rgbButtons[13] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[14] = (DirectInputState.rgbButtons[14] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[15] = (DirectInputState.rgbButtons[15] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[16] = (DirectInputState.rgbButtons[16] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[17] = (DirectInputState.rgbButtons[17] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[18] = (DirectInputState.rgbButtons[18] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[19] = (DirectInputState.rgbButtons[19] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[20] = (DirectInputState.rgbButtons[20] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[21] = (DirectInputState.rgbButtons[21] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[22] = (DirectInputState.rgbButtons[22] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[23] = (DirectInputState.rgbButtons[23] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[24] = (DirectInputState.rgbButtons[24] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[25] = (DirectInputState.rgbButtons[25] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[26] = (DirectInputState.rgbButtons[26] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[27] = (DirectInputState.rgbButtons[27] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[28] = (DirectInputState.rgbButtons[28] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[29] = (DirectInputState.rgbButtons[29] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[30] = (DirectInputState.rgbButtons[30] & 0x80) == 0x80;
+		State.Buttons.CurrentValues[31] = (DirectInputState.rgbButtons[31] & 0x80) == 0x80;
 	}
 }
 
