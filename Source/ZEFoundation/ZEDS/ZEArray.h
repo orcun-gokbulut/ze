@@ -244,7 +244,57 @@ class ZEArray
 
 			return &Items[Count - 1];
 		}
-		
+
+		inline ZEType* AddOrderedInc(ZEType NewItem)
+		{
+			if (Count == 0)
+				return Add(NewItem);
+	
+			ZESize Index = 0;
+			while(Index < Count && Items[Index] < NewItem)
+				Index++;
+
+			return Insert(Index + 1, NewItem);
+		}
+
+		template<ZEInt CompareFunction(const ZEType*, const ZEType*)>
+		inline ZEType* AddOrderedInc(ZEType NewItem)
+		{
+			if (Count == 0)
+				return Add(NewItem);
+
+			ZESize Index = 0;
+			while(Index < Count && CompareFunction(&Items[Index], &NewItem) == -1)
+				Index++;
+
+			return Insert(Index + 1, NewItem);
+		}
+
+		inline ZEType* AddOrderedDec(ZEType Type)
+		{
+			if (Count == 0)
+			return Add(NewItem);
+
+			ZESize Index = 0;
+			while(Index < Count && Items[Index] > NewItem)
+				Index++;
+
+			return Insert(Index + 1, NewItem);
+		}
+
+		template<ZEInt CompareFunction(const ZEType*, const ZEType*)>
+		inline ZEType* AddOrderedDec(ZEType NewItem)
+		{
+			if (Count == 0)
+				return Add(NewItem);
+
+			ZESize Index = 0;
+			while(Index < Count && CompareFunction(&Items[Index], &NewItem) == 1)
+				Index++;
+
+			return Insert(Index + 1, NewItem);
+		}
+
 		inline bool Exists(ZEType Value) const
 		{
 			for (ZESize I = 0; I < Count; I++)
