@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrain.h
+ Zinek Engine - ZETextureSampler.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,59 +33,68 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TERRAIN_H__
-#define __ZE_TERRAIN_H__
-
-#include "ZETypes.h"
-#include "ZEGame/ZEEntity.h"
-
-#include "ZETerrainDrawer.h"
-
-class ZETerrainLayer;
-
-ZE_META_ENTITY_DESCRIPTION(ZETerrain2)
-class ZETerrain2 : public ZEEntity
+// Template Programming
+/*void ZETextureSampler::SetData(void* Data)
 {
-	ZE_META_ENTITY(ZETerrain2)
-	private:
-		ZEArray<ZETerrainLayer*>				Layers;
-		ZETerrainDrawer							Drawer;
+	this->Data = Data;
+}
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+void ;ZETextureSampler::GetData()
+{
+	return Data;
+}
 
-												ZETerrain2();
-												~ZETerrain2();
+void ZETextureSampler::SetWidth(ZESize Width)
+{
+	this->Width = Width;
+}
 
-	public:	
-		virtual ZEDrawFlags						GetDrawFlags() const;
+void ZETextureSampler::GetWidth()
+{
+	return Width;
+}
 
-		ZETerrainDrawer&						GetDrawer();
+void ZETextureSampler::SetHeight(ZESize Height)
+{
+	this->Height = Height;
+}
 
-		const ZEArray<ZETerrainLayer*>&			GetLayers();
-		void									AddLayer(ZETerrainLayer* Layer);
-		void									RemoveLayer(ZETerrainLayer* Layer);
+void ZETextureSampler::GetHeight()
+{
+	return Height;
+}
 
-		void									SetPrimitiveSize(ZEUInt Size);
-		ZEUInt									GetPrimitiveSize();
+void ZETextureSampler::SetMipmapCount(ZEUInt MipmapCount)
+{
+	this->MipmapCount = MipmapCount;
+}
 
-		void									SetMaxLevel(ZEUInt MaxLevel);
-		ZEUInt									GetMaxLevel();
+ZEUInt ZETextureSampler::GetMipmapCount()
+{
+	return MipmapCount;
+}
 
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-	
-		static ZETerrain2*						CreateInstance();
+void ZETextureSampler::SetPixelSize(ZESize PixelSize)
+{
+	this->PixelSize = PixelSize;
+}
 
-};
+void ZETextureSampler::GetPixelSize()
+{
+	return PixelSize;
+}
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZETerrain2"	parent="ZEEntity"	description="Terrain" />
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-#endif
+void ZETextureSampler::SetVerticalAddresingMode(ZETextureSamplerAddresingMode AddresingMode)
+{
+	this->VerticalAddressingMode = AddresingMode;
+}
+
+void ZETextureSampler::SetHorizontalAddresingMode(ZETextureSamplerAddresingMode AddresingMode)
+{
+	this->HorizontalAddressingMode = AddresingMode;
+}
+
+void ZETextureSampler::SetFilteringMode(ZETextureSampleFilteringMode FilteringMode)
+{
+	this->FilteringMode = FilteringMode
+}*/

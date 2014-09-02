@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrain.h
+ Zinek Engine - ZETerrainDrawer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,58 +34,58 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_H__
-#define __ZE_TERRAIN_H__
+#ifndef __ZE_TERRAIN_DRAWER_H__
+#define __ZE_TERRAIN_DRAWER_H__
 
 #include "ZETypes.h"
-#include "ZEGame/ZEEntity.h"
+#include "ZETerrainPrimitiveBuffer.h"
 
-#include "ZETerrainDrawer.h"
+class ZETerrain2;
+class ZEMaterial;
+struct ZEDrawParameters;
 
-class ZETerrainLayer;
-
-ZE_META_ENTITY_DESCRIPTION(ZETerrain2)
-class ZETerrain2 : public ZEEntity
+class ZETerrainDrawer
 {
-	ZE_META_ENTITY(ZETerrain2)
 	private:
-		ZEArray<ZETerrainLayer*>				Layers;
-		ZETerrainDrawer							Drawer;
+		ZETerrain2*					Terrain;
+		ZEUInt						MinLevel;
+		ZEUInt						MaxLevel;
+		float						MaxViewDistance;
+		ZETerrainPrimitiveBuffer	VertexBuffer;
+		bool						Initialized;
+		ZEMaterial*					Material;
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		void						DrawPrimitive(ZEDrawParameters* DrawParameters,
+										float WorldPositionX, float WorldPositionY,
+										ZEUInt Level, float LocalPositionX, float LocalPositionY, ZETerrainPrimitiveType Type, 
+										ZEInt NegativeExtent, ZEInt PositiveExtent, 
+										float MinHeight, float MaxHeight);
+	public:
+		void						SetTerrain(ZETerrain2* Terrain);
+		ZETerrain2*					GetTerrain();
 
-												ZETerrain2();
-												~ZETerrain2();
+		void						SetPrimitiveSize(ZEUInt PrimtiveSize);
+		ZEUInt						GetPrimitiveSize();
 
-	public:	
-		virtual ZEDrawFlags						GetDrawFlags() const;
+		void						SetMinLevel(ZEUInt MinLevel);
+		ZEUInt						GetMinLevel();
 
-		ZETerrainDrawer&						GetDrawer();
+		void						SetMaxLevel(ZEUInt MaxLevel);
+		ZEUInt						GetMaxLevel();
 
-		const ZEArray<ZETerrainLayer*>&			GetLayers();
-		void									AddLayer(ZETerrainLayer* Layer);
-		void									RemoveLayer(ZETerrainLayer* Layer);
+		void						SetMaxViewDistance(float MaxViewDistance);
+		float						GetMaxViewDistance();
 
-		void									SetPrimitiveSize(ZEUInt Size);
-		ZEUInt									GetPrimitiveSize();
+		void						SetMaterial(ZEMaterial* Material);
+		ZEMaterial*					GetMaterial();
 
-		void									SetMaxLevel(ZEUInt MaxLevel);
-		ZEUInt									GetMaxLevel();
+		bool						Initialize();
+		void						Deinitialize();
 
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-	
-		static ZETerrain2*						CreateInstance();
+		void						Draw(ZEDrawParameters* DrawParameters);
 
+									ZETerrainDrawer();
+									~ZETerrainDrawer();
 };
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZETerrain2"	parent="ZEEntity"	description="Terrain" />
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

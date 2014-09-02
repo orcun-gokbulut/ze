@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainResource.cpp
+ Zinek Engine - ZETerrainResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,48 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETypes.h"
+#include "ZECore/ZEResource.h"
+#include "ZEDS/ZEArray.h"
+#include "ZETerrainBlock.h"
+
+struct ZETerrainBlockIndex
+{
+	ZEUInt			Level;
+	ZEUInt64		PositionX;
+	ZEUInt64		PositionY;
+	ZEUInt64		Offset;
+};
+
+class ZETerrainResource : public ZEResource
+{
+	protected:
+		ZETerrainBlockInfo					Info;
+
+											ZETerrainResource();
+
+	public: 
+		virtual const char*					GetResourceType() const;
+
+		const ZETerrainBlockInfo&			GetInfo();
+		virtual bool						GetBlock(ZETerrainBlock& Output, ZEUInt Level, ZEInt64 PositionX, ZEInt64 PositionY) = 0;
+
+};
+
+class ZETerrainStreamedResource : public ZETerrainResource
+{
+	private:
+		ZEArray<ZETerrainBlockIndex>		Index;
+		ZEFile								File;
+
+	protected:
+											ZETerrainStreamedResource();
+		virtual								~ZETerrainStreamedResource();
+
+	public:
+		virtual bool						GetBlock(ZETerrainBlock& Output, ZEUInt Level, ZEInt64 PositionX, ZEInt64 PositionY);
+
+		static ZETerrainResource*			LoadResource(const ZEString& FileName);
+		static ZETerrainResource*			LoadSharedResource(const ZEString& FileName);
+		static void							CacheResource(const ZEString& FileName);
+};

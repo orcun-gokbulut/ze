@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZETerrainVertexBuffer.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,21 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TERRAIN_VERTEX_BUFFER_H__
-#define __ZE_TERRAIN_VERTEX_BUFFER_H__
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZETypes.h"
+ze_add_source(ZETerrainBlock.cpp			Sources)
+ze_add_source(ZETerrainBlock.h				Sources)
+ze_add_source(ZETerrainPatch.cpp			Sources)
+ze_add_source(ZETerrainPatch.h				Sources)
+ze_add_source(ZETerrainDatabase.cpp			Sources)
+ze_add_source(ZETerrainDatabase.h			Sources)
+ze_add_source(ZETerrainExporterMain.cpp		Sources)
 
-class ZEStaticVertexBuffer;
 
-enum ZETerrainPrimitive
-{
-	ZE_TP_VERTICAL		= 0,
-	ZE_TP_HORIZONTAL	= 1,
-	ZE_TP_CORNER		= 2,
-	ZE_TP_CORNER_1		= 3,
-	ZE_TP_CORNER_2		= 4
-};
-
-struct ZETerrainPrimitiveIndices
-{
-	ZESize Index[5];
-};
-
-class ZETerrainPrimitivesGenerator
-{
-	public:
-		static bool Generate(ZEStaticVertexBuffer** Buffer, ZETerrainPrimitiveIndices* Indices, ZEInt EdgeLenght);
-};
-
-#endif
+ze_add_executable(TARGET ZETerrainExporter
+	CONSOLE
+	SOURCES ${Sources}
+	LIBS ZEFoundation libFreeImage ZETerrain2)
