@@ -35,79 +35,115 @@
 
 #include "ZEBuffer.h"
 
+#include <memory.h>
+
+ZESSize ZEBuffer::RawBlockSize(ZEBufferBlockPointer Pointer) const
+{
+	return *(ZESSize*)&Buffer[Pointer];
+}
+
+bool ZEBuffer::IsFragmented()
+{
+	return Fragmented;
+}
+
 void ZEBuffer::SetSize(ZESize Size)
 {
 	Buffer.SetCount(Size);
 }
 
-ZESize ZEBuffer::GetSize()
+ZESize ZEBuffer::GetSize() const
 {
 	return Buffer.GetCount();
 }
 
-ZESize ZEBuffer::GetBlockCount()
+ZESize ZEBuffer::GetBlockCount() const
 {
 	return BlockCount;
 }
 
-ZESize ZEBuffer::GetUsedSpace()
+ZESize ZEBuffer::GetUsedSpace() const
 {
 	return UsedSpace;
 }
 
-ZESize ZEBuffer::GetFreeSpace()
+ZESize ZEBuffer::GetFreeSpace() const
 {
-	ZESSize FreeSpace = (ZESSize)Buffer.GetSize() - (ZESSize)UsedSpace - sizeof(ZESize);
-	return (FreeSpace > 0 ? FreeSpace : 0);
+	if (BufferStart > BufferEnd)
+		return ZEMath::ClampLower((ZESSize)BufferEnd - (ZESSize)BufferStart - (ZESSize)sizeof(ZESSize), 0LL);
+	else
+		return ZEMath::ClampLower((ZESSize)ZEMath::Max(BufferStart, (Buffer.GetSize() - BufferEnd))  - (ZESSize)sizeof(ZESSize),  0LL);
 }
-		
-bool ZEBuffer::AddBlock(const void* Data, ZESize Size)
+
+ZEBufferBlockPointer ZEBuffer::AddBlock(ZESize Size)
 {
-	ZESize BlockSize = Size + sizeof(ZESize);
-
-	// Basic Tests
-	if (BlockSize + UsedSpace > Buffer.GetSize())
-		return false;
-
-	// Normal
-	if (BufferEnd + BlockSize <= Buffer.GetSize())
+	ZESize BlockSize = Size + sizeof(ZESSize);
+	ZESize FreeSpaceStart;
+	if (BufferStart > BufferEnd)
 	{
-		*(ZESize*)(Buffer.GetCArray() + BufferEnd) = Size;
-		memcpy(Buffer.GetCArray() + BufferEnd + sizeof(ZESize), Data, Size);
-		BufferEnd = Buffer.Circular(BufferEnd + BlockSize);
+		if (BufferEnd - BufferStart < BlockSize)
+			return ZE_BP_NONE;
+		FreeSpaceStart = BufferEnd;
 	}
 	else
 	{
-		if (BufferEnd + sizeof(ZESize) <= Buffer.GetCount())
+		if (BlockSize > Buffer.GetCount() - BufferEnd)
 		{
-			*(ZESize*)(Buffer.GetCArray() + BufferEnd) = Size;
-			BufferEnd += sizeof(ZESize);
+			if (BlockSize > BufferStart)
+				return ZE_BP_NONE;
+			FreeSpaceStart = BufferStart;
 		}
 		else
 		{
-			for (ZESize I = 0; I < sizeof(ZESize); I++)
-				Buffer[Buffer.Circular(BufferEnd + I)] = ((ZEUInt8*)&Size)[I];
-			BufferEnd = Buffer.Circular(BufferEnd + sizeof(ZESize));
+			FreeSpaceStart = BufferEnd;
+			BufferRemainingEnd = BufferEnd + BlockSize;
 		}
-
-		ZESize FirstPartSize = Buffer.GetCount() - BufferEnd;
-		memcpy(Buffer.GetCArray() + BufferEnd, Data, FirstPartSize);
-		memcpy(Buffer.GetCArray(), (ZEUInt8*)Data + FirstPartSize, Size - FirstPartSize);
-		BufferEnd = Size - FirstPartSize;
 	}
 
+	*(ZESSize*)&Buffer[FreeSpaceStart] = Size;
 	UsedSpace += BlockSize;
 	BlockCount++;
+	BufferEnd = FreeSpaceStart + BlockSize;
+	return FreeSpaceStart;
 }
 
-bool ZEBuffer::DeleteBlock()
+ZEBufferBlockPointer ZEBuffer::AddBlock(const void* Data, ZESize Size)
+{
+	ZEBufferBlockPointer BlockPointer = AddBlock(Size);
+	if (BlockPointer == ZE_BP_NONE)
+		return ZE_BP_NONE;
+
+	memcpy((ZEBYTE*)&Buffer[BlockPointer] + sizeof(ZESSize), Data, Size);
+	return BlockPointer;
+}		
+
+
+bool ZEBuffer::DeleteBlock(ZEBufferBlockPointer Pointer)
 {
 	if (BlockCount == 0)
 		return false;
-	
-	ZESize BlockSize = GetBlockSize() + sizeof(ZESize);
 
-	BufferStart = Buffer.Circular(BufferStart + BlockSize);
+	ZESSize BlockSize = *(ZESSize*)&Buffer[BufferStart];
+	if (BlockSize <= 0)
+		return false;
+
+	if (Pointer == BufferStart)
+	{
+		BufferStart += BlockSize;
+		if (BufferStart == BufferRemainingEnd)
+			BufferStart = 0;
+	}
+	else if (Pointer + *(ZESSize*)&Buffer[Pointer] == BufferEnd)
+	{
+		BufferEnd -= BlockSize;
+		if (BufferEnd == 0)
+			BufferEnd = BufferRemainingEnd;
+	}
+	else
+	{
+		*(ZESSize*)&Buffer[Pointer] = -BlockSize;
+		Fragmented = true;
+	}
 
 	UsedSpace -= BlockSize;
 	BlockCount--;
@@ -115,102 +151,116 @@ bool ZEBuffer::DeleteBlock()
 	return true;
 }
 
-ZEBufferBlockPointer ZEBuffer::GetFirstBlock()
+ZEBufferBlockPointer ZEBuffer::GetFirstBlock() const
 {
 	if (BlockCount == 0)
-		return ZE_BP_NONE;
-
-	if (BufferStart == BufferEnd)
 		return ZE_BP_NONE;
 
 	return BufferStart;
 }
 
-ZEBufferBlockPointer ZEBuffer::MoveNextBlock(ZEBufferBlockPointer PrevPointer)
+ZEBufferBlockPointer ZEBuffer::MoveNextBlock(ZEBufferBlockPointer PrevPointer) const
 {
+	if (PrevPointer == ZE_BP_NONE)
+		return ZE_BP_NONE;
+
 	if (BlockCount == 0)
 		return ZE_BP_NONE;
 
 	if (PrevPointer == BufferEnd)
 		return ZE_BP_NONE;
 	
-	ZESize Size = GetBlockSize(PrevPointer);
-	if (Size == 0)
+	PrevPointer += RawBlockSize(PrevPointer) + sizeof(ZESSize);
+	if (PrevPointer == BufferEnd)
 		return ZE_BP_NONE;
 
-	ZEBufferBlockPointer NewPointer = Buffer.Circular(PrevPointer + Size + sizeof(ZESize));
-
-	if (PrevPointer == BufferEnd)
-		return false;
-
-	return NewPointer;
-}
-
-bool ZEBuffer::GetBlockData(void* Data)
-{
-	return GetBlockData(Data, GetBlockSize());
-}
-
-bool ZEBuffer::GetBlockData(void* Data, ZESize Size)
-{
-	return GetBlockData(Data, Size);
-}
-
-ZESize ZEBuffer::GetBlockSize()
-{
-	return GetBlockSize(BufferStart);
-}
-
-bool ZEBuffer::GetBlockData(ZEBufferBlockPointer Pointer, void* Data)
-{
-	return GetBlockData(Data, GetBlockSize(Pointer));
-}
-
-bool ZEBuffer::GetBlockData(ZEBufferBlockPointer Pointer, void* Data, ZESize Size)
-{
-	if (BlockCount)
-		return false;
-
-	ZESize BlockSize = Size + sizeof(ZESize);
-	if (Pointer + BlockSize <= Buffer.GetCount())
+	while(RawBlockSize(PrevPointer) < 0)
 	{
-		memcpy(Data, Buffer.GetCArray() + sizeof(ZESize) + Pointer, Size);
-	}
-	else
-	{
-		ZESize FirstPartSize = Buffer.GetCount() - Pointer;
-		memcpy(Data, Buffer.GetCArray() + Pointer, FirstPartSize);
-		memcpy((ZEUInt8*)Data + FirstPartSize, Buffer.GetCArray(), Size - FirstPartSize);
+		if (PrevPointer == BufferEnd)
+			return ZE_BP_NONE;
+
+		PrevPointer += -RawBlockSize(PrevPointer) + sizeof(ZESSize);
+		if (PrevPointer == BufferEnd)
+			return ZE_BP_NONE;
+		else if (PrevPointer == BufferRemainingEnd)
+			PrevPointer = 0;
 	}
 
-	return true;
+	return PrevPointer;
 }
 
-ZESize ZEBuffer::GetBlockSize(ZEBufferBlockPointer Pointer)
+void* ZEBuffer::GetBlockData(ZEBufferBlockPointer Pointer)
 {
-	if (BlockCount == 0)
-		return 0;
-	
-	if (Pointer + sizeof(ZESize) > Buffer.GetCount())
-	{
-		ZESize BlockSize;
-		for (ZESize I = 0; I < sizeof(ZESize); I++)
-			((ZEUInt8*)&BlockSize)[I] = Buffer[Buffer.Circular(Pointer + I)];
-		return BlockSize;
-	}
-	else
-		return *(ZESize*)&Buffer[Pointer];
+	return &Buffer[Pointer + sizeof(ZESSize)];
 }
 
-void ZEBuffer::Reset()
+ZESSize ZEBuffer::GetBlockSize(ZEBufferBlockPointer Pointer) const
+{
+	ZESSize Size = *(ZESSize*)&Buffer[Pointer];
+	return Size;
+}
+
+void ZEBuffer::Clear()
 {
 	BufferStart = 0;
 	BufferEnd = 0;
 	BlockCount = 0;
+	BufferRemainingEnd = 0;
 	UsedSpace = 0;
+	Fragmented = false;
+}
+
+void ZEBuffer::Defrag()
+{
+	if (!Fragmented)
+		return;
+
+	ZESSize Destination = -1;
+	if (BufferStart < BufferEnd)
+	{
+		if (BufferStart > 0)
+			Destination = 0;
+	}
+
+	ZEBufferBlockPointer Current = BufferStart;
+	while(Current != BufferEnd)
+	{
+		ZESSize BlockSize = RawBlockSize(Current);
+		if (BlockSize < 0)
+		{
+			if (Destination == -1)
+				Destination = Current;
+
+			Current += -BlockSize;
+			if (Current == Buffer.GetCount() || Current == BufferRemainingEnd)
+				Current = 0;
+	
+			continue;
+		}
+
+		BlockSize += sizeof(ZESSize);
+		if (Destination != -1)
+		{
+			memmove(Buffer.GetCArray() + Destination, Buffer.GetCArray() + Current, BlockSize);
+			Destination += BlockSize + sizeof(ZESSize);
+			if (Destination > Buffer.GetCount())
+			{
+				if (Current == Destination)
+					Destination = -1;
+				else
+					Destination = 0;
+			}
+		}
+
+		Current += -BlockSize + sizeof(ZESSize);
+		if (Current == Buffer.GetCount() || Current == BufferRemainingEnd)
+			Current = 0;
+	}
+
+	Fragmented = false;
 }
 
 ZEBuffer::ZEBuffer()
 {
-	Reset();
+	Clear();
 }

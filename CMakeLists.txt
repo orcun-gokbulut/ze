@@ -35,11 +35,15 @@
 
 cmake_minimum_required(VERSION 2.8.10)
 
-project(Zinek)
+if(POLICY CMP0043)
+	cmake_policy(SET CMP0043 OLD)
+endif()
+ 
+project(ZinekEngine)
 
 ## Build system initalization
 #########################################################################################
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
 include(ze)
 ze_init()

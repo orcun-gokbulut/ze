@@ -45,12 +45,12 @@ const ZEIPAddress& ZESocketUDP::GetBindIPAddress() const
 	return BindIPAddress;
 }
 
-void ZESocketUDP::SetBindPort(ZEInt Port)
+void ZESocketUDP::SetBindPort(ZEUInt16 Port)
 {
 	BindPort = Port;
 }
 
-ZEInt ZESocketUDP::GetBindPort() const
+ZEUInt16 ZESocketUDP::GetBindPort() const
 {
 	return BindPort;
 }
@@ -87,12 +87,7 @@ ZESSize ZESocketUDP::Receive(void* Buffer, ZESize BufferSize)
 {
 	ZEIPAddress Address;
 	ZEUInt16 Port;
-	ZESSize Result = Receive(Address, Port, Buffer, BufferSize);
-
-	if (Result < 0)
-		return Result;
-
-	return Result;
+	return Receive(Address, Port, Buffer, BufferSize);
 }
 
 ZESocketUDP::ZESocketUDP()

@@ -42,7 +42,7 @@
 
 #undef GetFreeSpace
 
-typedef ZESize ZEBufferBlockPointer;
+typedef ZESSize ZEBufferBlockPointer;
 #define ZE_BP_NONE (ZEBufferBlockPointer)-1
 
 class ZEBuffer
@@ -51,34 +51,37 @@ class ZEBuffer
 		ZEArray<ZEUInt8>		Buffer;
 		ZESize					BufferStart;
 		ZESize					BufferEnd;
+		ZESize					BufferRemainingEnd;
 		ZESize					UsedSpace;
 		ZESize					BlockCount;
+		bool					Fragmented;
+
+		ZESSize					RawBlockSize(ZEBufferBlockPointer Pointer) const;
 
 	public:
+		bool					IsFragmented();
+
 		void					SetSize(ZESize Size);
-		ZESize					GetSize();
+		ZESize					GetSize() const;
 
-		ZESize					GetUsedSpace();
-		ZESize					GetFreeSpace();
-		ZESize					GetBlockCount();
+		ZESize					GetUsedSpace() const;
+		ZESize					GetFreeSpace() const;
+		ZESize					GetBlockCount() const;
 
-		void					Clear();
+		ZEBufferBlockPointer	AddBlock(const void* Data, ZESize Size);
+		ZEBufferBlockPointer	AddBlock(ZESize Size);
 
-		bool					AddBlock(const void* Data, ZESize Size);
-		bool					DeleteBlock();
+		bool					DeleteBlock(ZEBufferBlockPointer Pointer);
 	
-		ZEBufferBlockPointer	GetFirstBlock();
-		ZEBufferBlockPointer	MoveNextBlock(ZEBufferBlockPointer PrevPointer);
+		ZEBufferBlockPointer	GetFirstBlock() const;
+		ZEBufferBlockPointer	MoveNextBlock(ZEBufferBlockPointer PrevPointer) const;
 
-		bool					GetBlockData(void* Data);
-		bool					GetBlockData(void* Data, ZESize Size);	
-		bool					GetBlockData(ZEBufferBlockPointer Pointer, void* Data);
-		bool					GetBlockData(ZEBufferBlockPointer Pointer, void* Data, ZESize Size);
+		void*					GetBlockData(ZEBufferBlockPointer Pointer);
+		const void*				GetBlockData(ZEBufferBlockPointer Pointer) const;
+		ZESSize					GetBlockSize(ZEBufferBlockPointer Pointer) const;
 
-		ZESize					GetBlockSize();
-		ZESize					GetBlockSize(ZEBufferBlockPointer Pointer);
-
-		void					Reset();
+		void					Defrag();
+		void					Clear();
 
 								ZEBuffer();
 };
