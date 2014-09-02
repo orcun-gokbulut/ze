@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrain.h
+ Zinek Engine - ZETerrainBlock.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,58 +34,91 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_H__
-#define __ZE_TERRAIN_H__
 
 #include "ZETypes.h"
-#include "ZEGame/ZEEntity.h"
+class ZEFile;
 
-#include "ZETerrainDrawer.h"
-
-class ZETerrainLayer;
-
-ZE_META_ENTITY_DESCRIPTION(ZETerrain2)
-class ZETerrain2 : public ZEEntity
+enum ZETerrainPixelType
 {
-	ZE_META_ENTITY(ZETerrain2)
-	private:
-		ZEArray<ZETerrainLayer*>				Layers;
-		ZETerrainDrawer							Drawer;
-
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
-
-												ZETerrain2();
-												~ZETerrain2();
-
-	public:	
-		virtual ZEDrawFlags						GetDrawFlags() const;
-
-		ZETerrainDrawer&						GetDrawer();
-
-		const ZEArray<ZETerrainLayer*>&			GetLayers();
-		void									AddLayer(ZETerrainLayer* Layer);
-		void									RemoveLayer(ZETerrainLayer* Layer);
-
-		void									SetPrimitiveSize(ZEUInt Size);
-		ZEUInt									GetPrimitiveSize();
-
-		void									SetMaxLevel(ZEUInt MaxLevel);
-		ZEUInt									GetMaxLevel();
-
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-	
-		static ZETerrain2*						CreateInstance();
-
+	ZE_TPT_NONE			= 0,
+	ZE_TPT_ELEVATION	= 1,
+	ZE_TPT_COLOR		= 2,
+	ZE_TPT_GRAYSCALE	= 3	
 };
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZETerrain2"	parent="ZEEntity"	description="Terrain" />
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-#endif
+enum ZETerrainBlockState
+{
+	ZE_TBS_EMPTY,
+	ZE_TBS_NORMAL,
+	ZE_TBS_LOADING,
+	ZE_TBS_NOT_AVAILABLE
+};
+
+struct ZETerrainBlockInfo
+{
+	ZESize						BlockSize;
+	ZETerrainPixelType			PixelType;
+	ZESize						PixelSize;
+	ZESize						MipmapCount;
+};
+
+class ZETerrainBlock
+{
+	private:
+		ZEUInt64				PositionX;
+		ZEUInt64				PositionY;
+		ZEUInt					Level;
+		ZESize					Size;
+
+		void*					Data;
+		ZESize					TotalSize;
+		ZESize					Pitch;
+		ZEUInt					PixelSize;
+		ZETerrainPixelType		PixelType;
+
+		ZEUInt					MipmapCount;
+		float					MinValue;
+		float					MaxValue;
+		
+		ZETerrainBlockState		State;
+
+	public:
+		void					SetState(ZETerrainBlockState State);
+		bool					GetState();
+
+		void					SetPositionX(ZEUInt64 x);
+		ZEUInt64				GetPositionX();
+
+		void					SetPositionY(ZEUInt64 y);
+		ZEUInt64				GetPositionY();
+
+		ZEUInt64				GetEndX();
+		ZEUInt64				GetEndY();
+
+		void					SetLevel(ZEUInt Level);
+		ZEUInt					GetLevel();
+
+		ZETerrainPixelType		GetPixelType();
+		ZESize					GetPixelSize();
+
+		ZEUInt					GetMipmapCount();
+
+		void*					GetData(ZEUInt MipmapLevel = 0);
+		ZESize					GetPitch(ZEUInt MipmapLevel = 0);
+		ZESize					GetSize(ZEUInt MipmapLevel = 0);
+		ZESize					GetTotalSize();
+
+		float					GetMinValue();
+		float					GetMaxValue();
+		
+		void					Sample(void* Output, float x, float y);
+
+		bool					Create(ZETerrainPixelType PixelType, ZESize Size);
+		void					Clean();
+
+		bool					Load(ZEFile* File);
+		bool					Save(ZEFile* File);
+		
+								ZETerrainBlock();
+								~ZETerrainBlock();
+};

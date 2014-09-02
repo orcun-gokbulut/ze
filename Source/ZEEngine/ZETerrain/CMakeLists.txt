@@ -35,14 +35,26 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZETerrain.cpp					Sources)
-ze_add_source(ZETerrain.h					Sources Headers ZEPP)
-ze_add_source(ZETerrainResource.cpp			Sources)
-ze_add_source(ZETerrainResource.h			Sources Headers)
-ze_add_source(ZETerrainVertexBuffer.cpp		Sources)
-ze_add_source(ZETerrainVertexBuffer.h		Sources)
+ze_add_source(ZETerrain.cpp						Sources)
+ze_add_source(ZETerrain.h						Sources ZEPP)
+ze_add_source(ZETerrainLayer.cpp				Sources)
+ze_add_source(ZETerrainLayer.h					Sources)
+ze_add_source(ZETerrainLevel.cpp				Sources)
+ze_add_source(ZETerrainLevel.h					Sources)
+ze_add_source(ZETerrainBlock.h					Sources)
+ze_add_source(ZETerrainBlock.cpp				Sources)
+ze_add_source(ZETerrainBlockCache.h				Sources)
+ze_add_source(ZETerrainBlockCache.cpp			Sources)
+ze_add_source(ZETerrainResource.cpp				Sources)
+ze_add_source(ZETerrainResource.h				Sources)
+ze_add_source(ZETerrainDrawer.cpp				Sources)
+ze_add_source(ZETerrainDrawer.h					Sources)
+ze_add_source(ZETerrainPrimitiveBuffer.cpp		Sources)
+ze_add_source(ZETerrainPrimitiveBuffer.h		Sources)
+ze_add_source(ZETextureSampler.h				Sources)
+ze_add_source(ZETextureSampler.cpp				Sources)
 
-ze_add_library(TARGET ZETerrain 
+ze_add_library(TARGET ZETerrain
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation)

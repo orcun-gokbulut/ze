@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrain.h
+ Zinek Engine - ZETerrainDatabase.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,58 +34,71 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_H__
-#define __ZE_TERRAIN_H__
 
+#include "ZEDS/ZEArray.h"
 #include "ZETypes.h"
-#include "ZEGame/ZEEntity.h"
+#include "ZETerrainBlock.h"
 
-#include "ZETerrainDrawer.h"
+class ZETerrainPatch;
+class ZETerrainBlock;
 
-class ZETerrainLayer;
-
-ZE_META_ENTITY_DESCRIPTION(ZETerrain2)
-class ZETerrain2 : public ZEEntity
+enum ZETerrainBlockAvailableResult
 {
-	ZE_META_ENTITY(ZETerrain2)
-	private:
-		ZEArray<ZETerrainLayer*>				Layers;
-		ZETerrainDrawer							Drawer;
-
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
-
-												ZETerrain2();
-												~ZETerrain2();
-
-	public:	
-		virtual ZEDrawFlags						GetDrawFlags() const;
-
-		ZETerrainDrawer&						GetDrawer();
-
-		const ZEArray<ZETerrainLayer*>&			GetLayers();
-		void									AddLayer(ZETerrainLayer* Layer);
-		void									RemoveLayer(ZETerrainLayer* Layer);
-
-		void									SetPrimitiveSize(ZEUInt Size);
-		ZEUInt									GetPrimitiveSize();
-
-		void									SetMaxLevel(ZEUInt MaxLevel);
-		ZEUInt									GetMaxLevel();
-
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-	
-		static ZETerrain2*						CreateInstance();
-
+	ZE_TBAR_FULLY,
+	ZE_TBAR_PARTIALLY,
+	ZE_TBAR_NONE
 };
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZETerrain2"	parent="ZEEntity"	description="Terrain" />
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-#endif
+class ZETerrainPatchDatabase
+{
+	private:
+		double							StartX;
+		double							StartY;
+		double							EndX;
+		double							EndY;
+		double							UnitSize;
+
+		ZEUInt							LevelCount;
+
+		ZESize							BlockSize;
+		ZESize							BlocksPerChunk;
+		ZETerrainPixelType				PixelType;
+	
+		ZEArray<ZETerrainPatch*>		Patches;
+	
+		void							CalculateDimensions();
+
+	public:
+		const ZEArray<ZETerrainPatch*>&	GetPatches();
+		bool							AddPatch(ZETerrainPatch* Patch);
+		void							RemovePatch(ZETerrainPatch* Patch);
+
+		void							SetBlockType(ZETerrainPixelType Type);
+		ZETerrainPixelType				GetBlockType();
+
+		double							GetStartX();
+		double							GetStartY();
+		double							GetEndX();
+		double							GetEndY();
+
+		void							GetUnitSize(double UnitSize);
+		double							GetUnitSize();
+
+		void							SetBlocksPerChunks(ZESize BlocksPerChunk);
+		ZESize							GetBlocksPerChunks();
+		
+		void							SetBlockSize(ZESize BlockSize);
+		ZESize							GetBlockSize();
+
+		bool							CheckBlockAvailable(ZESize Level, double x, double y);
+
+		bool							SamplePixel(void* Output, double x, double y, ZEUInt Level);
+		bool							SampleBlock(ZETerrainBlock& Output, ZEUInt64 x, ZEUInt64 y, ZEUInt Level);
+
+		void							UpdateOrder();
+
+		void							Save(const ZEString& Path);
+
+										ZETerrainPatchDatabase();
+										~ZETerrainPatchDatabase();
+};

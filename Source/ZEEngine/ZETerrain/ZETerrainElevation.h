@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrain.h
+ Zinek Engine - ZETerrainElevation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,59 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TERRAIN_H__
-#define __ZE_TERRAIN_H__
 
-#include "ZETypes.h"
-#include "ZEGame/ZEEntity.h"
-
-#include "ZETerrainDrawer.h"
-
-class ZETerrainLayer;
-
-ZE_META_ENTITY_DESCRIPTION(ZETerrain2)
-class ZETerrain2 : public ZEEntity
+class ZERay;
+class ZETerrainDatabase
 {
-	ZE_META_ENTITY(ZETerrain2)
 	private:
-		ZEArray<ZETerrainLayer*>				Layers;
-		ZETerrainDrawer							Drawer;
+		ZESTri
+		ZEArray<float>		ElevationData;
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+	public:
+		void				SetPosition(const ZEVector3& Position);
+		const ZEVector3&	GetPosition();
 
-												ZETerrain2();
-												~ZETerrain2();
+		void				SetScale(const ZEVector3& SetScale);
+		const ZEVector3&	GetScale();
 
-	public:	
-		virtual ZEDrawFlags						GetDrawFlags() const;
+		bool				DoHAT(float& Result);
+		bool				DoHOT(float& Result);
+		bool				CastRay(const ZERay& Ray, float& ResulT);
 
-		ZETerrainDrawer&						GetDrawer();
-
-		const ZEArray<ZETerrainLayer*>&			GetLayers();
-		void									AddLayer(ZETerrainLayer* Layer);
-		void									RemoveLayer(ZETerrainLayer* Layer);
-
-		void									SetPrimitiveSize(ZEUInt Size);
-		ZEUInt									GetPrimitiveSize();
-
-		void									SetMaxLevel(ZEUInt MaxLevel);
-		ZEUInt									GetMaxLevel();
-
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-	
-		static ZETerrain2*						CreateInstance();
-
+		void				SetFileName(const char* FileName);
+		const char*			GetFileName();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZETerrain2"	parent="ZEEntity"	description="Terrain" />
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-#endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrain.h
+ Zinek Engine - ZETerrainLevel.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,58 +34,65 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_H__
-#define __ZE_TERRAIN_H__
+#ifndef __ZE_TERRAIN_LEVEL_H__
+#define __ZE_TERRAIN_LEVEL_H__
 
 #include "ZETypes.h"
-#include "ZEGame/ZEEntity.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZETerrainBlock.h"
+#include "ZETerrainBlockCache.h"
 
-#include "ZETerrainDrawer.h"
-
+class ZETexture2D;
 class ZETerrainLayer;
 
-ZE_META_ENTITY_DESCRIPTION(ZETerrain2)
-class ZETerrain2 : public ZEEntity
+class ZETerrainLevel
 {
-	ZE_META_ENTITY(ZETerrain2)
+	friend class ZETerrainLayer;
 	private:
-		ZEArray<ZETerrainLayer*>				Layers;
-		ZETerrainDrawer							Drawer;
+		ZETerrainLayer*					Owner;
+		ZEUInt							Level;
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		ZETexture2D*					Texture;
+		ZEMatrix4x4						TexcoordMatrix;
+		
+		float							MinHeight;
+		float							MaxHeight;
 
-												ZETerrain2();
-												~ZETerrain2();
+		ZEUInt64						PositionX;
+		ZEUInt64						PositionY;
 
-	public:	
-		virtual ZEDrawFlags						GetDrawFlags() const;
+		ZEArray<ZETerrainBlock>			Blocks;
+		ZEInt							LevelScale;
 
-		ZETerrainDrawer&						GetDrawer();
+		bool							Initialized;
 
-		const ZEArray<ZETerrainLayer*>&			GetLayers();
-		void									AddLayer(ZETerrainLayer* Layer);
-		void									RemoveLayer(ZETerrainLayer* Layer);
+		ZESize							ConvertToTextureCoords(ZEInt64 Value, ZEUInt Level);
+		ZESize							ConvertToBlockCoords(ZEInt64 Value);
+		ZESize							ConvertToBlockIndex(ZEInt64 PositionX, ZEInt64 PositionY);
 
-		void									SetPrimitiveSize(ZEUInt Size);
-		ZEUInt									GetPrimitiveSize();
+		void							CopyBlockToTexture(ZETerrainBlock* Block);
 
-		void									SetMaxLevel(ZEUInt MaxLevel);
-		ZEUInt									GetMaxLevel();
+		void							UpdateBlock(ZEInt64 PositionX, ZEUInt64 PositionY);	
+		void							UpdateLoadingBlocks();
 
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-	
-		static ZETerrain2*						CreateInstance();
+	public:
+		ZETerrainLayer*					GetOwner();
 
+		ZETexture2D*					GetTexture();
+		const ZEMatrix4x4&				GetTexcoordMatrix();
+
+		float							GetMinHeight();
+		float							GetMaxHeight();
+
+		bool							Initialize();
+		void							Deinitialize();
+
+		void							Stream(ZEInt64 PositionX, ZEUInt64 PositionY);
+
+										ZETerrainLevel();
+										~ZETerrainLevel();
 };
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZETerrain2"	parent="ZEEntity"	description="Terrain" />
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
+
 #endif

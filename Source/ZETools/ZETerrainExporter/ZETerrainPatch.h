@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrain.h
+ Zinek Engine - ZETerrainPatch.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,58 +34,69 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_H__
-#define __ZE_TERRAIN_H__
 
 #include "ZETypes.h"
-#include "ZEGame/ZEEntity.h"
+#include "ZETerrainBlock.h"
+#include "ZEMath\ZEVector.h"
 
-#include "ZETerrainDrawer.h"
-
-class ZETerrainLayer;
-
-ZE_META_ENTITY_DESCRIPTION(ZETerrain2)
-class ZETerrain2 : public ZEEntity
+class ZETerrainPatch
 {
-	ZE_META_ENTITY(ZETerrain2)
 	private:
-		ZEArray<ZETerrainLayer*>				Layers;
-		ZETerrainDrawer							Drawer;
+		ZEUInt					Priority;
+		ZEUInt					Level;
+		double					StartX, StartY;
+		double					EndX, EndY;
+		double					ScaleX, ScaleY;
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		void*					Data;
+		ZESize					Width, Height;
+		ZESize					Pitch;
+		ZESize					PixelSize;
+		ZETerrainPixelType		PixelType;
 
-												ZETerrain2();
-												~ZETerrain2();
+		void					UpdateScale();
 
-	public:	
-		virtual ZEDrawFlags						GetDrawFlags() const;
+	public:
+		void					SetStartX(double x);
+		double					GetStartX();
 
-		ZETerrainDrawer&						GetDrawer();
+		void					SetStartY(double y);
+		double					GetStartY();
 
-		const ZEArray<ZETerrainLayer*>&			GetLayers();
-		void									AddLayer(ZETerrainLayer* Layer);
-		void									RemoveLayer(ZETerrainLayer* Layer);
+		void					SetEndX(double EndX);
+		double					GetEndX();
 
-		void									SetPrimitiveSize(ZEUInt Size);
-		ZEUInt									GetPrimitiveSize();
+		void					SetEndY(double EndY);
+		double					GetEndY();
 
-		void									SetMaxLevel(ZEUInt MaxLevel);
-		ZEUInt									GetMaxLevel();
+		double					GetScaleX();
+		double					GetScaleY();
 
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-	
-		static ZETerrain2*						CreateInstance();
+		ZESize					GetWidth();
+		ZESize					GetHeight();
 
+		void*					GetData();
+		ZESize					GetPitch();
+
+		ZETerrainPixelType		GetPixelType();
+		ZESize					GetPixelSize();
+
+		ZEUInt					GetLevel();
+
+		void					SetPriority(ZEUInt Priority);
+		ZEUInt					GetPriority();
+		
+		bool					BoundaryCheck(double x, double y);
+
+		void*					SampleLocalRaw(ZESSize x, ZESSize y);
+		void					SampleLocal(void* Output, double x, double y);
+		void					Sample(void* Output, double x, double y);
+
+		bool					Create(ZESize Width, ZESize Height, ZETerrainPixelType PixelType);
+		void					Clean();
+
+		bool					Load(const char* FileName, ZETerrainPixelType PixelType);
+
+								ZETerrainPatch();
+								~ZETerrainPatch();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZETerrain2"	parent="ZEEntity"	description="Terrain" />
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-#endif

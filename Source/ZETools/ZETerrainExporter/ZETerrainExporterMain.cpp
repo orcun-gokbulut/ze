@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrain.h
+ Zinek Engine - ZETerrainExporterMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,59 +33,47 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TERRAIN_H__
-#define __ZE_TERRAIN_H__
+#include "ZEDS/ZEArray.h"
+#include "ZETerrainDatabase.h"
+#include "ZETerrainPatch.h"
+#include "FreeImage.h"
 
-#include "ZETypes.h"
-#include "ZEGame/ZEEntity.h"
-
-#include "ZETerrainDrawer.h"
-
-class ZETerrainLayer;
-
-ZE_META_ENTITY_DESCRIPTION(ZETerrain2)
-class ZETerrain2 : public ZEEntity
+void main()
 {
-	ZE_META_ENTITY(ZETerrain2)
-	private:
-		ZEArray<ZETerrainLayer*>				Layers;
-		ZETerrainDrawer							Drawer;
+	FreeImage_Initialise();
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+	ZETerrainPatchDatabase Database;
 
-												ZETerrain2();
-												~ZETerrain2();
+	ZETerrainPatch* Patch;
+	Patch = new ZETerrainPatch();
+	Patch->Load("e:\\Test\\0x0.tif", ZE_TPT_COLOR);
+	Patch->SetPriority(0);
+	Patch->SetStartX(0);
+	Patch->SetStartY(0);
+	Patch->SetEndX(Patch->GetStartX() + Patch->GetWidth());
+	Patch->SetEndY(Patch->GetStartY() + Patch->GetHeight());
+	Database.AddPatch(Patch);
 
-	public:	
-		virtual ZEDrawFlags						GetDrawFlags() const;
+	Patch = new ZETerrainPatch();
+	Patch->Load("e:\\Test\\5000x0.tif", ZE_TPT_COLOR);
+	Patch->SetPriority(0);
+	Patch->SetStartX(5000);
+	Patch->SetStartY(0);
+	Patch->SetEndX(Patch->GetStartX() + Patch->GetWidth());
+	Patch->SetEndY(Patch->GetStartY() + Patch->GetHeight());
+	Database.AddPatch(Patch);
 
-		ZETerrainDrawer&						GetDrawer();
+	Patch = new ZETerrainPatch();
+	Patch->Load("e:\\Test\\5000x5000.tif", ZE_TPT_COLOR);
+	Patch->SetPriority(0);
+	Patch->SetStartX(5000);
+	Patch->SetStartY(5000);
+	Patch->SetEndX(Patch->GetStartX() + Patch->GetWidth());
+	Patch->SetEndY(Patch->GetStartY() + Patch->GetHeight());
+	Database.AddPatch(Patch);
 
-		const ZEArray<ZETerrainLayer*>&			GetLayers();
-		void									AddLayer(ZETerrainLayer* Layer);
-		void									RemoveLayer(ZETerrainLayer* Layer);
+	Database.SetBlockSize(256);
+	Database.Save("e:\\Test\\Output2\\bla");
 
-		void									SetPrimitiveSize(ZEUInt Size);
-		ZEUInt									GetPrimitiveSize();
-
-		void									SetMaxLevel(ZEUInt MaxLevel);
-		ZEUInt									GetMaxLevel();
-
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-	
-		static ZETerrain2*						CreateInstance();
-
-};
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZETerrain2"	parent="ZEEntity"	description="Terrain" />
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-#endif
+	FreeImage_DeInitialise();
+}
