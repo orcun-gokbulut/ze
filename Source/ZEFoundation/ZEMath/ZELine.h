@@ -65,7 +65,6 @@ class ZELine
 		static void			GetPointOn(ZEVector3& Point, const ZELine& Line, float TLine);
 		ZEVector3			GetPointOn(float TLine) const;
 
-							//ZELine(const ZEVector3& v, const ZEVector3& p);
 							ZELine(const ZEVector3& P0, const ZEVector3& P1);
 							ZELine();
 };

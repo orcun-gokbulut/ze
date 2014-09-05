@@ -92,6 +92,47 @@ ZEMetaType::ZEMetaType(ZEMetaTypeType Type, ZEMetaTypeQualifier TypeQualifier, Z
 	this->ClassData->Name = ClassName;
 }
 
+ZEMetaType::~ZEMetaType()
+{
+
+}
+
+ZEEnumParameterData::ZEEnumParameterData()
+{
+
+}
+
+ZEEnumParameterData::~ZEEnumParameterData()
+{
+
+}
+
+ZEForwardDeclared::ZEForwardDeclared()
+{
+
+}
+
+ZEForwardDeclared::~ZEForwardDeclared()
+{
+
+}
+
+ZEAttributeData::ZEAttributeData()
+{
+
+}
+
+ZEAttributeData::~ZEAttributeData()
+{
+
+}
+
+ZEEnumData::ZEEnumData()
+{
+	ZEUInt32 Hash = 0;
+	ZEClassData* BaseClass = NULL;
+}
+
 ZEEnumData::~ZEEnumData()
 {
 	ZEArray<ZEEnumParameterData*>::Iterator EnumParameterIterator = Parameters.GetIterator();
@@ -103,6 +144,11 @@ ZEEnumData::~ZEEnumData()
 	Parameters.Clear();
 }
 
+ZETypeData::ZETypeData()
+{
+	Hash = 0;
+}
+
 ZETypeData::~ZETypeData()
 {
 	ZEArray<ZEAttributeData*>::Iterator AttributeIterator = Attributes.GetIterator();
@@ -112,6 +158,21 @@ ZETypeData::~ZETypeData()
 		AttributeIterator.MoveNext();
 	}
 	Attributes.Clear();
+}
+ZEEventParameterData::ZEEventParameterData()
+{
+	BaseClass = NULL;
+	EnumData = NULL;
+}
+
+ZEEventParameterData::~ZEEventParameterData()
+{
+
+}
+
+ZEEventData::ZEEventData()
+{
+	IsStatic = false;
 }
 
 ZEEventData::~ZEEventData()
@@ -125,6 +186,47 @@ ZEEventData::~ZEEventData()
 	Parameters.Clear();
 }
 
+ZEPropertyData::ZEPropertyData()
+{
+	ID = 0;
+	IsGeneratedByMetaCompiler = false;
+	IsStatic = false;
+	IsContainer = false;
+	
+	BaseClass = NULL;
+	EnumData = NULL;
+}
+
+ZEPropertyData::~ZEPropertyData()
+{
+
+}
+
+ZEMethodParameterData::ZEMethodParameterData()
+{
+	BaseClass = NULL;
+	EnumData = NULL;
+}
+
+ZEMethodParameterData::~ZEMethodParameterData()
+{
+
+}
+
+ZEMethodData::ZEMethodData()
+{
+	ID = 0;
+
+	IsVirtual = false;
+	IsPure = false;
+	IsStatic = false;
+	IsEvent = false;
+	IsConst = false;
+
+	IsOperator = false;
+	OperatorType = ZE_MGOT_UNDEFINED;
+}
+
 ZEMethodData::~ZEMethodData()
 {
 	ZEArray<ZEMethodParameterData*>::Iterator ParameterIterator = Parameters.GetIterator();
@@ -134,6 +236,17 @@ ZEMethodData::~ZEMethodData()
 		ParameterIterator.MoveNext();
 	}
 	Parameters.Clear();
+}
+
+ZEClassData::ZEClassData()
+{
+	BaseClass = NULL;
+	HasScriptBase = false;
+	HasPublicConstructor = false;
+	HasPublicCopyConstructor = false;
+	HasCreateInstanceMethod = false;
+	IsAbstract = false;
+	IsBuiltInClass = false;
 }
 
 ZEClassData::~ZEClassData()
@@ -153,6 +266,11 @@ ZEClassData::~ZEClassData()
 		MethodIterator.MoveNext();
 	}
 	Methods.Clear();
+}
+
+ZEMetaData::ZEMetaData()
+{
+
 }
 
 ZEMetaData::~ZEMetaData()

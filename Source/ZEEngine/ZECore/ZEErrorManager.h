@@ -58,7 +58,7 @@ class ZEErrorManager
 
 		void						SetLogFileName(const ZEString& NewLogFile);
 		const ZEString&				GetLogFileName();
-
+		
 		static ZEErrorManager*		GetInstance();
 };
 

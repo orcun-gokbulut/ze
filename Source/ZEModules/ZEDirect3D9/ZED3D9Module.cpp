@@ -421,7 +421,7 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 			zeCriticalError("Can not restore Direct3D Device. Out of video memory");
 		}
 
-		if (DeviceState == D3DERR_DEVICENOTRESET || ForceReset)
+		if ((DeviceState == D3DERR_DEVICENOTRESET) || ForceReset)
 		{
 			Hr = Device->Reset(&D3DPP);
 			if (Hr == D3D_OK)

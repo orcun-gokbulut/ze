@@ -41,19 +41,29 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEInput/ZEInputDevice.h"
+#include "ZEThread/ZELock.h"
 
-#include <cmt3.h>
-#include <cmtpacket.h>
+#include "xsensdeviceapi.h"
+
+class ZEXSensInputDevice;
+
+class ZEXSensCallback : public XsCallback
+{
+	public:
+		ZEXSensInputDevice*			Device;
+		virtual void				onDataAvailable(XsDevice* Device, const XsDataPacket* Packet);
+};
 
 class ZEXSensInputDevice : public ZEInputDevice
 {
 	friend class ZEXSensInputModule;
+	friend class ZEXSensCallback;
 	private:
-		xsens::Cmt3						XSensDevice;
-		CmtDeviceId						XSensDeviceId;
+		ZELock							Lock;
+		XsDevice*						XSensDevice;
+		XsPortInfo						PortInfo;
 		ZEXSensInputModule*				Module;
-		CmtPortInfo						Info;
-		xsens::Packet*					XSensPacket;
+		ZEXSensCallback					Callback;
 
 		void							Process();
 
@@ -61,8 +71,6 @@ class ZEXSensInputDevice : public ZEInputDevice
 		virtual bool					DeinitializeSelf();
 
 										ZEXSensInputDevice();
-		virtual							~ZEXSensInputDevice();
-
 };
 
 #endif

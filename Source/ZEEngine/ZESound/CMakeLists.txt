@@ -53,8 +53,7 @@ ze_add_source(ZESoundSource.h				Sources Headers ZEMC)
 ze_add_source(ZESoundSource3D.cpp			Sources)
 ze_add_source(ZESoundSource3D.h				Sources Headers ZEMC)
 
-
-ze_add_library(ZESound 
+ze_add_library(TARGET ZESound 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}

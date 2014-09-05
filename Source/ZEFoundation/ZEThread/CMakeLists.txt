@@ -54,12 +54,12 @@ ze_add_source(ZEThread_Windows.cpp		Sources PLATFORMS Windows)
 ze_add_source(ZEThread.h			Sources Headers)
 ze_add_source(ZEThreadTests.cpp			Tests)
 
-ze_add_library(ZEThread
+ze_add_library(TARGET ZEThread
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation)
 
-ze_add_test(ZEThreadTests
+ze_add_test(TARGET ZEThreadTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES
 	TEST_TARGET ZEThread)

@@ -73,6 +73,7 @@
 #include "ZEGame/ZEWeather.h"
 #include "ZEGame/ZESea.h"
 #include "ZEFile/ZEPathManager.h"
+#include "ZEGame/ZEFoliage.h"
 
 
 
@@ -132,7 +133,7 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	this->Scene->SetActiveCamera(this->Player->GetCamera());
 	this->Scene->AddEntity(this->Player);
 	Player->SetPosition(ZEVector3(0.0f, 2.0f, 0.0f));
-	this->Player->GetCamera()->SetFOV(ZE_PI / 3);
+	this->Player->GetCamera()->SetHorizontalFOV(ZE_PI / 3);
 
 	this->GenerateAssertList();	
 	EntitySelector = new ZEDEntitySelector();
@@ -181,6 +182,9 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	ZESea* Sea = ZESea::CreateInstance();
 	Sea->Destroy();
 
+	ZEFoliage* Foliage = ZEFoliage::CreateInstance();
+	Foliage->Destroy();
+
 	//setStyleSheet(GetCSSFromFile(":/CSS/MapEditor.qss"));
 
 	ZED3D9FrameRenderer* Renderer = ((ZED3D9FrameRenderer*)(Scene->GetRenderer()));
@@ -205,12 +209,16 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(5));
 	ui->PropertiesTabWidget->widget(5)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HBAOProcessor, QString()), QString("SSAO"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HBAOProcessor, QString()), QString("HBAO"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(6));
 	ui->PropertiesTabWidget->widget(6)->setLayout(TempLayout);
 
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->SSAOProcessor, QString()), QString("SSAO"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(7));
+	ui->PropertiesTabWidget->widget(7)->setLayout(TempLayout);
+
 	Scene->SetAmbientColor(ZEVector3::One);
-	Scene->SetAmbientFactor(0.5f);
+	Scene->SetAmbientFactor(0.2f);
 }
 
 void MapEditor::MakeConnections()

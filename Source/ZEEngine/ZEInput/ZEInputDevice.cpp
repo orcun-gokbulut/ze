@@ -319,7 +319,7 @@ bool ZEInputDevice::IsInitialized()
 bool ZEInputDevice::Initialize()
 {
 	if (IsInitialized())
-		return false;
+		return true;
 
 	if (!InitializeSelf())
 		return false;

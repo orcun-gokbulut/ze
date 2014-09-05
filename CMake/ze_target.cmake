@@ -51,30 +51,46 @@ function(ze_link)
 
 	foreach(CURRENT_LIB ${PARAMETER_LIBS})
 		if (TARGET ${CURRENT_LIB})
-			get_property(CURRENT_LIB_TYPE TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_TYPE)				
-			if (CURRENT_LIB_TYPE MATCHES "EXTERNAL")
+			get_property(CURRENT_LIB_TYPE TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_TYPE)
 			
-				get_property(CURRENT_LIB_DIRECTORY TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_LIB_DIRECTORY)
-				get_property(CURRENT_INCLUDE_DIRECTORY TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_INCLUDE_DIRECTORY)
-				get_property(CURRENT_DLL_DIRECTORY TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_DLL_DIRECTORY)
-				get_property(CURRENT_LIBS TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_LIBS)
-				get_property(CURRENT_SYSTEM_LIBS TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_SYSTEM_LIBS)
+			if (CURRENT_LIB_TYPE MATCHES "EXTERNAL")		
+				get_property(CURRENT_LIB_DIRECTORY TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_LIB_DIRECTORY)		
+				get_property(CURRENT_LIB_INCLUDE_DIRECTORY TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_INCLUDE_DIRECTORY)		
+				get_property(CURRENT_LIBS TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_LIBS)	
+				get_property(CURRENT_LIBS_DEBUG TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_LIBS_DEBUG)	
+				get_property(CURRENT_LIBS_RELEASE TARGET ${CURRENT_LIB} PROPERTY ZEBUILD_LIBS_RELEASE)	
 
-				set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY INCLUDE_DIRECTORIES ${CURRENT_INCLUDE_DIRECTORY})	
-				target_link_libraries(${PARAMETER_TARGET} ${CURRENT_LIBS} ${CURRENT_SYSTEM_LIBS})
+				set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY INCLUDE_DIRECTORIES ${CURRENT_LIB_INCLUDE_DIRECTORY})
+
+				if (CURRENT_LIBS)
+					target_link_libraries(${PARAMETER_TARGET} ${CURRENT_LIBS})
+				endif()
+				
+				if (CURRENT_LIBS_DEBUG)
+					target_link_libraries(${PARAMETER_TARGET} ${CURRENT_LIBS_DEBUG})
+				endif()
+				
+				#FUCK CMAKE !!!
+				#if (CURRENT_LIBS_DEBUG)
+				#	target_link_libraries(${PARAMETER_TARGET} ${CURRENT_LIBS_DEBUG})
+				#endif()
+				#if (CURRENT_LIBS_RELEASE)
+				#	message("Entered Release")
+				#	target_link_libraries(${PARAMETER_TARGET} OPTIMIZED ${CURRENT_LIBS_RELEASE})
+				#endif()
 			else()
 				target_link_libraries(${PARAMETER_TARGET} ${CURRENT_LIB})
 			endif()
 		else()
-			# Scan Externals
 			target_link_libraries(${PARAMETER_TARGET} ${CURRENT_LIB})
 		endif()
 		ze_add_dependency(TARGET ${PARAMETER_TARGET} DEPENDENCIES ${CURRENT_LIB})	
 	endforeach()
 endfunction()
 
+
 function(ze_add_source)
-	parse_arguments(PARAMETER "${ze_check_parameters}" "" ${ARGV})
+	parse_arguments(PARAMETER "${ze_source_processors};${ze_check_parameters}" "" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
@@ -89,7 +105,7 @@ function(ze_add_source)
 	# Add To Source List
 	list(APPEND ${PARAMETER_SOURCE_LIST} ${PARAMETER_FILE})
 	source_group("" FILES ${PARAMETER_FILE})
-
+	
 	# Add File to Lists
 	foreach (CURRENT_EXTRA_SOURCE_LIST ${PARAMETER_EXTRA_SOURCE_LISTS})
 		list(APPEND ${CURRENT_EXTRA_SOURCE_LIST} ${PARAMETER_FILE})
@@ -99,11 +115,12 @@ function(ze_add_source)
 	set(${PARAMETER_SOURCE_LIST} ${${PARAMETER_SOURCE_LIST}} PARENT_SCOPE)
 endfunction()
 
-set(ze_source_processors "ZEMC;ZEFC")
 
+set(ze_process_source_parameters "ZEMC;ZEFC")
 macro(ze_process_sources)
 	if (PARAMETER_ZEMC)
 		ze_meta_compiler(TARGET ${PARAMETER_TARGET} FILES ${PARAMETER_ZEMC} OUTPUTS VARIABLE_ZEMC_OUTPUTS)
+		set(PARAMETER_SOURCES ${PARAMETER_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.h" "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.cpp")
 	endif()
 	
 	if (PARAMETER_ZEFC)
@@ -114,19 +131,15 @@ macro(ze_process_sources)
 	source_group("Generated" FILES ${VARIABLE_ZEMC_OUTPUTS} ${VARIABLE_ZEFC_OUTPUTS})		
 endmacro()
 
+
 function(ze_add_executable)
-	parse_arguments(PARAMETER "SOURCES;LIBS;DESTINATION;${ze_source_processors};${ze_check_parameters}" "INSTALL;CONSOLE;DLL;BUNDLE" ${ARGV})
+	parse_arguments(PARAMETER "TARGET;SOURCES;LIBS;DESTINATION;${ze_process_source_parameters};${ze_check_parameters}" "INSTALL;CONSOLE;DLL;BUNDLE" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
 		return()
 	endif()
 
-	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
-	
-	ze_process_sources()
-	set(PARAMETER_SOURCES ${PARAMETER_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaModuleRegister.h" "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaModuleRegister.cpp")
-	
 	# Compile
 	set(VARIABLE_EXECUTABLE_TYPE "")
 	if (PARAMETER_CONSOLE)
@@ -139,6 +152,8 @@ function(ze_add_executable)
 		endif()
 	endif()
 
+	ze_process_sources()
+	
 	add_executable(${PARAMETER_TARGET} ${VARIABLE_EXECUTABLE_TYPE} ${PARAMETER_SOURCES})
 	
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
@@ -146,17 +161,10 @@ function(ze_add_executable)
 	set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS "ZE_ENGINE")
 	set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY INCLUDE_DIRECTORIES "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY VERSION "${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}")
-
-	if (PARAMETER_ZEMC)
-		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_ZE_META_REGISTER_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister")
-	endif()
 	
-	source_group("Generated" FILES "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaModuleRegister.h" "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaModuleRegister.cpp")
-	
+	ze_meta_register(TARGET ${PARAMETER_TARGET})
 	ze_link(TARGET ${PARAMETER_TARGET} LIBS ${PARAMETER_LIBS})
 	ze_copy_runtime_dlls(TARGET ${PARAMETER_TARGET})
-	ze_meta_generate_module_register(TARGET ${PARAMETER_TARGET})
-	
 	ze_static_analysis(${PARAMETER_TARGET})
 	
 	if (PARAMETER_INSTALL)
@@ -167,23 +175,20 @@ function(ze_add_executable)
 		ze_set_property_all_config(TARGET ${PARAMETER_TARGET} PROPERTY PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/Symbol)
 		ze_set_property_all_config(TARGET ${PARAMETER_TARGET} PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/${PARAMETER_DESTINATION})
 	endif()
-		
 	message(STATUS "[ZEBuild] Executable \"${PARAMETER_TARGET}\" project has been added.")
 endfunction()
 
+
 function(ze_add_plugin)
-	parse_arguments(PARAMETER "SOURCES;LIBS;${ze_source_processors};${ze_check_parameters}" "INSTALL;EDITOR" ${ARGV})
+	parse_arguments(PARAMETER "TARGET;SOURCES;LIBS;${ze_process_source_parameters};${ze_check_parameters}" "INSTALL;EDITOR" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
 		return()
 	endif()
 
-	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
-	
 	ze_process_sources()
-	ze_meta_generate_module_register(TARGET ${PARAMETER_TARGET})
-
+	
 	add_library(${PARAMETER_TARGET} SHARED ${PARAMETER_SOURCES})
 
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY SUFFIX ".zePlugin")
@@ -192,13 +197,10 @@ function(ze_add_plugin)
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_TYPE PLUGIN)
 	set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS "ZE_PLUGIN")
 	set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY INCLUDE_DIRECTORIES "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
-	if (PARAMETER_ZEMC)
-		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_ZE_META_REGISTER_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister")
-	endif()
-	
+
+	ze_meta_register()
 	ze_link(TARGET ${PARAMETER_TARGET} LIBS ${PARAMETER_LIBS})
 	ze_copy_runtime_dlls(TARGET ${PARAMETER_TARGET})
-	
 	ze_static_analysis(${PARAMETER_TARGET)
 		
 	if (PARAMETER_INSTALL)
@@ -210,15 +212,13 @@ function(ze_add_plugin)
 endfunction()
 
 function (ze_add_library)
-	parse_arguments(PARAMETER "SOURCES;LIBS;HEADERS;${ze_source_processors};${ze_check_parameters}" "INSTALL;DLL;COMBINE" ${ARGV})
+	parse_arguments(PARAMETER "TARGET;SOURCES;LIBS;HEADERS;${ze_process_source_parameters};${ze_check_parameters}" "INSTALL;DLL;COMBINE" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
 		return()
 	endif()
 
-	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
-	
 	ze_process_sources()
 	
 	if (PARAMETER_DLL)
@@ -247,54 +247,12 @@ function (ze_add_library)
 		ze_copy_headers(TARGET ${PARAMETER_TARGET} HEADERS ${PARAMETER_HEADERS})
 	endif()
 	
-	if (PARAMETER_ZEMC)
-		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_HAS_ZE_META_REGISTER TRUE)
-	else()
-		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_HAS_ZE_META_REGISTER FALSE)
-	endif()
-
 	if (NOT PARAMETER_DLL)
 		message(STATUS "[ZEBuild] Library \"${PARAMETER_TARGET}\" project has been added.")
 	else()
 		message(STATUS "[ZEBuild] DLL \"${PARAMETER_TARGET}\" project has been added.")
 	endif()
-endfunction()
 
-function (ze_add_test)
-	if (NOT ZEBUILD_UNIT_TESTS_ENABLE)
-		return()
-	endif()
-
-	parse_arguments(PARAMETER "SOURCES;TEST_TARGET;EXTRA_SOURCES;LIBS;${ze_check_parameters}" "" ${ARGV})
-
-	ze_check()
-	if (NOT CHECK_SUCCEEDED)
-		return()
-	endif()
-
-	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
-
-	add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES} ${PARAMETER_EXTRA_SOURCES})
-	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
-	#set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER "${ZEBUILD_PROJECT_FOLDER}/Tests")
-	set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY INCLUDE_DIRECTORIES "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
-
-	if (PARAMETER_TEST_TARGET)
-		get_property(TEST_TARGET_LINKS TARGET ${PARAMETER_TEST_TARGET} PROPERTY ZEBUILD_LIBS)
-		ze_link(TARGET ${PARAMETER_TARGET} LIBS ${TEST_TARGET_LINKS})
-
-		get_property(TEST_TARGET_TYPE TARGET ${PARAMETER_TEST_TARGET} PROPERTY TYPE)
-		if (TEST_TARGET_TYPE EQUAL STATIC_LIBRARY)
-			ze_link(TARGET ${PARAMETER_TARGET} LIBS ${PARAMETER_TEST_TARGET})
-		endif()
-	endif()
-
-	ze_link(TARGET ${PARAMETER_TARGET} LIBS ZETest)
-
-	ze_copy_runtime_dlls(TARGET ${PARAMETER_TARGET})
-
-	source_group("" FILES ${PARAMETER_SOURCES})		
-	add_test(${PARAMETER_TARGET}Test ${PARAMETER_TARGET})
 endfunction()
 
 function(ze_add_module)

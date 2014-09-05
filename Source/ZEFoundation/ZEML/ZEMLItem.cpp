@@ -59,6 +59,126 @@ ZEMLItemType ZEMLItem::GetType() const
 	return (ZEMLItemType)Type;
 }
 
+ZEString ZEMLItem::GetTypeText()
+{
+	switch (GetType())
+	{
+		case ZEML_IT_UNDEFINED:
+			return "ZEML_IT_UNDEFINED";
+			break;
+		case ZEML_IT_FLOAT:
+			return "ZEML_IT_FLOAT";
+			break;
+		case ZEML_IT_DOUBLE:
+			return "ZEML_IT_DOUBLE";
+			break;
+		case ZEML_IT_INT8:
+			return "ZEML_IT_INT8";
+			break;
+		case ZEML_IT_INT16:
+			return "ZEML_IT_INT16";
+			break;
+		case ZEML_IT_INT32:
+			return "ZEML_IT_INT32";
+			break;
+		case ZEML_IT_INT64:
+			return "ZEML_IT_INT64";
+			break;
+		case ZEML_IT_UINT8:
+			return "ZEML_IT_UINT8";
+			break;
+		case ZEML_IT_UINT16:
+			return "ZEML_IT_UINT16";
+			break;
+		case ZEML_IT_UINT32:
+			return "ZEML_IT_UINT32";
+			break;
+		case ZEML_IT_UINT64:
+			return "ZEML_IT_UINT64";
+			break;
+		case ZEML_IT_BOOLEAN:
+			return "ZEML_IT_BOOLEAN";
+		case ZEML_IT_STRING:
+			return "ZEML_IT_STRING";
+			break;
+		case ZEML_IT_QUATERNION:
+			return "ZEML_IT_QUATERNION";
+			break;
+		case ZEML_IT_VECTOR2:
+			return "ZEML_IT_VECTOR2";
+			break;
+		case ZEML_IT_VECTOR3:
+			return "ZEML_IT_VECTOR3";
+			break;
+		case ZEML_IT_VECTOR4:
+			return "ZEML_IT_VECTOR4";
+			break;
+		case ZEML_IT_MATRIX3X3:
+			return "ZEML_IT_MATRIX3X3";
+			break;
+		case ZEML_IT_MATRIX4X4:
+			return "ZEML_IT_MATRIX4X4";
+			break;
+		case ZEML_IT_INLINE_DATA:
+			return "ZEML_IT_INLINE_DATA";
+			break;
+		case ZEML_IT_OFFSET_DATA:
+			return "ZEML_IT_OFFSET_DATA";
+			break;
+		case ZEML_IT_NODE:
+			return "ZEML_IT_NODE";
+			break;
+	}	
+}
+
+ZEMLItemType ZEMLItem::GetTypeFromText(ZEString TypeText)
+{
+	if(TypeText == "ZEML_IT_FLOAT")
+		return ZEML_IT_FLOAT;
+	else if(TypeText == "ZEML_IT_DOUBLE")
+		return ZEML_IT_DOUBLE;
+	else if(TypeText == "ZEML_IT_INT8")
+		return ZEML_IT_INT8;
+	else if(TypeText == "ZEML_IT_INT16")
+		return ZEML_IT_INT16;
+	else if(TypeText == "ZEML_IT_INT32")
+		return ZEML_IT_INT32;
+	else if(TypeText == "ZEML_IT_INT64")
+		return ZEML_IT_INT64;
+	else if(TypeText == "ZEML_IT_UINT8")
+		return ZEML_IT_UINT8;
+	else if(TypeText == "ZEML_IT_UINT16")
+		return ZEML_IT_UINT16;
+	else if(TypeText == "ZEML_IT_UINT32")
+		return ZEML_IT_UINT32;
+	else if(TypeText == "ZEML_IT_UINT64")
+		return ZEML_IT_UINT64;
+	else if(TypeText == "ZEML_IT_BOOLEAN")
+		return ZEML_IT_BOOLEAN;
+	else if(TypeText == "ZEML_IT_STRING")
+		return ZEML_IT_STRING;
+	else if(TypeText == "ZEML_IT_QUATERNION")
+		return ZEML_IT_QUATERNION;
+	else if(TypeText == "ZEML_IT_VECTOR2")
+		return ZEML_IT_VECTOR2;
+	else if(TypeText == "ZEML_IT_VECTOR3")
+		return ZEML_IT_VECTOR3;
+	else if(TypeText == "ZEML_IT_VECTOR4")
+		return ZEML_IT_VECTOR4;
+	else if(TypeText == "ZEML_IT_MATRIX3X3")
+		return ZEML_IT_MATRIX3X3;
+	else if(TypeText == "ZEML_IT_MATRIX4X4")
+		return ZEML_IT_MATRIX4X4;
+	else if(TypeText == "ZEML_IT_INLINE_DATA")
+		return ZEML_IT_INLINE_DATA;
+	else if(TypeText == "ZEML_IT_OFFSET_DATA")
+		return ZEML_IT_OFFSET_DATA;
+	else if(TypeText == "ZEML_IT_NODE")
+		return ZEML_IT_NODE;
+	else
+		return ZEML_IT_UNDEFINED;
+}
+
 ZEUInt64 ZEMLItem::GetFilePosition()
 {
 	return FilePosition;

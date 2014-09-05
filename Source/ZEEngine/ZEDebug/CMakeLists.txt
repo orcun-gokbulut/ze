@@ -48,5 +48,5 @@ cmake_minimum_required (VERSION 2.8)
 #add_source (ZESoundDebugModule.cpp				Sources)
 #add_source (ZESoundDebugModule.h				Sources)
 
-#add_library (ZEDebug ${Sources})
+#add_library (TARGET ZEDebug ${Sources})
 #set_property(TARGET ZEDebug PROPERTY FOLDER "Zinek Engine")

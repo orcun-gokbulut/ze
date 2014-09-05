@@ -40,5 +40,5 @@ ze_add_source(ZEResourceOption.cpp			    Sources)
 ze_add_source(ZEResourceConfigurator.h			Sources)
 ze_add_source(ZEResourceConfigurator.cpp		Sources)
 
-ze_add_library(ZEResourceConfigurator 
+ze_add_library(TARGET ZEResourceConfigurator 
 	SOURCES ${Sources})

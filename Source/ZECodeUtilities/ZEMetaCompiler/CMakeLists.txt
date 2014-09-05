@@ -50,7 +50,7 @@ ze_add_source(ZEMetaProcessorClang.cpp          Sources)
 ze_add_source(ZEMetaCollectionGenerator.h    	Sources)
 ze_add_source(ZEMetaCollectionGenerator.cpp  	Sources)
 
-ze_add_executable(ZEMetaCompiler 
+ze_add_executable(TARGET ZEMetaCompiler 
 	CONSOLE 
 	SOURCES ${Sources} 
 	LIBS ZEFoundation libClang)

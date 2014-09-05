@@ -75,13 +75,13 @@ ze_add_source(ZENavigationMesh.cpp				Sources)
 ze_add_source(ZENavigationMeshGenerator.h		Sources Headers)
 ze_add_source(ZENavigationMeshGenerator.cpp		Sources)
 
-ze_add_library(ZEAI
+ze_add_library(TARGET ZEAI
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}
 	LIBS ZEFoundation)
 	
-ze_add_test(ZEAITests 
+ze_add_test(TARGET ZEAITests 
 	SOURCES ${Tests}
 	ZEMC ${ZEMC}
 	TEST_TARGET ZEAI)

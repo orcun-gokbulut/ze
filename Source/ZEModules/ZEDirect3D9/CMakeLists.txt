@@ -173,7 +173,7 @@ ze_add_source(Shaders/SkinTransform.hlsl						Sources ZEFC)
 ze_add_source(Shaders/SkyBoxMaterial.hlsl						Sources ZEFC)
 ze_add_source(Shaders/SkyDomeMaterial.hlsl						Sources ZEFC)
 ze_add_source(Shaders/SSAAProcessor.hlsl						Sources ZEFC)
-ze_add_source(Shaders/SSOAProcessor.hlsl						Sources ZEFC)
+ze_add_source(Shaders/SSAOProcessor.hlsl						Sources ZEFC)
 ze_add_source(Shaders/TerrainMaterial.hlsl						Sources ZEFC)
 ze_add_source(Shaders/TextureMaskProcessor.hlsl					Sources ZEFC)
 ze_add_source(Shaders/TextureResizeProcessor.hlsl				Sources ZEFC)
@@ -181,7 +181,7 @@ ze_add_source(Shaders/UI.hlsl									Sources ZEFC)
 ze_add_source(Shaders/UnsharpenFilterProcessor.hlsl				Sources ZEFC)
 ze_add_source(Shaders/ZoomBlurProcessor.hlsl					Sources ZEFC)
 
-ze_add_library(ZEDirect3D9 
+ze_add_library(TARGET ZEDirect3D9 
 	SOURCES ${Sources}
 	ZEMC ${ZEMC}
 	ZEFC ${ZEFC}

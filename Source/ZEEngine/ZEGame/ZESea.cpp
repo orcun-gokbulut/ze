@@ -358,3 +358,30 @@ ZEVector2 ZESea::GetNormalTile() const
 {
 	return NormalTextureTile;
 }
+
+bool ZESea::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	float Height = GetWorldPosition().y;
+	ZEPlane Plane(ZEVector3::UnitY, ZEVector3(0.0f, Height, 0.0f));
+	
+	float MinT;
+	if (ZEPlane::IntersectionTest(Plane, Parameters.Ray, MinT))
+	{
+		ZEVector3 InsersectionPosition = Parameters.Ray.GetPointOn(MinT);
+		float DistanceSquare = ZEVector3::DistanceSquare(Parameters.Ray.p, InsersectionPosition);
+		if (Report.Distance * Report.Distance > DistanceSquare && DistanceSquare < Parameters.MaximumDistance * Parameters.MaximumDistance)
+		{
+			Report.Distance = ZEMath::Sqrt(DistanceSquare);
+			Report.Position = InsersectionPosition;
+			Report.PoligonIndex = 0;
+			Report.SubComponent = NULL;
+			Report.Material = NULL;
+			Report.Binormal = ZEVector3::UnitZ;
+			Report.Normal = ZEVector3::UnitY;
+		}
+
+		return true;
+	}
+
+	return false;
+}

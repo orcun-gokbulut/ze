@@ -42,6 +42,6 @@ ze_add_source(ZEJobManager.h     		Sources Headers)
 ze_add_source(ZETask.cpp         		Sources)
 ze_add_source(ZETask.h           		Sources Headers)
 
-ze_add_library(ZETask
+ze_add_library(TARGET ZETask
 	SOURCES ${Sources} 
 	HEADERS ${Headers})

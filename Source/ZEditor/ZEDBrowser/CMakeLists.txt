@@ -46,6 +46,6 @@ ze_add_source(ZEDDirectoryTreeWidget.h		Sources)
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-ze_add_library(ZEDBrowser 
+ze_add_library(TARGET ZEDBrowser 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles}
 	LIBS libQt)

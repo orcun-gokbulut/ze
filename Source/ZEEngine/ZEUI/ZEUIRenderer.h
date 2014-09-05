@@ -43,14 +43,10 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEGraphics/ZERenderer.h"
 
-ZE_META_FORWARD_DECLARE(ZEVertexDeclaration, "ZEGraphics/ZEVertexDeclaration.h")
+class ZEVertexDeclaration;
 
-ZE_CLASS(ZEUIRenderer)
-
-class ZEUIRenderer : public ZEObject
+class ZEUIRenderer
 {
-	ZE_OBJECT
-
 	private:
 		ZESmartArray<ZERenderCommand>	RenderCommands;
 		ZEMaterial*						DefaultMaterial;

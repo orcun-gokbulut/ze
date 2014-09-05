@@ -235,7 +235,7 @@ void ZED3D9SSAOProcessor::UpdateStates()
 {
 	D3DPERF_BeginEvent(0, L"State Setup");
 
-	float Fov = Renderer->GetCamera()->GetFOV();
+	float Fov = Renderer->GetCamera()->GetHorizontalFOV();
 	float Width = (float)Output->GetWidth();
 	float Height = (float)Output->GetHeight();
 	
@@ -558,6 +558,7 @@ ZED3D9SSAOProcessor::ZED3D9SSAOProcessor()
 	VertexDeclaration = NULL;
 
 	Enabled = true;
+	UpdateKernel = true;
 	SampleRadius = 1.0f;
 	SampleCount = 16;
 	AngleBias = 0.075f;

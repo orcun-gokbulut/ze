@@ -82,7 +82,6 @@ void ZELock::Lock()
 bool ZELock::Unlock()
 {
 	CurrentNumber++;
-
 	return true;
 }
 

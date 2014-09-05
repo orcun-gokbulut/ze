@@ -71,6 +71,7 @@ class ZEQuaternion
 		static void						VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaternion, const ZEVector3& Vector);
 
 		static void						Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor);
+		static void						Nlerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor);
 		static void						Conjugate(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
 		static void						Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
 		static float					Length(const ZEQuaternion& Quaternion);

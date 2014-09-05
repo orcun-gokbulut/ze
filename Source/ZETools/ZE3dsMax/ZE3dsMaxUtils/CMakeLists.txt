@@ -38,6 +38,8 @@ cmake_minimum_required (VERSION 2.8)
 ze_add_source(ZE3dsMaxUtils.h				Sources)
 ze_add_source(ZE3dsMaxUtils.cpp				Sources)
 
-ze_add_library(ZE3dsMaxUtils
+ze_add_library(TARGET ZE3dsMaxUtils
 	SOURCES ${Sources}
 	LIBS ZEFoundation lib3dsMax)
+
+set_property(TARGET ZE3dsMaxUtils APPEND PROPERTY COMPILE_FLAGS "/GR")

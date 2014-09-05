@@ -47,6 +47,8 @@ bool ZECrashReport::RegisterProvider(ZECrashReportProvider* Provider)
 		return false;
 
 	Providers.Add(Provider);
+
+	return true;
 }
 
 void ZECrashReport::UnregisterProvider(ZECrashReportProvider* Provider)

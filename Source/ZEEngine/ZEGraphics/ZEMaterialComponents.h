@@ -64,4 +64,5 @@
 #define ZE_SHADER_DISTORTION_MAP			(1 << 20)
 #define ZE_SHADER_ALPHA_CULL				(1 << 22)
 #define ZE_SHADER_VERTEX_COLOR				(1 << 23)
+#define ZE_SHADER_SSAO						(1 << 24)
 #endif

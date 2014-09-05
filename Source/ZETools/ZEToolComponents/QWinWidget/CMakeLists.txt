@@ -44,6 +44,6 @@ ze_add_source(qmfcapp.cpp			Sources)
 
 qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
-ze_add_library(QWinWidget 
+ze_add_library(TARGET QWinWidget 
 	SOURCES ${Sources} ${QtMocFiles}
 	LIBS libQt)

@@ -33,6 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef	__ZE_CRASHREPORT_PACKAGER_H__
+#define __ZE_CRASHREPORT_PACKAGER_H__
+
 #include "ZECrashReport.h"
 #include "ZEDS/ZEString.h"
 
@@ -51,3 +55,4 @@ class ZECrashReportPackager
 
 		bool					Pack();
 };
+#endif

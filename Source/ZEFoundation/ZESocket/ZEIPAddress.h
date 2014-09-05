@@ -36,34 +36,34 @@
 #pragma once
 #ifndef	__ZE_IP_ADDRESS_H__
 #define __ZE_IP_ADDRESS_H__
+
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 
-enum ZEIPAddressType
-{
-	ZE_IAT_NONE,
-	ZE_IAT_IP_V4,
-};
-
 class ZEIPAddress
 {
 	public:
+		static const ZEIPAddress		Any;
+		static const ZEIPAddress		Broadcast;
 
-		static const ZEIPAddress		IPv4Any;
-		ZEIPAddressType					Type;
-		ZEUInt8							Address4[4];
-
-
-		static ZEIPAddress				Parse(const ZEString& String);
-		static ZEArray<ZEIPAddress>		Lookup(const ZEString& String);
-		static ZEArray<ZEIPAddress>		HostIPs();
+		ZEUInt8							Address[4];
+		
+		bool							IsAny() const;
+		bool							IsBroadcast() const;
 
 		bool							operator == (const ZEIPAddress &RightOperand) const;
 		bool							operator != (const ZEIPAddress &RightOperand) const;
 
 										ZEIPAddress();
 										ZEIPAddress(ZEUInt8 Byte0, ZEUInt8 Byte1, ZEUInt8 Byte2, ZEUInt8 Byte3);
+
+		static ZEIPAddress				Parse(const ZEString& String);
+		static ZEArray<ZEIPAddress>		Lookup(const ZEString& String);
+		static ZEArray<ZEIPAddress>		HostIPs();
+
+		static void						ToSockaddr_in(void* Buffer, const ZEIPAddress& IPAddress);
+		static void						FromSockaddr_in(ZEIPAddress& IPAddress, const void* Buffer);
 };
 
 #endif

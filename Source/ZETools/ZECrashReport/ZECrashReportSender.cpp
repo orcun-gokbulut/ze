@@ -36,10 +36,32 @@
 #define CURL_STATICLIB
 #include "curl/curl.h"
 #include "ZECrashReportSender.h"
+#include "ZEDS/ZEDelegate.h"
+
+ZELock ZECrashReportSender::ProgressInformationLock;
+ZECrashReportSenderProgressInformation ZECrashReportSender::ProgressInformation = {0};
 
 static size_t ReadFunction(void* Ouput, size_t Size, size_t Count, void* File)
 {
-	return fread(Ouput, Size, Count, (FILE*)File);
+	return fread(Ouput, Size, Count, (FILE*)File);	
+}
+
+int ZECrashReportSender::ProgressFunction(void* Output, double TotalDownloadSize, double Downloaded, double TotalUploadSize, double Uploaded)
+{
+	if(Uploaded == 0)
+		return 0;
+
+	ProgressInformationLock.Lock();
+	
+	ProgressInformation.TotalDownloadSize = (ZESize)TotalDownloadSize;
+	ProgressInformation.DownloadedSize = (ZESize)Downloaded;
+	ProgressInformation.TotalUploadSize = (ZESize)TotalUploadSize;
+	ProgressInformation.UploadedSize = (ZESize)Uploaded;
+
+	ProgressInformation.ProcessPercentage = (ProgressInformation.UploadedSize * 100) / ProgressInformation.TotalUploadSize;
+
+	ProgressInformationLock.Unlock();
+	return 0;
 }
 
 void ZECrashReportSender::SetFileName(const char* FileName)
@@ -85,22 +107,28 @@ bool ZECrashReportSender::OpenConnection()
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	Curl = curl_easy_init();
-	if(!Curl)
+	if (!Curl)
 		return false;
 
 	curl_easy_setopt((CURL*)Curl, CURLOPT_UPLOAD, 1L);
 	curl_easy_setopt((CURL*)Curl, CURLOPT_URL, UploadURL.ToCString());
-	curl_easy_setopt((CURL*)Curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)FileSize);
+	curl_easy_setopt((CURL*)Curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)FileSize);	
 	//curl_easy_setopt((CURL*)Curl, CURLOPT_CONNECT_ONLY, 1L);
 	curl_easy_setopt((CURL*)Curl, CURLOPT_READFUNCTION, ReadFunction);
 	curl_easy_setopt((CURL*)Curl, CURLOPT_READDATA, File);
+	curl_easy_setopt((CURL*)Curl, CURLOPT_PUT, 1L);
+	curl_easy_setopt((CURL*)Curl, CURLOPT_NOPROGRESS, 0L);
+	curl_easy_setopt((CURL*)Curl, CURLOPT_PROGRESSFUNCTION, this->ProgressFunction);
+	curl_easy_setopt((CURL*)Curl, CURLOPT_PROGRESSDATA, ProgressInformation);
 
 	CURLcode Result = curl_easy_perform(Curl);
 	if(Result != CURLE_OK)
+	{
+		fclose((FILE*)File);
 		return false;
+	}
 
-	TransferedDataSize = 0;
-	
+	fclose((FILE*)File);
 	return true;
 }
 
@@ -124,11 +152,43 @@ bool ZECrashReportSender::TransferChunk()
 		
 	TransferedDataSize += BlockSize;
 	return true;
-
 }
 
 void ZECrashReportSender::CloseConnection()
 {
 	curl_easy_cleanup((CURL*)Curl);
 	curl_global_cleanup();
+}
+
+void ZECrashReportSender::GetProgressInformation(ZECrashReportSenderProgressInformation& Output)
+{
+	ProgressInformationLock.Lock();
+	
+	Output.DownloadedSize = ProgressInformation.DownloadedSize;
+	Output.TotalDownloadSize = ProgressInformation.TotalDownloadSize;
+	Output.TotalUploadSize = ProgressInformation.TotalUploadSize;
+	Output.UploadedSize = ProgressInformation.UploadedSize;
+	Output.ProcessPercentage = ProgressInformation.ProcessPercentage;
+
+	ProgressInformationLock.Unlock();
+	return;
+}
+
+void ZECrashReportSender::ResetProgressInformation()
+{	
+	ProgressInformation.DownloadedSize = 0;	
+	ProgressInformation.TotalDownloadSize = 0;
+	ProgressInformation.TotalUploadSize = 0;
+	ProgressInformation.UploadedSize = 0;
+	ProgressInformation.ProcessPercentage = 0;
+}
+
+ZECrashReportSender::ZECrashReportSender()
+{	
+	ResetProgressInformation();
+}
+
+ZECrashReportSender::~ZECrashReportSender()
+{
+
 }

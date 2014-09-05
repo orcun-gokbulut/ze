@@ -33,129 +33,99 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMetaProcessorInternal.h"
+/*#include "ZEMetaProcessorInternal.h"
 
-#include <cstdio>
-#include <sstream>
-
-#include "clang/AST/ASTConsumer.h"
-#include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/Basic/TargetInfo.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/FrontendAction.h"
-#include "clang/Parse/ParseAST.h"
-#include "clang/Driver/Util.h"
-#include "llvm/Support/Path.h"
-#include "llvm/Support/Host.h"
-#include "llvm/Support/system_error.h"
-
-#include "ZEFile/ZEFileInfo.h"
+#include "ZEDS/ZEFormat.h"
 #include "ZEMetaGenerator.h"
-#include "ZEMetaCollectionGenerator.h"
 
-using namespace clang::driver;
-using namespace clang;
-using namespace std;
+#include <clang/Frontend/FrontendActions.h>
+#include <clang/Tooling/CommonOptionsParser.h>
+#include <clang/Tooling/Tooling.h>
+#include <llvm/Support/CommandLine.h>
+#include <clang/AST/ASTConsumer.h>
+#include "ZEFile/ZEFileInfo.h"
 
-class ZECodeGeneratorASTConsumer : public ASTConsumer
+class ZEMetaCompilerASTConsumer : public clang::ASTConsumer
 {
 	public:
+		virtual void Initialize(ASTContext &Context) 
+		{
+
+		}
+
 		virtual bool HandleTopLevelDecl(DeclGroupRef DR) 
 		{
 			for (DeclGroupRef::iterator Iterator = DR.begin(); Iterator != DR.end(); Iterator++)
 			{
-				ZEMetaProcessorInternal::ProcessDeclaration(*Iterator);
+				ZEMetaCompilerParser::ProcessDeclaration(*Iterator);
 			}
 
 			return true;
 		}
+
+		virtual void HandleTranslationUnit(ASTContext &Ctx)
+		{
+
+		}
 };
 
-void ZEMetaProcessorInternal::InitializeClang()
+class ZEMetaCompilerFrontendAction : public clang::ASTFrontendAction
 {
-	const char* Arguments[] =
+	public:
+		virtual clang::ASTConsumer *CreateASTConsumer(CompilerInstance &CI, StringRef InFile)
+		{
+			ZEMetaCompilerParser::Compiler = &CI;
+			return new ZEMetaCompilerASTConsumer();
+		}
+};
+
+class ZEMetaCompilerFrontendActionFactory : public clang::tooling::FrontendActionFactory
+{
+	public:
+		virtual clang::FrontendAction *create()
+		{
+			return new ZEMetaCompilerFrontendAction();
+		}
+};
+
+void ZEMetaCompilerParser::Parse()
+{
+	std::vector<std::string> Arguments;
+	Arguments.push_back("ZEMetaCompiler.exe");
+	Arguments.push_back(Options.InputFileName);
+	
+	Arguments.push_back("--");
+	Arguments.push_back("-fms-extensions");
+	Arguments.push_back("-fms-compatibility");
+	Arguments.push_back("-x");	Arguments.push_back("c++");
+	Arguments.push_back("-fsyntax-only");
+	Arguments.push_back("-w");
+	//Arguments.push_back("-std=c++11");
+
+	for (int I = 0; I < Options.IncludeDirectories.GetCount(); I++)
 	{
-		"-cc1",
-
-		"-disable-free",
-		
-		"-fmath-errno",
-		"-ferror-limit", "19",
-		"-fmessage-length", "150",
-		"-w",
-		"-fms-extensions",
-		"-fms-compatibility",
-		"-fmsc-version=1600",
-		"-fdelayed-template-parsing",
-		
-		"-fno-rtti",
-		"-fcolor-diagnostics",
-		
-		"-x", "c++",
-		//"-std=", "c++11", 
-		"-fsyntax-only",
-	};
-
-	size_t ArgumentCount = sizeof(Arguments) / sizeof(const char*);
-
-	CompilerInstance Compiler;
-	ZEMetaProcessorInternal::Compiler = &Compiler;
-	Compiler.createDiagnostics(ArgumentCount, Arguments);
-	
-	CompilerInvocation Invocation;
-	bool Result = CompilerInvocation::CreateFromArgs(Invocation, Arguments, Arguments + ArgumentCount, Compiler.getDiagnostics());
-	Compiler.setInvocation(&Invocation);
-
-	if (Invocation.getHeaderSearchOpts().UseBuiltinIncludes && Invocation.getHeaderSearchOpts().ResourceDir.empty())
-	{
-		llvm::sys::Path BinaryDir = llvm::sys::Path::GetMainExecutable(Options.BinaryPath, ZEMetaProcessorInternal::InitializeClang);
-		BinaryDir.eraseComponent();
-		Invocation.getHeaderSearchOpts().ResourceDir = BinaryDir.str();
-	}
-	
-	std::vector<std::string> SystemDirs = clang::driver::GetWindowsSystemIncludeDirs();
-	for(size_t i = 0; i < SystemDirs.size(); ++i)
-		Invocation.getHeaderSearchOpts().AddPath(SystemDirs[i], frontend::System, false, false, true, true);
-
-	for (size_t I = 0; I < Options.IncludeDirectories.GetCount(); I++)
-		Invocation.getHeaderSearchOpts().AddPath(Options.IncludeDirectories[I].ToCString(), frontend::IncludeDirGroup::After, true, false, true);
-
-	#ifdef ZE_PLATFORM_WINDOWS
-		Invocation.getPreprocessorOpts().addMacroDef("WIN32");
-		Invocation.getPreprocessorOpts().addMacroDef("_WINDOWS");
-		Invocation.getPreprocessorOpts().addMacroDef("NDEBUG");
-	#endif
-	Invocation.getPreprocessorOpts().addMacroDef("ZE_META_COMPILER");
-
-	for (size_t I = 0; I < Options.Definitions.GetCount(); I++)
-		Invocation.getPreprocessorOpts().addMacroDef(Options.Definitions[I].ToCString());
-	
-	TargetOptions TO;
-	TO.Triple = llvm::sys::getDefaultTargetTriple();
-	TargetInfo* TI = TargetInfo::CreateTargetInfo(Compiler.getDiagnostics(), TO);
-	TI->setCXXABI(TargetCXXABI::CXXABI_Microsoft);
-	Compiler.setTarget(TI);
-
-	Compiler.createDiagnostics(ArgumentCount, Arguments);
-	Compiler.createFileManager();
-	Compiler.createSourceManager(Compiler.getFileManager());
-	Compiler.createPreprocessor();
-	Compiler.setASTConsumer(new ZECodeGeneratorASTConsumer());
-	Compiler.createASTContext();
-	
-	if (Options.MSVC)
-	{
-		Compiler.getDiagnosticOpts().setFormat(TextDiagnosticFormat::Msvc);
-		Compiler.getDiagnosticOpts().MessageLength = 0;
+		Arguments.push_back(ZEFormat::Format("-I{0}", Options.IncludeDirectories[I]));
 	}
 
-	const FileEntry *pFile = Compiler.getFileManager().getFile(Options.InputFileName.ToCString());
-	Compiler.getSourceManager().createMainFileID(pFile);
-	Compiler.getDiagnosticClient().BeginSourceFile(Compiler.getLangOpts(), &Compiler.getPreprocessor());
+	for (int I = 0; I < Options.Definitions.GetCount(); I++)
+	{
+		Arguments.push_back(ZEFormat::Format("-D{0}", Options.Definitions[I]));
+	}	
+	
+	const char* argv[1024];
+	int argc = Arguments.size();
+	for (int I = 0; I < argc; I++)
+	{
+		argv[I] = Arguments[I].c_str();
+	}
 
-	ParseAST(Compiler.getPreprocessor(), &Compiler.getASTConsumer(), Compiler.getASTContext(), false, clang::TranslationUnitKind::TU_Complete, NULL, true);
-	if (Compiler.getDiagnostics().hasErrorOccurred())
+	clang::tooling::CommonOptionsParser OptionsParser(argc, argv);
+	clang::tooling::ClangTool Tool(OptionsParser.getCompilations(),	OptionsParser.getSourcePathList());
+	int Result = Tool.run(new ZEMetaCompilerFrontendActionFactory());
+	if (Result != EXIT_SUCCESS)
+	{
 		exit(EXIT_FAILURE);
+	}
 
 	if (!ZEMetaGenerator::Generate(Options, MetaData))
 		exit(EXIT_FAILURE);
@@ -167,8 +137,7 @@ void ZEMetaProcessorInternal::InitializeClang()
 
 		for(ZESize I = 0; I < MetaData->TargetTypes.GetCount(); I++)
 		{
-			fprintf(File, 
-				"%s,%s;", 
+			fprintf(File, "%s,%s;", 
 				MetaData->TargetTypes[I]->Name.ToCString(), 
 				ZEFileInfo::GetFileName(Options.InputFileName).ToCString());
 		}
@@ -177,4 +146,91 @@ void ZEMetaProcessorInternal::InitializeClang()
 	}
 
 	exit(EXIT_SUCCESS);
+}*/
+	/*
+#include <clang\AST\DeclCXX.h>
+#include <clang\Tooling\Tooling.h>
+#include <clang\AST\DeclBase.h>
+#include <clang\Frontend\FrontendAction.h>
+#include <clang\Frontend\CompilerInstance.h>
+#include <clang\Basic\LLVM.h>
+#include <clang\AST\ASTConsumer.h>
+
+using namespace clang;
+using namespace llvm;
+
+bool IsInstantiatable(const CXXMethodDecl* Method)
+{
+	if (!isa<CXXConstructorDecl>(Method))
+		return false;
+
+	// For regular C++ member functions Decl::getAccess() works fine for regular member functions
+	// however, in this case, if member function is constructor it allways returns AccessSpecifier::AS_public.
+	if (Method->getAccess() == AccessSpecifier::AS_public)
+		return true;
+
+	return false;
 }
+
+void ProcessClass(CXXRecordDecl* Class)
+{
+	for(CXXRecordDecl::decl_iterator Current = Class->decls_begin(), End = Class->decls_end(); Current != End; ++Current)
+	{
+		if(isa<CXXMethodDecl>(*Current))
+		{
+			if (IsInstantiatable(cast<CXXMethodDecl>(*Current)))
+			{
+				printf("Class %s has a public constructor so it is instantiatable.", Class->getName());
+				return;
+			}
+		}
+	}
+
+	printf("Class %s doesn't have a public constructor so it is not instantiatable.", Class->getName());
+}
+
+class TestASTConsumer : public ASTConsumer
+{
+	public:
+		virtual bool HandleTopLevelDecl(DeclGroupRef DR) 
+		{
+			for (DeclGroupRef::iterator Iterator = DR.begin(); Iterator != DR.end(); Iterator++)
+			{
+				if (isa<CXXRecordDecl>(*Iterator))
+				{
+					ProcessClass(cast<CXXRecordDecl>(*Iterator));
+				}
+			}
+
+			return true;
+		}
+};
+
+class TestFrontendAction : public ASTFrontendAction
+{
+	public:
+		virtual clang::ASTConsumer *CreateASTConsumer(CompilerInstance &CI, StringRef InFile)
+		{
+			return new TestASTConsumer();
+		}
+};
+
+void main(int argc, char** argv)
+{
+	char* Code = 
+		"class TestClass\n"
+		"{\n"
+		"	private:\n"
+		"		// It's access type is identified as public. WRONG\n"
+		"		\n"
+		"		void DoPrivateStuff();\n"
+		"\n"	
+		"	public:\n"
+		"TestClass();"
+		"		void DoStuff();\n"
+		"};\n";
+
+		clang::tooling::runToolOnCode(
+			new TestFrontendAction(), 
+			Code);
+}*/

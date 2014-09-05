@@ -41,13 +41,12 @@ set(ZEBUILD_3DS_MAX_BINARY_DIRECTORY "C:\\Program Files (x86)\\Autodesk\\3ds Max
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_subdirectory(ZE3dsMaxUI)	
+add_subdirectory(ZE3dsMaxUI)
 add_subdirectory(ZE3dsMaxModelExporter)
 add_subdirectory(ZE3dsMaxInteriorExporter)
 add_subdirectory(ZE3dsMaxPlugin)
 add_subdirectory(ZE3dsMaxUtils)
 
-add_custom_target(ZE3dsMax
+add_custom_target(ZE3dsMaxBuild
 	SOURCES CMakeLists.txt)
-
-set_property(TARGET ZE3dsMax PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
+set_property(TARGET ZE3dsMaxBuild PROPERTY FOLDER "ZETools/ZE3dsMax")

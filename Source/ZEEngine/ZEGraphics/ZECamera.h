@@ -48,6 +48,22 @@
 #include "ZEDS/ZEFlags.h"
 
 typedef ZEFlags ZECameraDirtyFlags;
+typedef ZEFlags ZECameraSettingFlags;
+
+enum ZECameraSettingType
+{
+	ZE_CST_NONE			= 0,
+	ZE_CST_ASPECT_RATIO = 1,
+	ZE_CST_NEAR_Z		= 2,
+	ZE_CST_FAR_Z		= 3,
+	ZE_CST_ALL			= 0xFFFFFFFF
+};
+
+//#define ZE_CSF_NONE			0
+//#define ZE_CSF_ASPECT_RATIO	1
+//#define ZE_CSF_NEAR_Z		2
+//#define ZE_CSF_FAR_Z		4
+//#define ZE_CSF_ALL			0xFFFFFFFF
 
 enum ZECameraProjectionType
 {
@@ -65,11 +81,16 @@ class ZECamera : public ZEEntity
 	ZE_OBJECT
 
 	private:
-		ZECameraDirtyFlags				CameraDirtyFlags;
+		mutable ZECameraDirtyFlags		CameraDirtyFlags;
 
 		float							NearZ, FarZ;
-		float							FOV, AspectRatio, GlobalAspectRatio;
+		float							VerticalFOV;
+		float							AspectRatio;
+		mutable float					EffectiveNearZ, EffectiveFarZ,  EffectiveAspectRatio;
 		float							Width, Height;
+
+		bool							AutoZ;
+		bool							AutoAspectRatio;
 
 		float							ShadowDistance;
 		float							ShadowFadeDistance;
@@ -84,16 +105,27 @@ class ZECamera : public ZEEntity
 										ZECamera();
 
 		virtual void					OnTransformChanged();
+		virtual void					UpdateAutoParameters();
 
 	public:
+
+		void							SetAutoZ(bool Enabled);
+		bool							GetAutoZ();
+
 		void							SetNearZ(float NearZ);
 		float							GetNearZ() const;
 
 		void							SetFarZ(float FarZ);
 		float							GetFarZ() const;
 
-		void							SetFOV(float FOV);
-		float							GetFOV() const;
+		void							SetHorizontalFOV(float FOV);
+		float							GetHorizontalFOV() const;
+
+		void							SetVerticalFOV(float FOV);
+		float							GetVerticalFOV() const;
+
+		void							SetAutoAspectRatio(bool Enabled);
+		bool							GetAutoAspectRatio();
 
 		void							SetAspectRatio(float AspectRatio);
 		float							GetAspectRatio() const;

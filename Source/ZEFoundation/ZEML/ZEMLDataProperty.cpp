@@ -36,6 +36,8 @@
 #include "ZEMLDataProperty.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEError.h"
+#include "TinyXML.h"
+#include "ZEBase64.h"
 
 ZEMLDataProperty::~ZEMLDataProperty()
 {
@@ -114,6 +116,28 @@ const void* ZEMLDataProperty::GetData()
 	}
 
 	return Data;
+}
+
+bool ZEMLDataProperty::WriteSelfToXML(TiXmlElement* Element)
+{
+	if(Element == NULL)
+		return false;
+
+	TiXmlElement* PropertElement = new TiXmlElement(GetName());
+	PropertElement->SetAttribute("Type", GetTypeText());
+	PropertElement->SetAttribute("DataSize", DataSize);
+
+	char* Base64Buffer = new char[ZEBase64::EncodeSize(DataSize) + 1];
+	Base64Buffer[ZEBase64::EncodeSize(DataSize)] = '\0';
+	ZEBase64::Encode(Base64Buffer, Data, DataSize);
+	PropertElement->SetAttribute("Data", Base64Buffer);
+	delete []Base64Buffer;
+
+	if(DataSize == 0)
+		zeWarning("ZEMLDataProperty \"%s\" data size is : 0", GetName().ToCString());
+
+	Element->LinkEndChild(PropertElement);
+	return true;
 }
 
 bool ZEMLDataProperty::WriteSelf(ZEFile* File)
@@ -231,4 +255,12 @@ bool ZEMLDataProperty::ReadSelf(ZEFile* File, bool DeferredDataReading)
 	}
 
 	return true;
+}
+
+bool ZEMLDataProperty::ReadFromXML(TiXmlElement* Element)
+{
+	SetName(Element->Value());
+	DataSize = ZEString(Element->Attribute("DataSize")).ToUInt64();
+	Data = new char[DataSize];
+	return ZEBase64::Decode(Data, (void*)Element->Attribute("Data"), strlen(Element->Attribute("Data")));
 }

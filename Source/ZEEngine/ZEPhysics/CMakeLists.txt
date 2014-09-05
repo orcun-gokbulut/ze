@@ -58,8 +58,7 @@ ze_add_source(ZEPhysicsModule.h					Sources Headers)
 ze_add_source(ZEPhysicsPicker.cpp				Sources)
 ze_add_source(ZEPhysicsPicker.h	        		Sources Headers)
 
-
-ze_add_library(ZEPhysics 
+ze_add_library(TARGET ZEPhysics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation)

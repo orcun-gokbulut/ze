@@ -95,6 +95,8 @@ class ZEMLItem : public ZEListItem
 
 	public:
 		ZEMLItemType		GetType() const;
+		ZEString			GetTypeText();
+		ZEMLItemType		GetTypeFromText(ZEString TypeText);
 
 		ZEUInt64			GetFilePosition();
 

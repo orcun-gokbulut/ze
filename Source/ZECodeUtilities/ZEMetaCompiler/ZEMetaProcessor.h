@@ -43,7 +43,7 @@
 class ZEMetaProcessor
 {
 	public:
-		static bool		Process(ZEMetaData* Data, const ZEMetaCompilerOptions& Options);
+		static bool		Parse(ZEMetaData* Data, const ZEMetaCompilerOptions& Options);
 };
 
 #endif

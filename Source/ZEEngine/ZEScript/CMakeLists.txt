@@ -40,7 +40,7 @@ ze_add_source(ZEScriptEngine.h						Sources Headers)
 ze_add_source(ZEScriptClass.cpp						Sources)
 ze_add_source(ZEScriptClass.h					  	Sources Headers)
 
-ze_add_library(ZEScript 
+ze_add_library(TARGET ZEScript 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation)

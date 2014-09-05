@@ -66,7 +66,7 @@ ZETestSuite(ZELine)
 
 		ZELine::Create(Line, P0, P1);
 		ZETestCheckEqual(Line.p, P0);
-		ZETestCheckClose(Line.v, ZEVector3(0.30151134f, 0.30151134f, 0.90453403f));
+		ZETestCheckClose(Line.v, P1.Normalize());
 
 	}
 	ZETest("void ZELine::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p)")

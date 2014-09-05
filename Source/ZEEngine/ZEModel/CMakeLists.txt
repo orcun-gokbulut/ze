@@ -59,7 +59,7 @@ ze_add_source(ZEModelDebugDrawer.cpp		Sources)
 ze_add_source(ZEModelDebugDrawer.h			Sources Headers)
 
 
-ze_add_library(ZEModel
+ze_add_library(TARGET ZEModel 
 	ZEMC ${ZEMC} 
 	SOURCES ${Sources}
 	HEADERS ${Headers}

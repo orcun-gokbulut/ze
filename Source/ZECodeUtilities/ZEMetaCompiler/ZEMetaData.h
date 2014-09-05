@@ -146,13 +146,18 @@ class ZEMetaType
 		ZEMetaType();
 		ZEMetaType(ZEMetaTypeType Type, ZEMetaTypeQualifier TypeQualifier = ZE_MTQ_VALUE, ZEMetaTypeType SubType = ZE_MTT_UNDEFINED, ZEMetaTypeQualifier SubTypeQualifier = ZE_MTQ_VALUE, ZEString ClassName = "", ZEClassData* ClassData = NULL);
 		ZEMetaType(ZEMetaTypeType Type, ZEMetaTypeQualifier TypeQualifier, ZEString ClassName = "", ZEClassData* ClassData = NULL);
+		~ZEMetaType();
 };
 
-class ZEEnumParameterData
+class ZEAttributeData
 {
 	public:
 		ZEString						Name;
-		ZEUInt32						Value;
+		ZEString						MemberOf;
+		ZEArray<ZEString>				Parameters;
+
+										ZEAttributeData();
+										~ZEAttributeData();
 };
 
 class ZEForwardDeclared
@@ -161,6 +166,19 @@ class ZEForwardDeclared
 		ZEString						HeaderFileDeclaredIn;
 		ZEString						ClassName;
 		ZEString						HeaderName;
+		
+										ZEForwardDeclared();
+										~ZEForwardDeclared();
+};
+
+class ZEEnumParameterData
+{
+	public:
+		ZEString						Name;
+		ZEUInt32						Value;
+
+										ZEEnumParameterData();
+										~ZEEnumParameterData();
 };
 
 class ZEEnumData
@@ -169,19 +187,10 @@ class ZEEnumData
 		ZEString						Name;
 		ZEUInt32						Hash;
 		ZEArray<ZEEnumParameterData*>	Parameters;
-
 		ZEClassData*					BaseClass;
 
-		virtual							~ZEEnumData();
-};
-
-class ZEAttributeData
-{
-	public:
-		ZEString						Name;
-		ZEArray<ZEString>				Parameters;
-
-		ZEString						MemberOf;
+										ZEEnumData();
+										~ZEEnumData();
 };
 
 class ZETypeData
@@ -191,6 +200,7 @@ class ZETypeData
 		ZEUInt32						Hash;
 		ZEArray<ZEAttributeData*>		Attributes;
 
+										ZETypeData();
 		virtual							~ZETypeData();
 };
 
@@ -201,6 +211,9 @@ class ZEEventParameterData
 		ZEMetaType						Type;
 		ZEClassData*					BaseClass;
 		ZEEnumData*						EnumData;
+
+										ZEEventParameterData();
+										~ZEEventParameterData();
 };
 
 class ZEEventData : public ZETypeData
@@ -212,6 +225,7 @@ class ZEEventData : public ZETypeData
 		ZEEventParameterData			ReturnParameter;
 		ZEArray<ZEEventParameterData*>	Parameters;
 
+										ZEEventData();
 		virtual							~ZEEventData();
 };
 
@@ -231,6 +245,9 @@ struct ZEPropertyData : public ZETypeData
 
 		ZEString						Getter;
 		ZEString						Setter;
+
+										ZEPropertyData();
+										~ZEPropertyData();
 };
 
 class ZEMethodParameterData
@@ -240,6 +257,9 @@ class ZEMethodParameterData
 		ZEMetaType						Type;
 		ZEClassData*					BaseClass;
 		ZEEnumData*						EnumData;
+										
+										ZEMethodParameterData();
+										~ZEMethodParameterData();
 };
 
 struct ZEMethodData : public ZETypeData
@@ -260,6 +280,7 @@ struct ZEMethodData : public ZETypeData
 		ZESize							ID;
 		ZEString						MemberOf;
 
+										ZEMethodData();
 		virtual							~ZEMethodData();
 };
 
@@ -271,12 +292,14 @@ class ZEClassData : public ZETypeData
 		ZEArray<ZEMethodData*>			Methods;
 		ZEArray<ZEEventData*>			Events;
 
+		bool							HasScriptBase;
 		bool							HasPublicConstructor;
 		bool							HasPublicCopyConstructor;
 		bool							HasCreateInstanceMethod;
 		bool							IsAbstract;
 		bool							IsBuiltInClass;
 
+										ZEClassData();
 		virtual							~ZEClassData();
 };
 
@@ -288,6 +311,7 @@ class ZEMetaData
 		ZEArray<ZEEnumData*>			EnumTypes;
 		ZEArray<ZEForwardDeclared*>		ForwardDeclaredClasses;
 
+										ZEMetaData();
 										~ZEMetaData();
 };
 

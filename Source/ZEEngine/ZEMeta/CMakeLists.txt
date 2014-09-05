@@ -86,12 +86,11 @@ ze_add_source(ZEMetaModuleRegister.h			Sources Headers)
 ze_add_source(ZEPrimitiveTypes.h				Sources)
 ze_add_source(ZEPrimitiveTypes.cpp				Sources)
 
-ze_add_source(${CMAKE_SOURCE_DIR}/Source/ZEFoundation/ZEMath/ZEVector.h     ZEMC)
-ze_add_source(${CMAKE_SOURCE_DIR}/Source/ZEFoundation/ZEMath/ZEMatrix.h     ZEMC)
-ze_add_source(${CMAKE_SOURCE_DIR}/Source/ZEFoundation/ZEMath/ZEQuaternion.h ZEMC)
+#ze_add_source(${CMAKE_SOURCE_DIR}/Source/ZEFoundation/ZEMath/ZEVector.h     ZEMC)
+#ze_add_source(${CMAKE_SOURCE_DIR}/Source/ZEFoundation/ZEMath/ZEMatrix.h     ZEMC)
+#ze_add_source(${CMAKE_SOURCE_DIR}/Source/ZEFoundation/ZEMath/ZEQuaternion.h ZEMC)
 
-ze_add_library(ZEMeta 
+ze_add_library(TARGET ZEMeta 
 	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation
+	HEADERS ${Headers}	LIBS ZEFoundation
 	ZEMC ${ZEMC})

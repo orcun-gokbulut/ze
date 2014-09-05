@@ -45,6 +45,6 @@ qt4_add_resources(QtResourceFiles ${QtResources})
 qt4_wrap_ui(QtUIFiles ${QtUI})
 qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
-ze_add_library(ZEMLVisualizerWidget 
+ze_add_library(TARGET ZEMLVisualizerWidget 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
 	LIBS libQt)
