@@ -47,7 +47,7 @@ add_subdirectory(QWinWidget)
 
 ze_add_source(ZEToolComponentsMain.cpp		Sources)
 
-ze_add_executable(ZEToolComponents 
+ze_add_executable(TARGET ZEToolComponents 
 	SOURCES ${Sources}
 	LIBS ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget ZEMLVisualizerWidget ZEResourceConfigurator
 		libQt)

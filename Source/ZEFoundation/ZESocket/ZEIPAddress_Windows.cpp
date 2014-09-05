@@ -44,61 +44,12 @@
 #include <Ws2tcpip.h>
 
 #ifdef ZE_PLATFORM_COMPILER_MSVC
-#include <Mstcpip.h>
-#include <Ws2ipdef.h>
+	#include <Mstcpip.h>
+	#include <Ws2ipdef.h>
 #endif
 
-#include <memory.h>
-
 #include "ZETypes.h"
-#include "ZEError.h"
-
-
-
-const ZEIPAddress ZEIPAddress::IPv4Any = ZEIPAddress(0, 0, 0, 0);
-
-ZEIPAddress::ZEIPAddress()
-{
-	memset(this, 0, sizeof(ZEIPAddress));
-	Type = ZE_IAT_NONE;
-}
-
-ZEIPAddress::ZEIPAddress(ZEUInt8 Byte0, ZEUInt8 Byte1, ZEUInt8 Byte2, ZEUInt8 Byte3)
-{
-	Type = ZE_IAT_IP_V4;
-	Address4[0] = Byte0;
-	Address4[1] = Byte1;
-	Address4[2] = Byte2;
-	Address4[3] = Byte3;
-}
-
-ZEIPAddress ZEIPAddress::Parse(const ZEString& String)
-{
-	ZEIPAddressType Type = ZE_IAT_IP_V4;
-
-	ZEString Part0, Part1, Part2, Part3;
-	ZEUInt PartIndex = 0;
-
-	for (ZESize I = 0; I < String.GetLength(); I++)
-	{
-		if(String[I] == '.')
-		{
-			PartIndex++;
-			continue;
-		}
-
-		if(PartIndex == 0)
-			Part0.Append(ZEString::FromChar(String.GetCharacter(I)));
-		else if(PartIndex == 1)
-			Part1.Append(ZEString::FromChar(String.GetCharacter(I)));
-		else if(PartIndex == 2)
-			Part2.Append(ZEString::FromChar(String.GetCharacter(I)));
-		else if(PartIndex == 3)
-			Part3.Append(ZEString::FromChar(String.GetCharacter(I)));
-	}
-
-	return ZEIPAddress((ZEUInt8)Part0.ToInt32(), (ZEUInt8)Part1.ToInt32(), (ZEUInt8)Part2.ToInt32(), (ZEUInt8)Part3.ToInt32());
-}
+#include <memory.h>
 
 ZEArray<ZEIPAddress> ZEIPAddress::Lookup(const ZEString& String)
 {
@@ -127,41 +78,32 @@ ZEArray<ZEIPAddress> ZEIPAddress::HostIPs()
 	return Lookup(ZEString(HostName));
 }
 
-bool ZEIPAddress::operator == (const ZEIPAddress &RightOperand) const
+void ZEIPAddress::ToSockaddr_in(void* Buffer, const ZEIPAddress& IPAddress)
 {
-	zeDebugCheck(Type != RightOperand.Type, "Ip type mismatch.");
-	zeDebugCheck((Type == ZE_IAT_NONE) || (RightOperand.Type == ZE_IAT_NONE), "Typeless Ip's are not comparable.");
+	sockaddr_in* SocketAddress = (sockaddr_in*)Buffer;
+	memset(SocketAddress, 0, sizeof(sockaddr_in));
 
-	if(Type != RightOperand.Type)
-		return false;
+	SocketAddress->sin_family = AF_INET;
+	SocketAddress->sin_port = htons(0);
 
-	if(Type == ZE_IAT_NONE || RightOperand.Type == ZE_IAT_NONE)
-		return false;
-
-	return ((Address4[0] == RightOperand.Address4[0]) &&
-			(Address4[1] == RightOperand.Address4[1]) &&
-			(Address4[2] == RightOperand.Address4[2]) &&
-			(Address4[3] == RightOperand.Address4[3]));
-
-	return false;
+	if(IPAddress.IsAny())
+	{
+		SocketAddress->sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+	}
+	else
+	{
+		SocketAddress->sin_addr.S_un.S_un_b.s_b1 = IPAddress.Address[0];
+		SocketAddress->sin_addr.S_un.S_un_b.s_b2 = IPAddress.Address[1];
+		SocketAddress->sin_addr.S_un.S_un_b.s_b3 = IPAddress.Address[2];
+		SocketAddress->sin_addr.S_un.S_un_b.s_b4 = IPAddress.Address[3];
+	}
 }
 
-bool ZEIPAddress::operator != (const ZEIPAddress &RightOperand) const
+void ZEIPAddress::FromSockaddr_in(ZEIPAddress& IPAddress, const void* Buffer)
 {
-	zeDebugCheck(Type != RightOperand.Type, "Ip type mismatch.");
-	zeDebugCheck((Type == ZE_IAT_NONE) || (RightOperand.Type == ZE_IAT_NONE), "Typeless Ip's are not comparable.");
-
-	if(Type != RightOperand.Type)
-		return false;
-
-	if(Type == ZE_IAT_NONE || RightOperand.Type == ZE_IAT_NONE)
-		return false;
-
-	if(Type == ZE_IAT_IP_V4)
-		return ((Address4[0] != RightOperand.Address4[0]) ||
-				(Address4[1] != RightOperand.Address4[1]) ||
-				(Address4[2] != RightOperand.Address4[2]) ||
-				(Address4[3] != RightOperand.Address4[3]));
-
-	return false;
+	sockaddr_in* SocketAddress = (sockaddr_in*)Buffer;
+	IPAddress.Address[0] = SocketAddress->sin_addr.S_un.S_un_b.s_b1;
+	IPAddress.Address[1] = SocketAddress->sin_addr.S_un.S_un_b.s_b2;
+	IPAddress.Address[2] = SocketAddress->sin_addr.S_un.S_un_b.s_b3;
+	IPAddress.Address[3] = SocketAddress->sin_addr.S_un.S_un_b.s_b4;
 }

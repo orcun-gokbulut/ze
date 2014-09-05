@@ -54,7 +54,7 @@ add_subdirectory(ZEDImageExtensionsPlugIn)
 
 ze_add_source(ZEDMain.cpp		Sources)
 
-ze_add_executable(ZEditor 
+ze_add_executable(TARGET ZEditor 
 	SOURCES ${Sources}
 	LIBS ZEEngine
 		ZEDCommonControls ZEDCommonEntities ZEDCore ZEDImageExtensionsPlugIn ZEDMaterialEditor ZEDPropertyWindowManager

@@ -407,6 +407,9 @@ class ZEFixedMaterial : public ZEMaterial
 		void							SetDistortionMapAddressModeV(ZETextureAddressMode Mode);
 		ZETextureAddressMode			GetDistortionMapAddressModeV() const;
 
+		void							SetSSAOEnabled(bool Enabled);
+		bool							GetSSAOEnabled() const;
+
 		void							SetVertexColorEnabled(bool Enabled);
 		bool							GetVertexColorEnabled();
 

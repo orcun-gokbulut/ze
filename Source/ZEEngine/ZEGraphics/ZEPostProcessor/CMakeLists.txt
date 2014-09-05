@@ -58,7 +58,6 @@ ze_add_source(ZEPPTextureOutputNode.h		Sources Headers)
 ze_add_source(ZEPPVelocityInputNode.cpp		Sources)
 ze_add_source(ZEPPVelocityInputNode.h		Sources Headers)
 
-
-ze_add_library(ZEPostProcessor 
+ze_add_library(TARGET ZEPostProcessor 
 	SOURCES ${Sources}
 	HEADERS ${Headers})

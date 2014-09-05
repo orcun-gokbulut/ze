@@ -46,7 +46,7 @@
 
 using namespace clang;
 
-class ZEMetaProcessorInternal
+class ZEMetaCompilerParser
 {
 	public:
 		static CompilerInstance*		Compiler;
@@ -72,7 +72,7 @@ class ZEMetaProcessorInternal
 		static void						ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* Method);
 		static void						ProcessDeclaration(Decl* BaseDeclaration);
 
-		static void						InitializeClang();
+		static bool						Parse();
 };
 
 #endif

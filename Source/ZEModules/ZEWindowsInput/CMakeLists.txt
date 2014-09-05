@@ -44,5 +44,5 @@ ze_add_source(ZEWindowsInputCursorDevice.h			Sources)
 ze_add_source(ZEWindowsInputModule.cpp				Sources)
 ze_add_source(ZEWindowsInputModule.h				Sources)
 
-ze_add_library(ZEWindowsInput 
+ze_add_library(TARGET ZEWindowsInput 
 	SOURCES ${Sources})

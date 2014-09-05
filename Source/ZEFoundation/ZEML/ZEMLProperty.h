@@ -41,6 +41,8 @@
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEValue.h"
 
+class TiXmlElement;
+
 class ZEMLProperty : public ZEMLItem
 {
 	friend class ZEMLNode;
@@ -53,6 +55,8 @@ class ZEMLProperty : public ZEMLItem
 
 	protected:
 
+		bool				WriteSelfToXML(TiXmlElement* Element);
+		bool				ReadFromXML(TiXmlElement* Element);
 		virtual bool		WriteSelf(ZEFile* File);
 		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading);
 

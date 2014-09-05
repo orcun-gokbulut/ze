@@ -63,7 +63,7 @@ ze_add_source(ZEUIManager.h							Sources Headers ZEMC)
 ze_add_source(ZEUIRectangle.cpp						Sources)
 ze_add_source(ZEUIRectangle.h						Sources Headers)
 ze_add_source(ZEUIRenderer.cpp						Sources)
-ze_add_source(ZEUIRenderer.h						Sources Headers ZEMC)
+ze_add_source(ZEUIRenderer.h						Sources Headers)
 ze_add_source(ZEUIVerticalSliderControl.cpp			Sources)
 ze_add_source(ZEUIVerticalSliderControl.h			Sources Headers ZEMC)
 ze_add_source(ZEUTextEditControl.cpp				Sources)
@@ -82,7 +82,7 @@ ze_add_source(ZEUIDebugDrawTag.cpp					Sources)
 ze_add_source(ZEUIDebugDrawTag.h					Sources Headers)
 
 
-ze_add_library(ZEUI
+ze_add_library(TARGET ZEUI
 	ZEMC ${ZEMC}
 	SOURCES ${Sources}
 	HEADERS ${Headers}

@@ -41,8 +41,6 @@
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 
-ZE_OBJECT_IMPL(ZEUIRenderer)
-
 ZEInt32 CompareCommandOrder(const ZERenderCommand* Command1, const ZERenderCommand* Command2)
 {
 	if(Command1->Order > Command2->Order)

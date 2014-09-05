@@ -61,4 +61,4 @@ ze_add_source(xmalloc.h 				Sources)
 
 ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS HAVE_CONFIG_H)
 
-ze_add_library(TRE SOURCES ${Sources})
+ze_add_library(TARGET TRE SOURCES ${Sources})

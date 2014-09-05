@@ -37,6 +37,7 @@
 #include "ZEError.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEEndian.h"
+#include "TinyXML.h"
 
 ZEMLProperty::ZEMLProperty()
 {
@@ -129,6 +130,252 @@ void ZEMLProperty::SetValue(const ZEValue& Value)
 const ZEValue& ZEMLProperty::GetValue() const
 {
 	return Value;
+}
+
+bool ZEMLProperty::WriteSelfToXML(TiXmlElement* Element)
+{
+	if(Element == NULL)
+		return false;
+
+	TiXmlElement* PropertElement = new TiXmlElement(GetName());
+	PropertElement->SetAttribute("Type", GetTypeText());
+
+	switch (this->Value.GetType())
+	{
+		case ZE_VRT_FLOAT:
+			PropertElement->SetAttribute("Value", ZEString::FromFloat(Value.GetFloat()));
+			break;
+		case ZE_VRT_DOUBLE:
+			PropertElement->SetAttribute("Value", ZEString::FromDouble(Value.GetDouble()));
+			break;
+		case ZE_VRT_INTEGER_8:
+			PropertElement->SetAttribute("Value", ZEString::FromInt8(Value.GetInt8()));
+			break;
+		case ZE_VRT_INTEGER_16:
+			PropertElement->SetAttribute("Value", ZEString::FromInt16(Value.GetInt16()));
+			break;
+		case ZE_VRT_INTEGER_32:
+			PropertElement->SetAttribute("Value", ZEString::FromInt32(Value.GetInt32()));
+			break;
+		case ZE_VRT_INTEGER_64:
+			PropertElement->SetAttribute("Value", ZEString::FromInt64(Value.GetInt64()));
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+			PropertElement->SetAttribute("Value", ZEString::FromUInt8(Value.GetUInt8()));
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+			PropertElement->SetAttribute("Value", ZEString::FromUInt16(Value.GetUInt16()));
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			PropertElement->SetAttribute("Value", ZEString::FromUInt32(Value.GetUInt32()));
+			break;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+			PropertElement->SetAttribute("Value", ZEString::FromUInt64(Value.GetUInt64()));
+			break;
+		case ZE_VRT_BOOLEAN:
+			PropertElement->SetAttribute("Value", ZEString::FromBool(Value.GetBoolean()));
+			break;
+		case ZE_VRT_STRING:
+			{
+				if (Value.GetString().GetSize() == 0)
+					PropertElement->SetAttribute("Value", "");
+				else
+					PropertElement->SetAttribute("Value", Value.GetString());
+				break;
+			}
+		case ZE_VRT_QUATERNION:
+			PropertElement->SetAttribute("X", ZEString::FromFloat(Value.GetQuaternion().x));
+			PropertElement->SetAttribute("Y", ZEString::FromFloat(Value.GetQuaternion().y));
+			PropertElement->SetAttribute("Z", ZEString::FromFloat(Value.GetQuaternion().z));
+			PropertElement->SetAttribute("W", ZEString::FromFloat(Value.GetQuaternion().w));
+			break;
+		case ZE_VRT_VECTOR2:
+			PropertElement->SetAttribute("X", ZEString::FromFloat(Value.GetVector2().x));
+			PropertElement->SetAttribute("Y", ZEString::FromFloat(Value.GetVector2().y));
+			break;
+		case ZE_VRT_VECTOR3:
+			PropertElement->SetAttribute("X", ZEString::FromFloat(Value.GetVector3().x));
+			PropertElement->SetAttribute("Y", ZEString::FromFloat(Value.GetVector3().y));
+			PropertElement->SetAttribute("Z", ZEString::FromFloat(Value.GetVector3().z));
+			break;
+		case ZE_VRT_VECTOR4:
+			PropertElement->SetAttribute("X", ZEString::FromFloat(Value.GetVector4().x));
+			PropertElement->SetAttribute("Y", ZEString::FromFloat(Value.GetVector4().y));
+			PropertElement->SetAttribute("Z", ZEString::FromFloat(Value.GetVector4().z));
+			PropertElement->SetAttribute("W", ZEString::FromFloat(Value.GetVector4().w));
+			break;
+		case ZE_VRT_MATRIX3X3:
+			PropertElement->SetAttribute("M11", ZEString::FromFloat(Value.GetMatrix3x3().M11));
+			PropertElement->SetAttribute("M12", ZEString::FromFloat(Value.GetMatrix3x3().M12));
+			PropertElement->SetAttribute("M13", ZEString::FromFloat(Value.GetMatrix3x3().M13));
+			PropertElement->SetAttribute("M21", ZEString::FromFloat(Value.GetMatrix3x3().M21));
+			PropertElement->SetAttribute("M22", ZEString::FromFloat(Value.GetMatrix3x3().M22));
+			PropertElement->SetAttribute("M23", ZEString::FromFloat(Value.GetMatrix3x3().M23));
+			PropertElement->SetAttribute("M31", ZEString::FromFloat(Value.GetMatrix3x3().M31));
+			PropertElement->SetAttribute("M32", ZEString::FromFloat(Value.GetMatrix3x3().M32));
+			PropertElement->SetAttribute("M33", ZEString::FromFloat(Value.GetMatrix3x3().M33));
+			break;
+		case ZE_VRT_MATRIX4X4:
+			PropertElement->SetAttribute("M11", ZEString::FromFloat(Value.GetMatrix4x4().M11));
+			PropertElement->SetAttribute("M12", ZEString::FromFloat(Value.GetMatrix4x4().M12));
+			PropertElement->SetAttribute("M13", ZEString::FromFloat(Value.GetMatrix4x4().M13));
+			PropertElement->SetAttribute("M14", ZEString::FromFloat(Value.GetMatrix4x4().M14));
+			PropertElement->SetAttribute("M21", ZEString::FromFloat(Value.GetMatrix4x4().M21));
+			PropertElement->SetAttribute("M22", ZEString::FromFloat(Value.GetMatrix4x4().M22));
+			PropertElement->SetAttribute("M23", ZEString::FromFloat(Value.GetMatrix4x4().M23));
+			PropertElement->SetAttribute("M24", ZEString::FromFloat(Value.GetMatrix4x4().M24));
+			PropertElement->SetAttribute("M31", ZEString::FromFloat(Value.GetMatrix4x4().M31));
+			PropertElement->SetAttribute("M32", ZEString::FromFloat(Value.GetMatrix4x4().M32));
+			PropertElement->SetAttribute("M33", ZEString::FromFloat(Value.GetMatrix4x4().M33));
+			PropertElement->SetAttribute("M34", ZEString::FromFloat(Value.GetMatrix4x4().M34));
+			PropertElement->SetAttribute("M41", ZEString::FromFloat(Value.GetMatrix4x4().M41));
+			PropertElement->SetAttribute("M42", ZEString::FromFloat(Value.GetMatrix4x4().M42));
+			PropertElement->SetAttribute("M43", ZEString::FromFloat(Value.GetMatrix4x4().M43));
+			PropertElement->SetAttribute("M44", ZEString::FromFloat(Value.GetMatrix4x4().M44));
+			break;
+		default:
+			zeError("Unsupported ZEMLProperty type.");
+			return false;
+			break;
+	}
+	
+	Element->LinkEndChild(PropertElement);
+	return true;
+}
+
+bool ZEMLProperty::ReadFromXML(TiXmlElement* Element)
+{
+	SetType(GetTypeFromText(Element->Attribute("Type")));
+	SetName(Element->Value());
+	
+	switch (GetType())
+	{
+		case ZEML_IT_UNDEFINED:
+			return false;
+			break;
+		case ZEML_IT_FLOAT:
+			SetValue(ZEString(Element->Attribute("Value")).ToFloat());
+			break;
+		case ZEML_IT_DOUBLE:
+			SetValue(ZEString(Element->Attribute("Value")).ToDouble());
+			break;
+		case ZEML_IT_INT8:
+			SetValue(ZEString(Element->Attribute("Value")).ToInt8());
+			break;
+		case ZEML_IT_INT16:
+			SetValue(ZEString(Element->Attribute("Value")).ToInt16());
+			break;
+		case ZEML_IT_INT32:
+			SetValue(ZEString(Element->Attribute("Value")).ToInt32());
+			break;
+		case ZEML_IT_INT64:
+			SetValue(ZEString(Element->Attribute("Value")).ToInt64());
+			break;
+		case ZEML_IT_UINT8:
+			SetValue(ZEString(Element->Attribute("Value")).ToUInt8());
+			break;
+		case ZEML_IT_UINT16:
+			SetValue(ZEString(Element->Attribute("Value")).ToUInt16());
+			break;
+		case ZEML_IT_UINT32:
+			SetValue(ZEString(Element->Attribute("Value")).ToUInt32());
+			break;
+		case ZEML_IT_UINT64:
+			SetValue(ZEString(Element->Attribute("Value")).ToUInt64());
+			break;
+		case ZEML_IT_BOOLEAN:
+			{
+				ZEString ValueText = Element->Attribute("Value");
+
+				if (ValueText == "true")
+					SetValue(true);
+				else
+					SetValue(false);
+			}
+			break;			
+		case ZEML_IT_STRING:
+			SetValue(ZEString(Element->Attribute("Value")));
+			break;
+		case ZEML_IT_QUATERNION:
+			{
+				ZEQuaternion Quaternion;
+				Quaternion.x = ZEString(Element->Attribute("X")).ToFloat();
+				Quaternion.y = ZEString(Element->Attribute("Y")).ToFloat();
+				Quaternion.z = ZEString(Element->Attribute("Z")).ToFloat();
+				Quaternion.w = ZEString(Element->Attribute("W")).ToFloat();
+				SetValue(Quaternion);
+			}
+			break;
+		case ZEML_IT_VECTOR2:
+			{
+				ZEVector2 Vector2;
+				Vector2.x = ZEString(Element->Attribute("X")).ToFloat();
+				Vector2.y = ZEString(Element->Attribute("Y")).ToFloat();
+				SetValue(Vector2);
+			}
+			break;
+		case ZEML_IT_VECTOR3:
+			{
+				ZEVector3 Vector3;
+				Vector3.x = ZEString(Element->Attribute("X")).ToFloat();
+				Vector3.y = ZEString(Element->Attribute("Y")).ToFloat();
+				Vector3.z = ZEString(Element->Attribute("Z")).ToFloat();
+				SetValue(Vector3);
+			}
+			break;
+		case ZEML_IT_VECTOR4:
+			{
+				ZEVector4 Vector4;
+				Vector4.x = ZEString(Element->Attribute("X")).ToFloat();
+				Vector4.y = ZEString(Element->Attribute("Y")).ToFloat();
+				Vector4.z = ZEString(Element->Attribute("Z")).ToFloat();
+				Vector4.w = ZEString(Element->Attribute("W")).ToFloat();
+				SetValue(Vector4);
+			}
+			break;
+		case ZEML_IT_MATRIX3X3:
+			{
+				ZEMatrix3x3 Matrix3x3;	
+				Matrix3x3.M11 = ZEString(Element->Attribute("M11")).ToFloat();
+				Matrix3x3.M12 = ZEString(Element->Attribute("M12")).ToFloat();
+				Matrix3x3.M13 = ZEString(Element->Attribute("M13")).ToFloat();
+				Matrix3x3.M21 = ZEString(Element->Attribute("M21")).ToFloat();
+				Matrix3x3.M22 = ZEString(Element->Attribute("M22")).ToFloat();
+				Matrix3x3.M23 = ZEString(Element->Attribute("M23")).ToFloat();
+				Matrix3x3.M31 = ZEString(Element->Attribute("M31")).ToFloat();
+				Matrix3x3.M32 = ZEString(Element->Attribute("M32")).ToFloat();
+				Matrix3x3.M33 = ZEString(Element->Attribute("M33")).ToFloat();
+				SetValue(Matrix3x3);
+			}
+			break;
+		case ZEML_IT_MATRIX4X4:
+			{
+				ZEMatrix4x4 Matrix4x4;	
+				Matrix4x4.M11 = ZEString(Element->Attribute("M11")).ToFloat();
+				Matrix4x4.M12 = ZEString(Element->Attribute("M12")).ToFloat();
+				Matrix4x4.M13 = ZEString(Element->Attribute("M13")).ToFloat();
+				Matrix4x4.M14 = ZEString(Element->Attribute("M14")).ToFloat();
+				Matrix4x4.M21 = ZEString(Element->Attribute("M21")).ToFloat();
+				Matrix4x4.M22 = ZEString(Element->Attribute("M22")).ToFloat();
+				Matrix4x4.M23 = ZEString(Element->Attribute("M23")).ToFloat();
+				Matrix4x4.M24 = ZEString(Element->Attribute("M24")).ToFloat();
+				Matrix4x4.M31 = ZEString(Element->Attribute("M31")).ToFloat();
+				Matrix4x4.M32 = ZEString(Element->Attribute("M32")).ToFloat();
+				Matrix4x4.M33 = ZEString(Element->Attribute("M33")).ToFloat();
+				Matrix4x4.M34 = ZEString(Element->Attribute("M34")).ToFloat();
+				Matrix4x4.M41 = ZEString(Element->Attribute("M41")).ToFloat();
+				Matrix4x4.M42 = ZEString(Element->Attribute("M42")).ToFloat();
+				Matrix4x4.M43 = ZEString(Element->Attribute("M43")).ToFloat();
+				Matrix4x4.M44 = ZEString(Element->Attribute("M44")).ToFloat();
+				SetValue(Matrix4x4);
+			}
+			break;
+		default:
+			return false;
+		break;
+	}
+
+	return true;
 }
 
 bool ZEMLProperty::WriteSelf(ZEFile* File)

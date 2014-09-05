@@ -50,6 +50,6 @@ ze_add_source(ZEDImageViewer.cpp		Sources)
 
 qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
-ze_add_library(ZEDCommonControls 
+ze_add_library(TARGET ZEDCommonControls 
 	SOURCES ${Sources} ${QtMocFiles}
 	LIBS libFreeImage libQt)

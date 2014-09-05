@@ -17,7 +17,7 @@ BoneAttributes = attributes ZEBoneAttributes
 	(
 		PhysicalBody_Type 						type:#integer					default:1				 			ui:uiPhysicalBody_Type  						animatable:false
 		PhysicalBody_Enabled					type:#boolean					default:false						ui:uiPhysicalBody_Enabled						animatable:false
-		PhysicalBody_IsKinematic   				type:#boolean					default:false						ui:uiPhysicalBody_IsKinematic						animatable:false
+		PhysicalBody_Kinematic   				type:#boolean					default:false						ui:uiPhysicalBody_Kinematic						animatable:false
 		PhysicalBody_Mass 						type:#float						default:0							ui:uiPhysicalBody_Mass							animatable:false
 		PhysicalBody_CenterOfMass   			type:#node															ui:uiPhysicalBody_CenterOfMass					animatable:false
 		PhysicalBody_LinearDamping  			type:#float						default:0							ui:uiPhysicalBody_LinearDamping					animatable:false
@@ -34,7 +34,7 @@ BoneAttributes = attributes ZEBoneAttributes
 		/* LAYOUT DEFINITION */
 		dropdownlist 			uiPhysicalBody_Type 						"Type:" 						items:#("None", "Rigid Body", "Deformable", "Cloth")
 		checkbox				uiPhysicalBody_Enabled						"Enabled" 																										enabled:(PhysicalBody_Type != 1)
-		checkbox 				uiPhysicalBody_IsKinematic 					"Is Kinematic Body"				tooltip:"Indicates whether the body is Kinematic or Dynamic actor."				enabled:(PhysicalBody_Type != 1)
+		checkbox 				uiPhysicalBody_Kinematic 					"Kinematic Body"				tooltip:"Indicates whether the body is Kinematic or Dynamic actor."				enabled:(PhysicalBody_Type != 1)
 		spinner 				uiPhysicalBody_Mass 						"Mass:"							type:#float																		enabled:(PhysicalBody_Type != 1)
 		label					uiPhysicalBody_CenterOfMass_Label			"Center Of Mass:"				align:#left																		enabled:(PhysicalBody_Type != 1)
 		pickbutton				uiPhysicalBody_CenterOfMass					"Pick"							type:#node across:2 filter:PointHelper_Filter autoDisplay:true					enabled:(PhysicalBody_Type != 1)
@@ -86,7 +86,7 @@ BoneAttributes = attributes ZEBoneAttributes
 		fn ManageLayout =
 		(
 			uiPhysicalBody_Enabled.enabled  					= PhysicalBody_Type != 1	
-			uiPhysicalBody_IsKinematic.enabled  			 	= PhysicalBody_Type != 1
+			uiPhysicalBody_Kinematic.enabled  			 		= PhysicalBody_Type != 1
 			uiPhysicalBody_Mass.enabled  			 			= PhysicalBody_Type != 1
 			uiPhysicalBody_CenterOfMass_Label.enabled 			= PhysicalBody_Type != 1
 			uiPhysicalBody_CenterOfMass.enabled  				= PhysicalBody_Type != 1 

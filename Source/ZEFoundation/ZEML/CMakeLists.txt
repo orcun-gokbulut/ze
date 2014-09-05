@@ -54,12 +54,12 @@ ze_add_source(ZEMLSerialReader.h 			Sources Headers)
 ze_add_source(ZEMLSerialReader.cpp 			Sources)
 ze_add_source(ZEMLSerialReaderTests.cpp 	Tests)
 
-ze_add_library(ZEML 
+ze_add_library(TARGET ZEML 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation)
+	LIBS ZEFoundation libTinyXML)
 
-ze_add_test(ZEMLTests
+ze_add_test(TARGET ZEMLTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES
 	TEST_TARGET ZEML)

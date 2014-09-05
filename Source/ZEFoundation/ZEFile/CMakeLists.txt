@@ -70,12 +70,12 @@ ze_add_source(ZEPathUtils.cpp				Sources)
 ze_add_source(ZEPathUtils.h					Sources)
 ze_add_source(ZEPathUtilsTests.cpp			Tests)
 
-ze_add_library(ZEFile 
+ze_add_library(TARGET ZEFile 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
     LIBS ZEFoundation)
 
-ze_add_test(ZEFileTests
+ze_add_test(TARGET ZEFileTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES
 	TEST_TARGET ZEFile)

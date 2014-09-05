@@ -40,7 +40,7 @@ ze_add_source(ZEQuadTree.h				Sources Headers)
 ze_add_source(ZEOctree.cpp				Sources)
 ze_add_source(ZEOctree.h				Sources Headers)
 
-ze_add_library(ZESpatial 
+ze_add_library(TARGET ZESpatial 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation ZEDS ZEMath)

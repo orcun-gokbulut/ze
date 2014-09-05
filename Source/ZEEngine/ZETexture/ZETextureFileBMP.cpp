@@ -42,7 +42,7 @@
 #include "ZEDS/ZEPointer.h"
 #include "ZEFile/ZEFile.h"
 #include "ZETexturePixelConverter.h"
-#include "ZEDecompressorBMPRLE.h"
+#include "ZECompression/ZEDecompressorBMPRLE.h"
 
 ZEPackStruct
 (

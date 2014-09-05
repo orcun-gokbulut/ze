@@ -53,4 +53,9 @@ typedef unsigned int		ZEUInt;
 typedef size_t				ZESize;
 typedef ptrdiff_t			ZESSize;
 
+typedef ZEUInt8				ZEBYTE;
+typedef ZEUInt16			ZEWORD;
+typedef ZEUInt32			ZEDWORD;
+typedef ZEUInt64			ZEQWORD;
+
 #endif

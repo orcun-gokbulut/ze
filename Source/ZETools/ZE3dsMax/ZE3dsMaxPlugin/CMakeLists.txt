@@ -44,20 +44,19 @@ ze_add_source(ZEToolbarIcons_24a.bmp		Sources ZEFC)
 ze_add_source(ZEToolbarIcons_24i.bmp		Sources ZEFC)
 ze_add_source(zineklogo.bmp					Sources ZEFC)
 
-ze_add_library(ZE3dsMaxPlugin 
+ze_add_library(TARGET ZE3dsMaxPlugin 
 	SOURCES ${Sources}
 	ZEFC ${ZEFC}
 	LIBS ZEFoundation ZEFile ZE3dsMaxModelExporter ZE3dsMaxInteriorExporter ZE3dsMaxUI ZE3dsMaxUtils Comctl32 lib3dsMax
 	DLL
 	INSTALL)
-	
-set(LOCAL_WARNING_FLAGS /W3)
-set(LOCAL_RTTI_FLAGS /GR)
 
-set_property(TARGET ZE3dsMaxPlugin PROPERTY FOLDER "ZE3dsMax")
+set_property(TARGET ZE3dsMaxPlugin APPEND PROPERTY COMPILE_FLAGS "/GR")
 set_property(TARGET ZE3dsMaxPlugin PROPERTY SUFFIX ".gup")
 set_property(TARGET ZE3dsMaxPlugin PROPERTY CLEAN_DIRECT_OUTPUT 1)
 
-get_property(TargetPath TARGET ZE3dsMaxPlugin PROPERTY LOCATION)
-file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)
-add_custom_command(TARGET ZE3dsMaxPlugin POST_BUILD COMMAND copy "${NativeTargetPath}" "${ZEBUILD_3DS_MAX_BINARY_DIRECTORY}\\plugins")
+if (EXISTS "${ZEBUILD_3DS_MAX_BINARY_DIRECTORY}\\plugins")
+	get_property(TargetPath TARGET ZE3dsMaxPlugin PROPERTY LOCATION)
+	file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)
+	add_custom_command(TARGET ZE3dsMaxPlugin POST_BUILD COMMAND copy "${NativeTargetPath}" "${ZEBUILD_3DS_MAX_BINARY_DIRECTORY}\\plugins")
+endif()

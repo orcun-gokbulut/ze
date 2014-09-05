@@ -35,27 +35,50 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 ze_add_source(ZECrashReport.cpp										Sources)
 ze_add_source(ZECrashReport.h										Sources)
 ze_add_source(ZECrashReportProvider.cpp								Sources)
 ze_add_source(ZECrashReportProvider.h								Sources)
 ze_add_source(ZECrashReportPackager.cpp								Sources)
 ze_add_source(ZECrashReportPackager.h								Sources)
-ze_add_source(ZECrashReportSender.cpp								Sources)
-ze_add_source(ZECrashReportSender.h								Sources)
-ze_add_source(ZECrashReportMain.cpp									Sources)
-
-#ze_add_source(ZECrashReportApplicationInformationProvider.cpp		Sources)
-#ze_add_source(ZECrashReportApplicationInformationProvider.h			Sources)
-#ze_add_source(ZECrashReportSystemInformationProvider.cpp			Sources)
-#ze_add_source(ZECrashReportSystemInformationProvider.h				Sources)
+ze_add_source(ZECrashReportSender.cpp 								Sources)
+ze_add_source(ZECrashReportSender.h									Sources)
+ze_add_source(ZECrashReportApplicationInformationProvider.cpp		Sources)
+ze_add_source(ZECrashReportApplicationInformationProvider.h			Sources)
+ze_add_source(ZECrashReportSystemInformationProvider.cpp			Sources)
+ze_add_source(ZECrashReportSystemInformationProvider.h				Sources)
+ze_add_source(ZECrashReportDumpProvider.cpp							Sources)
+ze_add_source(ZECrashReportDumpProvider.h							Sources)
+ze_add_source(ZECIM.h 												Sources)
+ze_add_source(ZECIM.cpp												Sources)
 ze_add_source(ZECrashReportFileProvider.cpp							Sources)
 ze_add_source(ZECrashReportFileProvider.h							Sources)
 ze_add_source(ZECrashReportUserCommentProvider.cpp					Sources)
 ze_add_source(ZECrashReportUserCommentProvider.h					Sources)
 
+ze_add_source(ZECrashReportUIClickableLabel.h						Sources QtMocs)
+ze_add_source(ZECrashReportUIClickableLabel.cpp						Sources)
+ze_add_source(ZECrashReportUIMainWindow.h							Sources QtMocs)
+ze_add_source(ZECrashReportUIMainWindow.cpp							Sources)
+ze_add_source(CrashMainWindow.ui									Sources QtUI)
+ze_add_source(ZECrashReportUIPrivacyDialog.h 						Sources QtMocs)
+ze_add_source(ZECrashReportUIPrivacyDialog.cpp 						Sources)
+ze_add_source(PrivacyDialog.ui 										Sources QtUI)
+ze_add_source(ZECrashReportUIProgressWindow.h 						Sources QtMocs)
+ze_add_source(ZECrashReportUIProgressWindow.cpp 					Sources)
+ze_add_source(ProgressWindow.ui 									Sources QtUI)
+ze_add_source(ZECrashReportUIReportDialog.h 						Sources QtMocs)
+ze_add_source(ZECrashReportUIReportDialog.cpp 						Sources)
+ze_add_source(ReportDialog.ui 										Sources QtUI)
+ze_add_source(zecrashreportui.qrc									Sources QtResources)
+ze_add_source(ZECrashReportUIMain.cpp								Sources)
 
-ze_add_executable(ZECrashReport
-	CONSOLE
-	SOURCES ${Sources}
-	LIBS ZEFoundation libCurl Ws2_32)
+qt4_add_resources (QtResourceFiles ${QtResources})
+qt4_wrap_ui (QtUIFiles ${QtUI})
+qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+
+ze_add_executable(TARGET ZECrashReport
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
+	LIBS ZEFoundation libQt libTinyXML libZLib libCurl Ws2_32)

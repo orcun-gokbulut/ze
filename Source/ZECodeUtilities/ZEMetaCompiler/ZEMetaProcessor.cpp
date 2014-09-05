@@ -36,10 +36,10 @@
 #include "ZEMetaProcessor.h"
 #include "ZEMetaProcessorInternal.h"
 
-bool ZEMetaProcessor::Process(ZEMetaData* MetaData, const ZEMetaCompilerOptions& Options)
+bool ZEMetaProcessor::Parse(ZEMetaData* MetaData, const ZEMetaCompilerOptions& Options)
 {
-	ZEMetaProcessorInternal::MetaData = MetaData;
-	ZEMetaProcessorInternal::Options = Options;
-	ZEMetaProcessorInternal::InitializeClang();
+	ZEMetaCompilerParser::MetaData = MetaData;
+	ZEMetaCompilerParser::Options = Options;
+	ZEMetaCompilerParser::Parse();
 	return true;
 }

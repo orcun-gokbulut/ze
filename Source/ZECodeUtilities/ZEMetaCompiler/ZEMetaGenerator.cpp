@@ -560,6 +560,8 @@ static void AppendScriptEngineCallMethod(FILE* File, ZEMethodData* Method, ZESiz
 
 static void CreateScriptBaseClass(FILE* File, const char* ClassName, ZEArray<ZEMethodData*> Methods, bool IsAbstract, bool HasPublicConstructor)
 {
+	return;
+
 	if(!HasPublicConstructor)
 		return;
 
@@ -1121,7 +1123,7 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 	const char* CurrentClassName = ClassData->Name.ToCString();
 	bool HasCreateInstanceMethod = ClassData->HasCreateInstanceMethod;
 	bool HasPublicCopyConstructor = ClassData->HasPublicCopyConstructor;
-	bool HasPublicConstructor = ClassData->HasPublicConstructor;
+	bool HasPublicConstructor = ClassData->HasScriptBase;
 	bool IsAbstract = ClassData->IsAbstract;
 
 	for(ZESize I = 0; I < Methods.GetCount(); I++)
@@ -1567,7 +1569,7 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 				}
 			}
 
-			if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
+			/*if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
 			{
 				if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_NULL)
 					fprintf(File, "{\n\t((%sScriptBase*)This)->ScriptTriggered%s(", ClassData->Name.ToCString(), Methods[I]->Name.ToCString());
@@ -1575,11 +1577,11 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 					fprintf(File, "{\n\treturn ((%sScriptBase*)This)->ScriptTriggered%s(", ClassData->Name.ToCString(), Methods[I]->Name.ToCString());
 			}
 			else
-			{
+			{*/
 				fprintf(File, "{\n\t%sThis->%s(",
 					Methods[I]->ReturnParameter.Type.Type == ZE_MTT_NULL ? "" : "return ",
 					Methods[I]->Name.ToCString());
-			}
+			//}
 
 			for(ZESize J = 0; J < Methods[I]->Parameters.GetCount(); J++)
 			{
@@ -1623,7 +1625,7 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 			{
 				if(Methods[I]->ReturnParameter.Type.SubType != ZE_MTT_UNDEFINED)
 				{
-					if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
+					if (false) //if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
 					{
 						fprintf(File, 
 							"static %sZEArray<%s%s> %s_%d_%s(%s* This)\n"
@@ -1658,7 +1660,7 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 			}
 			else if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_ENUMERATOR)
 			{
-				if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
+				if (false) // if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
 				{
 					fprintf(File, 
 						"static %s%s %s_%d_%s(%s* This)\n"
@@ -1690,7 +1692,7 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 			}
 			else if(Methods[I]->ReturnParameter.Type.Type == ZE_MTT_NULL)
 			{
-				if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
+				if (false) // if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
 				{
 					fprintf(File, 
 						"static %s%s%s %s_%d_%s(%s* This)\n"
@@ -1724,7 +1726,7 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 			}
 			else
 			{
-				if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
+				if (false) // if(Methods[I]->IsVirtual && ClassData->HasPublicConstructor)
 				{
 					fprintf(File, 
 						"static %s%s%s %s_%d_%s(%s* This)\n"
@@ -1760,7 +1762,7 @@ static void CreateMethodWrappers(FILE* File, ZEClassData* ClassData, ZEArray<ZEM
 	}
 
 	//SCRIPT BASE CLASS FACTORY METHOD
-	if(!ClassData->IsBuiltInClass && HasPublicConstructor && !IsAbstract)
+	if (false)// if(!ClassData->IsBuiltInClass && HasPublicConstructor && !IsAbstract)
 	{
 		fprintf(File,
 			"static %sScriptBase* %s_CreateScriptBaseClassInstance()\n"
@@ -2104,14 +2106,14 @@ static void CreateGetMethodsMethod(FILE* File, ZEClassData* ClassData, ZEArray<Z
 
 	}
 
-	if(!ClassData->HasPublicCopyConstructor)
+	if (false) //if(!ClassData->HasPublicCopyConstructor)
 	{
 		ZEString OperatorHash = "operator=";
 		fprintf(File, "\t\t{%d, %s%s::Class(), &%s_opAssign, \"operator=\", %#x, false, false, false, true, ZE_MOT_EQUAL, ZEType(%s, ZE_TQ_REFERENCE, ZE_TT_UNDEFINED, ZE_TQ_VALUE, %s%s::Class()), NULL, 0, AssignOperatorParameter, 1, NULL, 0}%s\n",
 			Methods.GetCount(), ClassName, ClassData->IsBuiltInClass ? "Class" : "", ClassName, OperatorHash.Hash(), ClassType.ToCString(), ClassName, ClassData->IsBuiltInClass ? "Class" : "", ClassData->IsBuiltInClass ? "" : ",");
 	}
 
-	if(!ClassData->IsBuiltInClass && ClassData->HasPublicConstructor && !ClassData->IsAbstract)
+	if (false)// if(!ClassData->IsBuiltInClass && ClassData->HasPublicConstructor && !ClassData->IsAbstract)
 	{
 		ZEString ScriptClassWrapperHash = ClassName;
 		ScriptClassWrapperHash.Append("_CreateScriptBaseClassInstance");
@@ -3061,6 +3063,8 @@ static void CreateGetPropertyItemCountMethod(FILE* File, const char* ClassName)
 
 static void CreateCallWrapperMethodMethod(FILE* File, ZEClassData* Class, ZEArray<ZEMethodData*> Methods)
 {
+	return;
+
 	const char* ClassName = Class->Name;
 
 	if(!Class->HasPublicConstructor)
@@ -3832,7 +3836,7 @@ static void CreateZEClassImplementation(FILE* File, ZEClassData* ClassData, ZEAr
 		"\treturn sizeof(%s);\n"
 		"}\n\n", ClassName, ClassName);
 
-	if(ClassData->HasPublicConstructor && !ClassData->IsAbstract)
+	if (false) //if(ClassData->HasPublicConstructor && !ClassData->IsAbstract)
 	{
 		fprintf(File,
 			"ZESize %sClass::GetSizeOfScriptBaseClass()\n"
@@ -3982,7 +3986,7 @@ static void CreateZEClassImplementation(FILE* File, ZEClassData* ClassData, ZEAr
 			"}\n\n", ClassName);
 	}
 
-	if(ClassData->HasPublicConstructor && !ClassData->IsAbstract)
+	if (false)//if(ClassData->HasPublicConstructor && !ClassData->IsAbstract)
 	{
 		fprintf(File, 
 			"void* %sClass::CreateScriptInstance()\n"
@@ -4120,6 +4124,11 @@ static void CreateBuiltInClassImplementation(FILE* File, const char* ClassName)
 
 bool ZEMetaGenerator::Generate(const ZEMetaCompilerOptions& Options, ZEMetaData* Data)
 {
+	if (Data->TargetTypes.GetCount() == 0)
+	{
+		return true;
+	}
+
 	FILE* File;
 	File = fopen(Options.OutputFileName.ToCString(), "w");
 

@@ -33,6 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef	__ZE_CRASHREPORT_FILEPROVIDER_H__
+#define __ZE_CRASHREPORT_FILEPROVIDER_H__
+
 #include "ZECrashReportProvider.h"
 #include "ZEDS/ZEString.h"
 #include "ZETypes.h"
@@ -48,7 +52,10 @@ class ZECrashReportFileProvider : public ZECrashReportProvider
 		ZESSize								Size;
 		void*								File;
 
+		bool								Binary;
 	public:
+		virtual ZECrashReportProviderType	GetProviderType();
+
 		virtual const char*					GetName();
 		void								SetName(const char* Name);
 
@@ -58,6 +65,9 @@ class ZECrashReportFileProvider : public ZECrashReportProvider
 		void								SetDeleteOnExit(bool Delete);
 		bool								GetDeleteOnExit();
 
+		void								SetBinary(bool Binary);
+		bool								GetBinary();
+
 		virtual ZESize						GetSize();
 		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size);
 		
@@ -66,3 +76,4 @@ class ZECrashReportFileProvider : public ZECrashReportProvider
 
 											ZECrashReportFileProvider();
 };
+#endif

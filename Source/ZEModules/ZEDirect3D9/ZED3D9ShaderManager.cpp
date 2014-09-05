@@ -114,7 +114,7 @@ void ZED3D9ShaderManager::WriteToFileCache(const char* Filenamne, const char* Fu
 #include "SkyBoxMaterial.hlsl.h"
 #include "SkyDomeMaterial.hlsl.h"
 #include "SSAAProcessor.hlsl.h"
-#include "SSOAProcessor.hlsl.h"
+#include "SSAOProcessor.hlsl.h"
 #include "TerrainMaterial.hlsl.h"
 #include "TextureMaskProcessor.hlsl.h"
 #include "TextureResizeProcessor.hlsl.h"
@@ -182,8 +182,8 @@ const char* ZED3D9ShaderManager::GetInternal(const char* Filename)
 		return (const char*)SkyDomeMaterial_hlsl().GetData();
 	else if(stricmp(Filename, "SSAAProcessor.hlsl") == 0)
 		return (const char*)SSAAProcessor_hlsl().GetData();
-	else if(stricmp(Filename, "SSOAProcessor.hlsl") == 0)
-		return (const char*)SSOAProcessor_hlsl().GetData();
+	else if(stricmp(Filename, "SSAOProcessor.hlsl") == 0)
+		return (const char*)SSAOProcessor_hlsl().GetData();
 	else if(stricmp(Filename, "TerrainMaterial.hlsl") == 0)
 		return (const char*)TerrainMaterial_hlsl().GetData();
 	else if(stricmp(Filename, "TextureMaskProcessor.hlsl") == 0)

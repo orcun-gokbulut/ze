@@ -35,8 +35,8 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-ze_add_module(ZECodeUtilities)
 ze_add_module(ZEFoundation)
+ze_add_module(ZECodeUtilities)
 ze_add_module(ZEEngine)
 ze_add_module(ZEModules			OPTIONAL DEFAULT)
 ze_add_module(ZEditor			OPTIONAL)

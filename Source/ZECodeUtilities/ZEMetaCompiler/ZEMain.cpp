@@ -89,6 +89,8 @@ static void ShowHelp()
 
 static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& Options)
 {
+	Options.Argc= Argc;
+	Options.Argv = Argv;
 	Options.BinaryPath = Argv[0];
 	Options.IsRegisterSession = false;
 	Options.IsGenerateSession = false;
@@ -216,6 +218,15 @@ int main(int Argc, const char** Argv)
 			"Copyright (C) 2013, Zinek Code House. All rights reserved.\n\n");
 	}
 
+	// Parse
+
+
+	// Generate
+
+	// Register
+
+	// Module Register
+
 	if(Options.IsGenerateSession)
 	{
 		ZEMetaCollectionGenerator::Generate(Options);
@@ -224,7 +235,7 @@ int main(int Argc, const char** Argv)
 	else
 	{
 		ZEMetaData MetaData;
-		bool Result = ZEMetaProcessor::Process(&MetaData, Options);
+		bool Result = ZEMetaProcessor::Parse(&MetaData, Options);
 		if (!Result)
 			Error("Processing failed.");
 	}

@@ -40,20 +40,24 @@
 
 #include "ZEXSensInputDevice.h"
 
-#include "cmt3.h"
-#include "xsens_list.h"
-#include "cmtscan.h"
 #include "ZEDS/ZEFormat.h"
 #include "ZEThread/ZEThread.h"
 
-inline ZEVector4 XSENS_TO_ZE_VECTOR(const CmtVector& Vector)
-{
-	return ZEVector4(Vector.m_data[0], Vector.m_data[2], Vector.m_data[1], 1.0f);
-}
+#include "xsensdeviceapi.h"
+#include "ZEMath/ZEAngle.h"
 
-inline ZEQuaternion XSENS_TO_ZE_QUATERNION(const CmtQuat& Quaternion)
+void ZEXSensCallback::onDataAvailable(XsDevice* XSensDevice, const XsDataPacket* Packet)
 {
-	return ZEQuaternion(-Quaternion.m_data[3], Quaternion.m_data[1], -Quaternion.m_data[0], Quaternion.m_data[2]).Normalize();	
+	Device->Lock.Lock();
+	XsQuaternion Quaternion = Packet->orientationQuaternion();
+	Device->State.Quaternions.CurrentValues[0] =  ZEQuaternion(Quaternion.w(), Quaternion.x(), Quaternion.y(), Quaternion.z());
+	
+	float Angle;
+	ZEVector3 Axis;
+	ZEQuaternion::ConvertToAngleAxis(Angle, Axis, Device->State.Quaternions.CurrentValues[0]);
+	ZEQuaternion::CreateFromAngleAxis(Device->State.Quaternions.CurrentValues[0], -Angle, ZEVector3(-Axis.y, Axis.z, Axis.x));
+
+	Device->Lock.Unlock();
 }
 
 bool ZEXSensInputDevice::InitializeSelf()
@@ -61,19 +65,12 @@ bool ZEXSensInputDevice::InitializeSelf()
 	if (!ZEInputDevice::InitializeSelf())
 		return false;
 
-	XsensResultValue Result = XSensDevice.openPort(Info.m_portNr, Info.m_baudrate);
-	if (Result != XRV_OK)
+	if (!Module->Control->openPort(PortInfo.portName(), PortInfo.baudrate()))
 		return false;
 
-	if (XSensDevice.getDeviceId(1,XSensDeviceId) != XRV_OK)
-		return false;
-
-	if (XSensDevice.gotoConfig() != XRV_OK)
-		return false;
-	
-	CmtDeviceMode DeviceMode(CMT_OUTPUTMODE_ORIENT | CMT_OUTPUTMODE_CALIB, CMT_OUTPUTSETTINGS_ORIENTMODE_QUATERNION, 30);
-	if (XSensDevice.setDeviceMode(DeviceMode, true, XSensDeviceId) != XRV_OK)
-		return false;
+	XSensDevice = Module->Control->device(PortInfo.deviceId());
+	Callback.Device = this;
+	XSensDevice->addCallbackHandler(&Callback);
 
 	Description.Type = ZE_IDT_SENSOR;
 	Description.FullName = "xsens";
@@ -90,10 +87,7 @@ bool ZEXSensInputDevice::InitializeSelf()
 	State.Initialize(Description);
 	State.Reset();
 
-	if (XSensPacket == NULL)
-		XSensPacket = new xsens::Packet((unsigned short)1, XSensDevice.isXm());
-
-	if (XSensDevice.gotoMeasurement() != XRV_OK)
+	if (!XSensDevice->gotoMeasurement())
 		return false;
 
 	return true;
@@ -101,34 +95,20 @@ bool ZEXSensInputDevice::InitializeSelf()
 
 bool ZEXSensInputDevice::DeinitializeSelf()
 {
-	if (XSensPacket != NULL)
-	{
-		delete XSensPacket;
-		XSensPacket = NULL;
-	}
-
-	XSensDevice.closePort();
+	XSensDevice->removeCallbackHandler(&Callback);
+	Module->Control->closePort(PortInfo);
 
 	return ZEInputDevice::DeinitializeSelf();
 }
 
 void ZEXSensInputDevice::Process()
 {
+	Lock.Lock();
 	State.Advance();
-		
-	while (XSensDevice.readDataPacket(XSensPacket) == XRV_OK)
-	{
-		State.Quaternions.CurrentValues[0] = XSENS_TO_ZE_QUATERNION(XSensPacket->getOriQuat());
-		State.Vectors.CurrentValues[0] = XSENS_TO_ZE_VECTOR(XSensPacket->getCalAcc());
-	}
+	Lock.Unlock();
 }
 
 ZEXSensInputDevice::ZEXSensInputDevice()
 {
-	XSensPacket = NULL;
-}
-
-ZEXSensInputDevice::~ZEXSensInputDevice()
-{
-
+	XSensDevice = NULL;
 }

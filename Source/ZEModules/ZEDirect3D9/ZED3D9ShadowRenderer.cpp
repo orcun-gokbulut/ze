@@ -215,6 +215,8 @@ bool ZED3D9ShadowRenderer::Initialize()
 		}
 	}
 
+	GetDevice()->CreateQuery(D3DQUERYTYPE_EVENT, &EventQuery);
+
 	return true;
 }
 
@@ -230,6 +232,7 @@ void ZED3D9ShadowRenderer::Deinitialize()
 	ZED3D_RELEASE(DirectionalLightPS);
 	ZED3D_RELEASE(ProjectiveLightVS);
 	ZED3D_RELEASE(ProjectiveLightPS);
+	ZED3D_RELEASE(EventQuery);
 }
 
 void ZED3D9ShadowRenderer::Destroy()
@@ -519,6 +522,7 @@ void ZED3D9ShadowRenderer::Render(float ElaspedTime)
 	DrawParameters = NULL;
 	GetDevice()->SetViewport(&OldViewport);
 
+	EventQuery->Issue(D3DISSUE_END);
 
 	D3DPERF_EndEvent();
 }
@@ -530,6 +534,7 @@ ZED3D9ShadowRenderer::ZED3D9ShadowRenderer()
 	NULLRenderTarget = NULL;
 	RandomRotationMap = NULL;
 	FilterType = ZE_SMFT_PCF_POISSON_5_TAP;
+	EventQuery = NULL;
 
 	ShadowResolution = 4096;
 }
@@ -537,4 +542,9 @@ ZED3D9ShadowRenderer::ZED3D9ShadowRenderer()
 ZED3D9ShadowRenderer::~ZED3D9ShadowRenderer()
 {
 	Deinitialize();
+}
+
+bool ZED3D9ShadowRenderer::IsGPUBusy()
+{
+	return (EventQuery->GetData(NULL, 0, D3DGETDATA_FLUSH) == S_FALSE);
 }

@@ -40,6 +40,6 @@ ze_add_source(ZEState.h					Sources Headers)
 ze_add_source(ZEStateMachine.cpp		Sources)
 ze_add_source(ZEStateMachine.h			Sources Headers)
 
-ze_add_library(ZEStateMachine
+ze_add_library(TARGET ZEStateMachine
 	SOURCES ${Sources} 
 	HEADERS ${Headers})

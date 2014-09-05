@@ -43,6 +43,7 @@
 #include "ZETypes.h"
 #include "ZEDrawParameters.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZERayCast.h"
 
 ZE_META_FORWARD_DECLARE(ZEEntity,			"ZEEntity.h")
 ZE_META_FORWARD_DECLARE(ZECamera,			"ZEGraphics/ZECamera.h")
@@ -88,6 +89,7 @@ class ZEScene : public ZEObject
 		ZECamera*								ActiveCamera;
 		ZEListener*								ActiveListener;
 
+		bool									Enabled;
 		float									AmbientFactor;
 		ZEVector3								AmbientColor;
 
@@ -112,6 +114,9 @@ class ZEScene : public ZEObject
 		void									SetActiveListener(ZEListener* Listener);
 		ZEListener*								GetActiveListener();
 
+		void									SetEnabled(bool Enabled);
+		bool									GetEnabled() const;
+
 		ZESceneCuller&							GetSceneCuller();
 		const ZESceneStatistics&				GetStatistics() const;
 
@@ -124,6 +129,7 @@ class ZEScene : public ZEObject
 
 		void									Tick(float ElapsedTime);
 		void									Render(float ElapsedTime);
+		bool									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		void									SetAmbientFactor(float Factor);
 		float									GetAmbientFactor() const;

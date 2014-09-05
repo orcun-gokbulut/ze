@@ -43,8 +43,6 @@
 #include "ZEModules/ZEDirect3D9/ZED3D9TextureResizer.h"
 
 #include <windows.h>
-#include <ATI_Compress.h>
-
 
 ZETextureTools::ZETextureTools()
 {
@@ -181,74 +179,7 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 
 void ZETextureTools::CompressTexture(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions)
 {
-	ATI_TC_FORMAT	Format;
-	ATI_TC_Speed	Speed;
 
-	// Decide Compression Type
-	switch(CompressionOptions->CompressionType)
-	{
-		case ZE_TCT_DXT1:
-			Format = ATI_TC_FORMAT_DXT1;
-			break;
-
-		case ZE_TCT_DXT3:
-			Format = ATI_TC_FORMAT_DXT3;
-			break;
-
-		case ZE_TCT_DXT5:
-			Format = ATI_TC_FORMAT_DXT5;
-			break;
-
-		case ZE_TCT_3DC:
-			Format = ATI_TC_FORMAT_BC5;
-			break;
-
-		default:
-			break;
-	};
-
-	// Decide compression Speed
-	switch(CompressionOptions->CompressionQuality)
-	{
-		case ZE_TCQ_HIGH:
-			Speed = ATI_TC_Speed_Normal;
-			break;
-
-		default:
-		case ZE_TCQ_NORMAL:
-			Speed = ATI_TC_Speed_Fast;
-			break;
-
-		case ZE_TCQ_LOW:
-			Speed = ATI_TC_Speed_SuperFast;
-			break;
-	};
-
-	ATI_TC_Texture srcTexture;
-	srcTexture.dwSize		= sizeof(srcTexture);
-	srcTexture.dwWidth		= SourceWidth;
-	srcTexture.dwHeight		= SourceHeight;
-	srcTexture.dwPitch		= (ATI_TC_DWORD)SourcePitch;
-	srcTexture.format		= ATI_TC_FORMAT_ARGB_8888;
-	srcTexture.pData		= (ATI_TC_BYTE*)SourceData;
-	srcTexture.dwDataSize	= ATI_TC_CalculateBufferSize(&srcTexture);
-
-	ATI_TC_Texture destTexture;  
-	destTexture.dwSize		= sizeof(destTexture);
-	destTexture.dwWidth		= SourceWidth;
-	destTexture.dwHeight	= SourceHeight;
-	destTexture.dwPitch		= (ATI_TC_DWORD)DestinationPitch;
-	destTexture.format		= Format;
-	destTexture.pData		= (ATI_TC_BYTE*)DestinationData;
-	destTexture.dwDataSize	= ATI_TC_CalculateBufferSize(&destTexture);
-
-	ATI_TC_CompressOptions options;
-	memset(&options, 0, sizeof(options));
-
-	options.dwSize				= sizeof(options);
-	options.nCompressionSpeed	= Speed;
-
-	ATI_TC_ConvertTexture(&srcTexture, &destTexture, &options, NULL, NULL, NULL);
 }
 
 void ZETextureTools::DownSample2x(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, const ZEUInt SourceWidth, const ZEUInt SourceHeight, bool UseGpu)

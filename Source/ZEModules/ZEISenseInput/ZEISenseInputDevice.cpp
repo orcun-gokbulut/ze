@@ -43,14 +43,15 @@
 
 #include "ZEMath/ZEAngle.h"
 #include "isense/isense.h"
+#include "ZECore/ZEOptionManager.h"
 
 
 bool ZEISenseInputDevice::InitializeSelf()
 {
 	if (!ZEInputDevice::InitializeSelf())
 		return false;
-	
-	Handle = ISD_OpenTracker((Hwnd)NULL, 5, FALSE, FALSE); 
+
+	Handle = ISD_OpenTracker((Hwnd)NULL, ZEOptionManager::GetInstance()->GetOption("CustHCombat", "HMDSensorPort")->GetValue().GetInt32(), FALSE, FALSE); 
 	if (Handle <= 0)
 		return false;
 	
@@ -60,7 +61,7 @@ bool ZEISenseInputDevice::InitializeSelf()
 	ISD_SetStationConfig(Handle, &Config, 0, false);
 
 	Description.Type = ZE_IDT_SENSOR;
-	Description.FullName = "iSense";
+	Description.FullName = "ISense";
 	Description.Sink = true;
 	Description.SinkName = "sensor";
 	Description.SinkNameHash = ZEHashGenerator::Hash(Description.SinkName);
@@ -68,7 +69,7 @@ bool ZEISenseInputDevice::InitializeSelf()
 	Description.VectorCount = 1;
 
 	Description.Index = ZEInputDeviceIndexes::GetNewDeviceIndex(ZE_IDT_SENSOR);
-	Description.Name = ZEFormat::Format("iSense{0:d:02}", Description.Index);
+	Description.Name = ZEFormat::Format("ISense{0:d:02}", Description.Index);
 	Description.NameHash = ZEHashGenerator::Hash(Description.Name);
 
 	State.Initialize(Description);
@@ -115,14 +116,10 @@ void ZEISenseInputDevice::Process()
 		ZEVector3 Axis;
 		ZEQuaternion::ConvertToAngleAxis(Angle, Axis, ZEQuaternion(Data.Station[0].Quaternion[0], Data.Station[0].Quaternion[1], Data.Station[0].Quaternion[2], Data.Station[0].Quaternion[3]));
 		ZEVector3 NewAxis;
-		NewAxis.x = Axis.x;
-		NewAxis.y = Axis.y;
-		NewAxis.z = Axis.z;
-		ZEQuaternion::CreateFromAngleAxis(State.Quaternions.CurrentValues[0], Angle, NewAxis);
-
-		//State.Quaternions.CurrentValues[0].ConjugateSelf();
-		//ZEQuaternion::CreateFromEuler(State.Quaternions.CurrentValues[0], ZEAngle::ToRadian(-Data.Station[0].Euler[1]), ZEAngle::ToRadian(Data.Station[0].Euler[3]), ZEAngle::ToRadian(Data.Station[0].Euler[2]));
-		//State.Quaternions.CurrentValues[0] = ZEQuaternion(Data.Station[0].Quaternion[0], Data.Station[0].Quaternion[2], Data.Station[0].Quaternion[3], Data.Station[0].Quaternion[1]).Normalize().Conjugate();	
+		NewAxis.x = Axis.y;
+		NewAxis.y = -Axis.z;
+		NewAxis.z = Axis.x;
+		ZEQuaternion::CreateFromAngleAxis(State.Quaternions.CurrentValues[0], -Angle, NewAxis);
 	}
 }
 

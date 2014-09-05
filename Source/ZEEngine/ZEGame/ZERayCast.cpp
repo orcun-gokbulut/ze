@@ -43,6 +43,7 @@ ZERayCastParameters::ZERayCastParameters()
 	Ray.v = ZEVector3::Zero;
 	MinimumDistance = 0.0f;
 	MaximumDistance = ZE_FLOAT_MAX;
+	FilterFunctionParameter = NULL;
 	Extras = ZE_RCRE_ALL;
 }
 

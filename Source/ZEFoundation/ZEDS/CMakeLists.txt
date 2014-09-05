@@ -41,8 +41,10 @@ ze_add_source(ZEArray.cpp				Sources)
 ze_add_source(ZEArray.h					Sources Headers)
 ze_add_source(ZEArrayIterators.cpp		Sources)
 ze_add_source(ZEArrayIterators.h		Sources Headers)
-ze_add_source(ZEArrayIteratorsTests.cpp		Tests)
+ze_add_source(ZEArrayIteratorsTests.cpp	Tests)
 ze_add_source(ZEArrayTests.cpp			Tests)
+ze_add_source(ZEBuffer.cpp				Sources)
+ze_add_source(ZEBuffer.h				Sources Headers)
 ze_add_source(ZEDelegate.cpp			Sources)
 ze_add_source(ZEDelegate.h				Sources Headers)
 ze_add_source(ZEDelegateImp.h			Sources Headers)
@@ -108,11 +110,11 @@ ze_add_source(ZEFormatOverloads.cpp		Sources)
 ze_add_source(ZEStringWriter.cpp		Sources)
 ze_add_source(ZEStringWriter.h			Sources Headers)
 ze_add_source(ZEStringWriterTests.cpp		Tests)
-ze_add_library(ZEDS 
+ze_add_library(TARGET ZEDS 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation)
 	
-ze_add_test(ZEDSTests 
+ze_add_test(TARGET ZEDSTests 
 	SOURCES ${Tests}
 	TEST_TARGET ZEDS)

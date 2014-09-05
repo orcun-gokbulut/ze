@@ -112,12 +112,12 @@ else()
 	ze_add_source(ZEVectorGeneric.cpp		Sources)
 endif()
 
-ze_add_library(ZEMath 
+ze_add_library(TARGET ZEMath 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
 	LIBS ZEFoundation)
 	
-ze_add_test(ZEMathTests
+ze_add_test(TARGET ZEMathTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES ZEMathIOStreamMapping.cpp ZEMathIOStreamMapping.h
 	TEST_TARGET ZEMath)

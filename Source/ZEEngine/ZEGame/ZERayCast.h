@@ -48,7 +48,7 @@ class ZEMaterial;
 
 typedef ZEFlags ZERayCastReportExtras;
 #define ZE_RCRE_ALL					0xFFFFFFFF
-#define ZE_RCRE_NONE				0x1
+#define ZE_RCRE_NONE				0x0
 #define ZE_RCRE_NORMAL				0x1
 #define ZE_RCRE_BINORMAL			0x2
 #define ZE_RCRE_POLIGON_INDEX		0x4

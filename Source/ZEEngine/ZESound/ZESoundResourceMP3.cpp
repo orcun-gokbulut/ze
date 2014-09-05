@@ -35,9 +35,11 @@
 
 #include "ZESoundResourceMP3.h"
 #include "ZEError.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEFile/ZEPathUtils.h"
+
 #include <mpg123.h>
 #include <stdio.h>
-#include "ZEFile\ZEPathUtils.h"
 
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
@@ -63,9 +65,11 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 	return NewString;
 }
 
+static ZEChunkArray<ZESoundResourceMP3*, 50> Indexes;
+
 static ssize_t Memory_Read(ZEInt fd, void *buffer, ZESize nbyte)
 {
-	ZESoundResourceMP3* Resource = (ZESoundResourceMP3*)fd;
+	ZESoundResourceMP3* Resource = (ZESoundResourceMP3*)Indexes[fd];
 
 	if (Resource->MemoryCursor == Resource->DataSize)
 		return 0;
@@ -79,7 +83,7 @@ static ssize_t Memory_Read(ZEInt fd, void *buffer, ZESize nbyte)
 
 static off_t Memory_Seek(ZEInt fd, off_t offset, ZEInt whence)
 {
-	ZESoundResourceMP3* Resource = (ZESoundResourceMP3*)fd;
+	ZESoundResourceMP3* Resource = (ZESoundResourceMP3*)Indexes[fd];
 
 	switch(whence)
 	{
@@ -191,7 +195,9 @@ ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
 	mpg123_param(NewResource->mpg123, MPG123_RESYNC_LIMIT, -1, 0); /* New in library version 0.0.1 . */
 
 	mpg123_replace_reader(NewResource->mpg123, Memory_Read, Memory_Seek);
-	mpg123_open_fd(NewResource->mpg123, (ZEInt)NewResource);
+
+	Indexes.Add(NewResource);
+	mpg123_open_fd(NewResource->mpg123, Indexes.GetCount() - 1);
 
 	long Rate;
 	ZEInt Channels, Encoding;

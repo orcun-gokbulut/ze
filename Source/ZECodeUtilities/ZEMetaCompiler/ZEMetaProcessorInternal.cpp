@@ -34,11 +34,21 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMetaProcessorInternal.h"
-#include "clang/AST/DeclTemplate.h"
 
-CompilerInstance* ZEMetaProcessorInternal::Compiler;
-ZEMetaData*	ZEMetaProcessorInternal::MetaData;
-ZEMetaCompilerOptions ZEMetaProcessorInternal::Options;
+#include "ZEDS/ZEFormat.h"
+
+#include <clang/AST/DeclTemplate.h>
+#include <clang/Frontend/FrontendActions.h>
+#include <clang/Tooling/CommonOptionsParser.h>
+#include <clang/Tooling/Tooling.h>
+#include <clang/AST/ASTConsumer.h>
+#include <llvm/Support/CommandLine.h>
+#include "ZEMetaGenerator.h"
+#include "ZEFile/ZEFileInfo.h"
+
+CompilerInstance* ZEMetaCompilerParser::Compiler;
+ZEMetaData*	ZEMetaCompilerParser::MetaData;
+ZEMetaCompilerOptions ZEMetaCompilerParser::Options;
 
 static ZEMetaGeneratorOperatorType GetOperatorType(OverloadedOperatorKind OperatorKind)
 {
@@ -115,36 +125,36 @@ static ZEMetaGeneratorOperatorType GetOperatorType(OverloadedOperatorKind Operat
 	}
 }
 
-void ZEMetaProcessorInternal::RaiseNote(SourceLocation& Location, const char* WarningText)
+void ZEMetaCompilerParser::RaiseNote(SourceLocation& Location, const char* WarningText)
 {
 	FullSourceLoc FullLocation(Location, Compiler->getSourceManager());
-	unsigned Id = Compiler->getDiagnostics().getDiagnosticIDs().getPtr()->getCustomDiagID(DiagnosticIDs::Level::Note, WarningText);
+	unsigned Id = Compiler->getDiagnostics().getDiagnosticIDs()->getCustomDiagID(DiagnosticIDs::Level::Note, WarningText);
 	DiagnosticBuilder B = Compiler->getDiagnostics().Report(FullLocation, Id);
 }
 
-void ZEMetaProcessorInternal::RaiseWarning(SourceLocation& Location, const char* WarningText)
+void ZEMetaCompilerParser::RaiseWarning(SourceLocation& Location, const char* WarningText)
 {
 	FullSourceLoc FullLocation(Location, Compiler->getSourceManager());
-	unsigned Id = Compiler->getDiagnostics().getDiagnosticIDs().getPtr()->getCustomDiagID(DiagnosticIDs::Level::Warning, WarningText);
+	unsigned Id = Compiler->getDiagnostics().getDiagnosticIDs()->getCustomDiagID(DiagnosticIDs::Level::Warning, WarningText);
 	DiagnosticBuilder B = Compiler->getDiagnostics().Report(FullLocation, Id);
 }
 
-void ZEMetaProcessorInternal::RaiseError(SourceLocation& Location, const char* ErrorText)
+void ZEMetaCompilerParser::RaiseError(SourceLocation& Location, const char* ErrorText)
 {
 	FullSourceLoc FullLocation(Location, Compiler->getSourceManager());
-	unsigned Id = Compiler->getDiagnostics().getDiagnosticIDs().getPtr()->getCustomDiagID(DiagnosticIDs::Level::Error, ErrorText);
+	unsigned Id = Compiler->getDiagnostics().getDiagnosticIDs()->getCustomDiagID(DiagnosticIDs::Level::Error, ErrorText);
 	DiagnosticBuilder B = Compiler->getDiagnostics().Report(FullLocation, Id);
 }
 
-void ZEMetaProcessorInternal::RaiseCriticalError(SourceLocation& Location, const char* ErrorText)
+void ZEMetaCompilerParser::RaiseCriticalError(SourceLocation& Location, const char* ErrorText)
 {
 	FullSourceLoc FullLocation(Location, Compiler->getSourceManager());
-	unsigned Id = Compiler->getDiagnostics().getDiagnosticIDs().getPtr()->getCustomDiagID(DiagnosticIDs::Level::Error, ErrorText);
+	unsigned Id = Compiler->getDiagnostics().getDiagnosticIDs()->getCustomDiagID(DiagnosticIDs::Level::Error, ErrorText);
 	DiagnosticBuilder B = Compiler->getDiagnostics().Report(FullLocation, Id);
 	exit(EXIT_FAILURE);
 }
 
-bool ZEMetaProcessorInternal::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class)
+bool ZEMetaCompilerParser::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class)
 {
 	bool Result = false;
 	if (Class->getName() == "ZEObject")
@@ -177,7 +187,7 @@ bool ZEMetaProcessorInternal::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Cl
 	return Result;
 }
 
-bool ZEMetaProcessorInternal::CheckClassHasZEObjectMacro(CXXRecordDecl* Class)
+bool ZEMetaCompilerParser::CheckClassHasZEObjectMacro(CXXRecordDecl* Class)
 {
 	bool HasClassMethodFound = false;
 	bool HasGetClassMethodFound = false;
@@ -223,7 +233,7 @@ bool ZEMetaProcessorInternal::CheckClassHasZEObjectMacro(CXXRecordDecl* Class)
 			continue;
 		}
 
-		QualType ReturnType = Iterator->getResultType().getCanonicalType();
+		QualType ReturnType = Iterator->getCallResultType().getCanonicalType();
 		if (!ReturnType.getTypePtr()->isPointerType() ||
 			ReturnType.getQualifiers() != 0 ||
 			!ReturnType.getTypePtr()->getPointeeType()->isClassType() ||
@@ -258,7 +268,7 @@ bool ZEMetaProcessorInternal::CheckClassHasZEObjectMacro(CXXRecordDecl* Class)
 	return true;
 }
 
-bool ZEMetaProcessorInternal::CheckClass(CXXRecordDecl* Class)
+bool ZEMetaCompilerParser::CheckClass(CXXRecordDecl* Class)
 {
 	if (!CheckClassHasDerivedFromZEObject(Class))
 		return false;
@@ -388,7 +398,7 @@ ZEMetaType ProcessInnerType(ZEString MainClassName, const Type* ClangType)
 
 			if(ClassPtr->isCompleteDefinition())
 			{
-				if(ZEMetaProcessorInternal::CheckClass(ClassPtr))
+				if(ZEMetaCompilerParser::CheckClass(ClassPtr))
 					return TempType;
 				else
 					return ZEMetaType();
@@ -401,13 +411,13 @@ ZEMetaType ProcessInnerType(ZEString MainClassName, const Type* ClangType)
 			}
 			else
 			{
-				if(ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses.GetCount() > 0)
+				if(ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses.GetCount() > 0)
 				{
-					for(int I = ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses.GetCount() - 1; I >= 0; I--)
+					for(int I = ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses.GetCount() - 1; I >= 0; I--)
 					{
-						if(ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses[I]->ClassName == TempType.ClassData->Name)
+						if(ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses[I]->ClassName == TempType.ClassData->Name)
 						{
-							ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses[I]->HeaderFileDeclaredIn = MainClassName;
+							ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses[I]->HeaderFileDeclaredIn = MainClassName;
 							return TempType;
 						}
 					}
@@ -493,7 +503,7 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 			
 			if(ClassPtr->isCompleteDefinition())
 			{
-				if(ZEMetaProcessorInternal::CheckClass(ClassPtr))
+				if(ZEMetaCompilerParser::CheckClass(ClassPtr))
 					return TempType;
 				else
 					return ZEMetaType();
@@ -542,13 +552,13 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 			}
 			else
 			{
-				if(ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses.GetCount() > 0)
+				if(ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses.GetCount() > 0)
 				{
-					for(int I = ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses.GetCount() - 1; I >= 0; I--)
+					for(int I = ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses.GetCount() - 1; I >= 0; I--)
 					{
-						if(ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses[I]->ClassName == TempType.ClassData->Name)
+						if(ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses[I]->ClassName == TempType.ClassData->Name)
 						{
-							ZEMetaProcessorInternal::MetaData->ForwardDeclaredClasses[I]->HeaderFileDeclaredIn = MainClassName;
+							ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses[I]->HeaderFileDeclaredIn = MainClassName;
 							return TempType;
 						}
 					}
@@ -619,14 +629,14 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 				EnumData->Parameters.Add(EnumParameterData);
 			}
 
-			ZEMetaProcessorInternal::MetaData->EnumTypes.Add(EnumData);
+			ZEMetaCompilerParser::MetaData->EnumTypes.Add(EnumData);
 		}
 
 		return TempType;
 	}
 }
 
-bool ZEMetaProcessorInternal::ParseAttribute(ZEAttributeData* Data, const AnnotateAttr* Attribute)
+bool ZEMetaCompilerParser::ParseAttribute(ZEAttributeData* Data, const AnnotateAttr* Attribute)
 {
 	std::string Temp = Attribute->getAnnotation().str();
 	const char* AttributeText = Temp.c_str();
@@ -667,7 +677,7 @@ bool ZEMetaProcessorInternal::ParseAttribute(ZEAttributeData* Data, const Annota
 			}
 			else
 			{
-				ZEMetaProcessorInternal::RaiseError(Attribute->getLocation(), "Wrong identifier name.");
+				ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Wrong identifier name.");
 				return false;
 			}				
 			break;
@@ -684,14 +694,14 @@ bool ZEMetaProcessorInternal::ParseAttribute(ZEAttributeData* Data, const Annota
 			}
 			else if (!isalnum(InputCharacter))
 			{
-				ZEMetaProcessorInternal::RaiseError(Attribute->getLocation(), "Wrong identifier name.");
+				ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Wrong identifier name.");
 				return false;
 			}
 			else
 			{
 				if (ParameterTextIndex >= 1024)
 				{
-					ZEMetaProcessorInternal::RaiseError(Attribute->getLocation(), "Max parameter size reached.");
+					ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Max parameter size reached.");
 					return false;
 				}
 
@@ -721,7 +731,7 @@ bool ZEMetaProcessorInternal::ParseAttribute(ZEAttributeData* Data, const Annota
 			}
 			else
 			{
-				ZEMetaProcessorInternal::RaiseError(Attribute->getLocation(), "Wrong parameter termination character.");
+				ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Wrong parameter termination character.");
 				return false;
 			}
 			break;
@@ -742,7 +752,7 @@ bool ZEMetaProcessorInternal::ParseAttribute(ZEAttributeData* Data, const Annota
 			{
 				if (ParameterTextIndex >= 1024)
 				{
-					ZEMetaProcessorInternal::RaiseError(Attribute->getLocation(), "Max parameter size reached.");
+					ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Max parameter size reached.");
 					return false;
 				}
 				ParameterText[ParameterTextIndex] = InputCharacter;
@@ -780,7 +790,7 @@ bool ZEMetaProcessorInternal::ParseAttribute(ZEAttributeData* Data, const Annota
 					ParameterText[ParameterTextIndex] = '\"';
 					break;
 				default:
-					ZEMetaProcessorInternal::RaiseError(Attribute->getLocation(), "Unknown string escape character.");
+					ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Unknown string escape character.");
 					return false;
 			}
 
@@ -802,14 +812,14 @@ bool ZEMetaProcessorInternal::ParseAttribute(ZEAttributeData* Data, const Annota
 	}
 	else
 	{
-		ZEMetaProcessorInternal::RaiseError(Attribute->getLocation(), "Cannot parse attribute.");
+		ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Cannot parse attribute.");
 		return false;
 	}
 
 	return true;
 }
 
-void ZEMetaProcessorInternal::ProcessDeclaration(Decl* BaseDeclaration)
+void ZEMetaCompilerParser::ProcessDeclaration(Decl* BaseDeclaration)
 {
 	if(isa<EnumDecl>(BaseDeclaration) && BaseDeclaration)
 		ProcessEnumerator(dyn_cast<EnumDecl>(BaseDeclaration));
@@ -818,7 +828,7 @@ void ZEMetaProcessorInternal::ProcessDeclaration(Decl* BaseDeclaration)
 		ProcessClass(dyn_cast<CXXRecordDecl>(BaseDeclaration));
 }
 
-void ZEMetaProcessorInternal::ProcessEnumerator(EnumDecl* EnumDeclaration)
+void ZEMetaCompilerParser::ProcessEnumerator(EnumDecl* EnumDeclaration)
 {
 	ZEEnumData* EnumData = new ZEEnumData();
 	EnumData->Name = EnumDeclaration->getNameAsString();
@@ -840,7 +850,7 @@ void ZEMetaProcessorInternal::ProcessEnumerator(EnumDecl* EnumDeclaration)
 	MetaData->EnumTypes.Add(EnumData);
 }
 
-void ZEMetaProcessorInternal::ProcessClass(CXXRecordDecl* Class)
+void ZEMetaCompilerParser::ProcessClass(CXXRecordDecl* Class)
 {
 	if(Class->isClass() && !Class->isCompleteDefinition() && Class->hasAttrs())
 	{
@@ -977,7 +987,7 @@ void ZEMetaProcessorInternal::ProcessClass(CXXRecordDecl* Class)
 		MetaData->TargetTypes.Add(ClassData);
 }
 
-void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, VarDecl* StaticProperty)
+void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, VarDecl* StaticProperty)
 {
 	if (StaticProperty->getAccess() != AccessSpecifier::AS_public)
 		return;
@@ -1019,7 +1029,7 @@ void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, VarDecl* S
 			{
 				CXXMethodDecl* TemplateEventMethodDecl = (CXXMethodDecl*)*CurrentTemplateEventMethod;
 
-				Event->ReturnParameter.Type = ProcessType(ClassData->Name, TemplateEventMethodDecl->getResultType());
+				Event->ReturnParameter.Type = ProcessType(ClassData->Name, TemplateEventMethodDecl->getCallResultType());
 
 				if (Event->ReturnParameter.Type == ZE_MTT_UNDEFINED)
 				{
@@ -1094,7 +1104,7 @@ void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, VarDecl* S
 	ClassData->Properties.Add(PropertyData);
 }
 
-void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, FieldDecl* NonStaticProperty)
+void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, FieldDecl* NonStaticProperty)
 {
 	if (NonStaticProperty->getAccess() != AccessSpecifier::AS_public)
 		return;
@@ -1138,7 +1148,7 @@ void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, FieldDecl*
 			{
 				CXXMethodDecl* TemplateEventMethodDecl = (CXXMethodDecl*)*CurrentTemplateEventMethod;
 
-				Event->ReturnParameter.Type = ProcessType(ClassData->Name, TemplateEventMethodDecl->getResultType());
+				Event->ReturnParameter.Type = ProcessType(ClassData->Name, TemplateEventMethodDecl->getCallResultType());
 
 				if (Event->ReturnParameter.Type.Type == ZE_MTT_UNDEFINED)
 				{
@@ -1213,7 +1223,7 @@ void ZEMetaProcessorInternal::ProcessProperty(ZEClassData* ClassData, FieldDecl*
 	ClassData->Properties.Add(PropertyData);
 }
 
-void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* Method)
+void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* Method)
 {
 	bool IsOperator = false;
 	if(Method->isOverloadedOperator())
@@ -1225,16 +1235,28 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 	if(!Method->getType()->isFunctionType())
 		return;
 
-	if(Method->isCopyAssignmentOperator())
-		ClassData->HasPublicCopyConstructor = true;
+	if(Method->isImplicit())
+		return;
+
+/*	if(Method->isCopyAssignmentOperator())
+		ClassData->HasPublicCopyConstructor = true;*/
 
 	if(isa<CXXDestructorDecl>(Method))
 		return;
 
 	if(isa<CXXConstructorDecl>(Method))
-		ClassData->HasPublicConstructor = true;
+	{
+		CXXConstructorDecl* constructor = cast<CXXConstructorDecl>(Method);
+		if (constructor->isCopyOrMoveConstructor())
+			return;
+		else if (constructor->isDefaultConstructor())
+		{
+			ClassData->HasPublicConstructor = true;
+			return;
+		}
+	}
 
-	ZEMetaType ReturnType = ProcessType(ClassData->Name, Method->getResultType());
+	ZEMetaType ReturnType = ProcessType(ClassData->Name, Method->getCallResultType());
 	if (ReturnType.Type == ZE_MTT_UNDEFINED)
 		return;
 
@@ -1301,7 +1323,7 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 			}
 			else
 			{
-				ZEMetaType PropertyType = ProcessType(ClassData->Name, Method->getResultType());
+				ZEMetaType PropertyType = ProcessType(ClassData->Name, Method->getCallResultType());
 				if (PropertyType.Type == ZE_MTT_UNDEFINED)
 					return;
 
@@ -1413,4 +1435,137 @@ void ZEMetaProcessorInternal::ProcessMethod(ZEClassData* ClassData, CXXMethodDec
 		return;
 	else
 		ClassData->Methods.Add(MethodData);
+}
+
+class ZEMetaCompilerASTConsumer : public clang::ASTConsumer
+{
+	public:
+		virtual void Initialize(ASTContext &Context) 
+		{
+
+		}
+
+		virtual bool HandleTopLevelDecl(DeclGroupRef DR) 
+		{
+			for (DeclGroupRef::iterator Iterator = DR.begin(); Iterator != DR.end(); Iterator++)
+			{
+				ZEMetaCompilerParser::ProcessDeclaration(*Iterator);
+			}
+
+			return true;
+		}
+
+		virtual void HandleTranslationUnit(ASTContext &Ctx)
+		{
+
+		}
+};
+
+class ZEMetaCompilerFrontendAction : public clang::ASTFrontendAction
+{
+	public:
+		virtual clang::ASTConsumer *CreateASTConsumer(CompilerInstance &CI, StringRef InFile)
+		{
+			ZEMetaCompilerParser::Compiler = &CI;
+			return new ZEMetaCompilerASTConsumer();
+		}
+};
+
+class ZEMetaCompilerFrontendActionFactory : public clang::tooling::FrontendActionFactory
+{
+	public:
+		virtual clang::FrontendAction *create()
+		{
+			return new ZEMetaCompilerFrontendAction();
+		}
+};
+
+#include <fstream>
+
+std::string readshit(const char* input_file_name)
+{
+	std::ifstream t;
+	int length;
+	t.open(input_file_name);      // open input file
+	t.seekg(0, std::ios::end);    // go to the end
+	length = t.tellg();           // report location (this is the length)
+	t.seekg(0, std::ios::beg);    // go back to the beginning
+	char* buffer = new char[length];    // allocate memory for a buffer of appropriate dimension
+	t.read(buffer, length);       // read the whole file into the buffer
+	t.close(); 
+
+	std::string content = buffer;
+	delete[] buffer;
+
+	return content;
+}
+
+bool ZEMetaCompilerParser::Parse()
+{
+	std::vector<std::string> Arguments;
+	//Arguments.push_back("ZEMetaCompiler.exe");
+	//Arguments.push_back(Options.InputFileName);
+	
+	//Arguments.push_back("--");
+	//Arguments.push_back("clang++");
+	Arguments.push_back("-fms-extensions");
+	Arguments.push_back("-fms-compatibility");
+	Arguments.push_back("-x");	Arguments.push_back("c++");
+	Arguments.push_back("-fsyntax-only");
+	Arguments.push_back("-w");
+	//Arguments.push_back("-std=c++11");
+
+	for (int I = 0; I < Options.IncludeDirectories.GetCount(); I++)
+	{
+		Arguments.push_back(ZEFormat::Format("-I{0}", Options.IncludeDirectories[I]));
+	}
+
+	for (int I = 0; I < Options.Definitions.GetCount(); I++)
+	{
+		Arguments.push_back(ZEFormat::Format("-D{0}", Options.Definitions[I]));
+	}	
+	
+	const char* argv[1024];
+	int argc = Arguments.size();
+	for (int I = 0; I < argc; I++)
+	{
+		argv[I] = Arguments[I].c_str();
+	}
+
+	/*
+	static llvm::cl::OptionCategory ZEMCCatagory("ZEMC options");
+	static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpMessage);
+	clang::tooling::CommonOptionsParser OptionsParser(argc, argv, ZEMCCatagory);
+	clang::tooling::ClangTool Tool(OptionsParser.getCompilations(),	OptionsParser.getSourcePathList());
+	int Result = Tool.run(new ZEMetaCompilerFrontendActionFactory());
+	return (Result == EXIT_SUCCESS);*/
+	
+	std::ifstream in(Options.InputFileName.ToCString());
+	std::string s((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+
+	bool Result = clang::tooling::runToolOnCodeWithArgs(
+		new ZEMetaCompilerFrontendAction(), 
+		s,
+		Arguments, 
+		Options.InputFileName.ToCString());
+	if (!Result)
+		return false;
+
+	if (!ZEMetaGenerator::Generate(Options, MetaData))
+		return false;
+
+	if(Options.IsRegisterSession)
+	{
+		FILE* File;
+		File = fopen(Options.RegisterFileName.ToCString(), "w");
+
+		for(ZESize I = 0; I < MetaData->TargetTypes.GetCount(); I++)
+		{
+			fprintf(File, "%s,%s;", 
+				MetaData->TargetTypes[I]->Name.ToCString(), 
+				ZEFileInfo::GetFileName(Options.InputFileName).ToCString());
+		}
+
+		fclose(File);
+	}
 }

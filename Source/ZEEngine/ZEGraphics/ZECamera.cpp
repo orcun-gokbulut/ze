@@ -65,10 +65,11 @@ const ZEMatrix4x4& ZECamera::GetViewTransform()
 
 const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 {
-	if (CameraDirtyFlags.GetFlags(ZE_CDF_PROJECTION_TRANSFORM) || (GlobalAspectRatio != zeGraphics->GetAspectRatio()))
+	UpdateAutoParameters();
+	
+	if (CameraDirtyFlags.GetFlags(ZE_CDF_PROJECTION_TRANSFORM))
 	{
-		GlobalAspectRatio = zeGraphics->GetAspectRatio();
-		ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, FOV, GlobalAspectRatio, NearZ, FarZ);
+		ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, VerticalFOV, EffectiveAspectRatio, EffectiveNearZ, EffectiveFarZ);
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_PROJECTION_TRANSFORM);
 	}
 
@@ -77,6 +78,8 @@ const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 
 const ZEMatrix4x4& ZECamera::GetViewProjectionTransform()
 {
+	UpdateAutoParameters();
+
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW_PROJECTION_TRANSFORM))
 	{
 		ZEMatrix4x4::Multiply(ViewProjectionTransform, GetProjectionTransform(), GetViewTransform());
@@ -88,26 +91,61 @@ const ZEMatrix4x4& ZECamera::GetViewProjectionTransform()
 
 void ZECamera::SetPosition(const ZEVector3& NewPosition)
 {
-	CameraDirtyFlags.RaiseFlags(ZE_CDF_VIEW | ZE_CDF_VIEW_FRUSTUM | ZE_CDF_VIEW_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_PROJECTION_TRANSFORM);
 	ZEEntity::SetPosition(NewPosition);
 }	
 
 void ZECamera::SetRotation(const ZEQuaternion& NewRotation)
 {
-	CameraDirtyFlags.RaiseFlags(ZE_CDF_VIEW | ZE_CDF_VIEW_FRUSTUM | ZE_CDF_VIEW_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_PROJECTION_TRANSFORM);
 	ZEEntity::SetRotation(NewRotation);
 }
 
 void ZECamera::OnTransformChanged()
 {
-	CameraDirtyFlags.RaiseFlags(ZE_CDF_VIEW | ZE_CDF_VIEW_FRUSTUM | ZE_CDF_VIEW_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_PROJECTION_TRANSFORM);
 	ZEEntity::OnTransformChanged();
+}
+
+void ZECamera::UpdateAutoParameters()
+{
+	if (AutoAspectRatio && EffectiveAspectRatio != zeGraphics->GetAspectRatio())
+	{
+		EffectiveAspectRatio = zeGraphics->GetAspectRatio();
+		CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
+	}
+			
+	if (AutoZ && (EffectiveNearZ != zeGraphics->GetNearZ() || EffectiveFarZ != zeGraphics->GetFarZ()))
+	{
+		EffectiveNearZ = zeGraphics->GetNearZ();
+		EffectiveFarZ = zeGraphics->GetFarZ();
+		CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
+	}
+}
+
+void ZECamera::SetAutoZ(bool Enabled)
+{
+	AutoZ = Enabled;
+
+	if (!Enabled)
+	{
+		EffectiveNearZ = NearZ;
+		EffectiveFarZ = FarZ;
+	}
+}
+
+bool ZECamera::GetAutoZ()
+{
+	return AutoZ;
 }
 
 void ZECamera::SetNearZ(float NearZ)
 {
-	CameraDirtyFlags.RaiseFlags(ZE_CDF_VIEW | ZE_CDF_VIEW_FRUSTUM | ZE_CDF_PROJECTION_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
 	this->NearZ = NearZ;
+
+	if (!AutoZ)
+		this->EffectiveNearZ = NearZ;
 }
 
 float ZECamera::GetNearZ() const
@@ -117,8 +155,11 @@ float ZECamera::GetNearZ() const
 
 void ZECamera::SetFarZ(float FarZ)
 {
-	CameraDirtyFlags.RaiseFlags(ZE_CDF_VIEW | ZE_CDF_VIEW_FRUSTUM | ZE_CDF_PROJECTION_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
 	this->FarZ = FarZ;
+
+	if (!AutoZ)
+		this->EffectiveFarZ = FarZ;
 }
 
 float ZECamera::GetFarZ() const
@@ -126,21 +167,51 @@ float ZECamera::GetFarZ() const
 	return FarZ;
 }
 
-void ZECamera::SetFOV(float FOV)
+void ZECamera::SetHorizontalFOV(float FOV)
 {
-	CameraDirtyFlags.RaiseFlags(ZE_CDF_VIEW | ZE_CDF_VIEW_FRUSTUM | ZE_CDF_PROJECTION_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
-	this->FOV = FOV;
+	UpdateAutoParameters();
+
+	SetVerticalFOV(2.0f * ZEAngle::ArcTan(ZEAngle::Tan(FOV * 0.5f) / EffectiveAspectRatio));
 }
 
-float ZECamera::GetFOV() const
+float ZECamera::GetHorizontalFOV() const
 {
-	return FOV;
+	return 2.0f * ZEAngle::ArcTan(ZEAngle::Tan(VerticalFOV * 0.5f) * EffectiveAspectRatio);
+}
+
+void ZECamera::SetVerticalFOV(float FOV)
+{
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
+
+	this->VerticalFOV = FOV;
+}
+
+float ZECamera::GetVerticalFOV() const
+{
+	return VerticalFOV;
+}
+
+void ZECamera::SetAutoAspectRatio(bool Enabled)
+{
+	AutoAspectRatio = Enabled;
+
+	if (!Enabled)
+		EffectiveAspectRatio = AspectRatio;
+}
+
+bool ZECamera::GetAutoAspectRatio()
+{
+	return AutoAspectRatio;
 }
 
 void ZECamera::SetAspectRatio(float AspectRatio)
 {
-	CameraDirtyFlags.RaiseFlags(ZE_CDF_VIEW | ZE_CDF_VIEW_FRUSTUM | ZE_CDF_PROJECTION_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
+
 	this->AspectRatio = AspectRatio;
+
+	if (!AutoAspectRatio)
+		this->EffectiveAspectRatio = AspectRatio;
 }
 
 float ZECamera::GetAspectRatio() const
@@ -170,11 +241,13 @@ float ZECamera::GetShadowFadeDistance() const
 
 const ZEView& ZECamera::GetView()
 {
+	UpdateAutoParameters();
+
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW))
 	{
 		View.Type = ZE_VPT_CAMERA;
 		View.Camera = this;
-		View.FOV = GetFOV();
+		View.FOV = GetHorizontalFOV();
 		View.ProjectionTransform = GetProjectionTransform();
 		View.ViewTransform = GetViewTransform();
 		View.ViewProjectionTransform = GetViewProjectionTransform();
@@ -189,10 +262,11 @@ const ZEView& ZECamera::GetView()
 
 const ZEViewVolume& ZECamera::GetViewVolume()
 {
-	if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW_FRUSTUM) || (GlobalAspectRatio != zeGraphics->GetAspectRatio()))
+	UpdateAutoParameters();
+
+	if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW_FRUSTUM))
 	{
-		GlobalAspectRatio = zeGraphics->GetAspectRatio();
-		ViewFrustum.Create(GetWorldPosition(), GetWorldRotation(), FOV, GlobalAspectRatio, NearZ, FarZ);
+		ViewFrustum.Create(GetWorldPosition(), GetWorldRotation(), VerticalFOV, EffectiveAspectRatio, EffectiveNearZ, EffectiveFarZ);
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW_FRUSTUM);
 	}
 
@@ -203,7 +277,7 @@ void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
 {
 	ZEVector3 V;
 	const ZEMatrix4x4& ProjMatrix = GetProjectionTransform();
-	V.x =  (((2.0f * ScreenX ) / zeGraphics->GetScreenWidth()) - 1) / ProjMatrix.M11;
+	V.x =  (((2.0f * ScreenX ) / zeGraphics->GetScreenWidth()) - 1) / ProjMatrix.M11; //ScreenWidthden Camera ViewPort Size a alınmalı
 	V.y = -(((2.0f * ScreenY ) / zeGraphics->GetScreenHeight()) - 1) / ProjMatrix.M22;
 	V.z =  1.0f;
 
@@ -221,13 +295,18 @@ void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
 ZECamera::ZECamera()
 {
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_VIEW | ZE_CDF_VIEW_FRUSTUM | ZE_CDF_VIEW_TRANSFORM | ZE_CDF_PROJECTION_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
+	
+	AutoZ = true;
+	AutoAspectRatio = true;
 
-	FOV = ZE_PI_2;
 	FarZ = zeGraphics->GetFarZ();
+	EffectiveFarZ = FarZ;
 	NearZ = zeGraphics->GetNearZ();
+	EffectiveNearZ = NearZ;
 	AspectRatio = zeGraphics->GetAspectRatio();
-	GlobalAspectRatio = AspectRatio;
-
+	EffectiveAspectRatio = AspectRatio;
+	SetHorizontalFOV(ZE_PI_2);
+	
 	ShadowDistance = 1000.0f;
 	ShadowFadeDistance = ShadowDistance * 0.1f;
 }

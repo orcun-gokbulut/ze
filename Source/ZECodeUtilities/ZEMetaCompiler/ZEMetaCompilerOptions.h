@@ -56,6 +56,9 @@ struct ZEMetaCompilerOptions
 	bool						IsRegisterSession;
 	bool						IsGenerateSession;
 
+	const char**				Argv;
+	int							Argc;
+
 	bool						Quiet;
 	bool						MSVC;
 };

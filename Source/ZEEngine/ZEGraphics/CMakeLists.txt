@@ -107,7 +107,7 @@ ze_add_source(ZESeaMaterial.cpp 					Sources)
 ze_add_source(ZESeaMaterial.h 						Sources Headers ZEMC)
 
 
-ze_add_library(ZEGraphics 
+ze_add_library(TARGET ZEGraphics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}

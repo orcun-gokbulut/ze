@@ -33,30 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-// Program Files\Microsoft Visual Studio 8\Common7\Packages\Debugger\autoexp.dat
-/*
-;------------------------------------------------------------------------------
-;  ZEArray<*> specialization
-;------------------------------------------------------------------------------
-
-ZEArray<*>{
-	children
-	(
-		#
-		(
-			Members: [$c,!],
-			Size: [$c.Count,i],
-			#array
-			(
-				expr :	($c.Items)[$i],  
-				size :	$c.Count
-			)
-		)
-	)
-}
-
-*/
-
 #pragma once
 #ifndef	__ZEDS_ARRAY_H__
 #define __ZEDS_ARRAY_H__
@@ -67,8 +43,6 @@ ZEArray<*>{
 #include "ZEArrayIterators.h"
 
 #include <stdlib.h>
-
-typedef ZEInt ZEArrayFunctionPointerCasterType(const void*, const void*);
 
 template<typename ZEType, typename Allocator_= ZEAllocatorBase<ZEType> >
 class ZEArray
@@ -270,8 +244,58 @@ class ZEArray
 
 			return &Items[Count - 1];
 		}
-		
-		inline bool Exists(ZEType& Value)
+
+		inline ZEType* AddOrderedInc(ZEType NewItem)
+		{
+			if (Count == 0)
+				return Add(NewItem);
+	
+			ZESize Index = 0;
+			while(Index < Count && Items[Index] < NewItem)
+				Index++;
+
+			return Insert(Index + 1, NewItem);
+		}
+
+		template<ZEInt CompareFunction(const ZEType*, const ZEType*)>
+		inline ZEType* AddOrderedInc(ZEType NewItem)
+		{
+			if (Count == 0)
+				return Add(NewItem);
+
+			ZESize Index = 0;
+			while(Index < Count && CompareFunction(&Items[Index], &NewItem) == -1)
+				Index++;
+
+			return Insert(Index + 1, NewItem);
+		}
+
+		inline ZEType* AddOrderedDec(ZEType Type)
+		{
+			if (Count == 0)
+			return Add(NewItem);
+
+			ZESize Index = 0;
+			while(Index < Count && Items[Index] > NewItem)
+				Index++;
+
+			return Insert(Index + 1, NewItem);
+		}
+
+		template<ZEInt CompareFunction(const ZEType*, const ZEType*)>
+		inline ZEType* AddOrderedDec(ZEType NewItem)
+		{
+			if (Count == 0)
+				return Add(NewItem);
+
+			ZESize Index = 0;
+			while(Index < Count && CompareFunction(&Items[Index], &NewItem) == 1)
+				Index++;
+
+			return Insert(Index + 1, NewItem);
+		}
+
+		inline bool Exists(ZEType Value) const
 		{
 			for (ZESize I = 0; I < Count; I++)
 				if (Items[I] == Value)
@@ -428,11 +452,6 @@ class ZEArray
 			Count = 0;
 		}
 
-		inline void Sort(ZEInt (*CompareFunction)(const ZEType*, const ZEType*))
-		{
-			qsort(Items, Count, sizeof(ZEType), (ZEArrayFunctionPointerCasterType*)(CompareFunction));
-		}
-
 		void Traverse()
 		{
 			for (ZESize I = 0; I < Count / 2; I++)
@@ -443,9 +462,39 @@ class ZEArray
 			}
 		}
 
+		template<ZEInt CompareFunction(const ZEType*, const ZEType*)>
+		inline void Sort()
+		{
+			qsort(Items, Count, sizeof(ZEType), (int (*)(const void*, const void*))CompareFunction);
+		}
+
+		template<typename ZESearchValueType, ZEInt CompareFunction(const ZEType&, ZESearchValueType)>
+		ZESSize BinarySearch(ZESearchValueType TargetValue) 
+		{
+			ZESSize Low = 0;
+			ZESSize High = Count;
+			while (Low <= High) 
+			{
+				ZESSize Middle = Low + (High - Low) / 2;
+				ZEInt Result = CompareFunction(Items[Middle], TargetValue);
+				if (Result > 0)
+					High = Middle - 1;
+				else if (Result < 0)
+					Low = Middle + 1;
+				else
+					return Middle;
+			}
+			return -1;
+		}
+
+		inline void Sort(ZEInt (*CompareFunction)(const ZEType*, const ZEType*))
+		{
+			qsort(Items, Count, sizeof(ZEType), (int (*)(const void*, const void*))CompareFunction);
+		}
+
 		inline ZESSize BinarySearch(const ZEType& Element, ZEInt (*CompareFunction)(const ZEType*, const ZEType*))
 		{
-			void* Result = bsearch(&Element, Items, Count, sizeof(ZEType), (ZEArrayFunctionPointerCasterType*)(CompareFunction));
+			void* Result = bsearch(&Element, Items, Count, sizeof(ZEType), (int (*)(const void*, const void*))(CompareFunction));
 			if (Result == NULL)
 				return -1;
 			else

@@ -33,23 +33,27 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.10)
 
-project(Zinek)
+if(POLICY CMP0043)
+	cmake_policy(SET CMP0043 OLD)
+endif()
+ 
+project(ZinekEngine)
 
 ## Build system initalization
 #########################################################################################
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
 include(ze)
-ze_configure_init()
-ze_configure_version()
-ze_configure_platform()
-ze_configure_external()
-ze_configure_debugging()
-ze_configure_unit_tests()
-ze_configure_static_checks()
-ze_configure_symbol_server()
+ze_init()
+ze_version_init()
+ze_platform_init()
+ze_external_init()
+ze_debugging_init()
+ze_unit_test_init()
+ze_static_check_init()
+ze_symbol_server_init()
 
 
 ## DLL Options
@@ -58,16 +62,22 @@ set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll wil
 
 
 
+
 ## Compiler & Linker Options
 #########################################################################################
 if ("${ZEBUILD_PLATFORM_COMPILER}" EQUAL "MSVC")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
 	if (ZEBUILD_PLATFORM_ARCHITECTURE_X86)
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")	
 	endif()
+	string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR- /EHsc-")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /IGNORE:4099")
+
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG")
+	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /DEBUGTYPE:cv /OPT:REF,ICF")
+
 	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
 endif()
 
@@ -75,9 +85,9 @@ endif()
 ## Directories
 #########################################################################################
 include_directories(
-	${CMAKE_SOURCE_DIR}/Source
-	${CMAKE_SOURCE_DIR}/Source/ZEEngine
-	${CMAKE_SOURCE_DIR}/Source/ZEFoundation)
+	${CMAKE_CURRENT_SOURCE_DIR}/Source
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEEngine
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEFoundation)
 
 include(ze_qt)
 

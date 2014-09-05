@@ -34,14 +34,22 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZM_PROVIDER_H__
-#define __ZM_PROVIDER_H__
+#ifndef	__ZE_CRASHREPORT_PROVIDER_H__
+#define __ZE_CRASHREPORT_PROVIDER_H__
 
 #include "ZETypes.h"
+
+enum ZECrashReportProviderType
+{
+	ZE_CRPT_TEXT,
+	ZE_CRPT_BINARY,
+};
 
 class ZECrashReportProvider
 {		
 	public:
+		virtual ZECrashReportProviderType	GetProviderType() = 0;
+
 		virtual const char*					GetName() = 0;
 
 		virtual ZESize						GetSize() = 0;

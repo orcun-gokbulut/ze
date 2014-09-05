@@ -46,6 +46,6 @@ include_directories(
 link_directories(
 	${ZEBUILD_LIB_PATH}/DirectX)
 
-ze_add_library(ZEDirectInput 
+ze_add_library(TARGET ZEDirectInput 
 	SOURCES ${Sources}
 	LIBS libDirectInput)
