@@ -48,6 +48,7 @@
 #include "ZEModelHelper.h"
 #include "ZEModelAnimation.h"
 #include "ZEModelAnimationTrack.h"
+#include "ZEModelAnimationController.h"
 #include "ZEModelIKChain.h"
 #include "ZEGame/ZEDrawStatistics.h"
 
@@ -69,6 +70,7 @@ class ZEModel : public ZEEntity
 
 	friend class ZEPhysicalEnvironment;
 	friend class ZEModelAnimationTrack;
+	friend class ZEModelAnimationController;
 	friend class ZEModelHelper;
 	friend class ZEModelDebugDrawer;
 	private:
@@ -93,6 +95,7 @@ class ZEModel : public ZEEntity
 
 		ZEModelAnimationType				AnimationType;
 		ZEModelAnimationUpdateMode			AnimationUpdateMode;
+		ZEModelAnimationController			AnimationController;			
 
 		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
 
@@ -146,6 +149,7 @@ class ZEModel : public ZEEntity
 		ZEModelAnimationUpdateMode			GetAnimationUpdateMode();
 
 		ZEArray<ZEModelAnimationTrack>&		GetAnimationTracks();
+		ZEModelAnimationController&			GetAnimationController();
 
 		void								SetAutoLOD(bool Enabled);
 		bool								GetAutoLOD();

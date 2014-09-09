@@ -133,6 +133,8 @@ void ZEModel::LoadModelResource()
 		Helpers[I].Deinitialize();
 	Helpers.SetCount(0);
 
+	AnimationController.Deinitialize();
+
 	if (ModelResource == NULL)
 		return;
 
@@ -213,6 +215,8 @@ void ZEModel::LoadModelResource()
 	{
 		Helpers[I].Initialize(this, &ModelResource->GetHelpers()[I]);
 	}
+
+	AnimationController.Initialize(this);
 }
 
 void ZEModel::SetModelFile(const char* ModelFile)
@@ -376,6 +380,11 @@ ZEArray<ZEModelAnimationTrack>& ZEModel::GetAnimationTracks()
 	return AnimationTracks;
 }
 
+ZEModelAnimationController&	ZEModel::GetAnimationController()
+{
+	return AnimationController;
+}
+
 void ZEModel::SetAutoLOD(bool Enabled)
 {
 	AutoLOD = Enabled;
@@ -512,17 +521,13 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 
 void ZEModel::Tick(float ElapsedTime)
 {
-	for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
-	{
-		AnimationTracks[I].Tick(ElapsedTime);
+	AnimationController.Tick(ElapsedTime);
 
-		if (AnimationUpdateMode == ZE_MAUM_LOGICAL)
-			AnimationTracks[I].UpdateAnimation();
-	}
+	if (AnimationUpdateMode == ZE_MAUM_LOGICAL)
+		AnimationController.ApplyOutput();
 
 	for(ZESize I = 0; I < IKChains.GetCount(); I++)
 		IKChains[I].Process();
-	
 }
 
 void ZEModel::TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation)
