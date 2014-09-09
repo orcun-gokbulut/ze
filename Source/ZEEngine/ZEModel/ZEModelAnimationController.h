@@ -54,7 +54,7 @@ class ZEModelAnimationController
 {
 	protected:
 
-		ZEModelAnimationPlayState		State;
+		ZEModelAnimationState			State;
 		ZEModel*						Owner;
 
 		ZEModelAnimationNode*			OutputNode;
