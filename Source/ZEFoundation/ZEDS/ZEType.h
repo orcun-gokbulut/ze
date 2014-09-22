@@ -40,65 +40,59 @@
 enum ZETypeType
 {
 	ZE_TT_UNDEFINED					= 0,
-	ZE_TT_NULL						= 1,
-
+	ZE_TT_VOID						= 1,
 	ZE_TT_INTEGER_8					= 2,
 	ZE_TT_INTEGER_16				= 3,
 	ZE_TT_INTEGER_32				= 4,
-	ZE_TT_UNSIGNED_INTEGER_8		= 5,
-	ZE_TT_UNSIGNED_INTEGER_16		= 6,
-	ZE_TT_UNSIGNED_INTEGER_32		= 7,
-
-	ZE_TT_INTEGER_64				= 16,
-	ZE_TT_UNSIGNED_INTEGER_64		= 17,
-
-	ZE_TT_FLOAT						= 32,
-	ZE_TT_DOUBLE					= 33,
-
-	ZE_TT_BOOLEAN					= 64,
-	ZE_TT_ENUMERATOR				= 65,
-	
-	ZE_TT_STRING					= 128,
-	ZE_TT_QUATERNION				= 129,
-	ZE_TT_VECTOR2					= 130,
-	ZE_TT_VECTOR3					= 131,
-	ZE_TT_VECTOR4					= 132,
-	ZE_TT_MATRIX3X3					= 133,
-	ZE_TT_MATRIX4X4					= 134,
-
-	ZE_TT_CLASS						= 135,
-	ZE_TT_OBJECT					= 136,
-	ZE_TT_OBJECT_PTR				= 137,
-	ZE_TT_ARRAY						= 138,
-	ZE_TT_LIST						= 139,
-
-	ZE_TT_VALUE						= 140
+	ZE_TT_INTEGER_64				= 5,
+	ZE_TT_UNSIGNED_INTEGER_8		= 6,
+	ZE_TT_UNSIGNED_INTEGER_16		= 7,
+	ZE_TT_UNSIGNED_INTEGER_32		= 8,
+	ZE_TT_UNSIGNED_INTEGER_64		= 9,
+	ZE_TT_FLOAT						= 10,
+	ZE_TT_DOUBLE					= 11,
+	ZE_TT_BOOLEAN					= 12,
+	ZE_TT_STRING					= 13,
+	ZE_TT_QUATERNION				= 14,
+	ZE_TT_VECTOR2					= 15,
+	ZE_TT_VECTOR3					= 16,
+	ZE_TT_VECTOR4					= 17,
+	ZE_TT_MATRIX3X3					= 18,
+	ZE_TT_MATRIX4X4					= 19,
+	ZE_TT_OBJECT					= 20,
+	ZE_TT_OBJECT_PTR				= 21,
+	ZE_TT_ENUMERATOR				= 22,
+	ZE_TT_CLASS						= 23
 };
-
-
-#define ZE_TYPE_MASK_INTEGER		14	
-#define ZE_TYPE_MASK_FLOAT			32
-#define ZE_TYPE_MASK_SCALAR_NUMERIC	ZE_TT_BOOLEAN + ZE_TYPE_MASK_FLOAT + ZE_TYPE_MASK_INTEGER
 
 enum ZETypeQualifier
 {
 	ZE_TQ_VALUE,
+	ZE_TQ_CONST_VALUE,
 	ZE_TQ_REFERENCE,
 	ZE_TQ_CONST_REFERENCE
 };
 
+enum ZEContainerType
+{
+	ZE_CT_NONE,
+	ZE_CT_ARRAY,
+	ZE_CT_LIST,
+	ZE_CT_CONTAINER
+};
+
 class ZEClass;
+class ZEEnumerator;
 
 class ZEType
 {
 	public:
 		ZETypeType			Type;
 		ZETypeQualifier		TypeQualifier;
-
-		ZETypeType			SubType;
-		ZETypeQualifier		SubTypeQualifier;
+		ZEContainerType		ContainerType;
 
 		ZEClass*			Class;
+		ZEEnumerator*		Enumerator;
 
 		bool				operator==(const ZEType& Other) const;
 		bool				operator!=(const ZEType& Other) const;
@@ -106,8 +100,8 @@ class ZEType
 		static bool			Equal(const ZEType& A, const ZEType& B);
 
 							ZEType();
-							ZEType(ZETypeType Type, ZETypeQualifier TypeQualifier = ZE_TQ_VALUE, ZETypeType SubType = ZE_TT_UNDEFINED, ZETypeQualifier SubTypeQualifier = ZE_TQ_VALUE, ZEClass* Class = 0);
-							ZEType(ZETypeType Type, ZETypeQualifier TypeQualifier, ZEClass* Class);
+							ZEType(ZETypeType Type, ZETypeQualifier TypeQualifier, ZEContainerType ContainerType, 
+								ZEClass* Class, ZEEnumerator* Enumerator);
 };
 
 #endif

@@ -149,7 +149,7 @@ bool ZEMLNode::RemoveProperty(ZEMLProperty* Property)
 	ZEMLItem* ToRemove = Property;
 	if(Properties.Exists(ToRemove))
 	{
-		Properties.DeleteValue(ToRemove);
+		Properties.RemoveValue(ToRemove);
 		return true;
 	}
 
@@ -308,7 +308,7 @@ bool ZEMLNode::RemoveDataProperty(ZEMLDataProperty* Property)
 	ZEMLItem* ToRemove = Property;
 	if(Properties.Exists(ToRemove))
 	{
-		Properties.DeleteValue(ToRemove);
+		Properties.RemoveValue(ToRemove);
 		return true;
 	}
 

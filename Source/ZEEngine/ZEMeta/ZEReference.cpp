@@ -471,26 +471,6 @@ void ZEReference::SetObjectPtrConstRef(const ZEObject*& Object)
 	Value.Pointer = const_cast<ZEObject**>(&Object);
 }
 
-void ZEReference::SetClassRef(ZEClass*& Class)
-{
-	ZEType Type;
-	Type.Type = ZE_TT_CLASS;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
-	SetType(Type);
-
-	Value.Pointer = &Class;
-}
-
-void ZEReference::SetClassConstRef(const ZEClass*& Class)
-{
-	ZEType Type;
-	Type.Type = ZE_TT_CLASS;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
-	SetType(Type);
-
-	Value.Pointer = const_cast<ZEClass**>(&Class);
-}
-
 ZEInt8& ZEReference::GetInt8Ref() const
 {
 	return ConvertRef<ZEInt8, ZE_TT_INTEGER_8>();
@@ -683,19 +663,6 @@ ZEObject*const& ZEReference::GetObjectPtrConstRef() const
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
 	return (ZEObject* const)Value.Pointer;
-}
-
-ZEClass*& ZEReference::GetClassRef() const
-{
-	return ConvertRef<ZEClass*, ZE_TT_CLASS>();
-}
-
-ZEClass* const& ZEReference::GetClassConstRef() const
-{
-	if (ValueType.Type != ZE_TT_CLASS)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
-
-	return (ZEClass* const)Value.Pointer;
 }
 
 ZEReference& ZEReference::operator=(const ZEReference& Value)

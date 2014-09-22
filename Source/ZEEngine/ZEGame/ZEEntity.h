@@ -85,8 +85,6 @@ enum ZEEntityState
 
 class ZEScene;
 
-ZE_CLASS(ZEEntity)
-
 class ZEEntity : public ZEObject
 {
 

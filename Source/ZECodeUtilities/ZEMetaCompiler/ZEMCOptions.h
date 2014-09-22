@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaProcessor.cpp
+ Zinek Engine - ZEMCOptions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,13 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMetaProcessor.h"
-#include "ZEMetaProcessorInternal.h"
+#pragma once
+#ifndef __ZE_MC_OPTIONS_H__
+#define __ZE_MC_OPTIONS_H__
 
-bool ZEMetaProcessor::Parse(ZEMetaData* MetaData, const ZEMetaCompilerOptions& Options)
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
+
+struct ZEMCOptions
 {
-	ZEMetaCompilerParser::MetaData = MetaData;
-	ZEMetaCompilerParser::Options = Options;
-	ZEMetaCompilerParser::Parse();
-	return true;
-}
+	ZEString BinaryPath;
+	ZEString InputFileName;
+	ZEString OutputFileName;
+	ZEArray<ZEString> IncludeDirectories;
+	ZEArray<ZEString> Definitions;
+
+	ZEString RegisterFileName;
+	ZEString ClassCollectionName;
+	ZEString ClassCollectionHeaderFile;
+	ZEString ClassCollectionSourceFile;
+	ZEArray<ZEString> RegisterFiles;
+	bool IsRegisterSession;
+	bool IsGenerateSession;
+
+	const char** Argv;
+	int Argc;
+
+	bool Quiet;
+	bool MSVC;
+	bool Benchmark;
+};
+
+#endif

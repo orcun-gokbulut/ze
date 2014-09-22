@@ -199,9 +199,9 @@ class ZEVariant
 		template<typename ZEItemType>
 		void							SetArrayRefConst(const ZEArray<ZEItemType>& Array);
 
-		void							SetClass(ZEClass* Class);
-		void							SetClassRef(ZEClass*& Class);
-		void							SetClassConstRef(const ZEClass*& Class);
+		void							SetClass(ZEClass* Object);
+		void							SetClassRef(ZEClass*& Object);
+		void							SetClassConstRef(const ZEClass*& Object);
 
 		// Getters
 		////////////////////////////////////////////////
@@ -284,13 +284,13 @@ class ZEVariant
 		ZEObject*const&					GetObjectPtrConstRef() const;
 
 		template<typename ZEObjecType>
-		const ZEObject&					GetObject() const;
+		const ZEObjecType&				GetObject() const;
 		
 		template<typename ZEObjecType>
-		ZEObject&						GetObjectRef() const;
+		ZEObjecType&					GetObjectRef() const;
 
 		template<typename ZEObjecType>
-		const ZEObject&					GetObjectConstRef() const;		
+		const ZEObjecType&				GetObjectConstRef() const;		
 
 		template<typename ZEItemType>
 		const ZEArray<ZEItemType>&		GetArray() const;
@@ -394,7 +394,7 @@ void ZEVariant::SetArrayRefConst(const ZEArray<ZEItemType>& Array)
 	Type.SubType = Type.Type;
 	Type.SubTypeQualifier = Type.TypeQualifier;
 	Type.Type = ZE_TT_ARRAY;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
 
 	SetType(Type);
 	Value.Pointer = const_cast<ZEArray<ZEItemType>*>(&Array);
@@ -405,6 +405,8 @@ void ZEVariant::SetObject(const ZEObjectType& Object)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_OBJECT;
+	Type.TypeQualifier = ZE_TQ_VALUE;
+	Type.Class = Object.GetClass();
 	SetType(Type);
 
 	Cloner = ClonerTemplate<ZEObjectType>;
@@ -418,7 +420,8 @@ void ZEVariant::SetObjectRef(ZEObjectType& Object)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_OBJECT;
-	Type.Class = ZEObjectType::Class();
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	Type.Class = Object.getClass();
 	SetType(Type);
 
 	Value.Pointer = &Object;
@@ -429,7 +432,8 @@ void ZEVariant::SetObjectConstRef(const ZEObjectType& Object)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_OBJECT;
-	Type.Class = ZEObjectType::Class();
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	Type.Class = Object.getClass();;
 	SetType(Type);
 
 	Value.Pointer = const_cast<ZEObjectType*>(&Object);
@@ -464,6 +468,7 @@ template<typename ZEItemType>
 const ZEArray<ZEItemType>& ZEVariant::GetArrayConstRef() const
 {
 	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
+
 	if (ValueType.Type = ZE_TT_ARRAY || ValueType.SubTypeType != Type.Type)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
@@ -471,24 +476,24 @@ const ZEArray<ZEItemType>& ZEVariant::GetArrayConstRef() const
 }
 
 template<typename ZEObjectType>
-const ZEObject& ZEVariant::GetObject() const
+const ZEObjectType& ZEVariant::GetObject() const
 {
 	if (ValueType.Type != ZE_TT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
 
-	if (!ZEClass::IsInherited(ZEObjectType::Class(), (ZEObject*)Value.Pointer))
+	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
 		zeCriticalError("Value of the variant is not inherited from Object Type.");
 
 	return *(ZEObjectType*)Value.Pointer;
 }
 
-template<typename ZEObjecType>
-ZEObject& ZEVariant::GetObjectRef() const
+template<typename ZEObjectType>
+ZEObjectType& ZEVariant::GetObjectRef() const
 {
 	if (ValueType.Type != ZE_TT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
 
-	if (!ZEClass::IsInherited(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
+	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
 		zeCriticalError("Value of the variant is not inherited from Object Type.");
 
 	if (ValueType.TypeQualifier == ZE_TQ_CONST_REFERENCE)
@@ -497,13 +502,13 @@ ZEObject& ZEVariant::GetObjectRef() const
 	return *(ZEObjectType*)Value.Pointer;
 }
 
-template<typename ZEObjecType>
-const ZEObject& ZEVariant::GetObjectConstRef() const
+template<typename ZEObjectType>
+const ZEObjectType& ZEVariant::GetObjectConstRef() const
 {
 	if (ValueType.Type != ZE_TT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
 
-	if (!ZEClass::IsInherited(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
+	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
 		zeCriticalError("Value of the variant is not inherited from Object Type.");
 
 	return *(const ZEObjectType*)Value.Pointer;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMain.cpp
+ Zinek Engine - ZEMCDriver.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEMCOptions.h"
+
+#include "ZEMCParser.h"
+#include "ZEMCGenerator.h"
+#include "ZEMCRegisterer.h"
+#include "ZETimeCounter.h"
+
 #include <stdio.h>
-#include "ZEMetaGenerator.h"
-#include "ZEMetaProcessor.h"
-#include "ZEMetaCompilerOptions.h"
-#include "ZEMetaCollectionGenerator.h"
 
 static void Error(const char* Text)
 {
@@ -87,7 +90,7 @@ static void ShowHelp()
 		"\n");
 }
 
-static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& Options)
+static void ParseParameters(int Argc, const char** Argv, ZEMCOptions& Options)
 {
 	Options.Argc= Argc;
 	Options.Argv = Argv;
@@ -95,6 +98,7 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 	Options.IsRegisterSession = false;
 	Options.IsGenerateSession = false;
 	Options.Quiet = false;
+	Options.Benchmark = false;
 
 	for (int I = 1; I < Argc; I++)
 	{
@@ -189,6 +193,10 @@ static void ParseParameters(int Argc, const char** Argv, ZEMetaCompilerOptions& 
 		{
 			Options.MSVC = true;
 		}
+		else if (strncmp(Argv[I], "-benchmark", 5) == 0)
+		{
+			Options.Benchmark = true;
+		}
 		else
 		{
 			if (Options.InputFileName != NULL)
@@ -209,10 +217,10 @@ int main(int Argc, const char** Argv)
 	if (Argc == 1)
 		Error("Command line arguments are missing.");
 
-	ZEMetaCompilerOptions Options;
-	ParseParameters(Argc, Argv, Options);
+	ZEMCOptions options;
+	ParseParameters(Argc, Argv, options);
 
-	if (!Options.Quiet)
+	if (!options.Quiet)
 	{
 		printf("ZEMetaCompiler - Version : 0.3.8\n"
 			"Copyright (C) 2013, Zinek Code House. All rights reserved.\n\n");
@@ -227,17 +235,48 @@ int main(int Argc, const char** Argv)
 
 	// Module Register
 
-	if(Options.IsGenerateSession)
+	if(options.IsGenerateSession)
 	{
-		ZEMetaCollectionGenerator::Generate(Options);
+		ZEMCRegisterer registerer;
+		registerer.SetOptions(&options);
+		registerer.RegisterModule();
 		return EXIT_SUCCESS;
 	}
 	else
 	{
-		ZEMetaData MetaData;
-		bool Result = ZEMetaProcessor::Parse(&MetaData, Options);
-		if (!Result)
-			Error("Processing failed.");
+		if (options.Benchmark)
+			printf("Compilation has started.\n");
+
+		ZETimeCounter counter;
+		counter.Start();
+		
+		ZEMCContext metaContext;
+		ZEMCParser parser;
+		parser.SetMetaContext(&metaContext);
+		parser.SetOptions(&options);
+		if (!parser.Parse())
+			Error("Cannot parse input file.");
+		if (options.Benchmark)
+			printf("Parser is done. It took %I64u microseconds.\n", counter.GetTime());
+		
+		ZEMCGenerator generator;
+		generator.SetOptions(&options);
+		generator.SetMetaContext(&metaContext);
+		if (!generator.Generate())
+			Error("Cannot generate ZEMeta file.");
+		if (options.Benchmark)
+			printf("Generator is done. It took %I64u microseconds.\n", counter.GetTime());
+
+		ZEMCRegisterer registerer;
+		registerer.SetOptions(&options);
+		registerer.RegisterFile(&metaContext);
+		if (options.Benchmark)
+			printf("Registerer is done. It took %I64u microseconds.\n", counter.GetTime());
+
+		counter.Stop();
+
+		if (options.Benchmark)
+			printf("Compilation is done.\n");
 	}
 
 	return EXIT_SUCCESS;

@@ -284,12 +284,13 @@ class ZETypeGenerator : Derived_from<T, ZEObject>
 	static ZEType GetType()
 	{
 		ZEType Type;
-		Type.Type = ZE_TT_CLASS;
+		Type.Type = ZE_TT_OBJECT;
 		Type.TypeQualifier = ZE_CT_VALUE;
 		Type.Class = T::Class();
 		return Type;
 	}
 };
+
 /*
 template <typename T>
 class ZETypeGenerator

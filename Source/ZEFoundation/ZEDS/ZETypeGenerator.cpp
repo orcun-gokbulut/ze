@@ -42,7 +42,7 @@
 ZEType ZETypeGenerator<void>::GetType()
 {
 	ZEType Type;
-	Type.Type = ZE_TT_NULL;
+	Type.Type = ZE_TT_VOID;
 	return Type;
 }
 

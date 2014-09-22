@@ -44,18 +44,18 @@ struct ZEEnum;
 
 struct ZEProperty
 {
-	ZESize							ID;
-	ZEClass*						MemberOf;
+	ZESize				ID;
+	ZEClass*			MemberOf;
 
-	const char*						Name;
-	ZEUInt32						Hash;
-	ZEType							Type;
-	bool							IsGeneratedByMeta;
-	bool							Container;
-	bool							IsStatic;
+	const char*			Name;
+	ZEUInt32			Hash;
+	void*				OffsetOrAddress;
+	ZEType				Type;
 
-	ZEEnum*							Enum;
-	ZESize							EnumParameterCount;
-	ZEMetaAttribute*				Attributes;
-	ZESize							AttributeCount;
+	bool				IsGenerated;
+	bool				IsContainer;
+	bool				IsStatic;
+
+	ZEMetaAttribute*	Attributes;
+	ZESize				AttributeCount;
 };

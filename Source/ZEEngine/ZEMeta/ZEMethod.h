@@ -40,7 +40,6 @@
 
 class ZEClass;
 struct ZEMetaAttribute;
-struct ZEEnum;
 
 enum ZEMetaOperatorType
 {
@@ -82,34 +81,30 @@ enum ZEMetaOperatorType
 
 struct ZEMethodParameter
 {
-	const char*						Name;
-	ZEType							Type;
-	ZEEnum*							Enum;
-	ZESize							EnumParameterCount;
+	const char*			Name;
+	ZEType				Type;
 };
 
 struct ZEMethod
 {
-	ZESize							Id;
-	ZEClass*						MemberOf;
+	ZESize				Id;
+	const char*			Name;
+	ZEUInt32			Hash;
 
-	void*							MethodPtr;
-	const char*						Name;
-	ZEUInt32						Hash;
-	bool							Event;
-	bool							IsVirtual;
-	bool							IsStatic;
+	ZEClass*			MemberOf;
 
-	bool							IsOperator;
-	ZEMetaOperatorType				OperatorType;
+	void*				MethodPtr;
 
-	ZEType							ReturnType;
-	ZEEnum*							ReturnEnum;
-	ZESize							ReturnEnumParameterCount;
+	bool				IsEvent;
+	bool				IsVirtual;
+	bool				IsStatic;
+	bool				IsOperator;
 
-	ZEMethodParameter*				Parameters;
-	ZESize							ParameterCount;
+	ZEMetaOperatorType	OperatorType;
+	ZEType				ReturnType;
+	ZEMethodParameter*	Parameters;
+	ZESize				ParameterCount;
 
-	ZEMetaAttribute*				Attributes;
-	ZESize							AttributeCount;
+	ZEMetaAttribute*	Attributes;
+	ZESize				AttributeCount;
 };

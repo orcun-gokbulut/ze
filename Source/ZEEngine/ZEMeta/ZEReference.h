@@ -140,9 +140,6 @@ class ZEReference
 		template<typename ZEItemType>
 		void							SetArrayConstRef(const ZEArray<ZEItemType>& Array);
 
-		void							SetClassRef(ZEClass*& Class);
-		void							SetClassConstRef(const ZEClass*& Class);
-
 		ZEInt8&							GetInt8Ref() const;
 		const ZEInt8&					GetInt8ConstRef() const;
 		ZEInt16&						GetInt16Ref() const;
@@ -191,9 +188,9 @@ class ZEReference
 		ZEObject*const&					GetObjectPtrConstRef() const;
 
 		template<typename ZEObjecType>
-		ZEObject&						GetObjectRef() const;
+		ZEObjecType&					GetObjectRef() const;
 		template<typename ZEObjecType>
-		const ZEObject&					GetObjectConstRef() const;		
+		const ZEObjecType&				GetObjectConstRef() const;		
 
 		template<typename ZEItemType>
 		ZEArray<ZEItemType>&			GetArrayRef() const;
@@ -409,13 +406,13 @@ const ZEArray<ZEItemType>& ZEReference::GetArrayConstRef() const
 	return *(const ZEArray<ZEItemType>*)Value.Pointer;
 }
 
-template<typename ZEObjecType>
-ZEObject& ZEReference::GetObjectRef() const
+template<typename ZEObjectType>
+ZEObjectType& ZEReference::GetObjectRef() const
 {
 	if (ValueType.Type != ZE_TT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
 
-	if (!ZEClass::IsInherited(ZEObjectType::Class(), ((ZEObject*)Pointer)->GetClass()))
+	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
 		zeCriticalError("Value of the variant is not inherited from Object Type.");
 
 	if (ValueType.TypeQualifier == ZE_TQ_CONST_REFERENCE)
@@ -425,12 +422,12 @@ ZEObject& ZEReference::GetObjectRef() const
 }
 
 template<typename ZEObjecType>
-const ZEObject& ZEReference::GetObjectConstRef() const
+const ZEObjecType& ZEReference::GetObjectConstRef() const
 {
 	if (ValueType.Type != ZE_TT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
 
-	if (!ZEClass::IsInherited(ZEObjectType::Class(), ((ZEObject*)Pointer)->GetClass()))
+	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObjecType*)Value.Pointer)->GetClass()))
 		zeCriticalError("Value of the variant is not inherited from Object Type.");
 
 	return *(const ZEObjectType*)Value.Pointer;

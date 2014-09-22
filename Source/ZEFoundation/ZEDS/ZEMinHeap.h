@@ -120,7 +120,7 @@ class ZEMinHeap : public ZEHeapBase<Type, Allocator_>
 		void Remove(ZESize Index)
 		{
 			this->Heap[Index] = this->Heap.GetLastItem();
-			this->Heap.DeleteAt(this->Heap.GetCount() - 1);
+			this->Heap.Remove(this->Heap.GetCount() - 1);
 
 			MinHeapify(Index);
 		}

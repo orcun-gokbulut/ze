@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaProcessorInternal.cpp
+ Zinek Engine - ZEMCParser .old.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMetaProcessorInternal.h"
+#include "ZEMCParser.h"
+#include "ZEMCOptions.h"
 
+#include "ZEFile/ZEFileInfo.h"
 #include "ZEDS/ZEFormat.h"
 
 #include <clang/AST/DeclTemplate.h>
@@ -43,110 +45,106 @@
 #include <clang/Tooling/Tooling.h>
 #include <clang/AST/ASTConsumer.h>
 #include <llvm/Support/CommandLine.h>
-#include "ZEMetaGenerator.h"
-#include "ZEFile/ZEFileInfo.h"
+#include <fstream>
+#include <string>
 
-CompilerInstance* ZEMetaCompilerParser::Compiler;
-ZEMetaData*	ZEMetaCompilerParser::MetaData;
-ZEMetaCompilerOptions ZEMetaCompilerParser::Options;
-
-static ZEMetaGeneratorOperatorType GetOperatorType(OverloadedOperatorKind OperatorKind)
+ZEMCMetaOperatorType ZEMCParser::GetOperatorType(OverloadedOperatorKind OperatorKind)
 {
 	switch(OperatorKind)
 	{
 		case OO_Plus:
-			return ZE_MGOT_PLUS;
+			return ZEMC_MOT_ADDITION;
 		case OO_PlusEqual:
-			return ZE_MGOT_PLUSEQUAL;
+			return ZEMC_MOT_ADDITION_ASSIGNMENT;
 		case OO_PlusPlus:
-			return ZE_MGOT_PLUSPLUS;
+			return ZEMC_MOT_INCREMENT;
 		case OO_Minus:
-			return ZE_MGOT_MINUS;
+			return ZEMC_MOT_SUBTRACTION;
 		case OO_MinusEqual:
-			return ZE_MGOT_MINUSEQUAL;
+			return ZEMC_MOT_SUBSTRACTION_ASSIGNMENT;
 		case OO_MinusMinus:
-			return ZE_MGOT_MINUSMINUS;
+			return ZEMC_MOT_DECREMENT;
 		case OO_Star:
-			return ZE_MGOT_STAR;
+			return ZEMC_MOT_MULTIPLICATION;
 		case OO_StarEqual:
-			return ZE_MGOT_STAREQUAL;
+			return ZEMC_MOT_MULTIPLICATION_ASSIGNMENT;
 		case OO_Slash:
-			return ZE_MGOT_SLASH;
+			return ZEMC_MOT_DIVISION;
 		case OO_SlashEqual:
-			return ZE_MGOT_SLASHEQUAL;
+			return ZEMC_MOT_DIVISION_ASSIGNMENT;
 		case OO_Percent:
-			return ZE_MGOT_PERCENT;
+			return ZEMC_MOT_MODULO;
 		case OO_PercentEqual:
-			return ZE_MGOT_PERCENTEQUAL;
+			return ZEMC_MOT_MODULO_ASSIGNMENT;
 		case OO_Amp:
-			return ZE_MGOT_AMP;
+			return ZEMC_MOT_BITWISE_AND;
 		case OO_AmpEqual:
-			return ZE_MGOT_AMPEQUAL;
+			return ZEMC_MOT_BITWISE_AND_ASSIGNMENT;
 		case OO_AmpAmp:
-			return ZE_MGOT_AMPAMP;
+			return ZEMC_MOT_LOGICAL_AND;
 		case OO_Pipe:
-			return ZE_MGOT_PIPE;
+			return ZEMC_MOT_BITWISE_OR;
 		case OO_PipeEqual:
-			return ZE_MGOT_PIPEEQUAL;
+			return ZEMC_MOT_BITWISE_OR_ASSIGNMENT;
 		case OO_PipePipe:
-			return ZE_MGOT_PIPEPIPE;
+			return ZEMC_MOT_LOGICAL_OR;
 		case OO_Caret:
-			return ZE_MGOT_CARET;
+			return ZEMC_MOT_BITWISE_XOR;
 		case OO_CaretEqual:
-			return ZE_MGOT_CARETEQUAL;
+			return ZEMC_MOT_BITWISE_XOR_ASSIGNMENT;
 		case OO_Equal:
-			return ZE_MGOT_EQUAL;
+			return ZEMC_MOT_ASSIGNMENT;
 		case OO_EqualEqual:
-			return ZE_MGOT_EQUALEQUAL;
+			return ZEMC_MOT_EQUAL;
 		case OO_ExclaimEqual:
-			return ZE_MGOT_EXCLAIMEQUAL;
+			return ZEMC_MOT_NOT_EQUAL;
 		case OO_Less:
-			return ZE_MGOT_LESS;
+			return ZEMC_MOT_LESS;
 		case OO_LessEqual:
-			return ZE_MGOT_LESSEQUAL;
+			return ZEMC_MOT_LESS_EQUAL;
 		case OO_LessLess:
-			return ZE_MGOT_LESSLESS;
+			return ZEMC_MOT_LEFT_SHIFT;
 		case OO_LessLessEqual:
-			return ZE_MGOT_LESSLESSEQUAL;
+			return ZEMC_MOT_LEFT_SHIFT_ASSIGNMENT;
 		case OO_Greater:
-			return ZE_MGOT_GREATER;
+			return ZEMC_MOT_GREATER;
 		case OO_GreaterEqual:
-			return ZE_MGOT_GREATEREQUAL;
+			return ZEMC_MOT_GREATER_AND_EQUAL;
 		case OO_GreaterGreater:
-			return ZE_MGOT_GREATERGREATER;
+			return ZEMC_MOT_RIGHT_SHIFT;
 		case OO_GreaterGreaterEqual:
-			return ZE_MGOT_GREATERGREATEREQUAL;
+			return ZEMC_MOT_RIGHT_SHIFT_ASSIGNMENT;
 		case OO_Call:
-			return ZE_MGOT_CALL;
+			return ZEMC_MOT_FUNCTION_CALL;
 		case OO_Subscript:
-			return ZE_MGOT_SUBSCRIPT;
+			return ZEMC_MOT_ARRAY_SUBSCRIPT;
 		default:
-			return ZE_MGOT_UNDEFINED;
+			return ZEMC_MOT_NOT_OPERATOR;
 	}
 }
 
-void ZEMetaCompilerParser::RaiseNote(SourceLocation& Location, const char* WarningText)
+void ZEMCParser::RaiseNote(SourceLocation& Location, const char* WarningText)
 {
 	FullSourceLoc FullLocation(Location, Compiler->getSourceManager());
 	unsigned Id = Compiler->getDiagnostics().getDiagnosticIDs()->getCustomDiagID(DiagnosticIDs::Level::Note, WarningText);
 	DiagnosticBuilder B = Compiler->getDiagnostics().Report(FullLocation, Id);
 }
 
-void ZEMetaCompilerParser::RaiseWarning(SourceLocation& Location, const char* WarningText)
+void ZEMCParser::RaiseWarning(SourceLocation& Location, const char* WarningText)
 {
 	FullSourceLoc FullLocation(Location, Compiler->getSourceManager());
 	unsigned Id = Compiler->getDiagnostics().getDiagnosticIDs()->getCustomDiagID(DiagnosticIDs::Level::Warning, WarningText);
 	DiagnosticBuilder B = Compiler->getDiagnostics().Report(FullLocation, Id);
 }
 
-void ZEMetaCompilerParser::RaiseError(SourceLocation& Location, const char* ErrorText)
+void ZEMCParser::RaiseError(SourceLocation& Location, const char* ErrorText)
 {
 	FullSourceLoc FullLocation(Location, Compiler->getSourceManager());
 	unsigned Id = Compiler->getDiagnostics().getDiagnosticIDs()->getCustomDiagID(DiagnosticIDs::Level::Error, ErrorText);
 	DiagnosticBuilder B = Compiler->getDiagnostics().Report(FullLocation, Id);
 }
 
-void ZEMetaCompilerParser::RaiseCriticalError(SourceLocation& Location, const char* ErrorText)
+void ZEMCParser::RaiseCriticalError(SourceLocation& Location, const char* ErrorText)
 {
 	FullSourceLoc FullLocation(Location, Compiler->getSourceManager());
 	unsigned Id = Compiler->getDiagnostics().getDiagnosticIDs()->getCustomDiagID(DiagnosticIDs::Level::Error, ErrorText);
@@ -154,7 +152,7 @@ void ZEMetaCompilerParser::RaiseCriticalError(SourceLocation& Location, const ch
 	exit(EXIT_FAILURE);
 }
 
-bool ZEMetaCompilerParser::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class)
+bool ZEMCParser::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class)
 {
 	bool Result = false;
 	if (Class->getName() == "ZEObject")
@@ -187,7 +185,7 @@ bool ZEMetaCompilerParser::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class
 	return Result;
 }
 
-bool ZEMetaCompilerParser::CheckClassHasZEObjectMacro(CXXRecordDecl* Class)
+bool ZEMCParser::CheckClassHasZEObjectMacro(CXXRecordDecl* Class)
 {
 	bool HasClassMethodFound = false;
 	bool HasGetClassMethodFound = false;
@@ -268,7 +266,7 @@ bool ZEMetaCompilerParser::CheckClassHasZEObjectMacro(CXXRecordDecl* Class)
 	return true;
 }
 
-bool ZEMetaCompilerParser::CheckClass(CXXRecordDecl* Class)
+bool ZEMCParser::CheckClass(CXXRecordDecl* Class)
 {
 	if (!CheckClassHasDerivedFromZEObject(Class))
 		return false;
@@ -282,65 +280,65 @@ bool ZEMetaCompilerParser::CheckClass(CXXRecordDecl* Class)
 	return true;
 }
 
-ZEMetaType ProcessInnerType(ZEString MainClassName, const Type* ClangType)
+ZEMCType ZEMCParser::ProcessInnerType(ZEString MainClassName, const Type* ClangType)
 {
-	ZEMetaType TempType;
+	ZEMCType TempType;
 	if (ClangType->isBuiltinType())
 	{
 		switch(((BuiltinType*)ClangType)->getKind())
 		{
 		case BuiltinType::Char_U:
 		case BuiltinType::UChar:
-			TempType.Type = ZE_MTT_UNSIGNED_INTEGER_8;
+			TempType.BaseType = ZEMC_BT_UNSIGNED_INTEGER_8;
 			break;
 
 		case BuiltinType::UShort:
-			TempType.Type = ZE_MTT_UNSIGNED_INTEGER_16;
+			TempType.BaseType = ZEMC_BT_UNSIGNED_INTEGER_16;
 			break;
 
 		case BuiltinType::UInt:
-			TempType.Type = ZE_MTT_UNSIGNED_INTEGER_32;
+			TempType.BaseType = ZEMC_BT_UNSIGNED_INTEGER_32;
 			break;
 
 		case BuiltinType::ULongLong:
-			TempType.Type = ZE_MTT_UNSIGNED_INTEGER_64;
+			TempType.BaseType = ZEMC_BT_UNSIGNED_INTEGER_64;
 			break;
 
 		case BuiltinType::Char_S:
 		case BuiltinType::SChar:
-			TempType.Type = ZE_MTT_INTEGER_8;
+			TempType.BaseType = ZEMC_BT_INTEGER_8;
 			break;
 
 		case BuiltinType::Short:
-			TempType.Type = ZE_MTT_INTEGER_16;
+			TempType.BaseType = ZEMC_BT_INTEGER_16;
 			break;
 
 		case BuiltinType::Int:
-			TempType.Type = ZE_MTT_INTEGER_32;
+			TempType.BaseType = ZEMC_BT_INTEGER_32;
 			break;
 
 		case BuiltinType::LongLong:
-			TempType.Type = ZE_MTT_UNSIGNED_INTEGER_64;
+			TempType.BaseType = ZEMC_BT_UNSIGNED_INTEGER_64;
 			break;
 
 		case BuiltinType::Float:
-			TempType.Type = ZE_MTT_FLOAT;
+			TempType.BaseType = ZEMC_BT_FLOAT;
 			break;
 
 		case BuiltinType::Double:
-			TempType.Type = ZE_MTT_DOUBLE;
+			TempType.BaseType = ZEMC_BT_DOUBLE;
 			break;
 
 		case BuiltinType::Bool:
-			TempType.Type = ZE_MTT_BOOLEAN;
+			TempType.BaseType = ZEMC_BT_BOOLEAN;
 			break;
 
 		case BuiltinType::Void:
-			TempType.Type = ZE_MTT_NULL;
+			TempType.BaseType = ZEMC_BT_VOID;
 			break;
 
 		default:
-			TempType.Type = ZE_MTT_UNDEFINED;
+			TempType.BaseType = ZEMC_BT_UNDEFINED;
 		}
 	}
 	else if (ClangType->isClassType())
@@ -348,138 +346,127 @@ ZEMetaType ProcessInnerType(ZEString MainClassName, const Type* ClangType)
 		CXXRecordDecl* ClassPtr = ClangType->getAsCXXRecordDecl();
 		if (ClassPtr->getName() == "ZEString")
 		{
-			TempType.Type = ZE_MTT_STRING;
-			TempType.ClassData->Name = "ZEString";
+			TempType.BaseType = ZEMC_BT_STRING;
 		}
 		else if (ClassPtr->getName() == "ZEArray")
 		{
-			TempType.Type = ZE_MTT_ARRAY;
-			TempType.ClassData->Name = "ZEArray";
+			TempType.BaseType = ZEMC_BT_ARRAY;
 		}
 		else if (ClassPtr->getName() == "ZEList")
 		{
-			TempType.Type = ZE_MTT_LIST;
-			TempType.ClassData->Name = "ZEList";
+			TempType.BaseType = ZEMC_BT_LIST;
 		}
 		else if (ClassPtr->getName() == "ZEVector2")
 		{
-			TempType.Type = ZE_MTT_VECTOR2;
-			TempType.ClassData->Name = "ZEVector2";
+			TempType.BaseType = ZEMC_BT_VECTOR2;
 		}
 		else if (ClassPtr->getName() == "ZEVector3")
 		{
-			TempType.Type = ZE_MTT_VECTOR3;
-			TempType.ClassData->Name = "ZEVector3";
+			TempType.BaseType = ZEMC_BT_VECTOR3;
 		}
 		else if (ClassPtr->getName() == "ZEVector4")
 		{
-			TempType.Type = ZE_MTT_VECTOR4;
-			TempType.ClassData->Name = "ZEVector4";
+			TempType.BaseType = ZEMC_BT_VECTOR4;
 		}
 		else if (ClassPtr->getName() == "ZEQuaternion")
 		{
-			TempType.Type = ZE_MTT_QUATERNION;
-			TempType.ClassData->Name = "ZEQuaternion";
+			TempType.BaseType = ZEMC_BT_QUATERNION;
 		}
 		else if (ClassPtr->getName() == "ZEMatrix3x3")
 		{
-			TempType.Type = ZE_MTT_MATRIX3X3;
-			TempType.ClassData->Name = "ZEMatrix3x3";
+			TempType.BaseType = ZEMC_BT_MATRIX3X3;
 		}
 		else if (ClassPtr->getName() == "ZEMatrix4x4")
 		{
-			TempType.Type = ZE_MTT_MATRIX4X4;
-			TempType.ClassData->Name = "ZEMatrix4x4";
+			TempType.BaseType = ZEMC_BT_MATRIX4X4;
 		}
 		else
 		{
-			TempType.Type = ZE_MTT_OBJECT_PTR;
-			TempType.ClassData->Name = ClassPtr->getNameAsString();
+			TempType.BaseType = ZEMC_BT_OBJECT_PTR;
+			TempType.Class->Name = ClassPtr->getNameAsString();
 
 			if(ClassPtr->isCompleteDefinition())
 			{
-				if(ZEMetaCompilerParser::CheckClass(ClassPtr))
+				if(CheckClass(ClassPtr))
 					return TempType;
 				else
-					return ZEMetaType();
+					return ZEMCType();
 
-				if(TempType.ClassData->Name == "ZEEvent")
+				if(TempType.Class->Name == "ZEEvent")
 				{
-					TempType.Type = ZE_MTT_CLASS;
+					TempType.BaseType = ZEMC_BT_CLASS;
 					return TempType;
 				}
 			}
 			else
 			{
-				if(ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses.GetCount() > 0)
+				if(Context->ForwardDeclarations.GetCount() > 0)
 				{
-					for(int I = ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses.GetCount() - 1; I >= 0; I--)
+					for(int I = Context->ForwardDeclarations.GetCount() - 1; I >= 0; I--)
 					{
-						if(ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses[I]->ClassName == TempType.ClassData->Name)
+						if(Context->ForwardDeclarations[I]->ClassName == TempType.Class->Name)
 						{
-							ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses[I]->HeaderFileDeclaredIn = MainClassName;
+							Context->ForwardDeclarations[I]->HeaderFileDeclaredIn = MainClassName;
 							return TempType;
 						}
 					}
 				}
 
-				return ZEMetaType();
+				return ZEMCType();
 			}
 		}
 	}
 	else if(ClangType->isEnumeralType())
 	{
-		TempType.Type = ZE_MTT_ENUMERATOR;
+		TempType.BaseType = ZEMC_BT_ENUMERATOR;
 	}
 	else
-		TempType.Type = ZE_MTT_UNDEFINED;
+		TempType.BaseType = ZEMC_BT_UNDEFINED;
 
 	return TempType;
 }
 
-ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
+ZEMCType ZEMCParser::ProcessType(ZEString MainClassName, QualType& ClangType)
 {
 	QualType CanonicalType = ClangType.getCanonicalType();
 	const Type* TypePtr = ClangType.getTypePtr();
 
-	ZEMetaType TempType;
+	ZEMCType TempType;
 	if (CanonicalType.getTypePtr()->isReferenceType())
 	{
 		const ReferenceType* ReferenceTypePtr = TypePtr->castAs<ReferenceType>();
 		QualType ReferenceePtr = ReferenceTypePtr->getPointeeType();
 
 		TempType = ProcessInnerType(MainClassName, ReferenceePtr.getTypePtr());
-		if (TempType.Type == ZE_MTT_UNDEFINED)
-			return ZEMetaType();
+		if (TempType.BaseType == ZEMC_BT_UNDEFINED)
+			return ZEMCType();
 
-		TempType.TypeQualifier = (ReferenceePtr.isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE);
+		TempType.TypeQualifier = (ReferenceePtr.isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE);
 
-		if (TempType.Type == ZE_MTT_ARRAY)
+		if (TempType.BaseType == ZEMC_BT_ARRAY)
 		{
 			const clang::TemplateSpecializationType* TemplateType = ClangType->getPointeeType()->getAs<TemplateSpecializationType>();
 
 			if(TemplateType->getNumArgs() < 1)
-				return ZEMetaType();
+				return ZEMCType();
 
 			TemplateArgument Argument = TemplateType->getArg(0);
 
 			if(Argument.getAsType().getTypePtr()->isPointerType())
 			{
-				ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr()->getPointeeType().getTypePtr());
-				TempType.SubType = SubTypeData.Type;
-				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
-				TempType.SubTypeClassName = SubTypeData.ClassData->Name;
+				ZEMCType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr()->getPointeeType().getTypePtr());
+				TempType.SubType = SubTypeData.BaseType;
+				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
 				return TempType;
 			}
 			else
 			{
 				if(Argument.getAsType().getTypePtr()->isClassType())
-					return ZEMetaType();
+					return ZEMCType();
 
-				ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
-				TempType.SubType = SubTypeData.Type;
-				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
-				TempType.SubTypeClassName = SubTypeData.ClassData->Name;
+				ZEMCType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
+				TempType.SubType = SubTypeData.BaseType;
+				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
 				return TempType;
 			}
 
@@ -491,80 +478,78 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 	else if (CanonicalType.getTypePtr()->isPointerType())
 	{
 		if(CanonicalType->getPointeeType()->isBuiltinType())
-			return ZEMetaType();
+			return ZEMCType();
 
 		if (CanonicalType->getPointeeType()->isClassType())
 		{
-			TempType.Type = ZE_MTT_OBJECT_PTR;
-			TempType.TypeQualifier = CanonicalType->getPointeeType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
-			TempType.ClassData->Name = CanonicalType.getBaseTypeIdentifier()->getName().str();
+			TempType.BaseType = ZEMC_BT_OBJECT_PTR;
+			TempType.TypeQualifier = CanonicalType->getPointeeType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
+			TempType.Class->Name = CanonicalType.getBaseTypeIdentifier()->getName().str();
 
 			CXXRecordDecl* ClassPtr = ClangType->getPointeeType().getTypePtr()->getAsCXXRecordDecl();
 			
 			if(ClassPtr->isCompleteDefinition())
 			{
-				if(ZEMetaCompilerParser::CheckClass(ClassPtr))
+				if(CheckClass(ClassPtr))
 					return TempType;
 				else
-					return ZEMetaType();
+					return ZEMCType();
 
 				for(CXXRecordDecl::base_class_iterator CurrentBaseClass = ClassPtr->bases_begin(), LastBaseClass = ClassPtr->bases_end(); CurrentBaseClass != LastBaseClass; ++CurrentBaseClass)
 				{
 					CXXRecordDecl* BaseClassDecl = CurrentBaseClass->getType()->getAsCXXRecordDecl();
-					TempType.ClassData->BaseClass->Name = BaseClassDecl->getNameAsString();
+					TempType.Class->BaseClass->Name = BaseClassDecl->getNameAsString();
 
 					const clang::TemplateSpecializationType* TemplateType = CurrentBaseClass->getType()->getAs<TemplateSpecializationType>();
 
 					if(TemplateType != NULL)
 					{
 						if(TemplateType->getNumArgs() < 1)
-							return ZEMetaType();
+							return ZEMCType();
 
 						TemplateArgument Argument = TemplateType->getArg(0);
 
 						if(Argument.getAsType().getTypePtr()->isPointerType())
 						{
-							ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr()->getPointeeType().getTypePtr());
-							TempType.SubType = SubTypeData.Type;
-							TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
-							TempType.SubTypeClassName = SubTypeData.ClassData->Name;
+							ZEMCType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr()->getPointeeType().getTypePtr());
+							TempType.SubType = SubTypeData.BaseType;
+							TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
 							return TempType;
 						}
 						else
 						{
 							if(Argument.getAsType().getTypePtr()->isClassType())
-								return ZEMetaType();
+								return ZEMCType();
 
-							ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
-							TempType.SubType = SubTypeData.Type;
-							TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
-							TempType.SubTypeClassName = SubTypeData.ClassData->Name;
+							ZEMCType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
+							TempType.SubType = SubTypeData.BaseType;
+							TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
 							return TempType;
 						}
 					}
 				}
 
-				if(TempType.ClassData->Name == "ZEClass")
+				if(TempType.Class->Name == "ZEClass")
 				{
-					TempType.Type = ZE_MTT_CLASS;
+					TempType.BaseType = ZEMC_BT_CLASS;
 					return TempType;
 				}
 			}
 			else
 			{
-				if(ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses.GetCount() > 0)
+				if(Context->ForwardDeclarations.GetCount() > 0)
 				{
-					for(int I = ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses.GetCount() - 1; I >= 0; I--)
+					for(int I = Context->ForwardDeclarations.GetCount() - 1; I >= 0; I--)
 					{
-						if(ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses[I]->ClassName == TempType.ClassData->Name)
+						if(Context->ForwardDeclarations[I]->ClassName == TempType.Class->Name)
 						{
-							ZEMetaCompilerParser::MetaData->ForwardDeclaredClasses[I]->HeaderFileDeclaredIn = MainClassName;
+							Context->ForwardDeclarations[I]->HeaderFileDeclaredIn = MainClassName;
 							return TempType;
 						}
 					}
 				}
 
-				return ZEMetaType();
+				return ZEMCType();
 			}
 		}
 
@@ -573,70 +558,68 @@ ZEMetaType ProcessType(ZEString MainClassName, QualType& ClangType)
 	else
 	{
 		if (CanonicalType.isConstQualified())
-			return ZEMetaType();
+			return ZEMCType();
 
 		TempType = ProcessInnerType(MainClassName, CanonicalType.getTypePtr());
 
-		if (TempType.Type == ZE_MTT_ARRAY)
+		if (TempType.BaseType == ZEMC_BT_ARRAY)
 		{
 			const clang::TemplateSpecializationType* TemplateType = ClangType->getAs<TemplateSpecializationType>();
 
 			if(TemplateType->getNumArgs() < 1)
-				return ZEMetaType();
+				return ZEMCType();
 
 			TemplateArgument Argument = TemplateType->getArg(0);
 
 			if(Argument.getAsType().getTypePtr()->isPointerType())
 			{
-				ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr()->getPointeeType().getTypePtr());
-				TempType.SubType = SubTypeData.Type;
-				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
-				TempType.SubTypeClassName = SubTypeData.ClassData->Name;
+				ZEMCType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr()->getPointeeType().getTypePtr());
+				TempType.SubType = SubTypeData.BaseType;
+				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
 				return TempType;
 			}
 			else
 			{
 				if(Argument.getAsType().getTypePtr()->isClassType())
-					return ZEMetaType();
+					return ZEMCType();
 
-				ZEMetaType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
-				TempType.SubType = SubTypeData.Type;
-				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZE_MTQ_CONST_REFERENCE : ZE_MTQ_REFERENCE;
-				TempType.SubTypeClassName = SubTypeData.ClassData->Name;
+				ZEMCType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
+				TempType.SubType = SubTypeData.BaseType;
+				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
 				return TempType;
 			}
 
 			return TempType;
 		}
-		else if (TempType.Type == ZE_MTT_LIST)
+		else if (TempType.BaseType == ZEMC_BT_LIST)
 		{
 			//TO DO : Handle List type
 		}
-		else if (TempType.Type == ZE_MTT_ENUMERATOR)
+		else if (TempType.BaseType == ZEMC_BT_ENUMERATOR)
 		{
 			TempType.EnumName = ClangType->getAs<EnumType>()->getDecl()->getNameAsString();
 
 			EnumDecl* EnumDeclaration = ClangType->getAs<EnumType>()->getDecl();
 
-			ZEEnumData* EnumData = new ZEEnumData();
+			ZEMCEnumerator* EnumData = new ZEMCEnumerator();
 			EnumData->Name = TempType.EnumName;
 
 			for(EnumDecl::enumerator_iterator CurrentEnum = EnumDeclaration->enumerator_begin(), EnumEnd = EnumDeclaration->enumerator_end(); CurrentEnum != EnumEnd; ++CurrentEnum)
 			{
-				ZEEnumParameterData* EnumParameterData = new ZEEnumParameterData();
+				ZEEnumeratorItem* EnumParameterData = new ZEEnumeratorItem();
 				EnumParameterData->Name = CurrentEnum->getNameAsString();
 				EnumParameterData->Value = *CurrentEnum->getInitVal().getRawData();
-				EnumData->Parameters.Add(EnumParameterData);
+				EnumData->Items.Add(EnumParameterData);
 			}
 
-			ZEMetaCompilerParser::MetaData->EnumTypes.Add(EnumData);
+			Context->Enumurators.Add(EnumData);
 		}
 
 		return TempType;
 	}
 }
 
-bool ZEMetaCompilerParser::ParseAttribute(ZEAttributeData* Data, const AnnotateAttr* Attribute)
+bool ZEMCParser::ParseAttribute(ZEMCAttribute* Data, const AnnotateAttr* Attribute)
 {
 	std::string Temp = Attribute->getAnnotation().str();
 	const char* AttributeText = Temp.c_str();
@@ -677,7 +660,7 @@ bool ZEMetaCompilerParser::ParseAttribute(ZEAttributeData* Data, const AnnotateA
 			}
 			else
 			{
-				ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Wrong identifier name.");
+				RaiseError(Attribute->getLocation(), "Wrong identifier name.");
 				return false;
 			}				
 			break;
@@ -694,14 +677,14 @@ bool ZEMetaCompilerParser::ParseAttribute(ZEAttributeData* Data, const AnnotateA
 			}
 			else if (!isalnum(InputCharacter))
 			{
-				ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Wrong identifier name.");
+				RaiseError(Attribute->getLocation(), "Wrong identifier name.");
 				return false;
 			}
 			else
 			{
 				if (ParameterTextIndex >= 1024)
 				{
-					ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Max parameter size reached.");
+					RaiseError(Attribute->getLocation(), "Max parameter size reached.");
 					return false;
 				}
 
@@ -731,7 +714,7 @@ bool ZEMetaCompilerParser::ParseAttribute(ZEAttributeData* Data, const AnnotateA
 			}
 			else
 			{
-				ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Wrong parameter termination character.");
+				RaiseError(Attribute->getLocation(), "Wrong parameter termination character.");
 				return false;
 			}
 			break;
@@ -752,7 +735,7 @@ bool ZEMetaCompilerParser::ParseAttribute(ZEAttributeData* Data, const AnnotateA
 			{
 				if (ParameterTextIndex >= 1024)
 				{
-					ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Max parameter size reached.");
+					RaiseError(Attribute->getLocation(), "Max parameter size reached.");
 					return false;
 				}
 				ParameterText[ParameterTextIndex] = InputCharacter;
@@ -790,7 +773,7 @@ bool ZEMetaCompilerParser::ParseAttribute(ZEAttributeData* Data, const AnnotateA
 					ParameterText[ParameterTextIndex] = '\"';
 					break;
 				default:
-					ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Unknown string escape character.");
+					RaiseError(Attribute->getLocation(), "Unknown string escape character.");
 					return false;
 			}
 
@@ -812,14 +795,14 @@ bool ZEMetaCompilerParser::ParseAttribute(ZEAttributeData* Data, const AnnotateA
 	}
 	else
 	{
-		ZEMetaCompilerParser::RaiseError(Attribute->getLocation(), "Cannot parse attribute.");
+		RaiseError(Attribute->getLocation(), "Cannot parse attribute.");
 		return false;
 	}
 
 	return true;
 }
 
-void ZEMetaCompilerParser::ProcessDeclaration(Decl* BaseDeclaration)
+void ZEMCParser::ProcessDeclaration(Decl* BaseDeclaration)
 {
 	if(isa<EnumDecl>(BaseDeclaration) && BaseDeclaration)
 		ProcessEnumerator(dyn_cast<EnumDecl>(BaseDeclaration));
@@ -828,33 +811,32 @@ void ZEMetaCompilerParser::ProcessDeclaration(Decl* BaseDeclaration)
 		ProcessClass(dyn_cast<CXXRecordDecl>(BaseDeclaration));
 }
 
-void ZEMetaCompilerParser::ProcessEnumerator(EnumDecl* EnumDeclaration)
+void ZEMCParser::ProcessEnumerator(EnumDecl* EnumDeclaration)
 {
-	ZEEnumData* EnumData = new ZEEnumData();
+	ZEMCEnumerator* EnumData = new ZEMCEnumerator();
 	EnumData->Name = EnumDeclaration->getNameAsString();
 
 	if(EnumData->Name == NULL || EnumData->Name == "")
 		return;
 
 	EnumData->Hash = EnumData->Name.Hash();
-	EnumData->BaseClass = NULL;
 
 	for(EnumDecl::enumerator_iterator Current = EnumDeclaration->enumerator_begin(), End = EnumDeclaration->enumerator_end(); Current != End; ++Current)
 	{
-		ZEEnumParameterData* EnumParameterData = new ZEEnumParameterData();
+		ZEEnumeratorItem* EnumParameterData = new ZEEnumeratorItem();
 		EnumParameterData->Name = Current->getNameAsString();
 		EnumParameterData->Value = *Current->getInitVal().getRawData();
-		EnumData->Parameters.Add(EnumParameterData);
+		EnumData->Items.Add(EnumParameterData);
 	}
 
-	MetaData->EnumTypes.Add(EnumData);
+	Context->Enumurators.Add(EnumData);
 }
 
-void ZEMetaCompilerParser::ProcessClass(CXXRecordDecl* Class)
+void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 {
 	if(Class->isClass() && !Class->isCompleteDefinition() && Class->hasAttrs())
 	{
-		ZEAttributeData* AttributeData = new ZEAttributeData();
+		ZEMCAttribute* AttributeData = new ZEMCAttribute();
 		for(CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 		{
 			ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
@@ -862,12 +844,12 @@ void ZEMetaCompilerParser::ProcessClass(CXXRecordDecl* Class)
 
 		if(AttributeData->Name == "ForwardDeclaration")
 		{
-			ZEForwardDeclared* ForwardDeclaredClass = new ZEForwardDeclared();
+			ZEMCForwardDeclaration* ForwardDeclaredClass = new ZEMCForwardDeclaration();
 			
 			ForwardDeclaredClass->ClassName = AttributeData->Parameters[0].ToCString();
 			ForwardDeclaredClass->HeaderName = AttributeData->Parameters[1].ToCString();
 
-			MetaData->ForwardDeclaredClasses.Add(ForwardDeclaredClass);
+			Context->ForwardDeclarations.Add(ForwardDeclaredClass);
 		}
 	}
 
@@ -896,7 +878,7 @@ void ZEMetaCompilerParser::ProcessClass(CXXRecordDecl* Class)
 			return;
 	}
 
-	ZEClassData* ClassData = new ZEClassData();
+	ZEMCClass* ClassData = new ZEMCClass();
 	ClassData->Name = Class->getNameAsString();
 	ClassData->Hash = ClassData->Name.Hash();
 	ClassData->HasCreateInstanceMethod = false;
@@ -907,11 +889,11 @@ void ZEMetaCompilerParser::ProcessClass(CXXRecordDecl* Class)
 
 	for(CXXRecordDecl::base_class_iterator CurrentBaseClass = Class->bases_begin(), LastBaseClass = Class->bases_end(); CurrentBaseClass != LastBaseClass; ++CurrentBaseClass)
 	{
-		ClassData->BaseClass = new ZEClassData();
+		ClassData->BaseClass = new ZEMCClass();
 		ClassData->BaseClass->Name = CurrentBaseClass->getType()->getAsCXXRecordDecl()->getNameAsString();
 	}
 
-	ZEAttributeData* AttributeData = new ZEAttributeData();
+	ZEMCAttribute* AttributeData = new ZEMCAttribute();
 	for(CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 	{
 		ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
@@ -939,12 +921,12 @@ void ZEMetaCompilerParser::ProcessClass(CXXRecordDecl* Class)
 		else if(isa<CXXMethodDecl>(*Current))
 		{
 			CXXMethodDecl* Method = ((CXXMethodDecl*)*Current);
-			ProcessMethod(ClassData, Method);
+			//ProcessMethod(ClassData, Method);
 		}
 		else if(isa<RecordDecl>(*Current))
 		{
 			RecordDecl* AnonymousRecord = ((RecordDecl*)*Current);
-			ZEAttributeData* AnonymousRecordAttributeData = new ZEAttributeData();
+			ZEMCAttribute* AnonymousRecordAttributeData = new ZEMCAttribute();
 			for(CXXRecordDecl::attr_iterator CurrentAttr = AnonymousRecord->attr_begin(), LastAttr = AnonymousRecord->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 			{
 				ParseAttribute(AnonymousRecordAttributeData, ((AnnotateAttr*)(*CurrentAttr)));
@@ -955,26 +937,21 @@ void ZEMetaCompilerParser::ProcessClass(CXXRecordDecl* Class)
 
 	for(ZESize I = 0; I < ClassData->Events.GetCount(); I++)
 	{
-		ZEMethodData* Method = new ZEMethodData();
+		ZEMCMethod* Method = new ZEMCMethod();
 		Method->Name = ClassData->Events[I]->Name;
 		Method->IsEvent = true;
 		Method->IsStatic = ClassData->Events[I]->IsStatic;
 		Method->Hash = Method->Name.Hash();
 		Method->Attributes = ClassData->Events[I]->Attributes;
 		
-		ZEMethodParameterData* ReturnParameter = new ZEMethodParameterData();
-		Method->ReturnParameter.Name = ClassData->Events[I]->ReturnParameter.Name;
-		Method->ReturnParameter.BaseClass = ClassData->Events[I]->ReturnParameter.BaseClass;
-		Method->ReturnParameter.EnumData = ClassData->Events[I]->ReturnParameter.EnumData;
-		Method->ReturnParameter.Type = ClassData->Events[I]->ReturnParameter.Type;
+		Method->ReturnValue = ClassData->Events[I]->ReturnValue;
 
 		for(ZESize J = 0; J < ClassData->Events[I]->Parameters.GetCount(); J++)
 		{
-			ZEMethodParameterData* MethodParameter = new ZEMethodParameterData();
+			ZEMCMethodParameter* MethodParameter = new ZEMCMethodParameter();
 			MethodParameter->Name = ClassData->Events[I]->Parameters[J]->Name;
 			MethodParameter->Type = ClassData->Events[I]->Parameters[J]->Type;
-			MethodParameter->BaseClass = ClassData->Events[I]->Parameters[J]->BaseClass;
-			MethodParameter->EnumData = ClassData->Events[I]->Parameters[J]->EnumData;
+			MethodParameter->Type.Enumurator = ClassData->Events[I]->Parameters[J]->EnumData;
 
 			Method->Parameters.Add(MethodParameter);
 		}
@@ -982,31 +959,30 @@ void ZEMetaCompilerParser::ProcessClass(CXXRecordDecl* Class)
 		ClassData->Methods.Add(Method);
 	}
 
-	MetaData->Types.Add(ClassData);
+	Context->Declarations.Add(ClassData);
 	if (Compiler->getSourceManager().getFileID(Class->getLocation()) == Compiler->getSourceManager().getMainFileID())
-		MetaData->TargetTypes.Add(ClassData);
+		Context->TargetDeclarations.Add(ClassData);
 }
 
-void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, VarDecl* StaticProperty)
+void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, VarDecl* StaticProperty)
 {
 	if (StaticProperty->getAccess() != AccessSpecifier::AS_public)
 		return;
 
-	ZEMetaType PropertyType = ProcessType(ClassData->Name, StaticProperty->getType());
-	if (PropertyType.Type == ZE_MTT_UNDEFINED)
+	ZEMCType PropertyType = ProcessType(ClassData->Name, StaticProperty->getType());
+	if (PropertyType.BaseType == ZEMC_BT_UNDEFINED)
 		return;
 
-	ZEPropertyData* PropertyData = new ZEPropertyData();
+	ZEMCProperty* PropertyData = new ZEMCProperty();
 	PropertyData->Name = StaticProperty->getNameAsString();
 	PropertyData->Hash = PropertyData->Name.Hash();
 	PropertyData->IsStatic = true;
 	PropertyData->IsContainer = false;
 	PropertyData->Type = PropertyType;
-	PropertyData->BaseClass = ClassData->BaseClass;
 
-	if(PropertyType.ClassData->BaseClass != NULL && (PropertyType.ClassData->BaseClass->Name != NULL || PropertyType.ClassData->BaseClass->Name != ""))
+	if(PropertyType.Class->BaseClass != NULL && (PropertyType.Class->BaseClass->Name != NULL || PropertyType.Class->BaseClass->Name != ""))
 	{
-		if(PropertyType.ClassData->BaseClass->Name == "ZEContainer")
+		if(PropertyType.Class->BaseClass->Name == "ZEContainer")
 			PropertyData->IsContainer = true;
 	}
 
@@ -1016,7 +992,7 @@ void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, VarDecl* Stat
 
 		CXXRecordDecl* TemplateEvent = StaticProperty->getType()->getAsCXXRecordDecl();
 
-		ZEEventData* Event = new ZEEventData();
+		ZEMCEvent* Event = new ZEMCEvent();
 		Event->Name = PropertyData->Name;
 		Event->IsStatic = PropertyData->IsStatic;
 
@@ -1029,9 +1005,9 @@ void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, VarDecl* Stat
 			{
 				CXXMethodDecl* TemplateEventMethodDecl = (CXXMethodDecl*)*CurrentTemplateEventMethod;
 
-				Event->ReturnParameter.Type = ProcessType(ClassData->Name, TemplateEventMethodDecl->getCallResultType());
+				Event->ReturnValue = ProcessType(ClassData->Name, TemplateEventMethodDecl->getCallResultType());
 
-				if (Event->ReturnParameter.Type == ZE_MTT_UNDEFINED)
+				if (Event->ReturnValue.BaseType == ZEMC_BT_UNDEFINED)
 				{
 					Error = true;
 					break;
@@ -1047,13 +1023,13 @@ void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, VarDecl* Stat
 						TemplateEventParameterData->Name = (*CurrentTemplateMethodParameter)->getNameAsString();
 						TemplateEventParameterData->Type = ProcessType(ClassData->Name, (*CurrentTemplateMethodParameter)->getType());
 
-						if(TemplateEventParameterData->Type.Type == ZE_MTT_ENUMERATOR)
+						if(TemplateEventParameterData->Type.BaseType == ZEMC_BT_ENUMERATOR)
 						{
-							for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
+							for(ZESize I = 0; I < Context->Enumurators.GetCount(); I++)
 							{
-								if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && TemplateEventParameterData->Type.EnumName == MetaData->EnumTypes[I]->Name)
+								if(Context->Enumurators[I]->Items.GetCount() > 0 && TemplateEventParameterData->Type.EnumName == Context->Enumurators[I]->Name)
 								{
-									TemplateEventParameterData->EnumData = MetaData->EnumTypes[I];
+									TemplateEventParameterData->EnumData = Context->Enumurators[I];
 									break;
 								}
 							}
@@ -1067,7 +1043,7 @@ void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, VarDecl* Stat
 			}
 		}
 
-		ZEAttributeData* AttributeData = new ZEAttributeData();
+		ZEMCAttribute* AttributeData = new ZEMCAttribute();
 		for(CXXRecordDecl::attr_iterator CurrentAttr = StaticProperty->attr_begin(), LastAttr = StaticProperty->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 		{
 			ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
@@ -1082,19 +1058,19 @@ void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, VarDecl* Stat
 		return;
 	}
 
-	if(PropertyType.Type == ZE_MTT_ENUMERATOR)
+	if(PropertyType.BaseType == ZEMC_BT_ENUMERATOR)
 	{
-		for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
+		for(ZESize I = 0; I < Context->Enumurators.GetCount(); I++)
 		{
-			if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && PropertyData->Type.EnumName == MetaData->EnumTypes[I]->Name)
+			if(Context->Enumurators[I]->Items.GetCount() > 0 && PropertyData->Type.EnumName == Context->Enumurators[I]->Name)
 			{
-				PropertyData->EnumData = MetaData->EnumTypes[I];
+				PropertyData->Type.Enumurator = Context->Enumurators[I];
 				break;
 			}
 		}
 	}
 
-	ZEAttributeData* AttributeData = new ZEAttributeData();
+	ZEMCAttribute* AttributeData = new ZEMCAttribute();
 	for(CXXRecordDecl::attr_iterator CurrentAttr = StaticProperty->attr_begin(), LastAttr = StaticProperty->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 	{
 		ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
@@ -1104,27 +1080,26 @@ void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, VarDecl* Stat
 	ClassData->Properties.Add(PropertyData);
 }
 
-void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, FieldDecl* NonStaticProperty)
+void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, FieldDecl* NonStaticProperty)
 {
 	if (NonStaticProperty->getAccess() != AccessSpecifier::AS_public)
 		return;
 
-	ZEMetaType PropertyType = ProcessType(ClassData->Name, NonStaticProperty->getType());
-	if (PropertyType.Type == ZE_MTT_UNDEFINED)
+	ZEMCType PropertyType = ProcessType(ClassData->Name, NonStaticProperty->getType());
+	if (PropertyType.BaseType == ZEMC_BT_UNDEFINED)
 		return;
 
-	ZEPropertyData* PropertyData = new ZEPropertyData();
+	ZEMCProperty* PropertyData = new ZEMCProperty();
 	PropertyData->Name = NonStaticProperty->getNameAsString();
 	PropertyData->Hash = PropertyData->Name.Hash();
-	PropertyData->IsGeneratedByMetaCompiler = false;
+	PropertyData->HasSetterGetter = false;
 	PropertyData->IsStatic = false;
 	PropertyData->IsContainer = false;
 	PropertyData->Type = PropertyType;
-	PropertyData->BaseClass = ClassData->BaseClass;
 
-	if(PropertyType.ClassData->BaseClass != NULL && (PropertyType.ClassData->BaseClass->Name != NULL || PropertyType.ClassData->BaseClass->Name != ""))
+	if(PropertyType.Class->BaseClass != NULL && (PropertyType.Class->BaseClass->Name != NULL || PropertyType.Class->BaseClass->Name != ""))
 	{
-		if(PropertyType.ClassData->BaseClass->Name == "ZEContainer")
+		if(PropertyType.Class->BaseClass->Name == "ZEContainer")
 			PropertyData->IsContainer = true;
 	}
 
@@ -1134,7 +1109,7 @@ void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, FieldDecl* No
 
 		CXXRecordDecl* TemplateEvent = NonStaticProperty->getType()->getAsCXXRecordDecl();
 
-		ZEEventData* Event = new ZEEventData();
+		ZEMCEvent* Event = new ZEMCEvent();
 		Event->Name = PropertyData->Name;
 		Event->IsStatic = PropertyData->IsStatic;
 		Event->ClassName = ClassData->Name;
@@ -1148,9 +1123,9 @@ void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, FieldDecl* No
 			{
 				CXXMethodDecl* TemplateEventMethodDecl = (CXXMethodDecl*)*CurrentTemplateEventMethod;
 
-				Event->ReturnParameter.Type = ProcessType(ClassData->Name, TemplateEventMethodDecl->getCallResultType());
+				Event->ReturnValue = ProcessType(ClassData->Name, TemplateEventMethodDecl->getCallResultType());
 
-				if (Event->ReturnParameter.Type.Type == ZE_MTT_UNDEFINED)
+				if (Event->ReturnValue.BaseType == ZEMC_BT_UNDEFINED)
 				{
 					Error = true;
 					break;
@@ -1166,13 +1141,13 @@ void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, FieldDecl* No
 						TemplateEventParameterData->Name = (*CurrentTemplateMethodParameter)->getNameAsString();
 						TemplateEventParameterData->Type = ProcessType(ClassData->Name, (*CurrentTemplateMethodParameter)->getType());
 
-						if(TemplateEventParameterData->Type.Type == ZE_MTT_ENUMERATOR)
+						if(TemplateEventParameterData->Type.BaseType == ZEMC_BT_ENUMERATOR)
 						{
-							for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
+							for(ZESize I = 0; I < Context->Enumurators.GetCount(); I++)
 							{
-								if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && TemplateEventParameterData->Type.EnumName == MetaData->EnumTypes[I]->Name)
+								if(Context->Enumurators[I]->Items.GetCount() > 0 && TemplateEventParameterData->Type.EnumName == Context->Enumurators[I]->Name)
 								{
-									TemplateEventParameterData->EnumData = MetaData->EnumTypes[I];
+									TemplateEventParameterData->EnumData = Context->Enumurators[I];
 									break;
 								}
 							}
@@ -1186,7 +1161,7 @@ void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, FieldDecl* No
 			}
 		}
 
-		ZEAttributeData* AttributeData = new ZEAttributeData();
+		ZEMCAttribute* AttributeData = new ZEMCAttribute();
 		for(CXXRecordDecl::attr_iterator CurrentAttr = NonStaticProperty->attr_begin(), LastAttr = NonStaticProperty->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 		{
 			ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
@@ -1201,19 +1176,19 @@ void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, FieldDecl* No
 		return;
 	}
 
-	if(PropertyType.Type == ZE_MTT_ENUMERATOR)
+	if(PropertyType.BaseType == ZEMC_BT_ENUMERATOR)
 	{
-		for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
+		for(ZESize I = 0; I < Context->Enumurators.GetCount(); I++)
 		{
-			if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && PropertyData->Type.EnumName == MetaData->EnumTypes[I]->Name)
+			if(Context->Enumurators[I]->Items.GetCount() > 0 && PropertyData->Type.EnumName == Context->Enumurators[I]->Name)
 			{
-				PropertyData->EnumData = MetaData->EnumTypes[I];
+				PropertyData->Type.Enumurator = Context->Enumurators[I];
 				break;
 			}
 		}
 	}
 
-	ZEAttributeData* AttributeData = new ZEAttributeData();
+	ZEMCAttribute* AttributeData = new ZEMCAttribute();
 	for(CXXRecordDecl::attr_iterator CurrentAttr = NonStaticProperty->attr_begin(), LastAttr = NonStaticProperty->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 	{
 		ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
@@ -1223,7 +1198,7 @@ void ZEMetaCompilerParser::ProcessProperty(ZEClassData* ClassData, FieldDecl* No
 	ClassData->Properties.Add(PropertyData);
 }
 
-void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* Method)
+void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* Method)
 {
 	bool IsOperator = false;
 	if(Method->isOverloadedOperator())
@@ -1256,8 +1231,8 @@ void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* 
 		}
 	}
 
-	ZEMetaType ReturnType = ProcessType(ClassData->Name, Method->getCallResultType());
-	if (ReturnType.Type == ZE_MTT_UNDEFINED)
+	ZEMCType ReturnType = ProcessType(ClassData->Name, Method->getCallResultType());
+	if (ReturnType.BaseType == ZEMC_BT_UNDEFINED)
 		return;
 
 	ZEString MethodName = Method->getNameAsString();
@@ -1284,10 +1259,10 @@ void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* 
 
 		if(!IsPropertyFound)
 		{
-			ZEPropertyData* PropertyData = new ZEPropertyData();
+			ZEMCProperty* PropertyData = new ZEMCProperty();
 			PropertyData->Name = PropertyName;
 			PropertyData->Hash = PropertyName.Hash();
-			PropertyData->IsGeneratedByMetaCompiler = true;
+			PropertyData->HasSetterGetter = true;
 			PropertyData->IsStatic = false;
 			PropertyData->IsContainer = false;
 
@@ -1302,19 +1277,19 @@ void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* 
 			{
 				for(clang::FunctionDecl::param_iterator CurrentParameter = Method->param_begin(), LastParameter = Method->param_end(); CurrentParameter != LastParameter; ++CurrentParameter)
 				{
-					ZEMetaType PropertyType = ProcessType(ClassData->Name, (*CurrentParameter)->getType());
-					if (PropertyType.Type == ZE_MTT_UNDEFINED)
+					ZEMCType PropertyType = ProcessType(ClassData->Name, (*CurrentParameter)->getType());
+					if (PropertyType.BaseType == ZEMC_BT_UNDEFINED)
 						return;
 
 					PropertyData->Type = PropertyType;
 
-					if(PropertyType.Type == ZE_MTT_ENUMERATOR)
+					if(PropertyType.BaseType == ZEMC_BT_ENUMERATOR)
 					{
-						for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
+						for(ZESize I = 0; I < Context->Enumurators.GetCount(); I++)
 						{
-							if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && PropertyType.EnumName == MetaData->EnumTypes[I]->Name)
+							if(Context->Enumurators[I]->Items.GetCount() > 0 && PropertyType.EnumName == Context->Enumurators[I]->Name)
 							{
-								PropertyData->EnumData = MetaData->EnumTypes[I];
+								PropertyData->Type.Enumurator = Context->Enumurators[I];
 								break;
 							}
 						}
@@ -1323,17 +1298,17 @@ void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* 
 			}
 			else
 			{
-				ZEMetaType PropertyType = ProcessType(ClassData->Name, Method->getCallResultType());
-				if (PropertyType.Type == ZE_MTT_UNDEFINED)
+				ZEMCType PropertyType = ProcessType(ClassData->Name, Method->getCallResultType());
+				if (PropertyType.BaseType == ZEMC_BT_UNDEFINED)
 					return;
 
-				if(PropertyType.Type == ZE_MTT_ENUMERATOR)
+				if(PropertyType.BaseType == ZEMC_BT_ENUMERATOR)
 				{
-					for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
+					for(ZESize I = 0; I < Context->Enumurators.GetCount(); I++)
 					{
-						if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && PropertyType.EnumName == MetaData->EnumTypes[I]->Name)
+						if(Context->Enumurators[I]->Items.GetCount() > 0 && PropertyType.EnumName == Context->Enumurators[I]->Name)
 						{
-							PropertyData->EnumData = MetaData->EnumTypes[I];
+							PropertyData->Type.Enumurator = Context->Enumurators[I];
 							break;
 						}
 					}
@@ -1342,7 +1317,7 @@ void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* 
 				PropertyData->Type = PropertyType;
 			}
 			
-			ZEAttributeData* AttributeData = new ZEAttributeData();
+			ZEMCAttribute* AttributeData = new ZEMCAttribute();
 			for(CXXRecordDecl::attr_iterator CurrentAttr = Method->attr_begin(), LastAttr = Method->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 			{
 				ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
@@ -1360,7 +1335,7 @@ void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* 
 		}
 	}
 
-	ZEMethodData* MethodData = new ZEMethodData();
+	ZEMCMethod* MethodData = new ZEMCMethod();
 	MethodData->Name = MethodName;
 	MethodData->IsConst = Method->isConst();
 	MethodData->IsVirtual = Method->isVirtual();
@@ -1369,18 +1344,18 @@ void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* 
 	MethodData->IsStatic = Method->isStatic();
 	MethodData->IsEvent = false;
 	MethodData->Hash = MethodData->Name.Hash();
-	MethodData->ReturnParameter.Type = ReturnType;
+	MethodData->ReturnValue = ReturnType;
 
 	if(IsOperator)
 		MethodData->OperatorType = GetOperatorType(Method->getOverloadedOperator());
 
-	if(MethodData->ReturnParameter.Type.Type == ZE_MTT_ENUMERATOR)
+	if(MethodData->ReturnValue.BaseType == ZEMC_BT_ENUMERATOR)
 	{
-		for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
+		for(ZESize I = 0; I < Context->Enumurators.GetCount(); I++)
 		{
-			if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && MethodData->ReturnParameter.Type.EnumName == MetaData->EnumTypes[I]->Name)
+			if(Context->Enumurators[I]->Items.GetCount() > 0 && MethodData->ReturnValue.EnumName == Context->Enumurators[I]->Name)
 			{
-				MethodData->ReturnParameter.EnumData = MetaData->EnumTypes[I];
+				MethodData->ReturnValue.Enumurator = Context->Enumurators[I];
 				break;
 			}
 		}
@@ -1390,14 +1365,14 @@ void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* 
 	ZESize ParameterCount = 0;
 	for(clang::FunctionDecl::param_iterator CurrentParameter = Method->param_begin(), LastParameter = Method->param_end(); CurrentParameter != LastParameter; ++CurrentParameter)
 	{
-		ZEMetaType ParameterType = ProcessType(ClassData->Name, (*CurrentParameter)->getType());
-		if (ParameterType.Type == ZE_MTT_UNDEFINED)
+		ZEMCType ParameterType = ProcessType(ClassData->Name, (*CurrentParameter)->getType());
+		if (ParameterType.BaseType == ZEMC_BT_UNDEFINED)
 		{
 			Error = true;
 			break;
 		}
 
-		ZEMethodParameterData* MethodParameterData = new ZEMethodParameterData();
+		ZEMCMethodParameter* MethodParameterData = new ZEMCMethodParameter();
 		if(!(*CurrentParameter)->getNameAsString().empty())
 			MethodParameterData->Name = (*CurrentParameter)->getNameAsString();
 		else
@@ -1407,13 +1382,13 @@ void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* 
 		}
 		MethodParameterData->Type = ParameterType;
 
-		if(ParameterType.Type == ZE_MTT_ENUMERATOR)
+		if(ParameterType.BaseType == ZEMC_BT_ENUMERATOR)
 		{
-			for(ZESize I = 0; I < MetaData->EnumTypes.GetCount(); I++)
+			for(ZESize I = 0; I < Context->Enumurators.GetCount(); I++)
 			{
-				if(MetaData->EnumTypes[I]->Parameters.GetCount() > 0 && ParameterType.EnumName == MetaData->EnumTypes[I]->Name)
+				if(Context->Enumurators[I]->Items.GetCount() > 0 && ParameterType.EnumName == Context->Enumurators[I]->Name)
 				{
-					MethodParameterData->EnumData = MetaData->EnumTypes[I];
+					MethodParameterData->Type.Enumurator = Context->Enumurators[I];
 					break;
 				}
 			}
@@ -1424,7 +1399,7 @@ void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* 
 		ParameterCount++;
 	}
 
-	ZEAttributeData* AttributeData = new ZEAttributeData();
+	ZEMCAttribute* AttributeData = new ZEMCAttribute();
 	for(CXXRecordDecl::attr_iterator CurrentAttr = Method->attr_begin(), LastAttr = Method->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 	{
 		ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
@@ -1439,6 +1414,9 @@ void ZEMetaCompilerParser::ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* 
 
 class ZEMetaCompilerASTConsumer : public clang::ASTConsumer
 {
+	private:
+		ZEMCParser* Parser;
+
 	public:
 		virtual void Initialize(ASTContext &Context) 
 		{
@@ -1449,58 +1427,52 @@ class ZEMetaCompilerASTConsumer : public clang::ASTConsumer
 		{
 			for (DeclGroupRef::iterator Iterator = DR.begin(); Iterator != DR.end(); Iterator++)
 			{
-				ZEMetaCompilerParser::ProcessDeclaration(*Iterator);
+				Parser->ProcessDeclaration(*Iterator);
 			}
 
 			return true;
 		}
 
-		virtual void HandleTranslationUnit(ASTContext &Ctx)
+		virtual void HandleTranslationUnit(ASTContext& Ctx)
 		{
 
+		}
+
+		ZEMetaCompilerASTConsumer(ZEMCParser* parser, CompilerInstance& CI)
+		{
+			Parser = parser;
+			parser->Compiler = &CI;
 		}
 };
 
 class ZEMetaCompilerFrontendAction : public clang::ASTFrontendAction
 {
+	private:
+		ZEMCParser* Parser;
+
 	public:
-		virtual clang::ASTConsumer *CreateASTConsumer(CompilerInstance &CI, StringRef InFile)
+		virtual clang::ASTConsumer* CreateASTConsumer(CompilerInstance& CI, StringRef InFile)
 		{
-			ZEMetaCompilerParser::Compiler = &CI;
-			return new ZEMetaCompilerASTConsumer();
+			return new ZEMetaCompilerASTConsumer(Parser, CI);
+		}
+
+		ZEMetaCompilerFrontendAction(ZEMCParser* parser)
+		{
+			Parser = parser;
 		}
 };
 
-class ZEMetaCompilerFrontendActionFactory : public clang::tooling::FrontendActionFactory
+void ZEMCParser::SetOptions(ZEMCOptions* options)
 {
-	public:
-		virtual clang::FrontendAction *create()
-		{
-			return new ZEMetaCompilerFrontendAction();
-		}
-};
-
-#include <fstream>
-
-std::string readshit(const char* input_file_name)
-{
-	std::ifstream t;
-	int length;
-	t.open(input_file_name);      // open input file
-	t.seekg(0, std::ios::end);    // go to the end
-	length = t.tellg();           // report location (this is the length)
-	t.seekg(0, std::ios::beg);    // go back to the beginning
-	char* buffer = new char[length];    // allocate memory for a buffer of appropriate dimension
-	t.read(buffer, length);       // read the whole file into the buffer
-	t.close(); 
-
-	std::string content = buffer;
-	delete[] buffer;
-
-	return content;
+	Options = options;
 }
 
-bool ZEMetaCompilerParser::Parse()
+void ZEMCParser::SetMetaContext(ZEMCContext* context)
+{
+	Context = context;
+}
+
+bool ZEMCParser::Parse()
 {
 	std::vector<std::string> Arguments;
 	//Arguments.push_back("ZEMetaCompiler.exe");
@@ -1515,14 +1487,14 @@ bool ZEMetaCompilerParser::Parse()
 	Arguments.push_back("-w");
 	//Arguments.push_back("-std=c++11");
 
-	for (int I = 0; I < Options.IncludeDirectories.GetCount(); I++)
+	for (int I = 0; I < Options->IncludeDirectories.GetCount(); I++)
 	{
-		Arguments.push_back(ZEFormat::Format("-I{0}", Options.IncludeDirectories[I]));
+		Arguments.push_back(ZEFormat::Format("-I{0}", Options->IncludeDirectories[I]));
 	}
 
-	for (int I = 0; I < Options.Definitions.GetCount(); I++)
+	for (int I = 0; I < Options->Definitions.GetCount(); I++)
 	{
-		Arguments.push_back(ZEFormat::Format("-D{0}", Options.Definitions[I]));
+		Arguments.push_back(ZEFormat::Format("-D{0}", Options->Definitions[I]));
 	}	
 	
 	const char* argv[1024];
@@ -1531,41 +1503,16 @@ bool ZEMetaCompilerParser::Parse()
 	{
 		argv[I] = Arguments[I].c_str();
 	}
-
-	/*
-	static llvm::cl::OptionCategory ZEMCCatagory("ZEMC options");
-	static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpMessage);
-	clang::tooling::CommonOptionsParser OptionsParser(argc, argv, ZEMCCatagory);
-	clang::tooling::ClangTool Tool(OptionsParser.getCompilations(),	OptionsParser.getSourcePathList());
-	int Result = Tool.run(new ZEMetaCompilerFrontendActionFactory());
-	return (Result == EXIT_SUCCESS);*/
 	
-	std::ifstream in(Options.InputFileName.ToCString());
-	std::string s((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+	std::ifstream sourceFile(Options->InputFileName.ToCString());
+	std::string sourceCode((std::istreambuf_iterator<char>(sourceFile)), std::istreambuf_iterator<char>());
 
 	bool Result = clang::tooling::runToolOnCodeWithArgs(
-		new ZEMetaCompilerFrontendAction(), 
-		s,
+		new ZEMetaCompilerFrontendAction(this), 
+		sourceCode,
 		Arguments, 
-		Options.InputFileName.ToCString());
+		Options->InputFileName.ToCString());
+
 	if (!Result)
 		return false;
-
-	if (!ZEMetaGenerator::Generate(Options, MetaData))
-		return false;
-
-	if(Options.IsRegisterSession)
-	{
-		FILE* File;
-		File = fopen(Options.RegisterFileName.ToCString(), "w");
-
-		for(ZESize I = 0; I < MetaData->TargetTypes.GetCount(); I++)
-		{
-			fprintf(File, "%s,%s;", 
-				MetaData->TargetTypes[I]->Name.ToCString(), 
-				ZEFileInfo::GetFileName(Options.InputFileName).ToCString());
-		}
-
-		fclose(File);
-	}
 }

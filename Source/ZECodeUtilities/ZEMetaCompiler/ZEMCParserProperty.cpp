@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaCollectionGenerator.h
+ Zinek Engine - ZEMCParserProperty.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,17 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_META_COLLECTION_GENERATOR_H__
-#define __ZE_META_COLLECTION_GENERATOR_H__
+#include "ZEMCParser.h"
+#include "ZEMCOptions.h"
 
-#include "ZEMetaCompilerOptions.h"
-#include "ZEMetaData.h"
-
-class ZEMetaCollectionGenerator
+void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, DeclaratorDecl* PropertyDeclaration)
 {
-	public:
-		static void		Generate(const ZEMetaCompilerOptions& Options);
-};
+	if (PropertyDeclaration->getAccess() != AccessSpecifier::AS_public)
+		return;
 
-#endif
+	ZEMCType PropertyType;
+	if (!ProcessType(PropertyType, PropertyDeclaration->getType()))
+		return;
+
+	// Only value qualified types can be container
+	if (PropertyType.TypeQualifier != ZEMC_TQ_VALUE)
+		return;
+
+	ZEMCProperty* PropertyData = new ZEMCProperty();
+	PropertyData->Name = PropertyDeclaration->getNameAsString();
+	PropertyData->Hash = PropertyData->Name.Hash();
+	PropertyData->IsStatic = isa<VarDecl>(PropertyDeclaration);
+	PropertyData->IsContainer = PropertyType.ContainerType != ZEMC_CT_NONE;
+	PropertyData->Type = PropertyType;
+
+	ZEMCAttribute* AttributeData = new ZEMCAttribute();
+	for(CXXRecordDecl::attr_iterator CurrentAttr = PropertyDeclaration->attr_begin(), LastAttr = PropertyDeclaration->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
+	{
+		ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
+		PropertyData->Attributes.Add(AttributeData);
+	}
+
+	ClassData->Properties.Add(PropertyData);
+}

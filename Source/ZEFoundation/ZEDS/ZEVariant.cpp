@@ -139,7 +139,9 @@ void ZEVariant::SetType(const ZEType& NewType)
 
 	if (ValueType.TypeQualifier == ZE_TQ_VALUE && Value.Pointer != NULL)
 	{
-		if (ValueType.Type == ZE_TT_OBJECT || ValueType.Type == ZE_TT_ARRAY)
+		if (NewType.ContainerType != ZE_CT_NONE)
+			Deleter(Value.Pointer);
+		else if (ValueType.Type == ZE_TT_OBJECT)
 			Deleter(Value.Pointer);
 		else if (ValueType.Type == ZE_TT_STRING)
 			Value.String.Clear();
@@ -172,7 +174,7 @@ void ZEVariant::SetVariant(const ZEVariant& Variant)
 
 	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
 	{
-		if (ValueType.Type == ZE_TT_OBJECT || ValueType.Type == ZE_TT_ARRAY || ValueType.Type == ZE_TT_LIST)
+		if (ValueType.ContainerType != ZE_CT_NONE || ValueType.Type == ZE_TT_OBJECT)
 			Value.Pointer = Variant.Cloner(Variant.Value.Pointer);
 		else if (ValueType.Type == ZE_TT_MATRIX3X3)
 			Value.Pointer = new ZEMatrix4x4(*(const ZEMatrix4x4*)Variant.Value.Pointer);
@@ -429,7 +431,7 @@ void ZEVariant::SetFloat(float Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_FLOAT;
-	Type.SubTypeQualifier = ZE_TQ_VALUE;
+	Type.TypeQualifier = ZE_TQ_VALUE;
 	SetType(Type);
 
 	this->Value.Float = Value;
@@ -439,7 +441,7 @@ void ZEVariant::SetFloatRef(float& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_FLOAT;
-	Type.SubTypeQualifier = ZE_TQ_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -449,7 +451,7 @@ void ZEVariant::SetFloatConstRef(const float& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_FLOAT;
-	Type.SubTypeQualifier = ZE_TQ_CONST_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<float*>(&Value);
@@ -459,7 +461,7 @@ void ZEVariant::SetDouble(double Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_DOUBLE;
-	Type.SubTypeQualifier = ZE_TQ_VALUE;
+	Type.TypeQualifier = ZE_TQ_VALUE;
 	SetType(Type);
 
 	this->Value.Double = Value;
@@ -469,7 +471,7 @@ void ZEVariant::SetDoubleRef(double& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_DOUBLE;
-	Type.SubTypeQualifier = ZE_TQ_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -479,7 +481,7 @@ void ZEVariant::SetDoubleConstRef(const double& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_DOUBLE;
-	Type.SubTypeQualifier = ZE_TQ_CONST_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<double*>(&Value);
@@ -489,7 +491,7 @@ void ZEVariant::SetBool(bool Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_BOOLEAN;
-	Type.SubTypeQualifier = ZE_TQ_VALUE;
+	Type.TypeQualifier = ZE_TQ_VALUE;
 	SetType(Type);
 
 	this->Value.Boolean = Value;
@@ -499,7 +501,7 @@ void ZEVariant::SetBoolRef(bool& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_BOOLEAN;
-	Type.SubTypeQualifier = ZE_TQ_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -509,7 +511,7 @@ void ZEVariant::SetBoolConstRef(const bool& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_BOOLEAN;
-	Type.SubTypeQualifier = ZE_TQ_CONST_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<bool*>(&Value);
@@ -720,7 +722,7 @@ void ZEVariant::SetStringRef(ZEString& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_STRING;
-	Type.SubTypeQualifier = ZE_TQ_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -730,7 +732,7 @@ void ZEVariant::SetStringConstRef(const ZEString& Value)
 {
 	ZEType Type;
 	Type.Type = ZE_TT_STRING;
-	Type.SubTypeQualifier = ZE_TQ_CONST_REFERENCE;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEString*>(&Value);
@@ -1134,7 +1136,7 @@ ZEObject*const& ZEVariant::GetObjectPtrConstRef() const
 	if (ValueType.Type != ZE_TT_OBJECT_PTR)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
-	if (ValueType.SubTypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
 		zeCriticalError("Variant is a value. Can not convert value to const reference.");
 
 	return (ZEObject* const)Value.Pointer;
@@ -1161,7 +1163,7 @@ ZEClass* const& ZEVariant::GetClassConstRef() const
 	if (ValueType.Type != ZE_TT_CLASS)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
-	if (ValueType.SubTypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
 		zeCriticalError("Variant is a value. Can not convert value to const reference.");
 
 	return (ZEClass* const)Value.Pointer;
