@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaCompilerOptions.h
+ Zinek Engine - ZEMCGeneratorClassScripting.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_META_COMPILER_OPTIONS_H__
-#define __ZE_META_COMPILER_OPTIONS_H__
+#include "ZEMCGenerator.h"
+#include "ZEMCContext.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-
-struct ZEMetaCompilerOptions
+void ZEMCGenerator::GenerateScriptClass(ZEMCClass* currentClass)
 {
-	ZEString					BinaryPath;
-	ZEString					InputFileName;
-	ZEString					OutputFileName;
-	ZEArray<ZEString>			IncludeDirectories;
-	ZEArray<ZEString>			Definitions;
 
-	ZEString					RegisterFileName;
-	ZEString					ClassCollectionName;
-	ZEString					ClassCollectionHeaderFile;
-	ZEString					ClassCollectionSourceFile;
-	ZEArray<ZEString>			RegisterFiles;
-	bool						IsRegisterSession;
-	bool						IsGenerateSession;
+}
 
-	const char**				Argv;
-	int							Argc;
+void ZEMCGenerator::GenerateGetSizeOfScriptBaseClass(ZEMCClass* currentClass)
+{
 
-	bool						Quiet;
-	bool						MSVC;
-};
+}
 
-#endif
+void ZEMCGenerator::GenerateCreateScriptInstance(ZEMCClass* currentClass)
+{
+
+}

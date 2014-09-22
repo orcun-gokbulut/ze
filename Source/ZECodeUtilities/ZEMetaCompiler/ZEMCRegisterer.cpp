@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaCollectionGenerator.cpp
+ Zinek Engine - ZEMCRegisterer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMetaCollectionGenerator.h"
+#include "ZEMCRegisterer.h"
 #include "ZEFile/ZEFileInfo.h"
 
 struct ZERegisteredClass
@@ -42,14 +42,34 @@ struct ZERegisteredClass
 	ZEString IncludeDirectory;
 };
 
-void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
+void ZEMCRegisterer::SetOptions(ZEMCOptions* options)
+{
+	Options = options;
+}
+
+void ZEMCRegisterer::RegisterFile(ZEMCContext* context)
+{
+	FILE* File;
+	File = fopen(Options->RegisterFileName.ToCString(), "w");
+
+	for(ZESize I = 0; I < context->TargetDeclarations.GetCount(); I++)
+	{
+		fprintf(File, "%s,%s;", 
+			context->TargetDeclarations[I]->Name.ToCString(), 
+			ZEFileInfo::GetFileName(Options->InputFileName).ToCString());
+	}
+
+	fclose(File);
+}
+
+void ZEMCRegisterer::RegisterModule()
 {
 	ZEArray<ZERegisteredClass> RegisteredClasses;
 
-	for(ZESize I = 0; I < Options.RegisterFiles.GetCount(); I++)
+	for(ZESize I = 0; I < Options->RegisterFiles.GetCount(); I++)
 	{
 		FILE* RegisterFile;
-		RegisterFile = fopen(Options.RegisterFiles[I].ToCString(), "r");
+		RegisterFile = fopen(Options->RegisterFiles[I].ToCString(), "r");
 
 		if(RegisterFile == NULL)
 			zeError("Error! Register file is not found!");
@@ -105,8 +125,8 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 		}
 	}
 
-	ZEString ClassCollectionName = Options.ClassCollectionName;
-	ZEString ClassCollectionHeader = Options.ClassCollectionHeaderFile;
+	ZEString ClassCollectionName = Options->ClassCollectionName;
+	ZEString ClassCollectionHeader = Options->ClassCollectionHeaderFile;
 
 	FILE* ClassCollectionHeaderFile;
 	ClassCollectionHeaderFile = fopen(ClassCollectionHeader.ToCString(), "w");
@@ -126,7 +146,7 @@ void ZEMetaCollectionGenerator::Generate(const ZEMetaCompilerOptions& Options)
 
 	fclose(ClassCollectionHeaderFile);
 
-	ZEString ClassCollectionCpp = Options.ClassCollectionSourceFile;
+	ZEString ClassCollectionCpp = Options->ClassCollectionSourceFile;
 
 	FILE* ClassCollectionSourceFile;
 	ClassCollectionSourceFile = fopen(ClassCollectionCpp.ToCString(), "w");

@@ -85,7 +85,7 @@ class ZEArray
 		{
 			zeDebugCheck(Count == 0, "There is no item in the queue.");
 			ZEType Temp = Items[0];
-			DeleteAt(0);
+			Remove(0);
 			return Temp;			
 		}
 
@@ -98,7 +98,7 @@ class ZEArray
 		{
 			zeDebugCheck(Count == 0, "There is no item in the stack.");
 			ZEType Temp = Items[Count - 1];
-			DeleteAt(Count - 1);
+			Remove(Count - 1);
 			return Temp;
 		}
 
@@ -338,7 +338,7 @@ class ZEArray
 			return &Items[Index];
 		}
 
-		inline void DeleteAt(ZESize Index)
+		inline void Remove(ZESize Index)
 		{
 			zeDebugCheck(Index >= Count, "Index is out of range.");
 			ZEType* TempPointer = this->Items;
@@ -368,7 +368,7 @@ class ZEArray
 			ZEDebugCheckMemory();
 		}
 
-		inline void DeleteValue(ZEType Value)
+		inline void RemoveValue(ZEType Value)
 		{
 			ZESize N = 0, OldCount = Count;
 

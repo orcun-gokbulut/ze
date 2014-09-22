@@ -36,18 +36,24 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEGUID.h"
 
-struct ZEEnumParameter
+struct ZEEnumeratorItem
 {
 	const char*					Name;
 	ZEUInt32					Value;
 };
 
-struct ZEEnum
+struct ZEEnumerator
 {
-	const char*					Name;
-	ZEUInt32					Hash;
+	const char*					GetName();
+	ZEGUID						GetGUID();
 
-	ZEEnumParameter*			Parameters;
-	ZESize						ParameterCount;
+
+	const ZEEnumeratorItem*		GetItems();
+	ZESize						GetItemCount();
 };
+
+#define ZE_ENUM(Name) \
+	ZEEnumerator* Name##_Description();\
+	enum Name

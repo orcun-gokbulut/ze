@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaProcessorInternal.h
+ Zinek Engine - ZEMCRegisterer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,45 +34,22 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_META_PROCESSOR_INTERNAL_H__
-#define __ZE_META_PROCESSOR_INTERNAL_H__
+#ifndef __ZEMC_REGISTERER_H__
+#define __ZEMC_REGISTERER_H__
 
-#include "ZEMetaCompilerOptions.h"
-#include "ZEMetaData.h"
+#include "ZEMCOptions.h"
+#include "ZEMCContext.h"
 
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/Attr.h"
-
-using namespace clang;
-
-class ZEMetaCompilerParser
+class ZEMCRegisterer
 {
+	private:
+		ZEMCOptions* Options;
+
 	public:
-		static CompilerInstance*		Compiler;
-		static ZEMetaData*				MetaData;
-		static ZEMetaCompilerOptions	Options;
+		void SetOptions(ZEMCOptions* options);
 
-		static void						RaiseNote(SourceLocation& Location, const char* WarningText);
-		static void						RaiseWarning(SourceLocation& Location, const char* WarningText);
-		static void						RaiseError(SourceLocation& Location, const char* ErrorText);
-		static void						RaiseCriticalError(SourceLocation& Location, const char* ErrorText);
-	
-		static bool						CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class);
-		static bool						CheckClassHasZEObjectMacro(CXXRecordDecl* Class);
-		static bool						CheckClass(CXXRecordDecl* Class);
-
-		static bool						ParseAttribute(ZEAttributeData* Data, const AnnotateAttr* Attribute);
-
-		static void						ProcessEnumerator(EnumDecl* EnumDeclaration);
-		static void						ProcessClass(CXXRecordDecl* Class);
-		static void						ProcessClassAttributes(ZEClassData* ClassData, CXXRecordDecl* ClassDeclaration);
-		static void						ProcessProperty(ZEClassData* ClassData, VarDecl* StaticProperty);
-		static void						ProcessProperty(ZEClassData* ClassData, FieldDecl* NonStaticProperty);
-		static void						ProcessMethod(ZEClassData* ClassData, CXXMethodDecl* Method);
-		static void						ProcessDeclaration(Decl* BaseDeclaration);
-
-		static bool						Parse();
+		void RegisterFile(ZEMCContext* context);
+		void RegisterModule();
 };
 
 #endif

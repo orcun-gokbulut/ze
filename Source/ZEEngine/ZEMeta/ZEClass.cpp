@@ -99,7 +99,11 @@ bool ZEClass::SetProperty(ZEObject* Object, ZESize PropertyId, const ZEVariant& 
 
 bool ZEClass::SetProperty(ZEObject* Object, ZEString PropertyName, const ZEVariant& Value)
 {
-	return false;
+	ZESize PropertyId = GetPropertyId(PropertyName);
+	if (PropertyId == -1)
+		return false;
+
+	return SetProperty(Object, PropertyId, Value);
 }
 
 bool ZEClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)
@@ -109,17 +113,11 @@ bool ZEClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)
 
 bool ZEClass::GetProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value)
 {
-	return false;
-}
+	ZESize PropertyId = GetPropertyId(PropertyName);
+	if (PropertyId == -1)
+		return false;
 
-ZESize ZEClass::GetPropertyOffset(ZESize PropertyId)
-{
-	return 0;
-}
-
-ZESize ZEClass::GetPropertyOffset(ZEString PropertyName)
-{
-	return 0;
+	return GetProperty(Object, PropertyId, Value);
 }
 
 bool ZEClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)
@@ -129,7 +127,11 @@ bool ZEClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index,
 
 bool ZEClass::GetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)
 {
-	return false;
+	ZESize PropertyId = GetPropertyId(PropertyName);
+	if (PropertyId == -1)
+		return false;
+
+	return GetPropertyItem(Object, PropertyId, Index, Value);
 }
 
 bool ZEClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)
@@ -139,17 +141,35 @@ bool ZEClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index,
 
 bool ZEClass::SetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)
 {
-	return false;
+	ZESize PropertyId = GetPropertyId(PropertyName);
+	if (PropertyId == -1)
+		return false;
+
+	return SetPropertyItem(Object, PropertyId, Index, Value);
 }
 
 bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)
 {
-	return false;
+	ZESize Count;
+	bool Result = GetPropertyItemCount(Object, PropertyId, Count);
+	if (!Result)
+		return false;
+
+	return AddItemToProperty(Object, PropertyId, Count, Value);
 }
 
 bool ZEClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value)
 {
-	return false;
+	ZESize PropertyId = GetPropertyId(PropertyName);
+	if (PropertyId == -1)
+		return false;
+
+	ZESize Count;
+	bool Result = GetPropertyItemCount(Object, PropertyId, Count);
+	if (!Result)
+		return false;
+
+	return AddItemToProperty(Object, PropertyId, Count, Value);
 }
 
 bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)
@@ -159,7 +179,11 @@ bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Inde
 
 bool ZEClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)
 {
-	return false;
+	ZESize PropertyId = GetPropertyId(PropertyName);
+	if (PropertyId == -1)
+		return false;
+
+	return AddItemToProperty(Object, PropertyId, Index, Value);
 }
 
 bool ZEClass::RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize Index)
@@ -169,7 +193,11 @@ bool ZEClass::RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize
 
 bool ZEClass::RemoveItemFromProperty(ZEObject* Object, ZEString PropertyName, ZESize Index)
 {
-	return false;
+	ZESize PropertyId = GetPropertyId(PropertyName);
+	if (PropertyId == -1)
+		return false;
+
+	return RemoveItemFromProperty(Object, PropertyId, Index);
 }
 
 bool ZEClass::GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& Count)
@@ -179,7 +207,11 @@ bool ZEClass::GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& 
 
 bool ZEClass::GetPropertyItemCount(ZEObject* Object, ZEString PropertyName, ZESize& Count)
 {
-	return false;
+	ZESize PropertyId = GetPropertyId(PropertyName);
+	if (PropertyId == -1)
+		return false;
+
+	return GetPropertyItemCount(Object, PropertyId, Count);
 }
 
 bool ZEClass::AddEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler)
@@ -187,24 +219,27 @@ bool ZEClass::AddEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBa
 	return false;
 }
 
-bool ZEClass::AddEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler)
+bool ZEClass::AddEventHandler(ZEObject* Object, ZEString EventName, ZEEventHandlerBase* Handler)
+{
+	ZESize MethodId = GetPropertyId(EventName);
+	if (MethodId == -1)
+		return false;
+
+	return AddEventHandler(Object, MethodId, Handler);
+}
+
+bool ZEClass::RemoveEventHandler(ZEObject* Object, ZESize EventId, ZEEventHandlerBase* Handler)
 {
 	return false;
 }
 
-bool ZEClass::RemoveEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler)
+bool ZEClass::RemoveEventHandler(ZEObject* Object, ZEString EventName, ZEEventHandlerBase* Handler)
 {
-	return false;
-}
+	ZESize MethodId = GetPropertyId(EventName);
+	if (MethodId == -1)
+		return false;
 
-bool ZEClass::RemoveEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler)
-{
-	return false;
-}
-
-bool ZEClass::CallWrapperMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
-{
-	return false;
+	return RemoveEventHandler(Object, MethodId, Handler);
 }
 
 bool ZEClass::CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
@@ -214,7 +249,11 @@ bool ZEClass::CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnVal
 
 bool ZEClass::CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
 {
-	return false;
+	ZESize MethodId = GetPropertyId(MethodName);
+	if (MethodId == -1)
+		return false;
+
+	return CallMethod(Object, MethodId, ReturnValue, Parameters, ParameterCount);
 }
 
 ZESize ZEClass::GetPropertyId(ZEString PropertyName)
@@ -239,39 +278,16 @@ void* ZEClass::CreateScriptInstance()
 
 bool ZEClass::IsDerivedFrom(ZEClass* ParentClass, ZEClass* Class)
 {
-	ZEClass* CurrentClass = Class;
-	while(CurrentClass->GetParentClass() != NULL)
+	if (ParentClass == NULL)
+		return false;
+
+	while(Class != NULL)
 	{
-		if(ParentClass == CurrentClass->GetParentClass())
+		if(ParentClass == Class)
 			return true;
 
-		CurrentClass = CurrentClass->GetParentClass();
+		Class = Class->GetParentClass();
 	}
 
 	return false;
 }
-
-bool ZEClass::IsDerivedFrom(ZEClass* ParentClass, ZEObject* Object)
-{
-	ZEClass* CurrentClass = Object->GetClass();
-	while(CurrentClass->GetParentClass() != NULL)
-	{
-		if(ParentClass == CurrentClass->GetParentClass())
-			return true;
-
-		CurrentClass = CurrentClass->GetParentClass();
-	}
-
-	return false;
-}
-
-bool ZEClass::IsSame(ZEClass* ClassA, ZEClass* ClassB)
-{
-	return ClassA == ClassB ? true : false;
-}
-
-bool ZEClass::IsSame(ZEClass* Class, ZEObject* Object)
-{
-	return Class == Object->GetClass() ? true : false;
-}
-

@@ -48,8 +48,10 @@ class ZETerrainMaterial;
 class ZERenderer;
 class ZEVertexDeclaration;
 
-struct ZETerrainDataLevel
+class ZETerrainDataLevel : public ZEObject
 {
+	ZE_OBJECT
+
 	ZESize		ElevationWidth;
 	ZESize		ElevationHeight;
 	float*		ElevationData;
@@ -58,8 +60,10 @@ struct ZETerrainDataLevel
 	ZEUInt32*	ColorData;
 };
 
-struct ZETerrainLevel
+class ZETerrainLevel : public ZEObject
 {
+	ZE_OBJECT
+
 	ZETerrainMaterial*	Material;
 	ZETexture2D*		ElevationTexture;
 	ZETexture2D*		ColorTexture;
@@ -67,15 +71,13 @@ struct ZETerrainLevel
 	float				MaxHeight;
 };
 
-ZE_CLASS(ZETerrain)
-
 class ZETerrain : public ZEEntity
 {
 	friend class ZEInteriorDoor;
 
 	ZE_OBJECT
 
-	private:
+	public:
 		ZEStaticVertexBuffer*					VertexBuffer;
 		ZEVertexDeclaration*					VertexDeclaration;
 		ZETerrainPrimitiveIndices				Indices;
@@ -96,8 +98,10 @@ class ZETerrain : public ZEEntity
 		ZEString								TerrainFileName;
 
 		ZESSize									OldPositionX;
-		ZESSize									OldPositionY;
+		static ZESSize							OldPositionY;
 
+		static ZEArray<int>						Test;
+		ZEArray<int>						TestNonStatic;
 
 		bool									CreateVertexBuffer();
 		void									DestroyVertexBuffer();
@@ -113,7 +117,7 @@ class ZETerrain : public ZEEntity
 
 		virtual bool							InitializeSelf();
 		virtual bool							DeinitializeSelf();
-
+		private:
 												ZETerrain();
 												~ZETerrain();
 

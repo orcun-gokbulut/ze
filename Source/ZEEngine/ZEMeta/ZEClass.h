@@ -73,40 +73,35 @@ class ZEClass
 		virtual ZESize					GetPropertyId(ZEString PropertyName);
 		virtual ZESize					GetMethodId(ZEString MethodName, ZESize OverloadIndex = 0);
 
-		virtual ZESize					GetPropertyOffset(ZESize PropertyId);
-		virtual ZESize					GetPropertyOffset(ZEString PropertyName);
-
 		virtual bool					SetProperty(ZEObject* Object, ZESize PropertyId, const ZEVariant& Value);
-		virtual bool					SetProperty(ZEObject* Object, ZEString PropertyName, const ZEVariant& Value);
+		bool							SetProperty(ZEObject* Object, ZEString PropertyName, const ZEVariant& Value);
 
 		virtual bool					GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value);
-		virtual bool					GetProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value);
+		bool							GetProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value);
 
 		virtual bool					SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value);
-		virtual bool					SetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value);
+		bool							SetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value);
 
 		virtual bool					GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value);
-		virtual bool					GetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value);
+		bool							GetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value);
 
-		virtual bool					AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value);
-		virtual bool					AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value);
+		bool							AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value);
+		bool							AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value);
 
 		virtual bool					AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value);
-		virtual bool					AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value);
+		bool							AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value);
 
 		virtual bool					RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize Index);
-		virtual bool					RemoveItemFromProperty(ZEObject* Object, ZEString PropertyName, ZESize Index);
+		bool							RemoveItemFromProperty(ZEObject* Object, ZEString PropertyName, ZESize Index);
 
 		virtual bool					GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& Count);
-		virtual bool					GetPropertyItemCount(ZEObject* Object, ZEString PropertyName, ZESize& Count);
+		bool							GetPropertyItemCount(ZEObject* Object, ZEString PropertyName, ZESize& Count);
 
 		virtual bool					AddEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler);
-		virtual bool					AddEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler);
+		bool							AddEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler);
 
 		virtual bool					RemoveEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler);
-		virtual bool					RemoveEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler);
-
-		virtual bool					CallWrapperMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount);
+		bool							RemoveEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler);
 
 		virtual bool					CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount);
 		bool							CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue);
@@ -136,7 +131,7 @@ class ZEClass
 		bool							CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference& Parameters0, const ZEReference& Parameters1, const ZEReference& Parameters2, const ZEReference& Parameters3, const ZEReference& Parameters4, const ZEReference& Parameters5, const ZEReference& Parameters6, const ZEReference& Parameters7, const ZEReference& Parameters8, const ZEReference& Parameters9, const ZEReference& Parameters10, const ZEReference& Parameters11, const ZEReference& Parameters12, const ZEReference& Parameters13, const ZEReference& Parameters14, const ZEReference& Parameters15, const ZEReference& Parameters16, const ZEReference& Parameters17, const ZEReference& Parameters18, const ZEReference& Parameters19, const ZEReference& Parameters20, const ZEReference& Parameters21, const ZEReference& Parameters22, const ZEReference& Parameters23);
 		bool							CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference& Parameters0, const ZEReference& Parameters1, const ZEReference& Parameters2, const ZEReference& Parameters3, const ZEReference& Parameters4, const ZEReference& Parameters5, const ZEReference& Parameters6, const ZEReference& Parameters7, const ZEReference& Parameters8, const ZEReference& Parameters9, const ZEReference& Parameters10, const ZEReference& Parameters11, const ZEReference& Parameters12, const ZEReference& Parameters13, const ZEReference& Parameters14, const ZEReference& Parameters15, const ZEReference& Parameters16, const ZEReference& Parameters17, const ZEReference& Parameters18, const ZEReference& Parameters19, const ZEReference& Parameters20, const ZEReference& Parameters21, const ZEReference& Parameters22, const ZEReference& Parameters23, const ZEReference& Parameters24);
 
-		virtual bool					CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount);
+		bool							CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount);
 		bool							CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue);
 		bool							CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference& Parameters0);
 		bool							CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference& Parameters0, const ZEReference& Parameters1);
@@ -165,14 +160,21 @@ class ZEClass
 		bool							CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference& Parameters0, const ZEReference& Parameters1, const ZEReference& Parameters2, const ZEReference& Parameters3, const ZEReference& Parameters4, const ZEReference& Parameters5, const ZEReference& Parameters6, const ZEReference& Parameters7, const ZEReference& Parameters8, const ZEReference& Parameters9, const ZEReference& Parameters10, const ZEReference& Parameters11, const ZEReference& Parameters12, const ZEReference& Parameters13, const ZEReference& Parameters14, const ZEReference& Parameters15, const ZEReference& Parameters16, const ZEReference& Parameters17, const ZEReference& Parameters18, const ZEReference& Parameters19, const ZEReference& Parameters20, const ZEReference& Parameters21, const ZEReference& Parameters22, const ZEReference& Parameters23, const ZEReference& Parameters24);
 
 		virtual ZEObject*				CreateInstance();
-
 		virtual void*					CreateScriptInstance();
-		
-		static bool						IsDerivedFrom(ZEClass* ParentClass, ZEClass* Class);
-		static bool						IsDerivedFrom(ZEClass* ParentClass, ZEObject* Object);
 
-		static bool						IsSame(ZEClass* ClassA, ZEClass* ClassB);
-		static bool						IsSame(ZEClass* Class, ZEObject* Object);
+		static bool						IsDerivedFrom(ZEClass* Parent, ZEClass* Target);
+
+		template<typename ZECastedObjectType>
+		static ZECastedObjectType*		Cast(ZEObject* Object);
 };
+
+template<typename ZECastedObjectType>
+ZECastedObjectType* ZEClass::Cast(ZEObject* Object)
+{
+	if (ZEClass::IsDerivedFrom(ZECastedObjectType::Class(), Object->GetClass()))
+		return static_cast<ZECastedObjectType*>(Object);
+	
+	return NULL;
+}
 
 #endif

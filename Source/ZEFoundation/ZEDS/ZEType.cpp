@@ -47,16 +47,20 @@ bool ZEType::operator!=(const ZEType& Other) const
 
 bool ZEType::Equal(const ZEType& A, const ZEType& B)
 {
-	if (A.Type != B.Type || A.TypeQualifier != B.TypeQualifier)
-		return false;
-	else if (A.Type == ZE_TT_OBJECT && A.Class != B.Class)
-		return false;
-	else if (A.Type == ZE_TT_LIST || A.Type == ZE_TT_ARRAY)
+	if (A.Type != B.Type || 
+		A.TypeQualifier != B.TypeQualifier || 
+		A.ContainerType != B.ContainerType)
 	{
-		if (A.SubType != B.SubType || A.SubTypeQualifier != B.SubTypeQualifier)
-			return false;
-		if (A.SubType == ZE_TT_OBJECT && A.Class != B.Class)
-			return false;
+		return false;
+	}
+
+	if ((A.Type == ZE_TT_OBJECT || A.Type == ZE_TT_OBJECT_PTR) && A.Class != B.Class)
+	{
+		return false;
+	}
+	else if (A.Type == ZE_TT_ENUMERATOR && A.Enumerator != B.Enumerator)
+	{
+		return false;
 	}
 
 	return true;
@@ -66,25 +70,16 @@ ZEType::ZEType()
 {
 	Type = ZE_TT_UNDEFINED;
 	TypeQualifier = ZE_TQ_VALUE;
-	SubType = ZE_TT_UNDEFINED;
-	SubTypeQualifier = ZE_TQ_VALUE;
+	ContainerType = ZE_CT_NONE;
 	Class = 0;
+	Enumerator = 0;
 }
 
-ZEType::ZEType(ZETypeType Type, ZETypeQualifier TypeQualifier, ZETypeType SubType, ZETypeQualifier SubTypeQualifier, ZEClass* Class)
+ZEType::ZEType(ZETypeType Type, ZETypeQualifier TypeQualifier, ZEContainerType ContainerType, ZEClass* Class, ZEEnumerator* Enumerator)
 {
 	this->Type = Type;
 	this->TypeQualifier = TypeQualifier;
-	this->SubType = SubType;
-	this->SubTypeQualifier = SubTypeQualifier;
-	this->Class = Class;
-}
-
-ZEType::ZEType(ZETypeType Type, ZETypeQualifier TypeQualifier, ZEClass* Class)
-{
-	this->Type = Type;
-	this->TypeQualifier = TypeQualifier;
-	this->SubType = ZE_TT_UNDEFINED;
-	this->SubTypeQualifier = ZE_TQ_VALUE;
+	this->ContainerType = ContainerType;
+	this->Enumerator = Enumerator;
 	this->Class = Class;
 }

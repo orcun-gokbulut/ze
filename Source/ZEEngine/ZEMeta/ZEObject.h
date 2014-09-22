@@ -64,22 +64,6 @@
 	#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) class ClassName;
 #endif
 
-#define ZE_OBJECT \
-	public: \
-		virtual	ZEClass*			GetClass() const; \
-		static ZEClass*				Class(); \
-	private:
-		
-#define ZE_OBJECT_IMPL(ClassName) \
-	ZEClass* ClassName::GetClass() const \
-	{ \
-		return ClassName::Class(); \
-	} \
-	ZEClass* ClassName::Class() \
-	{ \
-		return ClassName##Class::Class(); \
-	}
-
 class ZEObject
 {
 	public:
@@ -87,7 +71,25 @@ class ZEObject
 		static ZEClass*				Class();
 };
 
-#define ZE_CLASS(ClassName) \
+#define ZE_OBJECT \
+	public: \
+		virtual	ZEClass*			GetClass() const; \
+		static ZEClass*				Class(); \
+	private:
+		
+#define ZE_OBJECT_IMPLEMENTATION(ClassName) \
+	ZEClass* ClassName::GetClass() const \
+	{ \
+		return ClassName::Class(); \
+	} \
+	\
+	ZEClass* ClassName::Class() \
+	{ \
+		static ClassName##Class Class;\
+		return &Class; \
+	}\
+
+#define ZE_CLASS_IMPLEMENTATION(ClassName) \
 	class ClassName##Class : public ZEClass \
 	{ \
 		public: \
@@ -107,32 +109,17 @@ class ZEObject
 			virtual ZESize					GetPropertyOffset(ZESize PropertyId); \
 			virtual ZESize					GetPropertyOffset(ZEString PropertyName); \
 			virtual bool					SetProperty(ZEObject* Object, ZESize PropertyId, const ZEVariant& Value); \
-			bool							SetProperty(ZEObject* Object, ZEString PropertyName, const ZEVariant& Value); \
 			virtual bool					GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value); \
-			bool							GetProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value); \
 			virtual bool					GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value); \
-			bool							GetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value); \
 			virtual bool					SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value); \
-			bool							SetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value); \
-			virtual bool					AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value); \
-			bool							AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value); \
 			virtual bool					AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value); \
-			bool							AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value); \
 			virtual bool					RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize Index); \
-			bool							RemoveItemFromProperty(ZEObject* Object, ZEString PropertyName, ZESize Index); \
 			virtual bool					GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& Count); \
-			bool							GetPropertyItemCount(ZEObject* Object, ZEString PropertyName, ZESize& Count); \
 			virtual bool					AddEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler); \
-			bool							AddEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler); \
 			virtual bool					RemoveEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler); \
-			bool							RemoveEventHandler(ZEObject* Target, ZEString EventName, ZEEventHandlerBase* Handler); \
-			virtual bool					CallWrapperMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount); \
 			virtual bool					CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount); \
-			virtual bool					CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount); \
 			virtual ZEObject*				CreateInstance(); \
 			virtual void*					CreateScriptInstance(); \
-			virtual ZEClass*				GetClass() const; \
-			static ZEClass*					Class(); \
 	};
 
 #endif

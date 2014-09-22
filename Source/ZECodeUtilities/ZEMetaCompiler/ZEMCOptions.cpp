@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaProcessor.h
+ Zinek Engine - ZEMCOptions.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,17 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_META_PROCESSOR_H__
-#define __ZE_META_PROCESSOR_H__
-
-#include "ZEMetaCompilerOptions.h"
-#include "ZEMetaData.h"
-
-class ZEMetaProcessor
-{
-	public:
-		static bool		Parse(ZEMetaData* Data, const ZEMetaCompilerOptions& Options);
-};
-
-#endif
+#include "ZEMCOptions.h"

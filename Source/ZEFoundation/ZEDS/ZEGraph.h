@@ -134,7 +134,7 @@ class ZEGraph
 			for (ZESize I = 0; I < Links.GetCount(); I++)
 				if (Links[I].Nodes[0] == NodeIndex || Links[I].Nodes[1] == NodeIndex)
 				{
-					Links.DeleteAt(I);
+					Links.Remove(I);
 					I--;
 				}
 		}
@@ -175,7 +175,7 @@ class ZEGraph
 
 		void RemoveLink(ZESize LinkIndex)
 		{
-			Links.DeleteAt(LinkIndex);
+			Links.Remove(LinkIndex);
 		}
 
 		void RemoveLink(ZESize NodeIndex1, ZESize NodeIndex2)
@@ -184,7 +184,7 @@ class ZEGraph
 				if ((Links[I].Nodes[0] == NodeIndex1 && Links[I].Nodes[1] == NodeIndex2) || 
 					(Links[I].Nodes[0] == NodeIndex2 && Links[I].Nodes[1] == NodeIndex1))
 				{
-					Links.DeleteAt(I);
+					Links.Remove(I);
 					break;
 				}
 		}
