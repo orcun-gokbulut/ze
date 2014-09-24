@@ -37,20 +37,10 @@
 
 ZESize ZEPrimitiveTypes::GetClassCount()
 {
-	return 7;
+	return 0;
 }
 
 ZEClass** ZEPrimitiveTypes::GetClasses()
 {
-	static ZEClass* PrimitiveTypeClasses[] =
-	{
-		ZEVector2Class::Class(),
-		ZEVector3Class::Class(),
-		ZEVector4Class::Class(),
-		ZEQuaternionClass::Class(),
-		ZEMatrix3x3Class::Class(),
-		ZEMatrix4x4Class::Class(),
-	};
-
-	return PrimitiveTypeClasses;
+	return NULL;
 }

@@ -39,6 +39,20 @@
 
 #include "ZETypes.h"
 
+#ifdef ZE_META_COMPILER
+	#define ZE_META_ATTRIBUTE_INTERNAL(Value) __attribute__((annotate(Value)))
+#else
+	#define ZE_META_ATTRIBUTE_INTERNAL(Value)
+#endif
+
+#define ZE_META_ATTRIBUTE_0(Name) ZE_META_ATTRIBUTE_INTERNAL(#Name)
+#define ZE_META_ATTRIBUTE_1(Name, Parameter0) ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0)
+#define ZE_META_ATTRIBUTE_2(Name, Parameter0, Parameter1) ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1)
+#define ZE_META_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2) ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2)
+#define ZE_META_ATTRIBUTE_4(Name, Parameter0, Parameter1, Parameter2, Parameter3) ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2 "," #Parameter3)
+#define ZE_META_ATTRIBUTE_5(Name, Parameter0, Parameter1, Parameter2, Parameter3, Parameter4) ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2 "," #Parameter3  "," #Parameter4)
+#define ZE_META_ATTRIBUTE_6(Name, Parameter0, Parameter1, Parameter2, Parameter3, Parameter4, Parameter5) ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2 "," #Parameter4  "," #Parameter5)
+
 struct ZEMetaAttribute
 {
 	const char*		Name;

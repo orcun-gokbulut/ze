@@ -37,30 +37,12 @@
 #ifndef __ZE_OBJECT_H__
 #define __ZE_OBJECT_H__
 
-#include "ZEMacro/ZEMacro.h"
 #include "ZEClass.h"
+#include "ZEMetaAttribute.h"
 
 #ifdef ZE_META_COMPILER
-	#define ZE_META_ATTRIBUTE_INTERNAL(Value) __attribute__((annotate(Value)))
-	#define ZE_META_ATTRIBUTE_0(Name)											ZE_META_ATTRIBUTE_INTERNAL(#Name)
-	#define ZE_META_ATTRIBUTE_1(Name, Parameter0)								ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0)
-	#define ZE_META_ATTRIBUTE_2(Name, Parameter0, Parameter1)					ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1)
-	#define ZE_META_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2)		ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2)
-	#define ZE_META_CLASS_ATTRIBUTE_0(Name)										class ZE_META_ATTRIBUTE_INTERNAL("ClassAttribute" "," #Name) {};
-	#define ZE_META_CLASS_ATTRIBUTE_1(Name, Parameter0)							class ZE_META_ATTRIBUTE_INTERNAL("ClassAttribute" "," #Name "," #Parameter0) {};
-	#define ZE_META_CLASS_ATTRIBUTE_2(Name, Parameter0, Parameter1)				class ZE_META_ATTRIBUTE_INTERNAL("ClassAttribute" "," #Name "," #Parameter0 "," #Parameter1) {};
-	#define ZE_META_CLASS_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2)	class ZE_META_ATTRIBUTE_INTERNAL("ClassAttribute" "," #Name "," #Parameter0 "," #Parameter1 "," #Parameter2) {};
-	#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) \
-	class ZE_META_ATTRIBUTE_2("ForwardDeclaration", #ClassName, IncludeFile) ClassName;
+	#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) class ZE_META_ATTRIBUTE_2("ForwardDeclaration", #ClassName, IncludeFile) ClassName;
 #else
-	#define ZE_META_ATTRIBUTE_0(Name)
-	#define ZE_META_ATTRIBUTE_1(Name, Parameter0)
-	#define ZE_META_ATTRIBUTE_2(Name, Parameter0, Parameter1)
-	#define ZE_META_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2)
-	#define ZE_META_CLASS_ATTRIBUTE_0(Name)
-	#define ZE_META_CLASS_ATTRIBUTE_1(Name, Parameter0)
-	#define ZE_META_CLASS_ATTRIBUTE_2(Name, Parameter0, Parameter1)
-	#define ZE_META_CLASS_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2)
 	#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) class ClassName;
 #endif
 
@@ -88,38 +70,5 @@ class ZEObject
 		static ClassName##Class Class;\
 		return &Class; \
 	}\
-
-#define ZE_CLASS_IMPLEMENTATION(ClassName) \
-	class ClassName##Class : public ZEClass \
-	{ \
-		public: \
-			virtual ZEClass*				GetParentClass(); \
-			virtual const char*				GetName(); \
-			virtual ZEGUID					GetGUID(); \
-			virtual ZESize					GetSizeOfClass(); \
-			virtual ZESize					GetSizeOfScriptBaseClass(); \
-			virtual const ZEMetaAttribute*	GetAttributes(); \
-			virtual ZESize					GetAttributeCount(); \
-			virtual const ZEProperty*		GetProperties(); \
-			virtual ZESize					GetPropertyCount(); \
-			virtual const ZEMethod*			GetMethods(); \
-			virtual ZESize					GetMethodCount(); \
-			virtual ZESize					GetPropertyId(ZEString PropertyName); \
-			virtual ZESize					GetMethodId(ZEString MethodName, ZESize OverloadIndex = 0); \
-			virtual ZESize					GetPropertyOffset(ZESize PropertyId); \
-			virtual ZESize					GetPropertyOffset(ZEString PropertyName); \
-			virtual bool					SetProperty(ZEObject* Object, ZESize PropertyId, const ZEVariant& Value); \
-			virtual bool					GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value); \
-			virtual bool					GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value); \
-			virtual bool					SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value); \
-			virtual bool					AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value); \
-			virtual bool					RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize Index); \
-			virtual bool					GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& Count); \
-			virtual bool					AddEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler); \
-			virtual bool					RemoveEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler); \
-			virtual bool					CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount); \
-			virtual ZEObject*				CreateInstance(); \
-			virtual void*					CreateScriptInstance(); \
-	};
 
 #endif

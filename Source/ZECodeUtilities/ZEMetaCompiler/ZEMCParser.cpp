@@ -88,23 +88,26 @@ void ZEMCParser::ProcessDeclaration(Decl* BaseDeclaration)
 
 void ZEMCParser::ProcessEnumerator(EnumDecl* EnumDeclaration)
 {
-	ZEMCEnumerator* EnumData = new ZEMCEnumerator();
-	EnumData->Name = EnumDeclaration->getNameAsString();
-
-	if(EnumData->Name == NULL || EnumData->Name == "")
+	ZEMCEnumerator* Enumerator = new ZEMCEnumerator();
+	Enumerator->Name = EnumDeclaration->getNameAsString();
+	if(Enumerator->Name.IsEmpty())
 		return;
 
-	EnumData->Hash = EnumData->Name.Hash();
+	ParseAttributes(Enumerator, EnumDeclaration);
+	if (!CheckAttribute(Enumerator, "Enumerator"))
+		return;
+
+	Enumerator->Hash = Enumerator->Name.Hash();
 
 	for(EnumDecl::enumerator_iterator Current = EnumDeclaration->enumerator_begin(), End = EnumDeclaration->enumerator_end(); Current != End; ++Current)
 	{
-		ZEMCEnumeratorItem* EnumuratorItem = new ZEMCEnumeratorItem();
-		EnumuratorItem->Name = Current->getNameAsString().c_str();
-		EnumuratorItem->Value = *Current->getInitVal().getRawData();
-		EnumData->Items.Add(EnumuratorItem);
+		ZEMCEnumeratorItem* EnumeratorItem = new ZEMCEnumeratorItem();
+		EnumeratorItem->Name = Current->getNameAsString().c_str();
+		EnumeratorItem->Value = *Current->getInitVal().getRawData();
+		Enumerator->Items.Add(EnumeratorItem);
 	}
 
-	Context->Enumurators.Add(EnumData);
+	Context->Enumurators.Add(Enumerator);
 }
 
 class ZEMetaCompilerASTConsumer : public clang::ASTConsumer

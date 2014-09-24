@@ -197,9 +197,7 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 		Output.BaseType = ZEMC_BT_ENUMERATOR;
 		Output.Enumurator = FindEnumurator(ClangType->getAs<EnumType>()->getDecl()->getNameAsString().c_str());
 		if (Output.Enumurator == NULL)
-		{
-			Output.BaseType = ZEMC_BT_INTEGER_32;
-		}
+			return false;
 
 	}
 	else

@@ -39,6 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEGUID.h"
+#include "ZEMetaAttribute.h"
 
 struct ZEEnumeratorItem
 {
@@ -59,6 +60,6 @@ class ZEEnumerator
 
 #define ZE_ENUM(Name) \
 	ZEEnumerator* Name##_Description();\
-	enum Name
+	ZE_META_ATTRIBUTE_0(Enumerator) enum Name
 
 #endif

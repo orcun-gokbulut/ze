@@ -87,7 +87,7 @@ class ZEUILabel : public ZEUIFrameControl
 		virtual void						Draw(ZEUIRenderer* Renderer);
 
 		void								SetFontResource(ZEFontResource* Resource);
-		const ZEFontResource*				GetFontResource() const;
+		ZEFontResource*						GetFontResource();
 
 		void								SetFontColor(const ZEVector4& Color);
 		const ZEVector4&					GetFontColor() const;

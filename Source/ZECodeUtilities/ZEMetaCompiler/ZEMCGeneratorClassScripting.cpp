@@ -36,17 +36,27 @@
 #include "ZEMCGenerator.h"
 #include "ZEMCContext.h"
 
-void ZEMCGenerator::GenerateScriptClass(ZEMCClass* currentClass)
+void ZEMCGenerator::GenerateScriptingObject(ZEMCClass* CurrentClass)
 {
 
 }
 
-void ZEMCGenerator::GenerateGetSizeOfScriptBaseClass(ZEMCClass* currentClass)
+void ZEMCGenerator::GenerateGetSizeOfScriptingClass(ZEMCClass* CurrentClass)
 {
-
+	WriteToFile(
+		"ZESize %sClass::GetSizeOfScriptBaseClass()\n"
+		"{\n"
+		"\treturn 0;\n"
+		"}\n\n", 
+		CurrentClass->Name.ToCString());
 }
 
-void ZEMCGenerator::GenerateCreateScriptInstance(ZEMCClass* currentClass)
+void ZEMCGenerator::GenerateCreateScriptingInstance(ZEMCClass* CurrentClass)
 {
-
+	WriteToFile(
+		"ZEObject* %sClass::CreateScriptingInstance()\n"
+		"{\n"
+		"\treturn NULL;\n"
+		"}\n\n", 
+		CurrentClass->Name.ToCString());
 }

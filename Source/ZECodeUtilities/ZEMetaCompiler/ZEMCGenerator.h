@@ -122,9 +122,9 @@ class ZEMCGenerator
 		void GenerateWrapperMethods(ZEMCClass* CurrentClass);
 
 		// Scripting
-		void GenerateScriptClass(ZEMCClass* CurrentClass);
-		void GenerateGetSizeOfScriptBaseClass(ZEMCClass* CurrentClass);
-		void GenerateCreateScriptInstance(ZEMCClass* CurrentClass);
+		void GenerateScriptingObject(ZEMCClass* CurrentClass);
+		void GenerateGetSizeOfScriptingClass(ZEMCClass* CurrentClass);
+		void GenerateCreateScriptingInstance(ZEMCClass* CurrentClass);
 
 
 
