@@ -41,9 +41,9 @@
 ///////////////////////////////////////////////////////////////
 
 #include "ZEVariant.h"
+#include "ZEReference.h"
 #include "ZEError.h"
 
-#include "ZEMeta/ZEReference.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEMatrix.h"

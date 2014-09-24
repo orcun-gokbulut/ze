@@ -36,7 +36,7 @@
 #include "ZEClass.h"
 #include "ZEObject.h"
 #include "ZEDS/ZEVariant.h"
-#include "ZEReference.h"
+#include "ZEDS/ZEReference.h"
 
 ZEClass* ZEClass::GetParentClass()
 {
@@ -58,7 +58,7 @@ ZESize ZEClass::GetSizeOfClass()
 	return 0;
 }
 
-ZESize ZEClass::GetSizeOfScriptBaseClass()
+ZESize ZEClass::GetSizeOfScriptingClass()
 {
 	return 0;
 }
@@ -271,7 +271,7 @@ ZEObject* ZEClass::CreateInstance()
 	return NULL;
 }
 
-void* ZEClass::CreateScriptInstance()
+ZEObject* ZEClass::CreateScriptingInstance()
 {
 	return NULL;
 }

@@ -320,12 +320,24 @@ void ZEMCGenerator::GenerateGetMethodId(ZEMCClass* CurrentClass)
 
 void ZEMCGenerator::GenerateAddEventHandler(ZEMCClass* CurrentClass)
 {
+	WriteToFile(
+		"bool %sClass::AddEventHandler(ZEObject* Object, ZESize MethodId, ZEEventHandlerBase* Handler)\n"
+		"{\n", 
+		CurrentClass->Name.ToCString());
 
+	WriteToFile("\treturn false;\n");
+	WriteToFile("}\n\n");
 }
 
 void ZEMCGenerator::GenerateRemoveEventHandler(ZEMCClass* CurrentClass)
 {
+	WriteToFile(
+		"bool %sClass::RemoveEventHandler(ZEObject* Object, ZESize MethodId, ZEEventHandlerBase* Handler)\n"
+		"{\n", 
+		CurrentClass->Name.ToCString());
 
+	WriteToFile("\treturn false;\n");
+	WriteToFile("}\n\n");
 }
 
 void ZEMCGenerator::GenerateCallMethod(ZEMCClass* CurrentClass)

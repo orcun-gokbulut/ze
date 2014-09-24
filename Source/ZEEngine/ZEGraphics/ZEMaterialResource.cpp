@@ -95,20 +95,6 @@ const ZEArray<ZETextureResource*>& ZEMaterialResource::GetTextureResources() con
 	return TextureResources;
 }
 
-const ZEArray<ZEAnimation>& ZEMaterialResource::GetAnimations() const
-{
-	return Animations;
-}
-
-const ZEAnimation* ZEMaterialResource::GetAnimationByName(const char* Name) const
-{
-	for (ZESize I = 0; I < Animations.GetCount(); I++)
-		if (strnicmp(Animations[I].Name, Name, ZE_MTLF_MAX_NAME_SIZE) == 0)
-			return &Animations[I];
-
-	return NULL;
-}
-
 bool ZEMaterialResource::LoadTextures(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile, const ZETextureOptions* UserOptions)
 {
 	for (ZESize I = 0; I < MaterialResource->TextureResources.GetCount(); I++)
@@ -185,19 +171,6 @@ bool ZEMaterialResource::LoadFixedMaterial(ZEMaterialResource* MaterialResource,
 	return true;
 }
 
-bool ZEMaterialResource::LoadAnimations(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile)
-{
-	for (ZESize I = 0; I < MaterialResource->Animations.GetCount(); I++)
-		if (!ZEAnimation::ReadFromFile(ResourceFile, &MaterialResource->Animations[I]))
-		{	
-			zeError("Can not read material animation. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
-			return false;
-		}
-
-	return true;
-}
-
-
 ZEMaterialResource* ZEMaterialResource::LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions)
 {
 	if(UserOptions == NULL)
@@ -231,18 +204,6 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(ZEFile* ResourceFile, const
 
 	// Load Material
 	MaterialResource->Material = ZEFixedMaterial::CreateInstance();
-	//ZEMETADEBUGCHECK!!!
-	//MaterialResource->Material->Unserialize(ResourceFile);
-
-	// Load Animations
-	MaterialResource->Animations.SetCount((ZESize)HeaderChunk.AnimationCount);
-	if (!LoadAnimations(MaterialResource, ResourceFile))
-	{
-		zeError("Corrupted material file. (FileName : \"%s\")", ResourceFile->GetPath().GetValue());
-		delete MaterialResource;
-		return NULL;
-	}
-
 	MaterialResource->SetFileName(ResourceFile->GetPath().GetValue());
 	MaterialResource->Cached = false;
 	MaterialResource->Shared = false;
