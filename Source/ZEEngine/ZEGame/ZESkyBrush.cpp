@@ -44,8 +44,6 @@
 
 #include <string.h>
 
-ZE_OBJECT_IMPL(ZESkyBrush)
-
 ZEDrawFlags ZESkyBrush::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;

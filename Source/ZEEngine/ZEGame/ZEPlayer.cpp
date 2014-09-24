@@ -63,8 +63,6 @@
 #define ACTIONID_UP					11
 #define ACTIONID_DOWN				12
 
-ZE_OBJECT_IMPL(ZEPlayer)
-
 ZESteeringPlayerFree::~ZESteeringPlayerFree()
 {
 

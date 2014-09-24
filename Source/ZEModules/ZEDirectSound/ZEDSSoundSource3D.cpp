@@ -246,7 +246,7 @@ ZEDSSoundSource3D::ZEDSSoundSource3D()
 
 ZEDSSoundSource3D::~ZEDSSoundSource3D()
 {
-	GetModule()->SoundSources3D.DeleteValue(this);
+	GetModule()->SoundSources3D.RemoveValue(this);
 	if (DSBuffer != NULL)
 		DSBuffer->Release();
 	if (DS3DBuffer != NULL)

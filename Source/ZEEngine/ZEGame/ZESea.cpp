@@ -45,8 +45,6 @@
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGraphics/ZETexture2D.h"
 
-ZE_OBJECT_IMPL(ZESea)
-
 ZESea::ZESea()
 {
 	Material = ZESeaMaterial::CreateInstance();

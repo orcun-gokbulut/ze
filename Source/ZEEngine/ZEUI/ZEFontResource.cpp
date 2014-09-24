@@ -34,5 +34,3 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEFontResource.h"
-
-ZE_OBJECT_IMPL(ZEFontResource)

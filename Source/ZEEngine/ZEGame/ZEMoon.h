@@ -44,8 +44,6 @@
 ZE_META_FORWARD_DECLARE(ZEMoonMaterial, "ZEGraphics/ZEMoonMaterial.h")
 ZE_META_FORWARD_DECLARE(ZETexture3DResource, "ZETexture/ZETexture3DResource.h")
 
-ZE_CLASS(ZEMoon)
-
 class ZEMoon : public ZEEntity
 {
 	ZE_OBJECT

@@ -48,8 +48,6 @@
 #include <d3d9.h>
 #include <stdlib.h>
 
-ZE_OBJECT_IMPL(ZED3D9DOFProcessor)
-
 void ZED3D9DOFProcessor::CreateRenderTargets()
 {
 	ZEUInt OutputWidth = Renderer->GetViewPort()->GetWidth();

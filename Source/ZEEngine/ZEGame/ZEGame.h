@@ -54,8 +54,6 @@ class ZEGame;
 
 ZE_META_FORWARD_DECLARE(ZEUIManager, "ZEUI/ZEUIManager.h")
 
-ZE_CLASS(ZEGame)
-
 class ZEGame : public ZEObject
 {
 	ZE_OBJECT

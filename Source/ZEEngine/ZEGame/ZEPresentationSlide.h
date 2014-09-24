@@ -45,8 +45,6 @@ class ZERenderer;
 class ZEFixedMaterial;
 class ZETexture2DResource;
 
-ZE_CLASS(ZEPresentationSlide)
-
 class ZEPresentationSlide : public ZEEntity
 {
 	ZE_OBJECT

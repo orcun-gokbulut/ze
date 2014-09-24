@@ -37,8 +37,6 @@
 #include "ZESoundSource3D.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_OBJECT_IMPL(ZESoundSource3D)
-
 ZESoundSource3D::ZESoundSource3D()
 {
 	MinDistance = 0.0f;

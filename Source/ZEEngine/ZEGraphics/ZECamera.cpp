@@ -42,8 +42,6 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
 
-ZE_OBJECT_IMPL(ZECamera)
-
 #define ZE_CDF_NONE								0
 #define ZE_CDF_VIEW								1
 #define ZE_CDF_VIEW_FRUSTUM						2

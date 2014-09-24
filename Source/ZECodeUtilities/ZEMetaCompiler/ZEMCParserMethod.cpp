@@ -125,25 +125,43 @@ bool ZEMCParser::ProcessMethodParameters(ZEMCMethod* Method, CXXMethodDecl* Meth
 
 		Method->Parameters.Add(MethodParameter);
 	}
+
+	return true;
 }
 
 void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 {
-	if(MethodDecl->getAccess() != AccessSpecifier::AS_public)
-		return;
-
-	if(!MethodDecl->getType()->isFunctionType())
-		return;
-
-	if(isa<CXXDestructorDecl>(MethodDecl))
-		return;
-
-	ZEMCType ReturnType;
-	if (!ProcessType(ReturnType, MethodDecl->getCallResultType()))
+	//zeBreak(ClassData->Name == "ZETerrain");
+	if (!MethodDecl->getType()->isFunctionType())
 		return;
 
 	// C++11 Not Supported
 	if (MethodDecl->isMoveAssignmentOperator())
+		return;
+
+	if (MethodDecl->getAccess() != AccessSpecifier::AS_public)
+	{
+		if (isa<CXXDestructorDecl>(MethodDecl))
+			ClassData->HasPublicDestructor = false;
+
+		if (isa<CXXConstructorDecl>(MethodDecl))
+		{
+			CXXConstructorDecl* ConstructorDecl = cast<CXXConstructorDecl>(MethodDecl);
+			if (ConstructorDecl->isCopyConstructor())
+				ClassData->HasPublicCopyConstructor = false;
+		}
+
+		if (isa<CXXConstructorDecl>(MethodDecl))
+		{
+			if (MethodDecl->param_size() == 0)
+				ClassData->HasPublicDefaultConstructor = false;
+		}
+
+		return;
+	}
+
+	ZEMCType ReturnType;
+	if (!ProcessType(ReturnType, MethodDecl->getCallResultType()))
 		return;
 		
 	ZEMCMethod* Method = new ZEMCMethod();
@@ -157,30 +175,28 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 	Method->Hash = Method->Name.Hash();
 	Method->ReturnValue = ReturnType;
 
-
 	if (MethodDecl->isCopyAssignmentOperator())
 	{
 		Method->IsOperator = true;
 		Method->OperatorType = ZEMC_MOT_ASSIGNMENT;
+		
+		if (Method->ReturnValue.TypeQualifier == ZEMC_TQ_VALUE)
+			Method->ReturnValue.TypeQualifier = ZEMC_TQ_REFERENCE;
+		else if (Method->ReturnValue.TypeQualifier == ZEMC_TQ_CONST_VALUE)
+			Method->ReturnValue.TypeQualifier = ZEMC_TQ_CONST_REFERENCE;
 	}
 
-	if(MethodDecl->getNameAsString() == "CreateInstance")
+	if (isa<CXXConstructorDecl>(MethodDecl))
+	{
+		if (MethodDecl->param_size() == 0)
+			ClassData->HasPublicDefaultConstructor = true;
+
+		Method->IsConstructor = true;
+	}
+
+	if(MethodDecl->getNameAsString() == "CreateInstance" && MethodDecl->param_size() == 0)
 		ClassData->HasCreateInstanceMethod = true;
 
-	if(isa<CXXConstructorDecl>(MethodDecl))
-	{
-		CXXConstructorDecl* constructor = cast<CXXConstructorDecl>(MethodDecl);
-		if (constructor->isCopyOrMoveConstructor())
-			return;
-
-		else if (constructor->isDefaultConstructor())
-		{
-			ClassData->HasPublicConstructor = true;
-			if (MethodDecl->isImplicit())
-				return;
-		}
-	}
-	
 	if (Method->IsOperator)
 		Method->OperatorType = GetOperatorType(MethodDecl->getOverloadedOperator());
 

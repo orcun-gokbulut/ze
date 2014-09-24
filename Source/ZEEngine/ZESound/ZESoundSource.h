@@ -74,8 +74,6 @@ enum  ZESoundSourceState
 
 class ZESoundSourceEffect;
 
-ZE_CLASS(ZESoundSource)
-
 class ZESoundSource : public ZEEntity
 {
 	ZE_OBJECT

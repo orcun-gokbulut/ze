@@ -39,8 +39,6 @@
 
 #include "ZEParticleOperator.h"
 
-ZE_CLASS(ZEParticleGrow2DOperator)
-
 class ZEParticleGrow2DOperator : public ZEParticleOperator
 {
 	ZE_OBJECT

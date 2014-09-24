@@ -62,8 +62,6 @@ class ZEInteriorHelper;
 struct ZEDrawParameters;
 struct ZEInteriorCullStatistics;
 
-ZE_CLASS(ZEInterior)
-
 class ZEInterior : public ZEEntity
 {
 	friend class ZEInteriorDoor;

@@ -46,8 +46,6 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_OBJECT_IMPL(ZEWeather)
-
 void ZEWeather::AdjustHDR(float DayTime)
 {
 

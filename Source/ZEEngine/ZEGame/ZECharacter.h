@@ -87,8 +87,6 @@ enum ZECharacterRecordingStatus
 
 class ZEProjectiveLight;
 
-ZE_CLASS(ZEGameCharacter)
-
 class ZEGameCharacter : public ZEEntity
 {
 	ZE_OBJECT

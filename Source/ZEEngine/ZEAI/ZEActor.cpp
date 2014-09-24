@@ -41,8 +41,6 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMath.h"
 
-ZE_OBJECT_IMPL(ZEActor)
-
 void ZEActor::SetLinearVelocity(const ZEVector3& Velocity)
 {
 	LinearVelocity = Velocity;
@@ -156,7 +154,7 @@ void ZEActor::AddSteering(ZESteering* Steering)
 
 void ZEActor::RemoveSteering(ZESteering* Steering)
 {
-	Steerings.DeleteValue(Steering);
+	Steerings.RemoveValue(Steering);
 }
 
 void ZEActor::Tick(float ElapsedTime)

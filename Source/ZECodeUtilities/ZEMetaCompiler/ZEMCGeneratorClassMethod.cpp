@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMCGeneratorClassMethods.cpp
+ Zinek Engine - ZEMCGeneratorClassMethod.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -56,18 +56,18 @@ void ZEMCGenerator::GenerateMethodIdRangeCheck(ZEMCClass* CurrentClass)
 		CurrentClass->Methods.GetCount());
 }
 
-ZEString ZEMCGenerator::GenerateMethodParameterSignature(ZEMCMethod* Method, bool GenerateNames)
+ZEString ZEMCGenerator::GenerateMethodParameterSignature(ZEMCMethod* CurrentMethod, bool GenerateNames)
 {
 	ZEString Output;
-	for (int I = 0; I < Method->Parameters.GetCount(); I++)
+	for (int I = 0; I < CurrentMethod->Parameters.GetCount(); I++)
 	{
-		ZEMCMethodParameter* CurrentParameter = Method->Parameters[I];
+		ZEMCMethodParameter* CurrentParameter = CurrentMethod->Parameters[I];
 
 		Output.Append(GenerateTypeSignature(CurrentParameter->Type));
 		if (GenerateNames)
 			Output.Append(ZEFormat::Format(" Arg{0}", I));
 
-		if (I + 1 != Method->Parameters.GetCount())
+		if (I + 1 < CurrentMethod->Parameters.GetCount())
 			Output.Append(", ");
 	}
 
@@ -161,10 +161,11 @@ void ZEMCGenerator::GenerateGetMethods_Parameters(ZEMCClass* CurrentClass)
 
 ZEString ZEMCGenerator::GenerateMethodPointerCast(ZEMCMethod* CurrentMethod, ZEMCClass* CurrentClass)
 {
-	return ZEFormat::Format("({0} (*)({1}{2}{3}))",
+	return ZEFormat::Format("({0} (*)({1}{2}{3}{4}))",
 		CurrentMethod->ReturnValue.BaseType == ZEMC_BT_VOID ? "void" : GenerateTypeSignature(CurrentMethod->ReturnValue),
 		CurrentClass != NULL ? CurrentClass->Name : "",
-		CurrentClass != NULL ? "*, " : "",
+		CurrentClass != NULL ? "*" : "",
+		CurrentMethod->Parameters.GetCount() != 0 ? ", " : "",
 		GenerateMethodParameterSignature(CurrentMethod, false));
 }
 

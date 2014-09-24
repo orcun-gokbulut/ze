@@ -35,8 +35,6 @@
 
 #include "ZEParticleOperator.h"
 
-ZE_OBJECT_IMPL(ZEParticleOperator)
-
 const ZEParticleSystem*	ZEParticleOperator::GetOwner() const
 {
 	return Owner;

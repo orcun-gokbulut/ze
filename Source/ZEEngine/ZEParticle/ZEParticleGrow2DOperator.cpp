@@ -35,8 +35,6 @@
 
 #include "ZEParticleGrow2DOperator.h"
 
-ZE_OBJECT_IMPL(ZEParticleGrow2DOperator)
-
 void ZEParticleGrow2DOperator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool)
 {
 	for (ZESize I = 0; I < OwnerParticlePool.GetCount(); I++)

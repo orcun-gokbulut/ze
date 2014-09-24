@@ -45,8 +45,6 @@ struct ZEParticlePhysicalProperties
 	ZEVector3 Acceleration;
 };
 
-ZE_CLASS(ZEParticlePhysicsOperator)
-
 class ZEParticlePhysicsOperator : public ZEParticleOperator
 {
 	ZE_OBJECT

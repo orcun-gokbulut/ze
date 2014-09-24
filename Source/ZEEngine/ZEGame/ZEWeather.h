@@ -47,8 +47,6 @@ ZE_META_FORWARD_DECLARE(ZESkyDome, "ZESkyDome.h")
 ZE_META_FORWARD_DECLARE(ZECloud, "ZECloud.h")
 ZE_META_FORWARD_DECLARE(ZEMoon, "ZEMoon.h")
 
-ZE_CLASS(ZEWeather)
-
 class ZEWeather : public ZEEntity
 {
 	ZE_OBJECT

@@ -43,8 +43,6 @@
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9HDRProcessor.h"
 
-ZE_OBJECT_IMPL(ZED3D9HDRProcessor)
-
 #define GAUSSIAN_FILTER_WIDTH		21	//9 13 17 21 25 etc
 
 #define COLOR_RED	D3DCOLORWRITEENABLE_RED

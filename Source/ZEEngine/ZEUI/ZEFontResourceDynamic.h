@@ -47,8 +47,6 @@
 
 struct ZEFreeType;
 
-ZE_CLASS(ZEFontResourceDynamic)
-
 class ZEFontResourceDynamic : public ZEFontResource
 {
 	ZE_OBJECT

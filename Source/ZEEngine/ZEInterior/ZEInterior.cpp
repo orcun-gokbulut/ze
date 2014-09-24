@@ -48,8 +48,6 @@
 #include "ZEPhysics/ZEPhysicalMesh.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_OBJECT_IMPL(ZEInterior)
-
 ZEDrawFlags ZEInterior::GetDrawFlags() const
 {
 	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;

@@ -61,8 +61,6 @@ class ZEPhysicalJoint;
 
 struct ZEDrawParameters;
 
-ZE_CLASS(ZEModel)
-
 class ZEModel : public ZEEntity
 {	
 	friend class ZEPhysicalEnvironment;

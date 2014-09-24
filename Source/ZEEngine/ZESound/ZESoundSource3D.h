@@ -42,8 +42,6 @@
 
 #include "ZEMeta/ZEObject.h"
 
-ZE_CLASS(ZESoundSource3D)
-
 class ZESoundSource3D : public ZESoundSource
 {
 	ZE_OBJECT

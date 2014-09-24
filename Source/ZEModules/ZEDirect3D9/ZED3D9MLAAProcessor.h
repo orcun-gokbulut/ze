@@ -54,8 +54,6 @@ struct ZEMLAAScreenAlignedQuad
 	float Position[3];
 };
 
-ZE_CLASS(ZED3D9MLAAProcessor)
-
 class ZED3D9MLAAProcessor : public ZED3D9ComponentBase, public ZEObject
 {
 	ZE_OBJECT

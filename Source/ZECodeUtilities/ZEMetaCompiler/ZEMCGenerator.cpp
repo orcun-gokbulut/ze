@@ -107,7 +107,7 @@ void ZEMCGenerator::GenerateHeading()
 {
 	WriteToFile("#include \"%s\"\n", ZEFileInfo::GetFileName(Options->InputFileName).ToCString());
 	WriteToFile("#include \"ZEDS/ZEVariant.h\"\n");
-	WriteToFile("#include \"ZEMeta/ZEReference.h\"\n");
+	WriteToFile("#include \"ZEDS/ZEReference.h\"\n");
 	WriteToFile("#include \"ZEScript/ZEScriptEngine.h\"\n");
 	WriteToFile("#include <stddef.h>\n");
 }
@@ -414,7 +414,7 @@ ZEString ZEMCGenerator::ConvertBaseTypeToName(const ZEMCType& Type)
 			return "signed long long";
 
 		case ZEMC_BT_UNSIGNED_INTEGER_64:
-			return "unsigned long logn";
+			return "unsigned long long";
 
 		case ZEMC_BT_FLOAT:
 			return "float";
@@ -456,7 +456,7 @@ ZEString ZEMCGenerator::ConvertBaseTypeToName(const ZEMCType& Type)
 			return Type.Class->Name.ToCString();
 
 		case ZEMC_BT_OBJECT_PTR:
-			return ZEFormat::Format("*{0}", Type.Class->Name);
+			return ZEFormat::Format("{0}*", Type.Class->Name);
 	}
 }
 ZEString ZEMCGenerator::GenerateVariantPostfix(const ZEMCType& Type, ZEString& CastOutput)
@@ -578,7 +578,7 @@ ZEString ZEMCGenerator::GenerateVariantPostfix(const ZEMCType& Type, ZEString& C
 
 			case ZEMC_BT_OBJECT_PTR:
 				Output.Append("ObjectPtr");
-				CastOutput = ZEFormat::Format("({0])", Type.Class->Name);
+				CastOutput = ZEFormat::Format("({0})", Type.Class->Name);
 				break;
 
 			case ZEMC_BT_CLASS:

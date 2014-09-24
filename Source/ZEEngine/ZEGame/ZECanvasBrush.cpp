@@ -42,8 +42,6 @@
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEMaterial.h"
 
-ZE_OBJECT_IMPL(ZECanvasBrush)
-
 ZEDrawFlags ZECanvasBrush::GetDrawFlags() const
 {
 	return ZE_DF_DRAW | ZE_DF_CULL;

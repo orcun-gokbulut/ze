@@ -39,8 +39,6 @@
 
 #include "ZEParticleGenerator.h"
 
-ZE_CLASS(ZEParticleTorusGenerator)
-
 class ZEParticleTorusGenerator : public ZEParticleGenerator
 {
 	ZE_OBJECT

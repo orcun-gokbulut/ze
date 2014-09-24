@@ -49,8 +49,6 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEMath.h"
 
-ZE_OBJECT_IMPL(ZEDirectionalLight)
-
 void ZEDirectionalLight::CreateRenderTargets()
 {
 	ZEUInt Dimension = ((ZEShadowRenderer*)zeScene->GetShadowRenderer())->GetShadowResolution();

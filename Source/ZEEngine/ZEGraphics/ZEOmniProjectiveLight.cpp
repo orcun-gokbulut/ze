@@ -40,8 +40,6 @@
 #include "ZETexture2D.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_OBJECT_IMPL(ZEOmniProjectiveLight)
-
 ZELightType ZEOmniProjectiveLight::GetLightType()
 {
 	return ZE_LT_OMNIPROJECTIVE;

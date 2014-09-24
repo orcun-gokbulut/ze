@@ -35,5 +35,3 @@
 
 #include "ZETextureResource.h"
 #include "ZEMeta/ZEObject.h"
-
-ZE_OBJECT_IMPL(ZETextureResource)

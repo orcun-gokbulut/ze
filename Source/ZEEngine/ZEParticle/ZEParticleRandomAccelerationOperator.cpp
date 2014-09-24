@@ -37,8 +37,6 @@
 #include "ZEParticleSystem.h"
 #include "ZEParticlePhysicsOperator.h"
 
-ZE_OBJECT_IMPL(ZEParticleRandomAccelerationOperator)
-
 void ZEParticleRandomAccelerationOperator::SetMaxStrength(ZEVector3 NewStrength)
 {
 	MaxStrength = NewStrength;

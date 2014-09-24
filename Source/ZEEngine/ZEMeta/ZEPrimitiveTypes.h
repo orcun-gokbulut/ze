@@ -34,16 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+#ifndef __ZE_PRIMITIVE_TYPES_H__
+#define __ZE_PRIMITIVE_TYPES_H__
 
 #include "ZETypes.h"
 #include "ZEObject.h"
-
-ZE_CLASS(ZEVector2)
-ZE_CLASS(ZEVector3)
-ZE_CLASS(ZEVector4)
-ZE_CLASS(ZEQuaternion)
-ZE_CLASS(ZEMatrix3x3)
-ZE_CLASS(ZEMatrix4x4)
 
 class ZEPrimitiveTypes
 {
@@ -51,3 +46,5 @@ class ZEPrimitiveTypes
 		static ZESize		GetClassCount();
 		static ZEClass**	GetClasses();
 };
+
+#endif

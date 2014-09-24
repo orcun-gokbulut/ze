@@ -55,8 +55,6 @@ ZE_META_FORWARD_DECLARE(ZEModelBone,"ZEModelBone.h")
 #include "ZEModelMesh.h"
 #include "ZEModelBone.h"
 
-ZE_CLASS(ZEModelHelper)
-
 class ZEModelHelper : public ZEObject
 {
 	ZE_OBJECT

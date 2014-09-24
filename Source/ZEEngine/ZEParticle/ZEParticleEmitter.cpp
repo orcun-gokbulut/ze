@@ -45,8 +45,6 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEScene.h"
 
-ZE_OBJECT_IMPL(ZEParticleEmitter)
-
 void ZEParticleEmitter::Tick(float TimeElapsed)
 {
 	AliveParticleCount = 0;
@@ -363,7 +361,7 @@ void ZEParticleEmitter::AddModifier(ZEParticleModifier* Modifier)
 void ZEParticleEmitter::RemoveModifier(ZEParticleModifier* Modifier)
 {
 	if (Modifiers.Exists(Modifier))
-		Modifiers.DeleteValue(Modifier);
+		Modifiers.RemoveValue(Modifier);
 }
 
 void ZEParticleEmitter::SetSphereRadius(float SphereRadius)

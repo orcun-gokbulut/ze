@@ -43,8 +43,6 @@
 
 #include "ZEMeta\ZEObject.h"
 
-ZE_CLASS(ZEParticleOperator)
-
 class ZEParticleOperator : public ZEObject
 {
 	friend class ZEParticleSystem;

@@ -44,8 +44,6 @@
 
 ZE_META_FORWARD_DECLARE(ZESkyDomeMaterial, "ZEGraphics/ZESkyDomeMaterial.h")
 
-ZE_CLASS(ZESkyDome)
-
 class ZESkyDome : public ZEEntity
 {
 	ZE_OBJECT

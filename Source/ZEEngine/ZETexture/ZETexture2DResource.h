@@ -41,8 +41,6 @@
 
 ZE_META_FORWARD_DECLARE(ZETexture2D, "ZEGraphics/ZETexture2D.h")
 
-ZE_CLASS(ZETexture2DResource)
-
 class ZETexture2DResource : public ZETextureResource
 {
 	ZE_OBJECT

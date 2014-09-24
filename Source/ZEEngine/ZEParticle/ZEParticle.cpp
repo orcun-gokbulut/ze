@@ -34,5 +34,3 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEParticle.h"
-
-ZE_OBJECT_IMPL(ZEParticle)

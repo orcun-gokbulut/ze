@@ -66,8 +66,6 @@ enum ZEHDRToneMapOperator
 	ZE_HDR_TMO_FILMIC			= 4
 };
 
-ZE_CLASS(ZED3D9HDRProcessor)
-
 class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 {
 	ZE_OBJECT

@@ -37,8 +37,6 @@
 #include "ZEParticlePhysicsOperator.h"
 #include "ZEParticleSystem.h"
 
-ZE_OBJECT_IMPL(ZEParticleDisplacementOperator)
-
 void ZEParticleDisplacementOperator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool)
 {
 	ZEParticlePhysicsOperator* PhysicsOperator = NULL;

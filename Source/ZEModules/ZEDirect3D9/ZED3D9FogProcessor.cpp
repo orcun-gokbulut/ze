@@ -47,8 +47,6 @@
 #include <d3d9.h>
 #include "ZEGame/ZEScene.h"
 
-ZE_OBJECT_IMPL(ZED3D9FogProcessor)
-
 void ZED3D9FogProcessor::SetFogModel(ZED3D9FogModel Model)
 {
 	FogModel = Model;

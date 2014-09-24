@@ -42,8 +42,6 @@
 #include "ZESoundResourceWAV.h"
 #include "ZEFile/ZEPathUtils.h"
 
-ZE_OBJECT_IMPL(ZESoundResource)
-
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;

@@ -244,9 +244,10 @@ struct ZEMCMethod : public ZEMCDeclaration
 		bool IsPure;
 		bool IsStatic;
 		bool IsEvent;
-		bool IsConst;	
-
+		bool IsConst;
+		bool IsConstructor;
 		bool IsOperator;
+
 		ZEMCMetaOperatorType OperatorType;
 
 		ZEMCType ReturnValue;
@@ -266,14 +267,16 @@ class ZEMCClass : public ZEMCDeclaration
 		// Old
 		bool IsForwardDeclared;
 		bool HasScriptBase;
-		bool HasPublicConstructor;
-		bool HasPublicCopyConstructor;
+
 		bool IsAbstract;
 		bool IsBuiltInClass;
 
 		// Instancing
 		bool HasCreateInstanceMethod;
-		bool HasDefaultPublicConstructor;
+
+		bool HasPublicCopyConstructor;
+		bool HasPublicDefaultConstructor;
+		bool HasPublicDestructor;
 
 		ZEMCClass();
 		virtual ~ZEMCClass();

@@ -39,8 +39,6 @@
 
 #include "ZEParticleGenerator.h"
 
-ZE_CLASS(ZEParticleBoxGenerator)
-
 class ZEParticleBoxGenerator : public ZEParticleGenerator
 {
 	ZE_OBJECT

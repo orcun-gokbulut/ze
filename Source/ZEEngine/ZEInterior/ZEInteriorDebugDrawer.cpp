@@ -59,7 +59,7 @@ void ZEInteriorDebugDrawer::SetTarget(ZEEntity* Target)
 	if (Target == NULL)
 		return;
 
-	if (ZEClass::IsDerivedFrom(ZEInterior::Class(), Target->GetClass()) || ZEClass::IsSame(ZEInterior::Class(), Target->GetClass()))
+	if (ZEClass::IsDerivedFrom(ZEInterior::Class(), Target->GetClass()))
 	{
 		if (RoomColor == ZEVector4::Zero)
 			SetRoomColor(ZEVector4(0.7f, 0.5f, 0.0f, 1.0f));

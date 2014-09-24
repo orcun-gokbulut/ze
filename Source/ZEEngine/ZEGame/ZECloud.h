@@ -47,8 +47,6 @@ ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
 ZE_META_FORWARD_DECLARE(ZECloudMaterial, "ZEGraphics/ZECloudMaterial.h")
 ZE_META_FORWARD_DECLARE(ZECamera, "ZEGraphics/ZECamera.h")
 
-ZE_CLASS(ZECloud)
-
 class ZECloud : public ZEEntity
 {
 	ZE_OBJECT

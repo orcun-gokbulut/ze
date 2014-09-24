@@ -51,8 +51,6 @@
 #include <string.h>
 #include "ZEFile/ZEPathUtils.h"
 
-ZE_OBJECT_IMPL(ZETexture2DResource)
-
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;

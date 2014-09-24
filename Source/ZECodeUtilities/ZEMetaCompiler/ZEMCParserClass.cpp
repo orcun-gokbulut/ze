@@ -204,14 +204,20 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	if(!IsBuiltInClassFound && !CheckClass(Class))
 		return;
 	
-	ZEMCClass* ClassData = new ZEMCClass();
+	// If
+	ZEMCClass* ClassData = FindClass(Class->getNameAsString().c_str());
+	if (ClassData == NULL)
+		ClassData = new ZEMCClass();
+
 	ClassData->Name = Class->getNameAsString();
 	ClassData->Hash = ClassData->Name.Hash();
 	ClassData->HasCreateInstanceMethod = false;
-	ClassData->HasPublicCopyConstructor = false;
-	ClassData->HasPublicConstructor = false;
+	ClassData->HasPublicCopyConstructor = true;
+	ClassData->HasPublicDefaultConstructor = true;
+	ClassData->HasPublicDestructor = true;
 	ClassData->IsAbstract = Class->isAbstract();
 	ClassData->IsBuiltInClass = IsBuiltInClassFound;
+	ClassData->IsForwardDeclared = false;
 	Context->Declarations.Add(ClassData);
 
 	for(CXXRecordDecl::base_class_iterator CurrentBaseClass = Class->bases_begin(), LastBaseClass = Class->bases_end(); CurrentBaseClass != LastBaseClass; ++CurrentBaseClass)

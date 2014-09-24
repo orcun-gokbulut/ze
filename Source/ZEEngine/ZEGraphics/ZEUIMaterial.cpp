@@ -37,8 +37,6 @@
 #include "ZEUIMaterial.h"
 #include "ZETexture2D.h"
 
-ZE_OBJECT_IMPL(ZEUIMaterial)
-
 ZEUIMaterial::ZEUIMaterial()
 {
 	Texture = NULL;

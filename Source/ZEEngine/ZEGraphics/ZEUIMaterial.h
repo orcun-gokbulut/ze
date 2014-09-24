@@ -41,8 +41,6 @@
 
 ZE_META_FORWARD_DECLARE(ZETexture2D, "ZETexture2D.h")
 
-ZE_CLASS(ZEUIMaterial)
-
 class ZEUIMaterial : public ZEMaterial
 {
 	ZE_OBJECT

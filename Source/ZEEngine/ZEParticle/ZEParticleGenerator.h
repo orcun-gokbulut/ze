@@ -41,8 +41,6 @@
 #include "ZEDS\ZEArray.h"
 #include "ZEMeta\ZEObject.h"
 
-ZE_CLASS(ZEParticleGenerator)
-
 class ZEParticleGenerator : public ZEObject
 {
 	friend class ZEParticleSystem;

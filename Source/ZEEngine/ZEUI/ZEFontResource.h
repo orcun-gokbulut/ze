@@ -80,8 +80,6 @@ struct ZEFontCharacter
 	ZERectangle				CoordinateRectangle;
 };
 
-ZE_CLASS(ZEFontResource)
-
 class ZEFontResource : public ZEResource
 {
 	ZE_OBJECT

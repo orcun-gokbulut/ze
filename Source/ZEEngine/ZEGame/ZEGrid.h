@@ -45,8 +45,6 @@ class ZEListener;
 class ZEScene;
 class ZESimpleMaterial;
 
-ZE_CLASS(ZEGrid)
-
 class ZEGrid : public ZEEntity
 {
 	ZE_OBJECT

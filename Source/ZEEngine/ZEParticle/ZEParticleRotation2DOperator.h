@@ -46,8 +46,6 @@ struct ZEParticleRotation2DProperties
 	float AngularAcceleration;
 };
 
-ZE_CLASS(ZEParticleRotation2DOperator)
-
 class ZEParticleRotation2DOperator : public ZEParticleOperator
 {
 	ZE_OBJECT

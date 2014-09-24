@@ -41,8 +41,6 @@
 #include "zeui/ZEUIRectangle.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 
-ZE_CLASS(ZEUIFrameControl)
-
 class ZEUIFrameControl : public ZEUIControl
 {
 	friend class ZEUIBorderedFrameControl;

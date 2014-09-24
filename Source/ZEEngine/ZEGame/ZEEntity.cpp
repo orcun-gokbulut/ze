@@ -40,8 +40,6 @@
 #include "ZEScene.h"
 #include <string.h>
 
-ZE_OBJECT_IMPL(ZEEntity)
-
 void ZEEntity::OnTransformChanged()
 {
 	EntityDirtyFlags.RaiseFlags(ZE_EDF_ALL & ~ZE_EDF_LOCAL_TRANSFORM);
@@ -92,7 +90,7 @@ void ZEEntity::RemoveComponent(ZEEntity* Entity)
 		return;
 	}
 
-	Components.DeleteValue(Entity);
+	Components.RemoveValue(Entity);
 
 	Entity->Owner = NULL;
 	Entity->SetOwnerScene(NULL);
@@ -137,7 +135,7 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 		return;
 	}
 
-	ChildEntities.DeleteValue(Entity);
+	ChildEntities.RemoveValue(Entity);
 
 	Entity->Owner = NULL;
 	Entity->SetOwnerScene(NULL);

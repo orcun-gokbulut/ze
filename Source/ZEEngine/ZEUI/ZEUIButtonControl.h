@@ -41,8 +41,6 @@
 
 ZE_META_FORWARD_DECLARE(ZEUILabel, "ZEUILabel.h")
 
-ZE_CLASS(ZEUIButtonControl)
-
 class ZEUIButtonControl : public ZEUIFrameControl
 {
 	friend class ZEUIManager;

@@ -46,8 +46,6 @@
 
 class ZESteering;
 
-ZE_CLASS(ZEActor)
-
 class ZEActor : public ZEEntity
 {
 	ZE_OBJECT

@@ -51,8 +51,6 @@ ZE_META_FORWARD_DECLARE(ZETextureCubeResource, "ZETexture/ZETextureCubeResource.
 ZE_META_FORWARD_DECLARE(ZETexture2D, "ZETexture2D.h")
 ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
 
-ZE_CLASS(ZEFixedMaterial)
-
 class ZEFixedMaterial : public ZEMaterial
 {
 	ZE_OBJECT

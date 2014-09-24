@@ -43,8 +43,6 @@
 
 ZE_META_FORWARD_DECLARE(ZEResourceManager, "ZEResourceManager.h")
 
-ZE_CLASS(ZEResource)
-
 class ZEResource : public ZEObject
 {
 	friend class ZEResourceManager;

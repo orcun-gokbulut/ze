@@ -59,8 +59,6 @@ struct ZEDirectionalLightCascade
 	ZEMatrix4x4		ShadowTransform;
 };
 
-ZE_CLASS(ZEDirectionalLight)
-
 class ZEDirectionalLight : public ZELight
 {
 	ZE_OBJECT

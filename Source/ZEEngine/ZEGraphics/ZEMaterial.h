@@ -83,8 +83,6 @@ enum ZEMaterialOpacityComponent
 class ZEFrameRenderer;
 class ZERenderCommand;
 
-ZE_CLASS(ZEMaterial)
-
 class ZEMaterial : public ZEObject
 {
 	ZE_OBJECT

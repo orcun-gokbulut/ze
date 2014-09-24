@@ -73,7 +73,7 @@ void ZEInputDeviceModule::UnregisterDevice(ZEInputDevice* Device)
 	if (GetInitializationState() == ZE_IS_DEINITIALIZING || GetInitializationState() == ZE_IS_NOT_INITIALIZED)
 		Device->Deinitialize();
 
-	Devices.DeleteValue(Device);
+	Devices.RemoveValue(Device);
 }
 
 void ZEInputDeviceModule::DestroyDevices()

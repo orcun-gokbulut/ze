@@ -42,8 +42,6 @@
 
 class ZETexture2D;
 
-ZE_CLASS(ZEPointLight)
-
 class ZEPointLight  : public ZELight
 {
 	ZE_OBJECT

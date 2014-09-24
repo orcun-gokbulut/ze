@@ -74,8 +74,6 @@ enum ZECameraProjectionType
 
 class ZEViewPort;
 
-ZE_CLASS(ZECamera)
-
 class ZECamera : public ZEEntity
 {
 	ZE_OBJECT

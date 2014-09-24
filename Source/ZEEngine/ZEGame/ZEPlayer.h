@@ -63,8 +63,6 @@ class ZEProjectiveLight;
 class ZECamera;
 class ZEModelIKChain;
 
-ZE_CLASS(ZEPlayer)
-
 class ZEPlayer : public ZEActor
 {
 	ZE_OBJECT

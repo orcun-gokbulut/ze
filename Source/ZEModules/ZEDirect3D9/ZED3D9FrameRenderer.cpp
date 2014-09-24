@@ -1112,7 +1112,7 @@ bool ZED3D9FrameRenderer::DeviceRestored()
 
 void ZED3D9FrameRenderer::Destroy()
 {
-	GetModule()->Renderers.DeleteValue((ZED3D9FrameRenderer*)this);
+	GetModule()->Renderers.RemoveValue((ZED3D9FrameRenderer*)this);
 	delete this;
 }
 
@@ -1138,7 +1138,7 @@ void ZED3D9FrameRenderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
 
 void ZED3D9FrameRenderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
 {
-	PostProcessors.DeleteValue(PostProcessor);
+	PostProcessors.RemoveValue(PostProcessor);
 }
 
 void ZED3D9FrameRenderer::SetLights(ZESmartArray<ZELight*>& Lights)

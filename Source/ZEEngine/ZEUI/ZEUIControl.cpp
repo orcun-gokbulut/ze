@@ -36,8 +36,6 @@
 #include "ZEUIControl.h"
 #include "ZEUIRenderer.h"
 
-ZE_OBJECT_IMPL(ZEUIControl)
-
 void ZEUIControl::SetName(const ZEString& Name)
 {
 	this->Name = Name;
@@ -195,7 +193,7 @@ void ZEUIControl::AddChildControl(ZEUIControl* Control)
 
 void ZEUIControl::RemoveChildControl(ZEUIControl* Control)
 {
-	ChildControls.DeleteValue(Control);
+	ChildControls.RemoveValue(Control);
 	Control->SetParent(NULL);
 }
 

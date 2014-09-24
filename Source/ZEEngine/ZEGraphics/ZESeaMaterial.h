@@ -42,8 +42,6 @@
 
 class ZETexture2D;
 
-ZE_CLASS(ZESeaMaterial)
-
 class ZESeaMaterial : public ZEMaterial
 {
 	friend class ZESea;

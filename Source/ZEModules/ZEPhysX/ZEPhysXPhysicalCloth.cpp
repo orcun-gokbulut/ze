@@ -287,7 +287,7 @@ void ZEPhysXPhysicalCloth::DetachVertex(const ZEUInt VertexId)
 
 	for (ZESize I = 0; I < Attachments.GetCount(); I++)
 		if (Attachments[I].VertexId == VertexId)
-			Attachments.DeleteAt(I);
+			Attachments.Remove(I);
 }
 
 ZEClothVertexAttachment ZEPhysXPhysicalCloth::GetVertexAttachment(ZEUInt VertexId) const

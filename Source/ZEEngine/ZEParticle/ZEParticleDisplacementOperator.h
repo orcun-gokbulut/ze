@@ -39,8 +39,6 @@
 
 #include "ZEParticleOperator.h"
 
-ZE_CLASS(ZEParticleDisplacementOperator)
-
 class ZEParticleDisplacementOperator : public ZEParticleOperator
 {
 	ZE_OBJECT

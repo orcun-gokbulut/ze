@@ -94,7 +94,7 @@ bool ZEPluginManager::RegisterPlugin(ZEPlugin* Plugin)
 
 void ZEPluginManager::UnregisterPlugin(ZEPlugin* Plugin)
 {
-	Plugins.DeleteValue(Plugin);
+	Plugins.RemoveValue(Plugin);
 	/*const ZEArray<ZEExtensionDescription*>& Extensions = Plugin->GetExtensionDescriptions();
 	for (ZESize I = 0; I < Extensions.GetCount(); I++ )
 		ZEExtensionManager::GetInstance()->UnregisterExtension(Extensions[I]);
