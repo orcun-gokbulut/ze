@@ -40,7 +40,7 @@
 #include "ZEMetaAttribute.h"
 #include "ZEProperty.h"
 #include "ZEMethod.h"
-#include "ZEEnum.h"
+#include "ZEEnumerator.h"
 #include "ZETypes.h"
 #include "ZEGUID.h"
 

@@ -63,8 +63,6 @@ struct ZEDrawParameters;
 // 	ZEVector3		Size3D;
 // };
 
-ZE_CLASS(ZEParticleSystem)
-
 class ZEParticleSystem : public ZEObject
 {
 	ZE_OBJECT

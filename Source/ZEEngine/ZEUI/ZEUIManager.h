@@ -175,8 +175,6 @@ enum ZEUIMouseKey;
 ZE_META_FORWARD_DECLARE(ZEUIControl, "ZEUIControl.h")
 ZE_META_FORWARD_DECLARE(ZEUICursorControl, "ZEUICursorControl.h")
 
-ZE_CLASS(ZEUIManager)
-
 class ZEUIManager : public ZEObject
 {
 	ZE_OBJECT

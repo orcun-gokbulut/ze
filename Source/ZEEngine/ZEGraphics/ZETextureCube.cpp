@@ -36,8 +36,6 @@
 #include "ZETextureCube.h"
 #include "ZEGraphicsModule.h"
 
-ZE_OBJECT_IMPL(ZETextureCube)
-
 ZETextureType ZETextureCube::GetTextureType() const
 {
 	return ZE_TT_CUBE;

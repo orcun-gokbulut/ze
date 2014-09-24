@@ -37,8 +37,6 @@
 #include "ZEFontResource.h"
 #include "ZEGraphics/ZETexture2D.h"
 
-ZE_OBJECT_IMPL(ZEUITextEditControl)
-
 void ZEUITextEditControl::KeyPressed(ZEUIInputKey Key)
 {
 	ZEUIFrameControl::KeyPressed(Key);

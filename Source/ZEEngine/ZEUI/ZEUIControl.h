@@ -46,8 +46,6 @@
 
 ZE_META_FORWARD_DECLARE(ZEUIRenderer, "ZEUIRenderer.h")
 
-ZE_CLASS(ZEUIControl)
-
 class ZEUIControl : public ZEObject
 {
 	friend class ZEUIManager;

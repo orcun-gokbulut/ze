@@ -42,8 +42,6 @@
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
 
-ZE_OBJECT_IMPL(ZEResource)
-
 const ZEString& ZEResource::GetFileName() const
 {
 	return this->FileName;

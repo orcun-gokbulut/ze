@@ -82,7 +82,7 @@ ZECommand* ZECommandSection::GetCommand(ZESize Index)
 
 void ZECommandSection::DeleteCommand(ZESize Index)
 {
-	Commands.DeleteAt(Index);
+	Commands.Remove(Index);
 }
 
 bool ZECommandSection::ExecuteCommand(const ZEString& Name, ZEArray<ZEValue>* Paramlist)

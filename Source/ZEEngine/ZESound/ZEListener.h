@@ -39,8 +39,6 @@
 
 #include "ZEGame/ZEEntity.h"
 
-ZE_CLASS(ZEListener)
-
 class ZEListener: public ZEEntity
 {
 	ZE_OBJECT

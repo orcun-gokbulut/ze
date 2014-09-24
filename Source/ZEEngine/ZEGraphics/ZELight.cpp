@@ -38,8 +38,6 @@
 #include "ZEGame\ZEDrawParameters.h"
 #include "ZERenderer.h"
 
-ZE_OBJECT_IMPL(ZELight)
-
 float ZELight::AttenuationFunction(float RootToTry)
 {
 	float Result = 0.0f;

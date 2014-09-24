@@ -45,8 +45,6 @@ class ZEVertexDeclaration;
 class ZEStaticVertexBuffer;
 class ZETexture2D;
 
-ZE_CLASS(ZESea)
-
 class ZESea : public ZEEntity
 {
 	ZE_OBJECT

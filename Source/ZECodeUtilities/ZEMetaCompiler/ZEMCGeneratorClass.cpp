@@ -207,7 +207,7 @@ void ZEMCGenerator::GenerateCreateInstance(ZEMCClass* currentClass)
 		WriteToFile("\treturn %s::CreateInstance();\n", currentClass->Name.ToCString());
 
 	}
-	else if (currentClass->HasDefaultPublicConstructor)
+	else if (currentClass->HasPublicDefaultConstructor)
 	{
 		WriteToFile("\treturn new %s();\n", currentClass->Name.ToCString());
 	}

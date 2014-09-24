@@ -196,7 +196,7 @@ bool ZECommandManager::UnregisterSection(ZECommandSection* Section)
 			Section->GetName().ToCString());
 		return false;
 	}
-	Sections.DeleteValue(Section);
+	Sections.RemoveValue(Section);
 	return true;
 }
 

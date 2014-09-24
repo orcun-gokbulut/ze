@@ -34,6 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+#ifndef __ZE_PROPERTY_H__
+#define __ZE_PROPERTY_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEType.h"
@@ -59,3 +61,5 @@ struct ZEProperty
 	ZEMetaAttribute*	Attributes;
 	ZESize				AttributeCount;
 };
+
+#endif

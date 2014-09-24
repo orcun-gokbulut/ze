@@ -36,8 +36,6 @@
 #include "ZESeaMaterial.h"
 #include "ZEGraphicsModule.h"
 
-ZE_OBJECT_IMPL(ZESeaMaterial)
-
 ZEMaterialFlags ZESeaMaterial::GetMaterialFlags() const
 {
 	return ZE_MTF_G_BUFFER_PASS;

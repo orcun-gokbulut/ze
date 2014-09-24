@@ -100,6 +100,8 @@ ze_add_source(ZETypeGenerator.h					Sources Headers)
 ze_add_source(ZEVariantTests.cpp		Tests)
 ze_add_source(ZEPointerTestClass.h		Tests)
 ze_add_source(ZEPointerTestClass.cpp	Tests)
+ze_add_source(ZEReference.h				Sources Headers)
+ze_add_source(ZEReference.cpp			Sources)
 ze_add_source(ZEFormat.h				Sources Headers)
 ze_add_source(ZEFormat.cpp				Sources)
 ze_add_source(ZEFormatTests.cpp				Tests)
@@ -110,6 +112,7 @@ ze_add_source(ZEFormatOverloads.cpp		Sources)
 ze_add_source(ZEStringWriter.cpp		Sources)
 ze_add_source(ZEStringWriter.h			Sources Headers)
 ze_add_source(ZEStringWriterTests.cpp		Tests)
+
 ze_add_library(TARGET ZEDS 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}

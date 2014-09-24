@@ -207,7 +207,7 @@ ZEDSSoundSource::ZEDSSoundSource()
 
 ZEDSSoundSource::~ZEDSSoundSource()
 {
-	GetModule()->SoundSources.DeleteValue(this);
+	GetModule()->SoundSources.RemoveValue(this);
 	if (DSBuffer != NULL)
 		DSBuffer->Release();
 }

@@ -74,8 +74,6 @@ enum ZEReportBehaviour
 
 typedef fastdelegate::FastDelegate2<ZETrigger*, ZEEntity*, void> ZETriggerCallback;
 
-ZE_CLASS(ZETrigger)
-
 class ZETrigger : public ZEEntity
 {
 	ZE_OBJECT

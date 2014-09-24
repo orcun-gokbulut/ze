@@ -300,7 +300,7 @@ ZEALSoundSource::ZEALSoundSource()
 
 ZEALSoundSource::~ZEALSoundSource()
 {
-	GetModule()->SoundSources.DeleteValue(this);
+	GetModule()->SoundSources.RemoveValue(this);
 	DestroyBufferSource();
 }
 

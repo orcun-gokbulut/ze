@@ -170,6 +170,7 @@ ZEMCMethod::ZEMCMethod()
 	IsStatic = false;
 	IsEvent = false;
 	IsConst = false;
+	IsConstructor = false;
 
 	IsOperator = false;
 	OperatorType = ZEMC_MOT_NOT_OPERATOR;
@@ -187,8 +188,9 @@ ZEMCClass::ZEMCClass()
 {
 	BaseClass = NULL;
 	HasScriptBase = false;
-	HasPublicConstructor = false;
-	HasPublicCopyConstructor = false;
+	HasPublicDefaultConstructor = false;
+	HasPublicDestructor = true;
+	HasPublicCopyConstructor = true;
 	HasCreateInstanceMethod = false;
 	IsAbstract = false;
 	IsBuiltInClass = false;

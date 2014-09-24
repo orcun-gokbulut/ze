@@ -68,8 +68,6 @@ class ZEParticleEffect;
 class ZEParticleModifier;
 struct ZEDrawParameters;
 
-ZE_CLASS(ZEParticleEmitter)
-
 class ZEParticleEmitter : public ZEObject
 {
 	friend class ZEParticleModifier;

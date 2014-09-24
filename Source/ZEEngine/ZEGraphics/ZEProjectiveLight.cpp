@@ -46,8 +46,6 @@
 
 #include <string.h>
 
-ZE_OBJECT_IMPL(ZEProjectiveLight)
-
 ZELightType ZEProjectiveLight::GetLightType()
 {
 	return ZE_LT_PROJECTIVE;

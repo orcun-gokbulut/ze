@@ -39,8 +39,6 @@
 #include "ZEMeta/ZEAnimation.h"
 #include <memory.h>
 
-ZE_OBJECT_IMPL(ZEMaterial)
-
 ZEMaterial::ZEMaterial()
 {
 	LightningEnabled = true;

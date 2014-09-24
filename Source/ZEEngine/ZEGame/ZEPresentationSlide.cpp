@@ -47,8 +47,6 @@
 
 #include <string.h>
 
-ZE_OBJECT_IMPL(ZEPresentationSlide)
-
 ZEDrawFlags ZEPresentationSlide::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;

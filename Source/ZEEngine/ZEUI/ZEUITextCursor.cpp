@@ -36,8 +36,6 @@
 #include "ZEUITextCursor.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 
-ZE_OBJECT_IMPL(ZEUITextCursor)
-
 ZEUITextCursor::ZEUITextCursor()
 {
 	IsVisible = false;

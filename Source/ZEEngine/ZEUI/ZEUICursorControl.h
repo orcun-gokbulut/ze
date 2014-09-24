@@ -42,8 +42,6 @@
 #include "ZEInput/ZEInputMap.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 
-ZE_CLASS(ZEUICursorControl)
-
 class ZEUICursorControl : public ZEUIControl
 {
 	ZE_OBJECT

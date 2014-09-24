@@ -52,8 +52,6 @@ enum ZETextureCubeFace
 	ZE_CTF_NEGATIVEZ	= 5
 };
 
-ZE_CLASS(ZETextureCube)
-
 class ZETextureCube : public ZETexture
 {
 	ZE_OBJECT

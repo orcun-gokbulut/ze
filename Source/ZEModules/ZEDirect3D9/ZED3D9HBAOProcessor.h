@@ -53,7 +53,6 @@ struct ZEHBAOScreenAlignedQuad
 	float	TexCoord[2];
 };
 
-ZE_CLASS(ZED3D9HBAOProcessor)
 class ZED3D9HBAOProcessor : public ZED3D9ComponentBase, public ZEObject
 {
 	ZE_OBJECT

@@ -46,8 +46,6 @@
 #include "ZETextureCacheDataIdentifier.h"
 #include "ZEFile/ZEPathUtils.h"
 
-ZE_OBJECT_IMPL(ZETextureCubeResource)
-
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;

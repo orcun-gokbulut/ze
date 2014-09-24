@@ -42,8 +42,6 @@
 #define UTF8_SPACE_CHARACTER 0x00020
 #define CHARACTER_SPACING 4
 
-ZE_OBJECT_IMPL(ZEFontResourceDynamic)
-
 struct ZEFontPixel
 {
 	ZEUInt8	R;

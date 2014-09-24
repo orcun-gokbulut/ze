@@ -140,8 +140,6 @@ struct ZEUIControlStyle
 	}
 };
 
-ZE_CLASS(ZEUIBorderedFrameControl)
-
 class ZEUIBorderedFrameControl : public ZEUIControl
 {
 	ZE_OBJECT

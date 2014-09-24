@@ -102,8 +102,6 @@ enum ZETexturePixelFormat
 
 };
 
-ZE_CLASS(ZETexture)
-
 class ZETexture : public ZEObject
 {
 	ZE_OBJECT

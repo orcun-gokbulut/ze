@@ -56,8 +56,6 @@ struct ZEDOFScreenAlignedQuad
 	float Position[3];
 };
 
-ZE_CLASS(ZED3D9DOFProcessor)
-
 class ZED3D9DOFProcessor : public ZED3D9ComponentBase, public ZEObject
 {
 	ZE_OBJECT

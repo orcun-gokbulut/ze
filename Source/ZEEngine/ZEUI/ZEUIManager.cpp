@@ -42,8 +42,6 @@
 #include "ZEFontResourceBitmap.h"
 #include "ZEFontResourceDynamic.h"
 
-ZE_OBJECT_IMPL(ZEUIManager)
-
 ZEVector4 ZEUIManager::DefaultBackgroundColor = ZEVector4(0.2f, 0.2f, 0.2f, 1.0f);
 ZEVector4 ZEUIManager::DefaultForegroundColor = ZEVector4(0.0f, 0.8f, 0.0f, 1.0f);
 //ZEFontResource* ZEUIManager::DefaultFontResource = ZEFontResourceBitmap::LoadSharedResource("Courier New.zeFont");
@@ -219,7 +217,7 @@ void ZEUIManager::AddControl(ZEUIControl* Control)
 
 void ZEUIManager::RemoveControl(ZEUIControl* Control)
 {
-	Controls.DeleteValue(Control);
+	Controls.RemoveValue(Control);
 }
 
 ZEArray<ZEUIControl*>& ZEUIManager::GetControls()

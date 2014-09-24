@@ -80,12 +80,16 @@ class ZETypeGenerator<T *>
 		{
 			ZEType Type = ZETypeGenerator<T>::GetType();
 			
-			if (Type.Type != ZE_TT_OBJECT)
-				return ZEType();
-			
-			Type.Type = ZE_TT_OBJECT_PTR;
+			if (Type.Type == ZE_TT_OBJECT)
+			{
+				Type.Type = ZE_TT_OBJECT_PTR;
+			}
+			else if (Type.Type == ZE_TT_CLASS)
+			{
+				return Type;
+			}
 
-			return Type;
+			return ZEType();
 		}
 };
 
@@ -264,14 +268,11 @@ template <>
 class ZETypeGenerator<ZEObject>
 {
 	public:
-		static ZEType GetType()
-		{
-
-		}
+		static ZEType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEClass>
+class ZETypeGenerator<ZEClass*>
 {
 	public:
 		static ZEType GetType();
@@ -280,26 +281,15 @@ class ZETypeGenerator<ZEClass>
 template <typename T>
 class ZETypeGenerator : Derived_from<T, ZEObject>
 {
-	template<typename T>
-	static ZEType GetType()
-	{
-		ZEType Type;
-		Type.Type = ZE_TT_OBJECT;
-		Type.TypeQualifier = ZE_CT_VALUE;
-		Type.Class = T::Class();
-		return Type;
-	}
+	public:
+		static ZEType GetType()
+		{
+			ZEType Type;
+			Type.Type = ZE_TT_OBJECT;
+			Type.TypeQualifier = ZE_TQ_VALUE;
+			Type.Class = T::Class();
+			return Type;
+		}
 };
-
-/*
-template <typename T>
-class ZETypeGenerator
-{
-	template<typename T>
-	static ZEType GetType()
-	{
-		return ZEType;
-	}
-};*/
 
 #endif

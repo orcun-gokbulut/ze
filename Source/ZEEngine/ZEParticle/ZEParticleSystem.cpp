@@ -39,8 +39,6 @@
 #include "ZEParticleOperator.h"
 #include "ZEParticleGenerator.h"
 
-ZE_OBJECT_IMPL(ZEParticleSystem)
-
 void ZEParticleSystem::SetRenderer(ZEParticleRenderer* Renderer)
 {
 	if(Renderer == NULL)
@@ -82,7 +80,7 @@ bool ZEParticleSystem::RemoveOperator(ZEParticleOperator* OperatorToRemove)
 	if(!Operators.Exists(OperatorToRemove))
 		return false;
 
-	Operators.DeleteValue(OperatorToRemove);
+	Operators.RemoveValue(OperatorToRemove);
 	return true;
 }
 
@@ -107,7 +105,7 @@ bool ZEParticleSystem::RemoveGenerator(ZEParticleGenerator* GeneratorToRemove)
 	if(!Generators.Exists(GeneratorToRemove))
 		return false;
 
-	Generators.DeleteValue(GeneratorToRemove);
+	Generators.RemoveValue(GeneratorToRemove);
 	return true;
 }
 

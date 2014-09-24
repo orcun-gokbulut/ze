@@ -50,12 +50,9 @@ enum ZEParticleState
 	ZE_PAS_DEAD
 };
 
-ZE_CLASS(ZEParticle)
-
 class ZEParticle : public ZEObject
 {
 	ZE_OBJECT
-
 	public:
 
 		ZEVector2		Size2D;

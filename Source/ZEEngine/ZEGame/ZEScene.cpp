@@ -58,8 +58,6 @@
 
 #include <memory.h>
 
-ZE_OBJECT_IMPL(ZEScene)
-
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
@@ -220,7 +218,7 @@ void ZEScene::RemoveEntity(ZEEntity* Entity)
 
 	Entity->SetOwnerScene(NULL);
 
-	Entities.DeleteValue(Entity);
+	Entities.RemoveValue(Entity);
 }
 
 void ZEScene::ClearEntities()

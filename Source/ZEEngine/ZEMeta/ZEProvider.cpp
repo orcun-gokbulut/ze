@@ -66,7 +66,7 @@ bool ZEProvider::UnregisterClass(ZEClass* Class)
 	{
 		if(ClassList[I] == Class)
 		{
-			ClassList.DeleteAt(I);
+			ClassList.Remove(I);
 			return true;
 		}
 	}

@@ -93,7 +93,7 @@ class ZEEvent<void (ZE_TEMPLATE_ARGUMENTS)>
 
 		void RemoveEventHandler(ZEEventHandler<void (ZE_TEMPLATE_ARGUMENTS)>& Handler)
 		{
-			Handlers.DeleteValue(Handler);
+			Handlers.RemoveValue(Handler);
 		}
 };
 
@@ -146,7 +146,7 @@ class ZEEvent<TReturn (ZE_TEMPLATE_ARGUMENTS)>
 
 		void RemoveEventHandler(ZEEventHandler<TReturn (ZE_TEMPLATE_ARGUMENTS)>& Handler)
 		{
-			Handlers.DeleteValue(Handler);
+			Handlers.RemoveValue(Handler);
 		}
 };
 

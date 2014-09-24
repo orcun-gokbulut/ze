@@ -37,8 +37,6 @@
 #include "ZESoundModule.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_OBJECT_IMPL(ZESoundSource)
-
 ZESoundSource::ZESoundSource()
 {
 	SoundSourceState = ZE_SSS_NONE;

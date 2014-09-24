@@ -357,10 +357,14 @@ void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array)
 	if (Type.Type == ZE_TT_UNDEFINED)
 		return;
 
-	Type.SubType = Type.SubType;
-	Type.SubTypeQualifier = Type.SubTypeQualifier;
-	Type.Type = ZE_TT_ARRAY;
+	if (Type.ContainerType == ZE_CT_NONE)
+		zeCriticalError("Array to arrays are not supported.");
+
+	if (Type.TypeQualifier != ZE_TQ_VALUE)
+		zeCriticalError("Only value or object pointer type arrays supported.");
+
 	Type.TypeQualifier = ZE_TQ_VALUE;
+	Type.ContainerType = ZE_CT_ARRAY;
 
 	SetType(Type);
 	Cloner = &ClonerTemplate<ZEArray<ZEItemType> >;
@@ -375,10 +379,14 @@ void ZEVariant::SetArrayRef(ZEArray<ZEItemType>& Array)
 	if (Type.Type == ZE_TT_UNDEFINED)
 		return;
 
-	Type.SubType = Type.SubType;
-	Type.SubTypeQualifier = Type.SubTypeQualifier;
-	Type.Type = ZE_TT_ARRAY;
+	if (Type.ContainerType == ZE_CT_NONE)
+		zeCriticalError("Array to arrays are not supported.");
+
+	if (Type.TypeQualifier != ZE_TQ_VALUE)
+		zeCriticalError("Only value or object pointer type arrays supported.");
+
 	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	Type.ContainerType = ZE_CT_ARRAY;
 
 	SetType(Type);
 	Value.Pointer = &Array;
@@ -388,14 +396,19 @@ template<typename ZEItemType>
 void ZEVariant::SetArrayRefConst(const ZEArray<ZEItemType>& Array)
 {
 	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
+	
 	if (Type.Type == ZE_TT_UNDEFINED)
 		return;
+	
+	if (Type.ContainerType == ZE_CT_NONE)
+		zeCriticalError("Array to arrays are not supported.");
 
-	Type.SubType = Type.Type;
-	Type.SubTypeQualifier = Type.TypeQualifier;
-	Type.Type = ZE_TT_ARRAY;
+	if (Type.TypeQualifier != ZE_TQ_VALUE)
+		zeCriticalError("Only value or object pointer type arrays supported.");
+
 	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
-
+	Type.ContainerType = ZE_CT_ARRAY;
+	
 	SetType(Type);
 	Value.Pointer = const_cast<ZEArray<ZEItemType>*>(&Array);
 }
@@ -421,7 +434,7 @@ void ZEVariant::SetObjectRef(ZEObjectType& Object)
 	ZEType Type;
 	Type.Type = ZE_TT_OBJECT;
 	Type.TypeQualifier = ZE_TQ_REFERENCE;
-	Type.Class = Object.getClass();
+	Type.Class = Object.GetClass();
 	SetType(Type);
 
 	Value.Pointer = &Object;
@@ -433,7 +446,7 @@ void ZEVariant::SetObjectConstRef(const ZEObjectType& Object)
 	ZEType Type;
 	Type.Type = ZE_TT_OBJECT;
 	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
-	Type.Class = Object.getClass();;
+	Type.Class = Object.GetClass();
 	SetType(Type);
 
 	Value.Pointer = const_cast<ZEObjectType*>(&Object);

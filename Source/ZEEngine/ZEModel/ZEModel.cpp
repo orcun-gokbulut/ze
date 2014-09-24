@@ -49,8 +49,6 @@
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEMath/ZEViewVolume.h"
 
-ZE_OBJECT_IMPL(ZEModel)
-
 void ZEModel::CalculateBoundingBox() const
 {
 	if (Meshes.GetCount() == 0 && Bones.GetCount() == 0)

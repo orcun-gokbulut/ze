@@ -49,8 +49,6 @@ ZE_META_FORWARD_DECLARE(ZEUILabel, "ZEUILabel.h")
 ZE_META_FORWARD_DECLARE(ZEUIRectangle, "ZEUIRectangle.h")
 ZE_META_FORWARD_DECLARE(ZEUIMaterial, "ZEGraphics/ZEUIMaterial.h")
 
-ZE_CLASS(ZEUICheckBoxControl)
-
 class ZEUICheckBoxControl : public ZEUIControl
 {
 	friend class ZEUIManager;

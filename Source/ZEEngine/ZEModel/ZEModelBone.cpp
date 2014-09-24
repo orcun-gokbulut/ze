@@ -38,8 +38,6 @@
 #include "ZEGame/ZEScene.h"
 #include <stdio.h>
 
-ZE_OBJECT_IMPL(ZEModelBone)
-
 void ZEModelBone::OnTransformChanged()
 {
 	if (PhysicalBody != NULL)
@@ -319,7 +317,7 @@ void ZEModelBone::AddChild(ZEModelBone* Bone)
 void ZEModelBone::RemoveChild(ZEModelBone* Bone)
 {
 	Bone->ParentBone = NULL;
-	ChildBones.DeleteValue(Bone);
+	ChildBones.RemoveValue(Bone);
 }
 
 void ZEModelBone::SetPhysicsEnabled(bool Enabled)

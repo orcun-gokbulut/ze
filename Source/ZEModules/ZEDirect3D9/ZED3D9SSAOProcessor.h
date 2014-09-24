@@ -57,8 +57,6 @@ struct ZESSAOScreenAlignedQuad
 	float	TexCoord[2];
 };
 
-ZE_CLASS(ZED3D9SSAOProcessor)
-
 class ZED3D9SSAOProcessor : public ZED3D9ComponentBase, public ZEObject
 {
 	ZE_OBJECT

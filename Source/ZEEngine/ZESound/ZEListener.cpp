@@ -37,8 +37,6 @@
 #include "ZESoundModule.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_OBJECT_IMPL(ZEListener)
-
 ZEListener::ZEListener()
 {
 	DistanceFactor = 1.0f;

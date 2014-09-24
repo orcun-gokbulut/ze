@@ -38,7 +38,6 @@
 #include "ZEGraphics/ZESkyDomeMaterial.h"
 #include "ZEDrawParameters.h"
 
-ZE_OBJECT_IMPL(ZESkyDome)
 void ZESkyDome::SetSetMieConstant(float Value)
 {
 	MieConstant = Value;

@@ -42,8 +42,6 @@
 #include "ZEPhysics/ZEPhysicalCloth.h"
 #include "ZEMath/ZETriangle.h"
 
-ZE_OBJECT_IMPL(ZEModelMesh)
-
 void ZEModelMesh::SetActiveLOD(ZEUInt LOD)
 {
 	AutoLOD = false;
@@ -381,7 +379,7 @@ void ZEModelMesh::AddChild(ZEModelMesh* Mesh)
 void ZEModelMesh::RemoveChild(ZEModelMesh* Mesh)
 {
 	Mesh->ParentMesh = NULL;
-	ChildMeshes.DeleteValue(Mesh);
+	ChildMeshes.RemoveValue(Mesh);
 }
 
 void ZEModelMesh::SetPhysicsEnabled(bool Enabled)

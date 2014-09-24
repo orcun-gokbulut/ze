@@ -38,8 +38,6 @@
 #include "ZEIUCheckBoxControl.h"
 #include "ZEUIHorizontalSliderControl.h"
 
-ZE_OBJECT_IMPL(ZEUIFrameControl)
-
 void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
 {
 	Frame.Color = GetBackgroundColor();

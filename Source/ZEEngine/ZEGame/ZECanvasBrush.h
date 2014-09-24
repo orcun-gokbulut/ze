@@ -45,8 +45,6 @@
 class ZERenderer;
 class ZEMaterial;
 
-ZE_CLASS(ZECanvasBrush)
-
 class ZECanvasBrush : public ZEEntity
 {
 	ZE_OBJECT

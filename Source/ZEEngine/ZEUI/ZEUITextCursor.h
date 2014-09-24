@@ -42,8 +42,6 @@
 
 ZE_META_FORWARD_DECLARE(ZEMaterial, "ZEGraphics/ZEMaterial.h")
 
-ZE_CLASS(ZEUITextCursor)
-
 class ZEUITextCursor : public ZEUIRectangle, public ZEObject
 {
 	ZE_OBJECT

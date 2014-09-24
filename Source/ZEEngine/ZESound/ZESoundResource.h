@@ -48,8 +48,6 @@ enum ZESoundFileFormat
 	ZE_SFF_MP3
 };
 
-ZE_CLASS(ZESoundResource)
-
 class ZESoundResource : public ZEResource
 {
 	ZE_OBJECT

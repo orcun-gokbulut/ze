@@ -48,8 +48,6 @@
 
 #include <d3d9.h>
 
-ZE_OBJECT_IMPL(ZED3D9MLAAProcessor)
-
 void ZED3D9MLAAProcessor::SetVisualizeEdges(bool Enabled)
 {
 	VisualizeEdges = Enabled;

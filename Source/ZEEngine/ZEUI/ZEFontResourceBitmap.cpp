@@ -45,8 +45,6 @@
 #include "ZEML/ZEMLSerialReader.h"
 #include "ZEFile/ZEDirectoryInfo.h"
 
-ZE_OBJECT_IMPL(ZEFontResourceBitmap)
-
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;

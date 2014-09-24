@@ -124,41 +124,51 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 	}
 	else if (ClangType->isClassType()) // ZE Builtin Types
 	{
-		CXXRecordDecl* ClassPtr = ClangType->getAsCXXRecordDecl();
-		if (ClassPtr->getName() == "ZEString")
+		CXXRecordDecl* ClassDecl = ClangType->getAsCXXRecordDecl();
+		if (ClassDecl->getName() == "ZEString")
 		{
 			Output.BaseType = ZEMC_BT_STRING;
 		}
-		else if (ClassPtr->getName() == "ZEVector2")
+		else if (ClassDecl->getName() == "ZEVector2")
 		{
 			Output.BaseType = ZEMC_BT_VECTOR2;
 		}
-		else if (ClassPtr->getName() == "ZEVector3")
+		else if (ClassDecl->getName() == "ZEVector3")
 		{
 			Output.BaseType = ZEMC_BT_VECTOR3;
 		}
-		else if (ClassPtr->getName() == "ZEVector4")
+		else if (ClassDecl->getName() == "ZEVector4")
 		{
 			Output.BaseType = ZEMC_BT_VECTOR4;
 		}
-		else if (ClassPtr->getName() == "ZEQuaternion")
+		else if (ClassDecl->getName() == "ZEQuaternion")
 		{
 			Output.BaseType = ZEMC_BT_QUATERNION;
 		}
-		else if (ClassPtr->getName() == "ZEMatrix3x3")
+		else if (ClassDecl->getName() == "ZEMatrix3x3")
 		{
 			Output.BaseType = ZEMC_BT_MATRIX3X3;
 		}
-		else if (ClassPtr->getName() == "ZEMatrix4x4")
+		else if (ClassDecl->getName() == "ZEMatrix4x4")
 		{
 			Output.BaseType = ZEMC_BT_MATRIX4X4;
 		}
 		else
 		{
-			Output.BaseType = ZEMC_BT_OBJECT;
-			Output.Class = FindClass(ClassPtr->getNameAsString().c_str());
-			if (Output.Class == NULL)
-				return false;
+			if (ClassDecl->getNameAsString() == "ZEClass")
+			{
+				Output.BaseType = ZEMC_BT_CLASS;
+			}
+			else
+			{
+				Output.BaseType = ZEMC_BT_OBJECT;
+				Output.Class = FindClass(ClassDecl->getNameAsString().c_str());
+				if (Output.Class == NULL)
+					return false;
+
+				if (!Output.Class->HasPublicCopyConstructor || !Output.Class->HasPublicDestructor || Output.Class->IsForwardDeclared)
+					return false;
+			}
 		}
 	}
 	else if (ClangType->isPointerType())
@@ -166,11 +176,21 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 		if (!ClangType->getPointeeType().getTypePtr()->isClassType())
 			return false;
 
-		CXXRecordDecl* ClassPtr = ClangType->getPointeeType().getTypePtr()->getAsCXXRecordDecl();
-		Output.BaseType = ZEMC_BT_OBJECT_PTR;
-		Output.Class = FindClass(ClassPtr->getNameAsString().c_str());
-		if (Output.Class == NULL)
-			return false;
+		CXXRecordDecl* ClassDecl = ClangType->getPointeeType().getTypePtr()->getAsCXXRecordDecl();
+		if (ClassDecl->getNameAsString() == "ZEClass")
+		{
+			Output.BaseType = ZEMC_BT_CLASS;
+		}
+		else
+		{
+			Output.BaseType = ZEMC_BT_OBJECT_PTR;
+			Output.Class = FindClass(ClassDecl->getNameAsString().c_str());
+			if (Output.Class == NULL)
+				return false;
+
+			if (!Output.Class->HasPublicCopyConstructor || !Output.Class->HasPublicDestructor || Output.Class->IsForwardDeclared)
+				return false;
+		}
 	}
 	else if(ClangType->isEnumeralType())
 	{

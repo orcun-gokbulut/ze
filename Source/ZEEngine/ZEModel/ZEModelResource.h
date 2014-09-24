@@ -326,8 +326,6 @@ struct ZEModelResourceHelper
 	ZEString									UserDefinedProperties;
 };
 
-ZE_CLASS(ZEModelResource)
-
 class ZEModelResource : public ZEResource
 {
 	ZE_OBJECT

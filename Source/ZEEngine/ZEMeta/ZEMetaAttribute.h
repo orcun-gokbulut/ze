@@ -34,6 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+#ifndef __ZE_META_ATTRIBUTE__
+#define __ZE_META_ATTRIBUTE__
 
 #include "ZETypes.h"
 
@@ -43,3 +45,5 @@ struct ZEMetaAttribute
 	const char**	Values;
 	ZESize			ValueCount;
 };
+
+#endif

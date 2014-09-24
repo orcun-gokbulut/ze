@@ -39,8 +39,6 @@
 
 #include "ZEFontResource.h"
 
-ZE_CLASS(ZEFontResourceBitmap)
-
 ZE_META_FORWARD_DECLARE(ZETexture2D, "ZEGraphics/ZETexture2D.h")
 ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
 

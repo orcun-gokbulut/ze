@@ -65,8 +65,6 @@ enum ZEGizmoAxis
 ZE_META_FORWARD_DECLARE(ZESimpleMaterial, "ZEGraphics/ZESimpleMaterial.h")
 ZE_META_FORWARD_DECLARE(ZERenderer, "ZEGraphics/ZERenderer.h")
 
-ZE_CLASS(ZEGizmo)
-
 class ZEGizmo : public ZEEntity
 {
 	ZE_OBJECT

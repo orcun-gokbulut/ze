@@ -37,8 +37,6 @@
 #include "ZEScene.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_OBJECT_IMPL(ZETrigger)
-
 ZEUInt32 ZETrigger::GetDrawFlags()
 {
 	return ZE_DF_NONE;

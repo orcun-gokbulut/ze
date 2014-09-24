@@ -42,8 +42,6 @@
 #include "ZEGraphics/ZESimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
 
-ZE_OBJECT_IMPL(ZEGrid)
-
 ZEDrawFlags ZEGrid::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;

@@ -51,24 +51,24 @@ class ZEVertexDeclaration;
 class ZETerrainDataLevel : public ZEObject
 {
 	ZE_OBJECT
-
-	ZESize		ElevationWidth;
-	ZESize		ElevationHeight;
-	float*		ElevationData;
-	ZESize		ColorWidth;
-	ZESize		ColorHeight;
-	ZEUInt32*	ColorData;
+	public:
+		ZESize		ElevationWidth;
+		ZESize		ElevationHeight;
+		float*		ElevationData;
+		ZESize		ColorWidth;
+		ZESize		ColorHeight;
+		ZEUInt32*	ColorData;
 };
 
 class ZETerrainLevel : public ZEObject
 {
 	ZE_OBJECT
-
-	ZETerrainMaterial*	Material;
-	ZETexture2D*		ElevationTexture;
-	ZETexture2D*		ColorTexture;
-	float				MinHeight;
-	float				MaxHeight;
+	public:
+		ZETerrainMaterial*	Material;
+		ZETexture2D*		ElevationTexture;
+		ZETexture2D*		ColorTexture;
+		float				MinHeight;
+		float				MaxHeight;
 };
 
 class ZETerrain : public ZEEntity

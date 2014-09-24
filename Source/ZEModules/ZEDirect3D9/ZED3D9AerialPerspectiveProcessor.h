@@ -56,8 +56,6 @@ struct ZEAerialPerspectiveSAQuad
 	float	TexCoord[2];
 };
 
-ZE_CLASS(ZED3D9AerialPerspectiveProcessor)
-
 class ZED3D9AerialPerspectiveProcessor : public ZED3D9ComponentBase, public ZEObject
 {
 

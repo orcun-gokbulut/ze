@@ -44,8 +44,6 @@
 class ZETextureCubeResource;
 class ZESkyBoxMaterial;
 
-ZE_CLASS(ZESkyBrush)
-
 class ZESkyBrush : public ZEEntity
 {
 	ZE_OBJECT

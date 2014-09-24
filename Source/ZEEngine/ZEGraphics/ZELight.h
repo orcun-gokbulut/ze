@@ -54,8 +54,6 @@ enum ZELightType
 class ZEShadowRenderer;
 class ZEScene;
 
-ZE_CLASS(ZELight)
-
 class ZELight : public ZEEntity
 {
 	ZE_OBJECT

@@ -187,7 +187,7 @@ class ZEQuadTree
 		
 		void RemoveItem(ZESize Index)
 		{
-			Items.DeleteAt(Index);
+			Items.Remove(Index);
 		}
 
 		void Clear()

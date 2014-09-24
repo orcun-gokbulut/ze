@@ -37,8 +37,6 @@
 #include "ZEParticleEffect.h"
 #include "ZEParticleSystem.h"
 
-ZE_OBJECT_IMPL(ZEParticleBoxGenerator)
-
 void ZEParticleBoxGenerator::Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool)
 {
 	if(GetIsSingleBurst() && SingleBurstParticleCounter >= GetSingleBurstMaxParticleCount())

@@ -42,8 +42,6 @@
 
 #include <string.h>
 
-ZE_OBJECT_IMPL(ZEGame)
-
 ZEScene* ZEGame::GetScene()
 {
 	return Scene;

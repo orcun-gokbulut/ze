@@ -37,8 +37,6 @@
 #include "ZEModelResource.h"
 #include "ZEModel.h"
 
-ZE_OBJECT_IMPL(ZEModelHelper)
-
 const char* ZEModelHelper::GetName()
 {
 	return HelperResource->Name;

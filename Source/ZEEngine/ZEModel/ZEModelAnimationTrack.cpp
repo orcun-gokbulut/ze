@@ -40,8 +40,6 @@
 #include "ZEModel.h"
 #include <string.h>
 
-ZE_OBJECT_IMPL(ZEModelAnimationTrack)
-		
 void ZEModelAnimationTrack::SetOwner(ZEModel* Model)
 {
 	Owner = Model;

@@ -39,8 +39,6 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_OBJECT_IMPL(ZEPointLight)
-
 ZELightType ZEPointLight::GetLightType()
 {
 	return ZE_LT_POINT;

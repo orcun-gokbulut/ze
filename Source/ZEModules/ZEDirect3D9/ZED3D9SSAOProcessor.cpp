@@ -47,8 +47,6 @@
 
 #include "ZEFile/ZEFile.h"
 
-ZE_OBJECT_IMPL(ZED3D9SSAOProcessor)
-
 static ZEVector4 RandomRotations[16] = 
 {
 	ZEVector4(-0.75f,+0.75f,+0.5f,1.0f), ZEVector4(-0.25f,+0.75f,+0.5f,1.0f), ZEVector4(+0.25f,+0.75f,+0.5f,1.0f), ZEVector4(+0.75f,+0.75f,+0.5f,1.0f),

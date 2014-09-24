@@ -309,7 +309,7 @@ ZEALSoundSource3D::ZEALSoundSource3D()
 
 ZEALSoundSource3D::~ZEALSoundSource3D()
 {
-	GetModule()->SoundSources3D.DeleteValue(this);
+	GetModule()->SoundSources3D.RemoveValue(this);
 	DestroyBufferSource();
 }
 

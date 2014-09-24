@@ -54,8 +54,6 @@
 #define ACTIONID_TURNUP			7
 #define ACTIONID_TURNDOWN		8
 
-ZE_OBJECT_IMPL(ZEGameCharacter)
-
 ZEDrawFlags ZEGameCharacter::GetDrawFlags()
 {
 	return ZE_DF_DRAW_COMPONENTS | ZE_DF_CULL_COMPONENTS | ZE_DF_LIGHT_SOURCE;

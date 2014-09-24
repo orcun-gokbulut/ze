@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPostProcessor.h
+ Zinek Engine - ZEEnumerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,9 +34,31 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_POST_PROCESSOR__
-#define __ZE_POST_PROCESSOR_
+#ifndef __ZE_ENUMERATOR_H__
+#define __ZE_ENUMERATOR_H__
 
-#define ZE_POST_PROCESSOR_START(x)
-#define ZE_POST_PROCESSOR_ENDT(x)
+#include "ZETypes.h"
+#include "ZEGUID.h"
+
+struct ZEEnumeratorItem
+{
+	const char*					Name;
+	ZEUInt32					Value;
+};
+
+class ZEEnumerator
+{
+	public:
+		const char*				GetName();
+		ZEGUID					GetGUID();
+
+
+	const ZEEnumeratorItem*		GetItems();
+	ZESize						GetItemCount();
+};
+
+#define ZE_ENUM(Name) \
+	ZEEnumerator* Name##_Description();\
+	enum Name
+
 #endif

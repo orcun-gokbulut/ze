@@ -41,8 +41,6 @@
 
 ZE_META_FORWARD_DECLARE(ZEUIMaterial, "ZEGraphics/ZEUIMaterial.h")
 
-ZE_CLASS(ZEUIVerticalSliderControl)
-
 class ZEUIVerticalSliderControl : public ZEUIControl
 {
 	ZE_OBJECT

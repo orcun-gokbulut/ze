@@ -47,7 +47,6 @@
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 ZE_META_FORWARD_DECLARE(ZEAABBox, "ZEMath/ZEAABBox.h")
 
-ZE_CLASS(ZEModelBone)
 class ZEModelBone : public ZEObject
 {
 	friend class ZEModel;

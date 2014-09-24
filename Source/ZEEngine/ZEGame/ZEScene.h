@@ -64,8 +64,6 @@ class ZEPhysicalWorld;
 
 #define zeScene ZEScene::GetInstance()
 
-ZE_CLASS(ZEScene)
-
 class ZEScene : public ZEObject
 {
 	ZE_OBJECT

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEEnum.h
+ Zinek Engine - ZEMCGeneratorEnumerator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,27 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEMCGenerator.h"
+#include "ZEMCContext.h"
 
-#include "ZETypes.h"
-#include "ZEGUID.h"
-
-struct ZEEnumeratorItem
+void ZEMCGenerator::GenerateEnumerator(ZEMCEnumerator* enumerator)
 {
-	const char*					Name;
-	ZEUInt32					Value;
-};
 
-struct ZEEnumerator
-{
-	const char*					GetName();
-	ZEGUID						GetGUID();
-
-
-	const ZEEnumeratorItem*		GetItems();
-	ZESize						GetItemCount();
-};
-
-#define ZE_ENUM(Name) \
-	ZEEnumerator* Name##_Description();\
-	enum Name
+}

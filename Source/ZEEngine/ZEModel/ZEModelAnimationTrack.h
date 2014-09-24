@@ -50,8 +50,6 @@ enum ZEModelAnimationBlendMode
 	ZE_MABM_OVERWRITE	= 3,
 };
 
-ZE_CLASS(ZEModelAnimationTrack)
-
 class ZEModelAnimationTrack : public ZEObject
 {
 	friend class ZEModel;
