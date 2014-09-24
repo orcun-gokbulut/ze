@@ -60,7 +60,6 @@ ZEDrawFlags ZETerrain::GetDrawFlags() const
 	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
-
 void ZETerrain::SetChunkSize(ZEUInt Size)
 {
 	ChunkSize = Size;
