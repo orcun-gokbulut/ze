@@ -48,11 +48,12 @@ struct ZEMCOptions
 	ZEArray<ZEString> IncludeDirectories;
 	ZEArray<ZEString> Definitions;
 
-	ZEString RegisterFileName;
-	ZEString ClassCollectionName;
-	ZEString ClassCollectionHeaderFile;
-	ZEString ClassCollectionSourceFile;
-	ZEArray<ZEString> RegisterFiles;
+	ZEString DeclarationsFileName;
+	ZEArray<ZEString> DeclarationsFileNames;
+	ZEString RegisterName;
+	ZEString RegisterHeaderFileName;
+	ZEString RegisterSourceFileName;
+
 	bool IsRegisterSession;
 	bool IsGenerateSession;
 

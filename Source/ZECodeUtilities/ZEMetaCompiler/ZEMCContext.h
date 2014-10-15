@@ -181,7 +181,7 @@ class ZEMCDeclaration
 	public:
 		ZEString Name;
 		ZEUInt32 Hash;
-		ZEArray<ZEMCAttribute*> Attributes;
+		ZEArray<ZEMCAttribute> Attributes;
 
 		ZEMCDeclaration();
 		virtual ~ZEMCDeclaration();
@@ -200,7 +200,7 @@ class ZEMCEnumeratorItem
 class ZEMCEnumerator : public ZEMCDeclaration
 {
 	public:
-		ZEArray<ZEMCEnumeratorItem*> Items;
+		ZEArray<ZEMCEnumeratorItem> Items;
 
 		ZEMCEnumerator();
 		~ZEMCEnumerator();
@@ -251,7 +251,7 @@ struct ZEMCMethod : public ZEMCDeclaration
 		ZEMCMetaOperatorType OperatorType;
 
 		ZEMCType ReturnValue;
-		ZEArray<ZEMCMethodParameter*> Parameters;
+		ZEArray<ZEMCMethodParameter> Parameters;
 
 		ZEMCMethod();
 		virtual ~ZEMCMethod();
@@ -264,16 +264,13 @@ class ZEMCClass : public ZEMCDeclaration
 		ZEArray<ZEMCProperty*> Properties;
 		ZEArray<ZEMCMethod*> Methods;
 
-		// Old
 		bool IsForwardDeclared;
 		bool HasScriptBase;
 
 		bool IsAbstract;
-		bool IsBuiltInClass;
+		bool IsBuiltInType;
 
-		// Instancing
 		bool HasCreateInstanceMethod;
-
 		bool HasPublicCopyConstructor;
 		bool HasPublicDefaultConstructor;
 		bool HasPublicDestructor;
@@ -285,9 +282,12 @@ class ZEMCClass : public ZEMCDeclaration
 class ZEMCContext
 {
 	public:
-		ZEArray<ZEMCClass*> TargetDeclarations;
-		ZEArray<ZEMCClass*> Declarations;
-		ZEArray<ZEMCEnumerator*> Enumurators;
+		ZEArray<ZEMCClass*> Classes;
+		ZEArray<ZEMCEnumerator*> Enumerators;
+
+		ZEArray<ZEMCClass*> TargetClasses;
+		ZEArray<ZEMCEnumerator*> TargetEnumerators;
+
 		ZEArray<ZEMCForwardDeclaration*> ForwardDeclarations;
 
 		ZEMCContext();

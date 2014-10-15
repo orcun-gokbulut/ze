@@ -105,10 +105,6 @@ ZEMCAttribute::ZEMCAttribute()
 
 ZEMCAttribute::~ZEMCAttribute()
 {
-	for (ZESize I = 0; I < Parameters.GetCount(); I++)
-		delete Parameters[I];
-
-	Parameters.Clear();
 }
 
 ZEMCEnumerator::ZEMCEnumerator()
@@ -119,10 +115,6 @@ ZEMCEnumerator::ZEMCEnumerator()
 
 ZEMCEnumerator::~ZEMCEnumerator()
 {
-	for (ZESize I = 0; I < Items.GetCount(); I++)
-		delete Items[I];
-
-	Items.Clear();
 }
 
 ZEMCDeclaration::ZEMCDeclaration()
@@ -132,10 +124,7 @@ ZEMCDeclaration::ZEMCDeclaration()
 
 ZEMCDeclaration::~ZEMCDeclaration()
 {
-	for (ZESize I = 0; I < Attributes.GetCount(); I++)
-		delete Attributes[I];
 
-	Attributes.Clear();
 }
 
 ZEMCProperty::ZEMCProperty()
@@ -178,10 +167,7 @@ ZEMCMethod::ZEMCMethod()
 
 ZEMCMethod::~ZEMCMethod()
 {
-	for (ZESize I = 0; I < Parameters.GetCount(); I++)
-		delete Parameters[I];
 
-	Parameters.Clear();
 }
 
 ZEMCClass::ZEMCClass()
@@ -193,7 +179,7 @@ ZEMCClass::ZEMCClass()
 	HasPublicCopyConstructor = true;
 	HasCreateInstanceMethod = false;
 	IsAbstract = false;
-	IsBuiltInClass = false;
+	IsBuiltInType = false;
 	IsForwardDeclared = false;
 }
 
@@ -201,12 +187,10 @@ ZEMCClass::~ZEMCClass()
 {
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 		delete Properties[I];
-
 	Properties.Clear();
 
 	for (ZESize I = 0; I < Methods.GetCount(); I++)	
 		delete Methods[I];
-
 	Methods.Clear();
 }
 
@@ -217,20 +201,20 @@ ZEMCContext::ZEMCContext()
 
 ZEMCContext::~ZEMCContext()
 {
-	TargetDeclarations.Clear();
-
-	for (ZESize I = 0; I < Declarations.GetCount(); I++)
-		delete Declarations[I];
-
-	Declarations.Clear();
-
-	for (ZESize I = 0; I < Enumurators.GetCount(); I++)
-		delete Enumurators[I];
+	for (ZESize I = 0; I < Classes.GetCount(); I++)
+		delete Classes[I];
 	
-	Enumurators.Clear();
+	Classes.Clear();
+
+	for (ZESize I = 0; I < Enumerators.GetCount(); I++)
+		delete Enumerators[I];
+
+	Enumerators.Clear();
 
 	for (ZESize I = 0; I < ForwardDeclarations.GetCount(); I++)
 		delete ForwardDeclarations[I];
 
+	TargetClasses.Clear();
+	TargetEnumerators.Clear();
 	ForwardDeclarations.Clear();
 }

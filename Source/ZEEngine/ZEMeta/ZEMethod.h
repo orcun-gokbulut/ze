@@ -94,9 +94,9 @@ struct ZEMethod
 	ZEUInt32			Hash;
 
 	ZEClass*			MemberOf;
-
 	void*				MethodPtr;
 
+	bool				IsConst;
 	bool				IsEvent;
 	bool				IsVirtual;
 	bool				IsStatic;

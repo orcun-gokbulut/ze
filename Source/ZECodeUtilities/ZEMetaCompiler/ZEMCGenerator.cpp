@@ -86,14 +86,14 @@ bool ZEMCGenerator::Generate()
 
 	GenerateHeading();
 
-	for (int I = 0; I < Context->Enumurators.GetCount(); I++)
+	for (int I = 0; I < Context->TargetEnumerators.GetCount(); I++)
 	{
-		GenerateEnumerator(Context->Enumurators[I]);
+		GenerateEnumerator(Context->TargetEnumerators[I]);
 	}
 
-	for (int I = 0; I < Context->TargetDeclarations.GetCount(); I++)
+	for (int I = 0; I < Context->TargetClasses.GetCount(); I++)
 	{
-		GenerateClass((ZEMCClass*)Context->TargetDeclarations[I]);
+		GenerateClass((ZEMCClass*)Context->TargetClasses[I]);
 	}
 
 	GenerateEnding();
@@ -105,11 +105,17 @@ bool ZEMCGenerator::Generate()
 
 void ZEMCGenerator::GenerateHeading()
 {
+	WriteToFile("//////////////////////////////////////////////////\n");
+	WriteToFile("//  ZEMetaCompiler auto generated ZEMeta file.  //\n");
+	WriteToFile("//      DO NOT EDIT (HACK) THIS FILE !!!        //\n");
+	WriteToFile("//////////////////////////////////////////////////\n");
+	WriteToFile("\n\n");
+
 	WriteToFile("#include \"%s\"\n", ZEFileInfo::GetFileName(Options->InputFileName).ToCString());
 	WriteToFile("#include \"ZEDS/ZEVariant.h\"\n");
 	WriteToFile("#include \"ZEDS/ZEReference.h\"\n");
 	WriteToFile("#include \"ZEScript/ZEScriptEngine.h\"\n");
-	WriteToFile("#include <stddef.h>\n");
+	WriteToFile("#include <stddef.h>\n\n");
 }
 
 void ZEMCGenerator::GenerateEnding()
@@ -624,5 +630,5 @@ ZEString ZEMCGenerator::GenerateTypeConstructor(const ZEMCType& Type)
 		ConvertTypeQualifierToEnum(Type.TypeQualifier),
 		ConvertContainerTypeToEnum(Type.ContainerType),
 		Type.BaseType == ZEMC_BT_OBJECT || Type.BaseType == ZEMC_BT_OBJECT_PTR ? ZEFormat::Format("{0}::Class()", Type.Class->Name) : "NULL",
-		Type.BaseType == ZEMC_BT_ENUMERATOR ? ZEFormat::Format("{0}_Description", Type.Enumurator->Name) : "NULL");
+		Type.BaseType == ZEMC_BT_ENUMERATOR ? ZEFormat::Format("{0}_Declaration()", Type.Enumurator->Name) : "NULL");
 }

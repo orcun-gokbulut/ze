@@ -40,12 +40,16 @@
 #include "ZETypes.h"
 
 class ZEClass;
+class ZEEnumerator;
 
 class ZEMetaRegister
 {
 	public:
 		virtual ZEClass**		GetClasses() = 0;
 		virtual ZESize			GetClassCount() = 0;
+
+		virtual ZEEnumerator**	GetEnumerators() = 0;
+		virtual ZESize			GetEnumeratorCount() = 0;
 };
 
 #endif

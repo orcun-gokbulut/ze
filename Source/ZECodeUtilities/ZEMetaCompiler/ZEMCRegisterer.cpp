@@ -36,179 +36,244 @@
 #include "ZEMCRegisterer.h"
 #include "ZEFile/ZEFileInfo.h"
 
-struct ZERegisteredClass
-{
-	ZEString RegisteredClassName;
-	ZEString IncludeDirectory;
-};
-
 void ZEMCRegisterer::SetOptions(ZEMCOptions* options)
 {
 	Options = options;
 }
 
-void ZEMCRegisterer::RegisterFile(ZEMCContext* context)
+void ZEMCRegisterer::ParseCSVLine(ZEArray<ZEString>& Output, const char* Input)
 {
-	FILE* File;
-	File = fopen(Options->RegisterFileName.ToCString(), "w");
+	Output.Clear();
 
-	for(ZESize I = 0; I < context->TargetDeclarations.GetCount(); I++)
+	ZEString CurrentValue;
+
+	const char* CurrentChar = Input;
+	while(true)
 	{
-		fprintf(File, "%s,%s;", 
-			context->TargetDeclarations[I]->Name.ToCString(), 
-			ZEFileInfo::GetFileName(Options->InputFileName).ToCString());
-	}
+		if (*CurrentChar == '\n' || *CurrentChar == '\0' || *CurrentChar == ';')
+		{
+			if (!CurrentValue.IsEmpty())
+				Output.Add(CurrentValue);
+			break;
+		}
+		else if (*CurrentChar == ',')
+		{
+			Output.Add(CurrentValue);
+			CurrentValue.Clear();
+			CurrentChar++;
+			continue;
+		}
 
-	fclose(File);
+		CurrentValue.AppendCharacter(ZECharacter(*CurrentChar));
+		CurrentChar++;
+	}
 }
 
-void ZEMCRegisterer::RegisterModule()
+void ZEMCRegisterer::LoadDeclarations()
 {
-	ZEArray<ZERegisteredClass> RegisteredClasses;
-
-	for(ZESize I = 0; I < Options->RegisterFiles.GetCount(); I++)
+	for (ZESize I = 0; I < Options->DeclarationsFileNames.GetCount(); I++)
 	{
 		FILE* RegisterFile;
-		RegisterFile = fopen(Options->RegisterFiles[I].ToCString(), "r");
+		RegisterFile = fopen(Options->DeclarationsFileNames[I].ToCString(), "r");
 
 		if(RegisterFile == NULL)
-			zeError("Error! Register file is not found!");
-
-		fseek(RegisterFile, 0, SEEK_END);
-		unsigned int FileLength = ftell(RegisterFile);
-		fseek(RegisterFile, 0, SEEK_SET);
-
-		ZEArray<ZEInt8> Buffer;
-		Buffer.SetCount(FileLength);
-		ZESize BytesRead = fread(Buffer.GetCArray(), 1, FileLength, RegisterFile);
-
-		if (BytesRead != FileLength)
-			zeError("Error! Can not read register file!");
-
-		fclose(RegisterFile);
-
-		ZEString Context = (const char*)Buffer.GetConstCArray();
-		ZESize Index = 0;
-
-		ZERegisteredClass* RegisteredClass;
-
-		for(ZESize J = 0; J < Context.GetLength(); J++)
 		{
-			if(Context.GetCharacter(J).GetValue()[0] == ',')
-			{
-				RegisteredClass = RegisteredClasses.Add();
-				RegisteredClass->RegisteredClassName = Context.SubString(Index, J - 1);
+			zeError("Cannot open declarations file \"%s\" for reading.", Options->DeclarationsFileNames[I].ToCString());
+			return;
+		}
 
-				Index = J + 1;
+		char Buffer[4096];
+		if (fgets(Buffer, 4096, RegisterFile) == NULL)
+			continue;
+
+		ZEArray<ZEString> Values;
+		ParseCSVLine(Values, Buffer);
+		if (Values.GetCount() == 0)
+			continue;
+		
+		if (!Context.Includes.Exists(Values[0]))
+			Context.Includes.Add(Values[0]);
+
+		while(!feof(RegisterFile))
+		{
+
+			if (fgets(Buffer, 4096, RegisterFile) == NULL)
 				continue;
-			}
 
-			if(Context.GetCharacter(J).GetValue()[0] == ';')
-			{
-				bool IsDuplicateIncludeFileFound = false;
-				ZEString IncludeDirectory = Context.SubString(Index, J - 1);
+			ParseCSVLine(Values, Buffer);
+			if (Values.GetCount() < 2)
+				continue;
 
-				for(ZESize I = 0 ; I < RegisteredClasses.GetCount(); I++)
-				{
-					if(RegisteredClasses[I].IncludeDirectory == IncludeDirectory)
-					{
-						IsDuplicateIncludeFileFound = true;
-						break;
-					}
-				}
-
-				if(!IsDuplicateIncludeFileFound)
-					RegisteredClass->IncludeDirectory = Context.SubString(Index, J - 1);
-
-				break;
-			}
+			if (Values[0] == "Class")
+				Context.Classes.Add(Values[1]);
+			else if (Values[0] == "Enum")
+				Context.Enumerators.Add(Values[1]);
 		}
 	}
+}
 
-	ZEString ClassCollectionName = Options->ClassCollectionName;
-	ZEString ClassCollectionHeader = Options->ClassCollectionHeaderFile;
+void ZEMCRegisterer::GenerateRegisterHeader(FILE* File)
+{
+	FILE* RegisterHeaderFile;
+	RegisterHeaderFile = fopen(Options->RegisterHeaderFileName.ToCString(), "w");
+	if (RegisterHeaderFile == NULL)
+	{
+		zeError("Cannot open register header file \"%s\" for writing.\n", Options->RegisterHeaderFileName.ToCString());
+		return;
+	}
 
-	FILE* ClassCollectionHeaderFile;
-	ClassCollectionHeaderFile = fopen(ClassCollectionHeader.ToCString(), "w");
-
-	fprintf(ClassCollectionHeaderFile,
+	fprintf(RegisterHeaderFile,
 		"#pragma once\n"
 		"#include \"ZEMeta/ZEMetaRegister.h\"\n\n"
 		"class %s : public ZEMetaRegister\n"
 		"{\n"
 		"\tpublic:\n"
-		"\t\tvirtual ZEClass**\t\t\t\t\t\tGetClasses();\n"
-		"\t\tvirtual ZESize\t\t\t\t\t\t\tGetClassCount();\n\n"
+		"\t\tvirtual ZEClass**\t\t\t\t\tGetClasses();\n"
+		"\t\tvirtual ZESize\t\t\t\t\t\tGetClassCount();\n\n"
+		"\t\tvirtual ZEEnumerator**\t\t\t\tGetEnumerators();\n"
+		"\t\tvirtual ZESize\t\t\t\t\t\tGetEnumeratorCount();\n\n"
 		"\t\tstatic %s*\t\t\tGetInstance();\n"
 		"};\n\n", 
-		ClassCollectionName.ToCString(), 
-		ClassCollectionName.ToCString());
+		Context.RegisterName.ToCString(), 
+		Context.RegisterName.ToCString());
 
-	fclose(ClassCollectionHeaderFile);
+	fclose(RegisterHeaderFile);
+}
 
-	ZEString ClassCollectionCpp = Options->ClassCollectionSourceFile;
+void ZEMCRegisterer::GenerateIncludes(FILE* File)
+{
+	fprintf(File, "#include \"%s\"\n", Options->RegisterHeaderFileName.ToCString());
 
-	FILE* ClassCollectionSourceFile;
-	ClassCollectionSourceFile = fopen(ClassCollectionCpp.ToCString(), "w");
+	for(ZESize I = 0; I < Context.Includes.GetCount(); I++)
+		fprintf(File, "#include \"%s\"\n", Context.Includes[I].ToCString());
+}
 
-	fprintf(ClassCollectionSourceFile, "#include \"%s\"\n", ClassCollectionHeader.ToCString());
-
-	bool IsBuiltInTypeFound = false;
-	for(ZESize I = 0; I < RegisteredClasses.GetCount(); I++)
-	{
-		if(!RegisteredClasses[I].IncludeDirectory.IsEmpty())
-		{
-			//Is registered class a builtin math class type?
-			if(RegisteredClasses[I].IncludeDirectory == "ZEVector.h" || RegisteredClasses[I].IncludeDirectory == "ZEMatrix.h" || RegisteredClasses[I].IncludeDirectory == "ZEQuaternion.h")
-			{
-				fprintf(ClassCollectionSourceFile, "#include \"ZEMath/%s\"\n", RegisteredClasses[I].IncludeDirectory.ToCString());
-				IsBuiltInTypeFound = true;
-			}
-			else
-				fprintf(ClassCollectionSourceFile, "#include \"%s\"\n", RegisteredClasses[I].IncludeDirectory.ToCString());
-		}
-	}
-
-	if(IsBuiltInTypeFound)
-		fprintf(ClassCollectionSourceFile, "#include \"ZEPrimitiveTypes.h\"\n");
-
-	fprintf(ClassCollectionSourceFile,
+void ZEMCRegisterer::GenerateRegisterGetClasses(FILE* File)
+{
+	fprintf(File,
 		"\n"
 		"ZEClass** %s::GetClasses()\n"
-		"{\n"
-		"\tstatic ZEClass* Classes[%d] = \n"
-		"\t{\n", ClassCollectionName.ToCString(), RegisteredClasses.GetCount());
+		"{\n", Context.RegisterName.ToCString());
 
-	for(ZESize I = 0; I < RegisteredClasses.GetCount(); I++)
+	if (Context.Classes.GetCount() == 0)
 	{
-		if(!RegisteredClasses[I].RegisteredClassName.IsEmpty())
-		{
-			//Is registered class a builtin class type?
-			if(IsBuiltInTypeFound)
-				fprintf(ClassCollectionSourceFile, "\t\t%sClass::Class()%s\n", RegisteredClasses[I].RegisteredClassName.ToCString(), I < RegisteredClasses.GetCount() - 1 ? "," : "");
-			else
-				fprintf(ClassCollectionSourceFile, "\t\t%s::Class()%s\n", RegisteredClasses[I].RegisteredClassName.ToCString(), I < RegisteredClasses.GetCount() - 1 ? "," : "");
-		}
+		fprintf(File, "\treturn NULL;\n");
+	}
+	else
+	{
+		fprintf(File, "\tstatic ZEClass* Classes[%d] = \n"
+			"\t{\n", Context.Classes.GetCount());
+
+		for(ZESize I = 0; I < Context.Classes.GetCount(); I++)
+			fprintf(File, "\t\t%s::Class()%s\n", Context.Classes[I].ToCString(), I < Context.Classes.GetCount() - 1 ? "," : "");
+
+		fprintf(File,
+			"\t};\n\n"
+			"\treturn Classes;\n");
 	}
 
-	fprintf(ClassCollectionSourceFile,
-		"\t};\n\n"
-		"\treturn Classes;\n"
-		"};\n\n");
+	fprintf(File, "};\n\n");
+}
 
-	fprintf(ClassCollectionSourceFile,
+void ZEMCRegisterer::GenerateRegisterGetClassCount(FILE* File)
+{
+	fprintf(File,
 		"ZESize %s::GetClassCount()\n"
 		"{\n"
 		"\treturn %d;\n"
-		"}\n\n", ClassCollectionName.ToCString(), RegisteredClasses.GetCount());
+		"}\n\n", Context.RegisterName.ToCString(), Context.Classes.GetCount());
+}
 
-	fprintf(ClassCollectionSourceFile,
+void ZEMCRegisterer::GenereteRegisterGetEnumerators(FILE* File)
+{
+	fprintf(File,
+		"ZEEnumerator** %s::GetEnumerators()\n"
+		"{\n", Context.RegisterName.ToCString());
+
+	if (Context.Enumerators.GetCount() == 0)
+	{
+		fprintf(File, "\treturn NULL;\n");
+	}
+	else
+	{
+		fprintf(File, "\tstatic ZEEnumerator* Enumerators[%d] = \n"
+			"\t{\n", Context.Enumerators.GetCount());
+
+		for(ZESize I = 0; I < Context.Enumerators.GetCount(); I++)
+			fprintf(File, "\t\t%s_Declaration()%s\n", Context.Enumerators[I].ToCString(), I < Context.Enumerators.GetCount() - 1 ? "," : "");
+
+		fprintf(File,
+			"\t};\n\n"
+			"\treturn Enumerators;\n");
+	}
+
+	fprintf(File, "};\n\n");
+}
+
+void ZEMCRegisterer::GenerateRegisterGetEnumeratorCount(FILE* File)
+{
+	fprintf(File,
+		"ZESize %s::GetEnumeratorCount()\n"
+		"{\n"
+		"\treturn %d;\n"
+		"}\n\n", Context.RegisterName.ToCString(), Context.Classes.GetCount());
+}
+
+void ZEMCRegisterer::GenerateDeclarationsFile(ZEMCContext* Context)
+{
+	FILE* File;
+	File = fopen(Options->DeclarationsFileName.ToCString(), "w");
+	if(File == NULL)
+	{
+		zeError("Cannot open declarations file \"%s\" for writing.", Options->DeclarationsFileName.ToCString());
+		return;
+	}
+
+	fprintf(File, "%s\n", ZEFileInfo::GetFileName(Options->InputFileName).ToCString());
+	for (ZESize I = 0; I < Context->TargetClasses.GetCount(); I++)
+		fprintf(File, "Class,%s;\n", Context->TargetClasses[I]->Name.ToCString());
+
+	for (ZESize I = 0; I < Context->TargetEnumerators.GetCount(); I++)
+		fprintf(File, "Enum,%s;\n", Context->Enumerators[I]->Name.ToCString());
+
+	fclose(File);
+}
+
+void ZEMCRegisterer::GenerateGetInstance(FILE* File)
+{
+	fprintf(File,
 		"%s* %s::GetInstance()\n"
 		"{\n"
-		"\tstatic %s Collection;\n"
-		"\treturn &Collection;\n"
-		"}\n\n", ClassCollectionName.ToCString(), ClassCollectionName.ToCString(), ClassCollectionName.ToCString());
+		"\tstatic %s Register;\n"
+		"\treturn &Register;\n"
+		"}\n\n", Context.RegisterName.ToCString(), Context.RegisterName.ToCString(), Context.RegisterName.ToCString());
+}
 
-	fclose(ClassCollectionSourceFile);
+void ZEMCRegisterer::GenerateRegister()
+{
+	Context.RegisterName = Options->RegisterName;
+	Context.Classes.Clear();
+	Context.Enumerators.Clear();
+	Context.Includes.Clear();
+
+	LoadDeclarations();
+
+	FILE* File;
+	File = fopen(Options->RegisterSourceFileName.ToCString(), "w");
+	if (File == NULL)
+	{
+		zeError("Cannot open register source file \"%s\" for writing.\n", Options->RegisterSourceFileName.ToCString());
+		return;
+	}
+
+	GenerateRegisterHeader(File);
+	GenerateIncludes(File);
+	GenerateRegisterGetClasses(File);
+	GenerateRegisterGetClassCount(File);
+	GenereteRegisterGetEnumerators(File);
+	GenerateRegisterGetEnumeratorCount(File);
+	GenerateGetInstance(File);
+
+	fclose(File);
 }
 

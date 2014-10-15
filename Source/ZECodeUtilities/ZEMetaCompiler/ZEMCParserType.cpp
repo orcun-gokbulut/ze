@@ -38,19 +38,20 @@
 
 ZEMCClass* ZEMCParser::FindClass(const char* ClassName)
 {
-	for (int I = 0; I < Context->Declarations.GetCount(); I++)
+	for (int I = 0; I < Context->Classes.GetCount(); I++)
 	{
-		if (Context->Declarations[I]->Name == ClassName)
-			return Context->Declarations[I];
+		if (Context->Classes[I]->Name == ClassName)
+			return Context->Classes[I];
 	}
 
 	for (int I = 0; I < Context->ForwardDeclarations.GetCount(); I++)
 	{
 		if (Context->ForwardDeclarations[I]->ClassName == ClassName)
 		{
-			ZEMCClass* ForwardDeclaredClass = *Context->Declarations.Add();
+			ZEMCClass* ForwardDeclaredClass = new ZEMCClass();
 			ForwardDeclaredClass->Name = ClassName;
 			ForwardDeclaredClass->IsForwardDeclared = true;
+			Context->Classes.Add(ForwardDeclaredClass);
 			return ForwardDeclaredClass;
 		}
 	}
@@ -60,6 +61,10 @@ ZEMCClass* ZEMCParser::FindClass(const char* ClassName)
 
 ZEMCEnumerator* ZEMCParser::FindEnumurator(const char* EnumName)
 {
+	for (ZESize I = 0; I < Context->Enumerators.GetCount(); I++)
+		if (EnumName == Context->Enumerators[I]->Name)
+			return Context->Enumerators[I];
+
 	return NULL;
 }
 
@@ -270,304 +275,3 @@ bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 	Output = TempType;
 	return true;
 }
-
-/*
-ZEMCType ZEMCParser::ProcessInnerType(ZEString MainClassName, const Type* ClangType)
-{
-	ZEMCType TempType;
-	if (ClangType->isBuiltinType())
-	{
-		switch(((BuiltinType*)ClangType)->getKind())
-		{
-		case BuiltinType::Char_U:
-		case BuiltinType::UChar:
-			TempType.BaseType = ZEMC_BT_UNSIGNED_INTEGER_8;
-			break;
-
-		case BuiltinType::UShort:
-			TempType.BaseType = ZEMC_BT_UNSIGNED_INTEGER_16;
-			break;
-
-		case BuiltinType::UInt:
-			TempType.BaseType = ZEMC_BT_UNSIGNED_INTEGER_32;
-			break;
-
-		case BuiltinType::ULongLong:
-			TempType.BaseType = ZEMC_BT_UNSIGNED_INTEGER_64;
-			break;
-
-		case BuiltinType::Char_S:
-		case BuiltinType::SChar:
-			TempType.BaseType = ZEMC_BT_INTEGER_8;
-			break;
-
-		case BuiltinType::Short:
-			TempType.BaseType = ZEMC_BT_INTEGER_16;
-			break;
-
-		case BuiltinType::Int:
-			TempType.BaseType = ZEMC_BT_INTEGER_32;
-			break;
-
-		case BuiltinType::LongLong:
-			TempType.BaseType = ZEMC_BT_UNSIGNED_INTEGER_64;
-			break;
-
-		case BuiltinType::Float:
-			TempType.BaseType = ZEMC_BT_FLOAT;
-			break;
-
-		case BuiltinType::Double:
-			TempType.BaseType = ZEMC_BT_DOUBLE;
-			break;
-
-		case BuiltinType::Bool:
-			TempType.BaseType = ZEMC_BT_BOOLEAN;
-			break;
-
-		case BuiltinType::Void:
-			TempType.BaseType = ZEMC_BT_VOID;
-			break;
-
-		default:
-			TempType.BaseType = ZEMC_BT_UNDEFINED;
-		}
-	}
-	else if (ClangType->isClassType())
-	{
-		CXXRecordDecl* ClassPtr = ClangType->getAsCXXRecordDecl();
-		if (ClassPtr->getName() == "ZEString")
-		{
-			TempType.BaseType = ZEMC_BT_STRING;
-		}
-		else if (ClassPtr->getName() == "ZEArray")
-		{
-			TempType.BaseType = ZEMC_BT_ARRAY;
-		}
-		else if (ClassPtr->getName() == "ZEList")
-		{
-			TempType.BaseType = ZEMC_BT_LIST;
-		}
-		else if (ClassPtr->getName() == "ZEVector2")
-		{
-			TempType.BaseType = ZEMC_BT_VECTOR2;
-		}
-		else if (ClassPtr->getName() == "ZEVector3")
-		{
-			TempType.BaseType = ZEMC_BT_VECTOR3;
-		}
-		else if (ClassPtr->getName() == "ZEVector4")
-		{
-			TempType.BaseType = ZEMC_BT_VECTOR4;
-		}
-		else if (ClassPtr->getName() == "ZEQuaternion")
-		{
-			TempType.BaseType = ZEMC_BT_QUATERNION;
-		}
-		else if (ClassPtr->getName() == "ZEMatrix3x3")
-		{
-			TempType.BaseType = ZEMC_BT_MATRIX3X3;
-		}
-		else if (ClassPtr->getName() == "ZEMatrix4x4")
-		{
-			TempType.BaseType = ZEMC_BT_MATRIX4X4;
-		}
-		else
-		{
-			TempType.BaseType = ZEMC_BT_OBJECT_PTR;
-		
-			if(ClassPtr->isCompleteDefinition())
-			{
-				
-				for (int I = 0; I < Context->Declarations.GetCount(); I++)
-				{
-					if (Context->Declarations[I]->Name == ClassPtr->getNameAsString())
-					{
-						TempType.Class = Context->Declarations[I];
-					}
-					return TempType;
-				}
-
-				return ZEMCType();
-			}
-			else
-			{
-				if(Context->ForwardDeclarations.GetCount() > 0)
-				{
-					for(int I = Context->ForwardDeclarations.GetCount() - 1; I >= 0; I--)
-					{
-						if(Context->ForwardDeclarations[I]->ClassName == TempType.Class->Name)
-						{
-							Context->ForwardDeclarations[I]->HeaderFileDeclaredIn = MainClassName;
-							return TempType;
-						}
-					}
-				}
-
-				return ZEMCType();
-			}
-		}
-	}
-	else if(ClangType->isEnumeralType())
-	{
-		TempType.BaseType = ZEMC_BT_ENUMERATOR;
-	}
-	else
-		TempType.BaseType = ZEMC_BT_UNDEFINED;
-
-	return TempType;
-}
-
-ZEMCType ZEMCParser::ProcessType(ZEString MainClassName, QualType& ClangType)
-{
-	QualType CanonicalType = ClangType.getCanonicalType();
-	const Type* TypePtr = ClangType.getTypePtr();
-
-	ZEMCType TempType = ProcessInnerType(MainClassName, TypePtr);
-	
-	if (CanonicalType.getTypePtr()->isReferenceType())
-	{
-		const ReferenceType* ReferenceTypePtr = TypePtr->castAs<ReferenceType>();
-		QualType ReferenceePtr = ReferenceTypePtr->getPointeeType();
-
-		TempType = ProcessInnerType(MainClassName, ReferenceePtr.getTypePtr());
-		if (TempType.BaseType == ZEMC_BT_UNDEFINED)
-			return ZEMCType();
-
-		TempType.TypeQualifier = (ReferenceePtr.isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE);
-
-		if (TempType.BaseType == ZEMC_BT_ARRAY)
-		{
-			const clang::TemplateSpecializationType* TemplateType = ClangType->getPointeeType()->getAs<TemplateSpecializationType>();
-
-			if(TemplateType->getNumArgs() < 1)
-				return ZEMCType();
-
-			TemplateArgument Argument = TemplateType->getArg(0);
-
-			if(Argument.getAsType().getTypePtr()->isPointerType())
-			{
-				ZEMCType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr()->getPointeeType().getTypePtr());
-				TempType.SubType = SubTypeData.BaseType;
-				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
-				return TempType;
-			}
-			else
-			{
-				if(Argument.getAsType().getTypePtr()->isClassType())
-					return ZEMCType();
-
-				ZEMCType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
-				TempType.SubType = SubTypeData.BaseType;
-				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
-				return TempType;
-			}
-
-			return TempType;
-		}
-
-		return TempType;
-	}
-	else if (CanonicalType.getTypePtr()->isPointerType())
-	{
-		if(CanonicalType->getPointeeType()->isBuiltinType())
-			return ZEMCType();
-
-		if (CanonicalType->getPointeeType()->isClassType())
-		{
-			TempType.BaseType = ZEMC_BT_OBJECT_PTR;
-			TempType.TypeQualifier = CanonicalType->getPointeeType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
-			TempType.Class->Name = CanonicalType.getBaseTypeIdentifier()->getName().str();
-
-			CXXRecordDecl* ClassPtr = ClangType->getPointeeType().getTypePtr()->getAsCXXRecordDecl();
-			
-			if(ClassPtr->isCompleteDefinition())
-			{
-				if(CheckClass(ClassPtr))
-					return TempType;
-				else
-					return ZEMCType();
-			}
-			else
-			{
-				if(Context->ForwardDeclarations.GetCount() > 0)
-				{
-					for(int I = Context->ForwardDeclarations.GetCount() - 1; I >= 0; I--)
-					{
-						if(Context->ForwardDeclarations[I]->ClassName == TempType.Class->Name)
-						{
-							Context->ForwardDeclarations[I]->HeaderFileDeclaredIn = MainClassName;
-							return TempType;
-						}
-					}
-				}
-
-				return ZEMCType();
-			}
-		}
-
-		return TempType;
-	}
-	else
-	{
-		if (CanonicalType.isConstQualified())
-			return ZEMCType();
-
-		TempType = ProcessInnerType(MainClassName, CanonicalType.getTypePtr());
-
-		if (TempType.BaseType == ZEMC_BT_ARRAY)
-		{
-			const clang::TemplateSpecializationType* TemplateType = ClangType->getAs<TemplateSpecializationType>();
-
-			if(TemplateType->getNumArgs() < 1)
-				return ZEMCType();
-
-			TemplateArgument Argument = TemplateType->getArg(0);
-
-			if(Argument.getAsType().getTypePtr()->isPointerType())
-			{
-				ZEMCType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr()->getPointeeType().getTypePtr());
-				TempType.SubType = SubTypeData.BaseType;
-				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
-				return TempType;
-			}
-			else
-			{
-				if(Argument.getAsType().getTypePtr()->isClassType())
-					return ZEMCType();
-
-				ZEMCType SubTypeData = ProcessInnerType(MainClassName, Argument.getAsType().getTypePtr());
-				TempType.SubType = SubTypeData.BaseType;
-				TempType.SubTypeQualifier = Argument.getAsType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
-				return TempType;
-			}
-
-			return TempType;
-		}
-		else if (TempType.BaseType == ZEMC_BT_LIST)
-		{
-			//TO DO : Handle List type
-		}
-		else if (TempType.BaseType == ZEMC_BT_ENUMERATOR)
-		{
-			TempType.EnumName = ClangType->getAs<EnumType>()->getDecl()->getNameAsString();
-
-			EnumDecl* EnumDeclaration = ClangType->getAs<EnumType>()->getDecl();
-
-			ZEMCEnumerator* EnumData = new ZEMCEnumerator();
-			EnumData->Name = TempType.EnumName;
-
-			for(EnumDecl::enumerator_iterator CurrentEnum = EnumDeclaration->enumerator_begin(), EnumEnd = EnumDeclaration->enumerator_end(); CurrentEnum != EnumEnd; ++CurrentEnum)
-			{
-				ZEEnumeratorItem* EnumParameterData = new ZEEnumeratorItem();
-				EnumParameterData->Name = CurrentEnum->getNameAsString();
-				EnumParameterData->Value = *CurrentEnum->getInitVal().getRawData();
-				EnumData->Items.Add(EnumParameterData);
-			}
-
-			Context->Enumurators.Add(EnumData);
-		}
-
-		return TempType;
-	}
-}*/

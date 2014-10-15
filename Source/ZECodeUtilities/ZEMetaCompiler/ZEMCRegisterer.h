@@ -40,16 +40,40 @@
 #include "ZEMCOptions.h"
 #include "ZEMCContext.h"
 
+class ZEMCRegisterContext
+{
+	public:
+		ZEString RegisterName;
+		ZEArray<ZEString> Includes;
+		ZEArray<ZEString> Classes;
+		ZEArray<ZEString> Enumerators;
+};
+
 class ZEMCRegisterer
 {
 	private:
 		ZEMCOptions* Options;
+		ZEMCRegisterContext Context;
+		FILE* RegisterHeader;
+		FILE* RegisterSource;
 
+		void ParseCSVLine(ZEArray<ZEString>& Output, const char* Input);
+		void LoadDeclarations();
+
+		void GenerateRegisterHeader(FILE* File);
+		void GenerateIncludes(FILE* File);
+		void GenerateRegisterGetClasses(FILE* File);
+		void GenerateRegisterGetClassCount(FILE* File);
+		void GenereteRegisterGetEnumerators(FILE* File);
+		void GenerateRegisterGetEnumeratorCount(FILE* File);
+		void GenerateGetInstance(FILE* File);
+		
 	public:
+
 		void SetOptions(ZEMCOptions* options);
 
-		void RegisterFile(ZEMCContext* context);
-		void RegisterModule();
+		void GenerateDeclarationsFile(ZEMCContext* context);
+		void GenerateRegister();
 };
 
 #endif

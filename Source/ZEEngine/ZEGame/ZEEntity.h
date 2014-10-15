@@ -52,6 +52,7 @@
 #include "ZERayCast.h"
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEMeta/ZEEnumerator.h"
 
 struct ZEDrawParameters;
 
@@ -75,7 +76,7 @@ typedef ZEFlags ZEEntityDirtyFlags;
 #define ZE_EDF_INV_WORLD_TRANSFORM				8
 #define ZE_EDF_ALL								0xFFFFFFFF
 
-enum ZEEntityState
+ZE_ENUM(ZEEntityState)
 {
 	ZE_ES_NOT_INITIALIZED				= 0,
 	ZE_ES_INITIALIZING					= 1,

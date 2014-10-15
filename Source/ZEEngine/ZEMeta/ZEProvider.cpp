@@ -35,88 +35,85 @@
 
 #include "ZEProvider.h"
 
-bool ZEProvider::RegisterClasses(ZEClass** ClassArray, ZESize ClassCount)
-{
-	for(ZESize I = 0; I < ClassCount; I++)
-	{
-		if(ClassArray[I] == NULL)
-			continue;
-
-		if(ClassList.Exists(ClassArray[I]))
-			continue;
-
-		ClassList.Add(ClassArray[I]);
-	}
-
-	return true;
-}
+#include "ZEClass.h"
+#include "ZEEnumerator.h"
 
 bool ZEProvider::RegisterClass(ZEClass* Class)
 {
-	if (ClassList.Exists(Class))
+	if (Class == NULL)
 		return false;
 
-	ClassList.Add(Class);
+	if (Classes.Exists(Class))
+		return false;
+
+	RegisterClass(Class->GetParentClass());
+
+	Classes.Add(Class);
+
 	return true;
 }
 
-bool ZEProvider::UnregisterClass(ZEClass* Class)
+void ZEProvider::UnregisterClass(ZEClass* Class)
 {
-	for(ZESize I = 0; I < ClassList.GetCount(); I++)
-	{
-		if(ClassList[I] == Class)
-		{
-			ClassList.Remove(I);
-			return true;
-		}
-	}
+	Classes.RemoveValue(Class);
+}
 
-	return false;
+bool ZEProvider::RegisterEnumerator(ZEEnumerator* Enumerator)
+{
+	if (Enumerator == NULL)
+		return false;
+
+	if (Enumerators.Exists(Enumerator))
+		return false;
+
+	Enumerators.Add(Enumerator);
+}
+
+void ZEProvider::UnregisterEnumerator(ZEEnumerator* Enumerator)
+{
+	Enumerators.RemoveValue(Enumerator);
 }
 
 const ZEArray<ZEClass*>& ZEProvider::GetClasses()
 {
-	return ClassList;
+	return Classes;
 }
 
 const ZESize ZEProvider::GetClassCount()
 {
-	return ClassList.GetCount();
+	return Classes.GetCount();
 }
 
-ZEClass* ZEProvider::GetClass(const ZESize Index)
+ZEClass* ZEProvider::GetClass(const char* ClassName)
 {
-	return ClassList[Index];
-}
-
-ZEClass* ZEProvider::GetClass(const ZEString& ClassName)
-{
-	for(ZESize I = 0; I < ClassList.GetCount(); I++)
+	for(ZESize I = 0; I < Classes.GetCount(); I++)
 	{
-		if(ClassList[I]->GetName() == ClassName)
-			return ClassList[I];
+		if(Classes[I]->GetName() == ClassName)
+			return Classes[I];
 	}
 
 	return NULL;
 }
 
-ZEObject* ZEProvider::CreateInstance(const ZEString& ClassName)
+ZEArray<ZEClass*> ZEProvider::GetClass(ZEClass* ParentClass)
 {
-	for(ZESize I = 0; I < ClassList.GetCount(); I++)
+	ZEArray<ZEClass*> DerivedClasses;
+	for (ZESize I = 0; I < Classes.GetCount(); I++)
 	{
-		if(ClassList[I]->GetName() == ClassName)
-			return ClassList[I]->CreateInstance();
+		if (ZEClass::IsDerivedFrom(ParentClass, Classes[I]))
+			DerivedClasses.Add(Classes[I]);
+	}
+
+	return DerivedClasses;
+}
+
+ZEEnumerator* ZEProvider::GetEnumerator(const char* EnumeratorName)
+{
+	for(ZESize I = 0; I < Enumerators.GetCount(); I++)
+	{
+		if(Enumerators[I]->GetName() == EnumeratorName)
+			return Enumerators[I];
 	}
 
 	return NULL;
-}
-
-ZEProvider::ZEProvider()
-{
-	ClassList.Clear();
-}
-
-ZEProvider::~ZEProvider()
-{
-	ClassList.Clear();
 }

@@ -41,6 +41,27 @@
 #include "ZEGUID.h"
 #include "ZEMetaAttribute.h"
 
+#define ZE_ENUM(Name) \
+	ZEEnumerator* Name##_Declaration();\
+	enum ZE_META_ATTRIBUTE_0(Enumerator) Name
+
+#define ZE_ENUMERATOR_IMPLEMENTATION(Name) \
+	class Name##Enumerator : public ZEEnumerator \
+	{ \
+		public: \
+			virtual const char* GetName(); \
+			virtual ZEGUID GetGUID(); \
+			virtual const ZEEnumeratorItem* GetItems(); \
+			virtual ZESize GetItemCount(); \
+	};
+
+#define ZE_ENUMERATOR_DECLARATION(Name) \
+	ZEEnumerator* Name##_Declaration() \
+	{ \
+		static Name##Enumerator Enumerator; \
+		return &Enumerator; \
+	}
+
 struct ZEEnumeratorItem
 {
 	const char*					Name;
@@ -50,16 +71,13 @@ struct ZEEnumeratorItem
 class ZEEnumerator
 {
 	public:
-		const char*				GetName();
-		ZEGUID					GetGUID();
+		virtual const char*				GetName() = 0;
+		virtual ZEGUID					GetGUID() = 0;
 
 
-	const ZEEnumeratorItem*		GetItems();
-	ZESize						GetItemCount();
+	virtual const ZEEnumeratorItem*		GetItems() = 0;
+	virtual ZESize						GetItemCount() = 0;
 };
 
-#define ZE_ENUM(Name) \
-	ZEEnumerator* Name##_Description();\
-	ZE_META_ATTRIBUTE_0(Enumerator) enum Name
 
 #endif

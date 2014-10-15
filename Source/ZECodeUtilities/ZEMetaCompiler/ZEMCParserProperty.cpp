@@ -35,6 +35,7 @@
 
 #include "ZEMCParser.h"
 #include "ZEMCOptions.h"
+#include "ZEDS\ZEPointer.h"
 
 void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, DeclaratorDecl* PropertyDeclaration)
 {
@@ -49,19 +50,14 @@ void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, DeclaratorDecl* PropertyD
 	if (PropertyType.TypeQualifier != ZEMC_TQ_VALUE)
 		return;
 
-	ZEMCProperty* PropertyData = new ZEMCProperty();
+	ZEPointer<ZEMCProperty> PropertyData = new ZEMCProperty();
 	PropertyData->Name = PropertyDeclaration->getNameAsString();
 	PropertyData->Hash = PropertyData->Name.Hash();
 	PropertyData->IsStatic = isa<VarDecl>(PropertyDeclaration);
 	PropertyData->IsContainer = PropertyType.ContainerType != ZEMC_CT_NONE;
 	PropertyData->Type = PropertyType;
 
-	ZEMCAttribute* AttributeData = new ZEMCAttribute();
-	for(CXXRecordDecl::attr_iterator CurrentAttr = PropertyDeclaration->attr_begin(), LastAttr = PropertyDeclaration->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
-	{
-		ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
-		PropertyData->Attributes.Add(AttributeData);
-	}
+	ParseAttributes(PropertyData, PropertyDeclaration);
 
-	ClassData->Properties.Add(PropertyData);
+	ClassData->Properties.Add(PropertyData.Transfer());
 }
