@@ -66,7 +66,7 @@ class ZEMCParser
 		bool CheckClass(CXXRecordDecl* Class);
 
 		// Attributes
-		bool ParseAttribute(ZEMCAttribute* Attribute, const AnnotateAttr* ClangAttribute);
+		bool ParseAttribute(ZEMCAttribute& Attribute, const AnnotateAttr* ClangAttribute);
 		void ParseAttributes(ZEMCDeclaration* Decleration, Decl* ClangDecl);
 		bool CheckAttribute(ZEMCDeclaration* Decleration, const char* AttributeName);
 		const ZEArray<ZEString>* GetAttribute(ZEMCDeclaration* Declaration, const char* AttributeName);
@@ -83,6 +83,7 @@ class ZEMCParser
 		ZEMCMetaOperatorType GetOperatorType(OverloadedOperatorKind OperatorKind);
 		void ProcessDeclaration(Decl* BaseDeclaration);
 		void ProcessEnumerator(EnumDecl* EnumDeclaration);
+		bool ProcessForwardDeclaration(CXXRecordDecl* ClassDeclaration);
 		void ProcessClass(CXXRecordDecl* ClassDeclaration);
 		void ProcessClassAttributes(ZEMCClass* ClassData, CXXRecordDecl* ClassDeclaration);
 

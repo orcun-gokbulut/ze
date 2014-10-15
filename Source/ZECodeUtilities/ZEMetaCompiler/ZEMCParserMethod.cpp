@@ -35,6 +35,7 @@
 
 #include "ZEMCParser.h"
 #include "ZEMCOptions.h"
+#include "ZEDS\ZEPointer.h"
 
 ZEMCMetaOperatorType ZEMCParser::GetOperatorType(OverloadedOperatorKind OperatorKind)
 {
@@ -119,9 +120,9 @@ bool ZEMCParser::ProcessMethodParameters(ZEMCMethod* Method, CXXMethodDecl* Meth
 		if (!ProcessType(ParameterType, (*CurrentParameter)->getType()))
 			return false;
 
-		ZEMCMethodParameter* MethodParameter = new ZEMCMethodParameter();
-		MethodParameter->Name = (*CurrentParameter)->getNameAsString();
-		MethodParameter->Type = ParameterType;
+		ZEMCMethodParameter MethodParameter;
+		MethodParameter.Name = (*CurrentParameter)->getNameAsString();
+		MethodParameter.Type = ParameterType;
 
 		Method->Parameters.Add(MethodParameter);
 	}
@@ -164,7 +165,7 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 	if (!ProcessType(ReturnType, MethodDecl->getCallResultType()))
 		return;
 		
-	ZEMCMethod* Method = new ZEMCMethod();
+	ZEPointer<ZEMCMethod> Method = new ZEMCMethod();
 	Method->Name = MethodDecl->getNameAsString();
 	Method->IsConst = MethodDecl->isConst();
 	Method->IsVirtual = MethodDecl->isVirtual();
@@ -174,6 +175,8 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 	Method->IsEvent = false;
 	Method->Hash = Method->Name.Hash();
 	Method->ReturnValue = ReturnType;
+
+	ParseAttributes(Method, MethodDecl);
 
 	if (MethodDecl->isCopyAssignmentOperator())
 	{
@@ -203,14 +206,7 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 	if (!ProcessMethodParameters(Method, MethodDecl))
 		return;
 
-	ZEMCAttribute* AttributeData = new ZEMCAttribute();
-	for(CXXRecordDecl::attr_iterator CurrentAttr = MethodDecl->attr_begin(); CurrentAttr != MethodDecl->attr_end(); CurrentAttr++)
-	{
-		ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
-		Method->Attributes.Add(AttributeData);
-	}
-
-	ClassData->Methods.Add(Method);
+	ClassData->Methods.Add(Method.Transfer());
 }
 
 bool ZEMCParser::ProcessEvenParameters(ZEMCMethod* Method, CXXRecordDecl* EventTemplate)
@@ -233,9 +229,9 @@ bool ZEMCParser::ProcessEvenParameters(ZEMCMethod* Method, CXXRecordDecl* EventT
 			if (!ProcessType(Type, (*CurrentParameter)->getType()))
 				return false;
 
-			ZEMCMethodParameter* MethodParameter = new ZEMCMethodParameter();
-			MethodParameter->Name = (*CurrentParameter)->getNameAsString();
-			MethodParameter->Type = Type;
+			ZEMCMethodParameter MethodParameter;
+			MethodParameter.Name = (*CurrentParameter)->getNameAsString();
+			MethodParameter.Type = Type;
 			Method->Parameters.Add(MethodParameter);
 		}
 	}
@@ -248,7 +244,7 @@ void ZEMCParser::ProcessEvent(ZEMCClass* ClassData, DeclaratorDecl* EventDeclara
 	if(!EventDeclaration->getType()->isClassType() || EventDeclaration->getType()->getAsCXXRecordDecl()->getNameAsString() != "ZEEvent")
 		return;
 
-	ZEMCMethod* Method = new ZEMCMethod();
+	ZEPointer<ZEMCMethod> Method = new ZEMCMethod();
 	Method->Name = EventDeclaration->getName();
 	Method->Hash = Method->Name.Hash();
 	Method->IsEvent = true;
@@ -258,5 +254,5 @@ void ZEMCParser::ProcessEvent(ZEMCClass* ClassData, DeclaratorDecl* EventDeclara
 	if (!ProcessEvenParameters(Method, EventDeclaration->getType()->getAsCXXRecordDecl()))
 		return;
 
-	ClassData->Methods.Add(Method);
+	ClassData->Methods.Add(Method.Transfer());
 }

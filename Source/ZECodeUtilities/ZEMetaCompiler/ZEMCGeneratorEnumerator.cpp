@@ -36,7 +36,80 @@
 #include "ZEMCGenerator.h"
 #include "ZEMCContext.h"
 
-void ZEMCGenerator::GenerateEnumerator(ZEMCEnumerator* enumerator)
+void ZEMCGenerator::GenerateEnumeratorMacros(ZEMCEnumerator* CurrentEnumerator)
 {
+	WriteToFile("ZE_ENUMERATOR_IMPLEMENTATION(%s);\n\n", CurrentEnumerator->Name.ToCString());
+	WriteToFile("ZE_ENUMERATOR_DECLARATION(%s);\n", CurrentEnumerator->Name.ToCString());
+}
 
+void ZEMCGenerator::GenerateEnumeratorGetName(ZEMCEnumerator* CurrentEnumerator)
+{
+	WriteToFile(
+		"const char* %sEnumerator::GetName()\n"
+		"{\n"
+		"\treturn \"%s\";\n"
+		"}\n\n",
+		CurrentEnumerator->Name.ToCString(), 
+		CurrentEnumerator->Name.ToCString());
+}
+
+void ZEMCGenerator::GenerateEnumeratorGetGUID(ZEMCEnumerator* CurrentEnumerator)
+{
+	WriteToFile(
+		"ZEGUID %sEnumerator::GetGUID()\n"
+		"{\n"
+		"\treturn ZEGUID();\n"
+		"}\n\n", 
+		CurrentEnumerator->Name.ToCString());
+}
+
+void ZEMCGenerator::GenerateEnumeratorGetItems(ZEMCEnumerator* CurrentEnumerator)
+{
+	WriteToFile("const ZEEnumeratorItem* %sEnumerator::GetItems()\n"
+		"{\n", CurrentEnumerator->Name.ToCString());
+
+	if (CurrentEnumerator->Items.GetCount() != 0)
+	{
+		WriteToFile("\tstatic ZEEnumeratorItem Items[%d] =\n"
+			"\t{\n", 
+			CurrentEnumerator->Items.GetCount());
+
+		for (ZESize I = 0; I < CurrentEnumerator->Items.GetCount(); I++)
+		{
+			ZEMCEnumeratorItem* CurrentItem = &CurrentEnumerator->Items[I];
+
+			WriteToFile("\t\t{\"%s\", %d}%s\n", 
+				CurrentItem->Name.ToCString(), 
+				CurrentItem->Value,
+				I + 1 != CurrentEnumerator->Items.GetCount() ? ", " : "");
+		}
+
+		WriteToFile(
+			"\t};\n\n"
+			"\treturn Items;\n");
+	}
+	else
+	{
+		WriteToFile("\treturn NULL;\n");
+	}
+	
+	WriteToFile("}\n\n");
+}
+
+void ZEMCGenerator::GenerateEnumeratorGetItemCount(ZEMCEnumerator* CurrentEnumerator)
+{
+	WriteToFile("ZESize %sEnumerator::GetItemCount()\n"
+		"{\n"
+		"\treturn %d;\n"
+		"}\n\n", 
+		CurrentEnumerator->Name.ToCString(), CurrentEnumerator->Items.GetCount());
+}
+
+void ZEMCGenerator::GenerateEnumerator(ZEMCEnumerator* CurrentEnumerator)
+{
+	GenerateEnumeratorMacros(CurrentEnumerator);
+	GenerateEnumeratorGetName(CurrentEnumerator);
+	GenerateEnumeratorGetGUID(CurrentEnumerator);
+	GenerateEnumeratorGetItems(CurrentEnumerator);
+	GenerateEnumeratorGetItemCount(CurrentEnumerator);
 }

@@ -164,31 +164,54 @@ bool ZEMCParser::CheckClass(CXXRecordDecl* Class)
 	return true;
 }
 
-void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
+bool ZEMCParser::ProcessForwardDeclaration(CXXRecordDecl* Class)
 {
 	if(Class->isClass() && !Class->isCompleteDefinition() && Class->hasAttrs())
 	{
-		ZEMCAttribute* AttributeData = new ZEMCAttribute();
+		ZEMCAttribute AttributeData;
 		for(CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 		{
 			ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
-		}
 
-		if(AttributeData->Name == "ForwardDeclaration")
-		{
-			ZEMCForwardDeclaration* ForwardDeclaredClass = new ZEMCForwardDeclaration();
-			
-			ForwardDeclaredClass->ClassName = AttributeData->Parameters[0].ToCString();
-			ForwardDeclaredClass->HeaderName = AttributeData->Parameters[1].ToCString();
+			if(AttributeData.Name == "ForwardDeclaration")
+			{
+				bool Found = false;
+				for (ZESize I = 0; I < Context->ForwardDeclarations.GetCount(); I++)
+				{
+					if (Context->ForwardDeclarations[I]->ClassName == AttributeData.Parameters[0])
+					{
+						Found = true;
+						break;
+					}
+				}
 
-			Context->ForwardDeclarations.Add(ForwardDeclaredClass);
+				if (!Found)
+				{
+					ZEMCForwardDeclaration* ForwardDeclaredClass = new ZEMCForwardDeclaration();
+
+					ForwardDeclaredClass->ClassName = AttributeData.Parameters[0].ToCString();
+					ForwardDeclaredClass->HeaderName = AttributeData.Parameters[1].ToCString();
+
+					Context->ForwardDeclarations.Add(ForwardDeclaredClass);
+
+					return true;
+				}
+			}
 		}
 	}
+
+	return false;
+}
+
+void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
+{
+	if (ProcessForwardDeclaration(Class))
+		return;
 
 	if (!Class->isCompleteDefinition())
 		return;
 
-	bool IsBuiltInClassFound = false;
+	bool IsBuiltInTypeFound = false;
 	std::string ClassName = Class->getNameAsString();
 	if (ClassName == "ZEString" ||
 		ClassName == "ZEVector2" ||
@@ -198,16 +221,18 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 		ClassName == "ZEMatrix3x3" ||
 		ClassName == "ZEMatrix4x4")
 	{
-		IsBuiltInClassFound = true;
+		IsBuiltInTypeFound = true;
 	}
 
-	if(!IsBuiltInClassFound && !CheckClass(Class))
+	if(!IsBuiltInTypeFound && !CheckClass(Class))
 		return;
 	
-	// If
 	ZEMCClass* ClassData = FindClass(Class->getNameAsString().c_str());
 	if (ClassData == NULL)
+	{
 		ClassData = new ZEMCClass();
+		Context->Classes.Add(ClassData);
+	}
 
 	ClassData->Name = Class->getNameAsString();
 	ClassData->Hash = ClassData->Name.Hash();
@@ -216,17 +241,27 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	ClassData->HasPublicDefaultConstructor = true;
 	ClassData->HasPublicDestructor = true;
 	ClassData->IsAbstract = Class->isAbstract();
-	ClassData->IsBuiltInClass = IsBuiltInClassFound;
+	ClassData->IsBuiltInType = IsBuiltInTypeFound;
 	ClassData->IsForwardDeclared = false;
-	Context->Declarations.Add(ClassData);
+	ClassData->IsBuiltInType = IsBuiltInTypeFound;
 
-	for(CXXRecordDecl::base_class_iterator CurrentBaseClass = Class->bases_begin(), LastBaseClass = Class->bases_end(); CurrentBaseClass != LastBaseClass; ++CurrentBaseClass)
+	if (!ClassData->IsBuiltInType)
 	{
-		ClassData->BaseClass = new ZEMCClass();
-		ClassData->BaseClass->Name = CurrentBaseClass->getType()->getAsCXXRecordDecl()->getNameAsString();
+		for(CXXRecordDecl::base_class_iterator CurrentBaseClass = Class->bases_begin(), LastBaseClass = Class->bases_end(); CurrentBaseClass != LastBaseClass; ++CurrentBaseClass)
+		{
+			ClassData->BaseClass = FindClass(CurrentBaseClass->getType()->getAsCXXRecordDecl()->getNameAsString().c_str());
+			if (ClassData == NULL) // Non-Object Base
+			{
+				RaiseError(Class->getLocStart(), "Non-object base class.");
+			}
+		}
+	}
+	else
+	{
+		ClassData->BaseClass = NULL;
 	}
 
-	ZEMCAttribute* AttributeData = new ZEMCAttribute();
+	ZEMCAttribute AttributeData;
 	for(CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 	{
 		ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
@@ -256,7 +291,7 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 		else if(isa<RecordDecl>(*Current))
 		{
 			RecordDecl* AnonymousRecord = ((RecordDecl*)*Current);
-			ZEMCAttribute* AnonymousRecordAttributeData = new ZEMCAttribute();
+			ZEMCAttribute AnonymousRecordAttributeData;
 			for(CXXRecordDecl::attr_iterator CurrentAttr = AnonymousRecord->attr_begin(), LastAttr = AnonymousRecord->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 			{
 				ParseAttribute(AnonymousRecordAttributeData, ((AnnotateAttr*)(*CurrentAttr)));
@@ -277,5 +312,5 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	}
 
 	if (Compiler->getSourceManager().getFileID(Class->getLocation()) == Compiler->getSourceManager().getMainFileID())
-		Context->TargetDeclarations.Add(ClassData);
+		Context->TargetClasses.Add(ClassData);
 }

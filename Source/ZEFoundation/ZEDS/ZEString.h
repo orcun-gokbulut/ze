@@ -118,7 +118,7 @@ class ZEString
 	friend class ZEStringWriter;
 	private:
 		char*								Buffer;
-		ZEAllocatorBase<char>				Allocator;
+		ZESmartAllocator<char>				Allocator;
 
 		mutable bool						BufferChanged;
 
@@ -169,6 +169,11 @@ class ZEString
 		void						Insert(const char* String);
 		void						Insert(ZESize Position, const ZEString& String);
 		void						Insert(ZESize Position, const char* String);
+
+		void						AppendCharacter(const ZECharacter& Character);
+		void						InsertCharacter(const ZECharacter& Character);
+		void						InsertCharacter(ZESize Position, const ZECharacter& Character);
+
 		void						Remove(ZESize Position, ZESize Count = 1);
 
 		bool						Equals(const ZEString& String) const;

@@ -37,18 +37,18 @@
 #include "ZEMCContext.h"
 #include "ZEDS\ZEFormat.h"
 
-void ZEMCGenerator::GenerateProperties(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassProperties(ZEMCClass* CurrentClass)
 {
-	GenerateGetProperties(CurrentClass);
-	GenerateGetPropertyId(CurrentClass);
-	GenerateGetPropertyCount(CurrentClass);
-	GenerateSetProperty(CurrentClass);
-	GenerateGetProperty(CurrentClass);
-	GenerateSetPropertyItem(CurrentClass);
-	GenerateGetPropertyItem(CurrentClass);
-	GenerateAddItemToProperty(CurrentClass);
-	GenerateRemoveItemFromProperty(CurrentClass);
-	GenerateGetPropertyItemCount(CurrentClass);
+	GenerateClassGetProperties(CurrentClass);
+	GenerateClassGetPropertyId(CurrentClass);
+	GenerateClassGetPropertyCount(CurrentClass);
+	GenerateClassSetProperty(CurrentClass);
+	GenerateClassGetProperty(CurrentClass);
+	GenerateClassSetPropertyItem(CurrentClass);
+	GenerateClassGetPropertyItem(CurrentClass);
+	GenerateClassAddItemToProperty(CurrentClass);
+	GenerateClassRemoveItemFromProperty(CurrentClass);
+	GenerateClassGetPropertyItemCount(CurrentClass);
 }
 
 static ZEInt PropertySortOperator(ZEMCProperty* const* PropertyDataA, ZEMCProperty* const* PropertyDataB)
@@ -77,7 +77,7 @@ bool ZEMCGenerator::HasContainerProperty(ZEMCClass* CurrentClass)
 	return false;
 }
 
-void ZEMCGenerator::GeneratePropertyIdRangeCheck(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassPropertyIdRangeCheck(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"\tif (PropertyId >= %d)\n"
@@ -85,7 +85,7 @@ void ZEMCGenerator::GeneratePropertyIdRangeCheck(ZEMCClass* CurrentClass)
 		CurrentClass->Properties.GetCount());
 }
 
-void ZEMCGenerator::GenerateGetProperties_Attributes(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetProperties_Attributes(ZEMCClass* CurrentClass)
 {
 	//Creating Attributes
 	for (ZESize I = 0; I < CurrentClass->Properties.GetCount(); I++)
@@ -95,20 +95,20 @@ void ZEMCGenerator::GenerateGetProperties_Attributes(ZEMCClass* CurrentClass)
 		{
 			for (ZESize J = 0; J < CurrentProperty->Attributes.GetCount(); J++)
 			{
-				ZEMCAttribute* currentAttribute = CurrentProperty->Attributes[J];
-				if(currentAttribute->Parameters.GetCount() == 0)
+				ZEMCAttribute* CurrentAttribute = &CurrentProperty->Attributes[J];
+				if(CurrentAttribute->Parameters.GetCount() == 0)
 					continue;
 
 				WriteToFile(
 					"\tstatic const char* Property%dAttribute%dParameters[%d] = {", 
 					I, J, 
-					currentAttribute->Parameters.GetCount());
+					CurrentAttribute->Parameters.GetCount());
 
-				for (ZESize K = 0; K < currentAttribute->Parameters.GetCount(); K++)
+				for (ZESize K = 0; K < CurrentAttribute->Parameters.GetCount(); K++)
 				{
 					WriteToFile("\"%s\"%s", 
-						currentAttribute->Parameters[K].ToCString(), 
-						K != currentAttribute->Parameters.GetCount() - 1 ? ", " : "");
+						CurrentAttribute->Parameters[K].ToCString(), 
+						K != CurrentAttribute->Parameters.GetCount() - 1 ? ", " : "");
 				}
 
 				WriteToFile("};\n\n");
@@ -121,7 +121,7 @@ void ZEMCGenerator::GenerateGetProperties_Attributes(ZEMCClass* CurrentClass)
 
 			for (ZESize J = 0; J < CurrentProperty->Attributes.GetCount(); J++)
 			{
-				ZEMCAttribute* currentAttribute = CurrentProperty->Attributes[I];
+				ZEMCAttribute* currentAttribute = &CurrentProperty->Attributes[I];
 				WriteToFile(
 					"\t\t{\"%s\", %s, %d}%s\n", 
 					currentAttribute->Name.ToCString(),
@@ -135,7 +135,7 @@ void ZEMCGenerator::GenerateGetProperties_Attributes(ZEMCClass* CurrentClass)
 	}
 }
 
-void ZEMCGenerator::GenerateGetProperties_Properties(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetProperties_Properties(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"\tstatic ZEProperty Properties[%d] =\n\t"
@@ -192,7 +192,7 @@ void ZEMCGenerator::GenerateGetProperties_Properties(ZEMCClass* CurrentClass)
 	WriteToFile("\t};\n\n");
 }
 
-void ZEMCGenerator::GenerateGetProperties(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetProperties(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"const ZEProperty* %sClass::GetProperties()\n"
@@ -205,15 +205,15 @@ void ZEMCGenerator::GenerateGetProperties(ZEMCClass* CurrentClass)
 	}
 	else
 	{
-		GenerateGetProperties_Attributes(CurrentClass);
-		GenerateGetProperties_Properties(CurrentClass);
+		GenerateClassGetProperties_Attributes(CurrentClass);
+		GenerateClassGetProperties_Properties(CurrentClass);
 		WriteToFile("\treturn Properties;\n");
 	}
 
 	WriteToFile("}\n\n");
 }
 
-void ZEMCGenerator::GenerateGetPropertyId(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetPropertyId(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"ZESize %sClass::GetPropertyId(ZEString PropertyName)\n"
@@ -280,7 +280,7 @@ void ZEMCGenerator::GenerateGetPropertyId(ZEMCClass* CurrentClass)
 	WriteToFile("}\n\n");
 }
 
-void ZEMCGenerator::GenerateGetPropertyCount(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetPropertyCount(ZEMCClass* CurrentClass)
 {
 	WriteToFile( 
 		"ZESize %sClass::GetPropertyCount()\n"
@@ -291,7 +291,7 @@ void ZEMCGenerator::GenerateGetPropertyCount(ZEMCClass* CurrentClass)
 		CurrentClass->Properties.GetCount());
 }
 
-void ZEMCGenerator::GenerateSetProperty(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassSetProperty(ZEMCClass* CurrentClass)
 {
 	if (CurrentClass->Properties.GetCount() == 0)
 	{
@@ -309,7 +309,7 @@ void ZEMCGenerator::GenerateSetProperty(ZEMCClass* CurrentClass)
 		"{\n",
 		CurrentClass->Name.ToCString());
 
-	GeneratePropertyIdRangeCheck(CurrentClass);
+	GenerateClassPropertyIdRangeCheck(CurrentClass);
 	GenerateCastedObject(CurrentClass);
 
 	WriteToFile(
@@ -382,7 +382,7 @@ void ZEMCGenerator::GenerateSetProperty(ZEMCClass* CurrentClass)
 		"}\n\n");
 }
 
-void ZEMCGenerator::GenerateGetProperty(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetProperty(ZEMCClass* CurrentClass)
 {
 	if (CurrentClass->Properties.GetCount() == 0)
 	{
@@ -399,7 +399,7 @@ void ZEMCGenerator::GenerateGetProperty(ZEMCClass* CurrentClass)
 		"{\n",
 		CurrentClass->Name.ToCString());
 
-	GeneratePropertyIdRangeCheck(CurrentClass);
+	GenerateClassPropertyIdRangeCheck(CurrentClass);
 	GenerateCastedObject(CurrentClass);
 
 	WriteToFile(
@@ -461,7 +461,7 @@ void ZEMCGenerator::GenerateGetProperty(ZEMCClass* CurrentClass)
 	
 }
 
-void ZEMCGenerator::GenerateSetPropertyItem(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassSetPropertyItem(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"bool %sClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)\n"
@@ -474,7 +474,7 @@ void ZEMCGenerator::GenerateSetPropertyItem(ZEMCClass* CurrentClass)
 	}
 	else
 	{
-		GeneratePropertyIdRangeCheck(CurrentClass);
+		GenerateClassPropertyIdRangeCheck(CurrentClass);
 		GenerateCastedObject(CurrentClass);
 
 		WriteToFile(
@@ -529,7 +529,7 @@ void ZEMCGenerator::GenerateSetPropertyItem(ZEMCClass* CurrentClass)
 
 }
 
-void ZEMCGenerator::GenerateGetPropertyItem(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetPropertyItem(ZEMCClass* CurrentClass)
 {
 	WriteToFile( 
 		"bool %sClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)\n"
@@ -541,7 +541,7 @@ void ZEMCGenerator::GenerateGetPropertyItem(ZEMCClass* CurrentClass)
 	}
 	else
 	{
-		GeneratePropertyIdRangeCheck(CurrentClass);
+		GenerateClassPropertyIdRangeCheck(CurrentClass);
 		GenerateCastedObject(CurrentClass);
 
 		WriteToFile(
@@ -580,7 +580,7 @@ void ZEMCGenerator::GenerateGetPropertyItem(ZEMCClass* CurrentClass)
 
 }
 
-void ZEMCGenerator::GenerateAddItemToProperty(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassAddItemToProperty(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"bool %sClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)\n"
@@ -592,7 +592,7 @@ void ZEMCGenerator::GenerateAddItemToProperty(ZEMCClass* CurrentClass)
 	}
 	else
 	{
-		GeneratePropertyIdRangeCheck(CurrentClass);
+		GenerateClassPropertyIdRangeCheck(CurrentClass);
 		GenerateCastedObject(CurrentClass);
 
 		WriteToFile(
@@ -643,7 +643,7 @@ void ZEMCGenerator::GenerateAddItemToProperty(ZEMCClass* CurrentClass)
 	WriteToFile("}\n\n");
 }
 
-void ZEMCGenerator::GenerateRemoveItemFromProperty(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassRemoveItemFromProperty(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"bool %sClass::RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize Index)\n"
@@ -655,7 +655,7 @@ void ZEMCGenerator::GenerateRemoveItemFromProperty(ZEMCClass* CurrentClass)
 	}
 	else
 	{
-		GeneratePropertyIdRangeCheck(CurrentClass);
+		GenerateClassPropertyIdRangeCheck(CurrentClass);
 		GenerateCastedObject(CurrentClass);
 
 		WriteToFile(
@@ -697,7 +697,7 @@ void ZEMCGenerator::GenerateRemoveItemFromProperty(ZEMCClass* CurrentClass)
 
 }
 
-void ZEMCGenerator::GenerateGetPropertyItemCount(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetPropertyItemCount(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"bool %sClass::GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& Count)\n"
@@ -709,7 +709,7 @@ void ZEMCGenerator::GenerateGetPropertyItemCount(ZEMCClass* CurrentClass)
 	}
 	else
 	{
-		GeneratePropertyIdRangeCheck(CurrentClass);
+		GenerateClassPropertyIdRangeCheck(CurrentClass);
 		GenerateCastedObject(CurrentClass);
 
 		WriteToFile(

@@ -1107,6 +1107,30 @@ void ZEString::Insert(ZESize Position, const char* String)
 	ZEDebugCheckMemory();
 }
 
+void ZEString::AppendCharacter(const ZECharacter& Character)
+{
+	char Buffer[5];
+	memcpy(Buffer, Character.GetValue(), Character.GetSize());
+	Buffer[Character.GetSize()] = '\0';
+	Append(Buffer);
+}
+
+void ZEString::InsertCharacter(const ZECharacter& Character)
+{
+	char Buffer[5];
+	memcpy(Buffer, Character.GetValue(), Character.GetSize());
+	Buffer[Character.GetSize()] = '\0';
+	Insert(Buffer);
+}
+
+void ZEString::InsertCharacter(ZESize Position, const ZECharacter& Character)
+{
+	char Buffer[5];
+	memcpy(Buffer, Character.GetValue(), Character.GetSize());
+	Buffer[Character.GetSize()] = '\0';
+	InsertCharacter(Position, Buffer);
+}
+
 void ZEString::Remove(ZESize Position, ZESize Count)
 {
 

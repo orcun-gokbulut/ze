@@ -71,4 +71,11 @@ class ZEObject
 		return &Class; \
 	}\
 
+#define ZE_BUILTIN_TYPE_IMPLEMENTATION(ClassName) \
+	ZEClass* ClassName::Class() \
+	{ \
+		static ClassName##Class Class;\
+		return &Class; \
+	}
+
 #endif

@@ -37,18 +37,18 @@
 #include "ZEMCContext.h"
 #include "ZEDS\ZEFormat.h"
 
-void ZEMCGenerator::GenerateMethods(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassMethods(ZEMCClass* CurrentClass)
 {
-	GenerateWrapperMethods(CurrentClass);
-	GenerateGetMethods(CurrentClass);
-	GenerateGetMethodCount(CurrentClass);
-	GenerateGetMethodId(CurrentClass);
-	GenerateAddEventHandler(CurrentClass);
-	GenerateRemoveEventHandler(CurrentClass);
-	GenerateCallMethod(CurrentClass);
+	GenerateClassWrapperMethods(CurrentClass);
+	GenerateClassGetMethods(CurrentClass);
+	GenerateClassGetMethodCount(CurrentClass);
+	GenerateClassGetMethodId(CurrentClass);
+	GenerateClassAddEventHandler(CurrentClass);
+	GenerateClassRemoveEventHandler(CurrentClass);
+	GenerateClassCallMethod(CurrentClass);
 }
 
-void ZEMCGenerator::GenerateMethodIdRangeCheck(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassMethodIdRangeCheck(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"\tif (MethodId >= %d)\n"
@@ -56,12 +56,22 @@ void ZEMCGenerator::GenerateMethodIdRangeCheck(ZEMCClass* CurrentClass)
 		CurrentClass->Methods.GetCount());
 }
 
-ZEString ZEMCGenerator::GenerateMethodParameterSignature(ZEMCMethod* CurrentMethod, bool GenerateNames)
+bool ZEMCGenerator::HasEventMethod(ZEMCClass* CurrentClass)
+{
+	for (ZESize I = 0; I < CurrentClass->Methods.GetCount(); I++)
+		if (CurrentClass->Methods[I]->IsEvent)
+			return true;
+
+	return false;
+}
+
+
+ZEString ZEMCGenerator::GenerateClassMethodParameterSignature(ZEMCMethod* CurrentMethod, bool GenerateNames)
 {
 	ZEString Output;
 	for (int I = 0; I < CurrentMethod->Parameters.GetCount(); I++)
 	{
-		ZEMCMethodParameter* CurrentParameter = CurrentMethod->Parameters[I];
+		ZEMCMethodParameter* CurrentParameter = &CurrentMethod->Parameters[I];
 
 		Output.Append(GenerateTypeSignature(CurrentParameter->Type));
 		if (GenerateNames)
@@ -74,7 +84,7 @@ ZEString ZEMCGenerator::GenerateMethodParameterSignature(ZEMCMethod* CurrentMeth
 	return Output;
 }
 
-void ZEMCGenerator::GenerateGetMethods_Attributes(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetMethods_Attributes(ZEMCClass* CurrentClass)
 {
 	// Attribute Parameters
 	for (ZESize I = 0; I < CurrentClass->Methods.GetCount(); I++)
@@ -85,7 +95,7 @@ void ZEMCGenerator::GenerateGetMethods_Attributes(ZEMCClass* CurrentClass)
 
 		for (ZESize J = 0; J < CurrentMethod->Attributes.GetCount(); J++)
 		{
-			ZEMCAttribute* CurrentAttribute = CurrentMethod->Attributes[J];
+			ZEMCAttribute* CurrentAttribute = &CurrentMethod->Attributes[J];
 			if(CurrentAttribute->Parameters.GetCount() == 0)
 				continue;
 
@@ -113,7 +123,7 @@ void ZEMCGenerator::GenerateGetMethods_Attributes(ZEMCClass* CurrentClass)
 
 		for (ZESize J = 0; J < CurrentMethod->Attributes.GetCount(); J++)
 		{
-			ZEMCAttribute* CurrentAttribute = CurrentMethod->Attributes[J];
+			ZEMCAttribute* CurrentAttribute = &CurrentMethod->Attributes[J];
 			if(CurrentAttribute->Parameters.GetCount() > 0)
 			{
 				WriteToFile(
@@ -134,7 +144,7 @@ void ZEMCGenerator::GenerateGetMethods_Attributes(ZEMCClass* CurrentClass)
 	}
 }
 
-void ZEMCGenerator::GenerateGetMethods_Parameters(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetMethods_Parameters(ZEMCClass* CurrentClass)
 {
 	// Method Parameters
 	for (ZESize I = 0; I < CurrentClass->Methods.GetCount(); I++)
@@ -149,7 +159,7 @@ void ZEMCGenerator::GenerateGetMethods_Parameters(ZEMCClass* CurrentClass)
 
 		for (ZESize J = 0; J < CurrentMethod->Parameters.GetCount(); J++)
 		{
-			ZEMCMethodParameter* CurrentParameter = CurrentMethod->Parameters[J];
+			ZEMCMethodParameter* CurrentParameter = &CurrentMethod->Parameters[J];
 			WriteToFile("\t\t{");
 			WriteToFile("\"%s\", ", CurrentParameter->Name.ToCString());
 			WriteToFile("%s", GenerateTypeConstructor(CurrentParameter->Type).ToCString());
@@ -166,10 +176,10 @@ ZEString ZEMCGenerator::GenerateMethodPointerCast(ZEMCMethod* CurrentMethod, ZEM
 		CurrentClass != NULL ? CurrentClass->Name : "",
 		CurrentClass != NULL ? "*" : "",
 		CurrentMethod->Parameters.GetCount() != 0 ? ", " : "",
-		GenerateMethodParameterSignature(CurrentMethod, false));
+		GenerateClassMethodParameterSignature(CurrentMethod, false));
 }
 
-void ZEMCGenerator::GenerateGetMethods_Methods(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetMethods_Methods(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"\tstatic ZEMethod Methods[%d] =\n\t"
@@ -189,6 +199,7 @@ void ZEMCGenerator::GenerateGetMethods_Methods(ZEMCClass* CurrentClass)
 		else
 			WriteToFile("%s&MethodWrapper%d, ", GenerateMethodPointerCast(CurrentMethod, CurrentClass).ToCString(), CurrentMethod->ID);
 
+		WriteToFile("%s, ",	CurrentMethod->IsConst ? "true" : "false");
 		WriteToFile("%s, ",	CurrentMethod->IsEvent ? "true" : "false");
 		WriteToFile("%s, ", CurrentMethod->IsVirtual ? "true" : "false");
 		WriteToFile("%s, ", CurrentMethod->IsStatic ? "true" : "false");
@@ -221,7 +232,7 @@ void ZEMCGenerator::GenerateGetMethods_Methods(ZEMCClass* CurrentClass)
 	}
 }
 
-void ZEMCGenerator::GenerateGetMethods(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetMethods(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"const ZEMethod* %sClass::GetMethods()\n"
@@ -233,16 +244,16 @@ void ZEMCGenerator::GenerateGetMethods(ZEMCClass* CurrentClass)
 	}
 	else
 	{
-		GenerateGetMethods_Attributes(CurrentClass);
-		GenerateGetMethods_Parameters(CurrentClass);
-		GenerateGetMethods_Methods(CurrentClass);
+		GenerateClassGetMethods_Attributes(CurrentClass);
+		GenerateClassGetMethods_Parameters(CurrentClass);
+		GenerateClassGetMethods_Methods(CurrentClass);
 	}
 
 	WriteToFile("}\n\n");
 
 }
 
-void ZEMCGenerator::GenerateGetMethodCount(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetMethodCount(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"ZESize %sClass::GetMethodCount()\n"
@@ -253,7 +264,7 @@ void ZEMCGenerator::GenerateGetMethodCount(ZEMCClass* CurrentClass)
 		CurrentClass->Methods.GetCount());
 }
 
-void ZEMCGenerator::GenerateGetMethodId(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetMethodId(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"ZESize %sClass::GetMethodId(ZEString MethodName, ZESize OverloadIndex)\n"
@@ -318,29 +329,89 @@ void ZEMCGenerator::GenerateGetMethodId(ZEMCClass* CurrentClass)
 	WriteToFile("}\n\n");
 }
 
-void ZEMCGenerator::GenerateAddEventHandler(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassAddEventHandler(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"bool %sClass::AddEventHandler(ZEObject* Object, ZESize MethodId, ZEEventHandlerBase* Handler)\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 
+	if (HasEventMethod(CurrentClass))
+	{
+		GenerateCastedObject(CurrentClass);
+		GenerateClassMethodIdRangeCheck(CurrentClass);
+		
+		WriteToFile(
+			"\tswitch(EventId)\n"
+			"\t{\n", CurrentClass->Name.ToCString());
+
+		for(ZESize I = 0; I < CurrentClass->Methods.GetCount(); I++)
+		{
+			ZEMCMethod* CurrentMethod = CurrentClass->Methods[I];
+			if(CurrentMethod->IsEvent)
+			{
+				WriteToFile(
+					"\t\tcase %d:\n"
+					"\t\t\treturn ");
+
+				if (!CurrentMethod->IsStatic)
+					WriteToFile("CastedObject->");
+				else
+					WriteToFile("%s::", CurrentClass->Name.ToCString());
+
+				WriteToFile("%s.AddEventHandler(Handler);\n", I, CurrentMethod->Name.ToCString());
+			}
+		}
+
+		WriteToFile("\t}\n");
+	}
+
 	WriteToFile("\treturn false;\n");
 	WriteToFile("}\n\n");
 }
 
-void ZEMCGenerator::GenerateRemoveEventHandler(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassRemoveEventHandler(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"bool %sClass::RemoveEventHandler(ZEObject* Object, ZESize MethodId, ZEEventHandlerBase* Handler)\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 
+	if (HasEventMethod(CurrentClass))
+	{
+		GenerateCastedObject(CurrentClass);
+		GenerateClassMethodIdRangeCheck(CurrentClass);
+
+		WriteToFile(
+			"\tswitch(EventId)\n"
+			"\t{\n", CurrentClass->Name.ToCString());
+
+		for(ZESize I = 0; I < CurrentClass->Methods.GetCount(); I++)
+		{
+			ZEMCMethod* CurrentMethod = CurrentClass->Methods[I];
+			if(CurrentMethod->IsEvent)
+			{
+				WriteToFile(
+					"\t\tcase %d:\n"
+					"\t\t\treturn ");
+
+				if (!CurrentMethod->IsStatic)
+					WriteToFile("CastedObject->");
+				else
+					WriteToFile("%s::", CurrentClass->Name.ToCString());
+
+				WriteToFile("%s.RemoveEventHandler(Handler);\n", I, CurrentMethod->Name.ToCString());
+			}
+		}
+
+		WriteToFile("\t}\n");
+	}
+
 	WriteToFile("\treturn false;\n");
 	WriteToFile("}\n\n");
 }
 
-void ZEMCGenerator::GenerateCallMethod(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
 		"bool %sClass::CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)\n"
@@ -350,7 +421,7 @@ void ZEMCGenerator::GenerateCallMethod(ZEMCClass* CurrentClass)
 
 	if (CurrentClass->Methods.GetCount() != 0)
 	{
-		GenerateMethodIdRangeCheck(CurrentClass);
+		GenerateClassMethodIdRangeCheck(CurrentClass);
 		GenerateCastedObject(CurrentClass);
 		//GenerateCallMethodParameterCheck(CurrentClass);
 
@@ -359,7 +430,7 @@ void ZEMCGenerator::GenerateCallMethod(ZEMCClass* CurrentClass)
 			"\t{\n");
 
 
-		for(ZESize I = 0; I < CurrentClass->Methods.GetCount(); I++)
+		for (ZESize I = 0; I < CurrentClass->Methods.GetCount(); I++)
 		{
 			ZEMCMethod* CurrentMethod = CurrentClass->Methods[I];
 			WriteToFile("\t\tcase %d:\n", CurrentMethod->ID);
@@ -376,14 +447,14 @@ void ZEMCGenerator::GenerateCallMethod(ZEMCClass* CurrentClass)
 
 			for (ZESize N = 0; N < CurrentMethod->Parameters.GetCount(); N++)
 			{
-				ZEMCMethodParameter* CurrentParameter = CurrentMethod->Parameters[N];
+				ZEMCMethodParameter* CurrentParameter = &CurrentMethod->Parameters[N];
 				if (CurrentParameter->Type.BaseType == ZEMC_BT_ENUMERATOR)
 					WriteToFile("(%s)", CurrentParameter->Type.Enumurator->Name.ToCString());
 
 				ZEMCType ModifiedParameterType = CurrentParameter->Type;
-				if (CurrentMethod->Parameters[N]->Type.TypeQualifier == ZEMC_TQ_VALUE)
+				if (CurrentParameter->Type.TypeQualifier == ZEMC_TQ_VALUE)
 					ModifiedParameterType.TypeQualifier = ZEMC_TQ_REFERENCE;
-				else if (CurrentMethod->Parameters[N]->Type.TypeQualifier == ZEMC_TQ_CONST_VALUE)
+				else if (CurrentParameter->Type.TypeQualifier == ZEMC_TQ_CONST_VALUE)
 					ModifiedParameterType.TypeQualifier = ZEMC_TQ_CONST_REFERENCE;
 
 				ZEString VariantCast;
@@ -410,7 +481,7 @@ void ZEMCGenerator::GenerateCallMethod(ZEMCClass* CurrentClass)
 		"}\n\n");
 }
 
-void ZEMCGenerator::GenerateWrapperMethods(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassWrapperMethods(ZEMCClass* CurrentClass)
 {
 	for (ZESize I = 0; I < CurrentClass->Methods.GetCount(); I++)
 	{
@@ -425,7 +496,7 @@ void ZEMCGenerator::GenerateWrapperMethods(ZEMCClass* CurrentClass)
 			CurrentMethod->ID,
 			CurrentClass->Name.ToCString(),
 			CurrentMethod->Parameters.GetCount() != 0 ? ", " : "",
-			GenerateMethodParameterSignature(CurrentMethod, true).ToCString());
+			GenerateClassMethodParameterSignature(CurrentMethod, true).ToCString());
 		
 		WriteToFile("\t");
 		if (CurrentMethod->ReturnValue.BaseType != ZEMC_BT_VOID)

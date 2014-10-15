@@ -38,28 +38,33 @@
 #define __ZE_PROVIDER_H__
 
 #include "ZEDS/ZEArray.h"
-#include "ZEClass.h"
+
+class ZEClass;
+class ZEEnumerator;
 
 class ZEProvider
 {
 	private:
-		ZEArray<ZEClass*>				ClassList;
+		ZEArray<ZEClass*>				Classes;
+		ZEArray<ZEEnumerator*>			Enumerators;
 
 	public:
-		bool							RegisterClasses(ZEClass** ClassArray, ZESize ClassCount);
-
 		bool							RegisterClass(ZEClass* Class);
-		bool							UnregisterClass(ZEClass* Class);
+		void							UnregisterClass(ZEClass* Class);
+
+		bool							RegisterEnumerator(ZEEnumerator* Enumerator);
+		void							UnregisterEnumerator(ZEEnumerator* Enumerator);
 
 		const ZEArray<ZEClass*>&		GetClasses();
 		const ZESize					GetClassCount();
 
-		ZEClass*						GetClass(const ZESize Index);
-		ZEClass*						GetClass(const ZEString& ClassName);
-		ZEObject*						CreateInstance(const ZEString& ClassName);
+		const ZEArray<ZEEnumerator*>&	GetEnumerators();
+		const ZESize					GetEnumeratorCount();
 
-										ZEProvider();
-										~ZEProvider();
+		ZEClass*						GetClass(const char* ClassName);
+		ZEArray<ZEClass*>				GetClass(ZEClass* ParentClass);
+
+		ZEEnumerator*					GetEnumerator(const char* EnumeratorName);
 };
 
 #endif

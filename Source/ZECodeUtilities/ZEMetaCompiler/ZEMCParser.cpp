@@ -47,6 +47,7 @@
 #include <llvm/Support/CommandLine.h>
 #include <fstream>
 #include <string>
+#include "ZEDS/ZEPointer.h"
 
 void ZEMCParser::RaiseNote(SourceLocation& Location, const char* WarningText)
 {
@@ -88,10 +89,11 @@ void ZEMCParser::ProcessDeclaration(Decl* BaseDeclaration)
 
 void ZEMCParser::ProcessEnumerator(EnumDecl* EnumDeclaration)
 {
-	ZEMCEnumerator* Enumerator = new ZEMCEnumerator();
-	Enumerator->Name = EnumDeclaration->getNameAsString();
-	if(Enumerator->Name.IsEmpty())
+	if (EnumDeclaration->getNameAsString().empty())
 		return;
+
+	ZEPointer<ZEMCEnumerator> Enumerator = new ZEMCEnumerator();
+	Enumerator->Name = EnumDeclaration->getNameAsString();
 
 	ParseAttributes(Enumerator, EnumDeclaration);
 	if (!CheckAttribute(Enumerator, "Enumerator"))
@@ -101,13 +103,16 @@ void ZEMCParser::ProcessEnumerator(EnumDecl* EnumDeclaration)
 
 	for(EnumDecl::enumerator_iterator Current = EnumDeclaration->enumerator_begin(), End = EnumDeclaration->enumerator_end(); Current != End; ++Current)
 	{
-		ZEMCEnumeratorItem* EnumeratorItem = new ZEMCEnumeratorItem();
-		EnumeratorItem->Name = Current->getNameAsString().c_str();
-		EnumeratorItem->Value = *Current->getInitVal().getRawData();
+		ZEMCEnumeratorItem EnumeratorItem;
+		EnumeratorItem.Name = Current->getNameAsString().c_str();
+		EnumeratorItem.Value = *Current->getInitVal().getRawData();
 		Enumerator->Items.Add(EnumeratorItem);
 	}
 
-	Context->Enumurators.Add(Enumerator);
+	Context->Enumerators.Add(Enumerator.Transfer());
+
+	if (Compiler->getSourceManager().getFileID(EnumDeclaration->getLocation()) == Compiler->getSourceManager().getMainFileID())
+		Context->TargetEnumerators.Add(Enumerator);
 }
 
 class ZEMetaCompilerASTConsumer : public clang::ASTConsumer
@@ -173,17 +178,13 @@ void ZEMCParser::SetMetaContext(ZEMCContext* context)
 bool ZEMCParser::Parse()
 {
 	std::vector<std::string> Arguments;
-	//Arguments.push_back("ZEMetaCompiler.exe");
-	//Arguments.push_back(Options.InputFileName);
-	
-	//Arguments.push_back("--");
-	//Arguments.push_back("clang++");
+
 	Arguments.push_back("-fms-extensions");
 	Arguments.push_back("-fms-compatibility");
 	Arguments.push_back("-x");	Arguments.push_back("c++");
 	Arguments.push_back("-fsyntax-only");
 	Arguments.push_back("-w");
-	//Arguments.push_back("-std=c++11");
+	Arguments.push_back("-DZE_META_COMPILER");
 
 	for (int I = 0; I < Options->IncludeDirectories.GetCount(); I++)
 	{
