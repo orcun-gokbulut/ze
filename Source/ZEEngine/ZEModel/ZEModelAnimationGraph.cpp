@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelAnimationNodeBlend.h
+ Zinek Engine - ZEModelAnimationGraph.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,72 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MODEL_ANIMATION_NODE_BLEND_H__
-#define __ZE_MODEL_ANIMATION_NODE_BLEND_H__
+#include "ZEModelAnimationGraph.h"
 
-#include "ZEModelAnimationNode.h"
-#include "ZEDS/ZEFlags.h"
-
-#define ZE_MAN_BLEND_INPUT_NONE		0
-#define ZE_MAN_BLEND_INPUT_A		1
-#define ZE_MAN_BLEND_INPUT_B		2
-#define ZE_MAN_BLEND_INPUT_ALL		3
-
-class ZEModelAnimationNodeBlend : public ZEModelAnimationNode
+ZEModelAnimationGraph::ZEModelAnimationGraph()
 {
-	protected:
+	Initialized = false;
+	ResultNode = NULL;
+}
 
-		ZEFlags								InputCheckFlags;
+ZEModelAnimationGraph::~ZEModelAnimationGraph()
+{
 
-		float								BlendFactor;
+}
 
-		void								ProcessSelf(float elapsedTime);
-		bool								GenerateOutput(ZEModelAnimationFrame& output);
+bool ZEModelAnimationGraph::SetRootNode(ZEModelAnimationNode* node)
+{
+	if (!Nodes.Exists(node))
+		return false;
 
-											ZEModelAnimationNodeBlend();
-											~ZEModelAnimationNodeBlend();						
-	public:									
-											
-		bool								SetInputNodeA(ZEModelAnimationNode* input);
-		const ZEModelAnimationNode*			GetInputNodeA() const;
-		bool								SetInputNodeB(ZEModelAnimationNode* input);
-		const ZEModelAnimationNode*			GetInputNodeB() const;
+	//RootNode = node;
+	
+	return true;
+}
 
-		void								SetBlendFactor(float factor);
-		float								GetBlendFactor() const;
+const ZEModelAnimationNode* ZEModelAnimationGraph::GetRootNode() const
+{
+	//return RootNode;
+	return NULL;
+}
 
-		static ZEModelAnimationNodeBlend*	CreateInstance();
-};
+bool ZEModelAnimationGraph::AddAnimationNode(ZEModelAnimationNode* node)
+{
+	if (Nodes.Exists(node))
+		return false;
 
+	node->SetOwner(this);
+	Nodes.Add(node);
 
-#endif
+	return true;
+}
+
+bool ZEModelAnimationGraph::RemoveAnimationNode(ZEModelAnimationNode* node)
+{
+	if (!Nodes.Exists(node))
+		return false;
+
+	Nodes.DeleteValue(node);
+	node->SetOwner(NULL);
+
+	return true;
+}
+
+ZEModelAnimationNode* ZEModelAnimationGraph::GetAnimationNode(const char* name)
+{
+	for (ZEInt I = 0; I < Nodes.GetCount(); I++)
+	{
+		if (strcmp(Nodes[I]->GetName(), name) == 0)
+			return Nodes[I];
+	}
+
+	return NULL;
+}
+
+void ZEModelAnimationGraph::Process(float elapsedtime)
+{
+	for (ZEInt I = 0; I < Nodes.GetCount(); I++)
+	{
+		Nodes[I]->Process(elapsedtime);
+	}
+}

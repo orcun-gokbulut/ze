@@ -60,6 +60,21 @@ enum ZEModelAnimationUpdateMode
 	ZE_MAUM_VISUAL
 };
 
-typedef ZEModelResourceAnimation ZEModelAnimation;
+struct ZEModelAnimationKey
+{
+	char								Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEUInt32							ItemId;
+	ZEVector3							Position;
+	ZEQuaternion						Rotation;
+	ZEVector3							Scale;
+};
+
+struct ZEModelAnimationFrame
+{
+	ZEArray<ZEModelAnimationKey>		BoneKeys;
+	ZEArray<ZEModelAnimationKey>		MeshKeys;
+};
+
+//typedef ZEModelResourceAnimation ZEModelAnimation;
 
 #endif

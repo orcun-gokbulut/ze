@@ -38,8 +38,7 @@
 
 ZEModelAnimationNodeBlend::ZEModelAnimationNodeBlend()
 {
-	InputA = NULL;
-	InputB = NULL;
+	SetInputNodeCount(2);
 	InputCheckFlags.Value = ZE_MAN_BLEND_INPUT_NONE;
 	BlendFactor = 0.5f;
 }
@@ -49,38 +48,35 @@ ZEModelAnimationNodeBlend::~ZEModelAnimationNodeBlend()
 
 }
 
-bool ZEModelAnimationNodeBlend::SetInputA(ZEModelAnimationNode* input)
+bool ZEModelAnimationNodeBlend::SetInputNodeA(ZEModelAnimationNode* input)
 {
-	if (input->GetOwner() != NULL && input->GetOwner() != this->Owner)
+	if (!SetInputNode(0, input))
 		return false;
-
-	InputA = input;
 
 	InputCheckFlags.RaiseFlags(ZE_MAN_BLEND_INPUT_A);
 
 	return true;
+
 }
 
-ZEModelAnimationNode* ZEModelAnimationNodeBlend::GetInputA()
+const ZEModelAnimationNode* ZEModelAnimationNodeBlend::GetInputNodeA() const
 {
-	return InputA;
+	return InputNodes[0];
 }
 
-bool ZEModelAnimationNodeBlend::SetInputB(ZEModelAnimationNode* input)
+bool ZEModelAnimationNodeBlend::SetInputNodeB(ZEModelAnimationNode* input)
 {
-	if (input->GetOwner() != NULL && input->GetOwner() != this->Owner)
+	if (!SetInputNode(1, input))
 		return false;
-
-	InputB = input;
 
 	InputCheckFlags.RaiseFlags(ZE_MAN_BLEND_INPUT_B);
 
 	return true;
 }
 
-ZEModelAnimationNode* ZEModelAnimationNodeBlend::GetInputB()
+const ZEModelAnimationNode* ZEModelAnimationNodeBlend::GetInputNodeB() const
 {
-	return InputB;
+	return InputNodes[1];
 }
 
 void ZEModelAnimationNodeBlend::SetBlendFactor(float factor)
@@ -93,57 +89,47 @@ void ZEModelAnimationNodeBlend::SetBlendFactor(float factor)
 		BlendFactor = factor;
 }
 
-float ZEModelAnimationNodeBlend::GetBlendFactor()
+float ZEModelAnimationNodeBlend::GetBlendFactor() const
 {
 	return BlendFactor;
 }
 
-void ZEModelAnimationNodeBlend::Process(float elapsedTime)
+void ZEModelAnimationNodeBlend::ProcessSelf(float elapsedTime)
 {
-	if (InputA != NULL)
-		InputA->Process(elapsedTime);
-	else
+	if (InputNodes[0] == NULL)
 		InputCheckFlags.UnraiseFlags(ZE_MAN_BLEND_INPUT_A);
 	
-	if (InputB != NULL)
-		InputB->Process(elapsedTime);
-	else
+	if (InputNodes[1] == NULL)
 		InputCheckFlags.UnraiseFlags(ZE_MAN_BLEND_INPUT_B);
 }
 
-//void ZEModelAnimationNodeBlend::Process(float ElapsedTime)
-//{
-//	ZESize InputCount = Inputs.GetCount();
-//
-//	for (ZESize I = 0; I < InputCount; I++)
-//	{
-//		Inputs[I].Node->Process(ElapsedTime);
-//	}
-//}
-
-void ZEModelAnimationNodeBlend::GetOutput(ZEModelResourceAnimationFrame& output)
+bool ZEModelAnimationNodeBlend::GenerateOutput(ZEModelAnimationFrame& output)
 {
 
 	if (InputCheckFlags.GetFlags(ZE_MAN_BLEND_INPUT_ALL))
 	{
-		ZEModelResourceAnimationFrame outputA;
-		InputA->GetOutput(outputA);
+		ZEModelAnimationFrame outputA;
+		
+		if (!InputNodes[0]->GetOutput(outputA))
+			return false;
 
-		ZEModelResourceAnimationFrame outputB;
-		InputB->GetOutput(outputB);
+		ZEModelAnimationFrame outputB;
+
+		if (!InputNodes[1]->GetOutput(outputB))
+			return false;
 
 		ZESize outputBoneKeyCount = outputA.BoneKeys.GetCount();
 		output.BoneKeys.SetCount(outputBoneKeyCount);
 
 		for (ZESize I = 0; I < outputBoneKeyCount; I++)
 		{
-			const ZEModelResourceAnimationKey* keyA = &outputA.BoneKeys[I];
-			const ZEModelResourceAnimationKey* keyB = &outputB.BoneKeys[I];
-			ZEModelResourceAnimationKey* keyBlend = &output.BoneKeys[I];
+			const ZEModelAnimationKey* keyA = &outputA.BoneKeys[I];
+			const ZEModelAnimationKey* keyB = &outputB.BoneKeys[I];
+			ZEModelAnimationKey* keyBlend = &output.BoneKeys[I];
 
 			keyBlend->ItemId = keyA->ItemId;
 			ZEVector3::Lerp(keyBlend->Position, keyA->Position, keyB->Position, BlendFactor);
-			ZEQuaternion::Slerp(keyBlend->Rotation, keyA->Rotation, keyB->Rotation, BlendFactor);
+			ZEQuaternion::Nlerp(keyBlend->Rotation, keyA->Rotation, keyB->Rotation, BlendFactor);
 			keyBlend->Scale = ZEVector3::One;
 		}
 
@@ -152,28 +138,28 @@ void ZEModelAnimationNodeBlend::GetOutput(ZEModelResourceAnimationFrame& output)
 
 		for (ZESize I = 0; I < outputMeshKeyCount; I++)
 		{
-			const ZEModelResourceAnimationKey* keyA = &outputA.MeshKeys[I];
-			const ZEModelResourceAnimationKey* keyB = &outputB.MeshKeys[I];
-			ZEModelResourceAnimationKey* keyBlend = &output.MeshKeys[I];
+			const ZEModelAnimationKey* keyA = &outputA.MeshKeys[I];
+			const ZEModelAnimationKey* keyB = &outputB.MeshKeys[I];
+			ZEModelAnimationKey* keyBlend = &output.MeshKeys[I];
 
 			keyBlend->ItemId = keyA->ItemId;
 			ZEVector3::Lerp(keyBlend->Position, keyA->Position, keyB->Position, BlendFactor);
-			ZEQuaternion::Slerp(keyBlend->Rotation, keyA->Rotation, keyB->Rotation, BlendFactor);
+			ZEQuaternion::Nlerp(keyBlend->Rotation, keyA->Rotation, keyB->Rotation, BlendFactor);
 			ZEVector3::Lerp(keyBlend->Scale, keyA->Scale, keyB->Scale, BlendFactor);
 		}
 
 	}
 	else if (InputCheckFlags.GetFlags(ZE_MAN_BLEND_INPUT_A))
 	{
-		InputA->GetOutput(output);
+		return InputNodes[0]->GetOutput(output);
 	}
 	else if (InputCheckFlags.GetFlags(ZE_MAN_BLEND_INPUT_B))
 	{
-		InputB->GetOutput(output);
+		return InputNodes[1]->GetOutput(output);
 	}
 	else
 	{
-		return;
+		return false;
 	}
 
 }

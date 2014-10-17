@@ -37,27 +37,75 @@
 #define __ZE_MODEL_ANIMATION_NODE_H__
 
 #include "ZEModelResource.h"
+#include "ZEModelAnimation.h"
 
-class ZEModelAnimationController;
+//struct ZEModelAnimationMapItem
+//{
+//	ZEString		Name;
+//	ZESize			Id;
+//};
+
+struct ZEModelAnimationMap
+{
+	ZEArray<ZEString> BoneItems;
+	ZEArray<ZEString> MeshItems;
+};
+
+class ZEModelAnimationGraph;
+//typedef ZEModelResourceAnimationFrame ZEModelAnimationFrame;
 
 class ZEModelAnimationNode
 {
-	protected:
-		ZEModelAnimationController*				Owner;
-		ZEString								Name;
+	friend class ZEModelAnimationGraph;
 
-												ZEModelAnimationNode();
-		virtual									~ZEModelAnimationNode();
+	private:
+		ZEModelAnimationGraph*						Owner;
+		ZEString									Name;
+		bool										Initialized;
+		bool										Enabled;
+
+		void										SetOwner(ZEModelAnimationGraph* graph);
+		void										Initialize();
+		void										Deinitialize();
+
+	protected:
+
+		ZEModelAnimationNode*						OutputNode;
+		ZEArray<ZEModelAnimationNode*>				InputNodes;
+
+		void										SetInputNodeCount(ZESize count);
+
+		bool										AddInputNode(ZEModelAnimationNode* node);
+		bool										SetInputNode(ZESize index, ZEModelAnimationNode* node);
+		bool										RemoveInputNode(ZEModelAnimationNode* node);
+
+		virtual const ZEModelAnimationMap*			GenerateMap();
+
+		virtual bool								GenerateOutput(ZEModelAnimationFrame& output) = 0;
+		virtual void								ProcessSelf(float elapsedTime) = 0;
+
+		virtual void								InitializeSelf();
+		virtual void								DeinitializeSelf();
+
+													ZEModelAnimationNode();
+		virtual										~ZEModelAnimationNode();
 
 	public:
-		void									SetName(const ZEString& Name);
-		const ZEString&							GetName();
+		bool										SetName(const ZEString& name);
+		const ZEString&								GetName() const;
 
-		virtual void							SetOwner(ZEModelAnimationController* Controller);
-		virtual ZEModelAnimationController*		GetOwner();
+		void										SetEnabled(bool enabled);
+		bool										GetEnabled() const;
+		const ZEModelAnimationGraph*				GetOwner() const;
 
-		virtual void							Process(float ElapsedTime) = 0;
-		virtual void							GetOutput(ZEModelResourceAnimationFrame& Output) = 0;
+		bool										IsInitialized() const;
+
+		void										Process(float elapsedTime);
+		bool										GetOutput(ZEModelAnimationFrame& output);
+		const ZEModelAnimationMap*					GetMap();
+
+		bool										SetOutputNode(ZEModelAnimationNode* node);
+		const ZEModelAnimationNode*					GetOutputNode() const;
 };
 
 #endif

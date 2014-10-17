@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelAnimationNodeBlend.h
+ Zinek Engine - ZEModelAnimationNodeAdd.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MODEL_ANIMATION_NODE_BLEND_H__
-#define __ZE_MODEL_ANIMATION_NODE_BLEND_H__
+#ifndef __ZE_MODEL_ANIMATION_NODE_ADD_H__
+#define __ZE_MODEL_ANIMATION_NODE_ADD_H__
 
 #include "ZEModelAnimationNode.h"
 #include "ZEDS/ZEFlags.h"
 
-#define ZE_MAN_BLEND_INPUT_NONE		0
-#define ZE_MAN_BLEND_INPUT_A		1
-#define ZE_MAN_BLEND_INPUT_B		2
-#define ZE_MAN_BLEND_INPUT_ALL		3
+#define ZE_MAN_ADD_INPUT_NONE	0
+#define ZE_MAN_ADD_INPUT_BASE	1
+#define ZE_MAN_ADD_INPUT_ADD	2
+#define ZE_MAN_ADD_INPUT_ALL	3
 
-class ZEModelAnimationNodeBlend : public ZEModelAnimationNode
+class ZEModelAnimationNodeAdd : public ZEModelAnimationNode
 {
 	protected:
 
 		ZEFlags								InputCheckFlags;
 
-		float								BlendFactor;
+		float								Weight;
 
 		void								ProcessSelf(float elapsedTime);
 		bool								GenerateOutput(ZEModelAnimationFrame& output);
 
-											ZEModelAnimationNodeBlend();
-											~ZEModelAnimationNodeBlend();						
+											ZEModelAnimationNodeAdd();
+											~ZEModelAnimationNodeAdd();						
 	public:									
 											
-		bool								SetInputNodeA(ZEModelAnimationNode* input);
-		const ZEModelAnimationNode*			GetInputNodeA() const;
-		bool								SetInputNodeB(ZEModelAnimationNode* input);
-		const ZEModelAnimationNode*			GetInputNodeB() const;
+		bool								SetBaseInputNode(ZEModelAnimationNode* input);
+		ZEModelAnimationNode*				GetBaseInputNode();
+		bool								SetAdditiveInputNode(ZEModelAnimationNode* input);
+		ZEModelAnimationNode*				GetAdditiveInputNode();
 
-		void								SetBlendFactor(float factor);
-		float								GetBlendFactor() const;
+		void								SetWeight(float factor);
+		float								GetWeight();
 
-		static ZEModelAnimationNodeBlend*	CreateInstance();
+		static ZEModelAnimationNodeAdd*		CreateInstance();
 };
 
 

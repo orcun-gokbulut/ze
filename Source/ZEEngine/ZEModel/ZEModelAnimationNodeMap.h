@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelAnimationNodeBlend.h
+ Zinek Engine - ZEModelAnimationNodeMap.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,42 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MODEL_ANIMATION_NODE_BLEND_H__
-#define __ZE_MODEL_ANIMATION_NODE_BLEND_H__
+#ifndef __ZE_MODEL_ANIMATION_NODE_MAP_H__
+#define __ZE_MODEL_ANIMATION_NODE_MAP_H__
 
 #include "ZEModelAnimationNode.h"
-#include "ZEDS/ZEFlags.h"
 
-#define ZE_MAN_BLEND_INPUT_NONE		0
-#define ZE_MAN_BLEND_INPUT_A		1
-#define ZE_MAN_BLEND_INPUT_B		2
-#define ZE_MAN_BLEND_INPUT_ALL		3
-
-class ZEModelAnimationNodeBlend : public ZEModelAnimationNode
+class ZEModelAnimationNodeMap : public ZEModelAnimationNode
 {
+	private:
+
+		ZEModelAnimationMap					TargetMap;
+		ZEArray<ZEInt32>					Links;
+		ZEModelAnimationMap					CurrentMap;
+
 	protected:
 
-		ZEFlags								InputCheckFlags;
+		virtual const ZEModelAnimationMap*	GenerateMap();
 
-		float								BlendFactor;
+		virtual bool						GenerateOutput(ZEModelAnimationFrame& output);
+		virtual void						ProcessSelf(float elapsedTime);
 
-		void								ProcessSelf(float elapsedTime);
-		bool								GenerateOutput(ZEModelAnimationFrame& output);
+											ZEModelAnimationNodeMap();
+		virtual								~ZEModelAnimationNodeMap();
 
-											ZEModelAnimationNodeBlend();
-											~ZEModelAnimationNodeBlend();						
-	public:									
-											
-		bool								SetInputNodeA(ZEModelAnimationNode* input);
-		const ZEModelAnimationNode*			GetInputNodeA() const;
-		bool								SetInputNodeB(ZEModelAnimationNode* input);
-		const ZEModelAnimationNode*			GetInputNodeB() const;
+	public:
+		
+		bool								SetInputNode(ZEModelAnimationNode* node);
+		const ZEModelAnimationNode*			GetInputNode() const;
 
-		void								SetBlendFactor(float factor);
-		float								GetBlendFactor() const;
+		void								SetTargetMap(const ZEModelAnimationMap& map);
+		void								SetCurrentMap(const ZEModelAnimationMap& map);
+		void								SetLinks(const ZEArray<ZEInt32>& links);
 
-		static ZEModelAnimationNodeBlend*	CreateInstance();
+		//void								MapBone(ZEString targetName, ZEString currentName);
+		//void								MapMesh(ZEString targetName, ZEString currentName);
+
+		static ZEModelAnimationNodeMap*		CreateInstance();
 };
 
 

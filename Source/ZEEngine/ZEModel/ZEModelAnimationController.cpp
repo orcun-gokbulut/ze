@@ -73,7 +73,7 @@ void ZEModelAnimationController::AddAnimationNode(ZEModelAnimationNode* Node)
 	if (AnimationTree.Exists(Node))
 		return;
 
-	Node->SetOwner(this);
+	//Node->SetOwner(this);
 	AnimationTree.Add(Node);
 }
 
@@ -83,7 +83,7 @@ void ZEModelAnimationController::RemoveAnimationNode(ZEModelAnimationNode* Node)
 		return;
 
 	AnimationTree.DeleteValue(Node);
-	Node->SetOwner(NULL);
+	//Node->SetOwner(NULL);
 }
 
 ZEModelAnimationNode* ZEModelAnimationController::GetAnimationNode(const char* Name)
@@ -122,14 +122,14 @@ void ZEModelAnimationController::ApplyOutput()
 	if(OutputNode == NULL)
 		return;
 
-	ZEModelResourceAnimationFrame ResultFrame;
+	ZEModelAnimationFrame ResultFrame;
 
 	OutputNode->GetOutput(ResultFrame);
 
 	// Update Bones 
 	for (ZESize I = 0; I < ResultFrame.BoneKeys.GetCount(); I++)
 	{
-		const ZEModelResourceAnimationKey* Key = &ResultFrame.BoneKeys[I];
+		const ZEModelAnimationKey* Key = &ResultFrame.BoneKeys[I];
 
 		ZESize ItemId = (ZESize)Key->ItemId;
 
@@ -142,7 +142,7 @@ void ZEModelAnimationController::ApplyOutput()
 	// Mechanism is same as above (Update Bones)
 	for (ZESize I = 0; I < ResultFrame.MeshKeys.GetCount(); I++)
 	{
-		const ZEModelResourceAnimationKey* Key = &ResultFrame.MeshKeys[I];
+		const ZEModelAnimationKey* Key = &ResultFrame.MeshKeys[I];
 
 		ZESize ItemId = (ZESize)Key->ItemId;
 

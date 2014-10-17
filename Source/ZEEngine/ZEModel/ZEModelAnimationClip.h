@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelAnimationNodeBlend.h
+ Zinek Engine - ZEModelAnimationClip.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,70 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MODEL_ANIMATION_NODE_BLEND_H__
-#define __ZE_MODEL_ANIMATION_NODE_BLEND_H__
+#ifndef __ZE_MODEL_ANIMATION_CLIP_H__
+#define __ZE_MODEL_ANIMATION_CLIP_H__
 
-#include "ZEModelAnimationNode.h"
-#include "ZEDS/ZEFlags.h"
+#include "ZEModelResource.h"
+#include "ZEModelAnimation.h"
 
-#define ZE_MAN_BLEND_INPUT_NONE		0
-#define ZE_MAN_BLEND_INPUT_A		1
-#define ZE_MAN_BLEND_INPUT_B		2
-#define ZE_MAN_BLEND_INPUT_ALL		3
+//typedef ZEModelResourceAnimationFrame ZEModelAnimationFrame;
 
-class ZEModelAnimationNodeBlend : public ZEModelAnimationNode
+class ZEModel;
+
+struct AnimationSequence
 {
-	protected:
+	char							Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEArray<ZEModelAnimationFrame>	Frames;
 
-		ZEFlags								InputCheckFlags;
-
-		float								BlendFactor;
-
-		void								ProcessSelf(float elapsedTime);
-		bool								GenerateOutput(ZEModelAnimationFrame& output);
-
-											ZEModelAnimationNodeBlend();
-											~ZEModelAnimationNodeBlend();						
-	public:									
-											
-		bool								SetInputNodeA(ZEModelAnimationNode* input);
-		const ZEModelAnimationNode*			GetInputNodeA() const;
-		bool								SetInputNodeB(ZEModelAnimationNode* input);
-		const ZEModelAnimationNode*			GetInputNodeB() const;
-
-		void								SetBlendFactor(float factor);
-		float								GetBlendFactor() const;
-
-		static ZEModelAnimationNodeBlend*	CreateInstance();
+	ZESize							StartFrame;
+	ZESize							EndFrame;
+	ZESize							FrameCount;
 };
 
+class ZEModelAnimationClip
+{
+	friend class ZEModelAnimationNodeClip;
+
+	protected:
+
+		ZEString							Name;
+
+		ZEArray<AnimationSequence>			Sequences;
+		ZEArray<ZEModelAnimationFrame*>		Frames;
+		ZESize								FrameCount;
+
+		bool								IsInitialized;
+		ZESize								ReferenceCount;
+
+		void								AddReference();
+		void								RemoveReference();
+
+											ZEModelAnimationClip();
+		virtual								~ZEModelAnimationClip();												
+
+	public:
+
+		bool								AddAnimationSequence(const ZEModelResourceAnimation& animation);
+		bool								AddAnimationSequence(const char* name, const ZEModel& model);
+
+		bool								InsertAnimationSequence(ZESize index, const ZEModelResourceAnimation& animation);
+		bool								InsertAnimationSequence(ZESize index, const char* name, const ZEModel& model);
+
+		AnimationSequence*					GetAnimationSequence(const char* name);
+		AnimationSequence*					GetAnimationSequence(ZESize index);
+		ZESize								GetSequenceCount() const;
+
+		bool								RemoveAnimationSequence(const char* name);
+		bool								RemoveAnimationSequence(ZESize index);
+		bool								RemoveAnimationSequence(ZESize startIndex, ZESize endIndex);
+
+		ZEModelAnimationFrame*				GetFrame(ZESize index);
+		ZESize								GetFrameCount() const;
+
+		virtual void						Initialize();
+		virtual void						Deinitialize();
+
+		static ZEModelAnimationClip*		CreateInstance();
+};
 
 #endif

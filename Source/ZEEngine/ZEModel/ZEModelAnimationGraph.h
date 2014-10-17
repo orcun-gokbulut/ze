@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelAnimationNodeBlend.h
+ Zinek Engine - ZEModelAnimationGraph.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,42 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MODEL_ANIMATION_NODE_BLEND_H__
-#define __ZE_MODEL_ANIMATION_NODE_BLEND_H__
+#ifndef __ZE_MODEL_ANIMATION_TREE_H__
+#define __ZE_MODEL_ANIMATION_TREE_H__
 
 #include "ZEModelAnimationNode.h"
+#include "ZEModelAnimationNodeMap.h"
 #include "ZEDS/ZEFlags.h"
 
-#define ZE_MAN_BLEND_INPUT_NONE		0
-#define ZE_MAN_BLEND_INPUT_A		1
-#define ZE_MAN_BLEND_INPUT_B		2
-#define ZE_MAN_BLEND_INPUT_ALL		3
-
-class ZEModelAnimationNodeBlend : public ZEModelAnimationNode
+class ZEModelAnimationGraph
 {
 	protected:
+				
+		//ZESize							NodeIdCursor;
+		bool							Initialized;
+		ZEModelAnimationMap				ModelMap;
+		ZEModelAnimationNodeMap*		ResultNode;
+		ZEArray<ZEModelAnimationNode*>	Nodes;
 
-		ZEFlags								InputCheckFlags;
-
-		float								BlendFactor;
-
-		void								ProcessSelf(float elapsedTime);
-		bool								GenerateOutput(ZEModelAnimationFrame& output);
-
-											ZEModelAnimationNodeBlend();
-											~ZEModelAnimationNodeBlend();						
 	public:									
 											
-		bool								SetInputNodeA(ZEModelAnimationNode* input);
-		const ZEModelAnimationNode*			GetInputNodeA() const;
-		bool								SetInputNodeB(ZEModelAnimationNode* input);
-		const ZEModelAnimationNode*			GetInputNodeB() const;
+		bool							SetRootNode(ZEModelAnimationNode* node);
+		const ZEModelAnimationNode*		GetRootNode() const;
 
-		void								SetBlendFactor(float factor);
-		float								GetBlendFactor() const;
+		bool							AddAnimationNode(ZEModelAnimationNode* node);
+		bool							RemoveAnimationNode(ZEModelAnimationNode* node);
+		ZEModelAnimationNode*			GetAnimationNode(const char* name);
 
-		static ZEModelAnimationNodeBlend*	CreateInstance();
+		void							GetOutput(ZEModelResourceAnimationFrame& output);
+
+		void							Process(float elapsedtime);
+
+		void							Initialize(const ZEModelResource* modelResource);
+		void							Deinitialize();
+
+										ZEModelAnimationGraph();
+										~ZEModelAnimationGraph();		
+
 };
 
 

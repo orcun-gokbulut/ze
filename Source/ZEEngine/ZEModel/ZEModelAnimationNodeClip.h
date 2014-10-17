@@ -33,17 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MODEL_ANIMATION_CLIP_H__
-#define __ZE_MODEL_ANIMATION_CLIP_H__
+#ifndef __ZE_MODEL_ANIMATION_NODE_CLIP_H__
+#define __ZE_MODEL_ANIMATION_NODE_CLIP_H__
 
 #include "ZEModelAnimationNode.h"
-#include "ZEModelAnimation.h"
+#include "ZEModelAnimationClip.h"
 
 
 class ZEModelAnimationNodeClip : public ZEModelAnimationNode
 {
 	protected:
-		const ZEModelAnimation*					Animation;
+		ZEModelAnimationClip*					AnimationClip;
 
 		ZEUInt									StartFrame;
 		ZEUInt									EndFrame;
@@ -58,48 +58,51 @@ class ZEModelAnimationNodeClip : public ZEModelAnimationNode
 
 		void									ApplyLimits();
 
+		virtual void							ProcessSelf(float ElapsedTime);
+		virtual bool							GenerateOutput(ZEModelAnimationFrame& output);
+
 												ZEModelAnimationNodeClip();
 		virtual									~ZEModelAnimationNodeClip();												
 
 	public:
-		void									SetAnimation(const ZEModelAnimation* Animation);
-		const ZEModelAnimation*					GetAnimation();
+		void									SetAnimationClip(ZEModelAnimationClip* animationClip);
+		const ZEModelAnimationClip*				GetAnimationClip();
+		
+		void									SetSequence(ZESize index);
+		void									SetSequence(const char* name);
 
-		void									SetSpeed(float FPS);
+		void									SetSpeed(float fPS);
 		float									GetSpeed();
 
-		void									SetLooping(bool Looping);
+		void									SetLooping(bool looping);
 		bool									GetLooping();
 
-		void									SetLimitsEnabled(bool Enabled);
+		void									SetLimitsEnabled(bool enabled);
 		bool									GetLimitsEnabled();
 
-		void									SetCurrentFrame(float Frame);
-		void									SetCurrentFrameByTime(float Seconds);
-		void									SetCurrentFrameByPercentage(float Percentage);
+		void									SetCurrentFrame(float frame);
+		void									SetCurrentFrameByTime(float seconds);
+		void									SetCurrentFrameByPercentage(float percentage);
 
 		float 									GetCurrentFrame();
 		float									GetCurrentFrameByTime();
 		float									GetCurrentFrameByPercentage();
 
-		void									SetStartFrame(ZEUInt Frame);
-		void									SetStartFrameByTime(float Seconds);
-		void									SetStartFrameByPercentage(float Percentage);
+		void									SetStartFrame(ZEUInt frame);
+		void									SetStartFrameByTime(float seconds);
+		void									SetStartFrameByPercentage(float percentage);
 
 		ZEUInt									GetStartFrame();
 		float									GetStartFrameByTime();
 		float									GetStartFrameByPercentage();
 
-		void									SetEndFrame(ZEUInt Frame);
-		void									SetEndFrameByTime(float Seconds);
-		void									SetEndFrameByPercentage(float Percentage);
+		void									SetEndFrame(ZEUInt frame);
+		void									SetEndFrameByTime(float seconds);
+		void									SetEndFrameByPercentage(float percentage);
 
 		ZEUInt									GetEndFrame();
 		float									GetEndFrameByTime();
 		float									GetEndFrameByPercentage();
-
-		virtual void							Process(float ElapsedTime);
-		virtual void							GetOutput(ZEModelResourceAnimationFrame& Output);
 
 		static ZEModelAnimationNodeClip*		CreateInstance();
 };

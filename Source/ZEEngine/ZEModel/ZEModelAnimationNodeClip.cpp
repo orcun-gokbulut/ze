@@ -38,27 +38,27 @@
 
 void ZEModelAnimationNodeClip::ApplyLimits()
 {
-	if (Animation == NULL)
+	if (AnimationClip == NULL)
 		return;
 
-	if (Animation->Frames.GetCount() == 0)
+	if (AnimationClip->Frames.GetCount() == 0)
 		return;
 
 	if (!LimitsEnabled)
 	{
 		EffectiveStartFrame = 0;
-		EffectiveEndFrame = (ZEUInt)Animation->Frames.GetCount() - 1;
+		EffectiveEndFrame = (ZEUInt)AnimationClip->Frames.GetCount() - 1;
 	}
 	else
 	{
-		EffectiveStartFrame = StartFrame % (ZEUInt)Animation->Frames.GetCount();	
-		EffectiveEndFrame = EndFrame % (ZEUInt)Animation->Frames.GetCount();	
+		EffectiveStartFrame = StartFrame % (ZEUInt)AnimationClip->Frames.GetCount();	
+		EffectiveEndFrame = EndFrame % (ZEUInt)AnimationClip->Frames.GetCount();	
 	}
 }
 
 ZEModelAnimationNodeClip::ZEModelAnimationNodeClip()
 {
-	Animation = NULL;
+	AnimationClip = NULL;
 
 	CurrentFrame	= 0.0f;
 	StartFrame		= 0;
@@ -77,21 +77,66 @@ ZEModelAnimationNodeClip::~ZEModelAnimationNodeClip()
 
 }
 
-void ZEModelAnimationNodeClip::SetAnimation(const ZEModelAnimation* Animation)
+void ZEModelAnimationNodeClip::SetAnimationClip(ZEModelAnimationClip* animationClip)
 {
-	this->Animation = Animation;
+	if(animationClip == NULL)
+		return;
+
+	if (AnimationClip != NULL)
+	{
+		AnimationClip->RemoveReference();
+		AnimationClip = NULL;
+	}
+
+	AnimationClip = animationClip;
+	AnimationClip->AddReference();
 
 	ApplyLimits();
 }
 
-const ZEModelAnimation* ZEModelAnimationNodeClip::GetAnimation()
+const ZEModelAnimationClip* ZEModelAnimationNodeClip::GetAnimationClip()
 {
-	return Animation;
+	return AnimationClip;
 }
 
-void ZEModelAnimationNodeClip::SetSpeed(float FPS)
+void ZEModelAnimationNodeClip::SetSequence(ZESize index)
 {
-	Speed = FPS;
+	if (AnimationClip == NULL)
+		return;
+
+	if (index >= AnimationClip->GetSequenceCount())
+		return;
+
+	StartFrame = AnimationClip->Sequences[index].StartFrame;
+	EndFrame = AnimationClip->Sequences[index].EndFrame;
+
+	ApplyLimits();
+}
+
+void ZEModelAnimationNodeClip::SetSequence(const char* name)
+{
+	if (AnimationClip == NULL)
+		return;
+
+	ZESize sequenceCount = AnimationClip->GetSequenceCount();
+
+	for (ZESize I = 0; I < sequenceCount; I++)
+	{
+		if (strnicmp(name, AnimationClip->Sequences[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
+		{
+			StartFrame = AnimationClip->Sequences[I].StartFrame;
+			EndFrame = AnimationClip->Sequences[I].EndFrame;
+
+			ApplyLimits();
+
+			return;
+		}
+	}
+}
+
+void ZEModelAnimationNodeClip::SetSpeed(float fPS)
+{
+	Speed = fPS;
 }
 
 float ZEModelAnimationNodeClip::GetSpeed()
@@ -99,9 +144,9 @@ float ZEModelAnimationNodeClip::GetSpeed()
 	return Speed;
 }
 
-void ZEModelAnimationNodeClip::SetLooping(bool Enabled)
+void ZEModelAnimationNodeClip::SetLooping(bool enabled)
 {
-	Looping = Enabled;
+	Looping = enabled;
 }
 
 bool ZEModelAnimationNodeClip::GetLooping()
@@ -109,26 +154,38 @@ bool ZEModelAnimationNodeClip::GetLooping()
 	return Looping;
 }
 
-void ZEModelAnimationNodeClip::SetStartFrame(ZEUInt Frame)
+void ZEModelAnimationNodeClip::SetLimitsEnabled(bool enabled)
 {
-	StartFrame = Frame;
+	LimitsEnabled = enabled;
 
 	ApplyLimits();
 }
 
-void ZEModelAnimationNodeClip::SetStartFrameByTime(float Seconds)
+bool ZEModelAnimationNodeClip::GetLimitsEnabled()
 {
-	if (Animation == NULL)
+	return LimitsEnabled;
+}
+
+void ZEModelAnimationNodeClip::SetStartFrame(ZEUInt frame)
+{
+	StartFrame = frame;
+
+	ApplyLimits();
+}
+
+void ZEModelAnimationNodeClip::SetStartFrameByTime(float seconds)
+{
+	if (AnimationClip == NULL)
 		return;
 
-	if (Animation->Frames.GetCount() == 0)
+	if (AnimationClip->Frames.GetCount() == 0)
 		return;
 
-	ZEUInt TempStartFrameValue = (ZEUInt)(Speed * Seconds);
+	ZEUInt TempStartFrameValue = (ZEUInt)(Speed * seconds);
 
-	if (TempStartFrameValue > (ZEUInt)Animation->Frames.GetCount() - 1)
+	if (TempStartFrameValue > (ZEUInt)AnimationClip->Frames.GetCount() - 1)
 	{
-		SetStartFrame((ZEUInt)Animation->Frames.GetCount() - 1);
+		SetStartFrame((ZEUInt)AnimationClip->Frames.GetCount() - 1);
 	}
 	else
 	{
@@ -136,21 +193,21 @@ void ZEModelAnimationNodeClip::SetStartFrameByTime(float Seconds)
 	}
 }
 
-void ZEModelAnimationNodeClip::SetStartFrameByPercentage(float Percentage)
+void ZEModelAnimationNodeClip::SetStartFrameByPercentage(float percentage)
 {
-	if (Animation == NULL)
+	if (AnimationClip == NULL)
 		return;
 	
-	if (Animation->Frames.GetCount() == 0)
+	if (AnimationClip->Frames.GetCount() == 0)
 		return;
 
-	if (Percentage < 0.0f)
+	if (percentage < 0.0f)
 	{
 		SetStartFrame(0);
 	}
 	else
 	{
-		SetStartFrame((ZEUInt)((((float)Animation->Frames.GetCount() - 1.0f) / 100.0f) * Percentage));
+		SetStartFrame((ZEUInt)((((float)AnimationClip->Frames.GetCount() - 1.0f) / 100.0f) * percentage));
 	}
 }
 
@@ -161,10 +218,10 @@ ZEUInt ZEModelAnimationNodeClip::GetStartFrame()
 
 float ZEModelAnimationNodeClip::GetStartFrameByTime()
 {
-	if (Animation == NULL)
+	if (AnimationClip == NULL)
 		return 0.0f;
 
-	if (Animation->Frames.GetCount() == 0)
+	if (AnimationClip->Frames.GetCount() == 0)
 		return 0.0f;
 
 	return (float)StartFrame / Speed;
@@ -172,13 +229,13 @@ float ZEModelAnimationNodeClip::GetStartFrameByTime()
 
 float ZEModelAnimationNodeClip::GetStartFrameByPercentage()
 {
-	if (Animation == NULL)
+	if (AnimationClip == NULL)
 		return 0.0f;
 
-	if (Animation->Frames.GetCount() == 0)
+	if (AnimationClip->Frames.GetCount() == 0)
 		return 0.0f;
 
-	return ((float)StartFrame / ((float)Animation->Frames.GetCount() - 1.0f)) * 100.0f;
+	return ((float)StartFrame / ((float)AnimationClip->Frames.GetCount() - 1.0f)) * 100.0f;
 
 }
 
@@ -191,17 +248,17 @@ void ZEModelAnimationNodeClip::SetEndFrame(ZEUInt Frame)
 
 void ZEModelAnimationNodeClip::SetEndFrameByTime(float Seconds)
 {
-	if (Animation == NULL)
+	if (AnimationClip == NULL)
 		return;
 
-	if (Animation->Frames.GetCount() == 0)
+	if (AnimationClip->Frames.GetCount() == 0)
 		return;
 
 	ZEUInt TempEndFrameValue = (ZEUInt)(Speed * Seconds);
 
-	if (TempEndFrameValue > (ZEUInt)Animation->Frames.GetCount() - 1)
+	if (TempEndFrameValue > (ZEUInt)AnimationClip->Frames.GetCount() - 1)
 	{
-		SetEndFrame((ZEUInt)Animation->Frames.GetCount() - 1);
+		SetEndFrame((ZEUInt)AnimationClip->Frames.GetCount() - 1);
 	}
 	else
 	{
@@ -209,21 +266,21 @@ void ZEModelAnimationNodeClip::SetEndFrameByTime(float Seconds)
 	}
 }
 
-void ZEModelAnimationNodeClip::SetEndFrameByPercentage(float Percentage)
+void ZEModelAnimationNodeClip::SetEndFrameByPercentage(float percentage)
 {
-	if (Animation == NULL)
+	if (AnimationClip == NULL)
 		return;
 
-	if (Animation->Frames.GetCount() == 0)
+	if (AnimationClip->Frames.GetCount() == 0)
 		return;
 
-	if (Percentage < 0.0f)
+	if (percentage < 0.0f)
 	{
 		SetEndFrame(0);
 	}
 	else
 	{
-		SetEndFrame((ZEUInt)((((float)Animation->Frames.GetCount() - 1.0f) / 100.0f) * Percentage));
+		SetEndFrame((ZEUInt)((((float)AnimationClip->Frames.GetCount() - 1.0f) / 100.0f) * percentage));
 	}
 
 }
@@ -235,10 +292,10 @@ ZEUInt ZEModelAnimationNodeClip::GetEndFrame()
 
 float ZEModelAnimationNodeClip::GetEndFrameByTime()
 {
-	if (Animation == NULL)
+	if (AnimationClip == NULL)
 		return 0.0f;
 
-	if (Animation->Frames.GetCount() == 0)
+	if (AnimationClip->Frames.GetCount() == 0)
 		return 0.0f;
 
 	return (float)EndFrame / Speed;
@@ -246,19 +303,19 @@ float ZEModelAnimationNodeClip::GetEndFrameByTime()
 
 float ZEModelAnimationNodeClip::GetEndFrameByPercentage()
 {
-	if (Animation == NULL)
+	if (AnimationClip == NULL)
 		return 0.0f;
 
-	if (Animation->Frames.GetCount() == 0)
+	if (AnimationClip->Frames.GetCount() == 0)
 		return 0.0f;
 
-	return ((float)EndFrame / ((float)Animation->Frames.GetCount() - 1.0f)) * 100.0f;
+	return ((float)EndFrame / ((float)AnimationClip->Frames.GetCount() - 1.0f)) * 100.0f;
 }
 
-void ZEModelAnimationNodeClip::Process(float ElapsedTime)
+void ZEModelAnimationNodeClip::ProcessSelf(float elapsedTime)
 {
 	//Update CurrentFrame
-	CurrentFrame += Speed * ElapsedTime;
+	CurrentFrame += Speed * elapsedTime;
 
 	// Check animation limits
 	if (CurrentFrame >= (float)EffectiveEndFrame)
@@ -278,69 +335,70 @@ void ZEModelAnimationNodeClip::Process(float ElapsedTime)
 	}
 }
 
-void ZEModelAnimationNodeClip::GetOutput(ZEModelResourceAnimationFrame& Output)
+bool ZEModelAnimationNodeClip::GenerateOutput(ZEModelAnimationFrame& output)
 {
-
 	// Calculate interpolation value between two frames (current and next frame)
 	float Interpolation = CurrentFrame - ZEMath::Floor(CurrentFrame);
 
 	// Find next frame id
 	ZESize NextFrameId = (ZESize)ZEMath::Ceil(CurrentFrame);
-	if (NextFrameId >= Animation->Frames.GetCount())
+	if (NextFrameId >= AnimationClip->Frames.GetCount())
 	{
 		NextFrameId = (ZESize)EffectiveStartFrame + (ZESize)ZEMath::Mod(CurrentFrame, (float)(EffectiveEndFrame - EffectiveStartFrame));
 	}
 
 	// Get frames
-	const ZEModelResourceAnimationFrame* Frame = &Animation->Frames[(ZESize)ZEMath::Floor(CurrentFrame)];
-	const ZEModelResourceAnimationFrame* NextFrame = &Animation->Frames[NextFrameId]; //Looping bugu olabilir arrayden circular ile alýmmalýmý looping ise?
+	const ZEModelAnimationFrame* Frame = AnimationClip->Frames[(ZESize)ZEMath::Floor(CurrentFrame)];
+	const ZEModelAnimationFrame* NextFrame = AnimationClip->Frames[NextFrameId]; //Looping bugu olabilir arrayden circular ile alýmmalýmý looping ise?
 
 	ZESize OutputBoneKeyCount = Frame->BoneKeys.GetCount();
-	Output.BoneKeys.SetCount(OutputBoneKeyCount);
+	output.BoneKeys.SetCount(OutputBoneKeyCount);
 	ZESize OutputMeshKeyCount = Frame->MeshKeys.GetCount();
-	Output.MeshKeys.SetCount(OutputMeshKeyCount);
+	output.MeshKeys.SetCount(OutputMeshKeyCount);
 
 	for (ZESize I = 0; I < Frame->BoneKeys.GetCount(); I++)
 	{
-		const ZEModelResourceAnimationKey* Key = &Frame->BoneKeys[I];
-		const ZEModelResourceAnimationKey* NextKey = &NextFrame->BoneKeys[I];
+		const ZEModelAnimationKey* Key = &Frame->BoneKeys[I];
+		const ZEModelAnimationKey* NextKey = &NextFrame->BoneKeys[I];
 
-		Output.BoneKeys[I].ItemId = Key->ItemId;
+		output.BoneKeys[I].ItemId = Key->ItemId;
 
 		// Linear interpolate position of the two frames (Current and next frame)
 		ZEVector3 Position;
 		ZEVector3::Lerp(Position, Key->Position, NextKey->Position, Interpolation);
-		Output.BoneKeys[I].Position = Position;
+		output.BoneKeys[I].Position = Position;
 
 		// Spherical linear interpolate rotation of the two frames (Current and next frame
 		ZEQuaternion Rotation;
 		ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
-		Output.BoneKeys[I].Rotation = Rotation;
+		output.BoneKeys[I].Rotation = Rotation;
 
-		Output.BoneKeys[I].Scale = ZEVector3::One;
+		output.BoneKeys[I].Scale = ZEVector3::One;
 		
 	}
 
 	for (ZESize I = 0; I < Frame->MeshKeys.GetCount(); I++)
 	{
-		const ZEModelResourceAnimationKey* Key = &Frame->MeshKeys[I];
-		const ZEModelResourceAnimationKey* NextKey = &NextFrame->MeshKeys[I];
+		const ZEModelAnimationKey* Key = &Frame->MeshKeys[I];
+		const ZEModelAnimationKey* NextKey = &NextFrame->MeshKeys[I];
 
-		Output.MeshKeys[I].ItemId = Key->ItemId;
+		output.MeshKeys[I].ItemId = Key->ItemId;
 
 		ZEVector3 Position;
 		ZEVector3::Lerp(Position, Key->Position, NextKey->Position, Interpolation);
-		Output.MeshKeys[I].Position = Position;
+		output.MeshKeys[I].Position = Position;
 
 		ZEQuaternion Rotation;
 		ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
-		Output.MeshKeys[I].Rotation = Rotation;
+		output.MeshKeys[I].Rotation = Rotation;
 
 		ZEVector3 Scale;
 		ZEVector3::Lerp(Scale, Key->Scale, NextKey->Scale, Interpolation);
 		
-		Output.MeshKeys[I].Scale = Scale;
+		output.MeshKeys[I].Scale = Scale;
 	}
+
+	return true;
 }
 
 ZEModelAnimationNodeClip* ZEModelAnimationNodeClip::CreateInstance()
