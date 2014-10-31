@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelAnimationNodeBlend.h
+ Zinek Engine - ZEModelAnimationNodeState.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MODEL_ANIMATION_NODE_BLEND_H__
-#define __ZE_MODEL_ANIMATION_NODE_BLEND_H__
+#ifndef __ZE_MODEL_ANIMATION_NODE_STATE_H__
+#define __ZE_MODEL_ANIMATION_NODE_STATE_H__
 
 #include "ZEModelAnimationNode.h"
-#include "ZEDS/ZEFlags.h"
 
-#define ZE_MAN_BLEND_INPUT_NONE		0
-#define ZE_MAN_BLEND_INPUT_A		1
-#define ZE_MAN_BLEND_INPUT_B		2
-#define ZE_MAN_BLEND_INPUT_ALL		3
+class ZEModelAnimationNodeTransition;
 
-class ZEModelAnimationNodeBlend : public ZEModelAnimationNode
+class ZEModelAnimationNodeState : public ZEModelAnimationNode
 {
+	friend class ZEModelAnimationNodeStateMachine;
+
 	protected:
 
-		ZEFlags								InputCheckFlags;
+		ZEArray<ZEModelAnimationNodeTransition*>		Transitions;
 
-		float								BlendFactor;
+		virtual bool									GenerateOutput(ZEModelAnimationFrame& output);
+		virtual void									ProcessSelf(float elapsedTime);
 
-		void								ProcessSelf(float elapsedTime);
-		bool								GenerateOutput(ZEModelAnimationFrame& output);
+														ZEModelAnimationNodeState();
+		virtual											~ZEModelAnimationNodeState();
 
-											ZEModelAnimationNodeBlend();
-		virtual								~ZEModelAnimationNodeBlend();						
-	public:									
-											
-		bool								SetInputNodeA(ZEModelAnimationNode* input);
-		ZEModelAnimationNode*				GetInputNodeA() const;
-		bool								SetInputNodeB(ZEModelAnimationNode* input);
-		ZEModelAnimationNode*				GetInputNodeB() const;
+	public:
 
-		void								SetBlendFactor(float factor);
-		float								GetBlendFactor() const;
+		bool											SetInputNode(ZEModelAnimationNode* node);
+		ZEModelAnimationNode*							GetInputNode() const;
 
-		static ZEModelAnimationNodeBlend*	CreateInstance();
+		ZEArray<ZEModelAnimationNodeTransition*>&		GetTransitions();
+		ZEModelAnimationNodeTransition*					GetTransition(ZEModelAnimationNodeState* state);
+		
 };
+
+
 
 
 #endif

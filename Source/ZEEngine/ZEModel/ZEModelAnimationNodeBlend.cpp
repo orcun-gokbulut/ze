@@ -59,9 +59,9 @@ bool ZEModelAnimationNodeBlend::SetInputNodeA(ZEModelAnimationNode* input)
 
 }
 
-const ZEModelAnimationNode* ZEModelAnimationNodeBlend::GetInputNodeA() const
+ZEModelAnimationNode* ZEModelAnimationNodeBlend::GetInputNodeA() const
 {
-	return InputNodes[0];
+	return GetInputNode(0);
 }
 
 bool ZEModelAnimationNodeBlend::SetInputNodeB(ZEModelAnimationNode* input)
@@ -74,9 +74,9 @@ bool ZEModelAnimationNodeBlend::SetInputNodeB(ZEModelAnimationNode* input)
 	return true;
 }
 
-const ZEModelAnimationNode* ZEModelAnimationNodeBlend::GetInputNodeB() const
+ZEModelAnimationNode* ZEModelAnimationNodeBlend::GetInputNodeB() const
 {
-	return InputNodes[1];
+	return GetInputNode(1);
 }
 
 void ZEModelAnimationNodeBlend::SetBlendFactor(float factor)

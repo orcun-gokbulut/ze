@@ -36,19 +36,9 @@
 #ifndef __ZE_MODEL_ANIMATION_CONTROLLER_H__
 #define __ZE_MODEL_ANIMATION_CONTROLLER_H__
 
-#include "ZEFoundation/ZEDS/ZEString.h"
-#include "ZEFoundation/ZEDS/ZEVariant.h"
-#include "ZEFoundation/ZEDS/ZEArray.h"
-#include "ZEModelAnimation.h"
-
-struct ZEModelAnimationParameter
-{
-	ZEString Name;
-	ZEVariant Value;
-};
+#include "ZEModelAnimationGraph.h"
 
 class ZEModel;
-class ZEModelAnimationNode;
 
 class ZEModelAnimationController
 {

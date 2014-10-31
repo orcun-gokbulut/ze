@@ -54,7 +54,7 @@ bool ZEModelAnimationNodeMap::GenerateOutput(ZEModelAnimationFrame& output)
 
 	for (ZESize I = 0; I < BoneCount; I++)
 	{
-		output.BoneKeys[I] = temporaryOutput.BoneKeys[Links[I]];
+		output.BoneKeys[I] = temporaryOutput.BoneKeys[BoneLinks[I]];
 		strncpy(output.BoneKeys[I].Name, TargetMap.BoneItems[I], ZE_MDLF_MAX_NAME_SIZE);
 		output.BoneKeys[I].ItemId = I;
 	}
@@ -64,7 +64,7 @@ bool ZEModelAnimationNodeMap::GenerateOutput(ZEModelAnimationFrame& output)
 
 	for (ZESize I = 0; I < MeshCount; I++)
 	{
-		output.MeshKeys[I] = temporaryOutput.MeshKeys[Links[I]];
+		output.MeshKeys[I] = temporaryOutput.MeshKeys[MeshLinks[I]];
 		strncpy(output.MeshKeys[I].Name, TargetMap.MeshItems[I], ZE_MDLF_MAX_NAME_SIZE);
 		output.MeshKeys[I].ItemId = I;
 	}
@@ -128,13 +128,22 @@ void ZEModelAnimationNodeMap::SetCurrentMap(const ZEModelAnimationMap& map)
 		CurrentMap.MeshItems[I] = map.MeshItems[I];
 }
 
-void ZEModelAnimationNodeMap::SetLinks(const ZEArray<ZEInt32>& links)
+void ZEModelAnimationNodeMap::SetBoneLinks(const ZEArray<ZEInt32>& links)
 {
 	ZESize linkCount = links.GetCount();
-	Links.SetCount(linkCount);
+	BoneLinks.SetCount(linkCount);
 
 	for (ZESize I = 0; I < linkCount; I++)
-		Links[I] = links[I];
+		BoneLinks[I] = links[I];
+};
+
+void ZEModelAnimationNodeMap::SetMeshLinks(const ZEArray<ZEInt32>& links)
+{
+	ZESize linkCount = links.GetCount();
+	MeshLinks.SetCount(linkCount);
+
+	for (ZESize I = 0; I < linkCount; I++)
+		MeshLinks[I] = links[I];
 };
 
 //void ZEModelAnimationNodeMap::MapBone(ZEString targetName, ZEString currentName)

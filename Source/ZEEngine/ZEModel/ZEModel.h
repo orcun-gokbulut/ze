@@ -62,6 +62,8 @@ class ZEPhysicalJoint;
 
 struct ZEDrawParameters;
 
+typedef ZEModelResourceAnimation ZEModelAnimation;
+
 ZE_META_ENTITY_DESCRIPTION(ZEModel)
 
 class ZEModel : public ZEEntity
@@ -127,7 +129,7 @@ class ZEModel : public ZEEntity
 		const char*							GetModelFile() const;
 
 		void								SetModelResource(const ZEModelResource* ModelResource);	
-		const ZEModelResource*				GetModelResource();
+		const ZEModelResource*				GetModelResource() const;
 		
 		const ZEArray<ZEModelBone*>&		GetSkeleton();
 

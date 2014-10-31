@@ -253,7 +253,7 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 		LoadModelResource();
 }
 
-const ZEModelResource* ZEModel::GetModelResource()
+const ZEModelResource* ZEModel::GetModelResource() const
 {
 	return ModelResource;
 }
@@ -469,11 +469,11 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 		Statistics.TotalMeshCount = Meshes.GetCount();
 	}
 
-	if (AnimationUpdateMode == ZE_MAUM_VISUAL)
-	{
-		for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
-			AnimationTracks[I].UpdateAnimation();
-	}
+	//if (AnimationUpdateMode == ZE_MAUM_VISUAL)
+	//{
+	//	for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
+	//		AnimationTracks[I].UpdateAnimation();
+	//}
 
 	ZEUInt32 EntityDrawFlags = GetDrawFlags();
 

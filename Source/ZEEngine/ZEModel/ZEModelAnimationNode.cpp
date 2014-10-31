@@ -36,6 +36,11 @@
 #include "ZEModelAnimationNode.h"
 #include "ZEModelAnimationGraph.h"
 
+void ZEModelAnimationNode::SetOwner(ZEModelAnimationGraph* owner)
+{
+	Owner = owner;
+}
+
 const ZEModelAnimationMap* ZEModelAnimationNode::GetMap()
 {
 	if (OutputNode == NULL)
@@ -109,12 +114,7 @@ ZEModelAnimationNode::~ZEModelAnimationNode()
 
 }
 
-void ZEModelAnimationNode::SetOwner(ZEModelAnimationGraph* graph)
-{
-	Owner = graph;
-}
-
-const ZEModelAnimationGraph* ZEModelAnimationNode::GetOwner() const
+ZEModelAnimationGraph* ZEModelAnimationNode::GetOwner() const
 {
 	return Owner;
 }
@@ -176,6 +176,16 @@ bool ZEModelAnimationNode::SetInputNode(ZESize index, ZEModelAnimationNode* node
 
 	return true;
 
+}
+
+ZEModelAnimationNode* ZEModelAnimationNode::GetInputNode(ZESize index) const
+{
+	return InputNodes[index];
+}
+
+const ZEArray<ZEModelAnimationNode*>& ZEModelAnimationNode::GetInputNodes() const
+{
+	return InputNodes;
 }
 
 void ZEModelAnimationNode::SetInputNodeCount(ZESize count)
@@ -256,11 +266,11 @@ bool ZEModelAnimationNode::SetOutputNode(ZEModelAnimationNode* node)
 	if (OutputNode == node)
 		return false;
 
-	if (this->Owner == NULL)
-		return false;
-
-	if (node != NULL && (node->Owner != this->Owner || node->Owner == NULL))
-		return false;
+// 	if (this->Owner == NULL)
+// 		return false;
+// 
+// 	if (node != NULL && (node->Owner != this->Owner || node->Owner == NULL))
+// 		return false;
 
 	if (OutputNode != NULL)
 		OutputNode->RemoveInputNode(this);
@@ -274,3 +284,9 @@ const ZEModelAnimationNode* ZEModelAnimationNode::GetOutputNode() const
 {
 	return OutputNode;
 }
+
+void ZEModelAnimationNode::Destroy()
+{
+	delete this;
+}
+

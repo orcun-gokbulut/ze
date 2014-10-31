@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelAnimationNodeBlend.h
+ Zinek Engine - ZEModelAnimationNodeStateMachine.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,50 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MODEL_ANIMATION_NODE_BLEND_H__
-#define __ZE_MODEL_ANIMATION_NODE_BLEND_H__
+#ifndef __ZE_MODEL_ANIMATION_NODE_STATE_MACHINE_H__
+#define __ZE_MODEL_ANIMATION_NODE_STATE_MACHINE_H__
 
 #include "ZEModelAnimationNode.h"
-#include "ZEDS/ZEFlags.h"
 
-#define ZE_MAN_BLEND_INPUT_NONE		0
-#define ZE_MAN_BLEND_INPUT_A		1
-#define ZE_MAN_BLEND_INPUT_B		2
-#define ZE_MAN_BLEND_INPUT_ALL		3
+class ZEModelAnimationNodeState;
+class ZEModelAnimationNodeTransition;
 
-class ZEModelAnimationNodeBlend : public ZEModelAnimationNode
+class ZEModelAnimationNodeStateMachine : public ZEModelAnimationNode
 {
 	protected:
 
-		ZEFlags								InputCheckFlags;
+		ZEModelAnimationNode*								CurrentState;
+		bool												CurrentlyInTransition;
 
-		float								BlendFactor;
+		ZEArray<ZEModelAnimationNodeState*>					States;
+		ZEArray<ZEModelAnimationNodeTransition*>			Transitions;
 
-		void								ProcessSelf(float elapsedTime);
-		bool								GenerateOutput(ZEModelAnimationFrame& output);
+		virtual bool										GenerateOutput(ZEModelAnimationFrame& output);
+		virtual void										ProcessSelf(float elapsedTime);
 
-											ZEModelAnimationNodeBlend();
-		virtual								~ZEModelAnimationNodeBlend();						
-	public:									
-											
-		bool								SetInputNodeA(ZEModelAnimationNode* input);
-		ZEModelAnimationNode*				GetInputNodeA() const;
-		bool								SetInputNodeB(ZEModelAnimationNode* input);
-		ZEModelAnimationNode*				GetInputNodeB() const;
+															ZEModelAnimationNodeStateMachine();
+		virtual												~ZEModelAnimationNodeStateMachine();
 
-		void								SetBlendFactor(float factor);
-		float								GetBlendFactor() const;
+	public:
 
-		static ZEModelAnimationNodeBlend*	CreateInstance();
+		bool												SetCurrentState(ZEModelAnimationNodeState* state, bool forced = false);
+		ZEModelAnimationNodeState*							GetCurrentState() const;
+
+		ZEModelAnimationNodeState*							CreateStateNode();
+		ZEModelAnimationNodeState*							GetStateNode(const ZEString& name) const;
+		const ZEArray<ZEModelAnimationNodeState*>&			GetStates() const;
+		bool												DeleteStateNode(ZEModelAnimationNodeState* node);
+
+		bool												CreateTransitionNode(ZEModelAnimationNodeState* sourceState, ZEModelAnimationNodeState* destinationState, float transitiontimeinseconds = 0.0f);
+		ZEModelAnimationNodeTransition*						GetTransitionNode(ZEModelAnimationNodeState* sourceState, ZEModelAnimationNodeState* destinationState) const;
+		const ZEArray<ZEModelAnimationNodeTransition*>&		GetTransitions() const;
+		bool												DeleteTransitionNode(ZEModelAnimationNodeState* sourceState, ZEModelAnimationNodeState* destinationState);
+		bool												DeleteTransitionNode(ZEModelAnimationNodeTransition* node);
+
+		static ZEModelAnimationNodeStateMachine*			CreateInstance();
 };
+
+
 
 
 #endif

@@ -43,7 +43,8 @@ class ZEModelAnimationNodeMap : public ZEModelAnimationNode
 	private:
 
 		ZEModelAnimationMap					TargetMap;
-		ZEArray<ZEInt32>					Links;
+		ZEArray<ZEInt32>					BoneLinks;
+		ZEArray<ZEInt32>					MeshLinks;
 		ZEModelAnimationMap					CurrentMap;
 
 	protected:
@@ -63,7 +64,8 @@ class ZEModelAnimationNodeMap : public ZEModelAnimationNode
 
 		void								SetTargetMap(const ZEModelAnimationMap& map);
 		void								SetCurrentMap(const ZEModelAnimationMap& map);
-		void								SetLinks(const ZEArray<ZEInt32>& links);
+		void								SetBoneLinks(const ZEArray<ZEInt32>& links);
+		void								SetMeshLinks(const ZEArray<ZEInt32>& links);
 
 		//void								MapBone(ZEString targetName, ZEString currentName);
 		//void								MapMesh(ZEString targetName, ZEString currentName);

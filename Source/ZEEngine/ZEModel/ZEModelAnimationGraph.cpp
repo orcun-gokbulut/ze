@@ -38,12 +38,13 @@
 ZEModelAnimationGraph::ZEModelAnimationGraph()
 {
 	Initialized = false;
-	ResultNode = NULL;
+	ResultNode = ZEModelAnimationNodeMap::CreateInstance();
+	ResultNode->SetOwner(this);
 }
 
 ZEModelAnimationGraph::~ZEModelAnimationGraph()
 {
-
+	ResultNode->Destroy();
 }
 
 bool ZEModelAnimationGraph::SetRootNode(ZEModelAnimationNode* node)
@@ -51,37 +52,38 @@ bool ZEModelAnimationGraph::SetRootNode(ZEModelAnimationNode* node)
 	if (!Nodes.Exists(node))
 		return false;
 
-	//RootNode = node;
+	ResultNode->SetInputNode(node);
 	
 	return true;
 }
 
 const ZEModelAnimationNode* ZEModelAnimationGraph::GetRootNode() const
 {
-	//return RootNode;
-	return NULL;
+	return ResultNode->GetInputNode();
 }
 
-bool ZEModelAnimationGraph::AddAnimationNode(ZEModelAnimationNode* node)
+void ZEModelAnimationGraph::RegisterAnimationNode(ZEModelAnimationNode* node)
 {
 	if (Nodes.Exists(node))
-		return false;
+		return;
 
 	node->SetOwner(this);
 	Nodes.Add(node);
 
-	return true;
+	if (Initialized)
+		node->Initialize();
 }
 
-bool ZEModelAnimationGraph::RemoveAnimationNode(ZEModelAnimationNode* node)
+void ZEModelAnimationGraph::UnregisterAnimationNode(ZEModelAnimationNode* node)
 {
 	if (!Nodes.Exists(node))
-		return false;
+		return;
+
+	if (Initialized)
+		node->Deinitialize();
 
 	Nodes.DeleteValue(node);
 	node->SetOwner(NULL);
-
-	return true;
 }
 
 ZEModelAnimationNode* ZEModelAnimationGraph::GetAnimationNode(const char* name)
@@ -101,4 +103,52 @@ void ZEModelAnimationGraph::Process(float elapsedtime)
 	{
 		Nodes[I]->Process(elapsedtime);
 	}
+}
+
+void ZEModelAnimationGraph::Initialize(const ZEModelResource* modelResource)
+{
+	Initialized = true;
+
+	ZESize boneCount = modelResource->GetBones().GetCount();
+	ZESize meshCount = modelResource->GetMeshes().GetCount();
+
+	ModelMap.BoneItems.SetCount(boneCount);
+	ModelMap.MeshItems.SetCount(meshCount);
+
+	for (ZESize I = 0; I < boneCount; I++)
+		ModelMap.BoneItems[I] = modelResource->GetBones()[I].Name;
+
+
+	for (ZESize I = 0; I < meshCount; I++)
+		ModelMap.MeshItems[I] = modelResource->GetMeshes()[I].Name;
+
+	ZEArray<ZEInt32> links;
+
+	links.SetCount(boneCount);
+
+	for (ZESize I = 0; I < boneCount; I++)
+		links[I] = (ZEInt32)I;
+
+	ResultNode->SetBoneLinks(links);
+
+	links.SetCount(meshCount);
+
+	for (ZESize I = 0; I < meshCount; I++)
+		links[I] = (ZEInt32)I;
+
+	ResultNode->SetMeshLinks(links);
+
+	ResultNode->SetTargetMap(ModelMap);
+	ResultNode->SetCurrentMap(ModelMap);
+
+	for (ZESize I = 0; I < Nodes.GetCount(); I++)
+		Nodes[I]->Initialize();
+}
+
+void ZEModelAnimationGraph::Deinitialize()
+{
+	Initialized = false;
+
+	for (ZESize I = 0; I < Nodes.GetCount(); I++)
+		Nodes[I]->Deinitialize();
 }

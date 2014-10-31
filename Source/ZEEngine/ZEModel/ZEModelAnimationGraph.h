@@ -44,7 +44,6 @@ class ZEModelAnimationGraph
 {
 	protected:
 				
-		//ZESize							NodeIdCursor;
 		bool							Initialized;
 		ZEModelAnimationMap				ModelMap;
 		ZEModelAnimationNodeMap*		ResultNode;
@@ -55,8 +54,8 @@ class ZEModelAnimationGraph
 		bool							SetRootNode(ZEModelAnimationNode* node);
 		const ZEModelAnimationNode*		GetRootNode() const;
 
-		bool							AddAnimationNode(ZEModelAnimationNode* node);
-		bool							RemoveAnimationNode(ZEModelAnimationNode* node);
+		void							RegisterAnimationNode(ZEModelAnimationNode* node);
+		void							UnregisterAnimationNode(ZEModelAnimationNode* node);
 		ZEModelAnimationNode*			GetAnimationNode(const char* name);
 
 		void							GetOutput(ZEModelResourceAnimationFrame& output);
