@@ -43,33 +43,57 @@ void ZEMCGenerator::GenerateClass(ZEMCClass* CurrentClass)
 	GenerateClassGetParentClass(CurrentClass);
 	GenerateClassGetName(CurrentClass);
 	GenerateClassGetGUID(CurrentClass);
-	GenerateClassGetSizeOfClass(CurrentClass);
-	GenerateClassGetSizeOfScriptingClass(CurrentClass);
-	GenerateClassCreateInstance(CurrentClass);
-	GenerateClassCreateScriptingInstance(CurrentClass);
+	GenerateClassGetFlags(CurrentClass);
 	GenerateClassGetAttributes(CurrentClass);
 	GenerateClassGetAttributeCount(CurrentClass);
 
+	GenerateClassGetSizeOfObject(CurrentClass);
+	GenerateClassCreateInstance(CurrentClass);
+	GenerateClassDestroy(CurrentClass);
+	GenerateClassDynamicCast(CurrentClass);
+	GenerateClassClone(CurrentClass);
+	GenerateClassConstruct(CurrentClass);
+	GenerateClassDeconstruct(CurrentClass);
+	GenerateClassAssign(CurrentClass);
+
+	GenerateClassGetSizeOfScriptObject(CurrentClass);
+	GenerateClassCreateScriptInstance(CurrentClass);
+
 	GenerateClassProperties(CurrentClass);
 	GenerateClassMethods(CurrentClass);
-	GenerateClassScriptingObject(CurrentClass);
+	GenerateClassScriptObject(CurrentClass);
 }
 
-void ZEMCGenerator::GenerateCastedObject(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateCastedObject(ZEMCClass* CurrentClass, const char* SourceName, const char* DestinationName)
 {
-	WriteToFile(
-		"\t%s* CastedObject = ZEClass::Cast<%s>(Object);\n"
-		"\tif (CastedObject == NULL)\n"
-		"\t\treturn false;\n\n",
-		CurrentClass->Name.ToCString(),
-		CurrentClass->Name.ToCString());
+	if (!CurrentClass->IsBuiltInClass)
+	{
+		WriteToFile(
+			"\t%s* %s = ZEClass::Cast<%s>(%s);\n"
+			"\tif (%s == NULL)\n"
+			"\t\treturn false;\n\n",
+			CurrentClass->Name.ToCString(),
+			DestinationName,
+			CurrentClass->Name.ToCString(),
+			SourceName,
+			DestinationName);
+	}
+	else
+	{
+		WriteToFile(
+			"\t%s* %s = reinterpret_cast<%s*>(%s);\n",
+			CurrentClass->Name.ToCString(),
+			DestinationName,
+			CurrentClass->Name.ToCString(),
+			SourceName);
+	}
 }
 
 void ZEMCGenerator::GenerateClassMacros(ZEMCClass* CurrentClass)
 {
-	WriteToFile("ZE_CLASS_IMPLEMENTATION(%s);\n", CurrentClass->Name.ToCString());
-	if (CurrentClass->IsBuiltInType)
-		WriteToFile("ZE_BUILTIN_TYPE_IMPLEMENTATION(%s);\n\n", CurrentClass->Name.ToCString());
+	WriteToFile("ZE_CLASS_DEFINITION(%s);\n", CurrentClass->Name.ToCString());
+	if (CurrentClass->IsBuiltInClass)
+		WriteToFile("ZE_BUILTIN_OBJECT_IMPLEMENTATION(%s);\n\n", CurrentClass->Name.ToCString());
 	else
 		WriteToFile("ZE_OBJECT_IMPLEMENTATION(%s);\n\n", CurrentClass->Name.ToCString());
 }
@@ -121,21 +145,53 @@ void ZEMCGenerator::GenerateClassGetGUID(ZEMCClass* CurrentClass)
 		CurrentClass->Name.ToCString());
 }
 
-void ZEMCGenerator::GenerateClassGetSizeOfClass(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassGetFlags(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"ZESize %sClass::GetSizeOfClass()\n"
-		"{\n"
-		"\treturn sizeof(%s);\n"
-		"}\n\n", 
-		CurrentClass->Name.ToCString(), 
+		"ZEClassFlags %sClass::GetFlags()\n"
+		"{\n", 
 		CurrentClass->Name.ToCString());
+
+	WriteToFile("\treturn ZE_CF_NONE");
+
+	if (CurrentClass->IsBuiltInClass)
+		WriteToFile(" | ZE_CF_BUILTIN");
+	
+	if (CurrentClass->IsAbstract)
+		WriteToFile(" | ZE_CF_ABSTRACT");
+	
+	if (false)
+		WriteToFile(" | ZE_CF_SCRIPT");
+
+	if (!CurrentClass->IsAbstract)
+	{
+		if (CurrentClass->HasPublicDefaultConstructor || CurrentClass->HasCreateInstanceMethod)
+			WriteToFile(" | ZE_CF_CREATE_INSTANCE");
+
+		if (CurrentClass->HasPublicDestroyMethod || CurrentClass->HasPublicDestructor)
+			WriteToFile(" | ZE_CF_DESTROY");
+
+		if (CurrentClass->HasPublicAssignmentOperator)
+			WriteToFile(" | ZE_CF_ASSIGN");
+
+		if (CurrentClass->HasPublicCopyConstructor)
+			WriteToFile(" | ZE_CF_CLONE");
+
+		if (CurrentClass->HasPublicDefaultConstructor)
+			WriteToFile(" | ZE_CF_CONSTRUCT");
+
+		if (CurrentClass->HasPublicDestructor)
+			WriteToFile(" | ZE_CF_DECONSTRUCT");
+	}
+
+	WriteToFile(";\n");
+	WriteToFile("}\n\n");
 }
 
 void ZEMCGenerator::GenerateClassGetAttributes(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"const ZEMetaAttribute* %sClass::GetAttributes()\n"
+		"const ZEAttribute* %sClass::GetAttributes()\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 
@@ -163,7 +219,7 @@ void ZEMCGenerator::GenerateClassGetAttributes(ZEMCClass* CurrentClass)
 		if(CurrentClass->Attributes.GetCount() > 0)
 		{
 			WriteToFile(
-				"\tstatic ZEMetaAttribute Attributes[%d] =\n"
+				"\tstatic ZEAttribute Attributes[%d] =\n"
 				"\t{\n", CurrentClass->Attributes.GetCount());
 		}
 
@@ -200,25 +256,3 @@ void ZEMCGenerator::GenerateClassGetAttributeCount(ZEMCClass* CurrentClass)
 		CurrentClass->Attributes.GetCount());
 }
 
-void ZEMCGenerator::GenerateClassCreateInstance(ZEMCClass* CurrentClass)
-{
-	WriteToFile(
-		"ZEObject* %sClass::CreateInstance()\n"
-		"{\n", 
-		CurrentClass->Name.ToCString());
-
-	if (CurrentClass->HasCreateInstanceMethod && !CurrentClass->IsAbstract) 
-	{
-		WriteToFile("\treturn %s::CreateInstance();\n", CurrentClass->Name.ToCString());
-	}
-	else if (CurrentClass->HasPublicDefaultConstructor && !CurrentClass->IsAbstract)
-	{
-		WriteToFile("\treturn new %s();\n", CurrentClass->Name.ToCString());
-	}
-	else
-	{
-		WriteToFile("\treturn NULL;\n");
-	}
-
-	WriteToFile("}\n\n");
-}

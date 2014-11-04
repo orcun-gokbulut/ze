@@ -162,7 +162,7 @@ ZEMCMethod::ZEMCMethod()
 	IsConstructor = false;
 
 	IsOperator = false;
-	OperatorType = ZEMC_MOT_NOT_OPERATOR;
+	OperatorType = ZEMC_MOT_NONE;
 }
 
 ZEMCMethod::~ZEMCMethod()
@@ -178,8 +178,10 @@ ZEMCClass::ZEMCClass()
 	HasPublicDestructor = true;
 	HasPublicCopyConstructor = true;
 	HasCreateInstanceMethod = false;
+	HasPublicAssignmentOperator = false;
+	HasPublicDestroyMethod = false;
 	IsAbstract = false;
-	IsBuiltInType = false;
+	IsBuiltInClass = false;
 	IsForwardDeclared = false;
 }
 

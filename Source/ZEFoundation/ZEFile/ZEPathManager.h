@@ -40,16 +40,66 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 
-enum ZEKnownPath
+enum ZEPathRoot
 {
+	ZE_PR_NONE,
+	ZE_PR_ENGINE_RESOURCES,
+	ZE_PR_ENGINE_STOREGE,
+	ZE_PR_APPLICATION_RESOURCES,
+	ZE_PR_APPLICATION_STORAGE,
+	ZE_PR_RELATIVE,
+	
 	ZE_KP_NONE					= 0,
 	ZE_KP_RESOURCES				= 1,
 	ZE_KP_APP_RESOURCES			= 2,
 	ZE_KP_USER_DATA				= 3,
 	ZE_KP_SYSTEM_DATA			= 4,
 	ZE_KP_SAVED_GAMES			= 5,
-	ZE_KP_WORKING_DIRECTORY		= 6
+	ZE_KP_WORKING_DIRECTORY		= 6,
+	ZE_PR_RELATIVE				= 7
 };
+
+enum ZEPathAccess
+{
+	ZE_PA_NO_ACCESS				= 0,
+	ZE_PA_READ_ONLY				= 1,
+	ZE_PA_WRITE_ONLY			= 2,
+	ZE_PA_READ_WRITE			= 3
+};
+
+class ZEPathManager
+{
+	private:
+		bool						DisableAccessControl;
+
+		ZEString					EngineResources;
+		ZEString					EngineStorage;
+		ZEString					EngineUserStorage;
+
+		ZEString					ApplicationName;
+		ZEString					ApplicationResources;
+		ZEString					ApplicationStorage;
+		ZEString					ApplicationUserStorage;
+
+	public:
+		void						SetApplicationName(const char* Name);
+		const char*					GetApplicationName();
+
+		void						SetAccessControlEnabled(bool Enable);
+		bool						GetAccessControlEnabled();
+
+		const char*					GetRealRootPath(ZEPathRoot Root);
+
+		ZEString					GetRealPath(const char* Path);
+		ZEPathAccess				GetAccess(const char* Path);
+
+		void						Initialize();
+		void						Deinitialize();
+
+		ZEPathManager*				GetInstance();
+};
+
+/*
 
 class ZEPathManager
 {
@@ -92,16 +142,16 @@ class ZEPathManager
 		static void					SetApplicationResourcesPath(const ZEString& Name);
 		static const ZEString&		GetApplicationResourcesPath();
 
-		static ZEKnownPath			GetKnownPath(const ZEString& AbsolutePath);
-		static const ZEString&		GetKnownPath(const ZEKnownPath KnownPath);
+		static ZEPathRoot			GetRootPath(const ZEString& AbsolutePath);
+		static const ZEString&		GetRootPath(const ZEPathRoot KnownPath);
 		
-		static ZEString				GetFinalPath(const ZEString& Path, ZEKnownPath* Root = NULL);
+		static ZEString				GetRealPath(const ZEString& Path);
 
 		static void					CustomizePaths(	const ZEString* CompanyName = NULL,
 													const ZEString* ApplicationName = NULL,
 													const ZEString* ResourceDirectoryName = NULL);
 		
-};
+};*/
 
 
 #endif

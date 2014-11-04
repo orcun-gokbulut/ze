@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMethod.h
+ Zinek Engine - ZEAttribute.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,82 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_METHOD_H__
-#define __ZE_METHOD_H__
-
-#include "ZETypes.h"
-#include "ZEDS/ZEType.h"
-
-class ZEClass;
-struct ZEMetaAttribute;
-
-enum ZEMetaOperatorType
-{
-	ZE_MOT_UNDEFINED,
-	ZE_MOT_PLUS,
-	ZE_MOT_PLUSEQUAL,
-	ZE_MOT_PLUSPLUS,
-	ZE_MOT_MINUS,
-	ZE_MOT_MINUSEQUAL,
-	ZE_MOT_MINUSMINUS,
-	ZE_MOT_STAR,
-	ZE_MOT_STAREQUAL,
-	ZE_MOT_SLASH,
-	ZE_MOT_SLASHEQUAL,
-	ZE_MOT_PERCENT,
-	ZE_MOT_PERCENTEQUAL,
-	ZE_MOT_AMP,
-	ZE_MOT_AMPEQUAL,
-	ZE_MOT_AMPAMP,
-	ZE_MOT_PIPE,
-	ZE_MOT_PIPEEQUAL,
-	ZE_MOT_PIPEPIPE,
-	ZE_MOT_CARET,
-	ZE_MOT_CARETEQUAL,
-	ZE_MOT_EQUAL,
-	ZE_MOT_EQUALEQUAL,
-	ZE_MOT_EXCLAIMEQUAL,
-	ZE_MOT_LESS,
-	ZE_MOT_LESSEQUAL,
-	ZE_MOT_LESSLESS,
-	ZE_MOT_LESSLESSEQUAL,
-	ZE_MOT_GREATER,
-	ZE_MOT_GREATEREQUAL,
-	ZE_MOT_GREATERGREATER,
-	ZE_MOT_GREATERGREATEREQUAL,
-	ZE_MOT_CALL,
-	ZE_MOT_SUBSCRIPT
-};
-
-struct ZEMethodParameter
-{
-	const char*			Name;
-	ZEType				Type;
-};
-
-struct ZEMethod
-{
-	ZESize				Id;
-	const char*			Name;
-	ZEUInt32			Hash;
-
-	ZEClass*			MemberOf;
-	void*				MethodPtr;
-
-	bool				IsConst;
-	bool				IsEvent;
-	bool				IsVirtual;
-	bool				IsStatic;
-	bool				IsOperator;
-
-	ZEMetaOperatorType	OperatorType;
-	ZEType				ReturnType;
-	ZEMethodParameter*	Parameters;
-	ZESize				ParameterCount;
-
-	ZEMetaAttribute*	Attributes;
-	ZESize				AttributeCount;
-};
-
-#endif
+#include "ZEAttribute.h"

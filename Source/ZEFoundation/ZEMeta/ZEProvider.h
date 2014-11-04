@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaRegister.h
+ Zinek Engine - ZEProvider.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,22 +34,39 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_META_REGISTER_H__
-#define __ZE_META_REGISTER_H__
+#ifndef __ZE_PROVIDER_H__
+#define __ZE_PROVIDER_H__
 
-#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
 
 class ZEClass;
 class ZEEnumerator;
 
-class ZEMetaRegister
+class ZEProvider
 {
-	public:
-		virtual ZEClass**		GetClasses() = 0;
-		virtual ZESize			GetClassCount() = 0;
+	private:
+		ZEArray<ZEClass*>				Classes;
+		ZEArray<ZEEnumerator*>			Enumerators;
 
-		virtual ZEEnumerator**	GetEnumerators() = 0;
-		virtual ZESize			GetEnumeratorCount() = 0;
+	public:
+		bool							RegisterClass(ZEClass* Class);
+		void							UnregisterClass(ZEClass* Class);
+
+		bool							RegisterEnumerator(ZEEnumerator* Enumerator);
+		void							UnregisterEnumerator(ZEEnumerator* Enumerator);
+
+		const ZEArray<ZEClass*>&		GetClasses();
+		const ZESize					GetClassCount();
+
+		const ZEArray<ZEEnumerator*>&	GetEnumerators();
+		const ZESize					GetEnumeratorCount();
+
+		ZEClass*						GetClass(const char* ClassName);
+		ZEArray<ZEClass*>				GetClass(ZEClass* ParentClass);
+
+		ZEEnumerator*					GetEnumerator(const char* EnumeratorName);
+
+		static ZEProvider*				GetInstance();
 };
 
 #endif

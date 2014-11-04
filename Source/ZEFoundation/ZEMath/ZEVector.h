@@ -38,12 +38,14 @@
 #define __ZE_MATH_VECTOR_H__
 
 #include <ZETypes.h>
-#include "ZEMeta/ZEObject.h"
+#include "ZEMeta/ZEBuiltIn.h"
 
 // ZEVector2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector2
 {
+	ZE_BUILTIN_OBJECT
+
 	public:
 		union
 		{
@@ -131,8 +133,6 @@ class ZEVector2
 									ZEVector2(float x, float y);
 									ZEVector2(const ZEVector2 &Start, const ZEVector2 &End);
 									ZEVector2();
-
-		static ZEClass*				Class();
 };
 
 ZEVector2 operator*(float S, const ZEVector2& RightOperand);
@@ -141,6 +141,8 @@ ZEVector2 operator*(float S, const ZEVector2& RightOperand);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector3
 {
+	ZE_BUILTIN_OBJECT
+
 	public:
 		union
 		{
@@ -254,8 +256,6 @@ class ZEVector3
 									ZEVector3(ZEVector2& Base, float z);
 									ZEVector3(const ZEVector3& Start, const ZEVector3& End);
 									ZEVector3();
-
-		static ZEClass*				Class();
 };
 
 ZEVector3 operator*(float S, const ZEVector3& RightOperand);
@@ -264,6 +264,8 @@ ZEVector3 operator*(float S, const ZEVector3& RightOperand);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector4
 {
+	ZE_BUILTIN_OBJECT
+
 	public:
 		union
 		{
@@ -360,8 +362,6 @@ class ZEVector4
 									ZEVector4(const ZEVector3& Base, float w);
 									ZEVector4(const ZEVector4& Start, const ZEVector4& End);
 									ZEVector4();
-
-		static ZEClass*				Class();
 };
 
 ZEVector4 operator*(float S, const ZEVector4& RightOperand);

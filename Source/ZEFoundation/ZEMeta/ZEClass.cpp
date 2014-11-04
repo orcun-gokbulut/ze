@@ -53,17 +53,12 @@ ZEGUID ZEClass::GetGUID()
 	return ZEGUID(0, 0, 0, 0);
 }
 
-ZESize ZEClass::GetSizeOfClass()
+ZEClassFlags ZEClass::GetFlags()
 {
-	return 0;
+	return ZE_CF_CREATE_INSTANCE | ZE_CF_DESTROY | ZE_CF_ASSIGN | ZE_CF_CLONE | ZE_CF_CONSTRUCT | ZE_CF_DECONSTRUCT;
 }
 
-ZESize ZEClass::GetSizeOfScriptingClass()
-{
-	return 0;
-}
-
-const ZEMetaAttribute* ZEClass::GetAttributes()
+const ZEAttribute* ZEClass::GetAttributes()
 {
 	return NULL;
 }
@@ -261,19 +256,70 @@ ZESize ZEClass::GetPropertyId(ZEString PropertyName)
 	return -1;
 }
 
-ZESize	ZEClass::GetMethodId(ZEString MethodName, ZESize OverloadIndex)
+ZESize ZEClass::GetMethodId(ZEString MethodName, ZESize OverloadIndex)
 {
 	return -1;
 }
 
+ZESize ZEClass::GetSizeOfObject()
+{
+	return sizeof(ZEObject);
+}
+
 ZEObject* ZEClass::CreateInstance()
+{
+	return new ZEObject();
+}
+
+bool ZEClass::Destroy(ZEObject* Object)
+{
+	delete Object;
+	return true;
+}
+
+ZEObject* ZEClass::DynamicCast(ZEObject* Object)
+{
+	return Object;
+}
+
+ZEObject* ZEClass::Clone(ZEObject* Object)
+{
+	ZEObject* NewObject = new ZEObject();
+	NewObject = Object;
+	return NewObject;
+}
+
+bool ZEClass::Construct(ZEObject* Object)
+{
+	new(Object) ZEObject();
+	return false;
+}
+
+bool ZEClass::Deconstruct(ZEObject* Object)
+{
+	Object->~ZEObject();
+	return true;
+}
+
+bool ZEClass::Assign(ZEObject* Object, ZEObject* Source)
+{
+	ZEObject* CastedSource = ZEClass::Cast<ZEObject>(Source);
+	if (CastedSource == NULL)
+		return false;
+
+	*(ZEObject*)Object = *CastedSource;
+
+	return true;
+}
+
+ZEObject* ZEClass::CreateScriptInstance()
 {
 	return NULL;
 }
 
-ZEObject* ZEClass::CreateScriptingInstance()
+ZESize ZEClass::GetSizeOfScriptObject()
 {
-	return NULL;
+	return 0;
 }
 
 bool ZEClass::IsDerivedFrom(ZEClass* ParentClass, ZEClass* Class)

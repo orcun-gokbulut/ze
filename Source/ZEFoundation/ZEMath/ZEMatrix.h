@@ -38,6 +38,7 @@
 #define __ZE_MATH_MATRIX_H__
 
 #include "ZETypes.h"
+#include "ZEMeta\ZEBuiltIn.h"
 
 class ZEVector2;
 class ZEVector3;
@@ -58,6 +59,8 @@ enum ZERotationOrder
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEMatrix3x3
 {
+	ZE_BUILTIN_OBJECT
+
 	public:
 		union
 		{
@@ -160,6 +163,8 @@ ZEMatrix3x3 operator*(float S, const ZEMatrix3x3& RightOperand);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEMatrix4x4
 {
+	ZE_BUILTIN_OBJECT
+
 	public:
 		union
 		{

@@ -60,6 +60,7 @@
 #include "ZEGraphics/ZEIndexBuffer.h"
 #include "ZED3D9IndexBuffer.h"
 #include "ZED3D9FrameRenderer.h"
+#include "ZEMath/ZEMath.h"
 
 #define	 ZE_CLOUD_SHADOW_BUFFER_WIDTH		256
 #define	 ZE_CLOUD_SHADOW_BUFFER_HEIGHT		256

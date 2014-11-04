@@ -39,6 +39,7 @@
 #include "ZEEntityProvider.h"
 #include "ZEScene.h"
 #include <string.h>
+#include "ZEMath/ZEMath.h"
 
 void ZEEntity::OnTransformChanged()
 {

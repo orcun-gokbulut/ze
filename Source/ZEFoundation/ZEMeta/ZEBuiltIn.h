@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEOptionManager.h
+ Zinek Engine - ZEBuiltIn.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,57 +34,37 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_OPTION_MANAGER_H__
-#define __ZE_OPTION_MANAGER_H__
+#ifndef __ZE_BUILT_IN_OBJECT_H__
+#define __ZE_BUILT_IN_OBJECT_H__
 
 #include "ZETypes.h"
-#include "ZEOption.h"
-#include "ZECommand.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEOptionSection.h"
-#include "ZECommandSection.h"
-#include "ZEDS/ZEValue.h"
-#include "ZEDS/ZEFastDelegate.h"
+#include "ZEAttribute.h"
 
-class ZEOptionManager
-{
-	friend class ZECore;
+class ZEClass;
+
+#define ZE_BUILTIN_OBJECT \
+	public: \
+		static ZEClass*					Class() ZE_ATTRIBUTE_0("BuiltIn"); \
 	private:
-		ZECommandSection			Commands;
-		ZEArray<ZEOptionSection*>	Sections;
 
-		bool						MatchSet(char* Line, char* Match);
-		void						MatchOption(char* Line, char* MatchName, char* MatchValue);
+#define ZE_BUILTIN_OBJECT_IMPLEMENTATION(ClassName) \
+	ZEClass* ClassName::Class() \
+	{ \
+		static ClassName##Class Class;\
+		return &Class; \
+	}
 
-		bool						LoadCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						SaveCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						ListSectionsCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						ListOptionsCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						CommitChangesCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						ResetChangesCommand(ZECommand* Command, const ZECommandParameterList* Params);
-
-									ZEOptionManager();
-									~ZEOptionManager();
+class ZEBuiltInClassProvider
+{
+	private:
+										ZEBuiltInClassProvider();
+										~ZEBuiltInClassProvider();
 
 	public:
-		bool						RegisterSection(ZEOptionSection* Ref);
-		bool						UnregisterSection(ZEOptionSection* Ref);
-		
-		ZESize						GetNumberOfSections();
-		
-		ZEOptionSection*			GetSection(const ZEString& Name);
-		ZEOptionSection*			GetSection(ZESize Index);
+		ZESize							GetClassCount();
+		ZEClass**						GetClasses();
 
-		ZEOption*					GetOption(const ZEString& SectionName, const ZEString& Name);
-
-		void						Save(const ZEString& FileName);
-		void						Load(const ZEString& FileName);
-		void						ParseParameters(const ZEString& Parameters);
-		
-		void						CommitChanges();
-		void						ResetChanges();
-
-		static ZEOptionManager*		GetInstance();
+		static ZEBuiltInClassProvider*	GetInstance();
 };
 
 #endif

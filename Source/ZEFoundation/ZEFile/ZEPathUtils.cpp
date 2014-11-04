@@ -248,7 +248,7 @@ ZEString ZEPathUtils::GetAbsolutePath(const ZEString& RootPath, const ZEString& 
 // Finds the relative path symbol in symbolic path and return it as ZEKnownPath
 // If Relative path argument is not NULL, then RelativePart argument returns the remaining path starting from found symbol
 // If no symbol is found RelativePart is set to SymbolicPath
-ZEKnownPath ZEPathUtils::SearchForSymbol(ZEString* RelativePart, const ZEString& SymbolicPath)
+ZEPathRoot ZEPathUtils::SearchForSymbol(ZEString* RelativePart, const ZEString& SymbolicPath)
 {
 	if (RelativePart != NULL)
 		RelativePart->Clear();
@@ -260,7 +260,7 @@ ZEKnownPath ZEPathUtils::SearchForSymbol(ZEString* RelativePart, const ZEString&
 	ZEString Temp = SymbolicPath;
 	
 	bool SymbolFound = false;
-	ZEKnownPath Root = ZE_KP_NONE;
+	ZEPathRoot Root = ZE_KP_NONE;
 
 	wchar_t* Token = NULL;
 	wchar_t* Context = NULL;

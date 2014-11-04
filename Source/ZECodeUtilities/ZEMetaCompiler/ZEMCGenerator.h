@@ -71,7 +71,7 @@ class ZEMCGenerator
 		void GenerateEnding();
 		
 		// Generic
-		void GenerateCastedObject(ZEMCClass* CurrentClass);
+		void GenerateCastedObject(ZEMCClass* CurrentClass, const char* SourceName = "Object", const char* DestinationName = "CastedObject");
 
 		// Enumurator
 		void GenerateEnumeratorMacros(ZEMCEnumerator* Enumerator);
@@ -88,10 +88,9 @@ class ZEMCGenerator
 		void GenerateClassGetParentClass(ZEMCClass* CurrentClass);
 		void GenerateClassGetName(ZEMCClass* CurrentClass);
 		void GenerateClassGetGUID(ZEMCClass* CurrentClass);
-		void GenerateClassGetSizeOfClass(ZEMCClass* CurrentClass);
+		void GenerateClassGetFlags(ZEMCClass* CurrentClass);
 		void GenerateClassGetAttributes(ZEMCClass* CurrentClass);
 		void GenerateClassGetAttributeCount(ZEMCClass* CurrentClass);
-		void GenerateClassCreateInstance(ZEMCClass* CurrentClass);
 
 		// Properties
 		bool HasContainerProperty(ZEMCClass* CurrentClass);
@@ -128,9 +127,19 @@ class ZEMCGenerator
 		void GenerateClassWrapperMethods(ZEMCClass* CurrentClass);
 
 		// Scripting
-		void GenerateClassScriptingObject(ZEMCClass* CurrentClass);
-		void GenerateClassGetSizeOfScriptingClass(ZEMCClass* CurrentClass);
-		void GenerateClassCreateScriptingInstance(ZEMCClass* CurrentClass);
+		void GenerateClassScriptObject(ZEMCClass* CurrentClass);
+		void GenerateClassGetSizeOfObject(ZEMCClass* CurrentClass);
+		void GenerateClassCreateScriptInstance(ZEMCClass* CurrentClass);
+
+		// Memory Management
+		void GenerateClassGetSizeOfScriptObject(ZEMCClass* CurrentClass);
+		void GenerateClassCreateInstance(ZEMCClass* CurrentClass);
+		void GenerateClassDestroy(ZEMCClass* CurrentClass);
+		void GenerateClassDynamicCast(ZEMCClass* CurrentClass);
+		void GenerateClassClone(ZEMCClass* CurrentClass);
+		void GenerateClassConstruct(ZEMCClass* CurrentClass);
+		void GenerateClassDeconstruct(ZEMCClass* CurrentClass);
+		void GenerateClassAssign(ZEMCClass* CurrentClass);
 
 
 

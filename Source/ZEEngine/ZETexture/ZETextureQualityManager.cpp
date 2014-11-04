@@ -41,6 +41,7 @@
 #include "ZETextureOptions.h"
 #include "ZECore\ZEConsole.h"
 #include "ZETextureQualityManager.h"
+#include "ZEMath\ZEMath.h"
 
 
 #define	ZE_TC_BLOCK_WIDTH	4 // Pixels

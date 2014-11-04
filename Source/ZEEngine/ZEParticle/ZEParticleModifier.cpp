@@ -39,6 +39,7 @@
 #include "ZEGraphics\ZEFixedMaterial.h"
 #include "ZERandom.h"
 #include "ZEMath\ZEAngle.h"
+#include "ZEMath\ZEMath.h"
 
 void ZEParticleModifier::SetName(const ZEString& Name)
 {

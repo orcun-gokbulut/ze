@@ -73,7 +73,7 @@ ze_add_source(ZEPathUtilsTests.cpp			Tests)
 ze_add_library(TARGET ZEFile 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-    LIBS ZEFoundation)
+	LIBS ZEDS)
 
 ze_add_test(TARGET ZEFileTests
 	SOURCES ${Tests}

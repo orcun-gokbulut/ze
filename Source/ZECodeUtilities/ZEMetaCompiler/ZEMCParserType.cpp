@@ -91,7 +91,6 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 				Output.BaseType = ZEMC_BT_UNSIGNED_INTEGER_64;
 				break;
 
-			case BuiltinType::Char_S:
 			case BuiltinType::SChar:
 				Output.BaseType = ZEMC_BT_INTEGER_8;
 				break;
@@ -223,9 +222,10 @@ bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 	// Check Qualifier
 	if (TypePtr->isReferenceType())
 	{
-		TempType.TypeQualifier = CanonicalType.isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
 		if (TypePtr->getPointeeType()->isPointerType() || TypePtr->getPointeeType()->isReferenceType())
 			return false;
+
+		TempType.TypeQualifier = TypePtr->getPointeeType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
 		BaseTypePtr = TypePtr->getPointeeType().getTypePtr();
 	}
 	else

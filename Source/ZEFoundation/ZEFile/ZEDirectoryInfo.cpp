@@ -41,17 +41,13 @@
 
 ZEDirectoryInfo::ZEDirectoryInfo()
 {
-	memset((void*)&Creation, 0, sizeof(ZEFileTime));
-	memset((void*)&Modification, 0, sizeof(ZEFileTime));
+
 }
 
 ZEDirectoryInfo::ZEDirectoryInfo(const ZEString& DirectoryPath)
 {
-	Path = ZEPathManager::GetFinalPath(DirectoryPath, &Root);
+	Path = ZEPathManager::GetRealPath(DirectoryPath, &Root);
 	Name = GetDirectoryName(Path);
-
-	memset((void*)&Creation, 0, sizeof(ZEFileTime));
-	memset((void*)&Modification, 0, sizeof(ZEFileTime));
 }
 
 ZEDirectoryInfo::~ZEDirectoryInfo()
@@ -61,11 +57,8 @@ ZEDirectoryInfo::~ZEDirectoryInfo()
 
 void ZEDirectoryInfo::SetPath(const ZEString& DirectoryPath)
 {
-	Path = ZEPathManager:: GetFinalPath(DirectoryPath, &Root);
+	Path = ZEPathManager:: GetRealPath(DirectoryPath, &Root);
 	Name = GetDirectoryName(Path);
-	
-	memset((void*)&Creation, 0, sizeof(ZEFileTime));
-	memset((void*)&Modification, 0, sizeof(ZEFileTime));
 }
 
 const ZEString& ZEDirectoryInfo::GetName() const
@@ -78,64 +71,40 @@ const ZEString& ZEDirectoryInfo::GetPath() const
 	return Path;
 }
 
-bool ZEDirectoryInfo::GetCreationDate(ZEFileTime& Time)
+ZEFileTime ZEDirectoryInfo::GetCreationTime() const
 {
-    bool Result;
-
-    Result = ZEFileUtils::GetCreationTime(&Creation, Path);
-    memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
-
-    return Result;
+	ZEFileTime Time;
+    ZEFileUtils::GetCreationTime(&Time, Path);
+    return Time;
 }
 
-bool ZEDirectoryInfo::GetModificationDate(ZEFileTime& Time)
+ZEFileTime ZEDirectoryInfo::GetModificationTime() const
 {
-    bool Result;
-
-    Result = ZEFileUtils::GetModificationTime(&Modification, Path);
-    memcpy((void*)&Time, (void*)&Modification, sizeof(ZEFileTime));
-
-    return Result;
+	ZEFileTime Time;
+	ZEFileUtils::GetModificationTime(&Time, Path);
+	return Time;
 }
 
-ZEArray<ZEFileInfo*>* ZEDirectoryInfo::GetFileList()
+ZEArray<ZEFileInfo> ZEDirectoryInfo::GetFileList() const
 {
-	ZEFileInfo*	Temp;
-	bool Continue = true;
-	ZEArray<ZEFileInfo*>* FileList;
-    ZEFileSearchStream FindData;
+	ZEArray<ZEFileInfo> FileList;
+
 	const ZEString Seperator = ZEPathUtils::GetSeperator();
+	ZEString NewPath = ZEPathManager::GetRealPath(Path, NULL);
 
-	// Check if path can be opened
-	ZEString NewPath = ZEPathManager::GetFinalPath(Path, NULL);
-
-	FileList = new ZEArray<ZEFileInfo*>;
-	if (FileList == NULL)
-    {
-        zeError("Cannot allocate...");
-        return NULL;
-    }
-
-	// Open directory
-    Continue = ZEFileUtils::OpenSearchStream(&FindData, Path);
+	ZEFileSearchStream FindData;
+    bool Continue = ZEFileUtils::OpenSearchStream(&FindData, Path);
     while (Continue)
 	{
 		// If file
 		if (ZEFileUtils::IsFile(&FindData))
 		{
-			Temp = new ZEFileInfo();
-            if (Temp == NULL)
-            {
-                zeError("Cannot allcoate...");
-                ZEFileUtils::CloseSearchStream(&FindData);
-                return FileList;
-            }
-
-			Temp->Root = Root;
-			Temp->Name = ZEFileUtils::GetFileName(&FindData);
-			Temp->Path = NewPath + Seperator + Temp->Name;
-			Temp->Extension = ZEFileInfo::GetFileExtension(Temp->Name);
-			FileList->Add(Temp);
+			ZEFileInfo FileInfo;
+			FileInfo.Root = Root;
+			FileInfo.Name = ZEFileUtils::GetFileName(&FindData);
+			FileInfo.Path = NewPath + Seperator + FileInfo.Name;
+			FileInfo.Extension = ZEFileInfo::GetFileExtension(FileInfo.Name);
+			FileList.Add(FileInfo);
 		}
 
 		// Get next
@@ -143,52 +112,36 @@ ZEArray<ZEFileInfo*>* ZEDirectoryInfo::GetFileList()
 	}
 
     ZEFileUtils::CloseSearchStream(&FindData);
+
 	return FileList;
 }
 
-ZEArray<ZEDirectoryInfo*>* ZEDirectoryInfo::GetDirectoryList()
+ZEArray<ZEDirectoryInfo> ZEDirectoryInfo::GetDirectoryList() const
 {
-	ZEDirectoryInfo* Temp;
-	bool Continue = true;
-	ZEArray<ZEDirectoryInfo*>* FolderList;
-    ZEFileSearchStream FindData;
+	ZEArray<ZEDirectoryInfo> DirectoryList;
+    
 	const ZEString Seperator = ZEPathUtils::GetSeperator();
+	ZEString NewPath = ZEPathManager::GetRealPath(Path, &Root);
 
-	// Check if path can be opened
-	ZEString NewPath = ZEPathManager::GetFinalPath(Path, &Root);
-
-	FolderList = new ZEArray<ZEDirectoryInfo*>;
-    if (FolderList == NULL)
-    {
-        zeError("Cannot allocate...");
-        return NULL;
-    }
-
-    Continue = ZEFileUtils::OpenSearchStream(&FindData, Path);
+	ZEFileSearchStream FindData;
+	bool Continue = ZEFileUtils::OpenSearchStream(&FindData, Path);
     while (Continue)
     {
-		// If Folder
+		ZEDirectoryInfo DirectoryInfo;
 		if (ZEFileUtils::IsDirectory(&FindData))
 		{
-			Temp = new ZEDirectoryInfo();
-			if (Temp == NULL)
-            {
-                zeError("Cannot allcoate...");
-                ZEFileUtils::CloseSearchStream(&FindData);
-                return FolderList;
-            }
-
-            Temp->Root = Root;
-            Temp->Name = ZEFileUtils::GetFileName(&FindData);
-			Temp->Path = NewPath + Seperator + Temp->Name;
-			FolderList->Add(Temp);
+			DirectoryInfo.Root = Root;
+			DirectoryInfo.Name = ZEFileUtils::GetFileName(&FindData);
+			DirectoryInfo.Path = NewPath + Seperator + DirectoryInfo.Name;
+			DirectoryList.Add(DirectoryInfo);
 		}
 
         Continue = ZEFileUtils::FindNextInStream(&FindData);
 	}
 
     ZEFileUtils::CloseSearchStream(&FindData);
-    return FolderList;
+
+    return DirectoryList;
 }
 
 bool ZEDirectoryInfo::IsDirectory(const ZEString& DirectoryPath)

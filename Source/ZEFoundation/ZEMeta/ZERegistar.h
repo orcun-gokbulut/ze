@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaModuleRegister.cpp
+ Zinek Engine - ZERegistar.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMetaModuleRegister.h"
+#pragma once
+#ifndef __ZE_REGISTAR_H__
+#define __ZE_REGISTAR_H__
+
+#include "ZETypes.h"
+
+class ZEClass;
+class ZEEnumerator;
+
+#define ZE_REGISTAR(RegistarName)
+
+class ZERegistar
+{
+	public:
+		virtual ZEClass**		GetClasses() = 0;
+		virtual ZESize			GetClassCount() = 0;
+
+		virtual ZEEnumerator**	GetEnumerators() = 0;
+		virtual ZESize			GetEnumeratorCount() = 0;
+};
+
+#endif

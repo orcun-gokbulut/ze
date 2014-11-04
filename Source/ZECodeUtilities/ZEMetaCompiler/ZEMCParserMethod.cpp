@@ -35,7 +35,8 @@
 
 #include "ZEMCParser.h"
 #include "ZEMCOptions.h"
-#include "ZEDS\ZEPointer.h"
+#include "ZEPointer\ZEPointer.h"
+#include "llvm\Support\raw_ostream.h"
 
 ZEMCMetaOperatorType ZEMCParser::GetOperatorType(OverloadedOperatorKind OperatorKind)
 {
@@ -103,12 +104,14 @@ ZEMCMetaOperatorType ZEMCParser::GetOperatorType(OverloadedOperatorKind Operator
 			return ZEMC_MOT_RIGHT_SHIFT;
 		case OO_GreaterGreaterEqual:
 			return ZEMC_MOT_RIGHT_SHIFT_ASSIGNMENT;
+		case OO_Exclaim:
+			return ZEMC_MOT_LOGICAL_NOT;
 		case OO_Call:
 			return ZEMC_MOT_FUNCTION_CALL;
 		case OO_Subscript:
 			return ZEMC_MOT_ARRAY_SUBSCRIPT;
 		default:
-			return ZEMC_MOT_NOT_OPERATOR;
+			return ZEMC_MOT_NONE;
 	}
 }
 
@@ -130,6 +133,85 @@ bool ZEMCParser::ProcessMethodParameters(ZEMCMethod* Method, CXXMethodDecl* Meth
 	return true;
 }
 
+void ZEMCParser::CheckNonPublicDefaultContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl)
+{
+	if (isa<CXXConstructorDecl>(MethodDecl))
+	{
+		CXXConstructorDecl* ConstructorDecl = cast<CXXConstructorDecl>(MethodDecl);
+		if (ConstructorDecl->param_size() == 0)
+			Class->HasPublicDefaultConstructor = (ConstructorDecl->getAccess() == AccessSpecifier::AS_public);
+	}
+}
+
+void ZEMCParser::CheckNonPublicDefaultCopyContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl)
+{
+	if (isa<CXXConstructorDecl>(MethodDecl))
+	{
+		CXXConstructorDecl* ConstructorDecl = cast<CXXConstructorDecl>(MethodDecl);
+		if (ConstructorDecl->isCopyConstructor())
+			Class->HasPublicCopyConstructor = (MethodDecl->getAccess() == AccessSpecifier::AS_public);
+	}
+}
+
+void ZEMCParser::CheckNonPublicDefaultAssignmentOperator(ZEMCClass* Class, CXXMethodDecl* MethodDecl)
+{
+	if (MethodDecl->isCopyAssignmentOperator())
+		Class->HasPublicAssignmentOperator = (MethodDecl->getAccess() == AccessSpecifier::AS_public);
+}
+
+void ZEMCParser::CheckNonPublicDestructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl)
+{
+	if (isa<CXXDestructorDecl>(MethodDecl))
+		Class->HasPublicDestructor = (MethodDecl->getAccess() == AccessSpecifier::AS_public);
+}
+
+void ZEMCParser::CheckCreateInstanceMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl)
+{
+	if (MethodDecl->getAccess() != AccessSpecifier::AS_public)
+		return;
+
+	if (MethodDecl->getNameAsString() != "CreateInstance")
+		return;
+	
+	if (!MethodDecl->isStatic())
+		return;
+
+	if (MethodDecl->param_size() != 0)
+		return;
+
+	QualType ReturnType = MethodDecl->getReturnType();
+	if (!ReturnType->isPointerType() ||
+		ReturnType.isConstQualified() ||
+		!ReturnType->getPointeeType().getTypePtr()->isClassType() ||
+		ReturnType->getPointeeType().getTypePtr()->getAsCXXRecordDecl()->getNameAsString() != Class->Name.ToCString())
+	{
+		return;
+	}
+
+	Class->HasCreateInstanceMethod = true;
+}
+
+void ZEMCParser::CheckDestroyMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl)
+{
+	if (MethodDecl->getAccess() != AccessSpecifier::AS_public)
+		return;
+
+	if (MethodDecl->getNameAsString() != "Destroy")
+		return;
+
+	if (!MethodDecl->isVirtual())
+		return;
+
+	if (MethodDecl->param_size() != 0)
+		return;
+
+	QualType ReturnType = MethodDecl->getReturnType();
+	if (!ReturnType->isVoidType())
+		return;
+
+	Class->HasPublicDestroyMethod = true;
+}
+
 void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 {
 	//zeBreak(ClassData->Name == "ZETerrain");
@@ -140,26 +222,15 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 	if (MethodDecl->isMoveAssignmentOperator())
 		return;
 
+	CheckNonPublicDefaultContructor(ClassData, MethodDecl);
+	CheckNonPublicDefaultCopyContructor(ClassData, MethodDecl);
+	CheckNonPublicDefaultAssignmentOperator(ClassData, MethodDecl);
+	CheckNonPublicDestructor(ClassData, MethodDecl);
+	CheckCreateInstanceMethod(ClassData, MethodDecl);
+	CheckDestroyMethod(ClassData, MethodDecl);
+
 	if (MethodDecl->getAccess() != AccessSpecifier::AS_public)
-	{
-		if (isa<CXXDestructorDecl>(MethodDecl))
-			ClassData->HasPublicDestructor = false;
-
-		if (isa<CXXConstructorDecl>(MethodDecl))
-		{
-			CXXConstructorDecl* ConstructorDecl = cast<CXXConstructorDecl>(MethodDecl);
-			if (ConstructorDecl->isCopyConstructor())
-				ClassData->HasPublicCopyConstructor = false;
-		}
-
-		if (isa<CXXConstructorDecl>(MethodDecl))
-		{
-			if (MethodDecl->param_size() == 0)
-				ClassData->HasPublicDefaultConstructor = false;
-		}
-
 		return;
-	}
 
 	ZEMCType ReturnType;
 	if (!ProcessType(ReturnType, MethodDecl->getCallResultType()))
@@ -196,10 +267,7 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 
 		Method->IsConstructor = true;
 	}
-
-	if(MethodDecl->getNameAsString() == "CreateInstance" && MethodDecl->param_size() == 0)
-		ClassData->HasCreateInstanceMethod = true;
-
+			
 	if (Method->IsOperator)
 		Method->OperatorType = GetOperatorType(MethodDecl->getOverloadedOperator());
 

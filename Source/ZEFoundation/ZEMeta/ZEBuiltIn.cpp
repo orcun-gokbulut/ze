@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEObject.h
+ Zinek Engine - ZEBuiltIn.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,47 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_OBJECT_H__
-#define __ZE_OBJECT_H__
+#include "ZEBuiltIn.h"
 
-#include "ZEClass.h"
-#include "ZEMetaAttribute.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEDS\ZEString.h"
 
-#ifdef ZE_META_COMPILER
-	#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) class ZE_META_ATTRIBUTE_2("ForwardDeclaration", #ClassName, IncludeFile) ClassName;
-#else
-	#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) class ClassName;
-#endif
-
-class ZEObject
+ZESize ZEBuiltInClassProvider::GetClassCount()
 {
-	public:
-		virtual	ZEClass*			GetClass() const;
-		static ZEClass*				Class();
-};
+	return 0;
+}
 
-#define ZE_OBJECT \
-	public: \
-		virtual	ZEClass*			GetClass() const; \
-		static ZEClass*				Class(); \
-	private:
-		
-#define ZE_OBJECT_IMPLEMENTATION(ClassName) \
-	ZEClass* ClassName::GetClass() const \
-	{ \
-		return ClassName::Class(); \
-	} \
-	\
-	ZEClass* ClassName::Class() \
-	{ \
-		static ClassName##Class Class;\
-		return &Class; \
-	}\
+ZEClass** ZEBuiltInClassProvider::GetClasses()
+{
+	static ZEClass* Classes[] =
+	{
+		ZEVector2::Class(),
+		ZEVector3::Class(),
+		ZEVector4::Class(),
+		ZEQuaternion::Class(),
+		ZEMatrix3x3::Class(),
+		ZEMatrix4x4::Class(),
+		ZEString::Class()
+	};
 
-#define ZE_BUILTIN_TYPE_IMPLEMENTATION(ClassName) \
-	ZEClass* ClassName::Class() \
-	{ \
-		static ClassName##Class Class;\
-		return &Class; \
-	}
+	return Classes;
 
-#endif
+	return NULL;
+}
+
+ZEBuiltInClassProvider* ZEBuiltInClassProvider::GetInstance()
+{
+	static ZEBuiltInClassProvider Instance;
+	return &Instance;
+}
+
+ZEBuiltInClassProvider::ZEBuiltInClassProvider()
+{
+
+}
+
+ZEBuiltInClassProvider::~ZEBuiltInClassProvider()
+{
+
+}

@@ -47,7 +47,7 @@
 #include <llvm/Support/CommandLine.h>
 #include <fstream>
 #include <string>
-#include "ZEDS/ZEPointer.h"
+#include "ZEPointer/ZEPointer.h"
 
 void ZEMCParser::RaiseNote(SourceLocation& Location, const char* WarningText)
 {
@@ -101,7 +101,7 @@ void ZEMCParser::ProcessEnumerator(EnumDecl* EnumDeclaration)
 
 	Enumerator->Hash = Enumerator->Name.Hash();
 
-	for(EnumDecl::enumerator_iterator Current = EnumDeclaration->enumerator_begin(), End = EnumDeclaration->enumerator_end(); Current != End; ++Current)
+	for (EnumDecl::enumerator_iterator Current = EnumDeclaration->enumerator_begin(), End = EnumDeclaration->enumerator_end(); Current != End; ++Current)
 	{
 		ZEMCEnumeratorItem EnumeratorItem;
 		EnumeratorItem.Name = Current->getNameAsString().c_str();
@@ -111,8 +111,12 @@ void ZEMCParser::ProcessEnumerator(EnumDecl* EnumDeclaration)
 
 	Context->Enumerators.Add(Enumerator.Transfer());
 
-	if (Compiler->getSourceManager().getFileID(EnumDeclaration->getLocation()) == Compiler->getSourceManager().getMainFileID())
-		Context->TargetEnumerators.Add(Enumerator);
+	std::string output;
+	llvm::raw_string_ostream stream(output);
+	EnumDeclaration->getLocation().print(stream, Compiler->getSourceManager());
+
+	if (CheckTargetDeclaration(EnumDeclaration))
+		Context->TargetEnumerators.Add(Context->Enumerators.GetLastItem());
 }
 
 class ZEMetaCompilerASTConsumer : public clang::ASTConsumer

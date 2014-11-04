@@ -39,6 +39,8 @@ project (ZEFoundation)
 
 ze_set_project_folder("ZEFoundation")
 
+set(BuiltIn)
+
 add_subdirectory(ZEDS)
 add_subdirectory(ZEMath)
 add_subdirectory(ZESerialization)
@@ -55,6 +57,8 @@ add_subdirectory(ZEML)
 add_subdirectory(ZERegEx)
 add_subdirectory(ZECompression)
 add_subdirectory(ZEProtect)
+add_subdirectory(ZEMeta)
+add_subdirectory(ZEPointer)
 
 ze_add_source(ZEAutoExp.txt				Sources Headers)
 ze_add_source(ZEData.h 					Sources Headers)
@@ -92,11 +96,16 @@ ze_add_source(ZEBase64.cpp				Sources)
 ze_add_source(ZEVersion.cpp				Sources)
 ze_add_source(ZEVersion.h				Sources Headers)
 
+
 ze_add_library(TARGET ZEFoundation
-	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket ZEML ZERegEx ZECompression
 	COMBINE
+	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket ZEML ZERegEx ZECompression ZEPointer ZEMeta
 	SOURCES ${Sources} 
 	HEADERS ${Headers})
+
+ze_add_library(TARGET ZEFoundationMeta
+	SOURCES ${BuiltIn}
+	ZEMC ${BuildIn})
 
 ze_add_test(TARGET ZEFoundationTests
 	SOURCES ${Tests}

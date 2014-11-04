@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMCRegisterer.h"
-#include "ZEFile/ZEFileInfo.h"
 
 void ZEMCRegisterer::SetOptions(ZEMCOptions* options)
 {
@@ -124,8 +123,8 @@ void ZEMCRegisterer::GenerateRegisterHeader(FILE* File)
 
 	fprintf(RegisterHeaderFile,
 		"#pragma once\n"
-		"#include \"ZEMeta/ZEMetaRegister.h\"\n\n"
-		"class %s : public ZEMetaRegister\n"
+		"#include \"ZEMeta/ZERegistar.h\"\n\n"
+		"class %s : public ZERegistar\n"
 		"{\n"
 		"\tpublic:\n"
 		"\t\tvirtual ZEClass**\t\t\t\t\tGetClasses();\n"
@@ -229,9 +228,12 @@ void ZEMCRegisterer::GenerateDeclarationsFile(ZEMCContext* Context)
 		return;
 	}
 
-	fprintf(File, "%s\n", ZEFileInfo::GetFileName(Options->InputFileName).ToCString());
+	fprintf(File, "%s\n", Options->InputFileName.ToCString());
 	for (ZESize I = 0; I < Context->TargetClasses.GetCount(); I++)
-		fprintf(File, "Class,%s;\n", Context->TargetClasses[I]->Name.ToCString());
+	{
+		if (!Context->TargetClasses[I]->IsBuiltInClass)
+			fprintf(File, "Class,%s;\n", Context->TargetClasses[I]->Name.ToCString());
+	}
 
 	for (ZESize I = 0; I < Context->TargetEnumerators.GetCount(); I++)
 		fprintf(File, "Enum,%s;\n", Context->Enumerators[I]->Name.ToCString());

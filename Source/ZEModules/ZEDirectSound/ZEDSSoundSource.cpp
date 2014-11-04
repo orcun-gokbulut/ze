@@ -36,6 +36,7 @@
 #include "ZEDSSoundSource.h"
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
+#include "ZEMath/ZEMath.h"
 
 bool ZEDSSoundSource::CreateBuffer(bool Is3D)
 {

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaRegister.cpp
+ Zinek Engine - ZEEnumerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,51 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMetaRegister.h"
+#pragma once
+#ifndef __ZE_ENUMERATOR_H__
+#define __ZE_ENUMERATOR_H__
+
+#include "ZETypes.h"
+#include "ZEGUID.h"
+#include "ZEAttribute.h"
+
+#define ZE_ENUM(Name) \
+	ZEEnumerator* Name##_Declaration();\
+	enum ZE_ATTRIBUTE_0(Enumerator) Name
+
+#define ZE_ENUMERATOR_IMPLEMENTATION(Name) \
+	class Name##Enumerator : public ZEEnumerator \
+	{ \
+		public: \
+			virtual const char* GetName(); \
+			virtual ZEGUID GetGUID(); \
+			virtual const ZEEnumeratorItem* GetItems(); \
+			virtual ZESize GetItemCount(); \
+	};
+
+#define ZE_ENUMERATOR_DECLARATION(Name) \
+	ZEEnumerator* Name##_Declaration() \
+	{ \
+		static Name##Enumerator Enumerator; \
+		return &Enumerator; \
+	}
+
+struct ZEEnumeratorItem
+{
+	const char*					Name;
+	ZEUInt32					Value;
+};
+
+class ZEEnumerator
+{
+	public:
+		virtual const char*				GetName() = 0;
+		virtual ZEGUID					GetGUID() = 0;
+
+
+	virtual const ZEEnumeratorItem*		GetItems() = 0;
+	virtual ZESize						GetItemCount() = 0;
+};
+
+
+#endif

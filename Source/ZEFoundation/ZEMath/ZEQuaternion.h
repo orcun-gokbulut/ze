@@ -37,12 +37,15 @@
 #ifndef	__ZE_MATH_QUATERNION_H__
 #define __ZE_MATH_QUATERNION_H__
 
-#include <ZETypes.h>
+#include "ZETypes.h"
 #include "ZEVector.h"
 #include "ZEMatrix.h"
+#include "ZEMeta\ZEBuiltIn.h"
 
 class ZEQuaternion
 {
+	ZE_BUILTIN_OBJECT
+
 	public:
 		static const ZEQuaternion		Zero;
 		static const ZEQuaternion		Identity;

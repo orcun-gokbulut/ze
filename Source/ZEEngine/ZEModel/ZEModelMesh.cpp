@@ -41,6 +41,7 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEPhysics/ZEPhysicalCloth.h"
 #include "ZEMath/ZETriangle.h"
+#include "ZEMath/ZEMath.h"
 
 void ZEModelMesh::SetActiveLOD(ZEUInt LOD)
 {

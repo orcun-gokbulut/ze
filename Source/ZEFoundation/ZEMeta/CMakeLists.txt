@@ -35,13 +35,15 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+ze_add_source(ZEBuiltIn.cpp						Sources Headers)
+ze_add_source(ZEBuiltIn.h						Sources)
 ze_add_source(ZEClass.cpp						Sources)
 ze_add_source(ZEClass.h 						Sources Headers)
 ze_add_source(ZEClassOverloads.cpp				Sources)
 ze_add_source(ZEObject.cpp						Sources)
 ze_add_source(ZEObject.h						Sources Headers)
-ze_add_source(ZEMetaAttribute.cpp				Sources)
-ze_add_source(ZEMetaAttribute.h					Sources Headers)
+ze_add_source(ZEAttribute.cpp					Sources)
+ze_add_source(ZEAttribute.h						Sources Headers)
 ze_add_source(ZEProperty.cpp					Sources)
 ze_add_source(ZEProperty.h						Sources Headers)
 ze_add_source(ZEPropertySignature.cpp			Sources)
@@ -67,19 +69,16 @@ ze_add_source(ZEEventHandler.h					Sources Headers)
 ze_add_source(ZEEventHandlerImp.h				Sources Headers)
 ze_add_source(ZEProvider.cpp					Sources)
 ze_add_source(ZEProvider.h						Sources Headers)
-ze_add_source(ZEMetaRegister.cpp				Sources)
-ze_add_source(ZEMetaRegister.h					Sources Headers)
-ze_add_source(ZEMetaModuleRegister.cpp			Sources)
-ze_add_source(ZEMetaModuleRegister.h			Sources Headers)
-ze_add_source(ZEPrimitiveTypes.h				Sources)
-ze_add_source(ZEPrimitiveTypes.cpp				Sources)
-
-ze_add_source(${CMAKE_SOURCE_DIR}/Source/ZEFoundation/ZEDS/ZEString.h     	ZEMC)
-ze_add_source(${CMAKE_SOURCE_DIR}/Source/ZEFoundation/ZEMath/ZEVector.h     ZEMC)
-ze_add_source(${CMAKE_SOURCE_DIR}/Source/ZEFoundation/ZEMath/ZEMatrix.h     ZEMC)
-ze_add_source(${CMAKE_SOURCE_DIR}/Source/ZEFoundation/ZEMath/ZEQuaternion.h ZEMC)
+ze_add_source(ZEType.cpp						Sources)
+ze_add_source(ZEType.h							Sources Headers)
+ze_add_source(ZETypeGenerator.cpp				Sources)
+ze_add_source(ZETypeGenerator.h					Sources Headers)
+ze_add_source(ZERegistar.cpp					Sources)
+ze_add_source(ZERegistar.h						Sources Headers)
+ze_add_source(ZEModuleRegistar.cpp				Sources)
+ze_add_source(ZEModuleRegistar.h				Sources Headers)
 
 ze_add_library(TARGET ZEMeta 
 	SOURCES ${Sources}
-	HEADERS ${Headers}	LIBS ZEFoundation
-	ZEMC ${ZEMC})
+	HEADERS ${Headers} 
+	LIBS ZEDS)

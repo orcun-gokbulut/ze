@@ -46,17 +46,17 @@ class ZEFileOperations
 
 		static bool		CreateFolder(const ZEString& DestinationParentPath, const ZEString& Name);
 
-		static bool		Rename(const ZEString& Name, ZEFileInfo* File, bool OverwriteIfExists = false);
-		static bool		Rename(const ZEString& Name, ZEDirectoryInfo* Folder);
+		static bool		Rename(const ZEString& Name, const ZEFileInfo& File, bool OverwriteIfExists = false);
+		static bool		Rename(const ZEString& Name, const ZEDirectoryInfo& Folder);
 
-		static bool		Copy(const ZEString& DestinationParentPath, ZEFileInfo* File, bool OverwriteIfExists = false);
-		static bool		Copy(const ZEString& DestinationParentPath, ZEDirectoryInfo* Folder);
+		static bool		Copy(const ZEString& DestinationParentPath, const ZEFileInfo& File, bool OverwriteIfExists = false);
+		static bool		Copy(const ZEString& DestinationParentPath, const  ZEDirectoryInfo& Folder);
 
-		static bool		Move(const ZEString& DestinationParentPath, ZEFileInfo* File, bool OverwriteIfExists = false);
-		static bool		Move(const ZEString& DestinationParentPath, ZEDirectoryInfo* Folder);
+		static bool		Move(const ZEString& DestinationParentPath, const ZEFileInfo& File, bool OverwriteIfExists = false);
+		static bool		Move(const ZEString& DestinationParentPath, const ZEDirectoryInfo& Folder);
 
-		static bool		Delete(ZEFileInfo* File);
-		static bool		Delete(ZEDirectoryInfo* Folder);
+		static bool		Delete(const ZEFileInfo& File);
+		static bool		Delete(const ZEDirectoryInfo& Folder);
 
 };
 

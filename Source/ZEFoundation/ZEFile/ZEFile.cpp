@@ -196,7 +196,7 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 	zeDebugCheck(File != NULL, "File is already open.");
 
 	ZEString ModeStr;
-	ZEString FinalPath = ZEPathManager::GetFinalPath(FilePath);
+	ZEString FinalPath = ZEPathManager::GetRealPath(FilePath);
 
 	// Handle file creation
 	switch (FileCreationMode)

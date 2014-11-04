@@ -50,6 +50,7 @@ ze_add_module(ZEXSens				Modules OPTIONAL PLATFORMS Windows)
 ze_add_module(ZESensics				Modules OPTIONAL)
 ze_add_module(ZEISenseInput			Modules OPTIONAL)
 ze_add_module(ZEVectorNav			Modules OPTIONAL)
+ze_add_module(ZEAngelScript			Modules OPTIONAL DEFAULT)
 
 ze_add_source(ZEModules.h			Sources Headers)
 ze_add_source(ZEModules.cpp			Sources)

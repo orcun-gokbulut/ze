@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEObject.cpp
+ Zinek Engine - ZEObject.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,14 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEObject.h"
+#pragma once
+#ifndef __ZE_OBJECT_H__
+#define __ZE_OBJECT_H__
 
-ZEClass* ZEObject::GetClass() const
-{
-	return ZEObject::Class();
-}
+#include "ZEClass.h"
 
-ZEClass* ZEObject::Class()
+#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) class ZE_ATTRIBUTE_2("ForwardDeclaration", #ClassName, IncludeFile) ClassName;
+
+#define ZE_OBJECT \
+	public: \
+		virtual	ZEClass*			GetClass() const; \
+		static ZEClass*				Class(); \
+	private:
+		
+#define ZE_OBJECT_IMPLEMENTATION(ClassName) \
+	ZEClass* ClassName::GetClass() const \
+	{ \
+		return ClassName::Class(); \
+	} \
+	\
+	ZEClass* ClassName::Class() \
+	{ \
+		static ClassName##Class Class;\
+		return &Class; \
+	}\
+
+class ZEObject
 {
-	return 0;
-}
+	public:
+		virtual	ZEClass*			GetClass() const;
+		static ZEClass*				Class();
+};
+
+#endif
