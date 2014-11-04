@@ -35,6 +35,7 @@
 
 #include "ZESteeringCollisionAvoidance.h"
 #include "ZEActor.h"
+#include "ZEMath\ZEMath.h"
 
 ZESteeringOutput ZESteeringCollisionAvoidance::Process(float ElapsedTime)
 {

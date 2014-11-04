@@ -37,6 +37,7 @@
 #include "ZEModel.h"
 #include "ZEGame/ZEScene.h"
 #include <stdio.h>
+#include "ZEMath/ZEMath.h"
 
 void ZEModelBone::OnTransformChanged()
 {

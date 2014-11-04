@@ -42,6 +42,7 @@
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9HDRProcessor.h"
+#include "ZEMath/ZEMath.h"
 
 #define GAUSSIAN_FILTER_WIDTH		21	//9 13 17 21 25 etc
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEOptionManager.h
+ Zinek Engine - ZEProvider.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,58 +33,93 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_OPTION_MANAGER_H__
-#define __ZE_OPTION_MANAGER_H__
+#include "ZEProvider.h"
 
-#include "ZETypes.h"
-#include "ZEOption.h"
-#include "ZECommand.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEOptionSection.h"
-#include "ZECommandSection.h"
-#include "ZEDS/ZEValue.h"
-#include "ZEDS/ZEFastDelegate.h"
+#include "ZEClass.h"
+#include "ZEEnumerator.h"
 
-class ZEOptionManager
+bool ZEProvider::RegisterClass(ZEClass* Class)
 {
-	friend class ZECore;
-	private:
-		ZECommandSection			Commands;
-		ZEArray<ZEOptionSection*>	Sections;
+	if (Class == NULL)
+		return false;
 
-		bool						MatchSet(char* Line, char* Match);
-		void						MatchOption(char* Line, char* MatchName, char* MatchValue);
+	if (Classes.Exists(Class))
+		return false;
 
-		bool						LoadCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						SaveCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						ListSectionsCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						ListOptionsCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						CommitChangesCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						ResetChangesCommand(ZECommand* Command, const ZECommandParameterList* Params);
+	RegisterClass(Class->GetParentClass());
 
-									ZEOptionManager();
-									~ZEOptionManager();
+	Classes.Add(Class);
 
-	public:
-		bool						RegisterSection(ZEOptionSection* Ref);
-		bool						UnregisterSection(ZEOptionSection* Ref);
-		
-		ZESize						GetNumberOfSections();
-		
-		ZEOptionSection*			GetSection(const ZEString& Name);
-		ZEOptionSection*			GetSection(ZESize Index);
+	return true;
+}
 
-		ZEOption*					GetOption(const ZEString& SectionName, const ZEString& Name);
+void ZEProvider::UnregisterClass(ZEClass* Class)
+{
+	Classes.RemoveValue(Class);
+}
 
-		void						Save(const ZEString& FileName);
-		void						Load(const ZEString& FileName);
-		void						ParseParameters(const ZEString& Parameters);
-		
-		void						CommitChanges();
-		void						ResetChanges();
+bool ZEProvider::RegisterEnumerator(ZEEnumerator* Enumerator)
+{
+	if (Enumerator == NULL)
+		return false;
 
-		static ZEOptionManager*		GetInstance();
-};
+	if (Enumerators.Exists(Enumerator))
+		return false;
 
-#endif
+	Enumerators.Add(Enumerator);
+}
+
+void ZEProvider::UnregisterEnumerator(ZEEnumerator* Enumerator)
+{
+	Enumerators.RemoveValue(Enumerator);
+}
+
+const ZEArray<ZEClass*>& ZEProvider::GetClasses()
+{
+	return Classes;
+}
+
+const ZESize ZEProvider::GetClassCount()
+{
+	return Classes.GetCount();
+}
+
+ZEClass* ZEProvider::GetClass(const char* ClassName)
+{
+	for(ZESize I = 0; I < Classes.GetCount(); I++)
+	{
+		if(Classes[I]->GetName() == ClassName)
+			return Classes[I];
+	}
+
+	return NULL;
+}
+
+ZEArray<ZEClass*> ZEProvider::GetClass(ZEClass* ParentClass)
+{
+	ZEArray<ZEClass*> DerivedClasses;
+	for (ZESize I = 0; I < Classes.GetCount(); I++)
+	{
+		if (ZEClass::IsDerivedFrom(ParentClass, Classes[I]))
+			DerivedClasses.Add(Classes[I]);
+	}
+
+	return DerivedClasses;
+}
+
+ZEEnumerator* ZEProvider::GetEnumerator(const char* EnumeratorName)
+{
+	for(ZESize I = 0; I < Enumerators.GetCount(); I++)
+	{
+		if(Enumerators[I]->GetName() == EnumeratorName)
+			return Enumerators[I];
+	}
+
+	return NULL;
+}
+
+ZEProvider* ZEProvider::GetInstance()
+{
+	static ZEProvider Provider;
+	return &Provider;
+}

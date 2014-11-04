@@ -37,6 +37,7 @@
 #include "ZEModules\ZEPhysX\ZEPhysXConversion.h"
 #include "ZEMath\ZEAngle.h"
 #include "NxBoxShapeDesc.h"
+#include "ZEMath\ZEMath.h"
 
 enum ZEClothBehaviourFlags
 {

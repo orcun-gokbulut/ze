@@ -44,7 +44,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEList.h"
-#include "ZEDS/ZEType.h"
+#include "ZEMeta/ZEType.h"
 
 
 class ZEVector2;
@@ -421,13 +421,13 @@ ZEObjectType& ZEReference::GetObjectRef() const
 	return *(ZEObjectType*)Value.Pointer;
 }
 
-template<typename ZEObjecType>
-const ZEObjecType& ZEReference::GetObjectConstRef() const
+template<typename ZEObjectType>
+const ZEObjectType& ZEReference::GetObjectConstRef() const
 {
 	if (ValueType.Type != ZE_TT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
 
-	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObjecType*)Value.Pointer)->GetClass()))
+	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObjectType*)Value.Pointer)->GetClass()))
 		zeCriticalError("Value of the variant is not inherited from Object Type.");
 
 	return *(const ZEObjectType*)Value.Pointer;

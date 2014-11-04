@@ -48,7 +48,7 @@ class ZEFileInfo
 	friend class ZEDirectoryInfo;
 
 	private:
-		ZEKnownPath				Root;
+		ZEPathRoot				Root;
 		ZEInt64					Size;
 		ZEString				Name;
 		ZEString				Path;

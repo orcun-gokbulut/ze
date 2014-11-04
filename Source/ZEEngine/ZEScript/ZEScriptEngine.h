@@ -33,67 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#ifndef __ZE_SCRIPT_ENGINE_H__
+#define __ZE_SCRIPT_ENGINE_H__
 #pragma once
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEType.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZECore\ZEModule.h"
 
-struct ZEScriptProperty
-{
-	void*										PropertyPtr;
-	const char*									Declaration;
+class ZEClass;
 
-												ZEScriptProperty() {}
-
-												ZEScriptProperty(const char* Declaration, void* PropertyPtr) 
-												{
-													this->Declaration = Declaration;
-													this->PropertyPtr = PropertyPtr;
-												}
-};
-
-struct ZEScriptFunction
-{
-	void*										ScriptObject;
-	void*										FunctionPtr;
-	const char*									Name;
-	const char*									Declaration;
-	ZETypeType									ReturnType;
-	ZEArray<ZEVariant>							Parameters;
-
-												ZEScriptFunction() {}
-
-												ZEScriptFunction(ZETypeType ReturnType, const char* Declaration, void* FunctionPtr) 
-												{
-													this->Declaration = Declaration;
-													this->ReturnType = ReturnType;
-													this->FunctionPtr = FunctionPtr;
-												}
-};
-
-struct ZEScriptClassData
-{
-	ZEClass*									NativeClass;
-	ZESize										Id;
-};
-
-class ZEScriptEngine
+class ZEScriptEngine : public ZEModule
 {
 	public:
-		virtual void							RegisterNativeClass(ZEClass* Class, bool IsValueType) = 0;
+		virtual const char*		GetFileExtension() = 0;
+		virtual const char*		GetLanguageName() = 0;
 
-		virtual void							RegisterNativeGlobalProperty(ZEScriptProperty* Property) = 0;
-		virtual void							RegisterNativeGlobalFunction(ZEScriptFunction* Function) = 0;
+		virtual void			RegisterClass(ZEClass* Class) = 0;
+		virtual void			UnregisterClass(ZEClass* Class) = 0;
 
-		virtual void							BindScriptFunctionToNativeFunction(ZEScriptFunction* ScriptFunction) = 0;
-
-		virtual void							LoadScript(const char* ScriptFileName, bool IsBinary) = 0;
-		virtual void							ReloadScript() = 0;
-		virtual void							ExecuteScript() = 0;
-
-		virtual void*							CreateScriptClassInstance(ZEClass* Class) = 0;
-
-		virtual void*							CallScriptFunction(ZEScriptFunction* Function) = 0;
+		virtual bool			LoadScript(const char* ScriptName, const char* ScriptCode) = 0;
+		virtual bool			LoadScriptFile(const char* ScriptFile) = 0;
 };
 
+#endif

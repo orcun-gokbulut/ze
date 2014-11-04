@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPrimitiveTypes.h
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,18 +33,3 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PRIMITIVE_TYPES_H__
-#define __ZE_PRIMITIVE_TYPES_H__
-
-#include "ZETypes.h"
-#include "ZEObject.h"
-
-class ZEPrimitiveTypes
-{
-	public:
-		static ZESize		GetClassCount();
-		static ZEClass**	GetClasses();
-};
-
-#endif

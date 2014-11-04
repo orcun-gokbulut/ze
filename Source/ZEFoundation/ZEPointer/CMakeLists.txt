@@ -35,12 +35,22 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZESerialPort.h				Sources Headers)
-ze_add_source(ZESerialPort.cpp				Sources)
-ze_add_source(ZESerialPort_Windows.cpp		Sources PLATFORMS Windows)
-ze_add_source(ZESerialPort_Unix.cpp			Sources PLATFORMS Unix)
+ze_add_source(ZEPointer.cpp				Sources)
+ze_add_source(ZEPointer.h				Sources Headers)
+ze_add_source(ZEPointerTests.cpp		Tests)
+ze_add_source(ZESharedPointer.cpp		Sources)
+ze_add_source(ZESharedPointer.h			Sources Headers)
+ze_add_source(ZESharedPointerTests.cpp	Tests)
+ze_add_source(ZEWeakPointer.cpp			Sources)
+ze_add_source(ZEWeakPointer.h			Sources Headers)
+ze_add_source(ZEWeakPointerTests.cpp	Tests)
+ze_add_source(ZEPointerTestClass.h		Tests)
+ze_add_source(ZEPointerTestClass.cpp	Tests)
 
-ze_add_library(TARGET ZESerialPort 
+ze_add_library(TARGET ZEPointer 
 	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS)
+	HEADERS ${Headers})
+	
+ze_add_test(TARGET ZEPointerTests 
+	SOURCES ${Tests}
+	TEST_TARGET ZEPointer)

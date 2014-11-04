@@ -39,6 +39,7 @@
 #include "ZEModelMesh.h"
 #include "ZEModel.h"
 #include <string.h>
+#include "ZEMath\ZEMath.h"
 
 void ZEModelAnimationTrack::SetOwner(ZEModel* Model)
 {

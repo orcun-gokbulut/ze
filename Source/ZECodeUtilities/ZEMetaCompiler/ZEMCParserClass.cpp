@@ -164,16 +164,45 @@ bool ZEMCParser::CheckClass(CXXRecordDecl* Class)
 	return true;
 }
 
+bool ZEMCParser::CheckBuiltInClass(CXXRecordDecl* Class)
+{
+	for (CXXRecordDecl::method_iterator Iterator = Class->method_begin(); Iterator != Class->method_end(); Iterator++)
+	{
+		if (Iterator->param_size() != 0 ||
+			!Iterator->getDeclName().isIdentifier() ||
+			Iterator->getName() != "Class" ||  
+			!Iterator->isStatic())
+		{
+			continue;
+		}
+
+		ZEMCDeclaration Temp;
+		ParseAttributes(&Temp, *Iterator);
+
+		return CheckAttribute(&Temp, "BuiltIn");
+	}
+
+	return false;
+}
+
+bool ZEMCParser::CheckTargetDeclaration(Decl* Declaration)
+{
+	clang::SourceLocation Location = Declaration->getLocEnd();
+	clang::FileID CurrentFileID = Compiler->getSourceManager().getFileID(Location);
+	clang::FileID MainFileId = Compiler->getSourceManager().getMainFileID();
+	return (CurrentFileID == MainFileId);
+}
+
 bool ZEMCParser::ProcessForwardDeclaration(CXXRecordDecl* Class)
 {
-	if(Class->isClass() && !Class->isCompleteDefinition() && Class->hasAttrs())
+	if (Class->isClass() && !Class->isCompleteDefinition() && Class->hasAttrs())
 	{
 		ZEMCAttribute AttributeData;
-		for(CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
+		for (CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 		{
 			ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
 
-			if(AttributeData.Name == "ForwardDeclaration")
+			if (AttributeData.Name == "ForwardDeclaration")
 			{
 				bool Found = false;
 				for (ZESize I = 0; I < Context->ForwardDeclarations.GetCount(); I++)
@@ -211,20 +240,8 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	if (!Class->isCompleteDefinition())
 		return;
 
-	bool IsBuiltInTypeFound = false;
-	std::string ClassName = Class->getNameAsString();
-	if (ClassName == "ZEString" ||
-		ClassName == "ZEVector2" ||
-		ClassName == "ZEVector3" ||
-		ClassName == "ZEVector4" ||
-		ClassName == "ZEQuaternion" ||
-		ClassName == "ZEMatrix3x3" ||
-		ClassName == "ZEMatrix4x4")
-	{
-		IsBuiltInTypeFound = true;
-	}
-
-	if(!IsBuiltInTypeFound && !CheckClass(Class))
+	bool BuiltInClass = CheckBuiltInClass(Class);
+	if (!BuiltInClass && !CheckClass(Class))
 		return;
 	
 	ZEMCClass* ClassData = FindClass(Class->getNameAsString().c_str());
@@ -236,16 +253,20 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 
 	ClassData->Name = Class->getNameAsString();
 	ClassData->Hash = ClassData->Name.Hash();
+
 	ClassData->HasCreateInstanceMethod = false;
+	ClassData->HasPublicDestroyMethod = false;
+
 	ClassData->HasPublicCopyConstructor = true;
 	ClassData->HasPublicDefaultConstructor = true;
 	ClassData->HasPublicDestructor = true;
+	ClassData->HasPublicAssignmentOperator = true;
+	
 	ClassData->IsAbstract = Class->isAbstract();
-	ClassData->IsBuiltInType = IsBuiltInTypeFound;
+	ClassData->IsBuiltInClass = BuiltInClass;
 	ClassData->IsForwardDeclared = false;
-	ClassData->IsBuiltInType = IsBuiltInTypeFound;
 
-	if (!ClassData->IsBuiltInType)
+	if (!ClassData->IsBuiltInClass)
 	{
 		for(CXXRecordDecl::base_class_iterator CurrentBaseClass = Class->bases_begin(), LastBaseClass = Class->bases_end(); CurrentBaseClass != LastBaseClass; ++CurrentBaseClass)
 		{
@@ -311,6 +332,6 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 		ClassData->Methods[I]->ID = I;
 	}
 
-	if (Compiler->getSourceManager().getFileID(Class->getLocation()) == Compiler->getSourceManager().getMainFileID())
+	if (CheckTargetDeclaration(Class))
 		Context->TargetClasses.Add(ClassData);
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProperty.h
+ Zinek Engine - ZEScriptManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,33 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PROPERTY_H__
-#define __ZE_PROPERTY_H__
+#include "ZEScriptManager.h"
+#include "ZEMeta\ZEProvider.h"
+#include "ZEModules\ZEAngelScript\ZEAngelScriptEngine.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEType.h"
-
-class ZEClass;
-struct ZEMetaAttribute;
-struct ZEEnum;
-
-struct ZEProperty
+enum ZEClassRegisterState
 {
-	ZESize				ID;
-	ZEClass*			MemberOf;
-
-	const char*			Name;
-	ZEUInt32			Hash;
-	void*				OffsetOrAddress;
-	ZEType				Type;
-
-	bool				IsGenerated;
-	bool				IsContainer;
-	bool				IsStatic;
-
-	ZEMetaAttribute*	Attributes;
-	ZESize				AttributeCount;
+	ZE_CRS_NOT_REGISTERED,
+	ZE_CRS_REGISTERED,
+	ZE_CRS_ERROR_OCCURED
 };
 
-#endif
+void ZEScriptManager::InitializeEngine(ZEScriptEngine* Engine)
+{
+	ZEProvider* Provider = ZEProvider::GetInstance();
+	const ZEArray<ZEClass*>& Classes = Provider->GetClasses();
+
+	for (ZESize I = 0; I < Classes.GetCount(); I++)
+		Engine->RegisterClass(Classes[I]);
+}
+
+bool ZEScriptManager::InitializeSelf()
+{
+	Engines.Add(ZEAngelScriptEngine::CreateInstance());
+	Engines[0]->Initialize();
+	return true;
+}
+
+bool ZEScriptManager::DeinitializeSelf()
+{
+	for (ZESize I = 0; I < Engines.GetCount(); I++)
+		Engines[I]->Destroy();
+
+	Engines.Clear();
+	return true;
+}

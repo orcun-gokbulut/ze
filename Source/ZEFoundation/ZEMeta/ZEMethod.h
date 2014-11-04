@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaModuleRegister.h
+ Zinek Engine - ZEMethod.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,19 +34,86 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_META_MODULE_REGISTER_H__
-#define __ZE_META_MODULE_REGISTER_H__
+#ifndef __ZE_METHOD_H__
+#define __ZE_METHOD_H__
 
 #include "ZETypes.h"
+#include "ZEType.h"
 
-class ZEMetaRegister;
+class ZEClass;
+struct ZEAttribute;
 
-class ZEMetaModuleRegister
+enum ZEMetaOperatorType
 {
-	public:
-		virtual ZEMetaRegister**	GetRegisters() = 0;
-		virtual ZESize				GetRegisterCount() = 0;
+	ZE_MOT_NONE,
+	ZE_MOT_ADDITION,
+	ZE_MOT_ADDITION_ASSIGNMENT,
+	ZE_MOT_SUBTRACTION,
+	ZE_MOT_SUBSTRACTION_ASSIGNMENT,
+	ZE_MOT_MULTIPLICATION,
+	ZE_MOT_MULTIPLICATION_ASSIGNMENT,
+	ZE_MOT_DIVISION,
+	ZE_MOT_DIVISION_ASSIGNMENT,
+	ZE_MOT_MODULO,
+	ZE_MOT_MODULO_ASSIGNMENT,
+	ZE_MOT_INCREMENT,
+	ZE_MOT_DECREMENT,
 
+	ZE_MOT_LOGICAL_NOT,
+	ZE_MOT_LOGICAL_AND,
+	ZE_MOT_LOGICAL_OR,
+
+	ZE_MOT_BITWISE_AND,
+	ZE_MOT_BITWISE_AND_ASSIGNMENT,
+	ZE_MOT_BITWISE_OR,
+	ZE_MOT_BITWISE_OR_ASSIGNMENT,
+	ZE_MOT_BITWISE_XOR,
+	ZE_MOT_BITWISE_XOR_ASSIGNMENT,
+	ZE_MOT_LEFT_SHIFT,
+	ZE_MOT_LEFT_SHIFT_ASSIGNMENT,
+	ZE_MOT_RIGHT_SHIFT,
+	ZE_MOT_RIGHT_SHIFT_ASSIGNMENT,
+
+	ZE_MOT_ASSIGNMENT,
+	ZE_MOT_EQUAL,
+	ZE_MOT_NOT_EQUAL,
+	ZE_MOT_LESS,
+	ZE_MOT_LESS_EQUAL,
+	ZE_MOT_GREATER,
+	ZE_MOT_GREATER_AND_EQUAL,
+
+	ZE_MOT_FUNCTION_CALL,
+	ZE_MOT_ARRAY_SUBSCRIPT
+};
+
+struct ZEMethodParameter
+{
+	const char*			Name;
+	ZEType				Type;
+};
+
+struct ZEMethod
+{
+	ZESize				Id;
+	const char*			Name;
+	ZEUInt32			Hash;
+
+	ZEClass*			MemberOf;
+	void*				MethodPtr;
+
+	bool				IsConst;
+	bool				IsEvent;
+	bool				IsVirtual;
+	bool				IsStatic;
+	bool				IsOperator;
+
+	ZEMetaOperatorType	OperatorType;
+	ZEType				ReturnType;
+	ZEMethodParameter*	Parameters;
+	ZESize				ParameterCount;
+
+	ZEAttribute*	Attributes;
+	ZESize				AttributeCount;
 };
 
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETypedValue.h
+ Zinek Engine - ZEScriptObject.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,52 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-///////////////////////////////////////////////////////////////
-//  Orcun's Data Structres Version 2.0 (Zinek Engine)        //
-// --------------------------------------------------------- //
-//  Copyrights (C) 2005-2007,  Y. Orçun GÖKBULUT			 //
-//  All rights reserved.									 //
-///////////////////////////////////////////////////////////////
+#include "ZEMeta\ZEObject.h"
+#include "ZEScriptEngine.h"
 
-#pragma once
-#ifndef __ZE_TYPED_VARIANT_H__
-#define __ZE_TYPED_VARIANT_H__
-
-#pragma warning(push)
-#pragma warning(disable:4482)
-
-#include "ZEValue.h"
-#include "ZETypes.h"
-
-class ZETypedValue : public ZEValue
+class ZEScriptObject : public ZEObject
 {
 	public:
-		void		SetString		(char *NewValue);
-		void		SetInteger		(ZEInt NewValue);
-		void		SetFloat		(float NewValue);
-		void		SetBoolean		(bool NewValue);
-		void		SetValue		(const ZEValue& NewValue);
-		void		SetTypedValue	(const ZETypedValue& NewValue);
+		virtual ZEClass* GetClass();
+		virtual ZEScriptEngine* GetScriptEngine();
 
-		void		operator=		(ZEValue& NewValue);
-		void		operator=		(ZETypedValue& NewValue);
-		void		operator=		(char* NewValue);
-		void		operator=		(ZEInt NewValue);
-		void		operator=		(float NewValue);
-		void		operator=		(bool NewValue);
-
-
-					ZETypedValue	();
-					ZETypedValue	(ZETypedValue& InitialType);
-					ZETypedValue	(ZEValue& InitialValue);
-					ZETypedValue	(char* InitialValue);	
-					ZETypedValue	(ZEInt InitialValue);
-					ZETypedValue	(float InitialValue);
-					ZETypedValue	(bool InitialValue);
-
-					~ZETypedValue();
-				
+		// ZEClass 
 };
-
-#pragma warning(pop)
-#endif

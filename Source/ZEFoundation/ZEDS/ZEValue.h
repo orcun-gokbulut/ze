@@ -41,7 +41,6 @@
 #pragma warning(disable:4482)
 
 #include "ZETypes.h"
-#include "ZESerialization/ZESerializable.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
@@ -82,7 +81,7 @@ class ZEVector3;
 class ZEVector4;
 class ZEObject;
 
-class ZEValue : public ZESerializable
+class ZEValue
 {
 	public:
 		struct ZEValueValue

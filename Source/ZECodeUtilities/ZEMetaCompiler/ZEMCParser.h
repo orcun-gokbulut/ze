@@ -64,6 +64,16 @@ class ZEMCParser
 		bool CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class);
 		bool CheckClassHasZEObjectMacro(CXXRecordDecl* Class);
 		bool CheckClass(CXXRecordDecl* Class);
+		bool CheckBuiltInClass(CXXRecordDecl* Class);
+		bool CheckTargetDeclaration(Decl* Declaration);
+
+		// Memory Management
+		void CheckNonPublicDefaultContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
+		void CheckNonPublicDefaultCopyContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
+		void CheckNonPublicDefaultAssignmentOperator(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
+		void CheckNonPublicDestructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
+		void CheckCreateInstanceMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
+		void CheckDestroyMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 
 		// Attributes
 		bool ParseAttribute(ZEMCAttribute& Attribute, const AnnotateAttr* ClangAttribute);

@@ -38,7 +38,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEType.h"
-#include "ZEMeta/ZEReference.h"
+#include "ZEDS/ZEReference.h"
 
 #include "ZEMeta/ZEClass.h"
 #include "ZEMeta/ZEMethod.h"

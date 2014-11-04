@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEOptionManager.h
+ Zinek Engine - ZEProperty.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,57 +34,32 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_OPTION_MANAGER_H__
-#define __ZE_OPTION_MANAGER_H__
+#ifndef __ZE_PROPERTY_H__
+#define __ZE_PROPERTY_H__
 
 #include "ZETypes.h"
-#include "ZEOption.h"
-#include "ZECommand.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEOptionSection.h"
-#include "ZECommandSection.h"
-#include "ZEDS/ZEValue.h"
-#include "ZEDS/ZEFastDelegate.h"
+#include "ZEType.h"
 
-class ZEOptionManager
+class ZEClass;
+struct ZEAttribute;
+struct ZEEnum;
+
+struct ZEProperty
 {
-	friend class ZECore;
-	private:
-		ZECommandSection			Commands;
-		ZEArray<ZEOptionSection*>	Sections;
+	ZESize				ID;
+	ZEClass*			MemberOf;
 
-		bool						MatchSet(char* Line, char* Match);
-		void						MatchOption(char* Line, char* MatchName, char* MatchValue);
+	const char*			Name;
+	ZEUInt32			Hash;
+	void*				OffsetOrAddress;
+	ZEType				Type;
 
-		bool						LoadCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						SaveCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						ListSectionsCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						ListOptionsCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						CommitChangesCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						ResetChangesCommand(ZECommand* Command, const ZECommandParameterList* Params);
+	bool				IsGenerated;
+	bool				IsContainer;
+	bool				IsStatic;
 
-									ZEOptionManager();
-									~ZEOptionManager();
-
-	public:
-		bool						RegisterSection(ZEOptionSection* Ref);
-		bool						UnregisterSection(ZEOptionSection* Ref);
-		
-		ZESize						GetNumberOfSections();
-		
-		ZEOptionSection*			GetSection(const ZEString& Name);
-		ZEOptionSection*			GetSection(ZESize Index);
-
-		ZEOption*					GetOption(const ZEString& SectionName, const ZEString& Name);
-
-		void						Save(const ZEString& FileName);
-		void						Load(const ZEString& FileName);
-		void						ParseParameters(const ZEString& Parameters);
-		
-		void						CommitChanges();
-		void						ResetChanges();
-
-		static ZEOptionManager*		GetInstance();
+	ZEAttribute*	Attributes;
+	ZESize				AttributeCount;
 };
 
 #endif

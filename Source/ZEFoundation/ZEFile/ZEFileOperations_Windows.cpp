@@ -43,87 +43,82 @@
  
 bool ZEFileOperations::CreateFolder(const ZEString& DestinationParentPath, const ZEString& Name)
 {
-	ZEString Path = ZEPathManager::GetFinalPath(DestinationParentPath) + "\\" + Name;
+	ZEString Path = ZEPathManager::GetRealPath(DestinationParentPath) + "\\" + Name;
 
 	return CreateDirectoryW(Path.ToWCString(), NULL);
 }
 
-bool ZEFileOperations::Rename(const ZEString& Name, ZEFileInfo* File, bool OverwriteIfExists)
+bool ZEFileOperations::Rename(const ZEString& Name, const ZEFileInfo& File, bool OverwriteIfExists)
 {
-	ZEString ExistingPath = File->GetPath();
+	ZEString ExistingPath = File.GetPath();
 	ZEString NewPath = ZEFileInfo::GetParentDirectory(ExistingPath) + "\\" + Name;
 
 	if (OverwriteIfExists)
+	{
 		if (ZEFileUtils::IsFile(NewPath))
 		{
 			ZEFileInfo ExistingFile(NewPath);
-			Delete(&ExistingFile);
+			Delete(ExistingFile);
 		}
-
-	if (MoveFileW(ExistingPath.ToWCString(), NewPath.ToWCString()))
-	{
-		File->SetPath(NewPath);
-		return true;
 	}
 
-	return false;
-}
-
-bool ZEFileOperations::Rename(const ZEString& Name, ZEDirectoryInfo* Folder)
-{
-	ZEString ExistingPath = Folder->GetPath();
-	ZEString NewPath = ZEDirectoryInfo::GetParentDirectory(ExistingPath) + "\\" + Name;
-
-	if(ZEFileUtils::IsDirectory(NewPath))
+	if (!MoveFileW(ExistingPath.ToWCString(), NewPath.ToWCString()))
 		return false;
 
-	if (MoveFileW(ExistingPath.ToWCString(), NewPath.ToWCString()))
-	{
-		Folder->SetPath(NewPath);
-		return true;
-	}
-	
-	return false;
+	return true;
 }
 
-bool ZEFileOperations::Copy(const ZEString& DestinationParentPath, ZEFileInfo* File, bool OverwriteIfExists)
+bool ZEFileOperations::Rename(const ZEString& Name, const ZEDirectoryInfo& Folder)
 {
-	ZEString ExistingPath = File->GetPath();
-	ZEString NewPath = ZEPathManager::GetFinalPath(DestinationParentPath) + "\\" + File->GetName();
+	ZEString ExistingPath = Folder.GetPath();
+	ZEString NewPath = ZEDirectoryInfo::GetParentDirectory(ExistingPath) + "\\" + Name;
+
+	if (ZEFileUtils::IsDirectory(NewPath))
+		return false;
+
+	if (!MoveFileW(ExistingPath.ToWCString(), NewPath.ToWCString()))
+		return false;
+	
+	return true;
+}
+
+bool ZEFileOperations::Copy(const ZEString& DestinationParentPath, const ZEFileInfo& File, bool OverwriteIfExists)
+{
+	ZEString ExistingPath = File.GetPath();
+	ZEString NewPath = ZEPathManager::GetRealPath(DestinationParentPath) + "\\" + File.GetName();
 
 	if (OverwriteIfExists)
+	{
 		if (ZEFileUtils::IsFile(NewPath))
 		{
 			ZEFileInfo ExistingFile(NewPath);
-			Delete(&ExistingFile);
+			Delete(ExistingFile);
 		}
+	}
 
 	return CopyFileExW(ExistingPath.ToWCString(), NewPath.ToWCString(), NULL, NULL, NULL, COPY_FILE_FAIL_IF_EXISTS);
 
 }
 
-bool ZEFileOperations::Copy(const ZEString& DestinationParentPath, ZEDirectoryInfo* Folder)
+bool ZEFileOperations::Copy(const ZEString& DestinationParentPath, const ZEDirectoryInfo& Folder)
 {
-	ZEArray<ZEFileInfo*>* Files = Folder->GetFileList();
-	ZEInt FileCount = Files->GetCount();
+	ZEArray<ZEFileInfo> Files = Folder.GetFileList();
+	ZEInt FileCount = Files.GetCount();
 
-	ZEArray<ZEDirectoryInfo*>* SubFolders = Folder->GetDirectoryList();
-	ZEInt SubFolderCount = SubFolders->GetCount();
+	ZEArray<ZEDirectoryInfo> SubFolders = Folder.GetDirectoryList();
+	ZEInt SubFolderCount = SubFolders.GetCount();
 	
-	ZEString NewPath = ZEPathManager::GetFinalPath(DestinationParentPath) + "\\" + Folder->GetName();
+	ZEString NewPath = ZEPathManager::GetRealPath(DestinationParentPath) + "\\" + Folder.GetName();
 
-	if(!(CreateFolder(DestinationParentPath, Folder->GetName())))
+	if (!CreateFolder(DestinationParentPath, Folder.GetName()))
 		return false;
 
 	for (ZEInt I = 0; I < FileCount; I++)
 	{
-		if (!(ZEFileOperations::Copy(NewPath, (*Files)[I])))
+		if (!(ZEFileOperations::Copy(NewPath, Files[I])))
 		{
-			ZEDirectoryInfo* BackTrackFolder = new ZEDirectoryInfo(NewPath);
+			ZEDirectoryInfo BackTrackFolder(NewPath);
 			Delete(BackTrackFolder);
-			delete BackTrackFolder;
-			delete Files;
-			delete SubFolders;
 
 			return false;
 		}
@@ -131,115 +126,81 @@ bool ZEFileOperations::Copy(const ZEString& DestinationParentPath, ZEDirectoryIn
 
 	for (ZEInt I = 0; I < SubFolderCount; I++)
 	{
-		ZEString Name = (*SubFolders)[I]->GetName();
+		ZEString Name = SubFolders[I].GetName();
 
 		if((Name == ".") || (Name == ".."))
 			continue;
 
-		if (!(ZEFileOperations::Copy(NewPath, (*SubFolders)[I])))
+		if (!ZEFileOperations::Copy(NewPath, SubFolders[I]))
 		{
-			ZEDirectoryInfo* BackTrackFolder = new ZEDirectoryInfo(NewPath);
-			Delete(BackTrackFolder);
-			delete BackTrackFolder;
-			delete Files;
-			delete SubFolders;
-
+			Delete(ZEDirectoryInfo(NewPath));
 			return false;
 		}
 	}
-
-	delete Files;
-	delete SubFolders;
 
 	return true;
 }
 
-bool ZEFileOperations::Move(const ZEString& DestinationParentPath, ZEFileInfo* File, bool OverwriteIfExists)
+bool ZEFileOperations::Move(const ZEString& DestinationParentPath, const ZEFileInfo& File, bool OverwriteIfExists)
 {
-	ZEString ExistingPath = File->GetPath();
-	ZEString NewPath = ZEPathManager::GetFinalPath(DestinationParentPath) + "\\" + File->GetName();
+	ZEString ExistingPath = File.GetPath();
+	ZEString NewPath = ZEPathManager::GetRealPath(DestinationParentPath) + "\\" + File.GetName();
 
 	if (OverwriteIfExists)
-		if (ZEFileUtils::IsFile(NewPath))
-		{
-			ZEFileInfo ExistingFile(NewPath);
-			Delete(&ExistingFile);
-		}
-
-	if (MoveFileExW(ExistingPath.ToWCString(), NewPath.ToWCString(), MOVEFILE_WRITE_THROUGH))
 	{
-		File->SetPath(NewPath);
-
-		return true;
+		if (ZEFileUtils::IsFile(NewPath))
+			Delete(ZEFileInfo(NewPath));
 	}
 
-	return false;
+	if (!MoveFileExW(ExistingPath.ToWCString(), NewPath.ToWCString(), MOVEFILE_WRITE_THROUGH))
+		return false;
+
+	return true;
 }
 
-bool ZEFileOperations::Move(const ZEString& DestinationParentPath, ZEDirectoryInfo* Folder)
+bool ZEFileOperations::Move(const ZEString& DestinationParentPath, const ZEDirectoryInfo& Folder)
 {
-	ZEString ExistingPath = Folder->GetPath();
-	ZEString NewPath = ZEPathManager::GetFinalPath(DestinationParentPath) + "\\" + Folder->GetName();
+	ZEString ExistingPath = Folder.GetPath();
+	ZEString NewPath = ZEPathManager::GetRealPath(DestinationParentPath) + "\\" + Folder.GetName();
 
 	if(ZEFileUtils::IsDirectory(NewPath))
 		return false;
 
-	if (MoveFileExW(ExistingPath.ToWCString(), NewPath.ToWCString(), MOVEFILE_WRITE_THROUGH))
-	{
-		Folder->SetPath(NewPath);
+	if (!MoveFileExW(ExistingPath.ToWCString(), NewPath.ToWCString(), MOVEFILE_WRITE_THROUGH))
+		return false;
 
-		return true;
-	}
-
-	return false;
+	return true;
 }
 
-bool ZEFileOperations::Delete(ZEFileInfo* File)
+bool ZEFileOperations::Delete(const ZEFileInfo& File)
 {
-	ZEString Path = File->GetPath();
-
-	return DeleteFileW(Path.ToWCString());
+	return DeleteFileW(File.GetPath().ToWCString());
 }
 
-bool ZEFileOperations::Delete(ZEDirectoryInfo* Folder)
+bool ZEFileOperations::Delete(const ZEDirectoryInfo& Folder)
 {
-	ZEArray<ZEFileInfo*>* Files = Folder->GetFileList();
-	ZEInt FileCount = Files->GetCount();
+	ZEArray<ZEFileInfo> Files = Folder.GetFileList();
+	ZEInt FileCount = Files.GetCount();
 
-	ZEArray<ZEDirectoryInfo*>* SubFolders = Folder->GetDirectoryList();
-	ZEInt SubFolderCount = SubFolders->GetCount();
+	ZEArray<ZEDirectoryInfo> SubFolders = Folder.GetDirectoryList();
+	ZEInt SubFolderCount = SubFolders.GetCount();
 
 	for (ZEInt I = 0; I < FileCount; I++)
 	{
-		if (!(ZEFileOperations::Delete((*Files)[I])))
-		{
-			delete Files;
-			delete SubFolders;
-
+		if (!ZEFileOperations::Delete(Files[I]))
 			return false;
-		}
 	}
 
 	for (ZEInt I = 0; I < SubFolderCount; I++)
 	{
-		ZEString Name = (*SubFolders)[I]->GetName();
+		ZEString Name = SubFolders[I].GetName();
 
 		if((Name == ".") || (Name == ".."))
 			continue;
 
-		if (!(ZEFileOperations::Delete((*SubFolders)[I])))
-		{
-			delete Files;
-			delete SubFolders;
-
+		if (!ZEFileOperations::Delete(SubFolders[I]))
 			return false;
-		}
 	}
 
-	delete Files;
-	delete SubFolders;
-
-	ZEString FolderPath = Folder->GetPath();
-
-	return RemoveDirectoryW(FolderPath.ToWCString());
+	return RemoveDirectoryW(Folder.GetPath().ToWCString());
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaAttribute.cpp
+ Zinek Engine - ZEScriptManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMetaAttribute.h"
+#pragma once
+#ifndef __ZE_SCRIPT_MANAGER_H__
+#define __ZE_SCRIPT_MANAGER_H__
+
+#include "ZECore\ZEModule.h"
+#include "ZEDS\ZEArray.h"
+
+class ZEScriptEngine;
+
+class ZEScriptManager : public ZEModule
+{
+	private:
+		ZEArray<ZEScriptEngine*> Engines;
+
+		void			InitializeEngine(ZEScriptEngine* Engine);
+
+		bool			InitializeSelf();
+		bool			DeinitializeSelf();
+
+	public:
+		bool			LoadScript(const char* ScriptName, const char* ScriptCode);
+		bool			LoadScriptFile(const char* ScriptFile);
+		bool			LoadScripts(const char* Path, bool Recursive);
+};
+
+#endif

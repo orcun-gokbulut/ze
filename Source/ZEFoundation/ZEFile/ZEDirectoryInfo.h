@@ -50,11 +50,7 @@ class ZEFileInfo;
 class ZEDirectoryInfo
 {
 	private:
-		ZEKnownPath					Root;
-		ZEString					Name;
 		ZEString					Path;
-		ZEFileTime					Creation;
-		ZEFileTime					Modification;
 
 	public:
 									ZEDirectoryInfo();
@@ -65,11 +61,13 @@ class ZEDirectoryInfo
 		const ZEString&				GetPath() const;
 
 		const ZEString&				GetName() const;
-		bool						GetCreationDate(ZEFileTime& Time);
-		bool						GetModificationDate(ZEFileTime& Time);
+		ZEPathRoot					GetRoot() const;
 
-		ZEArray<ZEFileInfo*>*		GetFileList();
-		ZEArray<ZEDirectoryInfo*>*	GetDirectoryList();
+		ZEFileTime					GetCreationTime() const;
+		ZEFileTime					GetModificationTime() const;
+
+		ZEArray<ZEFileInfo>			GetFileList() const;
+		ZEArray<ZEDirectoryInfo>	GetDirectoryList() const;
 
 		static bool					IsDirectory(const ZEString& DirectoryPath);
 		static ZEString				GetDirectoryName(const ZEString& DirectoryPath);

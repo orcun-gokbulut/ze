@@ -54,7 +54,7 @@ class ZEPathUtils
 
 		static ZEString				GetSimplifiedPath(const ZEString& Path, bool StackDotDot);
 
-		static ZEKnownPath			SearchForSymbol(ZEString* RelativePart, const ZEString& SymbolicPath);
+		static ZEPathRoot			SearchForSymbol(ZEString* RelativePart, const ZEString& SymbolicPath);
 
 		static bool					CheckPathContainsRoot(const ZEString& RootPath, const ZEString& Path);
 		

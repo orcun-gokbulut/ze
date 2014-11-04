@@ -148,7 +148,11 @@ void ZEMCGenerator::GenerateClassGetProperties_Properties(ZEMCClass* CurrentClas
 		WriteToFile("\t\t{");
 
 		WriteToFile("%d, ", CurrentProperty->ID);
-		WriteToFile("%s::Class(), ", CurrentClass->Name.ToCString());
+		if (!CurrentClass->IsBuiltInClass)
+			WriteToFile("%s::Class(), ", CurrentClass->Name.ToCString());
+		else
+			WriteToFile("NULL, ");
+
 		WriteToFile("\"%s\", ",	CurrentProperty->Name.ToCString());
 		WriteToFile("%#x, ", CurrentProperty->Name.Hash());
 
@@ -244,7 +248,7 @@ void ZEMCGenerator::GenerateClassGetPropertyId(ZEMCClass* CurrentClass)
 			"\t\t//{Hash, ID, PropertyName}\n", 
 			sortedProperties.GetCount());
 		
-		for(ZESize I = 0; I < sortedProperties.GetCount(); I++)
+		for (ZESize I = 0; I < sortedProperties.GetCount(); I++)
 		{
 			ZEMCProperty* CurrentProperty = sortedProperties[I];
 			WriteToFile( 
@@ -293,186 +297,168 @@ void ZEMCGenerator::GenerateClassGetPropertyCount(ZEMCClass* CurrentClass)
 
 void ZEMCGenerator::GenerateClassSetProperty(ZEMCClass* CurrentClass)
 {
-	if (CurrentClass->Properties.GetCount() == 0)
-	{
-		WriteToFile(
-			"bool %sClass::SetProperty(ZEObject* Object, ZESize PropertyId, const ZEVariant& Value)\n"
-			"{\n"
-			"\treturn false;\n"
-			"}\n\n", CurrentClass->Name.ToCString());
-		
-		return;
-	}
-
 	WriteToFile(
 		"bool %sClass::SetProperty(ZEObject* Object, ZESize PropertyId, const ZEVariant& Value)\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
 
-	GenerateClassPropertyIdRangeCheck(CurrentClass);
-	GenerateCastedObject(CurrentClass);
-
-	WriteToFile(
-		"\tswitch(PropertyId)\n"
-		"\t{\n");
-
-	for (ZESize I = 0; I < CurrentClass->Properties.GetCount(); I++)
+	if (CurrentClass->Properties.GetCount() != 0)
 	{
-		ZEMCProperty* CurrentProperty = CurrentClass->Properties[I];
-		if (CurrentProperty->IsContainer)
-			continue;
+		GenerateClassPropertyIdRangeCheck(CurrentClass);
+		GenerateCastedObject(CurrentClass);
 
-		if (CurrentProperty->HasSetterGetter && CurrentProperty->Setter == "")
-			continue;
+		WriteToFile(
+			"\tswitch(PropertyId)\n"
+			"\t{\n");
 
-		else if (CurrentProperty->Type.BaseType == ZEMC_BT_OBJECT) // Not Supported Right Now
-			continue;
-		
-		WriteToFile("\t\tcase %d:\n", CurrentProperty->ID);
-
-		if (CurrentProperty->IsStatic)
+		for (ZESize I = 0; I < CurrentClass->Properties.GetCount(); I++)
 		{
-			if (CurrentProperty->HasSetterGetter)
+			ZEMCProperty* CurrentProperty = CurrentClass->Properties[I];
+			if (CurrentProperty->IsContainer)
+				continue;
+
+			if (CurrentProperty->HasSetterGetter && CurrentProperty->Setter == "")
+				continue;
+
+			else if (CurrentProperty->Type.BaseType == ZEMC_BT_OBJECT) // Not Supported Right Now
+				continue;
+		
+			WriteToFile("\t\tcase %d:\n", CurrentProperty->ID);
+
+			if (CurrentProperty->IsStatic)
 			{
-				WriteToFile("\t\t\t%s::%s(", 
-					CurrentClass->Name.ToCString(),
-					CurrentProperty->Setter.ToCString());
+				if (CurrentProperty->HasSetterGetter)
+				{
+					WriteToFile("\t\t\t%s::%s(", 
+						CurrentClass->Name.ToCString(),
+						CurrentProperty->Setter.ToCString());
+				}
+				else
+				{
+					WriteToFile("\t\t\t%s::%s = ",
+						CurrentClass->Name.ToCString(),
+						CurrentProperty->Name.ToCString());
+				}
 			}
 			else
 			{
-				WriteToFile("\t\t\t%s::%s = ",
-					CurrentClass->Name.ToCString(),
-					CurrentProperty->Name.ToCString());
+				if (CurrentProperty->HasSetterGetter)
+				{
+					WriteToFile("\t\t\tCastedObject->%s(",
+						CurrentProperty->Setter.ToCString());
+				}
+				else
+				{
+					WriteToFile("\t\t\tCastedObject->%s = ",
+						CurrentProperty->Name.ToCString());
+				}
 			}
-		}
-		else
-		{
+
+			ZEString VariantCast;
+			ZEString VariantPostfix = GenerateVariantPostfix(CurrentProperty->Type, VariantCast);
+			WriteToFile("%sValue.Get%s()", VariantCast.ToCString(), VariantPostfix.ToCString());
+		
 			if (CurrentProperty->HasSetterGetter)
 			{
-				WriteToFile("\t\t\tCastedObject->%s(",
-					CurrentProperty->Setter.ToCString());
+				WriteToFile(");\n");
 			}
 			else
 			{
-				WriteToFile("\t\t\tCastedObject->%s = ",
-					CurrentProperty->Name.ToCString());
+				WriteToFile(";\n");
 			}
+
+			WriteToFile("\t\t\treturn true;\n");
 		}
 
-		ZEString VariantCast;
-		ZEString VariantPostfix = GenerateVariantPostfix(CurrentProperty->Type, VariantCast);
-		WriteToFile("%sValue.Get%s()", VariantCast.ToCString(), VariantPostfix.ToCString());
-		
-		if (CurrentProperty->HasSetterGetter)
-		{
-			WriteToFile(");\n");
-		}
-		else
-		{
-			WriteToFile(";\n");
-		}
-
-		WriteToFile("\t\t\treturn true;\n");
+		WriteToFile("\t}\n");
 	}
 
-	WriteToFile(
-		"\t\tdefault:\n"
-		"\t\t\treturn false;\n"
-		"\t}\n"
+	WriteToFile("\treturn false;\n"
 		"}\n\n");
 }
 
 void ZEMCGenerator::GenerateClassGetProperty(ZEMCClass* CurrentClass)
 {
-	if (CurrentClass->Properties.GetCount() == 0)
-	{
-		WriteToFile(
-			"bool %sClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)\n"
-			"{\n"
-			"\treturn false;\n"
-			"}\n\n", CurrentClass->Name.ToCString());
-		return;
-	}
-
 	WriteToFile(
 		"bool %sClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)\n"
-		"{\n",
+		"{\n", 
 		CurrentClass->Name.ToCString());
 
-	GenerateClassPropertyIdRangeCheck(CurrentClass);
-	GenerateCastedObject(CurrentClass);
-
-	WriteToFile(
-		"\tswitch(PropertyId)\n"
-		"\t{\n");
-
-	for (ZESize I = 0; I < CurrentClass->Properties.GetCount(); I++)
+	if (CurrentClass->Properties.GetCount() != 0)
 	{
-		ZEMCProperty* CurrentProperty = CurrentClass->Properties[I];
-		if (CurrentProperty->IsContainer)
-			continue;
+		GenerateClassPropertyIdRangeCheck(CurrentClass);
+		GenerateCastedObject(CurrentClass);
 
-		if (CurrentProperty->HasSetterGetter && CurrentProperty->Getter == "")
-			continue;
+		WriteToFile(
+			"\tswitch(PropertyId)\n"
+			"\t{\n");
 
-		else if (CurrentProperty->Type.BaseType == ZEMC_BT_OBJECT) // Not Supported Right Now
-			continue;
-
-		WriteToFile("\t\tcase %d:\n", CurrentProperty->ID);
-		WriteToFile("\t\t\tValue = ");
-
-		if (CurrentProperty->IsStatic)
+		for (ZESize I = 0; I < CurrentClass->Properties.GetCount(); I++)
 		{
-			if (!CurrentProperty->Getter.IsEmpty())
+			ZEMCProperty* CurrentProperty = CurrentClass->Properties[I];
+			if (CurrentProperty->IsContainer)
+				continue;
+
+			if (CurrentProperty->HasSetterGetter && CurrentProperty->Getter == "")
+				continue;
+
+			else if (CurrentProperty->Type.BaseType == ZEMC_BT_OBJECT) // Not Supported Right Now
+				continue;
+
+			WriteToFile("\t\tcase %d:\n", CurrentProperty->ID);
+			WriteToFile("\t\t\tValue = ");
+
+			if (CurrentProperty->IsStatic)
 			{
-				WriteToFile("%s::%s();\n",
-					CurrentClass->Name.ToCString(),
-					CurrentProperty->Getter.ToCString());
+				if (!CurrentProperty->Getter.IsEmpty())
+				{
+					WriteToFile("%s::%s();\n",
+						CurrentClass->Name.ToCString(),
+						CurrentProperty->Getter.ToCString());
+				}
+				else
+				{
+					WriteToFile("%s::%s;\n",
+						CurrentClass->Name.ToCString(),
+						CurrentProperty->Name.ToCString());
+				}
 			}
 			else
 			{
-				WriteToFile("%s::%s;\n",
-					CurrentClass->Name.ToCString(),
-					CurrentProperty->Name.ToCString());
+				if (CurrentProperty->HasSetterGetter)
+				{
+					WriteToFile("CastedObject->%s();\n",
+						CurrentProperty->Setter.ToCString());
+				}
+				else
+				{
+					WriteToFile("CastedObject->%s;\n",
+						CurrentProperty->Name.ToCString());
+				}
 			}
-		}
-		else
-		{
-			if (CurrentProperty->HasSetterGetter)
-			{
-				WriteToFile("CastedObject->%s();\n",
-					CurrentProperty->Setter.ToCString());
-			}
-			else
-			{
-				WriteToFile("CastedObject->%s;\n",
-					CurrentProperty->Name.ToCString());
-			}
+
+			WriteToFile("\t\t\treturn true;\n");
 		}
 
-		WriteToFile("\t\t\treturn true;\n");
+		WriteToFile("\t}\n");
 	}
 
 	WriteToFile(
-		"\t\tdefault:\n"
-		"\t\t\treturn false;\n"
-		"\t}\n"
+		"\treturn false;\n"
 		"}\n\n");
-	
 }
 
 void ZEMCGenerator::GenerateClassSetPropertyItem(ZEMCClass* CurrentClass)
 {
+	if (CurrentClass->IsBuiltInClass)
+		return;
+
 	WriteToFile(
 		"bool %sClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 
-	if (!HasContainerProperty(CurrentClass))
-	{
-		WriteToFile("\treturn false;\n");
-	}
-	else
+	if (HasContainerProperty(CurrentClass))
 	{
 		GenerateClassPropertyIdRangeCheck(CurrentClass);
 		GenerateCastedObject(CurrentClass);
@@ -517,16 +503,13 @@ void ZEMCGenerator::GenerateClassSetPropertyItem(ZEMCClass* CurrentClass)
 				");\n"
 				"\t\t\t return true;\n");
 		}
-	
 
-		WriteToFile(
-			"\t\tdefault:\n"
-			"\t\t\treturn false;\n"
-			"\t}\n");
+		WriteToFile("\t}\n");
 	}
 
-	WriteToFile("}\n\n");
-
+	WriteToFile(
+		"\treturn false;\n"
+		"}\n\n");
 }
 
 void ZEMCGenerator::GenerateClassGetPropertyItem(ZEMCClass* CurrentClass)
@@ -535,11 +518,7 @@ void ZEMCGenerator::GenerateClassGetPropertyItem(ZEMCClass* CurrentClass)
 		"bool %sClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)\n"
 		"{\n", CurrentClass->Name.ToCString());
 
-	if (!HasContainerProperty(CurrentClass))
-	{
-		WriteToFile("\treturn false;\n");
-	}
-	else
+	if (HasContainerProperty(CurrentClass))
 	{
 		GenerateClassPropertyIdRangeCheck(CurrentClass);
 		GenerateCastedObject(CurrentClass);
@@ -570,13 +549,12 @@ void ZEMCGenerator::GenerateClassGetPropertyItem(ZEMCClass* CurrentClass)
 			}
 		}
 
-		WriteToFile(
-			"\t\tdefault:\n"
-			"\t\t\treturn false;\n"
-			"\t}\n");
+		WriteToFile("\t}\n");
 	}
 
-	WriteToFile("}\n\n");
+	WriteToFile(
+		"\treturn false;\n"
+		"}\n\n");
 
 }
 
@@ -586,11 +564,7 @@ void ZEMCGenerator::GenerateClassAddItemToProperty(ZEMCClass* CurrentClass)
 		"bool %sClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)\n"
 		"{\n", CurrentClass->Name.ToCString());
 
-	if (!HasContainerProperty(CurrentClass))
-	{
-		WriteToFile("\treturn false;\n");
-	}
-	else
+	if (HasContainerProperty(CurrentClass))
 	{
 		GenerateClassPropertyIdRangeCheck(CurrentClass);
 		GenerateCastedObject(CurrentClass);
@@ -634,13 +608,12 @@ void ZEMCGenerator::GenerateClassAddItemToProperty(ZEMCClass* CurrentClass)
 		}
 
 
-		WriteToFile(
-			"\t\tdefault:\n"
-			"\t\t\treturn false;\n"
-			"\t}\n");
+		WriteToFile("\t}\n");
 	}
 
-	WriteToFile("}\n\n");
+	WriteToFile(
+		"\treturn false;\n"
+		"}\n\n");
 }
 
 void ZEMCGenerator::GenerateClassRemoveItemFromProperty(ZEMCClass* CurrentClass)
@@ -649,11 +622,7 @@ void ZEMCGenerator::GenerateClassRemoveItemFromProperty(ZEMCClass* CurrentClass)
 		"bool %sClass::RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize Index)\n"
 		"{\n", CurrentClass->Name.ToCString());
 
-	if (!HasContainerProperty(CurrentClass))
-	{
-		WriteToFile("\treturn false;\n");
-	}
-	else
+	if (HasContainerProperty(CurrentClass))
 	{
 		GenerateClassPropertyIdRangeCheck(CurrentClass);
 		GenerateCastedObject(CurrentClass);
@@ -687,14 +656,12 @@ void ZEMCGenerator::GenerateClassRemoveItemFromProperty(ZEMCClass* CurrentClass)
 		}
 
 
-		WriteToFile(
-			"\t\tdefault:\n"
-			"\t\t\treturn false;\n"
-			"\t}\n");
+		WriteToFile("\t}\n");
 	}
 
-	WriteToFile("}\n\n");
-
+	WriteToFile(
+		"\treturn false;\n"
+		"}\n\n");
 }
 
 void ZEMCGenerator::GenerateClassGetPropertyItemCount(ZEMCClass* CurrentClass)
@@ -703,11 +670,7 @@ void ZEMCGenerator::GenerateClassGetPropertyItemCount(ZEMCClass* CurrentClass)
 		"bool %sClass::GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& Count)\n"
 		"{\n", CurrentClass->Name.ToCString());
 
-	if (!HasContainerProperty(CurrentClass))
-	{
-		WriteToFile("\treturn false;\n");
-	}
-	else
+	if (HasContainerProperty(CurrentClass))
 	{
 		GenerateClassPropertyIdRangeCheck(CurrentClass);
 		GenerateCastedObject(CurrentClass);
@@ -738,11 +701,10 @@ void ZEMCGenerator::GenerateClassGetPropertyItemCount(ZEMCClass* CurrentClass)
 			}
 		}
 
-		WriteToFile(
-			"\t\tdefault:\n"
-			"\t\t\treturn false;\n"
-			"\t}\n");
+		WriteToFile("\t}\n");
 	}
 
-	WriteToFile("}\n\n");
+	WriteToFile(
+		"\treturn false;\n"
+		"}\n\n");
 }

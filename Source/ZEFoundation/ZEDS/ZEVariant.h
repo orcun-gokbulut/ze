@@ -45,8 +45,8 @@
 #include "ZEArray.h"
 #include "ZEList.h"
 #include "ZEValue.h"
-#include "ZEType.h"
-#include "ZETypeGenerator.h"
+#include "ZEMeta/ZEType.h"
+#include "ZEMeta/ZETypeGenerator.h"
 
 class ZEVector2;
 class ZEVector3;

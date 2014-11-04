@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaAttribute.h
+ Zinek Engine - ZEAttribute.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,26 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_META_ATTRIBUTE__
-#define __ZE_META_ATTRIBUTE__
+#ifndef __ZE_ATTRIBUTE_H__
+#define __ZE_ATTRIBUTE_H__
 
 #include "ZETypes.h"
 
 #ifdef ZE_META_COMPILER
-	#define ZE_META_ATTRIBUTE_INTERNAL(Value) __attribute__((annotate(Value)))
+	#define ZE_ATTRIBUTE_INTERNAL(Value) __attribute__((annotate(Value)))
 #else
-	#define ZE_META_ATTRIBUTE_INTERNAL(Value)
+	#define ZE_ATTRIBUTE_INTERNAL(Value)
 #endif
 
-#define ZE_META_ATTRIBUTE_0(Name) ZE_META_ATTRIBUTE_INTERNAL(#Name)
-#define ZE_META_ATTRIBUTE_1(Name, Parameter0) ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0)
-#define ZE_META_ATTRIBUTE_2(Name, Parameter0, Parameter1) ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1)
-#define ZE_META_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2) ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2)
-#define ZE_META_ATTRIBUTE_4(Name, Parameter0, Parameter1, Parameter2, Parameter3) ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2 "," #Parameter3)
-#define ZE_META_ATTRIBUTE_5(Name, Parameter0, Parameter1, Parameter2, Parameter3, Parameter4) ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2 "," #Parameter3  "," #Parameter4)
-#define ZE_META_ATTRIBUTE_6(Name, Parameter0, Parameter1, Parameter2, Parameter3, Parameter4, Parameter5) ZE_META_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2 "," #Parameter4  "," #Parameter5)
+#define ZE_ATTRIBUTE_0(Name) ZE_ATTRIBUTE_INTERNAL(#Name)
+#define ZE_ATTRIBUTE_1(Name, Parameter0) ZE_ATTRIBUTE_INTERNAL(#Name "," #Parameter0)
+#define ZE_ATTRIBUTE_2(Name, Parameter0, Parameter1) ZE_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1)
+#define ZE_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2) ZE_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2)
+#define ZE_ATTRIBUTE_4(Name, Parameter0, Parameter1, Parameter2, Parameter3) ZE_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2 "," #Parameter3)
+#define ZE_ATTRIBUTE_5(Name, Parameter0, Parameter1, Parameter2, Parameter3, Parameter4) ZE_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2 "," #Parameter3  "," #Parameter4)
+#define ZE_ATTRIBUTE_6(Name, Parameter0, Parameter1, Parameter2, Parameter3, Parameter4, Parameter5) ZE_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2 "," #Parameter4  "," #Parameter5)
 
-struct ZEMetaAttribute
+struct ZEAttribute
 {
 	const char*		Name;
 	const char**	Values;

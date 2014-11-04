@@ -35,9 +35,8 @@
 
 #include "ZEMCGenerator.h"
 #include "ZEMCContext.h"
-
-#include "ZEFile\ZEFileInfo.h"
 #include "ZEDS\ZEFormat.h"
+#include <stdarg.h>
 
 
 bool ZEMCGenerator::OpenFile()
@@ -52,11 +51,11 @@ bool ZEMCGenerator::OpenFile()
 void ZEMCGenerator::WriteToFile(const char* Format, ...)
 {
 	va_list Args;
-	va_start (Args, Format);
+	va_start(Args, Format);
 
 	vfprintf(OutputFile, Format, Args);
 
-	va_end (Args);
+	va_end(Args);
 }
 
 void ZEMCGenerator::CloseFile()
@@ -109,168 +108,19 @@ void ZEMCGenerator::GenerateHeading()
 	WriteToFile("//  ZEMetaCompiler auto generated ZEMeta file.  //\n");
 	WriteToFile("//      DO NOT EDIT (HACK) THIS FILE !!!        //\n");
 	WriteToFile("//////////////////////////////////////////////////\n");
-	WriteToFile("\n\n");
-
-	WriteToFile("#include \"%s\"\n", ZEFileInfo::GetFileName(Options->InputFileName).ToCString());
+	WriteToFile("\n");
+	WriteToFile("#include \"%s\"\n", Options->InputFileName.ToCString());
 	WriteToFile("#include \"ZEDS/ZEVariant.h\"\n");
 	WriteToFile("#include \"ZEDS/ZEReference.h\"\n");
-	WriteToFile("#include \"ZEScript/ZEScriptEngine.h\"\n");
+	WriteToFile("#include \"ZEMeta/ZEClass.h\"\n");
+	WriteToFile("#include \"ZEMeta/ZEBuiltIn.h\"\n");
+	WriteToFile("\n");
 	WriteToFile("#include <stddef.h>\n\n");
 }
 
 void ZEMCGenerator::GenerateEnding()
 {
 
-}
-
-const char* ZEMCGenerator::ConvertOperatorTypeToName(ZEMCMetaOperatorType OperatorType)
-{
-	switch (OperatorType)
-	{
-		case ZEMC_MOT_ADDITION:
-			return "opAddition";
-		case ZEMC_MOT_ADDITION_ASSIGNMENT:
-			return "opAdditionAssignment";
-		case ZEMC_MOT_INCREMENT:
-			return "opIncrement";
-		case ZEMC_MOT_SUBTRACTION:
-			return "opSubtraction";
-		case ZEMC_MOT_SUBSTRACTION_ASSIGNMENT:
-			return "opSubtractionAssignment";
-		case ZEMC_MOT_DECREMENT:
-			return "opDecrement";
-		case ZEMC_MOT_MULTIPLICATION:
-			return "opMultiplication";
-		case ZEMC_MOT_MULTIPLICATION_ASSIGNMENT:
-			return "opMultiplicationAssignment";
-		case ZEMC_MOT_DIVISION:
-			return "opDivision";
-		case ZEMC_MOT_DIVISION_ASSIGNMENT:
-			return "opDivisionAssignment";
-		case ZEMC_MOT_MODULO:
-			return "opModulo";
-		case ZEMC_MOT_MODULO_ASSIGNMENT:
-			return "opModuloAssignment";
-		case ZEMC_MOT_BITWISE_AND:
-			return "opBitwiseAnd";
-		case ZEMC_MOT_BITWISE_AND_ASSIGNMENT:
-			return "opBitwiseAndAssignment";
-		case ZEMC_MOT_LOGICAL_AND:
-			return "opLogicalAnd";
-		case ZEMC_MOT_BITWISE_OR:
-			return "opBitwiseOr";
-		case ZEMC_MOT_BITWISE_OR_ASSIGNMENT:
-			return "opBitwiseOrAssignment";
-		case ZEMC_MOT_LOGICAL_OR:
-			return "opLogicalOr";
-		case ZEMC_MOT_BITWISE_XOR:
-			return "opBitwiseXor";
-		case ZEMC_MOT_BITWISE_XOR_ASSIGNMENT:
-			return "opBitwiseXorAssignment";
-		case ZEMC_MOT_ASSIGNMENT:
-			return "opAssignment";
-		case ZEMC_MOT_EQUAL:
-			return "opEqual";
-		case ZEMC_MOT_NOT_EQUAL:
-			return "opNotEquals";
-		case ZEMC_MOT_LESS:
-			return "opLess";
-		case ZEMC_MOT_LESS_EQUAL:
-			return "opCmp";
-		case ZEMC_MOT_LEFT_SHIFT:
-			return "opLeftShift";
-		case ZEMC_MOT_LEFT_SHIFT_ASSIGNMENT:
-			return "opLeftShiftAssignment";
-		case ZEMC_MOT_GREATER:
-			return "opGreater";
-		case ZEMC_MOT_GREATER_AND_EQUAL:
-			return "opGreaterAndEqual";
-		case ZEMC_MOT_RIGHT_SHIFT:
-			return "opRightShift";
-		case ZEMC_MOT_RIGHT_SHIFT_ASSIGNMENT:
-			return "opRightShiftAssignment";
-		case ZEMC_MOT_FUNCTION_CALL:
-			return "opFunctionCall";
-		case ZEMC_MOT_ARRAY_SUBSCRIPT:
-			return "opArraySubscript";
-		default:
-			return "";
-	}
-}
-
-const char* ZEMCGenerator::ConvertOperatorTypeToString(ZEMCMetaOperatorType OperatorType)
-{
-	switch (OperatorType)
-	{
-		case ZEMC_MOT_ADDITION:
-			return "ZE_MOT_PLUS";
-		case ZEMC_MOT_ADDITION_ASSIGNMENT:
-			return "ZE_MOT_PLUSEQUAL";
-		case ZEMC_MOT_INCREMENT:
-			return "ZE_MOT_PLUSPLUS";
-		case ZEMC_MOT_SUBTRACTION:
-			return "ZE_MOT_MINUS";
-		case ZEMC_MOT_SUBSTRACTION_ASSIGNMENT:
-			return "ZE_MOT_MINUSEQUAL";
-		case ZEMC_MOT_DECREMENT:
-			return "ZE_MOT_MINUSMINUS";
-		case ZEMC_MOT_MULTIPLICATION:
-			return "ZE_MOT_STAR";
-		case ZEMC_MOT_MULTIPLICATION_ASSIGNMENT:
-			return "ZE_MOT_STAREQUAL";
-		case ZEMC_MOT_DIVISION:
-			return "ZE_MOT_SLASH";
-		case ZEMC_MOT_DIVISION_ASSIGNMENT:
-			return "ZE_MOT_SLASHEQUAL";
-		case ZEMC_MOT_MODULO:
-			return "ZE_MOT_PERCENT";
-		case ZEMC_MOT_MODULO_ASSIGNMENT:
-			return "ZE_MOT_PERCENTEQUAL";
-		case ZEMC_MOT_BITWISE_AND:
-			return "ZE_MOT_AMP";
-		case ZEMC_MOT_BITWISE_AND_ASSIGNMENT:
-			return "ZE_MOT_AMPEQUAL";
-		case ZEMC_MOT_LOGICAL_AND:
-			return "ZE_MOT_AMPAMP";
-		case ZEMC_MOT_BITWISE_OR:
-			return "ZE_MOT_PIPE";
-		case ZEMC_MOT_BITWISE_OR_ASSIGNMENT:
-			return "ZE_MOT_PIPEEQUAL";
-		case ZEMC_MOT_LOGICAL_OR:
-			return "ZE_MOT_PIPEPIPE";
-		case ZEMC_MOT_BITWISE_XOR:
-			return "ZE_MOT_CARET";
-		case ZEMC_MOT_BITWISE_XOR_ASSIGNMENT:
-			return "ZE_MOT_CARETEQUAL";
-		case ZEMC_MOT_ASSIGNMENT:
-			return "ZE_MOT_EQUAL";
-		case ZEMC_MOT_EQUAL:
-			return "ZE_MOT_EQUALEQUAL";
-		case ZEMC_MOT_NOT_EQUAL:
-			return "ZE_MOT_EXCLAIMEQUAL";
-		case ZEMC_MOT_LESS:
-			return "ZE_MOT_LESS";
-		case ZEMC_MOT_LESS_EQUAL:
-			return "ZE_MOT_LESSEQUAL";
-		case ZEMC_MOT_LEFT_SHIFT:
-			return "ZE_MOT_LESSLESS";
-		case ZEMC_MOT_LEFT_SHIFT_ASSIGNMENT:
-			return "ZE_MOT_LESSLESSEQUAL";
-		case ZEMC_MOT_GREATER:
-			return "ZE_MOT_GREATER";
-		case ZEMC_MOT_GREATER_AND_EQUAL:
-			return "ZE_MOT_GREATEREQUAL";
-		case ZEMC_MOT_RIGHT_SHIFT:
-			return "ZE_MOT_GREATERGREATER";
-		case ZEMC_MOT_RIGHT_SHIFT_ASSIGNMENT:
-			return "ZE_MOT_GREATERGREATEREQUAL";
-		case ZEMC_MOT_FUNCTION_CALL:
-			return "ZE_MOT_CALL";
-		case ZEMC_MOT_ARRAY_SUBSCRIPT:
-			return "ZE_MOT_SUBSCRIPT";
-		default:
-			return "ZE_MOT_UNDEFINED";
-		}
 }
 
 const char* ZEMCGenerator::ConvertBaseTypeToEnum(ZEMCBaseType BaseType)
@@ -584,7 +434,7 @@ ZEString ZEMCGenerator::GenerateVariantPostfix(const ZEMCType& Type, ZEString& C
 
 			case ZEMC_BT_OBJECT_PTR:
 				Output.Append("ObjectPtr");
-				CastOutput = ZEFormat::Format("({0})", Type.Class->Name);
+				CastOutput = ZEFormat::Format("({0}*)", Type.Class->Name);
 				break;
 
 			case ZEMC_BT_CLASS:

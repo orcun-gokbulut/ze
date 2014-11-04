@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProvider.cpp
+ Zinek Engine - ZEModuleRegistar.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,87 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEProvider.h"
+#pragma once
+#ifndef __ZE_MODULE_REGISTAR_H__
+#define __ZE_MODULE_REGISTAR_H__
 
-#include "ZEClass.h"
-#include "ZEEnumerator.h"
+#include "ZETypes.h"
 
-bool ZEProvider::RegisterClass(ZEClass* Class)
+class ZERegistar;
+
+class ZEMetaModuleRegister
 {
-	if (Class == NULL)
-		return false;
+	public:
+		virtual ZERegistar**		GetRegisters() = 0;
+		virtual ZESize				GetRegisterCount() = 0;
 
-	if (Classes.Exists(Class))
-		return false;
+};
 
-	RegisterClass(Class->GetParentClass());
-
-	Classes.Add(Class);
-
-	return true;
-}
-
-void ZEProvider::UnregisterClass(ZEClass* Class)
-{
-	Classes.RemoveValue(Class);
-}
-
-bool ZEProvider::RegisterEnumerator(ZEEnumerator* Enumerator)
-{
-	if (Enumerator == NULL)
-		return false;
-
-	if (Enumerators.Exists(Enumerator))
-		return false;
-
-	Enumerators.Add(Enumerator);
-}
-
-void ZEProvider::UnregisterEnumerator(ZEEnumerator* Enumerator)
-{
-	Enumerators.RemoveValue(Enumerator);
-}
-
-const ZEArray<ZEClass*>& ZEProvider::GetClasses()
-{
-	return Classes;
-}
-
-const ZESize ZEProvider::GetClassCount()
-{
-	return Classes.GetCount();
-}
-
-ZEClass* ZEProvider::GetClass(const char* ClassName)
-{
-	for(ZESize I = 0; I < Classes.GetCount(); I++)
-	{
-		if(Classes[I]->GetName() == ClassName)
-			return Classes[I];
-	}
-
-	return NULL;
-}
-
-ZEArray<ZEClass*> ZEProvider::GetClass(ZEClass* ParentClass)
-{
-	ZEArray<ZEClass*> DerivedClasses;
-	for (ZESize I = 0; I < Classes.GetCount(); I++)
-	{
-		if (ZEClass::IsDerivedFrom(ParentClass, Classes[I]))
-			DerivedClasses.Add(Classes[I]);
-	}
-
-	return DerivedClasses;
-}
-
-ZEEnumerator* ZEProvider::GetEnumerator(const char* EnumeratorName)
-{
-	for(ZESize I = 0; I < Enumerators.GetCount(); I++)
-	{
-		if(Enumerators[I]->GetName() == EnumeratorName)
-			return Enumerators[I];
-	}
-
-	return NULL;
-}
+#endif

@@ -35,7 +35,7 @@
 
 #include "ZEMCParser.h"
 #include "ZEMCOptions.h"
-#include "ZEDS\ZEPointer.h"
+#include "ZEPointer\ZEPointer.h"
 
 void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, DeclaratorDecl* PropertyDeclaration)
 {

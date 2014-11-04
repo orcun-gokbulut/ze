@@ -41,6 +41,7 @@
 #include "ZEGraphics\ZECamera.h"
 #include "ZEMath\ZEAngle.h"
 #include "ZEMath\ZEMatrix.h"
+#include "ZEMath\ZEMath.h"
 
 
 ZED3D9SkyDomeMaterial::ZED3D9SkyDomeMaterial()

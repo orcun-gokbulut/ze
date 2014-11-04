@@ -39,6 +39,7 @@
 #include "ZETextureTestUtils.h"
 #include "ZEDS/ZEFormat.h"
 #include "ZETextureLoader.h"
+#include "ZEMath/ZEMath.h"
 
 ZESize ZETextureTestUtils::GetPixelSize(ZETexturePixelFormat Format)
 {

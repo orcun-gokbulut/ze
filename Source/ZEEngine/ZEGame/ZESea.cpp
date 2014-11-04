@@ -44,6 +44,7 @@
 #include "ZEEntityProvider.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGraphics/ZETexture2D.h"
+#include "ZEMath/ZEMath.h"
 
 ZESea::ZESea()
 {

@@ -370,11 +370,11 @@ const ZEString&	ZEPathManager::GetApplicationResourcesPath()
 	return AppResourcesPath;
 }
 
-ZEKnownPath ZEPathManager::GetKnownPath(const ZEString& AbsolutePath)
+ZEPathRoot ZEPathManager::GetRootPath(const ZEString& AbsolutePath)
 {
 
 	ZESize Length = 0;
-	ZEKnownPath Root = ZE_KP_NONE;
+	ZEPathRoot Root = ZE_KP_NONE;
 	ZESize PathLen = strlen(AbsolutePath.ToCString());
 	ZESize ResrcLen = strlen(ResourcesPath.ToCString());
 	ZESize AppResLen = strlen(AppResourcesPath.ToCString());
@@ -423,7 +423,7 @@ ZEKnownPath ZEPathManager::GetKnownPath(const ZEString& AbsolutePath)
 	return Root;
 }
 
-const ZEString& ZEPathManager::GetKnownPath(const ZEKnownPath KnownPath)
+const ZEString& ZEPathManager::GetRootPath(const ZEPathRoot KnownPath)
 {
 	switch (KnownPath)
 	{
@@ -518,12 +518,12 @@ void SeperateDriveAndPath(ZEString& Drive, ZEString& RestOfPath, const ZEString&
 }
 
 // Checks format, constructs final path and makes a boundary check
-ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEKnownPath* Root)
+ZEString ZEPathManager::GetRealPath(const ZEString& Path, ZEPathRoot* Root)
 {
 	ZEString RootPath;
 	ZEString FinalPath;
 	ZEString RelativePartOfPath;
-	ZEKnownPath RootSymbol;
+	ZEPathRoot RootSymbol;
 
 	// Absolute Path
 	if (ZEPathUtils::IsAbsolutePath(Path))
@@ -537,9 +537,9 @@ ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEKnownPath* Root)
 			// We have a drive, do not stack dots while simplification
 	        FinalPath = Drive + ZEPathUtils::GetSimplifiedPath(RestOfPath, false);
 			// Try to get root
-	        RootSymbol = GetKnownPath(FinalPath);
+	        RootSymbol = GetRootPath(FinalPath);
 			// Get root symbol path
-	        RootPath = GetKnownPath(RootSymbol);
+	        RootPath = GetRootPath(RootSymbol);
 			// Check for restriction
 	        if (!ZEPathUtils::CheckPathContainsRoot(RootPath, FinalPath))
             {
@@ -560,15 +560,15 @@ ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEKnownPath* Root)
 	    if (EnablePathRestriction)
 	    {
 	        RootSymbol = ZEPathUtils::SearchForSymbol(&RelativePartOfPath, Path);
-            RootPath = GetKnownPath(RootSymbol);
+            RootPath = GetRootPath(RootSymbol);
             // Construct temp path
             FinalPath = RootPath;
             FinalPath += RelativePartOfPath;
             // We have a drive since we have path restriction, do not stack dot dot
             FinalPath = ZEPathUtils::GetSimplifiedPath(FinalPath, false);
             // Root can change after simplification, check again
-            RootSymbol = GetKnownPath(FinalPath);
-            RootPath = GetKnownPath(RootSymbol);
+            RootSymbol = GetRootPath(FinalPath);
+            RootPath = GetRootPath(RootSymbol);
 
             if (!ZEPathUtils::CheckPathContainsRoot(RootPath, FinalPath))
             {
@@ -579,7 +579,7 @@ ZEString ZEPathManager::GetFinalPath(const ZEString& Path, ZEKnownPath* Root)
 	    else
 	    {
 			RootSymbol = ZEPathUtils::SearchForSymbol(&RelativePartOfPath, Path);
-			RootPath = GetKnownPath(RootSymbol);
+			RootPath = GetRootPath(RootSymbol);
 			FinalPath = RootPath;
 			FinalPath += RelativePartOfPath;
 			

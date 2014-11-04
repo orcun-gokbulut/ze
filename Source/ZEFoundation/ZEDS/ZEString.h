@@ -40,6 +40,7 @@
 #include <string>
 #include "ZETypes.h"
 #include "ZEAllocator.h"
+#include "ZEMeta\ZEBuiltIn.h"
 
 class ZEString;
 
@@ -115,6 +116,8 @@ bool operator!=(const wchar_t* WideCharacter, const ZECharacter& Character);
 
 class ZEString
 {
+	ZE_BUILTIN_OBJECT
+
 	friend class ZEStringWriter;
 	private:
 		char*								Buffer;
