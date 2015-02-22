@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFileUtils.h
+ Zinek Engine - ZEPath.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,82 +33,56 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
-#ifndef __ZE_FILE_UTILS_H__
-#define __ZE_FILE_UTILS_H__
+#pragma once
+#ifndef __ZE_PATH_H__
+#define __ZE_PATH_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 
-#if defined ZE_PLATFORM_WINDOWS
+enum ZEPathAccess
+{
+	ZE_PA_UNKNOWN		= 0,
+	ZE_PA_NO_ACCESS		= 1,
+	ZE_PA_READ			= 2,
+	ZE_PA_WRITE			= 3,
+	ZE_PA_READ_WRITE	= 4
+};
 
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
+enum ZEPathRoot
+{
+	ZE_PR_NONE,
+	ZE_PR_RELATIVE,
+	ZE_PR_RESOURCE,
+	ZE_PR_STORAGE,
+	ZE_PR_USER_STORAGE,
+	ZE_PR_INTERNAL,
+};
 
-	typedef FILETIME ZEFileTimeOS;
+class ZERealPath
+{
+	public:
+		ZEString Path;
+		ZEPathRoot Root;
+		ZEPathAccess Access;
 
-	struct ZEFileSearchStream
-	{
-		WIN32_FIND_DATAW	Data;
-		HANDLE				Handle;
-	};
+		ZERealPath();
+};
 
-#elif defined ZE_PLATFORM_UNIX
-
-    #include "fcntl.h"
-    #include <time.h>
-    #include <dirent.h>
-    #include <sys/stat.h>
-
-	typedef time_t ZEFileTimeOS;
-
-	struct ZEFileSearchStream
-	{
-		struct stat Data;
-		DIR*        Directory;
-		ZEString    Name;
-	};
-
-#endif
 
 struct ZEFileTime
 {
-	ZEInt	Year;
-	ZEInt	Month;
-	ZEInt	DayOfWeek;
-	ZEInt	Day;
-	ZEInt	Hour;
-	ZEInt	Minute;
-	ZEInt	Second;
-	ZEInt	Milliseconds;
-};
-
-class ZEFileUtils
-{
 	public:
-		static bool					IsFile(const ZEString& Path);
-		static bool					IsFile(const ZEFileSearchStream* FindData);
+		ZEInt	Year;
+		ZEInt	Month;
+		ZEInt	DayOfWeek;
+		ZEInt	Day;
+		ZEInt	Hour;
+		ZEInt	Minute;
+		ZEInt	Second;
+		ZEInt	Milliseconds;
 
-		static bool					IsDirectory(const ZEString& Path);
-        static bool					IsDirectory(const ZEFileSearchStream* FindData);
-
-        static ZEString				GetFileName(const ZEFileSearchStream* FindData);
-
-        static ZEInt64              GetFileSize(const ZEString& Path);
-        static ZEInt64				GetFileSize(const ZEFileSearchStream* FindData);
-
-        static bool                 GetCreationTime(ZEFileTime* Output, const ZEString& Path);
-        static void					GetCreationTime(ZEFileTime* Output, const ZEFileSearchStream* FindData);
-
-        static bool                 GetModificationTime(ZEFileTime* Output, const ZEString& Path);
-        static void					GetModificationTime(ZEFileTime* Output, const ZEFileSearchStream* FindData);
-
-        static void					GetErrorString(ZEString& ErrorString, const ZEInt ErrorId);
-
-        static bool					OpenSearchStream(ZEFileSearchStream* FindData, const ZEString& Path);
-        static bool					FindNextInStream(ZEFileSearchStream* FindData);
-        static bool					CloseSearchStream(ZEFileSearchStream* FindData);
-
+				ZEFileTime();
 };
 
 #endif

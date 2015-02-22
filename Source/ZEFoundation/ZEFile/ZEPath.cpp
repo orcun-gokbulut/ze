@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPathUtils.h
+ Zinek Engine - ZEPath.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,38 +32,18 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#include "ZEPath.h"
 
-#pragma once
-#ifndef __ZE_PATH_UTILS_H__
-#define __ZE_PATH_UTILS_H__
+#include <memory.h>
 
-#include "ZEDS/ZEString.h"
-#include "ZEPathManager.h"
-
-class ZEPathUtils
+ZEFileTime::ZEFileTime()
 {
-	private:
-									ZEPathUtils();
-									~ZEPathUtils();
-
-	public:
-		static const ZEString&		GetDot();
-		static const ZEString&		GetDotDot();
-		static const ZEString&		GetSeperator();
-		static const ZEString&		GetEmptyPath();
-
-		static ZEString				GetSimplifiedPath(const ZEString& Path, bool StackDotDot);
-
-		static ZEPathRoot			SearchForSymbol(ZEString* RelativePart, const ZEString& SymbolicPath);
-
-		static bool					CheckPathContainsRoot(const ZEString& RootPath, const ZEString& Path);
-		
-		static bool					IsAbsolutePath(const ZEString& Path);
-		static ZEString				GetAbsolutePath(const ZEString& RootPath, const ZEString& RelativePath);
-
-		static bool					IsRelativePath(const ZEString& Path);
-		static ZEString				GetRelativePath(ZEString& RootPath, ZEString& AbsolutePath);
-};
+	memset(this, 0, sizeof(ZEFileTime));
+}
 
 
-#endif
+ZERealPath::ZERealPath()
+{
+	Access = ZE_PA_NO_ACCESS;
+	Root = ZE_PR_NONE;
+}
