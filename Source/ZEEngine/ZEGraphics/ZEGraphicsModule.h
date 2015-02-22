@@ -164,6 +164,8 @@ class ZEGraphicsModule : public ZEModule
 		virtual ZEFixedMaterial*			CreateCGFXMaterial() = 0;
 		virtual ZESeaMaterial*				CreateSeaMaterial() = 0;
 
+		virtual bool						IsReady() = 0;
+
 		static ZEGraphicsModule*			GetInstance();
 };
 

@@ -1200,6 +1200,9 @@ static ZEInt RenderCommandCompare(const ZERenderCommand* A, const ZERenderComman
 
 void ZED3D9FrameRenderer::Render(float ElaspedTime)
 {
+	if (ViewPort->GetWidth() == 0 || ViewPort->GetHeight() == 0)
+		return;
+
 	D3DPERF_BeginEvent(0, L"Frame Render");
 
 	if (!GetModule()->GetEnabled() || GetModule()->IsDeviceLost())

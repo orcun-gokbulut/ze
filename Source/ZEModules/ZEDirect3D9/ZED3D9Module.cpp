@@ -363,18 +363,34 @@ void ZED3D9Module::DeviceLost()
 	ZED3D_RELEASE(FrameBufferViewPort.ZBuffer);
 }
 
+bool ZED3D9Module::IsReady()
+{
+	return (FrameBufferViewPort.FrameBuffer != NULL);
+}
+
 void ZED3D9Module::DeviceRestored()
 {
 	DeviceLostState = false;
 
-	Device->GetBackBuffer(0, 0,D3DBACKBUFFER_TYPE_MONO, &FrameBufferViewPort.FrameBuffer);
+	HRESULT Result = Device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &FrameBufferViewPort.FrameBuffer);
+	if (FAILED(Result))
+	{
+		//zeCriticalError("Cannot retrive Direct3D backbuffer.");
+		//Destroy();
+		return;
+	}
 	
 	// Get screen's z buffer
-	HRESULT Result = Device->CreateDepthStencilSurface(ScreenWidth, ScreenHeight, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, &FrameBufferViewPort.ZBuffer, NULL);
-	if(FAILED(Result))
+	Result = Device->CreateDepthStencilSurface(ScreenWidth, ScreenHeight, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, &FrameBufferViewPort.ZBuffer, NULL);
+	if (FAILED(Result))
 	{
-		zeCriticalError("Can not create Direct3D Backbuffer.");
-		Destroy();
+		bool A = false; 
+		A = Result == D3DERR_NOTAVAILABLE;
+		A = Result == D3DERR_INVALIDCALL;
+		A = Result == D3DERR_OUTOFVIDEOMEMORY;
+		A = Result == E_OUTOFMEMORY;
+		//zeCriticalError("Cannot create Direct3D depth stencil buffer.");
+		//Destroy();
 		return;
 	}
 
@@ -426,6 +442,7 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 			Hr = Device->Reset(&D3DPP);
 			if (Hr == D3D_OK)
 			{
+				DeviceRestored();
 				zeLog("Direct3D Device Restored.");
 				break;
 			}
@@ -434,15 +451,9 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 				Sleep(100);
 				continue;
 			}
-			else
-			{
-				zeLog("Bla");
-			}
 		}
 	}
 	while (DeviceState == D3DERR_DEVICELOST);
-	
-	DeviceRestored();
 }
 
 void ZED3D9Module::SetScreenSize(ZEInt Width, ZEInt Height)
@@ -453,7 +464,7 @@ void ZED3D9Module::SetScreenSize(ZEInt Width, ZEInt Height)
 	{
 		D3DPP.BackBufferWidth = Width;
 		D3DPP.BackBufferHeight = Height;
-		RestoreDevice(true);
+		//RestoreDevice(true);
 	}
 }
 
@@ -564,7 +575,7 @@ ZEVertexDeclaration* ZED3D9Module::CreateVertexDeclaration()
 void ZED3D9Module::UpdateScreen()
 {
 	if (IsDeviceLost())
-		return;
+		RestoreDevice();
 
 	if (Device->TestCooperativeLevel() != D3D_OK)
 		RestoreDevice();

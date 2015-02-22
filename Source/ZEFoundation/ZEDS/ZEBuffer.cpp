@@ -70,9 +70,9 @@ ZESize ZEBuffer::GetUsedSpace() const
 ZESize ZEBuffer::GetFreeSpace() const
 {
 	if (BufferStart > BufferEnd)
-		return ZEMath::ClampLower((ZESSize)BufferEnd - (ZESSize)BufferStart - (ZESSize)sizeof(ZESSize), 0LL);
+		return ZEMath::ClampLower((ZESSize)BufferEnd - (ZESSize)BufferStart - (ZESSize)sizeof(ZESSize), (ZESSize)0LL);
 	else
-		return ZEMath::ClampLower((ZESSize)ZEMath::Max(BufferStart, (Buffer.GetSize() - BufferEnd))  - (ZESSize)sizeof(ZESSize),  0LL);
+		return ZEMath::ClampLower((ZESSize)ZEMath::Max(BufferStart, (Buffer.GetSize() - BufferEnd))  - (ZESSize)sizeof(ZESSize),  (ZESSize)0LL);
 }
 
 ZEBufferBlockPointer ZEBuffer::AddBlock(ZESize Size)

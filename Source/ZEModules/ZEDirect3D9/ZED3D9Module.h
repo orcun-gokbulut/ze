@@ -197,6 +197,8 @@ class ZED3D9Module : public ZEGraphicsModule
 
 		static LPDIRECT3DDEVICE9						GetD3D9Device();
 		static ZED3D9Module*							GetD3D9Module();
+
+		virtual bool									IsReady();
 };
 
 #endif

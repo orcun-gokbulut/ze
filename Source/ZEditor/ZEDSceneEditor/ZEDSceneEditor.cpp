@@ -82,12 +82,13 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
 	SplashScreen = new ZEDLoadingScreen();
-	SplashScreen->show();
+	//SplashScreen->show();
 
 	SplashScreen->SetNotificationText("Setting Up UI...");
 
 	ui = new Ui::MapEditorClass();
 	ui->setupUi(this);
+	showMaximized();
 
 	ZEString DefaultCompanyName = "Zinek";
 	ZEString DefaultApplicationName = "Engine";
@@ -103,7 +104,6 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	SelectionDirtyFlag = false;
 	
 	this->MainLoopTimer = new QTimer(this);
-	MainLoopTimer->start(0);
 
 	BackupSaveTimer = new QTimer();
 	//BackupSaveTimer->start(120000);
@@ -153,7 +153,6 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	QObject::connect(this->SceneList, SIGNAL(visibilityChanged(bool)), ui->SceneListOpenAction, SLOT(setChecked(bool)));
 
 	SplashScreen->hide();
-	showMaximized();
 	this->statusBar()->showMessage("Ready");
 	Grid = ZEGrid::CreateInstance();
 	Scene->AddEntity(Grid);
@@ -219,6 +218,8 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 
 	Scene->SetAmbientColor(ZEVector3::One);
 	Scene->SetAmbientFactor(0.2f);
+
+	MainLoopTimer->start(0);
 }
 
 void MapEditor::MakeConnections()
@@ -384,7 +385,9 @@ void MapEditor::SaveSceneAsActionTriggered()
 
 void MapEditor::EngineMainLoop()
 {
+	MainLoopTimer->stop();
 	zeMainLoop();
+	MainLoopTimer->start();
 }
 
 void MapEditor::EventsLoop()
