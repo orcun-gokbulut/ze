@@ -36,7 +36,6 @@
 #include "ZESoundResourceMP3.h"
 #include "ZEError.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEFile/ZEPathUtils.h"
 
 #include <mpg123.h>
 #include <stdio.h>

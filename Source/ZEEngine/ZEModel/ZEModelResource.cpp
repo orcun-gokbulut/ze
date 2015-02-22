@@ -41,7 +41,6 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEFile/ZEFileInfo.h"
-#include "ZEFile/ZEPathUtils.h"
 
 #include <memory.h>
 #include <string.h>
