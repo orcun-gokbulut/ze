@@ -38,8 +38,6 @@
 #include "ZEError.h"
 #include "ZEFile.h"
 #include "ZEPathManager.h"
-#include "ZEPathUtils.h"
-
 
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
@@ -50,7 +48,7 @@
 
 #if defined ZE_PLATFORM_WINDOWS
 	#include <cerrno>
-    #include "ZEPathUtils.h"
+
     static ZEString GetErrorString(ZEInt ErrorId)
     {
         int Result;
@@ -196,7 +194,23 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 	zeDebugCheck(File != NULL, "File is already open.");
 
 	ZEString ModeStr;
-	ZEString FinalPath = ZEPathManager::GetRealPath(FilePath);
+	ZERealPath RealPath = ZEPathManager::GetInstance()->GetRealPath(FilePath);
+
+	if (RealPath.Access == ZE_PA_NO_ACCESS)
+	{
+		zeError("File access denied. File: \"%s\".", RealPath.Path.ToCString());
+		return false;
+	}
+	else if (FileOpenMode == ZE_FOM_READ && (RealPath.Access & ZE_PA_READ))
+	{
+		zeError("File read access denied. File: \"%s\".", RealPath.Path.ToCString());
+		return false;
+	}
+	else if (FileOpenMode == ZE_FOM_WRITE && (RealPath.Access & ZE_PA_WRITE))
+	{
+		zeError("File read access denied. File: \"%s\".", RealPath.Path.ToCString());
+		return false;
+	}
 
 	// Handle file creation
 	switch (FileCreationMode)
@@ -205,10 +219,10 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 		{
 			errno = 0;
 			// If file is not there give error
-			FILE* Valid = FileOpen(FinalPath, ZEString("rb"));
+			FILE* Valid = FileOpen(RealPath.Path, ZEString("rb"));
 			if (Valid == NULL)
 			{
-				zeError("Error: \"%s\" occurred in file: \"%s\".", GetErrorString(errno).ToCString(), FinalPath.ToCString());
+				zeError("Error: \"%s\" occurred in file: \"%s\".", GetErrorString(errno).ToCString(), RealPath.Path.ToCString());
 				return false;
 			}
 			else
@@ -217,20 +231,28 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 			}
 			break;
 		}
+
 		case ZE_FCM_CREATE:
 			// If cannot create give error
-			if (!FileCreate(FinalPath, false))
+			if (!FileCreate(RealPath.Path, false))
+			{
+				zeError("Cannot create file. File: \"%s\".", RealPath.Path.ToCString());
 				return false;
+			}
 			break;
+
 		case ZE_FCM_OVERWRITE:
 			// If cannot create or overwrite give error
-			if (!FileCreate(FinalPath, true))
+			if (!FileCreate(RealPath.Path, true))
+			{
+				zeError("Cannot create file. File: \"%s\".", RealPath.Path.ToCString());
 				return false;
+			}
 			break;
+
 		default:
 			zeError("Unknown creation type");
 			return false;
-			break;
 	}
 
 	// Handle file mode
@@ -239,12 +261,15 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 		case ZE_FOM_READ:
 			ModeStr = "rb";
 			break;
+
 		case ZE_FOM_WRITE:
 			ModeStr = "wb";
 			break;
+
 		case ZE_FOM_READ_WRITE:
 			ModeStr = "r+b";
 			break;
+
 		default:
 			zeError("Unknown open mode");
 			return false;
@@ -262,14 +287,14 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 
 	// Open file
 	errno = 0;
-	File = (void*)FileOpen(FinalPath, ModeStr);
+	File = (void*)FileOpen(RealPath.Path, ModeStr);
 	if (File == NULL)
 	{
-		zeError("Error: \"%s\" occurred in file: \"%s\".", GetErrorString(errno).ToCString(), FinalPath.ToCString());
+		zeError("Error: \"%s\" occurred in file: \"%s\".", GetErrorString(errno).ToCString(), RealPath.Path.ToCString());
 		return false;
 	}
 
-	Path = FinalPath;
+	Path = RealPath.Path;
 	OpenMode = FileOpenMode;
 	CreationMode = FileCreationMode;
 
@@ -367,11 +392,12 @@ ZEFileCreationMode ZEFile::GetCreationMode() const
 
 bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, const ZESize BufferSize)
 {
-	// @TODO: File path should not always include resources path.
-	ZEString AbsolutePath = ZEPathManager::GetResourcesPath() + ZEPathUtils::GetSeperator() + FilePath;
+	ZERealPath RealPath = ZEPathManager::GetInstance()->GetRealPath(FilePath);
+	if (RealPath.Access | ZE_PA_READ != 0)
+		return false;
 
 	ZEFile File;
-	if (!File.Open(AbsolutePath, ZE_FOM_READ, ZE_FCM_NONE))
+	if (!File.Open(RealPath.Path, ZE_FOM_READ, ZE_FCM_NONE))
 		return false;
 
 	ZEInt64 FileSize = File.GetSize();
@@ -391,11 +417,12 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, const ZESize Buffe
 
 bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, const ZESize BufferSize)
 {
-	// @TODO: File path should not always include resources path.
-	ZEString AbsolutePath = ZEPathManager::GetResourcesPath() + ZEPathUtils::GetSeperator() + FilePath;
+	ZERealPath RealPath = ZEPathManager::GetInstance()->GetRealPath(FilePath);
+	if (RealPath.Access | ZE_PA_READ != 0)
+		return false;
 
 	ZEFile File;
-	if (!File.Open(AbsolutePath, ZE_FOM_READ, ZE_FCM_NONE))
+	if (!File.Open(RealPath.Path, ZE_FOM_READ, ZE_FCM_NONE))
 		return false;
 
 	ZEInt64 FileSize = File.GetSize();

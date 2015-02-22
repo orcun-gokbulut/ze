@@ -39,43 +39,42 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
-#include "ZEPathManager.h"
-#include "ZEFileUtils.h"
-
+#include "ZEDS/ZEArray.h"
+#include "ZEPath.h"
 
 class ZEFileInfo
 {
-	friend class ZEDirectoryInfo;
-
 	private:
-		ZEPathRoot				Root;
-		ZEInt64					Size;
-		ZEString				Name;
 		ZEString				Path;
-		ZEString				Extension;
-		ZEFileTime				Creation;
-		ZEFileTime				Modification;
 
 	public:
-								ZEFileInfo();
-								ZEFileInfo(const ZEString& FilePath);
-								~ZEFileInfo();
+		const ZEString&			GetPath();
+		ZEString				GetFullName();
+		ZEString				GetName();
+		ZEString				GetExtension();
+		ZEString				GetParentDirectory();
+		ZEString				GetRealPath();
+		ZEPathRoot				GetRoot();
 
-		void					SetPath(const ZEString& FilePath);
-		const ZEString&			GetPath() const;
-
+		ZEPathAccess			GetAccess();
 		ZEInt64					GetSize();
-		const ZEString&			GetName() const;
-		const ZEString&			GetExtension() const;
-		bool					GetCreationDate(ZEFileTime& Time);
-		bool					GetModificationDate(ZEFileTime& Time);
 
-		ZEInt64					GetFileSize(const ZEString& FilePath);
-		static bool				IsFile(const ZEString& FilePath);
-		static ZEString			GetFileName(const ZEString& FilePath);
-		static ZEString			GetFileExtension(const ZEString& FilePath);
-		static ZEString			GetParentDirectory(const ZEString& DirectoryPath);
+		bool					IsExists();
+		bool					IsInsidePackage();
+
+		ZEFileTime				GetCreationDate();
+		ZEFileTime				GetModificationDate();
+
+		bool					Rename(const char* Name);
+		bool					Move(const char* Destination);
+		bool					Copy(const char* Destination);
+		bool					Delete();
+		bool					Touch();
+
+		bool					LoadText(ZEString& Output);
+		bool					LoadBinary(ZEArray<ZEBYTE>& Output);
+
+		static ZEFileInfo		Populate(const char* Path);
 };
-
 
 #endif
