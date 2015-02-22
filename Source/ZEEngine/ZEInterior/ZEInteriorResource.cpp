@@ -43,11 +43,11 @@
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
-#include <string.h>
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEML/ZEMLSerialReader.h"
-#include "ZEFile/ZEPathUtils.h"
 #include "ZEFoundation/ZEPacking.h"
+
+#include <string.h>
 
 // Reading
 #define ZE_SHADER_SKINTRANSFORM				1

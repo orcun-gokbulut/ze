@@ -40,7 +40,6 @@
 #include "ZESoundResourceMP3.h"
 #include "ZESoundResourceOGG.h"
 #include "ZESoundResourceWAV.h"
-#include "ZEFile/ZEPathUtils.h"
 
 static ZEString ConstructResourcePath(const ZEString& Path)
 {

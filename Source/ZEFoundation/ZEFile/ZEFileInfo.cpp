@@ -174,7 +174,7 @@ ZEFileTime ZEFileInfo::GetCreationDate()
 	return Output;
 }
 
-ZEFileTime ZEFileInfo::GetModificationDate()
+ZEFileTime ZEFileInfo::GetModificationTime()
 {
 	HANDLE Handle = CreateFile(Path, GENERIC_WRITE, FILE_SHARE_WRITE,	NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	if (Handle == INVALID_HANDLE_VALUE)

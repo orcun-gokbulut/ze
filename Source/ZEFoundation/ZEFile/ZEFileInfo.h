@@ -63,7 +63,7 @@ class ZEFileInfo
 		bool					IsInsidePackage();
 
 		ZEFileTime				GetCreationDate();
-		ZEFileTime				GetModificationDate();
+		ZEFileTime				GetModificationTime();
 
 		bool					Rename(const char* Name);
 		bool					Move(const char* Destination);

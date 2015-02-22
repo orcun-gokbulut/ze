@@ -36,7 +36,6 @@
 #include "ZESoundResourceWAV.h"
 #include "ZEError.h"
 #include <memory.h>
-#include "ZEFile\ZEPathUtils.h"
 
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
