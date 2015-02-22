@@ -150,7 +150,7 @@ void DumpTexture(const ZEString& FontFile, ZEUInt32 TextureNumber, HBITMAP Bitma
 	Data = (ZEUInt8*)Data + (ZESize)cb;
 
 	ZEFile TextureFile;
-	TextureFile.Open(ZEString(ZEDirectoryInfo::GetParentDirectory(FontFile) + "\\" + TextureNumber + ".bmp"), ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
+	TextureFile.Open(ZEString(ZEDirectoryInfo::Populate(FontFile).GetParentDirectory() + "\\" + TextureNumber + ".bmp"), ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 
 	if(TextureFile.Write(TextureBuffer , cb, 1) != 1)
 		zeError("Can not write texture %d to file. File name : ", TextureNumber, FontFile.ToCString());

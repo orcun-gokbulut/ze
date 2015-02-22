@@ -39,7 +39,6 @@
 #include "QtGui/QScrollBar"
 #include "QtCore/qmimedata.h"
 #include "ZEMLVisualizerWidget.h"
-#include "ZEFile/ZEFileUtils.h"
 #include "QtGui/Qevent.h"
 #include "QtCore/QUrl"
 #include "QtCore/QString"

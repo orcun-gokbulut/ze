@@ -37,7 +37,6 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "ZEFile\ZEPathUtils.h"
 
 #include <QtGui/QApplication>
 #include "ZETypes.h"

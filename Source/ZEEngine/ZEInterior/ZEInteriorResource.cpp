@@ -497,7 +497,7 @@ bool ZEInteriorResource::ReadMaterials(ZEMLSerialReader* Reader)
 
 		Reader->ReadPropertyList(MaterialList, 2);
 		
-		ZEString MaterialPath = ZEFileInfo::GetParentDirectory(GetFileName()) + ZEPathUtils::GetSeperator() + MaterialRelativePath.GetString();
+		ZEString MaterialPath = ZEFileInfo::Populate(GetFileName()).GetParentDirectory() + "/" + MaterialRelativePath.GetString();
 
 		ZEFixedMaterial* CurrentMaterial = (ZEFixedMaterial*)Materials[I];
 		CurrentMaterial->ReadFromFile(MaterialPath);
