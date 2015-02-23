@@ -147,7 +147,8 @@ class ZED3D9Module : public ZEGraphicsModule
 		bool											IsDeviceLost();
 		void											DeviceLost();
 		void											DeviceRestored();
-		void											RestoreDevice(bool ForceReset = false);
+		void											CheckAndRestoreDevice();
+		void											ResetDevice();
 
 		virtual void									ClearFrameBuffer();
 		virtual void									UpdateScreen();
@@ -197,8 +198,6 @@ class ZED3D9Module : public ZEGraphicsModule
 
 		static LPDIRECT3DDEVICE9						GetD3D9Device();
 		static ZED3D9Module*							GetD3D9Module();
-
-		virtual bool									IsReady();
 };
 
 #endif

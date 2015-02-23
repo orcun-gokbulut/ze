@@ -334,7 +334,9 @@ bool ZED3D9Module::IsDeviceLost()
 
 void ZED3D9Module::DeviceLost()
 {
-	DeviceLostState = true;
+	if (IsDeviceLost())
+		return;
+
 	for (ZESize I = 0; I < Texture2Ds.GetCount(); I++)
 		Texture2Ds[I]->DeviceLost();	
 
@@ -359,24 +361,19 @@ void ZED3D9Module::DeviceLost()
 	for (ZESize I = 0; I < ShadowRenderers.GetCount(); I++)
 		ShadowRenderers[I]->DeviceLost();
 
+
 	ZED3D_RELEASE(FrameBufferViewPort.FrameBuffer);
 	ZED3D_RELEASE(FrameBufferViewPort.ZBuffer);
-}
 
-bool ZED3D9Module::IsReady()
-{
-	return (FrameBufferViewPort.FrameBuffer != NULL);
+	DeviceLostState = true;
 }
 
 void ZED3D9Module::DeviceRestored()
 {
-	DeviceLostState = false;
-
 	HRESULT Result = Device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &FrameBufferViewPort.FrameBuffer);
 	if (FAILED(Result))
 	{
-		//zeCriticalError("Cannot retrive Direct3D backbuffer.");
-		//Destroy();
+		zeCriticalError("Cannot retrive Direct3D backbuffer.");
 		return;
 	}
 	
@@ -384,13 +381,7 @@ void ZED3D9Module::DeviceRestored()
 	Result = Device->CreateDepthStencilSurface(ScreenWidth, ScreenHeight, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, &FrameBufferViewPort.ZBuffer, NULL);
 	if (FAILED(Result))
 	{
-		bool A = false; 
-		A = Result == D3DERR_NOTAVAILABLE;
-		A = Result == D3DERR_INVALIDCALL;
-		A = Result == D3DERR_OUTOFVIDEOMEMORY;
-		A = Result == E_OUTOFMEMORY;
-		//zeCriticalError("Cannot create Direct3D depth stencil buffer.");
-		//Destroy();
+		zeCriticalError("Cannot create Direct3D depth stencil buffer.");
 		return;
 	}
 
@@ -419,41 +410,34 @@ void ZED3D9Module::DeviceRestored()
 
 	for (ZESize I = 0; I < ShadowRenderers.GetCount(); I++)
 		ShadowRenderers[I]->DeviceRestored();
+
+	DeviceLostState = false;
 }
 
-void ZED3D9Module::RestoreDevice(bool ForceReset)
+void ZED3D9Module::ResetDevice()
 {
 	DeviceLost();
-	HRESULT DeviceState, Hr;
-	do
-	{
-		DeviceState = Device->TestCooperativeLevel();
-		if (DeviceState == D3DERR_DRIVERINTERNALERROR)
-		{
-			zeCriticalError("Can not restore Direct3D Device. Internal driver error.");
-		}
-		else if (DeviceState == D3DERR_OUTOFVIDEOMEMORY)
-		{
-			zeCriticalError("Can not restore Direct3D Device. Out of video memory");
-		}
+	HRESULT Result = Device->Reset(&D3DPP);
+	if (Result == D3D_OK)
+		DeviceRestored();
+}
 
-		if ((DeviceState == D3DERR_DEVICENOTRESET) || ForceReset)
-		{
-			Hr = Device->Reset(&D3DPP);
-			if (Hr == D3D_OK)
-			{
-				DeviceRestored();
-				zeLog("Direct3D Device Restored.");
-				break;
-			}
-			else if (Hr == D3DERR_DEVICELOST)
-			{
-				Sleep(100);
-				continue;
-			}
-		}
+void ZED3D9Module::CheckAndRestoreDevice()
+{
+	HRESULT Result = Device->TestCooperativeLevel();
+	if (Result == D3DERR_DEVICELOST)
+	{
+		DeviceLost();
 	}
-	while (DeviceState == D3DERR_DEVICELOST);
+	else if (Result == D3DERR_DEVICENOTRESET)
+	{
+		if (IsIconic(D3DPP.hDeviceWindow) || !IsWindowVisible(D3DPP.hDeviceWindow))
+			return;
+
+		Result = Device->Reset(&D3DPP);
+		if (Result == D3D_OK)
+			DeviceRestored();
+	}
 }
 
 void ZED3D9Module::SetScreenSize(ZEInt Width, ZEInt Height)
@@ -464,7 +448,7 @@ void ZED3D9Module::SetScreenSize(ZEInt Width, ZEInt Height)
 	{
 		D3DPP.BackBufferWidth = Width;
 		D3DPP.BackBufferHeight = Height;
-		//RestoreDevice(true);
+		ResetDevice();
 	}
 }
 
@@ -474,7 +458,7 @@ void ZED3D9Module::SetVerticalSync(bool Enabled)
 	if (Device != NULL)
 	{
 		D3DPP.PresentationInterval = (VerticalSync ? D3DPRESENT_INTERVAL_DEFAULT : D3DPRESENT_INTERVAL_IMMEDIATE);
-		RestoreDevice(true);
+		ResetDevice();
 	}
 }
 
@@ -508,7 +492,7 @@ void ZED3D9Module::SetAntiAliasing(ZEInt Level)
 	if (Device != NULL)
 	{
 		D3DPP.MultiSampleType = (D3DMULTISAMPLE_TYPE)(AnisotropicFilter * 2);
-		RestoreDevice(true);
+		ResetDevice();
 	}
 }
 
@@ -574,14 +558,11 @@ ZEVertexDeclaration* ZED3D9Module::CreateVertexDeclaration()
 
 void ZED3D9Module::UpdateScreen()
 {
+	CheckAndRestoreDevice();
 	if (IsDeviceLost())
-		RestoreDevice();
+		return;
 
-	if (Device->TestCooperativeLevel() != D3D_OK)
-		RestoreDevice();
-
-	if (!IsDeviceLost())
-		Device->Present(NULL, NULL, NULL, NULL);
+	Device->Present(NULL, NULL, NULL, NULL);
 }
  
 void ZED3D9Module::ClearFrameBuffer()
