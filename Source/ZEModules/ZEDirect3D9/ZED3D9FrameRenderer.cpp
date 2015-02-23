@@ -1092,21 +1092,19 @@ void ZED3D9FrameRenderer::Deinitialize()
 	DeinitializeLightning();
 	DeinitializeRenderTargets();
 
-	if (EventQuery != NULL)
-	{
-		EventQuery->Release();
-		EventQuery = NULL;
-	}
+	ZED3D_RELEASE(EventQuery);
 }
 
 void ZED3D9FrameRenderer::DeviceLost()
 {
 	PixelWorldPositionProcessor.Deinitialize();
+	ZED3D_RELEASE(EventQuery);
 }
 
 bool ZED3D9FrameRenderer::DeviceRestored()
 {
 	PixelWorldPositionProcessor.Initialize();
+	GetDevice()->CreateQuery(D3DQUERYTYPE_EVENT, &EventQuery);
 	return true;
 }
 
@@ -1200,13 +1198,13 @@ static ZEInt RenderCommandCompare(const ZERenderCommand* A, const ZERenderComman
 
 void ZED3D9FrameRenderer::Render(float ElaspedTime)
 {
+	if (!GetModule()->IsInitialized() || !GetModule()->GetEnabled() || GetModule()->IsDeviceLost())
+		return;
+
 	if (ViewPort->GetWidth() == 0 || ViewPort->GetHeight() == 0)
 		return;
 
 	D3DPERF_BeginEvent(0, L"Frame Render");
-
-	if (!GetModule()->GetEnabled() || GetModule()->IsDeviceLost())
-		return;
 
 	if (GetCamera() == NULL)
 		return;

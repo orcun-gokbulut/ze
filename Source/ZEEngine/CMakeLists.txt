@@ -80,7 +80,7 @@ ze_add_library(TARGET ZEEnginePlugin
 		
 ze_add_executable(TARGET ZE 
 	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
-	LIBS ZEEngine
+	LIBS ZEEngine libMSVCR-v110 libMSVCR-v100
 	INSTALL)
 
 #ze_combine_libraries(ZEEngine LIBS ZEEngine ZEAI ZECore ZEGame ZEGraphics ZETexture ZEInput ZEMap ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZETerrain ZENetwork)
