@@ -114,6 +114,8 @@ ZEFixedMaterial::ZEFixedMaterial()
 	GlobalAmbientEnabled = true;
 
 	SetSSAOEnabled(true);
+
+	FileName = "";
 }
 
 ZEFixedMaterial::~ZEFixedMaterial()
@@ -134,6 +136,11 @@ void ZEFixedMaterial::SetName(const ZEString& Name)
 const ZEString& ZEFixedMaterial::GetName() const
 {
 	return Name;
+}
+
+const ZEString&	ZEFixedMaterial::GetFileName() const
+{
+	return FileName;
 }
 
 void ZEFixedMaterial::SetTwoSided(bool Enable)
@@ -1678,6 +1685,8 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + LightMapValue.GetString();
 		SetLightMapFile(ResourcePath);
 	}
+
+	FileName = FilePath;
 
 	UpdateMaterial();
 }
