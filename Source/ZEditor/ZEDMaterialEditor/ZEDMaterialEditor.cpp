@@ -61,9 +61,9 @@ ZEDMaterialEditor::ZEDMaterialEditor(QWidget *parent, Qt::WFlags flags) : QMainW
 	ui->setupUi(this);
 	showMaximized();
 
-	QObject::connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(close()));
 	QObject::connect(ui->actionSaveAs, SIGNAL(triggered()), this, SLOT(SaveAs()));
 	QObject::connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(Open()));
+	QObject::connect(ui->actionOpenModel, SIGNAL(triggered()), this, SLOT(OpenModel()));
 
 	ViewPort = new ZEDMaterialEditorViewPort(this ,ui->centralWidget);
 	ui->CentralLayout->addWidget(ViewPort);
@@ -74,15 +74,13 @@ ZEDMaterialEditor::ZEDMaterialEditor(QWidget *parent, Qt::WFlags flags) : QMainW
 	ZEString DefaultResourcesDirectoryName = "Resources";
 	ZEPathManager::CustomizePaths(&DefaultCompanyName, &DefaultApplicationName, &DefaultResourcesDirectoryName);
 
-	QObject::connect(&EngineMainLoopTimer, SIGNAL(timeout()), this, SLOT(EngineMainLoop()));
-	QObject::connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(Save()));
+	connect(&EngineMainLoopTimer, SIGNAL(timeout()), this, SLOT(EngineMainLoop()));
+	connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(SaveMaterials()));
+	connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(CloseFile()));
 	EngineMainLoopTimer.start(0);
 
-	ViewPort->SetModelFile("ZEEngine\\PrimitiveModels\\Box\\Box.ZEMODEL");
-	Material = (ZEFixedMaterial*)ViewPort->GetModel()->GetModelResource()->GetMaterials()[0];
-
-	MaterialPropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, Material, ZEPathManager::GetWorkingDirectory().ToCString());
-	ui->PropertyTabWidget->addTab(MaterialPropertyWindowManager, Material->GetName().ToCString());
+	Material = NULL;
+	ModelResource = NULL;
 
 	DirectLight1PropertyWindowManager = new ZEDPropertyWindowManager(ui->LightPropertiesTabWidget, ViewPort->GetDirectLight1(), ZEPathManager::GetWorkingDirectory().ToCString());
 	ui->DirectLight1TabLayout->addWidget(DirectLight1PropertyWindowManager);
@@ -141,18 +139,15 @@ void ZEDMaterialEditor::Close()
 
 }
 
-void ZEDMaterialEditor::Save()
+void ZEDMaterialEditor::WriteMaterialToFile(ZEFixedMaterial* Material, ZEString fileName)
 {
 	ZEFile File;
-	if(!File.Open((const char*)CurrentFileName.toLatin1(), ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
-		zeError("Can not open given file. File : %s", (const char*)CurrentFileName.toLatin1());
 
-	Material = ((ZEFixedMaterial*)(ViewPort->GetModel()->GetModelResource()->GetMaterials()[0]));
+	if(!File.Open(fileName, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+		zeError("Can not open given file. File : %s", fileName);
 
 	ZEMLNode* MaterialNode = new ZEMLNode("Material");
-
 	MaterialNode->AddProperty("Name", Material->GetName());
-
 	ZEMLNode* ConfigurationNode = MaterialNode->AddSubNode("Configuration");
 
 	ConfigurationNode->AddProperty("Name", "Default"); //Will be changed when configuration is implemented.
@@ -287,30 +282,80 @@ void ZEDMaterialEditor::Save()
 	delete MaterialNode;	
 }
 
+void ZEDMaterialEditor::SaveMaterials()
+{
+	ZEArray<ZEFixedMaterial*> Materials = ViewPort->GetModelMaterials();
+
+	for(int I = 0; I < Materials.GetCount(); I++)
+	{
+		WriteMaterialToFile(Materials[I], Materials[I]->GetFileName());
+	}
+}
+
 void ZEDMaterialEditor::Open()
 {
 	QString SelectedFilePath = QFileDialog::getOpenFileName(0, QString("Load Material"), QString(ZEPathManager::GetResourcesPath().ToCString()), QString("*.ZEMATERIAL"), 0, 0);
 
 	if(SelectedFilePath.count() != 0)
 	{
+		CloseFile();
 		SelectedFilePath = SelectedFilePath.replace("/", "\\");
 		CurrentFileName = SelectedFilePath;
 		SelectedFilePath.remove(QString(ZEPathManager::GetWorkingDirectory().ToCString()) + "\\", Qt::CaseInsensitive);
-		((ZEFixedMaterial*)(ViewPort->GetModel()->GetModelResource()->GetMaterials()[0]))->ReadFromFile((const char*)SelectedFilePath.toLatin1());
 
-		if(MaterialPropertyWindowManager != NULL)
-		{
-			MaterialPropertyWindowManager->close();
-			delete MaterialPropertyWindowManager;
-			MaterialPropertyWindowManager = NULL;
-		}
+		ViewPort->SetMaterial((const char*)SelectedFilePath.toLatin1());
+		ZEDPropertyWindowManager* PropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ((ZEFixedMaterial*)(ViewPort->GetModel()->GetModelResource()->GetMaterials()[0])), (ZEPathManager::GetResourcesPath() + "\\").ToCString());
+		ui->PropertyTabWidget->addTab(PropertyWindowManager, ((ZEFixedMaterial*)(ViewPort->GetModel()->GetModelResource()->GetMaterials()[0]))->GetName().ToCString());
+		PropertyWindows.Add(PropertyWindowManager);
+		Material = ((ZEFixedMaterial*)ViewPort->GetModel()->GetModelResource()->GetMaterials()[0]);
+	}
 
-		if(MaterialPropertyWindowManager == NULL)
+	setWindowTitle("ZEDMaterialEditor - " + SelectedFilePath);
+}
+
+void ZEDMaterialEditor::OpenModel()
+{
+	QString SelectedFilePath = QFileDialog::getOpenFileName(0, QString("Load Model"), QString(ZEPathManager::GetResourcesPath().ToCString()), QString("*.ZEMODEL"), 0, 0);
+
+	if(SelectedFilePath.count() != 0)
+	{
+		CloseFile();
+		SelectedFilePath = SelectedFilePath.replace("/", "\\");
+		CurrentFileName = SelectedFilePath;
+		SelectedFilePath.remove(QString(ZEPathManager::GetWorkingDirectory().ToCString()) + "\\", Qt::CaseInsensitive);
+
+		ModelResource = ZEModelResource::LoadResource((const char*)SelectedFilePath.toLatin1());
+		ViewPort->SetModelResource(ModelResource);
+
+		for(int I = 0; I < ViewPort->GetModelMaterials().GetCount(); I++)
 		{
-			MaterialPropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ((ZEFixedMaterial*)(ViewPort->GetModel()->GetModelResource()->GetMaterials()[0])), (ZEPathManager::GetResourcesPath() + "\\").ToCString());
-			ui->PropertyTabWidget->addTab(MaterialPropertyWindowManager, ((ZEFixedMaterial*)(ViewPort->GetModel()->GetModelResource()->GetMaterials()[0]))->GetName().ToCString());
+			ZEDPropertyWindowManager* PropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ((ZEFixedMaterial*)(ViewPort->GetModel()->GetModelResource()->GetMaterials()[I])), (ZEPathManager::GetResourcesPath() + "\\").ToCString());
+			ui->PropertyTabWidget->addTab(PropertyWindowManager, ((ZEFixedMaterial*)(ModelResource->GetMaterials()[I]))->GetName().ToCString());
+			PropertyWindows.Add(PropertyWindowManager);
 		}
 	}
 
 	setWindowTitle("ZEDMaterialEditor - " + SelectedFilePath);
+}
+
+void ZEDMaterialEditor::CloseFile()
+{
+	Material = NULL;
+	ModelResource = NULL;
+	CleanPropertyWindows();
+}
+
+void ZEDMaterialEditor::CleanPropertyWindows()
+{
+	for(int I = 0; I < PropertyWindows.GetCount(); I++)
+	{
+		if(PropertyWindows[I] != NULL)
+
+		PropertyWindows[I]->close();
+		delete PropertyWindows[I];
+		PropertyWindows[I] = NULL;
+	}
+	
+	PropertyWindows.Clear();
+	ui->PropertyTabWidget->clear();
 }
