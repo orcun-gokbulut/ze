@@ -62,6 +62,7 @@ class ZEFixedMaterial : public ZEMaterial
 		ZEMaterialOpacityComponent		OpacityComponent;
 
 		ZEString						Name;
+		ZEString						FileName;
 
 		bool							TwoSided;
 		bool							Wireframe;
@@ -203,6 +204,8 @@ class ZEFixedMaterial : public ZEMaterial
 		// Material Options
 		void							SetName(const ZEString& Name);
 		const ZEString&					GetName() const;
+
+		const ZEString&					GetFileName() const;
 
 		void							SetTwoSided(bool Enable);
 		bool							GetTwoSided() const;
