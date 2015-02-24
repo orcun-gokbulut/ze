@@ -63,11 +63,11 @@ function(ze_link)
 				set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY INCLUDE_DIRECTORIES ${CURRENT_LIB_INCLUDE_DIRECTORY})
 
 				if (CURRENT_LIBS)
-					set (LINK_TARGETS ${LINK_TARGETS} ${CURRENT_LIBS})
+					set (LINK_TARGETS ${CURRENT_LIBS})
 					#target_link_libraries(${PARAMETER_TARGET} ${CURRENT_LIBS})
 				endif()
 				
-				if (CURRENT_LIBS AND CURRENT_LIBS_DEBUG)
+				if (CURRENT_LIBS_DEBUG)
 					set (LINK_TARGETS ${LINK_TARGETS} debug ${CURRENT_LIBS_DEBUG})
 					#target_link_libraries(${PARAMETER_TARGET} debug ${CURRENT_LIBS_DEBUG})
 				endif()
