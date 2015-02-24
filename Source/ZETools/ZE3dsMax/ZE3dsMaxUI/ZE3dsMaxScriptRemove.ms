@@ -52,6 +52,14 @@ for obj in selection do
 				if (custAttributes.getdef obj i).name == #ZEInteriorRoomAttributes then custAttributes.delete obj i
 			)
 		)
+
+		if isProperty obj "ZEHelperAttributes" == true then
+		(
+			for i = 1 to custAttributes.count obj  do
+			(
+				if (custAttributes.getdef obj i).name == #ZEHelperAttributes then custAttributes.delete obj i
+			)
+		)
 	)
 )
 
