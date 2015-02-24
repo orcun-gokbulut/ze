@@ -90,7 +90,8 @@ class ZEDMaterialEditorViewPort : public QFrame
 
 		void						Initialize();
 		ZEArray<ZEFixedMaterial*>	GetModelMaterials();
-		void						SetModelFile(const char* FileName);
+		void						SetModelResource(ZEModelResource* ModelResource);
+		void						SetMaterial(ZEString MaterialFile);
 		ZEDirectionalLight*			GetDirectLight1();
 		ZEDirectionalLight*			GetDirectLight2();
 		ZEDirectionalLight*			GetDirectLight3();
