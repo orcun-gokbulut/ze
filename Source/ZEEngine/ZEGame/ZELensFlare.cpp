@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMain.cpp
+ Zinek Engine - ZELensFlare.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,91 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZELensFlare.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZEGame/ZEEntityProvider.h"
+#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGraphics/ZESkyBoxMaterial.h"
+#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZETexture/ZETextureCubeResource.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 
-#include <QtGui/QApplication>
+#include <string.h>
+#include "ZEWeather.h"
 
-#include "ZETypes.h"
-#include "ZEDSceneEditor/ZEDSceneEditor.h"
-#include "ZEDMaterialEditor/ZEDMaterialEditor.h"
-#include "ZEDBrowser/ZEDBrowser.h"
-#include "ZEDNodeEditor/ZEDNodeEditor.h"
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZELensFlare);
 
-ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
+ZEDrawFlags ZELensFlare::GetDrawFlags() const
 {
-	ZEInt argc = 0;
-	char** argv = NULL;
+	return ZE_DF_DRAW;
+}
 
-	QApplication a(argc, argv);
-	MapEditor w;
-	//ZEDMaterialEditor w;
-	// ZEDBrowser w;
-	// ZEDNodeEditor w;
+bool ZELensFlare::InitializeSelf()
+{
+	if (!ZEEntity::InitializeSelf())
+		return false;
 
-	w.show();
-	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
-	return a.exec();
+	
+	return true;
+}
+
+bool ZELensFlare::DeinitializeSelf()
+{
+
+	return ZEEntity::DeinitializeSelf();
+}
+
+void ZELensFlare::Draw(ZEDrawParameters* DrawParameters)
+{
+	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
+		return;
+
+	// Find Sun
+
+	ZEArray<ZEEntity*> Entities = ZEScene::GetInstance()->GetEntities(ZEWeather::Description());
+	if (Entities.GetSize() == 0)
+		return;
+
+	ZEWeather* Weather = static_cast<ZEWeather*>(Entities[0]);
+	ZEVector3 SunDirection = Weather->GetSunDirection();
+
+	ZECamera* Camera = ZEScene::GetInstance()->GetActiveCamera();
+	
+	ZEVector4 SunDirectionScreen;
+	ZEMatrix4x4::Transform(SunDirectionScreen, Camera->GetViewProjectionTransform(), ZEVector4(SunDirection, 1.0f));
+
+	SunDirectionScreen.x /= SunDirectionScreen.w;
+	SunDirectionScreen.y /= SunDirectionScreen.w;
+
+	float Length = SunDirectionScreen.Length();
+	
+
+
+
+}
+
+void ZELensFlare::Tick(float Time)
+{
+
+}
+
+ZELensFlare::ZELensFlare()
+{
+
+}
+
+ZELensFlare::~ZELensFlare()
+{
+
+}
+
+ZELensFlare* ZELensFlare::CreateInstance()
+{
+	return new ZELensFlare();
+}
+
+ZEEntityRunAt ZELensFlareDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
 }

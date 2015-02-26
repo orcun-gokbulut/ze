@@ -192,29 +192,33 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	QVBoxLayout* TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(1));
 	ui->PropertiesTabWidget->widget(1)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->DOFProcessor, QString()), QString("DOF"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->SunRaysProcessor, QString()), QString("SunRays"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(2));
 	ui->PropertiesTabWidget->widget(2)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->MLAAProcessor, QString()), QString("MLAA"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->DOFProcessor, QString()), QString("DOF"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(3));
 	ui->PropertiesTabWidget->widget(3)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->FogProcessor, QString()), QString("FOG"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->MLAAProcessor, QString()), QString("MLAA"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(4));
 	ui->PropertiesTabWidget->widget(4)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->AerialPerspectiveProcessor, QString()), QString("Aerial"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->FogProcessor, QString()), QString("FOG"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(5));
 	ui->PropertiesTabWidget->widget(5)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HBAOProcessor, QString()), QString("HBAO"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->AerialPerspectiveProcessor, QString()), QString("Aerial"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(6));
 	ui->PropertiesTabWidget->widget(6)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->SSAOProcessor, QString()), QString("SSAO"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HBAOProcessor, QString()), QString("HBAO"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(7));
 	ui->PropertiesTabWidget->widget(7)->setLayout(TempLayout);
+
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->SSAOProcessor, QString()), QString("SSAO"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(8));
+	ui->PropertiesTabWidget->widget(8)->setLayout(TempLayout);
 
 	Scene->SetAmbientColor(ZEVector3::One);
 	Scene->SetAmbientFactor(0.2f);
