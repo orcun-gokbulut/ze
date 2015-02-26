@@ -1063,6 +1063,8 @@ bool ZED3D9FrameRenderer::Initialize()
 	AerialPerspectiveProcessor.SetRenderer(this);
 	AerialPerspectiveProcessor.Initialize();
 
+	SunRaysProcessor.Initialize();
+
 	InitializeLightning();
 
 	GetDevice()->CreateQuery(D3DQUERYTYPE_EVENT, &EventQuery);
@@ -1088,6 +1090,7 @@ void ZED3D9FrameRenderer::Deinitialize()
 	ColorTransformProcessor.Deinitialize();
 	BlurProcessor.Deinitialize();
 	PixelWorldPositionProcessor.Deinitialize();
+	SunRaysProcessor.Deinitialize();
 
 	DeinitializeLightning();
 	DeinitializeRenderTargets();
@@ -1324,6 +1327,12 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		GrainProcessor.SetOutput(ViewPort);
 		GrainProcessor.Process(ElaspedTime);
 	*/
+
+ 		SunRaysProcessor.SetInput(HDRProcessor.BloomLevels[0]);
+		SunRaysProcessor.SetOutput(ViewPort);
+		SunRaysProcessor.SetSunDirectionFromScene();
+		SunRaysProcessor.Process();
+
 		Do2DPass();
 
 	GetDevice()->EndScene();

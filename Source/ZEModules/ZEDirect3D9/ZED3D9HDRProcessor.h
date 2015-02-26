@@ -82,10 +82,12 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 		ZED3D9Texture2D*				CurrentLuminance;
 		ZED3D9Texture2D*				PreviousLuminance;
 
+	public:
 		ZEArray<ZED3D9Texture2D*>		BloomLevels;
 		ZEArray<ZED3D9Texture2D*>		BloomLevelsTemp;
 		ZEArray<ZED3D9Texture2D*>		LuminanceMips;
-
+	
+	private:
 		struct
 		{
 			bool						Recompile;
