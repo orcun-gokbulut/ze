@@ -63,6 +63,7 @@
 #include "ZED3D9CloudMaterial.h"
 #include "ZED3D9SeaMaterial.h"
 #include "ZEGraphics/ZESeaMaterial.h"
+#include "Logo_png.h"
 
 
 LPDIRECT3DDEVICE9 D3D9Device;
@@ -111,6 +112,60 @@ bool ZED3D9Module::GetEnabled()
 void ZED3D9Module::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
+}
+
+static void DrawRect(LPDIRECT3DDEVICE9 Device, float Left, float Right, float Top, float Bottom, LPDIRECT3DTEXTURE9 Texture)
+{
+	Left -= 0.5f;
+	Right -= 0.5f;
+	Top -= 0.5f;
+	Bottom -= 0.5f;
+
+	struct Vertex
+	{
+		float x, y, z, w;
+		float u,v;
+	} 
+	Vertices[6] =
+	{
+		{Left,	Bottom,	1.0f, 1.0f, 0.0f, 1.0f},
+		{Left,	Top,	1.0f, 1.0f, 0.0f, 0.0f},
+		{Right, Top,	1.0f, 1.0f, 1.0f, 0.0f},
+		{Left,	Bottom,	1.0f, 1.0f, 0.0f, 1.0f},
+		{Right, Top,	1.0f, 1.0f, 1.0f, 0.0f},
+		{Right, Bottom,	1.0f, 1.0f, 1.0f, 1.0f}
+	};
+
+	Device->SetTexture(0, Texture);
+	Device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	Device->SetTextureStageState(0 ,D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	Device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+
+	Device->SetVertexShader(NULL);
+	Device->SetPixelShader(NULL);
+	Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+
+	Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 2, Vertices, sizeof(Vertex));
+}
+
+void ZED3D9Module::DrawLogo()
+{
+	Logo_png Data;
+	LPDIRECT3DTEXTURE9 Logo;
+	D3DXCreateTextureFromFileInMemoryEx(GetDevice(), Data.GetData(), Data.GetSize(),
+		D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, NULL, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 
+		D3DX_DEFAULT , D3DX_DEFAULT , 0, NULL, NULL, &Logo);
+	
+	D3DSURFACE_DESC LogoDesc;
+	Logo->GetLevelDesc(0, &LogoDesc);
+
+	float Left = (FrameBufferViewPort.GetWidth() - LogoDesc.Width) / 2;
+	float Right = Left + LogoDesc.Width;
+	float Top = (FrameBufferViewPort.GetHeight() - LogoDesc.Height) / 2;
+	float Bottom = Top + LogoDesc.Height;
+	DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo);
+
+	Logo->Release();
 }
 
 bool ZED3D9Module::InitializeSelf()
@@ -299,8 +354,12 @@ bool ZED3D9Module::InitializeSelf()
 		return false;
 	}
 
-	this->ClearFrameBuffer();
-
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+	GetDevice()->BeginScene();
+	DrawLogo();
+	GetDevice()->EndScene();
+	GetDevice()->Present(NULL, NULL, NULL, NULL);
+	
 	ShaderManager = new ZED3D9ShaderManager();
 
 	return true;
@@ -567,16 +626,10 @@ void ZED3D9Module::UpdateScreen()
  
 void ZED3D9Module::ClearFrameBuffer()
 {
-// 	if (IsDeviceLost())
-// 		return;
-// 
-// 	if (Device->TestCooperativeLevel() != D3D_OK)
-// 		RestoreDevice();
-// 
-// 	if (FAILED(Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00555555, 1, 0)))
-// 	{
-// 		zeCriticalError("Clear failed");
-// 	}
+ 	if (IsDeviceLost())
+ 		return;
+ 
+ 
 }
 
 ZEStaticIndexBuffer* ZED3D9Module::CreateStaticIndexBuffer()
