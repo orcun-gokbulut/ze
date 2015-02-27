@@ -52,8 +52,8 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 	char** argv = NULL;
 
 	QApplication a(argc, argv);
-	//MapEditor w;
-	ZEDMaterialEditor w;
+	MapEditor w;
+	//ZEDMaterialEditor w;
 	// ZEDBrowser w;
 	// ZEDNodeEditor w;
 
