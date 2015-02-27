@@ -114,7 +114,7 @@ void ZED3D9Module::SetEnabled(bool Enabled)
 	this->Enabled = Enabled;
 }
 
-static void DrawRect(LPDIRECT3DDEVICE9 Device, float Left, float Right, float Top, float Bottom, LPDIRECT3DTEXTURE9 Texture)
+static void DrawRect(LPDIRECT3DDEVICE9 Device, float Left, float Right, float Top, float Bottom, LPDIRECT3DTEXTURE9 Texture, D3DCOLOR Color)
 {
 	Left -= 0.5f;
 	Right -= 0.5f;
@@ -124,26 +124,28 @@ static void DrawRect(LPDIRECT3DDEVICE9 Device, float Left, float Right, float To
 	struct Vertex
 	{
 		float x, y, z, w;
+		D3DCOLOR Color;
 		float u,v;
 	} 
 	Vertices[6] =
 	{
-		{Left,	Bottom,	1.0f, 1.0f, 0.0f, 1.0f},
-		{Left,	Top,	1.0f, 1.0f, 0.0f, 0.0f},
-		{Right, Top,	1.0f, 1.0f, 1.0f, 0.0f},
-		{Left,	Bottom,	1.0f, 1.0f, 0.0f, 1.0f},
-		{Right, Top,	1.0f, 1.0f, 1.0f, 0.0f},
-		{Right, Bottom,	1.0f, 1.0f, 1.0f, 1.0f}
+		{Left,	Bottom,	1.0f, 1.0f, Color, 0.0f, 1.0f},
+		{Left,	Top,	1.0f, 1.0f, Color, 0.0f, 0.0f},
+		{Right, Top,	1.0f, 1.0f, Color, 1.0f, 0.0f},
+		{Left,	Bottom,	1.0f, 1.0f, Color, 0.0f, 1.0f},
+		{Right, Top,	1.0f, 1.0f, Color, 1.0f, 0.0f},
+		{Right, Bottom,	1.0f, 1.0f, Color, 1.0f, 1.0f}
 	};
 
 	Device->SetTexture(0, Texture);
-	Device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	Device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 	Device->SetTextureStageState(0 ,D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	Device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-
+	Device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_CONSTANT);
+	Device->SetTextureStageState(0, D3DTSS_CONSTANT, Color);
+	
 	Device->SetVertexShader(NULL);
 	Device->SetPixelShader(NULL);
-	Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+	Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
 	Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 2, Vertices, sizeof(Vertex));
 }
@@ -163,7 +165,20 @@ void ZED3D9Module::DrawLogo()
 	float Right = Left + LogoDesc.Width;
 	float Top = (FrameBufferViewPort.GetHeight() - LogoDesc.Height) / 2;
 	float Bottom = Top + LogoDesc.Height;
-	DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo);
+
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+	GetDevice()->Present(NULL, NULL, NULL, NULL);
+	Sleep(200);
+
+	for (int I = 0; I < 256; I+=8)
+	{
+		GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+		GetDevice()->BeginScene();
+		DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0x01010101 * I);
+		GetDevice()->EndScene();
+		GetDevice()->Present(NULL, NULL, NULL, NULL);
+		Sleep(20);
+	}
 
 	Logo->Release();
 }
@@ -354,11 +369,7 @@ bool ZED3D9Module::InitializeSelf()
 		return false;
 	}
 
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
-	GetDevice()->BeginScene();
 	DrawLogo();
-	GetDevice()->EndScene();
-	GetDevice()->Present(NULL, NULL, NULL, NULL);
 	
 	ShaderManager = new ZED3D9ShaderManager();
 
