@@ -56,6 +56,19 @@ char*  Parameters;
 ZEWindow* Window = NULL;
 bool WindowInitialization;
 
+
+static void PaintBlack(HWND hwnd)
+{
+	PAINTSTRUCT ps;
+	RECT rc;
+	HDC hdc = BeginPaint(hwnd, &ps);
+	GetClientRect(hwnd, &rc);
+	HBRUSH hBrush = CreateSolidBrush(RGB(0,0,0));
+	FillRect(hdc, &rc, hBrush);
+	EndPaint(hwnd, &ps);
+	DeleteObject(hBrush);
+}
+
 static void ManageCursorVisibility(HWND hWnd, LPARAM lParam)
 {
 	WORD Handle = LOWORD(lParam);
@@ -110,7 +123,10 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case WM_PAINT:
-			ValidateRect(hWnd, NULL);
+			if (ZECore::GetInstance()->GetGraphicsModule() != NULL)
+				ValidateRect(hWnd, NULL);
+			else
+				PaintBlack(hWnd);
 			break;
 
 		case WM_SETCURSOR:
@@ -266,10 +282,11 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 		zeError("Can not create window.");
 		return false;
 	}
-	ShowWindow();
-
+	
 	if (WindowType != ZE_WT_FULLSCREEN)
 		SetWindowSize(WindowWidth, WindowHeight);
+
+	ShowWindow();
 
 	return true;
 }
