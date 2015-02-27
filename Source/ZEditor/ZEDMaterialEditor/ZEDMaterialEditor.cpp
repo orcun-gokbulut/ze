@@ -335,7 +335,7 @@ void ZEDMaterialEditor::OpenModel()
 		}
 	}
 
-	setWindowTitle("ZEDMaterialEditor - " + SelectedFilePath);
+	setWindowTitle(QString("ZEDMaterialEditor - %1").arg(SelectedFilePath));
 }
 
 void ZEDMaterialEditor::CloseFile()

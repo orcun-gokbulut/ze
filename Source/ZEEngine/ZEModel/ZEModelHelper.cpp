@@ -39,22 +39,22 @@
 
 
 
-const char* ZEModelHelper::GetName()
+const char* ZEModelHelper::GetName() const
 {
 	return HelperResource->Name;
 }
 
-ZEModelHelperOwnerType ZEModelHelper::GetOwnerType()
+ZEModelHelperOwnerType ZEModelHelper::GetOwnerType() const
 {
 	return OwnerType;
 }
 
-ZEModelMesh* ZEModelHelper::GetMeshOwner()
+ZEModelMesh* ZEModelHelper::GetMeshOwner() const
 {
 	return OwnerMesh;
 }
 
-ZEModelBone* ZEModelHelper::GetBoneOwner()
+ZEModelBone* ZEModelHelper::GetBoneOwner() const
 {
 	return OwnerBone;
 }
@@ -64,12 +64,12 @@ void ZEModelHelper::SetPosition(const ZEVector3& Position)
 	this->Position = Position;
 }
 
-const ZEVector3& ZEModelHelper::GetPosition()
+const ZEVector3& ZEModelHelper::GetPosition() const
 {
 	return Position;
 }
 
-const ZEVector3 ZEModelHelper::GetModelPosition()
+const ZEVector3 ZEModelHelper::GetModelPosition() const
 {
 	ZEVector3 Temp;
 
@@ -83,7 +83,7 @@ const ZEVector3 ZEModelHelper::GetModelPosition()
 	return Temp;
 }
 
-const ZEVector3 ZEModelHelper::GetWorldPosition()
+const ZEVector3 ZEModelHelper::GetWorldPosition() const
 {
 	ZEVector3 Temp;
 
@@ -102,12 +102,12 @@ void ZEModelHelper::SetRotation(const ZEQuaternion& Rotation)
 	this->Rotation = Rotation;
 }
 
-const ZEQuaternion& ZEModelHelper::GetRotation()
+const ZEQuaternion& ZEModelHelper::GetRotation() const
 {
 	return Rotation;
 }
 
-const ZEQuaternion ZEModelHelper::GetModelRotation()
+const ZEQuaternion ZEModelHelper::GetModelRotation() const
 {
 	ZEQuaternion Temp;
 
@@ -122,7 +122,7 @@ const ZEQuaternion ZEModelHelper::GetModelRotation()
 	return Temp;
 }
 
-const ZEQuaternion ZEModelHelper::GetWorldRotation()
+const ZEQuaternion ZEModelHelper::GetWorldRotation() const
 {
 	ZEQuaternion Temp;
 
@@ -150,12 +150,12 @@ void ZEModelHelper::SetScale(const ZEVector3& Scale)
 	this->Scale = Scale;
 }
 
-const ZEVector3& ZEModelHelper::GetScale()
+const ZEVector3& ZEModelHelper::GetScale() const
 {
 	return Scale;
 }
 
-const ZEVector3 ZEModelHelper::GetModelScale()
+const ZEVector3 ZEModelHelper::GetModelScale() const
 {
 	ZEVector3 Temp;
 
@@ -167,7 +167,7 @@ const ZEVector3 ZEModelHelper::GetModelScale()
 	return Temp;
 }
 
-const ZEVector3 ZEModelHelper::GetWorldScale()
+const ZEVector3 ZEModelHelper::GetWorldScale() const
 {
 	ZEVector3 Temp;
 
@@ -185,47 +185,47 @@ const ZEVector3 ZEModelHelper::GetWorldScale()
 	return Temp;
 }
 
-ZEVector3 ZEModelHelper::GetFront()
+ZEVector3 ZEModelHelper::GetFront() const
 {
 	return Rotation * ZEVector3::UnitZ;
 }
 
-ZEVector3 ZEModelHelper::GetRight()
+ZEVector3 ZEModelHelper::GetRight() const
 {
 	return Rotation * ZEVector3::UnitX;
 }
 
-ZEVector3 ZEModelHelper::GetUp()
+ZEVector3 ZEModelHelper::GetUp() const
 {
 	return Rotation * ZEVector3::UnitY;
 }
 
-ZEVector3 ZEModelHelper::GetModelFront()
+ZEVector3 ZEModelHelper::GetModelFront() const
 {
 	return GetModelRotation() * ZEVector3::UnitZ;
 }
 
-ZEVector3 ZEModelHelper::GetModelRight()
+ZEVector3 ZEModelHelper::GetModelRight() const
 {
 	return GetModelRotation() * ZEVector3::UnitX;
 }
 
-ZEVector3 ZEModelHelper::GetModelUp()
+ZEVector3 ZEModelHelper::GetModelUp() const
 {
 	return GetModelRotation() * ZEVector3::UnitY;
 }
 
-ZEVector3 ZEModelHelper::GetWorldFront()
+ZEVector3 ZEModelHelper::GetWorldFront() const
 {
 	return GetWorldRotation() * ZEVector3::UnitZ;
 }
 
-ZEVector3 ZEModelHelper::GetWorldRight()
+ZEVector3 ZEModelHelper::GetWorldRight() const
 {
 	return GetWorldRotation() * ZEVector3::UnitX;
 }
 
-ZEVector3 ZEModelHelper::GetWorldUp()
+ZEVector3 ZEModelHelper::GetWorldUp() const
 {
 	return GetWorldRotation() * ZEVector3::UnitY;
 }
