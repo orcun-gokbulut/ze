@@ -49,31 +49,6 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <string.h>
-#include "ZEFile/ZEPathUtils.h"
-
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
 
 static void CopyToTexture2D(ZETexture2D* Output, ZETextureData* TextureData)
 {
@@ -121,16 +96,13 @@ ZETexture2DResource::~ZETexture2DResource()
 
 ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {	
-	ZEString NewPath = ConstructResourcePath(FileName);
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
-	ZETexture2DResource* NewResource =(ZETexture2DResource*)zeResources->GetResource(NewPath.GetValue());
+	ZETexture2DResource* NewResource = (ZETexture2DResource*)zeResources->GetResource(FileName.GetValue());
 	if(NewResource == NULL)
 	{		
 		if(UserOptions == NULL)
 			UserOptions = zeGraphics->GetTextureOptions();
 
-		NewResource = LoadResource(NewPath, UserOptions);
+		NewResource = LoadResource(FileName, UserOptions);
 		if(NewResource != NULL)
 		{
 			NewResource->Shared = true;
@@ -141,7 +113,7 @@ ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const ZEString& Fil
 		}
 		else
 		{
-			zeError("Texture file not found. File Path : \"%s\"", NewPath.GetValue());
+			zeError("Texture file not found. File Path : \"%s\"", FileName.GetValue());
 			return NULL;
 		}
 	}
@@ -153,17 +125,13 @@ ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const ZEString& Fil
 
 void ZETexture2DResource::CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
-	ZETexture2DResource* NewResource = (ZETexture2DResource*)zeResources->GetResource(NewPath.GetValue());
+	ZETexture2DResource* NewResource = (ZETexture2DResource*)zeResources->GetResource(FileName.GetValue());
 	if (NewResource == NULL)
 	{
 		if(UserOptions == NULL)
 			UserOptions = zeGraphics->GetTextureOptions();
 
-		NewResource = LoadResource(NewPath, UserOptions);
+		NewResource = LoadResource(FileName, UserOptions);
 		if (NewResource != NULL)
 		{
 			NewResource->Cached = true;
@@ -176,13 +144,9 @@ void ZETexture2DResource::CacheResource(const ZEString& FileName, const ZETextur
 ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {
 	ZETexture2DResource* TextureResource;
-	ZEString NewPath = ConstructResourcePath(FileName);
-	
 	bool Result;
 	ZEFile File;
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
+	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if(Result)
 	{
 		if(UserOptions == NULL)
@@ -195,7 +159,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName,
 	}
 	else
 	{
-		zeError("Texture file not found. File Path : \"%s\"", NewPath.GetValue());
+		zeError("Texture file not found. File Path : \"%s\"", FileName.GetValue());
 		return NULL;
 	}
 }

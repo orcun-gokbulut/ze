@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPath.h
+ Zinek Engine - ZEFileCommon.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,57 +32,18 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#include "ZEFileCommon.h"
 
-#pragma once
-#ifndef __ZE_PATH_H__
-#define __ZE_PATH_H__
+#include <memory.h>
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
-
-enum ZEPathAccess
+ZEFileTime::ZEFileTime()
 {
-	ZE_PA_UNKNOWN		= 0,
-	ZE_PA_NO_ACCESS		= 1,
-	ZE_PA_READ			= 2,
-	ZE_PA_WRITE			= 3,
-	ZE_PA_READ_WRITE	= 4
-};
+	memset(this, 0, sizeof(ZEFileTime));
+}
 
-enum ZEPathRoot
+
+ZERealPath::ZERealPath()
 {
-	ZE_PR_NONE,
-	ZE_PR_RELATIVE,
-	ZE_PR_RESOURCE,
-	ZE_PR_STORAGE,
-	ZE_PR_USER_STORAGE,
-	ZE_PR_INTERNAL,
-};
-
-class ZERealPath
-{
-	public:
-		ZEString Path;
-		ZEPathRoot Root;
-		ZEPathAccess Access;
-
-		ZERealPath();
-};
-
-
-struct ZEFileTime
-{
-	public:
-		ZEInt	Year;
-		ZEInt	Month;
-		ZEInt	DayOfWeek;
-		ZEInt	Day;
-		ZEInt	Hour;
-		ZEInt	Minute;
-		ZEInt	Second;
-		ZEInt	Milliseconds;
-
-				ZEFileTime();
-};
-
-#endif
+	Access = ZE_PA_NO_ACCESS;
+	Root = ZE_PR_NONE;
+}

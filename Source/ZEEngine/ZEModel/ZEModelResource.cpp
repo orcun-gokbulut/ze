@@ -41,35 +41,11 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEFile/ZEFileInfo.h"
+#include "ZEML/ZEMLSerialReader.h"
 
 #include <memory.h>
 #include <string.h>
 #include <float.h>
-#include "ZEML/ZEMLSerialReader.h"
-
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
 
 ZEStaticVertexBuffer* ZEModelResourceMeshLOD::GetSharedVertexBuffer() const
 {
@@ -197,9 +173,9 @@ bool ZEModelResource::ReadMaterials(ZEMLSerialReader* NodeReader)
 		if (!NodeReader->ReadPropertyList(MaterialList, 2))
 			return false;
 
-		ZEString MaterialPath = ZEFileInfo::GetParentDirectory(this->GetFileName()) + ZEPathUtils::GetSeperator() + FilePathValue.GetString();
+		ZEString MaterialPath = ZEFileInfo::Populate(this->GetFileName()).GetParentDirectory() + "/" + FilePathValue.GetString();
 
-		if (!ZEFileInfo::IsFile(MaterialPath))
+		if (!ZEFileInfo::Populate(MaterialPath).IsExists())
 			return false;
 
 		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();
@@ -1112,17 +1088,12 @@ const ZEArray<ZEModelResourceAnimation>& ZEModelResource::GetAnimations() const
 
 ZEModelResource* ZEModelResource::LoadSharedResource(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
-	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(NewPath);
-	
+	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(FileName);
 	if (Resource != NULL)
 		return Resource;
 	else
 	{
-		Resource = LoadResource(NewPath);
+		Resource = LoadResource(FileName);
 		if (Resource != NULL)
 		{
 			Resource->Shared = true;
@@ -1138,16 +1109,12 @@ ZEModelResource* ZEModelResource::LoadSharedResource(const ZEString& FileName)
 
 void ZEModelResource::CacheResource(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
-	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(NewPath);
+	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(FileName);
 	if (Resource != NULL)
 		Resource->Cached = true;
 	else
 	{
-		Resource = LoadResource(NewPath);
+		Resource = LoadResource(FileName);
 		Resource->Cached = true;
 		Resource->ReferenceCount = 0;
 		zeResources->AddResource(Resource);
@@ -1156,17 +1123,13 @@ void ZEModelResource::CacheResource(const ZEString& FileName)
 
 ZEModelResource* ZEModelResource::LoadResource(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
 	bool Result;
 	ZEFile ResourceFile;
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
-	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
+	Result = ResourceFile.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if (Result)
 	{
 		ZEModelResource* NewResource = new ZEModelResource();
-		NewResource->SetFileName(NewPath);
+		NewResource->SetFileName(FileName);
 		NewResource->Cached = false;
 		NewResource->ReferenceCount = 0;
 		if (!NewResource->ReadModelFromFile(&ResourceFile))

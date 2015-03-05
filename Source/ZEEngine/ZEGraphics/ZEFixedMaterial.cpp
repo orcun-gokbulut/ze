@@ -47,7 +47,6 @@
 #include "ZETexture2D.h"
 #include "ZETextureCube.h"
 #include "ZEML/ZEMLSerialReader.h"
-#include "ZEFile/ZEPathUtils.h"
 #include "ZEFile/ZEFileInfo.h"
 
 ZEFixedMaterial::ZEFixedMaterial()
@@ -1630,53 +1629,43 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 	ZEString ResourcePath;
 	if (BaseMapValue.GetType() != ZE_VRT_UNDEFINED && !BaseMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + BaseMapValue.GetString();
-		SetBaseMapFile(ResourcePath);
+		SetBaseMapFile(ZEFileInfo::PopulateRelative(FilePath, BaseMapValue).GetPath());
 	}
 	if (NormalMapValue.GetType() != ZE_VRT_UNDEFINED && !NormalMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + NormalMapValue.GetString();
-		SetNormalMapFile(ResourcePath);
+		SetNormalMapFile(ZEFileInfo::PopulateRelative(FilePath, NormalMapValue).GetPath());
 	}
 	if (ParallaxMapValue.GetType() != ZE_VRT_UNDEFINED && !ParallaxMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + ParallaxMapValue.GetString();
-		SetParallaxMapFile(ResourcePath);
+		SetParallaxMapFile(ZEFileInfo::PopulateRelative(FilePath, ParallaxMapValue).GetPath());
 	}
 	if (SpecularMapValue.GetType() != ZE_VRT_UNDEFINED && !SpecularMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + SpecularMapValue.GetString();
-		SetSpecularMapFile(ResourcePath);
+		SetSpecularMapFile(ZEFileInfo::PopulateRelative(FilePath, SpecularMapValue).GetPath());
 	}
 	if (EmissiveMapValue.GetType() != ZE_VRT_UNDEFINED && !EmissiveMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + EmissiveMapValue.GetString();
-		SetEmmisiveMapFile(ResourcePath);
+		SetEmmisiveMapFile(ZEFileInfo::PopulateRelative(FilePath, EmissiveMapValue).GetPath());
 	}
 	if (OpacityMapValue.GetType() != ZE_VRT_UNDEFINED && !OpacityMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + OpacityMapValue.GetString();
-		SetOpacityMapFile(ResourcePath);
+		SetOpacityMapFile(ZEFileInfo::PopulateRelative(FilePath, OpacityMapValue).GetPath());
 	}
 	if (DetailBaseMapValue.GetType() != ZE_VRT_UNDEFINED && !DetailBaseMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + DetailBaseMapValue.GetString();
-		SetDetailBaseMapFile(ResourcePath);
+		SetDetailBaseMapFile(ZEFileInfo::PopulateRelative(FilePath, DetailBaseMapValue).GetPath());
 	}
 	if (DetailNormalMapValue.GetType() != ZE_VRT_UNDEFINED && !DetailNormalMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + DetailNormalMapValue.GetString();
-		SetDetailNormalMapFile(ResourcePath);
+		SetDetailNormalMapFile(ZEFileInfo::PopulateRelative(FilePath, DetailNormalMapValue).GetPath());
 	}
 	if (EnvironmentMapValue.GetType() != ZE_VRT_UNDEFINED && !EnvironmentMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + EnvironmentMapValue.GetString();
-		SetEnvironmentMapFile(ResourcePath);
+		SetEnvironmentMapFile(ZEFileInfo::PopulateRelative(FilePath, EnvironmentMapValue).GetPath());
 	}
 	if (LightMapValue.GetType() != ZE_VRT_UNDEFINED && !LightMapValue.GetString().IsEmpty())
 	{
-		ResourcePath = ZEFileInfo::GetParentDirectory(FilePath) + ZEPathUtils::GetSeperator() + LightMapValue.GetString();
-		SetLightMapFile(ResourcePath);
+		SetLightMapFile(ZEFileInfo::PopulateRelative(FilePath, LightMapValue).GetPath());
 	}
 
 	UpdateMaterial();

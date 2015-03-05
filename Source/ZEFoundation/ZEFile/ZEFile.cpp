@@ -194,19 +194,19 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 	zeDebugCheck(File != NULL, "File is already open.");
 
 	ZEString ModeStr;
-	ZERealPath RealPath = ZEPathManager::GetInstance()->GetRealPath(FilePath);
+	ZERealPath RealPath = ZEFileInfo::Populate(FilePath).GetRealPath();
 
 	if (RealPath.Access == ZE_PA_NO_ACCESS)
 	{
 		zeError("File access denied. File: \"%s\".", RealPath.Path.ToCString());
 		return false;
 	}
-	else if (FileOpenMode == ZE_FOM_READ && (RealPath.Access & ZE_PA_READ))
+	else if (FileOpenMode == ZE_FOM_READ && (RealPath.Access & ZE_PA_READ) == 0)
 	{
 		zeError("File read access denied. File: \"%s\".", RealPath.Path.ToCString());
 		return false;
 	}
-	else if (FileOpenMode == ZE_FOM_WRITE && (RealPath.Access & ZE_PA_WRITE))
+	else if (FileOpenMode == ZE_FOM_WRITE && (RealPath.Access & ZE_PA_WRITE) == 0)
 	{
 		zeError("File read access denied. File: \"%s\".", RealPath.Path.ToCString());
 		return false;
@@ -392,8 +392,8 @@ ZEFileCreationMode ZEFile::GetCreationMode() const
 
 bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, const ZESize BufferSize)
 {
-	ZERealPath RealPath = ZEPathManager::GetInstance()->GetRealPath(FilePath);
-	if (RealPath.Access | ZE_PA_READ != 0)
+	ZERealPath RealPath = ZEFileInfo::Populate(FilePath).GetRealPath();
+	if ((RealPath.Access & ZE_PA_READ) == 0)
 		return false;
 
 	ZEFile File;
@@ -417,8 +417,8 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, const ZESize Buffe
 
 bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, const ZESize BufferSize)
 {
-	ZERealPath RealPath = ZEPathManager::GetInstance()->GetRealPath(FilePath);
-	if (RealPath.Access | ZE_PA_READ != 0)
+	ZERealPath RealPath = ZEFileInfo::Populate(FilePath).GetRealPath();
+	if ((RealPath.Access & ZE_PA_READ) == 0)
 		return false;
 
 	ZEFile File;

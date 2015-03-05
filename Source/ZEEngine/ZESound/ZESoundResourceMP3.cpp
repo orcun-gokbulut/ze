@@ -40,30 +40,6 @@
 #include <mpg123.h>
 #include <stdio.h>
 
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
-
 static ZEChunkArray<ZESoundResourceMP3*, 50> Indexes;
 
 static ssize_t Memory_Read(ZEInt fd, void *buffer, ZESize nbyte)
@@ -159,16 +135,13 @@ void ZESoundResourceMP3::BaseDeinitialize()
 
 ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
 	bool Result;
+
 	ZEFile File;
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-	
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
+	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if(!Result)
 	{
-		zeError("Can not open mp3 file. (FileName : \"%s\")", NewPath.ToCString());
+		zeError("Can not open mp3 file. (FileName : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
 
@@ -181,13 +154,13 @@ ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
 	File.Read(NewResource->Data, 1, NewResource->DataSize);
 	File.Close();
 
-	NewResource->SetFileName(NewPath);	
+	NewResource->SetFileName(FileName);	
 	NewResource->MemoryCursor = 0;
 
 	NewResource->mpg123 = mpg123_new(NULL, NULL);
 	if (NewResource->mpg123 == NULL)
 	{
-		zeError("Can not create MP3 handle. (FileName : \"%s\")", NewPath.ToCString());
+		zeError("Can not create MP3 handle. (FileName : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
 	
@@ -202,30 +175,13 @@ ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
 	ZEInt Channels, Encoding;
 	mpg123_getformat(NewResource->mpg123, &Rate, &Channels, &Encoding);
 
-	/*switch(Encoding)
-	{
-		case MPG123_ENC_8:
-			NewResource->BitsPerSample = 8;
-			break;
-		case MPG123_ENC_16:
-			NewResource->BitsPerSample = 16;
-			break;
-		case MPG123_ENC_32:
-			NewResource->BitsPerSample = 32;
-			break;
-		default:
-			zeError("Unsupported encoding. Only 8bit, 16bit and 32bit unsigned integer encoding supported. (Filename : \"%s\")", NewResource->GetFileName());
-			delete NewResource;
-			return NULL;
-	}*/
-
 	NewResource->FileFormat			= ZE_SFF_MP3;
 	NewResource->BitsPerSample		= 16;
 	NewResource->ChannelCount		= Channels;
 	NewResource->SamplesPerSecond	= (ZESize)Rate;
 	NewResource->BlockAlign			= (ZESize)NewResource->ChannelCount * ((ZESize)NewResource->BitsPerSample / 8);
 	mpg123_scan(NewResource->mpg123);
-	NewResource->SampleCount			= (ZESize)mpg123_length(NewResource->mpg123);
+	NewResource->SampleCount = (ZESize)mpg123_length(NewResource->mpg123);
 
 	return NewResource;
 }

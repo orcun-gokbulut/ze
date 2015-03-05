@@ -33,96 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEError.h"
 #include "ZEPathManager.h"
-#include "ZEDS\ZEString.h"
-#include "ZEDS\ZEArray.h"
+
+#include "ZEError.h"
+#include "ZEPathInfo.h"
 #include "ZEDS\ZEFormat.h"
-
-static char* DividePath(char* Output, ZESize OutputSize, const char* Path)
-{
-	char* OutputStart = Output;
-	bool Start = false;
-
-	while(*Path != '\0')
-	{
-		if (OutputSize == 0)	
-			return NULL;
-
-		if (*Path == '/' || *Path == '\\')
-		{
-			Path++;
-			break;
-		}
-		else if (*Path == ' ' && Start)
-		{
-			Path++;
-			continue;	
-		}
-		else
-		{
-			*Output = *Path;
-			Start = false;
-		}
-
-		OutputSize--;
-		Output++;
-		Path++;
-	}
-
-	*Output = '\0';
-	ZESSize LastSpaceStart = -1;
-	ZESize Index = 0;
-	while (*Output != '\0')
-	{
-		if (*Output == ' ' && LastSpaceStart == -1)
-			LastSpaceStart = Index;
-		else
-			LastSpaceStart = -1;
-
-		Index++;
-	}
-
-	if (LastSpaceStart != -1)
-		OutputStart[LastSpaceStart] = '\0';
-
-	return OutputStart;
-}
-
-static bool GeneratePathArray(ZEArray<ZEString> PathArray, const char* Path)
-{
-	while(true)
-	{
-		char PathPart[256];
-		char* Path = DividePath(PathPart, 256, Path);
-
-		if (Path == NULL)
-			return false;
-
-		if (*Path == '\0')
-			break;
-
-		PathArray.Add(PathPart);
-	}
-
-}
-
-static bool NormalizePath(ZEArray<ZEString> Path)
-{
-	for (size_t I = 0; I < Path.GetCount(); I++)
-	{
-		if (Path[I] == ".")
-		{
-			Path.Remove(I);
-			I--;
-		}
-		else if (Path[I] == '..')
-		{
-			if (I = 0)
-				return false;
-		}
-	}
-}
 
 void ZEPathManager::SetAccessControl(bool Enable)
 {
@@ -167,14 +82,7 @@ void ZEPathManager::Deinitialize()
 
 }
 
-ZERealPath ZEPathManager::GetRealPath(const char* Path)
-{
-	ZEArray<ZEString> PathArray;
-	if (!GeneratePathArray(PathArray, Path))
-		return ZERealPath();
-}
-
-ZERealPath ZEPathManager::GetRoot(ZEPathRoot Root)
+ZERealPath ZEPathManager::GetRootRealPath(ZEPathRoot Root)
 {
 	ZERealPath RealPath;
 	RealPath.Root = Root;
@@ -187,23 +95,23 @@ ZERealPath ZEPathManager::GetRoot(ZEPathRoot Root)
 			break;
 
 		case ZE_PR_RELATIVE:
-			RealPath.Access = ZE_PA_UNKNOWN;
+			RealPath.Access = ZE_PA_NO_ACCESS;
 			RealPath.Path = "";
 			break;
 
 		case ZE_PR_RESOURCE:
 			RealPath.Access = ZE_PA_READ;
-			RealPath.Path = "";
+			RealPath.Path = ResourcePath;
 			break;
 
 		case ZE_PR_STORAGE:
 			RealPath.Access = ZE_PA_READ_WRITE;
-			RealPath.Path = "";
+			RealPath.Path = StoragePath;
 			break;
 
 		case ZE_PR_USER_STORAGE:
 			RealPath.Access = ZE_PA_READ_WRITE;
-			RealPath.Path = "";
+			RealPath.Path = UserStoragePath;
 			break;
 
 		case ZE_PR_INTERNAL:
@@ -225,7 +133,7 @@ ZEPathRoot ZEPathManager::GetRoot(ZEString RootPath)
 	else if (RootPath.Right(0) == ":")
 	{
 		ZEString RootName = RootPath.Left(RootPath.GetLength() - 1);
-		if (RootName == "Internal" || RootName == "I")
+		if (RootName == "#Internal" || RootName == "#I")
 			return ZE_PR_INTERNAL;
 		else if (RootName == "#Resource" || RootName == "#R")
 			return ZE_PR_RESOURCE;
