@@ -55,31 +55,6 @@
 	(Vertex).Texcoord = ZEVector2(0.0f, 0.0f);\
 	(Vertex).Color = Color
 
-
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
-
 ZEVertexDeclaration* ZECanvasVertex::VertexDeclaration = NULL;
 
 ZEVertexDeclaration* ZECanvasVertex::GetVertexDeclaration()
@@ -792,15 +767,13 @@ void ZECanvas::Clean()
 
 bool ZECanvas::LoadFromFile(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
 	bool Result;
 	ZEFile File;
 
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
+	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if (!Result)
 	{
-		zeError("Can not load canvas file. (FileName : \"%s\")", NewPath.ToCString());
+		zeError("Can not load canvas file. (FileName : \"%s\")", FileName.ToCString());
 		return false;
 	}
 	
@@ -826,7 +799,7 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 	}
 
 	if (Index != (ZESize)VertexCount + 1 )
-		zeWarning("Corrupted canvas file. Vertex count is less than verties in the file. (FileName : \"%s\")", NewPath.ToCString());
+		zeWarning("Corrupted canvas file. Vertex count is less than verties in the file. (FileName : \"%s\")", FileName.ToCString());
 
 	File.Close();
 

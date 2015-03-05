@@ -63,30 +63,6 @@
 #define ZE_SHADER_LIGHT_MAP					1024
 #define ZE_SHADER_DISTORTION_MAP			2048
 
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
-
 const ZETexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZEString& FileName)
 {
 	if (FileName == "")
@@ -96,7 +72,7 @@ const ZETexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZESt
 		if (TextureResources[I]->GetFileName() == FileName)
 			return TextureResources[I]->GetTexture();
 
-	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(ZEFileInfo::GetParentDirectory(this->GetFileName()) + "\\" + FileName);
+	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(ZEFileInfo::Populate(this->GetFileName()).GetParentDirectory() + "\\" + FileName);
 	if (NewTextureResource == NULL)
 	{
 		zeError("Can not load texture file. (FileName : \"%s\")", FileName.ToCString());
@@ -541,18 +517,13 @@ const ZEArray<ZEInteriorResourceHelper>& ZEInteriorResource::GetHelpers() const
 
 ZEInteriorResource* ZEInteriorResource::LoadSharedResource(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-	// Try to get instance of shared ZEInterior file from resource manager
-	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(NewPath);
-	
+	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(FileName);
 	if (Resource != NULL)
 		return Resource;
 	else
 	{
 		// If there is no shared instance of ZEInterior file create and load new instance
-		Resource = LoadResource(NewPath);
+		Resource = LoadResource(FileName);
 		if (Resource != NULL)
 		{
 			// Flag as shared and add it to ZEResourceManager and return a instance
@@ -568,18 +539,14 @@ ZEInteriorResource* ZEInteriorResource::LoadSharedResource(const ZEString& FileN
 
 void ZEInteriorResource::CacheResource(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
 	// Try to get instance of shared ZEInterior file from resource manager
-	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(NewPath);
+	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(FileName);
 	if (Resource != NULL)
 		Resource->Cached = true;
 	else
 	{
 		// If there is no shared instance of ZEInterior file create and load new instance
-		Resource = LoadResource(NewPath);
+		Resource = LoadResource(FileName);
 		if (Resource != NULL)
 		{
 			// Flag as cached and add it to ZEResourceManager
@@ -594,25 +561,21 @@ void ZEInteriorResource::CacheResource(const ZEString& FileName)
 
 ZEInteriorResource* ZEInteriorResource::LoadResource(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
 	bool Result;
-	ZEFile ResourceFile;
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
 
-	// Open ZEInterior file
-	Result = ResourceFile.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
+	ZEFile ResourceFile;
+	Result = ResourceFile.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if (Result)
 	{
 		// Create ZEInteriorResource
 		ZEInteriorResource* MapResource = new ZEInteriorResource();
-		MapResource->SetFileName(NewPath);
+		MapResource->SetFileName(FileName);
 		MapResource->Cached = false;
 		MapResource->ReferenceCount = 0;
 
 		if (!MapResource->ReadInteriorFromFile(&ResourceFile))
 		{
-			zeError("Can not load interior resource. (FileName : \"%s\")", NewPath.GetValue());
+			zeError("Can not load interior resource. (FileName : \"%s\")", FileName.GetValue());
 			ResourceFile.Close();
 			delete MapResource;
 			return NULL;
@@ -624,7 +587,7 @@ ZEInteriorResource* ZEInteriorResource::LoadResource(const ZEString& FileName)
 	}
 	else
 	{
-		zeError("Interior file does not exists. FileName : \"%s\"", NewPath.GetValue());
+		zeError("Interior file does not exists. FileName : \"%s\"", FileName.GetValue());
 		return NULL;
 	}
 }

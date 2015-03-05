@@ -51,14 +51,16 @@ ze_add_source(ZEFileInfo.cpp				Sources)
 ze_add_source(ZEFileInfo.h					Sources Headers)
 ze_add_source(ZEFileInfoTests.cpp			Tests)
 ze_add_source(ZEFileTests.cpp				Tests)
+ze_add_source(ZEPathInfo.cpp				Sources)
+ze_add_source(ZEPathInfo.h					Sources Headers)
 ze_add_source(ZEPartialFile.cpp				Sources)
 ze_add_source(ZEPartialFile.h				Sources Headers)
 ze_add_source(ZEPartialFileTests.cpp		Tests)
 ze_add_source(ZEPathManager.cpp				Sources)
 ze_add_source(ZEPathManager.h				Sources)
 ze_add_source(ZEPathManagerTests.cpp		Tests)
-ze_add_source(ZEPath.cpp					Sources)
-ze_add_source(ZEPath.h						Sources Headers)
+ze_add_source(ZEFileCommon.cpp				Sources)
+ze_add_source(ZEFileCommon.h				Sources Headers)
 
 ze_add_library(TARGET ZEFile 
 	SOURCES ${Sources} 

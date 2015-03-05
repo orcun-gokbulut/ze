@@ -42,6 +42,7 @@
 #include "QtGui/Qevent.h"
 #include "QtCore/QUrl"
 #include "QtCore/QString"
+#include "ZEFile/ZEFileInfo.h"
 
 ZEMLVisualizerTreeWidget::ZEMLVisualizerTreeWidget(QWidget* Parent) : QTreeWidget(Parent)
 {
@@ -89,7 +90,7 @@ void ZEMLVisualizerTreeWidget::dragEnterEvent(QDragEnterEvent* Event)
 
 void ZEMLVisualizerTreeWidget::dropEvent(QDropEvent* Event)
 {
-	if(!ZEFileUtils::IsFile((const char*)Event->mimeData()->urls()[0].path().toLatin1()))
+	if(!ZEFileInfo::Populate((const char*)Event->mimeData()->urls()[0].path().toLatin1()).IsExists())
 		return;
 
 	((ZEMLVisualizerWidget*)ParentWidget)->SetZEMLFile((const char*)Event->mimeData()->urls()[0].path().toLatin1());

@@ -45,30 +45,6 @@
 
 #include <string.h>
 
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
-
 ZEMaterialResource::ZEMaterialResource()
 {
 	Material = NULL;
@@ -214,12 +190,10 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(ZEFile* ResourceFile, const
 ZEMaterialResource* ZEMaterialResource::LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {
 	ZEMaterialResource* MaterialResource = NULL;
-	ZEString NewPath = ConstructResourcePath(FileName);
-
+	
 	bool Result;
 	ZEFile File;
-
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
+	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if (Result)
 	{
 		if(UserOptions == NULL)
@@ -232,22 +206,20 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(const ZEString& FileName, c
 	}
 	else
 	{
-		zeError("Material file not found. FilePath : \"%s\"", NewPath.GetValue());
+		zeError("Material file not found. FilePath : \"%s\"", FileName.GetValue());
 		return NULL;
 	}
 }
 
 const ZEMaterialResource* ZEMaterialResource::LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-	ZEMaterialResource* NewResource =(ZEMaterialResource*)zeResources->GetResource(NewPath);
-	
+	ZEMaterialResource* NewResource =(ZEMaterialResource*)zeResources->GetResource(FileName);
 	if (NewResource == NULL)
 	{
 		if(UserOptions == NULL)
 			UserOptions = zeGraphics->GetTextureOptions();
 
-		NewResource = LoadResource(NewPath, UserOptions);
+		NewResource = LoadResource(FileName, UserOptions);
 		if (NewResource != NULL)
 		{
 			NewResource->Shared = true;

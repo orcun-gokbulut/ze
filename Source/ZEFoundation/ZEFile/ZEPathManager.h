@@ -38,8 +38,8 @@
 #define __ZE_PATH_MANAGER_H__
 
 #include "ZETypes.h"
+#include "ZEFileCommon.h"
 #include "ZEDS/ZEString.h"
-#include "ZEPath.h"
 
 class ZEPathManager
 {
@@ -59,8 +59,7 @@ class ZEPathManager
 		void						Deinitialize();
 
 		ZEPathRoot					GetRoot(ZEString RootPath);
-		ZERealPath					GetRoot(ZEPathRoot Root);
-		ZERealPath					GetRealPath(const char* Path);
+		ZERealPath					GetRootRealPath(ZEPathRoot Root);
 
 									ZEPathManager();
 

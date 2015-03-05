@@ -45,30 +45,6 @@
 #include "ZEML/ZEMLSerialReader.h"
 #include "ZEFile/ZEDirectoryInfo.h"
 
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
-
 ZEFontResourceBitmap::ZEFontResourceBitmap()
 {
 	Characters.SetCount(256);
@@ -109,17 +85,15 @@ const ZEFontCharacter& ZEFontResourceBitmap::GetCharacter(char CurrentChar, char
 	return GetCharacter(CurrentChar);
 }
 
-ZEFontResourceBitmap* ZEFontResourceBitmap::LoadSharedResource(const ZEString& FilePath, const ZETextureOptions* UserOptions)
+ZEFontResourceBitmap* ZEFontResourceBitmap::LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {
-	ZEString NewPath = ConstructResourcePath(FilePath);
-
-	ZEFontResourceBitmap* NewResource = (ZEFontResourceBitmap*)zeResources->GetResource(NewPath.GetValue());
+	ZEFontResourceBitmap* NewResource = (ZEFontResourceBitmap*)zeResources->GetResource(FileName.GetValue());
 	if (NewResource == NULL)
 	{
 		if(UserOptions == NULL)
 			UserOptions = zeGraphics->GetTextureOptions();
 
-		NewResource = LoadResource(NewPath, UserOptions);
+		NewResource = LoadResource(FileName, UserOptions);
 		if (NewResource != NULL)
 		{
 			NewResource->Shared = true;
@@ -139,15 +113,13 @@ ZEFontResourceBitmap* ZEFontResourceBitmap::LoadSharedResource(const ZEString& F
 
 void ZEFontResourceBitmap::CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
-	ZEFontResourceBitmap* NewResource = (ZEFontResourceBitmap*)zeResources->GetResource(NewPath.GetValue());
+	ZEFontResourceBitmap* NewResource = (ZEFontResourceBitmap*)zeResources->GetResource(FileName.GetValue());
 	if (NewResource == NULL)
 	{
 		if(UserOptions == NULL)
 			UserOptions = zeGraphics->GetTextureOptions();
 
-		NewResource = LoadResource(NewPath, UserOptions);
+		NewResource = LoadResource(FileName, UserOptions);
 		if (NewResource != NULL)
 		{
 			NewResource->Cached = true;
@@ -157,15 +129,13 @@ void ZEFontResourceBitmap::CacheResource(const ZEString& FileName, const ZETextu
 	}
 }
 
-ZEFontResourceBitmap* ZEFontResourceBitmap::LoadResource(const ZEString& FilePath, const ZETextureOptions* UserOptions)
+ZEFontResourceBitmap* ZEFontResourceBitmap::LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {
-	ZEString NewPath = ConstructResourcePath(FilePath);
-
 	bool Result;
 	ZEFile File;
 	ZEFontResourceBitmap* FontResource;
 
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
+	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if (Result)
 	{
 		if(UserOptions == NULL)
@@ -178,7 +148,7 @@ ZEFontResourceBitmap* ZEFontResourceBitmap::LoadResource(const ZEString& FilePat
 	}
 	else
 	{
-		zeError("Texture file not found. FilePath : \"%s\"", FilePath.GetValue());
+		zeError("Texture file not found. FilePath : \"%s\"", FileName.GetValue());
 		return NULL;
 	}
 }

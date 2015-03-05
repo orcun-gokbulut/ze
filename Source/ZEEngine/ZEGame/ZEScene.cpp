@@ -58,30 +58,6 @@
 
 #include <memory.h>
 
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
-
 bool ZEScene::Initialize()
 {
 	if (Initialized)
@@ -370,11 +346,8 @@ bool ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parame
 bool ZEScene::Save(const ZEString& FileName)
 {
 	zeLog("Saving scene file \"%s\".", FileName.GetValue());
-
-	ZEString NewPath = ConstructResourcePath(FileName);
-
 	ZEFile Serializer;
-	if (Serializer.Open(NewPath, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+	if (Serializer.Open(FileName, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
 	{
 		ZEUInt32 EntityCount = (ZEUInt32)Entities.GetCount();
 		Serializer.Write(&EntityCount, sizeof(ZEUInt32), 1);
@@ -405,7 +378,7 @@ bool ZEScene::Save(const ZEString& FileName)
 
 		Serializer.Close();
 		
-		zeLog("Scene file \"%s\" saved.", NewPath.GetValue());
+		zeLog("Scene file \"%s\" saved.", FileName.GetValue());
 		Serializer.Close();
 		return true;
 	}
@@ -419,13 +392,10 @@ bool ZEScene::Save(const ZEString& FileName)
 bool ZEScene::Load(const ZEString& FileName)
 {
 	zeLog("Loading scene file \"%s\".", FileName.GetValue());
-
-	ZEString NewPath = ConstructResourcePath(FileName);
-
 	ZEFile Unserializer;
 	char EntityTypeName[ZE_MAX_NAME_SIZE];
 
-	if (Unserializer.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE))
+	if (Unserializer.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
 	{
 		ZEUInt32 EntityCount;
 		Unserializer.Read(&EntityCount, sizeof(ZEUInt32), 1);
@@ -462,13 +432,13 @@ bool ZEScene::Load(const ZEString& FileName)
 			AddEntity(NewEntity);
 		}
 
-		zeLog("Scene file \"%s\" has been loaded.", NewPath.GetValue());
+		zeLog("Scene file \"%s\" has been loaded.", FileName.GetValue());
 		Unserializer.Close();
 		return true;
 	}
 	else
 	{
-		zeError("Can not open scene file. Unserialization failed. FileName : \"%s\"", NewPath.GetValue());
+		zeError("Can not open scene file. Unserialization failed. FileName : \"%s\"", FileName.GetValue());
 		return false;
 	}
 }

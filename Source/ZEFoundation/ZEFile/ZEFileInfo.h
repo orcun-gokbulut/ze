@@ -37,40 +37,24 @@
 #ifndef __ZE_FILE_INFO_H__
 #define __ZE_FILE_INFO_H__
 
+#include "ZEPathInfo.h"
+
 #include "ZETypes.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEPath.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEString.h"
 
-class ZEFileInfo
+class ZEFileInfo : public ZEPathInfo
 {
-	private:
-		ZEString				Path;
-
 	public:
-		const ZEString&			GetPath();
-		ZEString				GetFullName();
-		ZEString				GetName();
-		ZEString				GetExtension();
-		ZEString				GetParentDirectory();
-		ZEString				GetRealPath();
-		ZEPathRoot				GetRoot();
-
-		ZEPathAccess			GetAccess();
 		ZEInt64					GetSize();
-
 		bool					IsExists();
-		bool					IsInsidePackage();
-
-		ZEFileTime				GetCreationDate();
-		ZEFileTime				GetModificationTime();
 
 		bool					Rename(const char* Name);
 		bool					Move(const char* Destination);
 		bool					Copy(const char* Destination);
 		bool					Delete();
 		bool					Touch();
-
+	
 		bool					LoadText(ZEString& Output);
 		bool					LoadBinary(ZEArray<ZEBYTE>& Output);
 

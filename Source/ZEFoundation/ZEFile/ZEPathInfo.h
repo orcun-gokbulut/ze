@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDirectoryInfo.h
+ Zinek Engine - ZEPathInfo.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,25 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_DIRECTORY_INFO_H__
-#define __ZE_DIRECTORY_INFO_H__
+#ifndef __ZE_PATH_INFO_H__
+#define __ZE_PATH_INFO_H__
 
-#include "ZEPathInfo.h"
+#include "ZETypes.h"
+#include "ZEFileCommon.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 
-class ZEDirectoryInfo : public ZEPathInfo
+class ZEPathInfo
 {
+	protected:
+		ZEString				Path;
+
 	public:
+		const ZEString&			GetPath();
+		ZEString				GetFullName();
+		ZEString				GetName();
+		ZEString				GetExtension();
+		ZEString				GetParentDirectory();
+		ZEPathRoot				GetRoot();
+		ZEPathAccess			GetAccess();
+		ZERealPath				GetRealPath();
+
 		bool					IsExists();
+		bool					IsInsidePackage();
 
-		ZEArray<ZEString>		GetSubDirectories();
-		ZEArray<ZEString>		GetFiles();
+		ZEFileTime				GetCreationDate();
+		ZEFileTime				GetModificationTime();
 
-		bool					Rename(const char* Name);
-		bool					Move(const char* Destination);
-		bool					Copy(const char* Destination);
-		bool					Delete();
+		ZEArray<ZEString>		DividePath();
+		ZEString				Normalize();
 
-		static ZEDirectoryInfo	Populate(const char* Path);
+		static ZEPathInfo		PopulateRelative(const char* ParentPath, const char* Path);
+		static ZEPathInfo		Populate(const char* Path);
 };
 
 #endif
