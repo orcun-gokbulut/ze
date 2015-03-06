@@ -42,8 +42,6 @@
 class ZEDirectoryInfo : public ZEPathInfo
 {
 	public:
-		bool					IsExists();
-
 		ZEArray<ZEString>		GetSubDirectories();
 		ZEArray<ZEString>		GetFiles();
 
@@ -51,8 +49,10 @@ class ZEDirectoryInfo : public ZEPathInfo
 		bool					Move(const char* Destination);
 		bool					Copy(const char* Destination);
 		bool					Delete();
-
-		static ZEDirectoryInfo	Populate(const char* Path);
+		
+								ZEDirectoryInfo();
+								ZEDirectoryInfo(const char* Path);
+								ZEDirectoryInfo(const char* ParentPath, const char* RelativePath);
 };
 
 #endif

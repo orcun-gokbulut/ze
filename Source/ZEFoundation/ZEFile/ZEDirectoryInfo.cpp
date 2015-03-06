@@ -41,32 +41,16 @@
 #include <Windows.h>
 #include <shlwapi.h>
 
-bool ZEDirectoryInfo::IsExists()
-{
-	if ((GetAccess() & ZE_PA_READ) == 0)
-		return false;
-
-	DWORD PathAttribute = GetFileAttributesA(Path);
-	if (PathAttribute == INVALID_FILE_ATTRIBUTES)
-		return false; 
-	else if (PathAttribute & FILE_ATTRIBUTE_DIRECTORY)
-		return true;
-	else
-		return false;
-}
-
 ZEArray<ZEString> ZEDirectoryInfo::GetSubDirectories()
 {
-	ZERealPath RealPath = GetRealPath();
-	if ((RealPath.Access & ZE_PA_READ) == 0)
+	if ((GetAccess() & ZE_PA_READ) == 0)
 		return ZEArray<ZEString>();
-
-
+	
 	WIN32_FIND_DATA fdFile; 
 	HANDLE hFind = NULL; 
 	char sPath[2048]; 
 
-	sprintf(sPath, "%s\\*.*", RealPath.Path.ToWStdString().c_str()); 
+	sprintf(sPath, "%s\\*.*", GetRealPath().Path.ToWStdString().c_str()); 
 	if((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE) 
 		return ZEArray<ZEString>();
 
@@ -86,15 +70,14 @@ ZEArray<ZEString> ZEDirectoryInfo::GetSubDirectories()
 
 ZEArray<ZEString> ZEDirectoryInfo::GetFiles()
 {
-	ZERealPath RealPath = GetRealPath();
-	if ((RealPath.Access & ZE_PA_READ) == 0)
+	if ((GetAccess() & ZE_PA_READ) == 0)
 		return ZEArray<ZEString>();
 	
 	WIN32_FIND_DATA fdFile; 
 	HANDLE hFind = NULL; 
 	char sPath[2048]; 
 
-	sprintf(sPath, "%s\\*.*", RealPath.Path.ToWStdString().c_str()); 
+	sprintf(sPath, "%s\\*.*", GetRealPath().Path.ToWStdString().c_str()); 
 	if((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE) 
 		return ZEArray<ZEString>();
 
@@ -120,9 +103,9 @@ bool ZEDirectoryInfo::Rename(const char* Name)
 	if (!IsExists())
 		return false;
 
-	ZEString Destination = ZEFormat::Format("{0}\\{1}", GetParentDirectory(), GetFullName());
+	ZEString Destination = ZEFormat::Format("{0}\\{1}", GetParentDirectory(), GetFileName());
 
-	ZERealPath DestinationRealPath = ZEDirectoryInfo::Populate(Destination).GetRealPath();
+	ZERealPath DestinationRealPath = ZEDirectoryInfo(Destination).GetRealPath();
 	return MoveFileEx(GetRealPath().Path, DestinationRealPath.Path, MOVEFILE_REPLACE_EXISTING) != 0;
 }
 
@@ -134,11 +117,11 @@ bool ZEDirectoryInfo::Move(const char* Destination)
 	if (!IsExists())
 		return false;
 	
-	ZEDirectoryInfo DestinationInfo = ZEDirectoryInfo::Populate(Destination);
+	ZEDirectoryInfo DestinationInfo(Destination);
 	if ((DestinationInfo.GetAccess() & ZE_PA_WRITE) == 0)
 		return false;
 
-	ZERealPath DestinationRealPath = ZEDirectoryInfo::Populate(Destination).GetRealPath();
+	ZERealPath DestinationRealPath = DestinationInfo.GetRealPath();
 	return MoveFileEx(GetRealPath().Path, DestinationRealPath.Path, MOVEFILE_REPLACE_EXISTING) != 0;
 }
 
@@ -150,11 +133,11 @@ bool ZEDirectoryInfo::Copy(const char* Destination)
 	if (!IsExists())
 		return false;
 
-	ZEDirectoryInfo DestinationInfo = ZEDirectoryInfo::Populate(Destination);
+	ZEDirectoryInfo DestinationInfo(Destination);
 	if ((DestinationInfo.GetAccess() & ZE_PA_WRITE) == 0)
 		return false;
 
-	ZERealPath DestinationRealPath = ZEDirectoryInfo::Populate(Destination).GetRealPath();
+	ZERealPath DestinationRealPath = DestinationInfo.GetRealPath();
 	return CopyFile(GetRealPath().Path, DestinationRealPath.Path, TRUE) != 0;
 }
 
@@ -171,10 +154,17 @@ bool ZEDirectoryInfo::Delete()
 
 #endif
 
-ZEDirectoryInfo ZEDirectoryInfo::Populate(const char* Path)
+ZEDirectoryInfo::ZEDirectoryInfo()
 {
-	ZEDirectoryInfo Info;
-	Info.Path = Path;
-	Info.Path.TrimSelf();
-	return Info;
+
+}
+
+ZEDirectoryInfo::ZEDirectoryInfo(const char* Path)
+{
+	SetPath(Path);
+}
+
+ZEDirectoryInfo::ZEDirectoryInfo(const char* ParentPath, const char* RelativePath)
+{
+	SetRelativePath(ParentPath, RelativePath);
 }

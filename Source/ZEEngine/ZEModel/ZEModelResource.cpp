@@ -173,9 +173,9 @@ bool ZEModelResource::ReadMaterials(ZEMLSerialReader* NodeReader)
 		if (!NodeReader->ReadPropertyList(MaterialList, 2))
 			return false;
 
-		ZEString MaterialPath = ZEFileInfo::Populate(this->GetFileName()).GetParentDirectory() + "/" + FilePathValue.GetString();
+		ZEString MaterialPath = ZEFileInfo(this->GetFileName()).GetParentDirectory() + "/" + FilePathValue.GetString();
 
-		if (!ZEFileInfo::Populate(MaterialPath).IsExists())
+		if (!ZEFileInfo(MaterialPath).IsFile())
 			return false;
 
 		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();

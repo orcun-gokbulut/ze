@@ -90,7 +90,7 @@ void ZEMLVisualizerTreeWidget::dragEnterEvent(QDragEnterEvent* Event)
 
 void ZEMLVisualizerTreeWidget::dropEvent(QDropEvent* Event)
 {
-	if(!ZEFileInfo::Populate((const char*)Event->mimeData()->urls()[0].path().toLatin1()).IsExists())
+	if(!ZEFileInfo((const char*)Event->mimeData()->urls()[0].path().toLatin1()).IsFile())
 		return;
 
 	((ZEMLVisualizerWidget*)ParentWidget)->SetZEMLFile((const char*)Event->mimeData()->urls()[0].path().toLatin1());

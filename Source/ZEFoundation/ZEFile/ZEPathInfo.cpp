@@ -52,7 +52,10 @@ const char* TokenizePath(char* Output, const char* Path)
 	while(*Path != '\0')
 	{
 		if (TrimLeft && (*Path == ' ' || *Path == '\t'))
+		{
+			Path++;
 			continue;
+		}
 
 		TrimLeft = false;
 
@@ -62,9 +65,8 @@ const char* TokenizePath(char* Output, const char* Path)
 			break;
 		}
 		else if (*Path == '<' || *Path == '>' ||
-			*Path == ':' ||	*Path == '"' ||
-			*Path == '|' ||	*Path == '?' ||
-			*Path == '*')
+			*Path == '*' ||	*Path == '"' ||
+			*Path == '|' ||	*Path == '?')
 		{
 			return false;
 		}
@@ -80,7 +82,7 @@ const char* TokenizePath(char* Output, const char* Path)
 	{
 		for (char* Iter = Output - 1; Iter != OutputStart; Iter--)
 		{
-			if (*Iter != ' ' && *Iter == '\t')
+			if (*Iter != ' ' && *Iter != '\t')
 				break;
 
 			Iter = '\0';
@@ -124,10 +126,42 @@ static ZEString ConstructPath(ZEArray<ZEString> PathElements)
 	{
 		Output += PathElements[I];
 		if (I != PathElements.GetSize() - 1)
-			Output += '/';
+			Output += "/";
 	}
 
 	return Output;
+}
+
+void ZEPathInfo::SetPath(const char* Path)
+{
+	this->Path = Path;
+}
+
+void ZEPathInfo::SetRelativePath(const char* ParentPath, const char* RelativePath)
+{
+	RelativePath = "";
+
+	ZEPathInfo RelativePathInfo(RelativePath);
+	if (RelativePathInfo.GetRoot() == ZE_PR_NONE)
+	{
+		return;
+	}
+	else if (RelativePathInfo.GetRoot() != ZE_PR_RELATIVE)
+	{
+		Path = RelativePath;
+		return;
+	}
+
+	ZEPathInfo ParentPathInfo = ZEPathInfo(ParentPath);
+	if (ParentPathInfo.IsFile()) // Relative To File
+	{
+		ZEString ParentDirectory = ParentPathInfo.GetParentDirectory();
+		Path = ZEFormat::Format("{0}/{1}", ParentDirectory, RelativePath);
+	}
+	else
+	{
+		Path = ZEFormat::Format("{0}/{1}", ParentPath, RelativePath);
+	}
 }
 
 const ZEString&	ZEPathInfo::GetPath()
@@ -135,7 +169,7 @@ const ZEString&	ZEPathInfo::GetPath()
 	return Path;
 }
 
-ZEString ZEPathInfo::GetFullName()
+ZEString ZEPathInfo::GetFileName()
 {
 	ZESSize Length = Path.GetLength();
 	for (ZESSize I = Length - 1; I >= 0; I--)
@@ -150,13 +184,25 @@ ZEString ZEPathInfo::GetFullName()
 ZEString ZEPathInfo::GetName()
 {
 	ZESSize Length = Path.GetLength();
+	ZESSize Start = -1;
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
+		if(Path[I] == '.')
+			Start = I;
+
 		if (Path[I] == '\\' || Path[I] == '/')
-			return Path.Right(Length - 1 - I).Trim();
+		{
+			if (Start == -1)
+				return Path.Right(Length - I - 1);
+			else
+				return Path.Middle(I + 1, Start - 1).Trim();
+		}
 	}
 
-	return Path;
+	if (Start == -1)
+		return Path;
+	else
+		Path.Left(Start - 1);
 }
 
 ZEString ZEPathInfo::GetExtension()
@@ -208,7 +254,7 @@ ZEPathRoot ZEPathInfo::GetRoot()
 	if (!TokenizePath(RootNode, Iterator))
 		return ZE_PR_NONE;
 
-	return ZEPathManager::GetInstance()->GetRoot(Path);
+	return ZEPathManager::GetInstance()->GetRoot(RootNode);
 }
 
 ZEPathAccess ZEPathInfo::GetAccess()
@@ -238,12 +284,40 @@ bool ZEPathInfo::IsExists()
 		return true;
 }
 
+bool ZEPathInfo::IsFile()
+{
+	if ((GetAccess() & ZE_PA_READ) == 0)
+		return false;
+
+	DWORD PathAttribute = GetFileAttributesA(GetRealPath().Path);
+	if (PathAttribute == INVALID_FILE_ATTRIBUTES)
+		return false; 
+	else if ((PathAttribute & FILE_ATTRIBUTE_DIRECTORY) == 0)
+		return true;
+	else
+		return false;
+}
+
+bool ZEPathInfo::IsDirectory()
+{
+	if ((GetAccess() & ZE_PA_READ) == 0)
+		return false;
+
+	DWORD PathAttribute = GetFileAttributesA(GetRealPath().Path);
+	if (PathAttribute == INVALID_FILE_ATTRIBUTES)
+		return false; 
+	else if ((PathAttribute & FILE_ATTRIBUTE_DIRECTORY) != 0)
+		return true;
+	else
+		return false;
+}
+
 ZEFileTime ZEPathInfo::GetCreationDate()
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return ZEFileTime();
 
-	HANDLE Handle = CreateFile(Path, GENERIC_WRITE, FILE_SHARE_WRITE,	NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	HANDLE Handle = CreateFile(GetRealPath().Path, GENERIC_WRITE, FILE_SHARE_WRITE,	NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	if (Handle == INVALID_HANDLE_VALUE)
 		return ZEFileTime();
 
@@ -277,7 +351,7 @@ ZEFileTime ZEPathInfo::GetModificationTime()
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return ZEFileTime();
 
-	HANDLE Handle = CreateFile(Path, GENERIC_WRITE, FILE_SHARE_WRITE,	NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	HANDLE Handle = CreateFile(GetRealPath().Path, GENERIC_WRITE, FILE_SHARE_WRITE,	NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	if (Handle == INVALID_HANDLE_VALUE)
 		return ZEFileTime();
 
@@ -336,35 +410,17 @@ ZEString ZEPathInfo::Normalize()
 	return ConstructPath(PathElements);
 }
 
-ZEPathInfo ZEPathInfo::PopulateRelative(const char* ParentPath, const char* Path)
+ZEPathInfo::ZEPathInfo()
 {
-	ZEPathInfo PathInfo = ZEPathInfo::Populate(Path);
-	if (PathInfo.GetRoot() == ZE_PR_NONE)
-		return ZEPathInfo();
-	else if (PathInfo.GetRoot() != ZE_PR_RELATIVE)
-		return PathInfo;
 
-	ZEPathInfo ParentPathInfo = ZEPathInfo::Populate(ParentPath);
-	if (ParentPathInfo.GetRoot() == ZE_PR_NONE)
-		return PathInfo;
-	else if (ParentPathInfo.GetRoot() == ZE_PR_RELATIVE)
-		return ZEPathInfo::Populate(ZEFormat::Format("{0}/{0}", ParentPath, Path));
-
-	ZEPathInfo ParentDirectoryPathInfo = ZEPathInfo::Populate(ParentPathInfo.GetParentDirectory());
-	ZEArray<ZEString> PathElements = ParentDirectoryPathInfo.DividePath();
-	
-	PathElements.Combine(PathInfo.DividePath());
-
-	if (!NormalizePath(PathElements))
-		return ZEPathInfo();
-
-	return ZEPathInfo::Populate(ConstructPath(PathElements));
 }
 
-ZEPathInfo ZEPathInfo::Populate(const char* Path)
+ZEPathInfo::ZEPathInfo(const char* Path)
 {
-	ZEPathInfo Info;
-	Info.Path = Path;
-	Info.Path.TrimSelf();
-	return Info;
+	SetPath(Path);
+}
+
+ZEPathInfo::ZEPathInfo(const char* ParentPath, const char* Path)
+{
+	SetRelativePath(ParentPath, Path);
 }

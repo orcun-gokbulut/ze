@@ -198,7 +198,7 @@ ZEFontResourceBitmap* ZEFontResourceBitmap::LoadResource(ZEFile* ResourceFile, c
 			Reader->Read();
 			ZEString TextureFileName = Reader->GetItemValue().GetString();
 
-			ZEString TexturePath = "../" + ZEDirectoryInfo::Populate(ResourceFile->GetPath()).GetParentDirectory() + "/" + TextureFileName;
+			ZEString TexturePath = "../" + ZEDirectoryInfo(ResourceFile->GetPath()).GetParentDirectory() + "/" + TextureFileName;
 
 			NewResource->TextureResources[I] = ZETexture2DResource::LoadSharedResource(TexturePath);
 			NewResource->Textures[I] = NewResource->TextureResources[I]->GetTexture();

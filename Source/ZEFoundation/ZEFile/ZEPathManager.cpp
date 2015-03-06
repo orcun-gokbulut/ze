@@ -55,13 +55,8 @@ bool ZEPathManager::GetAccessControl()
 
 void ZEPathManager::Initialize()
 {
-	HMODULE ModuleHandle = GetModuleHandle(NULL);
-	char ZinekExecutivePath[256];
-	GetModuleFileName(ModuleHandle, ZinekExecutivePath, 256);
-
-	char ZinekPath[256];
-	GetFullPathName(ZinekExecutivePath, 256, ZinekPath, NULL);
-
+	char ZinekPath[MAX_PATH];
+	DWORD a = GetCurrentDirectory(MAX_PATH, ZinekPath);
 
 	char AppData[MAX_PATH];
 	SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, AppData);
@@ -130,7 +125,7 @@ ZEPathRoot ZEPathManager::GetRoot(ZEString RootPath)
 	{
 		return ZE_PR_NONE;
 	}
-	else if (RootPath.Right(0) == ":")
+	else if (RootPath.Right(1) == ":")
 	{
 		ZEString RootName = RootPath.Left(RootPath.GetLength() - 1);
 		if (RootName == "#Internal" || RootName == "#I")
@@ -158,7 +153,7 @@ ZEPathManager::ZEPathManager()
 ZEPathManager* ZEPathManager::GetInstance()
 {
 	static ZEPathManager* PathManager = NULL;
-	if (PathManager != NULL)
+	if (PathManager == NULL)
 	{
 		PathManager = new ZEPathManager();
 		PathManager->Initialize();

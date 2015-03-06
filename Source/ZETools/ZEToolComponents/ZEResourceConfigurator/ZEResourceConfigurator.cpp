@@ -88,7 +88,7 @@ bool ZEResourceConfigurator::GetResourceCopyState(const ZEString& FileName)
 		return false;
 	}
 
-	if(ZEFileInfo::Populate(TempOption->ExportPath + "\\" + TempOption->Identifier).IsExists())
+	if(ZEFileInfo(TempOption->ExportPath + "\\" + TempOption->Identifier).IsFile())
 		IsAvailableAtExportLocation = true;
 
 	if(TempOption->Action == ZE_ROAA_DO_NOTHING)
@@ -108,8 +108,8 @@ bool ZEResourceConfigurator::GetResourceCopyState(const ZEString& FileName)
 			if(!IsAvailableAtExportLocation)
 				return true;
 
-			ZEFileTime ExportedFileTime = ZEFileInfo::Populate(TempOption->ExportPath + "\\" + TempOption->Identifier).GetModificationTime();
-			ZEFileTime SourceFileTime = ZEFileInfo::Populate(TempOption->PhysicalPath).GetModificationTime();
+			ZEFileTime ExportedFileTime = ZEFileInfo(TempOption->ExportPath + "\\" + TempOption->Identifier).GetModificationTime();
+			ZEFileTime SourceFileTime = ZEFileInfo(TempOption->PhysicalPath).GetModificationTime();
 			if(GetTime(&ExportedFileTime) >= GetTime(&SourceFileTime))
 				return true;
 
