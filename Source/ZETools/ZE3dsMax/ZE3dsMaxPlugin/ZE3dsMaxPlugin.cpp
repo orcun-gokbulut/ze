@@ -97,7 +97,7 @@ __declspec( dllexport ) ULONG LibVersion()
 
 __declspec( dllexport ) ZEInt LibInitialize(void)
 {	
-	ZEDirectoryInfo IconsDirectory = ZEDirectoryInfo::Populate(IPathConfigMgr::GetPathConfigMgr()->GetDir(APP_USER_ICONS_DIR));
+	ZEDirectoryInfo IconsDirectory = ZEDirectoryInfo(IPathConfigMgr::GetPathConfigMgr()->GetDir(APP_USER_ICONS_DIR));
 
 	ZEToolbarIcons_16a_bmp IconImage16a;
 	ZEToolbarIcons_16i_bmp IconImage16i;
@@ -107,35 +107,35 @@ __declspec( dllexport ) ZEInt LibInitialize(void)
 
 	ZEFile IconFile;
 
-	if (!ZEFileInfo::Populate(IconsDirectory.GetPath() + "/ZEToolbarIcons_16a.bmp").IsExists())
+	if (!ZEFileInfo(IconsDirectory.GetPath() + "/ZEToolbarIcons_16a.bmp").IsFile())
 	{
 		IconFile.Open(IconsDirectory.GetPath() + "/ZEToolbarIcons_16a.bmp" , ZE_FOM_WRITE, ZE_FCM_CREATE);
 		IconFile.Write(IconImage16a.GetData(), IconImage16a.GetSize(), 1);
 		IconFile.Close();
 	}
 
-	if (!ZEFileInfo::Populate(IconsDirectory.GetPath() + "/ZEToolbarIcons_16i.bmp").IsExists())
+	if (!ZEFileInfo(IconsDirectory.GetPath() + "/ZEToolbarIcons_16i.bmp").IsFile())
 	{
 		IconFile.Open(IconsDirectory.GetPath() + "/ZEToolbarIcons_16i.bmp" , ZE_FOM_WRITE, ZE_FCM_CREATE);
 		IconFile.Write(IconImage16i.GetData(), IconImage16i.GetSize(), 1);
 		IconFile.Close();
 	}
 
-	if (!ZEFileInfo::Populate(IconsDirectory.GetPath() + "/ZEToolbarIcons_24a.bmp").IsExists())
+	if (!ZEFileInfo(IconsDirectory.GetPath() + "/ZEToolbarIcons_24a.bmp").IsFile())
 	{
 		IconFile.Open(IconsDirectory.GetPath() + "/ZEToolbarIcons_24a.bmp" , ZE_FOM_WRITE, ZE_FCM_CREATE);
 		IconFile.Write(IconImage24a.GetData(), IconImage24a.GetSize(), 1);
 		IconFile.Close();
 	}
 
-	if (!ZEFileInfo::Populate(IconsDirectory.GetPath() + "/ZEToolbarIcons_24i.bmp").IsExists())
+	if (!ZEFileInfo(IconsDirectory.GetPath() + "/ZEToolbarIcons_24i.bmp").IsFile())
 	{
 		IconFile.Open(IconsDirectory.GetPath() + "/ZEToolbarIcons_24i.bmp" , ZE_FOM_WRITE, ZE_FCM_CREATE);
 		IconFile.Write(IconImage24i.GetData(), IconImage24i.GetSize(), 1);
 		IconFile.Close();
 	}
 
-	if (!ZEFileInfo::Populate(IconsDirectory.GetPath() + "/zineklogo.bmp").IsExists())
+	if (!ZEFileInfo(IconsDirectory.GetPath() + "/zineklogo.bmp").IsFile())
 	{
 		IconFile.Open(IconsDirectory.GetPath() + "/zineklogo.bmp" , ZE_FOM_WRITE, ZE_FCM_CREATE);
 		IconFile.Write(ZinekLogo.GetData(), ZinekLogo.GetSize(), 1);

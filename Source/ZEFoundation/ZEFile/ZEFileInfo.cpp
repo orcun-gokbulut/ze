@@ -48,7 +48,7 @@ ZEInt64 ZEFileInfo::GetSize()
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return -1;
 
-	HANDLE Handle = CreateFile(Path, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	HANDLE Handle = CreateFile(GetRealPath().Path, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	if (Handle == INVALID_HANDLE_VALUE)
 		return false;
 
@@ -57,20 +57,6 @@ ZEInt64 ZEFileInfo::GetSize()
 		return -1;
 
 	return FileSize.QuadPart;
-}
-
-bool ZEFileInfo::IsExists()
-{
-	if ((GetAccess() & ZE_PA_READ) == 0)
-		return false;
-
-	DWORD PathAttribute = GetFileAttributesA(Path);
-	if (PathAttribute == INVALID_FILE_ATTRIBUTES)
-		return false; 
-	else if ((PathAttribute & FILE_ATTRIBUTE_DIRECTORY) == 0)
-		return true;
-	else
-		return false;
 }
 
 bool ZEFileInfo::Rename(const char* Name)
@@ -88,7 +74,7 @@ bool ZEFileInfo::Rename(const char* Name)
 
 	ZEString Destination = ZEFormat::Format("{0}\\{1}", GetParentDirectory(), Name);
 
-	ZERealPath DestinationRealPath = ZEFileInfo::Populate(Destination).GetRealPath();
+	ZERealPath DestinationRealPath = ZEFileInfo(Destination).GetRealPath();
 	return MoveFileEx(GetRealPath().Path, DestinationRealPath.Path, MOVEFILE_REPLACE_EXISTING) != 0;
 }
 
@@ -97,11 +83,11 @@ bool ZEFileInfo::Move(const char* Destination)
 	if ((GetAccess() & ZE_PA_READ_WRITE) == 0)
 		return false;
 
-	ZEDirectoryInfo DestinationInfo = ZEDirectoryInfo::Populate(Destination);
+	ZEDirectoryInfo DestinationInfo(Destination);
 	if ((DestinationInfo.GetAccess() & ZE_PA_WRITE) == 0)
 		return false;
 
-	ZERealPath DestinationRealPath = ZEFileInfo::Populate(Destination).GetRealPath();
+	ZERealPath DestinationRealPath = DestinationInfo.GetRealPath();
 	return MoveFileEx(GetRealPath().Path, DestinationRealPath.Path, MOVEFILE_REPLACE_EXISTING) != 0;
 }
 
@@ -110,11 +96,11 @@ bool ZEFileInfo::Copy(const char* Destination)
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return false;
 
-	ZEDirectoryInfo DestinationInfo = ZEDirectoryInfo::Populate(Destination);
+	ZEDirectoryInfo DestinationInfo(Destination);
 	if ((DestinationInfo.GetAccess() & ZE_PA_WRITE) == 0)
 		return false;
 
-	ZERealPath DestinationRealPath = ZEFileInfo::Populate(Destination).GetRealPath();
+	ZERealPath DestinationRealPath = DestinationInfo.GetRealPath();
 	return CopyFile(GetRealPath().Path, DestinationRealPath.Path, TRUE) != 0;
 }
 
@@ -151,12 +137,19 @@ bool ZEFileInfo::Touch()
 	return true;
 }
 
-ZEFileInfo ZEFileInfo::Populate(const char* Path)
+ZEFileInfo::ZEFileInfo()
 {
-	ZEFileInfo Info;
-	Info.Path = Path;
-	Info.Path.TrimSelf();
-	return Info;
+
+}
+
+ZEFileInfo::ZEFileInfo(const char* Path)
+{
+	SetPath(Path);
+}
+
+ZEFileInfo::ZEFileInfo(const char* ParentPath, const char* Path)
+{
+	SetRelativePath(ParentPath, Path);
 }
 
 #endif

@@ -38,10 +38,9 @@
 #include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileInfo.h"
-#include "ZEFile/ZEPathUtils.h"
 #include "ZEFile\ZEDirectoryInfo.h"
-#include "ZEFile\ZEFileOperations.h"
 #include "ZEML/ZEMLSerialWriter.h"
+#include "ZEMath/ZEMath.h"
 
 // #include <IGame/IGameFx.h>
 // #include <io.h>
@@ -168,11 +167,11 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 		{
 			ZEMLNode* MaterialNode = MaterialsNode->AddSubNode("Material");
 			MaterialNode->AddProperty("Name", MaterialName);
-			MaterialNode->AddProperty("FilePath", ResourceConfigurationDialog->GetResourceRelativePath(ZEString(FileName) , MaterialName + ".ZEMATERIAL"));
+			MaterialNode->AddProperty("FilePath", ResourceConfigurationDialog->GetResourceRelativePath(ZEString(FileName) , MaterialName + ".ZEMaterial"));
 			continue;
 		}
 
-		ZEString MaterialFilePath = MaterialOption.ExportPath + ZEPathUtils::GetSeperator() + MaterialOption.Identifier;
+		ZEString MaterialFilePath = MaterialOption.ExportPath + ZEString("/") + MaterialOption.Identifier;
 
 		ZEProgressDialog::GetInstance()->OpenTask(MaterialName);
 		zeLog("Processing material \"%s\" (%u/%d).", MaterialName.ToCString(), I + 1, ProcessedMaterials.Count());
@@ -185,7 +184,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 		ZeroMemory(EnvironmentMap, sizeof(EnvironmentMap));
 
 		ZEFile MaterialFile;
-		if (!MaterialFile.Open(MaterialOption.ExportPath + ZEPathUtils::GetSeperator() + MaterialName + ".ZEMaterial", ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+		if (!MaterialFile.Open(MaterialOption.ExportPath + ZEString("/") + MaterialName + ".ZEMaterial", ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
 		{
 			zeError("Material process failed. Unable to open file for material: \"%s\"", MaterialName);
 			return false;
@@ -204,11 +203,11 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 			case ID_AM: // Ambient
 				break;
 			case ID_DI: // Diffuse
-				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), MaterialOption))
-					zeError("Diffuse texture export path not found in resource options. Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), MaterialOption))
+					zeError("Diffuse texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
 
-				if(!ZEDirectoryInfo::IsDirectory(MaterialOption.ExportPath))
-					zeError("Diffuse texture export path not valid . Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
+					zeError("Diffuse texture export path not valid . Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
 				else
 				{
 					MapFlag |= ZE_MTMP_DIFFUSEMAP;
@@ -217,8 +216,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						ZEFileInfo FileInfo(MaterialOption.PhysicalPath);
-						if(!ZEFileOperations::Copy(MaterialOption.ExportPath, &FileInfo, true))
+						if(!ZEFileInfo(MaterialOption.ExportPath).Copy(MaterialOption.PhysicalPath))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -226,11 +224,11 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 				}
 				break;
 			case ID_SP: // Specular
-				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), MaterialOption))
-					zeError("Specular texture export path not found in resource options. Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), MaterialOption))
+					zeError("Specular texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
 
-				if(!ZEDirectoryInfo::IsDirectory(MaterialOption.ExportPath))
-					zeError("Specular texture export path not valid . Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
+					zeError("Specular texture export path not valid . Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
 				else
 				{
 					MapFlag |= ZE_MTMP_SPECULARMAP;
@@ -239,8 +237,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						ZEFileInfo FileInfo(MaterialOption.PhysicalPath);
-						if(!ZEFileOperations::Copy(MaterialOption.ExportPath, &FileInfo, true))
+						if(!ZEFileInfo(MaterialOption.ExportPath).Copy(MaterialOption.PhysicalPath))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -248,11 +245,11 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 				}
 				break;
 			case ID_SI:	// Emissive
-				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), MaterialOption))
-					zeError("Emissive texture export path not found in resource options. Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), MaterialOption))
+					zeError("Emissive texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
 
-				if(!ZEDirectoryInfo::IsDirectory(MaterialOption.ExportPath))
-					zeError("Emissive texture export path not valid . Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
+					zeError("Emissive texture export path not valid . Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
 				else
 				{
 					MapFlag |= ZE_MTMP_EMISSIVEMAP;
@@ -261,8 +258,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						ZEFileInfo FileInfo(MaterialOption.PhysicalPath);
-						if(!ZEFileOperations::Copy(MaterialOption.ExportPath, &FileInfo, true))
+						if(!ZEFileInfo(MaterialOption.ExportPath).Copy(MaterialOption.PhysicalPath))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -270,11 +266,11 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 				}
 				break;
 			case ID_OP:	// Opacity 
-				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), MaterialOption))
-					zeError("Opacity texture export path not found in resource options. Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), MaterialOption))
+					zeError("Opacity texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
 
-				if(!ZEDirectoryInfo::IsDirectory(MaterialOption.ExportPath))
-					zeError("Opacity texture export path not valid . Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
+					zeError("Opacity texture export path not valid . Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
 				else
 				{
 					MapFlag |= ZE_MTMP_OPACITYMAP;
@@ -283,8 +279,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						ZEFileInfo FileInfo(MaterialOption.PhysicalPath);
-						if(!ZEFileOperations::Copy(MaterialOption.ExportPath, &FileInfo, true))
+						if(!ZEFileInfo(MaterialOption.ExportPath).Copy(MaterialOption.PhysicalPath))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -305,11 +300,11 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 				*/
 				break;
 			case ID_BU: // Bump 
-				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), MaterialOption))
-					zeError("Bump texture export path not found in resource options. Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), MaterialOption))
+					zeError("Bump texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
 
-				if(!ZEDirectoryInfo::IsDirectory(MaterialOption.ExportPath))
-					zeError("Bump texture export path not valid . Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
+					zeError("Bump texture export path not valid . Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
 				else
 				{
 					MapFlag |= ZE_MTMP_NORMALMAP;
@@ -318,8 +313,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						ZEFileInfo FileInfo(MaterialOption.PhysicalPath);
-						if(!ZEFileOperations::Copy(MaterialOption.ExportPath, &FileInfo, true))
+						if(!ZEFileInfo(MaterialOption.ExportPath).Copy(MaterialOption.PhysicalPath))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -327,11 +321,11 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 				}
 				break;
 			case ID_RL: // Reflection - Environment
-				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), MaterialOption))
-					zeError("Environment texture export path not found in resource options. Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), MaterialOption))
+					zeError("Environment texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
 
-				if(!ZEDirectoryInfo::IsDirectory(MaterialOption.ExportPath))
-					zeError("Environment texture export path not valid . Resource identifier : %s", ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()).ToCString());
+				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
+					zeError("Environment texture export path not valid . Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
 				else
 				{
 					MapFlag |= ZE_MTMP_ENVIRONMENTMAP;
@@ -340,8 +334,7 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						ZEFileInfo FileInfo(MaterialOption.PhysicalPath);
-						if(!ZEFileOperations::Copy(MaterialOption.ExportPath, &FileInfo, true))
+						if(!ZEFileInfo(MaterialOption.ExportPath).Copy(MaterialOption.PhysicalPath))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -1760,30 +1753,38 @@ void ZE3dsMaxModelExporter::CollectResources()
 			IGameTextureMap* CurrentTexture = NodeMaterial->GetIGameTextureMap(N);
 			switch(CurrentTexture->GetStdMapSlot())
 			{
-			case ID_AM: // Ambient
-				break;
-			case ID_DI: // Diffuse
-				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
-				break;
-			case ID_SP: // Specular
-				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
-				break;
-			case ID_SI:	// Emissive
-				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
-				break;
-			case ID_OP:	// Opacity 
-				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
-				break;
-			case ID_FI:	// Filter color 
-				break;
-			case ID_BU: // Bump 
-				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
-				break;
-			case ID_RL: // Reflection - Environment
-				ResourceConfigurationDialog->AddResource(ZEFileInfo::GetFileName(CurrentTexture->GetBitmapFileName()), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
-				break; 
-			case ID_RR: // Refraction 
-				break;
+				case ID_AM: // Ambient
+					break;
+
+				case ID_DI: // Diffuse
+					ResourceConfigurationDialog->AddResource(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
+					break;
+
+				case ID_SP: // Specular
+					ResourceConfigurationDialog->AddResource(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
+					break;
+
+				case ID_SI:	// Emissive
+					ResourceConfigurationDialog->AddResource(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
+					break;
+
+				case ID_OP:	// Opacity 
+					ResourceConfigurationDialog->AddResource(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
+					break;
+
+				case ID_FI:	// Filter color 
+					break;
+
+				case ID_BU: // Bump 
+					ResourceConfigurationDialog->AddResource(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
+					break;
+
+				case ID_RL: // Reflection - Environment
+					ResourceConfigurationDialog->AddResource(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
+					break;
+
+				case ID_RR: // Refraction 
+					break;
 			}
 
 		}

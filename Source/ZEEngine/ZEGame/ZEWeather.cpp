@@ -366,7 +366,7 @@ ZEWeather::ZEWeather()
 	StarMap->SetName("StarMap");
 	StarMap->SetVisible(true);
 	StarMap->SetEnabled(true);
-	StarMap->SetSkyTexture("ZEEngine\\ZEAtmosphere\\Textures\\StarMap.png");
+	StarMap->SetSkyTexture("#R:\\ZEEngine\\ZEAtmosphere\\Textures\\StarMap.png");
 	StarMap->SetSkyColor(ZEVector3::One);
 	StarMap->SetSkyBrightness(1.0f);
 	this->AddComponent(StarMap);
@@ -376,7 +376,7 @@ ZEWeather::ZEWeather()
 	Moon->SetName("Moon");
 	Moon->SetEnabled(true);
 	Moon->SetVisible(true);
-	Moon->SetTexture("ZEEngine\\ZEAtmosphere\\Textures\\MoonFrame.png", 53, 1);
+	Moon->SetTexture("#R:\\ZEEngine\\ZEAtmosphere\\Textures\\MoonFrame.png", 53, 1);
 	Moon->SetAmbientColor(ZEVector3(1.0f, 0.99f, 0.92f));
 	Moon->SetDirection(MoonDirection);
 	Moon->SetPhase(MoonPhase);

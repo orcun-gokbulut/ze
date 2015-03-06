@@ -41,7 +41,6 @@
 #include "ZE3dsMaxModelExporterOptionsDialog.h"
 #include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
 #include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
-#include "ZEFile/ZEFileUtils.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileInfo.h"
 
@@ -271,7 +270,7 @@ bool ZE3dsMaxModelExporter::ShowResourceConfigurationDialog(HWND ParentWindow, c
 
 ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
-	ExportPath = ZEFileInfo::GetParentDirectory(name);
+	ExportPath = ZEFileInfo(name).GetParentDirectory();
 	LoadOptions(i->GetCurFilePath());
 
 	INodeTab lNodes;

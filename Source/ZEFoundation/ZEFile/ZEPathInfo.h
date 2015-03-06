@@ -48,8 +48,11 @@ class ZEPathInfo
 		ZEString				Path;
 
 	public:
+		void					SetPath(const char* Path);
+		void					SetRelativePath(const char* ParentPath, const char* RelativePath);
+
 		const ZEString&			GetPath();
-		ZEString				GetFullName();
+		ZEString				GetFileName();
 		ZEString				GetName();
 		ZEString				GetExtension();
 		ZEString				GetParentDirectory();
@@ -58,6 +61,8 @@ class ZEPathInfo
 		ZERealPath				GetRealPath();
 
 		bool					IsExists();
+		bool					IsFile();
+		bool					IsDirectory();
 		bool					IsInsidePackage();
 
 		ZEFileTime				GetCreationDate();
@@ -66,8 +71,9 @@ class ZEPathInfo
 		ZEArray<ZEString>		DividePath();
 		ZEString				Normalize();
 
-		static ZEPathInfo		PopulateRelative(const char* ParentPath, const char* Path);
-		static ZEPathInfo		Populate(const char* Path);
+								ZEPathInfo();
+								ZEPathInfo(const char* Path);
+								ZEPathInfo(const char* ParentPath, const char* RelativePath);
 };
 
 #endif

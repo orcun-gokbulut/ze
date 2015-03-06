@@ -72,7 +72,7 @@ const ZETexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZESt
 		if (TextureResources[I]->GetFileName() == FileName)
 			return TextureResources[I]->GetTexture();
 
-	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(ZEFileInfo::Populate(this->GetFileName()).GetParentDirectory() + "\\" + FileName);
+	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(ZEFileInfo(this->GetFileName()).GetParentDirectory() + "\\" + FileName);
 	if (NewTextureResource == NULL)
 	{
 		zeError("Can not load texture file. (FileName : \"%s\")", FileName.ToCString());
@@ -473,7 +473,7 @@ bool ZEInteriorResource::ReadMaterials(ZEMLSerialReader* Reader)
 
 		Reader->ReadPropertyList(MaterialList, 2);
 		
-		ZEString MaterialPath = ZEFileInfo::Populate(GetFileName()).GetParentDirectory() + "/" + MaterialRelativePath.GetString();
+		ZEString MaterialPath = ZEFileInfo(GetFileName()).GetParentDirectory() + "/" + MaterialRelativePath.GetString();
 
 		ZEFixedMaterial* CurrentMaterial = (ZEFixedMaterial*)Materials[I];
 		CurrentMaterial->ReadFromFile(MaterialPath);

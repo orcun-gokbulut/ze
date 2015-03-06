@@ -287,7 +287,7 @@ static bool LoadHeader(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8* Palett
 
 	if (strncmp(Footer.Signature, "TRUEVISION-XFILE.", 17) != 0)
 	{
-		if (ZEFileInfo::Populate(File->GetPath()).GetExtension().Lower() != ".tga")
+		if (ZEFileInfo(File->GetPath()).GetExtension().Lower() != ".tga")
 		{
 			if (OutputError)
 				zeError("Can not identifty the file. File is not a TGA 2.0 file and it's extension is not .TGA.");

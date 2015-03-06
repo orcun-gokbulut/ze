@@ -194,7 +194,7 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 	zeDebugCheck(File != NULL, "File is already open.");
 
 	ZEString ModeStr;
-	ZERealPath RealPath = ZEFileInfo::Populate(FilePath).GetRealPath();
+	ZERealPath RealPath = ZEFileInfo(FilePath).GetRealPath();
 
 	if (RealPath.Access == ZE_PA_NO_ACCESS)
 	{
@@ -392,7 +392,7 @@ ZEFileCreationMode ZEFile::GetCreationMode() const
 
 bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, const ZESize BufferSize)
 {
-	ZERealPath RealPath = ZEFileInfo::Populate(FilePath).GetRealPath();
+	ZERealPath RealPath = ZEFileInfo(FilePath).GetRealPath();
 	if ((RealPath.Access & ZE_PA_READ) == 0)
 		return false;
 
@@ -417,7 +417,7 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, const ZESize Buffe
 
 bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, const ZESize BufferSize)
 {
-	ZERealPath RealPath = ZEFileInfo::Populate(FilePath).GetRealPath();
+	ZERealPath RealPath = ZEFileInfo(FilePath).GetRealPath();
 	if ((RealPath.Access & ZE_PA_READ) == 0)
 		return false;
 

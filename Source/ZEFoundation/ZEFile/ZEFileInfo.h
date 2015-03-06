@@ -47,7 +47,6 @@ class ZEFileInfo : public ZEPathInfo
 {
 	public:
 		ZEInt64					GetSize();
-		bool					IsExists();
 
 		bool					Rename(const char* Name);
 		bool					Move(const char* Destination);
@@ -58,7 +57,9 @@ class ZEFileInfo : public ZEPathInfo
 		bool					LoadText(ZEString& Output);
 		bool					LoadBinary(ZEArray<ZEBYTE>& Output);
 
-		static ZEFileInfo		Populate(const char* Path);
+								ZEFileInfo();
+								ZEFileInfo(const char* Path);
+								ZEFileInfo(const char* ParentPath, const char* RelativePath);
 };
 
 #endif
