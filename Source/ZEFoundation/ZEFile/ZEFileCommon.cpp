@@ -41,9 +41,8 @@ ZEFileTime::ZEFileTime()
 	memset(this, 0, sizeof(ZEFileTime));
 }
 
-
 ZERealPath::ZERealPath()
 {
 	Access = ZE_PA_NO_ACCESS;
-	Root = ZE_PR_NONE;
+	Root = ZE_PR_UNKOWN;
 }

@@ -39,31 +39,42 @@
 
 #include "ZETypes.h"
 #include "ZEFileCommon.h"
+#include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 
 class ZEPathManager
 {
 	private:
-		bool						AccessControl;
+		bool					AccessControl;
 
-		ZEString					EnginePath;
-		ZEString					ResourcePath;
-		ZEString					StoragePath;
-		ZEString					UserStoragePath;
+		ZEArray<ZEString>		EnginePath;
+		ZEArray<ZEString>		ResourcePath;
+		ZEArray<ZEString>		StoragePath;
+		ZEArray<ZEString>		UserStoragePath;
+
+		void					SetEnginePath(const char* Path);
+		void					SetResourcePath(const char* Path);
+		void					SetStoragePath(const char* Path);
+		void					SetUserStoragePath(const char* Path);
 
 	public:
-		void						SetAccessControl(bool Enable);
-		bool						GetAccessControl();
+		void					SetAccessControl(bool Enable);
+		bool					GetAccessControl();
 
-		void						Initialize();
-		void						Deinitialize();
+		ZEString				GetEnginePath();
+		ZEString				GetResourcePath();
+		ZEString				GetStoragePath();
+		ZEString				GetUserStoragePath();
 
-		ZEPathRoot					GetRoot(ZEString RootPath);
-		ZERealPath					GetRootRealPath(ZEPathRoot Root);
+		void					Initialize();
+		void					Deinitialize();
 
-									ZEPathManager();
+		ZEPathRoot				GetRoot(const char* Path);
+		ZERealPath				TranslateToRealPath(const char* Path);
 
-		static ZEPathManager*		GetInstance();
+								ZEPathManager();
+
+		static ZEPathManager*	GetInstance();
 };
 
 #endif

@@ -65,15 +65,23 @@ class ZEPathInfo
 		bool					IsDirectory();
 		bool					IsInsidePackage();
 
+		bool					IsParent(const char* ParentPath);
+		ZEString				GetRelativeTo(const char* ParentPath);
+
 		ZEFileTime				GetCreationDate();
 		ZEFileTime				GetModificationTime();
 
-		ZEArray<ZEString>		DividePath();
 		ZEString				Normalize();
 
 								ZEPathInfo();
 								ZEPathInfo(const char* Path);
 								ZEPathInfo(const char* ParentPath, const char* RelativePath);
+
+		static ZEArray<ZEString>	Divide(const char* Path);
+		static bool					Normalize(ZEArray<ZEString>& PathElements);
+		static ZEString				Construct(const ZEArray<ZEString>& PathElements);
+		static bool					CheckParent(const ZEArray<ZEString>& ParentPathElemens, const ZEArray<ZEString>& ChildrenPathElements);
+		static ZEArray<ZEString>	RelativeTo(const ZEArray<ZEString>& ParentPathElemens, const ZEArray<ZEString>& ChildrenPathElements);
 };
 
 #endif

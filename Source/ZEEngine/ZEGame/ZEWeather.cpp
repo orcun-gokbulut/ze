@@ -401,7 +401,7 @@ ZEWeather::ZEWeather()
 	Cloud->SetName("PlanarCloud");
 	Cloud->SetEnabled(true);
 	Cloud->SetVisible(true);
-	Cloud->SetCloudFormationTexture("ZEEngine\\ZEAtmosphere\\Textures\\Cloud.bmp");
+	Cloud->SetCloudFormationTexture("#R:/ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
 	Cloud->SetCamera(zeScene->GetActiveCamera());
 	Cloud->SetCloudPlaneHeight(600.0f);
 	Cloud->SetSunLightDirection(SunDirection);

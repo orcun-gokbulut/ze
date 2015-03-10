@@ -57,6 +57,7 @@
 #include "ZEInterior/ZEInteriorResource.h"
 
 #include <memory.h>
+#include "ZEMeta/ZEProvider.h"
 
 bool ZEScene::Initialize()
 {
@@ -393,7 +394,7 @@ bool ZEScene::Load(const ZEString& FileName)
 {
 	zeLog("Loading scene file \"%s\".", FileName.GetValue());
 	ZEFile Unserializer;
-	char EntityTypeName[ZE_MAX_NAME_SIZE];
+	char EntityClassName[ZE_MAX_NAME_SIZE];
 
 	if (Unserializer.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
 	{
@@ -408,26 +409,31 @@ bool ZEScene::Load(const ZEString& FileName)
 
 		for (ZESize I = 0; I < (ZESize)EntityCount; I++)
 		{
-			ZEEntity* NewEntity;
-			Unserializer.Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
-			//ZEMETADEBUGCHECK!!!
-			//NewEntity = ZEProvider::CreateInstance(EntityTypeName);
-			//NewEntity = (ZEEntity*)ZEEntityProvider::GetInstance()->CreateInstance(EntityTypeName);
-			if (NewEntity == NULL)
+			ZEClass* EntityClass = NULL;
+			Unserializer.Read(EntityClassName, sizeof(char), ZE_MAX_NAME_SIZE);
+
+			EntityClass = ZEProvider::GetInstance()->GetClass(EntityClassName);
+			if (EntityClass == NULL)
 			{
-				zeError("Unserialization can not create entity type \"%s\".", EntityTypeName);
-				zeError("Unserialization failed.");
+				zeError("Unserialization error. Cannot find entity class. Class Name: \"%s\".", EntityClassName);
+				Unserializer.Close();
 				return false;
 			}
 
-			//ZEMETADEBUGCHECK!!!
-			/*if (!NewEntity->Unserialize((ZEUnserializer*)&Unserializer))
+			ZEEntity* NewEntity = (ZEEntity*)EntityClass->CreateInstance();
+			if (NewEntity == NULL)
 			{
-				zeError("Unserialization of entity \"%s\" has failed.", Entities[I]->GetName());
-				zeError("Unserialization failed.");
+				zeError("Unserialization failed. Cannot create instance of an entity. Class Name: \"%s\".", EntityClassName);
 				Unserializer.Close();
 				return false;
-			}*/
+			}
+
+			if (!NewEntity->Restore((ZEUnserializer*)&Unserializer))
+			{
+				zeError("Unserialization failed. Unserialization of entity has failed. Class Name: \"%s\".", EntityClassName);
+				Unserializer.Close();
+				return false;
+			}
 
 			AddEntity(NewEntity);
 		}

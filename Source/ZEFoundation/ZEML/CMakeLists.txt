@@ -53,6 +53,8 @@ ze_add_source(ZEMLSerialWriterTests.cpp 	Tests)
 ze_add_source(ZEMLSerialReader.h 			Sources Headers)
 ze_add_source(ZEMLSerialReader.cpp 			Sources)
 ze_add_source(ZEMLSerialReaderTests.cpp 	Tests)
+ze_add_source(ZEMLReader.h					Sources Headers)
+ze_add_source(ZEMLReader.cpp				Sources)
 
 ze_add_library(TARGET ZEML 
 	SOURCES ${Sources} 
