@@ -38,6 +38,31 @@
 #include "ZEError.h"
 #include "ZEPathInfo.h"
 #include "ZEDS\ZEFormat.h"
+#include "ZEFileInfo.h"
+
+void ZEPathManager::SetEnginePath(const char* Path)
+{
+	EnginePath = ZEPathInfo::Divide(Path);
+	ZEPathInfo::Normalize(EnginePath);
+}
+
+void ZEPathManager::SetResourcePath(const char* Path)
+{
+	ResourcePath = ZEPathInfo::Divide(Path);
+	ZEPathInfo::Normalize(ResourcePath);
+}
+
+void ZEPathManager::SetStoragePath(const char* Path)
+{
+	StoragePath = ZEPathInfo::Divide(Path);
+	ZEPathInfo::Normalize(StoragePath);
+}
+
+void ZEPathManager::SetUserStoragePath(const char* Path)
+{
+	UserStoragePath = ZEPathInfo::Divide(Path);
+	ZEPathInfo::Normalize(UserStoragePath);
+}
 
 void ZEPathManager::SetAccessControl(bool Enable)
 {
@@ -47,6 +72,26 @@ void ZEPathManager::SetAccessControl(bool Enable)
 bool ZEPathManager::GetAccessControl()
 {
 	return AccessControl;
+}
+
+ZEString ZEPathManager::GetEnginePath()
+{
+	return ZEPathInfo::Construct(EnginePath);
+}
+
+ZEString ZEPathManager::GetResourcePath()
+{
+	return ZEPathInfo::Construct(ResourcePath);
+}
+
+ZEString ZEPathManager::GetStoragePath()
+{
+	return ZEPathInfo::Construct(StoragePath);
+}
+
+ZEString ZEPathManager::GetUserStoragePath()
+{
+	return ZEPathInfo::Construct(UserStoragePath);
 }
 
 #ifdef WIN32
@@ -64,10 +109,10 @@ void ZEPathManager::Initialize()
 	char SystemAppData[MAX_PATH];
 	SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, SystemAppData);
 
-	EnginePath = ZinekPath;
-	ResourcePath = ZEFormat::Format("{0}/Resources", EnginePath);
-	StoragePath = ZEFormat::Format("{0}/ZinekEngine", SystemAppData);
-	UserStoragePath = ZEFormat::Format("{0}/ZinekEngine", AppData);
+	SetEnginePath(ZinekPath);
+	SetResourcePath(ZEFormat::Format("{0}/Resources", ZinekPath));
+	SetStoragePath(ZEFormat::Format("{0}/Storage", ZinekPath));
+	SetUserStoragePath(ZEFormat::Format("{0}/ZinekEngine", AppData));
 }
 
 #endif
@@ -77,72 +122,101 @@ void ZEPathManager::Deinitialize()
 
 }
 
-ZERealPath ZEPathManager::GetRootRealPath(ZEPathRoot Root)
+ZERealPath ZEPathManager::TranslateToRealPath(const char* Path)
 {
 	ZERealPath RealPath;
-	RealPath.Root = Root;
-	switch (Root)
+	RealPath.Access = AccessControl ? ZE_PA_NO_ACCESS : ZE_PA_READ_WRITE;
+	RealPath.Root = ZE_PR_UNKOWN;
+	RealPath.Path = Path;
+
+	if (Path == NULL || Path[0] == '\0')
+		return RealPath;
+
+	ZEArray<ZEString> PathElements = ZEPathInfo::Divide(Path);
+	ZEPathInfo::Normalize(PathElements);
+	
+	if (PathElements.GetSize() == 0)
+		return RealPath;
+
+	if (PathElements[0] == "#Internal:" || PathElements[0] == "#I:")
 	{
-		default:
-		case ZE_PR_NONE:
-			RealPath.Access = ZE_PA_NO_ACCESS;
-			RealPath.Path = "";
-			break;
-
-		case ZE_PR_RELATIVE:
-			RealPath.Access = ZE_PA_NO_ACCESS;
-			RealPath.Path = "";
-			break;
-
-		case ZE_PR_RESOURCE:
-			RealPath.Access = ZE_PA_READ;
-			RealPath.Path = ResourcePath;
-			break;
-
-		case ZE_PR_STORAGE:
-			RealPath.Access = ZE_PA_READ_WRITE;
-			RealPath.Path = StoragePath;
-			break;
-
-		case ZE_PR_USER_STORAGE:
-			RealPath.Access = ZE_PA_READ_WRITE;
-			RealPath.Path = UserStoragePath;
-			break;
-
-		case ZE_PR_INTERNAL:
-			RealPath.Access = ZE_PA_READ;
-			RealPath.Path = "";
-			break;
+		RealPath.Access = ZE_PA_READ;
+		RealPath.Root = ZE_PR_INTERNAL;
+		PathElements.Remove(0);
+		RealPath.Path = ZEPathInfo::Construct(PathElements);
+	}
+	else if (PathElements[0] == "#Resource:" || PathElements[0] == "#R:")
+	{
+		RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
+		RealPath.Root = ZE_PR_RESOURCE;
+		PathElements.Remove(0);
+		PathElements.MassInsert(0, ResourcePath.GetCArray(), ResourcePath.GetSize());
+		RealPath.Path = ZEPathInfo::Construct(PathElements);
+	}
+	else if (PathElements[0] == "#Storage:" || PathElements[0] == "#S:")
+	{
+		RealPath.Access = ZE_PA_READ_WRITE;
+		RealPath.Root = ZE_PR_STORAGE;
+		PathElements.Remove(0);
+		PathElements.MassInsert(0, StoragePath.GetCArray(), StoragePath.GetSize());
+		RealPath.Path = ZEPathInfo::Construct(PathElements);
+	}
+	else if (PathElements[0] == "#UserStorage:" || PathElements[0] == "#US:")
+	{
+		RealPath.Access = ZE_PA_READ_WRITE;
+		RealPath.Root = ZE_PR_USER_STORAGE;
+		PathElements.Remove(0);
+		PathElements.MassInsert(0, UserStoragePath.GetCArray(), UserStoragePath.GetSize());
+		RealPath.Path = ZEPathInfo::Construct(PathElements);
+	}
+	else if (ZEPathInfo::CheckParent(ResourcePath, PathElements))
+	{
+		RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
+		RealPath.Root = ZE_PR_RESOURCE;
+		RealPath.Path = ZEPathInfo::Construct(PathElements);
+	}
+	else if (ZEPathInfo::CheckParent(StoragePath, PathElements))
+	{
+		RealPath.Access = ZE_PA_READ_WRITE;
+		RealPath.Root = ZE_PR_STORAGE;
+		RealPath.Path = ZEPathInfo::Construct(PathElements);
+	}
+	else if (ZEPathInfo::CheckParent(UserStoragePath, PathElements))
+	{
+		RealPath.Access = ZE_PA_READ_WRITE;
+		RealPath.Root = ZE_PR_USER_STORAGE;
+		RealPath.Path = ZEPathInfo::Construct(PathElements);
 	}
 
 	return RealPath;
 }
 
-ZEPathRoot ZEPathManager::GetRoot(ZEString RootPath)
+ZEPathRoot ZEPathManager::GetRoot(const char* Path)
 {
-	ZERealPath RealPath;
-	if (RootPath.Left(0) == '\\' || RootPath.Right(0) == '/')
-	{
-		return ZE_PR_NONE;
-	}
-	else if (RootPath.Right(1) == ":")
-	{
-		ZEString RootName = RootPath.Left(RootPath.GetLength() - 1);
-		if (RootName == "#Internal" || RootName == "#I")
-			return ZE_PR_INTERNAL;
-		else if (RootName == "#Resource" || RootName == "#R")
-			return ZE_PR_RESOURCE;
-		else if (RootName == "#Storage" || RootName == "#S")
-			return ZE_PR_STORAGE;
-		else if (RootName == "#UserStorage" || RootName == "#US")
-			return ZE_PR_USER_STORAGE;
-		else
-			return ZE_PR_NONE;
-	}
-	else
-	{
-		return ZE_PR_RELATIVE;
-	}
+	if (Path == NULL || Path[0] == '\0')
+		return ZE_PR_UNKOWN;
+
+	ZEArray<ZEString> PathElements = ZEPathInfo::Divide(Path);
+	ZEPathInfo::Normalize(PathElements);
+	if (PathElements.GetSize() == 0)
+		return ZEPathRoot();
+
+	if (PathElements[0] == "#Internal:" || PathElements[0] == "#I:")
+		return ZE_PR_INTERNAL;
+	else if (PathElements[0] == "#Resource:" || PathElements[0] == "#R:")
+		return ZE_PR_RESOURCE;
+	else if (PathElements[0] == "#Storage:" || PathElements[0] == "#S:")
+		return ZE_PR_STORAGE;
+	else if (PathElements[0] == "#UserStorage:" || PathElements[0] == "#US:")
+		return ZE_PR_USER_STORAGE;
+	else if (ZEPathInfo::CheckParent(PathElements, ResourcePath))
+		return ZE_PR_RESOURCE;
+	else if (ZEPathInfo::CheckParent(PathElements, StoragePath))
+		return ZE_PR_STORAGE;
+	else if (ZEPathInfo::CheckParent(PathElements, UserStoragePath))
+		return ZE_PR_USER_STORAGE;
+
+	return ZE_PR_UNKOWN;
 }
 
 ZEPathManager::ZEPathManager()

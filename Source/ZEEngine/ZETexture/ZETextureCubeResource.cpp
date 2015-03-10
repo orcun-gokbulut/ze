@@ -151,7 +151,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	ZETextureOptions	FinalOptions;
 	ZETextureData	TempTextureData;
 	ZETextureData	ProcessedTextureData;
-	ZEString			CachePath = "TextureCache.ZECACHE";
+	ZEString			CachePath = "#S:/Caches/TextureCache.ZECache";
 
 	bool CacheIt			= true;
 	bool Process			= true;

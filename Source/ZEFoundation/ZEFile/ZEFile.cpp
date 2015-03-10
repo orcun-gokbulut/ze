@@ -198,17 +198,17 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 
 	if (RealPath.Access == ZE_PA_NO_ACCESS)
 	{
-		zeError("File access denied. File: \"%s\".", RealPath.Path.ToCString());
+		zeError("File access denied. File: \"%s\".", FilePath.ToCString());
 		return false;
 	}
 	else if (FileOpenMode == ZE_FOM_READ && (RealPath.Access & ZE_PA_READ) == 0)
 	{
-		zeError("File read access denied. File: \"%s\".", RealPath.Path.ToCString());
+		zeError("File read access denied. File: \"%s\".", FilePath.ToCString());
 		return false;
 	}
 	else if (FileOpenMode == ZE_FOM_WRITE && (RealPath.Access & ZE_PA_WRITE) == 0)
 	{
-		zeError("File read access denied. File: \"%s\".", RealPath.Path.ToCString());
+		zeError("File read access denied. File: \"%s\".", FilePath.ToCString());
 		return false;
 	}
 

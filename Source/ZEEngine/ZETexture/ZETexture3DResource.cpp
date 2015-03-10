@@ -183,7 +183,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	ZETextureData	ProcessedTextureData;
 	ZETextureOptions	FinalOptions;
 	ZEFileCache			FileCache;
-	ZEString			CachePath = "TextureCache.ZECACHE";
+	ZEString			CachePath = "#S:/Caches/TextureCache.ZECache";
 
 	bool CacheIt			= true;
 	bool Process			= true;
