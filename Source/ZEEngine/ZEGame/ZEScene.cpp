@@ -58,6 +58,7 @@
 
 #include <memory.h>
 #include "ZEMeta/ZEProvider.h"
+#include "ZEML/ZEMLReader.h"
 
 bool ZEScene::Initialize()
 {
@@ -393,60 +394,62 @@ bool ZEScene::Save(const ZEString& FileName)
 bool ZEScene::Load(const ZEString& FileName)
 {
 	zeLog("Loading scene file \"%s\".", FileName.GetValue());
-	ZEFile Unserializer;
-	char EntityClassName[ZE_MAX_NAME_SIZE];
-
-	if (Unserializer.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
+	
+	ZEFile SceneFile;
+	if (!SceneFile.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
 	{
-		ZEUInt32 EntityCount;
-		Unserializer.Read(&EntityCount, sizeof(ZEUInt32), 1);
-		Unserializer.Read(&LastEntityId, sizeof(ZEInt), 1);
-
-		char MapFile[ZE_MAX_FILE_NAME_SIZE];
-		Unserializer.Read(MapFile, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
-
-		ClearEntities();
-
-		for (ZESize I = 0; I < (ZESize)EntityCount; I++)
-		{
-			ZEClass* EntityClass = NULL;
-			Unserializer.Read(EntityClassName, sizeof(char), ZE_MAX_NAME_SIZE);
-
-			EntityClass = ZEProvider::GetInstance()->GetClass(EntityClassName);
-			if (EntityClass == NULL)
-			{
-				zeError("Unserialization error. Cannot find entity class. Class Name: \"%s\".", EntityClassName);
-				Unserializer.Close();
-				return false;
-			}
-
-			ZEEntity* NewEntity = (ZEEntity*)EntityClass->CreateInstance();
-			if (NewEntity == NULL)
-			{
-				zeError("Unserialization failed. Cannot create instance of an entity. Class Name: \"%s\".", EntityClassName);
-				Unserializer.Close();
-				return false;
-			}
-
-			if (!NewEntity->Restore((ZEUnserializer*)&Unserializer))
-			{
-				zeError("Unserialization failed. Unserialization of entity has failed. Class Name: \"%s\".", EntityClassName);
-				Unserializer.Close();
-				return false;
-			}
-
-			AddEntity(NewEntity);
-		}
-
-		zeLog("Scene file \"%s\" has been loaded.", FileName.GetValue());
-		Unserializer.Close();
-		return true;
-	}
-	else
-	{
-		zeError("Can not open scene file. Unserialization failed. FileName : \"%s\"", FileName.GetValue());
+		zeError("Cannot load scene. Cannot open scene file. File Name: \"%s\".", FileName);
 		return false;
 	}
+
+	ZEMLReader Reader;
+	Reader.Open(&SceneFile);
+	ZEMLReaderNode SceneNode = Reader.GetRootNode();
+
+	if (SceneNode.GetName() != "Scene")
+	{
+		zeError("Cannot load scene. Corrupted scene file. File Name: \"%s\".", FileName);
+		SceneFile.Close();
+		return false;
+	}
+
+	ClearEntities();
+
+	ZESize EntityCount = SceneNode.GetSubNodeCount("Entity");
+	for (ZESize I = 0; I < EntityCount; I++)
+	{
+		ZEMLReaderNode EntityNode = SceneNode.GetSubNode("Entity", I);
+		if (!EntityNode.IsValid())
+		{
+			zeError("Cannot load scene. Corrupted scene file. File Name: \"%s\".", FileName);
+			SceneFile.Close();
+			return false;
+		}
+		
+		ZEClass* EntityClass = NULL;
+		EntityClass = ZEProvider::GetInstance()->GetClass(EntityNode.ReadString("ClassName"));
+		ZEEntity* NewEntity = (ZEEntity*)EntityClass->CreateInstance();
+		if (NewEntity == NULL)
+		{
+			zeError("Cannot load scene. Cannot create instance of an entity. Class Name: \"%s\".", EntityNode.ReadString("ClassName"));
+			SceneFile.Close();
+			return false; 
+		}
+
+		if (!NewEntity->Restore(&EntityNode))
+		{
+			zeError("Unserialization failed. Unserialization of entity has failed. Class Name: \"%s\".", EntityNode.ReadString("ClassName"));
+			SceneFile.Close();
+			return false;
+		}
+
+		AddEntity(NewEntity);
+	}
+
+	SceneFile.Close();
+
+	zeLog("Scene file \"%s\" has been loaded.", FileName.GetValue());
+	return true;
 }
 
 void ZEScene::SetAmbientFactor(float Factor)

@@ -203,6 +203,8 @@ class ZEVariant
 		void							SetClassRef(ZEClass*& Object);
 		void							SetClassConstRef(const ZEClass*& Object);
 
+		void							SetValue(const ZEValue& Value);
+
 		// Getters
 		////////////////////////////////////////////////
 		ZEInt8							GetInt8() const;
@@ -303,8 +305,10 @@ class ZEVariant
 		ZEClass*&						GetClassRef() const;
 		ZEClass* const& 				GetClassConstRef() const;
 
+		ZEValue							GetValue();
 
 										ZEVariant();
+										explicit ZEVariant(const ZEValue& Value);
 										explicit ZEVariant(const ZEReference& Reference);
 										ZEVariant(const ZEVariant& Value);
 										ZEVariant(const char* Value);
