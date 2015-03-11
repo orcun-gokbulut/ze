@@ -687,12 +687,47 @@ ZEVector3 ZEDGizmo::MoveProjection_(ZEDGizmoAxis Axis, const ZERay& Ray)
 	}
 }
 
-ZEQuaternion ZEDGizmo::RotationProjection_(ZEDGizmoAxis Axis, const ZERay& Ray)
+ZEQuaternion ZEDGizmo::RotationProjection_(ZEDGizmoAxis Axis, const ZEVector2& ScreenPos)
 {
-	return ZEQuaternion::Identity;
+	float Displacement = 0.01f * ZEAngle::ToRadian((float)(ScreenPos.x - InitialScreenPosition.x));
+	Displacement = ZEAngle::Range(Displacement);
+
+	ZEVector3 RotationAxis;
+	switch (Axis)
+	{
+		default:
+		case ZED_GA_XY_AXIS:
+		case ZED_GA_XZ_AXIS:
+		case ZED_GA_YZ_AXIS:
+		case ZED_GA_XYZ_AXIS:
+		case ZED_GA_NONE:
+			return ZEQuaternion::Identity;
+			break;
+
+		case ZED_GA_X_AXIS:
+			RotationAxis = ZEVector3::UnitX;
+			break;
+
+		case ZED_GA_Y_AXIS:
+			RotationAxis = ZEVector3::UnitY;
+			break;
+
+		case ZED_GA_Z_AXIS:
+			RotationAxis = ZEVector3::UnitZ;
+			break;
+
+		case ZED_GA_SCREEN_AXIS:
+			RotationAxis = zeScene->GetActiveCamera()->GetWorldFront();
+			break;
+	}
+
+	ZEQuaternion Output;
+	ZEQuaternion::CreateFromAngleAxis(Output, Displacement, RotationAxis);
+
+	return Output;
 }
 
-ZEVector3 ZEDGizmo::ScaleProjection_(ZEDGizmoAxis Axis, const ZERay& Ray)
+ZEVector3 ZEDGizmo::ScaleProjection_(ZEDGizmoAxis Axis, const ZEVector2& ScreenPos)
 {
 	return ZEVector3::One;
 }
@@ -1086,26 +1121,26 @@ ZEVector3 ZEDGizmo::MoveProjection(const ZERay& Ray)
 	return MoveProjection_(ProjectionAxis, Ray) - MoveDifference;
 }
 
-void ZEDGizmo::StartRotationProjection(ZEDGizmoAxis& Axis, const ZERay& InitialRay)
+void ZEDGizmo::StartRotationProjection(ZEDGizmoAxis Axis, const ZEVector2& ScreenPos)
 {
-
-}
-
-ZEQuaternion ZEDGizmo::RotationProjection(const ZERay& Ray)
-{
-	return ZEQuaternion::Identity;
-}
-
-void ZEDGizmo::StartScaleProjection(ZEDGizmoAxis Axis, const ZERay& InitialRay)
-{
-	PickPosition = MoveProjection_(Axis, InitialRay);
-	MoveDifference = PickPosition - GetPosition();
+	InitialScreenPosition = ScreenPos;
 	ProjectionAxis = Axis;
 }
 
-ZEVector3 ZEDGizmo::ScaleProjection(const ZERay& Ray)
+ZEQuaternion ZEDGizmo::RotationProjection(const ZEVector2& ScreenPos)
 {
-	return (MoveProjection_(ProjectionAxis, Ray) - MoveDifference);
+	return RotationProjection_(ProjectionAxis, ScreenPos);
+}
+
+void ZEDGizmo::StartScaleProjection(ZEDGizmoAxis Axis, const ZEVector2& ScreenPos)
+{
+	InitialScreenPosition = ScreenPos;
+	ProjectionAxis = Axis;
+}
+
+ZEVector3 ZEDGizmo::ScaleProjection(const ZEVector2& ScreenPos)
+{
+	return ZEVector3::One;
 }
 
 ZEDGizmo::ZEDGizmo()
