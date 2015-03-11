@@ -34,12 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEEntity.h"
+
+#include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZERay.h"
-#include "ZEError.h"
-#include "ZEEntityProvider.h"
-#include "ZEScene.h"
-#include <string.h>
 #include "ZEMath/ZEMath.h"
+#include "ZEML/ZEMLSerialWriter.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZEError.h"
+#include "ZEScene.h"
+#include "ZEEntityProvider.h"
+
+#include <string.h>
+
 
 void ZEEntity::OnTransformChanged()
 {
@@ -578,5 +584,62 @@ bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 		Report.PoligonIndex = 0;
 		Report.Normal = ZEVector3::Zero;
 		Report.Binormal = ZEVector3::Zero;
+		
+		return true;
 	}
+
+	return false;
+}
+
+
+bool ZEEntity::Save(ZEMLSerialNode* Serializer)
+{
+	ZEMLSerialNode EntityNode = Serializer->OpenNode("Entity");
+		EntityNode.WriteProperty("Class", GetClass()->GetName());
+		ZEMLSerialNode PropertiesNode = EntityNode.OpenNode("Properties");
+			const ZEProperty* Properties = GetClass()->GetProperties();
+			for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
+			{
+				const ZEProperty* Current = &Properties[I];
+				if (Current->Type.ContainerType != ZE_CT_NONE)
+					continue;
+
+				if (Current->Type.TypeQualifier != ZE_TQ_VALUE)
+					continue;
+
+				if (Current->Type.Type == ZE_TT_OBJECT || Current->Type.Type == ZE_TT_OBJECT_PTR)
+					continue;
+
+				ZEVariant Variant;
+				GetClass()->GetProperty(this, Current->ID, Variant);
+
+				ZEValue Value = Variant.GetValue();
+				if (Value.IsNull())
+					continue;
+
+				PropertiesNode.WriteProperty(Current->Name, Value);
+			}
+		PropertiesNode.CloseNode();
+	EntityNode.CloseNode();
+	
+	return true;
+}
+
+bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
+{
+	if (Unserializer->GetName() != "Entity")
+		return false;
+
+	ZEMLReaderNode PropertiesNode = Unserializer->GetSubNode("Properties");
+	const ZESmartArray<ZEMLReaderProperty>& Properties = PropertiesNode.GetProperties();
+
+	for (ZESize I = 0; I < Properties.GetSize(); I++)
+	{
+		if (Properties[I].Type == ZEML_IT_OFFSET_DATA || Properties[I].Type == ZEML_IT_INLINE_DATA)
+			continue;
+
+		GetClass()->SetProperty(this, Properties[I].Name, ZEVariant(Properties[I].Value));
+	}
+
+	return false;
 }

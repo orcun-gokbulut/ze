@@ -49,6 +49,7 @@
 #include "ZEMath/ZEMatrix.h"
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEMeta/ZEType.h"
 
 #pragma warning(push)
 #pragma warning(disable:4482 4996 4244)
@@ -802,6 +803,90 @@ void ZEVariant::SetClassConstRef(const ZEClass*& Class)
 	Value.Pointer = const_cast<ZEClass**>(&Class);
 }
 
+
+void ZEVariant::SetValue(const ZEValue& Value)
+{
+	switch (Value.GetType())
+	{
+		case ZE_VRT_UNDEFINED:
+		case ZE_VRT_NULL:
+		case ZE_VRT_CLASS:
+			SetUndefined();
+			break;
+
+		case ZE_VRT_INTEGER_8:
+			return SetInt8(Value.GetInt8());
+			break;
+
+		case ZE_VRT_INTEGER_16:
+			SetInt16(Value.GetInt16());
+			break;
+
+		case ZE_VRT_INTEGER_32:
+			SetInt32(Value.GetInt32());
+			break;
+
+		case ZE_VRT_INTEGER_64:
+			SetInt64(Value.GetInt64());
+			break;
+
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+			SetInt8(Value.GetUInt8());
+			break;
+
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+			SetInt16(Value.GetUInt16());
+			break;
+
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			SetInt32(Value.GetUInt32());
+			break;
+
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+			SetInt64(Value.GetUInt64());
+			break;
+
+		case ZE_VRT_FLOAT:
+			SetFloat(Value.GetFloat());
+			break;
+
+		case ZE_VRT_DOUBLE:
+			SetDouble(Value.GetDouble());
+			break;
+
+		case ZE_VRT_BOOLEAN:
+			SetBool(Value.GetBoolean());
+			break;
+
+		case ZE_VRT_STRING:
+			SetString(Value.GetString());
+			break;
+
+		case ZE_VRT_QUATERNION:
+			SetQuaternion(Value.GetQuaternion());
+			break;
+
+		case ZE_VRT_VECTOR2:
+			SetVector2(Value.GetVector2());
+			break;
+
+		case ZE_VRT_VECTOR3:
+			SetVector3(Value.GetVector3());
+			break;
+
+		case ZE_VRT_VECTOR4:
+			SetVector4(Value.GetVector4());
+			break;
+
+		case ZE_VRT_MATRIX3X3:
+			SetMatrix3x3(Value.GetMatrix3x3());
+			break;
+
+		case ZE_VRT_MATRIX4X4:
+			SetMatrix4x4(Value.GetMatrix4x4());
+			break;
+	}
+}
 ZEInt8 ZEVariant::GetInt8() const
 {
 	return ConvertIntegerValue<ZEInt8>();
@@ -1169,6 +1254,75 @@ ZEClass* const& ZEVariant::GetClassConstRef() const
 	return (ZEClass* const)Value.Pointer;
 }
 
+ZEValue ZEVariant::GetValue()
+{
+	switch (ValueType.Type)
+	{
+		case ZE_TT_OBJECT:	
+		case ZE_TT_UNDEFINED:
+		case ZE_TT_VOID:
+		case ZE_TT_CLASS:
+			return ZEValue();
+
+		case ZE_TT_INTEGER_8:
+			return ZEValue(GetInt8());
+
+		case ZE_TT_INTEGER_16:
+			return ZEValue(GetInt16());
+
+		case ZE_TT_INTEGER_32:
+			return ZEValue(GetInt32());
+
+		case ZE_TT_INTEGER_64:
+			return ZEValue(GetInt64());
+
+		case ZE_TT_UNSIGNED_INTEGER_8:
+			return ZEValue(GetUInt8());
+
+		case ZE_TT_UNSIGNED_INTEGER_16:
+			return ZEValue(GetUInt16());
+
+		case ZE_TT_UNSIGNED_INTEGER_32:
+			return ZEValue(GetUInt32());
+
+		case ZE_TT_UNSIGNED_INTEGER_64:
+			return ZEValue(GetUInt64());
+
+		case ZE_TT_FLOAT:
+			return ZEValue(GetFloat());
+
+		case ZE_TT_DOUBLE:
+			return ZEValue(GetDouble());
+
+		case ZE_TT_BOOLEAN:
+			return ZEValue(GetBool());
+
+		case ZE_TT_STRING:
+			return ZEValue(GetString());
+
+		case ZE_TT_QUATERNION:
+			return ZEValue(GetQuaternion());
+
+		case ZE_TT_VECTOR2:
+			return ZEValue(GetVector2());
+
+		case ZE_TT_VECTOR3:
+			return ZEValue(GetVector3());
+
+		case ZE_TT_VECTOR4:
+			return ZEValue(GetVector4());
+
+		case ZE_TT_MATRIX3X3:
+			return ZEValue(GetMatrix3x3());
+
+		case ZE_TT_MATRIX4X4:
+			return ZEValue(GetMatrix4x4());
+
+		case ZE_TT_ENUMERATOR:
+			return ZEValue(GetInt32());
+	}
+}
+
 ZEVariant::ZEVariant()
 {
 	Value.Pointer = NULL;
@@ -1177,6 +1331,11 @@ ZEVariant::ZEVariant()
 ZEVariant::ZEVariant(const ZEVariant& Value)
 {
 	SetVariant(Value);
+}
+
+ZEVariant::ZEVariant(const ZEValue& Value)
+{
+	SetValue(Value);
 }
 
 ZEVariant::ZEVariant(const ZEReference& Value)
