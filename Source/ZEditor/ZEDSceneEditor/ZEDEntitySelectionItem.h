@@ -45,35 +45,41 @@
 
 class ZEDEntitySelectionItem : public ZEDSelectionItem
 {
-private:
+	private:
 
-	ZEEntity*					Entity;
-	ZEScene*					Scene;
-	ZEDGizmo*					Gizmo;
+		ZEEntity*					Entity;
+		ZEScene*					Scene;
+		ZEDGizmo*					Gizmo;
 
-public:
+		ZEVector3					OriginalPosition;
+		ZEQuaternion				OriginalRotation;
+		ZEVector3					OriginalScale;
 
-	virtual void				Update();
-	virtual ZEArray<QWidget*>	GetCustomPropertyWidgets(QWidget* Parent);
+	public:
 
-	virtual void				MoveUsingGizmo(ZEVector3 MoveAmount);
-	virtual void				ScaleUsingGizmo(ZEVector3 ScaleAmount);
-	virtual void				RotateUsingGizmo(ZEQuaternion RotateAmount);
+		virtual void				Update();
+		virtual ZEArray<QWidget*>	GetCustomPropertyWidgets(QWidget* Parent);
 
-	virtual ZEVariant			GetPosition();
-	virtual ZEVariant			GetScale();
-	virtual ZEVariant			GetRotation();
+		virtual void				MoveUsingGizmo(ZEVector3 MoveAmount);
+		virtual void				ScaleUsingGizmo(ZEVector3 ScaleAmount);
+		virtual void				RotateUsingGizmo(ZEQuaternion RotateAmount);
 
-	virtual void				SetGizmoMode(ZEDGizmoMode Mode);
-	virtual	void				SetBoundingBoxVisibility(bool Visible);
+		virtual ZEVariant			GetPosition();
+		virtual ZEVariant			GetScale();
+		virtual ZEVariant			GetRotation();
 
-	virtual void				SetVisiblity(bool Visibility);
-	virtual bool				GetVisiblity();
+		virtual void				SetGizmoMode(ZEDGizmoMode Mode);
+		virtual	void				SetBoundingBoxVisibility(bool Visible);
 
-	virtual ZEObject*			GetClass() const;
-	virtual ZEDGizmo*			GetGizmo() const;
+		virtual void				SetVisiblity(bool Visibility);
+		virtual bool				GetVisiblity();
 
-								ZEDEntitySelectionItem(ZEEntity* Entity, ZEDGizmoMode Mode, ZEScene* Scene);
+		virtual ZEObject*			GetClass() const;
+		virtual ZEDGizmo*			GetGizmo() const;
+
+		void						StartGizmoTransform();
+
+									ZEDEntitySelectionItem(ZEEntity* Entity, ZEDGizmoMode Mode, ZEScene* Scene);
 	virtual						~ZEDEntitySelectionItem();
 };
 

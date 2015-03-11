@@ -64,7 +64,8 @@ enum ZEDGizmoAxis
 	ZED_GA_XY_AXIS,
 	ZED_GA_XZ_AXIS,
 	ZED_GA_YZ_AXIS,
-	ZED_GA_XYZ_AXIS
+	ZED_GA_XYZ_AXIS,
+	ZED_GA_SCREEN_AXIS
 };
 
 class ZEDGizmo : public ZEEntity
@@ -94,6 +95,7 @@ class ZEDGizmo : public ZEEntity
 		ZEVector3						MoveDifference;
 		ZEQuaternion					InitialRotation;
 		ZEVector3						InitialScale;
+		ZEVector2						InitialScreenPosition;
 
 		ZEDGizmoAxis					PickMoveAxis(const ZERay& Ray, float& TRay);
 		ZEDGizmoAxis					PickRotateAxis(const ZERay& Ray, float& TRay);
@@ -104,8 +106,8 @@ class ZEDGizmo : public ZEEntity
 		void							UpdateGizmo();
 		
 		ZEVector3						MoveProjection_(ZEDGizmoAxis Axis, const ZERay& Ray);
-		ZEQuaternion					RotationProjection_(ZEDGizmoAxis Axis, const ZERay& Ray);
-		ZEVector3						ScaleProjection_(ZEDGizmoAxis Axis, const ZERay& Ray);
+		ZEQuaternion					RotationProjection_(ZEDGizmoAxis Axis, const ZEVector2& Ray);
+		ZEVector3						ScaleProjection_(ZEDGizmoAxis Axis, const ZEVector2& Ray);
 
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
@@ -134,11 +136,11 @@ class ZEDGizmo : public ZEEntity
 		void							StartMoveProjection(ZEDGizmoAxis Axis, const ZERay& InitialRay);
 		ZEVector3						MoveProjection(const ZERay& Ray);
 		
-		void							StartRotationProjection(ZEDGizmoAxis& Axis, const ZERay& InitialRay);
-		ZEQuaternion					RotationProjection(const ZERay& Ray);
+		void							StartRotationProjection(ZEDGizmoAxis Axis, const ZEVector2& InitialScreenPos);
+		ZEQuaternion					RotationProjection(const ZEVector2& ScreenPos);
 
-		void							StartScaleProjection(ZEDGizmoAxis Axis, const ZERay& InitialRay);
-		ZEVector3						ScaleProjection(const ZERay& Ray);
+		void							StartScaleProjection(ZEDGizmoAxis Axis, const const ZEVector2& InitialScreenPos);
+		ZEVector3						ScaleProjection(const ZEVector2& ScreenPos);
 
 		virtual void					Draw(ZEDrawParameters* DrawParameters);
 

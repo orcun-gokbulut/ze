@@ -180,6 +180,12 @@ void ZED3D9Module::DrawLogo()
 		Sleep(20);
 	}
 
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+	GetDevice()->BeginScene();
+	DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0xFFFFFFFF);
+	GetDevice()->EndScene();
+	GetDevice()->Present(NULL, NULL, NULL, NULL);
+
 	Logo->Release();
 }
 
