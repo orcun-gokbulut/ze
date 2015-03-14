@@ -80,26 +80,31 @@ ZEString ZEPathInfo::GetFileName()
 
 ZEString ZEPathInfo::GetName()
 {
-	ZESSize Length = Path.GetLength();
-	ZESSize Start = -1;
+	ZESize Length = Path.GetLength();
+	
+	if (Length == 0)
+		return "";
+	
+
+	ZESize Start = 0;
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
-		if(Path[I] == '.')
-			Start = I;
-
 		if (Path[I] == '\\' || Path[I] == '/')
 		{
-			if (Start == -1)
-				return Path.Right(Length - I - 1);
-			else
-				return Path.Middle(I + 1, Start - 1).Trim();
+			Start = I + 1;
+			break;
 		}
 	}
 
-	if (Start == -1)
-		return Path;
-	else
-		Path.Left(Start - 1);
+	ZESSize ExtensionStart = Length;
+	for (ZESSize I = Start;  I < Length; I++)
+	{
+		if(Path[I] == '.')
+			ExtensionStart = I;
+	}
+
+	Length = ExtensionStart - Start;
+	return Path.Middle(Start, Length).Trim();
 }
 
 ZEString ZEPathInfo::GetExtension()
@@ -108,8 +113,10 @@ ZEString ZEPathInfo::GetExtension()
 
 	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
-		if(Path[I] == '.')
+		if (Path[I] == '.')
 			return Path.Right(Length - I).Trim();
+		else if (Path[I] == '/' || Path[I] == '\\')
+			return "";
 	}
 
 	return "";
@@ -296,6 +303,44 @@ ZEString ZEPathInfo::Normalize()
 	if (!Normalize(PathElements))
 		return "";
 	return Construct(PathElements);
+}
+
+bool ZEPathInfo::Operate(const char* TargetDirectory, ZEPathOperationFunction Function, ZEPathOperationElement Elements, bool Recursive)
+{
+	ZEDirectoryInfo TargetDirectoryInfo(TargetDirectory);
+
+	ZEArray<ZEString> SubDirectories;
+	if (Recursive || (Elements & ZE_POE_DIRECTORY))
+		SubDirectories = TargetDirectoryInfo.GetSubDirectories();
+
+	if (Recursive)
+	{
+		for (ZESize I = 0; I < SubDirectories.GetSize(); I++)
+		{
+			ZEString SubDirectoryPath = ZEFormat::Format("{0}/{1}", TargetDirectory, SubDirectories[I]);
+			if (Elements & ZE_POE_DIRECTORY)
+			{
+				if (!Function(SubDirectoryPath, ZE_POE_DIRECTORY))
+					return false;
+			}
+
+			if (!Operate(SubDirectoryPath, Function, ZE_POE_DIRECTORY, Recursive))
+				return false;
+		}
+	}
+
+	if (Elements & ZE_POE_FILE)
+	{
+		ZEArray<ZEString> Files = TargetDirectoryInfo.GetFiles();
+		for (ZESize I = 0; I < Files.GetSize(); I++)
+		{
+			ZEString FilePath = ZEFormat::Format("{0}/{1}", TargetDirectory, Files[I]);
+			if (!Function(FilePath, ZE_POE_FILE))
+				return false;
+		}
+	}
+
+	return true;
 }
 
 ZEPathInfo::ZEPathInfo()

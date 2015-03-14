@@ -41,6 +41,17 @@
 #include "ZEFileCommon.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEDelegate.h"
+
+enum ZEPathOperationElement
+{
+	ZE_POE_NONE			= 0,
+	ZE_POE_FILE			= 1,
+	ZE_POE_DIRECTORY	= 2,
+	ZE_POE_ALL			= 3
+};
+
+typedef ZEDelegate<bool (const char*, ZEPathOperationElement)> ZEPathOperationFunction;
 
 class ZEPathInfo
 {
@@ -72,6 +83,8 @@ class ZEPathInfo
 		ZEFileTime				GetModificationTime();
 
 		ZEString				Normalize();
+
+		bool					Operate(const char* TargetDirectory, ZEPathOperationFunction Function, ZEPathOperationElement Elements = ZE_POE_FILE, bool Recursive = true);
 
 								ZEPathInfo();
 								ZEPathInfo(const char* Path);
