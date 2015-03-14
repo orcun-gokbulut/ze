@@ -50,7 +50,7 @@ ZEArray<ZEString> ZEDirectoryInfo::GetSubDirectories()
 	HANDLE hFind = NULL; 
 	char sPath[2048]; 
 
-	sprintf(sPath, "%s\\*.*", GetRealPath().Path.ToWStdString().c_str()); 
+	sprintf(sPath, "%s\\*.*", GetRealPath().Path.ToCString()); 
 	if((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE) 
 		return ZEArray<ZEString>();
 
@@ -77,7 +77,7 @@ ZEArray<ZEString> ZEDirectoryInfo::GetFiles()
 	HANDLE hFind = NULL; 
 	char sPath[2048]; 
 
-	sprintf(sPath, "%s\\*.*", GetRealPath().Path.ToWStdString().c_str()); 
+	sprintf(sPath, "%s\\*.*", GetRealPath().Path.ToCString()); 
 	if((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE) 
 		return ZEArray<ZEString>();
 

@@ -36,6 +36,8 @@
 cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZESceneConverter.cpp		Sources)
+ze_add_source(ZESceneConverter.h		Sources Headers)
+ze_add_source(ZEMain.cpp				Sources)
 
 ze_add_executable(TARGET ZESceneConverter
 	CONSOLE

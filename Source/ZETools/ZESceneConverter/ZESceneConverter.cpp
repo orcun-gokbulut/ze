@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <stdio.h>
+#include "ZESceneConverter.h"
+
 #include "ZEML/ZEMLSerialWriter.h"
-#include "ZESerialization/ZEFileUnserializer.h"
 #include "ZEFile/ZEPathManager.h"
 #include "ZEFile/ZEFile.h"
 
@@ -43,7 +43,7 @@
 #define ZE_MAX_FILE_NAME_SIZE		256
 #define ZE_CLSF_CLASS_CHUNKID ((ZEUInt32)'CLAS')
 
-bool ConvertProperty(const char* Name, ZEMLSerialNode* Serializer, ZEUnserializer* Unserializer)
+static bool ConvertProperty(const char* Name, ZEMLSerialNode* Serializer, ZEFile* Unserializer)
 {
 	ZEUInt32 Type;
 	ZEUInt32 StringSize;
@@ -178,7 +178,7 @@ bool ConvertProperty(const char* Name, ZEMLSerialNode* Serializer, ZEUnserialize
 	return true;
 }
 
-void ConvertEntity(ZEFileUnserializer* Unserializer, ZEMLSerialNode* Serializer)
+static void ConvertEntity(ZEFile* Unserializer, ZEMLSerialNode* Serializer)
 {
 	char EntityTypeName[ZE_MAX_NAME_SIZE];
 	Unserializer->Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
@@ -210,7 +210,7 @@ void ConvertEntity(ZEFileUnserializer* Unserializer, ZEMLSerialNode* Serializer)
 	}
 }
 
-void ConvertScene(ZEFileUnserializer* Unserializer, ZEMLSerialNode* Serializer)
+static void ConvertScene(ZEFile* Unserializer, ZEMLSerialNode* Serializer)
 {
 	ZEUInt32 EntityCount;
 	ZEUInt LastEntityId;
@@ -227,58 +227,48 @@ void ConvertScene(ZEFileUnserializer* Unserializer, ZEMLSerialNode* Serializer)
 		ConvertEntity(Unserializer, &EntityNode);
 		EntityNode.CloseNode();
 	}
+
 	EntitiesNode.CloseNode();
 	Serializer->CloseNode();
 }
 
-void Convert(const char* Source, const char* Destination)
+bool ZESceneConverter::Convert(const char* Source, const char* Destination)
 {
-	ZEFileUnserializer Unserializer;
-	Unserializer.OpenFile(Source);
+	ZEFile Unserializer;
+	if (!Unserializer.Open(Source, ZE_FOM_READ, ZE_FCM_NONE))
+	{
+		zeError("Cannot open source ZEScene file. File Name: \"%s\"", Source);
+		return false;
+	}
 
-	ZEPathManager::GetInstance()->SetAccessControl(false);
+	printf(" Checking source version.\n");
+	char Identifier[4];
+	if (Unserializer.Read(Identifier, 4, 1) != 1)
+	{
+		if (Identifier[0] == 'Z' ||
+			Identifier[0] == 'E' ||
+			Identifier[0] == 'M' ||
+			Identifier[0] == 'L')
+		{
+			zeError("Scene file is already converted.\n");
+			return true;
+		}
+	}
+
+	Unserializer.Seek(0, ZE_SF_BEGINING);
 
 	ZEFile DestinationFile;
-	DestinationFile.Open(Destination, ZE_FOM_WRITE, ZE_FCM_OVERWRITE);
+	if (!DestinationFile.Open(Destination, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+	{
+		zeError("Cannot open destination ZEScene file. File Name: \"%s\".", Destination);
+		return false;
+	}
 
 	ZEMLSerialRootNode Serializer("Scene", &DestinationFile);
 	ConvertScene(&Unserializer, &Serializer);
 
 	DestinationFile.Close();
-	Unserializer.CloseFile();
-}
+	Unserializer.Close();
 
-int main(int argc, char** argv)
-{
-	Convert("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewMeta/RunDir/Resources/CustTPayloadSim/CustTScene.ZESCENE",
-		"C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewMeta/RunDir/Resources/CustTPayloadSim/CustTScene.new.ZEScene");
-	Convert("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewMeta/RunDir/Resources/CustTPayloadSim/CustTSceneInteriorTerrain.ZESCENE",
-		"C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewMeta/RunDir/Resources/CustTPayloadSim/CustTSceneInteriorTerrain.new.ZEScene");
-	Convert("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewMeta/RunDir/Resources/CustTPayloadSim/CustTSceneInteriorTerrainExtended.ZESCENE",
-		"C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewMeta/RunDir/Resources/CustTPayloadSim/CustTSceneInteriorTerrainExtended.new.ZEScene");
-
-
-	printf(" Zinek Engine Scene Converter\n");
-	printf("----------------------------------------------------------------------------------- \n");
-
-	if (argc < 3)
-	{
-		printf(" This tool is provided for converting old format zeScene to new ZEML based zeScene\n");
-		printf(" format.\n");
-		printf("\n");
-		printf(" Usage:\n");
-		printf("   ZESceneConverter [Old Format Scene File] [ZEML Based Scene File].\n");
-		
-		return EXIT_FAILURE;
-	}
-
-	const char* Source = argv[1];
-	const char* Destination = argv[2];
-	
-	printf(" Source File: %s.\n", Source);
-	printf(" Destination File: %s.\n", Destination);
-
-
-
-	printf("Scene is converted.\n");
+	return true;
 }
