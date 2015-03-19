@@ -38,7 +38,7 @@
 #include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEMath.h"
-#include "ZEML/ZEMLSerialWriter.h"
+#include "ZEML/ZEMLWriter.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEError.h"
 #include "ZEScene.h"
@@ -592,11 +592,11 @@ bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 }
 
 
-bool ZEEntity::Save(ZEMLSerialNode* Serializer)
+bool ZEEntity::Save(ZEMLWriterNode* Serializer)
 {
-	ZEMLSerialNode EntityNode = Serializer->OpenNode("Entity");
+	ZEMLWriterNode EntityNode = Serializer->WriteNode("Entity");
 		EntityNode.WriteProperty("Class", GetClass()->GetName());
-		ZEMLSerialNode PropertiesNode = EntityNode.OpenNode("Properties");
+		ZEMLWriterNode PropertiesNode = EntityNode.WriteNode("Properties");
 			const ZEProperty* Properties = GetClass()->GetProperties();
 			for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
 			{

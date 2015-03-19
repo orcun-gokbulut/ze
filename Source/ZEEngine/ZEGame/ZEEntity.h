@@ -85,7 +85,7 @@ ZE_ENUM(ZEEntityState)
 };
 
 class ZEScene;
-class ZEMLSerialNode;
+class ZEMLWriterNode;
 class ZEMLReaderNode;
 
 class ZEEntity : public ZEObject
@@ -202,7 +202,7 @@ class ZEEntity : public ZEObject
 		bool									Deinitialize();
 		virtual void							Destroy();
 		
-		virtual bool							Save(ZEMLSerialNode* Serializer);
+		virtual bool							Save(ZEMLWriterNode* Serializer);
 		virtual bool							Restore(ZEMLReaderNode* Unserializer);
 
 		virtual void							Tick(float Time);

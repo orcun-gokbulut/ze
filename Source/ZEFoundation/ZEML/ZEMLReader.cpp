@@ -663,7 +663,7 @@ bool ZEMLReader::Load()
 
 	if (!File->IsOpen())
 	{
-			zeError("Cannot load ZEML file. File is not open.");
+		zeError("Cannot load ZEML file. File is not open.");
 		return false;
 	}
 

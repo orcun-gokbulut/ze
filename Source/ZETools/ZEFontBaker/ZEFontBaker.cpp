@@ -37,7 +37,7 @@
 #define WINDOWS_MEAN_AND_LEAN
 #include <windows.h>
 #include "ZEFile\ZEFile.h"
-#include "ZEML\ZEMLSerialWriter.h"
+#include "ZEML\ZEMLWriter.h"
 #include "ZEML\ZEMLNode.h"
 #include "ZETexture\ZETextureData.h"
 #include "ZETexture\ZETextureLoader.h"

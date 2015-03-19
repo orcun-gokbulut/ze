@@ -39,7 +39,7 @@
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEFile\ZEDirectoryInfo.h"
-#include "ZEML/ZEMLSerialWriter.h"
+#include "ZEML/ZEMLWriter.h"
 #include "ZEMath/ZEMath.h"
 
 // #include <IGame/IGameFx.h>
@@ -356,9 +356,9 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 			
 		}
 
-		ZEMLSerialRootNode MaterialSerialNode("Material", &MaterialFile);
+		ZEMLWriter MaterialSerialNode("Material", &MaterialFile);
 		MaterialSerialNode.WriteProperty("Name", MaterialName);
-		ZEMLSerialNode MaterialConfigNode = MaterialSerialNode.OpenNode("Configuration");
+		ZEMLWriterNode MaterialConfigNode = MaterialSerialNode.OpenNode("Configuration");
 
 		MaterialConfigNode.WriteProperty("Name", "Default");
 		bool TempBooleanValue = false;

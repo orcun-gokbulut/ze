@@ -40,7 +40,7 @@
 #include "ZEFile\ZEFile.h"
 #include "ZEFile\ZEFileInfo.h"
 #include "ZEFile\ZEDirectoryInfo.h"
-#include "ZEML\ZEMLSerialWriter.h"
+#include "ZEML\ZEMLWriter.h"
 #include "ZEMath\ZEAngle.h"
 
 enum ZEInteriorHelperOwnerType
@@ -734,9 +734,9 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 		}
 
 		zeLog("Writing material file.");
-		ZEMLSerialRootNode MaterialSerialNode("Material", &MaterialFile);
+		ZEMLWriter MaterialSerialNode("Material", &MaterialFile);
 		MaterialSerialNode.WriteProperty("Name", MaterialName);
-		ZEMLSerialNode MaterialConfigNode = MaterialSerialNode.OpenNode("Configuration");
+		ZEMLWriterNode MaterialConfigNode = MaterialSerialNode.OpenNode("Configuration");
 
 		MaterialConfigNode.WriteProperty("Name", "Default");
 		bool TempBooleanValue = false;
