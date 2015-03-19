@@ -35,7 +35,7 @@
 
 #include "ZESceneConverter.h"
 
-#include "ZEML/ZEMLSerialWriter.h"
+#include "ZEML/ZEMLWriter.h"
 #include "ZEFile/ZEPathManager.h"
 #include "ZEFile/ZEFile.h"
 
@@ -43,7 +43,7 @@
 #define ZE_MAX_FILE_NAME_SIZE		256
 #define ZE_CLSF_CLASS_CHUNKID ((ZEUInt32)'CLAS')
 
-static bool ConvertProperty(const char* Name, ZEMLSerialNode* Serializer, ZEFile* Unserializer)
+static bool ConvertProperty(const char* Name, ZEMLWriterNode* Serializer, ZEFile* Unserializer)
 {
 	ZEUInt32 Type;
 	ZEUInt32 StringSize;
@@ -82,57 +82,57 @@ static bool ConvertProperty(const char* Name, ZEMLSerialNode* Serializer, ZEFile
 
 		case ZE_VRT_FLOAT:
 			Unserializer->Read(&Value.Float, sizeof(float), 1);
-			Serializer->WriteProperty(Name, Value.Float);
+			Serializer->WriteFloat(Name, Value.Float);
 			break;
 
 		case ZE_VRT_DOUBLE:
 			Unserializer->Read(&Value.Double, sizeof(double), 1);
-			Serializer->WriteProperty(Name, Value.Double);
+			Serializer->WriteDouble(Name, Value.Double);
 			break;
 
 		case ZE_VRT_INTEGER_8:
 			Unserializer->Read(&Value.Int32, sizeof(ZEInt8), 1);
-			Serializer->WriteProperty(Name, (ZEInt8)Value.Int32);
+			Serializer->WriteInt8(Name, (ZEInt8)Value.Int32);
 			break;
 
 		case ZE_VRT_INTEGER_16:
 			Unserializer->Read(&Value.Int32, sizeof(ZEInt16), 1);
-			Serializer->WriteProperty(Name, (ZEInt16)Value.Int32);
+			Serializer->WriteInt16(Name, (ZEInt16)Value.Int32);
 			break;
 
 		case ZE_VRT_INTEGER_32:
 			Unserializer->Read(&Value.Int32, sizeof(ZEInt32), 1);
-			Serializer->WriteProperty(Name, (ZEInt32)Value.Int32);
+			Serializer->WriteInt32(Name, (ZEInt32)Value.Int32);
 			break;
 
 		case ZE_VRT_INTEGER_64:
 			Unserializer->Read(&Value.Int64, sizeof(ZEInt64), 1);
-			Serializer->WriteProperty(Name, (ZEInt64)Value.Int64);
+			Serializer->WriteInt64(Name, (ZEInt64)Value.Int64);
 			break;
 
 		case ZE_VRT_UNSIGNED_INTEGER_8:
 			Unserializer->Read(&Value.Int32, sizeof(ZEUInt8), 1);
-			Serializer->WriteProperty(Name, (ZEUInt8)Value.Int32);
+			Serializer->WriteUInt8(Name, (ZEUInt8)Value.Int32);
 			break;
 
 		case ZE_VRT_UNSIGNED_INTEGER_16:
 			Unserializer->Read(&Value.Int32, sizeof(ZEUInt16), 1);
-			Serializer->WriteProperty(Name, (ZEUInt16)Value.Int32);
+			Serializer->WriteUInt16(Name, (ZEUInt16)Value.Int32);
 			break;
 
 		case ZE_VRT_UNSIGNED_INTEGER_32:
 			Unserializer->Read(&Value.Int32, sizeof(ZEUInt32), 1);
-			Serializer->WriteProperty(Name, (ZEUInt32)Value.Int32);
+			Serializer->WriteUInt32(Name, (ZEUInt32)Value.Int32);
 			break;
 
 		case ZE_VRT_UNSIGNED_INTEGER_64:
 			Unserializer->Read(&Value.Int64, sizeof(ZEUInt64), 1);
-			Serializer->WriteProperty(Name, (ZEUInt64)Value.Int64);
+			Serializer->WriteUInt64(Name, (ZEUInt64)Value.Int64);
 			break;
 
 		case ZE_VRT_BOOLEAN:
 			Unserializer->Read(&Value.Boolean, sizeof(bool), 1);
-			Serializer->WriteProperty(Name, Value.Boolean);
+			Serializer->WriteBool(Name, Value.Boolean);
 			break;
 
 		case ZE_VRT_STRING:
@@ -141,50 +141,50 @@ static bool ConvertProperty(const char* Name, ZEMLSerialNode* Serializer, ZEFile
 			char* Buffer = new char[StringSize];
 			Unserializer->Read(Buffer, sizeof(char), StringSize);
 			Buffer[StringSize - 1] = '\0';
-			Serializer->WriteProperty(Name, Buffer);
+			Serializer->WriteString(Name, Buffer);
 			break;
 		}
 
 		case ZE_VRT_QUATERNION:
 			Unserializer->Read(&Value.Vectors, sizeof(ZEQuaternion), 1);
-			Serializer->WriteProperty(Name, *(ZEQuaternion*)&Value.Vectors);
+			Serializer->WriteQuaternion(Name, *(ZEQuaternion*)&Value.Vectors);
 			break;
 
 		case ZE_VRT_VECTOR2:
 			Unserializer->Read(&Value.Vectors, sizeof(ZEVector2), 1);
-			Serializer->WriteProperty(Name, *(ZEVector2*)&Value.Vectors);
+			Serializer->WriteVector2(Name, *(ZEVector2*)&Value.Vectors);
 			break;
 
 		case ZE_VRT_VECTOR3:
 			Unserializer->Read(&Value.Vectors, sizeof(ZEVector3), 1);
-			Serializer->WriteProperty(Name, *(ZEVector3*)&Value.Double);
+			Serializer->WriteVector3(Name, *(ZEVector3*)&Value.Double);
 			break;
 
 		case ZE_VRT_VECTOR4:
 			Unserializer->Read(&Value.Vectors, sizeof(ZEVector4), 1);
-			Serializer->WriteProperty(Name, *(ZEVector4*)&Value.Vectors);
+			Serializer->WriteVector4(Name, *(ZEVector4*)&Value.Vectors);
 			break;
 
 		case ZE_VRT_MATRIX3X3:
 			Unserializer->Read(Value.Matrix3x3, sizeof(ZEMatrix3x3), 1);
-			Serializer->WriteProperty(Name, *(ZEMatrix3x3*)&Value.Matrix3x3);
+			Serializer->WriteMatrix3x3(Name, *(ZEMatrix3x3*)&Value.Matrix3x3);
 			break;
 
 		case ZE_VRT_MATRIX4X4:
 			Unserializer->Read(Value.Matrix4x4, sizeof(ZEMatrix4x4), 1);
-			Serializer->WriteProperty(Name, *(ZEMatrix4x4*)&Value.Matrix4x4);
+			Serializer->WriteMatrix4x4(Name, *(ZEMatrix4x4*)&Value.Matrix4x4);
 			break;
 	}
 	return true;
 }
 
-static void ConvertEntity(ZEFile* Unserializer, ZEMLSerialNode* Serializer)
+static void ConvertEntity(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
 {
 	char EntityTypeName[ZE_MAX_NAME_SIZE];
 	Unserializer->Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
-	Serializer->WriteProperty("Class", EntityTypeName);
+	Serializer->WriteString("Class", EntityTypeName);
 
-	ZEMLSerialNode Properties = Serializer->OpenNode("Properties");
+	ZEMLWriterNode Properties = Serializer->WriteNode("Properties");
 
 	struct ZEObjectFileChunk
 	{
@@ -210,7 +210,7 @@ static void ConvertEntity(ZEFile* Unserializer, ZEMLSerialNode* Serializer)
 	}
 }
 
-static void ConvertScene(ZEFile* Unserializer, ZEMLSerialNode* Serializer)
+static void ConvertScene(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
 {
 	ZEUInt32 EntityCount;
 	ZEUInt LastEntityId;
@@ -220,10 +220,10 @@ static void ConvertScene(ZEFile* Unserializer, ZEMLSerialNode* Serializer)
 	char MapFile[ZE_MAX_FILE_NAME_SIZE];
 	Unserializer->Read(MapFile, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
 
-	ZEMLSerialNode EntitiesNode = Serializer->OpenNode("Entities");
+	ZEMLWriterNode EntitiesNode = Serializer->WriteNode("Entities");
 	for (ZESize I = 0; I < EntityCount; I++)
 	{
-		ZEMLSerialNode EntityNode = Serializer->OpenNode("Entity");
+		ZEMLWriterNode EntityNode = Serializer->WriteNode("Entity");
 		ConvertEntity(Unserializer, &EntityNode);
 		EntityNode.CloseNode();
 	}
@@ -264,7 +264,7 @@ bool ZESceneConverter::Convert(const char* Source, const char* Destination)
 		return false;
 	}
 
-	ZEMLSerialRootNode Serializer("Scene", &DestinationFile);
+	ZEMLWriter Serializer("Scene", &DestinationFile);
 	ConvertScene(&Unserializer, &Serializer);
 
 	DestinationFile.Close();

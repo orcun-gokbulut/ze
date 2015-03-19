@@ -47,14 +47,13 @@ ze_add_source(ZEMLPropertyTests.cpp 		Tests)
 ze_add_source(ZEMLDataProperty.h 			Sources Headers)
 ze_add_source(ZEMLDataProperty.cpp 			Sources)
 ze_add_source(ZEMLDataPropertyTests.cpp 	Tests)
-ze_add_source(ZEMLSerialWriter.h 			Sources Headers)
-ze_add_source(ZEMLSerialWriter.cpp 			Sources)
-ze_add_source(ZEMLSerialWriterTests.cpp 	Tests)
 ze_add_source(ZEMLSerialReader.h 			Sources Headers)
 ze_add_source(ZEMLSerialReader.cpp 			Sources)
 ze_add_source(ZEMLSerialReaderTests.cpp 	Tests)
 ze_add_source(ZEMLReader.h					Sources Headers)
 ze_add_source(ZEMLReader.cpp				Sources)
+ze_add_source(ZEMLWriter.h 					Sources Headers)
+ze_add_source(ZEMLWriter.cpp 				Sources)
 
 ze_add_library(TARGET ZEML 
 	SOURCES ${Sources} 

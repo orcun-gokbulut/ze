@@ -46,8 +46,8 @@ class TiXmlElement;
 class ZEMLDataProperty : public ZEMLItem
 {
 	friend class ZEMLNode;
-	friend class ZEMLSerialNode;
-	friend class ZEMLSerialRootNode;
+	friend class ZEMLWriterNode;
+	friend class ZEMLWriter;
 
 	private:
 
