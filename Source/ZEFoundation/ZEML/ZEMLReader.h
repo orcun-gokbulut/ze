@@ -73,21 +73,20 @@ class ZEMLReaderNode
 		ZEUInt64					Size;
 		ZEInt64						PrevNodeOffset;
 		ZEInt64						NextNodeOffset;
-		ZEInt						Version;
-
+		ZEInt						VersionMajor;
+		ZEInt						VersionMinor;
 		ZEString					Name;
+		bool						Dirty;
 		ZESmartArray<ZEMLReaderProperty> Properties;
 		ZESmartArray<ZEMLReaderSubNode>	SubNodes;
 
-		bool						Dirty;
 
 		const ZEMLReaderProperty*	FindProperty(const char* Name);
-
 		void						Load();
 		 
 	public:
 		const char*					GetName();
-		
+
 		const 
 		ZESmartArray<ZEMLReaderSubNode>& GetSubNodes();
 		const
@@ -105,7 +104,7 @@ class ZEMLReaderNode
 		bool						IsPropertyExists(const char* Name);
 		bool						IsSubNodeExists(const char* Name);
 
-		ZEValue						Read(const char* Name);
+		ZEValue						ReadValue(const char* Name);
 		ZEInt8						ReadInt8(const char* Name, ZEInt8 Default = 0);
 		ZEInt16						ReadInt16(const char* Name, ZEInt16 Default = 0);
 		ZEInt32						ReadInt32(const char* Name, ZEInt32 Default = 0);
@@ -133,14 +132,17 @@ class ZEMLReader
 {
 	private:
 		ZEFile*						File;
-		ZEUInt						Version;
+		ZEUInt						VersionMajor;
+		ZEUInt						VersionMinor;
 		ZEMLReaderNode				RootNode;
 
 		bool						Load();
 
 	public:
 		ZEMLReaderNode				GetRootNode();
-		ZEUInt						GetVersion();
+
+		ZEUInt						GetVersionMajor();
+		ZEUInt						GetVersionMinor();
 
 		bool						Open(ZEFile* File);
 		void						Close();

@@ -359,7 +359,8 @@ ZEMLReaderNode ZEMLReaderNode::GetSubNode(const char* Name, ZESize Index)
 				 ZEMLReaderNode Node;
 				 Node.File = this->File;
 				 Node.Offset = SubNodes[I].Offset;
-				 Node.Version = Version;
+				 Node.VersionMajor = VersionMajor;
+				 Node.VersionMinor = VersionMinor;
 				 Node.PrevNodeOffset = (I == 0 ? -1 : SubNodes[I].Offset);
 				 Node.NextNodeOffset = (I + 1 == SubNodes.GetCount() ? -1 : SubNodes[I + 1].Offset);
 				 return Node;
@@ -382,7 +383,8 @@ ZEMLReaderNode ZEMLReaderNode::GetPrevNode()
 	Node.File = this->File;
 	Node.Offset = PrevNodeOffset;
 	Node.NextNodeOffset = this->Offset;
-	Node.Version = Version;
+	Node.VersionMajor = VersionMajor;
+	Node.VersionMinor = VersionMinor;
 	return Node;
 }
 
@@ -397,7 +399,8 @@ ZEMLReaderNode ZEMLReaderNode::GetNextNode()
 	Node.File = this->File;
 	Node.Offset = NextNodeOffset;
 	Node.PrevNodeOffset = this->Offset;
-	Node.Version = Version;
+	Node.VersionMajor = VersionMajor;
+	Node.VersionMinor = VersionMinor;
 	return Node;
 }
 
@@ -408,7 +411,7 @@ bool ZEMLReaderNode::IsValid()
 
 bool ZEMLReaderNode::IsPropertyExists(const char* Name)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 	return !Value.IsNull();
 }
 
@@ -417,7 +420,7 @@ bool ZEMLReaderNode::IsSubNodeExists(const char* Name)
 	return GetSubNodeCount(Name) > 0;
 }
 
-ZEValue ZEMLReaderNode::Read(const char* Name)
+ZEValue ZEMLReaderNode::ReadValue(const char* Name)
 {
 	const ZEMLReaderProperty* Property = FindProperty(Name);
 
@@ -437,7 +440,7 @@ ZEValue ZEMLReaderNode::Read(const char* Name)
 
 ZEInt8 ZEMLReaderNode::ReadInt8(const char* Name, ZEInt8 Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 	
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_INTEGER_8)
 		return Default;
@@ -447,7 +450,7 @@ ZEInt8 ZEMLReaderNode::ReadInt8(const char* Name, ZEInt8 Default)
 
 ZEInt16 ZEMLReaderNode::ReadInt16(const char* Name, ZEInt16 Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_INTEGER_16)
 		return Default;
@@ -457,7 +460,7 @@ ZEInt16 ZEMLReaderNode::ReadInt16(const char* Name, ZEInt16 Default)
 
 ZEInt32 ZEMLReaderNode::ReadInt32(const char* Name, ZEInt32 Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_INTEGER_32)
 		return Default;
@@ -467,7 +470,7 @@ ZEInt32 ZEMLReaderNode::ReadInt32(const char* Name, ZEInt32 Default)
 
 ZEInt64 ZEMLReaderNode::ReadInt64(const char* Name, ZEInt64 Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_INTEGER_64)
 		return Default;
@@ -477,7 +480,7 @@ ZEInt64 ZEMLReaderNode::ReadInt64(const char* Name, ZEInt64 Default)
 
 ZEUInt8 ZEMLReaderNode::ReadUInt8(const char* Name, ZEUInt8 Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_UNSIGNED_INTEGER_8)
 		return Default;
@@ -487,7 +490,7 @@ ZEUInt8 ZEMLReaderNode::ReadUInt8(const char* Name, ZEUInt8 Default)
 
 ZEUInt16 ZEMLReaderNode::ReadUInt16(const char* Name, ZEUInt16 Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_UNSIGNED_INTEGER_16)
 		return Default;
@@ -497,7 +500,7 @@ ZEUInt16 ZEMLReaderNode::ReadUInt16(const char* Name, ZEUInt16 Default)
 
 ZEUInt32 ZEMLReaderNode::ReadUInt32(const char* Name, ZEUInt32 Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_UNSIGNED_INTEGER_32)
 		return Default;
@@ -507,7 +510,7 @@ ZEUInt32 ZEMLReaderNode::ReadUInt32(const char* Name, ZEUInt32 Default)
 
 ZEUInt64 ZEMLReaderNode::ReadUInt64(const char* Name, ZEUInt64 Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_UNSIGNED_INTEGER_64)
 		return Default;
@@ -517,7 +520,7 @@ ZEUInt64 ZEMLReaderNode::ReadUInt64(const char* Name, ZEUInt64 Default)
 
 float ZEMLReaderNode::ReadFloat(const char* Name, float Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_FLOAT)
 		return Default;
@@ -527,7 +530,7 @@ float ZEMLReaderNode::ReadFloat(const char* Name, float Default)
 
 double ZEMLReaderNode::ReadDouble(const char* Name, double Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_DOUBLE)
 		return Default;
@@ -537,7 +540,7 @@ double ZEMLReaderNode::ReadDouble(const char* Name, double Default)
 
 ZEVector2 ZEMLReaderNode::ReadVector3(const char* Name, const ZEVector2& Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_VECTOR2)
 		return Default;
@@ -547,7 +550,7 @@ ZEVector2 ZEMLReaderNode::ReadVector3(const char* Name, const ZEVector2& Default
 
 ZEVector3 ZEMLReaderNode::ReadVector4(const char* Name, const ZEVector3& Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_VECTOR3)
 		return Default;
@@ -557,7 +560,7 @@ ZEVector3 ZEMLReaderNode::ReadVector4(const char* Name, const ZEVector3& Default
 
 ZEVector4 ZEMLReaderNode::ReadVector4(const char* Name, const ZEVector4& Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_VECTOR4)
 		return Default;
@@ -567,7 +570,7 @@ ZEVector4 ZEMLReaderNode::ReadVector4(const char* Name, const ZEVector4& Default
 
 ZEQuaternion ZEMLReaderNode::ReadQuaternion(const char* Name, const ZEQuaternion& Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_QUATERNION)
 		return Default;
@@ -577,7 +580,7 @@ ZEQuaternion ZEMLReaderNode::ReadQuaternion(const char* Name, const ZEQuaternion
 
 ZEMatrix3x3 ZEMLReaderNode::ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_MATRIX3X3)
 		return Default;
@@ -587,7 +590,7 @@ ZEMatrix3x3 ZEMLReaderNode::ReadMatrix3x3(const char* Name, const ZEMatrix3x3& D
 
 ZEMatrix4x4 ZEMLReaderNode::ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_MATRIX4X4)
 		return Default;
@@ -597,7 +600,7 @@ ZEMatrix4x4 ZEMLReaderNode::ReadMatrix4x4(const char* Name, const ZEMatrix4x4& D
 
 ZEString ZEMLReaderNode::ReadString(const char* Name, const char* Default)
 {
-	ZEValue Value = Read(Name);
+	ZEValue Value = ReadValue(Name);
 
 	if (Value.IsNull() || Value.GetType() != ZE_VRT_STRING)
 		return Default;
@@ -645,7 +648,7 @@ ZEMLReaderNode::ZEMLReaderNode()
 	Offset = -1;
 	NextNodeOffset = -1;
 	Size = 0;
-	Version = 0;
+	VersionMajor = 0;
 	Dirty = true;
 }
 
@@ -682,19 +685,18 @@ bool ZEMLReader::Load()
 		Identifier[3] == 'L')
 	{
 		// Version 1+
-		ZEUInt16 Version;
-		if (File->Read(&Version, sizeof(ZEUInt32), 1) != 1)
+		ZEUInt8 Version[2];
+		if (File->Read(&Version, 2 * sizeof(ZEUInt8), 1) != 1)
 		{
 			zeError("Cannot load ZEML file. Corrupted ZEML file. File Name: \"%s\".", File->GetPath().ToCString());
 			return false;
 		}
-		Version == ZEEndian::Little(Version);
 
-		if ((Version & 0xFF00) > 0x0100)
+		if (Version[0] > 1)
 		{
 			zeWarning("Higher unknown ZEML file major version detected. Unknown major versions can cause problems. Current Version: 1.0. Detected Version: %d.%d. File Name: \"%s\".", 
-				(Version & 0xFF00) >> 8,
-				(Version & 0x00FF),
+				Version[0],
+				Version[1],
 				File->GetPath());
 		}
 
@@ -706,15 +708,17 @@ bool ZEMLReader::Load()
 		}
 		StartOffset == ZEEndian::Little(StartOffset);
 
-		RootNode.Version = Version;
-		RootNode.Offset = 0;
+		RootNode.VersionMajor = Version[0];
+		RootNode.VersionMinor = Version[1];
+		RootNode.Offset = StartOffset;
 		RootNode.File = File;
 	}
 	else if (Identifier[0] == 'Z' && Identifier[1] == ZEML_IT_NODE)
 	{
 		// Version 0
 		zeWarning("Old depricated ZEML file version detected. Please convert this file to new version for future compability. Current Version: 1.0. Detected Version: 0.0. File Name: \"%s\".", File->GetPath().ToCString());
-		RootNode.Version = Version;
+		RootNode.VersionMajor = 0;
+		RootNode.VersionMinor = 0;
 		RootNode.Offset = 0;
 		RootNode.File = File;
 	}
@@ -732,9 +736,14 @@ ZEMLReaderNode ZEMLReader::GetRootNode()
 	return RootNode;
 }
 
-ZEUInt ZEMLReader::GetVersion()
+ZEUInt ZEMLReader::GetVersionMajor()
 {
-	return Version;
+	return VersionMajor;
+}
+
+ZEUInt ZEMLReader::GetVersionMinor()
+{
+	return VersionMinor;
 }
 
 bool ZEMLReader::Open(ZEFile* File)
@@ -748,12 +757,15 @@ bool ZEMLReader::Open(ZEFile* File)
 
 void ZEMLReader::Close()
 {
+	VersionMajor = 0;
+	VersionMinor = 0;
 }
 
 ZEMLReader::ZEMLReader()
 {
 	File = NULL;
-	Version = 0;
+	VersionMajor = 0;
+	VersionMinor = 0;
 }
 
 ZEMLReader::ZEMLReader(ZEFile* File)

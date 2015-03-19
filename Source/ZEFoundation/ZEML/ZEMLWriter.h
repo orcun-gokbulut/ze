@@ -38,9 +38,9 @@
 #define __ZEML_WRITER_H__
 
 #include "ZETypes.h"
+#include "ZEMLCommon.h"
 #include "ZEDS/ZEValue.h"
-
-class ZEFile;
+#include "ZEFile/ZEFile.h"
 
 class ZEMLWriterNode
 {
@@ -53,12 +53,14 @@ class ZEMLWriterNode
 		ZEUInt64			Size;
 		ZEMLWriterNode*		ParentNode;
 
+		bool				WriteItemHeader(const char* Name, ZEMLItemType Type);
+
 	public:
 		ZEMLWriterNode		OpenSubNode(const char* Name);
 
-		bool				WriteProperty(const char* Name, const ZEValue& Value);
-		bool				WritePropertyFloat(const char* Name, float Value);
-		bool				WritePropertyDouble(const char* Name, double Value);
+		bool				WriteValue(const char* Name, const ZEValue& Value);
+		bool				WriteFloat(const char* Name, float Value);
+		bool				WriteDouble(const char* Name, double Value);
 		bool				WriteInt8(const char* Name, ZEInt8 Value);
 		bool				WriteInt16(const char* Name, ZEInt16 Value);
 		bool				WriteInt32(const char* Name, ZEInt32 Value);
@@ -85,18 +87,21 @@ class ZEMLWriterNode
 class ZEMLWriter
 {
 	private:
+		ZEFile				OwnedFile;
 		ZEFile*				File;
+
+		void				WriteHeader();
 
 	public:
 		ZEMLWriterNode		WriteRootNode(const char* Name);
-		void				CloseRootNode();
 
+		bool				Open(const char* FileName);
 		bool				Open(ZEFile* File);
 		void				Close();
 
 							ZEMLWriter();
-							ZEMLWriter(ZEFile* File);
 							~ZEMLWriter();
 };
+
 
 #endif
