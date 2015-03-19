@@ -42,14 +42,14 @@
 ZEMLNode::ZEMLNode()
 {
 	Properties.Clear();
-	SetType(ZEML_IT_NODE);
+	SetType(ZEML_ET_NODE);
 	NodeSize = 0;
 }
 
 ZEMLNode::ZEMLNode(const ZEString& Name)
 {
 	Properties.Clear();
-	SetType(ZEML_IT_NODE);
+	SetType(ZEML_ET_NODE);
 	SetName(Name);
 	NodeSize = 0;
 }
@@ -74,9 +74,9 @@ ZEUInt64 ZEMLNode::GetTotalSize()
 
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 	{
-		ZEMLItemType CurrentItemType = Properties[I]->GetType();
+		ZEMLElementType CurrentItemType = Properties[I]->GetType();
 
-		if(CurrentItemType == ZEML_IT_OFFSET_DATA)
+		if(CurrentItemType == ZEML_ET_OFFSET_DATA)
 			TotalSize += ((ZEMLDataProperty*)Properties[I])->GetTotalSize();
 		else
 			TotalSize += ((ZEMLProperty*)Properties[I])->GetTotalSize();
@@ -461,9 +461,9 @@ bool ZEMLNode::WriteSelf(ZEFile* File)
 
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 	{
-		ZEMLItemType CurrentItemType = Properties[I]->GetType();
+		ZEMLElementType CurrentItemType = Properties[I]->GetType();
 
-		if(CurrentItemType == ZEML_IT_INLINE_DATA)
+		if(CurrentItemType == ZEML_ET_INLINE_DATA)
 		{
 			if(!((ZEMLDataProperty*)Properties[I])->WriteSelf(File))
 			{
@@ -502,9 +502,9 @@ bool ZEMLNode::WriteSelfToXML(TiXmlElement* XMLElement)
 
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 	{
-		ZEMLItemType CurrentItemType = Properties[I]->GetType();
+		ZEMLElementType CurrentItemType = Properties[I]->GetType();
 
-		if(CurrentItemType == ZEML_IT_INLINE_DATA)
+		if(CurrentItemType == ZEML_ET_INLINE_DATA)
 		{
 			if(!((ZEMLDataProperty*)Properties[I])->WriteSelfToXML(XMLElement))
 			{
@@ -615,7 +615,7 @@ bool ZEMLNode::ReadSelf(ZEFile* File, bool DeferredDataReading)
 		File->Read(&SubItemType, sizeof(ZEUInt8), 1);
 		File->Seek((ZEInt64)sizeof(ZEUInt8) * -2, ZE_SF_CURRENT);
 
-		if((ZEMLItemType)SubItemType == ZEML_IT_NODE)
+		if((ZEMLElementType)SubItemType == ZEML_ET_NODE)
 		{
 			ZEMLNode* NewNode = new ZEMLNode();
 			if(!NewNode->ReadSelf(File, DeferredDataReading))
@@ -626,7 +626,7 @@ bool ZEMLNode::ReadSelf(ZEFile* File, bool DeferredDataReading)
 			NewNode->Parent = this;
 			SubNodes.Append(NewNode);
 		}
-		else if((ZEMLItemType)SubItemType == ZEML_IT_INLINE_DATA)
+		else if((ZEMLElementType)SubItemType == ZEML_ET_INLINE_DATA)
 		{
 			ZEMLDataProperty* NewDataProperty = new ZEMLDataProperty();
 			if(!NewDataProperty->ReadSelf(File, DeferredDataReading))
@@ -694,9 +694,9 @@ bool ZEMLNode::ReadFromXML(TiXmlElement* Element)
 
 		TiXmlElement* CurrentElement = CurrentNode->ToElement();
 
-		if(strcmp(CurrentElement->Attribute("Type"), "ZEML_IT_NODE") == 0)
+		if(strcmp(CurrentElement->Attribute("Type"), "ZEML_ET_NODE") == 0)
 			AddSubNode()->ReadFromXML(CurrentElement);
-		else if(strcmp(CurrentElement->Attribute("Type"), "ZEML_IT_INLINE_DATA") == 0)
+		else if(strcmp(CurrentElement->Attribute("Type"), "ZEML_ET_INLINE_DATA") == 0)
 			AddDataProperty()->ReadFromXML(CurrentElement);
 		else
 			AddProperty()->ReadFromXML(CurrentElement);
@@ -713,12 +713,12 @@ bool ZEMLNode::AddItem(ZEMLItem* Item)
 		return false;
 	}
 
-	if(Item->GetType() == ZEML_IT_NODE)
+	if(Item->GetType() == ZEML_ET_NODE)
 	{
 		AddSubNode((ZEMLNode*)Item);
 		return true;
 	}
-	else if (Item->GetType() == ZEML_IT_INLINE_DATA)
+	else if (Item->GetType() == ZEML_ET_INLINE_DATA)
 	{
 		return AddDataProperty((ZEMLDataProperty*)Item);
 	}	
@@ -739,9 +739,9 @@ bool ZEMLNode::RemoveItem(ZEMLItem* Item)
 		return false;
 	}
 
-	if(Item->GetType() == ZEML_IT_NODE)
+	if(Item->GetType() == ZEML_ET_NODE)
 		return RemoveSubNode((ZEMLNode*)Item);
-	else if (Item->GetType() == ZEML_IT_INLINE_DATA)
+	else if (Item->GetType() == ZEML_ET_INLINE_DATA)
 		return RemoveDataProperty((ZEMLDataProperty*)Item);
 	else
 		return RemoveProperty((ZEMLProperty*)Item);

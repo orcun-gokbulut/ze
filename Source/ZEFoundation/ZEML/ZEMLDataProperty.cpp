@@ -51,7 +51,7 @@ ZEMLDataProperty::ZEMLDataProperty()
 {
 	Data = NULL;
 	IsCached = false;
-	SetType(ZEML_IT_INLINE_DATA);
+	SetType(ZEML_ET_INLINE_DATA);
 	FileDataPosition = 0;
 	File = NULL;
 }
@@ -61,7 +61,7 @@ ZEMLDataProperty::ZEMLDataProperty(const ZEString& Name)
 	Data = NULL;
 	IsCached = false;
 	SetName(Name);
-	SetType(ZEML_IT_INLINE_DATA);
+	SetType(ZEML_ET_INLINE_DATA);
 	FileDataPosition = 0;
 	File = NULL;
 }
@@ -72,7 +72,7 @@ ZEMLDataProperty::ZEMLDataProperty(const ZEString& Name ,void* Data, ZEUInt64 Da
 	IsCached = false;
 	SetName(Name);
 	SetData(Data, DataSize, Cache);
-	SetType(ZEML_IT_INLINE_DATA);
+	SetType(ZEML_ET_INLINE_DATA);
 	FileDataPosition = 0;
 	File = NULL;
 }

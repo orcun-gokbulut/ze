@@ -53,7 +53,7 @@ class ZEMLWriterNode
 		ZEUInt64			Size;
 		ZEMLWriterNode*		ParentNode;
 
-		bool				WriteItemHeader(const char* Name, ZEMLItemType Type);
+		bool				WriteElementHeader(const char* Name, ZEMLElementType Type);
 
 	public:
 		ZEMLWriterNode		OpenSubNode(const char* Name);

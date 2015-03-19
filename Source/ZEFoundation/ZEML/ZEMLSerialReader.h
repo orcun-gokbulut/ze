@@ -72,7 +72,7 @@ class ZEMLSerialReader
 		ZEMLSerialPointer	DataItemDataPointer;
 		ZEMLSerialPointer	MaxPointer;
 
-		ZEMLItemType		CurrentItemType;
+		ZEMLElementType		CurrentItemType;
 		ZEValue			CurrentItemValue;
 		ZEString			CurrentItemName;
 		ZEUInt64			CurrentItemDataSize;
@@ -87,7 +87,7 @@ class ZEMLSerialReader
 		ZEMLSerialPointer	GetCurrentPointer();
 		void				GoToCurrentPointer();
 		
-		ZEMLItemType		GetItemType();
+		ZEMLElementType		GetItemType();
 		ZEString			GetItemName();
 		ZEUInt64			GetSubItemCount();
 		ZEValue			GetItemValue();
