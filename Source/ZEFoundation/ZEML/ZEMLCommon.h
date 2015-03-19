@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLItem.h
+ Zinek Engine - ZEMLCommon.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,49 +34,36 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEML_TYPE_H__
-#define __ZEML_TYPE_H__
+#ifndef __ZEML_COMMON_H__
+#define __ZEML_COMMON_H__
 
-#include "ZETypes.h"
-#include "ZEMLCommon.h"
-#include "ZEDS/ZEList.h"
-#include "ZEDS/ZEString.h"
+#define ZEML_ITEM_FILE_IDENTIFIER	'Z'
+#define ZEML_MAX_NAME_SIZE			256
 
-class ZEMLNode;
-class ZEFile;
-
-class ZEMLItem : public ZEListItem
+enum ZEMLItemType
 {
-	friend class ZEMLNode;
-
-	protected:
-		ZEString			Name;
-		ZEUInt8				Type;
-		ZEMLItem*			Parent;
-		ZEUInt64			DataSize;
-		ZEUInt64			FilePosition;
-
-		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading) = 0;
-		virtual bool		WriteSelf(ZEFile* File) = 0;
-
-
-		void				SetType(ZEMLItemType Type);
-
-							ZEMLItem();
-							~ZEMLItem();
-
-	public:
-		ZEMLItemType		GetType() const;
-		ZEString			GetTypeText();
-		ZEMLItemType		GetTypeFromText(ZEString TypeText);
-
-		ZEUInt64			GetFilePosition();
-
-		virtual ZEUInt64	GetTotalSize() = 0;
-		ZEUInt64			GetDataSize();
-
-		void				SetName(const ZEString& Name);
-		const ZEString&		GetName() const;				
+	ZEML_IT_UNDEFINED		= 0,
+	ZEML_IT_FLOAT			= 1,
+	ZEML_IT_DOUBLE			= 2,
+	ZEML_IT_INT8			= 3,
+	ZEML_IT_INT16			= 4,
+	ZEML_IT_INT32			= 5,
+	ZEML_IT_INT64			= 6,
+	ZEML_IT_UINT8			= 7,
+	ZEML_IT_UINT16			= 8,
+	ZEML_IT_UINT32			= 9,
+	ZEML_IT_UINT64			= 10,
+	ZEML_IT_BOOLEAN			= 11,
+	ZEML_IT_STRING			= 12,
+	ZEML_IT_QUATERNION		= 13,
+	ZEML_IT_VECTOR2			= 14,
+	ZEML_IT_VECTOR3			= 15,
+	ZEML_IT_VECTOR4			= 16,
+	ZEML_IT_MATRIX3X3		= 17,
+	ZEML_IT_MATRIX4X4		= 18,
+	ZEML_IT_INLINE_DATA		= 19,
+	ZEML_IT_OFFSET_DATA		= 20,
+	ZEML_IT_NODE			= 21
 };
 
 #endif

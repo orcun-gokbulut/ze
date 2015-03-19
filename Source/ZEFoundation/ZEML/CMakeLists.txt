@@ -35,6 +35,8 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+ze_add_source(ZEMLCommon.h					Sources Headers)
+ze_add_source(ZEMLCommon.cpp				Sources)
 ze_add_source(ZEMLItem.h 					Sources Headers)
 ze_add_source(ZEMLItem.cpp 					Sources)
 ze_add_source(ZEMLItemTests.cpp 			Tests)
