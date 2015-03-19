@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLSerialWriter.h
+ Zinek Engine - ZEMLWriter.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,72 +34,69 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEML_SERIAL_WRITER_H__
-#define __ZEML_SERIAL_WRITER_H__
+#ifndef	__ZEML_WRITER_H__
+#define __ZEML_WRITER_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEValue.h"
 
 class ZEFile;
 
-class ZEMLSerialNode
+class ZEMLWriterNode
 {
-	friend class ZEMLSerialRootNode;
-
+	friend class ZEMLWriter;
 	private:
-
 		ZEFile*				File;
 		ZEUInt64			FileUpdatePosition;
 		ZEString			Name;
 		ZEUInt64			SubItemCount;
 		ZEUInt64			Size;
-
-		ZEMLSerialNode*		ParentNode;
-
-							ZEMLSerialNode();
-							ZEMLSerialNode(const ZEString& Name, ZEFile* File, ZEMLSerialNode* Parent);
+		ZEMLWriterNode*		ParentNode;
 
 	public:
+		ZEMLWriterNode		OpenSubNode(const char* Name);
 
-		virtual ZEMLSerialNode	OpenNode(const ZEString& Name);
-		virtual void			CloseNode();
+		bool				WriteProperty(const char* Name, const ZEValue& Value);
+		bool				WritePropertyFloat(const char* Name, float Value);
+		bool				WritePropertyDouble(const char* Name, double Value);
+		bool				WriteInt8(const char* Name, ZEInt8 Value);
+		bool				WriteInt16(const char* Name, ZEInt16 Value);
+		bool				WriteInt32(const char* Name, ZEInt32 Value);
+		bool				WriteInt64(const char* Name, ZEInt64 Value);
+		bool				WriteUInt8(const char* Name, ZEUInt8 Value);
+		bool				WriteUInt16(const char* Name, ZEUInt16 Value);
+		bool				WriteUInt32(const char* Name, ZEUInt32 Value);
+		bool				WriteUInt64(const char* Name, ZEUInt64 Value);
+		bool				WriteBool(const char* Name, bool Value);
+		bool				WriteString(const char* Name, const char* Value);
+		bool				WriteQuaternion(const char* Name, const ZEQuaternion& Value);
+		bool				WriteVector2(const char* Name, const ZEVector2& Value);
+		bool				WriteVector3(const char* Name, const ZEVector3& Value);
+		bool				WriteVector4(const char* Name, const ZEVector4& Value);
+		bool				WriteMatrix3x3(const char* Name, const ZEMatrix3x3& Value);
+		bool				WriteMatrix4x4(const char* Name, const ZEMatrix4x4& Value);
+		bool				WriteData(const char* Name, void* Data, ZEUInt64 DataSize);
 
-		void					WriteProperty(const ZEString& Name, const ZEValue& Value);
-		void					WriteProperty(const ZEString& Name, float Value);
-		void					WriteProperty(const ZEString& Name, double Value);
-		void					WriteProperty(const ZEString& Name, ZEInt8 Value);
-		void					WriteProperty(const ZEString& Name, ZEInt16 Value);
-		void					WriteProperty(const ZEString& Name, ZEInt32 Value);
-		void					WriteProperty(const ZEString& Name, ZEInt64 Value);
-		void					WriteProperty(const ZEString& Name, ZEUInt8 Value);
-		void					WriteProperty(const ZEString& Name, ZEUInt16 Value);
-		void					WriteProperty(const ZEString& Name, ZEUInt32 Value);
-		void					WriteProperty(const ZEString& Name, ZEUInt64 Value);
-		void					WriteProperty(const ZEString& Name, bool Value);
-		void					WriteProperty(const ZEString& Name, const ZEString& Value);
-		void					WriteProperty(const ZEString& Name, const char* Value);
-		void					WriteProperty(const ZEString& Name, const ZEQuaternion& Value);
-		void					WriteProperty(const ZEString& Name, const ZEVector2& Value);
-		void					WriteProperty(const ZEString& Name, const ZEVector3& Value);
-		void					WriteProperty(const ZEString& Name, const ZEVector4& Value);
-		void					WriteProperty(const ZEString& Name, const ZEMatrix3x3& Value);
-		void					WriteProperty(const ZEString& Name, const ZEMatrix4x4& Value);
+		void				CloseNode();
 
-		void					WriteDataProperty(const ZEString& Name, void* Data, ZEUInt64 DataSize);
+							ZEMLWriterNode();
 };
 
-class ZEMLSerialRootNode : public ZEMLSerialNode
+class ZEMLWriter
 {
 	private:
-							ZEMLSerialRootNode();
+		ZEFile*				File;
 
 	public:
+		ZEMLWriterNode		WriteRootNode(const char* Name);
+		void				CloseRootNode();
 
-		virtual ZEMLSerialNode	OpenNode(const ZEString& Name);
-		virtual void			CloseNode();
+		bool				Open(ZEFile* File);
+		void				Close();
 
-								ZEMLSerialRootNode(const ZEString& Name, ZEFile* File);
+							ZEMLWriter();
+							ZEMLWriter(ZEFile* File);
+							~ZEMLWriter();
 };
 
 #endif
