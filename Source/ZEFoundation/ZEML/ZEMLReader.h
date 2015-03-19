@@ -46,7 +46,7 @@
 
 struct ZEMLReaderProperty
 {
-	ZEMLItemType	Type;
+	ZEMLElementType	Type;
 	ZEString		Name;
 	ZEValue			Value;
 	ZEUInt64		DataSize;

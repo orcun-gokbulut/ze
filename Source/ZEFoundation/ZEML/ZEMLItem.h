@@ -60,15 +60,15 @@ class ZEMLItem : public ZEListItem
 		virtual bool		WriteSelf(ZEFile* File) = 0;
 
 
-		void				SetType(ZEMLItemType Type);
+		void				SetType(ZEMLElementType Type);
 
 							ZEMLItem();
 							~ZEMLItem();
 
 	public:
-		ZEMLItemType		GetType() const;
+		ZEMLElementType		GetType() const;
 		ZEString			GetTypeText();
-		ZEMLItemType		GetTypeFromText(ZEString TypeText);
+		ZEMLElementType		GetTypeFromText(ZEString TypeText);
 
 		ZEUInt64			GetFilePosition();
 

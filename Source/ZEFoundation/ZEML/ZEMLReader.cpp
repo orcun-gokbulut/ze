@@ -38,7 +38,7 @@
 
 ZEMLReaderProperty::ZEMLReaderProperty()
 {
-	Type = ZEML_IT_UNDEFINED;
+	Type = ZEML_ET_UNDEFINED;
 	DataSize = 0;
 	DataOffset = 0;
 }
@@ -62,7 +62,7 @@ const ZEMLReaderProperty* ZEMLReaderNode::FindProperty(const char* Name)
 	return NULL;
 }
 
-static bool LoadItemV0(ZEFile* File, ZEString& Name, ZEMLItemType& ItemType, ZEValue& Value, ZEUInt64& Size, ZEUInt64& Offset, ZEUInt64& ItemCount)
+static bool LoadItemV0(ZEFile* File, ZEString& Name, ZEMLElementType& ItemType, ZEValue& Value, ZEUInt64& Size, ZEUInt64& Offset, ZEUInt64& ItemCount)
 {
 	Offset = File->Tell();
 
@@ -76,7 +76,7 @@ static bool LoadItemV0(ZEFile* File, ZEString& Name, ZEMLItemType& ItemType, ZEV
 	ZEUInt8 ItemTypeData = 0;
 	if (File->Read(&ItemTypeData, sizeof(ZEUInt8), 1) != 1)
 		return false;
-	ItemType = (ZEMLItemType)ItemTypeData;
+	ItemType = (ZEMLElementType)ItemTypeData;
 
 	ZEUInt8 NameSize = 0;
 	if (File->Read(&NameSize, sizeof(ZEUInt8), 1) != 1)
@@ -86,7 +86,7 @@ static bool LoadItemV0(ZEFile* File, ZEString& Name, ZEMLItemType& ItemType, ZEV
 	if (File->Read(NameBuffer, NameSize, 1) != 1)
 		return false;
 	
-	if (ItemType == ZEML_IT_NODE)
+	if (ItemType == ZEML_ET_NODE)
 	{
 		if (File->Read(&ItemCount, sizeof(ZEUInt64), 1) != 1)
 			return false;
@@ -103,96 +103,96 @@ static bool LoadItemV0(ZEFile* File, ZEString& Name, ZEMLItemType& ItemType, ZEV
 		return false;
 	ItemCount = ZEEndian::Little(ItemCount);
 
-	if (ItemType == ZEML_IT_INLINE_DATA)
+	if (ItemType == ZEML_ET_INLINE_DATA)
 	{
 		Offset = File->Tell();
 		File->Seek(Size, ZE_SF_CURRENT);
 	}
-	else if (ItemType == ZEML_IT_OFFSET_DATA)
+	else if (ItemType == ZEML_ET_OFFSET_DATA)
 	{
 		ZEUInt64 Temp;
 		if (File->Read(&Temp, sizeof(ZEUInt64), 1) != 1)
 			return false;
 		Offset = ZEEndian::Little(Temp);
 	}
-	else if (ItemType == ZEML_IT_INT8)
+	else if (ItemType == ZEML_ET_INT8)
 	{
 		ZEInt8 Temp;
 		if (!File->Read(&Temp, sizeof(ZEInt8), 1))
 			return false;
 		Value.SetInt8(Temp);
 	}
-	else if (ItemType == ZEML_IT_INT16)
+	else if (ItemType == ZEML_ET_INT16)
 	{
 		ZEInt16 Temp;
 		if (!File->Read(&Temp, sizeof(ZEInt16), 1))
 			return false;
 		Value.SetInt16(ZEEndian::Little(Temp));
 	}
-	else if (ItemType == ZEML_IT_INT32)
+	else if (ItemType == ZEML_ET_INT32)
 	{
 		ZEInt32 Temp;
 		if (!File->Read(&Temp, sizeof(ZEInt32), 1))
 			return false;
 		Value.SetInt32(ZEEndian::Little(Temp));
 	}
-	else if (ItemType == ZEML_IT_INT64)
+	else if (ItemType == ZEML_ET_INT64)
 	{
 		ZEInt64 Temp;
 		if (!File->Read(&Temp, sizeof(ZEInt64), 1))
 			return false;
 		Value.SetInt64(ZEEndian::Little(Temp));
 	}
-	else if (ItemType == ZEML_IT_UINT8)
+	else if (ItemType == ZEML_ET_UINT8)
 	{
 		ZEUInt8 Temp;
 		if (!File->Read(&Temp, sizeof(ZEUInt8), 1))
 			return false;
 		Value.SetUInt8(Temp);
 	}
-	else if (ItemType == ZEML_IT_UINT16)
+	else if (ItemType == ZEML_ET_UINT16)
 	{
 		ZEUInt16 Temp;
 		if (!File->Read(&Temp, sizeof(ZEUInt16), 1))
 			return false;
 		Value.SetUInt16(ZEEndian::Little(Temp));
 	}
-	else if (ItemType == ZEML_IT_UINT32)
+	else if (ItemType == ZEML_ET_UINT32)
 	{
 		ZEUInt32 Temp;
 		if (!File->Read(&Temp, sizeof(ZEUInt32), 1))
 			return false;
 		Value.SetUInt32(ZEEndian::Little(Temp));
 	}
-	else if (ItemType == ZEML_IT_UINT64)
+	else if (ItemType == ZEML_ET_UINT64)
 	{
 		ZEUInt64 Temp;
 		if (!File->Read(&Temp, sizeof(ZEUInt64), 1))
 			return false;
 		Value.SetUInt64(ZEEndian::Little(Temp));
 	}
-	else if (ItemType == ZEML_IT_BOOLEAN)
+	else if (ItemType == ZEML_ET_BOOLEAN)
 	{
 		bool Temp;
 		if (!File->Read(&Temp, sizeof(bool), 1))
 			return false;
 		Value.SetBoolean(Temp);
 	}
-	else if (ItemType == ZEML_IT_FLOAT)
+	else if (ItemType == ZEML_ET_FLOAT)
 	{
 		float Temp;
 		if (!File->Read(&Temp, sizeof(float), 1))
 			return false;
 		Value.SetFloat(Temp);
 	}
-	else if (ItemType == ZEML_IT_DOUBLE)
+	else if (ItemType == ZEML_ET_DOUBLE)
 	{
 		double Temp;
 		if (!File->Read(&Temp, sizeof(double), 1))
 			return false;
 		Value.SetDouble(Temp);
 	}
-	else if (ItemType == ZEML_IT_STRING)
+	else if (ItemType == ZEML_ET_STRING)
 	{
 		if (Size == 0)
 			Value.SetString("");
@@ -205,42 +205,42 @@ static bool LoadItemV0(ZEFile* File, ZEString& Name, ZEMLItemType& ItemType, ZEV
 			delete Temp;
 		}
 	}
-	else if (ItemType == ZEML_IT_QUATERNION)
+	else if (ItemType == ZEML_ET_QUATERNION)
 	{
 		ZEQuaternion Temp;
 		if (!File->Read(&Temp, sizeof(ZEQuaternion), 1))
 			return false;
 		Value.SetQuaternion(Temp);
 	}
-	else if (ItemType ==  ZEML_IT_VECTOR2)
+	else if (ItemType ==  ZEML_ET_VECTOR2)
 	{
 		ZEVector2 Temp;
 		if (!File->Read(&Temp, sizeof(ZEVector2), 1))
 			return false;
 		Value.SetVector2(Temp);
 	}
-	else if (ItemType == ZEML_IT_VECTOR3)
+	else if (ItemType == ZEML_ET_VECTOR3)
 	{
 		ZEVector3 Temp;
 		if (!File->Read(&Temp, sizeof(ZEVector3), 1))
 			return false;
 		Value.SetVector3(Temp);
 	}
-	else if (ItemType == ZEML_IT_VECTOR4)
+	else if (ItemType == ZEML_ET_VECTOR4)
 	{
 		ZEVector4 Temp;
 		if (!File->Read(&Temp, sizeof(ZEVector4), 1))
 			return false;
 		Value.SetVector4(Temp);
 	}
-	else if (ItemType == ZEML_IT_MATRIX3X3)
+	else if (ItemType == ZEML_ET_MATRIX3X3)
 	{
 		ZEMatrix3x3 Temp;
 		if (!File->Read(&Temp, sizeof(ZEMatrix3x3), 1))
 			return false;
 		Value.SetMatrix3x3(Temp);
 	}
-	else if (ItemType == ZEML_IT_MATRIX4X4)
+	else if (ItemType == ZEML_ET_MATRIX4X4)
 	{
 		ZEMatrix4x4 Temp;
 		if (!File->Read(&Temp, sizeof(ZEMatrix4x4), 1))
@@ -261,11 +261,11 @@ void ZEMLReaderNode::Load()
 	File->Seek(this->Offset, ZE_SF_BEGINING);
 
 	ZEString ItemName;
-	ZEMLItemType ItemType;
+	ZEMLElementType ItemType;
 	ZEUInt64 ItemSize, ItemOffset, ItemCount;
 	ZEValue ItemValue;
 
-	if (!LoadItemV0(File, ItemName, ItemType, ItemValue, ItemSize, ItemOffset, ItemCount) && ItemType != ZEML_IT_NODE)
+	if (!LoadItemV0(File, ItemName, ItemType, ItemValue, ItemSize, ItemOffset, ItemCount) && ItemType != ZEML_ET_NODE)
 	{
 		zeError("Corrupted ZEML file. Cannot read item. File Name: \"%s\".", File->GetPath().ToCString());
 		return;
@@ -285,14 +285,14 @@ void ZEMLReaderNode::Load()
 			return;
 		}
 
-		if (ItemType == ZEML_IT_NODE)
+		if (ItemType == ZEML_ET_NODE)
 		{
 			ZEMLReaderSubNode* Node = SubNodes.Add();
 			Node->Name = ItemName;
 			Node->Offset = ItemOffset;
 			Node->Size = ItemSize;
 		}
-		else if (ItemType == ZEML_IT_INLINE_DATA || ItemType == ZEML_IT_OFFSET_DATA)
+		else if (ItemType == ZEML_ET_INLINE_DATA || ItemType == ZEML_ET_OFFSET_DATA)
 		{
 			ZEMLReaderProperty* Property = Properties.Add();
 			Property->Name = ItemName;
@@ -427,10 +427,10 @@ ZEValue ZEMLReaderNode::ReadValue(const char* Name)
 	if (Property == NULL)
 		return ZEValue();
 
-	if (Property->Type == ZEML_IT_UNDEFINED || 
-		Property->Type == ZEML_IT_NODE ||
-		Property->Type == ZEML_IT_INLINE_DATA || 
-		Property->Type == ZEML_IT_OFFSET_DATA)
+	if (Property->Type == ZEML_ET_UNDEFINED || 
+		Property->Type == ZEML_ET_NODE ||
+		Property->Type == ZEML_ET_INLINE_DATA || 
+		Property->Type == ZEML_ET_OFFSET_DATA)
 	{
 		return ZEValue();
 	}
@@ -614,7 +614,7 @@ ZESize ZEMLReaderNode::ReadDataSize(const char* Name)
 	if (Property == NULL)
 		return 0;
 
-	if (Property->Type != ZEML_IT_INLINE_DATA && Property->Type != ZEML_IT_OFFSET_DATA)
+	if (Property->Type != ZEML_ET_INLINE_DATA && Property->Type != ZEML_ET_OFFSET_DATA)
 		return 0;
 
 	return Property->DataSize;
@@ -626,7 +626,7 @@ bool ZEMLReaderNode::ReadData(const char* Name, void* Buffer, ZESize BufferSize,
 	if (Property == NULL)
 		return true;
 
-	if (Property->Type != ZEML_IT_INLINE_DATA && Property->Type != ZEML_IT_OFFSET_DATA)
+	if (Property->Type != ZEML_ET_INLINE_DATA && Property->Type != ZEML_ET_OFFSET_DATA)
 		return true;
 
 
@@ -713,7 +713,7 @@ bool ZEMLReader::Load()
 		RootNode.Offset = StartOffset;
 		RootNode.File = File;
 	}
-	else if (Identifier[0] == 'Z' && Identifier[1] == ZEML_IT_NODE)
+	else if (Identifier[0] == 'Z' && Identifier[1] == ZEML_ET_NODE)
 	{
 		// Version 0
 		zeWarning("Old depricated ZEML file version detected. Please convert this file to new version for future compability. Current Version: 1.0. Detected Version: 0.0. File Name: \"%s\".", File->GetPath().ToCString());

@@ -41,7 +41,7 @@
 
 ZEMLProperty::ZEMLProperty()
 {
-	SetType(ZEML_IT_UNDEFINED);
+	SetType(ZEML_ET_UNDEFINED);
 }
 
 ZEMLProperty::ZEMLProperty(const ZEString& Name)
@@ -68,58 +68,58 @@ void ZEMLProperty::SetValue(const ZEValue& Value)
 	switch (this->Value.GetType())
 	{
 		case ZE_VRT_FLOAT:
-			SetType(ZEML_IT_FLOAT);
+			SetType(ZEML_ET_FLOAT);
 			break;
 		case ZE_VRT_DOUBLE:
-			SetType(ZEML_IT_DOUBLE);
+			SetType(ZEML_ET_DOUBLE);
 			break;
 		case ZE_VRT_INTEGER_8:
-			SetType(ZEML_IT_INT8);
+			SetType(ZEML_ET_INT8);
 			break;
 		case ZE_VRT_INTEGER_16:
-			SetType(ZEML_IT_INT16);
+			SetType(ZEML_ET_INT16);
 			break;
 		case ZE_VRT_INTEGER_32:
-			SetType(ZEML_IT_INT32);
+			SetType(ZEML_ET_INT32);
 			break;
 		case ZE_VRT_INTEGER_64:
-			SetType(ZEML_IT_INT64);
+			SetType(ZEML_ET_INT64);
 			break;
 		case ZE_VRT_UNSIGNED_INTEGER_8:
-			SetType(ZEML_IT_UINT8);
+			SetType(ZEML_ET_UINT8);
 			break;
 		case ZE_VRT_UNSIGNED_INTEGER_16:
-			SetType(ZEML_IT_UINT16);
+			SetType(ZEML_ET_UINT16);
 			break;
 		case ZE_VRT_UNSIGNED_INTEGER_32:
-			SetType(ZEML_IT_UINT32);
+			SetType(ZEML_ET_UINT32);
 			break;
 		case ZE_VRT_UNSIGNED_INTEGER_64:
-			SetType(ZEML_IT_UINT64);
+			SetType(ZEML_ET_UINT64);
 			break;
 		case ZE_VRT_BOOLEAN:
-			SetType(ZEML_IT_BOOLEAN);
+			SetType(ZEML_ET_BOOLEAN);
 			break;
 		case ZE_VRT_STRING:
-			SetType(ZEML_IT_STRING);
+			SetType(ZEML_ET_STRING);
 			break;
 		case ZE_VRT_QUATERNION:
-			SetType(ZEML_IT_QUATERNION);
+			SetType(ZEML_ET_QUATERNION);
 			break;
 		case ZE_VRT_VECTOR2:
-			SetType(ZEML_IT_VECTOR2);
+			SetType(ZEML_ET_VECTOR2);
 			break;
 		case ZE_VRT_VECTOR3:
-			SetType(ZEML_IT_VECTOR3);
+			SetType(ZEML_ET_VECTOR3);
 			break;
 		case ZE_VRT_VECTOR4:
-			SetType(ZEML_IT_VECTOR4);
+			SetType(ZEML_ET_VECTOR4);
 			break;
 		case ZE_VRT_MATRIX3X3:
-			SetType(ZEML_IT_MATRIX3X3);
+			SetType(ZEML_ET_MATRIX3X3);
 			break;
 		case ZE_VRT_MATRIX4X4:
-			SetType(ZEML_IT_MATRIX4X4);
+			SetType(ZEML_ET_MATRIX4X4);
 			break;
 		default:
 			zeError("Unsupported ZEMLProperty type.");
@@ -250,40 +250,40 @@ bool ZEMLProperty::ReadFromXML(TiXmlElement* Element)
 	
 	switch (GetType())
 	{
-		case ZEML_IT_UNDEFINED:
+		case ZEML_ET_UNDEFINED:
 			return false;
 			break;
-		case ZEML_IT_FLOAT:
+		case ZEML_ET_FLOAT:
 			SetValue(ZEString(Element->Attribute("Value")).ToFloat());
 			break;
-		case ZEML_IT_DOUBLE:
+		case ZEML_ET_DOUBLE:
 			SetValue(ZEString(Element->Attribute("Value")).ToDouble());
 			break;
-		case ZEML_IT_INT8:
+		case ZEML_ET_INT8:
 			SetValue(ZEString(Element->Attribute("Value")).ToInt8());
 			break;
-		case ZEML_IT_INT16:
+		case ZEML_ET_INT16:
 			SetValue(ZEString(Element->Attribute("Value")).ToInt16());
 			break;
-		case ZEML_IT_INT32:
+		case ZEML_ET_INT32:
 			SetValue(ZEString(Element->Attribute("Value")).ToInt32());
 			break;
-		case ZEML_IT_INT64:
+		case ZEML_ET_INT64:
 			SetValue(ZEString(Element->Attribute("Value")).ToInt64());
 			break;
-		case ZEML_IT_UINT8:
+		case ZEML_ET_UINT8:
 			SetValue(ZEString(Element->Attribute("Value")).ToUInt8());
 			break;
-		case ZEML_IT_UINT16:
+		case ZEML_ET_UINT16:
 			SetValue(ZEString(Element->Attribute("Value")).ToUInt16());
 			break;
-		case ZEML_IT_UINT32:
+		case ZEML_ET_UINT32:
 			SetValue(ZEString(Element->Attribute("Value")).ToUInt32());
 			break;
-		case ZEML_IT_UINT64:
+		case ZEML_ET_UINT64:
 			SetValue(ZEString(Element->Attribute("Value")).ToUInt64());
 			break;
-		case ZEML_IT_BOOLEAN:
+		case ZEML_ET_BOOLEAN:
 			{
 				ZEString ValueText = Element->Attribute("Value");
 
@@ -293,10 +293,10 @@ bool ZEMLProperty::ReadFromXML(TiXmlElement* Element)
 					SetValue(false);
 			}
 			break;			
-		case ZEML_IT_STRING:
+		case ZEML_ET_STRING:
 			SetValue(ZEString(Element->Attribute("Value")));
 			break;
-		case ZEML_IT_QUATERNION:
+		case ZEML_ET_QUATERNION:
 			{
 				ZEQuaternion Quaternion;
 				Quaternion.x = ZEString(Element->Attribute("X")).ToFloat();
@@ -306,7 +306,7 @@ bool ZEMLProperty::ReadFromXML(TiXmlElement* Element)
 				SetValue(Quaternion);
 			}
 			break;
-		case ZEML_IT_VECTOR2:
+		case ZEML_ET_VECTOR2:
 			{
 				ZEVector2 Vector2;
 				Vector2.x = ZEString(Element->Attribute("X")).ToFloat();
@@ -314,7 +314,7 @@ bool ZEMLProperty::ReadFromXML(TiXmlElement* Element)
 				SetValue(Vector2);
 			}
 			break;
-		case ZEML_IT_VECTOR3:
+		case ZEML_ET_VECTOR3:
 			{
 				ZEVector3 Vector3;
 				Vector3.x = ZEString(Element->Attribute("X")).ToFloat();
@@ -323,7 +323,7 @@ bool ZEMLProperty::ReadFromXML(TiXmlElement* Element)
 				SetValue(Vector3);
 			}
 			break;
-		case ZEML_IT_VECTOR4:
+		case ZEML_ET_VECTOR4:
 			{
 				ZEVector4 Vector4;
 				Vector4.x = ZEString(Element->Attribute("X")).ToFloat();
@@ -333,7 +333,7 @@ bool ZEMLProperty::ReadFromXML(TiXmlElement* Element)
 				SetValue(Vector4);
 			}
 			break;
-		case ZEML_IT_MATRIX3X3:
+		case ZEML_ET_MATRIX3X3:
 			{
 				ZEMatrix3x3 Matrix3x3;	
 				Matrix3x3.M11 = ZEString(Element->Attribute("M11")).ToFloat();
@@ -348,7 +348,7 @@ bool ZEMLProperty::ReadFromXML(TiXmlElement* Element)
 				SetValue(Matrix3x3);
 			}
 			break;
-		case ZEML_IT_MATRIX4X4:
+		case ZEML_ET_MATRIX4X4:
 			{
 				ZEMatrix4x4 Matrix4x4;	
 				Matrix4x4.M11 = ZEString(Element->Attribute("M11")).ToFloat();
@@ -558,57 +558,57 @@ bool ZEMLProperty::ReadSelf(ZEFile* File, bool DeferredDataReading)
 
 	switch(Type)
 	{
-		case ZEML_IT_FLOAT:
+		case ZEML_ET_FLOAT:
 			Value.SetType(ZE_VRT_FLOAT);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Float, DataSize, 1);
 			break;
-		case ZEML_IT_DOUBLE:
+		case ZEML_ET_DOUBLE:
 			Value.SetType(ZE_VRT_DOUBLE);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Double, DataSize, 1);
 			break;
-		case ZEML_IT_INT8:
+		case ZEML_ET_INT8:
 			Value.SetType(ZE_VRT_INTEGER_8);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
 			break;
-		case ZEML_IT_INT16:
+		case ZEML_ET_INT16:
 			Value.SetType(ZE_VRT_INTEGER_16);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
 			Value.SetInt16(ZEEndian::Little(Value.GetInt16()));
 			break;
-		case ZEML_IT_INT32:
+		case ZEML_ET_INT32:
 			Value.SetType(ZE_VRT_INTEGER_32);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
 			Value.SetInt32(ZEEndian::Little(Value.GetInt32()));
 			break;
-		case ZEML_IT_INT64:
+		case ZEML_ET_INT64:
 			Value.SetType(ZE_VRT_INTEGER_64);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Int64, DataSize, 1);
 			Value.SetInt64(ZEEndian::Little(Value.GetInt64()));
 			break;
-		case ZEML_IT_UINT8:
+		case ZEML_ET_UINT8:
 			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_8);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
 			break;
-		case ZEML_IT_UINT16:
+		case ZEML_ET_UINT16:
 			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_16);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
 			Value.SetUInt16(ZEEndian::Little(Value.GetUInt16()));
 			break;
-		case ZEML_IT_UINT32:
+		case ZEML_ET_UINT32:
 			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_32);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Int32, DataSize, 1);
 			Value.SetUInt32(ZEEndian::Little(Value.GetUInt32()));
 			break;
-		case ZEML_IT_UINT64:
+		case ZEML_ET_UINT64:
 			Value.SetType(ZE_VRT_UNSIGNED_INTEGER_64);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Int64, DataSize, 1);
 			Value.SetUInt64(ZEEndian::Little(Value.GetUInt64()));
 			break;
-		case ZEML_IT_BOOLEAN:
+		case ZEML_ET_BOOLEAN:
 			Value.SetType(ZE_VRT_BOOLEAN);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Boolean, DataSize, 1);
 			break;
-		case ZEML_IT_STRING:
+		case ZEML_ET_STRING:
 			{
 				Value.SetType(ZE_VRT_STRING);
 
@@ -626,27 +626,27 @@ bool ZEMLProperty::ReadSelf(ZEFile* File, bool DeferredDataReading)
 				}
 			}
 			break;
-		case ZEML_IT_QUATERNION:
+		case ZEML_ET_QUATERNION:
 			Value.SetType(ZE_VRT_QUATERNION);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
 			break;
-		case ZEML_IT_VECTOR2:
+		case ZEML_ET_VECTOR2:
 			Value.SetType(ZE_VRT_VECTOR2);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
 			break;
-		case ZEML_IT_VECTOR3:
+		case ZEML_ET_VECTOR3:
 			Value.SetType(ZE_VRT_VECTOR3);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
 			break;
-		case ZEML_IT_VECTOR4:
+		case ZEML_ET_VECTOR4:
 			Value.SetType(ZE_VRT_VECTOR4);
 			IsDataRead = File->Read(&Value.ImplicitAcesss().Vectors, DataSize, 1);
 			break;
-		case ZEML_IT_MATRIX3X3:
+		case ZEML_ET_MATRIX3X3:
 			Value.SetType(ZE_VRT_MATRIX3X3);
 			IsDataRead = File->Read(Value.ImplicitAcesss().Matrix3x3, DataSize, 1);
 			break;
-		case ZEML_IT_MATRIX4X4:
+		case ZEML_ET_MATRIX4X4:
 			Value.SetType(ZE_VRT_MATRIX4X4);
 			IsDataRead = File->Read(Value.ImplicitAcesss().Matrix4x4, DataSize, 1);
 			break;

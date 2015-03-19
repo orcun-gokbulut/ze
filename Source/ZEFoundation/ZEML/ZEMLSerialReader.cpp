@@ -48,7 +48,7 @@ bool ZEMLSerialReader::Read()
 {
 	ZEUInt64 TempUInt64;
 
-	CurrentItemType			= ZEML_IT_UNDEFINED;
+	CurrentItemType			= ZEML_ET_UNDEFINED;
 	CurrentItemValue		= ZEValue();
 	CurrentItemName			= "";
 	CurrentItemDataSize		= 0;
@@ -96,7 +96,7 @@ bool ZEMLSerialReader::Read()
 
 	CurrentItemName = TempNameBuffer;
 
-	if(CurrentItemType == ZEML_IT_NODE)
+	if(CurrentItemType == ZEML_ET_NODE)
 	{
 		if(File->Read(&CurrentItemSubItemCount, sizeof(ZEUInt64), 1) != 1)
 		{
@@ -114,7 +114,7 @@ bool ZEMLSerialReader::Read()
 
 		return true;
 	}
-	else if(CurrentItemType == ZEML_IT_INLINE_DATA)
+	else if(CurrentItemType == ZEML_ET_INLINE_DATA)
 	{
 		if(File->Read(&CurrentItemDataSize, sizeof(ZEUInt64), 1) != 1)
 		{
@@ -151,57 +151,57 @@ bool ZEMLSerialReader::Read()
 
 		switch(CurrentItemType)
 		{
-			case ZEML_IT_FLOAT:
+			case ZEML_ET_FLOAT:
 				CurrentItemValue.SetType(ZE_VRT_FLOAT);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Float, ValueSize, 1);
 				break;
-			case ZEML_IT_DOUBLE:
+			case ZEML_ET_DOUBLE:
 				CurrentItemValue.SetType(ZE_VRT_DOUBLE);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Double, ValueSize, 1);
 				break;
-			case ZEML_IT_INT8:
+			case ZEML_ET_INT8:
 				CurrentItemValue.SetType(ZE_VRT_INTEGER_8);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
 				break;
-			case ZEML_IT_INT16:
+			case ZEML_ET_INT16:
 				CurrentItemValue.SetType(ZE_VRT_INTEGER_16);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
 				CurrentItemValue.SetInt16(ZEEndian::Little(CurrentItemValue.GetInt16()));
 				break;
-			case ZEML_IT_INT32:
+			case ZEML_ET_INT32:
 				CurrentItemValue.SetType(ZE_VRT_INTEGER_32);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
 				CurrentItemValue.SetInt32(ZEEndian::Little(CurrentItemValue.GetInt32()));
 				break;
-			case ZEML_IT_INT64:
+			case ZEML_ET_INT64:
 				CurrentItemValue.SetType(ZE_VRT_INTEGER_64);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int64, ValueSize, 1);
 				CurrentItemValue.SetInt64(ZEEndian::Little(CurrentItemValue.GetInt64()));
 				break;
-			case ZEML_IT_UINT8:
+			case ZEML_ET_UINT8:
 				CurrentItemValue.SetType(ZE_VRT_UNSIGNED_INTEGER_8);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
 				break;
-			case ZEML_IT_UINT16:
+			case ZEML_ET_UINT16:
 				CurrentItemValue.SetType(ZE_VRT_UNSIGNED_INTEGER_16);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
 				CurrentItemValue.SetUInt16(ZEEndian::Little(CurrentItemValue.GetUInt16()));
 				break;
-			case ZEML_IT_UINT32:
+			case ZEML_ET_UINT32:
 				CurrentItemValue.SetType(ZE_VRT_UNSIGNED_INTEGER_32);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int32, ValueSize, 1);
 				CurrentItemValue.SetUInt32(ZEEndian::Little(CurrentItemValue.GetUInt32()));
 				break;
-			case ZEML_IT_UINT64:
+			case ZEML_ET_UINT64:
 				CurrentItemValue.SetType(ZE_VRT_UNSIGNED_INTEGER_64);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Int64, ValueSize, 1);
 				CurrentItemValue.SetUInt64(ZEEndian::Little(CurrentItemValue.GetUInt64()));
 				break;
-			case ZEML_IT_BOOLEAN:
+			case ZEML_ET_BOOLEAN:
 				CurrentItemValue.SetType(ZE_VRT_BOOLEAN);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Boolean, ValueSize, 1);
 				break;
-			case ZEML_IT_STRING:
+			case ZEML_ET_STRING:
 				{
 					CurrentItemValue.SetType(ZE_VRT_STRING);
 
@@ -219,27 +219,27 @@ bool ZEMLSerialReader::Read()
 					}
 				}
 				break;
-			case ZEML_IT_QUATERNION:
+			case ZEML_ET_QUATERNION:
 				CurrentItemValue.SetType(ZE_VRT_QUATERNION);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Vectors, ValueSize, 1);
 				break;
-			case ZEML_IT_VECTOR2:
+			case ZEML_ET_VECTOR2:
 				CurrentItemValue.SetType(ZE_VRT_VECTOR2);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Vectors, ValueSize, 1);
 				break;
-			case ZEML_IT_VECTOR3:
+			case ZEML_ET_VECTOR3:
 				CurrentItemValue.SetType(ZE_VRT_VECTOR3);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Vectors, ValueSize, 1);
 				break;
-			case ZEML_IT_VECTOR4:
+			case ZEML_ET_VECTOR4:
 				CurrentItemValue.SetType(ZE_VRT_VECTOR4);
 				IsDataRead = File->Read(&CurrentItemValue.ImplicitAcesss().Vectors, ValueSize, 1);
 				break;
-			case ZEML_IT_MATRIX3X3:
+			case ZEML_ET_MATRIX3X3:
 				CurrentItemValue.SetType(ZE_VRT_MATRIX3X3);
 				IsDataRead = File->Read(CurrentItemValue.ImplicitAcesss().Matrix3x3, ValueSize, 1);
 				break;
-			case ZEML_IT_MATRIX4X4:
+			case ZEML_ET_MATRIX4X4:
 				CurrentItemValue.SetType(ZE_VRT_MATRIX4X4);
 				IsDataRead = File->Read(CurrentItemValue.ImplicitAcesss().Matrix4x4, ValueSize, 1);
 				break;
@@ -260,13 +260,13 @@ bool ZEMLSerialReader::Read()
 
 bool ZEMLSerialReader::SkipNodeAndRead()
 {
-	if(CurrentItemType == ZEML_IT_NODE)
+	if(CurrentItemType == ZEML_ET_NODE)
 		File->Seek(CurrentItemDataSize, ZE_SF_CURRENT);
 
 	return Read();
 }
 
-ZEMLItemType ZEMLSerialReader::GetItemType()
+ZEMLElementType ZEMLSerialReader::GetItemType()
 {
 	return CurrentItemType;
 }
@@ -293,7 +293,7 @@ ZEUInt64 ZEMLSerialReader::GetDataSize()
 
 bool ZEMLSerialReader::GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offset)
 {
-	if(CurrentItemType != ZEML_IT_INLINE_DATA)
+	if(CurrentItemType != ZEML_ET_INLINE_DATA)
 		return false;
 
 	File->Seek(DataItemDataPointer, ZE_SF_BEGINING);
@@ -320,7 +320,7 @@ bool ZEMLSerialReader::GetData(void* Buffer, ZEUInt64 BufferSize, ZEUInt64 Offse
 
 bool ZEMLSerialReader::GetData(ZEPartialFile& File)
 {
-	if(CurrentItemType != ZEML_IT_INLINE_DATA)
+	if(CurrentItemType != ZEML_ET_INLINE_DATA)
 		return false;
 
 	if(!File.Open(this->File, DataItemDataPointer, CurrentItemDataSize))
@@ -351,7 +351,7 @@ void ZEMLSerialReader::GoToCurrentPointer()
 
 bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCount)
 {
-	if(GetItemType() != ZEML_IT_NODE)
+	if(GetItemType() != ZEML_ET_NODE)
 	{
 		zeError("Current item type is not a ZEMLNode");
 		return false;
@@ -401,11 +401,11 @@ bool ZEMLSerialReader::ReadPropertyList(ZEMLSerialListItem* List, ZESize ItemCou
 
 		if(CurrentItemIndex != -1)
 		{
-			if(CurrentItemType == ZEML_IT_NODE)
+			if(CurrentItemType == ZEML_ET_NODE)
 			{
 				*(List[CurrentItemIndex].Pointer) = ItemFilePosition - (sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + CurrentItemName.GetSize() + sizeof(ZEUInt64) + sizeof(ZEUInt64));
 			}
-			else if(CurrentItemType == ZEML_IT_INLINE_DATA)
+			else if(CurrentItemType == ZEML_ET_INLINE_DATA)
 			{
 				*(List[CurrentItemIndex].Pointer) = ItemFilePosition - (sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + CurrentItemName.GetSize() + sizeof(ZEUInt64) +  CurrentItemDataSize);
 			}
