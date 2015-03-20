@@ -40,15 +40,6 @@
 #include "ZEMLDataProperty.h"
 #include "ZEEndian.h"
 
-ZEMLWriterNode::ZEMLWriterNode()
-{
-	File = NULL;
-	Name = "";
-	ParentNode = NULL;
-	SubItemCount = 0;
-	Size = 0;
-}
-
 static ZEMLElementType ConvertType(ZEValueType Type)
 {
 	switch (Type)
@@ -128,7 +119,7 @@ bool ZEMLWriterNode::WriteElementHeader(const char* Name, ZEMLElementType Type)
 	Header[1] = Type;
 	File->Write(Header, 2 * sizeof(char), 1);
 
-	ZESize Size = strlen(Name);
+	ZESize Size = strlen(Name) + 1;
 	if (Size > 254)
 	{
 		zeError("Cannot write ZEML property. Item name is too long (Max Size: 254). Item Name: \"%s\". File Name: \"%s\"", Name, File->GetPath());
@@ -137,7 +128,7 @@ bool ZEMLWriterNode::WriteElementHeader(const char* Name, ZEMLElementType Type)
 
 	ZEUInt8 NameSize = (ZEUInt8)Size;
 	File->Write(&NameSize, sizeof(ZEUInt8), 1);
-	File->Write(Name, Size + 1, 1);
+	File->Write(Name, Size, 1);
 
 	return true;
 }
@@ -383,15 +374,15 @@ bool ZEMLWriterNode::WriteMatrix4x4(const char* Name, const ZEMatrix4x4& Value)
 	return WriteValue(Name, ZEValue(Value));
 }
 
-bool ZEMLWriterNode::WriteData(const char* Name, void* Data, ZEUInt64 DataSize)
+bool ZEMLWriterNode::WriteData(const char* Name, void* Data, ZEUInt64 Size)
 {
 	if (!WriteElementHeader(Name, ZEML_ET_INLINE_DATA))
 		return false;
 
-	ZESize Size = ZEEndian::Little(DataSize);
-	File->Write(&Size, sizeof(ZEUInt64), 1);
+	ZEUInt64 TempSize = ZEEndian::Little(Size);
+	File->Write(&TempSize, sizeof(ZEUInt64), 1);
 
-	if (!File->Write(Data, DataSize, 1) != 0)
+	if (!File->Write(Data, Size, 1) != 0)
 	{
 		zeError("Cannot write ZEML file. Cannot write data property. Property Name: \"%s\". File Name: \"%s\".", Name, File->GetPath().ToCString());
 		return false;
@@ -404,7 +395,7 @@ bool ZEMLWriterNode::WriteData(const char* Name, void* Data, ZEUInt64 DataSize)
 
 ZEMLWriterNode ZEMLWriterNode::OpenSubNode(const char* Name)
 {
-	if (WriteElementHeader(Name, ZEML_ET_NODE))
+	if (!WriteElementHeader(Name, ZEML_ET_NODE))
 		return ZEMLWriterNode();
 
 	ZEMLWriterNode NewNode;
@@ -444,6 +435,21 @@ void ZEMLWriterNode::CloseNode()
 	File->Seek(CurrentFilePos, ZE_SF_BEGINING);
 }
 
+ZEMLWriterNode::ZEMLWriterNode()
+{
+	File = NULL;
+	Name = "";
+	ParentNode = NULL;
+	SubItemCount = 0;
+	Size = 0;
+}
+
+ZEMLWriterNode::~ZEMLWriterNode()
+{
+
+}
+
+
 /************************************************************************/
 /*							RootNode	                                */
 /************************************************************************/
@@ -468,7 +474,7 @@ void ZEMLWriter::WriteHeader()
 	};
 	File->Write(Identifer, 6, 1);
 
-	ZEUInt64 StartOffset = ZEEndian::Little(OwnedFile.Tell());
+	ZEUInt64 StartOffset = ZEEndian::Little(OwnedFile.Tell()) + sizeof(ZEUInt64);
 	File->Write(&StartOffset, sizeof(ZEUInt64), 1);
 }
 
@@ -516,11 +522,16 @@ bool ZEMLWriter::Open(ZEFile* File)
 
 void ZEMLWriter::Close()
 {
-	OwnedFile.Flush();
 	OwnedFile.Close();
 }
 
 ZEMLWriter::ZEMLWriter()
 {
 	File = NULL;
+}
+
+
+ZEMLWriter::~ZEMLWriter()
+{
+	Close();
 }

@@ -175,7 +175,7 @@ bool ZEInteriorResource::ReadDoors(ZEMLSerialReader* Reader)
 			return false;
 		}
 
-		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Door")
+		if (Reader->GetItemType() != ZEML_ET_NODE || Reader->GetItemName() != "Door")
 			continue;
 
 		ZEValue DoorName, IsOpen, Width, Length, Position, Rotation, Scale, RoomAIndex, RoomBIndex, UserDefinedProperties;
@@ -255,7 +255,7 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 			return false;
 		}
 
-		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Room")
+		if (Reader->GetItemType() != ZEML_ET_NODE || Reader->GetItemName() != "Room")
 			continue;
 
 		ZEValue RoomName, Position, Rotation, Scale, PhysicalMeshEnabled, UserDefinedProperties, GenerateOctree;
@@ -407,7 +407,7 @@ bool ZEInteriorResource::ReadHelpers(ZEMLSerialReader* Reader)
 			return false;
 		}
 
-		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Helper")
+		if (Reader->GetItemType() != ZEML_ET_NODE || Reader->GetItemName() != "Helper")
 			continue;
 
 		ZEValue NameValue, OwnerTypeValue, OwnerIndexValue, PositionValue, RotationValue, ScaleValue, UserDefinedProperties;
@@ -461,7 +461,7 @@ bool ZEInteriorResource::ReadMaterials(ZEMLSerialReader* Reader)
 			return false;
 		}
 
-		if (Reader->GetItemType() != ZEML_IT_NODE || Reader->GetItemName() != "Material")
+		if (Reader->GetItemType() != ZEML_ET_NODE || Reader->GetItemName() != "Material")
 			continue;
 
 		ZEValue MaterialName, MaterialRelativePath;

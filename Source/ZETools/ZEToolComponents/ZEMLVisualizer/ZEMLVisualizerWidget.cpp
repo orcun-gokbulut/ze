@@ -142,7 +142,7 @@ void ZEMLVisualizerWidget::AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem)
 	QTreeWidgetItem* NewItem = new QTreeWidgetItem();
 	NewItem->setTextAlignment(1, Qt::AlignmentFlag::AlignCenter);
 
-	if(Item->GetType() == ZEML_IT_NODE)
+	if(Item->GetType() == ZEML_ET_NODE)
 	{
 		NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
 		NewItem->setText(1, "node");
@@ -163,7 +163,7 @@ void ZEMLVisualizerWidget::AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem)
 			AddItem((ZEMLItem*)CurrentItem->GetProperties()[I], NewItem);
 		}
 	}
-	else if(Item->GetType() == ZEML_IT_INLINE_DATA)
+	else if(Item->GetType() == ZEML_ET_INLINE_DATA)
 	{
 		NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
 		NewItem->setText(1, "DataProperty");

@@ -184,7 +184,7 @@ static void ConvertEntity(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
 	Unserializer->Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
 	Serializer->WriteString("Class", EntityTypeName);
 
-	ZEMLWriterNode Properties = Serializer->WriteNode("Properties");
+	ZEMLWriterNode Properties = Serializer->OpenSubNode("Properties");
 
 	struct ZEObjectFileChunk
 	{
@@ -220,10 +220,13 @@ static void ConvertScene(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
 	char MapFile[ZE_MAX_FILE_NAME_SIZE];
 	Unserializer->Read(MapFile, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
 
-	ZEMLWriterNode EntitiesNode = Serializer->WriteNode("Entities");
+	Serializer->WriteUInt8("VersionMajor", 1);
+	Serializer->WriteUInt8("VersionMinor", 0);
+
+	ZEMLWriterNode EntitiesNode = Serializer->OpenSubNode("Entities");
 	for (ZESize I = 0; I < EntityCount; I++)
 	{
-		ZEMLWriterNode EntityNode = Serializer->WriteNode("Entity");
+		ZEMLWriterNode EntityNode = Serializer->OpenSubNode("Entity");
 		ConvertEntity(Unserializer, &EntityNode);
 		EntityNode.CloseNode();
 	}
@@ -243,14 +246,14 @@ bool ZESceneConverter::Convert(const char* Source, const char* Destination)
 
 	printf(" Checking source version.\n");
 	char Identifier[4];
-	if (Unserializer.Read(Identifier, 4, 1) != 1)
+	if (Unserializer.Read(Identifier, 4, 1) == 1)
 	{
 		if (Identifier[0] == 'Z' ||
 			Identifier[0] == 'E' ||
 			Identifier[0] == 'M' ||
 			Identifier[0] == 'L')
 		{
-			zeError("Scene file is already converted.\n");
+			printf(" Scene file is already converted.\n");
 			return true;
 		}
 	}
@@ -264,10 +267,15 @@ bool ZESceneConverter::Convert(const char* Source, const char* Destination)
 		return false;
 	}
 
-	ZEMLWriter Serializer("Scene", &DestinationFile);
-	ConvertScene(&Unserializer, &Serializer);
+	ZEMLWriter Serializer;
+	Serializer.Open(Destination);
+	ZEMLWriterNode SceneNode = Serializer.WriteRootNode("Scene");
 
-	DestinationFile.Close();
+	ConvertScene(&Unserializer, &SceneNode);
+	
+	SceneNode.CloseNode();
+	Serializer.Close();
+
 	Unserializer.Close();
 
 	return true;

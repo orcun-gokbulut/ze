@@ -594,9 +594,9 @@ bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 
 bool ZEEntity::Save(ZEMLWriterNode* Serializer)
 {
-	ZEMLWriterNode EntityNode = Serializer->WriteNode("Entity");
-		EntityNode.WriteProperty("Class", GetClass()->GetName());
-		ZEMLWriterNode PropertiesNode = EntityNode.WriteNode("Properties");
+	ZEMLWriterNode EntityNode = Serializer->OpenSubNode("Entity");
+		EntityNode.WriteString("Class", GetClass()->GetName());
+		ZEMLWriterNode PropertiesNode = EntityNode.OpenSubNode("Properties");
 			const ZEProperty* Properties = GetClass()->GetProperties();
 			for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
 			{
@@ -617,7 +617,7 @@ bool ZEEntity::Save(ZEMLWriterNode* Serializer)
 				if (Value.IsNull())
 					continue;
 
-				PropertiesNode.WriteProperty(Current->Name, Value);
+				PropertiesNode.WriteValue(Current->Name, Value);
 			}
 		PropertiesNode.CloseNode();
 	EntityNode.CloseNode();
@@ -635,7 +635,7 @@ bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 
 	for (ZESize I = 0; I < Properties.GetSize(); I++)
 	{
-		if (Properties[I].Type == ZEML_IT_OFFSET_DATA || Properties[I].Type == ZEML_IT_INLINE_DATA)
+		if (Properties[I].Type == ZEML_ET_OFFSET_DATA || Properties[I].Type == ZEML_ET_INLINE_DATA)
 			continue;
 
 		GetClass()->SetProperty(this, Properties[I].Name, ZEVariant(Properties[I].Value));
