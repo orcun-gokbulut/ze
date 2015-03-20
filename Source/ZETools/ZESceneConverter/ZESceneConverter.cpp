@@ -184,7 +184,7 @@ static void ConvertEntity(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
 	Unserializer->Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
 	Serializer->WriteString("Class", EntityTypeName);
 
-	ZEMLWriterNode Properties = Serializer->OpenSubNode("Properties");
+	ZEMLWriterNode PropertiesNode = Serializer->OpenSubNode("Properties");
 
 	struct ZEObjectFileChunk
 	{
@@ -208,6 +208,8 @@ static void ConvertEntity(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
 		Unserializer->Read(PropertyName, sizeof(char), ZE_MAX_NAME_SIZE);
 		ConvertProperty(PropertyName, Serializer, Unserializer);
 	}
+
+	PropertiesNode.CloseNode();
 }
 
 static void ConvertScene(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
@@ -226,13 +228,12 @@ static void ConvertScene(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
 	ZEMLWriterNode EntitiesNode = Serializer->OpenSubNode("Entities");
 	for (ZESize I = 0; I < EntityCount; I++)
 	{
-		ZEMLWriterNode EntityNode = Serializer->OpenSubNode("Entity");
+		ZEMLWriterNode EntityNode = EntitiesNode.OpenSubNode("Entity");
 		ConvertEntity(Unserializer, &EntityNode);
 		EntityNode.CloseNode();
 	}
 
 	EntitiesNode.CloseNode();
-	Serializer->CloseNode();
 }
 
 bool ZESceneConverter::Convert(const char* Source, const char* Destination)
@@ -269,7 +270,7 @@ bool ZESceneConverter::Convert(const char* Source, const char* Destination)
 
 	ZEMLWriter Serializer;
 	Serializer.Open(Destination);
-	ZEMLWriterNode SceneNode = Serializer.WriteRootNode("Scene");
+	ZEMLWriterNode SceneNode = Serializer.WriteRootNode("ZEScene");
 
 	ConvertScene(&Unserializer, &SceneNode);
 	

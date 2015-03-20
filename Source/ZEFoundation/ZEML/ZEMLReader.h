@@ -82,7 +82,7 @@ class ZEMLReaderNode
 		bool						Load();
 		 
 	public:
-		const char*					GetName();
+		const ZEString&				GetName();
 
 		const ZESmartArray<ZEMLReaderSubNode>&	GetSubNodes();
 		const ZESmartArray<ZEMLReaderProperty>& GetProperties();	
@@ -114,7 +114,7 @@ class ZEMLReaderNode
 		ZEQuaternion				ReadQuaternion(const char* Name, const ZEQuaternion& Default = ZEQuaternion::Zero);
 		ZEMatrix3x3					ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default = ZEMatrix3x3::Zero);
 		ZEMatrix4x4					ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default = ZEMatrix4x4::Zero);
-		ZEString					ReadString(const char* Name, const char* Default = "");
+		const ZEString&				ReadString(const char* Name, const ZEString& Default = "");
 		ZESize						ReadDataSize(const char* Name);
 		bool						ReadData(const char* Name, void* Buffer, ZESize BufferSize, ZESize Offset = 0);
 

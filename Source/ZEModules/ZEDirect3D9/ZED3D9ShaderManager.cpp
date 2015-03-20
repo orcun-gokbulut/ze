@@ -39,6 +39,8 @@
 #include "ZED3D9Module.h"
 #include "ZEData.h"
 
+#pragma warning(disable:4996)
+
 ZEUInt32 ZED3D9ShaderManager::CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components)
 {
 	ZEUInt32 Hash = 0;
