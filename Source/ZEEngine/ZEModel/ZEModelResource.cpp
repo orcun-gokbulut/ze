@@ -159,7 +159,7 @@ bool ZEModelResource::ReadMaterials(ZEMLSerialReader* NodeReader)
 			return false;
 		}
 
-		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Material")
+		if (NodeReader->GetItemType() != ZEML_ET_NODE || NodeReader->GetItemName() != "Material")
 			continue;
 
 		ZEValue NameValue, FilePathValue;
@@ -228,7 +228,7 @@ bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSe
 			return false;
 		}
 
-		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "PhysicalShape")
+		if (NodeReader->GetItemType() != ZEML_ET_NODE || NodeReader->GetItemName() != "PhysicalShape")
 			continue;
 
 		ZEValue ShapePosition, ShapeRotation, ShapeRestitution, ShapeDynamicFriction, ShapeStaticFriction, ShapeType, UserDefinedProperties;
@@ -372,7 +372,7 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 			return false;
 		}
 
-		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Mesh")
+		if (NodeReader->GetItemType() != ZEML_ET_NODE || NodeReader->GetItemName() != "Mesh")
 			continue;
 
 		ZEValue NameValue, ParentMeshValue, PositionValue, RotationValue, ScaleValue, IsVisibleValue, IsSkinnedValue, UserDefinedPropertiesValue;
@@ -441,7 +441,7 @@ bool ZEModelResource::ReadMeshes(ZEMLSerialReader* NodeReader)
 				return false;
 			}
 
-			if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "LOD")
+			if (NodeReader->GetItemType() != ZEML_ET_NODE || NodeReader->GetItemName() != "LOD")
 				continue;
 
 			ZEValue LODLevelValue, MaterialIdValue;
@@ -746,7 +746,7 @@ bool ZEModelResource::ReadBones(ZEMLSerialReader* NodeReader)
 			return false;
 		}
 
-		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Bone")
+		if (NodeReader->GetItemType() != ZEML_ET_NODE || NodeReader->GetItemName() != "Bone")
 			continue;
 
 		ZEValue NameValue, ParentBoneValue, RelativePositionValue, RelativeRotationValue, RelativeScaleValue, UserDefinedPropertiesValue;
@@ -833,7 +833,7 @@ bool ZEModelResource::ReadHelpers(ZEMLSerialReader* NodeReader)
 			return false;
 		}
 
-		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Helper")
+		if (NodeReader->GetItemType() != ZEML_ET_NODE || NodeReader->GetItemName() != "Helper")
 			continue;
 
 		ZEValue NameValue, OwnerTypeValue, OwnerIdValue, PositionValue, RotationValue, ScaleValue, UserDefinedPropertiesValue;
@@ -901,7 +901,7 @@ bool ZEModelResource::ReadAnimations(ZEMLSerialReader* NodeReader)
 			return false;
 		}
 
-		if (NodeReader->GetItemType() != ZEML_IT_NODE || NodeReader->GetItemName() != "Animation")
+		if (NodeReader->GetItemType() != ZEML_ET_NODE || NodeReader->GetItemName() != "Animation")
 			continue;
 
 		ZEValue NameValue, BoneKeyCountValue, MeshKeyCountValue;

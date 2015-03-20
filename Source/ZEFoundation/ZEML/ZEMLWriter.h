@@ -37,10 +37,12 @@
 #ifndef	__ZEML_WRITER_H__
 #define __ZEML_WRITER_H__
 
+#include "ZECommon.h"
 #include "ZETypes.h"
 #include "ZEMLCommon.h"
 #include "ZEDS/ZEValue.h"
 #include "ZEFile/ZEFile.h"
+
 
 class ZEMLWriterNode
 {
@@ -82,6 +84,7 @@ class ZEMLWriterNode
 		void				CloseNode();
 
 							ZEMLWriterNode();
+							~ZEMLWriterNode();
 };
 
 class ZEMLWriter

@@ -71,33 +71,25 @@ class ZEMLReaderNode
 		ZEFile*						File;
 		ZEUInt64					Offset;
 		ZEUInt64					Size;
-		ZEInt64						PrevNodeOffset;
-		ZEInt64						NextNodeOffset;
 		ZEInt						VersionMajor;
 		ZEInt						VersionMinor;
 		ZEString					Name;
-		bool						Dirty;
-		ZESmartArray<ZEMLReaderProperty> Properties;
-		ZESmartArray<ZEMLReaderSubNode>	SubNodes;
 
-
+		ZESmartArray<ZEMLReaderSubNode>		SubNodes;
+		ZESmartArray<ZEMLReaderProperty>	Properties;
+		
 		const ZEMLReaderProperty*	FindProperty(const char* Name);
-		void						Load();
+		bool						Load();
 		 
 	public:
 		const char*					GetName();
 
-		const 
-		ZESmartArray<ZEMLReaderSubNode>& GetSubNodes();
-		const
-		ZESmartArray<ZEMLReaderProperty>& GetProperties();	
+		const ZESmartArray<ZEMLReaderSubNode>&	GetSubNodes();
+		const ZESmartArray<ZEMLReaderProperty>& GetProperties();	
 
 		ZESize						GetSubNodeCount();
 		ZESize						GetSubNodeCount(const char* Name);
 		ZEMLReaderNode				GetSubNode(const char* Name, ZESize Index = 0);
-
-		ZEMLReaderNode				GetPrevNode();
-		ZEMLReaderNode				GetNextNode();
 
 		bool						IsValid();
 
@@ -115,6 +107,7 @@ class ZEMLReaderNode
 		ZEUInt64					ReadUInt64(const char* Name, ZEUInt64 Default = 0);
 		float						ReadFloat(const char* Name, float Default = 0.0f);
 		double						ReadDouble(const char* Name, double Default = 0.0);
+		bool						ReadBoolean(const char* Name, bool Default = false);
 		ZEVector2					ReadVector3(const char* Name, const ZEVector2& Default = ZEVector2::Zero);
 		ZEVector3					ReadVector4(const char* Name, const ZEVector3& Default = ZEVector3::Zero);
 		ZEVector4					ReadVector4(const char* Name, const ZEVector4& Default = ZEVector4::Zero);
@@ -131,6 +124,7 @@ class ZEMLReaderNode
 class ZEMLReader
 {
 	private:
+		ZEFile						OwnedFile;
 		ZEFile*						File;
 		ZEUInt						VersionMajor;
 		ZEUInt						VersionMinor;
@@ -144,6 +138,7 @@ class ZEMLReader
 		ZEUInt						GetVersionMajor();
 		ZEUInt						GetVersionMinor();
 
+		bool						Open(const char* FileName);
 		bool						Open(ZEFile* File);
 		void						Close();
 
