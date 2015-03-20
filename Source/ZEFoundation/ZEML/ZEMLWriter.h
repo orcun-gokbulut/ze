@@ -49,11 +49,9 @@ class ZEMLWriterNode
 	friend class ZEMLWriter;
 	private:
 		ZEFile*				File;
-		ZEUInt64			FileUpdatePosition;
 		ZEString			Name;
-		ZEUInt64			SubItemCount;
-		ZEUInt64			Size;
-		ZEMLWriterNode*		ParentNode;
+		ZEUInt64			NodeDataOffset;
+		ZEUInt64			SubElementCount;
 
 		bool				WriteElementHeader(const char* Name, ZEMLElementType Type);
 

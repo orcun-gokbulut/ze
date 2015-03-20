@@ -230,8 +230,8 @@ bool ZEMLWriterNode::WriteValue(const char* Name, const ZEValue& Value)
 
 		case ZEML_ET_STRING:
 		{
-			ZEUInt64 StringSize = ZEEndian::Little((ZEUInt64)Value.GetString().GetSize());
-			File->Write(&StringSize, sizeof(ZEUInt64), 1);
+			ZEUInt32 StringSize = ZEEndian::Little((ZEUInt32)Value.GetString().GetSize());
+			File->Write(&StringSize, sizeof(ZEUInt32), 1);
 			File->Write(Value.GetString().ToCString(), Value.GetString().GetSize() * sizeof(char), 1);
 			break;
 		}
@@ -279,7 +279,7 @@ bool ZEMLWriterNode::WriteValue(const char* Name, const ZEValue& Value)
 		}
 	}
 
-	SubItemCount++;
+	SubElementCount++;
 
 	return true;
 }
@@ -388,7 +388,7 @@ bool ZEMLWriterNode::WriteData(const char* Name, void* Data, ZEUInt64 Size)
 		return false;
 	}
 
-	SubItemCount++;
+	SubElementCount++;
 
 	return true;
 }
@@ -401,10 +401,6 @@ ZEMLWriterNode ZEMLWriterNode::OpenSubNode(const char* Name)
 	ZEMLWriterNode NewNode;
 	NewNode.Name = Name;
 	NewNode.File = File;
-	NewNode.ParentNode = this;
-	NewNode.ParentNode->SubItemCount++;
-
-	NewNode.FileUpdatePosition = File->Tell();
 
 	ZEUInt64 NodeSize = 0;
 	File->Write(&NodeSize, sizeof(ZEUInt64), 1);
@@ -412,36 +408,32 @@ ZEMLWriterNode ZEMLWriterNode::OpenSubNode(const char* Name)
 	ZEUInt64 NodeSubItemCount = 0;
 	File->Write(&NodeSubItemCount, sizeof(ZEUInt64), 1);
 
+	NewNode.NodeDataOffset = File->Tell();
+
+	SubElementCount++;
+
 	return NewNode;
 }
 
 void ZEMLWriterNode::CloseNode()
 {
-	if (ParentNode != NULL)
-	{
-		ParentNode->Size += Size;
-		ParentNode->Size +=	sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + Name.GetSize() + sizeof(ZEUInt64) + sizeof(ZEUInt64);
-	}
-	
 	ZEUInt64 CurrentFilePos = File->Tell();
-	File->Seek(FileUpdatePosition, ZE_SF_BEGINING);
+	File->Seek(NodeDataOffset - 2 * sizeof(ZEUInt64), ZE_SF_BEGINING);
 
-	ZEUInt64 NodeSize = ZEEndian::Little(Size);
+	ZEUInt64 NodeSize = ZEEndian::Little(CurrentFilePos - NodeDataOffset);
 	File->Write(&NodeSize, sizeof(ZEUInt64), 1);
 
-	ZEUInt64 NodeSubItemCount = ZEEndian::Little(SubItemCount);
+	ZEUInt64 NodeSubItemCount = ZEEndian::Little(SubElementCount);
 	File->Write(&NodeSubItemCount, sizeof(ZEUInt64), 1);
 
-	File->Seek(CurrentFilePos, ZE_SF_BEGINING);
+	File->Seek(NodeDataOffset + NodeSize, ZE_SF_BEGINING);
 }
 
 ZEMLWriterNode::ZEMLWriterNode()
 {
 	File = NULL;
 	Name = "";
-	ParentNode = NULL;
-	SubItemCount = 0;
-	Size = 0;
+	SubElementCount = 0;
 }
 
 ZEMLWriterNode::~ZEMLWriterNode()
@@ -458,9 +450,9 @@ ZEMLWriterNode ZEMLWriter::WriteRootNode(const char* Name)
 {
 	ZEMLWriterNode Node;
 	Node.File = File;
+	Node.NodeDataOffset = File->Tell();
 
 	ZEMLWriterNode RootNode	= Node.OpenSubNode(Name);
-	RootNode.ParentNode = NULL;
 	return RootNode;
 }
 
@@ -474,7 +466,7 @@ void ZEMLWriter::WriteHeader()
 	};
 	File->Write(Identifer, 6, 1);
 
-	ZEUInt64 StartOffset = ZEEndian::Little(OwnedFile.Tell()) + sizeof(ZEUInt64);
+	ZEUInt64 StartOffset = ZEEndian::Little(OwnedFile.Tell() + sizeof(ZEUInt64));
 	File->Write(&StartOffset, sizeof(ZEUInt64), 1);
 }
 

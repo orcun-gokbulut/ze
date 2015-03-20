@@ -398,7 +398,7 @@ bool ZEScene::Load(const ZEString& FileName)
 	ZEFile SceneFile;
 	if (!SceneFile.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
 	{
-		zeError("Cannot load scene. Cannot open scene file. File Name: \"%s\".", FileName);
+		zeError("Cannot load scene. Cannot open scene file. File Name: \"%s\".", FileName.ToCString());
 		return false;
 	}
 
@@ -406,39 +406,45 @@ bool ZEScene::Load(const ZEString& FileName)
 	Reader.Open(&SceneFile);
 	ZEMLReaderNode SceneNode = Reader.GetRootNode();
 
-	if (SceneNode.GetName() != "Scene")
+	if (SceneNode.GetName() != "ZEScene")
 	{
-		zeError("Cannot load scene. Corrupted scene file. File Name: \"%s\".", FileName);
+		zeError("Cannot load scene. Corrupted scene file. File Name: \"%s\".", FileName.ToCString());
 		SceneFile.Close();
 		return false;
 	}
 
 	ClearEntities();
 
-	ZESize EntityCount = SceneNode.GetSubNodeCount("Entity");
+	ZEMLReaderNode EntitiesNode = SceneNode.GetSubNode("Entities");
+	ZESize EntityCount = EntitiesNode.GetSubNodeCount("Entity");
 	for (ZESize I = 0; I < EntityCount; I++)
 	{
-		ZEMLReaderNode EntityNode = SceneNode.GetSubNode("Entity", I);
+		ZEMLReaderNode EntityNode = EntitiesNode.GetSubNode("Entity", I);
 		if (!EntityNode.IsValid())
 		{
-			zeError("Cannot load scene. Corrupted scene file. File Name: \"%s\".", FileName);
+			zeError("Cannot load scene. Corrupted scene file. File Name: \"%s\".", FileName.ToCString());
 			SceneFile.Close();
 			return false;
 		}
 		
-		ZEClass* EntityClass = NULL;
-		EntityClass = ZEProvider::GetInstance()->GetClass(EntityNode.ReadString("ClassName"));
+		ZEClass* EntityClass = ZEProvider::GetInstance()->GetClass(EntityNode.ReadString("Class"));
+		if (EntityClass == NULL)
+		{
+			zeWarning("Problem in loading scene. Entity class is not registered. Class Name: \"%s\".", EntityNode.ReadString("Class").ToCString());
+			continue;
+		}
+
 		ZEEntity* NewEntity = (ZEEntity*)EntityClass->CreateInstance();
 		if (NewEntity == NULL)
 		{
-			zeError("Cannot load scene. Cannot create instance of an entity. Class Name: \"%s\".", EntityNode.ReadString("ClassName"));
+			zeError("Cannot load scene. Cannot create instance of an entity. Class Name: \"%s\".", EntityNode.ReadString("Class").ToCString());
 			SceneFile.Close();
 			return false; 
 		}
 
 		if (!NewEntity->Restore(&EntityNode))
 		{
-			zeError("Unserialization failed. Unserialization of entity has failed. Class Name: \"%s\".", EntityNode.ReadString("ClassName"));
+			zeError("Unserialization failed. Unserialization of entity has failed. Class Name: \"%s\".", EntityNode.ReadString("Class").ToCString());
 			SceneFile.Close();
 			return false;
 		}
