@@ -43,40 +43,24 @@
 #include "ZEDS/ZEString.h"
 
 class ZEMLNode;
-class ZEFile;
 
-class ZEMLItem : public ZEListItem
+class ZEMLElement : public ZEListItem
 {
-	friend class ZEMLNode;
-
+	friend ZEMLNode;
 	protected:
-		ZEString			Name;
-		ZEUInt8				Type;
-		ZEMLItem*			Parent;
-		ZEUInt64			DataSize;
-		ZEUInt64			FilePosition;
-
-		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading) = 0;
-		virtual bool		WriteSelf(ZEFile* File) = 0;
-
-
-		void				SetType(ZEMLElementType Type);
-
-							ZEMLItem();
-							~ZEMLItem();
+		ZEMLNode*					Parent;
+		ZEString					Name;
 
 	public:
-		ZEMLElementType		GetType() const;
-		ZEString			GetTypeText();
-		ZEMLElementType		GetTypeFromText(ZEString TypeText);
+		ZEMLNode*					GetParent();
 
-		ZEUInt64			GetFilePosition();
+		bool						SetName(const char* Name);
+		const ZEString&				GetName();	
 
-		virtual ZEUInt64	GetTotalSize() = 0;
-		ZEUInt64			GetDataSize();
+		virtual ZEMLElementType1	GetType() = 0;
+		virtual ZESize				GetSize() = 0;
 
-		void				SetName(const ZEString& Name);
-		const ZEString&		GetName() const;				
+									ZEMLElement();
 };
 
 #endif

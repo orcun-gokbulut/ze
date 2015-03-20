@@ -38,38 +38,26 @@
 #define __ZEML_PROPERTY_H__
 
 #include "ZEMLItem.h"
-#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEValue.h"
 
-class TiXmlElement;
-
-class ZEMLProperty : public ZEMLItem
+class ZEMLProperty : public ZEMLElement
 {
 	friend class ZEMLNode;
-	friend class ZEMLWriterNode;
-	friend class ZEMLWriter;
-
 	private:
-
-		ZEValue			Value;
-
-	protected:
-
-		bool				WriteSelfToXML(TiXmlElement* Element);
-		bool				ReadFromXML(TiXmlElement* Element);
-		virtual bool		WriteSelf(ZEFile* File);
-		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading);
+		ZEValue						Value;
 
 	public:
+		virtual ZEMLElementType1	GetType();
+		virtual ZESize				GetSize();
 
-		virtual ZEUInt64	GetTotalSize();
+		bool						SetValue(const ZEValue& Value);
+		const ZEValue&				GetValue() const;
 
-		void				SetValue(const ZEValue& Value);
-		const ZEValue&	GetValue() const;
+		ZEMLValueType				GetValueType();
 
-							ZEMLProperty();
-							ZEMLProperty(const ZEString& Name);
-							ZEMLProperty(const ZEString& Name ,const ZEValue& Value);
+									ZEMLProperty();
+									ZEMLProperty(const char* Name);
+									ZEMLProperty(const char* Name ,const ZEValue& Value);
 };
 
 #endif
