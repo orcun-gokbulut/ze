@@ -44,6 +44,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEMLVisualizerTreeWidget.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEDS/ZEFormat.h"
 
 ZEMLVisualizerQt::ZEMLVisualizerQt(QWidget* Parent)
 {
@@ -137,137 +138,146 @@ void ZEMLVisualizerWidget::Refresh()
 	AddItem(Node);
 }
 
-void ZEMLVisualizerWidget::AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem)
+void ZEMLVisualizerWidget::AddItem(ZEMLElement* Item, QTreeWidgetItem* ParentItem)
 {	
 	QTreeWidgetItem* NewItem = new QTreeWidgetItem();
 	NewItem->setTextAlignment(1, Qt::AlignmentFlag::AlignCenter);
 
 	if(Item->GetType() == ZEML_ET_NODE)
 	{
-		NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
+		//NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
 		NewItem->setText(1, "node");
-		NewItem->setBackgroundColor(0,QColor(230,230,230));
-		NewItem->setBackgroundColor(1,QColor(230,230,230));
-		NewItem->setBackgroundColor(2,QColor(230,230,230));
+		NewItem->setBackgroundColor(0, QColor(230,230,230));
+		NewItem->setBackgroundColor(1, QColor(230,230,230));
+		NewItem->setBackgroundColor(2, QColor(230,230,230));
 		ZEMLNode* CurrentItem = (ZEMLNode*)Item;
+		
+		ZEArray<ZEMLElement*> Nodes = CurrentItem->FindElements(ZEML_ET1_NODE);
+		ZEArray<ZEMLElement*> Properties = CurrentItem->FindElements(ZEML_ET_PROPERTY);
+		ZEArray<ZEMLElement*> Data = CurrentItem->FindElements(ZEML_ET_DATA);
 
-		ZESize SubNodeCount = CurrentItem->GetSubNodes().GetCount();
-		ZESize PropertyCount = CurrentItem->GetProperties().GetCount();
+		ZESize SubNodeCount = Nodes.GetCount();
+		ZESize PropertyCount = Properties.GetCount();
+		ZESize DataCount = Data.GetCount();
 
 		for (ZESize I = 0; I < SubNodeCount; I++)
-		{
-			AddItem((ZEMLItem*)CurrentItem->GetSubNodes()[I], NewItem);
-		}
+			AddItem(Nodes[I], NewItem);
+
 		for (ZESize I = 0; I < PropertyCount; I++)
-		{
-			AddItem((ZEMLItem*)CurrentItem->GetProperties()[I], NewItem);
-		}
+			AddItem(Nodes[I], NewItem);
+		
+		for (ZESize I = 0; I < PropertyCount; I++)
+			AddItem(Nodes[I], NewItem);
 	}
-	else if(Item->GetType() == ZEML_ET_INLINE_DATA)
+	else if (Item->GetType() == ZEML_ET_DATA)
 	{
-		NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
+		//NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
 		NewItem->setText(1, "DataProperty");
-		ZEMLDataProperty* CurrentItem = (ZEMLDataProperty*)Item;
+		ZEMLData* CurrentItem = (ZEMLData*)Item;
 		ZEString DataSize = CurrentItem->GetDataSize();
 		NewItem->setText(2, ("Data Size : " + DataSize + " byte(s)").ToCString());
 	}
-	else
+	else if (Item->GetType() == ZEML_ET_PROPERTY)
 	{
-		ZEQuaternion	TempQuat;
-		ZEVector2		TempVec2;
-		ZEVector3		TempVec3;
-		ZEVector4		TempVec4;
-		ZEMatrix3x3		TempM3;
-		ZEMatrix4x4		TempM4;
-		ZEString		TempString = "";
-
-		NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
+		//NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
 		ZEMLProperty* CurrentItem = (ZEMLProperty*)Item;
 		ZEValue Value = CurrentItem->GetValue();
 		switch (Value.GetType())
 		{
-		case ZE_VRT_FLOAT:
-			NewItem->setText(1, "float");
-			NewItem->setText(2, ZEString(Value.GetFloat()).ToCString());
-			break;
-		case ZE_VRT_DOUBLE:
-			NewItem->setText(1, "double");
-			NewItem->setText(2, ZEString(Value.GetDouble()).ToCString());
-			break;
-		case ZE_VRT_INTEGER_8:
-			NewItem->setText(1, "int8");
-			NewItem->setText(2, ZEString(Value.GetInt8()).ToCString());
-			break;
-		case ZE_VRT_INTEGER_16:
-			NewItem->setText(1, "int16");
-			NewItem->setText(2, ZEString(Value.GetInt16()).ToCString());
-			break;
-		case ZE_VRT_INTEGER_32:
-			NewItem->setText(1, "int32");
-			NewItem->setText(2, ZEString(Value.GetInt32()).ToCString());
-			break;
-		case ZE_VRT_INTEGER_64:
-			NewItem->setText(1, "int64");
-			NewItem->setText(2, ZEString(Value.GetInt64()).ToCString());
-			break;
-		case ZE_VRT_UNSIGNED_INTEGER_8:
-			NewItem->setText(1, "uint8");
-			NewItem->setText(2, ZEString(Value.GetUInt8()).ToCString());
-			break;
-		case ZE_VRT_UNSIGNED_INTEGER_16:
-			NewItem->setText(1, "uint16");
-			NewItem->setText(2, ZEString(Value.GetUInt16()).ToCString());
-			break;
-		case ZE_VRT_UNSIGNED_INTEGER_32:
-			NewItem->setText(1, "uint32");
-			NewItem->setText(2, ZEString(Value.GetUInt32()).ToCString());
-			break;
-		case ZE_VRT_UNSIGNED_INTEGER_64:
-			NewItem->setText(1, "uint64");
-			NewItem->setText(2, ZEString(Value.GetUInt64()).ToCString());
-			break;
-		case ZE_VRT_BOOLEAN:
-			NewItem->setText(1, "bool");
-			NewItem->setText(2, ZEString(Value.GetBoolean()).ToCString());
-			break;
-		case ZE_VRT_STRING:
-			NewItem->setText(1, "string");
-			NewItem->setText(2, Value.GetString().ToCString());
-			break;
-		case ZE_VRT_QUATERNION:
-			TempQuat = Value.GetQuaternion();
-			TempString = "x : " + ZEString(TempQuat.x) + " y : " + ZEString(TempQuat.y) + " z : " +ZEString(TempQuat.z) + " w : " + ZEString(TempQuat.w);
-			NewItem->setText(1, "quaternion");
-			NewItem->setText(2, TempString.ToCString());
-			break;
-		case ZE_VRT_VECTOR2:
-			TempVec2 = Value.GetVector2();
-			TempString = "x : " + ZEString(TempVec2.x) + " y : " + ZEString(TempVec2.y);
-			NewItem->setText(1, "vector2");
-			NewItem->setText(2, TempString.ToCString());
-			break;
-		case ZE_VRT_VECTOR3:
-			TempVec3 = Value.GetVector3();
-			TempString = "x : " + ZEString(TempVec3.x) + " y : " + ZEString(TempVec3.y) + " z : " +ZEString(TempVec3.z);
-			NewItem->setText(1, "vector3");
-			NewItem->setText(2, TempString.ToCString());
-			break;
-		case ZE_VRT_VECTOR4:
-			TempVec4 = Value.GetVector4();
-			TempString = "x : " + ZEString(TempVec4.x) + " y : " + ZEString(TempVec4.y) + " z : " +ZEString(TempVec4.z) + " w : " + ZEString(TempVec4.w);
-			NewItem->setText(1, "vector4");
-			NewItem->setText(2, TempString.ToCString());
-			break;
-		case ZE_VRT_MATRIX3X3:
-			NewItem->setText(1, "matrix3x3");
-			break;
-		case ZE_VRT_MATRIX4X4:
-			NewItem->setText(1, "matrix4x4");
-			break;
-		default:
-			zeError("Unsupported ZEMLProperty type.");
-			break;
+			case ZE_VRT_FLOAT:
+				NewItem->setText(1, "Float");
+				NewItem->setText(2, ZEString(Value.GetFloat()).ToCString());
+				break;
+
+			case ZE_VRT_DOUBLE:
+				NewItem->setText(1, "Double");
+				NewItem->setText(2, ZEString(Value.GetDouble()).ToCString());
+				break;
+
+			case ZE_VRT_INTEGER_8:
+				NewItem->setText(1, "Int8");
+				NewItem->setText(2, ZEString(Value.GetInt8()).ToCString());
+				break;
+
+			case ZE_VRT_INTEGER_16:
+				NewItem->setText(1, "Int16");
+				NewItem->setText(2, ZEString(Value.GetInt16()).ToCString());
+				break;
+			case ZE_VRT_INTEGER_32:
+				NewItem->setText(1, "Int32");
+				NewItem->setText(2, ZEString(Value.GetInt32()).ToCString());
+				break;
+
+			case ZE_VRT_INTEGER_64:
+				NewItem->setText(1, "Int64");
+				NewItem->setText(2, ZEString(Value.GetInt64()).ToCString());
+				break;
+			case ZE_VRT_UNSIGNED_INTEGER_8:
+				NewItem->setText(1, "UInt8");
+				NewItem->setText(2, ZEString(Value.GetUInt8()).ToCString());
+				break;
+
+			case ZE_VRT_UNSIGNED_INTEGER_16:
+				NewItem->setText(1, "UInt16");
+				NewItem->setText(2, ZEString(Value.GetUInt16()).ToCString());
+				break;
+
+			case ZE_VRT_UNSIGNED_INTEGER_32:
+				NewItem->setText(1, "UInt32");
+				NewItem->setText(2, ZEString(Value.GetUInt32()).ToCString());
+				break;
+
+			case ZE_VRT_UNSIGNED_INTEGER_64:
+				NewItem->setText(1, "UInt64");
+				NewItem->setText(2, ZEString(Value.GetUInt64()).ToCString());
+				break;
+			case ZE_VRT_BOOLEAN:
+				NewItem->setText(1, "Boolean");
+				NewItem->setText(2, ZEString(Value.GetBoolean()).ToCString());
+				break;
+
+			case ZE_VRT_STRING:
+				NewItem->setText(1, "String");
+				NewItem->setText(2, Value.GetString().ToCString());
+				break;
+
+			case ZE_VRT_QUATERNION:
+				NewItem->setText(1, "Quaternion");
+				NewItem->setText(2, ZEFormat::Format("<w:{0}, x:{1}, y:{2}, z:{3}>", Value.GetQuaternion().w, Value.GetQuaternion().x, Value.GetQuaternion().y, Value.GetQuaternion().z).ToCString());
+				break;
+
+			case ZE_VRT_VECTOR2:
+				NewItem->setText(1, "vector2");
+				NewItem->setText(2, ZEFormat::Format("<x:{1}, y:{2}}>", Value.GetVector2().x, Value.GetVector2().y).ToCString());
+				break;
+
+			case ZE_VRT_VECTOR3:
+				NewItem->setText(1, "vector3");
+				NewItem->setText(2, ZEFormat::Format("<x:{1}, y:{2}, z:{3}>", Value.GetVector3().x, Value.GetVector3().y, Value.GetVector3().z).ToCString());
+				break;
+
+			case ZE_VRT_VECTOR4:
+				NewItem->setText(1, "vector3");
+				NewItem->setText(2, ZEFormat::Format("<x:{1}, y:{2}, z:{3}, w:{3}>", Value.GetVector4().x, Value.GetVector4().y, Value.GetVector4().z, Value.GetVector4().w).ToCString());
+				break;
+
+			case ZE_VRT_MATRIX3X3:
+				NewItem->setText(1, "Matrix3x3");
+				break;
+
+			case ZE_VRT_MATRIX4X4:
+				NewItem->setText(1, "Matrix4x4");
+				break;
+
+			default:
+				NewItem->setText(1, "Unknown Type");
+				break;
 		}
+	}
+	else
+	{
+		NewItem->setText(1, "Unknown ZEML Element Type");
+		NewItem->setText(2, ZEFormat::Format("Code: 0x{0:x:2} ", Item->GetType()).ToCString());
 	}
 
 	if(ParentItem == NULL)

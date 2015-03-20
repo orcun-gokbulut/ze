@@ -38,44 +38,30 @@
 #define __ZEML_DATA_PROPERTY_H__
 
 #include "ZEMLItem.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZEValue.h"
+#include "ZEPointer/ZEPointer.h"
 
-class TiXmlElement;
+class ZEFile;
 
-class ZEMLDataProperty : public ZEMLItem
+class ZEMLData : public ZEMLElement
 {
 	friend class ZEMLNode;
-	friend class ZEMLWriterNode;
-	friend class ZEMLWriter;
-
 	private:
-
-		void*				Data;
-		bool				IsCached;
-		ZEFile*				File;
-		ZEUInt64			FileDataPosition;
-
-	protected:
-
-		virtual	bool		WriteSelfToXML(TiXmlElement* Element);
-		bool				ReadFromXML(TiXmlElement* Element);
-		virtual bool		WriteSelf(ZEFile* File);
-		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading);
+		ZEPointer<ZEBYTE>			Data;
+		ZESize						DataSize;
+		ZEUInt64					Offset;
+		ZEFile*						File;
 
 	public:
+		virtual ZEMLElementType1	GetType();
+		virtual ZESize				GetSize();
 
-		virtual ZEUInt64	GetTotalSize();
+		void						SetData(void* Data, ZESize DataSize);
+		const void*					GetData();
+		ZESize						GetDataSize();
 
-		void				SetData(void* Data, ZEUInt64 DataSize, bool Cache = true);
-		const void*			GetData();
-		//bool				GetData(ZEMemoryFile& File);
-
-							ZEMLDataProperty();
-							ZEMLDataProperty(const ZEString& Name);
-							ZEMLDataProperty(const ZEString& Name ,void* Data, ZEUInt64 DataSize, bool Cache = true);
-
-							~ZEMLDataProperty();
+									ZEMLData();
+									ZEMLData(const char* Name);
+									ZEMLData(const char* Name, void* Data, ZESize DataSize);
 };
 
 #endif

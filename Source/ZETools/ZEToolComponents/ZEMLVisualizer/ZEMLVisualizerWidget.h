@@ -42,7 +42,7 @@
 
 class ZEMLNode;
 class QApplication;
-class ZEMLItem;
+class ZEMLElement;
 class QTreeWidgetItem;
 class ZEMLVisualizerTreeWidget;
 
@@ -74,7 +74,7 @@ class ZEMLVisualizerWidget
 		ZEMLVisualizerQt*				QtComponents;
 		ZEMLNode*						Node;
 
-		void							AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem = NULL);
+		void							AddItem(ZEMLElement* Item, QTreeWidgetItem* ParentItem = NULL);
 
 	public:
 

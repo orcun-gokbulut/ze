@@ -36,716 +36,175 @@
 #include "ZEMLNode.h"
 #include "ZEMLProperty.h"
 #include "ZEMLDataProperty.h"
-#include "ZEFile/ZEFile.h"
-#include "TinyXML.h"
 
-ZEMLNode::ZEMLNode()
+ZEMLElementType1 ZEMLNode::GetType()
 {
-	Properties.Clear();
-	SetType(ZEML_ET_NODE);
-	NodeSize = 0;
+	return ZEML_ET1_NODE;
 }
 
-ZEMLNode::ZEMLNode(const ZEString& Name)
+ZESize ZEMLNode::GetSize()
 {
-	Properties.Clear();
-	SetType(ZEML_ET_NODE);
-	SetName(Name);
-	NodeSize = 0;
+	return 0;
 }
 
-ZEMLNode::~ZEMLNode()
+const ZEList<ZEMLElement>& ZEMLNode::GetElements()
 {
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
+	return Elements;
+}
+
+ZEMLElement* ZEMLNode::FindElement(const char* Name, ZEMLElementType1 Type, ZESize Index)
+{
+	ZEList<ZEMLElement>::Iterator Iterator = Elements.GetIterator();
+	while(!Iterator.IsEnd())
 	{
-		delete Properties[I];
-		Properties[I] = NULL;
-	}
-
-// 	for (ZESize I = 0; I < SubNodes.GetCount(); I++)
-// 		delete SubNodes[I];
-
-	Properties.Clear();
-}
-
-ZEUInt64 ZEMLNode::GetTotalSize()
-{
-	ZEUInt64 TotalSize = 0;
-
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
-	{
-		ZEMLElementType CurrentItemType = Properties[I]->GetType();
-
-		if(CurrentItemType == ZEML_ET_OFFSET_DATA)
-			TotalSize += ((ZEMLDataProperty*)Properties[I])->GetTotalSize();
-		else
-			TotalSize += ((ZEMLProperty*)Properties[I])->GetTotalSize();
-	}
-
-	for (ZESize I = 0; I < SubNodes.GetCount(); I++)
-	{
-		TotalSize += sizeof(char) + sizeof(ZEUInt8) + sizeof(ZEUInt8) + SubNodes[I]->GetName().GetSize() + sizeof(ZEUInt64) + sizeof(ZEUInt64);
-		TotalSize += ((ZEMLNode*)SubNodes[I])->GetTotalSize();
-	}
-
-	NodeSize = TotalSize;
-	return TotalSize;
-}
-
-bool ZEMLNode::AddProperty(ZEMLProperty* Property)
-{
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
-		if(Properties[I]->GetName() == Property->GetName())
+		if ((Type == ZEML_ET_ALL || Iterator->GetType() == Type) && Iterator->GetName() == Name)
 		{
-			zeError("ZEML node can not contain properties with duplicate name : %s.", Property->Name);
-			return false;
+			if (Index == 0)
+				return Iterator;
+			else
+				Index--;
 		}
 
-	Property->Parent = this;
-	Properties.Add(Property);
-	return true;
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEValue& Value)
-{
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
-		if(Properties[I]->GetName() == Name)
-		{
-			zeError("ZEML node can not contain properties with duplicate name : %s.", Name);
-			return NULL;
-		}
-
-	ZEMLProperty* Property = new ZEMLProperty(Name, Value);
-	Property->Parent = this;
-	Properties.Add(Property);
-	return Property;
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name)
-{
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
-		if(Properties[I]->GetName() == Name)
-		{
-			zeError("ZEML node can not contain properties with duplicate name : %s.", Name);
-			return NULL;
-		}
-
-	ZEMLProperty* Property = new ZEMLProperty(Name);
-	Property->Parent = this;
-	Properties.Add(Property);
-	return Property;
-}
-
-ZEMLProperty* ZEMLNode::AddProperty()
-{
-	ZEMLProperty* Property = new ZEMLProperty();
-	Property->Parent = this;
-	Properties.Add(Property);
-	return Property;
-}
-
-bool ZEMLNode::RemoveProperty(ZEMLProperty* Property)
-{
-	ZEMLItem* ToRemove = Property;
-	if(Properties.Exists(ToRemove))
-	{
-		Properties.RemoveValue(ToRemove);
-		return true;
+		Iterator++;
 	}
-
-	return false;
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, float Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, double Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt8 Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt16 Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt32 Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEInt64 Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt8 Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt16 Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt32 Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, ZEUInt64 Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, bool Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEString& Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const char* Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEQuaternion& Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVector2& Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVector3& Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEVector4& Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix3x3& Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-ZEMLProperty* ZEMLNode::AddProperty(const ZEString& Name, const ZEMatrix4x4& Value)
-{
-	return AddProperty(Name, ZEValue(Value));
-}
-
-bool ZEMLNode::AddDataProperty(ZEMLDataProperty* Property)
-{	
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
-		if(Properties[I]->GetName() == Property->GetName())
-		{
-			zeError("ZEML node can not contain data properties with duplicate name : %s.", Property->Name);
-			return false;
-		}
-
-	Property->Parent = this;
-	Properties.Add(Property);
-	return true;
-}
-
-ZEMLDataProperty* ZEMLNode::AddDataProperty(const ZEString& Name ,void* Data, ZEUInt64 DataSize, bool Cache)
-{
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
-		if(Properties[I]->GetName() == Name)
-		{
-			zeError("ZEML node can not contain data properties with duplicate name : %s.", Name);
-			return NULL;
-		}
-
-	ZEMLDataProperty* DataProperty = new ZEMLDataProperty(Name, Data, DataSize, Cache);
-	DataProperty->Parent = this;
-	Properties.Add(DataProperty);
-	return DataProperty;
-}
-
-ZEMLDataProperty* ZEMLNode::AddDataProperty(const ZEString& Name)
-{
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
-		if(Properties[I]->GetName() == Name)
-		{
-			zeError("ZEML node can not contain data properties with duplicate name : %s.", Name);
-			return NULL;
-		}
-
-	ZEMLDataProperty* DataProperty = new ZEMLDataProperty(Name);
-	DataProperty->Parent = this;
-	Properties.Add(DataProperty);
-	return DataProperty;
-}
-
-ZEMLDataProperty* ZEMLNode::AddDataProperty()
-{
-	ZEMLDataProperty* DataProperty = new ZEMLDataProperty();
-	DataProperty->Parent = this;
-	Properties.Add(DataProperty);
-	return DataProperty;
-}
-
-bool ZEMLNode::RemoveDataProperty(ZEMLDataProperty* Property)
-{
-	ZEMLItem* ToRemove = Property;
-	if(Properties.Exists(ToRemove))
-	{
-		Properties.RemoveValue(ToRemove);
-		return true;
-	}
-
-	return false;
-}
-
-void ZEMLNode::AddSubNode(ZEMLNode* Node)
-{
-	Node->Parent = this;
-	SubNodes.Append(Node);
-}
-
-ZEMLNode* ZEMLNode::AddSubNode(const ZEString& Name)
-{
-	ZEMLNode* Node = new ZEMLNode(Name);
-	Node->Parent = this;
-	SubNodes.Append(Node);
-	return Node;
-}
-
-ZEMLNode* ZEMLNode::AddSubNode()
-{
-	ZEMLNode* Node = new ZEMLNode();
-	Node->Parent = this;
-	SubNodes.Append(Node);
-	return Node;
-}
-
-bool ZEMLNode::InsertSubNode(ZEMLNode* Node, ZESize Index)
-{
-	if(Node == NULL)
-	{
-		zeError("Node can not be NULL.");
-		return false;
-	}
-
-	if(Index > SubNodes.GetCount())
-	{
-		zeError("Can not insert sub node index is out of range. Node name : %s, index : %d", Node->GetName().ToCString(), Index);
-		return false;
-	}
-
-	Node->Parent = this;
-	SubNodes.Insert(Index, Node);
-	return true;
-}
-
-ZEMLNode* ZEMLNode::InsertSubNode(const ZEString& Name, ZESize Index)
-{
-	ZEMLNode* Node = new ZEMLNode(Name);
-	Node->Parent = this;
-	SubNodes.Insert(Index, Node);
-	return Node;
-}
-
-bool ZEMLNode::RemoveSubNode(ZEMLNode* SubNode)
-{
-	if(SubNodes.Exists(SubNode))
-	{
-		SubNodes.Remove(SubNode);
-		return true;
-	}
-
-	return false;
-}
-
-const ZEList<ZEMLNode>& ZEMLNode::GetSubNodes() const
-{
-	return SubNodes;
-}
-
-const ZEArray<ZEMLNode*> ZEMLNode::GetSubNodes(const ZEString& NodeName)
-{
-	ZEArray<ZEMLNode*> Result;
-	Result.Clear();
-
-	for (ZESize I = 0; I < SubNodes.GetCount(); I++)
-		if(SubNodes[I]->GetName() == NodeName)
-			Result.Add(SubNodes[I]);
-
-	return Result;
-}
-
-const ZEArray<ZEMLItem*>& ZEMLNode::GetProperties() const
-{
-	return Properties;
-}
-
-const ZEMLItem*	ZEMLNode::GetProperty(const ZEString& PropertyName)
-{
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
-		if(Properties[I]->GetName() == PropertyName)
-			return Properties[I];
 
 	return NULL;
 }
 
-const ZEMLNode*	ZEMLNode::GetParent()
+ZEArray<ZEMLElement*> ZEMLNode::FindElements(ZEMLElementType1 Type)
 {
-	if(Parent == NULL)
-		return NULL;
-	else
-		return (ZEMLNode*)Parent;
+	ZEArray<ZEMLElement*> FoundElements;
+
+	ZEList<ZEMLElement>::Iterator Iterator = Elements.GetIterator();
+	while(!Iterator.IsEnd())
+	{
+		if (Type == ZEML_ET_ALL || Iterator->GetType() == Type)
+			FoundElements.Add(Iterator.GetItem());
+
+		Iterator++;
+	}
+
+	return FoundElements;
 }
 
-bool ZEMLNode::WriteSelf(ZEFile* File)
+ZEArray<ZEMLElement*> ZEMLNode::FindElements(const char* Name, ZEMLElementType1 Type)
 {
-	ZEUInt64 TempUInt64;
+	ZEArray<ZEMLElement*> FoundElements;
 
-	char Identifier = 'Z';
-	if(File->Write(&Identifier, sizeof(char), 1) != 1)
+	ZEList<ZEMLElement>::Iterator Iterator = Elements.GetIterator();
+	while(!Iterator.IsEnd())
 	{
-		zeError("Can not write ZEMLNode identifier to file.");
-		return false;
+		if (Iterator->GetName() == Name && (Type == ZEML_ET_ALL || Iterator->GetType() == Type))
+			FoundElements.Add(Iterator.GetItem());
+
+		Iterator++;
 	}
 
-	if(File->Write(&Type, sizeof(ZEUInt8), 1) != 1)
-	{
-		zeError("Can not write ZEMLNode type to file.");
-		return false;
-	}
-
-	ZEUInt8 NameLength = Name.GetSize();
-	if(File->Write(&NameLength, sizeof(ZEUInt8), 1) != 1)
-	{
-		zeError("Can not write ZEMLNode name lenght to file.");
-		return false;
-	}
-
-	if(File->Write(Name.GetValue(), sizeof(char) * NameLength, 1) != 1)
-	{
-		zeError("Can not write ZEMLNode name to file.");
-		return false;
-	}
-
-	ZEUInt64 SubItemCount = (ZEUInt64)Properties.GetCount() + SubNodes.GetCount();
-	TempUInt64 = ZEEndian::Little(SubItemCount);
-	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
-	{
-		zeError("Can not write ZEMLNode subitem count to file.");
-		return false;
-	}
-
-	TempUInt64 = ZEEndian::Little(NodeSize);
-	if(File->Write(&TempUInt64, sizeof(ZEUInt64), 1) != 1)
-	{
-		zeError("Can not write ZEMLNode node size to file.");
-		return false;
-	}
-
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
-	{
-		ZEMLElementType CurrentItemType = Properties[I]->GetType();
-
-		if(CurrentItemType == ZEML_ET_INLINE_DATA)
-		{
-			if(!((ZEMLDataProperty*)Properties[I])->WriteSelf(File))
-			{
-				zeError("Can not write data property, name : %s", Properties[I]->GetName());
-				return false;
-			}
-		}
-
-		else
-		{
-			if(!((ZEMLProperty*)Properties[I])->WriteSelf(File))
-			{
-				zeError("Can not write property, name : %s", Properties[I]->GetName());
-				return false;
-			}
-		}
-	}
-
-	for (ZESize I = 0; I < SubNodes.GetCount(); I++)
-	{
-		if(!SubNodes[I]->WriteSelf(File))
-		{
-			zeError("Can not write sub node, sub node name : %s", SubNodes[I]->GetName().ToCString());
-			return false;
-		}
-	}
-
-	return true;
+	return FoundElements;
 }
 
-bool ZEMLNode::WriteSelfToXML(TiXmlElement* XMLElement)
+bool ZEMLNode::AddElement(ZEMLElement* Element)
 {
-	ZEUInt64 TempUInt64;
-
-	XMLElement->SetAttribute("Type", GetTypeText()); 
-
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
-	{
-		ZEMLElementType CurrentItemType = Properties[I]->GetType();
-
-		if(CurrentItemType == ZEML_ET_INLINE_DATA)
-		{
-			if(!((ZEMLDataProperty*)Properties[I])->WriteSelfToXML(XMLElement))
-			{
-				zeError("Can not write data property, name : %s", Properties[I]->GetName());
-				return false;
-			}
-		}
-
-		else
-		{
-			if(!((ZEMLProperty*)Properties[I])->WriteSelfToXML(XMLElement))
-			{
-				zeError("Can not write property, name : %s", Properties[I]->GetName());
-				return false;
-			}
-		}
-	}
-
-	for (ZESize I = 0; I < SubNodes.GetCount(); I++)
-	{
-		TiXmlElement* NewSubNode = new TiXmlElement(SubNodes[I]->GetName());
-		XMLElement->LinkEndChild(NewSubNode);
-
-		if(!SubNodes[I]->WriteSelfToXML(NewSubNode))
-		{
-			zeError("Can not write sub node, sub node name : %s", SubNodes[I]->GetName().ToCString());
-			return false;
-		}
-	}
-
-	return true;
-}
-
-bool ZEMLNode::Write(ZEFile* File)
-{
-	GetTotalSize();
-	return WriteSelf(File);
-}
-
-bool ZEMLNode::WriteToXMLFile(const char* FilePath)
-{
-	TiXmlDocument XMLDocument(FilePath);	
-	TiXmlElement RootElement(GetName());
-	XMLDocument.LinkEndChild(&RootElement);
-	WriteSelfToXML(&RootElement);
-	bool Result = XMLDocument.SaveFile(FilePath);
-	return Result;
-}
-
-bool ZEMLNode::ReadSelf(ZEFile* File, bool DeferredDataReading)
-{
-	char		Identifier;	
-	ZEUInt8		NameSize;
-	char		TempNameBuffer[ZEML_MAX_NAME_SIZE];	
-	ZEUInt64	SubItemCount;
-	FilePosition = File->Tell();
-
-	if(File->Read(&Identifier, sizeof(char), 1) != 1)
-	{
-		zeError("Can not read ZEMLNode identifier from file. Corrupted ZEML file.");
-		return false;
-	}
-
-	if(Identifier != ZEML_ITEM_FILE_IDENTIFIER)
-	{
-		zeError("ZEMLNode identifier mismatch. Corrupted ZEML file.");
-		return false;
-	}
-
-	if(File->Read(&Type, sizeof(ZEUInt8), 1) != 1)
-	{
-		zeError("Can not read ZEMLNode type from file. Corrupted ZEML file.");
-		return false;
-	}
-
-	if(File->Read(&NameSize, sizeof(ZEUInt8), 1) != 1)
-	{
-		zeError("Can not read ZEMLNode name length from file. Corrupted ZEML file.");
-		return false;
-	}
-
-	if(File->Read(TempNameBuffer, NameSize, 1) != 1)
-	{
-		zeError("Can not read ZEMLNode name from file. Corrupted ZEML file.");
-		return false;
-	}
-
-	if(File->Read(&SubItemCount, sizeof(ZEUInt64), 1) != 1)
-	{
-		zeError("Can not read ZEMLNode sub item count from file. Corrupted ZEML file.");
-		return false;
-	}
-
-	SubItemCount = ZEEndian::Little(SubItemCount);
-
-	if(File->Read(&NodeSize, sizeof(ZEUInt64), 1) != 1)
-	{
-		zeError("Can not read ZEMLNode node size from file. Corrupted ZEML file.");
-		return false;
-	}
-
-	NodeSize = ZEEndian::Little(NodeSize);
-
-	for(ZESize I = 0; I < SubItemCount; I++)
-	{
-		ZEUInt8 SubItemType;
-		File->Read(&SubItemType, sizeof(ZEUInt8), 1);
-		File->Read(&SubItemType, sizeof(ZEUInt8), 1);
-		File->Seek((ZEInt64)sizeof(ZEUInt8) * -2, ZE_SF_CURRENT);
-
-		if((ZEMLElementType)SubItemType == ZEML_ET_NODE)
-		{
-			ZEMLNode* NewNode = new ZEMLNode();
-			if(!NewNode->ReadSelf(File, DeferredDataReading))
-			{
-				zeError("Can not read sub node.");
-				return false;
-			}
-			NewNode->Parent = this;
-			SubNodes.Append(NewNode);
-		}
-		else if((ZEMLElementType)SubItemType == ZEML_ET_INLINE_DATA)
-		{
-			ZEMLDataProperty* NewDataProperty = new ZEMLDataProperty();
-			if(!NewDataProperty->ReadSelf(File, DeferredDataReading))
-			{
-				zeError("Can not read data property.");
-				return false;
-			}
-			NewDataProperty->Parent = this;
-			Properties.Add(NewDataProperty);
-		}
-		else
-		{
-			ZEMLProperty* NewProperty = new ZEMLProperty();
-			if(!NewProperty->ReadSelf(File, DeferredDataReading))
-			{
-				zeError("Can not read property.");
-				return false;
-			}
-			NewProperty->Parent = this;
-			Properties.Add(NewProperty);
-		}
-	}
-
-	SetName(TempNameBuffer);
-	return true;
-}
-
-bool ZEMLNode::Read(ZEFile* File, bool DeferredDataReading)
-{
-	return ReadSelf(File, DeferredDataReading);
-}
-
-bool ZEMLNode::ReadFromXMLFile(const char* FilePath)
-{
-	TiXmlDocument XMLDocument(FilePath);
-	
-	if (!XMLDocument.LoadFile())
-	{
-		zeError("Can not read XML file, file name : %s.", FilePath);
-		return false;
-	}
-
-	TiXmlElement* CurrentNode = XMLDocument.FirstChildElement();
-
-	if (CurrentNode == NULL)
-	{
-		zeError("Can not read XML file's first element.");
-		return false;
-	}
-
-	ReadFromXML(CurrentNode);	
-
-	return true;
-}
-
-bool ZEMLNode::ReadFromXML(TiXmlElement* Element)
-{
-	SetName(Element->Value());
-	TiXmlNode* CurrentNode = NULL;
-
-	while(CurrentNode = Element->IterateChildren(CurrentNode ))
-	{
-		if(CurrentNode == NULL)
-			return false;
-
-		TiXmlElement* CurrentElement = CurrentNode->ToElement();
-
-		if(strcmp(CurrentElement->Attribute("Type"), "ZEML_ET_NODE") == 0)
-			AddSubNode()->ReadFromXML(CurrentElement);
-		else if(strcmp(CurrentElement->Attribute("Type"), "ZEML_ET_INLINE_DATA") == 0)
-			AddDataProperty()->ReadFromXML(CurrentElement);
-		else
-			AddProperty()->ReadFromXML(CurrentElement);
-	}
-
-	return true;
-}
-
-bool ZEMLNode::AddItem(ZEMLItem* Item)
-{
-	if (Item == NULL)
-	{
-		zeError("Given item for addition is NULL.");
-		return false;
-	}
-
-	if(Item->GetType() == ZEML_ET_NODE)
-	{
-		AddSubNode((ZEMLNode*)Item);
+	if (Elements.Exists(Element))
 		return true;
-	}
-	else if (Item->GetType() == ZEML_ET_INLINE_DATA)
-	{
-		return AddDataProperty((ZEMLDataProperty*)Item);
-	}	
-	else
-	{
-		return AddProperty((ZEMLProperty*)Item);
-	}
 
-	zeError("Can not add item, type is not supported.");
-	return false;
+	Element->Parent = this;
+	Elements.Append(Element);
+
+	return true;
 }
 
-bool ZEMLNode::RemoveItem(ZEMLItem* Item)
+bool ZEMLNode::RemoveElement(ZEMLElement* Element)
 {
-	if(Item == NULL)
+	Elements.Remove(Element);
+	return true;
+}
+
+ZEMLNode* ZEMLNode::AddNode(const char* Name)
+{
+	ZEPointer<ZEMLNode> Element = new ZEMLNode(Name);
+	if (!AddElement(Element))
 	{
-		zeError("Given item for removal is NULL.");
+		Element.Release();
+		return NULL;
+	}
+	else
+	{
+		return Element.Transfer();
+	}
+}
+
+ZEMLProperty* ZEMLNode::AddProperty(const char* Name)
+{
+	ZEPointer<ZEMLProperty> Element = new ZEMLProperty(Name);
+	if (!AddElement(Element))
+	{
+		Element.Release();
+		return NULL;
+	}
+	else
+	{
+		return Element.Transfer();
+	}
+}
+
+ZEMLProperty* ZEMLNode::AddProperty(const char* Name, const ZEValue& Value)
+{
+	if (ZEMLUtils::ConvertType(Value.GetType()) == ZEML_ET_UNDEFINED)
 		return false;
+	
+	ZEPointer<ZEMLProperty> Element = new ZEMLProperty(Name);
+	if (!AddElement(Element))
+	{
+		Element.Release();
+		return NULL;
+	}
+	else
+	{
+		return Element.Transfer();
 	}
 
-	if(Item->GetType() == ZEML_ET_NODE)
-		return RemoveSubNode((ZEMLNode*)Item);
-	else if (Item->GetType() == ZEML_ET_INLINE_DATA)
-		return RemoveDataProperty((ZEMLDataProperty*)Item);
-	else
-		return RemoveProperty((ZEMLProperty*)Item);
+}
 
-	zeError("Can not remove item, type is not supported.");
-	return false;
+ZEMLData* ZEMLNode::AddData(const char* Name)
+{
+	ZEPointer<ZEMLData> Element = new ZEMLData(Name);
+	if (!AddElement(Element))
+	{
+		Element.Release();
+		return NULL;
+	}
+	else
+	{
+		return Element.Transfer();
+	}
+}
+
+ZEMLData* ZEMLNode::AddData(const char* Name ,void* Data, ZEUInt64 DataSize)
+{
+	ZEPointer<ZEMLData> Element = new ZEMLData(Name, Data, DataSize);
+	if (!AddElement(Element))
+	{
+		Element.Release();
+		return NULL;
+	}
+	else
+	{
+		return Element.Transfer();
+	}
+}
+
+ZEMLNode::ZEMLNode()
+{
+
+}
+
+ZEMLNode::ZEMLNode(const char* Name)
+{
+	SetName(Name);
+}
+
+ZEMLNode::~ZEMLNode()
+{
+
 }

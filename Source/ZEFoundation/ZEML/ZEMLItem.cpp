@@ -36,168 +36,30 @@
 #include "ZEMLItem.h"
 #include "ZEError.h"
 
-ZEMLItem::ZEMLItem()
+ZEMLNode* ZEMLElement::GetParent()
 {
-	Type = (ZEUInt8)ZEML_ET_UNDEFINED;
-	DataSize = 0;
-	Parent = NULL;
-	FilePosition = 0;
+	return Parent;
 }
 
-ZEMLItem::~ZEMLItem()
+bool ZEMLElement::SetName(const char* Name) 
 {
-
-}
-
-void ZEMLItem::SetType(ZEMLElementType Type)
-{
-	this->Type = (ZEUInt8)Type;
-}
-
-ZEMLElementType ZEMLItem::GetType() const
-{
-	return (ZEMLElementType)Type;
-}
-
-ZEString ZEMLItem::GetTypeText()
-{
-	switch (GetType())
+	if(strlen(Name) + 1 > 255)
 	{
-		case ZEML_ET_UNDEFINED:
-			return "ZEML_ET_UNDEFINED";
-			break;
-		case ZEML_ET_FLOAT:
-			return "ZEML_ET_FLOAT";
-			break;
-		case ZEML_ET_DOUBLE:
-			return "ZEML_ET_DOUBLE";
-			break;
-		case ZEML_ET_INT8:
-			return "ZEML_ET_INT8";
-			break;
-		case ZEML_ET_INT16:
-			return "ZEML_ET_INT16";
-			break;
-		case ZEML_ET_INT32:
-			return "ZEML_ET_INT32";
-			break;
-		case ZEML_ET_INT64:
-			return "ZEML_ET_INT64";
-			break;
-		case ZEML_ET_UINT8:
-			return "ZEML_ET_UINT8";
-			break;
-		case ZEML_ET_UINT16:
-			return "ZEML_ET_UINT16";
-			break;
-		case ZEML_ET_UINT32:
-			return "ZEML_ET_UINT32";
-			break;
-		case ZEML_ET_UINT64:
-			return "ZEML_ET_UINT64";
-			break;
-		case ZEML_ET_BOOLEAN:
-			return "ZEML_ET_BOOLEAN";
-		case ZEML_ET_STRING:
-			return "ZEML_ET_STRING";
-			break;
-		case ZEML_ET_QUATERNION:
-			return "ZEML_ET_QUATERNION";
-			break;
-		case ZEML_ET_VECTOR2:
-			return "ZEML_ET_VECTOR2";
-			break;
-		case ZEML_ET_VECTOR3:
-			return "ZEML_ET_VECTOR3";
-			break;
-		case ZEML_ET_VECTOR4:
-			return "ZEML_ET_VECTOR4";
-			break;
-		case ZEML_ET_MATRIX3X3:
-			return "ZEML_ET_MATRIX3X3";
-			break;
-		case ZEML_ET_MATRIX4X4:
-			return "ZEML_ET_MATRIX4X4";
-			break;
-		case ZEML_ET_INLINE_DATA:
-			return "ZEML_ET_INLINE_DATA";
-			break;
-		case ZEML_ET_OFFSET_DATA:
-			return "ZEML_ET_OFFSET_DATA";
-			break;
-		case ZEML_ET_NODE:
-			return "ZEML_ET_NODE";
-			break;
-	}	
-}
-
-ZEMLElementType ZEMLItem::GetTypeFromText(ZEString TypeText)
-{
-	if(TypeText == "ZEML_ET_FLOAT")
-		return ZEML_ET_FLOAT;
-	else if(TypeText == "ZEML_ET_DOUBLE")
-		return ZEML_ET_DOUBLE;
-	else if(TypeText == "ZEML_ET_INT8")
-		return ZEML_ET_INT8;
-	else if(TypeText == "ZEML_ET_INT16")
-		return ZEML_ET_INT16;
-	else if(TypeText == "ZEML_ET_INT32")
-		return ZEML_ET_INT32;
-	else if(TypeText == "ZEML_ET_INT64")
-		return ZEML_ET_INT64;
-	else if(TypeText == "ZEML_ET_UINT8")
-		return ZEML_ET_UINT8;
-	else if(TypeText == "ZEML_ET_UINT16")
-		return ZEML_ET_UINT16;
-	else if(TypeText == "ZEML_ET_UINT32")
-		return ZEML_ET_UINT32;
-	else if(TypeText == "ZEML_ET_UINT64")
-		return ZEML_ET_UINT64;
-	else if(TypeText == "ZEML_ET_BOOLEAN")
-		return ZEML_ET_BOOLEAN;
-	else if(TypeText == "ZEML_ET_STRING")
-		return ZEML_ET_STRING;
-	else if(TypeText == "ZEML_ET_QUATERNION")
-		return ZEML_ET_QUATERNION;
-	else if(TypeText == "ZEML_ET_VECTOR2")
-		return ZEML_ET_VECTOR2;
-	else if(TypeText == "ZEML_ET_VECTOR3")
-		return ZEML_ET_VECTOR3;
-	else if(TypeText == "ZEML_ET_VECTOR4")
-		return ZEML_ET_VECTOR4;
-	else if(TypeText == "ZEML_ET_MATRIX3X3")
-		return ZEML_ET_MATRIX3X3;
-	else if(TypeText == "ZEML_ET_MATRIX4X4")
-		return ZEML_ET_MATRIX4X4;
-	else if(TypeText == "ZEML_ET_INLINE_DATA")
-		return ZEML_ET_INLINE_DATA;
-	else if(TypeText == "ZEML_ET_OFFSET_DATA")
-		return ZEML_ET_OFFSET_DATA;
-	else if(TypeText == "ZEML_ET_NODE")
-		return ZEML_ET_NODE;
-	else
-		return ZEML_ET_UNDEFINED;
-}
-
-ZEUInt64 ZEMLItem::GetFilePosition()
-{
-	return FilePosition;
-}
-
-void ZEMLItem::SetName(const ZEString& Name)
-{
-	if(Name.GetSize() > 255)
 		zeError("ZEMLProperty name too long. Name size must be smaller than 256");
+		return false;
+	}
 
 	this->Name = Name;
+
+	return true;
 }
 
-const ZEString& ZEMLItem::GetName() const
+const ZEString& ZEMLElement::GetName()
 {
 	return Name;
 }
 
-ZEUInt64 ZEMLItem::GetDataSize()
+ZEMLElement::ZEMLElement()
 {
-	return DataSize;
+	Parent = NULL;
 }

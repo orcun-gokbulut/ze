@@ -38,92 +38,39 @@
 #define __ZEML_NODE_H__
 
 #include "ZEMLItem.h"
-#include "ZEDS/ZEList.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZEValue.h"
-#include "ZEEndian.h"
 
-class ZEFile;
 class ZEMLProperty;
-class ZEMLDataProperty;
-class TiXmlElement;
+class ZEMLData;
 
-class ZEMLNode : public ZEMLItem
+class ZEMLNode : public ZEMLElement
 {
 	private:
-		ZEList<ZEMLNode>			SubNodes;
-		ZEArray<ZEMLItem*>			Properties;
-		ZEUInt64					NodeSize;
-
-	protected:
-		virtual bool				WriteSelf(ZEFile* File);
-		virtual bool				WriteSelfToXML(TiXmlElement* XMLElement);
-		virtual bool				ReadSelf(ZEFile* File, bool DeferredDataReading);
-		bool						ReadFromXML(TiXmlElement* Element);
-
-		bool						RemoveSubNode(ZEMLNode* SubNode);
-		bool						RemoveProperty(ZEMLProperty* Property);
-		bool						RemoveDataProperty(ZEMLDataProperty* Property);
+		ZEList<ZEMLElement>			Elements;
 
 	public:
+		virtual ZEMLElementType1	GetType();
+		virtual ZESize				GetSize();
 
-		virtual ZEUInt64			GetTotalSize();
+		const ZEList<ZEMLElement>&	GetElements();
 
-		bool						AddItem(ZEMLItem* Item);
-		bool						RemoveItem(ZEMLItem* Item);
+		ZEMLElement*				FindElement(const char* Name, ZEMLElementType1 Type = ZEML_ET_ALL, ZESize Index = 0);
+		ZEArray<ZEMLElement*>		FindElements(ZEMLElementType1 Type);
+		ZEArray<ZEMLElement*>		FindElements(const char* Name, ZEMLElementType1 Type = ZEML_ET_ALL);
 
-		ZEMLProperty*				AddProperty();
-		bool						AddProperty(ZEMLProperty* Property);
-		ZEMLProperty*				AddProperty(const ZEString& Name);
-		ZEMLProperty*				AddProperty(const ZEString& Name, const ZEValue& Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, float Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, double Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, ZEInt8 Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, ZEInt16 Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, ZEInt32 Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, ZEInt64 Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, ZEUInt8 Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, ZEUInt16 Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, ZEUInt32 Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, ZEUInt64 Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, bool Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, const ZEString& Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, const char* Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, const ZEQuaternion& Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, const ZEVector2& Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, const ZEVector3& Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, const ZEVector4& Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, const ZEMatrix3x3& Value);
-		ZEMLProperty*				AddProperty(const ZEString& Name, const ZEMatrix4x4& Value);
+		bool						AddElement(ZEMLElement* Item);
+		bool						RemoveElement(ZEMLElement* Item);
 
-		ZEMLDataProperty*			AddDataProperty();
-		bool						AddDataProperty(ZEMLDataProperty* Property);
-		ZEMLDataProperty*			AddDataProperty(const ZEString& Name);
-		ZEMLDataProperty*			AddDataProperty(const ZEString& Name ,void* Data, ZEUInt64 DataSize, bool Cache = true);
+		ZEMLNode*					AddNode(const char* Name);
 
-		ZEMLNode*					AddSubNode();
-		void						AddSubNode(ZEMLNode* Node);
-		ZEMLNode*					AddSubNode(const ZEString& Name);
-		bool						InsertSubNode(ZEMLNode* Node, ZESize Index);
-		ZEMLNode*					InsertSubNode(const ZEString& Name, ZESize Index);
-		
+		ZEMLProperty*				AddProperty(const char* Name);
+		ZEMLProperty*				AddProperty(const char* Name, const ZEValue& Value);
 
-		const ZEList<ZEMLNode>&		GetSubNodes() const;
-		const ZEArray<ZEMLNode*>	GetSubNodes(const ZEString& NodeName);
-		const ZEArray<ZEMLItem*>&	GetProperties() const;
-		const ZEMLItem*				GetProperty(const ZEString& PropertyName);
-
-		const ZEMLNode*				GetParent();
-
-		bool						Write(ZEFile* File);
-		bool						WriteToXMLFile(const char* FilePath);
-		bool						Read(ZEFile* File, bool DeferredDataReading = false);
-		bool						ReadFromXMLFile(const char* FilePath);
-
+		ZEMLData*					AddData(const char* Name);
+		ZEMLData*					AddData(const char* Name, void* Data, ZEUInt64 DataSize);
+	
 									ZEMLNode();
-									ZEMLNode(const ZEString& Name);
-
+									ZEMLNode(const char* Name);
 									~ZEMLNode();
 };
 
