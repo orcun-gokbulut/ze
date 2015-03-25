@@ -105,6 +105,6 @@ class ZEMLUtils
 {
 	public:	
 		static ZEMLElementType ConvertType(ZEValueType Type);
-		static ZEMLValueType ConvertType1(ZEValueType Type);
+		static ZEMLValueType ConvertValueType(ZEValueType Type);
 };
 #endif

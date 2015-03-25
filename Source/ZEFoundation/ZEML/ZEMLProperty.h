@@ -50,14 +50,33 @@ class ZEMLProperty : public ZEMLElement
 		virtual ZEMLElementType1	GetType();
 		virtual ZESize				GetSize();
 
+		ZEMLValueType				GetValueType();
+
 		bool						SetValue(const ZEValue& Value);
 		const ZEValue&				GetValue() const;
 
-		ZEMLValueType				GetValueType();
+		void						SetFloat(float Value);
+		void						SetDouble(double Value);
+		void						SetInt8(ZEInt8 Value);
+		void						SetInt16(ZEInt16 Value);
+		void						SetInt32(ZEInt32 Value);
+		void						SetInt64(ZEInt64 Value);
+		void						SetUInt8(ZEUInt8 Value);
+		void						SetUInt16(ZEUInt16 Value);
+		void						SetUInt32(ZEUInt32 Value);
+		void						SetUInt64(ZEUInt64 Value);
+		void						SetBool(bool Value);
+		void						SetString(const char* Value);
+		void						SetQuaternion(const ZEQuaternion& Value);
+		void						SetVector2(const ZEVector2& Value);
+		void						SetVector3(const ZEVector3& Value);
+		void						SetVector4(const ZEVector4& Value);
+		void						SetMatrix3x3(const ZEMatrix3x3& Value);
+		void						SetMatrix4x4(const ZEMatrix4x4& Value);
 
 									ZEMLProperty();
 									ZEMLProperty(const char* Name);
-									ZEMLProperty(const char* Name ,const ZEValue& Value);
+									ZEMLProperty(const char* Name, const ZEValue& Value);
 };
 
 #endif

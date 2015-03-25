@@ -43,12 +43,17 @@ ZEMLElementType1 ZEMLProperty::GetType()
 
 ZESize ZEMLProperty::GetSize()
 {
-	return Value.SizeOf();
+	ZESize Size = 1 +				// Identifier
+		1 + GetName().GetLength() +	// Name
+		8 +							// Size;
+		Value.SizeOf();				// Data
+
+	return Size;
 }
 
 bool ZEMLProperty::SetValue(const ZEValue& Value)
 {
-	ZEMLElementType ValueType = ZEMLUtils::ConvertType(Value.GetType());
+	ZEMLValueType ValueType = ZEMLUtils::ConvertValueType(Value.GetType());
 	if (ValueType == ZEML_ET_UNDEFINED)
 	{
 		zeError("Cannot set ZEMLProperty value. Unsupported ZEValue type.");
@@ -67,7 +72,7 @@ const ZEValue& ZEMLProperty::GetValue() const
 
 ZEMLValueType ZEMLProperty::GetValueType()
 {
-	return (ZEMLValueType)ZEMLUtils::ConvertType(Value.GetType());
+	return (ZEMLValueType)ZEMLUtils::ConvertValueType(Value.GetType());
 }
 
 ZEMLProperty::ZEMLProperty()

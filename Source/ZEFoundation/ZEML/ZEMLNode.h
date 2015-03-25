@@ -38,15 +38,22 @@
 #define __ZEML_NODE_H__
 
 #include "ZEMLItem.h"
+#include "ZEDS/ZEList.h"
 #include "ZEDS/ZEArray.h"
 
 class ZEMLProperty;
 class ZEMLData;
+class ZEMLReaderNode;
+class ZEMLWriterNode;
 
 class ZEMLNode : public ZEMLElement
 {
+	friend class ZEMLRoot;
 	private:
 		ZEList<ZEMLElement>			Elements;
+
+		bool						Read(ZEMLReaderNode* Reader);
+		bool						Write(ZEMLWriterNode* Writer);
 
 	public:
 		virtual ZEMLElementType1	GetType();
@@ -54,21 +61,22 @@ class ZEMLNode : public ZEMLElement
 
 		const ZEList<ZEMLElement>&	GetElements();
 
-		ZEMLElement*				FindElement(const char* Name, ZEMLElementType1 Type = ZEML_ET_ALL, ZESize Index = 0);
-		ZEArray<ZEMLElement*>		FindElements(ZEMLElementType1 Type);
-		ZEArray<ZEMLElement*>		FindElements(const char* Name, ZEMLElementType1 Type = ZEML_ET_ALL);
+		ZEMLElement*				GetElement(const char* Name, ZEMLElementType1 Type = ZEML_ET_ALL, ZESize Index = 0);
+		ZEArray<ZEMLElement*>		GetElements(ZEMLElementType1 Type);
+		ZEArray<ZEMLElement*>		GetElements(const char* Name = NULL, ZEMLElementType1 Type = ZEML_ET_ALL);
 
+		ZEMLNode*					GetNode(const char* Name, ZESize Index = 0);
+		ZEArray<ZEMLNode*>			GetNodes(const char* Name = NULL);
+		ZEMLProperty*				GetProperty(const char* Name);
+		ZEMLData*					GetData(const char* Name);
+		
 		bool						AddElement(ZEMLElement* Item);
 		bool						RemoveElement(ZEMLElement* Item);
 
 		ZEMLNode*					AddNode(const char* Name);
-
 		ZEMLProperty*				AddProperty(const char* Name);
-		ZEMLProperty*				AddProperty(const char* Name, const ZEValue& Value);
-
 		ZEMLData*					AddData(const char* Name);
-		ZEMLData*					AddData(const char* Name, void* Data, ZEUInt64 DataSize);
-	
+
 									ZEMLNode();
 									ZEMLNode(const char* Name);
 									~ZEMLNode();

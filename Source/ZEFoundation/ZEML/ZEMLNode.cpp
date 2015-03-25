@@ -36,6 +36,71 @@
 #include "ZEMLNode.h"
 #include "ZEMLProperty.h"
 #include "ZEMLDataProperty.h"
+#include "ZEMLReader.h"
+#include "ZEMLWriter.h"
+
+bool ZEMLNode::Read(ZEMLReaderNode* Reader)
+{
+	const ZESmartArray<ZEMLReaderSubNode>& Nodes = Reader->GetSubNodes();
+	for (ZESize I = 0; I < Nodes.GetCount(); I++)
+	{
+		ZEMLNode* NewNode = AddNode(Nodes[I].Name);
+		ZEMLReaderNode NewReaderNode = Reader->GetSubNode(Nodes[I].Name, Nodes[I].Index);
+		if (!NewNode->Read(&NewReaderNode))
+			return false;
+	}
+
+	const ZESmartArray<ZEMLReaderProperty>& Properties = Reader->GetProperties();
+	for (ZESize I = 0; I < Properties.GetCount(); I++)
+	{
+		if (Properties[I].Type == ZEML_ET_INLINE_DATA || Properties[I].Type == ZEML_ET_OFFSET_DATA)
+		{
+			ZEMLData* NewData = AddData(Properties[I].Name);
+			NewData->Allocate(Properties[I].DataSize);
+			Reader->ReadData(Properties[I].Name, const_cast<void*>(NewData->GetData()), NewData->GetSize());
+		}
+		else
+		{
+			ZEMLProperty* NewProperty = AddProperty(Properties[I].Name);
+			if (NewProperty != NULL)
+				NewProperty->SetValue(Properties[I].Value);
+		}
+	}
+
+	return false;
+}
+
+bool ZEMLNode::Write(ZEMLWriterNode* WriterNode)
+{
+	ZEMLWriterNode NewWriterNode = WriterNode->OpenSubNode(Name);
+	for (ZESize I = 0; I < Elements.GetCount(); I++)
+	{
+		if (Elements[I]->GetType() == ZEML_ET_NODE)
+		{
+			ZEMLNode* Node = static_cast<ZEMLNode*>(Elements[I]);
+			if (!Node->Write(&NewWriterNode))
+				return false;
+		}
+		else if (Elements[I]->GetType() == ZEML_ET_PROPERTY)
+		{
+			ZEMLProperty* Property = static_cast<ZEMLProperty*>(Elements[I]);
+			if (!NewWriterNode.WriteValue(Property->GetName(), Property->GetValue()))
+				return false;
+		}
+		else if (Elements[I]->GetType() == ZEML_ET_DATA)
+		{
+			ZEMLData* Data = static_cast<ZEMLData*>(Elements[I]);
+			if (!NewWriterNode.WriteData(Data->GetName(), Data->GetData(), Data->GetSize()))
+				return false;
+		}
+		else
+		{
+			continue;
+		}
+	}
+
+	return true;
+}
 
 ZEMLElementType1 ZEMLNode::GetType()
 {
@@ -44,7 +109,16 @@ ZEMLElementType1 ZEMLNode::GetType()
 
 ZESize ZEMLNode::GetSize()
 {
-	return 0;
+	ZESize Size = 1 +			// Identifier
+		1 + Name.GetLength() +	// Name
+		8 +						// Size
+		8;						// Element Count
+
+	ZEList<ZEMLElement>::Iterator Iterator = Elements.GetIterator();
+	while(!Iterator.IsEnd())
+		Size += Iterator->GetSize();
+
+	return Size;
 }
 
 const ZEList<ZEMLElement>& ZEMLNode::GetElements()
@@ -52,7 +126,7 @@ const ZEList<ZEMLElement>& ZEMLNode::GetElements()
 	return Elements;
 }
 
-ZEMLElement* ZEMLNode::FindElement(const char* Name, ZEMLElementType1 Type, ZESize Index)
+ZEMLElement* ZEMLNode::GetElement(const char* Name, ZEMLElementType1 Type, ZESize Index)
 {
 	ZEList<ZEMLElement>::Iterator Iterator = Elements.GetIterator();
 	while(!Iterator.IsEnd())
@@ -71,7 +145,7 @@ ZEMLElement* ZEMLNode::FindElement(const char* Name, ZEMLElementType1 Type, ZESi
 	return NULL;
 }
 
-ZEArray<ZEMLElement*> ZEMLNode::FindElements(ZEMLElementType1 Type)
+ZEArray<ZEMLElement*> ZEMLNode::GetElements(ZEMLElementType1 Type)
 {
 	ZEArray<ZEMLElement*> FoundElements;
 
@@ -87,20 +161,53 @@ ZEArray<ZEMLElement*> ZEMLNode::FindElements(ZEMLElementType1 Type)
 	return FoundElements;
 }
 
-ZEArray<ZEMLElement*> ZEMLNode::FindElements(const char* Name, ZEMLElementType1 Type)
+ZEArray<ZEMLElement*> ZEMLNode::GetElements(const char* Name, ZEMLElementType1 Type)
 {
 	ZEArray<ZEMLElement*> FoundElements;
 
 	ZEList<ZEMLElement>::Iterator Iterator = Elements.GetIterator();
 	while(!Iterator.IsEnd())
 	{
-		if (Iterator->GetName() == Name && (Type == ZEML_ET_ALL || Iterator->GetType() == Type))
+		if ((Name == NULL || Iterator->GetName() == Name) && 
+			(Type == ZEML_ET_ALL || Iterator->GetType() == Type))
 			FoundElements.Add(Iterator.GetItem());
 
 		Iterator++;
 	}
 
 	return FoundElements;
+}
+
+ZEMLNode* ZEMLNode::GetNode(const char* Name, ZESize Index)
+{
+	return (ZEMLNode*)GetElement(Name, ZEML_ET1_NODE, Index);
+}
+
+ZEArray<ZEMLNode*> ZEMLNode::GetNodes(const char* Name)
+{
+	ZEArray<ZEMLNode*> FoundElements;
+
+	ZEList<ZEMLElement>::Iterator Iterator = Elements.GetIterator();
+	while(!Iterator.IsEnd())
+	{
+		if ((Name == NULL || Iterator->GetName() == Name) && 
+			(Iterator->GetType() == ZEML_ET1_NODE))
+			FoundElements.Add((ZEMLNode*)Iterator.GetItem());
+
+		Iterator++;
+	}
+
+	return FoundElements;
+}
+
+ZEMLProperty* ZEMLNode::GetProperty(const char* Name)
+{
+	return (ZEMLProperty*)GetElement(Name, ZEML_ET_PROPERTY);
+}
+
+ZEMLData* ZEMLNode::GetData(const char* Name)
+{
+	return (ZEMLData*)GetElement(Name, ZEML_ET_DATA);
 }
 
 bool ZEMLNode::AddElement(ZEMLElement* Element)
@@ -148,41 +255,9 @@ ZEMLProperty* ZEMLNode::AddProperty(const char* Name)
 	}
 }
 
-ZEMLProperty* ZEMLNode::AddProperty(const char* Name, const ZEValue& Value)
-{
-	if (ZEMLUtils::ConvertType(Value.GetType()) == ZEML_ET_UNDEFINED)
-		return false;
-	
-	ZEPointer<ZEMLProperty> Element = new ZEMLProperty(Name);
-	if (!AddElement(Element))
-	{
-		Element.Release();
-		return NULL;
-	}
-	else
-	{
-		return Element.Transfer();
-	}
-
-}
-
 ZEMLData* ZEMLNode::AddData(const char* Name)
 {
 	ZEPointer<ZEMLData> Element = new ZEMLData(Name);
-	if (!AddElement(Element))
-	{
-		Element.Release();
-		return NULL;
-	}
-	else
-	{
-		return Element.Transfer();
-	}
-}
-
-ZEMLData* ZEMLNode::AddData(const char* Name ,void* Data, ZEUInt64 DataSize)
-{
-	ZEPointer<ZEMLData> Element = new ZEMLData(Name, Data, DataSize);
 	if (!AddElement(Element))
 	{
 		Element.Release();

@@ -46,22 +46,32 @@ class ZEMLData : public ZEMLElement
 {
 	friend class ZEMLNode;
 	private:
-		ZEPointer<ZEBYTE>			Data;
+		void*						Data;
 		ZESize						DataSize;
-		ZEUInt64					Offset;
-		ZEFile*						File;
+
+		bool						Referred;
+
+		bool						Deferred;
+		ZEFile*						DeferredFile;
+		ZEUInt64					DeferredOffset;
+
+		void						LoadDeferred();
 
 	public:
 		virtual ZEMLElementType1	GetType();
 		virtual ZESize				GetSize();
 
-		void						SetData(void* Data, ZESize DataSize);
+		void						Allocate(ZESize DataSize);
+		void						Deallocate();
+
+		void						SetData(void* Data, ZESize DataSize, bool Referred = false);
 		const void*					GetData();
 		ZESize						GetDataSize();
 
 									ZEMLData();
 									ZEMLData(const char* Name);
-									ZEMLData(const char* Name, void* Data, ZESize DataSize);
+									ZEMLData(const char* Name, void* Data, ZESize DataSize,  bool Referred = false);
+									~ZEMLData();
 };
 
 #endif

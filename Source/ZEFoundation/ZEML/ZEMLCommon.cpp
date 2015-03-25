@@ -103,7 +103,7 @@ ZEMLElementType ZEMLUtils::ConvertType(ZEValueType Type)
 
 
 
-ZEMLElementType ZEMLUtils::ConvertType1(ZEValueType Type)
+ZEMLValueType ZEMLUtils::ConvertValueType(ZEValueType Type)
 {
 	switch (Type)
 	{
