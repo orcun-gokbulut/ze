@@ -108,21 +108,21 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 		return true;
 	}
 
-	ZEMLNode* DoorsNode = InteriorNode.AddSubNode("Doors");
+	ZEMLNode* DoorsNode = InteriorNode.AddNode("Doors");
 
 	INode* RoomANode;
 	INode* RoomBNode;
 
 	for (ZESize I = 0; I < (ZESize)Doors.Count(); I++)
 	{
-		ZEMLNode* DoorNode = DoorsNode->AddSubNode("Door");
+		ZEMLNode* DoorNode = DoorsNode->AddNode("Door");
 
 		IGameNode* CurrentNode = Doors[I];
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		ZEProgressDialog::GetInstance()->OpenTask(CurrentNode->GetName());
 		zeLog("Processing Door \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Doors.Count());
 		
-		DoorNode->AddProperty("Name", CurrentNode->GetName());
+		DoorNode->AddProperty("Name")->SetString(CurrentNode->GetName());
 
 		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_BOOL_PROP, "IsOpen", *DoorNode->AddProperty("IsOpen")))
 			zeError("Can not find door property : \"IsOpen\".");
@@ -150,9 +150,9 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 		if (!OffsetTransform.Equals(ZEMatrix4x4::Identity, 0.0000001f))
 			zeWarning("Pivot transformations are omitted for ZEInteriorDoor. The pivot for ZEInteriorDoor: %s is returned to it's Identity state.", CurrentNode->GetName());
 
-		DoorNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Translation()));
-		DoorNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Rotation()));
-		DoorNode->AddProperty("Scale", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Scaling()));
+		DoorNode->AddProperty("Position")->SetVector3(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Translation()));
+		DoorNode->AddProperty("Rotation")->SetQuaternion(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Rotation()));
+		DoorNode->AddProperty("Scale")->SetVector3(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Scaling()));
 
 		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, "RoomA", RoomANode))
 			zeError("Can not find door property: RoomA");
@@ -171,20 +171,20 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 		if(RoomAIndex < 0)
 			zeError("Can nor find RoomAIndex.");
 		
-		DoorNode->AddProperty("RoomAIndex", RoomAIndex);
+		DoorNode->AddProperty("RoomAIndex")->SetInt32(RoomAIndex);
 
 		ZEInt32 RoomBIndex = FindRoomIndex(Scene->GetIGameNode(RoomBNode));
 
 		if(RoomBIndex < 0)
 			zeError("Can nor find RoomBIndex.");
 
-		DoorNode->AddProperty("RoomBIndex", RoomBIndex);
+		DoorNode->AddProperty("RoomBIndex")->SetInt32(RoomBIndex);
 
 		MSTR UserDefinedPropertiesBuffer;
 		CurrentNode->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
 
 		if (!UserDefinedPropertiesBuffer.isNull())
-			DoorNode->AddProperty("UserDefinedProperties", ZEString(UserDefinedPropertiesBuffer.data()));
+			DoorNode->AddProperty("UserDefinedProperties")->SetString(UserDefinedPropertiesBuffer.data());
 	
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
@@ -213,7 +213,7 @@ void ZE3dsMaxInteriorExporter::ProcessPhysicalMesh(IGameNode* ParentNode, IGameN
 		Polygons[I].Indices[2] = Face->vert[2]; 
 	}
 
-	PhysicalMeshNode->AddDataProperty("Polygons", Polygons.GetCArray(), sizeof(ZEInteriorFilePhysicalMeshPolygon) * Polygons.GetCount(), true);
+	PhysicalMeshNode->AddData("Polygons")->SetData(Polygons.GetCArray(), sizeof(ZEInteriorFilePhysicalMeshPolygon) * Polygons.GetCount(), false);
 
 	ZEArray<ZEVector3> Vertices;
 	Vertices.SetCount((ZESize)Mesh->GetNumberOfVerts());
@@ -246,7 +246,7 @@ void ZE3dsMaxInteriorExporter::ProcessPhysicalMesh(IGameNode* ParentNode, IGameN
 		ZEMatrix4x4::Transform(Vertices[I], TotalTransform, ZE3dsMaxUtils::MaxtoZE(TempObjectVertex));
 	}
 
-	PhysicalMeshNode->AddDataProperty("Vertices", Vertices.GetCArray(), sizeof(ZEVector3) * Vertices.GetCount(), true);
+	PhysicalMeshNode->AddData("Vertices")->SetData(Vertices.GetCArray(), sizeof(ZEVector3) * Vertices.GetCount(), false);
 }
 
 bool ZE3dsMaxInteriorExporter::ProcessRooms()
@@ -259,31 +259,36 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 		return false;
 	}
 
-	ZEMLNode* RoomsNode = InteriorNode.AddSubNode("Rooms");
+	ZEMLNode* RoomsNode = InteriorNode.AddNode("Rooms");
 
 	for (ZESize I = 0; I < (ZESize)Rooms.Count(); I++)
 	{
-		ZEMLNode* RoomNode = RoomsNode->AddSubNode("Room");
+		ZEMLNode* RoomNode = RoomsNode->AddNode("Room");
 
 		IGameNode* CurrentNode = Rooms[I];
 		ZEProgressDialog::GetInstance()->OpenTask(CurrentNode->GetName());
 		zeLog("Processing Room \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Rooms.Count());
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
-		bool PhysicalMeshExists, PhysicalMeshEnabled, PhysicalMeshUseSelf;
+		bool PhysicalMeshExists, PhysicalMeshEnabled, PhysicalMeshUseSelf, OctreeEnabled;
 		INode* PhysicalMeshMaxNode;
 		IGameNode* PhysicalMeshNode;
 
-		RoomNode->AddProperty("Name", CurrentNode->GetName());
+		RoomNode->AddProperty("Name")->SetString(CurrentNode->GetName());
 
-		RoomNode->AddProperty("Position", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Translation()));
-		RoomNode->AddProperty("Rotation", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Rotation()));
-		RoomNode->AddProperty("Scale", ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Scaling()));
+		RoomNode->AddProperty("Position")->SetVector3(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Translation()));
+		RoomNode->AddProperty("Rotation")->SetQuaternion(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Rotation()));
+		RoomNode->AddProperty("Scale")->SetVector3(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Scaling()));
 
 		MSTR UserDefinedPropertiesBuffer;
 		CurrentNode->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
 
 		if (!UserDefinedPropertiesBuffer.isNull())
-			RoomNode->AddProperty("UserDefinedProperties", ZEString(UserDefinedPropertiesBuffer.data()));
+			RoomNode->AddProperty("UserDefinedProperties")->SetString(UserDefinedPropertiesBuffer.data());
+
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "OctreeEnabled", OctreeEnabled))
+			zeError("Can not find room property : \"OctreeEnabled\".");
+		else
+			RoomNode->AddProperty("GenerateOctree")->SetBool(OctreeEnabled);
 
 		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "PhysicalMeshExists", PhysicalMeshExists))
 			zeError("Can not find room property : \"PhysicalMeshExists\".");
@@ -302,14 +307,14 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 		{
 			if (PhysicalMeshUseSelf)
 			{
-				ZEMLNode* PhysicalMeshZEMLNode = RoomNode->AddSubNode("PhysicalMesh");
-				PhysicalMeshZEMLNode->AddProperty("PhysicalMeshEnabled", PhysicalMeshEnabled);
+				ZEMLNode* PhysicalMeshZEMLNode = RoomNode->AddNode("PhysicalMesh");
+				PhysicalMeshZEMLNode->AddProperty("PhysicalMeshEnabled")->SetBool(PhysicalMeshEnabled);
 
 				MSTR UserDefinedPropertiesBuffer;
 				CurrentNode->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
 
 				if (!UserDefinedPropertiesBuffer.isNull())
-					PhysicalMeshZEMLNode->AddProperty("UserDefinedProperties", ZEString(UserDefinedPropertiesBuffer.data()));
+					PhysicalMeshZEMLNode->AddProperty("UserDefinedProperties")->SetString(UserDefinedPropertiesBuffer.data());
 
 				ProcessPhysicalMesh(CurrentNode, CurrentNode, PhysicalMeshZEMLNode);
 			}
@@ -323,14 +328,14 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 				}
 				else
 				{
-					ZEMLNode* PhysicalMeshZEMLNode = RoomNode->AddSubNode("PhysicalMesh");
-					PhysicalMeshZEMLNode->AddProperty("PhysicalMeshEnabled", PhysicalMeshEnabled);
+					ZEMLNode* PhysicalMeshZEMLNode = RoomNode->AddNode("PhysicalMesh");
+					PhysicalMeshZEMLNode->AddProperty("PhysicalMeshEnabled")->SetBool(PhysicalMeshEnabled);
 
 					MSTR UserDefinedPropertiesBuffer;
 					PhysicalMeshNode->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
 
 					if (!UserDefinedPropertiesBuffer.isNull())
-						PhysicalMeshZEMLNode->AddProperty("UserDefinedProperties", ZEString(UserDefinedPropertiesBuffer.data()));
+						PhysicalMeshZEMLNode->AddProperty("UserDefinedProperties")->SetString(UserDefinedPropertiesBuffer.data());
 
 					ProcessPhysicalMesh(CurrentNode, PhysicalMeshNode, PhysicalMeshZEMLNode);
 				}
@@ -410,7 +415,7 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 			}
 		}
 
-		RoomNode->AddDataProperty("Polygons", Polygons.GetCArray(), sizeof(ZEInteriorFilePolygon) * Polygons.GetCount(), true);
+		RoomNode->AddData("Polygons")->SetData(Polygons.GetCArray(), sizeof(ZEInteriorFilePolygon) * Polygons.GetCount(), false);
 
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
@@ -428,11 +433,11 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 		return true;
 	}
 
-	ZEMLNode* HelpersNode = InteriorNode.AddSubNode("Helpers");
+	ZEMLNode* HelpersNode = InteriorNode.AddNode("Helpers");
 
 	for (ZESize I = 0; I < (ZESize)Helpers.Count(); I++)
 	{
-		ZEMLNode* HelperNode = HelpersNode->AddSubNode("Helper");
+		ZEMLNode* HelperNode = HelpersNode->AddNode("Helper");
 
 		IGameNode* Node = Helpers[I];
 		IGameObject* Helper = Node->GetIGameObject();
@@ -440,7 +445,7 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 		ZEProgressDialog::GetInstance()->OpenTask(Node->GetName());
 		zeLog("Processing helper \"%s\".", Node->GetName());
 
-		HelperNode->AddProperty("Name", Node->GetName());
+		HelperNode->AddProperty("Name")->SetString(Node->GetName());
 
 		INode* OwnerNode = NULL;
 		ZEInt32 OwnerIndex;
@@ -461,7 +466,6 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 		else
 		{
 			const char* Type;
-			bool CurrentExportOption;
 
 			ZE3dsMaxUtils::GetProperty(OwnerGameNode->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type);
 
@@ -483,8 +487,8 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 			return false;
 		}
 
-		HelperNode->AddProperty("OwnerType", (ZEInt32)OwnerType);
-		HelperNode->AddProperty("OwnerIndex", OwnerIndex);
+		HelperNode->AddProperty("OwnerType")->SetInt32((ZEInt32)OwnerType);
+		HelperNode->AddProperty("OwnerIndex")->SetInt32(OwnerIndex);
 
 		ZEMatrix4x4 FinalTransform;
 
@@ -509,15 +513,15 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 			FinalTransform = WorldTM;
 		}
 
-		HelperNode->AddProperty("Position", FinalTransform.GetTranslation());
-		HelperNode->AddProperty("Rotation", FinalTransform.GetRotation());
-		HelperNode->AddProperty("Scale", FinalTransform.GetScale());
+		HelperNode->AddProperty("Position")->SetVector3(FinalTransform.GetTranslation());
+		HelperNode->AddProperty("Rotation")->SetQuaternion(FinalTransform.GetRotation());
+		HelperNode->AddProperty("Scale")->SetVector3(FinalTransform.GetScale());
 
 		MSTR UserDefinedPropertiesBuffer;
 		Node->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
 
 		if (!UserDefinedPropertiesBuffer.isNull())
-			HelperNode->AddProperty("UserDefinedProperties", ZEString(UserDefinedPropertiesBuffer.data()));
+			HelperNode->AddProperty("UserDefinedProperties")->SetString(UserDefinedPropertiesBuffer.data());
 
 		zeLog("Helper \"%s\" is processed.", Node->GetName());
 		ZEProgressDialog::GetInstance()->CloseTask();
@@ -545,7 +549,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 		return true;
 	}
 
-	ZEMLNode* MaterialsNode = InteriorNode.AddSubNode("Materials");
+	ZEMLNode* MaterialsNode = InteriorNode.AddNode("Materials");
 
 	zeLog("Material count : %d", MaterialCount);
 
@@ -560,9 +564,9 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 
 		if(!ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 		{
-			ZEMLNode* MaterialNode = MaterialsNode->AddSubNode("Material");
-			MaterialNode->AddProperty("Name", MaterialName);
-			MaterialNode->AddProperty("FilePath", ResourceConfigurationDialog->GetResourceRelativePath(ZEString(FileName) , MaterialName + ".ZEMaterial"));
+			ZEMLNode* MaterialNode = MaterialsNode->AddNode("Material");
+			MaterialNode->AddProperty("Name")->SetString(MaterialName);
+			MaterialNode->AddProperty("FilePath")->SetString(ResourceConfigurationDialog->GetResourceRelativePath(ZEString(FileName) , MaterialName + ".ZEMaterial"));
 			continue;
 		}
 
@@ -612,7 +616,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						if(!ZEFileInfo(MaterialOption.ExportPath).Copy(MaterialOption.PhysicalPath))
+						if(!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -633,7 +637,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						if(!ZEFileInfo(MaterialOption.ExportPath).Copy(MaterialOption.PhysicalPath))
+						if(!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -654,7 +658,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						if(!ZEFileInfo(MaterialOption.ExportPath).Copy(MaterialOption.PhysicalPath))
+						if(!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -675,7 +679,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						if(!ZEFileInfo(MaterialOption.ExportPath).Copy(MaterialOption.PhysicalPath))
+						if(!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -698,7 +702,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						if(!ZEFileInfo(MaterialOption.ExportPath).Copy(MaterialOption.PhysicalPath))
+						if(!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -720,7 +724,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
 						ZEFileInfo FileInfo(MaterialOption.PhysicalPath);
-						if(!ZEFileInfo(MaterialOption.ExportPath).Copy(MaterialOption.PhysicalPath))
+						if(!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -734,90 +738,95 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 		}
 
 		zeLog("Writing material file.");
-		ZEMLWriter MaterialSerialNode("Material", &MaterialFile);
-		MaterialSerialNode.WriteProperty("Name", MaterialName);
-		ZEMLWriterNode MaterialConfigNode = MaterialSerialNode.OpenNode("Configuration");
+		ZEMLWriter MaterialWriter;
+		MaterialWriter.Open(&MaterialFile);
+		ZEMLWriterNode MaterialSerialNode = MaterialWriter.WriteRootNode("ZEMaterial");
+		MaterialSerialNode.WriteUInt8("MajorVersion", 1);
+		MaterialSerialNode.WriteUInt8("MinorVersion", 0);
+		MaterialSerialNode.WriteString("Name", MaterialName);
+		ZEMLWriterNode MaterialConfigNode = MaterialSerialNode.OpenSubNode("Configuration");
 
-		MaterialConfigNode.WriteProperty("Name", "Default");
+		MaterialConfigNode.WriteString("Name", "Default");
 		bool TempBooleanValue = false;
 		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, "wire", TempBooleanValue);
-		MaterialConfigNode.WriteProperty("Wireframe", TempBooleanValue);
+		MaterialConfigNode.WriteBool("Wireframe", TempBooleanValue);
 
 		TempBooleanValue = false;
 		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, "twoSided", TempBooleanValue);
-		MaterialConfigNode.WriteProperty("TwoSided", TempBooleanValue);
+		MaterialConfigNode.WriteBool("TwoSided", TempBooleanValue);
 
-		MaterialConfigNode.WriteProperty("LightningEnabled", true); // Lightning Enabled is forced true;
+		MaterialConfigNode.WriteBool("LightningEnabled", true); // Lightning Enabled is forced true;
 
 		float Opacity = 0.0f;
 		NodeMaterial->GetOpacityData()->GetPropertyValue(Opacity);
 
 		if (Opacity != 1.0f || strncmp(OpacityMap, "", ZE_EXFL_MAX_FILENAME_SIZE) !=0)
-			MaterialConfigNode.WriteProperty("Transparant", true);
+			MaterialConfigNode.WriteBool("Transparant", true);
 		else
-			MaterialConfigNode.WriteProperty("Transparant", false);
+			MaterialConfigNode.WriteBool("Transparant", false);
 
 		//AMBIENT
 		zeLog("Writing ambient data.");
-		MaterialConfigNode.WriteProperty("AmbientEnabled", false); //Ambient is forced false
+		MaterialConfigNode.WriteBool("AmbientEnabled", false); //Ambient is forced false
 		ZEVector3 TempVector3Value = ZEVector3::Zero;
 		NodeMaterial->GetAmbientData()->GetPropertyValue(*(Point3*)&TempVector3Value);
-		MaterialConfigNode.WriteProperty("AmbientColor", TempVector3Value);
+		MaterialConfigNode.WriteVector3("AmbientColor", TempVector3Value);
 
 		//DIFFUSE
 		zeLog("Writing diffuse data.");
-		MaterialConfigNode.WriteProperty("DiffuseEnabled", true /*(MapFlag & ZE_MTMP_DIFFUSEMAP) != 0*/); //Diffuse is forced true
+		MaterialConfigNode.WriteBool("DiffuseEnabled", true /*(MapFlag & ZE_MTMP_DIFFUSEMAP) != 0*/); //Diffuse is forced true
 		TempVector3Value = ZEVector3::Zero;
 		NodeMaterial->GetDiffuseData()->GetPropertyValue(*(Point3*)&TempVector3Value);
-		MaterialConfigNode.WriteProperty("DiffuseColor", TempVector3Value);
-		MaterialConfigNode.WriteProperty("BaseMap", DiffuseMap);
+		MaterialConfigNode.WriteVector3("DiffuseColor", TempVector3Value);
+		MaterialConfigNode.WriteString("BaseMap", DiffuseMap);
 
 		//SPECULAR
 		zeLog("Writing specular data.");
-		MaterialConfigNode.WriteProperty("SpecularEnabled", true /*(MapFlag & ZE_MTMP_SPECULARMAP) != 0*/); //Specular is forced true
+		MaterialConfigNode.WriteBool("SpecularEnabled", true /*(MapFlag & ZE_MTMP_SPECULARMAP) != 0*/); //Specular is forced true
 		float TempFloatValue = 0.0f;
 		NodeMaterial->GetSpecularLevelData()->GetPropertyValue(TempFloatValue);
-		MaterialConfigNode.WriteProperty("SpecularFactor", TempFloatValue);
+		MaterialConfigNode.WriteFloat("SpecularFactor", TempFloatValue);
 
 		TempVector3Value = ZEVector3::Zero;
 		NodeMaterial->GetSpecularData()->GetPropertyValue(*(Point3*)&TempVector3Value);
-		MaterialConfigNode.WriteProperty("SpecularColor", TempVector3Value);
-		MaterialConfigNode.WriteProperty("SpecularMap", SpecularMap);
+		MaterialConfigNode.WriteVector3("SpecularColor", TempVector3Value);
+		MaterialConfigNode.WriteString("SpecularMap", SpecularMap);
 
 		//EMISSIVE
 		zeLog("Writing emissive data.");
-		MaterialConfigNode.WriteProperty("EmmisiveEnabled", (MapFlag & ZE_MTMP_EMISSIVEMAP) != 0);
+		MaterialConfigNode.WriteBool("EmmisiveEnabled", (MapFlag & ZE_MTMP_EMISSIVEMAP) != 0);
 		TempFloatValue = 0.0f;
 		NodeMaterial->GetEmissiveAmtData()->GetPropertyValue(TempFloatValue);
-		MaterialConfigNode.WriteProperty("EmmisiveFactor", TempFloatValue);
+		MaterialConfigNode.WriteFloat("EmmisiveFactor", TempFloatValue);
 
 		TempVector3Value = ZEVector3::Zero;
 		NodeMaterial->GetEmissiveData()->GetPropertyValue(*(Point3*)&TempVector3Value);
-		MaterialConfigNode.WriteProperty("EmmisiveColor", TempVector3Value);
-		MaterialConfigNode.WriteProperty("EmmisiveMap", EmissiveMap);
+		MaterialConfigNode.WriteVector3("EmmisiveColor", TempVector3Value);
+		MaterialConfigNode.WriteString("EmmisiveMap", EmissiveMap);
 
 		//NORMAL
 		zeLog("Writing normals data.");
-		MaterialConfigNode.WriteProperty("NormalMapEnabled", (MapFlag & ZE_MTMP_NORMALMAP) != 0);
-		MaterialConfigNode.WriteProperty("NormalMap", NormalMap);
+		MaterialConfigNode.WriteBool("NormalMapEnabled", (MapFlag & ZE_MTMP_NORMALMAP) != 0);
+		MaterialConfigNode.WriteString("NormalMap", NormalMap);
 
 		//OPACITY
-		MaterialConfigNode.WriteProperty("OpacityEnabled", (MapFlag & ZE_MTMP_OPACITYMAP) != 0);
-		MaterialConfigNode.WriteProperty("Opacity", Opacity);
-		MaterialConfigNode.WriteProperty("OpacityMap", OpacityMap);
+		MaterialConfigNode.WriteBool("OpacityEnabled", (MapFlag & ZE_MTMP_OPACITYMAP) != 0);
+		MaterialConfigNode.WriteFloat("Opacity", Opacity);
+		MaterialConfigNode.WriteString("OpacityMap", OpacityMap);
 
 		//ENVIRONMENT
 		zeLog("Writing environment data.");
-		MaterialConfigNode.WriteProperty("EnvironmentMap", EnvironmentMap);
+		MaterialConfigNode.WriteString("EnvironmentMap", EnvironmentMap);
 
 		MaterialConfigNode.CloseNode();
 		MaterialSerialNode.CloseNode();
+		MaterialWriter.Close();
 		zeLog("Closing material file.");
 		MaterialFile.Close();
 
-		ZEMLNode* MaterialDOMNode = MaterialsNode->AddSubNode("Material");
-		MaterialDOMNode->AddProperty("Name", MaterialName);
-		MaterialDOMNode->AddProperty("FilePath", ResourceConfigurationDialog->GetResourceRelativePath(ZEString(FileName) , MaterialName + ".ZEMaterial"));
+		ZEMLNode* MaterialDOMNode = MaterialsNode->AddNode("Material");
+		MaterialDOMNode->AddProperty("Name")->SetString(MaterialName);
+		MaterialDOMNode->AddProperty("FilePath")->SetString(ResourceConfigurationDialog->GetResourceRelativePath(ZEString(FileName) , MaterialName + ".ZEMaterial"));
 
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}

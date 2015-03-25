@@ -110,8 +110,8 @@ class ZEMLReaderNode
 		float						ReadFloat(const char* Name, float Default = 0.0f);
 		double						ReadDouble(const char* Name, double Default = 0.0);
 		bool						ReadBoolean(const char* Name, bool Default = false);
-		ZEVector2					ReadVector3(const char* Name, const ZEVector2& Default = ZEVector2::Zero);
-		ZEVector3					ReadVector4(const char* Name, const ZEVector3& Default = ZEVector3::Zero);
+		ZEVector2					ReadVector2(const char* Name, const ZEVector2& Default = ZEVector2::Zero);
+		ZEVector3					ReadVector3(const char* Name, const ZEVector3& Default = ZEVector3::Zero);
 		ZEVector4					ReadVector4(const char* Name, const ZEVector4& Default = ZEVector4::Zero);
 		ZEQuaternion				ReadQuaternion(const char* Name, const ZEQuaternion& Default = ZEQuaternion::Zero);
 		ZEMatrix3x3					ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default = ZEMatrix3x3::Zero);

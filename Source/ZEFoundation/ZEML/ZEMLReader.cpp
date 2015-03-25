@@ -584,7 +584,7 @@ bool ZEMLReaderNode::ReadBoolean(const char* Name, bool Default)
 	return Value.GetBoolean();	
 }
 
-ZEVector2 ZEMLReaderNode::ReadVector3(const char* Name, const ZEVector2& Default)
+ZEVector2 ZEMLReaderNode::ReadVector2(const char* Name, const ZEVector2& Default)
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -594,7 +594,7 @@ ZEVector2 ZEMLReaderNode::ReadVector3(const char* Name, const ZEVector2& Default
 	return Value.GetVector2();
 }
 
-ZEVector3 ZEMLReaderNode::ReadVector4(const char* Name, const ZEVector3& Default)
+ZEVector3 ZEMLReaderNode::ReadVector3(const char* Name, const ZEVector3& Default)
 {
 	ZEValue Value = ReadValue(Name);
 

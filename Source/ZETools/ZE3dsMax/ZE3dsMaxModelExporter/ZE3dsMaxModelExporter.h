@@ -61,9 +61,9 @@ class ZE3dsMaxModelExporter : public SceneExport
 		ZEString							ExportPath;
 
 		IGameScene*					Scene;
+		ZEMLRoot					ModelRoot;
 		ZEMLNode					ModelNode;
 
-		
 		Tab<IGameNode*>				ProcessedBones;
 		Tab<IGameNode*>				ProcessedMeshes;
 		Tab<IGameNode*>				ProcessedMasterMeshes;
