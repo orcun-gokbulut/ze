@@ -47,7 +47,7 @@ class ZEMLNode;
 class ZEMLElement : public ZEListItem
 {
 	friend ZEMLNode;
-	protected:
+	private:
 		ZEMLNode*					Parent;
 		ZEString					Name;
 

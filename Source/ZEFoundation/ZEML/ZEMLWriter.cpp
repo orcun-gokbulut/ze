@@ -308,7 +308,7 @@ bool ZEMLWriterNode::WriteMatrix4x4(const char* Name, const ZEMatrix4x4& Value)
 	return WriteValue(Name, ZEValue(Value));
 }
 
-bool ZEMLWriterNode::WriteData(const char* Name, void* Data, ZEUInt64 Size)
+bool ZEMLWriterNode::WriteData(const char* Name, const void* Data, ZEUInt64 Size)
 {
 	if (!WriteElementHeader(Name, ZEML_ET_INLINE_DATA))
 		return false;

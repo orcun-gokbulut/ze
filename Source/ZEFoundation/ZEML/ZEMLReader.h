@@ -58,9 +58,10 @@ struct ZEMLReaderProperty
 struct ZEMLReaderSubNode
 {
 	ZEString		Name;
+	ZEUInt64		Index;
 	ZEUInt64		Offset;
 	ZEUInt64		Size;
-
+	
 					ZEMLReaderSubNode();
 };
 
@@ -90,6 +91,7 @@ class ZEMLReaderNode
 		ZESize						GetSubNodeCount();
 		ZESize						GetSubNodeCount(const char* Name);
 		ZEMLReaderNode				GetSubNode(const char* Name, ZESize Index = 0);
+		ZEMLReaderNode				GetSubNode(ZESize Index);
 
 		bool						IsValid();
 
@@ -115,6 +117,7 @@ class ZEMLReaderNode
 		ZEMatrix3x3					ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default = ZEMatrix3x3::Zero);
 		ZEMatrix4x4					ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default = ZEMatrix4x4::Zero);
 		const ZEString&				ReadString(const char* Name, const ZEString& Default = "");
+
 		ZESize						ReadDataSize(const char* Name);
 		bool						ReadData(const char* Name, void* Buffer, ZESize BufferSize, ZESize Offset = 0);
 

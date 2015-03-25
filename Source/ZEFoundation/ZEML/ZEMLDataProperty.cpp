@@ -34,8 +34,25 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMLDataProperty.h"
+
 #include "ZEFile/ZEFile.h"
 #include "ZEError.h"
+
+void ZEMLData::LoadDeferred()
+{
+	if (!Deferred)
+		return;
+
+	DeferredFile->Seek(DeferredOffset, ZE_SF_BEGINING);
+
+	Allocate(DataSize);
+	if (DeferredFile->Read(Data, DataSize, 1) != 1)
+		zeError("Can not read ZEMLDataProperty data from file. Corrupted ZEML file.");
+
+	Deferred = false;
+	DeferredFile = NULL;
+	DeferredOffset = 0;
+}
 
 ZEMLElementType1 ZEMLData::GetType()
 {
@@ -44,58 +61,102 @@ ZEMLElementType1 ZEMLData::GetType()
 
 ZESize ZEMLData::GetSize()
 {
-	return DataSize;
+	ZESize Size = 1 +				// Identifier
+		1 + GetName().GetLength() +	// Name
+		8 +							// Size;
+		DataSize;					// Data
+
+	return Size;
 }
 
-void ZEMLData::SetData(void* Data, ZESize DataSize)
+void ZEMLData::Allocate(ZESize NewDataSize)
 {
-	this->Data = (ZEBYTE*)Data;
+	Deallocate();
 	
-	if (Data == NULL)
-		this->DataSize = 0;
-	else
-		this->DataSize = DataSize;
+	if (NewDataSize != 0)
+		Data = new ZEBYTE[NewDataSize];
 
-	Offset = 0;
-	File = NULL;
+	DataSize = NewDataSize;
+	Referred = false;
+}
+
+void ZEMLData::Deallocate()
+{
+	if (!Referred && Data != NULL)
+	{
+		delete Data;
+	}
+
+	Data = NULL;
+	DataSize = 0;
+	Referred = false;
+	Deferred = false;
+	DeferredFile = NULL;
+	DeferredOffset = 0;
+}
+
+void ZEMLData::SetData(void* NewData, ZESize NewDataSize, bool NewReferred)
+{
+	Deallocate();
+
+	if (NewData == NULL || NewDataSize == 0)
+		return;
+
+	if (NewReferred)
+	{
+		Data = (ZEBYTE*)NewData;
+		DataSize = NewDataSize;
+		Referred = true;
+	}
+	else
+	{
+		Allocate(NewDataSize);
+		memcpy(Data, NewData, NewDataSize);
+		Referred = false;
+	}
 }
 
 const void* ZEMLData::GetData()
 {
-	if (Data == NULL && File != NULL && File->IsOpen())
-	{
-		File->Seek(Offset, ZE_SF_BEGINING);
-		Data = new ZEBYTE[DataSize];
-		if(File->Read(Data, DataSize, 1) != 1)
-		{
-			zeError("Can not read ZEMLDataProperty data from file. Corrupted ZEML file.");
-			Data.Release();
-		}
-	}
-
+	LoadDeferred();
 	return Data;
 }
 
 ZEMLData::ZEMLData()
 {
-	File = NULL;
-	DataSize = 0;
-	Offset = 0;
+	Data = NULL;
+	DataSize = NULL;
+	Referred = false;
+	Deferred = false;
+	DeferredFile = NULL;
+	DeferredOffset = 0;
 }
 
-ZEMLData::ZEMLData(const char* Name)
+ZEMLData::ZEMLData(const char* NewName)
 {
+	Data = NULL;
 	DataSize = NULL;
-	Offset = 0;
-	File = NULL;
-	SetName(Name);
+	Referred = false;
+	Deferred = false;
+	DeferredFile = NULL;
+	DeferredOffset = 0;
+	SetName(NewName);
 }
 
-ZEMLData::ZEMLData(const char* Name, void* Data, ZEUInt64 DataSize)
+ZEMLData::ZEMLData(const char* Name, void* NewData, ZEUInt64 NewDataSize, bool NewStatic)
 {
+	Data = NULL;
 	DataSize = NULL;
-	Offset = 0;
-	File = NULL;
+	Referred = NewStatic;
+	Deferred = false;
+	DeferredFile = NULL;
+	DeferredOffset = 0;
 	SetName(Name);
-	SetData(Data, DataSize);
+	SetData(NewData, NewDataSize, NewStatic);
+}
+
+ZEMLData::~ZEMLData()
+{
+	if (Referred && Data != NULL)
+		delete Data;
 }

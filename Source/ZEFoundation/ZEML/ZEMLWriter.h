@@ -43,7 +43,6 @@
 #include "ZEDS/ZEValue.h"
 #include "ZEFile/ZEFile.h"
 
-
 class ZEMLWriterNode
 {
 	friend class ZEMLWriter;
@@ -77,7 +76,7 @@ class ZEMLWriterNode
 		bool				WriteVector4(const char* Name, const ZEVector4& Value);
 		bool				WriteMatrix3x3(const char* Name, const ZEMatrix3x3& Value);
 		bool				WriteMatrix4x4(const char* Name, const ZEMatrix4x4& Value);
-		bool				WriteData(const char* Name, void* Data, ZEUInt64 DataSize);
+		bool				WriteData(const char* Name, const void* Data, ZEUInt64 DataSize);
 
 		void				CloseNode();
 
