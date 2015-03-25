@@ -400,7 +400,7 @@ void ZEMLWriter::WriteHeader()
 	};
 	File->Write(Identifer, 6, 1);
 
-	ZEUInt64 StartOffset = ZEEndian::Little(OwnedFile.Tell() + sizeof(ZEUInt64));
+	ZEUInt64 StartOffset = ZEEndian::Little(File->Tell() + sizeof(ZEUInt64));
 	File->Write(&StartOffset, sizeof(ZEUInt64), 1);
 }
 
@@ -425,7 +425,7 @@ bool ZEMLWriter::Open(ZEFile* File)
 {
 	Close();
 
-	if (File->IsOpen())
+	if (!File->IsOpen())
 	{
 		zeError("Cannot write ZEML file. File is not open.");
 		return false;

@@ -693,7 +693,7 @@ ZEModelMesh::ZEModelMesh()
 	ActiveLOD = 0;
 	AnimationType = ZE_MAT_NOANIMATION;
 	DrawOrderIsUserDefined = false;
-	UserDefinedDrawOrder = 0.0f;
+	UserDefinedDrawOrder = 0;
 }
 
 ZEModelMesh::~ZEModelMesh()

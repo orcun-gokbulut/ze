@@ -62,7 +62,7 @@ void ZE3dsMaxModelExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 
 	this->Options = Options;
 
-	const ZEMLItem* CurrentProperty = NULL;
+	const ZEMLElement* CurrentProperty = NULL;
 	CurrentProperty = Options->GetProperty("ZinekEngineWorkingDirectory");
 	if(CurrentProperty != NULL)
 		Form->txtEngineWorkingDirectory->setText(((ZEMLProperty*)CurrentProperty)->GetValue().GetString().ToCString());
@@ -96,11 +96,11 @@ void ZE3dsMaxModelExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 		Form->grpExportAnimations->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
 
 
-	if (Options->GetSubNodes("Animations").GetCount() > 0)
+	if (Options->GetNodes("Animations").GetCount() > 0)
 	{
-		CurrentProperty = Options->GetSubNodes("Animations").GetFirstItem();
+		CurrentProperty = Options->GetNodes("Animations").GetFirstItem();
 
-		ZEArray<ZEMLNode*> Animations = ((ZEMLNode*)CurrentProperty)->GetSubNodes("Animation");
+		ZEArray<ZEMLNode*> Animations = ((ZEMLNode*)CurrentProperty)->GetNodes("Animation");
 
 		for (ZESize I = 0; I < Animations.GetCount(); I++)
 		{
@@ -203,87 +203,87 @@ void ZE3dsMaxModelExporterOptionsDialog::CollectOptionsFromForm()
 	if(Options == NULL)
 	{
 		Options = new ZEMLNode("Options");
-		Options->AddProperty("ZinekEngineWorkingDirectory", (const char*)Form->txtEngineWorkingDirectory->text().toUtf8());
-		Options->AddProperty("IsFileLoggingEnabled", Form->ckbFileLoggingEnabled->isChecked());
-		Options->AddProperty("LogFilePath", (const char*)Form->txtLogFilePath->text().toUtf8());
-		Options->AddProperty("IsBoneExportEnabled", Form->grpExportBones->isChecked());
-		Options->AddProperty("IsBonePhysicalBodyExportEnabled", Form->ckbExportBonePhysicalBodies->isChecked());
-		Options->AddProperty("IsMeshExportEnabled", Form->grpExportMeshes->isChecked());
-		Options->AddProperty("IsMeshPhysicalBodyExportEnabled", Form->ckbExportMeshPhysicalBodies->isChecked());
-		Options->AddProperty("IsAnimationExportEnabled", Form->grpExportAnimations->isChecked());
+		Options->AddProperty("ZinekEngineWorkingDirectory")->SetString(Form->txtEngineWorkingDirectory->text().toUtf8().constData());
+		Options->AddProperty("IsFileLoggingEnabled")->SetBool(Form->ckbFileLoggingEnabled->isChecked());
+		Options->AddProperty("LogFilePath")->SetString(Form->txtLogFilePath->text().toUtf8().constData());
+		Options->AddProperty("IsBoneExportEnabled")->SetBool(Form->grpExportBones->isChecked());
+		Options->AddProperty("IsBonePhysicalBodyExportEnabled")->SetBool(Form->ckbExportBonePhysicalBodies->isChecked());
+		Options->AddProperty("IsMeshExportEnabled")->SetBool(Form->grpExportMeshes->isChecked());
+		Options->AddProperty("IsMeshPhysicalBodyExportEnabled")->SetBool(Form->ckbExportMeshPhysicalBodies->isChecked());
+		Options->AddProperty("IsAnimationExportEnabled")->SetBool(Form->grpExportAnimations->isChecked());
 		
 		ZEInt32 ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
 
 		if (ItemCount > 0)
 		{
-			ZEMLNode* AnimationsNode = Options->AddSubNode("Animations");
+			ZEMLNode* AnimationsNode = Options->AddNode("Animations");
 
 			for (ZEInt32 I = 0; I < ItemCount; I++)
 			{
-				ZEMLNode* Animation = AnimationsNode->AddSubNode("Animation");
-				Animation->AddProperty("Name", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(0).toUtf8());
-				Animation->AddProperty("StartFrame", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(1).toUtf8());
-				Animation->AddProperty("EndFrame", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(2).toUtf8());
+				ZEMLNode* Animation = AnimationsNode->AddNode("Animation");
+				Animation->AddProperty("Name")->SetString(Form->AnimationTreeWidget->topLevelItem(I)->text(0).toUtf8().constData());
+				Animation->AddProperty("StartFrame")->SetString(Form->AnimationTreeWidget->topLevelItem(I)->text(1).toUtf8().constData());
+				Animation->AddProperty("EndFrame")->SetString(Form->AnimationTreeWidget->topLevelItem(I)->text(2).toUtf8().constData());
 			}
 		}
 	}
 	else
 	{
 		if (Options->GetProperty("ZinekEngineWorkingDirectory") !=  NULL)
-			((ZEMLProperty*)(Options->GetProperty("ZinekEngineWorkingDirectory")))->SetValue((const char*)Form->txtEngineWorkingDirectory->text().toUtf8());
+			((ZEMLProperty*)(Options->GetProperty("ZinekEngineWorkingDirectory")))->SetString(Form->txtEngineWorkingDirectory->text().toUtf8().constData());
 		else
-			Options->AddProperty("ZinekEngineWorkingDirectory", (const char*)Form->txtEngineWorkingDirectory->text().toUtf8());
+			Options->AddProperty("ZinekEngineWorkingDirectory")->SetString(Form->txtEngineWorkingDirectory->text().toUtf8().constData());
 
 		if (Options->GetProperty("IsFileLoggingEnabled") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("IsFileLoggingEnabled")))->SetValue(Form->ckbFileLoggingEnabled->isChecked());
+			((ZEMLProperty*)(Options->GetProperty("IsFileLoggingEnabled")))->SetBool(Form->ckbFileLoggingEnabled->isChecked());
 		else
-			Options->AddProperty("IsFileLoggingEnabled", Form->ckbFileLoggingEnabled->isChecked());
+			Options->AddProperty("IsFileLoggingEnabled")->SetBool(Form->ckbFileLoggingEnabled->isChecked());
 
 		if (Options->GetProperty("LogFilePath") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("LogFilePath")))->SetValue((const char*)Form->txtLogFilePath->text().toUtf8());
+			((ZEMLProperty*)(Options->GetProperty("LogFilePath")))->SetString(Form->txtLogFilePath->text().toUtf8().constData());
 		else
-			Options->AddProperty("LogFilePath", (const char*)Form->txtLogFilePath->text().toUtf8());
+			Options->AddProperty("LogFilePath")->SetString(Form->txtLogFilePath->text().toUtf8().constData());
 
 		if (Options->GetProperty("IsBoneExportEnabled") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("IsBoneExportEnabled")))->SetValue(Form->grpExportBones->isChecked());
+			((ZEMLProperty*)(Options->GetProperty("IsBoneExportEnabled")))->SetBool(Form->grpExportBones->isChecked());
 		else
-			Options->AddProperty("IsBoneExportEnabled", Form->grpExportBones->isChecked());
+			Options->AddProperty("IsBoneExportEnabled")->SetBool(Form->grpExportBones->isChecked());
 
 		if (Options->GetProperty("IsBonePhysicalBodyExportEnabled") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("IsBonePhysicalBodyExportEnabled")))->SetValue(Form->ckbExportBonePhysicalBodies->isChecked());
+			((ZEMLProperty*)(Options->GetProperty("IsBonePhysicalBodyExportEnabled")))->SetBool(Form->ckbExportBonePhysicalBodies->isChecked());
 		else
-			Options->AddProperty("IsBonePhysicalBodyExportEnabled", Form->ckbExportBonePhysicalBodies->isChecked());
+			Options->AddProperty("IsBonePhysicalBodyExportEnabled")->SetBool(Form->ckbExportBonePhysicalBodies->isChecked());
 
 		if (Options->GetProperty("IsMeshExportEnabled") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("IsMeshExportEnabled")))->SetValue(Form->grpExportMeshes->isChecked());
+			((ZEMLProperty*)(Options->GetProperty("IsMeshExportEnabled")))->SetBool(Form->grpExportMeshes->isChecked());
 		else
-			Options->AddProperty("IsMeshExportEnabled", Form->grpExportMeshes->isChecked());
+			Options->AddProperty("IsMeshExportEnabled")->SetBool(Form->grpExportMeshes->isChecked());
 
 		if (Options->GetProperty("IsMeshPhysicalBodyExportEnabled") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("IsMeshPhysicalBodyExportEnabled")))->SetValue(Form->ckbExportMeshPhysicalBodies->isChecked());
+			((ZEMLProperty*)(Options->GetProperty("IsMeshPhysicalBodyExportEnabled")))->SetBool(Form->ckbExportMeshPhysicalBodies->isChecked());
 		else
-			Options->AddProperty("IsMeshPhysicalBodyExportEnabled", Form->ckbExportMeshPhysicalBodies->isChecked());
+			Options->AddProperty("IsMeshPhysicalBodyExportEnabled")->SetBool(Form->ckbExportMeshPhysicalBodies->isChecked());
 
 		if (Options->GetProperty("IsAnimationExportEnabled") != NULL)
-			((ZEMLProperty*)(Options->GetProperty("IsAnimationExportEnabled")))->SetValue(Form->grpExportAnimations->isChecked());
+			((ZEMLProperty*)(Options->GetProperty("IsAnimationExportEnabled")))->SetBool(Form->grpExportAnimations->isChecked());
 		else
-			Options->AddProperty("IsAnimationExportEnabled", Form->grpExportAnimations->isChecked());
+			Options->AddProperty("IsAnimationExportEnabled")->SetBool(Form->grpExportAnimations->isChecked());
 
-		if (Options->GetSubNodes("Animations").GetCount() != 0)
-			Options->RemoveItem(Options->GetSubNodes("Animations").GetFirstItem());
+		if (Options->GetNodes("Animations").GetCount() != 0)
+			Options->RemoveElement(Options->GetNodes("Animations").GetFirstItem());
 
 		ZEInt32 ItemCount = Form->AnimationTreeWidget->topLevelItemCount();
 
 		if (ItemCount > 0)
 		{
-			ZEMLNode* AnimationsNode = Options->AddSubNode("Animations");
+			ZEMLNode* AnimationsNode = Options->AddNode("Animations");
 
 			for (ZEInt32 I = 0; I < ItemCount; I++)
 			{
-				ZEMLNode* Animation = AnimationsNode->AddSubNode("Animation");
-				Animation->AddProperty("Name", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(0).toUtf8());
-				Animation->AddProperty("StartFrame", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(1).toUtf8());
-				Animation->AddProperty("EndFrame", (const char*)Form->AnimationTreeWidget->topLevelItem(I)->text(2).toUtf8());
+				ZEMLNode* Animation = AnimationsNode->AddNode("Animation");
+				Animation->AddProperty("Name")->SetString(Form->AnimationTreeWidget->topLevelItem(I)->text(0).toUtf8().constData());
+				Animation->AddProperty("StartFrame")->SetString(Form->AnimationTreeWidget->topLevelItem(I)->text(1).toUtf8().constData());
+				Animation->AddProperty("EndFrame")->SetString(Form->AnimationTreeWidget->topLevelItem(I)->text(2).toUtf8().constData());
 			}
 		}
 	}

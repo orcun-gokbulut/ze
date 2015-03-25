@@ -194,7 +194,7 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 	zeDebugCheck(File != NULL, "File is already open.");
 
 	ZEString ModeStr;
-	ZERealPath RealPath = ZEFileInfo(FilePath).GetRealPath();
+ 	ZERealPath RealPath = ZEFileInfo(FilePath).GetRealPath();
 
 	if (RealPath.Access == ZE_PA_NO_ACCESS)
 	{

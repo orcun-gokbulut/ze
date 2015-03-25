@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEDirectoryInfo.h"
+#include "ZEFile/ZEPathManager.h"
 #include "ZEToolbarIcons_16a.bmp.h"
 #include "ZEToolbarIcons_16i.bmp.h"
 #include "ZEToolbarIcons_24a.bmp.h"
@@ -106,6 +107,8 @@ __declspec( dllexport ) ZEInt LibInitialize(void)
 	zineklogo_bmp		   ZinekLogo;
 
 	ZEFile IconFile;
+
+	ZEPathManager::GetInstance()->SetAccessControl(false);
 
 	if (!ZEFileInfo(IconsDirectory.GetPath() + "/ZEToolbarIcons_16a.bmp").IsFile())
 	{

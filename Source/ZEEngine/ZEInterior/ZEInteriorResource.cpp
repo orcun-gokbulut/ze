@@ -44,7 +44,7 @@
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
 #include "ZEFile/ZEFileInfo.h"
-#include "ZEML/ZEMLSerialReader.h"
+#include "ZEML/ZEMLReader.h"
 #include "ZEFoundation/ZEPacking.h"
 
 #include <string.h>
@@ -84,151 +84,124 @@ const ZETexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZESt
 
 bool ZEInteriorResource::ReadInteriorFromFile(ZEFile* ResourceFile)
 { 
-	ZEMLSerialReader Reader(ResourceFile);
+	ZEMLReader InteriorReader(ResourceFile);
 
-	if(!Reader.Read())
+	ZEMLReaderNode InteriorNode = InteriorReader.GetRootNode();
+
+	if (!InteriorNode.IsValid())
 	{
 		zeError("Can not read map file.");
 		return false;
 	}
 
-	if(Reader.GetItemName() != ZEString("ZEInterior"))
+	if (strcmp(InteriorNode.GetName(), "ZEInterior") != 0)
 	{
-		zeError("Resource file is not an interior file, file name : %s", ResourceFile->GetPath());
+		zeError("Specified resource file is not an interior file : %s", ResourceFile->GetPath());
 		return false;
 	}
 
-	ZEMLSerialPointer RoomsPointer, DoorsPointer, HelpersPointer, MaterialsPointer;
-	ZEValue DoorCount, RoomCount, HelperCount, MaterialCount;
+	Rooms.SetCount(InteriorNode.ReadUInt32("RoomCount"));
+	Doors.SetCount(InteriorNode.ReadUInt32("DoorCount"));
+	Helpers.SetCount(InteriorNode.ReadUInt32("HelperCount"));
+	Materials.SetCount(InteriorNode.ReadUInt32("MaterialCount"));
 
-	ZEMLSerialListItem InteriorList[] = {
-		ZEML_LIST_NODE("Rooms",					RoomsPointer,										true),
-		ZEML_LIST_NODE("Doors",					DoorsPointer,										false),
-		ZEML_LIST_NODE("Helpers",				HelpersPointer,										false),
-		ZEML_LIST_NODE("Materials",				MaterialsPointer,									true),
-		ZEML_LIST_PROPERTY("RoomCount",			RoomCount,			ZE_VRT_UNSIGNED_INTEGER_32,		true),
-		ZEML_LIST_PROPERTY("DoorCount",			DoorCount,			ZE_VRT_UNSIGNED_INTEGER_32,		true),
-		ZEML_LIST_PROPERTY("HelperCount",		HelperCount,		ZE_VRT_UNSIGNED_INTEGER_32,		true),
-		ZEML_LIST_PROPERTY("MaterialCount",		MaterialCount,		ZE_VRT_UNSIGNED_INTEGER_32,		true)
-	};
+	ZEMLReaderNode MaterialsNode = InteriorNode.GetSubNode("Materials");
 
-	if(!Reader.ReadPropertyList(InteriorList, 8))
-	{
-		zeError("Can not read map from file.");
-		return false;
-	}
-
-	Rooms.SetCount(RoomCount.GetUInt32());
-	Doors.SetCount(DoorCount.GetUInt32());
-	Helpers.SetCount(HelperCount.GetUInt32());
-	Materials.SetCount(MaterialCount.GetUInt32());
-
-	Reader.SeekPointer(MaterialsPointer);
-	if(!ReadMaterials(&Reader))
+	if (!ReadMaterials(&MaterialsNode))
 	{
 		zeError("Can not read materials from file.");
 		return false;
 	}
 
-	Reader.SeekPointer(RoomsPointer);
-	if(!ReadRooms(&Reader))
+	ZEMLReaderNode RoomsNode = InteriorNode.GetSubNode("Rooms");
+
+	if (!ReadRooms(&RoomsNode))
 	{
 		zeError("Can not read rooms from file.");
 		return false;
 	}
 
-	if (DoorsPointer != -1)
+	if (InteriorNode.IsSubNodeExists("Doors"))
 	{
-		Reader.SeekPointer(DoorsPointer);
+		ZEMLReaderNode DoorsNode = InteriorNode.GetSubNode("Doors");
 
-		if(!ReadDoors(&Reader))
+		if (!ReadDoors(&DoorsNode))
 		{
 			zeError("Can not read doors from file.");
 			return false;
 		}
 	}
 
-	if (HelpersPointer != -1)
+	if (InteriorNode.IsSubNodeExists("Helpers"))
 	{
-		Reader.SeekPointer(HelpersPointer);
+		ZEMLReaderNode HelpersNode = InteriorNode.GetSubNode("Helpers");
 
-		if(!ReadHelpers(&Reader))
+		if (!ReadHelpers(&HelpersNode))
 		{
 			zeError("Can not read helpers from file.");
 			return false;
 		}
 	}
 
-	Reader.GoToCurrentPointer();
+	InteriorReader.Close();
 
 	return true;
 }
 
-bool ZEInteriorResource::ReadDoors(ZEMLSerialReader* Reader)
+bool ZEInteriorResource::ReadDoors(ZEMLReaderNode* DoorsNode)
 {
-	ZESize SubItemCount = Reader->GetSubItemCount();
-	for (ZESize I = 0; I < SubItemCount; I++)
+	if (DoorsNode == NULL)
+		return false;
+
+	if (!DoorsNode->IsValid())
+		return false;
+
+	ZESize SubNodeCount = DoorsNode->GetSubNodeCount("Door");
+
+	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		if (!Reader->Read())
-		{
-			zeError("Can not read ZEML node.");
+		ZEMLReaderNode DoorNode = DoorsNode->GetSubNode("Door", I);
+
+		if (!DoorNode.IsValid())
 			return false;
-		}
-
-		if (Reader->GetItemType() != ZEML_ET_NODE || Reader->GetItemName() != "Door")
-			continue;
-
-		ZEValue DoorName, IsOpen, Width, Length, Position, Rotation, Scale, RoomAIndex, RoomBIndex, UserDefinedProperties;
-		ZEMLSerialPointer RectanglePointer;
-
-		ZEMLSerialListItem DoorPropertiesList[] = { 
-			ZEML_LIST_PROPERTY("Name",						DoorName,					ZE_VRT_STRING,					true),  
-			ZEML_LIST_PROPERTY("IsOpen",					IsOpen,						ZE_VRT_BOOLEAN, 				true),
-			ZEML_LIST_PROPERTY("Width",						Width,						ZE_VRT_FLOAT,					true),
-			ZEML_LIST_PROPERTY("Length",					Length,						ZE_VRT_FLOAT,					true),
-			ZEML_LIST_PROPERTY("Position",					Position,					ZE_VRT_VECTOR3,					true),
-			ZEML_LIST_PROPERTY("Rotation",					Rotation,					ZE_VRT_QUATERNION,				true),
-			ZEML_LIST_PROPERTY("Scale",						Scale,						ZE_VRT_VECTOR3,					true),
-			ZEML_LIST_PROPERTY("RoomAIndex",				RoomAIndex,					ZE_VRT_INTEGER_32,				true),  
-			ZEML_LIST_PROPERTY("RoomBIndex",				RoomBIndex,					ZE_VRT_INTEGER_32,				true),
-			ZEML_LIST_PROPERTY("UserDefinedProperties",		UserDefinedProperties,		ZE_VRT_STRING,					false)
-		};
-
-		Reader->ReadPropertyList(DoorPropertiesList, 10);
 
 		ZEInteriorResourceDoor* Door = &Doors[I];
 
-		strncpy(Door->Name, DoorName.GetString().ToCString(), ZE_MAX_NAME_SIZE);
-		Door->IsOpen = IsOpen.GetBoolean();
+		strncpy(Door->Name, DoorNode.ReadString("Name").ToCString(), ZE_MAX_NAME_SIZE);
+		Door->IsOpen = DoorNode.ReadBoolean("IsOpen");
 
-		Door->Width = Width.GetFloat();
-		Door->Length = Length.GetFloat();
-		Door->Position = Position.GetVector3();
-		Door->Rotation = Rotation.GetQuaternion();
-		Door->Scale = Scale.GetVector3();
+		Door->Width = DoorNode.ReadFloat("Width");
+		Door->Length = DoorNode.ReadFloat("Length");
+		Door->Position = DoorNode.ReadVector3("Position");
+		Door->Rotation = DoorNode.ReadQuaternion("Rotation");
+		Door->Scale = DoorNode.ReadVector3("Scale");
 
-		if (UserDefinedProperties.GetType() == ZE_VRT_STRING)
-			Door->UserDefinedProperties = UserDefinedProperties.GetString();
+		if (DoorNode.IsPropertyExists("UserDefinedProperties"))
+			Door->UserDefinedProperties = DoorNode.ReadString("UserDefinedProperties");
 
-		Door->RoomIds[0] = RoomAIndex.GetInt32();
+		Door->RoomIds[0] = DoorNode.ReadInt32("RoomAIndex");
 		Door->Rooms[0] = &Rooms[(ZESize)Door->RoomIds[0]];
 		Door->Rooms[0]->DoorIds.Add(I);
 		Door->Rooms[0]->Doors.Add(Door);
-
-		Door->RoomIds[1] = RoomBIndex.GetInt32();
+		
+		Door->RoomIds[1] = DoorNode.ReadInt32("RoomBIndex");
 		Door->Rooms[1] = &Rooms[(ZESize)Door->RoomIds[1]];
 		Door->Rooms[1]->DoorIds.Add(I);
 		Door->Rooms[1]->Doors.Add(Door);
 
 	}
 
-	Reader->GoToCurrentPointer();
-
 	return true;
 }
 
-bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
+bool ZEInteriorResource::ReadRooms(ZEMLReaderNode* RoomsNode)
 {
+	if (RoomsNode == NULL)
+		return false;
+
+	if (!RoomsNode->IsValid())
+		return false;
+
 	ZEPackStruct(
 	struct ZEInteriorFileVertexChunk
 	{
@@ -246,52 +219,32 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 		ZEInteriorFileVertexChunk	Vertices[3];
 	});
 
-	ZESize SubItemCount = Reader->GetSubItemCount();
-	for (ZESize I = 0; I < SubItemCount; I++)
+	ZESize SubNodeCount = RoomsNode->GetSubNodeCount("Room");
+
+	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		if (!Reader->Read())
-		{
-			zeError("Can not read ZEML node.");
+		ZEMLReaderNode RoomNode = RoomsNode->GetSubNode("Room", I);
+
+		if (!RoomNode.IsValid())
 			return false;
-		}
-
-		if (Reader->GetItemType() != ZEML_ET_NODE || Reader->GetItemName() != "Room")
-			continue;
-
-		ZEValue RoomName, Position, Rotation, Scale, PhysicalMeshEnabled, UserDefinedProperties, GenerateOctree;
-		ZEMLSerialPointer PolygonsPointer, PhysicalMeshPointer;
-
-		ZEMLSerialListItem RoomPropertiesList[] = {
-			ZEML_LIST_PROPERTY("Name",						RoomName,				ZE_VRT_STRING,		true),
-			ZEML_LIST_PROPERTY("Position",					Position,				ZE_VRT_VECTOR3,		true),
-			ZEML_LIST_PROPERTY("Rotation",					Rotation,				ZE_VRT_QUATERNION,	true),
-			ZEML_LIST_PROPERTY("Scale",						Scale,					ZE_VRT_VECTOR3,		true),
-			ZEML_LIST_PROPERTY("GenerateOctree",			GenerateOctree,			ZE_VRT_BOOLEAN,		false),
-			ZEML_LIST_PROPERTY("UserDefinedProperties",		UserDefinedProperties,	ZE_VRT_STRING,		false),
-			ZEML_LIST_DATA("Polygons",						PolygonsPointer,							true),
-			ZEML_LIST_NODE("PhysicalMesh",					PhysicalMeshPointer,						false)	
-		};
-
-		Reader->ReadPropertyList(RoomPropertiesList, 8);
-		Reader->SeekPointer(PolygonsPointer);
 
 		ZEInteriorResourceRoom* Room = &Rooms[I];
-		strncpy(Room->Name, RoomName.GetString().ToCString(), ZE_MAX_NAME_SIZE);
 
-		Room->Position = Position.GetVector3();
-		Room->Rotation = Rotation.GetQuaternion();
-		Room->Scale = Scale.GetVector3();
+		strncpy(Room->Name, RoomNode.ReadString("Name").ToCString(), ZE_MAX_NAME_SIZE);
+		Room->Position = RoomNode.ReadVector3("Position");
+		Room->Rotation = RoomNode.ReadQuaternion("Rotation");
+		Room->Scale = RoomNode.ReadVector3("Scale");
 		
-		if (UserDefinedProperties.GetType() == ZE_VRT_STRING)
-			Room->UserDefinedProperties = UserDefinedProperties.GetString();
+		if (RoomNode.IsPropertyExists("UserDefinedProperties"))
+			Room->UserDefinedProperties = RoomNode.ReadString("UserDefinedProperties");
 
 		ZEArray<ZEInteriorFilePolygonChunk> MapPolygons;
-		MapPolygons.SetCount(Reader->GetDataSize() / sizeof(ZEInteriorFilePolygonChunk));
-		Reader->GetData(MapPolygons.GetCArray(), Reader->GetDataSize());
-
+		MapPolygons.SetCount(RoomNode.ReadDataSize("Polygons") / sizeof(ZEInteriorFilePolygonChunk));
+		RoomNode.ReadData("Polygons", MapPolygons.GetCArray(), RoomNode.ReadDataSize("Polygons"));
+		
 		if(MapPolygons.GetCount() == 0)
 			zeError("Polygon count is : 0. Room name : %s", Room->Name);
-
+		
 		Room->Polygons.SetCount(MapPolygons.GetCount());
 
 		for (ZESize I = 0; I < Room->Polygons.GetCount(); I++)
@@ -303,13 +256,13 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 			Room->Polygons[I].Vertices[0].Tangent		= MapPolygons[I].Vertices[0].Tangent;
 			Room->Polygons[I].Vertices[0].Binormal		= MapPolygons[I].Vertices[0].Binormal;
 			Room->Polygons[I].Vertices[0].Texcoord		= MapPolygons[I].Vertices[0].Texcoord;
-
+		
 			Room->Polygons[I].Vertices[1].Position		= MapPolygons[I].Vertices[1].Position;
 			Room->Polygons[I].Vertices[1].Normal		= MapPolygons[I].Vertices[1].Normal;
 			Room->Polygons[I].Vertices[1].Tangent		= MapPolygons[I].Vertices[1].Tangent;
 			Room->Polygons[I].Vertices[1].Binormal		= MapPolygons[I].Vertices[1].Binormal;
 			Room->Polygons[I].Vertices[1].Texcoord		= MapPolygons[I].Vertices[1].Texcoord;
-
+		
 			Room->Polygons[I].Vertices[2].Position		= MapPolygons[I].Vertices[2].Position;
 			Room->Polygons[I].Vertices[2].Normal		= MapPolygons[I].Vertices[2].Normal;
 			Room->Polygons[I].Vertices[2].Tangent		= MapPolygons[I].Vertices[2].Tangent;
@@ -318,71 +271,64 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 		}
 
 		ZEAABBox BoundingBox(ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX), ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
-
+		
 		for (ZESize I = 0; I < Room->Polygons.GetCount(); I++)
 		{
 			for (ZESize J = 0; J < 3; J++)
 			{
 				ZEVector3 Vertex = Room->Polygons[I].Vertices[J].Position;
-
+		
 				if (Vertex.x < BoundingBox.Min.x) BoundingBox.Min.x = Vertex.x;
 				if (Vertex.y < BoundingBox.Min.y) BoundingBox.Min.y = Vertex.y;
 				if (Vertex.z < BoundingBox.Min.z) BoundingBox.Min.z = Vertex.z;
-
+		
 				if (Vertex.x > BoundingBox.Max.x) BoundingBox.Max.x = Vertex.x;
 				if (Vertex.y > BoundingBox.Max.y) BoundingBox.Max.y = Vertex.y;
 				if (Vertex.z > BoundingBox.Max.z) BoundingBox.Max.z = Vertex.z;
 			}
 		}
-
+		
 		Room->BoundingBox = BoundingBox;
 
-		if(PhysicalMeshPointer != -1)
+		if(RoomNode.IsPropertyExists("PhysicalMesh"))
 		{
-			ZEValue PhysicalMeshEnabledValue, PhysicalUserDefinedPropertiesValue;
-			ZEMLSerialPointer PhysicalVerticesPointer, PhysicalPolygonsPointer;
+			ZEMLReaderNode PhysicalMeshNode = RoomNode.GetSubNode("PhysicalMesh");
 
-			Reader->SeekPointer(PhysicalMeshPointer);
+			Room->PhysicalMesh.PhysicalMeshEnabled = PhysicalMeshNode.ReadBoolean("PhysicalMeshEnabled");
 
-			ZEMLSerialListItem PhysicalMeshList[] = {
-				ZEML_LIST_PROPERTY("PhysicalMeshEnabled",	PhysicalMeshEnabledValue,			ZE_VRT_BOOLEAN,	true),
-				ZEML_LIST_PROPERTY("UserDefinedProperties",	PhysicalUserDefinedPropertiesValue,	ZE_VRT_BOOLEAN,	false),
-				ZEML_LIST_DATA("Polygons",					PhysicalPolygonsPointer,							true),
-				ZEML_LIST_DATA("Vertices",					PhysicalVerticesPointer,							true)
-			};
+			if (PhysicalMeshNode.IsPropertyExists("UserDefinedProperties"))
+				Room->PhysicalMesh.UserDefinedProperties = PhysicalMeshNode.ReadString("UserDefinedProperties");
 
-			Reader->ReadPropertyList(PhysicalMeshList, 4);
+			Room->PhysicalMesh.Polygons.SetCount(PhysicalMeshNode.ReadDataSize("Polygons") / sizeof(ZEInteriorPhysicalMeshPolygon));
+			PhysicalMeshNode.ReadData("Polygons", Room->PhysicalMesh.Polygons.GetCArray(), PhysicalMeshNode.ReadDataSize("Polygons"));
 
-			Room->PhysicalMesh.PhysicalMeshEnabled = PhysicalMeshEnabledValue;
-
-			if (PhysicalUserDefinedPropertiesValue.GetType() == ZE_VRT_STRING)
-				Room->PhysicalMesh.UserDefinedProperties = PhysicalUserDefinedPropertiesValue.GetString();
-
-			Reader->SeekPointer(PhysicalPolygonsPointer);
-			Room->PhysicalMesh.Polygons.SetCount(Reader->GetDataSize() / sizeof(ZEInteriorPhysicalMeshPolygon));
-			Reader->GetData(Room->PhysicalMesh.Polygons.GetCArray(), Reader->GetDataSize());
-
-			Reader->SeekPointer(PhysicalVerticesPointer);
-			Room->PhysicalMesh.Vertices.SetCount(Reader->GetDataSize() / sizeof(ZEVector3));
-			Reader->GetData(Room->PhysicalMesh.Vertices.GetCArray(), Reader->GetDataSize());
+			Room->PhysicalMesh.Vertices.SetCount(PhysicalMeshNode.ReadDataSize("Vertices") / sizeof(ZEVector3));
+			PhysicalMeshNode.ReadData("Vertices", Room->PhysicalMesh.Vertices.GetCArray(), PhysicalMeshNode.ReadDataSize("Vertices"));
 
 			Room->HasPhysicalMesh = true;
 		}
 		else
 		{
 			Room->HasPhysicalMesh = false;
-			zeWarning("Room %s does not have physical mesh.", RoomName.GetString().ToCString());
+			zeWarning("Room %s does not have physical mesh.", Room->Name);
 		}
 
-		if (true)//GenerateOctree.GetType() == ZE_VRT_BOOLEAN && GenerateOctree.GetBoolean())
+		if (RoomNode.IsPropertyExists("GenerateOctree"))
 		{
-			Room->HasOctree = true;
-			Room->Octree.SetBoundingBox(Room->BoundingBox);
-			Room->Octree.SetMaxDepth(4);
-			for (ZESize I = 0; I < Room->Polygons.GetCount(); I++)
+			if (RoomNode.ReadBoolean("GenerateOctree"))
 			{
-				ZETriangle Triangle(Room->Polygons[I].Vertices[0].Position, Room->Polygons[I].Vertices[1].Position, Room->Polygons[I].Vertices[2].Position);
-				Room->Octree.AddItem(I, Triangle);
+				Room->HasOctree = true;
+				Room->Octree.SetBoundingBox(Room->BoundingBox);
+				Room->Octree.SetMaxDepth(4);
+				for (ZESize I = 0; I < Room->Polygons.GetCount(); I++)
+				{
+					ZETriangle Triangle(Room->Polygons[I].Vertices[0].Position, Room->Polygons[I].Vertices[1].Position, Room->Polygons[I].Vertices[2].Position);
+					Room->Octree.AddItem(I, Triangle);
+				}
+			}
+			else
+			{
+				Room->HasOctree = false;
 			}
 		}
 		else
@@ -391,96 +337,72 @@ bool ZEInteriorResource::ReadRooms(ZEMLSerialReader* Reader)
 		}
 	}
 
-	Reader->GoToCurrentPointer();
-
 	return true;
 }
 
-bool ZEInteriorResource::ReadHelpers(ZEMLSerialReader* Reader)
+bool ZEInteriorResource::ReadHelpers(ZEMLReaderNode* HelpersNode)
 {
-	ZESize SubItemCount = Reader->GetSubItemCount();
-	for (ZESize I = 0; I < SubItemCount; I++)
+	if (HelpersNode == NULL)
+		return false;
+
+	if (!HelpersNode->IsValid())
+		return false;
+
+	ZESize SubNodeCount = HelpersNode->GetSubNodeCount("Helper");
+
+	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		if (!Reader->Read())
-		{
-			zeError("Can not read ZEML node.");
+		ZEMLReaderNode HelperNode = HelpersNode->GetSubNode("Helper", I);
+
+		if (!HelperNode.IsValid())
 			return false;
-		}
-
-		if (Reader->GetItemType() != ZEML_ET_NODE || Reader->GetItemName() != "Helper")
-			continue;
-
-		ZEValue NameValue, OwnerTypeValue, OwnerIndexValue, PositionValue, RotationValue, ScaleValue, UserDefinedProperties;
-
-		ZEMLSerialListItem HelperPropertiesList[] = { 
-			ZEML_LIST_PROPERTY("Name",						NameValue,					ZE_VRT_STRING,			true),  
-			ZEML_LIST_PROPERTY("OwnerType",					OwnerTypeValue,				ZE_VRT_INTEGER_32, 		true),
-			ZEML_LIST_PROPERTY("OwnerIndex",				OwnerIndexValue,			ZE_VRT_INTEGER_32,		true),
-			ZEML_LIST_PROPERTY("Position",					PositionValue,				ZE_VRT_VECTOR3,			true),
-			ZEML_LIST_PROPERTY("Rotation",					RotationValue,				ZE_VRT_QUATERNION,		true),
-			ZEML_LIST_PROPERTY("Scale",						ScaleValue,					ZE_VRT_VECTOR3,			true),
-			ZEML_LIST_PROPERTY("UserDefinedProperties",		UserDefinedProperties,		ZE_VRT_STRING,			false)
-		};
-
-		Reader->ReadPropertyList(HelperPropertiesList, 7);
 
 		ZEInteriorResourceHelper* Helper = &Helpers[I];
+		
+		strncpy(Helper->Name, HelperNode.ReadString("Name").ToCString(), ZE_MAX_NAME_SIZE);
+		
+		Helper->Position = HelperNode.ReadVector3("Position");
+		Helper->Rotation = HelperNode.ReadQuaternion("Rotation");
+		Helper->Scale = HelperNode.ReadVector3("Scale");
 
-		strncpy(Helper->Name, NameValue.GetString().ToCString(), ZE_MAX_NAME_SIZE);
-
-		Helper->Position = PositionValue;
-		Helper->Rotation = RotationValue;
-		Helper->Scale = ScaleValue;
-
-		if (UserDefinedProperties.GetType() == ZE_VRT_STRING)
-			Helper->UserDefinedProperties = UserDefinedProperties.GetString();
-
-		Helper->OwnerType = (ZEInteriorResourceHelperOwnerType)OwnerTypeValue.GetInt32();
-		Helper->OwnerIndex = OwnerIndexValue;
-
+		if (HelperNode.IsPropertyExists("UserDefinedProperties"))
+			Helper->UserDefinedProperties = HelperNode.ReadString("UserDefinedProperties");
+		
+		Helper->OwnerType = (ZEInteriorResourceHelperOwnerType)HelperNode.ReadInt32("OwnerType");
+		Helper->OwnerIndex = HelperNode.ReadInt32("OwnerIndex");
+		
 		if (Helper->OwnerType == ZE_IRHOT_ROOM)
 			Helper->OwnerRoom = &Rooms[Helper->OwnerIndex];
 	}
 
-	Reader->GoToCurrentPointer();
-
 	return true;
 }
 
-bool ZEInteriorResource::ReadMaterials(ZEMLSerialReader* Reader)
+bool ZEInteriorResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 {
+	if (MaterialsNode == NULL)
+		return false;
+
+	if (!MaterialsNode->IsValid())
+		return false;
+
 	for(ZESize I = 0; I < Materials.GetCount(); I++)
 		Materials[I] = ZEFixedMaterial::CreateInstance();
 
-	ZESize SubItemCount = Reader->GetSubItemCount();
-	for (ZESize I = 0; I < SubItemCount; I++)
+	ZESize SubNodeCount = MaterialsNode->GetSubNodeCount("Material");
+
+	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		if (!Reader->Read())
-		{
-			zeError("Can not read ZEML node.");
+		ZEMLReaderNode MaterialNode = MaterialsNode->GetSubNode("Material", I);
+
+		if (!MaterialNode.IsValid())
 			return false;
-		}
 
-		if (Reader->GetItemType() != ZEML_ET_NODE || Reader->GetItemName() != "Material")
-			continue;
-
-		ZEValue MaterialName, MaterialRelativePath;
-
-		ZEMLSerialListItem MaterialList[] = {
-			ZEML_LIST_PROPERTY("Name",		MaterialName,			ZE_VRT_STRING,	true),
-			ZEML_LIST_PROPERTY("FilePath",	MaterialRelativePath,	ZE_VRT_STRING,	true)
-		};
-
-		Reader->ReadPropertyList(MaterialList, 2);
-		
-		ZEString MaterialPath = ZEFileInfo(GetFileName()).GetParentDirectory() + "/" + MaterialRelativePath.GetString();
+		ZEString MaterialPath = ZEFileInfo(GetFileName()).GetParentDirectory() + "/" + MaterialNode.ReadString("FilePath");
 
 		ZEFixedMaterial* CurrentMaterial = (ZEFixedMaterial*)Materials[I];
 		CurrentMaterial->ReadFromFile(MaterialPath);
-
 	}
-
-	Reader->GoToCurrentPointer();
 
 	return true;
 }

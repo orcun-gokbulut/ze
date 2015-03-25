@@ -51,6 +51,11 @@ ZESize ZEMLProperty::GetSize()
 	return Size;
 }
 
+ZEMLValueType ZEMLProperty::GetValueType()
+{
+	return (ZEMLValueType)ZEMLUtils::ConvertValueType(Value.GetType());
+}
+
 bool ZEMLProperty::SetValue(const ZEValue& Value)
 {
 	ZEMLValueType ValueType = ZEMLUtils::ConvertValueType(Value.GetType());
@@ -70,13 +75,99 @@ const ZEValue& ZEMLProperty::GetValue() const
 	return Value;
 }
 
-ZEMLValueType ZEMLProperty::GetValueType()
+void ZEMLProperty::SetFloat(float Value)
 {
-	return (ZEMLValueType)ZEMLUtils::ConvertValueType(Value.GetType());
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetDouble(double Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetInt8(ZEInt8 Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetInt16(ZEInt16 Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetInt32(ZEInt32 Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetInt64(ZEInt64 Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetUInt8(ZEUInt8 Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetUInt16(ZEUInt16 Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetUInt32(ZEUInt32 Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetUInt64(ZEUInt64 Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetBool(bool Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetString(const char* Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetQuaternion(const ZEQuaternion& Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetVector2(const ZEVector2& Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetVector3(const ZEVector3& Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetVector4(const ZEVector4& Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetMatrix3x3(const ZEMatrix3x3& Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetMatrix4x4(const ZEMatrix4x4& Value)
+{
+	SetValue(ZEValue(Value));
 }
 
 ZEMLProperty::ZEMLProperty()
 {
+
 }
 
 ZEMLProperty::ZEMLProperty(const char* Name)

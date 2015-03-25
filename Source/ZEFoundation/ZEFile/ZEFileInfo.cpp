@@ -101,7 +101,7 @@ bool ZEFileInfo::Copy(const char* Destination)
 		return false;
 
 	ZERealPath DestinationRealPath = DestinationInfo.GetRealPath();
-	return CopyFile(GetRealPath().Path, DestinationRealPath.Path, TRUE) != 0;
+	return CopyFile(GetRealPath().Path, DestinationRealPath.Path, FALSE) != 0;
 }
 
 bool ZEFileInfo::Delete()

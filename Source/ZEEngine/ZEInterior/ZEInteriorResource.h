@@ -52,7 +52,7 @@ class ZEMaterial;
 class ZETexture2D;
 class ZETexture2DResource;
 struct ZEInteriorResourceDoor;
-class ZEMLSerialReader;
+class ZEMLReaderNode;
 
 enum ZEInteriorResourceHelperOwnerType
 {
@@ -135,10 +135,10 @@ class ZEInteriorResource : public ZEResource
 		ZEArray<ZEInteriorResourceRoom>				Rooms;
 		ZEArray<ZEInteriorResourceHelper>			Helpers;
 
-		bool										ReadDoors(ZEMLSerialReader* Reader);
-		bool										ReadRooms(ZEMLSerialReader* Reader);
-		bool										ReadHelpers(ZEMLSerialReader* Reader);
-		bool										ReadMaterials(ZEMLSerialReader* Reader);
+		bool										ReadDoors(ZEMLReaderNode* DoorsNode);
+		bool										ReadRooms(ZEMLReaderNode* RoomsNode);
+		bool										ReadHelpers(ZEMLReaderNode* HelpersNode);
+		bool										ReadMaterials(ZEMLReaderNode* MaterialsNode);
 
 		const ZETexture2D*							ManageInteriorMaterialTextures(const ZEString& FileName);
 		bool  										ReadInteriorFromFile(ZEFile* ResourceFile);
