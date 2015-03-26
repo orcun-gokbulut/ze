@@ -37,10 +37,11 @@
 #include "QtGui/QWidget"
 #include "ui_ZEMLVisualizerWidget.h"
 #include "ZETypes.h"
-#include "ZEML/ZEMLItem.h"
+#include "ZEML/ZEMLElement.h"
 #include "ZEML/ZEMLNode.h"
+#include "ZEML/ZEMLRoot.h"
 #include "ZEML/ZEMLProperty.h"
-#include "ZEML/ZEMLDataProperty.h"
+#include "ZEML/ZEMLData.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMLVisualizerTreeWidget.h"
 #include "ZEFile/ZEFile.h"
@@ -92,8 +93,23 @@ ZEMLVisualizerWidget::ZEMLVisualizerWidget(QWidget* Parent)
 
 ZEMLVisualizerWidget::~ZEMLVisualizerWidget()
 {
-	delete QtComponents;
-	QtComponents = NULL;
+	if (QtComponents != NULL)
+	{
+		delete QtComponents;
+		QtComponents = NULL;
+	}
+
+	if (Node != NULL)
+	{
+		delete Node;
+		Node = NULL;
+	}
+
+	if (Root != NULL)
+	{
+		delete Root;
+		Root = NULL;
+	}
 }
 
 void ZEMLVisualizerWidget::Show()
@@ -125,8 +141,10 @@ void ZEMLVisualizerWidget::SetZEMLFile(const ZEString& FileName)
 	if(!File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
 		zeError("Can not open given file. File name : %s", FileName.ToCString());
 
+	Root = new ZEMLRoot();
 	Node = new ZEMLNode("Root");
-	Node->Read(&File);
+	Root->SetRootNode(Node);
+	Root->Read(&File);
 	File.Close();
 
 	SetZEMLNode(Node);
@@ -152,9 +170,9 @@ void ZEMLVisualizerWidget::AddItem(ZEMLElement* Item, QTreeWidgetItem* ParentIte
 		NewItem->setBackgroundColor(2, QColor(230,230,230));
 		ZEMLNode* CurrentItem = (ZEMLNode*)Item;
 		
-		ZEArray<ZEMLElement*> Nodes = CurrentItem->FindElements(ZEML_ET1_NODE);
-		ZEArray<ZEMLElement*> Properties = CurrentItem->FindElements(ZEML_ET_PROPERTY);
-		ZEArray<ZEMLElement*> Data = CurrentItem->FindElements(ZEML_ET_DATA);
+		ZEArray<ZEMLElement*> Nodes = CurrentItem->GetElements(ZEML_ET1_NODE);
+		ZEArray<ZEMLElement*> Properties = CurrentItem->GetElements(ZEML_ET_PROPERTY);
+		ZEArray<ZEMLElement*> Data = CurrentItem->GetElements(ZEML_ET_DATA);
 
 		ZESize SubNodeCount = Nodes.GetCount();
 		ZESize PropertyCount = Properties.GetCount();
@@ -174,7 +192,7 @@ void ZEMLVisualizerWidget::AddItem(ZEMLElement* Item, QTreeWidgetItem* ParentIte
 		//NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
 		NewItem->setText(1, "DataProperty");
 		ZEMLData* CurrentItem = (ZEMLData*)Item;
-		ZEString DataSize = CurrentItem->GetDataSize();
+		ZEString DataSize = CurrentItem->GetSize();
 		NewItem->setText(2, ("Data Size : " + DataSize + " byte(s)").ToCString());
 	}
 	else if (Item->GetType() == ZEML_ET_PROPERTY)

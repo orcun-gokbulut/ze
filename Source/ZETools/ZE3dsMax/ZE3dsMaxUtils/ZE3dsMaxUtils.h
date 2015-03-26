@@ -41,7 +41,7 @@
 #include "ZEMath/ZEAABBox.h"
 #include "ZEML/ZEMLNode.h"
 #include "ZEML/ZEMLProperty.h"
-#include "ZEML/ZEMLDataProperty.h"
+#include "ZEML/ZEMLData.h"
 #include "ZEML/ZEMLRoot.h"
 #include "ZEPacking.h"
 

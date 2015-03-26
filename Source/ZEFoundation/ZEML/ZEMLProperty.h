@@ -37,7 +37,7 @@
 #ifndef	__ZEML_PROPERTY_H__
 #define __ZEML_PROPERTY_H__
 
-#include "ZEMLItem.h"
+#include "ZEMLElement.h"
 #include "ZEDS/ZEValue.h"
 
 class ZEMLProperty : public ZEMLElement
