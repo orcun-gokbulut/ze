@@ -38,7 +38,6 @@
 #include <windows.h>
 #include "ZEFile\ZEFile.h"
 #include "ZEML\ZEMLWriter.h"
-#include "ZEML\ZEMLNode.h"
 #include "ZETexture\ZETextureData.h"
 #include "ZETexture\ZETextureLoader.h"
 #include "ZEFile\ZEDirectoryInfo.h"
@@ -184,11 +183,19 @@ bool ZEFontBaker::BakeFont(const char* FileName,
 		return false;
 	}
 
-	ZEMLNode FontRootNode("ZEFont");
-	ZEMLNode* TexturesNode = NULL;
+	ZEMLWriter FontWriter;
+
+	if (!FontWriter.Open(&FontFile))
+	{
+		zeError("Can not write font file.");
+		return false;
+	}
+
+	ZEMLWriterNode FontRootNode = FontWriter.WriteRootNode("ZEFont");
+	ZEMLWriterNode TexturesNode;
 
 	if(!GenerateCoordsOnly)
-		TexturesNode = FontRootNode.AddSubNode("Textures");
+		TexturesNode = FontRootNode.OpenSubNode("Textures");
 
 	HDC dc;
 	HBITMAP Bitmap;
@@ -237,14 +244,15 @@ bool ZEFontBaker::BakeFont(const char* FileName,
 			{
 				if (!GenerateCoordsOnly)
 				{
-					ZEMLNode* TextureNode = TexturesNode->AddSubNode("Texture");
-					TextureNode->AddProperty("FileName", ZEString(TextureCount) + ".bmp");
+					ZEMLWriterNode TextureNode = TexturesNode.OpenSubNode("Texture");
+					TextureNode.WriteString("FileName", ZEString(TextureCount) + ".bmp");
 					DumpTexture(FileName, TextureCount, Bitmap, dc);
 					DeleteObject(Bitmap);
 					Bitmap = CreateBitmap(TextureWidth, TextureHeight, 1, 32, NULL);
 					SelectObject(dc, Bitmap);
 					OffsetX = LeftMargin + CharacterSpacingX;
 					OffsetY = TopMargin + CharacterSpacingY;
+					TextureNode.CloseNode();
 					TextureCount++;
 				}
 				BitmapId++;
@@ -266,22 +274,21 @@ bool ZEFontBaker::BakeFont(const char* FileName,
 
 	if (!GenerateCoordsOnly)
 	{
-		ZEMLNode* TextureNode = TexturesNode->AddSubNode("Texture");
-		TextureNode->AddProperty("FileName", ZEString(TextureCount) + ".bmp");
+		ZEMLWriterNode TextureNode = TexturesNode.OpenSubNode("Texture");
+		TextureNode.WriteString("FileName", ZEString(TextureCount) + ".bmp");
 		DumpTexture(FileName, TextureCount, Bitmap, dc);
 		DeleteObject(Bitmap);
+		TextureNode.CloseNode();
 		TextureCount++;
+
+		TexturesNode.CloseNode();
 	}
 
-	FontRootNode.AddProperty("TextureCount", TextureCount);
-	FontRootNode.AddDataProperty("Characters", Characters.GetCArray(), Characters.GetCount() * sizeof(ZEFontCharacter), true);
+	FontRootNode.WriteUInt32("TextureCount", TextureCount);
+	FontRootNode.WriteData("Characters", Characters.GetCArray(), Characters.GetCount() * sizeof(ZEFontCharacter));
 
-	if(!FontRootNode.Write(&FontFile))
-	{
-		zeError("Can not write font file.");
-		return false;
-	}
-
+	FontRootNode.CloseNode();
+	FontWriter.Close();
 	FontFile.Close();
 
 	DeleteDC(dc);

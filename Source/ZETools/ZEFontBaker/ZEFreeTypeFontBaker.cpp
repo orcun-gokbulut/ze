@@ -38,7 +38,7 @@
 #include "ft2build.h"
 #include "freetype\freetype.h"
 #include "freetype\ftglyph.h"
-#include "ZEML/ZEMLNode.h"
+#include "ZEML/ZEMLWriter.h"
 #include "ZEFile/ZEFile.h"
 
 #define UTF8_SPACE_CHARACTER 0x00020
@@ -193,55 +193,71 @@ bool ZEFreeTypeFontBaker::BakeFont(ZEString CharacterSequence, ZEString FontFile
 	ZEFile* CharacterMetricsOutput = new ZEFile();
 	CharacterMetricsOutput->Open(DataOutputFile, ZE_FOM_WRITE, ZE_FCM_OVERWRITE);
 
-	ZEMLNode* Root = new ZEMLNode("ZEFont");
+	ZEMLWriter FreeTypeFontWriter;
+	FreeTypeFontWriter.Open(CharacterMetricsOutput);
 
-	ZEMLNode* Textures = Root->AddSubNode("Textures");
+	ZEMLWriterNode FreeTypeRootNode = FreeTypeFontWriter.WriteRootNode("ZEFont");
+
+	ZEMLWriterNode TexturesNode = FreeTypeRootNode.OpenSubNode("Textures");
+
+	ZEMLWriterNode TextureNode;
+
 	for(ZESize I = 0; I <= TextureId; I++)
 	{
-		ZEMLNode* Texture = Textures->AddSubNode("Texture");
+		TextureNode = TexturesNode.OpenSubNode("Texture");
 		ZEString TextureFileName;
 		TextureFileName.Append(I);
 		TextureFileName.Append(".png");
-		Texture->AddProperty("FileName", TextureFileName);
+		TextureNode.WriteString("FileName", TextureFileName);
+		TextureNode.CloseNode();
 	}
 
-	ZEMLNode* FontInformation = Root->AddSubNode("FontInformation");
-	FontInformation->AddProperty("CharacterSequence", CharacterSequence);
-	FontInformation->AddProperty("TextureCount", TextureId + 1);
-	FontInformation->AddProperty("FontSize", FontSize);
-	FontInformation->AddProperty("HorizontalOutputDPI", HorizontalOutputDPI);
-	FontInformation->AddProperty("VerticalOutputDPI", VerticalOutputDPI);
-	FontInformation->AddProperty("PointFactor", PointFactor);
-	FontInformation->AddProperty("TextureWidth", TextureWidth);
-	FontInformation->AddProperty("TextureHeight", TextureHeight);
-	FontInformation->AddProperty("MarginTop", MarginTop);
-	FontInformation->AddProperty("MarginBottom", MarginBottom);
-	FontInformation->AddProperty("MarginLeft", MarginLeft);
-	FontInformation->AddProperty("MarginRight", MarginRight);
-	FontInformation->AddProperty("HorizontalPadding", HorizontalPadding);
-	FontInformation->AddProperty("VerticalPadding", VerticalPadding);
+	TexturesNode.CloseNode();
 
-	ZEMLNode* Characters = Root->AddSubNode("Characters");
+	ZEMLWriterNode FontInformationNode = FreeTypeRootNode.OpenSubNode("FontInformation");
+	FontInformationNode.WriteString("CharacterSequence", CharacterSequence);
+	FontInformationNode.WriteUInt32("TextureCount", TextureId + 1);
+	FontInformationNode.WriteUInt32("FontSize", FontSize);
+	FontInformationNode.WriteUInt32("HorizontalOutputDPI", HorizontalOutputDPI);
+	FontInformationNode.WriteUInt32("VerticalOutputDPI", VerticalOutputDPI);
+	FontInformationNode.WriteUInt32("PointFactor", PointFactor);
+	FontInformationNode.WriteUInt32("TextureWidth", TextureWidth);
+	FontInformationNode.WriteUInt32("TextureHeight", TextureHeight);
+	FontInformationNode.WriteUInt32("MarginTop", MarginTop);
+	FontInformationNode.WriteUInt32("MarginBottom", MarginBottom);
+	FontInformationNode.WriteUInt32("MarginLeft", MarginLeft);
+	FontInformationNode.WriteUInt32("MarginRight", MarginRight);
+	FontInformationNode.WriteUInt32("HorizontalPadding", HorizontalPadding);
+	FontInformationNode.WriteUInt32("VerticalPadding", VerticalPadding);
+	FontInformationNode.CloseNode();
+
+	ZEMLWriterNode CharactersNode = FreeTypeRootNode.OpenSubNode("Characters");
+
+	ZEMLWriterNode CharacterMetricNode;
+
 	for(ZESize I = 0; I < FontCharacters.GetCount(); I++)
 	{
-		ZEMLNode* Metric = Characters->AddSubNode("Character");
-		Metric->AddProperty("Value", FontCharacters[I].Character);
-		Metric->AddProperty("GlyphIndex", FontCharacters[I].GlyphIndex);
-		Metric->AddProperty("FontSize", FontCharacters[I].FontSize);
-		Metric->AddProperty("Height", FontCharacters[I].Height);
-		Metric->AddProperty("Width", FontCharacters[I].Width);
-		Metric->AddProperty("HorizontalAdvance", FontCharacters[I].HorizontalAdvance);
-		Metric->AddProperty("VerticalAdvance", FontCharacters[I].VerticalAdvance);
-		Metric->AddProperty("HorizontalBearingX", FontCharacters[I].HorizontalBearingX);
-		Metric->AddProperty("HorizontalBearingY", FontCharacters[I].HorizontalBearingY);
-		Metric->AddProperty("VerticalBearingX", FontCharacters[I].VerticalBearingX);
-		Metric->AddProperty("VerticalBearingY", FontCharacters[I].VerticalBearingY);
-		Metric->AddProperty("LeftUp", FontCharacters[I].LeftUp);
-		Metric->AddProperty("RightDown", FontCharacters[I].RightDown);
-		Metric->AddProperty("TextureID", FontCharacters[I].TextureID);
+		CharacterMetricNode = CharactersNode.OpenSubNode("Character");
+		CharacterMetricNode.WriteInt32("Value", FontCharacters[I].Character);
+		CharacterMetricNode.WriteUInt32("GlyphIndex", FontCharacters[I].GlyphIndex);
+		CharacterMetricNode.WriteUInt32("FontSize", FontCharacters[I].FontSize);
+		CharacterMetricNode.WriteInt32("Height", FontCharacters[I].Height);
+		CharacterMetricNode.WriteInt32("Width", FontCharacters[I].Width);
+		CharacterMetricNode.WriteInt32("HorizontalAdvance", FontCharacters[I].HorizontalAdvance);
+		CharacterMetricNode.WriteInt32("VerticalAdvance", FontCharacters[I].VerticalAdvance);
+		CharacterMetricNode.WriteInt32("HorizontalBearingX", FontCharacters[I].HorizontalBearingX);
+		CharacterMetricNode.WriteInt32("HorizontalBearingY", FontCharacters[I].HorizontalBearingY);
+		CharacterMetricNode.WriteInt32("VerticalBearingX", FontCharacters[I].VerticalBearingX);
+		CharacterMetricNode.WriteInt32("VerticalBearingY", FontCharacters[I].VerticalBearingY);
+		CharacterMetricNode.WriteVector2("LeftUp", FontCharacters[I].LeftUp);
+		CharacterMetricNode.WriteVector2("RightDown", FontCharacters[I].RightDown);
+		CharacterMetricNode.WriteUInt32("TextureID", FontCharacters[I].TextureID);
+		CharacterMetricNode.CloseNode();
 	}
 
-	Root->Write(CharacterMetricsOutput);
+	CharactersNode.CloseNode();
+	FreeTypeRootNode.CloseNode();
+	FreeTypeFontWriter.Close();
 	CharacterMetricsOutput->Close();
 
 	return true;

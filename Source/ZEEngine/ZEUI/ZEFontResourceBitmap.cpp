@@ -42,7 +42,7 @@
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZETexture/ZETextureOptions.h"
 #include "ZECore/ZEResourceManager.h"
-#include "ZEML/ZEMLSerialReader.h"
+#include "ZEML/ZEMLReader.h"
 #include "ZEFile/ZEDirectoryInfo.h"
 
 ZEFontResourceBitmap::ZEFontResourceBitmap()
@@ -170,141 +170,78 @@ ZEFontResourceBitmap* ZEFontResourceBitmap::LoadResource(ZEFile* ResourceFile, c
 
 	ZEFontResourceBitmap* NewResource = new ZEFontResourceBitmap();
 	
-	ZEMLSerialReader* Reader = new ZEMLSerialReader(ResourceFile);
-	if(Reader->Read())
+	ZEMLReader FontReader;
+	FontReader.Open(ResourceFile);
+	ZEMLReaderNode RootNode = FontReader.GetRootNode();
+
+	if(RootNode.IsValid())
 	{
-		if(Reader->GetItemName() != "ZEFont")
+		if(RootNode.GetName() != "ZEFont")
 			zeError("File is not a ZEFont file.");
 	}
 
-	if(Reader->Read())
-	{
-		if(Reader->GetItemName() != "Textures")
-			zeError("Can not find Textures node.");
-	}
+	if (!RootNode.IsSubNodeExists("Textures"))
+		zeError("Can not find Textures node.");
 
-	ZESize TextureCount = Reader->GetSubItemCount();
+	ZEMLReaderNode TexturesNode = RootNode.GetSubNode("Textures");
+
+	ZESize TextureCount = TexturesNode.GetSubNodeCount("Texture");
 
 	NewResource->TextureResources.SetCount(TextureCount);
 	NewResource->Textures.SetCount(TextureCount);
 
 	for(ZESize I = 0; I < TextureCount; I++)
 	{
-		if(Reader->Read())
+		ZEMLReaderNode TextureNode = TexturesNode.GetSubNode("Texture", I);
+
+		if(!TextureNode.IsValid())
 		{
-			if(Reader->GetItemName() != "Texture")
-				zeError("Can not read Texture node.");
-
-			Reader->Read();
-			ZEString TextureFileName = Reader->GetItemValue().GetString();
-
-			ZEString TexturePath = "../" + ZEDirectoryInfo(ResourceFile->GetPath()).GetParentDirectory() + "/" + TextureFileName;
-
-			NewResource->TextureResources[I] = ZETexture2DResource::LoadSharedResource(TexturePath);
-			NewResource->Textures[I] = NewResource->TextureResources[I]->GetTexture();
+			zeError("Can not read Texture node.");
+			break;
 		}
+
+		ZEString TextureFileName = TextureNode.ReadString("FileName");
+
+		ZEString TexturePath = "../" + ZEDirectoryInfo(ResourceFile->GetPath()).GetParentDirectory() + "/" + TextureFileName;
+
+		NewResource->TextureResources[I] = ZETexture2DResource::LoadSharedResource(TexturePath);
+		NewResource->Textures[I] = NewResource->TextureResources[I]->GetTexture();
 	}
 
-	if(Reader->Read())
-	{
-		if(Reader->GetItemName() != "FontInformation")
-			zeError("Can not find FontInformation node.");
+	ZEMLReaderNode CharactersNode = RootNode.GetSubNode("Characters");
 
-		ZESize FontInformationSubItemCount = Reader->GetSubItemCount();
-		for(ZESize I = 0; I < FontInformationSubItemCount; I++)
-		{
-			Reader->Read();
-		}
-	}
+	if(!CharactersNode.IsValid())
+		zeError("Can not find Characters node.");
 
-	if(Reader->Read())
-	{
-		if(Reader->GetItemName() != "Characters")
-			zeError("Can not find Characters node.");
-	}
 
-	ZESize CharacterCount = Reader->GetSubItemCount();
+	ZESize CharacterCount = CharactersNode.GetSubNodeCount("Character");
 
 	NewResource->Characters.SetCount(CharacterCount);
 
 	for(ZESize I = 0; I < CharacterCount; I++)
 	{
-		if(Reader->Read())
+		ZEMLReaderNode CharacterNode = CharactersNode.GetSubNode("Character", I);
+
+		if(CharacterNode.IsValid())
 		{
-			if(Reader->GetItemName() != "Character")
-				zeError("Can not read Character node.");
-
-			Reader->Read();
-			if(Reader->GetItemName() != "Value")
-				zeError("Can not read Value node.");
-			NewResource->Characters[I].Character = Reader->GetItemValue().GetInt32();
-
-			Reader->Read();
-			if(Reader->GetItemName() != "GlyphIndex")
-				zeError("Can not read GlyphIndex node.");
-			NewResource->Characters[I].GlyphIndex = Reader->GetItemValue().GetUInt32();
-
-			Reader->Read();
-			if(Reader->GetItemName() != "FontSize")
-				zeError("Can not read FontSize node.");
-			NewResource->Characters[I].CharacterMetric.FontSize = Reader->GetItemValue().GetUInt32();
-
-			Reader->Read();
-			if(Reader->GetItemName() != "Height")
-				zeError("Can not read Height node.");
-			NewResource->Characters[I].CharacterMetric.Height = Reader->GetItemValue().GetInt32();
-
-			Reader->Read();
-			if(Reader->GetItemName() != "Width")
-				zeError("Can not read Width node.");
-			NewResource->Characters[I].CharacterMetric.Width = Reader->GetItemValue().GetInt32();
-
-			Reader->Read();
-			if(Reader->GetItemName() != "HorizontalAdvance")
-				zeError("Can not read HorizontalAdvance node.");
-			NewResource->Characters[I].CharacterMetric.HorizontalAdvance = Reader->GetItemValue().GetInt32();
-
-			Reader->Read();
-			if(Reader->GetItemName() != "VerticalAdvance")
-				zeError("Can not read VerticalAdvance node.");
-			NewResource->Characters[I].CharacterMetric.VerticalAdvance = Reader->GetItemValue().GetInt32();
-
-			Reader->Read();
-			if(Reader->GetItemName() != "HorizontalBearingX")
-				zeError("Can not read HorizontalBearingX node.");
-			NewResource->Characters[I].CharacterMetric.HorizontalBearingX = Reader->GetItemValue().GetInt32();
-
-			Reader->Read();
-			if(Reader->GetItemName() != "HorizontalBearingY")
-				zeError("Can not read HorizontalBearingY node.");
-			NewResource->Characters[I].CharacterMetric.HorizontalBearingY = Reader->GetItemValue().GetInt32();
-
-			Reader->Read();
-			if(Reader->GetItemName() != "VerticalBearingX")
-				zeError("Can not read VerticalBearingX node.");
-			NewResource->Characters[I].CharacterMetric.VerticalBearingX = Reader->GetItemValue().GetInt32();
-
-			Reader->Read();
-			if(Reader->GetItemName() != "VerticalBearingY")
-				zeError("Can not read VerticalBearingY node.");
-			NewResource->Characters[I].CharacterMetric.VerticalBearingY = Reader->GetItemValue().GetInt32();
-			
-			Reader->Read();
-			if(Reader->GetItemName() != "LeftUp")
-				zeError("Can not read LeftUp node.");
-			NewResource->Characters[I].CoordinateRectangle.LeftUp = Reader->GetItemValue().GetVector2();
-
-			Reader->Read();
-			if(Reader->GetItemName() != "RightDown")
-				zeError("Can not read RightDown node.");
-			NewResource->Characters[I].CoordinateRectangle.RightDown = Reader->GetItemValue().GetVector2();
-
-			Reader->Read();
-			if(Reader->GetItemName() != "TextureID")
-				zeError("Can not read TextureID node.");
-			NewResource->Characters[I].Texture = NewResource->Textures[Reader->GetItemValue().GetUInt32()];
+			NewResource->Characters[I].Character = CharacterNode.ReadInt32("Value");
+			NewResource->Characters[I].GlyphIndex = CharacterNode.ReadUInt32("GlyphIndex");
+			NewResource->Characters[I].CharacterMetric.FontSize = CharacterNode.ReadUInt32("FontSize");
+			NewResource->Characters[I].CharacterMetric.Height = CharactersNode.ReadInt32("Height");
+			NewResource->Characters[I].CharacterMetric.Width = CharactersNode.ReadInt32("Width");
+			NewResource->Characters[I].CharacterMetric.HorizontalAdvance = CharactersNode.ReadInt32("HorizontalAdvance");
+			NewResource->Characters[I].CharacterMetric.VerticalAdvance = CharactersNode.ReadInt32("VerticalAdvance");
+			NewResource->Characters[I].CharacterMetric.HorizontalBearingX = CharactersNode.ReadInt32("HorizontalBearingX");
+			NewResource->Characters[I].CharacterMetric.HorizontalBearingY = CharactersNode.ReadInt32("HorizontalBearingY");
+			NewResource->Characters[I].CharacterMetric.VerticalBearingX = CharactersNode.ReadInt32("VerticalBearingX");
+			NewResource->Characters[I].CharacterMetric.VerticalBearingY = CharactersNode.ReadInt32("VerticalBearingY");
+			NewResource->Characters[I].CoordinateRectangle.LeftUp = CharactersNode.ReadVector2("LeftUp");
+			NewResource->Characters[I].CoordinateRectangle.RightDown = CharactersNode.ReadVector2("RightDown");
+			NewResource->Characters[I].Texture = NewResource->Textures[CharactersNode.ReadUInt32("TextureID")];
 		}
 	}
+
+	FontReader.Close();
 
 	zeLog("Font file \"%s\" has been loaded.", ResourceFile->GetPath().GetValue());
 
