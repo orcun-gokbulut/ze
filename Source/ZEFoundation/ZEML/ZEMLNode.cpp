@@ -41,6 +41,7 @@
 
 bool ZEMLNode::Read(ZEMLReaderNode* Reader)
 {
+	Name = Reader->GetName();
 	const ZESmartArray<ZEMLReaderProperty>& Properties = Reader->GetProperties();
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 	{
@@ -52,19 +53,25 @@ bool ZEMLNode::Read(ZEMLReaderNode* Reader)
 		}
 		else
 		{
-			ZEMLProperty* NewProperty = AddProperty(Properties[I].Name);
+			ZEPointer<ZEMLProperty> NewProperty = new ZEMLProperty(Properties[I].Name);
 			if (NewProperty != NULL)
+			{
 				NewProperty->SetValue(Properties[I].Value);
+				continue;
+			}
+			AddElement(NewProperty.Transfer());
 		}
 	}
 
 	const ZESmartArray<ZEMLReaderSubNode>& Nodes = Reader->GetSubNodes();
 	for (ZESize I = 0; I < Nodes.GetCount(); I++)
 	{
-		ZEMLNode* NewNode = AddNode(Nodes[I].Name);
+		ZEPointer<ZEMLNode> NewNode = new ZEMLNode();
 		ZEMLReaderNode NewReaderNode = Reader->GetSubNode(Nodes[I].Name, Nodes[I].Index);
 		if (!NewNode->Read(&NewReaderNode))
 			return false;
+
+		AddElement(NewNode.Transfer());
 	}
 	return true;
 }
