@@ -122,6 +122,11 @@ const void* ZEMLData::GetData()
 	return Data;
 }
 
+ZESize ZEMLData::GetDataSize()
+{
+	return DataSize;
+}
+
 ZEMLData::ZEMLData()
 {
 	Data = NULL;

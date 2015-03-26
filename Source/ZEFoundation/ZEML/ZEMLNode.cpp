@@ -41,15 +41,6 @@
 
 bool ZEMLNode::Read(ZEMLReaderNode* Reader)
 {
-	const ZESmartArray<ZEMLReaderSubNode>& Nodes = Reader->GetSubNodes();
-	for (ZESize I = 0; I < Nodes.GetCount(); I++)
-	{
-		ZEMLNode* NewNode = AddNode(Nodes[I].Name);
-		ZEMLReaderNode NewReaderNode = Reader->GetSubNode(Nodes[I].Name, Nodes[I].Index);
-		if (!NewNode->Read(&NewReaderNode))
-			return false;
-	}
-
 	const ZESmartArray<ZEMLReaderProperty>& Properties = Reader->GetProperties();
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 	{
@@ -67,7 +58,15 @@ bool ZEMLNode::Read(ZEMLReaderNode* Reader)
 		}
 	}
 
-	return false;
+	const ZESmartArray<ZEMLReaderSubNode>& Nodes = Reader->GetSubNodes();
+	for (ZESize I = 0; I < Nodes.GetCount(); I++)
+	{
+		ZEMLNode* NewNode = AddNode(Nodes[I].Name);
+		ZEMLReaderNode NewReaderNode = Reader->GetSubNode(Nodes[I].Name, Nodes[I].Index);
+		if (!NewNode->Read(&NewReaderNode))
+			return false;
+	}
+	return true;
 }
 
 bool ZEMLNode::Write(ZEMLWriterNode* WriterNode)

@@ -66,6 +66,7 @@ class ZEMLData : public ZEMLElement
 
 		void						SetData(void* Data, ZESize DataSize, bool Referred = false);
 		const void*					GetData();
+		ZESize						GetDataSize();
 
 									ZEMLData();
 									ZEMLData(const char* Name);

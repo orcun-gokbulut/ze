@@ -206,7 +206,7 @@ static void ConvertEntity(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
 	{
 		char PropertyName[ZE_MAX_NAME_SIZE];
 		Unserializer->Read(PropertyName, sizeof(char), ZE_MAX_NAME_SIZE);
-		ConvertProperty(PropertyName, Serializer, Unserializer);
+		ConvertProperty(PropertyName, &PropertiesNode, Unserializer);
 	}
 
 	PropertiesNode.CloseNode();

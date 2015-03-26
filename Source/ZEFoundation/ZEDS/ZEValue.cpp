@@ -408,6 +408,86 @@ bool ZEValue::Unserialize(ZEUnserializer* Unserializer)
 	return true;
 }
 
+bool ZEValue::IsInteger() const
+{
+	return Type == ZE_VRT_INTEGER_8 ||
+		Type == ZE_VRT_INTEGER_16 ||
+		Type == ZE_VRT_INTEGER_32 ||
+		Type == ZE_VRT_INTEGER_64 ||
+		Type == ZE_VRT_UNSIGNED_INTEGER_8 ||
+		Type == ZE_VRT_UNSIGNED_INTEGER_16 ||
+		Type == ZE_VRT_UNSIGNED_INTEGER_32 ||
+		Type == ZE_VRT_UNSIGNED_INTEGER_64;
+}
+bool ZEValue::IsFloatingPoint() const
+{
+	return ZE_VRT_FLOAT || ZE_VRT_DOUBLE;
+}
+
+bool ZEValue::IsUnsignedInteger() const
+{
+	return Type == ZE_VRT_UNSIGNED_INTEGER_8 ||
+		Type == ZE_VRT_UNSIGNED_INTEGER_16 ||
+		Type == ZE_VRT_UNSIGNED_INTEGER_32 ||
+		Type == ZE_VRT_UNSIGNED_INTEGER_64;
+}
+
+bool ZEValue::IsSignedInteger() const
+{
+	return Type == ZE_VRT_INTEGER_8 ||
+		Type == ZE_VRT_INTEGER_16 ||
+		Type == ZE_VRT_INTEGER_32 ||
+		Type == ZE_VRT_INTEGER_64;
+}
+
+bool ZEValue::IsVector() const
+{
+	return Type == ZE_VRT_VECTOR2 || Type == ZE_VRT_VECTOR3 || Type == ZE_VRT_VECTOR4;
+}
+
+bool ZEValue::IsMatrix() const
+{
+	return Type == ZE_VRT_MATRIX3X3 || ZE_VRT_MATRIX4X4;
+}
+
+ZEInt64 ZEValue::GetIntegerRangeMin() const
+{
+	if (IsUnsignedInteger())
+		return 0;
+
+	if (Type == ZE_VRT_INTEGER_8)
+		return -128;
+	else if (Type == ZE_VRT_INTEGER_16)
+		return -32768;
+	else if (Type == ZE_VRT_INTEGER_32)
+		return  -2147483648;
+	else if (Type == ZE_VRT_INTEGER_64)
+		return -9223372036854775808;
+
+	return 0;
+}
+
+ZEUInt64 ZEValue::GetIntegerRangeMax() const
+{
+	if (Type == ZE_VRT_INTEGER_8)
+		return 127;
+	else if (Type == ZE_VRT_INTEGER_16)
+		return 32767;
+	else if (Type == ZE_VRT_INTEGER_32)
+		return  2147483647;
+	else if (Type == ZE_VRT_INTEGER_64)
+		return 9223372036854775807;
+	else if (Type == ZE_VRT_UNSIGNED_INTEGER_8)
+		return 255;
+	else if (Type == ZE_VRT_UNSIGNED_INTEGER_16)
+		return 65535;
+	else if (Type == ZE_VRT_UNSIGNED_INTEGER_32)
+		return  4294967295;
+	else if (Type == ZE_VRT_UNSIGNED_INTEGER_64)
+		return 18446744073709551615;
+
+	return 0;
+}
 
 void ZEValue::SetString(const char* Value)
 {
@@ -606,37 +686,37 @@ bool ZEValue::GetBoolean() const
 	zeDebugCheck(this->Type != ZE_VRT_BOOLEAN, "ZEValue::GetBoolean operation failed. Value type mismatched.");
 	return Value.Boolean;
 }
-ZEVector2& ZEValue::GetVector2() const
+const ZEVector2& ZEValue::GetVector2() const
 {
 	zeDebugCheck(this->Type != ZE_VRT_VECTOR2, "ZEValue::GetVector2 operation failed. Value type mismatched.");
 	return *((ZEVector2*)&Value.Vectors);
 }
 
-ZEVector3& ZEValue::GetVector3() const
+const ZEVector3& ZEValue::GetVector3() const
 {
 	zeDebugCheck(this->Type != ZE_VRT_VECTOR3, "ZEValue::GetVector3 operation failed. Value type mismatched.");
 	return *((ZEVector3*)&Value.Vectors);
 }
 
-ZEVector4& ZEValue::GetVector4() const
+const ZEVector4& ZEValue::GetVector4() const
 {
 	zeDebugCheck(this->Type != ZE_VRT_VECTOR4, "ZEValue::GetVector4 operation failed. Value type mismatched.");
 	return *((ZEVector4*)&Value.Vectors);
 }
 
-ZEQuaternion& ZEValue::GetQuaternion() const
+const ZEQuaternion& ZEValue::GetQuaternion() const
 {
 	zeDebugCheck(this->Type != ZE_VRT_QUATERNION, "ZEValue::Quaternion operation failed. Value type mismatched.");
 	return *((ZEQuaternion*)&Value.Vectors);
 }
 
-ZEMatrix3x3& ZEValue::GetMatrix3x3() const
+const ZEMatrix3x3& ZEValue::GetMatrix3x3() const
 {
 	zeDebugCheck(this->Type != ZE_VRT_MATRIX3X3, "ZEValue::GetMatrix3x3 operation failed. Value type mismatched.");
 	return *Value.Matrix3x3;
 }
 
-ZEMatrix4x4& ZEValue::GetMatrix4x4() const
+const ZEMatrix4x4& ZEValue::GetMatrix4x4() const
 {
 	zeDebugCheck(this->Type != ZE_VRT_MATRIX4X4, "ZEValue::GetMatrix4x4 operation failed. Value type mismatched.");
 	return *Value.Matrix4x4;

@@ -48,6 +48,12 @@ bool ZEMLWriterNode::WriteElementHeader(const char* Name, ZEMLElementType Type)
 	if (Type == ZEML_ET_UNDEFINED)
 		return false;
 
+	if (SubNodeIsOpen)
+	{
+		zeError("You cannot write a element while a child node is still open.");
+		return false;
+	}
+
 	char Header[2];
 	Header[0] = 'Z';
 	Header[1] = Type;
@@ -70,11 +76,6 @@ bool ZEMLWriterNode::WriteElementHeader(const char* Name, ZEMLElementType Type)
 bool ZEMLWriterNode::WriteValue(const char* Name, const ZEValue& Value)
 {
 	ZEMLElementType ItemType = ZEMLUtils::ConvertType(Value.GetType());
-	if (ItemType == ZEML_ET_UNDEFINED)
-	{
-		zeError("Cannot write ZEML property. Unsupported ZEValue type. File Name: \"%s\"", File->GetPath());
-		return false;
-	}
 
 	if (!WriteElementHeader(Name, ItemType))
 		return false;
@@ -335,6 +336,7 @@ ZEMLWriterNode ZEMLWriterNode::OpenSubNode(const char* Name)
 	ZEMLWriterNode NewNode;
 	NewNode.Name = Name;
 	NewNode.File = File;
+	NewNode.Parent = this;
 
 	ZEUInt64 NodeSize = 0;
 	File->Write(&NodeSize, sizeof(ZEUInt64), 1);
@@ -346,11 +348,19 @@ ZEMLWriterNode ZEMLWriterNode::OpenSubNode(const char* Name)
 
 	SubElementCount++;
 
+	SubNodeIsOpen = true;
+
 	return NewNode;
 }
 
 void ZEMLWriterNode::CloseNode()
 {
+	if (SubNodeIsOpen)
+	{
+		zeError("You cannot close the node while a child node is still open.");
+		return;
+	}
+
 	ZEUInt64 CurrentFilePos = File->Tell();
 	File->Seek(NodeDataOffset - 2 * sizeof(ZEUInt64), ZE_SF_BEGINING);
 
@@ -361,6 +371,9 @@ void ZEMLWriterNode::CloseNode()
 	File->Write(&NodeSubItemCount, sizeof(ZEUInt64), 1);
 
 	File->Seek(NodeDataOffset + NodeSize, ZE_SF_BEGINING);
+
+	if (Parent != NULL)
+		Parent->SubNodeIsOpen = false;
 }
 
 ZEMLWriterNode::ZEMLWriterNode()
@@ -368,6 +381,7 @@ ZEMLWriterNode::ZEMLWriterNode()
 	File = NULL;
 	Name = "";
 	SubElementCount = 0;
+	SubNodeIsOpen = false;
 }
 
 ZEMLWriterNode::~ZEMLWriterNode()
