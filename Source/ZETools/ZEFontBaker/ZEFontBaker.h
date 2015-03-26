@@ -34,38 +34,32 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_FONT_BAKER_H__
-#define __ZE_FONT_BAKER_H__
+#ifndef __ZET_FONT_BAKER_H__
+#define __ZET_FONT_BAKER_H__
 
+#include "ZETexture/ZEBitmap.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 #include "ZETypes.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZERectangle.h"
-#include "ZEML\ZEMLDataProperty.h"
-#include "ZEPacking.h"
 
-ZEPackStruct(
-struct ZEFontCharacter
-{
-	ZEUInt32					TextureId;
-	ZERectangle					Coordinates;
-	ZEUInt32					Value;
-});
+struct ZEFTFontCharMetrics;
 
 class ZEFontBaker
 {
-	private:
-
-		static ZEUInt32 TextureCount;
-
 	public:
-		static bool	BakeFont(const char* FileName, 
-			const char* FontName, ZEInt FontSize,
-			bool FontItalic, bool FontBold,	bool FontUnderLine, bool FontStrikeOut,
-			ZEInt TextureWidth, ZEInt TextureHeight, 
-			ZEInt StartCharacter = 32, ZEInt EndCharacter = 126,
-			ZEInt CharacterSpacingX= 1, ZEInt CharacterSpacingY = 1,
-			ZEInt LeftMargin = 0, ZEInt TopMargin = 0, ZEInt RightMargin = 0, ZEInt BottomMargin = 0, 
-			bool GenerateCoordsOnly = false);
+		static bool	BakeFont(ZEString CharacterSequence, ZEString FontFilePath, ZEString OutputFilePath, ZEString OutputFileName, ZEUInt32 FontSize, 
+							ZEUInt32 HorizontalOutputDPI = 72, ZEUInt32 VerticalOutputDPI = 72, ZEUInt32 PointFactor = 64,
+							ZEUInt32 TextureWidth = 512, ZEUInt32 TextureHeight = 512,
+							ZEUInt32 MarginTop = 8, ZEUInt32 MarginBottom = 8, ZEUInt32 MarginLeft = 8, ZEUInt32 MarginRight = 8,
+							ZEUInt32 HorizontalPadding = 8, ZEUInt32 VerticalPadding = 8);
+
+		static bool	BakeFont(const char StartCharacter, const char EndCharacter,
+							ZEString FontFilePath, ZEString OutputFilePath, ZEString OutputFileName, ZEUInt32 FontSize, 
+							ZEUInt32 HorizontalOutputDPI = 72, ZEUInt32 VerticalOutputDPI = 72, ZEUInt32 PointFactor = 64,
+							ZEUInt32 TextureWidth = 512, ZEUInt32 TextureHeight = 512,
+							ZEUInt32 MarginTop = 8, ZEUInt32 MarginBottom = 8, ZEUInt32 MarginLeft = 8, ZEUInt32 MarginRight = 8,
+							ZEUInt32 HorizontalPadding = 8, ZEUInt32 VerticalPadding = 8);
 };
 
 #endif

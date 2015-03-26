@@ -34,263 +34,255 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEFontBaker.h"
-#define WINDOWS_MEAN_AND_LEAN
-#include <windows.h>
-#include "ZEFile\ZEFile.h"
-#include "ZEML\ZEMLWriter.h"
-#include "ZETexture\ZETextureData.h"
-#include "ZETexture\ZETextureLoader.h"
-#include "ZEFile\ZEDirectoryInfo.h"
-#include "ZETexture\ZEBitmap.h"
 
-#define ZEFONT_PIXELTOUV(Pixel, Dimention) ((float)Pixel * (1.0f / (float)Dimention))
-#define ZEFONT_UVTOPIXEL(UV, Dimention) ((float)UV * (float)Dimention)
+#include "ft2build.h"
+#include "freetype\freetype.h"
+#include "freetype\ftglyph.h"
+#include "ZEML/ZEMLWriter.h"
+#include "ZEFile/ZEFile.h"
 
-PBITMAPINFO CreateBitmapInfoStruct(HBITMAP hBmp)
-{ 
-	BITMAP bmp; 
-	PBITMAPINFO pbmi; 
-	WORD    cClrBits; 
+#define UTF8_SPACE_CHARACTER 0x00020
 
-	if (!GetObject(hBmp, sizeof(BITMAP), (LPSTR)&bmp)) 
-		printf("GetObject"); 
+struct ZEFTFontCharMetrics
+{
+	char		Character;
+	ZEUInt32	GlyphIndex;
+	ZEUInt32	FontSize;
 
-	cClrBits = (WORD)(bmp.bmPlanes * bmp.bmBitsPixel); 
-	if (cClrBits == 1) 
-		cClrBits = 1; 
-	else if (cClrBits <= 4) 
-		cClrBits = 4; 
-	else if (cClrBits <= 8) 
-		cClrBits = 8; 
-	else if (cClrBits <= 16) 
-		cClrBits = 16; 
-	else if (cClrBits <= 24) 
-		cClrBits = 24; 
-	else cClrBits = 32; 
+	ZEInt32		Height;
+	ZEInt32		Width;
 
-	if (cClrBits != 24) 
-		pbmi = (PBITMAPINFO) LocalAlloc(LPTR, 
-		sizeof(BITMAPINFOHEADER) + 
-		sizeof(RGBQUAD) * (ZESize)(1<< cClrBits));
-	else 
-		pbmi = (PBITMAPINFO) LocalAlloc(LPTR, 
-		sizeof(BITMAPINFOHEADER)); 
+	ZEInt32		HorizontalAdvance;
+	ZEInt32		VerticalAdvance;
 
-	pbmi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER); 
-	pbmi->bmiHeader.biWidth = bmp.bmWidth; 
-	pbmi->bmiHeader.biHeight = bmp.bmHeight; 
-	pbmi->bmiHeader.biPlanes = bmp.bmPlanes; 
-	pbmi->bmiHeader.biBitCount = bmp.bmBitsPixel; 
-	if (cClrBits < 24) 
-		pbmi->bmiHeader.biClrUsed = (1<<cClrBits); 
+	ZEInt32		HorizontalBearingX;
+	ZEInt32		HorizontalBearingY;
 
-	pbmi->bmiHeader.biCompression = BI_RGB; 
-	pbmi->bmiHeader.biSizeImage = ((pbmi->bmiHeader.biWidth * cClrBits +31) & ~31) /8
-		* pbmi->bmiHeader.biHeight; 
-	pbmi->bmiHeader.biClrImportant = 0; 
-	return pbmi; 
-} 
+	ZEInt32		VerticalBearingX;
+	ZEInt32		VerticalBearingY;
 
-void DumpTexture(const ZEString& FontFile, ZEUInt32 TextureNumber, HBITMAP Bitmap, HDC DC) 
-{ 
-	BITMAPFILEHEADER hdr;
-	PBITMAPINFOHEADER pbih;
-	LPBYTE lpBits;
-	DWORD dwTotal; 
-	DWORD cb; 
-	BYTE *hp;
+	ZEVector2	LeftUp;
+	ZEVector2	RightDown;
 
-	PBITMAPINFO pbi = CreateBitmapInfoStruct(Bitmap);
+	ZEUInt32	TextureID;
+};
 
-	pbih = (PBITMAPINFOHEADER) pbi; 
-	lpBits = (LPBYTE) GlobalAlloc(GMEM_FIXED, pbih->biSizeImage);
-
-	if (!lpBits) 
-	{}  //printf("GlobalAlloc"); 
-
-	if (!GetDIBits(DC, Bitmap, 0, (WORD) pbih->biHeight, lpBits, pbi, DIB_RGB_COLORS)) 
-	{
-		//printf("GetDIBits"); 
-	}
-	hdr.bfType = 0x4d42;
-	hdr.bfSize = (DWORD) (sizeof(BITMAPFILEHEADER) + pbih->biSize + pbih->biClrUsed * sizeof(RGBQUAD) + pbih->biSizeImage); 
-	hdr.bfReserved1 = 0; 
-	hdr.bfReserved2 = 0; 
-
-
-	unsigned char* TextureBuffer = new unsigned char[(ZESize)hdr.bfSize];
-	hdr.bfOffBits = (DWORD) sizeof(BITMAPFILEHEADER) + pbih->biSize + pbih->biClrUsed * sizeof (RGBQUAD); 
-
-	void* Data = TextureBuffer;
-	memcpy(Data, &hdr, sizeof(BITMAPFILEHEADER));
-	Data = (ZEUInt8*)Data + sizeof(BITMAPFILEHEADER);
-	memcpy(Data, pbih, sizeof(BITMAPINFOHEADER) + pbih->biClrUsed * sizeof (RGBQUAD));
-	Data = (ZEUInt8*)Data + sizeof(BITMAPINFOHEADER) + pbih->biClrUsed * sizeof (RGBQUAD);
-	dwTotal = cb = pbih->biSizeImage; 
-
-	struct ARGB
-	{
-		unsigned char b;
-		unsigned char g;
-		unsigned char r;
-		unsigned char a;
-	}*color;
-
-	hp = lpBits; 
-
-	for (ZESize I = 0; I < (ZESize)cb / 4; I++)
-	{
-		color = ((ARGB*)hp) + I;
-		color->r = color->g = color->b = color->a = (color->r + color->g + color->b) / 3;
-		//(color->r != 0 ? 255 : 0);
-	}
-
-	memcpy(Data, hp, (ZESize)cb);
-	Data = (ZEUInt8*)Data + (ZESize)cb;
-
-	ZEFile TextureFile;
-	TextureFile.Open(ZEString(ZEDirectoryInfo(FontFile).GetParentDirectory() + "\\" + TextureNumber + ".bmp"), ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
-
-	if(TextureFile.Write(TextureBuffer , cb, 1) != 1)
-		zeError("Can not write texture %d to file. File name : ", TextureNumber, FontFile.ToCString());
-
-	if(TextureFile.IsOpen())
-		TextureFile.Close();
-
-	delete[] TextureBuffer;
-	TextureBuffer = NULL;
-
-	GlobalFree((HGLOBAL)lpBits);
+static ZEBitmap* CreateBitmap(ZEUInt32 TextureWidth, ZEUInt32 TextureHeight, ZEUInt32 PixelSize)
+{
+	ZEBitmap* Bitmap = new ZEBitmap();
+	Bitmap->Create(TextureWidth, TextureHeight, PixelSize);
+	Bitmap->Fill(0);
+	return Bitmap;
 }
 
-ZEUInt32 ZEFontBaker::TextureCount = 0;
-
-bool ZEFontBaker::BakeFont(const char* FileName, 
-	const char* FontName, ZEInt FontSize,
-	bool FontItalic, bool FontBold,	bool FontUnderLine, bool FontStrikeOut,
-	ZEInt TextureWidth, ZEInt TextureHeight, 
-	ZEInt StartCharacter, ZEInt EndCharacter,
-	ZEInt CharacterSpacingX, ZEInt CharacterSpacingY,
-	ZEInt LeftMargin, ZEInt TopMargin, ZEInt RightMargin, ZEInt BottomMargin, 
-	bool GenerateCoordsOnly)
+bool ZEFontBaker::BakeFont(ZEString CharacterSequence, ZEString FontFilePath, ZEString OutputFilePath, ZEString OutputFileName, ZEUInt32 FontSize, 
+									ZEUInt32 HorizontalOutputDPI, ZEUInt32 VerticalOutputDPI, ZEUInt32 PointFactor, 
+									ZEUInt32 TextureWidth, ZEUInt32 TextureHeight,
+									ZEUInt32 MarginTop, ZEUInt32 MarginBottom, ZEUInt32 MarginLeft, ZEUInt32 MarginRight,
+									ZEUInt32 HorizontalPadding, ZEUInt32 VerticalPadding)
 {
-	ZEFile FontFile;
-	TextureCount = 0;
+	CharacterSequence.Append(ZEString::FromChar(UTF8_SPACE_CHARACTER));
 
-	if(!FontFile.Open(FileName, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
+	FT_Library Library;
+	FT_Face	Face;
+
+	FT_Init_FreeType(&Library);
+	FT_New_Face(Library, FontFilePath, 0, &Face);
+
+	ZEUInt32 CurrentGlyphIndex;
+
+	ZEArray<ZEFTFontCharMetrics> FontCharacters;
+	FontCharacters.SetCount(CharacterSequence.GetLength());
+
+	ZEArray<FT_Bitmap> FTBitmaps;
+	FTBitmaps.SetCount(CharacterSequence.GetLength());
+
+	for(ZESize I = 0; I < CharacterSequence.GetLength(); I++)
 	{
-		zeError("Can not open font file to write. File name : %s", FileName);
-		return false;
+		char CurrentCharacter = CharacterSequence.GetCharacter(I).GetValue()[0];
+		FontCharacters[I].Character = CurrentCharacter;
+
+		if(isspace(CurrentCharacter))
+			CurrentGlyphIndex = FT_Get_Char_Index(Face, UTF8_SPACE_CHARACTER);
+		else
+			CurrentGlyphIndex = FT_Get_Char_Index(Face, CurrentCharacter);
+
+		//Character size in 1/64th of points (PointFactor of 64)
+		FT_Set_Char_Size(Face, 0, FontSize * PointFactor, HorizontalOutputDPI, VerticalOutputDPI);
+		FT_Load_Glyph(Face, CurrentGlyphIndex, FT_LOAD_DEFAULT);
+
+		FontCharacters[I].GlyphIndex			= CurrentGlyphIndex;
+		FontCharacters[I].FontSize				= FontSize;
+		FontCharacters[I].Height				= Face->glyph->metrics.height		/ PointFactor;
+		FontCharacters[I].Width					= Face->glyph->metrics.width		/ PointFactor;
+		FontCharacters[I].HorizontalAdvance		= Face->glyph->metrics.horiAdvance	/ PointFactor;
+		FontCharacters[I].VerticalAdvance		= Face->glyph->metrics.vertAdvance	/ PointFactor;
+		FontCharacters[I].HorizontalBearingX	= Face->glyph->metrics.horiBearingX / PointFactor;
+		FontCharacters[I].HorizontalBearingY	= Face->glyph->metrics.horiBearingY / PointFactor;
+		FontCharacters[I].VerticalBearingX		= Face->glyph->metrics.vertBearingX / PointFactor;
+		FontCharacters[I].VerticalBearingY		= Face->glyph->metrics.vertBearingY / PointFactor;
+
+		FT_Glyph Glyph;
+		FT_Get_Glyph(Face->glyph, &Glyph);
+		FT_Glyph_To_Bitmap(&Glyph, FT_RENDER_MODE_NORMAL, 0, 1);
+		FTBitmaps[I] = ((FT_BitmapGlyph)Glyph)->bitmap;
 	}
 
-	ZEMLWriter FontWriter;
+	ZEArray<ZEBitmap*> Bitmaps;
+	Bitmaps.Add(CreateBitmap(TextureWidth, TextureHeight, 1));
 
-	if (!FontWriter.Open(&FontFile))
+	ZEUInt32 TextureId = 0;
+	ZEUInt32 CurrentX = MarginLeft, CurrentY = MarginTop;
+
+	ZEString TextureOutputFile = OutputFilePath;
+	TextureOutputFile.Append(TextureId);
+	TextureOutputFile.Append(".png");
+
+	for(ZESize I = 0; I < FTBitmaps.GetCount(); I++)
 	{
-		zeError("Can not write font file.");
-		return false;
-	}
-
-	ZEMLWriterNode FontRootNode = FontWriter.WriteRootNode("ZEFont");
-	ZEMLWriterNode TexturesNode;
-
-	if(!GenerateCoordsOnly)
-		TexturesNode = FontRootNode.OpenSubNode("Textures");
-
-	HDC dc;
-	HBITMAP Bitmap;
-	HFONT Font;
-	Font = CreateFont(FontSize, 0, 0,  0, (FontBold ? FW_BOLD : FW_NORMAL), FontItalic, FontUnderLine, FontStrikeOut,     
-		ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, FontName);
-
-	if (!GenerateCoordsOnly)
-	{
-		dc = CreateCompatibleDC(NULL);
-		Bitmap = CreateBitmap(TextureWidth, TextureHeight, 1, 32, NULL);
-		SelectObject(dc, Bitmap);
-	}
-	SelectObject(dc, Font);
-	SetMapMode(dc, MM_TEXT);
-	SetBkMode(dc, TRANSPARENT);
-	SetTextColor(dc, RGB(255, 255, 255));
-
-	ZEInt OffsetX = LeftMargin + CharacterSpacingX;
-	ZEInt OffsetY = TopMargin + CharacterSpacingY;
-
-	ZEInt* CharacterWidths = new ZEInt[(ZESize)(EndCharacter - StartCharacter)];
-	GetCharWidth(dc, StartCharacter, EndCharacter, CharacterWidths);
-
-	TEXTMETRIC	Metric;
-	GetTextMetrics(dc, &Metric);
-
-	ZEArray<ZEFontCharacter> Characters;
-	Characters.SetCount(EndCharacter - StartCharacter);
-
-	ZEInt BitmapId = 0;
-	RECT CharacterRectangle;
-
-	for (ZESize I = 0; I < Characters.GetCount(); I++)
-		ZeroMemory(&Characters[I], sizeof(ZEFontCharacter));
-
-	for (ZESize I = 0; I < Characters.GetCount(); I++)
-	{
-		Characters[I].Value = StartCharacter + I;
-		
-		if (OffsetX + CharacterWidths[I] + RightMargin >= TextureWidth)
+		if(CurrentX + MarginRight + FTBitmaps[I].width > TextureWidth)
 		{
-			OffsetX = RightMargin + CharacterSpacingX;
-			OffsetY += Metric.tmHeight + CharacterSpacingY;
-			if (OffsetY + Metric.tmHeight + BottomMargin >= TextureHeight)
+			CurrentX = MarginLeft;
+			CurrentY += FontSize + VerticalPadding;
+
+			if(CurrentY + MarginBottom + FontSize > TextureHeight)
 			{
-				if (!GenerateCoordsOnly)
-				{
-					ZEMLWriterNode TextureNode = TexturesNode.OpenSubNode("Texture");
-					TextureNode.WriteString("FileName", ZEString(TextureCount) + ".bmp");
-					DumpTexture(FileName, TextureCount, Bitmap, dc);
-					DeleteObject(Bitmap);
-					Bitmap = CreateBitmap(TextureWidth, TextureHeight, 1, 32, NULL);
-					SelectObject(dc, Bitmap);
-					OffsetX = LeftMargin + CharacterSpacingX;
-					OffsetY = TopMargin + CharacterSpacingY;
-					TextureNode.CloseNode();
-					TextureCount++;
-				}
-				BitmapId++;
+				Bitmaps[TextureId]->Save(TextureOutputFile.ToCString(), ZE_BFF_PNG);
+
+				CurrentX = MarginLeft;
+				CurrentY = MarginTop;
+
+				TextureId++;
+				Bitmaps.Add(CreateBitmap(TextureWidth, TextureHeight, 1));
+
+				TextureOutputFile.Remove(TextureOutputFile.GetLength() - 5, 5);
+				TextureOutputFile.Append(TextureId);
+				TextureOutputFile.Append(".png");
 			}
 		}
 
-		Characters[I].TextureId = BitmapId;
-		Characters[I].Coordinates = ZERectangle(ZEVector2(ZEFONT_PIXELTOUV(OffsetX, TextureWidth), ZEFONT_PIXELTOUV(OffsetY, TextureHeight)), ZEFONT_PIXELTOUV(CharacterWidths[I], TextureWidth), ZEFONT_PIXELTOUV(Metric.tmHeight, TextureHeight));
-		CharacterRectangle.left = OffsetX;
-		CharacterRectangle.top = OffsetY;
-		CharacterRectangle.right = OffsetX + CharacterWidths[I];
-		CharacterRectangle.bottom = OffsetY + Metric.tmHeight;
+		if(FontCharacters[I].Character != UTF8_SPACE_CHARACTER)
+			Bitmaps[TextureId]->CopyFrom(FTBitmaps[I].buffer, FTBitmaps[I].pitch, FTBitmaps[I].width, FTBitmaps[I].rows, 0, 0, CurrentX, CurrentY);
 
-		if (!GenerateCoordsOnly)
-			DrawText(dc, (char*)(&Characters[I].Value), 1, &CharacterRectangle, NULL);
+		FontCharacters[I].TextureID = TextureId;
 
-		OffsetX += CharacterWidths[I] + CharacterSpacingX;
+		float U = (float)CurrentX / (float)TextureWidth;
+		float V = (float)CurrentY / (float)TextureHeight;
+		FontCharacters[I].LeftUp = ZEVector2(U, V);
+
+		CurrentX += FTBitmaps[I].width;
+
+		U = (float)CurrentX / (float)TextureWidth;
+		V = ((float)CurrentY + (float)FTBitmaps[I].rows) / (float)TextureHeight;
+		FontCharacters[I].RightDown = ZEVector2(U, V);
+
+		CurrentX += HorizontalPadding;
 	}
 
-	if (!GenerateCoordsOnly)
+	Bitmaps[TextureId]->Save(TextureOutputFile.ToCString(), ZE_BFF_PNG);
+
+	for(ZESize I = 0; I < Bitmaps.GetCount(); I++)
+		delete Bitmaps[I];
+
+	Bitmaps.Clear();
+
+	ZEString DataOutputFile = OutputFilePath;
+	DataOutputFile.Append(OutputFileName);
+	DataOutputFile.Append(".ZEFont");
+
+	ZEFile* CharacterMetricsOutput = new ZEFile();
+	CharacterMetricsOutput->Open(DataOutputFile, ZE_FOM_WRITE, ZE_FCM_OVERWRITE);
+
+	ZEMLWriter FreeTypeFontWriter;
+	FreeTypeFontWriter.Open(CharacterMetricsOutput);
+
+	ZEMLWriterNode FreeTypeRootNode = FreeTypeFontWriter.WriteRootNode("ZEFont");
+
+	ZEMLWriterNode TexturesNode = FreeTypeRootNode.OpenSubNode("Textures");
+
+	ZEMLWriterNode TextureNode;
+
+	for(ZESize I = 0; I <= TextureId; I++)
 	{
-		ZEMLWriterNode TextureNode = TexturesNode.OpenSubNode("Texture");
-		TextureNode.WriteString("FileName", ZEString(TextureCount) + ".bmp");
-		DumpTexture(FileName, TextureCount, Bitmap, dc);
-		DeleteObject(Bitmap);
+		TextureNode = TexturesNode.OpenSubNode("Texture");
+		ZEString TextureFileName;
+		TextureFileName.Append(I);
+		TextureFileName.Append(".png");
+		TextureNode.WriteString("FileName", TextureFileName);
 		TextureNode.CloseNode();
-		TextureCount++;
-
-		TexturesNode.CloseNode();
 	}
 
-	FontRootNode.WriteUInt32("TextureCount", TextureCount);
-	FontRootNode.WriteData("Characters", Characters.GetCArray(), Characters.GetCount() * sizeof(ZEFontCharacter));
+	TexturesNode.CloseNode();
 
-	FontRootNode.CloseNode();
-	FontWriter.Close();
-	FontFile.Close();
+	ZEMLWriterNode FontInformationNode = FreeTypeRootNode.OpenSubNode("FontInformation");
+	FontInformationNode.WriteString("CharacterSequence", CharacterSequence);
+	FontInformationNode.WriteUInt32("TextureCount", TextureId + 1);
+	FontInformationNode.WriteUInt32("FontSize", FontSize);
+	FontInformationNode.WriteUInt32("HorizontalOutputDPI", HorizontalOutputDPI);
+	FontInformationNode.WriteUInt32("VerticalOutputDPI", VerticalOutputDPI);
+	FontInformationNode.WriteUInt32("PointFactor", PointFactor);
+	FontInformationNode.WriteUInt32("TextureWidth", TextureWidth);
+	FontInformationNode.WriteUInt32("TextureHeight", TextureHeight);
+	FontInformationNode.WriteUInt32("MarginTop", MarginTop);
+	FontInformationNode.WriteUInt32("MarginBottom", MarginBottom);
+	FontInformationNode.WriteUInt32("MarginLeft", MarginLeft);
+	FontInformationNode.WriteUInt32("MarginRight", MarginRight);
+	FontInformationNode.WriteUInt32("HorizontalPadding", HorizontalPadding);
+	FontInformationNode.WriteUInt32("VerticalPadding", VerticalPadding);
+	FontInformationNode.CloseNode();
 
-	DeleteDC(dc);
+	ZEMLWriterNode CharactersNode = FreeTypeRootNode.OpenSubNode("Characters");
+
+	ZEMLWriterNode CharacterMetricNode;
+
+	for(ZESize I = 0; I < FontCharacters.GetCount(); I++)
+	{
+		CharacterMetricNode = CharactersNode.OpenSubNode("Character");
+		CharacterMetricNode.WriteInt32("Value", FontCharacters[I].Character);
+		CharacterMetricNode.WriteUInt32("GlyphIndex", FontCharacters[I].GlyphIndex);
+		CharacterMetricNode.WriteUInt32("FontSize", FontCharacters[I].FontSize);
+		CharacterMetricNode.WriteInt32("Height", FontCharacters[I].Height);
+		CharacterMetricNode.WriteInt32("Width", FontCharacters[I].Width);
+		CharacterMetricNode.WriteInt32("HorizontalAdvance", FontCharacters[I].HorizontalAdvance);
+		CharacterMetricNode.WriteInt32("VerticalAdvance", FontCharacters[I].VerticalAdvance);
+		CharacterMetricNode.WriteInt32("HorizontalBearingX", FontCharacters[I].HorizontalBearingX);
+		CharacterMetricNode.WriteInt32("HorizontalBearingY", FontCharacters[I].HorizontalBearingY);
+		CharacterMetricNode.WriteInt32("VerticalBearingX", FontCharacters[I].VerticalBearingX);
+		CharacterMetricNode.WriteInt32("VerticalBearingY", FontCharacters[I].VerticalBearingY);
+		CharacterMetricNode.WriteVector2("LeftUp", FontCharacters[I].LeftUp);
+		CharacterMetricNode.WriteVector2("RightDown", FontCharacters[I].RightDown);
+		CharacterMetricNode.WriteUInt32("TextureID", FontCharacters[I].TextureID);
+		CharacterMetricNode.CloseNode();
+	}
+
+	CharactersNode.CloseNode();
+	FreeTypeRootNode.CloseNode();
+	FreeTypeFontWriter.Close();
+	CharacterMetricsOutput->Close();
+
 	return true;
+}
+
+bool ZEFontBaker::BakeFont(const char StartCharacter, const char EndCharacter, 
+									ZEString FontFilePath, ZEString OutputFilePath, ZEString OutputFileName, ZEUInt32 FontSize, 
+									ZEUInt32 HorizontalOutputDPI, ZEUInt32 VerticalOutputDPI, ZEUInt32 PointFactor, 
+									ZEUInt32 TextureWidth, ZEUInt32 TextureHeight,
+									ZEUInt32 MarginTop, ZEUInt32 MarginBottom, ZEUInt32 MarginLeft, ZEUInt32 MarginRight,
+									ZEUInt32 HorizontalPadding, ZEUInt32 VerticalPadding)
+{
+	ZEString CharacterSequence;
+
+	if(StartCharacter < EndCharacter)
+		for(ZESize I = StartCharacter; I <= EndCharacter; I++)
+			CharacterSequence.Append(ZEString::FromChar(I));
+	else
+		for(ZESize I = EndCharacter; I <= StartCharacter; I++)
+			CharacterSequence.Append(ZEString::FromChar(I));
+
+
+	return BakeFont(CharacterSequence, FontFilePath, OutputFilePath, OutputFileName, FontSize, 
+					HorizontalOutputDPI, VerticalOutputDPI, PointFactor, 
+					TextureWidth, TextureHeight, 
+					MarginTop, MarginBottom, MarginLeft, MarginRight, 
+					HorizontalPadding, VerticalPadding);
 }
