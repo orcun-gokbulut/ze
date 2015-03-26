@@ -47,9 +47,12 @@ bool ZEMLNode::Read(ZEMLReaderNode* Reader)
 	{
 		if (Properties[I].Type == ZEML_ET_INLINE_DATA || Properties[I].Type == ZEML_ET_OFFSET_DATA)
 		{
-			ZEMLData* NewData = AddData(Properties[I].Name);
+			ZEPointer<ZEMLData> NewData = new ZEMLData(Properties[I].Name);
 			NewData->Allocate(Properties[I].DataSize);
-			Reader->ReadData(Properties[I].Name, const_cast<void*>(NewData->GetData()), NewData->GetSize());
+			if (!Reader->ReadData(Properties[I].Name, const_cast<void*>(NewData->GetData()), NewData->GetSize()))
+				continue;
+
+			AddElement(NewData.Transfer());
 		}
 		else
 		{
@@ -57,9 +60,8 @@ bool ZEMLNode::Read(ZEMLReaderNode* Reader)
 			if (NewProperty != NULL)
 			{
 				NewProperty->SetValue(Properties[I].Value);
-				continue;
+				AddElement(NewProperty.Transfer());
 			}
-			AddElement(NewProperty.Transfer());
 		}
 	}
 
@@ -122,7 +124,10 @@ ZESize ZEMLNode::GetSize()
 
 	ZEList<ZEMLElement>::Iterator Iterator = Elements.GetIterator();
 	while(!Iterator.IsEnd())
+	{
 		Size += Iterator->GetSize();
+		Iterator++;
+	}
 
 	return Size;
 }

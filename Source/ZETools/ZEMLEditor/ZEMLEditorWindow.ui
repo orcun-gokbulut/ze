@@ -92,6 +92,7 @@
     <addaction name="actCut"/>
     <addaction name="actCopy"/>
     <addaction name="actPaste"/>
+    <addaction name="actDeselect"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -123,6 +124,9 @@
    <property name="text">
     <string>New</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actOpen">
    <property name="text">
@@ -132,6 +136,9 @@
   <action name="actSave">
    <property name="text">
     <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actSaveAs">
@@ -143,6 +150,9 @@
    <property name="text">
     <string>Close</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+F4</string>
+   </property>
   </action>
   <action name="actQuit">
    <property name="text">
@@ -153,50 +163,80 @@
    <property name="text">
     <string>Add Node</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
   </action>
   <action name="actAddProperty">
    <property name="text">
     <string>Add Property</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
    </property>
   </action>
   <action name="actAddData">
    <property name="text">
     <string>Add Data</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+^</string>
+   </property>
   </action>
   <action name="actDelete">
    <property name="text">
     <string>Delete Element(s)</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
    </property>
   </action>
   <action name="actUndo">
    <property name="text">
     <string>Undo</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
   </action>
   <action name="actRedo">
    <property name="text">
     <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
    </property>
   </action>
   <action name="actCut">
    <property name="text">
     <string>Cut</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
   </action>
   <action name="actCopy">
    <property name="text">
     <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
    </property>
   </action>
   <action name="actPaste">
    <property name="text">
     <string>Paste</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
   </action>
   <action name="actUserGuide">
    <property name="text">
     <string>User Guide</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
   <action name="actAbout">
@@ -227,6 +267,14 @@
   <action name="actExport">
    <property name="text">
     <string>Export</string>
+   </property>
+  </action>
+  <action name="actDeselect">
+   <property name="text">
+    <string>Delect</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
  </widget>
