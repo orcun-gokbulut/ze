@@ -67,7 +67,7 @@ class ZEMLEditorWindow : public QMainWindow
 		void					ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue);
 		//void					DataChange(ZEMLData* Data, void* NewData, ZESize NewDataSize, void* OldData, ZESize OldDataSize);
 		
-		void					CurrentItemChanged(QTreeWidgetItem* Current, QTreeWidgetItem* Previous);
+		void					CurrentItemChanged();
 
 		void					Select();
 		void					Deselect();

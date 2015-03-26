@@ -252,13 +252,13 @@ void ZEMLEditorElementWidget::ConfigureUI()
 	}
 	else if (Element->GetType() == ZEML_ET_PROPERTY)
 	{
-		Form->grpNode->setVisible(true);
+		Form->grpProperty->setVisible(true);
 		Form->lblElementType->setText("Node");
 		ConfigureUIProperty();
 	}
 	else if (Element->GetType() == ZEML_ET_DATA)
 	{
-		Form->grpNode->setVisible(true);
+		Form->grpData->setVisible(true);
 		Form->lblElementType->setText("Node");
 
 		ZEMLData* Data = (ZEMLData*)Element;
@@ -446,6 +446,7 @@ void ZEMLEditorElementWidget::txtValueFloat_OnTextEdited(const QString& NewText)
 void ZEMLEditorElementWidget::SetElement(ZEMLElement* Element)
 {
 	this->Element = Element;
+	ConfigureUI();
 }
 
 ZEMLElement* ZEMLEditorElementWidget::GetElement()

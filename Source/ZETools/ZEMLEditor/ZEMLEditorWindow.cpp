@@ -44,6 +44,7 @@ void ZEMLEditorWindow::LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node)
 {
 	Item->setText(0, Node->GetName().ToCString());
 	Item->setText(1, "Node");
+	Item->setData(0, Qt::UserRole, QVariant((qlonglong)Node));
 
 	const ZEList<ZEMLElement>& Elements = Node->GetElements();
 	ZEList<ZEMLElement>::Iterator Iterator = Elements.GetConstIterator();
@@ -59,14 +60,17 @@ void ZEMLEditorWindow::LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node)
 
 			case ZEML_ET_PROPERTY:
 				SubItem->setText(1, "Property");
+				SubItem->setData(0, Qt::UserRole, QVariant((qlonglong)Iterator.GetItem()));
 				break;
 
 			case ZEML_ET_DATA:
 				SubItem->setText(1, "Data");
+				SubItem->setData(0, Qt::UserRole, QVariant((qlonglong)Iterator.GetItem()));
 				break;
 
 			default:
 				SubItem->setText(1, "Unknown");
+				SubItem->setData(0, Qt::UserRole, QVariant((qlonglong)Iterator.GetItem()));
 				break;
 
 		}
@@ -84,7 +88,6 @@ void ZEMLEditorWindow::LoadTree()
 
 	QTreeWidgetItem* TopLevelItem = new QTreeWidgetItem();
 	Form->trwElementTree->addTopLevelItem(TopLevelItem);
-	TopLevelItem->setData(0, Qt::UserRole, QVariant((qlonglong)RootNode));
 	LoadNode(TopLevelItem, RootNode);
 
 	Form->wgtElementEditor->SetElement(NULL);
@@ -95,9 +98,17 @@ void ZEMLEditorWindow::ValueChanged(ZEMLProperty* Property, const ZEValue& NewVa
 
 }
 
-void ZEMLEditorWindow::CurrentItemChanged(QTreeWidgetItem* Current, QTreeWidgetItem* Previous)
+void ZEMLEditorWindow::CurrentItemChanged()
 {
-
+	if (Form->trwElementTree->selectedItems().count() == 1)
+	{
+		ZEMLElement* Element = (ZEMLElement*)Form->trwElementTree->selectedItems().first()->data(0, Qt::UserRole).toULongLong();
+		Form->wgtElementEditor->SetElement(Element);
+	}
+	else
+	{
+		Form->wgtElementEditor->SetElement(NULL);
+	}
 }
 
 
@@ -252,7 +263,7 @@ ZEMLEditorWindow::ZEMLEditorWindow()
 	connect(Form->actClose, SIGNAL(triggered()), this, SLOT(Close()));
 	connect(Form->actQuit, SIGNAL(triggered()), this, SLOT(Quit()));
 
-	connect(Form->trwElementTree, SIGNAL(CurrentItemChanged(QTreeWidgetItem*, QTreeWidgetItem)), this, SLOT(CurrentItemChanged(QTreeWidget*, QTreeWidget*)));
+	connect(Form->trwElementTree, SIGNAL(itemSelectionChanged()), this, SLOT(CurrentItemChanged()));
 	connect(Form->wgtElementEditor, SIGNAL(ValueChanged(ZEMLProperty*, const ZEValue& NewValue, const ZEValue& OldValue)), this, SLOT(ValueChanged(ZEMLProperty*, const ZEValue& NewValue, const ZEValue& OldValue)));
 
 	RootNode = NULL;
