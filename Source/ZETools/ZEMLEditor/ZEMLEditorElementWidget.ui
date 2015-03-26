@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ZEMLEditorElementWidget</class>
+ <widget class="QWidget" name="ZEMLEditorElementWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>715</width>
+    <height>701</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ZEMLEditorElementWidget</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="lblNoElementSelected">
+     <property name="text">
+      <string>No element is selected.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpElement">
+     <property name="title">
+      <string>Element</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="minimumSize">
+         <size>
+          <width>75</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="txtElementName"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Type</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="lblElementType">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="lblElementSize">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpNode">
+     <property name="title">
+      <string>Node</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_3">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="lblItems">
+        <property name="minimumSize">
+         <size>
+          <width>75</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Element Count</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lblItems_2">
+        <property name="minimumSize">
+         <size>
+          <width>75</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Node Count</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lblItems_3">
+        <property name="minimumSize">
+         <size>
+          <width>75</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Property Count</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="lblItems_7">
+        <property name="minimumSize">
+         <size>
+          <width>75</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Data Count</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="lblElementCount">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="lblNodeCount">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="lblPropertyCount">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="lblDataCount">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpProperty">
+     <property name="title">
+      <string>Property</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="minimumSize">
+         <size>
+          <width>75</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Value Type</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="cmbValueType">
+        <item>
+         <property name="text">
+          <string>Boolean</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>String</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Int8</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Int16</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Int32</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Int64</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>UInt8</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>UInt16</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>UInt32</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>UInt64</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Vector2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Vector3</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Vector4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Quaternion</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Matrix 3x3</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Matrix 4x4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Data</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Value</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QLineEdit" name="txtValueInt"/>
+        </item>
+        <item>
+         <widget class="QWidget" name="widget" native="true">
+          <layout class="QGridLayout" name="gridLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="1" column="3">
+            <widget class="QLineEdit" name="txtValueFloat24"/>
+           </item>
+           <item row="2" column="3">
+            <widget class="QLineEdit" name="txtValueFloat34"/>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLineEdit" name="txtValueFloat41"/>
+           </item>
+           <item row="1" column="2">
+            <widget class="QLineEdit" name="txtValueFloat23"/>
+           </item>
+           <item row="2" column="2">
+            <widget class="QLineEdit" name="txtValueFloat33"/>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="txtValueFloat32"/>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLineEdit" name="txtValueFloat31"/>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="txtValueFloat42"/>
+           </item>
+           <item row="3" column="2">
+            <widget class="QLineEdit" name="txtValueFloat43"/>
+           </item>
+           <item row="3" column="3">
+            <widget class="QLineEdit" name="txtValueFloat44"/>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="txtValueFloat12"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLineEdit" name="txtValueFloat11"/>
+           </item>
+           <item row="0" column="2">
+            <widget class="QLineEdit" name="txtValueFloat13"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLineEdit" name="txtValueFloat21"/>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="txtValueFloat22"/>
+           </item>
+           <item row="0" column="3">
+            <widget class="QLineEdit" name="txtValueFloat14"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="txtValueString"/>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkValueBoolean">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpData">
+     <property name="title">
+      <string>Data</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Data Size: </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblDataSize">
+          <property name="text">
+           <string>1 kb</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QPushButton" name="btnDataView">
+          <property name="text">
+           <string>View</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnDataLoad">
+          <property name="text">
+           <string>Load</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnDataSave">
+          <property name="text">
+           <string>Save</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
