@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLItem.cpp
+ Zinek Engine - ZEMLElement.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,33 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMLItem.h"
-#include "ZEError.h"
+#pragma once
+#ifndef	__ZEML_TYPE_H__
+#define __ZEML_TYPE_H__
 
-ZEMLNode* ZEMLElement::GetParent()
+#include "ZETypes.h"
+#include "ZEMLCommon.h"
+#include "ZEDS/ZEList.h"
+#include "ZEDS/ZEString.h"
+
+class ZEMLNode;
+
+class ZEMLElement : public ZEListItem
 {
-	return Parent;
-}
+	friend ZEMLNode;
+	private:
+		ZEMLNode*					Parent;
+		ZEString					Name;
 
-bool ZEMLElement::SetName(const char* Name) 
-{
-	if(strlen(Name) + 1 > 255)
-	{
-		zeError("ZEMLProperty name too long. Name size must be smaller than 256");
-		return false;
-	}
+	public:
+		ZEMLNode*					GetParent();
 
-	this->Name = Name;
+		bool						SetName(const char* Name);
+		const ZEString&				GetName();	
 
-	return true;
-}
+		virtual ZEMLElementType1	GetType() = 0;
+		virtual ZESize				GetSize() = 0;
 
-const ZEString& ZEMLElement::GetName()
-{
-	return Name;
-}
+									ZEMLElement();
+};
 
-ZEMLElement::ZEMLElement()
-{
-	Parent = NULL;
-}
+#endif

@@ -37,7 +37,7 @@
 
 #include "ZEFile/ZEFile.h"
 #include "ZEMLProperty.h"
-#include "ZEMLDataProperty.h"
+#include "ZEMLData.h"
 #include "ZEEndian.h"
 
 bool ZEMLWriterNode::WriteElementHeader(const char* Name, ZEMLElementType Type)

@@ -42,7 +42,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEValue.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEMLItem.h"
+#include "ZEMLElement.h"
 
 struct ZEMLReaderProperty
 {

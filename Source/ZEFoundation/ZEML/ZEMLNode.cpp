@@ -35,7 +35,7 @@
 
 #include "ZEMLNode.h"
 #include "ZEMLProperty.h"
-#include "ZEMLDataProperty.h"
+#include "ZEMLData.h"
 #include "ZEMLReader.h"
 #include "ZEMLWriter.h"
 

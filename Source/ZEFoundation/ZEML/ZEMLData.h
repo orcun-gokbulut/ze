@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLDataProperty.h
+ Zinek Engine - ZEMLData.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,10 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEML_DATA_PROPERTY_H__
-#define __ZEML_DATA_PROPERTY_H__
+#ifndef	__ZEML_DATA_H__
+#define __ZEML_DATA_H__
 
-#include "ZEMLItem.h"
+#include "ZEMLElement.h"
 #include "ZEPointer/ZEPointer.h"
 
 class ZEFile;
@@ -66,7 +66,6 @@ class ZEMLData : public ZEMLElement
 
 		void						SetData(void* Data, ZESize DataSize, bool Referred = false);
 		const void*					GetData();
-		ZESize						GetDataSize();
 
 									ZEMLData();
 									ZEMLData(const char* Name);

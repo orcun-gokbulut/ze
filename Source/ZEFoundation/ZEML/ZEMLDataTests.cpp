@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLDataPropertyTests.cpp
+ Zinek Engine - ZEMLDataTests.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEML/ZEMLDataProperty.h"
+#include "ZEML/ZEMLData.h"
 #include "ZETest/ZETest.h"
 #include "ZETest/ZETestCheck.h"
 #include "ZEError.h"
@@ -41,7 +41,7 @@
 #include "ZEMLNode.h"
 
 
-ZETestSuite(ZEMLDataProperty)
+ZETestSuite(ZEMLData)
 {
 	ZETest("ZEMLDataProperty::~ZEMLDataProperty()")
 	{

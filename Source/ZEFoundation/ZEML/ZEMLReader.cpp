@@ -330,7 +330,7 @@ bool ZEMLReaderNode::Load()
 			Node->Size = ZEEndian::Little(Node->Size);
 			
 			Node->Index = 0;
-			for (ZESize I = SubNodes.GetCount() - 1; I >= 0; I--)
+			for (ZESSize I = SubNodes.GetCount() - 1; I >= 0; I--)
 			{
 				if (SubNodes[I].Name == Node->Name)
 					Node->Index = SubNodes[I].Index + 1;

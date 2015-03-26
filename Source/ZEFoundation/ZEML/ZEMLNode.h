@@ -37,7 +37,7 @@
 #ifndef	__ZEML_NODE_H__
 #define __ZEML_NODE_H__
 
-#include "ZEMLItem.h"
+#include "ZEMLElement.h"
 #include "ZEDS/ZEList.h"
 #include "ZEDS/ZEArray.h"
 
