@@ -114,7 +114,11 @@ void ZEMCGenerator::GenerateClassDynamicCast(ZEMCClass* CurrentClass)
 		"\t\treturn NULL;\n\n");
 
 	GenerateCastedObject(CurrentClass);
-	WriteToFile("\treturn CastedObject;\n");
+
+	if (CurrentClass->IsBuiltInClass)
+		WriteToFile("\treturn reinterpret_cast<ZEObject*>(CastedObject);\n");
+	else 
+		WriteToFile("\treturn CastedObject;\n");
 
 	WriteToFile("}\n\n");
 }
@@ -130,8 +134,10 @@ void ZEMCGenerator::GenerateClassClone(ZEMCClass* CurrentClass)
 	{
 		GenerateCastedObject(CurrentClass);
 
-		WriteToFile("\treturn new %s(*CastedObject);\n", 
-			CurrentClass->Name.ToCString());
+		if (CurrentClass->IsBuiltInClass)
+			WriteToFile("\treturn reinterpret_cast<ZEObject*>(new %s(*CastedObject));\n", CurrentClass->Name.ToCString());
+		else
+			WriteToFile("\treturn new %s(*CastedObject);\n", CurrentClass->Name.ToCString());
 	}
 	else
 	{
@@ -147,7 +153,7 @@ void ZEMCGenerator::GenerateClassConstruct(ZEMCClass* CurrentClass)
 		"bool %sClass::Construct(ZEObject* Object)\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
-
+	
 	if (CurrentClass->HasPublicDefaultConstructor && !CurrentClass->IsAbstract)
 	{
 		WriteToFile("\tnew(Object) %s();\n", 

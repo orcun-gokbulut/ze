@@ -47,10 +47,12 @@ class ZEMLWriterNode
 {
 	friend class ZEMLWriter;
 	private:
+		ZEMLWriterNode*		Parent;
 		ZEFile*				File;
 		ZEString			Name;
 		ZEUInt64			NodeDataOffset;
 		ZEUInt64			SubElementCount;
+		bool				SubNodeIsOpen;
 
 		bool				WriteElementHeader(const char* Name, ZEMLElementType Type);
 

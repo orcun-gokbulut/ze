@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLRoot.cpp
+ Zinek Engine - ZEMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,111 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMLRoot.h"
-#include "ZEMLReader.h"
-#include "ZEMLWriter.h"
+#include "ZEMLEditorWindow.h"
+#include "ZEFile/ZEPathManager.h"
+#include <QtGui/QApplication>
 
-ZESize ZEMLRoot::GetSize()
-{
+#ifdef ZE_PLATFORM_WINDOWS
+	#define  WIN32_LEAN_AND_MEAN
+	#include <windows.h>
 
-	ZESize Size = 
-		4 +	// Identifier
-		2 + // Version
-		8 + // StartOffset
-		RootNode->GetSize();
-
-	return Size;
-}
-
-void ZEMLRoot::SetRootNode(ZEMLNode* Node)
-{
-	RootNode = Node;
-}
-
-ZEMLNode* ZEMLRoot::GetRootNode()
-{
-	return RootNode;
-}
-
-void ZEMLRoot::SetDeferredDataLoadingMode(bool Enabled)
-{
-	DeferredMode = Enabled;
-}
-
-bool ZEMLRoot::GetDeferredDataLoadingMode()
-{
-	return DeferredMode;
-}
-
-bool ZEMLRoot::Read(const char* FileName)
-{
-	if (RootNode == NULL)
+	int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 	{
-		zeError("Cannot read ZEML file. Root node pointer is not set.");
-		return false;
+		int argc = 1;
+		char* argv[] =
+		{
+			"ZEMLEditor.exe"
+		};
+
+		ZEPathManager::GetInstance()->SetAccessControl(false);
+
+		QApplication Application(argc, argv);
+		ZEMLEditorWindow Widget;
+		Widget.show();
+		return Application.exec();
 	}
-
-	FileName = FileName;
-	ZEMLReader Reader;
-	if (!Reader.Open(FileName))
-		return false;
-
-	ZEMLReaderNode ReaderNode = Reader.GetRootNode();
-	bool Result = RootNode->Read(&ReaderNode);
-	
-	zeDebugCheck(!_CrtCheckMemory(), "Heap problem");
-
-	return Result;
-}
-
-bool ZEMLRoot::Read(ZEFile* File)
-{
-	if (RootNode == NULL)
+#else
+	int Main(int argc, char** argv)
 	{
-		zeError("Cannot read ZEML file. Root node pointer is not set.");
-		return false;
+		ZEPathManager::GetInstance()->SetAccessControl(false);
+
+		QApplication Application(argc, argv);
+		ZEMLEditorWindow Widget;
+		Widget.show();
+		return Application.exec();
 	}
-
-	ZEMLReader Reader;
-	if (!Reader.Open(File))
-		return false;
-
-	ZEMLReaderNode ReaderNode = Reader.GetRootNode();
-	return RootNode->Read(&ReaderNode);
-}
-
-bool ZEMLRoot::Write(const char* FileName)
-{
-	if (RootNode == NULL)
-	{
-		zeError("Cannot read ZEML file. Root node pointer is not set.");
-		return false;
-	}
-
-	ZEMLWriter Writer;
-	if (!Writer.Open(FileName))
-		return false;
-
-	return true;
-}
-
-bool ZEMLRoot::Write(ZEFile* File)
-{
-	if (RootNode == NULL)
-	{
-		zeError("Cannot read ZEML file. Root node pointer is not set.");
-		return false;
-	}
-
-	ZEMLWriter Writer;
-	if (!Writer.Open(File))
-		return false;
-
-	return true;
-}
-
-ZEMLRoot::ZEMLRoot()
-{
-	RootNode = NULL;
-	DeferredMode = false;
-}
+#endif

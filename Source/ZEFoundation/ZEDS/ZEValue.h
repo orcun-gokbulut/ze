@@ -119,6 +119,16 @@ class ZEValue
 		ZEValueValue			GetValue() const;
 		ZEValueValue&			ImplicitAcesss();
 
+		bool					IsInteger() const;
+		bool					IsFloatingPoint() const;
+		bool					IsUnsignedInteger() const;
+		bool					IsSignedInteger() const;
+		bool					IsVector() const;
+		bool					IsMatrix() const;
+
+		ZEInt64					GetIntegerRangeMin() const;
+		ZEUInt64				GetIntegerRangeMax() const;
+
 		void					SetString(const char* Value);
 		void					SetString(const ZEString& Value);
 		void					SetInt8(ZEInt8 Value);
@@ -154,12 +164,12 @@ class ZEValue
 		float					GetFloat() const;
 		double					GetDouble() const;
 		bool					GetBoolean() const;
-		ZEVector2&				GetVector2() const;
-		ZEVector3&				GetVector3() const;
-		ZEVector4&				GetVector4() const;
-		ZEQuaternion&			GetQuaternion() const;
-		ZEMatrix3x3&			GetMatrix3x3() const;
-		ZEMatrix4x4&			GetMatrix4x4() const;
+		const ZEVector2&		GetVector2() const;
+		const ZEVector3&		GetVector3() const;
+		const ZEVector4&		GetVector4() const;
+		const ZEQuaternion&		GetQuaternion() const;
+		const ZEMatrix3x3&		GetMatrix3x3() const;
+		const ZEMatrix4x4&		GetMatrix4x4() const;
 		ZEObject*				GetClass() const;
 		
 		bool					IsNull() const;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLRoot.cpp
+ Zinek Engine - ZEMLEditorWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,111 +33,71 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMLRoot.h"
-#include "ZEMLReader.h"
-#include "ZEMLWriter.h"
+#pragma once
+#ifndef	__ZEML_EDITOR_WINDOW_H__
+#define __ZEML_EDITOR_WINDOW_H__
 
-ZESize ZEMLRoot::GetSize()
+#include <QtGui/QMainWindow>
+#include "QtGui/qtreewidget.h"
+
+#include "ZEDS/ZEString.h"
+#include "ZEML/ZEMLRoot.h"
+
+class Ui_ZEMLEditorWindow;
+
+class ZEMLEditorWindow : public QMainWindow
 {
+	Q_OBJECT
+	private:
+		Ui_ZEMLEditorWindow*	Form;
 
-	ZESize Size = 
-		4 +	// Identifier
-		2 + // Version
-		8 + // StartOffset
-		RootNode->GetSize();
+		ZEString				FileName;
+		ZEMLRoot				Root;
+		ZEMLNode*				RootNode;
 
-	return Size;
-}
+		void					LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node);
+		void					LoadTree();
 
-void ZEMLRoot::SetRootNode(ZEMLNode* Node)
-{
-	RootNode = Node;
-}
+		void					ChangeName(const char* NewName);
+		void					ChangeValue(const ZEValue& NewValue);
+		void					ChangeData(void* NewData, ZESize Size);
 
-ZEMLNode* ZEMLRoot::GetRootNode()
-{
-	return RootNode;
-}
+	private slots:
+		//void					NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
+		void					ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue);
+		//void					DataChange(ZEMLData* Data, void* NewData, ZESize NewDataSize, void* OldData, ZESize OldDataSize);
+		
+		void					CurrentItemChanged(QTreeWidgetItem* Current, QTreeWidgetItem* Previous);
 
-void ZEMLRoot::SetDeferredDataLoadingMode(bool Enabled)
-{
-	DeferredMode = Enabled;
-}
+		void					Select();
+		void					Deselect();
 
-bool ZEMLRoot::GetDeferredDataLoadingMode()
-{
-	return DeferredMode;
-}
+		void					New();
+		void					Open();
+		void					Save();
+		void					SaveAs();
+		void					Close();
+		void					Quit();
 
-bool ZEMLRoot::Read(const char* FileName)
-{
-	if (RootNode == NULL)
-	{
-		zeError("Cannot read ZEML file. Root node pointer is not set.");
-		return false;
-	}
+		/*void					Undo();
+		void					Redo();
+		void					Cut();
+		void					Copy();
+		void					Paste();
 
-	FileName = FileName;
-	ZEMLReader Reader;
-	if (!Reader.Open(FileName))
-		return false;
+		void					AddNewNode();
+		void					AddNewProperty();
+		void					AddNewData();
+		void					Delete();
 
-	ZEMLReaderNode ReaderNode = Reader.GetRootNode();
-	bool Result = RootNode->Read(&ReaderNode);
-	
-	zeDebugCheck(!_CrtCheckMemory(), "Heap problem");
+		void					UserGuide();
+		void					BugReport();
+		void					Website();
+		void					About();*/
 
-	return Result;
-}
+	public:
+								ZEMLEditorWindow();
+								~ZEMLEditorWindow();
+};
 
-bool ZEMLRoot::Read(ZEFile* File)
-{
-	if (RootNode == NULL)
-	{
-		zeError("Cannot read ZEML file. Root node pointer is not set.");
-		return false;
-	}
-
-	ZEMLReader Reader;
-	if (!Reader.Open(File))
-		return false;
-
-	ZEMLReaderNode ReaderNode = Reader.GetRootNode();
-	return RootNode->Read(&ReaderNode);
-}
-
-bool ZEMLRoot::Write(const char* FileName)
-{
-	if (RootNode == NULL)
-	{
-		zeError("Cannot read ZEML file. Root node pointer is not set.");
-		return false;
-	}
-
-	ZEMLWriter Writer;
-	if (!Writer.Open(FileName))
-		return false;
-
-	return true;
-}
-
-bool ZEMLRoot::Write(ZEFile* File)
-{
-	if (RootNode == NULL)
-	{
-		zeError("Cannot read ZEML file. Root node pointer is not set.");
-		return false;
-	}
-
-	ZEMLWriter Writer;
-	if (!Writer.Open(File))
-		return false;
-
-	return true;
-}
-
-ZEMLRoot::ZEMLRoot()
-{
-	RootNode = NULL;
-	DeferredMode = false;
-}
+#endif
