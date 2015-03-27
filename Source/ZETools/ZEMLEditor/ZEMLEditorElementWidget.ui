@@ -207,16 +207,6 @@
        <widget class="QComboBox" name="cmbValueType">
         <item>
          <property name="text">
-          <string>Boolean</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>String</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
           <string>Int8</string>
          </property>
         </item>
@@ -257,6 +247,26 @@
         </item>
         <item>
          <property name="text">
+          <string>Float</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Double</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Boolean</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>String</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Vector2</string>
          </property>
         </item>
@@ -277,17 +287,12 @@
         </item>
         <item>
          <property name="text">
-          <string>Matrix 3x3</string>
+          <string>Matrix3x3</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Matrix 4x4</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Data</string>
+          <string>Matrix4x4</string>
          </property>
         </item>
        </widget>

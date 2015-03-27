@@ -56,16 +56,15 @@ class ZEMLEditorElementWidget : public QWidget
 		void					ConfigureUIProperty();
 		void					ConfigureUI();
 
-		void					ChangeName(const char* NewName);
-		void					ChangeValue(const ZEValue& NewValue);
-		void					ChangeData(void* NewData, ZESize Size);
-
+		int						GetTypeIndex(ZEValueType ValueType);
+		ZEValueType				GetValueType(int Index);
 
 	private slots:
-		void					cmbValueType_OnCurrentIndexChanged();
+		void					txtName_OnTextEdited(const QString& NewText);
+		void					cmbValueType_OnCurrentIndexChanged(int Index);
 		void					txtValueInt_OnTextEdited(const QString& NewText);
 		void					txtValueString_OnTextEdited(const QString& NewText);
-		void					chkValueBoolean_OnStateChanged(int state);
+		void					chkValueBoolean_OnStateChanged(int State);
 		void					txtValueFloat_OnTextEdited(const QString& NewText);
 
 	signals:

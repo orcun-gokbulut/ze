@@ -175,6 +175,8 @@ class ZEValue
 		bool					IsNull() const;
 		ZESize					SizeOf() const;
 
+		void					Clear();
+
 		bool					Serialize(ZESerializer* Serializer);
 		bool					Unserialize(ZEUnserializer* Unserializer);
 

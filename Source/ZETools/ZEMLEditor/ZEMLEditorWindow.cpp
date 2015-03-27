@@ -140,7 +140,7 @@ void ZEMLEditorWindow::Open()
 {
 	QString NewFileName = QFileDialog::getOpenFileName(this, 
 		"Open ZEML File", "", 
-		"ZEML Files (*.ZEML);;ZEML Based Files (*.ZEML *.ZEModel *.ZEIterior *.ZEMaterial);;All Files (*.*)");
+		"ZEML Based Files (*.ZEML *.ZE*);;ZEML Files (*.ZEML);;All Files (*.*)");
 	
 	if (NewFileName.isNull())
 		return;
@@ -195,12 +195,16 @@ void ZEMLEditorWindow::SaveAs()
 
 	QString NewFileName = QFileDialog::getSaveFileName(this, 
 		"Open ZEML File", "", 
-		"ZEML Files (*.ZEML);;ZEML Based Files (*.ZEML *.ZEModel *.ZEIterior *.ZEMaterial);;All Files (*.*)");
+		"ZEML Based Files (*.ZEML *.ZE*);;ZEML Files (*.ZEML);;All Files (*.*)");
 
 	if (NewFileName.isNull())
 		return;
 
-	if (!Root.Write(NewFileName.toStdString().c_str()))
+	ZEString Temp = NewFileName.toUtf8().constData();
+
+	ZEMLRoot Root;
+	Root.SetRootNode(RootNode);
+	if (!Root.Write(Temp))
 	{
 		QMessageBox::critical(this, "ZEML Editor", "Cannot save ZEML file.", QMessageBox::Ok);
 		return;

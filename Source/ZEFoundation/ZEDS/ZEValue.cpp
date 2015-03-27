@@ -226,6 +226,26 @@ ZESize ZEValue::SizeOf() const
 	}
 }
 
+void ZEValue::Clear()
+{
+	if (Type == ZE_VRT_MATRIX3X3)
+	{
+		memset(Value.Matrix3x3, 0, sizeof(ZEMatrix3x3));
+	}
+	else if (Type == ZE_VRT_MATRIX4X4)
+	{
+		memset(Value.Matrix4x4, 0, sizeof(ZEMatrix4x4));
+	}
+	else if (Type == ZE_VRT_STRING)
+	{
+		Value.String.Clear();
+	}
+	else
+	{
+		memset(&Value, 0, sizeof(Value));
+	}
+}
+
 bool ZEValue::Serialize(ZESerializer* Serializer)
 {
 

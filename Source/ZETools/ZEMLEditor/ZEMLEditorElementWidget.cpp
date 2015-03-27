@@ -65,6 +65,10 @@ void ZEMLEditorElementWidget::ConfigureUIProperty()
 	Form->txtValueFloat43->setVisible(false);
 	Form->txtValueFloat44->setVisible(false);
 
+	Form->cmbValueType->blockSignals(true);
+	Form->cmbValueType->setCurrentIndex(GetTypeIndex(Property->GetValue().GetType()));
+	Form->cmbValueType->blockSignals(false);
+
 	if (Property->GetValueType() == ZEML_VT_INT8)
 	{
 		Form->txtValueInt->setVisible(true);
@@ -104,6 +108,16 @@ void ZEMLEditorElementWidget::ConfigureUIProperty()
 	{
 		Form->txtValueInt->setVisible(true);
 		Form->txtValueInt->setText(QString::number(Property->GetValue().GetUInt64()));
+	}
+	else if (Property->GetValueType() == ZEML_VT_FLOAT)
+	{
+		Form->txtValueFloat11->setVisible(true);
+		Form->txtValueFloat11->setText(QString::number(Property->GetValue().GetFloat()));
+	}
+	else if (Property->GetValueType() == ZEML_VT_DOUBLE)
+	{
+		Form->txtValueFloat11->setVisible(true);
+		Form->txtValueFloat11->setText(QString::number(Property->GetValue().GetDouble()));
 	}
 	else if (Property->GetValueType() == ZEML_VT_STRING)
 	{
@@ -151,13 +165,13 @@ void ZEMLEditorElementWidget::ConfigureUIProperty()
 		const ZEQuaternion& Value = Property->GetValue().GetQuaternion();
 
 		Form->txtValueFloat11->setVisible(true);
-		Form->txtValueFloat11->setText(QString::number(Value.x));
+		Form->txtValueFloat11->setText(QString::number(Value.w));
 		Form->txtValueFloat12->setVisible(true);
-		Form->txtValueFloat12->setText(QString::number(Value.y));
+		Form->txtValueFloat12->setText(QString::number(Value.x));
 		Form->txtValueFloat13->setVisible(true);
-		Form->txtValueFloat13->setText(QString::number(Value.z));
+		Form->txtValueFloat13->setText(QString::number(Value.y));
 		Form->txtValueFloat14->setVisible(true);
-		Form->txtValueFloat14->setText(QString::number(Value.w));
+		Form->txtValueFloat14->setText(QString::number(Value.z));
 	}
 	else if (Property->GetValueType() == ZEML_VT_MATRIX3X3)
 	{
@@ -222,6 +236,96 @@ void ZEMLEditorElementWidget::ConfigureUIProperty()
 	}
 }
 
+int ZEMLEditorElementWidget::GetTypeIndex(ZEValueType ValueType)
+{
+	switch (ValueType)
+	{
+		default:
+			return -1;
+		case ZE_VRT_INTEGER_8:
+			return 0;
+		case ZE_VRT_INTEGER_16:
+			return 1;
+		case ZE_VRT_INTEGER_32:
+			return 2;
+		case ZE_VRT_INTEGER_64:
+			return 3;
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+			return 4;
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+			return 5;
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			return 6;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+			return 7;
+		case ZE_VRT_FLOAT:
+			return 8;
+		case ZE_VRT_DOUBLE:
+			return 9;
+		case ZE_VRT_BOOLEAN:
+			return 10;
+		case ZE_VRT_STRING:
+			return 11;
+		case ZE_VRT_VECTOR2:
+			return 12;
+		case ZE_VRT_VECTOR3:
+			return 13;
+		case ZE_VRT_VECTOR4:
+			return 14;
+		case ZE_VRT_QUATERNION:
+			return 15;
+		case ZE_VRT_MATRIX3X3:
+			return 16;
+		case ZE_VRT_MATRIX4X4:
+			return 17;
+	}
+}
+
+ZEValueType ZEMLEditorElementWidget::GetValueType(int Index)
+{
+	switch (Index)
+	{
+		default:
+			return ZE_VRT_NULL;
+		case 0:
+			return ZE_VRT_INTEGER_8;
+		case 1:
+			return ZE_VRT_INTEGER_16;
+		case 2:
+			return ZE_VRT_INTEGER_32;
+		case 3:
+			return ZE_VRT_INTEGER_64;
+		case 4:
+			return ZE_VRT_UNSIGNED_INTEGER_8;
+		case 5:
+			return ZE_VRT_UNSIGNED_INTEGER_16;
+		case 6:
+			return ZE_VRT_UNSIGNED_INTEGER_32;
+		case 7:
+			return ZE_VRT_UNSIGNED_INTEGER_64;
+		case 8:
+			return ZE_VRT_FLOAT;
+		case 9:
+			return ZE_VRT_DOUBLE;
+		case 10:
+			return ZE_VRT_BOOLEAN;
+		case 11:
+			return ZE_VRT_STRING;
+		case 12:
+			return ZE_VRT_VECTOR2;
+		case 13:
+			return ZE_VRT_VECTOR3;
+		case 14:
+			return ZE_VRT_VECTOR4;
+		case 15:
+			return ZE_VRT_QUATERNION;
+		case 16:
+			return ZE_VRT_MATRIX3X3;
+		case 17:
+			return ZE_VRT_MATRIX4X4;
+	}
+}
+
 void ZEMLEditorElementWidget::ConfigureUI()
 {
 	Form->grpElement->setVisible(false);
@@ -233,7 +337,7 @@ void ZEMLEditorElementWidget::ConfigureUI()
 	if (Element == NULL)
 		return;
 
-	Form->grpElement->setVisible(false);
+	Form->grpElement->setVisible(true);
 	Form->lblNoElementSelected->setVisible(false);
 
 	Form->txtElementName->setText(Element->GetName().ToCString());
@@ -266,48 +370,25 @@ void ZEMLEditorElementWidget::ConfigureUI()
 	}
 }
 
-void ZEMLEditorElementWidget::cmbValueType_OnCurrentIndexChanged()
+void ZEMLEditorElementWidget::txtName_OnTextEdited(const QString& NewText)
+{
+	ZEString OldName = Element->GetName();
+	ZEString NewName = NewText.toUtf8().constData();
+	Element->SetName(NewName);
+	emit NameChanged(Element, NewName, OldName);
+}
+
+void ZEMLEditorElementWidget::cmbValueType_OnCurrentIndexChanged(int Index)
 {
 	ZEMLProperty* Property = (ZEMLProperty*)Element;
 	ZEValue OldValue = Property->GetValue();
 
 	ZEValue Value;
-	if (Form->cmbValueType->currentText() == "Int8")
-		Value.SetType(ZE_VRT_INTEGER_8);
-	else if (Form->cmbValueType->currentText() == "Int16")
-		Value.SetType(ZE_VRT_INTEGER_16);
-	else if (Form->cmbValueType->currentText() == "Int32")
-		Value.SetType(ZE_VRT_INTEGER_32);
-	else if (Form->cmbValueType->currentText() == "Int64")
-		Value.SetType(ZE_VRT_INTEGER_64);
-	else if (Form->cmbValueType->currentText() == "UInt8")
-		Value.SetType(ZE_VRT_UNSIGNED_INTEGER_8);
-	else if (Form->cmbValueType->currentText() == "UInt16")
-		Value.SetType(ZE_VRT_UNSIGNED_INTEGER_16);
-	else if (Form->cmbValueType->currentText() == "UInt32")
-		Value.SetType(ZE_VRT_UNSIGNED_INTEGER_32);
-	else if (Form->cmbValueType->currentText() == "UInt64")
-		Value.SetType(ZE_VRT_UNSIGNED_INTEGER_64);
-	else if (Form->cmbValueType->currentText() == "Float")
-		Value.SetType(ZE_VRT_FLOAT);
-	else if (Form->cmbValueType->currentText() == "Double")
-		Value.SetType(ZE_VRT_DOUBLE);
-	else if (Form->cmbValueType->currentText() == "Boolean")
-		Value.SetType(ZE_VRT_BOOLEAN);
-	else if (Form->cmbValueType->currentText() == "String")
-		Value.SetType(ZE_VRT_STRING);
-	else if (Form->cmbValueType->currentText() == "Vector2")
-		Value.SetType(ZE_VRT_VECTOR2);
-	else if (Form->cmbValueType->currentText() == "Vector3")
-		Value.SetType(ZE_VRT_VECTOR3);
-	else if (Form->cmbValueType->currentText() == "Vector4")
-		Value.SetType(ZE_VRT_VECTOR4);
-	else if (Form->cmbValueType->currentText() == "Quaternion")
-		Value.SetType(ZE_VRT_QUATERNION);
-	else if (Form->cmbValueType->currentText() == "Matrix3x3")
-		Value.SetType(ZE_VRT_MATRIX3X3);
-	else if (Form->cmbValueType->currentText() == "Matrix4x4")
-		Value.SetType(ZE_VRT_MATRIX4X4);
+	Value.SetType(GetValueType(Index));
+	Value.Clear();
+	Property->SetValue(Value);
+
+	ConfigureUI();
 	
 	emit ValueChanged(Property, Property->GetValue(), OldValue);
 }
@@ -392,17 +473,27 @@ void ZEMLEditorElementWidget::txtValueFloat_OnTextEdited(const QString& NewText)
 	float NewValue = NewText.toFloat(&Success);
 	if (!Success)
 	{ 
-		Form->txtValueFloat11->setStyleSheet(Success ? "" : "background:#FFAAAA;"); 
+		((QWidget*)sender())->setStyleSheet("background:#FF3333"); 
 		Valid = Success; 
 		return;
 	}
-	
+
+	((QWidget*)sender())->setStyleSheet(""); 
+
 	ZEMLProperty* Property = (ZEMLProperty*)Element;
 	ZEValue OldValue = Property->GetValue();
 
-	int Column = sender()->property("column").toInt();
-	int Row = sender()->property("row").toInt();
-	if (Property->GetValue().GetType() == ZE_VRT_VECTOR2)
+	int Column = sender()->property("column").toInt() - 1;
+	int Row = sender()->property("row").toInt() - 1;
+	if (Property->GetValue().GetType() == ZE_VRT_FLOAT)
+	{
+		Property->SetFloat(NewValue);
+	}
+	else if (Property->GetValue().GetType() == ZE_VRT_DOUBLE)
+	{
+		Property->SetDouble(NewValue);
+	}
+	else if (Property->GetValue().GetType() == ZE_VRT_VECTOR2)
 	{
 		ZEVector2 Vector = Property->GetValue().GetVector2();
 		Vector.M[Column] = NewValue;
@@ -429,10 +520,10 @@ void ZEMLEditorElementWidget::txtValueFloat_OnTextEdited(const QString& NewText)
 	else if (Property->GetValue().GetType() == ZE_VRT_MATRIX3X3)
 	{
 		ZEMatrix3x3 Matrix = Property->GetValue().GetMatrix3x3();
-		Matrix.M[Row][Column] = NewValue;
+		Matrix.M[Column][Row] = NewValue;
 		Property->SetMatrix3x3(Matrix);
 	}
-	else if (Property->GetValueType() == ZE_VRT_MATRIX4X4)
+	else if (Property->GetValue().GetType() == ZE_VRT_MATRIX4X4)
 	{
 		ZEMatrix4x4 Matrix = Property->GetValue().GetMatrix4x4();
 		Matrix.M[Column][Row] = NewValue;
@@ -454,7 +545,6 @@ ZEMLElement* ZEMLEditorElementWidget::GetElement()
 	return Element;
 }
 
-
 ZEMLEditorElementWidget::ZEMLEditorElementWidget(QWidget* Parent) : QWidget(Parent)
 {
 	Element = NULL;
@@ -463,6 +553,45 @@ ZEMLEditorElementWidget::ZEMLEditorElementWidget(QWidget* Parent) : QWidget(Pare
 	Form->setupUi(this);
 
 	ConfigureUI();
+
+	Form->txtValueFloat11->setProperty("row", 1); Form->txtValueFloat11->setProperty("column", 1);
+	Form->txtValueFloat12->setProperty("row", 1); Form->txtValueFloat12->setProperty("column", 2);
+	Form->txtValueFloat13->setProperty("row", 1); Form->txtValueFloat13->setProperty("column", 3);
+	Form->txtValueFloat14->setProperty("row", 1); Form->txtValueFloat14->setProperty("column", 4);
+	Form->txtValueFloat21->setProperty("row", 2); Form->txtValueFloat21->setProperty("column", 1);
+	Form->txtValueFloat22->setProperty("row", 2); Form->txtValueFloat22->setProperty("column", 2);
+	Form->txtValueFloat23->setProperty("row", 2); Form->txtValueFloat23->setProperty("column", 3);
+	Form->txtValueFloat24->setProperty("row", 2); Form->txtValueFloat24->setProperty("column", 4);
+	Form->txtValueFloat31->setProperty("row", 3); Form->txtValueFloat31->setProperty("column", 1);
+	Form->txtValueFloat32->setProperty("row", 3); Form->txtValueFloat32->setProperty("column", 2);
+	Form->txtValueFloat33->setProperty("row", 3); Form->txtValueFloat33->setProperty("column", 3);
+	Form->txtValueFloat34->setProperty("row", 3); Form->txtValueFloat34->setProperty("column", 4);
+	Form->txtValueFloat41->setProperty("row", 4); Form->txtValueFloat41->setProperty("column", 1);
+	Form->txtValueFloat42->setProperty("row", 4); Form->txtValueFloat42->setProperty("column", 2);
+	Form->txtValueFloat43->setProperty("row", 4); Form->txtValueFloat43->setProperty("column", 3);
+	Form->txtValueFloat44->setProperty("row", 4); Form->txtValueFloat44->setProperty("column", 4);
+
+	connect(Form->cmbValueType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbValueType_OnCurrentIndexChanged(int)));
+	connect(Form->chkValueBoolean, SIGNAL(stateChanged(int)), this, SLOT(chkValueBoolean_OnStateChanged(int)));
+	connect(Form->txtValueString, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueString_OnTextEdited(const QString&)));
+	connect(Form->txtValueInt, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueInt_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat11, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat11, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat12, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat13, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat14, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat21, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat22, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat23, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat24, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat31, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat32, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat33, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat34, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat41, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat42, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat43, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->txtValueFloat44, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
 }
 
 ZEMLEditorElementWidget::~ZEMLEditorElementWidget()
