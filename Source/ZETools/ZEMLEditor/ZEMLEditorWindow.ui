@@ -61,6 +61,11 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <widget class="QMenu" name="mnuRecentFiles">
+     <property name="title">
+      <string>Recent Files</string>
+     </property>
+    </widget>
     <addaction name="actNew"/>
     <addaction name="separator"/>
     <addaction name="actOpen"/>
@@ -71,6 +76,7 @@
     <addaction name="actClose"/>
     <addaction name="separator"/>
     <addaction name="actQuit"/>
+    <addaction name="mnuRecentFiles"/>
    </widget>
    <widget class="QMenu" name="menuElements">
     <property name="title">
