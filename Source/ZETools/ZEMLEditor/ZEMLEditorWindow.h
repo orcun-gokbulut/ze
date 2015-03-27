@@ -57,10 +57,14 @@ class ZEMLEditorWindow : public QMainWindow
 
 		void					LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node);
 		void					LoadTree();
+		
+		void					RegisterRecentFile(const ZEString& FileName);
+		void					LoadRecentFiles();
 
-		void					ChangeName(const char* NewName);
-		void					ChangeValue(const ZEValue& NewValue);
-		void					ChangeData(void* NewData, ZESize Size);
+		void					OpenFile(const ZEString& FileName);
+		void					SaveFile(const ZEString& FileName);
+
+		void					ConfigureUI();
 
 	private slots:
 		//void					NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
@@ -74,6 +78,7 @@ class ZEMLEditorWindow : public QMainWindow
 
 		void					New();
 		void					Open();
+		void					OpenRecentFile();
 		void					Save();
 		void					SaveAs();
 		void					Close();
