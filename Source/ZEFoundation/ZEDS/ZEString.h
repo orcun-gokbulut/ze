@@ -158,6 +158,7 @@ class ZEString
 		void						SetCharacter(ZESize Position, ZECharacter Value);
 
 		bool						IsEmpty() const;
+		ZESize						GetBufferSize() const;
 		ZESize						GetLength() const;
 
 		void						SetSize(ZESize Size);

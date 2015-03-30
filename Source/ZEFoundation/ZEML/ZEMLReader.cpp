@@ -646,7 +646,7 @@ ZEMatrix4x4 ZEMLReaderNode::ReadMatrix4x4(const char* Name, const ZEMatrix4x4& D
 	return Value.GetMatrix4x4();
 }
 
-const ZEString& ZEMLReaderNode::ReadString(const char* Name, const ZEString& Default)
+ZEString ZEMLReaderNode::ReadString(const char* Name, const ZEString& Default)
 {
 	ZEValue Value = ReadValue(Name);
 
