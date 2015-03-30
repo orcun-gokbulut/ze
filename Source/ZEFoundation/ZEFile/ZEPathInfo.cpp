@@ -192,7 +192,7 @@ bool ZEPathInfo::IsExists()
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return false;
 
-	DWORD PathAttribute = GetFileAttributesA(Path);
+	DWORD PathAttribute = GetFileAttributesA(GetRealPath().Path);
 	if (PathAttribute == INVALID_FILE_ATTRIBUTES)
 		return false; 
 	else

@@ -118,6 +118,11 @@ bool ZEMLRoot::Write(const char* FileName)
 	if (!Writer.Open(FileName))
 		return false;
 
+	ZEMLWriterNode WriterNode = Writer.WriteRootNode(RootNode->GetName());
+	RootNode->Write(&WriterNode);
+	WriterNode.CloseNode();
+	Writer.Close();
+
 	return true;
 }
 
@@ -132,6 +137,11 @@ bool ZEMLRoot::Write(ZEFile* File)
 	ZEMLWriter Writer;
 	if (!Writer.Open(File))
 		return false;
+
+	ZEMLWriterNode WriterNode = Writer.WriteRootNode(RootNode->GetName());
+	RootNode->Write(&WriterNode);
+	WriterNode.CloseNode();
+	Writer.Close();
 
 	return true;
 }

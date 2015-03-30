@@ -38,7 +38,12 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "ZEDS\ZEFormat.h"
+#include "ZEDS/ZEFormat.h"
+#include "ZEML/ZEMLWriter.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZEFile/ZEFileInfo.h"
+#include "ZEML/ZEMLRoot.h"
+#include "ZEML/ZEMLProperty.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
 
@@ -199,55 +204,95 @@ bool ZEProtect::Activate()
 	if (Verify())
 		return true;
 
-	char Buffer[256];
 	ZEString ActivationCode = GenerateActivationCode();
 	ZESize ActivationCodeSize = ActivationCode.GetSize() < 256 ? ActivationCode.GetSize() : 256;
-
 	ZEString FileName;
+
 	if (SystemWide)
-		FileName = GetSystemWidePath() + "/" + ActivationFileName;
+		FileName = "#S:\\" + ActivationFileName;
 	else
 		FileName = ActivationFileName;
 
-	FILE* File = fopen(FileName, "a");
-	if (File == NULL)
-		File = fopen(FileName, "w");
-	if (File == NULL)
-		return false;
+	ZEFileInfo FileInfo(FileName);
+	ZEMLWriter ProtectWriter;
 
-	fprintf(File, "%s\n", ActivationCode.ToCString());
-	fclose(File);
+	if (!FileInfo.IsExists())
+	{
+		if (!ProtectWriter.Open(FileName))
+			return false;
+
+		ZEUInt8 MajorVersion = 1;
+		ZEUInt8 MinorVersion = 0;
+		ZEMLWriterNode RootNode = ProtectWriter.WriteRootNode("ZEProtect");
+		RootNode.WriteUInt8("MajorVersion", MajorVersion);
+		RootNode.WriteUInt8("MinorVersion", MinorVersion);
+
+		ZEMLWriterNode ProductNode = RootNode.OpenSubNode("Product");
+		ProductNode.WriteString("Name", GetApplicationName().ToCString());
+		ProductNode.WriteString("Key", ActivationCode.ToCString());
+		ProductNode.WriteUInt8("Type", 0);
+		ProductNode.CloseNode();
+
+		RootNode.CloseNode();
+		ProtectWriter.Close();
+	}
+	else
+	{
+		ZEMLRoot ProtectRoot;
+		ZEMLNode ProtectNode;
+
+		ProtectRoot.SetRootNode(&ProtectNode);
+		
+		if (!ProtectRoot.Read(FileName))
+			return false;
+
+		ZEMLNode* CurrentProductNode = ProtectNode.AddNode("Product");
+		CurrentProductNode->AddProperty("Name")->SetString(ApplicationName.ToCString());
+		CurrentProductNode->AddProperty("Key")->SetString(ActivationCode.ToCString());
+		CurrentProductNode->AddProperty("Type")->SetUInt8(0);
+
+		ProtectRoot.Write(FileName);
+	}
 
 	return true;
 }
 
 bool ZEProtect::Verify()
 {
-	char Buffer[256];
 	ZEString ActivationCode = GenerateActivationCode();
 	ZESize ActivationCodeSize = ActivationCode.GetSize() < 256 ? ActivationCode.GetSize() : 256;
-	
 	ZEString FileName;
+
 	if (SystemWide)
-		FileName = GetSystemWidePath() + "/" + ActivationFileName;
+		FileName = "#S:\\" + ActivationFileName;
 	else
 		FileName = ActivationFileName;
 
-	FILE* File = fopen(FileName, "r");
-	if (File != NULL)
+	ZEMLReader ProtectReader;
+	ZEFileInfo FileInfo(FileName);
+
+	if (FileInfo.IsExists())
 	{
-		while(!feof(File))
+		ProtectReader.Open(FileName);
+		ZEMLReaderNode ProtectNode = ProtectReader.GetRootNode();
+
+		ZESize ProductCount = ProtectNode.GetSubNodeCount("Product");
+		ZEMLReaderNode ProductNode;
+
+		for (ZESize I = 0; I < ProductCount; I++)
 		{
-			fgets(Buffer, ActivationCodeSize, File);
-			if (strncmp(Buffer, ActivationCode, ActivationCodeSize) == 0)
+			ProductNode = ProtectNode.GetSubNode("Product", I);
+
+			if (strncmp(ProductNode.ReadString("Key").ToCString(), ActivationCode, ActivationCodeSize) == 0)
 			{
-				fclose(File);
+				ProtectReader.Close();
 				return true;
 			}
 		}
-		fclose(File);
+
+		ProtectReader.Close();
 	}
-	
+
 	return false;
 }
 

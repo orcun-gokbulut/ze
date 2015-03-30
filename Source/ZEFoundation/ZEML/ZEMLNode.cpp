@@ -80,25 +80,26 @@ bool ZEMLNode::Read(ZEMLReaderNode* Reader)
 
 bool ZEMLNode::Write(ZEMLWriterNode* WriterNode)
 {
-	ZEMLWriterNode NewWriterNode = WriterNode->OpenSubNode(Name);
 	for (ZESize I = 0; I < Elements.GetCount(); I++)
 	{
-		if (Elements[I]->GetType() == ZEML_ET_NODE)
+		if (Elements[I]->GetType() == ZEML_ET1_NODE)
 		{
 			ZEMLNode* Node = static_cast<ZEMLNode*>(Elements[I]);
+			ZEMLWriterNode NewWriterNode = WriterNode->OpenSubNode(Node->GetName());
 			if (!Node->Write(&NewWriterNode))
 				return false;
+			NewWriterNode.CloseNode();
 		}
 		else if (Elements[I]->GetType() == ZEML_ET_PROPERTY)
 		{
 			ZEMLProperty* Property = static_cast<ZEMLProperty*>(Elements[I]);
-			if (!NewWriterNode.WriteValue(Property->GetName(), Property->GetValue()))
+			if (!WriterNode->WriteValue(Property->GetName(), Property->GetValue()))
 				return false;
 		}
 		else if (Elements[I]->GetType() == ZEML_ET_DATA)
 		{
 			ZEMLData* Data = static_cast<ZEMLData*>(Elements[I]);
-			if (!NewWriterNode.WriteData(Data->GetName(), Data->GetData(), Data->GetSize()))
+			if (!WriterNode->WriteData(Data->GetName(), Data->GetData(), Data->GetSize()))
 				return false;
 		}
 		else

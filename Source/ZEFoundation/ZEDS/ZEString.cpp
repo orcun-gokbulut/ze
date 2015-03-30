@@ -687,6 +687,11 @@ bool ZEString::IsEmpty() const
 	return (Buffer == NULL || (Buffer[0] == '\0'));
 }
 
+ZESize ZEString::GetBufferSize() const
+{
+	return Allocator.GetSize();
+}
+
 void ZEString::SetSize(ZESize Size)
 {
 	Allocator.Reallocate(&Buffer, Size);
@@ -694,7 +699,21 @@ void ZEString::SetSize(ZESize Size)
 
 ZESize ZEString::GetSize() const
 {
-	return Allocator.GetSize();
+	if (Buffer != NULL)
+	{
+		ZESize StringLength = sizeof(char);
+		const char* TempBuffer = Buffer;
+
+		while (*TempBuffer != '\0')
+		{
+			TempBuffer = TempBuffer + sizeof(char);
+			StringLength += sizeof(char);
+		}
+
+		return StringLength;
+	}
+	else
+		return 0;
 }
 
 void ZEString::Compact()
