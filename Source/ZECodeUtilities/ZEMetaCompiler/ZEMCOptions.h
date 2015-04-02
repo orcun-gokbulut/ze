@@ -47,15 +47,7 @@ struct ZEMCOptions
 	ZEString OutputFileName;
 	ZEArray<ZEString> IncludeDirectories;
 	ZEArray<ZEString> Definitions;
-
-	ZEString DeclarationsFileName;
-	ZEArray<ZEString> DeclarationsFileNames;
-	ZEString RegisterName;
-	ZEString RegisterHeaderFileName;
-	ZEString RegisterSourceFileName;
-
-	bool IsRegisterSession;
-	bool IsGenerateSession;
+	ZEString RegisterFileName;
 
 	const char** Argv;
 	int Argc;

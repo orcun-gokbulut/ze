@@ -57,7 +57,12 @@
 	{ \
 		static ClassName##Class Class;\
 		return &Class; \
-	}\
+	} \
+	\
+	ZEClass* ClassName##_Class() \
+	{ \
+		return ClassName::Class(); \
+	}
 
 class ZEObject
 {

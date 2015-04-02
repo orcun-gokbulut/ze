@@ -141,8 +141,6 @@ class ZEMCGenerator
 		void GenerateClassDeconstruct(ZEMCClass* CurrentClass);
 		void GenerateClassAssign(ZEMCClass* CurrentClass);
 
-
-
 	public:
 		void SetMetaContext(ZEMCContext* context);
 		void SetOptions(ZEMCOptions* options);

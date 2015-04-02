@@ -38,6 +38,7 @@
 #define __ZE_PROVIDER_H__
 
 #include "ZEDS/ZEArray.h"
+#undef RegisterClass
 
 class ZEClass;
 class ZEEnumerator;

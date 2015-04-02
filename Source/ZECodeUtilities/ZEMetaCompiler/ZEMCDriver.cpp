@@ -72,9 +72,6 @@ static void ShowHelp()
 		"  -D  [Definition]=[Value] : Adds new preprocessor definition with value.\n"
 		"  -o  [OutputFileName] : Generated output. Default: [HeaderFileName].ZEMeta.cpp\n"
 		"  -r  [RegisterFileName] : On meta generation mode, Creates a register file with given name. On class collection generation mode, inputs given register file. \n"
-		"  -c  [MetaCollectionName] : Generates meta collection file with given register files (-r).\n"
-		"  -ch [MetaCollectionHeader] : Meta collection header file name.\n"
-		"  -cs [MetaCollectionSource] : Meta collection source file name.\n"
 		"  -msvc : Generates Microsoft Visual Studio like error messages. (Default: Not set.)\n"
 		"  -q : Quiet mode, which only outputs errors.\n"
 		"\n"
@@ -82,10 +79,7 @@ static void ShowHelp()
 		"  ZEMetaCompiler ZEEntity.h -I . -I ..\\ZEFoundation -D ZE_PLATFORM_WINDOWS -D ZE_VERSION_MAJOR=0 -o ZEEntity.ZEMeta.cpp -r ZEEntity.ZEMeta.Register\n"
 		"  ZEMetaCompiler ZEScene.h -I . -I ..\\ZEFoundation -D ZE_PLATFORM_WINDOWS -D ZE_VERSION_MAJOR=0 -o ZEScene.ZEMeta.cpp -r ZEScene.ZEMeta.Register\n"
 		"\n"
-		"Example (Class Collection Generation):\n"
-		"  ZEMetaCompiler -g ZEGameClassCollection -gh ZEGameClassCollection.h -gs ZEGameClassCollection.cpp -r ZEEntity.ZEMeta.Register -r ZEScene.ZEMeta.Register\n"
-		"\n"
-		"CMake Example:\n"
+		"ZEBuild(CMake) Example:\n"
 		"  ze_add_source(ZEEntity.h Headers Sources ZEMC)\n"
 		"\n");
 }
@@ -95,8 +89,6 @@ static void ParseParameters(int Argc, const char** Argv, ZEMCOptions& Options)
 	Options.Argc= Argc;
 	Options.Argv = Argv;
 	Options.BinaryPath = Argv[0];
-	Options.IsRegisterSession = false;
-	Options.IsGenerateSession = false;
 	Options.Quiet = false;
 	Options.Benchmark = false;
 
@@ -136,54 +128,11 @@ static void ParseParameters(int Argc, const char** Argv, ZEMCOptions& Options)
 		}
 		else if (strncmp(Argv[I], "-r", 2) == 0)
 		{
-			if(Options.IsGenerateSession)
-			{
-				if (I + 1 >= Argc)
-					Error("Empty parameter value.");
-
-				I++;
-				Options.DeclarationsFileNames.Add(Argv[I]);
-
-				continue;
-			}
-
-			Options.IsRegisterSession = true;
-
 			if (I + 1 >= Argc)
 				Error("Empty parameter value.");
 
 			I++;
-			Options.DeclarationsFileName = Argv[I];
-		}
-		else if (strncmp(Argv[I], "-c", 2) == 0)
-		{
-			if (strncmp(Argv[I], "-ch", 3) == 0)
-			{
-				if (I + 1 >= Argc)
-					Error("Empty parameter value.");
-
-				I++;
-				Options.RegisterHeaderFileName = Argv[I];
-				continue;
-			}
-			else if (strncmp(Argv[I], "-cs", 3) == 0)
-			{
-				if (I + 1 >= Argc)
-					Error("Empty parameter value.");
-
-				I++;
-				Options.RegisterSourceFileName = Argv[I];
-				continue;
-			}
-
-			Options.IsGenerateSession = true;
-
-			if (I + 1 >= Argc)
-				Error("Empty parameter value.");
-
-			I++;
-
-			Options.RegisterName = Argv[I];
+			Options.RegisterFileName = Argv[I];
 		}
 		else if (strncmp(Argv[I], "-q", 2) == 0)
 		{
@@ -205,9 +154,15 @@ static void ParseParameters(int Argc, const char** Argv, ZEMCOptions& Options)
 		}
 	}
 
-	if (Options.InputFileName == NULL && !Options.IsGenerateSession)
+	if (Options.InputFileName == "")
 	{
 		zeError("Missing input header file name.");
+		ShowHelp();
+	}
+
+	if (Options.OutputFileName == "")
+	{
+		zeError("Missing output file name.");
 		ShowHelp();
 	}
 }
@@ -222,62 +177,43 @@ int main(int Argc, const char** Argv)
 
 	if (!Options.Quiet)
 	{
-		printf("ZEMetaCompiler - Version : 0.3.8\n"
+		printf("ZEMetaCompiler - Version : 0.4.0\n"
 			"Copyright (C) 2014, Zinek Code House. All rights reserved.\n\n");
 	}
 
-	// Parse
+	if (Options.Benchmark)
+		printf("Compilation has started.\n");
 
-
-	// Generate
-
-	// Register
-
-	// Module Register
-
-	if(Options.IsGenerateSession)
-	{
-		ZEMCRegisterer registerer;
-		registerer.SetOptions(&Options);
-		registerer.GenerateRegister();
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		if (Options.Benchmark)
-			printf("Compilation has started.\n");
-
-		ZETimeCounter counter;
-		counter.Start();
+	ZETimeCounter Counter;
+	Counter.Start();
 		
-		ZEMCContext Context;
-		ZEMCParser Parser;
-		Parser.SetMetaContext(&Context);
-		Parser.SetOptions(&Options);
-		if (!Parser.Parse())
-			Error("Cannot parse input file.");
-		if (Options.Benchmark)
-			printf("Parser is done. It took %I64u microseconds.\n", counter.GetTime());
+	ZEMCContext Context;
+	ZEMCParser Parser;
+	Parser.SetMetaContext(&Context);
+	Parser.SetOptions(&Options);
+	if (!Parser.Parse())
+		Error("Cannot parse input file.");
+	if (Options.Benchmark)
+		printf("Parser is done. It took %I64u microseconds.\n", Counter.GetTime());
 		
-		ZEMCGenerator Generator;
-		Generator.SetOptions(&Options);
-		Generator.SetMetaContext(&Context);
-		if (!Generator.Generate())
-			Error("Cannot generate ZEMeta file.");
-		if (Options.Benchmark)
-			printf("Generator is done. It took %I64u microseconds.\n", counter.GetTime());
+	ZEMCGenerator Generator;
+	Generator.SetOptions(&Options);
+	Generator.SetMetaContext(&Context);
+	if (!Generator.Generate())
+		Error("Cannot generate ZEMeta file.");
+	if (Options.Benchmark)
+		printf("Generator is done. It took %I64u microseconds.\n", Counter.GetTime());
 
-		ZEMCRegisterer Registerer;
-		Registerer.SetOptions(&Options);
-		Registerer.GenerateDeclarationsFile(&Context);
-		if (Options.Benchmark)
-			printf("Registerer is done. It took %I64u microseconds.\n", counter.GetTime());
+	ZEMCRegisterer Registerer;
+	Registerer.SetOptions(&Options);
+	Registerer.GenerateRegisterFile(&Context);
+	if (Options.Benchmark)
+		printf("Registerer is done. It took %I64u microseconds.\n", Counter.GetTime());
 
-		counter.Stop();
+	Counter.Stop();
 
-		if (Options.Benchmark)
-			printf("Compilation is done.\n");
-	}
+	if (Options.Benchmark)
+		printf("Compilation is done.\n");
 
 	return EXIT_SUCCESS;
 }

@@ -123,6 +123,8 @@ class ZECore
 
 		ZESystemMessageManager*			SystemMessageManager;
 		ZESystemMessageHandler*			SystemMessageHandler;
+		
+		void							LoadClasses();
 
 		bool							InitializeModule(ZEModule* Module);
 		void							DeInitializeModule(ZEModule** Module);

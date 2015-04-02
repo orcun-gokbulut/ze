@@ -53,27 +53,11 @@ class ZEMCRegisterer
 {
 	private:
 		ZEMCOptions* Options;
-		ZEMCRegisterContext Context;
-		FILE* RegisterHeader;
-		FILE* RegisterSource;
 
-		void ParseCSVLine(ZEArray<ZEString>& Output, const char* Input);
-		void LoadDeclarations();
-
-		void GenerateRegisterHeader(FILE* File);
-		void GenerateIncludes(FILE* File);
-		void GenerateRegisterGetClasses(FILE* File);
-		void GenerateRegisterGetClassCount(FILE* File);
-		void GenereteRegisterGetEnumerators(FILE* File);
-		void GenerateRegisterGetEnumeratorCount(FILE* File);
-		void GenerateGetInstance(FILE* File);
-		
 	public:
+		void SetOptions(ZEMCOptions* Options);
 
-		void SetOptions(ZEMCOptions* options);
-
-		void GenerateDeclarationsFile(ZEMCContext* context);
-		void GenerateRegister();
+		void GenerateRegisterFile(ZEMCContext* Context);
 };
 
 #endif
