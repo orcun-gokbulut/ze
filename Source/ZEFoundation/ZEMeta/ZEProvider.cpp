@@ -67,6 +67,8 @@ bool ZEProvider::RegisterEnumerator(ZEEnumerator* Enumerator)
 		return false;
 
 	Enumerators.Add(Enumerator);
+
+	return true;
 }
 
 void ZEProvider::UnregisterEnumerator(ZEEnumerator* Enumerator)

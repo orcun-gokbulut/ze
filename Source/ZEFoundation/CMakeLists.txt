@@ -103,9 +103,9 @@ ze_add_library(TARGET ZEFoundation
 	SOURCES ${Sources} 
 	HEADERS ${Headers})
 
-ze_add_library(TARGET ZEFoundationMeta
-	SOURCES ${BuiltIn}
-	ZEMC ${BuildIn})
+#ze_add_library(TARGET ZEFoundationMeta
+#	SOURCES ${BuiltIn}
+#	ZEMC ${BuildIn})
 
 ze_add_test(TARGET ZEFoundationTests
 	SOURCES ${Tests}

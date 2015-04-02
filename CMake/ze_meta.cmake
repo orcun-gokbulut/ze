@@ -54,129 +54,65 @@ function(ze_meta_compiler)
 		set(VARIABLE_ARGS ${VARIABLE_ARGS} "-msvc")
 	endif()
 
+	set(VARIABLE_MODULE_REGISTER_FILE_CONTENT "")
 	foreach(VARIABLE_FILE ${PARAMETER_FILES})
 		get_filename_component(VARIABLE_FILE_NORMALIZED ${VARIABLE_FILE} ABSOLUTE)
 		get_filename_component(VARIABLE_FILE_NAME_WE "${VARIABLE_FILE_NORMALIZED}" NAME_WE)
 	
 		set(VARIABLE_ARGS_FILE "-q" "-o" "\"${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.cpp\"")
-		set(VARIABLE_ARGS_FILE ${VARIABLE_ARGS_FILE} "-r" "\"${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.register\"")
+		set(VARIABLE_ARGS_FILE ${VARIABLE_ARGS_FILE} "-r" "\"${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.h\"")
 		set(VARIABLE_ARGS_FILE ${VARIABLE_ARGS_FILE} "\"${VARIABLE_FILE_NORMALIZED}\"")
 
 		if (ZEBUILD_USE_STOCK_META_COMPILER)
 			set(META_COMPILER_PATH "${CMAKE_SOURCE_DIR}/Tool/ZEMetaCompiler")
+			add_custom_command(
+				OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.h"
+				COMMAND ${META_COMPILER_PATH}
+				ARGS ${VARIABLE_ARGS} ${VARIABLE_ARGS_FILE}
+				MAIN_DEPENDENCY "${VARIABLE_FILE_NORMALIZED}"
+				WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+				DEPENDS "${META_COMPILER_PATH}")
 		else()
-			set(META_COMPILER_PATH "$<TARGET_FILE:ZEMetaCompiler>")
+			# FUCK YOU CMAKE !
+			add_custom_command(
+				OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.h"
+				COMMAND "$<TARGET_FILE:ZEMetaCompiler>"
+				ARGS ${VARIABLE_ARGS} ${VARIABLE_ARGS_FILE}
+				MAIN_DEPENDENCY "${VARIABLE_FILE_NORMALIZED}"
+				WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+				DEPENDS "${META_COMPILER_PATH}")
 		endif()
-		
-		add_custom_command(
-			OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.register"
-			COMMAND "${META_COMPILER_PATH}"
-			ARGS ${VARIABLE_ARGS} ${VARIABLE_ARGS_FILE}
-			MAIN_DEPENDENCY "${VARIABLE_FILE_NORMALIZED}"
-			WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-			DEPENDS "${META_COMPILER_PATH}")
-		set(VARIABLE_OUTPUTS ${VARIABLE_OUTPUTS} "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.register")
-	endforeach()
-	
-	set(VARIABLE_ARGS "-q" "-c" "\"${PARAMETER_TARGET}MetaRegister\"")
-	set(VARIABLE_ARGS ${VARIABLE_ARGS} "-cs" "\"${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.cpp\"")
-	set(VARIABLE_ARGS ${VARIABLE_ARGS} "-ch" "\"${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.h\"")
-	if (ZEBUILD_PLATFORM_WINDOWS)
-		set(VARIABLE_ARGS ${VARIABLE_ARGS} "-msvc")
-	endif()
-	
-	foreach(VARIABLE_FILE ${PARAMETER_FILES})
-		get_filename_component(VARIABLE_FILE_NAME_WE "${VARIABLE_FILE}" NAME_WE)
-		set(VARIABLE_ARGS ${VARIABLE_ARGS} "-r" "\"${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.register\"")
-		set(VARIABLE_DEPENDENCIES ${VARIABLE_DEPENDENCIES} "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.register")
-	endforeach()
-	
-	add_custom_command(
-		OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.h"
-		COMMAND "${META_COMPILER_PATH}"
-		ARGS ${VARIABLE_ARGS}
-		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-		DEPENDS "${META_COMPILER_PATH}" ${VARIABLE_DEPENDENCIES})
 
-	set(VARIABLE_OUTPUTS ${VARIABLE_OUTPUTS} "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.h")
+		set(VARIABLE_MODULE_REGISTER_FILE_CONTENT "${VARIABLE_MODULE_REGISTER_FILE_CONTENT}#include \"${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.h\"\n")
+		set(VARIABLE_OUTPUTS ${VARIABLE_OUTPUTS} "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME_WE}.ZEMeta.h")
+	endforeach()
+	
+	# Module Register File
+	set(VARIABLE_MODULE_REGISTER_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaRegister.h")
+	file(WRITE ${VARIABLE_MODULE_REGISTER_FILE} "// ZEBuild ZEMeta module\n// Auto-generated ZEMeta register file. Do not edit by hand.\n${VARIABLE_MODULE_REGISTER_FILE_CONTENT}")
+	set(VARIABLE_OUTPUTS ${VARIABLE_OUTPUTS} "${VARIABLE_MODULE_REGISTER_FILE}")
 	
 	set(${PARAMETER_OUTPUTS} ${VARIABLE_OUTPUTS} PARENT_SCOPE)
 endfunction()
 
-function (ze_meta_register)
-	parse_arguments(PARAMETER "TARGET" "" ${ARGV})
-
-	set(VARIABLE_REGISTER_CODE "")
-	set(VARIABLE_REGISTER_INCLUDES "")
-	set(VARIABLE_REGISTER_COUNT 0)
-	ze_get_dependency_list_combined(TARGET ${PARAMETER_TARGET} RETURN VARIABLE_DEPENDENCIES)
-	foreach(VARIABLE_DEPENDENCY ${VARIABLE_DEPENDENCIES})
-		if (TARGET ${VARIABLE_DEPENDENCY})
-			get_property(VARIABLE_REGISTER_FILE TARGET ${VARIABLE_DEPENDENCY} PROPERTY ZEBUILD_ZE_META_REGISTER_FILE)
-			if (VARIABLE_REGISTER_FILE)
-				set(VARIABLE_REGISTER_CODE "${VARIABLE_REGISTER_CODE}\t\t${VARIABLE_DEPENDENCY}MetaRegister::GetInstance(),\n")
-				set(VARIABLE_REGISTER_INCLUDES "${VARIABLE_REGISTER_INCLUDES}#include \"${VARIABLE_REGISTER_FILE}.h\"\n")
-				MATH(EXPR VARIABLE_REGISTER_COUNT "${VARIABLE_REGISTER_COUNT} + 1")
+function(ze_meta_register)
+	parse_arguments(PARAMETER "TARGET;LIBS;OUTPUT_FILE" "" ${ARGV})
+	if(NOT PARAMETER_OUTPUT_FILE)
+		set(PARAMETER_OUTPUT_FILE "ZEMetaRegister.h")
+	endif()
+	set(PARAMETER_OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_OUTPUT_FILE}")
+	
+	set(VARIABLE_OUTPUT_FILE_CONTENT "//ZEMeta auto generated file. Do not change by hand.\n")
+	foreach(VARIABLE_CURRENT ${PARAMETER_LIBS})
+		if (TARGET ${VARIABLE_CURRENT})
+			get_property(VARIABLE_RETURN TARGET ${VARIABLE_CURRENT} PROPERTY ZEBUILD_BINARY_DIRECTORY)
+			if (EXISTS "${VARIABLE_RETURN}/${VARIABLE_CURRENT}.ZEMetaRegister.h")
+				set(VARIABLE_OUTPUT_FILE_CONTENT "${VARIABLE_OUTPUT_FILE_CONTENT}#include \"${VARIABLE_RETURN}/${VARIABLE_CURRENT}.ZEMetaRegister.h\"\n")
+			endif()
+			if (EXISTS "${VARIABLE_RETURN}/ZEMetaRegister.h")
+				set(VARIABLE_OUTPUT_FILE_CONTENT "${VARIABLE_OUTPUT_FILE_CONTENT}#include \"${VARIABLE_RETURN}/ZEMetaRegister.h\"\n")
 			endif()
 		endif()
 	endforeach()
-	
-	file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaModuleRegister.h"
-		"#pragma once\n"
-		"#include \"ZEMeta/ZEMetaModuleRegister.h\"\n"
-		"\n"
-		"class ${PARAMETER_TARGET}_MetaModuleRegister : public ZEMetaModuleRegister\n"
-		"{\n"
-		"\tpublic:\n"
-		"\t\tvirtual ZEMetaRegister**\t\tGetRegisters();\n"
-		"\t\tvirtual ZESize\t\t\t\t\tGetRegisterCount();\n"
-		"\n"
-		"\t\tstatic ${PARAMETER_TARGET}_MetaModuleRegister*\tGetInstance();\n"
-		"};\n")
-	
-	if (VARIABLE_REGISTER_COUNT EQUAL 0)
-		file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaModuleRegister.cpp"		
-			"#include \"${PARAMETER_TARGET}.ZEMetaModuleRegister.h\"\n"
-			"\n"
-			"ZEMetaRegister** ${PARAMETER_TARGET}_MetaModuleRegister::GetRegisters()\n"
-			"{\n"
-			"\treturn NULL;\n"
-			"}\n"
-			"\n"
-			"ZESize ${PARAMETER_TARGET}_MetaModuleRegister::GetRegisterCount()\n"
-			"{\n"
-			"\treturn 0;\n"
-			"}\n"
-			"\n"
-			"${PARAMETER_TARGET}_MetaModuleRegister* ${PARAMETER_TARGET}_MetaModuleRegister::GetInstance()\n"
-			"{\n"
-			"\tstatic ${PARAMETER_TARGET}_MetaModuleRegister ModuleRegister;\n"
-			"\treturn &ModuleRegister;\n"
-			"}\n")
-	else()
-		file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${PARAMETER_TARGET}.ZEMetaModuleRegister.cpp"		
-			"#include \"${PARAMETER_TARGET}.ZEMetaModuleRegister.h\"\n"
-			"${VARIABLE_REGISTER_INCLUDES}"
-			"\n"
-			"ZEMetaRegister** ${PARAMETER_TARGET}_MetaModuleRegister::GetRegisters()\n"
-			"{\n"
-			"\tstatic ZEMetaRegister* Registers[] =\n"
-			"\t{\n"
-			"${VARIABLE_REGISTER_CODE}"
-			"\t};\n"
-			"\t\n"
-			"\treturn Registers;\n"
-			"}\n"
-			"\n"
-			"ZESize ${PARAMETER_TARGET}_MetaModuleRegister::GetRegisterCount()\n"
-			"{\n"
-			"\treturn ${VARIABLE_REGISTER_COUNT};\n"
-			"}\n"
-			"\n"
-			"${PARAMETER_TARGET}_MetaModuleRegister* ${PARAMETER_TARGET}_MetaModuleRegister::GetInstance()\n"
-			"{\n"
-			"\tstatic ${PARAMETER_TARGET}_MetaModuleRegister ModuleRegister;\n"
-			"\treturn &ModuleRegister;\n"
-			"}\n")
-	endif()
+	file(WRITE "${PARAMETER_OUTPUT_FILE}" "${VARIABLE_OUTPUT_FILE_CONTENT}")
 endfunction()
