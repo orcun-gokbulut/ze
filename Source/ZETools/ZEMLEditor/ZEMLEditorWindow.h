@@ -88,17 +88,17 @@ class ZEMLEditorWindow : public QMainWindow
 		void					Redo();
 		void					Cut();
 		void					Copy();
-		void					Paste();
+		void					Paste();*/
 
 		void					AddNewNode();
 		void					AddNewProperty();
 		void					AddNewData();
-		void					Delete();
+		void					DeleteElement();
 
 		void					UserGuide();
 		void					BugReport();
 		void					Website();
-		void					About();*/
+		void					About();
 
 	public:
 								ZEMLEditorWindow();

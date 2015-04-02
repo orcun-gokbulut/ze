@@ -70,8 +70,9 @@ class ZEMLNode : public ZEMLElement
 		ZEMLProperty*				GetProperty(const char* Name);
 		ZEMLData*					GetData(const char* Name);
 		
-		bool						AddElement(ZEMLElement* Item);
-		bool						RemoveElement(ZEMLElement* Item);
+		bool						AddElement(ZEMLElement* Element);
+		bool						InsertElement(ZESize Index, ZEMLElement* Element);
+		bool						RemoveElement(ZEMLElement* Element);
 
 		ZEMLNode*					AddNode(const char* Name);
 		ZEMLProperty*				AddProperty(const char* Name);

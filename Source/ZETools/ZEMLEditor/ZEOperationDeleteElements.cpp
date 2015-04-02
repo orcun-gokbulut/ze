@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDOperation.h
+ Zinek Engine - ZEOperationDeleteElements.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,43 +33,50 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZED_OPERATION_H__
-#define __ZED_OPERATION_H__
+#include "ZEOperationDeleteElements.h"
+#include "ZEML/ZEMLNode.h"
 
-#include "ZEDS\ZEString.h"
-
-enum ZEDOperationStatus
+bool ZEOperationDeleteElements::Apply()
 {
-	ZED_OS_NONE,
-	ZED_OS_DONE,
-	ZED_OS_NOT_DONE
-};
+	for (ZESize I = 0; I < DeletedElements.GetCount(); I++)
+	{
+		ZEOperationDeletedElement& CurrentElement = DeletedElements[I];
+		CurrentElement.Index = CurrentElement.Parent->GetElements().FindIndex(CurrentElement.Element);
+		CurrentElement.Parent->RemoveElement(CurrentElement.Element);
+	}
 
-class ZEDOperation
+	return true;
+}
+
+bool ZEOperationDeleteElements::Revert()
 {
-	friend class ZEDOperationManager;
-	private:
-		ZEString Text;
-		ZEDOperationStatus Status;
+	for (ZESize I = DeletedElements.GetCount() - 1; I >= 0; I--)
+	{
+		ZEOperationDeletedElement& CurrentElement = DeletedElements[I];
+		CurrentElement.Parent->InsertElement(CurrentElement.Index, CurrentElement.Element);
+	}
 
-	protected:
-		void SetText(const char* Text);
-		
-		virtual bool Apply() = 0;
-		virtual bool Revert() = 0;
+	return true;
+}
 
-	public:
-		const ZEString& GetText();
-		ZEDOperationStatus GetStatus();
+void ZEOperationDeleteElements::AddDeletedElement(ZEMLElement* Element)
+{
+	ZEOperationDeletedElement DeleteElement;
+	DeleteElement.Parent = Element->GetParent();
+	DeleteElement.Element = Element;
+	DeletedElements.Add(DeleteElement);
+}
 
-		bool Do();
-		bool Undo();
+ZEOperationDeleteElements::ZEOperationDeleteElements()
+{
 
-		virtual void Destroy();
+}
 
-		ZEDOperation();
-		virtual ~ZEDOperation();
-};
+ZEOperationDeleteElements::~ZEOperationDeleteElements()
+{
+	if (GetStatus() == ZED_OS_NOT_DONE)
+		return;
 
-#endif
+	/*if (ZESize I = 0; I < DeletedElements.GetCount(); I++)
+		delete DeletedElements[I].Element;*/
+}
