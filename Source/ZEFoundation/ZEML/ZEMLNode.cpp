@@ -233,6 +233,17 @@ bool ZEMLNode::AddElement(ZEMLElement* Element)
 	return true;
 }
 
+bool ZEMLNode::InsertElement(ZESize Index, ZEMLElement* Element)
+{
+	if (Elements.Exists(Element))
+		return true;
+
+	Element->Parent = this;
+	Elements.Insert(Index, Element);
+
+	return true;
+}
+
 bool ZEMLNode::RemoveElement(ZEMLElement* Element)
 {
 	Elements.Remove(Element);
@@ -293,5 +304,6 @@ ZEMLNode::ZEMLNode(const char* Name)
 
 ZEMLNode::~ZEMLNode()
 {
-
+	/*for (ZESize I = 0; I < Elements.GetCount(); I++)
+		delete Elements[I];*/
 }

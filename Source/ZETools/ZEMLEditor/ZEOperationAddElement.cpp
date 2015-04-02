@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDOperation.h
+ Zinek Engine - ZEOperationAddElement.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,43 +33,48 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZED_OPERATION_H__
-#define __ZED_OPERATION_H__
+#include "ZEOperationAddElement.h"
+#include "ZEML/ZEMLNode.h"
 
-#include "ZEDS\ZEString.h"
-
-enum ZEDOperationStatus
+bool ZEOperationAddElement::Apply()
 {
-	ZED_OS_NONE,
-	ZED_OS_DONE,
-	ZED_OS_NOT_DONE
-};
+	switch (Element->GetType())
+	{
+		case ZEML_ET_PROPERTY:
+			SetText("Add New Property");
+			break;
 
-class ZEDOperation
+		case ZEML_ET1_NODE:
+			SetText("Add New Property");
+			break;
+
+		case ZEML_ET_DATA:
+			SetText("Add New Property");
+			break;
+
+		default:
+			SetText("Add New Element");
+			break;
+	}
+
+	ParentNode->AddElement(Element);
+	return true;
+}
+
+bool ZEOperationAddElement::Revert()
 {
-	friend class ZEDOperationManager;
-	private:
-		ZEString Text;
-		ZEDOperationStatus Status;
+	ParentNode->RemoveElement(Element);
+	return true;
+}
 
-	protected:
-		void SetText(const char* Text);
-		
-		virtual bool Apply() = 0;
-		virtual bool Revert() = 0;
+ZEOperationAddElement::ZEOperationAddElement()
+{
+	ParentNode = NULL;
+	Element = NULL;
+}
 
-	public:
-		const ZEString& GetText();
-		ZEDOperationStatus GetStatus();
-
-		bool Do();
-		bool Undo();
-
-		virtual void Destroy();
-
-		ZEDOperation();
-		virtual ~ZEDOperation();
-};
-
-#endif
+ZEOperationAddElement::~ZEOperationAddElement()
+{
+	if (GetStatus() == ZED_OS_NOT_DONE)
+		delete Element;
+}

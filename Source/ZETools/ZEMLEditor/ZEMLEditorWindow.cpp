@@ -36,11 +36,17 @@
 #include "ZEMLEditorWindow.h"
 #include "ui_ZEMLEditorWindow.h"
 
+#include <QtCore\QCoreApplication>
+#include <QtCore\QSettings>
+#include <QtCore\QUrl>
 #include <QtGui\QTreeWidget>
 #include <QtGui\QMessageBox>
 #include <QtGui\QFileDialog>
-#include <QtCore\QCoreApplication>
-#include <QtCore\QSettings>
+#include <QtGui\QDesktopServices>
+
+#include "ZEDOperation.h"
+#include "ZEOperationAddElement.h"
+#include "ZEDOperationManager.h"
 
 void ZEMLEditorWindow::LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node)
 {
@@ -200,6 +206,7 @@ void ZEMLEditorWindow::ConfigureUI()
 void ZEMLEditorWindow::ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue)
 {
 
+
 }
 
 void ZEMLEditorWindow::CurrentItemChanged()
@@ -316,6 +323,56 @@ void ZEMLEditorWindow::Quit()
 			QApplication::exit(EXIT_SUCCESS);
 		}
 	}
+}
+
+void ZEMLEditorWindow::AddNewNode()
+{
+	if (Form->trwElementTree->selectedItems().count() != 1)
+		return;
+
+	ZEMLElement* SelectedElement = (ZEMLElement*)Form->trwElementTree->selectedItems()[0]->data(0, Qt::UserRole).toULongLong();
+	if (SelectedElement->GetType() == ZEML_ET1_NODE)
+		return;
+
+	ZEOperationAddElement* Element = new ZEOperationAddElement();
+	Element->Element = new ZEMLNode();
+	Element->ParentNode = (ZEMLNode*)SelectedElement;
+	ZEDOperationManager::GetInstance()->DoOperation(Element);
+}
+
+void ZEMLEditorWindow::AddNewProperty()
+{
+
+}
+
+void ZEMLEditorWindow::AddNewData()
+{
+
+}
+
+void ZEMLEditorWindow::DeleteElement()
+{
+
+}
+
+void ZEMLEditorWindow::UserGuide()
+{
+	QMessageBox::information(this, "ZEML Editor", "There is no user guide.", QMessageBox::Ok);
+}
+
+void ZEMLEditorWindow::BugReport()
+{
+	QDesktopServices::openUrl(QUrl("http://www.zinekengine.com/bugreport"));
+}
+
+void ZEMLEditorWindow::Website()
+{
+	QDesktopServices::openUrl(QUrl("http://www.zinekengine.com"));
+}
+
+void ZEMLEditorWindow::About()
+{
+	QMessageBox::about(this, "ZEML Editor", "Version: 1.0");
 }
 
 ZEMLEditorWindow::ZEMLEditorWindow()

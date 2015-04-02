@@ -45,7 +45,46 @@ const ZEString& ZEDOperation::GetText()
 	return Text;
 }
 
+ZEDOperationStatus ZEDOperation::GetStatus()
+{
+	return Status;
+}
+
+bool ZEDOperation::Do()
+{
+	if (Status == ZED_OS_DONE)
+		return false;
+
+	bool Result = Apply();
+	if (Result)
+		Status = ZED_OS_DONE;
+
+	return Result;
+}
+
+bool ZEDOperation::Undo()
+{
+	if (Status != ZED_OS_DONE)
+		return false;
+
+	bool Result = Revert();
+	if (Result)
+		Status = ZED_OS_NOT_DONE;
+
+	return Result;
+}
+
 void ZEDOperation::Destroy()
 {
 	delete this;
+}
+
+ZEDOperation::ZEDOperation()
+{
+	Status = ZED_OS_NONE;
+}
+
+ZEDOperation::~ZEDOperation()
+{
+
 }

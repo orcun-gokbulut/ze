@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDOperation.h
+ Zinek Engine - ZEOperationDeleteElements.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,36 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_OPERATION_H__
-#define __ZED_OPERATION_H__
+#ifndef __ZE_OPERATION_DELETED_ELEMENTS_H__
+#define __ZE_OPERATION_DELETED_ELEMENTS_H__
 
-#include "ZEDS\ZEString.h"
+#include "ZEDOperation.h"
+#include "ZETypes.h"
+#include "ZEDS\ZEArray.h"
 
-enum ZEDOperationStatus
+class ZEMLNode;
+class ZEMLElement;
+
+struct ZEOperationDeletedElement
 {
-	ZED_OS_NONE,
-	ZED_OS_DONE,
-	ZED_OS_NOT_DONE
+	ZEMLElement* Element;
+	ZEMLNode* Parent;
+	ZESize Index;
 };
 
-class ZEDOperation
+class ZEOperationDeleteElements : public ZEDOperation
 {
-	friend class ZEDOperationManager;
 	private:
-		ZEString Text;
-		ZEDOperationStatus Status;
+		ZEArray<ZEOperationDeletedElement> DeletedElements;
 
-	protected:
-		void SetText(const char* Text);
-		
-		virtual bool Apply() = 0;
-		virtual bool Revert() = 0;
+		virtual bool Apply();
+		virtual bool Revert();
 
 	public:
-		const ZEString& GetText();
-		ZEDOperationStatus GetStatus();
+		void AddDeletedElement(ZEMLElement* Element);
 
-		bool Do();
-		bool Undo();
-
-		virtual void Destroy();
-
-		ZEDOperation();
-		virtual ~ZEDOperation();
+		ZEOperationDeleteElements();
+		~ZEOperationDeleteElements();
 };
 
 #endif
