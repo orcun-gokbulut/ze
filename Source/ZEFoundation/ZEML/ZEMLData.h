@@ -61,6 +61,8 @@ class ZEMLData : public ZEMLElement
 		virtual ZEMLElementType1	GetType();
 		virtual ZESize				GetSize();
 
+		virtual ZEMLElement*		Clone();
+
 		void						Allocate(ZESize DataSize);
 		void						Deallocate();
 

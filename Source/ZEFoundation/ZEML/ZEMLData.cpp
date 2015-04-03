@@ -69,6 +69,28 @@ ZESize ZEMLData::GetSize()
 	return Size;
 }
 
+ZEMLElement* ZEMLData::Clone()
+{
+	ZEMLData* CloneData = new ZEMLData(GetName());
+	CloneData->SetUserData(GetUserData());
+	CloneData->Deferred = this->Deferred;
+	CloneData->DeferredFile = this->DeferredFile;
+	CloneData->DeferredOffset = this->DeferredOffset;
+
+	if (CloneData->Deferred)
+	{
+		CloneData->Data = NULL;
+		CloneData->DataSize = this->DataSize;
+		CloneData->Referred = Referred;
+	}
+	else
+	{
+		SetData(this->Data, this->DataSize, this->Referred);
+	}
+
+	return CloneData;
+}
+
 void ZEMLData::Allocate(ZESize NewDataSize)
 {
 	Deallocate();

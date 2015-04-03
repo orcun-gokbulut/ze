@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLEditorWindow.h
+ Zinek Engine - ZEOperationCut.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,81 +33,48 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZEML_EDITOR_WINDOW_H__
-#define __ZEML_EDITOR_WINDOW_H__
+#include "ZEOperationCut.h"
+#include "ZEML/ZEMLNode.h"
 
-#include <QtGui/QMainWindow>
-#include "QtGui/qtreewidget.h"
-
-#include "ZEDS/ZEString.h"
-#include "ZEML/ZEMLRoot.h"
-
-class Ui_ZEMLEditorWindow;
-
-class ZEMLEditorWindow : public QMainWindow
+bool ZEOperationCut::Apply()
 {
-	Q_OBJECT
-	private:
-		static ZEMLEditorWindow* Instance;
-		Ui_ZEMLEditorWindow*	Form;
-		ZEString				FileName;
-		ZEMLRoot				Root;
-		ZEMLNode*				RootNode;
+	for (ZESize I = 0; I < CutElements.GetCount(); I++)
+	{
+		ZEOperationCutElement& CurrentElement = CutElements[I];
+		CurrentElement.Index = CurrentElement.Parent->GetElements().FindIndex(CurrentElement.Element);
+		CurrentElement.Parent->RemoveElement(CurrentElement.Element);
+		((QTreeWidgetItem*)CurrentElement.Parent->GetUserData())->removeChild((QTreeWidgetItem*)CurrentElement.Element->GetUserData());
+	}
 
-		ZEMLNode*				ClipBoard;
+	return true;
+}
 
-		void					LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node);
-		void					LoadTree();
-		
-		void					RegisterRecentFile(const ZEString& FileName);
-		void					LoadRecentFiles();
+bool ZEOperationCut::Revert()
+{
+	for (ZESSize I = CutElements.GetCount() - 1; I >= 0; I--)
+	{
+		ZEOperationCutElement& CurrentElement = CutElements[I];
+		CurrentElement.Parent->InsertElement(CurrentElement.Index, CurrentElement.Element);
+		((QTreeWidgetItem*)CurrentElement.Parent->GetUserData())->addChild((QTreeWidgetItem*)CurrentElement.Element->GetUserData());
+	}
 
-		void					OpenFile(const ZEString& FileName);
-		void					SaveFile(const ZEString& FileName);
+	return true;
+}
 
-		void					ConfigureUI();
+ZEOperationCut::ZEOperationCut(ZEMLNode* ClipBoard, const QList<QTreeWidgetItem*>& Items)
+{
+	if (ClipBoard == NULL)
+		return;
 
-	private slots:
-		void					NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
-		void					ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue);
-		//void					DataChange(ZEMLData* Data, void* NewData, ZESize NewDataSize, void* OldData, ZESize OldDataSize);
-		
-		void					Select();
-		void					Deselect();
+	ZESSize SelectedItemCount = Items.count();
+	CutElements.SetCount(SelectedItemCount);
 
-		void					New();
-		void					Open();
-		void					OpenRecentFile();
-		void					Save();
-		void					SaveAs();
-		void					Close();
-		void					Quit();
+	for (ZESSize I = 0; I < SelectedItemCount; I++)
+	{
+		ZEMLElement* Element = (ZEMLElement*)Items[I]->data(0, Qt::UserRole).toLongLong();
+		ClipBoard->AddElement(Element->Clone());
 
-		void					Undo();
-		void					Redo();
-		void					Cut();
-		void					Copy();
-		void					Paste();
-
-		void					AddNewNode();
-		void					AddNewProperty();
-		void					AddNewData();
-		void					Delete();
-
-		void					UserGuide();
-		void					BugReport();
-		void					Website();
-		void					About();
-
-	public:
-		Ui_ZEMLEditorWindow*	 GetForm();
-		void					 Update();
-
-								ZEMLEditorWindow();
-								~ZEMLEditorWindow();
-
-		static ZEMLEditorWindow* GetInstance();
-};
-
-#endif
+		CutElements[I].Parent = Element->GetParent();
+		CutElements[I].Element = Element;
+	}
+}

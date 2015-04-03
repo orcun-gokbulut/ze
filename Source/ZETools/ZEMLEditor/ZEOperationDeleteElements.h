@@ -63,7 +63,7 @@ class ZEOperationDeleteElements : public ZEDOperation
 		void AddDeletedElement(ZEMLElement* Element);
 
 		ZEOperationDeleteElements();
-		~ZEOperationDeleteElements();
+		virtual ~ZEOperationDeleteElements();
 };
 
 #endif

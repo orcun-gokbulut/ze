@@ -292,6 +292,21 @@ ZEMLData* ZEMLNode::AddData(const char* Name)
 	}
 }
 
+ZEMLElement* ZEMLNode::Clone()
+{
+	ZEMLNode* CloneNode = new ZEMLNode(GetName());
+	CloneNode->SetUserData(GetUserData());
+
+	ZESize Count = Elements.GetCount();
+
+	for (ZESize I = 0; I < Count; I++)
+	{
+		CloneNode->AddElement(Elements[I]->Clone());
+	}
+
+	return CloneNode;
+}
+
 ZEMLNode::ZEMLNode()
 {
 
