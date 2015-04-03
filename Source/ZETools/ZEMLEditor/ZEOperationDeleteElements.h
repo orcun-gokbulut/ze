@@ -54,7 +54,7 @@ struct ZEOperationDeletedElement
 class ZEOperationDeleteElements : public ZEDOperation
 {
 	private:
-		ZEArray<ZEOperationDeletedElement> DeletedElements;
+		ZEArray<ZEOperationDeletedElement> Elements;
 
 		virtual bool Apply();
 		virtual bool Revert();

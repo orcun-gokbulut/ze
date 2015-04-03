@@ -35,27 +35,33 @@
 
 #include "ZEOperationDeleteElements.h"
 #include "ZEML/ZEMLNode.h"
+#include "ZETypes.h"
+
+#include <QtGui/QTreeWidgetItem>
+
 
 bool ZEOperationDeleteElements::Apply()
 {
-	for (ZESize I = 0; I < DeletedElements.GetCount(); I++)
+	for (ZESize I = 0; I < Elements.GetCount(); I++)
 	{
-		ZEOperationDeletedElement& CurrentElement = DeletedElements[I];
+		ZEOperationDeletedElement& CurrentElement = Elements[I];
 		CurrentElement.Index = CurrentElement.Parent->GetElements().FindIndex(CurrentElement.Element);
+		
 		CurrentElement.Parent->RemoveElement(CurrentElement.Element);
+		((QTreeWidgetItem*)CurrentElement.Parent->GetUserData())->removeChild((QTreeWidgetItem*)CurrentElement.Element->GetUserData());
 	}
-
 	return true;
 }
 
 bool ZEOperationDeleteElements::Revert()
 {
-	for (ZESize I = DeletedElements.GetCount() - 1; I >= 0; I--)
+	for (ZESize I = Elements.GetCount() - 1; I >= 0; I--)
 	{
-		ZEOperationDeletedElement& CurrentElement = DeletedElements[I];
-		CurrentElement.Parent->InsertElement(CurrentElement.Index, CurrentElement.Element);
-	}
+		ZEOperationDeletedElement& CurrentElement = Elements[I];
 
+		CurrentElement.Parent->InsertElement(CurrentElement.Index, CurrentElement.Element);
+		((QTreeWidgetItem*)CurrentElement.Parent->GetUserData())->addChild((QTreeWidgetItem*)CurrentElement.Element->GetUserData());
+	}
 	return true;
 }
 
@@ -64,7 +70,7 @@ void ZEOperationDeleteElements::AddDeletedElement(ZEMLElement* Element)
 	ZEOperationDeletedElement DeleteElement;
 	DeleteElement.Parent = Element->GetParent();
 	DeleteElement.Element = Element;
-	DeletedElements.Add(DeleteElement);
+	Elements.Add(DeleteElement);
 }
 
 ZEOperationDeleteElements::ZEOperationDeleteElements()
@@ -75,8 +81,11 @@ ZEOperationDeleteElements::ZEOperationDeleteElements()
 ZEOperationDeleteElements::~ZEOperationDeleteElements()
 {
 	if (GetStatus() == ZED_OS_NOT_DONE)
-		return;
-
-	/*if (ZESize I = 0; I < DeletedElements.GetCount(); I++)
-		delete DeletedElements[I].Element;*/
+	{
+		for (ZESize I = 0; I < Elements.GetCount(); I++)
+		{
+			delete (QTreeWidgetItem*)(Elements[I].Element->GetUserData());
+			delete Elements[I].Element;
+		}
+	}
 }

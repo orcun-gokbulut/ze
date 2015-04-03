@@ -35,46 +35,72 @@
 
 #include "ZEOperationAddElement.h"
 #include "ZEML/ZEMLNode.h"
+#include "ZEMLEditorWindow.h"
+
+#include <QtGui/QTreeWidgetItem>
 
 bool ZEOperationAddElement::Apply()
 {
-	switch (Element->GetType())
-	{
-		case ZEML_ET_PROPERTY:
-			SetText("Add New Property");
-			break;
-
-		case ZEML_ET1_NODE:
-			SetText("Add New Property");
-			break;
-
-		case ZEML_ET_DATA:
-			SetText("Add New Property");
-			break;
-
-		default:
-			SetText("Add New Element");
-			break;
-	}
-
 	ParentNode->AddElement(Element);
+	
+	QTreeWidgetItem* ElementItem = (QTreeWidgetItem*)Element->GetUserData();
+	if (Element->GetUserData() == NULL)
+	{
+		ElementItem = new QTreeWidgetItem();
+		Element->SetUserData(ElementItem);
+		ElementItem->setData(0, Qt::UserRole, (ZEUInt64)Element);
+		ElementItem->setText(0, Element->GetName().ToCString());
+		switch (Element->GetType())
+		{
+			case ZEML_ET_PROPERTY:
+				SetText("Add New Property");
+				ElementItem->setText(1, "Property");
+				break;
+
+			case ZEML_ET1_NODE:
+				SetText("Add New Property");
+				ElementItem->setText(1, "Node");
+				break;
+
+			case ZEML_ET_DATA:
+				SetText("Add New Property");
+				ElementItem->setText(1, "Data");
+				break;
+
+			default:
+				SetText("Add New Element");
+				ElementItem->setText(1, "Unknown");
+				break;
+		}
+	}
+	
+	QTreeWidgetItem* ParentNodeItem = (QTreeWidgetItem*)ParentNode->GetUserData();
+	ParentNodeItem->addChild(ElementItem);
+
+	ZEMLEditorWindow::Update();
+
 	return true;
 }
 
 bool ZEOperationAddElement::Revert()
 {
 	ParentNode->RemoveElement(Element);
+	((QTreeWidgetItem*)ParentNode->GetUserData())->removeChild((QTreeWidgetItem*)Element->GetUserData());
+
 	return true;
 }
 
-ZEOperationAddElement::ZEOperationAddElement()
+ZEOperationAddElement::ZEOperationAddElement(ZEMLNode* ParentNode, ZEMLElement* Element)
 {
-	ParentNode = NULL;
-	Element = NULL;
+	this->ParentNode = ParentNode;
+	this->Element = Element;
 }
 
 ZEOperationAddElement::~ZEOperationAddElement()
 {
 	if (GetStatus() == ZED_OS_NOT_DONE)
+	{
 		delete Element;
+		delete (QTreeWidgetItem*)Element->GetUserData();
+	}
 }

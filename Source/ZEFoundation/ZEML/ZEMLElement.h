@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEML_TYPE_H__
-#define __ZEML_TYPE_H__
+#ifndef	__ZEML_ELEMENT_H__
+#define __ZEML_ELEMENT_H__
 
 #include "ZETypes.h"
 #include "ZEMLCommon.h"
@@ -50,6 +50,7 @@ class ZEMLElement : public ZEListItem
 	private:
 		ZEMLNode*					Parent;
 		ZEString					Name;
+		void*						UserData;
 
 	public:
 		ZEMLNode*					GetParent();
@@ -59,6 +60,9 @@ class ZEMLElement : public ZEListItem
 
 		virtual ZEMLElementType1	GetType() = 0;
 		virtual ZESize				GetSize() = 0;
+
+		void						SetUserData(void* UserData);
+		void*						GetUserData();
 
 									ZEMLElement();
 };

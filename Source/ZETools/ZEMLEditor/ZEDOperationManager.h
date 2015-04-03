@@ -44,14 +44,17 @@ class ZEDOperationManager
 {
 	private:
 		ZEArray<ZEDOperation*> Stack;
-		ZESize StackIndex;
+		ZESSize StackIndex;
 
 		ZEDOperationManager();
 		virtual ~ZEDOperationManager();
 
 	public:
 		const ZEArray<ZEDOperation*>& GetStack();
-		ZESize GetStackIndex();
+		ZESSize GetStackIndex();
+
+		bool CanUndo();
+		bool CanRedo();
 
 		bool Undo();
 		bool Redo();

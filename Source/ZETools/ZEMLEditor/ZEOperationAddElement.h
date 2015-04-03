@@ -40,8 +40,8 @@
 #include "ZEDOperation.h"
 #include "ZETypes.h"
 
-class ZEMLNode;
 class ZEMLElement;
+class ZEMLNode;
 
 class ZEOperationAddElement : public ZEDOperation
 {
@@ -49,11 +49,11 @@ class ZEOperationAddElement : public ZEDOperation
 		virtual bool Apply();
 		virtual bool Revert();
 
-	public:
 		ZEMLNode* ParentNode;
 		ZEMLElement* Element;
 
-		ZEOperationAddElement();
+	public:
+		ZEOperationAddElement(ZEMLNode* ParentNode, ZEMLElement* NewElement);
 		~ZEOperationAddElement();
 };
 

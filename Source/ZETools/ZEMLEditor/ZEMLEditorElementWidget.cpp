@@ -533,7 +533,6 @@ void ZEMLEditorElementWidget::txtValueFloat_OnTextEdited(const QString& NewText)
 	emit ValueChanged(Property, Property->GetValue(), OldValue);
 }
 
-
 void ZEMLEditorElementWidget::SetElement(ZEMLElement* Element)
 {
 	this->Element = Element;
@@ -543,6 +542,11 @@ void ZEMLEditorElementWidget::SetElement(ZEMLElement* Element)
 ZEMLElement* ZEMLEditorElementWidget::GetElement()
 {
 	return Element;
+}
+
+void ZEMLEditorElementWidget::Update()
+{
+	ConfigureUI();
 }
 
 ZEMLEditorElementWidget::ZEMLEditorElementWidget(QWidget* Parent) : QWidget(Parent)
