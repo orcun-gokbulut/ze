@@ -72,4 +72,5 @@ void* ZEMLElement::GetUserData()
 ZEMLElement::ZEMLElement()
 {
 	Parent = NULL;
+	UserData = NULL;
 }

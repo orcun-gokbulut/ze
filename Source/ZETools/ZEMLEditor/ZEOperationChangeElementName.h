@@ -46,14 +46,14 @@ class ZEOperationChangeElementName : public ZEDOperation
 	private:
 		ZEMLElement* Element;
 
-		ZEString OldName;
 		ZEString NewName;	
+		ZEString OldName;
 
 		virtual bool Apply();
 		virtual bool Revert();
 
 	public:
-		ZEOperationChangeElementName(ZEMLElement* Element, const ZEString& OldName, const ZEString& NewName);
+		ZEOperationChangeElementName(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
 };
 
 #endif

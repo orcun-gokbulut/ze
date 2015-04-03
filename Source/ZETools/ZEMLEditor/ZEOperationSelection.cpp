@@ -41,15 +41,25 @@
 
 bool ZEOperationSelection::Apply()
 {
+	if (Items.GetCount() == 0)
+		return true;
+
+	Items[0]->treeWidget()->blockSignals(true);
 	for (ZESize I = 0; I < Items.GetCount(); I++)
 		Items[I]->setSelected(true);
+	Items[0]->treeWidget()->blockSignals(false);
 	return true;
 }
 
 bool ZEOperationSelection::Revert()
 {
+	if (Items.GetCount() == 0)
+		return true;
+
+	Items[0]->treeWidget()->blockSignals(true);
 	for (ZESize I = 0; I < Items.GetCount(); I++)
 		Items[I]->setSelected(false);
+	Items[0]->treeWidget()->blockSignals(false);
 	return true;
 }
 

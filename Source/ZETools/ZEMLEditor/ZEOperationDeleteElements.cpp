@@ -55,7 +55,7 @@ bool ZEOperationDeleteElements::Apply()
 
 bool ZEOperationDeleteElements::Revert()
 {
-	for (ZESize I = Elements.GetCount() - 1; I >= 0; I--)
+	for (ZESSize I = Elements.GetCount() - 1; I >= 0; I--)
 	{
 		ZEOperationDeletedElement& CurrentElement = Elements[I];
 

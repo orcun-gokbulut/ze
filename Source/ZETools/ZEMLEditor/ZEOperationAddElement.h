@@ -46,11 +46,11 @@ class ZEMLNode;
 class ZEOperationAddElement : public ZEDOperation
 {
 	private:
-		virtual bool Apply();
-		virtual bool Revert();
-
 		ZEMLNode* ParentNode;
 		ZEMLElement* Element;
+
+		virtual bool Apply();
+		virtual bool Revert();
 
 	public:
 		ZEOperationAddElement(ZEMLNode* ParentNode, ZEMLElement* NewElement);

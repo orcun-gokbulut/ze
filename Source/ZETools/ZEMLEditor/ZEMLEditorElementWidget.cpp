@@ -340,7 +340,7 @@ void ZEMLEditorElementWidget::ConfigureUI()
 	Form->grpElement->setVisible(true);
 	Form->lblNoElementSelected->setVisible(false);
 
-	Form->txtElementName->setText(Element->GetName().ToCString());
+	Form->txtName->setText(Element->GetName().ToCString());
 	Form->lblElementSize->setText(QString::number(Element->GetSize()));
 
 	if (Element->GetType() == ZEML_ET1_NODE)
@@ -575,6 +575,7 @@ ZEMLEditorElementWidget::ZEMLEditorElementWidget(QWidget* Parent) : QWidget(Pare
 	Form->txtValueFloat43->setProperty("row", 4); Form->txtValueFloat43->setProperty("column", 3);
 	Form->txtValueFloat44->setProperty("row", 4); Form->txtValueFloat44->setProperty("column", 4);
 
+	connect(Form->txtName, SIGNAL(textEdited(const QString&)), this, SLOT(txtName_OnTextEdited(const QString&)));
 	connect(Form->cmbValueType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbValueType_OnCurrentIndexChanged(int)));
 	connect(Form->chkValueBoolean, SIGNAL(stateChanged(int)), this, SLOT(chkValueBoolean_OnStateChanged(int)));
 	connect(Form->txtValueString, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueString_OnTextEdited(const QString&)));
