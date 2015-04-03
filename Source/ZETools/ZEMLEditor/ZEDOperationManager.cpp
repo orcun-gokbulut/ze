@@ -40,7 +40,7 @@
 
 ZEDOperationManager::ZEDOperationManager()
 {
-	StackIndex = 0;
+	StackIndex = -1;
 }
 
 ZEDOperationManager::~ZEDOperationManager()
@@ -48,12 +48,29 @@ ZEDOperationManager::~ZEDOperationManager()
 	Clear();
 }
 
+const ZEArray<ZEDOperation*>& ZEDOperationManager::GetStack()
+{
+	return Stack;
+}
+
+ZESSize ZEDOperationManager::GetStackIndex()
+{
+	return StackIndex;
+}
+
+bool ZEDOperationManager::CanUndo()
+{
+	return StackIndex != -1;
+}
+
+bool ZEDOperationManager::CanRedo()
+{
+	return StackIndex + 1 != Stack.GetCount();
+}
+
 bool ZEDOperationManager::Undo()
 {
-	if (Stack.GetSize() == 0)
-		return false;
-
-	if (StackIndex == 0)
+	if (!CanUndo())
 		return false;
 
 	if (!Stack[StackIndex]->Undo())
@@ -69,7 +86,7 @@ bool ZEDOperationManager::Undo()
 
 bool ZEDOperationManager::Redo()
 {
-	if (StackIndex + 1 >= Stack.GetSize())
+	if (!CanRedo())
 		return false;
 	
 	if (!Stack[StackIndex]->Do())
@@ -96,12 +113,19 @@ bool ZEDOperationManager::DoOperation(ZEDOperation* Operation)
 
 	if (StackIndex + 1 != Stack.GetCount())
 	{
-		for (ZESize I = StackIndex; I < Stack.GetSize(); I++)
+		for (ZESSize I = StackIndex + 1; I < Stack.GetCount(); I++)
+		{
 			Stack[I]->Destroy();
+			Stack.Remove(I);
+			I--;
+		}
+		Stack.SetCount(StackIndex + 1);
+		Stack[StackIndex] = Operation;
 	}
-
-	Stack.Add(Operation);
-	StackIndex = Stack.GetSize();
+	else
+	{
+		Stack.Add(Operation);
+	}
 
 	return true;
 }

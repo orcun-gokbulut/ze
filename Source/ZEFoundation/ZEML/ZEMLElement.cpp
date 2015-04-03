@@ -59,6 +59,16 @@ const ZEString& ZEMLElement::GetName()
 	return Name;
 }
 
+void ZEMLElement::SetUserData(void* UserData)
+{
+	this->UserData = UserData;
+}
+
+void* ZEMLElement::GetUserData()
+{
+	return UserData;
+}
+
 ZEMLElement::ZEMLElement()
 {
 	Parent = NULL;

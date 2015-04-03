@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEOperationChangeElementName.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,27 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef __ZE_OPERATION_CHANGE_ELEMENT_NAME_H__
+#define __ZE_OPERATION_CHANGE_ELEMENT_NAME_H__
+
+#include "ZEDOperation.h"
+
+class ZEMLElement;
+
+class ZEOperationChangeElementName : public ZEDOperation
+{
+	private:
+		ZEMLElement* Element;
+
+		ZEString OldName;
+		ZEString NewName;	
+
+		virtual bool Apply();
+		virtual bool Revert();
+
+	public:
+		ZEOperationChangeElementName(ZEMLElement* Element, const ZEString& OldName, const ZEString& NewName);
+};
+
+#endif

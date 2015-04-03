@@ -76,6 +76,8 @@ class ZEMLEditorElementWidget : public QWidget
 		void					SetElement(ZEMLElement* Element);
 		ZEMLElement*			GetElement();
 
+		void					Update();
+
 								ZEMLEditorElementWidget(QWidget* Parent = NULL);
 								~ZEMLEditorElementWidget();
 };

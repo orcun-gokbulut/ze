@@ -49,8 +49,8 @@ class ZEMLEditorWindow : public QMainWindow
 {
 	Q_OBJECT
 	private:
+		static ZEMLEditorWindow* Instance;
 		Ui_ZEMLEditorWindow*	Form;
-
 		ZEString				FileName;
 		ZEMLRoot				Root;
 		ZEMLNode*				RootNode;
@@ -67,7 +67,7 @@ class ZEMLEditorWindow : public QMainWindow
 		void					ConfigureUI();
 
 	private slots:
-		//void					NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
+		void					NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
 		void					ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue);
 		//void					DataChange(ZEMLData* Data, void* NewData, ZESize NewDataSize, void* OldData, ZESize OldDataSize);
 		
@@ -84,16 +84,16 @@ class ZEMLEditorWindow : public QMainWindow
 		void					Close();
 		void					Quit();
 
-		/*void					Undo();
+		void					Undo();
 		void					Redo();
-		void					Cut();
+		/*void					Cut();
 		void					Copy();
 		void					Paste();*/
 
 		void					AddNewNode();
 		void					AddNewProperty();
 		void					AddNewData();
-		void					DeleteElement();
+		void					Delete();
 
 		void					UserGuide();
 		void					BugReport();
@@ -101,6 +101,8 @@ class ZEMLEditorWindow : public QMainWindow
 		void					About();
 
 	public:
+		static void				Update();
+
 								ZEMLEditorWindow();
 								~ZEMLEditorWindow();
 };

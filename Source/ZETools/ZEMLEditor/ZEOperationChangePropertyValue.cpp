@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEOperationChangeElementName.cpp
+ Zinek Engine - ZEOperationChangePropertyValue.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,27 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEOperationChangeElementName.h"
-#include "ZEML/ZEMLElement.h"
+#include "ZEOperationChangePropertyValue.h"
+#include "ZEML/ZEMLProperty.h"
 #include "ZEMLEditorWindow.h"
 
-#include <QtGui/QTreeWidgetItem>
-
-bool ZEOperationChangeElementName::Apply()
+bool ZEOperationChangePropertyValue::Apply()
 {
-	Element->SetName(NewName);
-	((QTreeWidgetItem*)Element->GetUserData())->setText(0, NewName.ToCString());
+	Property->SetValue(NewValue);
 	ZEMLEditorWindow::Update();
 	return true;
 }
 
-bool ZEOperationChangeElementName::Revert()
+bool ZEOperationChangePropertyValue::Revert()
 {
-	Element->SetName(OldName);
-	((QTreeWidgetItem*)Element->GetUserData())->setText(0, OldName.ToCString());
+	Property->SetValue(NewValue);
 	ZEMLEditorWindow::Update();
 	return true;
 }
 
-ZEOperationChangeElementName::ZEOperationChangeElementName(ZEMLElement* Element, const ZEString& OldName, const ZEString& NewName)
+ZEOperationChangePropertyValue::ZEOperationChangePropertyValue(ZEMLProperty* Property, const ZEValue& OldValue, const ZEValue& NewValue)
 {
-	this->Element = Element;
-	this->OldName = OldName;
-	this->NewName = NewName;
+	this->Property = Property;
+	this->OldValue = OldValue;
+	this->NewValue = NewValue;
 }
