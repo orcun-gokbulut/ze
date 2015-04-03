@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEOperationSelection.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef __ZE_OPERATION_SELECTION_H__
+#define __ZE_OPERATION_SELECTION_H__
+
+#include "ZEDOperation.h"
+#include "ZEDS\ZEArray.h"
+
+#include <QtGui\QTreeWidgetItem>
+
+class ZEOperationSelection: public ZEDOperation
+{
+	private:
+		ZEArray<QTreeWidgetItem*> Items;
+
+		virtual bool Apply();
+		virtual bool Revert();
+
+	public:
+		ZEOperationSelection(const QList<QTreeWidgetItem*>& Items);
+};
+
+#endif

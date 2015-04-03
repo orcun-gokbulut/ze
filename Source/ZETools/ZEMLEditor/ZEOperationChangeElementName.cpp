@@ -43,7 +43,6 @@ bool ZEOperationChangeElementName::Apply()
 {
 	Element->SetName(NewName);
 	((QTreeWidgetItem*)Element->GetUserData())->setText(0, NewName.ToCString());
-	ZEMLEditorWindow::Update();
 	return true;
 }
 
@@ -51,7 +50,6 @@ bool ZEOperationChangeElementName::Revert()
 {
 	Element->SetName(OldName);
 	((QTreeWidgetItem*)Element->GetUserData())->setText(0, OldName.ToCString());
-	ZEMLEditorWindow::Update();
 	return true;
 }
 

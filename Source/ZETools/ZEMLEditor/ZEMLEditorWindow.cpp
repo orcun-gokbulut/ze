@@ -52,6 +52,7 @@
 #include "ZEOperationDeleteElements.h"
 #include "ZEML\ZEMLProperty.h"
 #include "ZEML\ZEMLData.h"
+#include "ZEOperationSelection.h"
 
 ZEMLEditorWindow* ZEMLEditorWindow::Instance = NULL;
 
@@ -211,28 +212,12 @@ void ZEMLEditorWindow::ConfigureUI()
 	Form->actAddData->setEnabled(SelectedItem == 1);
 	Form->actDelete->setEnabled(SelectedItem > 0);
 
-	Form->actUndo->setEnabled(RootNode != NULL);
-	Form->actRedo->setEnabled(RootNode != NULL);
 	Form->actCut->setEnabled(SelectedItem > 0);
 	Form->actCopy->setEnabled(SelectedItem > 0);
 	Form->actPaste->setEnabled(SelectedItem == 1);
 	Form->actDeselect->setEnabled(SelectedItem > 0);
-}
 
-void ZEMLEditorWindow::NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName)
-{
-	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationChangeElementName(Element, NewName, OldName));
-}
-
-void ZEMLEditorWindow::ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue)
-{
-	ZEOperationChangePropertyValue* Operation = new ZEOperationChangePropertyValue(Property, OldValue, NewValue);
-	ZEDOperationManager::GetInstance()->DoOperation(Operation);
-}
-
-void ZEMLEditorWindow::CurrentItemChanged()
-{
-	if (Form->trwElementTree->selectedItems().count() == 1)
+	if (SelectedItem == 1)
 	{
 		ZEMLElement* Element = (ZEMLElement*)Form->trwElementTree->selectedItems().first()->data(0, Qt::UserRole).toULongLong();
 		Form->wgtElementEditor->SetElement(Element);
@@ -242,18 +227,31 @@ void ZEMLEditorWindow::CurrentItemChanged()
 		Form->wgtElementEditor->SetElement(NULL);
 	}
 
-	ConfigureUI();
 }
 
+void ZEMLEditorWindow::NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName)
+{
+	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationChangeElementName(Element, NewName, OldName));
+	Update();
+}
+
+void ZEMLEditorWindow::ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue)
+{
+	ZEOperationChangePropertyValue* Operation = new ZEOperationChangePropertyValue(Property, OldValue, NewValue);
+	ZEDOperationManager::GetInstance()->DoOperation(Operation);
+	Update();
+}
 
 void ZEMLEditorWindow::Select()
 {
-
+	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationSelection(Form->trwElementTree->selectedItems()));
+	Update();
 }
 
 void ZEMLEditorWindow::Deselect()
 {
-
+	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationSelection(QList<QTreeWidgetItem*>()));
+	Update();
 }
 
 void ZEMLEditorWindow::New()
@@ -352,11 +350,13 @@ void ZEMLEditorWindow::Quit()
 void ZEMLEditorWindow::Undo()
 {
 	ZEDOperationManager::GetInstance()->Undo();
+	Update();
 }
 
 void ZEMLEditorWindow::Redo()
 {
 	ZEDOperationManager::GetInstance()->Redo();
+	Update();
 }
 
 void ZEMLEditorWindow::AddNewNode()
@@ -365,10 +365,11 @@ void ZEMLEditorWindow::AddNewNode()
 		return;
 
 	ZEMLElement* SelectedElement = (ZEMLElement*)Form->trwElementTree->selectedItems()[0]->data(0, Qt::UserRole).toULongLong();
-	if (SelectedElement->GetType() == ZEML_ET1_NODE)
+	if (SelectedElement->GetType() != ZEML_ET1_NODE)
 		return;
 
 	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationAddElement((ZEMLNode*)SelectedElement, new ZEMLNode()));
+	Update();
 }
 
 void ZEMLEditorWindow::AddNewProperty()
@@ -377,10 +378,11 @@ void ZEMLEditorWindow::AddNewProperty()
 		return;
 
 	ZEMLElement* SelectedElement = (ZEMLElement*)Form->trwElementTree->selectedItems()[0]->data(0, Qt::UserRole).toULongLong();
-	if (SelectedElement->GetType() == ZEML_ET1_NODE)
+	if (SelectedElement->GetType() != ZEML_ET1_NODE)
 		return;
 
 	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationAddElement((ZEMLNode*)SelectedElement, new ZEMLProperty()));
+	Update();
 }
 
 void ZEMLEditorWindow::AddNewData()
@@ -389,10 +391,11 @@ void ZEMLEditorWindow::AddNewData()
 		return;
 
 	ZEMLElement* SelectedElement = (ZEMLElement*)Form->trwElementTree->selectedItems()[0]->data(0, Qt::UserRole).toULongLong();
-	if (SelectedElement->GetType() == ZEML_ET1_NODE)
+	if (SelectedElement->GetType() != ZEML_ET1_NODE)
 		return;
 
 	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationAddElement((ZEMLNode*)SelectedElement, new ZEMLData()));
+	Update();
 }
 
 void ZEMLEditorWindow::Delete()
@@ -409,6 +412,7 @@ void ZEMLEditorWindow::Delete()
 	}
 
 	ZEDOperationManager::GetInstance()->DoOperation(Operation);
+	Update();
 }
 
 void ZEMLEditorWindow::UserGuide()
@@ -431,10 +435,15 @@ void ZEMLEditorWindow::About()
 	QMessageBox::about(this, "ZEML Editor", "Version: 1.0");
 }
 
+Ui_ZEMLEditorWindow* ZEMLEditorWindow::GetForm()
+{
+	return Form;
+}
+
 void ZEMLEditorWindow::Update()
 {
-	Instance->ConfigureUI();
-	Instance->Form->wgtElementEditor->Update();
+	ConfigureUI();
+	Form->wgtElementEditor->Update();
 }
 
 ZEMLEditorWindow::ZEMLEditorWindow()
@@ -459,6 +468,7 @@ ZEMLEditorWindow::ZEMLEditorWindow()
 
 	connect(Form->actUndo, SIGNAL(triggered()), this, SLOT(Undo()));
 	connect(Form->actRedo, SIGNAL(triggered()), this, SLOT(Redo()));
+	connect(Form->actDeselect, SIGNAL(triggered()), this, SLOT(Deselect()));
 
 	connect(Form->actAddNode, SIGNAL(triggered()), this, SLOT(AddNewNode()));
 	connect(Form->actAddProperty, SIGNAL(triggered()), this, SLOT(AddNewProperty()));
@@ -470,7 +480,7 @@ ZEMLEditorWindow::ZEMLEditorWindow()
 	connect(Form->actWebsite, SIGNAL(triggered()), this, SLOT(Website()));
 	connect(Form->actAbout, SIGNAL(triggered()), this, SLOT(About()));
 
-	connect(Form->trwElementTree, SIGNAL(itemSelectionChanged()), this, SLOT(CurrentItemChanged()));
+	connect(Form->trwElementTree, SIGNAL(itemSelectionChanged()), this, SLOT(Select()));
 	connect(Form->wgtElementEditor, SIGNAL(ValueChanged(ZEMLProperty*, const ZEValue&, const ZEValue&)), this, SLOT(ValueChanged(ZEMLProperty*, const ZEValue&, const ZEValue&)));
 	connect(Form->wgtElementEditor, SIGNAL(NameChanged(ZEMLElement*, const ZEString&, const ZEString&)), this, SLOT(NameChanged(ZEMLElement*, const ZEString&, const ZEString&)));
 
@@ -484,4 +494,9 @@ ZEMLEditorWindow::ZEMLEditorWindow()
 ZEMLEditorWindow::~ZEMLEditorWindow()
 {
 	delete Form;
+}
+
+ZEMLEditorWindow* ZEMLEditorWindow::GetInstance()
+{
+	return Instance;
 }
