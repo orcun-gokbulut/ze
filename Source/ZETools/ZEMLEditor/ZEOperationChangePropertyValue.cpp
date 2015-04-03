@@ -40,14 +40,12 @@
 bool ZEOperationChangePropertyValue::Apply()
 {
 	Property->SetValue(NewValue);
-	ZEMLEditorWindow::Update();
 	return true;
 }
 
 bool ZEOperationChangePropertyValue::Revert()
 {
 	Property->SetValue(NewValue);
-	ZEMLEditorWindow::Update();
 	return true;
 }
 

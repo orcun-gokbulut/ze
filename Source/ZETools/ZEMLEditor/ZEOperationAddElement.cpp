@@ -77,7 +77,7 @@ bool ZEOperationAddElement::Apply()
 	QTreeWidgetItem* ParentNodeItem = (QTreeWidgetItem*)ParentNode->GetUserData();
 	ParentNodeItem->addChild(ElementItem);
 
-	ZEMLEditorWindow::Update();
+	ZEMLEditorWindow::GetInstance()->Update();
 
 	return true;
 }
@@ -86,7 +86,6 @@ bool ZEOperationAddElement::Revert()
 {
 	ParentNode->RemoveElement(Element);
 	((QTreeWidgetItem*)ParentNode->GetUserData())->removeChild((QTreeWidgetItem*)Element->GetUserData());
-
 	return true;
 }
 

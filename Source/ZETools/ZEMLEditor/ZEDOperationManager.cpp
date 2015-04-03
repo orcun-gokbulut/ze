@@ -111,7 +111,7 @@ bool ZEDOperationManager::DoOperation(ZEDOperation* Operation)
 		return false;
 	}
 
-	if (StackIndex + 1 != Stack.GetCount())
+	if (CanRedo())
 	{
 		for (ZESSize I = StackIndex + 1; I < Stack.GetCount(); I++)
 		{
@@ -127,6 +127,7 @@ bool ZEDOperationManager::DoOperation(ZEDOperation* Operation)
 		Stack.Add(Operation);
 	}
 
+	StackIndex++;
 	return true;
 }
 
@@ -134,8 +135,10 @@ void ZEDOperationManager::Clear()
 {
 	for (ZESize I = 0; I < Stack.GetSize(); I++)
 		Stack[I]->Destroy();
+	
+	Stack.Clear();
 
-	StackIndex = 0;
+	StackIndex = -1;
 }
 
 void ZEDOperationManager::Destoy()

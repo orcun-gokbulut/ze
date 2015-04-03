@@ -71,8 +71,6 @@ class ZEMLEditorWindow : public QMainWindow
 		void					ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue);
 		//void					DataChange(ZEMLData* Data, void* NewData, ZESize NewDataSize, void* OldData, ZESize OldDataSize);
 		
-		void					CurrentItemChanged();
-
 		void					Select();
 		void					Deselect();
 
@@ -101,10 +99,13 @@ class ZEMLEditorWindow : public QMainWindow
 		void					About();
 
 	public:
-		static void				Update();
+		Ui_ZEMLEditorWindow*	 GetForm();
+		void					 Update();
 
 								ZEMLEditorWindow();
 								~ZEMLEditorWindow();
+
+		static ZEMLEditorWindow* GetInstance();
 };
 
 #endif
