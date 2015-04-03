@@ -54,7 +54,7 @@ class ZEOperationAddElement : public ZEDOperation
 
 	public:
 		ZEOperationAddElement(ZEMLNode* ParentNode, ZEMLElement* NewElement);
-		~ZEOperationAddElement();
+		virtual ~ZEOperationAddElement();
 };
 
 #endif

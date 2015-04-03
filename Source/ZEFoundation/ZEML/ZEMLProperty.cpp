@@ -51,6 +51,15 @@ ZESize ZEMLProperty::GetSize()
 	return Size;
 }
 
+ZEMLElement* ZEMLProperty::Clone()
+{
+	ZEMLProperty* CloneProperty = new ZEMLProperty(GetName());
+	CloneProperty->SetValue(GetValue());
+	CloneProperty->SetUserData(GetUserData());
+	
+	return CloneProperty;
+}
+
 ZEMLValueType ZEMLProperty::GetValueType()
 {
 	return (ZEMLValueType)ZEMLUtils::ConvertValueType(Value.GetType());
@@ -177,6 +186,6 @@ ZEMLProperty::ZEMLProperty(const char* Name)
 
 ZEMLProperty::ZEMLProperty(const char* Name ,const ZEValue& Value)
 {
-	SetName(NULL);
+	SetName(Name);
 	SetValue(Value);
 }

@@ -50,6 +50,8 @@ class ZEMLProperty : public ZEMLElement
 		virtual ZEMLElementType1	GetType();
 		virtual ZESize				GetSize();
 
+		virtual ZEMLElement*		Clone();
+
 		ZEMLValueType				GetValueType();
 
 		bool						SetValue(const ZEValue& Value);

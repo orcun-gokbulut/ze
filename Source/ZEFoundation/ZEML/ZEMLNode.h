@@ -59,6 +59,8 @@ class ZEMLNode : public ZEMLElement
 		virtual ZEMLElementType1	GetType();
 		virtual ZESize				GetSize();
 
+		virtual ZEMLElement*		Clone();
+
 		ZEMLElement*				GetElement(const char* Name, ZEMLElementType1 Type = ZEML_ET_ALL, ZESize Index = 0);
 
 		const ZEList<ZEMLElement>&	GetElements();

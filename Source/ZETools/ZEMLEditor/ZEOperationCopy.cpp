@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLEditorWindow.h
+ Zinek Engine - ZEOperationCopy.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,81 +33,27 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZEML_EDITOR_WINDOW_H__
-#define __ZEML_EDITOR_WINDOW_H__
+#include "ZEOperationCopy.h"
+#include "ZEML/ZEMLNode.h"
 
-#include <QtGui/QMainWindow>
-#include "QtGui/qtreewidget.h"
-
-#include "ZEDS/ZEString.h"
-#include "ZEML/ZEMLRoot.h"
-
-class Ui_ZEMLEditorWindow;
-
-class ZEMLEditorWindow : public QMainWindow
+bool ZEOperationCopy::Apply()
 {
-	Q_OBJECT
-	private:
-		static ZEMLEditorWindow* Instance;
-		Ui_ZEMLEditorWindow*	Form;
-		ZEString				FileName;
-		ZEMLRoot				Root;
-		ZEMLNode*				RootNode;
+	return true;
+}
 
-		ZEMLNode*				ClipBoard;
+bool ZEOperationCopy::Revert()
+{
+	return true;
+}
 
-		void					LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node);
-		void					LoadTree();
-		
-		void					RegisterRecentFile(const ZEString& FileName);
-		void					LoadRecentFiles();
+ZEOperationCopy::ZEOperationCopy(ZEMLNode* ClipBoard, const QList<QTreeWidgetItem*>& Items)
+{
+	if (ClipBoard == NULL)
+		return;
 
-		void					OpenFile(const ZEString& FileName);
-		void					SaveFile(const ZEString& FileName);
+	ZESSize SelectedItemCount = Items.count();
 
-		void					ConfigureUI();
+	for (ZESSize I = 0; I < SelectedItemCount; I++)
+		ClipBoard->AddElement(((ZEMLElement*)(Items[I]->data(0, Qt::UserRole).toLongLong()))->Clone());
+}
 
-	private slots:
-		void					NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
-		void					ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue);
-		//void					DataChange(ZEMLData* Data, void* NewData, ZESize NewDataSize, void* OldData, ZESize OldDataSize);
-		
-		void					Select();
-		void					Deselect();
-
-		void					New();
-		void					Open();
-		void					OpenRecentFile();
-		void					Save();
-		void					SaveAs();
-		void					Close();
-		void					Quit();
-
-		void					Undo();
-		void					Redo();
-		void					Cut();
-		void					Copy();
-		void					Paste();
-
-		void					AddNewNode();
-		void					AddNewProperty();
-		void					AddNewData();
-		void					Delete();
-
-		void					UserGuide();
-		void					BugReport();
-		void					Website();
-		void					About();
-
-	public:
-		Ui_ZEMLEditorWindow*	 GetForm();
-		void					 Update();
-
-								ZEMLEditorWindow();
-								~ZEMLEditorWindow();
-
-		static ZEMLEditorWindow* GetInstance();
-};
-
-#endif

@@ -50,6 +50,9 @@
 #include "ZEOperationChangePropertyValue.h"
 #include "ZEOperationChangeElementName.h"
 #include "ZEOperationDeleteElements.h"
+#include "ZEOperationCopy.h"
+#include "ZEOperationCut.h"
+#include "ZEOperationPaste.h"
 #include "ZEML\ZEMLProperty.h"
 #include "ZEML\ZEMLData.h"
 #include "ZEOperationSelection.h"
@@ -359,6 +362,49 @@ void ZEMLEditorWindow::Redo()
 	Update();
 }
 
+void ZEMLEditorWindow::Cut()
+{
+	if (QApplication::focusWidget() != Form->trwElementTree)
+		return;
+
+	if (ClipBoard != NULL)
+		delete ClipBoard;
+
+	ClipBoard = new ZEMLNode();
+
+	ZEOperationCut* Cut = new ZEOperationCut(ClipBoard, Form->trwElementTree->selectedItems());
+	ZEDOperationManager::GetInstance()->DoOperation(Cut);
+}
+
+void ZEMLEditorWindow::Copy()
+{
+	if (QApplication::focusWidget() != Form->trwElementTree)
+		return;
+
+	if (ClipBoard != NULL)
+		delete ClipBoard;
+
+	ClipBoard = new ZEMLNode();
+
+	ZEOperationCopy Copy(ClipBoard, Form->trwElementTree->selectedItems());
+}
+
+void ZEMLEditorWindow::Paste()
+{
+	if (QApplication::focusWidget() != Form->trwElementTree)
+		return;
+
+	if (Form->trwElementTree->selectedItems().count() != 1)
+		return;
+
+	ZEMLElement* SelectedElement = (ZEMLElement*)Form->trwElementTree->selectedItems()[0]->data(0, Qt::UserRole).toULongLong();
+	if (SelectedElement->GetType() != ZEML_ET1_NODE)
+		return;
+
+	ZEOperationPaste* Paste = new ZEOperationPaste(ClipBoard, (ZEMLNode*)SelectedElement);
+	ZEDOperationManager::GetInstance()->DoOperation(Paste);
+}
+
 void ZEMLEditorWindow::AddNewNode()
 {
 	if (Form->trwElementTree->selectedItems().count() != 1)
@@ -468,6 +514,9 @@ ZEMLEditorWindow::ZEMLEditorWindow()
 
 	connect(Form->actUndo, SIGNAL(triggered()), this, SLOT(Undo()));
 	connect(Form->actRedo, SIGNAL(triggered()), this, SLOT(Redo()));
+	connect(Form->actCut, SIGNAL(triggered()), this, SLOT(Cut()));
+	connect(Form->actCopy, SIGNAL(triggered()), this, SLOT(Copy()));
+	connect(Form->actPaste, SIGNAL(triggered()), this, SLOT(Paste()));
 	connect(Form->actDeselect, SIGNAL(triggered()), this, SLOT(Deselect()));
 
 	connect(Form->actAddNode, SIGNAL(triggered()), this, SLOT(AddNewNode()));
@@ -484,6 +533,7 @@ ZEMLEditorWindow::ZEMLEditorWindow()
 	connect(Form->wgtElementEditor, SIGNAL(ValueChanged(ZEMLProperty*, const ZEValue&, const ZEValue&)), this, SLOT(ValueChanged(ZEMLProperty*, const ZEValue&, const ZEValue&)));
 	connect(Form->wgtElementEditor, SIGNAL(NameChanged(ZEMLElement*, const ZEString&, const ZEString&)), this, SLOT(NameChanged(ZEMLElement*, const ZEString&, const ZEString&)));
 
+	ClipBoard = NULL;
 	RootNode = NULL;
 
 	LoadTree();

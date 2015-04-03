@@ -61,6 +61,8 @@ class ZEMLElement : public ZEListItem
 		virtual ZEMLElementType1	GetType() = 0;
 		virtual ZESize				GetSize() = 0;
 
+		virtual ZEMLElement*		Clone() = 0;
+
 		void						SetUserData(void* UserData);
 		void*						GetUserData();
 

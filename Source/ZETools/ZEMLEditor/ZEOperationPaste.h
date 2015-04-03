@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLEditorWindow.h
+ Zinek Engine - ZEOperationPaste.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,80 +34,34 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEML_EDITOR_WINDOW_H__
-#define __ZEML_EDITOR_WINDOW_H__
+#ifndef __ZE_OPERATION_PASTE_H__
+#define __ZE_OPERATION_PASTE_H__
 
-#include <QtGui/QMainWindow>
-#include "QtGui/qtreewidget.h"
+#include "ZEDOperation.h"
+#include "ZEDS\ZEArray.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEML/ZEMLRoot.h"
+class ZEMLNode;
+class ZEMLElement;
 
-class Ui_ZEMLEditorWindow;
-
-class ZEMLEditorWindow : public QMainWindow
+struct ZEOperationPastedElement
 {
-	Q_OBJECT
+	ZEMLElement* Element;
+	ZEMLNode* Parent;
+	ZESize Index;
+};
+
+class ZEOperationPaste : public ZEDOperation
+{
 	private:
-		static ZEMLEditorWindow* Instance;
-		Ui_ZEMLEditorWindow*	Form;
-		ZEString				FileName;
-		ZEMLRoot				Root;
-		ZEMLNode*				RootNode;
+		ZEMLNode* ClipBoard;
+		ZEMLNode* RootNode;
+		ZEArray<ZEOperationPastedElement> PastedElements;
 
-		ZEMLNode*				ClipBoard;
-
-		void					LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node);
-		void					LoadTree();
-		
-		void					RegisterRecentFile(const ZEString& FileName);
-		void					LoadRecentFiles();
-
-		void					OpenFile(const ZEString& FileName);
-		void					SaveFile(const ZEString& FileName);
-
-		void					ConfigureUI();
-
-	private slots:
-		void					NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
-		void					ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue);
-		//void					DataChange(ZEMLData* Data, void* NewData, ZESize NewDataSize, void* OldData, ZESize OldDataSize);
-		
-		void					Select();
-		void					Deselect();
-
-		void					New();
-		void					Open();
-		void					OpenRecentFile();
-		void					Save();
-		void					SaveAs();
-		void					Close();
-		void					Quit();
-
-		void					Undo();
-		void					Redo();
-		void					Cut();
-		void					Copy();
-		void					Paste();
-
-		void					AddNewNode();
-		void					AddNewProperty();
-		void					AddNewData();
-		void					Delete();
-
-		void					UserGuide();
-		void					BugReport();
-		void					Website();
-		void					About();
+		virtual bool Apply();
+		virtual bool Revert();
 
 	public:
-		Ui_ZEMLEditorWindow*	 GetForm();
-		void					 Update();
-
-								ZEMLEditorWindow();
-								~ZEMLEditorWindow();
-
-		static ZEMLEditorWindow* GetInstance();
+		ZEOperationPaste(ZEMLNode* ClipBoard, ZEMLNode* TargetNode);
 };
 
 #endif

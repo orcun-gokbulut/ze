@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLEditorWindow.h
+ Zinek Engine - ZEOperationPaste.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,81 +33,63 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZEML_EDITOR_WINDOW_H__
-#define __ZEML_EDITOR_WINDOW_H__
+#include "ZEOperationPaste.h"
+#include "ZEML/ZEMLNode.h"
+#include <QtGui\QTreeWidgetItem>
 
-#include <QtGui/QMainWindow>
-#include "QtGui/qtreewidget.h"
-
-#include "ZEDS/ZEString.h"
-#include "ZEML/ZEMLRoot.h"
-
-class Ui_ZEMLEditorWindow;
-
-class ZEMLEditorWindow : public QMainWindow
+bool ZEOperationPaste::Apply()
 {
-	Q_OBJECT
-	private:
-		static ZEMLEditorWindow* Instance;
-		Ui_ZEMLEditorWindow*	Form;
-		ZEString				FileName;
-		ZEMLRoot				Root;
-		ZEMLNode*				RootNode;
+	if (RootNode == NULL)
+		return false;
 
-		ZEMLNode*				ClipBoard;
+	for (ZESize I = 0; I < PastedElements.GetCount(); I++)
+	{
+		RootNode->AddElement(PastedElements[I].Element);
+		PastedElements[I].Index = RootNode->GetElements().FindIndex(PastedElements[I].Element);
+		((QTreeWidgetItem*)PastedElements[I].Parent->GetUserData())->addChild((QTreeWidgetItem*)PastedElements[I].Element->GetUserData());
+	}
 
-		void					LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node);
-		void					LoadTree();
-		
-		void					RegisterRecentFile(const ZEString& FileName);
-		void					LoadRecentFiles();
+	return true;
+}
 
-		void					OpenFile(const ZEString& FileName);
-		void					SaveFile(const ZEString& FileName);
+bool ZEOperationPaste::Revert()
+{
+	if (RootNode == NULL)
+		return false;
 
-		void					ConfigureUI();
+	for (ZESSize I = PastedElements.GetCount() - 1; I >= 0; I--)
+	{
+		ZEOperationPastedElement& CurrentElement = PastedElements[I];
+		CurrentElement.Parent->RemoveElement(CurrentElement.Element);
+		((QTreeWidgetItem*)CurrentElement.Parent->GetUserData())->removeChild((QTreeWidgetItem*)CurrentElement.Element->GetUserData());
+	}
 
-	private slots:
-		void					NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
-		void					ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue);
-		//void					DataChange(ZEMLData* Data, void* NewData, ZESize NewDataSize, void* OldData, ZESize OldDataSize);
-		
-		void					Select();
-		void					Deselect();
+	return true;
+}
 
-		void					New();
-		void					Open();
-		void					OpenRecentFile();
-		void					Save();
-		void					SaveAs();
-		void					Close();
-		void					Quit();
+ZEOperationPaste::ZEOperationPaste(ZEMLNode* ClipBoard, ZEMLNode* TargetNode)
+{
+	if (ClipBoard == NULL || TargetNode == NULL)
+		return;
 
-		void					Undo();
-		void					Redo();
-		void					Cut();
-		void					Copy();
-		void					Paste();
+	if (ClipBoard->GetElements().GetCount() == 0)
+		return;
 
-		void					AddNewNode();
-		void					AddNewProperty();
-		void					AddNewData();
-		void					Delete();
+	this->ClipBoard = ClipBoard;
+	this->RootNode = TargetNode;
 
-		void					UserGuide();
-		void					BugReport();
-		void					Website();
-		void					About();
+	ZEList<ZEMLElement>::Iterator Iterator = ClipBoard->GetElements().GetConstIterator();
+	ZESize ItemCount = ClipBoard->GetElements().GetCount();
+	PastedElements.SetCount(ItemCount);
+	ZESize Counter = 0;
 
-	public:
-		Ui_ZEMLEditorWindow*	 GetForm();
-		void					 Update();
+	while (!Iterator.IsEnd())
+	{
+		ZEMLElement* PasteElement = Iterator.GetItem()->Clone();
+		PastedElements[Counter].Element = PasteElement;
+		PastedElements[Counter].Parent = RootNode;
 
-								ZEMLEditorWindow();
-								~ZEMLEditorWindow();
-
-		static ZEMLEditorWindow* GetInstance();
-};
-
-#endif
+		Counter++;
+		Iterator++;
+	}
+}
