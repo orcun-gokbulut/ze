@@ -88,14 +88,14 @@ bool ZEDOperationManager::Redo()
 {
 	if (!CanRedo())
 		return false;
-	
+
+	StackIndex++;	
+
 	if (!Stack[StackIndex]->Do())
 	{
 		zeError("Cannot redo operation. Operation Text: \"%s\"", Stack[StackIndex]->GetText().ToCString());
 		return false;
 	}
-
-	StackIndex++;
 
 	return true;
 }
@@ -119,15 +119,17 @@ bool ZEDOperationManager::DoOperation(ZEDOperation* Operation)
 			Stack.Remove(I);
 			I--;
 		}
+		
+		StackIndex++;
 		Stack.SetCount(StackIndex + 1);
 		Stack[StackIndex] = Operation;
 	}
 	else
 	{
 		Stack.Add(Operation);
+		StackIndex++;
 	}
 
-	StackIndex++;
 	return true;
 }
 

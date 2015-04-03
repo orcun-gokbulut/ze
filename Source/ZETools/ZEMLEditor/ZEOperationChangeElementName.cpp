@@ -53,9 +53,9 @@ bool ZEOperationChangeElementName::Revert()
 	return true;
 }
 
-ZEOperationChangeElementName::ZEOperationChangeElementName(ZEMLElement* Element, const ZEString& OldName, const ZEString& NewName)
+ZEOperationChangeElementName::ZEOperationChangeElementName(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName)
 {
 	this->Element = Element;
-	this->OldName = OldName;
 	this->NewName = NewName;
+	this->OldName = OldName;
 }

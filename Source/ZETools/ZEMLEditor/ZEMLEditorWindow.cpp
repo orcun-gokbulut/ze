@@ -110,6 +110,7 @@ void ZEMLEditorWindow::LoadTree()
 		return;
 
 	QTreeWidgetItem* TopLevelItem = new QTreeWidgetItem();
+	RootNode->SetUserData(TopLevelItem);
 	Form->trwElementTree->addTopLevelItem(TopLevelItem);
 	LoadNode(TopLevelItem, RootNode);
 
@@ -210,9 +211,6 @@ void ZEMLEditorWindow::ConfigureUI()
 	Form->trwElementTree->setEnabled(RootNode != NULL);
 	
 	int SelectedItem = Form->trwElementTree->selectedItems().count();
-	Form->actAddNode->setEnabled(SelectedItem == 1);
-	Form->actAddProperty->setEnabled(SelectedItem == 1);
-	Form->actAddData->setEnabled(SelectedItem == 1);
 	Form->actDelete->setEnabled(SelectedItem > 0);
 
 	Form->actCut->setEnabled(SelectedItem > 0);
@@ -223,13 +221,17 @@ void ZEMLEditorWindow::ConfigureUI()
 	if (SelectedItem == 1)
 	{
 		ZEMLElement* Element = (ZEMLElement*)Form->trwElementTree->selectedItems().first()->data(0, Qt::UserRole).toULongLong();
+
+		Form->actAddNode->setEnabled(Element->GetType() == ZEML_ET1_NODE);
+		Form->actAddProperty->setEnabled(Element->GetType() == ZEML_ET1_NODE);
+		Form->actAddData->setEnabled(Element->GetType() == ZEML_ET1_NODE);
+
 		Form->wgtElementEditor->SetElement(Element);
 	}
 	else
 	{
 		Form->wgtElementEditor->SetElement(NULL);
 	}
-
 }
 
 void ZEMLEditorWindow::NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName)
@@ -279,7 +281,6 @@ void ZEMLEditorWindow::Open()
 		"ZEML Based Files (*.ZEML *.ZE*);;ZEML Files (*.ZEML);;All Files (*.*)");
 	
 	OpenFile(NewFileName.toUtf8().constData());
-
 }
 
 void ZEMLEditorWindow::OpenRecentFile()
