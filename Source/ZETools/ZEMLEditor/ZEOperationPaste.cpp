@@ -37,6 +37,50 @@
 #include "ZEML/ZEMLNode.h"
 #include <QtGui\QTreeWidgetItem>
 
+bool ZEOperationPaste::PasteToTree(ZEMLElement* Element, ZEMLNode* ParentNode)
+{
+	QTreeWidgetItem* ElementItem = new QTreeWidgetItem();
+	Element->SetUserData(ElementItem);
+	ElementItem->setData(0, Qt::UserRole, (ZEUInt64)Element);
+	ElementItem->setText(0, Element->GetName().ToCString());
+
+	switch (Element->GetType())
+	{
+	case ZEML_ET_PROPERTY:
+		ElementItem->setText(1, "Property");
+		break;
+
+	case ZEML_ET1_NODE:
+		{
+			ElementItem->setText(1, "Node");
+			ZEMLNode* Node = (ZEMLNode*)Element;
+			ZEList<ZEMLElement>::Iterator Iterator = Node->GetElements().GetConstIterator();
+
+			while (!Iterator.IsEnd())
+			{
+				ZEMLElement* ChildElement = Iterator.GetItem();
+				PasteToTree(ChildElement, Node);
+				Iterator++;
+			}
+
+		}
+		break;
+
+	case ZEML_ET_DATA:
+		ElementItem->setText(1, "Data");
+		break;
+
+	default:
+		ElementItem->setText(1, "Unknown");
+		break;
+	}
+
+	QTreeWidgetItem* ParentNodeItem = (QTreeWidgetItem*)(ParentNode->GetUserData());
+	ParentNodeItem->addChild(ElementItem);
+
+	return true;
+}
+
 bool ZEOperationPaste::Apply()
 {
 	if (RootNode == NULL)
@@ -45,8 +89,9 @@ bool ZEOperationPaste::Apply()
 	for (ZESize I = 0; I < PastedElements.GetCount(); I++)
 	{
 		RootNode->AddElement(PastedElements[I].Element);
+
+		PasteToTree(PastedElements[I].Element, PastedElements[I].Parent);
 		PastedElements[I].Index = RootNode->GetElements().FindIndex(PastedElements[I].Element);
-		((QTreeWidgetItem*)PastedElements[I].Parent->GetUserData())->addChild((QTreeWidgetItem*)PastedElements[I].Element->GetUserData());
 	}
 
 	return true;
@@ -60,8 +105,8 @@ bool ZEOperationPaste::Revert()
 	for (ZESSize I = PastedElements.GetCount() - 1; I >= 0; I--)
 	{
 		ZEOperationPastedElement& CurrentElement = PastedElements[I];
-		CurrentElement.Parent->RemoveElement(CurrentElement.Element);
 		((QTreeWidgetItem*)CurrentElement.Parent->GetUserData())->removeChild((QTreeWidgetItem*)CurrentElement.Element->GetUserData());
+		CurrentElement.Parent->RemoveElement(CurrentElement.Element);
 	}
 
 	return true;
@@ -69,6 +114,8 @@ bool ZEOperationPaste::Revert()
 
 ZEOperationPaste::ZEOperationPaste(ZEMLNode* ClipBoard, ZEMLNode* TargetNode)
 {
+	SetText("Paste")
+
 	if (ClipBoard == NULL || TargetNode == NULL)
 		return;
 

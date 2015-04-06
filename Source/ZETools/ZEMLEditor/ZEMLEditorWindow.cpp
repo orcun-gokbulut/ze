@@ -237,14 +237,12 @@ void ZEMLEditorWindow::ConfigureUI()
 void ZEMLEditorWindow::NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName)
 {
 	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationChangeElementName(Element, NewName, OldName));
-	Update();
 }
 
 void ZEMLEditorWindow::ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue)
 {
 	ZEOperationChangePropertyValue* Operation = new ZEOperationChangePropertyValue(Property, OldValue, NewValue);
 	ZEDOperationManager::GetInstance()->DoOperation(Operation);
-	Update();
 }
 
 void ZEMLEditorWindow::Select()
@@ -375,6 +373,7 @@ void ZEMLEditorWindow::Cut()
 
 	ZEOperationCut* Cut = new ZEOperationCut(ClipBoard, Form->trwElementTree->selectedItems());
 	ZEDOperationManager::GetInstance()->DoOperation(Cut);
+	Update();
 }
 
 void ZEMLEditorWindow::Copy()
@@ -388,6 +387,7 @@ void ZEMLEditorWindow::Copy()
 	ClipBoard = new ZEMLNode();
 
 	ZEOperationCopy Copy(ClipBoard, Form->trwElementTree->selectedItems());
+	Update();
 }
 
 void ZEMLEditorWindow::Paste()
@@ -404,6 +404,7 @@ void ZEMLEditorWindow::Paste()
 
 	ZEOperationPaste* Paste = new ZEOperationPaste(ClipBoard, (ZEMLNode*)SelectedElement);
 	ZEDOperationManager::GetInstance()->DoOperation(Paste);
+	Update();
 }
 
 void ZEMLEditorWindow::AddNewNode()
@@ -452,7 +453,7 @@ void ZEMLEditorWindow::Delete()
 
 	ZEOperationDeleteElements* Operation = new ZEOperationDeleteElements();
 	QList<QTreeWidgetItem*> Items = Form->trwElementTree->selectedItems();
-	for (ZESize I = 0; Items.count(); I++)
+	for (ZESize I = 0; I < Items.count(); I++)
 	{
 		ZEMLElement* Element = (ZEMLElement*)Items[I]->data(0, Qt::UserRole).toULongLong();
 		Operation->AddDeletedElement(Element);

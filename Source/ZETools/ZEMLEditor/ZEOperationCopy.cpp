@@ -48,6 +48,8 @@ bool ZEOperationCopy::Revert()
 
 ZEOperationCopy::ZEOperationCopy(ZEMLNode* ClipBoard, const QList<QTreeWidgetItem*>& Items)
 {
+	SetText("Copy");
+	
 	if (ClipBoard == NULL)
 		return;
 
