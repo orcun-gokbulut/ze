@@ -41,9 +41,19 @@ bool ZEOperationCut::Apply()
 	for (ZESize I = 0; I < CutElements.GetCount(); I++)
 	{
 		ZEOperationCutElement& CurrentElement = CutElements[I];
-		CurrentElement.Index = CurrentElement.Parent->GetElements().FindIndex(CurrentElement.Element);
-		CurrentElement.Parent->RemoveElement(CurrentElement.Element);
-		((QTreeWidgetItem*)CurrentElement.Parent->GetUserData())->removeChild((QTreeWidgetItem*)CurrentElement.Element->GetUserData());
+
+		if (CurrentElement.Parent != NULL)
+		{
+			CurrentElement.Index = CurrentElement.Parent->GetElements().FindIndex(CurrentElement.Element);
+			((QTreeWidgetItem*)CurrentElement.Parent->GetUserData())->removeChild((QTreeWidgetItem*)CurrentElement.Element->GetUserData());
+			CurrentElement.Parent->RemoveElement(CurrentElement.Element);
+		}
+		else
+		{
+			CurrentElement.Index = 0;
+			Tree->takeTopLevelItem(0);
+		}
+
 	}
 
 	return true;
@@ -54,8 +64,17 @@ bool ZEOperationCut::Revert()
 	for (ZESSize I = CutElements.GetCount() - 1; I >= 0; I--)
 	{
 		ZEOperationCutElement& CurrentElement = CutElements[I];
-		CurrentElement.Parent->InsertElement(CurrentElement.Index, CurrentElement.Element);
-		((QTreeWidgetItem*)CurrentElement.Parent->GetUserData())->addChild((QTreeWidgetItem*)CurrentElement.Element->GetUserData());
+
+		if (CurrentElement.Parent != NULL)
+		{
+			CurrentElement.Parent->InsertElement(CurrentElement.Index, CurrentElement.Element);
+			QTreeWidgetItem* CurrentElementItem = (QTreeWidgetItem*)CurrentElement.Element->GetUserData();
+			((QTreeWidgetItem*)CurrentElement.Parent->GetUserData())->insertChild(CurrentElement.Index, CurrentElementItem);
+		}
+		else
+		{
+			Tree->addTopLevelItem((QTreeWidgetItem*)CurrentElement.Element->GetUserData());
+		}
 	}
 
 	return true;
@@ -63,10 +82,16 @@ bool ZEOperationCut::Revert()
 
 ZEOperationCut::ZEOperationCut(ZEMLNode* ClipBoard, const QList<QTreeWidgetItem*>& Items)
 {
+	SetText("Cut");
+
 	if (ClipBoard == NULL)
 		return;
 
 	ZESSize SelectedItemCount = Items.count();
+
+	if (SelectedItemCount > 0)
+		Tree = Items[0]->treeWidget();
+
 	CutElements.SetCount(SelectedItemCount);
 
 	for (ZESSize I = 0; I < SelectedItemCount; I++)

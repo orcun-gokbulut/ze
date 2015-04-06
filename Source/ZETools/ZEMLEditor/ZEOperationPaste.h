@@ -56,6 +56,7 @@ class ZEOperationPaste : public ZEDOperation
 		ZEMLNode* ClipBoard;
 		ZEMLNode* RootNode;
 		ZEArray<ZEOperationPastedElement> PastedElements;
+		bool PasteToTree(ZEMLElement* Element, ZEMLNode* ParentNode);
 
 		virtual bool Apply();
 		virtual bool Revert();

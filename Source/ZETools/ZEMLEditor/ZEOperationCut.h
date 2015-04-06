@@ -39,7 +39,7 @@
 
 #include "ZEDOperation.h"
 #include "ZEDS/ZEArray.h"
-#include <QtGui\QTreeWidgetItem>
+#include <QtGui/QTreeWidgetItem>
 
 class ZEMLNode;
 class ZEMLElement;
@@ -54,6 +54,7 @@ struct ZEOperationCutElement
 class ZEOperationCut : public ZEDOperation
 {
 	private:
+		QTreeWidget* Tree;
 		ZEArray<ZEOperationCutElement> CutElements;
 
 		virtual bool Apply();
