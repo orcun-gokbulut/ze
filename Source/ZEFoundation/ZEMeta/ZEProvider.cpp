@@ -90,7 +90,7 @@ ZEClass* ZEProvider::GetClass(const char* ClassName)
 {
 	for(ZESize I = 0; I < Classes.GetCount(); I++)
 	{
-		if(Classes[I]->GetName() == ClassName)
+		if(strcmp(Classes[I]->GetName(), ClassName) == 0)
 			return Classes[I];
 	}
 
