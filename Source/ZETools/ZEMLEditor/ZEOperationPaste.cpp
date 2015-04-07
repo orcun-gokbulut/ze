@@ -114,7 +114,7 @@ bool ZEOperationPaste::Revert()
 
 ZEOperationPaste::ZEOperationPaste(ZEMLNode* ClipBoard, ZEMLNode* TargetNode)
 {
-	SetText("Paste")
+	SetText("Paste");
 
 	if (ClipBoard == NULL || TargetNode == NULL)
 		return;

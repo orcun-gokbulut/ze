@@ -82,7 +82,7 @@ class ZEMLNode : public ZEMLElement
 
 									ZEMLNode();
 									ZEMLNode(const char* Name);
-									~ZEMLNode();
+		virtual						~ZEMLNode();
 };
 
 #endif
