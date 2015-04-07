@@ -53,7 +53,9 @@ class ZEMLElement : public ZEListItem
 		void*						UserData;
 
 	public:
+		void						SetParent(ZEMLNode* Parent);
 		ZEMLNode*					GetParent();
+
 
 		bool						SetName(const char* Name);
 		const ZEString&				GetName();	
@@ -67,6 +69,7 @@ class ZEMLElement : public ZEListItem
 		void*						GetUserData();
 
 									ZEMLElement();
+		virtual						~ZEMLElement();
 };
 
 #endif

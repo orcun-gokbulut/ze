@@ -35,6 +35,21 @@
 
 #include "ZEMLElement.h"
 #include "ZEError.h"
+#include "ZEMLNode.h"
+
+void ZEMLElement::SetParent(ZEMLNode* Parent)
+{
+	if (this->Parent == Parent)
+		return;
+
+	if (this->Parent != NULL)
+		this->Parent->RemoveElement(this);
+
+	this->Parent = Parent;
+
+	if (Parent != NULL)
+		this->Parent->AddElement(this);
+}
 
 ZEMLNode* ZEMLElement::GetParent()
 {
@@ -73,4 +88,9 @@ ZEMLElement::ZEMLElement()
 {
 	Parent = NULL;
 	UserData = NULL;
+}
+
+ZEMLElement::~ZEMLElement()
+{
+	SetParent(NULL);
 }
