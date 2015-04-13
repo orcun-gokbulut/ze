@@ -272,7 +272,7 @@
   </action>
   <action name="actDeselect">
    <property name="text">
-    <string>Delect</string>
+    <string>Deselect</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
