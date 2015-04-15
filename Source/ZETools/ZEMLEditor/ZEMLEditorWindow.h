@@ -90,6 +90,8 @@ class ZEMLEditorWindow : public QMainWindow
 		void					Copy();
 		void					Paste();
 
+		void					EditMode();
+
 		void					AddNewNode();
 		void					AddNewProperty();
 		void					AddNewData();
@@ -101,8 +103,9 @@ class ZEMLEditorWindow : public QMainWindow
 		void					About();
 
 	public:
-		Ui_ZEMLEditorWindow*	 GetForm();
-		void					 Update();
+		Ui_ZEMLEditorWindow*	GetForm();
+		bool					GetEditMode();
+		void					Update();
 
 								ZEMLEditorWindow();
 								~ZEMLEditorWindow();

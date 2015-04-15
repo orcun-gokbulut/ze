@@ -36,14 +36,6 @@
 #include "ZEMLEditorWindow.h"
 #include "ui_ZEMLEditorWindow.h"
 
-#include <QtCore\QCoreApplication>
-#include <QtCore\QSettings>
-#include <QtCore\QUrl>
-#include <QtGui\QTreeWidget>
-#include <QtGui\QMessageBox>
-#include <QtGui\QFileDialog>
-#include <QtGui\QDesktopServices>
-
 #include "ZEDOperation.h"
 #include "ZEOperationAddElement.h"
 #include "ZEDOperationManager.h"
@@ -55,7 +47,15 @@
 #include "ZEOperationPaste.h"
 #include "ZEML\ZEMLProperty.h"
 #include "ZEML\ZEMLData.h"
-#include "ZEOperationSelection.h"
+
+#include <QtCore\QCoreApplication>
+#include <QtCore\QSettings>
+#include <QtCore\QUrl>
+#include <QtGui\QTreeWidget>
+#include <QtGui\QMessageBox>
+#include <QtGui\QFileDialog>
+#include <QtGui\QDesktopServices>
+#include <QtGui\QTreeWidgetItem>
 
 ZEMLEditorWindow* ZEMLEditorWindow::Instance = NULL;
 
@@ -208,31 +208,33 @@ void ZEMLEditorWindow::ConfigureUI()
 	Form->actUndo->setEnabled(ZEDOperationManager::GetInstance()->CanUndo());
 	Form->actRedo->setEnabled(ZEDOperationManager::GetInstance()->CanRedo());
 
-	Form->actSave->setEnabled(RootNode != NULL);
-	Form->actSaveAs->setEnabled(RootNode != NULL);
+	Form->actNew->setEnabled(GetEditMode());
+	Form->actSave->setEnabled(GetEditMode() && RootNode != NULL);
+	Form->actSaveAs->setEnabled(GetEditMode() && RootNode != NULL);
 	Form->trwElementTree->setEnabled(RootNode != NULL);
 	
 	int SelectedItem = Form->trwElementTree->selectedItems().count();
-	Form->actDelete->setEnabled(SelectedItem > 0);
 
-	Form->actCut->setEnabled(SelectedItem > 0);
+	Form->actCut->setEnabled(GetEditMode() && SelectedItem > 0);
 	Form->actCopy->setEnabled(SelectedItem > 0);
-	Form->actPaste->setEnabled(SelectedItem == 1);
+	Form->actPaste->setEnabled(GetEditMode() && SelectedItem == 1);
 	Form->actDeselect->setEnabled(SelectedItem > 0);
+	Form->actDelete->setEnabled(GetEditMode() && SelectedItem > 0);
 
 	if (SelectedItem == 1)
 	{
 		ZEMLElement* Element = (ZEMLElement*)Form->trwElementTree->selectedItems().first()->data(0, Qt::UserRole).toULongLong();
-
-		Form->actAddNode->setEnabled(Element->GetType() == ZEML_ET1_NODE);
-		Form->actAddProperty->setEnabled(Element->GetType() == ZEML_ET1_NODE);
-		Form->actAddData->setEnabled(Element->GetType() == ZEML_ET1_NODE);
-
+		Form->actAddNode->setEnabled(GetEditMode() && Element->GetType() == ZEML_ET1_NODE);
+		Form->actAddProperty->setEnabled(GetEditMode() && Element->GetType() == ZEML_ET1_NODE);
+		Form->actAddData->setEnabled(GetEditMode() && Element->GetType() == ZEML_ET1_NODE);
 		Form->wgtElementEditor->SetElement(Element);
 	}
 	else
 	{
 		Form->wgtElementEditor->SetElement(NULL);
+		Form->actAddNode->setEnabled(false);
+		Form->actAddProperty->setEnabled(false);
+		Form->actAddData->setEnabled(false);
 	}
 }
 
@@ -249,13 +251,17 @@ void ZEMLEditorWindow::ValueChanged(ZEMLProperty* Property, const ZEValue& NewVa
 
 void ZEMLEditorWindow::Select()
 {
-	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationSelection(Form->trwElementTree->selectedItems()));
+	if (Form->trwElementTree->selectedItems().size() == 1)
+		Form->wgtElementEditor->SetElement((ZEMLElement*)Form->trwElementTree->selectedItems().first()->data(0, Qt::UserRole).toULongLong());
+	else
+		Form->wgtElementEditor->SetElement(NULL);
+
 	Update();
 }
 
 void ZEMLEditorWindow::Deselect()
 {
-	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationSelection(QList<QTreeWidgetItem*>()));
+	Form->wgtElementEditor->SetElement(NULL);
 	Update();
 }
 
@@ -409,6 +415,11 @@ void ZEMLEditorWindow::Paste()
 	Update();
 }
 
+void ZEMLEditorWindow::EditMode()
+{
+	Update();
+}
+
 void ZEMLEditorWindow::AddNewNode()
 {
 	if (Form->trwElementTree->selectedItems().count() != 1)
@@ -490,6 +501,11 @@ Ui_ZEMLEditorWindow* ZEMLEditorWindow::GetForm()
 	return Form;
 }
 
+bool ZEMLEditorWindow::GetEditMode()
+{
+	return Form->actEditMode->isChecked();
+}
+
 void ZEMLEditorWindow::Update()
 {
 	ConfigureUI();
@@ -522,6 +538,8 @@ ZEMLEditorWindow::ZEMLEditorWindow()
 	connect(Form->actCopy, SIGNAL(triggered()), this, SLOT(Copy()));
 	connect(Form->actPaste, SIGNAL(triggered()), this, SLOT(Paste()));
 	connect(Form->actDeselect, SIGNAL(triggered()), this, SLOT(Deselect()));
+
+	connect(Form->actEditMode, SIGNAL(triggered()), this, SLOT(EditMode()));
 
 	connect(Form->actAddNode, SIGNAL(triggered()), this, SLOT(AddNewNode()));
 	connect(Form->actAddProperty, SIGNAL(triggered()), this, SLOT(AddNewProperty()));

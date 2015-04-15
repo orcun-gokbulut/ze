@@ -53,8 +53,10 @@ class ZEMLEditorElementWidget : public QWidget
 		ZEMLElement*			Element;
 		bool					Valid;
 
-		void					ConfigureUIProperty();
-		void					ConfigureUI();
+		void					ConfigureEditMode();
+		void					ConfigureProperty();
+		void					ConfigureForm();
+		void					Load();
 
 		int						GetTypeIndex(ZEValueType ValueType);
 		ZEValueType				GetValueType(int Index);
