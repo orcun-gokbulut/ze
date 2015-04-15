@@ -387,10 +387,10 @@ template<typename ZEItemType>
 ZEArray<ZEItemType>& ZEReference::GetArrayRef() const
 {
 	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
-	if (ValueType.Type == ZE_TT_ARRAY || ValueType.Type != Type.Type)
+	if (ValueType.ContainerType != ZE_CT_ARRAY || ValueType.Type != Type.Type)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
-	if (ValueType.SubTypeQualifier == ZE_TQ_CONST_REFERENCE)
+	if (ValueType.TypeQualifier == ZE_TQ_CONST_REFERENCE)
 		zeCriticalError("Variant is const reference. Can not convert const reference to reference.");
 
 	return *(ZEArray<ZEItemType>*)Value.Pointer;
@@ -400,7 +400,7 @@ template<typename ZEItemType>
 const ZEArray<ZEItemType>& ZEReference::GetArrayConstRef() const
 {
 	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
-	if (ValueType.Type == ZE_TT_ARRAY || ValueType.Type != Type.Type)
+	if (ValueType.ContainerType != ZE_CT_ARRAY || ValueType.Type != Type.Type)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
 	return *(const ZEArray<ZEItemType>*)Value.Pointer;

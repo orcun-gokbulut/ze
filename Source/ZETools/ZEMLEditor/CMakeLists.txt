@@ -60,8 +60,6 @@ ze_add_source(ZEOperationChangePropertyValue.cpp		Sources)
 ze_add_source(ZEOperationChangePropertyValue.h		Sources)
 ze_add_source(ZEOperationDeleteElements.cpp		Sources)
 ze_add_source(ZEOperationDeleteElements.h		Sources)
-ze_add_source(ZEOperationSelection.cpp			Sources)
-ze_add_source(ZEOperationSelection.h			Sources)
 
 qt4_wrap_ui(QtUIOutputs ${QtUIs})
 qt4_wrap_cpp(QtMocOutputs  ${QtMocs})

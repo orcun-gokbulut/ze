@@ -42,12 +42,13 @@ void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, DeclaratorDecl* PropertyD
 	if (PropertyDeclaration->getAccess() != AccessSpecifier::AS_public)
 		return;
 
+	std::string Name = PropertyDeclaration->getNameAsString();
 	ZEMCType PropertyType;
 	if (!ProcessType(PropertyType, PropertyDeclaration->getType()))
 		return;
 
 	// Only value qualified types can be container
-	if (PropertyType.TypeQualifier != ZEMC_TQ_VALUE)
+	if (PropertyType.TypeQualifier != ZEMC_TQ_VALUE && PropertyType.TypeQualifier != ZEMC_TQ_CONST_VALUE)
 		return;
 
 	ZEPointer<ZEMCProperty> PropertyData = new ZEMCProperty();
@@ -56,8 +57,157 @@ void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, DeclaratorDecl* PropertyD
 	PropertyData->IsStatic = isa<VarDecl>(PropertyDeclaration);
 	PropertyData->IsContainer = PropertyType.ContainerType != ZEMC_CT_NONE;
 	PropertyData->Type = PropertyType;
+	PropertyData->Access = PropertyType.TypeQualifier == ZEMC_TQ_VALUE ? ZEMC_PA_READ_WRITE : ZEMC_PA_READ;
 
 	ParseAttributes(PropertyData, PropertyDeclaration);
 
 	ClassData->Properties.Add(PropertyData.Transfer());
+}
+
+#define GET_ATTRIBUTE(Attributes, Name) 0
+#define CHECK_ATTRIBUTE(Attributes, Name) false
+
+static void WipeAccessor(ZEArray<ZEMCAccessor>& Accessors, ZEString Name)
+{
+	for (ZESize N = 0; N < Accessors.GetCount(); N++)
+	{
+		if (Accessors[N].Name == Name)
+		{
+			Accessors.Remove(N);
+			N--;
+		}
+	}
+}
+
+void ZEMCParser::FilterPropertyAccessors(ZEMCClass* ClassData, ZEArray<ZEMCAccessor>& Accessors)
+{
+	// Wipe Faulty Ones
+	for (ZESize I = 0; I < Accessors.GetCount(); I++)
+	{
+		for (ZESize N = 0; N < Accessors.GetCount(); N++)
+		{
+			if (N == I)
+				continue;
+
+			if (Accessors[I].Name != Accessors[N].Name)
+				continue;
+
+			if 	(Accessors[I].Type == Accessors[N].Type || Accessors[I].PropertyType != Accessors[N].PropertyType)
+			{
+				WipeAccessor(Accessors, Accessors[I].Name);
+				I = 0;
+				break;
+			}
+		}
+	}
+
+	// Wipe Already Property
+	for (ZESize I = 0; I < ClassData->Properties.GetCount(); I++)
+	{
+		for (ZESize N = 0; N < Accessors.GetCount(); N++)
+		{
+			if (ClassData->Properties[I]->Name == Accessors[N].Name)
+			{
+				WipeAccessor(Accessors, Accessors[N].Name);
+				break;
+			}
+		}
+	}
+}
+
+void ZEMCParser::ProcessPropertyAccessor(ZEArray<ZEMCAccessor>& Accessors, ZEMCMethod* MethodData)
+{
+	if (MethodData->Name.GetLength() <= 3)
+		return;
+
+	if (MethodData->CheckAttribute("NotAccessor"))
+		return;
+
+	if (MethodData->Name.Left(3) == "Set")
+	{
+		if (MethodData->Parameters.GetCount() != 1)
+			return;
+
+		ZEMCAccessor Accessor;
+		Accessor.Name = MethodData->Name.Right(MethodData->Name.GetLength() - 3);
+		Accessor.Type = ZEMC_AT_SETTER;
+		Accessor.PropertyType = MethodData->Parameters[0].Type;
+		Accessor.PropertyType.TypeQualifier = ZEMC_TQ_VALUE;
+		Accessor.Method = MethodData;
+		Accessors.Add(Accessor);
+
+	}
+	else if (MethodData->Name.Left(3) == "Get")
+	{
+		if (MethodData->Parameters.GetSize() != 0)
+			return;
+		
+		if (MethodData->ReturnValue.BaseType == ZEMC_BT_VOID)
+			return;
+
+		ZEMCAccessor Accessor;
+		Accessor.Name = MethodData->Name.Right(MethodData->Name.GetLength() - 3);
+		Accessor.Type = ZEMC_AT_GETTER;
+		Accessor.PropertyType = MethodData->ReturnValue;
+		Accessor.PropertyType.TypeQualifier = ZEMC_TQ_VALUE;
+		Accessor.Method = MethodData;
+		Accessors.Add(Accessor);
+	}
+}
+
+void ZEMCParser::ProcessPropertyAccessors(ZEMCClass* ClassData)
+{
+	ZEArray<ZEMCAccessor> Accessors;
+	const ZEArray<ZEMCMethod*>& Methods = ClassData->Methods;
+	for (ZESize I = 0; I < Methods.GetCount(); I++)
+		ProcessPropertyAccessor(Accessors, Methods[I]);
+
+	FilterPropertyAccessors(ClassData, Accessors);
+
+	for (ZESize I = 0; I < Accessors.GetCount(); I++)
+	{
+		if (Accessors[I].PropertyType.ContainerType != ZEMC_CT_NONE)
+			continue;
+
+		ZEMCAccessor& AccessorData = Accessors[I];
+		ZEMCProperty* PropertyData = NULL;
+		for (ZESize N = 0; N < ClassData->Properties.GetCount(); N++)
+		{
+			if (ClassData->Properties[N]->Name == AccessorData.Name)
+			{
+				PropertyData = ClassData->Properties[N];
+				break;
+			}
+		}
+
+		if (PropertyData == NULL)
+		{
+			PropertyData = new ZEMCProperty();
+			PropertyData->Name = AccessorData.Name;
+			PropertyData->Type = AccessorData.PropertyType;
+			PropertyData->IsContainer = AccessorData.PropertyType.ContainerType != ZEMC_CT_NONE;
+			PropertyData->Hash = PropertyData->Name.Hash();
+			ClassData->Properties.Add(PropertyData);
+		}
+
+		switch (Accessors[I].Type)
+		{
+			case ZEMC_AT_SETTER:
+				PropertyData->HasAccessors = true;
+				PropertyData->Setter = AccessorData.Method;
+				PropertyData->Access = (ZEMCPropertyAccess)(PropertyData->Access | ZEMC_PA_WRITE);
+				break;
+
+			case ZEMC_AT_GETTER:
+				PropertyData->HasAccessors = true;
+				PropertyData->Getter = AccessorData.Method;
+				PropertyData->Access = (ZEMCPropertyAccess)(PropertyData->Access | ZEMC_PA_READ);
+				break;
+
+			default:
+				break;
+		}
+	}
+
+
 }

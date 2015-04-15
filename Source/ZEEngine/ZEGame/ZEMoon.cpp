@@ -81,7 +81,7 @@ float ZEMoon::GetAmbientFactor() const
 	return AmbientFactor;
 }
 
-void ZEMoon::SetAmbientColor(ZEVector3& Color)
+void ZEMoon::SetAmbientColor(const ZEVector3& Color)
 {
 	AmbientColor = Color;
 }

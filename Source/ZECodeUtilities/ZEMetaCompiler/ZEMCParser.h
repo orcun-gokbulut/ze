@@ -46,6 +46,22 @@
 
 using namespace clang;
 
+enum ZEMCAccessorType
+{
+	ZEMC_AT_SETTER,
+	ZEMC_AT_GETTER,
+	ZEMC_AT_ADDER,
+	ZEMC_AT_REMOVER,
+};
+
+struct ZEMCAccessor
+{
+	ZEString Name;
+	ZEMCAccessorType Type;
+	ZEMCType PropertyType;
+	ZEMCMethod* Method;
+};
+
 class ZEMCParser
 {
 	friend class ZEMetaCompilerASTConsumer;
@@ -105,6 +121,9 @@ class ZEMCParser
 		bool ProcessMethodParameters(ZEMCMethod* Method, CXXMethodDecl* MethodDecl);
 		void ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDeclaration);
 
+		void FilterPropertyAccessors(ZEMCClass* Class, ZEArray<ZEMCAccessor>& Accessors);
+		void ProcessPropertyAccessor(ZEArray<ZEMCAccessor>& Accessors, ZEMCMethod* MethodData);
+		void ProcessPropertyAccessors(ZEMCClass* ClassData);
 
 	public:
 		void SetOptions(ZEMCOptions* options);

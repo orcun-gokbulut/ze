@@ -321,6 +321,8 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 		}
 	}
 
+	ProcessPropertyAccessors(ClassData);
+
 	// Give Properties Ordered IDs.
 	for (int I = 0; I < ClassData->Properties.GetCount(); I++)
 	{

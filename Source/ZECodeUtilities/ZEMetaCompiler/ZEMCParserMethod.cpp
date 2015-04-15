@@ -235,7 +235,7 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 	ZEMCType ReturnType;
 	if (!ProcessType(ReturnType, MethodDecl->getCallResultType()))
 		return;
-		
+
 	ZEPointer<ZEMCMethod> Method = new ZEMCMethod();
 	Method->Name = MethodDecl->getNameAsString();
 	Method->IsConst = MethodDecl->isConst();
@@ -262,6 +262,9 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 
 	if (isa<CXXConstructorDecl>(MethodDecl))
 	{
+		if (ClassData->IsAbstract)
+			return;
+
 		if (MethodDecl->param_size() == 0)
 			ClassData->HasPublicDefaultConstructor = true;
 

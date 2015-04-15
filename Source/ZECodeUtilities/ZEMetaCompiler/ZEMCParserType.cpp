@@ -120,7 +120,8 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 				break;
 
 			case BuiltinType::Void:
-				return false;
+				Output.BaseType = ZEMC_BT_VOID;
+				break;
 
 			default:
 				return false;
@@ -251,6 +252,10 @@ bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 			{
 				TempType.ContainerType = ZEMC_CT_CONTAINER;
 			}
+			else
+			{
+				return false;
+			}
 
 			if (TemplateType->getTemplateArgs().size() < 1)
 				return false;
@@ -268,7 +273,6 @@ bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 		}
 	}
 
-	ZEString NameOfTheThing = BaseTypePtr->getTypeClassName();
 	if (!ProcessBaseType(TempType,  BaseTypePtr))
 		return false;
 
