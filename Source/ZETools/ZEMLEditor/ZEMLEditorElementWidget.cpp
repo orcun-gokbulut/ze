@@ -36,6 +36,7 @@
 #include "ZEMLEditorElementWidget.h"
 #include "ui_ZEMLEditorElementWidget.h"
 
+#include "ZEMLEditorWindow.h"
 #include "ZEML\ZEMLElement.h"
 #include "ZEML\ZEMLNode.h"
 #include "ZEML\ZEMLProperty.h"
@@ -44,7 +45,97 @@
 
 #include <QtGui\QFileDialog>
 
-void ZEMLEditorElementWidget::ConfigureUIProperty()
+int ZEMLEditorElementWidget::GetTypeIndex(ZEValueType ValueType)
+{
+	switch (ValueType)
+	{
+		default:
+			return -1;
+		case ZE_VRT_INTEGER_8:
+			return 0;
+		case ZE_VRT_INTEGER_16:
+			return 1;
+		case ZE_VRT_INTEGER_32:
+			return 2;
+		case ZE_VRT_INTEGER_64:
+			return 3;
+		case ZE_VRT_UNSIGNED_INTEGER_8:
+			return 4;
+		case ZE_VRT_UNSIGNED_INTEGER_16:
+			return 5;
+		case ZE_VRT_UNSIGNED_INTEGER_32:
+			return 6;
+		case ZE_VRT_UNSIGNED_INTEGER_64:
+			return 7;
+		case ZE_VRT_FLOAT:
+			return 8;
+		case ZE_VRT_DOUBLE:
+			return 9;
+		case ZE_VRT_BOOLEAN:
+			return 10;
+		case ZE_VRT_STRING:
+			return 11;
+		case ZE_VRT_VECTOR2:
+			return 12;
+		case ZE_VRT_VECTOR3:
+			return 13;
+		case ZE_VRT_VECTOR4:
+			return 14;
+		case ZE_VRT_QUATERNION:
+			return 15;
+		case ZE_VRT_MATRIX3X3:
+			return 16;
+		case ZE_VRT_MATRIX4X4:
+			return 17;
+	}
+}
+
+ZEValueType ZEMLEditorElementWidget::GetValueType(int Index)
+{
+	switch (Index)
+	{
+		default:
+			return ZE_VRT_NULL;
+		case 0:
+			return ZE_VRT_INTEGER_8;
+		case 1:
+			return ZE_VRT_INTEGER_16;
+		case 2:
+			return ZE_VRT_INTEGER_32;
+		case 3:
+			return ZE_VRT_INTEGER_64;
+		case 4:
+			return ZE_VRT_UNSIGNED_INTEGER_8;
+		case 5:
+			return ZE_VRT_UNSIGNED_INTEGER_16;
+		case 6:
+			return ZE_VRT_UNSIGNED_INTEGER_32;
+		case 7:
+			return ZE_VRT_UNSIGNED_INTEGER_64;
+		case 8:
+			return ZE_VRT_FLOAT;
+		case 9:
+			return ZE_VRT_DOUBLE;
+		case 10:
+			return ZE_VRT_BOOLEAN;
+		case 11:
+			return ZE_VRT_STRING;
+		case 12:
+			return ZE_VRT_VECTOR2;
+		case 13:
+			return ZE_VRT_VECTOR3;
+		case 14:
+			return ZE_VRT_VECTOR4;
+		case 15:
+			return ZE_VRT_QUATERNION;
+		case 16:
+			return ZE_VRT_MATRIX3X3;
+		case 17:
+			return ZE_VRT_MATRIX4X4;
+	}
+}
+
+void ZEMLEditorElementWidget::ConfigureProperty()
 {
 	ZEMLProperty* Property = (ZEMLProperty*)Element;
 	
@@ -239,109 +330,19 @@ void ZEMLEditorElementWidget::ConfigureUIProperty()
 	}
 }
 
-int ZEMLEditorElementWidget::GetTypeIndex(ZEValueType ValueType)
+void ZEMLEditorElementWidget::ConfigureForm()
 {
-	switch (ValueType)
-	{
-		default:
-			return -1;
-		case ZE_VRT_INTEGER_8:
-			return 0;
-		case ZE_VRT_INTEGER_16:
-			return 1;
-		case ZE_VRT_INTEGER_32:
-			return 2;
-		case ZE_VRT_INTEGER_64:
-			return 3;
-		case ZE_VRT_UNSIGNED_INTEGER_8:
-			return 4;
-		case ZE_VRT_UNSIGNED_INTEGER_16:
-			return 5;
-		case ZE_VRT_UNSIGNED_INTEGER_32:
-			return 6;
-		case ZE_VRT_UNSIGNED_INTEGER_64:
-			return 7;
-		case ZE_VRT_FLOAT:
-			return 8;
-		case ZE_VRT_DOUBLE:
-			return 9;
-		case ZE_VRT_BOOLEAN:
-			return 10;
-		case ZE_VRT_STRING:
-			return 11;
-		case ZE_VRT_VECTOR2:
-			return 12;
-		case ZE_VRT_VECTOR3:
-			return 13;
-		case ZE_VRT_VECTOR4:
-			return 14;
-		case ZE_VRT_QUATERNION:
-			return 15;
-		case ZE_VRT_MATRIX3X3:
-			return 16;
-		case ZE_VRT_MATRIX4X4:
-			return 17;
-	}
-}
-
-ZEValueType ZEMLEditorElementWidget::GetValueType(int Index)
-{
-	switch (Index)
-	{
-		default:
-			return ZE_VRT_NULL;
-		case 0:
-			return ZE_VRT_INTEGER_8;
-		case 1:
-			return ZE_VRT_INTEGER_16;
-		case 2:
-			return ZE_VRT_INTEGER_32;
-		case 3:
-			return ZE_VRT_INTEGER_64;
-		case 4:
-			return ZE_VRT_UNSIGNED_INTEGER_8;
-		case 5:
-			return ZE_VRT_UNSIGNED_INTEGER_16;
-		case 6:
-			return ZE_VRT_UNSIGNED_INTEGER_32;
-		case 7:
-			return ZE_VRT_UNSIGNED_INTEGER_64;
-		case 8:
-			return ZE_VRT_FLOAT;
-		case 9:
-			return ZE_VRT_DOUBLE;
-		case 10:
-			return ZE_VRT_BOOLEAN;
-		case 11:
-			return ZE_VRT_STRING;
-		case 12:
-			return ZE_VRT_VECTOR2;
-		case 13:
-			return ZE_VRT_VECTOR3;
-		case 14:
-			return ZE_VRT_VECTOR4;
-		case 15:
-			return ZE_VRT_QUATERNION;
-		case 16:
-			return ZE_VRT_MATRIX3X3;
-		case 17:
-			return ZE_VRT_MATRIX4X4;
-	}
-}
-
-void ZEMLEditorElementWidget::ConfigureUI()
-{
+	Form->lblNoElementSelected->setVisible(true);
 	Form->grpElement->setVisible(false);
 	Form->grpNode->setVisible(false);
 	Form->grpProperty->setVisible(false);
 	Form->grpData->setVisible(false);
-	Form->lblNoElementSelected->setVisible(true);
 
 	if (Element == NULL)
 		return;
 
-	Form->grpElement->setVisible(true);
 	Form->lblNoElementSelected->setVisible(false);
+	Form->grpElement->setVisible(true);
 
 	Form->txtName->setText(Element->GetName().ToCString());
 	Form->lblElementSize->setText(QString::number(Element->GetSize()));
@@ -361,7 +362,7 @@ void ZEMLEditorElementWidget::ConfigureUI()
 	{
 		Form->grpProperty->setVisible(true);
 		Form->lblElementType->setText("Property");
-		ConfigureUIProperty();
+		ConfigureProperty();
 	}
 	else if (Element->GetType() == ZEML_ET_DATA)
 	{
@@ -371,6 +372,35 @@ void ZEMLEditorElementWidget::ConfigureUI()
 		ZEMLData* Data = (ZEMLData*)Element;
 		Form->lblDataSize->setText(QString::number(Data->GetDataSize()));
 	}
+}
+
+void ZEMLEditorElementWidget::ConfigureEditMode()
+{
+	bool EditMode = ZEMLEditorWindow::GetInstance()->GetEditMode();
+
+	Form->txtName->setReadOnly(!EditMode);
+	Form->cmbValueType->setEnabled(!EditMode);
+	Form->chkValueBoolean->setEnabled(!EditMode);
+	Form->txtValueString->setReadOnly(!EditMode);
+	Form->txtValueInt->setReadOnly(!EditMode);
+	Form->txtValueFloat11->setReadOnly(!EditMode);
+	Form->txtValueFloat11->setReadOnly(!EditMode);
+	Form->txtValueFloat12->setReadOnly(!EditMode);
+	Form->txtValueFloat13->setReadOnly(!EditMode);
+	Form->txtValueFloat14->setReadOnly(!EditMode);
+	Form->txtValueFloat21->setReadOnly(!EditMode);
+	Form->txtValueFloat22->setReadOnly(!EditMode);
+	Form->txtValueFloat23->setReadOnly(!EditMode);
+	Form->txtValueFloat24->setReadOnly(!EditMode);
+	Form->txtValueFloat31->setReadOnly(!EditMode);
+	Form->txtValueFloat32->setReadOnly(!EditMode);
+	Form->txtValueFloat33->setReadOnly(!EditMode);
+	Form->txtValueFloat34->setReadOnly(!EditMode);
+	Form->txtValueFloat41->setReadOnly(!EditMode);
+	Form->txtValueFloat42->setReadOnly(!EditMode);
+	Form->txtValueFloat43->setReadOnly(!EditMode);
+	Form->txtValueFloat44->setReadOnly(!EditMode);
+	Form->btnDataLoad->setEnabled(!EditMode);
 }
 
 void ZEMLEditorElementWidget::txtName_OnTextEdited(const QString& NewText)
@@ -391,7 +421,7 @@ void ZEMLEditorElementWidget::cmbValueType_OnCurrentIndexChanged(int Index)
 	Value.Clear();
 	Property->SetValue(Value);
 
-	ConfigureUI();
+	ConfigureForm();
 	
 	emit ValueChanged(Property, Property->GetValue(), OldValue);
 }
@@ -587,8 +617,12 @@ void ZEMLEditorElementWidget::btnDataSave_OnClicked()
 
 void ZEMLEditorElementWidget::SetElement(ZEMLElement* Element)
 {
+	if (this->Element == Element)
+		return;
+
 	this->Element = Element;
-	ConfigureUI();
+
+	Update();
 }
 
 ZEMLElement* ZEMLEditorElementWidget::GetElement()
@@ -598,7 +632,8 @@ ZEMLElement* ZEMLEditorElementWidget::GetElement()
 
 void ZEMLEditorElementWidget::Update()
 {
-	ConfigureUI();
+	ConfigureForm();
+	ConfigureEditMode();
 }
 
 ZEMLEditorElementWidget::ZEMLEditorElementWidget(QWidget* Parent) : QWidget(Parent)
@@ -608,7 +643,7 @@ ZEMLEditorElementWidget::ZEMLEditorElementWidget(QWidget* Parent) : QWidget(Pare
 	Form = new Ui_ZEMLEditorElementWidget();
 	Form->setupUi(this);
 
-	ConfigureUI();
+	Update();
 
 	Form->txtValueFloat11->setProperty("row", 1); Form->txtValueFloat11->setProperty("column", 1);
 	Form->txtValueFloat12->setProperty("row", 1); Form->txtValueFloat12->setProperty("column", 2);
