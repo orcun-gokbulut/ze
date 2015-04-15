@@ -81,7 +81,7 @@ class ZEMoon : public ZEEntity
 		virtual void				SetAmbientFactor(float Value);
 		float						GetAmbientFactor() const;
 		
-		virtual void				SetAmbientColor(ZEVector3& Color);
+		virtual void				SetAmbientColor(const ZEVector3& Color);
 		const ZEVector3&			GetAmbientColor() const;
 
 		virtual void				SetDirection(const ZEVector3& NewDirection);

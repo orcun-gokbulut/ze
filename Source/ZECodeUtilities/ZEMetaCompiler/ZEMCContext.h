@@ -114,8 +114,10 @@ enum ZEMCMetaOperatorType
 
 enum ZEMCPropertyAccess
 {
-	ZEMC_PA_PROTECTED,
-	ZEMC_PA_PUBLIC
+	ZEMC_PA_NONE		= 0,
+	ZEMC_PA_READ		= 1,
+	ZEMC_PA_WRITE		= 2,
+	ZEMC_PA_READ_WRITE	= 3
 };
 
 enum ZEMCTypeQualifier
@@ -135,6 +137,7 @@ enum ZEMCContainerType
 };
 
 class ZEMCEnumerator;
+class ZEMCMethod;
 
 class ZEMCType
 {
@@ -184,6 +187,9 @@ class ZEMCDeclaration
 		ZEUInt32 Hash;
 		ZEArray<ZEMCAttribute> Attributes;
 
+		bool CheckAttribute(const char* Name);
+		ZEMCAttribute* GetAttribute(const char* Name);
+
 		ZEMCDeclaration();
 		virtual ~ZEMCDeclaration();
 };
@@ -207,19 +213,22 @@ class ZEMCEnumerator : public ZEMCDeclaration
 		~ZEMCEnumerator();
 };
 
-struct ZEMCProperty : public ZEMCDeclaration
+class ZEMCProperty : public ZEMCDeclaration
 {
 	public:
 		ZESize ID;
 		ZEMCType Type;
 
-		bool HasSetterGetter;
-		ZEString Getter;
-		ZEString Setter;
-
+		bool HasAccessors;
+		ZEMCMethod* Getter;
+		ZEMCMethod* Setter;
+		ZEMCMethod* Adder;
+		ZEMCMethod* Remover;
 
 		bool IsStatic;
 		bool IsContainer;
+
+		ZEMCPropertyAccess Access;
 
 		ZEMCProperty();
 		~ZEMCProperty();
@@ -235,7 +244,7 @@ class ZEMCMethodParameter
 		~ZEMCMethodParameter();
 };
 
-struct ZEMCMethod : public ZEMCDeclaration
+class ZEMCMethod : public ZEMCDeclaration
 {
 	public:
 		ZESize ID;

@@ -610,6 +610,9 @@ bool ZEEntity::Save(ZEMLWriterNode* Serializer)
 				if (Current->Type.Type == ZE_TT_OBJECT || Current->Type.Type == ZE_TT_OBJECT_PTR)
 					continue;
 
+				if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)
+					continue;
+
 				ZEVariant Variant;
 				GetClass()->GetProperty(this, Current->ID, Variant);
 
@@ -638,7 +641,8 @@ bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 		if (Properties[I].Type == ZEML_ET_OFFSET_DATA || Properties[I].Type == ZEML_ET_INLINE_DATA)
 			continue;
 
-		GetClass()->SetProperty(this, Properties[I].Name, ZEVariant(Properties[I].Value));
+		if (!GetClass()->SetProperty(this, Properties[I].Name, ZEVariant(Properties[I].Value)))
+			zeWarning("Cannot restore property. Entity: \"%s\", Property: \"%s\".", Properties[I].Name.ToCString(), GetClass()->GetName());
 	}
 
 	return false;

@@ -98,7 +98,7 @@ ZEVector3 ZESkyDome::GetSunLightDirection() const
 	return SunLightDirection;
 }
 
-void ZESkyDome::SetSunLightWaveLenght(ZEVector3& Value)
+void ZESkyDome::SetSunLightWaveLenght(const ZEVector3& Value)
 {
 	SunLightWaveLenght = Value;
 }

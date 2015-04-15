@@ -51,7 +51,7 @@ bool ZEMCType::Equal(const ZEMCType& A, const ZEMCType& B)
 	if (A.BaseType != B.BaseType && A.TypeQualifier != B.TypeQualifier)
 		return false;
 
-	if (A.ContainerType == B.ContainerType)
+	if (A.ContainerType != B.ContainerType)
 		return false;
 
 	if (A.BaseType == ZEMC_BT_UNDEFINED)
@@ -117,6 +117,22 @@ ZEMCEnumerator::~ZEMCEnumerator()
 {
 }
 
+bool ZEMCDeclaration::CheckAttribute(const char* Name)
+{
+	return GetAttribute(Name) != NULL;
+}
+
+ZEMCAttribute* ZEMCDeclaration::GetAttribute(const char* Name)
+{
+	for (ZESize I = 0; I < Attributes.GetCount(); I++)
+	{
+		if (Attributes[I].Name == Name)
+			return &Attributes[I];
+	}
+
+	return false;
+}
+
 ZEMCDeclaration::ZEMCDeclaration()
 {
 	Hash = 0;
@@ -130,9 +146,14 @@ ZEMCDeclaration::~ZEMCDeclaration()
 ZEMCProperty::ZEMCProperty()
 {
 	ID = 0;
-	HasSetterGetter = false;
+	Access = ZEMC_PA_NONE;
+	HasAccessors = false;
 	IsStatic = false;
 	IsContainer = false;
+	Getter = NULL;
+	Setter = NULL;
+	Adder = NULL;
+	Remover = NULL;
 }
 
 ZEMCProperty::~ZEMCProperty()

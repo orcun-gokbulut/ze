@@ -522,6 +522,8 @@ void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 
 			if (CurrentMethod->IsStatic)
 				WriteToFile("%s::%s(", CurrentClass->Name.ToCString(), CurrentMethod->Name.ToCString());
+			else if (CurrentMethod->IsConstructor)
+				WriteToFile("new (CastedObject) %s(", CurrentClass->Name.ToCString());
 			else
 				WriteToFile("CastedObject->%s(", CurrentMethod->Name.ToCString());
 
@@ -546,7 +548,10 @@ void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 					N + 1 >= CurrentMethod->Parameters.GetCount() ? "" : ", ");
 			}
 			
-			WriteToFile("));\n");
+			if (CurrentMethod->ReturnValue.BaseType != ZEMC_BT_VOID)
+				WriteToFile(")");
+
+			WriteToFile(");\n");
 			WriteToFile("\t\t\treturn true;\n");
 		}
 
@@ -584,7 +589,11 @@ void ZEMCGenerator::GenerateClassWrapperMethods(ZEMCClass* CurrentClass)
 			WriteToFile("return ");
 		}
 		
-		WriteToFile("Object->%s(", CurrentMethod->Name.ToCString());
+		if (CurrentMethod->IsConstructor)
+			WriteToFile("new (Object) %s(", CurrentClass->Name.ToCString());
+		else
+			WriteToFile("Object->%s(", CurrentMethod->Name.ToCString());
+
 		for (ZESize N = 0; N < CurrentMethod->Parameters.GetCount(); N++)
 		{
 			WriteToFile("Arg%d%s",

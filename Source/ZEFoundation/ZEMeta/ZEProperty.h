@@ -44,6 +44,14 @@ class ZEClass;
 struct ZEAttribute;
 struct ZEEnum;
 
+enum ZEPropertyAccess
+{
+	ZEMT_PA_NONE		= 0,
+	ZEMT_PA_READ		= 1,
+	ZEMT_PA_WRITE		= 2,
+	ZEMT_PA_READ_WRITE	= 3
+};
+
 struct ZEProperty
 {
 	ZESize				ID;
@@ -54,11 +62,13 @@ struct ZEProperty
 	void*				OffsetOrAddress;
 	ZEType				Type;
 
+	ZEPropertyAccess	Access;
+
 	bool				IsGenerated;
 	bool				IsContainer;
 	bool				IsStatic;
 
-	ZEAttribute*	Attributes;
+	ZEAttribute*		Attributes;
 	ZESize				AttributeCount;
 };
 

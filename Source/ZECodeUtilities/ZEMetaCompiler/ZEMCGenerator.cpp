@@ -132,7 +132,7 @@ const char* ZEMCGenerator::ConvertBaseTypeToEnum(ZEMCBaseType BaseType)
 			return "ZE_TT_UNDEFINED";
 
 		case ZEMC_BT_VOID:
-			return "ZE_TT_NULL";
+			return "ZE_TT_VOID";
 
 		case ZEMC_BT_INTEGER_8:
 			return "ZE_TT_INTEGER_8";
