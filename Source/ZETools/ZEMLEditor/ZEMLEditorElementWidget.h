@@ -66,6 +66,8 @@ class ZEMLEditorElementWidget : public QWidget
 		void					txtValueString_OnTextEdited(const QString& NewText);
 		void					chkValueBoolean_OnStateChanged(int State);
 		void					txtValueFloat_OnTextEdited(const QString& NewText);
+		void					btnDataLoad_OnClicked();
+		void					btnDataSave_OnClicked();
 
 	signals:
 		void					NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);

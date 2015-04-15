@@ -317,7 +317,7 @@ bool ZEMLWriterNode::WriteData(const char* Name, const void* Data, ZEUInt64 Size
 	ZEUInt64 TempSize = ZEEndian::Little(Size);
 	File->Write(&TempSize, sizeof(ZEUInt64), 1);
 
-	if (!File->Write(Data, Size, 1) != 0)
+	if (File->Write(Data, Size, 1) == 0)
 	{
 		zeError("Cannot write ZEML file. Cannot write data property. Property Name: \"%s\". File Name: \"%s\".", Name, File->GetPath().ToCString());
 		return false;

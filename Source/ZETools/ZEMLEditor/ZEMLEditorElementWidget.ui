@@ -443,13 +443,6 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QPushButton" name="btnDataView">
-          <property name="text">
-           <string>View</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="btnDataLoad">
           <property name="text">
            <string>Load</string>

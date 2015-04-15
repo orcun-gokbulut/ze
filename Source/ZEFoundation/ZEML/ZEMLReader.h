@@ -80,6 +80,7 @@ class ZEMLReaderNode
 		ZESmartArray<ZEMLReaderProperty>	Properties;
 		
 		const ZEMLReaderProperty*	FindProperty(const char* Name);
+		bool						LoadDeprecated();
 		bool						Load();
 		 
 	public:

@@ -134,6 +134,8 @@ void ZEMLEditorWindow::RegisterRecentFile(const ZEString& FileName)
 	Settings.setValue("RecentFiles", RecentFiles);
 
 	LoadRecentFiles();
+
+	Form->mnuRecentFiles->setVisible(false);
 }
 
 void ZEMLEditorWindow::LoadRecentFiles()
@@ -309,7 +311,7 @@ void ZEMLEditorWindow::Save()
 void ZEMLEditorWindow::SaveAs()
 {
 	QString NewFileName = QFileDialog::getSaveFileName(this, 
-		"Open ZEML File", FileName.ToCString(), 
+		"Save ZEML File", FileName.ToCString(), 
 		"ZEML Based Files (*.ZEML *.ZE*);;ZEML Files (*.ZEML);;All Files (*.*)");
 
 	SaveFile(NewFileName.toUtf8().constData());
