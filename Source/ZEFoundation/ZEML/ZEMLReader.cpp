@@ -272,6 +272,301 @@ static bool LoadProperty(ZEFile* File, ZEMLElementType Type, ZEValue& Value)
 	return true;
 }
 
+static bool LoadDeprecatedProperty(ZEFile* File, ZEMLElementType Type, ZEValue& Value)
+{
+	ZEUInt64 ValueSize;
+	if (File->Read(&ValueSize, sizeof(ZEUInt64), 1) != 1)
+		return false;
+	ValueSize = ZEEndian::Little(ValueSize);
+
+	switch (Type)
+	{
+		case ZEML_ET_INT8:
+			{
+				ZEInt8 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetInt8(Temp);
+			}
+			break;
+
+		case ZEML_ET_INT16:
+			{
+				ZEInt16 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetInt16(ZEEndian::Little(Temp));
+			}
+			break;
+
+		case ZEML_ET_INT32:
+			{
+				ZEInt32 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetInt32(ZEEndian::Little(Temp));
+			}
+			break;
+
+		case ZEML_ET_INT64:
+			{
+				ZEInt64 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetInt64(ZEEndian::Little(Temp));
+			}
+			break;
+
+		case ZEML_ET_UINT8:
+			{
+				ZEUInt8 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetUInt8(Temp);
+			}
+			break;
+
+		case ZEML_ET_UINT16:
+			{
+				ZEUInt16 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetUInt16(ZEEndian::Little(Temp));
+			}
+			break;
+
+		case ZEML_ET_UINT32:
+			{
+				ZEUInt32 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetUInt32(ZEEndian::Little(Temp));
+			}
+			break;
+
+		case ZEML_ET_UINT64:
+			{
+				ZEUInt64 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetUInt64(ZEEndian::Little(Temp));
+			}
+			break;
+
+		case ZEML_ET_BOOLEAN:
+			{
+				bool Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetBoolean(Temp);
+			}
+			break;
+
+		case ZEML_ET_FLOAT:
+			{
+				float Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetFloat(Temp);
+			}
+			break;
+
+		case ZEML_ET_DOUBLE:
+			{
+				double Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetDouble(Temp);
+			}
+			break;
+
+		case ZEML_ET_STRING:
+			{
+				if (ValueSize == 0)
+				{
+					Value.SetString("");
+				}
+				else
+				{
+					ZEPointer<char> Temp = new char[ValueSize];
+					if (File->Read(Temp, ValueSize, 1) != 1)
+						return false;
+					Value.SetString(Temp);
+				}
+			}
+			break;
+
+		case ZEML_ET_QUATERNION:
+			{
+				ZEQuaternion Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetQuaternion(Temp);
+			}
+			break;
+
+		case ZEML_ET_VECTOR2:
+			{
+				ZEVector2 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetVector2(Temp);
+			}
+			break;
+
+		case ZEML_ET_VECTOR3:
+			{
+				ZEVector3 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetVector3(Temp);
+			}
+			break;
+
+		case ZEML_ET_VECTOR4:
+			{
+				ZEVector4 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetVector4(Temp);
+			}
+			break;
+
+		case ZEML_ET_MATRIX3X3:
+			{
+				ZEMatrix3x3 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetMatrix3x3(Temp);
+			}
+			break;
+
+		case ZEML_ET_MATRIX4X4:
+			{
+				ZEMatrix4x4 Temp;
+				if (File->Read(&Temp, ValueSize, 1) != 1)
+					return false;
+				Value.SetMatrix4x4(Temp);
+			}
+			break;
+
+		default:
+			return false;
+	}
+
+	return true;
+}
+
+bool ZEMLReaderNode::LoadDeprecated()
+{
+	if (VersionMajor == 0)
+	{
+		File->Seek(this->Offset, ZE_SF_BEGINING);
+
+		ZEMLElementType ElementType;
+		if (!LoadElementHeader(File, Name, ElementType) && ElementType != ZEML_ET_NODE)
+		{
+			zeError("Corrupted ZEML file. Cannot read element. File Name: \"%s\".", File->GetPath().ToCString());
+			return false;
+		}
+
+		ZEUInt64 ElementCount;
+
+		if (File->Read(&ElementCount, sizeof(ZEUInt64), 1) != 1)
+		{
+			zeError("Corrupted ZEML file. Cannot read element. File Name: \"%s\".", File->GetPath().ToCString());
+			return false;
+		}
+
+		ElementCount = ZEEndian::Little(ElementCount);
+
+		File->Read(&Size, sizeof(ZEUInt64), 1);
+		Size = ZEEndian::Little(Size);
+
+		ZEString SubElementName;
+		ZEMLElementType SubElementType;
+		for (ZESize I = 0; I < ElementCount; I++)
+		{
+			ZEUInt64 SubElementOffset = File->Tell();
+			if (!LoadElementHeader(File, SubElementName, SubElementType))
+			{
+				zeError("Corrupted ZEML file. Cannot read element. File Name: \"%s\".", File->GetPath().ToCString());
+				return false;
+			}
+
+			if (SubElementType == ZEML_ET_NODE)
+			{
+				ZEMLReaderSubNode* Node = SubNodes.Add();
+				Node->Name = SubElementName;
+				Node->Offset = SubElementOffset;
+				File->Seek(sizeof(ZEUInt64), ZE_SF_CURRENT);
+
+				if (File->Read(&Node->Size, sizeof(ZEUInt64), 1) != 1)
+				{
+					zeError("Corrupted ZEML file. Cannot read element. File Name: \"%s\".", File->GetPath().ToCString());
+					return false;
+				}
+				Node->Size = ZEEndian::Little(Node->Size);
+
+				Node->Index = 0;
+				for (ZESSize I = SubNodes.GetCount() - 1; I >= 0; I--)
+				{
+					if (&SubNodes[I] != Node && SubNodes[I].Name == Node->Name)
+						Node->Index = SubNodes[I].Index + 1;
+				}
+				File->Seek(Node->Size, ZE_SF_CURRENT);
+			}
+			else if (SubElementType == ZEML_ET_INLINE_DATA)
+			{
+				ZEMLReaderProperty* Property = Properties.Add();
+				Property->Name = SubElementName;
+				Property->Type = ZEML_ET_INLINE_DATA;
+				if (File->Read(&Property->DataSize, sizeof(ZEUInt64), 1) != 1)
+				{
+					zeError("Corrupted ZEML file. Cannot read element. File Name: \"%s\".", File->GetPath().ToCString());
+					return false;
+				}
+				Property->DataSize = ZEEndian::Little(Property->DataSize);
+				Property->DataOffset = File->Tell();
+				File->Seek(Property->DataSize, ZE_SF_CURRENT);
+			}
+			else if (SubElementType == ZEML_ET_OFFSET_DATA)
+			{
+				ZEMLReaderProperty* Property = Properties.Add();
+				Property->Name = SubElementName;
+				Property->Type = ZEML_ET_OFFSET_DATA;
+				if (File->Read(&Property->DataSize, sizeof(ZEUInt64), 1) != 1)
+				{
+					zeError("Corrupted ZEML file. Cannot read element. File Name: \"%s\".", File->GetPath().ToCString());
+					return false;
+				}
+				Property->DataSize = ZEEndian::Little(Property->DataSize);
+				if (File->Read(&Property->DataOffset, sizeof(ZEUInt64), 1) != 1)
+				{
+					zeError("Corrupted ZEML file. Cannot read element. File Name: \"%s\".", File->GetPath().ToCString());
+					return false;
+				}
+				Property->DataOffset = ZEEndian::Little(Property->DataOffset);
+			}
+			else
+			{
+				ZEMLReaderProperty* Property = Properties.Add();
+				Property->Name = SubElementName;
+				Property->Type = SubElementType;
+				if (!LoadDeprecatedProperty(File, Property->Type, Property->Value))
+				{
+					zeError("Corrupted ZEML file. Cannot read element. File Name: \"%s\".", File->GetPath().ToCString());
+					return false;
+				}
+			}
+		}
+	}
+
+	zeDebugCheck(!_CrtCheckMemory(), "Heap problem");	
+
+	return true;
+}
+
 bool ZEMLReaderNode::Load()
 {
 	File->Seek(this->Offset, ZE_SF_BEGINING);
@@ -284,27 +579,11 @@ bool ZEMLReaderNode::Load()
 	}
 
 	ZEUInt64 ElementCount;
-	if (VersionMajor == 0)
-	{
-		if (File->Read(&ElementCount, sizeof(ZEUInt64), 1) != 1)
-		{
-			zeError("Corrupted ZEML file. Cannot read element. File Name: \"%s\".", File->GetPath().ToCString());
-			return false;
-		}
+	File->Read(&Size, sizeof(ZEUInt64), 1);
+	Size = ZEEndian::Little(Size);
 
-		ElementCount = ZEEndian::Little(ElementCount);
-
-		File->Read(&Size, sizeof(ZEUInt64), 1);
-		Size = ZEEndian::Little(Size);
-	}
-	else 
-	{
-		File->Read(&Size, sizeof(ZEUInt64), 1);
-		Size = ZEEndian::Little(Size);
-
-		File->Read(&ElementCount, sizeof(ZEUInt64), 1);
-		ElementCount = ZEEndian::Little(ElementCount);
-	}
+	File->Read(&ElementCount, sizeof(ZEUInt64), 1);
+	ElementCount = ZEEndian::Little(ElementCount);
 
 	ZEString SubElementName;
 	ZEMLElementType SubElementType;
@@ -432,7 +711,7 @@ ZEMLReaderNode ZEMLReaderNode::GetSubNode(const char* Name, ZESize Index)
 				 Node.Offset = SubNodes[I].Offset;
 				 Node.VersionMajor = VersionMajor;
 				 Node.VersionMinor = VersionMinor;
-				 Node.Load();
+				 (VersionMajor == 0)?(Node.LoadDeprecated()):(Node.Load());
 				 return Node;
 			 }
 
@@ -682,6 +961,8 @@ bool ZEMLReaderNode::ReadData(const char* Name, void* Buffer, ZESize BufferSize,
 	if (EffectiveSize > BufferSize)
 		EffectiveSize = BufferSize;
 
+	File->Seek(Property->DataOffset, ZE_SF_BEGINING);
+
 	ZESize Result = File->Read(Buffer, EffectiveSize, 1);
 	if (Result != 1)
 		return false;
@@ -756,6 +1037,8 @@ bool ZEMLReader::Load()
 		RootNode.VersionMinor = Version[1];
 		RootNode.Offset = StartOffset;
 		RootNode.File = File;
+
+		return RootNode.Load();
 	}
 	else if (Identifier[0] == 'Z' && Identifier[1] == ZEML_ET_NODE)
 	{
@@ -765,14 +1048,14 @@ bool ZEMLReader::Load()
 		RootNode.VersionMinor = 0;
 		RootNode.Offset = 0;
 		RootNode.File = File;
+
+		return RootNode.LoadDeprecated();
 	}
 	else
 	{
 		zeError("Cannot read ZEML file. Corrupted ZEML file. File Name: \"%s\".", File->GetPath().ToCString());
 		return false;
 	}
-
-	return RootNode.Load();
 }
 
 ZEMLReaderNode ZEMLReader::GetRootNode()

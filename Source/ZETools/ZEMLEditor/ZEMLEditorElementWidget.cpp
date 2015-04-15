@@ -40,6 +40,9 @@
 #include "ZEML\ZEMLNode.h"
 #include "ZEML\ZEMLProperty.h"
 #include "ZEML\ZEMLData.h"
+#include "ZEFile\ZEFile.h"
+
+#include <QtGui\QFileDialog>
 
 void ZEMLEditorElementWidget::ConfigureUIProperty()
 {
@@ -357,13 +360,13 @@ void ZEMLEditorElementWidget::ConfigureUI()
 	else if (Element->GetType() == ZEML_ET_PROPERTY)
 	{
 		Form->grpProperty->setVisible(true);
-		Form->lblElementType->setText("Node");
+		Form->lblElementType->setText("Property");
 		ConfigureUIProperty();
 	}
 	else if (Element->GetType() == ZEML_ET_DATA)
 	{
 		Form->grpData->setVisible(true);
-		Form->lblElementType->setText("Node");
+		Form->lblElementType->setText("Data");
 
 		ZEMLData* Data = (ZEMLData*)Element;
 		Form->lblDataSize->setText(QString::number(Data->GetDataSize()));
@@ -533,6 +536,55 @@ void ZEMLEditorElementWidget::txtValueFloat_OnTextEdited(const QString& NewText)
 	emit ValueChanged(Property, Property->GetValue(), OldValue);
 }
 
+void ZEMLEditorElementWidget::btnDataLoad_OnClicked()
+{
+	if (Element == NULL)
+		return;
+
+	ZEMLData* Data = (ZEMLData*)Element;
+
+	QString NewFileName = QFileDialog::getOpenFileName(this, 
+		"Save Binary Data File", Data->GetName().ToCString(), 
+		"ZE Binary Files (*.ZEBIN)");
+
+	if (NewFileName.isEmpty())
+		return;
+
+	ZEFile DataFile;
+	if (!DataFile.Open(NewFileName.toUtf8().constData(), ZE_FOM_READ, ZE_FCM_NONE))
+		return;
+
+	Data->Allocate(DataFile.GetSize());
+
+	DataFile.Read(const_cast<void*>(Data->GetData()), Data->GetDataSize(), 1);
+	DataFile.Close();
+
+	Update();
+}
+
+void ZEMLEditorElementWidget::btnDataSave_OnClicked()
+{
+	if (Element == NULL)
+		return;
+
+	ZEMLData* Data = (ZEMLData*)Element;
+
+	QString NewFileName = QFileDialog::getSaveFileName(this, 
+		"Save Binary Data File", Data->GetName().ToCString(), 
+		"ZE Binary Files (*.ZEBIN);;All Files (*.*)");
+
+	if (NewFileName.isEmpty())
+		return;
+
+	ZEFile DataFile;
+	if (!DataFile.Open(NewFileName.toUtf8().constData(), ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+		return;
+	
+	DataFile.Write(Data->GetData(), Data->GetDataSize(), 1);
+	DataFile.Close();
+
+}
+
 void ZEMLEditorElementWidget::SetElement(ZEMLElement* Element)
 {
 	this->Element = Element;
@@ -597,6 +649,8 @@ ZEMLEditorElementWidget::ZEMLEditorElementWidget(QWidget* Parent) : QWidget(Pare
 	connect(Form->txtValueFloat42, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
 	connect(Form->txtValueFloat43, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
 	connect(Form->txtValueFloat44, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
+	connect(Form->btnDataSave, SIGNAL(clicked()), this, SLOT(btnDataSave_OnClicked()));
+	connect(Form->btnDataLoad, SIGNAL(clicked()), this, SLOT(btnDataLoad_OnClicked()));
 }
 
 ZEMLEditorElementWidget::~ZEMLEditorElementWidget()
