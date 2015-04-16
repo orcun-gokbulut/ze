@@ -56,16 +56,16 @@ class ZEMLNode : public ZEMLElement
 		bool						Write(ZEMLWriterNode* Writer);
 
 	public:
-		virtual ZEMLElementType1	GetType();
+		virtual ZEMLElementType		GetType();
 		virtual ZESize				GetSize();
 
 		virtual ZEMLElement*		Clone();
 
-		ZEMLElement*				GetElement(const char* Name, ZEMLElementType1 Type = ZEML_ET_ALL, ZESize Index = 0);
+		ZEMLElement*				GetElement(const char* Name, ZEMLElementType Type = ZEML_ET_ALL, ZESize Index = 0);
 
 		const ZEList<ZEMLElement>&	GetElements();
-		ZEArray<ZEMLElement*>		GetElements(ZEMLElementType1 Type);
-		ZEArray<ZEMLElement*>		GetElements(const char* Name, ZEMLElementType1 Type = ZEML_ET_ALL);
+		ZEArray<ZEMLElement*>		GetElements(ZEMLElementType Type);
+		ZEArray<ZEMLElement*>		GetElements(const char* Name, ZEMLElementType Type = ZEML_ET_ALL);
 
 		ZEMLNode*					GetNode(const char* Name, ZESize Index = 0);
 		ZEArray<ZEMLNode*>			GetNodes(const char* Name = NULL);

@@ -46,8 +46,9 @@
 
 struct ZEMLReaderProperty
 {
-	ZEMLElementType	Type;
+	ZEMLElementType	ElementType;
 	ZEString		Name;
+	ZEMLValueType	ValueType;
 	ZEValue			Value;
 	ZEUInt64		DataSize;
 	ZEUInt64		DataOffset;
@@ -80,7 +81,7 @@ class ZEMLReaderNode
 		ZESmartArray<ZEMLReaderProperty>	Properties;
 		
 		const ZEMLReaderProperty*	FindProperty(const char* Name);
-		bool						LoadDeprecated();
+		bool						LoadV0();
 		bool						Load();
 		 
 	public:

@@ -73,7 +73,7 @@ void ZEMLEditorWindow::LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node)
 		SubItem->setText(0, Iterator->GetName().ToCString());
 		switch (Iterator->GetType())
 		{
-			case ZEML_ET1_NODE:
+			case ZEML_ET_NODE:
 				LoadNode(SubItem, (ZEMLNode*)Iterator.GetItem());
 				Iterator->SetUserData(SubItem);
 				break;
@@ -224,9 +224,9 @@ void ZEMLEditorWindow::ConfigureUI()
 	if (SelectedItem == 1)
 	{
 		ZEMLElement* Element = (ZEMLElement*)Form->trwElementTree->selectedItems().first()->data(0, Qt::UserRole).toULongLong();
-		Form->actAddNode->setEnabled(GetEditMode() && Element->GetType() == ZEML_ET1_NODE);
-		Form->actAddProperty->setEnabled(GetEditMode() && Element->GetType() == ZEML_ET1_NODE);
-		Form->actAddData->setEnabled(GetEditMode() && Element->GetType() == ZEML_ET1_NODE);
+		Form->actAddNode->setEnabled(GetEditMode() && Element->GetType() == ZEML_ET_NODE);
+		Form->actAddProperty->setEnabled(GetEditMode() && Element->GetType() == ZEML_ET_NODE);
+		Form->actAddData->setEnabled(GetEditMode() && Element->GetType() == ZEML_ET_NODE);
 		Form->wgtElementEditor->SetElement(Element);
 	}
 	else
@@ -407,7 +407,7 @@ void ZEMLEditorWindow::Paste()
 		return;
 
 	ZEMLElement* SelectedElement = (ZEMLElement*)Form->trwElementTree->selectedItems()[0]->data(0, Qt::UserRole).toULongLong();
-	if (SelectedElement->GetType() != ZEML_ET1_NODE)
+	if (SelectedElement->GetType() != ZEML_ET_NODE)
 		return;
 
 	ZEOperationPaste* Paste = new ZEOperationPaste(ClipBoard, (ZEMLNode*)SelectedElement);
@@ -426,7 +426,7 @@ void ZEMLEditorWindow::AddNewNode()
 		return;
 
 	ZEMLElement* SelectedElement = (ZEMLElement*)Form->trwElementTree->selectedItems()[0]->data(0, Qt::UserRole).toULongLong();
-	if (SelectedElement->GetType() != ZEML_ET1_NODE)
+	if (SelectedElement->GetType() != ZEML_ET_NODE)
 		return;
 
 	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationAddElement((ZEMLNode*)SelectedElement, new ZEMLNode()));
@@ -439,7 +439,7 @@ void ZEMLEditorWindow::AddNewProperty()
 		return;
 
 	ZEMLElement* SelectedElement = (ZEMLElement*)Form->trwElementTree->selectedItems()[0]->data(0, Qt::UserRole).toULongLong();
-	if (SelectedElement->GetType() != ZEML_ET1_NODE)
+	if (SelectedElement->GetType() != ZEML_ET_NODE)
 		return;
 
 	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationAddElement((ZEMLNode*)SelectedElement, new ZEMLProperty()));
@@ -452,7 +452,7 @@ void ZEMLEditorWindow::AddNewData()
 		return;
 
 	ZEMLElement* SelectedElement = (ZEMLElement*)Form->trwElementTree->selectedItems()[0]->data(0, Qt::UserRole).toULongLong();
-	if (SelectedElement->GetType() != ZEML_ET1_NODE)
+	if (SelectedElement->GetType() != ZEML_ET_NODE)
 		return;
 
 	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationAddElement((ZEMLNode*)SelectedElement, new ZEMLData()));

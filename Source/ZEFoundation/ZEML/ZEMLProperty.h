@@ -47,7 +47,7 @@ class ZEMLProperty : public ZEMLElement
 		ZEValue						Value;
 
 	public:
-		virtual ZEMLElementType1	GetType();
+		virtual ZEMLElementType		GetType();
 		virtual ZESize				GetSize();
 
 		virtual ZEMLElement*		Clone();
