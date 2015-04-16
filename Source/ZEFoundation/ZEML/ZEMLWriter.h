@@ -54,7 +54,7 @@ class ZEMLWriterNode
 		ZEUInt64			SubElementCount;
 		bool				SubNodeIsOpen;
 
-		bool				WriteElementHeader(const char* Name, ZEMLElementType Type);
+		bool				WriteElementHeader(const char* Name, ZEMLElementType ElementType);
 
 	public:
 		ZEMLWriterNode		OpenSubNode(const char* Name);

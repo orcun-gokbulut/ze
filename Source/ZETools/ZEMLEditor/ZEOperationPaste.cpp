@@ -50,7 +50,7 @@ bool ZEOperationPaste::PasteToTree(ZEMLElement* Element, ZEMLNode* ParentNode)
 		ElementItem->setText(1, "Property");
 		break;
 
-	case ZEML_ET1_NODE:
+	case ZEML_ET_NODE:
 		{
 			ElementItem->setText(1, "Node");
 			ZEMLNode* Node = (ZEMLNode*)Element;

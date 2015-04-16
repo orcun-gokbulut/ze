@@ -35,7 +35,7 @@
 
 #include "ZEMLCommon.h"
 
-ZEMLElementType ZEMLUtils::ConvertType(ZEValueType Type)
+ZEMLElementTypeV0 ZEMLUtils::ConvertType(ZEValueType Type)
 {
 	switch (Type)
 	{
@@ -43,61 +43,61 @@ ZEMLElementType ZEMLUtils::ConvertType(ZEValueType Type)
 		case ZE_VRT_UNDEFINED:
 		case ZE_VRT_NULL:
 		case ZE_VRT_CLASS:
-			return ZEML_ET_UNDEFINED;
+			return ZEML_ETV0_UNDEFINED;
 
 		case ZE_VRT_FLOAT:
-			return ZEML_ET_FLOAT;
+			return ZEML_ETV0_FLOAT;
 
 		case ZE_VRT_DOUBLE:
-			return ZEML_ET_DOUBLE;
+			return ZEML_ETV0_DOUBLE;
 
 		case ZE_VRT_INTEGER_8:
-			return ZEML_ET_INT8;
+			return ZEML_ETV0_INT8;
 
 		case ZE_VRT_INTEGER_16:
-			return ZEML_ET_INT16;
+			return ZEML_ETV0_INT16;
 
 		case ZE_VRT_INTEGER_32:
-			return ZEML_ET_INT32;
+			return ZEML_ETV0_INT32;
 
 		case ZE_VRT_INTEGER_64:
-			return ZEML_ET_UINT64;
+			return ZEML_ETV0_UINT64;
 
 		case ZE_VRT_UNSIGNED_INTEGER_8:
-			return ZEML_ET_UINT8;
+			return ZEML_ETV0_UINT8;
 
 		case ZE_VRT_UNSIGNED_INTEGER_16:
-			return ZEML_ET_UINT16;
+			return ZEML_ETV0_UINT16;
 
 		case ZE_VRT_UNSIGNED_INTEGER_32:
-			return ZEML_ET_UINT32;
+			return ZEML_ETV0_UINT32;
 
 		case ZE_VRT_UNSIGNED_INTEGER_64:
-			return ZEML_ET_UINT64;
+			return ZEML_ETV0_UINT64;
 
 		case ZE_VRT_BOOLEAN:
-			return ZEML_ET_BOOLEAN;
+			return ZEML_ETV0_BOOLEAN;
 
 		case ZE_VRT_STRING:
-			return ZEML_ET_STRING;
+			return ZEML_ETV0_STRING;
 
 		case ZE_VRT_QUATERNION:
-			return ZEML_ET_QUATERNION;
+			return ZEML_ETV0_QUATERNION;
 
 		case ZE_VRT_VECTOR2:
-			return ZEML_ET_VECTOR2;
+			return ZEML_ETV0_VECTOR2;
 
 		case ZE_VRT_VECTOR3:
-			return ZEML_ET_VECTOR3;
+			return ZEML_ETV0_VECTOR3;
 
 		case ZE_VRT_VECTOR4:
-			return ZEML_ET_VECTOR4;
+			return ZEML_ETV0_VECTOR4;
 
 		case ZE_VRT_MATRIX3X3:
-			return ZEML_ET_MATRIX3X3;
+			return ZEML_ETV0_MATRIX3X3;
 
 		case ZE_VRT_MATRIX4X4:
-			return ZEML_ET_MATRIX4X4;
+			return ZEML_ETV0_MATRIX4X4;
 	}
 }
 

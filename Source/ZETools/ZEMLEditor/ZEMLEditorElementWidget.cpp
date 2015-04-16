@@ -347,14 +347,14 @@ void ZEMLEditorElementWidget::ConfigureForm()
 	Form->txtName->setText(Element->GetName().ToCString());
 	Form->lblElementSize->setText(QString::number(Element->GetSize()));
 
-	if (Element->GetType() == ZEML_ET1_NODE)
+	if (Element->GetType() == ZEML_ET_NODE)
 	{
 		Form->grpNode->setVisible(true);
 		Form->lblElementType->setText("Node");
 
 		ZEMLNode* Node = (ZEMLNode*)Element;
 		Form->lblElementCount->setText(QString::number(Node->GetElements().GetCount()));
-		Form->lblNodeCount->setText(QString::number(Node->GetElements(NULL, ZEML_ET1_NODE).GetCount()));
+		Form->lblNodeCount->setText(QString::number(Node->GetElements(NULL, ZEML_ET_NODE).GetCount()));
 		Form->lblPropertyCount->setText(QString::number(Node->GetElements(NULL, ZEML_ET_PROPERTY).GetCount()));
 		Form->lblDataCount->setText(QString::number(Node->GetElements(NULL, ZEML_ET_DATA).GetCount()));
 	}

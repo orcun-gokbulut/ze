@@ -58,7 +58,7 @@ class ZEMLData : public ZEMLElement
 		void						LoadDeferred();
 
 	public:
-		virtual ZEMLElementType1	GetType();
+		virtual ZEMLElementType		GetType();
 		virtual ZESize				GetSize();
 
 		virtual ZEMLElement*		Clone();

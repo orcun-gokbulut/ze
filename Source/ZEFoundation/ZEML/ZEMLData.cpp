@@ -54,7 +54,7 @@ void ZEMLData::LoadDeferred()
 	DeferredOffset = 0;
 }
 
-ZEMLElementType1 ZEMLData::GetType()
+ZEMLElementType ZEMLData::GetType()
 {
 	return ZEML_ET_DATA;
 }

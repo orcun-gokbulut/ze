@@ -57,7 +57,7 @@ bool ZEOperationAddElement::Apply()
 				ElementItem->setText(1, "Property");
 				break;
 
-			case ZEML_ET1_NODE:
+			case ZEML_ET_NODE:
 				SetText("Add New Node");
 				ElementItem->setText(1, "Node");
 				break;

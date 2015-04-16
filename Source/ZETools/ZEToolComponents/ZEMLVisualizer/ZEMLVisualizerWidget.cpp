@@ -170,7 +170,7 @@ void ZEMLVisualizerWidget::AddItem(ZEMLElement* Item, QTreeWidgetItem* ParentIte
 		NewItem->setBackgroundColor(2, QColor(230,230,230));
 		ZEMLNode* CurrentItem = (ZEMLNode*)Item;
 		
-		ZEArray<ZEMLElement*> Nodes = CurrentItem->GetElements(ZEML_ET1_NODE);
+		ZEArray<ZEMLElement*> Nodes = CurrentItem->GetElements(ZEML_ET_NODE);
 		ZEArray<ZEMLElement*> Properties = CurrentItem->GetElements(ZEML_ET_PROPERTY);
 		ZEArray<ZEMLElement*> Data = CurrentItem->GetElements(ZEML_ET_DATA);
 

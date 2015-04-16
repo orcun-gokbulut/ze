@@ -36,7 +36,7 @@
 #include "ZEMLProperty.h"
 #include "ZEError.h"
 
-ZEMLElementType1 ZEMLProperty::GetType()
+ZEMLElementType ZEMLProperty::GetType()
 {
 	return ZEML_ET_PROPERTY;
 }
@@ -68,7 +68,7 @@ ZEMLValueType ZEMLProperty::GetValueType()
 bool ZEMLProperty::SetValue(const ZEValue& Value)
 {
 	ZEMLValueType ValueType = ZEMLUtils::ConvertValueType(Value.GetType());
-	if (ValueType == ZEML_ET_UNDEFINED)
+	if (ValueType == ZEML_VT_UNDEFINED)
 	{
 		zeError("Cannot set ZEMLProperty value. Unsupported ZEValue type.");
 		return false;

@@ -45,7 +45,7 @@ bool ZEMLWriterNode::WriteElementHeader(const char* Name, ZEMLElementType Type)
 	if (Name == NULL)
 		return false;
 
-	if (Type == ZEML_ET_UNDEFINED)
+	if (Type == ZEML_ET_NONE)
 		return false;
 
 	if (SubNodeIsOpen)
@@ -75,95 +75,97 @@ bool ZEMLWriterNode::WriteElementHeader(const char* Name, ZEMLElementType Type)
 
 bool ZEMLWriterNode::WriteValue(const char* Name, const ZEValue& Value)
 {
-	ZEMLElementType ItemType = ZEMLUtils::ConvertType(Value.GetType());
+	ZEMLValueType ValueType = ZEMLUtils::ConvertValueType(Value.GetType());
 
-	if (!WriteElementHeader(Name, ItemType))
+	if (!WriteElementHeader(Name, ZEML_ET_PROPERTY))
 		return false;
 
-	switch (ItemType)
+	File->Write(&ValueType, sizeof(char), 1);
+
+	switch (ValueType)
 	{
 		default:
-		case ZEML_ET_UNDEFINED:
+		case ZEML_VT_UNDEFINED:
 			return false;
 
-		case ZEML_ET_FLOAT:
+		case ZEML_VT_FLOAT:
 		{
 			float ValueTemp = Value.GetFloat();
 			File->Write(&ValueTemp, sizeof(float), 1);
 			break;
 		}
 
-		case ZEML_ET_DOUBLE:
+		case ZEML_VT_DOUBLE:
 		{
 			double ValueTemp = Value.GetDouble();
 			File->Write(&ValueTemp, sizeof(double), 1);
 			break;
 		}
 
-		case ZEML_ET_INT8:
+		case ZEML_VT_INT8:
 		{
 			ZEInt8 ValueTemp = Value.GetInt8();
 			File->Write(&ValueTemp, sizeof(ZEInt8), 1);
 			break;
 		}
 
-		case ZEML_ET_INT16:
+		case ZEML_VT_INT16:
 		{
 			ZEInt16 ValueTemp = ZEEndian::Little(Value.GetInt16());
 			File->Write(&ValueTemp, sizeof(ZEInt16), 1);
 			break;
 		}
 
-		case ZEML_ET_INT32:
+		case ZEML_VT_INT32:
 		{
 			ZEInt32 ValueTemp = ZEEndian::Little(Value.GetInt32());
 			File->Write(&ValueTemp, sizeof(ZEInt32), 1);
 			break;
 		}
 
-		case ZEML_ET_INT64:
+		case ZEML_VT_INT64:
 		{
 			ZEInt64 ValueTemp = ZEEndian::Little(Value.GetInt64());
 			File->Write(&ValueTemp, sizeof(ZEInt64), 1);
 			break;
 		}
 
-		case ZEML_ET_UINT8:
+		case ZEML_VT_UINT8:
 		{
 			ZEUInt8 ValueTemp = Value.GetUInt8();
 			File->Write(&ValueTemp, sizeof(ZEUInt8), 1);
 			break;
 		}
 
-		case ZEML_ET_UINT16:
+		case ZEML_VT_UINT16:
 		{
 			ZEUInt16 ValueTemp = ZEEndian::Little(Value.GetUInt16());
 			File->Write(&ValueTemp, sizeof(ZEUInt16), 1);
 			break;
 		}
 
-		case ZEML_ET_UINT32:
+		case ZEML_VT_UINT32:
 		{
 			ZEUInt32 ValueTemp = ZEEndian::Little(Value.GetUInt32());
 			File->Write(&ValueTemp, sizeof(ZEUInt32), 1);
 			break;
 		}
 
-		case ZEML_ET_UINT64:
+		case ZEML_VT_UINT64:
 		{
 			ZEUInt64 ValueTemp = ZEEndian::Little(Value.GetUInt64());
 			File->Write(&ValueTemp, sizeof(ZEUInt64), 1);
 			break;
 		}
 
-		case ZEML_ET_BOOLEAN:
+		case ZEML_VT_BOOLEAN:
 		{
 			bool ValueTemp = Value.GetBoolean();
 			File->Write(&ValueTemp, sizeof(bool), 1);
 			break;
 		}
 
-		case ZEML_ET_STRING:
+		case ZEML_VT_STRING:
 		{
 			ZEUInt32 StringSize = ZEEndian::Little((ZEUInt32)Value.GetString().GetSize());
 			File->Write(&StringSize, sizeof(ZEUInt32), 1);
@@ -171,42 +173,42 @@ bool ZEMLWriterNode::WriteValue(const char* Name, const ZEValue& Value)
 			break;
 		}
 
-		case ZEML_ET_QUATERNION:
+		case ZEML_VT_QUATERNION:
 		{
 			ZEQuaternion ValueTemp = Value.GetQuaternion();
 			File->Write(&ValueTemp, sizeof(ZEQuaternion), 1);
 			break;
 		}
 
-		case ZEML_ET_VECTOR2:
+		case ZEML_VT_VECTOR2:
 		{
 			ZEVector2 ValueTemp = Value.GetVector2();
 			File->Write(&ValueTemp, sizeof(ZEVector2), 1);
 			break;
 		}
 
-		case ZEML_ET_VECTOR3:
+		case ZEML_VT_VECTOR3:
 		{
 			ZEVector3 ValueTemp = Value.GetVector3();
 			File->Write(&ValueTemp, sizeof(ZEVector3), 1);
 			break;
 		}
 
-		case ZEML_ET_VECTOR4:
+		case ZEML_VT_VECTOR4:
 		{
 			ZEVector4 ValueTemp = Value.GetVector4();
 			File->Write(&ValueTemp, sizeof(ZEVector4), 1);
 			break;
 		}
 
-		case ZEML_ET_MATRIX3X3:
+		case ZEML_VT_MATRIX3X3:
 		{
 			ZEMatrix3x3 ValueTemp = Value.GetMatrix3x3();
 			File->Write(&ValueTemp, sizeof(ZEMatrix3x3), 1);
 			break;
 		}
 
-		case ZEML_ET_MATRIX4X4:
+		case ZEML_VT_MATRIX4X4:
 		{
 			ZEMatrix4x4 ValueTemp = Value.GetMatrix4x4();
 			File->Write(&ValueTemp, sizeof(ZEMatrix4x4), 1);
@@ -311,7 +313,7 @@ bool ZEMLWriterNode::WriteMatrix4x4(const char* Name, const ZEMatrix4x4& Value)
 
 bool ZEMLWriterNode::WriteData(const char* Name, const void* Data, ZEUInt64 Size)
 {
-	if (!WriteElementHeader(Name, ZEML_ET_INLINE_DATA))
+	if (!WriteElementHeader(Name, ZEML_ET_DATA))
 		return false;
 
 	ZEUInt64 TempSize = ZEEndian::Little(Size);
