@@ -193,7 +193,7 @@ bool ZESkyDome::InitializeSelf()
 	// Load sky dome
 	if (SkyDomeGeometry.IsEmpty())
 	{
-		if (!SkyDomeGeometry.LoadFromFile("ZEEngine/ZEAtmosphere/Meshes/SkyDome.zeCanvas"))
+		if (!SkyDomeGeometry.LoadFromFile("#R:/ZEEngine/ZEAtmosphere/Meshes/SkyDome.zeCanvas"))
 		{
 			zeError("Cannot load sky dome geometry.");
 			return false;

@@ -84,10 +84,11 @@ const ZETexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZESt
 
 bool ZEInteriorResource::ReadInteriorFromFile(ZEFile* ResourceFile)
 { 
-	ZEMLReader InteriorReader(ResourceFile);
+	ZEMLReader InteriorReader;
+	if (!InteriorReader.Open(ResourceFile))
+		return false;
 
 	ZEMLReaderNode InteriorNode = InteriorReader.GetRootNode();
-
 	if (!InteriorNode.IsValid())
 	{
 		zeError("Can not read map file.");

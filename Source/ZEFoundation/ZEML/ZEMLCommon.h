@@ -39,35 +39,6 @@
 
 #include "ZEDS\ZEValue.h"
 
-#define ZEML_ITEM_FILE_IDENTIFIER	'Z'
-#define ZEML_MAX_NAME_SIZE			256
-
-enum ZEMLElementTypeV0
-{
-	ZEML_ETV0_UNDEFINED		= 0,
-	ZEML_ETV0_FLOAT			= 1,
-	ZEML_ETV0_DOUBLE		= 2,
-	ZEML_ETV0_INT8			= 3,
-	ZEML_ETV0_INT16			= 4,
-	ZEML_ETV0_INT32			= 5,
-	ZEML_ETV0_INT64			= 6,
-	ZEML_ETV0_UINT8			= 7,
-	ZEML_ETV0_UINT16		= 8,
-	ZEML_ETV0_UINT32		= 9,
-	ZEML_ETV0_UINT64		= 10,
-	ZEML_ETV0_BOOLEAN		= 11,
-	ZEML_ETV0_STRING		= 12,
-	ZEML_ETV0_QUATERNION	= 13,
-	ZEML_ETV0_VECTOR2		= 14,
-	ZEML_ETV0_VECTOR3		= 15,
-	ZEML_ETV0_VECTOR4		= 16,
-	ZEML_ETV0_MATRIX3X3		= 17,
-	ZEML_ETV0_MATRIX4X4		= 18,
-	ZEML_ETV0_INLINE_DATA	= 19,
-	ZEML_ETV0_OFFSET_DATA	= 20,
-	ZEML_ETV0_NODE			= 21
-};
-
 enum ZEMLValueType
 {
 	ZEML_VT_UNDEFINED		= 0,
@@ -104,7 +75,6 @@ enum ZEMLElementType
 class ZEMLUtils
 {
 	public:	
-		static ZEMLElementTypeV0 ConvertType(ZEValueType Type);
 		static ZEMLValueType ConvertValueType(ZEValueType Type);
 };
 #endif

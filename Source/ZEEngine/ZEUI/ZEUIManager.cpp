@@ -58,7 +58,7 @@ const ZEVector4& ZEUIManager::GetDefaultForegroundColor()
 
 ZEFontResource* ZEUIManager::GetDefaultFontResource()
 {
-	return ZEFontResourceDynamic::LoadSharedResource("ZEEngine\\ZEGUI\\Fonts\\arialbd.ttf", 12);
+	return ZEFontResourceDynamic::LoadSharedResource("#R:/ZEEngine/ZEGUI/Fonts/arialbd.ttf", 12);
 }
 
 ZEUIManager::ZEUIManager() 

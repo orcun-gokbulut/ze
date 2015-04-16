@@ -141,7 +141,12 @@ static bool ConvertProperty(const char* Name, ZEMLWriterNode* Serializer, ZEFile
 			char* Buffer = new char[StringSize];
 			Unserializer->Read(Buffer, sizeof(char), StringSize);
 			Buffer[StringSize - 1] = '\0';
-			Serializer->WriteString(Name, Buffer);
+
+			ZEString String = Buffer;	
+			if (String.Left(10).Upper() == "RESOURCES\\" || String.Left(10).Upper() == "RESOURCES/")
+				String = ZEString("#R:/") + String.Right(String.GetLength() - 10);
+
+			Serializer->WriteString(Name, String);
 			break;
 		}
 

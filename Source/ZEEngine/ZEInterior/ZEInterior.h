@@ -44,7 +44,7 @@
 #include "ZEGame/ZEDrawStatistics.h"
 #include "ZEGame/ZERayCast.h"
 
-enum ZEInteriorCullMode
+ZE_ENUM(ZEInteriorCullMode)
 {
 	ZE_ICM_NONE,
 	ZE_ICM_VIEW,
@@ -100,9 +100,9 @@ class ZEInterior : public ZEEntity
 		const ZEArray<ZEInteriorDoor*>&			GetDoors();
 		const ZEArray<ZEInteriorHelper*>&		GetHelpers();
 
-		ZEInteriorRoom*							GetRoom(const char* Name);
-		ZEInteriorDoor*							GetDoor(const char* Name);
-		ZEInteriorHelper*						GetHelper(const char* Name);
+		ZEInteriorRoom*							GetRoom(const ZEString& Name);
+		ZEInteriorDoor*							GetDoor(const ZEString& Name);
+		ZEInteriorHelper*						GetHelper(const ZEString& Name);
 
 		const ZEInteriorStatistics&				GetStatistics() const;
 
@@ -110,8 +110,8 @@ class ZEInterior : public ZEEntity
 
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
 
-		virtual void							SetInteriorFile(const char* InteriorFile);
-		virtual const char*						GetInteriorFile() const;
+		virtual void							SetInteriorFile(const ZEString& InteriorFile);
+		virtual const ZEString&					GetInteriorFile() const;
 
 		void									SetInteriorResource(const ZEInteriorResource* InteriorResource);	
 		const ZEInteriorResource*				GetInteriorResource();
