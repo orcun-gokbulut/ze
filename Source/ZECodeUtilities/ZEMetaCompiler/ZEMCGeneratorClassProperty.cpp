@@ -268,7 +268,7 @@ void ZEMCGenerator::GenerateClassGetPropertyId(ZEMCClass* CurrentClass)
 
 		WriteToFile("\t};\n\n");
 
-		WriteToFile("\treturn Search(SortedProperties, %d, PropertyName);\n", CurrentClass->Methods.GetCount());
+		WriteToFile("\treturn Search(SortedProperties, %d, PropertyName);\n", CurrentClass->Properties.GetCount());
 	}
 	else
 	{

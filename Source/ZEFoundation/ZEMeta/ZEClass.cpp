@@ -41,22 +41,37 @@
 ZESSize ZEClass::Search(ZEClassSortedData* Data, ZESize DataSize, const ZEString& Name)
 {
 	ZESize Hash = Name.Hash();
-	ZESize LeftmostIndex = 0, RightmostIndex = 12, MiddleIndex;
+	ZESSize LowIndex = 0, HighIndex = DataSize, MiddleIndex;
 
-	//Binary Search Algorithm
-	while (RightmostIndex >= LeftmostIndex)
+	while (LowIndex < HighIndex)
 	{
-		MiddleIndex = (LeftmostIndex + RightmostIndex) / 2;
+		MiddleIndex = (LowIndex + HighIndex) / 2;
 		if (Data[MiddleIndex].Hash < Hash)
-			LeftmostIndex  = MiddleIndex + 1;
-		else if (Data[MiddleIndex].Hash > Hash)
-			RightmostIndex = MiddleIndex - 1;
+			LowIndex  = MiddleIndex + 1;
 		else
-			break;
+			HighIndex = MiddleIndex;
 	}
 
-	if (Name == Data[MiddleIndex].Name)
-		return Data[MiddleIndex].ID;
+	if (LowIndex == HighIndex)
+	{
+		for (ZESSize I = LowIndex; I < DataSize; I++)
+		{
+			if (Data[LowIndex].Hash != Hash)
+				break;
+
+			if (Name == Data[LowIndex].Name)
+				return Data[LowIndex].ID;
+		}
+
+		for (ZESSize I = LowIndex - 1; I >= 0; I--)
+		{
+			if (Data[LowIndex].Hash != Hash)
+				break;
+
+			if (Name == Data[LowIndex].Name)
+				return Data[LowIndex].ID;
+		}
+	}
 
 	return -1;
 }

@@ -636,14 +636,14 @@ bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 	ZEMLReaderNode PropertiesNode = Unserializer->GetSubNode("Properties");
 	const ZESmartArray<ZEMLReaderProperty>& Properties = PropertiesNode.GetProperties();
 
-	for (ZESize I = 0; I < Properties.GetSize(); I++)
+	for (ZESize I = 0; I < Properties.GetCount(); I++)
 	{
 		if (Properties[I].Type == ZEML_ET_OFFSET_DATA || Properties[I].Type == ZEML_ET_INLINE_DATA)
 			continue;
 
 		if (!GetClass()->SetProperty(this, Properties[I].Name, ZEVariant(Properties[I].Value)))
-			zeWarning("Cannot restore property. Entity: \"%s\", Property: \"%s\".", Properties[I].Name.ToCString(), GetClass()->GetName());
+			zeWarning("Cannot restore property. Entity: \"%s\", Property: \"%s\".", GetClass()->GetName(), Properties[I].Name.ToCString());
 	}
 
-	return false;
+	return true;
 }
