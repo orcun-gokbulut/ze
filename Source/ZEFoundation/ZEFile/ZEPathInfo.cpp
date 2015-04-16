@@ -49,6 +49,12 @@ void ZEPathInfo::SetPath(const char* Path)
 
 void ZEPathInfo::SetRelativePath(const char* ParentPath, const char* RelativePath)
 {
+	if (RelativePath == NULL || RelativePath[0] == '\0')
+	{
+		Path = "";
+		return;
+	}
+
 	ZEPathInfo ParentPathInfo = ZEPathInfo(ParentPath);
 	if (ParentPathInfo.IsFile()) // Relative To File
 	{

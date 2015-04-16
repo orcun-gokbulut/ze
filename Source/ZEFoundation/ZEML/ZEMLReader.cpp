@@ -37,6 +37,9 @@
 #include "ZEEndian.h"
 #include "ZEPointer\ZEPointer.h"
 
+#define ZEML_ITEM_FILE_IDENTIFIER	'Z'
+#define ZEML_MAX_NAME_SIZE			256
+
 ZEMLReaderProperty::ZEMLReaderProperty()
 {
 	ElementType = ZEML_ET_NONE;
@@ -670,6 +673,7 @@ ZEMLReaderNode::ZEMLReaderNode()
 	Offset = -1;
 	Size = 0;
 	VersionMajor = 0;
+	VersionMinor = 0;
 }
 
 bool ZEMLReader::Load()
@@ -734,7 +738,7 @@ bool ZEMLReader::Load()
 
 		return RootNode.Load();
 	}
-	else if (Identifier[0] == 'Z' && Identifier[1] == ZEML_ETV0_NODE)
+	else if (Identifier[0] == 'Z' && Identifier[1] == 21)
 	{
 		// Version 0
 		zeWarning("Old depricated ZEML file version detected. Please convert this file to new version for future compability. Current Version: 1.0. Detected Version: 0.0. File Name: \"%s\".", File->GetPath().ToCString());
@@ -807,11 +811,6 @@ ZEMLReader::ZEMLReader()
 	File = NULL;
 	VersionMajor = 0;
 	VersionMinor = 0;
-}
-
-ZEMLReader::ZEMLReader(ZEFile* File)
-{
-	this->File = File;
 }
 
 ZEMLReader::~ZEMLReader()

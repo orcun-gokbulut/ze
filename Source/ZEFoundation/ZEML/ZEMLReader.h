@@ -148,7 +148,6 @@ class ZEMLReader
 		void						Close();
 
 									ZEMLReader();
-									ZEMLReader(ZEFile* File);
 									~ZEMLReader();
 };
 

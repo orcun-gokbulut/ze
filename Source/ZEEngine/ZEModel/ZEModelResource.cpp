@@ -41,7 +41,6 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEFile/ZEFileInfo.h"
-#include "ZEML/ZEMLSerialReader.h"
 #include "ZEML/ZEMLReader.h"
 
 #include <memory.h>
@@ -699,10 +698,12 @@ bool ZEModelResource::ReadAnimations(ZEMLReaderNode* AnimationsNode)
 
 bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
 {
-	ZEMLReader ModelReader(ResourceFile);
+	ZEMLReader ModelReader;
+	
+	if (!ModelReader.Open(ResourceFile))
+		return false;
 
 	ZEMLReaderNode ModelNode = ModelReader.GetRootNode();
-
 	if (!ModelNode.IsValid())
 		return false;
 

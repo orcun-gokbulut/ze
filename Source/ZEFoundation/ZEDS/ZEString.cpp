@@ -1222,11 +1222,13 @@ ZEString ZEString::Left(ZESize Count) const
 	if (Count == 0)
 		return ZEString();
 
+	if (Buffer == NULL)
+		return ZEString();
+
+	if (Count >= strlen(Buffer))
+		return *this;
+
 	ZESize ByteCount = GetBytePosition(Buffer, Count);
-
-	zeDebugCheck(Buffer == NULL, "Buffer is empty.");
-	zeDebugCheck(ByteCount >  strlen(Buffer), "Position is bigger than string length.");
-
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (ByteCount + 1) * sizeof(char));
 	memcpy(Temp.Buffer, Buffer, ByteCount * sizeof(char));
@@ -1242,9 +1244,12 @@ ZEString ZEString::Right(ZESize Count) const
 	if (Count == 0)
 		return ZEString();
 
-	zeDebugCheck(Buffer == NULL, "Buffer is empty.");
+	if (Buffer == NULL)
+		return ZEString();
 
 	ZESize ByteLength = strlen(Buffer);
+	if (Count >= ByteLength)
+		return *this;
 
 	char* CountBuffer = Buffer + ByteLength;
 

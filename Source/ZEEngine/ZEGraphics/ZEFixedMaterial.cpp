@@ -314,6 +314,9 @@ void ZEFixedMaterial::SetBaseMapFile(const char* Filename)
 		BaseMapResource = NULL;
 	}
 
+	if (Filename == NULL || Filename[0] == '\0')
+		return;
+
 	BaseMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
 	if (BaseMapResource == NULL)
@@ -424,6 +427,9 @@ void ZEFixedMaterial::SetSpecularMapFile(const char* Filename)
 		SpecularMapResource = NULL;
 	}
 
+	if (Filename == NULL || Filename[0] == '\0')
+		return;
+
 	SpecularMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
 	if (SpecularMapResource != NULL)
@@ -524,6 +530,9 @@ void ZEFixedMaterial::SetEmmisiveMapFile(const char* Filename)
 		EmmisiveMapResource = NULL;
 	}
 
+	if (Filename == NULL || Filename[0] == '\0')
+		return;
+
 	EmmisiveMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
 	if (EmmisiveMapResource != NULL)
@@ -609,6 +618,9 @@ void ZEFixedMaterial::SetNormalMapFile(const char* Filename)
 		NormalMapResource = NULL;
 	}
 
+	if (Filename == NULL || Filename[0] == '\0')
+		return;
+
 	NormalMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
 	if (NormalMapResource != NULL)
@@ -676,6 +688,9 @@ void ZEFixedMaterial::SetParallaxMapFile(const char* Filename)
 		ParallaxMapResource->Release();
 		ParallaxMapResource = NULL;
 	}
+
+	if (Filename == NULL || Filename[0] == '\0')
+		return;
 
 	ParallaxMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
@@ -798,6 +813,9 @@ void ZEFixedMaterial::SetOpacityMapFile(const char* Filename)
 		OpacityMapResource = NULL;
 	}
 
+	if (Filename == NULL || Filename[0] == '\0')
+		return;
+
 	OpacityMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
 	if (OpacityMapResource != NULL)
@@ -865,6 +883,9 @@ void ZEFixedMaterial::SetEnvironmentMapFile(const char* Filename)
 		EnvironmentMapResource->Release();
 		EnvironmentMapResource = NULL;
 	}
+
+	if (Filename == NULL || Filename[0] == '\0')
+		return;
 
 	EnvironmentMapResource = ZETextureCubeResource::LoadSharedResource(Filename);
 
@@ -1015,6 +1036,9 @@ void ZEFixedMaterial::SetDetailBaseMapFile(const char* Filename)
 		DetailBaseMapResource = NULL;
 	}
 
+	if (Filename == NULL || Filename[0] == '\0')
+		return;
+
 	DetailBaseMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
 	if (DetailBaseMapResource != NULL)
@@ -1087,6 +1111,9 @@ void ZEFixedMaterial::SetDetailNormalMapFile(const char* Filename)
 		DetailNormalMapResource->Release();
 		DetailNormalMapResource = NULL;
 	}
+
+	if (Filename == NULL || Filename[0] == '\0')
+		return;
 
 	DetailNormalMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
@@ -1164,6 +1191,9 @@ void ZEFixedMaterial::SetLightMapFile(const char* Filename)
 		LightMapResource->Release();
 		LightMapResource = NULL;
 	}
+
+	if (Filename == NULL || Filename[0] == '\0')
+		return;
 
 	LightMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
@@ -1247,6 +1277,9 @@ void ZEFixedMaterial::SetDistortionMapFile(const char* Filename)
 		DistortionMapResource->Release();
 		DistortionMapResource = NULL;
 	}
+
+	if (Filename == NULL || Filename[0] == '\0')
+		return;
 
 	DistortionMapResource = ZETexture2DResource::LoadSharedResource(Filename);
 
@@ -1424,7 +1457,10 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
 		zeError("Can not open given file. File : %s", FilePath.ToCString());
 
-	ZEMLReader MaterialReader(&File);
+
+	ZEMLReader MaterialReader;
+	if (!MaterialReader.Open(&File))
+		return;
 
 	ZEMLReaderNode MaterialNode = MaterialReader.GetRootNode();
 
@@ -1511,56 +1547,16 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		SetLightMapAddressModeU((ZETextureAddressMode)ConfigurationNode.ReadInt32("LightMapAddressModeU"));
 		SetLightMapAddressModeV((ZETextureAddressMode)ConfigurationNode.ReadInt32("LightMapAddressModeV"));
 
-		if (ConfigurationNode.IsPropertyExists("BaseMap"))
-		{
-			SetBaseMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("BaseMap")).GetPath());
-		}
-
-		if (ConfigurationNode.IsPropertyExists("NormalMap"))
-		{
-			SetNormalMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("NormalMap")).GetPath());
-		}
-
-		if (ConfigurationNode.IsPropertyExists("ParallaxMap"))
-		{
-			SetParallaxMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("ParallaxMap")).GetPath());
-		}
-
-		if (ConfigurationNode.IsPropertyExists("SpecularMap"))
-		{
-			SetSpecularMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("SpecularMap")).GetPath());
-		}
-
-		if (ConfigurationNode.IsPropertyExists("EmmisiveMap"))
-		{
-			SetEmmisiveMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("EmmisiveMap")).GetPath());
-		}
-
-		if (ConfigurationNode.IsPropertyExists("OpacityMap"))
-		{
-			SetOpacityMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("OpacityMap")).GetPath());
-		}
-
-		if (ConfigurationNode.IsPropertyExists("DetailBaseMap"))
-		{
-			SetDetailBaseMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("DetailBaseMap")).GetPath());
-		}
-
-		if (ConfigurationNode.IsPropertyExists("DetailNormalMap"))
-		{
-			SetDetailNormalMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("DetailNormalMap")).GetPath());
-		}
-
-		if (ConfigurationNode.IsPropertyExists("EnvironmentMap"))
-		{
-			SetEnvironmentMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("EnvironmentMap")).GetPath());
-		}
-
-		if (ConfigurationNode.IsPropertyExists("LightMap"))
-		{
-			SetLightMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("LightMap")).GetPath());
-		}
-
+		SetBaseMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("BaseMap")).GetPath());
+		SetNormalMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("NormalMap", "")).GetPath());
+		SetParallaxMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("ParallaxMap")).GetPath());
+		SetSpecularMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("SpecularMap")).GetPath());
+		SetEmmisiveMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("EmmisiveMap")).GetPath());
+		SetOpacityMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("OpacityMap")).GetPath());
+		SetDetailBaseMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("DetailBaseMap")).GetPath());
+		SetDetailNormalMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("DetailNormalMap")).GetPath());
+		SetEnvironmentMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("EnvironmentMap")).GetPath());
+		SetLightMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("LightMap")).GetPath());
 	}
 
 	MaterialReader.Close();
