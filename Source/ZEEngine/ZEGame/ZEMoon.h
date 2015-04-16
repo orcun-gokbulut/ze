@@ -72,11 +72,11 @@ class ZEMoon : public ZEEntity
 		virtual void				SetPhase(float Phase);
 		float						GetPhase() const;
 
-		virtual void				SetScale(float Scale);
-		float						GetScale() const;
+		virtual void				SetMoonScale(float Scale);
+		float						GetMoonScale() const;
 		
-		virtual void				SetRotation(float Rotation);
-		float						GetRotation() const;
+		virtual void				SetMoonRotation(float Rotation);
+		float						GetMoonRotation() const;
 
 		virtual void				SetAmbientFactor(float Value);
 		float						GetAmbientFactor() const;

@@ -52,12 +52,14 @@ void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, DeclaratorDecl* PropertyD
 		return;
 
 	ZEPointer<ZEMCProperty> PropertyData = new ZEMCProperty();
+	PropertyData->Class = ClassData;
 	PropertyData->Name = PropertyDeclaration->getNameAsString();
 	PropertyData->Hash = PropertyData->Name.Hash();
 	PropertyData->IsStatic = isa<VarDecl>(PropertyDeclaration);
 	PropertyData->IsContainer = PropertyType.ContainerType != ZEMC_CT_NONE;
 	PropertyData->Type = PropertyType;
 	PropertyData->Access = PropertyType.TypeQualifier == ZEMC_TQ_VALUE ? ZEMC_PA_READ_WRITE : ZEMC_PA_READ;
+	
 
 	ParseAttributes(PropertyData, PropertyDeclaration);
 
@@ -183,6 +185,7 @@ void ZEMCParser::ProcessPropertyAccessors(ZEMCClass* ClassData)
 		if (PropertyData == NULL)
 		{
 			PropertyData = new ZEMCProperty();
+			PropertyData->Class = ClassData;
 			PropertyData->Name = AccessorData.Name;
 			PropertyData->Type = AccessorData.PropertyType;
 			PropertyData->IsContainer = AccessorData.PropertyType.ContainerType != ZEMC_CT_NONE;

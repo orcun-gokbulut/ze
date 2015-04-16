@@ -236,28 +236,29 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 	if (!ProcessType(ReturnType, MethodDecl->getCallResultType()))
 		return;
 
-	ZEPointer<ZEMCMethod> Method = new ZEMCMethod();
-	Method->Name = MethodDecl->getNameAsString();
-	Method->IsConst = MethodDecl->isConst();
-	Method->IsVirtual = MethodDecl->isVirtual();
-	Method->IsPure = MethodDecl->isPure();
-	Method->IsOperator = MethodDecl->isOverloadedOperator();
-	Method->IsStatic = MethodDecl->isStatic();
-	Method->IsEvent = false;
-	Method->Hash = Method->Name.Hash();
-	Method->ReturnValue = ReturnType;
+	ZEPointer<ZEMCMethod> MethodData = new ZEMCMethod();
+	MethodData->Class = ClassData;
+	MethodData->Name = MethodDecl->getNameAsString();
+	MethodData->IsConst = MethodDecl->isConst();
+	MethodData->IsVirtual = MethodDecl->isVirtual();
+	MethodData->IsPure = MethodDecl->isPure();
+	MethodData->IsOperator = MethodDecl->isOverloadedOperator();
+	MethodData->IsStatic = MethodDecl->isStatic();
+	MethodData->IsEvent = false;
+	MethodData->Hash = MethodData->Name.Hash();
+	MethodData->ReturnValue = ReturnType;
 
-	ParseAttributes(Method, MethodDecl);
+	ParseAttributes(MethodData, MethodDecl);
 
 	if (MethodDecl->isCopyAssignmentOperator())
 	{
-		Method->IsOperator = true;
-		Method->OperatorType = ZEMC_MOT_ASSIGNMENT;
+		MethodData->IsOperator = true;
+		MethodData->OperatorType = ZEMC_MOT_ASSIGNMENT;
 		
-		if (Method->ReturnValue.TypeQualifier == ZEMC_TQ_VALUE)
-			Method->ReturnValue.TypeQualifier = ZEMC_TQ_REFERENCE;
-		else if (Method->ReturnValue.TypeQualifier == ZEMC_TQ_CONST_VALUE)
-			Method->ReturnValue.TypeQualifier = ZEMC_TQ_CONST_REFERENCE;
+		if (MethodData->ReturnValue.TypeQualifier == ZEMC_TQ_VALUE)
+			MethodData->ReturnValue.TypeQualifier = ZEMC_TQ_REFERENCE;
+		else if (MethodData->ReturnValue.TypeQualifier == ZEMC_TQ_CONST_VALUE)
+			MethodData->ReturnValue.TypeQualifier = ZEMC_TQ_CONST_REFERENCE;
 	}
 
 	if (isa<CXXConstructorDecl>(MethodDecl))
@@ -268,16 +269,19 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 		if (MethodDecl->param_size() == 0)
 			ClassData->HasPublicDefaultConstructor = true;
 
-		Method->IsConstructor = true;
+		MethodData->IsConstructor = true;
 	}
 			
-	if (Method->IsOperator)
-		Method->OperatorType = GetOperatorType(MethodDecl->getOverloadedOperator());
+	if (MethodData->IsOperator)
+		MethodData->OperatorType = GetOperatorType(MethodDecl->getOverloadedOperator());
 
-	if (!ProcessMethodParameters(Method, MethodDecl))
+	if (MethodData->IsOperator || MethodData->IsConstructor || isa<CXXDestructorDecl>(MethodDecl))
+		return;
+	
+	if (!ProcessMethodParameters(MethodData, MethodDecl))
 		return;
 
-	ClassData->Methods.Add(Method.Transfer());
+	ClassData->Methods.Add(MethodData.Transfer());
 }
 
 bool ZEMCParser::ProcessEvenParameters(ZEMCMethod* Method, CXXRecordDecl* EventTemplate)
@@ -315,15 +319,16 @@ void ZEMCParser::ProcessEvent(ZEMCClass* ClassData, DeclaratorDecl* EventDeclara
 	if(!EventDeclaration->getType()->isClassType() || EventDeclaration->getType()->getAsCXXRecordDecl()->getNameAsString() != "ZEEvent")
 		return;
 
-	ZEPointer<ZEMCMethod> Method = new ZEMCMethod();
-	Method->Name = EventDeclaration->getName();
-	Method->Hash = Method->Name.Hash();
-	Method->IsEvent = true;
-	Method->IsStatic = llvm::cast<FieldDecl>(EventDeclaration) == NULL;
+	ZEPointer<ZEMCMethod> MethodData = new ZEMCMethod();
+	MethodData->Class = ClassData;
+	MethodData->Name = EventDeclaration->getName();
+	MethodData->Hash = MethodData->Name.Hash();
+	MethodData->IsEvent = true;
+	MethodData->IsStatic = llvm::cast<FieldDecl>(EventDeclaration) == NULL;
 
 
-	if (!ProcessEvenParameters(Method, EventDeclaration->getType()->getAsCXXRecordDecl()))
+	if (!ProcessEvenParameters(MethodData, EventDeclaration->getType()->getAsCXXRecordDecl()))
 		return;
 
-	ClassData->Methods.Add(Method.Transfer());
+	ClassData->Methods.Add(MethodData.Transfer());
 }

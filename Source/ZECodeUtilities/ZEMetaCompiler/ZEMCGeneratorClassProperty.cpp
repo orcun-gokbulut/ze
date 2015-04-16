@@ -148,11 +148,10 @@ void ZEMCGenerator::GenerateClassGetProperties_Properties(ZEMCClass* CurrentClas
 		WriteToFile("\t\t{");
 
 		WriteToFile("%d, ", CurrentProperty->ID);
-		if (!CurrentClass->IsBuiltInClass)
-			WriteToFile("%s::Class(), ", CurrentClass->Name.ToCString());
+		if (CurrentProperty->Class != NULL)
+			WriteToFile("%s::Class(), ", CurrentProperty->Class->Name.ToCString());
 		else
 			WriteToFile("NULL, ");
-
 		WriteToFile("\"%s\", ",	CurrentProperty->Name.ToCString());
 		WriteToFile("%#x, ", CurrentProperty->Name.Hash());
 
@@ -241,30 +240,17 @@ void ZEMCGenerator::GenerateClassGetProperties(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassGetPropertyId(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"ZESize %sClass::GetPropertyId(ZEString PropertyName)\n"
+		"ZESize %sClass::GetPropertyId(const ZEString& PropertyName)\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
 
-	if (CurrentClass->Properties.GetCount() == 0)
-	{
-		WriteToFile("\treturn -1;\n");
-	}
-	else
+	if (CurrentClass->Properties.GetCount() != 0)
 	{
 		ZEArray<ZEMCProperty*> sortedProperties = CurrentClass->Properties;
 		sortedProperties.Sort(PropertySortOperator);
 
 		WriteToFile(
-			"\tstruct ZESortedPropertyData\n"
-			"\t{\n"
-			"\t\tZESize\t\tHash;\n"
-			"\t\tZESize\t\t\tID;\n"
-			"\t\tconst char*\t\tPropertyName;\n"
-			"\t};\n\n", 
-			CurrentClass->Name);
-
-		WriteToFile(
-			"\tstatic ZESortedPropertyData SortedProperties[%d] = \n"
+			"\tstatic ZEClassSortedData SortedProperties[%d] = \n"
 			"\t{\n"
 			"\t\t//{Hash, ID, PropertyName}\n", 
 			sortedProperties.GetCount());
@@ -282,24 +268,11 @@ void ZEMCGenerator::GenerateClassGetPropertyId(ZEMCClass* CurrentClass)
 
 		WriteToFile("\t};\n\n");
 
-		WriteToFile(
-			"\tZESize Hash = PropertyName.Hash();\n"
-			"\tZESize LeftmostIndex = 0, RightmostIndex = %d, MiddleIndex;\n"
-			"\twhile (RightmostIndex >= LeftmostIndex)\n"
-			"\t{\n"
-			"\t\tMiddleIndex = (LeftmostIndex + RightmostIndex) / 2;\n"
-			"\t\tif (SortedProperties[MiddleIndex].Hash < Hash)\n"
-			"\t\t\tLeftmostIndex  = MiddleIndex + 1;\n"
-			"\t\telse if (SortedProperties[MiddleIndex].Hash > Hash)\n"
-			"\t\t\tRightmostIndex = MiddleIndex - 1;\n"
-			"\t\telse\n"
-			"\t\t\tbreak;\n"
-			"\t}\n\n"
-			"\tif (PropertyName == SortedProperties[MiddleIndex].PropertyName)\n"
-			"\t\treturn SortedProperties[MiddleIndex].ID;\n"
-			"\n"
-			"\treturn -1;\n", 
-			sortedProperties.GetCount() - 1);
+		WriteToFile("\treturn Search(SortedProperties, %d, PropertyName);\n", CurrentClass->Methods.GetCount());
+	}
+	else
+	{
+		WriteToFile("\treturn -1;\n");
 	}
 
 	WriteToFile("}\n\n");
@@ -623,7 +596,7 @@ void ZEMCGenerator::GenerateClassAddItemToProperty(ZEMCClass* CurrentClass)
 		{
 			ZEMCProperty* CurrentProperty = CurrentClass->Properties[I];
 			if (!CurrentProperty->IsContainer)
-				continue;;
+				continue;
 
 			WriteToFile("\t\tcase %d:\n", CurrentProperty->ID);
 			if (CurrentProperty->IsStatic)

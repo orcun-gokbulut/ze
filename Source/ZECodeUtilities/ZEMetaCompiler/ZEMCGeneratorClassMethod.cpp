@@ -188,7 +188,6 @@ void ZEMCGenerator::GenerateClassGetMethods_Attributes(ZEMCClass* CurrentClass)
 			}
 
 			WriteToFile("};\n\n");
-			
 		}
 
 		// Attributes
@@ -267,9 +266,8 @@ void ZEMCGenerator::GenerateClassGetMethods_Methods(ZEMCClass* CurrentClass)
 		WriteToFile("%d, ", CurrentMethod->ID);
 		WriteToFile("\"%s\", ", CurrentMethod->Name.ToCString());
 		WriteToFile("%#x, ", CurrentMethod->Name.Hash());
-		
-		if (!CurrentClass->IsBuiltInClass)
-			WriteToFile("%s::Class(), ", CurrentClass->Name.ToCString());
+		if (CurrentMethod->Class != NULL)
+			WriteToFile("%s::Class(), ", CurrentMethod->Class->Name.ToCString());
 		else
 			WriteToFile("NULL, ");
 
@@ -349,24 +347,15 @@ void ZEMCGenerator::GenerateClassGetMethodId(ZEMCClass* CurrentClass)
 		return;
 
 	WriteToFile(
-		"ZESize %sClass::GetMethodId(ZEString MethodName, ZESize OverloadIndex)\n"
+		"ZESize %sClass::GetMethodId(const ZEString& MethodName, ZESize OverloadIndex)\n"
 		"{\n", CurrentClass->Name.ToCString());
 
 	if (CurrentClass->Methods.GetCount() != 0)
 	{
-		WriteToFile(
-			"\tstruct ZESortedMethodData\n"
-			"\t{\n"
-			"\t\tZEUInt32\t\tHash;\n"
-			"\t\tZESize\t\t\tID;\n"
-			"\t\tconst char*\t\tMethodName;\n"
-			"\t};\n\n", 
-			CurrentClass->Name);
-
 		if (CurrentClass->Methods.GetCount() > 0)
 		{
 			WriteToFile(
-				"\tstatic ZESortedMethodData SortedMethods[%d] = \n"
+				"\tstatic ZEClassSortedData SortedMethods[%d] = \n"
 				"\t{\n"
 				"\t\t//{Hash, ID, MethodName}\n", 
 				CurrentClass->Methods.GetCount());
@@ -382,31 +371,17 @@ void ZEMCGenerator::GenerateClassGetMethodId(ZEMCClass* CurrentClass)
 				CurrentMethod->Name.ToCString(),
 				I < CurrentClass->Methods.GetCount() - 1 ? "," : "");
 		}
-
 		WriteToFile("\t};\n\n");
 
-		WriteToFile(
-			"\tZESize Hash = MethodName.Hash();\n\n"
-			"\tZESize LeftmostIndex = 0, RightmostIndex = %d, MiddleIndex;\n\n"
-			"\t//Binary Search Algorithm\n"
-			"\twhile (RightmostIndex >= LeftmostIndex)\n"
-			"\t{\n"
-			"\t\tMiddleIndex = (LeftmostIndex + RightmostIndex) / 2;\n"
-			"\t\tif (SortedMethods[MiddleIndex].Hash < Hash)\n"
-			"\t\t\tLeftmostIndex  = MiddleIndex + 1;\n"
-			"\t\telse if (SortedMethods[MiddleIndex].Hash > Hash)\n"
-			"\t\t\tRightmostIndex = MiddleIndex - 1;\n"
-			"\t\telse\n"
-			"\t\t\tbreak;\n"
-			"\t}\n\n"
-			"\tif (MethodName == SortedMethods[MiddleIndex].MethodName)\n"
-			"\t\treturn SortedMethods[MiddleIndex].ID;\n\n",
-			CurrentClass->Methods.GetCount() - 1);
+		WriteToFile("\treturn Search(SortedMethods, %d, MethodName);\n", CurrentClass->Methods.GetCount());
+	}
+	else
+	{
+		WriteToFile("\treturn -1;\n");
 	}
 
-	WriteToFile(
-		"\treturn -1;\n"
-		"}\n\n");
+	WriteToFile("}\n\n");
+
 }
 
 void ZEMCGenerator::GenerateClassAddEventHandler(ZEMCClass* CurrentClass)

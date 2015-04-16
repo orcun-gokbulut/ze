@@ -38,6 +38,29 @@
 #include "ZEDS/ZEVariant.h"
 #include "ZEDS/ZEReference.h"
 
+ZESSize ZEClass::Search(ZEClassSortedData* Data, ZESize DataSize, const ZEString& Name)
+{
+	ZESize Hash = Name.Hash();
+	ZESize LeftmostIndex = 0, RightmostIndex = 12, MiddleIndex;
+
+	//Binary Search Algorithm
+	while (RightmostIndex >= LeftmostIndex)
+	{
+		MiddleIndex = (LeftmostIndex + RightmostIndex) / 2;
+		if (Data[MiddleIndex].Hash < Hash)
+			LeftmostIndex  = MiddleIndex + 1;
+		else if (Data[MiddleIndex].Hash > Hash)
+			RightmostIndex = MiddleIndex - 1;
+		else
+			break;
+	}
+
+	if (Name == Data[MiddleIndex].Name)
+		return Data[MiddleIndex].ID;
+
+	return -1;
+}
+
 ZEClass* ZEClass::GetParentClass()
 {
 	return NULL;
@@ -92,7 +115,7 @@ bool ZEClass::SetProperty(ZEObject* Object, ZESize PropertyId, const ZEVariant& 
 	return false;
 }
 
-bool ZEClass::SetProperty(ZEObject* Object, ZEString PropertyName, const ZEVariant& Value)
+bool ZEClass::SetProperty(ZEObject* Object, const ZEString& PropertyName, const ZEVariant& Value)
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == -1)
@@ -106,7 +129,7 @@ bool ZEClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)
 	return false;
 }
 
-bool ZEClass::GetProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value)
+bool ZEClass::GetProperty(ZEObject* Object, const ZEString& PropertyName, ZEVariant& Value)
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == -1)
@@ -120,7 +143,7 @@ bool ZEClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index,
 	return false;
 }
 
-bool ZEClass::GetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)
+bool ZEClass::GetPropertyItem(ZEObject* Object, const ZEString& PropertyName, ZESize Index, ZEVariant& Value)
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == -1)
@@ -134,7 +157,7 @@ bool ZEClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index,
 	return false;
 }
 
-bool ZEClass::SetPropertyItem(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)
+bool ZEClass::SetPropertyItem(ZEObject* Object, const ZEString& PropertyName, ZESize Index, ZEVariant& Value)
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == -1)
@@ -153,7 +176,7 @@ bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& 
 	return AddItemToProperty(Object, PropertyId, Count, Value);
 }
 
-bool ZEClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZEVariant& Value)
+bool ZEClass::AddItemToProperty(ZEObject* Object, const ZEString& PropertyName, ZEVariant& Value)
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == -1)
@@ -172,7 +195,7 @@ bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Inde
 	return false;
 }
 
-bool ZEClass::AddItemToProperty(ZEObject* Object, ZEString PropertyName, ZESize Index, ZEVariant& Value)
+bool ZEClass::AddItemToProperty(ZEObject* Object, const ZEString& PropertyName, ZESize Index, ZEVariant& Value)
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == -1)
@@ -186,7 +209,7 @@ bool ZEClass::RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize
 	return false;
 }
 
-bool ZEClass::RemoveItemFromProperty(ZEObject* Object, ZEString PropertyName, ZESize Index)
+bool ZEClass::RemoveItemFromProperty(ZEObject* Object, const ZEString& PropertyName, ZESize Index)
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == -1)
@@ -200,7 +223,7 @@ bool ZEClass::GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& 
 	return false;
 }
 
-bool ZEClass::GetPropertyItemCount(ZEObject* Object, ZEString PropertyName, ZESize& Count)
+bool ZEClass::GetPropertyItemCount(ZEObject* Object, const ZEString& PropertyName, ZESize& Count)
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == -1)
@@ -214,7 +237,7 @@ bool ZEClass::AddEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBa
 	return false;
 }
 
-bool ZEClass::AddEventHandler(ZEObject* Object, ZEString EventName, ZEEventHandlerBase* Handler)
+bool ZEClass::AddEventHandler(ZEObject* Object, const ZEString& EventName, ZEEventHandlerBase* Handler)
 {
 	ZESize MethodId = GetPropertyId(EventName);
 	if (MethodId == -1)
@@ -228,7 +251,7 @@ bool ZEClass::RemoveEventHandler(ZEObject* Object, ZESize EventId, ZEEventHandle
 	return false;
 }
 
-bool ZEClass::RemoveEventHandler(ZEObject* Object, ZEString EventName, ZEEventHandlerBase* Handler)
+bool ZEClass::RemoveEventHandler(ZEObject* Object, const ZEString& EventName, ZEEventHandlerBase* Handler)
 {
 	ZESize MethodId = GetPropertyId(EventName);
 	if (MethodId == -1)
@@ -242,7 +265,7 @@ bool ZEClass::CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnVal
 	return false;
 }
 
-bool ZEClass::CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
+bool ZEClass::CallMethod(ZEObject* Object, const ZEString& MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
 {
 	ZESize MethodId = GetPropertyId(MethodName);
 	if (MethodId == -1)
@@ -251,12 +274,12 @@ bool ZEClass::CallMethod(ZEObject* Object, ZEString MethodName, ZEVariant& Retur
 	return CallMethod(Object, MethodId, ReturnValue, Parameters, ParameterCount);
 }
 
-ZESize ZEClass::GetPropertyId(ZEString PropertyName)
+ZESize ZEClass::GetPropertyId(const ZEString& PropertyName)
 {
 	return -1;
 }
 
-ZESize ZEClass::GetMethodId(ZEString MethodName, ZESize OverloadIndex)
+ZESize ZEClass::GetMethodId(const ZEString& MethodName, ZESize OverloadIndex)
 {
 	return -1;
 }
