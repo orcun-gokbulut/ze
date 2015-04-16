@@ -51,22 +51,22 @@ float ZEMoon::GetPhase() const
 	return Phase;
 }
 
-void ZEMoon::SetScale(float Scale)
+void ZEMoon::SetMoonScale(float Scale)
 {
 	Scale = Scale;
 }
 
-float ZEMoon::GetScale() const
+float ZEMoon::GetMoonScale() const
 {
 	return Scale;
 }
 
-void ZEMoon::SetRotation(float Rotation)
+void ZEMoon::SetMoonRotation(float Rotation)
 {
 	Rotation = Rotation;
 }
 
-float ZEMoon::GetRotation() const
+float ZEMoon::GetMoonRotation() const
 {
 	return Rotation;
 }

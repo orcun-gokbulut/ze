@@ -1519,7 +1519,7 @@ void ZEString::TrimSelf()
 	ZEDebugCheckMemory();
 }
 
-ZESize ZEString::Hash()
+ZESize ZEString::Hash() const
 {
 	return ZEHashGenerator::Hash(Buffer);
 }

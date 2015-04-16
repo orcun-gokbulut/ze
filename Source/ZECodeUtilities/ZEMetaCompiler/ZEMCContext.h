@@ -216,6 +216,8 @@ class ZEMCEnumerator : public ZEMCDeclaration
 class ZEMCProperty : public ZEMCDeclaration
 {
 	public:
+		ZEMCClass* Class;
+
 		ZESize ID;
 		ZEMCType Type;
 
@@ -247,6 +249,8 @@ class ZEMCMethodParameter
 class ZEMCMethod : public ZEMCDeclaration
 {
 	public:
+		ZEMCClass* Class;
+
 		ZESize ID;
 		ZEString MemberOf;
 

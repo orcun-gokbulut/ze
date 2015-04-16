@@ -146,6 +146,7 @@ ZEMCDeclaration::~ZEMCDeclaration()
 ZEMCProperty::ZEMCProperty()
 {
 	ID = 0;
+	Class = NULL;
 	Access = ZEMC_PA_NONE;
 	HasAccessors = false;
 	IsStatic = false;
@@ -174,7 +175,7 @@ ZEMCMethodParameter::~ZEMCMethodParameter()
 ZEMCMethod::ZEMCMethod()
 {
 	ID = 0;
-
+	Class = NULL;
 	IsVirtual = false;
 	IsPure = false;
 	IsStatic = false;
@@ -209,11 +210,18 @@ ZEMCClass::ZEMCClass()
 ZEMCClass::~ZEMCClass()
 {
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
-		delete Properties[I];
+	{
+		if (Properties[I]->Class == this)
+			delete Properties[I];
+	}
+
 	Properties.Clear();
 
-	for (ZESize I = 0; I < Methods.GetCount(); I++)	
-		delete Methods[I];
+	for (ZESize I = 0; I < Methods.GetCount(); I++)
+	{
+		if (Methods[I]->Class == this)
+			delete Methods[I];
+	}
 	Methods.Clear();
 }
 
@@ -224,7 +232,7 @@ ZEMCContext::ZEMCContext()
 
 ZEMCContext::~ZEMCContext()
 {
-	for (ZESize I = 0; I < Classes.GetCount(); I++)
+	for (ZESSize I = (ZESSize)Classes.GetCount() - 1; I >= 0 ; I--)
 		delete Classes[I];
 	
 	Classes.Clear();

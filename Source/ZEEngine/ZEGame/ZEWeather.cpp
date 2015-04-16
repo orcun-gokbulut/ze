@@ -381,7 +381,7 @@ ZEWeather::ZEWeather()
 	Moon->SetDirection(MoonDirection);
 	Moon->SetPhase(MoonPhase);
 	Moon->SetAmbientFactor(0.9f);
-	Moon->SetScale(0.1f);
+	Moon->SetMoonScale(0.1f);
 	this->AddComponent(Moon);
 
 	// Sky Dome

@@ -62,7 +62,5 @@ void ZEMCRegisterer::GenerateRegisterFile(ZEMCContext* Context)
 		if (!Context->TargetClasses[I]->IsBuiltInClass)
 			fprintf(File, "ZE_META_REGISTER_CLASS(%s)\n", Context->TargetClasses[I]->Name.ToCString());
 
-	printf("#endif\n");
-
 	fclose(File);
 }

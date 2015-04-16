@@ -282,6 +282,13 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 		ClassData->BaseClass = NULL;
 	}
 
+	// Combine Methods and Properties
+	if (ClassData->BaseClass != NULL)
+	{
+		ClassData->Methods = ClassData->BaseClass->Methods;
+		ClassData->Properties = ClassData->BaseClass->Properties;
+	}
+
 	ZEMCAttribute AttributeData;
 	for(CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 	{
