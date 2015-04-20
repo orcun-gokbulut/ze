@@ -294,8 +294,8 @@ bool ZETerrain::LoadLevelData()
 
 	File.Close();
 
-	DetailNormalTexture = ZETexture2DResource::LoadResource("ZESimulationDemo/Terrains/TerrainDetailNormal.jpg")->GetTexture();
-	ColorTexture = ZETexture2DResource::LoadResource("ZESimulationDemo/Terrains/TerrainDiffuse.bmp")->GetTexture();
+	DetailNormalTexture = ZETexture2DResource::LoadResource("#R:/ZESimulationDemo/Terrains/TerrainDetailNormal.jpg")->GetTexture();
+	ColorTexture = ZETexture2DResource::LoadResource("#R:/ZESimulationDemo/Terrains/TerrainDiffuse.bmp")->GetTexture();
 	 
 	return true;
 }
