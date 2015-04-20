@@ -638,7 +638,7 @@ bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
 	{
-		if (Properties[I].ElementType == ZEML_ET_NODE)
+		if (Properties[I].ElementType == ZEML_ET_DATA)
 			continue;
 
 		if (!GetClass()->SetProperty(this, Properties[I].Name, ZEVariant(Properties[I].Value)))
