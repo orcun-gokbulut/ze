@@ -1063,6 +1063,8 @@ bool ZED3D9FrameRenderer::Initialize()
 	AerialPerspectiveProcessor.SetRenderer(this);
 	AerialPerspectiveProcessor.Initialize();
 
+	SunRaysProcessor.Initialize();
+
 	InitializeLightning();
 
 	GetDevice()->CreateQuery(D3DQUERYTYPE_EVENT, &EventQuery);
@@ -1088,25 +1090,24 @@ void ZED3D9FrameRenderer::Deinitialize()
 	ColorTransformProcessor.Deinitialize();
 	BlurProcessor.Deinitialize();
 	PixelWorldPositionProcessor.Deinitialize();
+	SunRaysProcessor.Deinitialize();
 
 	DeinitializeLightning();
 	DeinitializeRenderTargets();
 
-	if (EventQuery != NULL)
-	{
-		EventQuery->Release();
-		EventQuery = NULL;
-	}
+	ZED3D_RELEASE(EventQuery);
 }
 
 void ZED3D9FrameRenderer::DeviceLost()
 {
 	PixelWorldPositionProcessor.Deinitialize();
+	ZED3D_RELEASE(EventQuery);
 }
 
 bool ZED3D9FrameRenderer::DeviceRestored()
 {
 	PixelWorldPositionProcessor.Initialize();
+	GetDevice()->CreateQuery(D3DQUERYTYPE_EVENT, &EventQuery);
 	return true;
 }
 
@@ -1200,10 +1201,13 @@ static ZEInt RenderCommandCompare(const ZERenderCommand* A, const ZERenderComman
 
 void ZED3D9FrameRenderer::Render(float ElaspedTime)
 {
-	D3DPERF_BeginEvent(0, L"Frame Render");
-
-	if (!GetModule()->GetEnabled() || GetModule()->IsDeviceLost())
+	if (!GetModule()->IsInitialized() || !GetModule()->GetEnabled() || GetModule()->IsDeviceLost())
 		return;
+
+	if (ViewPort->GetWidth() == 0 || ViewPort->GetHeight() == 0)
+		return;
+
+	D3DPERF_BeginEvent(0, L"Frame Render");
 
 	if (GetCamera() == NULL)
 		return;
@@ -1323,6 +1327,12 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		GrainProcessor.SetOutput(ViewPort);
 		GrainProcessor.Process(ElaspedTime);
 	*/
+
+ 		SunRaysProcessor.SetInput(HDRProcessor.BloomLevels[0]);
+		SunRaysProcessor.SetOutput(ViewPort);
+		SunRaysProcessor.SetSunDirectionFromScene();
+		SunRaysProcessor.Process();
+
 		Do2DPass();
 
 	GetDevice()->EndScene();

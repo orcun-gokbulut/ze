@@ -59,7 +59,8 @@ enum ZEGizmoAxis
 	ZE_GA_XY_AXIS,
 	ZE_GA_XZ_AXIS,
 	ZE_GA_YZ_AXIS,
-	ZE_GA_XYZ_AXIS
+	ZE_GA_XYZ_AXIS,
+	ZE_GA_SCREEN_AXIS
 };
 
 ZE_META_FORWARD_DECLARE(ZESimpleMaterial, "ZEGraphics/ZESimpleMaterial.h")
@@ -100,6 +101,7 @@ class ZEGizmo : public ZEEntity
 		ZEGizmoAxis						PickScaleAxis(const ZERay& Ray, float& TRay);
 
 		ZEVector3						OldPosition;
+		ZEVector2						StartScreenPosition;
 
 		void							UpdateGizmo();
 		

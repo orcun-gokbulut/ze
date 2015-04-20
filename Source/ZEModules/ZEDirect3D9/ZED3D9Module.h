@@ -147,11 +147,14 @@ class ZED3D9Module : public ZEGraphicsModule
 		bool											IsDeviceLost();
 		void											DeviceLost();
 		void											DeviceRestored();
-		void											RestoreDevice(bool ForceReset = false);
+		void											CheckAndRestoreDevice();
+		void											ResetDevice();
 
 		virtual void									ClearFrameBuffer();
 		virtual void									UpdateScreen();
 	
+		virtual void									DrawLogo();
+
 		virtual void									SetScreenSize(ZEInt Width, ZEInt Height);
 		virtual void									SetVerticalSync(bool Enabled);
 		virtual void									SetShaderQuality(ZEInt Quality);

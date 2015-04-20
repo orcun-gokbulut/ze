@@ -38,6 +38,7 @@
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9Module.h"
 #include "ZEData.h"
+#include "SunRays.hlsl.h"
 
 #pragma warning(disable:4996)
 
@@ -198,6 +199,8 @@ const char* ZED3D9ShaderManager::GetInternal(const char* Filename)
 		return (const char*)UnsharpenFilterProcessor_hlsl().GetData();
 	else if(stricmp(Filename, "ZoomBlurProcessor.hlsl") == 0)
 		return (const char*)ZoomBlurProcessor_hlsl().GetData();
+	else if (stricmp(Filename, "SunRays.hlsl") == NULL)
+		return (const char*)SunRays_hlsl().GetData();
 	else 
 		return NULL;
 

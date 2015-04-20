@@ -76,39 +76,39 @@ class ZEModelHelper : public ZEObject
 
 	public:
 
-		const char*							GetName();
+		const char*							GetName() const;
 
-		ZEModelHelperOwnerType				GetOwnerType();
+		ZEModelHelperOwnerType				GetOwnerType() const;
 
-		ZEModelMesh*						GetMeshOwner();
-		ZEModelBone*						GetBoneOwner();
+		ZEModelMesh*						GetMeshOwner() const;
+		ZEModelBone*						GetBoneOwner() const;
 
 		void								SetPosition(const ZEVector3& LocalPosition);
-		const ZEVector3&					GetPosition();
-		const ZEVector3						GetModelPosition();
-		const ZEVector3						GetWorldPosition();
+		const ZEVector3&					GetPosition() const;
+		const ZEVector3						GetModelPosition() const;
+		const ZEVector3						GetWorldPosition() const;
 
 		void								SetRotation(const ZEQuaternion& LocalRotation);
-		const ZEQuaternion&					GetRotation();
-		const ZEQuaternion					GetModelRotation();
-		const ZEQuaternion					GetWorldRotation();
+		const ZEQuaternion&					GetRotation() const;
+		const ZEQuaternion					GetModelRotation() const;
+		const ZEQuaternion					GetWorldRotation() const;
 
 		void								SetScale(const ZEVector3& LocalScale);
-		const ZEVector3&					GetScale();
-		const ZEVector3						GetModelScale();
-		const ZEVector3						GetWorldScale();
+		const ZEVector3&					GetScale() const;
+		const ZEVector3						GetModelScale() const;
+		const ZEVector3						GetWorldScale() const;
 
-		ZEVector3							GetFront();
-		ZEVector3							GetRight();
-		ZEVector3							GetUp();
+		ZEVector3							GetFront() const;
+		ZEVector3							GetRight() const;
+		ZEVector3							GetUp() const;
 
-		ZEVector3							GetModelFront();
-		ZEVector3							GetModelRight();
-		ZEVector3							GetModelUp();
+		ZEVector3							GetModelFront() const;
+		ZEVector3							GetModelRight() const;
+		ZEVector3							GetModelUp() const;
 
-		ZEVector3							GetWorldFront();
-		ZEVector3							GetWorldRight();
-		ZEVector3							GetWorldUp();
+		ZEVector3							GetWorldFront() const;
+		ZEVector3							GetWorldRight() const;
+		ZEVector3							GetWorldUp() const;
 
 		void								Initialize(ZEModel* Model, const ZEModelResourceHelper* HelperResource);
 		void								Deinitialize();

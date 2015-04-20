@@ -114,6 +114,8 @@ ZEFixedMaterial::ZEFixedMaterial()
 	GlobalAmbientEnabled = true;
 
 	SetSSAOEnabled(true);
+
+	FileName = "";
 }
 
 ZEFixedMaterial::~ZEFixedMaterial()
@@ -134,6 +136,11 @@ void ZEFixedMaterial::SetName(const ZEString& Name)
 const ZEString& ZEFixedMaterial::GetName() const
 {
 	return Name;
+}
+
+const ZEString&	ZEFixedMaterial::GetFileName() const
+{
+	return FileName;
 }
 
 void ZEFixedMaterial::SetTwoSided(bool Enable)
@@ -292,10 +299,10 @@ void ZEFixedMaterial::SetBaseMap(const ZETexture2D* Texture)
 		BaseMapResource = NULL;
 	}
 
-	if (Texture == NULL)
-		MaterialComponents &= ~ZE_SHADER_BASE_MAP;
-	else
+	if (Texture != NULL)
 		MaterialComponents |= ZE_SHADER_BASE_MAP;
+	else
+		MaterialComponents &= ~ZE_SHADER_BASE_MAP;
 
 	BaseMap = Texture;
 }
@@ -318,16 +325,16 @@ void ZEFixedMaterial::SetBaseMapFile(const char* Filename)
 		return;
 
 	BaseMapResource = ZETexture2DResource::LoadSharedResource(Filename);
-
-	if (BaseMapResource == NULL)
-		MaterialComponents &= ~ZE_SHADER_BASE_MAP;
-	else
-		MaterialComponents |= ZE_SHADER_BASE_MAP;
-
 	if (BaseMapResource != NULL)
+	{
+		MaterialComponents |= ZE_SHADER_BASE_MAP;
 		BaseMap = BaseMapResource->GetTexture();
+	}
 	else
+	{
+		MaterialComponents &= ~ZE_SHADER_BASE_MAP;
 		BaseMap = NULL;
+	}
 }
 
 const char* ZEFixedMaterial::GetBaseMapFile() const
@@ -411,7 +418,11 @@ void ZEFixedMaterial::SetSpecularMap(const ZETexture2D* Texture)
 	}
 
 	SpecularMap = Texture;
-	MaterialComponents |= ZE_SHADER_SPECULAR_MAP;
+
+	if (SpecularMap != NULL)
+		MaterialComponents |= ZE_SHADER_SPECULAR_MAP;
+	else
+		MaterialComponents &= ~ZE_SHADER_SPECULAR_MAP;
 }
 
 const ZETexture2D* ZEFixedMaterial::GetSpecularMap() const
@@ -431,11 +442,16 @@ void ZEFixedMaterial::SetSpecularMapFile(const char* Filename)
 		return;
 
 	SpecularMapResource = ZETexture2DResource::LoadSharedResource(Filename);
-
 	if (SpecularMapResource != NULL)
+	{
+		MaterialComponents |= ZE_SHADER_SPECULAR_MAP;
 		SpecularMap = SpecularMapResource->GetTexture();
+	}
 	else
+	{
+		MaterialComponents &= ~ZE_SHADER_SPECULAR_MAP;
 		SpecularMap = NULL;
+	}
 }
 
 const char* ZEFixedMaterial::GetSpecularMapFile() const
@@ -508,13 +524,13 @@ void ZEFixedMaterial::SetEmmisiveMap(const ZETexture2D* Texture)
 		EmmisiveMapResource->Release();
 		EmmisiveMapResource = NULL;
 	}
-	else
-	{
-		MaterialComponents &= ~ZE_SHADER_EMMISIVE_MAP;
-	}
 
 	EmmisiveMap = Texture;
-	MaterialComponents |= ZE_SHADER_EMMISIVE_MAP;
+
+	if (EmmisiveMap != NULL)
+		MaterialComponents |= ZE_SHADER_EMMISIVE_MAP;
+	else
+		MaterialComponents &= ~ZE_SHADER_EMMISIVE_MAP;
 }
 
 const ZETexture2D* ZEFixedMaterial::GetEmmisiveMap() const
@@ -537,13 +553,13 @@ void ZEFixedMaterial::SetEmmisiveMapFile(const char* Filename)
 
 	if (EmmisiveMapResource != NULL)
 	{
-		EmmisiveMap = EmmisiveMapResource->GetTexture();
 		MaterialComponents |= ZE_SHADER_EMMISIVE_MAP;
+		EmmisiveMap = EmmisiveMapResource->GetTexture();
 	}
 	else
 	{
-		EmmisiveMap = NULL;
 		MaterialComponents &= ~ZE_SHADER_EMMISIVE_MAP;
+		EmmisiveMap = NULL;
 	}
 }
 
@@ -594,15 +610,9 @@ void ZEFixedMaterial::SetNormalMap(const ZETexture2D* Texture)
 	{
 		NormalMapResource->Release();
 		NormalMapResource = NULL;
+	}
 
-		SetNormalMapEnabled(true);
-		NormalMap = Texture;
-	}
-	else
-	{
-		SetNormalMapEnabled(false);
-		NormalMap = NULL;
-	}
+	NormalMap = Texture;
 }
 
 const ZETexture2D* ZEFixedMaterial::GetNormalMap() const
@@ -793,11 +803,6 @@ void ZEFixedMaterial::SetOpacityMap(const ZETexture2D* Texture)
 	}
 
 	OpacityMap = Texture;
-	SetOpacityEnabled(true);
-	SetOpacityComponent(ZE_MOC_OPACITY_MAP);
-
- 	SetAlphaCullEnabled(true);
- 	SetAlphaCullLimit(0.5f);
 }
 
 const ZETexture2D* ZEFixedMaterial::GetOpacityMap() const
@@ -817,18 +822,10 @@ void ZEFixedMaterial::SetOpacityMapFile(const char* Filename)
 		return;
 
 	OpacityMapResource = ZETexture2DResource::LoadSharedResource(Filename);
-
 	if (OpacityMapResource != NULL)
-	{
-		SetOpacityEnabled(true);
 		OpacityMap = OpacityMapResource->GetTexture();
-		SetAlphaCullEnabled(true);
-		SetAlphaCullLimit(0.5f);
-	}
 	else
-	{
 		OpacityMap = NULL;
-	}
 }
 
 const char* ZEFixedMaterial::GetOpacityMapFile() const
@@ -888,7 +885,6 @@ void ZEFixedMaterial::SetEnvironmentMapFile(const char* Filename)
 		return;
 
 	EnvironmentMapResource = ZETextureCubeResource::LoadSharedResource(Filename);
-
 	if (EnvironmentMapResource != NULL)
 		EnvironmentMap = EnvironmentMapResource->GetTexture();
 	else
@@ -1040,7 +1036,6 @@ void ZEFixedMaterial::SetDetailBaseMapFile(const char* Filename)
 		return;
 
 	DetailBaseMapResource = ZETexture2DResource::LoadSharedResource(Filename);
-
 	if (DetailBaseMapResource != NULL)
 		DetailBaseMap = DetailBaseMapResource->GetTexture();
 	else
@@ -1563,6 +1558,8 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 
 	if(File.IsOpen())
 		File.Close();
+
+	FileName = FilePath;
 
 	UpdateMaterial();
 }

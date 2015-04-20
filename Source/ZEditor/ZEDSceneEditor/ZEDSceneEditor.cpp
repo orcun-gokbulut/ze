@@ -82,12 +82,13 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
 	SplashScreen = new ZEDLoadingScreen();
-	SplashScreen->show();
+	//SplashScreen->show();
 
 	SplashScreen->SetNotificationText("Setting Up UI...");
 
 	ui = new Ui::MapEditorClass();
 	ui->setupUi(this);
+	showMaximized();
 
 	ZEString DefaultCompanyName = "Zinek";
 	ZEString DefaultApplicationName = "Engine";
@@ -103,7 +104,6 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	SelectionDirtyFlag = false;
 	
 	this->MainLoopTimer = new QTimer(this);
-	MainLoopTimer->start(0);
 
 	BackupSaveTimer = new QTimer();
 	//BackupSaveTimer->start(120000);
@@ -153,7 +153,6 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	QObject::connect(this->SceneList, SIGNAL(visibilityChanged(bool)), ui->SceneListOpenAction, SLOT(setChecked(bool)));
 
 	SplashScreen->hide();
-	showMaximized();
 	this->statusBar()->showMessage("Ready");
 	Grid = ZEGrid::CreateInstance();
 	Scene->AddEntity(Grid);
@@ -193,32 +192,38 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	QVBoxLayout* TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(1));
 	ui->PropertiesTabWidget->widget(1)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->DOFProcessor, QString()), QString("DOF"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->SunRaysProcessor, QString()), QString("SunRays"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(2));
 	ui->PropertiesTabWidget->widget(2)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->MLAAProcessor, QString()), QString("MLAA"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->DOFProcessor, QString()), QString("DOF"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(3));
 	ui->PropertiesTabWidget->widget(3)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->FogProcessor, QString()), QString("FOG"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->MLAAProcessor, QString()), QString("MLAA"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(4));
 	ui->PropertiesTabWidget->widget(4)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->AerialPerspectiveProcessor, QString()), QString("Aerial"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->FogProcessor, QString()), QString("FOG"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(5));
 	ui->PropertiesTabWidget->widget(5)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HBAOProcessor, QString()), QString("HBAO"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->AerialPerspectiveProcessor, QString()), QString("Aerial"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(6));
 	ui->PropertiesTabWidget->widget(6)->setLayout(TempLayout);
 
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->SSAOProcessor, QString()), QString("SSAO"));
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HBAOProcessor, QString()), QString("HBAO"));
 	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(7));
 	ui->PropertiesTabWidget->widget(7)->setLayout(TempLayout);
 
+	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->SSAOProcessor, QString()), QString("SSAO"));
+	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(8));
+	ui->PropertiesTabWidget->widget(8)->setLayout(TempLayout);
+
 	Scene->SetAmbientColor(ZEVector3::One);
 	Scene->SetAmbientFactor(0.2f);
+
+	MainLoopTimer->start(0);
 }
 
 void MapEditor::MakeConnections()
@@ -384,7 +389,9 @@ void MapEditor::SaveSceneAsActionTriggered()
 
 void MapEditor::EngineMainLoop()
 {
+	MainLoopTimer->stop();
 	zeMainLoop();
+	MainLoopTimer->start();
 }
 
 void MapEditor::EventsLoop()
