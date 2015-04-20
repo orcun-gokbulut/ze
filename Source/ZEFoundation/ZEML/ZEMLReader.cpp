@@ -316,13 +316,6 @@ bool ZEMLReaderNode::Load()
 				return false;
 			}
 			Node->Size = ZEEndian::Little(Node->Size);
-			
-			Node->Index = 0;
-			for (ZESSize I = SubNodes.GetCount() - 1; I >= 0; I--)
-			{
-				if (&SubNodes[I] != Node && SubNodes[I].Name == Node->Name)
-					Node->Index = SubNodes[I].Index + 1;
-			}
 			File->Seek(Node->Size + sizeof(ZEUInt64), ZE_SF_CURRENT);
 		}
 		else if (SubElementType == ZEML_ET_DATA)
@@ -403,21 +396,32 @@ ZEMLReaderNode ZEMLReaderNode::GetSubNode(const char* Name, ZESize Index)
 		if (SubNodes[I].Name == Name)
 		{
 			 if (Index == 0)
-			 {
-				 ZEMLReaderNode Node;
-				 Node.File = this->File;
-				 Node.Offset = SubNodes[I].Offset;
-				 Node.VersionMajor = VersionMajor;
-				 Node.VersionMinor = VersionMinor;
-				 (VersionMajor == 0)?(Node.LoadV0()):(Node.Load());
-				 return Node;
-			 }
+				 return GetSubNode(I);
 
 			 Index--;
 		}
 	}
 
 	return ZEMLReaderNode();
+}
+
+ZEMLReaderNode ZEMLReaderNode::GetSubNode(ZESize Index)
+{
+	if (Index >= SubNodes.GetCount())
+		return ZEMLReaderNode();
+
+	ZEMLReaderNode Node;
+	Node.File = this->File;
+	Node.Offset = SubNodes[Index].Offset;
+	Node.VersionMajor = VersionMajor;
+	Node.VersionMinor = VersionMinor;
+
+	if (VersionMajor == 0)
+		Node.LoadV0();
+	else
+		Node.Load();
+
+	return Node;
 }
 
 bool ZEMLReaderNode::IsValid()

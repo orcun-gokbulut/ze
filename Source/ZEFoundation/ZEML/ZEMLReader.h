@@ -59,7 +59,6 @@ struct ZEMLReaderProperty
 struct ZEMLReaderSubNode
 {
 	ZEString		Name;
-	ZEUInt64		Index;
 	ZEUInt64		Offset;
 	ZEUInt64		Size;
 	
