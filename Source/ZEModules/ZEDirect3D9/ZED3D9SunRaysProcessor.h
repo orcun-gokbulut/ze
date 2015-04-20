@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMaterialEditorViewPort.h
+ Zinek Engine - ZED3D9SunRaysProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,71 +33,64 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZED_MATERIAL_EDITOR_VIEWPORT_H__
-#define __ZED_MATERIAL_EDITOR_VIEWPORT_H__
+#ifndef __ZE_D3D9_SUN_RAYS_H__
+#define __ZE_D3D9_SUN_RAYS_H__
 
-#include <QtGui/QFrame>
-#include <ZEGame/ZEPlayer.h>
-#include <ZEGame/ZEGrid.h>
-#include <ZEModel/ZEModel.h>
-#include <ZEGraphics/ZEDirectionalLight.h>
-#include <QtCore/QPoint>
+#include "ZED3D9ComponentBase.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMeta\ZEObject.h"
 
-class ZEDMaterialEditor;
+class ZED3D9VertexShader;
+class ZED3D9PixelShader;
+class ZED3D9Texture2D;
+class ZED3D9ViewPort;
 
-class ZEDMaterialEditorViewPort : public QFrame
+class ZED3D9SunRaysProcessor : public ZEObject, public ZED3D9ComponentBase
 {
 	private:
+		bool								Enabled;
+		ZED3D9Texture2D*					Input;
+		ZED3D9ViewPort*						Output;
+		ZEVector3							SunDirection;
+		float								Intensity;
+		float								Density;
+		bool								DebugOutput;
 
-		ZEPlayer*			Camera;
-		ZEGrid*				Grid;
-		ZEModel*			Model;
-		ZEDirectionalLight* DirectLight1;
-		ZEDirectionalLight* DirectLight2;
-		ZEDirectionalLight* DirectLight3;
-
-		ZEDMaterialEditor*	ParentEditor;
-
-		QPoint				OldMousePosition;
-
-		float				Pitch;
-		float				Yawn;
-		float				Roll;
-
-		float				YawnLight1;
-		float				PitchLight1;
-
-		float				YawnLight2;
-		float				PitchLight2;
-
-		float				YawnLight3;
-		float				PitchLight3;
-		
-
-	protected:
-
-		virtual void		resizeEvent(QResizeEvent* ResizeEvent);
-		virtual void		mouseMoveEvent(QMouseEvent * Event);
-		virtual void		mousePressEvent(QMouseEvent * Event);
-		virtual void		wheelEvent(QWheelEvent * Event);
-
-		virtual void		RotateModel(QPoint PositionDifference);
-		virtual void		RotateLights(QPoint PositionDifference);
-		virtual void		MoveLeftRight(QPoint PositionDifference);
+		ZED3D9VertexShader*					VertexShader;
+		ZED3D9PixelShader*					PixelShader;
+		LPDIRECT3DVERTEXDECLARATION9		VertexDeclaration;
 
 	public:
+		void								SetEnabled(bool Value);
+		bool								GetEnabled() const;
 
-		void						Initialize();
-		ZEArray<ZEFixedMaterial*>	GetModelMaterials();
-		void						SetModelResource(ZEModelResource* ModelResource);
-		void						SetMaterial(ZEString MaterialFile);
-		ZEDirectionalLight*			GetDirectLight1();
-		ZEDirectionalLight*			GetDirectLight2();
-		ZEDirectionalLight*			GetDirectLight3();
-		ZEModel*					GetModel();
-									ZEDMaterialEditorViewPort(ZEDMaterialEditor* ParentEditor, QWidget* parent = 0, Qt::WindowFlags f = 0);
+		void								SetInput(ZED3D9Texture2D* Input);
+		ZED3D9Texture2D*					GetInput();
+
+		void								SetOutput(ZED3D9ViewPort* Output);
+		ZED3D9ViewPort*						GetOutput();
+		
+		void								SetSunDirection(const ZEVector3& SunDirection);
+		const ZEVector3&					GetSunDirection();
+		
+		void								SetSunDirectionFromScene();
+		
+		void								SetDebugOutput(bool Value);
+		bool								GetDebugOutput() const;
+
+		void								SetIntensity(float Intensity);
+		float								GetIntensity() const;
+
+		void								SetDensity(float Density);
+		float								GetDensity() const;
+
+		void								Initialize();
+		void								Deinitialize();
+
+		void								Process();
+
+											ZED3D9SunRaysProcessor();
+											~ZED3D9SunRaysProcessor();
 };
-
 
 #endif

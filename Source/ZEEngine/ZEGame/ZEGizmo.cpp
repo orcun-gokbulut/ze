@@ -692,7 +692,41 @@ ZEVector3 ZEGizmo::MoveProjection_(ZEGizmoAxis Axis, const ZERay& Ray)
 
 ZEQuaternion ZEGizmo::RotationProjection_(ZEGizmoAxis Axis, const ZERay& Ray)
 {
-	return ZEQuaternion::Identity;
+	ZEVector2 Replacement;
+	float Displacement = Replacement.Length();
+	
+	ZEVector3 RotationAxis;
+	switch (Axis)
+	{
+		default:
+		case ZE_GA_XY_AXIS:
+		case ZE_GA_XZ_AXIS:
+		case ZE_GA_YZ_AXIS:
+		case ZE_GA_XYZ_AXIS:
+		case ZE_GA_NONE:
+			return ZEQuaternion::Identity;
+			break;
+
+		case ZE_GA_X_AXIS:
+			RotationAxis = ZEVector3::UnitX;
+			break;
+
+		case ZE_GA_Y_AXIS:
+			RotationAxis = ZEVector3::UnitY;
+			break;
+
+		case ZE_GA_Z_AXIS:
+			RotationAxis = ZEVector3::UnitZ;
+			break;
+
+		case ZE_GA_SCREEN_AXIS:
+			RotationAxis = zeScene->GetActiveCamera()->GetWorldFront();
+			break;
+	}
+
+	ZEQuaternion Output;
+	ZEQuaternion::CreateFromAngleAxis(Output, Displacement, RotationAxis);
+	return Output;
 }
 
 ZEVector3 ZEGizmo::ScaleProjection_(ZEGizmoAxis Axis, const ZERay& Ray)

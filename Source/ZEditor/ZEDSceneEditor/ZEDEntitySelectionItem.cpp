@@ -42,6 +42,8 @@ void ZEDEntitySelectionItem::Update()
 
 	if (GizmoSpace == ZED_GS_LOCAL)
 		Gizmo->SetRotation(Entity->GetRotation());
+	else if (GizmoSpace == ZED_GS_WORLD)
+		Gizmo->SetRotation(Entity->GetWorldRotation());
 	else if (GizmoSpace == ZED_GS_VIEW)
 		Gizmo->SetRotation(Scene->GetActiveCamera()->GetWorldRotation());
 	else 
@@ -63,12 +65,14 @@ void ZEDEntitySelectionItem::MoveUsingGizmo(ZEVector3 MoveAmount)
 
 void ZEDEntitySelectionItem::ScaleUsingGizmo(ZEVector3 ScaleAmount)
 {
-	Entity->SetScale(Entity->GetScale() + ScaleAmount);
+	Entity->SetScale(OriginalScale + ScaleAmount);
 }
 
 void ZEDEntitySelectionItem::RotateUsingGizmo(ZEQuaternion RotateAmount)
 {
-
+	ZEQuaternion NewRotation = OriginalRotation * RotateAmount;
+	NewRotation.NormalizeSelf();
+	Entity->SetRotation(NewRotation);
 }
 
 ZEVariant ZEDEntitySelectionItem::GetPosition()
@@ -123,6 +127,7 @@ ZEDGizmo* ZEDEntitySelectionItem::GetGizmo() const
 
 ZEDEntitySelectionItem::ZEDEntitySelectionItem(ZEEntity* Entity, ZEDGizmoMode Mode, ZEScene* Scene)
 {
+	GizmoSpace = ZED_GS_WORLD;
 	this->Entity = Entity;
 	this->Scene = Scene;
 	this->Gizmo = new ZEDGizmo();
@@ -138,4 +143,11 @@ ZEDEntitySelectionItem::~ZEDEntitySelectionItem()
 {
 	Scene->RemoveEntity(Gizmo);
 	delete Gizmo;
+}
+
+void ZEDEntitySelectionItem::StartGizmoTransform()
+{
+	OriginalPosition = Entity->GetPosition();
+	OriginalRotation = Entity->GetRotation();
+	OriginalScale = Entity->GetScale();
 }

@@ -81,6 +81,7 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* Event)
 		ZEDGizmo* SelectedGizmo = NULL;
 		for(ZESize I = 0; I < this->SelectedItems->GetCount(); I++)
 		{
+			//SelectedItems->GetItem(I)->StartGizmoTransform();
 			if(this->SelectedItems->GetItem(I)->GetGizmo() != NULL)
 			{
 				if(this->SelectedItems->GetItem(I)->GetGizmo()->GetHoveredAxis() != ZED_GA_NONE)
@@ -93,12 +94,12 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* Event)
 
 		if (SelectedAxis != ZED_GA_NONE)
 		{
-			if(SelectedGizmo->GetMode() == ZED_GM_MOVE)
+			if (SelectedGizmo->GetMode() == ZED_GM_MOVE)
 				SelectedGizmo->StartMoveProjection(SelectedAxis, Ray);
-			if(SelectedGizmo->GetMode() == ZED_GM_SCALE)
-				SelectedGizmo->StartScaleProjection(SelectedAxis, Ray);
-			if(SelectedGizmo->GetMode() == ZED_GM_SCALE)
-				SelectedGizmo->StartRotationProjection(SelectedAxis, Ray);
+			else if (SelectedGizmo->GetMode() == ZED_GM_ROTATE)
+				SelectedGizmo->StartRotationProjection(SelectedAxis, ZEVector2(Event->x(), Event->y()));
+			else if (SelectedGizmo->GetMode() == ZED_GM_SCALE)
+				SelectedGizmo->StartScaleProjection(SelectedAxis, ZEVector2(Event->x(), Event->y()));
 
 			this->SendInputs = true;
 		}
@@ -218,7 +219,8 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* Event)
 
 				if (SelectedGizmo->GetMode() == ZED_GM_ROTATE)
 				{
-					//Fill Rotation
+					ZEQuaternion NewGizmoOrientation = SelectedGizmo->RotationProjection(ZEVector2(Event->x(), Event->y()));
+					RotateSelections(NewGizmoOrientation);
 				}
 
 				if (SelectedGizmo->GetMode() == ZED_GM_SCALE)
@@ -239,8 +241,8 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* Event)
 						GizmoUndoRedo->SetOldValues(SelectedItemOldValues);
 					}
 
-					ZEVector3 NewGizmoScale = SelectedGizmo->ScaleProjection(Ray);
-					ScaleSelections(NewGizmoScale - SelectedGizmo->GetPosition());
+					ZEVector3 NewGizmoScale = SelectedGizmo->ScaleProjection(ZEVector2(Event->x(), Event->y()));
+					ScaleSelections(NewGizmoScale);
 					ParentEditor->UpdatePropertyWidgetValues();
 				}
 			}

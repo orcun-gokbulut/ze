@@ -145,6 +145,7 @@ class ZECamera : public ZEEntity
 		const ZEViewVolume&				GetViewVolume();
 
 		void							GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
+		//ZEVector2						GetScreenPosition(ZEVector3& WorldPosition);
 
 		static ZECamera*				CreateInstance();
 };

@@ -155,13 +155,22 @@ void ZED3D9HDRProcessor::UpdateBuffers(ZEUInt Width, ZEUInt Height)
 	// Create bloom textures
 	for (ZEUInt32 I = 0; I < 6; ++I)
 	{
+		int WidthMod = (Width >> I);
+		int HeightMod = (Height >> I);
+		
+		if (WidthMod == 0)
+			WidthMod = 1;
+
+		if (HeightMod == 0)
+			HeightMod = 1;
+
 		ZED3D9Texture2D* Texture = NULL;
 		Texture = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Texture->Create(Width >> I, Height >> I, 1, ZE_TPF_F16_4, true);
+		Texture->Create(WidthMod, HeightMod, 1, ZE_TPF_F16_4, true);
 		BloomLevels.Add(Texture);
 
 		Texture = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Texture->Create(Width >> I, Height >> I, 1, ZE_TPF_F16_4, true);
+		Texture->Create(WidthMod, HeightMod, 1, ZE_TPF_F16_4, true);
 		BloomLevelsTemp.Add(Texture);
 	}
 
