@@ -56,6 +56,7 @@
 #include <QtGui\QFileDialog>
 #include <QtGui\QDesktopServices>
 #include <QtGui\QTreeWidgetItem>
+#include "QtGui\qlabel.h"
 
 ZEMLEditorWindow* ZEMLEditorWindow::Instance = NULL;
 
@@ -236,6 +237,18 @@ void ZEMLEditorWindow::ConfigureUI()
 		Form->actAddProperty->setEnabled(false);
 		Form->actAddData->setEnabled(false);
 	}
+
+	if (FileName == "")
+	{
+		Form->statusbar->showMessage("No file is opened.");
+	}
+	else
+	{
+		if (Form->trwElementTree->selectedItems().size() == 0)
+			Form->statusbar->showMessage("No item is selected.");
+		else
+			Form->statusbar->showMessage(QString("%1 item(s) selected.").arg(Form->trwElementTree->selectedItems().size()));
+	}
 }
 
 void ZEMLEditorWindow::NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName)
@@ -261,7 +274,7 @@ void ZEMLEditorWindow::Select()
 
 void ZEMLEditorWindow::Deselect()
 {
-	Form->wgtElementEditor->SetElement(NULL);
+	Form->trwElementTree->clearSelection();
 	Update();
 }
 
@@ -524,6 +537,8 @@ ZEMLEditorWindow::ZEMLEditorWindow()
 	Form->trwElementTree->header()->setStretchLastSection(false);
 	Form->trwElementTree->header()->setResizeMode(0, QHeaderView::Stretch);
 	Form->trwElementTree->header()->setResizeMode(1, QHeaderView::Interactive);
+	
+	Form->statusbar->showMessage("Ready.");
 
 	connect(Form->actNew, SIGNAL(triggered()), this, SLOT(New()));
 	connect(Form->actOpen, SIGNAL(triggered()), this, SLOT(Open()));

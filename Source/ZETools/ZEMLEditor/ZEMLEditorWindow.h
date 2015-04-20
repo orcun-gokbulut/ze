@@ -44,6 +44,7 @@
 #include "ZEML/ZEMLRoot.h"
 
 class Ui_ZEMLEditorWindow;
+class QLabel;
 
 class ZEMLEditorWindow : public QMainWindow
 {
@@ -51,6 +52,7 @@ class ZEMLEditorWindow : public QMainWindow
 	private:
 		static ZEMLEditorWindow* Instance;
 		Ui_ZEMLEditorWindow*	Form;
+		QLabel*					StatusBarLabel;
 		ZEString				FileName;
 		ZEMLRoot				Root;
 		ZEMLNode*				RootNode;

@@ -69,12 +69,13 @@ bool ZEMLNode::Read(ZEMLReaderNode* Reader)
 	for (ZESize I = 0; I < Nodes.GetCount(); I++)
 	{
 		ZEPointer<ZEMLNode> NewNode = new ZEMLNode();
-		ZEMLReaderNode NewReaderNode = Reader->GetSubNode(Nodes[I].Name, Nodes[I].Index);
+		ZEMLReaderNode NewReaderNode = Reader->GetSubNode(I);
 		if (!NewNode->Read(&NewReaderNode))
 			return false;
 
 		AddElement(NewNode.Transfer());
 	}
+
 	return true;
 }
 

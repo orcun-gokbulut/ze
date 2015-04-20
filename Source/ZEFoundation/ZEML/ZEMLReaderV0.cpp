@@ -328,13 +328,6 @@ bool ZEMLReaderNode::LoadV0()
 					return false;
 				}
 				Node->Size = ZEEndian::Little(Node->Size);
-
-				Node->Index = 0;
-				for (ZESSize I = SubNodes.GetCount() - 1; I >= 0; I--)
-				{
-					if (&SubNodes[I] != Node && SubNodes[I].Name == Node->Name)
-						Node->Index = SubNodes[I].Index + 1;
-				}
 				File->Seek(Node->Size, ZE_SF_CURRENT);
 			}
 			else if (SubElementType == ZEML_ETV0_INLINE_DATA)
