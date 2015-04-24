@@ -46,6 +46,7 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZEAngle.h"
+#include "ZEMath/ZEMath.h"
 
 ZESimpleMaterial* ZEDGizmo::GizmoMaterial = NULL;
 

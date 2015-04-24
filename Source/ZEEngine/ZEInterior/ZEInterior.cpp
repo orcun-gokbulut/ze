@@ -187,7 +187,7 @@ const ZEString& ZEInterior::GetInteriorFile() const
 	if (InteriorResource != NULL)
 		return InteriorResource->GetFileName();
 	else
-		return "";
+		return ZEString::Empty;
 }
 
 void ZEInterior::SetInteriorResource(const ZEInteriorResource* InteriorResource)

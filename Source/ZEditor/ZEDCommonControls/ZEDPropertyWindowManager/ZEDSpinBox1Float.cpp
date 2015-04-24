@@ -37,18 +37,18 @@
 #include "ZEDUndoRedo\ZEDUndoRedo.h"
 #include "ZEDPropertyUndoRedo.h"
 
-ZEDSpinBox1Float::ZEDSpinBox1Float(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+ZEDSpinBox1Float::ZEDSpinBox1Float(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property) : QTreeWidgetItem(parent)
 {
 	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
+	this->Object = Object;
+	this->Property = Property;
 	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
+	setText(0, Property->Name);
+	//this->setToolTip (0, QString(ClassAttribute.Description));
 
-	if (Value.GetType() != ZE_VRT_FLOAT)
+	if (Value.GetType().Type != ZE_TT_FLOAT)
 	{
 		setText(1, QString("Error Float"));
 		return;
@@ -59,7 +59,7 @@ ZEDSpinBox1Float::ZEDSpinBox1Float(QTreeWidget* ParentTree, QTreeWidgetItem *par
 	ParentTree->setItemWidget(this, 1, XValue);
 	this->XValue->SetFloat(Value.GetFloat());
 
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
+	if((this->Property->Access & ZEMT_PA_WRITE) != ZEMT_PA_WRITE)
 	{
 		this->XValue->setEnabled(false);
 	}
@@ -81,14 +81,14 @@ void ZEDSpinBox1Float::Changed()
 {
 	ZEVariant Value;
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
+	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Object, this->Property);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetOldValue(Value);
 
 	Value.SetFloat(XValue->GetFloat());
-	this->Class->SetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->SetProperty(Object, Property->Name, Value);
 
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetNewValue(Value);
 
 	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
