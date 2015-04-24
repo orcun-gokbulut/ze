@@ -662,7 +662,7 @@ bool ZEMLReaderNode::ReadData(const char* Name, void* Buffer, ZESize BufferSize,
 	if (EffectiveSize > BufferSize)
 		EffectiveSize = BufferSize;
 
-	File->Seek(Property->DataOffset, ZE_SF_BEGINING);
+	File->Seek(Property->DataOffset + Offset, ZE_SF_BEGINING);
 
 	ZESize Result = File->Read(Buffer, EffectiveSize, 1);
 	if (Result != 1)

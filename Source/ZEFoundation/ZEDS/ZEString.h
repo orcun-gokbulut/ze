@@ -129,6 +129,8 @@ class ZEString
 		mutable ZEAllocatorBase<wchar_t>	WAllocator;
 
 	public:
+		static const ZEString		Empty;
+
 		void						SetBuffer(void* Buffer, ZESize Size);
 
 		void						SetValue(void* Buffer, ZESize Size);
