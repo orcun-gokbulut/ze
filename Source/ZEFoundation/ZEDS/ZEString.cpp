@@ -64,6 +64,7 @@
 #include "ZEStringWriter.h"
 #include "ZEHashGenerator.h"
 
+const ZEString ZEString::Empty;
 
 static ZEUInt GetByteLength(const char* MultiByteCharacter)
 {
