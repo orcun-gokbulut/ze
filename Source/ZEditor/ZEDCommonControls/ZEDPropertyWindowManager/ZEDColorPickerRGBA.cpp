@@ -39,19 +39,19 @@
 #include "ZEDPropertyUndoRedo.h"
 #include "ZEDCommonControls/CSS.h"
 
-ZEDColorPickerRGBA::ZEDColorPickerRGBA(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+ZEDColorPickerRGBA::ZEDColorPickerRGBA(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property) : QTreeWidgetItem(parent)
 {
 
 	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
+	this->Object = Object;
+	this->Property = Property;
 	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
+	setText(0, Property->Name);
+	//this->setToolTip (0, QString(ClassAttribute.Description));
 
-	if (Value.GetType() != ZE_VRT_VECTOR4)
+	if (Value.GetType().Type != ZE_TT_VECTOR4)
 	{
 		setText(1, QString("Error Color RGBA"));
 		return;
@@ -117,7 +117,7 @@ ZEDColorPickerRGBA::ZEDColorPickerRGBA(QTreeWidget* ParentTree, QTreeWidgetItem 
 
 	ValueCollectionLine->setText("[" + XValue->text() + " ;  " + YValue->text() + " ;  " + ZValue->text()+ " ;  " + WValue->text() + "]");
 
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
+	if((this->Property->Access & ZEMT_PA_WRITE) != ZEMT_PA_WRITE)
 	{
 		this->ValueCollectionLine->setEnabled(false);
 		this->XValue->setEnabled(false);
@@ -168,8 +168,8 @@ void ZEDColorPickerRGBA::ChangeByDialog()
 
 	ZEVariant Value;
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
+	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Object, this->Property);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetOldValue(Value);
 
 	XValue->SetFloat(Color.red() / 255.0f);
@@ -178,14 +178,14 @@ void ZEDColorPickerRGBA::ChangeByDialog()
 	WValue->SetFloat(Color.alpha() / 255.0f);
 	ValueCollectionLine->setText("[" + XValue->text() + " ;  " + YValue->text() + " ;  " + ZValue->text()+ " ;  " + WValue->text() + "]");
 	Value.SetVector4(ZEVector4(XValue->GetFloat(), YValue->GetFloat(), ZValue->GetFloat(), WValue->GetFloat()));
-	this->Class->SetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->SetProperty(Object, Property->Name, Value);
 
 	if(XValue->GetFloat() == YValue->GetFloat() && YValue->GetFloat() == ZValue->GetFloat() && ZValue->GetFloat() == WValue->GetFloat())
 		AllValue->SetFloat(XValue->GetFloat());
 	else
 		AllValue->setText(QString());
 
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetNewValue(Value);
 
 	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
@@ -195,13 +195,13 @@ void ZEDColorPickerRGBA::Changed()
 {
 	ZEVariant Value;
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
+	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Object, this->Property);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetOldValue(Value);
 	
 	Value.SetVector4(ZEVector4(XValue->GetFloat(), YValue->GetFloat(), ZValue->GetFloat(), WValue->GetFloat()));
 	ValueCollectionLine->setText("[" + XValue->text() + " ;  " + YValue->text() + " ;  " + ZValue->text()+ " ;  " + WValue->text() + "]");
-	this->Class->SetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->SetProperty(Object, Property->Name, Value);
 	ColorButton->SetColor(QColor(XValue->GetFloat() * 255, YValue->GetFloat() * 255, ZValue->GetFloat() * 255, WValue->GetFloat() * 255));
 	
 	if(XValue->GetFloat() == YValue->GetFloat() && YValue->GetFloat() == ZValue->GetFloat() && ZValue->GetFloat() == WValue->GetFloat())
@@ -214,7 +214,7 @@ void ZEDColorPickerRGBA::Changed()
 	LastValidCollection.z = ZValue->GetFloat();
 	LastValidCollection.w = WValue->GetFloat();
 
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetNewValue(Value);
 
 	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);

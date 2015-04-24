@@ -55,8 +55,8 @@ class ZEDColorPickerRGBA :  public QObject, public QTreeWidgetItem, public ZEDPr
 
 	private:
 
-		ZEObject*				Class;
-		ZEPropertyDescription	ClassAttribute;
+		ZEObject*				Object;
+		ZEProperty*				Property;
 
 		QTreeWidget*			ParentTree;
 		QColor					Color;
@@ -83,7 +83,7 @@ class ZEDColorPickerRGBA :  public QObject, public QTreeWidgetItem, public ZEDPr
 
 		virtual void			UpdateValues();
 
-								ZEDColorPickerRGBA(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute);
+								ZEDColorPickerRGBA(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEProperty* Property);
 								~ZEDColorPickerRGBA();
 
 	public slots:

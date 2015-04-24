@@ -213,7 +213,7 @@ void ZEModel::LoadModelResource()
 	}
 }
 
-void ZEModel::SetModelFile(ZEString ModelFile)
+void ZEModel::SetModelFile(const ZEString& ModelFile)
 {
 	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource(ModelFile);
 
@@ -226,25 +226,12 @@ void ZEModel::SetModelFile(ZEString ModelFile)
 	SetModelResource(ModelResource);
 }
 
-void ZEModel::SetModelFile(const char* ModelFile)
-{
-	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource(ModelFile);
-
-	if (ModelResource == NULL)
-	{
-		zeError("Can not load model file. File Name : \"%s\"", ModelFile);
-		return;
-	}
-
-	SetModelResource(ModelResource);
-}
-
-const char* ZEModel::GetModelFile() const
+const ZEString& ZEModel::GetModelFile() const
 {
 	if (ModelResource != NULL)
 		return ModelResource->GetFileName();
 	else
-		return "";
+		return ZEString::Empty;
 }
 
 void ZEModel::SetModelResource(const ZEModelResource* ModelResource)

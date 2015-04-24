@@ -47,7 +47,7 @@ class ZEDGizmoUndoRedoOperation : public ZEDUndoRedoOperation
 {
 	private:
 
-		ZEArray<ZEObject*>		SelectedClasses;
+		ZEArray<ZEObject*>		SelectedObjects;
 		ZEArray<ZEVariant>		OldValues;
 		ZEArray<ZEVariant>		NewValues;
 		ZEDGizmoMode			GizmoMode;
@@ -57,14 +57,14 @@ class ZEDGizmoUndoRedoOperation : public ZEDUndoRedoOperation
 		void					SetOldValues(ZEArray<ZEVariant>	OldValues);
 		void					SetNewValues(ZEArray<ZEVariant>	NewValues);
 
-		void					SetClasses(ZEArray<ZEObject*> SelectedClasses);
+		void					SetClasses(ZEArray<ZEObject*> SelectedObjects);
 		void					SetGizmoMode(ZEDGizmoMode GizmoMode);
 		ZEDGizmoMode			GetGizmoMode();
 
 		virtual bool			Undo();
 		virtual bool			Redo();
 
-								ZEDGizmoUndoRedoOperation(ZEArray<ZEObject*>	SelectedClasses, ZEDGizmoMode GizmoMode);
+								ZEDGizmoUndoRedoOperation(ZEArray<ZEObject*>	SelectedObjects, ZEDGizmoMode GizmoMode);
 };
 
 #endif

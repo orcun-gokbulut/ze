@@ -66,19 +66,19 @@ class ZEDEnumComboBox : public QObject, public QTreeWidgetItem, public ZEDProper
 	
 	private:
 
-		QList<ZEInt>				ValueIndexTable;
+		QList<ZEInt32>			ValueIndexTable;
 
 	public:
 
-		ZEObject*				Class;
-		ZEPropertyDescription	ClassAttribute;
+		ZEObject*				Object;
+		ZEProperty*				Property;
 		QTreeWidget*			ParentTree;
 
 		ZEDPropertyComboBox*	XValue;
 
 		virtual void			UpdateValues();
 
-								ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute);
+								ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property);
 								~ZEDEnumComboBox();
 
 	public slots:

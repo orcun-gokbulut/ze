@@ -51,15 +51,15 @@ class ZEDLineEdit : public QObject, public QTreeWidgetItem, public ZEDPropertyWi
 	Q_OBJECT
 	
 	public:
-		ZEObject*				Class;
-		ZEPropertyDescription	ClassAttribute;
+		ZEObject*				Object;
+		ZEProperty*				Property;
 		QTreeWidget*			ParentTree;
 
 		ZEDFloatIntLineEdit*	XValue;
 
 		virtual void			UpdateValues();
 
-								ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute);
+								ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property);
 								~ZEDLineEdit();
 
 	public slots:

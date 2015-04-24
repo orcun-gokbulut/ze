@@ -46,9 +46,9 @@ void ZEDGizmoUndoRedoOperation::SetNewValues(ZEArray<ZEVariant> NewValues)
 	this->NewValues = NewValues;
 }
 
-void ZEDGizmoUndoRedoOperation::SetClasses(ZEArray<ZEObject*> SelectedClasses)
+void ZEDGizmoUndoRedoOperation::SetClasses(ZEArray<ZEObject*> SelectedObjects)
 {	
-	this->SelectedClasses = SelectedClasses;
+	this->SelectedObjects = SelectedObjects;
 }
 
 void ZEDGizmoUndoRedoOperation::SetGizmoMode(ZEDGizmoMode GizmoMode)
@@ -65,31 +65,31 @@ bool ZEDGizmoUndoRedoOperation::Undo()
 {	
 	if (GizmoMode == ZED_GM_MOVE)
 	{	
-		for(ZESize I = 0; I < SelectedClasses.GetCount(); I++)
+		for(ZESize I = 0; I < SelectedObjects.GetCount(); I++)
 		{
-			if(SelectedClasses[I] != NULL)
+			if(SelectedObjects[I] != NULL)
 			{
-				SelectedClasses[I]->SetProperty("Position", OldValues[I]);
+				SelectedObjects[I]->GetClass()->SetProperty(SelectedObjects[I], "Position", OldValues[I]);
 			}
 		}
 	}
 	if (GizmoMode == ZED_GM_SCALE)
 	{	
-		for(ZESize I = 0; I < SelectedClasses.GetCount(); I++)
+		for(ZESize I = 0; I < SelectedObjects.GetCount(); I++)
 		{
-			if(SelectedClasses[I] != NULL)
+			if(SelectedObjects[I] != NULL)
 			{
-				SelectedClasses[I]->SetProperty("Scale", OldValues[I]);
+				SelectedObjects[I]->GetClass()->SetProperty(SelectedObjects[I], "Scale", OldValues[I]);
 			}
 		}
 	}
 	if (GizmoMode == ZED_GM_ROTATE)
 	{	
-		for(ZESize I = 0; I < SelectedClasses.GetCount(); I++)
+		for(ZESize I = 0; I < SelectedObjects.GetCount(); I++)
 		{
-			if(SelectedClasses[I] != NULL)
+			if(SelectedObjects[I] != NULL)
 			{
-				SelectedClasses[I]->SetProperty("Rotation", OldValues[I]);
+				SelectedObjects[I]->GetClass()->SetProperty(SelectedObjects[I], "Rotation", OldValues[I]);
 			}
 		}
 	}
@@ -101,31 +101,31 @@ bool ZEDGizmoUndoRedoOperation::Redo()
 {
 	if (GizmoMode == ZED_GM_MOVE)
 	{	
-		for(ZESize I = 0; I < SelectedClasses.GetCount(); I++)
+		for(ZESize I = 0; I < SelectedObjects.GetCount(); I++)
 		{
-			if(SelectedClasses[I] != NULL)
+			if(SelectedObjects[I] != NULL)
 			{
-				SelectedClasses[I]->SetProperty("Position", NewValues[I]);
+				SelectedObjects[I]->GetClass()->SetProperty(SelectedObjects[I], "Position", NewValues[I]);
 			}
 		}
 	}
 	if (GizmoMode == ZED_GM_SCALE)
 	{	
-		for(ZESize I = 0; I < SelectedClasses.GetCount(); I++)
+		for(ZESize I = 0; I < SelectedObjects.GetCount(); I++)
 		{
-			if(SelectedClasses[I] != NULL)
+			if(SelectedObjects[I] != NULL)
 			{
-				SelectedClasses[I]->SetProperty("Scale", NewValues[I]);
+				SelectedObjects[I]->GetClass()->SetProperty(SelectedObjects[I], "Scale", NewValues[I]);
 			}
 		}
 	}
 	if (GizmoMode == ZED_GM_ROTATE)
 	{	
-		for(ZESize I = 0; I < SelectedClasses.GetCount(); I++)
+		for(ZESize I = 0; I < SelectedObjects.GetCount(); I++)
 		{
-			if(SelectedClasses[I] != NULL)
+			if(SelectedObjects[I] != NULL)
 			{
-				SelectedClasses[I]->SetProperty("Rotation", NewValues[I]);
+				SelectedObjects[I]->GetClass()->SetProperty(SelectedObjects[I], "Rotation", NewValues[I]);
 			}
 		}
 	}
@@ -133,8 +133,8 @@ bool ZEDGizmoUndoRedoOperation::Redo()
 	return true;
 }
 
-ZEDGizmoUndoRedoOperation::ZEDGizmoUndoRedoOperation(ZEArray<ZEObject*> SelectedClasses, ZEDGizmoMode GizmoMode)
+ZEDGizmoUndoRedoOperation::ZEDGizmoUndoRedoOperation(ZEArray<ZEObject*> SelectedObjects, ZEDGizmoMode GizmoMode)
 {
-	this->SelectedClasses = SelectedClasses;
+	this->SelectedObjects = SelectedObjects;
 	this->GizmoMode = GizmoMode;
 }

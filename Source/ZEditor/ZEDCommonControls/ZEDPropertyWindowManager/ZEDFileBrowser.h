@@ -58,8 +58,8 @@ class ZEDFileBrowser : public QObject, public QTreeWidgetItem, public ZEDPropert
 
 	public:
 
-		ZEObject*				Class;
-		ZEPropertyDescription	ClassAttribute;
+		ZEObject*				Object;
+		ZEProperty*				Property;
 		QTreeWidget*			ParentTree;
 		QWidget*				LayoutWidget;
 
@@ -73,7 +73,7 @@ class ZEDFileBrowser : public QObject, public QTreeWidgetItem, public ZEDPropert
 
 		virtual void			UpdateValues();
 		
-								ZEDFileBrowser(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute, QString WorkingDirectory);
+								ZEDFileBrowser(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property, QString WorkingDirectory);
 								~ZEDFileBrowser();
 
 	public slots:

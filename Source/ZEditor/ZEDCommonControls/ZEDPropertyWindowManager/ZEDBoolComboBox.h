@@ -42,8 +42,9 @@
 #include <QtGui/QTreeWidgetItem>
 #include <QtGui/QCheckBox>
 #include "ZEDPropertyWidget.h"
-#include "ZEDS\ZEVariant.h"
-#include "ZEMeta\ZEObject.h"
+#include "ZEDS/ZEVariant.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZEMeta/ZEProperty.h"
 
 class ZEDBoolComboBox : public QObject, public QTreeWidgetItem, public ZEDPropertyWidget
 {
@@ -51,14 +52,14 @@ class ZEDBoolComboBox : public QObject, public QTreeWidgetItem, public ZEDProper
 
 	public:
 
-		ZEObject*				Class;
-		ZEPropertyDescription	ClassAttribute;
+		ZEObject*				Object;
+		ZEProperty*				Property;
 		QTreeWidget*			ParentTree;
 		QCheckBox*				XValue;
 
 		virtual void			UpdateValues();
 
-								ZEDBoolComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute);
+								ZEDBoolComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property);
 								~ZEDBoolComboBox();
 
 	public slots:

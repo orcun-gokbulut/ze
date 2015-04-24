@@ -54,8 +54,8 @@ class ZEDSpinBox4 : public QObject, public QTreeWidgetItem, public ZEDPropertyWi
 
 	public:
 
-		ZEObject*				Class;
-		ZEPropertyDescription	ClassAttribute;
+		ZEObject*				Object;
+		ZEProperty*				Property;
 		QTreeWidget*			ParentTree;
 
 		ZEVector4				LastValidCollection;
@@ -76,7 +76,7 @@ class ZEDSpinBox4 : public QObject, public QTreeWidgetItem, public ZEDPropertyWi
 
 		virtual void			UpdateValues();
 
-								ZEDSpinBox4(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute);
+								ZEDSpinBox4(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property);
 								~ZEDSpinBox4();
 
 		public slots:

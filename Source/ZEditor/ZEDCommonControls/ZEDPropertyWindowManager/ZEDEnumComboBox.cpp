@@ -65,19 +65,20 @@ ZEDPropertyComboBox::~ZEDPropertyComboBox()
 
 }
 
-ZEDEnumComboBox::ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+ZEDEnumComboBox::ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property) : QTreeWidgetItem(parent)
 {
 	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
+	this->Object = Object;
+	this->Property = Property;
 	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
+
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
+	setText(0, Property->Name);
+	//this->setToolTip (0, QString(ClassAttribute.Description));
 	ValueIndexTable.clear();
 
-	if (Value.GetType() != ZE_VRT_INTEGER_32)
+	if (Value.GetType().Type != ZE_TT_INTEGER_32 || Property->Type.Enumerator == NULL)
 	{
 		setText(1, QString("Error Enumeration"));
 		return;
@@ -88,28 +89,35 @@ ZEDEnumComboBox::ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *paren
 	//this->XValue->setStyleSheet(GetCSSFromFile(":/CSS/PropertyWindowComboBox.qss"));
 	QString asd = XValue->styleSheet();
 	
-
 	QPalette Palette = XValue->palette();
 	Palette.setColor(XValue->backgroundRole(), Qt::transparent);
 	XValue->setPalette(Palette);
 	XValue->setAutoFillBackground(false);
 	XValue->setFrame(false);
 
-	for(ZESize I = 0; I < this->ClassAttribute.Enumurators->ItemCount; I++)
-		this->XValue->addItem(QString(ClassAttribute.Enumurators->Items[I].Name));
+	for(ZESize I = 0; I < this->Property->Type.Enumerator->GetItemCount(); I++)
+		this->XValue->addItem(this->Property->Type.Enumerator->GetItems()[I].Name);
 
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
+	if((this->Property->Access & ZEMT_PA_WRITE) != ZEMT_PA_WRITE)
 		this->XValue->setEnabled(false);
 
-	this->XValue->setMaxCount(this->ClassAttribute.Enumurators->ItemCount);
+	this->XValue->setMaxCount(this->Property->Type.Enumerator->GetItemCount());
 
-	for (ZESize I = 0; I < ClassAttribute.Enumurators->ItemCount; I++)
+	ZEUInt32 CurrentValue = 0;
+	ZESize CurrentIndex = 0;
+
+	for (ZESize I = 0; I < this->Property->Type.Enumerator->GetItemCount(); I++)
 	{
-		ValueIndexTable.append(ClassAttribute.Enumurators->Items[I].Value);
+		CurrentValue = this->Property->Type.Enumerator->GetItems()[I].Value;
+
+		if (CurrentValue == Value.GetEnum())
+			CurrentIndex = I;
+
+		ValueIndexTable.append(CurrentValue);
 	}
 
-	ParentTree->setItemWidget(this, 1, XValue);	
-	XValue->setCurrentIndex(Value.GetInt32());////////////////////Buggggggggggg
+	ParentTree->setItemWidget(this, 1, XValue);
+	XValue->setCurrentIndex(CurrentIndex);
 	connect(this->XValue, SIGNAL(currentIndexChanged(int)), this, SLOT(Changed()));
 }
 
@@ -127,15 +135,15 @@ void ZEDEnumComboBox::Changed()
 {
 	ZEVariant Value;
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
+	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Object, this->Property);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetOldValue(Value);
 
-	ZEInt Index = XValue->currentIndex();
+	ZEInt32 Index = XValue->currentIndex();
 	Value.SetInt32(ValueIndexTable[Index]);
-	this->Class->SetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->SetProperty(Object, Property->Name, Value);
 
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetNewValue(Value);
 
 	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);

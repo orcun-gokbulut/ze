@@ -39,19 +39,19 @@
 #include "ZEDPropertyUndoRedo.h"
 #include "ZEMath/ZEAngle.h"
 
-ZEDRotationSpinBox3::ZEDRotationSpinBox3(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+ZEDRotationSpinBox3::ZEDRotationSpinBox3(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property) : QTreeWidgetItem(parent)
 {
 	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
+	this->Object = Object;
+	this->Property = Property;
 	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
+	setText(0, Property->Name);
 	ZEQuaternion Temp = Value.GetQuaternion();
-	this->setToolTip (0, QString(ClassAttribute.Description));
+	//this->setToolTip (0, QString(ClassAttribute.Description));
 
-	if (Value.GetType() != ZE_VRT_QUATERNION)
+	if (Value.GetType().Type != ZE_TT_QUATERNION)
 	{
 		setText(1, QString("Error Quaternion"));
 		return;
@@ -104,7 +104,7 @@ ZEDRotationSpinBox3::ZEDRotationSpinBox3(QTreeWidget* ParentTree, QTreeWidgetIte
 
 	ValueCollectionLine->setText("[" + XValue->text() + " ;  " + YValue->text() + " ;  " + ZValue->text() + "]");
 
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
+	if((this->Property->Access & ZEMT_PA_WRITE) != ZEMT_PA_WRITE)
 	{
 		this->XValue->setEnabled(false);
 		this->YValue->setEnabled(false);
@@ -139,10 +139,10 @@ void ZEDRotationSpinBox3::UpdateValues()
 	ZEQuaternion TempQuarternion;
 	ZEVariant	 TempVariant;
 
-	if(Class->GetProperty(ClassAttribute.Name, TempVariant) == false)
+	if(Object->GetClass()->GetProperty(Object, Property->Name, TempVariant) == false)
 		return;
 
-	this->Class->GetProperty(ClassAttribute.Name, TempVariant);
+	Object->GetClass()->GetProperty(Object, Property->Name, TempVariant);
 	TempQuarternion = TempVariant.GetQuaternion();
 	ZEQuaternion::ConvertToEulerAngles(x, y, z, TempQuarternion);
 
@@ -166,8 +166,8 @@ void ZEDRotationSpinBox3::Changed()
 {
 	ZEVariant Value;
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
+	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Object, this->Property);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetOldValue(Value);
 
 	ZEQuaternion Temp;
@@ -189,7 +189,7 @@ void ZEDRotationSpinBox3::Changed()
 
 	ZEQuaternion::CreateFromEuler(Temp,XValue->GetFloat()*(ZE_PI/180), YValue->GetFloat()*(ZE_PI/180), ZValue->GetFloat()*(ZE_PI/180));
 	Value.SetQuaternion(Temp);
-	this->Class->SetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->SetProperty(Object, Property->Name, Value);
 
 	if(XValue->GetFloat() == YValue->GetFloat() && YValue->GetFloat() == ZValue->GetFloat())
 		AllValue->SetFloat(XValue->GetFloat());
@@ -200,7 +200,7 @@ void ZEDRotationSpinBox3::Changed()
 	LastValidCollection.y = YValue->GetFloat();
 	LastValidCollection.z = ZValue->GetFloat();
 
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetNewValue(Value);
 
 	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);

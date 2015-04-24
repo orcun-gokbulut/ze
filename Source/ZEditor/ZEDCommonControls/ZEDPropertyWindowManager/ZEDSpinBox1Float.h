@@ -52,14 +52,14 @@ class ZEDSpinBox1Float : public QObject, public QTreeWidgetItem, public ZEDPrope
 
 	public:
 
-		ZEObject*				Class;
-		ZEPropertyDescription	ClassAttribute;
+		ZEObject*				Object;
+		ZEProperty*				Property;
 		QTreeWidget*			ParentTree;
 		ZEDFloatIntLineEdit*	XValue;
 
 		virtual void			UpdateValues();
 
-								ZEDSpinBox1Float(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute);
+								ZEDSpinBox1Float(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property);
 								~ZEDSpinBox1Float();
 
 		public slots:

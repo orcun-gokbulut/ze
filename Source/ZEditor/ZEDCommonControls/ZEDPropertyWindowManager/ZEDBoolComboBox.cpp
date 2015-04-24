@@ -38,16 +38,17 @@
 #include "ZEDPropertyUndoRedo.h"
 #include "ZEDCommonControls/CSS.h"
 
-ZEDBoolComboBox::ZEDBoolComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+ZEDBoolComboBox::ZEDBoolComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property) : QTreeWidgetItem(parent)
 {
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
+	this->Object = Object;
+	this->Property = Property;
 	this->ParentTree = ParentTree;
 	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
-	setText(0, ClassAttribute.Name);
 
-	if (Value.GetType() != ZE_VRT_BOOLEAN)
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
+	setText(0, Property->Name);
+
+	if (Value.GetType().Type != ZE_TT_BOOLEAN)
 	{
 		setText(1, QString("Error Boolean"));
 		return;
@@ -58,7 +59,7 @@ ZEDBoolComboBox::ZEDBoolComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *paren
 
 	ParentTree->setItemWidget(this, 1, XValue);
 
-	if(Value.GetBoolean())
+	if(Value.GetBool())
 	{
 		XValue->setChecked(true);
 		XValue->setText(QString("True"));
@@ -69,7 +70,7 @@ ZEDBoolComboBox::ZEDBoolComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *paren
 		XValue->setText(QString("False"));
 	}
 
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
+	if((this->Property->Access & ZEMT_PA_WRITE) != ZEMT_PA_WRITE)
 		this->XValue->setEnabled(false);
 	
 	XValue->setFixedHeight(20);
@@ -91,11 +92,11 @@ void ZEDBoolComboBox::Changed()
 {
 	ZEVariant Value;
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
+	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Object, this->Property);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetOldValue(Value);	
 
-	Value.SetBoolean(XValue->isChecked());
+	Value.SetBool(XValue->isChecked());
 	
 	if(XValue->isChecked())
 		XValue->setText(QString("True"));
@@ -103,9 +104,9 @@ void ZEDBoolComboBox::Changed()
 	else
 		XValue->setText(QString("False"));
 
-	this->Class->SetProperty(ClassAttribute.Name, Value);
+	this->Object->GetClass()->SetProperty(Object, Property->Name, Value);
 
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetNewValue(Value);
 
 	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);

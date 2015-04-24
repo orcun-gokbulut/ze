@@ -71,6 +71,7 @@ class ZEModel : public ZEEntity
 	ZE_OBJECT
 
 	private:
+		//ZE_ATTRIBUTE_1(ModelResource, "ResourcePath")
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
 		ZEArray<ZERenderCommand>			LODRenderCommands;
@@ -119,11 +120,9 @@ class ZEModel : public ZEEntity
 		void								SetUserDefinedBoundingBoxEnabled(bool Value);
 		virtual const ZEAABBox&				GetWorldBoundingBox() const;
 
-		void								SetModelFile(const char* ModelFile);
-		const char*							GetModelFile() const;
+		void								SetModelFile(const ZEString& ModelFile);
+		const ZEString&						GetModelFile() const;
 
-		//i'll remove this method
-		void								SetModelFile(ZEString ModelFile);
 
 		void								SetModelResource(const ZEModelResource* ModelResource);	
 		const ZEModelResource*				GetModelResource();
