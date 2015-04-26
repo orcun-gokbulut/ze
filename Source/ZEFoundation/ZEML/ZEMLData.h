@@ -72,7 +72,7 @@ class ZEMLData : public ZEMLElement
 
 									ZEMLData();
 									ZEMLData(const char* Name);
-									ZEMLData(const char* Name, void* Data, ZESize DataSize,  bool Referred = false);
+									ZEMLData(const char* Name, void* Data, ZEUInt64 DataSize,  bool Referred = false);
 		virtual						~ZEMLData();
 };
 
