@@ -35,16 +35,15 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZETerrainBlock.cpp			Sources)
-ze_add_source(ZETerrainBlock.h				Sources)
-ze_add_source(ZETerrainPatch.cpp			Sources)
-ze_add_source(ZETerrainPatch.h				Sources)
-ze_add_source(ZETerrainDatabase.cpp			Sources)
-ze_add_source(ZETerrainDatabase.h			Sources)
-ze_add_source(ZETerrainExporterMain.cpp		Sources)
-
+ze_add_source(ZETEBlock.cpp					Sources)
+ze_add_source(ZETEBlock.h					Sources)
+ze_add_source(ZETEPatch.cpp					Sources)
+ze_add_source(ZETEPatch.h					Sources)
+ze_add_source(ZETEPatchDatabase.cpp			Sources)
+ze_add_source(ZETEPatchDatabase.h			Sources)
+ze_add_source(ZETEMain.cpp					Sources)
 
 ze_add_executable(TARGET ZETerrainExporter
 	CONSOLE
 	SOURCES ${Sources}
-	LIBS ZEFoundation libFreeImage ZETerrain2)
+	LIBS ZEFoundation libFreeImage libIPP)

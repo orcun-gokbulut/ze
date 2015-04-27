@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainDatabase.cpp
+ Zinek Engine - ZETEPatchDatabase.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,15 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDS/ZEArray.h"
-#include "ZETerrainDatabase.h"
-#include "ZETerrainPatch.h"
-#include "FreeImage.h"
-#include "ZEFile/ZEFile.h"
-#include "ZETerrainBlock.h"
-#include "ZEDS/ZEFormat.h"
 
-void ZETerrainPatchDatabase::CalculateDimensions()
+#include "ZEDS/ZEArray.h"
+#include "ZEFile/ZEFile.h"
+#include "ZEDS/ZEFormat.h"
+#include "ZETEPatch.h"
+#include "ZETEPatchDatabase.h"
+#include "ZETEBlock.h"
+
+#include <FreeImage.h>
+
+void ZETEPatchDatabase::CalculateDimensions()
 {
 	if (Patches.GetCount() == 0)
 	{
@@ -53,7 +55,7 @@ void ZETerrainPatchDatabase::CalculateDimensions()
 	}
 	else
 	{
-		ZETerrainPatch* CurrentPatch = Patches[0];
+		ZETEPatch* CurrentPatch = Patches[0];
 		StartX = CurrentPatch->GetStartX();
 		StartY = CurrentPatch->GetStartY();
 		EndX = CurrentPatch->GetEndX();
@@ -82,17 +84,17 @@ void ZETerrainPatchDatabase::CalculateDimensions()
 	}
 }
 
-void ZETerrainPatchDatabase::SetBlockType(ZETerrainPixelType Type)
+void ZETEPatchDatabase::SetBlockType(ZETEPixelType Type)
 {
 	this->PixelType = Type;
 }
 
-ZETerrainPixelType ZETerrainPatchDatabase::GetBlockType()
+ZETEPixelType ZETEPatchDatabase::GetBlockType()
 {
 	return PixelType;
 }
 
-bool ZETerrainPatchDatabase::AddPatch(ZETerrainPatch* Patch)
+bool ZETEPatchDatabase::AddPatch(ZETEPatch* Patch)
 {
 	if (PixelType == ZE_TPT_NONE)
 		PixelType = Patch->GetPixelType();
@@ -107,72 +109,72 @@ bool ZETerrainPatchDatabase::AddPatch(ZETerrainPatch* Patch)
 	CalculateDimensions();
 }
 
-void ZETerrainPatchDatabase::RemovePatch(ZETerrainPatch* Patch)
+void ZETEPatchDatabase::RemovePatch(ZETEPatch* Patch)
 {
 	Patches.DeleteValue(Patch);
 	CalculateDimensions();
 }
 
-const ZEArray<ZETerrainPatch*>& ZETerrainPatchDatabase::GetPatches()
+const ZEArray<ZETEPatch*>& ZETEPatchDatabase::GetPatches()
 {
 	return Patches;
 }
 
-double ZETerrainPatchDatabase::GetStartX()
+double ZETEPatchDatabase::GetStartX()
 {
 	return StartX;
 }
 
-double ZETerrainPatchDatabase::GetStartY()
+double ZETEPatchDatabase::GetStartY()
 {
 	return StartY;
 }
 
-double ZETerrainPatchDatabase::GetEndX()
+double ZETEPatchDatabase::GetEndX()
 {
 	return EndX;
 }
 
-double ZETerrainPatchDatabase::GetEndY()
+double ZETEPatchDatabase::GetEndY()
 {
 	return EndY;
 }
 
-void ZETerrainPatchDatabase::GetUnitSize(double UnitSize)
+void ZETEPatchDatabase::GetUnitSize(double UnitSize)
 {
 	this->UnitSize = UnitSize;
 }
 
-double ZETerrainPatchDatabase::GetUnitSize()
+double ZETEPatchDatabase::GetUnitSize()
 {
 	return UnitSize;
 }
 
-void ZETerrainPatchDatabase::SetBlocksPerChunks(ZESize BlocksPerChunk)
+void ZETEPatchDatabase::SetBlocksPerChunks(ZESize BlocksPerChunk)
 {
 	this->BlocksPerChunk = BlocksPerChunk;
 }
 
-ZESize ZETerrainPatchDatabase::GetBlocksPerChunks()
+ZESize ZETEPatchDatabase::GetBlocksPerChunks()
 {
 	return BlocksPerChunk;
 }
 
-void ZETerrainPatchDatabase::SetBlockSize(ZESize BlockSize)
+void ZETEPatchDatabase::SetBlockSize(ZESize BlockSize)
 {
 	this->BlockSize = BlockSize;
 }
 
-ZESize ZETerrainPatchDatabase::GetBlockSize()
+ZESize ZETEPatchDatabase::GetBlockSize()
 {
 	return BlockSize;
 }
 
-bool ZETerrainPatchDatabase::CheckBlockAvailable(ZESize Level, double x, double y)
+bool ZETEPatchDatabase::CheckBlockAvailable(ZESize Level, double x, double y)
 {
 	for (ZESize I = 0; I < Patches.GetCount(); I++)
 	{
-		ZETerrainPatch* CurrentPatch = Patches[I];
+		ZETEPatch* CurrentPatch = Patches[I];
 		if (CurrentPatch->GetLevel() <= Level &&
 			CurrentPatch->BoundaryCheck(x, y))
 			return true;
@@ -181,7 +183,7 @@ bool ZETerrainPatchDatabase::CheckBlockAvailable(ZESize Level, double x, double 
 	return false;
 }
 
-static ZEInt PartchSortFunction(ZETerrainPatch* const* A, ZETerrainPatch* const * B)
+static ZEInt PartchSortFunction(ZETEPatch* const* A, ZETEPatch* const * B)
 {
 	if ((*A)->GetPriority() > (*B)->GetPriority())
 		return 1;
@@ -191,41 +193,9 @@ static ZEInt PartchSortFunction(ZETerrainPatch* const* A, ZETerrainPatch* const 
 		return 0;
 }
 
-void ZETerrainPatchDatabase::UpdateOrder()
+void ZETEPatchDatabase::UpdateOrder()
 {
 	Patches.Sort(PartchSortFunction);
-}
-
-bool ZETerrainPatchDatabase::SampleBlock(ZETerrainBlock& Output, ZEUInt64 x, ZEUInt64 y, ZEUInt Level)
-{
-	Output.Create(PixelType, BlockSize);
-	Output.SetPositionX(x);
-	Output.SetPositionY(y);
-	Output.SetLevel(Level);
-
-	for (ZESize py = 0; py < BlockSize; py++)
-		for (ZESize px = 0; px < BlockSize; px++)
-				SamplePixel(Output.Sample(px, py), x + px + 0.5, y + py + 0.5, Level);
-	
-	Output.Update();
-
-	return true;
-}
-
-bool ZETerrainPatchDatabase::SamplePixel(void* Output, double x, double y, ZEUInt Level)
-{
-	for (ZESize I = 0; I < Patches.GetCount(); I++)
-	{
-		if (Patches[I]->BoundaryCheck(x, y))
-		{
-			Patches[I]->Sample(Output, x, y);
-			return true;
-		}
-	}
-
-	*(ZEUInt32*)Output = 0;
-
-	return false;
 }
 
 struct ZETerrainBlockIndex
@@ -239,7 +209,7 @@ struct ZETerrainBlockIndex
 struct ZETerrainBlockInfo
 {
 	ZESize						Size;
-	ZETerrainPixelType			PixelType;
+	ZETEPixelType			PixelType;
 	ZESize						PixelSize;
 	ZESize						MipmapCount;
 };
@@ -276,7 +246,7 @@ static ZEInt TerrainIndexCompare(const ZETerrainBlockIndex* A, const ZETerrainBl
 	}
 }
 
-void ZETerrainPatchDatabase::Save(const ZEString& Path)
+void ZETEPatchDatabase::Save(const ZEString& Path)
 {
 	ZEArray<ZETerrainBlockIndex> Indexes;
 	
@@ -284,7 +254,7 @@ void ZETerrainPatchDatabase::Save(const ZEString& Path)
 	DataFile.Open(Path + ".Data.ZETerrain", ZE_FOM_WRITE, ZE_FCM_CREATE);
 	
 	ZESize MipmapCount = 1;
-	ZETerrainBlock Block;
+	ZETEBlock Block;
 		
 	ZEUInt64 StartXN = (ZEUInt64)GetStartX() - ((ZEUInt64)GetStartX() % BlockSize);
 	ZEUInt64 StartYN = (ZEUInt64)GetStartY() - ((ZEUInt64)GetStartY() % BlockSize);
@@ -295,7 +265,7 @@ void ZETerrainPatchDatabase::Save(const ZEString& Path)
 		{
 			for (ZEUInt64 XN = StartXN; XN < GetEndX(); XN += BlockSize)
 			{
-				if (SampleBlock(Block, XN, YN, Level))
+				//if (SampleBlock(Block, XN, YN, Level))
 				{
 					ZETerrainBlockIndex Index;
 
@@ -341,7 +311,7 @@ void ZETerrainPatchDatabase::Save(const ZEString& Path)
 	IndexFile.Close();
 }
 
-ZETerrainPatchDatabase::ZETerrainPatchDatabase()
+ZETEPatchDatabase::ZETEPatchDatabase()
 {
 	StartX = 0.0;
 	StartY = 0.0;
@@ -354,7 +324,7 @@ ZETerrainPatchDatabase::ZETerrainPatchDatabase()
 	PixelType = ZE_TPT_NONE;
 }
 
-ZETerrainPatchDatabase::~ZETerrainPatchDatabase()
+ZETEPatchDatabase::~ZETEPatchDatabase()
 {
 	for (ZESize I = 0; I < Patches.GetCount(); I++)
 		delete Patches[I];
