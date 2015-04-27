@@ -322,6 +322,9 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		#ifdef ZE_SHADER_SSAO
 			AmbientColor *= tex2D(SSAOBuffer, ScreenPosition).r;
 		#endif
+		#ifdef ZE_SHADER_BASE_MAP
+			AmbientColor *= tex2D(BaseMap, Input.Texcoord).rgb;	
+		#endif	
 		Output.Color.rgb = AmbientColor;
 		#ifdef ZE_SHADER_LIGHT_MAP
 			//Output.Color.rgb *= tex2D(LightMap, Input.Texcoord).rgb;
@@ -331,6 +334,9 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	#ifdef ZE_SHADER_DIFFUSE
 		float3 DiffuseColor = MaterialDiffuseColor;
 		DiffuseColor *= ZELBuffer_GetDiffuse(ScreenPosition);
+		#ifdef ZE_SHADER_BASE_MAP
+			DiffuseColor *= tex2D(BaseMap, Input.Texcoord).rgb;	
+		#endif	
 		Output.Color.rgb += DiffuseColor;
 	#endif
 	
@@ -342,11 +348,6 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		SpecularColor *= ZELBuffer_GetSpecular(ScreenPosition);
 		Output.Color.rgb += SpecularColor;
 	#endif
-
-	#ifdef ZE_SHADER_BASE_MAP
-		Output.Color.rgb *= tex2D(BaseMap, Input.Texcoord).rgb;
-		
-	#endif	
 	
 	#ifdef ZE_SHADER_EMMISIVE
 		float3 EmmisiveColor = MaterialEmmisiveColor;

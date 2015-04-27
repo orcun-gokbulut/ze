@@ -50,7 +50,7 @@ qt4_add_resources(QtResourceFiles ${QtResources})
 qt4_wrap_ui(QtUIFiles ${QtUI})
 qt4_wrap_cpp(QtMocFiles ${QtMocs})
 
-include_directories(${CMAKE_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ze_add_library(TARGET ZEResourceConfigurationWidget 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}

@@ -34,13 +34,14 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETerrainDrawer.h"
+#include "ZETerrain.h"
+
 #include "ZEGraphics/ZEMaterial.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZEViewVolume.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZERenderer.h"
-#include "ZETerrain2/ZETerrain.h"
 
 void ZETerrainDrawer::SetTerrain(ZETerrain2* Terrain)
 {

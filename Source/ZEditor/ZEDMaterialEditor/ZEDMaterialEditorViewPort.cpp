@@ -100,7 +100,6 @@ void ZEDMaterialEditorViewPort::Initialize()
 	DirectLight3->SetName("D3");
 	zeCore->GetGame()->GetScene()->AddEntity(DirectLight3);
 	DirectLight3->SetIntensity(1.0f);
-	//DirectLight3->SetColor(ZEVector3(0.988235f; 1.0f; 0.827451f));
 	DirectLight3->SetColor(ZEVector3(0.666667f,  0.333333f,  0.0f));
 	ZEQuaternion::CreateFromEuler(Rotation, ZE_PI_2, 0, 0);
 	DirectLight3->SetRotation(Rotation);
@@ -147,7 +146,6 @@ void ZEDMaterialEditorViewPort::wheelEvent(QWheelEvent * Event)
 void ZEDMaterialEditorViewPort::mousePressEvent(QMouseEvent * Event)
 {
 	QFrame::mousePressEvent(Event);
-
 	OldMousePosition = Event->pos();
 }
 
@@ -166,25 +164,48 @@ ZEArray<ZEFixedMaterial*> ZEDMaterialEditorViewPort::GetModelMaterials()
 	return Materials;
 }
 
-void ZEDMaterialEditorViewPort::SetModelFile(const char* FileName)
+void ZEDMaterialEditorViewPort::SetModelResource(ZEModelResource* ModelResource)
 {
-	ZEModelResource* TempResource = ZEModelResource::LoadSharedResource(FileName);
+	if(ModelResource == NULL)
+		return;
 
-// 	if(Model->GetModelResource() != NULL)
-// 	{
-// 		for (ZESize I = 0; I < Model->GetModelResource()->GetMaterials()[0]->GetDescription()->GetPropertyCount(); I++)
-// 		{
-// 			ZEVariant TempVariant;
-// 			Model->GetModelResource()->GetMaterials()[0]->GetProperty(I, TempVariant);
-// 
-// 			if (TempVariant.GetType() == ZE_VRT_STRING && strcmp(TempVariant.GetString(), "") == 0)
-// 				continue;
-// 
-// 			TempResource->GetMaterials()[0]->SetProperty(I, TempVariant);
-// 		}
-// 	}
+	Model->SetModelResource(ModelResource);
 
-	Model->SetModelResource(TempResource);
+	for (int J = 0; J < Model->GetModelResource()->GetMaterials().GetCount(); J++)
+	{
+		for (ZESize I = 0; I < Model->GetModelResource()->GetMaterials()[J]->GetDescription()->GetPropertyCount(); I++)
+ 		{
+ 			ZEVariant TempVariant;
+ 			Model->GetModelResource()->GetMaterials()[J]->GetProperty(I, TempVariant);
+ 
+	 		if (TempVariant.GetType() == ZE_VRT_STRING && strcmp(TempVariant.GetString(), "") == 0)
+ 			continue;
+ 
+ 			ModelResource->GetMaterials()[J]->SetProperty(I, TempVariant);
+ 		}
+	}
+
+}
+
+void ZEDMaterialEditorViewPort::SetMaterial(ZEString MaterialFile)
+{
+	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource("ZEEngine\\PrimitiveModels\\Box\\Box.ZEMODEL");
+	SetModelResource(ModelResource);
+	((ZEFixedMaterial*)(ModelResource->GetMaterials()[0]))->ReadFromFile(MaterialFile);
+
+	for (int J = 0; J < Model->GetModelResource()->GetMaterials().GetCount(); J++)
+	{
+		for (ZESize I = 0; I < Model->GetModelResource()->GetMaterials()[J]->GetDescription()->GetPropertyCount(); I++)
+ 		{
+ 			ZEVariant TempVariant;
+ 			Model->GetModelResource()->GetMaterials()[J]->GetProperty(I, TempVariant);
+ 
+	 		if (TempVariant.GetType() == ZE_VRT_STRING && strcmp(TempVariant.GetString(), "") == 0)
+ 			continue;
+ 
+ 			ModelResource->GetMaterials()[J]->SetProperty(I, TempVariant);
+ 		}
+	}
 }
 
 void ZEDMaterialEditorViewPort::RotateModel(QPoint PositionDifference)

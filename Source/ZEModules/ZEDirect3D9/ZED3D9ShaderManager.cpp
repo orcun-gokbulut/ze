@@ -38,6 +38,7 @@
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9Module.h"
 #include "ZEData.h"
+#include "Shaders_SunRays_hlsl.h"
 
 ZEUInt32 ZED3D9ShaderManager::CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components)
 {
@@ -196,6 +197,8 @@ const char* ZED3D9ShaderManager::GetInternal(const char* Filename)
 		return (const char*)Shaders_UnsharpenFilterProcessor_hlsl().GetData();
 	else if(stricmp(Filename, "ZoomBlurProcessor.hlsl") == 0)
 		return (const char*)Shaders_ZoomBlurProcessor_hlsl().GetData();
+	else if (stricmp(Filename, "SunRays.hlsl") == NULL)
+		return (const char*)Shaders_SunRays_hlsl().GetData();
 	else 
 		return NULL;
 
