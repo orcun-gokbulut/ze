@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainPatch.h
+ Zinek Engine - ZETEPatchDatabase.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,67 +36,66 @@
 #pragma once
 
 #include "ZETypes.h"
-#include "ZETerrainBlock.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEDS/ZEArray.h"
+#include "ZETEBlock.h"
 
-class ZETerrainPatch
+class ZETEPatch;
+class ZETEBlock;
+
+enum ZETerrainBlockAvailableResult
+{
+	ZE_TBAR_FULLY,
+	ZE_TBAR_PARTIALLY,
+	ZE_TBAR_NONE
+};
+
+class ZETEPatchDatabase
 {
 	private:
-		ZEUInt					Priority;
-		ZEUInt					Level;
-		double					StartX, StartY;
-		double					EndX, EndY;
-		double					ScaleX, ScaleY;
+		double							StartX;
+		double							StartY;
+		double							EndX;
+		double							EndY;
+		double							UnitSize;
 
-		void*					Data;
-		ZESize					Width, Height;
-		ZESize					Pitch;
-		ZESize					PixelSize;
-		ZETerrainPixelType		PixelType;
+		ZEUInt							LevelCount;
 
-		void					UpdateScale();
+		ZESize							BlockSize;
+		ZESize							BlocksPerChunk;
+		ZETEPixelType					PixelType;
+	
+		ZEArray<ZETEPatch*>				Patches;
+	
+		void							CalculateDimensions();
 
 	public:
-		void					SetStartX(double x);
-		double					GetStartX();
+		const ZEArray<ZETEPatch*>&		GetPatches();
+		bool							AddPatch(ZETEPatch* Patch);
+		void							RemovePatch(ZETEPatch* Patch);
 
-		void					SetStartY(double y);
-		double					GetStartY();
+		void							SetBlockType(ZETEPixelType Type);
+		ZETEPixelType					GetBlockType();
 
-		void					SetEndX(double EndX);
-		double					GetEndX();
+		double							GetStartX();
+		double							GetStartY();
+		double							GetEndX();
+		double							GetEndY();
 
-		void					SetEndY(double EndY);
-		double					GetEndY();
+		void							GetUnitSize(double UnitSize);
+		double							GetUnitSize();
 
-		double					GetScaleX();
-		double					GetScaleY();
-
-		ZESize					GetWidth();
-		ZESize					GetHeight();
-
-		void*					GetData();
-		ZESize					GetPitch();
-
-		ZETerrainPixelType		GetPixelType();
-		ZESize					GetPixelSize();
-
-		ZEUInt					GetLevel();
-
-		void					SetPriority(ZEUInt Priority);
-		ZEUInt					GetPriority();
+		void							SetBlocksPerChunks(ZESize BlocksPerChunk);
+		ZESize							GetBlocksPerChunks();
 		
-		bool					BoundaryCheck(double x, double y);
+		void							SetBlockSize(ZESize BlockSize);
+		ZESize							GetBlockSize();
 
-		void*					SampleLocalRaw(ZESSize x, ZESSize y);
-		void					SampleLocal(void* Output, double x, double y);
-		void					Sample(void* Output, double x, double y);
+		bool							CheckBlockAvailable(ZESize Level, double x, double y);
 
-		bool					Create(ZESize Width, ZESize Height, ZETerrainPixelType PixelType);
-		void					Clean();
+		void							UpdateOrder();
 
-		bool					Load(const char* FileName, ZETerrainPixelType PixelType);
+		void							Save(const ZEString& Path);
 
-								ZETerrainPatch();
-								~ZETerrainPatch();
+										ZETEPatchDatabase();
+										~ZETEPatchDatabase();
 };

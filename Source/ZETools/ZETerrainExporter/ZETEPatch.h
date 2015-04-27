@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainExporterMain.cpp
+ Zinek Engine - ZETEPatch.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,47 +33,67 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDS/ZEArray.h"
-#include "ZETerrainDatabase.h"
-#include "ZETerrainPatch.h"
-#include "FreeImage.h"
+#pragma once
 
-void main()
+#include "ZETypes.h"
+#include "ZETEBlock.h"
+#include "ZEMath\ZEVector.h"
+
+class ZETEPatch
 {
-	FreeImage_Initialise();
+	private:
+		ZEUInt					Priority;
+		ZEUInt					Level;
+		double					StartX, StartY;
+		double					EndX, EndY;
+		double					LevelScalingWidth, LevelScalingHeight;
 
-	ZETerrainPatchDatabase Database;
+		void*					Data;
+		ZESize					Width, Height;
+		ZESize					Pitch;
+		ZETEPixelType			PixelType;
 
-	ZETerrainPatch* Patch;
-	Patch = new ZETerrainPatch();
-	Patch->Load("e:\\Test\\0x0.tif", ZE_TPT_COLOR);
-	Patch->SetPriority(0);
-	Patch->SetStartX(0);
-	Patch->SetStartY(0);
-	Patch->SetEndX(Patch->GetStartX() + Patch->GetWidth());
-	Patch->SetEndY(Patch->GetStartY() + Patch->GetHeight());
-	Database.AddPatch(Patch);
+		void					UpdateLevelAndScaling();
 
-	Patch = new ZETerrainPatch();
-	Patch->Load("e:\\Test\\5000x0.tif", ZE_TPT_COLOR);
-	Patch->SetPriority(0);
-	Patch->SetStartX(5000);
-	Patch->SetStartY(0);
-	Patch->SetEndX(Patch->GetStartX() + Patch->GetWidth());
-	Patch->SetEndY(Patch->GetStartY() + Patch->GetHeight());
-	Database.AddPatch(Patch);
+	public:
+		void					SetStartX(double x);
+		double					GetStartX();
 
-	Patch = new ZETerrainPatch();
-	Patch->Load("e:\\Test\\5000x5000.tif", ZE_TPT_COLOR);
-	Patch->SetPriority(0);
-	Patch->SetStartX(5000);
-	Patch->SetStartY(5000);
-	Patch->SetEndX(Patch->GetStartX() + Patch->GetWidth());
-	Patch->SetEndY(Patch->GetStartY() + Patch->GetHeight());
-	Database.AddPatch(Patch);
+		void					SetStartY(double y);
+		double					GetStartY();
 
-	Database.SetBlockSize(256);
-	Database.Save("e:\\Test\\Output2\\bla");
+		void					SetEndX(double EndX);
+		double					GetEndX();
 
-	FreeImage_DeInitialise();
-}
+		void					SetEndY(double EndY);
+		double					GetEndY();
+
+		double					GetLevelScaleWidth();
+		double					GetLevelScaleHeight();
+
+		ZESize					GetWidth();
+		ZESize					GetHeight();
+
+		void*					GetData();
+		ZESize					GetPitch();
+
+		ZETEPixelType			GetPixelType();
+		ZESize					GetPixelSize();
+
+		ZEUInt					GetLevel();
+
+		void					SetPriority(ZEUInt Priority);
+		ZEUInt					GetPriority();
+		
+		bool					BoundaryCheck(double x, double y);
+		
+		void					Resample(void* BlockData, ZESize BlockPitch, ZEUInt64 BlockX, ZEUInt64 BlockY, ZESize BlockSize);
+
+		bool					Create(ZESize Width, ZESize Height, ZETEPixelType PixelType);
+		void					Clean();
+
+		bool					Load(const char* FileName, ZETEPixelType PixelType);
+
+								ZETEPatch();
+								~ZETEPatch();
+};

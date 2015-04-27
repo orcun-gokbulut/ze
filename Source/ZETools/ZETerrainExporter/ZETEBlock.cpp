@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainBlock.cpp
+ Zinek Engine - ZETEBlock.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETerrainBlock.h"
+#include "ZETEBlock.h"
+
 #include "ZEError.h"
-#include "FreeImage.h"
 #include "ZEFile\ZEFile.h"
 #include "ZEDS\ZEFormat.h"
+
+#include <FreeImage.h>
 
 struct ZETerrainChunkHeader
 {
@@ -50,7 +52,7 @@ struct ZETerrainChunkHeader
 	float		MaxValue;
 };
 
-static void DownSample(float* Destination, float* Source, ZESize Size)
+static void DownSample_CPU(float* Destination, float* Source, ZESize Size)
 {
 	ZESize HalfSize = Size / 2;
 	for (ZESize y = 0; y < HalfSize; y++)
@@ -64,7 +66,7 @@ static void DownSample(float* Destination, float* Source, ZESize Size)
 	}
 }
 
-static void DownSample(ZEUInt32* Destination, ZEUInt32* Source, ZESize Size)
+static void DownSample_CPU(ZEUInt32* Destination, ZEUInt32* Source, ZESize Size)
 {
 	ZESize HalfSize = Size / 2;
 	for (ZESize y = 0; y < HalfSize; y++)
@@ -81,15 +83,38 @@ static void DownSample(ZEUInt32* Destination, ZEUInt32* Source, ZESize Size)
 			ZEUInt8* P3 = (ZEUInt8*)&SourceRowEven[2 * x + 1];
 			ZEUInt8* PD = (ZEUInt8*)&DestinationRow[x];
 
-			PD[0] = ((ZEUInt)P0[0] + (ZEUInt)P1[0] + (ZEUInt)P2[0] + (ZEUInt)P3[0]) /4;
-			PD[1] = ((ZEUInt)P0[1] + (ZEUInt)P1[1] + (ZEUInt)P2[1] + (ZEUInt)P3[1]) /4;
-			PD[2] = ((ZEUInt)P0[2] + (ZEUInt)P1[2] + (ZEUInt)P2[2] + (ZEUInt)P3[2]) /4;
-			PD[3] = ((ZEUInt)P0[3] + (ZEUInt)P1[3] + (ZEUInt)P2[3] + (ZEUInt)P3[3]) /4;
+			PD[0] = (ZEUInt8)(((ZEUInt)P0[0] + (ZEUInt)P1[0] + (ZEUInt)P2[0] + (ZEUInt)P3[0]) /4);
+			PD[1] = (ZEUInt8)(((ZEUInt)P0[1] + (ZEUInt)P1[1] + (ZEUInt)P2[1] + (ZEUInt)P3[1]) /4);
+			PD[2] = (ZEUInt8)(((ZEUInt)P0[2] + (ZEUInt)P1[2] + (ZEUInt)P2[2] + (ZEUInt)P3[2]) /4);
+			PD[3] = (ZEUInt8)(((ZEUInt)P0[3] + (ZEUInt)P1[3] + (ZEUInt)P2[3] + (ZEUInt)P3[3]) /4);
 		}
 	}
 }
 
-void ZETerrainBlock::CalculateMipmaps()
+enum ZETEImagePixelType
+{
+	ZETE_IPT_ELEVATION_8,
+	ZETE_IPT_ELEVATION_16,
+	ZETE_IPT_COLOR_RGBA,
+	ZETE_IPT_COLOR_GRAYSCALE
+};
+
+struct ZETERectangle
+{
+	ZETEImagePixelType PixelType;
+	void* Data;
+	ZESize OffsetX;
+	ZESize OffsetY;
+	ZESize Width;
+	ZESize Height;
+};
+
+static void Rescale_CPU(ZEUInt32* Destination, ZEUInt32* Source, ZETERectangle)
+{
+
+}
+
+void ZETEBlock::CalculateMipmaps()
 {
 	ZEUInt CurrentLevel = 0;
 	ZEUInt NextLevel = 1;
@@ -99,17 +124,17 @@ void ZETerrainBlock::CalculateMipmaps()
 		switch(PixelType)
 		{
 			case ZE_TPT_COLOR:
-				DownSample((ZEUInt32*)GetData(CurrentLevel + 1), (ZEUInt32*)GetData(CurrentLevel), GetSize(CurrentLevel));
+				DownSample_CPU((ZEUInt32*)GetData(CurrentLevel + 1), (ZEUInt32*)GetData(CurrentLevel), GetSize(CurrentLevel));
 				break;
 			case ZE_TPT_GRAYSCALE:
-				DownSample((float*)GetData(CurrentLevel + 1), (float*)GetData(CurrentLevel), GetSize(CurrentLevel));
+				DownSample_CPU((float*)GetData(CurrentLevel + 1), (float*)GetData(CurrentLevel), GetSize(CurrentLevel));
 				break;
 		}
 		CurrentLevel++;
 	}
 }
 
-void ZETerrainBlock::CalculateMinMax()
+void ZETEBlock::CalculateMinMax()
 {
 	if (Data == NULL || PixelType != ZE_TPT_ELEVATION)
 		return;
@@ -128,52 +153,52 @@ void ZETerrainBlock::CalculateMinMax()
 	}
 }
 
-void ZETerrainBlock::SetPositionX(ZEUInt64 x)
+void ZETEBlock::SetPositionX(ZEInt64 x)
 {
 	PositionX = x;
 }
 
-ZEUInt64 ZETerrainBlock::GetPositionX()
+ZEInt64 ZETEBlock::GetPositionX()
 {
 	return PositionX;
 }
 
-void ZETerrainBlock::SetPositionY(ZEUInt64 y)
+void ZETEBlock::SetPositionY(ZEInt64 y)
 {
 	PositionY = y;
 }
 
-ZEUInt64 ZETerrainBlock::GetPositionY()
+ZEInt64 ZETEBlock::GetPositionY()
 {
 	return PositionY;
 }
 
-void ZETerrainBlock::SetLevel(ZEUInt Level)
+void ZETEBlock::SetLevel(ZEUInt Level)
 {
 	this->Level = Level;
 }
 
-ZEUInt ZETerrainBlock::GetLevel()
+ZEUInt ZETEBlock::GetLevel()
 {
 	return Level;
 }
 
-ZETerrainPixelType ZETerrainBlock::GetPixelType()
+ZETEPixelType ZETEBlock::GetPixelType()
 {
 	return PixelType;
 }
 
-ZESize ZETerrainBlock::GetPixelSize()
+ZESize ZETEBlock::GetPixelSize()
 {
 	return PixelSize;
 }
 
-ZEUInt ZETerrainBlock::GetMipmapCount()
+ZEUInt ZETEBlock::GetMipmapCount()
 {
 	return MipmapCount;
 }
 
-void* ZETerrainBlock::GetData(ZEUInt MipmapLevel)
+void* ZETEBlock::GetData(ZEUInt MipmapLevel)
 {
 	ZEUInt8* NormalizedData = (ZEUInt8*)Data;
 
@@ -183,23 +208,23 @@ void* ZETerrainBlock::GetData(ZEUInt MipmapLevel)
 	return NormalizedData;
 }
 
-ZESize ZETerrainBlock::GetPitch(ZEUInt MipmapLevel)
+ZESize ZETEBlock::GetPitch(ZEUInt MipmapLevel)
 {
 	return Pitch >> MipmapLevel;
 }
 
 
-ZESize ZETerrainBlock::GetSize(ZEUInt MipmapLevel)
+ZESize ZETEBlock::GetSize(ZEUInt MipmapLevel)
 {
 	return Size >> MipmapLevel;
 }
 
-void* ZETerrainBlock::Sample(ZESize x, ZESize y, ZEUInt MipmapLevel)
+void* ZETEBlock::Sample(ZESize x, ZESize y, ZEUInt MipmapLevel)
 {
 	return (ZEUInt8*)GetData(MipmapLevel) + y * GetPitch(MipmapLevel) + x * GetPixelSize();
 }
 
-void ZETerrainBlock::Update()
+void ZETEBlock::Update()
 {
 	if (PixelType == ZE_TPT_ELEVATION)
 		CalculateMinMax();
@@ -207,7 +232,7 @@ void ZETerrainBlock::Update()
 		CalculateMipmaps();
 }
 
-bool ZETerrainBlock::Create(ZETerrainPixelType PixelType, ZESize Size)
+bool ZETEBlock::Create(ZETEPixelType PixelType, ZESize Size)
 {
 	if (this->PixelType != PixelType && this->Size != Size)
 		Clean();
@@ -251,7 +276,7 @@ bool ZETerrainBlock::Create(ZETerrainPixelType PixelType, ZESize Size)
 	return true;
 }
 
-void ZETerrainBlock::Clean()
+void ZETEBlock::Clean()
 {
 	Size = 0;
 	TotalSize = 0;
@@ -268,7 +293,7 @@ void ZETerrainBlock::Clean()
 	}
 }
 
-bool ZETerrainBlock::Load(ZEFile* File)
+bool ZETEBlock::Load(ZEFile* File)
 {
 	Clean();
 
@@ -276,7 +301,7 @@ bool ZETerrainBlock::Load(ZEFile* File)
 	if (!File->Read(&Header, sizeof(ZETerrainChunkHeader), 1) == 1)
 		return false;
 	
-	Create((ZETerrainPixelType)Header.Type, Header.Size);
+	Create((ZETEPixelType)Header.Type, Header.Size);
 
 	if (File->Read(GetData(), TotalSize, 1) != 1)
 	{
@@ -293,7 +318,7 @@ bool ZETerrainBlock::Load(ZEFile* File)
 	return true;
 }
 
-bool ZETerrainBlock::Save(ZEFile* File)
+bool ZETEBlock::Save(ZEFile* File)
 {
 	ZETerrainChunkHeader Header;
 	Header.PositionX = PositionX;
@@ -313,7 +338,7 @@ bool ZETerrainBlock::Save(ZEFile* File)
 	return true;
 }
 
-bool ZETerrainBlock::DebugDump(const ZEString& Directory)
+bool ZETEBlock::DebugDump(const ZEString& Directory)
 {
 	for (ZESize I = 0; I < MipmapCount; I++)
 	{
@@ -326,7 +351,7 @@ bool ZETerrainBlock::DebugDump(const ZEString& Directory)
 	}
 }
 
-ZETerrainBlock::ZETerrainBlock()
+ZETEBlock::ZETEBlock()
 {
 	PositionX = 0;
 	PositionY = 0;
@@ -335,7 +360,7 @@ ZETerrainBlock::ZETerrainBlock()
 	Clean();
 }
 
-ZETerrainBlock::~ZETerrainBlock()
+ZETEBlock::~ZETEBlock()
 {
 	Clean();
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainDatabase.h
+ Zinek Engine - ZETEMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,72 +33,59 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
 #include "ZEDS/ZEArray.h"
-#include "ZETypes.h"
-#include "ZETerrainBlock.h"
+#include "ZETEPatchDatabase.h"
+#include "ZETEPatch.h"
 
-class ZETerrainPatch;
-class ZETerrainBlock;
+#include <FreeImage.h>
 
-enum ZETerrainBlockAvailableResult
+void main()
 {
-	ZE_TBAR_FULLY,
-	ZE_TBAR_PARTIALLY,
-	ZE_TBAR_NONE
-};
+	FreeImage_Initialise();
 
-class ZETerrainPatchDatabase
-{
-	private:
-		double							StartX;
-		double							StartY;
-		double							EndX;
-		double							EndY;
-		double							UnitSize;
+	//ZETerrainPatchDatabase Database;
 
-		ZEUInt							LevelCount;
+	ZETEPatch* Patch;
+	Patch = new ZETEPatch();
+	Patch->Load("c:\\World.jpg", ZE_TPT_COLOR);
+	Patch->SetPriority(0);
+	Patch->SetStartX(0);
+	Patch->SetStartY(0);
+	Patch->SetEndX(3.5f * Patch->GetWidth());
+	Patch->SetEndY(3.5f * Patch->GetHeight());
 
-		ZESize							BlockSize;
-		ZESize							BlocksPerChunk;
-		ZETerrainPixelType				PixelType;
-	
-		ZEArray<ZETerrainPatch*>		Patches;
-	
-		void							CalculateDimensions();
+	ZETEBlock Block;
+	Block.SetLevel(Patch->GetLevel());
+	Block.SetPositionX(Patch->GetStartX());
+	Block.SetPositionY(Patch->GetStartY());
+	Block.Create(ZE_TPT_COLOR, 512);
 
-	public:
-		const ZEArray<ZETerrainPatch*>&	GetPatches();
-		bool							AddPatch(ZETerrainPatch* Patch);
-		void							RemovePatch(ZETerrainPatch* Patch);
+	Patch->Resample(Block.GetData(), Block.GetPitch(), Block.GetPositionX(), Block.GetPositionY(), Block.GetSize());
 
-		void							SetBlockType(ZETerrainPixelType Type);
-		ZETerrainPixelType				GetBlockType();
+	Block.DebugDump("c:/Test");
 
-		double							GetStartX();
-		double							GetStartY();
-		double							GetEndX();
-		double							GetEndY();
+	//Database.AddPatch(Patch);
 
-		void							GetUnitSize(double UnitSize);
-		double							GetUnitSize();
+	/*Patch = new ZETerrainPatch();
+	Patch->Load("e:\\Test\\5000x0.tif", ZE_TPT_COLOR);
+	Patch->SetPriority(0);
+	Patch->SetStartX(5000);
+	Patch->SetStartY(0);
+	Patch->SetEndX(Patch->GetStartX() + Patch->GetWidth());
+	Patch->SetEndY(Patch->GetStartY() + Patch->GetHeight());
+	Database.AddPatch(Patch);
 
-		void							SetBlocksPerChunks(ZESize BlocksPerChunk);
-		ZESize							GetBlocksPerChunks();
-		
-		void							SetBlockSize(ZESize BlockSize);
-		ZESize							GetBlockSize();
+	Patch = new ZETerrainPatch();
+	Patch->Load("e:\\Test\\5000x5000.tif", ZE_TPT_COLOR);
+	Patch->SetPriority(0);
+	Patch->SetStartX(5000);
+	Patch->SetStartY(5000);
+	Patch->SetEndX(Patch->GetStartX() + Patch->GetWidth());
+	Patch->SetEndY(Patch->GetStartY() + Patch->GetHeight());
+	Database.AddPatch(Patch);
 
-		bool							CheckBlockAvailable(ZESize Level, double x, double y);
+	Database.SetBlockSize(256);
+	Database.Save("c:\\Test");*/
 
-		bool							SamplePixel(void* Output, double x, double y, ZEUInt Level);
-		bool							SampleBlock(ZETerrainBlock& Output, ZEUInt64 x, ZEUInt64 y, ZEUInt Level);
-
-		void							UpdateOrder();
-
-		void							Save(const ZEString& Path);
-
-										ZETerrainPatchDatabase();
-										~ZETerrainPatchDatabase();
-};
+	FreeImage_DeInitialise();
+}

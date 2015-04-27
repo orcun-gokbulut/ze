@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainBlock.h
+ Zinek Engine - ZETEBlock.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -40,7 +40,7 @@
 
 class ZEFile;
 
-enum ZETerrainPixelType
+enum ZETEPixelType
 {
 	ZE_TPT_NONE			= 0,
 	ZE_TPT_ELEVATION	= 1,	// Float
@@ -48,11 +48,11 @@ enum ZETerrainPixelType
 	ZE_TPT_GRAYSCALE	= 3		// ZEUInt8
 };
 
-class ZETerrainBlock
+class ZETEBlock
 {
 	private:
-		ZEUInt64				PositionX;
-		ZEUInt64				PositionY;
+		ZEInt64					PositionX;
+		ZEInt64					PositionY;
 		ZEUInt					Level;
 		ZESize					Size;
 
@@ -60,7 +60,7 @@ class ZETerrainBlock
 		ZESize					TotalSize;
 		ZESize					Pitch;
 		ZEUInt					PixelSize;
-		ZETerrainPixelType		PixelType;
+		ZETEPixelType			PixelType;
 
 		ZEUInt					MipmapCount;
 		float					MinValue;
@@ -71,16 +71,16 @@ class ZETerrainBlock
 		void					CalculateMinMax();
 
 	public:
-		void					SetPositionX(ZEUInt64 x);
-		ZEUInt64				GetPositionX();
+		void					SetPositionX(ZEInt64 x);
+		ZEInt64					GetPositionX();
 
-		void					SetPositionY(ZEUInt64 y);
-		ZEUInt64				GetPositionY();
+		void					SetPositionY(ZEInt64 y);
+		ZEInt64					GetPositionY();
 
 		void					SetLevel(ZEUInt Level);
 		ZEUInt					GetLevel();
 
-		ZETerrainPixelType		GetPixelType();
+		ZETEPixelType			GetPixelType();
 		ZESize					GetPixelSize();
 
 		ZEUInt					GetMipmapCount();
@@ -97,7 +97,7 @@ class ZETerrainBlock
 		void*					Sample(ZESize x, ZESize y, ZEUInt MipmapLevel = 0);
 		void					PutPixel(ZESize x, ZESize y, void* Data);
 
-		bool					Create(ZETerrainPixelType PixelType, ZESize Size);
+		bool					Create(ZETEPixelType PixelType, ZESize Size);
 		void					Clean();
 
 		bool					Load(ZEFile* File);
@@ -105,6 +105,6 @@ class ZETerrainBlock
 		
 		bool					DebugDump(const ZEString& Directory);
 
-								ZETerrainBlock();
-								~ZETerrainBlock();
+								ZETEBlock();
+								~ZETEBlock();
 };
