@@ -32,9 +32,6 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "ZETexture/ZETextureOptions.h"
-#include "ZETexture/ZETexture2DResource.h"
-#include "ZERandom.h"
 
 
 #include "ZEError.h"
@@ -55,7 +52,9 @@
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZEGraphics/ZEDirectionalLight.h"
 #include "ZEGraphics/ZEOmniProjectiveLight.h"
-
+#include "ZETexture/ZETextureOptions.h"
+#include "ZETexture/ZETexture2DResource.h"
+#include "ZERandom.h"
 #include <time.h>
 
 ZED3D9VertexShader* OmniLightVS = NULL;
@@ -143,6 +142,7 @@ void ZED3D9ShadowRenderer::DeviceLost()
 bool ZED3D9ShadowRenderer::DeviceRestored()
 {
 	Initialize();
+
 	return true;
 }
 
@@ -476,6 +476,9 @@ void ZED3D9ShadowRenderer::RenderPointLight()
 
 void ZED3D9ShadowRenderer::Render(float ElaspedTime)
 {
+	if (!GetModule()->IsInitialized() || !GetModule()->GetEnabled() || GetModule()->IsDeviceLost())
+		return;
+
 	D3DPERF_BeginEvent(0, L"Cascade Pass");
 	
 	D3DVIEWPORT9 OldViewport;

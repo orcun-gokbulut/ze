@@ -57,6 +57,7 @@
 #include "ZED3D9AerialPerspectiveProcessor.h"
 #include "ZED3D9PixelWorldPositionProcessor.h"
 #include "ZED3D9ChannelDisorientationProcessor.h"
+#include "ZED3D9SunRaysProcessor.h"
 
 class ZELight;
 class ZEPointLight;
@@ -173,6 +174,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9AerialPerspectiveProcessor	AerialPerspectiveProcessor;
 		ZED3D9PixelWorldPositionProcessor	PixelWorldPositionProcessor;
 		ZED3D9ChannelDisorientationProcessor ChannelDisorientProcessor;
+		ZED3D9SunRaysProcessor				SunRaysProcessor;
 
 		virtual void						SetDrawParameters(ZEDrawParameters* DrawParameters);
 		virtual ZEDrawParameters*			GetDrawParameters();

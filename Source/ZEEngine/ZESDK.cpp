@@ -35,6 +35,8 @@
 
 #include "ZESDK.h"
 #include "ZECore/ZECore.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+
 #define WINDOWS_MEAN_AND_LEAN
 #include <windows.h>
 
@@ -49,6 +51,7 @@ bool zeInitialize(void* Instance, void* WindowHandle)
 
 void zeMainLoop()
 {
+	//if (zeCore->GetGraphicsModule()->IsReady())
 	zeCore->MainLoop();
 }
 

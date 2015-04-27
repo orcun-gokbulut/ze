@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMaterialEditorViewPort.h
+ Zinek Engine - ZELensFlare.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,71 +33,91 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZED_MATERIAL_EDITOR_VIEWPORT_H__
-#define __ZED_MATERIAL_EDITOR_VIEWPORT_H__
+#include "ZELensFlare.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZEGame/ZEEntityProvider.h"
+#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGraphics/ZESkyBoxMaterial.h"
+#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZETexture/ZETextureCubeResource.h"
 
-#include <QtGui/QFrame>
-#include <ZEGame/ZEPlayer.h>
-#include <ZEGame/ZEGrid.h>
-#include <ZEModel/ZEModel.h>
-#include <ZEGraphics/ZEDirectionalLight.h>
-#include <QtCore/QPoint>
 
-class ZEDMaterialEditor;
+#include <string.h>
+#include "ZEWeather.h"
 
-class ZEDMaterialEditorViewPort : public QFrame
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZELensFlare);
+
+ZEDrawFlags ZELensFlare::GetDrawFlags() const
 {
-	private:
+	return ZE_DF_DRAW;
+}
 
-		ZEPlayer*			Camera;
-		ZEGrid*				Grid;
-		ZEModel*			Model;
-		ZEDirectionalLight* DirectLight1;
-		ZEDirectionalLight* DirectLight2;
-		ZEDirectionalLight* DirectLight3;
+bool ZELensFlare::InitializeSelf()
+{
+	if (!ZEEntity::InitializeSelf())
+		return false;
 
-		ZEDMaterialEditor*	ParentEditor;
+	
+	return true;
+}
 
-		QPoint				OldMousePosition;
+bool ZELensFlare::DeinitializeSelf()
+{
 
-		float				Pitch;
-		float				Yawn;
-		float				Roll;
+	return ZEEntity::DeinitializeSelf();
+}
 
-		float				YawnLight1;
-		float				PitchLight1;
+void ZELensFlare::Draw(ZEDrawParameters* DrawParameters)
+{
+	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
+		return;
 
-		float				YawnLight2;
-		float				PitchLight2;
+	// Find Sun
 
-		float				YawnLight3;
-		float				PitchLight3;
-		
+	ZEArray<ZEEntity*> Entities = ZEScene::GetInstance()->GetEntities(ZEWeather::Description());
+	if (Entities.GetSize() == 0)
+		return;
 
-	protected:
+	ZEWeather* Weather = static_cast<ZEWeather*>(Entities[0]);
+	ZEVector3 SunDirection = Weather->GetSunDirection();
 
-		virtual void		resizeEvent(QResizeEvent* ResizeEvent);
-		virtual void		mouseMoveEvent(QMouseEvent * Event);
-		virtual void		mousePressEvent(QMouseEvent * Event);
-		virtual void		wheelEvent(QWheelEvent * Event);
+	ZECamera* Camera = ZEScene::GetInstance()->GetActiveCamera();
+	
+	ZEVector4 SunDirectionScreen;
+	ZEMatrix4x4::Transform(SunDirectionScreen, Camera->GetViewProjectionTransform(), ZEVector4(SunDirection, 1.0f));
 
-		virtual void		RotateModel(QPoint PositionDifference);
-		virtual void		RotateLights(QPoint PositionDifference);
-		virtual void		MoveLeftRight(QPoint PositionDifference);
+	SunDirectionScreen.x /= SunDirectionScreen.w;
+	SunDirectionScreen.y /= SunDirectionScreen.w;
 
-	public:
-
-		void						Initialize();
-		ZEArray<ZEFixedMaterial*>	GetModelMaterials();
-		void						SetModelResource(ZEModelResource* ModelResource);
-		void						SetMaterial(ZEString MaterialFile);
-		ZEDirectionalLight*			GetDirectLight1();
-		ZEDirectionalLight*			GetDirectLight2();
-		ZEDirectionalLight*			GetDirectLight3();
-		ZEModel*					GetModel();
-									ZEDMaterialEditorViewPort(ZEDMaterialEditor* ParentEditor, QWidget* parent = 0, Qt::WindowFlags f = 0);
-};
+	float Length = SunDirectionScreen.Length();
+	
 
 
-#endif
+
+}
+
+void ZELensFlare::Tick(float Time)
+{
+
+}
+
+ZELensFlare::ZELensFlare()
+{
+
+}
+
+ZELensFlare::~ZELensFlare()
+{
+
+}
+
+ZELensFlare* ZELensFlare::CreateInstance()
+{
+	return new ZELensFlare();
+}
+
+ZEEntityRunAt ZELensFlareDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}

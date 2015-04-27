@@ -578,6 +578,8 @@ bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 		Report.Normal = ZEVector3::Zero;
 		Report.Binormal = ZEVector3::Zero;
 	}
+
+	return true;
 }
 
 ZEEntityRunAt ZEEntityDescription::GetRunAt() const

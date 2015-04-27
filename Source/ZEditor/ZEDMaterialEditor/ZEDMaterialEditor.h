@@ -57,16 +57,20 @@ class ZEDMaterialEditor : public QMainWindow
 		Ui::ZEDMaterialEditorClass* ui;
 
 		ZEFixedMaterial*			Material;
+		ZEModelResource*			ModelResource;
 		QString						CurrentFileName;
 
 		QTimer						EngineMainLoopTimer;
 		ZEDMaterialEditorViewPort*	ViewPort;
 
-		ZEDPropertyWindowManager*	MaterialPropertyWindowManager;
+		ZEArray<ZEDPropertyWindowManager*> PropertyWindows;
 
 		ZEDPropertyWindowManager*	DirectLight1PropertyWindowManager;
 		ZEDPropertyWindowManager*	DirectLight2PropertyWindowManager;
 		ZEDPropertyWindowManager*	DirectLight3PropertyWindowManager;
+
+		void						CleanPropertyWindows();
+		void						WriteMaterialToFile(ZEFixedMaterial* Material, ZEString fileName);
 
 	public:
 
@@ -84,8 +88,10 @@ class ZEDMaterialEditor : public QMainWindow
 
 		void						SaveAs();
 		void						Open();
+		void						OpenModel();
+		void						CloseFile();
 		void						Close();
-		void						Save();
+		void						SaveMaterials();
 
 
 

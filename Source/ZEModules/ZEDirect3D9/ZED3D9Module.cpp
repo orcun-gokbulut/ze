@@ -63,6 +63,7 @@
 #include "ZED3D9CloudMaterial.h"
 #include "ZED3D9SeaMaterial.h"
 #include "ZEGraphics/ZESeaMaterial.h"
+#include "Logo_png.h"
 
 
 LPDIRECT3DDEVICE9 D3D9Device;
@@ -111,6 +112,81 @@ bool ZED3D9Module::GetEnabled()
 void ZED3D9Module::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
+}
+
+static void DrawRect(LPDIRECT3DDEVICE9 Device, float Left, float Right, float Top, float Bottom, LPDIRECT3DTEXTURE9 Texture, D3DCOLOR Color)
+{
+	Left -= 0.5f;
+	Right -= 0.5f;
+	Top -= 0.5f;
+	Bottom -= 0.5f;
+
+	struct Vertex
+	{
+		float x, y, z, w;
+		D3DCOLOR Color;
+		float u,v;
+	} 
+	Vertices[6] =
+	{
+		{Left,	Bottom,	1.0f, 1.0f, Color, 0.0f, 1.0f},
+		{Left,	Top,	1.0f, 1.0f, Color, 0.0f, 0.0f},
+		{Right, Top,	1.0f, 1.0f, Color, 1.0f, 0.0f},
+		{Left,	Bottom,	1.0f, 1.0f, Color, 0.0f, 1.0f},
+		{Right, Top,	1.0f, 1.0f, Color, 1.0f, 0.0f},
+		{Right, Bottom,	1.0f, 1.0f, Color, 1.0f, 1.0f}
+	};
+
+	Device->SetTexture(0, Texture);
+	Device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+	Device->SetTextureStageState(0 ,D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	Device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_CONSTANT);
+	Device->SetTextureStageState(0, D3DTSS_CONSTANT, Color);
+	
+	Device->SetVertexShader(NULL);
+	Device->SetPixelShader(NULL);
+	Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+
+	Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 2, Vertices, sizeof(Vertex));
+}
+
+void ZED3D9Module::DrawLogo()
+{
+	Logo_png Data;
+	LPDIRECT3DTEXTURE9 Logo;
+	D3DXCreateTextureFromFileInMemoryEx(GetDevice(), Data.GetData(), Data.GetSize(),
+		D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, NULL, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 
+		D3DX_DEFAULT , D3DX_DEFAULT , 0, NULL, NULL, &Logo);
+	
+	D3DSURFACE_DESC LogoDesc;
+	Logo->GetLevelDesc(0, &LogoDesc);
+
+	float Left = (FrameBufferViewPort.GetWidth() - LogoDesc.Width) / 2;
+	float Right = Left + LogoDesc.Width;
+	float Top = (FrameBufferViewPort.GetHeight() - LogoDesc.Height) / 2;
+	float Bottom = Top + LogoDesc.Height;
+
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+	GetDevice()->Present(NULL, NULL, NULL, NULL);
+	Sleep(200);
+
+	for (int I = 0; I < 256; I+=8)
+	{
+		GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+		GetDevice()->BeginScene();
+		DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0x01010101 * I);
+		GetDevice()->EndScene();
+		GetDevice()->Present(NULL, NULL, NULL, NULL);
+		Sleep(20);
+	}
+
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+	GetDevice()->BeginScene();
+	DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0xFFFFFFFF);
+	GetDevice()->EndScene();
+	GetDevice()->Present(NULL, NULL, NULL, NULL);
+
+	Logo->Release();
 }
 
 bool ZED3D9Module::InitializeSelf()
@@ -299,8 +375,8 @@ bool ZED3D9Module::InitializeSelf()
 		return false;
 	}
 
-	this->ClearFrameBuffer();
-
+	DrawLogo();
+	
 	ShaderManager = new ZED3D9ShaderManager();
 
 	return true;
@@ -334,7 +410,9 @@ bool ZED3D9Module::IsDeviceLost()
 
 void ZED3D9Module::DeviceLost()
 {
-	DeviceLostState = true;
+	if (IsDeviceLost())
+		return;
+
 	for (ZESize I = 0; I < Texture2Ds.GetCount(); I++)
 		Texture2Ds[I]->DeviceLost();	
 
@@ -359,22 +437,27 @@ void ZED3D9Module::DeviceLost()
 	for (ZESize I = 0; I < ShadowRenderers.GetCount(); I++)
 		ShadowRenderers[I]->DeviceLost();
 
+
 	ZED3D_RELEASE(FrameBufferViewPort.FrameBuffer);
 	ZED3D_RELEASE(FrameBufferViewPort.ZBuffer);
+
+	DeviceLostState = true;
 }
 
 void ZED3D9Module::DeviceRestored()
 {
-	DeviceLostState = false;
-
-	Device->GetBackBuffer(0, 0,D3DBACKBUFFER_TYPE_MONO, &FrameBufferViewPort.FrameBuffer);
+	HRESULT Result = Device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &FrameBufferViewPort.FrameBuffer);
+	if (FAILED(Result))
+	{
+		zeCriticalError("Cannot retrive Direct3D backbuffer.");
+		return;
+	}
 	
 	// Get screen's z buffer
-	HRESULT Result = Device->CreateDepthStencilSurface(ScreenWidth, ScreenHeight, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, &FrameBufferViewPort.ZBuffer, NULL);
-	if(FAILED(Result))
+	Result = Device->CreateDepthStencilSurface(ScreenWidth, ScreenHeight, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, &FrameBufferViewPort.ZBuffer, NULL);
+	if (FAILED(Result))
 	{
-		zeCriticalError("Can not create Direct3D Backbuffer.");
-		Destroy();
+		zeCriticalError("Cannot create Direct3D depth stencil buffer.");
 		return;
 	}
 
@@ -403,46 +486,34 @@ void ZED3D9Module::DeviceRestored()
 
 	for (ZESize I = 0; I < ShadowRenderers.GetCount(); I++)
 		ShadowRenderers[I]->DeviceRestored();
+
+	DeviceLostState = false;
 }
 
-void ZED3D9Module::RestoreDevice(bool ForceReset)
+void ZED3D9Module::ResetDevice()
 {
 	DeviceLost();
-	HRESULT DeviceState, Hr;
-	do
-	{
-		DeviceState = Device->TestCooperativeLevel();
-		if (DeviceState == D3DERR_DRIVERINTERNALERROR)
-		{
-			zeCriticalError("Can not restore Direct3D Device. Internal driver error.");
-		}
-		else if (DeviceState == D3DERR_OUTOFVIDEOMEMORY)
-		{
-			zeCriticalError("Can not restore Direct3D Device. Out of video memory");
-		}
+	HRESULT Result = Device->Reset(&D3DPP);
+	if (Result == D3D_OK)
+		DeviceRestored();
+}
 
-		if ((DeviceState == D3DERR_DEVICENOTRESET) || ForceReset)
-		{
-			Hr = Device->Reset(&D3DPP);
-			if (Hr == D3D_OK)
-			{
-				zeLog("Direct3D Device Restored.");
-				break;
-			}
-			else if (Hr == D3DERR_DEVICELOST)
-			{
-				Sleep(100);
-				continue;
-			}
-			else
-			{
-				zeLog("Bla");
-			}
-		}
+void ZED3D9Module::CheckAndRestoreDevice()
+{
+	HRESULT Result = Device->TestCooperativeLevel();
+	if (Result == D3DERR_DEVICELOST)
+	{
+		DeviceLost();
 	}
-	while (DeviceState == D3DERR_DEVICELOST);
-	
-	DeviceRestored();
+	else if (Result == D3DERR_DEVICENOTRESET)
+	{
+		if (IsIconic(D3DPP.hDeviceWindow) || !IsWindowVisible(D3DPP.hDeviceWindow))
+			return;
+
+		Result = Device->Reset(&D3DPP);
+		if (Result == D3D_OK)
+			DeviceRestored();
+	}
 }
 
 void ZED3D9Module::SetScreenSize(ZEInt Width, ZEInt Height)
@@ -453,7 +524,7 @@ void ZED3D9Module::SetScreenSize(ZEInt Width, ZEInt Height)
 	{
 		D3DPP.BackBufferWidth = Width;
 		D3DPP.BackBufferHeight = Height;
-		RestoreDevice(true);
+		ResetDevice();
 	}
 }
 
@@ -463,7 +534,7 @@ void ZED3D9Module::SetVerticalSync(bool Enabled)
 	if (Device != NULL)
 	{
 		D3DPP.PresentationInterval = (VerticalSync ? D3DPRESENT_INTERVAL_DEFAULT : D3DPRESENT_INTERVAL_IMMEDIATE);
-		RestoreDevice(true);
+		ResetDevice();
 	}
 }
 
@@ -497,7 +568,7 @@ void ZED3D9Module::SetAntiAliasing(ZEInt Level)
 	if (Device != NULL)
 	{
 		D3DPP.MultiSampleType = (D3DMULTISAMPLE_TYPE)(AnisotropicFilter * 2);
-		RestoreDevice(true);
+		ResetDevice();
 	}
 }
 
@@ -563,28 +634,19 @@ ZEVertexDeclaration* ZED3D9Module::CreateVertexDeclaration()
 
 void ZED3D9Module::UpdateScreen()
 {
+	CheckAndRestoreDevice();
 	if (IsDeviceLost())
 		return;
 
-	if (Device->TestCooperativeLevel() != D3D_OK)
-		RestoreDevice();
-
-	if (!IsDeviceLost())
-		Device->Present(NULL, NULL, NULL, NULL);
+	Device->Present(NULL, NULL, NULL, NULL);
 }
  
 void ZED3D9Module::ClearFrameBuffer()
 {
-// 	if (IsDeviceLost())
-// 		return;
-// 
-// 	if (Device->TestCooperativeLevel() != D3D_OK)
-// 		RestoreDevice();
-// 
-// 	if (FAILED(Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00555555, 1, 0)))
-// 	{
-// 		zeCriticalError("Clear failed");
-// 	}
+ 	if (IsDeviceLost())
+ 		return;
+ 
+ 
 }
 
 ZEStaticIndexBuffer* ZED3D9Module::CreateStaticIndexBuffer()

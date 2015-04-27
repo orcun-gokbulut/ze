@@ -65,7 +65,7 @@ bool ZED3D9UIMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderComma
 	else
 		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	
-	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
