@@ -76,7 +76,7 @@ void ZEJob::AddDependentJob(const ZEString& Job)
 
 void ZEJob::RemoveDependentJob(const ZEString& Job)
 {
-	DependentJobs.DeleteValue(Job);
+	DependentJobs.RemoveValue(Job);
 }
 
 void ZEJob::Reset()

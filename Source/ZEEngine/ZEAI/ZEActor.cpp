@@ -154,7 +154,7 @@ void ZEActor::AddSteering(ZESteering* Steering)
 
 void ZEActor::RemoveSteering(ZESteering* Steering)
 {
-	Steerings.DeleteValue(Steering);
+	Steerings.RemoveValue(Steering);
 }
 
 void ZEActor::Tick(float ElapsedTime)

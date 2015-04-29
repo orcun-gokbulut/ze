@@ -50,8 +50,6 @@
 #define ZE_CDF_VIEW_PROJECTION_TRANSFORM		16
 #define ZE_CDF_ALL								0xFFFFFFFF
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZECamera)
-
 const ZEMatrix4x4& ZECamera::GetViewTransform()
 {
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW_TRANSFORM))

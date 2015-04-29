@@ -42,10 +42,10 @@
 #include "ZEInput/ZEInputMap.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 
-class ZEVector3;
-
 class ZEUICursorControl : public ZEUIControl
 {
+	ZE_OBJECT
+
 	private:
 
 		ZEUIMaterial*		CursorMaterial;

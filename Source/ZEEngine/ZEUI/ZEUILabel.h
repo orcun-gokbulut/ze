@@ -54,12 +54,14 @@ struct ZEUITextCharacter
 	char				CChar;
 	ZEFontCharacter		FontCharacter;
 	ZEUIRectangle		RenderableCharacter;
-	ZEInt32					Line;
+	ZEInt32				Line;
 	bool				IsSelected;
 };
 
 class ZEUILabel : public ZEUIFrameControl
 {
+	ZE_OBJECT
+
 	protected:
 		ZEString							Text;
 		ZEArray<ZEUITextCharacter>			Characters;
@@ -85,7 +87,7 @@ class ZEUILabel : public ZEUIFrameControl
 		virtual void						Draw(ZEUIRenderer* Renderer);
 
 		void								SetFontResource(ZEFontResource* Resource);
-		const ZEFontResource*				GetFontResource() const;
+		ZEFontResource*						GetFontResource();
 
 		void								SetFontColor(const ZEVector4& Color);
 		const ZEVector4&					GetFontColor() const;

@@ -53,7 +53,7 @@
 #include "ZEModel/ZEModelMeshLOD.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZEMeta/ZEProperty.h"
-#include "ZEFile/ZEPathUtils.h"
+#include "ZEML/ZEMLWriter.h"
 
 ZEDMaterialEditor::ZEDMaterialEditor(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 {
@@ -69,10 +69,10 @@ ZEDMaterialEditor::ZEDMaterialEditor(QWidget *parent, Qt::WFlags flags) : QMainW
 	ui->CentralLayout->addWidget(ViewPort);
 	InitializeEngine();
 	ViewPort->Initialize();
-	ZEString DefaultCompanyName = "Zinek";
-	ZEString DefaultApplicationName = "Engine";
-	ZEString DefaultResourcesDirectoryName = "Resources";
-	ZEPathManager::CustomizePaths(&DefaultCompanyName, &DefaultApplicationName, &DefaultResourcesDirectoryName);
+// 	ZEString DefaultCompanyName = "Zinek";
+// 	ZEString DefaultApplicationName = "Engine";
+// 	ZEString DefaultResourcesDirectoryName = "Resources";
+// 	ZEPathManager::CustomizePaths(&DefaultCompanyName, &DefaultApplicationName, &DefaultResourcesDirectoryName);
 
 	connect(&EngineMainLoopTimer, SIGNAL(timeout()), this, SLOT(EngineMainLoop()));
 	connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(SaveMaterials()));
@@ -82,13 +82,13 @@ ZEDMaterialEditor::ZEDMaterialEditor(QWidget *parent, Qt::WFlags flags) : QMainW
 	Material = NULL;
 	ModelResource = NULL;
 
-	DirectLight1PropertyWindowManager = new ZEDPropertyWindowManager(ui->LightPropertiesTabWidget, ViewPort->GetDirectLight1(), ZEPathManager::GetWorkingDirectory().ToCString());
+	DirectLight1PropertyWindowManager = new ZEDPropertyWindowManager(ui->LightPropertiesTabWidget, ViewPort->GetDirectLight1(), ZEPathManager::GetInstance()->GetEnginePath().ToCString());
 	ui->DirectLight1TabLayout->addWidget(DirectLight1PropertyWindowManager);
 
-	DirectLight2PropertyWindowManager = new ZEDPropertyWindowManager(ui->LightPropertiesTabWidget, ViewPort->GetDirectLight2(), ZEPathManager::GetWorkingDirectory().ToCString());
+	DirectLight2PropertyWindowManager = new ZEDPropertyWindowManager(ui->LightPropertiesTabWidget, ViewPort->GetDirectLight2(), ZEPathManager::GetInstance()->GetEnginePath().ToCString());
 	ui->DirectLight2TabLayout->addWidget(DirectLight2PropertyWindowManager);
 
-	DirectLight3PropertyWindowManager = new ZEDPropertyWindowManager(ui->LightPropertiesTabWidget, ViewPort->GetDirectLight3(), ZEPathManager::GetWorkingDirectory().ToCString());
+	DirectLight3PropertyWindowManager = new ZEDPropertyWindowManager(ui->LightPropertiesTabWidget, ViewPort->GetDirectLight3(), ZEPathManager::GetInstance()->GetEnginePath().ToCString());
 	ui->DirectLight3TabLayout->addWidget(DirectLight3PropertyWindowManager);
 }
 
@@ -142,144 +142,96 @@ void ZEDMaterialEditor::Close()
 void ZEDMaterialEditor::WriteMaterialToFile(ZEFixedMaterial* Material, ZEString fileName)
 {
 	ZEFile File;
+	ZEMLWriter MaterialWriter;
+	MaterialWriter.Open(fileName);
 
-	if(!File.Open(fileName, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
-		zeError("Can not open given file. File : %s", fileName);
+	ZEMLWriterNode MaterialNode = MaterialWriter.WriteRootNode("Material");
+	MaterialNode.WriteUInt8("MajorVersion", 1);
+	MaterialNode.WriteUInt8("MinorVersion", 0);
+	MaterialNode.WriteString("Name", Material->GetName());
 
-	ZEMLNode* MaterialNode = new ZEMLNode("Material");
-	MaterialNode->AddProperty("Name", Material->GetName());
-	ZEMLNode* ConfigurationNode = MaterialNode->AddSubNode("Configuration");
+	ZEMLWriterNode MaterialConfigNode = MaterialNode.OpenSubNode("Configuration");
+	MaterialConfigNode.WriteString("Name", "Default"); //Will be changed when configuration is implemented.
+	MaterialConfigNode.WriteBool("Wireframe", Material->GetWireframe());
+	MaterialConfigNode.WriteBool("TwoSided", Material->GetTwoSided());
+	MaterialConfigNode.WriteInt32("TransparencyMode", (ZEInt32)Material->GetTransparancyMode());
+	MaterialConfigNode.WriteBool("LightningEnabled", Material->GetLightningEnabled());
+	MaterialConfigNode.WriteBool("ShadowReceiver", Material->GetShadowReceiver());
+	MaterialConfigNode.WriteBool("ShadowCaster", Material->GetShadowCaster());
 
-	ConfigurationNode->AddProperty("Name", "Default"); //Will be changed when configuration is implemented.
-	ConfigurationNode->AddProperty("Wireframe", Material->GetWireframe());
-	ConfigurationNode->AddProperty("TwoSided", Material->GetTwoSided());
-	ConfigurationNode->AddProperty("TransparencyMode", (ZEInt32)Material->GetTransparancyMode());
-	ConfigurationNode->AddProperty("LightningEnabled", Material->GetLightningEnabled());
-	ConfigurationNode->AddProperty("ShadowReceiver", Material->GetShadowReceiver());
-	ConfigurationNode->AddProperty("ShadowCaster", Material->GetShadowCaster());
+	MaterialConfigNode.WriteBool("AmbientEnabled", Material->GetAmbientEnabled());
+	MaterialConfigNode.WriteBool("GlobalAmbientEnabled", Material->GetGlobalAmbientEnabled());
+	MaterialConfigNode.WriteBool("DiffuseEnabled", Material->GetDiffuseEnabled());
+	MaterialConfigNode.WriteBool("NormalMapEnabled", Material->GetNormalMapEnabled());
+	MaterialConfigNode.WriteBool("ParallaxMapEnabled", Material->GetParallaxMapEnabled());
+	MaterialConfigNode.WriteBool("SpecularEnabled", Material->GetSpecularEnabled());
+	MaterialConfigNode.WriteBool("EmmisiveEnabled", Material->GetEmmisiveEnabled());
+	MaterialConfigNode.WriteBool("OpacityEnabled", Material->GetOpacityEnabled());
+	MaterialConfigNode.WriteBool("DetailBaseMapEnabled", Material->GetDetailBaseMapEnabled());
+	MaterialConfigNode.WriteBool("DetailNormalMapEnabled", Material->GetDetailNormalMapEnabled());
+	MaterialConfigNode.WriteBool("ReflectionEnabled", Material->GetReflectionEnabled());
+	MaterialConfigNode.WriteBool("RefractionEnabled", Material->GetRefractionEnabled());
+	MaterialConfigNode.WriteBool("LightMapEnabled", Material->GetLightMapEnabled());
+	MaterialConfigNode.WriteBool("AlphaCullEnabled", Material->GetAlphaCullEnabled());
+	MaterialConfigNode.WriteBool("VertexColorEnabled", Material->GetVertexColorEnabled());
 
-	ConfigurationNode->AddProperty("AmbientEnabled", Material->GetAmbientEnabled());
-	ConfigurationNode->AddProperty("GlobalAmbientEnabled", Material->GetGlobalAmbientEnabled());
-	ConfigurationNode->AddProperty("DiffuseEnabled", Material->GetDiffuseEnabled());
-	ConfigurationNode->AddProperty("NormalMapEnabled", Material->GetNormalMapEnabled());
-	ConfigurationNode->AddProperty("ParallaxMapEnabled", Material->GetParallaxMapEnabled());
-	ConfigurationNode->AddProperty("SpecularEnabled", Material->GetSpecularEnabled());
-	ConfigurationNode->AddProperty("EmmisiveEnabled", Material->GetEmmisiveEnabled());
-	ConfigurationNode->AddProperty("OpacityEnabled", Material->GetOpacityEnabled());
-	ConfigurationNode->AddProperty("DetailBaseMapEnabled", Material->GetDetailBaseMapEnabled());
-	ConfigurationNode->AddProperty("DetailNormalMapEnabled", Material->GetDetailNormalMapEnabled());
-	ConfigurationNode->AddProperty("ReflectionEnabled", Material->GetReflectionEnabled());
-	ConfigurationNode->AddProperty("RefractionEnabled", Material->GetRefractionEnabled());
-	ConfigurationNode->AddProperty("LightMapEnabled", Material->GetLightMapEnabled());
-	ConfigurationNode->AddProperty("AlphaCullEnabled", Material->GetAlphaCullEnabled());
-	ConfigurationNode->AddProperty("VertexColorEnabled", Material->GetVertexColorEnabled());
+	MaterialConfigNode.WriteFloat("Opacity", Material->GetOpacity());
+	MaterialConfigNode.WriteInt32("OpacityComponent", (ZEInt32)Material->GetOpacityComponent());
+	MaterialConfigNode.WriteFloat("AlphaCullLimit", Material->GetAlphaCullLimit());
+	MaterialConfigNode.WriteVector2("DetailMapTiling", Material->GetDetailMapTiling());
+	MaterialConfigNode.WriteFloat("SpecularShininess", Material->GetSpecularShininess());
+	MaterialConfigNode.WriteFloat("SubSurfaceScatteringFactor", Material->GetDiffuseSubSurfaceScatteringFactor());
 
-	ConfigurationNode->AddProperty("Opacity", Material->GetOpacity());
-	ConfigurationNode->AddProperty("OpacityComponent", (ZEInt32)Material->GetOpacityComponent());
-	ConfigurationNode->AddProperty("AlphaCullLimit", Material->GetAlphaCullLimit());
-	ConfigurationNode->AddProperty("DetailMapTiling", Material->GetDetailMapTiling());
-	ConfigurationNode->AddProperty("SpecularShininess", Material->GetSpecularShininess());
-	ConfigurationNode->AddProperty("SubSurfaceScatteringFactor", Material->GetDiffuseSubSurfaceScatteringFactor());
+	MaterialConfigNode.WriteVector3("AmbientColor", Material->GetAmbientColor());
+	MaterialConfigNode.WriteFloat("AmbientFactor", Material->GetAmbientFactor());
+	MaterialConfigNode.WriteVector3("SpecularColor", Material->GetSpecularColor());
+	MaterialConfigNode.WriteFloat("SpecularFactor", Material->GetSpecularFactor());
+	MaterialConfigNode.WriteVector3("DiffuseColor", Material->GetDiffuseColor());
+	MaterialConfigNode.WriteFloat("DiffuseFactor", Material->GetDiffuseFactor());
+	MaterialConfigNode.WriteVector3("EmmisiveColor", Material->GetEmmisiveColor());
+	MaterialConfigNode.WriteFloat("EmmisiveFactor", Material->GetEmmisiveFactor());
+	MaterialConfigNode.WriteFloat("RefractionIndex", Material->GetRefractionIndex());
+	MaterialConfigNode.WriteFloat("RefractionFactor", Material->GetRefractionFactor());
+	MaterialConfigNode.WriteFloat("ReflectionFactor", Material->GetReflectionFactor());
 
-	ConfigurationNode->AddProperty("AmbientColor", Material->GetAmbientColor());
-	ConfigurationNode->AddProperty("AmbientFactor", Material->GetAmbientFactor());
-	ConfigurationNode->AddProperty("SpecularColor", Material->GetSpecularColor());
-	ConfigurationNode->AddProperty("SpecularFactor", Material->GetSpecularFactor());
-	ConfigurationNode->AddProperty("DiffuseColor", Material->GetDiffuseColor());
-	ConfigurationNode->AddProperty("DiffuseFactor", Material->GetDiffuseFactor());
-	ConfigurationNode->AddProperty("EmmisiveColor", Material->GetEmmisiveColor());
-	ConfigurationNode->AddProperty("EmmisiveFactor", Material->GetEmmisiveFactor());
-	ConfigurationNode->AddProperty("RefractionIndex", Material->GetRefractionIndex());
-	ConfigurationNode->AddProperty("RefractionFactor", Material->GetRefractionFactor());
-	ConfigurationNode->AddProperty("ReflectionFactor", Material->GetReflectionFactor());
+	MaterialConfigNode.WriteString("BaseMap", Material->GetBaseMapFile());
+	MaterialConfigNode.WriteInt32("BaseMapAddressModeU", (ZEInt32)Material->GetBaseMapAddressModeU());
+	MaterialConfigNode.WriteInt32("BaseMapAddressModeV", (ZEInt32)Material->GetBaseMapAddressModeV());
+	MaterialConfigNode.WriteString("NormalMap", Material->GetNormalMapFile());
+	MaterialConfigNode.WriteInt32("NormalMapAddressModeU", Material->GetNormalMapAddressModeU());
+	MaterialConfigNode.WriteInt32("NormalMapAddressModeV", Material->GetNormalMapAddressModeV());
+	MaterialConfigNode.WriteString("ParallaxMap", Material->GetParallaxMapFile());
+	MaterialConfigNode.WriteInt32("ParallaxMapAddressModeU", Material->GetParallaxMapAddressModeU());
+	MaterialConfigNode.WriteInt32("ParallaxMapAddressModeV", Material->GetParallaxMapAddressModeV());
+	MaterialConfigNode.WriteString("SpecularMap", Material->GetSpecularMapFile());
+	MaterialConfigNode.WriteInt32("SpecularMapAddressModeU", Material->GetSpecularMapAddressModeU());
+	MaterialConfigNode.WriteInt32("SpecularMapAddressModeV", Material->GetSpecularMapAddressModeV());
+	MaterialConfigNode.WriteString("EmmisiveMap", Material->GetEmmisiveMapFile());
+	MaterialConfigNode.WriteInt32("EmmisiveMapAddressModeU", Material->GetEmmisiveMapAddressModeU());
+	MaterialConfigNode.WriteInt32("EmmisiveMapAddressModeV", Material->GetEmmisiveMapAddressModeV());
+	MaterialConfigNode.WriteString("OpacityMap", Material->GetOpacityMapFile());
+	MaterialConfigNode.WriteInt32("OpacityMapAddressModeU", Material->GetOpacityMapAddressModeU());
+	MaterialConfigNode.WriteInt32("OpacityMapAddressModeV", Material->GetOpacityMapAddressModeV());
+	MaterialConfigNode.WriteString("DetailBaseMap", Material->GetDetailBaseMapFile());
+	MaterialConfigNode.WriteInt32("DetailBaseMapAddressModeU", Material->GetDetailBaseMapAddressModeU());
+	MaterialConfigNode.WriteInt32("DetailBaseMapAddressModeV", Material->GetDetailBaseMapAddressModeV());
+	MaterialConfigNode.WriteString("DetailNormalMap", Material->GetDetailNormalMapFile());
+	MaterialConfigNode.WriteInt32("DetailNormalMapAddressModeU", Material->GetDetailNormalMapAddressModeU());
+	MaterialConfigNode.WriteInt32("DetailNormalMapAddressModeV", Material->GetDetailNormalMapAddressModeV());
+	MaterialConfigNode.WriteString("EnvironmentMap", Material->GetEnvironmentMapFile());
+	MaterialConfigNode.WriteInt32("EnvironmentMapAddressModeU", Material->GetEnvironmentMapAddressModeU());
+	MaterialConfigNode.WriteInt32("EnvironmentMapAddressModeV", Material->GetEnvironmentMapAddressModeV());
+	MaterialConfigNode.WriteInt32("EnvironmentMapAddressModeW", Material->GetEnvironmentMapAddressModeW());
+	MaterialConfigNode.WriteString("LightMap", Material->GetLightMapFile());
+	MaterialConfigNode.WriteInt32("LightMapAddressModeU", Material->GetLightMapAddressModeU());
+	MaterialConfigNode.WriteInt32("LightMapAddressModeV", Material->GetLightMapAddressModeV());
 
-	if(strlen(Material->GetBaseMapFile()) != 0)
-		ConfigurationNode->AddProperty("BaseMap", ZEPathUtils::GetRelativePath(ZEString((const char*)CurrentFileName.toLatin1()), ZEPathManager::GetWorkingDirectory() + "\\" + Material->GetBaseMapFile()));
-	else
-		ConfigurationNode->AddProperty("BaseMap", "");
-
-	ConfigurationNode->AddProperty("BaseMapAddressModeU", (ZEInt32)Material->GetBaseMapAddressModeU());
-	ConfigurationNode->AddProperty("BaseMapAddressModeV", (ZEInt32)Material->GetBaseMapAddressModeV());
-	
-	if(strlen(Material->GetNormalMapFile()) != 0)
-		ConfigurationNode->AddProperty("NormalMap", ZEPathUtils::GetRelativePath(ZEString((const char*)CurrentFileName.toLatin1()), ZEPathManager::GetWorkingDirectory() + "\\" + Material->GetNormalMapFile()));
-	else
-		ConfigurationNode->AddProperty("NormalMap", ""); 
-	
-	ConfigurationNode->AddProperty("NormalMapAddressModeU", Material->GetNormalMapAddressModeU());
-	ConfigurationNode->AddProperty("NormalMapAddressModeV", Material->GetNormalMapAddressModeV());
-	
-	if(strlen(Material->GetParallaxMapFile()) != 0)
-		ConfigurationNode->AddProperty("ParallaxMap", ZEPathUtils::GetRelativePath(ZEString((const char*)CurrentFileName.toLatin1()), ZEPathManager::GetWorkingDirectory() + "\\" + Material->GetParallaxMapFile()));
-	else
-		ConfigurationNode->AddProperty("ParallaxMap", "");
-
-	ConfigurationNode->AddProperty("ParallaxMapAddressModeU", Material->GetParallaxMapAddressModeU());
-	ConfigurationNode->AddProperty("ParallaxMapAddressModeV", Material->GetParallaxMapAddressModeV());
-	
-	if(strlen(Material->GetSpecularMapFile()) != 0)
-		ConfigurationNode->AddProperty("SpecularMap", ZEPathUtils::GetRelativePath(ZEString((const char*)CurrentFileName.toLatin1()), ZEPathManager::GetWorkingDirectory() + "\\" + Material->GetSpecularMapFile()));
-	else
-		ConfigurationNode->AddProperty("SpecularMap", "");
-
-	ConfigurationNode->AddProperty("SpecularMapAddressModeU", Material->GetSpecularMapAddressModeU());
-	ConfigurationNode->AddProperty("SpecularMapAddressModeV", Material->GetSpecularMapAddressModeV());
-	
-	if(strlen(Material->GetEmmisiveMapFile()) != 0)
-		ConfigurationNode->AddProperty("EmmisiveMap", ZEPathUtils::GetRelativePath(ZEString((const char*)CurrentFileName.toLatin1()), ZEPathManager::GetWorkingDirectory() + "\\" + Material->GetEmmisiveMapFile()));
-	else
-		ConfigurationNode->AddProperty("EmmisiveMap", "");
-
-	ConfigurationNode->AddProperty("EmmisiveMapAddressModeU", Material->GetEmmisiveMapAddressModeU());
-	ConfigurationNode->AddProperty("EmmisiveMapAddressModeV", Material->GetEmmisiveMapAddressModeV());
-	
-	if(strlen(Material->GetOpacityMapFile()) != 0)
-		ConfigurationNode->AddProperty("OpacityMap", ZEPathUtils::GetRelativePath(ZEString((const char*)CurrentFileName.toLatin1()), ZEPathManager::GetWorkingDirectory() + "\\" + Material->GetOpacityMapFile()));
-	else
-		ConfigurationNode->AddProperty("OpacityMap", "");
-
-	ConfigurationNode->AddProperty("OpacityMapAddressModeU", Material->GetOpacityMapAddressModeU());
-	ConfigurationNode->AddProperty("OpacityMapAddressModeV", Material->GetOpacityMapAddressModeV());
-	
-	if(strlen(Material->GetDetailBaseMapFile()) != 0)
-		ConfigurationNode->AddProperty("DetailBaseMap", ZEPathUtils::GetRelativePath(ZEString((const char*)CurrentFileName.toLatin1()), ZEPathManager::GetWorkingDirectory() + "\\" + Material->GetDetailBaseMapFile()));
-	else
-		ConfigurationNode->AddProperty("DetailBaseMap", "");
-
-	ConfigurationNode->AddProperty("DetailBaseMapAddressModeU", Material->GetDetailBaseMapAddressModeU());
-	ConfigurationNode->AddProperty("DetailBaseMapAddressModeV", Material->GetDetailBaseMapAddressModeV());
-	
-	if(strlen(Material->GetDetailNormalMapFile()) != 0)
-		ConfigurationNode->AddProperty("DetailNormalMap", ZEPathUtils::GetRelativePath(ZEString((const char*)CurrentFileName.toLatin1()), ZEPathManager::GetWorkingDirectory() + "\\" + Material->GetDetailNormalMapFile()));
-	else
-		ConfigurationNode->AddProperty("DetailNormalMap", "");
-
-	ConfigurationNode->AddProperty("DetailNormalMapAddressModeU", Material->GetDetailNormalMapAddressModeU());
-	ConfigurationNode->AddProperty("DetailNormalMapAddressModeV", Material->GetDetailNormalMapAddressModeV());
-
-	if(strlen(Material->GetEnvironmentMapFile()) != 0)
-		ConfigurationNode->AddProperty("EnvironmentMap", ZEPathUtils::GetRelativePath(ZEString((const char*)CurrentFileName.toLatin1()), ZEPathManager::GetWorkingDirectory() + "\\" + Material->GetEnvironmentMapFile()));
-	else
-		ConfigurationNode->AddProperty("EnvironmentMap", "");
-
-	ConfigurationNode->AddProperty("EnvironmentMapAddressModeU", Material->GetEnvironmentMapAddressModeU());
-	ConfigurationNode->AddProperty("EnvironmentMapAddressModeV", Material->GetEnvironmentMapAddressModeV());
-	ConfigurationNode->AddProperty("EnvironmentMapAddressModeW", Material->GetEnvironmentMapAddressModeW());
-	
-	if(strlen(Material->GetLightMapFile()) != 0)
-		ConfigurationNode->AddProperty("LightMap", ZEPathUtils::GetRelativePath(ZEString((const char*)CurrentFileName.toLatin1()), ZEPathManager::GetWorkingDirectory() + "\\" + Material->GetLightMapFile()));
-	else
-		ConfigurationNode->AddProperty("LightMap", "");
-
-	ConfigurationNode->AddProperty("LightMapAddressModeU", Material->GetLightMapAddressModeU());
-	ConfigurationNode->AddProperty("LightMapAddressModeV", Material->GetLightMapAddressModeV());
-
-	MaterialNode->Write(&File);
+	MaterialConfigNode.CloseNode();
+	MaterialNode.CloseNode();
+	MaterialWriter.Close();
 
 	if(File.IsOpen())
 		File.Close();
-
-	delete MaterialNode;	
 }
 
 void ZEDMaterialEditor::SaveMaterials()
@@ -294,17 +246,17 @@ void ZEDMaterialEditor::SaveMaterials()
 
 void ZEDMaterialEditor::Open()
 {
-	QString SelectedFilePath = QFileDialog::getOpenFileName(0, QString("Load Material"), QString(ZEPathManager::GetResourcesPath().ToCString()), QString("*.ZEMATERIAL"), 0, 0);
+	QString SelectedFilePath = QFileDialog::getOpenFileName(0, QString("Load Material"), QString(ZEPathManager::GetInstance()->GetResourcePath().ToCString()), QString("*.ZEMATERIAL"), 0, 0);
 
 	if(SelectedFilePath.count() != 0)
 	{
 		CloseFile();
 		SelectedFilePath = SelectedFilePath.replace("/", "\\");
 		CurrentFileName = SelectedFilePath;
-		SelectedFilePath.remove(QString(ZEPathManager::GetWorkingDirectory().ToCString()) + "\\", Qt::CaseInsensitive);
+		/*SelectedFilePath.remove(QString(ZEPathManager::GetWorkingDirectory().ToCString()) + "\\", Qt::CaseInsensitive);*/
 
 		ViewPort->SetMaterial((const char*)SelectedFilePath.toLatin1());
-		ZEDPropertyWindowManager* PropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ((ZEFixedMaterial*)(ViewPort->GetModel()->GetModelResource()->GetMaterials()[0])), (ZEPathManager::GetResourcesPath() + "\\").ToCString());
+		ZEDPropertyWindowManager* PropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ((ZEFixedMaterial*)(ViewPort->GetModel()->GetModelResource()->GetMaterials()[0])), (ZEPathManager::GetInstance()->GetResourcePath() + "\\").ToCString());
 		ui->PropertyTabWidget->addTab(PropertyWindowManager, ((ZEFixedMaterial*)(ViewPort->GetModel()->GetModelResource()->GetMaterials()[0]))->GetName().ToCString());
 		PropertyWindows.Add(PropertyWindowManager);
 		Material = ((ZEFixedMaterial*)ViewPort->GetModel()->GetModelResource()->GetMaterials()[0]);
@@ -315,21 +267,21 @@ void ZEDMaterialEditor::Open()
 
 void ZEDMaterialEditor::OpenModel()
 {
-	QString SelectedFilePath = QFileDialog::getOpenFileName(0, QString("Load Model"), QString(ZEPathManager::GetResourcesPath().ToCString()), QString("*.ZEMODEL"), 0, 0);
+	QString SelectedFilePath = QFileDialog::getOpenFileName(0, QString("Load Model"), QString(ZEPathManager::GetInstance()->GetResourcePath().ToCString()), QString("*.ZEMODEL"), 0, 0);
 
 	if(SelectedFilePath.count() != 0)
 	{
 		CloseFile();
 		SelectedFilePath = SelectedFilePath.replace("/", "\\");
 		CurrentFileName = SelectedFilePath;
-		SelectedFilePath.remove(QString(ZEPathManager::GetWorkingDirectory().ToCString()) + "\\", Qt::CaseInsensitive);
+		//SelectedFilePath.remove(QString(ZEPathManager::GetWorkingDirectory().ToCString()) + "\\", Qt::CaseInsensitive);
 
 		ModelResource = ZEModelResource::LoadResource((const char*)SelectedFilePath.toLatin1());
 		ViewPort->SetModelResource(ModelResource);
 
 		for(int I = 0; I < ViewPort->GetModelMaterials().GetCount(); I++)
 		{
-			ZEDPropertyWindowManager* PropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ((ZEFixedMaterial*)(ViewPort->GetModel()->GetModelResource()->GetMaterials()[I])), (ZEPathManager::GetResourcesPath() + "\\").ToCString());
+			ZEDPropertyWindowManager* PropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ((ZEFixedMaterial*)(ViewPort->GetModel()->GetModelResource()->GetMaterials()[I])), (ZEPathManager::GetInstance()->GetResourcePath() + "\\").ToCString());
 			ui->PropertyTabWidget->addTab(PropertyWindowManager, ((ZEFixedMaterial*)(ModelResource->GetMaterials()[I]))->GetName().ToCString());
 			PropertyWindows.Add(PropertyWindowManager);
 		}

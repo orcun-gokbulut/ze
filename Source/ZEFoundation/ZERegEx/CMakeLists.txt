@@ -43,4 +43,4 @@ ze_add_source(ZERegEx.cpp 			Sources)
 ze_add_library(TARGET ZERegEx 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation TRE)
+	LIBS TRE)

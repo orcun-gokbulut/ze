@@ -78,7 +78,7 @@ ze_add_source(ZEProfilerCounter.h					Sources Headers)
 ze_add_source(ZERealTimeClock.cpp					Sources)
 ze_add_source(ZERealTimeClock.h						Sources Headers)
 ze_add_source(ZEResource.cpp						Sources)
-ze_add_source(ZEResource.h							Sources Headers)
+ze_add_source(ZEResource.h							Sources Headers ZEMC)
 ze_add_source(ZEResourceManager.cpp					Sources)
 ze_add_source(ZEResourceManager.h					Sources Headers)
 ze_add_source(ZESystemMessageManager.cpp			Sources)
@@ -97,6 +97,7 @@ ze_add_source(ZECrashHandler.h						Sources Headers)
 ze_add_source(ZECrashHandler_Windows.cpp			Sources PLATFORMS Windows)
 
 ze_add_library(TARGET ZECore
+	ZEMC ${ZEMC}
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation libPhysX2)

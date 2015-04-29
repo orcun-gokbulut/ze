@@ -56,10 +56,10 @@ struct ZEAerialPerspectiveSAQuad
 	float	TexCoord[2];
 };
 
-ZE_META_OBJECT_DESCRIPTION(ZED3D9AerialPerspectiveProcessor);
 class ZED3D9AerialPerspectiveProcessor : public ZED3D9ComponentBase, public ZEObject
 {
-	ZE_META_OBJECT(ZED3D9AerialPerspectiveProcessor);
+
+	ZE_OBJECT
 
 	private:
 		ZED3D9ViewPort*						Output;
@@ -129,26 +129,5 @@ class ZED3D9AerialPerspectiveProcessor : public ZED3D9ComponentBase, public ZEOb
 											~ZED3D9AerialPerspectiveProcessor();
 };
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-	<zinek>
-		<meta> 
-			<class name="ZED3D9AerialPerspectiveProcessor">
-				<noinstance>true</noinstance>
-				<description>ZED3D9AerialPerspectiveProcessor</description>
-
-				<property name="MieFactor" type="float" autogetset="yes" description="..."/>
-				<property name="RayleighFactor" type="float" autogetset="yes" description="..."/>
-				<property name="ExtinctionFactor" type="float" autogetset="yes" description="..."/>
-				<property name="ScatterSymmetry" type="float" autogetset="yes" description="..."/>
-
-				<property name="SunIntensity" type="float" autogetset="yes" description="..."/>
-				<property name="SunColor" type="ZEVector3" autogetset="yes" semantic="ZE_PS_COLOR" description="..."/>
-
-			</class>
-		</meta>
-	</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 
 #endif 

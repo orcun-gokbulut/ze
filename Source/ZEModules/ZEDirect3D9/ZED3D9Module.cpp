@@ -57,14 +57,13 @@
 #include "ZED3D9TerrainMaterial.h"
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9IndexBuffer.h"
-
-#include <d3dx9.h>
 #include "ZED3D9SkyDomeMaterial.h"
 #include "ZED3D9CloudMaterial.h"
 #include "ZED3D9SeaMaterial.h"
 #include "ZEGraphics/ZESeaMaterial.h"
-#include "Logo_png.h"
+#include "Logo.png.h"
 
+#include <d3dx9.h>
 
 LPDIRECT3DDEVICE9 D3D9Device;
 ZED3D9Module* D3D9Module;

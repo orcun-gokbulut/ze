@@ -121,7 +121,7 @@ void ZEProfilerCounter::Stop()
 	EndTime = 0;
 		
 	if(Owner != NULL && Owner->GetInstance()->Stack.GetLastItem()->Name == ZEProfilerCounter::Name)
-		Owner->GetInstance()->Stack.DeleteAt(Owner->GetInstance()->Stack.GetSize()-1);
+		Owner->GetInstance()->Stack.Remove(Owner->GetInstance()->Stack.GetSize()-1);
 }
 
 ZEInt64 ZEProfilerCounter::GetFrameCount()

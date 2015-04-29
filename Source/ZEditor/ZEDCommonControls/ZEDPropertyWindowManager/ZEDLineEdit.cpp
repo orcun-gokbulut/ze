@@ -36,18 +36,19 @@
 #include "ZEDLineEdit.h"
 #include "ZEDUndoRedo\ZEDUndoRedo.h"
 #include "ZEDPropertyUndoRedo.h"
-ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property) : QTreeWidgetItem(parent)
 {
 	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
+	this->Object = Object;
+	this->Property = Property;
 	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
-	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
 
-	if (Value.GetType() != ZE_VRT_STRING)
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
+	//setForeground(0,QBrush(QColor(0,0,0)));
+	setText(0, Property->Name);
+	//this->setToolTip (0, QString(ClassAttribute.Description));
+
+	if (Value.GetType().Type != ZE_TT_STRING)
 	{
 		setText(1, QString("Error String"));
 		return;
@@ -58,7 +59,7 @@ ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObj
 
 	ParentTree->setItemWidget(this, 1, XValue);
 
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
+	if((this->Property->Access & ZEMT_PA_WRITE) != ZEMT_PA_WRITE)
 		XValue->setEnabled(false);
 
 	connect(this->XValue, SIGNAL(returnPressed()), this, SLOT(Changed()));
@@ -78,14 +79,14 @@ void ZEDLineEdit::Changed()
 {
 	ZEVariant Value;
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
+	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Object, this->Property);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetOldValue(Value);
 
 	Value.SetString((const char*)(XValue->text().toLatin1()));
-	this->Class->SetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->SetProperty(Object, Property->Name, Value);
 
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetNewValue(Value);
 
 	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);

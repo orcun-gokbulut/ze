@@ -316,65 +316,68 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ch
 	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
 	if (Prop != NULL && Prop->GetType() == Type)
 	{
-		bool Result;
-		ZEVariant TempValue;
+		bool Result = false;
 
 		switch (Type)
 		{
-		case ZE_FLOAT_PROP:
-			{
-				float FloatValue;
-				Result = Prop->GetPropertyValue(FloatValue);
-				TempValue.SetFloat(FloatValue);
-				break;
-			}
-		case ZE_INT_PROP:
-			{
-				ZEInt IntegerValue;
-				Result = Prop->GetPropertyValue(IntegerValue);
-
-				if (IsPropertyBoolean)
+			case ZE_FLOAT_PROP:
 				{
-					bool BooleanValue = (IntegerValue != 0);
-					TempValue.SetBoolean(BooleanValue);
-				}
-				else
-				{
-					TempValue.SetInt32(IntegerValue);
-				}
+					float FloatValue;
+					Result = Prop->GetPropertyValue(FloatValue);
 
-				break;
-			}
-		case ZE_VECTOR3_PROP:
-			{
-				ZEVector3 Vector3Value;
-				Result = Prop->GetPropertyValue((Point3&)Vector3Value);
-				TempValue.SetVector3(Vector3Value);
-				break;
-			}
-		case ZE_VECTOR4_PROP:
-			{
-				ZEVector4 Vector4Value;
-				Result = Prop->GetPropertyValue((Point4&)Vector4Value);
-				TempValue.SetVector4(Vector4Value);
-				break;
-			}
-		case ZE_STRING_PROP:
-			{
-				const char* StringValue;
-				Result = Prop->GetPropertyValue(StringValue);
-				TempValue.SetString(StringValue);
-				break;
-			}
+					if (Result)
+						Value.SetFloat(FloatValue);
+
+					break;
+				}
+			case ZE_INT_PROP:
+				{
+					ZEInt IntegerValue;
+					Result = Prop->GetPropertyValue(IntegerValue);
+
+					if (Result)
+					{
+						if (IsPropertyBoolean)
+							Value.SetBool((bool)(IntegerValue != 0));
+						else
+							Value.SetInt32(IntegerValue);
+					}
+
+					break;
+				}
+			case ZE_VECTOR3_PROP:
+				{
+					ZEVector3 Vector3Value;
+					Result = Prop->GetPropertyValue((Point3&)Vector3Value);
+
+					if (Result)
+						Value.SetVector3(Vector3Value);
+
+					break;
+				}
+			case ZE_VECTOR4_PROP:
+				{
+					ZEVector4 Vector4Value;
+					Result = Prop->GetPropertyValue((Point4&)Vector4Value);
+
+					if (Result)
+						Value.SetVector4(Vector4Value);
+
+					break;
+				}
+			case ZE_STRING_PROP:
+				{
+					const char* StringValue;
+					Result = Prop->GetPropertyValue(StringValue);
+
+					if (Result)
+						Value.SetString(StringValue);
+
+					break;
+				}
 		}
 
-		if(Result)
-		{
-			Value.SetValue(TempValue);
-			return true;
-		}
-		else
-			return false;
+		return Result;
 	}
 	else
 		return false;

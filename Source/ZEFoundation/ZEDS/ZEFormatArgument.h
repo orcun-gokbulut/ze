@@ -37,7 +37,7 @@
 #ifndef __ZE_FORMAT_ARGUMENT_H__
 #define __ZE_FORMAT_ARGUMENT_H__
 
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 #include "ZETypes.h"
 
 class ZEStringWriter;
@@ -66,7 +66,7 @@ class ZEFormatArgument
 		static bool			Format(ZEStringWriter& Output, const ZEMatrix4x4& Argument,const char* ArgumentFormat);
 		static bool			Format(ZEStringWriter& Output, const ZEString& Argument, const char* ArgumentFormat);
 		static bool			Format(ZEStringWriter& Output, ZEObject* Argument,	const char* ArgumentFormat);
-		static bool			FormatVariant(ZEStringWriter& Output, const ZEVariant& Argument, const char* ArgumentFormat);
+		static bool			FormatVariant(ZEStringWriter& Output, const ZEValue& Argument, const char* ArgumentFormat);
 };
 
 #endif

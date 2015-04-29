@@ -64,30 +64,6 @@ void ZEFontResourceDynamic::SetFontSize(ZEUInt32 FontSize)
 	this->FontSize = FontSize;
 }
 
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
-
 void ZEFontResourceDynamic::CreateNewTexture(ZEUInt32 Width, ZEUInt32 Height)
 {
 	Textures.Add();
@@ -255,12 +231,10 @@ ZETexture2D* ZEFontResourceDynamic::GetTexture(ZEUInt32 TextureId)
 
 ZEFontResourceDynamic* ZEFontResourceDynamic::LoadSharedResource(const ZEString& FileName, ZEUInt32 FontSize)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
-	ZEFontResourceDynamic* NewResource = (ZEFontResourceDynamic*)zeResources->GetResource(NewPath.GetValue());
+	ZEFontResourceDynamic* NewResource = (ZEFontResourceDynamic*)zeResources->GetResource(FileName.GetValue());
 	if (NewResource == NULL)
 	{
-		NewResource = LoadResource(NewPath, FontSize);
+		NewResource = LoadResource(FileName, FontSize);
 		if (NewResource != NULL)
 		{
 			NewResource->Shared = true;
@@ -280,12 +254,10 @@ ZEFontResourceDynamic* ZEFontResourceDynamic::LoadSharedResource(const ZEString&
 
 void ZEFontResourceDynamic::CacheResource(const ZEString& FileName, ZEUInt32 FontSize)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
-	ZEFontResourceDynamic* NewResource = (ZEFontResourceDynamic*)zeResources->GetResource(NewPath.GetValue());
+	ZEFontResourceDynamic* NewResource = (ZEFontResourceDynamic*)zeResources->GetResource(FileName.GetValue());
 	if (NewResource == NULL)
 	{
-		NewResource = LoadResource(NewPath, FontSize);
+		NewResource = LoadResource(FileName, FontSize);
 		if (NewResource != NULL)
 		{
 			NewResource->Cached = true;
@@ -297,13 +269,11 @@ void ZEFontResourceDynamic::CacheResource(const ZEString& FileName, ZEUInt32 Fon
 
 ZEFontResourceDynamic* ZEFontResourceDynamic::LoadResource(const ZEString& FileName, ZEUInt32 FontSize)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
 	bool Result;
-	ZEFile File;
 	ZEFontResourceDynamic* FontResource;
 
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
+	ZEFile File;
+	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if (Result)
 	{
 		FontResource = LoadResource(&File, FontSize);

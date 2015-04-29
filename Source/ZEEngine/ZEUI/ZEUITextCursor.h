@@ -40,8 +40,12 @@
 #include "ZEUIRectangle.h"
 #include "ZECore/ZETimer.h"
 
-class ZEUITextCursor : public ZEUIRectangle
+ZE_META_FORWARD_DECLARE(ZEMaterial, "ZEGraphics/ZEMaterial.h")
+
+class ZEUITextCursor : public ZEUIRectangle, public ZEObject
 {
+	ZE_OBJECT
+
 	private:
 		ZETimer*			Timer;
 		float				BlinkTime;

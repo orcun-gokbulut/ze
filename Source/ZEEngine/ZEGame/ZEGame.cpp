@@ -42,11 +42,6 @@
 
 #include <string.h>
 
-ZEGameDescription* ZEGame::GetGameDescription()
-{
-	return NULL;
-}
-
 ZEScene* ZEGame::GetScene()
 {
 	return Scene;

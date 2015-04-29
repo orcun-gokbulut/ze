@@ -51,14 +51,14 @@ class ZEDSpinBox1Integer : public QObject, public QTreeWidgetItem, public ZEDPro
 
 	public:
 
-		ZEObject*				Class;
-		ZEPropertyDescription	ClassAttribute;
+		ZEObject*				Object;
+		ZEProperty*				Property;
 		QTreeWidget*			ParentTree;
 		ZEDFloatIntLineEdit*	XValue;
 
 		virtual void			UpdateValues();
 
-								ZEDSpinBox1Integer(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute);
+								ZEDSpinBox1Integer(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property);
 								~ZEDSpinBox1Integer();
 
 		public slots:

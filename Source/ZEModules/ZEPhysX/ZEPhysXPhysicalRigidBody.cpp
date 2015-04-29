@@ -186,7 +186,7 @@ void ZEPhysXPhysicalRigidBody::AddPhysicalShape(ZEPhysicalShape* Shape)
 void ZEPhysXPhysicalRigidBody::RemovePhysicalShape(ZEPhysicalShape* Shape)
 {
 	ZESize OldCount = Shapes.GetCount();
-	Shapes.DeleteValue(Shape);
+	Shapes.RemoveValue(Shape);
 	if (Actor != NULL)
 		if (OldCount != Shapes.GetCount())
 			ReCreate();

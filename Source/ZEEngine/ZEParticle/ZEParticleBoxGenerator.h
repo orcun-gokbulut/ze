@@ -39,11 +39,9 @@
 
 #include "ZEParticleGenerator.h"
 
-ZE_META_OBJECT_DESCRIPTION(ZEParticleBoxGenerator)
-
 class ZEParticleBoxGenerator : public ZEParticleGenerator
 {
-	ZE_META_OBJECT(ZEParticleBoxGenerator)
+	ZE_OBJECT
 
 	private:
 
@@ -64,17 +62,3 @@ class ZEParticleBoxGenerator : public ZEParticleGenerator
 };
 
 #endif
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticleBoxGenerator" parent="ZEParticleGenerator">		
-			<noinstance>true</noinstance>
-			<description>Box shaped particle generator.</description>
-			<property name="BoxSize" type="ZEVector3" autogetset="yes" description="Size of the generator box."/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

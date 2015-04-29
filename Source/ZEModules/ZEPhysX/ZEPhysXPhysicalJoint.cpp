@@ -427,7 +427,7 @@ void ZEPhysXPhysicalJoint::AddLimitPlane(const ZEPhysicalLimitPlane& Plane)
 
 void ZEPhysXPhysicalJoint::RemoveLimitPlane(ZESize Index)
 {
-	LimitPlanes.DeleteAt(Index);
+	LimitPlanes.Remove(Index);
 
 	if (Joint != NULL)
 	{

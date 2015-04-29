@@ -42,6 +42,7 @@
 #include "ZEMath\ZEAABBox.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZETexture2D.h"
+#include "ZEMath\ZEMath.h"
 
 
 ZECloudMaterial::ZECloudMaterial()

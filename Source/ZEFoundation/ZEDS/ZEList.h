@@ -81,10 +81,10 @@ class ZEList
 			return Iterator(this);
 		}
 
-		typedef ZEListIteratorConst<ZEType> ConstIterator;
-		ConstIterator GetConstIterator() const
+		typedef ZEListIterator<ZEType> ConstIterator;
+		Iterator GetConstIterator() const
 		{
-			return ConstIterator(this);
+			return Iterator(const_cast<ZEList<ZEType>*>(this));
 		}
 
 		inline ZESize GetCount() const

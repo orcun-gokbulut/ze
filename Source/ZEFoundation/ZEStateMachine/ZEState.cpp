@@ -103,7 +103,7 @@ bool ZEState::RemoveTransition(ZEState* State)
 	if(!Transitions.Exists(State))
 		return false;
 
-	Transitions.DeleteValue(State);
+	Transitions.RemoveValue(State);
 	return true;
 }
 
@@ -121,7 +121,7 @@ ZEState::~ZEState()
 	for (ZESize I = 0; I < Owner->States.GetCount(); I++)
 		Owner->States[I]->RemoveTransition(this);
 
-	Owner->States.DeleteValue(this);
+	Owner->States.RemoveValue(this);
 }
 
 void ZEDelegatedState::OnEntering(ZEState* From, ZEState* To, bool& Cancel)

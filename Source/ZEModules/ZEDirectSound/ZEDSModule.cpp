@@ -43,6 +43,7 @@
 #include "ZEDSSoundSource.h"
 #include "ZEDSSoundSource3D.h"
 #include <dsound.h>
+#include "ZEMath/ZEMath.h"
 
 ZE_MODULE_DESCRIPTION(ZEDSModule, ZESoundModule, NULL)
 

@@ -108,7 +108,7 @@ void ZEDebugDrawer::DrawRectangle(const ZERectangle3D& Rectangle, const ZEVector
 
 void ZEDebugDrawer::DebugDrawEntity()
 {
-	if (ZEObjectDescription::CheckParent(ZELight::Description(), Target->GetDescription()))
+	if (ZEClass::IsDerivedFrom(ZELight::Class(), Target->GetClass()))
 	{
 		if (((ZELight*)Target)->GetLightType() != ZE_LT_DIRECTIONAL && DebugDrawElements.GetFlags(ZE_DDE_LIGHT_RANGE))
 		{
@@ -142,7 +142,7 @@ void ZEDebugDrawer::SetTarget(ZEEntity* Target)
 	this->Target = Target;
 	Target->AddChildEntity(this);
 
-	if (ZEObjectDescription::CheckParent(ZELight::Description(), Target->GetDescription()))
+	if (ZEClass::IsDerivedFrom(ZELight::Class(), Target->GetClass()))
 	{
 		if (DrawColor == ZEVector4::Zero)
 			SetDebugDrawColor(ZEVector4(1.0f, 0.96f, 0.8f, 1.0f));
@@ -197,7 +197,7 @@ void ZEDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
 	{
 		DebugDrawEntity();
 		EntityTag->SetNameField(Target->GetName());
-		EntityTag->SetTypeField(Target->GetDescription()->GetName());
+		EntityTag->SetTypeField(Target->GetClass()->GetName());
 
 		ZEInt32 WindowWidth, WindowHeight;
 		zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);

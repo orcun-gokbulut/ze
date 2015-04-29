@@ -36,12 +36,12 @@
 cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEListener.cpp				Sources)
-ze_add_source(ZEListener.h					Sources Headers ZEPP)
+ze_add_source(ZEListener.h					Sources Headers ZEMC)
 ze_add_source(ZESoundFX.h					Sources Headers)
 ze_add_source(ZESoundModule.cpp				Sources)
 ze_add_source(ZESoundModule.h				Sources Headers)
 ze_add_source(ZESoundResource.cpp			Sources)
-ze_add_source(ZESoundResource.h				Sources Headers)
+ze_add_source(ZESoundResource.h				Sources Headers ZEMC)
 ze_add_source(ZESoundResourceMP3.cpp		Sources)
 ze_add_source(ZESoundResourceMP3.h			Sources)
 ze_add_source(ZESoundResourceOGG.cpp		Sources)
@@ -49,11 +49,12 @@ ze_add_source(ZESoundResourceOGG.h			Sources)
 ze_add_source(ZESoundResourceWAV.cpp		Sources)
 ze_add_source(ZESoundResourceWAV.h			Sources)
 ze_add_source(ZESoundSource.cpp				Sources)
-ze_add_source(ZESoundSource.h				Sources Headers ZEPP)
+ze_add_source(ZESoundSource.h				Sources Headers ZEMC)
 ze_add_source(ZESoundSource3D.cpp			Sources)
-ze_add_source(ZESoundSource3D.h				Sources Headers ZEPP)
+ze_add_source(ZESoundSource3D.h				Sources Headers ZEMC)
 
 ze_add_library(TARGET ZESound 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
+	ZEMC ${ZEMC}
 	LIBS ZEFoundation libmpg123 libOGG libVorbis)

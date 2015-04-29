@@ -44,6 +44,8 @@ class ZEViewPort;
 
 class ZETexture2D : public ZETexture
 {
+	ZE_OBJECT
+
 	protected:
 		ZEUInt						Width;
 		ZEUInt						Height;	

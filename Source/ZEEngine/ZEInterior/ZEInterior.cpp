@@ -48,8 +48,6 @@
 #include "ZEPhysics/ZEPhysicalMesh.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEInterior);
-
 ZEDrawFlags ZEInterior::GetDrawFlags() const
 {
 	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
@@ -125,7 +123,7 @@ const ZEArray<ZEInteriorHelper*>& ZEInterior::GetHelpers()
 	return Helpers;
 }
 
-ZEInteriorRoom* ZEInterior::GetRoom(const char* Name)
+ZEInteriorRoom* ZEInterior::GetRoom(const ZEString& Name)
 {
 	for (ZESize I = 0; I < Rooms.GetCount(); I++)
 		if (strcmp(Rooms[I]->GetName(), Name) == 0)
@@ -134,7 +132,7 @@ ZEInteriorRoom* ZEInterior::GetRoom(const char* Name)
 	return NULL;
 }
 
-ZEInteriorDoor* ZEInterior::GetDoor(const char* Name)
+ZEInteriorDoor* ZEInterior::GetDoor(const ZEString& Name)
 {
 	for (ZESize I = 0; I < Doors.GetCount(); I++)
 		if (strcmp(Doors[I]->GetName(), Name) == 0)
@@ -143,7 +141,7 @@ ZEInteriorDoor* ZEInterior::GetDoor(const char* Name)
 	return NULL;
 }
 
-ZEInteriorHelper* ZEInterior::GetHelper(const char* Name)
+ZEInteriorHelper* ZEInterior::GetHelper(const ZEString& Name)
 {
 	for (ZESize I = 0; I < Helpers.GetCount(); I++)
 		if (strcmp(Helpers[I]->GetName(), Name) == 0)
@@ -171,7 +169,7 @@ bool ZEInterior::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZEInterior::SetInteriorFile(const char* InteriorFile)
+void ZEInterior::SetInteriorFile(const ZEString& InteriorFile)
 {
 	ZEInteriorResource* InteriorResource = ZEInteriorResource::LoadSharedResource(InteriorFile);
 
@@ -184,12 +182,12 @@ void ZEInterior::SetInteriorFile(const char* InteriorFile)
 	SetInteriorResource(InteriorResource);
 }
 
-const char* ZEInterior::GetInteriorFile() const
+const ZEString& ZEInterior::GetInteriorFile() const
 {
 	if (InteriorResource != NULL)
 		return InteriorResource->GetFileName();
 	else
-		return "";
+		return ZEString::Empty;
 }
 
 void ZEInterior::SetInteriorResource(const ZEInteriorResource* InteriorResource)
@@ -559,9 +557,4 @@ bool ZEInterior::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Par
 ZEInteriorCullMode ZEInterior::GetCullMode() const
 {
 	return CullMode;
-}
-
-ZEEntityRunAt ZEInteriorDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

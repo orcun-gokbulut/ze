@@ -69,7 +69,7 @@ void ZESystemMessageManager::RegisterMessageHandler(ZESystemMessageHandler* Hand
 
 void ZESystemMessageManager::UnregisterMessageHandler(ZESystemMessageHandler* Handler)
 {
-	Handlers.DeleteValue(Handler);
+	Handlers.RemoveValue(Handler);
 }
 
 void ZESystemMessageManager::ProcessMessages()

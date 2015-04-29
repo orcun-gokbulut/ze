@@ -37,19 +37,17 @@
 #ifndef __ZE_MOON_H__
 #define __ZE_MOON_H__
 
-
 #include "ZETypes.h"
 #include "ZEEntity.h"
 #include "ZEGraphics\ZERenderCommand.h"
 
-
-class ZEMaterial;
-class ZEMoonMaterial;
-class ZETexture3DResource;
-
+ZE_META_FORWARD_DECLARE(ZEMoonMaterial, "ZEGraphics/ZEMoonMaterial.h")
+ZE_META_FORWARD_DECLARE(ZETexture3DResource, "ZETexture/ZETexture3DResource.h")
 
 class ZEMoon : public ZEEntity
 {
+	ZE_OBJECT
+
 	protected:
 		ZEMoonMaterial*				Material;
 		ZETexture3DResource*		Texture;
@@ -74,16 +72,16 @@ class ZEMoon : public ZEEntity
 		virtual void				SetPhase(float Phase);
 		float						GetPhase() const;
 
-		virtual void				SetScale(float Scale);
-		float						GetScale() const;
+		virtual void				SetMoonScale(float Scale);
+		float						GetMoonScale() const;
 		
-		virtual void				SetRotation(float Rotation);
-		float						GetRotation() const;
+		virtual void				SetMoonRotation(float Rotation);
+		float						GetMoonRotation() const;
 
 		virtual void				SetAmbientFactor(float Value);
 		float						GetAmbientFactor() const;
 		
-		virtual void				SetAmbientColor(ZEVector3& Color);
+		virtual void				SetAmbientColor(const ZEVector3& Color);
 		const ZEVector3&			GetAmbientColor() const;
 
 		virtual void				SetDirection(const ZEVector3& NewDirection);

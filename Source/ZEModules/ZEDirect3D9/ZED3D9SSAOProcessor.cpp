@@ -46,6 +46,7 @@
 #include "ZEGraphics/ZECamera.h"
 
 #include "ZEFile/ZEFile.h"
+#include "ZEMath/ZEMath.h"
 
 static ZEVector4 RandomRotations[16] = 
 {

@@ -42,8 +42,6 @@
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 
-ZE_META_ENTITY_DESCRIPTION(ZELensFlare);
-
 class ZEFixedMaterial;
 class ZETexture2DResource;
 
@@ -74,7 +72,6 @@ class ZELensFlareArtifact
 
 class ZELensFlare : public ZEEntity
 {
-	ZE_META_ENTITY(ZELensFlare)
 	private:
 		ZECanvas							VertexBuffer;
 		ZEArray<ZELensFlareArtifact>		Artifacts;

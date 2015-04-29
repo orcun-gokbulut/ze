@@ -42,7 +42,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEInput/ZEInputMap.h"
-
+#include "ZEMeta/ZEObject.h"
 
 
 typedef ZEFlags ZESteeringElements;
@@ -59,9 +59,11 @@ struct ZESteeringOutput
 };
 
 class ZEActor;
+
 class ZESteering
 {
 	friend class ZEActor;
+
 	private:
 		ZEActor*					Owner;
 		ZEActor*					Target;

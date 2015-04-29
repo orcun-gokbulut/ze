@@ -45,11 +45,9 @@ class ZEVertexDeclaration;
 class ZEStaticVertexBuffer;
 class ZETexture2D;
 
-ZE_META_ENTITY_DESCRIPTION(ZESea)
-
 class ZESea : public ZEEntity
 {
-	ZE_META_ENTITY(ZESea)
+	ZE_OBJECT
 
 	private:
 
@@ -113,27 +111,5 @@ class ZESea : public ZEEntity
 
 		static ZESea*			CreateInstance();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZESea" parent="ZEEntity" description="Sea">
-		<property name="DiffuseColor" groupname="Diffuse" type="ZEVector3" autogetset="true" description="Diffuse Color" semantic="ZE_PS_COLOR"/>
-		<property name="DiffuseVelocity" groupname="Diffuse" type="ZEVector2" autogetset="true" description="Diffuse Velocity"/>
-		<property name="DiffuseTile" groupname="Diffuse" type="ZEVector2" autogetset="true" description="Diffuse Texture Tile"/>
-		<property name="DiffuseFactor" groupname="Diffuse" type="float" autogetset="true" description="Diffuse Factor"/>
-
-		<property name="SpecularColor" groupname="Specular" type="ZEVector3" autogetset="true" description="Specular Color" semantic="ZE_PS_COLOR"/>
-		<property name="SpecularFactor" groupname="Specular" type="float" autogetset="true" description="Specular Factor"/>
-		<property name="SpecularShineness" groupname="Specular" type="float" autogetset="true" description="Specular Shineness"/>
-
-		<property name="NormalVelocity" groupname="Normal" type="ZEVector2" autogetset="true" description="Normal Map Velocity"/>
-		<property name="NormalTile" groupname="Normal" type="ZEVector2" autogetset="true" description="Normal Texture Tile"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 
 #endif

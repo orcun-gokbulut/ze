@@ -37,6 +37,7 @@
 #include "ZEModel.h"
 #include "ZEGame/ZEScene.h"
 #include <stdio.h>
+#include "ZEMath/ZEMath.h"
 
 void ZEModelBone::OnTransformChanged()
 {
@@ -317,7 +318,7 @@ void ZEModelBone::AddChild(ZEModelBone* Bone)
 void ZEModelBone::RemoveChild(ZEModelBone* Bone)
 {
 	Bone->ParentBone = NULL;
-	ChildBones.DeleteValue(Bone);
+	ChildBones.RemoveValue(Bone);
 }
 
 void ZEModelBone::SetPhysicsEnabled(bool Enabled)

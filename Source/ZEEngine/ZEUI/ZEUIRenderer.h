@@ -40,9 +40,11 @@
 #include "ZEUIRectangle.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZEMeta/ZEObject.h"
 #include "ZEGraphics/ZERenderer.h"
 
 class ZEVertexDeclaration;
+
 class ZEUIRenderer
 {
 	private:

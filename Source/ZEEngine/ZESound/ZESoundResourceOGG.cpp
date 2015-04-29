@@ -35,34 +35,10 @@
 
 #include "ZESoundResourceOGG.h"
 #include "ZEError.h"
+
 #include <ogg/ogg.h>
 #include <vorbis/vorbisfile.h>
 #include <Memory.h>
-#include "ZEFile/ZEPathUtils.h"
-
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
 
 // MEMORY SEEK
 static ZESize OggMemory_Read(void *ptr, ZESize size, ZESize nmemb, void *datasource)
@@ -156,16 +132,12 @@ void ZESoundResourceOGG::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
 
 ZESoundResource* ZESoundResourceOGG::LoadResource(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
 	bool Result;
 	ZEFile File; 
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
+	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if(!Result)
 	{
-		zeError("Can not open ogg file. (FileName : \"%s\")", NewPath.ToCString());
+		zeError("Can not open ogg file. (FileName : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
 
@@ -178,7 +150,7 @@ ZESoundResource* ZESoundResourceOGG::LoadResource(const ZEString& FileName)
 	File.Read(NewResource->Data, 1, NewResource->DataSize);
 	File.Close();
 
-	NewResource->SetFileName(NewPath);	
+	NewResource->SetFileName(FileName);	
 	
 	NewResource->MemoryCursor = 0;
 	
@@ -190,7 +162,7 @@ ZESoundResource* ZESoundResourceOGG::LoadResource(const ZEString& FileName)
 
 	if(!ov_open_callbacks(NewResource, &NewResource->OggFile, NULL, 0, Callbacks)==0)
 	{
-		zeError("Can not read ogg. (FileName : \"%s\")", NewPath.ToCString());
+		zeError("Can not read ogg. (FileName : \"%s\")", FileName.ToCString());
 		delete NewResource;
 		return NULL;
 	}

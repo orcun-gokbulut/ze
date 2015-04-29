@@ -44,8 +44,6 @@
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZETexture/ZETexture2DResource.h"
 
-
-
 #define ACTIONID_FORWARD		0
 #define ACTIONID_BACKWARD		1
 #define ACTIONID_RUN			2
@@ -816,9 +814,4 @@ ZEGameCharacter::~ZEGameCharacter()
 ZEGameCharacter* ZEGameCharacter::CreateInstance()
 {
 	return new ZEGameCharacter();
-}
-
-ZEEntityRunAt ZEGameCharacterDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

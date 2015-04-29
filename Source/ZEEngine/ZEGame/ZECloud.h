@@ -43,14 +43,14 @@
 #include "ZETypes.h"
 #include "ZEMath\ZEAABBox.h"
 
-class ZETexture2DResource;
-class ZECloudMaterial;
-class ZEMaterial;
-class ZEScene;
-class ZECamera;
+ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
+ZE_META_FORWARD_DECLARE(ZECloudMaterial, "ZEGraphics/ZECloudMaterial.h")
+ZE_META_FORWARD_DECLARE(ZECamera, "ZEGraphics/ZECamera.h")
 
 class ZECloud : public ZEEntity
 {
+	ZE_OBJECT
+
 	protected:
 		float					CloudCover;
 		float					CloudPlaneHeight;

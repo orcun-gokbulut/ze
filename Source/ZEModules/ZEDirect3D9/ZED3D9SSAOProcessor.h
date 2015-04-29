@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZED3D9ComponentBase.h"
+#include "ZEMath/ZEVector.h"
 
 class ZETexture2D;
 class ZED3D9ViewPort;
@@ -56,10 +57,9 @@ struct ZESSAOScreenAlignedQuad
 	float	TexCoord[2];
 };
 
-ZE_META_OBJECT_DESCRIPTION(ZED3D9SSAOProcessor);
 class ZED3D9SSAOProcessor : public ZED3D9ComponentBase, public ZEObject
 {
-	ZE_META_OBJECT(ZED3D9SSAOProcessor);
+	ZE_OBJECT
 
 	private:
 		ZED3D9FrameRenderer*			Renderer;

@@ -38,7 +38,7 @@
 #define __ZE_OPTION_H__
 
 #include "ZEDS/ZEString.h"
-#include "ZEDS/ZETypedVariant.h"
+#include "ZEDS/ZEValue.h"
 #include "ZEDS/ZEFastDelegate.h"
 
 enum ZEOptionAttribute
@@ -67,8 +67,8 @@ class ZEOption
 	protected:
 		ZEString						Name;
 		ZEOptionSection*				Section;
-		ZETypedVariant					DefaultValue;
-		ZETypedVariant					Value;
+		ZEValue							DefaultValue;
+		ZEValue							Value;
 		ZEOptionAttribute				Attribute;
 		bool							Changed;
 		
@@ -79,16 +79,16 @@ class ZEOption
 		const ZEString&					GetName();
 		void							SetName(const ZEString& Name);
 
-		void							SetValueType(ZEVariantType NewType);
-		ZEVariantType					GetValueType();
+		void							SetValueType(ZEValueType NewType);
+		ZEValueType						GetValueType();
 
-		void							SetDefaultValue(ZETypedVariant NewDefaultValue);
-		ZETypedVariant					GetDefaultValue();
+		void							SetDefaultValue(ZEValue NewDefaultValue);
+		ZEValue							GetDefaultValue();
 		
 		void							SetToDefault();
 
-		void							SetValue(ZETypedVariant NewValue);
-		ZETypedVariant					GetValue();
+		void							SetValue(ZEValue NewValue);
+		ZEValue							GetValue();
 
 		ZEOptionAttribute 				GetAttribute();
 		void							SetAttribute(ZEOptionAttribute NewAttribute);
@@ -105,7 +105,7 @@ class ZEOption
 		void							ChangeCommitted();
 
 										ZEOption();
-										ZEOption(const char *InitialName, ZETypedVariant InitialDefaultValue, 
+										ZEOption(const char *InitialName, ZEValue InitialDefaultValue, 
 										ZEOptionAttribute InitialAttribute);
 };
 

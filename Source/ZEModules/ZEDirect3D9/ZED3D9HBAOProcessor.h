@@ -53,10 +53,9 @@ struct ZEHBAOScreenAlignedQuad
 	float	TexCoord[2];
 };
 
-ZE_META_OBJECT_DESCRIPTION(ZED3D9HBAOProcessor);
 class ZED3D9HBAOProcessor : public ZED3D9ComponentBase, public ZEObject
 {
-	ZE_META_OBJECT(ZED3D9HBAOProcessor);
+	ZE_OBJECT
 
 	private:
 		ZED3D9FrameRenderer*			Renderer;
@@ -168,31 +167,5 @@ class ZED3D9HBAOProcessor : public ZED3D9ComponentBase, public ZEObject
 										~ZED3D9HBAOProcessor();
 };
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-	<zinek>
-		<meta> 
-			<class name="ZED3D9HBAOProcessor">
-				<noinstance>true</noinstance>
-				<description>ZED3D9HBAOProcessor</description>
-
-				<property name="Enabled" type="boolean" autogetset="yes" description="..."/>
-
-				<property name="OcclusionRadius" type="float" autogetset="yes" description="..."/>
-				<property name="RadiusMultiplier" type="float" autogetset="yes" description="..."/>
-				<property name="StepCount" type="integer32" autogetset="yes" description="..."/>
-				<property name="DirectionCount" type="integer32" autogetset="yes" description="..."/>
-				<property name="AngleBias" type="float" autogetset="yes" description="..."/>
-				<property name="Attenuation" type="float" autogetset="yes" description="..."/>
-				<property name="Contrast" type="float" autogetset="yes" description="..."/>
-				
-				<property name="BlurSharpness" type="float" autogetset="yes" description="..."/>
-				<property name="BlurEdgeThreshold" type="float" autogetset="yes" description="..."/>
-
-			</class>
-		</meta>
-	</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 
 #endif

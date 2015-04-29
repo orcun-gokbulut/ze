@@ -170,6 +170,6 @@ void ZED3D9Texture2D::Release()
 
 void ZED3D9Texture2D::Destroy()
 {
-	GetModule()->Texture2Ds.DeleteValue((ZED3D9Texture2D*)this);
+	GetModule()->Texture2Ds.RemoveValue((ZED3D9Texture2D*)this);
 	delete this;
 }

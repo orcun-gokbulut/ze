@@ -83,7 +83,7 @@ ZEDSListener::ZEDSListener()
 
 ZEDSListener::~ZEDSListener()
 {
-	GetModule()->Listeners.DeleteValue(this);
+	GetModule()->Listeners.RemoveValue(this);
 }
 
 void ZEDSListener::SetActiveListener()

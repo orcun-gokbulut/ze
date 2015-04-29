@@ -39,8 +39,13 @@
 
 #include "ZEFontResource.h"
 
+ZE_META_FORWARD_DECLARE(ZETexture2D, "ZEGraphics/ZETexture2D.h")
+ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
+
 class ZEFontResourceBitmap : public ZEFontResource
 {
+	ZE_OBJECT
+
 	private:
 		ZEArray<ZETexture2DResource*>		TextureResources;
 		ZEArray<const ZETexture2D*>			Textures;

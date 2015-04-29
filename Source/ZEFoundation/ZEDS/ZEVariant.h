@@ -41,202 +41,507 @@
 #pragma warning(disable:4482)
 
 #include "ZETypes.h"
-#include "ZESerialization/ZESerializable.h"
-#include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEDS/ZEString.h"
+#include "ZEString.h"
+#include "ZEArray.h"
+#include "ZEList.h"
+#include "ZEValue.h"
+#include "ZEMeta/ZEType.h"
+#include "ZEMeta/ZETypeGenerator.h"
 
-class ZESerializer;
-class ZEUnserializer;
-
-enum ZEVariantType
-{
-	ZE_VRT_UNDEFINED = 0,
-	ZE_VRT_NULL,
-	ZE_VRT_FLOAT,
-	ZE_VRT_DOUBLE,
-	ZE_VRT_INTEGER_8,
-	ZE_VRT_INTEGER_16,
-	ZE_VRT_INTEGER_32,
-	ZE_VRT_INTEGER_64,
-	ZE_VRT_UNSIGNED_INTEGER_8,
-	ZE_VRT_UNSIGNED_INTEGER_16,
-	ZE_VRT_UNSIGNED_INTEGER_32,
-	ZE_VRT_UNSIGNED_INTEGER_64,
-	ZE_VRT_BOOLEAN,
-	ZE_VRT_STRING,
-	ZE_VRT_QUATERNION,
-	ZE_VRT_VECTOR2,
-	ZE_VRT_VECTOR3,
-	ZE_VRT_VECTOR4,
-	ZE_VRT_MATRIX3X3,
-	ZE_VRT_MATRIX4X4,
-	ZE_VRT_CLASS
-};
-
-class ZEMatrix4x4;
-class ZEMatrix4x4;
 class ZEVector2;
 class ZEVector3;
 class ZEVector4;
+class ZEQuaternion;
+class ZEMatrix3x3;
+class ZEMatrix4x4;
+class ZEClass;
 class ZEObject;
+class ZEReference;
 
-class ZEVariant : public ZESerializable
+class ZEVariant
 {
 	public:
 		struct ZEVariantValue
 		{
 			union
 			{
-				float			Float;
-				double			Double;
+				// Value Types
+				float					Float;
+				double					Double;
+				ZEInt32					Int32;
+				ZEInt64					Int64;
+				bool					Boolean;
+				float					Vectors[4];
 
-				ZEInt32			Int32;
-				ZEInt64			Int64;
-			
-				bool			Boolean;
-				ZEObject*		Pointer;
-			
-				struct
-				{
-					float		A, B, C, D;
-				} Vectors;
-
-				ZEMatrix3x3*	Matrix3x3;
-				ZEMatrix4x4*	Matrix4x4;
+				void*					Pointer;
 			};
-			ZEString			String;
-		};
+			ZEString					String;
+		}Value;
 
-	protected:
-		ZEVariantType			Type;
-		ZEVariantValue			Value;
+		void*							(*Cloner)(const void*);
+		void							(*Deleter)(void*);
+
+		ZEType							ValueType;
+		void							SetType(const ZEType& NewType);
+
+		template<typename ZETypeInstance>
+		static void*					ClonerTemplate(const void* Instance);
+		template<typename ZETypeInstance>
+		static void						DeleterTemplate(void* Instance);
+
+		template<typename ZEReturnType>
+		ZEReturnType					ConvertIntegerValue() const;
+		template <typename ZEReturnType, ZETypeType Type>
+		ZEReturnType&					ConvertRef() const;
+		template <typename ZEReturnType, ZETypeType Type>
+		const ZEReturnType&				ConvertConstRef() const;
 
 	public:
-		void					SetType	(ZEVariantType NewType);
-		ZEVariantType			GetType	() const;
+		const ZEType&					GetType() const;
 
-		ZEVariantValue			GetValue() const;
-		ZEVariantValue&			ImplicitAcesss();
+		// Setters
+		////////////////////////////////////////////////
 
-		void					SetString(const char* Value);
-		void					SetString(const ZEString& Value);
-		void					SetInt8(ZEInt8 Value);
-		void					SetInt16(ZEInt16 Value);
-		void					SetInt32(ZEInt32 Value);
-		void					SetInt64(ZEInt64 Value);
-		void					SetUInt8(ZEUInt8 Value);
-		void					SetUInt16(ZEUInt16 Value);
-		void					SetUInt32(ZEUInt32 Value);
-		void					SetUInt64(ZEUInt64 Value);
-		void					SetFloat(float Value);
-		void					SetDouble(double Value);
-		void					SetBoolean(bool Value);
-		void					SetVector2(const ZEVector2& Value);
-		void					SetVector3(const ZEVector3& Value);
-		void					SetVector4(const ZEVector4& Value);
-		void					SetQuaternion(const ZEQuaternion& Value);
-		void					SetMatrix3x3(const ZEMatrix3x3& Value);
-		void					SetMatrix4x4(const ZEMatrix4x4& Value);
-		void					SetClass(ZEObject* Value);
-		void					SetNull();
-		void					SetVariant(const ZEVariant& Value);
+		void							SetUndefined();
+		void							SetVariant(const ZEVariant& Value);
+		void							SetReference(const ZEReference& Value);
 
-		const ZEString&			GetString() const;
-		ZEInt8					GetInt8() const;
-		ZEInt16					GetInt16() const;
-		ZEInt32					GetInt32() const;
-		ZEInt64					GetInt64() const;
-		ZEUInt8					GetUInt8() const;
-		ZEUInt16				GetUInt16() const;
-		ZEUInt32				GetUInt32() const;
-		ZEUInt64				GetUInt64() const;
-		float					GetFloat() const;
-		double					GetDouble() const;
-		bool					GetBoolean() const;
-		ZEVector2&				GetVector2() const;
-		ZEVector3&				GetVector3() const;
-		ZEVector4&				GetVector4() const;
-		ZEQuaternion&			GetQuaternion() const;
-		ZEMatrix3x3&			GetMatrix3x3() const;
-		ZEMatrix4x4&			GetMatrix4x4() const;
-		ZEObject*				GetClass() const;
+		void							SetInt8(ZEInt8 Value);
+		void							SetInt8Ref(ZEInt8& Reference);
+		void							SetInt8ConstRef(const ZEInt8& Reference);
+
+		void							SetInt16(ZEInt16 Value);
+		void							SetInt16Ref(ZEInt16& Reference);
+		void							SetInt16ConstRef(const ZEInt16& Reference);
+
+		void							SetInt32(ZEInt32 Value);
+		void							SetInt32Ref(ZEInt32& Reference);
+		void							SetInt32ConstRef(const ZEInt32& Reference);
+
+		void							SetInt64(ZEInt64 Value);
+		void							SetInt64Ref(ZEInt64& Reference);
+		void							SetInt64ConstRef(const ZEInt64& Reference);
+
+		void							SetUInt8(ZEUInt8 Value);
+		void							SetUInt8Ref(ZEUInt8& Reference);
+		void							SetUInt8ConstRef(const ZEUInt8& Reference);
+
+		void							SetUInt16(ZEUInt16 Value);
+		void							SetUInt16Ref(ZEUInt16& Reference);
+		void							SetUInt16ConstRef(const ZEUInt16& Reference);
+
+		void							SetUInt32(ZEUInt32 Value);
+		void							SetUInt32Ref(ZEUInt32& Reference);
+		void							SetUInt32ConstRef(const ZEUInt32& Reference);
+
+		void							SetUInt64(ZEUInt64 Value);
+		void							SetUInt64Ref(ZEUInt64& Reference);
+		void							SetUInt64ConstRef(const ZEUInt64& Reference);
+
+		void							SetFloat(float Value);
+		void							SetFloatRef(float& Value);
+		void							SetFloatConstRef(const float& Value);
+
+		void							SetDouble(double Value);
+		void							SetDoubleRef(double& Value);
+		void							SetDoubleConstRef(const double & Value);
+
+		void							SetBool(bool Value);
+		void							SetBoolRef(bool& Value);
+		void							SetBoolConstRef(const bool & Value);
+
+		void							SetEnum(ZEInt32 Value);
+
+		void							SetVector2(const ZEVector2& Value);
+		void							SetVector2Ref(ZEVector2& Value);
+		void							SetVector2ConstRef(const ZEVector2& Value);
+
+		void							SetVector3(const ZEVector3& Value);
+		void							SetVector3Ref(ZEVector3& Value);
+		void							SetVector3ConstRef(const ZEVector3& Value);
+
+		void							SetVector4(const ZEVector4& Value);
+		void							SetVector4Ref(ZEVector4& Value);
+		void							SetVector4ConstRef(const ZEVector4& Value);
 		
-		bool					IsNull() const;
-		ZESize					SizeOf() const;
+		void							SetQuaternion(const ZEQuaternion& Value);
+		void							SetQuaternionRef(ZEQuaternion& Value);
+		void							SetQuaternionConstRef(const ZEQuaternion& Value);
 
-		bool					Serialize(ZESerializer* Serializer);
-		bool					Unserialize(ZEUnserializer* Unserializer);
+		void							SetMatrix3x3(const ZEMatrix3x3& Value);
+		void							SetMatrix3x3Ref(ZEMatrix3x3& Value);
+		void							SetMatrix3x3ConstRef(const ZEMatrix3x3& Value);
 
-		ZEVariant&				operator=(const ZEVariant& Value);
-		ZEVariant&				operator=(const char* Value);
-		ZEVariant&				operator=(const ZEString& Value);
-		ZEVariant&				operator=(ZEInt8 Value);
-		ZEVariant&				operator=(ZEInt16 Value);
-		ZEVariant&				operator=(ZEInt32 Value);
-		ZEVariant&				operator=(ZEInt64 Value);
-		ZEVariant&				operator=(ZEUInt8 Value);
-		ZEVariant&				operator=(ZEUInt16 Value);
-		ZEVariant&				operator=(ZEUInt32 Value);
-		ZEVariant&				operator=(ZEUInt64 Value);
-		ZEVariant&				operator=(float Value);
-		ZEVariant&				operator=(double Value);
-		ZEVariant&				operator=(bool Value);
-		ZEVariant&				operator=(const ZEVector2& Value);
-		ZEVariant&				operator=(const ZEVector3& Value);
-		ZEVariant&				operator=(const ZEVector4& Value);
-		ZEVariant&				operator=(const ZEQuaternion& Value);
-		ZEVariant&				operator=(const ZEMatrix3x3& Value);
-		ZEVariant&				operator=(const ZEMatrix4x4& Value);
-		ZEVariant&				operator=(ZEObject* Value);
+		void							SetMatrix4x4(const ZEMatrix4x4& Value);
+		void							SetMatrix4x4Ref(ZEMatrix4x4& Value);
+		void							SetMatrix4x4ConstRef(const ZEMatrix4x4& Value);
 
-								operator const char*();
-								
-								operator ZEInt8();
-								operator ZEInt16();
-								operator ZEInt32();
-								operator ZEInt64();
-								operator ZEUInt8();
-								operator ZEUInt16();
-								operator ZEUInt32();
-								operator ZEUInt64();
-								operator float();
-								operator double();
-								operator bool();
-								operator ZEVector2();
-								operator ZEVector3();
-								operator ZEVector4();
-								operator ZEQuaternion();
-								operator ZEMatrix3x3();
-								operator ZEMatrix4x4();
-								operator ZEObject*();
+		void							SetString(const char* Value);
+		void							SetString(const ZEString& Value);
+		void							SetStringRef(ZEString& Value);
+		void							SetStringConstRef(const ZEString& Value);
 
-								ZEVariant();
-								ZEVariant(const ZEVariant& Value);
-								ZEVariant(const char* Value);
-								ZEVariant(const ZEString& Value);
-								ZEVariant(ZEInt8 Value);
-								ZEVariant(ZEInt16 Value);
-								ZEVariant(ZEInt32 Value);
-								ZEVariant(ZEInt64 Value);
-								ZEVariant(ZEUInt8 Value);
-								ZEVariant(ZEUInt16 Value);
-								ZEVariant(ZEUInt32 Value);
-								ZEVariant(ZEUInt64 Value);
-								ZEVariant(float Value);
-								ZEVariant(double Value);
-								ZEVariant(bool Value);
-								ZEVariant(const ZEVector2& Value);
-								ZEVariant(const ZEVector3& Value);
-								ZEVariant(const ZEVector4& Value);
-								ZEVariant(const ZEQuaternion& Quaternion);
-								ZEVariant(const ZEMatrix3x3& Value);
-								ZEVariant(const ZEMatrix4x4& Value);
-								ZEVariant(ZEObject* Value);
-								~ZEVariant();
+		template<typename ZEObjectType>
+		void							SetObject(const ZEObjectType& Object);
+		template<typename ZEObjectType>
+		void							SetObjectRef(ZEObjectType& Object);
+		template<typename ZEObjectType>
+		void							SetObjectConstRef(const ZEObjectType& Object);
+
+		void							SetObjectPtr(ZEObject* Object);
+		void							SetObjectPtrRef(ZEObject*& Object);
+		void							SetObjectPtrConstRef(const ZEObject*& Object);
+
+		template<typename ZEItemType>
+		void							SetArray(const ZEArray<ZEItemType>& Array);
+		template<typename ZEItemType>
+		void							SetArrayRef(ZEArray<ZEItemType>& Array);
+		template<typename ZEItemType>
+		void							SetArrayRefConst(const ZEArray<ZEItemType>& Array);
+
+		void							SetClass(ZEClass* Object);
+		void							SetClassRef(ZEClass*& Object);
+		void							SetClassConstRef(const ZEClass*& Object);
+
+		void							SetValue(const ZEValue& Value);
+
+		// Getters
+		////////////////////////////////////////////////
+		ZEInt8							GetInt8() const;
+		ZEInt8&							GetInt8Ref() const;
+		const ZEInt8&					GetInt8ConstRef() const;
+
+		ZEInt16							GetInt16() const;
+		ZEInt16&						GetInt16Ref() const;
+		const ZEInt16&					GetInt16ConstRef() const;
+
+		ZEInt32							GetInt32() const;
+		ZEInt32&						GetInt32Ref() const;
+		const ZEInt32&					GetInt32ConstRef() const;
+
+		ZEInt64							GetInt64() const;
+		ZEInt64&						GetInt64Ref() const;
+		const ZEInt64&					GetInt64ConstRef() const;
+
+		ZEUInt8							GetUInt8() const;
+		ZEUInt8&						GetUInt8Ref() const;
+		const ZEUInt8&					GetUInt8ConstRef() const;
+
+		ZEUInt16						GetUInt16() const;
+		ZEUInt16&						GetUInt16Ref() const;
+		const ZEUInt16&					GetUInt16ConstRef() const;
+
+		ZEUInt32						GetUInt32() const;
+		ZEUInt32&						GetUInt32Ref() const;
+		const ZEUInt32&					GetUInt32ConstRef() const;
+	
+		ZEUInt64						GetUInt64() const;
+		ZEUInt64&						GetUInt64Ref() const;
+		const ZEUInt64&					GetUInt64ConstRef() const;
+
+		bool							GetBool() const;
+		bool&							GetBoolRef() const;
+		const bool&						GetBoolConstRef() const;
+
+		ZEInt32							GetEnum() const ;
+
+		float							GetFloat() const;
+		float&							GetFloatRef() const;
+		const float&					GetFloatConstRef() const;
+
+		double							GetDouble() const;
+		double&							GetDoubleRef() const;
+		const double&					GetDoubleConstRef() const;
+
+		const ZEVector2&				GetVector2() const;
+		ZEVector2&						GetVector2Ref() const;
+		const ZEVector2&				GetVector2ConstRef() const;
+
+		const ZEVector3&				GetVector3() const;
+		ZEVector3&						GetVector3Ref() const;
+		const ZEVector3&				GetVector3ConstRef() const;
+
+		const ZEVector4&				GetVector4() const;
+		ZEVector4&						GetVector4Ref() const;
+		const ZEVector4&				GetVector4ConstRef() const;
+		
+		const ZEQuaternion&				GetQuaternion() const;
+		ZEQuaternion&					GetQuaternionRef() const;
+		const ZEQuaternion&				GetQuaternionConstRef() const;
+
+		const ZEMatrix3x3&				GetMatrix3x3() const;
+		ZEMatrix3x3&					GetMatrix3x3Ref() const;
+		const ZEMatrix3x3&				GetMatrix3x3ConstRef() const;
+
+		const ZEMatrix4x4&				GetMatrix4x4() const;
+		ZEMatrix4x4&					GetMatrix4x4Ref() const;
+		const ZEMatrix4x4&				GetMatrix4x4ConstRef() const;
+
+		const ZEString&					GetString() const;
+		ZEString&						GetStringRef() const;
+		const ZEString&					GetStringConstRef() const;
+
+		ZEObject*						GetObjectPtr() const;
+		ZEObject*&						GetObjectPtrRef() const;
+		ZEObject*const&					GetObjectPtrConstRef() const;
+
+		template<typename ZEObjecType>
+		const ZEObjecType&				GetObject() const;
+		
+		template<typename ZEObjecType>
+		ZEObjecType&					GetObjectRef() const;
+
+		template<typename ZEObjecType>
+		const ZEObjecType&				GetObjectConstRef() const;		
+
+		template<typename ZEItemType>
+		const ZEArray<ZEItemType>&		GetArray() const;
+		template<typename ZEItemType>
+		ZEArray<ZEItemType>&			GetArrayRef() const;
+		template<typename ZEItemType>
+		const ZEArray<ZEItemType>&		GetArrayConstRef() const;
+
+		ZEClass*						GetClass() const;
+		ZEClass*&						GetClassRef() const;
+		ZEClass* const& 				GetClassConstRef() const;
+
+		ZEValue							GetValue();
+
+										ZEVariant();
+										explicit ZEVariant(const ZEValue& Value);
+										explicit ZEVariant(const ZEReference& Reference);
+										ZEVariant(const ZEVariant& Value);
+										ZEVariant(const char* Value);
+										ZEVariant(const ZEString& Value);
+										ZEVariant(ZEInt8 Value);
+										ZEVariant(ZEInt16 Value);
+										ZEVariant(ZEInt32 Value);
+										ZEVariant(ZEInt64 Value);
+										ZEVariant(ZEUInt8 Value);
+										ZEVariant(ZEUInt16 Value);
+										ZEVariant(ZEUInt32 Value);
+										ZEVariant(ZEUInt64 Value);
+										ZEVariant(float Value);
+										ZEVariant(double Value);
+										ZEVariant(bool Value);
+										ZEVariant(const ZEVector2& Value);
+										ZEVariant(const ZEVector3& Value);
+										ZEVariant(const ZEVector4& Value);
+										ZEVariant(const ZEQuaternion& Value);
+										ZEVariant(const ZEMatrix3x3& Value);
+										ZEVariant(const ZEMatrix4x4& Value);
+										
+										template<typename ZEObjectType>
+										ZEVariant(const ZEObjectType& Value);
+										ZEVariant(ZEObject* Value);
+
+										template<typename ZEArrayType>
+										ZEVariant(const ZEArray<ZEArrayType>& Value);
+
+										ZEVariant(ZEClass* Class);
+										~ZEVariant();
 };
 
+template<typename ZETypeInstance>
+void* ZEVariant::ClonerTemplate(const void* Instance)
+{
+	return new ZETypeInstance(*(const ZETypeInstance*)Instance);
+}
+
+template<typename ZETypeInstance>
+void ZEVariant::DeleterTemplate(void* Instance)
+{
+	delete (ZETypeInstance*)Instance;
+}
+
+template<typename ZEItemType>
+void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array)
+{
+	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
+	if (Type.Type == ZE_TT_UNDEFINED)
+		return;
+
+	if (Type.ContainerType == ZE_CT_NONE)
+		zeCriticalError("Array to arrays are not supported.");
+
+	if (Type.TypeQualifier != ZE_TQ_VALUE)
+		zeCriticalError("Only value or object pointer type arrays supported.");
+
+	Type.TypeQualifier = ZE_TQ_VALUE;
+	Type.ContainerType = ZE_CT_ARRAY;
+
+	SetType(Type);
+	Cloner = &ClonerTemplate<ZEArray<ZEItemType> >;
+	Deleter = &DeleterTemplate<ZEArray<ZEItemType> >;
+	Value.Pointer = new ZEArray<ZEItemType>(Array);
+}
+
+template<typename ZEItemType>
+void ZEVariant::SetArrayRef(ZEArray<ZEItemType>& Array)
+{
+	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
+	if (Type.Type == ZE_TT_UNDEFINED)
+		return;
+
+	if (Type.ContainerType == ZE_CT_NONE)
+		zeCriticalError("Array to arrays are not supported.");
+
+	if (Type.TypeQualifier != ZE_TQ_VALUE)
+		zeCriticalError("Only value or object pointer type arrays supported.");
+
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	Type.ContainerType = ZE_CT_ARRAY;
+
+	SetType(Type);
+	Value.Pointer = &Array;
+}
+
+template<typename ZEItemType>
+void ZEVariant::SetArrayRefConst(const ZEArray<ZEItemType>& Array)
+{
+	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
+	
+	if (Type.Type == ZE_TT_UNDEFINED)
+		return;
+	
+	if (Type.ContainerType == ZE_CT_NONE)
+		zeCriticalError("Array to arrays are not supported.");
+
+	if (Type.TypeQualifier != ZE_TQ_VALUE)
+		zeCriticalError("Only value or object pointer type arrays supported.");
+
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	Type.ContainerType = ZE_CT_ARRAY;
+	
+	SetType(Type);
+	Value.Pointer = const_cast<ZEArray<ZEItemType>*>(&Array);
+}
+
+template<typename ZEObjectType>
+void ZEVariant::SetObject(const ZEObjectType& Object)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_OBJECT;
+	Type.TypeQualifier = ZE_TQ_VALUE;
+	Type.Class = Object.GetClass();
+	SetType(Type);
+
+	Cloner = ClonerTemplate<ZEObjectType>;
+	Deleter = DeleterTemplate<ZEObjectType>;
+
+	Value.Pointer = new ZEObjectType(Object);
+}
+
+template<typename ZEObjectType>
+void ZEVariant::SetObjectRef(ZEObjectType& Object)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_OBJECT;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	Type.Class = Object.GetClass();
+	SetType(Type);
+
+	Value.Pointer = &Object;
+}
+
+template<typename ZEObjectType>
+void ZEVariant::SetObjectConstRef(const ZEObjectType& Object)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_OBJECT;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	Type.Class = Object.GetClass();
+	SetType(Type);
+
+	Value.Pointer = const_cast<ZEObjectType*>(&Object);
+}
+
+template<typename ZEItemType>
+const ZEArray<ZEItemType>& ZEVariant::GetArray() const
+{
+	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
+	if (ValueType.Type != ZE_TT_ARRAY || ValueType.SubType != Type.SubType)
+		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
+
+	return *(const ZEArray<ZEItemType>*)Value.Pointer;
+}
+
+template<typename ZEItemType>
+ZEArray<ZEItemType>& ZEVariant::GetArrayRef() const
+{
+	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
+	if (ValueType.Type = ZE_TT_ARRAY || ValueType.SubTypeType != Type.Type)
+		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
+
+	if (ValueType.SubTypeQualifier == ZE_TQ_REFERENCE)
+		return *(ZEReturnType*)Value.Pointer;
+	else if (ValueType.SubTypeQualifier == ZE_TQ_CONST_REFERENCE)
+		zeCriticalError("Variant is const reference. Can not convert const reference to reference.");
+
+	return *(ZEArray<ZEItemType>*)Value.Pointer;
+}
+
+template<typename ZEItemType>
+const ZEArray<ZEItemType>& ZEVariant::GetArrayConstRef() const
+{
+	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
+
+	if (ValueType.Type = ZE_TT_ARRAY || ValueType.SubTypeType != Type.Type)
+		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
+
+	return *(const ZEArray<ZEItemType>*)Value.Pointer;
+}
+
+template<typename ZEObjectType>
+const ZEObjectType& ZEVariant::GetObject() const
+{
+	if (ValueType.Type != ZE_TT_OBJECT)
+		zeCriticalError("Value of the variant is not object.");
+
+	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
+		zeCriticalError("Value of the variant is not inherited from Object Type.");
+
+	return *(ZEObjectType*)Value.Pointer;
+}
+
+template<typename ZEObjectType>
+ZEObjectType& ZEVariant::GetObjectRef() const
+{
+	if (ValueType.Type != ZE_TT_OBJECT)
+		zeCriticalError("Value of the variant is not object.");
+
+	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
+		zeCriticalError("Value of the variant is not inherited from Object Type.");
+
+	if (ValueType.TypeQualifier == ZE_TQ_CONST_REFERENCE)
+		zeCriticalError("Value of the variant is const reference.");
+
+	return *(ZEObjectType*)Value.Pointer;
+}
+
+template<typename ZEObjectType>
+const ZEObjectType& ZEVariant::GetObjectConstRef() const
+{
+	if (ValueType.Type != ZE_TT_OBJECT)
+		zeCriticalError("Value of the variant is not object.");
+
+	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
+		zeCriticalError("Value of the variant is not inherited from Object Type.");
+
+	return *(const ZEObjectType*)Value.Pointer;
+}
+
+template<typename ZEObjectType>
+ZEVariant::ZEVariant(const ZEObjectType& Value)
+{
+	SetObject(Value);
+}
+
+template<typename ZEArrayType>
+ZEVariant::ZEVariant(const ZEArray<ZEArrayType>& Value)
+{
+	SetArray(Value);
+}
 
 #pragma warning(pop)
 #endif

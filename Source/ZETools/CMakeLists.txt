@@ -45,5 +45,7 @@ ze_add_module(ZEFontBaker)
 ze_add_module(ZEToolComponents)
 ze_add_module(ZECrashReport)
 ze_add_module(ZEProtectActivator)
+ze_add_module(ZESceneConverter)
+ze_add_module(ZEMLEditor)
 
 ze_add_cmake_project(ZETools)

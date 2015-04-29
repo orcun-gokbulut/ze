@@ -38,14 +38,14 @@
 #define __ZE_MATH_VECTOR_H__
 
 #include <ZETypes.h>
-
-class ZEMatrix3x3;
-class ZEMatrix4x4;
+#include "ZEMeta/ZEBuiltIn.h"
 
 // ZEVector2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector2
 {
+	ZE_BUILTIN_OBJECT
+
 	public:
 		union
 		{
@@ -64,11 +64,10 @@ class ZEVector2
 		static const ZEVector2		MaxValue;
 		static const ZEVector2		MinValue;
 
-		void						Create(float x, float y);
-		void						Create(const ZEVector2 &Start, const ZEVector2 &End);
-
-		void						CreateFromPolar(float Radius, float Theta);
-		void						ConvertToPolar(float& Radius, float& Theta);
+		static void					Create(ZEVector2& Out, float x, float y);
+		static void					Create(ZEVector2& Out, const ZEVector2 &Start, const ZEVector2 &End);
+		static void					CreateFromPolar(ZEVector2& Out, float Radius, float Theta);
+		static void					ConvertToPolar(ZEVector2& In, float& Radius, float& Theta);
 
 		static void					Add(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B);
 		static void					Substution(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B);
@@ -138,11 +137,12 @@ class ZEVector2
 
 ZEVector2 operator*(float S, const ZEVector2& RightOperand);
 
-
 // ZEVector3
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector3
 {
+	ZE_BUILTIN_OBJECT
+
 	public:
 		union
 		{
@@ -260,11 +260,12 @@ class ZEVector3
 
 ZEVector3 operator*(float S, const ZEVector3& RightOperand);
 
-
 // ZEVector4
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector4
 {
+	ZE_BUILTIN_OBJECT
+
 	public:
 		union
 		{
@@ -288,8 +289,8 @@ class ZEVector4
 		static const ZEVector4		MaxValue;
 		static const ZEVector4		MinValue;
 
-		void						Create(float x, float y, float z, float w);
-		void						Create(const ZEVector4 &Start, const ZEVector4 &End);
+		static void					Create(ZEVector4& Out, float x, float y, float z, float w);
+		static void					Create(ZEVector4& Out, const ZEVector4 &Start, const ZEVector4 &End);
 
 		static void					Add(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B);
 		static void					Sub(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B);

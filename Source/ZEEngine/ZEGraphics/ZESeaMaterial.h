@@ -38,6 +38,7 @@
 #define __ZE_SEA_MATERIAL_H__
 
 #include "ZEMaterial.h"
+#include "ZEMath/ZEVector.h"
 
 class ZETexture2D;
 
@@ -45,6 +46,8 @@ class ZESeaMaterial : public ZEMaterial
 {
 	friend class ZESea;
 	friend class ZED3D9Module;
+
+	ZE_OBJECT
 	
 	protected:
 

@@ -384,7 +384,7 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 	}
 
 	File->Flush();
-	zeLog("Saved successfully : \"%s\".", ZEFileInfo::GetFileName(File->GetPath()).ToCString());
+	zeLog("Saved successfully : \"%s\".", ZEFileInfo(File->GetPath()).GetFileName().ToCString());
 	return true;
 }
 

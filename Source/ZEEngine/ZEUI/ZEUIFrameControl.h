@@ -48,6 +48,8 @@ class ZEUIFrameControl : public ZEUIControl
 	friend class ZEUIHorizontalScrollbar;
 	friend class ZEUIScrollArea;
 
+	ZE_OBJECT
+
 	protected:
 
 		ZEUIRectangle		Frame;

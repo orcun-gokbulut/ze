@@ -60,9 +60,12 @@
 #include "ZEGame/ZEGame.h"
 #include "ZECrashHandler.h"
 
+#include "ZEMeta/ZEProvider.h"
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <time.h>
+
 
 ZEOptionSection ZECore::CoreOptions; 
 
@@ -525,6 +528,23 @@ void ZECore::DeinitializeModules()
 	}
 }
 
+void ZECore::LoadClasses()
+{
+	#undef RegisterClass
+
+	#define ZE_META_REGISTER_ENUM(Name) ZEEnumerator* Name ## _Declaration();
+	#define ZE_META_REGISTER_CLASS(Name) ZEClass* Name ## _Class();
+	#include "../ZEMetaRegister.h"
+	#undef ZE_META_REGISTER_ENUM
+	#undef ZE_META_REGISTER_CLASS
+	
+	#define ZE_META_REGISTER_ENUM(Name) ZEProvider::GetInstance()->RegisterEnumerator(Name ## _Declaration());
+	#define ZE_META_REGISTER_CLASS(Name) ZEProvider::GetInstance()->RegisterClass(Name ## _Class());
+	#include "../ZEMetaRegister.h"
+	#undef ZE_META_REGISTER_ENUM
+	#undef ZE_META_REGISTER_CLASS
+}
+
 bool ZECore::StartUp(void* WindowHandle)
 {
 	CrashHandler->Initialize();
@@ -539,6 +559,9 @@ bool ZECore::StartUp(void* WindowHandle)
 
 	zeLog("Zinek Engine %s.", ZEVersion::GetZinekVersion().GetLongString());
 	zeLog("Initializing core...");
+
+	zeLog("Loading ZEMeta classes.");
+	LoadClasses();
 
 	zeLog("Initializing main window...");
 	if (WindowHandle != NULL)
